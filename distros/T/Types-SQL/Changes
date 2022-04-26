@@ -1,5 +1,22 @@
 Revision history for Types-SQL
 
+v0.6.0    2022-04-23 12:53:00+01:00 Europe/London
+  [Enhancements]
+  - Recognise some types from Types::DateTime.
+
+  - Recognise InstanceOf['Date'].
+
+  [Bug Fixes]
+  - Use "timestamp" type instead of "datetime" type for various DateTime-like objects.
+
+  - column_info_from_type will use internally configured types before guessing about the type.
+
+v0.5.0    2022-04-21 17:13:34+01:00 Europe/London
+  [Incompatibilies]
+  - Support for Perls before v5.10 has been removed.
+
+  - Size parameters of 0 will not be overridden, and may throw errors.
+
 v0.4.1    2022-04-21 14:00:49+01:00 Europe/London
   [Bug Fixes]
   - Char with no size parameter should default to 1. N.B. this may be an incompatible change.

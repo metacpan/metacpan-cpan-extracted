@@ -261,13 +261,6 @@ sub build_exe_file {
   my $spvm_core_objects = $self->compile_spvm_core_sources;
   push @$object_files, @$spvm_core_objects;
 
-  # Create SPMV module C source_files
-  $self->create_spvm_module_sources;
-
-  # Compile SPVM compiler and runtime C source files
-  my $spvm_module_objects = $self->compile_spvm_module_sources;
-  push @$object_files, @$spvm_module_objects;
-
   # Create precompile C source_files
   $self->create_precompile_sources;
   
@@ -375,38 +368,22 @@ sub compile_source_file {
   return $object_file_info;
 }
 
-sub create_bootstrap_source {
+sub create_bootstrap_header_source {
   my ($self) = @_;
-  
+
   # Builder
   my $builder = $self->builder;
-  
+
   # Class name
   my $class_name = $self->class_name;
-  
-  # Class names
-  my $class_names_exclude_anon = $builder->get_class_names_exclude_anon;
-  
-  # Module files - Input
-  my $module_files = [];
-  for my $class_name (@$class_names_exclude_anon) {
-    my $module_file = $builder->get_module_file($class_name);
-    push @$module_files, $module_file;
-  }
-  
-  # Source file - Output
-  my $build_src_dir = $self->builder->create_build_src_path;
-  my $target_perl_class_name = "SPVM::$class_name";
-  my $boot_base = $target_perl_class_name;
-  $boot_base =~ s|::|/|g;
-  my $boot_source_file = "$build_src_dir/$boot_base.boot.c";
 
-  # Source creating callback
-  my $create_cb = sub {
-    
-    my $boot_source = '';
-    
-    $boot_source .= <<'EOS';
+  # Class names
+  my $class_names = $self->builder->get_class_names;
+  my $class_names_without_anon = [grep { $_ !~ /::anon::/ } @$class_names];
+
+  my $source = '';
+
+  $source .= <<'EOS';
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -418,41 +395,69 @@ sub create_bootstrap_source {
 
 EOS
     
-    $boot_source .= "// module source get functions declaration\n";
-    for my $class_name (@$class_names_exclude_anon) {
+  $source .= "// precompile functions declaration\n";
+  for my $class_name (@$class_names) {
+    my $precompile_method_names = $builder->get_method_names($class_name, 'precompile');
+    for my $method_name (@$precompile_method_names) {
       my $class_cname = $class_name;
       $class_cname =~ s/::/__/g;
-      $boot_source .= <<"EOS";
-const char* SPMODSRC__${class_cname}__get_module_source();
-EOS
-    }
-
-    my $class_names = $self->builder->get_class_names;
-    $boot_source .= "// precompile functions declaration\n";
-    for my $class_name (@$class_names) {
-      my $precompile_method_names = $builder->get_method_names($class_name, 'precompile');
-      for my $method_name (@$precompile_method_names) {
-        my $class_cname = $class_name;
-        $class_cname =~ s/::/__/g;
-        $boot_source .= <<"EOS";
+      $source .= <<"EOS";
 int32_t SPVMPRECOMPILE__${class_cname}__$method_name(SPVM_ENV* env, SPVM_VALUE* stack);
 EOS
-      }
     }
+  }
 
-    $boot_source .= "// native functions declaration\n";
-    for my $class_cname (@$class_names_exclude_anon) {
-      my $native_method_names = $builder->get_method_names($class_cname, 'native');
-      for my $method_name (@$native_method_names) {
-        my $class_cname = $class_cname;
-        $class_cname =~ s/::/__/g;
-        $boot_source .= <<"EOS";
+  $source .= "// native functions declaration\n";
+  for my $class_cname (@$class_names_without_anon) {
+    my $native_method_names = $builder->get_method_names($class_cname, 'native');
+    for my $method_name (@$native_method_names) {
+      my $class_cname = $class_cname;
+      $class_cname =~ s/::/__/g;
+      $source .= <<"EOS";
 int32_t SPVM__${class_cname}__$method_name(SPVM_ENV* env, SPVM_VALUE* stack);
 EOS
-      }
     }
-    
-    $boot_source .= <<"EOS";
+  }
+
+  $source .= "static int32_t* SPVM_BOOTSTRAP_create_bootstrap_set_precompile_method_addresses(SPVM_ENV* env);\n";
+
+  $source .= "static int32_t* SPVM_BOOTSTRAP_create_bootstrap_set_native_method_addresses(SPVM_ENV* env);\n";
+
+  $source .= "static int32_t* SPVM_BOOTSTRAP_get_spvm_32bit_codes();\n";
+
+  $source .= <<"EOS";
+static int32_t* SPVM_BOOTSTRAP_set_native_method_address(SPVM_ENV* env, const char* class_name, const char* method_name, void* native_address) {
+  int32_t method_id = env->api->runtime->get_method_id_by_name(env->runtime, class_name, method_name);
+  env->api->runtime->set_native_method_address(env->runtime, method_id, native_address);
+}
+EOS
+
+  $source .= <<"EOS";
+static int32_t* SPVM_BOOTSTRAP_set_precompile_method_address(SPVM_ENV* env, const char* class_name, const char* method_name, void* precompile_address) {
+  int32_t method_id = env->api->runtime->get_method_id_by_name(env->runtime, class_name, method_name);
+  env->api->runtime->set_precompile_method_address(env->runtime, method_id, precompile_address);
+}
+EOS
+
+  return $source;
+}
+
+sub create_bootstrap_main_func_source {
+  my ($self) = @_;
+
+  # Builder
+  my $builder = $self->builder;
+
+  # Class name
+  my $class_name = $self->class_name;
+
+  # Class names
+  my $class_names = $self->builder->get_class_names;
+  my $class_names_without_anon = [grep { $_ !~ /::anon::/ } @$class_names];
+
+  my $source = '';
+
+  $source .= <<"EOS";
 
 int32_t main(int32_t argc, const char *argv[]) {
 
@@ -509,137 +514,221 @@ int32_t main(int32_t argc, const char *argv[]) {
 
   return status;
 }
+EOS
 
+  return $source;
+}
+
+sub create_bootstrap_get_spvm_32bit_codes_func_source {
+  my ($self) = @_;
+
+  # Builder
+  my $builder = $self->builder;
+
+  my $spvm_32bit_codes = $builder->get_spvm_32bit_codes;
+  my $spvm_32bit_codes_length = @$spvm_32bit_codes;
+  my $source = '';
+  
+  my $spvm_32bit_codes_str = join(",", @$spvm_32bit_codes);
+
+  $source .= "static int32_t SPVM_BOOTSTRAP_spvm_32bit_codes[$spvm_32bit_codes_length] = {$spvm_32bit_codes_str};\n";
+
+  $source .= <<"EOS";
+static int32_t* SPVM_BOOTSTRAP_get_spvm_32bit_codes() {
+  return SPVM_BOOTSTRAP_spvm_32bit_codes;
+}
+EOS
+  
+  return $source;
+}
+
+sub create_bootstrap_new_env_prepared_func_source {
+  my ($self) = @_;
+
+  # Builder
+  my $builder = $self->builder;
+
+  # Class name
+  my $class_name = $self->class_name;
+
+  # Class names
+  my $class_names = $self->builder->get_class_names;
+  my $class_names_without_anon = [grep { $_ !~ /::anon::/ } @$class_names];
+
+  my $source = '';
+  
+  $source .= <<"EOS";
 SPVM_ENV* SPVM_NATIVE_new_env_prepared() {
 EOS
 
-    $boot_source .= <<"EOS";
-  // Class name
-  const char* class_name = "$class_name";
-EOS
-
-    $boot_source .= <<'EOS';
+  $source .= <<'EOS';
 
   // Create env
   SPVM_ENV* env = SPVM_NATIVE_new_env_raw();
-  
-  // Create compiler
-  void* compiler = env->api->compiler->new_compiler();
 
-  env->api->compiler->set_start_file(compiler, class_name);
-
-  // Set module source_files
-EOS
-    
-    for my $class_name (@$class_names_exclude_anon) {
-      my $class_cname = $class_name;
-      $class_cname =~ s/::/__/g;
-      
-      $boot_source .= "  {\n";
-      $boot_source .= "    const char* module_source = SPMODSRC__${class_cname}__get_module_source();\n";
-      $boot_source .= qq(    env->api->compiler->set_module_source_by_name(compiler, "$class_name", module_source);\n);
-      $boot_source .= "  }\n";
-    }
-    $boot_source .= "\n";
-
-    $boot_source .= <<'EOS';
-
-  int32_t compile_error_code = env->api->compiler->compile_spvm(compiler, class_name);
-
-  if (compile_error_code != 0) {
-    int32_t error_messages_length = env->api->compiler->get_error_messages_length(compiler);
-    for (int32_t i = 0; i < error_messages_length; i++) {
-      const char* error_message = env->api->compiler->get_error_message(compiler, i);
-      fprintf(stderr, "%s\n", error_message);
-    }
-    exit(255);
-  }
-
-  // Build runtime information
+  // New runtime
   void* runtime = env->api->runtime->new_runtime(env);
-  env->api->compiler->build_runtime(compiler, runtime);
-
-EOS
-    
-    $boot_source .= <<'EOS';
-    
-  // Free compiler
-  env->api->compiler->free_compiler(compiler);
+  
+  // Runtime allocator
+  void* runtime_allocator = env->api->runtime->get_allocator(runtime);
+  
+  // Create SPVM 32bit codes
+  int32_t* spvm_32bit_codes = SPVM_BOOTSTRAP_get_spvm_32bit_codes();
+  
+  // Build runtime
+  env->api->runtime->build(runtime, spvm_32bit_codes);
 
   // Prepare runtime
   env->api->runtime->prepare(runtime);
 
   // Set runtime information
   env->runtime = runtime;
-  
+
   // Initialize env
   env->init_env(env);
+
+  // Set precompile method addresses
+  SPVM_BOOTSTRAP_create_bootstrap_set_precompile_method_addresses(env);
   
-EOS
-
-    for my $class_name (@$class_names) {
-      my $class_cname = $class_name;
-      $class_cname =~ s/::/__/g;
-      
-      my $precompile_method_names = $builder->get_method_names($class_name, 'precompile');
-      
-      for my $precompile_method_name (@$precompile_method_names) {
-        $boot_source .= <<"EOS";
-  { 
-    const char* class_name = "$class_name";
-    const char* method_name = "$precompile_method_name";
-    int32_t method_id = env->api->runtime->get_method_id_by_name(env->runtime, class_name, method_name);
-    void* precompile_address = SPVMPRECOMPILE__${class_cname}__$precompile_method_name;
-    env->api->runtime->set_precompile_method_address(env->runtime, method_id, precompile_address);
-  }
-EOS
-      }
-    }
-
-    for my $class_name (@$class_names_exclude_anon) {
-      my $class_cname = $class_name;
-      $class_cname =~ s/::/__/g;
-      
-      my $native_method_names = $builder->get_method_names($class_name, 'native');
-      
-      for my $native_method_name (@$native_method_names) {
-        $boot_source .= <<"EOS";
-  { 
-    const char* class_name = "$class_name";
-    const char* method_name = "$native_method_name";
-    int32_t method_id = env->api->runtime->get_method_id_by_name(env->runtime, class_name, method_name);
-    void* native_address = SPVM__${class_cname}__$native_method_name;
-    env->api->runtime->set_native_method_address(env->runtime, method_id, native_address);
-  }
-EOS
-      }
-    }
-
-    $boot_source .= <<'EOS';
+  // Set native method addresses
+  SPVM_BOOTSTRAP_create_bootstrap_set_native_method_addresses(env);
   
   env->call_init_blocks(env);
   
   return env;
 }
 EOS
+  
+  return $source;
+}
 
-    my $build_dir = $self->builder->build_dir;
+sub create_bootstrap_set_precompile_method_addresses_func_source {
+  my ($self) = @_;
+
+  # Builder
+  my $builder = $self->builder;
+
+  # Class names
+  my $class_names = $self->builder->get_class_names;
+
+  my $source = '';
+
+  $source .= "static int32_t* SPVM_BOOTSTRAP_create_bootstrap_set_precompile_method_addresses(SPVM_ENV* env){\n";
+
+  for my $class_name (@$class_names) {
+    my $class_cname = $class_name;
+    $class_cname =~ s/::/__/g;
+    
+    my $precompile_method_names = $builder->get_method_names($class_name, 'precompile');
+    
+    for my $precompile_method_name (@$precompile_method_names) {
+      $source .= <<"EOS";
+  SPVM_BOOTSTRAP_set_precompile_method_address(env, "$class_name", "$precompile_method_name", &SPVMPRECOMPILE__${class_cname}__$precompile_method_name);
+EOS
+    }
+  }
+
+  $source .= "}\n";
+  
+  return $source;
+}
+
+sub create_bootstrap_set_native_method_addresses_func_source {
+  my ($self) = @_;
+
+  # Builder
+  my $builder = $self->builder;
+
+  # Class names
+  my $class_names = $self->builder->get_class_names;
+
+  my $source = '';
+
+  $source .= "static int32_t* SPVM_BOOTSTRAP_create_bootstrap_set_native_method_addresses(SPVM_ENV* env){\n";
+
+  for my $class_name (@$class_names) {
+    my $class_cname = $class_name;
+    $class_cname =~ s/::/__/g;
+    
+    my $native_method_names = $builder->get_method_names($class_name, 'native');
+    
+    for my $native_method_name (@$native_method_names) {
+      $source .= <<"EOS";
+  SPVM_BOOTSTRAP_set_native_method_address(env, "$class_name", "$native_method_name", &SPVM__${class_cname}__$native_method_name);
+EOS
+    }
+  }
+
+  $source .= "}\n";
+  
+  return $source;
+}
+
+sub create_bootstrap_source {
+  my ($self) = @_;
+  
+  # Builder
+  my $builder = $self->builder;
+  
+  # Class name
+  my $class_name = $self->class_name;
+  
+  # Class names
+  my $class_names = $builder->get_class_names;
+  my $class_names_without_anon = [grep { $_ !~ /::anon::/ } @$class_names];
+  
+  # Module files - Input
+  my $module_files = [];
+  for my $class_name (@$class_names_without_anon) {
+    my $module_file = $builder->get_module_file($class_name);
+    push @$module_files, $module_file;
+  }
+  
+  # Source file - Output
+  my $build_src_dir = $self->builder->create_build_src_path;
+  my $target_perl_class_name = "SPVM::$class_name";
+  my $bootstrap_base = $target_perl_class_name;
+  $bootstrap_base =~ s|::|/|g;
+  my $bootstrap_source_file = "$build_src_dir/$bootstrap_base.boot.c";
+
+  # Source creating callback
+  my $create_cb = sub {
+    
+    my $bootstrap_source = '';
+    
+    # Header
+    $bootstrap_source .= $self->create_bootstrap_header_source;
+    
+    # main function
+    $bootstrap_source .= $self->create_bootstrap_main_func_source;
+
+    # SPVM_NATIVE_new_env_prepared function
+    $bootstrap_source .= $self->create_bootstrap_new_env_prepared_func_source;
+
+    # Set precompile method addresses function
+    $bootstrap_source .= $self->create_bootstrap_set_precompile_method_addresses_func_source;
+
+    # Set native method addresses function
+    $bootstrap_source .= $self->create_bootstrap_set_native_method_addresses_func_source;
+
+    # get_spvm_32bit_codes function
+    $bootstrap_source .= $self->create_bootstrap_get_spvm_32bit_codes_func_source;
 
     # Build source directory
     my $build_src_dir = $self->builder->create_build_src_path;
     mkpath $build_src_dir;
-    mkpath dirname $boot_source_file;
+    mkpath dirname $bootstrap_source_file;
     
-    open my $boot_source_fh, '>', $boot_source_file
-      or die "Can't open file $boot_source_file:$!";
+    open my $bootstrap_source_fh, '>', $bootstrap_source_file
+      or die "Can't open file $bootstrap_source_file:$!";
 
-    print $boot_source_fh $boot_source;
+    print $bootstrap_source_fh $bootstrap_source;
   };
   
   # Create source file
   $self->create_source_file({
     input_files => [@$module_files, __FILE__],
-    output_file => $boot_source_file,
+    output_file => $bootstrap_source_file,
     create_cb => $create_cb,
   });
 }
@@ -709,97 +798,6 @@ sub compile_spvm_core_sources {
   return $object_file_infos;
 }
 
-sub create_spvm_module_sources {
-  my ($self) = @_;
-  
-  # Builder
-  my $builder = $self->builder;
-  
-  # Compiled class names
-  my $class_names_exclude_anon = $builder->get_class_names_exclude_anon;
-  
-  for my $class_name (@$class_names_exclude_anon) {
-    
-    # Moudle file - Input
-    my $module_file = $builder->get_module_file($class_name);
-    
-    # Source file - Output
-    my $build_dir = $self->builder->build_dir;
-    my $build_src_dir = $self->builder->create_build_src_path;
-    my $perl_class_name = "SPVM::$class_name";
-    my $module_source_base = $perl_class_name;
-    $module_source_base =~ s|::|/|g;
-    my $module_source_source_file = "$build_src_dir/$module_source_base.modsrc.c";
-    
-    # Source creating callback
-    my $create_cb = sub {
-      # This source is UTF-8 binary
-      my $module_source = $builder->get_module_source_by_name($class_name);
-      my $module_source_c_hex = $module_source;
-      
-      # Escape to Hex C launguage string literal
-      $module_source_c_hex =~ s/(.)/$_ = sprintf("\\x%02X", ord($1));$_/ges;
-      
-      # native class name
-      my $class_cname = $class_name;
-      $class_cname =~ s/::/__/g;
-
-      my $get_module_source_source = <<"EOS";
-static const char* module_source = "$module_source_c_hex";
-const char* SPMODSRC__${class_cname}__get_module_source() {
-return module_source;
-}
-EOS
-      mkpath dirname $module_source_source_file;
-      
-      open my $module_source_source_fh, '>', $module_source_source_file
-        or die "Can't open file $module_source_source_file:$!";
-
-      print $module_source_source_fh $get_module_source_source;
-    };
-    
-    # Create source file
-    $self->create_source_file({
-      input_files => [$module_file, __FILE__],
-      output_file => $module_source_source_file,
-      create_cb => $create_cb,
-    });
-  }
-}
-
-sub compile_spvm_module_sources {
-  my ($self) = @_;
-  
-  my $builder = $self->builder;
-  
-  # Compile module source files
-  my $class_names_exclude_anon = $builder->get_class_names_exclude_anon;
-  my $object_file_infos = [];
-  for my $class_name (@$class_names_exclude_anon) {
-    my $perl_class_name = "SPVM::$class_name";
-    
-    # Build source directory
-    my $build_src_dir = $self->builder->create_build_src_path;
-    
-    # Create source directory
-    my $class_name_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file($perl_class_name);
-    my $source_file = "$build_src_dir/$class_name_rel_file.modsrc.c";
-    mkpath dirname $source_file;
-    
-    # Create object directory
-    my $build_object_dir = $self->builder->create_build_object_path;
-    mkpath $build_object_dir;
-    my $object_file = "$build_object_dir/$class_name_rel_file.modsrc.o";
-    mkpath dirname $object_file;
-    
-    # Compile
-    my $object_file_info = $self->compile_source_file({source_file => $source_file, output_file => $object_file});
-    push @$object_file_infos, $object_file_info;
-  }
-  
-  return $object_file_infos;
-}
-
 sub create_precompile_sources {
   my ($self) = @_;
 
@@ -818,8 +816,9 @@ sub create_precompile_sources {
     force => $self->force,
   );
 
-  my $class_names_exclude_anon = $builder->get_class_names_exclude_anon;
-  for my $class_name (@$class_names_exclude_anon) {
+  my $class_names = $builder->get_class_names;
+  my $class_names_without_anon = [grep { $_ !~ /::anon::/ } @$class_names];
+  for my $class_name (@$class_names_without_anon) {
     my $precompile_method_names = $builder->get_method_names($class_name, 'precompile');
     if (@$precompile_method_names) {
       
@@ -854,9 +853,10 @@ sub compile_precompile_sources {
     force => $self->force,
   );
   
-  my $class_names_exclude_anon = $builder->get_class_names_exclude_anon;
+  my $class_names = $builder->get_class_names;
+  my $class_names_without_anon = [grep { $_ !~ /::anon::/ } @$class_names];
   my $object_files = [];
-  for my $class_name (@$class_names_exclude_anon) {
+  for my $class_name (@$class_names_without_anon) {
     my $precompile_method_names = $builder->get_method_names($class_name, 'precompile');
     if (@$precompile_method_names) {
       my $src_dir = $self->builder->create_build_src_path;
@@ -898,9 +898,10 @@ sub compile_native_sources {
     force => $self->force,
   );
   
-  my $class_names_exclude_anon = $builder->get_class_names_exclude_anon;
+  my $class_names = $builder->get_class_names;
+  my $class_names_without_anon = [grep { $_ !~ /::anon::/ } @$class_names];
   my $all_object_files = [];
-  for my $class_name (@$class_names_exclude_anon) {
+  for my $class_name (@$class_names_without_anon) {
 
     my $perl_class_name = "SPVM::$class_name";
     

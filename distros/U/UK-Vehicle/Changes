@@ -1,0 +1,18 @@
+Revision history for Perl extension UK::Vehicle.
+
+0.4 Tue Apr 26 14:41:00 2022
+    - Remove version from README
+    - Set time correctly when DST is in use
+    - Test spelling fixes
+
+0.3 Mon Apr 25 19:02:00 2022
+    - Add motExpiryDate() method
+    - Documentation fixes
+    - Fix tests that check API data that is constantly changing
+
+0.2 Thu Apr 21 17:25:00 2022
+    - Documentation fixes
+
+0.1 Tue Apr 19 16:47:07 2022
+	- first version
+

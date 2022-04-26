@@ -62,7 +62,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.24';
+our $VERSION = '1.25';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -110,6 +110,8 @@ sub _MIN_VERSION_FOR_SCRIPT_WO_ARGS { return 60 }
 sub _MIN_VERSION_FOR_MODERN_GO      { return 31 }
 sub _MIN_VERSION_FOR_MODERN_SWITCH  { return 90 }
 sub _ACTIVE_UPDATE_XML_FILE_NAME    { return 'active-update.xml' }
+sub _NUMBER_OF_CHARS_IN_TEMPLATE    { return 11 }
+sub _DEFAULT_ADB_PORT               { return 5555 }
 
 # sub _MAGIC_NUMBER_MOZL4Z            { return "mozLz40\0" }
 
@@ -122,7 +124,6 @@ sub _WATERFOX_CLASSIC_VERSION_EQUIV {
 }    # https://github.com/MrAlex94/Waterfox/wiki/Versioning-Guidelines
 
 my $proxy_name_regex = qr/perl_ff_m_\w+/smx;
-my $local_name_regex = qr/firefox_marionette_local_\w+/smx;
 my $tmp_name_regex   = qr/firefox_marionette_(?:remote|local)_\w+/smx;
 my @sig_nums         = split q[ ], $Config{sig_num};
 my @sig_names        = split q[ ], $Config{sig_name};
@@ -185,25 +186,15 @@ sub BY_PARTIAL {
 
 sub _download_directory {
     my ($self) = @_;
-    my $directory;
-    eval {
-        my $context = $self->_context('chrome');
-        $directory =
-          $self->script( 'let branch = Components.classes["' . q[@]
-              . 'mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService).getBranch(""); return branch.getStringPref ? branch.getStringPref("browser.download.downloadDir") : branch.getComplexValue("browser.download.downloadDir", Components.interfaces.nsISupportsString).data;'
-          );
-        $self->_context($context);
-    } or do {
-        chomp $EVAL_ERROR;
-        Carp::carp(
-"Firefox does not support dynamically determining download directory:$EVAL_ERROR"
-        );
-        my $profile =
-          Firefox::Marionette::Profile->parse(
-            File::Spec->catfile( $self->{_profile_directory}, 'prefs.js' ) );
-        $directory = $profile->get_value('browser.download.downloadDir');
-    };
-    if ( $OSNAME eq 'cygwin' ) {
+    my $context = $self->_context('chrome');
+    my $directory =
+      $self->script( 'let branch = Components.classes["' . q[@]
+          . 'mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService).getBranch(""); return branch.getStringPref ? branch.getStringPref("browser.download.downloadDir") : branch.getComplexValue("browser.download.downloadDir", Components.interfaces.nsISupportsString).data;'
+      );
+    $self->_context($context);
+    if ( my $ssh = $self->_ssh() ) {
+    }
+    elsif ( $OSNAME eq 'cygwin' ) {
         $directory = $self->execute( 'cygpath', '-s', '-m', $directory );
     }
     return $directory;
@@ -311,8 +302,11 @@ sub downloads {
 }
 
 sub _setup_adb {
-    my ( $self, $host ) = @_;
-    $self->{_adb} = { host => $host, };
+    my ( $self, $host, $port ) = @_;
+    if ( !defined $port ) {
+        $port = _DEFAULT_ADB_PORT();
+    }
+    $self->{_adb} = { host => $host, port => $port };
     return;
 }
 
@@ -601,6 +595,7 @@ sub _init {
     $self->{last_message_id}  = 0;
     $self->{creation_pid}     = $PROCESS_ID;
     $self->{sleep_time_in_ms} = $parameters{sleep_time_in_ms};
+    $self->{visible}          = $parameters{visible};
     foreach my $type (qw(nightly developer waterfox)) {
         if ( defined $parameters{$type} ) {
             $self->{requested_version}->{$type} = $parameters{$type};
@@ -611,6 +606,8 @@ sub _init {
     }
     $self->{extension_index} = 0;
     $self->{debug}           = $parameters{debug};
+    $self->{ssh_via_host}    = $parameters{via};
+    $self->{reconnect_index} = $parameters{index};
 
     $self->_get_marionette_parameter(%parameters);
     if ( $parameters{console} ) {
@@ -618,7 +615,7 @@ sub _init {
     }
 
     if ( defined $parameters{adb} ) {
-        $self->_setup_adb( $parameters{adb} );
+        $self->_setup_adb( $parameters{adb}, $parameters{port} );
     }
     if ( defined $parameters{host} ) {
         if ( $OSNAME eq 'MSWin32' ) {
@@ -727,6 +724,17 @@ sub _check_reconnecting_firefox_process_is_alive {
     return;
 }
 
+sub _get_local_name_regex {
+    my ($self) = @_;
+    my $local_name_regex = qr/firefox_marionette_local_/smx;
+    if ( $self->{reconnect_index} ) {
+        my $quoted_index = quotemeta $self->{reconnect_index};
+        $local_name_regex = qr/${local_name_regex}${quoted_index}\-/smx;
+    }
+    $local_name_regex = qr/${local_name_regex}\w+/smx;
+    return $local_name_regex;
+}
+
 sub _get_local_reconnect_pid {
     my ($self)         = @_;
     my $temp_directory = File::Spec->tmpdir();
@@ -734,6 +742,8 @@ sub _get_local_reconnect_pid {
       or Firefox::Marionette::Exception->throw(
         "Failed to open directory '$temp_directory':$EXTENDED_OS_ERROR");
     my $alive_pid;
+    my $local_name_regex = $self->_get_local_name_regex();
+
   TEMP_DIR_LISTING: while ( my $tainted_entry = $temp_handle->read() ) {
         next if ( $tainted_entry eq File::Spec->curdir() );
         next if ( $tainted_entry eq File::Spec->updir() );
@@ -2342,13 +2352,12 @@ sub _check_visible {
         && ( defined $parameters{capabilities}->moz_headless() )
         && ( !$parameters{capabilities}->moz_headless() ) )
     {
-        if ( !$parameters{visible} ) {
+        if ( !$self->_visible() ) {
             Carp::carp('Unable to launch firefox with -headless option');
         }
         $self->{visible} = 1;
     }
-    elsif ( $parameters{visible} ) {
-        $self->{visible} = 1;
+    elsif ( $self->_visible() ) {
     }
     else {
         if ( $self->_is_headless_okay() ) {
@@ -2803,12 +2812,19 @@ sub execute {
     }
 }
 
-sub _adb_initialise {
+sub _adb_serial {
     my ($self) = @_;
-    $self->execute( 'adb', 'connect', $self->_adb()->{host} );
-    my $adb_regex = qr/package:(.*(firefox|fennec).*)/smx;
+    my $adb = $self->_adb();
+    return join q[:], $adb->{host}, $adb->{port};
+}
+
+sub _initialise_adb {
+    my ($self) = @_;
+    $self->execute( 'adb', 'connect', $self->_adb_serial() );
+    my $adb_regex = qr/package:(.*(firefox|fennec|fenix).*)/smx;
     my $binary    = 'adb';
-    my @arguments = qw(shell pm list packages);
+    my @arguments =
+      ( qw(-s), $self->_adb_serial(), qw(shell pm list packages) );
     my $package_name;
     foreach my $line ( split /\r?\n/smx, $self->execute( $binary, @arguments ) )
     {
@@ -3017,7 +3033,7 @@ sub _active_update_version {
         my $active_update_handle;
         if ( $self->_ssh() ) {
             $active_update_handle =
-              $self->_get_file_via_scp( { ignore_missing_file => 1 },
+              $self->_get_file_via_scp( { ignore_exit_status => 1 },
                 $active_update_path, _ACTIVE_UPDATE_XML_FILE_NAME() );
         }
         else {
@@ -3056,7 +3072,7 @@ sub _application_ini_config {
             if ( $self->_remote_uname() eq 'darwin' ) {
                 $binary_directory =~ s/Contents\/MacOS$/Contents\/Resources/smx;
             }
-            if ( $self->_remote_uname() eq 'cygwin' ) {
+            elsif ( $self->_remote_uname() eq 'cygwin' ) {
                 $binary_directory =
                   $self->_execute_via_ssh( {}, 'cygpath', '-u',
                     $binary_directory );
@@ -3065,10 +3081,19 @@ sub _application_ini_config {
             $application_ini_path =
               $self->_catfile( $binary_directory, $application_ini_name );
             $application_ini_handle =
-              $self->_get_file_via_scp( { ignore_missing_file => 1 },
+              $self->_get_file_via_scp( { ignore_exit_status => 1 },
                 $application_ini_path, $application_ini_name );
         }
         else {
+            if ( $OSNAME eq 'darwin' ) {
+                $binary_directory =~ s/Contents\/MacOS$/Contents\/Resources/smx;
+            }
+            elsif ( $OSNAME eq 'cygwin' ) {
+                if ( defined $binary_directory ) {
+                    $binary_directory =
+                      $self->execute( 'cygpath', '-u', $binary_directory );
+                }
+            }
             $application_ini_path =
               File::Spec->catfile( $binary_directory, $application_ini_name );
             $application_ini_handle =
@@ -3130,6 +3155,16 @@ sub _initialise_version {
     return;
 }
 
+sub _adb_package_name {
+    my ($self) = @_;
+    return $self->{adb_package_name};
+}
+
+sub _adb_component_name {
+    my ($self) = @_;
+    return join q[.], $self->_adb_package_name, q[App];
+}
+
 sub _get_version {
     my ($self) = @_;
     my $binary = $self->_binary();
@@ -3137,9 +3172,10 @@ sub _get_version {
     my $version_string;
     my $version_regex = qr/(\d+)[.](\d+(?:\w\d+)?)(?:[.](\d+))*/smx;
     if ( $self->_adb() ) {
-        my $package_name = $self->_adb_initialise();
+        my $package_name = $self->_initialise_adb();
         my $dumpsys =
-          $self->execute( 'adb', 'shell', 'dumpsys', 'package', $package_name );
+          $self->execute( 'adb', '-s', $self->_adb_serial(), 'shell',
+            'dumpsys', 'package', $package_name );
         my $found;
         foreach my $line ( split /\r?\n/smx, $dumpsys ) {
             if ( $line =~ /^[ ]+versionName=$version_regex\s*$/smx ) {
@@ -3149,9 +3185,13 @@ sub _get_version {
                 $self->{_initial_version}->{patch} = $3;
             }
         }
-        if ( !$found ) {
-            Firefox::Marionette::Exception->throw(
-"'adb shell dumpsys package $package_name' did not produce output that looks like '^[ ]+versionName=\\d+[.]\\d+([.]\\d+)?\\s*\$':$version_string"
+        if ($found) {
+            $self->{adb_package_name} = $package_name;
+        }
+        else {
+            Firefox::Marionette::Exception->throw( 'adb -s '
+                  . $self->_adb_serial()
+                  . " shell dumpsys package $package_name' did not produce output that looks like '^[ ]+versionName=\\d+[.]\\d+([.]\\d+)?\\s*\$':$version_string"
             );
         }
     }
@@ -3390,6 +3430,7 @@ sub _launch_via_ssh {
     if ( $self->_visible() ) {
         if (   ( $self->_remote_uname() eq 'MSWin32' )
             || ( $self->_remote_uname() eq 'darwin' )
+            || ( $self->_visible() eq 'local' )
             || ( $self->_remote_uname() eq 'cygwin' ) )
         {
         }
@@ -3397,7 +3438,7 @@ sub _launch_via_ssh {
             @arguments = (
                 '-a', '-s',
                 q["] . ( join q[ ], $self->_xvfb_common_arguments() ) . q["],
-                $binary, @arguments
+                $binary, @arguments,
             );
             $binary = 'xvfb-run';
         }
@@ -3407,8 +3448,10 @@ sub _launch_via_ssh {
           or Firefox::Marionette::Exception->throw(
 "Failed to find 'ssh' anywhere in the Path environment variable:$ENV{Path}"
           );
-        my @ssh_arguments =
-          ( $self->_ssh_arguments( env => 1 ), $self->_ssh_address() );
+        my @ssh_arguments = (
+            $self->_ssh_arguments( graphical => 1, env => 1 ),
+            $self->_ssh_address()
+        );
         my $process =
           $self->_start_win32_process( 'ssh', @ssh_arguments,
             $binary, @arguments );
@@ -3429,7 +3472,8 @@ sub _launch_via_ssh {
                 open STDIN, q[<], $dev_null
                   or Firefox::Marionette::Exception->throw(
                     "Failed to redirect STDIN to $dev_null:$EXTENDED_OS_ERROR");
-                $self->_ssh_exec( $self->_ssh_arguments( env => 1 ),
+                $self->_ssh_exec(
+                    $self->_ssh_arguments( graphical => 1, env => 1 ),
                     $self->_ssh_address(), $binary, @arguments )
                   or Firefox::Marionette::Exception->throw(
                     "Failed to exec 'ssh':$EXTENDED_OS_ERROR");
@@ -3460,6 +3504,25 @@ sub _local_firefox_tmp_directory {
     return File::Spec->catdir( $root_directory, 'tmp' );
 }
 
+sub _launch_via_adb {
+    my ( $self, @arguments ) = @_;
+    my $binary         = q[adb];
+    my $package_name   = $self->_adb_package_name();
+    my $component_name = $self->_adb_component_name();
+    @arguments = (
+        (
+            qw(-s),
+            $self->_adb_serial(),
+            qw(shell am start -W -n),
+            ( join q[/], $package_name, $component_name ),
+            qw(--es),
+            q[args -marionette]
+        ),
+    );
+    $self->execute( $binary, @arguments );
+    return;
+}
+
 sub _launch {
     my ( $self, @arguments ) = @_;
     $self->{_initial_arguments} = [];
@@ -3467,6 +3530,10 @@ sub _launch {
         push @{ $self->{_initial_arguments} }, $argument;
     }
     local $ENV{XPCSHELL_TEST_PROFILE_DIR} = 1;
+    if ( $self->_adb() ) {
+        $self->_launch_via_adb(@arguments);
+        return;
+    }
     if ( $self->_ssh() ) {
         $self->{_local_ssh_pid} = $self->_launch_via_ssh(@arguments);
         $self->_wait_for_updating_to_finish();
@@ -4539,39 +4606,40 @@ sub _win32_remote_process_running {
 
 sub _generic_remote_process_running {
     my ( $self, $remote_pid ) = @_;
-    my $binary    = 'kill';
-    my @arguments = ( '-0', $remote_pid );
-    my $dev_null  = File::Spec->devnull();
-    if ( my $pid = fork ) {
-        waitpid $pid, 0;
-        if ( $CHILD_ERROR == 0 ) {
-            $self->{last_remote_alive_status} = 1;
-        }
-        else {
-            $self->{last_remote_alive_status} = 0;
-        }
-    }
-    elsif ( defined $pid ) {
-        eval {
-            $self->_ssh_exec( $self->_ssh_arguments(),
-                $self->_ssh_address(), $binary, @arguments )
-              or Firefox::Marionette::Exception->throw(
-                "Failed to exec 'ssh':$EXTENDED_OS_ERROR");
-        } or do {
-            chomp $EVAL_ERROR;
-            warn "$EVAL_ERROR\n";
-        };
-        exit 1;
+    my $result = $self->_execute_via_ssh( { return_exit_status => 1 },
+        'kill', '-0', $remote_pid );
+    if ( $result == 0 ) {
+        $self->{last_remote_alive_status} = 1;
     }
     else {
-        Firefox::Marionette::Exception->throw(
-            "Failed to fork:$EXTENDED_OS_ERROR");
+        $self->{last_remote_alive_status} = 0;
     }
     return $self->{last_remote_alive_status};
 }
 
 sub alive {
     my ($self) = @_;
+    if ( $self->_adb() ) {
+        my $parameters;
+        my $binary = q[adb];
+        my @arguments =
+          ( qw(-s), $self->_adb_serial(), qw(shell am stack list) );
+        my $handle =
+          $self->_get_local_handle_for_generic_command_output( $parameters,
+            $binary, @arguments );
+        my $quoted_package_name   = quotemeta $self->_adb_package_name();
+        my $quoted_component_name = quotemeta $self->_adb_component_name();
+        my $found                 = 0;
+        while ( my $line = <$handle> ) {
+            if ( $line =~
+/^[ ]+taskId=\d+:[ ]$quoted_package_name\/${quoted_component_name}[ ]+/smx
+              )
+            {
+                $found = 1;
+            }
+        }
+        return $found;
+    }
     if ( my $ssh = $self->_ssh() ) {
         $self->_reap();
         if ( defined $ssh->{pid} ) {
@@ -4853,6 +4921,10 @@ sub _setup_local_connection_to_firefox {
     my $sock_addr;
     my $connected;
     while ( ( !$connected ) && ( $self->alive() ) ) {
+        if ( $self->_adb() ) {
+            Firefox::Marionette::Exception->throw(
+                'TODO: Cannot connect to android yet. Patches welcome');
+        }
         $socket = undef;
         socket $socket,
           $self->_using_unix_sockets_for_ssh_connection()
@@ -4865,6 +4937,7 @@ sub _setup_local_connection_to_firefox {
         next if ( !defined $port );
         $sock_addr ||= $self->_get_sock_addr( $host, $port );
         next if ( !defined $sock_addr );
+
         if ( connect $socket, $sock_addr ) {
             $connected = 1;
         }
@@ -4920,6 +4993,12 @@ sub _ssh_address {
 sub _ssh_arguments {
     my ( $self, %parameters ) = @_;
     my @arguments = ( '-2', );
+    if ( ( $parameters{graphical} ) || ( $parameters{master} ) ) {
+        if ( ( defined $self->_visible() ) && ( $self->_visible() eq 'local' ) )
+        {
+            push @arguments, '-X';
+        }
+    }
     if ( my $ssh = $self->_ssh() ) {
         if ( my $port = $ssh->{port} ) {
             push @arguments, ( '-p' => $port, );
@@ -5015,10 +5094,16 @@ sub root_directory {
 sub _root_directory {
     my ($self) = @_;
     if ( !defined $self->{_root_directory} ) {
+        my $template_prefix = 'firefox_marionette_local_';
+        if ( $self->{reconnect_index} ) {
+            $template_prefix .= $self->{reconnect_index} . q[-];
+        }
+
         my $root_directory = File::Temp->newdir(
             CLEANUP  => 0,
             TEMPLATE => File::Spec->catdir(
-                File::Spec->tmpdir(), 'firefox_marionette_local_XXXXXXXXXXX'
+                File::Spec->tmpdir(),
+                $template_prefix . 'X' x _NUMBER_OF_CHARS_IN_TEMPLATE()
             )
           )
           or Firefox::Marionette::Exception->throw(
@@ -5122,9 +5207,8 @@ sub _setup_profile_directories {
     return;
 }
 
-sub _setup_new_profile {
-    my ( $self, $profile, %parameters ) = @_;
-    $self->_setup_profile_directories($profile);
+sub _new_profile_path {
+    my ($self) = @_;
     my $profile_path;
     if ( $self->_ssh() ) {
         $profile_path =
@@ -5134,7 +5218,13 @@ sub _setup_new_profile {
         $profile_path =
           File::Spec->catfile( $self->{_profile_directory}, 'prefs.js' );
     }
-    $self->{profile_path} = $profile_path;
+    return $profile_path;
+}
+
+sub _setup_new_profile {
+    my ( $self, $profile, %parameters ) = @_;
+    $self->_setup_profile_directories($profile);
+    $self->{profile_path} = $self->_new_profile_path();
     if ($profile) {
         if ( !$profile->download_directory() ) {
             my $download_directory = $self->{_download_directory};
@@ -5247,7 +5337,7 @@ sub _setup_new_profile {
         $self->_save_profile_via_ssh($profile);
     }
     else {
-        $profile->save($profile_path);
+        $profile->save( $self->{profile_path} );
     }
     return $self->{_profile_directory};
 }
@@ -5442,6 +5532,7 @@ sub _get_local_handle_for_generic_command_output {
 
 sub _get_local_command_output {
     my ( $self, $parameters, $binary, @arguments ) = @_;
+    local $SIG{PIPE} = 'IGNORE';
     my $output;
     my $handle;
     if ( $OSNAME eq 'MSWin32' ) {
@@ -5471,16 +5562,23 @@ sub _get_local_command_output {
     }
     defined $result
       or $parameters->{ignore_exit_status}
+      or $parameters->{return_exit_status}
       or Firefox::Marionette::Exception->throw( "Failed to read from $binary "
           . ( join q[ ], @arguments )
           . ":$EXTENDED_OS_ERROR" );
-    $handle->close()
+         $handle->close()
       or $parameters->{ignore_exit_status}
+      or $parameters->{return_exit_status}
       or Firefox::Marionette::Exception->throw( q[Command ']
           . ( join q[ ], $binary, @arguments )
           . q[ did not complete successfully:]
           . $self->_error_message( $binary, $CHILD_ERROR ) );
-    return $output;
+    if ( $parameters->{return_exit_status} ) {
+        return $CHILD_ERROR;
+    }
+    else {
+        return $output;
+    }
 }
 
 sub _ssh_client_version {
@@ -5536,6 +5634,9 @@ sub _ssh_common_arguments {
         '-o' => 'BatchMode=yes',
         '-o' => 'ExitOnForwardFailure=yes',
     );
+    if ( $self->{ssh_via_host} ) {
+        push @arguments, ( '-o' => 'ProxyJump=' . $self->{ssh_via_host} );
+    }
     if (   ( $parameters{master} )
         || ( $parameters{env} ) )
     {
@@ -5582,6 +5683,7 @@ sub _system {
         }
     }
     else {
+        local $SIG{PIPE} = 'IGNORE';
         my $dev_null = File::Spec->devnull();
         $command_line = join q[ ], $binary, @arguments;
         if ( $self->debug() ) {
@@ -5639,11 +5741,14 @@ sub _get_file_via_scp {
     if ( $OSNAME eq 'MSWin32' ) {
         $remote_path = $self->_quoting_for_cmd_exe($remote_path);
     }
+    else {
+        $remote_path = "\"$remote_path\"";
+    }
     my @arguments = (
         $self->_scp_arguments(),
-        $self->_ssh_address() . ":\"$remote_path\"", $local_path,
+        $self->_ssh_address() . ":$remote_path", $local_path,
     );
-    $self->_system( {}, 'scp', @arguments );
+    $self->_system( $parameters, 'scp', @arguments );
     my $handle = FileHandle->new( $local_path, Fcntl::O_RDONLY() );
     if ($handle) {
         binmode $handle;
@@ -5697,9 +5802,12 @@ sub _put_file_via_scp {
     if ( $OSNAME eq 'MSWin32' ) {
         $remote_path = $self->_quoting_for_cmd_exe($remote_path);
     }
+    else {
+        $remote_path = "\"$remote_path\"";
+    }
     my @arguments = (
         $self->_scp_arguments(),
-        $local_path, $self->_ssh_address() . ":\"$remote_path\"",
+        $local_path, $self->_ssh_address() . ":$remote_path",
     );
     $self->_system( {}, 'scp', @arguments );
     unlink $local_path
@@ -5711,6 +5819,8 @@ sub _put_file_via_scp {
 sub _initialise_remote_uname {
     my ($self) = @_;
     if ( defined $self->{_remote_uname} ) {
+    }
+    elsif ( $self->_adb() ) {
     }
     else {
         my $uname;
@@ -5744,8 +5854,8 @@ sub _get_marionette_port_via_ssh {
     my $sandbox_regex = $self->_sandbox_regex();
     $self->_initialise_remote_uname();
     if ( $self->_remote_uname() eq 'MSWin32' ) {
-        $handle =
-          $self->_get_file_via_scp( {}, $self->{profile_path}, 'profile path' );
+        $handle = $self->_get_file_via_scp( { ignore_exit_status => 1 },
+            $self->{profile_path}, 'profile path' );
     }
     else {
         $handle = $self->_search_file_via_ssh(
@@ -8431,14 +8541,24 @@ sub _terminate_local_win32_process {
 
 sub _terminate_marionette_process {
     my ($self) = @_;
-    if ( $OSNAME eq 'MSWin32' ) {
-        $self->_terminate_local_win32_process();
+    if ( $self->_adb() ) {
+        $self->execute(
+            q[adb], qw(-s), $self->_adb_serial(),
+            qw(shell am force-stop),
+            $self->_adb_package_name()
+        );
     }
-    elsif ( my $ssh = $self->_ssh() ) {
-        $self->_terminate_process_via_ssh();
-    }
-    elsif ( ( $self->_firefox_pid() ) && ( kill 0, $self->_firefox_pid() ) ) {
-        $self->_terminate_local_non_win32_process();
+    else {
+        if ( $OSNAME eq 'MSWin32' ) {
+            $self->_terminate_local_win32_process();
+        }
+        elsif ( my $ssh = $self->_ssh() ) {
+            $self->_terminate_process_via_ssh();
+        }
+        elsif ( ( $self->_firefox_pid() ) && ( kill 0, $self->_firefox_pid() ) )
+        {
+            $self->_terminate_local_non_win32_process();
+        }
     }
     return;
 }
@@ -9377,7 +9497,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 1.24
+Version 1.25
 
 =head1 SYNOPSIS
 
@@ -10624,6 +10744,8 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * implicit - a shortcut to allow directly providing the L<implicit|Firefox::Marionette::Timeout#implicit> timeout, instead of needing to use timeouts from the capabilities parameter.  Overrides all longer ways.
 
+=item * index - a parameter to allow the user to specify a specific firefox instance to survive and reconnect to.  It does not do anything else at the moment.  See the survive parameter.
+
 =item * kiosk - start the browser in L<kiosk|https://support.mozilla.org/en-US/kb/firefox-enterprise-kiosk-mode> mode.
 
 =item * mime_types - any MIME types that Firefox will encounter during this session.  MIME types that are not specified will result in a hung browser (the File Download popup will appear).
@@ -10654,7 +10776,9 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * user - if the "host" parameter is also set, use L<ssh|https://man.openbsd.org/ssh.1> to create and automate firefox with the specified user.  See L<REMOTE AUTOMATION OF FIREFOX VIA SSH|Firefox::Marionette#REMOTE-AUTOMATION-OF-FIREFOX-VIA-SSH>.  The user will default to the current user name.
 
-=item * visible - should firefox be visible on the desktop.  This defaults to "0".
+=item * via - specifies a L<proxy jump box|https://man.openbsd.org/ssh_config#ProxyJump> to be used to connect to a remote host.  See the host parameter.
+
+=item * visible - should firefox be visible on the desktop.  This defaults to "0".  When moving from a X11 platform to another X11 platform, you can set visible to 'local' to enable L<X11 forwarding|https://man.openbsd.org/ssh#X>.  See L<X11 FORWARDING WITH FIREFOX|Firefox::Marionette#X11-FORWARDING-WITH-FIREFOX>.
 
 =item * waterfox - only allow a binary that looks like a L<waterfox version|https://www.waterfox.net/> to be launched.
 
@@ -11242,6 +11366,16 @@ And used to fill in login prompts without explicitly knowing the account details
     my $firefox = Firefox::Marionette->new( host => 'remote.example.org', port => 2222, debug => 1 );
     $firefox->go('https://metacpan.org/');
 
+    # OR use a proxy host to jump via to the final host
+
+    my $firefox = Firefox::Marionette->new(
+                                             host  => 'remote.example.org',
+                                             port  => 2222,
+                                             via   => 'user@secure-jump-box.example.org:42222',
+                                             debug => 1,
+                                          );
+    $firefox->go('https://metacpan.org/');
+
 This module has support for creating and automating an instance of Firefox on a remote node.  It has been tested against a number of operating systems, including recent version of L<Windows 10 or Windows Server 2019|https://docs.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse>, OS X, and Linux and BSD distributions.  It expects to be able to login to the remote node via public key authentication.  It can be further secured via the L<command|https://man.openbsd.org/sshd#command=_command_> option in the L<OpenSSH|https://www.openssh.com/> L<authorized_keys|https://man.openbsd.org/sshd#AUTHORIZED_KEYS_FILE_FORMAT> file such as;
 
     no-agent-forwarding,no-pty,no-X11-forwarding,permitopen="127.0.0.1:*",command="/usr/local/bin/ssh-auth-cmd-marionette" ssh-rsa AAAA ... == user@server
@@ -11264,7 +11398,7 @@ There are a number of steps to getting L<WebGL|https://en.wikipedia.org/wiki/Web
 
 =item 2. The visible parameter to the L<new|Firefox::Marionette#new> method must be set.  This is due to L<an existing bug in Firefox|https://bugzilla.mozilla.org/show_bug.cgi?id=1375585>.
 
-=item 3. It can be tricky getting L<WebGL|https://en.wikipedia.org/wiki/WebGL> to work with a L<Xvfb|https://en.wikipedia.org/wiki/Xvfb> instance.  L<glxinfo|https://dri.freedesktop.org/wiki/glxinfo/> can be useful to help debug issues in this case.
+=item 3. It can be tricky getting L<WebGL|https://en.wikipedia.org/wiki/WebGL> to work with a L<Xvfb|https://en.wikipedia.org/wiki/Xvfb> instance.  L<glxinfo|https://dri.freedesktop.org/wiki/glxinfo/> can be useful to help debug issues in this case.  The mesa-dri-drivers rpm is also required for Redhat systems.
 
 =back
 
@@ -11278,6 +11412,21 @@ With all those conditions being met, L<WebGL|https://en.wikipedia.org/wiki/WebGL
     } else {
         die "WebGL is not supported";
     }
+
+=head1 X11 FORWARDING WITH FIREFOX
+
+This is an experimental addition to this module.  L<X11 Forwarding|https://man.openbsd.org/ssh#X> allows you to launch a L<remote firefox via ssh|Firefox::Marionette#REMOTE-AUTOMATION-OF-FIREFOX-VIA-SSH> and have it visually appear in your local X11 desktop.  This can be accomplished with the following code;
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new(
+                                             host    => 'remote-x11.example.org',
+                                             visible => 'local',
+                                             debug   => 1,
+                                          );
+    $firefox->go('https://metacpan.org');
+
+Feedback is welcome on any odd X11 workarounds that might be required for different platforms.
 
 =head1 DIAGNOSTICS
 

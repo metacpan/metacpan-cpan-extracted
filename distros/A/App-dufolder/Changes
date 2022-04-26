@@ -1,0 +1,6 @@
+
+Revision history for the module "App::dirdim"
+
+-.---  2022-02-28 "datafile-sizecheck.sh" 
+0.030  2022-04-26 Begin to make this module.
+0.031  2022-04-26 =head1 NAME の所にも解説を加えた。このことでMetaCPANで解説文がきちんと現れることが期待できそう。

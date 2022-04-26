@@ -5,7 +5,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.025';
+our $VERSION = '0.026';
 
 use 5.020;
 use Moo;
@@ -238,7 +238,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 SYNOPSIS
 
@@ -307,6 +307,40 @@ longer be assumed.
 
 Returns the json pointer location of the operation containing the provided C<operationId> (suitable
 for passing to C<< $document->get(..) >>), or C<undef> if the location does not exist in the document.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Mojolicious::Plugin::OpenAPI::Modern>
+
+=item *
+
+L<OpenAPI::Modern>
+
+=item *
+
+L<JSON::Schema::Modern>
+
+=item *
+
+L<https://json-schema.org>
+
+=item *
+
+L<https://www.openapis.org/>
+
+=item *
+
+L<https://oai.github.io/Documentation/>
+
+=item *
+
+L<https://spec.openapis.org/oas/v3.1.0>
+
+=back
 
 =head1 SUPPORT
 

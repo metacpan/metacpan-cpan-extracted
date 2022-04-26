@@ -53,7 +53,7 @@ standard L<PPI::Statement>, L<PPI::Node> and L<PPI::Element> methods.
 use strict;
 use PPI::Statement ();
 
-our $VERSION = '1.272';
+our $VERSION = '1.273';
 
 our @ISA = "PPI::Statement";
 

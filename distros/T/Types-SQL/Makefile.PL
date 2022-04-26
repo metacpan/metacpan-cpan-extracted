@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.008000;
+use 5.010000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Types-SQL",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.008000",
+  "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "Types::SQL",
   "PREREQ_PM" => {
     "Exporter" => 0,
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "Types::Common::String" => 0,
     "if" => 0
   },
-  "VERSION" => "v0.4.1",
+  "VERSION" => "v0.6.0",
   "test" => {
     "TESTS" => "t/*.t"
   }

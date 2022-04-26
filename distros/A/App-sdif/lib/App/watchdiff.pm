@@ -40,6 +40,7 @@ use Getopt::EX::Hashed 'has'; {
     has old      => ' O  !   ' , default => 0;
     has date     => ' D  !   ' , default => 1;
     has newline  => ' N  !   ' , default => 1;
+    has context  => ' U  =i  ' , default => 100;
     has colormap => ' cm =s@ ' , default => [];
     has plain    => ' p      ' ,
 	action   => sub {
@@ -107,7 +108,7 @@ sub do_loop {
     my $new = App::cdif::Command->new(@{$opt->exec});
 
     my @default_diff = (
-			qw(cdif --no-command --no-unknown -U100),
+			qw(cdif --no-command --no-unknown),
 			map { ('--cm', "$_=$colormap{$_}") } sort keys %colormap
 		       );
 
@@ -119,9 +120,10 @@ sub do_loop {
 	    ( @default_diff,
 	      map  { $_->[1] }
 	      grep { $_->[0] }
-	      [   $opt->unit => "--unit=$opt->unit" ],
+	      [   $opt->unit => '--unit=' . $opt->unit ],
 	      [ ! $opt->mark => '--no-mark' ],
 	      [ ! $opt->old  => '--no-old' ],
+	      [ defined $opt->context => '-U' . $opt->context ],
 	    );
 	}
     };
@@ -214,7 +216,7 @@ Options:
 
 =head1 VERSION
 
-Version 4.21.1
+Version 4.22.0
 
 =head1 EXAMPLES
 

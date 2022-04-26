@@ -62,6 +62,7 @@ my $builder = $class->new(
         'base'                      => 0,
         'strict'                    => 0,
         'warnings'                  => 0,
+        'perl'                      => 5.006001,
     },
 
     build_requires => {

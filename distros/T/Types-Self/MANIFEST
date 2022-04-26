@@ -1,0 +1,17 @@
+COPYRIGHT
+CREDITS
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+SIGNATURE
+dist.ini
+doap.ttl
+lib/Types/Self.pm
+t/01basic.t
+t/02class.t
+t/03role.t

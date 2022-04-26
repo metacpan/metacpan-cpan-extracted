@@ -16,7 +16,7 @@ use PDL::Lite '2.012';
 
 ## no critic (ProhibitExplicitReturnUndef)
 
-our $VERSION = '0.13';
+our $VERSION = '0.16';
 
 use parent 'Statistics::Descriptive::PDL::Weighted';
 
@@ -71,6 +71,9 @@ sub _median {
 sub _skewness {
     my $self = shift;
 
+    my $n = $self->sum_weights;
+    return undef if $n < 3;
+
     my $data = $self->_get_piddle;
 
     #  long winded approach
@@ -82,7 +85,6 @@ sub _skewness {
     #  Possibly PDL is smart enough to do it by default
     #  in such cases
     #my $sumpow3 = ($data - $mean)->inplace->divide($sd, 0)->pow(3)->mult($wts, 0)->sum;
-    my $n = $self->sum_weights;
     my $correction = $n / ( ($n-1) * ($n-2) );
     my $skew = $correction * $sumpow3;
     return $skew;
@@ -91,11 +93,13 @@ sub _skewness {
 sub _kurtosis {
     my $self = shift;
 
+    my $n    = $self->sum_weights;
+    return undef if $n <= 3;
+
     my $data = $self->_get_piddle;
     my $mean = $self->mean;
     my $sd   = $self->standard_deviation;
     my $wts  = $self->_get_weights_piddle;
-    my $n    = $self->sum_weights;
 
     my $sumpow4 = ($wts * ((($data - $mean) / $sd) ** 4))->sum;
 

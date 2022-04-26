@@ -32,6 +32,7 @@ requires:
   Module::Load: 0
   Moo: 0
   Pod::Usage: 0
+  perl: '5.010'
   Test::LWP::UserAgent: 0
   Test::More: 0
   URI: 0
@@ -40,4 +41,4 @@ requires:
   warnings: 0
 resources:
   license: http://opensource.org/licenses/gpl-license.php
-version: '0.05'
+version: '0.06'

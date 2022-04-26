@@ -5,7 +5,7 @@
 
 use Object::Pad 0.27;
 
-package Tickit::Widget::Scroller::Item::Text 0.27;
+package Tickit::Widget::Scroller::Item::Text 0.28;
 class Tickit::Widget::Scroller::Item::Text;
 
 use Tickit::Utils qw( textwidth cols2chars );

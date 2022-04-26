@@ -1,0 +1,68 @@
+{
+   "abstract" : "read operating system details from FreeDesktop.Org standard /etc/os-release file",
+   "author" : [
+      "Ian Kluft <https://github.com/ikluft>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Sys-OsRelease",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "File::Find" : "0",
+            "Test::More" : "0",
+            "YAML" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ikluft/Sys-OsRelease/issues"
+      },
+      "homepage" : "https://github.com/ikluft/Sys-OsRelease",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ikluft/Sys-OsRelease.git",
+         "web" : "https://github.com/ikluft/Sys-OsRelease"
+      }
+   },
+   "version" : "0.0.1",
+   "x_generated_by_perl" : "v5.34.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_spdx_expression" : "Artistic-2.0"
+}
+

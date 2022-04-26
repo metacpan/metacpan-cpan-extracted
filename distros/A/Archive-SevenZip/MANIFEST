@@ -18,6 +18,7 @@ t/01-constructor.t
 t/01-identity-7z.t
 t/01-identity.t
 t/02-add-scalar.t
+t/02-env.t
 t/02_main.t
 t/03-archive-from-stdin.t
 t/05_tree.t

@@ -2,9 +2,9 @@
 package Rinci;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-03-20'; # DATE
+our $DATE = '2022-04-22'; # DATE
 our $DIST = 'Rinci'; # DIST
-our $VERSION = '1.1.101'; # VERSION
+our $VERSION = '1.1.102'; # VERSION
 
 1;
 # ABSTRACT: Language-neutral metadata for your code
@@ -21,7 +21,7 @@ Rinci - Language-neutral metadata for your code
 
 =head1 VERSION
 
-This document describes version 1.1.101 of Rinci (from Perl distribution Rinci), released on 2022-03-20.
+This document describes version 1.1.102 of Rinci (from Perl distribution Rinci), released on 2022-04-22.
 
 =head1 HOMEPAGE
 

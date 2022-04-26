@@ -28,9 +28,7 @@ SPVM_ENV_COMPILER* SPVM_API_COMPILER_new_env() {
     SPVM_API_COMPILER_compile_spvm,
     SPVM_API_COMPILER_get_error_messages_length,
     SPVM_API_COMPILER_get_error_message,
-    SPVM_API_COMPILER_build_runtime,
-    SPVM_API_COMPILER_get_module_source_by_name,
-    SPVM_API_COMPILER_set_module_source_by_name,
+    SPVM_API_COMPILER_create_spvm_32bit_codes,
   };
   SPVM_ENV_COMPILER* env_compiler = calloc(1, sizeof(env_compiler_init));
   memcpy(env_compiler, env_compiler_init, sizeof(env_compiler_init));
@@ -88,10 +86,6 @@ int32_t SPVM_API_COMPILER_compile_spvm(SPVM_COMPILER* compiler, const char* clas
   return error_code;
 }
 
-void SPVM_API_COMPILER_build_runtime(SPVM_COMPILER* compiler, SPVM_RUNTIME* runtime) {  
-  SPVM_COMPILER_build_runtime(compiler, runtime);
-}
-
 int32_t SPVM_API_COMPILER_get_error_messages_length(SPVM_COMPILER* compiler) {  
   return SPVM_COMPILER_get_error_messages_length(compiler);
 }
@@ -100,11 +94,9 @@ const char* SPVM_API_COMPILER_get_error_message(SPVM_COMPILER* compiler, int32_t
   return  SPVM_COMPILER_get_error_message(compiler, index);
 }
 
-const char* SPVM_API_COMPILER_get_module_source_by_name(SPVM_COMPILER* compiler, const char* class_name) {  
-  const char* module_source = SPVM_HASH_get(compiler->module_source_symtable, class_name, strlen(class_name));
-  return module_source;
-}
-
-void SPVM_API_COMPILER_set_module_source_by_name(SPVM_COMPILER* compiler, const char* class_name, const char* module_source) {  
-  SPVM_HASH_set(compiler->module_source_symtable, class_name, strlen(class_name), (void*)module_source);
+int32_t* SPVM_API_COMPILER_create_spvm_32bit_codes(SPVM_COMPILER* compiler, SPVM_ALLOCATOR* allocator) {
+  
+  int32_t* spvm_32bit_codes = SPVM_COMPILER_create_spvm_32bit_codes(compiler, allocator);
+  
+  return spvm_32bit_codes;
 }

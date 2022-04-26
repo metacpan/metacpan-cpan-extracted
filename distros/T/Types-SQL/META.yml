@@ -23,10 +23,10 @@ name: Types-SQL
 provides:
   Types::SQL:
     file: lib/Types/SQL.pm
-    version: v0.4.1
+    version: v0.6.0
   Types::SQL::Util:
     file: lib/Types/SQL/Util.pm
-    version: v0.4.1
+    version: v0.6.0
 recommends:
   PerlX::Maybe::XS: '0'
   Ref::Util::XS: '0'
@@ -40,12 +40,12 @@ requires:
   Type::Utils: '0.44'
   Types::Standard: '0'
   namespace::autoclean: '0'
-  perl: v5.8.0
+  perl: v5.10.0
   version: '0.77'
 resources:
   bugtracker: https://github.com/robrwo/Types-SQL/issues
   repository: git://github.com/robrwo/Types-SQL.git
-version: v0.4.1
+version: v0.6.0
 x_authority: cpan:RRWO
 x_contributors:
   - 'Slaven Rezić <slaven@rezic.de>'

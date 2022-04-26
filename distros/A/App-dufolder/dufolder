@@ -1,0 +1,159 @@
+#!/usr/bin/perl
+# use 5.030 ; 
+use strict ; 
+use warnings ; 
+use feature qw [ say state ] ;
+use Cwd ; 
+use File::Spec ; 
+use Getopt::Std ; getopts '.,:b:i:l:B:G:' , \my %o ; 
+use List::Util qw[ max sum0 ] ;
+use POSIX qw [ strftime ] ; 
+use Term::ANSIColor qw[ :constants ] ; $Term::ANSIColor::AUTORESET = 1 ;
+binmode STDOUT , ':utf8' ;
+
+$o{b} //= 512 ; # stat関数で1個のファイルのブロック数を得た場合に、それを何倍したら、ディスクを占有するバイト数になるか。
+my $optI0 = 0 eq ($o{i} // '' ) ; # -i0の指定があるか否か。 inodeで一致するものは1個しか受け付けないようにする。
+my $optL0 = 0 eq ($o{l} // '' ) ; # -l0の指定があるか否か。stat 関数を使うか lstat 関数を使うかを指定。
+my $optc0 = 0 eq ($o{','}//'' ) ; # -,0の指定があるか否か。千進法区切りで,を使うか否かを指定。
+$ARGV[0] = '.' if @ARGV == 0 ;
+
+# 特殊な関数
+
+sub d3 ($)  ; # 数を3桁区切りに変換することもできるようにする。# -,0が指定されたら3桁区切りにしない。
+* d3 = $optc0 ? sub ( $ ) { $_[0] } : sub ( $ ) { $_[0] =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr } ; 
+sub xstat ( $ ) ; #{ lstat $_ } ; 
+* xstat = $optL0 ? sub ( $ ) { stat $_ } : sub ( $ ) { lstat $_ } ; # if $optL0 ;
+
+# メインとなる部分
+
+my $datetime = strftime ( '%Y-%m-%d(%a) %H:%M:%S %Z(%z)', localtime () ) ; 
+my @files ; # 探索したファイルを収納する。
+my @visible ; # 非ドットファイルの全体。
+my $d0 = cwd ; 
+& getFiles ( $_ , \@files , \@visible ) for @ARGV ; 
+if ( exists $o{B} ) { & fileDimTable ( $o{'.'} ? @files : @visible ) ; exit } 
+
+& prepCommands ( \@files , \@visible , $datetime, my $msg , my $change , my $cmd1 , my $cmd2 ) ; # change はファイルの変更個数, 
+do { say $msg ; exit } unless exists $o{G} ; # -Gの指定があればさらに続く。
+if ( $o{G} =~ /0/ ) { say "$cmd1\n$cmd2" } ; # -Gに0があれば、コマンド文を表示
+if ( $o{G} =~ /1/ ) { & againCheck ( $change ) and exit } ; # -G に1があれば、もしも前のコミットでこのコマンドでコミット済みなら終了。
+if ( $o{G} =~ /[12]/ ) { do { my $out2 = qx[$cmd2] ; binmode STDOUT , ':raw' ; say "-- ->", BOLD $out2 //'' } } ; # コミット実行! 
+exit ; 
+
+# 上記を構造化するために切り出した関数
+
+sub getFiles ( $ $$ ) { 
+  state $inodes ;
+  state $c2 = do { File::Spec -> catfile ( '' , '.' ) } ; # ディレクトリ階層の区切りの直後にドットがあるパターン "/."
+  my @found = split /\n/ , qx [ find $_[0] ] , 0 ; # find コマンドで見つけたファイルを格納。
+  @found = grep { ! $inodes -> { ( xstat $_ ) [ 1 ] } ++ }  @found if ! $optI0 ; # inodeで過去に一致したものは除去する
+  push @{ $_[1] } , @found ;
+  push @{ $_[2] } , grep { ! m/\Q$c2\E/ } @found ; 
+}
+
+sub prepCommands ( $$$ $$$$ ) { 
+  sub sumdu ( @ ) { sum0 map { my @s = xstat $_ ; max ( $s[7] , $o{b} * $s[12] ) } @_ } # <-- Unixコマンドduと同じ事をしたつもり。
+  my ($b1,$b2) = map { sumdu ( @{ $_ [ $_ ] } ) } 0 , 1 ; # バイト単位の数値なのでbを変数名に用いた。
+  my ($l1,$l2) = map { scalar @{ $_ [ $_ ] } } 0 , 1 ; # 配列の長さ l 
+  $_[3] = sprintf "du: %s / %s = %0.3f", d3 $b1, d3 $b2 , $b1 / $b2 ;
+  $_[3] .= sprintf "  obj: %s / %s = %0.2f  -- %s", d3 $l1 , d3 $l2 , $l1 / $l2 , $_[2] ;
+  $_[5] = qq[ git status > /dev/null 2>&1 && git diff --raw HEAD~..HEAD | wc -l # -- -> ] ; 
+  $_[4] = (`$_[5]` =~ s/\n$//sr) ;
+  $_[5] .= BOLD $_[4]  ;# 何個のファイルが HEADとその前の間で変更があったか。
+  $_[6] = qq[ git commit --allow-empty -m '$_[3]' ] ; # --amend 
+}
+
+sub againCheck ( $ ) {
+  if ( $_[0] eq 0 ) { # さらに確かさを高めるために、計2個の条件で調べる。
+    my $p1 = qr | .* [0-9] .*/.* [0-9] .*=.* [0-9] .* |x ; # <-- 少し雑な条件かも。しかし、きちんと書くと、バグの元になりやすい。
+    my $pattern = qr| du: $p1 obj: $p1 -- .*\d{4}-\d{2}-\d{2} .* \d{2}:\d{2}:\d{2} |x ; # 
+    return 1 if qx [ git log -n1 --oneline ] =~ m/$pattern/s ;
+  } ; 
+}
+
+sub fileDimTable ( @ ) { # -B8 で起動
+  say join "\t" , qw[ dir? occ. Size bsize Blocks S/B(1) S/B(2) inode filename ] ;  
+  do { my @s = stat $_ ; say join "\t" , -d $_ ? "D":"" , $s[12]*$o{b}, @s[7,11,12], & pratio ( @s[7,12] ) , $s[1], $_ } for @_ ;
+
+  sub pratio ($$) { 
+    my $o1 = $_[1] == 0 ? $_[0] == 0 ? "'0/0'" : '-' : sprintf '%1.2f' , $_[0] / $_[1] ; 
+    my $o2 = $_[1] <= $o{B} ? 0 < $_[1] ? '+infty' : '-' : sprintf '%1.2f' , $_[0] / ( $_[1] - $o{B} ) ; 
+    return ( $o1, $o2 ) ;# 〜 ↑ $o{B} つまり-Bで与える数が難しい状況があるかも。
+  }
+}
+
+#   2022-03-01 thu ; Toshiyuki Shimono 下野寿之 (統計数理研究所 特任研究員)
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+  use FindBin qw[ $Script ] ; 
+  $ARGV[1] //= '' ;
+  open my $FH , '<' , $0 ;
+  while(<$FH>){
+    s/\$0/$Script/g ;
+    print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+  }
+  close $FH ;
+  exit 0 ;
+}
+
+=encoding utf8
+
+=head1 
+
+  dufolder DIR [DIR2] [DIR3] ..
+  
+ 機能: 
+
+  指定したフォルダ(ディレクトリ)に対して、ディスク使用量とそのフォルダ内で辿れるファイルの
+   サイズのそれぞれ合計（共にバイト単位）などを標準出力に出力する。
+
+  出力する値は、そのディレクトリからfindで辿れるファイル(ディレクトリも含む)全てと、それらの内ドットファイル以外の
+   両者について、ディスク使用量(占有量)のバイト単位のサイズと、ファイルの個数を出力する。
+
+  コマンドオプションにより、その出力をコミットメッセージにした Git のコミットに残すこともできる。
+
+  引数の directory が指定されない場合は、カレントディレクトリ(つまり".")が指定されたものと見なされる。
+
+ 利用例: 
+    $0 -G1 .  # Gitレポジトリ内についての、ディスク占有の状況を調べて、Gitに情報をコミットメッセージに入れて、空コミットをする。
+    $0 -B8 -b512 -.  # カレントディレクトリ内の、全てのファイルのディスク占有状況を表示する。
+
+ オプション: 
+
+    -, 0 : 千進法の3桁区切りのコンマを打たない。
+    -b 512 : 各ファイルの占有するブロックサイズを取得して、それを何倍にすることで占有サイズと見なすかの、倍率。
+    -i 0 : ファイルのリンクによる重複を考慮しない。つまり、両方とも数える。i-node で判定。
+    -l 0 : シンボリックリンクファイルについてたどって調べる。
+
+    -G N: Gitのコミットのメッセージ(N=0,1,2) 以下を参照せよ。     
+     -G 0 : 単に gitのコマンド文を出力する。そのgit文は、--allow-empty を使う。
+     -G 1 : HEAD~とHEADの間の変更が、このプログラムで実行されてる可能性が高い場合は、そのgit文は実行しないようにする。
+     -G 2 : その gitのコマンド文を実行する。(cronで実行すると、どんどんコミットが増えるので、やらない方が良い。) 
+    ※ -G 01 や -G02 など、0と1と2の複数を使ったオプション指定の仕方もできる。
+
+   (ファイルシステム等に依存して 記憶媒体のクラスタとセクタのバイト数を調べるための オプション)
+    -B 8 : 各ファイルがディスク上で持つブロックのバイト数の考察用。計算機環境により8以外の正の数になるかも。
+    ※ 出力表のBlocksの列が、どの数の倍数か(たとえば8の倍数であるか)をまず最初に観察し、その数を次に指定すると良いだろう。
+    ※ 出力表の 各行において Occ. の列が、Sizeよりも大きくなれば -b(小文字)の指定は合っている。
+      その時に-bで指定する数は、S/B(1)とS/B(2)の間の数になるはず。ここで(1)は下限、(2)は上限を意味する。
+
+    -.   : -B と共に用いる。ドットファイルについての分も表示する。
+
+    --help : このコマンドのヘルプ(つまり、ここに現れる文面)を出力して、終了。
+
+ 作成した目的: 
+  
+  データファイルを蓄えていくＧｉｔのレポジトリの、ディスク占有サイズのバイト数を、
+  ワークツリー内の指定フォルダー内のファイルサイズの合計バイト数、および、
+  その合計値に対する占有サイズの倍率と共に記録する。
+  このことで、必要なディスクサイズの成長を見積もる。
+
+　開発メモ: 
+    * このプログラムは、UNIX/Linuxコマンドのfindの動作に依存している。
+    * 空コミットと直前コミット文の正規表現による条件チェックをしている。cronによる実行をしても、似たGitのコメントが多数作られないようにするため。
+    * 機微な情報が含まれる可能性を考え、対象としたディレクトリの名前は出さないことにした。ファイルの個数の情報で十分なことが多いであろう。
+    * デバッグ又はテストをする際に、-i と -l の相互作用で、無用に頭を悩まさせるかも知れない。
+
+=cut

@@ -10,7 +10,7 @@ use File::Spec;
 
 use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS %OS_ALIASES);
 
-our $VERSION = '1.90';
+our $VERSION = '1.93';
 
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(
@@ -23,9 +23,17 @@ our $VERSION = '1.90';
     fatal    => [qw(die_if_os_is die_if_os_isnt)]
 );
 
+# get a list of the .pm files under a list of dirs, or the empty list
+# in taint mode
+sub _find_pm_files_in_dirs {
+    my @files;
+    eval { @files = File::Find::Rule->file()->name('*.pm')->in(@_) };
+    return @files;
+}
+
 if(exists($INC{'File/Find/Rule.pm'})) {
     foreach my $alias_module (
-        File::Find::Rule->file()->name('*.pm')->in(
+        _find_pm_files_in_dirs(
             grep { -d }
             map { File::Spec->catdir($_, qw(Devel AssertOS Alias)) }
             @INC
@@ -93,7 +101,8 @@ of OSes and OS families, eg ...
 
     os_is(qw(Unix VMS)); # Unix is a family, VMS is an OS
 
-Matching is case-insensitive, so the above could also be written:
+Matching is case-insensitive provided that Taint-mode is not enabled, so the
+above could also be written:
 
     os_is(qw(unix vms));
 
@@ -103,7 +112,6 @@ sub os_is {
     my @targets = @_;
     my $rval = 0;
 
-    my @available_platforms = list_platforms();
     TARGET: foreach my $target (@targets) {
         # resolve aliases
         ALIAS: foreach my $alias (keys %OS_ALIASES) {
@@ -113,12 +121,16 @@ sub os_is {
             }
         }
 
+        # resolve case-insensitive names (no-op in taint-mode as list_platforms
+        # won't work)
+        my @available_platforms = list_platforms();
         CANDIDATE: foreach my $candidate (@available_platforms) {
             if($target =~ /^\Q$candidate\E$/i) {
                 $target = $candidate;
                 last CANDIDATE;
             }
         }
+
         die("Devel::CheckOS: $target isn't a legal OS name\n")
             unless($target =~ /^\w+(::\w+)*$/);
         eval "use Devel::AssertOS::$target";
@@ -199,6 +211,8 @@ broken.  eg, some platforms might return 'freebsd' instead of 'FreeBSD'.
 This is because they have case-insensitive filesystems so things
 should Just Work anyway.
 
+This function does not work in taint-mode.
+
 =cut
 
 my $case_flag = File::Spec->case_tolerant ? '(?i)' : '';
@@ -230,7 +244,7 @@ sub list_platforms {
             module => join('::', @dirs, $file_part),
             file   => File::Spec->canonpath($_)
         }
-    } File::Find::Rule->file()->name('*.pm')->in(
+    } _find_pm_files_in_dirs(
         grep { -d }
         map { File::Spec->catdir($_, qw(Devel AssertOS)) }
         @INC
@@ -285,6 +299,8 @@ alias will return the appropriate result for the named OS.
 
 It returns true unless you invoke it incorrectly or you attempt to change
 an existing alias.
+
+Aliases don't work under taint-mode.
 
 See L<Devel::AssertOS::Extending>.
 

@@ -1,5 +1,12 @@
 Revision history for perl distribution App-remarkpl
 
+0.06 2022-04-25T08:52:05+0900
+ - Add support for REMARK_JS environment variable
+ - Documented environment variables
+ - Updated remarkjs to the latest version
+ - Bumped Mojolicious to 9.00
+ - PWD is no longer in INC
+
 0.05 2017-04-29T12:43:22+0200
  - Stopped using deprecated "slurp" function
 

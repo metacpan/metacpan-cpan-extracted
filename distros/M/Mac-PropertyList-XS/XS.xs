@@ -121,7 +121,7 @@ static inline unsigned int hash(register const char *str)
 
 static struct state* state_for_parser(SV *expat)
 {
-    HE *p = hv_fetch_ent(statehash, SvRV(expat), false, 0);
+    HE *p = hv_fetch_ent(statehash, expat, false, 0);
     if (p == NULL)
         croak("Failed to look up state object by parser argument");
     struct state *st = INT2PTR(struct state *, SvUV(HeVAL(p)));
@@ -306,7 +306,7 @@ handle_init(SV *expat)
         struct state *st;
         Newxz(st, 1, struct state);
         st->parser = expat;
-        hv_store_ent(statehash, SvRV(expat), newSVuv(PTR2UV(st)), 0);
+        hv_store_ent(statehash, expat, newSVuv(PTR2UV(st)), 0);
 
         if (!decoder[0]) {
             int i;
@@ -319,7 +319,7 @@ SV *
 handle_final(SV *expat)
     CODE:
         struct state *st = state_for_parser(expat);
-        hv_delete_ent(statehash, SvRV(expat), G_DISCARD, 0);
+        hv_delete_ent(statehash, expat, G_DISCARD, 0);
         RETVAL = st->base.val;
         while (st->stack) {
             struct stack *temp = st->stack;

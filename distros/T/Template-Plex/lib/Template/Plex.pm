@@ -4,7 +4,7 @@ use warnings;
 
 use Symbol qw<delete_package>;
 use Carp qw<carp croak>;
-use version; our $VERSION = version->declare('v0.2.0');
+use version; our $VERSION = version->declare('v0.3.0');
 use feature qw<say state refaliasing lexical_subs>;
 no warnings "experimental";
 
@@ -51,6 +51,7 @@ sub  bootstrap{
 	my $href=shift;
 	my %opts=@_;
 
+	#say  "Bootstrap: ", Dumper $href;
 	$href//={};
 	\my %fields=$href;
 
@@ -91,15 +92,15 @@ $out.='
 	#lexical plex changes the prepare and also reuses options with out making it explicit
         my sub plex{
                 my ($path, $vars, %opts)=@_;
+		\my %fields=$href;
 
 
                 #unshift @_, $prepare;  #Sub templates now access lexical plex sub routine
                                         #with access to its scoped $prepare sub and variables
-                my $template=Template::Plex->new($prepare,$path,$vars,%opts?%opts:%options);
+                my $template=Template::Plex->new($prepare, $path, $vars?$vars:\%fields, %opts?%opts:%options);
                 $template;
-
-
         }
+
 	my sub plx {
 		my ($path,$vars,%opts)=@_;
 
@@ -107,7 +108,7 @@ $out.='
 		$cache{$id} and return $cache{$id}->render;
 		
 		my $template=&plex;
-		#Template::Plex->new($prepare,$path,$vars,%opts?%opts:%options);
+
 		#TODO: check for errors
 		
 		$cache{$id}//=$template;
@@ -116,13 +117,19 @@ $out.='
 	my sub plex_clear {
 		%cache=();
 	}
+	my sub skip{
+		goto _PLEX_SKIP;	
+	}
 
 sub {
 	no warnings \'uninitialized\';
 	no strict;
 	my $self=shift;
+	#say "FIELDS: ", %fields;
 	\\my %fields=shift//\\%fields;
-	qq{'.$_data_.'};
+	return qq{'.$_data_.'};
+	_PLEX_SKIP:
+		"";
 
 }
 };';
@@ -280,7 +287,7 @@ sub new{
 		#Returns the render sub
 
 		state $package=0;
-		$options{package}//="Template::Plex::temp".$package++;#force a unique package if non specified
+		$options{package}//="Template::Plex::temp".$package++; #force a unique package if non specified
 		$prepare->($self, $data, $args, %options);	#Prepare in the correct scope
 	}
 	else {

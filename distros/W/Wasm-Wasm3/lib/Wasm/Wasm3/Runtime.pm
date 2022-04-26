@@ -44,6 +44,14 @@ returns from that function.
 A scalar-context call to this method will produce an exception
 if the WebAssembly function returns multiple values.
 
+=head2 $exit_code = I<OBJ>->run_wasi( @ARGV )
+
+A WASI-specific variant of C<call()>.  Calls WASI’s start function
+(as of this writing, always C<_start>) with the given @ARGV list
+(byte strings).
+
+Returns the WASI exit code.
+
 =head2 @types = I<OBJ>->get_function_arguments( $FUNCTION_NAME )
 
 Returns a list of the named function’s argument types, as TYPE_* constants.

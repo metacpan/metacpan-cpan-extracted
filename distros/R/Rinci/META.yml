@@ -19,12 +19,12 @@ name: Rinci
 provides:
   Rinci:
     file: lib/Rinci.pm
-    version: v1.1.101
+    version: v1.1.102
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Rinci
   homepage: https://metacpan.org/release/Rinci
   repository: git://github.com/perlancar/perl-Rinci.git
-version: 1.1.101
+version: 1.1.102
 x_Dist_Zilla:
   perl:
     version: '5.034000'

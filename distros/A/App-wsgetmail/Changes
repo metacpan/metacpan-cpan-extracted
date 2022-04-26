@@ -1,14 +1,32 @@
 Revision history for App-wsgetmail
 
+0.06    22/04/22
+        * Update 0.05 Changes to conform to spec
+        * Sync module pod with recent changes in script
+        * Move script to bin/wsgetmail
+        * Declare Perl v5.10 minimum version
+        * Set minimum Perl version for the dist
+        * Add debug output for unsuccessful responses
+        * Add instruction to select Application permissions
+        * Move configuration instructions to App::wsgetmail
+        * Generate README.md from App::wsgetmail
+        * Remove version from pod
+        * Update README.md with pod from wsgetmail.pm
+        * Add documention for command_timeout config value
+        * Add vim and config to gitignore and manifest skip
+        * Fix default values for attributes
+        * Correct indent spacing in MS365.pm
+        * Move config_fields array into BUILDARGS sub
+        * Add comments about BUILDARGS for object attributes
+
 0.05    24/1/22
-        Major documentation overhaul:
         * The script pod provides full details about all available
           configuration options, and refers to Microsoft documentation about
           how to set up the client application
         * Library pod documents attributes and methods of all classes
-        Add missing dependencies to Makefile.PL
-        Add MANIFEST.SKIP to support release tests
-        Provide interpreter substitution for the wsgetmail script
+        * Add missing dependencies to Makefile.PL
+        * Add MANIFEST.SKIP to support release tests
+        * Provide interpreter substitution for the wsgetmail script
 
 0.04    18/8/20
         Documentation improvements

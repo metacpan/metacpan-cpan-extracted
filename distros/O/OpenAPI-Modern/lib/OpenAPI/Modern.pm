@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package OpenAPI::Modern; # git description: v0.024-6-g68faea4
+package OpenAPI::Modern; # git description: v0.025-5-gfbeeb1b
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.025';
+our $VERSION = '0.026';
 
 use 5.020;
 use Moo;
@@ -653,7 +653,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI docume
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 SYNOPSIS
 
@@ -978,6 +978,10 @@ for query and header parameters, only the first value of each name is considered
 =head1 SEE ALSO
 
 =over 4
+
+=item *
+
+L<Mojolicious::Plugin::OpenAPI::Modern>
 
 =item *
 

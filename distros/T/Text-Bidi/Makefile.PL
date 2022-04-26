@@ -46,57 +46,57 @@ EOF
 my %PM = map { 'lib/' . $_ => '$(INST_LIB)/' . $_} qw(
 Text/Bidi/private.pm
 Text/Bidi.pm
+Text/Bidi/private.pm
 Text/Bidi/Paragraph.pm
 Text/Bidi/Constants.pm
 Text/Bidi/Array.pm
-Text/Bidi/private.pm
-Text/Bidi/Array/Long.pm
 Text/Bidi/Array/Byte.pm
+Text/Bidi/Array/Long.pm
 
 );
 
 my %WriteMakefileArgs = (
-                       'LICENSE' => 'perl',
-                       'MIN_PERL_VERSION' => '5.010000',
-                       'VERSION' => '2.15',
-                       'AUTHOR' => 'Moshe Kamensky <kamensky@cpan.org>',
-                       'TEST_REQUIRES' => {
-                                            'ExtUtils::MakeMaker' => '0',
-                                            'Test::More' => '0',
-                                            'charnames' => '0',
-                                            'File::Temp' => '0',
-                                            'version' => '0.77',
-                                            'File::Spec' => '0',
-                                            'IPC::Open3' => '0',
-                                            'IO::Handle' => '0',
-                                            'Data::Dumper' => '0'
-                                          },
-                       'ABSTRACT' => 'Unicode bidi algorithm using libfribidi',
+                       'test' => {
+                                   'TESTS' => 't/*.t'
+                                 },
                        'DISTNAME' => 'Text-Bidi',
+                       'MIN_PERL_VERSION' => '5.010000',
+                       'CONFIGURE_REQUIRES' => {
+                                                 'ExtUtils::MakeMaker' => '0'
+                                               },
                        'EXE_FILES' => [
                                         'bin/fribidi.pl'
                                       ],
                        'NAME' => 'Text::Bidi::private',
-                       'CONFIGURE_REQUIRES' => {
-                                                 'ExtUtils::MakeMaker' => '0'
-                                               },
+                       'ABSTRACT' => 'Unicode bidi algorithm using libfribidi',
+                       'LICENSE' => 'perl',
+                       'VERSION' => '2.16',
                        'PREREQ_PM' => {
-                                        'integer' => '0',
-                                        'open' => '0',
-                                        'Carp' => '0',
-                                        'Getopt::Long' => '0',
-                                        'Encode' => '0',
-                                        'overload' => '0',
-                                        'DynaLoader' => '0',
-                                        'Exporter' => '0',
-                                        'warnings' => '0',
-                                        'strict' => '0',
                                         'Tie::Array' => '0',
-                                        'base' => '0'
+                                        'integer' => '0',
+                                        'Getopt::Long' => '0',
+                                        'strict' => '0',
+                                        'base' => '0',
+                                        'Exporter' => '0',
+                                        'DynaLoader' => '0',
+                                        'Carp' => '0',
+                                        'warnings' => '0',
+                                        'overload' => '0',
+                                        'open' => '0',
+                                        'Encode' => '0'
                                       },
-                       'test' => {
-                                   'TESTS' => 't/*.t'
-                                 }
+                       'AUTHOR' => 'Moshe Kamensky <kamensky@cpan.org>',
+                       'TEST_REQUIRES' => {
+                                            'Data::Dumper' => '0',
+                                            'charnames' => '0',
+                                            'File::Temp' => '0',
+                                            'IO::Handle' => '0',
+                                            'File::Spec' => '0',
+                                            'ExtUtils::MakeMaker' => '0',
+                                            'IPC::Open3' => '0',
+                                            'Test::More' => '0',
+                                            'version' => '0.77'
+                                          }
                      );
 
 

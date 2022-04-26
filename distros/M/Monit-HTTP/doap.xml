@@ -10,18 +10,31 @@
   <shortdesc>An OOP interface to Monit.</shortdesc>
   <developer>
     <foaf:Person>
-      <foaf:name>Angelo &quot;pallotron&quot; Failla</foaf:name>
+      <foaf:name>Angelo Failla</foaf:name>
       <foaf:mbox rdf:resource="mailto:pallotron@freaknet.org" />
     </foaf:Person>
   </developer>
   <developer>
     <foaf:Person>
       <foaf:name>Dean Hamstead</foaf:name>
-      <foaf:mbox rdf:resource="mailto:dean@bytefoundry.com.au" />
+      <foaf:mbox rdf:resource="mailto:dean@fragfest.com.au" />
     </foaf:Person>
   </developer>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Angelo Failla</foaf:name>
+      <foaf:mbox rdf:resource="mailto:pallotron@gmail.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Dean Hamstead</foaf:name>
+      <foaf:mbox rdf:resource="mailto:djzort@cpan.org" />
+    </foaf:Person>
+  </helper>
   <license rdf:resource="http://dev.perl.org/licenses/" />
   <homepage rdf:resource="https://github.com/djzort/perl-monit-http-api" />
+  <bug-database rdf:resource="https://github.com/djzort/perl-monit-http-api/issues" />
   <repository>
     <GitRepository>
       <browse rdf:resource="https://github.com/djzort/perl-monit-http-api" />

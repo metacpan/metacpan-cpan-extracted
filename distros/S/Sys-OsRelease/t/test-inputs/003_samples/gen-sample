@@ -1,0 +1,2 @@
+name=$1
+podman run --tty $name:latest cat /etc/os-release > os-release-$name

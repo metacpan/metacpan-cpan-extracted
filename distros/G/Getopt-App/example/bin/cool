@@ -1,0 +1,24 @@
+#!/usr/bin/env perl
+package Test::Cool;
+use Getopt::App;
+use File::Spec::Functions qw(catdir rel2abs);
+use File::Basename qw(dirname);
+
+# getopt_subcommands() is called by Getopt::App
+sub getopt_subcommands {
+  my $app = shift;
+  my $dir = dirname(__FILE__);
+  opendir(my ($DH), $dir);
+  return [map { [s!^cool-!!r, rel2abs(catdir $dir, $_), 'Try it'] }
+      sort grep {/^cool-\w+$/} readdir $DH];
+}
+
+run(
+  qw(h),
+  sub {
+    my ($app) = @_;
+    return print extract_usage() if $app->{h};
+    print __FILE__;
+    return 10;
+  }
+);

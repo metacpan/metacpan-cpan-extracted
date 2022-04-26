@@ -37,13 +37,15 @@ static m3_wasi_context_t* wasi_context;
 typedef size_t __wasi_size_t;
 
 static inline
-void copy_iov_to_host(void* _mem, __wasi_iovec_t* host_iov, __wasi_iovec_t* wasi_iov, int32_t iovs_len)
+const void* copy_iov_to_host(IM3Runtime runtime, void* _mem, __wasi_iovec_t* host_iov, __wasi_iovec_t* wasi_iov, int32_t iovs_len)
 {
     // Convert wasi memory offsets to host addresses
     for (int i = 0; i < iovs_len; i++) {
         host_iov[i].buf = m3ApiOffsetToPtr(wasi_iov[i].buf);
         host_iov[i].buf_len  = wasi_iov[i].buf_len;
+        m3ApiCheckMem(host_iov[i].buf,     host_iov[i].buf_len);
     }
+    m3ApiSuccess();
 }
 
 #if d_m3EnableWasiTracing
@@ -665,7 +667,10 @@ m3ApiRawFunction(m3_wasi_generic_fd_pread)
     m3ApiCheckMem(nread,        sizeof(__wasi_size_t));
 
     __wasi_iovec_t iovs[iovs_len];
-    copy_iov_to_host(_mem, iovs, wasi_iovs, iovs_len);
+    const void* mem_check = copy_iov_to_host(runtime, _mem, iovs, wasi_iovs, iovs_len);
+    if (mem_check != m3Err_none) {
+        return mem_check;
+    }
 
     __wasi_errno_t ret = __wasi_fd_pread(fd, iovs, iovs_len, offset, nread);
 
@@ -686,7 +691,10 @@ m3ApiRawFunction(m3_wasi_generic_fd_read)
     m3ApiCheckMem(nread,        sizeof(__wasi_size_t));
 
     __wasi_iovec_t iovs[iovs_len];
-    copy_iov_to_host(_mem, iovs, wasi_iovs, iovs_len);
+    const void* mem_check = copy_iov_to_host(runtime, _mem, iovs, wasi_iovs, iovs_len);
+    if (mem_check != m3Err_none) {
+        return mem_check;
+    }
 
     __wasi_errno_t ret = __wasi_fd_read(fd, iovs, iovs_len, nread);
 
@@ -707,7 +715,10 @@ m3ApiRawFunction(m3_wasi_generic_fd_write)
     m3ApiCheckMem(nwritten,     sizeof(__wasi_size_t));
 
     __wasi_iovec_t iovs[iovs_len];
-    copy_iov_to_host(_mem, iovs, wasi_iovs, iovs_len);
+    const void* mem_check = copy_iov_to_host(runtime, _mem, iovs, wasi_iovs, iovs_len);
+    if (mem_check != m3Err_none) {
+        return mem_check;
+    }
 
     __wasi_errno_t ret = __wasi_fd_write(fd, (__wasi_ciovec_t*)iovs, iovs_len, nwritten);
 
@@ -729,8 +740,11 @@ m3ApiRawFunction(m3_wasi_generic_fd_pwrite)
     m3ApiCheckMem(nwritten,     sizeof(__wasi_size_t));
 
     __wasi_iovec_t iovs[iovs_len];
-    copy_iov_to_host(_mem, iovs, wasi_iovs, iovs_len);
-
+    const void* mem_check = copy_iov_to_host(runtime, _mem, iovs, wasi_iovs, iovs_len);
+    if (mem_check != m3Err_none) {
+        return mem_check;
+    }
+    
     __wasi_errno_t ret = __wasi_fd_pwrite(fd, (__wasi_ciovec_t*)iovs, iovs_len, offset, nwritten);
 
     WASI_TRACE("fd:%d | nwritten:%d", fd, *nwritten);
@@ -899,17 +913,20 @@ m3_wasi_context_t* m3_GetWasiContext()
     return wasi_context;
 }
 
+m3_wasi_context_t* m3_GetModuleWasiContext (IM3Module module)
+{
+    return module->wasi;
+}
 
-M3Result  m3_LinkWASI  (IM3Module module)
+void m3_FreeWasi(m3_wasi_context_t* wasi)
+{
+    m3_Free(wasi);
+}
+
+static inline
+M3Result  _linkWASI (IM3Module module, m3_wasi_context_t* wasi_context)
 {
     M3Result result = m3Err_none;
-
-    if (!wasi_context) {
-        wasi_context = (m3_wasi_context_t*)malloc(sizeof(m3_wasi_context_t));
-        wasi_context->exit_code = 0;
-        wasi_context->argc = 0;
-        wasi_context->argv = 0;
-    }
 
     static const char* namespaces[2] = { "wasi_unstable", "wasi_snapshot_preview1" };
 
@@ -975,6 +992,27 @@ _       (SuppressLookupFailure (m3_LinkRawFunction (module, wasi, "sched_yield",
 
 _catch:
     return result;
+}
+
+M3Result m3_LinkModuleWASI (IM3Module module)
+{
+    if (NULL == module->wasi) {
+        module->wasi = m3_AllocStruct(m3_wasi_context_t);
+    }
+    else {
+        return "WASI already linked";
+    }
+
+    return _linkWASI(module, module->wasi);
+}
+
+M3Result  m3_LinkWASI  (IM3Module module)
+{
+    if (!wasi_context) {
+        wasi_context = m3_AllocStruct(m3_wasi_context_t);
+    }
+
+    return _linkWASI(module, wasi_context);
 }
 
 #endif // d_m3HasMetaWASI

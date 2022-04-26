@@ -1016,7 +1016,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 SPVM_CLASS* new_class = type->basic_type->class;
                 
                 // Anon sub
-                if (new_class && new_class->flag & SPVM_CLASS_C_FLAG_ANON_METHOD_CLASS) {
+                if (new_class && new_class->is_anon) {
                   SPVM_OP* op_type = op_cur->first;
                   
                   SPVM_METHOD* anon_method = SPVM_LIST_get(new_class->methods, 0);
@@ -1164,14 +1164,14 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                     SPVM_COMPILER_error(compiler, "Can't create the object of a multi numeric type at %s line %d", op_cur->file, op_cur->line);
                     return;
                   }
-                  else if (class->flag & SPVM_CLASS_C_FLAG_POINTER) {
+                  else if (class->is_pointer) {
                     SPVM_COMPILER_error(compiler, "Can't create the object of a pointer type at %s line %d", op_cur->file, op_cur->line);
                     return;
                   }
                   
                   // Access control
                   int32_t is_private;
-                  if (class->flag & SPVM_CLASS_C_FLAG_PUBLIC) {
+                  if (class->is_public) {
                     is_private = 0;
                   }
                   // Default
@@ -2468,7 +2468,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
 
               // Access control
               int32_t is_private;
-              if (call_method->method->flag & SPVM_METHOD_C_FLAG_PRIVATE) {
+              if (call_method->method->is_private) {
                 is_private = 1;
               }
               // Default
@@ -2629,7 +2629,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 return;
               }
               
-              if (call_method->method->flag & SPVM_METHOD_C_FLAG_DESTRUCTOR) {
+              if (call_method->method->is_destructor) {
                 SPVM_COMPILER_error(compiler, "Can't call DESTROY in yourself at %s line %d", op_cur->file, op_cur->line);
                 return;
               }
@@ -2637,7 +2637,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               // Inline expansion
               {
                 // Enum is replaced to constant value
-                if (call_method->method->flag & SPVM_METHOD_C_FLAG_ENUM) {
+                if (call_method->method->is_enum) {
                   // Replace sub to constant
                   SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_cur);
                   
@@ -2837,7 +2837,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               
               int32_t is_private;
               // Public flag
-              if (class_var->flag & SPVM_CLASS_VAR_C_FLAG_PUBLIC) {
+              if (class_var->is_public) {
                 is_private = 0;
               }
               // Default is private
@@ -3016,13 +3016,13 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
 
               // Access control
               int32_t is_private;
-              if (field->flag & SPVM_FIELD_C_FLAG_PUBLIC) {
+              if (field->is_public) {
                 is_private = 0;
               }
               // Default
               else {
                 // If anon method, field is public
-                if (field->class->flag & SPVM_CLASS_C_FLAG_ANON_METHOD_CLASS) {
+                if (field->class->is_anon) {
                   is_private = 0;
                 }
                 // If multi numeric type, field is public
@@ -3488,7 +3488,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
           SPVM_TYPE* class_type = class->type;
           
           // Destructor must receive own class object
-          if (method->flag & SPVM_METHOD_C_FLAG_DESTRUCTOR) {
+          if (method->is_destructor) {
             // DESTROY argument must be 0
             int32_t error = 0;
             if (method->args_length != 1) {
@@ -3510,7 +3510,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
           }
           
           // Check method
-          if (!(method->flag & SPVM_METHOD_C_FLAG_NATIVE)) {
+          if (!(method->is_native)) {
             SPVM_CHECK_AST_INFO check_ast_info_struct = {0};
             SPVM_CHECK_AST_INFO* check_ast_info = &check_ast_info_struct;
             
@@ -3868,7 +3868,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
 
           // Fifth tree traversal
           // Resolve var_decl mem ids
-          if (!(method->flag & SPVM_METHOD_C_FLAG_NATIVE)) {
+          if (!(method->is_native)) {
             {
               SPVM_LIST* tmp_var_decl_stack = SPVM_LIST_new(compiler->allocator, 0, SPVM_ALLOCATOR_C_ALLOC_TYPE_TMP);
               SPVM_LIST* no_tmp_var_decl_stack = SPVM_LIST_new(compiler->allocator, 0, SPVM_ALLOCATOR_C_ALLOC_TYPE_TMP);
@@ -4885,24 +4885,24 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
     SPVM_CLASS* class = SPVM_LIST_get(compiler->classes, class_index);
     
     // Add the interfaces to the class
-    for (int32_t i = 0; i < class->interfaces->length; i++) {
-      SPVM_INTERFACE* interface =  SPVM_LIST_get(class->interfaces, i);
+    for (int32_t i = 0; i < class->interface_decls->length; i++) {
+      SPVM_INTERFACE* interface_decl =  SPVM_LIST_get(class->interface_decls, i);
 
-      SPVM_OP* op_interface = interface->op_interface;
+      SPVM_OP* op_interface = interface_decl->op_interface;
       
-      const char* interface_class_name = interface->class_name;
+      const char* interface_name = interface_decl->class_name;
       
-      SPVM_CLASS* interface_class = SPVM_HASH_get(compiler->class_symtable, interface_class_name, strlen(interface_class_name));
+      SPVM_CLASS* interface = SPVM_HASH_get(compiler->class_symtable, interface_name, strlen(interface_name));
       
-      if (interface_class->category != SPVM_CLASS_C_CATEGORY_INTERFACE) {
-        SPVM_COMPILER_error(compiler, "The operand of the interface statment must be the interface class at %s line %d", interface_class->name, op_interface->file, op_interface->line);
+      if (interface->category != SPVM_CLASS_C_CATEGORY_INTERFACE) {
+        SPVM_COMPILER_error(compiler, "The operand of the interface statment must be the interface class at %s line %d", interface->name, op_interface->file, op_interface->line);
         return;
       }
       
-      SPVM_CLASS* found_interface_class = SPVM_HASH_get(class->interface_symtable, interface_class->name, strlen(interface_class->name));
-      if (!found_interface_class) {
-        SPVM_LIST_push(class->interface_classes, interface_class);
-        SPVM_HASH_set(class->interface_symtable, interface_class->name, strlen(interface_class->name), interface_class);
+      SPVM_CLASS* found_interface = SPVM_HASH_get(class->interface_symtable, interface->name, strlen(interface->name));
+      if (!found_interface) {
+        SPVM_LIST_push(class->interfaces, interface);
+        SPVM_HASH_set(class->interface_symtable, interface->name, strlen(interface->name), interface);
       }
     }
 
@@ -4928,7 +4928,7 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
       
       // Set method precompile flag if class have precompile descriptor
       if (class->has_precompile_descriptor && method->can_precompile) {
-        method->flag |= SPVM_METHOD_C_FLAG_PRECOMPILE;
+        method->is_precompile = 1;
       }
 
       // Set method id

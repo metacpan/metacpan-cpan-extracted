@@ -19,7 +19,7 @@ name: Perinci-Sub-DepChecker
 provides:
   Perinci::Sub::DepChecker:
     file: lib/Perinci/Sub/DepChecker.pm
-    version: '0.124'
+    version: '0.125'
 requires:
   Exporter: '5.57'
   File::Which: '0'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-DepChecker
   homepage: https://metacpan.org/release/Perinci-Sub-DepChecker
   repository: git://github.com/perlancar/perl-Perinci-Sub-DepChecker.git
-version: '0.124'
+version: '0.125'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

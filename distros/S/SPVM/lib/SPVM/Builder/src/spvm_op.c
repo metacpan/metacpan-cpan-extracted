@@ -1830,7 +1830,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
   class->name = op_name_class->uv.name;
 
   // Class is callback
-  int32_t category_descriptors_count = 0;
+  int32_t class_descriptors_count = 0;
   int32_t access_control_descriptors_count = 0;
   if (op_list_descriptors) {
     SPVM_OP* op_descriptor = op_list_descriptors->first;
@@ -1839,18 +1839,18 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
       switch (descriptor->id) {
         case SPVM_DESCRIPTOR_C_ID_CALLBACK_T: {
           class->category = SPVM_CLASS_C_CATEGORY_CALLBACK;
-          category_descriptors_count++;
+          class_descriptors_count++;
           break;
         }
         case SPVM_DESCRIPTOR_C_ID_POINTER_T: {
           class->category = SPVM_CLASS_C_CATEGORY_CLASS;
-          class->flag |= SPVM_CLASS_C_FLAG_POINTER;
-          category_descriptors_count++;
+          class->is_pointer = 1;
+          class_descriptors_count++;
           break;
         }
         case SPVM_DESCRIPTOR_C_ID_MULNUM_T: {
           class->category = SPVM_CLASS_C_CATEGORY_MULNUM;
-          category_descriptors_count++;
+          class_descriptors_count++;
           break;
         }
         case SPVM_DESCRIPTOR_C_ID_PRIVATE: {
@@ -1859,7 +1859,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           break;
         }
         case SPVM_DESCRIPTOR_C_ID_PUBLIC: {
-          class->flag |= SPVM_CLASS_C_FLAG_PUBLIC;
+          class->is_public = 1;
           access_control_descriptors_count++;
           break;
         }
@@ -1869,7 +1869,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
         }
         case SPVM_DESCRIPTOR_C_ID_INTERFACE_T: {
           class->category = SPVM_CLASS_C_CATEGORY_INTERFACE;
-          category_descriptors_count++;
+          class_descriptors_count++;
           break;
         }
         default: {
@@ -1877,7 +1877,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
         }
       }
     }
-    if (category_descriptors_count > 1) {
+    if (class_descriptors_count > 1) {
       SPVM_COMPILER_error(compiler, "callback_t, mulnum_t, pointer_t interface_t can be specified only one at %s line %d", op_list_descriptors->file, op_list_descriptors->line);
     }
     if (access_control_descriptors_count > 1) {
@@ -1924,7 +1924,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
         if (class->category != SPVM_CLASS_C_CATEGORY_CLASS) {
           SPVM_COMPILER_error(compiler, "Non-noramal classes can't have \"implement\" statements at %s line %d", op_decl->file, op_decl->line);
         }
-        SPVM_LIST_push(class->interfaces, op_decl->uv.interface);
+        SPVM_LIST_push(class->interface_decls, op_decl->uv.interface);
       }
       // Class var declarations
       else if (op_decl->id == SPVM_OP_C_ID_CLASS_VAR) {
@@ -2170,7 +2170,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
     for (int32_t i = 0; i < class->fields->length; i++) {
       SPVM_FIELD* field = SPVM_LIST_get(class->fields, i);
 
-      if (class->flag & SPVM_CLASS_C_FLAG_POINTER) {
+      if (class->is_pointer) {
         SPVM_COMPILER_error(compiler, "class which has pointer_t descriptor can't have fields at %s line %d", field->op_field->file, field->op_field->line);
         continue;
       }
@@ -2218,12 +2218,6 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
       for (i = 0; i < class->methods->length; i++) {
         SPVM_METHOD* method = SPVM_LIST_get(class->methods, i);
         
-        if (method->flag & SPVM_METHOD_C_FLAG_ANON) {
-          class->flag |= SPVM_CLASS_C_FLAG_ANON_METHOD_CLASS;
-          assert(class->methods->length == 1);
-          assert(class->is_anon);
-        }
-
         SPVM_OP* op_name_method = method->op_name;
         const char* method_name = op_name_method->uv.name;
 
@@ -2263,12 +2257,12 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           }
           
           // If class is callback, the method must not be native
-          if (method->flag & SPVM_METHOD_C_FLAG_NATIVE) {
+          if (method->is_native) {
             SPVM_COMPILER_error(compiler, "Methods of callback classes  can't have native descriptors at %s line %d", method->op_method->file, method->op_method->line);
           }
 
           // If class is callback, the method must not be precompile
-          if (method->flag & SPVM_METHOD_C_FLAG_PRECOMPILE) {
+          if (method->is_precompile) {
             SPVM_COMPILER_error(compiler, "Methods of callback classes can't have precompile descriptors at %s line %d", method->op_method->file, method->op_method->line);
           }
           
@@ -2284,12 +2278,12 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           }
           
           // If class is interface, the method must not be native
-          if (method->flag & SPVM_METHOD_C_FLAG_NATIVE) {
+          if (method->is_native) {
             SPVM_COMPILER_error(compiler, "Methods of interface classes  can't have native descriptors at %s line %d", method->op_method->file, method->op_method->line);
           }
 
           // If class is interface, the method must not be precompile
-          if (method->flag & SPVM_METHOD_C_FLAG_PRECOMPILE) {
+          if (method->is_precompile) {
             SPVM_COMPILER_error(compiler, "Methods of interface classes can't have precompile descriptors at %s line %d", method->op_method->file, method->op_method->line);
           }
           
@@ -2299,7 +2293,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           }
         }
         
-        if (method->flag & SPVM_METHOD_C_FLAG_NATIVE) {
+        if (method->is_native) {
           if (method->op_block) {
             SPVM_COMPILER_error(compiler, "Native methods can't have blocks at %s line %d", method->op_method->file, method->op_method->line);
           }
@@ -2320,8 +2314,8 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
             // Bind standard functions
             method->class = class;
             
-            if (method->flag & SPVM_METHOD_C_FLAG_DESTRUCTOR) {
-              class->method_destructor = method;
+            if (method->is_destructor) {
+              class->destructor_method = method;
             }
             
             assert(method->op_method->file);
@@ -2448,29 +2442,35 @@ SPVM_OP* SPVM_OP_build_our(SPVM_COMPILER* compiler, SPVM_OP* op_class_var, SPVM_
       SPVM_DESCRIPTOR* descriptor = op_descriptor->uv.descriptor;
       
       switch (descriptor->id) {
-        case SPVM_DESCRIPTOR_C_ID_PRIVATE:
+        case SPVM_DESCRIPTOR_C_ID_PRIVATE: {
           // Default is private
           access_control_descriptors_count++;
           break;
-        case SPVM_DESCRIPTOR_C_ID_PUBLIC:
-          class_var->flag |= SPVM_CLASS_VAR_C_FLAG_PUBLIC;
+        }
+        case SPVM_DESCRIPTOR_C_ID_PUBLIC: {
+          class_var->is_public = 1;
           access_control_descriptors_count++;
           break;
-        case SPVM_DESCRIPTOR_C_ID_RW:
+        }
+        case SPVM_DESCRIPTOR_C_ID_RW: {
           class_var->has_setter = 1;
           class_var->has_getter = 1;
           accessor_descriptors_count++;
           break;
-        case SPVM_DESCRIPTOR_C_ID_RO:
+        }
+        case SPVM_DESCRIPTOR_C_ID_RO: {
           class_var->has_getter = 1;
           accessor_descriptors_count++;
           break;
-        case SPVM_DESCRIPTOR_C_ID_WO:
+        }
+        case SPVM_DESCRIPTOR_C_ID_WO: {
           class_var->has_setter = 1;
           accessor_descriptors_count++;
           break;
-        default:
+        }
+        default: {
           SPVM_COMPILER_error(compiler, "Invalid class variable descriptor in class variable declaration %s at %s line %d", (SPVM_DESCRIPTOR_C_ID_NAMES())[descriptor->id], op_descriptors->file, op_descriptors->line);
+        }
       }
       if (accessor_descriptors_count > 1) {
         SPVM_COMPILER_error(compiler, "rw, ro, wo can be specifed only one in class variable  declaration at %s line %d", op_class_var->file, op_class_var->line);
@@ -2513,7 +2513,7 @@ SPVM_OP* SPVM_OP_build_has(SPVM_COMPILER* compiler, SPVM_OP* op_field, SPVM_OP* 
           access_control_descriptors_count++;
           break;
         case SPVM_DESCRIPTOR_C_ID_PUBLIC:
-          field->flag |= SPVM_FIELD_C_FLAG_PUBLIC;
+          field->is_public = 1;
           access_control_descriptors_count++;
           break;
         case SPVM_DESCRIPTOR_C_ID_RW:
@@ -2552,7 +2552,7 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
   
   // Is anon method
   if (is_anon) {
-    method->flag |= SPVM_METHOD_C_FLAG_ANON;
+    method->is_anon = 1;
   }
   
   if (op_name_method == NULL) {
@@ -2590,7 +2590,7 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
       
       switch (descriptor->id) {
         case SPVM_DESCRIPTOR_C_ID_PRIVATE: {
-          method->flag |= SPVM_METHOD_C_FLAG_PRIVATE;
+          method->is_private = 1;
           access_control_descriptors_count++;
           break;
         }
@@ -2600,7 +2600,7 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
           break;
         }
         case SPVM_DESCRIPTOR_C_ID_NATIVE: {
-          method->flag |= SPVM_METHOD_C_FLAG_NATIVE;
+          method->is_native = 1;
           break;
         }
         case SPVM_DESCRIPTOR_C_ID_STATIC: {
@@ -2613,7 +2613,7 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
       }
     }
     
-    if ((method->flag & SPVM_METHOD_C_FLAG_NATIVE) && (method->flag & SPVM_METHOD_C_FLAG_PRECOMPILE)) {
+    if ((method->is_native) && (method->is_precompile)) {
       SPVM_COMPILER_error(compiler, "native and compile descriptor can't be used together at %s line %d", op_descriptors->file, op_descriptors->line);
     }
     if (access_control_descriptors_count > 1) {
@@ -2622,7 +2622,7 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
   }
 
   // Native method can't have block
-  if ((method->flag & SPVM_METHOD_C_FLAG_NATIVE) && op_block) {
+  if ((method->is_native) && op_block) {
     SPVM_COMPILER_error(compiler, "Native method can't have block at %s line %d", op_block->file, op_block->line);
   }
   
@@ -2670,7 +2670,7 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
   method->return_type = op_return_type->uv.type;
   
   if (strcmp(method->op_name->uv.name, "DESTROY") == 0) {
-    method->flag |= SPVM_METHOD_C_FLAG_DESTRUCTOR;
+    method->is_destructor = 1;
     
     // DESTROY return type must be void
     if (!(method->return_type->dimension == 0 && method->return_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_VOID)) {
@@ -2798,8 +2798,8 @@ SPVM_OP* SPVM_OP_build_enumeration_value(SPVM_COMPILER* compiler, SPVM_OP* op_na
   // Set constant
   op_method->uv.method->op_inline = op_constant;
   
-  // Method is constant
-  op_method->uv.method->flag |= SPVM_METHOD_C_FLAG_ENUM;
+  // Method is enumeration
+  op_method->uv.method->is_enum = 1;
   
   return op_method;
 }
@@ -2822,7 +2822,7 @@ SPVM_OP* SPVM_OP_build_enumeration(SPVM_COMPILER* compiler, SPVM_OP* op_enumerat
         
         switch (descriptor->id) {
           case SPVM_DESCRIPTOR_C_ID_PRIVATE:
-            method->flag |= SPVM_METHOD_C_FLAG_PRIVATE;
+            method->is_private = 1;
             access_control_descriptors_count++;
             break;
           case SPVM_DESCRIPTOR_C_ID_PUBLIC:

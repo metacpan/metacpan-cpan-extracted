@@ -6,6 +6,7 @@ use Digest::SHA();
 use MIME::Base64();
 use Test::More;
 use Cwd();
+use Encode();
 use Firefox::Marionette();
 use Waterfox::Marionette();
 use Compress::Zlib();
@@ -14,6 +15,11 @@ use HTTP::Daemon();
 use HTTP::Status();
 use HTTP::Response();
 use IO::Socket::SSL();
+BEGIN: {
+    if ( $^O eq 'MSWin32' ) {
+        require Win32::Process;
+    }
+}
 
 my $segv_detected;
 my $at_least_one_success;
@@ -79,6 +85,19 @@ foreach my $sig_name (@sig_names) {
 
 $SIG{INT} = sub { $terminated = 1; die "Caught an INT signal"; };
 $SIG{TERM} = sub { $terminated = 1; die "Caught a TERM signal"; };
+
+sub process_alive {
+	my ($pid) = @_;
+	if ($^O eq 'MSWin32') {
+		if (Win32::Process::Open(my $process, $pid, 0)) {
+			return 1;
+		} else {
+			return 0;
+		}
+	} else {
+		return kill 0, $pid;
+	}
+}
 
 sub out_of_time {
 	my ($package, $file, $line) = caller 1;
@@ -148,6 +167,9 @@ sub start_firefox {
 	if ($ENV{FIREFOX_HOST}) {
 		$parameters{host} = $ENV{FIREFOX_HOST};
 		diag("Overriding host to '$parameters{host}'");
+		if ($ENV{FIREFOX_VIA}) {
+			$parameters{via} = $ENV{FIREFOX_VIA};
+		}
 		if ($ENV{FIREFOX_USER}) {
 			$parameters{user} = $ENV{FIREFOX_USER};
 		} elsif (($ENV{FIREFOX_HOST} eq 'localhost') && (!$ENV{FIREFOX_PORT})) {
@@ -191,7 +213,7 @@ sub start_firefox {
 			}
 			$parameters{capabilities} = Firefox::Marionette::Capabilities->new(%new);
 		}
-		if (($parameters{visible}) && ($ENV{FIREFOX_NO_VISIBLE})) {
+		if ((($parameters{visible}) || ($require_visible)) && ($ENV{FIREFOX_NO_VISIBLE})) {
 			$skip_message = "Firefox visible tests are unreliable on a remote host";
 			return ($skip_message, undef);
 		}
@@ -214,9 +236,7 @@ sub start_firefox {
 	}
 	if ($ENV{FIREFOX_VISIBLE}) {
 		$require_visible = 1;
-		if (!$parameters{visible}) {
-			$parameters{visible} = 1;
-		}
+		$parameters{visible} = $require_visible;
 		if ((defined $parameters{capabilities}) && ($parameters{capabilities}->moz_headless())) {
 			my $old = $parameters{capabilities};
 			my %new = ( moz_headless => 0 );
@@ -253,6 +273,10 @@ sub start_firefox {
 			$parameters{capabilities} = Firefox::Marionette::Capabilities->new(%new);
 		}
 		diag("Overriding firefox visibility");
+	} elsif ($ENV{FIREFOX_NO_VISIBLE}) {
+		$parameters{visible} = 0;
+	} else {
+		$parameters{visible} = $require_visible;
 	}
 	if ($segv_detected) {
 		$skip_message = "Previous SEGV detected.  Trying to shutdown tests as fast as possible";
@@ -399,6 +423,9 @@ if ((exists $ENV{FIREFOX_USER}) && (defined $ENV{FIREFOX_USER})) {
 }
 if ((exists $ENV{FIREFOX_PORT}) && (defined $ENV{FIREFOX_PORT})) {
 	diag("FIREFOX_PORT is $ENV{FIREFOX_PORT}");
+}
+if ((exists $ENV{FIREFOX_VIA}) && (defined $ENV{FIREFOX_VIA})) {
+	diag("FIREFOX_VIA is $ENV{FIREFOX_VIA}");
 }
 if ((exists $ENV{FIREFOX_VISIBLE}) && (defined $ENV{FIREFOX_VISIBLE})) {
 	diag("FIREFOX_VISIBLE is $ENV{FIREFOX_VISIBLE}");
@@ -779,7 +806,7 @@ SKIP: {
 	ok($timeouts->implicit() == $implicit_timeout, "\$timeouts->implicit() is $implicit_timeout");
 	ok(!defined $firefox->child_error(), "Firefox does not have a value for child_error");
 	ok($firefox->alive(), "Firefox is still alive");
-	ok(not($firefox->script('window.open("https://duckduckgo.com", "_blank");')), "Opening new window to duckduckgo.com via 'window.open' script");
+	ok(not($firefox->script('window.open("about:blank", "_blank");')), "Opening new window to about:blank via 'window.open' script");
 	ok($firefox->close_current_window_handle(), "Closed new tab/window");
 	SKIP: {
 		if ($major_version < 55) {
@@ -808,7 +835,7 @@ $profile->set_value('browser.pagethumbnails.capturing_disabled', 'false', 0);
 $profile->set_value('startup.homepage_welcome_url', 'false', 0); 
 
 SKIP: {
-	if (($^O eq 'MSWin32') || ($^O eq 'cygwin') || ($ENV{FIREFOX_NO_RECONNECT})) {
+	if (($ENV{FIREFOX_NO_RECONNECT})) {
 		if ($ENV{FIREFOX_HOST}) {
 			skip("$ENV{FIREFOX_HOST} is not supported for reconnecting yet", 8);
 		} else {
@@ -833,11 +860,11 @@ SKIP: {
 	my $firefox_pid = $capabilities->moz_process_id();
 	ok($firefox_pid, "Firefox process has a process id of $firefox_pid");
 	if (!$ENV{FIREFOX_HOST}) {
-		ok((kill 0, $firefox_pid), "Can contact firefox process ($firefox_pid)");
+		ok(process_alive($firefox_pid), "Can contact firefox process ($firefox_pid)");
 	}
 	$firefox = undef;
 	if (!$ENV{FIREFOX_HOST}) {
-		ok((kill 0, $firefox_pid), "Can contact firefox process ($firefox_pid)");
+		ok(process_alive($firefox_pid), "Can contact firefox process ($firefox_pid)");
 	}
 	($skip_message, $firefox) = start_firefox(0, debug => 1, reconnect => 1);
 	ok($firefox, "Firefox has reconnected in Marionette mode");
@@ -845,7 +872,7 @@ SKIP: {
 	ok($firefox_pid == $capabilities->moz_process_id(), "Firefox has the same process id");
 	$firefox = undef;
 	if (!$ENV{FIREFOX_HOST}) {
-		ok((!kill 0, $firefox_pid), "Cannot contact firefox process ($firefox_pid)");
+		ok(!process_alive($firefox_pid), "Cannot contact firefox process ($firefox_pid)");
 	}
 	if (!$ENV{FIREFOX_HOST}) {
 		if ($ENV{FIREFOX_BINARY}) {
@@ -856,6 +883,16 @@ SKIP: {
 		}
 		if (($ENV{WATERFOX}) || ($ENV{WATERFOX_VIA_FIREFOX})) {
 			skip("No profile testing when any WATERFOX override is used", 6);
+		}
+		my $found;
+		my @names = Firefox::Marionette::Profile->names();
+		foreach my $name (@names) {
+			if ($name eq 'throw') {
+				$found = 1;
+			}
+		}
+		if (!$found) {
+			skip("No profile testing when throw profile doesn't exist", 6);
 		}
 		my $name = 'throw';
 		($skip_message, $firefox) = start_firefox(0, debug => 1, har => 1, survive => 1, profile_name => $name );
@@ -870,14 +907,14 @@ SKIP: {
 		ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
 		my $firefox_pid = $capabilities->moz_process_id();
 		ok($firefox_pid, "Firefox process has a process id of $firefox_pid when using a profile_name");
-		ok((kill 0, $firefox_pid), "Can contact firefox process ($firefox_pid) when using a profile_name");
+		ok(process_alive($firefox_pid), "Can contact firefox process ($firefox_pid) when using a profile_name");
 		$firefox = undef;
-		ok((kill 0, $firefox_pid), "Can contact firefox process ($firefox_pid) when using a profile_name");
+		ok(process_alive($firefox_pid), "Can contact firefox process ($firefox_pid) when using a profile_name");
 		($skip_message, $firefox) = start_firefox(0, debug => 1, reconnect => 1, profile_name => $name);
 		ok($firefox, "Firefox has reconnected in Marionette mode when using a profile_name");
 		ok($firefox_pid == $capabilities->moz_process_id(), "Firefox has the same process id when using a profile_name");
 		$firefox = undef;
-		ok(!(kill 0, $firefox_pid), "Cannot contact firefox process ($firefox_pid)");
+		ok(!process_alive($firefox_pid), "Cannot contact firefox process ($firefox_pid)");
 	}
 }
 
@@ -1052,6 +1089,8 @@ SKIP: {
 			skip("\$capabilities->proxy is not supported for remote hosts", 3);
 		} elsif (!$capabilities->proxy()) {
 			skip("\$capabilities->proxy is not supported for " . $capabilities->browser_version(), 1);
+		} elsif ($^O eq 'cygwin') {
+			skip("\$capabilities->proxy is not supported for $^O", 1);
 		} elsif ((exists $Config::Config{'d_fork'}) && (defined $Config::Config{'d_fork'}) && ($Config::Config{'d_fork'} eq 'define')) {
 			if ($ENV{RELEASE_TESTING}) {
 				my $handle = File::Temp->new( TEMPLATE => File::Spec->catfile( File::Spec->tmpdir(), 'firefox_test_proxy_XXXXXXXXXXX')) or Firefox::Marionette::Exception->throw( "Failed to open temporary file for writing:$!");
@@ -1154,7 +1193,11 @@ SKIP: {
 
 SKIP: {
 	diag("Starting new firefox for testing proxies again");
-	($skip_message, $firefox) = start_firefox(1, seer => 1, chatty => 1, debug => 1, capabilities => Firefox::Marionette::Capabilities->new(proxy => Firefox::Marionette::Proxy->new( host => 'proxy.example.org:3128')));
+	my $visible = 1;
+	if (($ENV{FIREFOX_HOST}) && ($ENV{FIREFOX_HOST} eq 'localhost') && ($ENV{FIREFOX_USER})) {
+		$visible = 'local';
+	}
+	($skip_message, $firefox) = start_firefox($visible, seer => 1, chatty => 1, debug => 1, capabilities => Firefox::Marionette::Capabilities->new(proxy => Firefox::Marionette::Proxy->new( host => 'proxy.example.org:3128')));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
@@ -1173,7 +1216,29 @@ SKIP: {
 		ok($capabilities->proxy()->https() eq 'proxy.example.org:3128', "\$capabilities->proxy()->https() is 'proxy.example.org:3128'");
 		ok($capabilities->proxy()->http() eq 'proxy.example.org:3128', "\$capabilities->proxy()->http() is 'proxy.example.org:3128'");
 	}
-	ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
+	if (($ENV{RELEASE_TESTING}) && ($visible eq 'local')) {
+		`xwininfo -version 2>/dev/null`;
+		if ($? == 0) {
+			require Crypt::URandom;
+			my $string = join q[], unpack("h*", Crypt::URandom::urandom(20));
+			$firefox->script('window.document.title = arguments[0]', args => [ $string ]);
+			my $found_window = `xwininfo -root -tree | grep $string`;
+			chomp $found_window;
+			ok($found_window, "Found X11 Forwarded window:$found_window");
+			my $pid = $capabilities->moz_process_id();
+			if (defined $pid) {
+				my $command = "ps axo pid,user,cmd | grep -E '^[ ]+$pid\[ \]+$ENV{FIREFOX_USER}\[ \]+.+firefox[ ]\-marionette[ ]\-safe\-mode[ ]\-profile[ ].*/profile[ ]\-\-no\-remote[ ]\-\-new\-instance[ ]*\$'";
+				my $process_listing = `$command`;
+				chomp $process_listing;
+				ok($process_listing =~ /^[ ]+$pid/, "Found X11 Forwarded process:$process_listing");
+			}
+		}
+	}
+	my $child_error = $firefox->quit();
+	if (($major_version < 50) && ($ENV{RELEASE_TESTING}) && ($visible eq 'local')) {
+		$correct_exit_status = $child_error;
+	}
+	ok($child_error == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->error_message());
 }
 
 SKIP: {
@@ -1257,11 +1322,11 @@ SKIP: {
 		}
 		{
 			my $value = $firefox->script('return [2,arguments[0]]', args => [ $span ]);
-			ok(ref $value->[1] eq 'Firefox::Marionette::Element' && $value->[1]->tag_name() eq 'span', "Value returned from script is a Firefox::Mariontte::Element for a 'span' in an array");
+			ok(ref $value->[1] eq 'Firefox::Marionette::Element' && $value->[1]->tag_name() eq 'span', "Value returned from script is a Firefox::Marionette::Element for a 'span' in an array");
 		}
 		{
 			my $value = $firefox->script('return arguments[0]', args => { elem => $span });
-			ok(ref $value->{elem} eq 'Firefox::Marionette::Element' && $value->{elem}->tag_name() eq 'span', "Value returned from script is a Firefox::Mariontte::Element for a 'span' in a hash");
+			ok(ref $value->{elem} eq 'Firefox::Marionette::Element' && $value->{elem}->tag_name() eq 'span', "Value returned from script is a Firefox::Marionette::Element for a 'span' in a hash");
 		}
 		{
 			my $value = $firefox->script('return 2', args => [ $span ]);
@@ -1279,6 +1344,9 @@ SKIP: {
 		skip("\$capabilities->accept_insecure_certs is not supported for " . $capabilities->browser_version(), 4);
 	}
 	ok($capabilities->accept_insecure_certs(), "\$capabilities->accept_insecure_certs() is true");
+	if (!$ENV{RELEASE_TESTING}) {
+		skip("Skipping network tests", 3);
+	}
 	ok($firefox->go(URI->new("https://untrusted-root.badssl.com/")), "https://untrusted-root.badssl.com/ has been loaded");
 	if (out_of_time()) {
 		skip("Running out of time.  Trying to shutdown tests as fast as possible", 2);
@@ -1411,6 +1479,9 @@ SKIP: {
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
 	if (out_of_time()) {
 		skip("Running out of time.  Trying to shutdown tests as fast as possible", 2);
+	}
+	if (!$ENV{RELEASE_TESTING}) {
+		skip("Skipping network tests", 2);
 	}
 	if (grep /^accept_insecure_certs$/, $capabilities->enumerate()) {
 		ok(!$capabilities->accept_insecure_certs(), "\$capabilities->accept_insecure_certs() is false");
@@ -2022,13 +2093,14 @@ SKIP: {
 			}
 			ok($switch_to_parent_frame, "Switched to parent frame");
 		}
+		my $browser_name = $firefox->capabilities()->browser_name();
 		SKIP: {
 			if (!$chrome_window_handle_supported) {
 				diag("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version");
 				skip("\$firefox->chrome_window_handle is not supported for $major_version.$minor_version.$patch_version", 1);
 			}
 			foreach my $handle ($firefox->close_current_chrome_window_handle()) {
-				local $TODO = $major_version < 52 || $binary =~ /waterfox/i ? "\$firefox->close_current_chrome_window_handle() can return a undef value for versions less than 52" : undef;
+				local $TODO = $major_version < 52 || $browser_name =~ /waterfox/i ? "\$firefox->close_current_chrome_window_handle() can return a undef value for versions less than 52 or browser is waterfox" : undef;
 				if ($major_version < 90) {
 					ok(defined $handle && $handle == $new_chrome_window_handle, "Closed original window, which means the remaining chrome window handle should be $new_chrome_window_handle:" . ($handle || ''));
 				} else {
@@ -2037,6 +2109,9 @@ SKIP: {
 			}
 		}
 		ok($firefox->switch_to_window($new_window_handle), "\$firefox->switch_to_window() used to move back to the original window");
+	}
+	if (!$ENV{RELEASE_TESTING}) {
+		skip("Skipping network tests", 225);
 	}
 	my $metacpan_uri = 'https://metacpan.org/';
 	ok($firefox->go($metacpan_uri), "$metacpan_uri has been loaded in the new window");
@@ -2748,15 +2823,12 @@ SKIP: {
 		ok($count == 1, "Downloaded 1 files:$count");
 		my $handle = $firefox->download($download_path);
 		ok($handle->isa('GLOB'), "Obtained GLOB from \$firefox->download(\$path)");
-		if ($INC{'Devel/Cover.pm'}) {
-		} else {
-			my $gz = Compress::Zlib::gzopen($handle, 'rb') or die "Failed to open gzip stream";
-			my $bytes_read = 0;
-			while($gz->gzread(my $buffer, 4096)) {
-				$bytes_read += length $buffer
-			}
-			ok($bytes_read > 1_000, "Downloaded file is gzipped");
+		my $gz = Compress::Zlib::gzopen($handle, 'rb') or die "Failed to open gzip stream";
+		my $bytes_read = 0;
+		while($gz->gzread(my $buffer, 4096)) {
+			$bytes_read += length $buffer
 		}
+		ok($bytes_read > 1_000, "Downloaded file is gzipped");
 	}
 	foreach my $element ($firefox->find_tag('option')) {
 		my $inner_html;
@@ -2957,7 +3029,10 @@ SKIP: {
 		local $TODO = ($major_version < 31) ? "\$capabilities->platform_version() may not exist for Firefox versions less than 31" : undef;
 		ok(defined $capabilities->platform_version() && $capabilities->platform_version() =~ /\d+/, "\$capabilities->platform_version() contains a number:" . ($capabilities->platform_version() || ''));
 	}
-	ok($capabilities->moz_profile() =~ /firefox_marionette/, "\$capabilities->moz_profile() contains 'firefox_marionette':" . $capabilities->moz_profile());
+	TODO: {
+		local $TODO = ($ENV{FIREFOX_HOST} || $^O eq 'cygwin' || $^O eq 'Win32') ? "\$capabilities->moz_profiles() can contain shorted profile directory names" : undef;
+		ok($capabilities->moz_profile() =~ /firefox_marionette/, "\$capabilities->moz_profile() contains 'firefox_marionette':" . $capabilities->moz_profile());
+	}
 	SKIP: {
 		if (!grep /^moz_webdriver_click$/, $capabilities->enumerate()) {
 			diag("\$capabilities->moz_webdriver_click is not supported for " . $capabilities->browser_version());
@@ -3067,6 +3142,9 @@ SKIP: {
 		} elsif (($ENV{FIREFOX_HOST}) && ($ENV{FIREFOX_HOST} eq 'localhost') && ($ENV{FIREFOX_PORT})) {
 			diag("\$capabilities->proxy is not supported for remote hosts");
 			skip("\$capabilities->proxy is not supported for remote hosts", 3);
+		} elsif ($^O eq 'cygwin') {
+			diag("\$capabilities->proxy is not supported for " . $^O);
+			skip("\$capabilities->proxy is not supported for " . $^O, 3);
 		} elsif ((exists $Config::Config{'d_fork'}) && (defined $Config::Config{'d_fork'}) && ($Config::Config{'d_fork'} eq 'define')) {
 			my $json_document = Encode::decode('UTF-8', '{ "id": "5", "value": "sömething"}');
 			my $txt_document = 'This is ordinary text';
@@ -3200,6 +3278,9 @@ SKIP: {
 			} elsif (($ENV{FIREFOX_HOST}) && ($ENV{FIREFOX_HOST} eq 'localhost') && ($ENV{FIREFOX_PORT})) {
 				diag("\$capabilities->proxy is not supported for remote hosts");
 				skip("\$capabilities->proxy is not supported for remote hosts", 3);
+			} elsif ($^O eq 'cygwin') {
+				diag("\$capabilities->proxy is not supported for " . $^O);
+				skip("\$capabilities->proxy is not supported for " . $^O, 3);
 			} elsif ((exists $Config::Config{'d_fork'}) && (defined $Config::Config{'d_fork'}) && ($Config::Config{'d_fork'} eq 'define')) {
 				if (my $pid = fork) {
 					$firefox->go($daemon->url() . '?links_and_images');
@@ -3507,8 +3588,13 @@ _CERT_
 			ok($certificate->sha1_fingerprint(), Encode::encode('UTF-8', display_name($certificate)) . " has a sha1_fingerprint of " . $certificate->sha1_fingerprint());
 			ok(defined $certificate->organizational_unit(), Encode::encode('UTF-8', display_name($certificate)) . " has a organizational_unit of " . Encode::encode('UTF-8', $certificate->organizational_unit()));
 			$count += 1;
+			if (!$ENV{RELEASE_TESTING}) {
+				last;
+			}
 		}
-		ok($count > 0, "There are $count certificates in the firefox database");
+		if ($ENV{RELEASE_TESTING}) {
+			ok($count > 0, "There are $count certificates in the firefox database");
+		}
 	}
 	ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
 }
@@ -3722,8 +3808,10 @@ SKIP: {
 			}
 			my $handle = File::Temp->new( TEMPLATE => File::Spec->catfile( File::Spec->tmpdir(), 'firefox_test_ssh_local_directory_XXXXXXXXXXX')) or Firefox::Marionette::Exception->throw( "Failed to open temporary file for writing:$!");
 			fcntl $handle, Fcntl::F_SETFD(), 0 or Carp::croak("Can't clear close-on-exec flag on temporary file:$!");
+			my $via = $ENV{FIREFOX_VIA} ? q[, via => "] . $ENV{FIREFOX_VIA} . q["] : q[];
 			my $handle_fileno = fileno $handle;
-			my $command = join q[ ], $^X, (map { "-I$_" } @INC), '-MFirefox::Marionette', '-e', q['open(my $fh, ">&=", ] . $handle_fileno . q[) or die "OPEN:$!"; $f = Firefox::Marionette->new( user => "] . $user . q[", host => "] . $host . q["); $fh->print($f->ssh_local_directory()) or die "PRINT:$!"; close($fh) or die "CLOSE:$!";'];
+			my $command = join q[ ], $^X, (map { "-I$_" } @INC), '-MFirefox::Marionette', '-e', q['open(my $fh, ">&=", ] . $handle_fileno . q[) or die "OPEN:$!"; $f = Firefox::Marionette->new( user => "] . $user . q[", host => "] . $host . q["] . $via . q[); $fh->print($f->ssh_local_directory()) or die "PRINT:$!"; close($fh) or die "CLOSE:$!";'];
+			$command =~ s/([@])/\\$1/smxg;
 			my $output = `$command`;
 			$handle->seek(0,0) or die "Failed to seek on temporary file:$!";
 			my $result = read($handle, my $directory, 2048) or die "Failed to read from temporary file:$!";

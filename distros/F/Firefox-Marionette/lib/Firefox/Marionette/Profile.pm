@@ -13,7 +13,7 @@ BEGIN {
         require Win32;
     }
 }
-our $VERSION = '1.24';
+our $VERSION = '1.25';
 
 sub ANY_PORT            { return 0 }
 sub _GETPWUID_DIR_INDEX { return 7 }
@@ -98,7 +98,10 @@ sub names {
 
 sub path {
     my ( $class, $name ) = @_;
-    return File::Spec->catfile( $class->directory($name), 'prefs.js' );
+    if ( my $profile_directory = $class->directory($name) ) {
+        return File::Spec->catfile( $profile_directory, 'prefs.js' );
+    }
+    return;
 }
 
 sub directory {
@@ -137,7 +140,7 @@ sub directory {
             }
         }
     }
-    if ( ( !$path ) && ( defined $first_key ) ) {
+    if ( ( !$path ) && ( !defined $name ) && ( defined $first_key ) ) {
         if ( $config->{$first_key}->{IsRelative} ) {
             $path = File::Spec->catfile( $profile_ini_directory,
                 $config->{$first_key}->{Path} );
@@ -204,7 +207,7 @@ sub new {
     if ( !$parameters{seer} ) {
         $profile->set_value( 'browser.urlbar.speculativeConnect.enable',
             'false', 0 );
-        $profile->set_value( 'network.dns.disablePrefetch', 'false', 0 );
+        $profile->set_value( 'network.dns.disablePrefetch', 'true', 0 );
         $profile->set_value( 'network.http.speculative-parallel-limit', '0',
             0 );
         $profile->set_value( 'network.prefetch-next', 'false', 0 );
@@ -473,7 +476,7 @@ Firefox::Marionette::Profile - Represents a prefs.js Firefox Profile
 
 =head1 VERSION
 
-Version 1.24
+Version 1.25
 
 =head1 SYNOPSIS
 

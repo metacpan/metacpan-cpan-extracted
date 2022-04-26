@@ -15,9 +15,9 @@ our @EXPORT_OK = qw(
                );
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-04-20'; # DATE
+our $DATE = '2022-04-22'; # DATE
 our $DIST = 'Perinci-Sub-DepChecker'; # DIST
-our $VERSION = '0.124'; # VERSION
+our $VERSION = '0.125'; # VERSION
 
 my $pa;
 
@@ -100,20 +100,21 @@ sub checkdep_prog {
         require IPC::System::Options;
         require Version::Util;
 
-        my ($ver_cmd, $ver_extract);
+        my (@ver_cmd, $ver_extract);
+        my $prog_path = $cval->{path} // $prog_name;
         if ($prog_name eq 'git') {
-            $ver_cmd = "git --version";
+            @ver_cmd = ($prog_path, "--version");
             $ver_extract = sub { $_[0] =~ /git version (.+)/ ? $1 : undef };
         } elsif ($prog_name eq 'perl') {
-            $ver_cmd = "perl -v";
+            @ver_cmd = ($prog_path, "-v");
             $ver_extract = sub { $_[0] =~ /\(v(.+?)\)/ ? $1 : undef };
         } else {
             return "ERR: Cannot check minimum version for program '$prog_name'";
         }
 
-        my $ver = IPC::System::Options::readpipe({log=>1}, $ver_cmd);
+        my $ver = IPC::System::Options::readpipe({log=>1, shell=>0}, @ver_cmd);
         my ($exit_code, $signal, $core_dump) = ($? < 0 ? $? : $? >> 8, $? & 127, $? & 128);
-        return "ERR: Cannot check version with '$ver_cmd': exit_code=$exit_code"
+        return "ERR: Cannot check version with '".join(" ", @ver_cmd)."': exit_code=$exit_code"
             if $exit_code;
         ($ver) = $ver_extract->($ver) or return "ERR: Cannot extract version from response '$ver'";
         return "Program '$prog_name' version ($ver) is less than required ($cval->{min_version})"
@@ -243,7 +244,7 @@ Perinci::Sub::DepChecker - Check dependencies from 'deps' property
 
 =head1 VERSION
 
-This document describes version 0.124 of Perinci::Sub::DepChecker (from Perl distribution Perinci-Sub-DepChecker), released on 2022-04-20.
+This document describes version 0.125 of Perinci::Sub::DepChecker (from Perl distribution Perinci-Sub-DepChecker), released on 2022-04-22.
 
 =head1 SYNOPSIS
 

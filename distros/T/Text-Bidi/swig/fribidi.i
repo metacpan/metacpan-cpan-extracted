@@ -98,6 +98,7 @@ OUTSTR(char, utf8out);
 %}
 
 %apply const FriBidiChar* str { const FriBidiCharType* bidi_types }
+%apply unsigned long { FriBidiChar ch }
 %apply unsigned long *OUTPUT { FriBidiChar *mirrored_ch }
 
 %typemap(check) const FriBidiLevel* embedding_levels ""

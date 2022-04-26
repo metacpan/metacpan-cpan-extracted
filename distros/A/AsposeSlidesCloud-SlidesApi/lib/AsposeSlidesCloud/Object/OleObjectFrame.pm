@@ -41,6 +41,7 @@ use AsposeSlidesCloud::Object::EffectFormat;
 use AsposeSlidesCloud::Object::FillFormat;
 use AsposeSlidesCloud::Object::Hyperlink;
 use AsposeSlidesCloud::Object::LineFormat;
+use AsposeSlidesCloud::Object::PictureFill;
 use AsposeSlidesCloud::Object::ResourceUri;
 use AsposeSlidesCloud::Object::ShapeBase;
 use AsposeSlidesCloud::Object::ThreeDFormat;
@@ -260,13 +261,6 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
-    'shapes' => {
-    	datatype => 'ResourceUri',
-    	base_name => 'Shapes',
-    	description => 'Gets or sets the link to shapes.',
-    	format => '',
-    	read_only => '',
-    		},
     'fill_format' => {
     	datatype => 'FillFormat',
     	base_name => 'FillFormat',
@@ -330,6 +324,55 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'substitute_picture_format' => {
+    	datatype => 'PictureFill',
+    	base_name => 'SubstitutePictureFormat',
+    	description => 'OleObject image fill properties.',
+    	format => '',
+    	read_only => '',
+    		},
+    'object_name' => {
+    	datatype => 'string',
+    	base_name => 'ObjectName',
+    	description => 'Returns or sets the name of an object.',
+    	format => '',
+    	read_only => '',
+    		},
+    'embedded_file_base64_data' => {
+    	datatype => 'string',
+    	base_name => 'EmbeddedFileBase64Data',
+    	description => 'File data of embedded OLE object. ',
+    	format => '',
+    	read_only => '',
+    		},
+    'embedded_file_extension' => {
+    	datatype => 'string',
+    	base_name => 'EmbeddedFileExtension',
+    	description => 'File extension for the current embedded OLE object',
+    	format => '',
+    	read_only => '',
+    		},
+    'object_prog_id' => {
+    	datatype => 'string',
+    	base_name => 'ObjectProgId',
+    	description => 'ProgID of an object.',
+    	format => '',
+    	read_only => '',
+    		},
+    'link_path' => {
+    	datatype => 'string',
+    	base_name => 'LinkPath',
+    	description => 'Full path to a linked file.',
+    	format => '',
+    	read_only => '',
+    		},
+    'update_automatic' => {
+    	datatype => 'boolean',
+    	base_name => 'UpdateAutomatic',
+    	description => 'Determines if the linked embedded object is automatically updated when the presentation is opened or printed. Read/write Boolean.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -344,7 +387,6 @@ __PACKAGE__->swagger_types( {
     'x' => 'double',
     'y' => 'double',
     'z_order_position' => 'int',
-    'shapes' => 'ResourceUri',
     'fill_format' => 'FillFormat',
     'effect_format' => 'EffectFormat',
     'three_d_format' => 'ThreeDFormat',
@@ -353,7 +395,14 @@ __PACKAGE__->swagger_types( {
     'hyperlink_mouse_over' => 'Hyperlink',
     'type' => 'string',
     'is_object_icon' => 'boolean',
-    'substitute_picture_title' => 'string'
+    'substitute_picture_title' => 'string',
+    'substitute_picture_format' => 'PictureFill',
+    'object_name' => 'string',
+    'embedded_file_base64_data' => 'string',
+    'embedded_file_extension' => 'string',
+    'object_prog_id' => 'string',
+    'link_path' => 'string',
+    'update_automatic' => 'boolean'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -368,7 +417,6 @@ __PACKAGE__->attribute_map( {
     'x' => 'X',
     'y' => 'Y',
     'z_order_position' => 'ZOrderPosition',
-    'shapes' => 'Shapes',
     'fill_format' => 'FillFormat',
     'effect_format' => 'EffectFormat',
     'three_d_format' => 'ThreeDFormat',
@@ -377,7 +425,14 @@ __PACKAGE__->attribute_map( {
     'hyperlink_mouse_over' => 'HyperlinkMouseOver',
     'type' => 'Type',
     'is_object_icon' => 'IsObjectIcon',
-    'substitute_picture_title' => 'SubstitutePictureTitle'
+    'substitute_picture_title' => 'SubstitutePictureTitle',
+    'substitute_picture_format' => 'SubstitutePictureFormat',
+    'object_name' => 'ObjectName',
+    'embedded_file_base64_data' => 'EmbeddedFileBase64Data',
+    'embedded_file_extension' => 'EmbeddedFileExtension',
+    'object_prog_id' => 'ObjectProgId',
+    'link_path' => 'LinkPath',
+    'update_automatic' => 'UpdateAutomatic'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

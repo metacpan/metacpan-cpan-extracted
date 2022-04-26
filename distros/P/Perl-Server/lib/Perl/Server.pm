@@ -5,9 +5,10 @@ use warnings;
 use Cwd;
 use Plack::Runner;
 use Term::ANSIColor;
-use Net::EmptyPort qw/check_port/;
+use Getopt::Long;
+use Net::EmptyPort qw/empty_port check_port/;
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 sub new {
     my $class = shift;
@@ -22,6 +23,18 @@ sub new {
 sub run {
     my $self = shift;
     my @argv = @_;
+    
+    local @ARGV = @argv;   
+    
+    my $parser = Getopt::Long::Parser->new(
+        config => [ "no_auto_abbrev", "no_ignore_case", "pass_through" ],
+    ); 
+    
+    my $port;
+    
+    $parser->getoptions(
+        "p|port=s" => \$port
+    );      
 
     my $type = $self->_type;   
     
@@ -41,7 +54,10 @@ sub run {
         push(@argv, $type->{app});        
     }
     
-    unless (grep(/^(-p|--port)$/, @argv)) {
+    if ($port) {
+        push(@argv, '-p');
+        push(@argv, $port =~ /^e(mpty)?$/i ? $self->_port(1) : ($port =~ /\D/ ? $self->_port : $port));        
+    } else {
         push(@argv, '-p');
         push(@argv, $self->_port);      
     }
@@ -105,6 +121,10 @@ sub _middleware {
 }
 
 sub _port {
+    my ($self, $rand) = @_;
+    
+    return empty_port if $rand;
+    
     my $port = 3000;
     
     return $port unless check_port($port);
@@ -175,7 +195,25 @@ Using Perl::Server:
     
     $ perl-server [options]
     
-These options are the same as L<Plackup Options|plackup#OPTIONS>.
+=head1 OPTIONS
+
+=over 4
+ 
+=item -p, --port 
+
+    $ perl-server path -p 5000 
+    
+    $ perl-server path -p e
+    
+    $ perl-server path -p empty
+    
+Specifies the port to bind or set e or empty to a random free port.
+    
+=back
+    
+Others options are the same as L<Plackup Options|plackup#OPTIONS>.
+
+=cut
 
 =head1 SEE ALSO
  

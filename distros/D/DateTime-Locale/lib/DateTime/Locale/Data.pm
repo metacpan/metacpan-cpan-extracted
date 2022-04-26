@@ -21,7 +21,7 @@ use namespace::autoclean;
 use File::ShareDir qw( dist_file );
 use File::Spec;
 
-our $VERSION = '1.34';
+our $VERSION = '1.35';
 
 #<<<
 ### :start CLDRVersion:
@@ -6143,6 +6143,10 @@ sub locale_data {
 sub _data_for {
     my $code = shift;
 
+    # This untaints the variable.
+    ($code) = $code =~ /^([A-Za-z0-9-]+)$/
+        or die "Invalid locale code - $code\n";
+
     my $data
         = do(
         File::Spec->rel2abs( dist_file( 'DateTime-Locale', $code . '.pl' ) )
@@ -6188,7 +6192,7 @@ DateTime::Locale::Data - Locale data generated from CLDR
 
 =head1 VERSION
 
-version 1.34
+version 1.35
 
 =head1 DESCRIPTION
 

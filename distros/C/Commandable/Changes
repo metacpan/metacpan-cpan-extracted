@@ -1,5 +1,15 @@
 Revision history for Commandable
 
+0.07    2022-04-25
+        [CHANGES]
+         * Initial version of Commandable::Output API, an interface for user
+           programs to customise the way output is displayed
+         * Ensure that the 'help' builtin command uses Commandable::Output for
+           all its printing
+         * Convert underscores to hyphens in command names for
+           Commandable::Finder::SubAttributes
+         * More documentation on how to use Commandable::Finder::Packages
+
 0.06    2021-11-03
         [CHANGES]
          * Initial support for declaring named options to commands

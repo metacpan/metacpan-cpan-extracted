@@ -1,33 +1,36 @@
 use strict;
 use warnings;
-use Test::More tests => 10;
+use Test::More tests => 11;
 
 # TEST 1.
 use_ok('Dancer2::Plugin::FormValidator');
 
 # TEST 2.
-use_ok('Dancer2::Plugin::FormValidator::Config');
+use_ok('Dancer2::Plugin::FormValidator::Validator');
 
 # TEST 3.
-use_ok('Dancer2::Plugin::FormValidator::Processor');
+use_ok('Dancer2::Plugin::FormValidator::Config');
 
 # TEST 4.
-use_ok('Dancer2::Plugin::FormValidator::Registry');
+use_ok('Dancer2::Plugin::FormValidator::Processor');
 
 # TEST 5.
-use_ok('Dancer2::Plugin::FormValidator::Result');
+use_ok('Dancer2::Plugin::FormValidator::Registry');
 
 # TEST 6.
-use_ok('Dancer2::Plugin::FormValidator::Role::Profile');
+use_ok('Dancer2::Plugin::FormValidator::Result');
 
 # TEST 7.
-use_ok('Dancer2::Plugin::FormValidator::Role::HasMessages');
+use_ok('Dancer2::Plugin::FormValidator::Role::Profile');
 
 # TEST 8.
-use_ok('Dancer2::Plugin::FormValidator::Role::ProfileHasMessages');
+use_ok('Dancer2::Plugin::FormValidator::Role::HasMessages');
 
 # TEST 9.
-use_ok('Dancer2::Plugin::FormValidator::Role::Validator');
+use_ok('Dancer2::Plugin::FormValidator::Role::ProfileHasMessages');
 
 # TEST 10.
+use_ok('Dancer2::Plugin::FormValidator::Role::Validator');
+
+# TEST 11.
 use_ok('Dancer2::Plugin::FormValidator::Role::Extension');

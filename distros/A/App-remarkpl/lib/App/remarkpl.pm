@@ -1,4 +1,11 @@
 package App::remarkpl;
+use Mojo::Base -strict;
+
+our $VERSION = '0.06';
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -6,7 +13,7 @@ App::remarkpl - Web based presentation tool
 
 =head1 VERSION
 
-0.05
+0.06
 
 =head1 DESCRIPTION
 
@@ -31,15 +38,31 @@ about how to write slides.
 After starting the server, you can open your favorite (modern) browser
 at L<http://localhost:3000>.
 
-=cut
+=head1 ENVIRONMENT VARIABLES
 
-use Mojo::Base -base;
+=over 2
 
-our $VERSION = '0.05';
+=item * REMARK_JS
+
+Can be set to an external URL such as
+L<https://remarkjs.com/downloads/remark-latest.min.js> to use a different
+version than the bundled remarkjs version.
+
+=item * REMARK_STATIC
+
+Path to static files to include. Default value is the current working
+directory.
+
+=item * REMARK_TEMPLATES
+
+Path to custom Mojolicious templates. Default to C<./templates> in the current
+working directory.
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014, Jan Henning Thorsen
+Copyright (C) Jan Henning Thorsen
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.
@@ -49,5 +72,3 @@ the terms of the Artistic License version 2.0.
 Jan Henning Thorsen - C<jhthorsen@cpan.org>
 
 =cut
-
-1;

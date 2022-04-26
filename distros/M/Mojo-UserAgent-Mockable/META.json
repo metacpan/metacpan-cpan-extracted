@@ -1,10 +1,10 @@
 {
    "abstract" : "A Mojo User-Agent that can record and play back requests without Internet connectivity, similar to LWP::UserAgent::Mockable",
    "author" : [
-      "Kit Peters <popefelix@gmail.com>"
+      "Kit Peters <popefelix@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -51,6 +51,7 @@
       "test" : {
          "requires" : {
             "Array::Compare" : "0",
+            "Devel::Hide" : "0",
             "Exporter" : "0",
             "File::Compare" : "0",
             "File::Spec" : "0",
@@ -73,6 +74,7 @@
             "Test::JSON" : "0",
             "Test::Mojo" : "0",
             "Test::Moose" : "0",
+            "Test::More" : "0",
             "Test::Most" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
@@ -85,19 +87,19 @@
    "provides" : {
       "Mojo::UserAgent::Mockable" : {
          "file" : "lib/Mojo/UserAgent/Mockable.pm",
-         "version" : "1.58"
+         "version" : "1.59"
       },
       "Mojo::UserAgent::Mockable::Proxy" : {
          "file" : "lib/Mojo/UserAgent/Mockable/Proxy.pm",
-         "version" : "1.58"
+         "version" : "1.59"
       },
       "Mojo::UserAgent::Mockable::Request::Compare" : {
          "file" : "lib/Mojo/UserAgent/Mockable/Request/Compare.pm",
-         "version" : "1.58"
+         "version" : "1.59"
       },
       "Mojo::UserAgent::Mockable::Serializer" : {
          "file" : "lib/Mojo/UserAgent/Mockable/Serializer.pm",
-         "version" : "1.58"
+         "version" : "1.59"
       }
    },
    "release_status" : "stable",
@@ -112,9 +114,9 @@
          "web" : "https://github.com/popefelix/Mojo-UserAgent-Mockable"
       }
    },
-   "version" : "1.58",
-   "x_generated_by_perl" : "v5.32.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "version" : "1.59",
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

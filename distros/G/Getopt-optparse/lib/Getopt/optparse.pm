@@ -3,7 +3,7 @@ package Getopt::optparse;
 use strict;
 use Scalar::Util 'reftype';
 
-our $VERSION = '0.07';
+our $VERSION = '1.6.0';
  
 $| = 1;
 
@@ -42,13 +42,19 @@ sub add_option {
     my $optvals = shift;
 
     # action, default ,dest, help
+    # TODO: test for dest name collision.
 
     if (Scalar::Util::reftype($optvals) eq 'HASH') {
+        if (! $optvals->{dest}) {
+            printf("%s attribute dest is required.\n", $optname);
+            exit;
+        }
+
         $self->{parser}{$optname} = $optvals;
     }
     else {
         print "Attributes must be passed as hashref\n";
-        return;
+        exit;
     }
 }
 
@@ -99,9 +105,11 @@ sub parse_args {
                 }
 
                 # Match for store_true and count actions.
-                if (my @matches = ($self->{cmdline} =~ /$key\s+/g)) {
-                    for my $match (@matches) {
-                        $options{$parser->{dest}} += 1;
+                if ($parser->{action} eq 'count') {
+                    if (my @matches = ($self->{cmdline} =~ /$key\s+/g)) {
+                        for my $match (@matches) {
+                            $options{$parser->{dest}} += 1;
+                        }
                     }
                 }
 
@@ -121,7 +129,25 @@ sub parse_args {
             }
         }
     }
+
+    $self->run_callback(\%options);
+
     return \%options;
+}
+
+######################################################
+sub run_callback {
+######################################################
+    my $self = shift;
+    my $options = shift;
+
+    for my $key (keys %{$self->{parser}}) {
+        if ($self->{parser}{$key}{callback}) {
+            my $parser = $self->{parser}{$key};
+            $parser->{callback}->($parser, $options);
+        }
+    }
+
 }
 
 ######################################################
@@ -153,28 +179,49 @@ sub show_help {
         }
     }
 
-    # Print help.
-    for my $val ('int_parser', 'parser') {
-        for my $key (keys %{$self->{$val}}) {
-            # Add special character for actions count and append.
-            my $special;
-            if ($self->{$val}{$key}{action} eq 'count') {
-                $special = '++';
-            }
-            if ($self->{$val}{$key}{action} eq 'append') {
-                $special = '[]';
-            }
+    my (@singles, @doubles);
+    for my $key (keys %{$self->{parser}}) {
+        if ($key =~ /^--\w+/) {
+            push @doubles, $key;
+        }
+        elsif ($key =~ /^-\w+/) {
+            push @singles, $key;
+        }
+    }
 
-            if ($self->{$val}{$key}{dest} && ($self->{$val}{$key}{action} ne 'store_true')) {
-                printf(
-                    "%-$max_length{1}s : %s\n",
-                    $key . '=' . uc($self->{$val}{$key}{dest}) . $special,
-                    $self->{$val}{$key}{help}
-                );
-            }
-            else {
-                printf("%-$max_length{1}s : %s\n", $key, $self->{$val}{$key}{help});
-            }
+    my @sorted;
+    for my $elmt (sort { length $a <=> length $b } @singles) {
+        push @sorted, $elmt;
+    }
+
+    for my $elmt (sort { length $a <=> length $b } @doubles) {
+        push @sorted, $elmt;
+    }
+
+    # Print help.
+    for my $key(keys %{$self->{int_parser}}) {
+        printf("%-$max_length{1}s : %s\n", $key, $self->{int_parser}{$key}{help});
+    }
+
+    for my $key (@sorted) {
+        # Add special character for actions count and append.
+        my $special;
+        if ($self->{parser}{$key}{action} eq 'count') {
+            $special = '++';
+        }
+        if ($self->{parser}{$key}{action} eq 'append') {
+            $special = '[]';
+        }
+
+        if ($self->{parser}{$key}{dest} && ($self->{parser}{$key}{action} ne 'store_true')) {
+            printf(
+                "%-$max_length{1}s : %s\n",
+                $key . '=' . uc($self->{parser}{$key}{dest}) . $special,
+                $self->{parser}{$key}{help}
+            );
+        }
+        else {
+            printf("%-$max_length{1}s : %s\n", $key, $self->{parser}{$key}{help});
         }
     }
 }
@@ -271,18 +318,18 @@ Add option to be parsed from command line.  Accepts two arguments.  Both are req
 
 =over 4
 
-=item Option Name
+=item Option Name (required)
 
 Value to be parsed from command line.  --hostname in the above example.  
-This library uses only double dash.
+This library supports both single and double dash option names..
 
-=item Option Attributes.  A hash reference.
+=item Option Attributes hash reference (required)
 
 These may include:
 
 =over 8
 
-=item dest
+=item dest (required)
 
 Name of key were parsed option will be stored.
 
@@ -292,7 +339,7 @@ Value of dest if no option is parsed on command line.
 
 =item help (optional)
 
-Text message displayed when --help is found on command line.
+Text message displayed when -h or --help is found on command line.
 
 =item action (optional)
 
@@ -302,17 +349,91 @@ The following actions are supported.
 
 =item store_true
 
-Using this makes dest true or false.  (0 or 1).  If the option is found.
+Using this makes dest true or false (0 or 1) if the option name is found on the command line.
 
 =item append
 
-Using this appends each occurrance of an option to an array reference.
+Using this appends each occurrance of an option to an ARRAY reference if option name is found on the command line.
 
 =item count
 
-using this increments dest by one for every occurrence.
+Using this increments dest by one for every occurrence if option name is found on the command line.
 
 =back
+
+=item callback (optional)
+
+Allows user to pass code reference which is executed after Getopt::optparse->parse_args() is run.  The callback has access to to all parsed options from command line.  Placed here as not to clobber other actions.
+
+    # This example uses a callback to validate that user accounts don't already exist.
+    $parser->add_option(
+        '-username', 
+        {
+            dest     => 'username',
+            action   => 'append',
+            help     => 'Username for new ILO account',
+            callback => sub {
+                my ($parser, $options) = @_;
+                for my $uname (@{$options->{username}}) {
+                    if ($uname) {
+                         my $code = system(sprintf("getent passwd %s 2>&1 > /dev/null", $uname));
+                         if (! $code) {
+                             printf("Error: -username provided already exists: %s\n", $uname);
+                             exit 1;
+                         }
+                     }
+                     else {
+                         printf("Error: -username provided not defined: %s\n", $uname);
+                         exit 2;
+                     }
+                 }
+             }
+         }
+    );
+
+    # This example uses a callback to ensure a hostname is resolvable.
+    $parser->add_option(
+        '-hostname', 
+        {
+            dest     => 'hostname',
+            help     => 'Remote hostname',
+            default  => 'cpan.perl.org',
+            callback => sub {
+                my ($parser, $options) = @_;
+                my $hostname = $options->{hostname};
+                if ($hostname) {
+                    if ($hostname =~ /(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/) {
+                        printf("Error: -hostname should be resolvable fqdn not IP: %s\n", $hostname);
+                        exit 3;
+                    }
+                    if (! gethostbyname($hostname)) {
+                        printf("Error: unable to resolve -hostname: %s\n", $hostname);
+                        exit 4;
+                    }
+                }
+            }
+        }
+    );
+
+    # This example uses a callback to validate password integrity.
+    $parser->add_option(
+        '-password', 
+        {
+            dest     => 'password',
+            help     => 'Password for account',
+            callback => sub {
+                my ($parser, $options) = @_;
+                my $password = $options->{password};
+                if ($password) {
+                    if ($password !~ /^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])/s || (length($options->{password}) < 10)) {
+                        print "Error: Password should be at least 10 characters, contain numbers and a lower and upper case letters.\n";
+                        exit 5;
+                    }
+                }
+            }
+        }
+       
+    );
 
 =back
 

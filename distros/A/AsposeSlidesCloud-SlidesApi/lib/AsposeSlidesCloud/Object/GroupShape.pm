@@ -260,13 +260,6 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
-    'shapes' => {
-    	datatype => 'ResourceUri',
-    	base_name => 'Shapes',
-    	description => 'Gets or sets the link to shapes.',
-    	format => '',
-    	read_only => '',
-    		},
     'fill_format' => {
     	datatype => 'FillFormat',
     	base_name => 'FillFormat',
@@ -316,6 +309,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'shapes' => {
+    	datatype => 'ResourceUri',
+    	base_name => 'Shapes',
+    	description => 'Gets or sets the link to shapes.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -330,14 +330,14 @@ __PACKAGE__->swagger_types( {
     'x' => 'double',
     'y' => 'double',
     'z_order_position' => 'int',
-    'shapes' => 'ResourceUri',
     'fill_format' => 'FillFormat',
     'effect_format' => 'EffectFormat',
     'three_d_format' => 'ThreeDFormat',
     'line_format' => 'LineFormat',
     'hyperlink_click' => 'Hyperlink',
     'hyperlink_mouse_over' => 'Hyperlink',
-    'type' => 'string'
+    'type' => 'string',
+    'shapes' => 'ResourceUri'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -352,14 +352,14 @@ __PACKAGE__->attribute_map( {
     'x' => 'X',
     'y' => 'Y',
     'z_order_position' => 'ZOrderPosition',
-    'shapes' => 'Shapes',
     'fill_format' => 'FillFormat',
     'effect_format' => 'EffectFormat',
     'three_d_format' => 'ThreeDFormat',
     'line_format' => 'LineFormat',
     'hyperlink_click' => 'HyperlinkClick',
     'hyperlink_mouse_over' => 'HyperlinkMouseOver',
-    'type' => 'Type'
+    'type' => 'Type',
+    'shapes' => 'Shapes'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

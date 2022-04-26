@@ -37,6 +37,7 @@ my $url = Mojo::URL->new(q{https://www.random.org/integers/})->query(
 );
 my $output_file = qq{$dir/output_normalized.json};
 my $transaction_count = 10;
+plan skip_all => 'Random.org quota exceeded' unless check_quota($transaction_count);
 
 note "Record the interchange";
 my ( @results, @transactions );
@@ -45,7 +46,6 @@ my ( @results, @transactions );
     $mock->transactor->name('kit.peters@broadbean.com');
 
     for ( 1 .. $transaction_count ) {
-        plan skip_all => 'Random.org quota exceeded' unless check_quota();
         push @transactions, $mock->get( $url->clone->query( [ quux => int rand 1e9 ] ));
     }
     @results = map { [ split /\n/, $_->res->text ] } @transactions;

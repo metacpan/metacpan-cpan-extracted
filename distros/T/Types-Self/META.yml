@@ -1,0 +1,42 @@
+---
+abstract: 'provides a "Self" type constraint, referring to the caller class or role'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Role::Tiny: '0'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Types-Self
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Types::Self:
+    file: lib/Types/Self.pm
+    version: '0.001'
+requires:
+  Role::Hooks: '0'
+  Types::Standard: '1.012'
+  perl: '5.008001'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/Types-Self/project
+  bugtracker: https://github.com/tobyink/p5-types-self/issues
+  homepage: https://metacpan.org/release/Types-Self
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-types-self.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

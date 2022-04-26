@@ -1,7 +1,7 @@
 use 5.014;
 
 package Mojo::UserAgent::Mockable::Request::Compare;
-$Mojo::UserAgent::Mockable::Request::Compare::VERSION = '1.58';
+$Mojo::UserAgent::Mockable::Request::Compare::VERSION = '1.59';
 # VERSION
 
 # ABSTRACT: Helper class for Mojo::UserAgent::Mockable that compares two Mojo::Message::Request instances
@@ -154,7 +154,7 @@ Mojo::UserAgent::Mockable::Request::Compare - Helper class for Mojo::UserAgent::
 
 =head1 VERSION
 
-version 1.58
+version 1.59
 
 =head1 ATTRIBUTES
 
@@ -178,11 +178,11 @@ Compare two instances of L<Mojo::Message::Request>.
 
 =head1 AUTHOR
 
-Kit Peters <popefelix@gmail.com>
+Kit Peters <popefelix@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Kit Peters.
+This software is copyright (c) 2022 by Kit Peters.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -9,7 +9,7 @@ utf8::decode $_ for @ARGV;  # pretend -CA is in effect
 
 my $font = Font::PCF->open( shift @ARGV // die "Need FONT\n" );
 
-my $glyph = $font->get_glyph_for_char( shift @ARGV // "Need GLYPH\n" );
+my $glyph = $font->get_glyph_for_char( shift @ARGV // die "Need GLYPH\n" );
 
 sub printbits {
    my ( $bits ) = @_;
@@ -20,4 +20,11 @@ sub printbits {
    print "\n";
 }
 
-printbits $_ for $glyph->bitmap->@*;
+foreach my $row ( 0 .. $glyph->bitmap->$#* ) {
+   printf "[%02d]: ", $row;
+   printbits $glyph->bitmap->[$row];
+}
+
+foreach my $key (qw( width left_side_bearing right_side_bearing ascent descent )) {
+   printf "%-20s: %s\n", $key, $glyph->$key;
+}

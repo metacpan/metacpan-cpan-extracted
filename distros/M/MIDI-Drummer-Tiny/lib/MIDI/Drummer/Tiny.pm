@@ -3,11 +3,12 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.1902';
+our $VERSION = '0.2011';
 
-use Math::Bezier;
-use MIDI::Simple ();
+use Algorithm::Combinatorics qw(variations_with_repetition);
+use MIDI::Util qw(dura_size set_time_signature);
 use Music::Duration;
+
 use Moo;
 use strictures 2;
 use namespace::clean;
@@ -29,7 +30,8 @@ sub BUILD {
 
     $self->score->control_change($self->channel, 91, $self->reverb);
 
-    $self->set_time_sig;
+    # Add a TS to the score but don't reset the beats if given
+    $self->set_time_sig( $self->signature, !$args->{beats} );
 }
 
 
@@ -42,8 +44,9 @@ has file      => ( is => 'ro', default => sub { 'MIDI-Drummer.mid' } );
 has bars      => ( is => 'ro', default => sub { 4 } );
 has score     => ( is => 'ro', default => sub { MIDI::Simple->new_score } );
 has signature => ( is => 'rw', default => sub { '4/4' });
-has beats     => ( is => 'rw' );
-has divisions => ( is => 'rw' );
+has beats     => ( is => 'rw', default => sub { 4 }  );
+has divisions => ( is => 'rw', default => sub { 4 } );
+has counter   => ( is => 'rw', default => sub { 0 } );
 
 
 has click          => ( is => 'ro', default => sub { 'n33' } );
@@ -375,19 +378,15 @@ sub crescendo_roll {
 
 
 sub set_time_sig {
-    my $self = shift;
-    if (@_) {
-        $self->signature(shift);
+    my ($self, $signature, $set) = @_;
+    $self->signature($signature) if $signature;
+    $set //= 1;
+    if ($set) {
+        my ($beats, $divisions) = split /\//, $self->signature;
+        $self->beats($beats);
+        $self->divisions($divisions);
     }
-    my ($beats, $divisions) = split /\//, $self->signature;
-    $self->beats($beats);
-    $self->divisions($divisions);
-    $self->score->time_signature(
-        $self->beats,
-        ( $self->divisions == 8 ? 3 : 2),
-        ( $self->divisions == 8 ? 24 : 18 ),
-        8
-    );
+    set_time_signature($self->score, $self->signature);
 }
 
 
@@ -400,6 +399,56 @@ sub sync {
 sub write {
     my $self = shift;
     $self->score->write_score( $self->file );
+}
+
+
+sub steady {
+    my ( $self, $instrument, $opts ) = @_;
+
+    $instrument ||= $self->closed_hh;
+
+    $opts->{duration} ||= $self->quarter;
+
+    for my $n ( 1 .. $self->counter ) {
+        $self->note( $opts->{duration}, $instrument );
+    }
+}
+
+
+sub combinatorial {
+    my ( $self, $instrument, $opts ) = @_;
+
+    $instrument ||= $self->snare;
+
+    $opts->{negate}   ||= 0;
+    $opts->{count}    ||= 0;
+    $opts->{beats}    ||= $self->beats;
+    $opts->{repeat}   ||= 4;
+    $opts->{duration} ||= $self->quarter;
+    $opts->{vary}     ||= {
+        0 => sub { $self->rest( $opts->{duration} ) },
+        1 => sub { $self->note( $opts->{duration}, $instrument ) },
+    };
+
+    my $size = dura_size( $opts->{duration} );
+
+    my @items = $opts->{patterns}
+        ? @{ $opts->{patterns} }
+        : sort map { join '', @$_ }
+            variations_with_repetition( [ keys %{ $opts->{vary} } ], $opts->{beats} );
+
+    for my $pattern (@items) {
+        next if $pattern =~ /^0+$/;
+
+        $pattern =~ tr/01/10/ if $opts->{negate};
+
+        for ( 1 .. $opts->{repeat} ) {
+            for my $bit ( split //, $pattern ) {
+                $opts->{vary}{$bit}->();
+                $self->counter( $self->counter + $size ) if $opts->{count};
+            }
+        }
+    }
 }
 
 1;
@@ -416,7 +465,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.1902
+version 0.2011
 
 =head1 SYNOPSIS
 
@@ -438,11 +487,11 @@ version 0.1902
 
  $d->metronome54;  # 5/4 time for the number of bars
 
- $d->set_time_sig('4/4');
-
  $d->rest($d->whole);
 
- $d->metronome44;  # 4/4 time for the number of bars
+ $d->set_time_sig('4/4');
+
+ $d->metronome44(3);  # 4/4 time for 3 bars
 
  $d->flam($d->quarter, $d->snare);
  $d->crescendo_roll([50, 127, 1], $d->eighth, $d->thirtysecond);
@@ -453,12 +502,26 @@ version 0.1902
  $d->note($d->quarter, $d->open_hh, $_ % 2 ? $d->kick : $d->snare)
     for 1 .. $d->beats * $d->bars;
 
+ $d->combinatorial( $d->snare, {
+    repeat   => 2,
+    patterns => [qw(0101 1001)],
+ });
+
+ # Play parts simultaneously
+ $d->sync( \&snare, \&kick, \&hhat );
+ sub snare { $d->combinatorial( $d->snare, { count => 1 } ) }
+ sub kick { $d->combinatorial( $d->kick, { negate => 1 } ) }
+ sub hhat { $d->steady( $d->closed_hh ) }
+
  $d->write;
 
 =head1 DESCRIPTION
 
 This module provides handy defaults and tools to produce a MIDI score
 with drum parts.
+
+Below, the term "spec" refers to a note length duration, like an
+eighth or quarter note, for instance.
 
 =for Pod::Coverage BUILD
 
@@ -516,11 +579,23 @@ B<beats> / B<divisions>
 
 =head2 beats
 
-Computed given the B<signature>.
+Computed from the B<signature>, if not given in the constructor.
+
+Default: C<4>
 
 =head2 divisions
 
-Computed given the B<signature>.
+Computed from the B<signature>.
+
+Default: C<4>
+
+=head2 counter
+
+  $d->counter( $d->counter + $duration );
+  $count = $d->counter;
+
+Beat counter of durations, where a quarter-note is equal to 1. An
+eighth-note is 0.5, etc.
 
 =head1 KIT
 
@@ -584,14 +659,15 @@ can be overridden with the B<electric_bass> (C<'n36'>).
 
   $d = MIDI::Drummer::Tiny->new(%arguments);
 
-Return a new C<MIDI::Drummer::Tiny> object.
+Return a new C<MIDI::Drummer::Tiny> object and add a time signature
+event to the score.
 
 =head2 note
 
  $d->note( $d->quarter, $d->closed_hh, $d->kick );
  $d->note( 'qn', 'n42', 'n35' ); # Same thing
 
-Add a note to the score.
+Add notes to the score.
 
 This method takes the same arguments as L<MIDI::Simple/"Parameters for n/r/noop">.
 
@@ -732,10 +808,16 @@ rather than as a straight line.
 
 =head2 set_time_sig
 
+  $d->set_time_sig;
   $d->set_time_sig('5/4');
+  $d->set_time_sig( '5/4', 0 );
 
-Set the B<signature>, B<beats>, B<divisions>, and the B<score>
-C<time_signature> values based on the given string.
+Add a time signature event to the score, and reset the B<beats> and
+B<divisions> object attributes.
+
+If a ratio argument is given, set the B<signature> object attribute to
+it.  If the 2nd argument flag is C<0>, the B<beats> and B<divisions>
+are B<not> reset.
 
 =head2 sync
 
@@ -751,15 +833,64 @@ references.
 Output the score as a MIDI file with the module L</file> attribute as
 the file name.
 
+=head2 steady
+
+  $d->steady;
+  $d->steady( $d->kick );
+  $d->steady( $d->kick, { duration => $d->eighth } );
+
+Play a steady beat with the given B<instrument> and optional
+B<duration>, for the number of beats accumulated in the object's
+B<counter> attribute.
+
+Defaults:
+
+  instrument: closed_hh
+  Option:
+    duration: quarter
+
+=head2 combinatorial
+
+  $d->combinatorial;
+  $d->combinatorial( $d->kick );
+  $d->combinatorial( $d->kick, \%options );
+
+Play a beat pattern with the given B<instrument>, given by
+L<Algorithm::Combinatorics/variations_with_repetition>.
+
+This method accumulates beats in the object's B<counter> attribute if
+the B<count> option is set.
+
+The B<vary> option is a hashref of coderefs, keyed by single character
+tokens, like the digits, 0-9.  The coderef durations should add up to
+the B<duration> option.
+
+Defaults:
+
+  instrument: snare
+  Options:
+    duration: quarter
+    count: 0
+    negate: 0
+    beats: beats
+    repeat: 4
+    duration: quarter
+    vary:
+        0 => sub { $self->rest( $options->{duration} ) },
+        1 => sub { $self->note( $options->{duration}, $instrument ) },
+    patterns: undef
+
 =head1 SEE ALSO
 
-The metronome method sources in this module, the F<eg/*> programs in
-this distribution, and also F<eg/drum-fills-advanced> in the
-L<Music::Duration::Partition> distribution
+The F<eg/*> programs in this distribution. Also
+F<eg/drum-fills-advanced> in the L<Music::Duration::Partition>
+distribution.
+
+L<Algorithm::Combinatorics>
 
 L<Math::Bezier>
 
-L<MIDI::Simple>
+L<MIDI::Util>
 
 L<Moo>
 
@@ -768,6 +899,9 @@ L<Music::Duration>
 L<https://en.wikipedia.org/wiki/General_MIDI#Percussion>
 
 L<https://en.wikipedia.org/wiki/General_MIDI_Level_2#Drum_sounds>
+
+L<https://www.amazon.com/dp/0882847953> -
+"Progressive Steps to Syncopation for the Modern Drummer"
 
 =head1 AUTHOR
 

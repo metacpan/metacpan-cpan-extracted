@@ -16,7 +16,7 @@ use MIME::Base64 qw(encode_base64url);
 use WWW::Mechanize;
 use URI;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 $| = 1;
 
@@ -39,8 +39,8 @@ use constant {
     API_CACHE_TIMEOUT_SECONDS   => 2,
     API_TIMEOUT_RETRIES         => 3,
     AUTH_CACHE_FILE             => "$home_dir/tesla_auth_cache.json",
-    ENDPOINTS_FILE              => dist_file('Tesla-API', 'endpoints.json'),
-    OPTION_CODES_FILE           => dist_file('Tesla-API', 'option_codes.json'),
+    ENDPOINTS_FILE              => $ENV{TESLA_API_ENDPOINTS_FILE} // dist_file('Tesla-API', 'endpoints.json'),
+    OPTION_CODES_FILE           => $ENV{TESLA_API_OPTIONCODES_FILE} // dist_file('Tesla-API', 'option_codes.json'),
     TOKEN_EXPIRY_WINDOW         => 5,
     URL_API                     => 'https://owner-api.teslamotors.com/',
     URL_ENDPOINTS               => 'https://raw.githubusercontent.com/tdorssers/TeslaPy/master/teslapy/endpoints.json',
@@ -98,13 +98,15 @@ sub api {
         $uri =~ s/\{.*?\}/$id/;
     }
 
+    $id //= 0;
+
     # Return early if all cache mechanisms check out
 
     if ($self->api_cache_persist || $self->api_cache_time) {
         my $cache = $self->_api_cache(endpoint => $endpoint_name, id => $id);
         if ($cache) {
             if ($self->api_cache_persist || time - $cache->{time} <= $self->api_cache_time) {
-                print "Returning cache for $endpoint_name/$id pair...\n" if DEBUG_CACHE;
+                warn "Returning cache for $endpoint_name/$id pair...\n" if DEBUG_CACHE;
                 return $cache->{data};
             }
         }
@@ -127,15 +129,19 @@ sub api {
     );
 
     my ($success, $code, $response_data) = $self->_tesla_api_call($request);
-    my $data = _decode($response_data)->{response};
+    my $data = $self->_decode($response_data);
+
+    if ($data->{error}) {
+        return $data;
+    }
 
     $self->_api_cache(
         endpoint => $endpoint_name,
         id       => $id,
-        data     => $data
+        data     => $data->{response}
     );
 
-    return $data;
+    return $data->{response};
 }
 sub api_cache_clear {
     my ($self) = @_;
@@ -161,8 +167,8 @@ sub api_cache_time {
 sub endpoints {
     my ($self, $endpoint) = @_;
 
-    if (! $self->{endpoints} || $self->{reset_data}) {
-        $self->{reset_data} = 0;
+    if (! $self->{endpoints} || $self->{reset_endpoints_data}) {
+        $self->{reset_endpoints_data} = 0;
 
         my $json_endpoints;
         {
@@ -188,7 +194,9 @@ sub endpoints {
 sub mech {
     my ($self) = @_;
 
-    return $self->{mech} if $self->{mech};
+    if ($self->{mech} && ! $self->{mech_reset}) {
+        return $self->{mech};
+    }
 
     my $www_mech = WWW::Mechanize->new(
         agent      => $self->useragent_string,
@@ -198,13 +206,17 @@ sub mech {
     );
 
     $self->{mech} = $www_mech;
+    $self->{mech_reset} = 0;
 
     return $self->{mech};
 }
 sub option_codes {
     my ($self, $code) = @_;
 
-    if (! $self->{option_codes}) {
+    if (! $self->{option_codes} || $self->{reset_option_codes_data}) {
+        print "RESET DATA\n";
+        $self->{reset_option_codes_data} = 0;
+
         my $json_option_codes;
         {
             local $/;
@@ -228,9 +240,19 @@ sub option_codes {
     return $self->{option_codes};
 }
 sub update_data_files {
-    my ($self) = @_;
+    my ($self, $url_type) = @_;
 
-    for my $data_url (URL_ENDPOINTS, URL_OPTION_CODES) {
+    my @urls_to_process;
+
+    if (defined $url_type) {
+        push @urls_to_process, URL_ENDPOINTS if $url_type eq 'endpoints';
+        push @urls_to_process, URL_OPTION_CODES if $url_type eq 'option_codes';
+    }
+    else {
+        @urls_to_process = (ENDPOINTS_FILE, OPTION_CODES_FILE);
+    }
+
+    for my $data_url (@urls_to_process) {
         my $filename;
 
         if ($data_url =~ /.*\/(\w+\.json)$/) {
@@ -254,27 +276,30 @@ sub update_data_files {
         my $data_differs;
 
         if (scalar keys %$new_data != scalar keys %$existing_data) {
-                                                               $data_differs = 1;
-                                                               }
+           $data_differs = 1;
+        }
 
         if (! $data_differs) {
             for my $key (keys %$new_data) {
-                                      if (! exists $existing_data->{$key}) {
-                                      $data_differs = 1;
-                                      last;
-                                      }
-                                      }
-            for my $key (keys %$existing_data) {
-                                           if (! exists $new_data->{$key}) {
-                                           $data_differs = 1;
-                                           last;
-                                           }
-                                           }
+                if (! exists $existing_data->{$key}) {
+                    $data_differs = 1;
+                    last;
+                }
+            }
         }
 
         if ($data_differs) {
-            $self->{reset_data} = 1;
-            my $file = dist_file('Tesla-API', $filename);
+
+            my $file = $filename =~ /endpoints/
+                ? ENDPOINTS_FILE
+                : OPTION_CODES_FILE ;
+
+            if ($filename =~ /endpoints/) {
+                $self->{reset_endpoints_data} = 1;
+            }
+            else {
+                $self->{reset_option_codes_data} = 1;
+            }
 
             # Make a backup copy
 
@@ -295,6 +320,7 @@ sub useragent_string {
 
     if (defined $ua_string) {
         $self->{useragent_string} = $ua_string;
+        $self->{mech_reset} = 1;
     }
 
     return $self->{useragent_string} // USERAGENT_STRING;
@@ -307,6 +333,7 @@ sub useragent_timeout {
             croak "useragent_timeout() requires an integer or float";
         }
         $self->{useragent_timeout} = $timeout;
+        $self->{mech_reset} = 1;
     }
 
     return $self->{useragent_timeout} // USERAGENT_TIMEOUT;
@@ -477,7 +504,12 @@ sub _api_attempts {
     my ($self, $add) = @_;
 
     if (defined $add) {
-        $self->{api_attempts}++;
+        if ($add) {
+            $self->{api_attempts}++;
+        }
+        else {
+            $self->{api_attempts} = 0;
+        }
     }
 
     return $self->{api_attempts} || 0;
@@ -526,11 +558,20 @@ sub _authentication_code {
 
     my $auth_url = $self->_authentication_code_url;
 
-    print "\n$auth_url\n";
+    # If we're in testing mode, we don't want to be waiting for
+    # a read from STDIN
 
-    print "\nPaste URL here: ";
+    my $code_url;
 
-    my $code_url = <STDIN>;
+    if ($ENV{TESLA_API_TESTING}) {
+        $code_url = $ENV{TESLA_API_TESTING_CODE_URL};
+    }
+    else {
+        print "\n$auth_url\n";
+        print "\nPaste URL here: ";
+        $code_url = <STDIN>;
+    }
+
     chomp $code_url;
 
     my $code = $self->_authentication_code_extract($code_url);
@@ -600,7 +641,7 @@ sub _authentication_code_verifier {
 }
 sub _decode {
     # Decode JSON to Perl
-    my ($json) = @_;
+    my ($self, $json) = @_;
     my $perl = decode_json($json);
     return $perl;
 }
@@ -618,6 +659,8 @@ sub _tesla_api_call {
 
     my ($self, $request) = @_;
 
+    $self->_api_attempts(0);
+
     my $response;
 
     for (1 .. API_TIMEOUT_RETRIES) {
@@ -630,20 +673,20 @@ sub _tesla_api_call {
         }
     }
 
-    if (! $response->is_success) {
-        my $error_string = sprintf(
-            "Error - Tesla API said: '%s'",
-            $self->mech->response->status_line
-        );
+    my $success = $response->is_success;
+    my $code = $response->code;
+    my $decoded_content = $response->decoded_content;
 
-        croak $error_string;
+    if (! $response->is_success) {
+        my $error_msg = $response->status_line;
+
+        my $error_string = "Error - Tesla API said: '$error_msg'";
+        warn $error_string;
+
+        $decoded_content = "{\"error\" : \"$error_msg\"}";
     }
 
-    return (
-        $response->is_success,
-        $response->code,
-        $response->decoded_content
-    );
+    return ($success, $code, $decoded_content);
 }
 
 1;
@@ -755,7 +798,7 @@ B<Parameters>:
     endpoint
 
 I<Mandatory, String>: A valid Tesla API endpoint name. The entire list can be
-found in the C<t/test_data/endpoints.json> file for the time being.
+found in the C<share/endpoints.json> file for the time being.
 
     id
 
@@ -768,7 +811,9 @@ I<Optional, Hash Reference>: Some API calls require additional parameters. Send
 in a hash reference where the keys are the API parameter name, and the value is,
 well, the value.
 
-I<Return>: Hash or array reference, depending on the endpoint.
+I<Return>: Hash or array reference, depending on the endpoint. If an error
+occurs while communicating with the Tesla API, we'll send back a hash reference
+containing C<< error => 'Tesla error message' >>.
 
 =head2 endpoints
 
@@ -809,12 +854,19 @@ all Tesla products, so I'm leaving this method here for now.
 
 Returns a hash reference of 'option code' => 'description' pairs.
 
-=head2 update_data_files
+=head2 update_data_files($type)
 
 Checks to see if there are any updates to the C<endpoints.json> or
 C<option_codes.json> files online, and updates them locally.
 
-Takes no parameters, there is no return. C<croak()>s on failure.
+Parameters:
+
+    $type
+
+I<Optional, String>: One of B<endpoints> or B<option_codes>. If set, we'll
+operate on only that file.
+
+I<Return>: None. C<croak()>s on faiure.
 
 =head2 useragent_string($ua_string)
 
@@ -1109,7 +1161,9 @@ are only modifiable by updating the actual value in the file.
 
 Prints to C<STDOUT> debugging output from the caching mechanism.
 
-I<Override>: C<$ENV{DEBUG_TESLA_API_CACHE}>
+I<Override>: C<$ENV{DEBUG_TESLA_API_CACHE}>. Note that this must be configured
+within a C<BEGIN> block, prior to the C<use Tesla::API> line for it to have
+effect.
 
 =head2 API_CACHE_PERSIST
 
@@ -1151,7 +1205,9 @@ file.
 
 I<Default>: C<dist_file('Tesla-API', 'endpoints.json')>
 
-I<Override>: None
+I<Override>: C<$ENV{TESLA_API_ENDPOINTS_FILE}>. Note that this must be
+configured within a C<BEGIN> block, prior to the C<use Tesla::API> line for it
+to have effect.
 
 =head2 OPTION_CODES_FILE
 
@@ -1160,7 +1216,9 @@ for Tesla products.
 
 I<Default>: C<dist_file('Tesla-API', 'option_codes.json')>
 
-I<Override>: None
+I<Override>: C<$ENV{TESLA_API_OPTIONCODES_FILE}>. Note that this must be
+configured within a C<BEGIN> block, prior to the C<use Tesla::API> line for it
+to have effect.
 
 =head2 TOKEN_EXPIRY_WINDOW
 

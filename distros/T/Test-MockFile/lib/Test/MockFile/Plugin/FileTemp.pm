@@ -9,7 +9,7 @@ use Test::MockModule qw{strict};
 
 use Carp qw(croak);
 
-our $VERSION = '0.033';
+our $VERSION = '0.034';
 
 sub register {
     my ($self) = @_;

@@ -12,3 +12,6 @@ Revision history for Perl extension Mac::PropertyList::XS.
 
 0.04    Sat Oct  3 11:55:03 PDT 2020
     - update for new API in Mac::PropertyList::SAX 0.90
+
+0.05    Mon Apr 25 20:38:56 EDT 2022
+    - address assertion failure in debugging Perls

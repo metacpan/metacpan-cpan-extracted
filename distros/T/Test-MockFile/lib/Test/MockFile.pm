@@ -47,11 +47,11 @@ files without touching the file system.
 
 =head1 VERSION
 
-Version 0.033
+Version 0.034
 
 =cut
 
-our $VERSION = '0.033';
+our $VERSION = '0.034';
 
 our %files_being_mocked;
 
@@ -1141,7 +1141,34 @@ sub _abs_path_to_file {
 
     return q[/] if $path eq q[/..];
 
-    return $path if $path =~ m{^/};
+    return $path if $path =~ m{^/}xms;
+
+    # ~
+    # ~/...
+    # ~sawyer
+    if ( $path =~ m{ ^(~ ([^/]+)? ) }xms ) {
+        my $req_homedir = $1;
+        my $username    = $2 || getpwuid($<);
+        my $pw_homedir;
+
+        # Reset iterator so we *definitely* start from the first one
+        # Then reset when done looping over pw entries
+        endpwent;
+        while ( my @pwdata = getpwent ) {
+            if ( $pwdata[0] eq $username ) {
+                $pw_homedir = $pwdata[7];
+                endpwent;
+                last;
+            }
+        }
+        endpwent;
+
+        $pw_homedir
+          or die;
+
+        $path =~ s{\Q$req_homedir\E}{$pw_homedir};
+        return $path;
+    }
 
     my $cwd = Cwd::getcwd();
 

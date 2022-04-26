@@ -34,15 +34,22 @@ Options:
 	-e, --exec=s        set executing commands
 	-s, --silent        do not show same result
 	-p, --plain         shortcut for --nodate --nonewline
-	--[no]date          show date at the beginning (default on)
-	--[no]newline       print newline result (default on)
-	--[no]clear         clear screen after output (default on)
+	--[no-]date         show date at the beginning (default on)
+	--[no-]newline      print newline result (default on)
+	--[no-]clear        clear screen after output (default on)
 	--diff=command      diff command used to compare result
 	--unit=unit         comparison unit (word/char/mecab)
 
+	-M, --mark          show diff mark (default off)
+	-O, --old           show old data (default off)
+	-U, --context=i     diff before/after context (default 100)
+
+	-h, --help          show help
+	-v, --version       show version
+
 =head1 VERSION
 
-Version 4.21.1
+Version 4.22.0
 
 =head1 EXAMPLES
 
@@ -62,6 +69,7 @@ Version 4.21.1
 
 	watchdiff -pc18i10r0 date; say tea is ready
 
+	watchdiff -sU2 du -h ~/Music
 
 =head1 DESCRIPTION
 
@@ -77,7 +85,7 @@ L<https://github.com/kaz-utashiro/sdif-tools>
 
 =head1 LICENSE
 
-Copyright 2014- Kazumasa Utashiro
+Copyright 2014-2022 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

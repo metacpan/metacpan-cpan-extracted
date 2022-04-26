@@ -4,3 +4,5 @@ MANIFEST
 README
 t/Getopt-optparse.t
 lib/Getopt/optparse.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

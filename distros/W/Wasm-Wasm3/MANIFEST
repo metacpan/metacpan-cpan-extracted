@@ -19,9 +19,15 @@ lib/Wasm/Wasm3.pm
 lib/Wasm/Wasm3/Environment.pm
 lib/Wasm/Wasm3/Module.pm
 lib/Wasm/Wasm3/Runtime.pm
+t/assets/hello.ts
+t/assets/hello.wasm
 t/assets/perl_wasm_perl.wasm
 t/assets/perl_wasm_perl.wat
+t/assets/wasi-demo.ts
+t/assets/wasi-demo.wasm
 t/run.t
+t/wasi.t
+t/wasi_pp.t
 t/wasm_root.t
 wasm3/.codespellrc
 wasm3/CMakeLists.txt
@@ -249,6 +255,7 @@ wasm3/source/m3_info.h
 wasm3/source/m3_math_utils.h
 wasm3/source/m3_module.c
 wasm3/source/m3_parse.c
+wasm3/source/m3_wasi.h
 wasm3/source/wasm3.h
 wasm3/source/wasm3_defs.h
 wasm3/test/fuzz/corpus/fib.c.wasm
@@ -332,5 +339,6 @@ wasm3/test/wasi/wasmsynth/image.png
 wasm3/test/wasi/wasmsynth/shuffle-chill.wasm
 wasm3/test/wasi/wasmsynth/wasm-song.wasm
 wasm3/test/wasi/wasmsynth/webchip-music.wasm
+wasm3-dummy-app-dir/main.c
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

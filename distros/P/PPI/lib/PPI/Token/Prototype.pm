@@ -49,7 +49,7 @@ L<PPI::Token> and L<PPI::Element> parent classes.
 use strict;
 use PPI::Token ();
 
-our $VERSION = '1.272';
+our $VERSION = '1.273';
 
 our @ISA = "PPI::Token";
 
@@ -59,7 +59,7 @@ sub __TOKENIZER__on_char {
 
 	# Suck in until we find the closing paren (or the end of line)
 	pos $t->{line} = $t->{line_cursor};
-	die "regex should always match" if $t->{line} !~ m/\G(.*?(?:\)|$))/gc;
+	die "regex should always match" if $t->{line} !~ m/\G(.*?\n?(?:\)|$))/gc;
 	$t->{token}->{content} .= $1;
 	$t->{line_cursor} += length $1;
 

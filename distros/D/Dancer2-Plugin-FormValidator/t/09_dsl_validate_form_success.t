@@ -11,7 +11,7 @@ package Validator {
         return {
             email => [qw(required email)],
         };
-    };
+    }
 }
 
 package App {
@@ -30,7 +30,7 @@ package App {
     use Dancer2::Plugin::FormValidator;
 
     post '/' => sub {
-        to_json validate 'Validator';
+        to_json validate profile => Validator->new;
     };
 }
 

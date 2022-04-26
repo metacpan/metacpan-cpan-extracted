@@ -4,11 +4,13 @@
 
 use warnings;
 use strict;
+use v5.10;
 
 package Monit::HTTP;
-$Monit::HTTP::VERSION = '0.04';
+$Monit::HTTP::VERSION = '0.05';
 use HTTP::Tiny;
 use XML::Fast;
+use Carp qw( croak );
 
 our (
     %MONIT_ACTIONS,
@@ -57,17 +59,20 @@ BEGIN {
     7 => 'TYPE_STATUS',
 );
 %MONIT_TYPES = reverse %MONIT_TYPES_REV;
+
 }
 
+# This creates constants from all the above values
 # perl 5.10 has strange issues just going:
 #   use constant reverse %{ MONIT_TYPES() }
 # So work around it with do {}
 use constant do { my %foo = reverse( %MONIT_TYPES_REV ); \%foo };
 use constant do { my %foo = reverse( %MONIT_ACTIONS_REV ); \%foo };
 
-use Exporter;
+use parent qw(Exporter);
+our (%EXPORT_TAGS, @EXPORT_OK);
 
-our %EXPORT_TAGS = (
+%EXPORT_TAGS = (
     constants => [qw/
         ACTION_MONITOR
         ACTION_RESTART
@@ -96,13 +101,12 @@ our %EXPORT_TAGS = (
     /],
 );
 
-our @EXPORT_OK = (
+@EXPORT_OK = (
     @{$EXPORT_TAGS{constants}},
     @{$EXPORT_TAGS{hashes}},
 );
 
-our @ISA = qw(Exporter);
-
+Exporter::export_ok_tags( keys %EXPORT_TAGS );
 
 
 sub new {
@@ -183,7 +187,7 @@ sub _fetch_info {
         $self->{xml_hash} = xml2hash( $self->_get_xml );
     }
     else {
-        die sprintf "Error while connecting to %s !\n" .
+        croak sprintf "Error while connecting to %s !\n" .
             "Status: %s\nReason: %s\nContent: %s\n",
         $self->{status_url}, $res->{status}, $res->{reason}, $res->{content} || 'NIL';
     }
@@ -197,7 +201,7 @@ sub get_services {
     my @services;
     $type ||= '-1';
 
-    die "Don't understand this service type!\n"
+    croak "Don't understand this service type!\n"
         unless $type == -1 or grep {$_ == $type} keys %{MONIT_TYPES()};
 
     $self->_fetch_info;
@@ -287,7 +291,7 @@ sub service_status {
         }
     }
 
-    die "Service $service does not exist\n"
+    croak "Service $service does not exist\n"
         unless scalar keys %$status_href;
 
     return $status_href
@@ -298,12 +302,12 @@ sub service_status {
 sub command_run {
     my ($self, $service, $command) = @_;
 
-    die "Don't understand this action\n"
+    croak "Don't understand this action\n"
         unless grep { $command eq $_ } keys %{MONIT_ACTIONS()};
 
     if(not defined $service) {
         $self->{is_success} = 0;
-        die "Service not specified\n";
+        croak "Service not specified\n";
     }
 
     # if services does not exist throw error
@@ -311,12 +315,11 @@ sub command_run {
     my $url = 'http://'.$self->{hostname}.':'.$self->{port}.'/'.$service;
 
     my $res = $self->{ua}->post_form($url, { action => $command });
-    die $res->{status}
+    croak $res->{status}
         unless $res->{success};
 
     return 1
 }
-
 
 1; # End of Monit::HTTP
 
@@ -332,7 +335,7 @@ Monit::HTTP - An OOP interface to Monit.
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -574,61 +577,23 @@ $command can be a constant (ACTION_STOP, ACTION_START, ACTION_RESTART, ACTION_MO
 
 This method throws errors in case something goes wrong. Use eval { } statement to catch the error.
 
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-monit-http-api at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Monit-HTTP-API>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Monit::HTTP
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Monit-HTTP-API>
-
-=for stopwords AnnoCPAN
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Monit-HTTP-API>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Monit-HTTP-API>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Monit-HTTP-API>
-
-=back
-
-=head1 ACKNOWLEDGEMENTS
-
 =head1 AUTHORS
 
 =over 4
 
 =item *
 
-Angelo "pallotron" Failla <pallotron@freaknet.org>
+Angelo Failla <pallotron@freaknet.org>
 
 =item *
 
-Dean Hamstead <dean@bytefoundry.com.au>
+Dean Hamstead <dean@fragfest.com.au>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Angelo Failla.
+This software is copyright (c) 2022 by Angelo Failla.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

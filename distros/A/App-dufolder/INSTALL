@@ -1,0 +1,10 @@
+
+## INSTALL
+
+cpanm App::dufolder
+
+
+## UNINSTALL 
+
+cpanm -U App::dufolder
+

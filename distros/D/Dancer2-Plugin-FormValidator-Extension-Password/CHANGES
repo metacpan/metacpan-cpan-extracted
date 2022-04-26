@@ -1,3 +1,7 @@
+0.82 2022-04-12 14:43:31 Europe/Moscow
+    [BUGS]
+    * Test case with old signatures
+
 0.81 2022-04-12 14:43:31 Europe/Moscow
     [IMPROVEMENTS]
     * Refactored check field defined and not empty

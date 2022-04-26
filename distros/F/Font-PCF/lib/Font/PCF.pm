@@ -4,10 +4,10 @@
 #  (C) Paul Evans, 2019-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use Object::Pad 0.64 ':experimental(init_expr)';
 use Syntax::Keyword::Match;
 
-package Font::PCF 0.02;
+package Font::PCF 0.03;
 class Font::PCF;
 
 use List::Util 1.33 qw( any first );

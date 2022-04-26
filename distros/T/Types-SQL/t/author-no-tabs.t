@@ -33,6 +33,7 @@ my @files = (
     't/100-str.t',
     't/100-text.t',
     't/100-varchar.t',
+    't/101-types-datetime.t',
     't/199-unsupported.t',
     't/200-custom.t',
     't/author-critic.t',

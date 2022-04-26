@@ -2,9 +2,13 @@ body { font-family: 'Droid Serif'; }
 a { color: #222; }
 h1, h2, h3 { font-family: 'Yanone Kaffeesatz'; font-weight: normal; }
 img { max-width: 100%; }
+
+.remark-container { background: #222; }
+.remark-slide-scaler { box-shadow: none; }
 .remark-slide-content { background: #f8f8f4; color: #111; }
 .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
-.inverse { background: #272822; color: #aaaba2; }
+
+.inverse { background: #222; color: #aaaba2; }
 .inverse.contrast { background: #000; color: #fff; }
 .inverse a { color: #777872; }
 .inverse h1, .inverse h2 { color: #f3f3f3; line-height: 0.8em; }

@@ -7,7 +7,7 @@ my $build = Module::Build->new(
    module_name => 'Font::PCF',
    requires => {
       'perl' => '5.026',
-      'Object::Pad' => '0.57',
+      'Object::Pad' => '0.64',
       'Object::Pad::ClassAttr::Struct' => 0,
       'Syntax::Keyword::Match' => 0,
 

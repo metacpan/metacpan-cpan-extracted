@@ -16,16 +16,16 @@ name: Font-PCF
 provides:
   Font::PCF:
     file: lib/Font/PCF.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   IO::Handle::Packable: '0'
   List::Util: '1.33'
-  Object::Pad: '0.57'
+  Object::Pad: '0.64'
   Object::Pad::ClassAttr::Struct: '0'
   PerlIO::gzip: '0'
   Syntax::Keyword::Match: '0'
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

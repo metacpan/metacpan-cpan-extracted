@@ -1,4 +1,7 @@
 Revision history for Perl module Text::Bidi
+2.16      2022-04-24 23:30:36+03:00 Asia/Jerusalem
+        * Fix `get_mirror_char`
+
 2.15      2018-09-24 19:08:49+03:00 Asia/Jerusalem
         * Cleanup swig file
         * Check fribidi version in Makefile.PL

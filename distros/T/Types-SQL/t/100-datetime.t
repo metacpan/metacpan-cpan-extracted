@@ -15,7 +15,7 @@ subtest 'IntstanceOf[DateTime]' => sub {
 
     my %info = column_info_from_type($type);
 
-    is_deeply \%info => { data_type => 'datetime' },
+    is_deeply \%info => { data_type => 'timestamp' },
       'column_info'
       or note( explain \%info );
 
@@ -29,7 +29,7 @@ subtest 'IntstanceOf[DateTime::Tiny]' => sub {
 
     my %info = column_info_from_type($type);
 
-    is_deeply \%info => { data_type => 'datetime' },
+    is_deeply \%info => { data_type => 'timestamp' },
       'column_info'
       or note( explain \%info );
 
@@ -44,7 +44,7 @@ subtest 'Maybe InstanceOf[DateTime]' => sub {
     my %info = column_info_from_type($type);
 
     is_deeply \%info => {
-        data_type   => 'datetime',
+        data_type   => 'timestamp',
         is_nullable => 1,
       },
       'column_info'
@@ -60,7 +60,7 @@ subtest 'IntstanceOf[Time::Moment]' => sub {
 
     my %info = column_info_from_type($type);
 
-    is_deeply \%info => { data_type => 'datetime' },
+    is_deeply \%info => { data_type => 'timestamp' },
       'column_info'
       or note( explain \%info );
 
@@ -75,7 +75,7 @@ subtest 'Maybe InstanceOf[Time::Moment]' => sub {
     my %info = column_info_from_type($type);
 
     is_deeply \%info => {
-        data_type   => 'datetime',
+        data_type   => 'timestamp',
         is_nullable => 1,
       },
       'column_info'
@@ -91,7 +91,7 @@ subtest 'IntstanceOf[Time::Piece]' => sub {
 
     my %info = column_info_from_type($type);
 
-    is_deeply \%info => { data_type => 'datetime' },
+    is_deeply \%info => { data_type => 'timestamp' },
       'column_info'
       or note( explain \%info );
 
@@ -106,9 +106,23 @@ subtest 'Maybe InstanceOf[Time::Piece]' => sub {
     my %info = column_info_from_type($type);
 
     is_deeply \%info => {
-        data_type   => 'datetime',
+        data_type   => 'timestamp',
         is_nullable => 1,
       },
+      'column_info'
+      or note( explain \%info );
+
+};
+
+subtest 'IntstanceOf[Date]' => sub {
+
+    my $type = InstanceOf['Date'];
+
+    isa_ok $type => 'Type::Tiny';
+
+    my %info = column_info_from_type($type);
+
+    is_deeply \%info => { data_type => 'timestamp' },
       'column_info'
       or note( explain \%info );
 

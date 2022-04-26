@@ -36,13 +36,15 @@ WriteMakefile(
 
     PREREQ_PM => {
         'Cwd'             => 0,
+        'Getopt::Long'    => 0,
+        'Net::EmptyPort'  => 0,
         'Plack'           => 0,
         'Plack::App::WWW' => '0.03',
-        'Term::ANSIColor' => 0,
-        'Net::EmptyPort'  => 0
+        'Term::ANSIColor' => 0
     },
     
     TEST_REQUIRES => {
+        'LWP::UserAgent' => 0,
         'Test::More'     => 0,
         'Test::Requires' => 0
     },   

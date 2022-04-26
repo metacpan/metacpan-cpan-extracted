@@ -3,6 +3,7 @@ lib/AsposeSlidesCloud/ApiInfo.pm
 lib/AsposeSlidesCloud/ClassRegistry.pm
 lib/AsposeSlidesCloud/Configuration.pm
 lib/AsposeSlidesCloud/Object/AccentElement.pm
+lib/AsposeSlidesCloud/Object/AccessPermissions.pm
 lib/AsposeSlidesCloud/Object/AddLayoutSlide.pm
 lib/AsposeSlidesCloud/Object/AddMasterSlide.pm
 lib/AsposeSlidesCloud/Object/AddShape.pm
@@ -78,6 +79,7 @@ lib/AsposeSlidesCloud/Object/Hyperlink.pm
 lib/AsposeSlidesCloud/Object/Image.pm
 lib/AsposeSlidesCloud/Object/ImageExportFormat.pm
 lib/AsposeSlidesCloud/Object/ImageExportOptions.pm
+lib/AsposeSlidesCloud/Object/ImageExportOptionsBase.pm
 lib/AsposeSlidesCloud/Object/Images.pm
 lib/AsposeSlidesCloud/Object/InnerShadowEffect.pm
 lib/AsposeSlidesCloud/Object/Input.pm
@@ -127,6 +129,7 @@ lib/AsposeSlidesCloud/Object/Placeholder.pm
 lib/AsposeSlidesCloud/Object/Placeholders.pm
 lib/AsposeSlidesCloud/Object/PlotArea.pm
 lib/AsposeSlidesCloud/Object/Portion.pm
+lib/AsposeSlidesCloud/Object/PortionFormat.pm
 lib/AsposeSlidesCloud/Object/Portions.pm
 lib/AsposeSlidesCloud/Object/PptxExportOptions.pm
 lib/AsposeSlidesCloud/Object/PresentationsMergeRequest.pm
@@ -220,7 +223,6 @@ lib/AsposeSlidesCloud/SlidesApi.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-prove.pl
 README.md
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

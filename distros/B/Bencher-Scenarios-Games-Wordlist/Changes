@@ -1,0 +1,30 @@
+0.050   2022-03-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename dist
+          Bencher-{Scenario-GamesWordlistModules,Scenarios-Games-Wordlist}.
+
+
+0.04    2017-01-25  Released-By: PERLANCAR
+
+	- No functional changes.
+
+        - [build] Rebuild with updated Dist::Zilla::Plugin::Bencher::Scenario
+          (0.16) to add benchmarked modules as prereq with phase=x_benchmarks,
+          type=x_benchmarks.
+
+
+0.03    2016-01-08  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- [doc] Mention Bencher::Scenario::WordListModules.
+
+
+0.02    2016-01-07  Released-By: PERLANCAR
+
+        - Rename module/dist from Bencher-Scenario-GamesWordlist{s,Modules}.
+
+
+0.01    2016-01-07  Released-By: PERLANCAR
+
+        - First release.

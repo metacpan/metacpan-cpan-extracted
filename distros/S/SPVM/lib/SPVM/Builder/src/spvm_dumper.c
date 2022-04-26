@@ -312,9 +312,10 @@ void SPVM_DUMPER_dump_method(SPVM_COMPILER* compiler, SPVM_METHOD* method) {
     printf("      return_type => ");
     printf("%s", SPVM_TYPE_new_type_name(compiler, method->return_type->basic_type->id, method->return_type->dimension, method->return_type->flag));
     printf("\n");
-    printf("      is_enum => %d\n", (method->flag & SPVM_METHOD_C_FLAG_ENUM) ? 1 : 0);
-    printf("      have_native_desc => %d\n", (method->flag & SPVM_METHOD_C_FLAG_NATIVE) ? 1 : 0);
-    if (!(method->flag & SPVM_METHOD_C_FLAG_NATIVE)) {
+    printf("      is_enum => %d\n", method->is_enum);
+    printf("      is_native => %d\n", method->is_native);
+    printf("      is_precompile => %d\n", method->is_precompile);
+    if (!method->is_native) {
       printf("      var_decls\n");
       SPVM_LIST* var_decls = method->var_decls;
       {
@@ -342,7 +343,7 @@ void SPVM_DUMPER_dump_method_opcode_array(SPVM_COMPILER* compiler, SPVM_METHOD* 
   if (method) {
     
     printf("      name => \"%s\"\n", method->op_name->uv.name);
-    if (!(method->flag & SPVM_METHOD_C_FLAG_NATIVE)) {
+    if (!method->is_native) {
       printf("      var_decls\n");
       SPVM_LIST* var_decls = method->var_decls;
       {

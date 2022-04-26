@@ -1,0 +1,60 @@
+{
+   "abstract" : "Write and test your script with ease",
+   "author" : [
+      "Jan Henning Thorsen <jan.henning@thorsen.pm>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Getopt-App",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getopt::Long" : "2.00",
+            "perl" : "v5.16.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jhthorsen/getopt-app/issues"
+      },
+      "homepage" : "https://github.com/jhthorsen/getopt-app",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jhthorsen/getopt-app.git",
+         "web" : "https://github.com/jhthorsen/getopt-app"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "Jan Henning Thorsen <jhthorsen@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

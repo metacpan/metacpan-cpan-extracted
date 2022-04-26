@@ -13,7 +13,6 @@ struct spvm_runtime_method {
   int32_t name_id;
   int32_t signature_id;
   int32_t class_id;
-  int32_t flag;
   int32_t call_stack_byte_vars_length;
   int32_t call_stack_short_vars_length;
   int32_t call_stack_int_vars_length;
@@ -27,6 +26,8 @@ struct spvm_runtime_method {
   int8_t is_class_method;
   int8_t is_init;
   int8_t is_anon;
+  int8_t is_precompile;
+  int8_t is_native;
 };
 
 #endif

@@ -1,5 +1,8 @@
 Revision history for experimental
 
+0.028     2022-04-26 02:02:45+02:00 Europe/Amsterdam
+          - Add extra_paired_delims feature
+
 0.027     2022-02-08 18:41:07+01:00 Europe/Amsterdam
           - Update documented list of experiments
 

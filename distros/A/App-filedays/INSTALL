@@ -1,0 +1,10 @@
+
+## INSTALL
+
+cpanm App::filedays
+
+
+## UNINSTALL 
+
+cpanm -U App::filedays
+

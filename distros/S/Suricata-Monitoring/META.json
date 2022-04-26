@@ -54,6 +54,6 @@
          "web" : "https://github.com/VVelox/Suricata-Monitoring"
       }
    },
-   "version" : "v0.0.1",
+   "version" : "v0.1.1",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

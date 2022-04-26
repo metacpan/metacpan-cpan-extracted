@@ -32,8 +32,7 @@ do { my $x = {
                                       'Ref::Util' => '0',
                                       'Safe::Isa' => '1.000008',
                                       'Types::SQL::Util' => 'v0.3.0',
-                                      'perl' => 'v5.8.0',
-                                      'version' => '0'
+                                      'perl' => 'v5.10.0'
                                     }
                     },
        'test' => {

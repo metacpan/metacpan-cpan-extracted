@@ -43,7 +43,7 @@
    "provides" : {
       "Rinci" : {
          "file" : "lib/Rinci.pm",
-         "version" : "v1.1.101"
+         "version" : "v1.1.102"
       }
    },
    "release_status" : "stable",
@@ -58,7 +58,7 @@
          "web" : "https://github.com/perlancar/perl-Rinci"
       }
    },
-   "version" : "1.1.101",
+   "version" : "1.1.102",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

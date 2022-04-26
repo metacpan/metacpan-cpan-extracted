@@ -2,8 +2,8 @@ NAME
     Perinci::Sub::DepChecker - Check dependencies from 'deps' property
 
 VERSION
-    This document describes version 0.124 of Perinci::Sub::DepChecker (from
-    Perl distribution Perinci-Sub-DepChecker), released on 2022-04-20.
+    This document describes version 0.125 of Perinci::Sub::DepChecker (from
+    Perl distribution Perinci-Sub-DepChecker), released on 2022-04-22.
 
 SYNOPSIS
      use Perinci::Spec::DepChecker qw(check_deps dep_satisfy_rel list_mentioned_dep_clauses);

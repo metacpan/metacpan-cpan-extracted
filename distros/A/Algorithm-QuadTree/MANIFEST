@@ -1,6 +1,16 @@
 Changes
+ex/bench.pl
+lib/Algorithm/QuadTree.pm
 Makefile.PL
-MANIFEST
-QuadTree.pm
-README
-test.pl
+MANIFEST			This list of files
+README.md
+t/01-use.t
+t/02-zones.t
+t/03-delete.t
+t/04-circles.t
+t/05-window.t
+t/06-references.t
+t/lib/QuadTreeUtils.pm
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

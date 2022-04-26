@@ -1,3 +1,5 @@
+# NB this test is also run from t/canonicalize_portably_*
+
 use 5.014;
 
 use File::Temp;
@@ -42,6 +44,8 @@ my $app = $args{'app'};
 my $output_file = qq{$dir/output.json};
 
 my $transaction_count = 10;
+plan skip_all => 'Random.org quota exceeded' unless check_quota($transaction_count);
+
 my %cookies;
 my $cookie_count = 0;
 # Record the interchange
@@ -51,7 +55,6 @@ my ( @results, @transactions );
     $mock->transactor->name('kit.peters@broadbean.com');
 
     for ( 1 .. $transaction_count ) {
-        plan skip_all => 'Random.org quota exceeded' unless check_quota();
         push @transactions, $mock->get( $url->clone->query( [ quux => int rand 1e9 ] ));
     }
 

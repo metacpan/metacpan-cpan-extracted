@@ -3,12 +3,14 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder 0.06;
+package Commandable::Finder 0.07;
 
 use v5.14;
 use warnings;
 
 use List::Util 'max';
+
+require Commandable::Output;
 
 =head1 NAME
 
@@ -120,9 +122,18 @@ sub _print_table2
 
    my $max_len = max map { length $_->[0] } @rows;
 
-   printf "%-*s%s%s\n",
+   Commandable::Output->printf( "%-*s%s%s\n",
       $max_len, $_->[0], $sep, $_->[1]
-      for @rows;
+   ) for @rows;
+}
+
+# A join() that respects stringify overloading
+sub _join
+{
+   my $sep = shift;
+   my $ret = shift;
+   $ret .= "$sep$_" for @_;
+   return $ret;
 }
 
 =head2 help
@@ -145,7 +156,9 @@ sub builtin_command_helpsummary
 
    my @commands = sort { $a->name cmp $b->name } $self->find_commands;
 
-   _print_table2 ": ", map { [ $_->name, $_->description ] } @commands;
+   _print_table2 ": ", map {
+      [ Commandable::Output->format_note( $_->name ), $_->description ]
+   } @commands;
 }
 
 sub builtin_command_helpcmd
@@ -159,37 +172,59 @@ sub builtin_command_helpcmd
    my @argspecs = $cmd->arguments;
    my %optspecs = $cmd->options;
 
-   printf "%s - %s\n",
-      $cmd->name, $cmd->description;
+   Commandable::Output->printf( "%s - %s\n",
+      Commandable::Output->format_note( $cmd->name ),
+      $cmd->description
+   );
+   Commandable::Output->printf( "\n" );
 
-   printf "\nSYNOPSIS:\n";
-   printf "  %s\n", join " ",
-      $cmd->name,
-      %optspecs ? "[OPTIONS...]" : (),
-      @argspecs ? ( map { "\$" . uc $_->name } @argspecs ) : ();
+   Commandable::Output->print_heading( "SYNOPSIS:" );
+   Commandable::Output->printf( "  %s\n",
+      join " ",
+         $cmd->name,
+         %optspecs ? "[OPTIONS...]" : (),
+         @argspecs ? (
+            map { 
+               my $argspec = $_;
+               my $str = "\$" . uc $argspec->name;
+               $str = "($str)" if $argspec->optional;
+               $str;
+            } @argspecs
+         ) : ()
+   );
 
    if( %optspecs ) {
-      print "\nOPTIONS:\n";
+      Commandable::Output->printf( "\n" );
+      Commandable::Output->print_heading( "OPTIONS:" );
 
       # %optspecs contains duplicates; filter them
       my %primary_names = map { $_->name => 1 } values %optspecs;
       my @primary_optspecs = @optspecs{ sort keys %primary_names };
 
-      print join "\n", map {
-         my $optspec = $_;
+      my $first = 1;
+      foreach my $optspec ( @primary_optspecs ) {
+         Commandable::Output->printf( "\n" ) unless $first; undef $first;
+
          my $default = $optspec->default;
 
-         ( "    " . join( ", ", map { length $_ > 1 ? "--$_" : "-$_" } $optspec->names ),
-            "      " . $optspec->description . ( defined $default ? " (default: $default)" : "" ),
-            "" );
-      } @primary_optspecs;
+         Commandable::Output->printf( "    %s\n",
+            _join( ", ", map {
+               Commandable::Output->format_note( length $_ > 1 ? "--$_" : "-$_", 1 )
+            } $optspec->names )
+         );
+         Commandable::Output->printf( "      %s%s\n",
+            $optspec->description,
+            ( defined $default ? " (default: $default)" : "" ),
+         );
+      }
    }
 
    if( @argspecs ) {
-      print "\nARGUMENTS:\n";
+      Commandable::Output->printf( "\n" );
+      Commandable::Output->print_heading( "ARGUMENTS:" );
 
       _print_table2 "    ", map {
-         [ "  \$" . uc $_->name,
+         [ "  " . Commandable::Output->format_note( '$' . uc $_->name, 1 ),
            $_->description ]
       } @argspecs;
    }

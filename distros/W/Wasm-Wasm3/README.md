@@ -10,6 +10,10 @@ Basic setup:
     my $module = $env->parse_module($wasm_binary);
     my $runtime = $env->create_runtime(1024)->load_module($module);
 
+Run [WASI](https://wasi.dev):
+
+    my $exit_code = $runtime->run_wasi('arg1', 'arg2');
+
 WebAssembly-exported globals:
 
     my $global = $module->get_global('some-value');
@@ -60,6 +64,31 @@ Wasmer et al. wasm3 only exports a single WebAssembly memory, for
 example. It can’t import memories or globals, and it neither imports
 _nor_ exports tables.
 
+# [WASI](https://wasi.dev) SUPPORT
+
+wasm3 implements WASI via either of (as of this writing) two backends:
+a wrapper around [uvwasi](https://github.com/nodejs/uvwasi), and a
+less-complete original implementation. The former needs
+[libuv](https://libuv.org), which doesn’t compile on all platforms,
+while the latter should compile everywhere this module can run.
+
+This distribution’s `Makefile.PL` implements logic to determine which
+backend to use.
+
+You’re free, of course, to implement your own WASI imports rather than to
+use wasm3’s. Depending on how much of WASI you actually need that may not
+be as onerous as it sounds; see the distribution’s `t/wasi_pp.t` for an
+example.
+
+# MEMORY LEAK DETECTION
+
+To help you avoid memory leaks, instances of all classes `warn()`
+if their `DESTROY()` method runs at global destruction time.
+
+This necessitates extra care when linking Perl functions to WASM;
+see [Wasm::Wasm3::Module](https://metacpan.org/pod/Wasm%3A%3AWasm3%3A%3AModule) for details, and the distribution’s
+`t/wasi_pp.t` for an example.
+
 # DOCUMENTATION
 
 This module generally documents only those aspects of its usage that
@@ -79,6 +108,11 @@ Returns wasm3’s version as a string.
 ## `TYPE_I32`, `TYPE_I64`, `TYPE_F32`, `TYPE_F64`
 
 Numeric constants that indicate the corresponding WebAssembly type.
+
+## $YN = WASI\_BACKEND
+
+Either `uvwasi` or `simple`. See above about WASI support for
+details.
 
 # METHODS
 

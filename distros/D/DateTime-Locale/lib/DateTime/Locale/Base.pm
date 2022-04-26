@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.34';
+our $VERSION = '1.35';
 
 use Carp qw( carp );
 use DateTime::Locale;
@@ -493,7 +493,7 @@ DateTime::Locale::Base - Base class for individual locale objects (deprecated)
 
 =head1 VERSION
 
-version 1.34
+version 1.35
 
 =head1 SYNOPSIS
 

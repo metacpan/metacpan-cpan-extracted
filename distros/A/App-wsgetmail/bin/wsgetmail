@@ -1,0 +1,188 @@
+#!/usr/bin/env perl
+### before: #!@PERL@
+#
+# BEGIN BPS TAGGED BLOCK {{{
+#
+# COPYRIGHT:
+#
+# This software is Copyright (c) 2020-2022 Best Practical Solutions, LLC
+#                                          <sales@bestpractical.com>
+#
+# (Except where explicitly superseded by other copyright notices)
+#
+#
+# LICENSE:
+#
+# This work is made available to you under the terms of Version 2 of
+# the GNU General Public License. A copy of that license should have
+# been provided with this software, but in any event can be snarfed
+# from www.gnu.org.
+#
+# This work is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301 or visit their web page on the internet at
+# http://www.gnu.org/licenses/old-licenses/gpl-2.0.html.
+#
+#
+# CONTRIBUTION SUBMISSION POLICY:
+#
+# (The following paragraph is not intended to limit the rights granted
+# to you to modify and distribute this software under the terms of
+# the GNU General Public License and is only of importance to you if
+# you choose to contribute your changes and enhancements to the
+# community by submitting them to Best Practical Solutions, LLC.)
+#
+# By intentionally submitting any modifications, corrections or
+# derivatives to this work, or any other work intended for use with
+# Request Tracker, to Best Practical Solutions, LLC, you confirm that
+# you are the copyright holder for those contributions and you grant
+# Best Practical Solutions,  LLC a nonexclusive, worldwide, irrevocable,
+# royalty-free, perpetual, license to use, copy, create derivative
+# works based on those contributions, and sublicense and distribute
+# those contributions and any derivatives thereof.
+#
+# END BPS TAGGED BLOCK }}}
+
+use v5.10;
+use strict;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use JSON;
+use App::wsgetmail;
+use File::Slurp;
+use Pod::Usage;
+use Getopt::Long;
+
+my ($config_file, $options, $dry_run);
+my ($debug, $help) = (0,0);
+
+GetOptions('h|help|?' => \$help,
+           "v|verbose|debug" => \$debug,
+           'dry-run' => \$dry_run,
+           "c|config|configuration=s" => \$config_file,
+           'options=s' => \$options);
+
+pod2usage(1) if $help;
+pod2usage(1) unless ($config_file);
+die "Can't find config file $config_file" unless (-f $config_file);
+
+# parse options, over-ride config if provided extra options
+my $config_json = read_file($config_file);
+my $config = decode_json($config_json);
+my $extra_options = (defined($options) && $options ) ? decode_json($options) : { };
+foreach my $option ( keys %$extra_options ) {
+    $config->{$option} = $extra_options->{$option};
+}
+$config->{dry_run} = $dry_run if (defined $dry_run);
+$config->{debug} = $debug if (defined $debug);
+
+
+my $getmail = App::wsgetmail->new({config => $config});
+
+print "\nfetching mail using configuration $config_file\n";
+
+my $count = 0;
+
+while (my $message = $getmail->get_next_message()) {
+    my $ok = $getmail->process_message($message);
+    $count++ if ($ok);
+}
+
+print "\nprocessed $count messages\n";
+
+
+__END__
+
+=head1 NAME
+
+wsgetmail - get mail from cloud webservices
+
+=head1 SYNOPSIS
+
+Run:
+
+    wsgetmail [options] --config=wsgetmail.json
+
+where C<wsgetmail.json> looks like:
+
+    {
+    "client_id": "abcd1234-xxxx-xxxx-xxxx-1234abcdef99",
+    "tenant_id": "abcd1234-xxxx-xxxx-xxxx-123abcde1234",
+    "secret": "abcde1fghij2klmno3pqrst4uvwxy5~0",
+    "global_access": 1,
+    "username": "rt-comment@example.com",
+    "folder": "Inbox",
+    "command": "/opt/rt5/bin/rt-mailgate",
+    "command_args": "--url=http://rt.example.com/ --queue=General --action=comment",
+    "command_timeout": 30,
+    "action_on_fetched": "mark_as_read"
+    }
+
+=head1 DESCRIPTION
+
+wsgetmail retrieves mail from a folder available through a web services API
+and delivers it to another system. Currently, it only knows how to retrieve
+mail from the Microsoft Graph API, and deliver it by running another command
+on the local system.
+
+=head1 CONFIGURATION
+
+For full setup and configuration instructions, see L<App::wsgetmail>.
+
+    perldoc App::wsgetmail
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item --config, --configuration, -c
+
+Path of the primary wsgetmail JSON configuration file to read. This argument
+is required. The configuration file is documented in the next section.
+
+=item --options
+
+A string with a JSON object in the same format as the configuration
+file. Configuration in this object will override the configuration file. You
+can use this to extend a base configuration. For example, given the
+configuration in the synopsis above, you can process a second folder the
+same way by running:
+
+    wsgetmail --config=wsgetmail.json --options='{"folder": "Other Folder"}'
+
+=item --verbose, --debug, -v
+
+Log additional information about each mail API request and any problems
+delivering mail.
+
+=item --dry-run
+
+Read mail and deliver it to the configured command, but don't run the
+configured C<action_on_fetched> like deleting messages or marking them as
+read.
+
+=item --help, -h
+
+Show this help documentation.
+
+=back
+
+=head1 AUTHOR
+
+Best Practical Solutions, LLC <modules@bestpractical.com>
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2015-2020 by Best Practical Solutions, LLC.
+
+This is free software, licensed under:
+
+The GNU General Public License, Version 2, June 1991
+
+=cut

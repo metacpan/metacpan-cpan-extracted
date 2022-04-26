@@ -11,6 +11,7 @@ use File::Spec;
 use File::Path;
 
 use Test::More;
+use lib '.';
 
 BEGIN {
 if( ! eval {

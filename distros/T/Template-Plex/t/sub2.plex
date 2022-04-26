@@ -1,1 +1,7 @@
+@{[
+	block {
+		$fields{"new_field"}="NEW";
+		#say "fields: ", %fields#;
+	}
+]}
 Sub template 2 $value

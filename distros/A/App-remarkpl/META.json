@@ -1,16 +1,16 @@
 {
    "abstract" : "Web based presentation tool",
    "author" : [
-      "Jan Henning Thorsen <jhthorsen@cpan.org>"
+      "Jan Henning Thorsen <jan.henning@thorsen.pm>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-remarkpl",
    "no_index" : {
@@ -21,9 +21,7 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "Test::More" : "0.88"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
@@ -32,7 +30,12 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "6.00"
+            "Mojolicious" : "9.00"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
          }
       }
    },
@@ -43,9 +46,14 @@
       },
       "homepage" : "https://github.com/jhthorsen/app-remarkpl",
       "repository" : {
-         "url" : "https://github.com/jhthorsen/app-remarkpl.git"
+         "type" : "git",
+         "url" : "https://github.com/jhthorsen/app-remarkpl.git",
+         "web" : "https://github.com/jhthorsen/app-remarkpl"
       }
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.06",
+   "x_contributors" : [
+      "Jan Henning Thorsen <jhthorsen@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

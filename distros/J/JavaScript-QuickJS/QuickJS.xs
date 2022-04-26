@@ -8,6 +8,7 @@
 typedef struct {
     JSContext *ctx;
     pid_t pid;
+    char* module_base_path;
 } perl_qjs_s;
 
 typedef struct {
@@ -37,6 +38,12 @@ const char* __jstype_name_back[] = {
     /* Small hack to ensure we can always read: */
     [99] = NULL,
 };
+
+#if defined _WIN32 || defined __CYGWIN__
+#   define PATH_SEPARATOR '\\'
+#else
+#   define PATH_SEPARATOR '/'
+#endif
 
 #define _jstype_name(typenum) __jstype_name_back[ typenum - JS_TAG_FIRST ]
 
@@ -424,7 +431,7 @@ static JSValue _sv_to_jsvalue(pTHX_ JSContext* ctx, SV* value, SV** error_svp) {
     return JS_NULL;
 }
 
-JSContext* _create_new_jsctx( pTHX_ JSRuntime *rt ) {
+static JSContext* _create_new_jsctx( pTHX_ JSRuntime *rt ) {
     JSContext *ctx = JS_NewContext(rt);
 
     ctx_opaque_s* ctxdata;
@@ -496,6 +503,33 @@ static void _free_jsctx(pTHX_ JSContext* ctx) {
     }
 }
 
+static JSModuleDef *pqjs_module_loader(JSContext *ctx,
+                              const char *module_name, void *opaque) {
+    char** module_base_path_p = (char**) opaque;
+
+    char* module_base_path = *module_base_path_p;
+
+    JSModuleDef *moduledef;
+
+    if (module_base_path) {
+        size_t base_path_len = strlen(module_base_path);
+        size_t module_name_len = strlen(module_name);
+
+        char real_path[1 + base_path_len + module_name_len];
+
+        memcpy(real_path, module_base_path, base_path_len);
+        memcpy(real_path + base_path_len, module_name, module_name_len);
+        real_path[base_path_len + module_name_len] = 0;
+
+        moduledef = js_module_loader(ctx, real_path, NULL);
+    }
+    else {
+        moduledef = js_module_loader(ctx, module_name, NULL);
+    }
+
+    return moduledef;
+}
+
 /* ---------------------------------------------------------------------- */
 
 MODULE = JavaScript::QuickJS        PACKAGE = JavaScript::QuickJS
@@ -519,6 +553,13 @@ new (SV* classname_sv)
             .pid = getpid(),
         };
 
+        JS_SetModuleLoaderFunc(
+            rt,
+            NULL,
+            pqjs_module_loader,
+            &pqjs->module_base_path
+        );
+
     OUTPUT:
         RETVAL
 
@@ -531,6 +572,7 @@ DESTROY (SV* self_sv)
             warn("DESTROYing %" SVf " at global destruction; memory leak likely!\n", self_sv);
         }
 
+        if (pqjs->module_base_path) Safefree(pqjs->module_base_path);
 
         _free_jsctx(aTHX_ pqjs->ctx);
 
@@ -559,6 +601,51 @@ std (SV* self_sv)
 
         RETVAL = SvREFCNT_inc(self_sv);
 
+    OUTPUT:
+        RETVAL
+
+SV*
+unset_module_base (SV* self_sv)
+    CODE:
+        perl_qjs_s* pqjs = exs_structref_ptr(self_sv);
+
+        if (pqjs->module_base_path) {
+            Safefree(pqjs->module_base_path);
+            pqjs->module_base_path = NULL;
+        }
+
+        RETVAL = SvREFCNT_inc(self_sv);
+    OUTPUT:
+        RETVAL
+
+SV*
+set_module_base (SV* self_sv, SV* path_sv)
+    CODE:
+        if (!SvOK(path_sv)) croak("Give a path! (Did you want unset_module_base?)");
+
+        perl_qjs_s* pqjs = exs_structref_ptr(self_sv);
+
+        const char* path = exs_SvPVbyte_nolen(path_sv);
+
+        size_t path_len = strlen(path);
+
+        if (pqjs->module_base_path) {
+            Renew(pqjs->module_base_path, 2 + path_len, char);
+        }
+        else {
+            Newx(pqjs->module_base_path, 2 + path_len, char);
+        }
+
+        Copy(path, pqjs->module_base_path, 2 + path_len, char);
+
+        /** If the given path is “/foo/bar”, we store “/foo/bar/”.
+            This means if “/foo/bar/” is given we store “/foo/bar//”,
+            which is ugly but should work on all supported platforms.
+        */
+        pqjs->module_base_path[path_len] = PATH_SEPARATOR;
+        pqjs->module_base_path[1 + path_len] = 0;
+
+        RETVAL = SvREFCNT_inc(self_sv);
     OUTPUT:
         RETVAL
 

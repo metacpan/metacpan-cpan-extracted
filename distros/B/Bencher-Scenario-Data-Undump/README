@@ -1,0 +1,193 @@
+NAME
+    Bencher::Scenario::Data::Undump - Benchmark Data::Undump against eval()
+    for loading a Data::Dumper output
+
+VERSION
+    This document describes version 0.003 of Bencher::Scenario::Data::Undump
+    (from Perl distribution Bencher-Scenario-Data-Undump), released on
+    2022-03-19.
+
+SYNOPSIS
+    To run benchmark with default option:
+
+     % bencher -m Data::Undump
+
+    To run module startup overhead benchmark:
+
+     % bencher --module-startup -m Data::Undump
+
+    For more options (dump scenario, list/include/exclude/add participants,
+    list/include/exclude/add datasets, etc), see bencher or run "bencher
+    --help".
+
+DESCRIPTION
+    Packaging a benchmark script as a Bencher scenario makes it convenient
+    to include/exclude/add participants/datasets (either via CLI or Perl
+    code), send the result to a central repository, among others . See
+    Bencher and bencher (CLI) for more details.
+
+BENCHMARKED MODULES
+    Version numbers shown below are the versions used when running the
+    sample benchmark.
+
+    Data::Undump 0.15
+
+BENCHMARK PARTICIPANTS
+    *   Data::Undump::undump (perl_code)
+
+        Function call template:
+
+         Data::Undump::undump(<dump>)
+
+    *   eval (perl_code)
+
+        Code template:
+
+         eval(<dump>)
+
+BENCHMARK DATASETS
+    *   array100i
+
+        Array of 100 integers.
+
+    *   array1000i
+
+        Array of 1000 integers.
+
+    *   array10mixed
+
+        A 10-element array containing a mix of various Perl data items.
+
+SAMPLE BENCHMARK RESULTS
+    Run on: perl: *v5.34.0*, CPU: *Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz
+    (2 cores)*, OS: *GNU/Linux Ubuntu version 20.04*, OS kernel: *Linux
+    version 5.4.0-91-generic*.
+
+    Benchmark with default options ("bencher -m Data::Undump"):
+
+     #table1#
+     {dataset=>"array1000i"}
+     +----------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+     | participant          | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     +----------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+     | eval                 |      5300 |     190   |                 0.00% |               445.39% | 2.6e-07 |      21 |
+     | Data::Undump::undump |     29200 |      34.3 |               445.39% |                 0.00% | 1.3e-08 |      22 |
+     +----------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+
+    Formatted as Benchmark.pm result:
+
+               Rate     e  DU:u 
+      e      5300/s    --  -81% 
+      DU:u  29200/s  453%    -- 
+ 
+     Legends:
+       DU:u: participant=Data::Undump::undump
+       e: participant=eval
+
+     #table2#
+     {dataset=>"array100i"}
+     +----------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+     | participant          | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     +----------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+     | eval                 |     44000 |      22   |                 0.00% |               434.05% | 2.7e-08 |      20 |
+     | Data::Undump::undump |    240000 |       4.2 |               434.05% |                 0.00% |   5e-09 |      20 |
+     +----------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+
+    Formatted as Benchmark.pm result:
+
+                Rate     e  DU:u 
+      e      44000/s    --  -80% 
+      DU:u  240000/s  423%    -- 
+ 
+     Legends:
+       DU:u: participant=Data::Undump::undump
+       e: participant=eval
+
+     #table3#
+     {dataset=>"array10mixed"}
+     +----------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+     | participant          | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     +----------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+     | eval                 |     75000 |      13   |                 0.00% |               680.30% |   2e-08 |      20 |
+     | Data::Undump::undump |    587000 |       1.7 |               680.30% |                 0.00% | 7.9e-10 |      22 |
+     +----------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+
+    Formatted as Benchmark.pm result:
+
+                Rate     e  DU:u 
+      e      75000/s    --  -86% 
+      DU:u  587000/s  664%    -- 
+ 
+     Legends:
+       DU:u: participant=Data::Undump::undump
+       e: participant=eval
+
+    Benchmark module startup overhead ("bencher -m Data::Undump
+    --module-startup"):
+
+     #table4#
+     +---------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
+     | participant         | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
+     +---------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
+     | Data::Undump        |      9.25 |              2.25 |                 0.00% |                25.88% | 8.5e-06   |      21 |
+     | perl -e1 (baseline) |      7    |              0    |                25.88% |                 0.00% |   0.00013 |      20 |
+     +---------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
+
+    Formatted as Benchmark.pm result:
+
+                              Rate  D:U  perl -e1 (baseline) 
+      D:U                  108.1/s   --                 -24% 
+      perl -e1 (baseline)  142.9/s  32%                   -- 
+ 
+     Legends:
+       D:U: mod_overhead_time=2.25 participant=Data::Undump
+       perl -e1 (baseline): mod_overhead_time=0 participant=perl -e1 (baseline)
+
+    To display as an interactive HTML table on a browser, you can add option
+    "--format html+datatables".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenario-Data-Undump>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenario-DataUndump>.
+
+SEE ALSO
+    <https://www.reddit.com/r/perl/comments/czhwe6/syntax_differences_from_d
+    ata_dumper_to_json/ez95r7c?utm_source=share&utm_medium=web2x>
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenario-Data
+    -Undump>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

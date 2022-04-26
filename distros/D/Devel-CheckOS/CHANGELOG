@@ -1,3 +1,19 @@
+1.93    2022-04-25
+
+- No functional changes, just changes to where dependencies are declared
+  https://github.com/DrHyde/perl-modules-Devel-CheckOS/issues/27
+
+1.92    2022-04-24
+
+- Fix bugs in new alias and case-insensitivity features which meant everything
+  broke in taint-mode. The new features now no longer work in taint-mode but
+  everything else should.
+
+1.91    2022-04-21
+
+- Fix tests for platforms where the OS is detected as something that is
+  a family, but not as anything more specific, such as Fedora Linux
+
 1.90    2022-04-20
 
 - Matches are now case-insensitive

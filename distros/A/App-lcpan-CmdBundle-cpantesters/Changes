@@ -1,8 +1,13 @@
-0.002   2018-09-12 (PERLANCAR)
+0.003   2022-03-27  Released-By: PERLANCAR; Urgency: medium
+
+        - Update to newer App::lcpan (table 'dist' was removed).
+
+
+0.002   2018-09-12  Released-By: PERLANCAR
 
 	- [bugfix] Fix URL (http, not https yet).
 
 
-0.001   2018-09-12 (PERLANCAR)
+0.001   2018-09-12  Released-By: PERLANCAR
 
         - First release.

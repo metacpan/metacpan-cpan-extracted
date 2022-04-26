@@ -4,7 +4,7 @@ use Moo;
 
 with 'Dancer2::Plugin::FormValidator::Role::Extension';
 
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 
 sub validators {
     return {
@@ -31,7 +31,7 @@ Dancer2::Plugin::FormValidator::Extension::Password - Dancer2 FormValidator exte
 
 =head1 VERSION
 
-version 0.81
+version 0.82
 
 =head1 SYNOPSIS
 

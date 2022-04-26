@@ -485,8 +485,7 @@ YAML
   );
 
 
-  my $uri = URI->new('http://example.com');
-  $uri->path_segments('', 'foo', 'hello // there ಠ_ಠ!');
+  my $uri = uri('http://example.com', '', 'foo', 'hello // there ಠ_ಠ!');
   ok($openapi->find_path(request('GET', $uri),
       $options = { path_template => '/foo/{foo_id}', path_captures => { foo_id => 'hello // there ಠ_ಠ!' } }),
     'find_path returns successfully');

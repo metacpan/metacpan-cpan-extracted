@@ -1,5 +1,10 @@
 Revision history for Test-MockFile
 
+0.034   4/25/2022
+- GH #176: Add file handle support for BINMODE. This does nothing at this
+  time but at least it doesn't die.
+- support for ~/foo and ~user/foo in mocking and access (globs)
+
 0.033   3/7/2022
 - Request last Overload::FileCheck release - 0.013
 - Correct chown parameter position for file name

@@ -1,7 +1,14 @@
-1.58      2021-03-15 18:07:40-05:00 America/Chicago
+1.59      2022-04-22 15:16:17-05:00 America/Chicago
+
+- #35: The sort_by option used in c6b5d1c is not present in (some versions of?) JSON::XS. canonical is more portable.
+
+1.57      2019-11-27 00:00:00-06:00 America/Chicago
+
+- #28: Prettify and canonicalize recorded mocks
+
+1.56      2018-11-21 23:33:38-06:00 America/Chicago
 
 - #15: Fixed issue where save wouldn't work if called during global destruction
-- #28: Prettify and canonicalize recorded mocks
 
 1.55      2018-11-21 22:05:33-06:00 America/Chicago
 

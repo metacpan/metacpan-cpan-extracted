@@ -43,6 +43,8 @@ my $original_port   = $url->port;
 my $output_file = qq{$dir/output.json};
 
 my $transaction_count = 3;
+plan skip_all => 'Random.org quota exceeded' unless check_quota($transaction_count);
+
 # Record the interchange
 my ( @results, @transactions );
 {    # Look! Scoping braces!
@@ -50,7 +52,6 @@ my ( @results, @transactions );
     $mock->transactor->name('kit.peters@broadbean.com');
 
     for ( 1 .. $transaction_count ) {
-        plan skip_all => 'Random.org quota exceeded' unless check_quota();
         push @transactions, $mock->get( $url->clone->query( [ quux => int rand 1e9 ] ));
     }
 

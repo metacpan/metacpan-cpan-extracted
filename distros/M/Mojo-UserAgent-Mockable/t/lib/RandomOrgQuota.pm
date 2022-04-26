@@ -12,7 +12,7 @@ sub check_quota {
         $quota = get_quota();
         1;
     } or die qq{Failed to get quota: $@\n};
-    return $quota >= $minimum;
+    return $quota && $quota >= $minimum;
 }
 
 sub get_quota {
@@ -23,8 +23,11 @@ sub get_quota {
     my $quota;
     eval {
         my $res = $tx->result;
-        if ( $res->code eq 200 ) {
+        if ( $res->code == 200 ) {
             $quota = int $res->body;
+        }
+        elsif ($res->code == 403) {
+            $quota = 0;
         }
         else { die qq{$res->{code} $res->{message}\n}; }
         1;

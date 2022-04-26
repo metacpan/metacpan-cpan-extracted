@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 
 # Set the version for CPAN
-our $VERSION = '1.272';
+our $VERSION = '1.273';
 
 our ( $XS_COMPATIBLE, @XS_EXCLUDE ) = ( '0.845' );
 

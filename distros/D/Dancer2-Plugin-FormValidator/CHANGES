@@ -1,3 +1,39 @@
+0.80 2022-04-25 20:58:04 Europe/Moscow
+    [CHANGES]
+    * No memoization for validators
+
+    [IMPROVEMENTS]
+    * Refactoring
+    * Moved Plugin login to Validator class
+    * More tests
+
+    [DOCS]
+    * Validators docs
+    * Configuration docs
+
+0.71 2022-04-22 19:40:42 Europe/Moscow
+    [IMPROVEMENTS]
+    * Unsetting $valid_input after first access
+
+    [DOCS]
+    * Document validators
+    * Profile method
+    * Screenshot
+    * Fix typos
+
+0.70 2022-04-22 18:01:46 Europe/Moscow
+    [CHANGES]
+    * Validate signature. Now accepting arguments as hash
+
+    [FEATURES]
+    * New dsl keyword: validated
+
+    [REMOVED]
+    * validator_language
+
+    [DOCS]
+    * Update docs
+
 0.61 2022-04-12 14:38:13 Europe/Moscow
     [IMPROVEMENTS]
     * Refactored field defined and not empty

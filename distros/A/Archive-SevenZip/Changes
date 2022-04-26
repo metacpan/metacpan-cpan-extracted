@@ -1,3 +1,8 @@
+0.13 2022-04-21
+    * ->find_7z_executable now also returns the 7z version when a path to
+      the executable is set via $ENV{PERL_ARCHIVE_SEVENZIP_BIN}
+      Reported by LanX
+
 0.12 2020-05-12
     * Recognize 7zip Windows 64bit version (Reported at RT #132570)
     * Docfixes (Reported at RT #132570)

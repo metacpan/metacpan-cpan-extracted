@@ -1,4 +1,4 @@
-bin/wsgetmail.in
+bin/wsgetmail
 Changes
 COPYING
 inc/Module/AutoInstall.pm
@@ -15,7 +15,6 @@ inc/Module/Install/Scripts.pm
 inc/Module/Install/Substitute.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
-INSTALL.SKIP
 lib/App/wsgetmail.pm
 lib/App/wsgetmail/MDA.pm
 lib/App/wsgetmail/MS365.pm

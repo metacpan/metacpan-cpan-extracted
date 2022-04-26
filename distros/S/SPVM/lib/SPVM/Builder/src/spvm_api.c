@@ -7,35 +7,32 @@
 #include <inttypes.h>
 #include <stdarg.h>
 
-#include "spvm_list.h"
-#include "spvm_hash.h"
+#include "spvm_api.h"
+#include "spvm_native.h"
 
 #include "spvm_allocator.h"
 
-#include "spvm_opcode_array.h"
-#include "spvm_opcode.h"
-#include "spvm_class.h"
-#include "spvm_method.h"
-#include "spvm_type.h"
-#include "spvm_weaken_backref.h"
+#include "spvm_list.h"
+#include "spvm_hash.h"
 #include "spvm_string_buffer.h"
-#include "spvm_api.h"
-#include "spvm_object.h"
-#include "spvm_native.h"
 
+#include "spvm_opcode.h"
+#include "spvm_object.h"
+#include "spvm_weaken_backref.h"
+
+#include "spvm_runtime.h"
+#include "spvm_runtime_constant_string.h"
 #include "spvm_runtime_basic_type.h"
+#include "spvm_runtime_type.h"
 #include "spvm_runtime_class.h"
 #include "spvm_runtime_class_var.h"
 #include "spvm_runtime_field.h"
-#include "spvm_runtime.h"
 #include "spvm_runtime_method.h"
-#include "spvm_runtime_constant_string.h"
-#include "spvm_runtime_type.h"
-#include "spvm_precompile.h"
-#include "spvm_api_compiler.h"
+
 #include "spvm_api_string_buffer.h"
 #include "spvm_api_allocator.h"
 #include "spvm_api_runtime.h"
+#include "spvm_api_compiler.h"
 #include "spvm_api_precompile.h"
 
 
@@ -1246,7 +1243,7 @@ int32_t SPVM_API_call_spvm_method(SPVM_ENV* env, int32_t method_id, SPVM_VALUE* 
   int32_t exception_flag;
   
   // Call native method
-  if (method->flag & SPVM_METHOD_C_FLAG_NATIVE) {
+  if (method->is_native) {
     // Enter scope
     int32_t original_mortal_stack_top = SPVM_API_enter_scope(env);
 
@@ -4954,8 +4951,8 @@ int32_t SPVM_API_call_spvm_method_vm(SPVM_ENV* env, int32_t method_id, SPVM_VALU
         
         int32_t interface_basic_type_id = opcode->operand3;
         SPVM_RUNTIME_BASIC_TYPE* interface_basic_type = SPVM_API_RUNTIME_get_basic_type(runtime, interface_basic_type_id);
-        SPVM_RUNTIME_CLASS* interface_class = SPVM_API_RUNTIME_get_class(runtime, interface_basic_type->class_id);
-        SPVM_RUNTIME_METHOD* interface_method = SPVM_API_RUNTIME_get_method_by_class_id_and_method_name(runtime, interface_class->id, implement_method_name);
+        SPVM_RUNTIME_CLASS* interface = SPVM_API_RUNTIME_get_class(runtime, interface_basic_type->class_id);
+        SPVM_RUNTIME_METHOD* interface_method = SPVM_API_RUNTIME_get_method_by_class_id_and_method_name(runtime, interface->id, implement_method_name);
         const char* implement_method_signature = SPVM_API_RUNTIME_get_constant_string_value(runtime, implement_method->signature_id, NULL);
         
         void* object = *(void**)&object_vars[opcode->operand1];
@@ -6528,7 +6525,7 @@ SPVM_OBJECT* SPVM_API_new_object_raw(SPVM_ENV* env, int32_t basic_type_id) {
   object->length = fields_length;
 
   // Has destructor
-  if (class->method_destructor_id >= 0) {
+  if (class->destructor_method_id >= 0) {
     object->flag |= SPVM_OBJECT_C_FLAG_HAS_DESTRUCTOR;
   }
   
@@ -6569,7 +6566,7 @@ SPVM_OBJECT* SPVM_API_new_pointer_raw(SPVM_ENV* env, int32_t basic_type_id, void
   object->length = 0;
 
   // Has destructor
-  if (SPVM_API_RUNTIME_get_method(runtime, class->method_destructor_id)) {
+  if (SPVM_API_RUNTIME_get_method(runtime, class->destructor_method_id)) {
     object->flag |= SPVM_OBJECT_C_FLAG_HAS_DESTRUCTOR;
   }
   
@@ -6704,7 +6701,7 @@ void SPVM_API_dec_ref_count(SPVM_ENV* env, SPVM_OBJECT* object) {
         
         int32_t is_pointer = 0;
         if (class) {
-          if (class->flag & SPVM_CLASS_C_FLAG_POINTER) {
+          if (class->is_pointer) {
             is_pointer = 1;
           }
         }
@@ -6713,7 +6710,7 @@ void SPVM_API_dec_ref_count(SPVM_ENV* env, SPVM_OBJECT* object) {
         if (object->flag & SPVM_OBJECT_C_FLAG_HAS_DESTRUCTOR) {
           SPVM_VALUE args[1];
           args[0].oval = object;
-          int32_t exception_flag = SPVM_API_call_spvm_method(env, class->method_destructor_id, args);
+          int32_t exception_flag = SPVM_API_call_spvm_method(env, class->destructor_method_id, args);
           
           // Exception in destructor is changed to warning
           if (exception_flag) {
@@ -7169,7 +7166,7 @@ int32_t SPVM_API_get_instance_method_id(SPVM_ENV* env, SPVM_OBJECT* object, cons
     SPVM_RUNTIME_METHOD* method = NULL;
     
     // Anon instance method
-    if (class->flag & SPVM_CLASS_C_FLAG_ANON_METHOD_CLASS) {
+    if (class->is_anon) {
       // Method name
       int32_t method_id = class->methods_base_id;
       method = SPVM_API_RUNTIME_get_method(runtime, method_id);

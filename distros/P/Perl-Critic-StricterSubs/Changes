@@ -1,5 +1,15 @@
 Revision history for Perl module Perl::Critic::StricterSubs
 
+0.06 2022-04-25
+
+    [Enhancements]
+    * Modules::RequireExplicitInclusion: Disambiguated package names,
+      such as Foo::Bar:: instead of just Foo::Bar, are now OK.
+      Thanks, Olaf Alders and Klaus S. Madsen.
+
+    * Modules::RequireExplicitInclusion: Add "utf8" to the list of
+      built-in modules that don't require "use".  Thanks, Klaus S. Madsen.
+
 0.05 2015-02-20
 
     [Bug Fixes]

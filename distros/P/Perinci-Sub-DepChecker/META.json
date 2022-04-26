@@ -27,7 +27,7 @@
             "Test::Pod::Coverage" : "1.08"
          },
          "x_spec" : {
-            "Rinci" : "v1.1.101"
+            "Rinci" : "v1.1.102"
          }
       },
       "runtime" : {
@@ -55,7 +55,7 @@
    "provides" : {
       "Perinci::Sub::DepChecker" : {
          "file" : "lib/Perinci/Sub/DepChecker.pm",
-         "version" : "0.124"
+         "version" : "0.125"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-Sub-DepChecker"
       }
    },
-   "version" : "0.124",
+   "version" : "0.125",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

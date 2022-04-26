@@ -15,3 +15,18 @@ Revision history for Perl extension Getopt-optparse.
 
 0.07  Wed Apr 20 11:37:17 2022
         - Added support for single dash options.  Syntax changes.
+
+0.08  Fri Apr 22 12:59:19 2022
+        - Fixed bug with parse_args.  Added support for callback action.  Updated POD.
+
+1.2.0 Fri Apr 22 04:54:14 2022
+        - Fixed bug with callbacks being run twice.  Removed callback as action.  Callback now has its own hashref key.  This was done to avoid multiple actions.  Updated POD.
+
+1.4.0 Sat Apr 23 15:00:23 2022
+        - Fixed logic bug with example callback.  Rearranged POD.  Added santity checks to add_option method, dest required.  show_help method in attempt to beautify output, now printing single dash options ordered alphabetically, then double dash options ordered alphabetically.
+
+1.5.0 Sun Apr 24 10:07:23 2022
+        - Updated Makefile.PL.  Added dependencies and updated email.
+
+1.6.0 Sun Apr 24 03:28:23 2022
+        - Retrying dependencies

@@ -1,6 +1,6 @@
 package DBIx::Class::Helper::Row::Types;
 
-use v5.8;
+use v5.10;
 
 # ABSTRACT: Use Types to define rows
 
@@ -14,13 +14,7 @@ use Types::SQL::Util v0.3.0 ();
 # RECOMMEND PREREQ: Ref::Util::XS
 # RECOMMEND PREREQ: Type::Tiny::XS
 
-our $VERSION = 'v0.2.0';
-
-
-sub VERSION { # for older Perls
-    require version;
-    return version->parse($VERSION);
-}
+our $VERSION = 'v0.3.1';
 
 
 
@@ -90,17 +84,18 @@ DBIx::Class::Helper::Row::Types - Use Types to define rows
 
 =head1 VERSION
 
-version v0.2.0
+version v0.3.1
 
 =head1 SYNOPSIS
 
 In result class:
 
   use Types::SQL -types;
+  use Types::Standard -types;
 
  __PACKAGE__->load_components('Helper::Row::Types');
 
- __PACKAGE__->add_column(
+ __PACKAGE__->add_columns(
 
     id   => Serial,
 
@@ -148,17 +143,10 @@ This is entirely separate from database-level constraints.
 
 Enabling C<strict> for an inflated column is strongly discouraged.
 
-=for Pod::Coverage VERSION
-
 =head1 KNOWN ISSUES
 
 Strict type constraints are only applied when explicitly setting a
 column value.
-
-=head1 ROADMAP
-
-Support for Perl versions earlier than 5.10 will be removed sometime
-in 2019.
 
 =head1 SEE ALSO
 
@@ -189,7 +177,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017-2018 by Robert Rothenberg.
+This software is Copyright (c) 2017-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

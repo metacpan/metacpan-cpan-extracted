@@ -1,10 +1,9 @@
 use strict;
 use warnings;
-use Test::More tests => 16;
+use Test::More tests => 14;
 
 # TEST 1.
 use_ok('Dancer2::Plugin::FormValidator::Validator::Required');
-
 
 # TEST 2.
 use_ok('Dancer2::Plugin::FormValidator::Validator::Email');
@@ -44,9 +43,3 @@ use_ok('Dancer2::Plugin::FormValidator::Validator::LengthMax');
 
 # TEST 14.
 use_ok('Dancer2::Plugin::FormValidator::Validator::Accepted');
-
-# TEST 15.
-use_ok('Dancer2::Plugin::FormValidator::Validator::AlphaAscii');
-
-# TEST 16.
-use_ok('Dancer2::Plugin::FormValidator::Validator::AlphaNumAscii');

@@ -18,3 +18,9 @@ Revision history for Perl extension Net::pWhoIs.
 
 0.07  Wed Apr 20 10:41:03 2022
         -  printReport method: added newline between results.  Stripped tabs.  Updated POD
+
+1.1.0  Sun Apr 24 22:16:04 2022
+        -  Updated Makefile.PL.  Specified dependencies and updated author.
+
+1.2.0  Mon Apr 25 02:25:57 2022
+        - Trying to add dependencies again.

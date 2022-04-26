@@ -3,10 +3,10 @@ Changes
 LICENSE
 META.json
 README.md
-bin/pm-uninstall
 cpanfile
 lib/App/pmuninstall.pm
 minil.toml
+script/pm-uninstall
 t/happy_cpantesters.t
 xt/02_perlcritic.t
 xt/perlcriticrc

@@ -29,8 +29,20 @@ Using Perl::Server:
     # or
 
     $ perl-server [options]
-        
-These options are the same as [Plackup Options](https://metacpan.org/pod/plackup#OPTIONS).
+    
+# OPTIONS
+
+## -p, --port
+
+    $ perl-server path -p 5000 
+
+    $ perl-server path -p e
+
+    $ perl-server path -p empty
+
+Specifies the port to bind or set e or empty to a random free port.
+
+Others options are the same as [Plackup Options](https://metacpan.org/pod/plackup#OPTIONS).
 
 # SEE ALSO
 

@@ -45,6 +45,6 @@
          "web" : "https://github.com/vkeselj/App-Utils"
       }
    },
-   "version" : 22.03,
+   "version" : 22.04,
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

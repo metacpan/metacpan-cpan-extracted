@@ -19,7 +19,7 @@ umask 022;
 note "_abs_path_to_file";
 my $cwd = Cwd::getcwd();
 
-is( Test::MockFile::_abs_path_to_file("0"), "$cwd/0", "no / prefix makes prepends path on it." );
+is( Test::MockFile::_abs_path_to_file("0"), "$cwd/0", "no / prefix makes prepends path on it" );
 
 is( Test::MockFile::_abs_path_to_file(), undef, "undef is undef" );
 

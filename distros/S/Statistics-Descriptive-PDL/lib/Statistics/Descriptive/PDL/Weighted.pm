@@ -13,7 +13,7 @@ use PDL::Lite '2.012';
 
 ## no critic (ProhibitExplicitReturnUndef)
 
-our $VERSION = '0.13';
+our $VERSION = '0.16';
 
 use parent 'Statistics::Descriptive::PDL';
 
@@ -355,10 +355,8 @@ sub _geometric_mean {
 
     my $wts = $self->_get_weights_piddle;
 
-    my $exponent = 1 / $self->sum_weights;
-    my $powered = $data * $wts;
-
-    return $powered->dprodover ** $exponent;
+    # formula from https://en.wikipedia.org/wiki/Weighted_geometric_mean
+    return exp (($data->log * $wts)->sum / $wts->sum);
 }
 
 sub _mode {

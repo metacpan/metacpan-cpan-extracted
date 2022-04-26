@@ -306,6 +306,8 @@ struct spvm_env_runtime {
   void (*prepare)(void* runtime);
   int32_t* (*get_opcodes)(void* runtime);
   int32_t (*get_opcodes_length)(void* runtime);
+  int32_t* (*get_spvm_32bit_codes)(void* runtime);
+  int32_t (*get_spvm_32bit_codes_length)(void* runtime);
   int32_t (*get_classes_length)(void* runtime);
   int32_t (*get_constant_string_id)(void* runtime, const char* string);
   const char* (*get_constant_string_value)(void* runtime, int32_t constant_string_id, int32_t* string_length);
@@ -379,6 +381,8 @@ struct spvm_env_runtime {
   void* object_type_dimension_offset;
   void* object_flag_offset;
   void* object_length_offset;
+  void* (*get_allocator)(void* runtime);
+  void (*build)(void* runtime, int32_t* spvm_32bit_codes);
 };
 
 struct spvm_env_compiler {
@@ -394,9 +398,7 @@ struct spvm_env_compiler {
   int32_t (*compile_spvm)(void* compiler, const char* class_name);
   int32_t (*get_error_messages_length)(void* compiler);
   const char* (*get_error_message)(void* compiler, int32_t index);
-  void (*build_runtime)(void* compiler, void* runtime);
-  const char* (*get_module_source_by_name)(void* compiler, const char* class_name);
-  void (*set_module_source_by_name)(void* compiler, const char* class_name, const char* module_source);
+  int32_t* (*create_spvm_32bit_codes)(void* compiler, void* allocator);
 };
 
 struct spvm_env_precompile {

@@ -185,20 +185,6 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
-    'height' => {
-    	datatype => 'int',
-    	base_name => 'Height',
-    	description => 'Gets or sets the height of slides in the output format, e.g. image size, pdf page size etc.',
-    	format => '',
-    	read_only => '',
-    		},
-    'width' => {
-    	datatype => 'int',
-    	base_name => 'Width',
-    	description => 'Gets or sets the height of slides in the output format, e.g. image size, pdf page size etc.',
-    	format => '',
-    	read_only => '',
-    		},
     'font_fallback_rules' => {
     	datatype => 'ARRAY[FontFallbackRule]',
     	base_name => 'FontFallbackRules',
@@ -213,10 +199,24 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'slides_transition_duration' => {
+    	datatype => 'int',
+    	base_name => 'SlidesTransitionDuration',
+    	description => 'Slides transition duration.',
+    	format => '',
+    	read_only => '',
+    		},
+    'transition_type' => {
+    	datatype => 'string',
+    	base_name => 'TransitionType',
+    	description => 'Video transition type',
+    	format => '',
+    	read_only => '',
+    		},
     'transition_duration' => {
     	datatype => 'int',
     	base_name => 'TransitionDuration',
-    	description => 'Transition duration.',
+    	description => 'Duration of transition defined in TransitionType property.',
     	format => '',
     	read_only => '',
     		},
@@ -231,20 +231,20 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->swagger_types( {
     'default_regular_font' => 'string',
-    'height' => 'int',
-    'width' => 'int',
     'font_fallback_rules' => 'ARRAY[FontFallbackRule]',
     'format' => 'string',
+    'slides_transition_duration' => 'int',
+    'transition_type' => 'string',
     'transition_duration' => 'int',
     'video_resolution_type' => 'string'
 } );
 
 __PACKAGE__->attribute_map( {
     'default_regular_font' => 'DefaultRegularFont',
-    'height' => 'Height',
-    'width' => 'Width',
     'font_fallback_rules' => 'FontFallbackRules',
     'format' => 'Format',
+    'slides_transition_duration' => 'SlidesTransitionDuration',
+    'transition_type' => 'TransitionType',
     'transition_duration' => 'TransitionDuration',
     'video_resolution_type' => 'VideoResolutionType'
 } );

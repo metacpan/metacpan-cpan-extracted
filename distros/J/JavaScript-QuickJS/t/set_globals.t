@@ -90,10 +90,20 @@ like($err, qr<javascript>i, 'error mentions JS');
 #----------------------------------------------------------------------
 
 if ($is_64bit) {
+    my $ivmax = "\x7f\0\0\0\0\0\0\0";
+
+    my $ivmax_plus1 = "\x80\0\0\0\0\0\0\0";
+
+    my $ivmin = "\x80\0\0\0\0\0\0\0";
+
+    if ($Config{'byteorder'} == '87654321') {
+        $_ = reverse $_ for ($ivmax, $ivmax_plus1, $ivmin);
+    }
+
     my @t = (
-        [ '> IV_MAX', unpack('Q>', "\x80\0\0\0\0\0\0\0") ],
-        [ '<= IV_MAX', unpack('Q>', "\x7f\0\0\0\0\0\0\0") ],
-        [ 'negative 64-bit', unpack('q>', "\x80\0\0\0\0\0\0\0") ],
+        [ '> IV_MAX', unpack('Q', $ivmax) ],
+        [ '<= IV_MAX', unpack('Q', $ivmax_plus1) ],
+        [ 'negative 64-bit', unpack('q', $ivmin) ],
     );
 
     for my $tt (@t) {

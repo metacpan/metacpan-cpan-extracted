@@ -17,6 +17,10 @@ Basic setup:
     my $module = $env->parse_module($wasm_binary);
     my $runtime = $env->create_runtime(1024)->load_module($module);
 
+Run L<WASI|https://wasi.dev>:
+
+    my $exit_code = $runtime->run_wasi('arg1', 'arg2');
+
 WebAssembly-exported globals:
 
     my $global = $module->get_global('some-value');
@@ -67,6 +71,31 @@ Wasmer et al. wasm3 only exports a single WebAssembly memory, for
 example. It can’t import memories or globals, and it neither imports
 I<nor> exports tables.
 
+=head1 L<WASI|https://wasi.dev> SUPPORT
+
+wasm3 implements WASI via either of (as of this writing) two backends:
+a wrapper around L<uvwasi|https://github.com/nodejs/uvwasi>, and a
+less-complete original implementation. The former needs
+L<libuv|https://libuv.org>, which doesn’t compile on all platforms,
+while the latter should compile everywhere this module can run.
+
+This distribution’s F<Makefile.PL> implements logic to determine which
+backend to use.
+
+You’re free, of course, to implement your own WASI imports rather than to
+use wasm3’s. Depending on how much of WASI you actually need that may not
+be as onerous as it sounds; see the distribution’s F<t/wasi_pp.t> for an
+example.
+
+=head1 MEMORY LEAK DETECTION
+
+To help you avoid memory leaks, instances of all classes C<warn()>
+if their C<DESTROY()> method runs at global destruction time.
+
+This necessitates extra care when linking Perl functions to WASM;
+see L<Wasm::Wasm3::Module> for details, and the distribution’s
+F<t/wasi_pp.t> for an example.
+
 =head1 DOCUMENTATION
 
 This module generally documents only those aspects of its usage that
@@ -82,10 +111,13 @@ use XSLoader;
 our $VERSION;
 
 BEGIN {
-    $VERSION = '0.01';
+    $VERSION = '0.02';
 
     XSLoader::load( __PACKAGE__, $VERSION );
 }
+
+use Wasm::Wasm3::Module ();
+use Wasm::Wasm3::Runtime ();
 
 use constant M3_VERSION => (_M3_VERSION_MAJOR, _M3_VERSION_MINOR, _M3_VERSION_REV);
 
@@ -104,6 +136,11 @@ Returns wasm3’s version as a string.
 =head2 C<TYPE_I32>, C<TYPE_I64>, C<TYPE_F32>, C<TYPE_F64>
 
 Numeric constants that indicate the corresponding WebAssembly type.
+
+=head2 $YN = WASI_BACKEND
+
+Either C<uvwasi> or C<simple>. See above about WASI support for
+details.
 
 =head1 METHODS
 

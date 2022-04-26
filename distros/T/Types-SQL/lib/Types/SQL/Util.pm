@@ -8,7 +8,7 @@ use Exporter qw/ import /;
 use PerlX::Maybe qw/ maybe /;
 use Safe::Isa 1.000008 qw/ $_isa $_call_if_can /;
 
-our $VERSION = 'v0.4.1';
+our $VERSION = 'v0.6.0';
 
 # RECOMMEND PREREQ: PerlX::Maybe::XS
 
@@ -19,11 +19,14 @@ our @EXPORT    = qw/ column_info_from_type /;
 our @EXPORT_OK = @EXPORT;
 
 my %CLASS_TYPES = (
-    'DateTime'                   => 'datetime',
-    'DateTime::Tiny'             => 'datetime',
+    'Data::UUID'                 => 'uuid',
+    'Data::GUID'                 => 'uuid',
+    'Date'                       => 'timestamp',
+    'DateTime'                   => 'timestamp',
+    'DateTime::Tiny'             => 'timestamp',
     'JSON::PP::Boolean'          => 'boolean',
-    'Time::Moment'               => 'datetime',
-    'Time::Piece'                => 'datetime',
+    'Time::Moment'               => 'timestamp',
+    'Time::Piece'                => 'timestamp',
     'Types::Serialiser::Boolean' => 'boolean',
 );
 
@@ -157,6 +160,33 @@ my %FROM_TYPE = (
 
     },
 
+    'Types::DateTime' => {
+
+        'DateTime' => sub {
+            return ( data_type => 'timestamp' );
+        },
+
+        'DateTimeWithZone' => sub {
+            return ( data_type => 'timestamp with time zone' );
+        },
+
+        'DateTimeUTC' => sub {
+            return ( data_type => 'timestamp with time zone' );
+        },
+
+        'Now' => sub {
+            return ( data_type => 'timestamp', default_value => \ "CURRENT_TIMESTAMP"  );
+        },
+    },
+
+    'Types::UUID' => {
+
+        'Uuid' => sub {
+            return ( data_type => 'uuid' ),
+        },
+
+    },
+
 );
 
 
@@ -178,6 +208,14 @@ sub column_info_from_type {
         return $methods->{dbic_column_info}->($type);
     }
 
+    my $from = ( $type->library ? $FROM_TYPE{ $type->library } : undef ) // { };
+
+    if ( my $code = $from->{$name} ) {
+        if ( my %info = $code->($type) ) {
+            return %info;
+        }
+    }
+
     if ( $type->isa('Type::Tiny::Enum') ) {
         return (
             data_type  => 'enum',
@@ -194,12 +232,6 @@ sub column_info_from_type {
             if ( my %info = $code->($type) ) {
                 return %info;
             }
-        }
-    }
-
-    if ( my $code = $FROM_TYPE{ $type->library }{$name} ) {
-        if ( my %info = $code->($type) ) {
-            return %info;
         }
     }
 
@@ -226,7 +258,7 @@ Types::SQL::Util - extract DBIx::Class column_info from types
 
 =head1 VERSION
 
-version v0.4.1
+version v0.6.0
 
 =head1 SYNOPSIS
 
@@ -255,8 +287,10 @@ C<add_column> method of L<DBIx::Class::ResultSource>, based on the
 type.
 
 Besides the types from L<Types::SQL>, it also supports the following
-types from L<Types::Standard>, L<Types::Common::String>, and
-L<Types::Common::Numeric>:
+types.
+
+Unless noted, these come from L<Types::Standard>,
+L<Types::Common::String> or L<Types::Common::Numeric>.
 
 =head3 C<ArrayRef>
 
@@ -266,6 +300,16 @@ This treats the type as an array.
 
 This is treated as a C<boolean> type.
 
+=head3 C<DateTime>
+
+From L<Types::DateTime>. This is a C<timestamp>.
+
+=head3 C<DateTimeUTC>
+
+=head3 C<DateTimeWithZone>
+
+From L<Types::DateTime>. These are C<timestamp with time zone>.
+
 =head3 C<Enum>
 
 This is treated as an C<enum> type, which can be used with
@@ -273,8 +317,13 @@ L<DBIx::Class::InflateColumn::Object::Enum>.
 
 =head3 C<InstanceOf>
 
-For L<DateTime>, L<DateTime::Tiny>, L<Time::Moment> and L<Time::Piece>
-objects, this is treated as a C<datetime>.
+For L<Date>, L<DateTime>, L<DateTime::Tiny>, L<Time::Moment> and
+L<Time::Piece> objects, this is treated as a C<timestamp>.
+
+If you want a timestamp with a time zone, use L<Types::DateTime>
+C<DateTimeWithZone> or C<DateTimeUTC> type.
+
+L<Data::UUID> or L<Data::GUID> will be treated as C<uuid>.
 
 =head3 C<Int>
 
@@ -327,6 +376,15 @@ This is treated as a C<text> value with a size of 255.
 These are treated the same as L</SimpleStr>. In the future, if
 L<DBIx::Class> supports database-related constraints, this will be
 added to the metadata.
+
+=head3 C<Now>
+
+From L<Types::DateTime>. This is a C<timestamp> with a default set to
+the SQL C<current_timestamp> function.
+
+=head3 C<Uuid>
+
+From L<Types::UUID>. This is a C<uuid>.
 
 =head1 CUSTOM TYPES
 

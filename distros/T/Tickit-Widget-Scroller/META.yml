@@ -15,13 +15,13 @@ name: Tickit-Widget-Scroller
 provides:
   Tickit::Widget::Scroller:
     file: lib/Tickit/Widget/Scroller.pm
-    version: '0.27'
+    version: '0.28'
   Tickit::Widget::Scroller::Item::RichText:
     file: lib/Tickit/Widget/Scroller/Item/RichText.pm
-    version: '0.27'
+    version: '0.28'
   Tickit::Widget::Scroller::Item::Text:
     file: lib/Tickit/Widget/Scroller/Item/Text.pm
-    version: '0.27'
+    version: '0.28'
 requires:
   Object::Pad: '0.57'
   String::Tagged: '0'
@@ -33,5 +33,5 @@ requires:
 resources:
   IRC: irc://irc.freenode.net/#tickit
   license: http://dev.perl.org/licenses/
-version: '0.27'
+version: '0.28'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

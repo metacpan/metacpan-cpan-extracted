@@ -4,7 +4,7 @@ use warnings;
 use Data::Dumper;
 $Data::Dumper::Deparse=1;
 
-use Test::More tests => 10;
+use Test::More tests => 12;
 
 BEGIN { use_ok('Template::Plex') };
 
@@ -106,7 +106,10 @@ ok $result eq "my name is John not Jill", "Lexical and override access";
 	my $text=$t->render;
 	my($first,$last)=split ":", $text;
 	ok $last eq 'Sub template 2 10', "Recursive plex, top aliased";
+	#print %vars;
+	ok $vars{new_field} eq "NEW", "New field from sub template";
 }
+
 
 {
 	my $top_level='This template is loaded,cached and executed automatically. $value';
@@ -118,7 +121,11 @@ ok $result eq "my name is John not Jill", "Lexical and override access";
 	}
 }
 
-
 {
-	
+	my $top_level='skipped:@{[plx "sub3.plex"]}';
+	my %vars=(value=>10);
+	my $t=plex [$top_level], \%vars, root=> "t";
+	my $text=$t->render;
+	ok $text eq 'skipped:', "skip template";
 }
+

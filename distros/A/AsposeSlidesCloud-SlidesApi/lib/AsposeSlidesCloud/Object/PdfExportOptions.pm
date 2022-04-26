@@ -37,6 +37,7 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 
+use AsposeSlidesCloud::Object::AccessPermissions;
 use AsposeSlidesCloud::Object::ExportOptions;
 use AsposeSlidesCloud::Object::FontFallbackRule;
 
@@ -185,20 +186,6 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
-    'height' => {
-    	datatype => 'int',
-    	base_name => 'Height',
-    	description => 'Gets or sets the height of slides in the output format, e.g. image size, pdf page size etc.',
-    	format => '',
-    	read_only => '',
-    		},
-    'width' => {
-    	datatype => 'int',
-    	base_name => 'Width',
-    	description => 'Gets or sets the height of slides in the output format, e.g. image size, pdf page size etc.',
-    	format => '',
-    	read_only => '',
-    		},
     'font_fallback_rules' => {
     	datatype => 'ARRAY[FontFallbackRule]',
     	base_name => 'FontFallbackRules',
@@ -340,7 +327,7 @@ __PACKAGE__->method_documentation({
     	read_only => '',
     		},
     'access_permissions' => {
-    	datatype => 'string',
+    	datatype => 'AccessPermissions',
     	base_name => 'AccessPermissions',
     	description => 'Access permissions that should be granted when the document is opened with user access.  Default is AccessPermissions.None.             ',
     	format => '',
@@ -350,8 +337,6 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->swagger_types( {
     'default_regular_font' => 'string',
-    'height' => 'int',
-    'width' => 'int',
     'font_fallback_rules' => 'ARRAY[FontFallbackRule]',
     'format' => 'string',
     'text_compression' => 'string',
@@ -372,13 +357,11 @@ __PACKAGE__->swagger_types( {
     'show_comments_by_no_author' => 'boolean',
     'image_transparent_color' => 'string',
     'apply_image_transparent' => 'boolean',
-    'access_permissions' => 'string'
+    'access_permissions' => 'AccessPermissions'
 } );
 
 __PACKAGE__->attribute_map( {
     'default_regular_font' => 'DefaultRegularFont',
-    'height' => 'Height',
-    'width' => 'Width',
     'font_fallback_rules' => 'FontFallbackRules',
     'format' => 'Format',
     'text_compression' => 'TextCompression',

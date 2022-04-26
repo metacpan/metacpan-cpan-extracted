@@ -15,7 +15,7 @@ Quick and dirty …
 
 This library embeds Fabrice Bellard’s [QuickJS](https://bellard.org/quickjs)
 engine into a Perl XS module. You can thus run JavaScript
-([ES2020](https://tc39.github.io/ecma262/)) specification) directly in your
+([ES2020](https://tc39.github.io/ecma262/) specification) directly in your
 Perl programs.
 
 This distribution includes all needed C code; unlike with most XS modules
@@ -56,6 +56,15 @@ Untrapped exceptions in JavaScript will be rethrown as Perl exceptions.
 
 Runs $JS\_CODE as a module, which enables ES6 module syntax.
 Note that no values can be returned directly in this mode of execution.
+
+## $obj = _OBJ_->set\_module\_base( $PATH )
+
+Sets a base path (a byte string) for ES6 module imports.
+
+## $obj = _OBJ_->unset\_module\_base()
+
+Restores QuickJS’s default directory for ES6 module imports
+(as of this writing, it’s the process’s current directory).
 
 # TYPE CONVERSION: JAVASCRIPT → PERL
 
@@ -131,3 +140,4 @@ V8 versions.
 Copyright 2022 Gasper Software Consulting.
 
 This library is licensed under the same terms as Perl itself.
+See [perlartistic](https://metacpan.org/pod/perlartistic).

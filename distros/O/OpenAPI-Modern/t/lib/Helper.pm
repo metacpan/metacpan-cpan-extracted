@@ -72,4 +72,23 @@ sub response ($code, $headers = [], $body_content = undef) {
   return $res;
 }
 
+sub uri ($uri_string, @path_parts) {
+  die '$TYPE is not set' if not defined $TYPE;
+
+  my $uri;
+  if ($TYPE eq 'lwp') {
+    $uri = URI->new($uri_string);
+    $uri->path_segments(@path_parts) if @path_parts;
+  }
+  elsif ($TYPE eq 'mojo') {
+    $uri = Mojo::URL->new($uri_string);
+    $uri->path->parts(\@path_parts) if @path_parts;
+  }
+  else {
+    die '$TYPE '.$TYPE.' not supported';
+  }
+
+  return $uri;
+}
+
 1;

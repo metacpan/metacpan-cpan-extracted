@@ -3560,44 +3560,6 @@ get_anon_class_names_by_parent_class_name(...)
 }
 
 SV*
-get_class_names_exclude_anon(...)
-  PPCODE:
-{
-  (void)RETVAL;
-  
-  SV* sv_self = ST(0);
-
-  HV* hv_self = (HV*)SvRV(sv_self);
-
-  // The environment
-  SV** sv_env_ptr = hv_fetch(hv_self, "env", strlen("env"), 0);
-  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
-  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
-
-  // Runtime
-  SV** sv_runtime_ptr = hv_fetch(hv_self, "runtime", strlen("runtime"), 0);
-  SV* sv_runtime = sv_runtime_ptr ? *sv_runtime_ptr : &PL_sv_undef;
-  void* runtime = INT2PTR(void*, SvIV(SvRV(sv_runtime)));
-
-  AV* av_class_names = (AV*)sv_2mortal((SV*)newAV());
-  SV* sv_class_names = sv_2mortal(newRV_inc((SV*)av_class_names));
-
-  int32_t classes_legnth = env->api->runtime->get_classes_length(runtime);
-
-  for (int32_t class_id = 0; class_id < classes_legnth; class_id++) {
-    const char* class_name = env->api->runtime->get_name(runtime, env->api->runtime->get_class_name_id(runtime, class_id));
-    int32_t is_anon_class = env->api->runtime->get_class_is_anon(runtime, class_id);
-    if (!is_anon_class) {
-      SV* sv_class_name = sv_2mortal(newSVpv(class_name, 0));
-      av_push(av_class_names, SvREFCNT_inc(sv_class_name));
-    }
-  }
-  
-  XPUSHs(sv_class_names);
-  XSRETURN(1);
-}
-
-SV*
 get_class_names(...)
   PPCODE:
 {
@@ -3756,47 +3718,6 @@ get_module_file(...)
 }
 
 SV*
-get_module_source_by_name(...)
-  PPCODE:
-{
-  (void)RETVAL;
-  
-  SV* sv_self = ST(0);
-  SV* sv_class_name = ST(1);
-
-  HV* hv_self = (HV*)SvRV(sv_self);
-  
-  // Name
-  const char* class_name = SvPV_nolen(sv_class_name);
-
-  SV** sv_env_ptr = hv_fetch(hv_self, "env", strlen("env"), 0);
-  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
-  SPVM_ENV* env = INT2PTR(void*, SvIV(SvRV(sv_env)));
-
-  SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
-  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
-  void* compiler = INT2PTR(void*, SvIV(SvRV(sv_compiler)));
-
-  // Runtime
-  SV** sv_runtime_ptr = hv_fetch(hv_self, "runtime", strlen("runtime"), 0);
-  SV* sv_runtime = sv_runtime_ptr ? *sv_runtime_ptr : &PL_sv_undef;
-  void* runtime = INT2PTR(void*, SvIV(SvRV(sv_runtime)));
-
-  // Copy class load path to builder
-  SV* sv_module_source;
-  const char* module_source = env->api->compiler->get_module_source_by_name(compiler, class_name);
-  if (module_source) {
-    sv_module_source = sv_2mortal(newSVpv(module_source, 0));
-  }
-  else {
-    sv_module_source = &PL_sv_undef;
-  }
-
-  XPUSHs(sv_module_source);
-  XSRETURN(1);
-}
-
-SV*
 build_runtime(...)
   PPCODE:
 {
@@ -3829,7 +3750,15 @@ build_runtime(...)
 
   // Build runtime information
   runtime = env->api->runtime->new_runtime(env);
-  env->api->compiler->build_runtime(compiler, runtime);
+
+  // Runtime allocator
+  void* runtime_allocator = env->api->runtime->get_allocator(runtime);
+  
+  // SPVM 32bit codes
+  int32_t* spvm_32bit_codes = env->api->compiler->create_spvm_32bit_codes(compiler, runtime_allocator);
+  
+  // Build runtime
+  env->api->runtime->build(runtime, spvm_32bit_codes);
 
   // Prepare runtime
   env->api->runtime->prepare(runtime);
@@ -3841,6 +3770,42 @@ build_runtime(...)
   (void)hv_store(hv_self, "runtime", strlen("runtime"), SvREFCNT_inc(sv_runtime), 0);
 
   XSRETURN(0);
+}
+
+SV*
+get_spvm_32bit_codes(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+  HV* hv_self = (HV*)SvRV(sv_self);
+  
+  // Environment
+  SV** sv_env_ptr = hv_fetch(hv_self, "env", strlen("env"), 0);
+  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
+  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+  
+  // Runtime
+  SV** sv_runtime_ptr = hv_fetch(hv_self, "runtime", strlen("runtime"), 0);
+  SV* sv_runtime = sv_runtime_ptr ? *sv_runtime_ptr : &PL_sv_undef;
+  void* runtime = INT2PTR(void*, SvIV(SvRV(sv_runtime)));
+
+  // SPVM 32bit codes
+  int32_t* spvm_32bit_codes = env->api->runtime->get_spvm_32bit_codes(runtime);
+  int32_t spvm_32bit_codes_length = env->api->runtime->get_spvm_32bit_codes_length(runtime);
+  
+  AV* av_spvm_32bit_codes = (AV*)sv_2mortal((SV*)newAV());
+  SV* sv_spvm_32bit_codes = sv_2mortal(newRV_inc((SV*)av_spvm_32bit_codes));
+  for (int32_t i = 0; i < spvm_32bit_codes_length; i++) {
+    int32_t spvm_32bit_code = spvm_32bit_codes[i];
+    SV* sv_spvm_32bit_code = sv_2mortal(newSViv(spvm_32bit_code));
+    av_push(av_spvm_32bit_codes, SvREFCNT_inc(sv_spvm_32bit_code));
+  }
+  
+  XPUSHs(sv_spvm_32bit_codes);
+
+  XSRETURN(1);
 }
 
 SV*

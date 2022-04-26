@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.34';
+our $VERSION = '1.35';
 
 use DateTime::Locale::Data;
 use DateTime::Locale::FromData;
@@ -380,7 +380,7 @@ DateTime::Locale - Localization support for DateTime.pm
 
 =head1 VERSION
 
-version 1.34
+version 1.35
 
 =head1 SYNOPSIS
 
@@ -602,13 +602,17 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexander Pankoff Karen Etheridge Mohammad S Anwar Ryley Breiddal Sergey Leschenko yasu47b
+=for stopwords Alexander Pankoff James Raspass Karen Etheridge Mohammad S Anwar Ryley Breiddal Sergey Leschenko yasu47b
 
 =over 4
 
 =item *
 
 Alexander Pankoff <ccntrq@screenri.de>
+
+=item *
+
+James Raspass <jraspass@gmail.com>
 
 =item *
 

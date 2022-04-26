@@ -28,7 +28,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
@@ -38,6 +38,12 @@
             "Test::More" : "0.88",
             "Test::Warnings" : "0",
             "perl" : "5.006000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Warnings" : "0"
          }
       }
    },
@@ -50,6 +56,6 @@
          "url" : "https://github.com/DrHyde/perl-modules-Devel-CheckOS"
       }
    },
-   "version" : "1.90",
+   "version" : "1.93",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

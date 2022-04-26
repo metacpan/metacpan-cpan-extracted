@@ -1,7 +1,10 @@
-.git/*
+.git/.*
 .gitignore
 Makefile$
 MYMETA.*
-bin/wsgetmail
-blib/*
+blib/.*
 pm_to_blib
+.*.swp
+.*.swo
+wsgetmail.json
+MANIFEST.bak

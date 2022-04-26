@@ -22,5 +22,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=List-Util-MaybeXS
   license: http://dev.perl.org/licenses/
   repository: https://github.com/haarg/List-Util-MaybeXS.git
-version: '1.500010'
+version: '1.500011'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

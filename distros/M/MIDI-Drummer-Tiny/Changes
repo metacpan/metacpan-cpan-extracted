@@ -1,5 +1,50 @@
 Revision history for MIDI-Drummer
 
+0.2011 2022-04-23 21:01:39
+    - Remove post-derefs.
+
+0.2010 2022-04-23 14:16:50
+    - Fix time signature setting logic.
+    - Add tests!
+    - Improve documentation.
+
+0.2009 2022-04-23 12:21:09
+    - Use the M::U::set_time_signature() function instead of reinventing it.
+
+0.2008 2022-04-23 11:38:53
+    - Improve documentation.
+
+0.2007 2022-04-23 09:12:21
+    - Improve documentation.
+
+0.2006 2022-04-23 08:15:53
+    - Add a count option to combinatorial().
+    - Skip the "zeroth" pattern.
+
+0.2005 2022-04-22 12:10:28
+    - Add missing imports!
+    - Clean up syncopation lesson code again.
+
+0.2004 2022-04-22 08:24:34
+    - Improve documentation again.
+    - Optimize code slightly.
+
+0.2003 2022-04-22 08:04:33
+    - Fix SEE ALSO links.
+    - Improve documentation.
+
+0.2002 2022-04-22 01:05:35
+    - Clean up syncopation lesson code.
+    - Remove use lib statements.
+
+0.2001 2022-04-22 00:55:47
+    - Fix a small but dumb typo.
+
+0.2000 2022-04-22 00:51:08
+    - Add a beat counter.
+    - Add the ->steady & ->combinatorial methods.
+    - Add eg/syncopation lessons from the SEE ALSO linked book.
+
 0.1902 2022-01-19 12:13:04
     - Add missing closed_hh! Whoops
 

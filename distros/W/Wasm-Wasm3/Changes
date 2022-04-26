@@ -1,4 +1,13 @@
 Revision history for Perl extension Wasm::Wasm3:
 
+0.02
+- BUG FIX: Big-endian global i32 imports now work (via wasm3 PR #322).
+- Add WASI support (via wasm3 PR #331).
+- Add Cygwin compatibility (via wasm3 PR #330).
+- Add Strawberry Perl compatibility.
+- Fix compatibility with 5.16.3 multiplicity perls.
+- Update to latest wasm3.
+- Switch (temporarily?) to forked wasm3.
+
 0.01    Mon, 11 Apr 2022
 - Initial release

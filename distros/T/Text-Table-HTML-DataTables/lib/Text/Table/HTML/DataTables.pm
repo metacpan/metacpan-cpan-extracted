@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-03-22'; # DATE
+our $DATE = '2022-04-22'; # DATE
 our $DIST = 'Text-Table-HTML-DataTables'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 sub _encode {
     state $load = do { require HTML::Entities };
@@ -16,7 +16,7 @@ sub _encode {
 
 sub _escape_uri {
     require URI::Escape;
-    URI::Escape::uri_escape(shift, "^A-Za-z0-9\-\._~/");
+    URI::Escape::uri_escape(shift, "^A-Za-z0-9\-\._~/:"); # : for drive notation on Windows
 }
 
 sub table {
@@ -64,6 +64,7 @@ sub table {
     } elsif ($library_link_mode eq 'local') {
         require File::ShareDir;
         my $dist_dir = File::ShareDir::dist_dir('Text-Table-HTML-DataTables');
+        $dist_dir =~ s!\\!/!g if $^O eq 'MSWin32';
         push @table, qq(<link rel="stylesheet" type="text/css" href="file://)._escape_uri("$dist_dir/datatables-$datatables_ver/datatables.css").qq(">\n);
         push @table, qq(<script src="file://)._escape_uri("$dist_dir/jquery-$jquery_ver/jquery-$jquery_ver.min.js").qq("></script>\n);
         push @table, qq(<script src="file://)._escape_uri("$dist_dir/datatables-$datatables_ver/datatables.js").qq("></script>\n);
@@ -156,7 +157,7 @@ Text::Table::HTML::DataTables - Generate HTML table with jQuery and DataTables p
 
 =head1 VERSION
 
-This document describes version 0.011 of Text::Table::HTML::DataTables (from Perl distribution Text-Table-HTML-DataTables), released on 2022-03-22.
+This document describes version 0.012 of Text::Table::HTML::DataTables (from Perl distribution Text-Table-HTML-DataTables), released on 2022-04-22.
 
 =head1 SYNOPSIS
 

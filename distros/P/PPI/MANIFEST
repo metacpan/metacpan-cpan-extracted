@@ -6,6 +6,7 @@ META.json
 META.yml
 Makefile.PL
 README
+cpanfile
 dev_notes.txt
 dist.ini
 lib/PPI.pm
@@ -341,6 +342,7 @@ t/ppi_token_symbol.t
 t/ppi_token_unknown.t
 t/ppi_token_whitespace.t
 t/ppi_token_word.t
+t/signatures.t
 xt/api.t
 xt/author.t
 xt/author/00-compile.t
@@ -350,6 +352,7 @@ xt/author/mojibake.t
 xt/author/pod-no404s.t
 xt/author/pod-syntax.t
 xt/author/portability.t
+xt/dependent-modules.t
 xt/meta.t
 xt/pmv.t
 xt/release/changes_has_content.t

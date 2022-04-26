@@ -76,7 +76,7 @@ A file to use in manual mode.
 
 A file to use in manual mode.
 
-=head2-2 <manual>
+=head2 -2 <manual>
 
 A file to use in manual mode.
 
@@ -177,8 +177,8 @@ Use the specified eve file, -e, and the specified instance name, -i.
 =head2 slug
 
 Check the dir specified, -l. for files starting with the slug, -s.
-The files must match //^$slug\-[A-Za-z\_\-]\.[Jj][Ss][Oo][Nn]$//.
-The instance name is formed by removing //^$slug\-/// and //\.[Jj][Ss][Oo][Nn]$//.
+The files must match /^$slug\-[A-Za-z\_\-]\.[Jj][Ss][Oo][Nn]$/.
+The instance name is formed by removing /^$slug\-/ and /\.[Jj][Ss][Oo][Nn]$/.
 So "alert-ids.json" becomes "ids".
 
 =head2 manual

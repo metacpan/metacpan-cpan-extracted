@@ -28,7 +28,38 @@ perl-server - Perl::Server launcher
 
 perl-server [path] [options]
 
-These options are the same as L<Plackup Options|plackup#OPTIONS>.
+=head1 DESCRIPTION
+
+Perl::Server is a simple, zero-configuration command-line Perl server. 
+It is to be used for testing, local development, and learning.
+
+Using Perl::Server:
+
+    $ perl-server [path] [options]
+    
+    # or
+    
+    $ perl-server [options]
+    
+=head1 OPTIONS
+
+=over 4
+ 
+=item -p, --port 
+
+    $ perl-server path -p 5000 
+    
+    $ perl-server path -p e
+    
+    $ perl-server path -p empty
+    
+Specifies the port to bind or set e or empty to a random free port.
+    
+=back
+    
+Others options are the same as L<Plackup Options|plackup#OPTIONS>.
+
+=cut
 
 =head1 SEE ALSO
  

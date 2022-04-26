@@ -1,0 +1,102 @@
+NAME
+    Types::Self - provides a "Self" type constraint, referring to the caller
+    class or role
+
+SYNOPSIS
+      {
+        package Cow;
+        use Moo;
+      }
+  
+      {
+        package Horse;
+        use Moo;
+        use Types::Self;
+        use Types::Standard qw( Str );
+    
+        has name   => ( is => 'ro', isa => Str  );
+        has mother => ( is => 'ro', isa => Self );
+        has father => ( is => 'ro', isa => Self );
+      }
+  
+      my $alice = Horse->new( name => 'Alice' );
+      my $bob   = Horse->new( name => 'Bob' );
+  
+      # Okay
+      my $baby = Horse->new(
+        name   => 'Baby',
+        mother => $alice,
+        father => $bob,
+      );
+  
+      # Dies
+      my $baby = Horse->new(
+        name   => 'Baby',
+        mother => Cow->new,
+        father => $bob,
+      );
+
+DESCRIPTION
+    This module exports a `Self` type constraint which consrtains values to be
+    blessed objects in the same class as the package it was imported into, or
+    blessed objects which consume the role it was imported into. It should do
+    the right thing with inheritance.
+
+    This module also exports `is_Self`, which returns a boolean.
+
+      package Marriage;
+      use Moo::Role;
+      use Types::Self qw( is_Self );
+  
+      has spouse => ( is => 'rwp', init_arg => undef );
+  
+      sub marry {
+        my ( $me, $maybe_spouse ) = @_;
+        if ( is_Self( $maybe_spouse ) ) {
+          $me->_set_spouse( $maybe_spouse );
+          $maybe_spouse->_set_spouse( $me );
+        }
+        else {
+          warn "Cannot marry this!";
+        }
+        return $me;
+      }
+
+    The module also exports `assert_Self` which acts like `is_Self` but
+    instead of returning a boolean, either lives or dies. This can be useful
+    is you need to check that the first argument to a function is a blessed
+    object.
+
+      sub connect {
+        my ( $self ) = ( shift );
+        assert_Self $self;  # dies if called as a class method
+        $self->{connected} = 1;
+        return $self;
+      }
+
+    The module also exports `to_Self` which will attempt to coerce other types
+    to the Self type.
+
+    Only `Self` is exported by default.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Types-Self>.
+
+SEE ALSO
+    Types::Standard, Type::Tiny::Manual.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2022 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

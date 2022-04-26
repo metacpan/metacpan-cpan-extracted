@@ -46,25 +46,21 @@
 #
 # END BPS TAGGED BLOCK }}}
 
+use v5.10;
+
 package App::wsgetmail;
 
 use Moo;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 NAME
 
 App::wsgetmail - Fetch mail from the cloud using webservices
 
-=head1 VERSION
-
-0.05
-
 =head1 SYNOPSIS
 
-If you just want to run wsgetmail on the command line, the L<wsgetmail>
-documentation page provides full documentation for how to configure and run
-it, including how to configure the app in your cloud environment. Run:
+Run:
 
     wsgetmail [options] --config=wsgetmail.json
 
@@ -79,6 +75,7 @@ where C<wsgetmail.json> looks like:
     "folder": "Inbox",
     "command": "/opt/rt5/bin/rt-mailgate",
     "command_args": "--url=http://rt.example.com/ --queue=General --action=comment",
+    "command_timeout": 30,
     "action_on_fetched": "mark_as_read"
     }
 
@@ -98,14 +95,17 @@ Using App::wsgetmail as a library looks like:
 wsgetmail retrieves mail from a folder available through a web services API
 and delivers it to another system. Currently, it only knows how to retrieve
 mail from the Microsoft Graph API, and deliver it by running another command
-on the local system. It may grow to support other systems in the future.
+on the local system.
 
 =head1 INSTALLATION
 
     perl Makefile.PL
-    make PERL_CANARY_STABILITY_NOPROMPT=1
+    make
     make test
     sudo make install
+
+C<wsgetmail> will be installed under C</usr/local/bin> if you're using the
+system Perl, or in the same directory as C<perl> if you built your own.
 
 =cut
 
@@ -264,6 +264,227 @@ sub _build_mda {
     }
     return App::wsgetmail::MDA->new($config);
 }
+
+=head1 CONFIGURATION
+
+=head2 Configuring Microsoft 365 Client Access
+
+To use wsgetmail, first you need to set up the app in Microsoft 365.
+Two authentication methods are supported:
+
+=over
+
+=item Client Credentials
+
+This method uses shared secrets and is preferred by Microsoft.
+(See L<Client credentials|https://docs.microsoft.com/en-us/azure/active-directory/develop/msal-authentication-flows#client-credentials>)
+
+=item Username/password
+
+This method is more like previous connections via IMAP. It is currently
+supported by Microsoft, but not recommended. (See L<Username/password|https://docs.microsoft.com/en-us/azure/active-directory/develop/msal-authentication-flows#usernamepassword>)
+
+=back
+
+This section walks you through each piece of configuration wsgetmail needs,
+and how to obtain it.
+
+=over 4
+
+=item tenant_id
+
+wsgetmail authenticates to an Azure Active Directory (AD) tenant. This
+tenant is identified by an identifier that looks like a UUID/GUID: it should
+be mostly alphanumeric, with dividing dashes in the same places as shown in
+the example configuration above. Microsoft documents how to find your tenant
+ID, and create a tenant if needed, in the L<"Set up a tenant"
+quickstart|https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-create-new-tenant>. Save
+this as the C<tenant_id> string in your wsgetmail configuration file.
+
+=item client_id
+
+You need to register wsgetmail as an application in your Azure Active
+Directory tenant. Microsoft documents how to do this in the L<"Register an
+application with the Microsoft identity platform"
+quickstart|https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app#register-an-application>,
+under the section "Register an application." When asked who can use this
+application, you can leave that at the default "Accounts in this
+organizational directory only (Single tenant)."
+
+After you successfully register the wsgetmail application, its information
+page in your Azure account will display an "Application (client) ID" in the
+same UUID/GUID format as your tenant ID. Save this as the C<client_id>
+string in your configuration file.
+
+After that is done, you need to grant wsgetmail permission to access the
+Microsoft Graph mail APIs. Microsoft documents how to do this in the
+L<"Configure a client application to access a web API"
+quickstart|https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-access-web-apis#application-permission-to-microsoft-graph>,
+under the section "Add permissions to access Microsoft Graph." When selecting
+the type of permissions, select "Application permissions." When prompted to
+select permissions, select all of the following:
+
+=over 4
+
+=item * Mail.Read
+
+=item * Mail.Read.Shared
+
+=item * Mail.ReadWrite
+
+=item * Mail.ReadWrite.Shared
+
+=item * openid
+
+=item * User.Read
+
+=back
+
+=back
+
+=head3 Configuring client secret authentication
+
+We recommend you deploy wsgetmail by configuring it with a client
+secret. Client secrets can be granted limited access to only the mailboxes
+you choose. You can adjust or revoke wsgetmail's access without interfering
+with other applications.
+
+Microsoft documents how to create a client secret in the L<"Register an
+application with the Microsoft identity platform"
+quickstart|https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app#add-a-client-secret>,
+under the section "Add a client secret." Take care to record the secret
+token when it appears; it will never be displayed again. It should look like
+a completely random string, not a UUID/GUID.
+
+=over 4
+
+=item global_access
+
+Set this to C<1> in your wsgetmail configuration file.
+
+=item secret
+
+Set this to the secret token string you recorded earlier in your wsgetmail
+configuration file.
+
+=item username
+
+wsgetmail will fetch mail from this user's account. Set this to an email
+address string in your wsgetmail configuration file.
+
+=back
+
+=head3 Configuring user+password authentication
+
+If you do not want to use a client secret, you can also configure wsgetmail
+to authenticate with a traditional username+password combination. As noted
+above, this method is not recommended by Microsoft. It also does not work
+for systems with federated authentication enabled.
+
+=over 4
+
+=item global_access
+
+Set this to C<0> in your wsgetmail configuration file.
+
+=item username
+
+wsgetmail will authenticate as this user. Set this to an email address
+string in your wsgetmail configuration file.
+
+=item user_password
+
+Set this to the password string for C<username> in your wsgetmail
+configuration file.
+
+=back
+
+=head2 Configuring the mail delivery command
+
+Now that you've configured wsgetmail to access a mail account, all that's
+left is configuring delivery. Set the following in your wsgetmail
+configuration file.
+
+=over 4
+
+=item folder
+
+Set this to the name string of a mail folder to read.
+
+=item command
+
+Set this to an executable command. You can specify an absolute path,
+or a plain command name which will be found from C<$PATH>. For each
+email wsgetmail retrieves, it will run this command and pass the
+message data to it via standard input.
+
+=item command_args
+
+Set this to a string with additional arguments to pass to C<command>.
+These arguments follow shell quoting rules: you can escape characters
+with a backslash, and denote a single string argument with single or
+double quotes.
+
+=item command_timeout
+
+Set this to the number of seconds the C<command> has to return before
+timeout is reached.  The default value is 30.
+
+=item action_on_fetched
+
+Set this to a literal string C<"mark_as_read"> or C<"delete">.
+For each email wsgetmail retrieves, after the configured delivery
+command succeeds, it will take this action on the message.
+
+If you set this to C<"mark_as_read">, wsgetmail will only retrieve and
+deliver messages that are marked unread in the configured folder, so it does
+not try to deliver the same email multiple times.
+
+=back
+
+=head1 TESTING AND DEPLOYMENT
+
+After you write your wsgetmail configuration file, you can test it by running:
+
+    wsgetmail --debug --dry-run --config=wsgetmail.json
+
+This will read and deliver messages, but will not mark them as read or
+delete them. If there are any problems, those will be reported in the error
+output. You can update your configuration file and try again until wsgetmail
+runs successfully.
+
+Once your configuration is stable, you can configure wsgetmail to run
+periodically through cron or a systemd service on a timer.
+
+=head1 LIMITATIONS
+
+=head2 Fetching from Multiple Folders
+
+wsgetmail can only read from a single folder each time it runs. If you need
+to read multiple folders (possibly spanning different accounts), then you
+need to run it multiple times with different configuration.
+
+If you only need to change a couple small configuration settings like the
+folder name, you can use the C<--options> argument to override those from a
+base configuration file. For example:
+
+    wsgetmail --config=wsgetmail.json --options='{"folder": "Inbox"}'
+    wsgetmail --config=wsgetmail.json --options='{"folder": "Other Folder"}'
+
+NOTE: Setting C<secret> or C<user_password> with C<--options> is not secure
+and may expose your credentials to other users on the local system. If you
+need to set these options, or just change a lot of settings in your
+configuration, just run wsgetmail with different configurations:
+
+    wsgetmail --config=account01.json
+    wsgetmail --config=account02.json
+
+=head2 Office 365 API Limits
+
+Microsoft applies some limits to the amount of API requests allowed as
+documented in their L<Microsoft Graph throttling guidance|https://docs.microsoft.com/en-us/graph/throttling>.
+If you reach a limit, requests to the API will start failing for a period
+of time.
 
 =head1 SEE ALSO
 

@@ -5,7 +5,7 @@ use Socket;
 use IO::Socket::INET;
 use Scalar::Util 'reftype';
 
-our $VERSION = '0.07';
+our $VERSION = '1.2.0';
  
 $| = 1;
 

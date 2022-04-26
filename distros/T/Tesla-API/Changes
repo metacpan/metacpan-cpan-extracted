@@ -1,5 +1,15 @@
 Revision history for Tesla-API
 
+1.01    2022-04-22
+    - Unit test suite now has 90% coverage
+    - _decode() is now an object method as opposed to a simple function
+    - _api_attempts() now resets on a false value, and we reset it at the
+      beginning of each call to _tesla_api_call()
+    - useragent_string() and useragent_timeout() now set a flag that the mech()
+      object needs to be re-instantiated, so changes are reflected in runtime
+    - _tesla_api_call() now returns a hashref with error and displays a warning
+      if all API_TIMEOUT_RETRIES get exhausted, instead of croaking
+
 1.00    2022-04-19
     - This version is now deemed stable; The user-facing API calls will now
       remain consistent going forward

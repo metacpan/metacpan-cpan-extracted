@@ -72,7 +72,7 @@ loading/management (i.e. `plex` and `plx`) and also includes a couple of
 convenience routines to make processing simpler (i.e. `block` and `jmap`).
 
 [String::Util](https://metacpan.org/pod/String%3A%3AUtil) string filtering routines are also made available in templates
-for the most common of filtering tasks.  Of course you and `use` any modules
+for the most common of filtering tasks.  Of course you can `use` any modules
 you like within the template, or define your own subroutines within the
 template. The template is just perl!
 
@@ -501,6 +501,24 @@ Very handy for rendering lists:
                     @{[jmap {"<li>$_</li>"} "\n", $items]}
             </ul>
 ```
+
+## skip
+
+```
+    Template with potential output
+    @{[ block {
+            skip if $flag;
+            }
+    ]}
+    Any more potential output
+```
+
+This subroutine prevents the current template from generating rendered output.
+Instead it will return an empty string.  Variables can still be manipulated by
+template before the `skip` call.
+
+Useful to conditionally skip the body of a template, but configure the variable
+hash for preprocessing in a `@{[block{...}]}` structure
 
 # FILTERS
 

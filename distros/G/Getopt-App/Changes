@@ -1,0 +1,7 @@
+Revision history for perl distribution Getopt-App
+
+0.01 2022-04-24T17:21:25+0900
+ - Can parse arguments and call the run() callback
+ - The script can easily be tested
+ - Depends on Getopt::Long 2.00
+ - Started project

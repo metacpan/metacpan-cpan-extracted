@@ -34,8 +34,10 @@
       "test" : {
          "requires" : {
             "File::Slurper" : "0",
+            "Scope::Guard" : "0",
             "Test::Deep" : "0",
-            "Test::FailWarnings" : "0"
+            "Test::FailWarnings" : "0",
+            "autodie" : "0"
          }
       }
    },
@@ -50,6 +52,6 @@
          "web" : "https://github.com/FGasper/p5-Wasm-Wasm3"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

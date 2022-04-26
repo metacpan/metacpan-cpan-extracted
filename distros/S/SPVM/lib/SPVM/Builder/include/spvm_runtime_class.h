@@ -8,8 +8,7 @@ struct spvm_runtime_class {
   int32_t module_rel_file_id;
   int32_t module_dir_id;
   int32_t id;
-  int32_t method_destructor_id;
-  int32_t flag;
+  int32_t destructor_method_id;
   int32_t object_fields_length;
   int32_t object_fields_offset;
   int32_t type_id;
@@ -21,10 +20,11 @@ struct spvm_runtime_class {
   int32_t fields_length;
   int32_t class_vars_base_id;
   int32_t class_vars_length;
-  int32_t interface_classes_base_id;
-  int32_t interface_classes_length;
+  int32_t interfaces_base_id;
+  int32_t interfaces_length;
   int8_t has_init_block;
   int8_t is_anon;
+  int8_t is_pointer;
 };
 
 #endif

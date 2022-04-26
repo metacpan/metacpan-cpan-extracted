@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Exporter ();
 
-our $VERSION = '1.500010';
+our $VERSION = '1.500011';
 $VERSION =~ tr/_//d;
 
 our @EXPORT_OK;
@@ -347,13 +347,18 @@ sub uniq (@) {
 
 sub uniqnum (@) {
   my %seen;
+  my $sv;
+  require B;
+  my $b = B::svref_2object(\$sv);
   my @uniq =
     grep {
       my $nv = $_;
+      my $k;
       if (ref $nv && defined &overload::ov_method && defined &overload::mycan) {
         my $package = ref $nv;
+        # also covers Math::BigInt and Math::BigFloat
         if (UNIVERSAL::isa($nv, 'Math::BigInt')) {
-          $nv = \($nv->bstr);
+          $k = $nv->bstr;
         }
         elsif(my $method
           = overload::ov_method(overload::mycan($package, '(0+'), $package)
@@ -368,31 +373,38 @@ sub uniqnum (@) {
           $nv = $nv->$nomethod(undef, undef, '0+');
         }
       }
-      if (ref $nv) {
-        $nv = \('R' . 0+$nv);
-      }
-      my $iv = $nv;
-      my $F;
-      my $NV;
-      my $f;
 
-      !$seen{
-          ref $nv         ? $$nv
-        : ($NV = (unpack 'F', ($F = pack 'F', $nv))[0]) == 0
-                          ? 0
-        : $NV != $NV      ? sprintf('%f', $NV)
-        : int($NV) != $NV ? 'N'.$F
-        : (
-          $iv - 1 == $iv
-        )                 ? sprintf('%.0f', $NV)
-        : (
-          ($f = sprintf('%.0f', $NV)) ne sprintf('%.0f', $NV + 1)
-          &&
-          ($f)                        ne sprintf('%.0f', $NV - 1)
-        )                 ? $f
-        : $NV > 0         ? sprintf('%u', $iv)
-                          : sprintf('%d', $iv)
-      }++;
+      if (defined $k) {
+      }
+      elsif (ref $nv) {
+        $k = 'R' . 0+$nv;
+      }
+      elsif ($nv == 0) {
+        $k = '0';
+      }
+      elsif ($nv != $nv || $nv == 9**9**9) {
+        $k = sprintf '%f', $nv;
+      }
+      elsif (int($nv) != $nv) {
+        $k = 'N' . pack('F', $nv);
+      }
+      else {
+        $sv = $nv + 0;
+        my $flags = $b->FLAGS;
+        if ($flags & B::SVf_IVisUV()) {
+          $k = sprintf '%u', $nv;
+        }
+        elsif ($flags & B::SVf_IOK()) {
+          $k = sprintf '%d', $nv;
+        }
+        elsif ($flags & B::SVf_NOK()) {
+          $k = sprintf '%.0f', $nv;
+        }
+        else {
+          $k = $nv;
+        }
+      }
+      !$seen{$k}++;
     }
     map +(defined($_) ? $_
       : do { warnings::warnif('uninitialized', 'Use of uninitialized value in subroutine entry'); 0 }),

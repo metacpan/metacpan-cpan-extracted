@@ -1,0 +1,126 @@
+#!/usr/bin/perl
+#use 5.001 ; 
+use strict ; use warnings ; 
+use feature qw[ say ] ; 
+use Time::HiRes qw[gettimeofday tv_interval] ; 
+my $time_start = [ gettimeofday ] ; 
+use Getopt::Std ; getopts '.jnrvy' , \my%o ; 
+use Term::ANSIColor qw [ :constants ] ; $Term::ANSIColor::AUTORESET = 1 ; 
+use File::Spec::Functions qw[catfile splitdir ] ; 
+use List::Util qw[ minstr maxstr ] ;
+my $T = catfile '', '' ; # OS毎に異なる可能性のある、ファイルパスの区切り文字を取得。 
+
+# & HELP_MESSAGE unless @ARGV ; 
+@ARGV = ( "." ) unless @ARGV  ;
+& measure_simple ; 
+exit 0 ; 
+
+sub measure_simple { 
+  my @tmp ;
+  push @tmp , !$o{j} ? ( "Non-dir-child-files" , CYAN ( "Dir-child-files" ) ) : ("直下の通常ファイル", CYAN "直下のディレクトリ" ) ; 
+  push @tmp , !$o{j} ? ( BRIGHT_BLUE BOLD ("max_depth"), BOLD ("all-files") ) : ( BRIGHT_BLUE (BOLD "最深の深さ") , BOLD "全てのファイル(ディレクトリ含む)") if defined $o{r} ;
+  push @tmp , YELLOW !$o{j} ? "Given directory" : "所与のディレクトリ" ;
+  push @tmp , BRIGHT_WHITE !$o{j} ? "A file name at the max depth" : "最深部のファイルの例" if defined $o{r} ;
+  push @tmp , !$o{j} ? ("fileName_minstr" , BRIGHT_WHITE "fileName_maxstr" ) : ("ファイル名(辞書順先頭)",BRIGHT_WHITE "ファイル名(辞書順末尾)") if $o{v} ; 
+  say join "\t" , map { UNDERLINE $_ } @tmp ; 
+  #print "\n--\n" ;
+  
+  my ($y,$z) = (0,0) ; # 結果的に処理対象となったものとそうでないもの
+  for ( @ARGV ) { 
+    chomp ;
+    #do { print "notExists\t$_\n" ; next ; } if ! -e $_  ; 
+    do { print join("\t",'','',$_,RED "not a directory."),"\n" if ! $o{y} ; $z++ ; next } if ! -d $_  ; 
+    opendir my $dh , $_ or do { warn "$_ does not open.\n" ; next } ;
+    my @files = grep {! /\A\.{1,2}\Z/ } readdir $dh  ; 
+    @files = grep {/\A\./ } @files if $o{'.'} ; 
+    @files = grep {! /\A\./ } @files if $o{n} ; 
+    #my $dnum = do { my $t = $_ ; grep { -d "$t$T$_" and  $_ = $_.$T } @files } ; 
+    my @ddir = do { my $t = $_ ; grep { -d "$t$T$_" and  $_ = $_.$T } @files } ; 
+    my $dnum = (scalar @ddir) . do { my $t = $_ ; my @L = grep {-l "$t$T$_"} @ddir ; my $l = @L ; $l == 0 ? "" : FAINT "($l)"  }  ;
+    #my $pnum = (scalar @files) - $dnum ;
+    my @pfile =do { my $t = $_ ; grep { ! -d "$t$T$_" } @files } ; 
+    my $pnum = (scalar @pfile ). do { my $t = $_ ; my @L = grep {-l "$t$T$_"} @pfile ; my $l = @L ; $l == 0 ? "" : FAINT "($l)"  }  ;
+    my ($dp, $dn , $finum, $links ) = max_depth ( $_ ) if $o{r} ;
+
+    my @out ; 
+    push @out , $pnum , CYAN $dnum ;
+    push @out , BRIGHT_BLUE ("$dp"), BOLD "$finum" . ($links ? FAINT "($links)" : '') if defined $dp ; # 最も深い所の深さ  それと数えたファイル数
+    push @out , YELLOW $_ . $T ; 
+    push @out , BRIGHT_WHITE $dn if defined $dn ; # 最も深い所にあるファイルの名前
+    if ( $o{v} ) { 
+    	my $f1 = minstr @files ;
+    	my $f2 = maxstr @files ; 
+    	push @out , ($f1) if defined $f1 ; 
+    	push @out , (BRIGHT_WHITE $f2) if defined $f1 && $f1 ne $f2 ;
+    }
+    say join "\t", @out ; 
+    #print "\n" ; 
+    $y ++ ;
+    closedir $dh ; 
+  }
+  my $time_elapsed = tv_interval ( $time_start , [ gettimeofday ] ) ;
+  my $end = "$y entries are processed. " ; 
+  $end .= "$z entrie(s) are suppressed for the processing. " if $z ;
+  $end .= "$time_elapsed seconds in calculation. ($0)" ;
+  say STDERR BOLD FAINT ITALIC $end ; 
+}
+
+use File::Find qw[find ] ; 
+
+
+sub max_depth ( $ ) { 
+  my $d = 0 ; # 最大の深さ
+  my $dname = '' ; # 最も深い所にあるファイルの名前
+  my $t ; # 仮変数
+  my $n = 0 ; # ついでにファイルの個数も数える。
+  my $l = 0 ; # リンクファイルの個数
+   #find ( {wanted => sub { -d $_ and $t = splitdir ( $_ ) and  $d = $t if $t > $d } }  , $_[0] ) ; 
+   find ( {
+    no_chdir => 1 , 
+    #wanted => sub { -d $_ and my @t = splitdir ( $_ ); $d=@t and $dname=$_ if @t> $d }}  , $_[0] ) ; 
+    #wanted => sub { $n++ ; $l ++ if -l $_ ; my @t = splitdir ( $_ ) ; $d = @t and $dname=$_ if @t > $d }}  , $_[0] ) ; 
+    wanted => sub { my @t = splitdir ( $_ ) ; unless ( $o{n} && grep { m/\A\.([^\.]|$)/ } @t ) { $n++ ; $l ++ if -l $_ ;  ; $d = @t and $dname=$_ if @t > $d }}} , $_[0] ) ; 
+   $d -= 2 if $d =~ /^\d+$/;
+   $d .= '/' if -d $d ; # <-- - ? 
+   return $d, $dname , $n , $l ;
+}
+
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+  use FindBin qw[ $Script ] ;
+  $ARGV[1] //= '' ;
+  open my $FH , '<' , $0 ;
+  while(<$FH>){
+    s/\$0/$Script/g ;
+    print $_ if $ARGV[1] eq 'opt' ? m/^\ +\-/ : s/^=head1// .. s/^=cut// ;
+  }
+  close $FH ;
+  exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+
+ $0 DIR [DIR] [DIR] ..
+
+  指定されたディレクトリの直下にある、非ディリクトリファイルの数とディレトリの数を出力する。
+  シンボリックファイルの個数は括弧内に示す。 (何も引数が無い場合は、カレントディレクトリに対して動作。)
+
+ オプション: 
+
+  -.  : ファイル名がピリオドで始まるファイル(隠しファイルと言われる)について調べる。(dot file)
+  -j  : 出力の表頭の表記を、英語から日本語に変更。
+  -n  : ファイル名がピリオドで始まるファイル(隠しファイルと言われる)は対象外とする。(Nomal)
+  -r  ; 最も深い所にあるファイルの名前とその深さを示す。さらに、findで見つかるファイルの個数も出力。(Recursive)
+  -v  : ファイル名の(文字列としての)最小値と最大値も出力する。(verbose)
+  -y  : 引数 arg でディレクトリ以外のものがあった場合は、処理を飛ばす。(出力が簡潔になる。)
+
+  --help : このヘルプを表示。
+
+ 開発上のメモ: 
+   * glob の */../*のような探索と File::Find による探索の違いを発見した。dirdimとdirdigで共通化の検討が必要。
+   * Ctrl-Cを押下した時の挙動を決めたい。
+   * 色を消すオプションを実装した方が良いだろうか? 他のコマンドの colorplus -0 に任せるべきか?
+
+=cut

@@ -73,6 +73,7 @@ do { my $x = {
                                    'File::Temp' => '0',
                                    'IPC::System::Simple' => '0',
                                    'Path::Tiny' => '0',
+                                   'Scalar::Util' => '0',
                                    'Test2::Plugin::NoWarnings' => '0',
                                    'Test2::Plugin::UTF8' => '0',
                                    'Test2::Require::Module' => '0',

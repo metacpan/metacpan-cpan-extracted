@@ -5,7 +5,7 @@
 
 use Object::Pad 0.57;
 
-package Tickit::Widget::Scroller::Item::RichText 0.27;
+package Tickit::Widget::Scroller::Item::RichText 0.28;
 class Tickit::Widget::Scroller::Item::RichText
    :isa(Tickit::Widget::Scroller::Item::Text);
 
@@ -38,9 +38,53 @@ with rendering attributes, used to apply formatting. The attributes are stored
 by supplying the text in an instance of a L<String::Tagged> object.
 
 The recognised attributes are those of L<Tickit::Pen>, taking the same names
-and values.
+and values. To use a L<String::Tagged::Formatting> instance instead, use the
+L</new_from_formatting> constructor.
 
 =cut
+
+=head1 CONSTRUCTOR
+
+=cut
+
+=head2 new_from_formatting
+
+   $item = Tickit::Widget::Scroller::Item::RichText->new_from_formatting( $str, %opts )
+
+Constructs a new item containing the text given by the L<String::Tagged>
+instance, converting the tags from the L<String::Tagged::Formatting>
+convention into native L<Tickit::Pen> format.
+
+=cut
+
+sub _convert_color_tag ($n, $v)
+{
+   return $n => $v->as_xterm->index;
+}
+
+my %convert_tags = (
+   bold      => "b",
+   under     => "u",
+   italic    => "i",
+   strike    => "strike",
+   blink     => "blink",
+   monospace => sub ($, $v) { "af" => ( $v ? 1 : 0 ) },
+   reverse   => "rv",
+   fg        => \&_convert_color_tag,
+   bg        => \&_convert_color_tag,
+);
+
+sub new_from_formatting ( $class, $str, %opts )
+{
+   return $class->new(
+      # TODO: Maybe this should live somewhere more fundamental in Tickit itself?
+      $str->clone(
+         only_tags    => [ keys %convert_tags ],
+         convert_tags => \%convert_tags,
+      ),
+      %opts
+   );
+}
 
 method _build_chunks_for ( $str )
 {

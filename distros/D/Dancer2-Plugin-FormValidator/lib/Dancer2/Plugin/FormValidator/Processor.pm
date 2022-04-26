@@ -42,7 +42,7 @@ sub result {
     }
 
     # Flatten $invalid array ref and leave only unique fields.
-    my @invalid_fields = uniqstr map { $_->[0] } @ { $invalid };
+    my @invalid_fields = uniqstr map { $_->[0] } @{ $invalid };
 
     # Collect valid values from input.
     my %valid_input;

@@ -22,7 +22,7 @@ use Perl::Critic::StricterSubs::Utils qw(
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 my $expl =
     'Without importing a package, it is unlikely that references to things inside it even exist.';
@@ -49,7 +49,7 @@ sub violates {
     }
 
     my @included_packages = get_package_names_from_include_statements($doc);
-    my @builtin_packages = ( qw(main UNIVERSAL CORE CORE::GLOBAL), $EMPTY );
+    my @builtin_packages = ( qw(main UNIVERSAL CORE CORE::GLOBAL utf8), $EMPTY );
 
     my %all_packages =
         hashify( @declared_packages, @included_packages, @builtin_packages );
@@ -143,6 +143,11 @@ sub _extract_package_from_class_method_call {
     # which should be everything to the left of "->"
 
     my $word = shift;
+
+    # Remove trailing double colon, which is allowed and can be used for
+    # disambiguation.
+    $word =~ s/::$//xms;
+
     return $word;
 }
 
@@ -155,7 +160,7 @@ sub _extract_package_from_subroutine_call {
     # to (but not including) the last "::".
 
     my $word = shift;
-    if ($word->content() =~ m/\A ( .* ) :: [^:]+ \z/xms) {
+    if ($word->content() =~ m/\A ( .* ) :: [^:]* \z/xms) {
         return $1;
     }
 

@@ -1,6 +1,6 @@
 # NAME
 
-wsgetmail - get mail from cloud webservices
+App::wsgetmail - Fetch mail from the cloud using webservices
 
 # SYNOPSIS
 
@@ -19,7 +19,19 @@ where `wsgetmail.json` looks like:
     "folder": "Inbox",
     "command": "/opt/rt5/bin/rt-mailgate",
     "command_args": "--url=http://rt.example.com/ --queue=General --action=comment",
+    "command_timeout": 30,
     "action_on_fetched": "mark_as_read"
+    }
+
+Using App::wsgetmail as a library looks like:
+
+    my $getmail = App::wsgetmail->new({config => {
+      # The config hashref takes all the same keys and values as the
+      # command line tool configuration JSON.
+    }});
+    while (my $message = $getmail->get_next_message()) {
+        $getmail->process_message($message)
+          or warn "could not process $message->id";
     }
 
 # DESCRIPTION
@@ -39,37 +51,37 @@ on the local system.
 `wsgetmail` will be installed under `/usr/local/bin` if you're using the
 system Perl, or in the same directory as `perl` if you built your own.
 
-# ARGUMENTS
+# ATTRIBUTES
 
-- --config, --configuration, -c
+## config
 
-    Path of the primary wsgetmail JSON configuration file to read. This argument
-    is required. The configuration file is documented in the next section.
+A hash ref that is passed to construct the `mda` and `client` (see below).
 
-- --options
+## mda
 
-    A string with a JSON object in the same format as the configuration
-    file. Configuration in this object will override the configuration file. You
-    can use this to extend a base configuration. For example, given the
-    configuration in the synopsis above, you can process a second folder the
-    same way by running:
+An instance of [App::wsgetmail::MDA](https://metacpan.org/pod/App::wsgetmail::MDA) created from our `config` object.
 
-        wsgetmail --config=wsgetmail.json --options='{"folder": "Other Folder"}'
+## client\_class
 
-- --verbose, --debug, -v
+The name of the App::wsgetmail package used to construct the
+`client`. Default `MS365`.
 
-    Log additional information about each mail API request and any problems
-    delivering mail.
+## client
 
-- --dry-run
+An instance of the `client_class` created from our `config` object.
 
-    Read mail and deliver it to the configured command, but don't run the
-    configured `action_on_fetched` like deleting messages or marking them as
-    read.
+# METHODS
 
-- --help, -h
+## process\_message($message)
 
-    Show this help documentation.
+Given a Message object, retrieves the full message content, delivers it
+using the `mda`, and then executes the configured post-fetch
+action. Returns a boolean indicating success.
+
+## post\_fetch\_action($message)
+
+Given a Message object, executes the configured post-fetch action. Returns a
+boolean indicating success.
 
 # CONFIGURATION
 
@@ -119,9 +131,10 @@ and how to obtain it.
     After that is done, you need to grant wsgetmail permission to access the
     Microsoft Graph mail APIs. Microsoft documents how to do this in the
     ["Configure a client application to access a web API"
-    quickstart](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-access-web-apis#add-permissions-to-access-microsoft-graph),
-    under the section "Add permissions to access Microsoft Graph." When prompted
-    to select permissions, select all of the following:
+    quickstart](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-configure-app-access-web-apis#application-permission-to-microsoft-graph),
+    under the section "Add permissions to access Microsoft Graph." When selecting
+    the type of permissions, select "Application permissions." When prompted to
+    select permissions, select all of the following:
 
     - Mail.Read
     - Mail.Read.Shared
@@ -203,6 +216,11 @@ configuration file.
     with a backslash, and denote a single string argument with single or
     double quotes.
 
+- command\_timeout
+
+    Set this to the number of seconds the `command` has to return before
+    timeout is reached.  The default value is 30.
+
 - action\_on\_fetched
 
     Set this to a literal string `"mark_as_read"` or `"delete"`.
@@ -256,6 +274,13 @@ Microsoft applies some limits to the amount of API requests allowed as
 documented in their [Microsoft Graph throttling guidance](https://docs.microsoft.com/en-us/graph/throttling).
 If you reach a limit, requests to the API will start failing for a period
 of time.
+
+# SEE ALSO
+
+- [wsgetmail](https://metacpan.org/pod/wsgetmail)
+- [App::wsgetmail::MDA](https://metacpan.org/pod/App::wsgetmail::MDA)
+- [App::wsgetmail::MS365](https://metacpan.org/pod/App::wsgetmail::MS365)
+- [App::wsgetmail::MS365::Message](https://metacpan.org/pod/App::wsgetmail::MS365::Message)
 
 # AUTHOR
 

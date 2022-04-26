@@ -1,0 +1,160 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+sneck - a boopable LibreNMS JSON style SNMP extend for remotely running nagios style checks
+
+=head1 SYNOPSIS
+
+sneck -u [B<-C> <cache file] [B<-f> <config file>] [B<-p>] [B<-i>]
+
+sneck -c [B<-C> <cache file]
+
+sneck [B<-f> <config file>] [B<-p>] [B<-i>]
+
+=head1 DESCRIPTION
+
+For a description of the config file format and output,
+please see L<Monitoring::Sneck>.
+
+=head1 FLAGS
+
+=head2 -f <config file>
+
+The config file to use.
+
+Defaults to '/usr/local/etc/sneck.conf'.
+
+=head2 -p
+
+Pretty it in a nicely formatted format.
+
+=head2 -C <cache file>
+
+The cache file to use.
+
+Defaults to '/var/cache/sneck.cache'.
+
+=head2 -u
+
+Update the cache file. Will also print the was written to it.
+
+=head2 -c
+
+Print the cache file. Please note that B<-p> or B<-i> won't affect
+this as this flag only reads/prints the cache file.
+
+=head2 -i
+
+Includes the config file used.
+
+=cut
+
+use strict;
+use warnings;
+use Getopt::Long;
+use File::Slurp;
+use JSON;
+use Monitoring::Sneck;
+
+sub version {
+	print "sneck v. 0.0.1\n";
+}
+
+sub help {
+	&version;
+
+	print '
+
+-f <config>              Config file to use.
+                         Default: /usr/local/etc/sneck.conf
+
+-c                       Print the cache and exit. Requires -u being used previously.
+
+-C                       Cache file.
+                         Default: /var/cache/sneck.cache
+
+-u                       Run and write to cache.
+
+-p                       Pretty print. Does not affect -c.
+
+-i                       Include the raw config in the JSON.
+
+-h                       Print help info.
+--help                   Print help info.
+-v                       Print version info.
+--version                Print version info.
+
+';
+}
+
+my $cache_file  = '/var/cache/sneck.cache';
+my $config_file = '/usr/local/etc/sneck.conf';
+my $update;
+my $print_cache;
+my $fallback;
+my $help;
+my $version;
+my $pretty;
+my $include;
+Getopt::Long::Configure('no_ignore_case');
+Getopt::Long::Configure('bundling');
+GetOptions(
+	'version' => \$version,
+	'v'       => \$version,
+	'help'    => \$help,
+	'h'       => \$help,
+	'c'       => \$print_cache,
+	'f=s'     => \$config_file,
+	'C=s'     => \$cache_file,
+	'p'       => \$pretty,
+	'u'       => \$update,
+	'i'       => \$include,
+);
+
+# print version or help if requested
+if ($help) {
+	&help;
+	exit 42;
+}
+if ($version) {
+	&version;
+	exit 42;
+}
+
+# prints the cache and exit if requested
+if ($print_cache) {
+	if ( !-f $cache_file || !-r $cache_file ) {
+		my $error = 'Cache file does not exist or is not readable "' . $cache_file . '"';
+		my $possible_error
+			= { error => 1, version => 1, errorString => $error, data => { alert => 1, alertString => $error } };
+		print encode_json($possible_error) . "\n";
+		exit 3;
+	}
+	my $cache = read_file($cache_file);
+	print $cache;
+	exit;
+}
+
+my $sneck    = Monitoring::Sneck->new( { config => $config_file, include=>$include } );
+my $returned = $sneck->run;
+
+# encode it and print it
+my $json = JSON->new->utf8->canonical(1);
+if ($pretty) {
+	$json->pretty;
+}
+my $raw_json = $json->encode($returned);
+
+# non-pretty does not include a new line, so add it
+if ( !$pretty ) {
+	$raw_json = $raw_json . "\n";
+}
+print $raw_json;
+
+if ($update) {
+	my $fh;
+	open( $fh, '>', $cache_file );
+	print $fh $raw_json;
+	close($fh);
+}

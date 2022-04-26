@@ -3,11 +3,13 @@
 
 #include "spvm_typedecl.h"
 
-SPVM_RUNTIME* SPVM_RUNTIME_new();
-
-void SPVM_RUNTIME_free(SPVM_RUNTIME* runtime);
-
 struct spvm_runtime {
+  // SPVM 32bit codes
+  int32_t* spvm_32bit_codes;
+
+  // SPVM 32bit codes
+  int32_t spvm_32bit_codes_length;
+  
   // Allocator
   SPVM_ALLOCATOR* allocator;
   
@@ -102,6 +104,14 @@ struct spvm_runtime {
   SPVM_HASH* class_var_cache_symtable;
 };
 
+SPVM_RUNTIME* SPVM_RUNTIME_new();
+
+void SPVM_RUNTIME_free(SPVM_RUNTIME* runtime);
+
 void SPVM_RUNTIME_prepare(SPVM_RUNTIME* runtime);
+
+SPVM_ALLOCATOR* SPVM_RUNTIME_get_allocator(SPVM_RUNTIME* runtime);
+
+void SPVM_RUNTIME_build(SPVM_RUNTIME* runtime, int32_t* spvm_32bit_codes);
 
 #endif

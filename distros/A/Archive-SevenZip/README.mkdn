@@ -57,7 +57,7 @@ Creates a new class instance.
 
 Lists the entries in the archive. A fresh archive which does not
 exist on disk yet has no entries. The returned entries
-are [Archive::SevenZip::Entry](https://metacpan.org/pod/Archive::SevenZip::Entry) instances.
+are [Archive::SevenZip::Entry](https://metacpan.org/pod/Archive%3A%3ASevenZip%3A%3AEntry) instances.
 
 This method will one day move to the Path::Class-compatibility
 API.
@@ -131,8 +131,8 @@ exists
     print "$_\n" for $ar->list_files;
 
 This is an alternative constructor that gives you an API
-that is somewhat compatible with the API of [Archive::Zip](https://metacpan.org/pod/Archive::Zip).
-See also [Archive::SevenZip::API::ArchiveZip](https://metacpan.org/pod/Archive::SevenZip::API::ArchiveZip).
+that is somewhat compatible with the API of [Archive::Zip](https://metacpan.org/pod/Archive%3A%3AZip).
+See also [Archive::SevenZip::API::ArchiveZip](https://metacpan.org/pod/Archive%3A%3ASevenZip%3A%3AAPI%3A%3AArchiveZip).
 
 ## `->archiveTarApi`
 
@@ -144,8 +144,8 @@ See also [Archive::SevenZip::API::ArchiveZip](https://metacpan.org/pod/Archive::
     print "$_\n" for $ar->list_files;
 
 This is an alternative constructor that gives you an API
-that is somewhat compatible with the API of [Archive::Tar](https://metacpan.org/pod/Archive::Tar).
-See also [Archive::SevenZip::API::ArchiveTar](https://metacpan.org/pod/Archive::SevenZip::API::ArchiveTar).
+that is somewhat compatible with the API of [Archive::Tar](https://metacpan.org/pod/Archive%3A%3ATar).
+See also [Archive::SevenZip::API::ArchiveTar](https://metacpan.org/pod/Archive%3A%3ASevenZip%3A%3AAPI%3A%3AArchiveTar).
 
 # NAME
 
@@ -153,20 +153,20 @@ Path::Class::Archive - treat archives as directories
 
 # CAUTION
 
-This module tries to mimic the API of [Archive::Zip](https://metacpan.org/pod/Archive::Zip) in some cases
-and in other cases, the API of [Path::Class](https://metacpan.org/pod/Path::Class). It is also a very rough
+This module tries to mimic the API of [Archive::Zip](https://metacpan.org/pod/Archive%3A%3AZip) in some cases
+and in other cases, the API of [Path::Class](https://metacpan.org/pod/Path%3A%3AClass). It is also a very rough
 draft that just happens to be doing what I need, mostly extracting
 files.
 
 # SEE ALSO
 
-[File::Unpack](https://metacpan.org/pod/File::Unpack) - also supports unpacking from 7z archives
+[File::Unpack](https://metacpan.org/pod/File%3A%3AUnpack) - also supports unpacking from 7z archives
 
-[Compress::unLZMA](https://metacpan.org/pod/Compress::unLZMA) - uncompressor for the LZMA compression method used by 7z
+[Compress::unLZMA](https://metacpan.org/pod/Compress%3A%3AunLZMA) - uncompressor for the LZMA compression method used by 7z
 
-[Archive::Libarchive::Any](https://metacpan.org/pod/Archive::Libarchive::Any)
+[Archive::Libarchive::Any](https://metacpan.org/pod/Archive%3A%3ALibarchive%3A%3AAny)
 
-[Archive::Any](https://metacpan.org/pod/Archive::Any)
+[Archive::Any](https://metacpan.org/pod/Archive%3A%3AAny)
 
 # REPOSITORY
 
@@ -182,7 +182,7 @@ The public support forum of this module is
 
 Please report bugs in this module via the RT CPAN bug queue at
 [https://rt.cpan.org/Public/Dist/Display.html?Name=Archive-SevenZip](https://rt.cpan.org/Public/Dist/Display.html?Name=Archive-SevenZip)
-or via mail to [archive-sevenzip-Bugs@rt.cpan.org](https://metacpan.org/pod/archive-sevenzip-Bugs@rt.cpan.org).
+or via mail to [archive-sevenzip-Bugs@rt.cpan.org](https://metacpan.org/pod/archive-sevenzip-Bugs%40rt.cpan.org).
 
 # AUTHOR
 

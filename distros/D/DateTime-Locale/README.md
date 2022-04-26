@@ -4,7 +4,7 @@ DateTime::Locale - Localization support for DateTime.pm
 
 # VERSION
 
-version 1.34
+version 1.35
 
 # SYNOPSIS
 
@@ -222,6 +222,7 @@ Dave Rolsky <autarch@urth.org>
 # CONTRIBUTORS
 
 - Alexander Pankoff <ccntrq@screenri.de>
+- James Raspass <jraspass@gmail.com>
 - Karen Etheridge <ether@cpan.org>
 - Mohammad S Anwar <mohammad.anwar@yahoo.com>
 - Ryley Breiddal <rbreiddal@presinet.com>

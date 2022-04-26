@@ -63,8 +63,11 @@ subtest 'exec in PATH' => sub {
     deps_met {exec=>{name=>$perl_name}}, "perl (hash)";
 
     # min_version of perl
-    deps_met   {exec=>{name=>'perl', min_version=>$]}}, "min_version 1";
-    deps_unmet {exec=>{name=>'perl', min_version=>'9.999'}}, "min_version 2";
+    {
+        my $v = "$^V"; $v =~ s/^v//;
+        deps_met   {exec=>{name=>'perl', min_version=>$v, path=>$^X}}, "min_version 1";
+        deps_unmet {exec=>{name=>'perl', min_version=>'9.999', path=>$^X}}, "min_version 2";
+    }
 
     # min_version of git
     subtest "min_version of git" => sub {

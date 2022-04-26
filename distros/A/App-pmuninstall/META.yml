@@ -3,17 +3,15 @@ abstract: 'Uninstall modules'
 author:
   - 'Yuji Shimada'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  CPAN::Meta: 0
-  CPAN::Meta::Prereqs: 0
-  Module::Build: 0.38
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v0.4.6, CPAN::Meta::Converter version 2.130880'
+generated_by: 'Minilla/v3.1.16, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: App-pmuninstall
 no_index:
   directory:
@@ -24,26 +22,31 @@ no_index:
     - eg
     - examples
     - author
+    - builder
 provides:
   App::pmuninstall:
     file: lib/App/pmuninstall.pm
-    version: 0.30
+    version: '0.31'
 requires:
-  CPAN::DistnameInfo: 0
-  ExtUtils::Install: 1.43
-  ExtUtils::MakeMaker: 6.3
-  HTTP::Tiny: 0.012
-  JSON::PP: 2.01
-  Module::CoreList: 0
-  YAML: 0
-  version: 0
+  CPAN::DistnameInfo: '0'
+  ExtUtils::Install: '1.43'
+  ExtUtils::MakeMaker: '6.3'
+  HTTP::Tiny: '0.012'
+  JSON::PP: '2.01'
+  Module::CoreList: '0'
+  YAML: '0'
+  version: '0'
 resources:
   bugtracker: https://github.com/xaicron/pm-uninstall/issues
   homepage: https://github.com/xaicron/pm-uninstall
-  repository: git://github.com/xaicron/pm-uninstall.git
-version: 0.30
+  repository: https://github.com/xaicron/pm-uninstall.git
+version: '0.31'
 x_contributors:
   - 'Finn Smith <finn@buzzfeed.com>'
   - 'Finn Smith <finn@timeghost.net>'
+  - 'Tina Mueller <tina.mueller@strato-rz.de>'
+  - 'Yuji Shimada <xaicron@gmail.com>'
   - 'Yuji Shimada <xaicron{ at }gmail.com>'
-  - 'xaicron <xaicron@gmail.com>'
+  - 'Zakariyya Mughal <zaki.mughal@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

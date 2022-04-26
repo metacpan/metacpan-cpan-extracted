@@ -37,8 +37,8 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 
-use AsposeSlidesCloud::Object::ExportOptions;
 use AsposeSlidesCloud::Object::FontFallbackRule;
+use AsposeSlidesCloud::Object::ImageExportOptionsBase;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -185,20 +185,6 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
-    'height' => {
-    	datatype => 'int',
-    	base_name => 'Height',
-    	description => 'Gets or sets the height of slides in the output format, e.g. image size, pdf page size etc.',
-    	format => '',
-    	read_only => '',
-    		},
-    'width' => {
-    	datatype => 'int',
-    	base_name => 'Width',
-    	description => 'Gets or sets the height of slides in the output format, e.g. image size, pdf page size etc.',
-    	format => '',
-    	read_only => '',
-    		},
     'font_fallback_rules' => {
     	datatype => 'ARRAY[FontFallbackRule]',
     	base_name => 'FontFallbackRules',
@@ -210,6 +196,20 @@ __PACKAGE__->method_documentation({
     	datatype => 'string',
     	base_name => 'Format',
     	description => 'Export format.',
+    	format => '',
+    	read_only => '',
+    		},
+    'height' => {
+    	datatype => 'int',
+    	base_name => 'Height',
+    	description => 'Gets or sets the height of slides in the output image format.',
+    	format => '',
+    	read_only => '',
+    		},
+    'width' => {
+    	datatype => 'int',
+    	base_name => 'Width',
+    	description => 'Gets or sets the height of slides in the output the output image format.',
     	format => '',
     	read_only => '',
     		},
@@ -245,10 +245,10 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->swagger_types( {
     'default_regular_font' => 'string',
-    'height' => 'int',
-    'width' => 'int',
     'font_fallback_rules' => 'ARRAY[FontFallbackRule]',
     'format' => 'string',
+    'height' => 'int',
+    'width' => 'int',
     'notes_position' => 'string',
     'comments_position' => 'string',
     'comments_area_width' => 'int',
@@ -257,10 +257,10 @@ __PACKAGE__->swagger_types( {
 
 __PACKAGE__->attribute_map( {
     'default_regular_font' => 'DefaultRegularFont',
-    'height' => 'Height',
-    'width' => 'Width',
     'font_fallback_rules' => 'FontFallbackRules',
     'format' => 'Format',
+    'height' => 'Height',
+    'width' => 'Width',
     'notes_position' => 'NotesPosition',
     'comments_position' => 'CommentsPosition',
     'comments_area_width' => 'CommentsAreaWidth',

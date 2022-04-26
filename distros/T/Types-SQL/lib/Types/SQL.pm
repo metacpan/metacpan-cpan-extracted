@@ -1,6 +1,6 @@
 package Types::SQL;
 
-use v5.8;
+use v5.10;
 
 use strict;
 use warnings;
@@ -22,14 +22,7 @@ use namespace::autoclean;
 
 # ABSTRACT: a library of SQL types
 
-our $VERSION = 'v0.4.1';
-
-
-sub VERSION { # for older Perls
-    my ( $class, $wanted ) = @_;
-    require version;
-    return version->parse($VERSION);
-}
+our $VERSION = 'v0.6.0';
 
 
 our $Blob = _generate_type(
@@ -66,9 +59,9 @@ our $Varchar = _generate_type(
         my ( $self, $size ) = @_;
         my $parent = $self->parent->my_methods->{dbic_column_info};
         return (
-            $parent->( $self->parent, $size || $self->type_parameter ),
+            $parent->( $self->parent, $size // $self->type_parameter ),
             data_type => 'varchar',
-            maybe size => $size || $self->type_parameter,
+            maybe size => $size // $self->type_parameter,
         );
     },
 );
@@ -82,9 +75,9 @@ our $Char = _generate_type(
         my ( $self, $size ) = @_;
         my $parent = $self->parent->my_methods->{dbic_column_info};
         return (
-            $parent->( $self->parent, $size || $self->type_parameter || 1 ),
+            $parent->( $self->parent, $size // $self->type_parameter // 1 ),
             data_type => 'char',
-            size      => $size || $self->type_parameter || 1,
+            size      => $size // $self->type_parameter // 1,
         );
     },
 );
@@ -99,7 +92,7 @@ our $Integer = _generate_type(
         return (
             data_type  => 'integer',
             is_numeric => 1,
-            maybe size => $size || $self->type_parameter,
+            maybe size => $size // $self->type_parameter,
         );
     },
 );
@@ -117,7 +110,7 @@ our $Serial = _generate_type(
         my ( $self, $size ) = @_;
         my $parent = $self->parent->my_methods->{dbic_column_info};
         return (
-            $parent->( $self->parent, $size || $self->type_parameter ),
+            $parent->( $self->parent, $size // $self->type_parameter ),
             data_type         => 'serial',
             is_auto_increment => 1,
         );
@@ -134,7 +127,7 @@ our $Numeric = _generate_type(
         return (
             data_type  => 'numeric',
             is_numeric => 1,
-            maybe size => $size || $self->parameters,
+            maybe size => $size // $self->parameters,
         );
     },
 );
@@ -154,7 +147,7 @@ sub _size_constraint_generator {
 sub _size_range_constraint_generator {
     if (@_) {
         my ( $prec, $scale ) = @_;
-        $scale ||= 0;
+        $scale //= 0;
 
         die "Precision must be a positive integer" unless $prec =~ /^[1-9]\d*$/;
         die "Scale must be a positive integer"     unless $scale =~ /^\d+$/;
@@ -196,7 +189,7 @@ Types::SQL - a library of SQL types
 
 =head1 VERSION
 
-version v0.4.1
+version v0.6.0
 
 =head1 SYNOPSIS
 
@@ -210,8 +203,6 @@ This module provides a type library of SQL types.  These are
 L<Type::Tiny> objects that are augmented with a C<dbic_column_info>
 method that returns column information for use with
 L<DBIx::Class>.
-
-=for Pod::Coverage VERSION
 
 =for readme stop
 
@@ -299,12 +290,6 @@ The method should return a hash of values that are passed to the
 C<add_column> method of L<DBIx::Class::ResultSource>.
 
 =for readme continue
-
-=head1 ROADMAP
-
-Support for Perl versions earlier than 5.10 will be removed sometime
-in 2019.
-
 =head1 SEE ALSO
 
 L<Type::Tiny>.

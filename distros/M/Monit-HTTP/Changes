@@ -1,5 +1,15 @@
 Revision history for Monit::HTTP
 
+0.05    21 April 2022
+        - Use Carp's croak rather than die
+        - Add some tests
+        - Use parent to import Exporter
+        - Remove outdated pod
+        - Have metacpan point to githu issues rather than RT
+        - Add mailmap to take care of Contributors metadata
+        - Set minimum perl to 5.10 because why not? even thats far too old
+        - Ensure cpan doesnt index t/ and scripts/
+
 0.04    19 December 2018
         - Various adjustments
 

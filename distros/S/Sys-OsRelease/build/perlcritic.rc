@@ -1,0 +1,24 @@
+severity  = harsh
+verbose = [%p] %m at line %l, column %c. %e (Severity: %s)\n
+include   = RequirePodSections
+color-severity-lowest = bright_blue
+color-severity-low = bright_green
+color-severity-medium = bright_yellow
+color-severity-high = rgb530
+color-severity-highest = bright_red
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Moo Modern::Perl
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Moo Modern::Perl
+
+[Documentation::RequirePodSections]
+lib_sections = NAME | VERSION | SYNOPSIS | DESCRIPTION | BUGS AND LIMITATIONS | AUTHOR | COPYRIGHT AND LICENSE
+script_sections = NAME | USAGE | OPTIONS | EXIT STATUS | BUGS AND LIMITATIONS | AUTHOR | COPYRIGHT AND LICENSE
+
+[Subroutines::ProhibitExcessComplexity]
+max_mccabe = 20
+
+[Subroutines::RequireFinalReturn]
+terminal_methods = throw

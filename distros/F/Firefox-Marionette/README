@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 1.24
+    Version 1.25
 
 SYNOPSIS
 
@@ -64,7 +64,7 @@ SUBROUTINES/METHODS
       * path - a file system path to a single PEM encoded X.509 certificate
       <https://datatracker.ietf.org/doc/html/rfc7468#section-5>.
 
-      * string - a string containg a single PEM encoded X.509 certificate
+      * string - a string containing a single PEM encoded X.509 certificate
       <https://datatracker.ietf.org/doc/html/rfc7468#section-5>
 
       * trust - This is the trustargs
@@ -694,7 +694,7 @@ SUBROUTINES/METHODS
 
  fill_login
 
-    This method searchs the Password Manager
+    This method searches the Password Manager
     <https://support.mozilla.org/en-US/kb/password-manager-remember-delete-edit-logins>
     for an appropriate login for any form on the current page. The form
     must match the host, the action attribute and the user and password
@@ -1143,7 +1143,7 @@ SUBROUTINES/METHODS
     returns the page source of the content document. This page source can
     be wrapped in html that firefox provides. See the json method for an
     alternative when dealing with response content types such as
-    application/json and strip for an alterative when dealing with other
+    application/json and strip for an alternative when dealing with other
     non-html content types such as text/plain.
 
         use Firefox::Marionette();
@@ -1194,7 +1194,7 @@ SUBROUTINES/METHODS
     and an optional true/false second parameter to indicate if the xpi file
     should be a temporary extension
     <https://extensionworkshop.com/documentation/develop/temporary-installation-in-firefox/>
-    (just for the existance of this browser instance). Unsigned xpi files
+    (just for the existence of this browser instance). Unsigned xpi files
     may only be loaded temporarily
     <https://wiki.mozilla.org/Add-ons/Extension_Signing> (except for
     nightly firefox installations
@@ -1549,6 +1549,10 @@ SUBROUTINES/METHODS
       timeout, instead of needing to use timeouts from the capabilities
       parameter. Overrides all longer ways.
 
+      * index - a parameter to allow the user to specify a specific firefox
+      instance to survive and reconnect to. It does not do anything else at
+      the moment. See the survive parameter.
+
       * kiosk - start the browser in kiosk
       <https://support.mozilla.org/en-US/kb/firefox-enterprise-kiosk-mode>
       mode.
@@ -1618,8 +1622,14 @@ SUBROUTINES/METHODS
       the specified user. See REMOTE AUTOMATION OF FIREFOX VIA SSH. The
       user will default to the current user name.
 
+      * via - specifies a proxy jump box
+      <https://man.openbsd.org/ssh_config#ProxyJump> to be used to connect
+      to a remote host. See the host parameter.
+
       * visible - should firefox be visible on the desktop. This defaults
-      to "0".
+      to "0". When moving from a X11 platform to another X11 platform, you
+      can set visible to 'local' to enable X11 forwarding
+      <https://man.openbsd.org/ssh#X>. See X11 FORWARDING WITH FIREFOX.
 
       * waterfox - only allow a binary that looks like a waterfox version
       <https://www.waterfox.net/> to be launched.
@@ -1969,7 +1979,7 @@ SUBROUTINES/METHODS
       * line - Line in the client's program where this script is evaluated.
 
       * new - Forces the script to be evaluated in a fresh sandbox. Note
-      that if it is undefined, the script will normally be evaluted in a
+      that if it is undefined, the script will normally be evaluated in a
       fresh sandbox.
 
       * sandbox - Name of the sandbox to evaluate the script in. The
@@ -1977,7 +1987,7 @@ SUBROUTINES/METHODS
       <https://developer.mozilla.org/en-US/docs/Web/API/Window> object if
       new is false. If he parameter is undefined, the script is evaluated
       in a mutable sandbox. If the parameter is "system", it will be
-      evaluted in a sandbox with elevated system privileges, equivalent to
+      evaluated in a sandbox with elevated system privileges, equivalent to
       chrome space.
 
       * timeout - A timeout to override the default script timeout, which,
@@ -2105,7 +2115,7 @@ SUBROUTINES/METHODS
     been made to remove typical firefox html wrappers of non html content
     types such as text/plain and application/json. See the json method for
     an alternative when dealing with response content types such as
-    application/json and html for an alterative when dealing with html
+    application/json and html for an alternative when dealing with html
     content types. This is a convenience method that wraps the html method.
 
         use Firefox::Marionette();
@@ -2228,7 +2238,7 @@ SUBROUTINES/METHODS
 
     returns a hash of known Windows product names (such as 'Mozilla
     Firefox') with priority orders. The lower the priority will determine
-    the order that this module will check for the existance of this
+    the order that this module will check for the existence of this
     product. Only of interest when sub-classing.
 
  window_handle
@@ -2348,6 +2358,16 @@ REMOTE AUTOMATION OF FIREFOX VIA SSH
         
         my $firefox = Firefox::Marionette->new( host => 'remote.example.org', port => 2222, debug => 1 );
         $firefox->go('https://metacpan.org/');
+    
+        # OR use a proxy host to jump via to the final host
+    
+        my $firefox = Firefox::Marionette->new(
+                                                 host  => 'remote.example.org',
+                                                 port  => 2222,
+                                                 via   => 'user@secure-jump-box.example.org:42222',
+                                                 debug => 1,
+                                              );
+        $firefox->go('https://metacpan.org/');
 
     This module has support for creating and automating an instance of
     Firefox on a remote node. It has been tested against a number of
@@ -2405,7 +2425,8 @@ WEBGL
     3. It can be tricky getting WebGL <https://en.wikipedia.org/wiki/WebGL>
     to work with a Xvfb <https://en.wikipedia.org/wiki/Xvfb> instance.
     glxinfo <https://dri.freedesktop.org/wiki/glxinfo/> can be useful to
-    help debug issues in this case.
+    help debug issues in this case. The mesa-dri-drivers rpm is also
+    required for Redhat systems.
 
     With all those conditions being met, WebGL
     <https://en.wikipedia.org/wiki/WebGL> can be enabled like so;
@@ -2418,6 +2439,25 @@ WEBGL
         } else {
             die "WebGL is not supported";
         }
+
+X11 FORWARDING WITH FIREFOX
+
+    This is an experimental addition to this module. X11 Forwarding
+    <https://man.openbsd.org/ssh#X> allows you to launch a remote firefox
+    via ssh and have it visually appear in your local X11 desktop. This can
+    be accomplished with the following code;
+
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new(
+                                                 host    => 'remote-x11.example.org',
+                                                 visible => 'local',
+                                                 debug   => 1,
+                                              );
+        $firefox->go('https://metacpan.org');
+
+    Feedback is welcome on any odd X11 workarounds that might be required
+    for different platforms.
 
 DIAGNOSTICS
 

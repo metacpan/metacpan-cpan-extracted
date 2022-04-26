@@ -8,7 +8,7 @@ use strict;
 
 package Text::Bidi::Array;
 # ABSTRACT: Base class for dual life arrays
-$Text::Bidi::Array::VERSION = '2.15';
+$Text::Bidi::Array::VERSION = '2.16';
 
 use Carp;
 
@@ -71,7 +71,7 @@ Text::Bidi::Array - Base class for dual life arrays
 
 =head1 VERSION
 
-version 2.15
+version 2.16
 
 =head1 SYNOPSIS
 

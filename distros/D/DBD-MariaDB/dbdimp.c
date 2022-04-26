@@ -15,6 +15,16 @@
 
 #include "dbdimp.h"
 
+#ifdef HAVE_GET_CHARSET_NUMBER
+/* Available only in some clients and declared in header file my_sys.h which cannot be included */
+unsigned int get_charset_number(const char *cs_name, unsigned int cs_flags);
+#endif
+
+#if defined(__GNUC__) && ((__GNUC__ == 4 && __GNUC_MINOR__ >= 1) || (__GNUC__ > 4))
+/* Do not export non-static functions from driver library */
+#pragma GCC visibility push(hidden)
+#endif
+
 #define ASYNC_CHECK_RETURN(h, value)\
   if(imp_dbh->async_query_in_flight) {\
       mariadb_dr_do_error(h, CR_UNKNOWN_ERROR, "Calling a synchronous function on an asynchronous handle", "HY000");\
@@ -513,7 +523,7 @@ PERL_STATIC_INLINE bool mysql_charsetnr_is_utf8(unsigned int id)
 /* 
   count embedded options
 */
-int count_embedded_options(char *st)
+static int count_embedded_options(char *st)
 {
   int rc;
   char c;
@@ -538,7 +548,7 @@ int count_embedded_options(char *st)
 /*
   Free embedded options
 */
-int free_embedded_options(char ** options_list, int options_count)
+static int free_embedded_options(char ** options_list, int options_count)
 {
   int i;
 
@@ -556,7 +566,7 @@ int free_embedded_options(char ** options_list, int options_count)
  Print out embedded option settings
 
 */
-int print_embedded_options(PerlIO *stream, char ** options_list, int options_count)
+static int print_embedded_options(PerlIO *stream, char ** options_list, int options_count)
 {
   int i;
 
@@ -573,7 +583,7 @@ int print_embedded_options(PerlIO *stream, char ** options_list, int options_cou
 /*
 
 */
-char **fill_out_embedded_options(char *options,
+static char **fill_out_embedded_options(char *options,
                                  int options_type,
                                  STRLEN slen, int cnt)
 {
@@ -616,6 +626,25 @@ char **fill_out_embedded_options(char *options,
   }
   return options_list;
 }
+
+#if MYSQL_VERSION_ID < 50001
+/* MySQL client prior to version 5.0.1 does not implement mysql_real_escape_string() for SERVER_STATUS_NO_BACKSLASH_ESCAPES */
+static unsigned long string_escape_quotes(char *to, const char *from, unsigned long len)
+{
+  const char *to_start = to;
+  const char *end = from + len;
+
+  while (from < end)
+  {
+    if (*from == '\'')
+      *to++ = '\'';
+    *to++ = *from++;
+  }
+
+  *to = '\0';
+  return to - to_start;
+}
+#endif
 
 /*
   constructs an SQL statement previously prepared with
@@ -828,9 +857,8 @@ static char *parse_params(
 #if MYSQL_VERSION_ID < 50001
             if (sock->server_status & SERVER_STATUS_NO_BACKSLASH_ESCAPES)
             {
-              *ptr++ = 'X';
               *ptr++ = '\'';
-              ptr += mysql_hex_string(ptr, ph->value, ph->len);
+              ptr += string_escape_quotes(ptr, ph->value, ph->len);
               *ptr++ = '\'';
             }
             else
@@ -1363,11 +1391,6 @@ static void error_no_connection(SV *h, const char *msg)
 #endif
   mariadb_dr_do_error(h, CR_CONNECTION_ERROR, msg, "HY000");
 }
-
-#ifdef HAVE_GET_CHARSET_NUMBER
-/* Available only in some clients and declared in header file my_sys.h which cannot be included */
-unsigned int get_charset_number(const char *cs_name, unsigned int cs_flags);
-#endif
 
 /***************************************************************************
  *
@@ -2221,7 +2244,7 @@ static bool mariadb_dr_connect(
       }
       if (connected && mysql_get_server_version(sock) < 40100)
       {
-        mariadb_dr_do_error(dbh, CR_CONNECTION_ERROR, "Connection error: MariaDB or MySQL server version is older then 4.1.0", "HY000");
+        mariadb_dr_do_error(dbh, CR_CONNECTION_ERROR, "Connection error: MariaDB or MySQL server version is older than 4.1.0", "HY000");
         mariadb_db_disconnect(dbh, imp_dbh);
         return FALSE;
       }
@@ -2238,7 +2261,7 @@ static bool mariadb_dr_connect(
       }
       if (mysql_get_server_version(sock) < 40100)
       {
-        mariadb_dr_do_error(dbh, CR_CONNECTION_ERROR, "Connection error: MariaDB or MySQL server version is older then 4.1.0", "HY000");
+        mariadb_dr_do_error(dbh, CR_CONNECTION_ERROR, "Connection error: MariaDB or MySQL server version is older than 4.1.0", "HY000");
         mariadb_db_disconnect(dbh, imp_dbh);
         return FALSE;
       }
@@ -6406,9 +6429,8 @@ SV* mariadb_db_quote(SV *dbh, SV *str, SV *type)
 #if MYSQL_VERSION_ID < 50001
       if (imp_dbh->pmysql->server_status & SERVER_STATUS_NO_BACKSLASH_ESCAPES)
       {
-        *sptr++ = 'X';
         *sptr++ = '\'';
-        sptr += mysql_hex_string(sptr, ptr, len);
+        sptr += string_escape_quotes(sptr, ptr, len);
         *sptr++ = '\'';
       }
       else

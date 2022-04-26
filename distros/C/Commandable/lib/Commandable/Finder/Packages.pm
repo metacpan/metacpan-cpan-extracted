@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder::Packages 0.06;
+package Commandable::Finder::Packages 0.07;
 
 use v5.14;
 use warnings;
@@ -42,6 +42,53 @@ This class uses L<Module::Pluggable> to load packages from the filesystem.
 As commands are located per package (and not per file), the application can
 provide special-purpose internal commands by implementing more packages in the
 given namespace, regardless of which files they come from.
+
+=head1 CONSTANTS
+
+   package My::App::Commands::example;
+
+   use constant COMMAND_NAME => "example";
+   use constant COMMAND_DESC => "an example of a command";
+
+   ...
+
+Properties about each command are stored as methods (usually constant methods)
+within each package. Often the L<constant> pragma module is used to create
+them.
+
+The following constant names are used by default:
+
+=head2 COMMAND_NAME
+
+   use constant COMMAND_NAME => "name";
+
+Gives a string name for the command.
+
+=head2 COMMAND_DESC
+
+   use constant COMMAND_DESC => "description";
+
+Gives a string description for the command.
+
+=head2 COMMAND_ARGS
+
+   use constant COMMAND_ARGS => (
+      { name => "argname", description => "description" },
+   );
+
+Gives a list of command argument specifications. Each specification is a HASH
+reference corresponding to one positional argument, and should contain keys
+named C<name>, C<description>, and optionally C<optional>.
+
+=head2 COMMAND_OPTS
+
+   use constant COMMAND_OPTS => (
+      { name => "optname", description => "description" },
+   );
+
+Gives a list of command option specifications. Each specification is a HASH
+reference giving one named option, in no particular order, and should contain
+keys named C<name>, C<description> and optionally C<mode> and C<default>.
 
 =cut
 

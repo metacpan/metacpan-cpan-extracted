@@ -30,7 +30,7 @@ sub _compare {
 	unless ($reftype_other) {
 		eval{
 			local $SIG{'__DIE__'};
-			$other = JSON->new->decode($other);
+			$other = JSON->new->decode($other // '');
 		};
 		return 0 if $@;
 	}
@@ -46,7 +46,7 @@ sub _compare {
 	return $canonself eq $canonother;
 }
 
-our $VERSION = '2.25';
+our $VERSION = '2.26';
 
 =encoding utf8
 
@@ -319,7 +319,7 @@ sub new {
 	if ($type eq '') {
 		eval{
 			local $SIG{'__DIE__'};
-			$json = JSON->new->decode($json);
+			$json = JSON->new->decode($json // '');
 		};
 
 		unless($@) {
@@ -897,7 +897,7 @@ sub graft {
 
 	eval{
 		local $SIG{'__DIE__'};
-		$self->{$name} = JSON->new->decode($json);
+		$self->{$name} = JSON->new->decode($json // '');
 	};
 
 	return 0 if $@;
@@ -934,7 +934,7 @@ sub stack {
 
 	eval{
 		local $SIG{'__DIE__'};
-		push @$self, JSON->new->decode($json);
+		push @$self, JSON->new->decode($json // '');
 	};
 	return 0 if $@;
 

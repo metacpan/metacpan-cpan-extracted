@@ -42,7 +42,7 @@ done_testing;
 
 sub find_platform {
     foreach my $platform (list_platforms()) {
-        if(os_is($platform) && scalar(my @temp = list_family_members($platform)) == 0) {
+        if(os_is($platform)) {
             return $platform;
         }
     }

@@ -1,0 +1,302 @@
+# NAME
+
+CXC::Exporter::Util - Tagged Based Exporting
+
+# VERSION
+
+version 0.01
+
+# SYNOPSIS
+
+    package My::Constants;
+    use CXC::Exporter::Util ':all';
+
+    install_CONSTANTS( {
+          DETECTOR => {
+              ACIS => 'ACIS',
+              HRC  => 'HRC',
+          },
+
+          AGGREGATE => {
+              ALL  => 'all',
+              NONE => 'none',
+              ANY  => 'any',
+          },
+      } );
+
+    install_EXPORTS;
+
+    # in an importer;
+
+    # import ACIS & HRC constants, and DETECTORS function
+    use My::Constants '-detector', 'DETECTORS';
+
+    # print the DETECTOR constants' values;
+    say $_ for DETECTORS;
+
+# DESCRIPTION
+
+`CXC::Exporter::Util` provides tag-centric utilities for
+modules which export symbols.
+
+In this approach, `%EXPORT_TAGS` is the definitive source for
+information about exportable symbols and is used to generate both
+`@EXPORT_OK` and `@EXPORT`.  Consolidation of symbol information in
+one place avoids errors of omission.
+
+The standard export interface provided by Perl's core [Exporter](https://metacpan.org/pod/Exporter) (and
+emulated by others such as [Exporter::Tiny](https://metacpan.org/pod/Exporter::Tiny)) uses three structures in
+the exporting module's namespace:
+
+- @EXPORT
+
+    Symbols in this array are automatically exported.
+
+- @EXPORT\_OK
+
+    Symbols in this array are available for export.
+
+- %EXPORT\_TAGS
+
+    This hash associates sets of symbols with tags. [Exporter](https://metacpan.org/pod/Exporter) allows the
+    importing module to import a set of symbols by specifying
+    a set's tag rather than each of the symbols individually.
+
+## Standard Usage
+
+At it simplest, the exporting module calls ["install\_EXPORTS"](#install_exports) with a hash:
+
+    package My::ExportingModule;
+    use CXC::Exporter::Util;
+
+    use parent 'Exporter';
+
+    install_EXPORTS( { tag => [ 'Symbol1', 'Symbol2' ] } );
+
+For more complicated setups, `%EXPORT_TAGS` may be specified first:
+
+    package My::ExportingModule;
+    use CXC::Exporter::Util;
+
+    use parent 'Exporter';
+    our %EXPORT_TAGS = ( tag => [ 'Symbol1', 'Symbol2' ] );
+    install_EXPORTS;
+
+## Handling Constant values
+
+[CXC::Exporter::Util](https://metacpan.org/pod/CXC::Exporter::Util) provides additional support for creating,
+organizing and installing constants via ["install\_CONSTANTS"](#install_constants).
+Constants are created via Perl's [constant](https://metacpan.org/pod/constant) pragma.
+
+["install\_CONSTANTS"](#install_constants) is passed a hash containing sets of constants
+grouped by tags, e.g.:
+
+    install_CONSTANTS( {
+          DETECTOR => {
+              ACIS => 'ACIS',
+              HRC  => 'HRC',
+          },
+
+          AGGREGATE => {
+              ALL  => 'all',
+              NONE => 'none',
+              ANY  => 'any',
+          },
+     });
+     install_EXPORTS;
+
+In addition to the constants, it generates constant functions which
+return all of the constant values in each set.
+
+For the above example, it creates constants `ACIS`, `HRC`, `ALL`,
+`NONE`, `ANY`, and constant functions `DETECTORS` and `AGGREGATES`
+(note the trailing upper-case `S`).  The latter are useful for generating
+enumerated types via e.g. [Type::Tiny](https://metacpan.org/pod/Type::Tiny):
+
+    Enum( DETECTORS )
+
+or iterating:
+
+    say $_ for DETECTORS;
+
+The top level keys (`DETECTOR`, `AGGREGATE`) are transformed into
+tags by lower casing them, e.g.
+
+    $EXPORT_TAGS{detector} = [ qw( ACIS HRC ) ];
+    $EXPORT_TAGS{aggregate} = [ qw( ALL NONE ANY ) ];
+
+The constant functions are assigned the `constant_funcs` tag, e.g.
+
+    $EXPORT_TAGS{constant_funcs} = [ qw( DETECTORS AGGREGATES ) ];
+
+If the constants are used later in the module for other purposes, constant definition
+should be done in a [BEGIN](https://metacpan.org/pod/BEGIN) block:
+
+    BEGIN { install_CONSTANTS( \%CONSTANTS ) }
+
+For more complex situations, the lower level ["install\_constant\_tag"](#install_constant_tag)
+and ["install\_constant\_func"](#install_constant_func) routines may be useful.
+
+# SUBROUTINES
+
+## install\_EXPORTS
+
+    install_EXPORT( [\%export_tags], [$package],   );
+
+Populate `$package`'s `@EXPORT` and `@EXPORT_OK` arrays based upon
+`%export_tags`. `$package` defaults to the caller's package.
+
+If not specified, `%export_tags` defaults to `%EXPORT_TAGS` in `$package`.
+If specified, the contents of `%export_tags` will overwrite `%EXPORT_TAGS`;
+
+This routine does the following in `$package`, which defaults to the
+caller's package.
+
+- Install the symbols specified via the `default` tag into `$package`'s `@EXPORT`.
+- Install all of the symbols in `%EXPORT_TAGS` into `@EXPORT_OK`.
+
+## install\_CONSTANTS
+
+    install_CONSTANTS( \%hash, [$package]  );
+
+Create constants from a nested hash of constants names and values and
+make them available for export.
+
+`%hash` should be a two level nested structure.  The keys in the top
+level are tag names, the second level structures are either hashes or
+arrays ( of _name-value_ pairs )and contain the constant names and
+values, e.g.
+
+     %hash = (
+        DETECTOR => {
+            ACIS => 'ACIS',
+            HRC  => 'HRC',
+        },
+
+        AGGREGATE => {
+            ALL  => 'all',
+            NONE => 'none',
+            ANY  => 'any',
+        },
+     );
+
+This routine does the following in `$package`, which defaults to the
+caller's package.
+
+1. Create constants for each of the entries in the inner hashes, and
+add tags to `%EXPORT_TAGS` for them.
+2. Create constant functions for each of the inner hashes which return
+the hash values, and add them to the export tag `constant_funcs`
+in `%EXPORT_TAGS`
+
+For example, given the above value for `%hash`,
+
+- constants `ACIS`, and `HRC` will be created and assigned the export
+tag `detector`.
+- constants `ALL`, `NONE`, and `ANY` will be created and assigned
+the export tag `aggregate`.
+- Constant functions `DETECTORS` and `AGGREGATES` will be created
+and assigned to the `constant_funcs` export tag.
+
+[install\_EXPORTS](https://metacpan.org/pod/install_EXPORTS) uses ["install\_constant\_tag"](#install_constant_tag) to install the individual
+tagged sets.
+
+## install\_constant\_tag( $tag, $constants, \[$package\] )
+
+`$constants` may be either a hashref or an arrayref ( composed of _name-value_ pairs ).
+Specifying constant names and their values, e.g.
+
+     (
+             NAME1     => VALUE1,
+             NAME2     => VALUE2,
+    );
+
+This routine does the following in `$package`, which defaults to the
+caller's package.
+
+1. installs the constants in `$package`,
+2. installs a constant function `${tag}S` which returns the constant
+values
+3. adds the constant names to `%EXPORT_TAGS` with the
+lower-cased tag `$tag`
+4. adds `${tag}S` in the `$EXPORT_TAGS{contant_funcs}` tag.
+
+For example, after
+
+    install_constant_tag( 'AGGREGATE',
+                          { ALL => 'all', NONE => 'none', ANY => 'any' } );
+
+1. The constants, `ALL`, `NONE`, `ANY` will be created.
+2. The function `AGGREGATES` will return `all`, `none`, `any`.
+3. A package importing from `$package` can import the constants
+`ALL`, `NONE`, `ANY` via the `aggregate` tag:
+
+        use Package ':aggregate';
+
+4. A package importing from `$package` can import the `AGGREGATE`
+constant function via the `constant_funcs` tag:
+
+        use Package ':constant_funcs';
+
+    or directly
+
+        use Package 'AGGREGATES';
+
+[install\_constant\_tag](https://metacpan.org/pod/install_constant_tag) uses ["install\_constant\_func"](#install_constant_func) to create and install
+the constant functions which return the constant values.
+
+## install\_constant\_func( $name, \\@values )
+
+This routine does the following in `$package`, which defaults to the
+caller's package.
+
+1. Create a constant subroutine named `$name` which returns `@values`;
+2. Adds `$name` to the `constant_funcs` tag in `%EXPORT_TAGS`.
+
+For example, after calling
+
+    install_constant_func( 'AGGREGATE', [ 'all', 'none', 'any' ]  );
+
+1. The function `AGGREGATES` will return `all`, `none`, `any`.
+2. A package importing from `$package` can import the `AGGREGATE`
+constant function via the `constant_funcs` tag:
+
+        use Package ':constant_funcs';
+
+    or directly
+
+        use Package 'AGGREGATES';
+
+# SUPPORT
+
+## Bugs
+
+Please report any bugs or feature requests to bug-cxc-exporter-tagged@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Exporter-Util
+
+## Source
+
+Source is available at
+
+    https://gitlab.com/djerius/cxc-exporter-tagged
+
+and may be cloned from
+
+    https://gitlab.com/djerius/cxc-exporter-tagged.git
+
+# SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+- [Exporter](https://metacpan.org/pod/Exporter)
+
+# AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2022 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+    The GNU General Public License, Version 3, June 2007

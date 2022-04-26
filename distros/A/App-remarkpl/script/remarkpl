@@ -1,60 +1,61 @@
 #!/usr/bin/env perl
 use Mojolicious::Lite;
-use App::remarkpl;
-my $presentation = shift @ARGV || $ENV{REMARK_PRESENTATION} || '';
 
+use if -e 'lib/App/remarkpl', qw(lib lib);
+use App::remarkpl;
+use Mojo::File qw(path);
+
+# Read in the presentation when running the script from command line,
+# show the manual or an error message in case of an invalid file.
+my $presentation = shift @ARGV || $ENV{REMARK_PRESENTATION} || 'example.markdown';
 unless ($ENV{MOJO_APP_LOADER}) {
   exec perldoc => -tT => $INC{'App/remarkpl.pm'} unless $presentation;
-  die qq(Cannot read presentation file "$presentation".\n) unless $presentation eq 'example.markdown' or -r $presentation;
+  die qq(Cannot read presentation file "$presentation".\n)
+    unless $presentation eq 'example.markdown' or -r $presentation;
   unshift @ARGV, 'daemon';
 }
 
-require Cwd;
-app->renderer->paths([split /:/, ($ENV{REMARK_PUBLIC} // File::Spec->catdir(Cwd::getcwd(), 'templates'))]);
-app->static->paths([split /:/, ($ENV{REMARK_STATIC} // Cwd::getcwd())]);
+# Include static assets and templates
+app->renderer->paths([split /:/, ($ENV{REMARK_TEMPLATES} // path('templates')->to_abs)]);
+app->static->paths([split /:/, ($ENV{REMARK_STATIC} // path)]);
 push @{app->static->paths},
-  Cwd::abs_path(File::Spec->catdir(File::Basename::dirname($INC{'App/remarkpl.pm'}), qw( remarkpl public )));
+  path(path($INC{'App/remarkpl.pm'})->dirname, qw(remarkpl public))->to_abs;
 
-$presentation ||= 'example.markdown';
-app->defaults(title => $presentation);
-
-if (grep {/^--print/} @ARGV) {
-  print read_presentation();
-  exit 0;
-}
+# Custom switch to show example presentation file
+exit(print(read_presentation()) ? 0 : $!) if grep {/^--print/} @ARGV;
 
 app->log->info(qq(Looking for static files in ) . join ', ', @{app->static->paths});
 app->log->info(qq(Looking for templates in ) . join ', ',    @{app->renderer->paths});
 app->log->info(qq(Serving presentation "$presentation"));
 
-get '/' => sub {
-  shift->render(template => 'index', presentation => read_presentation());
-};
+get '/' => sub { shift->render(template => 'remarkpl', presentation => read_presentation()) };
 
+app->defaults(remarkjs => $ENV{REMARK_JS} || '/remark.min.js');
+app->defaults(title    => $presentation);
 app->start;
 
 sub read_presentation {
-  Mojo::Util::decode(
-    'UTF-8',
-    -e $presentation ? Mojo::File->new($presentation)->slurp : Mojo::Loader::data_section(__PACKAGE__, $presentation)
-  );
+  Mojo::Util::decode('UTF-8',
+    -e $presentation
+    ? path($presentation)->slurp
+    : Mojo::Loader::data_section(__PACKAGE__, $presentation));
 }
 
 __DATA__
-@@ index.html.ep
+@@ remarkpl.html.ep
 <!DOCTYPE html>
 <html>
 <head>
-  <title>remark - <%= title %></title>
+  <title><%= title %> - remarkpl</title>
   <meta charset="utf-8">
   %= stylesheet '/fonts.css'
   %= stylesheet '/basic.css'
 </head>
 <body>
   <textarea id="source"><%= $presentation %></textarea>
-  %= javascript '/remark.min.js'
+  %= javascript $remarkjs
   %= javascript '/custom.js'
-  <script>var slideshow = remark.create();</script>
+  <script>const slideshow = remark.create();</script>
 </body>
 </html>
 @@ example.markdown

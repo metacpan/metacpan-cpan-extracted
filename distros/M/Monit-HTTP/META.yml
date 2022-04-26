@@ -1,8 +1,8 @@
 ---
 abstract: 'An OOP interface to Monit.'
 author:
-  - 'Angelo "pallotron" Failla <pallotron@freaknet.org>'
-  - 'Dean Hamstead <dean@bytefoundry.com.au>'
+  - 'Angelo Failla <pallotron@freaknet.org>'
+  - 'Dean Hamstead <dean@fragfest.com.au>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
@@ -12,28 +12,40 @@ build_requires:
   Test::MockModule: '0'
   Test::More: '0'
   Test::Trap: '0'
+  perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Build: '0.28'
+  perl: v5.10.0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Monit-HTTP
+no_index:
+  directory:
+    - scripts
+    - t
 requires:
+  Carp: '0'
   Exporter: '0'
   HTTP::Tiny: '0'
   XML::Fast: '0'
-  YAML: '0'
   constant: '0'
-  perl: '5.004'
+  parent: '0'
+  perl: '5.010'
   strict: '0'
   warnings: '0'
 resources:
+  bugtracker: https://github.com/djzort/perl-monit-http-api/issues
   homepage: https://github.com/djzort/perl-monit-http-api
   repository: https://github.com/djzort/perl-monit-http-api.git
-version: '0.04'
-x_generated_by_perl: v5.26.2
+version: '0.05'
+x_contributors:
+  - 'Angelo Failla <pallotron@gmail.com>'
+  - 'Dean Hamstead <djzort@cpan.org>'
+x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

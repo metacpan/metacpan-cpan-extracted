@@ -1,3 +1,9 @@
+0.125   2022-04-22  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Use the correct perl version when testing min_version
+          (RT#142335).
+
+
 0.124   2022-04-20  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

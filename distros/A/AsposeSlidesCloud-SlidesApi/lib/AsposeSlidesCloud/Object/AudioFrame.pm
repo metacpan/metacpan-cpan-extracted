@@ -42,6 +42,7 @@ use AsposeSlidesCloud::Object::FillFormat;
 use AsposeSlidesCloud::Object::GeometryShape;
 use AsposeSlidesCloud::Object::Hyperlink;
 use AsposeSlidesCloud::Object::LineFormat;
+use AsposeSlidesCloud::Object::PictureFill;
 use AsposeSlidesCloud::Object::ResourceUri;
 use AsposeSlidesCloud::Object::ThreeDFormat;
 
@@ -260,13 +261,6 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
-    'shapes' => {
-    	datatype => 'ResourceUri',
-    	base_name => 'Shapes',
-    	description => 'Gets or sets the link to shapes.',
-    	format => '',
-    	read_only => '',
-    		},
     'fill_format' => {
     	datatype => 'FillFormat',
     	base_name => 'FillFormat',
@@ -407,6 +401,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'picture_fill_format' => {
+    	datatype => 'PictureFill',
+    	base_name => 'PictureFillFormat',
+    	description => 'Picture fill format.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -421,7 +422,6 @@ __PACKAGE__->swagger_types( {
     'x' => 'double',
     'y' => 'double',
     'z_order_position' => 'int',
-    'shapes' => 'ResourceUri',
     'fill_format' => 'FillFormat',
     'effect_format' => 'EffectFormat',
     'three_d_format' => 'ThreeDFormat',
@@ -441,7 +441,8 @@ __PACKAGE__->swagger_types( {
     'volume' => 'string',
     'base64_data' => 'string',
     'play_across_slides' => 'boolean',
-    'rewind_audio' => 'boolean'
+    'rewind_audio' => 'boolean',
+    'picture_fill_format' => 'PictureFill'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -456,7 +457,6 @@ __PACKAGE__->attribute_map( {
     'x' => 'X',
     'y' => 'Y',
     'z_order_position' => 'ZOrderPosition',
-    'shapes' => 'Shapes',
     'fill_format' => 'FillFormat',
     'effect_format' => 'EffectFormat',
     'three_d_format' => 'ThreeDFormat',
@@ -476,7 +476,8 @@ __PACKAGE__->attribute_map( {
     'volume' => 'Volume',
     'base64_data' => 'Base64Data',
     'play_across_slides' => 'PlayAcrossSlides',
-    'rewind_audio' => 'RewindAudio'
+    'rewind_audio' => 'RewindAudio',
+    'picture_fill_format' => 'PictureFillFormat'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

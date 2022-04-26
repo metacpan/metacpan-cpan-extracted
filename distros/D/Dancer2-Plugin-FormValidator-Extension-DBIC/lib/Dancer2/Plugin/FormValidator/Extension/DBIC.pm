@@ -4,7 +4,7 @@ use Moo;
 
 with 'Dancer2::Plugin::FormValidator::Role::Extension';
 
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 
 has plugin_dbic => (
     is      => 'ro',
@@ -45,7 +45,7 @@ Dancer2::Plugin::FormValidator::Extension::DBIC - Dancer2 FormValidator extensio
 
 =head1 VERSION
 
-version 0.81
+version 0.82
 
 =head1 SYNOPSIS
 

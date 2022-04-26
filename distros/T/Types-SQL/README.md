@@ -4,7 +4,7 @@ Types::SQL - a library of SQL types
 
 # VERSION
 
-version v0.4.1
+version v0.6.0
 
 # SYNOPSIS
 
@@ -119,13 +119,6 @@ my $type = Type::Tiny->new(
 
 The method should return a hash of values that are passed to the
 `add_column` method of [DBIx::Class::ResultSource](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AResultSource).
-
-# ROADMAP
-
-Support for Perl versions earlier than 5.10 will be removed sometime
-in 2019.
-
-# SEE ALSO
 
 [Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny).
 

@@ -10,6 +10,7 @@ t/001-auth_cache_file.t
 t/005-auth_code_verifier.t
 t/010-auth_code_url.t
 t/015-auth_code_extract.t
+t/020-auth_code.t
 t/110-access_token_generate.t
 t/115-access_token_set_expiry.t
 t/120-access_token_update.t
@@ -23,15 +24,23 @@ t/300-api_cache_persist.t
 t/305-api_cache_time.t
 t/310-api_cache.t
 t/315-api_cache_clear.t
-t/900-endpoints.t
+t/400-api_attempts.t
+t/500-api.t
+t/510-api_with_cache.t
+t/515-tesla_api_call.t
+t/900-new.t
+t/903-endpoints.t
 t/905-option_codes.t
 t/910-api_unauth.t
+t/915-_decode.t
+t/925-update_data_files.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
 t/test_data/endpoints.json
 t/test_data/option_codes.json
 t/test_data/test_data.json
+t/TestResponse.pm
 t/TestSuite.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

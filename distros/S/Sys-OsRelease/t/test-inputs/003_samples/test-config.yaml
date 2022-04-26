@@ -1,0 +1,95 @@
+---
+count: 177
+files:
+  os-release-almalinux:
+    almalinux_mantisbt_project: AlmaLinux-8
+    almalinux_mantisbt_project_version: 8.5
+    ansi_color: 0;34
+    bug_report_url: https://bugs.almalinux.org/
+    cpe_name: cpe:/o:almalinux:almalinux:8::baseos
+    documentation_url: https://wiki.almalinux.org/
+    home_url: https://almalinux.org/
+    id: almalinux
+    id_like: rhel centos fedora
+    name: AlmaLinux
+    platform_id: platform:el8
+    pretty_name: AlmaLinux 8.5 (Arctic Sphynx)
+    version: 8.5 (Arctic Sphynx)
+    version_id: 8.5
+  os-release-alpine:
+    bug_report_url: https://bugs.alpinelinux.org/
+    home_url: https://alpinelinux.org/
+    id: alpine
+    name: Alpine Linux
+    pretty_name: Alpine Linux v3.15
+    version_id: 3.15.4
+  os-release-archlinux:
+    ansi_color: 38;2;23;147;209
+    bug_report_url: https://bugs.archlinux.org/
+    build_id: rolling
+    documentation_url: https://wiki.archlinux.org/
+    home_url: https://archlinux.org/
+    id: arch
+    logo: archlinux-logo
+    name: Arch Linux
+    pretty_name: Arch Linux
+    support_url: https://bbs.archlinux.org/
+  os-release-debian:
+    bug_report_url: https://bugs.debian.org/
+    home_url: https://www.debian.org/
+    id: debian
+    name: Debian GNU/Linux
+    pretty_name: Debian GNU/Linux 11 (bullseye)
+    support_url: https://www.debian.org/support
+    version: 11 (bullseye)
+    version_codename: bullseye
+    version_id: 11
+  os-release-fedora:
+    ansi_color: 0;38;2;60;110;180
+    bug_report_url: https://bugzilla.redhat.com/
+    cpe_name: cpe:/o:fedoraproject:fedora:35
+    documentation_url: https://docs.fedoraproject.org/en-US/fedora/f35/system-administrators-guide/
+    home_url: https://fedoraproject.org/
+    id: fedora
+    logo: fedora-logo-icon
+    name: Fedora Linux
+    platform_id: platform:f35
+    pretty_name: Fedora Linux 35 (Container Image)
+    privacy_policy_url: https://fedoraproject.org/wiki/Legal:PrivacyPolicy
+    redhat_bugzilla_product: Fedora
+    redhat_bugzilla_product_version: 35
+    redhat_support_product: Fedora
+    redhat_support_product_version: 35
+    support_url: https://ask.fedoraproject.org/
+    variant: Container Image
+    variant_id: container
+    version: 35 (Container Image)
+    version_codename: ''
+    version_id: 35
+  os-release-rockylinux:
+    ansi_color: 0;32
+    bug_report_url: https://bugs.rockylinux.org/
+    cpe_name: cpe:/o:rocky:rocky:8:GA
+    home_url: https://rockylinux.org/
+    id: rocky
+    id_like: rhel centos fedora
+    name: Rocky Linux
+    platform_id: platform:el8
+    pretty_name: Rocky Linux 8.5 (Green Obsidian)
+    rocky_support_product: Rocky Linux
+    rocky_support_product_version: 8
+    version: 8.5 (Green Obsidian)
+    version_id: 8.5
+  os-release-ubuntu:
+    bug_report_url: https://bugs.launchpad.net/ubuntu/
+    home_url: https://www.ubuntu.com/
+    id: ubuntu
+    id_like: debian
+    name: Ubuntu
+    pretty_name: Ubuntu 20.04.4 LTS
+    privacy_policy_url: https://www.ubuntu.com/legal/terms-and-policies/privacy-policy
+    support_url: https://help.ubuntu.com/
+    ubuntu_codename: focal
+    version: 20.04.4 LTS (Focal Fossa)
+    version_codename: focal
+    version_id: 20.04

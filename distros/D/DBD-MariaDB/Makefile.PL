@@ -450,6 +450,17 @@ my %o = ( 'NAME' => 'DBD::MariaDB',
 		'realclean' => { 'FILES' => 't/MariaDB.mtest' },
           'C' => ["dbdimp.c", "MariaDB.c", "socket.c"],
           'XS' => {'MariaDB.xs' => 'MariaDB.c'},
+          'PM' => {
+              'lib/DBD/MariaDB.pm' => '$(INST_LIB)/DBD/MariaDB.pm',
+              'lib/DBD/MariaDB.pod' => '$(INST_LIB)/DBD/MariaDB.pod',
+              'lib/DBD/MariaDB/INSTALL.pod' => '$(INST_LIB)/DBD/MariaDB/INSTALL.pod',
+              'README.pod' => '$(INST_LIB)/DBD/MariaDB/README.pod',
+          },
+          'MAN3PODS' => {
+              'lib/DBD/MariaDB.pod' => '$(INST_MAN3DIR)/DBD::MariaDB.$(MAN3EXT)',
+              'lib/DBD/MariaDB/INSTALL.pod' => '$(INST_MAN3DIR)/DBD::MariaDB::INSTALL.$(MAN3EXT)',
+              'README.pod' => '$(INST_MAN3DIR)/DBD::MariaDB::README.$(MAN3EXT)',
+          },
 	  'OBJECT' => '$(O_FILES)',
 	  'LIBS' => (join ' ', @libdirs, $main_lib, @libs),
 	  @ldflags ? (dynamic_lib => { OTHERLDFLAGS => (join ' ', @ldflags) }) : (),
@@ -743,8 +754,16 @@ sub Configure {
                     # and always crash in mysql_real_connect() function, so avoid its usage
                     # https://jira.mariadb.org/browse/MDEV-16478
                     $function .= "\n#if defined(MARIADB_BASE_VERSION) || defined(MARIADB_PACKAGE_VERSION)\nif (mysql_get_client_version() >= 100301 && mysql_get_client_version() < 100308) return 1;\n#endif\n";
+                    # libmysqld.a from MySQL 8.x is broken too
+                    $function .= "\n#if !defined(MARIADB_BASE_VERSION) && !defined(MARIADB_PACKAGE_VERSION)\nif (mysql_get_client_version() >= 80000) return 1;\n#endif\n";
                 }
-                $function .= 'return (mysql_get_client_version() == MYSQL_VERSION_ID) ? 0 : 1;';
+                # MariaDB Connector/C 3.1.10+ has broken mysql_get_client_version() function, so use mariadb_get_infov(MARIADB_CLIENT_VERSION_ID) instead
+                $function .= "size_t version;\n";
+                $function .= "#if defined(MARIADB_PACKAGE_VERSION) && defined(MARIADB_PACKAGE_VERSION_ID) && MARIADB_PACKAGE_VERSION_ID >= 30000\n";
+                $function .= "if (mariadb_get_infov((void *)0, MARIADB_CLIENT_VERSION_ID, &version) != 0)\n";
+                $function .= "#endif\n";
+                $function .= "version = mysql_get_client_version();\n";
+                $function .= 'return (version == MYSQL_VERSION_ID) ? 0 : 1;';
                 # libmysqld is built using g++ rather than gcc and sometimes
                 # we have to use libstdc++ to resolve linking problems
                 foreach my $add_ldflags (undef, '-lstdc++') {

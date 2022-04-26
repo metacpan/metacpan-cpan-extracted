@@ -17,7 +17,7 @@ sub message {
 sub validate {
     my ($self, $field, $input, $source, $attribute) = @_;
 
-    if (exists $input->{$field}) {
+    if ($self->_field_defined_and_non_empty($field, $input)) {
         my $result = $self->extension->schema->resultset($source)->search(
             {
                 $attribute => $input->{$field},

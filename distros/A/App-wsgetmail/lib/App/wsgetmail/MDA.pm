@@ -67,6 +67,8 @@ another command via standard input.
 
 =cut
 
+use v5.10;
+
 package App::wsgetmail::MDA;
 use Moo;
 
@@ -152,11 +154,22 @@ has debug => (
 );
 
 
-
-my @config_fields = qw( command command_args command_timeout debug );
+# this sets the attributes in the object using values from the config.
+# if no value is defined in the config, the attribute's "default" is used
+# instead (if defined).
 around BUILDARGS => sub {
     my ( $orig, $class, $config ) = @_;
-    my $attributes = { map { $_ => $config->{$_} } @config_fields };
+
+    my $attributes = {
+        map {
+            $_ => $config->{$_}
+        }
+        grep {
+            defined $config->{$_}
+        }
+        qw(command command_args command_timeout debug)
+    };
+
     return $class->$orig($attributes);
 };
 
@@ -185,6 +198,7 @@ sub _run_command {
         warn "no action to delivery message, command option is empty or null" if ($self->debug);
         return 1;
     }
+
     my $ok = run ([ $self->command, _split_command_args($self->command_args, 1)], $fh, \$output, \$error, timeout( $self->command_timeout + 5 ) );
     unless ($ok) {
         warn sprintf('failed to run command "%s %s" for file %s : %s',

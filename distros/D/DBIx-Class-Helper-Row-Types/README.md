@@ -4,7 +4,7 @@ DBIx::Class::Helper::Row::Types - Use Types to define rows
 
 # VERSION
 
-version v0.2.0
+version v0.3.1
 
 # SYNOPSIS
 
@@ -12,10 +12,11 @@ In result class:
 
 ```perl
  use Types::SQL -types;
+ use Types::Standard -types;
 
 __PACKAGE__->load_components('Helper::Row::Types');
 
-__PACKAGE__->add_column(
+__PACKAGE__->add_columns(
 
    id   => Serial,
 
@@ -28,15 +29,15 @@ __PACKAGE__->add_column(
 # DESCRIPTION
 
 This helper allows you to specify column information by passing a
-[Type::Tiny](https://metacpan.org/pod/Type::Tiny) object.
+[Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny) object.
 
 Note that this _does not_ enforce that the data is of that type,
 unless you specify the `strict` option (See ["set\_column"](#set_column)).  The
 main purpose of this is to allow you to use types as a shorthand for
 specifying the column type.
 
-You can use types from [Types::SQL](https://metacpan.org/pod/Types::SQL) or supported types from
-[Types::Standard](https://metacpan.org/pod/Types::Standard).
+You can use types from [Types::SQL](https://metacpan.org/pod/Types%3A%3ASQL) or supported types from
+[Types::Standard](https://metacpan.org/pod/Types%3A%3AStandard).
 
 # METHODS
 
@@ -45,7 +46,7 @@ You can use types from [Types::SQL](https://metacpan.org/pod/Types::SQL) or supp
 ## `add_columns`
 
 These methods are modified to allow you to specify the column info
-using the `isa` attribute and a [Type::Tiny](https://metacpan.org/pod/Type::Tiny) type.
+using the `isa` attribute and a [Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny) type.
 
 Note that in no way does this enforce that type.
 
@@ -69,18 +70,13 @@ Enabling `strict` for an inflated column is strongly discouraged.
 Strict type constraints are only applied when explicitly setting a
 column value.
 
-# ROADMAP
-
-Support for Perl versions earlier than 5.10 will be removed sometime
-in 2019.
-
 # SEE ALSO
 
-[DBIx::Class](https://metacpan.org/pod/DBIx::Class)
+[DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass)
 
-[Types::SQL](https://metacpan.org/pod/Types::SQL)
+[Types::SQL](https://metacpan.org/pod/Types%3A%3ASQL)
 
-[Types::SQL::Util](https://metacpan.org/pod/Types::SQL::Util) provides a list of "standard" types that are
+[Types::SQL::Util](https://metacpan.org/pod/Types%3A%3ASQL%3A%3AUtil) provides a list of "standard" types that are
 supported.
 
 # SOURCE
@@ -103,7 +99,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017-2018 by Robert Rothenberg.
+This software is Copyright (c) 2017-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

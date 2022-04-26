@@ -10,7 +10,8 @@ do { my $x = {
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0',
-                                        'Module::Build' => '0.28'
+                                        'Module::Build' => '0.28',
+                                        'perl' => 'v5.10.0'
                                       }
                       },
        'develop' => {
@@ -32,12 +33,13 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'Carp' => '0',
                                       'Exporter' => '0',
                                       'HTTP::Tiny' => '0',
                                       'XML::Fast' => '0',
-                                      'YAML' => '0',
                                       'constant' => '0',
-                                      'perl' => '5.004',
+                                      'parent' => '0',
+                                      'perl' => '5.010',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -51,7 +53,8 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
-                                   'Test::More' => '0'
+                                   'Test::More' => '0',
+                                   'perl' => '5.010'
                                  }
                  }
      };

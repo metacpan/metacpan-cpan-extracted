@@ -3,9 +3,9 @@ NAME
     DataTables plugin
 
 VERSION
-    This document describes version 0.011 of Text::Table::HTML::DataTables
+    This document describes version 0.012 of Text::Table::HTML::DataTables
     (from Perl distribution Text-Table-HTML-DataTables), released on
-    2022-03-22.
+    2022-04-22.
 
 SYNOPSIS
      use Text::Table::HTML::DataTables;

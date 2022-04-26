@@ -82,10 +82,10 @@ CONFIGURATION
     them at once using either of these methods:
 
       # In your .perlcriticrc file...
-      theme = no strictersubs
+      theme = not strictersubs
 
       # With the perlcritic command-line...
-      $> perlcritic --theme='no stricter_subs' MyModule.pm
+      $> perlcritic --theme='not stricter_subs' MyModule.pm
 
     See "CONFIGURATION" in Perl::Critic section for more information about
     configuring the Perl::Critic engine.
@@ -104,7 +104,7 @@ AUTHOR
     Jeffrey Ryan Thalhammer <thaljef@cpan.org>
 
 COPYRIGHT
-    Copyright (c) 2007 Jeffrey Ryan Thalhammer. All rights reserved.
+    Copyright (c) 2007-2022 Jeffrey Ryan Thalhammer.
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself. The full text of this license can

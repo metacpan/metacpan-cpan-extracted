@@ -1,0 +1,10 @@
+
+## INSTALL
+
+cpanm App::dirdim
+
+
+## UNINSTALL 
+
+cpanm -U App::dirdim
+

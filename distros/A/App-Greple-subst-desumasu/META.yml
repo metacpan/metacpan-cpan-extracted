@@ -1,0 +1,44 @@
+---
+abstract: 'Japanese DESU/MASU dictionary for App::Greple::subst'
+author:
+  - 'Kazumasa Utashiro'
+build_requires:
+  Command::Runner: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Greple-subst-desumasu
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::Greple::subst::desumasu:
+    file: lib/App/Greple/subst/desumasu.pm
+    version: '0.01'
+requires:
+  App::Greple::subst: '0'
+  File::Share: '0'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/kaz-utashiro/greple-subst-desumasu/issues
+  homepage: https://github.com/kaz-utashiro/greple-subst-desumasu
+  repository: git://github.com/kaz-utashiro/greple-subst-desumasu.git
+version: '0.01'
+x_authority: cpan:UTASHIRO
+x_contributors:
+  - 'Kazumasa Utashiro <kaz@utashiro.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

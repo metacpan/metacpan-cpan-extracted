@@ -30,7 +30,7 @@ use Carp;
 use 5.008;
 # major.minor.bugfix, the latter two with 3 digits each
 # or major.minor_alpha
-our $VERSION = '4.000003';
+our $VERSION = '4.000004';
 $VERSION = eval $VERSION;
 our %features = qw(array 1 hash 1);
 
@@ -953,6 +953,7 @@ sub par_content
 	{
 		if(eval { require Data::Dumper })
 		{
+			no warnings 'once'; # triggers when embedding the module
 			local $Data::Dumper::Terse = 1;
 			local $Data::Dumper::Deepcopy = 1;
 			local $Data::Dumper::Indent = $indent;

@@ -1,3 +1,9 @@
+1.1.102  2022-04-22  Released-By: PERLANCAR; Urgency: medium
+
+         - In function argument property 'deps' and for dep type 'prog',
+           introduce property 'path'.
+
+
 1.1.101  2022-03-20  Released-By: PERLANCAR; Urgency: medium
 
          - Specify that in function argument property 'deps', the dep type
@@ -8,7 +14,7 @@
 1.1.100  2022-01-23  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	 - [incompatible change] Rename 'title' result metadata property to
-	   'caption'.
+	   'caption', which is a standard DefHash property.
 
 	 - [removed] Remove deprecated specification Rinci::Undo.
 

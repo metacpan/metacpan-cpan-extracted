@@ -46,6 +46,8 @@
 #
 # END BPS TAGGED BLOCK }}}
 
+use v5.10;
+
 package App::wsgetmail::MS365;
 
 =head1 NAME
@@ -223,12 +225,23 @@ has _next_fetch_url => (
 );
 
 
-my @config_fields = qw(client_id tenant_id username user_password global_access secret folder post_fetch_action debug);
+# this sets the attributes in the object using values from the config.
+# if no value is defined in the config, the attribute's "default" is used
+# instead (if defined).
 around BUILDARGS => sub {
-  my ( $orig, $class, $config ) = @_;
+    my ( $orig, $class, $config ) = @_;
 
-  my $attributes = { map { $_ => $config->{$_} } @config_fields };
-  return $class->$orig($attributes);
+    my $attributes = {
+        map {
+            $_ => $config->{$_}
+        }
+        grep {
+            defined $config->{$_}
+        }
+        qw(client_id tenant_id username user_password global_access secret folder post_fetch_action debug)
+    };
+
+    return $class->$orig($attributes);
 };
 
 
@@ -277,6 +290,7 @@ sub get_message_mime_content {
     my $response = $self->_client->get_request([@path_parts]);
     unless ($response->is_success) {
         warn "failed to fetch message $message_id " . $response->status_line;
+        warn "response from server : " . $response->content if $self->debug;
         return undef;
     }
 
@@ -298,6 +312,7 @@ sub delete_message {
     my $response = $self->_client->delete_request([@path_parts]);
     unless ($response->is_success) {
         warn "failed to mark message as read " . $response->status_line;
+        warn "response from server : " . $response->content if $self->debug;
     }
 
     return $response;
@@ -317,6 +332,7 @@ sub mark_message_as_read {
                                                   Content => encode_json({isRead => $JSON::true }) });
     unless ($response->is_success) {
         warn "failed to mark message as read " . $response->status_line;
+        warn "response from server : " . $response->content if $self->debug;
     }
 
     return $response;
@@ -338,6 +354,7 @@ sub get_folder_details {
     );
     unless ($response->is_success) {
         warn "failed to fetch folder detail " . $response->status_line;
+        warn "response from server : " . $response->content if $self->debug;
         return undef;
     }
 
@@ -358,6 +375,7 @@ sub _fetch_messages {
         my $response = $self->_client->get_request_by_url($self->_next_fetch_url);
         unless ($response->is_success) {
             warn "failed to fetch messages " . $response->status_line;
+            warn "response from server : " . $response->content if $self->debug;
             $self->_have_messages_to_fetch(0);
             return 0;
         }
@@ -408,6 +426,7 @@ sub _get_message_list {
 
     unless ($response->is_success) {
         warn "failed to fetch messages " . $response->status_line;
+        warn "response from server : " . $response->content if $self->debug;
         return { value => [ ] };
     }
 

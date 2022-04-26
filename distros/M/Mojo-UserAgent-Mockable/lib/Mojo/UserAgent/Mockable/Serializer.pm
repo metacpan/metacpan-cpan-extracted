@@ -1,7 +1,7 @@
 use 5.014;
 
 package Mojo::UserAgent::Mockable::Serializer;
-$Mojo::UserAgent::Mockable::Serializer::VERSION = '1.58';
+$Mojo::UserAgent::Mockable::Serializer::VERSION = '1.59';
 use warnings::register;
 
 use Carp;
@@ -25,7 +25,7 @@ sub serialize {
     for (0 .. $#serialized) {
         $serialized[$_]->{txn_num} = $_;
     }
-    my $JSON = JSON::MaybeXS->new(pretty => 1, sort_by => 1, utf8 => 1);
+    my $JSON = JSON::MaybeXS->new(pretty => 1, canonical => 1, utf8 => 1);
     return $JSON->encode( \@serialized );
 }
 
@@ -233,7 +233,7 @@ Mojo::UserAgent::Mockable::Serializer - A class that serializes Mojo transaction
 
 =head1 VERSION
 
-version 1.58
+version 1.59
 
 =head1 SYNOPSIS
 
@@ -421,11 +421,11 @@ This module does not serialize any event listeners.  This is unlikely to change 
 
 =head1 AUTHOR
 
-Kit Peters <popefelix@gmail.com>
+Kit Peters <popefelix@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Kit Peters.
+This software is copyright (c) 2022 by Kit Peters.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -5,7 +5,7 @@ use warnings;
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 #-----------------------------------------------------------------------------
 
@@ -117,10 +117,10 @@ Policies in this distro all belong to the "strictersubs" theme, so
 you can disable all of them at once using either of these methods:
 
   # In your .perlcriticrc file...
-  theme = no strictersubs
+  theme = not strictersubs
 
   # With the perlcritic command-line...
-  $> perlcritic --theme='no stricter_subs' MyModule.pm
+  $> perlcritic --theme='not stricter_subs' MyModule.pm
 
 See L<Perl::Critic/"CONFIGURATION"> section for more information about
 configuring the L<Perl::Critic|Perl::Critic> engine.
@@ -142,7 +142,7 @@ Jeffrey Ryan Thalhammer <thaljef@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007 Jeffrey Ryan Thalhammer.  All rights reserved.
+Copyright (c) 2007-2022 Jeffrey Ryan Thalhammer.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.  The full text of this license

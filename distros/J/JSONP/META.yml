@@ -27,5 +27,5 @@ requires:
   perl: '5.016'
 resources:
   repository: https://github.com/ANSI-C/JSONP.git
-version: '2.25'
+version: '2.26'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

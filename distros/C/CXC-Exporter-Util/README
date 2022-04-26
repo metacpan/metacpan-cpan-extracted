@@ -1,0 +1,126 @@
+CXC::Exporter::Util
+
+"CXC::Exporter::Util" provides tag-centric utilities for modules which
+export symbols.
+
+In this approach, %EXPORT_TAGS is the definitive source for information
+about exportable symbols and is used to generate both @EXPORT_OK and
+@EXPORT. Consolidation of symbol information in one place avoids errors
+of omission.
+
+The standard export interface provided by Perl's core Exporter (and
+emulated by others such as Exporter::Tiny) uses three structures in the
+exporting module's namespace:
+
+@EXPORT
+    Symbols in this array are automatically exported.
+
+@EXPORT_OK
+    Symbols in this array are available for export.
+
+%EXPORT_TAGS
+    This hash associates sets of symbols with tags. Exporter allows the
+    importing module to import a set of symbols by specifying a set's
+    tag rather than each of the symbols individually.
+
+  Standard Usage
+
+At it simplest, the exporting module calls "install_EXPORTS" with a
+hash:
+
+  package My::ExportingModule;
+  use CXC::Exporter::Util;
+
+  use parent 'Exporter';
+
+  install_EXPORTS( { tag => [ 'Symbol1', 'Symbol2' ] } );
+
+For more complicated setups, %EXPORT_TAGS may be specified first:
+
+  package My::ExportingModule;
+  use CXC::Exporter::Util;
+
+  use parent 'Exporter';
+  our %EXPORT_TAGS = ( tag => [ 'Symbol1', 'Symbol2' ] );
+  install_EXPORTS;
+
+  Handling Constant values
+
+CXC::Exporter::Util provides additional support for creating, organizing
+and installing constants via "install_CONSTANTS". Constants are created
+via Perl's constant pragma.
+
+"install_CONSTANTS" is passed a hash containing sets of constants
+grouped by tags, e.g.:
+
+  install_CONSTANTS( {
+        DETECTOR => {
+            ACIS => 'ACIS',
+            HRC  => 'HRC',
+        },
+
+        AGGREGATE => {
+            ALL  => 'all',
+            NONE => 'none',
+            ANY  => 'any',
+        },
+   });
+   install_EXPORTS;
+
+In addition to the constants, it generates constant functions which
+return all of the constant values in each set.
+
+For the above example, it creates constants "ACIS", "HRC", "ALL",
+"NONE", "ANY", and constant functions "DETECTORS" and "AGGREGATES" (note
+the trailing upper-case "S"). The latter are useful for generating
+enumerated types via e.g. Type::Tiny:
+
+  Enum( DETECTORS )
+
+or iterating:
+
+  say $_ for DETECTORS;
+
+The top level keys ("DETECTOR", "AGGREGATE") are transformed into tags
+by lower casing them, e.g.
+
+  $EXPORT_TAGS{detector} = [ qw( ACIS HRC ) ];
+  $EXPORT_TAGS{aggregate} = [ qw( ALL NONE ANY ) ];
+
+The constant functions are assigned the "constant_funcs" tag, e.g.
+
+  $EXPORT_TAGS{constant_funcs} = [ qw( DETECTORS AGGREGATES ) ];
+
+If the constants are used later in the module for other purposes,
+constant definition should be done in a BEGIN block:
+
+  BEGIN { install_CONSTANTS( \%CONSTANTS ) }
+
+For more complex situations, the lower level "install_constant_tag" and
+"install_constant_func" routines may be useful.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2022 by Smithsonian Astrophysical
+Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007

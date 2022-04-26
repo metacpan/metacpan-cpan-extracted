@@ -21,11 +21,19 @@ my $libpath = File::Spec->catfile('quickjs', 'libquickjs.a');
 my @libs = qw(-lm -ldl -lpthread);
 
 # RaspiOS needs this:
-if (_has_libatomic()) {
+if (_can_link_libatomic()) {
     push @libs, '-latomic';
 }
 
+if (_need_librt()) {
+    push @libs, '-lrt';
+}
+
 _tweak_for_os();
+
+if (!_stdatomic_h_exists()) {
+    _avoid_stdatomic_h();
+}
 
 make_libquickjs();
 
@@ -46,10 +54,11 @@ WriteMakefile(
 
     LIBS => "@libs",
 
-    OBJECT => [
+    OBJECT => join(
+        q< >,
         '$(BASEEXT)$(OBJ_EXT)',
         $libpath,
-    ],
+    ),
 
     META_MERGE => {
         'meta-spec' => { version => 2 },
@@ -136,7 +145,35 @@ sub _tweak_for_os {
     }
 }
 
-sub _has_libatomic {
+# In CloudLinux 6, glibc is old enough to need -lrt. Test for that.
+#
+my $_cached_need_librt;
+sub _need_librt {
+    return $_cached_need_librt if defined $_cached_need_librt;
+
+    my $dir = File::Temp::tempdir( CLEANUP => 1 );
+    open my $fh, '>', "$dir/test.c";
+    syswrite $fh, join(
+        "\n",
+        '#include <stdlib.h>',
+        '#ifdef __GLIBC__',
+        '#  if __GLIBC__ < 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 17)',
+        '#      error "This system needs librt"',
+        '#  endif',
+        '#endif',
+        'int main() { return 0; }',
+    );
+
+    print "Checking whether this system needs to link to librt …\n";
+
+    my $ok = !!system $Config{'cc'}, "$dir/test.c";
+
+    print "\t… " . ($ok ? 'Looks like it.' : 'Guess not.') . "\n";
+
+    return $_cached_need_librt = $ok;
+}
+
+sub _can_link_libatomic {
     my $dir = File::Temp::tempdir( CLEANUP => 1 );
     open my $fh, '>', "$dir/test.c";
     syswrite $fh, join(
@@ -144,13 +181,52 @@ sub _has_libatomic {
         'int main() { return 0; }',
     );
 
-    print "Checking whether this system uses libatomic …\n";
+    print "Checking whether this system can link libatomic …\n";
 
     my $ok = !system $Config{'cc'}, "$dir/test.c", '-latomic';
 
     print "\t… " . ($ok ? 'Looks like it.' : 'Guess not.') . "\n";
 
     return $ok;
+}
+
+sub _stdatomic_h_exists {
+    my $dir = File::Temp::tempdir( CLEANUP => 1 );
+    open my $fh, '>', "$dir/test.c";
+    syswrite $fh, join(
+        "\n",
+        '#include <stdatomic.h>',
+        'int main() { return 0; }',
+    );
+
+    print "Checking whether stdatomic.h exists …\n";
+
+    my $ok = !system $Config{'cc'}, "$dir/test.c";
+
+    print "\t… " . ($ok ? 'Looks like it.' : 'Guess not.') . "\n";
+
+    return $ok;
+}
+
+sub _avoid_stdatomic_h {
+    print "Tweaking QuickJS to avoid use of stdatomic.h …\n";
+
+    my $qjs_c_path = File::Spec->catfile( qw( quickjs quickjs.c ) );
+
+    my $quickjs_c = File::Slurper::read_binary($qjs_c_path);
+
+    $quickjs_c =~ s<^#define\s+CONFIG_ATOMICS></* no atomics - J::QJS */>m or do {
+        warn "Did no replace for quickjs.c?\n";
+    };
+    File::Slurper::write_binary($qjs_c_path, $quickjs_c);
+
+    my $qjs_libc_path = File::Spec->catfile( qw( quickjs quickjs-libc.c ) );
+    my $quickjs_libc_c = File::Slurper::read_binary($qjs_libc_path);
+
+    $quickjs_libc_c =~ s<^#define\s+USE_WORKER></* no atomics - J::QJS */>m or do {
+        warn "Did no replace for quickjs-libc.c?\n";
+    };
+    File::Slurper::write_binary($qjs_libc_path, $quickjs_libc_c);
 }
 
 sub make_libquickjs {
@@ -165,6 +241,15 @@ sub make_libquickjs {
     # shared library.
     #
     $make =~ s<^(\s*CFLAGS\s*=\s*)><$1 -fPIC >mg;
+
+    # In systems old enough to need -lrt (e.g., CloudLinux 6),
+    # assume we need these other omissions as well:
+    #
+    if (_need_librt()) {
+        $make =~ s<^(.*no-format-truncation)><#$1 -- J::QJS>m;
+        $make =~ s<^(CONFIG_BIGNUM)><#$1 -- J::QJS>m;
+        $make =~ s<^(CONFIG_LTO)><#$1 -- J::QJS>m;
+    }
 
     open my $fh, '>', $PERL_QJS_MAKEFILE_PATH or die "open($PERL_QJS_MAKEFILE_PATH): $!";
     syswrite $fh, $make or die "write custom quickjs make: $!";

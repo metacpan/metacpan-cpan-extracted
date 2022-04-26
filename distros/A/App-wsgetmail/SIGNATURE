@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,50 +12,48 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA256
+Hash: RIPEMD160
 
-SHA1 17e3b0eea99abffe6ac71e65627413236e0b117a COPYING
-SHA1 1605ffc8bbe1c350472e28578b7dd1babc80df42 Changes
-SHA1 3e833db77c7712e43ec35a20aad92cb1aef5fc85 INSTALL.SKIP
-SHA1 a0f09b7ea016fccf02656ee01dfb53a056757d09 MANIFEST
-SHA1 715bad41868b9c52087b3425a9d7f3065901be39 MANIFEST.SKIP
-SHA1 0daf0129be9f258b4c1ac32f371fd68ca6c9bbac META.yml
-SHA1 50f563ea7779c458a75b878bff201b723d45dd79 Makefile.PL
-SHA1 ba30546059286bf5f160e5e6cd96499dac97a4b6 README.md
-SHA1 4585c4d395c1e13fa9cf7ff5d28ab984ebd05e6e bin/wsgetmail.in
-SHA1 fe85f4bb1c9da8c8fe3c58cf37ed126771dd81af inc/Module/AutoInstall.pm
-SHA1 c3f8f9f2a209f80b7ca3c8af3a6b1b7b408ad620 inc/Module/Install.pm
-SHA1 6d0f3583ae3a240ed0d75aa436ac6b44163de8bb inc/Module/Install/AutoInstall.pm
-SHA1 de30b539a326675c42e6ad360fddb05902d621be inc/Module/Install/Base.pm
-SHA1 81fffeca82bcd7100d8435b139f0780fcc5cdf9c inc/Module/Install/Can.pm
-SHA1 b4dd9cb3cf0cb60390c575bd3405e2297d4a0b1a inc/Module/Install/Fetch.pm
-SHA1 85254e101a40b265981d7165d2b8cf0277ebfed2 inc/Module/Install/Include.pm
-SHA1 b84cf97b12f8e5ef37bea54e33ddce32dff804d1 inc/Module/Install/Makefile.pm
-SHA1 0d9fd69718198fcd1560214c4f23fcaa44f8395e inc/Module/Install/Metadata.pm
-SHA1 8d19f4485276b987b7838d4ec01909f8055a4724 inc/Module/Install/ReadmeFromPod.pm
-SHA1 78f307119470d0c85d7d6496e76fc95cb939b462 inc/Module/Install/Scripts.pm
-SHA1 13c903897bad7f0fdd7871a4a0182ff62dfbefd5 inc/Module/Install/Substitute.pm
-SHA1 99b8179fbd9e05422b161cf91abe198744188064 inc/Module/Install/Win32.pm
-SHA1 6a91e14bbecc64e9c8e2261dfa4b360641d152e4 inc/Module/Install/WriteAll.pm
-SHA1 92f1bee6997de2dd8a3d0d51afbbee15180f9567 lib/App/wsgetmail.pm
-SHA1 12353f04449f3fa8dd3f6d44938fd59874d5c4c7 lib/App/wsgetmail/MDA.pm
-SHA1 0f3eb245167eabf1939bd66d0d2308fca0848ae7 lib/App/wsgetmail/MS365.pm
-SHA1 cdde66e529632236e102aaae09739714c252ab98 lib/App/wsgetmail/MS365/Client.pm
-SHA1 0b63bd1314074f9c01352bde47747e676278e7d6 lib/App/wsgetmail/MS365/Message.pm
-SHA1 d738844cb315f84d5438696b6be02c22797f2979 t/00-load.t
-SHA1 0b857e8d4f9442523c73509a7610a3211c9cebbc t/basic.t
-SHA1 e015ef6819b6005d1bff11b4436a4adc590c25ce t/manifest.t
-SHA1 ce5b8c9e0f9c5459efcec91fb141184d5362207b t/mock_responses/messages.json
-SHA1 944a1ef8c5d4e3c36d0ad7094504afc08244ca7e t/pod-coverage.t
-SHA1 6d6ee1e914426c6c5e16f4487578c610f0cdbce6 t/pod.t
+SHA256 1b2a567f289f66a143c56353e7b3d4fa5862514a5e3c5cfdf8b02ee5e5aaa953 COPYING
+SHA256 49072ad975d22dc82fc595e303944ad5c4641d68af2da15138ed21573d15ed64 Changes
+SHA256 5623738f052c5102090bb926c4bd67f1fc607f8c86fa3c81cb7458abfb10334a MANIFEST
+SHA256 f9a816274b7cc8689656327397eafd83cd745a5697b2db81deaec1d1b3742006 MANIFEST.SKIP
+SHA256 fbcd8387f74f4e8f8aed78b7410dd04626c6d8846d0f1bca4e5350d5722b25d8 META.yml
+SHA256 e03d191f441aa38c88f7d440537f8d8b3b68b167becfd8efb51fef5d029c9913 Makefile.PL
+SHA256 26b16d481c5a05b6ded12da5a3ae348d0ce1edf40e63da9a1a6b3c60c5160ff8 README.md
+SHA256 122e0bdb540c1817a7e18e90387640f369e74f63549cb401bd194b1974426f56 bin/wsgetmail
+SHA256 7fe8013fad8ecb0b9ef8bad3fd7287486c1c61c776f76beb7d9d24e06ee3ab44 inc/Module/AutoInstall.pm
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 1e48ae2cb24e1d16193d476e735579dfcd0eefb3685921ad4736390df75d939b inc/Module/Install/AutoInstall.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a97bf661b739643c3adee064addf7a85f22e25e1bbffc137974cd8754ffa5c66 inc/Module/Install/Include.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 751bc4e2f98074c05c9e23d484f2406cef042099664b6c87a73d6530bbeda427 inc/Module/Install/Scripts.pm
+SHA256 9f50489182b83fb275494764918038d1f176067f32bd59bad7b912cc6d29cacb inc/Module/Install/Substitute.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 b0bc0fbae542ba3401116db0a2ee8bd6998de25a39bc285e8f421dfaf8b7c906 lib/App/wsgetmail.pm
+SHA256 d991da77977733d69e750d7c58dc86d01d07a8bfb2bc7cb68f2511eba7cef083 lib/App/wsgetmail/MDA.pm
+SHA256 fd698a9f345f5af119777ac439970e50cce0dd6f45fede5f3149725bfc847e97 lib/App/wsgetmail/MS365.pm
+SHA256 7ebbc25dedd3fc9bc4512d5156129e7c7aac581139a86f835ed41aed271195c1 lib/App/wsgetmail/MS365/Client.pm
+SHA256 c041de5a8c5c0b953b0f6cfc21bb85095d5bd46fdcba8cf8faf492144d866024 lib/App/wsgetmail/MS365/Message.pm
+SHA256 6917cf9f89856924912fcbce64b50329a1252886e338c75ae410b1e5ccb83e0c t/00-load.t
+SHA256 aa30da9a848d9d8e16601ede28e170282eab05c0676eedad1642ca616c850d6c t/basic.t
+SHA256 c86e4888895e5927042e3206898001644880b3fb272cc41fd9c57bcba4b766aa t/manifest.t
+SHA256 14f11334fcaaa349614cc327babada44d28fa64ce64fd4244c4f627cfd17e92f t/mock_responses/messages.json
+SHA256 3b39fcec173541bccdfcbbd3178258710cfab7417698d8105fe81a1fd835ec30 t/pod-coverage.t
+SHA256 00b03a9792c4037d124e023edf2ee91cf85eb9470a670cad0b4d07bc316eb17a t/pod.t
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEFelFwSnB+u9xCpouFedxUadmpRQFAmH0V3UACgkQFedxUadm
-pRQ0AAgApPwyEhO4vExYNLHN1qMeY5IGlx5IjCqa0dpjp3+/j3qMfyvRJv/ObZCl
-PvQl94dWeZ2pg0bSrz7pf9mFFIqFYhkkfLCJJlvPu8ZikIb4ut097q8VJsYdyR6I
-UAm5O77fdDtjIYN4Jw2lbwjorZNMCFc3jpPoZxxWUaeoRp8EUjyjgpwdhr38nwPy
-bfrKIBk68fnR+ujqa+d2J6KNerFujlJBNSJLMecizDwzzIrZMXTzQwVTcXWm7GvD
-DqHNb/pfkmbSaZCZvlHmwiDk1QJ4St7L68L6uOsOPvkBDqzNCTf3mOdDx3UUJ02l
-9zR75FfP36CQWbb87W3eJsoDM56spw==
-=t151
+iQEcBAEBAwAGBQJiYw/4AAoJEA3wooP+rICysKwH/1KiSEdMS1T8w9q5c7ge+nuo
+0Nx/J6f8veDt/o/WZdqFs9OAfc/0WbLxfacHpvlqpW8E3R34BIv/Cq/ylME7dsuG
+58NGcyBvYh10niMqSfEzlAx5zVAtoRdozku/5j+Cbb8+eFSyizmmo67Q0LCBIJA8
+6M/C42st0a2xf3WuscL0sbABCVcJ21I1/tXm/y1Zijqu1hMxQxSQBiAvqiRpE+WJ
+4HKWorG6du0vmq21X32dU/6w6xDQFzeBSh7Yt4oGzGF/Z9f3SFaP/yaDGLJVx2Mu
+X38ijHX/LSJV/L3Z/MLkTTyzuaEMIZ9+f8ekmt/JpbRq+mE/Le5jPKsJ/h72DLQ=
+=HGTB
 -----END PGP SIGNATURE-----

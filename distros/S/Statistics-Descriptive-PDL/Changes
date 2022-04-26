@@ -1,5 +1,18 @@
 Revision history for Statistics-Descriptive-PDL
 
+0.16    2022-04-25
+        - SampleWeighted:
+          - Return undef for skewness and kurtosis
+            when insufficient samples to apply correction.
+        - Avoid method call on scalar in weighted geometric mean 
+
+0.15    2022-04-24
+        - Fix weighted geometric_mean for larger data samples
+          (but properly this time and with a better test)
+
+0.14    2022-04-24
+        - Fix weighted geometric_mean for larger data samples
+
 0.13    2022-01-31
         - Remove niceslice syntax to avoid possible parsing issues.
 

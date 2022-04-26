@@ -1,0 +1,60 @@
+{
+   "abstract" : "Perl module to query the UK's Vehicle Enquiry Service API",
+   "author" : [
+      "Ian Gibbs <igibbs@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "UK-Vehicle",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Tiny" : "0",
+            "DateTime" : "0",
+            "HTTP::Request" : "0",
+            "JSON" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "Mozilla::CA" : "0",
+            "Scalar::Util" : "0",
+            "Try::Tiny" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Config::Tiny" : "0",
+            "DateTime" : "0",
+            "JSON" : "0",
+            "Test2::Tools::Exception" : "0",
+            "Test::More" : "0.88",
+            "Test::Pod" : "1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.4",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

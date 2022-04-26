@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder::SubAttributes 0.06;
+package Commandable::Finder::SubAttributes 0.07;
 
 use v5.14;
 use warnings;
@@ -136,6 +136,14 @@ Optional. Gives the name prefix to use to filter for subs that actually
 provide a command, and to strip off to find the name of the command. Default
 C<command_>.
 
+=item underscore_to_hyphen => BOOL
+
+Optional. If true, sub names that contain underscores will be converted into
+hyphens. This is often useful in CLI systems, allowing commands to be typed
+with hyphenated names (e.g. "get-thing") while the Perl sub that implements it
+is named with an underscores (e.g. "command_get_thing"). Defaults true, but
+can be disabled by passing a defined-but-false value such as C<0> or C<''>.
+
 =back
 
 =cut
@@ -151,10 +159,12 @@ sub new
    my $package = $args{package} or croak "Require 'packaage'";
 
    my $name_prefix = $args{name_prefix} // "command_";
+   my $conv_under = $args{underscore_to_hyphen} // 1;
 
    return bless {
       package     => $package,
       name_prefix => $name_prefix,
+      conv_under  => $conv_under,
    }, $class;
 }
 
@@ -212,6 +222,7 @@ sub _commands
       my $code = $subs{$subname};
 
       my $name = $subname =~ s/^$prefix//r;
+      $name =~ s/_/-/g if $self->{conv_under};
 
       my $args;
       if( $args = Attribute::Storage::get_subattr( $code, "Command_arg" ) ) {

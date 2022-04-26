@@ -52,7 +52,7 @@
             "Type::Utils" : "0.44",
             "Types::Standard" : "0",
             "namespace::autoclean" : "0",
-            "perl" : "v5.8.0",
+            "perl" : "v5.10.0",
             "version" : "0.77"
          }
       },
@@ -75,11 +75,11 @@
    "provides" : {
       "Types::SQL" : {
          "file" : "lib/Types/SQL.pm",
-         "version" : "v0.4.1"
+         "version" : "v0.6.0"
       },
       "Types::SQL::Util" : {
          "file" : "lib/Types/SQL/Util.pm",
-         "version" : "v0.4.1"
+         "version" : "v0.6.0"
       }
    },
    "release_status" : "stable",
@@ -93,7 +93,7 @@
          "web" : "https://github.com/robrwo/Types-SQL"
       }
    },
-   "version" : "v0.4.1",
+   "version" : "v0.6.0",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Slaven Rezi\u0107 <slaven@rezic.de>"

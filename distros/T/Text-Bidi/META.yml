@@ -15,7 +15,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 keywords:
   - Bidi
   - RTL
@@ -33,22 +33,22 @@ no_index:
 provides:
   Text::Bidi:
     file: lib/Text/Bidi.pm
-    version: '2.15'
+    version: '2.16'
   Text::Bidi::Array:
     file: lib/Text/Bidi/Array.pm
-    version: '2.15'
+    version: '2.16'
   Text::Bidi::Array::Byte:
     file: lib/Text/Bidi/Array/Byte.pm
-    version: '2.15'
+    version: '2.16'
   Text::Bidi::Array::Long:
     file: lib/Text/Bidi/Array/Long.pm
-    version: '2.15'
+    version: '2.16'
   Text::Bidi::Constants:
     file: lib/Text/Bidi/Constants.pm
-    version: '2.15'
+    version: '2.16'
   Text::Bidi::Paragraph:
     file: lib/Text/Bidi/Paragraph.pm
-    version: '2.15'
+    version: '2.16'
 requires:
   Carp: '0'
   DynaLoader: '0'
@@ -67,5 +67,7 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Text-Bidi
   homepage: https://github.com/mkamensky/Text-Bidi
   repository: https://github.com/mkamensky/Text-Bidi.git
-version: '2.15'
+version: '2.16'
+x_generated_by_perl: v5.34.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

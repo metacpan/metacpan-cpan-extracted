@@ -11,6 +11,7 @@
 #include "wasm3.h"
 #include "m3_code.h"
 #include "m3_compile.h"
+#include "m3_api_wasi.h"
 
 d_m3BeginExternC
 
@@ -58,7 +59,8 @@ typedef struct M3Global
 
     union
     {
-        i64 intValue;
+        i32 i32Value;
+        i64 i64Value;
 #if d_m3HasFloat
         f64 f64Value;
         f32 f32Value;
@@ -116,6 +118,8 @@ typedef struct M3Module
     //bool                    hasWasmCodeCopy;
 
     struct M3Module *       next;
+
+    m3_wasi_context_t*      wasi;
 }
 M3Module;
 

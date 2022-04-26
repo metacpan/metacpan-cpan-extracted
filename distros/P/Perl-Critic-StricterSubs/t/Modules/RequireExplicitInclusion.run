@@ -7,11 +7,12 @@
 
 ## ----- Perl::Critic::Policy::Modules::RequireExplicitInclusion [ 2.0 ] -----
 ## name Qualified function from package that *is not* explicitly included
-## failures 6
+## failures 7
 ## cut
 
 package main;
 
+Foo::;                 #Disambiguated class name
 Foo::foo;              #No parens
 Foo::foo();            #No args
 Foo::foo( 'quux' );    #With args
@@ -260,6 +261,18 @@ __PACKAGE__->foo();
 __PACKAGE__::foo();
 &__PACKAGE__::foo();
 $__PACKAGE__::bar;
+
+## name Allow disambiguated class names
+## failures 0
+## cut
+
+use Foo::Bar;
+Foo::Bar::->test();
+
+## name Allow calling functions in the utf8 module without including it
+## failures 0
+## cut
+utf8::is_utf8("abc");
 
 ##############################################################################
 # Local Variables:

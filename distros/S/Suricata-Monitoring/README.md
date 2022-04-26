@@ -8,7 +8,11 @@ For LibreNMS, this should be set up to run from cron and as a snmp extend.
 
 cron...
 
-`*/5 * * * * /usr/local/bin/suricata_stat_check`
+`*/5 * * * * /usr/local/bin/suricata_stat_check > /dev/null`
+
+snmpd...
+
+`extend suricata-stats /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin suricata_stat_check -c`
 
 ## SYNOPSIS
 
@@ -26,6 +30,8 @@ suricata_stats_check B<-m> manual B<-1> <manual>  [B<-d> <drop percent warn>]
 [B<-r> <error percent warn>] [B<-r> <error percent crit>] [B<-2> <manual>] [B<-3> <manual>]
 [B<-4> <manual>] [B<-5> <manual>] [B<-6> <manual>] [B<-7> <manual>]
 [B<-8> <manual>] [B<-9> <manual>] [B<-0> <manual>]
+
+suricata_stats_check -c
 ```
 
 ## Flags

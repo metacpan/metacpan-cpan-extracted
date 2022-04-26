@@ -31,7 +31,7 @@ Archive::SevenZip - Read/write 7z , zip , ISO9960 and other archives
 
 =cut
 
-our $VERSION= '0.12';
+our $VERSION= '0.13';
 
 # Archive::Zip API
 # Error codes
@@ -109,7 +109,7 @@ sub find_7z_executable {
     my $found;
     if( $ENV{PERL_ARCHIVE_SEVENZIP_BIN}) {
         $class_defaults{'7zip'} = $ENV{PERL_ARCHIVE_SEVENZIP_BIN};
-        $found = $class_defaults{'7zip'};
+        $found = $class->version || "7zip not found via environment '($ENV{PERL_ARCHIVE_SEVENZIP_BIN})'";
     } else {
         my @search;
         push @search, split /$envsep/, $ENV{PATH};
@@ -288,16 +288,21 @@ sub list {
 
     # Split entries
     my %entry_info;
-    while( @output ) {
-        my $line = shift @output;
+    for my $line (@output ) {
         if( $line =~ /^([\w ]+) =(?: (.*?)|)\s*$/ ) {
             $entry_info{ $1 } = $2;
         } elsif($line =~ /^\s*$/) {
-            push @members, Archive::SevenZip::Entry->new(
-                %entry_info,
-                _Container => $self,
-            );
+            if( $entry_info{ 'Path' }) {
+                push @members, Archive::SevenZip::Entry->new(
+                    %entry_info,
+                    _Container => $self,
+                );
+            };
             %entry_info = ();
+        } elsif( $line =~ /^Warnings: \d+\s+/) {
+            # ignore
+            # use Data::Dumper; warn Dumper \@output;
+            # croak "Unknown file entry [$line]";
         } else {
             croak "Unknown file entry [$line]";
         };

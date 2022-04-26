@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: MIDI Utilities
 
-our $VERSION = '0.0902';
+our $VERSION = '0.1002';
 
 use strict;
 use warnings;
@@ -17,9 +17,10 @@ our @EXPORT = qw(
     midi_dump
     midi_format
     set_chan_patch
-    set_time_sig
+    set_time_signature
     setup_score
     dura_size
+    ticks
 );
 
 use constant TICKS => 96;
@@ -39,7 +40,7 @@ sub setup_score {
 
     my $score = MIDI::Simple->new_score();
 
-    set_time_sig($score, $args{signature});
+    set_time_signature($score, $args{signature});
 
     $score->set_tempo( bpm_to_ms($args{bpm}) * 1000 );
 
@@ -190,7 +191,7 @@ sub midi_format {
 }
 
 
-sub set_time_sig {
+sub set_time_signature {
     my ($score, $signature) = @_;
     my ($beats, $divisions) = split /\//, $signature;
     $score->time_signature(
@@ -215,6 +216,12 @@ sub dura_size {
     return $size;
 }
 
+
+sub ticks {
+    my ($score) = @_;
+    return ${ $score->{Tempo} };
+}
+
 1;
 
 __END__
@@ -229,11 +236,11 @@ MIDI::Util - MIDI Utilities
 
 =head1 VERSION
 
-version 0.0902
+version 0.1002
 
 =head1 SYNOPSIS
 
-  use MIDI::Util qw(midi_dump midi_format set_chan_patch set_time_sig setup_score);
+  use MIDI::Util qw(midi_dump midi_format set_chan_patch set_time_signature setup_score);
 
   my $dump = midi_dump('volume'); # length, etc.
   print Dumper $dump;
@@ -242,14 +249,17 @@ version 0.0902
 
   my $score = setup_score( bpm => 120, etc => '...', );
 
-  set_time_sig( $score, '5/4' );
+  my $ticks = ticks($score);
+  my $half = 'd' . ( $size / 2 * $ticks );
+
+  set_time_signature( $score, '5/4' );
 
   set_chan_patch( $score, 0, 1 );
 
   my @notes = midi_format('C','C#','Db','D'); # C, Cs, Df, D
 
-  $score->n('wn', @notes);         # MIDI::Simple functionality
-  $score->write_score('some.mid'); # MIDI::Simple functionality
+  $score->n( $half, @notes );      # MIDI::Simple functionality
+  $score->write_score('some.mid'); # "
 
 =head1 DESCRIPTION
 
@@ -331,9 +341,9 @@ L<MIDI::Simple>, and L<MIDI::Event> internal lists:
 Change sharp C<#> and flat C<b>, in the list of named notes, to the
 L<MIDI::Simple> C<s> and C<f> respectively.
 
-=head2 set_time_sig
+=head2 set_time_signature
 
-  set_time_sig( $score, $signature );
+  set_time_signature( $score, $signature );
 
 Set the B<score> C<time_signature> based on the given string.
 
@@ -347,6 +357,12 @@ value (e.g. C<hn>, C<ten>) or number of ticks (if given as C<d###>).
 
 If a B<ppqn> value is not given, we use the MIDI::Simple value of
 C<96> ticks.
+
+=head2 ticks
+
+  $ticks = ticks($score);
+
+Return the B<score> ticks.
 
 =head1 SEE ALSO
 
@@ -364,7 +380,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

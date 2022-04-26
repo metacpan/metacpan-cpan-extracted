@@ -9,6 +9,9 @@ lib/Perl/Critic/StricterSubs.pm
 lib/Perl/Critic/StricterSubs/Utils.pm
 LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/20_policies.t
 t/Modules/RequireExplicitInclusion.run
 t/Subroutines/ProhibitCallsToUndeclaredSubs.run
@@ -25,6 +28,3 @@ xt/author/94_includes.t
 xt/author/95_kwalitee.t
 xt/author/98_pod_syntax.t
 xt/author/99_pod_coverage.t
-README
-META.yml
-META.json

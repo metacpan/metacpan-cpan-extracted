@@ -1,5 +1,9 @@
 Revision history for List-Util-MaybeXS
 
+1.500011 - 2022-04-25
+  - uniqnum: fix handling of all numbers by checking how they are stored,
+    rather than trying to detect it.
+
 1.500010 - 2022-04-20
   - uniqnum: fix handling numbers near the max unsigned int on some systems
     where packing as a float gives different values when their decimal value

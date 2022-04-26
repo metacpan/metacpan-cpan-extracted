@@ -11,6 +11,7 @@ use FileHandle;
 use File::Spec;
 
 use Test::More tests => 2;
+use lib '.';
 BEGIN {
 if( ! eval {
     require t::common;

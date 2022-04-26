@@ -1,5 +1,14 @@
 Revision history for MIDI-Util
 
+0.1002 2022-04-23 12:07:38
+    - Rename set_time_sig to set_time_signature.
+
+0.1001 2022-04-21 08:25:47
+    - Improve SYNOPSIS.
+
+0.1000 2022-04-21 08:14:01
+    - Add the ticks() function.
+
 0.0902 2021-04-14 15:07:26
     - Add ppqn handling to dura_size().
 

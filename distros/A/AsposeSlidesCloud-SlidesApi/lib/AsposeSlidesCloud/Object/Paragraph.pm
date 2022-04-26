@@ -38,6 +38,7 @@ use Date::Parse;
 use DateTime;
 
 use AsposeSlidesCloud::Object::Portion;
+use AsposeSlidesCloud::Object::PortionFormat;
 use AsposeSlidesCloud::Object::ResourceBase;
 use AsposeSlidesCloud::Object::ResourceUri;
 
@@ -332,6 +333,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'default_portion_format' => {
+    	datatype => 'PortionFormat',
+    	base_name => 'DefaultPortionFormat',
+    	description => 'Default portion format.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -356,7 +364,8 @@ __PACKAGE__->swagger_types( {
     'east_asian_line_break' => 'string',
     'latin_line_break' => 'string',
     'right_to_left' => 'string',
-    'portion_list' => 'ARRAY[Portion]'
+    'portion_list' => 'ARRAY[Portion]',
+    'default_portion_format' => 'PortionFormat'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -381,7 +390,8 @@ __PACKAGE__->attribute_map( {
     'east_asian_line_break' => 'EastAsianLineBreak',
     'latin_line_break' => 'LatinLineBreak',
     'right_to_left' => 'RightToLeft',
-    'portion_list' => 'PortionList'
+    'portion_list' => 'PortionList',
+    'default_portion_format' => 'DefaultPortionFormat'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

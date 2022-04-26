@@ -1,0 +1,41 @@
+---
+abstract: 'Simple Template Toolkit plugin interfacing to the CGI.pm module'
+author:
+  - 'Andy Wardley'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::Bundle::Extended: '0'
+  Test2::Plugin::NoWarnings: '0'
+  Test2::Suite: '0'
+  Test2::Tools::Explain: '0'
+  Test::Builder: '0'
+  Test::CPAN::Meta: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Template-Plugin-CGI
+provides:
+  Template::Plugin::CGI:
+    file: lib/Template/Plugin/CGI.pm
+    version: '3.100'
+requires:
+  CGI: '4.44'
+resources:
+  bugtracker: https://github.com/xsawyerx/template-plugin-cgi/issues
+  homepage: http://template-toolkit.org
+  repository: git://github.com/xsawyerx/template-plugin-cgi.git
+version: '3.100'
+x_authority: cpan:TODDR
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: MIT

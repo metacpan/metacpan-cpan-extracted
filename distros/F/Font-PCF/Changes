@@ -1,0 +1,19 @@
+Revision history for Font-PCF
+
+0.03    2022-04-21
+        [CHANGES]
+         * More details on printed output of examples/show-glyph
+
+        [BUGFIXES]
+         * Quiet the `:experimental(init_expr)` warning of Object::Pad 0.64
+         * Fix examples/show-glyph for shift @ARGV
+
+0.02    2022-01-29
+        [CHANGES]
+         * Use Object::Pad and perl 5.26 signatures
+         * Use Syntax::Keyword::Match
+         * Drop Struct::Dumb
+         * Added a simple example script
+
+0.01    2019-11-09
+        First version, released on an unsuspecting world.

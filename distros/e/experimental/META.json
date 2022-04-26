@@ -45,7 +45,7 @@
    "provides" : {
       "experimental" : {
          "file" : "lib/experimental.pm",
-         "version" : "0.027"
+         "version" : "0.028"
       }
    },
    "release_status" : "stable",
@@ -60,7 +60,7 @@
          "web" : "https://github.com/Dual-Life/experimental"
       }
    },
-   "version" : "0.027",
+   "version" : "0.028",
    "x_contributors" : [
       "brian greenfield <0briang0@gmail.com>",
       "Dagfinn Ilmari Manns\u00e5ker <ilmari@ilmari.org>",
@@ -72,8 +72,8 @@
       "Ricardo Signes <rjbs@cpan.org>",
       "Sawyer X <xsawyerx@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.32.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

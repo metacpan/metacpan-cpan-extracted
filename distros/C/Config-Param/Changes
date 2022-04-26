@@ -1,5 +1,14 @@
 =head1 Revision history for Config-Param
 
+=item * B<4.000004> (2022-04-25)
+
+=over 2
+
+=item - avoid warnings for Data::Dumper usage
+(when packing the module in a script)
+
+=back
+
 =item * B<4.000003> (2022-04-21)
 
 =over 2

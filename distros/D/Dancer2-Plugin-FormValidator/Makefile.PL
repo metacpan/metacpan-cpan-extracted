@@ -32,6 +32,7 @@ my %WriteMakefileArgs = (
     "Storable" => 0,
     "Types::Common::String" => 0,
     "Types::Standard" => 0,
+    "constant" => 0,
     "namespace::clean" => 0,
     "utf8" => 0
   },
@@ -48,7 +49,7 @@ my %WriteMakefileArgs = (
     "utf8::all" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.61",
+  "VERSION" => "0.80",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -79,6 +80,7 @@ my %FallbackPrereqs = (
   "Types::Common::String" => 0,
   "Types::Standard" => 0,
   "URI::Escape" => 0,
+  "constant" => 0,
   "namespace::clean" => 0,
   "strict" => 0,
   "utf8" => 0,

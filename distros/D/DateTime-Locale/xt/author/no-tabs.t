@@ -830,6 +830,7 @@ my @files = (
     't/register_from_data.t',
     't/script.t',
     't/storable.t',
+    't/taint.t',
     't/version-check.t',
     't/zzz-check-breaks.t'
 );

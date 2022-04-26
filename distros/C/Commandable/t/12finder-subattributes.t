@@ -27,6 +27,12 @@ package MyTest::Commands {
    {
       # command
    }
+
+   sub command_with_hyphen
+      :Command_description("command with hpyhenated name")
+   {
+      # command
+   }
 }
 
 my $finder = Commandable::Finder::SubAttributes->new(
@@ -37,7 +43,7 @@ my $finder = Commandable::Finder::SubAttributes->new(
 {
 
    is_deeply( [ sort map { $_->name } $finder->find_commands ],
-      [qw( help one two )],
+      [qw( help one two with-hyphen )],
       '$finder->find_commmands' );
 }
 

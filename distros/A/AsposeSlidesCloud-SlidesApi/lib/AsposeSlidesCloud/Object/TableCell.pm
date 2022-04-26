@@ -289,6 +289,20 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'column_index' => {
+    	datatype => 'int',
+    	base_name => 'ColumnIndex',
+    	description => 'Cell column index',
+    	format => '',
+    	read_only => '',
+    		},
+    'row_index' => {
+    	datatype => 'int',
+    	base_name => 'RowIndex',
+    	description => 'Cell row index',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -307,7 +321,9 @@ __PACKAGE__->swagger_types( {
     'border_left' => 'LineFormat',
     'border_bottom' => 'LineFormat',
     'border_diagonal_up' => 'LineFormat',
-    'border_diagonal_down' => 'LineFormat'
+    'border_diagonal_down' => 'LineFormat',
+    'column_index' => 'int',
+    'row_index' => 'int'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -326,7 +342,9 @@ __PACKAGE__->attribute_map( {
     'border_left' => 'BorderLeft',
     'border_bottom' => 'BorderBottom',
     'border_diagonal_up' => 'BorderDiagonalUp',
-    'border_diagonal_down' => 'BorderDiagonalDown'
+    'border_diagonal_down' => 'BorderDiagonalDown',
+    'column_index' => 'ColumnIndex',
+    'row_index' => 'RowIndex'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

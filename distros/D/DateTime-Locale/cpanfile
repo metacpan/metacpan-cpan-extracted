@@ -24,6 +24,7 @@ on 'test' => sub {
   requires "File::Temp" => "0";
   requires "IPC::System::Simple" => "0";
   requires "Path::Tiny" => "0";
+  requires "Scalar::Util" => "0";
   requires "Test2::Plugin::NoWarnings" => "0";
   requires "Test2::Plugin::UTF8" => "0";
   requires "Test2::Require::Module" => "0";

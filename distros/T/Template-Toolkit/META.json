@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Template-Toolkit",
    "no_index" : {
@@ -40,7 +40,6 @@
       },
       "test" : {
          "requires" : {
-            "CGI" : "4.11",
             "Test::LeakTrace" : "0"
          }
       }
@@ -57,5 +56,5 @@
          "web" : "https://github.com/abw/Template2"
       }
    },
-   "version" : "3.010"
+   "version" : "3.100"
 }

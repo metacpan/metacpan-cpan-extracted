@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::OpenAPI;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema OpenAPI vocabulary
 
-our $VERSION = '0.025';
+our $VERSION = '0.026';
 
 use 5.020;
 use Moo;
@@ -117,7 +117,7 @@ JSON::Schema::Modern::Vocabulary::OpenAPI - Implementation of the JSON Schema Op
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 DESCRIPTION
 
@@ -131,6 +131,44 @@ L<https://spec.openapis.org/oas/v3.1.0#schema-object>.
 
 This vocabulary is normally made available by using the metaschema
 L<https://spec.openapis.org/oas/3.1/dialect/base>.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Mojolicious::Plugin::OpenAPI::Modern>
+
+=item *
+
+L<OpenAPI::Modern>
+
+=item *
+
+L<JSON::Schema::Modern::Document::OpenAPI>
+
+=item *
+
+L<JSON::Schema::Modern>
+
+=item *
+
+L<https://json-schema.org>
+
+=item *
+
+L<https://www.openapis.org/>
+
+=item *
+
+L<https://oai.github.io/Documentation/>
+
+=item *
+
+L<https://spec.openapis.org/oas/v3.1.0>
+
+=back
 
 =head1 SUPPORT
 

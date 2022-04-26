@@ -102,6 +102,8 @@ SPVM_ENV_RUNTIME* SPVM_API_RUNTIME_new_env() {
     SPVM_API_RUNTIME_prepare,
     SPVM_API_RUNTIME_get_opcodes,
     SPVM_API_RUNTIME_get_opcodes_length,
+    SPVM_API_RUNTIME_get_spvm_32bit_codes,
+    SPVM_API_RUNTIME_get_spvm_32bit_codes_length,
     SPVM_API_RUNTIME_get_classes_length,
     SPVM_API_RUNTIME_get_constant_string_id,
     SPVM_API_RUNTIME_get_constant_string_value,
@@ -175,6 +177,8 @@ SPVM_ENV_RUNTIME* SPVM_API_RUNTIME_new_env() {
     (void*)(intptr_t)offsetof(SPVM_OBJECT, type_dimension), // object_type_dimension_offset
     (void*)(intptr_t)offsetof(SPVM_OBJECT, flag), // object_flag_offset
     (void*)(intptr_t)offsetof(SPVM_OBJECT, length), // object_length_offset
+    SPVM_API_RUNTIME_get_allocator,
+    SPVM_API_RUNTIME_build,
   };
   SPVM_ENV_RUNTIME* env_runtime = calloc(1, sizeof(env_runtime_init));
   memcpy(env_runtime, env_runtime_init, sizeof(env_runtime_init));
@@ -211,6 +215,16 @@ int32_t SPVM_API_RUNTIME_get_opcodes_length(SPVM_RUNTIME* runtime) {
 int32_t SPVM_API_RUNTIME_get_classes_length(SPVM_RUNTIME* runtime) {
   
   return runtime->classes_length;
+}
+
+int32_t* SPVM_API_RUNTIME_get_spvm_32bit_codes(SPVM_RUNTIME* runtime) {
+
+  return runtime->spvm_32bit_codes;
+}
+
+int32_t SPVM_API_RUNTIME_get_spvm_32bit_codes_length(SPVM_RUNTIME* runtime) {
+  
+  return runtime->spvm_32bit_codes_length;
 }
 
 const char* SPVM_API_RUNTIME_get_name(SPVM_RUNTIME* runtime, int32_t constant_string_id) {
@@ -971,13 +985,13 @@ int32_t SPVM_API_RUNTIME_get_method_is_native(SPVM_RUNTIME* runtime, int32_t met
   
   SPVM_RUNTIME_METHOD* method = SPVM_API_RUNTIME_get_method(runtime, method_id);
   
-  return method->flag & SPVM_METHOD_C_FLAG_NATIVE;
+  return method->is_native;
 }
 
 int32_t SPVM_API_RUNTIME_get_method_is_precompile(SPVM_RUNTIME* runtime, int32_t method_id) {
   
   SPVM_RUNTIME_METHOD* method = SPVM_API_RUNTIME_get_method(runtime, method_id);
-  return method->flag & SPVM_METHOD_C_FLAG_PRECOMPILE;
+  return method->is_precompile;
 }
 
 int32_t SPVM_API_RUNTIME_get_method_signature_id(SPVM_RUNTIME* runtime, int32_t method_id) {
@@ -1211,9 +1225,9 @@ int32_t SPVM_API_RUNTIME_has_interface_by_id(SPVM_RUNTIME* runtime, int32_t obje
     return 1;
   }
   
-  for (int32_t i = 0; i < class->interface_classes_length; i++) {
-    int32_t must_interface_class_id = class->interface_classes_base_id + i;
-    if (must_interface_class_id == interface->id) {
+  for (int32_t i = 0; i < class->interfaces_length; i++) {
+    int32_t must_interface_id = class->interfaces_base_id + i;
+    if (must_interface_id == interface->id) {
       return 1;
     }
   }
@@ -1248,7 +1262,7 @@ int32_t SPVM_API_RUNTIME_has_callback_by_id(SPVM_RUNTIME* runtime, int32_t objec
   SPVM_RUNTIME_CLASS* callback = SPVM_API_RUNTIME_get_class(runtime, callback_basic_type->class_id);
   
   // Class which have only anon sub
-  if (class->flag & SPVM_CLASS_C_FLAG_ANON_METHOD_CLASS) {
+  if (class->is_anon) {
     assert(class->methods_length == 1);
     assert(callback->methods_length == 1);
     SPVM_RUNTIME_METHOD* found_method = SPVM_API_RUNTIME_get_method(runtime, class->methods_base_id + 0);
@@ -1285,4 +1299,12 @@ int32_t SPVM_API_RUNTIME_has_callback_by_id(SPVM_RUNTIME* runtime, int32_t objec
   }
   
   return has_callback;
+}
+
+SPVM_ALLOCATOR* SPVM_API_RUNTIME_get_allocator(SPVM_RUNTIME* runtime) {
+  return SPVM_RUNTIME_get_allocator(runtime);
+}
+
+void SPVM_API_RUNTIME_build(SPVM_RUNTIME* runtime, int32_t* spvm_32bit_codes) {
+  SPVM_RUNTIME_build(runtime, spvm_32bit_codes);
 }

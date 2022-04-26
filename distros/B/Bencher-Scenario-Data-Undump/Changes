@@ -1,0 +1,15 @@
+0.003   2022-03-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename dist Bencher-Scenario-Data{,-}Undump.
+
+
+0.002   2019-09-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Add dataset: array10mixed.
+
+	- Mention reddit link.
+
+
+0.001   2019-09-06  Released-By: PERLANCAR
+
+        - First release.

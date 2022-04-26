@@ -1,3 +1,4 @@
+#!perl
 require 5.006;
 use ExtUtils::MakeMaker;
 
@@ -68,11 +69,19 @@ WriteMakefile(
     },
     MIN_PERL_VERSION => "5.6.0",
     VERSION_FROM => 'lib/Devel/CheckOS.pm',
+    CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker' => 6.64, # TEST_REQUIRES (CONFIGURE_REQUIRES is in 6.52; BUILD_REQUIRES in 6.56)
+    },
     PREREQ_PM    => {
-        'Test::Warnings'   => 0,
-        'Test::More'       => 0.88, # done_testing
         'File::Find::Rule' => 0.28,
         'File::Temp'       => 0.19,
+        'Test::More'       => 0.88, # done_testing
+        'Test::Warnings'   => 0,    # listed here as well as in TEST_REQUIRES in case we've got a Ye Olde Toolchaine
+                                    # and not even the CONFIGURE_REQUIRES above is understood
+    },
+    TEST_REQUIRES => {
+        'Test::More'       => 0.88,
+        'Test::Warnings'   => 0,
     },
     EXE_FILES    => [qw(
         bin/use-devel-assertos

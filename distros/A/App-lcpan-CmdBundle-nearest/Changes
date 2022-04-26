@@ -1,10 +1,15 @@
-0.002   2017-01-20 (PERLANCAR)
+0.003   2022-03-27  Released-By: PERLANCAR; Urgency: medium
+
+        - Update to newer App::lcpan (table 'dist' was removed).
+
+
+0.002   2017-01-20  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [dist] Use Pod::Weaver plugin PWP:App::lcpan.
 
 
-0.001   2017-01-17 (PERLANCAR)
+0.001   2017-01-17  Released-By: PERLANCAR
 
         - First version.

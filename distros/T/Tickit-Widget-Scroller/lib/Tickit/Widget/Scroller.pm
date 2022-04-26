@@ -6,7 +6,7 @@
 use v5.26; # signatures
 use Object::Pad 0.57;
 
-package Tickit::Widget::Scroller 0.27;
+package Tickit::Widget::Scroller 0.28;
 class Tickit::Widget::Scroller
    :isa(Tickit::Widget);
 

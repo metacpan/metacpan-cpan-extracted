@@ -46,7 +46,7 @@ use PPI::Token::Symbol ();
 use PPI::Token::Unknown ();
 use PPI::Singletons qw' %MAGIC $CURLY_SYMBOL ';
 
-our $VERSION = '1.272';
+our $VERSION = '1.273';
 
 our @ISA = "PPI::Token::Symbol";
 

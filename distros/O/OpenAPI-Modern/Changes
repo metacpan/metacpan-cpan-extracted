@@ -1,5 +1,9 @@
 Revision history for OpenAPI-Modern
 
+0.026     2022-04-23 16:48:26Z
+          - fix installation of sharedir files when fallback installers
+            (ExtUtils::MakeMaker or Module::Build) are used
+
 0.025     2022-04-03 19:58:27Z
           - find_path() no longer returns an undef operation_id when there is
             no operationId defined in the schema document

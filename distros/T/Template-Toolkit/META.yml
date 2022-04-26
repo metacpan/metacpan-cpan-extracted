@@ -3,7 +3,6 @@ abstract: 'comprehensive template processing system'
 author:
   - 'Andy Wardley <abw@wardley.org>'
 build_requires:
-  CGI: '4.11'
   ExtUtils::MakeMaker: '0'
   Test::LeakTrace: '0'
 configure_requires:
@@ -28,4 +27,4 @@ resources:
   bugtracker: https://github.com/abw/Template2/issues
   homepage: http://www.template-toolkit.org
   repository: https://github.com/abw/Template2.git
-version: '3.010'
+version: '3.100'
