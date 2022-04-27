@@ -1,5 +1,19 @@
 Change log for Sys::OsRelease
 
-0.0.1 2022-04-26T00:17:12-07:00 America/Los_Angeles
+0.0.2 2022-04-26T23:23:40-07:00 America/Los_Angeles
+ [BUG FIXES]
+ - fix from CPAN Testers results: on mswin32 init empty rather than bail
+   out
+
+ [DOCS]
+ - expand POD docs with method descriptions
+
+ [REVISION]
+ - add platform method and configuration items to expand systems recognized
+   as common in ID_LIKE
+ - add unit tests for empty configurations simulating systems where
+   os-release doesn't exist (using empty search path)
+
+0.0.1 2022-04-26T00:18:04Z America/Los_Angeles
  [REVISION]
  - initial revision

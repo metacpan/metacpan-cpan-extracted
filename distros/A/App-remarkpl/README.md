@@ -4,7 +4,7 @@ App::remarkpl - Web based presentation tool
 
 # VERSION
 
-0.06
+0.07
 
 # DESCRIPTION
 

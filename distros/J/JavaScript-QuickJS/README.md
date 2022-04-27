@@ -52,6 +52,8 @@ see below for details on type conversions from JavaScript to Perl.
 
 Untrapped exceptions in JavaScript will be rethrown as Perl exceptions.
 
+$JS\_CODE is a _character_ string.
+
 ## _OBJ_->eval\_module( $JS\_CODE )
 
 Runs $JS\_CODE as a module, which enables ES6 module syntax.
@@ -91,8 +93,68 @@ primitives.
 - Perl undef becomes JS null.
 - Unblessed array & hash references become JavaScript arrays and
 “plain” objects.
+- [Types::Serialiser](https://metacpan.org/pod/Types%3A%3ASerialiser) booleans become JavaScript booleans.
 - Perl code references become JavaScript functions.
 - Anything else triggers an exception.
+
+# MEMORY HANDLING NOTES
+
+If any instance of a class of this distribution is DESTROY()ed at Perl’s
+global destruction, we assume that this is a memory leak, and a warning is
+thrown. To prevent this, avoid circular references.
+
+Callbacks make that tricky. As noted above, JavaScript functions
+given to Perl become Perl code references. Those code references are
+closures around the QuickJS context & runtime; once the code reference
+is destroyed, we release its reference to QuickJS.
+
+Perl code references given to JavaScript become JavaScript functions;
+however, QuickJS exposes no facility analogous to Perl `DESTROY()`. Thus,
+we retain those Perl code references as part of the QuickJS context.
+
+Consider the following:
+
+    my $return;
+
+    $js->set_globals(  __return => sub { $return = shift; () } );
+
+    $js->eval('__return( a => a )');
+
+Here $js retains a reference to the `__return` callback. That callback
+refers to `$return`. Once we run `eval()`, Perl $return stores
+_another_ callback, which stores a reference to $js. Here we have a
+circular reference. The way to break it is simply:
+
+    undef $return;
+
+… which is ugly, but it is what it is for now.
+
+Note also that the `__return` callback ends with `()`. Recall that, in
+Perl, a function’s last statement value is the function’s default return
+value. Without the `()`, then, our callback would return `$return`,
+which would create yet _another_ reference cycle.
+
+# CHARACTER ENCODING NOTES
+
+Although QuickJS (like all JS engines) assumes its strings are text,
+you can oftentimes pass in byte strings and get a reasonable result.
+
+One place where this falls over, though, is ES6 modules. QuickJS, when
+it loads an ES6 module, decodes that module’s string literals to characters.
+Thus, if you pass in byte strings from Perl, QuickJS will treat your
+Perl byte strings’ code points as character code points, and when you
+combine those code points with the ones from your ES6 module you may
+get mangled output.
+
+Another place that may create trouble is if your argument to `eval()`
+or `eval_module()` (above) contains JSON. Perl’s popular JSON encoders
+output byte strings by default, but as noted above, `eval()` and
+`eval_module()` need _character_ strings. So either configure your
+JSON encoder to output characters, or decode JSON bytes to characters
+before calling `eval()`/`eval_module()`.
+
+For best results, _always_ interact with QuickJS via _character_
+strings, and double-check that you’re doing it that way consistently.
 
 # NUMERIC PRECISION
 

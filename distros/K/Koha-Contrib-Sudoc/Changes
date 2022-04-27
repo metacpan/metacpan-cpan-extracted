@@ -1,5 +1,9 @@
 Revision history for Perl module Koha::Contrib::Sudoc
 
+2.38 2022-04-27
+
+  - Mise à jour pour Koha 21.11
+
 2.37 2022-03-21
 
   - Fix warning

@@ -1,3 +1,10 @@
+0.42.0 2022-04-27 08:48:54 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - add btCfg.testingIdPostfix for action menues with generic Popup
+   (e.g. CredMgr OAuth)
+
+ - add check to enforce unique none-popup action keys
+
 0.41.6 2022-04-05 14:28:48 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - make sure LC_TIME and LC_NUMERIC are C and not set to some local

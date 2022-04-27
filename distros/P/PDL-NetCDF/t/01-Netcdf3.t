@@ -1,30 +1,36 @@
-use Test::More;
-use warnings;
 use strict;
+use warnings;
+use Test::More;
 use Fcntl;
-use FindBin qw($Bin);
-BEGIN { use_ok('PDL') };
-BEGIN { use_ok('PDL::NetCDF') };
-BEGIN { use_ok('PDL::Char') };
-BEGIN { note( "Removing test file $_\n" ), unlink foreach grep -e, qw/ foo.nc foo1.nc do_not_create.nc / }
-END   { note( "Removing test file $_\n" ), unlink foreach grep -e, qw/ bogus.nc foo.nc foo1.nc / }
+use PDL;
+use PDL::NetCDF;
+use PDL::Char;
+use File::Temp qw/ tempdir /;
+use File::Spec::Functions;
 
 sub vnorm2 { sumover(shift()**2.)->sqrt } # Euclidean vector norm
+my $dir = tempdir(CLEANUP=>1);
 
 #
 ## Test object-oriented interface
 #
 
 # Test whether PDL::NetCDF honours `O_RDONLY' when trying to open a nonexistent file
-eval { PDL::NetCDF->new( 'do_not_create.nc', { MODE => O_RDONLY } ) };
+my $dnc = catfile($dir, 'do_not_create.nc');
+eval { PDL::NetCDF->new( $dnc, { MODE => O_RDONLY } ) };
 like( $@, qr/Cannot open readonly! No such file/, 'PDL::NetCDF should complain when opening nonexistent file when O_RDONLY is in effect' );
-ok( ! -f 'do_not_create.nc', 'PDL::NetCDF must not create new file when O_RDONLY is in effect' );
+ok( ! -f $dnc, 'PDL::NetCDF must not create new file when O_RDONLY is in effect' );
 
 # Test starting with new file
-my $obj = PDL::NetCDF->new ('foo.nc');
+my $newfile = catfile($dir, 'foo.nc');
+my $obj = PDL::NetCDF->new ($newfile);
 my $in1 = pdl [[1,2,3], [4,5,6]];
 $obj->put ('var1', ['dim1', 'dim2'], $in1);
 my $out1 = $obj->get ('var1');
+
+ok (($out1 == $in1)->sum == $in1->nelem, 'Read in correctly');
+my $out_byte = $obj->get ('var1', {FETCH_AS => PDL::byte->[0]});
+ok ((($out_byte == $in1)->sum == $out1->nelem && $out_byte->type == PDL::byte), 'Read in correctly as new type');
 
 # Test record putting
 $obj->put ('recvar1', ['dim2'], double ([1,2,3]));
@@ -88,13 +94,13 @@ cmp_ok(vnorm2($pdlcomp - $correct), '<', $tol, "Compressed put/get 2");
 ok(!$obj->close, "Compressed put/get 3");
 
 # try a fast open
-my $nc1 = PDL::NetCDF->new('foo.nc', {TEMPLATE => $obj});
+my $nc1 = PDL::NetCDF->new($newfile, {TEMPLATE => $obj});
 my $varnames = $nc1->getvariablenames;
 ok(grep(/^var1$/,@$varnames) + grep(/^textvar$/,@$varnames), "Fast open 1");
 ok(!$nc1->close, "Fast open 2");
 
 # Try rewriting an existing file
-my $obj1 = PDL::NetCDF->new ('>foo.nc', {PERL_SCALAR => 1, PDL_BAD => 1});
+my $obj1 = PDL::NetCDF->new (">$newfile", {PERL_SCALAR => 1, PDL_BAD => 1});
 $varnames = $obj1->getvariablenames;
 ok(grep(/^var1$/,@$varnames) + grep(/^textvar$/,@$varnames), "Re-writing 1");
 
@@ -183,14 +189,13 @@ is($shuffle, 0, 'unshuffled variable');
 
 
 # Test with a bogus file
-open (IN, ">bogus.nc");
-print IN "I'm not a netCDF file\n";
-close IN;
-my $obj2;
-eval { $obj2 = PDL::NetCDF->new ('bogus.nc'); };
+my $bogus = catfile($dir, 'bogus.nc');
+{ open my $fh, ">", $bogus; print $fh "I'm not a netCDF file\n"; }
+eval { my $obj2 = PDL::NetCDF->new ($bogus); };
 like $@, qr/(Not a netCDF file|Unknown file format)/, "Read bogus file";
 
-$obj = PDL::NetCDF->new ('foo1.nc');
+my $newfile2 = catfile($dir, 'foo1.nc');
+$obj = PDL::NetCDF->new ($newfile2);
 # test chars with unlimited dimension
 my $strlen = 5;
 my $id = 0;
@@ -202,7 +207,7 @@ for ('abc', 'defg', 'hijkl') {
 }
 $charout = $obj->get('char_unlim');
 $pdlchar = PDL::Char->new (['abc', 'defg', 'hijkl']);
-print $charout, "\n";
+# print $charout, "\n";
 ok (sum($pdlchar - $charout) == 0, "chars with unlimited dimension");
 
 my $charout1 = $obj->get('char_unlim', [0,0], [3, $strlen]);
@@ -211,9 +216,9 @@ my $charout2 = $obj->get('char_unlim', [0,0], [1, $strlen]);
 ok (($charout2->dims)[0] == $strlen, "Getting exactly one string from nc with unlimited dimension");
 
 $obj->close;
-unlink 'foo1.nc';
+unlink $newfile2;
 
-$obj = PDL::NetCDF->new ('>foo1.nc');
+$obj = PDL::NetCDF->new (">$newfile2");
 my $nullPdl = new PDL::Char("");
 $obj->put('dimless_var', [],$nullPdl);
 ok(${ $obj->getvariablenames }[0] eq 'dimless_var', 'adding dimless char variable');
@@ -225,14 +230,14 @@ $obj->close;
 
 $obj = undef;
 
-$obj = PDL::NetCDF->new('foo.nc');
+$obj = PDL::NetCDF->new($newfile);
 $obj->close;
-$obj = PDL::NetCDF->new('foo.nc');
+$obj = PDL::NetCDF->new($newfile);
 $obj->getatt("text_attribute");
 ok(1, "close is idempotent");
 
 # check reading of string slices
-$obj = PDL::NetCDF->new("$Bin/threedimstring.nc", {MODE => O_RDONLY,
+$obj = PDL::NetCDF->new(catfile(qw(t threedimstring.nc)), {MODE => O_RDONLY,
 			    		           REVERSE_DIMS => 1,
                                                    SLOW_CHAR_FETCH => 1});
 my $varname = 'threedimstring';

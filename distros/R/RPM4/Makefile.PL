@@ -24,7 +24,7 @@ unless (eval "use ExtUtils::Depends '$CONFIGURE_REQUIRES{'ExtUtils::Depends'}';"
            . "1") {
    warn "$@\n";
    WriteMakefile(
-         NAME         => 'URPM',
+         NAME         => 'RPM4',
          PREREQ_FATAL => 1,
          PREREQ_PM    => \%CONFIGURE_REQUIRES,
    );

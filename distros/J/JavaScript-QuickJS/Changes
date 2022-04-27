@@ -1,5 +1,14 @@
 Revision history for Perl extension JavaScript::QuickJS:
 
+0.08 Tue 26 Apr 2022
+- BUG FIX: Avoid segfault when passing a function from JS to Perl.
+- BUG FIX: Avoid segfault if an invalid SV is given to a Perl/JS coderef.
+- BUG FIX: Free args to JS function references when call()ed.
+- Set strict mode to always-on.
+- Teach Perl->JSON conversion to recognize Types::Serialiser booleans.
+- Warn if funcref is destroyed at global destruction.
+- Document the present memory-handling weirdness. :(
+
 0.07 Mon 25 Apr 2022
 - Add ability to customize base path for ES6 module imports.
 

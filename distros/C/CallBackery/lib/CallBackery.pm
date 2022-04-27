@@ -38,7 +38,7 @@ use CallBackery::Database;
 use CallBackery::User;
 
 
-our $VERSION = '0.41.6';
+our $VERSION = '0.42.0';
 
 
 =head2 config

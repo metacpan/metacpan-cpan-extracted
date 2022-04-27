@@ -35,7 +35,7 @@ your system.
 
 use XSLoader;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 XSLoader::load( __PACKAGE__, $VERSION );
 
@@ -70,6 +70,8 @@ Comparable to running C<qjs -e '...'>. Returns the last value from $JS_CODE;
 see below for details on type conversions from JavaScript to Perl.
 
 Untrapped exceptions in JavaScript will be rethrown as Perl exceptions.
+
+$JS_CODE is a I<character> string.
 
 =head2 I<OBJ>->eval_module( $JS_CODE )
 
@@ -134,11 +136,72 @@ primitives.
 =item * Unblessed array & hash references become JavaScript arrays and
 “plain” objects.
 
+=item * L<Types::Serialiser> booleans become JavaScript booleans.
+
 =item * Perl code references become JavaScript functions.
 
 =item * Anything else triggers an exception.
 
 =back
+
+=head1 MEMORY HANDLING NOTES
+
+If any instance of a class of this distribution is DESTROY()ed at Perl’s
+global destruction, we assume that this is a memory leak, and a warning is
+thrown. To prevent this, avoid circular references.
+
+Callbacks make that tricky. As noted above, JavaScript functions
+given to Perl become Perl code references. Those code references are
+closures around the QuickJS context & runtime; once the code reference
+is destroyed, we release its reference to QuickJS.
+
+Perl code references given to JavaScript become JavaScript functions;
+however, QuickJS exposes no facility analogous to Perl C<DESTROY()>. Thus,
+we retain those Perl code references as part of the QuickJS context.
+
+Consider the following:
+
+    my $return;
+
+    $js->set_globals(  __return => sub { $return = shift; () } );
+
+    $js->eval('__return( a => a )');
+
+Here $js retains a reference to the C<__return> callback. That callback
+refers to C<$return>. Once we run C<eval()>, Perl $return stores
+I<another> callback, which stores a reference to $js. Here we have a
+circular reference. The way to break it is simply:
+
+    undef $return;
+
+… which is ugly, but it is what it is for now.
+
+Note also that the C<__return> callback ends with C<()>. Recall that, in
+Perl, a function’s last statement value is the function’s default return
+value. Without the C<()>, then, our callback would return C<$return>,
+which would create yet I<another> reference cycle.
+
+=head1 CHARACTER ENCODING NOTES
+
+Although QuickJS (like all JS engines) assumes its strings are text,
+you can oftentimes pass in byte strings and get a reasonable result.
+
+One place where this falls over, though, is ES6 modules. QuickJS, when
+it loads an ES6 module, decodes that module’s string literals to characters.
+Thus, if you pass in byte strings from Perl, QuickJS will treat your
+Perl byte strings’ code points as character code points, and when you
+combine those code points with the ones from your ES6 module you may
+get mangled output.
+
+Another place that may create trouble is if your argument to C<eval()>
+or C<eval_module()> (above) contains JSON. Perl’s popular JSON encoders
+output byte strings by default, but as noted above, C<eval()> and
+C<eval_module()> need I<character> strings. So either configure your
+JSON encoder to output characters, or decode JSON bytes to characters
+before calling C<eval()>/C<eval_module()>.
+
+For best results, I<always> interact with QuickJS via I<character>
+strings, and double-check that you’re doing it that way consistently.
 
 =head1 NUMERIC PRECISION
 

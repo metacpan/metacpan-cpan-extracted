@@ -1,12 +1,14 @@
 # -*- Perl -*-
 use Config;
 use Devel::CheckLib qw(check_lib);
-our $VERSION = '4.23';
+our $VERSION = '4.24';
 pp_setversion($VERSION);
 
 my $ncversion = {nc_inq_var_deflate => check_lib(
+  INC  => $ENV{INC},
+  LIBS => $ENV{LIBS},
   header => 'netcdf.h', lib => 'netcdf',
-  function => 'nc_inq_var_deflate(0, 0, NULL, NULL, NULL);',
+  function => 'return !nc_inq_var_deflate(0, 0, NULL, NULL, NULL);',
 )};
 
 pp_addpm({At => Top}, <<'EOD');
@@ -165,7 +167,7 @@ Create an object representing a netCDF file.
     netcdf-files. Even with this option the 'put' function will write
     variables in FORTRAN order (as before) and will reverse the
     dimension names so they fit this order.  With this option, the
-    'putslice' function will write varibles in the same way as 'put'.
+    'putslice' function will write variables in the same way as 'put'.
     You should use this option if your planning to work with other
     netcdf-programs (ncview, NCL) or if you are planning to combine
     putslice and slice.  You should _not_ use this option, if you need
@@ -359,7 +361,7 @@ Arguments:
 1) The name of the netCDF variable to fetch.  If this is the only
 argument, then the entire variable will be returned.
 
-To fetch a slice of the netCDF variable, optional 2nd and 3rd argments
+To fetch a slice of the netCDF variable, optional 2nd and 3rd arguments
 must be specified:
 
 2) A pdl which specifies the N dimensional starting point of the slice.
@@ -744,6 +746,7 @@ Doug Hunt, dhunt\@ucar.edu.
 
 Heiko Klein, heiko.klein\@met.no
 Edward Baudrez, Royal Meteorological Institute of Belgium, edward.baudrez\@meteo.be
+Ed J (mohawk2), etj@cpan.org
 
 =head1 SEE ALSO
 
@@ -1121,6 +1124,7 @@ sub NC_USHORT () { return 8; }   # unsigned 2-byte int
 sub NC_UINT () { return 9; }     # unsigned 4-byte int
 sub NC_INT64 () { return 10; }   # signed 8-byte int
 sub NC_UINT64 () { return 11; }  # unsigned 8-byte int
+sub NC_STRING () { return 12; }  # string
 
 # Used for creating new blank pdls with the input number of dimensions, and
 # the correct type.
@@ -1147,11 +1151,11 @@ my %typemap1 = (
 		NC_INT()    => sub { PDL::long  (@_); },
 		NC_FLOAT()  => sub { PDL::float (@_); },
 		NC_DOUBLE() => sub { PDL::double(@_); },
-        NC_UBYTE()   => sub { PDL::byte (@_); },
-	    NC_USHORT()  => sub { PDL::ushort(@_); },
-	    NC_UINT()    => sub { PDL::long(@_); },
-	    NC_INT64()    => sub { PDL::longlong(@_); },
-	    NC_UINT64()    => sub { PDL::longlong(@_); },
+               NC_UBYTE()   => sub { PDL::byte (@_); },
+               NC_USHORT()  => sub { PDL::ushort(@_); },
+	       NC_UINT()    => sub { PDL::long(@_); },
+	      NC_INT64()    => sub { PDL::longlong(@_); },
+	     NC_UINT64()    => sub { PDL::longlong(@_); },
 		);
 
 # Used for creating new blank pdls with the input number of dimensions, and
@@ -1985,7 +1989,12 @@ sub get {
     }
 
     # Create empty PDL (of correct type and size) to hold output from NetCDF file
-    $pdl = &{$typemap{$self->{DATATYPES}{$varnm}}}(reverse @cnt);	
+    if (defined($opt->{FETCH_AS})) {
+       my $netcdf_type = $typemap3{$opt->{FETCH_AS}};  # FETCH_AS is the PDL type: PDL::byte->[0] ..PDL::longlong->[0]
+       $pdl = &{$typemap{$netcdf_type}}(reverse @cnt);
+    } else {
+       $pdl = &{$typemap{$self->{DATATYPES}{$varnm}}}(reverse @cnt);
+    }
 
     print "In get(): pdl = ", $pdl->info, " cnt = @cnt\n" if ($self->{DEBUG});
 
@@ -2003,7 +2012,11 @@ sub get {
         $pdl->upd_data();
       }
     } else {
-      $rc = &{$typemap4{$pdl->get_datatype}}($self->{NCID}, $self->{VARIDS}{$varnm}, $pdl);
+      if (defined($opt->{FETCH_AS})) {
+        $rc = &{$typemap4{$opt->{FETCH_AS}}}($self->{NCID}, $self->{VARIDS}{$varnm}, $pdl);
+      } else {
+        $rc = &{$typemap4{$pdl->get_datatype}}($self->{NCID}, $self->{VARIDS}{$varnm}, $pdl);
+      }
       print "In get(): rc = $rc, pdl[info, first, last] = ", $pdl->info, " ", $pdl->at(0), " ", $pdl->at($pdl->nelem-1), "\n" if ($self->{DEBUG});
     }
     barf ("get:  Cannot get data -- " . PDL::NetCDF::nc_strerror ($rc)) if $rc;
@@ -2070,7 +2083,7 @@ sub dimsize {
 # Put a netCDF attribute from a PDL or string
 sub putatt {
   my $self  = shift;  # name of object
-  my $att   = shift;  # Attribute to put.  Can be a string or a PDL
+  my $att   = shift;  # Attribute to put.  Can be a string, a PDL, or a ref to a list of strings
   my $attnm = shift;  # Name of attribute to put
   my $varnm = shift;  # name of netCDF variable this attribute is to be associated with
                       # (defaults to global if not passed).
@@ -2124,6 +2137,20 @@ sub putatt {
     $self->{ATTTYPE}{$varnm}{$attnm} = NC_CHAR();
     $self->{ATTLEN}{$varnm}{$attnm} = length($att);
 
+  } elsif (ref $att eq 'ARRAY') {  # A ref to a list:  Treat as a list of strings for string attributes
+
+    # Put the attribute
+    my $rc = PDL::NetCDF::nc_put_att_string ($self->{NCID}, $self->{VARIDS}{$varnm}, $attnm,
+			                     scalar(@$att), $att);
+    barf ("putatt:  Cannot put string attribute -- " . PDL::NetCDF::nc_strerror ($rc)) if $rc;
+
+#
+#  update self
+#
+
+    $self->{ATTTYPE}{$varnm}{$attnm} = NC_STRING();
+    $self->{ATTLEN}{$varnm}{$attnm} = scalar(@$att);
+
   } else {
 
     barf ("Attributes of this type not supported");
@@ -2176,7 +2203,12 @@ sub getatt {
 
     return $str;
 
-  } 
+  } elsif ($datatype == NC_STRING()) { # Handle the new string attributes
+
+    my $str = PDL::NetCDF::nc_get_att_string ($self->{NCID}, $self->{VARIDS}{$varnm}, $attnm, $attlen);
+    return $str;
+
+  }
 
   # Get PDL attribute
 
@@ -2427,6 +2459,79 @@ CODE:
 OUTPUT:
 	RETVAL
 EOXS
+
+#-------------------------------------------------------------------------
+# Add the ability to fetch 'string' variable attributes (as opposed to 'text')
+# using the new routine nc_get_att_string
+#-------------------------------------------------------------------------
+pp_addxs (<<'EOXS');
+
+SV *
+nc_get_att_string(ncid, varid, name, attlen)
+        int ncid
+        int varid
+        char *name
+        size_t attlen
+CODE:
+	{
+           int i;
+           AV *perlarray = newAV();
+           char **string_attr = (char**)malloc(attlen * sizeof(char*));
+           memset(string_attr, 0, attlen * sizeof(char*));
+           int rc = nc_get_att_string(ncid, varid, name, string_attr);
+           if (rc != NC_NOERR)
+              croak("Error fetching attribute %s from varid %d\n", name, varid);
+
+           for (i=0;i<attlen;i++) {
+             size_t lenstr = strlen(string_attr[i]);
+             SV *perlstr = newSVpv (string_attr[i], lenstr);
+             av_push(perlarray, perlstr);
+           }
+           RETVAL = newRV((SV *)perlarray);
+           rc = nc_free_string(attlen, string_attr);
+           if (rc != NC_NOERR)
+              croak("Error in nc_free_string attribute %s from varid %d\n", name, varid);
+           free(string_attr);
+	}
+OUTPUT:
+	RETVAL
+EOXS
+
+
+#-------------------------------------------------------------------------
+# Add the ability to put 'string' variable attributes (as opposed to 'text')
+# using the new routine nc_put_att_string.  These strings are multiple, represented
+# as a char** in C and a ref to a list of perl strings in perl.
+#-------------------------------------------------------------------------
+pp_addxs (<<'EOXS');
+
+int
+nc_put_att_string(ncid, varid, name, len, perlarr_ref)
+        int ncid
+        int varid
+        char *name
+        size_t len
+        SV *perlarr_ref
+CODE:
+	{
+           int i;
+           char **string_attr = (char**)malloc(len * sizeof(char*));
+           memset(string_attr, 0, len * sizeof(char*));
+           AV *perlarr = (AV *)SvRV(perlarr_ref);
+           for (i=0;i<len;i++) {
+              SV** perlstr_p = av_fetch(perlarr, i, 0);
+              string_attr[i] = SvPVbyte_nolen(*perlstr_p); // Assume string null-terminated!
+           }
+           RETVAL = nc_put_att_string(ncid, varid, name, len, (const char **)string_attr);
+           if (RETVAL != NC_NOERR)
+              printf("Error in nc_put_att_string for attribute %s from varid %d\n", name, varid);
+
+           free(string_attr);
+	}
+OUTPUT:
+	RETVAL
+EOXS
+
 
 #-------------------------------------------------------------------------
 # Put a list of values to a bunch of 1D variables.

@@ -4,7 +4,7 @@
       "Tony Cook <tonyc@cpan.org>, Arnar M. Hrafnkelsson"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -29,6 +29,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Exporter" : "5.57",
             "ExtUtils::MakeMaker" : "0",
             "XSLoader" : "0"
          }
@@ -43,6 +44,7 @@
             "Parse::RecDescent" : "0"
          },
          "requires" : {
+            "Exporter" : "5.57",
             "Scalar::Util" : "1.00",
             "Test::More" : "0.99",
             "XSLoader" : "0"
@@ -57,8 +59,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-Imager@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Dist/Display.html?Name=Imager"
+         "web" : "https://github.com/tonycoz/imager/issues"
       },
       "homepage" : "http://imager.perl.org/",
       "repository" : {
@@ -67,6 +68,6 @@
          "web" : "https://github.com/tonycoz/imager.git"
       }
    },
-   "version" : "1.012",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "1.013",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

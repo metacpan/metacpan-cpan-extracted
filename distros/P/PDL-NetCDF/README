@@ -1,4 +1,4 @@
-PDL::NetCDF, version 4.01
+PDL::NetCDF
 
 Allows reading and writing of NetCDF files into and out of PDL objects using
 a simple object-oriented interface.  NetCDF is a flexible, binary, portable
@@ -6,18 +6,10 @@ file standard for storing gridded data.  One can access netCDF files through
 interface libraries in FORTRAN, C/C++ and perl.  Numerous utilities also exist
 for manipulating these files.
 
-The following are required for installation:
+See Makefile.PL for for minimum versions of Perl libraries needed,
+including PDL.
 
--- PDL v2.0.3+ (MUST have PDL::Char module to work!)
-
-If you want to use the old version of pdl (pdl 1.11), please
-use PDL::NetCDF version 0.34, also available on CPAN.  
-
--- perl 5.004 (or later)
--- NetCDF version 3, NetCDF version 4
-
-The first two are available on CPAN.  The third is available from UCAR UNIDATA 
-at 
+NetCDF is available from UCAR UNIDATA at
 
 http://www.unidata.ucar.edu/packages/netcdf/index.html
 
@@ -50,5 +42,4 @@ Best of luck!
 Doug Hunt
 dhunt@ucar.edu
 Software Engineer III
-UCAR - GPS/MET 
-
+UCAR - GPS/MET

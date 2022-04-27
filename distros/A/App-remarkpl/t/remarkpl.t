@@ -17,6 +17,7 @@ $t->get_ok('/')->status_is(200)->text_is('title', 'example.markdown - remarkpl')
 
 $t->get_ok('/fonts.css')->status_is(200);
 $t->get_ok('/basic.css')->status_is(200);
+$t->get_ok('/custom.css')->status_is(200);
 $t->get_ok('/remark.min.js')->status_is(200);
 $t->get_ok('/custom.js')->status_is(200);
 

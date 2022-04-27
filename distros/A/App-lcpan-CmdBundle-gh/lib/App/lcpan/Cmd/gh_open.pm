@@ -1,8 +1,5 @@
 package App::lcpan::Cmd::gh_open;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.004'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -10,6 +7,11 @@ use Log::ger;
 
 require App::lcpan;
 require App::lcpan::Cmd::dist_meta;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-03-27'; # DATE
+our $DIST = 'App-lcpan-CmdBundle-gh'; # DIST
+our $VERSION = '0.005'; # VERSION
 
 our %SPEC;
 
@@ -31,12 +33,12 @@ sub handle_cmd {
     {
         # first find dist
         if (($file_id) = $dbh->selectrow_array(
-            "SELECT file_id FROM dist WHERE name=? AND is_latest", {}, $args{module_or_dist})) {
+            "SELECT id FROM file WHERE dist_name=? AND is_latest_dist", {}, $args{module_or_dist})) {
             $dist = $args{module_or_dist};
             last;
         }
         # try mod
-        if (($file_id, $dist) = $dbh->selectrow_array("SELECT m.file_id, d.name FROM module m JOIN dist d ON m.file_id=d.file_id WHERE m.name=?", {}, $args{module_or_dist})) {
+        if (($file_id, $dist) = $dbh->selectrow_array("SELECT m.file_id, f.dist_name FROM module m JOIN file f ON m.file_id=f.id WHERE m.name=?", {}, $args{module_or_dist})) {
             last;
         }
     }
@@ -75,7 +77,7 @@ App::lcpan::Cmd::gh_open - Open the GitHub project page of a module/dist
 
 =head1 VERSION
 
-This document describes version 0.004 of App::lcpan::Cmd::gh_open (from Perl distribution App-lcpan-CmdBundle-gh), released on 2017-07-10.
+This document describes version 0.005 of App::lcpan::Cmd::gh_open (from Perl distribution App-lcpan-CmdBundle-gh), released on 2022-03-27.
 
 =head1 DESCRIPTION
 
@@ -88,9 +90,9 @@ This module handles the L<lcpan> subcommand C<gh-open>.
 
 Usage:
 
- handle_cmd(%args) -> [status, msg, result, meta]
+ handle_cmd(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Open the GitHub project page of a module/dist.
+Open the GitHub project page of a moduleE<sol>dist.
 
 This function is not exported.
 
@@ -100,7 +102,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<cpan> => I<dirname>
 
-Location of your local CPAN mirror, e.g. /path/to/cpan.
+Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 
 Defaults to C<~/cpan>.
 
@@ -108,20 +110,33 @@ Defaults to C<~/cpan>.
 
 Filename of index.
 
+If C<index_name> is a filename without any path, e.g. C<index.db> then index will
+be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
+C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
+using the C<index_name>.
+
 =item * B<module_or_dist>* => I<str>
 
 Module or dist name.
+
+=item * B<use_bootstrap> => I<bool> (default: 1)
+
+Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+If you are indexing your private CPAN-like repository, you want to turn this
+off.
+
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -133,6 +148,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-lcpan-
 
 Source repository is at L<https://github.com/perlancar/perl-App-lcpan-CmdBundle-gh>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2017 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan-CmdBundle-gh>
@@ -140,16 +183,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2017 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

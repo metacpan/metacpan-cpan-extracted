@@ -21,6 +21,7 @@ t/01_basic.t
 t/02_streaming.t
 t/03_context.t
 t/04_dictionary.t
+t/05_streaming_windowlog.t
 t/test.dic
 typemap
 xt/01_leaktrace.t

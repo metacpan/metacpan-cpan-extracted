@@ -34,6 +34,7 @@ MappingOptions::MappingOptions(pTHX_ SV *options_ref) :
         generic_extension_methods(true),
         implicit_maps(false),
         decode_blessed(true),
+        no_redefine_perl_names(false),
         accessor_style(GetAndSet),
         client_services(Disable),
         numeric_bool(false),
@@ -111,13 +112,21 @@ Dynamic::Dynamic(const string &root_directory) :
 }
 
 Dynamic::~Dynamic() {
+    for (STD_TR1::unordered_map<std::string, const Mapper *>::iterator it = descriptor_map.begin(), en = descriptor_map.end(); it != en; ++it)
+        it->second->unref();
+}
+
+void Dynamic::add_file_recursively(pTHX_ const FileDescriptor *file) {
+    files.insert(file);
+    for (int i = 0, max = file->dependency_count(); i < max; ++i)
+        add_file_recursively(aTHX_ file->dependency(i));
 }
 
 void Dynamic::load_file(pTHX_ const string &file) {
     const FileDescriptor *loaded = descriptor_loader.load_proto(file);
 
     if (loaded)
-        files.insert(loaded);
+        add_file_recursively(aTHX_ loaded);
 }
 
 void Dynamic::load_string(pTHX_ const string &file, SV *sv) {
@@ -134,7 +143,14 @@ void Dynamic::load_serialized_string(pTHX_ SV *sv) {
     const char *data = SvPV(sv, len);
     const vector<const FileDescriptor *> loaded = descriptor_loader.load_serialized(data, len);
 
-    files.insert(loaded.begin(), loaded.end());
+    for (vector<const FileDescriptor *>::const_iterator it = loaded.begin(), en = loaded.end(); it != en; ++it)
+        add_file_recursively(aTHX_ *it);
+}
+
+void Dynamic::map_wkts(pTHX_ const MappingOptions &options) {
+    MappingOptions maybe_no_perl_names = options;
+    maybe_no_perl_names.no_redefine_perl_names = true;
+    map_package(aTHX_ "google.protobuf", "Google::ProtocolBuffers::Dynamic::WKT", maybe_no_perl_names);
 }
 
 namespace {
@@ -423,14 +439,26 @@ void Dynamic::map_message(pTHX_ const Descriptor *descriptor, const string &perl
         croak("Message '%s' has already been mapped", descriptor->full_name().c_str());
     if (options.use_bigints)
         load_module(PERL_LOADMOD_NOIMPORT, newSVpvs("Math::BigInt"), NULL);
+    bool define_perl_names = !options.no_redefine_perl_names || gv_stashpvn(perl_package.data(), perl_package.size(), 0) == NULL;
     HV *stash = gv_stashpvn(perl_package.data(), perl_package.size(), GV_ADD);
     const MessageDef *message_def = def_builder.GetMessageDef(descriptor);
     if (is_map_entry(message_def, options.implicit_maps))
         // it's likely I will regret this const_cast<>
         upb_msgdef_setmapentry(const_cast<MessageDef *>(message_def), true);
     Mapper *mapper = new Mapper(aTHX_ this, message_def, stash, options);
-    const char *getter_prefix, *setter_prefix;
+
+    // the map owns the reference from Mapper constructor, and is unreffed in ~Dynamic
+    descriptor_map[message_def->full_name()] = mapper;
+    used_packages.insert(perl_package);
+    pending.push_back(mapper);
+
+    if (define_perl_names)
+        bind_message(aTHX_ perl_package, mapper, stash, options);
+}
+
+void Dynamic::bind_message(pTHX_ const string &perl_package, Mapper *mapper, HV *stash, const MappingOptions &options) {
     bool plain_accessor = false;
+    const char *getter_prefix, *setter_prefix;
 
     if (options.accessor_style == MappingOptions::SingleAccessor) {
         getter_prefix = setter_prefix = NULL;
@@ -442,10 +470,6 @@ void Dynamic::map_message(pTHX_ const Descriptor *descriptor, const string &perl
             "get_" : "";
         setter_prefix = "set_";
     }
-
-    descriptor_map[message_def->full_name()] = mapper;
-    used_packages.insert(perl_package);
-    pending.push_back(mapper);
 
     copy_and_bind(aTHX_ "decode", perl_package, mapper);
     copy_and_bind(aTHX_ "encode", perl_package, mapper);
@@ -542,8 +566,6 @@ void Dynamic::map_message(pTHX_ const Descriptor *descriptor, const string &perl
             copy_and_bind(aTHX_ "get_or_set_extension_list", "extension_list", perl_package, mapper);
         }
     }
-
-    mapper->unref(); // reference from constructor
 }
 
 void Dynamic::map_enum(pTHX_ const EnumDescriptor *descriptor, const string &perl_package, const MappingOptions &options) {
@@ -641,6 +663,7 @@ void Dynamic::resolve_references() {
     pending.clear();
     for (std::vector<MethodMapper *>::iterator it = pending_methods.begin(), en = pending_methods.end(); it != en; ++it)
         (*it)->resolve_input_output();
+    pending_methods.clear();
 }
 
 const Mapper *Dynamic::find_mapper(const MessageDef *message_def) const {

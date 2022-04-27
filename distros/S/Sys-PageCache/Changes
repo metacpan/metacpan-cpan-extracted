@@ -1,5 +1,9 @@
 Revision history for Sys::PageCache
 
+0.07  2022-04-27
+    [TRIVIAL]
+        - Adjust page numbers in test cases
+
 0.06  2019-01-24
     [IMPROVEMENTS]
         - Use needed parts of POSIX [RT #128339]

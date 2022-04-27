@@ -16,11 +16,11 @@ Suricata::Monitoring - LibreNMS JSON SNMP extend and Nagios style check for Suri
 
 =head1 VERSION
 
-Version 0.1.1
+Version 0.1.2
 
 =cut
 
-our $VERSION = '0.1.1';
+our $VERSION = '0.1.2';
 
 =head1 SYNOPSIS
 
@@ -301,27 +301,27 @@ sub run {
 					my @new_alerts;
 
 					my $new_stats = {
-						uptime           => $json->{stats}{uptime},
-						packets          => $json->{stats}{capture}{kernel_packets},
-						dropped          => $json->{stats}{capture}{kernel_drops},
-						ifdropped        => $json->{stats}{capture}{kernel_ifdrops},
-						errors           => $json->{stats}{capture}{errors},
-						packet_delta     => 0,
-						drop_delta       => 0,
-						ifdrop_delta     => 0,
-						error_delta      => 0,
-						drop_percent     => 0,
-						ifdrop_percent   => 0,
-						error_percent    => 0,
-						bytes            => $json->{stats}{decoder}{bytes},
-						dec_packets      => $json->{stats}{decoder}{pkts},
-						dec_invalid      => $json->{stats}{decoder}{invalid},
-						dec_ipv4         => $json->{stats}{decoder}{ipv4},
-						dec_ipv6         => $json->{stats}{decoder}{ipv6},
-						dec_udp          => $json->{stats}{decoder}{udp},
-						dec_tcp          => $json->{stats}{decoder}{tcp},
-						dec_avg_pkt_size => $json->{stats}{decoder}{avg_pkt_size},
-						dec_max_pkt_size => $json->{stats}{decoder}{max_pkt_size},
+						uptime             => $json->{stats}{uptime},
+						packets            => $json->{stats}{capture}{kernel_packets},
+						dropped            => $json->{stats}{capture}{kernel_drops},
+						ifdropped          => $json->{stats}{capture}{kernel_ifdrops},
+						errors             => $json->{stats}{capture}{errors},
+						packet_delta       => 0,
+						drop_delta         => 0,
+						ifdrop_delta       => 0,
+						error_delta        => 0,
+						drop_percent       => 0,
+						ifdrop_percent     => 0,
+						error_percent      => 0,
+						bytes              => $json->{stats}{decoder}{bytes},
+						dec_packets        => $json->{stats}{decoder}{pkts},
+						dec_invalid        => $json->{stats}{decoder}{invalid},
+						dec_ipv4           => $json->{stats}{decoder}{ipv4},
+						dec_ipv6           => $json->{stats}{decoder}{ipv6},
+						dec_udp            => $json->{stats}{decoder}{udp},
+						dec_tcp            => $json->{stats}{decoder}{tcp},
+						dec_avg_pkt_size   => $json->{stats}{decoder}{avg_pkt_size},
+						dec_max_pkt_size   => $json->{stats}{decoder}{max_pkt_size},
 						dec_chdlc          => $json->{stats}{decoder}{chdlc},
 						dec_ethernet       => $json->{stats}{decoder}{ethernet},
 						dec_geneve         => $json->{stats}{decoder}{geneve},
@@ -549,13 +549,10 @@ sub run {
 
 	}
 
-	$to_return->{data}{'.total'}{alert} = $to_return->{'alert'};
-
-	# join any found alerts into the string
-	$to_return->{alertString} = join( "\n", @alerts );
-
 	# compute percents for .total
-	if ( $to_return->{data}{'.total'}{packet_delta} != 0 ) {
+	if ( defined( $to_return->{data}{'.total'}{packet_delta} )
+		&& ( $to_return->{data}{'.total'}{packet_delta} != 0 ) )
+	{
 		$to_return->{data}{'.total'}{drop_percent}
 			= ( $to_return->{data}{'.total'}{drop_delta} / $to_return->{data}{'.total'}{packet_delta} ) * 100;
 		$to_return->{data}{'.total'}{drop_percent} = sprintf( '%0.5f', $to_return->{data}{'.total'}{ifdrop_percent} );
@@ -568,6 +565,14 @@ sub run {
 			= ( $to_return->{data}{'.total'}{error_delta} / $to_return->{data}{'.total'}{packet_delta} ) * 100;
 		$to_return->{data}{'.total'}{error_percent} = sprintf( '%0.5f', $to_return->{data}{'.total'}{error_percent} );
 	}
+	else {
+		$to_return->{data}{alert} = '3';
+		push( @alerts, 'Did not find a stats entry after searching back ' . $self->{max_age} . ' seconds' );
+	}
+
+	# join any found alerts into the string
+	$to_return->{alertString} = join( "\n", @alerts );
+	$to_return->{data}{'.total'}{alert} = $to_return->{'alert'};
 
 	# write the cache file on out
 	eval {

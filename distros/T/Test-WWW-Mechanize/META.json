@@ -4,13 +4,13 @@
       "Andy Lester <andy@petdance.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test-WWW-Mechanize",
    "no_index" : {
@@ -36,6 +36,7 @@
             "Carp::Assert::More" : "1.16",
             "HTML::Form" : "0",
             "HTML::TokeParser" : "0",
+            "HTTP::Message" : "6.29",
             "HTTP::Server::Simple" : "0.42",
             "HTTP::Server::Simple::CGI" : "0",
             "LWP" : "6.02",
@@ -45,7 +46,7 @@
             "URI::file" : "0",
             "WWW::Mechanize" : "1.68",
             "parent" : "0",
-            "perl" : "5.008"
+            "perl" : "5.01"
          }
       }
    },
@@ -57,11 +58,8 @@
       "homepage" : "https://github.com/petdance/test-www-mechanize",
       "license" : [
          "https://opensource.org/licenses/artistic-license-2.0"
-      ],
-      "repository" : {
-         "url" : "https://github.com/petdance/test-www-mechanize"
-      }
+      ]
    },
-   "version" : "1.54",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "1.56",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

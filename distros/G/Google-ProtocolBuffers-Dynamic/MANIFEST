@@ -142,6 +142,8 @@ t/proto/wkt/scalar.pb
 t/proto/wkt/scalar.proto
 t/proto/wkt/scalar_copies.pb
 t/proto/wkt/scalar_copies.proto
+t/proto/wkt/timestamp.pb
+t/proto/wkt/timestamp.proto
 xsp/dynamic.xsp
 xsp/introspection.xsp
 xsp/main.xspt

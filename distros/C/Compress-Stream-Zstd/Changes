@@ -1,6 +1,22 @@
 Revision history for Perl extension Compress-Stream-Zstd
 
-0.202 2020-07-31T20:39:49Z
+0.203 2022-04-27
+
+  * 0.203
+    Wed Apr 27 12:52:55 2022 +0100
+    87835ddb651932c3e89aa4b49ed80fc64539b83d
+
+  * Compress::Zstd::* to Compress::Stream::Zstd::*
+    Wed Apr 27 12:39:12 2022 +0100
+    a5405d64163eb60ed6da58deeef8a95d31d295ea
+
+  * Merge branch 'set_parameter' of https://github.com/FGasper/Compress-Zstd into set-parameter
+    Wed Apr 27 09:09:13 2022 +0100
+    f9728e090f238d489c8dd6242b6f65b9b5c55570
+
+  * Add Perl 5.34
+    Fri May 28 11:05:31 2021 +0100
+    d09a13acfe81f8c4f5fa2b29b35a2c4bbbee095a
 
 0.202 2020-07-30
     - Add ZSTD_MIN_CLEVEL

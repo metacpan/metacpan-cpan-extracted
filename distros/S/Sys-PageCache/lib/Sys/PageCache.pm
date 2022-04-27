@@ -15,7 +15,7 @@ our @EXPORT = qw(page_size fincore fadvise
             );
 our @EXPORT_OK = qw();
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 our $MAX_CHUNK_SIZE = 512*1024*1024;
 

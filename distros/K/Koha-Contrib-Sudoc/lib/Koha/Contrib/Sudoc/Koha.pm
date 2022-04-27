@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Koha;
 # ABSTRACT: Lien à Koha
-$Koha::Contrib::Sudoc::Koha::VERSION = '2.37';
+$Koha::Contrib::Sudoc::Koha::VERSION = '2.38';
 use Moose;
 use Modern::Perl;
 use Carp;
@@ -8,7 +8,7 @@ use XML::Simple;
 use DBI;
 use ZOOM;
 use MARC::Moose::Record;
-use C4::Biblio;
+use C4::Biblio qw/ GetMarcFromKohaField GetFrameworkCode /;;
 use Search::Elasticsearch;
 use YAML;
 use MIME::Base64;
@@ -369,7 +369,7 @@ Koha::Contrib::Sudoc::Koha - Lien à Koha
 
 =head1 VERSION
 
-version 2.37
+version 2.38
 
 =head1 DESCRIPTION
 

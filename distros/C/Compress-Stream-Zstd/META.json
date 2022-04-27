@@ -61,7 +61,7 @@
    "provides" : {
       "Compress::Stream::Zstd" : {
          "file" : "lib/Compress/Stream/Zstd.pm",
-         "version" : "0.202"
+         "version" : "0.203"
       },
       "Compress::Stream::Zstd::CompressionContext" : {
          "file" : "lib/Compress/Stream/Zstd/CompressionContext.pm"
@@ -93,8 +93,9 @@
          "web" : "https://github.com/pmqs/Compress-Stream-Zstd"
       }
    },
-   "version" : "0.202",
+   "version" : "0.203",
    "x_contributors" : [
+      "Felipe Gasper <felipe@felipegasper.com>",
       "Jiro Nishiguchi <jiro@cpan.org>",
       "Jiro Nishiguchi <spiritloose@users.noreply.github.com>",
       "Paul Marquess <pmqs@outlook.com>",

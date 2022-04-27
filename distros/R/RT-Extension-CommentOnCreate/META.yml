@@ -18,10 +18,11 @@ no_index:
   directory:
     - html
     - inc
+    - static
 requires:
   perl: 5.8.3
 resources:
   license: http://opensource.org/licenses/gpl-license.php
-version: '1.01'
-x_module_install_rtx_version: '0.42'
+version: '1.02'
+x_module_install_rtx_version: '0.43'
 x_requires_rt: 4.0.7

@@ -199,7 +199,7 @@ Google::ProtocolBuffers::Dynamic::ProtocInterface
 
 =head1 VERSION
 
-version 0.38
+version 0.39
 
 =head1 AUTHOR
 

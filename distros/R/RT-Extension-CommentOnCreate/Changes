@@ -1,5 +1,10 @@
 Revision history for RT-Extension-CommentOnCreate
 
+1.02 2022-04-26
+  - Use the same box modal for comment on create
+  - Add new config $CommentOnCreateRichTextHeight to set ckeditor height
+  - Set input color to yellow just like comment inputs in core
+
 1.01 2021-06-11
   - Add RT 5 support
 

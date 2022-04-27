@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Loader;
 # ABSTRACT: Classe de base pour le chargement de notices biblio/autorité
-$Koha::Contrib::Sudoc::Loader::VERSION = '2.37';
+$Koha::Contrib::Sudoc::Loader::VERSION = '2.38';
 use Moose;
 use Modern::Perl;
 use utf8;
@@ -144,7 +144,7 @@ Koha::Contrib::Sudoc::Loader - Classe de base pour le chargement de notices bibl
 
 =head1 VERSION
 
-version 2.37
+version 2.38
 
 =head1 AUTHOR
 

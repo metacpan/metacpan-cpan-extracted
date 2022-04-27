@@ -146,7 +146,9 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                             this.add(button);
                         }
                         if (btCfg.key) {
-                            let btnId = btCfg.key + 'Button';
+                            let btnId = btCfg.key
+                                + (btCfg.testingIdPostfix ? btCfg.testingIdPostfix : '')
+                                + 'Button';
                             this.addOwnedQxObject(button, btnId);
                             this._buttonMap[btCfg.key]=button;
                         }
@@ -191,7 +193,9 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         if ( btCfg.addToContextMenu) {
                             menuButton = new qx.ui.menu.Button(label);
                             if (btCfg.key) {
-                                let btnId = btCfg.key + 'MenuButton'
+                                let btnId = btCfg.key
+                                    + (btCfg.testingIdPostfix ? btCfg.testingIdPostfix : '')
+                                    + 'MenuButton';
                                 this.addOwnedQxObject(menuButton, btnId);
                             }
                             [
@@ -255,7 +259,9 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         this.debug('Invalid execute action:' + btCfg.action + ' for button', btCfg);
                 }
                 if (button && btCfg.key) {
-                    let btnId = btCfg.key + 'Button';
+                    let btnId = btCfg.key
+                        + (btCfg.testingIdPostfix ? btCfg.testingIdPostfix : '')
+                        + 'Button';
                     this.addOwnedQxObject(button, btnId);
                 }
                 var action = function(){

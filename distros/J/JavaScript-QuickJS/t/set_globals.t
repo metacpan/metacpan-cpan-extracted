@@ -9,6 +9,8 @@ use Test::FailWarnings;
 use Data::Dumper;
 use Config;
 
+use Types::Serialiser;
+
 use JavaScript::QuickJS;
 
 my $js = JavaScript::QuickJS->new()->set_globals(
@@ -86,6 +88,22 @@ my $err = $@;
 
 like($err, qr<abc>, 'error mentions what can’t be converted');
 like($err, qr<javascript>i, 'error mentions JS');
+
+
+$js->set_globals(
+    mytrue => Types::Serialiser::true(),
+    myfalse => Types::Serialiser::false(),
+);
+
+my $got = $js->eval(<<END);
+    [ typeof mytrue, mytrue, typeof myfalse, myfalse ]
+END
+
+cmp_deeply(
+    $got,
+    [ 'boolean', bool(1), 'boolean', bool(0) ],
+    'Types::Serialiser',
+);
 
 #----------------------------------------------------------------------
 

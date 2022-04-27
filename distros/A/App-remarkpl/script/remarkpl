@@ -9,15 +9,18 @@ use Mojo::File qw(path);
 # show the manual or an error message in case of an invalid file.
 my $presentation = shift @ARGV || $ENV{REMARK_PRESENTATION} || 'example.markdown';
 unless ($ENV{MOJO_APP_LOADER}) {
-  exec perldoc => -tT => $INC{'App/remarkpl.pm'} unless $presentation;
+  exec perldoc => -tT => $INC{'App/remarkpl.pm'} if $presentation =~ m!^-*(h|help|man)$!;
   die qq(Cannot read presentation file "$presentation".\n)
     unless $presentation eq 'example.markdown' or -r $presentation;
   unshift @ARGV, 'daemon';
 }
 
+$presentation = path $presentation;
+
 # Include static assets and templates
-app->renderer->paths([split /:/, ($ENV{REMARK_TEMPLATES} // path('templates')->to_abs)]);
-app->static->paths([split /:/, ($ENV{REMARK_STATIC} // path)]);
+app->renderer->paths(
+  [split /:/, ($ENV{REMARK_TEMPLATES} // $presentation->sibling('templates')->to_abs)]);
+app->static->paths([split /:/, ($ENV{REMARK_STATIC} // $presentation->dirname)]);
 push @{app->static->paths},
   path(path($INC{'App/remarkpl.pm'})->dirname, qw(remarkpl public))->to_abs;
 
@@ -31,13 +34,13 @@ app->log->info(qq(Serving presentation "$presentation"));
 get '/' => sub { shift->render(template => 'remarkpl', presentation => read_presentation()) };
 
 app->defaults(remarkjs => $ENV{REMARK_JS} || '/remark.min.js');
-app->defaults(title    => $presentation);
+app->defaults(title    => $presentation->basename);
 app->start;
 
 sub read_presentation {
   Mojo::Util::decode('UTF-8',
     -e $presentation
-    ? path($presentation)->slurp
+    ? $presentation->slurp
     : Mojo::Loader::data_section(__PACKAGE__, $presentation));
 }
 
@@ -50,6 +53,7 @@ __DATA__
   <meta charset="utf-8">
   %= stylesheet '/fonts.css'
   %= stylesheet '/basic.css'
+  %= stylesheet '/custom.css'
 </head>
 <body>
   <textarea id="source"><%= $presentation %></textarea>

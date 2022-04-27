@@ -4,7 +4,7 @@
       "HIROSE Masaaki"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -21,11 +21,7 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "File::Temp" : "0",
-            "Test::More" : "0",
-            "Test::Output" : "0"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
@@ -36,8 +32,23 @@
          "requires" : {
             "Pod::Usage" : "1.36"
          }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0",
+            "Test::Output" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.06"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/hirose31/Sys-PageCache.git",
+         "web" : "https://github.com/hirose31/Sys-PageCache"
+      }
+   },
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

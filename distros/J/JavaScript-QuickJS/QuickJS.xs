@@ -5,6 +5,8 @@
 
 #define PERL_NS_ROOT "JavaScript::QuickJS"
 
+#define PERL_BOOLEAN_CLASS "Types::Serialiser::Boolean"
+
 typedef struct {
     JSContext *ctx;
     pid_t pid;
@@ -166,7 +168,7 @@ static SV* _JSValue_to_SV (pTHX_ JSContext* ctx, JSValue jsval, SV** err_svp) {
 
                 *pqjs = (perl_qjs_func_s) {
                     .ctx = ctx,
-                    .jsfunc = jsval,
+                    .jsfunc = JS_DupValue(ctx, jsval),
                     .pid = getpid(),
                 };
 
@@ -349,7 +351,13 @@ static JSValue _sv_to_jsvalue(pTHX_ JSContext* ctx, SV* value, SV** error_svp) {
         } STMT_END;
 
         case EXS_SVTYPE_REFERENCE:
-            if (sv_isobject(value)) break;
+            if (sv_isobject(value)) {
+                if (sv_derived_from(value, PERL_BOOLEAN_CLASS)) {
+                    return JS_NewBool(ctx, SvTRUE(SvRV(value)));
+                }
+
+                break;
+            }
 
             switch (SvTYPE(SvRV(value))) {
                 case SVt_PVCV:
@@ -369,6 +377,7 @@ static JSValue _sv_to_jsvalue(pTHX_ JSContext* ctx, SV* value, SV** error_svp) {
                     AV* av = (AV*) SvRV(value);
                     JSValue jsarray = JS_NewArray(ctx);
                     JS_SetPropertyStr(ctx, jsarray, "length", JS_NewUint32(ctx, 1 + av_len(av)));
+
                     for (int32_t i=0; i <= av_len(av); i++) {
                         SV** svp = av_fetch(av, i, 0);
                         assert(svp);
@@ -716,6 +725,8 @@ eval (SV* self_sv, SV* js_code_sv)
         const char* js_code = SvPVutf8(js_code_sv, js_code_len);
 
         int eval_flags = ix ? JS_EVAL_TYPE_MODULE : JS_EVAL_TYPE_GLOBAL;
+        eval_flags |= JS_EVAL_FLAG_STRICT;
+
         JSValue jsret = JS_Eval(ctx, js_code, js_code_len, "", eval_flags);
 
         RETVAL = _return_jsvalue_or_croak(aTHX_ ctx, jsret);
@@ -734,7 +745,11 @@ DESTROY( SV* self_sv )
     CODE:
         perl_qjs_func_s* pqjs = exs_structref_ptr(self_sv);
 
-        /* Functions don’t appear to need to be freed … ? */
+        if (PL_dirty && pqjs->pid == getpid()) {
+            warn("DESTROYing %" SVf " at global destruction; memory leak likely!\n", self_sv);
+        }
+
+        JS_FreeValue(pqjs->ctx, pqjs->jsfunc);
 
         _free_jsctx(aTHX_ pqjs->ctx);
 
@@ -750,7 +765,7 @@ call( SV* self_sv, ... )
 
         SV* error = NULL;
 
-        for (uint32_t i=0; i<params_count; i++) {
+        for (int32_t i=0; i<params_count; i++) {
             SV* cur_sv = ST(i+1);
 
             JSValue jsval = _sv_to_jsvalue(aTHX_ pqjs->ctx, cur_sv, &error);
@@ -769,6 +784,10 @@ call( SV* self_sv, ... )
         JSValue jsret = JS_Call(pqjs->ctx, pqjs->jsfunc, JS_NULL, params_count, jsvars);
 
         RETVAL = _return_jsvalue_or_croak(aTHX_ pqjs->ctx, jsret);
+
+        for (uint32_t i=0; i<params_count; i++) {
+            JS_FreeValue(pqjs->ctx, jsvars[i]);
+        }
 
     OUTPUT:
         RETVAL

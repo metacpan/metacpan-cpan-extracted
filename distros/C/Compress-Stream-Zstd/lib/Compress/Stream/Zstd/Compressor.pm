@@ -8,6 +8,7 @@ use Compress::Stream::Zstd ();
 
 our @EXPORT = qw(
     ZSTD_CSTREAM_IN_SIZE
+    ZSTD_c_windowLog
 );
 
 1;
@@ -55,11 +56,26 @@ Flush whatever data remains within internal buffer.
 
 Instructs to finish a frame.
 
+=head2 $compressor->set_parameter( PARAMETER => VALUE )
+
+Sets one of the compressor’s internal parameters. PARAMETER
+is one of the parameter constants listed below.
+
 =head1 CONSTANTS
 
 =head2 ZSTD_CSTREAM_IN_SIZE
 
 Recommended size for input buffer.
+
+=head1 PARAMETER CONSTANTS
+
+The following may be given to C<set_parameter()>:
+
+=over
+
+=item * C<ZSTD_c_windowLog>
+
+=back
 
 =head1 SEE ALSO
 

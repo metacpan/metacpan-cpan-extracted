@@ -81,9 +81,12 @@ quickjs/unicode_gen.c
 quickjs/unicode_gen_def.h
 t/basic.t
 t/callback_err.t
+t/callback_invalid_sv.t
+t/export_ref.t
 t/js2perl.t
 t/js_func_to_perl.t
 t/module.t
 t/set_globals.t
+t/strict.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

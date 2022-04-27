@@ -22,7 +22,7 @@ my %fatpacked;
 
 $fatpacked{"App/cpanminus.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'APP_CPANMINUS';
   package App::cpanminus;
-  our $VERSION = "1.7045";
+  our $VERSION = "1.7046";
   
   =encoding utf8
   
@@ -98,8 +98,7 @@ $fatpacked{"App/cpanminus.pm"} = '#line '.(1+__LINE__).' "'.__FILE__."\"\n".<<'A
   to be updated.
   
   You're recommended to update the software or system if you can. If
-  that is impossible or difficult, use the C<-k> option with curl or an
-  alternative URL, C<https://git.io/cpanm>
+  that is impossible or difficult, use the C<-k> option with curl.
   
   =head1 DEPENDENCIES
   

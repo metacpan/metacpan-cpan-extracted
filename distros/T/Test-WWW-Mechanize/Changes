@@ -5,6 +5,26 @@ bug tracking.  They are now being tracked via GitHub at
 https://github.com/petdance/test-www-mechanize/issues
 
 
+1.56    Tue Apr 26 22:14:12 CDT 2022
+------------------------------------
+This version of Test::WWW::Mechanize requires Perl 5.10.
+
+[FIXES]
+Removed some code that only runs on Perl 5.10+.
+
+Add check_all_images_ok(). (GH #17)  Thanks, Julien Fiegehenn.
+This is the first version of this function, and its functionality may
+change in the near future.
+
+[DOCUMENTATION]
+Fixed some incorrect docs. Thanks, Daniel Böhmer.
+
+[INTERNALS]
+Require Perl 5.10.
+
+Explicitly requires HTTP::Message 6.29 or higher.
+
+
 1.54    Tue Dec  8 23:25:06 CST 2020
 ------------------------------------
 [ENHANCEMENTS]
@@ -479,4 +499,3 @@ Sorichetti.
 0.01    Mon Jun 28 16:38:45 CDT 2004
 ------------------------------------
 First version, released on an unsuspecting world.
-

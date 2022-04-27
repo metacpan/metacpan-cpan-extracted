@@ -1,6 +1,11 @@
 use strict;
 use Test::More;
 use Test::Output;
+
+use File::Spec;
+use FindBin;
+use lib File::Spec->catdir($FindBin::Bin, '..');
+
 use t::Util;
 use Sys::PageCache;
 

@@ -4,6 +4,7 @@ Changes
 cpanfile
 lib/App/remarkpl.pm
 lib/App/remarkpl/public/basic.css
+lib/App/remarkpl/public/custom.css
 lib/App/remarkpl/public/custom.js
 lib/App/remarkpl/public/example.jpg
 lib/App/remarkpl/public/fonts.css

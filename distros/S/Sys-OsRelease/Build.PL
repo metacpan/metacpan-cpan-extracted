@@ -13,12 +13,12 @@ my %module_build_args = (
   "configure_requires" => {
     "Module::Build" => "0.28"
   },
-  "dist_abstract" => "read operating system details from FreeDesktop.Org standard /etc/os-release file",
+  "dist_abstract" => "read operating system details from standard /etc/os-release file",
   "dist_author" => [
     "Ian Kluft <https://github.com/ikluft>"
   ],
   "dist_name" => "Sys-OsRelease",
-  "dist_version" => "0.0.1",
+  "dist_version" => "0.0.2",
   "license" => "artistic_2",
   "module_name" => "Sys::OsRelease",
   "recursive_test_files" => 1,

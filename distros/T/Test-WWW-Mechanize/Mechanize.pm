@@ -2,6 +2,7 @@ package Test::WWW::Mechanize;
 
 use strict;
 use warnings;
+use 5.010;
 
 =head1 NAME
 
@@ -9,11 +10,11 @@ Test::WWW::Mechanize - Testing-specific WWW::Mechanize subclass
 
 =head1 VERSION
 
-Version 1.54
+Version 1.56
 
 =cut
 
-our $VERSION = '1.54';
+our $VERSION = '1.56';
 
 =head1 SYNOPSIS
 
@@ -66,10 +67,22 @@ results in
 
 use HTML::TokeParser ();
 use WWW::Mechanize ();
-use Test::LongString;
+use Test::LongString qw(
+    contains_string
+    is_string
+    lacks_string
+    like_string
+    unlike_string
+);
 use Test::Builder ();
 use Carp ();
-use Carp::Assert::More;
+use Carp::Assert::More qw(
+    assert_arrayref
+    assert_in
+    assert_is
+    assert_isa
+    assert_nonblank
+);
 
 use parent 'WWW::Mechanize';
 
@@ -1440,7 +1453,7 @@ sub _check_links_content {
     return @failures;
 }
 
-# Create an array of urls to match for mech to follow.
+# Return a list of URLs to match for Mech to follow.
 sub _format_links {
     my $links = shift;
 
@@ -1468,7 +1481,7 @@ sub _format_links {
 
 =head2 $mech->scrape_text_by_attr( $attr, $attr_regex [, $html ] )
 
-Returns an array of strings, each string the text surrounded by an
+Returns a list of strings, each string the text surrounded by an
 element with attribute I<$attr> of value I<$value>.  You can also pass in
 a regular expression.  If nothing is found the return is an empty list.
 In scalar context the return is the first string found.
@@ -1764,7 +1777,8 @@ sub lacks_ids_ok {
             $TB->plan( tests => scalar @{$ids} );
 
             foreach my $id ( @$ids ) {
-                $self->lacks_id_ok( $id, "ID '" . ($id // '') . "' should not exist" );
+                my $id_disp = defined($id) ? $id : '<undef>';
+                $self->lacks_id_ok( $id, "ID '$id_disp' should not exist" );
             }
         }
     );
@@ -1893,18 +1907,18 @@ sub autotidy {
 
 =head2 $mech->grep_inputs( \%properties )
 
-grep_inputs() returns an array of all the input controls in the
-current form whose properties match all of the regexes in $properties.
+Returns a list of all the input controls in the
+current form whose properties match all of the regexes in C<$properties>.
 The controls returned are all descended from HTML::Form::Input.
 
-If $properties is undef or empty then all inputs will be
+If C<$properties> is undef or empty then all inputs will be
 returned.
 
 If there is no current page, there is no form on the current
 page, or there are no submit controls in the current form
-then the return will be an empty array.
+then the return will be an empty list.
 
-    # get all text controls whose names begin with "customer"
+    # Get all text controls whose names begin with "customer".
     my @customer_text_inputs =
         $mech->grep_inputs( {
             type => qr/^(text|textarea)$/,
@@ -1948,7 +1962,7 @@ sub grep_submits {
     return @found;
 }
 
-# search an array of hashrefs, returning an array of the incoming
+# Search an array of hashrefs, returning a list of the incoming
 # hashrefs that match *all* the pattern in $patterns.
 sub _grep_hashes {
     my $hashes = shift;
@@ -1957,13 +1971,13 @@ sub _grep_hashes {
     my @found;
 
     if ( ! %{$patterns} ) {
-        # nothing to match on, so return them all
+        # Nothing to match on, so return them all.
         @found = @{$hashes};
     }
     else {
         foreach my $hash ( @{$hashes} ) {
 
-            # check every pattern for a match on the current hash
+            # Check every pattern for a match on the current hash.
             my $matches_everything = 1;
             foreach my $pattern_key ( keys %{$patterns} ) {
                 $matches_everything = 0 unless exists $hash->{$pattern_key} && $hash->{$pattern_key} =~ $patterns->{$pattern_key};
@@ -2142,8 +2156,6 @@ input length.  Fields for which the concept of input length is irrelevant,
 and controls that HTML does not allow to be capped (e.g. textarea)
 are ignored.
 
-The inputs in the returned array are descended from HTML::Form::Input.
-
 The return is true if the test succeeded, false otherwise.
 
 =cut
@@ -2176,6 +2188,65 @@ sub lacks_uncapped_inputs {
 
     my $ok = $TB->ok( @uncapped == 0, $comment );
     $TB->diag( $_ ) for @uncapped;
+
+    return $ok;
+}
+
+=head2 $mech->check_all_images_ok( [%criterium ], [$comment] )
+
+Executes a test to make sure all images in the page can be downloaded. It
+does this by running C<HEAD> requests on them. The current page content stays the same.
+
+The test fails if any image cannot be found, but reports all of the ones that were not found.
+
+For a definition of I<all images>, see L<< C<images>in WWW::Mechanize|WWW::Mechanize/$mech->images >>.
+
+The optional C<%criterium> argument can be passed in before the C<$comment> and will be used to define
+which images should be considered. This is useful to filter out specific paths.
+
+    $mech->check_all_images_ok( url_regex => qr{^/}, 'All absolute images should exist');
+    $mech->check_all_images_ok( url_regex => qr{\.(?:gif|jpg)$}, 'All gif and jpg images should exist');
+    $mech->check_all_images_ok(
+        url_regex => qr{^((?!\Qhttps://googleads.g.doubleclick.net/\E).)*$},
+        'All images should exist, but Ignore the ones from Doubleclick'
+    );
+
+For a full list of possible arguments see L<< C<find_all_images>in WWW::Mechanize|WWW::Mechanize/$mech->find_all_images >>.
+
+The return is true if the test succeeded, false otherwise.
+
+=cut
+
+sub check_all_images_ok {
+    my $self = shift;
+    my @args = @_;
+
+    my $comment;
+    if ( @args % 2 ) {
+        $comment = pop @args;
+    }
+
+    $comment = 'All images in the page should exist' unless defined($comment);
+
+    require HTTP::Request::Common;
+
+    my @not_ok;
+    foreach my $img ( map { $_->URI } $self->find_all_images(@args) ) {
+        my $abs = $img->abs;
+
+        state $head_cache; # Cache images we've already checked between calls.
+        if ( !$head_cache->{$abs}++ ) {
+            # WWW::Mechanize->_make_request makes a raw LWP::UserAgent request that does
+            # not show up in our history and does not mess with our current content.
+            my $res = $self->_make_request( HTTP::Request::Common::HEAD($abs) );
+            if ( not $res->is_success ) {
+                push( @not_ok, $img . ' returned code ' . $res->code );
+            }
+        }
+    }
+
+    my $ok = $TB->ok( @not_ok == 0, $comment );
+    $TB->diag($_) for @not_ok;
 
     return $ok;
 }
@@ -2222,6 +2293,7 @@ L<http://search.cpan.org/dist/Test-WWW-Mechanize>
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to
+Julien Fiegehenn,
 @marderh,
 Eric A. Zarko,
 @moznion,
@@ -2243,7 +2315,7 @@ and Pete Krawczyk for patches.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2004-2020 Andy Lester.
+Copyright 2004-2022 Andy Lester.
 
 This library is free software; you can redistribute it and/or modify it
 under the terms of the Artistic License version 2.0.

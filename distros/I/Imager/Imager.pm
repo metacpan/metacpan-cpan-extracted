@@ -5,7 +5,9 @@ use strict;
 use IO::File;
 use Scalar::Util;
 use Imager::Color;
+use Imager::Color::Float;
 use Imager::Font;
+use Imager::TrimColorList;
 use Config;
 
 our $ERRSTR;
@@ -148,7 +150,7 @@ BEGIN {
   if ($ex_version < 5.57) {
     our @ISA = qw(Exporter);
   }
-  $VERSION = '1.012';
+  $VERSION = '1.013';
   require XSLoader;
   XSLoader::load(Imager => $VERSION);
 }
@@ -909,6 +911,87 @@ sub crop {
 
   i_copyto($dst->{IMG},$self->{IMG},$l,$t,$r,$b,0,0);
   return $dst;
+}
+
+my $empty_trim_colors = Imager::TrimColorList->new();
+
+sub _trim_rect {
+  my ($self, $name, %hsh) = @_;
+
+  $self->_valid_image($name)
+    or return;
+
+  my $auto = delete $hsh{auto};
+  my $colors = delete $hsh{colors} || $empty_trim_colors;
+  my $alpha = delete $hsh{alpha} || 0;
+  my $tolerance = delete $hsh{tolerance};
+  defined $tolerance or $tolerance = 0.01;
+
+  if (keys %hsh) {
+    $self->_set_error("$name: unexpected arguments:".join(", ", sort keys %hsh));
+    return;
+  }
+
+  if ($auto) {
+    if ($colors != $empty_trim_colors) {
+      $self->_set_error("$name: only one of auto and colors can be supplied");
+      return;
+    }
+    if ($tolerance < 0) {
+      $self->_set_error("$name: tolerance must be non-negative");
+      return;
+    }
+
+    $colors = Imager::TrimColorList->auto
+      (
+       auto => $auto,
+       tolerance => $tolerance,
+       name => $name,
+       image => $self,
+      );
+    unless ($colors) {
+      $self->_set_error(Imager->errstr);
+      return;
+    }
+  }
+
+  unless (ref $colors) {
+    $self->_set_error("$name: colors must be an arrayref or an Imager::TrimColorList object");
+    return;
+  }
+  unless (UNIVERSAL::isa($colors, "Imager::TrimColorList")) {
+    unless (Scalar::Util::reftype($colors) eq "ARRAY") {
+      $self->_set_error("$name: colors must be an arrayref or an Imager::TrimColorList object");
+      return;
+    }
+    $colors = Imager::TrimColorList->new(@$colors);
+  }
+
+  return i_trim_rect($self->{IMG}, $alpha, $colors);
+}
+
+sub trim_rect {
+  my ($self, %hsh) = @_;
+
+  return $self->_trim_rect("trim_rect", %hsh);
+}
+
+sub trim {
+  my ($self, %hsh) = @_;
+
+  my ($left, $top, $right, $bottom) = $self->_trim_rect("trim", %hsh)
+    or return;
+
+  if ($left == $self->getwidth) {
+    # the whole image would be trimmed, but we don't support zero
+    # width or height images.
+    return $self->crop(width => 1, height => 1);
+  }
+  else {
+    my ($w, $h) = i_img_info($self->{IMG});
+    return $self->crop(left => $left, right => $w - $right,
+                       top => $top,   bottom => $h - $bottom);
+  }
 }
 
 sub _sametype {
@@ -3942,6 +4025,26 @@ sub difference {
   return $result;
 }
 
+sub rgb_difference {
+  my ($self, %opts) = @_;
+
+  $self->_valid_image("rgb_difference")
+    or return;
+
+  defined $opts{other}
+    or return $self->_set_error("No 'other' parameter supplied");
+  unless ($opts{other}->_valid_image("rgb_difference")) {
+    $self->_set_error($opts{other}->errstr . " (other image)");
+    return;
+  }
+
+  my $result = Imager->new;
+  $result->{IMG} = i_rgbdiff_image($self->{IMG}, $opts{other}{IMG})
+    or return $self->_set_error($self->_error_as_msg());
+
+  return $result;
+}
+
 # destructive border - image is shrunk by one pixel all around
 
 sub border {
@@ -4910,7 +5013,7 @@ is_bilevel() - L<Imager::ImageTypes/is_bilevel()> - returns whether
 image write functions should write the image in their bilevel (blank
 and white, no gray levels) format
 
-is_logging() L<Imager::ImageTypes/is_logging()> - test if the debug
+is_logging() - L<Imager::ImageTypes/is_logging()> - test if the debug
 log is active.
 
 line() - L<Imager::Draw/line()> - draw an interval
@@ -4980,6 +5083,9 @@ register_reader() - L<Imager::Files/register_reader()>
 
 register_writer() - L<Imager::Files/register_writer()>
 
+rgb_difference() - L<Imager::Filters/rgb_difference()> - produce a difference
+images from two input images.
+
 rotate() - L<Imager::Transformations/rotate()>
 
 rubthrough() - L<Imager::Transformations/rubthrough()> - draw an image
@@ -5024,6 +5130,12 @@ double per sample image.
 transform() - L<Imager::Engines/"transform()">
 
 transform2() - L<Imager::Engines/"transform2()">
+
+trim() - L<Imager::Transformations/trim()> - return a cropped image
+based on border transparency or border colors.
+
+trim_rect() - L<Imager::Transformations/trim_rect()> - return how much
+trim() would remove.
 
 type() -  L<Imager::ImageTypes/type()> - type of image (direct vs paletted)
 
@@ -5070,7 +5182,7 @@ contrast - L<< Imager::Filters/C<contrast> >>, L<< Imager::Filters/C<autolevels>
 
 convolution - L<< Imager::Filters/C<conv> >>
 
-cropping - L<Imager::Transformations/crop()>
+cropping - L<Imager::Transformations/crop()>, L<Imager::Transformations/trim()>
 
 CUR files - L<Imager::Files/"ICO (Microsoft Windows Icon) and CUR (Microsoft Windows Cursor)">
 

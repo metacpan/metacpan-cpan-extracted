@@ -8,6 +8,7 @@ use Compress::Stream::Zstd ();
 
 our @EXPORT = qw(
     ZSTD_DSTREAM_IN_SIZE
+    ZSTD_d_windowLogMax
 );
 
 1;
@@ -46,11 +47,26 @@ Create an instance of Compress::Stream::Zstd::Decompressor.
 
 Consume input stream.
 
+=head2 $decompressor->set_parameter( PARAMETER => VALUE )
+
+Sets one of the decompressor’s internal parameters. PARAMETER
+is one of the parameter constants listed below.
+
 =head1 CONSTANTS
 
 =head2 ZSTD_DSTREAM_IN_SIZE
 
 Recommended size for input buffer.
+
+=head1 PARAMETER CONSTANTS
+
+The following may be given to C<set_parameter()>:
+
+=over
+
+=item * C<ZSTD_d_windowLogMax>
+
+=back
 
 =head1 SEE ALSO
 

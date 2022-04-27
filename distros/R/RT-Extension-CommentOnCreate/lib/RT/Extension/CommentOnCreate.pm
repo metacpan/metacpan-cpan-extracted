@@ -1,11 +1,12 @@
 package RT::Extension::CommentOnCreate;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use warnings;
 use strict;
 use Carp;
 
+RT->AddStyleSheets('rt-extension-commentoncreate.css');
 
 =head1 NAME
 
@@ -48,11 +49,13 @@ or add C<RT::Extension::CommentOnCreate> to your existing C<@Plugins> line.
 Optional configuration options to control the width and height of the
 Comment textbox:
 
-    Set($CommentOnCreateWidth, 80);
-    Set($CommentOnCreateHeight, 190);
+    Set($CommentOnCreateWidth, 80); # For RT 4 only
+    Set($CommentOnCreateHeight, 15);
 
-These only apply if you have C<MessageBoxRichText> enabled; otherwise it
-will inherit the global C<MessageBoxRichTextHeight> attribute.
+If C<MessageBoxRichText> is enabled, use this to control the height of the
+editor:
+
+    Set($CommentOnCreateRichTextHeight, 200);
 
 =head1 AUTHOR
 
@@ -70,7 +73,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2014-2021 by Best Practical Solutions
+This software is Copyright (c) 2014-2022 by Best Practical Solutions
 
 This is free software, licensed under:
 
