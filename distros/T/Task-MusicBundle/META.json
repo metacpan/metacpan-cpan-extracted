@@ -69,6 +69,7 @@
             "Music::Note::Role::Operators" : "0",
             "Music::PitchNum" : "0",
             "Music::RecRhythm" : "0",
+            "Music::RhythmSet" : "0",
             "Music::ScaleNote" : "0",
             "Music::Scales" : "0",
             "Music::Tempo" : "0",
@@ -101,7 +102,7 @@
          "web" : "https://github.com/ology/Task-MusicBundle"
       }
    },
-   "version" : "0.1908",
+   "version" : "0.1910",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"

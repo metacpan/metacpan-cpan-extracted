@@ -64,7 +64,7 @@ use common::sense;
 
 use Carp ();
 
-our $VERSION = '1.0';
+our $VERSION = '1.02';
 
 our $PID; # child pid
 our $ENABLED = 0; # also version
@@ -256,7 +256,7 @@ END { $end && &$end }
 
 =head1 SEE ALSO
 
-L<AnyEvent::Watchdg::Util>, L<AnyEvent>.
+L<AnyEvent::Watchdog::Util>, L<AnyEvent>.
 
 =head1 AUTHOR
 

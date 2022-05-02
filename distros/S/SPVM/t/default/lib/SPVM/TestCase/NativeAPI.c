@@ -2218,3 +2218,230 @@ int32_t SPVM__TestCase__NativeAPI__new_string_nolen(SPVM_ENV* env, SPVM_VALUE* s
 
   return 0;
 }
+
+int32_t SPVM__TestCase__NativeAPI__check_native_api_constant_values(SPVM_ENV* env, SPVM_VALUE* stack) {
+  (void)env;
+  (void)stack;
+  
+  int32_t e;
+  
+  void** env_array = (void**)env;
+  
+  // Constant Values of Basic Type IDs
+  {
+    if (SPVM_NATIVE_C_BASIC_TYPE_ID_UNKNOWN != 0) { stack[0].ival = 0; return 0; }
+    if (SPVM_NATIVE_C_BASIC_TYPE_ID_UNDEF != 1) { stack[0].ival = 0; return 0; }
+    if (SPVM_NATIVE_C_BASIC_TYPE_ID_VOID != 2) { stack[0].ival = 0; return 0; }
+    if (SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE != 3) { stack[0].ival = 0; return 0; }
+    if (SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT != 4) { stack[0].ival = 0; return 0; }
+    if (SPVM_NATIVE_C_BASIC_TYPE_ID_INT != 5) { stack[0].ival = 0; return 0; }
+    if (SPVM_NATIVE_C_BASIC_TYPE_ID_LONG != 6) { stack[0].ival = 0; return 0; }
+    if (SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT != 7) { stack[0].ival = 0; return 0; }
+    if (SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE != 8) { stack[0].ival = 0; return 0; }
+    if (SPVM_NATIVE_C_BASIC_TYPE_ID_STRING != 9) { stack[0].ival = 0; return 0; }
+    if (SPVM_NATIVE_C_BASIC_TYPE_ID_ANY_OBJECT != 10) { stack[0].ival = 0; return 0; }
+    if (SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE_OBJECT != 11) { stack[0].ival = 0; return 0; }
+    if (SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT_OBJECT != 12) { stack[0].ival = 0; return 0; }
+    if (SPVM_NATIVE_C_BASIC_TYPE_ID_INT_OBJECT != 13) { stack[0].ival = 0; return 0; }
+    if (SPVM_NATIVE_C_BASIC_TYPE_ID_LONG_OBJECT != 14) { stack[0].ival = 0; return 0; }
+    if (SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT_OBJECT != 15) { stack[0].ival = 0; return 0; }
+    if (SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE_OBJECT != 16) { stack[0].ival = 0; return 0; }
+    if (SPVM_NATIVE_C_BASIC_TYPE_ID_BOOL_OBJECT != 17) { stack[0].ival = 0; return 0; }
+  }
+
+  // Constant Values of Basic Type Categories
+  {
+    if (SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_UNKNOWN != 0) { stack[0].ival = 0; return 0; }
+    if (SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_NOT_FOUND_CLASS != 1) { stack[0].ival = 0; return 0; }
+    if (SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_UNDEF != 2) { stack[0].ival = 0; return 0; }
+    if (SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_VOID != 3) { stack[0].ival = 0; return 0; }
+    if (SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_NUMERIC != 4) { stack[0].ival = 0; return 0; }
+    if (SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_MULNUM != 5) { stack[0].ival = 0; return 0; }
+    if (SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_STRING != 6) { stack[0].ival = 0; return 0; }
+    if (SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CLASS != 7) { stack[0].ival = 0; return 0; }
+    if (SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE != 8) { stack[0].ival = 0; return 0; }
+    if (SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CALLBACK != 9) { stack[0].ival = 0; return 0; }
+    if (SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_ANY_OBJECT != 10) { stack[0].ival = 0; return 0; }
+  }
+  
+  stack[0].ival = 1;
+
+  return 0;
+}
+
+int32_t SPVM__TestCase__NativeAPI__check_native_api_precompile_indexes(SPVM_ENV* env, SPVM_VALUE* stack) {
+  (void)env;
+  (void)stack;
+  
+  int32_t e;
+  
+  void** env_array = (void**)env->api->precompile;
+
+  if ((void*)&env->api->precompile->new_precompile != &env_array[0]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->precompile->free_precompile != &env_array[1]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->precompile->set_runtime != &env_array[2]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->precompile->get_runtime != &env_array[3]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->precompile->create_precompile_source != &env_array[4]) { stack[0].ival = 0; return 0; }
+
+  stack[0].ival = 1;
+
+  return 0;
+}
+
+int32_t SPVM__TestCase__NativeAPI__check_native_api_string_buffer_indexes(SPVM_ENV* env, SPVM_VALUE* stack) {
+  (void)env;
+  (void)stack;
+  
+  int32_t e;
+  
+  void** env_array = (void**)env->api->string_buffer;
+
+  if ((void*)&env->api->string_buffer->new_string_buffer_tmp != &env_array[0]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->string_buffer->free_string_buffer != &env_array[1]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->string_buffer->get_value != &env_array[2]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->string_buffer->get_length != &env_array[3]) { stack[0].ival = 0; return 0; }
+
+  stack[0].ival = 1;
+
+  return 0;
+}
+
+int32_t SPVM__TestCase__NativeAPI__check_native_api_allocator_indexes(SPVM_ENV* env, SPVM_VALUE* stack) {
+  (void)env;
+  (void)stack;
+  
+  int32_t e;
+  
+  void** env_array = (void**)env->api->allocator;
+
+  if ((void*)&env->api->allocator->new_allocator != &env_array[0]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->allocator->free_allocator != &env_array[1]) { stack[0].ival = 0; return 0; }
+
+  stack[0].ival = 1;
+
+  return 0;
+}
+
+int32_t SPVM__TestCase__NativeAPI__check_native_api_compiler_indexes(SPVM_ENV* env, SPVM_VALUE* stack) {
+  (void)env;
+  (void)stack;
+  
+  int32_t e;
+  
+  void** env_array = (void**)env->api->compiler;
+
+  if ((void*)&env->api->compiler->new_compiler != &env_array[0]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->compiler->free_compiler != &env_array[1]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->compiler->set_start_line != &env_array[2]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->compiler->get_start_line != &env_array[3]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->compiler->set_start_file != &env_array[4]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->compiler->get_start_file != &env_array[5]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->compiler->add_module_dir != &env_array[6]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->compiler->get_module_dirs_length != &env_array[7]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->compiler->get_module_dir != &env_array[8]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->compiler->compile_spvm != &env_array[9]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->compiler->get_error_messages_length != &env_array[10]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->compiler->get_error_message != &env_array[11]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->compiler->create_spvm_32bit_codes != &env_array[12]) { stack[0].ival = 0; return 0; }
+
+  stack[0].ival = 1;
+
+  return 0;
+}
+
+int32_t SPVM__TestCase__NativeAPI__check_native_api_runtime_indexes(SPVM_ENV* env, SPVM_VALUE* stack) {
+  (void)env;
+  (void)stack;
+  
+  int32_t e;
+  
+  void** env_array = (void**)env->api->runtime;
+
+  if ((void*)&env->api->runtime->new_runtime != &env_array[0]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->free_runtime != &env_array[1]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->prepare != &env_array[2]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_opcodes != &env_array[3]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_opcodes_length != &env_array[4]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_spvm_32bit_codes != &env_array[5]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_spvm_32bit_codes_length != &env_array[6]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_classes_length != &env_array[7]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_constant_string_id != &env_array[8]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_constant_string_value != &env_array[9]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_name != &env_array[10]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_basic_type_id_by_name != &env_array[11]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_basic_type_name_id != &env_array[12]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_basic_type_class_id != &env_array[13]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_basic_type_category != &env_array[14]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_type_basic_type_id != &env_array[15]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_type_dimension != &env_array[16]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_type_width != &env_array[17]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_type_is_object != &env_array[18]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_type_is_ref != &env_array[19]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_class_id_by_name != &env_array[20]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_class_name_id != &env_array[21]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_class_module_rel_file_id != &env_array[22]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_class_module_dir_id != &env_array[23]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_class_is_anon != &env_array[24]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_class_fields_base_id != &env_array[25]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_class_fields_length != &env_array[26]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_class_methods_base_id != &env_array[27]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_class_methods_length != &env_array[28]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_class_class_vars_base_id != &env_array[29]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_class_class_vars_length != &env_array[30]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_class_anon_methods_base_id != &env_array[31]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_class_anon_methods_length != &env_array[32]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_class_var_id_by_index != &env_array[33]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_class_var_id_by_name != &env_array[34]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_class_var_name_id != &env_array[35]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_class_var_signature_id != &env_array[36]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_class_var_class_id != &env_array[37]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_field_id_by_index != &env_array[38]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_field_id_by_name != &env_array[39]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_field_name_id != &env_array[40]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_field_type_id != &env_array[41]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_field_signature_id != &env_array[42]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_field_class_id != &env_array[43]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_method_id_by_index != &env_array[44]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_method_id_by_name != &env_array[45]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_method_name_id != &env_array[46]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_method_signature_id != &env_array[47]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_method_return_type_id != &env_array[48]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_method_class_id != &env_array[49]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_method_is_class_method != &env_array[50]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_method_is_anon != &env_array[51]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_method_is_native != &env_array[52]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_method_is_precompile != &env_array[53]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_method_call_stack_byte_vars_length != &env_array[54]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_method_call_stack_short_vars_length != &env_array[55]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_method_call_stack_int_vars_length != &env_array[56]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_method_call_stack_long_vars_length != &env_array[57]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_method_call_stack_float_vars_length != &env_array[58]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_method_call_stack_double_vars_length != &env_array[59]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_method_call_stack_object_vars_length != &env_array[60]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_method_call_stack_ref_vars_length != &env_array[61]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_method_mortal_stack_length != &env_array[62]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_method_opcodes_base_id != &env_array[63]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_method_opcodes_length != &env_array[64]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_method_args_base_id != &env_array[65]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_method_args_length != &env_array[66]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_arg_type_id != &env_array[67]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_anon_method_method_id != &env_array[68]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_native_method_address != &env_array[69]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->set_native_method_address != &env_array[70]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_precompile_method_address != &env_array[71]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->set_precompile_method_address != &env_array[72]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->object_header_byte_size != &env_array[73]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->object_weaken_backref_head_offset != &env_array[74]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->object_ref_count_offset != &env_array[75]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->object_basic_type_id_offset != &env_array[76]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->object_type_dimension_offset != &env_array[77]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->object_flag_offset != &env_array[78]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->object_length_offset != &env_array[79]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->get_allocator != &env_array[80]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->api->runtime->build != &env_array[81]) { stack[0].ival = 0; return 0; }
+  
+  stack[0].ival = 1;
+
+  return 0;
+}
+

@@ -3,7 +3,7 @@
 # Beware: DON'T PERFORM ANY ACTIONS AT TOP LEVEL: this file runs many times under -n!
 
 BEGIN {
-    $pl::VERSION = 'v0.63.0';
+    $pl::VERSION = 'v0.63.1.92';
     my $execed = shift if @ARGV && $ARGV[0] eq '+'; # don't recursively call perl again for -p
     return unless @ARGV and $ARGV[0] =~ /^-/s;
     my $onepl = qr/[rhv?]|[oOpP](?:[1-9][0-9]*)?/; # simple pl opts, reflect these in pod/html
@@ -79,25 +79,24 @@ use strict;
 
 #use warnings;
 
-use feature ':'.substr $^V, 1; # Enable latest optional features.
+use feature ':5.10';
 use sort 'stable';
 
-use List::Util;
-use List::Util @List::Util::EXPORT_OK;
+use List::Util '/./'; # all EXPORT_OK
 BEGIN {
-    if( $] lt '5.02' ) {
-	*any = sub(&@) { my $prog = shift; &$prog && return 1 for @_ };
-	*all = sub(&@) { my $prog = shift; &$prog || return for @_; 1 };
-	*none = sub(&@) { my $prog = shift; &$prog && return for @_; 1 };
-	*notall = sub(&@) { my $prog = shift; &$prog || return 1 for @_ };
-	*product = sub(@) { reduce { $a * $b } 1, @_ };
-	*sum0 = sub(@) { sum 0, @_ } if !defined \&sum0;
-    }
+    eval q{
+	sub any(&@) { my $prog = shift; &$prog && return 1 for @_ };
+	sub all(&@) { my $prog = shift; &$prog || return for @_; 1 };
+	sub none(&@) { my $prog = shift; &$prog && return for @_; 1 };
+	sub notall(&@) { my $prog = shift; &$prog || return 1 for @_ };
+	sub product(@) { reduce { $a * $b } 1, @_ };
+	*sum0 = sub(@) { sum 0, @_ } if !defined \&sum0; # perl < 5.18
+    } if $List::Util::VERSION lt '1.33'; # perl < 5.20
 }
 
 
 our( $A, @A,
-     @F, @FIELD,
+     @FIELD,
      $H, $HEX_SORT,
      $I, $ARGIND,
      %K, %KEYDIFF,
@@ -555,8 +554,7 @@ EOF
 
 # Put this before compiling caller's main program, as these get run LIFO.
 END {
-    echo $RESULT if defined $RESULT;
-    echo for @RESULT;
+    echo for $RESULT // (), @RESULT;
     form "%s:  %s", $_, $RESULT{$_}
 	for pl::sort_keys %RESULT;
 
@@ -570,7 +568,7 @@ END {
 
 BEGIN {
     *I = \$ARGIND;
-    *FIELD = \@F;
+    *FIELD = \@::F;
     eval '*' . substr( $_, 1, 1 ) . " = \\$_" for
       qw'*ARGV &benchmark &Benchmark &Config &Date &echo &Echo &form &Form &hosts $HEX_SORT &Isodate &keydiff &Keydiff %KEYDIFF &Number %NUMBER &piped $quote $Quote *RESULT $TXT_SORT';
 
@@ -583,7 +581,7 @@ BEGIN {
     {
 	# Assemble a program that works under perl -n, etc., while adding in pl's options.
 	# This is wild stuff, as it has to blend in various options, while potentially accomodating an outer loop.
-	my @prog = '';
+	my @prog = "use feature ':'.substr \$^V, 1;\n"; # Enable latest optional features.
 	@prog[2, 4, 11, 13, 22] =
 	  ('sub pl::prog { $pl::last = 1;',
 	   'LINE: {',		# dummy loop
@@ -601,7 +599,7 @@ BEGIN {
 	    } elsif( /v/ ) {
 		say "This is pl $pl::VERSION, with perl $^V
 
-Copyright 1997-2021, Daniel Pfeiffer
+Copyright 1997-2022, Daniel Pfeiffer
 
 Pl may be copied only under the terms of either the Artistic License or the
 GNU General Public License, which may be found in the Perl 5 source kit.";
@@ -613,7 +611,8 @@ GNU General Public License, which may be found in the Perl 5 source kit.";
 		my $bit = "\n#line 1 \"-$1 option\"\n$pl::opts[0]\n;";
 		my $block = shift( @pl::opts ) =~ /\A\{.+\}\Z/s;
 		if( /A/ ) {
-		    $prog[0] .= "\@ARGV = map { $bit } \@ARGV ? \@ARGV : undef;\n";
+		    chop $bit;
+		    $prog[0] .= '@ARGV = ' . ($block ? "grep $bit" : "map { $bit }") . " \@ARGV ? \@ARGV : undef;\n";
 		} elsif( /b/ ) {
 		    # Do it each time ARGV changes
 		    $prog[5] = 'if( ($pl::exARGV //= "") ne $ARGV ) {' . $bit . '$pl::exARGV = $ARGV; }';
@@ -739,15 +738,15 @@ Count hits in magic statistics hash C<%N(UMBER)>:
 Though they are sometimes slightly, sometimes quite a bit more complicated,
 most Perl one-liners from the internet work, just by omitting C<-e> or C<-E>
 (pl has only one main program, but you can just as well concatenate the C<-e>s
-with C<;>).  See L<minor differences|/"Minor Differences with perl -e"> for
+with C<;>).  See L<minor differences|/"Minor Differences with perl -E"> for
 exceptions.  There are L<many varied examples|https://metacpan.org/dist/App-pl/view/pod/examples.pod>.
 
 =head1 DESCRIPTION
 
-I<Don't believe everything you read on SourceForge^H^H^H the internet! -- Aristotle ;-)>
+I<Don't believe everything you read on SourceForge^H^H^H the internet! --B< >Plato :-y>
 
 Pl follows Perl's philosophy for one-liners: the one variable solely used in
-one-liners, C<@F>, is single-lettered.  Because not everyone may like that, Pl
+one-liners, C<@F>, is single-lettered.  Because not everyone may like that, pl
 has it both ways.  Everything is aliased both as a word and as a single
 letter, including Perl's own C<@F> & C<*ARGV>.
 
@@ -785,8 +784,15 @@ I<perl:> Specify record separator with B<-n>/B<-p> (C<\0>, if no argument).
 =item C<-AI<prog>>
 
 Map program over already available C<@A(RGV)> (from command line or previous
-B<-A>) or undef.  The result becomes the new C<@A(RGV)>.  May be mixed with
-B<-B>.
+B<-A>) or undef.  If program is wrapped in C<{}> use C<grep> instead of
+C<map>.  The result becomes the new C<@A(RGV)>.  May be mixed with B<-B>.  The
+1st two are equivalent, except that the 1st one isn't limited by Shell line
+length limitations.  The third again greps by file size, reading only the Perl
+modules less than 1kB:
+
+    pl -nA '<*.pm>' '...'
+    pl -n '...' *.pm
+    pl -nA '<*.pm>' -A '{ (stat)[7] < 1000 }' '...'
 
 =item C<-a>
 
@@ -978,13 +984,13 @@ some context, else echoes it.
 
     pl 'Date;
         $_ = Date -86400, "+3600";
-        e $_, " -- ", Date "+8:45"'
+        echo $_, " -- ", Date "+8:45"'
     pl 'D;
         $_ = D -86400, "+3600";
         e $_, " -- ", D "+8:45"'
 
-    >   Thu Jan  6 23:44:02.147683 2022
-    >   Thu Jan  6 00:44:02.147744 2022  --  Fri Jan  7 07:29:02.147769 +08:45 2022
+    >   Mon May  2 11:30:33.595486 2022
+    >   Sun May  1 12:30:33.595676 2022  --  Mon May  2 18:15:33.595729 +08:45 2022
 
 =item C<echo I<[arg...]>> |
 C<e I<[arg...]>>
@@ -1023,13 +1029,13 @@ Same as C<D(ate)>, but uses ISO format.
 
     pl 'Isodate;
         $_ = Isodate 7 * -86400;
-        e $_, " -- ", Isodate "+8.75"'
+        echo $_, " -- ", Isodate "+8.75"'
     pl 'I;
         $_ = I 7 * -86400;
         e $_, " -- ", I "+8.75"'
 
-    >   2022-01-06T23:44:02.165406
-    >   2021-12-30T23:44:02.165471  --  2022-01-07T07:29:02.165494 +08:45
+    >   2022-05-02T11:30:33.635706
+    >   2022-04-25T11:30:33.635792  --  2022-05-02T18:15:33.635824 +08:45
 
 =item C<keydiff I<[key[, value]]>> |
 C<k I<[key[, value]]>>
@@ -1123,6 +1129,8 @@ complicated.  Expect it to change and be optimized further in the future:
     PLDUMP=1 \
         pl 'say "Hello Perld!"'
 
+    >   use feature ':' . substr $^V, 1;
+    >   
     >   sub pl::prog {
     >       $pl::last = 1;
     >     LINE: {
@@ -1148,7 +1156,7 @@ for C<any>, C<all>, C<none>, C<notall>, C<product> & C<sum0>.  Dumped
 data-structures may be formatted with a funny margin and C<h(osts)> will find
 the less IPv6 resolutions, the older your Perl.
 
-=head2 Minor Differences with perl -e
+=head2 Minor Differences with perl -E
 
 Known minor differences are:
 

@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2021 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.19;
+use Object::Pad 0.57;
 
-package Device::Chip::MPL3115A2 0.09;
+package Device::Chip::MPL3115A2 0.10;
 class Device::Chip::MPL3115A2
-   extends Device::Chip::Base::RegisteredI2C;
+   :isa(Device::Chip::Base::RegisteredI2C);
 
 use utf8;
 

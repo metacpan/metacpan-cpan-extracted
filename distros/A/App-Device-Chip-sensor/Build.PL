@@ -10,9 +10,11 @@ my $build = Module::Build->new(
    requires => {
       'perl' => '5.026',
       'Feature::Compat::Defer' => 0,
-      'Object::Pad' => '0.32',
+      'Future::AsyncAwait' => 0,
+      'Object::Pad' => '0.57',
 
       'Device::Chip::Adapter' => 0,
+      'Device::Chip::Sensor' => '0.19',
       'Future::IO' => '0.08',
       'Future::IO::Impl::IOAsync' => 0,
    },

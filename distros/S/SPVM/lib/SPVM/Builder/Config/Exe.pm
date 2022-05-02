@@ -2,8 +2,22 @@ package SPVM::Builder::Config::Exe;
 
 use strict;
 use warnings;
+use Carp 'confess';
+
+use SPVM::Builder::Util;
 
 use base 'SPVM::Builder::Config';
+
+sub dependent_files {
+  my $self = shift;
+  if (@_) {
+    $self->{dependent_files} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{dependent_files};
+  }
+}
 
 sub new {
   my ($self, %options) = @_;
@@ -13,8 +27,47 @@ sub new {
   }
   
   $self = $self->SUPER::new(%options);
+  
+  unless (defined $self->{dependent_files}) {
+    $self->{dependent_files} = [];
+  }
 
   return $self;
+}
+
+sub load_config {
+  my ($self, $config_file) = @_;
+  
+  my $config = SPVM::Builder::Util::load_config($config_file);
+  
+  push @{$config->dependent_files}, $config_file;
+  
+  return $config;
+}
+
+sub load_mode_config {
+  my ($self, $config_file, $mode) = @_;
+  
+  my $default_config_file = $config_file;
+  
+  $default_config_file =~ s/(\.[a-zA-Z0-9_]+)?\.config$//;
+  $default_config_file .= ".$mode.config";
+  
+  unless (-f $default_config_file) {
+    confess "Can't find default config file \"$default_config_file\"";
+  }
+  
+  my $config = $self->load_config($default_config_file);
+  
+  return $config;
+}
+
+sub load_default_config {
+  my ($self, $config_file) = @_;
+  
+  my $config = $self->load_mode_config($config_file, 'default');
+  
+  return $config;
 }
 
 sub global_cc_each {
@@ -47,6 +100,51 @@ sub global_optimize_each {
   }
   else {
     return $self->{global_optimize_each};
+  }
+}
+
+sub no_precompile {
+  my $self = shift;
+  if (@_) {
+    $self->{no_precompile} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{no_precompile};
+  }
+}
+
+sub no_compiler_api {
+  my $self = shift;
+  if (@_) {
+    $self->{no_compiler_api} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{no_compiler_api};
+  }
+}
+
+sub dynamic_lib {
+  my $self = shift;
+  if (@_) {
+    $self->{dynamic_lib} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{dynamic_lib};
+  }
+}
+
+
+sub static_lib {
+  my $self = shift;
+  if (@_) {
+    $self->{static_lib} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{static_lib};
   }
 }
 

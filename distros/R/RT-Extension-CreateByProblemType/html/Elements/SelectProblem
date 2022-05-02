@@ -1,0 +1,58 @@
+<select name="<% $Name %>" <% $OnChange ? qq{onchange="$OnChange"} : '' |n %> class="select-problem form-control selectpicker">
+% my $in_group;
+% my $i = 0;
+% for my $option ( @options ) {
+% if ( ref $option eq 'HASH' ) {
+%   if ( $in_group ) {
+%   # the bold style on optgroup applies to its children, so we need to set back to normal here.
+    <option style="font-weight: normal !important;" class="<% ++$i % 2 ? 'odd' : 'even' %>"
+%   } else {
+    <option class="font-weight-bold" data-divider="true"></option>
+    <option class="font-weight-bold"
+% }
+    <% $Default eq $option->{value} ? 'selected="selected"' : '' |n %> value="<% $option->{value} %>"><% $option->{label} %></option>
+}
+% } elsif ( $option ) {
+    <optgroup class="font-weight-bold" label="<% $option %>">
+%   $in_group = 1;
+%   $i = 0;
+% } else {
+%   $in_group = 0;
+    </optgroup>
+% }
+% }
+</select>
+
+<%INIT>
+my @options;
+my $queues = RT::Queues->new( $session{'CurrentUser'} );
+$queues->UnLimit;
+while ( my $q = $queues->Next ) {
+    next unless $q->CurrentUserHasRight("CreateTicket");
+    my $cf = RT::CustomField->new( $session{'CurrentUser'} );
+    $cf->LoadByName(
+        Name          => 'Problem Type',
+        LookupType    => RT::Ticket->CustomFieldLookupType,
+        ObjectId      => $q->id,
+        IncludeGlobal => 1,
+    );
+    if ( not $cf->Id or not $cf->Values->Count ) {
+        push @options, { value => $q->Id . '-', label => $q->Name };
+    }
+    else {
+        push @options, $q->Name;
+        my $values = $cf->Values;
+        while ( my $v = $values->Next ) {
+            push @options, { value => $q->Id . "-" . $v->Name, label => $v->Name };
+        }
+        push @options, ''; # close optgroup
+    }
+}
+
+</%INIT>
+
+<%ARGS>
+$Name => 'Problem'
+$OnChange => ''
+$Default => ''
+</%ARGS>

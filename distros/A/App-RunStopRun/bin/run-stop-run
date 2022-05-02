@@ -1,0 +1,450 @@
+#!perl
+use strict;
+use warnings;
+
+use App::RunStopRun;
+use Config;
+use File::Spec;
+use Getopt::Long qw(:config bundling no_ignore_case require_order);
+use IO::Pty;
+use List::Util qw(first uniq);
+use POSIX qw(:unistd_h :sys_wait_h);
+use Pod::Usage;
+use Proc::ProcessTable;
+use Time::HiRes qw(sleep);
+
+# NOTE: docs claim getpgrp($PID) isn't portable. Also, the POSIX module
+# doesn't provide a separate interface for getpgid, though it's part of the
+# standard and used internally.
+use constant HAS_PORTABLE_GETPGRP =>
+    !! ($Config{d_getpgid} || $Config{d_bsdgetpgrp} || $Config{d_getpgrp2});
+
+my $filename = (File::Spec->splitpath(__FILE__))[-1];
+my @option = (
+    'verbose|v' => \my $verbose,
+    'dry-run|n' => \my $dryrun,
+
+    'limit|l=f'          => \my $limit,
+    'pid|p=s'            => \my @pid,
+    'run|r=f'            => \my $run,
+    'stop|s=f'           => \my $stop,
+    'group|g'            => \my $group,
+    'nogroup|no-group|G' => \my $nogroup,
+    'children|c'         => \my $children,
+    'notty|no-tty|T'     => \my $notty,
+    'tty|t+'             => \my $tty,
+
+    'version|V' => \my $version,
+    'help|h'    => \my $help,
+    'man|H'     => \my $man,
+);
+my @getopt_msg;
+eval {
+    local @SIG{qw(__DIE__ __WARN__)} = (sub { push @getopt_msg, $_[0] }) x 2;
+    GetOptions(@option);
+} or usage(@getopt_msg);
+@pid = uniq split /,/, join ',', @pid;
+
+usage() if $help;
+exit printf "$filename $App::RunStopRun::VERSION\n" if $version;
+pod2usage(-exitval => 0, -verbose => 2) if $man;
+usage('Missing command or PIDs') unless @pid or @ARGV;
+usage("Can't use both command and PIDs") if @pid and @ARGV;
+if (my @bad = grep { ! /^-?\d+$/ or 1 >= abs or ! kill 0, $_ } @pid) {
+    usage(sprintf "Bad PID%s: %s", 1 < @bad ? 's' : '', join ',', @bad);
+}
+usage('--run must be >0') if defined $run and 0 >= $run;
+usage('--stop must be >0') if defined $stop and 0 >= $stop;
+usage("Can't use --limit with both --run and --stop")
+    if defined $limit and defined $run and defined $stop;
+usage('limit must be between 1..99')
+    if defined $limit and (1 > $limit or 99 < $limit);
+
+$limit ||= 50;
+$run   ||= 1;
+$stop  ||= 100 * $run / $limit - $run;
+
+my $status = 0;
+my @kill;
+my $isfg = (getpgrp == tcgetpgrp STDIN_FILENO);
+if ($verbose) {
+    warn "Controller PID: $$\n";
+    warn "Controller is in the foreground\n" if $isfg;
+}
+
+# Ensure END block is run.
+$SIG{INT} = $SIG{TERM} = sub { exit };
+$SIG{USR1} = sub {
+    my $pids = join ',', sort { $a <=> $b } @pid;
+    my $info = sprintf "Invoked on PID%s: %s\n", 1 < @pid ? 's' : '', $pids;
+    my $kill = join ',', sort { $a <=> $b } @kill;
+    $info .= sprintf "Signals to PID%s: %s\n", 1 < @kill ? 's' : '', $kill
+        if $pids ne $kill;
+    warn $info;
+};
+# SIGINFO isn't standard.
+$SIG{INFO} = $SIG{USR1} if exists $SIG{INFO};
+
+# TODO: if ptrace is available, it might be possible to attach to the process
+# to do something with the file descriptors.
+if (@pid) {
+    @kill = get_kill_list();
+    exit printf "Would signal %s\n", join ',', @kill if $dryrun;
+    run_stop_run() while kill 0, @kill;
+    exit;
+}
+
+exit print "Would exec command: @ARGV\n" if $dryrun;
+
+my $table = Proc::ProcessTable->new;
+pipe my ($parent_reader, $child_writer) or die "Can't pipe: $!";
+
+my ($pty, $termios, $ttyfh);
+unless ($notty) {
+    $ttyfh = first { isatty $_ } *STDIN, *STDERR, *STDOUT;
+    if (! $ttyfh) {
+        warn "No attached terminal found\n" if $verbose;
+        $tty = 0 if 1 == $tty
+    }
+    else { $tty ||= 1 }
+    if ($tty) {
+        $pty = IO::Pty->new;
+        warn sprintf "Opened pseudo-terminal: %s\n", $pty->ttyname if $verbose;
+        if ($ttyfh) {
+            warn sprintf "Using terminal attached to %s\n",
+                [qw(STDIN STDERR STDOUT)]->[fileno $ttyfh] if $verbose;
+            if (@ARGV and $isfg) {
+                $termios = POSIX::Termios->new;
+                $termios->getattr(fileno $ttyfh) or $termios = undef;
+            }
+        }
+    }
+}
+
+# Child
+unless ($pid[0] = fork) {
+    die "Can't fork: $!" unless defined $pid[0];
+    local @SIG{qw(INT TERM USR1)};
+    local $SIG{INFO} if exists $SIG{INFO};
+
+    close $parent_reader;
+
+    # Calls setsid(), so no need create a new process group with setpgrp().
+    if ($pty) {
+        $pty->make_slave_controlling_terminal;
+        my $slave = $pty->slave;
+        close $pty;
+        $slave->clone_winsize_from($ttyfh) if $ttyfh;
+        $slave->set_raw;
+        close $slave;
+    }
+    elsif (! $nogroup) {
+        setpgrp;
+    }
+
+    syswrite $child_writer, "\0";
+
+    warn "Exec'ing command: @ARGV\n" if $verbose;
+    exec { $ARGV[0] } @ARGV or exit $!;
+}
+
+close $child_writer;
+# Block until the child is ready.
+sysread $parent_reader, my $ready, 1;
+close $parent_reader;
+
+if ($pty) {
+    $pty->close_slave;
+    $pty->set_raw;
+}
+
+$group = ! $nogroup;
+
+$SIG{CHLD} = sub {
+    local ($!, $?);
+    while (0 < waitpid $pid[0], WNOHANG) {
+        $status = WIFEXITED($?) ? WEXITSTATUS($?)
+            : WIFSIGNALED($?) ? WTERMSIG($?) : $? >> 8;
+        warn "Received SIGCHLD for $pid[0]; exit($status)\n" if $verbose;
+    }
+};
+$SIG{TSTP} = sub {
+    @kill = get_kill_list();
+    warn sprintf "Sending SIGTSTP to %s\n", join ',', @kill, $$ if $verbose;
+    kill $_ => @kill for qw(TSTP STOP);
+    kill STOP => $$;
+};
+$SIG{CONT} = sub {
+    warn sprintf "Sending SIGCONT to %s\n", join ',', @kill if $verbose;
+    kill CONT => @kill;
+};
+$SIG{WINCH} = sub {
+    $pty->slave->clone_winsize_from($ttyfh) if $ttyfh;
+    warn sprintf "Sending SIGWINCH to %s\n", join ',', @kill if $verbose;
+    kill WINCH => @kill;
+};
+
+run_stop_run() until waitpid $pid[0], WNOHANG;
+
+exit $status;
+
+
+END {
+    return unless @pid;
+
+    close $pty if $pty;
+
+    if (@kill) {
+        # Ensure the processes aren't left stopped.
+        warn sprintf "Sending SIGCONT to %s\n", join ',', @kill if $verbose;
+        kill CONT => @kill;
+
+        # Controller process is in the foreground.
+        if (@ARGV and $isfg) {
+            warn sprintf "Sending SIGTERM to %s\n", join ',', @pid if $verbose;
+            kill TERM => @pid;
+        }
+    }
+
+    # Restore terminal settings.
+    $termios->setattr(fileno $ttyfh, &POSIX::TCSANOW) if $termios;
+}
+
+
+sub run_stop_run {
+    sleep $run;
+    @kill = get_kill_list() or return;
+    warn sprintf "Sending SIGSTOP to %s\n", join ',', @kill if $verbose;
+    kill STOP => @kill or return;
+    sleep $stop;
+    warn sprintf "Sending SIGCONT to %s\n", join ',', @kill if $verbose;
+    kill CONT => @kill or return;
+}
+
+
+sub get_kill_list {
+    return @pid if ! $group and ! $children;
+    my @p = @pid;
+
+    # Generating the process table is slow- avoid if possible. The runtime of
+    # Proc::ProcessTable is similar to that of running `ps` and parsing it's
+    # output.
+    if (HAS_PORTABLE_GETPGRP and ! $children) {
+        my %g;
+        for my $p (@p) {
+            if (0 > $p) { $g{$p} = undef }
+            else {
+                my $g = getpgrp $p;
+                $g{ 0 - $g } = undef if 1 < $g;
+            }
+        }
+        @p = keys %g;
+    }
+    else {
+        my (%group, %child);
+        for my $p (@{ $table->table }) {
+            $group{$p->pid} = $p->pgrp;
+
+            push @{ $child{ $p->ppid } }, $p->pid;
+            # Detached process.
+            push @{ $child{ $p->pgrp } }, $p->pid
+                if 1 == $p->ppid and $p->pid != $p->pgrp;
+        }
+
+        if ($children) {
+            my %g; @g{ grep { 0 > $_ } @p } = ();
+            my @c = @p;
+            while (@c = map { @{ $child{$_} || [] } } @c) {
+                # Don't include members of any given process group.
+                push @p, grep { ! exists $g{$_} } @c
+            }
+        }
+
+        if ($group and ! $nogroup) {
+            my %m; @m{ map { my $g = $group{$_}; $g ? 0 - $g : $_ } @p } = ();
+            @p = keys %m;
+        }
+    }
+
+    return @p;
+}
+
+
+sub usage {
+    my @msg = grep { defined and length } @_;
+    @msg = map { split "\n" } @msg;
+    warn "$filename: $_\n" for @msg;
+    warn "\n" if @_;
+
+    print <<"    END_OF_USAGE";
+Usage:
+  $filename [options] command [arguments]
+  $filename [options] -p PID[,-PGID,...]
+    END_OF_USAGE
+
+    print <<'    END_OF_OPTIONS' unless @_;
+
+Options:
+  -v, --verbose       Be verbose
+  -n, --dry-run       Dry run, don't run command or send signals
+
+  -l, --limit PERCENT Limit runtime to between 1..99 (default: 50.0)
+  -r, --run SECONDS   Run the process for SECONDS (default: 1.0)
+  -s, --stop SECONDS  Stop the process for SECONDS
+  -p, --pid PIDS      Operate on PIDS
+  -c, --children      Operate also on all child processes of the PIDs
+  -g, --group         Operate on the process groups of the PIDs
+  -G  --no-group      Don't create a new process group or determine PGIDs
+  -T, --no-tty        Disable pseudo-terminal allocation
+  -t, --tty           Force pseudo-terminal allocation
+
+  -V  --version       Display the version number
+  -h, --help          Display this help message
+  -H, --man           Display the complete documentation
+    END_OF_OPTIONS
+
+    exit @_ ? 2 : 0;
+}
+
+
+__END__
+
+=head1 NAME
+
+run-stop-run - limit CPU usage of processes
+
+=head1 SYNOPSIS
+
+  run-stop-run [options] command [arguments]
+  run-stop-run [options] -p PID1,-PGID
+
+=head1 DESCRIPTION
+
+This program controls the CPU usage of processes by repeatedly sending SIGSTOP
+and SIGCONT signals. It can be used to run a command or on the PIDs of
+already-running processes.
+
+It is useful in the case that you have a long-running CPU-intensive process
+and want to maintain a thermal limit (think fanless computer). Or you may have
+a program that uses all cores without providing a means to configure the level
+of concurrency.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-v>, B<--verbose>
+
+Be verbose.
+
+=item B<-n>, B<--dry-run>
+
+Don't send any signals, just print the command (if given), or list the
+PIDs/PGIDs it would affect.
+
+=item B<-l>, B<--limit> I<PERCENT>
+
+The percent of time to run. The default value is 50.0; possible values are
+1..99. Specify this with only one of B<--run> or B<--stop>. The other will be
+derived.
+
+=item B<-r>, B<--run> I<SECONDS>
+
+The number of seconds to run. The default value is 1.0. Specify this with only
+one of B<--limit> or B<--stop>. The other will be derived.
+
+=item B<-s>, B<--stop> I<SECONDS>
+
+The number of seconds to stop. Specify this with only one of B<--limit> or
+B<--run>. The other will be derived.
+
+=item B<-p>, B<--pid> I<PID,-PGID>
+
+A list of PIDs of already-running processes. The list may be comma-separated
+or the option given multiple times. If the PID is negative, it is interpreted
+as a process group.
+
+=item B<-g>, B<--group>
+
+Operate on the entire process group. This is the default when running
+a command, as it will start a new process group. When operating on a list of
+PIDs, it will determine the associated process groups and operate on them
+directly.
+
+=item B<-G>, B<--no-group>, B<--nogroup>
+
+Don't create a new process group for the command to run. When operating on
+a list of PIDs, it will not determine associated process groups and operate on
+them, but it will still operate on any given PGIDs.
+
+Note that creating a new process group causes the command to be run in the
+background, and some commands refuse to print if they are not the foreground
+process (ex. newer versions of B<pv>). In this case, you will also have to
+disable pseudo-terminal allocation, as that results in a call to C<setsid()>,
+which creates a new process group.
+
+=item B<-c>, B<--children>
+
+Operate on all descendent processes of the command or PIDs. These are found by
+scanning the process table and checking the parent process and group of each
+process. Note that it's not always possible to determine the parentage, since
+the process might have double-forked and changed it's process group.
+
+=item B<-T>, B<--no-tty>, B<--notty>
+
+Disable pseudo-terminal allocation.
+
+=item B<-t>, B<--tty>
+
+Force pseudo-terminal allocation. Specifying this more than once will force
+allocation even if there is no attached terminal.
+
+=item B<-V>, B<--version>
+
+Display the version.
+
+=item B<-h>, B<--help>
+
+Display the help message.
+
+=item B<-H>, B<--man>
+
+Display this documentation.
+
+=back
+
+=head1 KNOWN PROBLEMS
+
+Operating on a PID of a foreground process will likely result in job control
+message from the shell indicating the job was stopped when it receives the
+SIGSTOP signal. Note that the job will be continued in the background after
+receiving the SIGCONT signal, but no shell message will be displayed.
+
+It is not always possible to determine if a process is a child process. In
+that case, you can run the command separately and then run this program
+against a list of PIDs.
+
+=head1 SEE ALSO
+
+L<https://github.com/opsengine/cpulimit>
+
+L<https://en.wikipedia.org/wiki/Cgroups>
+
+L<https://www.freedesktop.org/software/systemd/man/systemd.resource-control.html>
+
+L<bash/ulimit>
+
+L<nice(8)>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2022 gray <gray at cpan.org>
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=head1 AUTHOR
+
+gray, <gray at cpan.org>
+
+=cut

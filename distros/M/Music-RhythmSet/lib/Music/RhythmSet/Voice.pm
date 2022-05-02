@@ -4,7 +4,7 @@
 # ttl times
 
 package Music::RhythmSet::Voice;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use 5.24.0;
 use warnings;
@@ -24,7 +24,8 @@ has stash   => ( is => 'rw' );
 has ttl     => ( is => 'rw', default => sub { 0 } );
 
 # perldoc Moo
-sub BUILD {
+sub BUILD
+{
     my ( $self, $args ) = @_;
     if ( exists $args->{pattern} and exists $args->{ttl} ) {
         croak "invalid ttl" if $args->{ttl} < 1;
@@ -40,7 +41,8 @@ sub BUILD {
 #
 # METHODS
 
-sub advance {
+sub advance
+{
     my ( $self, $count, %param ) = @_;
 
     my $measure = $self->measure;
@@ -86,7 +88,8 @@ sub advance {
 #   $set->voices([$voice]);
 #   $set->changes(...)
 
-sub clone {
+sub clone
+{
     my ( $self, %param ) = @_;
 
     $param{newid} //= $self->id;
@@ -119,7 +122,8 @@ sub clone {
     return $new;
 }
 
-sub from_string {
+sub from_string
+{
     my ( $self, $str, %param ) = @_;
     croak "need a string" unless defined $str and length $str;
 
@@ -161,7 +165,8 @@ sub from_string {
 
 # TODO some means of note reduction and optional note sustains
 # over rests
-sub to_ly {
+sub to_ly
+{
     my ( $self, %param ) = @_;
 
     my $replay = $self->replay;
@@ -202,7 +207,8 @@ sub to_ly {
     return $ly;
 }
 
-sub to_midi {
+sub to_midi
+{
     my ( $self, %param ) = @_;
 
     my $replay = $self->replay;
@@ -269,13 +275,23 @@ sub to_midi {
         # must be applied to the start of subsequent repeats of this
         # measure (if there is an onset that makes this possible) and
         # then must be passed on as leftovers for the next text_event
+        #
+        # NOTE this duplicates the MIDI events by default (unless embig)
         if ( $delay and $onsets and $ttl > 1 ) {
             push $events->@*, @midi;
             $midi[0] = [ $midi[0]->@* ];
             $midi[0][1] += $delay;
-            push $events->@*, (@midi) x ( $ttl - 1 );
+            if ( $param{embig} ) {
+                _to_midi_bigly( $events, \@midi, $ttl );
+            } else {
+                push $events->@*, (@midi) x ( $ttl - 1 );
+            }
         } else {
-            push $events->@*, (@midi) x $ttl;
+            if ( $param{embig} ) {
+                _to_midi_bigly( $events, \@midi, $ttl );
+            } else {
+                push $events->@*, (@midi) x $ttl;
+            }
         }
 
         # delay from trailing rests *or* a full measure of rest
@@ -339,7 +355,18 @@ sub to_midi {
     return $track;
 }
 
-sub to_string {
+sub _to_midi_bigly
+{
+    my ( $events, $midi, $ttl ) = @_;
+    for ( 1 .. $ttl ) {
+        for my $eref ( $midi->@* ) {
+            push $events->@*, [ $eref->@* ];
+        }
+    }
+}
+
+sub to_string
+{
     my ( $self, %param ) = @_;
 
     my $replay = $self->replay;
@@ -638,6 +665,24 @@ C<text_event> is used to demark where the track ends that I<notext>
 will remove.
 
 I<maxm> will limit the number of measures produced from the replay log.
+
+B<Note that the MIDI events are by default duplicated to save memory>.
+If the track events are adjusted via the B<events_r> method of
+L<MIDI::Track> the individual events must be made unique prior to
+modification so that a change is not replicated into the repeats of
+that event:
+
+  my $track = $v->to_midi( ...
+  my $tref  = $track->events_r;
+  my $i     = 0;
+  while (...) {
+    ...
+    $tref->[$i]    = [ $tref->[$i]->@* ]; # make unique
+    $tref->[$i][3] = next_pitch();
+    # be sure to also modify the relevant note_off ...
+
+With I<embig> enabled the MIDI events will be de-duplicated. This was
+added in module version 0.04.
 
 =item B<to_string> [ I<param> ]
 

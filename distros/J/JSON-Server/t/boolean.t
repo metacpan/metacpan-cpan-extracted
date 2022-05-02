@@ -5,7 +5,7 @@ use lib "$Bin";
 use JST;
 
 use JSON::Create::Bool qw!true false!;
-my $port = '9998';
+my $port = empty_port ();
 my $response;
 my $pid = fork ();
 my $verbose;# = 1;

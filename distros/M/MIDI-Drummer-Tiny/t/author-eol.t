@@ -16,6 +16,7 @@ use Test::EOL;
 
 my @files = (
     'lib/MIDI/Drummer/Tiny.pm',
+    'lib/MIDI/Drummer/Tiny/Syncopate.pm',
     't/00-compile.t',
     't/01-methods.t'
 );

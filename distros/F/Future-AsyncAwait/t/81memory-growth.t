@@ -49,4 +49,22 @@ no_growth \&abandoned,
    calls => 10000,
    'abandoned async sub does not grow memory';
 
+# RT142222
+{
+   my $ftick;
+
+   my $floop = (async sub {
+      while(1) {
+         await ( $ftick = Future->new );
+      }
+   })->();
+
+   no_growth sub {
+      my $f = $ftick;
+      undef $ftick;
+      $f->done;
+   }, calls => 10000,
+      'loop later does not grow memory';
+}
+
 done_testing;

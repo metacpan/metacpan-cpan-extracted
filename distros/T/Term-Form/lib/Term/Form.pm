@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.546';
+our $VERSION = '0.547';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form read_line ); #
 
@@ -62,9 +62,9 @@ sub new {
 #        page               => '[ 0 1 2 ]',         # undocumented
 #        keep               => '[ 1-9 ][ 0-9 ]*',   # undocumented
 #        read_only          => 'Array_Int',
-#        section_separators => 'Array_Int',         # 24.06.2021 removed
-#        skip_items         => 'Regexp',            # only keys are checked, passed values are ignored
-#                                                   # it's up to the user to remove the skipped items from the returned arra
+#        skip_items         => 'Regexp',            # undocumented
+                                                    # only keys are checked, passed values are ignored
+#                                                   # it's up to the user to remove the skipped items from the returned array
 #        back               => 'Str',
 #        confirm            => 'Str',
 #        footer             => 'Str',               # undocumented
@@ -89,7 +89,6 @@ sub new {
 #        page               => 1,
 #        prompt             => '',
 #        read_only          => [],
-#        section_separators => [],           # 24.06.2021 removed
 #        skip_items         => undef,
 #    };
 #}
@@ -109,11 +108,8 @@ sub _valid_options { ###
             page               => '[ 0 1 2 ]',       # undocumented
             keep               => '[ 1-9 ][ 0-9 ]*', # undocumented
             read_only          => 'Array_Int',
-            section_separators => 'Array_Int',       # 24.06.2021 removed
             history            => 'Array_Str',
-            skip_items         => 'Regexp',          # experimental
-                                                     # only keys are checked, passed values are ignored
-                                                     # it's up to the user to remove the skipped items from the returned array
+            skip_items         => 'Regexp',          # undocumented
             back               => 'Str',
             confirm            => 'Str',
             default            => 'Str',
@@ -147,7 +143,6 @@ sub _valid_options { ###
             page               => '[ 0 1 2 ]',
             keep               => '[ 1-9 ][ 0-9 ]*',
             read_only          => 'Array_Int',
-            section_separators => 'Array_Int', # 24.06.2021 removed
             skip_items         => 'Regexp',
             back               => 'Str',
             confirm            => 'Str',
@@ -177,7 +172,6 @@ sub _defaults { ###
         page               => 1,
         prompt             => '',
         read_only          => [],
-        section_separators => [],           # 24.06.2021 removed
         skip_items         => undef,
         show_context       => 0,
     };
@@ -945,19 +939,6 @@ sub fill_form {
         }
         $self->{i}{end_down} += @{$self->{i}{pre}};
     }
-    #########################################################################################  24.06.2021  ####  App::DBBrowser < 2.269 use 'section_separators'
-    elsif ( @{$self->{section_separators}||[]} ) {
-        $self->{i}{end_down} = $#$orig_list;
-        my $id = -1;
-        if ( $self->{section_separators}[$id] == $#$orig_list ) {
-            while ( $self->{section_separators}[$id] - $self->{section_separators}[--$id] == 1 ) {
-                --$self->{i}{end_down};
-            }
-        }
-        $self->{i}{keys_to_skip} = [ map { $_ + @{$self->{i}{pre}} } @{$self->{section_separators}} ];
-        $self->{i}{end_down} += @{$self->{i}{pre}};
-    }
-    ############################################################################################################
     else {
         $self->{i}{end_down} = $#$orig_list + @{$self->{i}{pre}};
     }
@@ -1347,14 +1328,8 @@ sub __after_readline {
 
 sub __print_footer {
     my ( $self ) = @_;
-    my $used_rows = (
-          $self->{i}{info_row_count}
-        + $self->{i}{pre_text_row_count}
-        + 1        # readline
-        + $self->{i}{post_text_row_count}
-    );
-    my $empty = get_term_height() - $used_rows;
-    my $footer_line = sprintf $self->{i}{footer_fmt}, 1;
+    my $empty = get_term_height() - $self->{i}{info_row_count} - 1;
+    my $footer_line = sprintf $self->{i}{footer_fmt}, $self->{i}{page_count};
     if ( $empty > 0 ) {
         print "\n" x $empty;
         print $footer_line;
@@ -1372,7 +1347,7 @@ sub __print_footer {
 
 sub __modify_readline_options {
     my ( $self ) = @_;
-    if ( $self->{clear_screen} == 2 && ( $self->{show_context} || $self->{info} ) ) {
+    if ( $self->{clear_screen} == 2 && $self->{show_context} ) {
         $self->{clear_screen} = 0;
     }
     if ( length $self->{footer} && $self->{page} != 2 ) {
@@ -1481,7 +1456,13 @@ sub __init_readline {
         }
         my @info = line_fold( $self->{info}, $info_w, { color => $self->{color}, join => 0 } );
         $self->{i}{info_row_count} = @info;
-        print join( "\n", @info ), "\n";
+        if ( $self->{clear_screen} == 2 ) {
+            print clear_to_end_of_line();
+            print join( "\n" . clear_to_end_of_line(), @info ), "\n";
+        }
+        else {
+            print join( "\n", @info ), "\n";
+        }
     }
     else {
         $self->{i}{info_row_count} = 0;
@@ -1505,9 +1486,10 @@ sub __init_readline {
     }
     $self->__threshold_width();
     if ( $self->{page} == 2 ) {
-        $self->{i}{page_count} = 1; ##
+        $self->{i}{page_count} = 1;
         $self->{i}{print_footer} = 1;
         $self->__prepare_footer_fmt( $term_w );
+        $self->__print_footer();
     }
     else {
         $self->{i}{print_footer} = 0;
@@ -1598,8 +1580,12 @@ sub readline {
         if ( $up_before ) {
             print up( $up_before );
         }
-        if ( $self->{clear_screen} < 2 ) {
-            print "\r" . clear_to_end_of_screen();
+        print "\r" . clear_to_end_of_line();
+        if ( $self->{i}{prev_context_count} ) {
+            for ( 1 .. $self->{i}{prev_context_count} ) {
+                print down( 1 ) . clear_to_end_of_line();
+            }
+            print up( $self->{i}{prev_context_count} );
         }
         $self->__before_readline( $m, $term_w );
         $up_before = $self->{i}{pre_text_row_count};
@@ -1614,13 +1600,10 @@ sub readline {
         if ( length $self->{i}{post_text} ) {
             print "\n" . $self->{i}{post_text};
         }
-        if ( $self->{i}{print_footer} ) {
-            $self->__print_footer();
-        }
         if ( $self->{i}{post_text_row_count} ) {
-            # after __print_footer()
             print up( $self->{i}{post_text_row_count} );
         }
+        $self->{i}{prev_context_count} = $self->{i}{pre_text_row_count} + $self->{i}{post_text_row_count};
         $self->__print_readline( $m );
         my $char = $self->{plugin}->__get_key_OS();
         if ( ! defined $char ) {
@@ -1686,7 +1669,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.546
+Version 0.547
 
 =cut
 

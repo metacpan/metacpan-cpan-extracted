@@ -56,6 +56,11 @@ ok($h, "Reading the header works");
 ok($ts->transadd($h, "$Bin/test-rpm-1.0-1mdk.noarch.rpm") == 0, "Adding a package to transaction works");
 ok($ts->traverse_transaction(sub { 
     ok($_[0]->fullname, "Can get name from te");
+SKIP: {
+# segfault on mga[2-7], aka with rpm-4.9 & rpm-4.1[04], status is unknown for 4.15
+skip 'segfault on older rpm', 1  if `rpm --version` =~ /4\.(9|1[0-5])\./;
+    ok($_[0]->files, "Can get files from te");
+}
     ok($_[0]->type, "Can get type from te");
 }), "traverse_transaction works");
 
@@ -107,6 +112,10 @@ ok($ts->transremove($roffset), "Removing pkg from header and offset");
 ok($ts->transorder == 0, "Run transaction order");
 ok($ts->transcheck == 0, "Checking transaction works");
 ok(defined($ts->transflag([qw(JUSTDB)])), "Set transflags");
+SKIP: {
+# rpmal.c:293: rpmalAdd: Assertion `dspool == ((void *)0) || dspool == al->pool' failed.
+# on at least mga[3-7], aka with rpm-4.1[14], status is unknown for 4.10 & 4.15
+skip 'assertion failure on older rpm', 1  if `rpm --version` =~ /4\.1[0-5]\./;
 ok($ts->transrun(\&callback) == 0, "Running transaction justdb");
 process_problems();
 
@@ -122,6 +131,7 @@ ok($ts->traverse(sub {
     }), "Running traverse");
 
 ok($found == 0, "The previously removed rpm is not found");
+};
 
 ok($ts->transadd($h, "test-rpm-1.0-1mdk.noarch.rpm", 1, "/usr", 1) == 0, "Adding a package to transaction with prefix");
 ok($ts->transorder == 0, "Run transaction order");

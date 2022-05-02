@@ -1,42 +1,19 @@
 use warnings;
 use strict;
 
-use Test::Simple tests => 20;
+BEGIN {
+    our $tests = 23;
 
-# chdir to t/
-$_ = $0;
-s~[^/\\]+$~~;
-chdir $_ if length;
+    # chdir to t/
+    $_ = $0;
+    s~[^/\\]+$~~;
+    chdir $_ if length;
 
-# run pl, expect $_
-sub pl(@) {
-    my $fh;
-    if( $^O =~ /^MSWin/ ) {
-	require Win32::ShellQuote;
-	open $fh, Win32::ShellQuote::quote_native( $^X, '-W', '..\pl', @_ ) . '|';
-    } else {
-	open $fh, '-|', $^X, '-W', '../pl', @_;
-    }
-    local $/;
-    my $ret = <$fh>;
-    ok $ret eq $_, join ' ', 'pl', map /[\s*?()[\]{}\$\\'";|&]|^$/ ? "'$_'" : $_, @_
-      or print "got: '$ret', expected: '$_'\n";
-}
-# run pl, expect shift
-sub pl_e($@) {
-    local $_ = shift;
-    &pl;
-}
-# run pl, expect $_ altered by shift->()
-sub pl_a(&@) {
-    local $_ = $_;
-    shift->();
-    &pl;
+    require './test.pm';
 }
 
 
 my @files = <atom-weight-[123].csv>;
-
 
 my $copy = $_ = <<EOF;
 begin
@@ -100,9 +77,11 @@ pl_e '', '-n', '', @files;
 
 unBbeE;
 s/^.+? //gm;
+$copy = $_;
 
 # run pl, expect @F[1, 0] separated by $_[0]
 sub pl_F($$) {
+    at;
     my $sep = $_[0];
     pl_a { s/^(.+)$sep(.+)$/$2$sep$1/gm } "-Bmy \$j = '$sep'", $_[1], '$_ = pop @F; e join $j, $_, @F', @files;
 }
@@ -128,3 +107,26 @@ s/\n0,/\n][0,/g; # new file
 s/,/,][/g;
 substr $_, 0, 0, '['; $_ .= ']';
 pl '-054n', 'E "[$_]"', @files; # 054 is comma, also splits at file ends
+
+
+# Testing -i is a bit more complicated. pl_e -i doesn't really test anything.  The actual test comes then.
+my @copies = map {
+    open my $in, '<', $_ or die $!;
+    my $copy = "copy-$_";
+    open my $out, '>', $copy or die $!;
+    defined( syswrite $out, slurp $in ) or die $!;
+    $copy;
+} @files;
+
+# Since -i outputs nothing, instead as a side effect test that I get STDERR.
+pl_e "get me\nnow", '-pibkp', '-B warn "get me\n"; E "now"', 'tr/abc/xyz/', @copies;	# Windows perl requires -i with backup
+
+$_ = $copy;
+for my $sfx ('bkp', '') {
+    test "pl -i file$sfx contents",
+      join '', map {
+	  open my $in, '<', $_.$sfx or die $!;
+	  slurp $in;
+      } @copies;
+    tr/abc/xyz/;
+}

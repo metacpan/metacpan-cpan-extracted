@@ -1,5 +1,8 @@
 Revision history for BioX-Seq
 
+0.009 2022-04-30
+         Add support for writing as input format
+
 0.008004 2022-01-21
          Add check for out-of-date faidx files
 

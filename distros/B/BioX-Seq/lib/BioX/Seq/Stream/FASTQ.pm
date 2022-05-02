@@ -78,7 +78,9 @@ sub next_seq {
 
     $self->{buffer} = undef;
 
-    return BioX::Seq->new($seq, $id, $desc, $qual);
+    my $obj = BioX::Seq->new($seq, $id, $desc, $qual);
+    $obj->{_input_format} = 'fastq';
+    return $obj;
 
 }
 

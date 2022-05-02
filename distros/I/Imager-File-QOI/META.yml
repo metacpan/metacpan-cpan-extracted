@@ -1,0 +1,32 @@
+---
+abstract: 'QOI image file support for Imager'
+author:
+  - 'Tony Cook <tonyc@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Imager: '1.013'
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Imager: '1.013'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Imager-File-QOI
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Imager: '1.013'
+  XSLoader: '0'
+resources:
+  bugtracker: https://github.com/tonycoz/imager-file-qoi/issues
+  homepage: http://imager.perl.org/
+  repository: https://github.com/tonycoz/imager-file-qoi.git
+version: '0.010'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

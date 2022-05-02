@@ -24,7 +24,7 @@
             "Device::Chip" : "0",
             "Future::AsyncAwait" : "0.47",
             "List::Util" : "0",
-            "Object::Pad" : "0.27",
+            "Object::Pad" : "0.57",
             "perl" : "5.026"
          }
       },
@@ -38,7 +38,7 @@
    "provides" : {
       "Device::Chip::NoritakeGU_D" : {
          "file" : "lib/Device/Chip/NoritakeGU_D.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -47,6 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -4,8 +4,16 @@
 use strict;
 use warnings;
 use lib 'blib/lib';
-use Test::More tests => 21;
+use Test::More;
 use File::Temp;
+use Config;
+
+if (exists($Config{taint_support}) && not $Config{taint_support}) {
+    plan skip_all => "your perl was built without taint support";
+}
+else {
+    plan tests => 21;
+}
 
 use_ok 'Text::Template' or exit 1;
 

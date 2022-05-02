@@ -12,11 +12,13 @@ use JSON::Server;
 use JSON::Client;
 use JSON::Parse;
 use JSON::Create;
+use Net::EmptyPort;
 
 push @EXPORT, (
     @Test::More::EXPORT,
     @JSON::Parse::EXPORT_OK,
     @JSON::Create::EXPORT_OK,
+    'empty_port',
 );
 
 my $builder = Test::More->builder;
@@ -35,6 +37,7 @@ sub import
     Test::More->import ();
     JSON::Parse->import (':all');
     JSON::Create->import (':all');
+    Net::EmptyPort->import ('empty_port');
 
     JST->export_to_level (1);
 }

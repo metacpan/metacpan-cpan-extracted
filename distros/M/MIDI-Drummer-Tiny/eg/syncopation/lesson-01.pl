@@ -5,15 +5,15 @@ use warnings;
 # Adapted from the book "Progressive Steps to Syncopation for the Modern Drummer"
 # https://www.amazon.com/dp/0882847953
 
-use MIDI::Drummer::Tiny;
+use MIDI::Drummer::Tiny::Syncopate;
 
 my $bpm = shift || 100;
 
-my $d = MIDI::Drummer::Tiny->new(
+my $d = MIDI::Drummer::Tiny::Syncopate->new(
     bpm    => $bpm,
     file   => "$0.mid",
-    kick   => 'n36',
-    snare  => 'n40',
+    kick   => 36,
+    snare  => 40,
     reverb => 15,
 );
 

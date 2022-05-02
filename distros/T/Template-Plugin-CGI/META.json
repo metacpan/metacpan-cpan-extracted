@@ -42,6 +42,7 @@
             "File::Temp" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Template" : "3.100",
             "Test2::Bundle::Extended" : "0",
             "Test2::Plugin::NoWarnings" : "0",
             "Test2::Suite" : "0",
@@ -55,7 +56,7 @@
    "provides" : {
       "Template::Plugin::CGI" : {
          "file" : "lib/Template/Plugin/CGI.pm",
-         "version" : "3.100"
+         "version" : "3.101"
       }
    },
    "release_status" : "stable",
@@ -70,7 +71,7 @@
          "web" : "https://github.com/xsawyerx/template-plugin-cgi"
       }
    },
-   "version" : "3.100",
+   "version" : "3.101",
    "x_authority" : "cpan:TODDR",
    "x_generated_by_perl" : "v5.32.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",

@@ -1,0 +1,1207 @@
+#! /usr/bin/env perl
+
+# Beware: DON'T PERFORM ANY ACTIONS AT TOP LEVEL: this file runs many times under -n!
+
+BEGIN {
+    $pltest::VERSION = 'v0.63.1';
+    my $execed = shift if @ARGV && $ARGV[0] eq '+'; # don't recursively call perl again for -p
+    return unless @ARGV and $ARGV[0] =~ /^-/s;
+    my $onepl = qr/[rhv?]|[oOpP](?:[1-9][0-9]*)?/; # simple pltest opts, reflect these in pod/html
+    my $one = qr/[cfTtUuWwXan]|$onepl/; # simple opts to pass to perl, which handles them well
+    my( $perl, @perl, @pl1, %seen );
+    while( @ARGV ) {		# no for, may need to shift
+	$_ = $ARGV[0];
+	last unless /^-/s;
+	shift;
+	last if /^--$/s;
+	if( /^--(?:help|version|color(?:|=never|=always|=auto))$/s ) {
+	    push @pltest::opts, $_;
+	    next;
+	}
+	unshift @ARGV, "-$1" if s/^-$one*[0l][0-7]*$onepl+\K(0.*)//; # avoid -l012o0 -> -l0120
+	if( /^(-$one*(?:[0l][0-7]*$one*)*)(?:([CDdFiIMm0ABbEeV])(.*))?$/s ) { # Perl does 0 & l inline only with oct arg.
+	    my( $opts, $opt, $arg ) = ($1, $2, $3);
+	    $seen{$_} ||= $opts =~ $_ for qw(a n O o P p r);
+	    push @pl1, $1 while $opts =~ s/($onepl)//;
+	    if( defined $opt ) {
+		if( ! length $arg and $opt =~ /[IABbEeV]/ ) { # These can have arg glued or separated
+		    $arg = shift;
+		    unless( defined $arg ) {
+			warn "Missing argument to -$opt.\n";
+			exit 29;
+		    }
+		}
+		if( $opt eq 'V' ) {
+		    $perl = "perl$arg";
+		    undef $opt; # treat $opts below
+		} elsif( $opt eq 'I' ) {
+		    push @perl, $opts.'I', $arg; # let perl check for empty arg
+		} elsif( $opt =~ /[ABbEe]/ ) {
+		    $seen{$opt} ||= $opt =~ /[be]/;
+		    push @pltest::opts, join( '', '-', @pl1, $opt ), $arg;
+		    @pl1 = ();
+		    undef $opt; # treat $opts below
+		} else {
+		    $seen{F} ||= $opt eq 'F';
+		    push @perl, $opts.$opt.$arg;
+		}
+	    }
+	    unless( defined $opt ) { # no else, because of -[bBeEV] above
+		push @perl, $opts if 1 < length $opts;
+	    }
+	} else {
+	    s/^-$one*(?:[0l][0-7]*$one*)*(.).*/-$1/;
+	    warn "Unrecognized switch: $_  (-h will show valid options).\n";
+	    exit 29;
+	}
+    }
+    $seen{a} ||= push @perl, '-a' if $seen{F};
+    $seen{n} ||= push @perl, '-n'
+      if ! grep $seen{$_}, qw(o O)
+      and grep $seen{$_}, qw(a b e P p r);
+    push @pltest::opts, join '', '-', @pl1 if @pl1;
+#warn join '|', $perl // $^X, @perl, '--', $0, '+', @pltest::opts, '--', @ARGV, "\n";
+    if( ! $execed and $perl || @perl ) { # let perl do perl-opts
+	unshift @ARGV, $perl //= $^X, @perl, '--', $0, '+', @pltest::opts, '--';
+	if( $^O =~ /^MSWin/ ) {
+	    require Win32::ShellQuote;
+	    my $ret = system {$ARGV[0]} Win32::ShellQuote::quote_system_list( @ARGV );
+	    warn $perl, ": $!\n" if $!;
+	    exit $ret >> 8;
+	}
+	exec @ARGV;
+	warn $perl, ": $!\n";
+	exit 1;
+    }
+}
+
+use strict;
+
+#use warnings;
+
+use feature ':5.10';
+use sort 'stable';
+
+use List::Util '/./'; # all EXPORT_OK
+BEGIN {
+    eval q{
+	sub any(&@) { my $prog = shift; &$prog && return 1 for @_ };
+	sub all(&@) { my $prog = shift; &$prog || return for @_; 1 };
+	sub none(&@) { my $prog = shift; &$prog && return for @_; 1 };
+	sub notall(&@) { my $prog = shift; &$prog || return 1 for @_ };
+	sub product(@) { reduce { $a * $b } 1, @_ };
+	*sum0 = sub(@) { sum 0, @_ } if !defined \&sum0;
+    } if $] lt '5.02';
+}
+
+
+our( $A, @A,
+     @F, @FIELD,
+     $H, $HEX_SORT,
+     $I, $ARGIND,
+     %K, %KEYDIFF,
+     %N, %NUMBER,
+     $q, $quote,
+     $Q, $Quote,
+     $R, $RESULT,
+     @R, @RESULT,
+     %R, %RESULT,
+     $T, $TXT_SORT );
+
+
+
+# Echo remove quine
+sub echo(@) {
+    if( wantarray ) {
+	my @ret = &Echo;
+	$ret[-1] .= "\n" if @ret;
+	@ret;
+    } elsif( defined wantarray ) {
+	join( ' ', &Echo ) . "\n";
+    } else {
+	local $, = ' ';
+	say &Echo;
+    }
+}
+
+# Echo without newline
+sub Echo(@) {
+    if( wantarray ) {
+	map {
+	    if( ! defined ) {
+		"$pltest::c{I}undef$pltest::c{E}";
+	    } elsif( !ref ) {
+		$_;
+	    } elsif( eval { $_->can( '(""' ) } ) {
+		"$_";
+	    } else {
+		require Data::Dumper;
+		my $ret = Data::Dumper::Dumper( $_ );
+		$ret =~ s/;?\n?$//s;
+		$ret =~ s/\bundef\b/$pltest::c{I}undef$pltest::c{E}/gs;
+		$ret;
+	    }
+	} @_ ? @_ : $_;
+    } elsif( defined wantarray ) {
+	join ' ', &Echo;
+    } else {
+	local( $,, $\, $| ) = (' ', '', 1);
+	print &Echo;
+    }
+}
+
+# Would call it format, but that's not overridable.
+sub form($@) {
+    echo &Form;
+}
+
+# Form without newline
+sub Form($@) {
+    (my $form = shift) =~ s/%\K(%|[^a-z]+)/ my $x = $1; $x =~ tr!:!$!; $x /eg; # also matches %%, todo /r
+    Echo sprintf $form, &Echo;
+}
+
+
+sub benchmark(&@) {
+    my( $code, $name, @args ) = @_;
+    local( $a, $b ) = ($a, $b);
+    $name //= 'anonymous';
+    require Benchmark;
+    local $SIG{__WARN__} = sub { die @_ };
+    if( @args ) {
+	say Benchmark::timestr( Benchmark::countit( 10, $code )), " $name: $_"
+	    for @args;
+    } else {
+	say Benchmark::timestr( Benchmark::countit( 10, $code )), " $name";
+    }
+}
+
+# Do it 100x for very fast test code (to increase weight compared to Benchmark overhead).
+sub Benchmark(&@) {
+    my( $code, @rest ) = @_;
+    benchmark { for my $i (0..99) { &$code() }} @rest;
+}
+
+sub Config(@) {
+    require Config;
+    if( @_ ) {
+	#{map { pairgrep { $a =~ /$_/ } %Config::Config } @_}; # needs 5.20
+	my %config;
+	while( my( $k, $v ) = each %Config::Config ) {
+	    $k =~ $_ and $config{$k} = $v, last
+	      for @_;
+	}
+	\%config;
+    } else {
+	\%Config::Config;
+    }
+}
+
+sub Date(@) {
+    my( $s, $us, $tz, $tzo );
+    require Time::HiRes;
+    for( @_ ) {
+	if( ref ) {
+	    ($s, $us) = @$_;
+	} elsif( /^([-+]?)(1[0-4]|0?[0-9])(?:\.([0-9])([0-9])?|:([0-5])?([0-9]))?$/i ) {
+	    $tz = $2 * 3600  +  ($3 ? ($3.($4//0)) * 36  :  $6 ? (($5//0).$6) * 60  :  0);
+	    $tzo = sprintf ' %s%02d:%02d', $1 || '+', $tz / 3600, $tz % 3600 / 60;
+	    $tz = -$tz if $1 eq '-';
+	} elsif( /^([-+]?)(?=.)([0-9]*)(?:\.([0-9]*))?$/i ) {
+	    my $nus = substr +($3 // '') . '0'x6, 0, 6;
+	    if( $1 ) {
+		($s, $us) = Time::HiRes::gettimeofday() unless defined $s;
+		if( $1 eq '+' ) {
+		    $s += $2 // 0;
+		    $us += $nus;
+		    ++$s, $us -= 1e6 if $us >= 1e6;
+		} else {
+		    $s -= $2 // 0;
+		    $us -= $nus;
+		    --$s, $us += 1e6 if $us < 0;
+		}
+	    } else {
+		$s = $2 // 0;
+		$us = $nus;
+	    }
+	}
+    }
+    ($s, $us) = Time::HiRes::gettimeofday() unless defined $s;
+    if( $pltest::isodate ) {;
+	my @time = reverse +(defined( $tz ) ? gmtime $s + $tz : localtime $s)[0..5];
+	$s = sprintf '%04d-%02d-%02dT%02d:%02d:%02d.%06d%s', 1900 + shift( @time ), 1 + shift( @time ), @time, $us, $tzo // '';
+    } else {
+	$s = defined( $tz ) ? gmtime $s + $tz : localtime $s;
+	substr $s, 19, 0, $tzo if $tzo;
+	substr $s, 19, 0, sprintf '.%06d', $us // 0;
+    }
+    defined wantarray ? $s : say $s;
+}
+
+sub Isodate(@) {
+    local $pltest::isodate = 1;
+    &Date;
+}
+
+# turns list of ipv4/6 addresses & hostnames or $_ into /etc/hosts format
+# todo comment not found
+sub hosts(@) {
+    require Socket;
+    package Socket;
+    my( %res, %name );
+    my $res = sub {
+	my( $v4, $name, $aliases, undef, undef, @addr ) = @_;
+	undef $name{$_} for $name, split ' ', $aliases;
+	for( @addr ) {
+	    $_ = unpack 'H*', $_;
+	    if( $v4 ) { # make sortable by kind
+		s/^(?=7f)/g/ or # loopback
+		  s/^(?=a9fe)/i/ or # link local
+		  s/^(?=0a|ac1|c0a8)/k/ or # private
+		  substr $_, 0, 0, 'm';
+	    } else {
+		s/^(?=0+1$)/h/ or # loopback
+		  s/^(?=fe[89ab])/j/ or # link local
+		  s/^(?=fd)/l/ or # private
+		  substr $_, 0, 0, 'n';
+	    }
+	    @{$res{$_}}{keys %name} = (); # don't just store %name, different names might point to same IP but not vice versa
+	}
+    };
+    my @unpack = (\&unpack_sockaddr_in6, \&unpack_sockaddr_in);
+    for my $name ( @_ ? @_ : $_ ) {
+	if( exists &getaddrinfo ) { # somewhere > v5.16.3
+	    for( getaddrinfo( $name, undef, {socktype => SOCK_STREAM()} )) {
+		next unless ref; # 1st is return code
+		%name = ();
+		undef $name{$_->{canonname}} if defined $_->{canonname};
+		my $v4 = $_->{family} == AF_INET();
+		my $addr = $unpack[$v4]->( $_->{addr} );
+		my @get = gethostbyaddr( $addr, $_->{family} );
+		&$res( $v4, @get ? @get : ($name, (undef)x3, $addr) );
+	    }
+	} else {		# older perl
+	    %name = ();
+	    my $addr;
+	    my $v6 = $name =~ /:/ || exists &inet_pton;
+	    my @get = $v6 ? gethostbyaddr( $addr = inet_pton( AF_INET6(), $name ), AF_INET6()) :
+	      $name =~ /[a-z]/i ? gethostbyname( $name ) :
+	      gethostbyaddr $addr = inet_aton( $name ), AF_INET();
+	    &$res( ! $v6, @get ? @get : ($name, (undef)x3, $addr) );
+	}
+    }
+    for( sort keys %res ) {
+	next if 1 == length;	# IPv6 on old perl
+	my $ip = pack 'H*', substr $_, 1;
+	::echo 4 == length $ip ? inet_ntoa( $ip ) : inet_ntop( AF_INET6(), $ip ),
+	  sort grep ! /^[0-9.]+$|^(?=.*:)[0-9a-f:]+$/i, keys %{$res{$_}};
+    }
+}
+
+# Fill keydiff arrays
+sub keydiff(;$$) {
+    my $val;
+    if( @_ > 1 ) {
+	$val = $_[1];
+    } else {
+	chomp( $val = $_ );
+    }
+    $KEYDIFF{@_ == 0 ? $1 : $_[0]}[$ARGIND] = $val;
+}
+sub Keydiff(;$$) {
+    my $key = $FIELD[@_ == 0 ? 0 : $_[0]];
+    if( @_ > 1 ) {
+	keydiff $key, $_[1];
+    } else {
+	keydiff $key;
+    }
+}
+
+# trim small values from %NUMBER
+sub Number(;$) {
+    my $n = $_[0] // 2;
+    $NUMBER{$_} < $n and delete $NUMBER{$_} for keys %NUMBER;
+}
+
+# Pipe command to CODE
+sub piped(&$@) {
+    my $code = shift;
+    open my $fd, "-|", @_ or die "$_[0]: $!\n";
+    &$code() while <$fd>;
+}
+
+sub help(;$) {
+    if( @_ && ! defined $_[0] ) {
+	print <<\EOF;
+usage: pltest {-{BbeE} program} [-o] [-Vversion] [-perlopt...] [--] [main program] [arg ...]
+  -Aprog            map prog over @A (or undef) returning new @A
+  -bprog & -eprog   wrap begin/end program around each file in -n/-p...
+  -Bprog & -Eprog   wrap begin/end program around program in same scope, my-vars work
+  -o[number]        assume "for(@A) { ... }" loop around main program or array of number args
+  -O[number]        like -o, but use $A as loop var
+  -p[number]        print on each loop (also -o/-O) iteration, at most number times
+  -P[number]        like -p, but print only if main program evaluates to true, like grep
+  -r                reset "$." and -p/-P counter for each file
+  -VVERSION         rerun with given version, which is just appended to "perl"
+  --color[=when]    colorize the output; when can be 'never', 'always', or 'auto' (the default)
+These options are handled by perl:
+EOF
+	piped { print if /^\s+-[0acCdDfFiIlmMntTuUvwWX]/ } $^X, '-h';
+    }
+    print <<\EOF;
+Predefined functions:
+  b { } name, arg... benchmark slow code for 10s, display name, looping over args.
+  B { } name, arg... same, but run code 100 times in benchmark, to reduce overhead.
+  C re...           %Config, e.g. C->{sitelib}, optionally only part matching regexps
+  D [arg...][, tz]  Date (from arg [s, us], s{.us}, offset [+-]s{.us}, tz ([+-]0-14{:mm|.ff})
+  e arg...          echo prettified args or $_ with spaces and newline
+  E arg...          same, but no newline
+  f fmt, arg...     format prettified args with newline, index can be "%1:" instead of "%1\$"
+  F fmt, arg...     same, but no newline
+  h ip|name...      dns-lookup as hosts file
+  I [arg...][, tz]  Isodate (from arg [s, us], s{.us}, offset [+-]s{.us}, tz ([+-]0-14{:mm|.ff})
+  k [key, value]    store value or chomped $_ in $K{key or $1}[$I] for keydiff
+  K [number, value] same, but key is $F[number] or $F[0]
+  N [n]             trim %N values less than n (default 2) e.g.; -EN or -E 'N 5'
+  p { } cmd, arg... open pipe from cmd and loop over it.
+Predefined & magic variables:
+  *A	*ARGV	    A, $A & @A are aliases to ARGV, $ARGV & @ARGV
+  $I	0..n	    index of ARG currently being processed in -o, -n or -p
+  $q	'
+  $Q	"
+  %K	()[]	    at end, sort by keys, print keydiff of $I array elements.  Filled by k.
+  %N	()	    at end, sort numerically by values
+  *R	undef () {} at end, print each, if defined or not empty, %RESULT sorted by keys
+EOF
+}
+
+
+
+# \todo help doc readline test:my
+{
+    package pltest;
+
+    our %c;
+
+    # It's annoyingly hard to figure out if all are unique & lexically compatible numbers, or whether to sort textually.
+    sub sort_keys(\%) {
+	my $hash = $_[0];
+	return () unless keys %$hash;
+	goto TXT if $::TXT_SORT;
+	my( $hex, $perl, $no_oct, %seen, @seen_oct ) = $::HEX_SORT;
+	for( keys %$hash ) {
+	    goto TXT if /[^0-9a-fx._+-]/i;
+	    $hex = 0, last unless /^[0-9a-f](?:_?[0-9a-f]+)*$/i;
+	    goto TXT if exists $seen{hex $_};
+	    undef $seen{hex $_};
+	}
+	return sort { hex $a <=> hex $b } keys %$hash if $hex;
+
+	%seen = ();
+	for( keys %$hash ) {
+	    unless( $no_oct ||= /^[+-]?0(?=.*[89])/ ) {
+		if( /^[+-]?0(?:b(?:_?[01]+)*|x(?:_?[0-9a-f]+)*)$/i ) {
+		    goto TXT if exists $seen{eval $_};
+		    undef $seen{eval $_};
+		    $perl = 1, next;
+		}
+		if( /^[+-]?0(?:_?[0-7]+)*$/ ) {
+		    push @seen_oct, $_; # can't decide yet
+		    next;
+		}
+	    }
+
+	    if( /^[+-]?(?=.)[0-9]*(?:\.[0-9]*)?(?:(?<=.)e[+-]?[0-9]+)?$/i ) {
+		goto TXT if exists $seen{0 + $_};
+		undef $seen{0 + $_};
+		next;
+	    }
+
+	    goto TXT;
+	}
+	if( $perl ) {
+	    goto TXT if $no_oct;
+	    for( @seen_oct  ) {
+		goto TXT if exists $seen{eval $_};
+		undef $seen{eval $_};
+	    }
+	    return sort { eval $a <=> eval $b } keys %$hash;
+	} else {
+	    for( @seen_oct  ) {
+		goto TXT if exists $seen{0 + $_};
+		undef $seen{0 + $_};
+	    }
+	    return sort { $a <=> $b } keys %$hash;
+	}
+
+      TXT:				# clearest solution here
+	sort keys %$hash;
+    }
+
+
+    sub keydiff() {
+	goto &_keydiff if $c{E} && eval { require Algorithm::Diff };
+	for my $key ( sort_keys %::KEYDIFF ) {
+	    $#{$::KEYDIFF{$key}} = $ARGIND - 1; # lengthen list if needed
+	    my $str;
+	    next if ::all { ($str ||= $_) eq $_ if defined } @{$::KEYDIFF{$key}};
+	    say "$c{B}$key$c{E}";
+	    my( $begin, $end );
+	    if( $c{E} ) {
+		for( @{$::KEYDIFF{$key}} ) {
+		    if( !defined ) {
+		    } elsif( defined $end ) {
+			chop $begin while length $begin and !/\A\Q$begin/;
+			#substr( $begin, -1 ) = '' until !length $begin or /^\Q$begin/;
+			substr( $end, 0, 1 ) = '' while length $end and !/\Q$end\E\Z/;
+		    } else {
+			$begin = $end = $_;
+		    }
+		}
+		$begin = length $begin;
+		$end = length $end;
+		#$_ = length for $begin, $end;
+	    }
+	    say "\t",
+	      !defined() ? "$c{I}n/a$c{E}" :
+	      !defined( $end ) ? $_ :
+	      $begin == length() ? "$c{G}$_$c{E}" :
+
+	      ($begin ? $c{G} . substr( $_, 0, $begin ) : '') .
+	      $c{R} . substr( $_, $begin, length() - $begin - $end ) .
+	      ($end ? $c{G} . substr $_, length() - $end : '') .
+	      $c{E}
+
+	      for @{$::KEYDIFF{$key}};
+	}
+    }
+    sub _keydiff() {
+	for my $key ( sort_keys %::KEYDIFF ) {
+	    my( $max, $n, $ref ) = (0, 0);
+	    for( @{$::KEYDIFF{$key}} ) {
+		next unless defined;
+		$max = length if $max < length;
+		++$n;
+		if( $ref ) {
+		    $ref = Algorithm::Diff::LCS( $ref, [split //] );
+		} else {
+		    $ref = [split //];
+		}
+	    }
+	    next if $n == $ARGIND && @$ref == $max;
+	    say "$c{B}$key$c{E}";
+	    $#{$::KEYDIFF{$key}} = $ARGIND - 1; # lengthen list if needed
+	    for( @{$::KEYDIFF{$key}} ) {
+		if( defined ) {
+		    if( ! @$ref ) {
+			substr $_, 0, 0, $c{R};
+		    } elsif( @$ref == length ) {
+			substr $_, 0, 0, $c{G};
+		    } else {
+			my( undef, $idx ) = Algorithm::Diff::LCSidx( $ref, [split //] );
+			for my $i ( reverse @$idx ) {
+			    substr $_, $i + 1, 0, $c{R};
+			    substr $_, $i, 0, $c{G};
+			}
+			substr $_, 0, 0, $c{R};
+			s/\e\[3.m(?=\e\[3.m|$)//g;
+			() while s/(\e\[3.m)[^\e]+\K\1//;
+		    }
+		} else {
+		    $_ = "$c{I}n/a";
+		}
+		say "\t$_$c{E}";
+	    }
+	}
+    }
+
+    sub getline {
+	{ local $\ = ''; print STDERR defined() ? '>> ' : '> ' }
+	my $part = <>;
+	if( defined $part ) {
+	    if( defined ) {
+		$_ .= "\n" . $part;
+	    } else {
+		$_ = $part;
+	    }
+	} else {
+	    say '';
+	    exit;
+	}
+    }
+    sub shell {
+	# No my, as that would inject into eval.
+	our $lp = eval { require Lexical::Persistence; Lexical::Persistence->new() };
+	while( 1 ) {
+	    our $lines = undef;
+	    for( $lines ) {
+		&getline;
+		&getline while s/\\$//s;
+		if( /\{$/s ) {
+		    &getline until /\n\}$/s;
+		}
+	    }
+	    {
+		package main;
+		$lp ? $lp->do( $lines ) : eval $lines;
+	    }
+	    warn $@ if $@;
+	}
+    }
+}
+
+
+
+# Put this before compiling caller's main program, as these get run LIFO.
+END {
+    echo for $RESULT // (), @RESULT;
+    form "%s:  %s", $_, $RESULT{$_}
+	for pltest::sort_keys %RESULT;
+
+    # todo lenint.lenfloat %d/f
+    printf "%8d: %s\n", $NUMBER{$_}, $_
+	for sort { $NUMBER{$a} <=> $NUMBER{$b} } pltest::sort_keys %NUMBER;
+    &pltest::keydiff if keys %KEYDIFF;
+}
+
+
+
+BEGIN {
+    *I = \$ARGIND;
+    *FIELD = \@F;
+    eval '*' . substr( $_, 1, 1 ) . " = \\$_" for
+      qw'*ARGV &benchmark &Benchmark &Config &Date &echo &Echo &form &Form &hosts $HEX_SORT &Isodate &keydiff &Keydiff %KEYDIFF &Number %NUMBER &piped $quote $Quote *RESULT $TXT_SORT';
+
+    ($ARGIND, $quote, $Quote, $H) = (0, "'", '"', 1);
+    unless( @pltest::opts || @ARGV ) {
+	*pltest::prog = \&pltest::shell;
+	return;
+    }
+
+    {
+	# Assemble a program that works under perl -n, etc., while adding in pltest's options.
+	# This is wild stuff, as it has to blend in various options, while potentially accomodating an outer loop.
+	my @prog = "use feature ':'.substr \$^V, 1;\n"; # Enable latest optional features.
+	@prog[2, 4, 11, 13, 22] =
+	  ('sub pltest::prog { $pltest::last = 1;',
+	   'LINE: {',		# dummy loop
+	   '} continue {',		# program didn't do last
+	   '$pltest::last = 0 }',
+	   '}');
+	while( @pltest::opts ) {	# no for, need to shift
+	    $_ = shift @pltest::opts;
+	    if( /^--color(?:()|=(a)lways|=(n)ever|=auto)$/s ) {
+		$pltest::c = defined( $1 ) || $2 ? 1 : $3 ? 0 : undef;
+		next;
+	    } elsif( /[?h]/ ) {
+		help undef;
+		exit;
+	    } elsif( /v/ ) {
+		say "This is pltest $pltest::VERSION, with perl $^V
+
+Copyright 1997-2022, Daniel Pfeiffer
+
+Pl may be copied only under the terms of either the Artistic License or the
+GNU General Public License, which may be found in the Perl 5 source kit.";
+		exit;
+	    }
+
+	    if( /([ABbEe])/ ) {
+		# put ; after \n as user may end with a comment
+		my $bit = "\n#line 1 \"-$1 option\"\n$pltest::opts[0]\n;";
+		my $block = shift( @pltest::opts ) =~ /\A\{.+\}\Z/s;
+		if( /A/ ) {
+		    chop $bit;
+		    $prog[0] .= '@ARGV = ' . ($block ? "grep $bit" : "map { $bit }") . " \@ARGV ? \@ARGV : undef;\n";
+		} elsif( /b/ ) {
+		    # Do it each time ARGV changes
+		    $prog[5] = 'if( ($pltest::exARGV //= "") ne $ARGV ) {' . $bit . '$pltest::exARGV = $ARGV; }';
+		} elsif( /B/ ) {
+		    $prog[0] .= $block ? "BEGIN$bit" : $bit;
+		} elsif( /e/ ) {
+		    # append 1 to not leak any wantarray into $bit
+		    $prog[8] = "\nINIT { \$pltest::_e = sub { $bit 1 }}";
+		    $pltest::_e = '&$pltest::_e();';
+		} else {
+		    $prog[9] = "\n;END { $bit 1 }";
+		}
+	    }
+	    if( /o([1-9][0-9]*)?/i ) {
+		if( my $o = $1 ) {
+		    @prog[3, 14] =
+		      ('while( @ARGV > $ARGIND ) { sub {' . (/o/ ? '$_' : '$ARGV') . ' = \@_ }->( @ARGV[$ARGIND..$ARGIND+' . ($o - 1) . '] );', # hack to ref into @ARGV
+		       '} continue { $ARGIND += ' . $o . '; last if $pltest::last }')
+		} else {
+		    @prog[3, 14] =
+		      (/O/ ? 'for $ARGV (@ARGV) {' : 'for(@ARGV) {',
+		       '} continue { ++$ARGIND; last if $pltest::last }');
+		}
+	    }
+	    if( /p([1-9][0-9]*)?/i ) {
+		my $p = $1;
+		$prog[1] = '$pltest::_pn = 0;';
+		@prog[6, 10] =
+		  ('$pltest::_P = do {',
+		   '}') if /P/;
+		$prog[12] = '++$pltest::_pn, print or die "-p destination: $!\n"' . (/P/ ? 'if $pltest::_P;' : ';');
+		$prog[13] =~ s/0/\$pltest::_pn >= $p ? 2 : 0/ if $p;
+	    }
+	    $pltest::_r = 1 if /r/;
+	}
+	$prog[7] = @ARGV ? "\n#line 1 \"main program\"\n" . shift() . "\n;" : ';';
+	#$prog[13] =~ s/\$pltest::last =( \$pltest::_pn >= \d+)/ if($1 ) { &\$pltest::_e() if \$pltest::_e; exit }/ unless $pltest::_r || $prog[14];
+	$prog[14] //= 		# ! -[oO]
+	  'if( $pltest::last || eof ) { ++$ARGIND;' .
+	    ($pltest::_r ? 'close ARGV; $pltest::_pn = 0;' : 'if( $pltest::last ) { my $d = $.; close ARGV; $. = $d }') .
+	      ($pltest::_e // '') .
+		($pltest::_r ? '}' : 'exit if $pltest::last == 2 }');
+	# Don't pollute eval with my-vars
+	$_ = join '', grep defined, @prog;
+    };
+    #no warnings 'experimental';	# overridden by -W
+    no strict;
+    if( $ENV{PLDUMP} ) { open STDOUT, '| perltidy -cb'; say; exit }
+    eval;
+    if( $@ ) {
+	warn $@;
+	exit 255;
+    }
+    undef $_;
+    @pltest::c{qw(B I G R E)} = $pltest::c // (-t STDOUT && $^O !~ /^MSWin/) ?
+      map "\e[${_}m", 1, 3, 32, 31, '' :
+      ('')x5;
+
+    package Data::Dumper;
+    our( $Deparse, $Quotekeys, $Terse, $Sortkeys ) = (1, 0, 1, sub { [&pltest::sort_keys] });
+}
+&pltest::prog; # will be called repeatedly if -n
+
+
+
+=head1 NAME
+
+pltest - Perl One-Liner Magic Wand
+
+=head1 SYNOPSIS
+
+There are always those tasks too menial for dedicated script, but still too
+cumbersome even with the many neat one-liner options of C<perl -E>.  This
+small script fills the gap with many bells & whistles: Various one-letter
+commands & magic variables (with meaningful aliases too) and more nifty loop
+options take Perl programming to the command line.  C<List::Util> is fully
+imported.  If you pass no program on the command line, starts a simple Perl
+Shell.
+
+How to C<e(cho)> values, including from C<@A(RGV)>, with single C<$q(uote)> &
+double C<$Q(uote)>:
+
+    pltest 'echo "${quote}Perl$quote", "$Quote@ARGV$Quote"' one liner
+    pltest 'e "${q}Perl$q", "$Q@A$Q"' one liner
+
+    >   'Perl' "one liner"
+
+Same for hard-to-print values:
+
+    pltest 'echo \"Perl", \@ARGV, undef' one liner
+    pltest 'e \"Perl", \@A, undef' one liner
+
+    >   \'Perl' [
+    >     'one',
+    >     'liner'
+    >   ] undef
+
+Loop over args, printing each with line ending.  And same, SHOUTING:
+
+    pltest -opl '' Perl one liner
+    pltest -opl '$_ = uc' Perl one liner
+
+    >   Perl
+    >   one
+    >   liner
+    >   PERL
+    >   ONE
+    >   LINER
+
+Print up to 3 matching lines, resetting count (and C<$.>) for each file:
+
+    pltest -rP3 '/Perl.*one.*liner/' file*
+
+Count hits in magic statistics hash C<%N(UMBER)>:
+
+    pltest -n '++$NUMBER{$1} while /(Perl|one|liner)/g' file*
+    pltest -n '++$N{$1} while /(Perl|one|liner)/g' file*
+
+    >          2: one
+    >          7: liner
+    >          9: Perl
+
+Though they are sometimes slightly, sometimes quite a bit more complicated,
+most Perl one-liners from the internet work, just by omitting C<-e> or C<-E>
+(pltest has only one main program, but you can just as well concatenate the C<-e>s
+with C<;>).  See L<minor differences|/"Minor Differences with perl -E"> for
+exceptions.  There are L<many varied examples|https://metacpan.org/dist/App-pltest/view/pod/examples.pod>.
+
+=head1 DESCRIPTION
+
+I<Don't believe everything you read on SourceForge^H^H^H the internet! --B< >Plato :-y>
+
+Pl follows Perl's philosophy for one-liners: the one variable solely used in
+one-liners, C<@F>, is single-lettered.  Because not everyone may like that, pltest
+has it both ways.  Everything is aliased both as a word and as a single
+letter, including Perl's own C<@F> & C<*ARGV>.
+
+Perl one-liners, and hence pltest, are by nature bilingual.  You must run the
+command with its options & arguments, typically from Shell.  By design, Perl
+quotes mimic Shell quotes, so here they collide.  As Perl also uses Shell
+meta-characters like C<$>, the best solution is to protect Perl-code from the
+Shell with single quotes.  That means they can't be used inside.  (An ugly way
+around that is C<'\''>, which ends a string, blackslashes a quote and starts
+another.)  For literal quotes use C<$q(uote)>.  For quoting use double quotes
+or C<q{}>.
+
+I<Shell and Perl, unlike most other languages, don't make you stick your toe
+up your nose to get newlines into strings.  So, long "one-liners" are spread
+very naturally to legible many-liners.  You get more features on the L<pltest
+homepage|https://perl1liner.sourceforge.io/>, like in the veggie-burger menu,
+you can toggle many-line display.  In normal text short and long name variants
+are initial-bold as C<X(YZ)>.  All examples use the long names, if applicable.
+On the homepage those are in the darker blue upper half.  They are repeated with the short variant.  Many examples are followed by their output, indented with C<< > >>.>
+
+=head1 DOCUMENTATION
+
+=head2 Options
+
+Many of perl's options are also available in pltest, sometimes enhanced with extra
+functionality.  And the new options complement what perl offers, specifically
+oriented towards one liners.
+
+=over
+
+=item C<-0I<[octal]>>
+
+I<perl:> Specify record separator with B<-n>/B<-p> (C<\0>, if no argument).
+
+=item C<-AI<prog>>
+
+Map program over already available C<@A(RGV)> (from command line or previous
+B<-A>) or undef.  If program is wrapped in C<{}> use C<grep> instead of
+C<map>.  The result becomes the new C<@A(RGV)>.  May be mixed with B<-B>.  The
+1st two are equivalent, except that the 1st one isn't limited by Shell line
+length limitations.  The third again greps by file size, reading only the Perl
+modules less than 1kB:
+
+    pltest -nA '<*.pm>' '...'
+    pltest -n '...' *.pm
+    pltest -nA '<*.pm>' -A '{ (stat)[7] < 1000 }' '...'
+
+=item C<-a>
+
+I<perl:> Autosplit mode with B<-n>/B<-p> (splits C<$_> into C<@F(IELD)>).
+
+=item C<-bI<prog>>
+
+Run program before reading a new file in B<-n>/B<-p>.
+
+=item C<-BI<prog>>
+
+Add program before main program in same scope.  So you can use it to
+initialise C<my> variables.  Whereas, if you define a my variable in the main
+program of a B<-n>, B<-p>, B<-P>, B<-o> or B<-O> loop, it's a new variable on
+each iteration.  This doesn't do a C<BEGIN> block, unless program is wrapped
+in C<{}>.  May be mixed with B<-A>.
+
+=item C<-c>
+
+I<perl:> Check syntax only (runs C<BEGIN> and C<CHECK> blocks).
+
+=item C<-CI<[number/list]>>
+
+I<perl:> Enables the listed Unicode features.
+
+=item C<--colorI<[=when]>>
+
+Colorize (people with impairment have hopefully adapted their system or
+browser) some of the output; when can be C<never>, C<always>, or C<auto> (the
+default).
+
+=item C<-dI<[:debugger]>>
+
+I<perl:> Run program under debugger.
+
+=item C<-DI<[number/list]>>
+
+I<perl:> Set debugging flags (argument is a bit mask or alphabets).
+
+=item C<-eI<prog>>
+
+Run program after finishing reading a file in B<-n>/B<-p>.
+
+=item C<-EI<prog>>
+
+Add an C<END> block after main-program in same scope.  So C<my>-vars work as
+follows: The C<END> block is a closure of the 1st C<$inner> variable.  Perl
+warns "Variable "$inner" will not stay shared":
+
+    pltest -OB 'my $outer' -E 'echo $inner, $outer' 'my $inner = $outer = $ARGV' a b c
+    pltest -OB 'my $outer' -E 'e $inner, $outer' 'my $inner = $outer = $A' a b c
+
+    >   a c
+
+=item C<-f>
+
+I<perl:> Don't do F<$sitelib/sitecustomize.pltest> at startup.
+
+=item C<-FI</pattern/>>
+
+I<perl:> Provide C<split()> pattern for B<-a> switch (C<//>'s are optional).
+
+=item C<-II<directory>>
+
+I<perl:> Specify C<@INC>/C<#include> directory (several B<-I>'s allowed).
+
+=item C<-iI<[extension]>>
+
+I<perl:> Edit C<< <> >> files in place (makes backup if extension supplied).
+
+=item C<-n>
+
+I<As I said before, I never repeat myself. :-)>
+
+I<perl:> Assume C<< while (<>) { ... } >> loop around program.  It's a little
+richer than that: if you use C<last>, it closes the current file, leaving you
+to continue the loop on the next file.
+
+=item C<-oI<[number]>>
+
+Assume C<for(@ARGV) { ... }> loop around main program, and C<$ARGIND> (or
+C<$I>) is the current position.  In this case B<-p> doesn't imply B<-n>.  If
+number is given, that many args are passed at once as an array, referencing
+the original values.  If there are not enough on the last round, C<@A(RGV)> is
+filled up with C<undef>.
+
+    pltest -opl '' I II III IV
+    pltest -o3 'echo $ARGIND, @$_' i ii iii iv v vi vii viii ix
+    pltest -opl '' I II III IV
+    pltest -o3 'e $I, @$_' i ii iii iv v vi vii viii ix
+
+    >   I
+    >   II
+    >   III
+    >   IV
+    >   0 i ii iii
+    >   3 iv v vi
+    >   6 vii viii ix
+
+=item C<-OI<[number]>>
+
+like B<-o>, but use C<@A(RGV)> as loop variable.
+
+=item C<-pI<[number]>>
+
+I<Does C<pltest -penis> do pussy?  B< >It implements C<cat>. :-*>
+
+I<perl++:> On each loop C<print> (also B<-o> and B<-O>, in which case you must
+fill C<$_>) iteration.  If number is given, print at most number times.
+
+=item C<-PI<[number]>>
+
+Like B<-p>, but print only if main program evaluates to true, like C<grep>.
+
+=item C<-r>
+
+Reset C<$.> and B<-p>/B<-P> counter for each file.
+
+=item C<-T>
+
+I<perl:> Enable tainting checks.
+
+=item C<-t>
+
+I<perl:> Enable tainting warnings.
+
+=item C<-U>
+
+I<perl:> Allow unsafe operations.
+
+=item C<-u>
+
+I<perl:> Dump core after parsing program.
+
+=item C<-v>
+
+I<perl:> Print version, patchlevel and license.
+
+=item C<-VI<VERSION>>
+
+Rerun with given perl version, which is just a string appended to F<perl>.
+
+=item C<-W>
+
+I<perl:> Enable all warnings.
+
+=item C<-w>
+
+I<perl:> Enable many useful warnings.
+
+=item C<-X>
+
+I<perl:> Disable all warnings.
+
+=back
+
+=head2 Functions
+
+There are various functions, always also with a one letter alias, which
+perform little tasks that can be useful in one liners.
+
+=over
+
+=item C<benchmark { } I<[name[, arg...]]>> |
+C<b { } I<[name[, arg...]]>>
+
+Benchmark slow code for 10s, display name, looping over args.
+
+=item C<Benchmark { } I<[name[, arg...]]>> |
+C<B { } I<[name[, arg...]]>>
+
+Same, but run code 100 times in benchmark, to reduce overhead.
+
+=item C<Config I<[regexp...]>> |
+C<C I<[regexp...]>>
+
+Import and return C<%Config>, e.g. C<< Config->{sitelib} >>, optionally only part matching regexps.
+
+=item C<Date I<[arg...][, tz]>> |
+C<D I<[arg...][, tz]>>
+
+I<Why is Halloween Christmas?  Because Oct 31 = Dec 25. (^)>
+
+Date (from arg [s, us], s{.us}, offset [+-]s{.us}, tz ([+-]0-14{:mm|.ff}).
+Microseconds should be passed as strings, because floats have
+implementation-dependent rounding issues.  Positive offsets must be passed as
+strings, because otherwise the C<+> gets lost.  Returns the date, if called in
+some context, else echoes it.
+
+    pltest 'Date;
+        $_ = Date -86400, "+3600";
+        echo $_, " -- ", Date "+8:45"'
+    pltest 'D;
+        $_ = D -86400, "+3600";
+        e $_, " -- ", D "+8:45"'
+
+    >   Sat Apr 30 16:59:51.927225 2022
+    >   Fri Apr 29 17:59:51.927309 2022  --  Sat Apr 30 23:44:51.927342 +08:45 2022
+
+=item C<echo I<[arg...]>> |
+C<e I<[arg...]>>
+
+Echo prettified args or C<$_> with spaces and newline.  Prettified means,
+C<undef> becomes that string, italic if B<--color> is active.  Anything that
+can be stringified, is.  Any other reference goes through C<Data::Dumper>,
+which is loaded only if needed.
+
+If it is called in scalar context (e.g. C<$x = echo ...>) instead return the
+same as it would echo, in one string (inspired by Shell C<$(...)>).  If it is
+called in list context (e.g. C<@l = echo ...>) return each arg prettified
+individually, with a newline on the last one.
+
+=item C<Echo I<[arg...]>> |
+C<E I<[arg...]>>
+
+Same, but no newline.
+
+=item C<form I<format, [arg...]>> |
+C<f I<format, [arg...]>>
+
+Form(at) and echo prettified args or C<$_> with newline.  If it is called in
+scalar or list context (e.g. C<$x = form ...>) instead return the same as it
+would echo, in one string.  Parameter index can be "%1:" instead of "%1\$".
+
+=item C<Form I<format, [arg...]>> |
+C<F I<format, [arg...]>>
+
+Same, but no newline.
+
+=item C<Isodate I<[arg...][, tz]>> |
+C<I I<[arg...][, tz]>>
+
+Same as C<D(ate)>, but uses ISO format.
+
+    pltest 'Isodate;
+        $_ = Isodate 7 * -86400;
+        echo $_, " -- ", Isodate "+8.75"'
+    pltest 'I;
+        $_ = I 7 * -86400;
+        e $_, " -- ", I "+8.75"'
+
+    >   2022-04-30T16:59:51.958264
+    >   2022-04-23T16:59:51.958489  --  2022-04-30T23:44:51.958538 +08:45
+
+=item C<keydiff I<[key[, value]]>> |
+C<k I<[key[, value]]>>
+
+Store value or chomped C<$_> in C<$KEYDIFF{key or $1}[$ARGIND]>.  At the
+C<END> for each key (sorted numerically if possible) all values are
+diffed.
+
+=item C<Keydiff I<[number[, value]]>> |
+C<K I<[number[, value]]>>
+
+Same, but key is C<$FIELD[number]> or C<$F[0]>.
+
+=item C<Number I<[n]>> |
+C<N I<[n]>>
+
+Trim C<%N(UMBER)> values less than n (default 2) e.g.; C<B<-E>Number> or C<B<-E> 'N 5'>.
+
+=item C<piped { } I<cmd[, arg...]>> |
+C<p { } I<cmd[, arg...]>>
+
+Open pipe from cmd and loop over it.
+
+=back
+
+=head2 Variables
+
+There are various variables, always also with a one letter alias, many of
+which perform magic tasks at the C<END>.
+
+=over
+
+=item C<*ARGV> |
+C<*A>
+
+I<perl:> C<ARGV>, C<$ARGV> & C<@ARGV> are all aliased to C<A>, C<$A> & C<@A>.
+
+=item C<$ARGIND> |
+C<$I>
+
+Index of ARG currently being processed in B<-o>, B<-n> or B<-p>.
+
+=item C<@FIELD> |
+C<@F>
+
+I<perl:> This is an alias to loop autosplit variable C<@F>.
+
+=item C<$quote> |
+C<$q>
+
+Predefined to a single quote C<'>.  There is no magic associated.  Perl's
+C<q()> makes it easy to integrate functional quotes under all circumstances.
+This does the same for literal quotes.
+
+=item C<$Quote> |
+C<$Q>
+
+Predefined to a double quote C<">.  There is no magic associated.  Perl's
+C<qq()> makes it easy to integrate functional quotes under all circumstances.
+This does the same for literal quotes.
+
+=item C<%KEYDIFF> |
+C<%K>
+
+At END, sort by keys, print keydiff of C<$ARGIND> array elements.  Filled by
+C<k(eydiff)>.
+
+=item C<%NUMBER> |
+C<%N>
+
+At END, sort numerically by values.
+
+=item C<*RESULT> |
+C<*R>
+
+At END, echo C<$RESULT> if defined, then C<@RESULT> one per line if not empty,
+then C<%RESULT> sorted by keys.
+
+=item C<$ENV{PLDUMP}>
+
+Since C<pltest -MO=Deparse> won't show your parts of the program, it can be quite
+baffling when things go wrong.  If you export this before starting pltest, you see
+how your parts get embedded in various bits of generated stuff.  If you
+install C<perltidy>, it will be used.
+
+You will not see the effect of B<-a>, B<-F> or B<-n> as those get wrapped
+around it by C<perl> behind the scenes.  Due to interfacing with those options
+and providing for various option-combinations, the generated code may be too
+complicated.  Expect it to change and be optimized further in the future:
+
+    PLDUMP=1 \
+        pltest 'say "Hello Perld!"'
+
+    >   use feature ':' . substr $^V, 1;
+    >   
+    >   sub pltest::prog {
+    >       $pltest::last = 1;
+    >     LINE: {
+    >   #line 1 "main program"
+    >           say "Hello Perld!";
+    >       } continue {
+    >           $pltest::last = 0;
+    >       }
+    >       if ( $pltest::last || eof ) {
+    >           ++$ARGIND;
+    >           if ($pltest::last) { my $d = $.; close ARGV; $. = $d }
+    >           exit if $pltest::last == 2;
+    >       }
+    >   }
+
+=back
+
+=head1 COMPATIBILITY
+
+Even if it is rare nowadays, Perl 5.10 is still found out in the wild.  Pl
+tries to accomodate it gracefully, falling back to what works.  It has shims
+for C<any>, C<all>, C<none>, C<notall>, C<product> & C<sum0>.  Dumped
+data-structures may be formatted with a funny margin and C<h(osts)> will find
+the less IPv6 resolutions, the older your Perl.
+
+=head2 Minor Differences with perl -E
+
+Known minor differences are:
+
+=over
+
+=item *
+
+don't C<goto LINE>, but C<next LINE> is fine
+
+=item *
+
+in a B<-n> loop C<last> is per file instead of behaving like C<exit>
+
+=item *
+
+using C<pop>, etc. to implicitly modify C<@A(RGV)> works in B<-B> begin code,
+but not in your main program (which gets compiled to a function)
+
+=item *
+
+shenanigans with unbalanced braces won't work
+
+=back
+
+=head2 Windows Notes
+
+I<B<W>ork B<I>s B<N>ever B<D>one B<O>n B<W>indows B<S>ystems ;-)>
+
+Do yourself a favour and get a real Shell, e.g. from WSL, Cygwin, MSYS, MinGW
+or git!  If you can't avoid F<command.com> or F<cmd.exe>, you will have to
+first convert all inner quotes to C<qq>.  Then convert the outer single quotes
+to double quotes:
+
+    pltest "echo qq{${quote}Perl$quote}, qq{$Quote@ARGV$Quote}" one liner
+    pltest "e qq{${q}Perl$q}, qq{$Q@A$Q}" one liner
+
+    >   'Perl' "one liner"
+
+Any help for getting this to work in PowerShell is welcome!
+
+While the old Windows 10 terminal understands ANSI escape sequences, it makes
+it horribly hard to activate them.  So they are off by default, requiring
+B<--color> to override that choice.
+
+=for html <hr>
+
+Pl is maintained on L<SourceForge|https://perl1liner.sourceforge.io/> and also
+available on L<meta::cpan|https://metacpan.org/pod/distribution/App-pltest/pltest>.

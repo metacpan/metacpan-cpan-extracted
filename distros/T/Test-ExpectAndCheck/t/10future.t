@@ -82,4 +82,20 @@ my ( $controller, $puppet ) = Test::ExpectAndCheck::Future->create;
    test_test 'immediate';
 }
 
+# remains pending
+{
+   test_out q[ok 1 - $f is still pending];
+   test_out q[# Subtest: ->pending];
+   test_out q[    ok 1 - ->pending()];
+   test_out q[    1..1];
+   test_out q[ok 2 - ->pending];
+
+   $controller->expect( pending => )->remains_pending;
+   my $f = $puppet->pending();
+   ok( !$f->is_ready, '$f is still pending' );
+   $controller->check_and_clear( '->pending' );
+
+   test_test 'remains_pending';
+}
+
 done_testing;

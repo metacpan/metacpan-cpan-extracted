@@ -27,7 +27,7 @@ name: Perinci-Sub-GetArgs-Argv
 provides:
   Perinci::Sub::GetArgs::Argv:
     file: lib/Perinci/Sub/GetArgs/Argv.pm
-    version: '0.848'
+    version: '0.849'
 recommends:
   YAML::XS: '0'
 requires:
@@ -54,7 +54,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-GetArgs-Argv
   homepage: https://metacpan.org/release/Perinci-Sub-GetArgs-Argv
   repository: git://github.com/perlancar/perl-Perinci-Sub-GetArgs-Argv.git
-version: '0.848'
+version: '0.849'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

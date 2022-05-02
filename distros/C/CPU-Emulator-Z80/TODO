@@ -1,2 +1,4 @@
 Finish writing Internals.pod
 t/z80-calc-parity-table.t
+
+MEMPTR and BIT n, (HL).  See memptr.html

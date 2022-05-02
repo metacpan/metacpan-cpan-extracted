@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.549-8-g62710998
+package JSON::Schema::Modern; # git description: v0.550-7-ge92fa2b2
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.550';
+our $VERSION = '0.551';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -17,7 +17,7 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use JSON::MaybeXS;
 use Carp qw(croak carp);
-use List::Util 1.55 qw(pairs first uniqint pairmap uniq);
+use List::Util 1.55 qw(pairs first uniqint pairmap uniq any);
 use Ref::Util 0.100 qw(is_ref is_plain_hashref);
 use Scalar::Util 'refaddr';
 use Mojo::URL;
@@ -49,6 +49,11 @@ use constant SPECIFICATION_VERSIONS_SUPPORTED => [qw(draft7 draft2019-09 draft20
 has specification_version => (
   is => 'ro',
   isa => Enum(SPECIFICATION_VERSIONS_SUPPORTED),
+  coerce => sub {
+    return $_[0] if any { $_[0] eq $_ } SPECIFICATION_VERSIONS_SUPPORTED->@*;
+    my $real = 'draft'.($_[0]//'');
+    (any { $real eq $_ } SPECIFICATION_VERSIONS_SUPPORTED->@*) ? $real : $_[0];
+  },
 );
 
 has output_format => (
@@ -958,13 +963,14 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.550
+version 0.551
 
 =head1 SYNOPSIS
 
   use JSON::Schema::Modern;
 
   $js = JSON::Schema::Modern->new(
+    specification_version => 'draft2020-12',
     output_format => 'flag',
     ... # other options
   );
@@ -985,8 +991,13 @@ These values are all passed as arguments to the constructor.
 
 Indicates which version of the JSON Schema specification is used during evaluation. When not set,
 this value is derived from the C<$schema> keyword in the schema used in evaluation, or defaults to
-the latest version (draft2020-12). When left unset, the use of C<$schema> keywords in
-the schema is permitted, to switch between draft versions.
+the latest version (currently C<draft2020-12>).
+
+The use of this option is I<HIGHLY> encouraged to ensure continued correct operation of your schema.
+The current default value will not stay the same over time.
+
+Note that you can also use a C<$schema> keyword in the schema itself, to specify a different metaschema or
+specification version.
 
 May be one of:
 
@@ -994,15 +1005,15 @@ May be one of:
 
 =item *
 
-L<C<draft2020-12>|https://json-schema.org/specification-links.html#2020-12>, corresponding to metaschema C<https://json-schema.org/draft/2020-12/schema>.
+L<C<draft2020-12 or 2020-12>|https://json-schema.org/specification-links.html#2020-12>, corresponding to metaschema C<https://json-schema.org/draft/2020-12/schema>.
 
 =item *
 
-L<C<draft2019-09>|https://json-schema.org/specification-links.html#2019-09-formerly-known-as-draft-8>, corresponding to metaschema C<https://json-schema.org/draft/2019-09/schema>.
+L<C<draft2019-09 or 2019-09>|https://json-schema.org/specification-links.html#2019-09-formerly-known-as-draft-8>, corresponding to metaschema C<https://json-schema.org/draft/2019-09/schema>.
 
 =item *
 
-L<C<draft7>|https://json-schema.org/specification-links.html#draft-7>, corresponding to metaschema C<http://json-schema.org/draft-07/schema#>
+L<C<draft7 or 7>|https://json-schema.org/specification-links.html#draft-7>, corresponding to metaschema C<http://json-schema.org/draft-07/schema#>
 
 =back
 

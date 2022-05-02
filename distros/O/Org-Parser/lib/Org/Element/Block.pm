@@ -9,9 +9,9 @@ with 'Org::Element::Role';
 with 'Org::Element::BlockRole';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-08'; # DATE
+our $DATE = '2022-03-27'; # DATE
 our $DIST = 'Org-Parser'; # DIST
-our $VERSION = '0.556'; # VERSION
+our $VERSION = '0.557'; # VERSION
 
 has name => (is => 'rw');
 has args => (is => 'rw');
@@ -59,7 +59,7 @@ Org::Element::Block - Represent Org block
 
 =head1 VERSION
 
-This document describes version 0.556 of Org::Element::Block (from Perl distribution Org-Parser), released on 2022-02-08.
+This document describes version 0.557 of Org::Element::Block (from Perl distribution Org-Parser), released on 2022-03-27.
 
 =head1 DESCRIPTION
 

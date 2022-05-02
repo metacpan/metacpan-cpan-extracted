@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 1.25
+    Version 1.26
 
 SYNOPSIS
 
@@ -173,8 +173,8 @@ SUBROUTINES/METHODS
     
         # for form based login
     
-        $firefox->add_login(host => 'https://github.com', origin => 'https://github.com', user => 'me@example.org', password => 'qwerty', user_field => 'login', password_field => 'password');
         my $form_login = Firefox::Marionette::Login(host => 'https://github.com', user => 'me2@example.org', password => 'uiop[]', user_field => 'login', password_field => 'password');
+        $firefox->add_login($form_login);
     
         # or just directly
     
@@ -232,16 +232,17 @@ SUBROUTINES/METHODS
 
     accepts an element as the first parameter and a scalar attribute name
     as the second parameter. It returns the initial value of the attribute
-    with the supplied name. This method will return the initial content,
-    the property method will return the current content.
+    with the supplied name. This method will return the initial content
+    from the HTML source code, the property method will return the current
+    content.
 
         use Firefox::Marionette();
     
         my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-        my $element = $firefox->find_id('search_input');
-        !defined $element->attribute('value') or die "attribute is not defined!");
+        my $element = $firefox->find_id('metacpan_search-input');
+        !defined $element->attribute('value') or die "attribute is defined but did not exist in the html source!";
         $element->type('Test::More');
-        !defined $element->attribute('value') or die "attribute is still not defined!");
+        !defined $element->attribute('value') or die "attribute has changed but only the property should have changed!";
 
  await
 
@@ -386,6 +387,18 @@ SUBROUTINES/METHODS
 
     accepts a element as the first parameter and clears any user supplied
     input
+
+ clear_pref
+
+    accepts a preference <http://kb.mozillazine.org/About:config> name and
+    restores it to the original value. See the get_pref and set_pref
+    methods to get a preference value and to set to it to a particular
+    value. This method returns itself to aid in chaining methods.
+
+        use Firefox::Marionette();
+        my $firefox = Firefox::Marionette->new();
+    
+        $firefox->clear_pref('browser.search.defaultenginename');
 
  click
 
@@ -949,6 +962,18 @@ SUBROUTINES/METHODS
 
     This method returns itself to aid in chaining methods.
 
+ get_pref
+
+    accepts a preference <http://kb.mozillazine.org/About:config> name. See
+    the set_pref and clear_pref methods to set a preference value and to
+    restore it to it's original value. This method returns the current
+    value of the preference.
+
+        use Firefox::Marionette();
+        my $firefox = Firefox::Marionette->new();
+    
+        warn "Your browser's default search engine is set to " . $firefox->get_pref('browser.search.defaultenginename');
+
  har
 
     returns a hashref representing the http archive
@@ -1230,7 +1255,7 @@ SUBROUTINES/METHODS
         use Firefox::Marionette();
     
         my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-        $firefox->find_id('search_input')->type('Type::More');
+        $firefox->find_id('metacpan_search-input')->type('Type::More');
         $firefox->find('//button[@name="lucky"]')->click();
         while(!$firefox->interactive()) {
             # redirecting to Test::More page
@@ -1314,7 +1339,7 @@ SUBROUTINES/METHODS
         use Firefox::Marionette();
     
         my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-        $firefox->find_id('search_input')->type('Type::More');
+        $firefox->find_id('metacpan_search-input')->type('Type::More');
         $firefox->find('//button[@name="lucky"]')->click();
         while(!$firefox->loaded()) {
             # redirecting to Test::More page
@@ -1575,14 +1600,17 @@ SUBROUTINES/METHODS
 
       * profile - create a new profile based on the supplied profile. NOTE:
       firefox ignores any changes made to the profile on the disk while it
-      is running.
+      is running, instead, use the set_pref and clear_pref methods to make
+      changes while firefox is running.
 
       * profile_name - pick a specific existing profile to automate, rather
       than creating a new profile. Firefox <https://firefox.com> refuses to
       allow more than one instance of a profile to run at the same time.
       Profile names can be obtained by using the
       Firefox::Marionette::Profile::names() method. NOTE: firefox ignores
-      any changes made to the profile on the disk while it is running.
+      any changes made to the profile on the disk while it is running,
+      instead, use the set_pref and clear_pref methods to make changes
+      while firefox is running.
 
       * reconnect - an experimental parameter to allow a reconnection to
       firefox that a connection has been discontinued. See the survive
@@ -1803,13 +1831,14 @@ SUBROUTINES/METHODS
     accepts an element as the first parameter and a scalar attribute name
     as the second parameter. It returns the current value of the property
     with the supplied name. This method will return the current content,
-    the attribute method will return the initial content.
+    the attribute method will return the initial content from the HTML
+    source code.
 
         use Firefox::Marionette();
     
         my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-        my $element = $firefox->find_id('search_input');
-        $element->property('value') eq '' or die "Initial property is the empty string";
+        my $element = $firefox->find_id('metacpan_search-input');
+        $element->property('value') eq '' or die "Initial property should be the empty string";
         $element->type('Test::More');
         $element->property('value') eq 'Test::More' or die "This property should have changed!";
     
@@ -2051,6 +2080,18 @@ SUBROUTINES/METHODS
 
     sends keys to the input field of a currently displayed modal message
     box
+
+ set_pref
+
+    accepts a preference <http://kb.mozillazine.org/About:config> name and
+    the new value to set it to. See the get_pref and clear_pref methods to
+    get a preference value and to restore it to it's original value. This
+    method returns itself to aid in chaining methods.
+
+        use Firefox::Marionette();
+        my $firefox = Firefox::Marionette->new();
+        ...
+        $firefox->set_pref('browser.search.defaultenginename', 'DuckDuckGo');
 
  shadow_root
 

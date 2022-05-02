@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2021 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.19;
+use Object::Pad 0.57;
 
-package Device::Chip::TSL256x 0.06;
+package Device::Chip::TSL256x 0.07;
 class Device::Chip::TSL256x
-   extends Device::Chip;
+   :isa(Device::Chip);
 
 use Device::Chip::Sensor -declare;
 
@@ -302,36 +302,34 @@ async method read_lux ()
    my $ch0 = $data0 * ( 16 / $gain ) * ( 402 / $msec );
    my $ch1 = $data1 * ( 16 / $gain ) * ( 402 / $msec );
 
-   return if !$ch0;
+   my $lux = 0;
 
-   my $ratio = $ch1 / $ch0;
+   if( $ch0 != 0 ) {
+      my $ratio = $ch1 / $ch0;
 
-   # TODO: take account of differing package types.
+      # TODO: take account of differing package types.
 
-   my $lux;
-   if( $ratio <= 0.52 ) {
-      $lux = 0.0304 * $ch0 - 0.062 * $ch0 * ( $ratio ** 1.4 );
-   }
-   elsif( $ratio <= 0.65 ) {
-      $lux = 0.0224 * $ch0 - 0.031 * $ch1;
-   }
-   elsif( $ratio <= 0.80 ) {
-      $lux = 0.0128 * $ch0 - 0.0153 * $ch1;
-   }
-   elsif( $ratio <= 1.30 ) {
-      $lux = 0.00146 * $ch0 - 0.00112 * $ch1;
-   }
-   else {
-      $lux = 0;
-   }
+      if( $ratio <= 0.52 ) {
+         $lux = 0.0304 * $ch0 - 0.062 * $ch0 * ( $ratio ** 1.4 );
+      }
+      elsif( $ratio <= 0.65 ) {
+         $lux = 0.0224 * $ch0 - 0.031 * $ch1;
+      }
+      elsif( $ratio <= 0.80 ) {
+         $lux = 0.0128 * $ch0 - 0.0153 * $ch1;
+      }
+      elsif( $ratio <= 1.30 ) {
+         $lux = 0.00146 * $ch0 - 0.00112 * $ch1;
+      }
 
-   my $saturation = ( $msec == 402 ) ? 0xFFFF :
-                    ( $msec == 101 ) ? 0x9139 : 0x13B7;
+      my $saturation = ( $msec == 402 ) ? 0xFFFF :
+                       ( $msec == 101 ) ? 0x9139 : 0x13B7;
 
-   # Detect sensor saturation
-   if( $data0 == $saturation or $data1 == $saturation ) {
-      # The sensor saturates at well under 50klux
-      $lux = 50_000;
+      # Detect sensor saturation
+      if( $data0 == $saturation or $data1 == $saturation ) {
+         # The sensor saturates at well under 50klux
+         $lux = 50_000;
+      }
    }
 
    if( $_agc_enabled ) {

@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Object::Pad 0.19;
+use Object::Pad 0.57;
 
 use Future::AsyncAwait;
 use Future::IO::Impl::IOAsync;
@@ -26,7 +26,7 @@ a CSV file.
 
 =cut
 
-class MyApp extends App::Device::Chip::sensor
+class MyApp :isa(App::Device::Chip::sensor)
 {
    use Text::CSV;
    use POSIX qw( strftime );

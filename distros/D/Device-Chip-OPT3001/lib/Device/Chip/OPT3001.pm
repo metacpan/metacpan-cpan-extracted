@@ -4,11 +4,11 @@
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.40;
+use Object::Pad 0.57;
 
-package Device::Chip::OPT3001 0.01;
+package Device::Chip::OPT3001 0.02;
 class Device::Chip::OPT3001
-   extends Device::Chip::Base::RegisteredI2C;
+   :isa(Device::Chip::Base::RegisteredI2C);
 
 use Device::Chip::Sensor -declare;
 

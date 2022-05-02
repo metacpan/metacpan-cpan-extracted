@@ -9,4 +9,8 @@ Escape character is '^]'.
 	"data":"OK",
 	"hello":"world"
 }
+{"JSON::Server::control":"close"}
+{
+	"JSON::Server::response":"closing"
+}
 Connection closed by foreign host.

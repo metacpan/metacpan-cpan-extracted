@@ -27,10 +27,10 @@ can_ok(
 my $pwq = Lib::PWQuality->new();
 isa_ok( $pwq, 'Lib::PWQuality' );
 
-is(
-    $pwq->get_int_value('MIN_LENGTH'),
-    8, ## no critic
-    'Default MIN_LENGTH is 8',
+my $min_len = $pwq->get_int_value('MIN_LENGTH');
+ok(
+    $min_len < 10,
+    "Default MIN_LENGTH is under 10 ($min_len)",
 );
 
 is(

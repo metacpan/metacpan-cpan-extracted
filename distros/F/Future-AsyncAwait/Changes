@@ -1,5 +1,11 @@
 Revision history for Future-AsyncAwait
 
+0.58    2022-04-29
+        [BUGFIXES]
+         * Fix memory leak with long-running futures and on_cancel (RT142222)
+         * Copy SVs with SvPADTMP in case of running code, or folded constants
+           that erroneously end up with that flag anyway (RT142468)
+
 0.57    2022-03-16
         [CHANGES]
          * Updates for Devel::MAT::Dumper v0.44

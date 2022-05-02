@@ -1,5 +1,9 @@
 Revision history for Music-RhythmSet
 
+0.04    2022-04-29
+        Better document the duplication of MIDI events. Also new embig
+        parameter to de-duplicate the MIDI events.
+
 0.03    2021-04-22
         Switch tests from Test::Most to Test2::V0. Better test coverage.
 

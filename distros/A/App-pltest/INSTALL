@@ -1,0 +1,20 @@
+No installation is needed for pltest on Unix-like systems.  You have 2 options:
+
+- run it from where you unpacked it -- as either of
+  ./pltest ...
+  perl pltest ...
+- copy pltest to some directory in your PATH, e.g. ~/bin -- you may need to
+  chmod a+x pltest
+
+  You can save some space (and maybe a bit of starting time) by compacting pltest:
+  ./pltest -rp 'last if /=head1/; s/^(?:    |\t+ *)//; $. > 1 ? s/^(?:#.*|\cL)?\n// : s/env //; s/\s+#.*//' pltest > DESTINATION/pltest
+
+On Windows you have 3 options:
+
+- run it from where you unpacked it
+- copy pltest and pltest.bat to some directory in your PATH
+- copy pltest as pltest.pltest to some directory in your PATH -- the 2nd pltest tells Win its type
+  If Perl installation didn't add it (Strawberry didn't for me), you must
+  set PATHEXT=.PL;%PATHEXT%
+
+Currently pltest doesn't seem to work from Power Shell.  Any help welcome!

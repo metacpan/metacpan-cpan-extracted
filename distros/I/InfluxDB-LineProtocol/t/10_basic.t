@@ -252,6 +252,27 @@ my @tests = (
         'metric value=7.51696501241595e+50',
         [ 'metric', { value => '7.51696501241595e+50' }, undef ]
     ],
+
+    # Influx >= v1.0 requires equals character to be escaped in tag keys, tag
+    # values and field keys
+    [
+        0,
+        ['metric', { example_field => 1 }, { example_tag => 'foo=bar' }],
+        'metric,example_tag=foo\=bar example_field=1i',
+        ['metric', { example_field => 1 }, { example_tag => 'foo=bar' }],
+    ],
+    [
+        0,
+        ['metric', { example_field => 1 }, { 'example=tag' => 'foo' }],
+        'metric,example\=tag=foo example_field=1i',
+        ['metric', { example_field => 1 }, { 'example=tag' => 'foo' }],
+    ],
+    [
+        0,
+        ['metric', { 'example=field' => 1 }, { 'example_tag' => 'foo' }],
+        'metric,example_tag=foo example\=field=1i',
+        ['metric', { 'example=field' => 1 }, { 'example_tag' => 'foo' }],
+    ]
 );
 
 

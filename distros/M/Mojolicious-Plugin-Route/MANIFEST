@@ -16,6 +16,8 @@ t/Lite/Route/Bar/Qux/B.pm
 t/Lite/Route/Baz.pm
 t/Lite/Route/Baz/A.pm
 t/Lite/Route/Foo.pm
+t/Lite/Route/Qux.pm
+t/Lite/Route/QuxA.pm
 lib/Mojolicious/Plugin/Route.pm
 lib/MojoX/Route.pm
 cpanfile

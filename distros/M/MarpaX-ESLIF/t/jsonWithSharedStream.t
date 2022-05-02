@@ -46,7 +46,7 @@ sub generator_action {
     $log->debugf('generator_action: %s', \@_);
     $log->debugf('generator_action: first 2 character are "%s"', $self->getRecognizer->input(0, 2));
 
-    return 'test ::= "XXX"'
+    return '"XXX"'
 }
 sub setRecognizer          { my ($self, $recognizer) = @_; $log->debugf('setRecognizer: %s', $recognizer); $self->{recognizer} = $recognizer; }
 sub getRecognizer          { my ($self) = shift; $self->{recognizer} }

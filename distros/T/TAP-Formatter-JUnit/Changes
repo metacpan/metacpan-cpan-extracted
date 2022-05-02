@@ -1,5 +1,10 @@
 Revision history for Perl extension TAP::Formatter::JUnit.
 
+0.14      2022-04-30 12:36:14-07:00 America/Vancouver
+    - Update "t/formatter.t" to accommodate fixes made in Test::Harness v3.44
+      (most specifically w.r.t. the "bailout" test).  david-dot-krupicka++
+      ppisar++ pghmcfc++
+
 0.13      2021-05-04 10:04:17-07:00 America/Vancouver
     - Fix install of "script/tap2junit"
 

@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+1.82 2022-04-30
+
+ - Do not URI-escape the @ sign in URLS.
+
 1.81 2022-03-29
 
  - EXPERIMENTAL feature: Support <ruby>lower|upper</ruby>

@@ -1,40 +1,48 @@
 package MsOffice::Word::Template;
+use 5.024;
 use Moose;
 use MooseX::StrictConstructor;
 use Carp                           qw(croak);
 use HTML::Entities                 qw(decode_entities);
-use MsOffice::Word::Surgeon 1.08;
+use MsOffice::Word::Surgeon 2.0;
+
+# syntactic sugar for attributes
+sub has_inner ($@) {my $attr = shift; has($attr => @_, init_arg => undef, lazy => 1, builder => "_$attr")}
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '1.02';
+our $VERSION = '2.0';
 
-# attributes for interacting with MsWord
-has 'surgeon'       => (is => 'ro',   isa => 'MsOffice::Word::Surgeon', required => 1);
-has 'data_color'    => (is => 'ro',   isa => 'Str',                     default  => "yellow");
-has 'control_color' => (is => 'ro',   isa => 'Str',                     default  => "green");
-# see also BUILDARGS: the "docx" arg will be translated into "surgeon"
+#======================================================================
+# ATTRIBUTES
+#======================================================================
 
-# attributes for interacting with the chosen template engine
-# Filled by default with values for the Template Toolkit (a.k.a TT2)
-has 'start_tag'     => (is => 'ro',   isa => 'Str',                     default  => "[% ");
-has 'end_tag'       => (is => 'ro',   isa => 'Str',                     default  => " %]");
-has 'engine'        => (is => 'ro',   isa => 'CodeRef',                 default  => sub {\&TT2_engine});
-has 'engine_args'   => (is => 'ro',   isa => 'ArrayRef',                default  => sub {[]});
+# constructor attributes for interacting with MsWord
+# See also BUILDARGS: the constructor can also take a "docx" arg
+# that will be automatically translated into a "surgeon" attribute
+has 'surgeon'       => (is => 'ro', isa => 'MsOffice::Word::Surgeon', required => 1);
+has 'data_color'    => (is => 'ro', isa => 'Str',                     default  => "yellow");
+has 'control_color' => (is => 'ro', isa => 'Str',                     default  => "green");
+has 'part_names'    => (is => 'ro', isa => 'ArrayRef[Str]',           lazy     => 1,
+                        default  => sub {[keys shift->surgeon->parts->%*]});
 
-# attributes constructed by the module -- not received through the constructor
-has 'template_text' => (is => 'bare', isa => 'Str',                     init_arg => undef);
-has 'engine_stash'  => (is => 'bare', isa => 'HashRef',                 init_arg => undef,
-                                                                        clearer  => 'clear_stash');
+# constructor attributes for building a templating engine
+has 'engine_class'  => (is => 'ro', isa => 'Str',                     default  => 'TT2');
+has 'engine_args'   => (is => 'ro', isa => 'ArrayRef',                default  => sub {[]});
+
+# attributes lazily constructed by the module -- not received through the constructor
+has_inner 'engine'  => (is => 'ro', isa => 'MsOffice::Word::Template::Engine');
+
+#======================================================================
+# GLOBALS
+#======================================================================
 
 my $XML_COMMENT_FOR_MARKING_DIRECTIVES = '<!--TEMPLATE_DIRECTIVE_ABOVE-->';
 
 
-
 #======================================================================
-# BUILDING THE TEMPLATE
+# BUILDING INSTANCES
 #======================================================================
-
 
 # syntactic sugar for supporting ->new($surgeon) instead of ->new(surgeon => $surgeon)
 around BUILDARGS => sub {
@@ -62,96 +70,84 @@ around BUILDARGS => sub {
 };
 
 
-sub BUILD {
+#======================================================================
+# LAZY ATTRIBUTE CONSTRUCTORS
+#======================================================================
+
+
+sub _engine {
   my ($self) = @_;
 
-  # assemble the template text and store it into the bare attribute
-  $self->{template_text} = $self->build_template_text;
+  # instantiate the templating engine
+  my $engine_class = $self->engine_class;
+  my $engine;
+  my @load_errors;
+ CLASS:
+  for my $class ("MsOffice::Word::Template::Engine::$engine_class", $engine_class) {
+    eval "require $class; 1"                        or  push @load_errors, $@ and next CLASS;
+    $engine = $class->new($self->engine_args->@*)                             and last CLASS;
+  }
+  $engine or die "could not load engine class '$engine_class'", @load_errors;
+
+  # compile regexes based on the start/end tags
+  my ($start_tag, $end_tag) = ($engine->start_tag, $engine->end_tag);
+  my @xml_regexes = $self->_xml_regexes($start_tag, $end_tag);
+
+  # tell the engine to build a compiled template for each document part
+  foreach my $part_name ($self->part_names->@*) {
+    my $part = $self->surgeon->part($part_name);
+
+    # assemble template fragments from all runs in the part into a global template text
+    $part->cleanup_XML;
+    my @template_fragments = map {$self->_template_fragment_for_run($_, $start_tag, $end_tag)}
+                                 $part->runs->@*;
+    my $template_text      = join "", @template_fragments;
+
+    # remove markup around directives, successively for table rows, for paragraphs, and finally
+    # for remaining directives embedded within text runs.
+    $template_text =~ s/$_/$1/g foreach @xml_regexes;
+
+    # compile and store the template
+    $engine->compile_template($part_name => $template_text);
+  }
+
+  return $engine;
 }
 
 
-sub build_template_text {
-  my ($self) = @_;
 
-  # start and end character sequences for a template fragment
-  my ($rx_start, $rx_end) = map quotemeta, $self->start_tag, $self->end_tag;
-
-  # Regexes for extracting template directives within the XML.
-  # Such directives are identified through a specific XML comment -- this comment is
-  # inserted by method "template_fragment_for_run()" below.
-  # The (*SKIP) instructions are used to avoid backtracking after a
-  # closing tag for the subexpression has been found. Otherwise the
-  # .*? inside could possibly match across boundaries of the current
-  # XML node, we don't want that.
-
-  # regex for matching directives to be treated outside the text flow.
-  my $regex_outside_text_flow = qr{
-      <w:r\b           [^>]*>                  # start run node
-        (?: <w:rPr> .*? </w:rPr>   (*SKIP) )?  # optional run properties
-        <w:t\b         [^>]*>                  # start text node
-          ($rx_start .*? $rx_end)  (*SKIP)     # template directive
-          $XML_COMMENT_FOR_MARKING_DIRECTIVES  # specific XML comment
-        </w:t>                                 # close text node
-      </w:r>                                   # close run node
-   }sx;
-
-  # regex for matching paragraphs that contain only a directive
-  my $regex_paragraph = qr{
-    <w:p\b             [^>]*>                  # start paragraph node
-      (?: <w:pPr> .*? </w:pPr>     (*SKIP) )?  # optional paragraph properties
-      $regex_outside_text_flow
-    </w:p>                                     # close paragraph node
-   }sx;
-
-  # regex for matching table rows that contain only a directive in the first cell
-  my $regex_row = qr{
-    <w:tr\b            [^>]*>                  # start row node
-      <w:tc\b          [^>]*>                  # start cell node
-         (?:<w:tcPr> .*? </w:tcPr> (*SKIP) )?  # cell properties
-         $regex_paragraph                      # paragraph in cell
-      </w:tc>                                  # close cell node
-      (?:<w:tc> .*? </w:tc>        (*SKIP) )*  # ignore other cells on the same row
-    </w:tr>                                    # close row node
-   }sx;
-
-  # assemble template fragments from all runs in the document into a global template text
-  $self->surgeon->cleanup_XML;
-  my @template_fragments = map {$self->template_fragment_for_run($_)}  @{$self->surgeon->runs};
-  my $template_text      = join "", @template_fragments;
-
-  # remove markup around directives, successively for table rows, for paragraphs, and finally
-  # for remaining directives embedded within text runs.
-  $template_text =~ s/$_/$1/g for $regex_row, $regex_paragraph, $regex_outside_text_flow;
-
-  return $template_text;
-}
+#======================================================================
+# UTILITY METHODS
+#======================================================================
 
 
-sub template_fragment_for_run { # given an instance of Surgeon::Run, build a template fragment
-  my ($self, $run) = @_;
+
+sub _template_fragment_for_run { # given an instance of Surgeon::Run, build a template fragment
+  my ($self, $run, $start_tag, $end_tag) = @_;
 
   my $props         = $run->props;
   my $data_color    = $self->data_color;
   my $control_color = $self->control_color;
 
-  # if this run is highlighted in yellow or green, it must be translated into a template directive
+  # if this run is highlighted in data or control color, it must be translated into a template directive
   if ($props =~ s{<w:highlight w:val="($data_color|$control_color)"/>}{}) {
     my $color       = $1;
     my $xml         = $run->xml_before;
 
+    # re-build the run, removing the highlight, and adding the start/end tags for the template engine
     my $inner_texts = $run->inner_texts;
     if (@$inner_texts) {
       $xml .= "<w:r>";                                                # opening XML tag for run node
       $xml .= "<w:rPr>" . $props . "</w:rPr>" if $props;              # optional run properties
       $xml .= "<w:t>";                                                # opening XML tag for text node
-      $xml .= $self->start_tag;                                       # start a template directive
+      $xml .= $start_tag;                                             # start a template directive
       foreach my $inner_text (@$inner_texts) {                        # loop over text nodes
         my $txt = decode_entities($inner_text->literal_text);         # just take inner literal text
         $xml .= $txt . "\n";
         # NOTE : adding "\n" because the template parser may need them for identifying end of comments
       }
 
-      $xml .= $self->end_tag;                                         # end of template directive
+      $xml .= $end_tag;                                               # end of template directive
       $xml .= $XML_COMMENT_FOR_MARKING_DIRECTIVES
                                          if $color eq $control_color; # XML comment for marking
       $xml .= "</w:t>";                                               # closing XML tag for text node
@@ -169,6 +165,60 @@ sub template_fragment_for_run { # given an instance of Surgeon::Run, build a tem
 
 
 
+
+sub _xml_regexes {
+  my ($self, $start_tag, $end_tag) = @_;
+
+  # start and end character sequences for a template fragment
+  my $rx_start = quotemeta  $start_tag;
+  my $rx_end   = quotemeta  $end_tag;
+
+  # Regexes for extracting template directives within the XML.
+  # Such directives are identified through a specific XML comment -- this comment is
+  # inserted by method "template_fragment_for_run()" below.
+  # The (*SKIP) instructions are used to avoid backtracking after a
+  # closing tag for the subexpression has been found. Otherwise the
+  # .*? inside could possibly match across boundaries of the current
+  # XML node, we don't want that.
+
+  # regex for matching directives to be treated outside the text flow.
+  my $rx_outside_text_flow = qr{
+      <w:r\b           [^>]*>                  # start run node
+        (?: <w:rPr> .*? </w:rPr>   (*SKIP) )?  # optional run properties
+        <w:t\b         [^>]*>                  # start text node
+          ($rx_start .*? $rx_end)  (*SKIP)     # template directive
+          $XML_COMMENT_FOR_MARKING_DIRECTIVES  # specific XML comment
+        </w:t>                                 # close text node
+      </w:r>                                   # close run node
+   }sx;
+
+  # regex for matching paragraphs that contain only a directive
+  my $rx_paragraph = qr{
+    <w:p\b             [^>]*>                  # start paragraph node
+      (?: <w:pPr> .*? </w:pPr>     (*SKIP) )?  # optional paragraph properties
+      $rx_outside_text_flow
+    </w:p>                                     # close paragraph node
+   }sx;
+
+  # regex for matching table rows that contain only a directive in the first cell
+  my $rx_row = qr{
+    <w:tr\b            [^>]*>                  # start row node
+      <w:tc\b          [^>]*>                  # start cell node
+         (?:<w:tcPr> .*? </w:tcPr> (*SKIP) )?  # cell properties
+         $rx_paragraph                         # paragraph in cell
+      </w:tc>                                  # close cell node
+      (?:<w:tc> .*? </w:tc>        (*SKIP) )*  # ignore other cells on the same row
+    </w:tr>                                    # close row node
+   }sx;
+
+  return ($rx_row, $rx_paragraph, $rx_outside_text_flow);
+  # Note : the order is important
+}
+
+
+
+
+
 #======================================================================
 # PROCESSING THE TEMPLATE
 #======================================================================
@@ -176,127 +226,16 @@ sub template_fragment_for_run { # given an instance of Surgeon::Run, build a tem
 sub process {
   my ($self, $vars) = @_;
 
-  # process the template to generate new XML
-  my $engine  = $self->engine;
-  my $new_XML = $self->$engine($vars);
+  # create a clone of the original 
+  my $new_doc = $self->surgeon->clone;
 
-  # insert the generated output into a new MsWord document; other zip members
-  # are cloned from the original template
-  my $new_doc = $self->surgeon->meta->clone_object($self->surgeon);
-  $new_doc->contents($new_XML);
+  foreach my $part_name ($self->part_names->@*) {
+    my $new_doc_part = $new_doc->part($part_name);
+    my $new_contents = $self->engine->process($part_name, $new_doc_part, $vars);
+    $new_doc_part->contents($new_contents);
+  }
 
   return $new_doc;
-}
-
-
-#======================================================================
-# DEFAULT ENGINE : TEMPLATE TOOLKIT, a.k.a. TT2
-#======================================================================
-
-# arbitrary value for the first bookmark id. 100 should most often be above other
-# bookmarks generated by Word itself. TODO : would be better to find the highest
-# id number really used in the template
-my $first_bookmark_id = 100;
-
-# precompiled blocks as facilities to be used within templates
-my %precompiled_blocks = (
-
-  # a wrapper block for inserting a Word bookmark
-  bookmark => sub {
-    my $context     = shift;
-    my $stash       = $context->stash;
-
-    # assemble xml markup
-    my $bookmark_id = $stash->get('global.bookmark_id') || $first_bookmark_id;
-    my $name        = fix_bookmark_name($stash->get('name') || 'anonymous_bookmark');
-
-    my $xml         = qq{<w:bookmarkStart w:id="$bookmark_id" w:name="$name"/>}
-                    . $stash->get('content') # content of the wrapper
-                    . qq{<w:bookmarkEnd w:id="$bookmark_id"/>};
-
-    # next bookmark will need a fresh id
-    $stash->set('global.bookmark_id', $bookmark_id+1);
-
-    return $xml;
-  },
-
-  # a wrapper block for linking to a bookmark
-  link_to_bookmark => sub {
-    my $context = shift;
-    my $stash   = $context->stash;
-
-    # assemble xml markup
-    my $name    = fix_bookmark_name($stash->get('name') || 'anonymous_bookmark');
-    my $content = $stash->get('content');
-    my $tooltip = $stash->get('tooltip');
-    if ($tooltip) {
-      # TODO: escap quotes
-      $tooltip = qq{ w:tooltip="$tooltip"};
-    }
-    my $xml  = qq{<w:hyperlink w:anchor="$name"$tooltip>$content</w:hyperlink>};
-
-    return $xml;
-  },
-
-  # a block for generating a Word field. Can also be used as wrapper.
-  field => sub {
-    my $context = shift;
-    my $stash   = $context->stash;
-    my $code    = $stash->get('code');         # field code, including possible flags
-    my $text    = $stash->get('content');      # initial text content (before updating the field)
-
-    my $xml     = qq{<w:r><w:fldChar w:fldCharType="begin"/></w:r>}
-                . qq{<w:r><w:instrText xml:space="preserve"> $code </w:instrText></w:r>};
-    $xml       .= qq{<w:r><w:fldChar w:fldCharType="separate"/></w:r>$text} if $text;
-    $xml       .= qq{<w:r><w:fldChar w:fldCharType="end"/></w:r>};
-
-    return $xml;
-  },
-
-);
-
-
-
-
-sub TT2_engine {
-  my ($self, $vars) = @_;
-
-  require Template::AutoFilter; # a subclass of Template that adds automatic html filtering
-
-
-  # assemble args to be passed to the constructor
-  my %TT2_args = @{$self->engine_args};
-  $TT2_args{BLOCKS}{$_} //= $precompiled_blocks{$_} for keys %precompiled_blocks;
-
-
-  # at the first invocation, create a TT2 compiled template and store it in the stash.
-  # Further invocations just reuse the TT2 object in stash.
-  my $stash                     = $self->{engine_stash} //= {};
-  $stash->{TT2}               //= Template::AutoFilter->new(\%TT2_args);
-  $stash->{compiled_template} //= $stash->{TT2}->template(\$self->{template_text});
-
-  # generate new XML by invoking the template on $vars
-  my $new_XML = $stash->{TT2}->context->process($stash->{compiled_template}, $vars);
-
-  return $new_XML;
-}
-
-
-#======================================================================
-# UTILITY ROUTINES (not methods)
-#======================================================================
-
-
-sub fix_bookmark_name {
-  my $name = shift;
-
-  # see https://stackoverflow.com/questions/852922/what-are-the-limitations-for-bookmark-names-in-microsoft-word
-
-  $name =~ s/[^\w_]+/_/g;                              # only digits, letters or underscores
-  $name =~ s/^(\d)/_$1/;                               # cannot start with a digit
-  $name = substr($name, 0, 40) if length($name) > 40;  # max 40 characters long
-
-  return $name;
 }
 
 
@@ -337,7 +276,7 @@ using control directives for loops, conditionals, subroutines, etc.
 =back
 
 
-Template authors just have to use the highlighing function in MsWord to
+Template authors just use the highlighing function in MsWord to
 mark the templating directives :
 
 =over
@@ -360,16 +299,21 @@ in order to avoid empty paragraphs or empty rows in the resulting document.
 
 The syntax of data and control directives depends on the backend
 templating engine.  The default engine is the L<Perl Template Toolkit|Template>;
-other engines can be specified through parameters
-to the L</new> method -- see the L</TEMPLATE ENGINE> section below.
+other engines can be specified as subclasses -- see the L</TEMPLATE ENGINE> section below.
 
 
 =head2 Status
 
-This first release is a proof of concept. Some simple templates have
-been successfully tried; however it is likely that a number of
-improvements will have to be made before this system can be used at
-large scale in production.  If you use this module, please keep me
+This second release is a major refactoring of the first version, together with
+a refactoring of L<MsOffice::Word::Surgeon>. New features include support
+for headers and footers and for image insertion. The internal object-oriented
+structure has been redesigned.
+
+This module has been used successfully for a pilot project in my organization,
+generating quite complex documents from deeply nested datastructures.
+Yet this has not been used yet at large scale in production, so it is quite likely
+that some youth defects may still be discovered.
+If you use this module, please keep me
 informed of your difficulties, tricks, suggestions, etc.
 
 
@@ -422,7 +366,7 @@ These are described in section L</TEMPLATE ENGINE> below.
   my $new_doc = $template->process(\%data);
   $new_doc->save_as($path_for_new_doc);
 
-Process the template on a given data tree, and return a new document
+Processes the template on a given data tree, and returns a new document
 (actually, a new instance of L<MsOffice::Word::Surgeon>).
 That document can then be saved  using L<MsOffice::Word::Surgeon/save_as>.
 
@@ -458,71 +402,43 @@ for paragraph nodes, run nodes and text nodes; but in that case you must
 also apply the "none" filter from L<Template::AutoFilter> so that
 angle brackets in XML markup do not get translated into HTML entities.
 
+See also L<MsOffice::Word::Template::Engine::TT2> for
+additional advice on authoring templates based on the
+L<Template Toolkit|Template>.
+
+
 
 =head1 TEMPLATE ENGINE
 
 This module invokes a backend I<templating engine> for interpreting the
-template directives. In order to use an engine different from the default
-L<Template Toolkit|Template>, you must supply the following parameters
-to the L</new> method :
+template directives. The default engine is
+L<MsOffice::Word::Template::Engine::TT2>, built on top of
+L<Template Toolkit|Template>. Another engine supplied in this distribution is
+L<MsOffice::Word::Template::Engine::Mustache>, mostly as an example.
+To implement another engine, just subclass
+L<MsOffice::Word::Template::Engine>.
+
+To use an engine different from the default, the following arguments
+must be supplied to the L</new> method :
 
 =over
 
-=item start_tag
+=item engine_class
 
-The string for identifying the start of a template directive
-
-=item end_tag
-
-The string for identifying the end of a template directive
-
-=item engine
-
-A reference to a method that will perform the templating operation (explained below)
+The name of the engine class. If the class is within the L<MsOffice::Word::Template::Engine>
+namespace, just the suffix is sufficient; otherwise, specify the fully qualified class name.
 
 =item engine_args
 
-An optional list of parameters that may be used by the engine
+An optional list of parameters that may be used for initializing the engine
 
 =back
 
+The engine will get a C<compile_template> method call for each part in the
+C<.docx> document (main 
+
 Given a datatree in C<$vars>, the engine will be called as :
 
-  my $engine  = $self->engine;
-  my $new_XML = $self->$engine($vars);
-
-It is up to the engine method to exploit C<< $self->engine_args >> if needed.
-
-If the engine is called repetively, it may need to store some data to be
-persistent between two calls, like for example a compiled version of the
-parsed template. To this end, there is an internal hashref attribute
-called C<engine_stash>. If necessary the stash can be cleared through
-the C<clear_stash> method.
-
-Here is an example using L<Template::Mustache> :
-
-  my $template = MsOffice::Word::Template->new(
-    docx      => $template_file,
-    start_tag => "{{",
-    end_tag   => "}}",
-    engine    => sub {
-      my ($self, $vars) = @_;
-
-      # at the first invocation, create a Mustache compiled template and store it in the stash.
-      # Further invocations will just reuse the object in stash.
-      my $stash            = $self->{engine_stash} //= {};
-      $stash->{mustache} //= Template::Mustache->new(
-        template => $self->{template_text},
-        @{$self->engine_args},   # for ex. partials, partial_path, context
-                                 # -- see L<Template::Mustache> documentation
-       );
-
-      # generate new XML by invoking the template on $vars
-      my $new_XML = $stash->{mustache}->render($vars);
-
-      return $new_XML;
-      },
-   );
 
 The engine must make sure that ampersand characters and angle brackets
 are automatically replaced by the corresponding HTML entities
@@ -537,56 +453,52 @@ but thanks to the L<Template::AutoFilter>
 module, this is performed automatically.
 
 
-=head1 AUTHORING NOTES SPECIFIC TO THE TEMPLATE TOOLKIT
 
-This chapter just gives a few hints for authoring Word templates with the
-Template Toolkit.
+This module invokes a backend I<templating engine> for interpreting the
+template directives. The default engine is
+L<MsOffice::Word::Template::Engine::TT2>, built on top of
+L<Template Toolkit|Template>. Another engine supplied in this distribution is
+L<MsOffice::Word::Template::Engine::Mustache>, mostly as an example.
+To implement another engine, just subclass
+L<MsOffice::Word::Template::Engine>.
 
-The examples below use [[double square brackets]] to indicate
-segments that should be highlighted in B<green> within the Word template.
+To use an engine different from the default, the following arguments
+must be supplied to the L</new> method :
 
+=over
 
-=head2 Bookmarks
+=item engine_class
 
-The template processor is instantiated with a predefined wrapper named C<bookmark>
-for generating Word bookmarks. Here is an example:
+The name of the engine class. If the class sits within the L<MsOffice::Word::Template::Engine>
+namespace, just the suffix is sufficient; otherwise, specify the fully qualified class name.
 
-  Here is a paragraph with [[WRAPPER bookmark name="my_bookmark"]]bookmarked text[[END]].
+=item engine_args
 
-The C<name> argument is automatically truncated to 40 characters, and non-alphanumeric
-characters are replaced by underscores, in order to comply with the limitations imposed by Word
-for bookmark names.
+An optional list of parameters that may be used for initializing the engine
 
-=head2 Internal hyperlinks
+=back
 
-Similarly, there is a predefined wrapper named C<link_to_bookmark> for generating
-hyperlinks to bookmarks. Here is an example:
+After initialization the engine will receive a C<compile_template> method call for each part in the
+C<.docx> document, i.e. not only the main document body, but also headers and footers.
 
-  Click [[WRAPPER link_to_bookmark name="my_bookmark" tooltip="tip top"]]here[[END]].
+Then the main C<process()> method, given a datatree in C<$vars>, will call
+the engine's C<process()> method on each document part.
 
-The C<tooltip> argument is optional.
+The engine must make sure that ampersand characters and angle brackets
+are automatically replaced by the corresponding HTML entities
+(otherwise the resulting XML would be incorrect and could not be
+opened by Microsoft Word).  The Mustache engine does this
+automatically.  The Template Toolkit would normally require to
+explicitly add an C<html> filter at each directive :
 
-=head2 Word fields
+  [% foo.bar | html %]
 
-A predefined block C<field> generates XML markup for Word fields, like for example :
-
-  Today is [[PROCESS field code="DATE \\@ \"h:mm am/pm, dddd, MMMM d\""]]
-
-Beware that quotes or backslashes must be escaped so that the Template Toolkit parser
-does not interpret these characters.
-
-The list of Word field codes is documented at 
-L<https://support.microsoft.com/en-us/office/list-of-field-codes-in-word-1ad6d91a-55a7-4a8d-b535-cf7888659a51>.
-
-When used as a wrapper, the C<field> block generates a Word field with alternative
-text content, displayed before the field gets updated. For example :
-
-  [[WRAPPER field code="TOC \o \"1-3\" \h \z \u"]]Table of contents – press F9 to update[[END]]
-
+but thanks to the L<Template::AutoFilter>
+module, this is performed automatically.
 
 =head1 TROUBLESHOOTING
 
-If the document generated by this module cannot open in Word, it is probably because the XML
+If a document generated by this module cannot open in Word, it is probably because the XML
 generated by your template is not equilibrated and therefore not valid.
 For example a template like this :
 
@@ -599,7 +511,7 @@ of a paragraph and closes at a different paragraph -- therefore when the I<condi
 evaluates to false, the XML tag for closing the initial paragraph will be missing.
 
 Compound directives like IF .. END, FOREACH .. END,  TRY .. CATCH .. END should therefore
-be equilibrated, either all within the same paragraph, or each directive on a separate 
+be equilibrated, either all within the same paragraph, or each directive on a separate
 paragraph. Examples like this should be successful :
 
   This paragraph [[ IF condition ]]has an optional part[[ ELSE ]]or an alternative[[ END ]].

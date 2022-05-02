@@ -1,29 +1,24 @@
-{
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
-   "meta-spec" : {
-      "version" : 1.4,
-      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
-   },
-   "generated_by" : "ExtUtils::MakeMaker version 6.50",
-   "distribution_type" : "module",
-   "version" : "1.0",
-   "name" : "AnyEvent-Watchdog",
-   "author" : [],
-   "license" : "unknown",
-   "build_requires" : {
-      "ExtUtils::MakeMaker" : 0
-   },
-   "requires" : {
-      "AnyEvent" : 4.15,
-      "common::sense" : 0
-   },
-   "abstract" : null,
-   "configure_requires" : {
-      "ExtUtils::MakeMaker" : 0
-   }
-}
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-Watchdog
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyEvent: '5'
+  common::sense: '0'
+version: '1.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

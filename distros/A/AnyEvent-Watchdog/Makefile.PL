@@ -10,7 +10,7 @@ my $mm = MM->new({
     VERSION_FROM => "Watchdog.pm",
     PREREQ_PM    => {
        common::sense => 0,
-       AnyEvent      => 4.15,
+       AnyEvent      => 5,
     },
 });
 

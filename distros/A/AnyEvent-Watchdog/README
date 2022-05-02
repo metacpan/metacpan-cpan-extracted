@@ -51,7 +51,7 @@ VARIABLES/FUNCTIONS
           or croak "not running under watchdog!";
 
 SEE ALSO
-    AnyEvent::Watchdg::Util, AnyEvent.
+    AnyEvent::Watchdog::Util, AnyEvent.
 
 AUTHOR
      Marc Lehmann <schmorp@schmorp.de>

@@ -19,6 +19,11 @@
             "Module::Build" : "0.4004"
          }
       },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.014"
+         }
+      },
       "test" : {
          "requires" : {
             "Test::Identity" : "0",
@@ -29,7 +34,11 @@
    "provides" : {
       "String::Tagged" : {
          "file" : "lib/String/Tagged.pm",
-         "version" : "0.17"
+         "version" : "0.18"
+      },
+      "String::Tagged::Extent" : {
+         "file" : "lib/String/Tagged/Extent.pm",
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -38,6 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.17",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.18",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

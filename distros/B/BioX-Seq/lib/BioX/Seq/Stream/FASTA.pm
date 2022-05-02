@@ -81,7 +81,9 @@ sub next_seq {
                 }
             }
 
-            return BioX::Seq->new($seq, $id, $desc);
+            my $obj = BioX::Seq->new($seq, $id, $desc);
+            $obj->{_input_format} = 'fasta';
+            return $obj;
 
         }
         else {
@@ -106,7 +108,9 @@ sub next_seq {
             }
         }
 
-        return BioX::Seq->new($seq, $id, $desc);
+        my $obj = BioX::Seq->new($seq, $id, $desc);
+        $obj->{_input_format} = 'fasta';
+        return $obj;
     }
     return undef;
 

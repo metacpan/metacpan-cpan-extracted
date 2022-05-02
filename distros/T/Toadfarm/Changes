@@ -1,5 +1,9 @@
 Revision history for perl distribution Toadfarm
 
+0.84 2022-05-02T07:03:47+0000
+ - Fix t/log.t non-deterministic failures
+   Contributor: Lee Johnson
+
 0.83 2021-06-17T12:58:47+0900
  - Fix format detection in test app
  - Compatible with Mojolicious 9.xx

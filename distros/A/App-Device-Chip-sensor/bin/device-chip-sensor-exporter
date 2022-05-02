@@ -6,7 +6,7 @@ use experimental 'signatures';
 
 use utf8;
 
-use Object::Pad 0.19;
+use Object::Pad 0.57;
 
 use Future::AsyncAwait;
 use Future::IO::Impl::IOAsync;
@@ -20,7 +20,7 @@ STDOUT->binmode( ":encoding(UTF-8)" );
 my $PORT;
 my $VERBOSE;
 
-class MyApp extends App::Device::Chip::sensor
+class MyApp :isa(App::Device::Chip::sensor)
 {
    use Metrics::Any '$metrics';
 

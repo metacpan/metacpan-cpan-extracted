@@ -3,6 +3,9 @@ Changes
 examples/describe_moose_class.pl
 examples/describe_moose_class.tmpl.docx
 lib/MsOffice/Word/Template.pm
+lib/MsOffice/Word/Template/Engine.pm
+lib/MsOffice/Word/Template/Engine/Mustache.pm
+lib/MsOffice/Word/Template/Engine/TT2.pm
 MANIFEST			This list of files
 README.md
 t/etc/mustache_template.docx

@@ -16,16 +16,17 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-    Devel::CallParser
-    Test::More
+    Devel::CheckLib
+    Exporter 5.57
+    ExtUtils::MakeMaker 6.52
+    Test::More 0.98
     XSLoader
-    parent
 
 A C compiler is required to build this module.
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2011-2012 by gray <gray@cpan.org>
+Copyright (c) 2011-2022 gray <gray at cpan.org>
 
-This library is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

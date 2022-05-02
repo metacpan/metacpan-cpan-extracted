@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.546';
+our $VERSION = '0.547';
 use Exporter 'import';
 our @EXPORT_OK = qw( read_line );
 
@@ -110,7 +110,7 @@ Term::Form::ReadLine - Read a line from STDIN.
 
 =head1 VERSION
 
-Version 0.546
+Version 0.547
 
 =cut
 
@@ -132,8 +132,8 @@ Version 0.546
 
 =head1 DESCRIPTION
 
-C<readline> reads a line from STDIN. As soon as C<Return> is pressed, C<readline> returns the read string without the
-newline character - so no C<chomp> is required.
+C<readline> reads a line from STDIN. As soon as C<Return> is pressed, C<readline> returns the read string without a
+trailing newline character.
 
 The output is removed after leaving the method, so the user can decide what remains on the screen.
 
@@ -192,8 +192,8 @@ argument is a hash-reference, the hash is used to set the different options. The
 
 1 - clears the entire screen
 
-2 - clears only the readline row if I<show_context> is not enabled and I<info> not set. If I<show_context> is enabled
-or I<info> is set, clears from the current position to the end of screen as with I<clear_screen> set to 0.
+2 - clears only the readline row if I<show_context> is not enabled. If I<show_context> is enabled, clears from the
+current position to the end of screen as with I<clear_screen> set to C<0>.
 
 default: C<0>
 
@@ -237,7 +237,8 @@ default: C<1>
 
 This option allows one to pass a C<readline> history as a reference to an array.
 
-If the entered string matches the beginning of one or more history entries, only these matched history entries are used.
+If the entered string matches the beginning of one or more history entries, only these matched history entries are
+offered.
 
 See L</Keys> for how to move through the history.
 

@@ -1,0 +1,14 @@
+bin/run-stop-run
+Changes
+lib/App/RunStopRun.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_script.t
+xt/kwalitee.t
+xt/perlcritic.t
+xt/perlcriticrc
+xt/pod.t
+xt/portability_filenames.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

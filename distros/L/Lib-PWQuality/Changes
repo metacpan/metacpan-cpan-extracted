@@ -1,3 +1,9 @@
-NEXT
+0.002     2022-05-01 23:11:23+03:00 Asia/Jerusalem
+
+    * Fix some tsts (Thanks, Slaven Rezic).
+    * Fix version numbers in Changelog.
+    * Change license to MIT.
+
+0.001     2022-04-14 23:06:40+03:00 Asia/Jerusalem
 
     * Initial commit.

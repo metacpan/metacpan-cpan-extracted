@@ -14,7 +14,7 @@ INSTALLATION
             make install
 
 AUTHOR
-    This module is Copyright (C) 2017-2021 by
+    This module is Copyright (C) 2017-2022 by
 
     Jim Turner, "<turnerjw784 at yahoo.com>"
 
@@ -126,13 +126,14 @@ DESCRIPTION
 
     The currently-supported websites are: podcasts.apple.com
     (StreamFinder::Apple), bitchute.com (StreamFinder::Bitchute),
-    blogger.com (StreamFinder::Blogger), brighteon.com
-    (StreamFinder::Brighteon), castbox.fm (StreamFinder::Castbox),
-    podcasts.google.com (StreamFinder::Google), iheartradio.com
-    (StreamFinder::IHeartRadio), odysee.com (StreamFinder::Odysee),
-    podbean.com (StreamFinder::Podbean), radio.net (StreamFinder::RadioNet),
-    rumble.com (StreamFinder::Rumble), sermonaudio.com
-    (StreamFinder::SermonAudio), spreaker.com podcasts
+    blogger.com (StreamFinder::Blogger), brandnewtube.com
+    (StreamFinder::BrandNewTube), brighteon.com (StreamFinder::Brighteon),
+    castbox.fm (StreamFinder::Castbox), podcasts.google.com
+    (StreamFinder::Google), iheartradio.com (StreamFinder::IHeartRadio),
+    odysee.com (StreamFinder::Odysee), podbean.com (StreamFinder::Podbean),
+    podcastaddict.com (StreamFinder::PodcastAddict), radio.net
+    (StreamFinder::RadioNet), rumble.com (StreamFinder::Rumble),
+    sermonaudio.com (StreamFinder::SermonAudio), spreaker.com podcasts
     (StreamFinder::Spreaker), tunein.com (StreamFinder::Tunein), vimeo.com
     (StreamFinder::Vimeo), (youtube.com, et. al and other sites that
     youtube-dl supports) (StreamFinder::Youtube), and
@@ -326,10 +327,11 @@ SUBROUTINES/METHODS
 
     $station->getType()
         Returns the station / podcast / video's type (*submodule-name*).
-        (one of: "Anystream", "Apple", "BitChute", "Blogger", "Brighteon",
-        "Castbox", "Google", "IHeartRadio", "Odysee", "Podbean", "RadioNet",
-        "Rumble", "SermonAudio", "Spreaker", "Tunein", "Youtube" or "Vimeo"
-        - depending on the sight that matched the URL).
+        (one of: "Anystream", "Apple", "BitChute", "Blogger",
+        "BrandNewTube", "Brighteon", "Castbox", "Google", "IHeartRadio",
+        "Odysee", "Podbean", "PodcastAddict", "RadioNet", "Rumble",
+        "SermonAudio", "Spreaker", "Tunein", "Youtube" or "Vimeo" -
+        depending on the sight that matched the URL).
 
 CONFIGURATION FILES
     The default root location directory for StreamFinder configuration files
@@ -419,7 +421,7 @@ SEE ALSO
         <http://search.cpan.org/dist/StreamFinder/>
 
 LICENSE AND COPYRIGHT
-    Copyright 2017-2021 Jim Turner.
+    Copyright 2017-2022 Jim Turner.
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of the the Artistic License (2.0). You may obtain a copy

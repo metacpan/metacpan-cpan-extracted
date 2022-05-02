@@ -1,11 +1,6 @@
-use 5.14.0; # for the /r modifier in regex substitution
-use utf8;
+use 5.24.0;
 use strict;
 use warnings;
-
-use lib "../../MsOffice-Word-Surgeon/lib";
-use lib "../lib";
-
 
 use MsOffice::Word::Template;
 use Module::Load;

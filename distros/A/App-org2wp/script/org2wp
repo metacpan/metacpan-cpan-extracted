@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-21'; # DATE
+our $DATE = '2022-05-01'; # DATE
 our $DIST = 'App-org2wp'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/org2wp/org2wp",
@@ -38,7 +38,7 @@ org2wp - Publish Org document (or heading) to WordPress as blog post
 
 =head1 VERSION
 
-This document describes version 0.011 of org2wp (from Perl distribution App-org2wp), released on 2022-01-21.
+This document describes version 0.012 of org2wp (from Perl distribution App-org2wp), released on 2022-05-01.
 
 =head1 SYNOPSIS
 
@@ -58,6 +58,12 @@ First, create C<~/org2wp.conf> containing the API credentials, e.g.:
  proxy=https://YOURBLOGNAME.wordpress.com/xmlrpc.php
  username=YOURUSERNAME
  password=YOURPASSWORD
+
+Note that C<proxy> is the endpoint URL of your WordPress instance's XML-RPC
+server, which can be hosted on C<wordpress.com> or on other server, including
+your own. It has nothing to do with HTTP/HTTPS proxy; the term "proxy" is used
+by the L<XMLRPC::Lite> and L<SOAP::Lite> Perl libraries and C<org2wp> simply
+uses the same terminology.
 
 You can also put multiple credentials in the configuration file using profile
 sections, e.g.:
@@ -159,6 +165,14 @@ will become blog posts.
 
 In heading mode, you can use several options to select only certain headlines
 which contain (or don't contain) specified tags.
+
+=head3 FAQ
+
+=head4 What if I want to set HTTP/HTTPS proxy?
+
+You can set the environment variable C<HTTP_proxy> (and C<HTTP_proxy_user> and
+C<HTTP_proxy_pass> additionally). See the L<SOAP::Lite> documentation for more
+details, which uses L<LWP::UserAgent> underneath.
 
 =head1 OPTIONS
 
@@ -381,6 +395,12 @@ Display help message and exit.
 
 Example: `https://YOURBLOGNAME.wordpress.com/xmlrpc.php`.
 
+Note that `proxy` is the endpoint URL of your WordPress instance's XML-RPC
+server, which can be hosted on `wordpress.com` or on other server, including
+your own. It has nothing to do with HTTP/HTTPS proxy; the term "proxy" is used
+by the <pm:XMLRPC::Lite> and <pm:SOAP::Lite> Perl libraries and `org2wp` simply
+uses the same terminology.
+
 
 =item B<--username>=I<s>*
 
@@ -428,7 +448,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/s1/.config/org2wp.conf>, F</home/s1/org2wp.conf>, or F</etc/org2wp.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/org2wp.conf>, F</home/u1/org2wp.conf>, or F</etc/org2wp.conf>.
 
 All found files will be read and merged.
 
@@ -481,9 +501,9 @@ Specify additional command-line options.
 
 =head1 FILES
 
-F</home/s1/.config/org2wp.conf>
+F</home/u1/.config/org2wp.conf>
 
-F</home/s1/org2wp.conf>
+F</home/u1/org2wp.conf>
 
 F</etc/org2wp.conf>
 

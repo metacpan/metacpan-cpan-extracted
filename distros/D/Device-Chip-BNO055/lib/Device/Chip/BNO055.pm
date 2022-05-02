@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
 
-use 5.026;
-use Object::Pad 0.19;
+use v5.26;
+use Object::Pad 0.57;
 
-package Device::Chip::BNO055 0.02;
+package Device::Chip::BNO055 0.03;
 class Device::Chip::BNO055
-   extends Device::Chip;
+   :isa(Device::Chip);
 
 use utf8;
 

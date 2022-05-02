@@ -62,7 +62,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.25';
+our $VERSION = '1.26';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -184,14 +184,95 @@ sub BY_PARTIAL {
     return 'partial link text';
 }
 
+sub _prefs_interface_preamble {
+    my ($self) = @_;
+    return <<'_JS_';    # security/manager/ssl/nsIPK11Token.idl
+let prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService);
+let branch = prefs.getBranch("");
+_JS_
+}
+
+sub get_pref {
+    my ( $self, $name ) = @_;
+    my $script = <<'_JS_';
+let result = [ null ];
+switch (branch.getPrefType(arguments[0])) {
+  case branch.PREF_STRING:
+    result = [ branch.getStringPref ? branch.getStringPref(arguments[0]) : branch.getComplexValue(arguments[0], Components.interfaces.nsISupportsString).data, 'string' ];
+    break;
+  case branch.PREF_INT:
+    result = [ branch.getIntPref(arguments[0]), 'integer' ];
+    break;
+  case branch.PREF_BOOL:
+    result = [ branch.getBoolPref(arguments[0]), 'boolean' ];
+}
+return result;
+_JS_
+    $self->chrome();
+    my ( $result, $type ) = @{
+        $self->script(
+            $self->_compress_script(
+                $self->_prefs_interface_preamble() . $script
+            ),
+            args => [$name]
+        )
+    };
+    $self->content();
+    if ($type) {
+        if ( $type eq 'integer' ) {
+            $result += 0;
+        }
+    }
+    return $result;
+}
+
+sub set_pref {
+    my ( $self, $name, $value ) = @_;
+    my $script = <<'_JS_';
+switch (branch.getPrefType(arguments[0])) {
+  case branch.PREF_INT:
+    branch.setIntPref(arguments[0], arguments[1]);
+    break;
+  case branch.PREF_BOOL:
+    branch.setBoolPref(arguments[0], arguments[1] ? true : false);
+    break;
+  case branch.PREF_STRING:
+  default:
+    if (branch.setStringPref) {
+      branch.setStringPref(arguments[0], arguments[1]);
+    } else {
+      let newString = Components.classes["@mozilla.org/supports-string;1"].createInstance(Components.interfaces.nsISupportsString);
+      newString.data = arguments[1];
+      branch.setComplexValue(arguments[0], Components.interfaces.nsISupportsString, newString);
+    }
+}
+_JS_
+    $self->chrome();
+    $self->script(
+        $self->_compress_script( $self->_prefs_interface_preamble() . $script ),
+        args => [ $name, $value ]
+    );
+    $self->content();
+    return $self;
+}
+
+sub clear_pref {
+    my ( $self, $name ) = @_;
+    my $script = <<'_JS_';
+branch.clearUserPref(arguments[0]);
+_JS_
+    $self->chrome();
+    $self->script(
+        $self->_compress_script( $self->_prefs_interface_preamble() . $script ),
+        args => [$name]
+    );
+    $self->content();
+    return $self;
+}
+
 sub _download_directory {
     my ($self) = @_;
-    my $context = $self->_context('chrome');
-    my $directory =
-      $self->script( 'let branch = Components.classes["' . q[@]
-          . 'mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService).getBranch(""); return branch.getStringPref ? branch.getStringPref("browser.download.downloadDir") : branch.getComplexValue("browser.download.downloadDir", Components.interfaces.nsISupportsString).data;'
-      );
-    $self->_context($context);
+    my $directory = $self->get_pref('browser.download.downloadDir');
     if ( my $ssh = $self->_ssh() ) {
     }
     elsif ( $OSNAME eq 'cygwin' ) {
@@ -1832,10 +1913,11 @@ sub update {
     my $old = $self->_context('chrome');
 
     # toolkit/mozapps/update/nsIUpdateService.idl
-    my $update_parameters = $self->script( $self->_compress_script(<<'_JS_') );
-let branch = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService).getBranch("app.update.");
-let disabledForTesting = branch.getBoolPref("disabledForTesting");
-branch.setBoolPref("disabledForTesting", false);
+    my $update_parameters = $self->script(
+        $self->_compress_script(
+            $self->_prefs_interface_preamble() . <<'_JS_') );
+let disabledForTesting = branch.getBoolPref("app.update.disabledForTesting");
+branch.setBoolPref("app.update.disabledForTesting", false);
 let updateManager = new Promise((resolve, reject) => {
   var updateStatus = {};
   if ("@mozilla.org/updates/update-manager;1" in Components.classes) {
@@ -1924,7 +2006,7 @@ let updateManager = new Promise((resolve, reject) => {
 let updateStatus = (async function() {
   return await updateManager.then(function(updateStatus) { return updateStatus }, function(updateStatus) { return updateStatus });
 })();
-branch.setBoolPref("disabledForTesting", disabledForTesting);
+branch.setBoolPref("app.update.disabledForTesting", disabledForTesting);
 return updateStatus;
 _JS_
     $self->_context($old);
@@ -9497,7 +9579,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 1.25
+Version 1.26
 
 =head1 SYNOPSIS
 
@@ -9634,8 +9716,8 @@ or a L<Firefox::Marionette::Login|Firefox::Marionette::Login> object as the firs
 
     # for form based login
 
-    $firefox->add_login(host => 'https://github.com', origin => 'https://github.com', user => 'me@example.org', password => 'qwerty', user_field => 'login', password_field => 'password');
     my $form_login = Firefox::Marionette::Login(host => 'https://github.com', user => 'me2@example.org', password => 'uiop[]', user_field => 'login', password_field => 'password');
+    $firefox->add_login($form_login);
 
     # or just directly
 
@@ -9681,15 +9763,15 @@ The executing javascript is subject to the L<script|Firefox::Marionette::Timeout
 
 =head2 attribute 
 
-accepts an L<element|Firefox::Marionette::Element> as the first parameter and a scalar attribute name as the second parameter.  It returns the initial value of the attribute with the supplied name.  This method will return the initial content, the L<property|Firefox::Marionette#property> method will return the current content.
+accepts an L<element|Firefox::Marionette::Element> as the first parameter and a scalar attribute name as the second parameter.  It returns the initial value of the attribute with the supplied name.  This method will return the initial content from the HTML source code, the L<property|Firefox::Marionette#property> method will return the current content.
 
     use Firefox::Marionette();
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-    my $element = $firefox->find_id('search_input');
-    !defined $element->attribute('value') or die "attribute is not defined!");
+    my $element = $firefox->find_id('metacpan_search-input');
+    !defined $element->attribute('value') or die "attribute is defined but did not exist in the html source!";
     $element->type('Test::More');
-    !defined $element->attribute('value') or die "attribute is still not defined!");
+    !defined $element->attribute('value') or die "attribute has changed but only the property should have changed!";
 
 =head2 await
 
@@ -9802,6 +9884,15 @@ returns identifiers for each open chrome window for tests interested in managing
 =head2 clear
 
 accepts a L<element|Firefox::Marionette::Element> as the first parameter and clears any user supplied input
+
+=head2 clear_pref
+
+accepts a L<preference|http://kb.mozillazine.org/About:config> name and restores it to the original value.  See the L<get_pref|Firefox::Marionette#get_pref> and L<set_pref|Firefox::Marionette#set_pref> methods to get a preference value and to set to it to a particular value.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+
+    use Firefox::Marionette();
+    my $firefox = Firefox::Marionette->new();
+
+    $firefox->clear_pref('browser.search.defaultenginename');
 
 =head2 click
 
@@ -10271,6 +10362,15 @@ When going directly to a URL that needs to be downloaded, please see L<BUGS AND 
 
 This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
+=head2 get_pref
+
+accepts a L<preference|http://kb.mozillazine.org/About:config> name.  See the L<set_pref|Firefox::Marionette#set_pref> and L<clear_pref|Firefox::Marionette#clear_pref> methods to set a preference value and to restore it to it's original value.  This method returns the current value of the preference.
+
+    use Firefox::Marionette();
+    my $firefox = Firefox::Marionette->new();
+
+    warn "Your browser's default search engine is set to " . $firefox->get_pref('browser.search.defaultenginename');
+
 =head2 har
 
 returns a hashref representing the L<http archive|https://en.wikipedia.org/wiki/HAR_(file_format)> of the session.  This function is subject to the L<script|Firefox::Marionette::Timeouts#script> timeout, which, by default is 30 seconds.  It is also possible for the function to hang (until the L<script|Firefox::Marionette::Timeouts#script> timeout) if the original L<devtools|https://developer.mozilla.org/en-US/docs/Tools> window is closed.  The hashref has been designed to be accepted by the L<Archive::Har|Archive::Har> module.  This function should be considered experimental.  Feedback welcome.
@@ -10492,7 +10592,7 @@ returns true if C<document.readyState === "interactive"> or if L<loaded|Firefox:
     use Firefox::Marionette();
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-    $firefox->find_id('search_input')->type('Type::More');
+    $firefox->find_id('metacpan_search-input')->type('Type::More');
     $firefox->find('//button[@name="lucky"]')->click();
     while(!$firefox->interactive()) {
         # redirecting to Test::More page
@@ -10557,7 +10657,7 @@ returns true if C<document.readyState === "complete">
     use Firefox::Marionette();
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-    $firefox->find_id('search_input')->type('Type::More');
+    $firefox->find_id('metacpan_search-input')->type('Type::More');
     $firefox->find('//button[@name="lucky"]')->click();
     while(!$firefox->loaded()) {
         # redirecting to Test::More page
@@ -10756,9 +10856,9 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * page_load - a shortcut to allow directly providing the L<page_load|Firefox::Marionette::Timeouts#page_load> timeout, instead of needing to use timeouts from the capabilities parameter.  Overrides all longer ways.
 
-=item * profile - create a new profile based on the supplied L<profile|Firefox::Marionette::Profile>.  NOTE: firefox ignores any changes made to the profile on the disk while it is running.
+=item * profile - create a new profile based on the supplied L<profile|Firefox::Marionette::Profile>.  NOTE: firefox ignores any changes made to the profile on the disk while it is running, instead, use the L<set_pref|Firefox::Marionette#set_pref> and L<clear_pref|Firefox::Marionette#clear_pref> methods to make changes while firefox is running.
 
-=item * profile_name - pick a specific existing profile to automate, rather than creating a new profile.  L<Firefox|https://firefox.com> refuses to allow more than one instance of a profile to run at the same time.  Profile names can be obtained by using the L<Firefox::Marionette::Profile::names()|Firefox::Marionette::Profile#names> method.  NOTE: firefox ignores any changes made to the profile on the disk while it is running.
+=item * profile_name - pick a specific existing profile to automate, rather than creating a new profile.  L<Firefox|https://firefox.com> refuses to allow more than one instance of a profile to run at the same time.  Profile names can be obtained by using the L<Firefox::Marionette::Profile::names()|Firefox::Marionette::Profile#names> method.  NOTE: firefox ignores any changes made to the profile on the disk while it is running, instead, use the L<set_pref|Firefox::Marionette#set_pref> and L<clear_pref|Firefox::Marionette#clear_pref> methods to make changes while firefox is running.
 
 =item * reconnect - an experimental parameter to allow a reconnection to firefox that a connection has been discontinued.  See the survive parameter.
 
@@ -10916,13 +11016,13 @@ returns the profile directory used by the current instance of firefox.  This is 
 
 =head2 property
 
-accepts an L<element|Firefox::Marionette::Element> as the first parameter and a scalar attribute name as the second parameter.  It returns the current value of the property with the supplied name.  This method will return the current content, the L<attribute|Firefox::Marionette#attribute> method will return the initial content.
+accepts an L<element|Firefox::Marionette::Element> as the first parameter and a scalar attribute name as the second parameter.  It returns the current value of the property with the supplied name.  This method will return the current content, the L<attribute|Firefox::Marionette#attribute> method will return the initial content from the HTML source code.
 
     use Firefox::Marionette();
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-    my $element = $firefox->find_id('search_input');
-    $element->property('value') eq '' or die "Initial property is the empty string";
+    my $element = $firefox->find_id('metacpan_search-input');
+    $element->property('value') eq '' or die "Initial property should be the empty string";
     $element->type('Test::More');
     $element->property('value') eq 'Test::More' or die "This property should have changed!";
 
@@ -11115,6 +11215,15 @@ The parameters after the L<element|Firefox::Marionette::Element> parameter are t
 =head2 send_alert_text
 
 sends keys to the input field of a currently displayed modal message box
+
+=head2 set_pref
+
+accepts a L<preference|http://kb.mozillazine.org/About:config> name and the new value to set it to.  See the L<get_pref|Firefox::Marionette#get_pref> and L<clear_pref|Firefox::Marionette#clear_pref> methods to get a preference value and to restore it to it's original value.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+
+    use Firefox::Marionette();
+    my $firefox = Firefox::Marionette->new();
+    ...
+    $firefox->set_pref('browser.search.defaultenginename', 'DuckDuckGo');
 
 =head2 shadow_root
 

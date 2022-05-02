@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -7,9 +8,10 @@ my $build = Module::Build->new(
    module_name => 'Attribute::Storage',
    configure_requires => {
       'Module::Build' => 0,
-      'Module::Build::Compat' => 0,
    },
    requires => {
+      'perl' => '5.014',
+
       'XSLoader' => 0,
    },
    build_requires => {
@@ -17,7 +19,6 @@ my $build = Module::Build->new(
       'Test::NoWarnings' => 0,
    },
    license => 'perl',
-   create_makefile_pl => 'small',
    create_license => 1,
    create_readme  => 1,
 );

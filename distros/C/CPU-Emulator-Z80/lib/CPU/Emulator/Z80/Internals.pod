@@ -1,4 +1,3 @@
-# $Id: Internals.pod,v 1.1 2008/03/02 19:33:24 drhyde Exp $
 =head1 NAME
 
 CPU::Emulator::Z80::Internals

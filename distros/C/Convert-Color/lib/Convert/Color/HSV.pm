@@ -1,19 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
-package Convert::Color::HSV;
+package Convert::Color::HSV 0.12;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Convert::Color::HueChromaBased );
 
 __PACKAGE__->register_color_space( 'hsv' );
 
 use Carp;
-
-our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -23,18 +21,18 @@ C<Convert::Color::HSV> - a color value represented as hue/saturation/value
 
 Directly:
 
- use Convert::Color::HSV;
+   use Convert::Color::HSV;
 
- my $red = Convert::Color::HSV->new( 0, 1, 1 );
+   my $red = Convert::Color::HSV->new( 0, 1, 1 );
 
- # Can also parse strings
- my $pink = Convert::Color::HSV->new( '0,0.7,1' );
+   # Can also parse strings
+   my $pink = Convert::Color::HSV->new( '0,0.7,1' );
 
 Via L<Convert::Color>:
 
- use Convert::Color;
+   use Convert::Color;
 
- my $cyan = Convert::Color->new( 'hsv:300,1,1' );
+   my $cyan = Convert::Color->new( 'hsv:300,1,1' );
 
 =head1 DESCRIPTION
 
@@ -62,18 +60,20 @@ than that used by CIE).
 
 =cut
 
-=head2 $color = Convert::Color::HSV->new( $hue, $saturation, $value )
+=head2 new
+
+   $color = Convert::Color::HSV->new( $hue, $saturation, $value )
 
 Returns a new object to represent the set of values given. The hue should be
 in the range 0 to 360 (exclusive), and saturation and value should be between
 0 and 1. Values outside of these ranges will be clamped.
 
-=head2 $color = Convert::Color::HSV->new( $string )
+   $color = Convert::Color::HSV->new( $string )
 
 Parses C<$string> for values, and construct a new object similar to the above
 three-argument form. The string should be in the form
 
- hue,saturation,value
+   hue,saturation,value
 
 containing the three floating-point values in decimal notation.
 
@@ -102,7 +102,10 @@ sub new
    }
 
    # Clamp
-   map { $_ < 0 and $_ = 0; $_ > 1 and $_ = 1 } ( $s, $v );
+   for ( $s, $v ) {
+      $_ = 0 if $_ < 0;
+      $_ = 1 if $_ > 1;
+   }
 
    # Fit to range [0,360)
    $h += 360 while $h < 0;
@@ -115,11 +118,17 @@ sub new
 
 =cut
 
-=head2 $h = $color->hue
+=head2 hue
 
-=head2 $s = $color->saturation
+   $h = $color->hue
 
-=head2 $v = $color->value
+=head2 saturation
+
+   $s = $color->saturation
+
+=head2 value
+
+   $v = $color->value
 
 Accessors for the three components of the color.
 
@@ -130,7 +139,9 @@ sub hue        { shift->[0] }
 sub saturation { shift->[1] }
 sub value      { shift->[2] }
 
-=head2 $c = $color->chroma
+=head2 chroma
+
+   $c = $color->chroma
 
 Returns the derived property of "chroma", which maps the color space onto a
 cone instead of a cylinder. This more closely measures the intuitive concept
@@ -145,7 +156,9 @@ sub chroma
    return $self->saturation * $self->value;
 }
 
-=head2 ( $hue, $saturation, $value ) = $color->hsv
+=head2 hsv
+
+   ( $hue, $saturation, $value ) = $color->hsv
 
 Returns the individual hue, saturation and value components of the color
 value.
@@ -214,7 +227,9 @@ sub new_rgb
    );
 }
 
-=head2 $measure = $color->dst_hsv( $other )
+=head2 dst_hsv
+
+   $measure = $color->dst_hsv( $other )
 
 Returns a measure of the distance between the two colors. This is the
 Euclidean distance between the two colors as points in the chroma-adjusted
@@ -231,7 +246,9 @@ sub dst_hsv
    return sqrt( $self->dst_hsv_cheap( $other ) ) / 2;
 }
 
-=head2 $measure = $color->dst_hsv_cheap( $other )
+=head2 dst_hsv_cheap
+
+   $measure = $color->dst_hsv_cheap( $other )
 
 Returns a measure of the distance between the two colors. This is used in the
 calculation of C<dst_hsv> but since it omits the final square-root and scaling

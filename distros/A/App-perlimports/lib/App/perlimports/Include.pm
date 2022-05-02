@@ -2,7 +2,7 @@ package App::perlimports::Include;
 
 use Moo;
 
-our $VERSION = '0.000035';
+our $VERSION = '0.000036';
 
 use Data::Dumper qw( Dumper );
 use List::Util qw( any none uniq );
@@ -750,7 +750,7 @@ App::perlimports::Include - Encapsulate one use statement in a document
 
 =head1 VERSION
 
-version 0.000035
+version 0.000036
 
 =head1 METHODS
 

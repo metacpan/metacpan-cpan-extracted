@@ -3,6 +3,7 @@ use TestAuto;
 
 use strict;
 use warnings;
+use Config;
 
 use Test::More;
 
@@ -194,6 +195,21 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
   {
     my $ret = SPVM::TestCase::Method->args_max_count_mulnum((1) x 253, {re => 2, im => 3});
     is_deeply($ret, {re => 2, im => 3});
+  }
+}
+
+# precompile method
+{
+  # Check precompile module file
+  {
+    my $precompile_module_file = "$FindBin::Bin/.spvm_build/work/lib/SPVM/TestCase/Method.precompile.$Config{dlext}";
+    ok(-f $precompile_module_file);
+  }
+  
+  # Call precompile method
+  {
+    my $ret = SPVM::TestCase::Method->precompile_sum(2, 3);
+    is($ret, 5);
   }
 }
 

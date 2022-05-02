@@ -1,27 +1,17 @@
 use warnings;
 use strict;
 
-use Test::Simple tests => 12;
+BEGIN {
+    our $tests = 12;
 
-# chdir to t/
-$_ = $0;
-s~[^/\\]+$~~;
-chdir $_ if length;
+    # chdir to t/
+    $_ = $0;
+    s~[^/\\]+$~~;
+    chdir $_ if length;
 
-# run pl, expect $_
-sub pl(@) {
-    my $fh;
-    if( $^O =~ /^MSWin/ ) {
-	require Win32::ShellQuote;
-	open $fh, Win32::ShellQuote::quote_native( $^X, '-W', '..\pl', @_ ) . '|';
-    } else {
-	open $fh, '-|', $^X, '-W', '../pl', @_;
-    }
-    local $/;
-    my $ret = <$fh>;
-    ok $ret eq $_, join ' ', 'pl', map /[\s*?()[\]{}\$\\'";|&]|^$/ ? "'$_'" : $_, @_
-      or print "got: '$ret', expected: '$_'\n";
+    require './test.pm';
 }
+
 # run pl, shift -B arg, sort list
 sub pl_s($@) {
     my( $B, @l ) = @_;

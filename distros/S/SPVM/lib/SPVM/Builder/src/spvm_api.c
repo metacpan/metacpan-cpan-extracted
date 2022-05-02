@@ -32,24 +32,11 @@
 #include "spvm_api_string_buffer.h"
 #include "spvm_api_allocator.h"
 #include "spvm_api_runtime.h"
-#include "spvm_api_compiler.h"
-#include "spvm_api_precompile.h"
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#ifndef SPVM_NO_COMPILER_API
+#  include "spvm_api_compiler.h"
+#  include "spvm_api_precompile.h"
+#endif
 
 
 
@@ -72,11 +59,24 @@ SPVM_ENV* SPVM_API_new_env_raw() {
   // Env String Buffer
   SPVM_ENV_STRING_BUFFER* env_string_buffer = SPVM_API_STRING_BUFFER_new_env();
 
+#ifdef SPVM_NO_COMPILER_API
+
+  // Env Compiler
+  SPVM_ENV_COMPILER* env_compiler = NULL;
+
+  // Env Precompile
+  SPVM_ENV_PRECOMPILE* env_precompile = NULL;
+  
+
+#else
+
   // Env Compiler
   SPVM_ENV_COMPILER* env_compiler = SPVM_API_COMPILER_new_env();
 
   // Env Precompile
   SPVM_ENV_PRECOMPILE* env_precompile = SPVM_API_PRECOMPILE_new_env();
+
+#endif
 
   // Env Runtime
   SPVM_ENV_RUNTIME* env_runtime = SPVM_API_RUNTIME_new_env();
@@ -284,13 +284,14 @@ SPVM_ENV* SPVM_API_new_env_raw() {
     SPVM_API_call_init_blocks,
     SPVM_API_cleanup_global_vars,
     SPVM_API_is_object_array,
-    SPVM_API_can_assign_array_element,
-    env_api,
-    SPVM_API_free_env_prepared,
     SPVM_API_get_method_id_cache,
     SPVM_API_get_field_id_cache,
     SPVM_API_get_class_var_id_cache,
+    SPVM_API_free_env_prepared,
+    env_api,
     allocator, // allocator
+    SPVM_API_can_assign_array_element,
+    SPVM_API_can_assign,
   };
   
   SPVM_ENV* env = calloc(1, sizeof(env_init));
@@ -591,6 +592,10 @@ void SPVM_API_dump_recursive(SPVM_ENV* env, SPVM_OBJECT* object, int32_t* depth,
         SPVM_RUNTIME_CLASS* class = SPVM_API_RUNTIME_get_class(runtime, basic_type->class_id);
         assert(class);
 
+        SPVM_STRING_BUFFER_add(string_buffer, basic_type_name);
+        sprintf(tmp_buffer, " (%p) ", object);
+        SPVM_STRING_BUFFER_add(string_buffer, tmp_buffer);
+
         SPVM_STRING_BUFFER_add(string_buffer, "{\n");
         
         // Free object fields
@@ -674,10 +679,6 @@ void SPVM_API_dump_recursive(SPVM_ENV* env, SPVM_OBJECT* object, int32_t* depth,
         }
         SPVM_STRING_BUFFER_add(string_buffer, "}");
 
-        SPVM_STRING_BUFFER_add(string_buffer, " : ");
-        SPVM_STRING_BUFFER_add(string_buffer, basic_type_name);
-        sprintf(tmp_buffer, "(%p)", object);
-        SPVM_STRING_BUFFER_add(string_buffer, tmp_buffer);
       }
     }
   }
@@ -1682,11 +1683,11 @@ int32_t SPVM_API_call_spvm_method_vm(SPVM_ENV* env, int32_t method_id, SPVM_VALU
       }
       case SPVM_OPCODE_C_ID_IS_TYPE: {
         void* object = *(void**)&object_vars[opcode->operand1];
-        int32_t check_basic_type_id = opcode->operand2;
-        int32_t check_type_dimension = opcode->operand3;
+        int32_t cast_basic_type_id = opcode->operand2;
+        int32_t cast_type_dimension = opcode->operand3;
 
         if (object) {
-          int_vars[0] = env->is_type(env, object, check_basic_type_id, check_type_dimension);
+          int_vars[0] = env->is_type(env, object, cast_basic_type_id, cast_type_dimension);
         }
         else {
           int_vars[0] = 0;
@@ -2113,134 +2114,134 @@ int32_t SPVM_API_call_spvm_method_vm(SPVM_ENV* env, int32_t method_id, SPVM_VALU
         long_vars[opcode->operand0] = ~long_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_INT_TO_LONG: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_INT_TO_LONG: {
         long_vars[opcode->operand0] = (int64_t)int_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_INT_TO_FLOAT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_INT_TO_FLOAT: {
         float_vars[opcode->operand0] = (float)int_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_INT_TO_DOUBLE: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_INT_TO_DOUBLE: {
         double_vars[opcode->operand0] = (double)int_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_LONG_TO_INT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_LONG_TO_INT: {
         int_vars[opcode->operand0] = (int32_t)long_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_LONG_TO_FLOAT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_LONG_TO_FLOAT: {
         float_vars[opcode->operand0] = (float)long_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_LONG_TO_DOUBLE: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_LONG_TO_DOUBLE: {
         double_vars[opcode->operand0] = (double)long_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_FLOAT_TO_INT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_FLOAT_TO_INT: {
         int_vars[opcode->operand0] = (int32_t)float_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_FLOAT_TO_LONG: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_FLOAT_TO_LONG: {
         long_vars[opcode->operand0] = (int64_t)float_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_FLOAT_TO_DOUBLE: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_FLOAT_TO_DOUBLE: {
         double_vars[opcode->operand0] = (double)float_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_DOUBLE_TO_INT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_DOUBLE_TO_INT: {
         int_vars[opcode->operand0] = (int32_t)double_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_DOUBLE_TO_LONG: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_DOUBLE_TO_LONG: {
         long_vars[opcode->operand0] = (int64_t)double_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_DOUBLE_TO_FLOAT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_DOUBLE_TO_FLOAT: {
         float_vars[opcode->operand0] = (float)double_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_INT_TO_BYTE: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_INT_TO_BYTE: {
         byte_vars[opcode->operand0] = (int8_t)(int_vars[opcode->operand1]);
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_INT_TO_SHORT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_INT_TO_SHORT: {
         short_vars[opcode->operand0] = (int16_t)(int_vars[opcode->operand1]);
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_BYTE_TO_INT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_BYTE_TO_INT: {
         int_vars[opcode->operand0] = (int32_t)byte_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_SHORT_TO_INT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_SHORT_TO_INT: {
         int_vars[opcode->operand0] = (int32_t)short_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_BYTE_TO_LONG: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_BYTE_TO_LONG: {
         long_vars[opcode->operand0] = (int64_t)byte_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_BYTE_TO_FLOAT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_BYTE_TO_FLOAT: {
         float_vars[opcode->operand0] = (float)byte_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_BYTE_TO_DOUBLE: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_BYTE_TO_DOUBLE: {
         double_vars[opcode->operand0] = (double)byte_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_SHORT_TO_BYTE: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_SHORT_TO_BYTE: {
         byte_vars[opcode->operand0] = (int8_t)short_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_SHORT_TO_LONG: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_SHORT_TO_LONG: {
         long_vars[opcode->operand0] = (int64_t)short_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_SHORT_TO_FLOAT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_SHORT_TO_FLOAT: {
         float_vars[opcode->operand0] = (float)short_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_SHORT_TO_DOUBLE: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_SHORT_TO_DOUBLE: {
         double_vars[opcode->operand0] = (double)short_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_LONG_TO_BYTE: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_LONG_TO_BYTE: {
         byte_vars[opcode->operand0] = (int8_t)long_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_LONG_TO_SHORT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_LONG_TO_SHORT: {
         short_vars[opcode->operand0] = (int16_t)long_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_FLOAT_TO_BYTE: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_FLOAT_TO_BYTE: {
         byte_vars[opcode->operand0] = (int8_t)float_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_FLOAT_TO_SHORT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_FLOAT_TO_SHORT: {
         short_vars[opcode->operand0] = (int16_t)float_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_DOUBLE_TO_BYTE: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_DOUBLE_TO_BYTE: {
         byte_vars[opcode->operand0] = (int8_t)double_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_DOUBLE_TO_SHORT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_DOUBLE_TO_SHORT: {
         short_vars[opcode->operand0] = (int16_t)double_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_BYTE_TO_SHORT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_BYTE_TO_SHORT: {
         short_vars[opcode->operand0] = (int16_t)byte_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_BYTE_TO_STRING: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_BYTE_TO_STRING: {
         sprintf(tmp_buffer, "%" PRId8, byte_vars[opcode->operand1]);
         int32_t string_length = strlen(tmp_buffer);
         void* string = env->new_string_raw(env, tmp_buffer, string_length);
         SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], string);
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_STRING_TO_BYTE_ARRAY: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_STRING_TO_BYTE_ARRAY: {
         void* src_string = object_vars[opcode->operand1];
         int32_t src_string_length = env->length(env, src_string);
         const char* src_string_data = env->get_chars(env, src_string);
@@ -2251,7 +2252,7 @@ int32_t SPVM_API_call_spvm_method_vm(SPVM_ENV* env, int32_t method_id, SPVM_VALU
         SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], byte_array);
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_BYTE_ARRAY_TO_STRING: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_BYTE_ARRAY_TO_STRING: {
         void* src_byte_array = object_vars[opcode->operand1];
         int32_t src_byte_array_length = env->length(env, src_byte_array);
         int8_t* src_byte_array_data = env->get_elems_byte(env, src_byte_array);
@@ -2259,35 +2260,35 @@ int32_t SPVM_API_call_spvm_method_vm(SPVM_ENV* env, int32_t method_id, SPVM_VALU
         SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], string);
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_SHORT_TO_STRING: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_SHORT_TO_STRING: {
         sprintf(tmp_buffer, "%" PRId16, short_vars[opcode->operand1]);
         int32_t string_length = strlen(tmp_buffer);
         void* string = env->new_string_raw(env, tmp_buffer, string_length);
         SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], string);
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_INT_TO_STRING: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_INT_TO_STRING: {
         sprintf(tmp_buffer, "%" PRId32, int_vars[opcode->operand1]);
         int32_t string_length = strlen(tmp_buffer);
         void* string = env->new_string_raw(env, tmp_buffer, string_length);
         SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], string);
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_LONG_TO_STRING: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_LONG_TO_STRING: {
         sprintf(tmp_buffer, "%" PRId64, long_vars[opcode->operand1]);
         int32_t string_length = strlen(tmp_buffer);
         void* string = env->new_string_raw(env, tmp_buffer, string_length);
         SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], string);
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_FLOAT_TO_STRING: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_FLOAT_TO_STRING: {
         sprintf(tmp_buffer, "%g", float_vars[opcode->operand1]);
         int32_t string_length = strlen(tmp_buffer);
         void* string = env->new_string_raw(env, tmp_buffer, string_length);
         SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], string);
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_DOUBLE_TO_STRING: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_DOUBLE_TO_STRING: {
         sprintf(tmp_buffer, "%g", double_vars[opcode->operand1]);
         int32_t string_length = strlen(tmp_buffer);
         void* string = env->new_string_raw(env, tmp_buffer, string_length);
@@ -4015,66 +4016,20 @@ int32_t SPVM_API_call_spvm_method_vm(SPVM_ENV* env, int32_t method_id, SPVM_VALU
         stack_index += fields_length;
         break;
       }
-      case SPVM_OPCODE_C_ID_CHECK_OBJECT_TYPE: {
+      case SPVM_OPCODE_C_ID_MOVE_OBJECT_CHECK_ASSIGN: {
         void* object = *(void**)&object_vars[opcode->operand1];
         
-        if (object != NULL) {
-          int32_t check_basic_type_id = opcode->operand2;
-          int32_t check_type_dimension = opcode->operand3;
-          
-          int32_t object_basic_type_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_basic_type_id_offset);
-          int32_t object_type_dimension = *(uint8_t*)((intptr_t)object + (intptr_t)env->object_type_dimension_offset);
-          
-          if (object_basic_type_id == check_basic_type_id && object_type_dimension == check_type_dimension) {
-            SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], *(void**)&object_vars[opcode->operand1]);
-          }
-          else {
-            void* exception = env->new_string_nolen_raw(env, "Can't convert imcompatible object type in runtime.");
-            env->set_exception(env, exception);
-            exception_flag = 1;
-          }
+        int32_t cast_basic_type_id = opcode->operand2;
+        int32_t cast_type_dimension = opcode->operand3;
+        
+        int32_t can_assign = env->can_assign(env, cast_basic_type_id, cast_type_dimension, object);
+        if (can_assign) {
+          SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], *(void**)&object_vars[opcode->operand1]);
         }
-        
-        break;
-      }
-      case SPVM_OPCODE_C_ID_CHECK_CALLBACK: {
-        void* object = *(void**)&object_vars[opcode->operand1];
-        
-        if (object != NULL) {
-          int32_t check_basic_type_id = opcode->operand2;
-          
-          int32_t object_basic_type_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_basic_type_id_offset);
-          int32_t object_type_dimension = *(uint8_t*)((intptr_t)object + (intptr_t)env->object_type_dimension_offset);
-          
-          if (env->has_callback(env, object, check_basic_type_id)) {
-            SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], *(void**)&object_vars[opcode->operand1]);
-          }
-          else {
-            void* exception = env->new_string_nolen_raw(env, "Can't convert imcompatible callback type.");
-            env->set_exception(env, exception);
-            exception_flag = 1;
-          }
-        }
-        
-        break;
-      }
-      case SPVM_OPCODE_C_ID_CHECK_INTERFACE: {
-        void* object = *(void**)&object_vars[opcode->operand1];
-        
-        if (object != NULL) {
-          int32_t check_basic_type_id = opcode->operand2;
-          
-          int32_t object_basic_type_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_basic_type_id_offset);
-          int32_t object_type_dimension = *(uint8_t*)((intptr_t)object + (intptr_t)env->object_type_dimension_offset);
-          
-          if (env->has_interface(env, object, check_basic_type_id)) {
-            SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], *(void**)&object_vars[opcode->operand1]);
-          }
-          else {
-            void* exception = env->new_string_nolen_raw(env, "Can't convert imcompatible callback type.");
-            env->set_exception(env, exception);
-            exception_flag = 1;
-          }
+        else {
+          void* exception = env->new_string_nolen_raw(env, "Can't perform the type cast to incompatible object type.");
+          env->set_exception(env, exception);
+          exception_flag = 1;
         }
         
         break;
@@ -5165,7 +5120,7 @@ int32_t SPVM_API_call_spvm_method_vm(SPVM_ENV* env, int32_t method_id, SPVM_VALU
       case SPVM_OPCODE_C_ID_END_METHOD: {
         goto label_END_METHOD;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_BYTE_TO_BYTE_OBJECT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_BYTE_TO_BYTE_OBJECT: {
         int8_t value = byte_vars[opcode->operand1];
         int32_t basic_type_id = SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE_OBJECT;
 
@@ -5176,7 +5131,7 @@ int32_t SPVM_API_call_spvm_method_vm(SPVM_ENV* env, int32_t method_id, SPVM_VALU
         
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_SHORT_TO_SHORT_OBJECT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_SHORT_TO_SHORT_OBJECT: {
         int16_t value = short_vars[opcode->operand1];
         int32_t basic_type_id = SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT_OBJECT;
         void* object = env->new_object_raw(env, basic_type_id);
@@ -5186,7 +5141,7 @@ int32_t SPVM_API_call_spvm_method_vm(SPVM_ENV* env, int32_t method_id, SPVM_VALU
         
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_INT_TO_INT_OBJECT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_INT_TO_INT_OBJECT: {
         int32_t value = int_vars[opcode->operand1];
         int32_t basic_type_id = SPVM_NATIVE_C_BASIC_TYPE_ID_INT_OBJECT;
         void* object = env->new_object_raw(env, basic_type_id);
@@ -5196,7 +5151,7 @@ int32_t SPVM_API_call_spvm_method_vm(SPVM_ENV* env, int32_t method_id, SPVM_VALU
         
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_LONG_TO_LONG_OBJECT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_LONG_TO_LONG_OBJECT: {
         int64_t value = long_vars[opcode->operand1];
         int32_t basic_type_id = SPVM_NATIVE_C_BASIC_TYPE_ID_LONG_OBJECT;
         void* object = env->new_object_raw(env, basic_type_id);
@@ -5206,7 +5161,7 @@ int32_t SPVM_API_call_spvm_method_vm(SPVM_ENV* env, int32_t method_id, SPVM_VALU
         
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_FLOAT_TO_FLOAT_OBJECT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_FLOAT_TO_FLOAT_OBJECT: {
         float value = float_vars[opcode->operand1];
         int32_t basic_type_id = SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT_OBJECT;
         void* object = env->new_object_raw(env, basic_type_id);
@@ -5216,7 +5171,7 @@ int32_t SPVM_API_call_spvm_method_vm(SPVM_ENV* env, int32_t method_id, SPVM_VALU
         
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_DOUBLE_TO_DOUBLE_OBJECT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_DOUBLE_TO_DOUBLE_OBJECT: {
         double value = double_vars[opcode->operand1];
         int32_t basic_type_id = SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE_OBJECT;
         void* object = env->new_object_raw(env, basic_type_id);
@@ -5226,7 +5181,7 @@ int32_t SPVM_API_call_spvm_method_vm(SPVM_ENV* env, int32_t method_id, SPVM_VALU
         
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_BYTE_OBJECT_TO_BYTE: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_BYTE_OBJECT_TO_BYTE: {
         void* object = *(void**)&object_vars[opcode->operand1];
         if (object == NULL) {
           void* exception = env->new_string_nolen_raw(env, "Can't convert undef value.");
@@ -5248,7 +5203,7 @@ int32_t SPVM_API_call_spvm_method_vm(SPVM_ENV* env, int32_t method_id, SPVM_VALU
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_SHORT_OBJECT_TO_SHORT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_SHORT_OBJECT_TO_SHORT: {
         void* object = *(void**)&object_vars[opcode->operand1];
         if (object == NULL) {
           void* exception = env->new_string_nolen_raw(env, "Can't convert undef value.");
@@ -5270,7 +5225,7 @@ int32_t SPVM_API_call_spvm_method_vm(SPVM_ENV* env, int32_t method_id, SPVM_VALU
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_INT_OBJECT_TO_INT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_INT_OBJECT_TO_INT: {
         void* object = *(void**)&object_vars[opcode->operand1];
         if (object == NULL) {
           void* exception = env->new_string_nolen_raw(env, "Can't convert undef value.");
@@ -5292,7 +5247,7 @@ int32_t SPVM_API_call_spvm_method_vm(SPVM_ENV* env, int32_t method_id, SPVM_VALU
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_LONG_OBJECT_TO_LONG: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_LONG_OBJECT_TO_LONG: {
         void* object = *(void**)&object_vars[opcode->operand1];
         if (object == NULL) {
           void* exception = env->new_string_nolen_raw(env, "Can't convert undef value.");
@@ -5314,7 +5269,7 @@ int32_t SPVM_API_call_spvm_method_vm(SPVM_ENV* env, int32_t method_id, SPVM_VALU
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_FLOAT_OBJECT_TO_FLOAT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_FLOAT_OBJECT_TO_FLOAT: {
         void* object = *(void**)&object_vars[opcode->operand1];
         if (object == NULL) {
           void* exception = env->new_string_nolen_raw(env, "Can't convert undef value.");
@@ -5337,7 +5292,7 @@ int32_t SPVM_API_call_spvm_method_vm(SPVM_ENV* env, int32_t method_id, SPVM_VALU
         
         break;
       }
-      case SPVM_OPCODE_C_ID_CONVERT_DOUBLE_OBJECT_TO_DOUBLE: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_DOUBLE_OBJECT_TO_DOUBLE: {
         void* object = *(void**)&object_vars[opcode->operand1];
         if (object == NULL) {
           void* exception = env->new_string_nolen_raw(env, "Can't convert undef value.");
@@ -5617,22 +5572,6 @@ int32_t SPVM_API_get_elem_byte_size(SPVM_ENV* env, SPVM_OBJECT* array) {
   return elem_byte_size;
 }
 
-int32_t SPVM_API_has_callback(SPVM_ENV* env, SPVM_OBJECT* object, int32_t callback_basic_type_id) {
-  (void)env;
-
-  SPVM_RUNTIME* runtime = env->runtime;
-
-  // Object must be not null
-  assert(object);
-  
-  int32_t object_basic_type_id = object->basic_type_id;
-  int32_t object_type_dimension = object->type_dimension;
-  
-  int32_t has_callback = SPVM_API_RUNTIME_has_callback_by_id(runtime, object_basic_type_id, object_type_dimension, callback_basic_type_id, 0);
-  
-  return has_callback;
-}
-
 int32_t SPVM_API_has_interface(SPVM_ENV* env, SPVM_OBJECT* object, int32_t interface_basic_type_id) {
   (void)env;
 
@@ -5641,12 +5580,38 @@ int32_t SPVM_API_has_interface(SPVM_ENV* env, SPVM_OBJECT* object, int32_t inter
   // Object must be not null
   assert(object);
   
-  int32_t object_basic_type_id = object->basic_type_id;
   int32_t object_type_dimension = object->type_dimension;
-  
-  int32_t has_interface = SPVM_API_RUNTIME_has_interface_by_id(runtime, object_basic_type_id, object_type_dimension, interface_basic_type_id, 0);
+  int32_t has_interface;
+  if (object->type_dimension > 0) {
+    has_interface = 0;
+  }
+  else {
+    int32_t object_basic_type_id = object->basic_type_id;
+    has_interface = SPVM_API_RUNTIME_has_interface_by_id(runtime, object_basic_type_id, interface_basic_type_id);
+  }
   
   return has_interface;
+}
+
+int32_t SPVM_API_has_callback(SPVM_ENV* env, SPVM_OBJECT* object, int32_t callback_basic_type_id) {
+  (void)env;
+
+  SPVM_RUNTIME* runtime = env->runtime;
+
+  // Object must be not null
+  assert(object);
+  
+  int32_t object_type_dimension = object->type_dimension;
+  int32_t has_callback;
+  if (object->type_dimension > 0) {
+    has_callback = 0;
+  }
+  else {
+    int32_t object_basic_type_id = object->basic_type_id;
+    has_callback = SPVM_API_RUNTIME_has_callback_by_id(runtime, object_basic_type_id, callback_basic_type_id);
+  }
+  
+  return has_callback;
 }
 
 int32_t SPVM_API_enter_scope(SPVM_ENV* env) {
@@ -7698,75 +7663,75 @@ int32_t SPVM_API_can_assign_array_element(SPVM_ENV* env, SPVM_OBJECT* array, SPV
   
   SPVM_RUNTIME* runtime = env->runtime;
 
-  int32_t can_assign;
-  
   assert(array);
+
+  int32_t array_basic_type_id = array->basic_type_id;
+  int32_t array_type_dimension = array->type_dimension;
   
-  if (element == NULL) {
+  assert(array_type_dimension > 0);
+  int32_t can_assign = SPVM_API_can_assign(env, array_basic_type_id, array_type_dimension - 1, element);
+
+  return can_assign;
+}
+
+int32_t SPVM_API_can_assign(SPVM_ENV* env, int32_t cast_basic_type_id, int32_t cast_type_dimension, SPVM_OBJECT* object) {
+  
+  SPVM_RUNTIME* runtime = env->runtime;
+
+  int32_t can_assign;
+  if (object == NULL) {
     can_assign = 1;
   }
   else {
-    int32_t array_basic_type_id = array->basic_type_id;
-    int32_t array_type_dimension = array->type_dimension;
-    int32_t array_basic_type_category = SPVM_API_RUNTIME_get_basic_type_category(runtime, array_basic_type_id);
-
-    int32_t element_basic_type_id = element->basic_type_id;
-    int32_t element_type_dimension = element->type_dimension;
+    int32_t cast_basic_type_category = SPVM_API_RUNTIME_get_basic_type_category(runtime, cast_basic_type_id);
+    int32_t object_basic_type_id = object->basic_type_id;
+    int32_t object_type_dimension = object->type_dimension;
+    int32_t object_basic_type_category = SPVM_API_RUNTIME_get_basic_type_category(runtime, object_basic_type_id);
     
-    if (array_type_dimension == 0) {
-      can_assign = 0;
+    if (cast_type_dimension == 0 && cast_basic_type_category == SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_ANY_OBJECT) {
+      assert(object_type_dimension >= 0);
+      can_assign = 1;
     }
-    else if (array_type_dimension == 1) {
-      if (array_basic_type_id == element_basic_type_id && array_type_dimension == element_type_dimension + 1) {
+    else if (cast_type_dimension == 1 && cast_basic_type_category == SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_ANY_OBJECT) {
+      if (object_type_dimension >= 1) {
         can_assign = 1;
       }
       else {
-        switch (array_basic_type_category) {
-          case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_ANY_OBJECT:
-          {
+        can_assign = 0;
+      }
+    }
+    else if (cast_type_dimension == object_type_dimension) {
+      switch (cast_basic_type_category) {
+        case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_NUMERIC:
+        case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_MULNUM:
+        case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_STRING:
+        case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CLASS:
+        {
+          if (cast_basic_type_id == object_basic_type_id && cast_type_dimension == object_type_dimension) {
             can_assign = 1;
-            break;
           }
-          case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE:
-          {
-            can_assign = SPVM_API_RUNTIME_has_interface_by_id(runtime, array_basic_type_id, array_type_dimension - 1, element_basic_type_id, element_type_dimension);
-            break;
-          }
-          case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CALLBACK:
-          {
-            can_assign = SPVM_API_RUNTIME_has_callback_by_id(runtime, array_basic_type_id, array_type_dimension - 1, element_basic_type_id, element_type_dimension);
-            break;
-          }
-          default: {
+          else {
             can_assign = 0;
           }
+          break;
+        }
+        case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE: {
+          can_assign = SPVM_API_RUNTIME_has_interface_by_id(runtime, cast_basic_type_id, object_basic_type_id);
+          break;
+        }
+        case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CALLBACK: {
+          can_assign = SPVM_API_RUNTIME_has_callback_by_id(runtime, cast_basic_type_id, object_basic_type_id);
+          break;
+        }
+        default: {
+          assert(0);
         }
       }
     }
-    else if (array_type_dimension > 1) {
-      if (array_basic_type_id == element_basic_type_id && array_type_dimension == element_type_dimension + 1) {
-        can_assign = 1;
-      }
-      else {
-        switch (array_basic_type_category) {
-          case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE:
-          {
-            can_assign = SPVM_API_RUNTIME_has_interface_by_id(runtime, array_basic_type_id, array_type_dimension - 1, element_basic_type_id, element_type_dimension);
-            break;
-          }
-          case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CALLBACK:
-          {
-            can_assign = SPVM_API_RUNTIME_has_callback_by_id(runtime, array_basic_type_id, array_type_dimension - 1, element_basic_type_id, element_type_dimension);
-            break;
-          }
-          default: {
-            can_assign = 0;
-          }
-        }
-      }
+    else {
+      can_assign = 0;
     }
   }
   
   return can_assign;
 }
-

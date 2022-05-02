@@ -1,5 +1,14 @@
 Revision history for String-Tagged
 
+0.18    2022-04-29
+        [CHANGES]
+         * Extract String::Tagged::Extent into its own actual .pm file
+         * Documentation style fixes
+         * Requires perl 5.14+
+
+        [BUGFIXES]
+         * Various fixes to make zero-length tags work correctly
+
 0.17    2021-08-10
         [CHANGES]
          * Added a ->join constructor method

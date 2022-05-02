@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.19;
+use Object::Pad 0.57;
 
-package Device::Chip::INA219 0.07;
+package Device::Chip::INA219 0.08;
 class Device::Chip::INA219
-   extends Device::Chip::Base::RegisteredI2C 0.10;
+   :isa(Device::Chip::Base::RegisteredI2C 0.10);
 
 use constant REG_DATA_SIZE => 16;
 
@@ -102,6 +102,15 @@ bitfield { format => "integer" }, CONFIG =>
    $config = await $chip->read_config;
 
 Reads and returns the current chip configuration as a C<HASH> reference.
+
+   RST        => BOOL
+   BRNG       => "16V" | "32V"
+   PG         => "40mV" | "80mV" | "160mV" | "320mV"
+   BADC       => "9b" | "10b" | "11b" | "12b" | 1 | 2 | 4 | 8 | 16 | 32 | 64 | 128
+   SADC       => as above
+   MODE_CONT  => BOOL
+   MODE_BUS   => BOOL
+   MODE_SHUNT => BOOL
 
 =cut
 

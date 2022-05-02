@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2021 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.19;
+use Object::Pad 0.43;
 
-package Device::Chip::PCF857x 0.03;
+package Device::Chip::PCF857x 0.04;
 class Device::Chip::PCF857x
-   extends Device::Chip;
+   :isa(Device::Chip);
 
 use constant PROTOCOL => "I2C";
 
@@ -39,7 +39,7 @@ async method read
 
 method as_adapter
 {
-   return Device::Chip::PCF857x::_Adapter->new( $self );
+   return Device::Chip::PCF857x::_Adapter->new( chip => $self );
 }
 
 class # hide from indexer
@@ -51,15 +51,14 @@ use Carp;
 
 use Future;
 
-has $_chip;
+has $_chip :param;
 has $_mask;
 has $_gpiobits;
 
-BUILD ( $chip )
+ADJUST
 {
-   $_chip = $chip;
-   $_mask = $chip->DEFMASK;
-   $_gpiobits = $chip->GPIOBITS;
+   $_mask = $_chip->DEFMASK;
+   $_gpiobits = $_chip->GPIOBITS;
 }
 
 async method power ( $on )

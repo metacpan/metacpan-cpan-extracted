@@ -1,0 +1,216 @@
+---
+abstract: 'Encrypted database to store secret text and files'
+author:
+  - 'Charles McGarvey <ccm@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  Getopt::Std: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Deep: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  Test::Warnings: '0'
+  lib: '0'
+  perl: '5.006'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-KDBX
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+optional_features:
+  compression:
+    description: 'ability to read and write compressed KDBX files'
+    requires:
+      Compress::Raw::Zlib: '0'
+      IO::Compress::Gzip: '0'
+      IO::Uncompress::Gunzip: '0'
+  otp:
+    description: 'ability to generate one-time passwords from configured database entries'
+    requires:
+      Pass::OTP: '0'
+  xs:
+    description: 'speed improvements (requires C compiler)'
+    requires:
+      File::KDBX::XS: '0'
+provides:
+  File::KDBX:
+    file: lib/File/KDBX.pm
+    version: '0.901'
+  File::KDBX::Cipher:
+    file: lib/File/KDBX/Cipher.pm
+    version: '0.901'
+  File::KDBX::Cipher::CBC:
+    file: lib/File/KDBX/Cipher/CBC.pm
+    version: '0.901'
+  File::KDBX::Cipher::Stream:
+    file: lib/File/KDBX/Cipher/Stream.pm
+    version: '0.901'
+  File::KDBX::Constants:
+    file: lib/File/KDBX/Constants.pm
+    version: '0.901'
+  File::KDBX::Dumper:
+    file: lib/File/KDBX/Dumper.pm
+    version: '0.901'
+  File::KDBX::Dumper::KDB:
+    file: lib/File/KDBX/Dumper/KDB.pm
+    version: '0.901'
+  File::KDBX::Dumper::Raw:
+    file: lib/File/KDBX/Dumper/Raw.pm
+    version: '0.901'
+  File::KDBX::Dumper::V3:
+    file: lib/File/KDBX/Dumper/V3.pm
+    version: '0.901'
+  File::KDBX::Dumper::V4:
+    file: lib/File/KDBX/Dumper/V4.pm
+    version: '0.901'
+  File::KDBX::Dumper::XML:
+    file: lib/File/KDBX/Dumper/XML.pm
+    version: '0.901'
+  File::KDBX::Entry:
+    file: lib/File/KDBX/Entry.pm
+    version: '0.901'
+  File::KDBX::Error:
+    file: lib/File/KDBX/Error.pm
+    version: '0.901'
+  File::KDBX::Group:
+    file: lib/File/KDBX/Group.pm
+    version: '0.901'
+  File::KDBX::IO:
+    file: lib/File/KDBX/IO.pm
+    version: '0.901'
+  File::KDBX::IO::Crypt:
+    file: lib/File/KDBX/IO/Crypt.pm
+    version: '0.901'
+  File::KDBX::IO::HashBlock:
+    file: lib/File/KDBX/IO/HashBlock.pm
+    version: '0.901'
+  File::KDBX::IO::HmacBlock:
+    file: lib/File/KDBX/IO/HmacBlock.pm
+    version: '0.901'
+  File::KDBX::Iterator:
+    file: lib/File/KDBX/Iterator.pm
+    version: '0.901'
+  File::KDBX::KDF:
+    file: lib/File/KDBX/KDF.pm
+    version: '0.901'
+  File::KDBX::KDF::AES:
+    file: lib/File/KDBX/KDF/AES.pm
+    version: '0.901'
+  File::KDBX::KDF::Argon2:
+    file: lib/File/KDBX/KDF/Argon2.pm
+    version: '0.901'
+  File::KDBX::Key:
+    file: lib/File/KDBX/Key.pm
+    version: '0.901'
+  File::KDBX::Key::ChallengeResponse:
+    file: lib/File/KDBX/Key/ChallengeResponse.pm
+    version: '0.901'
+  File::KDBX::Key::Composite:
+    file: lib/File/KDBX/Key/Composite.pm
+    version: '0.901'
+  File::KDBX::Key::File:
+    file: lib/File/KDBX/Key/File.pm
+    version: '0.901'
+  File::KDBX::Key::Password:
+    file: lib/File/KDBX/Key/Password.pm
+    version: '0.901'
+  File::KDBX::Key::YubiKey:
+    file: lib/File/KDBX/Key/YubiKey.pm
+    version: '0.901'
+  File::KDBX::Loader:
+    file: lib/File/KDBX/Loader.pm
+    version: '0.901'
+  File::KDBX::Loader::KDB:
+    file: lib/File/KDBX/Loader/KDB.pm
+    version: '0.901'
+  File::KDBX::Loader::Raw:
+    file: lib/File/KDBX/Loader/Raw.pm
+    version: '0.901'
+  File::KDBX::Loader::V3:
+    file: lib/File/KDBX/Loader/V3.pm
+    version: '0.901'
+  File::KDBX::Loader::V4:
+    file: lib/File/KDBX/Loader/V4.pm
+    version: '0.901'
+  File::KDBX::Loader::XML:
+    file: lib/File/KDBX/Loader/XML.pm
+    version: '0.901'
+  File::KDBX::Object:
+    file: lib/File/KDBX/Object.pm
+    version: '0.901'
+  File::KDBX::Safe:
+    file: lib/File/KDBX/Safe.pm
+    version: '0.901'
+  File::KDBX::Transaction:
+    file: lib/File/KDBX/Transaction.pm
+    version: '0.901'
+  File::KDBX::Util:
+    file: lib/File/KDBX/Util.pm
+    version: '0.901'
+recommends:
+  Compress::Raw::Zlib: '0'
+  File::KDBX::XS: '0'
+  File::Spec: '0'
+  IO::Compress::Gzip: '0'
+  IO::Uncompress::Gunzip: '0'
+  Pass::OTP: '0'
+requires:
+  Carp: '0'
+  Crypt::Argon2: '0'
+  Crypt::Cipher: '0'
+  Crypt::Digest: '0'
+  Crypt::Mac::HMAC: '0'
+  Crypt::Misc: '0.029'
+  Crypt::Mode::CBC: '0'
+  Crypt::PRNG: '0'
+  Data::Dumper: '0'
+  Devel::GlobalDestruction: '0'
+  Encode: '0'
+  Exporter: '0'
+  File::Temp: '0'
+  Hash::Util::FieldHash: '0'
+  IO::Handle: '0'
+  IPC::Cmd: '0.52'
+  Iterator::Simple: '0'
+  List::Util: '1.33'
+  Module::Load: '0'
+  Module::Loaded: '0'
+  POSIX: '0'
+  Ref::Util: '0'
+  Scalar::Util: '0'
+  Scope::Guard: '0'
+  Storable: '0'
+  Symbol: '0'
+  Text::ParseWords: '0'
+  Time::Piece: '0'
+  XML::LibXML: '0'
+  XML::LibXML::Reader: '0'
+  boolean: '0'
+  namespace::clean: '0'
+  overload: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/chazmcgarvey/File-KDBX/issues
+  homepage: https://github.com/chazmcgarvey/File-KDBX
+  repository: https://github.com/chazmcgarvey/File-KDBX.git
+version: '0.901'
+x_authority: cpan:CCM
+x_generated_by_perl: v5.34.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

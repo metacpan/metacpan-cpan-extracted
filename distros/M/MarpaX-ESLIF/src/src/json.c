@@ -181,7 +181,7 @@ static inline marpaESLIFGrammar_t *_marpaESLIFJSON_decode_newp(marpaESLIF_t *mar
   marpaESLIFGrammarOption.encodings = "ASCII";
   marpaESLIFGrammarOption.encodingl = 5; /* strlen("ASCII") */
 
-  marpaESLIFJSONp = _marpaESLIFGrammar_newp(marpaESLIFp, &marpaESLIFGrammarOption, 0 /* startGrammarIsLexemeb */, NULL /* L */, 0 /* bootstrapb */);
+  marpaESLIFJSONp = _marpaESLIFGrammar_newp(marpaESLIFp, &marpaESLIFGrammarOption, NULL /* L */, 0 /* bootstrapb */, 0 /* rememberGrammarUtf8b */, NULL /* forcedStartSymbols */, -1 /* forcedStartSymbolLeveli */, NULL /* marpaESLIFGrammar_bootstrapp */);
   if (MARPAESLIF_UNLIKELY(marpaESLIFJSONp == NULL)) {
     goto err;
   }
@@ -221,7 +221,7 @@ static inline marpaESLIFGrammar_t *_marpaESLIFJSON_encode_newp(marpaESLIF_t *mar
   marpaESLIFGrammarOption.encodings = "ASCII";
   marpaESLIFGrammarOption.encodingl = 5; /* strlen("ASCII") */
 
-  marpaESLIFJSONp = _marpaESLIFGrammar_newp(marpaESLIFp, &marpaESLIFGrammarOption, 0 /* startGrammarIsLexemeb */, NULL /* L */, 0 /* bootstrapb */);
+  marpaESLIFJSONp = _marpaESLIFGrammar_newp(marpaESLIFp, &marpaESLIFGrammarOption, NULL /* L */, 0 /* bootstrapb */, 0 /* rememberGrammarUtf8b */, NULL /* forcedStartSymbols */, -1 /* forcedStartSymbolLeveli */, NULL /* marpaESLIFGrammar_bootstrapp */);
   if (MARPAESLIF_UNLIKELY(marpaESLIFJSONp == NULL)) {
     goto err;
   }
@@ -281,7 +281,7 @@ short marpaESLIFJSON_encodeb(marpaESLIFGrammar_t *marpaESLIFGrammarJSONp, marpaE
     goto err;
   }
 
-  marpaESLIFValuep = _marpaESLIFValue_newp(marpaESLIFRecognizerp, &marpaESLIFValueOption, 0 /* silentb */, 0 /* fakeb */);
+  marpaESLIFValuep = _marpaESLIFValue_newp(marpaESLIFRecognizerp, &marpaESLIFValueOption, 0 /* silentb */, 0 /* fakeb */, 0 /* directTransferb */);
   if (MARPAESLIF_UNLIKELY(marpaESLIFValuep == NULL)) {
     goto err;
   }
@@ -379,7 +379,7 @@ short marpaESLIFJSON_decodeb(marpaESLIFGrammar_t *marpaESLIFGrammarJSONp, marpaE
   marpaESLIFRecognizerOption.regexActionResolverp = _marpaESLIFJSONDecodeRegexActionResolverp;
   marpaESLIFRecognizerOption.importerp            = _marpaESLIFJSONDecodeValueResultInternalImportb;
 
-  marpaESLIFRecognizerp = _marpaESLIFRecognizer_newp(marpaESLIFGrammarJSONp->marpaESLIFp, marpaESLIFGrammarJSONp->grammarp, &marpaESLIFRecognizerOption);
+  marpaESLIFRecognizerp = _marpaESLIFRecognizer_newp(marpaESLIFGrammarJSONp->marpaESLIFp, marpaESLIFGrammarJSONp->grammarp, &marpaESLIFRecognizerOption, 0 /* discardb */, 0 /* noEventb */, 0 /* silentb */);
   if (MARPAESLIF_UNLIKELY(marpaESLIFRecognizerp == NULL)) {
     goto err;
   }
@@ -605,7 +605,7 @@ short marpaESLIFJSON_decodeb(marpaESLIFGrammar_t *marpaESLIFGrammarJSONp, marpaE
   marpaESLIFValueOption.nullb                     = 0; /* Fixed */
   marpaESLIFValueOption.maxParsesi                = 0; /* Fixed */
 
-  marpaESLIFValuep = _marpaESLIFValue_newp(marpaESLIFRecognizerp, &marpaESLIFValueOption, 0 /* silentb */, 1 /* fakeb */);
+  marpaESLIFValuep = _marpaESLIFValue_newp(marpaESLIFRecognizerp, &marpaESLIFValueOption, 0 /* silentb */, 1 /* fakeb */, 0 /* directTransferb */);
   if (MARPAESLIF_UNLIKELY(marpaESLIFValuep == NULL)) {
     goto err;
   }

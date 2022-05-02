@@ -19,7 +19,7 @@
 package Template::Plugin::CGI;
 our $AUTHORITY = 'cpan:TODDR';
 # ABSTRACT: Simple Template Toolkit plugin interfacing to the CGI.pm module
-$Template::Plugin::CGI::VERSION = '3.100';
+$Template::Plugin::CGI::VERSION = '3.101';
 use strict;
 use warnings;
 use base 'Template::Plugin';
@@ -63,7 +63,7 @@ Template::Plugin::CGI - Simple Template Toolkit plugin interfacing to the CGI.pm
 
 =head1 VERSION
 
-version 3.100
+version 3.101
 
 =head1 SYNOPSIS
 

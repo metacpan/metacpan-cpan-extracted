@@ -1636,7 +1636,7 @@ sub format_single_link {
 sub _url_safe_escape {
   my ($self, $string) = @_;
   utf8::encode($string);
-  $string =~ s/([^0-9a-zA-Z\.\/\:\;_\%\&\#\?\=\-])
+  $string =~ s/([^0-9a-zA-Z\.\/\:\;_\%\&\#\?\=\@\-])
 	      /sprintf("%%%02X", ord ($1))/gesx;
   my $escaped = $self->safe($string);
   return $escaped;

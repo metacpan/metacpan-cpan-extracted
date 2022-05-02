@@ -6,7 +6,7 @@ package WWW::Mechanize;
 use strict;
 use warnings;
 
-our $VERSION = '2.06';
+our $VERSION = '2.07';
 
 use Tie::RefHash;
 use HTTP::Request 1.30;
@@ -1800,7 +1800,7 @@ WWW::Mechanize - Handy web browsing in a Perl object
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

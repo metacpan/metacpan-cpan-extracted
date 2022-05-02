@@ -1,0 +1,12 @@
+1.01    2022-05-01
+
+- Apply patch to stop the SET instruction from de-refing HL when not necessary
+    https://rt.cpan.org/Ticket/Display.html?id=142489
+
+1.0     2008-06-13      1.0 release. No real changes, just added a test
+                          that runs some non-trivial code, and some
+                          licencing tweaks
+
+0.9     2008-03-12      Original release, still needs some doco and
+                          some 'real-world' tests, but it's
+                          functional

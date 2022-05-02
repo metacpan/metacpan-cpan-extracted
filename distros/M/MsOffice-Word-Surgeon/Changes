@@ -1,5 +1,12 @@
 Revision history for MsOffice-Word-Surgeon
 
+
+2.0      01.05.2022
+  - major refactoring
+  - support for multiple package parts (main document, headers and footers)
+  - support for replacing or adding an image
+  - renamed "change" ==> "revision"
+
 1.08     21.03.2022
   - additional noise reduction : soft hyphens
 

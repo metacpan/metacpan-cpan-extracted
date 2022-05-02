@@ -45,7 +45,9 @@ This library is free software; you can redistribute it and/or modify it under th
 
 use Class::Inspector;
 use Moose::Role;
+
 use Carp ();
+use RPC::XML qw<RPC_BOOLEAN>;
 
 my $invalid_class = qr/(?: \b:\b | \:{3,} | \:\:$ )/x;
 
@@ -78,11 +80,15 @@ sub prepare_attribute_for_send
     my $type = shift;
     my $value = shift;
 
-    return RPC::XML::string->new($value) if $type =~ /Str/i && defined $value;
-    return RPC::XML::boolean->new($value) if $type =~ /Str/i; # return null in effect
-    return $value->ymd if $type =~ qr'DateTime'i && $value && ref $value && $value->can('ymd');
-    
-    return $value;
+    if (!defined $value)
+        { return RPC_BOOLEAN(0); }
+    elsif ($type =~ /Str/i)
+        { return RPC::XML::string->new($value); }
+    elsif ($type =~ qr'DateTime'i && $value && ref $value && $value->can('ymd'))
+        { return $value->ymd; }
+        # ^ TODO that only the date part matters is a terrible assumption to make
+    else
+        { return $value; }
 }
 
 1;

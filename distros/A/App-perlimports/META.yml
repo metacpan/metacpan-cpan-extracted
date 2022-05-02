@@ -17,7 +17,7 @@ build_requires:
   perl: v5.12.0
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.010'
+  perl: v5.10.0
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -45,7 +45,7 @@ requires:
   Moo: '0'
   Moo::Role: '0'
   MooX::StrictConstructor: '0'
-  PPI: '1.272'
+  PPI: '1.273'
   PPIx::Utils::Classification: '0'
   Path::Tiny: '0'
   Perl::Tidy: '20220217'
@@ -67,10 +67,10 @@ resources:
   bugtracker: https://github.com/oalders/App-perlimports/issues
   homepage: https://github.com/oalders/App-perlimports
   repository: https://github.com/oalders/App-perlimports.git
-version: '0.000035'
+version: '0.000036'
 x_Dist_Zilla:
   perl:
-    version: '5.030002'
+    version: '5.034001'
   plugins:
     -
       class: Dist::Zilla::Plugin::PromptIfStale
@@ -260,67 +260,67 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@Default/SingleEncoding'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Name
               name: '@Default/Name'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Version
               name: '@Default/Version'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Region
               name: '@Default/prelude'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Generic
               name: SYNOPSIS
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Generic
               name: DESCRIPTION
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Generic
               name: OVERVIEW
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Collect
               name: ATTRIBUTES
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Collect
               name: METHODS
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Collect
               name: FUNCTIONS
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@Default/Leftovers'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Region
               name: '@Default/postlude'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Authors
               name: '@Default/Authors'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Default/Legal'
-              version: '4.015'
+              version: '4.018'
       name: '@Author::OALDERS/PodWeaver'
       version: '4.009'
     -
@@ -383,7 +383,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.35.1
+          git_version: 2.36.0
           repo_root: .
       name: '@Author::OALDERS/Git::Check'
       version: '2.048'
@@ -391,7 +391,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.35.1
+          git_version: 2.36.0
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -469,7 +469,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
           commit_msg: v%V%n%n%c
-          signoff: 0
+          signoff: '0'
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -483,7 +483,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.35.1
+          git_version: 2.36.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -496,11 +496,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.000035
+          tag: v0.000036
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.35.1
+          git_version: 2.36.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -528,7 +528,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
           commit_msg: 'increment $VERSION after %v release'
-          signoff: 0
+          signoff: '0'
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Build.PL
@@ -538,7 +538,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.35.1
+          git_version: 2.36.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -552,7 +552,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.35.1
+          git_version: 2.36.0
           repo_root: .
       name: '@Author::OALDERS/Git::Push'
       version: '2.048'
@@ -563,7 +563,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GitHubREADME::Badge
       name: GitHubREADME::Badge
-      version: '0.33'
+      version: '0.35'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -579,6 +579,14 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
+      version: '6.024'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: requires
+      name: DevelopRequires
       version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
@@ -630,7 +638,7 @@ x_contributors:
   - 'Nicolas Mendoza <mendoza@pvv.ntnu.no>'
   - 'Olaf Alders <olaf.alders@gmail.com>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
-x_generated_by_perl: v5.30.2
+x_generated_by_perl: v5.34.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

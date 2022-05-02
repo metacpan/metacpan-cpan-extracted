@@ -1,5 +1,10 @@
 Revision history for POSIX-RT-Spawn
 
+0.12  Fri Apr 29 15:46:29 UTC 2022
+    - Fix compilation on Perl >= 5.02707 (RT #125666)
+    - Updated prereqs.
+    - Upgraded ppport.h.
+
 0.11  Thu Feb 16 22:16:02 UTC 2012
     - Added missing semicolons to XS statements.
     - Added ppport request to provide sv_2pv_flags function for Perl 5.6.2.

@@ -14,7 +14,7 @@ MarpaX::ESLIF::BNF - MarpaX::ESLIF's BNF
 
 =head1 VERSION
 
-version 6.0.16
+version 6.0.18
 
 =head1 DESCRIPTION
 
@@ -75,9 +75,13 @@ A zero-length terminal that matches only before a newline.
 
 A zero-length terminal that matches only after a newline.
 
+=item :empty
+
+A zero-length terminal that always match the empty string.
+
 Note that the newline is hardcoded to be any unicode newline, i.e. C<(*BSR_UNICODE)\R> in PCRE2 terminology.
 
-The presence of :sol pseudo-terminal anywhere in the grammar enforces the C<newlineb> flag in recognizers, because a C<:discard> rule can contain C<(*BSR_UNICODE)\R> characters, and then only newline count can safely indicate the beginning of a line. On the contrary C<:eof> and C<:eol> work regardless of recognizer's C<newlineb> flag. In particular C<:eol> is doing a positive look-forward of C<(*BSR_UNICODE)\R> in the stream.
+The presence of :eol or :sol pseudo-terminal anywhere in the grammar enforces the C<newlineb> flag in recognizers. On the contrary C<:eof> and C<:eol> work regardless of recognizer's C<newlineb> flag.
 
 =back
 
@@ -272,7 +276,7 @@ function lua_action(x,y)
   return "
 </luascript>
 
-In any of these cases, the call must be successful a return a string that is a new grammar, that ESLIF will compile and execute as a lexeme. ESLIF will be try to clever to not recompile grammars everytime, though it will use a very basic check: the whole UTF-8 version of the grammar will be kept in memory, and only grammars with a different UTF-8 version will be recompiled.
+In any of these cases, the call must be successful a return a string that is compatible with an RHS, that ESLIF execute as a lexeme. ESLIF will be try to clever to not recompile grammars everytime, though it will use a very basic check: the whole UTF-8 version of the generated RHS, together with an internally generated hook on grammar level, will be kept in memory, and only grammars with a different UTF-8 version at different grammar levels will be recompiled.
 
 End-user must take care, because infinite recursivity is very easy with parameterized rules, and ESLIF is not protected against that.
 
@@ -297,12 +301,12 @@ A concrete lua example is e.g.:
   
         local output
         if (self._nbParameterizedRhsCalls == 5) then
-          output = "start ::= '5'"
+          output = "'5'"
         elseif (self._nbParameterizedRhsCalls > 5) then
-          output = "start ::= 'no match'"
+          output = "'no match'"
         else
           parameter = parameter + 1
-          output = "start ::= . => parameterizedRhs->("..parameter..")"
+          output = ". => parameterizedRhs->("..parameter..")"
         end
         return output
      end
@@ -350,12 +354,12 @@ A concrete lua example is e.g.:
         | . => parameterizedRhs->(3)
         | . => parameterizedRhs->(4)
         | . => ::luac->function(x)
-                         return "thisgrammar ::= 'will not match'"
+                         return "'will not match'"
                        end
                ->(5)
         | . => ::luac->function(x)
                          print('Called with x='..x)
-                         return "thisgrammar ::= 'will not match'"
+                         return "'will not match'"
                        end
                ->(15)
         | . => ::lua->grammar_ok->(10,12)
@@ -365,10 +369,10 @@ A concrete lua example is e.g.:
   
   <luascript>
   function grammar_ok(x,y)
-    return "x ::= 'Y'"
+    return "'Y'"
   end
   function grammar_ko(x,y)
-    return "x ::= Y"
+    return "Y"
   end
   function action_raising_error(x,y)
     error('Errors are trapped...')
@@ -1161,6 +1165,7 @@ MarpaX::ESLIF BNF can be expressed in itself:
                                    | ':eof'
                                    | ':eol'
                                    | ':sol'
+                                   | ':empty'
   <symbol>                       ::= <symbol name>
   <symbol name>                  ::= <bare name>
                                    | <bracketed name>
@@ -1250,7 +1255,7 @@ MarpaX::ESLIF BNF can be expressed in itself:
   <bare name>                    ~ <word character>+ proper => 1
   <standard name>                ~ /[a-zA-Z]/ <zero or more word characters>
   <bracketed name>               ~ '<' <bracketed name string> '>'
-  <bracketed name string>        ~ /[\s\w]+/
+  <bracketed name string>        ~ /[\\s\\w\\[\\]]+/
   <quoted string>                ~ /'(?:[^\\']*(?:\\.[^\\']*)*)'|"(?:[^\\"]*(?:\\.[^\\"]*)*)"|\x{201C}(?:[^\\\x{201D}]*(?:\\.[^\\\x{201D}]*)*)\x{201D}/su
                                  | /'(?:[^\\']*(?:\\.[^\\']*)*)'|"(?:[^\\"]*(?:\\.[^\\"]*)*)"|\x{201C}(?:[^\\\x{201D}]*(?:\\.[^\\\x{201D}]*)*)\x{201D}/su ':' /ic?/
   <quoted string literal>        ~ /'(?:[^\\']*(?:\\.[^\\']*)*)'|"(?:[^\\"]*(?:\\.[^\\"]*)*)"|\x{201C}(?:[^\\\x{201D}]*(?:\\.[^\\\x{201D}]*)*)\x{201D}/su

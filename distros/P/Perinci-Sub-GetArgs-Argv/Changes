@@ -1,3 +1,8 @@
+0.849   2022-03-27  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Show the details of clashing options.
+
+
 0.848   2022-03-02  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] Order elements in 'func.missing_args' result metadata key

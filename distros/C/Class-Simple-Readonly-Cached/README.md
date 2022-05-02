@@ -7,7 +7,7 @@ Class::Simple::Readonly::Cached - cache messages to an object
 
 # VERSION
 
-Version 0.07
+Version 0.08
 
 # SYNOPSIS
 
@@ -30,7 +30,7 @@ that works on objects which doesn't change its state based on input:
 Creates a Class::Simple::Readonly::Cached object.
 
 It takes one mandatory parameter: cache,
-which is either an object which understands get() and set() calls,
+which is either an object which understands clear(), get() and set() calls,
 such as an [CHI](https://metacpan.org/pod/CHI) object;
 or is a reference to a hash where the return values are to be stored.
 
@@ -66,16 +66,9 @@ Nigel Horne, `<njh at bandsman.co.uk>`
 
 Doesn't work with [Memoize](https://metacpan.org/pod/Memoize).
 
-Please report any bugs or feature requests to `bug-class-simple-readonly-cached at rt.cpan.org`,
-or through the web interface at
-[http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Class-Simple-Readonly-Cached](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Class-Simple-Readonly-Cached).
+Please report any bugs or feature requests to [https://github.com/nigelhorne/Class-Simple-Readonly-Cached/issues](https://github.com/nigelhorne/Class-Simple-Readonly-Cached/issues).
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
-
-params() returns a ref which means that calling routines can change the hash
-for other routines.
-Take a local copy before making amendments to the table if you don't want unexpected
-things to happen.
 
 # SEE ALSO
 
@@ -93,9 +86,9 @@ You can also look for information at:
 
     [https://metacpan.org/release/Class-Simple-Readonly-Cached](https://metacpan.org/release/Class-Simple-Readonly-Cached)
 
-- RT: CPAN's request tracker
+- Source Repository
 
-    [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-Simple-Readonly-Cached](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-Simple-Readonly-Cached)
+    [https://github.com/nigelhorne/Class-Simple-Readonly-Cached](https://github.com/nigelhorne/Class-Simple-Readonly-Cached)
 
 - CPANTS
 
@@ -120,7 +113,7 @@ You can also look for information at:
 # LICENSE AND COPYRIGHT
 
 Author Nigel Horne: `njh@bandsman.co.uk`
-Copyright (C) 2019-2021 Nigel Horne
+Copyright (C) 2019-2022 Nigel Horne
 
 Usage is subject to licence terms.
 The licence terms of this software are as follows:

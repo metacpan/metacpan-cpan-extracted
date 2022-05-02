@@ -2,7 +2,7 @@ do { my $x = {
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0',
-                                        'perl' => '5.010'
+                                        'perl' => 'v5.10.0'
                                       }
                       },
        'develop' => {
@@ -10,6 +10,7 @@ do { my $x = {
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
+                                      'App::FatPacker::Simple' => '0.09',
                                       'Code::TidyAll' => '0.71',
                                       'Code::TidyAll::Plugin::SortLines::Naturally' => '0.000003',
                                       'Code::TidyAll::Plugin::Test::Vars' => '0.04',
@@ -47,7 +48,7 @@ do { my $x = {
                                       'Moo' => '0',
                                       'Moo::Role' => '0',
                                       'MooX::StrictConstructor' => '0',
-                                      'PPI' => '1.272',
+                                      'PPI' => '1.273',
                                       'PPIx::Utils::Classification' => '0',
                                       'Path::Tiny' => '0',
                                       'Perl::Tidy' => '20220217',

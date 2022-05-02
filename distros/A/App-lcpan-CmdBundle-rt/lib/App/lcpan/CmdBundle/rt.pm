@@ -5,7 +5,7 @@ use strict;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-03-27'; # DATE
 our $DIST = 'App-lcpan-CmdBundle-rt'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 1;
 # ABSTRACT: More lcpan subcommands related to rt.cpan.org
@@ -22,7 +22,7 @@ App::lcpan::CmdBundle::rt - More lcpan subcommands related to rt.cpan.org
 
 =head1 VERSION
 
-This document describes version 0.004 of App::lcpan::CmdBundle::rt (from Perl distribution App-lcpan-CmdBundle-rt), released on 2022-03-27.
+This document describes version 0.005 of App::lcpan::CmdBundle::rt (from Perl distribution App-lcpan-CmdBundle-rt), released on 2022-03-27.
 
 =head1 SYNOPSIS
 

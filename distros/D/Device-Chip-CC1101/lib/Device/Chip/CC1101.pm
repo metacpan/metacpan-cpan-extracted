@@ -4,11 +4,11 @@
 #  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
 
 use v5.26; # postfix-deref, signatures
-use Object::Pad 0.41; # :param
+use Object::Pad 0.57;
 
-package Device::Chip::CC1101 0.06;
+package Device::Chip::CC1101 0.07;
 class Device::Chip::CC1101
-   extends Device::Chip;
+   :isa(Device::Chip);
 
 use Carp;
 use Data::Bitfield 0.04 qw( bitfield boolfield enumfield intfield signed_intfield );
@@ -300,7 +300,7 @@ The following values are also returned, derived from the actual register
 values as a convenience.
 
    carrier_frequency => "800.000MHz",
-   channel_spacing   => "191.951.kHz",
+   channel_spacing   => "191.951kHz",
    deviation         => "47.607kHz",
 
    data_rate         => "115.1kbps",
@@ -388,7 +388,7 @@ supplied with the module. The names of these presets are
    GFSK-38.4kb
    GFSK-100kb
    MSK-250kb
-   MSG-500kb
+   MSK-500kb
 
 =back
 

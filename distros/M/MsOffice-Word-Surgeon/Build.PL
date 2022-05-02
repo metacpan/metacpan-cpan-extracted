@@ -16,14 +16,17 @@ my $builder = Module::Build->new(
         'Test::More' => '0',
     },
     requires => {
-      perl                        => '5.10.0',
+      perl                        => '5.24.0',
       'Archive::Zip'              => undef,
       'Carp'                      => undef,
       'Encode'                    => undef,
+      'List::Util'                => undef,
       'Moose'                     => undef,
       'MooseX::StrictConstructor' => undef,
       'XML::LibXML'               => undef,
       'namespace::clean'          => undef,
+      'POSIX'                     => undef,
+      'Exporter'                  => undef,
     },
     add_to_cleanup     => [ 'MsOffice-Word-Surgeon-*' ],
     meta_merge => {

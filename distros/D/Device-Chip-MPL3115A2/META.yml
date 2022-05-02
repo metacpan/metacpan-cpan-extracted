@@ -17,15 +17,15 @@ name: Device-Chip-MPL3115A2
 provides:
   Device::Chip::MPL3115A2:
     file: lib/Device/Chip/MPL3115A2.pm
-    version: '0.09'
+    version: '0.10'
 requires:
   Data::Bitfield: '0.02'
   Device::Chip::Base::RegisteredI2C: '0.03'
   Future::AsyncAwait: '0.47'
   Future::Mutex: '0.47'
-  Object::Pad: '0.19'
+  Object::Pad: '0.57'
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

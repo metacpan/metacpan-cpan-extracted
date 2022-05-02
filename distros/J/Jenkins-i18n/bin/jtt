@@ -1,0 +1,344 @@
+#!perl
+
+# -*- mode: perl -*-
+# vi: set ft=perl :
+
+use warnings;
+use strict;
+use File::Basename;
+use File::Path;
+use Getopt::Long;
+use Set::Tiny 0.04;
+use Cwd;
+use Pod::Usage qw(pod2usage);
+
+use Jenkins::i18n (
+    'remove_unused', 'find_files', 'print_license', 'load_properties',
+    'load_jelly'
+);
+use Jenkins::i18n::Stats;
+use Jenkins::i18n::Warnings;
+use Jenkins::i18n::ProcOpts;
+
+my $DATA_START  = tell DATA;
+my $current_dir = getcwd;
+
+my ( $lang, $dir, $add, $remove, $counter, $target, $help, $debug, $man )
+    = ( undef, $current_dir, 0, 0, 0, $current_dir, 0, 0, 0 );
+
+GetOptions(
+    'help'     => \$help,
+    'lang=s'   => \$lang,
+    'dir=s'    => \$dir,
+    'add'      => \$add,
+    'remove'   => \$remove,
+    'counter'  => \$counter,
+    'target=s' => \$target,
+    'debug'    => \$debug,
+    'man'      => \$man,
+) or pod2usage( -exitval => 1 );
+
+pod2usage( -exitval => 0, -verbose => 0 ) if ($help);
+pod2usage( -exitval => 0, -verbose => 2 ) if ($man);
+
+# language parameter is mandatory and shouldn't be 'en'
+unless ( $lang and ( $lang ne 'en' ) ) {
+    pod2usage( -exitval => 1, -verbose => 1 );
+}
+
+print "Searching for files ...\n";
+
+# look for Message.properties and *.jelly files in the provided folder
+my $files_ref = find_files($dir);
+print 'Found ', scalar( @{$files_ref} ), ' files', "\n";
+my $stats    = Jenkins::i18n::Stats->new;
+my $warnings = Jenkins::i18n::Warnings->new;
+my $processor
+    = Jenkins::i18n::ProcOpts->new( $dir, $target, $counter, $remove, $add,
+    $debug, $lang );
+
+# process each file
+foreach my $file ( @{$files_ref} ) {
+    $stats->inc('files');
+    process_file( $file, $stats, $warnings, $processor );
+    $warnings->reset;
+}
+
+$stats->summary;
+
+# This is the main method with is run for each file
+sub process_file {
+    my ( $file, $stats, $warnings, $processor ) = @_;
+    print "Working on $file\n" if ( $processor->is_debug );
+    my ( $curr_lang_file, $english_file ) = $processor->define_files($file);
+
+   # entries_ref -> keys used in jelly or Message.properties files
+   # lang_entries_ref -> keys/values in the desired language which are already
+   # present in the file
+    my ( $entries_ref, $lang_entries_ref, $english_entries_ref );
+
+    # Read .jelly or Message.properties files, and fill a hash with the keys
+    # found
+    if ( $file =~ m/.jelly$/ ) {
+        $entries_ref = load_jelly($file);
+        $english_entries_ref
+            = load_properties( $english_file, $processor->is_debug );
+    }
+    else {
+        $english_entries_ref = load_properties( $file, $processor->is_debug );
+        $entries_ref         = $english_entries_ref;
+    }
+
+    $lang_entries_ref
+        = load_properties( $curr_lang_file, $processor->is_debug );
+
+    foreach my $entry ( keys %{$entries_ref} ) {
+        $stats->inc('keys');
+
+        unless (( exists( $lang_entries_ref->{$entry} ) )
+            and ( defined( $lang_entries_ref->{$entry} ) ) )
+        {
+            $stats->inc('missing');
+            $warnings->add( 'missing', $entry );
+            next;
+        }
+
+        if ( $lang_entries_ref->{$entry} eq '' ) {
+            $stats->inc('empty');
+            $warnings->add( 'empty', $entry );
+        }
+    }
+
+    foreach my $entry ( keys %{$lang_entries_ref} ) {
+        unless ( defined $entries_ref->{$entry} ) {
+            $stats->inc('unused');
+            $warnings->add( 'unused', $entry );
+        }
+    }
+
+    foreach my $entry ( keys %{$lang_entries_ref} ) {
+        if (   $lang_entries_ref->{$entry}
+            && $english_entries_ref->{$entry}
+            && $lang_entries_ref->{$entry} eq $english_entries_ref->{$entry} )
+        {
+            $stats->inc('same');
+            $warnings->add( 'same', $entry );
+        }
+    }
+
+    my $hudson_regex = qr/Hudson/;
+
+    foreach my $entry ( keys %{$lang_entries_ref} ) {
+        if (   $lang_entries_ref->{$entry}
+            && $lang_entries_ref->{$entry} =~ $hudson_regex )
+        {
+            $warnings->add( 'nonjenkins',
+                ( "$entry -> " . $lang_entries_ref->{$entry} ) );
+            $stats->inc('nojenkins');
+        }
+    }
+
+    $warnings->summary($curr_lang_file);
+
+    # write new keys in our file adding the English translation as a reference
+    if ( $processor->is_add and $warnings->has_missing ) {
+        print_license( $curr_lang_file, read_license($DATA_START) )
+            unless ( -f $curr_lang_file );
+        open( my $out, '>>', $curr_lang_file )
+            or die "Cannot write to $curr_lang_file: $!\n";
+
+        foreach my $entry ( keys %{$entries_ref} ) {
+            unless ( exists( $lang_entries_ref->{$entry} ) ) {
+
+                unless ( $lang_entries_ref->{$entry} ) {
+                    my @todo = ( $entry, '=---TranslateMe ' );
+                    push( @todo, $processor->get_counter )
+                        if ( $processor->use_counter );
+                    push( @todo, '--- ' );
+
+                    if ( $english_entries_ref->{$entry} ) {
+                        push( @todo, $english_entries_ref->{$entry} );
+                    }
+                    else {
+                        push( @todo, $entry );
+                    }
+
+                    print $out ( join( '', @todo ) ), "\n";
+                    $processor->inc if ( $processor->use_counter );
+                }
+            }
+        }
+        close($out);
+    }
+
+    # write new keys in our file adding the English translation as a reference
+    if ( $processor->is_remove and $warnings->has_unused ) {
+        my $removed = remove_unused(
+            $curr_lang_file,
+            Set::Tiny->new( keys( %{$entries_ref} ) ),
+            read_license($DATA_START)
+        );
+        print "Removed $removed keys\n";
+    }
+
+}
+
+sub read_license {
+    my $start = shift;
+    seek DATA, $start, 0;
+    my @license = <DATA>;
+    return \@license;
+}
+
+=pod
+
+=head1 NAME
+
+jtt - CLI to help internationalization for Jenkins
+
+=head1 USAGE
+
+  jtt --lang=xx
+
+  options:
+    --dir=directory    -> source folder for searching files, optional
+    --help             -> print this help message and exits
+    --man              -> provides this CLI manpage and exits
+    --lang=xx          -> language code to use
+    --add              -> optional, generate new files and add new keys to existing
+                          files if present
+    --remove           -> optional, remove unused key/value pair for existing files
+                          if present
+    --counter          -> optional, to each translated key, unique value is added
+                          to easily identify match missing translation with value
+                          in source code if present
+    --target=directory -> optional, target directory for writing files
+    --debug            -> optional, print debugging messages to STDOUT when they
+                          are available
+
+=head1 OPTIONS
+
+C<--lang> is mandatory and it has to be different to English. If it is the only
+option provided, all files in the provided language code will be analyzed and
+a report will be provided at the end of it, without modifying a single
+translation file.
+
+C<--dir> and C<--target> are optional and the default values for each one is
+the current directory. This probably the best configuration if you're going
+to use a Git repository to support the changes.
+
+Some examples:
+
+=over
+
+=item *
+
+Look for Spanish files with incomplete keys in the current directory:
+
+  jtt --lang=es
+
+=item *
+
+Remove all orphaned keys from German files which are in the current directory:
+
+  jtt --lang=de --remove .
+
+=back
+
+=head1 DESCRIPTION
+
+CLI to generate missing translation keys and missing properties files and to
+remove unused keys.
+
+=over
+
+=item 1.
+
+It recursively looks for files in a folder, and analyzes them to extract the
+keys being used in the application.
+
+=item 2.
+
+If C<--add>, it generates the appropriate file for the desired language and
+adds these keys to it, adding the English text as a reference. If the
+properties file already exists the script update it with the new keys.
+
+=item 3.
+
+When C<--remove> and there are unused keys in our file, the script removes
+them.
+
+=item 4.
+
+If an editor is passed as argument, the script edits each modified file
+after adding new keys.
+
+=back
+
+Note, while the migration to Jenkins this file will report the keys which
+should point to Jenkins instead of the old name.
+
+=head1 AUTHOR
+
+=over
+
+=item *
+
+Original C<translation-tool.pl>: Manuel Carrasco.
+
+=item *
+
+Fork to C<jtt>: Alceu Rodrigues de Freitas Junior.
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022 of Alceu Rodrigues de Freitas Junior,
+E<lt>arfreitas@cpan.orgE<gt>.
+
+This file is part of Jenkins Translation Tool project.
+
+Jenkins Translation Tool is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by the
+Free Software Foundation, either version 3 of the License, or (at your option)
+any later version.
+
+Jenkins Translation Tool is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+Jenkins Translation Tool. If not, see (http://www.gnu.org/licenses/).
+
+The original translation-tool.pl script was licensed through the MIT License,
+copyright (c) 2004-, Kohsuke Kawaguchi, Sun Microsystems, Inc., and a number
+of other of contributors. Translations files generated by the Jenkins
+Translation Tool CLI are distributed with the same MIT License.
+
+=cut
+
+__DATA__
+ The MIT License
+
+ Copyright (c) 2004-, Kohsuke Kawaguchi, Sun Microsystems, Inc., and a number
+ of other of contributors
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.

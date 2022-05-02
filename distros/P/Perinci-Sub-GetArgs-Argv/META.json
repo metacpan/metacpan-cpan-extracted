@@ -31,7 +31,7 @@
             "Test::Rinci" : "0.151"
          },
          "x_spec" : {
-            "Rinci" : "v1.1.100"
+            "Rinci" : "v1.1.101"
          }
       },
       "runtime" : {
@@ -80,7 +80,7 @@
    "provides" : {
       "Perinci::Sub::GetArgs::Argv" : {
          "file" : "lib/Perinci/Sub/GetArgs/Argv.pm",
-         "version" : "0.848"
+         "version" : "0.849"
       }
    },
    "release_status" : "stable",
@@ -95,7 +95,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-Sub-GetArgs-Argv"
       }
    },
-   "version" : "0.848",
+   "version" : "0.849",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

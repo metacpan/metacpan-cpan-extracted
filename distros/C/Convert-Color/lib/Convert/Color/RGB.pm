@@ -1,19 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2011 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
-package Convert::Color::RGB;
+package Convert::Color::RGB 0.12;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Convert::Color );
 
 __PACKAGE__->register_color_space( 'rgb' );
 
 use Carp;
-
-our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -23,18 +21,18 @@ C<Convert::Color::RGB> - a color value represented as red/green/blue
 
 Directly:
 
- use Convert::Color::RGB;
+   use Convert::Color::RGB;
 
- my $red = Convert::Color::RGB->new( 1, 0, 0 );
+   my $red = Convert::Color::RGB->new( 1, 0, 0 );
 
- # Can also parse strings
- my $pink = Convert::Color::RGB->new( '1,0.7,0.7' );
+   # Can also parse strings
+   my $pink = Convert::Color::RGB->new( '1,0.7,0.7' );
 
 Via L<Convert::Color>:
 
- use Convert::Color;
+   use Convert::Color;
 
- my $cyan = Convert::Color->new( 'rgb:0,1,1' );
+   my $cyan = Convert::Color->new( 'rgb:0,1,1' );
 
 =head1 DESCRIPTION
 
@@ -50,18 +48,20 @@ and L<Convert::Color::RGB16>.
 
 =cut
 
-=head2 $color = Convert::Color::RGB->new( $red, $green, $blue )
+=head2 new
+
+   $color = Convert::Color::RGB->new( $red, $green, $blue )
 
 Returns a new object to represent the set of values given. These values should
 be floating-point numbers between 0 and 1. Values outside of this range will
 be clamped.
 
-=head2 $color = Convert::Color::RGB->new( $string )
+   $color = Convert::Color::RGB->new( $string )
 
 Parses C<$string> for values, and construct a new object similar to the above
 three-argument form. The string should be in the form
 
- red,green,blue
+   red,green,blue
 
 containing the three floating-point values in decimal notation.
 
@@ -90,7 +90,10 @@ sub new
    }
 
    # Clamp to the range [0,1]
-   map { $_ < 0 and $_ = 0; $_ > 1 and $_ = 1 } ( $r, $g, $b );
+   for ( $r, $g, $b ) {
+      $_ = 0 if $_ < 0;
+      $_ = 1 if $_ > 1;
+   }
 
    return bless [ $r, $g, $b ], $class;
 }
@@ -99,11 +102,17 @@ sub new
 
 =cut
 
-=head2 $r = $color->red
+=head2 red
 
-=head2 $g = $color->green
+   $r = $color->red
 
-=head2 $b = $color->blue
+=head2 green
+
+   $g = $color->green
+
+=head2 blue
+
+   $b = $color->blue
 
 Accessors for the three components of the color.
 
@@ -114,7 +123,9 @@ sub red   { shift->[0] }
 sub green { shift->[1] }
 sub blue  { shift->[2] }
 
-=head2 ( $red, $green, $blue ) = $color->rgb
+=head2 rgb
+
+   ( $red, $green, $blue ) = $color->rgb
 
 Returns the individual red, green and blue color components of the color
 value.
@@ -133,7 +144,9 @@ sub new_rgb
    return $class->new( @_ );
 }
 
-=head2 $mix = $color->alpha_blend( $other, [ $alpha ] )
+=head2 alpha_blend
+
+   $mix = $color->alpha_blend( $other, [ $alpha ] )
 
 Return a new color which is a blended combination of the two passed into it.
 The optional C<$alpha> parameter defines the mix ratio between the two colors,
@@ -164,7 +177,9 @@ sub alpha_blend
    );
 }
 
-=head2 $measure = $color->dst_rgb( $other )
+=head2 dst_rgb
+
+   $measure = $color->dst_rgb( $other )
 
 Return a measure of the distance between the two colors. This is the
 unweighted Euclidean distance of the three color components. Two identical
@@ -181,7 +196,9 @@ sub dst_rgb
    return sqrt( $self->dst_rgb_cheap( $other ) ) / sqrt(3);
 }
 
-=head2 $measure = $color->dst_rgb_cheap( $other )
+=head2 dst_rgb_cheap
+
+   $measure = $color->dst_rgb_cheap( $other )
 
 Return a measure of the distance between the two colors. This is the sum of
 the squares of the differences of each of the color components. This is part
@@ -215,12 +232,12 @@ sub dst_rgb_cheap
 The C<alpha_blend> method can be used to generate a smooth gradient between
 two colours.
 
- use Convert::Color;
- 
- my $blue = Convert::Color->new("vga:blue");
- my $cyan = Convert::Color->new("vga:cyan");
- 
- say $blue->alpha_blend( $cyan, $_/10 )->as_rgb8->hex for 0 .. 10
+   use Convert::Color;
+
+   my $blue = Convert::Color->new("vga:blue");
+   my $cyan = Convert::Color->new("vga:cyan");
+
+   say $blue->alpha_blend( $cyan, $_/10 )->as_rgb8->hex for 0 .. 10
 
 =head1 SEE ALSO
 

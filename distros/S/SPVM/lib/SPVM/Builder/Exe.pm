@@ -81,17 +81,6 @@ sub output_file {
   }
 }
 
-sub optimize {
-  my $self = shift;
-  if (@_) {
-    $self->{optimize} = $_[0];
-    return $self;
-  }
-  else {
-    return $self->{optimize};
-  }
-}
-
 sub quiet {
   my $self = shift;
   if (@_) {
@@ -133,29 +122,6 @@ sub config_file {
   }
   else {
     return $self->{config_file};
-  }
-}
-
-sub dynamic_lib {
-  my $self = shift;
-  if (@_) {
-    $self->{dynamic_lib} = $_[0];
-    return $self;
-  }
-  else {
-    return $self->{dynamic_lib};
-  }
-}
-
-
-sub static_lib {
-  my $self = shift;
-  if (@_) {
-    $self->{static_lib} = $_[0];
-    return $self;
-  }
-  else {
-    return $self->{static_lib};
   }
 }
 
@@ -209,7 +175,7 @@ sub new {
   # Config
   my $config;
   if (defined $config_file) {
-    $config = SPVM::Builder::Util::load_config($config_file);
+    $config = SPVM::Builder::Config::Exe->load_config($config_file);
     unless ($config->is_exe) {
       confess "Config file \"$config_file\" is not the config to create the executable file";
     }
@@ -260,15 +226,19 @@ sub build_exe_file {
   # Compile SPVM core source files
   my $spvm_core_objects = $self->compile_spvm_core_sources;
   push @$object_files, @$spvm_core_objects;
-
-  # Create precompile C source_files
-  $self->create_precompile_sources;
   
-  # Compile precompile C source_files
-  my $precompile_object_files = $self->compile_precompile_sources;
-  push @$object_files, @$precompile_object_files;
+  my $no_precompile = $config->no_precompile;
 
-  # Compile precompile C source_files
+  unless ($no_precompile) {
+    # Create precompile C source_files
+    $self->create_precompile_sources;
+    
+    # Compile precompile C source_files
+    my $precompile_object_files = $self->compile_precompile_sources;
+    push @$object_files, @$precompile_object_files;
+  }
+
+  # Compile native source files
   my $native_object_files = $self->compile_native_sources;
   push @$object_files, @$native_object_files;
   
@@ -293,14 +263,10 @@ sub create_source_file {
   my $output_file = $opt->{output_file};
   my $create_cb = $opt->{create_cb};
   
-  my $need_generate_input_files = [@$input_files];
-  my $config_file = $self->config_file;
-  if (defined $config_file && -f $config_file) {
-    push @$need_generate_input_files, $config_file;
-  }
+  my $config_dependent_files = $config->dependent_files;
+  my $need_generate_input_files = [@$input_files, @$config_dependent_files];
   my $need_generate = SPVM::Builder::Util::need_generate({
-    global_force => $self->force,
-    config_force => $config->force,
+    force => $self->force || $config->force,
     output_file => $output_file,
     input_files => $need_generate_input_files,
   });
@@ -316,10 +282,11 @@ sub compile_source_file {
   # Config
   my $config = $self->config;
   
-  # Optimize
-  my $optimize = $self->optimize;
-  if (defined $optimize) {
-    $config->optimize($optimize);
+  my $opt_ccflags = $opt->{ccflags};
+  $opt_ccflags = [] unless defined $opt_ccflags;
+  
+  if (@$opt_ccflags) {
+    $config->add_ccflags(@$opt_ccflags);
   }
 
   my $source_file = $opt->{source_file};
@@ -329,14 +296,10 @@ sub compile_source_file {
     $depend_files = [];
   }
   
-  my $need_generate_input_files = [$source_file, @$depend_files];
-  my $config_file = $self->config_file;
-  if (defined $config_file && -f $config_file) {
-    push @$need_generate_input_files, $config_file;
-  }
+  my $config_dependent_files = $config->dependent_files;
+  my $need_generate_input_files = [$source_file, @$depend_files, @$config_dependent_files];
   my $need_generate = SPVM::Builder::Util::need_generate({
-    global_force => $self->force,
-    config_force => $config->force,
+    force => $self->force || $config->force,
     output_file => $output_file,
     input_files => $need_generate_input_files,
   });
@@ -371,6 +334,9 @@ sub compile_source_file {
 sub create_bootstrap_header_source {
   my ($self) = @_;
 
+  # Config
+  my $config = $self->config;
+
   # Builder
   my $builder = $self->builder;
 
@@ -379,6 +345,7 @@ sub create_bootstrap_header_source {
 
   # Class names
   my $class_names = $self->builder->get_class_names;
+  
   my $class_names_without_anon = [grep { $_ !~ /::anon::/ } @$class_names];
 
   my $source = '';
@@ -394,19 +361,32 @@ sub create_bootstrap_header_source {
 #include "spvm_native.h"
 
 EOS
-    
-  $source .= "// precompile functions declaration\n";
-  for my $class_name (@$class_names) {
-    my $precompile_method_names = $builder->get_method_names($class_name, 'precompile');
-    for my $method_name (@$precompile_method_names) {
-      my $class_cname = $class_name;
-      $class_cname =~ s/::/__/g;
-      $source .= <<"EOS";
+  
+  my $no_precompile = $config->no_precompile;
+  
+  unless ($no_precompile) {
+    $source .= "// precompile functions declaration\n";
+    for my $class_name (@$class_names) {
+      my $precompile_method_names = $builder->get_method_names($class_name, 'precompile');
+      for my $method_name (@$precompile_method_names) {
+        my $class_cname = $class_name;
+        $class_cname =~ s/::/__/g;
+        $source .= <<"EOS";
 int32_t SPVMPRECOMPILE__${class_cname}__$method_name(SPVM_ENV* env, SPVM_VALUE* stack);
 EOS
+      }
     }
-  }
 
+    $source .= "static int32_t* SPVM_BOOTSTRAP_create_bootstrap_set_precompile_method_addresses(SPVM_ENV* env);\n";
+
+    $source .= <<"EOS";
+static int32_t* SPVM_BOOTSTRAP_set_precompile_method_address(SPVM_ENV* env, const char* class_name, const char* method_name, void* precompile_address) {
+  int32_t method_id = env->api->runtime->get_method_id_by_name(env->runtime, class_name, method_name);
+  env->api->runtime->set_precompile_method_address(env->runtime, method_id, precompile_address);
+}
+EOS
+  }
+  
   $source .= "// native functions declaration\n";
   for my $class_cname (@$class_names_without_anon) {
     my $native_method_names = $builder->get_method_names($class_cname, 'native');
@@ -419,8 +399,6 @@ EOS
     }
   }
 
-  $source .= "static int32_t* SPVM_BOOTSTRAP_create_bootstrap_set_precompile_method_addresses(SPVM_ENV* env);\n";
-
   $source .= "static int32_t* SPVM_BOOTSTRAP_create_bootstrap_set_native_method_addresses(SPVM_ENV* env);\n";
 
   $source .= "static int32_t* SPVM_BOOTSTRAP_get_spvm_32bit_codes();\n";
@@ -429,13 +407,6 @@ EOS
 static int32_t* SPVM_BOOTSTRAP_set_native_method_address(SPVM_ENV* env, const char* class_name, const char* method_name, void* native_address) {
   int32_t method_id = env->api->runtime->get_method_id_by_name(env->runtime, class_name, method_name);
   env->api->runtime->set_native_method_address(env->runtime, method_id, native_address);
-}
-EOS
-
-  $source .= <<"EOS";
-static int32_t* SPVM_BOOTSTRAP_set_precompile_method_address(SPVM_ENV* env, const char* class_name, const char* method_name, void* precompile_address) {
-  int32_t method_id = env->api->runtime->get_method_id_by_name(env->runtime, class_name, method_name);
-  env->api->runtime->set_precompile_method_address(env->runtime, method_id, precompile_address);
 }
 EOS
 
@@ -545,6 +516,9 @@ EOS
 sub create_bootstrap_new_env_prepared_func_source {
   my ($self) = @_;
 
+  # Config
+  my $config = $self->config;
+
   # Builder
   my $builder = $self->builder;
 
@@ -557,11 +531,17 @@ sub create_bootstrap_new_env_prepared_func_source {
 
   my $source = '';
   
+  my $no_precompile = $config->no_precompile;
+  
+  my $set_precompile_method_addresses_source = '';
+  unless ($no_precompile) {
+    $set_precompile_method_addresses_source = "SPVM_BOOTSTRAP_create_bootstrap_set_precompile_method_addresses(env);";
+  }
   $source .= <<"EOS";
 SPVM_ENV* SPVM_NATIVE_new_env_prepared() {
 EOS
 
-  $source .= <<'EOS';
+  $source .= <<"EOS";
 
   // Create env
   SPVM_ENV* env = SPVM_NATIVE_new_env_raw();
@@ -588,7 +568,7 @@ EOS
   env->init_env(env);
 
   // Set precompile method addresses
-  SPVM_BOOTSTRAP_create_bootstrap_set_precompile_method_addresses(env);
+  $set_precompile_method_addresses_source
   
   // Set native method addresses
   SPVM_BOOTSTRAP_create_bootstrap_set_native_method_addresses(env);
@@ -667,6 +647,9 @@ EOS
 sub create_bootstrap_source {
   my ($self) = @_;
   
+  # Config
+  my $config = $self->config;
+
   # Builder
   my $builder = $self->builder;
   
@@ -690,6 +673,8 @@ sub create_bootstrap_source {
   my $bootstrap_base = $target_perl_class_name;
   $bootstrap_base =~ s|::|/|g;
   my $bootstrap_source_file = "$build_src_dir/$bootstrap_base.boot.c";
+  
+  my $no_precompile = $config->no_precompile;
 
   # Source creating callback
   my $create_cb = sub {
@@ -706,7 +691,9 @@ sub create_bootstrap_source {
     $bootstrap_source .= $self->create_bootstrap_new_env_prepared_func_source;
 
     # Set precompile method addresses function
-    $bootstrap_source .= $self->create_bootstrap_set_precompile_method_addresses_func_source;
+    unless ($no_precompile) {
+      $bootstrap_source .= $self->create_bootstrap_set_precompile_method_addresses_func_source;
+    }
 
     # Set native method addresses function
     $bootstrap_source .= $self->create_bootstrap_set_native_method_addresses_func_source;
@@ -758,6 +745,9 @@ sub compile_bootstrap_source {
 sub compile_spvm_core_sources {
   my ($self) = @_;
 
+  # Config
+  my $config = $self->config;
+
   # SPVM::Builder::Config directory
   my $spvm_builder_config_dir = $INC{"SPVM/Builder/Config.pm"};
 
@@ -772,8 +762,14 @@ sub compile_spvm_core_sources {
   my $spvm_core_header_dir = "$spvm_builder_dir/include";
   
   # SPVM runtime source files
-  my $spvm_runtime_src_base_names = SPVM::Builder::Util::get_spvm_core_source_file_names();
-
+  my $no_compiler_api = $config->no_compiler_api;
+  my $spvm_runtime_src_base_names;
+  if ($no_compiler_api) {
+    $spvm_runtime_src_base_names = SPVM::Builder::Util::get_spvm_core_common_source_file_names();
+  }
+  else {
+    $spvm_runtime_src_base_names = SPVM::Builder::Util::get_spvm_core_source_file_names();
+  }
   my @spvm_core_source_files = map { "$spvm_core_source_dir/$_" } @$spvm_runtime_src_base_names;
 
   # Object dir
@@ -787,8 +783,15 @@ sub compile_spvm_core_sources {
     my $object_file = "$object_dir/" . basename($src_file);
     $object_file =~ s/\.c$//;
     $object_file .= '.o';
+
+    my $no_compiler_api = $config->no_compiler_api;
+    my $ccflags = [];
+    if ($no_compiler_api) {
+      push @$ccflags, '-DSPVM_NO_COMPILER_API';
+    }
     
     my $object_file_info = $self->compile_source_file({
+      ccflags => $ccflags,
       source_file => $src_file,
       output_file => $object_file,
     });
@@ -849,7 +852,6 @@ sub compile_precompile_sources {
     category => 'precompile',
     builder => $builder,
     quiet => $self->quiet,
-    optimize => $self->optimize,
     force => $self->force,
   );
   
@@ -894,7 +896,6 @@ sub compile_native_sources {
     category => 'native',
     builder => $builder,
     quiet => $self->quiet,
-    optimize => $self->optimize,
     force => $self->force,
   );
   
@@ -982,14 +983,10 @@ sub link {
     libpth => '',
   };
   
-  my $need_generate_input_files = [@$object_file_infos];
-  my $config_file = $self->config_file;
-  if (defined $config_file && -f $config_file) {
-    push @$need_generate_input_files, $config_file;
-  }
+  my $config_dependent_files = $config->dependent_files;
+  my $need_generate_input_files = [@$object_file_infos, @$config_dependent_files];
   my $need_generate = SPVM::Builder::Util::need_generate({
-    global_force => $self->force,
-    config_force => $config->force,
+    force => $self->force || $config->force,
     output_file => $output_file,
     input_files => $need_generate_input_files,
   });
@@ -1017,8 +1014,8 @@ sub link {
     my $link_info_object_files = [map { $_->to_string } @$link_info_object_file_infos];
     my $link_info_ldflags_str = join(' ', @$link_info_ldflags);
     
-    my $dynamic_lib = $self->dynamic_lib;
-    my $static_lib = $self->static_lib;
+    my $dynamic_lib = $config->dynamic_lib;
+    my $static_lib = $config->static_lib;
     
     # CBuilder
     my $cbuilder = ExtUtils::CBuilder->new(quiet => $self->quiet, config => $cbuilder_config);

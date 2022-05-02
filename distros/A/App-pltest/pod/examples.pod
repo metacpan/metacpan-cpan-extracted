@@ -1,0 +1,917 @@
+=head1 NAME
+
+pltest-examples - Perl One-Liner Examples
+
+=head1 EXAMPLES
+
+I<To steal ideas from one person is plagiarism.  To steal from many is research. ;-)>
+
+Here's a wide variety of examples, many solving real-life problems.  Often you
+can copy & paste them as-is.  Or you need to make minor changes, e.g. to adapt
+them to your search expression.  Many of these examples started out quite
+small, illustrating the power of pltest.  But in order to be generally useful,
+they have been extended to cope with border cases.  See L<canned
+commands|canned-commands> for how you can make your favourite ones easier to
+use.
+
+Only some of these are original.  Many have been adapted from the various Perl
+one-liner webpages
+(L<Tom Christiansen|http://softpanorama.org/Scripting/Perlorama/One-liners/tom_christiansen_one-liners.shtml>,
+L<Peteris Krumins|https://nostarch.com/perloneliners>,
+L<CatOnMat|https://catonmat.net/introduction-to-perl-one-liners>,
+L<joyrexus|https://gist.github.com/joyrexus/7328094>,
+L<Richard Socher|http://kiswebformations.wordpress.com/2015/04/04/perl-scripts-and-one-liners/>,
+L<eduonix|https://blog.eduonix.com/perl-programming/learn-one-liners-perl-programming/>,
+L<IBM 101|http://calmar.ws/linux/perl/One-liners101.html>,
+L<IBM 102|https://www.ibm.com/developerworks/library/l-p102/>,
+L<Oracle|https://blogs.oracle.com/linux/the-top-10-tricks-of-perl-one-liners-v2>,
+L<PerlMonks|https://perlmonks.org/?node_id=502261>,
+L<perloneliner|https://twitter.com/perloneliner>)
+or videos
+(L<Walt Mankowski|https://youtu.be/IGe0GnlIWq4>,
+L<Techalicious|https://youtu.be/gbZAABq4uZk?t=284>,
+L<David Oswald|https://youtu.be/euj54cqpGOE>).
+This is no attempt to appropriate ownership, just to show how things are even
+easier and more concise with pltest.
+
+=head2 Dealing with Files
+
+=over
+
+=item Heads ...
+
+I<People say the back of my head looks really nice -- but I don't see it. :-)>
+
+If you want just I<n>, e.g. 10, lines from the head of each file, use the
+optional number argument to B<-p>, along with B<-r> to reset the count.  The
+program can be empty, but must be present, unless you're reading from stdin:
+
+    pltest -rp10 '' file*
+
+If you want the head up to a regexp, use the flip-flop operator, starting with
+line number 1.  Use the print-if-true B<-P> loop option, again with B<-r> to
+reset the count:
+
+    pltest -rP '1../last/' file*
+
+You can combine the two, if you want at most I<n> lines, e.g. 10:
+
+    pltest -rP10 '1../last/' file*
+
+=item ... or Tails?
+
+I<What has a head, a tail, but no legs?  B< >A penny. :-)>
+
+If you want a bigger number of last lines, you need to stuff them in a list;
+not really worth it.  But if you want just 1 last line from each file, the
+end-of-file B<-e> code (no need to quote, as it has no special characters) can
+C<E(cho)> it for you, capitalized so as to not add another newline (yes, Perl
+is case sensitive):
+
+    pltest -e Echo '' file*
+
+If you want the tail from a line-number (e.g. 99) or a regexp, use the
+flip-flop operator, starting with your regexp and going till each end-of-file:
+
+    pltest -P '99..eof' file*
+    pltest -P '/first/..eof' file*
+
+You can even get head and tail (which in programming logic translates to print
+if in 1st C<or> 2nd range), if last line of head comes before 1st line of tail
+(or actually any number of such disjoint ranges):
+
+    pltest -rP '1../last/ or /first/..eof' file*
+
+=item Remove Trailing Whitespace in Each File
+
+This print-loops (B<-p>) over each file, replacing it (B<-i>) with the
+modified output.  Line ends are stripped on reading and added on printing
+(B<-l>), because they are also whitespace (C<\s>).  At each end of line,
+substitute one or more spaces of any kind (incl. DOS newlines) with nothing:
+
+    pltest -pli 's/\s+$//' file*
+
+=item Tabify/Untabify Each File
+
+This print-loops (B<-p>) over each file, replacing it (B<-i>) with the
+modified output.  At beginning of line and after each tab, 8 spaces or less
+than 8 followed by a tab are converted to a tab:
+
+    pltest -pi '1 while s/(?:^|\t)\K(?: {1,7}\t| {8})/\t/' file*
+
+To go the other way, subtract the tab-preceding length modulo 8, to get the
+number of spaces to replace with:
+
+    pltest -pi '1 while s/^([^\t\n]*)\K\t/" " x (8 - length($1) % 8)/e' file*
+
+Fans of half-width tabs make that:
+
+    pltest -pi '1 while s/(?:^|\t)\K(?: {1,3}\t| {4})/\t/' file*
+    pltest -pi '1 while s/^([^\t\n]*)\K\t/" " x (4 - length($1) % 4)/e' file*
+
+=item Print Only 1st Occurrence of Each Line
+
+I<Poets create worlds through a minimal of words. --B< >Kim Hilliker |/|>
+
+This counts repetitions of lines in a hash.  Print only when the expression is
+true (B<-P>), i.e. the count was 0:
+
+    pltest -P '!$a{$_}++' file*
+
+If you want this per file, you must empty the hash in the end-of-file B<-e>
+code:
+
+    pltest -Pe '%a = ()' '!$a{$_}++' file*
+
+=item Remove Empty Lines
+
+Or, actually the opposite, printing back to the same files (B<-Pi>) all lines
+containing non-whitespace C<\S>:
+
+    pltest -Pi '/\S/' file*
+
+=item Move a Line Further Down in Each File
+
+Assume we have lines matching "from" followed by lines matching "to".  The
+former shall move after the latter.  This loops over each file, replacing it
+with the modified output.  The flip-flop operator becomes true when matching
+the 1st regexp.  Capture something in there to easily recognize it's the
+first, keep the line in a variable and empty C<$_>.  When C<$1> is again true,
+it must be the last matching line.  Append the keep variable to it.
+
+    pltest -pi 'if( /(f)rom/.../(t)o/ ) {
+            if( $1 eq "f" ) { $k = $_; $_ = "" } elsif( $1 ) { $_ .= $k }
+        }' file*
+
+=item Rename a File Depending on Contents
+
+This reads each file in an B<-n> loop.  When it finds the C<package>
+declaration, which gives the logical name of this file, it replaces
+double-colons with slashes.  It renames the file to the result.  The C<last>
+statement then makes this the last line read of the current file, continuing
+with the next file:
+
+    pltest -n 'if( s/^\s*package\s+([^\s;]+).*/$1/s ) {
+            s!::!/!g;
+            rename $ARGV, "$_.pm" or warn "$ARGV -> $_.pm: $!\n";
+            last;
+        }' *.pm
+
+This assumes all files are at the root of the destination directories.  If not
+you must add the common part of the target directories before C<$_>.
+
+On Windows this won't quite work, because that locks the file while reading.
+So there you must add C<close ARGV;> (or C<close A;>) before the C<rename>.
+
+For Java, it's a bit more complicated, because the full name is split into a
+C<package> followed by a C<class> or similar statement.  Join them when we
+find the latter:
+
+    pltest -n 'if( /^\s*package\s+([^\s;]+)/ ) {
+            $d = $1 =~ tr+.+/+r;
+        } elsif( /^\s*(?:(?:public|private|protected|abstract|sealed|final)\s+)*(?:class|interface|enum|record)\s+([^\s;]+)/ ) {
+            rename $ARGV, "$d/$1.java" or warn "$ARGV -> $d/$1.java: $!\n";
+            last;
+        }' *.java
+
+=item Delete Matching Files, Except Last One
+
+If you have many files, which sort chronologically by name, and you want to
+keep only the last one, it can be quite painful to formulate Shell patterns.
+So check on each iteration of the B<-o> loop, if the index C<$ARGIND> (or
+C<$I>) is less than the last, before unlinking (deleting).  If you want to test
+it first, replace C<unlink> with C<e(cho)>:
+
+    pltest -o 'unlink if $ARGIND < $#ARGV' file*
+
+If your resulting list is too long for the Shell, let Perl do it.  Beware that
+the Shell has a clever ordering of files, while Perl does it purely lexically!
+In the B<-A> code the result is assigned to C<@A(RGV)>, as though it had come
+from the command line.  This list is then popped (shortened) in B<-B> begin
+code, instead of checking each time.  Since the programs don't contain special
+characters, you don't even need to quote them:
+
+    pltest -oA '<file*>' -B pop unlink
+
+You can exclude files by any other criterion as well:
+
+    pltest -oA 'grep !/keep-me/, <file*>' unlink
+
+=back
+
+=head2 File Statistics
+
+I<42% of statistics are made up! :-)>
+
+=over
+
+=item Count Files per Suffix
+
+Find and pltest both use the B<-0> option to allow funny filenames, including
+newlines.  Sum up encountered suffixes in sort-numerically-at-end hash
+C<%N(UMBER)>:
+
+    find -type f -print0 |
+        pltest -0ln 'm@[^/.](\.[^/.]*)?$@;
+            ++$NUMBER{$1 // "none"}'
+
+=item Count Files per Directory per Suffix
+
+I<There are three types of people: those who can count and those who can't. (-:>
+
+Match to first or last C</> and from last dot following something, i.e. not
+just a dot-file.  Store sub-hashes in sort-by-key-and-stringify-at-end hash
+C<%R(ESULT)>.  So count in a nested hash of directory & suffix:
+
+    find -type f -print0 |
+        pltest -0ln 'm@^(?:\./)?(.+?)/.*?[^/.](\.[^/.]*)?$@;
+            ++$RESULT{$1}{$2 // "none"}'
+
+    find -type f -print0 |
+        pltest -0ln 'm@^(?:\./)?(.+)/.*?[^/.](\.[^/.]*)?$@;
+            ++$RESULT{$1}{$2 // "none"}'
+
+This is the same pivoted, grouping by suffix and counting per directory:
+
+    find -type f -print0 |
+        pltest -0ln 'm@^(?:\./)?(.+)/.*?[^/.](\.[^/.]*)?$@;
+            ++$RESULT{$2 // "none"}{$1}'
+
+This is similar, but stores in sort-by-number-at-end C<%N(UMBER)>.  Therefore
+it sorts by frequency, only secondarily by directory & suffix (pltest sorts
+stably):
+
+    find -type f -print0 |
+        pltest -0ln 'm@^(?:\./)?(.+)/.*?[^/.](\.[^/.]*)?$@;
+            ++$NUMBER{"$1 " . ($2 // "none")}'
+
+The function C<N(umber)> can trim C<%N(UMBER)>, to those entries at least the
+argument (default 2):
+
+    find -type f -print0 |
+        pltest -0lnE Number 'm@^(?:\./)?(.+)/.*?[^/.](\.[^/.]*)?$@;
+            ++$NUMBER{"$1 " . ($2 // "none")}'
+
+    find -type f -print0 |
+        pltest -0lnE 'Number 80' 'm@^(?:\./)?(.+)/.*?[^/.](\.[^/.]*)?$@;
+            ++$NUMBER{"$1 " . ($2 // "none")}'
+
+=item Sum up File-sizes per Suffix
+
+This illustrates a simpler approach: rather than the complicated regexps
+above, let Perl split each filename for us.  Find separates output with a dot
+and -F splits on that.  The C<\\> is to escape one backslash from the Shell.
+No matter how many dots the filename contains, 1st element is the size and
+last is the suffix.  Sum it in C<%N(UMBER)>, which gets sorted numerically at
+the end:
+
+    find -type f -printf "%s.%f\0" |
+        pltest -0lF\\. '$NUMBER{@FIELD > 2 ? ".$FIELD[-1]" : "none"} += $FIELD[0]'
+
+=item Count Files per Date
+
+I<I feel more like I do now than I did a while ago. (-:>
+
+Incredibly, find has no ready-made ISO date, so specify the 3 parts.  If you
+don't want days, just leave out C<-%Td>.  Sum up encountered dates in
+sort-value-numerically-at-end hash C<%N(UMBER)>:
+
+    find -type f -printf "%TY-%Tm-%Td\n" |
+        pltest -ln '++$NUMBER{$_}'
+
+=item Count Files per Date with Rollup
+
+I<Learn sign language!  It's very handy. :-)>
+
+Rollup means, additionally to the previous case, sum up dates with the same
+prefix.  The trick here is to count both for the actual year, month and day,
+as well as replacing once only the day, once also the month with "__", and
+once also the year with "____".  This sorts after numbers and gives a sum for
+all with the same leading numbers.  Use the sort-by-key-and-stringify-at-end
+hash C<%R(ESULT)>:
+
+    find -type f -printf "%TY-%Tm-%Td\n" |
+        pltest -ln 'do { ++$RESULT{$_} }
+            while s/[0-9]+(?=[-_]*$)/"_" x length $&/e'
+
+=back
+
+=head2 Diff Several Inputs by a Unique Key
+
+I<Always remember you're unique, just like everyone else. :-)>
+
+The function C<k(eydiff)> stores the 2nd arg or chomped C<$_> in C<%K(EYDIFF)>
+keyed by 1st arg or C<$1> and the arg counter C<$ARGIND> (or C<$I>).  Its
+sibling C<K(eydiff)> does the same using 1st arg or 0 as an index into
+C<@F(IELD)> for the 1st part of the key.  At the end only the rows differing
+between files are shown.  If you write to a terminal or specify B<--color> the
+difference gets color-highlighted in per-character detail with
+C<Algorithm::Diff>, or in just one red blob without.  There are examples for
+L<how to alias|canned-commands/Shell Aliases> these as canned commands.
+
+=over
+
+=item Diff Several csv, tsv or passwd Files by 1st Field
+
+This assumes comma-less key fields and no newline in any field.  Else you need
+a csv-parser package.  B<-F> implies B<-a>, which implies B<-n> (even using
+older than Perl 5.20, which introduced this idea).  B<-F,> splits each line on
+commas, and C<K(eydiff)> by default takes the 1st field as your unique key:
+
+    pltest -F, Keydiff *.csv
+
+This is similar, but removes the key from the stored value, so it doesn't get
+repeated for each file.  Note how C<k(eydiff)> by default uses C<$1> as a key
+for C<$_>.  Additionally, in a B<-B> begin program, show the filenames one per
+line:
+
+    pltest -nB 'echo for @ARGV' 'keydiff if s/(.+?),//' *.csv
+
+A variant of csv is tsv, with tab as separator.  Tab is C<\t>, which must be
+escaped from the Shell as C<\\t>, either with or without repeated keys:
+
+    pltest -F\\t Keydiff *.tsv
+
+    pltest -n 'keydiff if s/(.+?)\t//' *.tsv
+
+The same, with a colon as separator, if you want to compare passwd files from
+several hosts.  Here we additionally need to ignore commented out lines:
+
+    pltest -F: 'Keydiff unless /^#/' /etc/passwd passwd*
+    pltest -n 'keydiff if s/^([^#].*?)://' /etc/passwd passwd*
+
+=item Diff Several zip Archives by Member Name
+
+I<Growing old you forget to zip up your fly.  Later you forget to unzip your fly. 8-)>
+
+This uses the same mechanism as the csv example.  Addidionally, through the
+C<p(iped)> block, it reads the output of C<unzip -vql> for each archive.  That
+has an almost fixed format, except with extreme member sizes:
+
+    pltest -oB 'echo for @ARGV' 'piped {
+            keydiff if s@.{29,}% .{16} [\da-f]{8}\K  (.+)@@;
+        } "unzip", "-vqq", $_' *.zip
+
+Java .jar, .ear & .war files (which are aliases for .zip), after a clean build
+have many class files with the identical crc, but a different date.  This
+excludes the date.  There are examples for L<how to
+combine|canned-commands/Shell Functions> these variants as Shell functions:
+
+    pltest -o 'piped {
+            keydiff $2 if s@.{16} ([\da-f]{8})  (.+)@$1@;
+        } "unzip", "-vqq", $_' *.zip
+
+Browsers have a bug of not checking for updated css & javascript.  A common
+workaround is to add a hex number to those file names.  In that case use only
+the meaningful part of the filename as a key:
+
+    pltest -o 'piped {
+            keydiff $2
+                if s@.{16} ([\da-f]{8})  (.+?)(?:\.([0-9a-f]{20})(\..[a-z]+))?$@if( $3 ) {
+                    $n = "$2.\$x$4"; "$1  \$x=$3"
+                } else {
+                    $n = $2; $1
+                }@e
+        } "unzip", "-vqq", $_' *.jar
+
+=item Diff Several Tarballs by Member Name
+
+I<Actually I'm very different.  But I rarely find time for it. --B< >von HorvE<0xe1>th :-)>
+
+This is like the zip example.  Alas, tar gives no checksums, so this is less
+reliable.  Exclude directories, by taking only lines not starting with a C<d>.
+Each time a wider owner/group or file size was seen, columns shift right.  So
+reformat the columns, to not show this as a difference:
+
+    pltest -oB 'echo for @ARGV' 'piped {
+            keydiff $4
+                if s!^[^d]\S+ \K(.+?) +(\d+) (.{16}) (.+)!Form "%-20s %10d %s", $1, $2, $3!e;
+        } "tar", "-tvf", $_' *.tar *.tgz *.txz
+
+Same without the date:
+
+    pltest -o 'piped {
+            keydiff $3
+                if s!^[^d]\S+ \K(.+?) +(\d+) .{16} (.+)!Form "%-20s %10d", $1, $2!e;
+        } "tar", "-tvf", $_' *.tar *.tgz *.txz
+
+Tarballs from the internet have a top directory of F<name-version/>, which
+across versions would make every member have a different key.  So exclude the
+1st path element from the key by matching C<[^/]+/> before the last paren
+group:
+
+    pltest -o 'piped {
+            keydiff $4
+                if s!^[^d]\S+ \K(.+?) +(\d+) (.{16}) [^/]+/(.+)!Form "%-20s %10d %s", $1, $2, $3!e;
+        } "tar", "-tvf", $_' *.tar *.tgz *.txz
+
+Again without the date and owner/group, which can also vary:
+
+    pltest -o 'piped {
+           keydiff $2
+                if s!^[^d]\S+ \K.+? +(\d+) .{16} [^/]+/(.+)!Form "%10d", $1!e;
+        } "tar", "-tvf", $_' *.tar *.tgz *.txz
+
+=item Diff ELF Executables by Loaded Dependencies
+
+You get the idea: you can do this for any command that outputs records with a
+unique key.  This one looks at the required libraries and which file they came
+from.  For a change, loop with B<-O> and C<$A(RGV)> to avoid the previous
+examples' confusion between outer C<$_> which were the cli args, and the inner
+one, which were the read lines:
+
+    pltest -O 'piped {
+           keydiff if s/^\t(.+\.so.*) => (.*) \(\w+\)/$2/;
+        } ldd => $ARGV' exe1 exe2 lib*.so
+
+It's even more useful if you use just the basename as a key, because version
+numbers may change:
+
+    pltest -O 'piped {
+           keydiff $2 if s/^\t((.+)\.so.* => .*) \(\w+\)/$1/;
+        } ldd => $ARGV' exe1 exe2 lib*.so
+
+=back
+
+=head2 Looking at Perl
+
+I<A pig looking at an electric socket:  "Oh no, who put you into that wall?" :)>
+
+=over
+
+=item VERSION of a File
+
+Print the first line (B<-P1>) where the substitution was successful.  To avoid
+the hassle of protecting them from (sometimes multiple levels of) Shell
+quoting, there are variables for single C<$q(uote)> & double C<$Q(uote)>:
+
+    pltest -P1 's/.+\bVERSION\s*=\s*[v$Quote$quote]{0,2}([0-9.]+).+/$1/' pltest
+
+For multple files, add the filename, and reset (B<-r>) the B<-P> count for each
+file:
+
+    pltest -rP1 's/.+\bVERSION\s*=\s*[v$Quote$quote]{0,2}([0-9.]+).+/$ARGV: $1/' *.pm
+
+=item Only POD or non-POD
+
+You can extract either parts of a Perl file, with these commands.  Note that
+they don't take the empty line before into account.  If you want that, and
+you're sure the files adheres strictly to this convention, use the option
+B<-00P> instead (not exactly as desired, the empty line comes after things,
+but still, before next thing).  If you want only the 1st POD (e.g. NAME &
+SYNOPSIS) use the option B<-P1> or B<-00P1>:
+
+    pltest -P '/^=\w/../^=cut/' file*
+    pltest -P 'not /^=\w/../^=cut/' file*
+
+=item Count Perl Code
+
+This makes C<__DATA__> or C<__END__> the last inspected line of (unlike in
+C<perl -n>!) each file.  It strips any comment (not quite reliably, also
+inside a string).  Then it strips leading whitespace and adds the remaining
+length to print-at-end C<$R(ESULT)>:
+
+    pltest -ln 'last if /^__(?:DATA|END)__/;
+        s/(?:^|\s+)#.*//s;
+        s/^\s+//;
+        $RESULT += length' *.pm
+
+If you want the count per file, instead of C<$R(ESULT)> use either
+sort-lexically C<$RESULT{$ARGV}> (or C<$R{$A}>) or sort-numerically
+C<$NUMBER{$ARGV}> (or C<$N{$A}>).
+
+=item Content of a Package
+
+Pl's C<e(cho)> can print any item.  Packages are funny hashes, with two colons
+at the end.  Backslashing the variable passes it as a unit to C<Data::Dumper>,
+which gets loaded on demand in this case.  Otherwise all elements would come
+out just separated by spaces:
+
+    pltest 'echo \%List::Util::'
+
+=item Library Loading
+
+Where does perl load from, and what exactly has it loaded?
+
+    pltest 'echo \@INC, \%INC'
+
+Same, for a different Perl version, e.g. if you have F<perl5.28.1> in your
+path.  This time copy C<%INC> before calling C<e(cho)>, which for an array or
+hashref needs to load C<Data::Dumper> on the fly and thus its dependencies:
+
+    pltest -V5.28.1 '$orig = {%INC}; echo \@INC, $orig, \%INC'
+
+=item Configuration
+
+You get C<%Config::Config> loaded on demand and returned by C<C(onfig)>:
+
+    pltest 'echo Config'
+
+It returns a hash reference, from which you can lookup an entry:
+
+    pltest 'echo Config->{sitelib}'
+
+You can also return a sub-hash, of only the keys matching any regexps you
+pass:
+
+    pltest 'echo Config "random", qr/stream/'
+
+=back
+
+=head2 Tables
+
+=over
+
+=item Number Bases
+
+Perl natively handles the 4 different bases common to programming.  If you
+want to list them side by side, simply quadruple them and C<f(orm)> them with
+the 4 corresponding formats.  Note the alternate parameter index syntax "1:":
+
+    pltest 'form "0b%08b  0%1:03o  %1:3d  0x%1:02x"
+            for 0..0xff'
+
+That makes a rather long table.  You can get a better overview with 4 nested
+tables, looping over a preset C<@A(RGV)>:
+
+    pltest -OA '0..0x3f' 'say join "\t",
+        map Form( "0b%08b  0%1:03o  %1:3d  0x%1:02x", $ARGV+$_ ), 0, 0x40, 0x80, 0xc0'
+
+If you prefer to enumerate sideways, it's easier.  C<@A(RGV)> is in the right
+order so we can loop in chunks of 4:
+
+    pltest -O4 -A '0..0xff' 'form join( "\t", map "0b%08b  0%$_:03o  %$_:3d  0x%$_:02x", 1..4 ), @$ARGV'
+
+=item ISO Paper Sizes
+
+I<ISO replaced 8 standards by one.  Now we have 9 standards. :-(>
+
+Since C<@A(RGV)> is initially empty, B<-A> isn't looping.  So we can do other
+things as a side effect, rather than in a separate B<-B>.  Use Perl's lovely
+list assignment to swap and alternately halve the numbers.  Because halving
+happens before echoing, start with double size:
+
+    pltest -oA '($w, $h) = (1189, 1682); 0..10' \
+        'form "A%-2d  %4dmm x %4dmm", $_, ($w, $h) = ($h / 2, $w)'
+
+The table could easily be widened to cover B- & C-formats, by extending each
+list of 2, to a corresponding list of 6, e.g. C<($Aw, $Ah, $Bw, ...)>.  But a
+more algorithmic approach seems better.  The format is tripled (with cheat
+spaces at the beginning).  The main program loops over C<@A(RGV)>, thanks to
+B<-O>, doing the same as above, but on anonymous elements of C<@d>, which got
+set as a side effect of B<-A>:
+
+    pltest -OA '@d = (["A", 1189, 1682], ["B", 1414, 2000], ["C", 1297, 1834]); 0..10' \
+        'form "  %3s  %4dmm x %4dmm" x 3,
+            map +("$$_[0]$ARGV", ($$_[1], $$_[2]) = ($$_[2] / 2, $$_[1])), @d'
+
+=item ANSI Background;Foreground Color Table
+
+I<What color is a mirror?  It depends whom you ask. ;-)>
+
+You get numbers to fill into C<"\e[BGm">, C<"\e[FGm"> or C<"\e[BG;FGm"> to get
+a color and close it with C<"\e[m">.  There are twice twice 8 different colors
+for dim & bright and for background & foreground.  Hence the multiplication of
+escape codes and of values to fill them.
+
+This fills C<@A(RGV)> in B<-A> twice, the 2nd time looping over the 1st list,
+as though it had been given on the command line.  It maps it to the 16-fold
+number format to print the header, swallowing every other number with 0-width.
+Then the main program loops over it pairwise with C<$A(RGV)>, thanks to
+B<-o2>, to print the body.  Numbers are duplicated with C<(N)x2>, once to go
+into the escape sequence, once to be displayed:
+
+    pltest -o2A 1..8 -A '$_, $_+39, $_+8, $_+99' -B 'form "co:   bg;fg"."%4d%.0s"x16, @ARGV;
+        $b = Form "\e[%dm%3d "x16, map +(($_)x2, ($_+60)x2), 30..37' \
+        'form "%2d: %4d;   \e[%2:dm$b\e[m", @$_'
+
+=item Terminal Rulers
+
+If you need a ruler to better count the width of some other output, you can
+print out one of the following.  These are either decimal, by groups of 5 or
+hex by groups of 4 and 8.  The latter two do the same.  But instead of one
+static ruler of length 100 or 256, they repeat and adapt.  Depending on your
+terminal emulator and Shell, the variable C<$COLUMNS> may track the current
+width.  If so, pass it in a single argument to "loop" over with B<-o>, else
+provide the desired width yourself:
+
+    pltest 'say map "$_...:.....", 0..9'
+    pltest 'say map "$_..:...|...:....", 0..9, "A".."F"'
+    pltest -o 'say substr join( "", map "$_...:.....", 0..9 ) x ($_ / 100 + 1), 0, $_' $COLUMNS
+    pltest -o 'say substr join( "", map "$_..:...|...:....", 0..9, "A".."F" ) x ($_ / 256 + 1), 0, $_' $COLUMNS
+
+=back
+
+=head2 Math
+
+=over
+
+=item Minimum and Maximum
+
+The C<List::Util> functions C<min> and C<max> are imported for you:
+
+    pltest 'echo max 1..5'
+
+If you have just several numbers on each line and want their minimums, you can
+autosplit (B<-a>) to C<@F(IELD)>:
+
+    pltest -a 'echo min @FIELD' file*
+
+If on the same you just want the overall minimum, you can use the print-at-end
+variable C<$R(ESULT)>, which you initialise to infinity in a B<-B> begin
+program:
+
+    pltest -aB '$RESULT = "inf"' '$RESULT = min $RESULT, @FIELD' file*
+
+Likewise for overall maximum, you start with negative infinity:
+
+    pltest -aB '$RESULT = "-inf"' '$RESULT = max $RESULT, @FIELD' file*
+
+=item Median, Quartiles, Percentiles
+
+The median is the number where half the list is less and half is greater.
+Similarly the 1st quartile is where 25% are less and the 3rd where 25% are
+greater.  Use a list slice to extract these 3 and a 97th percentile, by
+multiplying the fractional percentage with the list length:
+
+    pltest -A 0..200 'echo @ARGV[map $_*@ARGV, .25, .5, .75, .97]'
+
+If you'd rather have names associated, assign them to hash slice in
+sort-numerically-at-end C<%N(UMBER)>, whose key order must match the
+percentages:
+
+    pltest -A 0..200 '@NUMBER{qw(lower median upper 97.)} = @ARGV[map $_*@ARGV, .25, .5, .75, .97]'
+
+=item Triangular Number, Factorial and Averages
+
+I<80% of people consider themselves to be above average. :-)>
+
+The triangular number is defined as the sum of all numbers from 1 to I<n>, e.g. 1
+to 5.  Factorial is the equivalent for products:
+
+    pltest 'echo sum 1..5;
+        echo product 1..5'
+
+The sum of all list elements divided by the length of the list gives the
+linear average.  Alternately the root mean square can be a fairer average,
+because it accounts for the weights:
+
+    pltest -A 11..200 'echo sum( @ARGV ) / @ARGV;
+         echo sqrt sum( map $_ ** 2, @ARGV ) / @ARGV'
+
+=item Add Pairs or Tuples of Numbers
+
+If you have a list of number pairs and want to add each 1st and each 2nd
+number, C<reduce> is your friend.  Inside it map over the pair elements
+C<0..1>:
+
+    pltest 'echo reduce {
+            [map $a->[$_] + $b->[$_], 0..1]
+        } [1, 11], [2, 12], [3, 13]'
+
+If your list is a variable and is empty the result is C<undef>.  You can
+insert a fallback zero element if you'd rather receive that for an empty list:
+
+    pltest 'echo reduce {
+            [map $a->[$_] + $b->[$_], 0..1]
+        } [0, 0], @list'
+
+The above adds pairs, because we iterate C<0..1>.  This can be generalized to
+tuples by iterating to the length of the 1st array:
+
+    pltest 'echo reduce {
+            [map $a->[$_] + $b->[$_], 0..$#$a]
+        } [1, 11, 21], [2, 12, 22], [3, 13, 23]'
+
+=item Big Math
+
+I<2 + 2 = 5 for extremely large values of 2. :-)>
+
+With the C<bignum> and C<bigrat> modules you can do arbitrary precision and
+semi-symbolic fractional math:
+
+    pltest -Mbignum 'echo 123456789012345678901234567890 * 123456789012345678901234567890'
+
+    pltest -Mbignum 'echo 1.23456789012345678901234567890 * 1.23456789012345678901234567890'
+
+    pltest -Mbigrat 'echo 1/23456789012345678901234567890 * 1/23456789012345678901234567890'
+
+=item Primes
+
+This calculates all primes in a given range, e.g. 2 to 99:
+
+    pltest 'echo grep {
+            $a = $_;
+            all { $a % $_ } 2..$_/2;
+        } 2..99'
+
+=item Fibonacci Numbers
+
+These are, seeded with 1 and 1, all sums of the previous two.  Show all up to
+a given maximum:
+
+    pltest '$a = $_ = 1; echo;
+        while( $_ < $ARGV[0] ) {
+            echo; ($a, $_) = ($_, $a + $_)
+        }' 50000
+
+=item Collatz 3n + 1
+
+I<What is 3n plus n?  B< >Hmm, sounds 4n to me. (-:>
+
+Collatz' unproven & unrefuted conjecture is that the function C<f(n) = if odd:
+3n + 1 else n/2> will always lead to 1, when applied repeatedly to any natural
+number C<n>.  Since C<if odd: 3n + 1> is even, we can skip it and go straight
+to the postsuccessor C<(3n + 1)/2 = (2n + n-1 + 2)/2 = n + int(n/2) + 1>.
+Loop with B<-o> over remaining args in C<$_>.  Having simplified the factor 3,
+inline the function as more efficient bit-ops:
+
+    pltest -o 'echo "---" if $ARGIND; echo;
+        while( $_ > 1 ) {
+            if( $_ & 1 ) { ++($_ += $_ >> 1) } else { $_ >>= 1 }
+            echo;
+        }' 23 27
+
+Add some fancy indent to show the turns, starting far enough right to let the
+snakes wiggle in both directions:
+
+    pltest -o 'echo "---" if $ARGIND;
+        $i = 40;
+        while( 1 ) {
+            form "%*d", $i, $_;
+        last if $_ < 2;
+            if( $_ & 1 ) { ++$i; ++($_ += $_ >> 1) } else { --$i; $_ >>= 1 }
+        }' 15 48 49
+
+Powers of 2 only get halved, so check only as long as the result has more than
+one bit on (C<n & (n - 1)>).  Furthermore this tricky problem alternates
+between the binary & ternary realms which never meet, as no power of three is
+even.  At least we can show both bases, their square and product bases, as
+well as, out of habit, decimal.  For bases use C<bignum> as of Perl 5.30,
+which would also allow astronomical numbers.  Sadly C<f(orm)> can't go beyond
+64 bits, so this is also how you'd get around that.  Also add direction
+indicators:
+
+    pltest -OMbignum -B 'form $f = "%s %26s %16s %14s %12s %9s %8s", " ", @b = qw(2 3 4 6 9 10)' '$ARGV += 0; $b = 2;
+        echo "---" if $ARGIND;
+        while( 1 ) {
+            form $f, qw(\\ / +)[$b], map $ARGV->to_base($_), @b;
+        last unless $ARGV & ($ARGV - 1);
+            if( $b = $ARGV & 1 ) { ++($ARGV += $ARGV >> 1) } else { $ARGV >>= 1 }
+        }' 255 511
+
+This lead to exciting findings L<here|https://perl1liner.sourceforge.io/Collatz/>.
+
+=item Separate Big Numbers with Commas, ...
+
+Loop and print with line-end (B<-opl>) over remaining args in C<$_>.  If
+reading from stdin or files, instead of arguments, use only B<-pltest>.  After a
+decimal dot, insert a comma before each 4th comma-less digit.  Then do the
+same backwards from end or decimal dot, also for Perl style with underscores:
+
+    n='1234567 12345678 123456789 1234.5678 3.141 3.14159265358'
+    pltest -opl '1 while s/[,.]\d{3}\K(?=\d)/,/;
+        1 while s/\d\K(?=\d{3}(?:$|[.,]))/,/' $n
+    pltest -opl '1 while s/[._]\d{3}\K(?=\d)/_/;
+        1 while s/\d\K(?=\d{3}(?:$|[._]))/_/' $n
+
+The same for languages with a decimal comma, using either a dot or a space as spacer:
+
+    n='1234567 12345678 123456789 1234,5678 3,141 3,141592653589'
+    pltest -opl '1 while s/[,.]\d{3}\K(?=\d)/./;
+        1 while s/\d\K(?=\d{3}(?:$|[.,]))/./' $n
+    pltest -opl '1 while s/[, ]\d{3}\K(?=\d)/ /;
+        1 while s/\d\K(?=\d{3}(?:$|[ ,]))/ /' $n
+
+=back
+
+=head2 Miscellaneous
+
+=over
+
+=item Renumber Shell Parameters
+
+If you want to insert another parameter before C<$2>, you have to renumber
+C<$2> - C<$8> respectively to C<$3> - C<$9>.  The same applies to Perl regexp
+match variables.  This matches and replaces them, including optional braces.
+Apply in your editor to the corresponding region:
+
+    echo 'random Shell stuff with $1 - $2 - x${3}yz' |
+        pltest -p 's/\$\{?\K([2-8])\b/$1 + 1/eg'
+
+=item System Errors
+
+Assign Unix error numbers to Perl's magic variable C<$!>, which in string
+context gives the corresponding message.  Instead of explicit individual
+numbers, you could fill C<@A(RGV)> programmatically with C<B<-A> 1..133> (the
+biggest errno on my system):
+
+    pltest -o 'form "%3d %1:s", $! = $_' 1 14 64 111
+
+=item Find Palindromes
+
+This assumes a dictionary on your machine.  It loops over the file printing
+each match B<-P>.  It eliminates trivials like I, mom & dad with a minimum
+length:
+
+    pltest -Pl 'length > 3 and $_ eq reverse' /usr/share/dict/words
+
+=item Generate a Random UUID
+
+I<Lottery: a tax on people who are bad at math. :-)>
+
+This gives a hex number with the characteristic pattern of dashes.  The hex
+format takes only the integral parts of the random numbers.  If you need to
+further process the UUID, you can retrieve it instead of echoing, by giving a
+scalar context, e.g. C<$x = form ...>:
+
+    pltest '$x = "%04x";
+        form "$x$x-$x-$x-$x-$x$x$x", map rand 0x10000, 0..7'
+
+To be RFC 4122 conformant, the 4 version & 2 variant bits need to have
+standard values.  As a different approach, B<-o> "loops" over the one
+parameter in C<$_>.  That's a template to be transformed into a format.  This
+uses C</r> which requires Perl v5.20:
+
+    pltest -o '@u = map rand 0x10000, 0..7;
+        ($u[3] /= 16) |= 0x4000;
+        ($u[4] /= 4) |= 0x8000;
+        form s/x/%04x/gr, @u' xx-x-x-x-xxx
+
+=item Generate a Random Password
+
+I<Why should you trust atoms?  They make up everything. :-)>
+
+Use C<say>, which doesn't put spaces between its arguments.  Generate twelve
+random characters from 33 to 126, i.e. printable Ascii characters.  Note that
+C<rand 94> will always be less than 94 and C<chr> will round it down:
+
+    pltest 'say map chr(33 + rand 94), 1..12'
+
+=item DNS Lookup
+
+I<What do you call a sheep with no legs?  B< >A cloud. *;=;>
+
+The C<h(osts)> function deals with the nerdy details and outputs as a hosts
+file.  The file is sorted by address type (localhost, link local, private,
+public), version (IPv4, IPv6) and address.  You tack on any number of
+IP-addresses or hostnames, either as Perl arguments or on the command-line via
+C<@A(RGV)>:
+
+    pltest 'hosts qw(perl.org 127.0.0.1 perldoc.perl.org cpan.org)'
+
+    pltest 'hosts @ARGV' perl.org 127.0.0.1 perldoc.perl.org cpan.org
+
+If you don't want it to be merged & sorted, call C<h(osts)> for individual
+addresses:
+
+    pltest 'hosts for qw(perl.org 127.0.0.1 perldoc.perl.org cpan.org)'
+
+    pltest -o hosts perl.org 127.0.0.1 perldoc.perl.org cpan.org
+
+If your input comes from files, collect it in a list and perform at end (B<-E>):
+
+    pltest -lnE 'hosts @list' 'push @list, $_' file*
+
+=item Quine
+
+I<Life is what the least of us make the most of us feel the least of us make
+the most of. --B< >van Orman Quine @-)>
+
+A quine is a program that prints itself.  This uses inside knowledge of that
+your program compiles to a function.  The 2nd C<e(cho)> decompiles and
+pretty-prints it.  Because its return value is used, it returns it, instead of
+printing.  Surrounding boilerplate is replaced by C<pltest ''>.  Both the long and
+short form are quines.  This requires at least Perl 5.16, which introduced
+C<__SUB__>:
+
+    pltest 'echo grep({tr/\n / /s; s/.*: \{ /pltest $quote/u; s/; \}.*/$quote/u;} echo(__SUB__))'
+
+Even though decompilation rarely comes up as a quine no-go, indirectly the
+above does read its source.  So it might be considered a cheating quine.  To
+placate those who think so, here's a constructive way of doing it, with a
+format string that implicitly gets fed to itself:
+
+    pltest '$_ = q{$_ = q{%s}; form "pltest $quote$_$quote"}; form "pltest $quote$_$quote"'
+
+The same approach, but without adding C<pltest ''>, so this works only in the
+pltest-Shell, which you start by calling pltest without arguments.  In the spirit of
+L<Code Golf|https://codegolf.stackexchange.com/a/213629/98751>, made it very
+compact.  This is inspired by the shortest Perl quine, which we beat by 6
+characters in the short form.  That uses C<x2> to duplicate the argument to
+the pre-prototypes C<printf>.  But C<f(orm)> has a prototype.  So use the
+C<&>-syntax to prevent it giving 2 (the length of the list):
+
+    &form(qw(&form(qw(%s)x2))x2)
+
+=item Just another pltest hacker,
+
+I<If you can't convince 'em, confuse 'em! ;-)>
+
+Just another Perl hacker, adapted.  This obfuscated mock turtle soup
+L<JAPH|https://en.wikipedia.org/wiki/Just_another_Perl_hacker> is left for you
+to figure out.  You may wonder y "y", y things start or end in "y":
+
+    pltest -ploiy y' ya-zy You, Turtleneck phrase Jar. Yoda? Yes! 'y yhvjfumcjslifrkfsuoplie
+
+=back

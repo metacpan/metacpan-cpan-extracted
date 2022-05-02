@@ -10,3 +10,4 @@ Socket-.*\.tar\.gz
 .*\.bs
 .*\.c
 .*\.o
+.vimrc

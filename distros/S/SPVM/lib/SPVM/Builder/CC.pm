@@ -246,12 +246,6 @@ sub resolve_resources {
       confess "Can't find config file \"$config_file\"";
     }
     
-    my $resource_file = $config_file;
-    $resource_file =~ s/\.config/\.a/;
-    unless (-f $resource_file) {
-      confess "Can't find resource file \"$resource_file\"";
-    }
-    
     # Config file
     if (defined $config_file) {
       $found_resources_h->{$resource}++;
@@ -261,21 +255,6 @@ sub resolve_resources {
       my $depend_resources = $config->resources;
       
       for my $depend_resource (@$depend_resources) {
-        my $depend_config_file = $self->get_config_file_from_class_name($depend_resource);
-
-        my $depend_resource_file = $depend_config_file;
-        $depend_resource_file =~ s/\.config/\.a/;
-        
-        unless (-f $depend_resource_file) {
-          confess "Can't find dependent resource file \"$depend_resource_file\"";
-        }
-        
-        my $mod_time_depend_resource_file = (stat($depend_resource_file))[9];
-        my $mod_time_resource_file = (stat($resource_file))[9];
-        unless ($mod_time_resource_file > $mod_time_depend_resource_file) {
-          confess "Resource file \"$resource_file\" must be newer than the dependent resource file \"$depend_resource_file\". Resource \"$resource\" must be re-compiled";
-        }
-        
         unshift @all_resources, @$depend_resources;
       }
     }
@@ -285,6 +264,28 @@ sub resolve_resources {
   }
   
   return \@found_resources;
+}
+
+sub get_resource_src_dir_from_class_name {
+  my ($self, $class_name) = @_;
+  
+  my $module_file = $self->builder->get_module_file($class_name);
+  my $module_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name, 'spvm');
+  
+  my $src_dir = $module_file;
+  $src_dir =~ s|/\Q$module_rel_file\E$||;
+  
+  return $src_dir;
+}
+
+sub get_resource_object_dir_from_class_name {
+  my ($self, $class_name) = @_;
+
+  my $class_rel_dir = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name);
+  
+  my $object_dir = $self->builder->create_build_object_path("$class_rel_dir.resource");
+  
+  return $object_dir;
 }
 
 sub get_config_file_from_class_name {
@@ -333,7 +334,7 @@ sub compile {
   # Object directory
   my $object_dir = $opt->{object_dir};
   unless (defined $object_dir && -d $object_dir) {
-    confess "Temporary directory must be specified for " . $self->category . " build";
+    confess "Temporary directory must exists for " . $self->category . " build";
   }
   
   # Module file
@@ -494,8 +495,7 @@ sub compile {
       push @$input_files, $module_file;
     }
     $need_generate = SPVM::Builder::Util::need_generate({
-      global_force => $self->force,
-      config_force => $config->force,
+      force => $self->force || $config->force,
       output_file => $object_file,
       input_files => $input_files,
     });
@@ -750,35 +750,29 @@ sub link {
     my $resources = $config->resources;
     my $resources_all_depend = $self->resolve_resources($class_name, $resources);
     for my $resource (@$resources_all_depend) {
-      my $config_file = $self->get_config_file_from_class_name($resource);
       
-      my $static_lib_file = $config_file;
-      $static_lib_file =~ s/\.config$/\.a/;
-      if (-f $static_lib_file) {
-        # Check resource symbol duplication
-        my @symbol_lines = `nm $static_lib_file`;
-        for my $symbol_line (@symbol_lines) {
-          my ($address, $type, $symbol_name) = split(/\s+/, $symbol_line);
-          if ($type eq 'T') {
-            $symbol_names_h->{$symbol_name}++;
-            if ($symbol_names_h->{$symbol_name} > 1) {
-              confess "Duplicate symbol $symbol_name using resource \"$resource\"";
-            }
-          }
+      # Build native classes
+      my $builder_cc_resource = SPVM::Builder::CC->new(
+        build_dir => $self->builder->build_dir,
+        category => 'native',
+        builder => $self->builder,
+        quiet => $self->quiet,
+        force => $self->force,
+      );
+      
+      my $src_dir = $self->get_resource_src_dir_from_class_name($resource);
+      my $object_dir = $self->get_resource_object_dir_from_class_name($class_name);
+      mkpath $object_dir;
+      
+      my $object_file_infos = $builder_cc_resource->compile(
+        $resource,
+        {
+          src_dir => $src_dir,
+          object_dir => $object_dir,
         }
-        my $object_file_info = SPVM::Builder::ObjectFileInfo->new(
-          object_file => $static_lib_file,
-          class_name => $resource,
-          is_exe_config => 0,
-          is_resource => 1,
-          is_lib_file => 1,
-        );
-        
-        push @$all_object_file_infos, $object_file_info;
-      }
-      else {
-        confess "Can't find resource static library file \"$static_lib_file\"";
-      }
+      );
+      
+      push @$all_object_file_infos, @$object_file_infos;
     }
   }
 
@@ -843,6 +837,7 @@ sub link {
           is_exe_config => 0,
           is_lib_file => 1,
         );
+        
         push @$all_object_file_infos, $object_file_info;
       }
     }
@@ -871,8 +866,7 @@ sub link {
   mkpath dirname $shared_lib_file;
 
   my $need_generate = SPVM::Builder::Util::need_generate({
-    global_force => $self->force,
-    config_force => $config->force,
+    force => $self->force || $config->force,
     output_file => $shared_lib_file,
     input_files => [$config_file, @$all_object_files],
   });
@@ -897,9 +891,11 @@ sub link {
     my $link_info_class_name = $link_info->class_name;
     my $link_info_output_file = $link_info->output_file;
     my $link_info_object_file_infos = $link_info->object_file_infos;
-    my $link_info_object_files = [map { $_->to_string } @$link_info_object_file_infos];
-    my $link_info_ldflags_str = join(' ', @$link_info_ldflags);
 
+    my $link_info_object_files = [map { my $tmp = $_->to_string; $tmp } @$link_info_object_file_infos];
+
+    my $link_info_ldflags_str = join(' ', @$link_info_ldflags);
+    
     # Create shared library
     my (undef, @tmp_files) = $cbuilder->link(
       lib_file => $link_info_output_file,
@@ -935,25 +931,6 @@ sub link {
         }
       }
     }
-
-    # Create a resource.
-    # This is a static library. 
-    # This contains the object files that is compiled from native source files.
-    if ($category eq 'native') {
-      my $resource_static_lib_rel_file = SPVM::Builder::Util::convert_class_name_to_category_rel_file($class_name, $category, 'a');
-      my $resource_static_lib_file = "$lib_dir/$resource_static_lib_rel_file";
-      if (-f $resource_static_lib_file) {
-        unlink $resource_static_lib_file
-          or confess "Can't delete file \"$resource_static_lib_file\":$!";
-      }
-      my @native_source_object_file_infos = grep { $_->is_native_source } @$all_object_file_infos;
-      
-      if (@native_source_object_file_infos) {
-        my @native_source_object_files = map { "$_" } @native_source_object_file_infos;
-        my @ar_cmd = ('ar', 'rc', $resource_static_lib_file, @native_source_object_files);
-        $cbuilder->do_system(@ar_cmd);
-      }
-    }
   }
   
   return $shared_lib_file;
@@ -984,8 +961,7 @@ sub create_precompile_source_file {
   }
 
   my $need_generate = SPVM::Builder::Util::need_generate({
-    global_force => $self->force,
-    config_force => 0,
+    force => $self->force,
     output_file => $source_file,
     input_files => [$module_file, $spvm_precompile_soruce_file],
   });

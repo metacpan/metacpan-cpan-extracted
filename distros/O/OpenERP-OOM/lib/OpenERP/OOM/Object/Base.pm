@@ -160,7 +160,17 @@ sub update {
     }
 
     $self->class->_with_retries(sub {
-        $self->class->schema->client->update($self->model, $self->id, $object, $context);
+        $self->class->schema->client->object_execute_kw(
+            'write',
+            $self->model,
+            [ # positional args
+                $self->id,
+                $object,
+            ],
+            { # keyword args
+                context => $context,
+            },
+        );
     });
     $self->refresh;
 

@@ -43,7 +43,8 @@ await $chip->mount(
    $adapter->check_and_clear( '$chip->read_lux' );
 
    # gut-wrench to clear test data
-   undef $chip->META->get_slot( '$_TIMINGbyte' )->value( $chip );
+   use Object::Pad ':experimental(mop)';
+   undef Object::Pad::MOP::Class->for_class( ref $chip )->get_field( '$_TIMINGbyte' )->value( $chip );
 }
 
 # ->read_lux respects GAIN
@@ -62,7 +63,8 @@ await $chip->mount(
    $adapter->check_and_clear( '$chip->read_lux at GAIN=16' );
 
    # gut-wrench to clear test data
-   undef $chip->META->get_slot( '$_TIMINGbyte' )->value( $chip );
+   use Object::Pad ':experimental(mop)';
+   undef Object::Pad::MOP::Class->for_class( ref $chip )->get_field( '$_TIMINGbyte' )->value( $chip );
 }
 
 # ->read_lux respects INTEG
@@ -81,7 +83,8 @@ await $chip->mount(
    $adapter->check_and_clear( '$chip->read_lux at INTEG=101ms' );
 
    # gut-wrench to clear test data
-   undef $chip->META->get_slot( '$_TIMINGbyte' )->value( $chip );
+   use Object::Pad ':experimental(mop)';
+   undef Object::Pad::MOP::Class->for_class( ref $chip )->get_field( '$_TIMINGbyte' )->value( $chip );
 }
 
 # ->read_lux also returns DATA0/DATA1
@@ -101,7 +104,8 @@ await $chip->mount(
    $adapter->check_and_clear( '$chip->read_lux list context' );
 
    # gut-wrench to clear test data
-   undef $chip->META->get_slot( '$_TIMINGbyte' )->value( $chip );
+   use Object::Pad ':experimental(mop)';
+   undef Object::Pad::MOP::Class->for_class( ref $chip )->get_field( '$_TIMINGbyte' )->value( $chip );
 }
 
 done_testing;

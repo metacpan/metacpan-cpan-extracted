@@ -1,5 +1,5 @@
 use strict;
-$^W = 1;
+use warnings;
 
 use Test::More tests => 24;
 # FIXME - add tests for flags

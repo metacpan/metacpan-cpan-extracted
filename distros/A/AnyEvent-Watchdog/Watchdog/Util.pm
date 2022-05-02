@@ -210,7 +210,7 @@ killed.
 
 All of this should ensure that C<on_exit> hooks are only executed when the
 program is in a sane state and data structures are still intact. This only
-works when the program does not install it's own TERM (etc.) watchers, of
+works when the program does not install its own TERM (etc.) watchers, of
 course, as there is no control over them.
 
 There is currently no way to unregister C<on_exit> hooks.

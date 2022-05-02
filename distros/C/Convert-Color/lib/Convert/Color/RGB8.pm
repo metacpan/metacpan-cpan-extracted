@@ -1,19 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
-package Convert::Color::RGB8;
+package Convert::Color::RGB8 0.12;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Convert::Color );
 
 __PACKAGE__->register_color_space( 'rgb8' );
 
 use Carp;
-
-our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -24,21 +22,21 @@ integers
 
 Directly:
 
- use Convert::Color::RGB8;
+   use Convert::Color::RGB8;
 
- my $red = Convert::Color::RGB8->new( 255, 0, 0 );
+   my $red = Convert::Color::RGB8->new( 255, 0, 0 );
 
- # Can also parse strings
- my $pink = Convert::Color::RGB8->new( '255,192,192' );
+   # Can also parse strings
+   my $pink = Convert::Color::RGB8->new( '255,192,192' );
 
- # or
- $pink = Convert::Color::RGB8->new( 'ffc0c0' );
+   # or
+   $pink = Convert::Color::RGB8->new( 'ffc0c0' );
 
 Via L<Convert::Color>:
 
- use Convert::Color;
+   use Convert::Color;
 
- my $cyan = Convert::Color->new( 'rgb8:0,255,255' );
+   my $cyan = Convert::Color->new( 'rgb8:0,255,255' );
 
 =head1 DESCRIPTION
 
@@ -54,23 +52,25 @@ For representations using 16-bit integers, see L<Convert::Color::RGB16>.
 
 =cut
 
-=head2 $color = Convert::Color::RGB8->new( $red, $green, $blue )
+=head2 new
+
+   $color = Convert::Color::RGB8->new( $red, $green, $blue )
 
 Returns a new object to represent the set of values given. These values should
 be integers between 0 and 255. Values outside of this range will be clamped.
 
-=head2 $color = Convert::Color::RGB8->new( $string )
+   $color = Convert::Color::RGB8->new( $string )
 
 Parses C<$string> for values, and construct a new object similar to the above
 three-argument form. The string should be in the form
 
- red,green,blue
+   red,green,blue
 
 containing the three integer values in decimal notation. It can also be given
 in the form of a hex encoded string, such as would be returned by the
 C<rgb8_hex> method:
 
- rrggbb
+   rrggbb
 
 =cut
 
@@ -100,7 +100,10 @@ sub new
    }
 
    # Clamp to the range [0,255]
-   map { $_ < 0 and $_ = 0; $_ > 255 and $_ = 255 } ( $r, $g, $b );
+   for ( $r, $g, $b ) {
+      $_ = 0 if $_ < 0;
+      $_ = 255 if $_ > 255;
+   }
 
    return bless [ $r, $g, $b ], $class;
 }
@@ -109,11 +112,17 @@ sub new
 
 =cut
 
-=head2 $r = $color->red
+=head2 red
 
-=head2 $g = $color->green
+   $r = $color->red
 
-=head2 $b = $color->blue
+=head2 green
+
+   $g = $color->green
+
+=head2 blue
+
+   $b = $color->blue
 
 Accessors for the three components of the color.
 
@@ -139,7 +148,9 @@ sub new_rgb
    return $class->new( map { $_ * 255 } @_ );
 }
 
-=head2 ( $red, $green, $blue ) = $color->rgb8
+=head2 rgb8
+
+   ( $red, $green, $blue ) = $color->rgb8
 
 Returns the individual red, green and blue color components of the color
 value in RGB8 space.
@@ -152,7 +163,9 @@ sub rgb8
    return $self->red, $self->green, $self->blue;
 }
 
-=head2 $str = $color->hex
+=head2 hex
+
+   $str = $color->hex
 
 Returns a string representation of the color components in the RGB8 space, in
 a convenient C<RRGGBB> hex string, likely to be useful HTML, or other similar
@@ -166,7 +179,9 @@ sub hex :method
    sprintf "%02x%02x%02x", $self->rgb8;
 }
 
-=head2 $mix = $color->alpha_blend( $other, [ $alpha ] )
+=head2 alpha_blend
+
+   $mix = $color->alpha_blend( $other, [ $alpha ] )
 
 Return a new color which is a blended combination of the two passed into it.
 The optional C<$alpha> parameter defines the mix ratio between the two colors,
@@ -198,7 +213,9 @@ sub alpha_blend
    );
 }
 
-=head2 $mix = $color->alpha8_blend( $other, [ $alpha ] )
+=head2 alpha8_blend
+
+   $mix = $color->alpha8_blend( $other, [ $alpha ] )
 
 Similar to C<alpha_blend> but works with integer arithmetic. C<$alpha> should
 be an integer in the range 0 to 255.
@@ -228,7 +245,9 @@ sub alpha8_blend
    );
 }
 
-=head2 $measure = $color->dst_rgb8( $other )
+=head2 dst_rgb8
+
+   $measure = $color->dst_rgb8( $other )
 
 Return a measure of the distance between the two colors. This is the
 unweighted Euclidean distance of the three color components. Two identical
@@ -245,7 +264,9 @@ sub dst_rgb8
    return sqrt( $self->dst_rgb8_cheap( $other ) ) / sqrt(3*255*255);
 }
 
-=head2 $measure = $color->dst_rgb8_cheap( $other )
+=head2 dst_rgb8_cheap
+
+   $measure = $color->dst_rgb8_cheap( $other )
 
 Return a measure of the distance between the two colors. This is the sum of
 the squares of the differences of each of the color components. This is part

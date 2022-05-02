@@ -1,0 +1,28 @@
+#!perl
+
+use warnings;
+use strict;
+use CPU::Z80::Assembler;
+$CPU::Z80::Assembler::verbose =1;
+
+open(BIN, '>t/parity.bin');
+print BIN "\x00" x 256;
+print BIN z80asm("
+  ORG 256
+  LD B, 0
+  LD HL, 0      ; addr to write result to
+  :loop
+    LD A, B     ; A now has value we're checking
+    OR A        ; compare A to itself, just to set the parity flag
+    JP PE, parityeven
+    :parityodd
+      LD (HL), 1
+      JR endofparity
+    :parityeven
+      LD (HL), 0
+    :endofparity
+    DEC L
+    DJNZ loop
+  STOP
+");
+close(BIN);

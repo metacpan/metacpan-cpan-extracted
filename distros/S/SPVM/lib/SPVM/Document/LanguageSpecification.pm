@@ -1332,6 +1332,9 @@ The list of syntax parsing tokens:
 
 <table>
   <tr>
+    <th>Tokens</td><th>Keywords or Operators</th>
+  </tr>
+  <tr>
     <td>ALIAS</td><td>alias</td>
   </tr>
   <tr>
@@ -1663,6 +1666,8 @@ The list of syntax parsing tokens:
   </tr>
 </table>
 
+=end html
+
 =head2 Operator Precidence
 
 The definition of the precidence of operators. This is written by yacc/bison syntax.
@@ -1692,8 +1697,6 @@ The operator precidence can be increased using C<()>.
   
   # b + c is calculated at first
   a * (b + c)
-
-=end html
 
 =head1 Class
 
@@ -1825,7 +1828,7 @@ The list of class descriptors.
       <b>mulnum_t</b>
     </td>
     <td>
-      This class is a <a href="#Multi-Numeric-Types">multi numeric type</a>.
+      This class is a <a href="#Multi-Numeric-Types">multi-numeric type</a>.
     </td>
   </tr>
   <tr>
@@ -2156,7 +2159,7 @@ In the other hand, the else block exists, so a warning is issued.
 
 =head2 Default Loaded Modules
 
-The following modules are loaded by default. These modules are deeply related to the features of SPVM language itself, such as L<type conversions|/"Type Conversions">.
+The following modules are loaded by default. These modules are deeply related to the features of SPVM language itself, such as L<type conversion|/"Type Conversion">.
 
 =begin html
 
@@ -2436,30 +2439,30 @@ See L</"Getting Field"> to get the field of the L<class|/"Class">.
 
 See L</"Setting Field"> to set the field of the L<class|/"Class">.
 
-=head3 Field Access of the Multi Numeric Type
+=head3 Field Access of the Multi-Numeric Type
 
-The field access of the L<multi numeric type|/"Multi Numeric Types">.
+The field access of the L<multi-numeric type|/"Multi-Numeric Types">.
 
   my $z : Complex_2d;
   $z->{re} = 1;
   my $re = $z->{re};
 
-See L</"Getting Multi Numeric Field"> to get the field of the L<multi numeric type|/"Multi Numeric Types">.
+See L</"Getting Multi-Numeric Field"> to get the field of the L<multi-numeric type|/"Multi-Numeric Types">.
 
-See L</"Setting Multi Numeric Field"> to set the field of L<multi numeric type|/"Multi Numeric Types">.
+See L</"Setting Multi-Numeric Field"> to set the field of L<multi-numeric type|/"Multi-Numeric Types">.
 
-=head3 Field Access of the Multi Numeric Reference via Derefernce
+=head3 Field Access of the Multi-Numeric Reference via Derefernce
 
-The field access of the L<multi numeric reference|/"Multi Numeric Reference Type"> via derefernce.
+The field access of the L<multi-numeric reference|/"Multi-Numeric Reference Type"> via derefernce.
 
   my $z : Complex_2d;
   my $z_ref = \$z;
   $z_ref->{re} = 1;
   my $re = $z_ref->{re};
 
-See L</"Getting Multi Numeric Field via Dereference"> to get the field of the L<multi numeric reference|/"Multi Numeric Reference Type"> via dereference.
+See L</"Getting Multi-Numeric Field via Dereference"> to get the field of the L<multi-numeric reference|/"Multi-Numeric Reference Type"> via dereference.
 
-See L</"Setting Multi Numeric Field via Dereference"> to set the field of the L<multi numeric reference|/"Multi Numeric Reference Type"> via dereference.
+See L</"Setting Multi-Numeric Field via Dereference"> to set the field of the L<multi-numeric reference|/"Multi-Numeric Reference Type"> via dereference.
 
 =head1 Method
 
@@ -2487,9 +2490,9 @@ The argument names must be follow the rule of L</"Local Variable Names">.
 
 The minimal length of arguments is C<0>. The max length of arguments is C<255>.
 
-The types of the arguments must be L</"Numeric Types">, L</"Multi Numeric Types">, L</"Object Types">, or L</"Reference Type">, otherwise a compilation error will occur.
+The types of the arguments must be L</"Numeric Types">, L</"Multi-Numeric Types">, L</"Object Types">, or L</"Reference Type">, otherwise a compilation error will occur.
 
-The type of the return value must be L</"void Type">, L</"Numeric Types">, L</"Multi Numeric Types"> or L</"Object Types">, otherwise a compilation error will occur.
+The type of the return value must be L</"void Type">, L</"Numeric Types">, L</"Multi-Numeric Types"> or L</"Object Types">, otherwise a compilation error will occur.
 
 Defined methods can be called using L</"Method Call"> syntax.
 
@@ -2564,7 +2567,7 @@ An instance method can be called from the object.
 
 =head2 Method Descriptors
 
-Method descriptors are the descriptors that is used in a L<method definition|/"Method Definition">.
+Method descriptors are descriptors used in a L<method definition|/"Method Definition">.
 
 =begin html
 
@@ -2579,6 +2582,30 @@ Method descriptors are the descriptors that is used in a L<method definition|/"M
   </tr>
   <tr>
     <td>
+      <b>public</b>
+    </td>
+    <td>
+      This method is public. This method can be accessed from other classes. This is default setting.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <b>private</b>
+    </td>
+    <td>
+      This method is private. This method can not be accessed from other classes.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <b>precompile</b>
+    </td>
+    <td>
+      This method is a <a href="#Precompile-Method">precompile method</a>.
+    </td>
+  </tr>
+  <tr>
+    <td>
       <b>native</b>
     </td>
     <td>
@@ -2586,6 +2613,27 @@ Method descriptors are the descriptors that is used in a L<method definition|/"M
     </td>
   </tr>
 </table>
+
+If C<native> and C<precompile> descriptors can't used together.
+
+C<public> and C<private> descriptors can't be used together.
+
+If the specifed descriptor is not found or the way to specify is invalid, a compilation error will occur.
+
+B<Examples:>
+  
+  # private method
+  private method : int sum ($num1 : int, $num2 : int) {
+    return $num1 + $num2;
+  }
+  
+  # precompile method
+  precompile method : int sum ($num1 : int, $num2 : int) {
+    return $num1 + $num2;
+  }
+  
+  # native method
+  native method : int sum ($num1 : int, $num2 : int);
 
 =end html
 
@@ -2744,7 +2792,7 @@ B<The list of enumeration descriptors:>
       <b>public</b>
     </td>
     <td>
-      This enumeration is public. Each value of this enumeration can be accessed from other class. This is default setting.
+      This enumeration is public. Each value of this enumeration can be accessed from other classes. This is default setting.
     </td>
   </tr>
   <tr>
@@ -2752,7 +2800,7 @@ B<The list of enumeration descriptors:>
       <b>private</b>
     </td>
     <td>
-      This enumeration is private. Each value of this enumeration can not be accessed from other class.
+      This enumeration is private. Each value of this enumeration can not be accessed from other classes.
     </td>
   </tr>
 </table>
@@ -2847,7 +2895,7 @@ Local Variable is declared using B<my> L</"Keyword">.
 
 The local variable name must be follow the rule of L</"Local Variable Names">.
 
-L</"Types"> must be specified. Type must be L</"Numeric Types">, L</"Object Types">, L</"Multi Numeric Types">, or L</"Reference Type">.
+L</"Types"> must be specified. Type must be L</"Numeric Types">, L</"Object Types">, L</"Multi-Numeric Types">, or L</"Reference Type">.
 
   # Local Variable Declaration Examples
   my $var : int;
@@ -3142,7 +3190,7 @@ There are the following types of array.
     Object Array
  </li>
   <li>
-    Multi Numeric Array
+    Multi-Numeric Array
  </li>
 </ul>
 
@@ -3152,7 +3200,7 @@ The numeric array is the array that the type of the element is the L<numeric typ
 
 The object array is the array that the type of the element is the L<object type|/"Object Types">.
 
-The multi numeric array is the array that the type of the element is the L<multi numeric type|/"Multi Numeric Types">.
+The multi-numeric array is the array that the type of the element is the L<multi-numeric type|/"Multi-Numeric Types">.
 
 See L</"Creating Array"> to create Array.
 
@@ -3166,13 +3214,13 @@ See L</"Getting Array Element"> to get the element value of Array.
 
 See L</"Setting Array Element"> to set the element value of Array.
 
-=head1 Multi Numeric Value
+=head1 Multi-Numeric Value
 
-=head2 Multi Numeric Types Definition
+=head2 Multi-Numeric Types Definition
 
-Multi Numeric type represents continuous numeric values. For example, there are three consecutive 32-bit signed integers, two consecutive double-precision floating point numbers. It isplaned to use 3D points, complex numbers, quaternions, etc.
+Multi-Numeric type represents continuous numeric values. For example, there are three consecutive 32-bit signed integers, two consecutive double-precision floating point numbers. It isplaned to use 3D points, complex numbers, quaternions, etc.
 
-Multi Numeric Types are defined by specifying mulnum_t L</"Class Descriptors"> in L</"Class Definition">.
+Multi-Numeric Types are defined by specifying mulnum_t L</"Class Descriptors"> in L</"Class Definition">.
 
   # Three consecutive 32bit signed integers
   class Point_3i : mulnum_t {
@@ -3187,7 +3235,7 @@ Multi Numeric Types are defined by specifying mulnum_t L</"Class Descriptors"> i
     y : double;
   }
 
-Multi Numeric Types must end with "_", Number of Fields, L</"Multi Numeric Types Suffix">.
+Multi-Numeric Types must end with "_", Number of Fields, L</"Multi-Numeric Types Suffix">.
 
 The suffix must correspond to L</"Numeric Types">.
 
@@ -3195,28 +3243,28 @@ All Fields must be the same L</"Numeric Types">.
 
 The maximum number of Fields is 255.
 
-Multi Numeric Types can be used as L</"Types"> of L</"Local Variable Declaration">.
+Multi-Numeric Types can be used as L</"Types"> of L</"Local Variable Declaration">.
 
-Multi Numeric Types can be used as an argument L</"Types"> in L</"Method Definition"> .
+Multi-Numeric Types can be used as an argument L</"Types"> in L</"Method Definition"> .
 
-Multi Numeric Types can be used as L</"Types"> of Return Value in L</"Method Definition">.
+Multi-Numeric Types can be used as L</"Types"> of Return Value in L</"Method Definition">.
 
-Multi Numeric Types can be used as L</"Basic Type"> of L</"Array Types"> .
+Multi-Numeric Types can be used as L</"Basic Type"> of L</"Array Types"> .
 
   my $points = new Point_3i[5];
 
-Reference can be created for Multi Numeric Types value.
+Reference can be created for Multi-Numeric Types value.
 
   my $point : Point_3i;
   my $point_ref = \$point;
 
-L</"Undefined Value"> cannot be assigned to Multi Numeric Types value.
+L</"Undefined Value"> cannot be assigned to Multi-Numeric Types value.
 
-See L</"Multi Numeric Types Field Access"> to get and set the value of field of Multi Numeric Types Value.
+See L</"Multi-Numeric Types Field Access"> to get and set the value of field of Multi-Numeric Types Value.
 
-=head2 Multi Numeric Types Suffix
+=head2 Multi-Numeric Types Suffix
 
-List of Multi Numeric Types Suffix.
+List of Multi-Numeric Types Suffix.
 
 =begin html
 
@@ -3226,7 +3274,7 @@ List of Multi Numeric Types Suffix.
       <b>Numeric Types</b>
    </th>
     <th>
-      Multi Numeric Types Suffix
+      Multi-Numeric Types Suffix
    </th>
   </tr>
   <tr>
@@ -3281,51 +3329,51 @@ List of Multi Numeric Types Suffix.
 
 =end html
 
-=head2 Multi Numeric Types Usage
+=head2 Multi-Numeric Types Usage
 
-To use Multi Numeric Types, load a Module using L</"use Statement">.
+To use Multi-Numeric Types, load a Module using L</"use Statement">.
 
   use Point_3i;
   use Complex_2d;
 
-Next is L</"Local Variable Declaration">. Local Variable Declaration create continuous area for fields of Multi Numeric Types Value. All fields of of Multi Numeric Types Value are initialized by L</"Type Initial Value">.
+Next is L</"Local Variable Declaration">. Local Variable Declaration create continuous area for fields of Multi-Numeric Types Value. All fields of of Multi-Numeric Types Value are initialized by L</"Type Initial Value">.
 
   my $point : Point_3i;
   my $z : Complex_2d;
 
-Note that Multi Numeric Types value are not object, so cannot create a Object by L</"new"> syntax.
+Note that Multi-Numeric Types value are not object, so cannot create a Object by L</"new"> syntax.
 
-=head2 Multi Numeric Types Field Access
+=head2 Multi-Numeric Types Field Access
 
-B<Multi Numeric Types Field Access> is an operation to access Multi Numeric Types Field to get or set a value.
+B<Multi-Numeric Types Field Access> is an operation to access Multi-Numeric Types Field to get or set a value.
 
   MULTI_NUMERIC_TYPE_VALUE->{FIELD_NAME}
 
-See L</"Getting Multi Numeric Field"> to get Multi Numeric Types Field.
+See L</"Getting Multi-Numeric Field"> to get Multi-Numeric Types Field.
 
-See L</"Setting Multi Numeric Field"> to set Multi Numeric Types Field.
+See L</"Setting Multi-Numeric Field"> to set Multi-Numeric Types Field.
 
-=head1 Multi Numeric Array
+=head1 Multi-Numeric Array
 
-=head2 Multi Numeric Array Summary
+=head2 Multi-Numeric Array Summary
 
-L</"Multi Numeric Value"> can be an element of L</"Array">.
+L</"Multi-Numeric Value"> can be an element of L</"Array">.
 
   my $points = new Point_3i[5];
   
   my $zs = new Complex_2d[5];
 
-Multi Numeric Array has continuous Multi Numeric Values.
+Multi-Numeric Array has continuous Multi-Numeric Values.
 
-The Element Type is L</"Multi Numeric Types">, not L</"Object Types">.
+The Element Type is L</"Multi-Numeric Types">, not L</"Object Types">.
 
 For example, Point_3i[5] is continuous 15 (= 3 * 5) count L</"int Type"> Value.
 
-L</"Types"> of Multi Numeric Array is L</"Array Types">.
+L</"Types"> of Multi-Numeric Array is L</"Array Types">.
 
-=head2 Multi Numeric Array Access
+=head2 Multi-Numeric Array Access
 
-Multi Numeric Array Access is an operation to access Multi Numeric Array to get and set the element value.
+Multi-Numeric Array Access is an operation to access Multi-Numeric Array to get and set the element value.
 
   Array->[INDEX]
 
@@ -3341,18 +3389,18 @@ Reference is data that indicates the location of L</"Local Variable"> in the mem
 
 You can get Reference of Local Variable using L</"Reference Operator">.
 
-L</"Reference Type"> is represented by L</"Numeric Types"> "*" or L</"Multi Numeric Types"> followed by "*".
-Reference types are represented by appending an * after L</"Numeric Types"> or L</"Multi Numeric Types">.
+L</"Reference Type"> is represented by L</"Numeric Types"> "*" or L</"Multi-Numeric Types"> followed by "*".
+Reference types are represented by appending an * after L</"Numeric Types"> or L</"Multi-Numeric Types">.
 
   # Numeric Types Reference
   my $num : int;
   my $num_ref : int* = \$num;
   
-  # Multi Numeric Types Reference
+  # Multi-Numeric Types Reference
   my $point : Point_3d;
   my $point_ref : Point_3d* = \$point;
 
-Target of Reference Operator is Variable of L</"Numeric Types"> or L</"Multi Numeric Types">. L</"Object Types"> Variable or L</"Literals"> can't be target of Reference Operator.
+Target of Reference Operator is Variable of L</"Numeric Types"> or L</"Multi-Numeric Types">. L</"Object Types"> Variable or L</"Literals"> can't be target of Reference Operator.
 
 L</"Reference Type"> can be used in Method Argument.
 
@@ -3378,25 +3426,25 @@ Dereference is an operation to get and set the value pointed by Reference.
   # Dereference Numeric Types Reference to set the pointed value
   $$num_ref = 3;
   
-  # Dereference Multi Numeric Types Reference to get the pointed value
+  # Dereference Multi-Numeric Types Reference to get the pointed value
   my $point2 = $$point_ref;
   
-  # Dereference Multi Numeric Types Reference to set the pointed value
+  # Dereference Multi-Numeric Types Reference to set the pointed value
   $$point_ref = $point2;
 
-If the target of Reference Type is L</"Multi Numeric Types">, the setting and getting of Multi Numeric Types Field can be done by Arrow Operator.
+If the target of Reference Type is L</"Multi-Numeric Types">, the setting and getting of Multi-Numeric Types Field can be done by Arrow Operator.
 
-  # If the target of Reference Type is Multi Numeric Types, get Multi Numeric Types Field
+  # If the target of Reference Type is Multi-Numeric Types, get Multi-Numeric Types Field
   my $x = $point_ref->{x};
   
-  # If the Target of Reference Type is Multi Numeric Types, set Multi Numeric Types Field
+  # If the Target of Reference Type is Multi-Numeric Types, set Multi-Numeric Types Field
   $point_ref->{x} = 1;
 
 =head1 Expressions
 
 Expressions are L</"Operators">, L</"Undefined Value">, L</"Literals">, L</"Getting Local Variable">, L</"Setting Local Variable">,
 L</"Getting Class Variable">, L</"Getting Class Variable">, L</"Setting Class Variable">, L</"Getting Exception Variable">, L</"Setting Exception Variable">,
-L</"Getting Field">, L</"Setting Field">, L</"Getting Multi Numeric Field">, L</"Setting Multi Numeric Field">, L</"Getting Multi Numeric Field via Dereference">, L</"Setting Multi Numeric Field via Dereference">, <"Getting Array Element">, L</"Setting Array Element"> and L</"Method Call">.
+L</"Getting Field">, L</"Setting Field">, L</"Getting Multi-Numeric Field">, L</"Setting Multi-Numeric Field">, L</"Getting Multi-Numeric Field via Dereference">, L</"Setting Multi-Numeric Field via Dereference">, <"Getting Array Element">, L</"Setting Array Element"> and L</"Method Call">.
 
 A expression returns a value.
 
@@ -3559,83 +3607,83 @@ B<Examples of Setting Field:>
   my $point = Point->new;
   $point->{x} = 1;
 
-=head2 Getting Multi Numeric Field
+=head2 Getting Multi-Numeric Field
 
-B<Getting Multi Numeric Field Expression> is an L<expression|/"Expressions"> to get Field of L</"Multi Numeric Value">. This is one syntax of the L<field access|/"Field Access">.
+B<Getting Multi-Numeric Field Expression> is an L<expression|/"Expressions"> to get Field of L</"Multi-Numeric Value">. This is one syntax of the L<field access|/"Field Access">.
 
   INVOCANT->{FIELD_NAME}
 
-Invocant Expression is L</"Multi Numeric Types">.
+Invocant Expression is L</"Multi-Numeric Types">.
   
 If the field names does not found in the L</"Class">, a compilation error will occur
 
-Getting Multi Numeric Field Expression returns the field value in the Multi Numeric Value.
+Getting Multi-Numeric Field Expression returns the field value in the Multi-Numeric Value.
 
 Retrun Type is The L</"Types"> of the Field.
 
-B<Examples of Getting Multi Numeric Field:>
+B<Examples of Getting Multi-Numeric Field:>
 
   my $z : Complex_2d;
   my $re = $z->{x};
 
-=head2 Setting Multi Numeric Field
+=head2 Setting Multi-Numeric Field
 
-Setting Multi Numeric Field Expression is an L<expression|/"Expressions"> to set Field of L</"Multi Numeric Value"> using L</"Assignment Operator">. This is one syntax of the L<field access|/"Field Access">.
+Setting Multi-Numeric Field Expression is an L<expression|/"Expressions"> to set Field of L</"Multi-Numeric Value"> using L</"Assignment Operator">. This is one syntax of the L<field access|/"Field Access">.
 
   INVOCANT->{FIELD_NAME} = RIGHT_OPERAND
 
-Invocant Expression is L</"Multi Numeric Types">.
+Invocant Expression is L</"Multi-Numeric Types">.
 
 If the field names does not found in the L</"Class">, a compilation error will occur.
 
-Setting Multi Numeric Field Expression returns the value of Field after setting. 
+Setting Multi-Numeric Field Expression returns the value of Field after setting. 
 
 The assignment must satisfy the L<type assignability|/"Type Assignability">.
 
 Return Value Type is the type of Field.
 
-B<Examples of Setting Multi Numeric Field:>
+B<Examples of Setting Multi-Numeric Field:>
 
   my $z : Complex_2d;
   $z->{x} = 2.5;
 
-=head2 Getting Multi Numeric Field via Dereference
+=head2 Getting Multi-Numeric Field via Dereference
 
-B<Getting Multi Numeric Field via Dereference Expression> is an L<expression|/"Expressions"> to get Field of L</"Multi Numeric Value"> via L</"Dereference">. This is one syntax of the L<field access|/"Field Access">
+B<Getting Multi-Numeric Field via Dereference Expression> is an L<expression|/"Expressions"> to get Field of L</"Multi-Numeric Value"> via L</"Dereference">. This is one syntax of the L<field access|/"Field Access">
 
   INVOCANT->{FIELD_NAME}
 
-Invocant Expression is L</"Multi Numeric Reference Type">.
+Invocant Expression is L</"Multi-Numeric Reference Type">.
 
 If the field names does not found in the L</"Class">, a compilation error will occur
 
-Getting Multi Numeric Field via Dereference Expression returns the field value in the Multi Numeric Value.
+Getting Multi-Numeric Field via Dereference Expression returns the field value in the Multi-Numeric Value.
 
 Retrun Type is The L</"Types"> of the Field.
 
-B<Examples of Getting Multi Numeric Field via Dereference:>
+B<Examples of Getting Multi-Numeric Field via Dereference:>
 
   my $z : Complex_2d;
   my $z_ref = \$z;
   my $re = $z_ref->{x};
 
-=head2 Setting Multi Numeric Field via Dereference
+=head2 Setting Multi-Numeric Field via Dereference
 
-Setting Multi Numeric Field Expression via Dereference is an L<expression|/"Expressions"> to set Field of L</"Multi Numeric Value"> via L</"Dereference"> using L</"Assignment Operator">. This is one syntax of the L<field access|/"Field Access">.
+Setting Multi-Numeric Field Expression via Dereference is an L<expression|/"Expressions"> to set Field of L</"Multi-Numeric Value"> via L</"Dereference"> using L</"Assignment Operator">. This is one syntax of the L<field access|/"Field Access">.
 
   INVOCANT->{FIELD_NAME} = RIGHT_OPERAND
 
-Invocant Expression is L</"Multi Numeric Reference Type">.
+Invocant Expression is L</"Multi-Numeric Reference Type">.
 
 If the field names does not found in the L</"Class">, a compilation error will occur
 
-Setting Multi Numeric Field via Dereference Expression returns the value of Field after setting.
+Setting Multi-Numeric Field via Dereference Expression returns the value of Field after setting.
 
 The assignment must satisfy the L<type assignability|/"Type Assignability">.
 
 Return Value Type is the type of Field.
 
-B<Examples of Setting Multi Numeric Field via Dereference:>
+B<Examples of Setting Multi-Numeric Field via Dereference:>
 
   my $z : Complex_2d;
   my $z_ref = \$z;
@@ -4256,97 +4304,149 @@ The return type of the remainder unsigned long operator is the L<long type|/"lon
 
 If the value of the right operand is C<0>, an L<exception|/"Exception"> is thrown .
 
-=head2 Increment Operator
+=head2 Increment Operators
 
-B<Increment Operator> is an operator that adds 1 to the value. the meaning of Increment Operator is different depending on whether the Increment Operator is placed Pre or Post.
+Increment operators are the L<pre-increment operator|/"Pre-Increment Operator"> and L<post-increment operator|/"Post-Increment Operator">.
 
-  # Pre Increment Operator
-  ++LEXICAL_VARIABLE
-  ++CLASS_VARIABLE
-  ++FIELD_ACCESS
-  ++ARRAY_ACCESS
-  ++DEREFERENCE
+=head3 Pre-Increment Operator
+
+The pre-increment operator adds C<1> to the value of the operand and returns the value after the incrementation.
   
-  # Post Increment Operator
-  LEXICAL_VARIABLE++
-  CLASS_VARIABLE++
-  FIELD_ACCESS++
-  ARRAY_ACCESS++
-  DEREFERENCE++
+  # Pre-increment operator
+  ++OPERAND
 
-The operand of Increment Operator must L</"Local Variable">, L</"Class Variable">, <a href = "#language-field-access">Field Access</a>, L</"Array Access">, L</"Dereference">, otherwise a compilation error will occur.
+The type of the operand must be a L<local variable|/"Local Variable">, a L<class variable|/"Class Variable">, a L<field access|/"Field Access"></a>, an L<array access|/"Array Access">, a L<dereference|/"Dereference">, otherwise a compilation error will occur.
 
-The type of operand of Increment Operator must be L</"Numeric Types">, otherwise a compilation error will occur.
+The pre-increment operator performs the same operation as the following.
 
-=head3 Pre Increment Operator
+  (OPERAND = (TYPE_OF_OPERAND)(OPERAND + 1))
 
-Pre Increment Operator adds 1 to the operand and returns the value after increment.
-
-Pre Increment Operator is equivalent to the following Expression. After 1 is added to the operand, L</"Type Cast"> is performed with the operand Type and the value is assinged to original operand.
-
-  (OPERAND_OPERAND = (TYPE)(OPERAND_OPERAND + 1))
-
-For example, Pre Increment of L</"byte Type"> value is equivalent to the following Expression:
+For example, if the type of the operand is the L<byte type|/"byte Type">, the following operation is performed.
 
   ($num = (byte)($num + 1))
 
-=head3 Post Increment Operator
+B<Examples:>
+  
+  # Pre-increment of a local variable
+  ++$num;
+  
+  # Pre-increment of a class variable
+  ++$NUM;
+  
+  # Pre-increment of an element of an array
+  ++$point->{x};
+  
+  # Pre-increment of a field
+  ++$nums->[0];
+  
+  # Pre-increment of a dereferenced value
+  ++$$num_ref;
 
-Post Increment Operator add 1 to the operand and returns the value before Increment.
+=head3 Post-Increment Operator
 
-Post Increment Operator is equivalent to the following Expression using L</"Sequential Operator">. The value of operand is saved in a temporary variable, 1 is added to the operand, L</"Type Cast"> is performed with the operand Type, and the value is assinged to original operand. Then the temporary variable is returned.
+The post-increment operator adds C<1> to the value of the operand and returns the value before the incrementation.
+  
+  # Post-increment operator
+  OPERAND++
 
-  (my TMP_VARIABLE = OPERAND_OPERAND, OPERAND_OPERAND = (TYPE)(OPERAND_OPERAND + 1), TMP_VARIABLE)
+The type of the operand must be a L<local variable|/"Local Variable">, a L<class variable|/"Class Variable">, a L<field access|/"Field Access"></a>, an L<array access|/"Array Access">, a L<dereference|/"Dereference">, otherwise a compilation error will occur.
 
-For example, Post Increment of L</"byte Type"> value is equivalent to the following Expression.
+The post-increment operator performs the same operation as the following.
+
+  (my TMP_VARIABLE = OPERAND, OPERAND = (TYPE_OF_OPERAND)(OPERAND + 1), TMP_VARIABLE)
+
+For example, if the type of the operand is the L<byte type|/"byte Type">, the following operation is performed.
 
   (my $tmp = $num, $num = (byte)($num + 1), $tmp)
 
-=head2 Decrement Operator
-
-B<Decrement Operator> is an operator that subtracts 1 to the value. the meaning of Decrement Operator is different depending on whether the Decrement Operator is placed Pre or Post.
-
-  # Pre Decrement Operator
-  --LEXICAL_VARIABLE
-  --CLASS_VARIABLE
-  --FIELD_ACCESS
-  --ARRAY_ACCESS
-  --DEREFERENCE
+B<Examples:>
   
-  # Post Decrement Operator
-  LEXICAL_VARIABLE--
-  CLASS_VARIABLE--
-  FIELD_ACCESS--
-  ARRAY_ACCESS--
-  DEREFERENCE--
+  # Post-increment of a local variable
+  $num++;
+  
+  # Post-increment of a class variable
+  $NUM++;
+  
+  # Post-increment of an element of an array
+  $point->{x}++;
+  
+  # Post-increment of a field
+  $nums->[0]++;
+  
+  # Post-increment of a dereferenced value
+  $$num_ref++;
 
-The operand of Decrement Operator must L</"Local Variable">, L</"Class Variable">, <a href = "#language-field-access">Field Access</a>, L</"Array Access">, L</"Dereference">, otherwise a compilation error will occur.
+=head2 Decrement Operators
 
-The type of operand of Decrement Operator must be L</"Numeric Types">, otherwise a compilation error will occur.
+Decrement operators are the L<pre-decrement operator|/"Pre-Decrement Operator"> and L<post-decrement operator|/"Post-Decrement Operator">.
 
-=head3 Pre Decrement Operator
+=head3 Pre-Decrement Operator
 
-Pre Decrement Operator subtracts 1 to the operand and returns the value after decrement.
+The pre-decrement operator subtracts C<1> to the value of the operand and returns the value after the decrementation.
+  
+  # Pre-decrement operator
+  --OPERAND
 
-Pre Decrement Operator is equivalent to the following Expression. After 1 is subtracted to the operand, L</"Type Cast"> is performed with the operand Type and the value is assinged to original operand.
+The type of the operand must be a L<local variable|/"Local Variable">, a L<class variable|/"Class Variable">, a L<field access|/"Field Access"></a>, an L<array access|/"Array Access">, a L<dereference|/"Dereference">, otherwise a compilation error will occur.
 
-  (OPERAND_OPERAND = (TYPE)(OPERAND_OPERAND - 1))
+The pre-decrement operator performs the same operation as the following.
 
-For example, Pre Decrement of L</"byte Type"> value is equivalent to the following Expression:
+  (OPERAND = (TYPE_OF_OPERAND)(OPERAND - 1))
+
+For example, if the type of the operand is the L<byte type|/"byte Type">, the following operation is performed.
 
   ($num = (byte)($num - 1))
 
-=head3 Post Decrement Operator
+B<Examples:>
+  
+  # Pre-decrement of a local variable
+  --$num;
+  
+  # Pre-decrement of a class variable
+  --$NUM;
+  
+  # Pre-decrement of an element of an array
+  --$point->{x};
+  
+  # Pre-decrement of a field
+  --$nums->[0];
+  
+  # Pre-decrement of a dereferenced value
+  --$$num_ref;
 
-Post Decrement Operator subtract 1 to the operand and returns the value before Decrement.
+=head3 Post-Decrement Operator
 
-Post Decrement Operator is equivalent to the following Expression using L</"Sequential Operator">. The value of operand is saved in a temporary variable, 1 is subtracted to the operand, L</"Type Cast"> is performed with the operand Type, and the value is assinged to original operand. Then the temporary variable is returned.
+The post-decrement operator subtracts C<1> to the value of the operand and returns the value before the decrementation.
+  
+  # Post-decrement operator
+  OPERAND--
 
-  (my TMP_VARIABLE = OPERAND_OPERAND, OPERAND_OPERAND = (TYPE)(OPERAND_OPERAND - 1), TMP_VARIABLE)
+The type of the operand must be a L<local variable|/"Local Variable">, a L<class variable|/"Class Variable">, a L<field access|/"Field Access"></a>, an L<array access|/"Array Access">, a L<dereference|/"Dereference">, otherwise a compilation error will occur.
 
-For example, Post Decrement of L</"byte Type"> value is equivalent to the following Expression.
+The post-decrement operator performs the same operation as the following.
+
+  (my TMP_VARIABLE = OPERAND, OPERAND = (TYPE_OF_OPERAND)(OPERAND - 1), TMP_VARIABLE)
+
+For example, if the type of the operand is the L<byte type|/"byte Type">, the following operation is performed.
 
   (my $tmp = $num, $num = (byte)($num - 1), $tmp)
+
+B<Examples:>
+  
+  # Post-decrement of a local variable
+  $num--;
+  
+  # Post-decrement of a class variable
+  $NUM--;
+  
+  # Post-decrement of an element of an array
+  $point->{x}--;
+  
+  # Post-decrement of a field
+  $nums->[0]--;
+  
+  # Post-decrement of a dereferenced value
+  $$num_ref--;
 
 =head2 Bit Operators
 
@@ -4360,7 +4460,7 @@ The bit AND operator C<&> is an L<operator|/"Operators"> to performe a bit AND o
 
   LEFT_OPERAND & RIGHT_OPERAND
 
-The left operand and the right operand must be an L<integral type/"Integral Types">. If not, a compilation error will occur.
+The left operand and the right operand must be an L<integral type/"Integral Types">, otherwise a compilation error will occur.
 
 A L<binary numeric widening type conversion|/"Binary Numeric Widening Type Conversion"> is performed.
 
@@ -4383,7 +4483,7 @@ The bit OR operator C<|> is an L<operator|/"Operators"> to performe a bit OR ope
 
   LEFT_OPERAND | RIGHT_OPERAND
 
-The left operand and the right operand must be an L<integral type/"Integral Types">. If not, a compilation error will occur.
+The left operand and the right operand must be an L<integral type/"Integral Types">, otherwise a compilation error will occur.
 
 A L<binary numeric widening type conversion|/"Binary Numeric Widening Type Conversion"> is performed.
 
@@ -4406,7 +4506,7 @@ The bit NOT operator C<~> is an L<unary operator|/"Unary Operators"> to perform 
 
   ~OPERAND
 
-The type of the operand must is an L<integral type|/"Integral Types">. If not, a compilation error will occur.
+The type of the operand must is an L<integral type|/"Integral Types">, otherwise a compilation error will occur.
 
 The L<unary numeric widening type conversion|/"Unary Numeric Widening Type Conversion"> is performed.
 
@@ -4510,7 +4610,7 @@ A list of Numeric Comparison Operators.
 <table>
   <tr>
     <th>Operator</th>
-    <th>Comparable Type</th>
+    <th>Allowing Type</th>
     <th>Description</th>
   </tr>
   <tr>
@@ -4704,7 +4804,7 @@ B<isa Operator> is a L</"Comparison Operator"> to check whether The left operand
 
 isa Operator has three behaviors, depending on Right Type.
 
-1. If Right Type is L</"Numeric Types">, L</"Multi Numeric Types">, L</"Any Object Type">, L</"Reference Type">, isa operator checks whether the type of The left operand is same as Right Type. This check is done at compile time and isa operator is replaced by L</"int Type"> value. If their types is same, replaced by 1, otherwise by 0.
+1. If Right Type is L</"Numeric Types">, L</"Multi-Numeric Types">, L</"Any Object Type">, L</"Reference Type">, isa operator checks whether the type of The left operand is same as Right Type. This check is done at compile time and isa operator is replaced by L</"int Type"> value. If their types is same, replaced by 1, otherwise by 0.
 
 2. If the Right Type is L</"Class Type">, isa operator checks whether the type of The left operand is same as Right Type at Run Time. If their types are same, L</"int Type"> 1 is return, otherwise 0. The type of The left operand must be L</"Object Types">, otherwise a compilation error will occur.
 
@@ -4915,11 +5015,11 @@ Special Assignment Operator Example
 
 =head2 Reference Operator
 
-The Reference Operator is an operator that retrieves the address of a variable for L</"Numeric Types"> or L</"Multi Numeric Types">. Designed to achieve c address Operator "*".
+The Reference Operator is an operator that retrieves the address of a variable for L</"Numeric Types"> or L</"Multi-Numeric Types">. Designed to achieve c address Operator "*".
 
   \VARIABLE
 
-If the variable is not numeric type or Multi Numeric Types, a compilation error will occur
+If the variable is not numeric type or Multi-Numeric Types, a compilation error will occur
 
 Reference Operator returns expression. The type returned is L</"Reference Type">.
 
@@ -4982,7 +5082,7 @@ The C<copy> operator is an L<Unary Operator|/"Unary Operators"> to copy the obje
 
 The operand must be an L<expression|/"Expressions"> that type is a L<object type|/"object Type">, otherwise a compilation error will occur.
 
-If the type of operand is none of a L<string type|/"String Type">, a L<numeric type|/"Numerci Types">, a L<multi numeric type|/"Multi Numeric Types">,
+If the type of operand is none of a L<string type|/"String Type">, a L<numeric type|/"Numerci Types">, a L<multi-numeric type|/"Multi-Numeric Types">,
 An L<exception|/"Exception"> is thorwn.
 
 The C<copy> operator returns the copied object.
@@ -5062,13 +5162,13 @@ The C<isweak> operator checks whether the L<field|/"Field"> is L<weak reference|
 
   isweak OBJECT->{FIELD_NAME};
 
-The type of the object must be the L<class type|/"Class Type">. If not, a compilation error will occur.
+The type of the object must be the L<class type|/"Class Type">, otherwise a compilation error will occur.
 
 If the field name is not found, a compilation error will occur.
 
 The type of the field targetted by the C<isweak> operator is not an L<object type|/"Object Types">, a compilation error will occur.
 
-If the field is weaken, the C<isweak> operator returns C<1>. If not, returns C<0>.
+If the field is weaken, the C<isweak> operator returns C<1>, otherwise returns C<0>.
 
 The return type of the C<isweak> operator is the L<int type|/"int Type">.
 
@@ -5092,6 +5192,188 @@ The method name must be a L<method name|/"Method Names">, otherwise a compilatio
 The return type is L<int type|/"int Type">.
 
 If the class of the object has the method implementation, returns C<1>, otherwise returns C<0>.
+
+=head2 Type Cast
+
+The type cast is the L<operator|/"Operators"> to perform an L<explicite type conversion|/"Explicite Type Conversion">.
+
+  # Type Cast
+  (TYPE)OPERAND
+  
+  # Postfix Type Cast
+  OPERAND->(TYPE)
+
+=begin html
+
+<table>
+  <tr>
+    <th>
+      To
+   </th>
+    <th>
+      From
+   </th>
+    <th>
+      Type Conversion
+    </th>
+  </tr>
+  <tr>
+    <td>
+      byte, short, int, long, float, double
+    </td>
+    <td>
+      byte, short, int, long, float, double
+    </td>
+    <td>
+      <a href="#Numeric-Type-Conversion">Numeric type conversion</a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Byte
+    </td>
+    <td>
+      byte
+    </td>
+    <td>
+      <a href="#Boxing-Type-Conversion">Boxing type conversion</a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Short
+    </td>
+    <td>
+      short
+    </td>
+    <td>
+      <a href="#Boxing-Type-Conversion">Boxing type conversion</a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Int
+    </td>
+    <td>
+      int
+    </td>
+    <td>
+      <a href="#Boxing-Type-Conversion">Boxing type conversion</a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Long
+    </td>
+    <td>
+      long
+    </td>
+    <td>
+      <a href="#Boxing-Type-Conversion">Boxing type conversion</a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Float
+    </td>
+    <td>
+      float
+    </td>
+    <td>
+      <a href="#Boxing-Type-Conversion">Boxing type conversion</a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Double
+    </td>
+    <td>
+      double
+    </td>
+    <td>
+      <a href="#Boxing-Type-Conversion">Boxing type conversion</a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      object
+    </td>
+    <td>
+      byte, short, int, long, float, double
+    </td>
+    <td>
+      <a href="#Boxing-Type-Conversion">Boxing type conversion</a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Numeric Types
+    </td>
+    <td>
+      Numeric Object Type
+    </td>
+    <td>
+      L</"Unboxing Type Conversion"> is performed. Numeric Types represented by Numeric Types and Numeric Object Type must be the same. For example, if Numeric Types are int, Numeric Object Type must be Int Type.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Numeric Types
+    </td>
+    <td>
+      Any Object Type
+    </td>
+    <td>
+      L</"Unboxing Type Conversion"> is performed.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      String Type
+    </td>
+    <td>
+      Numeric Types
+    </td>
+    <td>
+      The number is converted to a string using the "%g" format of the C standard sprintf function.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      byte[]
+    </td>
+    <td>
+      string
+    </td>
+    <td>
+      <a href="#String-to-byte[]-Type-Conversion">String-to-byte[] Type Conversion</a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      string
+    </td>
+    <td>
+      byte[]
+    </td>
+    <td>
+      <a href="#byte[]-to-String-Type-Conversion">byte[]-to-String Type Conversion</a>
+    </td>
+  </tr>
+</table>
+
+=end html
+
+B<Examples:>
+  
+  # Explicte long to int type conversion
+  my $num = (int)123L;
+
+  # Explicte byte[] to string type conversion
+  my $num = (string)new byte[3];
+
+  # Explicte string to byte[]
+  my $num = (byte[])"Hello";
 
 =head1 Statements
 
@@ -5578,7 +5860,7 @@ The C<weaken> statement is a L<statement|/"Statements"> to create a L<weak refer
 
   weaken OBJECT->{FIELD_NAME};
 
-The type of the object must be the L<class type|/"Class Type">. If not, a compilation error will occur.
+The type of the object must be the L<class type|/"Class Type">, otherwise a compilation error will occur.
 
 If the field name is not found, a compilation error will occur.
 
@@ -5597,7 +5879,7 @@ The C<unweaken> statement is a L<statement|/"Statements"> to unweakens a L<weak 
 
   unweaken OBJECT->{FIELD_NAME};
 
-The type of the object must be the L<class type|/"Class Type">. If not, a compilation error will occur.
+The type of the object must be the L<class type|/"Class Type">, otherwise a compilation error will occur.
 
 If the field name is not found, a compilation error will occur.
 
@@ -5695,7 +5977,7 @@ A list of Type Initial Value. All Bit columns in the data are set to 0.
   </tr>
   <tr>
     <td>
-      <b>Multi Numeric Types</b>
+      <b>Multi-Numeric Types</b>
     </td>
     <td>
       All Field is 0
@@ -6021,7 +6303,7 @@ B<void Type> is a special Type that can only be used in the return type of L</"M
 
 =head2 Basic Type
 
-The basic types are L<numeric types|/"Numeric Types">, L<multi numeric types|/"Multi Numeric Types">, the L<class type|/"Class Type">, the L<any object type|/"Any Object Type">, and the L<string type|/"String Type">.
+The basic types are L<numeric types|/"Numeric Types">, L<multi-numeric types|/"Multi-Numeric Types">, the L<class type|/"Class Type">, the L<any object type|/"Any Object Type">, and the L<string type|/"String Type">.
 
 Another definition of basic types are the types that is not L<array types|"Array Types"> and can become the element of L<array types|"Array Types">.
 
@@ -6049,11 +6331,11 @@ Use new Operator to create an Array. In the following example, L</"int Type"> Ar
 
 my $nums = new int [3];
 
-You also use new Operator when creating a multidimensional Array.The following example creates an Array of int[] Type with 3 elements.
+You also use new Operator when creating a Multi-Dimensional Array.The following example creates an Array of int[] Type with 3 elements.
 
 my $nums = new int[] [3];
 
-=head2 Numeric Array Types
+=head3 Numeric Array Types
 
 Numeric Array Types means L</"Numeric Types"> with the element L</"Array Types"> It is.
 
@@ -6088,44 +6370,73 @@ Data represented by Numeric Array Types must have elements whose size is L</"Num
 
 All elements of Numeric Array Types are initialized by L</"Type Initial Value"> when the L<creating array|/"Creating Array"> is performed.
 
-=head2 byte[] Type
+=head3 byte[] Type
 
 The C<byte[]> type is an L<array type|/"Array Types"> that the element type is C<byte>.
 
   byte[]
 
-=head2 Object Array Types
+=head3 Object Array Types
 
 Object array types are L</"Array Types"> that the type of the element is an L<object type|/"Object Types">.
 
-B<Examples of object array types:>
+B<Examples:>
 
-=begin html
+  # Object array types
+  my $points : Point[];
+  my $points_2dim : Point[][];
+  my $stringables : Stringable[];
+  my $strings : string[];
+  my $objects : object[];
 
-<ul>
-  <li>
-    Foo[]
- </li>
-  <li>
-    Foo[][]
- </li>
-  <li>
-    Comparable[]
- </li>
-  <li>
-    object[]
- </li>
-</ul>
+=head3 String Array Types
 
-=end html
+String array types are L</"Array Types"> that the type of the element is the L<string type|/"String Types">.
 
-The data represented by Object Array Types must have elements of size of L</"Object Types"> and consecutive by the number of Array Length.
+B<Examples:>
 
-All elements of Object Array Types are initialized by L</"Type Initial Value"> when the L<creating array|/"Creating Array"> is performed.
+  # String array types
+  my $strings : string[];
 
-=head2 Multi Numeric Array Types
+=head3 Class Array Types
 
-A multi numeric array type is an L<array type|/"Array Types"> that the basic type is a L<multi numeric type|"Multi Numeric Types">.
+Class array types are L</"Array Types"> that the type of the element is the L<class type|/"Class Types">.
+
+B<Examples:>
+
+  # Class array types
+  my $points : Point[];
+
+=head3 Interface Array Types
+
+Interface array types are L</"Array Types"> that the type of the element is the L<interface type|/"Interface Type">.
+
+B<Examples:>
+
+  # Interface array types
+  my $stringables : Stringable[];
+
+=head3 Callback Array Types
+
+Callback array types are L</"Array Types"> that the type of the element is the L<callback type|/"Callback Type">.
+
+B<Examples:>
+
+  # Callback array types
+  my $stringers : Stringer[];
+
+=head3 Multi-Dimensional Array Type
+
+The multi-dimensional array type is the L<array type|/"Array Types"> that the type of the element is an L<array type|/"Array Types">.
+
+B<Examples:>
+
+  # Callback array types
+  my $stringers : Stringer[];
+
+=head3 Multi-Numeric Array Types
+
+A multi-numeric array type is an L<array type|/"Array Types"> that the basic type is a L<multi-numeric type|"Multi-Numeric Types">.
 
 =begin html
 
@@ -6140,42 +6451,43 @@ A multi numeric array type is an L<array type|/"Array Types"> that the basic typ
 
 =end html
 
-The byte size of the element is the total byte size of the fields of the L<multi numeric type|"Multi Numeric Types">.
+The byte size of the element is the total byte size of the fields of the L<multi-numeric type|"Multi-Numeric Types">.
 
 For example, The byte size of the element of L<Complex_2d|SPVM::Complex_2d> is 16 bytes (2 * 8 bytes).
 
-The object of the multi numeric array type can be created by the L<new|/"Creating Array"> operator.
+The object of the multi-numeric array type can be created by the L<new|/"Creating Array"> operator.
 
   my $complex_nums = new Complex_2d[10];
 
-=head2 Any Object-Array Type
+=head3 Any Object Array Type
 
-The any object-array type C<object[]> is the type that any L<object array type|/"Object Array Types"> can be assigned.
+The any object array type C<object[]> is the type that any L<object array type|/"Object Array Types"> can be assigned.
 
-  # Any object-array Type
+  # Any object array Type
   my $array : object[] = new Point[3];
   my $array : object[] = new object[3];
+  my $array : object[] = new Point[][3];
 
 If a invalid type is assigned, a compilation error will occur.
 
-Any Object-Array Type is an L<array type|/"Array Types">.
+Any Object Array Type is an L<array type|/"Array Types">.
 
 You can get the array length using the L<array length operator|/"Array Length Operator">.
 
   my $array : object[] = new Int[3];
   
-  # Getting the length of the element of Any Object-Array Type
+  # Getting the length of the element of Any Object Array Type
   my $length = @$array;
 
 You can get and set the element using the L<get array element|/"Getting Array Element"> syntax and the L<set array element|/"Setting Array Element">.
  
-  # Getting the element of any object-array
+  # Getting the element of any object array
   my $num = (Int)$array->[0];
   
-  # Setting the element of any object-array
+  # Setting the element of any object array
   $array->[0] = Int->new(5);
 
-When setting the element of any object-array, the element type is checked. If the dimension of the element is not the dimension of the array - C<1>, an L<exception|/"Exception"> is thrown.
+When setting the element of any object array, the element type is checked. If the dimension of the element is not the dimension of the array - C<1>, an L<exception|/"Exception"> is thrown.
 
 =head2 String Type
 
@@ -6193,11 +6505,11 @@ B<Examples:>
   my $message : string = "Hello";
   my $message : mutable string = new_string_len 256;
 
-=head2 Multi Numeric Types
+=head2 Multi-Numeric Types
 
-Multi Numeric Types are a type that can represent continuous numerical values.
+Multi-Numeric Types are a type that can represent continuous numerical values.
 
-Multi Numeric Types can be defined by specifying "mulnum_t" Descriptor in L</"Class Definition">.
+Multi-Numeric Types can be defined by specifying "mulnum_t" Descriptor in L</"Class Definition">.
 
   class Point_3i : mulnum_t {
     has x : int;
@@ -6205,11 +6517,11 @@ Multi Numeric Types can be defined by specifying "mulnum_t" Descriptor in L</"Cl
     has z : int;
   }
 
-See L</"Values ​​"> for a detailed explanation of Multi Numeric Types.
+See L</"Values ​​"> for a detailed explanation of Multi-Numeric Types.
 
 =head2 Reference Type
 
-Reference Type is a Type that can store the address of a variable. Add "*" after L</"Numeric Types"> or L</"Multi Numeric Types"> You can define it.
+Reference Type is a Type that can store the address of a variable. Add "*" after L</"Numeric Types"> or L</"Multi-Numeric Types"> You can define it.
 
   my $num : int;
   my $num_ref : int* = \$num;
@@ -6237,15 +6549,15 @@ See L</"Reference"> for a detailed explanation of Reference.
 
 =head2 Reference Types
 
-Reference Types are L<Numeric Reference Type> and L<Multi Numeric Reference Type>.
+Reference Types are L<Numeric Reference Type> and L<Multi-Numeric Reference Type>.
 
 =head2 Numeric Reference Type
 
 Numeric Reference Type means L</"Numeric Types"> for L</"Reference Type">. Says.
 
-=head2 Multi Numeric Reference Type
+=head2 Multi-Numeric Reference Type
 
-Multi Numeric Reference Type means L</"Reference Type"> for L</"Multi Numeric Types"> variables. > Means.
+Multi-Numeric Reference Type means L</"Reference Type"> for L</"Multi-Numeric Types"> variables. > Means.
 
 =head1 Type Inference
 
@@ -6259,6 +6571,24 @@ Omitting L</"Types"> when L</"Local Variable Declaration"> by Type Inference can
   
   # Foo
   my $foo = new Foo;
+
+=head2 Type Qualifiers
+
+Type qualifiers qualify the type.
+
+  QUALIFIER TYPE
+
+=head3 mutable Type Qualifier
+
+The C<mutable> type qualifier is used to allow to set the character of the string.
+
+  my $string : mutable string;
+
+B<Examples:>
+  
+  # Mutable string
+  my $message = (mutable string)"abc";
+  $message->[0] = 'd';
 
 =head1 Type Assignability
 
@@ -6279,32 +6609,28 @@ If the L<nemric type order|/"Numeric Types Order"> of the left operand is greate
 =begin html
 
 <table>
-  <tr>
-    <th>Assignable</th><th>To</th><th>From</th><th>Implicite Type Conversion</th>
-  </tr>
-  <tr>
-    <td>True</td><td>byte</td><td>byte</td><td>None</td>
-    <td>True</td><td>short</td><td>short</td><td>None</td>
-    <td>True</td><td>int</td><td>int</td><td>None</td>
-    <td>True</td><td>long</td><td>long</td><td>None</td>
-    <td>True</td><td>float</td><td>float</td><td>None</td>
-    <td>True</td><td>double</td><td>double</td><td>None</td>
-    <td>True</td><td>short</td><td>byte</td><td>Unary Numeric Widening Type Conversion</td>
-    <td>True</td><td>int</td><td>byte</td><td>Unary Numeric Widening Type Conversion</td>
-    <td>True</td><td>long</td><td>byte</td><td>Unary Numeric Widening Type Conversion</td>
-    <td>True</td><td>float</td><td>byte</td><td>Unary Numeric Widening Type Conversion</td>
-    <td>True</td><td>double</td><td>byte</td><td>Unary Numeric Widening Type Conversion</td>
-    <td>True</td><td>int</td><td>short</td><td>Unary Numeric Widening Type Conversion</td>
-    <td>True</td><td>long</td><td>short</td><td>Unary Numeric Widening Type Conversion</td>
-    <td>True</td><td>float</td><td>short</td><td>Unary Numeric Widening Type Conversion</td>
-    <td>True</td><td>double</td><td>short</td><td>Unary Numeric Widening Type Conversion</td>
-    <td>True</td><td>long</td><td>int</td><td>Unary Numeric Widening Type Conversion</td>
-    <td>True</td><td>float</td><td>int</td><td>Unary Numeric Widening Type Conversion</td>
-    <td>True</td><td>double</td><td>int</td><td>Unary Numeric Widening Type Conversion</td>
-    <td>True</td><td>float</td><td>long</td><td>Unary Numeric Widening Type Conversion</td>
-    <td>True</td><td>double</td><td>long</td><td>Unary Numeric Widening Type Conversion</td>
-    <td>True</td><td>double</td><td>float</td><td>Unary Numeric Widening Type Conversion</td>
-  </tr>
+  <tr><th>Assignable</th><th>To</th><th>From</th><th><a href="#Implicite-Type-Conversion">Implicite Type Conversion</th></tr>
+  <tr><td>True</td><td>byte</td><td>byte</td><td>None</td></tr>
+  <tr><td>True</td><td>short</td><td>short</td><td>None</td></tr>
+  <tr><td>True</td><td>int</td><td>int</td><td>None</td></tr>
+  <tr><td>True</td><td>long</td><td>long</td><td>None</td></tr>
+  <tr><td>True</td><td>float</td><td>float</td><td>None</td></tr>
+  <tr><td>True</td><td>double</td><td>double</td><td>None</td></tr>
+  <tr><td>True</td><td>short</td><td>byte</td><td>Unary Numeric Widening Type Conversion</td></tr>
+  <tr><td>True</td><td>int</td><td>byte</td><td>Unary Numeric Widening Type Conversion</td></tr>
+  <tr><td>True</td><td>long</td><td>byte</td><td>Unary Numeric Widening Type Conversion</td></tr>
+  <tr><td>True</td><td>float</td><td>byte</td><td>Unary Numeric Widening Type Conversion</td></tr>
+  <tr><td>True</td><td>double</td><td>byte</td><td>Unary Numeric Widening Type Conversion</td></tr>
+  <tr><td>True</td><td>int</td><td>short</td><td>Unary Numeric Widening Type Conversion</td></tr>
+  <tr><td>True</td><td>long</td><td>short</td><td>Unary Numeric Widening Type Conversion</td></tr>
+  <tr><td>True</td><td>float</td><td>short</td><td>Unary Numeric Widening Type Conversion</td></tr>
+  <tr><td>True</td><td>double</td><td>short</td><td>Unary Numeric Widening Type Conversion</td></tr>
+  <tr><td>True</td><td>long</td><td>int</td><td>Unary Numeric Widening Type Conversion</td></tr>
+  <tr><td>True</td><td>float</td><td>int</td><td>Unary Numeric Widening Type Conversion</td></tr>
+  <tr><td>True</td><td>double</td><td>int</td><td>Unary Numeric Widening Type Conversion</td></tr>
+  <tr><td>True</td><td>float</td><td>long</td><td>Unary Numeric Widening Type Conversion</td></tr>
+  <tr><td>True</td><td>double</td><td>long</td><td>Unary Numeric Widening Type Conversion</td></tr>
+  <tr><td>True</td><td>double</td><td>float</td><td>Unary Numeric Widening Type Conversion</td></tr>
 </table>
 
 =end html
@@ -6332,26 +6658,22 @@ If the condition is ture, the L<numeric narrowing type conversion|/"Numeric Narr
 =begin html
 
 <table>
-  <tr>
-    <th>Assignable</th><th>To</th><th>From</th><th>Implicite Type Conversion</th>
-  </tr>
-  <tr>
-    <td>Conditinal True</td><td>byte</td><td>short</td><td>Numeric Narrowing Type Conversion</td>
-    <td>Conditinal True</td><td>byte</td><td>int</td><td>Numeric Narrowing Type Conversion</td>
-    <td>Conditinal True</td><td>byte</td><td>long</td><td>byte</td><td>Numeric Narrowing Type Conversion</td>
-    <td>False</td><td>byte</td><td>float</td><td>None</td>
-    <td>False</td><td>byte</td><td>double</td><td>None</td>
-    <td>Conditinal True</td><td>short</td><td>int</td><td>Numeric Narrowing Type Conversion</td>
-    <td>Conditinal True</td><td>short</td><td>long</td><td>Numeric Narrowing Type Conversion</td>
-    <td>False</td><td>short</td><td>float</td><td>None</td>
-    <td>False</td><td>short</td><td>double</td><td>None</td>
-    <td>Conditinal True</td><td>int</td><td>long</td><td>Numeric Narrowing Type Conversion</td>
-    <td>False</td><td>int</td><td>float</td><td>None</td>
-    <td>False</td><td>int</td><td>double</td><td>None</td>
-    <td>False</td><td>long</td><td>float</td><td>None</td>
-    <td>False</td><td>long</td><td>double</td><td>None</td>
-    <td>False</td><td>float</td><td>double</td><td>None</td>
-  </tr>
+  <tr><th>Assignable</th><th>To</th><th>From</th><th><a href="#Implicite-Type-Conversion">Implicite Type Conversion</th></tr>
+  <tr><td>Conditinal True</td><td>byte</td><td>short</td><td>Numeric Narrowing Type Conversion</td></tr>
+  <tr><td>Conditinal True</td><td>byte</td><td>int</td><td>Numeric Narrowing Type Conversion</td></tr>
+  <tr><td>Conditinal True</td><td>byte</td><td>long</td><td>Numeric Narrowing Type Conversion</td></tr>
+  <tr><td>False</td><td>byte</td><td>float</td><td>None</td></tr>
+  <tr><td>False</td><td>byte</td><td>double</td><td>None</td></tr>
+  <tr><td>Conditinal True</td><td>short</td><td>int</td><td>Numeric Narrowing Type Conversion</td></tr>
+  <tr><td>Conditinal True</td><td>short</td><td>long</td><td>Numeric Narrowing Type Conversion</td></tr>
+  <tr><td>False</td><td>short</td><td>float</td><td>None</td></tr>
+  <tr><td>False</td><td>short</td><td>double</td><td>None</td></tr>
+  <tr><td>Conditinal True</td><td>int</td><td>long</td><td>Numeric Narrowing Type Conversion</td></tr>
+  <tr><td>False</td><td>int</td><td>float</td><td>None</td></tr>
+  <tr><td>False</td><td>int</td><td>double</td><td>None</td></tr>
+  <tr><td>False</td><td>long</td><td>float</td><td>None</td></tr>
+  <tr><td>False</td><td>long</td><td>double</td><td>None</td></tr>
+  <tr><td>False</td><td>float</td><td>double</td><td>None</td></tr>
 </table>
 
 =end html
@@ -6368,17 +6690,13 @@ If the type of the left operand is a L<numeric type|/"Numeric Types"> correspond
 =begin html
 
 <table>
-  <tr>
-    <th>Assignable</th><th>To</th><th>From</th><th>Implicite Type Conversion</th>
-  </tr>
-  <tr>
-    <td>True</td><td>byte</td><td>Byte</td><td>Unboxing Type Conversion</td>
-    <td>True</td><td>short</td><td>Short</td><td>Unboxing Type Conversion</td>
-    <td>True</td><td>int</td><td>Int</td><td>Unboxing Type Conversion</td>
-    <td>True</td><td>long</td><td>Long</td><td>Unboxing Type Conversion</td>
-    <td>True</td><td>float</td><td>Float</td><td>Unboxing Type Conversion</td>
-    <td>True</td><td>double</td><td>Double</td><td>Unboxing Type Conversion</td>
-  </tr>
+  <tr><th>Assignable</th><th>To</th><th>From</th><th><a href="#Implicite-Type-Conversion">Implicite Type Conversion</th></tr>
+  <tr><td>True</td><td>byte</td><td>Byte</td><td>Unboxing Type Conversion</td></tr>
+  <tr><td>True</td><td>short</td><td>Short</td><td>Unboxing Type Conversion</td></tr>
+  <tr><td>True</td><td>int</td><td>Int</td><td>Unboxing Type Conversion</td></tr>
+  <tr><td>True</td><td>long</td><td>Long</td><td>Unboxing Type Conversion</td></tr>
+  <tr><td>True</td><td>float</td><td>Float</td><td>Unboxing Type Conversion</td></tr>
+  <tr><td>True</td><td>double</td><td>Double</td><td>Unboxing Type Conversion</td></tr>
 </table>
 
 =end html
@@ -6389,7 +6707,7 @@ B<Examples:>
 
   my $double : double = Double->new(3.5);
 
-=head3 Type Assignability from AnyObject to Numeric
+=head3 Type Assignability from Any Object to Numeric
 
 If the type of the left operand is a L<numeric type|/"Numeric Types"> and the type of the right operand is a L<any object type|/"Any Object Type"> C<object>, the assignability is true.
 
@@ -6398,12 +6716,8 @@ The L<unboxing type conversion|/"Unboxing Type Conversion"> corresponding to the
 =begin html
 
 <table>
-  <tr>
-    <th>Assignable</th><th>To</th><th>From</th><th>Implicite Type Conversion</th>
-  </tr>
-  <tr>
-    <td>True</td><td>NUMERIC_X</td><td>object</td><td>Unboxing Type Conversion</td>
-  </tr>
+  <tr><th>Assignable</th><th>To</th><th>From</th><th><a href="#Implicite-Type-Conversion">Implicite Type Conversion</th></tr>
+  <tr><td>True</td><td>NUMERIC_X</td><td>object</td><td>Unboxing Type Conversion</td></tr>
 </table>
 
 =end html
@@ -6418,22 +6732,18 @@ B<Examples:>
 
 If the type of the left operand is a L<numeric type|/"Numeric Types"> and the type of the right operand is other than the types described above, the assignability is false.
 
-=head2 Type Assignability to MultiNumeric
+=head2 Type Assignability to Multi-Numeric
 
-If the type of the left operand is a L<multi numeric type|/"Multi Numeric Types"> and the type of the right operand is the same type of the left operand, the assignability is true.
+If the type of the left operand is a L<multi-numeric type|/"Multi-Numeric Types"> and the type of the right operand is the same type of the left operand, the assignability is true.
 
 If not, the assignability is false.
 
 =begin html
 
 <table>
-  <tr>
-    <th>Assignable</th><th>To</th><th>From</th><th>Implicite Type Conversion</th>
-  </tr>
-  <tr>
-    <td>True</td><td>MULNUM_X</td><td>MULNUM_X</td><td>None</td>
-    <td>False</td><td>MULNUM_X</td><td>OTHER</td><td>None</td>
-  </tr>
+  <tr><th>Assignable</th><th>To</th><th>From</th><th><a href="#Implicite-Type-Conversion">Implicite Type Conversion</th></tr>
+  <tr><td>True</td><td>MULNUM_X</td><td>MULNUM_X</td><td>None</td></tr>
+  <tr><td>False</td><td>MULNUM_X</td><td>OTHER</td><td>None</td></tr>
 </table>
 
 =end html
@@ -6442,6 +6752,22 @@ B<Examples:>
 
   my $z1 : Complex_2d;
   my $z2 : Complex_2d = $z1;
+
+=head2 Type Assignability to Referenece
+
+If the type of the left operand is a L<reference type|/"Reference Types"> and the type of the right operand is the same type of the left operand, the assignability is true.
+
+If not, the assignability is false.
+
+=begin html
+
+<table>
+  <tr><th>Assignable</th><th>To</th><th>From</th><th><a href="#Implicite-Type-Conversion">Implicite Type Conversion</th></tr>
+  <tr><td>True</td><td>REF_X</td><td>REF_X</td><td>None</td></tr>
+  <tr><td>False</td><td>REF_X</td><td>OTHER</td><td>None</td></tr>
+</table>
+
+=end html
 
 =head2 Type Assignability to String
 
@@ -6458,19 +6784,15 @@ If the type of the right operand is a L<numeric type|/"Numeric Types">, the L<Nu
 =begin html
 
 <table>
-  <tr>
-    <th>Assignable</th><th>To</th><th>From</th><th>Implicite Type Conversion</th>
-  </tr>
-  <tr>
-    <td>True</td><td>string</td><td>string</td><td>None</td>
-    <td>True</td><td>string</td><td>mutable string</td><td>None</td>
-    <td>True</td><td>mutable string</td><td>mutable string</td><td>None</td>
-    <td>False</td><td>mutable string</td><td>string</td><td>None</td>
-    <td>True</td><td>string</td><td>string</td><td>None</td>
-    <td>True</td><td>string</td><td>NUMERIC_X</td><td>Numeric-to-String type conversion</td>
-    <td>True</td><td>string</td><td>undef</td><td>None</td>
-    <td>False</td><td>string</td><td>OTHER</td><td>None</td>
-  </tr>
+  <tr><th>Assignable</th><th>To</th><th>From</th><th><a href="#Implicite-Type-Conversion">Implicite Type Conversion</th></tr>
+  <tr><td>True</td><td>string</td><td>string</td><td>None</td></tr>
+  <tr><td>True</td><td>string</td><td>mutable string</td><td>None</td></tr>
+  <tr><td>True</td><td>mutable string</td><td>mutable string</td><td>None</td></tr>
+  <tr><td>False</td><td>mutable string</td><td>string</td><td>None</td></tr>
+  <tr><td>True</td><td>string</td><td>string</td><td>None</td></tr>
+  <tr><td>True</td><td>string</td><td>NUMERIC_X</td><td>Numeric-to-String type conversion</td></tr>
+  <tr><td>True</td><td>string</td><td>undef</td><td>None</td></tr>
+  <tr><td>False</td><td>string</td><td>OTHER</td><td>None</td></tr>
 </table>
 
 =end html
@@ -6492,15 +6814,11 @@ If the type of the right operand is a L<numeric type|/"Numeric Types">, the L<bo
 =begin html
 
 <table>
-  <tr>
-    <th>Assignable</th><th>To</th><th>From</th><th>Implicite Type Conversion</th>
-  </tr>
-  <tr>
-    <td>True</td><td>NUMERIC_OBJECT_X</td><td>NUMERIC_OBJECT_X</td><td>None</td>
-    <td>True</td><td>NUMERIC_OBJECT_X</td><td>NUMERIC_X</td><td>Boxing type conversion</td>
-    <td>True</td><td>NUMERIC_OBJECT</td><td>undef</td><td>None</td>
-    <td>False</td><td>NUMERIC_OBJECT</td><td>OTHER</td><td>None</td>
-  </tr>
+  <tr><th>Assignable</th><th>To</th><th>From</th><th><a href="#Implicite-Type-Conversion">Implicite Type Conversion</th></tr>
+  <tr><td>True</td><td>NUMERIC_OBJECT_X</td><td>NUMERIC_OBJECT_X</td><td>None</td></tr>
+  <tr><td>True</td><td>NUMERIC_OBJECT_X</td><td>NUMERIC_X</td><td>Boxing type conversion</td></tr>
+  <tr><td>True</td><td>NUMERIC_OBJECT</td><td>undef</td><td>None</td></tr>
+  <tr><td>False</td><td>NUMERIC_OBJECT</td><td>OTHER</td><td>None</td></tr>
 </table>
 
 =end html
@@ -6520,14 +6838,10 @@ If not, the assignability is false.
 =begin html
 
 <table>
-  <tr>
-    <th>Assignable</th><th>To</th><th>From</th><th>Implicite Type Conversion</th>
-  </tr>
-  <tr>
-    <td>True</td><td>CLASS_X</td><td>CLASS_X</td><td>None</td>
-    <td>True</td><td>CLASS</td><td>undef</td><td>None</td>
-    <td>False</td><td>CLASS</td><td>OTHER</td><td>None</td>
-  </tr>
+  <tr><th>Assignable</th><th>To</th><th>From</th><th><a href="#Implicite-Type-Conversion">Implicite Type Conversion</th></tr>
+  <tr><td>True</td><td>CLASS_X</td><td>CLASS_X</td><td>None</td></tr>
+  <tr><td>True</td><td>CLASS</td><td>undef</td><td>None</td></tr>
+  <tr><td>False</td><td>CLASS</td><td>OTHER</td><td>None</td></tr>
 </table>
 
 =end html
@@ -6548,15 +6862,11 @@ If not, the assignability is false.
 =begin html
 
 <table>
-  <tr>
-    <th>Assignable</th><th>To</th><th>From</th><th>Implicite Type Conversion</th>
-  </tr>
-  <tr>
-    <td>True</td><td>INTERFACE_X</td><td>INTERFACE_X</td><td>None</td>
-    <td>Conditinal True</td><td>INTERFACE_X</td><td>CLASS_Y</td><td>None</td>
-    <td>True</td><td>INTERFACE</td><td>undef</td><td>None</td>
-    <td>False</td><td>INTERFACE</td><td>OTHER</td><td>None</td>
-  </tr>
+  <tr><th>Assignable</th><th>To</th><th>From</th><th><a href="#Implicite-Type-Conversion">Implicite Type Conversion</th></tr>
+  <tr><td>True</td><td>INTERFACE_X</td><td>INTERFACE_X</td><td>None</td></tr>
+  <tr><td>Conditinal True</td><td>INTERFACE_X</td><td>CLASS_Y</td><td>None</td></tr>
+  <tr><td>True</td><td>INTERFACE</td><td>undef</td><td>None</td></tr>
+  <tr><td>False</td><td>INTERFACE</td><td>OTHER</td><td>None</td></tr>
 </table>
 
 =end html
@@ -6578,15 +6888,11 @@ If not, the assignability is false.
 =begin html
 
 <table>
-  <tr>
-    <th>Assignable</th><th>To</th><th>From</th><th>Implicite Type Conversion</th>
-  </tr>
-  <tr>
-    <td>True</td><td>CALLBACK_X</td><td>CALLBACK_X</td><td>None</td>
-    <td>Conditinal True</td><td>CALLBACK_X</td><td>CLASS_Y</td><td>None</td>
-    <td>True</td><td>CALLBACK</td><td>undef</td><td>None</td>
-    <td>False</td><td>CALLBACK</td><td>OTHER</td><td>None</td>
-  </tr>
+  <tr><th>Assignable</th><th>To</th><th>From</th><th><a href="#Implicite-Type-Conversion">Implicite Type Conversion</th></tr>
+  <tr><td>True</td><td>CALLBACK_X</td><td>CALLBACK_X</td><td>None</td></tr>
+  <tr><td>Conditinal True</td><td>CALLBACK_X</td><td>CLASS_Y</td><td>None</td></tr>
+  <tr><td>True</td><td>CALLBACK</td><td>undef</td><td>None</td></tr>
+  <tr><td>False</td><td>CALLBACK</td><td>OTHER</td><td>None</td></tr>
 </table>
 
 =end html
@@ -6602,7 +6908,7 @@ B<Examples:>
   };
   my $comparator : Comparator = undef;
 
-=head2 Type Assignability to AnyObject
+=head2 Type Assignability to Any Object
 
 If the type of the left operand is the L<any object type|/"Any Object Type"> and the type of the right operand is an L<object type|/"Object Types">, a L<numeric type|/"Numeric Types"> or the L<undef type|/"Undefined Type">, the assignability is true.
 
@@ -6613,15 +6919,11 @@ If the type of the right operand is a L<numeric type|/"Numeric Types">, the L<bo
 =begin html
 
 <table>
-  <tr>
-    <th>Assignable</th><th>To</th><th>From</th><th>Implicite Type Conversion</th>
-  </tr>
-  <tr>
-    <td>True</td><td>object</td><td>OBJECT_X</td><td>None</td>
-    <td>True</td><td>object</td><td>NUMERIC_X</td><td>Boxing type conversion</td>
-    <td>True</td><td>object</td><td>undef</td><td>None</td>
-    <td>False</td><td>object</td><td>OTHER</td><td>None</td>
-  </tr>
+  <tr><th>Assignable</th><th>To</th><th>From</th><th><a href="#Implicite-Type-Conversion">Implicite Type Conversion</th></tr>
+  <tr><td>True</td><td>object</td><td>OBJECT_X</td><td>None</td></tr>
+  <tr><td>True</td><td>object</td><td>NUMERIC_X</td><td>Boxing type conversion</td></tr>
+  <tr><td>True</td><td>object</td><td>undef</td><td>None</td></tr>
+  <tr><td>False</td><td>object</td><td>OTHER</td><td>None</td></tr>
 </table>
 
 =end html
@@ -6634,48 +6936,40 @@ B<Examples:>
 
 =head2 Type Assignability to Undefined
 
-=head2 Type Assignability to Referenece
-
-If the type of the left operand is a L<reference type|/"Reference Types"> and the type of the right operand is the same type of the left operand, the assignability is true.
-
-If not, the assignability is false.
+If the type of the left operand is the L<undefined type|/"Undefined Type">, the assignability is false.
 
 =begin html
 
 <table>
-  <tr>
-    <th>Assignable</th><th>To</th><th>From</th><th>Implicite Type Conversion</th>
-  </tr>
-  <tr>
-    <td>True</td><td>REF_X</td><td>REF_X</td><td>None</td>
-    <td>False</td><td>REF_X</td><td>OTHER</td><td>None</td>
-  </tr>
+  <tr><th>Assignable</th><th>To</th><th>From</th><th><a href="#Implicite-Type-Conversion">Implicite Type Conversion</th></tr>
+  <tr><td>False</td><td>Undefined Type</td><td>OTHER</td><td>None</td></tr>
 </table>
 
 =end html
 
-=head2 Type Assignability to NumericArray
+B<Examples:>
+  
+  # The assignability is false
+  undef = Point->new;
+  
+=head2 Type Assignability to Numeric Array
 
-If the type of the left operand is a L<numeric type|/"Numeric Types"> and the type of the right operand is the same type of the left operand or the L<undef type|/"Undefined Type">, the assignability is true.
+If the type of the left operand is a L<numeric array type|/"Numeric Array Types"> and the type of the right operand is the same type of the left operand or the L<undef type|/"Undefined Type">, the assignability is true.
 
 If not, the assignability is false.
 
 =begin html
 
 <table>
-  <tr>
-    <th>Assignable</th><th>To</th><th>From</th><th>Implicite Type Conversion</th>
-  </tr>
-  <tr>
-    <td>True</td><td>byte[]</td><td>byte[]</td><td>None</td>
-    <td>True</td><td>short[]</td><td>short[]</td><td>None</td>
-    <td>True</td><td>int[]</td><td>int[]</td><td>None</td>
-    <td>True</td><td>long[]</td><td>long[]</td><td>None</td>
-    <td>True</td><td>float[]</td><td>float[]</td><td>None</td>
-    <td>True</td><td>double[]</td><td>double[]</td><td>None</td>
-    <td>True</td><td>NUMERIC[]</td><td>undef</td><td>None</td>
-    <td>False</td><td>NUMERIC[]</td><td>OTHER</td><td>None</td>
-  </tr>
+  <tr><th>Assignable</th><th>To</th><th>From</th><th><a href="#Implicite-Type-Conversion">Implicite Type Conversion</th></tr>
+  <tr><td>True</td><td>byte[]</td><td>byte[]</td><td>None</td></tr>
+  <tr><td>True</td><td>short[]</td><td>short[]</td><td>None</td></tr>
+  <tr><td>True</td><td>int[]</td><td>int[]</td><td>None</td></tr>
+  <tr><td>True</td><td>long[]</td><td>long[]</td><td>None</td></tr>
+  <tr><td>True</td><td>float[]</td><td>float[]</td><td>None</td></tr>
+  <tr><td>True</td><td>double[]</td><td>double[]</td><td>None</td></tr>
+  <tr><td>True</td><td>NUMERIC[]</td><td>undef</td><td>None</td></tr>
+  <tr><td>False</td><td>NUMERIC[]</td><td>OTHER</td><td>None</td></tr>
 </table>
 
 =end html
@@ -6685,23 +6979,19 @@ B<Examples:>
   my $nums : int[] = new int[3];
   my $nums : int[] = undef;
 
-=head2 Type Assignability to MultiNumericArray
+=head2 Type Assignability to Multi-Numeric Array
 
-If the type of the left operand is a L<numeric type|/"Multi Numeric Types"> and the type of the right operand is the same type of the left operand or the L<undef type|/"Undefined Type">, the assignability is true.
+If the type of the left operand is a L<multi-numeric array type|/"Multi-Numeric Array Types"> and the type of the right operand is the same type of the left operand or the L<undef type|/"Undefined Type">, the assignability is true.
 
 If not, the assignability is false.
 
 =begin html
 
 <table>
-  <tr>
-    <th>Assignable</th><th>To</th><th>From</th><th>Implicite Type Conversion</th>
-  </tr>
-  <tr>
-    <td>True</td><td>MULNUM_X[]</td><td>MULNUM_X[]</td><td>None</td>
-    <td>True</td><td>MULNUM_X[]</td><td>undef</td><td>None</td>
-    <td>False</td><td>MULNUM_X[]</td><td>OTHER</td><td>None</td>
-  </tr>
+  <tr><th>Assignable</th><th>To</th><th>From</th><th><a href="#Implicite-Type-Conversion">Implicite Type Conversion</th></tr>
+  <tr><td>True</td><td>MULNUM_X[]</td><td>MULNUM_X[]</td><td>None</td></tr>
+  <tr><td>True</td><td>MULNUM_X[]</td><td>undef</td><td>None</td></tr>
+  <tr><td>False</td><td>MULNUM_X[]</td><td>OTHER</td><td>None</td></tr>
 </table>
 
 =end html
@@ -6711,225 +7001,233 @@ B<Examples:>
   my $nums : Complex_2d[] = new Complex_2d[3];
   my $nums : Complex_2d[] = undef;
 
-=head2 Type Assignability to StringArray
+=head2 Type Assignability to String Array
 
-=head2 Type Assignability to ClassArray
+If the type of the left operand is a L<string array type|/"String Array Type"> and the type of the right operand is the same type of the left operand or the L<undef type|/"Undefined Type">, the assignability is true.
 
-=head2 Type Assignability to InterfaceArray
-
-=head2 Type Assignability to CallbackArray
-
-=head2 Type Assignability to AnyObjectArray
-
-=head2 Type Assignability to MultiDimensionalArray
-
-(Not Completed)
-
-=head1 Type Conversions
-
-=head2 Type Cast
-
-Type Cast is Type Conversion that is explicitly described.
-
-  # Type Cast
-  (TYPE)EXPRESSION
-  
-  # Postfix Type Cast
-  EXPRESSION->(TYPE)
-
-L</"int Type"> value is converted to L</"long Type"> Become.
-
-  my $num = (long)3;
-
-If the source Type and the specified Type are the same, the value is simply copied.
-
-  my $num : int = (int)4;
-
-B<List of Type Conversion in Type Cast>
-
-It is a list of Type Conversion in Type Cast. If a Type Cast not listed in this table is performed, a compilation error will occur.
+If not, the assignability is false.
 
 =begin html
 
 <table>
-  <tr>
-    <th>
-      <b>The specified Type</b>
-   </th>
-    <th>
-      <b>Source type</b>
-   </th>
-    <th>
-      Content of conversion
-   </th>
-  </tr>
-  <tr>
-    <td>
-      <b>byte[]</b>
-    </td>
-    <td>
-      <b>string</b>
-    </td>
-    <td>
-      The address value is copied.
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <b>string</b>
-    </td>
-    <td>
-      <b>byte[]</b>
-    </td>
-    <td>
-      The address value is copied.
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <b>Numeric Types</b>
-    </td>
-    <td>
-      <b>Numeric Types</b>
-    </td>
-    <td>
-      L</"Numeric Types Conversion"> is performed.
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <b>Numeric Object Type</b>
-    </td>
-    <td>
-      <b>Numeric Types</b>
-    </td>
-    <td>
-      L</"Boxing Type Conversion"> is performed. Numeric Types represented by Numeric Types and Numeric Object Type must be the same. For example, if Numeric Types are int, Numeric Object Type must be Int Type.
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <b>Any Object Type</b>
-    </td>
-    <td>
-      <b>Numeric Types</b>
-    </td>
-    <td>
-      L</"Boxing Type Conversion"> is performed.
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <b>Numeric Types</b>
-    </td>
-    <td>
-      <b>Numeric Object Type</b>
-    </td>
-    <td>
-      L</"Unboxing Type Conversion"> is performed. Numeric Types represented by Numeric Types and Numeric Object Type must be the same. For example, if Numeric Types are int, Numeric Object Type must be Int Type.
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <b>Numeric Types</b>
-    </td>
-    <td>
-      <b>Any Object Type</b>
-    </td>
-    <td>
-      L</"Unboxing Type Conversion"> is performed.
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <b>String Type</b>
-    </td>
-    <td>
-      <b>Numeric Types</b>
-    </td>
-    <td>
-      The number is converted to a string using the "%g" format of the C standard sprintf function.
-    </td>
-  </tr>
+  <tr><th>Assignable</th><th>To</th><th>From</th><th><a href="#Implicite-Type-Conversion">Implicite Type Conversion</th></tr>
+  <tr><td>True</td><td>string[]</td><td>string[]</td><td>None</td></tr>
+  <tr><td>True</td><td>string[]</td><td>undef</td><td>None</td></tr>
+  <tr><td>False</td><td>string[]</td><td>OTHER</td><td>None</td></tr>
 </table>
 
 =end html
 
-=head2 Implicit Type Conversion
+B<Examples:>
 
-Implicit type conversion is automatic type conversion performed by SPVM. The following are the places where implicit Type Conversion may occur.
+  my $strings : string[] = ["abc", "def"];
+  my $strings : string[] = undef;
+
+=head2 Type Assignability to Class Array
+
+If the type of the left operand is a L<class array type|/"Class Array Types"> and the type of the right operand is the same type of the left operand or the L<undef type|/"Undefined Type">, the assignability is true.
+
+If not, the assignability is false.
 
 =begin html
 
-<ul>
-  <li>When assigning to a different Type</li>
-  <li>When passing to Method Arguments of different Type</li>
-  <li>When returning a Type different from Return Value</li>
-</ul>
+<table>
+  <tr><th>Assignable</th><th>To</th><th>From</th><th><a href="#Implicite-Type-Conversion">Implicite Type Conversion</th></tr>
+  <tr><td>True</td><td>CLASS_X[]</td><td>CLASS_X[]</td><td>None</td></tr>
+  <tr><td>True</td><td>CLASS_X[]</td><td>undef</td><td>None</td></tr>
+  <tr><td>False</td><td>CLASS_X[]</td><td>OTHER</td><td>None</td></tr>
+</table>
 
 =end html
 
-Implicit Type Conversion occurs when:
+B<Examples:>
 
-=head3 Implicit Widening Type Conversion
+  my $points : Point[] = new Point[3];
+  my $points : Point[] = undef;
 
-If both the source and destination Type are Numeric Types and the destination Type is greater than the source Type, L</"Numeric Widening Type Conversion"> is done.
+=head2 Type Assignability to Interface Array
 
-  # Implicit Widening Type Conversion
-  my $num : long = 123;
-  my $num : double = 12.5f;
+If the type of the left operand is an L<interface array type|/"Interface Array Types"> and the type of the right operand is the same type of the left operand or the L<undef type|/"Undefined Type">, the assignability is true.
 
-=head3 Implicit Narrowing Type Conversion
+If the type of the left operand is an L<interface array type|/"Interface Array Types"> and the type of the right operand is a L<class array type|/"Class Array Types"> and its L<basic type|/"Basic Type"> can assign to the basic type of the left operand, the assignability is true.
 
-Both the source and destination Type are Numeric Types, and the destination Type is smaller than the source Type, and the source value can be expressed in the range of Integer Literal and destination Type value. L</"Numeric Narrowing Type Conversion"> is performed.
+If not, the assignability is false.
 
-  # Implicit Narrowing Type Conversion
-  my $num : byte = 123;
-  my $num : short = 134;
+=begin html
 
-=head3 Implicit Numeric Type to Any Object Conversion
+<table>
+  <tr><th>Assignable</th><th>To</th><th>From</th><th><a href="#Implicite-Type-Conversion">Implicite Type Conversion</th></tr>
+  <tr><td>True</td><td>INTERFACE_X[]</td><td>INTERFACE_X[]</td><td>None</td></tr>
+  <tr><td>True</td><td>INTERFACE_X[]</td><td>undef</td><td>None</td></tr>
+  <tr><td>Conditional True</td><td>INTERFACE_X[]</td><td>CLASS_Y[]</td><td>None</td></tr>
+  <tr><td>False</td><td>INTERFACE_X[]</td><td>OTHER</td><td>None</td></tr>
+</table>
 
-If the source Type is Numeric Types and the destination Type is Any Object Type, L</"Boxing Type Conversion"> to the corresponding Numeric Object Type Is done. In the following case, the converted Int Type object is assigned to the generic object.
+=end html
 
-  # Implicit Boxing Type Conversion to objectType
-  my $num = 123;
-  my $object : object = $num;
+B<Examples:>
 
-=head3 Implicit Numeric Type to Numeric Object Type Conversion
+  my $stringables : Stringable[] = new Stringable[3];
 
-When the source Type is Numeric Types and the destination Type is the corresponding Numeric Object Type, L</"Boxing Type Conversion"> to the corresponding Numeric Object Type a> is done.
+  my $stringables : Stringable[] = new Point[3];
+  
+  my $stringables : Stringable[] = undef;
 
-  # Implicit Boxing Type Conversion to object Type
-  my $num = 123;
-  my $object : Int = $num;
+=head2 Type Assignability to Callback Array
 
-When the source Type is Any Object Type and the destination Type is Numeric Types, L</"Unboxing Type Conversion"> in the corresponding Numeric Types are displayed. Will be opened. In the following case, an attempt is made to convert the Int Type object to L</"int Type">.
+If the type of the left operand is an L<Callback array type|/"Callback Array Types"> and the type of the right operand is the same type of the left operand or the L<undef type|/"Undefined Type">, the assignability is true.
 
-=head3 Implicit Numeric Object Type to Numeric Type Conversion
+If the type of the left operand is an L<Callback array type|/"Callback Array Types"> and the type of the right operand is a L<class array type|/"Class Array Types"> and its L<basic type|/"Basic Type"> can assign to the basic type of the left operand, the assignability is true.
 
-  # Implicit Unboxing Type Conversion from objectType-
-  my $object : object;
-  my $num : int = $object;
+If not, the assignability is false.
 
-If the source Type is Numeric Object Type and the destination Type is the corresponding Numeric Types, L</"Unboxing Type Conversion"> in the corresponding Numeric Types Is done.
+=begin html
 
-  # Implicit Unboxing Type Conversion from Numeric Object Type
-  my $num_obj = Int->new(3);
-  my $num : int = $num_obj;
+<table>
+  <tr><th>Assignable</th><th>To</th><th>From</th><th><a href="#Implicite-Type-Conversion">Implicite Type Conversion</th></tr>
+  <tr><td>True</td><td>Callback_X[]</td><td>Callback_X[]</td><td>None</td></tr>
+  <tr><td>True</td><td>Callback_X[]</td><td>undef</td><td>None</td></tr>
+  <tr><td>Conditional True</td><td>Callback_X[]</td><td>CLASS_Y[]</td><td>None</td></tr>
+  <tr><td>False</td><td>Callback_X[]</td><td>OTHER</td><td>None</td></tr>
+</table>
 
-=head3 Numeric Type to String Type Conversion
+=end html
 
-If the source Type is Numeric Types and the destination Type is L</"String Type">, L</"Numeric-to-String Type Conversion"> is performed. In the following case, the numerical value "123" is converted to String "" 123 "" and assigned.
+B<Examples:>
 
-  # Implicit Boxing Type Conversion to String Type
-  my $num = 123;
-  my $str : string = $num;
+  my $stringers : Stringer[] = new Stringer[3];
 
-=head2 Numeric Types Conversion
+  {
+    my $cb = method : string ($object : object) {
+      my $point = (Point)$object;
+      return $point->to_string;
+    };
+    my $stringers : Stringer[] = [$cb];
+  }
+  
+  my $stringers : Stringer[] = undef;
 
-Numeric Types Conversion is the conversion from L</"Numeric Types"> to L</"Numeric Types">.
+=head2 Type Assignability to Any Object Array
 
-Numeric Types Conversion performs exactly the same processing as Numeric Types Conversion in the corresponding C language. For example, Type Conversion from int to long in SPVM is the same as the type conversion from int32_t Type to int64_t Type in C language.
+If the type of the left operand is the L<any object array type|/"Any Object Array Type"> C<object[]> and the type of the right operand is an L<object array type|/"Object Array Type"> or the L<undef type|/"Undefined Type">, the assignability is true.
+
+If not, the assignability is false.
+
+=begin html
+
+<table>
+  <tr><th>Assignable</th><th>To</th><th>From</th><th><a href="#Implicite-Type-Conversion">Implicite Type Conversion</th></tr>
+  <tr><td>True</td><td>object[]</td><td>OBJECT_X[]</td><td>None</td></tr>
+  <tr><td>True</td><td>object[]</td><td>undef</td><td>None</td></tr>
+  <tr><td>False</td><td>object[]</td><td>OTHER</td><td>None</td></tr>
+</table>
+
+=end html
+
+B<Examples:>
+
+  my $any_object0 : object[];
+  my $any_object : object[] = $any_object0;
+
+  my $points : Point[];
+  my $any_object : object[] = $points;
+
+  my $any_object : object[] = undef;
+
+  my $points_2dim : Point[][];
+  my $any_object : object[] = $points_2dim;
+
+  my $stringables : Stringable[];
+  my $any_object : object[] = $stringables;
+  
+  my $strings : string[];
+  my $any_object : object[] = $strings;
+  
+=head2 Type Assignability to Multi-Dimensional Array
+
+If the type of the left operand is a L<multi-dimensional array type|/"Multi-Dimensional Array Type"> and the type of the right operand is the same type of the left operand or the L<undef type|/"Undefined Type">, the assignability is true.
+
+If the L<basic type|/"Basic Type"> of the type of the left operand is an L<interface type|/"Interface Type"> and the L<basic type|/"Basic Type"> of the type of the right operand is a L<class type|/"Class Type"> and the dimension of the type of the right operand is same as the dimension of the type left oerand and the L<basic type|/"Basic Type"> of the type of the right operand has the interface of the L<basic type|/"Basic Type"> of the type of the left operand , the assignability is true.
+
+If the L<basic type|/"Basic Type"> of the type of the left operand is an L<callback type|/"Callback Type"> and the L<basic type|/"Basic Type"> of the type of the right operand is a L<class type|/"Class Type"> and the dimension of the type of the right operand is same as the dimension of the type left oerand and the L<basic type|/"Basic Type"> of the type of the right operand has the callback of the L<basic type|/"Basic Type"> of the type of the left operand , the assignability is true.
+
+If not, the assignability is false.
+
+=begin html
+
+<table>
+  <tr><th>Assignable</th><th>To</th><th>From</th><th><a href="#Implicite-Type-Conversion">Implicite Type Conversion</th></tr>
+  <tr><td>True</td><td>MULDIM_X</td><td>MULDIM_X</td><td>None</td></tr>
+  <tr><td>True</td><td>object[]</td><td>undef</td><td>None</td></tr>
+  <tr><td>Conditional True</td><td>INTERFACE_MULDIM_X[]</td><td>CLASS_MULDIM_Y[]</td><td>None</td></tr>
+  <tr><td>Conditional True</td><td>CALLBACK_MULDIM_X[]</td><td>CLASS_MULDIM_Y[]</td><td>None</td></tr>
+  <tr><td>False</td><td>object[]</td><td>OTHER</td><td>None</td></tr>
+</table>
+
+=end html
+
+B<Examples:>
+
+  my $points_2dim : Point[][];
+  my $muldim_array : Point[][] = $points_2dim;
+
+  my $muldim_array : Point[][] = undef;
+
+  my $strings_2dim : String[][];
+  my $muldim_array : Stringable[][] = $strings_2dim;
+
+  {
+    my $cb = method : string ($object : object) {
+      my $point = (Point)$object;
+      return $point->to_string;
+    };
+    my $muldim_array : Stringer[][] = [[$cb]];
+  }
+  
+=head1 Type Conversion
+
+Type conversion is explained.
+
+=head2 Explicite Type Conversion
+
+The explicite type conversion is the L<type conversion|/"Type Conversion"> performed by a L<type cast|/"Type Cast"> expicitely.
+
+B<Examples:>
+  
+  # Explicte long to int type conversion
+  my $num = (int)123L;
+
+  # Explicte byte[] to string type conversion
+  my $num = (string)new byte[3];
+
+  # Explicte string to byte[] type conversion
+  my $num = (byte[])"Hello";
+
+=head2 Implicite Type Conversion
+
+The implicite type conversion is the L<type conversion|/"Type Conversion"> performed implicitly when a value is assigned using L<assignment operator|/"Assignment Operator">, pass an argument to a method using a L<method call|/"Method Calls">, or set a return value using the L<return statement|/"return Statement">.
+
+See L<"Type Assignability"> if you know when implicite type conversion is performed.
+
+B<Examples:>
+  
+  # Implicite int to double type conversion
+  my $num : double = 5;
+  
+  # Implicte double to Double type conversion
+  my $num_object : Double = 5.1;
+  
+  # Implicte Double to double type conversion
+  my $num : double = Double->new(5.1);
+  
+  # Implicte int to string type conversion
+  my $string : string = 4;
+
+=head2 Numeric Type Conversion
+
+Numeric Type Conversion is the conversion from L</"Numeric Types"> to L</"Numeric Types">.
+
+Numeric Type Conversion performs exactly the same processing as Numeric Type Conversion in the corresponding C language. For example, Type Conversion from int to long in SPVM is the same as the type conversion from int32_t Type to int64_t Type in C language.
 
   # SPVM conversion
   my $src : int = 5;
@@ -7004,7 +7302,7 @@ Numeric Widening Type Conversion is a conversion rule applied when converting fr
 
 =head2 Numeric-to-String Type Conversion
 
-The numeric-to-String type conversion is a L<type conversion|/"Type Conversions"> from a L<numeric type|/"Numeric Types"> to the L<string type|/"String Type">.
+The numeric-to-String type conversion is a L<type conversion|/"Type Conversion"> from a L<numeric type|/"Numeric Types"> to the L<string type|/"String Type">.
 
   # Numeric-to-String type conversion
   my $byte = (byte)1;
@@ -7032,21 +7330,21 @@ The numeric-to-String type conversion is a L<type conversion|/"Type Conversions"
   # The string is "3.3"
   my $string_double = (string)$double;
 
-=head2 string to byte[] Type Conversion
+=head2 String-to-byte[] Type Conversion
 
-string to byte[] type conversion is a L</"Type Conversions"> from L</"String Type"> to L</"byte[] Type">.
+The String-to-byte[] type conversion is a L</"Type Conversion"> from L</"String Type"> to L</"byte[] Type">.
 
-  # string to byte[] Type Conversion
+  # String-to-byte[] Type Conversion
   my $string : string = "Hello";
   my $bytes : byte[] = (byte[])$string;
 
 A new byte[] object is created and all characters in the string are copied to the elements of byte[] object.
 
-=head2 byte[] to String Type Conversion
+=head2 byte[]-to-String Type Conversion
 
-byte[] to string type conversion is a L</"Type Conversions"> from L</"byte[] type"> to L</"String Type">.
+The byte[]-to-String type conversion is a L</"Type Conversion"> from L</"byte[] type"> to L</"String Type">.
 
-  # byte[] to string type conversion
+  # byte[]-to-String type conversion
   my $bytes : byte[] = new byte[3];
   $bytes->[0] = 'a';
   $bytes->[1] = 'b';
@@ -7065,7 +7363,7 @@ Unboxing Type Conversion is an operation to convert the value of Numeric Object 
 
 =head2 Bool Type Conversion
 
-The bool type conversion is a L<type conversion|/"Type Conversions"> that is performed in operands of conditional branches.
+The bool type conversion is a L<type conversion|/"Type Conversion"> that is performed in operands of conditional branches.
 
 The operand of the L<if statement|/"if Statement">:
 
@@ -7103,7 +7401,7 @@ The operand of the L<logical NOT operator|/"Logical NOT Operator">:
 
   !CONDITION
 
-The type of the operand of the bool type conversion must be a L<numeric type|/"Numeric Types"> or an L<object type|/"Object Types"> or the L<undef type|/"Undefined Type">. If not, a compilation error will occur.
+The type of the operand of the bool type conversion must be a L<numeric type|/"Numeric Types"> or an L<object type|/"Object Types"> or the L<undef type|/"Undefined Type">, otherwise a compilation error will occur.
 
 The return type of the bool type conversion is the L<int type|/"int Type">.
 
@@ -7169,24 +7467,6 @@ B<Examples:>
   if (undef) {
     # not ok
   }
-
-=head1 Type Qualifiers
-
-Type qualifiers qualify the type.
-
-  QUALIFIER TYPE
-
-=head2 mutable Type Qualifier
-
-The C<mutable> type qualifier is used to allow to set the character of the string.
-
-  my $string : mutable string;
-
-B<Examples:>
-  
-  # Mutable string
-  my $message = (mutable string)"abc";
-  $message->[0] = 'd';
 
 =head1 Type Comment
 
@@ -7326,3 +7606,10 @@ Even if there are 3 circular references, you can release them correctly by setti
 
 As a syntax related to Weak Reference, Weak Reference can be released L</"weaken Statement">, and it can be confirmed whether Field is Weak Reference the L<isweak operator|/"isweak Operator">.
 
+=head1 SEE ALSO
+
+=head2 Examples
+
+You can see more examples in the following test codes.
+
+L<Examples of SPVM|https://github.com/yuki-kimoto/SPVM/tree/master/t/default/lib/SPVM/TestCase>

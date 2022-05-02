@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2021 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.19;
+use Object::Pad 0.57;
 
-package Device::Chip::HTU21D 0.07;
+package Device::Chip::HTU21D 0.08;
 class Device::Chip::HTU21D
-   extends Device::Chip;
+   :isa(Device::Chip);
 
 use utf8;
 
@@ -158,7 +158,9 @@ async method _trigger_nohold ( $cmd )
          $attempts-- and $f = $f->else_done( undef );
 
          my $bytes = await $f;
-         defined $bytes and
+         # TODO: Is this a tinyUSSB bug? We're successfully reading two 0xFF
+         #   bytes before it's ready
+         defined $bytes and $bytes ne "\xFF\xFF" and
             return unpack "S>", $bytes;
 
          await $protocol->sleep( 0.01 );

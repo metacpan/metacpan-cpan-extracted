@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.748';
+our $VERSION = '1.750';
 
 use Term::Choose::Constants qw( ROW COL );
 use Term::Choose::Screen    qw( up clear_to_end_of_screen show_cursor hide_cursor );
@@ -53,11 +53,11 @@ sub __search_begin {
         }
         if ( ! eval {
             if ( $self->{search} == 1 ) {
-                $search_regex = "(?i)$search_str";
+                $search_regex = qr/$search_str/i;
                 $self->{search_info} = 'm/' . $search_str . '/i';
             }
             else {
-                $search_regex = $search_str;
+                $search_regex = qr/$search_str/;
                 $self->{search_info} = 'm/' . $search_str . '/';
             }
             'Teststring' =~ $search_regex;
@@ -72,7 +72,7 @@ sub __search_begin {
     $self->{map_search_list_index} = [];
     my $filtered_list = [];
     for my $i ( 0 .. $#{$self->{list}} ) {
-        if ( $self->{list}[$i] =~ /$search_regex/ ) {
+        if ( $self->{list}[$i] =~ $search_regex ) {
             push @{$self->{map_search_list_index}}, $i;
             push @$filtered_list, $self->{list}[$i];
         }

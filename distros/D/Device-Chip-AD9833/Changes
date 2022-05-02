@@ -1,5 +1,9 @@
 Revision history for Device-Chip-AD9833
 
+0.03    2022-04-28
+        [CHANGES]
+         * Use the new :isa from Object::Pad 0.57 to avoid `extends`
+
 0.02    2020-12-06
         [CHANGES]
          * Use new toplevel 'await' syntax from Future::AsyncAwait 0.47

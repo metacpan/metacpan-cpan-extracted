@@ -15,26 +15,8 @@ SKIP: {
   my $template_file = "$dir/etc/mustache_template.docx";
 
   my $template = MsOffice::Word::Template->new(
-    docx      => $template_file,
-    start_tag => "{{",
-    end_tag   => "}}",
-    engine    => sub {
-      my ($self, $vars) = @_;
-
-      # at the first invocation, create a Mustache compiled template and store it in the stash.
-      # Further invocations will just reuse the object in stash.
-      my $stash            = $self->{engine_stash} //= {};
-      $stash->{mustache} //= Template::Mustache->new(
-        template => $self->{template_text},
-        @{$self->engine_args},   # for ex. partials, partial_path, context
-                                 # -- see L<Template::Mustache> documentation
-       );
-
-      # generate new XML by invoking the template on $vars
-      my $new_XML = $stash->{mustache}->render($vars);
-
-      return $new_XML;
-      },
+    docx         => $template_file,
+    engine_class => 'Mustache',
    );
 
   my %data = (

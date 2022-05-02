@@ -14,7 +14,7 @@ MarpaX::ESLIF::Bindings - MarpaX::ESLIF's Bindings
 
 =head1 VERSION
 
-version 6.0.16
+version 6.0.18
 
 =head1 DESCRIPTION
 
@@ -101,11 +101,11 @@ Every object that is not mappable into a MarpaX::ESLIF type, is exported using m
 
 =item [1]
 
-The number of bits of the C<C> type is compared to the number of bits in java, that is fixed whatever the java version. The shortest java type is used, else a Math.BigInteger default if not java type is found.
+The number of bits of the C<C> type is compared to the number of bits in java, that is fixed whatever the java version. The shortest java type is used, else a Math.BigInteger if no java type is found.
 
 =item [2]
 
-The number of bits of the C<C> type is compared to the number of bits in java, that is fixed whatever the java version. The shortest java type is used, else a Math.BigDecimal default if not java type is found.
+The number of bits of the C<C> type is compared to the number of bits in java, that is fixed whatever the java version. The shortest java type is used, else a Math.BigDecimal if no java type is found.
 
 =item [3]
 

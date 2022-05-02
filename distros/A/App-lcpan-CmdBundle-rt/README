@@ -3,7 +3,7 @@ NAME
     rt.cpan.org
 
 VERSION
-    This document describes version 0.004 of App::lcpan::CmdBundle::rt (from
+    This document describes version 0.005 of App::lcpan::CmdBundle::rt (from
     Perl distribution App-lcpan-CmdBundle-rt), released on 2022-03-27.
 
 SYNOPSIS

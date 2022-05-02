@@ -1,19 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2008-2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2008-2022 -- leonerd@leonerd.org.uk
 
-package Attribute::Storage;
+package Attribute::Storage 0.10;
 
-use strict;
+use v5.14;
 use warnings;
 
 use Carp;
 
-our $VERSION = '0.09';
-
 require XSLoader;
-XSLoader::load( __PACKAGE__, $VERSION );
+XSLoader::load( __PACKAGE__, our $VERSION );
 
 use B qw( svref_2object );
 
@@ -24,29 +22,29 @@ references
 
 =head1 SYNOPSIS
 
- package My::Package;
+   package My::Package;
 
- use Attribute::Storage;
+   use Attribute::Storage;
 
- sub Title :ATTR(CODE)
- {
-    my $package = shift;
-    my ( $title ) = @_;
+   sub Title :ATTR(CODE)
+   {
+      my $package = shift;
+      my ( $title ) = @_;
 
-    return $title;
- }
+      return $title;
+   }
 
- package main;
+   package main;
 
- use Attribute::Storage qw( get_subattr );
- use My::Package;
+   use Attribute::Storage qw( get_subattr );
+   use My::Package;
 
- sub myfunc :Title('The title of my function')
- {
-    ...
- }
+   sub myfunc :Title('The title of my function')
+   {
+      ...
+   }
 
- print "Title of myfunc is: ".get_subattr(\&myfunc, 'Title')."\n";
+   print "Title of myfunc is: ".get_subattr(\&myfunc, 'Title')."\n";
 
 =head1 DESCRIPTION
 
@@ -130,13 +128,13 @@ handle accordingly.
 
 Only C<CODE> attributes are supported at present.
 
- sub AttributeName :ATTR(CODE)
- {
-    my $package = shift;
-    my ( $attr, $args, $here ) = @_;
-    ...
-    return $value;
- }
+   sub AttributeName :ATTR(CODE)
+   {
+      my $package = shift;
+      my ( $attr, $args, $here ) = @_;
+      ...
+      return $value;
+   }
 
 At attachment time, the optional string that may appear within brackets
 following the attribute's name is parsed as a Perl expression in list context.
@@ -144,59 +142,59 @@ If this succeeds, the values are passed as a list to the handling code. If
 this fails, an error is returned to the perl compiler. If no string is
 present, then an empty list is passed to the handling code.
 
- package Defining;
+   package Defining;
 
- sub NameMap :ATTR(CODE)
- {
-    my $package = shift;
-    my @strings = @_;
+   sub NameMap :ATTR(CODE)
+   {
+      my $package = shift;
+      my @strings = @_;
 
-    return { map { m/^(.*)=(.*)$/ and ( $1, $2 ) } @strings };
- }
+      return { map { m/^(.*)=(.*)$/ and ( $1, $2 ) } @strings };
+   }
 
- package Using;
+   package Using;
 
- use Defining;
+   use Defining;
 
- sub somefunc :NameMap("foo=FOO","bar=BAR","splot=WIBBLE") { ... }
+   sub somefunc :NameMap("foo=FOO","bar=BAR","splot=WIBBLE") { ... }
 
- my $map = get_subattr("somefunc", "NameMap");
- # Will yield:
- #  { foo   => "FOO",
- #    bar   => "BAR",
- #    splot => "WIBBLE" }
+   my $map = get_subattr("somefunc", "NameMap");
+   # Will yield:
+   #  { foo   => "FOO",
+   #    bar   => "BAR",
+   #    splot => "WIBBLE" }
 
 Note that it is impossible to distinguish
 
- sub somefunc :NameMap   { ... }
- sub somefunc :NameMap() { ... }
+   sub somefunc :NameMap   { ... }
+   sub somefunc :NameMap() { ... }
 
 It is possible to create attributes that do not parse their argument as a perl
 list expression, instead they just pass the plain string as a single argument.
 For this, add the C<RAWDATA> flag to the C<ATTR()> list.
 
- sub Title :ATTR(CODE,RAWDATA)
- {
-    my $package = shift;
-    my ( $text ) = @_;
+   sub Title :ATTR(CODE,RAWDATA)
+   {
+      my $package = shift;
+      my ( $text ) = @_;
 
-    return $text;
- }
+      return $text;
+   }
 
- sub thingy :Title(Here is the title for thingy) { ... }
+   sub thingy :Title(Here is the title for thingy) { ... }
 
 To obtain the name of the function to which the attribute is being applied,
 use the C<NAME> flag to the C<ATTR()> list.
 
- sub Callable :ATTR(CODE,NAME)
- {
-    my $package = shift;
-    my ( $subname, @args ) = @_;
+   sub Callable :ATTR(CODE,NAME)
+   {
+      my $package = shift;
+      my ( $subname, @args ) = @_;
 
-    print "The Callable attribute is being applied to $package :: $subname\n";
+      print "The Callable attribute is being applied to $package :: $subname\n";
 
-    return;
- }
+      return;
+   }
 
 When applied to an anonymous function (C<sub { ... }>), the name will appear
 as C<__ANON__>.
@@ -209,47 +207,47 @@ handling code will be given the previous value that was returned, or C<undef>
 for the first time. It is up to the code to perform whatever merging logic is
 required.
 
- sub Description :ATTR(CODE,MULTI,RAWDATA)
- {
-    my $package = shift;
-    my ( $olddesc, $more ) = @_;
+   sub Description :ATTR(CODE,MULTI,RAWDATA)
+   {
+      my $package = shift;
+      my ( $olddesc, $more ) = @_;
 
-    return defined $olddesc ? "$olddesc$more\n" : "$more\n";
- }
+      return defined $olddesc ? "$olddesc$more\n" : "$more\n";
+   }
 
- sub Argument :ATTR(CODE,MULTI)
- {
-    my $package = shift;
-    my ( $args, $argname ) = @_;
+   sub Argument :ATTR(CODE,MULTI)
+   {
+      my $package = shift;
+      my ( $args, $argname ) = @_;
 
-    push @$args, $argname;
-    return $args;
- }
+      push @$args, $argname;
+      return $args;
+   }
 
- sub Option :ATTR(CODE,MULTI)
- {
-    my $package = shift;
-    my ( $opts, $optname ) = @_;
+   sub Option :ATTR(CODE,MULTI)
+   {
+      my $package = shift;
+      my ( $opts, $optname ) = @_;
 
-    $opts and exists $opts->{$optname} and
-       croak "Already have the $optname option";
+      $opts and exists $opts->{$optname} and
+         croak "Already have the $optname option";
 
-    $opts->{$optname}++;
-    return $opts;
- }
+      $opts->{$optname}++;
+      return $opts;
+   }
 
- ...
+   ...
 
- sub do_copy
-    :Description(Copy from SOURCE to DESTINATION)
-    :Description(Optionally preserves attributes)
-    :Argument("SOURCE")
-    :Argument("DESTINATION")
-    :Option("attrs")
-    :Option("verbose")
- {
-    ...
- }
+   sub do_copy
+      :Description(Copy from SOURCE to DESTINATION)
+      :Description(Optionally preserves attributes)
+      :Argument("SOURCE")
+      :Argument("DESTINATION")
+      :Option("attrs")
+      :Option("verbose")
+   {
+      ...
+   }
 
 =cut
 
@@ -334,7 +332,9 @@ sub handle_attr
 
 =cut
 
-=head2 $attrs = get_subattrs( $sub )
+=head2 get_subattrs
+
+   $attrs = get_subattrs( $sub )
 
 Returns a HASH reference containing all the attributes defined on the given
 sub. The sub should either be passed as a CODE reference, or as a name in the
@@ -365,7 +365,9 @@ sub get_subattrs
    return { %{ _get_attr_hash( $cv, 0 ) || {} } }; # clone
 }
 
-=head2 $value = get_subattr( $sub, $attrname )
+=head2 get_subattr
+
+   $value = get_subattr( $sub, $attrname )
 
 Returns the value of a single named attribute on the given sub. The sub should
 either be passed as a CODE reference, or as a name in the caller's package. If
@@ -393,19 +395,21 @@ sub get_subattr
    return $attrhash->{$attr};
 }
 
-=head2 $sub = apply_subattrs( @attrs_kvlist, $sub )
+=head2 apply_subattrs
+
+   $sub = apply_subattrs( @attrs_kvlist, $sub )
 
 A utility function to help apply attributes dynamically to the given CODE
 reference. The CODE reference is given last so that calls to the function
 appear similar in visual style to the same applied at compiletime.
 
- apply_subattrs
+   apply_subattrs
     Title => "Here is my title",
     sub { return $title };
 
 Is equivalent to
 
- sub :Title(Here is my title) { return $title }
+   sub :Title(Here is my title) { return $title }
 
 except that because its arguments are evaluated at runtime, they can be
 calculated by other code in ways that the compiletime version cannot.
@@ -418,7 +422,9 @@ use the C<RAWDATA> flag, it should be a valid perl expression. As this is
 still evaluated using an C<eval()> call, take care when handling
 potentially-unsafe or user-supplied data.
 
-=head2 $sub = apply_subattrs_for_pkg( $pkg, @attrs_kvlist, $sub )
+=head2 apply_subattrs_for_pkg
+
+   $sub = apply_subattrs_for_pkg( $pkg, @attrs_kvlist, $sub )
 
 As C<apply_subattrs> but allows passing a specific package name, rather than
 using C<caller>.
@@ -444,7 +450,9 @@ sub apply_subattrs
    apply_subattrs_for_pkg( scalar caller, @_ );
 }
 
-=head2 %subs = find_subs_with_attr( $pkg, $attrname, %opts )
+=head2 find_subs_with_attr
+
+   %subs = find_subs_with_attr( $pkg, $attrname, %opts )
 
 A utility function to find CODE references in the given package that have the
 name attribute applied. The symbol table is checked for the given package,
@@ -457,7 +465,7 @@ which will be searched in order with earlier ones taking precedence over later
 ones. This, for example, allows for subclass searching over an entire class
 heirarchy of packages, via the use of L<mro>:
 
- %subs = find_subs_with_attr( [ mro::get_linear_isa $class ], $attrname );
+   %subs = find_subs_with_attr( mro::get_linear_isa( $class ), $attrname );
 
 Takes the following named options:
 
@@ -467,8 +475,8 @@ Takes the following named options:
 
 If present, gives a filter regexp or CODE reference to apply to symbol names.
 
- $name =~ $matching
- $matching->( local $_ = $name )
+   $name =~ $matching
+   $matching->( local $_ = $name )
 
 =item filter => CODE
 
@@ -477,7 +485,7 @@ before they are accepted as results. Note that this allows the possibility
 that the first match for a given method name to be rejected, while later ones
 are accepted.
 
- $filter->( $cv, $name, $package )
+   $filter->( $cv, $name, $package )
 
 =back
 

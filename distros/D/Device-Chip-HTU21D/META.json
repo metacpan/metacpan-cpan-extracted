@@ -26,7 +26,7 @@
             "Device::Chip::Sensor" : "0",
             "Future::AsyncAwait" : "0.47",
             "Future::Mutex" : "0.47",
-            "Object::Pad" : "0.19",
+            "Object::Pad" : "0.57",
             "perl" : "5.026"
          }
       },
@@ -40,7 +40,7 @@
    "provides" : {
       "Device::Chip::HTU21D" : {
          "file" : "lib/Device/Chip/HTU21D.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -49,6 +49,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.07",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

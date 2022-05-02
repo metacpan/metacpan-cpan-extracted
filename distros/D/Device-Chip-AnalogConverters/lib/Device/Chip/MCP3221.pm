@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2018-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2018-2022 -- leonerd@leonerd.org.uk
 
-use 5.026;
-use Object::Pad 0.19;
+use v5.26;
+use Object::Pad 0.57;
 
-package Device::Chip::MCP3221 0.12;
+package Device::Chip::MCP3221 0.13;
 class Device::Chip::MCP3221
-   extends Device::Chip;
+   :isa(Device::Chip);
 
 use Future::AsyncAwait;
 

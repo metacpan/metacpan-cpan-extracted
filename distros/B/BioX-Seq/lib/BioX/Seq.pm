@@ -1,4 +1,4 @@
-package BioX::Seq 0.008004;
+package BioX::Seq 0.008005;
 
 use 5.016;
 use strict;
@@ -215,6 +215,16 @@ sub as_fastq {
         : $self->{qual};
     $string .= "\n";
     return $string;
+
+}
+
+sub as_input {
+
+    my ($self, $arg2) = @_;
+    die "No input format found"
+        if (! defined $self->{_input_format});
+    my $method = 'as_' . $self->{_input_format};
+    $self->$method();
 
 }
 
@@ -450,6 +460,17 @@ that, at a minimum, the <seq> and <id> properties be defined.
 I<DEFAULT_QUALITY>, if given, specifies the default Phred quality score to be
 assigned to each base if missing - for instance, if converting from FASTA to
 FASTQ (default: 20).
+
+=item B<as_input>
+
+=item B<as_input> I<ARGUMENT>
+
+If the sequence object comes from a C<BioX::Seq::Stream> instance, this method
+will format the sequence to match the input format, calling either
+C<BioX::Seq::as_fasta> or <BioX::Seq::as_fastq> as appropriate. The optional
+argument, if given, will be passed on to the appropriate method and evaluated
+in that context. Throws an error if the input format cannot be deduced
+(probably because the object was not created by a parser).
 
 =back
 

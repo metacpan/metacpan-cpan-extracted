@@ -1,0 +1,37 @@
+#!/usr/bin/env perl
+
+# This is a fake ykinfo program that provides canned responses, for testing.
+
+use warnings;
+use strict;
+
+use Getopt::Std;
+
+our ($opt_a, $opt_n);
+getopts('an:');
+
+my $device = $opt_n // -1;
+
+if ($device == 0) {
+    print q{serial: 123
+version: 2.0.0
+touch_level: 0
+vendor_id: 1050
+product_id: 113
+};
+    exit 0;
+}
+elsif ($device == 1) {
+    print q{serial: 456
+version: 3.0.1
+touch_level: 10
+vendor_id: 1050
+product_id: 401
+};
+    exit 0;
+}
+else {
+    print STDERR "Yubikey core error: no yubikey present\n";
+    exit 1;
+}
+

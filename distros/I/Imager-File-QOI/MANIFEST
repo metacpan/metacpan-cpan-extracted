@@ -1,0 +1,16 @@
+Changes
+imqoi.c
+imqoi.h
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+qoi.h
+QOI.pm
+QOI.xs
+t/10-image.t
+t/20-test-images.t
+t/30-errors.t
+t/90-pod.t
+t/91-meta.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

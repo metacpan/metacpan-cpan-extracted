@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad;
+use Object::Pad 0.57;
 
-package Device::Chip::TCS3472x 0.02;
+package Device::Chip::TCS3472x 0.03;
 class Device::Chip::TCS3472x
-   extends Device::Chip;
+   :isa(Device::Chip);
 
 use Carp;
 
@@ -72,7 +72,7 @@ method mount ( $adapter, %params )
 {
    $_led_pin = delete $params{led} if exists $params{led};
 
-   return $self->SUPER::mount( @_ );
+   return $self->SUPER::mount( $adapter, %params );
 }
 
 sub I2C_options

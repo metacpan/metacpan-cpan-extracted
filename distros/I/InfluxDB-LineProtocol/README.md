@@ -4,7 +4,7 @@ InfluxDB::LineProtocol - Write and read InfluxDB LineProtocol
 
 # VERSION
 
-version 1.014
+version 1.015
 
 # SYNOPSIS
 
@@ -135,6 +135,7 @@ nanosecond timestamps cause some Perls to render the timestamp in
 scientific notation.
 - [Adrian Popa](https://github.com/mad-ady) for fixing a bug when
 handling large scientific notation data.
+- [ zachary-bull ](https://github.com/zachary-bull) for adding code to escape `=` in tag keys.
 
 # AUTHOR
 
@@ -142,7 +143,15 @@ Thomas Klausner <domm@plix.at>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 - 2021 by Thomas Klausner.
+This software is copyright (c) 2016 - 2022 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+# POD ERRORS
+
+Hey! **The above document had some coding errors, which are explained below:**
+
+- Around line 173:
+
+    L<> starts or ends with whitespace

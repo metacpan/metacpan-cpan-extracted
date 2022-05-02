@@ -3,11 +3,11 @@ use warnings;
 use strict;
 use Carp;
 use utf8;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use IO::Socket;
 use IO::Select;
-use JSON::Create '0.34', ':all';
+use JSON::Create '0.35', ':all';
 use JSON::Parse '0.61', ':all';
 
 $SIG{PIPE} = sub {

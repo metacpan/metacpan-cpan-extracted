@@ -5,7 +5,7 @@ use strict;
 use CPU::Z80::Assembler;
 $CPU::Z80::Assembler::verbose =1;
 
-open(BIN, '>multiply.bin');
+open(BIN, '>t/multiply.bin');
 print BIN z80asm('
         MACRO MUL8x8 target, r1, r2 {   ; takes three reg parms, multiplies r1
 	  PUSH HL                       ; and r2 with result into target

@@ -1,3 +1,4 @@
+[![Actions Status](https://github.com/kaz-utashiro/greple-subst-desumasu/workflows/test/badge.svg)](https://github.com/kaz-utashiro/greple-subst-desumasu/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-Greple-subst-desumasu.svg)](https://metacpan.org/release/App-Greple-subst-desumasu)
 # NAME
 
 App::Greple::subst::desumasu - Japanese DESU/MASU dictionary for App::Greple::subst
@@ -65,6 +66,10 @@ See [App::Greple::subst](https://metacpan.org/pod/App%3A%3AGreple%3A%3Asubst) fo
 # INSTALL
 
 ## CPANMINUS
+
+From CPAN:
+
+    cpanm App::Greple::subst::desumasu
 
 From GIT repository:
 

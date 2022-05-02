@@ -1,6 +1,6 @@
 package App::Greple::subst::desumasu;
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 use 5.014;
 use warnings;
@@ -96,6 +96,10 @@ See L<App::Greple::subst> for other options.
 =head1 INSTALL
 
 =head2 CPANMINUS
+
+From CPAN:
+
+    cpanm App::Greple::subst::desumasu
 
 From GIT repository:
 

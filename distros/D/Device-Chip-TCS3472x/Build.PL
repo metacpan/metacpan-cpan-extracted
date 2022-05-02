@@ -9,7 +9,7 @@ my $build = Module::Build->new(
       'Data::Bitfield' => '0.03',
       'Future' => 0,
       'Future::AsyncAwait' => '0.47', # toplevel await
-      'Object::Pad' => '0.15',
+      'Object::Pad' => '0.57',
 
       'perl' => '5.026', # signatures in Object::Pad
    },

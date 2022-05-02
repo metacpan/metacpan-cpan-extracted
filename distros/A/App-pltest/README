@@ -1,0 +1,44 @@
+pltest - Perl One-Liner Magic Wand
+
+There are always those tasks too menial for dedicated script, but still too
+cumbersome even with the many neat one-liner options of "perl -E".  This small
+script fills the gap with many bells & whistles: Various one-letter commands &
+magic variables (with meaningful aliases too) and more nifty loop options take
+Perl programming to the command line.  List::Util is fully imported.  If you
+pass no program on the command line, starts a simple Perl Shell.
+
+How to "e(cho)" values, including from "@A(RGV)", with single "$q(uote)" &
+double "$Q(uote)".  Same for hard-to-print values:
+
+    pltest 'echo "${quote}Perl$quote", "$Quote@ARGV$Quote"' one liner
+    pltest 'e "${q}Perl$q", "$Q@A$Q"' one liner
+
+    pltest 'echo \"Perl", \@ARGV, undef' one liner
+    pltest 'e \"Perl", \@A, undef' one liner
+
+Loop over args, printing each with line ending.  And same, SHOUTING:
+
+    pltest -opl '' Perl one liner
+    pltest -opl '$_ = uc' Perl one liner
+
+Print up to 3 matching lines, resetting count (and "$.") for each file:
+
+    pltest -rP3 '/Perl.*one.*liner/' file*
+
+Count hits in magic statistics hash "%N(UMBER)":
+
+    pltest -n '++$NUMBER{$1} while /(Perl|one|liner)/g' file*
+    pltest -n '++$N{$1} while /(Perl|one|liner)/g' file*
+
+Though they are sometimes slightly, sometimes quite a bit more complicated,
+most Perl one-liners from the internet work, just by omitting "-e" or "-E".
+Known minor differences are:
+
+* don't "goto LINE", but "next LINE" is fine
+
+* in a "-n" loop "last" is per file instead of behaving like "exit"
+
+* using "pop", etc. to implicitly modify "@A(RGV)" works in "-B" begin code,
+but not in your main program (which gets compiled to a function)
+
+* shenanigans with unbalanced braces won't work

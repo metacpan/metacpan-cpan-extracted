@@ -6,17 +6,17 @@ use warnings;
 use Test::More;
 
 use Future::AsyncAwait 0.47;
-use Object::Pad 0.19;
+use Object::Pad 0.57;
 
 my $after_sensors_arg;
-class TestApp extends App::Device::Chip::sensor
+class TestApp :isa(App::Device::Chip::sensor)
 {
    async method after_sensors { $after_sensors_arg = [ @_ ]; }
 }
 
 my $app = TestApp->new;
 
-class Device::Chip::Adapter::_ATestAdapter implements Device::Chip::Adapter
+class Device::Chip::Adapter::_ATestAdapter :does(Device::Chip::Adapter)
 {
    async method make_protocol_GPIO { return $self }
 
@@ -25,7 +25,7 @@ class Device::Chip::Adapter::_ATestAdapter implements Device::Chip::Adapter
 $INC{"Device/Chip/Adapter/_ATestAdapter.pm"} = __FILE__;
 
 my $initialized;
-class Device::Chip::_ATestChip extends Device::Chip
+class Device::Chip::_ATestChip :isa(Device::Chip)
 {
    use Device::Chip::Sensor -declare;
 

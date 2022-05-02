@@ -14,4 +14,5 @@ on "test" => sub {
         requires "Test::Builder"             => 0;
         requires "Test::CPAN::Meta"          => 0;
         requires "Test::More"                => 0;
+        requires "Template"                  => "3.100";
 };

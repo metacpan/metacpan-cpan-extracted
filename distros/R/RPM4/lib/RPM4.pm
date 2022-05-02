@@ -30,7 +30,7 @@ use RPM4::Header::Dependencies;
 use RPM4::Header::Files;
 use RPM4::Spec;
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 our @ISA = qw(DynaLoader Exporter);
 our @EXPORT = qw(moduleinfo
                  readconfig querytag tagName tagValue expand rpmvercmp

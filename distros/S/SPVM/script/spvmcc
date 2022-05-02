@@ -14,7 +14,6 @@ SPVM::Builder::Util::getopt
   'B|build-dir=s'   => \my $build_dir,
   'I|module-dir=s' => \my @module_dirs,
   'q|quiet'   => \my $quiet,
-  'O|optimize=s' => \my $optimize,
   'f|force' => \my $force,
   'c|config=s' => \my $config_file,
   'dynamic-lib' => \my $dynamic_lib,
@@ -42,7 +41,6 @@ else {
     output_file => $output_file,
     class_name => $class_name,
     quiet => $quiet,
-    optimize => $optimize,
     force => $force,
     config_file => $config_file,
     dynamic_lib => $dynamic_lib,
@@ -68,11 +66,10 @@ spvmcc - SPVM compiler to create exe file
   Options:
     -h, --help                     Show this message
     -v, --version                  Show the version
-    -o, --output                   Excutable file name
+    -o, --output                   Output file name
     -I, --module-dir <directory>   Add SPVM module searching directory
     -B, --build-dir <directory>    Building diretory
     -q, --quiet                    Quiet output
-    -O, --optimize <level>         Optimaization level
     -f, --force                    Force compile and link
     -c, --config                   Config file
     --dynamic-lib                  The output file is a dynamic library

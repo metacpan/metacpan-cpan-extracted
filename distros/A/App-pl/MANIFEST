@@ -6,6 +6,7 @@ App/pl.pm
 pl
 pl.cmd
 pod/examples.pod
+pod/canned-commands.pod
 t/atom-weight-1.csv
 t/atom-weight-2.csv
 t/atom-weight-3.csv
@@ -13,6 +14,7 @@ t/diff.t
 t/n-loop.t
 t/o-loop.t
 t/sort_keys.t
+t/test.pm
 t/unit.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

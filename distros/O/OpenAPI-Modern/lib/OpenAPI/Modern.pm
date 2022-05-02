@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package OpenAPI::Modern; # git description: v0.025-5-gfbeeb1b
+package OpenAPI::Modern; # git description: v0.026-4-g1ec0924
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 use 5.020;
 use Moo;
@@ -23,7 +23,7 @@ use Scalar::Util 'looks_like_number';
 use Feature::Compat::Try;
 use Encode 2.89;
 use URI::Escape ();
-use JSON::Schema::Modern 0.544;
+use JSON::Schema::Modern 0.551;
 use JSON::Schema::Modern::Utilities 0.531 qw(jsonp unjsonp canonical_uri E abort is_equal);
 use JSON::Schema::Modern::Document::OpenAPI;
 use MooX::HandlesVia;
@@ -85,6 +85,7 @@ sub validate_request ($self, $request, $options = {}) {
     traversed_schema_path => '',    # the accumulated traversal path as of the start, or last $id, or up to the last traversed $ref
     schema_path => '',              # the rest of the path, since the last $id or the last traversed $ref
     effective_base_uri => Mojo::URL->new->host(scalar _header($request, 'Host'))->scheme('https'),
+    annotations => [],
   };
 
   try {
@@ -178,6 +179,7 @@ sub validate_response ($self, $response, $options = {}) {
     initial_schema_uri => $self->openapi_uri,   # the canonical URI as of the start or last $id, or the last traversed $ref
     traversed_schema_path => '',    # the accumulated traversal path as of the start, or last $id, or up to the last traversed $ref
     schema_path => '',              # the rest of the path, since the last $id or the last traversed $ref
+    annotations => [],
   };
 
   try {
@@ -531,11 +533,11 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
 sub _result ($self, $state, $exception = 0) {
   return JSON::Schema::Modern::Result->new(
     output_format => $self->evaluator->output_format,
+    formatted_annotations => 0,
     valid => !$state->{errors}->@*,
     $exception ? ( exception => 1 ) : (),
     !$state->{errors}->@*
-      ? ($self->evaluator->collect_annotations
-        ? (annotations => $state->{annotations}//[]) : ())
+      ? (annotations => $state->{annotations}//[])
       : (errors => $state->{errors}),
   );
 }
@@ -578,11 +580,23 @@ sub _evaluate_subschema ($self, $data, $schema, $state) {
       data_path => $state->{data_path},
       traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path},
       effective_base_uri => $state->{effective_base_uri},
+      collect_annotations => 1,
     },
   );
 
   push $state->{errors}->@*, $result->errors;
-  push $state->{annotations}->@*, $result->annotations if $self->evaluator->collect_annotations;
+  push $state->{annotations}->@*, $result->annotations;
+
+  my $type = (split('/', $state->{data_path}, 3))[1];
+  my $keyword = $type eq 'request' ? 'readOnly' : $type eq 'response' ? 'writeOnly' : die "unknown type $type";
+
+  foreach my $annotation (grep $_->keyword eq $keyword && $_->annotation, $result->annotations) {
+    push $state->{errors}->@*, JSON::Schema::Modern::Error->new(
+      (map +($_ => $annotation->$_), qw(keyword instance_location keyword_location absolute_keyword_location)),
+      error => ($keyword =~ s/O/-o/r).' value is present',
+    );
+  }
+
   return !!$result;
 }
 
@@ -653,7 +667,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI docume
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

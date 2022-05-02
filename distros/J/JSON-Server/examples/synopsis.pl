@@ -3,7 +3,9 @@ use warnings;
 use strict;
 use JSON::Server;
 my $js = JSON::Server->new (handler => \& hello, port => '7777', data => 'OK');
-$js->serve ();
+while (1) {
+    $js->serve ();
+}
 
 sub hello
 {

@@ -1,19 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2011 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
-package Convert::Color::X11;
+package Convert::Color::X11 0.12;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Convert::Color::RGB8 );
 
 __PACKAGE__->register_color_space( 'x11' );
 
 use Carp;
-
-our $VERSION = '0.11';
 
 # Different systems put it in different places. We'll try all of them taking
 # the first we find
@@ -32,15 +30,15 @@ C<Convert::Color::X11> - named lookup of colors from X11's F<rgb.txt>
 
 Directly:
 
- use Convert::Color::X11;
+   use Convert::Color::X11;
 
- my $red = Convert::Color::X11->new( 'red' );
+   my $red = Convert::Color::X11->new( 'red' );
 
 Via L<Convert::Color>:
 
- use Convert::Color;
+   use Convert::Color;
 
- my $cyan = Convert::Color->new( 'x11:cyan' );
+   my $cyan = Convert::Color->new( 'x11:cyan' );
 
 =head1 DESCRIPTION
 
@@ -82,12 +80,14 @@ sub _load_x11_colors
 
 =cut
 
-=head2 @colors = Convert::Color::X11->colors
+=head2 colors
+
+   @colors = Convert::Color::X11->colors
 
 Returns a list of the defined color names, in the order they were found in the
 F<rgb.txt> file.
 
-=head2 $num_colors = Convert::Color::X11->colors
+   $num_colors = Convert::Color::X11->colors
 
 When called in scalar context, this method returns the count of the number of
 defined colors.
@@ -114,7 +114,9 @@ __PACKAGE__->register_palette(
 
 =cut
 
-=head2 $color = Convert::Color::X11->new( $name )
+=head2 new
+
+   $color = Convert::Color::X11->new( $name )
 
 Returns a new object to represent the named color.
 
@@ -147,7 +149,9 @@ sub new
 
 =cut
 
-=head2 $name = $color->name
+=head2 name
+
+   $name = $color->name
 
 The name of the VGA color.
 

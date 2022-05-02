@@ -1,0 +1,114 @@
+ORG 0x0000
+INCLUDE "example/constants.z80"
+MACRO OSFUNC { RST 1 }
+$rst0
+  DI
+  IM 1
+  LD HL, 0x0000
+  JR $init__part2   ; jump to immediately after RST block
+  
+$osfunc
+  ; on entry, stack is param1, param2, funcno, retaddr
+  PUSH AF                    ; first, see if we're already in OSFUNC
+  LD A, ($osfunc__in_osfunc)
+  CP 1
+  JR NZ, $osfunc__chk_in_osfunc_NO
+  JP $osfunc__recurse        ; we are, so crash
+$osfunc__chk_in_osfunc_NO
+  LD A, 1                    ; we're not. record that we are
+  LD ($osfunc__in_osfunc), A
+  PUSH HL                    ; store rest of registers ...
+  PUSH DE
+  PUSH BC
+  PUSH IX
+  PUSH IY
+;   ... do osfunc ...
+  PUSH IY                    ; restore rest of registers ...
+  PUSH IX
+  PUSH BC
+  PUSH DE
+  PUSH HL
+  LD A, 0                    ; mark that we're no longer in OSFUNC
+  LD ($osfunc__in_osfunc), A
+  POP AF
+  RET
+$osfunc__recurse
+; ... print message ...
+  JP $osfunc__recurse
+$osfunc__in_osfunc
+  DEFB 0x00
+
+$init__part2
+  LD SP, HL             ; initialise stack
+  JR $init__part3
+
+  DEFB 0
+
+$rst7
+  DEFT "0x38 int"
+  
+$init__part3
+
+; now slurp all ports
+  LD B, 0x80            ; 2 bytes     num ports to slurp
+  LD C, 0x00            ; 2 bytes     port to start at
+  CALL $init__slurp_ports_loop
+
+; load/execute shell
+  LD HL, $shell_name
+  PUSH HL
+  LD HL, $os_exec
+  PUSH HL
+  OSFUNC
+
+  RST 0
+
+$clock_low16
+  DEFW 0
+$clock_high16
+  DEFW 0
+
+$nmi                         ;            0x0066
+  PUSH AF                    ; inc clock
+  PUSH HL
+  LD HL, ($clock_low16)      ; first the low 16 bits
+  INC HL
+  LD ($clock_low16), HL
+  LD A, 0
+  CP L
+  JR NZ, $nmi__inc_clock__after_inc_high16
+  CP H
+  JR NZ, $nmi__inc_clock__after_inc_high16
+  LD HL, ($clock_high16)     ; now the high sixteen bits
+  INC HL
+  LD ($clock_high16), HL
+$nmi__inc_clock__after_inc_high16
+  POP HL
+  LD A, ($osfunc__in_osfunc)  ; now see if we're already in OSFUNC
+  CP 1
+  JR NZ, $nmi__chk_in_osfunc_NO
+  POP AF
+  RETN
+$nmi__chk_in_osfunc_NO
+  POP AF
+;   ... process switch? ...
+  RETN
+
+$init__slurp_ports_loop ; B is no of ports to slurp, C is no of current port
+  LD HL, $os_readport   ;  \
+  PUSH BC               ;  | set up stack for call
+  PUSH HL               ;  /
+  OSFUNC                ; leaves addr of data on stack
+  POP HL                ; throw it away
+  INC C                 ; 
+  INC C                 ; point at next port
+  DJNZ $init__slurp_ports_loop
+  RET
+
+$shell_name
+  DEFT "shell.cmd", 0x00
+
+; on entry stack is param1, param2, ..., retaddr
+$os_nmi
+$os_readport
+$os_exec

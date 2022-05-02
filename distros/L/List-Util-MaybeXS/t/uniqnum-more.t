@@ -181,17 +181,17 @@ my $fail;
 
 my $last_count_uniq = 0;
 my $it = iterate_uniqnum();
-for my $i (0 .. $#numinfo) {
+my @selected;
+for my $current_info (@numinfo) {
   SKIP: {
-    my @select = map $_->[1], @numinfo[0 .. $i];
-    my ($source, $number, $sprintf, $j, $J, $F) = @{$numinfo[$i]};
+    my ($source, $number, $sprintf, $j, $J, $F) = @$current_info;
     if (!defined $number) {
       skip "NOT NUMERIC : $source", 1;
     }
 
+    push @selected, $number;
     my $want_uniq = $it->($number);
-
-    my @uniqnum = $uniqnum->(map $_->[1], @numinfo[0 .. $i]);
+    my @uniqnum = $uniqnum->(@selected);
     my $got_uniq = $last_count_uniq != @uniqnum;
     $last_count_uniq = @uniqnum;
 

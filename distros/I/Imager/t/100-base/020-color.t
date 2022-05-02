@@ -137,11 +137,130 @@ my @oo_tests =
     255, 250, 250, 255,
     'name'
    ],
+
+   # rgb() without alpha
+   [
+     [ "rgb(255 128 128)" ],
+     255, 128, 128, 255,
+     "rgb non-percent, spaces"
+    ],
+   [
+     [ "rgb(255, 128, 128)" ],
+     255, 128, 128, 255,
+     "rgb non-percent, commas simple"
+    ],
+   [
+     [ "rgb(255 ,128   ,128)" ],
+     255, 128, 128, 255,
+     "rgb non-percent, commas less simple"
+    ],
+   [
+     [ "rgb(254.5 127.5 127.5)" ],
+     255, 128, 128, 255,
+     "rgb non-percent with decimals, spaces"
+    ],
+   [
+     [ "rgb(254.5,127.5,126.2)" ],
+     255, 128, 127, 255,
+     "rgb non-percent decimals, commas"
+    ],
+   [
+     [ "rgb(254.5  , 127.5 ,  126.2)" ],
+     255, 128, 127, 255,
+     "rgb non-percent decimals, commas more spaces"
+    ],
+   [
+     [ "rgb(100% 50% 50%)" ],
+     255, 128, 128, 255,
+     "rgb percent, spaces"
+    ],
+   [
+     [ "rgb(100%, 50%, 50%)" ],
+     255, 128, 128, 255,
+     "rgb percent, commas"
+    ],
+   [
+     [ "rgb(99.99% 49.99% 74.98%)" ],
+     255, 128, 192, 255,
+     "rgb percent decimals, spaces"
+    ],
+   [
+     [ "rgb(99.99%, 49.99%, 49.98%)" ],
+     255, 128, 128, 255,
+     "rgb percent decimals, commas"
+    ],
+   # rgb() with alpha
+   [
+     [ "rgb(255 128 128 / 0.5)" ],
+     255, 128, 128, 128,
+     "rgba non-percent, spaces"
+    ],
+   [
+     [ "rgb(255, 128, 128, 0.25)" ],
+     255, 128, 128, 64,
+     "rgba non-percent, commas simple"
+    ],
+   [
+     [ "rgb(255 ,128   ,128 , 0.75)" ],
+     255, 128, 128, 192,
+     "rgba non-percent, commas less simple"
+    ],
+   [
+     [ "rgba(254.5 127.5 127.5 / 0.1)" ],
+     255, 128, 128, 26,
+     "rgba non-percent with decimals, spaces"
+    ],
+   [
+     [ "rgb(254.5,127.5,126.2,1.0)" ],
+     255, 128, 127, 255,
+     "rgba non-percent decimals, commas"
+    ],
+   [
+     [ "rgb(254.5  , 127.5 ,  126.2, 0.9)" ],
+     255, 128, 127, 230,
+     "rgba non-percent decimals, commas more spaces"
+    ],
+   [
+     [ "rgb(100% 50% 50% / 0.2)" ],
+     255, 128, 128, 51,
+     "rgba percent, spaces"
+    ],
+   [
+     [ "rgb(100%, 50%, 50%, 30%)" ],
+     255, 128, 128, 77,
+     "rgba percent, commas"
+    ],
+   [
+     [ "rgb(99.99% 49.99% 74.98% / 49.9%)" ],
+     255, 128, 192, 128,
+     "rgba percent decimals, spaces"
+    ],
+   [
+     [ "rgb(99.99%, 49.99%, 49.98%, 50.0%)" ],
+     255, 128, 128, 128,
+     "rgba percent decimals, commas"
+    ],
   );
 
 for my $test (@oo_tests) {
   my ($parms, $r, $g, $b, $a, $name) = @$test;
-  is_color4(Imager::Color->new(@$parms), $r, $g, $b, $a, $name);
+  my $c = Imager::Color->new(@$parms);
+  is_color4($c, $r, $g, $b, $a, $name);
+
+  my $rgb = $c->as_css_rgb;
+  is_color4(Imager::Color->new($rgb), $r, $g, $b, $a, "$name via rgb $rgb");
+}
+
+{
+  # test our promises for as_css_rgb
+  is(Imager::Color->new(255, 128, 64)->as_css_rgb, "rgb(255, 128, 64)",
+     "as_css_rgb: simple rgb");
+  is(Imager::Color->new(255, 128, 64, 128)->as_css_rgb, "rgba(255, 128, 64, 0.5)",
+     "as_css_rgb: simple rgb with 1 decimal alpha");
+  is(Imager::Color->new(255, 128, 64, 64)->as_css_rgb, "rgba(255, 128, 64, 25%)",
+     "as_css_rgb: simple rgb with 2 decimal alpha");
+  is(Imager::Color->new(255, 128, 64, 24)->as_css_rgb, "rgba(255, 128, 64, 9.4%)",
+     "as_css_rgb: simple rgb with alpha we don't simplify");
 }
 
 # test the internal HSV <=> RGB conversions
@@ -284,9 +403,173 @@ is_color4(Imager::Color->new(builtin=>'black'), 0, 0, 0, 255, 'builtin black');
   for my $test (@tests) {
     my ($name, $float, $expect) = @$test;
     my $f = Imager::Color::Float->new(@$float);
-    my $as8 = $f->as_8bit;
-    is_deeply([ $as8->rgba ], $expect, $name);
+    {
+      # test as_8bit
+      my $as8 = $f->as_8bit;
+      is_deeply([ $as8->rgba ], $expect, $name);
+    }
+    {
+      # test construction
+      my $as8 = Imager::Color->new($f);
+      is_deeply([ $as8->rgba ], $expect, "constructed: $name");
+    }
   }
+}
+
+# test conversion from 8bit to float color
+{
+  my @tests =
+    (
+      [ "black", [ 0,0,0 ], [ 0,0,0, 1.0 ] ],
+      [ "white", [ 255, 255, 255 ], [ 1.0, 1.0, 1.0, 1.0 ] ],
+      [ "dark red", [ 128, 0, 0 ], [ 128/255, 0, 0, 1.0 ] ],
+      [ "green", [ 255, 128, 128, 64 ], [ 1.0, 128/255, 128/255, 64/255 ] ],
+     );
+  for my $test (@tests) {
+    my ($name, $as8, $float) = @$test;
+    my $c = Imager::Color->new(@$as8);
+    {
+      # test as_float
+      my $f = $c->as_float;
+      is_fcolor4($f, $float->[0], $float->[1], $float->[2], $float->[3], "as_float: $name");
+    }
+    {
+      # test construction
+      my $f = Imager::Color::Float->new($c);
+      is_fcolor4($f, $float->[0], $float->[1], $float->[2], $float->[3], "construction: $name");
+    }
+  }
+}
+
+{
+  # CSS rgb() support for float colors
+  my @tests =
+    (
+      # rgb() without alpha
+      [
+        [ "rgb(255 128 128)" ],
+        1.0, 128/255, 128/255, 1.0,
+        "rgb non-percent, spaces"
+       ],
+      [
+        [ "rgb(255, 128, 128)" ],
+        1.0, 128/255, 128/255, 1.0,
+        "rgb non-percent, commas simple"
+       ],
+      [
+        [ "rgb(255 ,128   ,128)" ],
+        1.0, 128/255, 128/255, 1.0,
+        "rgb non-percent, commas less simple"
+       ],
+      [
+        [ "rgb(254.5 127.5 127.5)" ],
+        254.5/255, 127.5/255, 127.5/255, 1.0,
+        "rgb non-percent with decimals, spaces"
+       ],
+      [
+        [ "rgb(254.5,127.5,126.2)" ],
+        254.5/255, 127.5/255, 126.2/255, 1.0,
+        "rgb non-percent decimals, commas"
+       ],
+      [
+        [ "rgb(254.5  , 127.5 ,  126.2)" ],
+        254.5/255, 127.5/255, 126.2/255, 1.0,
+        "rgb non-percent decimals, commas more spaces"
+       ],
+      [
+        [ "rgb(100% 50% 50%)" ],
+        1.0, 0.5, 0.5, 1.0,
+        "rgb percent, spaces"
+       ],
+      [
+        [ "rgb(100%, 50%, 50%)" ],
+        1.0, 0.5, 0.5, 1.0,
+        "rgb percent, commas"
+       ],
+      [
+        [ "rgb(99.99% 49.99% 74.98%)" ],
+        0.9999, 0.4999, 0.7498, 1.0,
+        "rgb percent decimals, spaces"
+       ],
+      [
+        [ "rgb(99.99%, 49.99%, 49.98%)" ],
+        0.9999, 0.4999, 0.4998, 1.0,
+        "rgb percent decimals, commas"
+       ],
+      # rgb() with alpha
+      [
+        [ "rgb(255 128 128 / 0.5)" ],
+        1.0, 128/255, 128/255, 0.5,
+        "rgba non-percent, spaces"
+       ],
+      [
+        [ "rgb(255, 128, 128, 0.25)" ],
+        1.0, 128/255, 128/255, 0.25,
+        "rgba non-percent, commas simple"
+       ],
+      [
+        [ "rgb(255 ,128   ,128 , 0.75)" ],
+        1.0, 128/255, 128/255, 0.75,
+        "rgba non-percent, commas less simple"
+       ],
+      [
+        [ "rgba(254.5 127.5 127.5 / 0.1)" ],
+        254.5/255, 127.5/255, 127.5/255, 0.1,
+        "rgba non-percent with decimals, spaces"
+       ],
+      [
+        [ "rgb(254.5,127.5,126.2,1.0)" ],
+        254.5/255, 127.5/255, 126.2/255, 1.0,
+        "rgba non-percent decimals, commas"
+       ],
+      [
+        [ "rgb(254.5  , 127.5 ,  126.2, 0.9)" ],
+        254.5/255, 127.5/255, 126.2/255, 0.9,
+        "rgba non-percent decimals, commas more spaces"
+       ],
+      [
+        [ "rgb(100% 50% 50% / 0.2)" ],
+        1.0, 0.5, 0.5, 0.2,
+        "rgba percent, spaces"
+       ],
+      [
+        [ "rgb(100%, 50%, 50%, 30%)" ],
+        1.0, 0.5, 0.5, 0.3,
+        "rgba percent, commas"
+       ],
+      [
+        [ "rgb(99.99% 49.99% 74.98% / 49.9%)" ],
+        0.9999, 0.4999, 0.7498, 0.499,
+        "rgba percent decimals, spaces"
+       ],
+      [
+        [ "rgb(99.99%, 49.99%, 49.98%, 50.0%)" ],
+        0.9999, 0.4999, 0.4998, 0.5,
+        "rgba percent decimals, commas"
+       ],
+     );
+  for my $test (@tests) {
+    my ($parms, $r, $g, $b, $a, $name) = @$test;
+    my $f = Imager::Color::Float->new(@$parms);
+    is_fcolor4($f, $r, $g, $b, $a, "float: $name");
+
+    my $css = $f->as_css_rgb;
+    my $f2 = Imager::Color::Float->new($css);
+    is_fcolor4($f2, $r, $g, $b, $a, "via css: $name ($css)");
+  }
+}
+
+{
+  # we make promises for as_css_rgb(), test those
+  # if represntable as bytes, we return that
+  is(Imager::Color->new(255, 127, 20)->as_float->as_css_rgb,
+     "rgb(255, 127, 20)", "float as_css_rgb: representable as bytes");
+  is(Imager::Color::Float->new(1.0, 0.7654, 1/3)->as_css_rgb,
+     "rgb(100% 76.54% 33.33%)", "float as_css_rgb: not representable as bytes");
+  is(Imager::Color->new(255, 127, 20, 128)->as_float->as_css_rgb,
+     "rgba(255, 127, 20, 0.502)", "float as_css_rgb: representable as bytes with alpha");
+  is(Imager::Color::Float->new(1.0, 0.7654, 1/3, 0.5)->as_css_rgb,
+     "rgba(100% 76.54% 33.33% / 0.5)", "float as_css_rgb: not representable as bytes with alpha");
 }
 
 done_testing();

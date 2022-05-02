@@ -1,6 +1,6 @@
 package Net::IPAM::IP;
 
-our $VERSION = '3.00';
+our $VERSION = '3.10';
 
 use 5.10.0;
 use strict;
@@ -313,6 +313,17 @@ sub to_string {
 
   # handle the bug, use our pure perl inet_ntop_pp
   return $_[0]->{as_string} = Net::IPAM::Util::inet_ntop_pp( Socket::AF_INET6, $n );
+}
+
+=head2 TO_JSON
+
+helper method for JSON serialization, just calls $ip->to_string.
+See also L<JSON/OBJECT SERIALISATION>.
+
+=cut
+
+sub TO_JSON {
+  $_[0]->to_string;
 }
 
 =head2 incr

@@ -1,0 +1,32 @@
+App-RunStopRun
+==============
+
+This program limits the CPU usage of processes.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Capture::Tiny
+    ExtUtils::MakeMaker 6.52
+    IO::Pty
+    List::Util 1.45
+    Proc::ProcessTable
+    Test::More 0.88
+    Time::HiRes
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2022 gray <gray at cpan.org>
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

@@ -51,6 +51,6 @@
          "web" : "https://github.com/ltmbr/Mojolicious-Plugin-Route"
       }
    },
-   "version" : "0.06",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

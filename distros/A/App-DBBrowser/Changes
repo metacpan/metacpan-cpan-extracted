@@ -1,6 +1,11 @@
 Revision history for App-DBBrowser
 
 
+2.296    2022-05-01
+        - Term::Choose minimum version is '1.749'.
+        - Term::Form minimum version is '0.547'.
+        - Update documentation.
+
 2.295    2022-03-31
        - Make the code work with the new version (0.543) of Term::From.
 
@@ -46,7 +51,7 @@ Revision history for App-DBBrowser
         - Attached databases: update tables menu.
 
 2.282    2021-09-24
-        - Term::Choose::Util minimum version is '1.739'.
+        - Term::Choose minimum version is '1.739'.
         - Code refactoring.
 
 2.281    2021-08-29

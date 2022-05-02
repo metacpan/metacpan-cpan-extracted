@@ -1,5 +1,3 @@
-# $Id: Register8F.pm,v 1.6 2008/02/26 21:54:55 drhyde Exp $
-
 package CPU::Emulator::Z80::Register8F;
 
 use strict;
@@ -9,7 +7,7 @@ use vars qw($VERSION $AUTOLOAD);
 
 use base qw(CPU::Emulator::Z80::Register8);
 
-$VERSION = '1.0';
+$VERSION = '1.01';
 
 =head1 NAME
 
@@ -71,12 +69,16 @@ sub _reset {
 }
 
 sub DESTROY{}
+# only calculate this once
+my $autoload_prefix_length = length(__PACKAGE__) + 2;
 sub AUTOLOAD {
-    (my $sub = $AUTOLOAD) =~ s/.*:://;
-    my($fn, $flag) = ($sub =~ /^(.*)(.)$/);
+    my $sub = substr($AUTOLOAD, $autoload_prefix_length);
+    my $flag = substr($sub, -1);
+    substr($sub, -1, 1) = '';
+
     my $self = shift();
     no strict 'refs';
-    return *{"_$fn"}->($self, $masks{$flag}, @_);
+    return *{"_$sub"}->($self, $masks{$flag}, @_);
 }
 
 =head1 BUGS/WARNINGS/LIMITATIONS

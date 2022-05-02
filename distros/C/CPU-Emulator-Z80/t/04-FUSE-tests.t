@@ -1,8 +1,7 @@
-# $Id: 04-FUSE-tests.t,v 1.22 2008/03/08 14:41:55 drhyde Exp $
 # FUSE tester is at http://fuse-emulator.svn.sourceforge.net/viewvc/fuse-emulator/trunk/fuse/z80/coretest.c?revision=3414&view=markup
 
 use strict;
-$^W = 1;
+use warnings;
 
 my %ARGV = map { $_ => 1 } @ARGV;
 opendir(my $dir, 't/fuse-tests') || die("Can't read t/fuse-tests/\n");

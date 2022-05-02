@@ -1,0 +1,30 @@
+INCLUDE "example/constants.z80"
+
+  DI
+  LD A, 76; L
+  OUT ($port__io_wr_stdout), A
+  LD HL, $ldr__part2         ; copy rest of boot loader to top of memory
+  LD DE, 0xF000
+  LD BC, $ldr__part2_end - $ldr__part2
+  LDIR
+  JP 0xF000
+
+$ldr__part2                  ; this is really at 0xF000
+  LD A, 68 ; D
+  OUT ($port__io_wr_stdout), A
+  LD A, 0                    ; bank 0 ...
+  OUT ($port__mem_unbank), A ; unbank
+  LD HL, 0x4000              ; address of OS ROM on boot
+  LD DE, 0x0000
+  LD BC, 0x100    ; just 256 bytes
+  LDIR
+  LD A, 1
+  OUT ($port__mem_unbank), A
+  LD A, 82 ; R
+  OUT ($port__io_wr_stdout), A
+  LD A, 10 ; \n
+  OUT ($port__io_wr_stdout), A
+  OUT ($port__hw_start_clock), A
+  JP 0x0000                  ; boot
+$ldr__part2_end
+

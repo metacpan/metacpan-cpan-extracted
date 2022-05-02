@@ -1,4 +1,96 @@
 Revision history for SPVM
+0.9514  2022-05-02
+        [CHANGE]
+        * Add no_compiler_api to SPVM::Builder::Config::Exe
+        * Add no_precompile to SPVM::Builder::Config::Exe
+        * Add dynamic_lib to SPVM::Builder::Config::Exe
+        * Add static_lib to SPVM::Builder::Config::Exe
+        * Improve resource system. Don't use ar command.
+        * Add to_string method to Point class.
+        * Point class has Stringable interface.
+        * Add the following Native API constant values of basic type ids.
+          0  SPVM_NATIVE_C_BASIC_TYPE_ID_UNKNOWN
+          1  SPVM_NATIVE_C_BASIC_TYPE_ID_UNDEF
+          2  SPVM_NATIVE_C_BASIC_TYPE_ID_VOID
+          3  SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE
+          4  SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT
+          5  SPVM_NATIVE_C_BASIC_TYPE_ID_INT
+          6  SPVM_NATIVE_C_BASIC_TYPE_ID_LONG
+          7  SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT
+          8  SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE
+          9  SPVM_NATIVE_C_BASIC_TYPE_ID_STRING
+          10 SPVM_NATIVE_C_BASIC_TYPE_ID_ANY_OBJECT
+          11 SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE_OBJECT
+          12 SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT_OBJECT
+          13 SPVM_NATIVE_C_BASIC_TYPE_ID_INT_OBJECT
+          14 SPVM_NATIVE_C_BASIC_TYPE_ID_LONG_OBJECT
+          15 SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT_OBJECT
+          16 SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE_OBJECT
+          17 SPVM_NATIVE_C_BASIC_TYPE_ID_BOOL_OBJECT
+        * Add the following Native API constant values of basic type categories.
+          0  SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_UNKNOWN
+          1  SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_NOT_FOUND_CLASS
+          2  SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_UNDEF
+          3  SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_VOID
+          4  SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_NUMERIC
+          5  SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_MULNUM
+          6  SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_STRING
+          7  SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CLASS
+          8  SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE
+          9  SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CALLBACK
+          10 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_ANY_OBJECT
+        * Add SPVM Precompile Native APIs. The document is SPVM::Document::NativeAPI::Precompile.
+        * Add SPVM String Buffer Native APIs. The document is SPVM::Document::NativeAPI::StringBuffer.
+        * Add SPVM Allocator Native APIs. The document is SPVM::Document::NativeAPI::Allocator.
+        * Improve SPVM::Document::NativeAPI::Compiler.
+        * Improve SPVM::Document::NativeAPI::Runtime.
+        * Improve type cast error messages.
+        * Improve dump test
+          [Before]
+          object_value => {
+            byte_value => 0,
+            short_value => 0,
+            int_value => 0,
+            long_value => 0,
+            float_value => 0,
+            double_value => 0,
+            string_value => undef,
+            int_array => undef,
+            object_value => undef
+          } : TestCase::DumpTest1 (0x55f472a79f30)
+          [After]
+          object_value => TestCase::DumpTest1 (0x55f472a79f30) {
+            byte_value => 0,
+            short_value => 0,
+            int_value => 0,
+            long_value => 0,
+            float_value => 0,
+            double_value => 0,
+            string_value => undef,
+            int_array => undef,
+            object_value => undef
+          }
+        * Allow same mulnum type cast
+          my $z_src : Complex_2d;
+          my $z_dist = (Complex_2d)$z_src;
+        * Allow same reference type cast
+            my $num = 3;
+            my $num_ref : int* = \$num;
+            my $num_ref2 = (int*)$num_ref;
+          
+        [BUG FIX]
+        * Fix the bug that multi-dimensional array can't assing to any object array "object[]".
+        * Fix the bug that SPVM::Builder::Util::API::create_make_rule_native can't detect native file extension.
+        * Fix the bug that unboxing type conversion doesn't throw the exception.
+        * Fix the bug that type cast to numeric array compilation error is wrong.
+        * Improve the message of type cast compilation error.
+        * Fix type cast many bugs.
+        
+        [NON BACKWORD COMPATIBLE CHANGES]
+        * Remove -O|--optimize option from spvmcc.
+        * Remove --dynamic-lib option from spvmcc.
+        * Remove --static-lib option from spvmcc.
+        * Methods of interfaces must have the names.
 0.9513  2021-04-23
         [NON BACKWORD COMPATIBLE CHANGES]
         * Remove Fn->srand because this method is not thread safe.

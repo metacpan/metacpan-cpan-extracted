@@ -11,7 +11,7 @@ use Mojo::Util qw(class_to_path monkey_patch);
 
 use constant DEBUG => $ENV{TOADFARM_DEBUG} ? 1 : 0;
 
-our $VERSION = '0.83';
+our $VERSION = '0.84';
 
 BEGIN {
   $ENV{TOADFARM_ACTION} //= (@ARGV and $ARGV[0] =~ /^(reload|start|stop)$/) ? $1 : 'load';
@@ -41,7 +41,7 @@ sub import {
     start       => sub {
       if (@_) {
         my $listen = ref $_[0] eq 'ARRAY' ? shift : undef;
-        $app->config->{hypnotoad} = @_ > 1 ? {@_} : {%{$_[0]}} if @_;
+        $app->config->{hypnotoad}         = @_ > 1 ? {@_} : {%{$_[0]}} if @_;
         $app->config->{hypnotoad}{listen} = $listen if $listen;
       }
 
@@ -153,7 +153,7 @@ sub _mount_apps {
       my ($class, $path, @error) = ($app, $app);
       $path = File::Which::which($path) || class_to_path($path) unless -r $path;
       $app  = eval { $server->build_app($class) } or push @error, $@ if $class =~ /^[\w:]+$/;
-      $app  = eval { $server->load_app($path) } or push @error, $@ unless ref $app;
+      $app  = eval { $server->load_app($path) }   or push @error, $@ unless ref $app;
       die join "\n", @error unless $app;
     }
 
@@ -258,7 +258,7 @@ sub _setup_app {
     if (@{$config->{apps} || []} == 2) {
       my $plugins = $config->{tf_plugins} || [];
       $root_app->config(hypnotoad => $config->{hypnotoad}) if $config->{hypnotoad};
-      $root_app->log($app->log) if $config->{tf}{logging};
+      $root_app->log($app->log)                            if $config->{tf}{logging};
       $root_app->plugin(shift(@$plugins), shift(@$plugins)) for @$plugins;
       $root_app->secrets($app->secrets);
       push @{$root_app->commands->namespaces}, 'Toadfarm::Command';
@@ -308,7 +308,7 @@ Toadfarm - One Mojolicious app to rule them all
 
 =head1 VERSION
 
-0.83
+0.84
 
 =head1 DESCRIPTION
 

@@ -4,14 +4,14 @@ use warnings;
 use strict;
 
 use Test::More;
-use URI::file;
+use URI::file ();
 
 BEGIN {
     delete @ENV{qw(PATH IFS CDPATH ENV BASH_ENV)};  # Placates taint-unsafe Cwd.pm in 5.6.1
     use_ok( 'WWW::Mechanize' );
 }
 
-my $mech = WWW::Mechanize->new( cookie_jar => undef );
+my $mech = WWW::Mechanize->new( cookie_jar => undef, max_redirect => 0 );
 isa_ok( $mech, 'WWW::Mechanize' );
 
 my $uri = URI::file->new_abs( 't/find_link.html' )->as_string;

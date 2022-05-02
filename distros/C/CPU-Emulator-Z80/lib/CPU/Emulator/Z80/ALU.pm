@@ -1,12 +1,12 @@
-# $Id: ALU.pm,v 1.9 2008/02/24 23:52:05 drhyde Exp $
-
 package CPU::Emulator::Z80::ALU;
 
 use strict;
 use warnings;
 
 use base qw(Exporter);
-use vars qw(@EXPORT);
+use vars qw($VERSION @EXPORT);
+
+$VERSION = '1.01';
 
 {   # find and export ALU_*
     no strict 'refs';
@@ -195,13 +195,13 @@ None known
 
 =head1 FEEDBACK
 
-I welcome feedback about my code, including constructive criticism and bug reports. The best bug reports include files that I can add to the test suite, which fail with the current code in CVS and will pass once I've fixed the bug.
+I welcome feedback about my code, including constructive criticism and bug reports. The best bug reports include files that I can add to the test suite, which fail with the current code and will pass once I've fixed the bug.
 
 Feature requests are far more likely to get implemented if you submit a patch yourself.
 
-=head1 CVS
+=head1 SOURCE CODE REPOSITORY
 
-L<http://drhyde.cvs.sourceforge.net/drhyde/perlmodules/CPU-Emulator-Z80/>
+L<git://github.com/DrHyde/perl-modules-CPU-Emulator-Z80.git>
 
 =head1 AUTHOR, COPYRIGHT and LICENCE
 

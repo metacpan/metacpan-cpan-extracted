@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2017-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2017-2022 -- leonerd@leonerd.org.uk
 
-use 5.026;
-use Object::Pad 0.19;
+use v5.26;
+use Object::Pad 0.57;
 
-package Device::Chip::ADS1115 0.12;
+package Device::Chip::ADS1115 0.13;
 class Device::Chip::ADS1115
-   extends Device::Chip::Base::RegisteredI2C;
+   :isa(Device::Chip::Base::RegisteredI2C);
 
 Device::Chip::Base::RegisteredI2C->VERSION( '0.10' );
 

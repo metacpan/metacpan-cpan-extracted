@@ -1,6 +1,7 @@
 Revision history for OpenERP-OOM
 
-0.47      2019-10-08 11:16:13+01:00 Europe/London
+0.48      2022-04-28 17:13:27+01:00 Europe/London
+        - Fix some bugs communicating with Odoo 14
         - Fix bug where numeric database names were sent to Odoo as integers in XMLRPC calls, causing exceptions
         - Bring authors list into line with one another and reality
 

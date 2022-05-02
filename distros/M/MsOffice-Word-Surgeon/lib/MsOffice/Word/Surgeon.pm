@@ -1,63 +1,48 @@
 package MsOffice::Word::Surgeon;
-use 5.10.0;
+use 5.24.0;
 use Moose;
 use MooseX::StrictConstructor;
 use Archive::Zip                          qw(AZ_OK);
 use Encode                                qw(encode_utf8 decode_utf8);
 use Carp                                  qw(croak);
-use XML::LibXML;
-use MsOffice::Word::Surgeon::Run;
-use MsOffice::Word::Surgeon::Text;
-use MsOffice::Word::Surgeon::Change;
+use MsOffice::Word::Surgeon::Revision;
+use MsOffice::Word::Surgeon::PackagePart;
+
+# syntactic sugar for attributes
+sub has_lazy  ($@) {my $attr = shift; has($attr => @_, lazy => 1, builder => "_$attr")}
+sub has_inner ($@) {my $attr = shift; has_lazy($attr => @_, init_arg => undef)}
+
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '1.08';
+our $VERSION = '2.0';
 
-# constant integers to specify indentation modes -- see L<XML::LibXML>
-use constant XML_NO_INDENT     => 0;
-use constant XML_SIMPLE_INDENT => 1;
 
-# name of the zip member that contains the main document body
-use constant MAIN_DOCUMENT => 'word/document.xml';
+#======================================================================
+# ATTRIBUTES
+#======================================================================
 
-has 'docx'      => (is => 'ro', isa => 'Str', required => 1);
+# attributes to the constructor -- either the filename or an existing zip archive
+has      'docx'      => (is => 'ro', isa => 'Str');
+has_lazy 'zip'       => (is => 'ro', isa => 'Archive::Zip');
 
-has 'zip'       => (is => 'ro', isa => 'Archive::Zip', init_arg => undef,
-                    builder => '_zip',   lazy => 1);
+# inner attributes lazily constructed by the module
+has_inner 'parts'    => (is => 'ro', isa => 'HashRef[MsOffice::Word::Surgeon::PackagePart]',
+                         traits => ['Hash'], handles => {part => 'get'});
 
-has 'contents'  => (is => 'rw', isa => 'Str',          init_arg => undef,
-                    builder => 'original_contents', lazy => 1,
-                    trigger => sub {shift->clear_runs});
+has_inner 'document' => (is => 'ro', isa => 'MsOffice::Word::Surgeon::PackagePart',
+                        handles => [qw/contents original_contents indented_contents plain_text replace/]);
+  # Note: this attribute is equivalent to $self->part('document'); made into an attribute
+  # for convenience and for automatic delegation of methods through the 'handles' declaration
 
-has 'runs'      => (is => 'ro', isa => 'ArrayRef',     init_arg => undef,
-                    builder => '_runs', lazy => 1, clearer => 'clear_runs');
-
-has 'rev_id'    => (is => 'bare', isa => 'Num', default => 1, init_arg => undef);
-   # used by the change() method for creating *::Change objects -- each instance
+# just a slot for internal storage
+has 'next_rev_id'    => (is => 'bare', isa => 'Num', default => 1, init_arg => undef);
+   # used by the revision() method for creating *::Revision objects -- each instance
    # gets a fresh value
 
-#======================================================================
-# GLOBAL VARIABLES
-#======================================================================
-
-# Various regexes for removing uninteresting XML information
-my %noise_reduction_regexes = (
-  proof_checking        => qr(<w:(?:proofErr[^>]+|noProof/)>),
-  revision_ids          => qr(\sw:rsid\w+="[^"]+"),
-  complex_script_bold   => qr(<w:bCs/>),
-  page_breaks           => qr(<w:lastRenderedPageBreak/>),
-  language              => qr(<w:lang w:val="[^/>]+/>),
-  empty_run_props       => qr(<w:rPr></w:rPr>),
-  soft_hyphens          => qr(<w:softHyphen/>),
- );
-
-my @noise_reduction_list = qw/proof_checking revision_ids
-                              complex_script_bold page_breaks language 
-                              empty_run_props soft_hyphens/;
 
 #======================================================================
-# BUILDING
+# BUILDING INSTANCES
 #======================================================================
 
 
@@ -75,6 +60,18 @@ around BUILDARGS => sub {
 };
 
 
+# make sure that the constructor got either a 'docx' or a 'zip' attribute
+sub BUILD {
+  my $self = shift;
+
+  my $class = ref $self;
+
+  $self->{docx} || $self->{zip}
+    or croak "$class->new() : need either 'docx' or 'zip' attribute";
+  not ($self->{docx} && $self->{zip})
+    or croak "$class->new() : can't have both 'docx' and 'zip' attributes";
+}
+
 
 #======================================================================
 # LAZY ATTRIBUTE CONSTRUCTORS
@@ -85,294 +82,155 @@ sub _zip {
 
   my $zip = Archive::Zip->new;
   $zip->read($self->{docx}) == AZ_OK
-      or die "cannot unzip $self->{docx}";
+      or croak "cannot unzip $self->{docx}";
 
   return $zip;
 }
 
-sub original_contents { # can also be called later, not only as lazy constructor
+
+
+sub _parts {
   my $self = shift;
 
-  my $bytes    = $self->zip->contents(MAIN_DOCUMENT)
-    or die "no contents for member ", MAIN_DOCUMENT();
-  my $contents = decode_utf8($bytes);
-  return $contents;
+  # first create a package part for the main document
+  my $doc = MsOffice::Word::Surgeon::PackagePart->new(surgeon   => $self,
+                                                      part_name => 'document');
+
+  # gather names of headers and footers related to that document
+  my @headers_footers = map  {$_->{target} =~ s/\.xml$//r}
+                        grep {$_ && $_->{short_type} =~ /^(header|footer)$/}
+                        $doc->relationships->@*;
+
+  # create package parts for headers and footers and assemble all parts into a hash
+  my %parts = (document => $doc);
+  $parts{$_} = MsOffice::Word::Surgeon::PackagePart->new(surgeon   => $self,
+                                                         part_name => $_)
+    for @headers_footers;
+
+  return \%parts;
 }
 
 
-sub _runs {
+sub _document {shift->part('document')}
+
+
+#======================================================================
+# ACCESSING OR CHANGING THE INTERNAL STATE
+#======================================================================
+
+sub xml_member {
+  my ($self, $member_name, $new_content) = @_;
+
+  if (! defined $new_content) {  # used as a reader
+    my $bytes = $self->zip->contents($member_name)
+      or croak "no zip member for $member_name";
+    return decode_utf8($bytes);
+  }
+  else {                         # used as a writer
+    my $bytes = encode_utf8($new_content);
+    return $self->zip->contents($member_name, $bytes);
+  }
+}
+
+sub _content_types {
+  my ($self, $new_content_types) = @_;
+  return $self->xml_member('[Content_Types].xml', $new_content_types);
+}
+
+
+sub headers {
+  my ($self) = @_;
+  return sort {substr($a, 6) <=> substr($b, 6)} grep {/^header/} keys $self->parts->%*;
+}
+
+sub footers {
+  my ($self) = @_;
+  return sort {substr($a, 6) <=> substr($b, 6)} grep {/^footer/} keys $self->parts->%*;
+}
+
+sub new_rev_id {
+  my ($self) = @_;
+  return $self->{next_rev_id}++;
+}
+
+
+
+#======================================================================
+# GENERIC PROPAGATION TO ALL PARTS
+#======================================================================
+
+
+sub all_parts_do {
+  my ($self, $method_name, @args) = @_;
+
+  my $parts = $self->parts;
+
+  # apply the method to each package part
+  my %result;
+  $result{$_} = $parts->{$_}->$method_name(@args) foreach keys %$parts;
+
+
+  return \%result;
+}
+
+
+#======================================================================
+# CLONING
+#======================================================================
+
+sub clone {
   my $self = shift;
 
-  state $run_regex = qr[
-    <w:r>                             # opening tag for the run
-    (?:<w:rPr>(.*?)</w:rPr>)?         # run properties -- capture in $1
-    (.*?)                             # run contents -- capture in $2
-    </w:r>                            # closing tag for the run
-  ]x;
-
-  state $txt_regex = qr[
-    <w:t(?:\ xml:space="preserve")?>  # opening tag for the text contents
-    (.*?)                             # text contents -- capture in $1
-    </w:t>                            # closing tag for text
-  ]x;
-
-
-  # split XML content into run fragments
-  my $contents      = $self->contents;
-  my @run_fragments = split m[$run_regex], $contents, -1;
-  my @runs;
-
-  # build internal RUN objects
- RUN:
-  while (my ($xml_before_run, $props, $run_contents) = splice @run_fragments, 0, 3) {
-    $run_contents //= '';
-
-    # split XML of this run into text fragmentsn
-    my @txt_fragments = split m[$txt_regex], $run_contents, -1;
-    my @texts;
-
-    # build internal TEXT objects
-  TXT:
-    while (my ($xml_before_text, $txt_contents) = splice @txt_fragments, 0, 2) {
-      next TXT if !$xml_before_text && ( !(defined $txt_contents) || $txt_contents eq '');
-      push @texts, MsOffice::Word::Surgeon::Text->new(
-        xml_before   => $xml_before_text // '',
-        literal_text => $txt_contents    // '',
-       );
-    }
-
-    # assemble TEXT objects into a RUN object
-    next RUN if !$xml_before_run && !@texts;
-    push @runs, MsOffice::Word::Surgeon::Run->new(
-      xml_before  => $xml_before_run // '',
-      props       => $props          // '',
-      inner_texts => \@texts,
-     );
+  # create a new Zip archive and copy all members to it
+  my $new_zip = Archive::Zip->new;
+  foreach my $member ($self->zip->members) {
+    $new_zip->addMember($member);
   }
 
-  return \@runs;
+  # create a new instance of this class
+  my $class = ref $self;
+  my $clone = $class->new(zip => $new_zip);
+
+  # other attributes will be recreated lazily within the clone .. not
+  # the most efficient way, but it is easier and safer, otherwise there is
+  # a risk of mixed references
+
+  return $clone;
 }
-
-
-
-#======================================================================
-# CONTENTS RESTITUTION
-#======================================================================
-
-sub indented_contents {
-  my $self = shift;
-
-  my $dom = XML::LibXML->load_xml(string => $self->contents);
-  return $dom->toString(XML_SIMPLE_INDENT); # returned as bytes sequence, not a Perl string
-}
-
-sub plain_text {
-  my $self = shift;
-
-  # XML contents
-  my $txt = $self->contents;
-
-  # replace opening paragraph tags by newlines
-  $txt =~ s/(<w:p[ >])/\n$1/g;
-
-  # replace break tags by newlines
-  $txt =~ s[<w:br/>][\n]g;
-
-  # replace tab nodes by ASCII tabs
-  $txt =~ s/<w:tab[^s][^>]*>/\t/g;
-
-  # remove all remaining XML tags
-  $txt =~ s/<[^>]+>//g;
-
-  return $txt;
-}
-
-#======================================================================
-# MODIFYING CONTENTS
-#======================================================================
-
-sub cleanup_XML {
-  my ($self, @merge_args) = @_;
-
-  $self->reduce_all_noises;
-  my @names_of_ASK_fields = $self->unlink_fields;
-  $self->suppress_bookmarks(@names_of_ASK_fields);
-  $self->merge_runs(@merge_args);
-}
-
-sub noise_reduction_regex {
-  my ($self, $regex_name) = @_;
-  my $regex = $noise_reduction_regexes{$regex_name}
-    or croak "->noise_reduction_regex('$regex_name') : unknown regex name";
-  return $regex;
-}
-
-sub reduce_noise {
-  my ($self, @noises) = @_;
-
-  # gather regexes to apply, given either directly as regex refs, or as names of builtin regexes
-  my @regexes = map {ref $_ eq 'Regexp' ? $_ : $self->noise_reduction_regex($_)} @noises;
-
-  # get contents, apply all regexes, put back the modified contents.
-  my $contents = $self->contents;
-  no warnings 'uninitialized'; # for regexes without capture groups, $1 will be undef
-  $contents =~ s/$_/$1/g foreach @regexes;
-  $self->contents($contents);
-}
-
-sub reduce_all_noises {
-  my $self = shift;
-
-  $self->reduce_noise(@noise_reduction_list);
-}
-
-sub suppress_bookmarks {
-  my ($self, @names_to_erase) = @_;
-
-  # regex to find bookmarks markup
-  state $bookmark_rx = qr{
-     <w:bookmarkStart         # initial tag
-       .+? w:id="(\d+)"       # 'id' attribute, bookmark identifier -- capture 1
-       .+? w:name="([^"]+)"   # 'name' attribute                    -- capture 2
-       .*? />                 # end of this tag
-       (.*?)                  # bookmark contents (may be empty)    -- capture 3
-     <w:bookmarkEnd           # ending tag
-       \s+ w:id="\1"          # same 'id' attribute
-       .*? />                 # end of this tag
-    }sx;
-
-  # closure to decide what to do with bookmark contents
-  my %should_erase_contents = map {($_ => 1)} @names_to_erase;
-  my $deal_with_bookmark_text = sub {
-    my ($bookmark_name, $bookmark_contents) = @_;
-    return $should_erase_contents{$bookmark_name} ? "" : $bookmark_contents;
-  };
-
-  # remove bookmarks markup
-  my $contents = $self->contents;
-  $contents    =~ s{$bookmark_rx}{$deal_with_bookmark_text->($2, $3)}eg;
-
-  # re-inject the modified contents
-  $self->contents($contents);
-}
-
-sub merge_runs {
-  my ($self, %args) = @_;
-
-  # check validity of received args
-  state $is_valid_arg = {no_caps => 1};
-  $is_valid_arg->{$_} or croak "merge_runs(): invalid arg: $_"
-    foreach keys %args;
-
-  my @new_runs;
-  # loop over internal "run" objects
-  foreach my $run (@{$self->runs}) {
-
-    $run->remove_caps_property if $args{no_caps};
-
-    # check if the current run can be merged with the previous one
-    if (   !$run->xml_before                    # no other XML markup between the 2 runs
-        && @new_runs                            # there was a previous run
-        && $new_runs[-1]->props eq $run->props  # both runs have the same properties
-       ) {
-      # conditions are OK, so merge this run with the previous one
-      $new_runs[-1]->merge($run);
-    }
-    else {
-      # conditions not OK, just push this run without merging
-      push @new_runs, $run;
-    }
-  }
-
-  # reassemble the whole stuff and inject it as new contents
-  $self->contents(join "", map {$_->as_xml} @new_runs);
-}
-
-
-
-
-
-sub unlink_fields {
-  my $self = shift;
-
-  # must find out what are the ASK fields before erasing the markup
-  state $ask_field_rx = qr[<w:instrText[^>]+?>\s+ASK\s+(\w+)];
-  my $contents            = $self->contents;
-  my @names_of_ASK_fields = $contents =~ /$ask_field_rx/g;
-
-
-  # regexes to remove field nodes and "field instruction" nodes
-  state $field_instruction_txt_rx = qr[<w:instrText.*?</w:instrText>];
-  state $field_boundary_rx        = qr[<w:fldChar
-                                         (?:  [^>]*?/>                 # ignore all attributes until end of node ..
-                                            |                          # .. or
-                                              [^>]*?>.*?</w:fldChar>)  # .. ignore node content until closing tag
-                                      ]x;   # field boundaries are encoded as  "begin" / "separate" / "end"
-  state $simple_field_rx          = qr[</?w:fldSimple[^>]*>];
-
-  $self->reduce_noise($field_instruction_txt_rx, $field_boundary_rx, $simple_field_rx);
-
-  return @names_of_ASK_fields;
-}
-
-
-sub replace {
-  my ($self, $pattern, $replacement_callback, %replacement_args) = @_;
-
-  # cleanup the XML structure so that replacements work better
-  my $keep_xml_as_is = delete $replacement_args{keep_xml_as_is};
-  $self->cleanup_XML unless $keep_xml_as_is;
-
-  # special option to avoid modying contents
-  my $dont_overwrite_contents = delete $replacement_args{dont_overwrite_contents};
-
-  # apply replacements and generate new XML
-  my $xml = join "", map {
-    $_->replace($pattern, $replacement_callback, %replacement_args)
-  }  @{$self->runs};
-
-  $self->contents($xml) unless $dont_overwrite_contents;
-
-  return $xml;
-}
-
-#======================================================================
-# DELEGATION TO SUBCLASSES
-#======================================================================
-
-sub change {
-  my $self = shift;
-
-  my $change = MsOffice::Word::Surgeon::Change->new(rev_id => $self->{rev_id}++, @_);
-  return $change->as_xml;
-}
-
 
 #======================================================================
 # SAVING THE FILE
 #======================================================================
 
 
-sub _update_contents_in_zip {
-  my $self = shift;
-
-  $self->zip->contents(MAIN_DOCUMENT, encode_utf8($self->contents));
-}
-
 sub overwrite {
   my $self = shift;
 
-  $self->_update_contents_in_zip;
-  $self->zip->overwrite;
+  $_->_update_contents_in_zip foreach values $self->parts->%*;
+  $self->zip->overwrite == AZ_OK
+    or croak "error overwriting zip archive " . $self->docx;
 }
 
 sub save_as {
   my ($self, $docx) = @_;
 
-  $self->_update_contents_in_zip;
+  $_->_update_contents_in_zip foreach values $self->parts->%*;
   $self->zip->writeToFileNamed($docx) == AZ_OK
-    or die "error writing zip archive to $docx";
+    or croak "error writing zip archive to $docx";
 }
+
+
+#======================================================================
+# DELEGATION TO OTHER CLASSES
+#======================================================================
+
+sub new_revision {
+  my $self = shift;
+
+  my $revision = MsOffice::Word::Surgeon::Revision->new(rev_id => $self->new_rev_id, @_);
+  return $revision->as_xml;
+}
+
 
 1;
 
@@ -382,32 +240,40 @@ __END__
 
 =head1 NAME
 
-MsOffice::Word::Surgeon - tamper wit the guts of Microsoft docx documents
+MsOffice::Word::Surgeon - tamper with the guts of Microsoft docx documents, with regexes
 
 =head1 SYNOPSIS
 
   my $surgeon = MsOffice::Word::Surgeon->new(docx => $filename);
 
   # extract plain text
-  my $text = $surgeon->plain_text;
+  my $main_text    = $surgeon->document->plain_text;
+  my @header_texts = map {$surgeon->part($_)->plain_text} $surgeon->headers;
 
   # anonymize
   my %alias = ('Claudio MONTEVERDI' => 'A_____', 'Heinrich SCHÜTZ' => 'B_____');
   my $pattern = join "|", keys %alias;
   my $replacement_callback = sub {
     my %args =  @_;
-    my $replacement = $surgeon->change(to_delete  => $args{matched},
-                                       to_insert  => $alias{$args{matched}},
-                                       run        => $args{run},
-                                       xml_before => $args{xml_before},
-                                      );
+    my $replacement = $surgeon->new_revision(to_delete  => $args{matched},
+                                             to_insert  => $alias{$args{matched}},
+                                             run        => $args{run},
+                                             xml_before => $args{xml_before},
+                                            );
     return $replacement;
   };
-  $surgeon->replace(qr[$pattern], $replacement_callback);
+  $surgeon->document->replace(qr[$pattern], $replacement_callback);
 
   # save the result
   $surgeon->overwrite; # or ->save_as($new_filename);
 
+
+=head1 VERSION
+
+WARNING: this is version 2.0. Due to internal refactorings, some
+changes made to the application programming interface (API) are
+incompatible with version 1.  Client programs may need some minor
+adaptations.
 
 =head1 DESCRIPTION
 
@@ -417,7 +283,9 @@ This module supports a few operations for modifying or extracting text
 from Microsoft Word documents in '.docx' format -- therefore the name
 'surgeon'. Since a surgeon does not give life, there is no support for
 creating fresh documents; if you have such needs, use one of the other
-packages listed in the L<SEE ALSO> section.
+packages listed in the L<SEE ALSO> section. To my knowledge, this is the
+only solution (even in other languages) for applying regular expressions
+to the contents of Word documents.
 
 Some applications for this module are :
 
@@ -484,195 +352,91 @@ reassembling the whole document after having modified some text nodes.
 
 Builds a new surgeon instance, initialized with the contents of the given filename.
 
+=head2 Accessors
 
-=head2 Contents restitution
+=head3 docx
 
-=head3 contents
+Path to the C<.docx> file
 
-Returns a Perl string with the current internal XML representation of the document
-contents.
+=head3 zip
 
-=head3 original_contents
+Instance of L<Archive::Zip> associated with this file
 
-Returns a Perl string with the XML representation of the
-document contents, as it was in the ZIP archive before any
-modification.
+=head3 parts
 
-=head3 indented_contents
+Hashref to L<MsOffice::Word::Surgeon::PackagePart> objects, keyed by their part name in the ZIP file.
+There is always a C<'document'> part. Currently, other optional parts may be headers and footers.
+Future versions may include other parts like footnotes or endnotes.
 
-Returns an indented version of the XML contents, suitable for inspection in a text editor.
-This is produced by L<XML::LibXML::Document/toString> and therefore is returned as an encoded
-byte string, not a Perl string.
+=head3 document
 
-=head3 plain_text
+Shortcut to C<< $surgeon->part('document') >> -- the 
+L<MsOffice::Word::Surgeon::PackagePart> object corresponding to the main document.
+See the C<PackagePart> documentation for operations on part objects.
+Besides, the following operations are supported directly as methods to the C<< $surgeon >> object
+and are automatically delegated to the C<< document >> part :
+C<contents>, C<original_contents>, C<indented_contents>, C<plain_text>, C<replace>.
 
-Returns the text contents of the document, without any markup.
-Paragraphs and breaks are converted to newlines, all other formatting instructions are ignored.
 
 
-=head3 runs
+=head3 headers
 
-Returns a list of L<MsOffice::Word::Surgeon::Run> objects. Each of
-these objects holds an XML fragment; joining all fragments
-restores the complete document.
+  my @header_parts = $surgeon->headers;
 
-  my $contents = join "", map {$_->as_xml} $self->runs;
+Returns the ordered list of names of header members stored in the ZIP file.
 
+=head3 footers
 
-=head2 Modifying contents
+  my @footer_parts = $surgeon->footers;
 
-=head3 cleanup_XML
+Returns the ordered list of names of footer members stored in the ZIP file.
 
-  $surgeon->cleanup_XML;
 
-Apply several other methods for removing unnecessary nodes within the internal
-XML. This method successively calls L</reduce_all_noises>, L</unlink_fields>,
-L</suppress_bookmarks> and L</merge_runs>.
 
+=head2 Other methods
 
-=head3 reduce_noise
 
-  $surgeon->reduce_noise($regex1, $regex2, ...);
+=head3 part
 
-This method is used for removing unnecessary information in the XML
-markup.  It applies the given list of regexes to the whole document,
-suppressing matches.  The final result is put back into C<<
-$self->contents >>. Regexes may be given either as C<< qr/.../ >>
-references, or as names of builtin regexes (described below).  Regexes
-are applied to the whole XML contents, not only to run nodes.
+  my $part = $surgeon->part($part_name);
 
+Returns the L<MsOffice::Word::Surgeon::PackagePart> object corresponding to the given part name.
 
-=head3 noise_reduction_regex
 
-  my $regex = $surgeon->noise_reduction_regex($regex_name);
+=head3 all_parts_do
 
-Returns the builtin regex corresponding to the given name.
-Known regexes are :
+  my $result = $surgeon->all_parts_do($method_name => %args);
 
-  proof_checking       => qr(<w:(?:proofErr[^>]+|noProof/)>),
-  revision_ids         => qr(\sw:rsid\w+="[^"]+"),
-  complex_script_bold  => qr(<w:bCs/>),
-  page_breaks          => qr(<w:lastRenderedPageBreak/>),
-  language             => qr(<w:lang w:val="[^/>]+/>),
-  empty_run_props      => qr(<w:rPr></w:rPr>),
-  soft_hyphens         => qr(<w:softHyphen/>),
+Calls the given method on all part objects. Results are accumulated
+in a hash, with part names as keys to the results.
 
-=head3 reduce_all_noises
 
-  $surgeon->reduce_all_noises;
+=head3 xml_member
 
-Applies all regexes from the previous method.
+  my $xml = $surgeon->xml_member($member_name);
+  # or
+  $surgeon->xml_member($member_name, $new_xml);
 
-=head3 unlink_fields
+Reads or writes the given member name in the ZIP file, with utf8 decoding or encoding.
 
-  my @names_of_ASK_fields = $self->unlink_fields;
 
-Removes all fields from the document, just leaving the current
-value stored in each field. This is the equivalent of performing Ctrl-Shift-F9
-on the whole document.
+=head3 save_as
 
-The return value is a list of names of ASK fields within the document.
-Such names should then be passed to the L</suppress_bookmarks> method
-(see below).
+  $surgeon->save_as($docx_file);
 
+Writes the ZIP archive into the given file.
 
-=head3 suppress_bookmarks
 
-  $surgeon->suppress_bookmarks(@names_to_erase);
+=head3 overwrite
 
-Removes bookmarks markup in the document. This is useful because
-MsWord may silently insert bookmarks in unexpected places; therefore
-some searches within the text may fail because of such bookmarks.
+  $surgeon->overwrite;
 
-By default, this method only removes the bookmarks markup, leaving
-intact the contents of the bookmark. However, when the name of a
-bookmark belongs to the list C<< @names_to_erase >>, the contents
-is also removed. Currently this is used for suppressing ASK fields,
-because such fields contain a bookmark content that is never displayed by MsWord.
+Writes the updated ZIP archive into the initial file.
 
 
+=head3 new_revision
 
-=head3 merge_runs
-
-  $surgeon->merge_runs(no_caps => 1); # optional arg
-
-Walks through all runs of text within the document, trying to merge
-adjacent runs when possible (i.e. when both runs have the same
-properties, and there is no other XML node inbetween).
-
-This operation is a prerequisite before performing replace operations, because
-documents edited in MsWord often have run boundaries across sentences or
-even in the middle of words; so regex searches can only be successful if those
-artificial boundaries have been removed.
-
-If the argument C<< no_caps => 1 >> is present, the merge operation
-will also convert runs with the C<w:caps> property, putting all letters
-into uppercase and removing the property; this makes more merges possible.
-
-
-=head3 replace
-
-  $surgeon->replace($pattern, $replacement, %replacement_args);
-
-Replaces all occurrences of C<$pattern> regex within the text nodes by the
-given C<$replacement>. This is not exactly like a search-replace
-operation performed within MsWord, because the search does not cross boundaries
-of text nodes. In order to maximize the chances of successful replacements,
-the L</cleanup_XML> method is automatically called before starting the operation.
-
-The argument C<$pattern> can be either a string or a reference to a regular expression.
-It should not contain any capturing parentheses, because that would perturb text
-splitting operations.
-
-The argument C<$replacement> can be either a fixed string, or a reference to
-a callback subroutine that will be called for each match.
-
-
-The C<< %replacement_args >> hash can be used to pass information to the callback
-subroutine. That hash will be enriched with three entries :
-
-=over
-
-=item matched
-
-The string that has been matched by C<$pattern>.
-
-=item run
-
-The run object in which this text resides.
-
-=item xml_before
-
-The XML fragment (possibly empty) found before the matched text .
-
-=back
-
-The callback subroutine may return either plain text or structured XML.
-See the L</SYNOPSIS> for an example of a replacement callback.
-
-
-The following special keys within C<< %replacement_args >> are interpreted by the 
-C<replace()> method itself, and therefore are not passed to the callback subroutine :
-
-=over
-
-=item keep_xml_as_is
-
-if true, no call is made to the L</cleanup_XML> method before performing the replacements
-
-=item dont_overwrite_contents
-
-if true, the internal XML contents is not modified in place; the new XML after performing
-replacements is merely returned to the caller.
-
-=back
-
-
-
-
-=head3 change
-
-  my $xml = $surgeon->change(
+  my $xml = $surgeon->new_revision(
     to_delete   => $text_to_delete,
     to_insert   => $text_to_insert,
     author      => $author_string,
@@ -681,14 +445,17 @@ replacements is merely returned to the caller.
     xml_before  => $xml_string,
   );
 
-This method generates markup for MsWord tracked changes. Users can
-then manually review those changes within MsWord and accept or reject
+This method is syntactic sugar for instantiating the
+L<MsOffice::Word::Surgeon::Revision> class and returning 
+XML markup for MsWord revisions (a.k.a. "tracked changes")
+generated by that class. Users can
+then manually review those revisions within MsWord and accept or reject
 them. This is best used in collaboration with the L</replace> method :
-the replacement callback can call C<< $self->change(...) >> to
-generate tracked change marks in the document.
+the replacement callback can call C<< $self->new_revision(...) >> to
+generate revision marks in the document.
 
-All parameters are optional, but either C<to_delete> or C<to_insert> (or both) must
-be present. The parameters are :
+Either C<to_delete> or C<to_insert> (or both) must
+be present. Other parameters are optional. The parameters are :
 
 =over
 
@@ -703,18 +470,18 @@ The string of new text to insert.
 
 =item author
 
-A short string that will be displayed by MsWord as the "author" of this tracked change.
+A short string that will be displayed by MsWord as the "author" of this revision.
 
 =item date
 
 A date (and optional time) in ISO format that will be displayed by
-MsWord as the date of this tracked change. The current date and time
+MsWord as the date of this revision. The current date and time
 will be used by default.
 
 =item run
 
 A reference to the L<MsOffice::Word::Surgeon::Run> object surrounding
-this tracked change. The formatting properties of that run will be
+this revision. The formatting properties of that run will be
 copied into the C<< <w:r> >> nodes of the deleted and inserted text fragments.
 
 
@@ -724,12 +491,6 @@ An optional XML fragment to be inserted before the C<< <w:t> >> node
 of the inserted text
 
 =back
-
-This method delegates to the
-L<MsOffice::Word::Surgeon::Change> class for generating the
-XML markup.
-
-
 
 
 =head1 SEE ALSO
@@ -778,7 +539,7 @@ A Python library, documented at L<https://python-docx.readthedocs.io/en/latest/>
 
 As far as I can tell, most of these libraries provide objects and methods that
 closely reflect the complete XML structure : for example they have classes for
-paragraphes, styles, fonts, inline shapes, etc.
+paragraphs, styles, fonts, inline shapes, etc.
 
 The present module is much simpler but also much more limited : it was optimised
 for dealing with the text contents and offers no support for presentation or
@@ -795,7 +556,7 @@ Laurent Dami, E<lt>dami AT cpan DOT org<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2019, 2020 by Laurent Dami.
+Copyright 2019-2022 by Laurent Dami.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

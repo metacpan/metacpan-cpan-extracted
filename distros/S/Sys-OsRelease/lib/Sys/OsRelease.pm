@@ -14,12 +14,12 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package Sys::OsRelease;
-$Sys::OsRelease::VERSION = '0.0.2';
+$Sys::OsRelease::VERSION = '0.2.0';
 use Config;
 use Carp qw(carp croak);
 
 # the instance - use Sys::OsRelease->instance() to get it
-my $_instance;
+my %_instances = ();
 
 # default search path and file name for os-release file
 my @std_search_path = qw(/etc /usr/lib /run/host);
@@ -36,19 +36,20 @@ my %common_id = (
     debian => 1,
 );
 
-# fold case for case-insensitive matching
-my $can_fc = CORE->can("fc"); # test fc() once and save result
-sub fold_case
-{
-    my $str = shift;
-
-    # use fc if available, otherwise lc to support older Perls
-    return $can_fc ?  $can_fc->($str) : lc($str);
+# call destructor when program ends
+END {
+    foreach my $class (keys %_instances) {
+        $class->clear_instance();
+    }
+    undef %_instances;
 }
 
-# access module data
-sub std_search_path { return @std_search_path; }
-sub std_attrs { return @std_attrs; }
+#
+# singleton management methods
+# These can be imported by another class by using the import_singleton() method. That was done for Sys::OsPackage,
+# to avoid copying those methods.  But other classes with a similar need to minimize module dependencies which already
+# use Sys::OsRelease can do this too.
+#
 
 # alternative method to initiate initialization without returning a value
 sub init
@@ -70,18 +71,70 @@ sub instance
 {
     my ($class, @params) = @_;
 
-    # enforce class lineage
-    if (not $class->isa(__PACKAGE__)) {
-        croak "cannot find instance: ".(ref $class ? ref $class : $class)." is not a ".__PACKAGE__;
-    }
-
     # initialize if not already done
-    if (not defined $_instance) {
-        $_instance = $class->_new_instance(@params);
+    if (not defined $_instances{$class}) {
+        $_instances{$class} = $class->_new_instance(@params);
     }
 
     # return singleton instance
-    return $_instance;
+    return $_instances{$class};
+}
+
+# test if instance is defined for testing
+sub defined_instance
+{
+    my $class = shift;
+    return ((defined $_instances{$class}) and $_instances{$class}->isa($class)) ? 1 : 0;
+}
+
+# clear instance for exit-cleanup or for re-use in testing
+sub clear_instance
+{
+    my $class = shift;
+    if ($class->defined_instance()) {
+        # clean up anything that the destructor will miss, such as auto-generated methods
+        if ($class->can("_cleanup_instance")) {
+            $class->_cleanup_instance();
+        }
+
+        # dereferencing will destroy singleton instance
+        undef $_instances{$class};
+    }
+    return;
+}
+
+# allow other classes which cooperate with Sys::OsRelease to import our singleton-management methods
+# This helps maintain minimal prerequisites among modules working to set up Perl on containers or new systems.
+sub import_singleton
+{
+    my $class = shift;
+    my $caller_class = caller;
+
+    # export singleton-management methods to caller class
+    foreach my $method_name (qw(init new instance defined_instance clear_instance)) {
+        ## no critic (TestingAndDebugging::ProhibitNoStrict)
+        no strict 'refs';
+        *{$caller_class."::".$method_name} = \&{__PACKAGE__."::".$method_name};
+    }
+    return;
+}
+
+#
+# os-release data access methods
+#
+
+# access module constants
+sub std_search_path { return @std_search_path; }
+sub std_attrs { return @std_attrs; }
+
+# fold case for case-insensitive matching
+my $can_fc = CORE->can("fc"); # test fc() once and save result
+sub fold_case
+{
+    my $str = shift;
+
+    # use fc if available, otherwise lc to support older Perls
+    return $can_fc ?  $can_fc->($str) : lc($str);
 }
 
 # initialize a new instance
@@ -89,9 +142,10 @@ sub _new_instance
 {
     my ($class, @params) = @_;
 
-    # enforce class lineage
+    # enforce class lineage - _new_instance() should be overloaded by other classes that import singleton methods
     if (not $class->isa(__PACKAGE__)) {
-        croak "cannot find instance: ".(ref $class ? ref $class : $class)." is not a ".__PACKAGE__;
+        croak "_new_instance() should be overloaded by calling class: "
+            .(ref $class ? ref $class : $class)." is not a ".__PACKAGE__;
     }
 
     # obtain parameters from array or hashref
@@ -150,16 +204,45 @@ sub _new_instance
 
     # bless instance and generate accessor methods
     my $obj_ref = bless \%obj, $class;
-    $obj_ref->gen_accessors();
+    $obj_ref->_gen_accessors();
 
     # instantiate object
     return $obj_ref;
 }
 
+# helper function to allow methods to get the instance ref when called via the class name
+sub class_or_obj
+{
+    my $coo = shift;
+
+    # return the instance
+    return ((ref $coo) ? $coo : $coo->instance());
+}
+
+# clean up data in an instance before feeding it to the destructor
+sub _cleanup_instance
+{
+    my ($class_or_obj) = @_;
+    my $self = class_or_obj($class_or_obj);
+
+    # enforce class lineage - _cleanup_instance() should be overloaded by other classes that import singleton methods
+    if (not $self->isa(__PACKAGE__)) {
+        croak "_new_instance() should be overloaded by calling class: "
+            .(ef $self)." is not a ".__PACKAGE__;
+    }
+
+    # clear accessor functions
+    foreach my $acc (keys %{$self->{_config}{accessor}}) {
+        $self->_clear_accessor($acc);
+    }
+    return;
+}
+
 # determine platform type
 sub platform
 {
-    my $self = shift;
+    my ($class_or_obj) = @_;
+    my $self = class_or_obj($class_or_obj);
     
     # if we haven't already saved this result, compute and save it
     if (not $self->has_config("platform")) {
@@ -178,7 +261,7 @@ sub platform
 
             # check ID_LIKE for more common names which should be used instead of ID
             foreach my $like (split /\s+/x, $self->id_like) {
-                if ($common_id{$like} // 0) {
+                if (exists $common_id{$like}) {
                     $self->config("platform", $like);
                     last;
                 }
@@ -197,44 +280,43 @@ sub platform
 # return undef if the file was not found
 sub osrelease_path
 {
-    my $self = shift;
+    my ($class_or_obj) = @_;
+    my $self = class_or_obj($class_or_obj);
     if (exists $self->{_config}{osrelease_path}) {
         return $self->{_config}{osrelease_path};
     }
     return;
 }
 
-# test if instance is defined for testing
-sub defined_instance
-{
-    return ((defined $_instance) and $_instance->isa(__PACKAGE__)) ? 1 : 0;
-}
-
 # attribute existence checker
 sub has_attr
 {
-    my ($self, $key) = @_;
+    my ($class_or_obj, $key) = @_;
+    my $self = class_or_obj($class_or_obj);
     return ((exists $self->{fold_case($key)}) ? 1 : 0);
 }
 
 # attribute read-only accessor
 sub get
 {
-    my ($self, $key) = @_;
-    return $self->{fold_case($key)} // undef;
+    my ($class_or_obj, $key) = @_;
+    my $self = class_or_obj($class_or_obj);
+    return $self->{fold_case($key)};
 }
 
 # attribute existence checker
 sub has_config
 {
-    my ($self, $key) = @_;
+    my ($class_or_obj, $key) = @_;
+    my $self = class_or_obj($class_or_obj);
     return ((exists $self->{_config}{$key}) ? 1 : 0);
 }
 
 # config read/write accessor
 sub config
 {
-    my ($self, $key, $value) = @_;
+    my ($class_or_obj, $key, $value) = @_;
+    my $self = class_or_obj($class_or_obj);
     if (defined $value) {
         $self->{_config}{$key} = $value;
     }
@@ -242,14 +324,16 @@ sub config
 }
 
 # generate accessor methods for all defined and standardized attributes
-sub gen_accessors
+# private internal method
+sub _gen_accessors
 {
-    my $self = shift;
+    my ($class_or_obj) = @_;
+    my $self = class_or_obj($class_or_obj);
 
     # generate read-only accessors for attributes actually found in os-release
     foreach my $key (sort keys %{$self}) {
         next if $key eq "_config"; # protect special/reserved attribute
-        $self->gen_accessor($key);
+        $self->_gen_accessor($key);
     }
 
     # generate undef accessors for standardized attributes which were not found in os-release
@@ -257,15 +341,17 @@ sub gen_accessors
         next if $std_attr eq "_config"; # protect special/reserved attribute
         my $fc_attr = fold_case($std_attr);
         next if $self->has_attr($fc_attr);
-        $self->gen_accessor($fc_attr);
+        $self->_gen_accessor($fc_attr);
     }
     return;
 }
 
 # generate accessor
-sub gen_accessor
+# private internal method
+sub _gen_accessor
 {
-    my ($self, $name) = @_;
+    my ($class_or_obj, $name) = @_;
+    my $self = class_or_obj($class_or_obj);
     my $class = (ref $self) ? (ref $self) : $self; 
     my $method_name = $class."::".$name;
 
@@ -277,7 +363,7 @@ sub gen_accessor
     # generate accessor as read-only or undef depending whether it exists in the running system
     if (exists $self->{$name}) {
         # generate read-only accessor for attribute which was found in os-release
-        $self->{_config}{accessor}{$name} = sub { return $self->{$name} // undef };
+        $self->{_config}{accessor}{$name} = sub { return $self->{$name} };
     } else {
         # generate undef accessor for standard attribute which was not found in os-release
         $self->{_config}{accessor}{$name} = sub { return; };
@@ -290,9 +376,11 @@ sub gen_accessor
 }
 
 # clean up accessor
-sub clear_accessor
+# private internal method
+sub _clear_accessor
 {
-    my ($self, $name) = @_;
+    my ($class_or_obj, $name) = @_;
+    my $self = class_or_obj($class_or_obj);
     my $class = (ref $self) ? (ref $self) : $self; 
     if (exists $self->{_config}{accessor}{$name}) {
         my $method_name = $class."::".$name;
@@ -302,26 +390,6 @@ sub clear_accessor
         delete $self->{_config}{accessor}{$name};
     }
     return;
-}
-
-# clear instance for exit-cleanup or for re-use in testing
-sub clear_instance
-{
-    if (defined $_instance) {
-        # clear accessor functions
-        foreach my $acc (keys %{$_instance->{_config}{accessor}}) {
-            $_instance->clear_accessor($acc);
-        }
-
-        # dereferencing will destroy singleton instance
-        undef $_instance;
-    }
-    return;
-}
-
-# call destructor when program ends
-END {
-    Sys::OsRelease::clear_instance();
 }
 
 1;
@@ -336,7 +404,7 @@ Sys::OsRelease - read operating system details from standard /etc/os-release fil
 
 =head1 VERSION
 
-version 0.0.2
+version 0.2.0
 
 =head1 SYNOPSIS
 
@@ -495,6 +563,15 @@ different parameters.
 
 Since this class is based on the singleton model, there is only one instance.
 The instance(), new() and init() methods will only initialize the instance if it is not already initialized.
+
+=item import_singleton
+
+The singleton-management methods I<init>, I<new>, I<instance>, I<defined_instance> and I<clear_instance>
+can be imported by another class by using the import_singleton() method.
+That was done for L<Sys::OsPackage>, to allow it to avoid copying those methods.
+But other classes with a similar need to minimize module dependencies which already
+use I<Sys::OsRelease> can do this too.
+This helps maintain minimal prerequisites among modules working to set up Perl on containers or new systems.
 
 =back
 

@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
-package Convert::Color::CMYK;
+package Convert::Color::CMYK 0.12;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Convert::Color );
 
@@ -15,8 +15,6 @@ use List::Util qw( min );
 
 use Carp;
 
-our $VERSION = '0.11';
-
 =head1 NAME
 
 C<Convert::Color::CMYK> - a color value represented as cyan/magenta/yellow/key
@@ -25,18 +23,18 @@ C<Convert::Color::CMYK> - a color value represented as cyan/magenta/yellow/key
 
 Directly:
 
- use Convert::Color::CMYK;
+   use Convert::Color::CMYK;
 
- my $red = Convert::Color::CMYK->new( 0, 1, 1, 0 );
+   my $red = Convert::Color::CMYK->new( 0, 1, 1, 0 );
 
- # Can also parse strings
- my $pink = Convert::Color::CMYK->new( '0,0.3,0.3,0' );
+   # Can also parse strings
+   my $pink = Convert::Color::CMYK->new( '0,0.3,0.3,0' );
 
 Via L<Convert::Color>:
 
- use Convert::Color;
+   use Convert::Color;
 
- my $cyan = Convert::Color->new( 'cmyk:1,0,0,0' );
+   my $cyan = Convert::Color->new( 'cmyk:1,0,0,0' );
 
 =head1 DESCRIPTION
 
@@ -49,18 +47,20 @@ floating-point values in the range 0 to 1.
 
 =cut
 
-=head2 $color = Convert::Color::CMYK->new( $cyan, $magenta, $yellow, $key )
+=head2 new
+
+   $color = Convert::Color::CMYK->new( $cyan, $magenta, $yellow, $key )
 
 Returns a new object to represent the set of values given. These values should
 be floating-point numbers between 0 and 1. Values outside of this range will
 be clamped.
 
-=head2 $color = Convert::Color::CMYK->new( $string )
+   $color = Convert::Color::CMYK->new( $string )
 
 Parses C<$string> for values, and construct a new object similar to the above
 three-argument form. The string should be in the form
 
- cyan,magenta,yellow,key
+   cyan,magenta,yellow,key
 
 containing the three floating-point values in decimal notation.
 
@@ -89,7 +89,10 @@ sub new
    }
 
    # Clamp
-   map { $_ < 0 and $_ = 0; $_ > 1 and $_ = 1 } ( $c, $m, $y, $k );
+   for ( $c, $m, $y, $k ) {
+      $_ = 0 if $_ < 0;
+      $_ = 1 if $_ > 1;
+   }
 
    return bless [ $c, $m, $y, $k ], $class;
 }
@@ -98,13 +101,21 @@ sub new
 
 =cut
 
-=head2 $c = $color->cyan
+=head2 cyan
 
-=head2 $m = $color->magenta
+   $c = $color->cyan
 
-=head2 $y = $color->yellow
+=head2 magenta
 
-=head2 $k = $color->key
+   $m = $color->magenta
+
+=head2 yellow
+
+   $y = $color->yellow
+
+=head2 key
+
+   $k = $color->key
 
 Accessors for the four components of the color.
 
@@ -116,7 +127,9 @@ sub magenta { shift->[1] }
 sub yellow  { shift->[2] }
 sub key     { shift->[3] }
 
-=head2 $k = $color->black
+=head2 black
+
+   $k = $color->black
 
 An alias to C<key>
 
@@ -124,7 +137,9 @@ An alias to C<key>
 
 *black = \&key; # alias
 
-=head2 ( $cyan, $magenta, $yellow, $key ) = $color->cmyk
+=head2 cmyk
+
+   ( $cyan, $magenta, $yellow, $key ) = $color->cmyk
 
 Returns the individual cyan, magenta, yellow and key components of the color
 value.

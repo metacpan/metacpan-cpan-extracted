@@ -1,5 +1,11 @@
 Revision history for Attribute-Storage
 
+0.10    2022-04-28
+        [CHANGES]
+         * Refresh module documentation style
+         * Remember to `#define PERL_NO_GET_CONTEXT` in .xs file
+         * Depends on perl versions >= 5.14
+
 0.09    2014/05/12 16:06:20
         [CHANGES]
          * Added apply_subattrs and find_subs_with_attr; useful copies from

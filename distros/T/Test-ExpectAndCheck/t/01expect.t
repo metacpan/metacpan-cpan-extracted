@@ -86,13 +86,24 @@ my ( $controller, $puppet ) = Test::ExpectAndCheck->create;
    test_err q[    #    got : '1'];
    test_err q[    # expect : '0.5'];
    test_err q[    # Looks like you failed 1 test of 1.];
-   test_fail +4;
+   test_fail +6;
 
+   my $line = __LINE__;
    $controller->expect( cmethod => 0.5 );
    ok( !defined eval { $puppet->cmethod( 1.0 ) }, '->cmethod with wrong args dies' );
+   my $e = "$@";
    $controller->check_and_clear( '->cmethod fails' );
 
    test_test 'cmethod fail wrong args';
+
+   # I can't actually break out of TBT mode here so lets nest it instead
+   test_out q[ok 1 - thrown exception from expectation failure];
+
+   is( $e, "Unexpected call to ->cmethod(1) at $0 line ${\( $line+2 )}.\n" .
+           "... while expecting ->cmethod('0.5') at $0 line ${\( $line+1 )}.\n",
+      'thrown exception from expectation failure' );
+
+   test_test 'exception message check';
 }
 
 # fail unexpected

@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
-package Convert::Color;
+package Convert::Color 0.12;
 
-use strict;
+use v5.14;
 use warnings;
 
 use Carp;
@@ -16,25 +16,23 @@ use Module::Pluggable require => 0,
                       search_path => [ 'Convert::Color' ];
 my @plugins = Convert::Color->plugins;
 
-our $VERSION = '0.11';
-
 =head1 NAME
 
 C<Convert::Color> - color space conversions and named lookups
 
 =head1 SYNOPSIS
 
- use Convert::Color;
+   use Convert::Color;
 
- my $color = Convert::Color->new( 'hsv:76,0.43,0.89' );
+   my $color = Convert::Color->new( 'hsv:76,0.43,0.89' );
 
- my ( $red, $green, $blue ) = $color->rgb;
+   my ( $red, $green, $blue ) = $color->rgb;
 
- # GTK uses 16-bit values
- my $gtk_col = Gtk2::Gdk::Color->new( $color->as_rgb16->rgb16 );
+   # GTK uses 16-bit values
+   my $gtk_col = Gtk2::Gdk::Color->new( $color->as_rgb16->rgb16 );
 
- # HTML uses #rrggbb in hex
- my $html = '<td bgcolor="#' . $color->as_rgb8->hex . '">';
+   # HTML uses #rrggbb in hex
+   my $html = '<td bgcolor="#' . $color->as_rgb8->hex . '">';
 
 =head1 DESCRIPTION
 
@@ -145,24 +143,26 @@ sub _space2class
    return $_space2class_cache{$space};
 }
 
-=head2 $color = Convert::Color->new( STRING )
+=head2 new
+
+   $color = Convert::Color->new( STRING )
 
 Return a new value to represent the color specified by the string. This string
 should be prefixed by the name of the color space to which it applies. For
 example
 
- rgb:RED,GREEN,BLUE
- rgb8:RRGGBB
- rgb16:RRRRGGGGBBBB
- hsv:HUE,SAT,VAL
- hsl:HUE,SAT,LUM
- cmy:CYAN,MAGENTA,YELLOW
- cmyk:CYAN,MAGENTA,YELLOW,KEY
+   rgb:RED,GREEN,BLUE
+   rgb8:RRGGBB
+   rgb16:RRRRGGGGBBBB
+   hsv:HUE,SAT,VAL
+   hsl:HUE,SAT,LUM
+   cmy:CYAN,MAGENTA,YELLOW
+   cmyk:CYAN,MAGENTA,YELLOW,KEY
 
- vga:NAME
- vga:INDEX
+   vga:NAME
+   vga:INDEX
 
- x11:NAME
+   x11:NAME
 
 For more detail, see the constructor of the color space subclass in question.
 
@@ -185,7 +185,9 @@ sub new
 
 =cut
 
-=head2 ( $red, $green, $blue ) = $color->rgb
+=head2 rgb
+
+   ( $red, $green, $blue ) = $color->rgb
 
 Returns the individual red, green and blue color components of the color
 value. For RGB values, this is done directly. For values in other spaces, this
@@ -237,13 +239,15 @@ If none of these operations worked, then throw an exception.
 
 These functions may be called in the following ways:
 
- $other = $color->convert_to_DEST()
- $other = Dest::Class->new_from_SRC( $color )
- $other = Dest::Class->new_rgb( $color->rgb )
+   $other = $color->convert_to_DEST()
+   $other = Dest::Class->new_from_SRC( $color )
+   $other = Dest::Class->new_rgb( $color->rgb )
 
 =cut
 
-=head2 $other = $color->convert_to( $space )
+=head2 convert_to
+
+   $other = $color->convert_to( $space )
 
 Attempt to convert the color into its representation in the given space. See
 above for the various ways this may be achieved.
@@ -252,7 +256,7 @@ If the relevant subclass has already been loaded (either explicitly, or
 implicitly by either the C<new> or C<convert_to> methods), then a specific
 conversion method will be installed in the class.
 
- $other = $color->as_$space
+   $other = $color->as_$space
 
 Methods of this form are currently C<AUTOLOAD>ed if they do not yet exist, but
 this feature should not be relied upon - see below.
@@ -303,8 +307,8 @@ sub convert_to_rgb
 This class provides C<AUTOLOAD> and C<can> behaviour which automatically
 constructs conversion methods. The following method calls are identical:
 
- $color->convert_to('rgb')
- $color->as_rgb
+   $color->convert_to('rgb')
+   $color->as_rgb
 
 The generated method will be stored in the package, so that future calls will
 not have the AUTOLOAD overhead.
@@ -369,13 +373,17 @@ This base class is intended to be subclassed to provide more color spaces.
 
 =cut
 
-=head2 $class->register_color_space( $space )
+=head2 register_color_space
+
+   $class->register_color_space( $space )
 
 A subclass should call this method to register itself as a named color space.
 
 =cut
 
-=head2 $class->register_palette( %args )
+=head2 register_palette
+
+   $class->register_palette( %args )
 
 A subclass that provides a fixed set of color values should call this method,
 to set up automatic conversions that look for the closest match within the
@@ -397,7 +405,9 @@ As per C<enumerate>, but will be called only once and the results cached.
 This method creates a new class method on the calling package, called
 C<closest_to>.
 
-=head3 $color = $pkg->closest_to( $orig, $space )
+=head2 closest_to
+
+   $color = $pkg->closest_to( $orig, $space )
 
 Returns the color in the space closest to the given value. The distance is
 measured in the named space; defaulting to C<rgb> if this is not provided.

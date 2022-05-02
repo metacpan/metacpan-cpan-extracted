@@ -2,12 +2,7 @@ Build.PL
 Changes
 lib/Attribute/Storage.pm
 lib/Attribute/Storage.xs
-LICENSE
-Makefile.PL
 MANIFEST			This list of files
-META.json
-META.yml
-README
 t/00use.t
 t/01simple.t
 t/02value.t
@@ -18,3 +13,7 @@ t/06subname.t
 t/07apply.t
 t/08find.t
 t/99pod.t
+README
+LICENSE
+META.yml
+META.json

@@ -1,0 +1,29 @@
+---
+abstract: 'functions for the jtt CLI'
+author:
+  - 'Alceu Rodrigue de Freitas Junior'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Exception: '0.43'
+  Test::TempDir::Tiny: '0.018'
+  Test::Warnings: '0.031'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Jenkins-i18n
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Config::Properties: '1.8'
+  Set::Tiny: '0.04'
+  Text::Wrap: '2021.0814'
+  perl: '5.014004'
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -2012,7 +2012,7 @@ static inline marpaESLIFGrammar_t *_marpaESLIF_lua_grammarp(marpaESLIF_t *marpaE
   marpaESLIFGrammarOption.encodings = "ASCII";
   marpaESLIFGrammarOption.encodingl = 5;
 
-  rcp = _marpaESLIFGrammar_newp(marpaESLIFp, &marpaESLIFGrammarOption, 0 /* startGrammarIsLexemeb */, &(marpaESLIFp->Lshare), 0 /* bootstrapb */);
+  rcp = _marpaESLIFGrammar_newp(marpaESLIFp, &marpaESLIFGrammarOption, &(marpaESLIFp->Lshare), 0 /* bootstrapb */, 0 /* rememberGrammarUtf8b */, NULL /* forcedStartSymbols */, -1 /* forcedStartSymbolLeveli */, NULL /* marpaESLIFGrammar_bootstrapp */);
   goto done;
 
  err:
@@ -2418,12 +2418,6 @@ static inline short _marpaESLIF_lua_recognizer_push_contextb(marpaESLIFRecognize
   char                         *parlistWithoutParens = NULL;
   int                           topi                 = -1;
   lua_State                    *L;
-#ifndef MARPAESLIF_NTRACE
-  int                           i;
-  char                         *p;
-  char                         *p2;
-  char                          c;
-#endif
   marpaESLIF_stringGenerator_t  marpaESLIF_stringGenerator;
   short                         rcb;
 
@@ -2489,40 +2483,6 @@ static inline short _marpaESLIF_lua_recognizer_push_contextb(marpaESLIFRecognize
         goto err;
       }
     }
-#ifndef MARPAESLIF_NTRACE
-    if (parlistWithoutParens != NULL) {
-      /* Enclose parlist members with '' */
-      p = parlistWithoutParens;
-      for (i = 0; i < symbolp->declp->sizei; i++) {
-        /* Get start of symbol */
-        c = *p;
-        while (1) {
-          if ((c == '_') || ((c >= '0') && (c <= '9')) || ((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'Z'))) {
-            break;
-          }
-          c = *++p;
-        }
-        /* Put NUL at end of symbol */
-        p2 = p;
-        c = *++p2;
-        while (1) {
-          if ((c == '_') || ((c >= '0') && (c <= '9')) || ((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'Z'))) {
-            c = *++p2;
-            continue;
-          }
-          break;
-        }
-        *p2 = '\0';
-        GENERICLOGGER_TRACEF(genericLoggerp, "  print('[%d][lua] Parameter %s = '..tostring(%s))\n", marpaESLIFRecognizerp->leveli, p, p);
-        if (MARPAESLIF_UNLIKELY(! marpaESLIF_stringGenerator.okb)) {
-          goto err;
-        }
-        *p2 = c;
-        p = ++p2;
-      }
-    }
-    GENERICLOGGER_TRACEF(genericLoggerp, "  print('[%d][lua] Pushed: %s')\n", marpaESLIFRecognizerp->leveli, symbolp->callp->luaexplists);
-#endif
     GENERICLOGGER_TRACEF(genericLoggerp, "  marpaESLIFContextStackp:push(table.pack%s)\n", symbolp->callp->luaexplists);
     if (MARPAESLIF_UNLIKELY(! marpaESLIF_stringGenerator.okb)) {
       goto err;
@@ -2658,6 +2618,9 @@ static inline short _marpaESLIF_lua_recognizer_pop_contextb(marpaESLIFRecognizer
 /*****************************************************************************/
 static inline short _marpaESLIF_lua_recognizer_get_contextp(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFValueResult_t *contextp)
 /*****************************************************************************/
+/* This is when we push a context into Lua: we want it to be array that      */
+/* keeps the nils.                                                           */
+/*****************************************************************************/
 {
   static const char *funcs       = "_marpaESLIF_lua_recognizer_get_contextp";
   marpaESLIF_t      *marpaESLIFp = marpaESLIFRecognizerp->marpaESLIFp;
@@ -2665,7 +2628,7 @@ static inline short _marpaESLIF_lua_recognizer_get_contextp(marpaESLIFRecognizer
   lua_State         *L;
   const char        *gets        =
     "return function()\n"
-    "  return marpaESLIFContextStackp:get()\n"
+    "  return niledarray(table.unpack(marpaESLIFContextStackp:get()))\n"
     "end\n";
   short              rcb;
 
@@ -2756,7 +2719,7 @@ static inline short _marpaESLIF_lua_recognizer_set_contextb(marpaESLIFRecognizer
 
   /* ---------------------------------------------------------------------------------------------------------------- */
   /* return function()                                                                                                */
-  /*   return marpaESLIFContextStackp:set()                                                                           */
+  /*   return marpaESLIFContextStackp:set(context)                                                                    */
   /* end                                                                                                              */
   /* ---------------------------------------------------------------------------------------------------------------- */
   if (marpaESLIFRecognizerp->setContextActionp == NULL) {

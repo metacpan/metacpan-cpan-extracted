@@ -1,5 +1,8 @@
 Revision history for Net-IPAM-Block
 
+5.10    Wed, 27 Apr 2022 20:32:43 +0200
+        * add serialization method TO_JSON
+
 5.01    Sun, 11 Apr 2021 16:53:20 +0200
         * bitlen() still useful, deprecation was a fault
         * better _clone()

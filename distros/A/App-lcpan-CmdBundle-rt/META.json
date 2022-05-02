@@ -55,15 +55,15 @@
    "provides" : {
       "App::lcpan::Cmd::rt_open" : {
          "file" : "lib/App/lcpan/Cmd/rt_open.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "App::lcpan::Cmd::rt_tickets" : {
          "file" : "lib/App/lcpan/Cmd/rt_tickets.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "App::lcpan::CmdBundle::rt" : {
          "file" : "lib/App/lcpan/CmdBundle/rt.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -78,7 +78,7 @@
          "web" : "https://github.com/perlancar/perl-App-lcpan-CmdBundle-rt"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

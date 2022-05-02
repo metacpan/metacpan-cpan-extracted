@@ -1,5 +1,11 @@
 Revision history for MIDI-Drummer
 
+0.2100 2022-05-01 16:38:40
+    - Move the syncopation logic to its own module.
+
+0.2012 2022-05-01 11:04:22
+    - Make patches plain numbers and not 'n42' type strings.
+
 0.2011 2022-04-23 21:01:39
     - Remove post-derefs.
 

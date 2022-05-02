@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-
+use lib "d:/Git/DAMI/MsOffice-Word-Surgeon/lib";
 use lib "../lib";
 use MsOffice::Word::Template;
 use Test::More;

@@ -1,15 +1,15 @@
 package Org::Parser;
 
-use 5.010001;
+use 5.014; # compilation failure in older perls, RT#141560
 use Moo;
 
 use Org::Document;
 use Scalar::Util qw(blessed);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-08'; # DATE
+our $DATE = '2022-03-27'; # DATE
 our $DIST = 'Org-Parser'; # DIST
-our $VERSION = '0.556'; # VERSION
+our $VERSION = '0.557'; # VERSION
 
 sub parse {
     my ($self, $arg, $opts) = @_;
@@ -110,7 +110,7 @@ Org::Parser - Parse Org documents
 
 =head1 VERSION
 
-This document describes version 0.556 of Org::Parser (from Perl distribution Org-Parser), released on 2022-02-08.
+This document describes version 0.557 of Org::Parser (from Perl distribution Org-Parser), released on 2022-03-27.
 
 =head1 SYNOPSIS
 

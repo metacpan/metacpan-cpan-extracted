@@ -1,3 +1,19 @@
+1.04 2022-04-30
+ - Add odd/even css classes to problem options
+ - Split queue and problem options to ease future changes
+ - Mark queues bold to make them more distinguishale
+ - Add dividers for queues not having "Problem Type"
+
+1.03 2022-04-28
+ - Ignore submitted "Problem Type" value on problem change
+ - Fix "Problem Type" lookup type: it's a ticket custom field
+
+1.02 2022-04-27
+ - Support select problem on ticket create page for RT 5
+ - Refactor to render options in normal mason instead of calling $m->out
+ - Abstract SelectProblem to reuse it later for RT 5 create page
+ - Load queue custom field directly from RT::CustomField
+
 1.01 2014-07-14
  - Updated changelog
  - cpansign

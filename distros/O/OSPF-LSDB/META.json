@@ -69,6 +69,6 @@
          "url" : "git://git.code.sf.net/p/ospfview/code"
       }
    },
-   "version" : "1.16",
+   "version" : "1.17",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,6 +1,7 @@
 # $Id$
 
 # use 5.008;
+use Config;
 use ExtUtils::MakeMaker;
 use ExtUtils::PkgConfig;
 use Getopt::Long;
@@ -56,6 +57,8 @@ MAKECHANGELOG
 WriteMakefile(
     NAME	 => 'RPM4',
     VERSION_FROM => 'lib/RPM4.pm',
+    # Just for seeing it in the logs when inspecting cpan testers failures:
+    CCFLAGS      => "$cfg{cflags} -Wall -DRPM$cfg{modversion} $Config{ccflags}",
     DIR          => [ 'src' ],
     'EXE_FILES'  => [ qw(bin/rpm_produced bin/rpmresign bin/hrpmreb) ],
     depend => { dist => 'copyrpmconstant' },

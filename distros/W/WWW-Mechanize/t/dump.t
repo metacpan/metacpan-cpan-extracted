@@ -2,11 +2,12 @@
 
 use warnings;
 use strict;
+
+use File::Spec ();
+use File::Temp qw( tempdir );
 use Test::More 0.96 tests => 7;
-use Test::Output;
-use URI::file;
-use File::Temp qw/tempdir/;
-use File::Spec;
+use Test::Output qw( stdout_is stdout_like );
+use URI::file ();
 
 BEGIN {
     use_ok( 'WWW::Mechanize' );
@@ -153,7 +154,7 @@ sub dump_tests {
 
 sub create_mech {
 	my $filepath = shift;
-	my $mech     = WWW::Mechanize->new( cookie_jar => undef );
+	my $mech     = WWW::Mechanize->new( cookie_jar => undef, max_redirect => 0 );
 	isa_ok( $mech, 'WWW::Mechanize' );
 	my $uri = URI::file->new($filepath)->abs(URI::file->cwd)->as_string;
 

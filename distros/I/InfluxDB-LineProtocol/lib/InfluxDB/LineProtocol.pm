@@ -4,7 +4,7 @@ use warnings;
 
 # ABSTRACT: Write and read InfluxDB LineProtocol
 
-our $VERSION = '1.014'; # VERSION
+our $VERSION = '1.015'; # VERSION
 
 use Carp qw(croak);
 use Time::HiRes qw(gettimeofday);
@@ -59,8 +59,36 @@ sub _format_key {
     return $k;
 }
 
-sub _format_value {
+sub _format_measurement {
+    my $measurement = shift;
+
+    $measurement =~ s/([, ])/\\$1/g;
+    return $measurement;
+}
+
+sub _format_tag_key {
+    my $key = shift;
+
+    $key =~ s/([, =])/\\$1/g;
+    return $key;
+}
+
+sub _format_tag_value {
+    my $value = shift;
+
+    $value =~ s/([, =])/\\$1/g;
+    return $value;
+}
+
+sub _format_field_key {
     my $k = shift;
+
+    $k =~ s/([, =])/\\$1/g;
+
+    return $k;
+}
+
+sub _format_field_value {
     my $v = shift;
 
     if ( $v =~ /^(-?\d+)(?:i?)$/ ) {
@@ -93,8 +121,7 @@ sub data2line {
         return $measurement;
     }
 
-    my $key = $measurement;
-    $key =~ s/([, ])/\\$1/g;
+    my $key = _format_measurement($measurement);
 
     # $tags has to be a hashref, if it's not, we don't have tags, so it's the timestamp
     if ( defined $tags ) {
@@ -106,9 +133,11 @@ sub data2line {
                 #      http://golang.org/pkg/bytes/#Compare
                 my $v = $tags->{$k};
                 next unless defined $v;
-                $k =~ s/([, ])/\\$1/g;
-                $v =~ s/([, ])/\\$1/g;
-                push( @tags, $k . '=' . $v );
+
+                my $esc_k = _format_tag_key($k);
+                my $esc_v = _format_tag_value($v);
+
+                push( @tags, $esc_k . '=' . $esc_v );
             }
             $key .= join( ',', '', @tags ) if @tags;
         }
@@ -128,8 +157,8 @@ sub data2line {
     foreach my $k ( sort keys %$values ) {
         my $v = $values->{$k};
 
-        my $esc_k = _format_key($k);
-        my $esc_v = _format_value($k, $v);
+        my $esc_k = _format_field_key($k);
+        my $esc_v = _format_field_value($v);
 
         push( @fields, $esc_k . '=' . $esc_v );
     }
@@ -173,6 +202,7 @@ sub line2data {
     $line =~ s/\\,/ESCAPEDCOMMA/g;
     $line =~ s/\\"/ESCAPEDDBLQUOTE/g;
     $line =~ s/\\\\/ESCAPEDBACKSLASH/g;
+    $line =~ s/\\=/ESCAPEDEQUALS/g;
 
     $line=~/^(.*?) (.*) (.*)$/;
     my ($key, $fields, $timestamp) = ( $1, $2, $3);
@@ -186,6 +216,8 @@ sub line2data {
         $tagset =~ s/ESCAPEDSPACE/ /g;
         $tagset =~ s/ESCAPEDCOMMA/,/g;
         my ( $k, $v ) = split( /=/, $tagset );
+        $k =~ s/ESCAPEDEQUALS/=/g;
+        $v =~ s/ESCAPEDEQUALS/=/g;
         $tags->{$k} = $v;
     }
 
@@ -204,6 +236,7 @@ sub line2data {
         $v =~ s/ESCAPEDBACKSLASH/\\/g;
         $v =~ s/^(-?\d+)i$/$1/;
         $k =~ s/ESCAPEDBACKSLASH/\\\\/g;
+        $k =~ s/ESCAPEDEQUALS/=/g;
         $values->{$k} = $v;
     }
 
@@ -337,7 +370,7 @@ InfluxDB::LineProtocol - Write and read InfluxDB LineProtocol
 
 =head1 VERSION
 
-version 1.014
+version 1.015
 
 =head1 SYNOPSIS
 
@@ -499,6 +532,10 @@ scientific notation.
 L<Adrian Popa|https://github.com/mad-ady> for fixing a bug when
 handling large scientific notation data.
 
+=item *
+
+L< zachary-bull |https://github.com/zachary-bull> for adding code to escape C<=> in tag keys.
+
 =back
 
 =head1 AUTHOR
@@ -507,7 +544,7 @@ Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 - 2021 by Thomas Klausner.
+This software is copyright (c) 2016 - 2022 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

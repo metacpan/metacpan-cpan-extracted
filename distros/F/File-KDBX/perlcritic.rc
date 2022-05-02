@@ -1,0 +1,4 @@
+# We don't really do much using the return value for error-checking. I think
+# in this codebase bugs would more likely be in the form if unintentionally
+# returning empty list in list context.
+[-Subroutines::ProhibitExplicitReturnUndef]

@@ -19,8 +19,7 @@ WriteMakefile(
 		'Test::NoWarnings' => 0,
 		'Test::Requires' => 0,
 		# 'Test::Kwalitee' => 0,
-	},
-	PREREQ_PM => {
+	}, PREREQ_PM => {
 		'Carp' => 0,
 		'Class::Simple' => 0,
 	},
@@ -43,7 +42,6 @@ WriteMakefile(
 				web => 'https://github.com/nigelhorne/Class-Simple-Readonly-Cached/issues',
 				url => 'https://github.com/nigelhorne/Class-Simple-Readonly-Cached/issues',
 			}
-		
 		},
 	},
 	MIN_PERL_VERSION	=> '5.6.2'	# Probably would work, but never tested on earlier versions than this

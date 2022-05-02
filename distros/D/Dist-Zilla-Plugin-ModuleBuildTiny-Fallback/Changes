@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-ModuleBuildTiny-Fallback
 
+0.027     2022-04-30 19:53:27Z
+          - revert the use of List::Keywords, for now
+
 0.026     2022-04-15 02:44:40Z
           - warning messages shown to the user are text-wrapped to 78 chars
           - warn about a possible missing [ShareDir]

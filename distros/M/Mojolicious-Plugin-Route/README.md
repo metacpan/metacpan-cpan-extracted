@@ -26,7 +26,6 @@ Mojolicious::Plugin::Route - Plugin to loader files of routes.
 
     1;
 
-
 # DESCRIPTION
 
 Mojolicious::Plugin::Route - Allows you to create routes through files that will be automatically loaded.
@@ -209,6 +208,47 @@ Namespace to load routes from, defaults to $moniker::Route.
     }
     
     1;
+    
+## Example 3
+
+    package MyApp::Route::Base;
+    use Mojo::Base 'MojoX::Route';
+
+    sub under {
+        my ($self, $r) = @_;
+
+        $r->under('/base');
+    }
+
+    1; 
+
+    package MyApp::Route::Foo;
+    use Mojo::Base 'MyApp::Route::Base';
+
+    sub route {
+        my ($self, $base) = @_;
+
+        # will create route /base/foo
+        $base->get('/foo' => sub {
+            shift->render(text => 'Foo');
+        });
+    }
+
+    1;
+
+    package MyApp::Route::Baz;
+    use Mojo::Base 'MyApp::Route::Base';
+
+    sub route {
+        my ($self, $base) = @_;
+
+        # will create route /base/baz
+        $base->get('/baz' => sub {
+            shift->render(text => 'Baz');
+        });
+    }
+
+    1;    
 
 # SEE ALSO
 

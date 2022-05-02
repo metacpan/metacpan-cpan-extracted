@@ -26,7 +26,7 @@ INSTALLATION
     make install
         May need root permissions
 
-    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+    Edit your /opt/rt5/etc/RT_SiteConfig.pm
         If you are using RT 4.2 or greater, add this line:
 
             Plugin('RT::Extension::CreateByProblemType');
@@ -39,7 +39,7 @@ INSTALLATION
         line.
 
     Clear your mason cache
-            rm -rf /opt/rt4/var/mason_data/obj
+            rm -rf /opt/rt5/var/mason_data/obj
 
     Restart your webserver
 
@@ -62,7 +62,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-CreateByProblemType>.
 
 COPYRIGHT
-    This extension is Copyright (C) 2008-2014 Best Practical Solutions, LLC.
+    This extension is Copyright (C) 2008-2022 Best Practical Solutions, LLC.
 
     This is free software, licensed under:
 

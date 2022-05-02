@@ -7,7 +7,13 @@
 <h3><a href="<%RT->Config->Get('WebPath')%>/SelfService/Create.html?Queue=<%$q->id%>">
     <% $q->Name %>
     <% $q->Description ? " - ".$q->Description : "" %></a></h3>
-%     my $cf = $q->CustomField("Problem Type");
+%    my $cf = RT::CustomField->new($session{'CurrentUser'});
+%    $cf->LoadByName(
+%        Name          => 'Problem Type',
+%        LookupType    => RT::Ticket->CustomFieldLookupType,
+%        ObjectId      => $q->id,
+%        IncludeGlobal => 1,
+%    );
 %     next unless $cf->Id;
 %     my $values = $cf->Values;
 <ul>

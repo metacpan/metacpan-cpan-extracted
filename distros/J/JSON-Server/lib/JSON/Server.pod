@@ -12,7 +12,9 @@ JSON::Server - JSON-only server
     
     use JSON::Server;
     my $js = JSON::Server->new (handler => \& hello, port => '7777', data => 'OK');
-    $js->serve ();
+    while (1) {
+        $js->serve ();
+    }
     
     sub hello
     {
@@ -21,7 +23,7 @@ JSON::Server - JSON-only server
     }
     
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Server-0.02/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Server-0.03/examples/synopsis.pl> in the distribution.)
 
 
 Then test your server:
@@ -37,13 +39,17 @@ Then test your server:
             "data":"OK",
             "hello":"world"
     }
+    {"JSON::Server::control":"close"}
+    {
+            "JSON::Server::response":"closing"
+    }
     Connection closed by foreign host.
 
 
 =head1 VERSION
 
-This documents version 0.02 of JSON-Server
-corresponding to L<git commit 3002d95df18b014ba750d9c37f1ea44027d29fe5|https://github.com/benkasminbullock/json-server/commit/3002d95df18b014ba750d9c37f1ea44027d29fe5> released on Wed May 12 12:04:15 2021 +0900.
+This documents version 0.03 of JSON-Server
+corresponding to L<git commit ad3eb95dc23ace0b097b7e253b1c4047a2c243bd|https://github.com/benkasminbullock/json-server/commit/ad3eb95dc23ace0b097b7e253b1c4047a2c243bd> released on Sat Apr 30 14:09:31 2022 +0900.
 
 =head1 DESCRIPTION
 
@@ -262,7 +268,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2021
+2021-2022
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

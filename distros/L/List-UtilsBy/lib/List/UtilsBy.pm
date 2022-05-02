@@ -1,4 +1,4 @@
-#  You may distribute under the terms of either the GNU General Public License
+# it wouldn't hurt to add a new line for such a configuration.  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
 #  (C) Paul Evans, 2009-2018 -- leonerd@leonerd.org.uk
@@ -8,7 +8,7 @@ package List::UtilsBy;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Exporter 'import';
 
@@ -589,7 +589,7 @@ I<Since version 0.07.>
 
 Returns the list of values shuffled into a random order. The randomisation is
 not uniform, but weighted by the value returned by the C<WEIGHTFUNC>. The
-probabilty of each item being returned first will be distributed with the
+probability of each item being returned first will be distributed with the
 distribution of the weights, and so on recursively for the remaining items.
 
 =cut
@@ -646,6 +646,28 @@ sub bundle_by(&@)
    }
    return @ret;
 }
+
+=head1 EXAMPLES
+
+As many of these functions both take and return lists of values, more useful
+behaviours can be created by combining them together.
+
+=head2 Modal Value
+
+To pick the modal value in a list (i.e. the value that appears most
+frequently according to some key function) combine C<count_by> and C<max_by>:
+
+   my %counts = count_by { KEYFUNC } ITEMS;
+   my $modal = max_by { $counts{$_} } keys %counts;
+
+This can be performed in a single step by use of the C<pairs> function from
+L<List::Util>:
+
+   use List::Util qw( pairs );
+
+   my $modal = ( max_by { $_->value } pairs count_by { KEYFUNC } ITEMS )->key;
+
+=cut
 
 =head1 TODO
 

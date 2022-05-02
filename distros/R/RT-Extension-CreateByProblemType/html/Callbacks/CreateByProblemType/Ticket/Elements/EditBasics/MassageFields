@@ -1,0 +1,26 @@
+<%INIT>
+return
+       if RT::Handle::cmp_version( $RT::VERSION, '5.0.0' ) < 0
+    || !RT->Config->Get( 'CreateByProblemType', $session{'CurrentUser'} )
+    || ( $TicketObj && $TicketObj->Id );
+
+
+for my $field (@$Fields) {
+    if ( $field->{name} eq 'Queue' ) {
+        $field->{name} = 'Problem';
+        $field->{comp} = '/Elements/SelectProblem';
+        $field->{args} = {
+            Name => 'Problem',
+            OnChange => q{jQuery(this).closest('form').find('input[name=QueueChanged]').val(1); jQuery(this).closest('form').submit();},
+            Default  => $ARGS{defaults}{Problem} || '',
+        };
+
+        last;
+    }
+}
+</%INIT>
+
+<%ARGS>
+$TicketObj
+$Fields
+</%ARGS>

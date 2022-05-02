@@ -1,0 +1,30 @@
+---
+abstract: 'limit CPU usage of processes'
+author:
+  - 'gray <gray@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-RunStopRun
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  IO::Pty: '0'
+  List::Util: '1.45'
+  Proc::ProcessTable: '0'
+  Time::HiRes: '0'
+resources:
+  repository: https://github.com/gray/app-runstoprun
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

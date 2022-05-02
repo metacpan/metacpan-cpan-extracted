@@ -123,7 +123,11 @@ static CV *MY_cv_copy_flags(pTHX_ CV *orig, U32 flags)
       else if(!origpad[padix])
         newval = NULL;
       else if(SvPADTMP(origpad[padix])) {
-        newval = newSV(0);
+        /* We still have to copy the value, in case it is live. Also core perl
+        * is known to set SvPADTMP on non-temporaries, like folded constants
+        *   https://rt.cpan.org/Ticket/Display.html?id=142468
+        */
+        newval = newSVsv(origpad[padix]);
         SvPADTMP_on(newval);
       }
       else {

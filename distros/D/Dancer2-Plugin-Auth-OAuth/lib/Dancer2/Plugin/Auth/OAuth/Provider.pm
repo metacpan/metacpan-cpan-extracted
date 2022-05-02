@@ -11,6 +11,7 @@ use LWP::UserAgent;
 use Net::OAuth;
 use Scalar::Util qw( blessed );
 use URI::Query;
+use Hash::Merge;
 
 sub new {
     my ($class, $settings) = @_;
@@ -18,9 +19,10 @@ sub new {
         settings => $settings,
     }, $class;
 
-    for my $default (keys %{$self->config}) {
-        $self->{settings}{providers}{$self->_provider}{$default} ||= $self->config->{$default};
-    }
+    my $merge = Hash::Merge->new('LEFT_PRECEDENT');
+    my $config = $merge->merge($self->{settings}{providers}{$self->_provider}||{}, $self->config);
+
+    $self->{settings}{providers}{$self->_provider} = $config;
 
     my $protocol_version = $self->provider_settings->{version} || 2;
     $self->{protocol_version} = $protocol_version;

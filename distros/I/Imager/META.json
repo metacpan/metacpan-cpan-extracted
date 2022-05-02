@@ -68,6 +68,6 @@
          "web" : "https://github.com/tonycoz/imager.git"
       }
    },
-   "version" : "1.013",
+   "version" : "1.014",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

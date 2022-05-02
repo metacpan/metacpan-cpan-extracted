@@ -1373,6 +1373,131 @@ YAML
   );
 };
 
+subtest 'unevaluatedProperties and annotations' => sub {
+  my $openapi = OpenAPI::Modern->new(
+    openapi_uri => '/api',
+    evaluator => JSON::Schema::Modern->new,
+    openapi_schema => $yamlpp->load_string(<<YAML));
+$openapi_preamble
+paths:
+  /foo:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bar: true
+              unevaluatedProperties: false
+YAML
+
+  my $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'application/json' ], '{"foo":1}');
+  cmp_deeply(
+    (my $result = $openapi->validate_request($request))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/body/foo',
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json schema unevaluatedProperties)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json schema unevaluatedProperties)))->to_string,
+          error => 'additional property not permitted',
+        },
+        {
+          instanceLocation => '/request/body',
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json schema unevaluatedProperties)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json schema unevaluatedProperties)))->to_string,
+          error => 'not all additional properties are valid',
+        },
+      ],
+    },
+    'unevaluatedProperties can be used in schemas',
+  );
+
+  $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'application/json' ], '{"bar":1}');
+  cmp_deeply(
+    ($result = $openapi->validate_request($request))->format('basic', 1),
+    {
+      valid => true,
+      annotations => [
+        {
+          instanceLocation => '/request/body',
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json schema properties)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json schema properties)))->to_string,
+          annotation => ['bar'],
+        },
+        {
+          instanceLocation => '/request/body',
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json schema unevaluatedProperties)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json schema unevaluatedProperties)))->to_string,
+          annotation => [],
+        },
+      ],
+    },
+    'annotations are collected when evaluating valid requests',
+  );
+};
+
+subtest 'readOnly' => sub {
+  my $openapi = OpenAPI::Modern->new(
+    openapi_uri => '/api',
+    evaluator => JSON::Schema::Modern->new,
+    openapi_schema => $yamlpp->load_string(<<YAML));
+$openapi_preamble
+paths:
+  /foo:
+    post:
+      parameters:
+      - name: a
+        in: query
+        schema:
+          readOnly: true
+          writeOnly: true
+      - name: b
+        in: query
+        schema:
+          readOnly: false
+          writeOnly: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                c:
+                  readOnly: true
+                  writeOnly: true
+                d:
+                  readOnly: false
+                  writeOnly: false
+YAML
+
+  my $request = request('POST', 'http://example.com/foo?a=1&b=2',
+    [ 'Content-Type' => 'application/json' ], '{"c":1,"d":2}');
+  cmp_deeply(
+    (my $result = $openapi->validate_request($request))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/uri/query/a',
+          keywordLocation => jsonp(qw(/paths /foo post parameters 0 schema readOnly)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 0 schema readOnly)))->to_string,
+          error => 'read-only value is present',
+        },
+        {
+          instanceLocation => '/request/body/c',
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json schema properties c readOnly)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json schema properties c readOnly)))->to_string,
+          error => 'read-only value is present',
+        },
+      ],
+    },
+    'the request is valid, except for the presence of readOnly values',
+  );
+};
+
 goto START if ++$type_index < @::TYPES;
 
 done_testing;

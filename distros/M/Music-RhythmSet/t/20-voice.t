@@ -11,9 +11,10 @@
 
 use 5.24.0;
 use Data::Dumper;
+use Scalar::Util 'refaddr';
 use Test2::V0;
 
-plan(73);
+plan(75);
 
 use Music::RhythmSet::Util qw(write_midi);
 use Music::RhythmSet::Voice;
@@ -290,6 +291,14 @@ write_midi( 't/sustains.midi', $track );
 write_midi( 't/staccato.midi', $voice->to_midi( dur => 96 ) );
 
 push @playback, 't/sustains.midi', 't/staccato.midi';
+
+# embig de-duplicates the MIDI events (thus wasting more memory and CPU)
+my $tref = $track->events_r;
+is( refaddr $tref->[5], refaddr $tref->[9] );
+
+$tref = $voice->to_midi( embig => 1 )->events_r;
+isnt( refaddr $tref->[5], refaddr $tref->[9] );
+
 
 # a whole lot of nothing
 $track = audit_track(

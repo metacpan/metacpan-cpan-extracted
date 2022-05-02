@@ -24,6 +24,7 @@ my %WriteMakefileArgs = (
     "File::Temp" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Template" => "3.100",
     "Test2::Bundle::Extended" => 0,
     "Test2::Plugin::NoWarnings" => 0,
     "Test2::Suite" => 0,
@@ -32,7 +33,7 @@ my %WriteMakefileArgs = (
     "Test::CPAN::Meta" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "3.100",
+  "VERSION" => "3.101",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,6 +47,7 @@ my %FallbackPrereqs = (
   "File::Temp" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Template" => "3.100",
   "Test2::Bundle::Extended" => 0,
   "Test2::Plugin::NoWarnings" => 0,
   "Test2::Suite" => 0,

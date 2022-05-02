@@ -2,12 +2,9 @@ Build.PL
 Changes
 examples/demo-show.pl
 lib/String/Tagged.pm
+lib/String/Tagged/Extent.pm
 lib/String/Tagged/Formatting.pod
-LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
-README
 t/00use.t
 t/01plain.t
 t/02tags-conststr.t
@@ -18,6 +15,7 @@ t/06tags-substr.t
 t/07tags-range.t
 t/10debugprint.t
 t/11clone.t
+t/12zerolen.t
 t/20merge-tags.t
 t/21merge-tags-anchors.t
 t/30appendinsert.t
@@ -28,3 +26,7 @@ t/34join.t
 t/40operators.t
 t/50subclass.t
 t/99pod.t
+README
+LICENSE
+META.yml
+META.json

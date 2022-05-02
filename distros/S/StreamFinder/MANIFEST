@@ -5,12 +5,14 @@ lib/StreamFinder/Anystream.pm
 lib/StreamFinder/Apple.pm
 lib/StreamFinder/Bitchute.pm
 lib/StreamFinder/Blogger.pm
+lib/StreamFinder/BrandNewTube.pm
 lib/StreamFinder/Brighteon.pm
 lib/StreamFinder/Castbox.pm
 lib/StreamFinder/Google.pm
 lib/StreamFinder/IHeartRadio.pm
 lib/StreamFinder/Odysee.pm
 lib/StreamFinder/Podbean.pm
+lib/StreamFinder/PodcastAddict.pm
 lib/StreamFinder/RadioNet.pm
 lib/StreamFinder/Rumble.pm
 lib/StreamFinder/SermonAudio.pm

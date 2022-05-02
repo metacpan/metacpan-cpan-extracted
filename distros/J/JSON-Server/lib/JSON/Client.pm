@@ -3,11 +3,11 @@ use warnings;
 use strict;
 use utf8;
 use Carp;
-use JSON::Parse '0.60_01', 'valid_json';
-use JSON::Create '0.30_04';
+use JSON::Parse '0.61', 'valid_json';
+use JSON::Create '0.35';
 use JSON::Server;
 use IO::Socket;
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 sub new
 {

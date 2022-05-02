@@ -1,19 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2011 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
-package Convert::Color::VGA;
+package Convert::Color::VGA 0.12;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Convert::Color::RGB );
 
 __PACKAGE__->register_color_space( 'vga' );
 
 use Carp;
-
-our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -23,32 +21,32 @@ C<Convert::Color::VGA> - named lookup for the basic VGA colors
 
 Directly:
 
- use Convert::Color::VGA;
+   use Convert::Color::VGA;
 
- my $red = Convert::Color::VGA->new( 'red' );
+   my $red = Convert::Color::VGA->new( 'red' );
 
- # Can also use index
- my $black = Convert::Color::VGA->new( 0 );
+   # Can also use index
+   my $black = Convert::Color::VGA->new( 0 );
 
 Via L<Convert::Color>:
 
- use Convert::Color;
+   use Convert::Color;
 
- my $cyan = Convert::Color->new( 'vga:cyan' );
+   my $cyan = Convert::Color->new( 'vga:cyan' );
 
 =head1 DESCRIPTION
 
 This subclass of L<Convert::Color::RGB> provides predefined colors for the 8
 basic VGA colors. Their names are
 
- black
- red
- green
- yellow
- blue
- magenta
- cyan
- white
+   black
+   red
+   green
+   yellow
+   blue
+   magenta
+   cyan
+   white
 
 They may be looked up either by name, or by numerical index within this list.
 
@@ -81,11 +79,13 @@ __PACKAGE__->register_palette(
 
 =cut
 
-=head2 $color = Convert::Color::VGA->new( $name )
+=head2 new
+
+   $color = Convert::Color::VGA->new( $name )
 
 Returns a new object to represent the named color.
 
-=head2 $color = Convert::Color::VGA->new( $index )
+   $color = Convert::Color::VGA->new( $index )
 
 Returns a new object to represent the color at the given index.
 
@@ -126,7 +126,9 @@ sub new
 
 =cut
 
-=head2 $index = $color->index
+=head2 index
+
+   $index = $color->index
 
 The index of the VGA color.
 
@@ -138,7 +140,9 @@ sub index
    return $self->[3];
 }
 
-=head2 $name = $color->name
+=head2 name
+
+   $name = $color->name
 
 The name of the VGA color.
 

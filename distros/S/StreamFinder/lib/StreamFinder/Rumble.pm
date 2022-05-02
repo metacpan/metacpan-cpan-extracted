@@ -252,7 +252,7 @@ I<-debug> => [0|1|2] and most of the L<LWP::UserAgent> options.
 Options specified here override any specified in 
 I<~/.config/StreamFinder/config>.
 
-Among options valid for IHeartRadio streams are the I<-keep> option 
+Among options valid for Rumble streams are the I<-keep> option 
 described in the B<new()> function.
 
 =item ~/.config/StreamFinder/config

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,36 +12,40 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 53ca1a87daa2f1c794abd8e0c04e68945129ceaa Changes
-SHA1 4b4165445dac8f865d332a28326dc83b96799288 MANIFEST
-SHA1 1482b426864733989ddc64d9b59be74af7013859 META.yml
-SHA1 6f3139e8a67227e2a32b72af0620cd495e4d5ce1 Makefile.PL
-SHA1 b4f8cc89acdf57315a9d9a7e8db9944f52d011fc README
-SHA1 225dd53f0adb761dfbcf4ecf449323ef159d6a86 html/Callbacks/CreateByProblemType/Elements/Tabs/Privileged
-SHA1 bbbc359cb7a24e114f46b2c379c7fa0790d6bc6c html/Callbacks/CreateByProblemType/Ticket/Create.html/Init
-SHA1 a75658dd1b076f7d14a810fb88709d8f3b61533c html/Elements/CreateTicketByProblemType
-SHA1 75dd96e3b6bba057d339617d3d320b00d1b0e195 html/SelfService/CreateTicketInQueue.html
-SHA1 dc13ce0dbb488a5de81c3f6519ee31acda17397a inc/Module/Install.pm
-SHA1 91c20cbda8ca41b4e8f9e0390faff635c2ebe839 inc/Module/Install/Base.pm
-SHA1 eaf50ccbacecb797f0527deb0221c8264f6c8bd8 inc/Module/Install/Can.pm
-SHA1 363c8931cc183444907684b71d6a379e4fc8edcb inc/Module/Install/Fetch.pm
-SHA1 0c70de66cdd063352766d49db176e5f710f75fe7 inc/Module/Install/Include.pm
-SHA1 26ae1c0f5f352037b560414f216d7e3ac682f936 inc/Module/Install/Makefile.pm
-SHA1 ff97eb025b44c343d026c2a56a73d50c65319e95 inc/Module/Install/Metadata.pm
-SHA1 3b092ed8ce4fa9ed6667f681b54f4a624695e508 inc/Module/Install/RTx.pm
-SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 4c5ce519d404e242418f51dfe761287469e18e3a inc/Module/Install/Win32.pm
-SHA1 47a52cf8719a283c0efa2edab0088b5d67e0f23a inc/Module/Install/WriteAll.pm
-SHA1 4e09b598c2626e08cec2bed5e981492fa9e90967 inc/YAML/Tiny.pm
-SHA1 034d0f3a7401dae4be3eee279258181f51a4ad81 inc/unicore/Name.pm
-SHA1 9368cac90350ee86e0a5c82446a59e15064a83ad lib/RT/Extension/CreateByProblemType.pm
+SHA256 e12b21ed06dfbf2c1f2190a6498a7f99a1054fa4d7e1ba0946c3c6e743d64c1d Changes
+SHA256 86db6272157d02bad6510e6bc603f1c0b43870411813a7ae220a3177566c524a MANIFEST
+SHA256 cc504a7c3b33819ee5eab42b93848225ba8de98da970cdb639a06a7e5c563c66 META.yml
+SHA256 18c0d8819b55b8b071d1ee2d22fd209c19194d9968f81c34f5b979dde2810edd Makefile.PL
+SHA256 fd935da1c0f9a8a830561878d37c4999d883d357684dea4d30e3c6b91bf29d1e README
+SHA256 435a004d47dc71b6723d68ebf548e1331504a97d8d130801985397f64f3918ee html/Callbacks/CreateByProblemType/Elements/Tabs/Privileged
+SHA256 08ed84b1e6a12816a9795685fe6cc43f19c07386fd7def1fb2ce1495c3ac8aa0 html/Callbacks/CreateByProblemType/Ticket/Create.html/Init
+SHA256 8590f3ea59e6576c1cae8591355b0a094731b5e54a92d696030cf47dc00806fa html/Callbacks/CreateByProblemType/Ticket/Elements/EditBasics/MassageFields
+SHA256 064451a848cadcfc0c37410c4cd9b090dd375be88525732930085262f0bd1faf html/Elements/CreateTicketByProblemType
+SHA256 3bbf0d992500fe679a192363d5fc136b6f78fbb137ddfab6c5a8291e34cf8f37 html/Elements/SelectProblem
+SHA256 1eb376caf421694b611f6d208bc20c9c177c557b89516b5b335e9268e91796a2 html/SelfService/CreateTicketInQueue.html
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a97bf661b739643c3adee064addf7a85f22e25e1bbffc137974cd8754ffa5c66 inc/Module/Install/Include.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 492f566c84b3db9340895ef53f31f0d83310feb01f0362db28b9d579ef90e01a inc/Module/Install/RTx.pm
+SHA256 a7c5323f81fc052097b0470bd3e6e7e2de2ac9d90c59646948d89c4c7e46cfe6 inc/Module/Install/RTx/Runtime.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 3164c32202bf4604ab1f90b926a81e15493b191e0bc2f90ae42d8358f18259d6 inc/YAML/Tiny.pm
+SHA256 2942efc1a12ba26d13ad85dcd19b29c099cdf5b1613327bd67f5475a635eb45c lib/RT/Extension/CreateByProblemType.pm
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
 
-iEYEARECAAYFAlPESMcACgkQMflWJZZAbqC75QCfWTTTowWtqXdCBJjHpI8RFFMJ
-7+4AoKHFTzASOUAT8WkEZukU8AQ78xc+
-=6k7Q
+iQEcBAEBAwAGBQJibKqJAAoJEA3wooP+rICy3f4H/RY5c2C79FcqsGnSVhgg5bI7
+nnZb4+3+Xrca3fN+QiAtWdJdzU+4ulcUes7p/5coxUT62R6TVrgoznX2NFhP2stB
+DvwUpA3vWuO70ogFETea7u374F/N81cTROxuFN4UrKZeG5lwT6RaZpn71etk7bjW
+yXB+af4pVOUjnvipfCYbC5SNwzR4AtBJr3lx9CywZiI/iBsgqHZtH8ON/qSOVDo7
+jVSMebBEnsaG+E8rMUw/63Jqkvoete0LtNfxNYbHdWVjkEUe7q/kiAemPj4vr+5g
+uUKT6DQcii4Mf7N04lq8c76/qjaU15UVvxbfi2x5Pcr6oLIoK1QPUgCfy5bFtBY=
+=fBG6
 -----END PGP SIGNATURE-----

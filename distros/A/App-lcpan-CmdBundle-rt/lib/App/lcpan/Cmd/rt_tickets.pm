@@ -12,7 +12,7 @@ use Perinci::Object;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-03-27'; # DATE
 our $DIST = 'App-lcpan-CmdBundle-rt'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 our %SPEC;
 
@@ -29,7 +29,7 @@ $SPEC{handle_cmd} = {
         count => {
             summary => 'Instead of listing each ticket, return ticket count for each distribution',
             schema => ['bool*', is=>1],
-            cmdline_aliases => {c=>{}},
+            #cmdline_aliases => {c=>{}}, # currently with Perinci::CmdLine::Lite (1.917) options from subcommands are not detected and thus can clash with --config-path (-c)
         },
     },
 };
@@ -116,7 +116,7 @@ App::lcpan::Cmd::rt_tickets - Return RT tickets for dist/module
 
 =head1 VERSION
 
-This document describes version 0.004 of App::lcpan::Cmd::rt_tickets (from Perl distribution App-lcpan-CmdBundle-rt), released on 2022-03-27.
+This document describes version 0.005 of App::lcpan::Cmd::rt_tickets (from Perl distribution App-lcpan-CmdBundle-rt), released on 2022-03-27.
 
 =head1 DESCRIPTION
 

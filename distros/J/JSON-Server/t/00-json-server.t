@@ -10,13 +10,14 @@ use JSON::Server;
 use JSON::Client;
 
 my $verbose = undef;
+my $port = empty_port ();
+print "Port is $port\n";
 my $pid = fork ();
-my $port = '9999';
 if ($pid) {
     # Give the server some time to start.
     sleep (1);
     # Parent process
-    ok ($pid, "Started a server at $pid");
+    ok ($pid, "Started a server with PID $pid");
     my $client = JSON::Client->new (port => $port, verbose => $verbose);
     my $reply = $client->send ({'JSON::Server::control' => 'stop'});
     ok ($reply, "Got reply from server");

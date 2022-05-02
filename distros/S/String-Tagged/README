@@ -4,26 +4,26 @@ NAME
 
 SYNOPSIS
 
-     use String::Tagged;
+       use String::Tagged;
     
-     my $st = String::Tagged->new( "An important message" );
+       my $st = String::Tagged->new( "An important message" );
     
-     $st->apply_tag( 3, 9, bold => 1 );
+       $st->apply_tag( 3, 9, bold => 1 );
     
-     $st->iter_substr_nooverlap(
-        sub {
-           my ( $substring, %tags ) = @_;
+       $st->iter_substr_nooverlap(
+          sub {
+             my ( $substring, %tags ) = @_;
     
-           print $tags{bold} ? "<b>$substring</b>"
-                             : $substring;
-        }
-     );
+             print $tags{bold} ? "<b>$substring</b>"
+                               : $substring;
+          }
+       );
 
 DESCRIPTION
 
     This module implements an object class, instances of which store a
     (mutable) string buffer that supports tags. A tag is a name/value pair
-    that applies to some non-empty extent of the underlying string.
+    that applies to some extent of the underlying string.
 
     The types of tag names ought to be strings, or at least values that are
     well-behaved as strings, as the names will often be used as the keys in
@@ -40,10 +40,10 @@ DESCRIPTION
 
     For example, consider a string with three tags represented here:
 
-     Here is my string with tags
-     [-------------------------]  foo => 1
-             [-------]            foo => 2
-          [---]                   bar => 3
+       Here is my string with tags
+       [-------------------------]  foo => 1
+               [-------]            foo => 2
+            [---]                   bar => 3
 
     Every character in this string has a tag named foo. The value of this
     tag is 2 for the words my and string and the space inbetween, and 1
@@ -54,9 +54,9 @@ DESCRIPTION
     values it therefore cannot detect if two neighbouring tags really
     contain the same semantic idea. Consider the following string:
 
-     A string with words
-     [-------]            type => "message"
-              [--------]  type => "message"
+       A string with words
+       [-------]            type => "message"
+                [--------]  type => "message"
 
     This string contains two tags. String::Tagged will treat this as two
     different tag values as far as iter_tags_nooverlap is concerned, even
@@ -131,8 +131,8 @@ CONSTRUCTOR
       corresponding function, which should return an even-sized key/value
       list giving a tag, or a list of tags, to apply to the new clone.
 
-       my @new_tags = $convert_tags->{$orig_name}->( $orig_name, $orig_value )
-       # Where @new_tags is ( $new_name, $new_value, $new_name_2, $new_value_2, ... )
+         my @new_tags = $convert_tags->{$orig_name}->( $orig_name, $orig_value )
+         # Where @new_tags is ( $new_name, $new_value, $new_name_2, $new_value_2, ... )
 
       As a further convenience, if the value for a given tag name is a
       plain string instead of a code reference, it gives the new name for
@@ -196,8 +196,8 @@ METHODS
     This method is also called for stringification; so the String::Tagged
     object can be used in a plain string interpolation such as
 
-     my $message = String::Tagged->new( "Hello world" );
-     print "My message is $message\n";
+       my $message = String::Tagged->new( "Hello world" );
+       print "My message is $message\n";
 
  length
 
@@ -246,9 +246,9 @@ METHODS
 
        $st->apply_tag( $e, $name, $value )
 
-    Alternatively, an existing extent object can be passed as the first
-    argument instead of two integers. The new tag will apply at the given
-    extent.
+    Alternatively, an existing String::Tagged::Extent object can be passed
+    as the first argument instead of two integers. The new tag will apply
+    at the given extent.
 
  unapply_tag
 
@@ -262,8 +262,8 @@ METHODS
 
        $st->unapply_tag( $e, $name )
 
-    Alternatively, an existing extent object can be passed as the first
-    argument instead of two integers.
+    Alternatively, an existing String::Tagged::Extent object can be passed
+    as the first argument instead of two integers.
 
  delete_tag
 
@@ -276,8 +276,8 @@ METHODS
 
        $st->delete_tag( $e, $name )
 
-    Alternatively, an existing extent object can be passed as the first
-    argument instead of two integers.
+    Alternatively, an existing String::Tagged::Extent object can be passed
+    as the first argument instead of two integers.
 
  merge_tags
 
@@ -289,7 +289,7 @@ METHODS
     For each pair of tags of the same name that apply on neighbouring or
     overlapping extents, the $eqsub callback is called, as
 
-      $equal = $eqsub->( $name, $value_a, $value_b )
+       $equal = $eqsub->( $name, $value_a, $value_b )
 
     If this function returns true then the tags are merged.
 
@@ -305,10 +305,10 @@ METHODS
        $st->iter_extents( $callback, %opts )
 
     Iterate the tags stored in the string. For each tag, the CODE reference
-    in $callback is invoked once, being passed an extent object that
-    represents the extent of the tag.
+    in $callback is invoked once, being passed a String::Tagged::Extent
+    object that represents the extent of the tag.
 
-     $callback->( $extent, $tagname, $tagvalue )
+       $callback->( $extent, $tagname, $tagvalue )
 
     Options passed in %opts may include:
 
@@ -342,7 +342,7 @@ METHODS
     in $callback is invoked once, being passed the start point and length
     of the tag.
 
-     $callback->( $start, $length, $tagname, $tagvalue )
+       $callback->( $start, $length, $tagname, $tagvalue )
 
     Options passed in %opts are the same as for iter_extents.
 
@@ -356,7 +356,7 @@ METHODS
     to the callback. Because the extent covers possibly-multiple tags, it
     will not define the anchor_before and anchor_after flags.
 
-     $callback->( $extent, %tags )
+       $callback->( $extent, %tags )
 
     The callback will be invoked over the entire length of the string,
     including any extents with no tags applied.
@@ -377,7 +377,7 @@ METHODS
     the start and length of each extent to the callback instead of the
     extent object.
 
-     $callback->( $start, $length, %tags )
+       $callback->( $start, $length, %tags )
 
     Options may be passed in %opts to control the range of the string
     iterated over, in the same way as the iter_extents method.
@@ -389,7 +389,7 @@ METHODS
     Iterate extents of the string using iter_extents_nooverlap, but passing
     the substring of data instead of the extent object.
 
-     $callback->( $substr, %tags )
+       $callback->( $substr, %tags )
 
     Options may be passed in %opts to control the range of the string
     iterated over, in the same way as the iter_extents method.
@@ -419,10 +419,11 @@ METHODS
 
        $extent = $st->get_tag_extent( $pos, $name )
 
-    If the named tag applies to the given position, returns the extent of
-    the tag at that position. If it does not, undef is returned. If an
-    extent is returned it will define the anchor_before and anchor_after
-    flags if appropriate.
+    If the named tag applies to the given position, returns a
+    String::Tagged::Extent object to represent the extent of the tag at
+    that position. If it does not, undef is returned. If an extent is
+    returned it will define the anchor_before and anchor_after flags if
+    appropriate.
 
  get_tag_missing_extent
 
@@ -519,18 +520,18 @@ METHODS
     This could be used, for example, to build a formatted string from a
     formatted template containing variable expansions:
 
-     my $template = ...
-     my %vars = ...
+       my $template = ...
+       my %vars = ...
     
-     my $ret = String::Tagged->new;
-     foreach my $m ( $template->matches( qr/\$\w+|[^$]+/ ) ) {
-        if( $m =~ m/^\$(\w+)$/ ) {
-           $ret->append_tagged( $vars{$1}, %{ $m->get_tags_at( 0 ) } );
-        }
-        else {
-           $ret->append( $m );
-        }
-     }
+       my $ret = String::Tagged->new;
+       foreach my $m ( $template->matches( qr/\$\w+|[^$]+/ ) ) {
+          if( $m =~ m/^\$(\w+)$/ ) {
+             $ret->append_tagged( $vars{$1}, %{ $m->get_tags_at( 0 ) } );
+          }
+          else {
+             $ret->append( $m );
+          }
+       }
 
     This iterates segments of the template containing variables expansions
     starting with a $ symbol, and replaces them with values from the %vars
@@ -574,57 +575,10 @@ METHODS
 
     For example:
 
-      Hello, world
-      [---]         word       => 1
-     <[----------]> everywhere => 1
-            |       space      => 1
-
-Extent Objects
-
-    These objects represent a range of characters within the containing
-    String::Tagged object. The range they represent is fixed at the time of
-    creation. If the containing string is modified by a call to set_substr
-    then the effect on the extent object is not defined. These objects
-    should be considered as relatively short-lived - used briefly for the
-    purpose of querying the result of an operation, then discarded soon
-    after.
-
- $extent->string
-
-    Returns the containing String::Tagged object.
-
- $extent->start
-
-    Returns the start index of the extent. This is the index of the first
-    character within the extent.
-
- $extent->end
-
-    Returns the end index of the extent. This is the index of the first
-    character beyond the end of the extent.
-
- $extent->anchor_before
-
-    True if this extent begins "before" the start of the string. Only
-    certain methods return extents with this flag defined.
-
- $extent->anchor_after
-
-    True if this extent ends "after" the end of the string. Only certain
-    methods return extents with this flag defined.
-
- $extent->length
-
-    Returns the number of characters within the extent.
-
- $extent->substr
-
-    Returns the substring contained by the extent.
-
- $extent->plain_substr
-
-    Returns the substring of the underlying plain string buffer contained
-    by the extent.
+        Hello, world
+        [---]         word       => 1
+       <[----------]> everywhere => 1
+              |       space      => 1
 
 TODO
 

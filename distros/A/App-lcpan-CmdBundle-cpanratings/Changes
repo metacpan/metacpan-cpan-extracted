@@ -1,15 +1,20 @@
-0.003   2017-07-11 (PERLANCAR)
+0.004   2022-03-27  Released-By: PERLANCAR; Urgency: medium
+
+        - Update to newer App::lcpan (table 'dist' was removed).
+
+
+0.003   2017-07-11  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.002   2017-01-24 (PERLANCAR)
+0.002   2017-01-24  Released-By: PERLANCAR
 
 	- Add subcommand: cpanratings-get-reviews.
 
 
-0.001   2017-01-21 (PERLANCAR)
+0.001   2017-01-21  Released-By: PERLANCAR
 
         - First release.

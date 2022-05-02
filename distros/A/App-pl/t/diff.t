@@ -1,33 +1,17 @@
 use warnings;
 use strict;
 
-use Test::Simple tests => 8;
+BEGIN {
+    our $tests = 8;
 
-# chdir to t/
-$_ = $0;
-s~[^/\\]+$~~;
-chdir $_ if length;
+    # chdir to t/
+    $_ = $0;
+    s~[^/\\]+$~~;
+    chdir $_ if length;
 
-# run pl, expect $_
-sub pl(@) {
-    my $fh;
-    if( $^O =~ /^MSWin/ ) {
-	require Win32::ShellQuote;
-	open $fh, Win32::ShellQuote::quote_native( $^X, '-W', '..\pl', @_ ) . '|';
-    } else {
-	open $fh, '-|', $^X, '-W', '../pl', @_;
-    }
-    local $/;
-    my $ret = <$fh>;
-    ok $ret eq $_, join ' ', 'pl', map /[\s*?()[\]{}\$\\'";|&]|^$/ ? "'$_'" : $_, @_
-      or print "got: '$ret', expected: '$_'\n";
+    require './test.pm';
 }
-# run pl, expect $_ altered by shift->()
-sub pl_a(&@) {
-    local $_ = $_;
-    shift->();
-    &pl;
-}
+
 
 my @files = <atom-weight-[123].csv>;
 my( $B, $I, $G, $R, $E ) = map "\e[${_}m", 1, 3, 32, 31, '', '';

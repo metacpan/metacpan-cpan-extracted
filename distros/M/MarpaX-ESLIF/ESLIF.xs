@@ -1227,7 +1227,7 @@ static inline short marpaESLIFPerl_valueSymbolCallbackb(void *userDatavp, marpaE
 }
 
 /*****************************************************************************/
-static inline short marpaESLIFPerl_recognizerIfCallbackb(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFValueResult_t *marpaESLIFValueResultLexemep, marpaESLIFValueResultBool_t *marpaESLIFValueResultBoolp)
+static inline short marpaESLIFPerl_recognizerIfCallbackb(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFValueResult_t *marpaESLIFValueResultp, marpaESLIFValueResultBool_t *marpaESLIFValueResultBoolp)
 /*****************************************************************************/
 {
   /* Almost exactly like marpaESLIFPerl_valueSymbolCallbackb */
@@ -1240,7 +1240,7 @@ static inline short marpaESLIFPerl_recognizerIfCallbackb(void *userDatavp, marpa
   dTHXa(MarpaX_ESLIF_Recognizerp->PerlInterpreterp);
 
   list = newAV();
-  svp = marpaESLIFPerl_recognizerGetSvp(aTHX_ marpaESLIFRecognizerp, internalStackp, marpaESLIFValueResultLexemep);
+  svp = marpaESLIFPerl_recognizerGetSvp(aTHX_ marpaESLIFRecognizerp, internalStackp, marpaESLIFValueResultp);
   /* One reference count ownership is transfered to the array */
   av_push(list, svp);
   actionResult = marpaESLIFPerl_recognizerCallbackActionp(aTHX_ MarpaX_ESLIF_Recognizerp, marpaESLIFRecognizerp, list);

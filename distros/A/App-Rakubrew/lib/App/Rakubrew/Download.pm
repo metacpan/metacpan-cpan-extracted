@@ -32,6 +32,7 @@ sub download_precomp_archive {
 
     if (!@matching_releases) {
         say STDERR 'Couldn\'t find a precomp release for OS: "' . _my_platform() . '", architecture: "' . _my_arch() . '"' . ($ver ? (', version: "' . $ver . '"') : '');
+        say STDERR 'You can try building yourself. Use the `rakubrew build` command to do so.';
         exit 1;
     }
     if ($ver && @matching_releases > 1) {
@@ -145,6 +146,7 @@ sub _my_arch {
         $Config{archname} =~ /darwin/i && `sysctl -n machdep.cpu.brand_string` =~ /Intel/i ? 'x86_64' : # MacOS Intel
         $Config{archname} =~ /aarch64/i                           ? 'arm64'  : # e.g. Raspi >= 2.1 with 64bit OS
         $Config{archname} =~ /arm-linux-gnueabihf/i               ? 'armhf'  : # e.g. Raspi >= 2, with 32bit OS
+        $Config{archname} =~ /s390x-linux/i                       ? 's390x'  :
         '';
 
     unless ($arch) {

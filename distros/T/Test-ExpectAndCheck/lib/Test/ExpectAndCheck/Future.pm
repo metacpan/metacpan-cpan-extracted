@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Test::ExpectAndCheck );
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use constant EXPECTATION_CLASS => "Test::ExpectAndCheck::Future::_Expectation";
 
@@ -66,9 +66,9 @@ use base qw( Test::ExpectAndCheck::_Expectation );
 use Test::Future::Deferred;
 
 use constant {
-   RETURNS => 3,
-   FAILURE => 6,
-   IMMEDIATE => 7,
+   RETURNS => 5,
+   FAILURE => 8,
+   BEHAVIOUR => 9,
 };
 
 =head1 EXPECTATIONS
@@ -114,14 +114,35 @@ sub immediately
 {
    my $self = shift;
 
-   $self->[IMMEDIATE]++;
+   $self->[BEHAVIOUR] = "immediate";
+}
+
+=head2 remains_pending
+
+   $exp->remains_pending
+
+Sets that the future returned by this method will not complete and simply
+remain pending.
+
+=cut
+
+sub remains_pending
+{
+   my $self = shift;
+
+   $self->[BEHAVIOUR] = "pending";
 }
 
 sub _result
 {
    my $self = shift;
 
-   if( $self->[IMMEDIATE] ) {
+   my $behaviour = $self->[BEHAVIOUR] // "";
+
+   if( $behaviour eq "pending" ) {
+      return Future->new;
+   }
+   elsif( $behaviour eq "immediate" ) {
       return Future->fail( @{ $self->[FAILURE] } ) if $self->[FAILURE];
       return Future->done( @{ $self->[RETURNS] } );
    }

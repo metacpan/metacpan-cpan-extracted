@@ -7,7 +7,7 @@ my $build = Module::Build->new(
    module_name => 'Device::Chip::DS1307',
    requires => {
       'perl' => '5.026',
-      'Object::Pad' => '0.41',
+      'Object::Pad' => '0.57',
       'Future::AsyncAwait' => '0.47', # toplevel await
 
       'Device::Chip::Base::RegisteredI2C' => '0.03',

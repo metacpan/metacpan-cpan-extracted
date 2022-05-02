@@ -298,7 +298,7 @@ FUNCTIONS
 
     Returns the list of values shuffled into a random order. The
     randomisation is not uniform, but weighted by the value returned by the
-    WEIGHTFUNC. The probabilty of each item being returned first will be
+    WEIGHTFUNC. The probability of each item being returned first will be
     distributed with the distribution of the weights, and so on recursively
     for the remaining items.
 
@@ -314,6 +314,26 @@ FUNCTIONS
 
     If given a list of values whose length does not evenly divide by
     $number, the final call will be passed fewer elements than the others.
+
+EXAMPLES
+
+    As many of these functions both take and return lists of values, more
+    useful behaviours can be created by combining them together.
+
+ Modal Value
+
+    To pick the modal value in a list (i.e. the value that appears most
+    frequently according to some key function) combine count_by and max_by:
+
+       my %counts = count_by { KEYFUNC } ITEMS;
+       my $modal = max_by { $counts{$_} } keys %counts;
+
+    This can be performed in a single step by use of the pairs function
+    from List::Util:
+
+       use List::Util qw( pairs );
+    
+       my $modal = ( max_by { $_->value } pairs count_by { KEYFUNC } ITEMS )->key;
 
 TODO
 

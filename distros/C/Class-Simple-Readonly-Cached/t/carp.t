@@ -20,6 +20,16 @@ CARP: {
 			Class::Simple::Readonly::Cached->new({ foo => 'bar' })
 		}, qr/^Usage:\s/);
 
+		does_carp_that_matches(sub {
+			Class::Simple::Readonly::Cached->new(object => 'tulip', cache => {});
+		}, qr/is a scalar/);
+
+		my $object = new_ok('Class::Simple::Readonly::Cached' => [ cache => {} ]);
+
+		does_carp_that_matches(sub {
+			Class::Simple::Readonly::Cached->new(object => $object, cache => {});
+		}, qr/is already cached/);
+
 		done_testing();
 	}
 }

@@ -25,3 +25,19 @@
 [[https://example.com/*foo*]]
 
 [[https://example.com/foo>}bar]]
+
+
+[[mailto:marco@pessotto.hr]]
+
+[[https://example.com/@test]]
+
+
+[[mailto:marco@pessotto.hr][@pessotto]]
+
+[[https://example.com/@test][@test]]
+
+[[mailto:marco@pessotto.hr/\text{test}][@pessotto]]
+
+[[https://example.com/<test>@test][@test]]
+
+

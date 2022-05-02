@@ -8,7 +8,7 @@ Tests for the Perl module L<Util::H2O>.
 
 =head1 Author, Copyright, and License
 
-Copyright (c) 2020-2021 Hauke Daempfling (haukex@zero-g.net).
+Copyright (c) 2020-2022 Hauke Daempfling (haukex@zero-g.net).
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl 5 itself.
@@ -20,7 +20,7 @@ L<http://perldoc.perl.org/perlartistic.html>.
 
 =cut
 
-use Test::More tests => 238;
+use Test::More tests => 291;
 use Scalar::Util qw/blessed/;
 
 sub exception (&) { eval { shift->(); 1 } ? undef : ($@ || die) }  ## no critic (ProhibitSubroutinePrototypes, RequireFinalReturn, RequireCarping)
@@ -30,7 +30,7 @@ sub warns (&) { my @w; { local $SIG{__WARN__} = sub { push @w, shift }; shift->(
 
 diag "This is Perl $] at $^X on $^O";
 BEGIN { use_ok 'Util::H2O' }
-is $Util::H2O::VERSION, '0.16';
+is $Util::H2O::VERSION, '0.18';
 
 diag "If all tests pass, you can ignore the \"this Perl is too old\" warnings"
 	if $] lt '5.008009';
@@ -92,6 +92,52 @@ my $PACKRE = $Util::H2O::_PACKAGE_REGEX;  ## no critic (ProtectPrivateVars)
 	$o2->foo->{def} = 456;
 	is_deeply [sort keys %$o2], [qw/ abc foo /];
 	is_deeply [sort keys %{$o2->foo}], [qw/ bar def /];
+}
+
+# o2h
+{
+	BEGIN { use_ok 'Util::H2O', 'o2h' }
+	my $o = h2o -recurse, { a=>[ h2o {abc=>123} ], h=>{ x=>'y', z=>undef }, c=>sub {} };
+	like blessed($o), $PACKRE;
+	like blessed($o->h), $PACKRE;
+	is $o->h->x, 'y';
+	is $o->a->[0]->abc, 123;
+	$o->h->z({ foo => h2o {def=>456} });
+	is ref $o->h->z, 'HASH';
+	is $o->h->z->{foo}->def, 456;
+	my $h = o2h $o;
+	is ref $h, 'HASH';
+	is ref $h->{a}, 'ARRAY';
+	like blessed($h->{a}[0]), $PACKRE;
+	is ref $h->{h}, 'HASH';
+	is ref $h->{h}{z}, 'HASH';
+	like blessed($h->{h}{z}{foo}), $PACKRE;
+	is $h->{h}{z}{foo}->def, 456;
+	is ref $h->{c}, 'CODE';
+	is $h->{h}{x}, 'y';
+}
+# o2h + -lock + -ro
+{
+	my $o = h2o -recurse, -lock=>1, -ro, { abc => { def => { ghi => 555 } } };
+	SKIP: {
+		skip "Won't work on old Perls", 2 if $] lt '5.008009';
+		ok exception { my $x = $o->{zzz} };
+		ok exception { my $y = $o->{abc}{def}{yyy} };
+	}
+	my $h = o2h $o;
+	is ref $h, 'HASH';
+	is ref $h->{abc}{def}, 'HASH';
+	$h->{zzz} = 543;
+	$h->{abc}{def}{ghi} = 777;
+	is_deeply $h, { abc => { def => { ghi => 777 } }, zzz => 543 };
+}
+# o2h + -meth
+{
+	my $o = h2o -meth, { foo => "bar", quz => sub { "baz" } };
+	is $o->foo, "bar";
+	is $o->quz, "baz";
+	my $h = o2h $o;
+	is_deeply $h, { foo => "bar" };
 }
 
 # -meth
@@ -447,6 +493,32 @@ SKIP: {
 	# to warnings that used to be here was buggy and moved to the author tests for now.
 	my $od = h2o -destroy=>sub { die "You can safely ignore this warning during testing,\neven if it is followed by another \" at t/Util-H2O.t line ...\"." }, {}; ## no critic (RequireCarping)
 }
+{ # -destroy + -isa
+	my $superdest = 0;
+	{
+		package DestIsaTest;  ## no critic (ProhibitMultiplePackages)
+		sub DESTROY { $superdest++; return }
+	}
+	my $dest = 0;
+	my $o1 = h2o -isa=>'DestIsaTest', -destroy=>sub{$dest++}, {};
+	is $dest, 0;
+	is $superdest, 0;
+	$o1=undef;
+	is $dest, 1;
+	is $superdest, 0;
+	my $dest2 = 0;
+	h2o -isa=>'DestIsaTest', -classify=>'DestIsaH2O', { DESTROY=>sub{$dest2++} };
+	is $dest2, 1;
+	is $superdest, 0;
+	{
+		package DestIsaH2O2;  ## no critic (ProhibitMultiplePackages)
+		use Util::H2O;
+		h2o -isa=>'DestIsaTest', -classify, {
+			DESTROY=>sub{ my $self=shift; $dest2++; $self->SUPER::DESTROY(@_) } };
+	}
+	is $dest2, 2;
+	is $superdest, 1;
+}
 
 # DESTROY
 {
@@ -519,6 +591,37 @@ SKIP: {
 	is grep({ /\btoo old\b/i } @w), 2;
 }
 
+{ # -pass
+	like blessed( h2o {} ), $PACKRE;
+	like blessed( h2o -pass=>'undef', {} ), $PACKRE;
+	# "undef"
+	is h2o(-pass=>'undef', undef), undef;
+	ok exception { h2o -pass=>'undef', [] };
+	ok exception { h2o -pass=>'undef', "foo" };
+
+	my $sref = \"foo";
+	my $aref = [ { xyz=>'abc' } ];
+	my $obj = bless {}, "SomeClass";
+
+	# "ref"
+	like blessed( h2o -pass=>'ref', {} ), $PACKRE;
+	is h2o(-pass=>'ref', $sref), $sref;
+	is h2o(-pass=>'ref', $obj), $obj;
+	is 0+h2o(-recurse, -pass=>'ref', $aref), 0+$aref;
+	ok !blessed($aref->[0]);
+	is ref($aref->[0]), 'HASH';
+	is h2o(-pass=>'ref', undef), undef;
+	ok exception { h2o -pass=>'ref', "foo" };
+	ok exception { h2o -pass=>'ref', 1234 };
+	ok exception { h2o -pass=>'ref', -123 };
+	ok exception { h2o -pass=>'ref', "-foobar" };
+
+	# Note to self: I decided against implementing "any" because then
+	# there is ambiguity when negative numbers or strings starting with
+	# dashes look like options.
+	ok exception { h2o -pass=>'any', {} };
+}
+
 ok exception { h2o() };
 ok exception { h2o("blah") };
 ok exception { h2o(undef) };
@@ -527,6 +630,7 @@ ok exception { h2o(-meth,-recurse) };
 ok exception { h2o(bless {}, "SomeClass") };
 ok exception { h2o({DESTROY=>'foo'}) };
 ok exception { h2o(-new, { new=>5 }) };
+ok exception { h2o(-foobar) };
 ok exception { h2o(-class) };
 ok exception { h2o(-class=>'') };
 ok exception { h2o(-class=>[]) };
@@ -536,6 +640,9 @@ ok exception { h2o(-classify=>[]) };
 ok exception { h2o(-destroy=>'') };
 ok exception { h2o(-destroy=>undef) };
 ok exception { h2o(-isa=>{}) };
+ok exception { h2o -pass=>undef, {} };
+ok exception { h2o -pass=>[], {} };
+ok exception { h2o -pass=>"foo", {} };
 
 diag "If all tests pass, you can ignore the \"this Perl is too old\" warnings"
 	if $] lt '5.008009';

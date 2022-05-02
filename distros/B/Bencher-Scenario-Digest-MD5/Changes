@@ -1,0 +1,34 @@
+0.005   2022-03-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename dist Bencher-Scenario-Digest{,-}MD5.
+
+
+0.004   2017-07-10  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- Replace Log::Any with Log::ger.
+
+
+0.003   2017-01-25  Released-By: PERLANCAR
+
+	- Tweak scenario: move String::ShellQuote from participant's modules to
+          helper_modules.
+
+        - [build] Rebuild with updated Dist::Zilla::Plugin::Bencher::Scenario
+          (0.16) to add benchmarked modules as prereq with phase=x_benchmarks,
+          type=x_benchmarks.
+
+
+0.002   2016-11-21  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- Tweak scenario: make participant more independent by specifying
+	  the required modules (String::ShellQuote) in the participant
+	  instead of use-ing the module at the start of the module source.
+
+
+0.001   2016-11-21  Released-By: PERLANCAR
+
+        - First release.

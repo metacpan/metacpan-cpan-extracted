@@ -1,7 +1,7 @@
 package Lib::PWQuality;
 our $AUTHORITY = 'cpan:XSAWYERX';
 # ABSTRACT: Perl interface to the libpwquality C library
-$Lib::PWQuality::VERSION = '0.001';
+$Lib::PWQuality::VERSION = '0.002';
 ## no critic
 
 use strict;
@@ -72,7 +72,7 @@ $ffi->lib( find_lib_or_die( 'lib' => 'pwquality' ) );
 package Lib::PWQuality::Setting {
 our $AUTHORITY = 'cpan:XSAWYERX';
 
-$Lib::PWQuality::Setting::VERSION = '0.001';
+$Lib::PWQuality::Setting::VERSION = '0.002';
 FFI::C->enum( 'pwquality_setting' => [
         [ 'DIFF_OK'          =>  1 ],
         [ 'MIN_LENGTH'       =>  3 ],
@@ -100,7 +100,7 @@ FFI::C->enum( 'pwquality_setting' => [
 package Lib::PWQaulity::Return {
 our $AUTHORITY = 'cpan:XSAWYERX';
 
-$Lib::PWQaulity::Return::VERSION = '0.001';
+$Lib::PWQaulity::Return::VERSION = '0.002';
 FFI::C->enum( 'pwquality_return' => [
         [ 'SUCCESS'           =>   0 ],
         [ 'FATAL_FAILURE'     =>  -1 ],
@@ -138,7 +138,7 @@ FFI::C->enum( 'pwquality_return' => [
 package Lib::PWQuality::Settings {
 our $AUTHORITY = 'cpan:XSAWYERX';
 
-$Lib::PWQuality::Settings::VERSION = '0.001';
+$Lib::PWQuality::Settings::VERSION = '0.002';
 use experimental qw< signatures >;
 
     FFI::C->struct( 'pwquality_settings_t' => [
@@ -376,7 +376,7 @@ Lib::PWQuality - Perl interface to the libpwquality C library
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -777,9 +777,10 @@ Sawyer X
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Sawyer X.
+This software is Copyright (c) 2022 by Sawyer X.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

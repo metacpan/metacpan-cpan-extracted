@@ -1,6 +1,10 @@
 Revision history for Term::Form
 
 
+0.547   2022-05-01
+    - readline: refactoring output.
+    - fill_form: removed deprecated option 'section_separators'.
+
 0.546   2022-04-18
     - readline: new option 'history'.
     - readline: new keys for big-step movement.

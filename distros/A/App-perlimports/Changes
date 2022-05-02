@@ -1,5 +1,9 @@
 Revision history for App-perlimports
 
+0.000036  2022-04-29 13:09:44Z
+    - Bump PPI from 1.272 to 1.273
+    - Allow multiple filenames to be passed to CLI (GH#68) (Olaf Alders)
+
 0.000035  2022-02-23 00:35:26Z
     - Bump Perl::Tidy from 20211029 to 20220217 (GH#67) (Olaf Alders)
     - Bump PPI from 1.270 to 1.272

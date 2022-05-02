@@ -1,0 +1,30 @@
+bin/jtt
+Changes
+lib/Jenkins/i18n.pm
+lib/Jenkins/i18n/ProcOpts.pm
+lib/Jenkins/i18n/Properties.pm
+lib/Jenkins/i18n/Stats.pm
+lib/Jenkins/i18n/Warnings.pm
+LICENSE
+Makefile.PL
+MANIFEST
+perlcriticrc
+perltidyrc
+README.md
+t/find_files.t
+t/Jenkins-i18n.t
+t/load_jelly.t
+t/load_properties.t
+t/proc_opts.t
+t/removed_unused.t
+t/samples/config.jelly
+t/samples/message.jelly
+t/samples/Messages.properties
+t/samples/table_pt_BR.properties
+t/stats.t
+t/warnings.t
+tidyall.ini
+xt/pod-coverage.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.295';
+our $VERSION = '2.296';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -53,7 +53,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.295
+Version 2.296
 
 =head1 SYNOPSIS
 
@@ -137,7 +137,7 @@ C<Right-Arrow> to move forward a character, C<Left-Arrow> to move back a charact
 
 =item *
 
-C<Up-Arrow> to move back 10 characters, C<Down-Arrow> to move forward 10 characters.
+C<Page-Up> to move back 10 characters, C<Page-Down> to move forward 10 characters.
 
 =item *
 

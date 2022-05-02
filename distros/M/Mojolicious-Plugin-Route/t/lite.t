@@ -16,6 +16,8 @@ $t->get_ok('/baz/a/new')->status_is(200)->content_is('Baz::A->new');
 
 $t->get_ok('/bar/qux/b')->status_is(200)->content_is('Bar::Qux::B');
 
+$t->get_ok('/qux/a')->status_is(200)->content_is('Qux::A');
+
 $t->get_ok('/b')->status_is(200)->content_is('B');
 
 $t->get_ok('/login')->status_is(200)->content_is('Login');

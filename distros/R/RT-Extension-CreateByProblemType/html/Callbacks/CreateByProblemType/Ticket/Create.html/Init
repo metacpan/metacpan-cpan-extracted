@@ -2,7 +2,36 @@
 $ARGSRef
 </%args>
 <%init>
-return if $ARGSRef->{Queue};
+return if $ARGSRef->{Queue} || !RT->Config->Get( 'CreateByProblemType', $session{'CurrentUser'} );
+
+# We need to load default problem for RT 5 create page
+if ( RT::Handle::cmp_version( $RT::VERSION, '5.0.0' ) >= 0 && !$ARGSRef->{Problem} ) {
+    my $queues = RT::Queues->new( $session{'CurrentUser'} );
+    $queues->UnLimit;
+    while ( my $q = $queues->Next ) {
+        next unless $q->CurrentUserHasRight("CreateTicket");
+        my $cf = RT::CustomField->new( $session{'CurrentUser'} );
+        $cf->LoadByName(
+            Name          => 'Problem Type',
+            LookupType    => RT::Ticket->CustomFieldLookupType,
+            ObjectId      => $q->id,
+            IncludeGlobal => 1,
+        );
+        if ( not $cf->Id or not $cf->Values->Count ) {
+            $ARGSRef->{Problem} = $q->Id . '-';
+        }
+        else {
+            my $values = $cf->Values;
+            while ( my $v = $values->Next ) {
+                $ARGSRef->{Problem} = $q->Id . "-" . $v->Name;
+                $ARGSRef->{Subject} = $v->Name;
+                last;
+            }
+        }
+        last;
+    }
+}
+
 return unless $ARGSRef->{Problem} and $ARGSRef->{Problem} =~ /^(\d+)-(.*)/;
 
 my ($Queue, $ProblemValue) = ($1, $2);
@@ -11,9 +40,31 @@ $ARGSRef->{Queue} = $Queue;
 my $QueueObj = RT::Queue->new($session{'CurrentUser'});
 $QueueObj->Load($Queue) or return;
 
-my $cf = $QueueObj->CustomField("Problem Type");
-return unless $cf->Id;
+my $cf = RT::CustomField->new($session{'CurrentUser'});
+$cf->LoadByName(
+    Name          => 'Problem Type',
+    LookupType    => RT::Ticket->CustomFieldLookupType,
+    ObjectId      => $QueueObj->id,
+    IncludeGlobal => 1,
+);
 
-$ARGSRef->{"CustomField-".$cf->Id} = $ProblemValue;
-$ARGSRef->{"Subject"} = $ProblemValue;
+if ( $cf->Id ) {
+    $ARGSRef->{"CustomField-".$cf->Id} = $ProblemValue;
+
+    # For RT 5, ignore submitted "Problem Type" value on problem change.
+    if ( $ARGSRef->{QueueChanged} ) {
+        my $id = $cf->Id;
+        for my $field ( keys %$ARGSRef ) {
+            delete $ARGSRef->{$field} if $field =~ /^Object-RT::Ticket--CustomField(?::.+)?-$id-/;
+        }
+    }
+
+    # For RT 5, update Subject only on problem change, to avoid overriding user input value on "Create"
+    $ARGSRef->{Subject} = $ProblemValue if $ARGSRef->{QueueChanged} || RT::Handle::cmp_version($RT::VERSION, '5.0.0') < 0;
+}
+else {
+    # Reset Subject if current queue doesn't support Problem Type on problem change
+    $ARGSRef->{Subject} = '' if $ARGSRef->{QueueChanged};
+}
+
 </%init>

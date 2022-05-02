@@ -224,10 +224,6 @@ static SV *my_newSVpvn_flags(pTHX_ const char *s, STRLEN len, U32 flags)
 }
 #endif /* !newSVpvn_flags */
 
-#ifndef SvRV_set
-# define SvRV_set(sv, val) (SvRV(sv) = (val))
-#endif /* !SvRV_set */
-
 #ifndef SvPVbyte_nomg
 # define SvPVbyte_nomg SvPV
 #endif /* !SvPVbyte_nomg */
@@ -733,8 +729,13 @@ static void xs_getnameinfo(pTHX_ CV *cv)
 #endif
 
 	err = getnameinfo((struct sockaddr *)sa, addr_len,
-			want_host ? host : NULL, want_host ? sizeof(host) : 0,
-			want_serv ? serv : NULL, want_serv ? sizeof(serv) : 0,
+#ifdef OS390    /* This OS requires both parameters to be non-NULL */
+			host, sizeof(host),
+			serv, sizeof(serv),
+#else
+                        want_host ? host : NULL, want_host ? sizeof(host) : 0,
+                        want_serv ? serv : NULL, want_serv ? sizeof(serv) : 0,
+#endif
 			flags);
 
 	Safefree(sa);

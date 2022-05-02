@@ -1,16 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2008-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2008-2022 -- leonerd@leonerd.org.uk
 
-package String::Tagged;
+package String::Tagged 0.18;
 
-use strict;
+use v5.14;
 use warnings;
 
-our $VERSION = '0.17';
-
 use Scalar::Util qw( blessed );
+
+require String::Tagged::Extent;
 
 use constant FLAG_ANCHOR_BEFORE => 0x01;
 use constant FLAG_ANCHOR_AFTER  => 0x02;
@@ -26,26 +26,26 @@ C<String::Tagged> - string buffers with value tags on extents
 
 =head1 SYNOPSIS
 
- use String::Tagged;
+   use String::Tagged;
 
- my $st = String::Tagged->new( "An important message" );
+   my $st = String::Tagged->new( "An important message" );
 
- $st->apply_tag( 3, 9, bold => 1 );
+   $st->apply_tag( 3, 9, bold => 1 );
 
- $st->iter_substr_nooverlap(
-    sub {
-       my ( $substring, %tags ) = @_;
+   $st->iter_substr_nooverlap(
+      sub {
+         my ( $substring, %tags ) = @_;
 
-       print $tags{bold} ? "<b>$substring</b>"
-                         : $substring;
-    }
- );
+         print $tags{bold} ? "<b>$substring</b>"
+                           : $substring;
+      }
+   );
 
 =head1 DESCRIPTION
 
 This module implements an object class, instances of which store a (mutable)
 string buffer that supports tags. A tag is a name/value pair that applies to
-some non-empty extent of the underlying string.
+some extent of the underlying string.
 
 The types of tag names ought to be strings, or at least values that are
 well-behaved as strings, as the names will often be used as the keys in hashes
@@ -61,10 +61,10 @@ For tags of the same name, only the latest, shortest tag takes effect.
 
 For example, consider a string with three tags represented here:
 
- Here is my string with tags
- [-------------------------]  foo => 1
-         [-------]            foo => 2
-      [---]                   bar => 3
+   Here is my string with tags
+   [-------------------------]  foo => 1
+           [-------]            foo => 2
+        [---]                   bar => 3
 
 Every character in this string has a tag named C<foo>. The value of this tag
 is 2 for the words C<my> and C<string> and the space inbetween, and 1
@@ -75,9 +75,9 @@ Since C<String::Tagged> does not understand the significance of the tag values
 it therefore cannot detect if two neighbouring tags really contain the same
 semantic idea. Consider the following string:
 
- A string with words
- [-------]            type => "message"
-          [--------]  type => "message"
+   A string with words
+   [-------]            type => "message"
+            [--------]  type => "message"
 
 This string contains two tags. C<String::Tagged> will treat this as two
 different tag values as far as C<iter_tags_nooverlap> is concerned, even
@@ -122,7 +122,7 @@ Out-of-band data
 *is_string_tagged =
    # It would be nice if we could #ifdef HAVE_PERL_VERSION(...)
    ( $] >= 5.034 ) ?
-      do { eval 'use experimental "isa"; sub { $_[0] isa __PACKAGE__ }' } :
+      do { eval 'use experimental "isa"; sub { $_[0] isa __PACKAGE__ }' // die $@ } :
       do { sub { blessed $_[0] and $_[0]->isa( __PACKAGE__ ) } };
 
 =head1 CONSTRUCTOR
@@ -209,8 +209,8 @@ name and value are passed into the corresponding function, which should return
 an even-sized key/value list giving a tag, or a list of tags, to apply to the
 new clone.
 
- my @new_tags = $convert_tags->{$orig_name}->( $orig_name, $orig_value )
- # Where @new_tags is ( $new_name, $new_value, $new_name_2, $new_value_2, ... )
+   my @new_tags = $convert_tags->{$orig_name}->( $orig_name, $orig_value )
+   # Where @new_tags is ( $new_name, $new_value, $new_name_2, $new_value_2, ... )
 
 As a further convenience, if the value for a given tag name is a plain string
 instead of a code reference, it gives the new name for the tag, and will be
@@ -443,8 +443,8 @@ Returns the plain string contained within the object.
 This method is also called for stringification; so the C<String::Tagged>
 object can be used in a plain string interpolation such as
 
- my $message = String::Tagged->new( "Hello world" );
- print "My message is $message\n";
+   my $message = String::Tagged->new( "Hello world" );
+   print "My message is $message\n";
 
 =cut
 
@@ -655,8 +655,9 @@ This method returns the C<$st> object.
 
    $st->apply_tag( $e, $name, $value )
 
-Alternatively, an existing extent object can be passed as the first argument
-instead of two integers. The new tag will apply at the given extent.
+Alternatively, an existing L<String::Tagged::Extent> object can be passed as
+the first argument instead of two integers. The new tag will apply at the
+given extent.
 
 =cut
 
@@ -767,8 +768,8 @@ This method returns the C<$st> object.
 
    $st->unapply_tag( $e, $name )
 
-Alternatively, an existing extent object can be passed as the first argument
-instead of two integers.
+Alternatively, an existing L<String::Tagged::Extent> object can be passed as
+the first argument instead of two integers.
 
 =cut
 
@@ -789,8 +790,8 @@ This method returns the C<$st> object.
 
    $st->delete_tag( $e, $name )
 
-Alternatively, an existing extent object can be passed as the first argument
-instead of two integers.
+Alternatively, an existing L<String::Tagged::Extent> object can be passed as
+the first argument instead of two integers.
 
 =cut
 
@@ -809,7 +810,7 @@ Merge neighbouring or overlapping tags of the same name and equal values.
 For each pair of tags of the same name that apply on neighbouring or
 overlapping extents, the C<$eqsub> callback is called, as
 
-  $equal = $eqsub->( $name, $value_a, $value_b )
+   $equal = $eqsub->( $name, $value_a, $value_b )
 
 If this function returns true then the tags are merged.
 
@@ -871,10 +872,10 @@ sub merge_tags
    $st->iter_extents( $callback, %opts )
 
 Iterate the tags stored in the string. For each tag, the CODE reference in
-C<$callback> is invoked once, being passed an extent object that represents
-the extent of the tag.
+C<$callback> is invoked once, being passed a L<String::Tagged::Extent> object
+that represents the extent of the tag.
 
- $callback->( $extent, $tagname, $tagvalue )
+   $callback->( $extent, $tagname, $tagvalue )
 
 Options passed in C<%opts> may include:
 
@@ -916,7 +917,7 @@ sub iter_extents
 
    my $end   = exists $opts{end} ? $opts{end} :
                exists $opts{len} ? $start + $opts{len} :
-                                   $self->length;
+                                   $self->length + 1; # so as to include zerolen at end
 
    my $only = exists $opts{only} ? { map { $_ => 1 } @{ $opts{only} } } :
                                    undef;
@@ -947,7 +948,7 @@ Iterate the tags stored in the string. For each tag, the CODE reference in
 C<$callback> is invoked once, being passed the start point and length of the
 tag.
 
- $callback->( $start, $length, $tagname, $tagvalue )
+   $callback->( $start, $length, $tagname, $tagvalue )
 
 Options passed in C<%opts> are the same as for C<iter_extents>.
 
@@ -977,7 +978,7 @@ tags change. The entire set of tags active in that extent is given to the
 callback. Because the extent covers possibly-multiple tags, it will not define
 the C<anchor_before> and C<anchor_after> flags.
 
- $callback->( $extent, %tags )
+   $callback->( $extent, %tags )
 
 The callback will be invoked over the entire length of the string, including
 any extents with no tags applied.
@@ -1019,7 +1020,7 @@ sub iter_extents_nooverlap
       my ( $ts, $te, $tn, $tv ) = @$t;
 
       next if $te < $start;
-      last if $ts >= $end;
+      last if $ts > $end;
 
       next if $only   and !$only->{$tn};
       next if $except and  $except->{$tn};
@@ -1068,6 +1069,18 @@ sub iter_extents_nooverlap
       $pos = $rangeend;
       @active = grep { $_->[1] > $pos } @active;
    }
+
+   # We might have zero-length tags active at the very end of the range
+   if( my @zerolen = grep { $_->[0] == $pos and $_->[1] == $pos } @active ) {
+      my %activetags;
+      foreach ( @active ) {
+         my ( undef, undef, $n, $v ) = @$_;
+
+         $activetags{$n} = $v;
+      }
+
+      $callback->( $self->_mkextent( $pos, $pos, 0 ), %activetags );
+   }
 }
 
 =head2 iter_tags_nooverlap
@@ -1078,7 +1091,7 @@ Iterate extents of the string using C<iter_extents_nooverlap>, but passing
 the start and length of each extent to the callback instead of the extent
 object.
 
- $callback->( $start, $length, %tags )
+   $callback->( $start, $length, %tags )
 
 Options may be passed in C<%opts> to control the range of the string iterated
 over, in the same way as the C<iter_extents> method.
@@ -1106,7 +1119,7 @@ sub iter_tags_nooverlap
 Iterate extents of the string using C<iter_extents_nooverlap>, but passing the
 substring of data instead of the extent object.
 
- $callback->( $substr, %tags )
+   $callback->( $substr, %tags )
 
 Options may be passed in C<%opts> to control the range of the string iterated
 over, in the same way as the C<iter_extents> method.
@@ -1213,10 +1226,10 @@ sub get_tag_at
 
    $extent = $st->get_tag_extent( $pos, $name )
 
-If the named tag applies to the given position, returns the extent of the tag
-at that position. If it does not, C<undef> is returned. If an extent is
-returned it will define the C<anchor_before> and C<anchor_after> flags if
-appropriate.
+If the named tag applies to the given position, returns a
+L<String::Tagged::Extent> object to represent the extent of the tag at that
+position. If it does not, C<undef> is returned. If an extent is returned it
+will define the C<anchor_before> and C<anchor_after> flags if appropriate.
 
 =cut
 
@@ -1570,18 +1583,18 @@ non-overlapping match of the given C<$regexp>.
 This could be used, for example, to build a formatted string from a formatted
 template containing variable expansions:
 
- my $template = ...
- my %vars = ...
+   my $template = ...
+   my %vars = ...
 
- my $ret = String::Tagged->new;
- foreach my $m ( $template->matches( qr/\$\w+|[^$]+/ ) ) {
-    if( $m =~ m/^\$(\w+)$/ ) {
-       $ret->append_tagged( $vars{$1}, %{ $m->get_tags_at( 0 ) } );
-    }
-    else {
-       $ret->append( $m );
-    }
- }
+   my $ret = String::Tagged->new;
+   foreach my $m ( $template->matches( qr/\$\w+|[^$]+/ ) ) {
+      if( $m =~ m/^\$(\w+)$/ ) {
+         $ret->append_tagged( $vars{$1}, %{ $m->get_tags_at( 0 ) } );
+      }
+      else {
+         $ret->append( $m );
+      }
+   }
 
 This iterates segments of the template containing variables expansions
 starting with a C<$> symbol, and replaces them with values from the C<%vars>
@@ -1678,10 +1691,10 @@ tags which are "before" or "after" anchored.
 
 For example:
 
-  Hello, world
-  [---]         word       => 1
- <[----------]> everywhere => 1
-        |       space      => 1
+    Hello, world
+    [---]         word       => 1
+   <[----------]> everywhere => 1
+          |       space      => 1
 
 =cut
 
@@ -1711,7 +1724,8 @@ sub debug_sprintf
       my $tl = $te - $ts;
 
       if( $tl == 0 ) {
-         $ret .= "";
+         $ret =~ s/ $/></;
+         $te++; # account for extra printed width
       }
       elsif( $tl == 1 ) {
          $ret .= "|";
@@ -1728,116 +1742,6 @@ sub debug_sprintf
    }
 
    return $ret;
-}
-
-=head1 Extent Objects
-
-These objects represent a range of characters within the containing
-C<String::Tagged> object. The range they represent is fixed at the time of
-creation. If the containing string is modified by a call to C<set_substr>
-then the effect on the extent object is not defined. These objects should be
-considered as relatively short-lived - used briefly for the purpose of
-querying the result of an operation, then discarded soon after.
-
-=cut
-
-package # hide from CPAN indexer
-  String::Tagged::Extent;
-
-=head2 $extent->string
-
-Returns the containing C<String::Tagged> object.
-
-=cut
-
-sub string
-{
-   shift->[0]
-}
-
-=head2 $extent->start
-
-Returns the start index of the extent. This is the index of the first
-character within the extent.
-
-=cut
-
-sub start
-{
-   shift->[1]
-}
-
-=head2 $extent->end
-
-Returns the end index of the extent. This is the index of the first character
-beyond the end of the extent.
-
-=cut
-
-sub end
-{
-   shift->[2]
-}
-
-=head2 $extent->anchor_before
-
-True if this extent begins "before" the start of the string. Only certain
-methods return extents with this flag defined.
-
-=cut
-
-sub anchor_before
-{
-   shift->[3] & String::Tagged::FLAG_ANCHOR_BEFORE;
-}
-
-=head2 $extent->anchor_after
-
-True if this extent ends "after" the end of the string. Only certain methods
-return extents with this flag defined.
-
-=cut
-
-sub anchor_after
-{
-   shift->[3] & String::Tagged::FLAG_ANCHOR_AFTER;
-}
-
-=head2 $extent->length
-
-Returns the number of characters within the extent.
-
-=cut
-
-sub length
-{
-   my $self = shift;
-   $self->end - $self->start;
-}
-
-=head2 $extent->substr
-
-Returns the substring contained by the extent.
-
-=cut
-
-sub substr
-{
-   my $self = shift;
-   $self->string->substr( $self->start, $self->length );
-}
-
-=head2 $extent->plain_substr
-
-Returns the substring of the underlying plain string buffer contained by the
-extent.
-
-=cut
-
-sub plain_substr
-{
-   my $self = shift;
-   $self->string->plain_substr( $self->start, $self->length );
 }
 
 =head1 TODO

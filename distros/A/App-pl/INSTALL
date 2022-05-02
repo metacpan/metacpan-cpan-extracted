@@ -6,6 +6,9 @@ No installation is needed for pl on Unix-like systems.  You have 2 options:
 - copy pl to some directory in your PATH, e.g. ~/bin -- you may need to
   chmod a+x pl
 
+  You can save some space (and maybe a bit of starting time) by compacting pl:
+  ./pl -rp 'last if /=head1/; s/^(?:    |\t+ *)//; $. > 1 ? s/^(?:#.*|\cL)?\n// : s/env //; s/\s+#.*//' pl > DESTINATION/pl
+
 On Windows you have 3 options:
 
 - run it from where you unpacked it

@@ -4,7 +4,7 @@
       "Ben Bullock <bkb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -37,8 +37,9 @@
          "requires" : {
             "IO::Select" : "1.42",
             "IO::Socket" : "1.43",
-            "JSON::Create" : "0.34",
+            "JSON::Create" : "0.35",
             "JSON::Parse" : "0.61",
+            "Test::TCP" : "2.22",
             "perl" : "5.006001"
          }
       }
@@ -54,6 +55,6 @@
          "web" : "https://github.com/benkasminbullock/json-server"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

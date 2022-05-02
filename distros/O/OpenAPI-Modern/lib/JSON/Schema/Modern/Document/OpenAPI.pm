@@ -5,7 +5,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 use 5.020;
 use Moo;
@@ -155,7 +155,7 @@ sub traverse ($self, $evaluator) {
   my @real_json_schema_paths;
   foreach my $path (sort @json_schema_paths) {
     # disregard paths that are not the root of each embedded subschema.
-    next if any { return $path =~ m{^\Q$_\E(?:/|\z)} } @real_json_schema_paths;
+    next if any { $path =~ m{^\Q$_\E(?:/|\z)} } @real_json_schema_paths;
 
     unshift @real_json_schema_paths, $path;
     $self->_traverse_schema($self->get($path), { %$state, schema_path => $path });
@@ -238,7 +238,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

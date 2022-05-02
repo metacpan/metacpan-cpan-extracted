@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
 package Test::ExpectAndCheck;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Carp;
 
@@ -101,8 +101,11 @@ sub expect
    my $self = shift;
    my ( $method, @args ) = @_;
 
+   my ( undef, $file, $line ) = caller(1);
+   defined $file or ( undef, $file, $line ) = caller(0);
+
    push @{ $self->{expectations} }, my $exp = $self->EXPECTATION_CLASS->new(
-      $method => [ @args ],
+      $method => [ @args ], $file, $line,
    );
 
    return $exp;
@@ -111,7 +114,10 @@ sub expect
 sub _stringify
 {
    my ( $v ) = @_;
-   if( blessed $v and $v->isa( "Test::Deep::Ignore" ) ) {
+   if( !defined $v ) {
+      return "undef";
+   }
+   elsif( blessed $v and $v->isa( "Test::Deep::Ignore" ) ) {
       return "ignore()";
    }
    elsif( $v =~ m/^-?[0-9]+$/ ) {
@@ -122,7 +128,7 @@ sub _stringify
       return qq('$v');
    }
    else {
-      if( $v =~ m/^[^\n\x20-\x7E]/ ) {
+      if( $v =~ m/[^\n\x20-\x7E]/ ) {
          # string contains something non-printable; just hexdump it all
          $v =~ s{(.)}{sprintf "\\x%02X", ord $1}gse;
       }
@@ -146,8 +152,12 @@ sub _call
 
    my $e;
    $e = first { !$_->_called } @{ $self->{expectations} } and
-      $e->_consume( $method, @args ) or
-      croak "Unexpected call to ->$method(${\ _stringify_args @args })";
+      $e->_consume( $method, @args ) or do {
+         my $message = Carp::shortmess( "Unexpected call to ->$method(${\ _stringify_args @args })" );
+         $message .= "... while expecting " . $e->_stringify if $e;
+         $message .= "... after all expectations done" if !$e;
+         die "$message.\n";
+      };
 
    return $e->_result;
 }
@@ -191,10 +201,12 @@ use List::Util qw( all );
 use constant {
    METHOD  => 0,
    ARGS    => 1,
-   CALLED  => 2,
-   RETURNS => 3,
-   THROWS  => 4,
-   DIAG    => 5,
+   FILE    => 2,
+   LINE    => 3,
+   CALLED  => 4,
+   RETURNS => 5,
+   THROWS  => 6,
+   DIAG    => 7,
 };
 
 =head1 EXPECTATIONS
@@ -208,8 +220,8 @@ the return value it should provide.
 sub new
 {
    my $class = shift;
-   my ( $method, $args ) = @_;
-   return bless [ $method, $args, 0 ], $class;
+   my ( $method, $args, $file, $line ) = @_;
+   return bless [ $method, $args, $file, $line, 0 ], $class;
 }
 
 =head2 returns
@@ -289,8 +301,16 @@ sub _called
    return $self->[CALLED];
 }
 
+sub _stringify
+{
+   my $self = shift;
+   return "->$self->[METHOD](${\( Test::ExpectAndCheck::_stringify_args @{ $self->[ARGS] } )}) at $self->[FILE] line $self->[LINE]";
+}
+
 package
    Test::ExpectAndCheck::_Obj;
+
+our @CARP_NOT = qw( Test::ExpectAndCheck );
 
 sub new
 {

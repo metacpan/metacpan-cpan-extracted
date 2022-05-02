@@ -14,7 +14,7 @@ use Term::ANSIColor qw(colored);
 use Cwd ();
 use JSON::PP qw(decode_json);
 
-our $VERSION = "0.31";
+our $VERSION = "0.33";
 
 my $perl_version     = version->new($])->numify;
 my $depended_on_by   = 'http://deps.cpantesters.org/depended-on-by.pl?dist=';
@@ -304,14 +304,26 @@ sub fixup_packlist {
     return @target_list;
 }
 
+# NOTE only use this for comparing paths
+sub _canon_path_compare {
+    my ($self, $path) = @_;
+    $path = Cwd::realpath($path);
+    if( $^O eq 'MSWin32' ) {
+        require Win32;
+        $path = Win32::GetLongPathName($path);
+    }
+
+    return $path;
+}
+
 sub is_local_lib {
     my ($self, $file) = @_;
     return unless $self->{local_lib};
 
-    my $local_lib_base = quotemeta File::Spec->canonpath(Cwd::realpath($self->{local_lib}));
-    $file = File::Spec->canonpath(Cwd::realpath($file));
+    my $local_lib_base = quotemeta $self->_canon_path_compare($self->{local_lib});
+    $file = $self->_canon_path_compare($file);
 
-    return $file =~ /^$local_lib_base/ ? 1 : 0;
+    return $file =~ /^$local_lib_base(?:\/|\z)/ ? 1 : 0;
 }
 
 sub vname_for {

@@ -1,0 +1,5 @@
+# libtomcrypt - but only AES
+
+The complete code can be found online: https://github.com/libtom/libtomcrypt
+
+The software in this directory is under the LibTom license (see LICENSE).

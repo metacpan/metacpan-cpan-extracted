@@ -1,19 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
-package Convert::Color::RGB16;
+package Convert::Color::RGB16 0.12;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Convert::Color );
 
 __PACKAGE__->register_color_space( 'rgb16' );
 
 use Carp;
-
-our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -24,21 +22,21 @@ C<Convert::Color::RGB16> - a color value represented as red/green/blue in
 
 Directly:
 
- use Convert::Color::RGB16;
+   use Convert::Color::RGB16;
 
- my $red = Convert::Color::RGB16->new( 65535, 0, 0 );
+   my $red = Convert::Color::RGB16->new( 65535, 0, 0 );
 
- # Can also parse strings
- my $pink = Convert::Color::RGB16->new( '65535,49152,49152' );
+   # Can also parse strings
+   my $pink = Convert::Color::RGB16->new( '65535,49152,49152' );
 
- # or
- $pink = Convert::Color::RGB16->new( 'ffffc000c000' );
+   # or
+   $pink = Convert::Color::RGB16->new( 'ffffc000c000' );
 
 Via L<Convert::Color>:
 
- use Convert::Color;
+   use Convert::Color;
 
- my $cyan = Convert::Color->new( 'rgb16:0,65535,65535' );
+   my $cyan = Convert::Color->new( 'rgb16:0,65535,65535' );
 
 =head1 DESCRIPTION
 
@@ -54,23 +52,25 @@ For representations using 8-bit integers, see L<Convert::Color::RGB8>.
 
 =cut
 
-=head2 $color = Convert::Color::RGB16->new( $red, $green, $blue )
+=head2 new
+
+   $color = Convert::Color::RGB16->new( $red, $green, $blue )
 
 Returns a new object to represent the set of values given. These values should
 be integers between 0 and 65535. Values outside of this range will be clamped.
 
-=head2 $color = Convert::Color::RGB16->new( $string )
+   $color = Convert::Color::RGB16->new( $string )
 
 Parses C<$string> for values, and construct a new object similar to the above
 three-argument form. The string should be in the form
 
- red,green,blue
+   red,green,blue
 
 containing the three integer values in decimal notation. It can also be given
 in the form of a hex encoded string, such as would be returned by the
 C<rgb16_hex> method:
 
- rrrrggggbbbb
+   rrrrggggbbbb
 
 =cut
 
@@ -100,7 +100,10 @@ sub new
    }
 
    # Clamp to the range [0,0xffff]
-   map { $_ < 0 and $_ = 0; $_ > 0xffff and $_ = 0xffff } ( $r, $g, $b );
+   for ( $r, $g, $b ) {
+      $_ = 0 if $_ < 0;
+      $_ = 0xffff if $_ > 0xffff;
+   }
 
    return bless [ $r, $g, $b ], $class;
 }
@@ -109,11 +112,17 @@ sub new
 
 =cut
 
-=head2 $r = $color->red
+=head2 red
 
-=head2 $g = $color->green
+   $r = $color->red
 
-=head2 $b = $color->blue
+=head2 green
+
+   $g = $color->green
+
+=head2 blue
+
+   $b = $color->blue
 
 Accessors for the three components of the color.
 
@@ -139,7 +148,9 @@ sub new_rgb
    return $class->new( map { $_ * 0xffff } @_ );
 }
 
-=head2 ( $red, $green, $blue ) = $color->rgb16
+=head2 rgb16
+
+   ( $red, $green, $blue ) = $color->rgb16
 
 Returns the individual red, green and blue color components of the color
 value in RGB16 space.
@@ -152,7 +163,9 @@ sub rgb16
    return $self->red, $self->green, $self->blue;
 }
 
-=head2 $str = $color->hex
+=head2 hex
+
+   $str = $color->hex
 
 Returns a string representation of the color components in the RGB16 space, in
 a convenient C<RRRRGGGGBBBB> hex string.
@@ -165,7 +178,9 @@ sub hex :method
    sprintf "%04x%04x%04x", $self->rgb16;
 }
 
-=head2 $mix = $color->alpha_blend( $other, [ $alpha ] )
+=head2 alpha_blend
+
+   $mix = $color->alpha_blend( $other, [ $alpha ] )
 
 Return a new color which is a blended combination of the two passed into it.
 The optional C<$alpha> parameter defines the mix ratio between the two colors,
@@ -197,7 +212,9 @@ sub alpha_blend
    );
 }
 
-=head2 $mix = $color->alpha16_blend( $other, [ $alpha ] )
+=head2 alpha16_blend
+
+   $mix = $color->alpha16_blend( $other, [ $alpha ] )
 
 Similar to C<alpha_blend> but works with integer arithmetic. C<$alpha> should
 be an integer in the range 0 to 65535.
@@ -227,7 +244,9 @@ sub alpha16_blend
    );
 }
 
-=head2 $measure = $color->dst_rgb16( $other )
+=head2 dst_rgb16
+
+   $measure = $color->dst_rgb16( $other )
 
 Return a measure of the distance between the two colors. This is the
 unweighted Euclidean distance of the three color components. Two identical
@@ -244,7 +263,9 @@ sub dst_rgb16
    return sqrt( $self->dst_rgb16_cheap( $other ) ) / sqrt(3*65535*65535);
 }
 
-=head2 $measure = $color->dst_rgb16_cheap( $other )
+=head2 dst_rgb16_cheap
+
+   $measure = $color->dst_rgb16_cheap( $other )
 
 Return a measure of the distance between the two colors. This is the sum of
 the squares of the differences of each of the color components. This is part

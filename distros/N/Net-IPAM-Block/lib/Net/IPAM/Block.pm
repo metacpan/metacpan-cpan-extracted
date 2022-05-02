@@ -1,6 +1,6 @@
 package Net::IPAM::Block;
 
-our $VERSION = '5.01';
+our $VERSION = '5.10';
 
 use 5.10.0;
 use strict;
@@ -144,6 +144,17 @@ sub to_string {
   }
 
   return $self->{base}->to_string . '-' . $self->{last}->to_string;
+}
+
+=head2 TO_JSON
+
+helper method for JSON serialization, just calls $block->to_string.
+See also L<JSON/OBJECT SERIALISATION>.
+
+=cut
+
+sub TO_JSON {
+  $_[0]->to_string;
 }
 
 =head2 is_cidr

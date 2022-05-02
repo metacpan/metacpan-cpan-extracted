@@ -6,7 +6,7 @@ use FindBin '$Bin';
 use lib "$Bin";
 use JST;
 
-my $port = '9996';
+my $port = empty_port ();
 my $pid = fork ();
 if ($pid) {
     sleep (1);

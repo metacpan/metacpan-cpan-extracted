@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+use v5.10;
+use warnings;
+use strict;
+use Try::Tiny;
+use JSON::MaybeXS qw( decode_json );
+use Data::Dumper;
+
+my $code = $ARGV[0] || 'print Dumper($j)';
+
+my $stdin = do { local $/; <STDIN> };
+
+my $j = try { decode_json($stdin) }
+    catch { die "Error: Malformed JSON: $_\n" };
+
+try { eval $code }
+    catch { die "Error with function: $_\n" };

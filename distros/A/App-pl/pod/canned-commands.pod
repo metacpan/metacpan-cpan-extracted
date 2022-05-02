@@ -1,0 +1,154 @@
+=head1 NAME
+
+pl-canned-commands - Perl One-Liner Canned Commands
+
+=head1 CANNED COMMANDS
+
+I<If canned goods expire, are they canned bads? (-:>
+
+It's nice to have so many L<https://metacpan.org/dist/App-pl/view/pod/examples.pod>, but copying some of the more frequently
+used ones in time of need would be cumbersome.  There are better ways!
+
+So let's explore two ways to make them more accessible from the Shell.  You
+can put these in one of your Shell startup files like F<.bashrc> to have them
+permanently available.  The first, more compact, but also limited, way is with
+L<aliases|/Shell Aliases>.  The second, more flexible and powerful, way is
+with L<functions|/Shell Functions>.  However, they require more or less Shell
+prgramming know how, depending on how flexible you want them to be.
+
+=head2 Shell Aliases
+
+I<That smart pig's alias is Mr. Cunning Ham. :)>
+
+Right in the spirit of one-liners are Shell aliases.  These have drawbacks:
+
+=over
+
+=item *
+
+They will usually need to be quoted.  If you pass in Perl code containing
+dollar signs, they should be single quoted to protect them from the Shell when
+running and yet again to protect them from the Shell when defining the alias.
+
+=item *
+
+Their value simply literally replaces that one word at the beginning of a command.
+So arguments can be added only at the end.
+
+=item *
+
+Your IDE might not give you syntax highlighting for the value.
+
+=back
+
+Either you can alias just initial options you use frequently.  In that case
+you'd give some Perl code when invoking the alias, e.g. here to process the
+output of find:
+
+    alias pl0='pl -nl0'
+    find -type f -print0 |
+        pl0 '...'
+
+Or you alias a full command, in which case only the run-time arguments will be
+passed in C<@A(RGV)>.  Since there are no dollars it doesn't matter which
+quote type you embed within the other:
+
+    alias hosts="pl 'hosts @ARGV'"
+    alias h="pl 'h @A'"
+
+Here's an unnecessarily complex example where both the inner and outer strings
+need single quoting.  We clumsily achieve that by leaving the outer single
+quoted string, appending a backslashed single quote and reentering the single
+quote again.  Possible, but a L<function|/Shell Functions> would have been more
+readable here:
+
+    alias whereis='pl '\''$p = $ENV{PATH} =~ s!/*:!,!gr;
+        @x = grep { -f && -x } map <{$p}/$_>, @ARGV;
+        exec ls => -fl => @x if @x'\'
+    alias whereis='pl '\''$p = $ENV{PATH} =~ s!/*:!,!gr;
+        @x = grep { -f && -x } map <{$p}/$_>, @A;
+        exec ls => -fl => @x if @x'\'
+
+Here are a few of the key-based L<diff examples|examples/Diff Several Inputs
+by a Unique Key>.  The 3rd name is unfortunate, as csv commonly means "comma
+separated values", so "c" for "colon" was taken.  That name might not work in
+all Shells, in which case you could use "diffCsv":
+
+    alias diffcsv="pl -nB 'echo for @ARGV' 'k if s/(.+?),//'"
+    alias difftsv="pl -nB 'echo for @ARGV' 'k if s/(.+?)\t//'"
+    alias diff:sv="pl -nB 'echo for @ARGV' 'k if s/^([^#].*?)://'"
+    alias diffelf='pl -OB "echo for @ARGV" '\''p { k $2 if s/^\t((.+)\.so.* => .*) \(\w+\)/$1/ } ldd => $ARGV'\'
+    alias diffcsv="pl -nB 'e for @A' 'k if s/(.+?),//'"
+    alias difftsv="pl -nB 'e for @A' 'k if s/(.+?)\t//'"
+    alias diff:sv="pl -nB 'e for @A' 'k if s/^([^#].*?)://'"
+    alias diffelf='pl -OB "e for @A" '\''p { k $2 if s/^\t((.+)\.so.* => .*) \(\w+\)/$1/ } ldd => $A'\'
+
+We can import some of the pl functionality directly to the Shell.  My
+favourite is the smart C<e(cho)>, only by short name to avoid collision.
+Shell meta-characters like C<*> need quoting.  I chose to treat multiple
+arguments as though they were one, therefore needing a comma if I have more
+than one expression.  Since the expression needs C<eval> I can even have
+multiple statements, the last one being the list that C<e(cho)> sees:
+
+    alias e="pl 'e eval qq{@A}; die \$@ if \$@'"
+    e 10 / 3, '7 * 3'
+    e '$x = 5; 10 / $x, $x * 2'
+
+    >   3.33333333333333 21
+    >   2 10
+
+=head2 Shell Functions
+
+I<I can't function without my glasses.  Especially when they are empty! 8-)>
+
+Functions (here using the classical syntax understood by various Shells)
+directly contain normal Shell code.  So they avoid the double quoting problem
+of L<aliases|/Shell Aliases>.  In the simplest case, you just wrap any pl
+command like this, with a special sigil meaning pass the function's parameters
+to pl here:
+
+    somename() {
+        pl ... "$@"
+    }
+
+Some more key-based L<diff examples|examples/Diff Several Inputs by a Unique
+Key> can be jazzed up as functions.  That way we can have options, like B<-d>
+for "eliminate date" or for zip B<-x> for "extract hex part of file name".
+
+    diffzip() {
+        local prg='if s/ [0-9a-f]{8}\K  (.+)//'
+        if [ "x$1" = x-x ]; then        # randomized hex web resource
+            shift
+            prg='$n if s/.{16} ([0-9a-f]{8})  (.+?)(?:\.([0-9a-f]{20})(\..[a-z]+))?$/if( $3 ) { $n = "$2.\$x$4"; "$1  \$x=$3" } else { $n = $2; $1 }/e'
+        elif [ "x$1" = x-d ]; then      # undate
+            shift
+            prg='$2 if s/.{16} ([0-9a-f]{8})  (.+)/$1/'
+        fi
+        pl -oB 'echo for @ARGV' 'piped { keydiff '"$prg"' } "unzip", "-vqq", $_' "$@"
+    }
+    difftar() {
+        local prg='s/^\S+ \K(.+?) +(\d+) (.{16}) (.+)/sprintf "%-20s %10d %s", $1, $2, $3/e; keydiff $4'
+        if [ "x$1" = x-d ]; then      # undate
+            shift
+            prg='s/^\S+ \K(.+?) +(\d+) .{16} (.+)/sprintf "%-20s %10d", $1, $2/e; keydiff $3'
+        fi
+        pl -oB 'echo for @ARGV' 'piped { '"$prg"' } "tar", "-tvf", $_' "$@"
+    }    diffzip() {
+        local prg='if s/ [0-9a-f]{8}\K  (.+)//'
+        if [ "x$1" = x-x ]; then        # randomized hex web resource
+            shift
+            prg='$n if s/.{16} ([0-9a-f]{8})  (.+?)(?:\.([0-9a-f]{20})(\..[a-z]+))?$/if( $3 ) { $n = "$2.\$x$4"; "$1  \$x=$3" } else { $n = $2; $1 }/e'
+        elif [ "x$1" = x-d ]; then      # undate
+            shift
+            prg='$2 if s/.{16} ([0-9a-f]{8})  (.+)/$1/'
+        fi
+        pl -oB 'e for @A' 'p { k '"$prg"' } "unzip", "-vqq", $_' "$@"
+    }
+    difftar() {
+        local prg='s/^\S+ \K(.+?) +(\d+) (.{16}) (.+)/sprintf "%-20s %10d %s", $1, $2, $3/e; k $4'
+        if [ "x$1" = x-d ]; then      # undate
+            shift
+            prg='s/^\S+ \K(.+?) +(\d+) .{16} (.+)/sprintf "%-20s %10d", $1, $2/e; k $3'
+        fi
+        pl -oB 'e for @A' 'p { '"$prg"' } "tar", "-tvf", $_' "$@"
+    }

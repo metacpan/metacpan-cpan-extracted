@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
 use v5.26; # signatures
-use Object::Pad 0.27;
+use Object::Pad 0.57;
 
-package Device::Chip::NoritakeGU_D 0.03;
+package Device::Chip::NoritakeGU_D 0.04;
 class Device::Chip::NoritakeGU_D
-   extends Device::Chip;
+   :isa(Device::Chip);
 
 use Carp;
 
@@ -62,19 +62,15 @@ my %INTERFACES = (
    UART => 1, I2C => 1, SPI => 1,
 );
 
-has $_protocol;
+has $_protocol  :param(interface);
 has $_interface;
 
-BUILD ( %params )
+ADJUST
 {
-   my $interface = delete $params{interface} or
-      croak "Require an interface parameter";
-   $INTERFACES{$interface} or
-      croak "Unrecognised interface type '$interface'";
+   $INTERFACES{$_protocol} or
+      croak "Unrecognised interface type '$_protocol'";
 
-   $_protocol = $interface;
-
-   my $iface_class = __PACKAGE__."::_Iface::$interface";
+   my $iface_class = __PACKAGE__."::_Iface::$_protocol";
    $_interface = $iface_class->new;
 }
 

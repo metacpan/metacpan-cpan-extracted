@@ -1,5 +1,11 @@
 Revision history for Net-IPAM-IP
 
+3.10    Wed, 27 Apr 2022 14:45:27 +0200
+        * add serialization method TO_JSON
+
+3.00    Sun Feb 7 14:43:45 2021 +0100
+        * better version handling
+
 2.10    Sun, 07 Feb 2021 14:33:55 +0100
         * less complex version handling, maybe even faster
 

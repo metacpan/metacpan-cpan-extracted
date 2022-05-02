@@ -428,3 +428,9 @@ Revision history for StreamFinder
         regardless of -keep order).
         - StreamFinder::Podbean - Fix doc. that said that a full URL was 
         required - the module allows for only an ID to be specified.
+1.83    2022/04/28
+        - Add StreamFinder::BrandNewTube (brandnewtube.com videos)
+1.84    2022/04/29
+        - Add StreamFinder::PodcastAddict (podcastaddict.com podcasts)
+        - Improve module-selection speed/efficiency (only require in module 
+        matching URL, instead of all modules).

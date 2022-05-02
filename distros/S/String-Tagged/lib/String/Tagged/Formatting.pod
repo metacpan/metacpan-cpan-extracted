@@ -89,6 +89,11 @@ bidirectionally to this format.
 L<String::Tagged::Terminal> - build terminal control sequences for message
 formatting and convert bidirectionally to this format.
 
+=item *
+
+L<Tickit::Widget::Scroller::Item::RichText> - has a constructor method that
+takes an instance of a tagged string in this format.
+
 =back
 
 =head1 AUTHOR

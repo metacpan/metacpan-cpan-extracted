@@ -1,6 +1,29 @@
 Change log for Sys::OsRelease
 
-0.0.2 2022-04-26T23:23:40-07:00 America/Los_Angeles
+0.2.0 2022-04-28T22:57:58-07:00 America/Los_Angeles
+ [ENHANCEMENTS]
+ - add import_singleton() so new module Sys::OsPackage can import rather
+   than copy the singleton-management methods
+
+0.1.1 2022-04-28T16:04:09Z America/Los_Angeles
+ [REVISION]
+ - based on CPAN Testers feedback, remove occurrences of // operator which
+   did not exist prior to Perl 5.10 (in keeping with module's minimal
+   prerequisites)
+
+0.1.0 2022-04-27T14:47:00Z America/Los_Angeles
+ [BUG FIXES]
+ - all methods now correctly handle being called via class name in addition
+   to instance reference
+
+ [MINOR]
+ - prefixed "_" on private internal method names
+
+ [REVISION]
+ - added tests for method calls from the class name in addition to object
+   reference
+
+0.0.2 2022-04-26T23:22:00Z America/Los_Angeles
  [BUG FIXES]
  - fix from CPAN Testers results: on mswin32 init empty rather than bail
    out

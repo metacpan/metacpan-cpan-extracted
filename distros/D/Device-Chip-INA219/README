@@ -41,6 +41,15 @@ METHODS
 
     Reads and returns the current chip configuration as a HASH reference.
 
+       RST        => BOOL
+       BRNG       => "16V" | "32V"
+       PG         => "40mV" | "80mV" | "160mV" | "320mV"
+       BADC       => "9b" | "10b" | "11b" | "12b" | 1 | 2 | 4 | 8 | 16 | 32 | 64 | 128
+       SADC       => as above
+       MODE_CONT  => BOOL
+       MODE_BUS   => BOOL
+       MODE_SHUNT => BOOL
+
  change_config
 
        await $chip->change_config( %config );

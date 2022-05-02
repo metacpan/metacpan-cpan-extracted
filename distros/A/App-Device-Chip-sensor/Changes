@@ -1,5 +1,15 @@
 Revision history for App-Device-Chip-sensor
 
+0.04    2022-04-28
+        [CHANGES]
+         * Also accept -M for mountparam options to chip arguments
+         * Use the :isa and :does of Object::Pad 0.57 to avoid `extends` and
+           `implements`
+
+        [BUGFIXES]
+         * Declare dependency on Device::Chip::Sensor 0.19 (RT139813)
+         * Declare dependency on Future::AsyncAwait (RT139814)
+
 0.03    2021-10-22
         [CHANGES]
          * Added a --best-effort mode where failures are presumed temporary

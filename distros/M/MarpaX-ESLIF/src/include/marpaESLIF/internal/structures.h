@@ -59,6 +59,8 @@ typedef struct  marpaESLIF_lua_functiondecl      marpaESLIF_lua_functiondecl_t;
 typedef enum    marpaESLIF_json_type             marpaESLIF_json_type_t;
 typedef struct  marpaESLIF_pcre2_callout_context marpaESLIF_pcre2_callout_context_t;
 typedef struct  marpaESLIFGrammar_Lshare         marpaESLIFGrammar_Lshare_t;
+typedef struct  marpaESLIF_grammar_bootstrap     marpaESLIF_grammar_bootstrap_t;
+typedef struct  marpaESLIFGrammar_bootstrap      marpaESLIFGrammar_bootstrap_t;
 
 #include "marpaESLIF/internal/lua.h" /* For lua_State* */
 
@@ -130,7 +132,8 @@ enum marpaESLIF_terminal_type {
   MARPAESLIF_TERMINAL_TYPE_REGEX,    /* Regular expression */
   MARPAESLIF_TERMINAL_TYPE__EOF,     /* :eof */
   MARPAESLIF_TERMINAL_TYPE__EOL,     /* :eol */
-  MARPAESLIF_TERMINAL_TYPE__SOL      /* :sol */
+  MARPAESLIF_TERMINAL_TYPE__SOL,     /* :sol */
+  MARPAESLIF_TERMINAL_TYPE__EMPTY    /* :empty */
 };
 
 /* Regex modifiers - we take JPCRE2 matching semantics, c.f. https://neurobin.org/projects/softwares/libs/jpcre2/ */
@@ -180,6 +183,8 @@ struct marpaESLIF_regex {
 };
 
 struct marpaESLIF_terminal {
+  char                          *utf8s;               /* Original UTF-8 input to _marpaESLIF_terminal_new() */
+  size_t                         utf8l;               /* Original UTF-8 input length to _marpaESLIF_terminal_new() */
   int                            idi;                 /* Terminal Id */
   marpaESLIF_string_t           *descp;               /* Terminal description */
   char                          *modifiers;           /* Modifiers */
@@ -334,19 +339,17 @@ struct marpaESLIF_grammar {
   short                  discardIsFallbackb;                 /* discard is fallback mode */
   marpaWrapperGrammar_t *marpaWrapperGrammarStartp;          /* Grammar implementation at :start */
   marpaWrapperGrammar_t *marpaWrapperGrammarStartNoEventp;   /* Grammar implementation at :start forcing no event */
-  size_t                 nSymboll;                           /* Total number of accessible terminals */
+  size_t                 nTerminall;                         /* Total number of accessible terminals */
   marpaESLIF_symbol_t  **symbolArraypp;                      /* Total accessible grammar terminal (Symbols sorted by priority) */
   marpaESLIF_symbol_t  **willFailsymbolArraypp;              /* Workarea for total accessible grammar terminals predicted to fail */
-  size_t                 nSymbolDiscardl;                    /* Total number of discard accessible terminals */
-  marpaESLIF_symbol_t  **symbolArrayDiscardpp;               /* Total accessible grammar terminal (Symbols sorted by priority) */
-  size_t                 nSymbolPristinel;                   /* Number of lexemes at the very beginning of marpaWrapperGrammarStartp */
-  int                   *symbolIdArrayPristinep;             /* Lexemes at the very beginning of marpaWrapperGrammarStartp (Ids sorted by priority) */
-  marpaESLIF_symbol_t  **symbolArrayPristinepp;              /* Lexemes at the very beginning of marpaWrapperGrammarStartp (Symbols sorted by priority) */
+  size_t                 nTerminalPristinel;                 /* Number of terminals at the very beginning of marpaWrapperGrammarStartp */
+  int                   *terminalIdArrayPristinep;           /* Terminals at the very beginning of marpaWrapperGrammarStartp (Ids sorted by priority) */
+  marpaESLIF_symbol_t  **terminalArrayPristinepp;            /* Terminals at the very beginning of marpaWrapperGrammarStartp (Symbols sorted by priority) */
   marpaWrapperGrammar_t *marpaWrapperGrammarDiscardp;        /* Grammar implementation at :discard */
   marpaWrapperGrammar_t *marpaWrapperGrammarDiscardNoEventp; /* Grammar implementation at :discard forcing no event */
-  size_t                 nSymbolDiscardPristinel;            /* Number of lexemes at the very beginning of marpaWrapperGrammarDiscardp */
-  int                   *symbolIdArrayDiscardPristinep;      /* Lexemes at the very beginning of marpaWrapperGrammarStartp (Ids) */
-  marpaESLIF_symbol_t  **symbolArrayDiscardPristinepp;       /* Lexemes at the very beginning of marpaWrapperGrammarStartp (Symbols ordered by priority) */
+  size_t                 nTerminalDiscardPristinel;          /* Number of lexemes at the very beginning of marpaWrapperGrammarDiscardp */
+  int                   *terminalIdArrayDiscardPristinep;    /* Terminals at the very beginning of marpaWrapperGrammarStartp (Ids) */
+  marpaESLIF_symbol_t  **terminalArrayDiscardPristinepp;     /* Terminals at the very beginning of marpaWrapperGrammarStartp (Symbols ordered by priority) */
   marpaESLIF_symbol_t   *discardp;                           /* Discard symbol, used at grammar validation */
   genericStack_t         _symbolStack;                       /* Stack of symbols */
   genericStack_t        *symbolStackp;                       /* Pointer to stack of symbols */
@@ -372,8 +375,8 @@ struct marpaESLIF_grammar {
   short                  fastDiscardb;                       /* True when :discard can be done in the context of the current recognizer */
   marpaESLIF_symbol_t  **allSymbolsArraypp;                  /* For fast access to symbols, they are all flatened here */
   marpaESLIF_rule_t    **allRulesArraypp;                    /* For fast access to rules, they are all flatened here */
-  int                   *expectedSymbolIdArrayp;             /* Total list of expected symbol ids sorted by priority */
-  marpaESLIF_symbol_t  **expectedSymbolArraypp;              /* Total list of expected symbols sorted by priority */
+  int                   *expectedTerminalIdArrayp;           /* Total list of expected symbol ids sorted by priority */
+  marpaESLIF_symbol_t  **expectedTerminalArraypp;            /* Total list of expected terminals sorted by priority */
 };
 
 enum marpaESLIF_json_type {
@@ -457,6 +460,7 @@ struct marpaESLIFGrammar {
   short                      hasEofPseudoTerminalb; /* Any :eof terminal in the grammar ? */
   short                      hasEolPseudoTerminalb; /* Any :eol terminal in the grammar ? */
   short                      hasSolPseudoTerminalb; /* Any :sol terminal in the grammar ? */
+  short                      hasEmptyPseudoTerminalb; /* Any :empty terminal in the grammar ? */
   genericHash_t              _lexemeGrammarHash; /* Cache of string <=> lexeme grammars */
   genericHash_t             *lexemeGrammarHashp;
   short                      hasLookaheadMetab;  /* Any lookahead meta in the grammar ? */
@@ -471,22 +475,25 @@ struct marpaESLIFGrammar {
   /* By definition a grammar is the owner of the singleton if *Lsharep == &_Lshare.               */
   marpaESLIFGrammar_Lshare_t _Lshare;
   marpaESLIFGrammar_Lshare_t *Lsharep;
+
+  marpaESLIFGrammar_bootstrap_t *marpaESLIFGrammar_bootstrapp;
 };
 
 struct marpaESLIF_meta {
   int                            idi;                             /* Non-terminal Id */
   char                          *asciinames;
   marpaESLIF_string_t           *descp;                           /* Meta description */
-  marpaWrapperGrammar_t         *marpaWrapperGrammarLexemeClonep; /* Cloned low-level grammar in lexeme search mode (no event) */
+  marpaWrapperGrammar_t         *marpaWrapperGrammarStartp;       /* Cloned low-level grammar starting at idi */
+  marpaWrapperGrammar_t         *marpaWrapperGrammarStartNoEventp; /* Cloned low-level grammar starting at idi (no event) */
   int                            lexemeIdi;                       /* Lexeme Id in this cloned grammar */
   short                         *prioritizedb;                    /* Internal flag to prevent a prioritized symbol to appear more than once as an LHS */
   marpaESLIFGrammar_t           _marpaESLIFGrammarLexemeClone;    /* Cloned ESLIF grammar in lexeme search mode (no event): allocated when meta is allocated */
   marpaESLIF_grammar_t          _grammar;
   marpaESLIFGrammar_t           *marpaESLIFGrammarLexemeClonep;   /* Cloned ESLIF grammar in lexeme search mode (no event) */
-  size_t                         nSymbolPristinel;                /* Number of lexemes at the very beginning of marpaWrapperGrammarStartp */
-  int                           *symbolIdArrayPristinep;          /* Grammar terminals at the very beginning of marpaWrapperGrammarStartp (Ids sorted by priority) */
-  marpaESLIF_symbol_t          **symbolArrayPristinepp;           /* Grammar terminals at the very beginning of marpaWrapperGrammarStartp (Symbols sorted by priority) */
-  size_t                         nSymboll;                        /* Number of grammar terminals of marpaWrapperGrammarp */
+  size_t                         nTerminalPristinel;              /* Number of terminals at the very beginning of marpaWrapperGrammarStartp */
+  int                           *terminalIdArrayPristinep;        /* Grammar terminals at the very beginning of marpaWrapperGrammarStartp (Ids sorted by priority) */
+  marpaESLIF_symbol_t          **terminalArrayPristinepp;         /* Grammar terminals at the very beginning of marpaWrapperGrammarStartp (Symbols sorted by priority) */
+  size_t                         nTerminall;                      /* Number of grammar terminals of marpaWrapperGrammarp */
   marpaESLIF_symbol_t          **symbolArraypp;                   /* Grammar terminals of marpaWrapperGrammarp (Symbols sorted by priority) */
   marpaESLIF_symbol_t          **willFailsymbolArraypp;           /* Workarea for total accessible grammar terminals predicted to fail */
   short                          lazyb;                           /* Meta symbol is lazy - for internal usage only at bootstrap */
@@ -522,6 +529,7 @@ struct marpaESLIFValue {
   char                        *luaprecompiledp;    /* Lua script source precompiled */
   size_t                       luaprecompiledl;    /* Lua script source precompiled length in byte */
   short                        hideSeparatorb;     /* Hook for internal ::row and ::table actions to process more efficiently hide-separator adverb */
+  short                        isLexemeb;          /* Special mode for true lexemes: caller did not mind about valuation, just the number of bytes consumed up to completion */
 };
 
 struct marpaESLIF_stream {
@@ -543,10 +551,10 @@ struct marpaESLIF_stream {
   short                  noAnchorIsOkb;        /* Flag to say if the "A" flag in regexp modifiers is allowed: removing PCRE2_ANCHOR is allowed ONLY is the whole stream was read once */
   char                  *encodings;            /* Current encoding. Always != NULL when charconvb is true. Always NULL when charconvb is false. */
   tconv_t                tconvp;               /* current converter. Always != NULL when charconvb is true. Always NULL when charconvb is false. */
-  size_t                 linel;                /* Line number */
-  size_t                 columnl;              /* Column number */
   short                  bomdoneb;             /* In char mode, flag indicating if BOM was processed successfully (BOM existence or not) */
   unsigned int           peeki;                /* Number of peeked sharing */
+  size_t                 linel;                /* Line number */
+  size_t                 columnl;              /* Column number */
 };
 
 struct marpaESLIFRecognizer {
@@ -575,9 +583,12 @@ struct marpaESLIFRecognizer {
   marpaESLIF_symbol_t         *discardSymbolp;    /* Ditto */
   int                          resumeCounteri;    /* Internal counter for tracing - no functional impact */
   int                          callstackCounteri; /* Internal counter for tracing - no functional impact */
+  int                          callstackCounterGlobali; /* Internal counter for tracing - no functional impact */
 
   int                          leveli;         /* Recognizer level (!= grammar level) */
-  size_t                       parentDeltal;   /* Parent original delta - used to recovert parent current pointer at our free */
+  size_t                       parentDeltal;   /* Parent original delta - used to recover parent current pointer at our free */
+  size_t                       parentLinel;    /* Parent original linel - used to recover parent line number our free */
+  size_t                       parentColumnl;  /* Parent original columnl - used to recover parent column number our free */
   /* Current recognizer states */
   short                        scanb;          /* Prevent resume before a call to scan */
   short                        noEventb;       /* No event mode */
@@ -619,12 +630,12 @@ struct marpaESLIFRecognizer {
   void                        *marpaESLIFLuaRecognizerContextp;
 
   /* For pristine recognizers, expected terminals are always known in advance */
-  size_t                       nSymbolPristinel;
-  int                         *symbolIdArrayPristinep; /* This is a shallow pointer! */
-  marpaESLIF_symbol_t        **symbolArrayPristinepp; /* This is a shallow pointer! */
+  size_t                       nTerminalPristinel;
+  int                         *terminalIdArrayPristinep; /* This is a shallow pointer! */
+  marpaESLIF_symbol_t        **terminalArrayPristinepp; /* This is a shallow pointer! */
 
   /* Accessible terminals */
-  size_t                       nSymboll;
+  size_t                       nTerminall;
   int                         *symbolIdArrayp; /* This is a shallow pointer! */
 
   /* Last discard information is NOT available via last_complete because it is not */
@@ -667,6 +678,12 @@ struct marpaESLIFRecognizer {
   marpaESLIFAction_t             *popContextActionp;  /* Getting the context is a common function that is stored at recognizer level */
 
   marpaESLIFRecognizer_t         *marpaESLIFRecognizerSharedp;
+
+  /* A flag to remember if we are in the last_discard_loop mode */
+  short                           last_discard_loopb;
+
+  /* Proxy generic logger */
+  genericLogger_t                *genericLoggerp;
 };
 
 struct marpaESLIF_symbol_data {
@@ -682,10 +699,11 @@ struct marpaESLIF_symbol_data {
    - when this is a top-level recognizer, everything is allocated on the heap.
 */
 struct marpaESLIF_alternative {
-  marpaESLIF_symbol_t *symbolp;                  /* Associated symbol - shallow pointer */
-  marpaESLIFValueResult_t marpaESLIFValueResult; /* Associated value */
-  int                     grammarLengthi;        /* Length within the grammar (1 in the token-stream model) */
-  short                   usedb;                 /* Is this structure in use ? */
+  marpaESLIF_symbol_t     *symbolp;               /* Associated symbol - shallow pointer */
+  marpaESLIFValueResult_t  marpaESLIFValueResult; /* Associated value */
+  int                      grammarLengthi;        /* Length within the grammar (1 in the token-stream model) */
+  short                    usedb;                 /* Is this structure in use ? */
+  size_t                   matchedLengthl;        /* Number of bytes that matched */
 };
 
 /* ------------------------------- */
@@ -768,6 +786,44 @@ struct marpaESLIF_lua_functiondecl {
   char   *luaparlists;
   short   luaparlistcb;
   int     sizei;   /* Number of parameters */
+};
+
+struct marpaESLIF_grammar_bootstrap {
+  marpaESLIFGrammar_bootstrap_t *marpaESLIFGrammarBootstrapp;
+  marpaWrapperGrammar_t         *marpaWrapperGrammarStartp;          /* Grammar implementation at :start */
+  unsigned int                   nbupdatei;                          /* Number of updates - used in grammar ESLIF actions */
+  int                            leveli;                             /* Grammar level */
+  short                          latmb;                              /* Longest acceptable token match mode */
+  marpaESLIF_string_t           *descp;                              /* Grammar description */
+  short                          descautob;                          /* True if alternative name was autogenerated */
+  short                          discardIsFallbackb;                 /* discard is fallback mode */
+  marpaESLIFAction_t            *defaultRuleActionp;                 /* Default action for rules */
+  marpaESLIFAction_t            *defaultSymbolActionp;               /* Default action for symbols */
+  marpaESLIFAction_t            *defaultEventActionp;                /* Default action for events */
+  marpaESLIFAction_t            *defaultRegexActionp;                /* Default regex action, applies to all regexes of a grammar */
+  char                          *defaultEncodings;                   /* Default encoding is reader returns NULL */
+  char                          *fallbackEncodings;                  /* Fallback encoding is reader returns NULL and tconv fails to detect encoding */
+  genericStack_t                 _symbolStack;                       /* Stack of symbols */
+  genericStack_t                *symbolStackp;                       /* Pointer to stack of symbols */
+  genericStack_t                 _ruleStack;                         /* Stack of rules */
+  genericStack_t                *ruleStackp;                         /* Pointer to stack of rules */
+};
+
+struct marpaESLIFGrammar_bootstrap {
+  genericStack_t             _grammarBootstrapStack; /* Stack of marpaESLIF_grammar_bootstrap_t */
+  genericStack_t            *grammarBootstrapStackp; /* Pointer to stack of marpaESLIF_grammar_bootstrap_t */
+  short                      warningIsErrorb;        /* Current warningIsErrorb setting (used when parsing grammars ) */
+  short                      warningIsIgnoredb;      /* Current warningIsErrorb setting (used when parsing grammars ) */
+  short                      autorankb;              /* Current autorank setting */
+  char                      *luabytep;               /* Lua script source */
+  size_t                     luabytel;               /* Lua script source length in byte */
+  int                        internalRuleCounti;     /* Internal counter when creating internal rules (groups '(-...-)' and '(...)' */
+  short                      hasPseudoTerminalb;     /* Any pseudo terminal in the grammar ? */
+  short                      hasEofPseudoTerminalb;  /* Any :eof terminal in the grammar ? */
+  short                      hasEolPseudoTerminalb;  /* Any :eol terminal in the grammar ? */
+  short                      hasSolPseudoTerminalb;  /* Any :sol terminal in the grammar ? */
+  short                      hasEmptyPseudoTerminalb; /* Any :empty terminal in the grammar ? */
+  short                      hasLookaheadMetab;      /* Any lookahead meta in the grammar ? */
 };
 
 #include "marpaESLIF/internal/eslif.h"

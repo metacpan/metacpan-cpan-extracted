@@ -1,3 +1,10 @@
+0.012   2022-05-01  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Clarify the 'proxy' terminology (GH#1).
+
+
 0.011   2022-01-21  Released-By: PERLANCAR; Urgency: high
 
 	- [bugfix] Fix inserting/updating post ID.

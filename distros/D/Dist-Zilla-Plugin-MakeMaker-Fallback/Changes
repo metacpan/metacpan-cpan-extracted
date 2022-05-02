@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-MakeMaker-Fallback
 
+0.032     2022-04-30 19:48:38Z
+          - revert the use of List::Keywords, for now
+
 0.031     2022-04-15 02:43:29Z
           - warn about a possible missing [ShareDir]
 

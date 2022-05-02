@@ -8,7 +8,7 @@ Author tests for the Perl module L<Util::H2O>.
 
 =head1 Author, Copyright, and License
 
-Copyright (c) 2020-2021 Hauke Daempfling (haukex@zero-g.net).
+Copyright (c) 2020-2022 Hauke Daempfling (haukex@zero-g.net).
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl 5 itself.
@@ -131,10 +131,14 @@ END_CODE
 	}, "bar\nworld!\nbeans\n0.927\n", 'output of synopsis correct';
 };
 
-subtest 'cookbook code' => sub { plan tests=>21;
+subtest 'cookbook code' => sub { plan tests=>22;
 	my $codes = getverbatim($PERLFILES[0], qr/\b(?:cookbook)\b/i);
-	is @$codes, 6, 'verbatim block count';
-	my ($c_cfg,$c_db1,$c_db2,$c_auto,$c_up1,$c_up2) = @$codes;
+	is @$codes, 7, 'verbatim block count';
+	my ($c_map,$c_cfg,$c_db1,$c_db2,$c_auto,$c_up1,$c_up2) = @$codes;
+	# pairmap
+	is capture_merged {
+		eval "{ use warnings; use strict; $c_map\n;1}" or die $@;  ## no critic (ProhibitStringyEval, RequireCarping)
+	}, "123456\n", 'pairmap example output correct';
 	# Config::Tiny
 	is capture_merged {
 		my ($tfh, $config_filename) = tempfile(UNLINK=>1);

@@ -1,5 +1,3 @@
-# $Id: Z80.pm,v 1.56 2008/06/13 14:42:08 drhyde Exp $
-
 package CPU::Emulator::Z80;
 
 use strict;
@@ -7,7 +5,7 @@ use warnings;
 
 use vars qw($VERSION %INSTR_LENGTHS %INSTR_DISPATCH);
 
-$VERSION = '1.0';
+$VERSION = '1.01';
 
 $SIG{__WARN__} = sub {
     warn(__PACKAGE__.": $_[0]\n");
@@ -783,7 +781,8 @@ sub stopped {
 # fetch all the bytes for an instruction and return them
 sub _fetch {
     my $self = shift;
-    my $pc = $self->register('PC')->get();
+    my $pcREG = $self->register('PC');
+    my $pc = $pcREG->get();
     
     $self->register('R')->inc() # don't inc for DDCB and FDCB
         unless(
@@ -799,7 +798,7 @@ sub _fetch {
         $self->{instr_dispatch_table} = $self->{instr_dispatch_table}->{$byte};
         $self->{instr_length_table} = $self->{instr_length_table}->{$byte};
         push @{$self->{prefix_bytes}}, $byte;
-        $self->register('PC')->inc(); # set($pc + 1);
+        $pcREG->inc(); # set($pc + 1);
         return $self->_fetch();
     }
 
@@ -812,7 +811,7 @@ sub _fetch {
     )) if($bytes_to_fetch eq 'UNDEFINED');
 
     push @bytes, map { $self->memory()->peek($pc + $_) } (1 .. $bytes_to_fetch - 1);
-    $self->register('PC')->set($pc + $bytes_to_fetch);
+    $pcREG->set($pc + $bytes_to_fetch);
     return @bytes;
 }
 
@@ -898,7 +897,7 @@ sub _RES_SET {
         _LD_indHL_r8($self, 'W', $d) if($r eq '(HL)');
         _LD_r8_r8($self, $realr, 'W');
     } else {
-        _LD_r8_indHL($self, 'W', $d);
+        _LD_r8_indHL($self, 'W', $d) if($r eq '(HL)');
         $self->register($r)->set(            # RES by default
             $self->register($r)->get() & (255 - 2**$bit)
         );
@@ -940,18 +939,23 @@ sub _binop {
     #     _LD_r8_ind($self, 'W', @addr);
     #     $r2 = 'W';
     # }
-    $self->register($r1)->set(eval
-        '$self->register($r1)->get() '.$op.' $self->register($r2)->get()'
-    );
-    die($@) if($@);
-    $self->register('F')->setS($self->register($r1)->get() & 0x80);
-    $self->register('F')->setZ($self->register($r1)->get() == 0);
-    $self->register('F')->set5($self->register($r1)->get() & 0b100000);
-    $self->register('F')->setH($op eq '&');
-    $self->register('F')->set3($self->register($r1)->get() & 0b1000);
-    $self->register('F')->setP(ALU_parity($self->register($r1)->get()));
-    $self->register('F')->resetN();
-    $self->register('F')->resetC();
+
+    my $aREG = $self->register($r1);
+    my $fREG = $self->register('F');
+
+    $op eq '&' ? $aREG->set($aREG->get() & $self->register($r2)->get()) :
+    $op eq '|' ? $aREG->set($aREG->get() | $self->register($r2)->get()) :
+    $op eq '^' ? $aREG->set($aREG->get() ^ $self->register($r2)->get()) :
+      die("unknown binop: $op\n");
+
+    $fREG->setS($aREG->get() & 0x80);
+    $fREG->setZ($aREG->get() == 0);
+    $fREG->set5($aREG->get() & 0b100000);
+    $fREG->setH($op eq '&');
+    $fREG->set3($aREG->get() & 0b1000);
+    $fREG->setP(ALU_parity($aREG->get()));
+    $fREG->resetN();
+    $fREG->resetC();
 }
 sub _AND_r8_r8 { _binop(@_, '&'); }
 sub _OR_r8_r8  { _binop(@_, '|'); }
@@ -1011,16 +1015,20 @@ sub _EXX {
 sub _DJNZ {
     my($self, $offset) = @_;
 
-    _LD_r8_r8($self, 'W', 'F');          # preserve flags
+    my $fREG  = $self->register('F');
+    my $bREG  = $self->register('B');
+    my $pcREG = $self->register('PC');
 
-    $self->register('B')->dec();         # decrement B and ...
-    if($self->register('B')->get()) {    # jump if not zero
-        $self->register('PC')->set(
-            $self->register('PC')->get() +
+    my $f = $fREG->get(); # preserve flags
+
+    $bREG->dec();         # decrement B and ...
+    if($bREG->get()) {    # jump if not zero
+        $pcREG->set(
+            $pcREG->get() +
             ALU_getsigned($offset, 8)
         );
     }
-    _LD_r8_r8($self, 'F', 'W');          # restore flags
+    $fREG->set($f);       # restore flags
 }
 sub _HALT { shift()->register('PC')->dec(); select(undef, undef, undef, 0.01) }
 sub _INC {
@@ -1205,8 +1213,12 @@ sub _LD_r8_r8 {
     } elsif(defined($d) && $r1 eq '(HL)' && $r2 =~ /^[HL]$/) { # LD (IX/IY+d), H/L
         $r2 .= $self->_got_prefix(0xDD) ? 'IX' : 'IY';
     }
-    my $addr = $self->register('HL')->get() + ALU_getsigned($d, 8);
-    my @addr = ($addr & 0xFF, $addr >> 8);
+
+    my $addr; my @addr; # 'if' optimises away a bunch of ->register->get
+    if($r1 eq '(HL)' || $r2 eq '(HL)') {
+        $addr = $self->register('HL')->get() + ALU_getsigned($d, 8);
+        @addr = ($addr & 0xFF, $addr >> 8);
+    }
     if($r2 eq '(HL)') {
         _LD_r8_ind($self, 'W', @addr);
         $r2 = 'W';
@@ -1718,7 +1730,7 @@ and have been replaced - see "Extra Instructions" above.
 
 I welcome feedback about my code, including constructive criticism
 and bug reports.  The best bug reports include files that I can add
-to the test suite, which fail with the current code in CVS and will
+to the test suite, which fail with the current code and will
 pass once I've fixed the bug.
 
 Feature requests are far more likely to get implemented if you submit
@@ -1732,9 +1744,9 @@ L<CPU::Z80::Assembler>
 
 The FUSE Free Unix Spectrum Emulator: L<http://fuse-emulator.sourceforge.net/>
 
-=head1 CVS
+=head1 SOURCE CODE REPOSITORY
 
-L<http://drhyde.cvs.sourceforge.net/drhyde/perlmodules/CPU-Emulator-Z80/>
+L<git://github.com/DrHyde/perl-modules-CPU-Emulator-Z80.git>
 
 =head1 AUTHOR, COPYRIGHT and LICENCE
 

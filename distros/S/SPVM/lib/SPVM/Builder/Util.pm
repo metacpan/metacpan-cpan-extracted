@@ -10,15 +10,15 @@ use Getopt::Long 'GetOptionsFromArray';
 use List::Util 'min';
 use File::Basename 'dirname';
 use File::Spec;
+use SPVM::Builder::Config;
 
 # SPVM::Builder::Util is used from Makefile.PL
-# so this module must be wrote as pure perl script, not contain XS functions and don't use any other SPVM modules.
+# so this module must be wrote as pure perl script, not contain XS functions.
 
 sub need_generate {
   my ($opt) = @_;
   
-  my $global_force = $opt->{global_force};
-  my $config_force = $opt->{config_force};
+  my $force = $opt->{force};
   my $input_files = $opt->{input_files};
   my $output_file = $opt->{output_file};
   
@@ -69,10 +69,7 @@ sub need_generate {
   }
 
   my $need_generate;
-  if ($global_force) {
-    $need_generate = 1;
-  }
-  elsif ($config_force) {
+  if ($force) {
     $need_generate = 1;
   }
   else {
@@ -270,25 +267,26 @@ sub remove_class_part_from_file {
 sub create_make_rule_native {
   my $class_name = shift;
   
-  create_class_make_rule($class_name, 'native');
+  create_make_rule($class_name, 'native', @_);
 }
 
 sub create_make_rule_precompile {
   my $class_name = shift;
   
-  create_class_make_rule($class_name, 'precompile');
+  create_make_rule($class_name, 'precompile', @_);
 }
 
-sub create_class_make_rule {
-  my ($class_name, $category) = @_;
-
+sub create_make_rule {
+  my ($class_name, $category, $options) = @_;
+  
+  $options ||= {};
   $class_name =~ s/^SPVM:://;
   
   my $module_base_name = $class_name;
   $module_base_name =~ s/^.+:://;
   
-  my $src_dir = 'lib';
-
+  my $lib_dir = defined $options->{lib_dir} ? $options->{lib_dir} : 'lib';
+  
   my $class_rel_file = convert_class_name_to_rel_file($class_name, 'spvm');
   
   my $noext_file = $class_rel_file;
@@ -296,25 +294,27 @@ sub create_class_make_rule {
   
   my $spvm_file = $noext_file;
   $spvm_file .= '.spvm';
-  $spvm_file = "$src_dir/$spvm_file";
+  $spvm_file = "$lib_dir/$spvm_file";
   
-  my $native_c_file = $noext_file;
-  $native_c_file .= '.c';
-  $native_c_file = "$src_dir/$native_c_file";
-
-  my $config_file = $noext_file;
-  $config_file .= '.config';
-  $config_file = "$src_dir/$config_file";
-
   # Dependency files
   my @deps;
   
   # Dependency c source files
-  push @deps, grep { $_ ne '.' && $_ ne '..' } glob "$src_dir/$class_rel_file/*";
+  push @deps, grep { $_ ne '.' && $_ ne '..' } glob "$lib_dir/$class_rel_file/*";
   
   # Dependency module file
   if ($category eq 'native') {
-    push @deps, $spvm_file, $native_c_file, $config_file;
+    my $config_file = $noext_file;
+    $config_file .= '.config';
+    $config_file = "$lib_dir/$config_file";
+    my $config = &load_config($config_file);
+    
+    my $native_file = $noext_file;
+    my $native_file_ext = $config->ext;
+    $native_file .= ".$native_file_ext";
+    $native_file = "$lib_dir/$native_file";
+
+    push @deps, $spvm_file, $native_file, $config_file;
   }
   elsif ($category eq 'precompile') {
     push @deps, $spvm_file;
@@ -357,15 +357,23 @@ sub get_spvm_builder_module_file_names {
 
 sub get_spvm_core_source_file_names {
   
+  my $spvm_core_compiler_only_source_file_names = &get_spvm_core_compiler_only_source_file_names();
+  my $spvm_core_common_source_file_names = &get_spvm_core_common_source_file_names();
+  
+  my @spvm_core_source_file_names = (
+    @$spvm_core_compiler_only_source_file_names,
+    @$spvm_core_common_source_file_names
+  );
+  
+  return \@spvm_core_source_file_names;
+}
+
+sub get_spvm_core_compiler_only_source_file_names {
+  
   my @spvm_core_source_file_names = qw(
-    spvm_allocator.c
     spvm_allow.c
-    spvm_api_allocator.c
-    spvm_api.c
     spvm_api_compiler.c
     spvm_api_precompile.c
-    spvm_api_runtime.c
-    spvm_api_string_buffer.c
     spvm_array_field_access.c
     spvm_basic_type.c
     spvm_block.c
@@ -380,19 +388,13 @@ sub get_spvm_core_source_file_names {
     spvm_dumper.c
     spvm_field_access.c
     spvm_field.c
-    spvm_hash.c
     spvm_interface.c
-    spvm_list.c
     spvm_method.c
-    spvm_native.c
     spvm_op.c
     spvm_op_checker.c
     spvm_opcode_array.c
     spvm_opcode_builder.c
-    spvm_opcode.c
     spvm_precompile.c
-    spvm_runtime.c
-    spvm_string_buffer.c
     spvm_constant_string.c
     spvm_switch_info.c
     spvm_toke.c
@@ -407,6 +409,24 @@ sub get_spvm_core_source_file_names {
   return \@spvm_core_source_file_names;
 }
 
+sub get_spvm_core_common_source_file_names {
+  
+  my @spvm_core_source_file_names = qw(
+    spvm_allocator.c
+    spvm_api_allocator.c
+    spvm_api.c
+    spvm_api_runtime.c
+    spvm_api_string_buffer.c
+    spvm_hash.c
+    spvm_list.c
+    spvm_native.c
+    spvm_opcode.c
+    spvm_runtime.c
+    spvm_string_buffer.c
+  );
+  
+  return \@spvm_core_source_file_names;
+}
 
 sub get_spvm_core_header_file_names {
   

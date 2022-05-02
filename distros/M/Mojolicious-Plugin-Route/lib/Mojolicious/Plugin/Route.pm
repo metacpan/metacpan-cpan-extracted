@@ -10,7 +10,7 @@ use constant BASE => {
     references => {}
 };
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 
 sub register {
     my ($self, $app, $conf) = @_;
@@ -30,6 +30,8 @@ sub register {
     $self->_find_files($path_routes);
 
     $self->_load_routes($app, $moniker, $namespace, $inverse);
+    
+    $self->_clean_base;
 }
 
 sub _find_files {
@@ -59,6 +61,8 @@ sub _load_routes {
     my ($self, $app, $moniker, $namespace, $inverse) = @_;
 
     my $base = $moniker . '::' . $namespace;
+    
+    my $routes = $app->routes;
 
     for my $file (@{BASE->{files}}) {
         $file =~ s/\//::/g;
@@ -68,21 +72,26 @@ sub _load_routes {
         if ($class && $class->isa('MojoX::Route')) {            
             my $ref = $class->new(app => $app);
 
-            $self->_any($app, $ref, $file, $base, $inverse)   if $class->can('any');
-            $self->_under($app, $ref, $file, $base, $inverse) if $class->can('under');
-            $self->_route($app, $ref, $file, $base, $inverse) if $class->can('route');
+            $self->_any($routes, $ref, $file, $base, $inverse)   if $class->can('any');
+            $self->_under($routes, $ref, $file, $base, $inverse) if $class->can('under');
+            $self->_route($routes, $ref, $file, $base, $inverse) if $class->can('route');
         }
     }
 }
 
+sub _clean_base {
+    @{BASE->{files}} = ();
+    %{BASE->{references}} = ();
+}
+
 sub _any {
-    my ($self, $app, $ref, $file, $base, $inverse) = @_;
+    my ($self, $routes, $ref, $file, $base, $inverse) = @_;
 
     my ($name, $ref_name) = $self->_ref_name($file, $base);
     
     my @params;
     push(@params, BASE->{references}->{$ref_name}) if $self->_valid_reference($ref_name);
-    push(@params, $app->routes);    
+    push(@params, $routes);    
 
     my $any = $ref->any($inverse ? reverse(@params) : @params);
 
@@ -90,13 +99,13 @@ sub _any {
 }
 
 sub _under {
-    my ($self, $app, $ref, $file, $base, $inverse) = @_;
+    my ($self, $routes, $ref, $file, $base, $inverse) = @_;
 
     my ($name, $ref_name) = $self->_ref_name($file, $base);
     
     my @params;
     push(@params, BASE->{references}->{$ref_name}) if $self->_valid_reference($ref_name);
-    push(@params, $app->routes);    
+    push(@params, $routes);    
 
     my $under = $ref->under($inverse ? reverse(@params) : @params);
 
@@ -104,14 +113,14 @@ sub _under {
 }
 
 sub _route {
-    my ($self, $app, $ref, $file, $base, $inverse) = @_;
+    my ($self, $routes, $ref, $file, $base, $inverse) = @_;
 
     my ($name, $ref_name) = $self->_ref_name($file, $base);
     
     my @params;
     push(@params, BASE->{references}->{$name})     if $self->_valid_reference($name);
     push(@params, BASE->{references}->{$ref_name}) if $self->_valid_reference($ref_name);
-    push(@params, $app->routes);
+    push(@params, $routes);
 
     $ref->route($inverse ? reverse(@params) : @params);
 }
@@ -379,6 +388,48 @@ Namespace to load routes from, defaults to $moniker::Route.
     }
     
     1;
+    
+=head2 Example 3
+
+    package MyApp::Route::Base;
+    use Mojo::Base 'MojoX::Route';
+
+    sub under {
+        my ($self, $r) = @_;
+
+        $r->under('/base');
+    }
+
+    1; 
+    
+    package MyApp::Route::Foo;
+    use Mojo::Base 'MyApp::Route::Base';
+
+    sub route {
+        my ($self, $base) = @_;
+
+        # will create route /base/foo
+        $base->get('/foo' => sub {
+            shift->render(text => 'Foo');
+        });
+    }
+
+    1;
+    
+    package MyApp::Route::Baz;
+    use Mojo::Base 'MyApp::Route::Base';
+
+    sub route {
+        my ($self, $base) = @_;
+
+        # will create route /base/baz
+        $base->get('/baz' => sub {
+            shift->render(text => 'Baz');
+        });
+    }
+
+    1;    
+      
 
 =head1 SEE ALSO
 

@@ -71,7 +71,7 @@
          "requires" : {
             "Dist::Zilla::Plugin::MakeMaker::Awesome" : "0.47",
             "Dist::Zilla::Role::AfterBuild" : "0",
-            "List::Keywords" : "0.03",
+            "List::Util" : "1.33",
             "Moose" : "0",
             "Path::Tiny" : "0.062",
             "namespace::autoclean" : "0",
@@ -189,7 +189,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::MakeMaker::Fallback" : {
          "file" : "lib/Dist/Zilla/Plugin/MakeMaker/Fallback.pm",
-         "version" : "0.031"
+         "version" : "0.032"
       }
    },
    "release_status" : "stable",
@@ -207,7 +207,7 @@
       "x_IRC" : "irc://irc.perl.org/#distzilla",
       "x_MailingList" : "http://dzil.org/#mailing-list"
    },
-   "version" : "0.031",
+   "version" : "0.032",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.035010"
@@ -782,7 +782,7 @@
                }
             },
             "name" : "@Author::ETHER/MakeMaker::Fallback",
-            "version" : "0.031"
+            "version" : "0.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::ModuleBuildTiny::Fallback",
@@ -817,7 +817,7 @@
                }
             },
             "name" : "@Author::ETHER/ModuleBuildTiny::Fallback",
-            "version" : "0.025"
+            "version" : "0.026"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
@@ -1132,7 +1132,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.031",
+                  "tag" : "v0.032",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

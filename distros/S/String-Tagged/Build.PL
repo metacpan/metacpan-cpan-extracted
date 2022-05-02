@@ -6,6 +6,7 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'String::Tagged',
    requires => {
+      'perl' => '5.014',
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

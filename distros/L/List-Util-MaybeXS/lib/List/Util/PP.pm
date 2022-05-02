@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Exporter ();
 
-our $VERSION = '1.500011';
+our $VERSION = '1.500012';
 $VERSION =~ tr/_//d;
 
 our @EXPORT_OK;
@@ -382,7 +382,7 @@ sub uniqnum (@) {
       elsif ($nv == 0) {
         $k = '0';
       }
-      elsif ($nv != $nv || $nv == 9**9**9) {
+      elsif ($nv*0 != $nv*0) {
         $k = sprintf '%f', $nv;
       }
       elsif (int($nv) != $nv) {

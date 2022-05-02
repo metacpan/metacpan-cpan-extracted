@@ -26,7 +26,7 @@ no_index:
 provides:
   App::pmuninstall:
     file: lib/App/pmuninstall.pm
-    version: '0.31'
+    version: '0.33'
 requires:
   CPAN::DistnameInfo: '0'
   ExtUtils::Install: '1.43'
@@ -40,7 +40,7 @@ resources:
   bugtracker: https://github.com/xaicron/pm-uninstall/issues
   homepage: https://github.com/xaicron/pm-uninstall
   repository: https://github.com/xaicron/pm-uninstall.git
-version: '0.31'
+version: '0.33'
 x_contributors:
   - 'Finn Smith <finn@buzzfeed.com>'
   - 'Finn Smith <finn@timeghost.net>'

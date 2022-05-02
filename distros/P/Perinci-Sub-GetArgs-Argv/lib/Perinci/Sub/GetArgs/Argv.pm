@@ -14,9 +14,9 @@ use Perinci::Sub::GetArgs::Array qw(get_args_from_array);
 use Perinci::Sub::Util qw(err);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-03-02'; # DATE
+our $DATE = '2022-03-27'; # DATE
 our $DIST = 'Perinci-Sub-GetArgs-Argv'; # DIST
-our $VERSION = '0.848'; # VERSION
+our $VERSION = '0.849'; # VERSION
 
 use Exporter;
 our @ISA = qw(Exporter);
@@ -285,6 +285,7 @@ sub _args2opts {
 
     for my $arg (keys %$args_prop) {
         my $fqarg    = "$argprefix$arg";
+        my $optlabel = "arg=$arg".($fqarg ne $arg ? ", fqarg=$fqarg":""); # written to %$seen_opts values
         my $arg_spec = $args_prop->{$arg};
         next if grep { $_ eq 'hidden' || $_ eq 'hidden-cli' }
             @{ $arg_spec->{tags} // [] };
@@ -376,6 +377,7 @@ sub _args2opts {
         my @triplets = _opt2ospec($opt, $sch, $arg_spec);
         my $aliases_processed;
         while (my ($ospec, $parsed, $extra) = splice @triplets, 0, 3) {
+            my $optlabel = $optlabel . ", spec=$ospec"; # note: redefine
             $extra //= {};
             if ($extra->{is_neg}) {
                 $go_spec->{$ospec} = sub { $handler->($_[0], 0) };
@@ -393,13 +395,14 @@ sub _args2opts {
 
             $specmeta->{$ospec} = {arg=>$arg, fqarg=>$fqarg, parsed=>$parsed, %$extra};
             for (@{ $parsed->{opts} }) {
-                $seen_opts->{$_}++; $seen_func_opts->{$_} = $fqarg;
+                $seen_opts->{$_} = $optlabel;
+                $seen_func_opts->{$_} = $fqarg;
             }
 
             if ($parent_args->{per_arg_json} && !$is_simple) {
                 my $jopt = "$opt-json";
                 if ($seen_opts->{$jopt}) {
-                    warn "Clash of option: $jopt, not added";
+                    warn "Clash of option $jopt ($optlabel) vs existing ($seen_opts->{$jopt}), not added";
                 } else {
                     my $jospec = "$jopt=s";
                     my $parsed = {type=>"s", opts=>[$jopt]};
@@ -413,13 +416,14 @@ sub _args2opts {
                         }
                     };
                     $specmeta->{$jospec} = {arg=>$arg, fqarg=>$fqarg, is_json=>1, parsed=>$parsed, %$extra};
-                    $seen_opts->{$jopt}++; $seen_func_opts->{$jopt} = $fqarg;
+                    $seen_opts->{$jopt} = $optlabel;
+                    $seen_func_opts->{$jopt} = $fqarg;
                 }
             }
             if ($parent_args->{per_arg_yaml} && !$is_simple) {
                 my $yopt = "$opt-yaml";
                 if ($seen_opts->{$yopt}) {
-                    warn "Clash of option: $yopt, not added";
+                    warn "Clash of option: $yopt ($optlabel) vs existing ($seen_opts->{$yopt}), not added";
                 } else {
                     my $yospec = "$yopt=s";
                     my $parsed = {type=>"s", opts=>[$yopt]};
@@ -433,7 +437,8 @@ sub _args2opts {
                         }
                     };
                     $specmeta->{$yospec} = {arg=>$arg, fqarg=>$fqarg, is_yaml=>1, parsed=>$parsed, %$extra};
-                    $seen_opts->{$yopt}++; $seen_func_opts->{$yopt} = $fqarg;
+                    $seen_opts->{$yopt} = $optlabel;
+                    $seen_func_opts->{$yopt} = $fqarg;
                 }
             }
 
@@ -446,7 +451,7 @@ sub _args2opts {
                     my $altype = $alsch->[0];
                     my $alopt = _arg2opt("$argprefix$al");
                     if ($seen_opts->{$alopt}) {
-                        warn "Clash of cmdline_alias option $al";
+                        warn "Clash of cmdline_alias option $al ($optlabel) vs existing ($seen_opts->{$alopt})";
                         next;
                     }
                     my $alcode = $alspec->{code};
@@ -506,7 +511,8 @@ sub _args2opts {
                     };
                     push @{$specmeta->{$ospec}{($alcode ? '':'non').'code_aliases'}},
                         $alospec;
-                    $seen_opts->{$alopt}++; $seen_func_opts->{$alopt} = $fqarg;
+                    $seen_opts->{$alopt} = $optlabel;
+                    $seen_func_opts->{$alopt} = $fqarg;
                 }
             } # cmdline_aliases
 
@@ -696,11 +702,14 @@ sub gen_getopt_long_spec_from_meta {
         $go_spec{$ospec} = $handler;
         $specmeta{$ospec} = {common_opt=>$k, arg=>undef, parsed=>$res};
         for (@{ $res->{opts} }) {
-            return [412, "Clash of common opt '$_'"] if $seen_opts{$_};
-            $seen_opts{$_}++; $seen_common_opts{$_} = $ospec;
+            return [412, "Clash of common opt '$_' ($seen_opts{$_})"] if $seen_opts{$_};
+            $seen_opts{$_} = "common option $k";
+            $seen_common_opts{$_} = $ospec;
             if ($res->{is_neg}) {
-                $seen_opts{"no$_"}++ ; $seen_common_opts{"no$_"}  = $ospec;
-                $seen_opts{"no-$_"}++; $seen_common_opts{"no-$_"} = $ospec;
+                $seen_opts{"no$_"} = "common option $k, negative form";
+                $seen_common_opts{"no$_"}  = $ospec;
+                $seen_opts{"no-$_"} = "common option $k, negative form";
+                $seen_common_opts{"no-$_"} = $ospec;
             }
         }
     }
@@ -1142,7 +1151,7 @@ Perinci::Sub::GetArgs::Argv - Get subroutine arguments from command line argumen
 
 =head1 VERSION
 
-This document describes version 0.848 of Perinci::Sub::GetArgs::Argv (from Perl distribution Perinci-Sub-GetArgs-Argv), released on 2022-03-02.
+This document describes version 0.849 of Perinci::Sub::GetArgs::Argv (from Perl distribution Perinci-Sub-GetArgs-Argv), released on 2022-03-27.
 
 =head1 SYNOPSIS
 

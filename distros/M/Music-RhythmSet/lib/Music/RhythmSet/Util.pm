@@ -4,7 +4,7 @@
 # of beats, and etc
 
 package Music::RhythmSet::Util;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use 5.24.0;
 use warnings;
@@ -17,14 +17,16 @@ use parent qw(Exporter);
 our @EXPORT_OK =
   qw(beatstring compare_onsets duration filter_pattern flatten ocvec onset_count pattern_from rand_onsets score_fourfour score_stddev upsize write_midi);
 
-sub beatstring {
+sub beatstring
+{
     my ($bpat) = @_;
     croak "no pattern set"
       unless defined $bpat and ref $bpat eq 'ARRAY';
     return join( '', $bpat->@* ) =~ tr/10/x./r;
 }
 
-sub compare_onsets {
+sub compare_onsets
+{
     my ( $first, $second ) = @_;
 
     my $same   = 0;
@@ -41,7 +43,8 @@ sub compare_onsets {
     return $same / $onsets;
 }
 
-sub duration {
+sub duration
+{
     my ($replay) = @_;
     croak "no replay log"
       unless defined $replay and ref $replay eq 'ARRAY';
@@ -57,7 +60,8 @@ sub duration {
     return $measures, $beats;
 }
 
-sub filter_pattern {
+sub filter_pattern
+{
     my ( $onsets, $total, $trials, $fudge, $nozero ) = @_;
 
     $fudge //= 0.0039;
@@ -77,7 +81,8 @@ sub filter_pattern {
     return $bpat;
 }
 
-sub flatten {
+sub flatten
+{
     my ($replay) = @_;
     croak "no replay log"
       unless defined $replay and ref $replay eq 'ARRAY';
@@ -85,7 +90,8 @@ sub flatten {
 }
 
 # "onset-coordinate vector" notation for a pattern
-sub ocvec {
+sub ocvec
+{
     my ($bpat) = @_;
     croak "no pattern set"
       unless defined $bpat and ref $bpat eq 'ARRAY';
@@ -101,7 +107,8 @@ sub ocvec {
     return \@set;
 }
 
-sub onset_count {
+sub onset_count
+{
     my ($bpat) = @_;
     croak "no pattern set"
       unless defined $bpat and ref $bpat eq 'ARRAY';
@@ -115,14 +122,16 @@ sub onset_count {
     return $onsets;
 }
 
-sub pattern_from {
+sub pattern_from
+{
     my ($string) = @_;
     $string =~ tr/x.//cd;
     $string =~ tr/x./10/;
     return [ split '', $string ];
 }
 
-sub rand_onsets {
+sub rand_onsets
+{
     my ( $onsets, $total ) = @_;
     croak "onsets must be < total" if $onsets >= $total;
 
@@ -140,7 +149,8 @@ sub rand_onsets {
     return \@pattern;
 }
 
-sub score_fourfour {
+sub score_fourfour
+{
     my ($bpat) = @_;
 
     my @beatquality = map { 256 - $_ } qw(
@@ -160,7 +170,8 @@ sub score_fourfour {
     return $score;
 }
 
-sub score_stddev {
+sub score_stddev
+{
     my ($bpat) = @_;
 
     my @deltas;
@@ -184,7 +195,8 @@ sub score_stddev {
     return stddevp(@deltas);
 }
 
-sub upsize {
+sub upsize
+{
     my ( $bpat, $newlen ) = @_;
     croak "no pattern set"
       unless defined $bpat
@@ -202,7 +214,8 @@ sub upsize {
     return \@pat;
 }
 
-sub write_midi {
+sub write_midi
+{
     my ( $file, $track, %param ) = @_;
 
     $param{format} //= 1;
@@ -363,6 +376,13 @@ L<Music::AtonalUtil> has various relevant routines, especially for beat
 patterns of length 12.
 
 "The Geometry of Musical Rhythm" by Godfried T. Toussaint.
+
+Balanced parentheses (there are code problems for this) are somewhat
+musical and may be converted to rhythm via
+
+  tr/()/10/;
+  # and maybe also
+  s/(?<=1)(1+)/"0" x length $1/eg;
 
 =head1 COPYRIGHT AND LICENSE
 

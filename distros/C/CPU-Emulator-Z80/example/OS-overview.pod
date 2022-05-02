@@ -1,0 +1,107 @@
+=head1 OPERATING SYSTEM OVERVIEW
+
+=head2 HARDWARE
+
+There is 64K of memory and maximum of 256 ports.  Input ports are
+arranged in pairs - the first of each pair, when read, will tell
+how many bytes are available to be read.  The second is where
+actual data is available.
+
+=head3 PORTS
+
+=head4 OUTPUT
+
+=over
+
+=item 0 - mem_bank
+
+Write either 0, 1, 2 or 3 to indicate which chunk of memory to bank
+(meaning the 16K chunk starting at N * 0x4000) following by a byte
+indicating which ROM or which extra chunk of RAM to map in.
+
+=item 1 - mem_unbank
+
+Write either 0, 1, 2 or 3 to indicate which chunk of memory to unbank.
+
+=item 2 - io_wr_stdout
+
+Write a byte to the host machine's STDOUT.
+
+=item 0xFF - hw_start_clock
+
+Starts the machine clock.  The clock generates NMIs.  Writing anything
+to this port works.
+
+=back
+
+=head4 INPUT
+
+=head2 BOOT LOADER
+
+The machine starts with PC = 0x0000, the Boot ROM paged in at 0x0000
+and the OS ROM paged in at 0x4000.
+
+The Boot loader first copies some code to the top of memory, then
+jumps to it.  That code disables the Boot ROM, copies the first
+256 bytes of the OS from the OS ROM to 0x0000, disables the
+OS ROM, starts the clock, then jumps to 0x0000.
+
+=head2 BOOTING THE OS
+
+There's just a few bytes 0x0000, and a jump past the RST block.
+
+The stack is initialised and the memory-map reset.
+
+It then reads each port in turn until no more data are available,
+flushing them.  The various bits of memory reserved for the OS are
+then marked as such in the memory map.  Finally, the file
+C<shell.cmd> is executed.
+
+=head1 REGISTERS
+
+The alternate register set may be used by OS functions.
+
+=head1 MEMORY MAP
+
+    0xFF80 to 0xFFFF: stack
+    0xFF00 to 0xFF7F: memory allocation bitmap
+                      each bit represents 64 bytes
+    ...
+    0x0000 to 0xXXXX: OS code
+
+=head1 ACCESS TO OS FUNCTIONS FROM USER CODE
+
+Parameters are passed via the stack, and are all sixteen bits long
+The last parameter passed should be the function number to call.
+To execute the function, C<RST 1>.
+RST 1 itself is not re-entrant.
+
+=head1 NMIs
+
+The NMI increments a 32-bit clock counter in memory and may, if
+we're not inside RST 1, may perform a task switch.
+
+=head2 RST 1
+
+This function saves the user's registers, pages in the OS ROM, and calls
+the relevant function.  When that function returns, the OS ROM is paged
+back out and registers restored.  Any return values will be on the
+stack.
+
+=head1 PROCESSES
+
+User processes may be loaded and executed at any address.
+Consequently they should not use any absolute addresses in their code.
+
+Associated with each process is a control structure.  This is stored
+at 0xXXXX + 0xXX * PID and consists of:
+
+    offset | size | use
+    -------------------
+    0      | 2    | storage for AF register
+    2      | 2    | storage for BC register
+    4      | 2    | storage for DE register
+    6      | 2    | storage for HL register
+    8      | 2    | storage for PC register
+    10     | 2    | storage for SP register
+

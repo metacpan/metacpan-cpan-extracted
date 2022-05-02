@@ -1619,7 +1619,7 @@ static void MY_future_chain_on_cancel(pTHX_ SV *f1, SV *f2)
   PUSHs(f2);
   PUTBACK;
 
-  call_method("AWAIT_ON_CANCEL", G_VOID);
+  call_method("AWAIT_CHAIN_CANCEL", G_VOID);
 
   FREETMPS;
   LEAVE_with_name("future_chain_on_cancel");

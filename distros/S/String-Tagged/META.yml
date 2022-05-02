@@ -17,8 +17,13 @@ name: String-Tagged
 provides:
   String::Tagged:
     file: lib/String/Tagged.pm
-    version: '0.17'
+    version: '0.18'
+  String::Tagged::Extent:
+    file: lib/String/Tagged/Extent.pm
+    version: '0.18'
+requires:
+  perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.17'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

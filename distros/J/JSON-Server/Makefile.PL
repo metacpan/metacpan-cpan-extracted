@@ -13,10 +13,11 @@ WriteMakefile (
     AUTHOR => 'Ben Bullock <bkb@cpan.org>',
     LICENSE => 'perl',
     PREREQ_PM => {
-	'JSON::Create' => '0.34',
+	'JSON::Create' => '0.35',
 	'JSON::Parse' => '0.61',
 	'IO::Socket' => '1.43',
 	'IO::Select' => '1.42',
+	'Test::TCP' => '2.22',
     },
     META_MERGE => {
 	'meta-spec' => {

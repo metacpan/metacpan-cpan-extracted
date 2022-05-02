@@ -58,6 +58,6 @@
          "web" : "https://github.com/kuerbis/Term-Form"
       }
    },
-   "version" : "0.546",
+   "version" : "0.547",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

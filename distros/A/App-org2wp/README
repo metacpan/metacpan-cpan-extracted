@@ -3,8 +3,8 @@ NAME
     post
 
 VERSION
-    This document describes version 0.011 of App::org2wp (from Perl
-    distribution App-org2wp), released on 2022-01-21.
+    This document describes version 0.012 of App::org2wp (from Perl
+    distribution App-org2wp), released on 2022-05-01.
 
 FUNCTIONS
   org2wp
@@ -24,6 +24,12 @@ FUNCTIONS
      proxy=https://YOURBLOGNAME.wordpress.com/xmlrpc.php
      username=YOURUSERNAME
      password=YOURPASSWORD
+
+    Note that "proxy" is the endpoint URL of your WordPress instance's
+    XML-RPC server, which can be hosted on "wordpress.com" or on other
+    server, including your own. It has nothing to do with HTTP/HTTPS proxy;
+    the term "proxy" is used by the XMLRPC::Lite and SOAP::Lite Perl
+    libraries and "org2wp" simply uses the same terminology.
 
     You can also put multiple credentials in the configuration file using
     profile sections, e.g.:
@@ -125,6 +131,12 @@ FUNCTIONS
     In heading mode, you can use several options to select only certain
     headlines which contain (or don't contain) specified tags.
 
+   FAQ
+   What if I want to set HTTP/HTTPS proxy?
+    You can set the environment variable "HTTP_proxy" (and "HTTP_proxy_user"
+    and "HTTP_proxy_pass" additionally). See the SOAP::Lite documentation
+    for more details, which uses LWP::UserAgent underneath.
+
     This function is not exported.
 
     This function supports dry-run operation.
@@ -170,6 +182,12 @@ FUNCTIONS
     *   proxy* => *str*
 
         Example: C<https://YOURBLOGNAME.wordpress.com/xmlrpc.php>.
+
+        Note that "proxy" is the endpoint URL of your WordPress instance's
+        XML-RPC server, which can be hosted on "wordpress.com" or on other
+        server, including your own. It has nothing to do with HTTP/HTTPS
+        proxy; the term "proxy" is used by the XMLRPC::Lite and SOAP::Lite
+        Perl libraries and "org2wp" simply uses the same terminology.
 
     *   publish => *bool*
 

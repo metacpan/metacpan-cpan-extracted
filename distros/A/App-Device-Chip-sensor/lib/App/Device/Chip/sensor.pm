@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.19;
 
-package App::Device::Chip::sensor 0.03;
+package App::Device::Chip::sensor 0.04;
 class App::Device::Chip::sensor;
 
 use Carp;
@@ -15,6 +15,7 @@ use Feature::Compat::Defer;
 use Future::AsyncAwait;
 
 use Device::Chip::Adapter;
+use Device::Chip::Sensor 0.19; # ->type
 use Future::IO 0.08; # ->alarm
 use Getopt::Long qw( GetOptionsFromArray );
 use List::Util qw( all max );
@@ -157,6 +158,9 @@ method parse_argv ( $argv = \@ARGV )
             if( $opts =~ s/^-C:(.*?)=(.*)(?:$|,)// ) {
                $config->{config}{$1} = $2;
             }
+            elsif( $opts =~ s/^-M:(.*?)=(.*)(?:$|,)// ) {
+               $config->{mountopts}{$1} = $2;
+            }
             else {
                croak "Unable to parse chip configuration options '$opts' for $chiptype'";
             }
@@ -193,7 +197,11 @@ async method chips
       require ( "$class.pm" ) =~ s(::)(/)gr;
 
       my $chip = $class->new;
-      await $chip->mount( $adapter );
+
+      my %mountopts;
+      %mountopts = $chipconfig->{mountopts}->%* if $chipconfig->{mountopts};
+
+      await $chip->mount( $adapter, %mountopts );
 
       if( $chipconfig->{config} ) {
          await $chip->change_config( $chipconfig->{config}->%* );

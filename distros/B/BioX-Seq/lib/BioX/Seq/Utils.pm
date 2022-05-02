@@ -174,7 +174,7 @@ Takes one required argument (a sequence string) and two optional arguments
 representing all ORFs in all reading frames of the sequence. Each reference
 contains three values: the sequence, the start position, and the stop
 position. The strand can be determined by comparing start and stop position
-(ORFs on the reverse strand will have start > stop). See C<bulid_ORF_regex()>
+(ORFs on the reverse strand will have start > stop). See C<build_ORF_regex()>
 for an explanation for the possible values for ORF mode.
 
 =head2 build_ORF_regex

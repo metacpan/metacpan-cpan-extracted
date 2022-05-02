@@ -19,13 +19,13 @@ name: App-lcpan-CmdBundle-rt
 provides:
   App::lcpan::Cmd::rt_open:
     file: lib/App/lcpan/Cmd/rt_open.pm
-    version: '0.004'
+    version: '0.005'
   App::lcpan::Cmd::rt_tickets:
     file: lib/App/lcpan/Cmd/rt_tickets.pm
-    version: '0.004'
+    version: '0.005'
   App::lcpan::CmdBundle::rt:
     file: lib/App/lcpan/CmdBundle/rt.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   App::lcpan: '1.066'
   Browser::Open: '0'
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan-CmdBundle-rt
   homepage: https://metacpan.org/release/App-lcpan-CmdBundle-rt
   repository: git://github.com/perlancar/perl-App-lcpan-CmdBundle-rt.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

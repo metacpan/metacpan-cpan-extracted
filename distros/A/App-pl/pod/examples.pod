@@ -10,7 +10,9 @@ Here's a wide variety of examples, many solving real-life problems.  Often you
 can copy & paste them as-is.  Or you need to make minor changes, e.g. to adapt
 them to your search expression.  Many of these examples started out quite
 small, illustrating the power of pl.  But in order to be generally useful,
-they have been extended to cope with border cases.
+they have been extended to cope with border cases.  See L<canned
+commands|https://metacpan.org/dist/App-pl/view/pod/canned-commands.pod> for how you can make your favourite ones easier to
+use.
 
 Only some of these are original.  Many have been adapted from the various Perl
 one-liner webpages
@@ -81,7 +83,7 @@ if in 1st C<or> 2nd range), if last line of head comes before 1st line of tail
 
     pl -rP '1../last/ or /first/..eof' file*
 
-=item Remove trailing whitespace in each file
+=item Remove Trailing Whitespace in Each File
 
 This print-loops (B<-p>) over each file, replacing it (B<-i>) with the
 modified output.  Line ends are stripped on reading and added on printing
@@ -90,7 +92,7 @@ substitute one or more spaces of any kind (incl. DOS newlines) with nothing:
 
     pl -pli 's/\s+$//' file*
 
-=item Tabify/Untabify each file
+=item Tabify/Untabify Each File
 
 This print-loops (B<-p>) over each file, replacing it (B<-i>) with the
 modified output.  At beginning of line and after each tab, 8 spaces or less
@@ -108,9 +110,9 @@ Fans of half-width tabs make that:
     pl -pi '1 while s/(?:^|\t)\K(?: {1,3}\t| {4})/\t/' file*
     pl -pi '1 while s/^([^\t\n]*)\K\t/" " x (4 - length($1) % 4)/e' file*
 
-=item Print only 1st occurrence of each line
+=item Print Only 1st Occurrence of Each Line
 
-I<Poets create worlds through a minimal of words. -- Kim Hilliker |/|>
+I<Poets create worlds through a minimal of words. --B< >Kim Hilliker |/|>
 
 This counts repetitions of lines in a hash.  Print only when the expression is
 true (B<-P>), i.e. the count was 0:
@@ -129,7 +131,7 @@ containing non-whitespace C<\S>:
 
     pl -Pi '/\S/' file*
 
-=item Move a line further down in each file
+=item Move a Line Further Down in Each File
 
 Assume we have lines matching "from" followed by lines matching "to".  The
 former shall move after the latter.  This loops over each file, replacing it
@@ -142,7 +144,7 @@ it must be the last matching line.  Append the keep variable to it.
             if( $1 eq "f" ) { $k = $_; $_ = "" } elsif( $1 ) { $_ .= $k }
         }' file*
 
-=item Rename a file depending on contents
+=item Rename a File Depending on Contents
 
 This reads each file in an B<-n> loop.  When it finds the C<package>
 declaration, which gives the logical name of this file, it replaces
@@ -184,7 +186,7 @@ find the latter:
             last;
         }' *.java
 
-=item Delete matching files, except last one
+=item Delete Matching Files, Except Last One
 
 If you have many files, which sort chronologically by name, and you want to
 keep only the last one, it can be quite painful to formulate Shell patterns.
@@ -210,13 +212,13 @@ You can exclude files by any other criterion as well:
 
 =back
 
-=head2 File statistics
+=head2 File Statistics
 
 I<42% of statistics are made up! :-)>
 
 =over
 
-=item Count files per suffix
+=item Count Files per Suffix
 
 Find and pl both use the B<-0> option to allow funny filenames, including
 newlines.  Sum up encountered suffixes in sort-numerically-at-end hash
@@ -250,7 +252,7 @@ C<%N(UMBER)>:
     >       3264: .pm
     >      10846: .t
 
-=item Count files per directory per suffix
+=item Count Files per Directory per Suffix
 
 I<There are three types of people: those who can count and those who can't. (-:>
 
@@ -444,7 +446,7 @@ argument (default 2):
     >        149: perl-5.30.3/pod .pod
     >        206: perl-5.30.3/t/op .t
 
-=item Sum up file-sizes per suffix
+=item Sum up File-sizes per Suffix
 
 This illustrates a simpler approach: rather than the complicated regexps
 above, let Perl split each filename for us.  Find separates output with a dot
@@ -456,7 +458,7 @@ the end:
     find -type f -printf "%s.%f\0" |
         pl -0lF\\. '$NUMBER{@FIELD > 2 ? ".$FIELD[-1]" : "none"} += $FIELD[0]'
     find -type f -printf "%s.%f\0" |
-        pl -0lF\\. '$N{@F > 2 ? ".$F[-1]" : "none"} += $F[0]'
+        pl -0lF\\. '$N{@FIELD > 2 ? ".$FIELD[-1]" : "none"} += $FIELD[0]'
 
     >          0: .configure
     >         16: .perldb
@@ -473,7 +475,9 @@ the end:
     >   11617824: .pm
     >   12259742: .txt
 
-=item Count files per date
+=item Count Files per Date
+
+I<I feel more like I do now than I did a while ago. (-:>
 
 Incredibly, find has no ready-made ISO date, so specify the 3 parts.  If you
 don't want days, just leave out C<-%Td>.  Sum up encountered dates in
@@ -494,7 +498,7 @@ sort-value-numerically-at-end hash C<%N(UMBER)>:
     >       6024: 2019-10-21
     >      12159: 2019-10-24
 
-=item Count files per date with rollup
+=item Count Files per Date with Rollup
 
 I<Learn sign language!  It's very handy. :-)>
 
@@ -537,7 +541,7 @@ hash C<%R(ESULT)>:
 
 =back
 
-=head2 Diff several inputs by a unique key
+=head2 Diff Several Inputs by a Unique Key
 
 I<Always remember you're unique, just like everyone else. :-)>
 
@@ -547,11 +551,12 @@ sibling C<K(eydiff)> does the same using 1st arg or 0 as an index into
 C<@F(IELD)> for the 1st part of the key.  At the end only the rows differing
 between files are shown.  If you write to a terminal or specify B<--color> the
 difference gets color-highlighted in per-character detail with
-C<Algorithm::Diff>, or in just one red blob without.
+C<Algorithm::Diff>, or in just one red blob without.  There are examples for
+L<how to alias|canned-commands/Shell Aliases> these as canned commands.
 
 =over
 
-=item Diff several csv, tsv or passwd files by 1st field
+=item Diff Several csv, tsv or passwd Files by 1st Field
 
 This assumes comma-less key fields and no newline in any field.  Else you need
 a csv-parser package.  B<-F> implies B<-a>, which implies B<-n> (even using
@@ -721,9 +726,9 @@ several hosts.  Here we additionally need to ignore commented out lines:
     pl -F: 'K unless /^#/' /etc/passwd passwd*
     pl -n 'k if s/^([^#].*?)://' /etc/passwd passwd*
 
-=item Diff several zip archives by member name
+=item Diff Several zip Archives by Member Name
 
-I<Growing old you forget to zip up your fly.  Later you forget to unzip your fly. (-:>
+I<Growing old you forget to zip up your fly.  Later you forget to unzip your fly. 8-)>
 
 This uses the same mechanism as the csv example.  Addidionally, through the
 C<p(iped)> block, it reads the output of C<unzip -vql> for each archive.  That
@@ -759,7 +764,8 @@ has an almost fixed format, except with extreme member sizes:
 
 Java .jar, .ear & .war files (which are aliases for .zip), after a clean build
 have many class files with the identical crc, but a different date.  This
-excludes the date:
+excludes the date.  There are examples for L<how to
+combine|canned-commands/Shell Functions> these variants as Shell functions:
 
     pl -o 'piped {
             keydiff $2 if s@.{16} ([\da-f]{8})  (.+)@$1@;
@@ -811,9 +817,9 @@ the meaningful part of the filename as a key:
                 }@e
         } "unzip", "-vqq", $_' *.jar
 
-=item Diff several tarballs by member name
+=item Diff Several Tarballs by Member Name
 
-I<Actually I'm very different.  But I rarely find time for it. -- von HorvE<0xe1>th :-)>
+I<Actually I'm very different.  But I rarely find time for it. --B< >von HorvE<0xe1>th :-)>
 
 This is like the zip example.  Alas, tar gives no checksums, so this is less
 reliable.  Exclude directories, by taking only lines not starting with a C<d>.
@@ -969,7 +975,7 @@ Again without the date and owner/group, which can also vary:
     >   	-r-xr-xr-x     587825
     >   ...
 
-=item Diff ELF executables by loaded dependencies
+=item Diff ELF Executables by Loaded Dependencies
 
 You get the idea: you can do this for any command that outputs records with a
 unique key.  This one looks at the required libraries and which file they came
@@ -1011,7 +1017,7 @@ quoting, there are variables for single C<$q(uote)> & double C<$Q(uote)>:
     pl -P1 's/.+\bVERSION\s*=\s*[v$Quote$quote]{0,2}([0-9.]+).+/$1/' pl
     pl -P1 's/.+\bVERSION\s*=\s*[v$Q$q]{0,2}([0-9.]+).+/$1/' pl
 
-    >   0.63.0
+    >   0.63.1.92
 
 For multple files, add the filename, and reset (B<-r>) the B<-P> count for each
 file:
@@ -1064,7 +1070,9 @@ out just separated by spaces:
     >   {
     >     BEGIN => *List::Util::BEGIN,
     >     EXPORT => *List::Util::EXPORT,
+    >     EXPORT_FAIL => *List::Util::EXPORT_FAIL,
     >     EXPORT_OK => *List::Util::EXPORT_OK,
+    >     EXPORT_TAGS => *List::Util::EXPORT_TAGS,
     >     ISA => *List::Util::ISA,
     >     RAND => *List::Util::RAND,
     >     REAL_MULTICALL => *List::Util::List::Util,
@@ -1126,6 +1134,7 @@ Where does perl load from, and what exactly has it loaded?
     >     'Carp.pm' => '/usr/share/perl/5.32/Carp.pm',
     >     'Data/Dumper.pm' => '/usr/lib/x86_64-linux-gnu/perl/5.32/Data/Dumper.pm',
     >     'Exporter.pm' => '/usr/share/perl/5.32/Exporter.pm',
+    >     'Exporter/Heavy.pm' => '/usr/share/perl/5.32/Exporter/Heavy.pm',
     >     'List/Util.pm' => '/usr/lib/x86_64-linux-gnu/perl-base/List/Util.pm',
     >     'XSLoader.pm' => '/usr/share/perl/5.32/XSLoader.pm',
     >     'bytes.pm' => '/usr/share/perl/5.32/bytes.pm',
@@ -1158,6 +1167,7 @@ hashref needs to load C<Data::Dumper> on the fly and thus its dependencies:
     >     '/usr/lib/x86_64-linux-gnu/perl-base'
     >   ] {
     >     'Exporter.pm' => '/usr/share/perl/5.32/Exporter.pm',
+    >     'Exporter/Heavy.pm' => '/usr/share/perl/5.32/Exporter/Heavy.pm',
     >     'List/Util.pm' => '/usr/lib/x86_64-linux-gnu/perl/5.28/List/Util.pm',
     >     'XSLoader.pm' => '/usr/share/perl/5.32/XSLoader.pm',
     >     'feature.pm' => '/usr/share/perl/5.32/feature.pm',
@@ -1168,6 +1178,7 @@ hashref needs to load C<Data::Dumper> on the fly and thus its dependencies:
     >     'Carp.pm' => '/usr/share/perl/5.32/Carp.pm',
     >     'Data/Dumper.pm' => '/usr/lib/x86_64-linux-gnu/perl/5.28/Data/Dumper.pm',
     >     'Exporter.pm' => '/usr/share/perl/5.32/Exporter.pm',
+    >     'Exporter/Heavy.pm' => '/usr/share/perl/5.32/Exporter/Heavy.pm',
     >     'List/Util.pm' => '/usr/lib/x86_64-linux-gnu/perl/5.28/List/Util.pm',
     >     'XSLoader.pm' => '/usr/share/perl/5.32/XSLoader.pm',
     >     'bytes.pm' => '/usr/share/perl/5.32/bytes.pm',
@@ -1230,7 +1241,7 @@ pass:
 
 =over
 
-=item Number bases
+=item Number Bases
 
 Perl natively handles the 4 different bases common to programming.  If you
 want to list them side by side, simply quadruple them and C<f(orm)> them with
@@ -1287,7 +1298,7 @@ order so we can loop in chunks of 4:
     >   0b11111000  0370  248  0xf8	0b11111001  0371  249  0xf9	0b11111010  0372  250  0xfa	0b11111011  0373  251  0xfb
     >   0b11111100  0374  252  0xfc	0b11111101  0375  253  0xfd	0b11111110  0376  254  0xfe	0b11111111  0377  255  0xff
 
-=item ISO paper sizes
+=item ISO Paper Sizes
 
 I<ISO replaced 8 standards by one.  Now we have 9 standards. :-(>
 
@@ -1339,9 +1350,9 @@ set as a side effect of B<-A>:
     >      A9    37mm x   52mm   B9    44mm x   62mm   C9    40mm x   57mm
     >     A10    26mm x   37mm  B10    31mm x   44mm  C10    28mm x   40mm
 
-=item ANSI background;foreground color table
+=item ANSI Background;Foreground Color Table
 
-I<If at first you don't succeed, destroy all evidence that you tried! ;-)>
+I<What color is a mirror?  It depends whom you ask. ;-)>
 
 You get numbers to fill into C<"\e[BGm">, C<"\e[FGm"> or C<"\e[BG;FGm"> to get
 a color and close it with C<"\e[m">.  There are twice twice 8 different colors
@@ -1362,6 +1373,26 @@ into the escape sequence, once to be displayed:
         $b = F "\e[%dm%3d "x16, map +(($_)x2, ($_+60)x2), 30..37' \
         'f "%2d: %4d;   \e[%2:dm$b\e[m", @$_'
 
+=item Terminal Rulers
+
+If you need a ruler to better count the width of some other output, you can
+print out one of the following.  These are either decimal, by groups of 5 or
+hex by groups of 4 and 8.  The latter two do the same.  But instead of one
+static ruler of length 100 or 256, they repeat and adapt.  Depending on your
+terminal emulator and Shell, the variable C<$COLUMNS> may track the current
+width.  If so, pass it in a single argument to "loop" over with B<-o>, else
+provide the desired width yourself:
+
+    pl 'say map "$_...:.....", 0..9'
+    pl 'say map "$_..:...|...:....", 0..9, "A".."F"'
+    pl -o 'say substr join( "", map "$_...:.....", 0..9 ) x ($_ / 100 + 1), 0, $_' $COLUMNS
+    pl -o 'say substr join( "", map "$_..:...|...:....", 0..9, "A".."F" ) x ($_ / 256 + 1), 0, $_' $COLUMNS
+
+    >   0...:.....1...:.....2...:.....3...:.....4...:.....5...:.....6...:.....7...:.....8...:.....9...:.....
+    >   0..:...|...:....1..:...|...:....2..:...|...:....3..:...|...:....4..:...|...:....5..:...|...:....6..:...|...:....7..:...|...:....8..:...|...:....9..:...|...:....A..:...|...:....B..:...|...:....C..:...|...:....D..:...|...:....E..:...|...:....F..:...|...:....
+    >   0...:.....1...:.....2...:.....3...:.....4...:.....5...:.....6...:.....7...:.....
+    >   0..:...|...:....1..:...|...:....2..:...|...:....3..:...|...:....4..:...|...:....
+
 =back
 
 =head2 Math
@@ -1381,19 +1412,19 @@ If you have just several numbers on each line and want their minimums, you can
 autosplit (B<-a>) to C<@F(IELD)>:
 
     pl -a 'echo min @FIELD' file*
-    pl -a 'e min @F' file*
+    pl -a 'e min @FIELD' file*
 
 If on the same you just want the overall minimum, you can use the print-at-end
 variable C<$R(ESULT)>, which you initialise to infinity in a B<-B> begin
 program:
 
     pl -aB '$RESULT = "inf"' '$RESULT = min $RESULT, @FIELD' file*
-    pl -aB '$R = "inf"' '$R = min $R, @F' file*
+    pl -aB '$R = "inf"' '$R = min $R, @FIELD' file*
 
 Likewise for overall maximum, you start with negative infinity:
 
     pl -aB '$RESULT = "-inf"' '$RESULT = max $RESULT, @FIELD' file*
-    pl -aB '$R = "-inf"' '$R = max $R, @F' file*
+    pl -aB '$R = "-inf"' '$R = max $R, @FIELD' file*
 
 =item Median, Quartiles, Percentiles
 
@@ -1402,8 +1433,8 @@ Similarly the 1st quartile is where 25% are less and the 3rd where 25% are
 greater.  Use a list slice to extract these 3 and a 97th percentile, by
 multiplying the fractional percentage with the list length:
 
-    pl '@list = 0..200; echo @list[map $_*@list, .25, .5, .75, .97]'
-    pl '@list = 0..200; e @list[map $_*@list, .25, .5, .75, .97]'
+    pl -A 0..200 'echo @ARGV[map $_*@ARGV, .25, .5, .75, .97]'
+    pl -A 0..200 'e @A[map $_*@A, .25, .5, .75, .97]'
 
     >   50 100 150 194
 
@@ -1411,42 +1442,40 @@ If you'd rather have names associated, assign them to hash slice in
 sort-numerically-at-end C<%N(UMBER)>, whose key order must match the
 percentages:
 
-    pl '@list = 0..200;
-        @NUMBER{qw(lower median upper 97.)} = @list[map $_*@list, .25, .5, .75, .97]'
-    pl '@list = 0..200;
-        @N{qw(lower median upper 97.)} = @list[map $_*@list, .25, .5, .75, .97]'
+    pl -A 0..200 '@NUMBER{qw(lower median upper 97.)} = @ARGV[map $_*@ARGV, .25, .5, .75, .97]'
+    pl -A 0..200 '@N{qw(lower median upper 97.)} = @A[map $_*@A, .25, .5, .75, .97]'
 
     >         50: lower
     >        100: median
     >        150: upper
     >        194: 97.
 
-=item Triangular Number, Factorial and Average
+=item Triangular Number, Factorial and Averages
 
 I<80% of people consider themselves to be above average. :-)>
 
 The triangular number is defined as the sum of all numbers from 1 to I<n>, e.g. 1
-to 5:
+to 5.  Factorial is the equivalent for products:
 
-    pl 'echo sum 1..5'
-    pl 'e sum 1..5'
+    pl 'echo sum 1..5;
+        echo product 1..5'
+    pl 'e sum 1..5;
+        e product 1..5'
 
     >   15
-
-Factorial is the equivalent for products:
-
-    pl 'echo product 1..5'
-    pl 'e product 1..5'
-
     >   120
 
 The sum of all list elements divided by the length of the list gives the
-average:
+linear average.  Alternately the root mean square can be a fairer average,
+because it accounts for the weights:
 
-    pl -A '11..200' 'echo sum( @ARGV ) / @ARGV'
-    pl -A '11..200' 'e sum( @A ) / @A'
+    pl -A 11..200 'echo sum( @ARGV ) / @ARGV;
+         echo sqrt sum( map $_ ** 2, @ARGV ) / @ARGV'
+    pl -A 11..200 'e sum( @A ) / @A;
+         e sqrt sum( map $_ ** 2, @A ) / @A'
 
     >   105.5
+    >   118.905424602917
 
 =item Add Pairs or Tuples of Numbers
 
@@ -1539,9 +1568,9 @@ This calculates all primes in a given range, e.g. 2 to 99:
 These are, seeded with 1 and 1, all sums of the previous two.  Show all up to
 a given maximum:
 
-    pl '$a = $_ = 1; e;
+    pl '$a = $_ = 1; echo;
         while( $_ < $ARGV[0] ) {
-            e; ($a, $_) = ($_, $a + $_)
+            echo; ($a, $_) = ($_, $a + $_)
         }' 50000
     pl '$a = $_ = 1; e;
         while( $_ < $A[0] ) {
@@ -1575,7 +1604,7 @@ a given maximum:
 
 =item Collatz 3n + 1
 
-I<What is 3n plus n?  B< >Dunno, sounds 4n to me. (-:>
+I<What is 3n plus n?  B< >Hmm, sounds 4n to me. (-:>
 
 Collatz' unproven & unrefuted conjecture is that the function C<f(n) = if odd:
 3n + 1 else n/2> will always lead to 1, when applied repeatedly to any natural
@@ -1840,7 +1869,7 @@ indicators:
 
 This lead to exciting findings L<here|https://perl1liner.sourceforge.io/Collatz/>.
 
-=item Separate big numbers with commas, ...
+=item Separate Big Numbers with Commas, ...
 
 Loop and print with line-end (B<-opl>) over remaining args in C<$_>.  If
 reading from stdin or files, instead of arguments, use only B<-pl>.  After a
@@ -1909,7 +1938,7 @@ Apply in your editor to the corresponding region:
 
 Assign Unix error numbers to Perl's magic variable C<$!>, which in string
 context gives the corresponding message.  Instead of explicit individual
-numbers, you could fill C<@A(RGV)> programmatically with C<B<-A> 1..133>> (the
+numbers, you could fill C<@A(RGV)> programmatically with C<B<-A> 1..133> (the
 biggest errno on my system):
 
     pl -o 'form "%3d %1:s", $! = $_' 1 14 64 111
@@ -1949,7 +1978,7 @@ length:
     >   tenet
     >   toot
 
-=item Generate a random UUID
+=item Generate a Random UUID
 
 I<Lottery: a tax on people who are bad at math. :-)>
 
@@ -1963,7 +1992,7 @@ scalar context, e.g. C<$x = form ...>:
     pl '$x = "%04x";
         f "$x$x-$x-$x-$x-$x$x$x", map rand 0x10000, 0..7'
 
-    >   1c3ccd71-0996-bb2b-b6ee-7a22686afe3e
+    >   3d614579-b779-3e37-da86-4dcc509eeb79
 
 To be RFC 4122 conformant, the 4 version & 2 variant bits need to have
 standard values.  As a different approach, B<-o> "loops" over the one
@@ -1979,9 +2008,9 @@ uses C</r> which requires Perl v5.20:
         ($u[4] /= 4) |= 0x8000;
         f s/x/%04x/gr, @u' xx-x-x-x-xxx
 
-    >   9ce973e9-06b4-48e8-ae38-32414f53e8f5
+    >   276346ff-c481-42a7-8081-4af384a2ff38
 
-=item Generate a random password
+=item Generate a Random Password
 
 I<Why should you trust atoms?  They make up everything. :-)>
 
@@ -1991,9 +2020,9 @@ C<rand 94> will always be less than 94 and C<chr> will round it down:
 
     pl 'say map chr(33 + rand 94), 1..12'
 
-    >   :IDYYyMe%&|Q
+    >   1(YtjPq+MnUq
 
-=item DNS lookup
+=item DNS Lookup
 
 I<What do you call a sheep with no legs?  B< >A cloud. *;=;>
 
@@ -2008,7 +2037,11 @@ C<@A(RGV)>:
 
     >   127.0.0.1 localhost
     >   139.178.67.96 cpan.org perl.org
+    >   151.101.1.55 cpan.org
+    >   151.101.65.55 cpan.org
     >   151.101.114.132 perldoc.perl.org
+    >   151.101.129.55 cpan.org
+    >   151.101.193.55 cpan.org
     >   2a04:4e42:1b::644 perldoc.perl.org
 
     pl 'hosts @ARGV' perl.org 127.0.0.1 perldoc.perl.org cpan.org
@@ -2025,6 +2058,10 @@ addresses:
     >   151.101.114.132 perldoc.perl.org
     >   2a04:4e42:1b::644 perldoc.perl.org
     >   139.178.67.96 cpan.org
+    >   151.101.1.55 cpan.org
+    >   151.101.65.55 cpan.org
+    >   151.101.129.55 cpan.org
+    >   151.101.193.55 cpan.org
 
     pl -o hosts perl.org 127.0.0.1 perldoc.perl.org cpan.org
     pl -o h perl.org 127.0.0.1 perldoc.perl.org cpan.org
@@ -2036,7 +2073,8 @@ If your input comes from files, collect it in a list and perform at end (B<-E>):
 
 =item Quine
 
-I<I feel more like I do now than I did a while ago. (-:>
+I<Life is what the least of us make the most of us feel the least of us make
+the most of. --B< >van Orman Quine @-)>
 
 A quine is a program that prints itself.  This uses inside knowledge of that
 your program compiles to a function.  The 2nd C<e(cho)> decompiles and

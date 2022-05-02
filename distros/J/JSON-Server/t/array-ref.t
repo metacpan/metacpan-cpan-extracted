@@ -11,7 +11,7 @@ my $in = [qw!monster baby!];
 # is odd, but probably due to simultaneous with utf8-server.t which
 # was using the same port number before.
 
-my $port = 9995;
+my $port = empty_port ();
 my $pid = fork ();
 my $rt; # round trip
 if ($pid) {

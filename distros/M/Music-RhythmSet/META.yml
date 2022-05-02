@@ -4,6 +4,7 @@ author:
   - 'Jeremy Mates <jeremy.mates@gmail.com>'
 build_requires:
   MIDI: '0'
+  Scalar::Util: '0'
   Test2::V0: '0.000060'
   perl: v5.24.0
 configure_requires:
@@ -18,13 +19,13 @@ name: Music-RhythmSet
 provides:
   Music::RhythmSet:
     file: lib/Music/RhythmSet.pm
-    version: '0.03'
+    version: '0.04'
   Music::RhythmSet::Util:
     file: lib/Music/RhythmSet/Util.pm
-    version: '0.03'
+    version: '0.04'
   Music::RhythmSet::Voice:
     file: lib/Music/RhythmSet/Voice.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   List::GroupingPriorityQueue: '0'
   MIDI: '0'
@@ -34,5 +35,5 @@ requires:
   perl: v5.24.0
 resources:
   license: http://opensource.org/licenses/BSD-3-Clause
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

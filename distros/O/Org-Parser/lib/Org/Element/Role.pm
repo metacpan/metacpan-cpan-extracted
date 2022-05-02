@@ -17,7 +17,7 @@ Org::Element::Role - Role for Org::Element::* classes
 
 =head1 VERSION
 
-This document describes version 0.556 of Org::Element::Role (from Perl distribution Org-Parser), released on 2022-02-08.
+This document describes version 0.557 of Org::Element::Role (from Perl distribution Org-Parser), released on 2022-03-27.
 
 =head1 HOMEPAGE
 

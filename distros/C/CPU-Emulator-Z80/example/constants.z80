@@ -1,0 +1,6 @@
+$port__mem_bank   = 0
+$port__mem_unbank = 1
+
+$port__io_wr_stdout = 2
+
+$port__hw_start_clock = 0xFF

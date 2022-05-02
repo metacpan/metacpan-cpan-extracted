@@ -19,7 +19,7 @@ use Test::Deep;
     package MyMunger;
     use Moose;
     with 'Dist::Zilla::Role::FileMunger';
-    use List::Keywords 'first';
+    use List::Util 'first';
     sub munge_files {
         my $self = shift;
         my $file = first { $_->name eq 'Build.PL' } @{ $self->zilla->files };

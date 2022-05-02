@@ -19,6 +19,17 @@
 #include "lua_template_engine.c"
 #endif
 
+/* A util macro to get marpaESLIFLuaValueContextp from parameters when we are executing callbacks. */
+/* It is writen like this to comply with old compilers that do not like instructions between       */
+/* declarations. Do not forget ';' when using it.                                                  */
+#ifdef MARPAESLIFLUA_EMBEDDED
+#  define MARPAESLIFVALUEP_TO_CONTEXT(marpaESLIFValuep, userDatavp) (((marpaESLIFValuep)->marpaESLIFLuaValueContextp != NULL) ? (marpaESLIFValuep)->marpaESLIFLuaValueContextp : userDatavp)
+#  define MARPAESLIFRECOGNIZERP_TO_CONTEXT(marpaESLIFRecognizerp, userDatavp) (((marpaESLIFRecognizerp)->marpaESLIFLuaRecognizerContextp != NULL) ? (marpaESLIFRecognizerp)->marpaESLIFLuaRecognizerContextp : userDatavp)
+#else
+#  define MARPAESLIFVALUEP_TO_CONTEXT(marpaESLIFValuep, userDatavp) userDatavp
+#  define MARPAESLIFRECOGNIZERP_TO_CONTEXT(marpaESLIFRecognizerp, userDatavp) userDatavp
+#endif
+
 /* Shall this module determine automatically string encoding ? */
 /* #define MARPAESLIFLUA_AUTO_ENCODING_DETECT */
 
@@ -224,10 +235,13 @@ static void                               marpaESLIFLua_recognizerFreeCallbackv(
 static void                               marpaESLIFLua_genericFreeCallbackv(void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp);
 static short                              marpaESLIFLua_valueImporterb(marpaESLIFValue_t *marpaESLIFValuep, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb);
 static short                              marpaESLIFLua_recognizerImporterb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb);
+static short                              marpaESLIFLua_recognizerImporter_forceArraycopyb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb);
 static short                              marpaESLIFLua_symbolImporterb(marpaESLIFSymbol_t *marpaESLIFSymbolp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb);
 static inline short                       marpaESLIFLua_importb(lua_State *L, int stringtoencoding_r, int opaque_r, marpaESLIFValueResult_t *marpaESLIFValueResultp, short arraycopyb, short haveUndefb);
 static inline short                       marpaESLIFLua_pushValueb(marpaESLIFLuaValueContext_t *marpaESLIFLuaValueContextp, marpaESLIFValue_t *marpaESLIFValuep, int stackindicei, marpaESLIFValueResult_t *marpaESLIFValueResultSymbolp);
 static inline short                       marpaESLIFLua_pushRecognizerb(marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFValueResult_t *marpaESLIFValueResultp);
+static inline short                       marpaESLIFLua_pushRecognizer_forceArraycopyb(marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFValueResult_t *marpaESLIFValueResultp);
+static inline short                       _marpaESLIFLua_pushRecognizerb(marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short arraycopyb);
 static void                               marpaESLIFLua_representationDisposev(void *userDatavp, char *inputcp, size_t inputl, char *encodings);
 static short                              marpaESLIFLua_representationb(void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, char **inputcpp, size_t *inputlp, char **encodingsp, marpaESLIFRepresentationDispose_t *disposeCallbackpp, short *stringbp);
 static int                                marpaESLIFLua_marpaESLIFRecognizer_newi(lua_State *L);
@@ -3969,15 +3983,7 @@ static marpaESLIFValueRuleCallback_t marpaESLIFLua_valueRuleActionResolver(void 
 /*****************************************************************************/
 {
   static const char           *funcs                      = "marpaESLIFLua_valueRuleActionResolver";
-#ifdef MARPAESLIFLUA_EMBEDDED
-  marpaESLIFLuaValueContext_t *marpaESLIFLuaValueContextp = (marpaESLIFLuaValueContext_t *) marpaESLIFValuep->marpaESLIFLuaValueContextp;
-  /* When running embedded, the context can be injected by ESLIF or directly created inside Lua */
-  if (marpaESLIFLuaValueContextp == NULL) {
-    marpaESLIFLuaValueContextp = (marpaESLIFLuaValueContext_t *) userDatavp;
-  }
-#else
-  marpaESLIFLuaValueContext_t *marpaESLIFLuaValueContextp = (marpaESLIFLuaValueContext_t *) userDatavp;
-#endif
+  marpaESLIFLuaValueContext_t *marpaESLIFLuaValueContextp = (marpaESLIFLuaValueContext_t *) MARPAESLIFVALUEP_TO_CONTEXT(marpaESLIFValuep, userDatavp);
 
   /* Just remember the action name - lua will croak if calling this method fails */
   marpaESLIFLuaValueContextp->actions = actions;
@@ -3990,15 +3996,7 @@ static marpaESLIFValueSymbolCallback_t marpaESLIFLua_valueSymbolActionResolver(v
 /*****************************************************************************/
 {
   static const char           *funcs                      = "marpaESLIFLua_valueSymbolActionResolver";
-#ifdef MARPAESLIFLUA_EMBEDDED
-  marpaESLIFLuaValueContext_t *marpaESLIFLuaValueContextp = (marpaESLIFLuaValueContext_t *) marpaESLIFValuep->marpaESLIFLuaValueContextp;
-  /* When running embedded, the context can be injected by ESLIF or directly created inside Lua */
-  if (marpaESLIFLuaValueContextp == NULL) {
-    marpaESLIFLuaValueContextp = (marpaESLIFLuaValueContext_t *) userDatavp;
-  }
-#else
-  marpaESLIFLuaValueContext_t *marpaESLIFLuaValueContextp = (marpaESLIFLuaValueContext_t *) userDatavp;
-#endif
+  marpaESLIFLuaValueContext_t *marpaESLIFLuaValueContextp = (marpaESLIFLuaValueContext_t *) MARPAESLIFVALUEP_TO_CONTEXT(marpaESLIFValuep, userDatavp);
 
   /* Just remember the action name - lua will croak if calling this method fails */
   marpaESLIFLuaValueContextp->actions = actions;
@@ -4010,16 +4008,8 @@ static marpaESLIFValueSymbolCallback_t marpaESLIFLua_valueSymbolActionResolver(v
 static marpaESLIFRecognizerIfCallback_t marpaESLIFLua_recognizerIfActionResolver(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char *actions)
 /*****************************************************************************/
 {
-  static const char           *funcs                      = "marpaESLIFLua_recognizerIfActionResolver";
-#ifdef MARPAESLIFLUA_EMBEDDED
-  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) marpaESLIFRecognizerp->marpaESLIFLuaRecognizerContextp;
-  /* When running embedded, the context can be injected by ESLIF or directly created inside Lua */
-  if (marpaESLIFLuaRecognizerContextp == NULL) {
-    marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) userDatavp;
-  }
-#else
-  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) userDatavp;
-#endif
+  static const char                *funcs                           = "marpaESLIFLua_recognizerIfActionResolver";
+  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = MARPAESLIFRECOGNIZERP_TO_CONTEXT(marpaESLIFRecognizerp, userDatavp);
 
   /* Just remember the action name - lua will croak if calling this method fails */
   marpaESLIFLuaRecognizerContextp->actions = actions;
@@ -4031,16 +4021,8 @@ static marpaESLIFRecognizerIfCallback_t marpaESLIFLua_recognizerIfActionResolver
 static marpaESLIFRecognizerEventCallback_t marpaESLIFLua_recognizerEventActionResolver(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char *actions)
 /*****************************************************************************/
 {
-  static const char           *funcs                      = "marpaESLIFLua_recognizerEventActionResolver";
-#ifdef MARPAESLIFLUA_EMBEDDED
-  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) marpaESLIFRecognizerp->marpaESLIFLuaRecognizerContextp;
-  /* When running embedded, the context can be injected by ESLIF or directly created inside Lua */
-  if (marpaESLIFLuaRecognizerContextp == NULL) {
-    marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) userDatavp;
-  }
-#else
-  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) userDatavp;
-#endif
+  static const char                *funcs                           = "marpaESLIFLua_recognizerEventActionResolver";
+  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = MARPAESLIFRECOGNIZERP_TO_CONTEXT(marpaESLIFRecognizerp, userDatavp);
 
   /* Just remember the action name - lua will croak if calling this method fails */
   marpaESLIFLuaRecognizerContextp->actions = actions;
@@ -4052,16 +4034,8 @@ static marpaESLIFRecognizerEventCallback_t marpaESLIFLua_recognizerEventActionRe
 static marpaESLIFRecognizerRegexCallback_t marpaESLIFLua_recognizerRegexActionResolver(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char *actions)
 /*****************************************************************************/
 {
-  static const char           *funcs                      = "marpaESLIFLua_recognizerRegexActionResolver";
-#ifdef MARPAESLIFLUA_EMBEDDED
-  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) marpaESLIFRecognizerp->marpaESLIFLuaRecognizerContextp;
-  /* When running embedded, the context can be injected by ESLIF or directly created inside Lua */
-  if (marpaESLIFLuaRecognizerContextp == NULL) {
-    marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) userDatavp;
-  }
-#else
-  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) userDatavp;
-#endif
+  static const char                *funcs                           = "marpaESLIFLua_recognizerRegexActionResolver";
+  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = MARPAESLIFRECOGNIZERP_TO_CONTEXT(marpaESLIFRecognizerp, userDatavp);
 
   /* Just remember the action name - lua will croak if calling this method fails */
   marpaESLIFLuaRecognizerContextp->actions = actions;
@@ -4073,16 +4047,8 @@ static marpaESLIFRecognizerRegexCallback_t marpaESLIFLua_recognizerRegexActionRe
 static marpaESLIFRecognizerGeneratorCallback_t marpaESLIFLua_recognizerGeneratorActionResolver(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char *actions)
 /*****************************************************************************/
 {
-  static const char           *funcs                      = "marpaESLIFLua_recognizerGeneratorActionResolver";
-#ifdef MARPAESLIFLUA_EMBEDDED
-  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) marpaESLIFRecognizerp->marpaESLIFLuaRecognizerContextp;
-  /* When running embedded, the context can be injected by ESLIF or directly created inside Lua */
-  if (marpaESLIFLuaRecognizerContextp == NULL) {
-    marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) userDatavp;
-  }
-#else
-  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) userDatavp;
-#endif
+  static const char                *funcs                           = "marpaESLIFLua_recognizerGeneratorActionResolver";
+  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = MARPAESLIFRECOGNIZERP_TO_CONTEXT(marpaESLIFRecognizerp, userDatavp);
 
   /* Just remember the action name - lua will croak if calling this method fails */
   marpaESLIFLuaRecognizerContextp->actions = actions;
@@ -4140,15 +4106,7 @@ static short marpaESLIFLua_valueCallbackb(void *userDatavp, marpaESLIFValue_t *m
 /*****************************************************************************/
 {
   static const char           *funcs                      = "marpaESLIFLua_valueCallbackb";
-#ifdef MARPAESLIFLUA_EMBEDDED
-  marpaESLIFLuaValueContext_t *marpaESLIFLuaValueContextp = (marpaESLIFLuaValueContext_t *) marpaESLIFValuep->marpaESLIFLuaValueContextp;
-  /* When running embedded, the context can be injected by ESLIF or directly created inside Lua */
-  if (marpaESLIFLuaValueContextp == NULL) {
-    marpaESLIFLuaValueContextp = (marpaESLIFLuaValueContext_t *) userDatavp;
-  }
-#else
-  marpaESLIFLuaValueContext_t *marpaESLIFLuaValueContextp = (marpaESLIFLuaValueContext_t *) userDatavp;
-#endif
+  marpaESLIFLuaValueContext_t *marpaESLIFLuaValueContextp = MARPAESLIFVALUEP_TO_CONTEXT(marpaESLIFValuep, userDatavp);
   lua_State                   *L                          = marpaESLIFLuaValueContextp->L;
   char                        *actions                    = precompiledb ? NULL : marpaESLIFLuaValueContextp->actions;
   int                          interface_r                = marpaESLIFLuaValueContextp->valueInterface_r;
@@ -4228,23 +4186,15 @@ static short marpaESLIFLua_valueCallbackb(void *userDatavp, marpaESLIFValue_t *m
 }
 
 /*****************************************************************************/
-static short marpaESLIFLua_ifCallbackb(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFValueResult_t *marpaESLIFValueResultSymbolp, marpaESLIFValueResultBool_t *marpaESLIFValueResultBoolp, short precompiledb)
+static short marpaESLIFLua_ifCallbackb(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFValueResult_t *marpaESLIFValueResultp, marpaESLIFValueResultBool_t *marpaESLIFValueResultBoolp, short precompiledb)
 /*****************************************************************************/
 {
-  static const char           *funcs                      = "marpaESLIFLua_ifCallbackb";
-#ifdef MARPAESLIFLUA_EMBEDDED
-  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) marpaESLIFRecognizerp->marpaESLIFLuaRecognizerContextp;
-  /* When running embedded, the context can be injected by ESLIF or directly created inside Lua */
-  if (marpaESLIFLuaRecognizerContextp == NULL) {
-    marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) userDatavp;
-  }
-#else
-  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) userDatavp;
-#endif
-  lua_State                   *L                          = marpaESLIFLuaRecognizerContextp->L;
-  char                        *actions                    = precompiledb ? NULL : marpaESLIFLuaRecognizerContextp->actions;
-  int                          tmpi;
-  short                        rcb;
+  static const char                *funcs                           = "marpaESLIFLua_ifCallbackb";
+  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = MARPAESLIFRECOGNIZERP_TO_CONTEXT(marpaESLIFRecognizerp, userDatavp);
+  lua_State                        *L                               = marpaESLIFLuaRecognizerContextp->L;
+  char                             *actions                         = precompiledb ? NULL : marpaESLIFLuaRecognizerContextp->actions;
+  int                               tmpi;
+  short                             rcb;
 
   /* fprintf(stdout, "... action %s start\n", marpaESLIFLuaRecognizerContextp->actions); fflush(stdout); fflush(stderr); */
 
@@ -4256,7 +4206,7 @@ static short marpaESLIFLua_ifCallbackb(void *userDatavp, marpaESLIFRecognizer_t 
                           actions,
                           1 /* nargs */,
                           {
-                            if (! marpaESLIFLua_pushRecognizerb(marpaESLIFLuaRecognizerContextp, marpaESLIFRecognizerp, marpaESLIFValueResultSymbolp)) goto err;
+                            if (! marpaESLIFLua_pushRecognizerb(marpaESLIFLuaRecognizerContextp, marpaESLIFRecognizerp, marpaESLIFValueResultp)) goto err;
                           },
                           &tmpi
                           );
@@ -4280,19 +4230,11 @@ static short marpaESLIFLua_regexCallbackb(void *userDatavp, marpaESLIFRecognizer
 /*****************************************************************************/
 {
   static const char                *funcs                           = "marpaESLIFLua_regexCallbackb";
-#ifdef MARPAESLIFLUA_EMBEDDED
-  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) marpaESLIFRecognizerp->marpaESLIFLuaRecognizerContextp;
-  /* When running embedded, the context can be injected by ESLIF or directly created inside Lua */
-  if (marpaESLIFLuaRecognizerContextp == NULL) {
-    marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) userDatavp;
-  }
-#else
-  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) userDatavp;
-#endif
-  lua_State                   *L                          = marpaESLIFLuaRecognizerContextp->L;
-  char                        *actions                    = precompiledb ? NULL : marpaESLIFLuaRecognizerContextp->actions;
-  int                          tmpi;
-  short                        rcb;
+  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = MARPAESLIFRECOGNIZERP_TO_CONTEXT(marpaESLIFRecognizerp, userDatavp);
+  lua_State                        *L                               = marpaESLIFLuaRecognizerContextp->L;
+  char                             *actions                         = precompiledb ? NULL : marpaESLIFLuaRecognizerContextp->actions;
+  int                               tmpi;
+  short                             rcb;
 
   /* fprintf(stdout, "... action %s start\n", marpaESLIFLuaRecognizerContextp->actions); fflush(stdout); fflush(stderr); */
 
@@ -4329,38 +4271,32 @@ static short marpaESLIFLua_regexCallbackb(void *userDatavp, marpaESLIFRecognizer
 static short marpaESLIFLua_generatorCallbackb(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFValueResult_t *contextp, short precompiledb, marpaESLIFValueResultString_t *marpaESLIFValueResultOutp)
 /*****************************************************************************/
 {
-  static const char           *funcs                      = "marpaESLIFLua_generatorCallbackb";
-#ifdef MARPAESLIFLUA_EMBEDDED
-  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) marpaESLIFRecognizerp->marpaESLIFLuaRecognizerContextp;
-  /* When running embedded, the context can be injected by ESLIF or directly created inside Lua */
-  if (marpaESLIFLuaRecognizerContextp == NULL) {
-    marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) userDatavp;
-  }
-#else
-  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) userDatavp;
-#endif
-  lua_State                    *L                          = marpaESLIFLuaRecognizerContextp->L;
-  char                         *actions                    = precompiledb ? NULL : marpaESLIFLuaRecognizerContextp->actions;
+  static const char                *funcs                           = "marpaESLIFLua_generatorCallbackb";
+  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = MARPAESLIFRECOGNIZERP_TO_CONTEXT(marpaESLIFRecognizerp, userDatavp);
+  lua_State                        *L                               = marpaESLIFLuaRecognizerContextp->L;
+  char                             *actions                         = precompiledb ? NULL : marpaESLIFLuaRecognizerContextp->actions;
   /* Note that ESLIF guarantees that contextp is never NULL and is of type ROW */
-  size_t                        nargs                      = contextp->u.r.sizel;
-  char                         *strings;
-  size_t                        stringl;
-  short                         rcb;
-  char                         *encodingasciis;
-  size_t                        i;
+  size_t                            nargs                           = contextp->u.r.sizel;
+  char                             *strings;
+  size_t                            stringl;
+  short                             rcb;
+  char                             *encodingasciis;
+  size_t                            i;
 
   /* fprintf(stdout, "... action %s start\n", marpaESLIFLuaRecognizerContextp->actions); fflush(stdout); fflush(stderr); */
 
   /* We set a unmanaged recognizer object in recognizer interface */
   if (! marpaESLIFLua_setRecognizerEngineForCallbackv(L, marpaESLIFLuaRecognizerContextp, marpaESLIFRecognizerp)) goto err;
 
+  /* Take care, here contextp is the equivalent of a table.pack */
   MARPAESLIFLUA_CALLBACKS(L,
                           marpaESLIFLuaRecognizerContextp->recognizerInterface_r,
                           actions,
                           nargs,
                           for (i = 0; i < nargs; i++) {
-                            if (! marpaESLIFLua_pushRecognizerb(marpaESLIFLuaRecognizerContextp, marpaESLIFRecognizerp, &(contextp->u.r.p[i]))) goto err;
+                            if (! marpaESLIFLua_pushRecognizer_forceArraycopyb(marpaESLIFLuaRecognizerContextp, marpaESLIFRecognizerp, &(contextp->u.r.p[i]))) goto err;
                           }
+                          /* marpaESLIFLua_stackdumpv(L, 0); */
                           ,
                           &strings,
                           &stringl
@@ -4391,21 +4327,13 @@ static short marpaESLIFLua_generatorCallbackb(void *userDatavp, marpaESLIFRecogn
 static short marpaESLIFLua_eventCallbackb(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFEvent_t *eventArrayp, size_t eventArrayl, marpaESLIFValueResultBool_t *marpaESLIFValueResultBoolp, short precompiledb)
 /*****************************************************************************/
 {
-  static const char           *funcs                      = "marpaESLIFLua_eventCallbackb";
-#ifdef MARPAESLIFLUA_EMBEDDED
-  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) marpaESLIFRecognizerp->marpaESLIFLuaRecognizerContextp;
-  /* When running embedded, the context can be injected by ESLIF or directly created inside Lua */
-  if (marpaESLIFLuaRecognizerContextp == NULL) {
-    marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) userDatavp;
-  }
-#else
-  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) userDatavp;
-#endif
-  lua_State                   *L                          = marpaESLIFLuaRecognizerContextp->L;
-  char                        *actions                    = precompiledb ? NULL : marpaESLIFLuaRecognizerContextp->actions;
-  size_t                       i;
-  int                          tmpi;
-  short                        rcb;
+  static const char                *funcs                           = "marpaESLIFLua_eventCallbackb";
+  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = MARPAESLIFRECOGNIZERP_TO_CONTEXT(marpaESLIFRecognizerp, userDatavp);
+  lua_State                        *L                               = marpaESLIFLuaRecognizerContextp->L;
+  char                             *actions                         = precompiledb ? NULL : marpaESLIFLuaRecognizerContextp->actions;
+  size_t                            i;
+  int                               tmpi;
+  short                             rcb;
 
   /* fprintf(stdout, "... action %s start\n", marpaESLIFLuaRecognizerContextp->actions); fflush(stdout); fflush(stderr); */
 
@@ -4448,15 +4376,7 @@ static void marpaESLIFLua_valueFreeCallbackv(void *userDatavp, marpaESLIFValue_t
 /*****************************************************************************/
 {
   static const char           *funcs                      = "marpaESLIFLua_valueFreeCallbackv";
-#ifdef MARPAESLIFLUA_EMBEDDED
-  marpaESLIFLuaValueContext_t *marpaESLIFLuaValueContextp = (marpaESLIFLuaValueContext_t *) marpaESLIFValuep->marpaESLIFLuaValueContextp;
-  /* When running embedded, the context can be injected by ESLIF or directly created inside Lua */
-  if (marpaESLIFLuaValueContextp == NULL) {
-    marpaESLIFLuaValueContextp = (marpaESLIFLuaValueContext_t *) userDatavp;
-  }
-#else
-  marpaESLIFLuaValueContext_t *marpaESLIFLuaValueContextp = (marpaESLIFLuaValueContext_t *) userDatavp;
-#endif
+  marpaESLIFLuaValueContext_t *marpaESLIFLuaValueContextp = MARPAESLIFVALUEP_TO_CONTEXT(marpaESLIFValuep, userDatavp);
 
   marpaESLIFLua_genericFreeCallbackv((void *) marpaESLIFLuaValueContextp->L, marpaESLIFValueResultp);
 }
@@ -4466,15 +4386,7 @@ static void marpaESLIFLua_recognizerFreeCallbackv(void *userDatavp, marpaESLIFRe
 /*****************************************************************************/
 {
   static const char                *funcs                           = "marpaESLIFLua_recognizerFreeCallbackv";
-#ifdef MARPAESLIFLUA_EMBEDDED
-  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) marpaESLIFRecognizerp->marpaESLIFLuaRecognizerContextp;
-  /* When running embedded, the context can be injected by ESLIF or directly created inside Lua */
-  if (marpaESLIFLuaRecognizerContextp == NULL) {
-    marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) userDatavp;
-  }
-#else
-  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) userDatavp;
-#endif
+  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = MARPAESLIFRECOGNIZERP_TO_CONTEXT(marpaESLIFRecognizerp, userDatavp);
 
   marpaESLIFLua_genericFreeCallbackv((void *) marpaESLIFLuaRecognizerContextp->L, marpaESLIFValueResultp);
 }
@@ -4534,9 +4446,7 @@ static inline short marpaESLIFLua_importb(lua_State *L, int stringtoencoding_r, 
 {
   static const char           *funcs = "marpaESLIFLua_importb";
   size_t                       i;
-  size_t                       j;
   marpaESLIFValueResult_t     *marpaESLIFValueResultDupp;
-  int                          typei;
   short                        rcb;
 
   switch (marpaESLIFValueResultp->type) {
@@ -4714,15 +4624,7 @@ static short marpaESLIFLua_valueImporterb(marpaESLIFValue_t *marpaESLIFValuep, v
 /*****************************************************************************/
 {
   static const char           *funcs                      = "marpaESLIFLua_valueImporterb";
-#ifdef MARPAESLIFLUA_EMBEDDED
-  marpaESLIFLuaValueContext_t *marpaESLIFLuaValueContextp = (marpaESLIFLuaValueContext_t *) marpaESLIFValuep->marpaESLIFLuaValueContextp;
-  /* When running embedded, the context can be injected by ESLIF or directly created inside Lua */
-  if (marpaESLIFLuaValueContextp == NULL) {
-    marpaESLIFLuaValueContextp = (marpaESLIFLuaValueContext_t *) userDatavp;
-  }
-#else
-  marpaESLIFLuaValueContext_t *marpaESLIFLuaValueContextp = (marpaESLIFLuaValueContext_t *) userDatavp;
-#endif
+  marpaESLIFLuaValueContext_t *marpaESLIFLuaValueContextp = MARPAESLIFVALUEP_TO_CONTEXT(marpaESLIFValuep, userDatavp);
 
   return marpaESLIFLua_importb(marpaESLIFLuaValueContextp->L, marpaESLIFLuaValueContextp->stringtoencoding_r, marpaESLIFLuaValueContextp->opaque_r, marpaESLIFValueResultp, 1 /* arraycopyb */, haveUndefb);
 }
@@ -4731,18 +4633,20 @@ static short marpaESLIFLua_valueImporterb(marpaESLIFValue_t *marpaESLIFValuep, v
 static short marpaESLIFLua_recognizerImporterb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb)
 /*****************************************************************************/
 {
-  static const char           *funcs                      = "marpaESLIFLua_recognizerImporterb";
-#ifdef MARPAESLIFLUA_EMBEDDED
-  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) marpaESLIFRecognizerp->marpaESLIFLuaRecognizerContextp;
-  /* When running embedded, the context can be injected by ESLIF or directly created inside Lua */
-  if (marpaESLIFLuaRecognizerContextp == NULL) {
-    marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) userDatavp;
-  }
-#else
-  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = (marpaESLIFLuaRecognizerContext_t *) userDatavp;
-#endif
+  static const char                *funcs                           = "marpaESLIFLua_recognizerImporterb";
+  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = MARPAESLIFRECOGNIZERP_TO_CONTEXT(marpaESLIFRecognizerp, userDatavp);
 
   return marpaESLIFLua_importb(marpaESLIFLuaRecognizerContextp->L, marpaESLIFLuaRecognizerContextp->stringtoencoding_r, marpaESLIFLuaRecognizerContextp->opaque_r, marpaESLIFValueResultp, 0 /* arraycopyb */, haveUndefb);
+}
+
+/*****************************************************************************/
+static short marpaESLIFLua_recognizerImporter_forceArraycopyb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb)
+/*****************************************************************************/
+{
+  static const char                *funcs                           = "marpaESLIFLua_recognizerImporter_forceArraycopyb";
+  marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp = MARPAESLIFRECOGNIZERP_TO_CONTEXT(marpaESLIFRecognizerp, userDatavp);
+
+  return marpaESLIFLua_importb(marpaESLIFLuaRecognizerContextp->L, marpaESLIFLuaRecognizerContextp->stringtoencoding_r, marpaESLIFLuaRecognizerContextp->opaque_r, marpaESLIFValueResultp, 1 /* arraycopyb */, haveUndefb);
 }
 
 /*****************************************************************************/
@@ -4797,13 +4701,33 @@ static inline short marpaESLIFLua_pushValueb(marpaESLIFLuaValueContext_t *marpaE
 /*****************************************************************************/
 static inline short marpaESLIFLua_pushRecognizerb(marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFValueResult_t *marpaESLIFValueResultp)
 /*****************************************************************************/
+/* Standard recognizer push that will not force an array copy.               */
+/*****************************************************************************/
+{
+  return _marpaESLIFLua_pushRecognizerb(marpaESLIFLuaRecognizerContextp, marpaESLIFRecognizerp, marpaESLIFValueResultp, 0 /* arraycopyb */);
+}
+
+/*****************************************************************************/
+static inline short marpaESLIFLua_pushRecognizer_forceArraycopyb(marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFValueResult_t *marpaESLIFValueResultp)
+/*****************************************************************************/
+/* A recognizer push that forces array copy (generator action case only)     */
+/*****************************************************************************/
+{
+  return _marpaESLIFLua_pushRecognizerb(marpaESLIFLuaRecognizerContextp, marpaESLIFRecognizerp, marpaESLIFValueResultp, 1 /* arraycopyb */);
+}
+
+/*****************************************************************************/
+static inline short _marpaESLIFLua_pushRecognizerb(marpaESLIFLuaRecognizerContext_t *marpaESLIFLuaRecognizerContextp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short arraycopyb)
+/*****************************************************************************/
+/* Note that arraycopyb can be true only with the embedded Lua.              */
+/*****************************************************************************/
 {
   static const char       *funcs = "marpaESLIFLua_pushRecognizerb";
   lua_State               *L     = marpaESLIFLuaRecognizerContextp->L;
 
 #ifdef MARPAESLIFLUA_EMBEDDED
   /* In embedded mode we must never trust userDatavp */
-  if (! _marpaESLIFRecognizer_eslif2hostb(marpaESLIFRecognizerp, marpaESLIFValueResultp, marpaESLIFLuaRecognizerContextp /* forcedUserDatavp */, marpaESLIFLua_recognizerImporterb /* forcedImporterp */)) {
+  if (! _marpaESLIFRecognizer_eslif2hostb(marpaESLIFRecognizerp, marpaESLIFValueResultp, marpaESLIFLuaRecognizerContextp /* forcedUserDatavp */, arraycopyb ? marpaESLIFLua_recognizerImporter_forceArraycopyb : marpaESLIFLua_recognizerImporterb /* forcedImporterp */)) {
     marpaESLIFLua_luaL_errorf(L, "_marpaESLIFRecognizer_eslif2hostb failure, %s", strerror(errno));
     goto err;
   }
@@ -7979,18 +7903,8 @@ static inline short marpaESLIFLua_lua_copy(lua_State *L, int fromidx, int toidx)
 /* Note that caller is responsible to give valid indices.                   */
 /****************************************************************************/
 {
-  short rcb;
-
   lua_copy(L, fromidx, toidx); /* Native lua call */
-
-  rcb = 1;
-  goto done;
-
- err:
-  rcb = 0;
-
- done:
-  return rcb;
+  return 1;
 }
 #endif
 
@@ -8726,7 +8640,6 @@ static inline short marpaESLIFLua_lua_gettable(int *rcip, lua_State *L, int idx)
 /****************************************************************************/
 {
   int   rci;
-  short rcb;
 
 #if LUA_VERSION_NUM < 503
   lua_gettable(L, idx);
@@ -8736,14 +8649,7 @@ static inline short marpaESLIFLua_lua_gettable(int *rcip, lua_State *L, int idx)
 #endif
   if (rcip != NULL) *rcip = rci;
 
-  rcb = 1;
-  goto done;
-
- err:
-  rcb = 0;
-
- done:
-  return rcb;
+  return 1;
 }
 #endif
 

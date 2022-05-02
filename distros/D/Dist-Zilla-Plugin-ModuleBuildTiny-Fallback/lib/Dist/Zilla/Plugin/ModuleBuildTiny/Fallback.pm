@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::ModuleBuildTiny::Fallback; # git description: v0.025-17-gb471c35
+package Dist::Zilla::Plugin::ModuleBuildTiny::Fallback; # git description: v0.026-2-g0b94ee1
 # vim: set ts=8 sts=2 sw=2 tw=115 et :
 # ABSTRACT: Generate a Build.PL that uses Module::Build::Tiny and Module::Build
 # KEYWORDS: plugin installer Module::Build Build.PL toolchain legacy ancient backcompat
 
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 use Moose;
 with
@@ -19,7 +19,7 @@ use Types::Standard qw(Str HashRef ArrayRef ConsumerOf);
 use Dist::Zilla::Plugin::ModuleBuild;
 use Dist::Zilla::Plugin::ModuleBuildTiny;
 use Moose::Util 'find_meta';
-use List::Keywords qw(first any);
+use List::Util 1.33 qw(first any);
 use Scalar::Util 'blessed';
 use Path::Tiny;
 use namespace::autoclean;
@@ -396,7 +396,7 @@ Dist::Zilla::Plugin::ModuleBuildTiny::Fallback - Generate a Build.PL that uses M
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

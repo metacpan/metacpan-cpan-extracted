@@ -68,7 +68,7 @@ METHODS
     register values as a convenience.
 
        carrier_frequency => "800.000MHz",
-       channel_spacing   => "191.951.kHz",
+       channel_spacing   => "191.951kHz",
        deviation         => "47.607kHz",
     
        data_rate         => "115.1kbps",
@@ -102,7 +102,7 @@ METHODS
          GFSK-38.4kb
          GFSK-100kb
          MSK-250kb
-         MSG-500kb
+         MSK-500kb
 
  read_marcstate
 

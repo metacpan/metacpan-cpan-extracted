@@ -1,5 +1,8 @@
 Revision history for List-Util-MaybeXS
 
+1.500012 - 2022-04-29
+  - fix handling of various Inf forms on platforms like Windows
+
 1.500011 - 2022-04-25
   - uniqnum: fix handling of all numbers by checking how they are stored,
     rather than trying to detect it.

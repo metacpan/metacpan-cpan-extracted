@@ -1,6 +1,6 @@
 package RT::Extension::CreateByProblemType;
 
-our $VERSION = '1.01';
+our $VERSION = '1.04';
 
 use warnings;
 use strict;
@@ -40,7 +40,7 @@ selecting a problem type, not a queue."
 
 May need root permissions
 
-=item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
 
 If you are using RT 4.2 or greater, add this line:
 
@@ -54,7 +54,7 @@ or add C<RT::Extension::CreateByProblemType> to your existing C<@Plugins> line.
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt4/var/mason_data/obj
+    rm -rf /opt/rt5/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -83,7 +83,7 @@ or via the web at
 
 =head1 COPYRIGHT
 
-This extension is Copyright (C) 2008-2014 Best Practical Solutions, LLC.
+This extension is Copyright (C) 2008-2022 Best Practical Solutions, LLC.
 
 This is free software, licensed under:
 

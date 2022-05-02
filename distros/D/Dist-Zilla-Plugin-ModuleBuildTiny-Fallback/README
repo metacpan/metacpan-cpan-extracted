@@ -1,5 +1,5 @@
 This archive contains the distribution Dist-Zilla-Plugin-ModuleBuildTiny-Fallback,
-version 0.026:
+version 0.027:
 
   Generate a Build.PL that uses Module::Build::Tiny and Module::Build
 

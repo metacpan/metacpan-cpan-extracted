@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.748';
+our $VERSION = '1.750';
 
 use Term::Choose::Constants qw( :all );
 use Term::Choose::Screen    qw( hide_cursor show_cursor normal );
@@ -32,6 +32,12 @@ sub _getc_wrapper {
         return Term::ReadKey::ReadKey( $timeout );
     }
     else {
+#        if ( $timeout ) {
+#            my $rin = '';
+#            vec( $rin, fileno( STDIN ),  1 ) = 1;
+#            my $nfount = select( $rin, undef, undef, $timeout );
+#            return if ! $nfount;
+#        }
         return getc();
     }
 }
@@ -43,17 +49,7 @@ sub __get_key_OS {
     return if ! defined $c1;
     if ( $c1 eq "\e" ) {
         my $c2 = _getc_wrapper( 0.10 );
-        if    ( ! defined $c2 ) { return KEY_ESC; } # unused        #\e
-        elsif ( $c2 eq 'A' ) { return VK_UP; }      # vt 52         #\eA
-        elsif ( $c2 eq 'B' ) { return VK_DOWN; }                    #\eB
-        elsif ( $c2 eq 'C' ) { return VK_RIGHT; }                   #\eC
-        elsif ( $c2 eq 'D' ) { return VK_LEFT; }                    #\eD
-        elsif ( $c2 eq 'F' ) { return VK_END; }                     #\eF
-        elsif ( $c2 eq 'H' ) { return VK_HOME; }                    #\eH
-        elsif ( $c2 eq 'P' ) { return VK_F1; }                      #\eP
-        elsif ( $c2 eq 'Q' ) { return VK_F2; }                      #\eQ
-        elsif ( $c2 eq 'R' ) { return VK_F3; }                      #\eR
-        elsif ( $c2 eq 'S' ) { return VK_F4; }                      #\eS
+        if ( ! defined $c2 ) { return KEY_ESC; }    # unused        #\e
         elsif ( $c2 eq 'O' ) {
             my $c3 = _getc_wrapper( 0 );
             if    ( $c3 eq 'A' ) { return VK_UP; }                  #\eOA
@@ -67,9 +63,6 @@ sub __get_key_OS {
             elsif ( $c3 eq 'R' ) { return VK_F3; }                  #\eOR
             elsif ( $c3 eq 'S' ) { return VK_F4; }                  #\eOS
             elsif ( $c3 eq 'Z' ) { return KEY_BTAB; }               #\eOZ
-            else {
-                return NEXT_get_key;
-            }
         }
         elsif ( $c2 eq '[' ) {
             my $c3 = _getc_wrapper( 0 );
@@ -91,18 +84,9 @@ sub __get_key_OS {
                         elsif ( $c4 eq '2' ) { return VK_F2; }      #\e[12~
                         elsif ( $c4 eq '3' ) { return VK_F3; }      #\e[13~
                         elsif ( $c4 eq '4' ) { return VK_F4; }      #\e[14~
-                        else {
-                            return NEXT_get_key;
-                        }
-                    }
-                    else {
-                        return NEXT_get_key;
                     }
                 }
                 elsif ( $c4 eq '~' ) { return VK_HOME; }            #\e[1~
-                else {
-                    return NEXT_get_key;
-                }
             }
             elsif ( $c3 =~ m/^[23456]$/ ) {
                 my $c4 = _getc_wrapper( 0 );
@@ -112,9 +96,6 @@ sub __get_key_OS {
                     elsif ( $c3 eq '4' ) { return VK_END; }         #\e[4~
                     elsif ( $c3 eq '5' ) { return VK_PAGE_UP; }     #\e[5~
                     elsif ( $c3 eq '6' ) { return VK_PAGE_DOWN; }   #\e[6~
-                    else {
-                        return NEXT_get_key;
-                    }
                 }
             }
             # http://invisible-island.net/xterm/ctlseqs/ctlseqs.html
@@ -151,17 +132,12 @@ sub __get_key_OS {
                 return NEXT_get_key if $button == NEXT_get_key;
                 return [ $button, $x, $y ];
             }
-            else {
-                return NEXT_get_key;
-            }
-        }
-        else {
-            return NEXT_get_key;
         }
     }
     else {
         return ord $c1;
     }
+    return NEXT_get_key;
 };
 
 

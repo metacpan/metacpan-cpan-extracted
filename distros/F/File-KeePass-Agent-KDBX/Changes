@@ -1,0 +1,11 @@
+Revision history for File-KeePass-Agent-KDBX.
+
+0.901     2022-05-01 23:00:59-0600
+
+  * Now tests are skipped if they would fail because the OS is not supported.
+    No other changes.
+
+0.900     2022-04-30 23:13:23-0600
+
+  * Initial release
+

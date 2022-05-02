@@ -13,11 +13,11 @@ Class::Simple::Readonly::Cached - cache messages to an object
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 SYNOPSIS
 
@@ -40,7 +40,7 @@ that works on objects which doesn't change its state based on input:
 Creates a Class::Simple::Readonly::Cached object.
 
 It takes one mandatory parameter: cache,
-which is either an object which understands get() and set() calls,
+which is either an object which understands clear(), get() and set() calls,
 such as an L<CHI> object;
 or is a reference to a hash where the return values are to be stored.
 
@@ -64,7 +64,11 @@ sub new {
 	my $proto = shift;
 	my $class = ref($proto) || $proto;
 
-	return unless(defined($class));
+	# Use Class::Simple::Readonly::Cached->new(), not Class::Simple::Readonly::Cached::new()
+	if(!defined($class)) {
+		Carp::carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		return;
+	}
 
 	my %args;
 	if(ref($_[0]) eq 'HASH') {
@@ -81,7 +85,18 @@ sub new {
 		return;
 	}
 
-	if(!defined($args{'object'})) {
+	if(defined($args{'object'})) {
+		if(ref($args{'object'})) {
+			if(ref($args{'object'}) eq __PACKAGE__) {
+				Carp::carp(__PACKAGE__, ' warning: $object is already cached');
+				# Note that this isn't a technique for clearing the cache
+				return $args{'object'};
+			}
+		} else {
+			Carp::carp(__PACKAGE__, ' $object is a scalar');
+			return;
+		}
+	} else {
 		$args{'object'} = Class::Simple->new(%args);
 	}
 
@@ -125,6 +140,7 @@ sub state {
 	return { hits => $self->{_hits}, misses => $self->{_misses} };
 }
 
+# Returns a cached object, if you want it to be uncached, you'll need to clone it
 sub AUTOLOAD {
 	our $AUTOLOAD;
 	my $param = $AUTOLOAD;
@@ -159,7 +175,6 @@ sub AUTOLOAD {
 
 	my $key = $param . '::' . join('::', grep defined, @_);
 
-	# Retrieving a value
 	my $rc;
 	if(ref($cache) eq 'HASH') {
 		$rc = $cache->{$key};
@@ -167,13 +182,14 @@ sub AUTOLOAD {
 		$rc = $cache->get($key);
 	}
 	if(defined($rc)) {
+		# Retrieving a value
 		die $key if($rc eq 'never');
 		if(ref($rc) eq 'ARRAY') {
 			$self->{_hits}{$key}++;
 			my @foo = @{$rc};
 			if(wantarray) {
 				if(defined($foo[0])) {
-					die $key if($foo[0] eq __PACKAGE__ . ">UNDEF<");
+					die $key if($foo[0] eq __PACKAGE__ . '>UNDEF<');
 					die $key if($foo[0] eq 'never');
 				}
 				return @{$rc};
@@ -188,6 +204,7 @@ sub AUTOLOAD {
 			$self->{_hits}{$key}++;
 			return $rc;
 		}
+		# Want array from cached array after previously requesting it as a scalar
 	}
 	$self->{_misses}{$key}++;
 	my $object = $self->{'object'};
@@ -212,6 +229,10 @@ sub AUTOLOAD {
 		}
 		return;
 	}
+	# This would be nice, but it does break gedcom.  TODO: find out why
+	# if(ref($rc) && (ref($rc) =~ /::/) && (ref($rc) ne __PACKAGE__)) {
+		# $rc = Class::Simple::Readonly::Cached->new(object => $rc, cache => {});
+	# }
 	if(ref($cache) eq 'HASH') {
 		return $cache->{$key} = $rc;
 	}
@@ -226,16 +247,9 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 Doesn't work with L<Memoize>.
 
-Please report any bugs or feature requests to C<bug-class-simple-readonly-cached at rt.cpan.org>,
-or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Class-Simple-Readonly-Cached>.
+Please report any bugs or feature requests to L<https://github.com/nigelhorne/Class-Simple-Readonly-Cached/issues>.
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
-
-params() returns a ref which means that calling routines can change the hash
-for other routines.
-Take a local copy before making amendments to the table if you don't want unexpected
-things to happen.
 
 =head1 SEE ALSO
 
@@ -255,9 +269,9 @@ You can also look for information at:
 
 L<https://metacpan.org/release/Class-Simple-Readonly-Cached>
 
-=item * RT: CPAN's request tracker
+=item * Source Repository
 
-L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-Simple-Readonly-Cached>
+L<https://github.com/nigelhorne/Class-Simple-Readonly-Cached>
 
 =item * CPANTS
 
@@ -284,7 +298,7 @@ L<http://search.cpan.org/dist/Class-Simple-Readonly-Cached/>
 =head1 LICENSE AND COPYRIGHT
 
 Author Nigel Horne: C<njh@bandsman.co.uk>
-Copyright (C) 2019-2021 Nigel Horne
+Copyright (C) 2019-2022 Nigel Horne
 
 Usage is subject to licence terms.
 The licence terms of this software are as follows:

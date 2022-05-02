@@ -10,7 +10,7 @@ BEGIN {
 	use_ok('Class::Simple::Readonly::Cached');
 }
 
-HASH: {
+UTF8: {
 	my $cache = {};
 	my $cached = new_ok('Class::Simple::Readonly::Cached' => [ cache => $cache, object => x->new() ]);
 
@@ -20,11 +20,14 @@ HASH: {
 	ok($cached->utf8() eq 'Mrkvička');
 
 	# White box test the cache
-	ok($cache->{'utf8::'} eq 'Mrkvička');
+	is($cache->{'utf8::'}, 'Mrkvička', 'White box test');
 
-	# foreach my $key(sort keys %{$cache}) {
-		# diag($key);
-	# }
+	if($ENV{'TEST_VERBOSE'}) {
+		foreach my $key(sort keys %{$cache}) {
+			utf8::encode($key);
+			diag($key);
+		}
+	}
 
 	# diag(Data::Dumper->new([$cached->state()])->Dump());
 	my $misses = $cached->state()->{'misses'};

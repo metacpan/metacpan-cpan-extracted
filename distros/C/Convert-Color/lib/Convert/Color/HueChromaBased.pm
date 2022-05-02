@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
 package # hide from CPAN
    Convert::Color::HueChromaBased;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Convert::Color );
 

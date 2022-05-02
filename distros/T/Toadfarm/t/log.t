@@ -70,20 +70,23 @@ open my $FH, '<', $log_file;
 while (<$FH>) {
   diag "$.: $_" if $ENV{HARNESS_IS_VERBOSE};
 
-  #[info] 127.0.0.1 GET http://127.0.0.1:35902/yikes 404 0.0145s
-  #[info] user1 GET http://127.0.0.1:35902/with/identity 200 0.0012s
+  # 1: [2022-05-02 08:00:47.43058] [87507] [info] Loading plugin AccessLog
+  # 2: [2022-05-02 08:00:47.43343] [87507] [info] [cru53-eNVpKN] user1 GET http://127.0.0.1:50575/with/identity 200 0.0007s
+  # 3: [2022-05-02 08:00:47.44021] [87507] [info] [r7SWdN-hAcNU] 127.0.0.1 GET http://127.0.0.1:50575/yikes 404 0.0062s
+  # 4: [2022-05-02 08:00:47.44136] [87507] [info] [39MZ7FvDelBV] 127.0.0.1 GET http://thorsen.pm/prefix/with-request-base?X-Request-Base=http%3A%2F%2Fthorsen.pm%2Fprefix%2F 200 0.0004s
+  # 5: [2022-05-02 08:00:47.48140] [87507] [info] [AMiOzHurhgEo] 127.0.0.1 GET http://127.0.0.1:50575/stream/timeout 504 0.0129s
 
-  $log{without_identity} = $_ if m!info\W+\w+\W+\S+ GET http://[\w\.]+:\d+/yikes 404 [\d.]+s$!;
-  $log{with_identity}    = $_ if m!info\W+\w+\W+user1 GET http://[\w\.]+:\d+/with/identity 200 [\d.]+s$!;
-  $log{with_prefix}      = $_ if m!info.*X-Request-Base!;
-  $log{with_close}       = $_ if m!/close\s\d+!;
-  $log{with_timeout}     = $_ if m!/timeout.*504!;
+  $log{without_identity} = $_ if m!info.*?GET http://[\w\.]+:\d+/yikes 404 [\d.]+s$!s;
+  $log{with_identity}    = $_ if m!info.*?GET http://[\w\.]+:\d+/with/identity 200 [\d.]+s$!s;
+  $log{with_prefix}      = $_ if m!info.*X-Request-Base!s;
+  $log{with_close}       = $_ if m!/close\s\d+!s;
+  $log{with_timeout}     = $_ if m!/timeout.*504!s;
 }
 
-like $log{with_identity},    qr{\buser1\b.*identity},                         'got access log line with identity';
-like $log{without_identity}, qr{GET.*yikes},                                  'got access log line without userinfo';
-like $log{with_prefix},      qr{http://thorsen\.pm/prefix/with-request-base}, 'got access log line base url prefix';
-like $log{with_timeout},     qr{GET.*/timeout\s504\s},                        'got timeout';
+like $log{with_identity},    qr{\buser1\b.*identity}s,                         'got access log line with identity';
+like $log{without_identity}, qr{GET.*yikes}s,                                  'got access log line without userinfo';
+like $log{with_prefix},      qr{http://thorsen\.pm/prefix/with-request-base}s, 'got access log line base url prefix';
+like $log{with_timeout},     qr{GET.*/timeout\s504\s}s,                        'got timeout';
 ok !$log{with_close}, 'do not log when client close' or diag $log{with_close};
 
 unlink $log_file unless $ENV{KEEP_LOG_FILE};

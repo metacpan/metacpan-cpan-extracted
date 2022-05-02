@@ -19,8 +19,8 @@ sub post_process {
     my $session_data = $session->read('oauth');
 
     my $resp = $self->{ua}->request(
-        GET $self->provider_settings->{urls}{user_info}."?access_token=".
-            $session_data->{github}{access_token}
+        GET $self->provider_settings->{urls}{user_info},
+        'Authorization' => 'token '.$session_data->{github}{access_token}
     );
 
     if( $resp->is_success ) {

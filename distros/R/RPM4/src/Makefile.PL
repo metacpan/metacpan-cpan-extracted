@@ -39,8 +39,10 @@ print $FH ' * $Id$' . "\n";
 print $FH " */\n\n";
 print $FH "#ifndef RPMVERSION_H\n#define RPMVERSION_H\n\n";
 foreach (qw(
+    4.12.0
     4.12.90
     4.15.0
+    4.18.0
     )) {
     my $v = $_;
     my $vobj = version->declare("v$_");

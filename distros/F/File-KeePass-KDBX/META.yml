@@ -1,0 +1,61 @@
+---
+abstract: 'Read and write KDBX files (using the File::KDBX backend)'
+author:
+  - 'Charles McGarvey <ccm@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-KeePass-KDBX
+no_index:
+  directory:
+    - lib/File/KeePass/KDBX/Tie
+    - t
+    - xt
+provides:
+  File::KeePass::KDBX:
+    file: lib/File/KeePass/KDBX.pm
+    version: '0.901'
+requires:
+  Crypt::Digest: '0'
+  Crypt::Misc: '0.029'
+  Crypt::PRNG: '0'
+  File::KDBX: '0.900'
+  File::KDBX::Constants: '0'
+  File::KDBX::Loader::KDB: '0'
+  File::KDBX::Util: '0'
+  Hash::Util::FieldHash: '0'
+  Module::Load: '0'
+  Scalar::Util: '0'
+  Storable: '0'
+  Tie::Array: '0'
+  Tie::Hash: '0'
+  Time::Piece: '0'
+  boolean: '0'
+  namespace::clean: '0'
+  parent: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/chazmcgarvey/File-KeePass-KDBX/issues
+  homepage: https://github.com/chazmcgarvey/File-KeePass-KDBX
+  repository: https://github.com/chazmcgarvey/File-KeePass-KDBX.git
+version: '0.901'
+x_authority: cpan:CCM
+x_generated_by_perl: v5.34.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

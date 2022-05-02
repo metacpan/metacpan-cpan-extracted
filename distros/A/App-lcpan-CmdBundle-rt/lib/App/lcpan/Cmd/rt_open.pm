@@ -10,7 +10,7 @@ require App::lcpan;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-03-27'; # DATE
 our $DIST = 'App-lcpan-CmdBundle-rt'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 our %SPEC;
 
@@ -71,7 +71,7 @@ App::lcpan::Cmd::rt_open - Open RT page for dist/module
 
 =head1 VERSION
 
-This document describes version 0.004 of App::lcpan::Cmd::rt_open (from Perl distribution App-lcpan-CmdBundle-rt), released on 2022-03-27.
+This document describes version 0.005 of App::lcpan::Cmd::rt_open (from Perl distribution App-lcpan-CmdBundle-rt), released on 2022-03-27.
 
 =head1 DESCRIPTION
 

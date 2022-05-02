@@ -1,5 +1,3 @@
-# $Id: Register8R.pm,v 1.2 2008/02/22 02:08:08 drhyde Exp $
-
 package CPU::Emulator::Z80::Register8R;
 
 use strict;
@@ -9,7 +7,7 @@ use vars qw($VERSION $AUTOLOAD);
 
 use base qw(CPU::Emulator::Z80::Register8);
 
-$VERSION = '1.0';
+$VERSION = '1.01';
 
 =head1 NAME
 

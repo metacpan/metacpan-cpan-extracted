@@ -1,8 +1,6 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0',
-                                        'File::ShareDir::Install' => '0.06',
                                         'Module::Build::Tiny' => '0.034',
                                         'perl' => '5.020'
                                       }
@@ -148,7 +146,6 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::InstallGuide' => '1.200005',
                                            'Dist::Zilla::Plugin::Keywords' => '0.004',
                                            'Dist::Zilla::Plugin::License' => '5.038',
-                                           'Dist::Zilla::Plugin::MakeMaker::Fallback' => '0.029',
                                            'Dist::Zilla::Plugin::Manifest' => '0',
                                            'Dist::Zilla::Plugin::MetaConfig' => '0',
                                            'Dist::Zilla::Plugin::MetaJSON' => '0',
@@ -157,7 +154,7 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::MetaTests' => '0',
                                            'Dist::Zilla::Plugin::MetaYAML' => '0',
                                            'Dist::Zilla::Plugin::MinimumPerl' => '1.006',
-                                           'Dist::Zilla::Plugin::ModuleBuildTiny::Fallback' => '0.018',
+                                           'Dist::Zilla::Plugin::ModuleBuildTiny' => '0.012',
                                            'Dist::Zilla::Plugin::MojibakeTests' => '0.8',
                                            'Dist::Zilla::Plugin::NextRelease' => '5.033',
                                            'Dist::Zilla::Plugin::PodCoverageTests' => '5.040',

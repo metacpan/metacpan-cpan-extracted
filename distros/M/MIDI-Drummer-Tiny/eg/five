@@ -14,7 +14,7 @@ my $d = MIDI::Drummer::Tiny->new(
     signature => '5/4',
 );
 
-$d->score->synch(
+$d->sync(
     \&cymbals,
     \&beat,
 );

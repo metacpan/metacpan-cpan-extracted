@@ -1,19 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
-package Convert::Color::HSL;
+package Convert::Color::HSL 0.12;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Convert::Color::HueChromaBased );
 
 __PACKAGE__->register_color_space( 'hsl' );
 
 use Carp;
-
-our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -23,18 +21,18 @@ C<Convert::Color::HSL> - a color value represented as hue/saturation/lightness
 
 Directly:
 
- use Convert::Color::HSL;
+   use Convert::Color::HSL;
 
- my $red = Convert::Color::HSL->new( 0, 1, 0.5 );
+   my $red = Convert::Color::HSL->new( 0, 1, 0.5 );
 
- # Can also parse strings
- my $pink = Convert::Color::HSL->new( '0,1,0.8' );
+   # Can also parse strings
+   my $pink = Convert::Color::HSL->new( '0,1,0.8' );
 
 Via L<Convert::Color>:
 
- use Convert::Color;
+   use Convert::Color;
 
- my $cyan = Convert::Color->new( 'hsl:300,1,0.5' );
+   my $cyan = Convert::Color->new( 'hsl:300,1,0.5' );
 
 =head1 DESCRIPTION
 
@@ -65,18 +63,20 @@ not be confused with the similarly-named Hue-Chroma-Luminance (HCL) space.
 
 =cut
 
-=head2 $color = Convert::Color::HSL->new( $hue, $saturation, $lightness )
+=head2 new
+
+   $color = Convert::Color::HSL->new( $hue, $saturation, $lightness )
 
 Returns a new object to represent the set of values given. The hue should be
 in the range 0 to 360 (exclusive), and saturation and lightness should be
 between 0 and 1. Values outside of these ranges will be clamped.
 
-=head2 $color = Convert::Color::HSL->new( $string )
+   $color = Convert::Color::HSL->new( $string )
 
 Parses C<$string> for values, and construct a new object similar to the above
 three-argument form. The string should be in the form
 
- hue,saturation,lightnes
+   hue,saturation,lightnes
 
 containing the three floating-point values in decimal notation.
 
@@ -105,7 +105,10 @@ sub new
    }
 
    # Clamp
-   map { $_ < 0 and $_ = 0; $_ > 1 and $_ = 1 } ( $s, $l );
+   for ( $s, $l ) {
+      $_ = 0 if $_ < 0;
+      $_ = 1 if $_ > 1;
+   }
 
    # Fit to range [0,360)
    $h += 360 while $h < 0;
@@ -118,11 +121,17 @@ sub new
 
 =cut
 
-=head2 $h = $color->hue
+=head2 hue
 
-=head2 $s = $color->saturation
+   $h = $color->hue
 
-=head2 $v = $color->lightness
+=head2 saturation
+
+   $s = $color->saturation
+
+=head2 lightness
+
+   $v = $color->lightness
 
 Accessors for the three components of the color.
 
@@ -133,7 +142,9 @@ sub hue        { shift->[0] }
 sub saturation { shift->[1] }
 sub lightness  { shift->[2] }
 
-=head2 $c = $color->chroma
+=head2 chroma
+
+   $c = $color->chroma
 
 Returns the derived property of "chroma", which maps the color space onto a
 bicone instead of a cylinder. This more closely measures the intuitive concept
@@ -157,7 +168,9 @@ sub chroma
    }
 }
 
-=head2 ( $hue, $saturation, $lightness ) = $color->hsl
+=head2 hsl
+
+   ( $hue, $saturation, $lightness ) = $color->hsl
 
 Returns the individual hue, saturation and lightness components of the color
 value.
@@ -192,10 +205,10 @@ sub rgb
    my $tg = $hk;
    my $tb = $hk - 2;
 
-   map {
+   for ( $tr, $tg, $tb ) {
       $_ += 6 while $_ < 0;
       $_ -= 6 while $_ > 6;
-   } ( $tr, $tg, $tb );
+   }
 
    return map {
       $_ < 1 ? $p + ( ( $q - $p ) * $_ ) :
@@ -221,7 +234,9 @@ sub new_rgb
    return $class->new( $hue, $s, $l );
 }
 
-=head2 $measure = $color->dst_hsl( $other )
+=head2 dst_hsl
+
+   $measure = $color->dst_hsl( $other )
 
 Returns a measure of the distance between the two colors. This is the
 Euclidean distance between the two colors as points in the chroma-adjusted
@@ -238,7 +253,9 @@ sub dst_hsl
    return sqrt( $self->dst_hsl_cheap( $other ) ) / 2;
 }
 
-=head2 $measure = $color->dst_hsl_cheap( $other )
+=head2 dst_hsl_cheap
+
+   $measure = $color->dst_hsl_cheap( $other )
 
 Returns a measure of the distance between the two colors. This is used in the
 calculation of C<dst_hsl> but since it omits the final square-root and scaling

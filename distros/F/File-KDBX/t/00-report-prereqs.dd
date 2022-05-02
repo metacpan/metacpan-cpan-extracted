@@ -1,0 +1,109 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Compress::Raw::Zlib' => '0',
+                                      'Dist::Zilla' => '5',
+                                      'Dist::Zilla::Plugin::Encoding' => '0',
+                                      'Dist::Zilla::Plugin::OptionalFeature' => '0',
+                                      'Dist::Zilla::Plugin::Prereqs' => '0',
+                                      'Dist::Zilla::Plugin::Prereqs::Soften' => '0',
+                                      'Dist::Zilla::PluginBundle::Author::CCM' => '0',
+                                      'File::KDBX::XS' => '0',
+                                      'IO::Compress::Gzip' => '0',
+                                      'IO::Uncompress::Gunzip' => '0',
+                                      'Pass::OTP' => '0',
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Software::License::Perl_5' => '0',
+                                      'Test::CPAN::Changes' => '0.19',
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::CleanNamespaces' => '0.15',
+                                      'Test::EOL' => '0',
+                                      'Test::MinimumVersion' => '0',
+                                      'Test::More' => '0.96',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Perl::Critic' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage' => '1.08',
+                                      'Test::Pod::No404s' => '0',
+                                      'Test::Portability::Files' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'recommends' => {
+                                        'Compress::Raw::Zlib' => '0',
+                                        'File::KDBX::XS' => '0',
+                                        'File::Spec' => '0',
+                                        'IO::Compress::Gzip' => '0',
+                                        'IO::Uncompress::Gunzip' => '0',
+                                        'Pass::OTP' => '0'
+                                      },
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Crypt::Argon2' => '0',
+                                      'Crypt::Cipher' => '0',
+                                      'Crypt::Digest' => '0',
+                                      'Crypt::Mac::HMAC' => '0',
+                                      'Crypt::Misc' => '0.029',
+                                      'Crypt::Mode::CBC' => '0',
+                                      'Crypt::PRNG' => '0',
+                                      'Data::Dumper' => '0',
+                                      'Devel::GlobalDestruction' => '0',
+                                      'Encode' => '0',
+                                      'Exporter' => '0',
+                                      'File::Temp' => '0',
+                                      'Hash::Util::FieldHash' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Cmd' => '0.52',
+                                      'Iterator::Simple' => '0',
+                                      'List::Util' => '1.33',
+                                      'Module::Load' => '0',
+                                      'Module::Loaded' => '0',
+                                      'POSIX' => '0',
+                                      'Ref::Util' => '0',
+                                      'Scalar::Util' => '0',
+                                      'Scope::Guard' => '0',
+                                      'Storable' => '0',
+                                      'Symbol' => '0',
+                                      'Text::ParseWords' => '0',
+                                      'Time::Piece' => '0',
+                                      'XML::LibXML' => '0',
+                                      'XML::LibXML::Reader' => '0',
+                                      'boolean' => '0',
+                                      'namespace::clean' => '0',
+                                      'overload' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900',
+                                     'Pass::OTP' => '0'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'FindBin' => '0',
+                                   'Getopt::Std' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::Deep' => '0',
+                                   'Test::Fatal' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Warnings' => '0',
+                                   'lib' => '0',
+                                   'perl' => '5.006',
+                                   'utf8' => '0'
+                                 },
+                   'suggests' => {
+                                   'POSIX::1003' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

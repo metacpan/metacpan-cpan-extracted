@@ -1,0 +1,17 @@
+Revision history for App-RunStopRun
+
+0.04  Mon May  2 15:15:35 UTC 2022
+    - Add an option to disable creating a new process group or determining
+      associated PGIDs.
+
+0.03  Sat Apr 30 23:05:19 UTC 2022
+    - Update prereqs; List::Util 1.45 needed for uniq().
+
+0.02  Sat Apr 30 17:59:26 UTC 2022
+    - Add separate tty options, a la SSH.
+    - Test if SIGINFO exists before localizing it.
+    - Set a default value for exit status.
+    - Don't operate on groups unless option is set.
+
+0.01  Thu Apr 28 22:57:54 UTC 2022
+    - Initial distribution.

@@ -26,5 +26,7 @@ t/t2-s.txt
 t/t3-r.txt
 t/t4-r.txt
 t/test.bats
+t/runner/README.md
+t/runner/Runner.pm
 META.yml
 MANIFEST

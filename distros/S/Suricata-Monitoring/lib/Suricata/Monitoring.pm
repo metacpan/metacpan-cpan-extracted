@@ -16,11 +16,11 @@ Suricata::Monitoring - LibreNMS JSON SNMP extend and Nagios style check for Suri
 
 =head1 VERSION
 
-Version 0.1.2
+Version 0.1.3
 
 =cut
 
-our $VERSION = '0.1.2';
+our $VERSION = '0.1.3';
 
 =head1 SYNOPSIS
 
@@ -371,7 +371,7 @@ sub run {
 					my @zero_if_undef = ( 'errors', 'ifdropped' );
 					foreach my $undef_check (@zero_if_undef) {
 						if ( !defined( $new_stats->{$undef_check} ) ) {
-							$new_stats->{$undef_check} = 1;
+							$new_stats->{$undef_check} = 0;
 						}
 					}
 
@@ -555,7 +555,7 @@ sub run {
 	{
 		$to_return->{data}{'.total'}{drop_percent}
 			= ( $to_return->{data}{'.total'}{drop_delta} / $to_return->{data}{'.total'}{packet_delta} ) * 100;
-		$to_return->{data}{'.total'}{drop_percent} = sprintf( '%0.5f', $to_return->{data}{'.total'}{ifdrop_percent} );
+		$to_return->{data}{'.total'}{drop_percent} = sprintf( '%0.5f', $to_return->{data}{'.total'}{drop_percent} );
 
 		$to_return->{data}{'.total'}{ifdrop_percent}
 			= ( $to_return->{data}{'.total'}{ifdrop_delta} / $to_return->{data}{'.total'}{packet_delta} ) * 100;

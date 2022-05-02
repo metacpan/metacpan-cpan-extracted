@@ -6,11 +6,11 @@ use warnings;
 use Test::More;
 use Test::Deep;
 
-use Object::Pad 0.19;
+use Object::Pad 0.57;
 
 my $customarg;
 
-class TestApp extends App::Device::Chip::sensor
+class TestApp :isa(App::Device::Chip::sensor)
 {
    method OPTSPEC
    {
@@ -64,7 +64,7 @@ my $app = TestApp->new;
 }
 
 my %adapterargs;
-class Device::Chip::Adapter::_ATestAdapter implements Device::Chip::Adapter
+class Device::Chip::Adapter::_ATestAdapter :does(Device::Chip::Adapter)
 {
    sub new_from_description { shift->new( @_ ) }
 

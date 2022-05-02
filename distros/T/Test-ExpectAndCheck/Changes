@@ -1,5 +1,15 @@
 Revision history for Test-ExpectAndCheck
 
+0.03    2021-07-14
+        [CHANGES]
+         * Print more detailed error message on expectation failure to give
+           details about what the next expectation was
+         * Set @CARP_NOT to get slightly better call location reporting
+
+        [BUGFIXES]
+         * Fix printable-or-not detection logic so it applies to all bytes
+         * Handle `undef` correctly in stringification logic
+
 0.02    2021-01-02
         [CHANGES]
          * Return deferred futures by default

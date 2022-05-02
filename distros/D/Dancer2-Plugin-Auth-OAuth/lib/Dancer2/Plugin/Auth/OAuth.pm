@@ -2,7 +2,7 @@ package Dancer2::Plugin::Auth::OAuth;
 
 use strict;
 use 5.008_005;
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use Dancer2::Plugin;
 use Module::Load;

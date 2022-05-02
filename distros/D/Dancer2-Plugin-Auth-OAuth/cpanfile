@@ -10,6 +10,7 @@ requires 'URI::Query';
 requires 'HTTP::Message';
 requires 'LWP::Protocol::https';
 requires 'LWP::UserAgent';
+requires 'Hash::Merge';
 
 on test => sub {
     requires 'Plack::Test';

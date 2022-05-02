@@ -4,11 +4,11 @@
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.40;
+use Object::Pad 0.57;
 
-package Device::Chip::MAX44009 0.03;
+package Device::Chip::MAX44009 0.04;
 class Device::Chip::MAX44009
-   extends Device::Chip::Base::RegisteredI2C;
+   :isa(Device::Chip::Base::RegisteredI2C);
 
 use Device::Chip::Sensor -declare;
 

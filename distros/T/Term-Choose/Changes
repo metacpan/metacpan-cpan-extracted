@@ -1,6 +1,14 @@
 Revision history for Term::Choose
 
 
+1.750   2022-05-02
+    - Option 'margin' expects a reference to an array instead of an integer.
+
+1.749   2022-05-01
+    - Removed vt52 spezial keys.
+    - 'qr'-operator for the search regexp.
+    - New option 'margin'.
+
 1.748   2022-04-06
     - Search: 'readline' is now in Term::From::ReadLine.
 

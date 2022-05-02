@@ -90,7 +90,7 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Role::BuildPL" => 0,
     "Dist::Zilla::Role::FileGatherer" => 0,
     "Dist::Zilla::Role::PrereqSource" => 0,
-    "List::Keywords" => 0,
+    "List::Util" => "1.33",
     "Moose" => 0,
     "Moose::Util" => 0,
     "Path::Tiny" => "0.062",
@@ -114,7 +114,7 @@ my %WriteMakefileArgs = (
     "Test::Warnings" => 0,
     "if" => 0
   },
-  "VERSION" => "0.026",
+  "VERSION" => "0.027",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -131,7 +131,7 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Role::PrereqSource" => 0,
   "File::Spec" => 0,
   "File::pushd" => 0,
-  "List::Keywords" => 0,
+  "List::Util" => "1.33",
   "Module::Metadata" => 0,
   "Moose" => 0,
   "Moose::Util" => 0,

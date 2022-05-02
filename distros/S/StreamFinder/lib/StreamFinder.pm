@@ -16,7 +16,7 @@ StreamFinder - Fetch actual raw streamable URLs from various radio-station, vide
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2021 by
+This module is Copyright (C) 2017-2022 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -129,10 +129,12 @@ site URL as the argument.  You can then edit it to tailor it to your needs.
 
 The currently-supported websites are:  podcasts.apple.com (L<StreamFinder::Apple>), 
 bitchute.com (L<StreamFinder::Bitchute>), blogger.com (L<StreamFinder::Blogger>), 
-brighteon.com (L<StreamFinder::Brighteon>), castbox.fm (L<StreamFinder::Castbox>), 
+brandnewtube.com (L<StreamFinder::BrandNewTube>), brighteon.com 
+(L<StreamFinder::Brighteon>), castbox.fm (L<StreamFinder::Castbox>), 
 podcasts.google.com (L<StreamFinder::Google>), 
 iheartradio.com (L<StreamFinder::IHeartRadio>), 
 odysee.com (L<StreamFinder::Odysee>), podbean.com (L<StreamFinder::Podbean>), 
+podcastaddict.com (L<StreamFinder::PodcastAddict>), 
 radio.net (L<StreamFinder::RadioNet>), rumble.com (L<StreamFinder::Rumble>),
 sermonaudio.com (L<StreamFinder::SermonAudio>), 
 spreaker.com podcasts (L<StreamFinder::Spreaker>), 
@@ -330,10 +332,10 @@ the "icon image" data, if any, will be returned.
 =item $station->B<getType>()
 
 Returns the station / podcast / video's type (I<submodule-name>).  
-(one of:  "Anystream", "Apple", "BitChute", "Blogger", "Brighteon", 
-"Castbox", "Google", "IHeartRadio", "Odysee", "Podbean", "RadioNet", 
-"Rumble", "SermonAudio", "Spreaker", "Tunein", "Youtube" or "Vimeo" - 
-depending on the sight that matched the URL).
+(one of:  "Anystream", "Apple", "BitChute", "Blogger", "BrandNewTube", 
+"Brighteon", "Castbox", "Google", "IHeartRadio", "Odysee", "Podbean", 
+"PodcastAddict", "RadioNet", "Rumble", "SermonAudio", "Spreaker", "Tunein", 
+"Youtube" or "Vimeo" - depending on the sight that matched the URL).
 
 =back
 
@@ -437,7 +439,7 @@ L<http://search.cpan.org/dist/StreamFinder/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2021 Jim Turner.
+Copyright 2017-2022 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -485,22 +487,22 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.82';
+our $VERSION = '1.84';
 our $DEBUG = 0;
 
 require Exporter;
 
 @ISA = qw(Exporter);
 @EXPORT = qw();
-my @supported_mods = (qw(Anystream Apple Bitchute Blogger Brighteon Castbox Google IHeartRadio
-		Odysee Podbean RadioNet Rumble SermonAudio Spreaker Tunein Vimeo Youtube));
+my @supported_mods = (qw(Anystream Apple Bitchute Blogger BrandNewTube Brighteon Castbox Google
+		IHeartRadio Odysee Podbean PodcastAddict RadioNet Rumble SermonAudio Spreaker 
+		Tunein Vimeo Youtube));
 
-my %haveit;
+my %useit;
 
 foreach my $module (@supported_mods)
 {
-	$haveit{$module} = 0;
-	eval "use StreamFinder::$module; \$haveit{$module} = 1; 1";
+	$useit{$module} = 1;
 }
 
 sub new
@@ -519,50 +521,77 @@ sub new
 			my @omitModules = split(/\,\s*/, shift(@_));
 			foreach my $omit (@omitModules)
 			{
-				$haveit{$omit} = 0  if (defined($haveit{$omit}) && $haveit{$omit});
+				$useit{$omit} = 0;
 			}
 		} else {
 			push @args, $arg;
 		}
 	}
-		
+
+	my $haveit = 0;
 	push @args, ('-debug', $DEBUG)  if ($DEBUG);
-	if ($haveit{'IHeartRadio'} && $url =~ m#\biheart(?:radio)?\.#i) {
-		return new StreamFinder::IHeartRadio($url, @args);
-	} elsif ($haveit{'Tunein'} && $url =~ m#\btunein\.#) {  #NOTE:ALSO USES youtube-dl!
-		return new StreamFinder::Tunein($url, @args);
-	} elsif ($haveit{'RadioNet'} && $url =~ m#\bradio\.net\/#) {
-		return new StreamFinder::RadioNet($url, @args);
-	} elsif ($haveit{'Brighteon'} && $url =~ m#\bbrighteon\.com\/#) {  #NOTE:ALSO USES youtube-dl!
-		return new StreamFinder::Brighteon($url, @args);
-	} elsif ($haveit{'Vimeo'} && $url =~ m#\bvimeo\.#) {  #NOTE:ALSO USES youtube-dl!
-		return new StreamFinder::Vimeo($url, @args);
-	} elsif ($haveit{'Apple'} && $url =~ m#\b(?:podcasts?|music)\.apple\.com\/#) {  #NOTE:ALSO USES youtube-dl!
-		return new StreamFinder::Apple($url, @args);
-	} elsif ($haveit{'Spreaker'} && $url =~ m#\bspreaker\.#) {
-		return new StreamFinder::Spreaker($url, @args);
-	} elsif ($haveit{'Bitchute'} && $url =~ m#\bbitchute\.#) {
-		return new StreamFinder::Bitchute($url, @args);
-	} elsif ($haveit{'Rumble'} && $url =~ m#\brumble\.com\/#) {
-		return new StreamFinder::Rumble($url, @args);
-	} elsif ($haveit{'Blogger'} && $url =~ m#\bblogger\.#) {
-		return new StreamFinder::Blogger($url, @args);
-	} elsif ($haveit{'Castbox'} && $url =~ m#\bcastbox\.\w+\/#) {
-		return new StreamFinder::Castbox($url, @args);
-	} elsif ($haveit{'Google'} && $url =~ m#\b\.google\.\w+\/#) {
-		return new StreamFinder::Google($url, @args);
-	} elsif ($haveit{'SermonAudio'} && $url =~ m#\bsermonaudio\.com\/#) {
-		return new StreamFinder::SermonAudio($url, @args);
-	} elsif ($haveit{'Odysee'} && $url =~ m#\bodysee\.com\/#) {
-		return new StreamFinder::Odysee($url, @args);
-	} elsif ($haveit{'Podbean'} && $url =~ m#\bpodbean\.com\/#) {
-		return new StreamFinder::Podbean($url, @args);
-	} elsif ($haveit{'Youtube'}) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
-		my $yt = new StreamFinder::Youtube($url, @args);
-		return $yt  if (defined($yt) && $yt && $yt->count() > 0);
+	if ($url =~ m#\b(?:podcasts?|music)\.apple\.com\/# && $useit{'Apple'}) {
+		eval { require 'StreamFinder/Apple.pm'; $haveit = 1; };
+		return new StreamFinder::Apple($url, @args)  if ($haveit);
+	} elsif ($url =~ m#\brumble\.com\/# && $useit{'Rumble'}) {
+		eval { require 'StreamFinder/Rumble.pm'; $haveit = 1; };
+		return new StreamFinder::Rumble($url, @args)  if ($haveit);
+	} elsif ($url =~ m#\bpodcastaddict\.# && $useit{'PodcastAddict'}) {
+		eval { require 'StreamFinder/PodcastAddict.pm'; $haveit = 1; };
+		return new StreamFinder::PodcastAddict($url, @args)  if ($haveit);
+	} elsif ($url =~ m#\bbrandnewtube\.# && $useit{'BrandNewTube'}) {
+		eval { require 'StreamFinder/BrandNewTube.pm'; $haveit = 1; };
+		return new StreamFinder::BrandNewTube($url, @args)  if ($haveit);
+	} elsif ($url =~ m#\bbitchute\.# && $useit{'Bitchute'}) {
+		eval { require 'StreamFinder/Bitchute.pm'; $haveit = 1; };
+		return new StreamFinder::Bitchute($url, @args)  if ($haveit);
+	} elsif ($url =~ m#\biheart(?:radio)?\.#i && $useit{'IHeartRadio'}) {
+		eval { require 'StreamFinder/IHeartRadio.pm'; $haveit = 1; };
+		return new StreamFinder::IHeartRadio($url, @args)  if ($haveit);
+	} elsif ($url =~ m#\btunein\.# && $useit{'Tunein'}) {  #NOTE:ALSO USES youtube-dl!
+		eval { require 'StreamFinder/Tunein.pm'; $haveit = 1; };
+		return new StreamFinder::Tunein($url, @args)  if ($haveit);
+	} elsif ($url =~ m#\bbrighteon\.com\/# && $useit{'Brighteon'}) {  #NOTE:ALSO USES youtube-dl!
+		eval { require 'StreamFinder/Brighteon.pm'; $haveit = 1; };
+		return new StreamFinder::Brighteon($url, @args)  if ($haveit);
+	} elsif ($url =~ m#\bspreaker\.# && $useit{'Spreaker'}) {
+		eval { require 'StreamFinder/Spreaker.pm'; $haveit = 1; };
+		return new StreamFinder::Spreaker($url, @args)  if ($haveit);
+	} elsif ($url =~ m#\bcastbox\.\w+\/# && $useit{'Castbox'}) {
+		eval { require 'StreamFinder/Castbox.pm'; $haveit = 1; };
+		return new StreamFinder::Castbox($url, @args)  if ($haveit);
+	} elsif ($url =~ m#\b\.google\.\w+\/# && $useit{'Google'}) {
+		eval { require 'StreamFinder/Google.pm'; $haveit = 1; };
+		return new StreamFinder::Google($url, @args)  if ($haveit);
+	} elsif ($url =~ m#\bradio\.net\/# && $useit{'RadioNet'}) {
+		eval { require 'StreamFinder/RadioNet.pm'; $haveit = 1; };
+		return new StreamFinder::RadioNet($url, @args)  if ($haveit);
+	} elsif ($url =~ m#\bvimeo\.# && $useit{'Vimeo'}) {  #NOTE:ALSO USES youtube-dl!
+		eval { require 'StreamFinder/Vimeo.pm'; $haveit = 1; };
+		return new StreamFinder::Vimeo($url, @args)  if ($haveit);
+	} elsif ($url =~ m#\bblogger\.# && $useit{'Blogger'}) {
+		eval { require 'StreamFinder/Blogger.pm'; $haveit = 1; };
+		return new StreamFinder::Blogger($url, @args)  if ($haveit);
+	} elsif ($url =~ m#\bsermonaudio\.com\/# && $useit{'SermonAudio'}) {
+		eval { require 'StreamFinder/SermonAudio.pm'; $haveit = 1; };
+		return new StreamFinder::SermonAudio($url, @args)  if ($haveit);
+	} elsif ($url =~ m#\bodysee\.com\/# && $useit{'Odysee'}) {
+		eval { require 'StreamFinder/Odysee.pm'; $haveit = 1; };
+		return new StreamFinder::Odysee($url, @args)  if ($haveit);
+	} elsif ($url =~ m#\bpodbean\.com\/# && $useit{'Podbean'}) {
+		eval { require 'StreamFinder/Podbean.pm'; $haveit = 1; };
+		return new StreamFinder::Podbean($url, @args)  if ($haveit);
+	} elsif ($useit{'Youtube'}) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
+		eval { require 'StreamFinder/Youtube.pm'; $haveit = 1; };
+		if ($haveit) {
+			my $yt = new StreamFinder::Youtube($url, @args);
+			return $yt  if (defined($yt) && $yt && $yt->count() > 0);
+		}
 	}
-	if ($haveit{'Anystream'}) {  #SITE NOT SUPPORTED, TRY TO FIND ANY STREAM URLS WE CAN:
-		return new StreamFinder::Anystream($url, @args);
+	if ($useit{'Anystream'}) {  #SITE NOT SUPPORTED, TRY TO FIND ANY STREAM URLS WE CAN:
+		$haveit = 0;
+		eval { require 'StreamFinder/Anystream.pm'; $haveit = 1; };
+		return new StreamFinder::Anystream($url, @args)  if ($haveit);
 	}
 	return undef;
 }

@@ -76,7 +76,7 @@
             "Dist::Zilla::Role::BuildPL" : "0",
             "Dist::Zilla::Role::FileGatherer" : "0",
             "Dist::Zilla::Role::PrereqSource" : "0",
-            "List::Keywords" : "0",
+            "List::Util" : "1.33",
             "Moose" : "0",
             "Moose::Util" : "0",
             "Path::Tiny" : "0.062",
@@ -194,7 +194,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::ModuleBuildTiny::Fallback" : {
          "file" : "lib/Dist/Zilla/Plugin/ModuleBuildTiny/Fallback.pm",
-         "version" : "0.026"
+         "version" : "0.027"
       }
    },
    "release_status" : "stable",
@@ -212,7 +212,7 @@
       "x_IRC" : "irc://irc.perl.org/#distzilla",
       "x_MailingList" : "http://dzil.org/#mailing-list"
    },
-   "version" : "0.026",
+   "version" : "0.027",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.035010"
@@ -822,7 +822,7 @@
                }
             },
             "name" : "@Author::ETHER/ModuleBuildTiny::Fallback",
-            "version" : "0.026"
+            "version" : "0.027"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
@@ -1137,7 +1137,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.026",
+                  "tag" : "v0.027",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

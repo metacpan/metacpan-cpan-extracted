@@ -8,7 +8,7 @@ use Test::Deep;
 
 use Future::AsyncAwait 0.47;
 use Future::IO;
-use Object::Pad 0.19;
+use Object::Pad 0.57;
 
 my $run_count;
 my $run_f;
@@ -21,7 +21,7 @@ class TestFutureIO
 
 Future::IO->override_impl( TestFutureIO->new );
 
-class TestApp extends App::Device::Chip::sensor
+class TestApp :isa(App::Device::Chip::sensor)
 {
    method output_readings ( $, $sensors, $values )
    {
@@ -31,7 +31,7 @@ class TestApp extends App::Device::Chip::sensor
    }
 }
 
-class Device::Chip::Adapter::TestAdapter implements Device::Chip::Adapter
+class Device::Chip::Adapter::TestAdapter :does(Device::Chip::Adapter)
 {
    async method make_protocol_GPIO { return $self }
 
@@ -39,7 +39,7 @@ class Device::Chip::Adapter::TestAdapter implements Device::Chip::Adapter
 }
 $INC{"Device/Chip/Adapter/TestAdapter.pm"} = __FILE__;
 
-class Device::Chip::TestChip extends Device::Chip
+class Device::Chip::TestChip :isa(Device::Chip)
 {
    use Device::Chip::Sensor -declare;
    use Test::Future::Deferred;

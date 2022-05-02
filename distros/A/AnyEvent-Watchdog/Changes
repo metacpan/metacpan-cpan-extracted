@@ -1,6 +1,13 @@
 Revision history for AnyEvent::Watchdog
 
 TODO: testsuite
+TODO: document $^C or so for autostart
+
+1.02 Thu 28 Apr 2022 18:16:17 CEST
+	- mind the semicolon re-release (reported by James Wright).
+
+1.01 Thu 28 Apr 2022 01:42:17 CEST
+	- anniversary re-release.
 
 1.0 Wed Sep  2 20:39:06 CEST 2009
 	- INCOMPATIBLE CHANGE: split into two modules, new module

@@ -946,11 +946,22 @@ Header_string(h, no_header_magic = 0)
     PREINIT:
     char * string = NULL;
     char * ptr = NULL;
+#if defined(RPM4_18_0)
+    unsigned int hsize = 0;
+#else
     int hsize = 0;
+#endif
     PPCODE:
+#if defined(RPM4_18_0)
+    string = headerExport(h, &hsize);
+#else
     hsize = headerSizeof(h, no_header_magic ? HEADER_MAGIC_NO : HEADER_MAGIC_YES);
     string = headerUnload(h);
+#endif
     if (! no_header_magic) {
+#if defined(RPM4_18_0)
+        hsize +=sizeof(header_magic); // Adjust for header_magic
+#endif
         ptr = malloc(hsize);
         memcpy(ptr, header_magic, 8);
         memcpy(ptr + 8, string, hsize - 8);
@@ -1957,15 +1968,27 @@ void
 Te_files(Te)
     rpmte Te
     PREINIT:
-    rpmfi Files;
+#if defined(RPM4_12_0)
+    rpmfiles Files;
+#endif
+    rpmfi fi;
     PPCODE:
-    Files = rpmteFI(Te);
-    if ((Files = rpmfiInit(Files, 0)) != NULL && rpmfiNext(Files) >= 0) {
-        mXPUSHs(sv_setref_pv(newSVpvs(""), bless_rpmfi, Files));
+#if defined(RPM4_12_0)
+    Files = rpmteFiles(Te);
+    fi = rpmfilesIter(Files, RPMFI_ITER_FWD);
+    if (fi != NULL && rpmfiNext(fi) >= 0) {
+#else
+    fi = rpmteFI(Te);
+    if ((fi = rpmfiInit(fi, 0)) != NULL && rpmfiNext(fi) >= 0) {
+#endif
+        mXPUSHs(sv_setref_pv(newSVpvs(""), bless_rpmfi, fi));
 #ifdef HDRPMMEM
         PRINTF_NEW(bless_rpmfi, Files, Files->nrefs);
 #endif
     }
+#if defined(RPM4_12_0)
+    rpmfilesFree(Files);
+#endif
     
 MODULE = RPM4     PACKAGE = RPM4
 

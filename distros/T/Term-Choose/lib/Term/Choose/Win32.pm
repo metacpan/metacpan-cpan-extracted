@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.748';
+our $VERSION = '1.750';
 
 
 use Encode qw( decode );
@@ -44,11 +44,11 @@ use constant {
 
 
 sub SHIFTED_MASK () {
-      RIGHT_ALT_PRESSED
-    | LEFT_ALT_PRESSED
-    | RIGHT_CTRL_PRESSED
-    | LEFT_CTRL_PRESSED
-    | SHIFT_PRESSED
+      RIGHT_ALT_PRESSED     # 0x0001
+    | LEFT_ALT_PRESSED      # 0x0002
+    | RIGHT_CTRL_PRESSED    # 0x0004
+    | LEFT_CTRL_PRESSED     # 0x0008
+    | SHIFT_PRESSED         # 0x0010
 }
 
 

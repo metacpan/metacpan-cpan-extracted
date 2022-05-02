@@ -20,13 +20,13 @@
 #define MARPAESLIF_TRACEF(marpaESLIFp, funcs, fmts, ...) MARPAESLIF2LOG(marpaESLIFp, GENERICLOGGER_TRACEF(_genericLoggerp, "[%s at %12s:%05d] " fmts, funcs, FILENAMES, __LINE__, __VA_ARGS__))
 #define MARPAESLIF_TRACE(marpaESLIFp, funcs, msgs)       MARPAESLIF2LOG(marpaESLIFp, GENERICLOGGER_TRACEF(_genericLoggerp, "[%s at %12s:%05d] %s", funcs, FILENAMES, __LINE__, msgs))
 #define MARPAESLIFRECOGNIZER_TRACEF(marpaESLIFRecognizerp, funcs, fmts, ...) \
-  MARPAESLIF2LOG(marpaESLIFRecognizerp->marpaESLIFp, GENERICLOGGER_TRACEF(_genericLoggerp, "[Level %2d Iter %4d[%4d]][%s%-47s at %12s:%05d]%*s" fmts, marpaESLIFRecognizerp->leveli, marpaESLIFRecognizerp->resumeCounteri, marpaESLIFRecognizerp->callstackCounteri, marpaESLIFRecognizerp->discardb ? "!" : " ", funcs, FILENAMES, __LINE__, marpaESLIFRecognizerp->leveli + marpaESLIFRecognizerp->callstackCounteri, " ", __VA_ARGS__))
+  MARPAESLIF2LOG(marpaESLIFRecognizerp->marpaESLIFp, GENERICLOGGER_TRACEF(_genericLoggerp, "[Level %2d Iter %4d[%4d]][%s%-47s at %12s:%05d]%*s" fmts, marpaESLIFRecognizerp->leveli, marpaESLIFRecognizerp->resumeCounteri, marpaESLIFRecognizerp->callstackCounteri, marpaESLIFRecognizerp->discardb ? "!" : " ", funcs, FILENAMES, __LINE__, marpaESLIFRecognizerp->marpaESLIFRecognizerTopp->callstackCounterGlobali, " ", __VA_ARGS__))
 #define MARPAESLIFRECOGNIZER_TRACE(marpaESLIFRecognizerp, funcs, msgs) \
-  MARPAESLIF2LOG(marpaESLIFRecognizerp->marpaESLIFp, GENERICLOGGER_TRACEF(_genericLoggerp, "[Level %2d Iter %4d[%4d]][%s%-47s at %12s:%05d]%*s%s", marpaESLIFRecognizerp->leveli, marpaESLIFRecognizerp->resumeCounteri, marpaESLIFRecognizerp->callstackCounteri, marpaESLIFRecognizerp->discardb ? "!" : " ", funcs, FILENAMES, __LINE__, marpaESLIFRecognizerp->leveli + marpaESLIFRecognizerp->callstackCounteri, " ", msgs))
+  MARPAESLIF2LOG(marpaESLIFRecognizerp->marpaESLIFp, GENERICLOGGER_TRACEF(_genericLoggerp, "[Level %2d Iter %4d[%4d]][%s%-47s at %12s:%05d]%*s%s", marpaESLIFRecognizerp->leveli, marpaESLIFRecognizerp->resumeCounteri, marpaESLIFRecognizerp->callstackCounteri, marpaESLIFRecognizerp->discardb ? "!" : " ", funcs, FILENAMES, __LINE__, marpaESLIFRecognizerp->marpaESLIFRecognizerTopp->callstackCounterGlobali, " ", msgs))
 #define MARPAESLIFRECOGNIZER_RESUMECOUNTER_INC(marpaESLIFRecognizerp) do { marpaESLIFRecognizerp->resumeCounteri++; } while (0)
 #define MARPAESLIFRECOGNIZER_RESUMECOUNTER_DEC(marpaESLIFRecognizerp) do { marpaESLIFRecognizerp->resumeCounteri--; } while (0)
-#define MARPAESLIFRECOGNIZER_CALLSTACKCOUNTER_INC(marpaESLIFRecognizerp) do { marpaESLIFRecognizerp->callstackCounteri++; } while (0)
-#define MARPAESLIFRECOGNIZER_CALLSTACKCOUNTER_DEC(marpaESLIFRecognizerp) do { marpaESLIFRecognizerp->callstackCounteri--; } while (0)
+#define MARPAESLIFRECOGNIZER_CALLSTACKCOUNTER_INC(marpaESLIFRecognizerp) do { marpaESLIFRecognizerp->callstackCounteri++; marpaESLIFRecognizerp->marpaESLIFRecognizerTopp->callstackCounterGlobali++; } while (0)
+#define MARPAESLIFRECOGNIZER_CALLSTACKCOUNTER_DEC(marpaESLIFRecognizerp) do { marpaESLIFRecognizerp->callstackCounteri--; marpaESLIFRecognizerp->marpaESLIFRecognizerTopp->callstackCounterGlobali--; if (marpaESLIFRecognizerp->marpaESLIFRecognizerTopp->callstackCounterGlobali < 0) { /* This is an internal bug */ abort(); } } while (0)
 #else
 #define MARPAESLIF_TRACEF(marpaESLIFp, funcs, fmts, ...)
 #define MARPAESLIF_TRACE(marpaESLIFp, funcs, msgs)
@@ -59,7 +59,7 @@
 #ifndef MARPAESLIF_HEXDUMP_COLS
 #define MARPAESLIF_HEXDUMP_COLS 16
 #endif
-#define MARPAESLIFRECOGNIZER_HEXDUMPV(funcs, marpaESLIFRecognizerp, headers, asciidescs, p, lengthl, traceb) do { \
+#define MARPAESLIFRECOGNIZER_HEXDUMPV(funcs, marpaESLIFRecognizerp, headers, asciidescs, p, lengthl, traceb, noticeb, linel, columnl) do { \
     marpaESLIFRecognizer_t       *_marpaESLIFRecognizerp = (marpaESLIFRecognizer_t *) (marpaESLIFRecognizerp); \
     marpaESLIF_t                 *_marpaESLIFp = _marpaESLIFRecognizerp->marpaESLIFp; \
     marpaESLIF_stringGenerator_t  _marpaESLIF_stringGenerator;          \
@@ -70,6 +70,8 @@
     short                         _traceb = (short) (traceb);           \
     genericLogger_t               *_genericLoggerp;                     \
     int                            _errnoi = errno;                     \
+    unsigned long                  _columnl = columnl;                  \
+    unsigned long                  _linel = linel;                      \
     size_t  _i;                                                         \
     size_t  _j;                                                         \
                                                                         \
@@ -81,9 +83,23 @@
     _genericLoggerp = GENERICLOGGER_CUSTOM(_marpaESLIF_generateStringWithLoggerCallback, (void *) &_marpaESLIF_stringGenerator, GENERICLOGGER_LOGLEVEL_TRACE); \
     if (_genericLoggerp != NULL) {                                      \
       if (_traceb) {                                                    \
-        MARPAESLIFRECOGNIZER_TRACEF(marpaESLIFRecognizerp, funcs, "%s%s (%ld bytes):", _headers, _asciidescs, (unsigned long) _lengthl); \
+        if ((_lengthl > 0) && (_columnl > 0)) {                         \
+          MARPAESLIFRECOGNIZER_TRACEF(marpaESLIFRecognizerp, funcs, "%s%s (%ld bytes) at %ld:%ld:", _headers, _asciidescs, (unsigned long) _lengthl, (unsigned long) _linel, (unsigned long) _columnl); \
+        } else {                                                        \
+          MARPAESLIFRECOGNIZER_TRACEF(marpaESLIFRecognizerp, funcs, "%s%s (%ld bytes):", _headers, _asciidescs, (unsigned long) _lengthl); \
+        }                                                               \
+      } else if (noticeb) {                                             \
+        if ((_lengthl > 0) && (_columnl > 0)) {                         \
+          MARPAESLIF_NOTICEF(_marpaESLIFp, "%s%s (%ld bytes) at %ld:%ld:", _headers, _asciidescs, (unsigned long) _lengthl, (unsigned long) _linel, (unsigned long) _columnl); \
+        } else {                                                        \
+          MARPAESLIF_NOTICEF(_marpaESLIFp, "%s%s (%ld bytes):", _headers, _asciidescs, (unsigned long) _lengthl); \
+        }                                                               \
       } else {                                                          \
-        MARPAESLIF_ERRORF(_marpaESLIFp, "%s%s (%ld bytes):", _headers, _asciidescs, (unsigned long) _lengthl); \
+        if ((_lengthl > 0) && (_columnl > 0)) {                         \
+          MARPAESLIF_ERRORF(_marpaESLIFp, "%s%s (%ld bytes) at %ld:%ld:", _headers, _asciidescs, (unsigned long) _lengthl, (unsigned long) _linel, (unsigned long) _columnl); \
+        } else {                                                        \
+          MARPAESLIF_ERRORF(_marpaESLIFp, "%s%s (%ld bytes):", _headers, _asciidescs, (unsigned long) _lengthl); \
+        }                                                               \
       }                                                                 \
       for (_i = 0; _i < _lengthl + ((_lengthl % MARPAESLIF_HEXDUMP_COLS) ? (MARPAESLIF_HEXDUMP_COLS - _lengthl % MARPAESLIF_HEXDUMP_COLS) : 0); _i++) { \
         /* print offset */                                              \
@@ -112,6 +128,8 @@
           if (_marpaESLIF_stringGenerator.okb) {                        \
             if (_traceb) {                                              \
               MARPAESLIFRECOGNIZER_TRACE(marpaESLIFRecognizerp, funcs, _marpaESLIF_stringGenerator.s); \
+            } else if (noticeb) {                                       \
+              MARPAESLIF_NOTICE(_marpaESLIFp, _marpaESLIF_stringGenerator.s); \
             } else {                                                    \
               MARPAESLIF_ERROR(_marpaESLIFp, _marpaESLIF_stringGenerator.s); \
             }                                                           \

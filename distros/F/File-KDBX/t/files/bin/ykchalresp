@@ -1,0 +1,55 @@
+#!/usr/bin/env perl
+
+# This is a fake ykchalresp program that provides canned responses, for testing.
+
+use warnings;
+use strict;
+
+use Getopt::Std;
+
+my %opts;
+getopts('12HNn:i:', \%opts);
+
+my ($device, $hmac, $nonblocking, $in) = @opts{qw(n H N i)};
+
+if (!$hmac) {
+    print STDERR "HMAC-SHA1 not requested\n";
+    exit 3;
+}
+elsif (!defined($in) || $in ne '-') {
+    $in //= '(none)';
+    print STDERR "Unexpected input file: $in\n";
+    exit 3;
+}
+
+my $challenge = <STDIN>;
+
+my $mock = $ENV{YKCHALRESP_MOCK} || '';
+if ($mock eq 'block') {
+    if ($nonblocking) {
+        print STDERR "Yubikey core error: operation would block\n";
+        exit 1;
+    }
+    sleep 2;
+    succeed();
+}
+elsif ($mock eq 'error') {
+    my $resp = $ENV{YKCHALRESP_ERROR} || 'not yet implemented';
+    print STDERR "Yubikey core error: $resp\n";
+    exit 1;
+}
+elsif ($mock eq 'usberror') {
+    print STDERR "USB error: something happened\n";
+    exit 1;
+}
+else {  # OK
+    succeed();
+}
+
+sub succeed {
+    my $resp = $ENV{YKCHALRESP_RESPONSE} || 'f000000000000000000000000000000000000000';
+    print "$resp\n";
+    exit 0;
+}
+
+exit 2;

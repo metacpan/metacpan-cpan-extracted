@@ -4,7 +4,7 @@
 # various utility functions
 
 package Music::RhythmSet;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use 5.24.0;
 use warnings;
@@ -20,7 +20,8 @@ has stash  => ( is => 'rw' );
 has voices => ( is => 'rw', default => sub { [] } );
 
 # perldoc Moo
-sub BUILD {
+sub BUILD
+{
     my ( $self, $args ) = @_;
     # so ->new->add(...) can instead be written ->new(voicel => [...])
     if ( exists $args->{voicel} ) {
@@ -36,7 +37,8 @@ sub BUILD {
 #
 # METHODS
 
-sub add {
+sub add
+{
     my ( $self, @rest ) = @_;
     croak "nothing to add" unless @rest;
 
@@ -52,7 +54,8 @@ sub add {
     return $self;
 }
 
-sub advance {
+sub advance
+{
     my ( $self, $count, %param ) = @_;
     # this is done stepwise for each voice so that TTL expirations and
     # thus potential new patterns are more likely to be visible to other
@@ -69,7 +72,8 @@ sub advance {
     return $self;
 }
 
-sub changes {
+sub changes
+{
     my ( $self, %param ) = @_;
 
     for my $cb (qw{header voice}) {
@@ -131,7 +135,8 @@ sub changes {
     return $self;
 }
 
-sub clone {
+sub clone
+{
     my ($self) = @_;
 
     my $new = Music::RhythmSet->new;
@@ -146,7 +151,8 @@ sub clone {
     return $new;
 }
 
-sub from_string {
+sub from_string
+{
     my ( $self, $str, %param ) = @_;
     croak "need a string" unless defined $str and length $str;
 
@@ -203,7 +209,8 @@ sub from_string {
     return $self;
 }
 
-sub measure {
+sub measure
+{
     my ( $self, $num ) = @_;
     for my $voice ( $self->voices->@* ) {
         $voice->measure($num);
@@ -211,7 +218,8 @@ sub measure {
     return $self;
 }
 
-sub to_ly {
+sub to_ly
+{
     my ( $self, %param ) = @_;
 
     for my $id ( 0 .. $self->voices->$#* ) {
@@ -225,14 +233,15 @@ sub to_ly {
     return [ map { $_->to_ly( $param{voice}->[ $id++ ]->%* ) } $self->voices->@* ];
 }
 
-sub to_midi {
+sub to_midi
+{
     my ( $self, %param ) = @_;
 
     $param{format} //= 1;
     $param{ticks}  //= 96;
 
     for my $id ( 0 .. $self->voices->$#* ) {
-        for my $pram (qw/chan dur maxm note notext tempo sustain velo/) {
+        for my $pram (qw/chan dur embig maxm note notext tempo sustain velo/) {
             $param{track}[$id]{$pram} = $param{$pram}
               if exists $param{$pram} and not exists $param{track}[$id]{$pram};
         }
@@ -248,7 +257,8 @@ sub to_midi {
     );
 }
 
-sub to_string {
+sub to_string
+{
     my ( $self, @rest ) = @_;
 
     my $str = '';
@@ -543,6 +553,15 @@ all the tracks:
       track => [ {}, { note => 67 }, { note => 72 } ]
   );
   $opus->write_to_file("noise.midi");
+
+B<Note that the MIDI events are by default duplicated to save memory>.
+If the opus track events are adjusted (e.g. via the B<events_r> method
+of L<MIDI::Track>) the individual events must be made unique prior to
+modification so that a change is not replicated into the repeats of that
+event. With I<embig> enabled (since version 0.04) the MIDI events will
+be de-duplicated.
+
+  ...->to_midi( embig => 1, ...
 
 L<MIDI::Event> documents most of the values the I<track> parameters can
 take. I<maxm> will limit the output to the given number of measures.

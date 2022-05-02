@@ -9,9 +9,9 @@ use Perinci::Object qw(envresmulti);
 use POSIX qw(strftime);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-21'; # DATE
+our $DATE = '2022-05-01'; # DATE
 our $DIST = 'App-org2wp'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 our %SPEC;
 
@@ -36,6 +36,12 @@ First, create `~/org2wp.conf` containing the API credentials, e.g.:
     proxy=https://YOURBLOGNAME.wordpress.com/xmlrpc.php
     username=YOURUSERNAME
     password=YOURPASSWORD
+
+Note that `proxy` is the endpoint URL of your WordPress instance's XML-RPC
+server, which can be hosted on `wordpress.com` or on other server, including
+your own. It has nothing to do with HTTP/HTTPS proxy; the term "proxy" is used
+by the <pm:XMLRPC::Lite> and <pm:SOAP::Lite> Perl libraries and `org2wp` simply
+uses the same terminology.
 
 You can also put multiple credentials in the configuration file using profile
 sections, e.g.:
@@ -138,6 +144,14 @@ will become blog posts.
 In heading mode, you can use several options to select only certain headlines
 which contain (or don't contain) specified tags.
 
+### FAQ
+
+#### What if I want to set HTTP/HTTPS proxy?
+
+You can set the environment variable `HTTP_proxy` (and `HTTP_proxy_user` and
+`HTTP_proxy_pass` additionally). See the <pm:SOAP::Lite> documentation for more
+details, which uses <pm:LWP::UserAgent> underneath.
+
 _
     args => {
         proxy => {
@@ -146,6 +160,12 @@ _
             description => <<'_',
 
 Example: `https://YOURBLOGNAME.wordpress.com/xmlrpc.php`.
+
+Note that `proxy` is the endpoint URL of your WordPress instance's XML-RPC
+server, which can be hosted on `wordpress.com` or on other server, including
+your own. It has nothing to do with HTTP/HTTPS proxy; the term "proxy" is used
+by the <pm:XMLRPC::Lite> and <pm:SOAP::Lite> Perl libraries and `org2wp` simply
+uses the same terminology.
 
 _
             tags => ['credential'],
@@ -663,7 +683,7 @@ App::org2wp - Publish Org document (or heading) to WordPress as blog post
 
 =head1 VERSION
 
-This document describes version 0.011 of App::org2wp (from Perl distribution App-org2wp), released on 2022-01-21.
+This document describes version 0.012 of App::org2wp (from Perl distribution App-org2wp), released on 2022-05-01.
 
 =head1 FUNCTIONS
 
@@ -686,6 +706,12 @@ First, create C<~/org2wp.conf> containing the API credentials, e.g.:
  proxy=https://YOURBLOGNAME.wordpress.com/xmlrpc.php
  username=YOURUSERNAME
  password=YOURPASSWORD
+
+Note that C<proxy> is the endpoint URL of your WordPress instance's XML-RPC
+server, which can be hosted on C<wordpress.com> or on other server, including
+your own. It has nothing to do with HTTP/HTTPS proxy; the term "proxy" is used
+by the L<XMLRPC::Lite> and L<SOAP::Lite> Perl libraries and C<org2wp> simply
+uses the same terminology.
 
 You can also put multiple credentials in the configuration file using profile
 sections, e.g.:
@@ -788,6 +814,14 @@ will become blog posts.
 In heading mode, you can use several options to select only certain headlines
 which contain (or don't contain) specified tags.
 
+=head3 FAQ
+
+=head4 What if I want to set HTTP/HTTPS proxy?
+
+You can set the environment variable C<HTTP_proxy> (and C<HTTP_proxy_user> and
+C<HTTP_proxy_pass> additionally). See the L<SOAP::Lite> documentation for more
+details, which uses L<LWP::UserAgent> underneath.
+
 This function is not exported.
 
 This function supports dry-run operation.
@@ -835,6 +869,12 @@ Set password for posts.
 =item * B<proxy>* => I<str>
 
 Example: CL<https://YOURBLOGNAME.wordpress.com/xmlrpc.php>.
+
+Note that C<proxy> is the endpoint URL of your WordPress instance's XML-RPC
+server, which can be hosted on C<wordpress.com> or on other server, including
+your own. It has nothing to do with HTTP/HTTPS proxy; the term "proxy" is used
+by the L<XMLRPC::Lite> and L<SOAP::Lite> Perl libraries and C<org2wp> simply
+uses the same terminology.
 
 =item * B<publish> => I<bool>
 

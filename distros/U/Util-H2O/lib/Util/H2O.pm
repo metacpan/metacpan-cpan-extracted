@@ -40,10 +40,11 @@ Util::H2O - Hash to Object: turns hashrefs into objects with accessors for keys
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 # For AUTHOR, COPYRIGHT, AND LICENSE see the bottom of this file
 
 our @EXPORT = qw/ h2o /;  ## no critic (ProhibitAutomaticExportation)
+our @EXPORT_OK = qw/ o2h /;
 
 BEGIN {
 	# lock_ref_keys wasn't available until Hash::Util 0.06 / Perl v5.8.9
@@ -121,6 +122,15 @@ name, you will get "redefined" warnings. Therefore, if you want to
 create multiple objects in the same package, you should probably use
 C<-new>.
 
+If you wanted to generate a unique package name in a different package,
+you could use:
+C<< h2o -class => sprintf('My::Class::Name::_%x', $hash+0), $hash >>,
+perhaps even in combination with C<< -isa => 'My::Class::Name' >>.
+However, keep in mind that you shouldn't step into another class' namespace
+without knowing that this won't cause conflicts, and also that not using the
+default class names means that functions like C<o2h> will no longer identify
+the objects as coming from C<h2o>.
+
 =item C<< -classify => I<classname_string or $hashref> >>
 
 In the form C<< -classify => I<classname_string> >>, this is simply the short
@@ -152,6 +162,10 @@ could load L<namespace::clean> after you load this module.
 Convenience option to set the L<C<@ISA>|perlvar/"@ISA"> variable in the package
 of the object, so that the object inherits from that/those package(s).
 This option was added in v0.14.
+
+B<Warning:> The methods created by C<h2o> will not call superclass methods.
+This means the parent class' C<DESTROY> method(s) are not called, and any
+accessors generated from hash keys are blindly overriden.
 
 =item C<-new>
 
@@ -214,6 +228,19 @@ C<< -lock=>0 >>.
 This option was added in v0.12. Using this option will not work and cause a
 warning when used on really old Perls (before v5.8.9), because this
 functionality was not yet available there.
+
+=item C<< -pass => "ref" I<or> "undef" >>
+
+When this option is set to C<"undef"> (that's the string C<"undef">, I<not>
+C<undef> itself!), then passing a value of C<undef> for the C<$hashref> will
+not result in a fatal error, the value will simply be passed through.
+
+When this option is set to the string C<"ref">, then any value other than a
+plain hashref that is a reference, including objects, plus C<undef> as above,
+will be passed through without modification. Any hashes nested inside of these
+references will not be descended into, even when C<-recurse> is specified.
+
+This option was added in v0.18.
 
 =back
 
@@ -296,8 +323,8 @@ The (now blessed and optionally locked) C<$hashref>.
 our $_PACKAGE_REGEX = qr/\AUtil::H2O::_[0-9A-Fa-f]+\z/;
 
 sub h2o {  ## no critic (RequireArgUnpacking, ProhibitExcessComplexity)
-	my ($recurse,$meth,$class,$isa,$destroy,$new,$clean,$lock,$ro);
-	while ( @_ && $_[0] && !ref$_[0] ) {
+	my ($recurse,$meth,$class,$isa,$destroy,$new,$clean,$lock,$ro,$pass);
+	while ( @_ && $_[0] && !ref$_[0] && $_[0]=~/^-/ ) {
 		if ($_[0] eq '-recurse' ) { $recurse = shift }  ## no critic (ProhibitCascadingIfElse)
 		elsif ($_[0] eq '-meth' ) { $meth    = shift }
 		elsif ($_[0] eq '-clean') { $clean   = (shift, shift()?1:0) }
@@ -305,6 +332,11 @@ sub h2o {  ## no critic (RequireArgUnpacking, ProhibitExcessComplexity)
 		elsif ($_[0] eq '-nolock'){ $lock = 0; shift }
 		elsif ($_[0] eq '-ro'   ) { $ro      = shift }
 		elsif ($_[0] eq '-new'  ) { $new     = shift }
+		elsif ($_[0] eq '-pass' ) {
+			$pass = (shift, shift);
+			croak "invalid -pass option value (must be 'undef' or 'ref')"
+				if !defined $pass || $pass ne 'undef' && $pass ne 'ref';
+		}
 		elsif ($_[0] eq '-class') {
 			$class = (shift, shift);
 			croak "invalid -class option value"
@@ -331,7 +363,19 @@ sub h2o {  ## no critic (RequireArgUnpacking, ProhibitExcessComplexity)
 	$clean = !defined $class unless defined $clean;
 	$lock = 1 unless defined $lock;
 	my $hash = shift;
-	croak "h2o must be given a plain hashref" unless ref $hash eq 'HASH';
+	if ( ref $hash ne 'HASH' ) {
+		if ( $pass ) {
+			if ( $pass eq 'ref' ) {
+				return $hash if !defined $hash || ref $hash;
+				croak "this h2o call only accepts references or undef";
+			}
+			else { # $pass must be 'undef' due to checks above
+				return $hash if !defined $hash;
+				croak "this h2o call only accepts a plain hashref or undef";
+			}
+		}
+		croak "this h2o call only accepts plain hashrefs";
+	}
 	croak "h2o with additional keys doesn't make sense with -ro" if $ro && @_ && !$new;
 	my %ak   = map {$_=>1} @_;
 	my %keys = map {$_=>1} @_, keys %$hash;
@@ -381,33 +425,66 @@ sub h2o {  ## no critic (RequireArgUnpacking, ProhibitExcessComplexity)
 	return $hash;
 }
 
+=head2 C<o2h I<$h2object>>
+
+This function takes an object as created by C<h2o> and turns it back into a
+hashref by making shallow copies of the object hash and any nested objects that
+may have been created via C<-recurse> (or created manually). This function is
+recursive by default because for a non-recursive operation you can simply
+write: C<{%$h2object}> (making a shallow copy). Unlike C<h2o>, this function
+returns a new hashref instead of modifying the given variable in place (unless
+what you give this function is not an C<h2o> object, in which case it will just
+be returned unchanged).
+
+B<Note> that this function operates only on objects in the default package - it
+does not step into plain arrayrefs or hashrefs, nor does it operate on objects
+created with the C<-class> or C<-classify> options. Also be aware that because
+methods created via C<-meth> are removed from the object hash, these will
+disappear in the resulting hashref.
+
+This function was added in v0.18.
+
+=cut
+
+sub o2h {
+	my $h2o = shift;
+	return ref($h2o) =~ $_PACKAGE_REGEX ? { map { $_ => o2h($h2o->{$_}) } keys %$h2o } : $h2o;
+}
+
 1;
 __END__
 
 =head1 Cookbook
 
+=head2 Keys with Spaces, Dashes, or Other Non-Identifier Characters
+
+If the hash you want to pass to C<h2o> contains keys that are not usable as
+method names, such as keys containing spaces or dashes, you can transform the
+hash before passing it to C<h2o>. There are several ways to do this, including
+in plain Perl, but one of the easier ways is with C<pairmap> from the core
+module L<List::Util>.
+
+ use List::Util 'pairmap';
+ my $hash = { "foo bar" => 123, "quz-ba%z" => 456 };
+ my $obj = h2o { pairmap { $a=~tr/a-zA-Z0-9/_/c; ($a,$b) } %$hash };
+ print $obj->foo_bar, $obj->quz_ba_z, "\n";  # prints "123456"
+
 =head2 Using with Config::Tiny
 
 One common use case for this module is to make accessing hashes nicer, like for
-example those you get from L<Config::Tiny>. Here's how you can create a new
-C<h2o> object from a configuration file, and if you have L<Config::Tiny> v2.27
-or newer, the second part of the example for writing the configuration file
-back out will work too:
+example those you get from L<Config::Tiny|Config::Tiny>. Here's how you can
+create a new C<h2o> object from a configuration file:
 
- use Util::H2O;
- use Config::Tiny;
+ use Util::H2O 0.18 qw/ h2o o2h /;  # v0.18 for o2h
+ use Config::Tiny 2.27;             # v2.27 for writing file back out
  
  my $config = h2o -recurse, {%{ Config::Tiny->read($config_filename) }};
  
  say $config->foo->bar;  # prints the value of "bar" in section "[foo]"
  $config->foo->bar("Hello, World!");  # change value
  
- # write file back out, requires Config::Tiny v2.27 or newer
- Config::Tiny->new({%$config})->write($config_filename);
-
-Please be aware that since the above code only uses shallow copies, the nested
-hashes are actually not copied, and the second L<Config::Tiny> object's nested
-hashes will still be C<h2o> objects - but L<Config::Tiny> doesn't mind this.
+ # write file back out
+ Config::Tiny->new(o2h $config)->write($config_filename);
 
 =head2 Debugging
 
@@ -460,7 +537,7 @@ Let's say you've used this module to whip up two simple classes:
  h2o -classify => 'My::Class', {}, qw/ foo bar details /;
  h2o -classify => 'My::Class::Details', {}, qw/ a b /;
 
-But now you need more features and would like to upgrade to a better OO system
+But now you need more features and would like to upgrade to an actual OO system
 like L<Moo>. Here's how you'd write the above code using that, with some
 L<Type::Tiny> thrown in:
 
@@ -490,13 +567,28 @@ Similar modules include L<Object::Adhoc|Object::Adhoc>,
 L<Object::Anon|Object::Anon>, L<Hash::AsObject|Hash::AsObject>,
 L<Object::Result|Object::Result>, and L<Hash::Wrap|Hash::Wrap>,
 the latter of which also contains a comprehensive list of similar
-modules.
+modules. Also, see L<Class::Tiny|Class::Tiny> for another minimalistic class
+generation module.
 
-For real OO work, I like L<Moo> and L<Type::Tiny> (see L</"Upgrading to Moo">).
+For real OO work, I like L<Moo|Moo> and L<Type::Tiny|Type::Tiny> (see
+L</"Upgrading to Moo">).
+
+Further modules that might be useful in combination with this one:
+L<Hash::Merge|Hash::Merge> for merging hashes before using this module (for
+example, to supply default values for keys); L<Role::Tiny|Role::Tiny> for
+applying roles.
+
+See also L<Util::H2O::More|Util::H2O::More> by OODLER, a module with additional
+functionality on top of this module.
+
+=head1 Special Thanks
+
+Thanks to oodler577 on GitHub (OODLER on CPAN), whose many suggestions have
+inspired a lot of the features in this module!
 
 =head1 Author, Copyright, and License
 
-Copyright (c) 2020-2021 Hauke Daempfling (haukex@zero-g.net).
+Copyright (c) 2020-2022 Hauke Daempfling (haukex@zero-g.net).
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl 5 itself.
