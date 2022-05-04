@@ -5,6 +5,7 @@ push @CustomFields, (
         Queue       => 0,
         Disabled    => 0,
         Pattern     => q'(?#Mandatory).',
+        RenderType  => 'List',
         Values      => [
             { Name      => "web", SortOrder => 1 },
             { Name      => "mail",  SortOrder => 2 },
@@ -15,5 +16,17 @@ push @CustomFields, (
         Type        => 'FreeformSingle',
         Queue       => 0,
         Disabled    => 0,
+    },
+);
+
+our @Final = (
+    sub {
+        my $cf = RT::CustomField->new( RT->SystemUser );
+        $cf->Load('Systems');
+        my ( $ret, $msg ) = $cf->SetDefaultValues(
+            Object => RT->System,
+            Values => 'web',
+        );
+        warn "Could not set default value for Systems: $msg" unless $ret;
     },
 );

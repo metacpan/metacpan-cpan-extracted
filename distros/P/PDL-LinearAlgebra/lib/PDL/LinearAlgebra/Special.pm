@@ -19,7 +19,7 @@ our @ISA = ( 'PDL::Exporter');
 
 use strict;
 
-=encoding Latin-1
+=encoding utf8
 
 =head1 NAME
 
@@ -27,7 +27,7 @@ PDL::LinearAlgebra::Special - Special matrices for PDL
 
 =head1 SYNOPSIS
 
- use PDL::LinearAlgebra::Mtype;
+ use PDL::LinearAlgebra::Special;
 
  $a = mhilb(5,5);
 
@@ -327,7 +327,7 @@ sub PDL::mcompanion{
 
 =head1 AUTHOR
 
-Copyright (C) Grégory Vanuxem 2005-2007.
+Copyright (C) GrÃ©gory Vanuxem 2005-2007.
 
 This library is free software; you can redistribute it and/or modify
 it under the terms of the artistic license as specified in the Artistic

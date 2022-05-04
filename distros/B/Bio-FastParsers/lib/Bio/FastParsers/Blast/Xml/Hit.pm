@@ -1,6 +1,6 @@
 package Bio::FastParsers::Blast::Xml::Hit;
 # ABSTRACT: NCBI BLAST DTD-derived internal class
-$Bio::FastParsers::Blast::Xml::Hit::VERSION = '0.213510';
+$Bio::FastParsers::Blast::Xml::Hit::VERSION = '0.221230';
 use Moose;
 use namespace::autoclean;
 
@@ -23,6 +23,7 @@ has '_parent' => (
     is       => 'ro',
     isa      => 'Maybe[Object]',
     required => 1,
+    weak_ref => 1,
 );
 
 
@@ -110,7 +111,7 @@ Bio::FastParsers::Blast::Xml::Hit - NCBI BLAST DTD-derived internal class
 
 =head1 VERSION
 
-version 0.213510
+version 0.221230
 
 =head1 SYNOPSIS
 

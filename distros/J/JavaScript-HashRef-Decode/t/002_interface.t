@@ -5,7 +5,7 @@ use JavaScript::HashRef::Decode qw<decode_js>;
 
 # This uses the JavaScript::HashRef::Decode **EXTERNAL INTERFACE**
 
-is_deeply(decode_js('{}'), {}, 'empty hashref');
+is_deeply( decode_js('{}'), {}, 'empty hashref' );
 
 is_deeply(
     decode_js('{k:"v",y:undefined}'),

@@ -83,12 +83,12 @@ List possible words made of unique characters.
 
 =item B<=>I<chars>
 
-If start with slash, list words which include all of I<chars>.
+If start with equal (C<=>), list words which include all of I<chars>.
 
 =item B<!>I<chars>
 
-If start with exclamation mark, list words which does not include any
-of I<chars>.
+If start with exclamation mark (C<!>), list words which does not
+include any of I<chars>.
 
 =item I<regex>
 

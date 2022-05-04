@@ -22,12 +22,12 @@ use File::KDBX::Constants qw(:header :compression :kdf);
 use File::KDBX::Error;
 use File::KDBX::IO::Crypt;
 use File::KDBX::IO::HashBlock;
-use File::KDBX::Util qw(:class :io :load assert_64bit erase_scoped);
+use File::KDBX::Util qw(:class :int :io :load erase_scoped);
 use namespace::clean;
 
 extends 'File::KDBX::Loader';
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 sub _read_header {
     my $self = shift;
@@ -62,8 +62,7 @@ sub _read_header {
         # nothing
     }
     elsif ($type == HEADER_TRANSFORM_ROUNDS) {
-        assert_64bit;
-        $val = unpack('Q<', $val);
+        ($val) = unpack_Ql($val);
     }
     elsif ($type == HEADER_ENCRYPTION_IV) {
         # nothing
@@ -75,7 +74,7 @@ sub _read_header {
         # nothing
     }
     elsif ($type == HEADER_INNER_RANDOM_STREAM_ID) {
-        $val = unpack('L<', $val);
+        ($val) = unpack('L<', $val);
     }
     elsif ($type == HEADER_KDF_PARAMETERS ||
            $type == HEADER_PUBLIC_CUSTOM_DATA) {
@@ -175,7 +174,7 @@ File::KDBX::Loader::V3 - Load KDBX3 files
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 BUGS
 

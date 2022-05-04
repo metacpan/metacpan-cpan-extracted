@@ -9,7 +9,7 @@ DESCRIPTION
     their own forms in Mason.
 
 RT VERSION
-    Works with RT 4.0 and 4.2
+    Works with RT 4.2.3+
 
 INSTALLATION
     perl Makefile.PL
@@ -18,15 +18,9 @@ INSTALLATION
         May need root permissions
 
     Edit your /opt/rt4/etc/RT_SiteConfig.pm
-        If you are using RT 4.2 or greater, add this line:
+        Add this line:
 
             Plugin('RT::Extension::FormTools');
-
-        For RT 4.0, add this line:
-
-            Set(@Plugins, qw(RT::Extension::FormTools));
-
-        or add RT::Extension::FormTools to your existing @Plugins line.
 
     Clear your mason cache
             rm -rf /opt/rt4/var/mason_data/obj
@@ -108,7 +102,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-FormTools>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2014-2018 by Best Practical Solutions
+    This software is Copyright (c) 2014-2022 by Best Practical Solutions
 
     This is free software, licensed under:
 

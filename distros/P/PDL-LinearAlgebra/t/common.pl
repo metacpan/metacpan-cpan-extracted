@@ -116,6 +116,7 @@ my $a_mexp = pdl([10927.432,10577.72],[30410.945,29438.441]);
 runtest($a_mexp, 'mlog', $a);
 my $a_mpow2 = pdl([32.33,28.8],[82.8,82.73]);
 runtest($a, 'mpow', $a_mpow2, [2]);
+runtest($a, 'mpow', identity(2), [0]);
 runtest($a_mpow2, 'msqrt', pdl([4.042101,2.358438],[6.780510,8.169368]));
 runtest($a, 'mexp', $a_mexp);
 my $a_mcos = pdl([-0.128354,-0.090435],[-0.260001,-0.286616]);

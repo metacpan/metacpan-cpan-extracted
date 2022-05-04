@@ -4,7 +4,7 @@ package File::KDBX::Entry;
 use warnings;
 use strict;
 
-use Crypt::Misc 0.029 qw(decode_b64 encode_b32r);
+use Crypt::Misc 0.049 qw(decode_b64 encode_b32r);
 use Devel::GlobalDestruction;
 use Encode qw(encode);
 use File::KDBX::Constants qw(:history :icon);
@@ -21,7 +21,7 @@ use namespace::clean;
 
 extends 'File::KDBX::Object';
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 my $PLACEHOLDER_MAX_DEPTH = 10;
 my %PLACEHOLDERS;
@@ -681,7 +681,7 @@ File::KDBX::Entry - A KDBX database entry
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 DESCRIPTION
 
@@ -720,7 +720,8 @@ There is also some metadata associated with an entry. Each entry in a database i
 a UUID. An entry can also have an icon associated with it, and there are various timestamps. Take a look at
 the attributes to see what's available.
 
-A B<File::KDBX::Entry> is a subclass of L<File::KDBX::Object>.
+A B<File::KDBX::Entry> is a subclass of L<File::KDBX::Object>. View its documentation to see other attributes
+and methods available on entries.
 
 =head2 Placeholders
 

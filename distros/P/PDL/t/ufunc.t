@@ -15,6 +15,10 @@ my $p = pdl([]); $p->setdims([1,0]); $p->qsortvec; # shouldn't segfault!
 my $p2d  = pdl([[1,2],[3,4],[1,3],[1,2],[3,3]]);
 is $p2d->dice_axis(1,$p2d->qsortveci).'', $p2d->qsortvec.'', "qsortveci";
 
+my $ind_double = zeroes($p2d->dim(1));
+$p2d->qsortveci($ind_double); # shouldn't segfault!
+is $ind_double.'', '[3 0 2 4 1]';
+
 eval { empty()->medover }; # shouldn't segfault
 isnt $@, '', 'exception for percentile on empty ndarray';
 
@@ -118,8 +122,8 @@ EOF
  ok($x->min == $y->min, "min with NaNs");
  ok($x->max == $y->max, "max with NaNs");
 }
-my $empty = which(ones(5)>5);
-$x = $empty->double->maximum;
+my $empty = empty();
+$x = $empty->maximum;
 ok( $x->nelem==1, "maximum over an empty dim yields 1 value");
 is $x.'', 'BAD', "max of empty nonbad float gives BAD";
 

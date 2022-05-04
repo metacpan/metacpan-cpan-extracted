@@ -14,7 +14,7 @@ use namespace::clean;
 
 extends 'File::KDBX::Dumper';
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 sub _write_magic_numbers { '' }
 sub _write_headers { '' }
@@ -28,8 +28,6 @@ sub _write_body {
 
     my $k = File::KeePass::KDBX->new($self->kdbx)->to_fkp;
     $self->_write_custom_icons($self->kdbx, $k);
-
-    # TODO create a KPX_CUSTOM_ICONS_4 meta stream. FKP itself handles KPX_GROUP_TREE_STATE
 
     substr($k->header->{seed_rand}, 16) = '';
 
@@ -138,7 +136,7 @@ File::KDBX::Dumper::KDB - Write KDB files
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 DESCRIPTION
 

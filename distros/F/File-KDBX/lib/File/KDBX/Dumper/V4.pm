@@ -11,7 +11,7 @@ use File::KDBX::Constants qw(:header :inner_header :compression :kdf :variant_ma
 use File::KDBX::Error;
 use File::KDBX::IO::Crypt;
 use File::KDBX::IO::HmacBlock;
-use File::KDBX::Util qw(:class :empty :load assert_64bit erase_scoped);
+use File::KDBX::Util qw(:class :empty :int :load erase_scoped);
 use IO::Handle;
 use Scalar::Util qw(looks_like_number);
 use boolean qw(:all);
@@ -19,7 +19,7 @@ use namespace::clean;
 
 extends 'File::KDBX::Dumper';
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 has _binaries_written => {}, is => 'ro';
 
@@ -129,9 +129,8 @@ sub _intuit_variant_type {
         return VMAP_TYPE_BOOL;
     }
     elsif (looks_like_number($variant) && ($variant + 0) =~ /^\d+$/) {
-        assert_64bit;
         my $neg = $variant < 0;
-        my @b = unpack('L>2', pack('Q>', $variant));
+        my @b = unpack('L>2', scalar reverse pack_Ql($variant));
         return VMAP_TYPE_INT64  if $b[0] && $neg;
         return VMAP_TYPE_UINT64 if $b[0];
         return VMAP_TYPE_INT32  if $neg;
@@ -162,8 +161,7 @@ sub _write_variant_dictionary {
             $val = pack('L<', $val);
         }
         elsif ($type == VMAP_TYPE_UINT64) {
-            assert_64bit;
-            $val = pack('Q<', $val);
+            $val = pack_Ql($val);
         }
         elsif ($type == VMAP_TYPE_BOOL) {
             $val = pack('C', $val);
@@ -172,8 +170,7 @@ sub _write_variant_dictionary {
             $val = pack('l', $val);
         }
         elsif ($type == VMAP_TYPE_INT64) {
-            assert_64bit;
-            $val = pack('q<', $val);
+            $val = pack_ql($val);
         }
         elsif ($type == VMAP_TYPE_STRING) {
             $val = encode('UTF-8', $val);
@@ -377,7 +374,7 @@ File::KDBX::Dumper::V4 - Dump KDBX4 files
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 BUGS
 

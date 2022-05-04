@@ -993,8 +993,6 @@ Return matrix power of a square matrix.
 
 =cut
 
-#TODO: improve it (really crappy)
-
 *mpow = \&PDL::mpow;
 sub PDL::mpow {
 	&PDL::LinearAlgebra::_square;
@@ -1004,14 +1002,15 @@ sub PDL::mpow {
 	my $ret;
 	if (UNIVERSAL::isa($power,'PDL') and $power->dims > 1){
 		my ($e, $v) = $m->meigen(0,1);
-		$ret = $v * $e->Cpow($power) x $v->minv;
+		$ret = $v * ($e**$power) x $v->minv;
 	}
 	elsif( 1/$dims[$di] * 1000 > abs($power)  and !$eigen){
-		$ret = $m;
+		$ret = identity($dims[$di]);
+		$ret = $ret->r2C if $m->_is_complex;
 		my $pow = floor($power);
 		$pow++ if ($power < 0 and $power != $pow);
                 # TODO: what a beautiful thing (is it a game ?)
-		for(my $i = 1; $i < abs($pow); $i++){	$ret x= $m;}
+		for(my $i = 0; $i < abs($pow); $i++){$ret x= $m;}
 		$ret = $ret->minv if $power < 0;
 		if ($power = $power - $pow){
 			if($power == 0.5){

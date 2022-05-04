@@ -15,6 +15,7 @@ my $builder = Module::Build->new(
         'Regexp::Common'   => 0, 
         'Scalar::Util'     => 0,
         'Class::Trigger'   => 0,
+        'CGI'              => 3.06,
     },
     add_to_cleanup      => [ 'HTML-Template-Pluggable-*' ],
     create_makefile_pl => 'traditional',

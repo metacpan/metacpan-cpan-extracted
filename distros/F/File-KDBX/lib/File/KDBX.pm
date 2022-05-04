@@ -1,6 +1,7 @@
 package File::KDBX;
 # ABSTRACT: Encrypted database to store secret text and files
 
+use 5.010;
 use warnings;
 use strict;
 
@@ -19,7 +20,7 @@ use Time::Piece;
 use boolean;
 use namespace::clean;
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 our $WARNINGS = 1;
 
 fieldhashes \my (%SAFE, %KEYS);
@@ -419,7 +420,7 @@ sub groups {
     my %args = @_ % 2 == 0 ? @_ : (base => shift, @_);
     my $base = delete $args{base} // $self->root;
 
-    return $base->groups_deeply(%args);
+    return $base->all_groups(%args);
 }
 
 ##############################################################################
@@ -451,7 +452,7 @@ sub entries {
     my %args = @_ % 2 == 0 ? @_ : (base => shift, @_);
     my $base = delete $args{base} // $self->root;
 
-    return $base->entries_deeply(%args);
+    return $base->all_entries(%args);
 }
 
 ##############################################################################
@@ -462,7 +463,7 @@ sub objects {
     my %args = @_ % 2 == 0 ? @_ : (base => shift, @_);
     my $base = delete $args{base} // $self->root;
 
-    return $base->objects_deeply(%args);
+    return $base->all_objects(%args);
 }
 
 sub __iter__ { $_[0]->objects }
@@ -1120,28 +1121,33 @@ File::KDBX - Encrypted database to store secret text and files
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 SYNOPSIS
 
     use File::KDBX;
 
+    # Create a new database from scratch
     my $kdbx = File::KDBX->new;
 
+    # Add some objects to the database
     my $group = $kdbx->add_group(
         name => 'Passwords',
     );
-
     my $entry = $group->add_entry(
         title    => 'My Bank',
+        username => 'mreynolds',
         password => 's3cr3t',
     );
 
+    # Save the database to the filesystem
     $kdbx->dump_file('passwords.kdbx', 'M@st3rP@ssw0rd!');
 
-    $kdbx = File::KDBX->load_file('passwords.kdbx', 'M@st3rP@ssw0rd!');
+    # Load the database from the filesystem into a new database instance
+    my $kdbx2 = File::KDBX->load_file('passwords.kdbx', 'M@st3rP@ssw0rd!');
 
-    $kdbx->entries->each(sub {
+    # Iterate over database entries, print entry titles
+    $kdbx2->entries->each(sub {
         my ($entry) = @_;
         say 'Entry: ', $entry->title;
     });
@@ -1279,7 +1285,7 @@ A text string associated with the database. Often unset.
 
 The UUID of a cipher used to encrypt the database when stored as a file.
 
-See L</File::KDBX::Cipher>.
+See L<File::KDBX::Cipher>.
 
 =head2 compression_flags
 
@@ -1384,7 +1390,7 @@ Number of days until the agent should prompt to recommend changing the master ke
 Number of days until the agent should prompt to force changing the master key.
 
 Note: This is purely advisory. It is up to the individual agent software to actually enforce it.
-C<File::KDBX> does NOT enforce it.
+B<File::KDBX> does NOT enforce it.
 
 =head2 custom_icons
 
@@ -1569,7 +1575,7 @@ might increase this value. For example, setting the KDF to Argon2 will increase 
 least C<KDBX_VERSION_4_0> (i.e. C<0x00040000>) because Argon2 was introduced with KDBX4.
 
 This method never returns less than C<KDBX_VERSION_3_1> (i.e. C<0x00030001>). That file version is so
-ubiquitious and well-supported, there are seldom reasons to dump in a lesser format nowadays.
+ubiquitous and well-supported, there are seldom reasons to dump in a lesser format nowadays.
 
 B<WARNING:> If you dump a database with a minimum version higher than the current L</version>, the dumper will
 typically issue a warning and automatically upgrade the database. This seems like the safest behavior in order
@@ -2640,7 +2646,7 @@ your own query logic, like this:
 
 Iterators are the built-in way to navigate or walk the database tree. You get an iterator from L</entries>,
 L</groups> and L</objects>. You can specify the search algorithm to iterate over objects in different orders
-using the C<algorith> option, which can be one of these L<constants|File::KDBX::Constants/":iteration">:
+using the C<algorithm> option, which can be one of these L<constants|File::KDBX::Constants/":iteration">:
 
 =over 4
 
@@ -2795,13 +2801,6 @@ C<PERL_ONLY> - Do not use L<File::KDBX::XS> if true (default: false)
 C<NO_FORK> - Do not fork if true (default: false)
 
 =back
-
-=head1 CAVEATS
-
-Some features (e.g. parsing) require 64-bit perl. It should be possible and actually pretty easy to make it
-work using L<Math::BigInt>, but I need to build a 32-bit perl in order to test it and frankly I'm still
-figuring out how. I'm sure it's simple so I'll mark this one "TODO", but for now an exception will be thrown
-when trying to use such features with undersized IVs.
 
 =head1 SEE ALSO
 

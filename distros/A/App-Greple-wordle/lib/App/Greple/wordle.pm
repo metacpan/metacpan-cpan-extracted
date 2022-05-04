@@ -3,7 +3,7 @@ use v5.14;
 use warnings;
 use utf8;
 
-our $VERSION = "0.10";
+our $VERSION = "0.11";
 
 use Data::Dumper;
 use List::Util qw(shuffle max);
@@ -13,7 +13,7 @@ use Text::VisualWidth::PP 0.05 'vwidth';
 use App::Greple::wordle::word_all    qw(@word_all %word_all);
 use App::Greple::wordle::word_hidden qw(@word_hidden);
 use App::Greple::wordle::game;
-use App::Greple::wordle::util qw(uniqword);
+use App::Greple::wordle::util qw();
 
 use Getopt::EX::Hashed; {
     has answer  => '   =s ' , default => $ENV{WORDLE_ANSWER} ;
@@ -145,19 +145,28 @@ sub command {
     state @remember;
     $cmd[0] =~ /^u(niq)?$/ and unshift @cmd, 'hint';
 
-    for (@cmd) {
+    while (@cmd) {
+	local $_ = shift @cmd;
 	try {
 	    if    ($_ eq '|')   {}
-	    elsif (/^d$/)       { $app->{debug} ^= 1 }
+	    elsif (/^d$/)       {
+		$app->{debug} ^= 1;
+		printf 'Debug %s', $app->{debug} ? 'on' : 'off';
+		return;
+	    }
+	    elsif (/^\?$/)      { help(); return }
 	    elsif (/^!!$/)      { @word = @remember }
 	    elsif (/^h(int)?$/) { @word = choose($game->hint, @word) }
-	    elsif (/^u(niq)?$/) { @word = uniqword(@word) }
+	    elsif (/^u(niq)?$/) { @word = grep { !/(.).*\1/i } @word }
 	    elsif (/^=(.+)/)    { @word = choose(includes($1), @word) }
 	    elsif (/^!(.+)/)    { @word = choose("^(?!.*[$1])", @word) }
 	    elsif (/\W/)        { @word = choose($_, @word); }
 	    else  { return }
 	    1;
-	} or return;
+	} or do {
+	    warn "ERROR: $_" if $app->{debug};
+	    return /^[a-z]+$/i ? 0 : 1;
+	};
     }
     if (@word == 0) {
 	warn "No match\n";
@@ -171,12 +180,27 @@ sub command {
     1;
 }
 
+sub help {
+    my $message = << "    END";
+#   d      debug
+    ?      help
+    h      show hint
+    u      uniq
+    !!     repeat last result
+    =<str> include characters
+    !<str> exclude characters
+    END
+    print $message =~ s/^\s*(#.*)\n//gr;
+}
+
 sub includes {
     '^' . join '', map { "(?=.*$_)" } $_[0] =~ /./g;
 }
 
 sub choose {
     my $p = shift;
+    $p =~ s/([A-Z])/[^$1]/g;
+    warn "> $p\n" if $app->{debug};
     grep /$p/, @_;
 }
 

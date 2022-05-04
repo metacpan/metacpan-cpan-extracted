@@ -1,10 +1,801 @@
 ==================================================
-Changes from 2017-07-30 00:00:00 +0000 to present.
+Changes from 2021-05-04 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.017 at 2018-07-30 01:33:52 +0000
+version 0.018 at 2022-05-04 01:14:48 +0000
 ------------------------------------------
+
+  Change: aab8b95d2e88169098f5dc1f0451944ef880a03e
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-05-03 21:54:21 +0000
+
+    Merge branch 'master' into ansible 
+
+  Change: 91402ef1943c887e13bccd7d1c03eef75590328c
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-04-28 16:29:53 +0000
+
+    chore: version bump 
+
+  Change: 79fad392b6d80627d677cccf5f3ef7d531175574
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-04-28 16:29:42 +0000
+
+    refactor: avoiding STDERR message 
+
+  Change: 7f113a164ab7ce727903b7b525b7647b8cb15546
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-04-28 16:29:12 +0000
+
+    fix: invalid distroprefs when undef 
+
+  Change: fbe1c79b76f17f61e6d205f1c51aa62b2978ee23
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-04-28 13:01:29 +0000
+
+    fix: undef does not work 
+
+  Change: b10aa6c44e06b917c4d1a9d472270e7a155d383e
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-04-22 20:18:20 +0000
+
+    doc: improved 
+
+  Change: d93a3f70b1910533fcc35e7ab902da6772899531
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-04-22 20:18:09 +0000
+
+    fix: using TLS for default 
+
+  Change: 0e2cb52a90b4467a59d778c453f7a1c9604cbe1b
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-04-22 20:10:15 +0000
+
+    fix: installing CPAN::Mini 
+
+  Change: 99c1d51ca7f268b149f7a93b1f16cc5360b899fb
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-04-22 20:09:56 +0000
+
+    feat: added missing configurations
+
+    Also refactored the Vagrantfile to be easier to use. 
+
+  Change: 8d7211242ac6cd4185a4f3455a7d4a68bd1a15a9
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-04-22 17:41:47 +0000
+
+    fix: making PKG_PATH dynamic 
+
+  Change: b2d4e7bdd893e315176889fb3378b5d677a129e6
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-04-22 17:38:17 +0000
+
+    fix: removing hardcodes 
+
+  Change: fba503b6dca74fec5ebd8c3ab75973b4678c453a
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-04-09 11:04:07 +0000
+
+    Merge branch 'master' into ansible 
+
+  Change: 675967774644219001d0e9efadadf45f25f07899
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-04-06 14:20:35 +0000
+
+    chore: required distroprefs updates 
+
+  Change: 8f543598d4d51dd49bd06d3fdd431144669ec783
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-04-04 00:39:19 +0000
+
+    Merge branch 'ansible' of github.com:glasswalk3r/cpan-openbsd-smoker
+    into ansible 
+
+  Change: 6e45ba7ddc4459dca79e1422431cd4a682b1f72d
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-04-04 00:39:06 +0000
+
+    feat: Math::MPC support 
+
+  Change: d038a59fac7dec086749c7165c3ca223d885000e
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-13 22:19:05 +0000
+
+    feat: not checking guest additions
+
+    Also made require updated in post_up_message 
+
+  Change: f21b3bd61f4c113c0f61072a9160bb66ffa9e7fc
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-06 19:49:28 +0000
+
+    fix: saving partial info 
+
+  Change: 54c7c72ee82ba9350bce48ba8fe7cbded87671a4
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-06 18:07:31 +0000
+
+    fix: bugs 
+
+  Change: f26e822cd8dda6e98e97d22485048364cd1ea70b
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-06 17:15:59 +0000
+
+    feat: allowing multiple CPUs usage 
+
+  Change: c5833a77ac7ed90015a79fe0d669a09aee72b7fa
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-06 17:15:35 +0000
+
+    refactor: end user config 
+
+  Change: 56a3db4eddbbf7c37ba06b191546eaa5adfae01f
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-06 17:15:18 +0000
+
+    feat: vim config 
+
+  Change: 98d04277c2cba72e786000fdb02b14ab3cd0f76a
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-06 17:14:31 +0000
+
+    fix: handling Alien::Build 
+
+  Change: 2d6fb87527c66758ae1258fe0877cd797781b3cf
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-06 17:13:43 +0000
+
+    fix: wrong filename to version 
+
+  Change: e7f7034b2dafdc1a3af5ecb6f9d968a847f7cf0c
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-06 14:17:20 +0000
+
+    chore: maintaining OpenBSD packages 
+
+  Change: d3bcc678a48764a9b59c235c6b501e4c968c815c
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-06 14:15:04 +0000
+
+    feat: better standard perl 
+
+  Change: 8a0e02bb980a6502e70ab32de056244debe6080d
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-06 14:13:51 +0000
+
+    feat: smoker enhancements 
+
+  Change: 9d6bf5c6650cd2497b28f773ffbb4be952c4fbbd
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-06 14:13:13 +0000
+
+    feat: vim config 
+
+  Change: 2e24a6bc45f4784697df3e5f52280f86a7aa35f6
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-04 10:39:11 +0000
+
+    fix: all architectures affected 
+
+  Change: f1336d9ddcffb6bd38077bc472349f468d533d4d
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-03 11:06:52 +0000
+
+    feat: new distroprefs 
+
+  Change: 249d06f98f84d91a5e7c8398351c8675420c3e62
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-03 11:05:14 +0000
+
+    Merge branch 'master' into ansible 
+
+  Change: f66a99bb3db182efb4b79169aa8c263b44e4dccd
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-03 11:04:57 +0000
+
+    fix: broken in all architectures 
+
+  Change: 4cfa5d9c114bf5f58d657a3b11c905af03cd99cd
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-02 16:53:39 +0000
+
+    fix: handling distroprefs 
+
+  Change: a51bde817f64c9adfa49c5859b5676bc4030df7f
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-02 00:33:15 +0000
+
+    fix: cannot test CPAN::Reporter::Smoker 
+
+  Change: 374c02f7671341009fabb3cea9fd102510ac792f
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-03-02 00:25:35 +0000
+
+    refactor: packages maintained in the base image
+
+    Also fixed a bug regarding copying smoker_install. 
+
+  Change: b5039845c1998089d999458645d43eae2ff94bf8
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-26 15:07:10 +0000
+
+    fix: PKG_PATH not defined 
+
+  Change: c6696b56ab811b9d3ed2b114337f33ac830e4141
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-25 22:46:08 +0000
+
+    feat: provisioning for non-root users 
+
+  Change: c354892a0d40aa548a88f829c04c87ce01fe8bc0
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-25 22:45:45 +0000
+
+    doc: required update 
+
+  Change: 9c5a286fdf5c0107e3c550d24ef592a84e41ea92
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-25 22:45:30 +0000
+
+    feat: adding all test Perl modules 
+
+  Change: 435d122e267654ac0614f2f22755c1fda93f67ed
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-25 21:50:19 +0000
+
+    chore: added license 
+
+  Change: f256d7e7eee5ec3e1e9a466556dea24d8f6ad78a
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-25 21:23:25 +0000
+
+    chore: clean, added license 
+
+  Change: 02955a7923dc5f90e0f3d9f002a9b741011ebc6c
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-25 19:24:07 +0000
+
+    chore: deprecated 
+
+  Change: c1974326ae30f9e7ea93aeb07302b7a18bcd01b2
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-25 19:23:10 +0000
+
+    Merge branch 'master' into ansible 
+
+  Change: e0f0419774cbedd219f448bea825f104c6ffc815
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-25 19:22:42 +0000
+
+    refactor: allowing extended tests 
+
+  Change: 5387666f0fc0df677f29efee53ed14619df820ec
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-25 19:00:46 +0000
+
+    feat: SSH access config 
+
+  Change: 413e751e3200f7aa98d97e17d825ded735e3aa3b
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-25 18:59:11 +0000
+
+    chore: deprecated 
+
+  Change: 5b8feb7ca9e0b1e593cd8b461245831340244728
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-25 18:40:26 +0000
+
+    feat: adding non-root user to MariaDB 
+
+  Change: 66d224cc83a365ffa0dbcae399f1d1ee419ed78a
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-25 18:40:11 +0000
+
+    feat: adding non-root user do MariaDB 
+
+  Change: 17fbd1fead48c9284e5e2ef780e6cf1b260a068b
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-25 17:07:56 +0000
+
+    fix: envs for testing only 
+
+  Change: 6a9095065c3137ff1eba450ded49b12df77e5b51
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-25 16:57:50 +0000
+
+    fix: envs for testing only 
+
+  Change: 1d4d9602fa3be143124f4d703b54b15a1957108f
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-25 16:48:34 +0000
+
+    fix: envs for testing only 
+
+  Change: 93d868882728c7a4e483e763805b0253ed644bc1
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-25 16:24:20 +0000
+
+    feat: distroprefs for MariaDB e MySQL DBI tests 
+
+  Change: 87c0e66e1dbff8a6dfd20f7a4361c130c80b34bb
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-25 16:22:26 +0000
+
+    fix: typo 
+
+  Change: c8702751a927a4182aee1a90b82213dcbdc0a38c
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-25 15:54:10 +0000
+
+    refactor: making easier for user config 
+
+  Change: 244a58ea102abfa0e71f0ab0040ac27097ddd77c
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-25 15:53:51 +0000
+
+    fix: fine tunning for speed 
+
+  Change: c14920309fa745057441327c85a3e7b993756190
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-25 15:53:31 +0000
+
+    refactor: moving env vars to distroprefs 
+
+  Change: 39d90b451005e6387894bef149ae69d9f9c2df7e
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-25 15:53:14 +0000
+
+    feat: low privileges user for smoker 
+
+  Change: 1f5c8db28be71ff900af52a73f9644f0abd5d3d8
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-25 12:32:12 +0000
+
+    Merge branch 'master' into ansible 
+
+  Change: 0684aadd62b5d6c8432d44a18214b0f89e7079a5
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-25 12:04:36 +0000
+
+    Merge pull request #4 from glasswalk3r/feature/disto_prefs
+
+    Feature/disto prefs 
+
+  Change: bfc0bffab52df7103428250d0658dc427ae53b0b
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-25 12:01:04 +0000
+
+    chore: updated files to ignore 
+
+  Change: 31e108f1a6257b34640941534dc3de334cf10b49
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-25 11:59:12 +0000
+
+    new distroprefs 
+
+  Change: e42044cda5d897bf66228a99d1d24de05e158aee
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-22 16:11:05 +0000
+
+    Merge branch 'ansible' of github.com:glasswalk3r/cpan-openbsd-smoker
+    into ansible 
+
+  Change: 9a5ee08780311c48e66dec5f0739ac38902d7b23
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-22 16:10:25 +0000
+
+    chore: more tests 
+
+  Change: 750a62687a0b70c373da0f83fa9caecf0f6e7a39
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-02-22 16:10:16 +0000
+
+    fix: missing step 
+
+  Change: 29da0c05510a0867cea87077078421ac4419036b
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-22 16:10:16 +0000
+
+    fix: missing libpth fixes 
+
+  Change: 419605f9b74de4f3f23e5950144491232aebfaab
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-22 16:10:16 +0000
+
+    feat: CPAN::Reporter cfg 
+
+  Change: 3584d921ea0f9d51da98c77e6dfccfb83d576213
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-22 16:10:15 +0000
+
+    fix: packer cache 
+
+  Change: e66b26ab95ff9c4cd5840e18c5339949ac9a7a59
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-22 16:10:14 +0000
+
+    chore: deprecated 
+
+  Change: 78595ac399606cb730282be1df82b7e777a6dcf3
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-22 16:10:14 +0000
+
+    chore: reorg of packages/modules 
+
+  Change: 05487c45cb1a79e73ed215cc4dac50ba57512ba0
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-22 16:10:13 +0000
+
+    feat: incremented cleanup 
+
+  Change: 08c13910ba4957707a459780fedc662082a83f5a
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-22 16:10:11 +0000
+
+    refactor: DRY 
+
+  Change: 0a53da64cec76fd80067d3cbb29ae8d1c58fb1ba
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-22 16:10:11 +0000
+
+    fix: mariadb setup 
+
+  Change: 23daacd7dadc93ba3cbe1789acec5a0dfc2eb20c
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-22 16:10:10 +0000
+
+    feat: DRY with make 
+
+  Change: 85c803a12422319d8c2afcdf26a0e8509add6b67
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-22 16:10:10 +0000
+
+    feat: targets, DRY 
+
+  Change: 90b14efda7f2fb2a28d4db928fe702223264027c
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-22 16:10:09 +0000
+
+    chore: updated list 
+
+  Change: a0e8ce0dc81f5d91fb2ba55e72de7d67e1d27320
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-22 16:10:09 +0000
+
+    feat: MFS size as param 
+
+  Change: d4582d15beb714e51438717c0da36369d4201a58
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-22 16:10:08 +0000
+
+    chore: skipping files from repo 
+
+  Change: a75226e0df54ffd5342a8b8c0bbf3b5f07ed00b9
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-22 16:09:46 +0000
+
+    doc: missing info 
+
+  Change: ec74f03ddba220386469bc73b69a811da1f215b0
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-02-22 16:09:30 +0000
+
+    chore: deprecated 
+
+  Change: c723c6a859099fa1a843770ddd6048d35270be0f
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-22 16:09:30 +0000
+
+    feat: automation with GNU Make 
+
+  Change: c2be4666dcde3c3f53f714162c9f439ff8a3183f
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-22 16:08:52 +0000
+
+    refactor: deprecated, single user 
+
+  Change: a3c5a91a8e1c0dbb5ab1ee28afe47925737b4b84
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-22 16:05:49 +0000
+
+    chore: more tests 
+
+  Change: f9280ecb6f91b8cf84790c1e681055271467844c
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-02-22 11:29:07 +0000
+
+    fix: missing step 
+
+  Change: 43c5da63d34f98bbcac253aa923254748b796ecb
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-02-21 22:04:50 +0000
+
+    fix: missing libpth fixes 
+
+  Change: ef99b4640805c1bc28c85b9ef6b0c0a8fed848a7
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-02-21 22:04:36 +0000
+
+    feat: CPAN::Reporter cfg 
+
+  Change: b17e59a22ff277f7800b4f14adbe280ff879cd61
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-02-21 22:04:07 +0000
+
+    fix: packer cache 
+
+  Change: 52273dfdb4fa26de2f4f88af636445db37a60d11
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-02-21 22:03:23 +0000
+
+    chore: deprecated 
+
+  Change: 18974a8528eaf31ec53f2e8ae27d075a6da9480c
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-02-21 20:59:42 +0000
+
+    chore: reorg of packages/modules 
+
+  Change: e3943661c30a5fdc201771351ce790e5587f70a8
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-02-21 19:21:53 +0000
+
+    feat: incremented cleanup 
+
+  Change: a3973cf4b76ff7943abcc398506d996e3f5fee99
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-02-21 19:21:37 +0000
+
+    refactor: DRY 
+
+  Change: d3551f8669921578d5c7706913f3a290d9458480
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-02-21 18:50:39 +0000
+
+    fix: mariadb setup 
+
+  Change: 02f703d0c9c429e572aafe40767715c17d8704bf
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-02-21 18:50:29 +0000
+
+    feat: DRY with make 
+
+  Change: a5c5f336956300488a439b9052ec3bc0cffb6485
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-02-21 18:49:59 +0000
+
+    feat: targets, DRY 
+
+  Change: 656d7b48f8cdfeda7d649c69025c6daa12146e2e
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-02-21 17:07:26 +0000
+
+    chore: updated list 
+
+  Change: 48e7554114939086f647cf0d83e322beabf0a7a3
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-02-21 17:05:07 +0000
+
+    feat: MFS size as param 
+
+  Change: 1610f9fcccf141d8690a08b89273eb5c160b999e
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-02-21 17:04:17 +0000
+
+    chore: skipping files from repo 
+
+  Change: 8637e46df65dc13dc4f8ad37504c372cfd0bedb9
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-02-21 17:03:36 +0000
+
+    doc: missing info 
+
+  Change: a7d60cf1d56c561607aeade738e06802942695c4
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-02-21 16:41:46 +0000
+
+    chore: deprecated 
+
+  Change: 700e79af7ef5cbb1925e32f48fe3f472de81f542
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-02-21 16:01:16 +0000
+
+    feat: automation with GNU Make 
+
+  Change: 678d3a64381228c40acc0f62767e4adbbf76f9ec
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-02-21 13:52:05 +0000
+
+    refactor: deprecated, single user 
+
+  Change: 67019bceebe63da09d55c0ad30e40abdf5a469f5
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-02-16 20:16:54 +0000
+
+    feat: new prefs 
+
+  Change: 961dd1d4994ba0cccab2828f2a78536dfea253a9
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-02-16 20:13:03 +0000
+
+    chore: all architectures affected 
+
+  Change: 3596ca6bc1b3459b659bce176dc9423ba02a55c2
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-13 19:24:05 +0000
+
+    refactor: initial to use Ansible 
+
+  Change: 9967be2747a03b9023a5b9e298e2801dfef5b68f
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-13 19:23:46 +0000
+
+    refactor: moved dependencies to OpenBSD pkgs 
+
+  Change: 1a0cc9f7ec4a6bf57a3f8d55680fe813bd40c941
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-13 19:23:12 +0000
+
+    refactor: MFS defined by param
+
+    Also added MFS configuration. 
+
+  Change: a58f14c0fb13d048605fb9e764d4ecde9fc789b5
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-13 19:20:55 +0000
+
+    feat: initial Ansible usage 
+
+  Change: 0855470e427521fa903e87dc9576ba4f63687148
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-11-20 20:29:10 +0000
+
+    small improvements 
+
+  Change: 4e1990d21815fdd0881a34c186fa1aec67cee62b
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2020-05-06 18:44:03 +0000
+
+    Small improvements 
+
+  Change: be4e80e25d91b7fdcc8fda1b856deb4551fe7d48
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2019-11-25 01:16:36 +0000
+
+    Using pkg_info to generate a list of required packages, and using
+    this list as single source of packages to install. Returning
+    automatically the sha256 of the Vagrant box generated with Packer.
+    Adding a fallback to http://www.cpan.org if the mirror fails for any
+    reason. Adding the options softdep and noatime in some partitions to
+    make them faster. Added options to try to solve the circular
+    dependency between Moo and Role::Tiny. 
+
+  Change: 58963a1fd35bfb38f0e25bb1f8edc3415d617a3c
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2019-11-21 00:35:47 +0000
+
+    Resolved merge conflict 
+
+  Change: f8905d49b91f7a582b5c3fa2747d9ff8515c9405
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2019-11-21 00:26:12 +0000
+
+    Fixes for Packer usage
+
+    Replacing the usage of a local mirror named "minicpan" to ask for a
+    explicit IP address for the mirror, to avoid issues with name
+    resolution. Using a more appropriated name for the Vagrant box
+    generated. Copying files from local directory instead of getting them
+    from git repository. Removed the onliner sed from vagrant user to
+    setup MariaDB. Fixed code format issues due wrong setup for tabs.
+    Making sure that the CPAN mirror is setup everytime "vagrant up" is
+    executed. 
+
+  Change: 7bb54036167ff62d221c8a924b0ee2a7ec471e83
+  Author: Alceu Rodrigues de Freitas Junior
+  <alceu.freitas@lendico.com.br>
+  Date : 2019-11-13 17:51:44 +0000
+
+    Fixing hardcoded CPAN mirror 
+
+  Change: 4803fef8f3939594fb3df29b2fe3888f6f77cbeb
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2019-11-11 06:44:05 +0000
+
+    Bug fixes 
+
+  Change: 0d59a7f0026a11cf52c05a1f47771f65e22c41a8
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2019-11-10 12:26:54 +0000
+
+    Upgraded to install OpenBSD 6.6 Workaround an error when installing
+    Archive::Zip 
+
+  Change: a690e6f2da561c28b7978a647cb12589a70604d1
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2019-11-09 17:27:47 +0000
+
+    Added troubleshooting info. 
+
+  Change: cd441fa9366e2970b4bd3b06ad0fb67c42abbc09
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2019-05-26 18:26:13 +0000
+
+    Small improvements
+
+    Configuring better prompt for Bash users inside the VM. Properly
+    validating that all Perl modules required for vagrant user to run
+    metabase-relayd are in place. 
+
+  Change: 393aa2d790ab028b45bd63bd43e017f54b4c4502
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2019-05-05 15:48:00 +0000
+
+    Updates due OpenBSD 6.5 release 
+
+  Change: dae9d450ab2178dee427a0c25e89e7005fd4f89e
+  Author: Alceu Rodrigues de Freitas Junior <glaswalk3r@yahoo.com.br>
+  Date : 2019-04-28 16:52:45 +0000
+
+    Updated preferences 
+
+  Change: 4d0851362f183c521de4eb685abfede27c51d3c5
+  Author: Alceu Rodrigues de Freitas Junior <glaswalk3r@yahoo.com.br>
+  Date : 2019-03-23 11:48:04 +0000
+
+    Prefs updated 
+
+  Change: 9a54655bca8df754dd7f1ae72e1e35eda3e1506f
+  Author: Alceu Rodrigues de Freitas Junior <glaswalk3r@yahoo.com.br>
+  Date : 2019-03-01 02:19:12 +0000
+
+    More distributions blocked 
+
+  Change: bf34f45eeab33540c54bb4779e90eb7787d527a1
+  Author: Alceu Rodrigues de Freitas Junior <arfjunior@uolinc.com>
+  Date : 2019-01-31 23:39:05 +0000
+
+    Fixes 
+
+  Change: 9343a016b8acd36ee620a47f31cc1209652c2784
+  Author: Alceu Rodrigues de Freitas Junior <arfjunior@uolinc.com>
+  Date : 2019-01-27 04:11:41 +0000
+
+    Fixes 
+
+  Change: a36d7f5d2e857f50bb5f3d8aec315bf382afd603
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-09-08 17:05:50 +0000
+
+    Added CPAN::SQLite to the required modules 
+
+  Change: 4e4edbe9c477e219401083bc8c2fafada103833b
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-09-01 15:37:14 +0000
+
+    Improvements
+
+    The bootstrap for vagrant user wasn't using full paths, and maybe
+    that's the reason for failing to setup .bash_profile to setup
+    perlbrew at logon time.
+
+    Sharing the code related to cleanup_cpan wasn't working as expected,
+    took a step back to copy and paste the single line of code that was
+    doing this job to both vagrant_user and vagrant_bootstrap scripts. 
+
+  Change: 4094adbe2d2e0a333636d7a7c2846122af7791b5
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-09-01 03:42:06 +0000
+
+    Bug fixes 
+
+  Change: 4cfa2f91e3615dc78b467272b8b505f341e9df68
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-08-01 14:00:51 +0000
+
+    Added new distroprefs 
 
   Change: 8c4a7665ac9bd61e3404b4108e042dd459fbe15d
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>

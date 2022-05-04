@@ -4,18 +4,20 @@ use Test::More;
 use Test::Warnings 0.026 qw(:all :no_end_test);
 
 BEGIN {
-    use_ok('CPAN::Reporter::Smoker::OpenBSD',qw(is_distro_ok));
+    use_ok( 'CPAN::Reporter::Smoker::OpenBSD', qw(is_distro_ok) );
 }
 
 my $dummy = 'ARFREITAS/Module::Name';
 
 note('Testing is_distro_ok');
-ok(! is_distro_ok($dummy),'fails with a warning if a module name is passed instead');
-like(warning { is_distro_ok($dummy) }, qr/^invalid\sstring/, 'got the expected warning');
+my $result;
+like( warning { $result = is_distro_ok($dummy) },
+    qr/^invalid\sstring/, 'got the expected warning' );
+ok( !$result, 'fails with a warning if a module name is passed instead' );
 
-while(<DATA>) {
+while (<DATA>) {
     chomp;
-    ok(is_distro_ok($_),"$_ passes");
+    ok( is_distro_ok($_), "$_ passes" );
 }
 
 close(DATA);

@@ -9,7 +9,7 @@ use Crypt::Misc 0.029 qw(encode_b64);
 use Encode qw(encode);
 use File::KDBX::Constants qw(:version :time);
 use File::KDBX::Error;
-use File::KDBX::Util qw(:class assert_64bit erase_scoped gzip snakify);
+use File::KDBX::Util qw(:class :int erase_scoped gzip snakify);
 use IO::Handle;
 use Scalar::Util qw(blessed isdual looks_like_number);
 use Time::Piece;
@@ -19,7 +19,7 @@ use namespace::clean;
 
 extends 'File::KDBX::Dumper';
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 
 has allow_protection => 1;
@@ -526,9 +526,8 @@ sub _encode_datetime {
 
 sub _encode_datetime_binary {
     local $_ = shift;
-    assert_64bit;
     my $seconds_since_ad1 = $_ + TIME_SECONDS_AD1_TO_UNIX_EPOCH;
-    my $buf = pack('Q<', $seconds_since_ad1->epoch);
+    my $buf = pack_Ql($seconds_since_ad1->epoch);
     return eval { encode_b64($buf) };
 }
 
@@ -564,7 +563,7 @@ File::KDBX::Dumper::XML - Dump unencrypted XML KeePass files
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 ATTRIBUTES
 

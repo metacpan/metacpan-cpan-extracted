@@ -1,0 +1,21 @@
+This module performs DoubleDouble arithmetic.
+To use it, make sure that you have installed:
+
+ gmp-6.2.0  or later ( https://gmplib.org )
+ mpfr-4.1.0 or later ( https://www.mpfr.org )
+
+Then install Math::MPFR-4.22 or later:
+ cpan -i Math::MPFR
+
+Then install this module:
+ cpan -i Math::FakeDD
+
+Please raise any issues with Math::MPFR at:
+ https://github.com/sisyphus/math-mpfr/issues
+
+Please raise any issues with Math::FakeDD at:
+ https://github.com/sisyphus/math-fakedd/issues
+
+The basics of the DoubleDouble data type and its
+arithmetic can be found at:
+https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format#Double-double_arithmetic

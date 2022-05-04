@@ -115,7 +115,7 @@ the third argument (see second example), or supply it (see third one).
 =for bad
 
 plus processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -181,7 +181,7 @@ the third argument (see second example), or supply it (see third one).
 =for bad
 
 mult processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -247,7 +247,7 @@ the third argument (see second example), or supply it (see third one).
 =for bad
 
 minus processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -313,7 +313,7 @@ the third argument (see second example), or supply it (see third one).
 =for bad
 
 divide processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -375,7 +375,7 @@ the third argument (see second example), or supply it (see third one).
 =for bad
 
 gt processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -437,7 +437,7 @@ the third argument (see second example), or supply it (see third one).
 =for bad
 
 lt processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -499,7 +499,7 @@ the third argument (see second example), or supply it (see third one).
 =for bad
 
 le processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -561,7 +561,7 @@ the third argument (see second example), or supply it (see third one).
 =for bad
 
 ge processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -623,7 +623,7 @@ the third argument (see second example), or supply it (see third one).
 =for bad
 
 eq processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -685,7 +685,7 @@ the third argument (see second example), or supply it (see third one).
 =for bad
 
 ne processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -751,7 +751,7 @@ the third argument (see second example), or supply it (see third one).
 =for bad
 
 shiftleft processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -817,7 +817,7 @@ the third argument (see second example), or supply it (see third one).
 =for bad
 
 shiftright processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -883,7 +883,7 @@ the third argument (see second example), or supply it (see third one).
 =for bad
 
 or2 processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -949,7 +949,7 @@ the third argument (see second example), or supply it (see third one).
 =for bad
 
 and2 processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1015,7 +1015,7 @@ the third argument (see second example), or supply it (see third one).
 =for bad
 
 xor processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1030,7 +1030,7 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
 
 
-#line 315 "ops.pd"
+#line 309 "ops.pd"
 
 BEGIN { $OVERLOADS{'~'} = sub { PDL::bitnot($_[0]) } }
 #line 1037 "Ops.pm"
@@ -1079,7 +1079,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 245 "ops.pd"
+#line 242 "ops.pd"
 
 {
   my ($foo, $overload_sub);
@@ -1130,7 +1130,7 @@ This restriction is expected to go away in future releases.
 =for bad
 
 power processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1145,7 +1145,7 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
 
 
-#line 245 "ops.pd"
+#line 242 "ops.pd"
 
 {
   my ($foo, $overload_sub);
@@ -1192,7 +1192,7 @@ This restriction is expected to go away in future releases.
 =for bad
 
 atan2 processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1207,7 +1207,7 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
 
 
-#line 245 "ops.pd"
+#line 242 "ops.pd"
 
 {
   my ($foo, $overload_sub);
@@ -1258,7 +1258,7 @@ This restriction is expected to go away in future releases.
 =for bad
 
 modulo processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1273,7 +1273,7 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
 
 
-#line 245 "ops.pd"
+#line 242 "ops.pd"
 
 {
   my ($foo, $overload_sub);
@@ -1320,7 +1320,7 @@ This restriction is expected to go away in future releases.
 =for bad
 
 spaceship processes bad values.
-The state of the bad-value flag of the output ndarrays is unknown.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1335,7 +1335,7 @@ The state of the bad-value flag of the output ndarrays is unknown.
 
 
 
-#line 315 "ops.pd"
+#line 309 "ops.pd"
 
 BEGIN { $OVERLOADS{'sqrt'} = sub { PDL::sqrt($_[0]) } }
 #line 1342 "Ops.pm"
@@ -1384,7 +1384,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 315 "ops.pd"
+#line 309 "ops.pd"
 
 BEGIN { $OVERLOADS{'sin'} = sub { PDL::sin($_[0]) } }
 #line 1391 "Ops.pm"
@@ -1433,7 +1433,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 315 "ops.pd"
+#line 309 "ops.pd"
 
 BEGIN { $OVERLOADS{'cos'} = sub { PDL::cos($_[0]) } }
 #line 1440 "Ops.pm"
@@ -1482,7 +1482,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 315 "ops.pd"
+#line 309 "ops.pd"
 
 BEGIN { $OVERLOADS{'!'} = sub { PDL::not($_[0]) } }
 #line 1489 "Ops.pm"
@@ -1531,7 +1531,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 315 "ops.pd"
+#line 309 "ops.pd"
 
 BEGIN { $OVERLOADS{'exp'} = sub { PDL::exp($_[0]) } }
 #line 1538 "Ops.pm"
@@ -1580,7 +1580,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 315 "ops.pd"
+#line 309 "ops.pd"
 
 BEGIN { $OVERLOADS{'log'} = sub { PDL::log($_[0]) } }
 #line 1587 "Ops.pm"
@@ -1809,27 +1809,19 @@ Plain numerical assignment. This is used to implement the ".=" operator
 
 =for bad
 
-If C<a> is a child ndarray (e.g., the result of a slice) and bad values are generated in C<b>,
-the bad value flag is set in C<b>, but it is B<NOT> automatically propagated back to the parent of C<a>.
-The following idiom ensures that the badflag is propagated back to the parent of C<a>:
+assgn processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
- $pdl->slice(":,(1)") .= PDL::Bad_aware_func();
- $pdl->badflag(1);
- $pdl->check_badflag();
-
-This is unnecessary if $pdl->badflag is known to be 1 before the slice is performed.
-
-See http://pdl.perl.org/PDLdocs/BadValues.html#dataflow_of_the_badflag for details.
 
 =cut
-#line 1826 "Ops.pm"
+#line 1818 "Ops.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *assgn = \&PDL::assgn;
-#line 1833 "Ops.pm"
+#line 1825 "Ops.pm"
 
 
 
@@ -1854,14 +1846,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1858 "Ops.pm"
+#line 1850 "Ops.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *carg = \&PDL::carg;
-#line 1865 "Ops.pm"
+#line 1857 "Ops.pm"
 
 
 
@@ -1886,14 +1878,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1890 "Ops.pm"
+#line 1882 "Ops.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *conj = \&PDL::conj;
-#line 1897 "Ops.pm"
+#line 1889 "Ops.pm"
 
 
 
@@ -1919,14 +1911,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1923 "Ops.pm"
+#line 1915 "Ops.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *czip = \&PDL::czip;
-#line 1930 "Ops.pm"
+#line 1922 "Ops.pm"
 
 
 
@@ -1967,18 +1959,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1971 "Ops.pm"
+#line 1963 "Ops.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *ipow = \&PDL::ipow;
-#line 1978 "Ops.pm"
+#line 1970 "Ops.pm"
 
 
 
-#line 585 "ops.pd"
+#line 571 "ops.pd"
 
 
 =head2 abs
@@ -1990,18 +1982,18 @@ Returns the absolute value of a number.
 =cut
 
 sub PDL::abs { $_[0]->type->real ? goto &PDL::_rabs : goto &PDL::_cabs }
-#line 1994 "Ops.pm"
+#line 1986 "Ops.pm"
 
 
 
-#line 597 "ops.pd"
+#line 583 "ops.pd"
 
 BEGIN { $OVERLOADS{'abs'} = sub { PDL::abs($_[0]) } }
-#line 2001 "Ops.pm"
+#line 1993 "Ops.pm"
 
 
 
-#line 599 "ops.pd"
+#line 585 "ops.pd"
 
 
 =head2 abs2
@@ -2013,7 +2005,7 @@ Returns the square of the absolute value of a number.
 =cut
 
 sub PDL::abs2 ($) { my $r = &PDL::abs; $r * $r }
-#line 2017 "Ops.pm"
+#line 2009 "Ops.pm"
 
 
 
@@ -2038,7 +2030,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2042 "Ops.pm"
+#line 2034 "Ops.pm"
 
 
 
@@ -2050,14 +2042,14 @@ sub PDL::r2C ($) {
   PDL::_r2C_int($_[0], $r);
   $r;
 }
-#line 2054 "Ops.pm"
+#line 2046 "Ops.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *r2C = \&PDL::r2C;
-#line 2061 "Ops.pm"
+#line 2053 "Ops.pm"
 
 
 
@@ -2082,7 +2074,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 2086 "Ops.pm"
+#line 2078 "Ops.pm"
 
 
 
@@ -2094,18 +2086,18 @@ sub PDL::i2C ($) {
   PDL::_i2C_int($_[0], $r);
   $r;
 }
-#line 2098 "Ops.pm"
+#line 2090 "Ops.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *i2C = \&PDL::i2C;
-#line 2105 "Ops.pm"
+#line 2097 "Ops.pm"
 
 
 
-#line 642 "ops.pd"
+#line 628 "ops.pd"
 
 # This is to used warn if an operand is non-numeric or non-PDL.
 sub warn_non_numeric_op_wrapper {
@@ -2132,7 +2124,7 @@ sub warn_non_numeric_op_wrapper {
     '--' => sub { $_[0] -= 1 },
     ;
 }
-#line 2136 "Ops.pm"
+#line 2128 "Ops.pm"
 
 
 
@@ -2151,7 +2143,7 @@ Doug Burke (burke@ifa.hawaii.edu),
 and Craig DeForest (deforest@boulder.swri.edu).
 
 =cut
-#line 2155 "Ops.pm"
+#line 2147 "Ops.pm"
 
 
 

@@ -19,7 +19,7 @@ use constant {
 
 use strict;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 $VERSION = eval $VERSION;
 
 @PDL::LinearAlgebra::ISA = qw/PDL::Exporter/;
@@ -46,7 +46,7 @@ our @ISA = @ISA ? @ISA : 'PDL'; # so still operates when no PDL::Complex
 }
 ########################################################################
 
-=encoding Latin-1
+=encoding utf8
 
 =head1 NAME
 
@@ -676,12 +676,9 @@ sub PDL::mrcond {
 	&_square;
 	my ($m,$anorm) = @_;
 	$anorm = 0 unless defined $anorm;
-	my ($ipiv, $info,$rcond,$norm);
-	$norm = $m->mnorm($anorm);
+	$_ = null for my ($ipiv, $info, $rcond);
+	my $norm = $m->mnorm($anorm);
 	$m = $m->t->copy();
-	$ipiv = PDL->null;
-	$info = PDL->null;
-	$rcond = PDL->null;
 	$m->_call_method('getrf', $ipiv, $info);
 	_error($info, "mrcond: Factor(s) U (PDL(s) %s) is/are singular (after getrf factorization)");
 	$m->_call_method('gecon',$anorm,$norm,$rcond,$info);
@@ -779,10 +776,8 @@ from Lapack and returns C<inverse, info> in array context.
 sub PDL::minv {
 	&_square;
 	my $m = shift;
-	my ($ipiv, $info);
 	$m = $m->copy() unless $m->is_inplace(0);
-	$ipiv = PDL->null;
-	$info = PDL->null;
+	$_ = null for my ($ipiv, $info);
 	$m->_call_method('getrf', $ipiv, $info);
 	_error($info, "minv: Factor(s) U (PDL(s) %s) is/are singular (after getrf factorization)");
 	$m->_call_method('getri', $ipiv, $info);
@@ -1628,7 +1623,6 @@ sub PDL::mqr {
 	my @di_vals = $_[0]->dims_internal_values;
 	my($m, $full) = @_;
 	my(@dims) = $m->dims;
-	my ($q, $r);
 	$m = $m->t->copy;
 	my $min = $dims[$di] < $dims[$di+1] ? $dims[$di] : $dims[$di+1];
 	my $slice_arg = (',' x $di) . ",:@{[$min-1]}";
@@ -3376,7 +3370,7 @@ sub PDL::mgsvd {
 
 =head1 AUTHOR
 
-Copyright (C) Grégory Vanuxem 2005-2018.
+Copyright (C) GrÃ©gory Vanuxem 2005-2018.
 
 This library is free software; you can redistribute it and/or modify
 it under the terms of the Perl Artistic License as in the file Artistic_2

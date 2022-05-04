@@ -5,6 +5,17 @@
 package PDL::Demos::TriD1;
 
 use PDL::Graphics::TriD;
+use Carp;
+require File::Spec;
+
+my @f = qw(PDL IO STL owl.stl);
+our $owlfile = undef;
+foreach my $path ( @INC ) {
+    my $file = File::Spec->catfile( $path, @f );
+    if ( -f $file ) { $owlfile = $file; last; }
+}
+confess "Unable to find owl.stl within the perl libraries.\n"
+  unless defined $owlfile;
 
 sub info {('3d', '3d demo (requires TriD with OpenGL or Mesa)')}
 sub init {'
@@ -31,10 +42,37 @@ my @demo = (
 [actnw => q|
 	# See if we had a 3D window open already
 	$|.__PACKAGE__.q|::we_opened = !defined $PDL::Graphics::TriD::current_window;
+	$vertices = pdl([ [0,0,-1], [1,0,-1], [0.5,1,-1], [0.5,0.5,0] ]);
+	$faceidx = pdl([ [0,2,1], [0,1,3], [0,3,2], [1,2,3] ]);
+	# show the vertex and face normal vectors on a triangular grid
+	trigrid3d($vertices,$faceidx,{ShowNormals=>1});
+	# [press 'q' in the graphics window when done]
+|],
 
+[actnw => q|
+	# Show a PDL logo
+	require PDL::Graphics::TriD::Logo;
+	$vertices = $PDL::Graphics::TriD::Logo::POINTS;
+	$faceidx = $PDL::Graphics::TriD::Logo::FACES;
+	$rotate_m = pdl [1,0,0],[0,0,1],[0,-1,0]; # top towards X axis
+	$c22 = cos(PI/8); $s22 = sin(PI/8);
+	$rot22 = pdl [$c22,$s22,0],[-$s22,$c22,0],[0,0,1]; # +22deg about vert
+	$vertices = ($vertices x $rotate_m x $rot22);
+	trigrid3d($vertices,$faceidx);
+	# [press 'q' in the graphics window when done]
+|],
+
+[actnw => q|
+	# Show an owl loaded from an STL file
+	use PDL::IO::STL;
+	($vertices, $faceidx) = rstl $|.__PACKAGE__.q|::owlfile;
+	trigrid3d($vertices,$faceidx);
+	# [press 'q' in the graphics window when done]
+|],
+
+[actnw => q|
 	# Number of subdivisions for lines / surfaces.
 	$size = 25;
-
 	$cz = (xvals zeroes $size+1) / $size;  # interval 0..1
 	$cx = sin($cz*12.6);	# Corkscrew
 	$cy = cos($cz*12.6);
@@ -187,24 +225,27 @@ my @demo = (
 [actnw => q|
 	# Show the world!
 	use PDL::Transform::Cartography;
-	$shape = earth_shape();
-	$floats = t_raster2float()->apply($shape->mv(2,0));
-	$radius = $floats->slice('(2)'); # r g b all same
-	$radius *= float((6377.09863 - 6370.69873) / 6371);
-	$radius += float(6370.69873 / 6371);
-	$e_i = earth_image('day');
-	$earth = t_raster2float()->apply($e_i->mv(2,0));
-	$earth = $earth->append($radius->dummy(0));
-	$shrink = 2.5; # how much to shrink by
-	$new_x = int($e_i->dim(0) / $shrink);
-	$earth2 = $earth->mv(0,2)->match([$new_x,int($new_x/2),6])->mv(2,0); # shrink
-	($lonlatrad, $rgb) = map $earth2->slice($_), pdl(0,1,5), '2:4';
-	$sph = t_spherical()->inverse()->apply($lonlatrad);
-	imag3d($sph, $rgb, {Lines=>0});
+	eval { # this is in case no NetPBM, i.e. can't load Earth images
+	  $shape = earth_shape();
+	  $floats = t_raster2float()->apply($shape->mv(2,0));
+	  $radius = $floats->slice('(2)'); # r g b all same
+	  $radius *= float((6377.09863 - 6370.69873) / 6371);
+	  $radius += float(6370.69873 / 6371);
+	  $e_i = earth_image('day');
+	  $earth = t_raster2float()->apply($e_i->mv(2,0));
+	  $earth = $earth->append($radius->dummy(0));
+	  $shrink = 2.5; # how much to shrink by
+	  $new_x = int($e_i->dim(0) / $shrink);
+	  $earth2 = $earth->mv(0,2)->match([$new_x,int($new_x/2),6])->mv(2,0); # shrink
+	  ($lonlatrad, $rgb) = map $earth2->slice($_), pdl(0,1,5), '2:4';
+	  $sph = t_spherical()->inverse()->apply($lonlatrad);
+	  imag3d($sph, $rgb, {Lines=>0});
+	};
 	# [press 'q' in the graphics window when done]
 |],
 
 [actnw => q|
+	return if !defined $earth; # failed to load
 	# Show off the world!
 	# The Earth's radius doesn't proportionally vary much,
 	# but let's exaggerate it to prove we have height information!
@@ -217,6 +258,7 @@ my @demo = (
 |],
 
 [actnw => q|
+	return if !defined $earth; # failed to load
 	# Now zoom in over Europe
 	($lats, $lons) = map $_ / 180, pdl(22, 72), pdl(-10, 40);
 	$lats = indx(($lats + 0.5) * $earth->dim(2));

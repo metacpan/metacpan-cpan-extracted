@@ -9,6 +9,8 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 META.yml
 README
+t/RT40714-1.t
+t/RT40714-2.t
 t/before_output.t
 t/dot_can.t
 t/dot_for_loops.t
@@ -21,3 +23,4 @@ t/dot_notation_recursive.t
 t/pod-coverage.t
 t/pod.t
 t/side_effects.t
+META.json

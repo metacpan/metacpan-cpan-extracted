@@ -5,6 +5,8 @@ author:
 build_requires:
   Test::Pod: '1.00'
 configure_requires:
+  Config: '0'
+  Crypt::OpenSSL::Guess: '0'
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
@@ -19,7 +21,7 @@ resources:
   bugtracker: https://github.com/dsully/perl-crypt-openssl-x509/issues
   homepage: https://github.com/dsully/perl-crypt-openssl-x509
   repository: https://github.com/dsully/perl-crypt-openssl-x509.git
-version: '1.913'
+version: '1.914'
 x_contributors:
   - 'TIMLEGGE <timlegge@cpan.org>'
   - 'SKAJI <skaji@cpan.org>'

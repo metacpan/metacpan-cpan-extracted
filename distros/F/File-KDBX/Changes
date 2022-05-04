@@ -1,18 +1,24 @@
 Revision history for File-KDBX.
 
+0.902     2022-05-03 19:18:06-0600
+
+  * Added support for 32-bit perls.
+  * API change: Rename iterator accessors on group to all_*.
+  * Declared perl 5.10.0 prerequisite. I have no intention of supporting 5.8 or earlier.
+  * Fixed more other broken tests -- thanks CPAN testers.
+
 0.901     2022-05-02 01:18:13-0600
 
-  * Fixed a bug where peeking at memory-protected strings and binaries does
-    not work without unlocking the database at least once.
+  * Fixed a bug where peeking at memory-protected strings and binaries does not work without unlocking the
+    database at least once.
   * Added an option for writing files non-atomically.
   * Fixed broken tests on Windows.
 
 0.900     2022-05-01 12:55:59-0600
 
-  * Removed the min_version methods from dumper and loader because it was
-    unused and unnecessary.
-  * Now use the database maintenance_history_days value as the default
-    "max_age" value in prune_history method.
+  * Removed the min_version methods from dumper and loader because it was unused and unnecessary.
+  * Now use the database maintenance_history_days value as the default "max_age" value in prune_history
+    method.
   * Fixed distribution prereq issues.
   * Cleaned up a lot of pod typos and other inaccuracies.
 

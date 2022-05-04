@@ -1,3 +1,6 @@
+0.30 2022-05-02
+- fix mpow to work with power 0 - https://perlmonks.org/?node_id=1229396
+
 0.29 2022-04-10
 - fix mnull reporting different solution on Windows - thanks @aero for CPANTesters report
 - remove PDL::Complex method aliases now in PDL 2.078

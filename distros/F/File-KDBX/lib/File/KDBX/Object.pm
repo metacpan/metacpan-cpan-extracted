@@ -14,7 +14,7 @@ use Ref::Util qw(is_arrayref is_plain_arrayref is_plain_hashref is_ref);
 use Scalar::Util qw(blessed weaken);
 use namespace::clean;
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 fieldhashes \my (%KDBX, %PARENT, %TXNS, %REFS, %SIGNALS);
 
@@ -526,7 +526,7 @@ File::KDBX::Object - A KDBX database object
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 DESCRIPTION
 

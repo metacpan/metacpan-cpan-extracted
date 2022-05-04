@@ -1,6 +1,7 @@
 package File::KDBX::Error;
 # ABSTRACT: Represents something bad that happened
 
+use 5.010;
 use warnings;
 use strict;
 
@@ -8,7 +9,7 @@ use Exporter qw(import);
 use Scalar::Util qw(blessed looks_like_number);
 use namespace::clean -except => 'import';
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 our @EXPORT = qw(alert error throw);
 
@@ -166,7 +167,7 @@ File::KDBX::Error - Represents something bad that happened
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 ATTRIBUTES
 

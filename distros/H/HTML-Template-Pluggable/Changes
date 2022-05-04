@@ -1,5 +1,13 @@
 Revision history for HTML-Template-Pluggable
 
+0.20    2022-05-03  Rhesa Rozendaal <rhesa@cpan.org>
+        * add prereq for CGI since this is no longer bundled
+          with perl core
+0.18    2009-12-26  Rhesa Rozendaal <rhesa@cpan.org>
+        * fixed RT #40714 to the extent that H::T allows
+        * fixed RT #49123 by checking can('AUTOLOAD')
+        * imported CPAN history into git, and published on github
+
 0.17    2007-05-15  Rhesa Rozendaal <rhesa@cpan.org>
         - ::Dot now handles exceptions on method calls differently:
         * if the option die_on_bad_params is on, it will rethrow the exception
@@ -18,15 +26,15 @@ Revision history for HTML-Template-Pluggable
             this breaks with using a CGI object for versions older than 3.06,
             since CGI didn't have a working can() method.
           - made nested calls to the same object work, so you can now do:
-          
+
               <tmpl_var t.greeting(t.name)>
-          
+
           Both issues were reported by Dan Horne.
 
 0.13    2005-10-04  Rhesa Rozendaal <rhesa@cpan.org>
         - bug fixes in ::Dot:
           - using obj.loop in a <tmpl_if> or <tmpl_var> now returns the
-            number of elements; this is a slight incompatibility with 
+            number of elements; this is a slight incompatibility with
             H::T, but makes the if's work
           - single char method names in nested calls work properly now
         - added pod tests to improve kwalitee...
@@ -41,10 +49,10 @@ Revision history for HTML-Template-Pluggable
 
 0.07    Tue Aug 16 16:19:50 CEST 2005  Rhesa Rozendaal <rhesa@cpan.org>
         - bug fix in tmpl_loop stuff. Only get array on final method call
-		
+
 0.06    Mon Aug 15 19:56:24 CEST 2005  Rhesa Rozendaal <rhesa@cpan.org>
         - implemented tmpl_loops in ::Dot!
-		
+
 0.05    Sun Aug 14 23:36:55 CEST 2005  Rhesa Rozendaal <rhesa@cpan.org>
         - Added tests against side effects (where avoidable). Extended the docs
           for ::Dot
@@ -52,7 +60,7 @@ Revision history for HTML-Template-Pluggable
         - renamed 'pre_param' trigger location to 'middle_param'
 
 0.04    Sat Aug 13 03:09:54 CEST 2005  Rhesa Rozendaal <rhesa@cpan.org>
-        - Thanks to Michael Graham, it's now possible to reference plain old 
+        - Thanks to Michael Graham, it's now possible to reference plain old
           tmpl_vars in argument lists
 
 0.03    Fri Aug 12 16:16:29 CEST 2005  Rhesa Rozendaal <rhesa@cpan.org>

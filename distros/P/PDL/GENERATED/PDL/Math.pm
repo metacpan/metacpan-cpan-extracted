@@ -3,7 +3,7 @@
 #
 package PDL::Math;
 
-our @EXPORT_OK = qw(acos asin atan cosh sinh tan tanh ceil floor rint pow acosh asinh atanh erf erfc bessj0 bessj1 bessy0 bessy1 bessjn bessyn lgamma badmask isfinite erfi ndtri polyroots );
+our @EXPORT_OK = qw(acos asin atan cosh sinh tan tanh ceil floor rint pow acosh asinh atanh erf erfc bessj0 bessj1 bessy0 bessy1 bessjn bessyn lgamma isfinite erfi ndtri polyroots );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -824,43 +824,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-=head2 badmask
-
-=for sig
-
-  Signature: (a(); b(); [o]c())
-
-=for ref
-
-Clears all C<infs> and C<nans> in C<$a> to the corresponding value in C<$b>.
-
-badmask can be run with C<$x> inplace:
-
-  badmask($x->inplace,0);
-  $x->inplace->badmask(0);
-
-
-
-=for bad
-
-If bad values are present, these are also cleared.
-
-=cut
-#line 850 "Math.pm"
-
-
-
-#line 1060 "../../blib/lib/PDL/PP.pm"
-
-*badmask = \&PDL::badmask;
-#line 857 "Math.pm"
-
-
-
-#line 1058 "../../blib/lib/PDL/PP.pm"
-
-
-
 =head2 isfinite
 
 =for sig
@@ -876,14 +839,14 @@ Sets C<$mask> true if C<$a> is not a C<NaN> or C<inf> (either positive or negati
 Bad values are treated as C<NaN> or C<inf>.
 
 =cut
-#line 880 "Math.pm"
+#line 843 "Math.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *isfinite = \&PDL::isfinite;
-#line 887 "Math.pm"
+#line 850 "Math.pm"
 
 
 
@@ -908,14 +871,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 912 "Math.pm"
+#line 875 "Math.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *erfi = \&PDL::erfi;
-#line 919 "Math.pm"
+#line 882 "Math.pm"
 
 
 
@@ -942,14 +905,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 946 "Math.pm"
+#line 909 "Math.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *ndtri = \&PDL::ndtri;
-#line 953 "Math.pm"
+#line 916 "Math.pm"
 
 
 
@@ -983,20 +946,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 987 "Math.pm"
+#line 950 "Math.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *polyroots = \&PDL::polyroots;
-#line 994 "Math.pm"
+#line 957 "Math.pm"
 
 
 
 
 
-#line 392 "math.pd"
+#line 365 "math.pd"
 
 
 =head1 BUGS
@@ -1017,7 +980,7 @@ distribution. If this file is separated from the PDL distribution,
 the PDL copyright notice should be included in the file.
 
 =cut
-#line 1021 "Math.pm"
+#line 984 "Math.pm"
 
 
 

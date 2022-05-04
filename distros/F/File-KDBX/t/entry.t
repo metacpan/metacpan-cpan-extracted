@@ -82,7 +82,7 @@ subtest 'Accessors' => sub {
     my $entry = File::KDBX::Entry->new;
 
     $entry->creation_time('2022-02-02 12:34:56');
-    cmp_ok $entry->creation_time, '==', 1643805296, 'Creation time coerced into a Time::Piece (epoch)';
+    cmp_ok $entry->creation_time->epoch, '==', 1643805296, 'Creation time coerced into a Time::Piece (epoch)';
     is $entry->creation_time->datetime, '2022-02-02T12:34:56', 'Creation time coerced into a Time::Piece';
 };
 

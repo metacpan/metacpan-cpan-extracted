@@ -24,6 +24,7 @@ certs/vsign1.pem
 cpanfile
 dist.ini
 maint/Makefile_header.PL
+perl-crypt-openssl-x509.code-workspace
 ppport.h
 t/00-version.t
 t/author-pod-syntax.t

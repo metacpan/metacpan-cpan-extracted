@@ -1,10 +1,15 @@
-0.002   2017-07-10 (PERLANCAR)
+0.003   2022-03-27  Released-By: PERLANCAR; Urgency: medium
+
+        - Update to newer App::lcpan (table 'dist' was removed).
+
+
+0.002   2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.001   2017-01-25 (PERLANCAR)
+0.001   2017-01-25  Released-By: PERLANCAR
 
         - First release.

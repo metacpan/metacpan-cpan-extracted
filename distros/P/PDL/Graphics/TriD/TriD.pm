@@ -5,20 +5,20 @@ PDL::Graphics::TriD - PDL 3D interface
 =head1 SYNOPSIS
 
  use PDL::Graphics::TriD;
- 
+
  # Generate a somewhat interesting sequence of points:
  $t = sequence(100)/10;
  $x = sin($t); $y = cos($t), $z = $t;
  $coords = cat($x, $y, $z)->transpose;
  my $red = cos(2*$t); my $green = sin($t); my $blue = $t;
  $colors = cat($red, $green, $blue)->transpose;
- 
+
  # After each graph, let the user rotate and
  # wait for them to press 'q', then make new graph
  line3d($coords);       # $coords = (3,n,...)
  line3d($coords,$colors);  # $colors = (3,n,...)
  line3d([$x,$y,$z]);
- 
+
  # Generate a somewhat interesting sequence of surfaces
  $surf1 = (rvals(100, 100) / 50)**2 + sin(xvals(100, 100) / 10);
  $surf2 = sqrt(rvals(zeroes(50,50))/2);
@@ -164,7 +164,7 @@ will do exactly the same.
 
 =head2 Wrapping your head around 3d surface specifications
 
-Let's begin by thnking about how you might make a 2d data plot.
+Let's begin by thinking about how you might make a 2d data plot.
 If you sampled your data at regular intervals, you would have
 a time serires y(t) = (y0, y1, y2, ...).  You could plot y vs t
 by computing t0 = 0, t1 = dt, t2 = 2 * dt, and then plotting
@@ -187,7 +187,7 @@ C<mesh3d([$surface])>.
 Of course, your data is not required to be regularly gridded.
 You could, for example, be measuring the flight path of a bat
 flying after mosquitos, which could be wheeling and arching
-all over the space.  This is what you might plot using 
+all over the space.  This is what you might plot using
 C<line3d([$x, $y, $z])>.  You could plot the trajectories of
 multiple bats, in which case C<$x>, C<$y>, and C<$z> would have
 multiple columns, but in general you wouldn't expect them to be
@@ -355,6 +355,24 @@ contexts and options
 
 alias for mesh3d
 
+=item trigrid3d
+
+Show a triangular mesh, giving C<$vertices> and C<$faceidx> which is
+a series of triplets of indices into the vertices, each describing
+one triangle. The order of points matters for the shading - the normal
+vector points towards the clockface if the points go clockwise.
+
+Options: C<Smooth> (on by default), C<Lines> (off by default),
+C<ShowNormals> (off by default, useful for debugging).
+
+Implemented by C<PDL::Graphics::TriD::STrigrid_S>.
+
+=item trigrid3d_ns
+
+Like L</trigrid3d>, but without shading or normals.
+
+Implemented by C<PDL::Graphics::TriD::STrigrid>.
+
 =head2 points3d
 
 =for ref
@@ -399,8 +417,8 @@ Implemented by C<PDL::Graphics::TriD::Spheres>.
 
 Example:
 
- pdl> spheres3d ndcoords(10,10,10)->clump(1,2,3)  
- 
+ pdl> spheres3d ndcoords(10,10,10)->clump(1,2,3)
+
  - lattice of spheres at coordinates on 10x10x10 grid
 
 =head2 imagrgb
@@ -550,14 +568,6 @@ implemented.
 
 Implemented by C<PDL::Graphics::TriD::Contours>.
 
-=item STrigrid_S_imag3d
-
-Implemented by C<PDL::Graphics::TriD::STrigrid_S>.
-
-=item STrigrid_imag3d
-
-Implemented by C<PDL::Graphics::TriD::STrigrid>.
-
 =back
 
 =head1 CONCEPTS
@@ -601,14 +611,14 @@ an object like
 =head2 PDL::Graphics::TriD::LineStrip
 
 This is just a line or a set of lines. The arguments are 3 1-or-more-D
-ndarrays which describe the vertices of a continuous line and an 
+ndarrays which describe the vertices of a continuous line and an
 optional color ndarray (which is 1-D also and simply
 defines the color between red and blue. This will probably change).
 
 =head2 PDL::Graphics::TriD::Lines
 
 This is just a line or a set of lines. The arguments are 3 1-or-more-D
-ndarrays where each contiguous pair of vertices describe a line segment 
+ndarrays where each contiguous pair of vertices describe a line segment
 and an optional color ndarray (which is 1-D also and simply
 defines the color between red and blue. This will probably change).
 
@@ -655,22 +665,22 @@ to the previous viewport in the (0,1) range.
 Every implementation-level window object should implement the new_viewport
 method.
 
-=head1 EXAMPLE SCRIPT FOR VARIOUS 
+=head1 EXAMPLE SCRIPT FOR VARIOUS
 
 =cut
 
 #KGB: NEEDS DOCS ON COMMON OPTIONS!!!!!
 
 # List of global variables
-# 
+#
 # $PDL::Graphics::TriD::offline
-# $PDL::Graphics::TriD::Settings 
+# $PDL::Graphics::TriD::Settings
 $PDL::Graphics::TriD::verbose //= 0;
 # $PDL::Graphics::TriD::keeptwiddling
 # $PDL::Graphics::TriD::only_one
 # $PDL::Graphics::TriD::create_window_sub
 # $PDL::Graphics::TriD::current_window
-# 
+#
 # '
 
 package PDL::Graphics::TriD;
@@ -681,6 +691,7 @@ use PDL::Exporter;
 use PDL::Core '';  # barf
 our @ISA = qw/PDL::Exporter/;
 our @EXPORT_OK = qw/imag3d_ns imag3d line3d mesh3d lattice3d points3d
+  trigrid3d trigrid3d_ns
   spheres3d describe3d imagrgb imagrgb3d hold3d release3d
   keeptwiddling3d nokeeptwiddling3d close3d
   twiddle3d grabpic3d tridsettings/;
@@ -849,7 +860,7 @@ sub PDL::imagrgb {
 
 # Call: line3d([$x,$y,$z],[$color]);
 *line3d=*line3d=\&PDL::line3d;
-sub PDL::line3d { 
+sub PDL::line3d {
     &checkargs;
     my $obj = PDL::Graphics::TriD::LineStrip->new(@_);
     print "line3d: object is $obj\n" if($PDL::Graphics::TriD::verbose);
@@ -857,7 +868,7 @@ sub PDL::line3d {
 }
 
 *contour3d=*contour3d=\&PDL::contour3d;
-sub PDL::contour3d { 
+sub PDL::contour3d {
 #  &checkargs;
   require PDL::Graphics::TriD::Contours;
   graph_object(PDL::Graphics::TriD::Contours->new(@_));
@@ -880,17 +891,13 @@ sub PDL::imag3d { &checkargs;
 	graph_object(PDL::Graphics::TriD::SLattice_S->new(@_));
 }
 
-####################################################################
-################ JNK 15mar11 added section start ###################
-*STrigrid_S_imag3d=*STrigrid_S_imag3d=\&PDL::STrigrid_S_imag3d;
-sub PDL::STrigrid_S_imag3d { &checkargs;
+*trigrid3d=*trigrid3d=\&PDL::trigrid3d;
+sub PDL::trigrid3d { &checkargs;
   graph_object(PDL::Graphics::TriD::STrigrid_S->new(@_)); }
 
-*STrigrid_imag3d=*STrigrid_imag3d=\&PDL::STrigrid_imag3d;
-sub PDL::STrigrid_imag3d { &checkargs;
+*trigrid3d_ns=*trigrid3d_ns=\&PDL::trigrid3d_ns;
+sub PDL::trigrid3d_ns { &checkargs;
   graph_object(PDL::Graphics::TriD::STrigrid->new(@_)); }
-################ JNK 15mar11 added section finis ###################
-####################################################################
 
 *mesh3d=*mesh3d=\&PDL::mesh3d;
 *lattice3d=*lattice3d=\&PDL::mesh3d;
@@ -997,7 +1004,7 @@ package PDL::Graphics::TriD::BoundingBox;
 use base qw/PDL::Graphics::TriD::Object/;
 use fields qw/Box/;
 
-sub new { 
+sub new {
   my($type,$x0,$y0,$z0,$x1,$y1,$z1) = @_;
   my $this = $type->SUPER::new();
   $this->{Box} = [$x0,$y0,$z0,$x1,$y1,$z1];

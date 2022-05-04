@@ -1,8 +1,5 @@
 package JavaScript::HashRef::Decode;
-{
-  $JavaScript::HashRef::Decode::VERSION = '0.133120';
-}
-
+$JavaScript::HashRef::Decode::VERSION = '0.221231';
 ## ABSTRACT: JavaScript "simple object" (hashref) decoder
 
 use v5.10;
@@ -62,7 +59,7 @@ string_single_quoted:
         value => "$1",
     }, 'JavaScript::HashRef::Decode::STRING';
 }
-unescaped_key:        m{[a-zA-Z_][a-zA-Z_0-9]*}
+unescaped_key:        m{[a-zA-Z_0-9]+}
 {
     $return = bless {
         key => $item[1],
@@ -120,8 +117,8 @@ JavaScript::HashRef::Decode - a JavaScript "data hashref" decoder for Perl
 
 =head1 DESCRIPTION
 
-This module "decodes" a simple data-only JavaScript "object" and returns a
-Perl hashref constructed from the data contained in it.
+This module "decodes" a simple data-only JavaScript "variable value" and
+returns a Perl data structure constructed from the data contained in it.
 
 It only supports "data" which comprises of: hashrefs, arrayrefs, single- and
 double-quoted strings, numbers, and "special" token the likes of "undefined",
@@ -154,8 +151,9 @@ Patches are always welcome.
 
 =head2 C<decode_js($str)>
 
-Given a JavaScript object thing (i.e. an hashref), returns a Perl hashref
-structure which corresponds to the given data
+Given a JavaScript "variable value" thing (i.e. an hashref or arrayref or
+string, number, etc), returns a Perl hashref structure which corresponds to the
+given data
 
   decode_js('{foo:"bar"}');
 
@@ -171,10 +169,10 @@ sub decode_js {
     my ($str) = @_;
 
     $parser = Parse::RecDescent->new($js_grammar)
-        if !defined $parser;
-    my $parsed = $parser->hashref($str);
+      if !defined $parser;
+    my $parsed = $parser->any_value($str);
     die "decode_js: Cannot parse (invalid js?) \"$str\""
-        if !defined $parsed;
+      if !defined $parsed;
     return $parsed->out;
 }
 
@@ -182,19 +180,13 @@ sub decode_js {
 # for the structure, possibly recursively
 
 package JavaScript::HashRef::Decode::NUMBER;
-{
-  $JavaScript::HashRef::Decode::NUMBER::VERSION = '0.133120';
-}
-
+$JavaScript::HashRef::Decode::NUMBER::VERSION = '0.221231';
 sub out {
-    return $_[ 0 ]->{value};
+    return $_[0]->{value};
 }
 
 package JavaScript::HashRef::Decode::STRING;
-{
-  $JavaScript::HashRef::Decode::STRING::VERSION = '0.133120';
-}
-
+$JavaScript::HashRef::Decode::STRING::VERSION = '0.221231';
 my %unescape = (
     'b'  => "\b",
     'f'  => "\f",
@@ -214,7 +206,7 @@ my $unescape_rx = do {
 };
 
 sub out {
-    my $val = $_[ 0 ]->{value};
+    my $val = $_[0]->{value};
     $val =~ s{\\u[dD]([89abAB][0-9a-fA-F][0-9a-fA-F])
               \\u[dD]([c-fC-F][0-9a-fA-F][0-9a-fA-F])}
              { chr(0x10000 + ((hex($1) - 0x800 << 10) | hex($2) - 0xC00)) }xmsge;
@@ -223,66 +215,45 @@ sub out {
 }
 
 package JavaScript::HashRef::Decode::UNDEFINED;
-{
-  $JavaScript::HashRef::Decode::UNDEFINED::VERSION = '0.133120';
-}
-
+$JavaScript::HashRef::Decode::UNDEFINED::VERSION = '0.221231';
 sub out {
     return undef;
 }
 
 package JavaScript::HashRef::Decode::TRUE;
-{
-  $JavaScript::HashRef::Decode::TRUE::VERSION = '0.133120';
-}
-
+$JavaScript::HashRef::Decode::TRUE::VERSION = '0.221231';
 sub out {
-    return (1 == 1);
+    return ( 1 == 1 );
 }
 
 package JavaScript::HashRef::Decode::FALSE;
-{
-  $JavaScript::HashRef::Decode::FALSE::VERSION = '0.133120';
-}
-
+$JavaScript::HashRef::Decode::FALSE::VERSION = '0.221231';
 sub out {
-    return (1 == 0);
+    return ( 1 == 0 );
 }
 
 package JavaScript::HashRef::Decode::ARRAYREF;
-{
-  $JavaScript::HashRef::Decode::ARRAYREF::VERSION = '0.133120';
-}
-
+$JavaScript::HashRef::Decode::ARRAYREF::VERSION = '0.221231';
 sub out {
-    return [ map {$_->out} @{ $_[ 0 ] } ];
+    return [ map { $_->out } @{ $_[0] } ];
 }
 
 package JavaScript::HashRef::Decode::KEY;
-{
-  $JavaScript::HashRef::Decode::KEY::VERSION = '0.133120';
-}
-
+$JavaScript::HashRef::Decode::KEY::VERSION = '0.221231';
 sub out {
-    return $_[ 0 ]->{key};
+    return $_[0]->{key};
 }
 
 package JavaScript::HashRef::Decode::TUPLE;
-{
-  $JavaScript::HashRef::Decode::TUPLE::VERSION = '0.133120';
-}
-
+$JavaScript::HashRef::Decode::TUPLE::VERSION = '0.221231';
 sub out {
-    return $_[ 0 ]->{key}->out => $_[ 0 ]->{value}->out;
+    return $_[0]->{key}->out => $_[0]->{value}->out;
 }
 
 package JavaScript::HashRef::Decode::HASHREF;
-{
-  $JavaScript::HashRef::Decode::HASHREF::VERSION = '0.133120';
-}
-
+$JavaScript::HashRef::Decode::HASHREF::VERSION = '0.221231';
 sub out {
-    return { map {$_->out} @{ $_[ 0 ] } };
+    return { map { $_->out } @{ $_[0] } };
 }
 
 =head1 SEE ALSO

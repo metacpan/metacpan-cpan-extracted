@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Error;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains a single error from a JSON Schema evaluation
 
-our $VERSION = '0.551';
+our $VERSION = '0.552';
 
 use 5.020;
 use Moo;
@@ -68,7 +68,7 @@ sub TO_JSON ($self) {
 }
 
 sub stringify ($self) {
-  ($self->mode//'') eq 'evaluate'
+  ($self->mode//'evaluate') eq 'traverse'
     ? 'at \''.$self->keyword_location.'\': '.$self->error
     : 'at \''.$self->instance_location.'\': '.$self->error;
 }
@@ -95,7 +95,7 @@ JSON::Schema::Modern::Error - Contains a single error from a JSON Schema evaluat
 
 =head1 VERSION
 
-version 0.551
+version 0.552
 
 =head1 SYNOPSIS
 

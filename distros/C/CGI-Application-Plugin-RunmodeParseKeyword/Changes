@@ -1,0 +1,14 @@
+Revision history for CGI-Application-Plugin-RunmodeKeyword
+
+0.14    2022-05-03  Rhesa Rozendaal <rhesa@cpan.org>
+        allow for exporting into another package
+
+0.13    2022-05-03  Rhesa Rozendaal <rhesa@cpan.org>
+        more tidying up
+
+0.09    2022-05-03  Rhesa Rozendaal <rhesa@cpan.org>
+        tidying up
+
+0.01    2022-04-30
+        First version
+

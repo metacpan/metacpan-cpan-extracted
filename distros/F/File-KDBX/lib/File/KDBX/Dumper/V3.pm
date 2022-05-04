@@ -10,13 +10,13 @@ use File::KDBX::Constants qw(:header :compression);
 use File::KDBX::Error;
 use File::KDBX::IO::Crypt;
 use File::KDBX::IO::HashBlock;
-use File::KDBX::Util qw(:class :empty :load assert_64bit erase_scoped);
+use File::KDBX::Util qw(:class :empty :int :load erase_scoped);
 use IO::Handle;
 use namespace::clean;
 
 extends 'File::KDBX::Dumper';
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 sub _write_headers {
     my $self = shift;
@@ -81,8 +81,7 @@ sub _write_header {
         # nothing
     }
     elsif ($type == HEADER_TRANSFORM_ROUNDS) {
-        assert_64bit;
-        $val = pack('Q<', $val);
+        $val = pack_Ql($val);
     }
     elsif ($type == HEADER_ENCRYPTION_IV) {
         # nothing
@@ -152,7 +151,6 @@ sub _write_body {
 
     $fh->print($kdbx->headers->{+HEADER_STREAM_START_BYTES})
         or throw 'Failed to write start bytes';
-    $fh->flush;
 
     $kdbx->key($key);
 
@@ -189,7 +187,7 @@ File::KDBX::Dumper::V3 - Dump KDBX3 files
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 BUGS
 

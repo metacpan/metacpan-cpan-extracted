@@ -11,6 +11,18 @@ use Test::Warn;
 #
 use constant ABSTOL => 1.0e-4;
 
+{
+  my $a_bad = pdl double, '[1 BAD 3]';
+  my $b_double = zeroes double, 3;
+  $a_bad->assgn($b_double);
+  ok $b_double->badflag, 'b_double badflag set';
+  is $b_double.'', '[1 BAD 3]', 'b_double got badval';
+  my $b_float = zeroes float, 3;
+  $a_bad->assgn($b_float);
+  ok $b_float->badflag, 'b_float badflag set';
+  is $b_float.'', '[1 BAD 3]', 'b_float got badval';
+}
+
 # check default behaviour (ie no bad data)
 # - probably overkill
 #
@@ -46,7 +58,7 @@ ok( $y->badflag, "badflag is now set in a copy" );
 
 $x->badflag(0);
 $y = $x->slice('2:5,3:4');
-$c = $y->slice('0:1,(0)'); 
+$c = $y->slice('0:1,(0)');
 is( $y->badflag, 0, "slice handling okay with no badflag" );
 
 $x->badflag(1);
@@ -162,13 +174,13 @@ is( $x->check_badflag, 0, "check_badflag did not find a bad value" );
 # check out stats, since it uses several routines
 # and setbadif
 $x = pdl( qw(42 47 98 13 22 96 74 41 79 76 96 3 32 76 25 59 5 96 32 6) );
-$y = $x->setbadif( $x < 20 ); 
-my @s = $y->stats();                     
+$y = $x->setbadif( $x < 20 );
+my @s = $y->stats();
 ok( approx( $s[0], 61.9375, ABSTOL ), "setbadif/stats test 1" );
 ok( approx( $s[1], 27.6079, ABSTOL ), "setbadif/stats test 2" );
 is( $s[2], 66.5, "setbadif/stats test 3" );
-is( $s[3], 22, "setbadif/stats test 4" );  
-is( $s[4], 98, "setbadif/stats test 5" );  
+is( $s[3], 22, "setbadif/stats test 4" );
+is( $s[4], 98, "setbadif/stats test 5" );
 ok( approx( $s[6], 26.7312, ABSTOL ), "setbadif/stats test 6" );
 
 # how about setbadtoval
@@ -178,34 +190,47 @@ ok( all($x == 0), "setbadtoval() worked" );
 
 # and inplace?
 $x = pdl( qw(42 47 98 13 22 96 74 41 79 76 96 3 32 76 25 59 5 96 32 6) );
-$y = $x->setbadif( $x < 20 ); 
+$y = $x->setbadif( $x < 20 );
 $y->inplace->setbadtoval(20);
 $x = $y - pdl(qw(42 47 98 20 22 96 74 41 79 76 96 20 32 76 25 59 20 96 32 20));
 ok( all($x == 0), "   and inplace" );
 
 # ditto for copybad
 $x = pdl( qw(42 47 98 13 22 96 74 41 79 76 96 3 32 76 25 59 5 96 32 6) );
-$y = $x->setbadif( $x < 20 ); 
+$y = $x->setbadif( $x < 20 );
 $c = copybad( $x, $y );
-is( PDL::Core::string( $c->isbad ), 
+is( PDL::Core::string( $c->isbad ),
     "[0 0 0 1 0 0 0 0 0 0 0 1 0 0 0 0 1 0 0 1]",
   "isbad() worked" );
 
 $x = pdl( qw(42 47 98 13 22 96 74 41 79 76 96 3 32 76 25 59 5 96 32 6) );
-$y = $x->setbadif( $x < 20 ); 
+$y = $x->setbadif( $x < 20 );
 $x->inplace->copybad( $y );
-is( PDL::Core::string( $x->isbad ), 
+is( PDL::Core::string( $x->isbad ),
     "[0 0 0 1 0 0 0 0 0 0 0 1 0 0 0 0 1 0 0 1]",
   "  and inplace" );
 
+$x = zeroes(20,30);
+$y = $x->slice('0:10,0:10');
+$c = $y->slice(',(2)');
+ok !$c->badflag, 'no badflag on slice-child of good';
+$x->badflag(1);
+ok $c->badflag, 'badflag on same slice-child of good set to bad';
+$c->badflag(0);
+ok !$x->badflag, 'badflag now off for slice-parent of bad slice-child set to good';
+
+$x = pdl '1 BAD';
+ok any($x > 0), 'any with some badvals just omits them';
+ok all($x > 0), 'all with some badvals just omits them';
+
 ## $x->inplace->setbadif( $x % 2 ) does NOT work because
-## ($x % 2) is performed inplace - ie the flag is set for 
+## ($x % 2) is performed inplace - ie the flag is set for
 ## that function
 #
 ##$x = sequence(3,3);
 ##$x->inplace->setbadif( $x % 2 );
 ###$x = $x->setbadif( $x % 2 );              # for when not bothered about inplace
-##ok( PDL::Core::string( $x->clump(-1) ), 
+##ok( PDL::Core::string( $x->clump(-1) ),
 ##    "[0 BAD 2 BAD 4 BAD 6 BAD 8]" );   #
 
 ## look at propagation of bad flag using inplace routines...
@@ -213,7 +238,8 @@ $x = sequence( byte, 2, 3 );
 $x = $x->setbadif( $x == 3 );
 $y = $x->slice("(1),:");
 $x->inplace->setbadtoval(3);
-is( $y->badflag, 0, "badflag cleared using inplace setbadtoval()" );
+is( $x->badflag, 0, "direct pdl badflag cleared using inplace setbadtoval()" );
+is( $y->badflag, 0, "child pdl badflag cleared using inplace setbadtoval()" );
 
 $x = sequence( byte, 2, 3 );
 $y = $x->slice("(1),:");
@@ -224,12 +250,12 @@ is( $y->badflag, 1, "badflag propagated using inplace copybad()" );
 
 # test some of the qsort functions
 $x = pdl( qw(42 47 98 13 22 96 74 41 79 76 96 3 32 76 25 59 5 96 32 6) );
-$y = $x->setbadif( $x < 20 ); 
+$y = $x->setbadif( $x < 20 );
 my $ix = qsorti( $y );
-is( PDL::Core::string( $y->index($ix) ), 
+is( PDL::Core::string( $y->index($ix) ),
     "[22 25 32 32 41 42 47 59 74 76 76 79 96 96 96 98 BAD BAD BAD BAD]",
     "qsorti() okay"
-    );                                   # 
+    );                                   #
 
 # check comparison/bit operators in ops.pd
 
@@ -317,7 +343,7 @@ $y = long(2,1,1,1,1);
 $y->setbadat(0);
 my @c = ( 1,0,3 );
 $c = histogram2d($x,$y,@c,@c);
-is( PDL::Core::string($c->clump(-1)), 
+is( PDL::Core::string($c->clump(-1)),
     "[0 0 0 0 2 2 0 0 0]",
   "histogram2d()" );
 
@@ -344,8 +370,8 @@ like( PDL::Core::string( $x->clump(-1) ),
     qr{^\[-?0 BAD 2 3 -?0 BAD 2 3 -?0 BAD]$}, "inplace setvaltobad()" );
 
 $x->inplace->setbadtonan;
-like( PDL::Core::string( $x->clump(-1) ),
-    qr/^\[-?0 nan 2 3 -?0 nan 2 3 -?0 nan]$/i, "inplace setbadtonan()" );
+like PDL::Core::string( $x->clump(-1) ),
+    qr/^\[-?0 \S*nan 2 3 -?0 \S*nan 2 3 -?0 \S*nan]$/i, "inplace setbadtonan()";
 
 # check setvaltobad for non-double ndarrays
 my $fa = pdl( float,  1..4) / 3;
@@ -357,7 +383,7 @@ $inf2b->set(1, 'Inf');
 $inf2b->set(2, 'NaN');
 $inf2b->inplace->setinftobad;
 like( PDL::Core::string( $inf2b->clump(-1) ),
-    qr{^\[-?0 BAD nan]$}i, "inplace setinftobad()" );
+    qr{^\[-?0 BAD \S*nan]$}i, "inplace setinftobad()" );
 
 my $x_copy = $x->copy;
 $x_copy->set(1, 'Inf');
@@ -370,7 +396,7 @@ like( PDL::Core::string( $x_copy->clump(-1) ),
 #   NaN's and then a simple version of rfits
 #   (can't use rfits as does conversion!)
 $x->inplace->setnantobad;
-like( PDL::Core::string( $x->clump(-1) ), 
+like( PDL::Core::string( $x->clump(-1) ),
     qr{^\[-?0 BAD 2 3 -?0 BAD 2 3 -?0 BAD]$}, "inplace setnantobad()" );
 
 # check that we can change the value used to represent
@@ -543,7 +569,7 @@ subtest "stats() badvalue behavior" => sub {
 			badvalue => 2,
 			string => "[1 BAD 3]",
 			mean => "2",
-			badflag => 0
+			badflag => 1,
 		},
 		{
 			name => "stats() should set the badflag for output with all badvalues and mean should be BAD" ,
@@ -588,7 +614,7 @@ EOF
 			},
 			badvalue => 1,
 			mean => "[2 2 2]",
-			badflag => 0,
+			badflag => 1,
 		}
 	];
 
@@ -605,7 +631,7 @@ EOF
 
 			note "\$m = $m";
 			is( "$m", $case->{mean}, "Mean of \$p" );
-			is( $m->badflag, $case->{badflag}, "Mean does @{[ (' not ')x!!( ! $case->{badflag} ) ]} have badflag set");
+			is( $m->badflag, $case->{badflag}, "Mean does @{[ ('not ')x!!( ! $case->{badflag} ) ]}have badflag set");
 		};
 	}
 

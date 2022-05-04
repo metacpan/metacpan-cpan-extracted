@@ -16,6 +16,8 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
+            "Config" : "0",
+            "Crypt::OpenSSL::Guess" : "0",
             "ExtUtils::MakeMaker" : "0"
          }
       },
@@ -49,7 +51,7 @@
          "web" : "https://github.com/dsully/perl-crypt-openssl-x509"
       }
    },
-   "version" : "1.913",
+   "version" : "1.914",
    "x_contributors" : [
       "TIMLEGGE <timlegge@cpan.org>",
       "SKAJI <skaji@cpan.org>"

@@ -3,7 +3,7 @@
 #
 package PDL::Bad;
 
-our @EXPORT_OK = qw(badflag check_badflag badvalue orig_badvalue nbad nbadover ngood ngoodover setbadat  isbad isgood nbadover ngoodover setbadif setvaltobad setnantobad setinftobad setnonfinitetobad setbadtonan setbadtoval copybad locf );
+our @EXPORT_OK = qw(badflag check_badflag badvalue orig_badvalue nbad nbadover ngood ngoodover setbadat  isbad isgood nbadover ngoodover setbadif setvaltobad setnantobad setinftobad setnonfinitetobad setbadtonan setbadtoval badmask copybad locf );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -95,7 +95,7 @@ use PDL::Primitive;
 
 
 
-#line 114 "bad.pd"
+#line 99 "bad.pd"
 
 ############################################################
 ############################################################
@@ -205,12 +205,12 @@ with the original bad value for the associated type.
 
 =for ref
 
-Clear the bad-value flag of an ndarray if it does not
+Clear the badflag of an ndarray if it does not
 contain any bad values
 
 Given an ndarray whose bad flag is set, check whether it
 actually contains any bad values and, if not, clear the flag.
-It returns the final state of the bad-value flag.
+It returns the final state of the badflag.
 
 =for example
 
@@ -219,7 +219,7 @@ It returns the final state of the bad-value flag.
 =for bad
 
 This method accepts ndarrays with or without bad values. It
-returns an ndarray with the final bad-value.
+returns an ndarray with the final badflag.
 
 =cut
 
@@ -234,7 +234,7 @@ sub PDL::check_badflag {
 
 
 
-#line 325 "bad.pd"
+#line 310 "bad.pd"
 
 
 # note:
@@ -477,7 +477,7 @@ flag set.
 
 
 
-#line 552 "bad.pd"
+#line 536 "bad.pd"
 
 
 *nbad = \&PDL::nbad;
@@ -490,7 +490,7 @@ sub PDL::nbad {
 
 
 
-#line 552 "bad.pd"
+#line 536 "bad.pd"
 
 
 *ngood = \&PDL::ngood;
@@ -503,7 +503,7 @@ sub PDL::ngood {
 
 
 
-#line 564 "bad.pd"
+#line 548 "bad.pd"
 
 
 =head2 nbad
@@ -865,7 +865,6 @@ operation, it clears the bad flag.
 #line 1058 "../../blib/lib/PDL/PP.pm"
 
 
-
 =head2 setbadtoval
 
 =for sig
@@ -877,7 +876,7 @@ operation, it clears the bad flag.
 Replace any bad values by a (non-bad) value. 
 
 Can be done inplace. Also see
-L<badmask|PDL::Math/badmask>.
+L</badmask>.
 
 =for example
 
@@ -894,14 +893,50 @@ values are copied with no replacement.
 
 
 =cut
-#line 898 "Bad.pm"
+#line 897 "Bad.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *setbadtoval = \&PDL::setbadtoval;
-#line 905 "Bad.pm"
+#line 904 "Bad.pm"
+
+
+
+#line 1058 "../../blib/lib/PDL/PP.pm"
+
+
+
+=head2 badmask
+
+=for sig
+
+  Signature: (a(); b(); [o]c())
+
+=for ref
+
+Clears all C<infs> and C<nans> in C<$a> to the corresponding value in C<$b>.
+
+badmask can be run with C<$x> inplace:
+
+  badmask($x->inplace,0);
+  $x->inplace->badmask(0);
+
+
+=for bad
+
+If bad values are present, these are also cleared.
+
+=cut
+#line 933 "Bad.pm"
+
+
+
+#line 1060 "../../blib/lib/PDL/PP.pm"
+
+*badmask = \&PDL::badmask;
+#line 940 "Bad.pm"
 
 
 
@@ -946,14 +981,14 @@ its bad value flag set to true.
 
 
 =cut
-#line 950 "Bad.pm"
+#line 985 "Bad.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *copybad = \&PDL::copybad;
-#line 957 "Bad.pm"
+#line 992 "Bad.pm"
 
 
 
@@ -981,20 +1016,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 985 "Bad.pm"
+#line 1020 "Bad.pm"
 
 
 
 #line 1060 "../../blib/lib/PDL/PP.pm"
 
 *locf = \&PDL::locf;
-#line 992 "Bad.pm"
+#line 1027 "Bad.pm"
 
 
 
 
 
-#line 1122 "bad.pd"
+#line 1130 "bad.pd"
 
 
 =head1 AUTHOR
@@ -1012,7 +1047,7 @@ separated from the PDL distribution, the copyright notice should be
 included in the file.
 
 =cut
-#line 1016 "Bad.pm"
+#line 1051 "Bad.pm"
 
 
 

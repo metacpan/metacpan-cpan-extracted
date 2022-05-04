@@ -65,12 +65,12 @@ as a command.
 
 - **=**_chars_
 
-    If start with slash, list words which include all of _chars_.
+    If start with equal (`=`), list words which include all of _chars_.
 
 - **!**_chars_
 
-    If start with exclamation mark, list words which does not include any
-    of _chars_.
+    If start with exclamation mark (`!`), list words which does not
+    include any of _chars_.
 
 - _regex_
 

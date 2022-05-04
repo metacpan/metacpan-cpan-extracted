@@ -34,15 +34,9 @@ in case changes need to be made to your database.
 
 =item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
 
-If you are using RT 4.2 or greater, add this line:
+Add this line:
 
     Plugin('RT::Example::FormTools');
-
-For RT 4.0, add this line:
-
-    Set(@Plugins, qw(RT::Example::FormTools));
-
-or add C<RT::Example::FormTools> to your existing C<@Plugins> line.
 
 =item Clear your mason cache
 

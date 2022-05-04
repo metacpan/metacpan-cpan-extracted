@@ -1,6 +1,8 @@
 JavaScript::HashRef::Decode
 ===========================
 
+[![Build Status](https://api.travis-ci.org/theregister/JavaScript-HashRef-Decode.svg)](https://travis-ci.org/theregister/JavaScript-HashRef-Decode/)
+
 This module allows you to decode a JavaScript "simple object" (a hashref)
 into a Perl hashref structure.
 

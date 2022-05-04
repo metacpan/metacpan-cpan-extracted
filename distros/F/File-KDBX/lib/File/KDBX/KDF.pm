@@ -12,7 +12,7 @@ use Module::Load;
 use Scalar::Util qw(blessed);
 use namespace::clean;
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 my %KDFS;
 
@@ -120,7 +120,7 @@ File::KDBX::KDF - A key derivation function
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 DESCRIPTION
 

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "File-KDBX",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "File::KDBX",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
     "Crypt::Cipher" => 0,
     "Crypt::Digest" => 0,
     "Crypt::Mac::HMAC" => 0,
-    "Crypt::Misc" => "0.029",
+    "Crypt::Misc" => "0.049",
     "Crypt::Mode::CBC" => 0,
     "Crypt::PRNG" => 0,
     "Data::Dumper" => 0,
@@ -32,9 +32,10 @@ my %WriteMakefileArgs = (
     "File::Temp" => 0,
     "Hash::Util::FieldHash" => 0,
     "IO::Handle" => 0,
-    "IPC::Cmd" => "0.52",
+    "IPC::Cmd" => "0.84",
     "Iterator::Simple" => 0,
     "List::Util" => "1.33",
+    "Math::BigInt" => 0,
     "Module::Load" => 0,
     "Module::Loaded" => 0,
     "POSIX" => 0,
@@ -67,7 +68,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.901",
+  "VERSION" => "0.902",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -80,7 +81,7 @@ my %FallbackPrereqs = (
   "Crypt::Cipher" => 0,
   "Crypt::Digest" => 0,
   "Crypt::Mac::HMAC" => 0,
-  "Crypt::Misc" => "0.029",
+  "Crypt::Misc" => "0.049",
   "Crypt::Mode::CBC" => 0,
   "Crypt::PRNG" => 0,
   "Data::Dumper" => 0,
@@ -94,10 +95,11 @@ my %FallbackPrereqs = (
   "Getopt::Std" => 0,
   "Hash::Util::FieldHash" => 0,
   "IO::Handle" => 0,
-  "IPC::Cmd" => "0.52",
+  "IPC::Cmd" => "0.84",
   "IPC::Open3" => 0,
   "Iterator::Simple" => 0,
   "List::Util" => "1.33",
+  "Math::BigInt" => 0,
   "Module::Load" => 0,
   "Module::Loaded" => 0,
   "POSIX" => 0,

@@ -1,7 +1,7 @@
 package Bio::FastParsers::Blast;
 # ABSTRACT: Classes for parsing BLAST output
 # CONTRIBUTOR: Aymeric NAOME <aymeric.naome@gmail.com>
-$Bio::FastParsers::Blast::VERSION = '0.213510';
+$Bio::FastParsers::Blast::VERSION = '0.221230';
 use strict;
 use warnings;
 
@@ -20,7 +20,7 @@ Bio::FastParsers::Blast - Classes for parsing BLAST output
 
 =head1 VERSION
 
-version 0.213510
+version 0.221230
 
 =head1 SYNOPSIS
 

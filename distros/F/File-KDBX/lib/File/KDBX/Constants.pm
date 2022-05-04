@@ -6,14 +6,16 @@ package File::KDBX::Constants;
 #  2. List it in the pod at the bottom of this file in the section corresponding to its tag.
 #  3. There is no step three.
 
+use 5.010;
 use warnings;
 use strict;
 
 use Exporter qw(import);
+use File::KDBX::Util qw(int64);
 use Scalar::Util qw(dualvar);
 use namespace::clean -except => 'import';
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 BEGIN {
     my %CONSTANTS = (
@@ -213,7 +215,7 @@ BEGIN {
         },
         time        => {
             __prefix                    => 'TIME',
-            SECONDS_AD1_TO_UNIX_EPOCH   => 62_135_596_800,
+            SECONDS_AD1_TO_UNIX_EPOCH   => int64('62135596800'),
         },
         yubikey     => {
             YUBICO_VID              => dualvar( 0x1050, 'Yubico'),
@@ -346,7 +348,7 @@ File::KDBX::Constants - All the KDBX-related constants you could ever want
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 SYNOPSIS
 

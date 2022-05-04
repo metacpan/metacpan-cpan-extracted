@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-04-21'; # DATE
+our $DATE = '2022-05-03'; # DATE
 our $DIST = 'Browser-Find-Windows'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(find_browser list_browsers);
@@ -42,7 +42,7 @@ Browser::Find::Windows - Find available browser on Windows
 
 =head1 VERSION
 
-This document describes version 0.001 of Browser::Find::Windows (from Perl distribution Browser-Find-Windows), released on 2022-04-21.
+This document describes version 0.002 of Browser::Find::Windows (from Perl distribution Browser-Find-Windows), released on 2022-05-03.
 
 =head1 SYNOPSIS
 

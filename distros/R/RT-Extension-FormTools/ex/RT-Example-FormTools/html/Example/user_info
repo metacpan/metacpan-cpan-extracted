@@ -4,7 +4,7 @@
 
 <& /FormTools/Field, name => 'Requestors', label => 'Requested By', default => $session{'CurrentUser'}->EmailAddress  &> 
 
-<& /FormTools/Field, name => 'Systems', render_as => 'radio', default => 'web' &>
+<& /FormTools/Field, name => 'Systems' &>
 
 <& /FormTools/Next &>
 </&>

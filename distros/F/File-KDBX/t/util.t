@@ -7,10 +7,11 @@ use lib 't/lib';
 use TestCommon;
 
 use File::KDBX::Util qw(:all);
+use Math::BigInt;
+use Scalar::Util qw(blessed);
 use Test::More;
 
 can_ok('File::KDBX::Util', qw{
-    assert_64bit
     can_fork
     dumper
     empty
@@ -130,6 +131,60 @@ subtest 'Padding' => sub {
     like exception { pad_pkcs7(undef, 8) }, qr/must provide a string/i, 'String must be defined';
     like exception { pad_pkcs7('bar') }, qr/must provide block size/i, 'Size must defined';
     like exception { pad_pkcs7('bar', 0) }, qr/must provide block size/i, 'Size must be non-zero';
+};
+
+subtest '64-bit packing' => sub {
+    for my $test (
+        # bytes, value
+        ["\xfe\xff\xff\xff\xff\xff\xff\xff", -2],
+        ["\xff\xff\xff\xff\xff\xff\xff\xff", -1],
+        ["\x00\x00\x00\x00\x00\x00\x00\x00",  0],
+        ["\x01\x00\x00\x00\x00\x00\x00\x00",  1],
+        ["\x02\x00\x00\x00\x00\x00\x00\x00",  2],
+        ["\x01\x01\x00\x00\x00\x00\x00\x00", 257],
+        ["\xfe\xff\xff\xff\xff\xff\xff\xff", Math::BigInt->new('-2')],
+        ["\xff\xff\xff\xff\xff\xff\xff\xff", Math::BigInt->new('-1')],
+        ["\x00\x00\x00\x00\x00\x00\x00\x00", Math::BigInt->new('0')],
+        ["\x01\x00\x00\x00\x00\x00\x00\x00", Math::BigInt->new('1')],
+        ["\x02\x00\x00\x00\x00\x00\x00\x00", Math::BigInt->new('2')],
+        ["\x01\x01\x00\x00\x00\x00\x00\x00", Math::BigInt->new('257')],
+        ["\xfe\xff\xff\xff\xff\xff\xff\xff", Math::BigInt->new('18446744073709551614')],
+        ["\xff\xff\xff\xff\xff\xff\xff\xff", Math::BigInt->new('18446744073709551615')],
+        ["\xff\xff\xff\xff\xff\xff\xff\xff", Math::BigInt->new('18446744073709551616')], # overflow
+        ["\x02\x00\x00\x00\x00\x00\x00\x80", Math::BigInt->new('-9223372036854775806')],
+        ["\x01\x00\x00\x00\x00\x00\x00\x80", Math::BigInt->new('-9223372036854775807')],
+        ["\x00\x00\x00\x00\x00\x00\x00\x80", Math::BigInt->new('-9223372036854775808')],
+        ["\x00\x00\x00\x00\x00\x00\x00\x80", Math::BigInt->new('-9223372036854775809')], # overflow
+    ) {
+        my ($bytes, $num) = @$test;
+        my $desc = sprintf('Pack %s => %s', $num, unpack('H*', $bytes));
+        $desc =~ s/^(Pack)/$1 bigint/ if blessed $num;
+        my $p = pack_Ql($num);
+        is $p, $bytes, $desc or diag unpack('H*', $p);
+    }
+
+    for my $test (
+        # bytes, unsigned value, signed value
+        ["\x00\x00\x00\x00\x00\x00\x00\x00", 0, 0],
+        ["\x01\x00\x00\x00\x00\x00\x00\x00", 1, 1],
+        ["\x02\x00\x00\x00\x00\x00\x00\x00", 2, 2],
+        ["\xfe\xff\xff\xff\xff\xff\xff\xff", Math::BigInt->new('18446744073709551614'), -2],
+        ["\xff\xff\xff\xff\xff\xff\xff\xff", Math::BigInt->new('18446744073709551615'), -1],
+        ["\x02\x00\x00\x00\x00\x00\x00\x80", Math::BigInt->new('9223372036854775810'),
+            Math::BigInt->new('-9223372036854775806')],
+        ["\x01\x00\x00\x00\x00\x00\x00\x80", Math::BigInt->new('9223372036854775809'),
+            Math::BigInt->new('-9223372036854775807')],
+        ["\x00\x00\x00\x00\x00\x00\x00\x80", Math::BigInt->new('9223372036854775808'),
+            Math::BigInt->new('-9223372036854775808')],
+    ) {
+        my ($bytes, $num1, $num2) = @$test;
+        my $desc = sprintf('Unpack %s => %s', unpack('H*', $bytes), $num1);
+        my $p = unpack_Ql($bytes);
+        cmp_ok $p, '==', $num1, $desc or diag $p;
+        $desc = sprintf('Unpack signed %s => %s', unpack('H*', $bytes), $num2);
+        my $q = unpack_ql($bytes);
+        cmp_ok $q, '==', $num2, $desc or diag $q;
+    };
 };
 
 done_testing;

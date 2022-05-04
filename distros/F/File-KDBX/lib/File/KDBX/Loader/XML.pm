@@ -9,7 +9,7 @@ use Encode qw(decode);
 use File::KDBX::Constants qw(:version :time);
 use File::KDBX::Error;
 use File::KDBX::Safe;
-use File::KDBX::Util qw(:class :text assert_64bit gunzip erase_scoped);
+use File::KDBX::Util qw(:class :int :text gunzip erase_scoped);
 use Scalar::Util qw(looks_like_number);
 use Time::Piece;
 use XML::LibXML::Reader;
@@ -18,7 +18,7 @@ use namespace::clean;
 
 extends 'File::KDBX::Loader';
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 has '_reader',  is => 'ro';
 has '_safe',    is => 'ro', default => sub { File::KDBX::Safe->new(cipher => $_[0]->kdbx->random_stream) };
@@ -533,9 +533,8 @@ sub _decode_datetime {
             throw 'Failed to parse binary datetime', text => $_, error => $err;
         }
         throw $@ if $@;
-        assert_64bit;
         $binary .= \0 x (8 - length($binary)) if length($binary) < 8;
-        my ($seconds_since_ad1) = unpack('Q<', $binary);
+        my ($seconds_since_ad1) = unpack_Ql($binary);
         my $epoch = $seconds_since_ad1 - TIME_SECONDS_AD1_TO_UNIX_EPOCH;
         return Time::Piece->new($epoch);
     }
@@ -591,7 +590,7 @@ File::KDBX::Loader::XML - Load unencrypted XML KeePass files
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 BUGS
 

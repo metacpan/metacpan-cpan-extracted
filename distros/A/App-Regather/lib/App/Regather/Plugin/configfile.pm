@@ -44,6 +44,7 @@ sub new {
 	 log          => delete $args->{log},
 	 obj          => delete $args->{obj},
 	 out_file_old => delete $args->{out_file_old},
+	 prog         => delete $args->{prog},
 	 rdn          => delete $args->{rdn},
 	 service      => delete $args->{s},
 	 st           => delete $args->{st},
@@ -116,7 +117,7 @@ sub ldap_sync_add_modify {
 			ls => [ __PACKAGE__, $out_to, $self->cf->get('service', $self->service, 'map', $i, $j) ] )
 		if $self->{v} > 0;
 	    } else {
-	      $self->log->cc( pr => 'err', fm => "%s: %s not removed (no attribute: %s); error: ",
+	      $self->log->cc( pr => 'err', fm => "%s: %s not removed (no attribute: %s); error: %s",
 			ls => [ __PACKAGE__, $out_to, $self->cf->get('service', $self->service, 'map', $i, $j), $! ],
 			nt => 1, );
 	    }

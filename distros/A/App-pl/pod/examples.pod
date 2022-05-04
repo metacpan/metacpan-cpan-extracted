@@ -1017,7 +1017,7 @@ quoting, there are variables for single C<$q(uote)> & double C<$Q(uote)>:
     pl -P1 's/.+\bVERSION\s*=\s*[v$Quote$quote]{0,2}([0-9.]+).+/$1/' pl
     pl -P1 's/.+\bVERSION\s*=\s*[v$Q$q]{0,2}([0-9.]+).+/$1/' pl
 
-    >   0.63.1.92
+    >   0.63.2
 
 For multple files, add the filename, and reset (B<-r>) the B<-P> count for each
 file:
@@ -1992,7 +1992,7 @@ scalar context, e.g. C<$x = form ...>:
     pl '$x = "%04x";
         f "$x$x-$x-$x-$x-$x$x$x", map rand 0x10000, 0..7'
 
-    >   3d614579-b779-3e37-da86-4dcc509eeb79
+    >   dc19d3ab-e96b-5f79-75ce-3dee4dfdc121
 
 To be RFC 4122 conformant, the 4 version & 2 variant bits need to have
 standard values.  As a different approach, B<-o> "loops" over the one
@@ -2008,7 +2008,7 @@ uses C</r> which requires Perl v5.20:
         ($u[4] /= 4) |= 0x8000;
         f s/x/%04x/gr, @u' xx-x-x-x-xxx
 
-    >   276346ff-c481-42a7-8081-4af384a2ff38
+    >   2d905f2c-7bb4-493f-8f15-fc2c88adee05
 
 =item Generate a Random Password
 
@@ -2020,7 +2020,7 @@ C<rand 94> will always be less than 94 and C<chr> will round it down:
 
     pl 'say map chr(33 + rand 94), 1..12'
 
-    >   1(YtjPq+MnUq
+    >   U6`!=colO%<b
 
 =item DNS Lookup
 

@@ -20,7 +20,7 @@ my $pb = yvals zeroes 3,5;
 my $pc = $pa + $pb;
 ok($pc->at(2,2) == 4, 'pdl addition 1');
 ok($pc->at(2,3) == 5, 'pdl addition 2');
-throws_ok { $pc->at(3,3); } qr/Position\s*\d+\s*out of range/, 'invalid position';
+throws_ok { $pc->at(3,3); } qr/Position.*out of range/, 'invalid position';
 }
 
 {
@@ -44,7 +44,7 @@ ok(approx(cdouble(25 - 10*i) - cdouble(25 - 10*i), 0), 'pdl complex subtraction'
 ok(approx($pc->double->at(2,2), 24), 'pdl complex addition 1');
 is $pc->at(2,3), '25-10i', 'at stringifies complex';
 ok(approx($pc->slice([2], [3]), cdouble(25 - 10*i)), 'pdl complex addition 2');
-throws_ok { $pc->at(3,3); } qr/Position\s*\d+\s*out of range/, 'invalid position';
+throws_ok { $pc->at(3,3); } qr/Position.*out of range/, 'invalid position';
 is_deeply \@w, [], 'no warnings' or diag explain \@w;
 }
 
@@ -288,13 +288,13 @@ SKIP:
 is(~pdl(1,2,3)              ."", '[-2 -3 -4]', 'bitwise negation');
 is((pdl(1,2,3) ^ pdl(4,5,6))."", '[5 7 5]'   , 'bitwise xor'     );
 
-# Check badflag propagation with .= (Ops::assgn) sf.net bug 3543056
-$a = sequence(10);
-$b = sequence(5);
-$b->inplace->setvaltobad(3);
-$a->slice('0:4') .= $b;
-$a->badflag(1);
-$a->check_badflag();
-ok($a->badflag == 1 && $a->nbad == 1, 'badflag propagation with .=');
+{
+my $startgood = sequence(10);
+my $hasbad = sequence(5);
+$hasbad->inplace->setvaltobad(3);
+$startgood->slice('0:4') .= $hasbad;
+ok $startgood->badflag, 'startgood badflag now true';
+ok $startgood->nbad == 1, 'badflag propagation with .=';
+}
 
 done_testing;

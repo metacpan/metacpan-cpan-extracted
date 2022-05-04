@@ -7,14 +7,14 @@ use strict;
 use File::KDBX::Constants qw(:yubikey);
 use File::KDBX::Error;
 use File::KDBX::Util qw(:class :io pad_pkcs7);
-use IPC::Cmd 0.52 qw(run_forked);
+use IPC::Cmd 0.84 qw(run_forked);
 use Ref::Util qw(is_arrayref);
 use Symbol qw(gensym);
 use namespace::clean;
 
 extends 'File::KDBX::Key::ChallengeResponse';
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 # It can take some time for the USB device to be ready again, so we can retry a few times.
 our $RETRY_COUNT    = 5;
@@ -296,7 +296,7 @@ File::KDBX::Key::YubiKey - A Yubico challenge-response key
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 SYNOPSIS
 
@@ -487,7 +487,7 @@ C<run_forked> from L<IPC::Cmd> worked in Windows, but it probably doesn't. I spe
 various quirks to L<IPC::Open3> and L<IPC::Cmd> implementations but never quite got it to worked reliably
 without deadlocks. Maybe I'll revisit this later. Hit me up so I know if there's demand.
 
-It would also be possible to implement this is an XS module that incorporated ykcore, using libusb-1 which
+It would also be possible to implement this as an XS module that incorporated ykcore, using libusb-1 which
 would probably make it more portable with Windows. Perhaps if I get around to it.
 
 =head1 BUGS

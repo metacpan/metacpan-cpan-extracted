@@ -1,5 +1,8 @@
 Revision history for JSON-Schema-Modern
 
+0.552     2022-05-03 03:31:59Z
+          - fix result serialization from exceptions (broken in 0.550)
+
 0.551     2022-05-01 01:29:51Z
           - the "specification_version" configuration option now accepts
             values without "draft" in the name, to facilitate a new naming

@@ -7,19 +7,18 @@ use CPAN::HandleConfig;
 
 our @EXPORT_OK = qw(is_distro_ok block_distro);
 
-our $VERSION = '0.017'; # VERSION
-#
+our $VERSION = '0.018'; # VERSION
 
 =pod
 
 =head1 NAME
 
-CPAN::Reporter::Smoker::OpenBSD - set of scripts to manage a CPAN::Reporter::Smoker on OpenBSD
+CPAN::Reporter::Smoker::OpenBSD - set of scripts to manage a 
+L<CPAN::Reporter::Smoker> on OpenBSD
 
 =head1 DESCRIPTION
 
 This module exports some functions used to manage a smoker testing machine based L<CPAN::Reporter>.
-
 
 =head1 EXPORTS
 
@@ -66,7 +65,7 @@ a distribution name (for example, "JOHNDOE/Some-Distro-Name").
 
 =item 2.
 
-The perl interpreter which is in execution, for example, "perl-5.24.3".
+The perl interpreter (which is in execution) configuration.
 
 =item 3.
 
@@ -91,7 +90,7 @@ sub block_distro {
 
     my %data = (
         comment => $comment || 'Tests hang smoker',
-        match => {
+        match   => {
             distribution => $distribution,
             perlconfig   => $perl_info
         },
@@ -101,7 +100,7 @@ sub block_distro {
     CPAN::HandleConfig->load;
     my $prefs_dir = $CPAN::Config->{prefs_dir};
     die "$prefs_dir does not exist or it is not readable\n"
-      unless ( -d $prefs_dir );
+        unless ( -d $prefs_dir );
     my $full_path = File::Spec->catfile( $prefs_dir, $filename );
 
     if ( -f $full_path ) {

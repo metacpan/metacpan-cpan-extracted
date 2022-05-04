@@ -1,7 +1,7 @@
 package Bio::FastParsers::Hmmer::Table;
 # ABSTRACT: Front-end class for tabular HMMER parser
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::FastParsers::Hmmer::Table::VERSION = '0.213510';
+$Bio::FastParsers::Hmmer::Table::VERSION = '0.221230';
 use Moose;
 use namespace::autoclean;
 
@@ -114,7 +114,7 @@ Bio::FastParsers::Hmmer::Table - Front-end class for tabular HMMER parser
 
 =head1 VERSION
 
-version 0.213510
+version 0.221230
 
 =head1 SYNOPSIS
 

@@ -56,8 +56,16 @@ SEE ALSO
 
         "cpanp d --fetchdir=. Some::Module"
 
+    cpanget
+        Shell tool in cpanspec project.
+
+        "cpanget App::Pod::Example"
+
     cpanspec
         Generate a spec file for a CPAN module
+
+        Unofficial version of cpanspec from
+        <https://github.com/contyk/cpanspec>.
 
         "cpanspec -D App::Pod::Example"
 
@@ -83,5 +91,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

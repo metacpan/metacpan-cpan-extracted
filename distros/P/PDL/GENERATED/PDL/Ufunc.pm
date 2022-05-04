@@ -1143,7 +1143,7 @@ Output is set bad if no elements of the input are non-bad,
 otherwise the bad flag is cleared for the output ndarray.
 
 Note that C<NaNs> are considered to be valid values and will "win" over non-C<NaN>;
-see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Math/badmask>
+see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Bad/badmask>
 for ways of masking NaNs.
 
 
@@ -1194,7 +1194,7 @@ Output is set bad if no elements of the input are non-bad,
 otherwise the bad flag is cleared for the output ndarray.
 
 Note that C<NaNs> are considered to be valid values and will "win" over non-C<NaN>;
-see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Math/badmask>
+see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Bad/badmask>
 for ways of masking NaNs.
 
 
@@ -1256,7 +1256,7 @@ Output bad flag is cleared for the output ndarray if sufficient non-bad elements
 else remaining slots in C<$c()> are set bad.
 
 Note that C<NaNs> are considered to be valid values and will "win" over non-C<NaN>;
-see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Math/badmask>
+see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Bad/badmask>
 for ways of masking NaNs.
 
 
@@ -1344,7 +1344,7 @@ Output is set bad if no elements of the input are non-bad,
 otherwise the bad flag is cleared for the output ndarray.
 
 Note that C<NaNs> are considered to be valid values and will "win" over non-C<NaN>;
-see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Math/badmask>
+see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Bad/badmask>
 for ways of masking NaNs.
 
 
@@ -1395,7 +1395,7 @@ Output is set bad if no elements of the input are non-bad,
 otherwise the bad flag is cleared for the output ndarray.
 
 Note that C<NaNs> are considered to be valid values and will "win" over non-C<NaN>;
-see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Math/badmask>
+see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Bad/badmask>
 for ways of masking NaNs.
 
 
@@ -1457,7 +1457,7 @@ Output bad flag is cleared for the output ndarray if sufficient non-bad elements
 else remaining slots in C<$c()> are set bad.
 
 Note that C<NaNs> are considered to be valid values and will "win" over non-C<NaN>;
-see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Math/badmask>
+see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Bad/badmask>
 for ways of masking NaNs.
 
 

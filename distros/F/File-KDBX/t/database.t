@@ -133,7 +133,7 @@ subtest 'Recycle bin' => sub {
 
     is $kdbx->entries->size, 1, 'Database is not empty';
     is $kdbx->entries(searching => 1)->size, 0, 'Database has no entries if searching';
-    cmp_ok $bin->entries_deeply->size, '==', 1, 'Recycle bin has an entry';
+    cmp_ok $bin->all_entries->size, '==', 1, 'Recycle bin has an entry';
 
     $entry->recycle_or_remove;
     is $kdbx->entries->size, 0, 'Remove entry if it is already in the recycle bin';

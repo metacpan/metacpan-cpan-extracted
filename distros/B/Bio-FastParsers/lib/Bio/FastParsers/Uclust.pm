@@ -1,7 +1,7 @@
 package Bio::FastParsers::Uclust;
 # ABSTRACT: Front-end class for UCLUST parser
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
-$Bio::FastParsers::Uclust::VERSION = '0.213510';
+$Bio::FastParsers::Uclust::VERSION = '0.221230';
 use Moose;
 use namespace::autoclean;
 
@@ -71,7 +71,7 @@ Bio::FastParsers::Uclust - Front-end class for UCLUST parser
 
 =head1 VERSION
 
-version 0.213510
+version 0.221230
 
 =head1 SYNOPSIS
 

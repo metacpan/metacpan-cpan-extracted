@@ -3,7 +3,7 @@
 # Beware: DON'T PERFORM ANY ACTIONS AT TOP LEVEL: this file runs many times under -n!
 
 BEGIN {
-    $pl::VERSION = 'v0.63.1.92';
+    $pl::VERSION = 'v0.63.2';
     my $execed = shift if @ARGV && $ARGV[0] eq '+'; # don't recursively call perl again for -p
     return unless @ARGV and $ARGV[0] =~ /^-/s;
     my $onepl = qr/[rhv?]|[oOpP](?:[1-9][0-9]*)?/; # simple pl opts, reflect these in pod/html
@@ -989,8 +989,8 @@ some context, else echoes it.
         $_ = D -86400, "+3600";
         e $_, " -- ", D "+8:45"'
 
-    >   Mon May  2 11:30:33.595486 2022
-    >   Sun May  1 12:30:33.595676 2022  --  Mon May  2 18:15:33.595729 +08:45 2022
+    >   Mon May  2 22:52:58.017441 2022
+    >   Sun May  1 23:52:58.017535 2022  --  Tue May  3 05:37:58.017574 +08:45 2022
 
 =item C<echo I<[arg...]>> |
 C<e I<[arg...]>>
@@ -1034,8 +1034,8 @@ Same as C<D(ate)>, but uses ISO format.
         $_ = I 7 * -86400;
         e $_, " -- ", I "+8.75"'
 
-    >   2022-05-02T11:30:33.635706
-    >   2022-04-25T11:30:33.635792  --  2022-05-02T18:15:33.635824 +08:45
+    >   2022-05-02T22:52:58.051087
+    >   2022-04-25T22:52:58.051219  --  2022-05-03T05:37:58.051254 +08:45
 
 =item C<keydiff I<[key[, value]]>> |
 C<k I<[key[, value]]>>

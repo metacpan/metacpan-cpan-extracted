@@ -62,28 +62,19 @@ pp_def(
         %}
         PDL_IF_BAD(if (badflag) { $SETBAD(c()); $PDLSTATESETBAD(c); }
         else,)                  { $c() = tmp;  }',
-       CopyBadStatusCode => '',
        Doc => '
-
 =for ref
 
 Inner product over one dimension
 
  c = sum_i a_i * b_i
-
-=cut
-
 ',
        BadDoc => '
-
 =for bad
 
 If C<a() * b()> contains only bad data,
 C<c()> is set bad. Otherwise C<c()> will have its bad flag cleared,
 as it will not contain any bad values.
-
-=cut
-
 ',
        ); # pp_def( inner )
 
@@ -1037,7 +1028,6 @@ pp_def(
         %}
         PDL_IF_BAD(if (!flag) { $SETBAD(b()); $PDLSTATESETBAD(b); }
         else,)                { $b() = statsum / wtsum; }',
-       CopyBadStatusCode => '',
        Doc => '
 =for ref
 
@@ -1107,7 +1097,6 @@ pp_def('statsover',
                    PDL_IF_BAD($SETBAD(prms()),$prms() = 0);
            $adev() = tmp1 / norm ;
          }',
-      CopyBadStatusCode => '',
       PMCode => '
 sub PDL::statsover {
    barf(\'Usage: ($mean,[$prms, $median, $min, $max, $adev, $rms]) = statsover($data,[$weights])\') if @_>2;
@@ -1591,11 +1580,8 @@ sub PDL::glue{
     my($x) = shift;
     my($dim) = shift;
 
-    if(defined $x && !(ref $x)) {
-	my $y = $dim;
-	$dim = $x;
-	$x = $y;
-    }
+    ($dim, $x) = ($x, $dim) if defined $x && !ref $x;
+    confess 'dimension must be Perl scalar' if ref $dim;
 
     if(!defined $x || $x->nelem==0) {
 	return $x unless(@_);
@@ -1634,6 +1620,56 @@ pp_def( 'axisvalues',
 	GenericTypes => [ppdefs_all],
 	Doc => undef,
        ); # pp_def: axisvalues
+
+pp_def(
+    'cmpvec',
+    HandleBad => 1,
+    Pars => 'a(n); b(n); sbyte [o]c();',
+    Code => '
+     char anybad = 0;
+     broadcastloop %{
+       $c() = 0;
+       loop(n) %{
+         PDL_IF_BAD(if ($ISBAD(a()) || $ISBAD(b())) { $SETBAD(c()); anybad = 1; break; }
+         else,) if ($a() != $b()) { $c() = $a() < $b() ? -1 : 1; break; }
+       %}
+     %}
+     PDL_IF_BAD(if (anybad) $PDLSTATESETBAD(c);,)
+    ',
+    Doc => '
+=for ref
+
+Compare two vectors lexicographically, returning -1 if a is less, 1 if
+greater, 0 if equal.
+',
+    BadDoc => '
+The output is bad if any input values up to the point of inequality are
+bad - any after are ignored.
+',
+);
+
+pp_def(
+    'eqvec',
+    HandleBad => 1,
+    Pars => 'a(n); b(n); sbyte [o]c();',
+    Code => '
+     char anybad = 0;
+     broadcastloop %{
+       $c() = 1;
+       loop(n) %{
+         PDL_IF_BAD(if ($ISBAD(a()) || $ISBAD(b())) { $SETBAD(c()); anybad = 1; break; }
+         else,) if ($a() != $b()) { $c() = 0; PDL_IF_BAD(,break;) }
+       %}
+     %}
+     PDL_IF_BAD(if (anybad) $PDLSTATESETBAD(c);,)
+    ',
+    Doc => '
+=for ref
+
+Compare two vectors, returning 1 if equal, 0 if not equal.
+',
+    BadDoc => 'The output is bad if any input values are bad.',
+);
 
 pp_addhdr(<<'EOH');
 extern int pdl_srand_threads;
@@ -2902,82 +2938,59 @@ EOD
 
     for (
 	 {Name=>'which',
-	  Pars => 'mask(n); indx [o] inds(m);',
-	  Variables => 'int dm=0;',
+	  Pars => 'mask(n); indx [o] inds(n); indx [o]lastout()',
+	  Variables => 'PDL_Indx dm=0;',
 	  Elseclause => "",
-	  Autosize => '$SIZE(m) = sum;',
+	  Outclause => '$lastout() = dm; while (dm < $SIZE(n)) $inds(n=>dm++) = -1;',
 	  Doc => $doc_which,
 	  PMCode=><<'EOD',
    sub which { my ($this,$out) = @_;
 		$this = $this->flat;
 		$out //= $this->nullcreate;
-		PDL::_which_int($this,$out);
-		return $out;
+		PDL::_which_int($this,$out,my $lastout = $this->nullcreate);
+		my $lastoutmax = $lastout->max->sclr;
+		$lastoutmax ? $out->slice('0:'.($lastoutmax-1))->sever : empty(indx);
    }
    *PDL::which = \&which;
 EOD
 	  },
 	 {Name => 'which_both',
-	  Pars => 'mask(n); indx [o] inds(m); indx [o]notinds(q)',
-	  Variables => 'int dm=0; int dm2=0;',
-	  Elseclause => "else { \n          \$notinds(q => dm2)=n; \n           dm2++;\n     }",
-	  Autosize => '$SIZE(m) = sum;'."\n".'  	  $SIZE(q) = dpdl->dims[0]-sum;',
+	  Pars => 'mask(n); indx [o] inds(n); indx [o]notinds(n); indx [o]lastout(); indx [o]lastoutn()',
+	  Variables => 'PDL_Indx dm=0; int dm2=0;',
+	  Elseclause => "else { \n          \$notinds(n => dm2)=n; \n           dm2++;\n     }",
+	  Outclause => '$lastout() = dm; $lastoutn() = dm2; while (dm < $SIZE(n)) $inds(n=>dm++) = -1; while (dm2 < $SIZE(n)) $notinds(n=>dm2++) = -1;',
 	  Doc => $doc_which_both,
 	  PMCode=><<'EOD',
    sub which_both { my ($this,$outi,$outni) = @_;
 		$this = $this->flat;
 		$outi //= $this->nullcreate;
 		$outni //= $this->nullcreate;
-		PDL::_which_both_int($this,$outi,$outni);
-		return wantarray ? ($outi,$outni) : $outi;
+		PDL::_which_both_int($this,$outi,$outni,my $lastout = $this->nullcreate,my $lastoutn = $this->nullcreate);
+		my $lastoutmax = $lastout->max->sclr;
+		$outi = $lastoutmax ? $outi->slice('0:'.($lastoutmax-1))->sever : empty(indx);
+		return $outi if !wantarray;
+		my $lastoutnmax = $lastoutn->max->sclr;
+		($outi, $lastoutnmax ? $outni->slice('0:'.($lastoutnmax-1))->sever : empty(indx));
    }
    *PDL::which_both = \&which_both;
 EOD
 	  }
 	 )
 {
-    my $code = $_->{Variables} .'
-                 loop(n) %{
-			if ( $mask() PDL_IF_BAD(&& $ISGOOD($mask()),) ) {
-				$inds(m => dm) = n;
-				dm++;
-			}'.$_->{Elseclause}.'
-		 %}';
     pp_def($_->{Name},
 	   HandleBad => 1,
 	   Doc => $_->{Doc},
 	   Pars => $_->{Pars},
 	   GenericTypes => [ppdefs_all],
 	   PMCode => $_->{PMCode},
-	   Code => $code,
-#		the next one is currently a dirty hack
-#               this will probably break once dataflow is enabled again
-#               *unless* we have made sure that mask is physical by now!!!
-	   RedoDimsCode => '
-		PDL_Indx sum = 0;
-		/* not sure if this is necessary */
-		pdl * dpdl = $PDL(mask);
-		$GENERIC() *m_datap = (($GENERIC() *)(PDL_REPRP(dpdl)));
-		PDL_Indx inc = PDL_REPRINC(dpdl,0);
-		PDL_Indx offs = PDL_REPROFFS(dpdl);
-		PDL_Indx i;
-
-		if (dpdl->ndims != 1)
-		  $CROAK("dimflag currently works only with 1D pdls");
-
-		if(dpdl->state & PDL_BADVAL)
-		  for (i=0; i<dpdl->dims[0]; i++) {
-	 	 	$GENERIC() foo = *(m_datap+inc*i+offs);
-	 	        if(foo && $ISGOODVAR(foo,mask) )sum++;
-		}
-	        else
-		for (i=0; i<dpdl->dims[0]; i++) {
- 	 		$GENERIC() foo = *(m_datap+inc*i+offs);
-	 	                if(foo) sum++;
-		}
-
-                '. $_->{Autosize}
-	   );
+	   Code => $_->{Variables} .'
+                 loop(n) %{
+			if ( $mask() PDL_IF_BAD(&& $ISGOOD($mask()),) ) {
+				$inds(n => dm) = n;
+				dm++;
+			}'.$_->{Elseclause}.'
+		 %}'.$_->{Outclause},
+    );
 }
 
 pp_add_exported("", 'where');

@@ -11,7 +11,7 @@ use namespace::clean;
 
 extends 'File::KDBX::Cipher';
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 has key_size => 32;
 sub iv_size     { 16 }
@@ -63,7 +63,7 @@ File::KDBX::Cipher::CBC - A CBC block cipher mode encrypter/decrypter
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 SYNOPSIS
 

@@ -19,10 +19,10 @@ no_index:
     - html
     - inc
 requires:
-  perl: 5.8.3
+  perl: 5.10.1
 resources:
   license: http://opensource.org/licenses/gpl-license.php
   repository: https://github.com/bestpractical/rt-extension-formtools
-version: '0.52'
-x_module_install_rtx_version: '0.40'
-x_requires_rt: 4.0.0
+version: '0.53'
+x_module_install_rtx_version: '0.43'
+x_requires_rt: 4.2.3

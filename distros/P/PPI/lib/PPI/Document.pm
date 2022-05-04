@@ -75,7 +75,7 @@ use PPI::Node                     ();
 use overload 'bool' => \&PPI::Util::TRUE;
 use overload '""'   => 'content';
 
-our $VERSION = '1.273';
+our $VERSION = '1.274';
 
 our ( $errstr, @ISA ) = ( "", "PPI::Node" );
 
@@ -428,9 +428,12 @@ sub serialize {
 		# case will definitely not contain a newline.
 		$output .= $Token->content;
 
+		# Pick up the indentation, which may be undef.
+		my $indentation = $Token->indentation || '';
+
 		# Now add all of the here-doc content to the heredoc buffer.
 		foreach my $line ( $Token->heredoc ) {
-			$heredoc .= $line;
+			$heredoc .= "\n" eq $line ? $line : $indentation . $line;
 		}
 
 		if ( $Token->{_damaged} ) {
@@ -494,7 +497,7 @@ sub serialize {
 
 		# Now add the termination line to the heredoc buffer
 		if ( defined $Token->{_terminator_line} ) {
-			$heredoc .= $Token->{_terminator_line};
+			$heredoc .= $indentation . $Token->{_terminator_line};
 		}
 	}
 

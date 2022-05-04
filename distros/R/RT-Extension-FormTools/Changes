@@ -1,5 +1,12 @@
 Revision history for RT-Extension-FormTools
 
+0.53 2022-05-03
+
+ - Update example to render radio using RT core feature
+ - Use RT core feature to render radio/checkbox/date
+ - Clean up code: GetCustomFieldInputName is available since RT 4.2.3
+ - Bump minimal RT version to 4.2.3
+
 0.52 2020-04-30
  - Prioritize user submitted args before default values in field component
  - Add labels for radio and check inputs (Thanks Matt!)

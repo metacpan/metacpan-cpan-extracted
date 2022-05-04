@@ -98,4 +98,5 @@ sub fast_kdf {
     }
     return $params;
 }
+
 1;

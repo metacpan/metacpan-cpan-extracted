@@ -1,27 +1,36 @@
-v.133120 - 2013-11-08
-    Properly parse negative decimals
+Revision history for Perl module JavaScript::HashRef::Decode
 
-v.130240 - 2013-01-24
-    Add improved backslash decoding and support all backslash sequences
-    Faster string parsing, support \u notation
-    Support more decimal and hex number syntaxes
-    Requires perl 5.10.0
+0.221231 2022-05-03
+    - fix: allow any top-level value
 
-v.130220 - 2013-01-22
-    Die properly on invalid input (#1 on github)
-    Add link to ECMAScript spec
+0.221230 2022-05-03
+    - fix: hash keys can be whole numbers
 
-v.130160 - 2013-01-16
-    Fix test failure on 5.8.9 (defined-or)
+0.133120 2013-11-08
+    - Properly parse negative decimals
 
-v.130142 - 2013-01-14
-    Add support for true, false, null
-    hashref keys can be single- and double- quoted strings
-    Renamed key_value to tuple
-    Added description
+0.130240 2013-01-24
+    - Add improved backslash decoding and support all backslash sequences
+    - Faster string parsing, support \u notation
+    - Support more decimal and hex number syntaxes
+    - Requires perl 5.10.0
 
-v.130141 - 2013-01-14
-    Fixed POD
+0.130220 2013-01-22
+    - Die properly on invalid input (#1 on github)
+    - Add link to ECMAScript spec
 
-v.130140 - 2013-01-14
-    Initial release
+0.130160 2013-01-16
+    - Fix test failure on 5.8.9 (defined-or)
+
+0.130142 2013-01-14
+    - Add support for true, false, null
+    - hashref keys can be single- and double- quoted strings
+    - Renamed key_value to tuple
+    - Added description
+
+0.130141 2013-01-14
+    - Fixed POD
+
+0.130140 2013-01-14
+    - Initial release
+

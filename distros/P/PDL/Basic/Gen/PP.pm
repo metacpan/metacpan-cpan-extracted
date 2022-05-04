@@ -400,13 +400,13 @@ sub dosubst_private {
       ISPDLSTATEBAD   => \&badflag_isset,
       ISPDLSTATEGOOD  => sub {"!".badflag_isset($_[0])},
       BADFLAGCACHE    => sub { PDL::PP::pp_line_numbers(__LINE__-1, "badflag_cache") },
-      PDLSTATESETBAD => sub { PDL::PP::pp_line_numbers(__LINE__-1, $sig->objs->{$_[0]}->do_pdlaccess."->state |= PDL_BADVAL") },
-      PDLSTATESETGOOD => sub { PDL::PP::pp_line_numbers(__LINE__-1, $sig->objs->{$_[0]}->do_pdlaccess."->state &= ~PDL_BADVAL") },
-      PDLSTATEISBAD => sub {badflag_isset($sig->objs->{$_[0]}->do_pdlaccess)},
-      PDLSTATEISGOOD => sub {"!".badflag_isset($sig->objs->{$_[0]}->do_pdlaccess)},
-      PP => sub { $sig->objs->{$_[0]}->do_physpointeraccess },
-      P => sub { (my $o = $sig->objs->{$_[0]})->{FlagPhys} = 1; $o->do_pointeraccess; },
-      PDL => sub { $sig->objs->{$_[0]}->do_pdlaccess },
+      PDLSTATESETBAD => sub { PDL::PP::pp_line_numbers(__LINE__-1, ($sig->objs->{$_[0]}//confess "Can't get PDLSTATESETBAD for unknown ndarray '$_[0]'")->do_pdlaccess."->state |= PDL_BADVAL") },
+      PDLSTATESETGOOD => sub { PDL::PP::pp_line_numbers(__LINE__-1, ($sig->objs->{$_[0]}->do_pdlaccess//confess "Can't get PDLSTATESETGOOD for unknown ndarray '$_[0]'")."->state &= ~PDL_BADVAL") },
+      PDLSTATEISBAD => sub {badflag_isset(($sig->objs->{$_[0]}//confess "Can't get PDLSTATEISBAD for unknown ndarray '$_[0]'")->do_pdlaccess)},
+      PDLSTATEISGOOD => sub {"!".badflag_isset(($sig->objs->{$_[0]}//confess "Can't get PDLSTATEISGOOD for unknown ndarray '$_[0]'")->do_pdlaccess)},
+      PP => sub { ($sig->objs->{$_[0]}//confess "Can't get PP for unknown ndarray '$_[0]'")->do_physpointeraccess },
+      P => sub { (my $o = ($sig->objs->{$_[0]}//confess "Can't get P for unknown ndarray '$_[0]'"))->{FlagPhys} = 1; $o->do_pointeraccess; },
+      PDL => sub { ($sig->objs->{$_[0]}//confess "Can't get PDL for unknown ndarray '$_[0]'")->do_pdlaccess },
       SIZE => sub { ($sig->ind_obj($_[0])//confess "Can't get SIZE of unknown dim '$_[0]'")->get_size },
       %PDL::PP::macros,
    );
@@ -1217,7 +1217,7 @@ sub typemap {
 	    $_rootdir.'typemap');
   # Note that the OUTPUT typemap is unlikely to be of use here, but I have kept
   # the source code from xsubpp for tidiness.
-  push @tm, &PDL::Core::Dev::PDL_TYPEMAP, 'typemap';
+  push @tm, &PDL::Core::Dev::PDL_TYPEMAP, '../../typemap', '../typemap', 'typemap';
   carp "**CRITICAL** PP found no typemap in $_rootdir/typemap; this will cause problems..."
       unless my @typemaps = grep -f $_ && -T _, @tm;
   foreach $typemap (@typemaps) {
@@ -2088,7 +2088,6 @@ EOF
    PDL::PP::Rule::MakeComp->new("NewXSCoerceMustCompNS", "NewXSCoerceMustSubd", "FOO"),
    PDL::PP::Rule::Substitute->new("NewXSCoerceMustCompSubd", "NewXSCoerceMustCompNS"),
 
-   PDL::PP::Rule->new("NewXSFindBadStatusNS", "FindBadStatusCode", sub {@_}),
    PDL::PP::Rule->new("NewXSFindBadStatusNS", ["StructName"],
       "Rule to find the bad value status of the input ndarrays",
       sub {

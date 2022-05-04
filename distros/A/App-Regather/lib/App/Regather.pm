@@ -15,16 +15,18 @@ use List::Util   qw(uniqstr);
 
 use Net::LDAP;
 use Net::LDAP::LDIF;
-use Net::LDAP::Constant qw( LDAP_SYNC_REFRESH_ONLY
-			    LDAP_SYNC_REFRESH_AND_PERSIST
-			    LDAP_SUCCESS
-			    LDAP_SYNC_PRESENT
-			    LDAP_SYNC_ADD
-			    LDAP_SYNC_MODIFY
-			    LDAP_SYNC_DELETE
+use Net::LDAP::Constant qw( 
 			    LDAP_CONNECT_ERROR
+			    LDAP_LOCAL_ERROR
 			    LDAP_OPERATIONS_ERROR
-			    LDAP_LOCAL_ERROR );
+			    LDAP_SUCCESS
+			    LDAP_SYNC_ADD
+			    LDAP_SYNC_DELETE
+			    LDAP_SYNC_MODIFY
+			    LDAP_SYNC_PRESENT
+			    LDAP_SYNC_REFRESH_AND_PERSIST
+			    LDAP_SYNC_REFRESH_ONLY
+			 );
 use Net::LDAP::Control::SyncRequest;
 use Net::LDAP::Util qw(generalizedTime_to_time);
 
@@ -40,7 +42,7 @@ use App::Regather::Plugin;
 use constant SYNST => [ qw( LDAP_SYNC_PRESENT LDAP_SYNC_ADD LDAP_SYNC_MODIFY LDAP_SYNC_DELETE ) ];
 
 # my @DAEMONARGS = ($0, @ARGV);
-our $VERSION   = '0.81.04';
+our $VERSION   = '0.81.06';
 
 sub new {
   my $class = shift;
@@ -151,11 +153,11 @@ sub run {
   $self->l->cc( pr => 'info', fm => "%s: Dry Run is set on, no file is to be changed\n" )
     if $self->cf->get(qw(core dryrun));
   $self->l->cc( pr => 'info', fm => "%s: Config::Parse object as hash:\n%s",
-	    ls => [ __PACKAGE__, $self->cf->as_hash ] ) if $self->o('v') > 3;
+	        ls => [ __PACKAGE__, $self->cf->as_hash ] ) if $self->o('v') > 3;
   $self->l->cc( pr => 'info', fm => "%s: %s",
-	    ls => [ __PACKAGE__, $self->progargs ] );
+		ls => [ __PACKAGE__, $self->progargs ] );
   $self->l->cc( pr => 'info', fm => "%s: %s v.%s is starting ...",
-	    ls => [ __PACKAGE__, $self->progname, $VERSION, ] );
+		ls => [ __PACKAGE__, $self->progname, $VERSION, ] );
 
   @{$self->{_opt}{svc}} = grep { $self->cf->get('service', $_, 'skip') != 1 } $self->cf->names_of('service');
 
@@ -213,17 +215,17 @@ sub run {
       };
     }
 
-    $self->{_opt}{ldap} = Net::LDAP->new( $uri,
-			    @{[ map { $_ => $ldap_opt->{$_} } %$ldap_opt ]} )
-      || do {
-	$self->l->cc( pr => 'err', fm => "%s: Unable to connect to %s; error: %s",
-		  ls => [ __PACKAGE__, $uri, $! ] );
-	if ( $self->o('strict') ) {
-	  exit LDAP_CONNECT_ERROR;
-	} else {
-	  next;
-	}
-      };
+    $self->{_opt}{ldap} =
+      Net::LDAP->new( $uri, @{[ map { $_ => $ldap_opt->{$_} } %$ldap_opt ]} )
+	|| do {
+	  $self->l->cc( pr => 'err', fm => "%s: Unable to connect to %s; error: %s",
+			ls => [ __PACKAGE__, $uri, $! ] );
+	  if ( $self->o('strict') ) {
+	    exit LDAP_CONNECT_ERROR;
+	  } else {
+	    next;
+	  }
+	};
 
     my $start_tls_options = $self->cf->getnode(qw(ldap ssl))->as_hash if $self->cf->is_section(qw(ldap ssl));
     if ( exists $start_tls_options->{ssl} && $start_tls_options->{ssl} eq 'start_tls' ) {
@@ -256,7 +258,8 @@ sub run {
 	if ( $mesg->code ) {
 	  ####### !!!!!!! TODO: to implement exponential delay on error sending to awoid log file/notify
 	  ####### !!!!!!! queue overflow
-	  $self->l->cc( pr => 'err', fm => "%s: bind error: %s", ls => [ __PACKAGE__, $mesg->error ] );
+	  $self->l->cc( pr => 'err', fm => "%s: bind error: %s",
+			ls => [ __PACKAGE__, $mesg->error ] );
 	  if ( $self->o('strict') ) {
 	    exit $mesg->code;
 	  } else {
@@ -266,9 +269,10 @@ sub run {
       }
     }
 
-    $self->{_opt}{req} = Net::LDAP::Control::SyncRequest->new( mode     => LDAP_SYNC_REFRESH_AND_PERSIST,
-						 critical => 1,
-						 cookie   => undef, );
+    $self->{_opt}{req} =
+      Net::LDAP::Control::SyncRequest->new( mode     => LDAP_SYNC_REFRESH_AND_PERSIST,
+					    critical => 1,
+					    cookie   => undef, );
 
     $mesg = $self->o('ldap')->search( base     => $self->cf->get(qw(ldap srch base)),
 				      scope    => $self->cf->get(qw(ldap srch scope)),
@@ -278,25 +282,25 @@ sub run {
 				      attrs    => $cfgattrs,
 				      sizelimit=> $self->cf->get(qw(ldap srch sizelimit)),
 				      timelimit=> $self->cf->get(qw(ldap srch timelimit)),
-			 );
+				    );
     if ( $mesg->code ) {
       $self->l->cc( pr => 'err',
 		fm => "%s: LDAP search ERROR...\n% 13s%s\n% 13s%s\n% 13s%s\n% 13s%s\n\n",
 		ls => [ __PACKAGE__,
-			'base: ',         $self->cf->get(qw(ldap srch base)),
-			'scope: ',        $self->cf->get(qw(ldap srch scope)),
-			'filter: ',       $self->cf->get(qw(ldap srch filter)),
-			'attrs: ',        join("\n", @{$cfgattrs}) ] );
+			'base: ',   $self->cf->get(qw(ldap srch base)),
+			'scope: ',  $self->cf->get(qw(ldap srch scope)),
+			'filter: ', $self->cf->get(qw(ldap srch filter)),
+			'attrs: ',  join("\n", @{$cfgattrs}) ] );
       $self->l->cc_ldap_err( mesg => $mesg );
       exit $mesg->code if $self->o('strict');
     } else {
       $self->l->cc( pr => 'info',
-		fm => "%s: LDAP search:\n% 13s%s\n% 13s%s\n% 13s%s\n% 13s%s\n\n",
-		ls => [ __PACKAGE__,
-			'base: ',   $self->cf->get(qw(ldap srch base)),
-			'scope: ',  $self->cf->get(qw(ldap srch scope)),
-			'filter: ', $self->cf->get(qw(ldap srch filter)),
-			'attrs: ',  join("\n", @{$cfgattrs}) ] ) if $self->o('v') > 2;
+		    fm => "%s: LDAP search:\n% 13s%s\n% 13s%s\n% 13s%s\n% 13s%s\n\n",
+		    ls => [ __PACKAGE__,
+			    'base: ',   $self->cf->get(qw(ldap srch base)),
+			    'scope: ',  $self->cf->get(qw(ldap srch scope)),
+			    'filter: ', $self->cf->get(qw(ldap srch filter)),
+			    'attrs: ',  join("\n", @{$cfgattrs}) ] ) if $self->o('v') > 2;
     }
   }
 

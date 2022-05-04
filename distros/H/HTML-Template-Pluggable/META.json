@@ -1,0 +1,52 @@
+{
+   "abstract" : "Extends HTML::Template with plugin support",
+   "author" : [
+      "Mark Stosberg <mark@summersault.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "HTML-Template-Pluggable",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI" : "3.06",
+            "Class::Trigger" : "0",
+            "HTML::Template" : "2.7",
+            "Regexp::Common" : "0",
+            "Scalar::Util" : "0",
+            "Test::MockObject" : "1",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "HTML::Template::Pluggable" : {
+         "file" : "lib/HTML/Template/Pluggable.pm",
+         "version" : "0.20"
+      },
+      "HTML::Template::Plugin::Dot" : {
+         "file" : "lib/HTML/Template/Plugin/Dot.pm",
+         "version" : "1.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.20",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

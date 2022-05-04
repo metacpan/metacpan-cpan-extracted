@@ -19,7 +19,7 @@ use namespace::clean;
 
 extends 'File::KDBX::Object';
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 
 # has uuid                        => sub { generate_uuid(printable => 1) };
@@ -78,7 +78,7 @@ sub entries {
 }
 
 
-sub entries_deeply {
+sub all_entries {
     my $self = shift;
     my %args = @_;
 
@@ -86,7 +86,7 @@ sub entries_deeply {
     my $auto_type   = delete $args{auto_type};
     my $history     = delete $args{history};
 
-    my $groups = $self->groups_deeply(%args);
+    my $groups = $self->all_groups(%args);
     my @entries;
 
     return File::KDBX::Iterator->new(sub {
@@ -149,7 +149,7 @@ sub groups {
 }
 
 
-sub groups_deeply {
+sub all_groups {
     my $self = shift;
     my %args = @_;
 
@@ -220,7 +220,7 @@ sub remove_group {
 ##############################################################################
 
 
-sub objects_deeply {
+sub all_objects {
     my $self = shift;
     my %args = @_;
 
@@ -228,7 +228,7 @@ sub objects_deeply {
     my $auto_type   = delete $args{auto_type};
     my $history     = delete $args{history};
 
-    my $groups = $self->groups_deeply(%args);
+    my $groups = $self->all_groups(%args);
     my @entries;
 
     return File::KDBX::Iterator->new(sub {
@@ -398,7 +398,7 @@ File::KDBX::Group - A KDBX database group
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 DESCRIPTION
 
@@ -407,6 +407,9 @@ A group in a KDBX database is a type of object that can contain entries and othe
 There is also some metadata associated with a group. Each group in a database is identified uniquely by
 a UUID. An entry can also have an icon associated with it, and there are various timestamps. Take a look at
 the attributes to see what's available.
+
+A B<File::KDBX::Group> is a subclass of L<File::KDBX::Object>. View its documentation to see other attributes
+and methods available on groups.
 
 =head1 ATTRIBUTES
 
@@ -454,9 +457,9 @@ Array of subgroups contained within the group.
 
 Get an array of direct child entries within a group.
 
-=head2 entries_deeply
+=head2 all_entries
 
-    \&iterator = $kdbx->entries_deeply(%options);
+    \&iterator = $kdbx->all_entries(%options);
 
 Get an L<File::KDBX::Iterator> over I<entries> within a group. Supports the same options as L</groups>,
 plus some new ones:
@@ -498,9 +501,9 @@ Remove an entry from a group's array of entries. Returns the entry removed or C<
 
 Get an array of direct subgroups within a group.
 
-=head2 groups_deeply
+=head2 all_groups
 
-    \&iterator = $group->groups_deeply(%options);
+    \&iterator = $group->all_groups(%options);
 
 Get an L<File::KDBX::Iterator> over I<groups> within a groups, deeply. Options:
 
@@ -531,9 +534,9 @@ being added to C<$group>.
 
 Remove a group from a group's array of subgroups. Returns the group removed or C<undef> if nothing removed.
 
-=head2 objects_deeply
+=head2 all_objects
 
-    \&iterator = $groups->objects_deeply(%options);
+    \&iterator = $groups->all_objects(%options);
 
 Get an L<File::KDBX::Iterator> over I<objects> within a group, deeply. Groups and entries are considered
 objects, so this is essentially a combination of L</groups> and L</entries>. This won't often be useful, but

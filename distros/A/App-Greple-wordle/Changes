@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-wordle
 
+0.11 2022-05-03T00:36:16Z
+
+    - show help message
+
 0.10 2022-03-10T07:47:21Z
 
     - implement filter command pipeline

@@ -5,7 +5,7 @@ use warnings;
 
 use App::CPAN::Get;
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Run.
 exit App::CPAN::Get->new->run;
@@ -95,9 +95,17 @@ The CPANPLUS launcher
 
 C<cpanp d --fetchdir=. Some::Module>
 
+=item L<cpanget>
+
+Shell tool in cpanspec project.
+
+C<cpanget App::Pod::Example>
+
 =item L<cpanspec>
 
 Generate a spec file for a CPAN module
+
+Unofficial version of cpanspec from L<https://github.com/contyk/cpanspec>.
 
 C<cpanspec -D App::Pod::Example>
 
@@ -131,6 +139,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

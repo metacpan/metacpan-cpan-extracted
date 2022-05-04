@@ -13,16 +13,10 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Browser-Find-Windows",
-  "EXE_FILES" => [
-    "script/inplace"
-  ],
   "LICENSE" => "perl",
   "NAME" => "Browser::Find::Windows",
   "PREREQ_PM" => {
     "Exporter" => "5.57",
-    "Fcntl" => 0,
-    "Getopt::Long" => "2.50",
-    "IPC::Run" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -32,7 +26,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,12 +35,9 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Exporter" => "5.57",
-  "Fcntl" => 0,
   "File::Spec" => 0,
-  "Getopt::Long" => "2.50",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "IPC::Run" => 0,
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

@@ -1,46 +1,51 @@
 NAME
+
     HTML::Template::Pluggable - Extends HTML::Template with plugin support
 
 SYNOPSIS
+
     Just use this module instead of HTML::Template, then use any plugins,
     and go on with life.
 
      use HTML::Template::Pluggable;
      use HTML::Template::Plugin::Dot;
-
+    
      # Everything works the same, except for functionality that plugins add. 
      my $t = HTML::Template::Pluggable->new();
 
 THE GOAL
+
     Ideally we'd like to see this functionality merged into HTML::Template,
     and turn this into a null sub-class.
 
 STATUS
+
     The design of the plugin system is still in progress. Right now we have
     just two triggers, in param and output. The name and function of this
-    may change, and we would like to add triggers in new() and other methods
-    when the need arises.
+    may change, and we would like to add triggers in new() and other
+    methods when the need arises.
 
     All we promise for now is to keep HTML::Template::Plugin::Dot
-    compatible. Please get in touch if you have suggestions with feedback on
-    designing the plugin system if you would like to contribute.
+    compatible. Please get in touch if you have suggestions with feedback
+    on designing the plugin system if you would like to contribute.
 
 WRITING PLUGINS
+
     HTML::Template offers a plugin system which allows developers to extend
     the functionality in significant ways without creating a creating a
     sub-class, which might be impossible to use in combination with another
     sub-class extension.
 
-    Currently, two triggers have been made available to alter how the values
-    of TMPL_VARs are set. If more hooks are needed to implement your own
-    plugin idea, it may be feasible to add them-- check the FAQ then ask
-    about it on the list.
+    Currently, two triggers have been made available to alter how the
+    values of TMPL_VARs are set. If more hooks are needed to implement your
+    own plugin idea, it may be feasible to add them-- check the FAQ then
+    ask about it on the list.
 
     Class::Trigger is used to provide plugins. Basically, you can just:
 
         HTML::Template->add_trigger('middle_param', \&trigger);
 
-    A good place to add one is in your plugin's "import" subroutine:
+    A good place to add one is in your plugin's import subroutine:
 
         package HTML::Template::Plugin::MyPlugin;
         use base 'Exporter';
@@ -49,51 +54,60 @@ WRITING PLUGINS
             goto &Exporter::import;
         }
 
-  TRIGGER LOCATIONS
+ TRIGGER LOCATIONS
+
     param
-        We have added one trigger location to this method, named
-        "middle_param".
 
-           # in a Plugin's import() routine. 
-           HTML::Template->add_trigger('middle_param',   \&_set_tmpl_var_with_dot  );
+      We have added one trigger location to this method, named
+      middle_param.
 
-        This sets a callback which is executed in param() with all of the
-        same arguments. It is only useful for altering how /setting/ params
-        works. The logic to read a param is unaffected.
+         # in a Plugin's import() routine. 
+         HTML::Template->add_trigger('middle_param',   \&_set_tmpl_var_with_dot  );
 
-        It can set any TMPL_VAR values before the normal param logic kicks
-        in. To do this, "$self->{param_map}" is modified as can be seen from
-        source in HTML::Template::param(). However, it must obey the
-        following convention of setting $self->{param_map_done}{$param_name}
-        for each param that is set. $param_name would be a key from
-        "$self->{param_map}". This notifies the other plugins and the core
-        param() routine to skip trying to set this value.
-        $self->{param_map_done} is reset with each call to param(), so that
-        like with a hash, you have the option to reset a param later with
-        the same name.
+      This sets a callback which is executed in param() with all of the
+      same arguments. It is only useful for altering how /setting/ params
+      works. The logic to read a param is unaffected.
+
+      It can set any TMPL_VAR values before the normal param logic kicks
+      in. To do this, $self->{param_map} is modified as can be seen from
+      source in HTML::Template::param(). However, it must obey the
+      following convention of setting $self->{param_map_done}{$param_name}
+      for each param that is set. $param_name would be a key from
+      $self->{param_map}. This notifies the other plugins and the core
+      param() routine to skip trying to set this value.
+      $self->{param_map_done} is reset with each call to param(), so that
+      like with a hash, you have the option to reset a param later with the
+      same name.
 
     output
-        One trigger location here: "before_output".
 
-           HTML::Template->add_trigger('before_output',   \&_last_chance_params  );
+      One trigger location here: before_output.
 
-        This sets a callback which is executed right before output is
-        generated.
+         HTML::Template->add_trigger('before_output',   \&_last_chance_params  );
+
+      This sets a callback which is executed right before output is
+      generated.
 
 SEE ALSO
-    o   HTML::Template::Plugin::Dot - Add Template Toolkit's magic dot
-        notation to HTML::Template.
+
+    o
+
+      HTML::Template::Plugin::Dot - Add Template Toolkit's magic dot
+      notation to HTML::Template.
 
 AUTHOR
-    Mark Stosberg, "<mark@summersault.com>"
+
+    Mark Stosberg, <mark@summersault.com>
 
 BUGS
+
     Please report any bugs or feature requests to
-    "bug-html-template-pluggable@rt.cpan.org", or through the web interface
-    at <http://rt.cpan.org>. I will be notified, and then you'll
+    bug-html-template-pluggable@rt.cpan.org, or through the web interface
+    at http://rt.cpan.org. I will be notified, and then you'll
     automatically be notified of progress on your bug as I make changes.
 
 Copyright & License
+
     Copyright 2006 Mark Stosberg, All Rights Reserved.
 
     This program is free software; you can redistribute it and/or modify it

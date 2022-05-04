@@ -1,0 +1,20 @@
+MANIFEST
+Changes
+FakeDD.pm
+FakeDD.pod
+Makefile.PL
+README
+
+t/add.t
+t/assign.t
+t/cmp.t
+t/div.t
+t/mul.t
+t/new.t
+t/overload.t
+t/sqrt.t
+t/stringify.t
+t/sub.t
+t/validate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -76,12 +76,11 @@ pp_addhdr('
 #define ABS(A)       ( (A)>=0 ? (A) : -(A) )
 ');
 
+my %char2escape = ('>'=>'E<gt>','<'=>'E<lt>');
+my $chars = '(['.join('', map quotemeta, sort keys %char2escape).'])';
 sub protect_chars {
   my ($txt) = @_;
-  $txt =~ s/>/E;gt#/g;
-  $txt =~ s/</E;lt#/g;
-  $txt =~ s/;/</g;
-  $txt =~ s/#/>/g;
+  $txt =~ s/$chars/$char2escape{$1}/g;
   return $txt;
 }
 
@@ -139,16 +138,13 @@ EOH
 	   NoBadifNaN => 1,
 	   Inplace => [ 'a' ], # quick and dirty solution to get ->inplace do its job
 	   Code => pp_line_numbers(__LINE__-1, qq{
-	        PDL_IF_BAD(if ( $badcode ) \$SETBAD(c()); else,)
+char anybad = 0;
+broadcastloop %{
+	        PDL_IF_BAD(if ( $badcode ) { \$SETBAD(c()); anybad = 1; } else,)
 	           \$c() = \$a() $op \$b();
+%}
+if (anybad) \$PDLSTATESETBAD(c);
 	   }),
-	   CopyBadStatusCode => pp_line_numbers(__LINE__,
-	   'if ( $BADFLAGCACHE() ) {
-               if ( a == c && $ISPDLSTATEGOOD(a) ) {
-                  PDL->propagate_badflag( c, 1 ); /* have inplace op AND badflag has changed */
-               }
-               $SETPDLSTATEBAD(c);
-            }'),
 	   %extra,
 	   Doc => << "EOD");
 =for ref
@@ -251,17 +247,14 @@ ENDCODE
 	   OtherParsDefaults => { swap => 0 },
 	   Inplace => [ 'a' ], # quick and dirty solution to get ->inplace do its job
 	   Code => pp_line_numbers(__LINE__, qq{
-	        PDL_IF_BAD(if ( \$ISBAD(a()) || \$ISBAD(b()) ) \$SETBAD(c()); else {,)
-	           $codestr
-		PDL_IF_BAD(},)
+char anybad = 0;
+broadcastloop %{
+  PDL_IF_BAD(if ( \$ISBAD(a()) || \$ISBAD(b()) ) { anybad = 1; \$SETBAD(c()); } else ,){
+     $codestr
+  }
+%}
+if (anybad) \$PDLSTATESETBAD(c);
 	   }),
-	   CopyBadStatusCode =>
-	   pp_line_numbers(__LINE__, 'if ( $BADFLAGCACHE() ) {
-               if ( a == c && $ISPDLSTATEGOOD(a) ) {
-                  PDL->propagate_badflag( c, 1 ); /* have inplace op AND badflag has changed */
-               }
-               $SETPDLSTATEBAD(c);
-            }'),
 	   %extra,
 	   Doc => << "EOD");
 =for ref
@@ -472,24 +465,16 @@ pp_def(
        GenericTypes => $A,
        Pars => 'a(); [o]b();',
        Code => pp_line_numbers(__LINE__-1, q{
-	    PDL_IF_BAD(if ( $ISBAD(a()) ) $SETBAD(b()); else,)
+	  char anybad = 0;
+	  broadcastloop %{
+	    PDL_IF_BAD(if ( $ISBAD(a()) ) { anybad = 1; $SETBAD(b()); } else,)
 	       $b() = $a();
+	  %}
+	  PDL_IF_BAD(if (anybad) $PDLSTATESETBAD(b);,)
        }),
        Doc =>
 'Plain numerical assignment. This is used to implement the ".=" operator',
-		BadDoc =>
-'If C<a> is a child ndarray (e.g., the result of a slice) and bad values are generated in C<b>,
-the bad value flag is set in C<b>, but it is B<NOT> automatically propagated back to the parent of C<a>.
-The following idiom ensures that the badflag is propagated back to the parent of C<a>:
-
- $pdl->slice(":,(1)") .= PDL::Bad_aware_func();
- $pdl->badflag(1);
- $pdl->check_badflag();
-
-This is unnecessary if $pdl->badflag is known to be 1 before the slice is performed.
-
-See http://pdl.perl.org/PDLdocs/BadValues.html#dataflow_of_the_badflag for details.'
-); # pp_def assgn
+);
 
 # special functions for complex data types that don't work well with
 # the ufunc/bifunc logic

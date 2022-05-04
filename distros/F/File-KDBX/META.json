@@ -106,7 +106,7 @@
             "Crypt::Cipher" : "0",
             "Crypt::Digest" : "0",
             "Crypt::Mac::HMAC" : "0",
-            "Crypt::Misc" : "0.029",
+            "Crypt::Misc" : "0.049",
             "Crypt::Mode::CBC" : "0",
             "Crypt::PRNG" : "0",
             "Data::Dumper" : "0",
@@ -116,9 +116,10 @@
             "File::Temp" : "0",
             "Hash::Util::FieldHash" : "0",
             "IO::Handle" : "0",
-            "IPC::Cmd" : "0.52",
+            "IPC::Cmd" : "0.84",
             "Iterator::Simple" : "0",
             "List::Util" : "1.33",
+            "Math::BigInt" : "0",
             "Module::Load" : "0",
             "Module::Loaded" : "0",
             "POSIX" : "0",
@@ -134,6 +135,7 @@
             "boolean" : "0",
             "namespace::clean" : "0",
             "overload" : "0",
+            "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -155,7 +157,6 @@
             "Test::More" : "0",
             "Test::Warnings" : "0",
             "lib" : "0",
-            "perl" : "5.006",
             "utf8" : "0"
          },
          "suggests" : {
@@ -166,155 +167,155 @@
    "provides" : {
       "File::KDBX" : {
          "file" : "lib/File/KDBX.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Cipher" : {
          "file" : "lib/File/KDBX/Cipher.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Cipher::CBC" : {
          "file" : "lib/File/KDBX/Cipher/CBC.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Cipher::Stream" : {
          "file" : "lib/File/KDBX/Cipher/Stream.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Constants" : {
          "file" : "lib/File/KDBX/Constants.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Dumper" : {
          "file" : "lib/File/KDBX/Dumper.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Dumper::KDB" : {
          "file" : "lib/File/KDBX/Dumper/KDB.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Dumper::Raw" : {
          "file" : "lib/File/KDBX/Dumper/Raw.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Dumper::V3" : {
          "file" : "lib/File/KDBX/Dumper/V3.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Dumper::V4" : {
          "file" : "lib/File/KDBX/Dumper/V4.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Dumper::XML" : {
          "file" : "lib/File/KDBX/Dumper/XML.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Entry" : {
          "file" : "lib/File/KDBX/Entry.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Error" : {
          "file" : "lib/File/KDBX/Error.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Group" : {
          "file" : "lib/File/KDBX/Group.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::IO" : {
          "file" : "lib/File/KDBX/IO.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::IO::Crypt" : {
          "file" : "lib/File/KDBX/IO/Crypt.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::IO::HashBlock" : {
          "file" : "lib/File/KDBX/IO/HashBlock.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::IO::HmacBlock" : {
          "file" : "lib/File/KDBX/IO/HmacBlock.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Iterator" : {
          "file" : "lib/File/KDBX/Iterator.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::KDF" : {
          "file" : "lib/File/KDBX/KDF.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::KDF::AES" : {
          "file" : "lib/File/KDBX/KDF/AES.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::KDF::Argon2" : {
          "file" : "lib/File/KDBX/KDF/Argon2.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Key" : {
          "file" : "lib/File/KDBX/Key.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Key::ChallengeResponse" : {
          "file" : "lib/File/KDBX/Key/ChallengeResponse.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Key::Composite" : {
          "file" : "lib/File/KDBX/Key/Composite.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Key::File" : {
          "file" : "lib/File/KDBX/Key/File.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Key::Password" : {
          "file" : "lib/File/KDBX/Key/Password.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Key::YubiKey" : {
          "file" : "lib/File/KDBX/Key/YubiKey.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Loader" : {
          "file" : "lib/File/KDBX/Loader.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Loader::KDB" : {
          "file" : "lib/File/KDBX/Loader/KDB.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Loader::Raw" : {
          "file" : "lib/File/KDBX/Loader/Raw.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Loader::V3" : {
          "file" : "lib/File/KDBX/Loader/V3.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Loader::V4" : {
          "file" : "lib/File/KDBX/Loader/V4.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Loader::XML" : {
          "file" : "lib/File/KDBX/Loader/XML.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Object" : {
          "file" : "lib/File/KDBX/Object.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Safe" : {
          "file" : "lib/File/KDBX/Safe.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Transaction" : {
          "file" : "lib/File/KDBX/Transaction.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "File::KDBX::Util" : {
          "file" : "lib/File/KDBX/Util.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       }
    },
    "release_status" : "stable",
@@ -329,7 +330,7 @@
          "web" : "https://github.com/chazmcgarvey/File-KDBX"
       }
    },
-   "version" : "0.901",
+   "version" : "0.902",
    "x_authority" : "cpan:CCM",
    "x_generated_by_perl" : "v5.34.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",

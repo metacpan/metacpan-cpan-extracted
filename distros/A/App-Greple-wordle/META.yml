@@ -26,7 +26,7 @@ no_index:
 provides:
   App::Greple::wordle:
     file: lib/App/Greple/wordle.pm
-    version: '0.10'
+    version: '0.11'
   App::Greple::wordle::game:
     file: lib/App/Greple/wordle/game.pm
   App::Greple::wordle::util:
@@ -50,7 +50,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/greple-wordle/issues
   homepage: https://github.com/kaz-utashiro/greple-wordle
   repository: git://github.com/kaz-utashiro/greple-wordle.git
-version: '0.10'
+version: '0.11'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

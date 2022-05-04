@@ -2,8 +2,8 @@ NAME
     Browser::Find::Windows - Find available browser on Windows
 
 VERSION
-    This document describes version 0.001 of Browser::Find::Windows (from
-    Perl distribution Browser-Find-Windows), released on 2022-04-21.
+    This document describes version 0.002 of Browser::Find::Windows (from
+    Perl distribution Browser-Find-Windows), released on 2022-05-03.
 
 SYNOPSIS
      use Browser::Find::Windows qw(find_browser list_browsers);

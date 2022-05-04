@@ -80,7 +80,7 @@ subtest 'Warnings' => sub {
     }
 
     SKIP: {
-        skip 'warnings::warnif_at_level is required', 1 if !warnings->can('warnif_at_level');
+        skip 'warnings::warnif_at_level is required', 1 if !warnings::->can('warnif_at_level');
         no warnings 'File::KDBX';
         my @warnings = warnings { alert 'uh oh' };
         is @warnings, 0, 'Warnings can be disabled lexically'
@@ -88,7 +88,7 @@ subtest 'Warnings' => sub {
     }
 
     SKIP: {
-        skip 'warnings::fatal_enabled_at_level is required', 1 if !warnings->can('fatal_enabled_at_level');
+        skip 'warnings::fatal_enabled_at_level is required', 1 if !warnings::->can('fatal_enabled_at_level');
         use warnings FATAL => 'File::KDBX';
         my $exception = exception { alert 'uh oh' };
         like $exception, qr/uh oh/, 'Warnings can be fatal';

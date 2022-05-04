@@ -63,7 +63,7 @@
    "provides" : {
       "App::Greple::wordle" : {
          "file" : "lib/App/Greple/wordle.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "App::Greple::wordle::game" : {
          "file" : "lib/App/Greple/wordle/game.pm"
@@ -89,7 +89,7 @@
          "web" : "https://github.com/kaz-utashiro/greple-wordle"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

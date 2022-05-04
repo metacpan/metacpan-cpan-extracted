@@ -1,0 +1,197 @@
+NAME
+
+    CGI::Application::Plugin::RunmodeParseKeyword - Declare runmodes using
+    Parse::Keyword
+
+SYNOPSIS
+
+        package My::CgiApp;
+    
+        use base 'CGI::Application';
+        use CGI::Application::Plugin::RunmodeParseKeyword;
+    
+        startmode hello { "Hello!" }
+    
+        runmode world($name) {
+            return $self->hello
+            . ', '
+            . $name || "World!";
+        }
+    
+        errormode oops($c: $exception) {
+            return "Something went wrong at "
+            . $c->get_current_runmode
+            . ". Exception: $exception";
+        }
+
+DESCRIPTION
+
+    This module allows you to declare run modes with a simple keyword. It
+    provides method signatures similar to Method::Signatures::Simple.
+
+    It respects inheritance: run modes defined in the superclass are also
+    available in the subclass.
+
+    Beyond automatically registering the run mode, and providing $self, it
+    also optionally pulls named parameters from $self->query->param or
+    $self->param.
+
+      * Basic example
+
+          runmode foo { $self->bar }
+
+      This declares the run mode "foo". Notice how $self is ready for use.
+
+      * Rename invocant
+
+          runmode bar ($c:) { $c->baz }
+
+      Same as above, only use $c instead of $self.
+
+          use CGI::Application::Plugin::RunmodeParseKeyword invocant => '$c';
+          runmode baz { $c->quux }
+
+      Same as above, but every runmode gets $c by default. You can still
+      say runmode ($self:) to rename the invocant.
+
+      * With a parameter list
+
+          runmode baz ( $id, $name ) {
+              return $self->wibble("I received $id and $name from a form submission
+                                    or a method invocation.");
+          }
+
+      Here, we specify that the method expects two parameters, $id and
+      $name. Values can be supplied through a method call (e.g.
+      $self->baz(1, "me")), or from the cgiapp object (e.g. $self->param(
+      id => 42 )), or from the query object (e.g. from
+      /script?id=42;name=me).
+
+      * with default values for parameters
+
+          runmode quux ($page = 1, $rows = 42) {
+              ...
+          }
+
+      Here we specify default values for the $page and <$rows> parameters.
+      These defaults will be set in the absence of cgiapp params or query
+      params.
+
+      * Code attributes
+
+          runmode secret :Auth { ... }
+
+      Code attributes are supported as well.
+
+      * Combining with other ways to set run modes
+
+      This all works:
+
+          sub setup {
+              my $self = shift;
+              $self->run_modes([ qw/ foo / ]);
+          }
+      
+          sub foo {
+              my $self = shift;
+              return $self->other;
+          }
+      
+          runmode bar {
+              return $self->other;
+          }
+      
+          sub other : Runmode {
+              my $self = shift;
+              return $self->param('other');
+          }
+
+      So you can still use the classic way of setting up run modes, and you
+      can still use CGI::Application::Plugin::AutoRunmode, *and* you can
+      mix and match.
+
+EXPORT
+
+      * errormode
+
+      Define the run mode that serves as $self->error_mode. You can only
+      declare one errormode per package.
+
+      * startmode
+
+      Define the run mode that serves as $self->start_mode. You can only
+      declare one startmode per package.
+
+      * runmode
+
+      Define run mode.
+
+AUTHOR
+
+    Rhesa Rozendaal, <rhesa at cpan.org>
+
+DIAGNOSTICS
+
+      * error mode redefined (from %s) at %s line %s
+
+      You tried to install another errormode. Placeholders are filled with
+
+       * fully qualified name of existing errormode
+       * file name
+       * line number
+
+      * start mode redefined (from %s) at %s line %s
+
+      You tried to install another startmode. Placeholders are filled with
+
+       * fully qualified name of existing startmode
+       * file name
+       * line number
+
+BUGS
+
+    Please report any bugs or feature requests to
+    bug-cgi-application-plugin-runmodeparsekeyword at rt.cpan.org, or
+    through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Application-Plugin-RunmodeParseKeyword.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc CGI::Application::Plugin::RunmodeParseKeyword
+
+    You can also look for information at:
+
+      * RT: CPAN's request tracker
+
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Application-Plugin-RunmodeParseKeyword
+
+      * AnnoCPAN: Annotated CPAN documentation
+
+      http://annocpan.org/dist/CGI-Application-Plugin-RunmodeParseKeyword
+
+      * CPAN Ratings
+
+      http://cpanratings.perl.org/d/CGI-Application-Plugin-RunmodeParseKeyword
+
+      * Search CPAN
+
+      http://search.cpan.org/dist/CGI-Application-Plugin-RunmodeParseKeyword
+
+ACKNOWLEDGEMENTS
+
+    Matt S. Trout for Devel::Declare, and Michael G. Schwern for providing
+    the inspiration with Method::Signatures. Paul Knop for writing
+    Parse::Keyword. Even though it says DO NOT USE, it works perfectly for
+    this module.
+
+COPYRIGHT & LICENSE
+
+    Copyright 2022 Rhesa Rozendaal, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

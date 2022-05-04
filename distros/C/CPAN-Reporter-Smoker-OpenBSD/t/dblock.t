@@ -6,6 +6,8 @@ use CPAN::Reporter::Smoker::OpenBSD qw(block_distro);
 use File::Spec;
 use CPAN;
 use CPAN::HandleConfig;
+use CPAN::Reporter::Smoker::OpenBSD::PerlConfig;
+use Config;
 
 my $total_tests = 3;
 plan tests => $total_tests;
@@ -14,29 +16,48 @@ SKIP: {
 
     skip
 "Can only run those tests with cpan client, currently testing with cpanplus, version $ENV{PERL5_CPANPLUS_IS_VERSION}",
-      $total_tests
-      unless ( not( exists( $ENV{PERL5_CPANPLUS_IS_VERSION} ) ) );
+        $total_tests
+        unless ( not( exists( $ENV{PERL5_CPANPLUS_IS_VERSION} ) ) );
 
     CPAN::HandleConfig->load;
     my $prefs_dir = $CPAN::Config->{prefs_dir};
 
     skip "prefs_dir '$prefs_dir' is not available for reading/writing",
-      $total_tests
-      unless ( -d $prefs_dir && -r $prefs_dir && -w $prefs_dir );
+        $total_tests
+        unless ( -d $prefs_dir && -r $prefs_dir && -w $prefs_dir );
 
     my $distro_name = 'ARFREITAS/Foo-Bar';
     my %perl_info   = (
-        useithreads     => 'define',
-        osname          => 'openbsd',
-        archname        => 'Openbsd.amd64-openbsd'
+        no_useithreads => 'define',
+        osname         => 'openbsd',
+        archname       => 'Openbsd.amd64-openbsd'
     );
-    my $data_ref =
-      block_distro( $distro_name, \%perl_info, 'Tests hang smoker' );
-    ok( delete( $data_ref->{full_path} ), 'can remove full_path property' );
+    my $data_ref
+        = block_distro( $distro_name, \%perl_info, 'Tests hang smoker' );
+
+    # required to avoid issue with different paths
+    delete( $data_ref->{full_path} );
     my $expected = LoadFile(
         File::Spec->catfile( 't', 'distroprefs', 'ARFREITAS.Foo-Bar.yml' ) );
     like( $data_ref->{match}->{distribution},
         qr/^\^ARFREITAS/,
         'the created distroprefs has the expected distro name' );
+    note('Testing with stub');
     is_deeply( $data_ref, $expected, 'block_distro works as expected' );
+
+    # to match the current running OS
+    update_per_os($expected);
+    my $perl_info = CPAN::Reporter::Smoker::OpenBSD::PerlConfig->new;
+    $data_ref
+        = block_distro( $distro_name, $perl_info->dump, 'Tests hang smoker' );
+    delete( $data_ref->{full_path} );
+    note('Testing with CPAN::Reporter::Smoker::OpenBSD::PerlConfig');
+    is_deeply( $data_ref, $expected, 'block_distro works as expected' );
+}
+
+sub update_per_os {
+    my $expected = shift;
+    my $shortcut = $expected->{match}->{perlconfig};
+    $shortcut->{osname}   = $Config{osname};
+    $shortcut->{archname} = $Config{archname};
 }

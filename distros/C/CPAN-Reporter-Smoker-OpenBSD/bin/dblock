@@ -6,9 +6,9 @@ use File::Spec;
 use Getopt::Long;
 use Pod::Usage 1.69;
 use CPAN::Reporter::Smoker::OpenBSD qw(is_distro_ok block_distro);
-use Config;
+use CPAN::Reporter::Smoker::OpenBSD::PerlConfig;
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 my ( $distro, $help, $version_check, $comment );
 
 GetOptions(
@@ -27,13 +27,10 @@ if ($version_check) {
 
 pod2usage( -exitval => 1, -verbose => 1 ) unless ( is_distro_ok($distro) );
 
-my %perl_info = (
-    osname      => $Config{osname},
-    archname    => $Config{archname},
-    useithreads => $Config{useithreads},
-);
+my $perl_info = CPAN::Reporter::Smoker::OpenBSD::PerlConfig->new;
 
-unless ( my $data_ref = block_distro( $distro, \%perl_info, $comment ) ) {
+unless ( my $data_ref = block_distro( $distro, $perl_info->dump, $comment ) )
+{
     exit(1);
 }
 else {

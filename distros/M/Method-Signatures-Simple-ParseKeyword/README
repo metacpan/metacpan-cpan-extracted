@@ -1,0 +1,231 @@
+NAME
+
+    Method::Signatures::Simple::ParseKeyword - method and func keywords
+    using Parse::Keyword
+
+SYNOPSIS
+
+        # -- a basic class -- #
+        package User;
+        use Method::Signatures::Simple::ParseKeyword;
+    
+        method new ($class: $name, $email) {
+            my $user = {
+                id    => new_id(42),
+                name  => $name,
+                email => $email,
+            };
+            bless $user, $class;
+        }
+    
+        func new_id ($seed) {
+            state $id = $seed;
+            $id++;
+        }
+    
+        method name  { $self->{name};  }
+        method email { $self->{email}; }
+        1;
+    
+    
+        # -- other features -- #
+        # attributes
+        method foo : Bent { $self->{foo} }
+    
+        # specify defaults
+        method answer ($everything = 42) { "the answer to everything is $everything" }
+    
+        # change invocant name
+        use Method::Signatures::Simple::ParseKeyword invocant => '$this';
+        method foo ($bar) { $this->bar($bar) }
+        method bar ($class: $bar) { $class->baz($bar) }
+    
+        # use a different function keyword
+        use Method::Signatures::Simple::ParseKeyword function_keyword => 'fun';
+        fun triple ($num) { 3 * $num }
+    
+        # use a different method keyword
+        use Method::Signatures::Simple::ParseKeyword method_keyword => 'action';
+        action foo { $self->bar }
+
+RATIONALE
+
+    This module provides basic method and func keywords with simple
+    signatures. It's intentionally simple, and is supposed to be a stepping
+    stone for its bigger brothers MooseX::Method::Signatures and
+    Method::Signatures. It only has a small benefit over regular subs, so
+    if you want more features, look at those modules. But if you're looking
+    for a small amount of syntactic sugar, this might just be enough.
+
+    This module is a port from Devel::Declare to Parse::Keyword. This
+    utilizes the parsing API of the perl core, so should be more stable.
+
+FEATURES
+
+      * invocant
+
+      The method keyword automatically injects the annoying my $self =
+      shift; for you. You can rename the invocant with the first argument,
+      followed by a colon:
+
+          method ($this:) {}
+          method ($this: $that) {}
+
+      The func keyword doesn't inject an invocant, but does do the
+      signature processing below:
+
+          func ($that) {}
+
+      * signature
+
+      The signature ($sig) is transformed into "my ($sig) = \@_;". That
+      way, we mimic perl's usual argument handling.
+
+          method foo ($bar, $baz, %opts) {
+          func xyzzy ($plugh, @zorkmid) {
+      
+          # becomes
+      
+          sub foo {
+              my $self = shift;
+              my ($bar, $baz, %opts) = @_;
+      
+          sub xyzzy {
+              my ($plugh, @zorkmid) = @_;
+
+ADVANCED CONFIGURATION
+
+    You can change the keywords and the default invocant with import
+    arguments. These changes affect the current scope.
+
+      * change the invocant name
+
+          use Method::Signatures::Simple::ParseKeyword invocant => '$this';
+          method x { $this->{x} }
+          method y { $this->{y} }
+      
+          # and this of course still works:
+          method z ($self:) { $self->{z} }
+
+      * change the keywords
+
+      You can install a different keyword (instead of the default 'method'
+      and 'func'), by passing names to the use line:
+
+          use Method::Signatures::Simple::ParseKeyword method_keyword   => 'action',
+                                         function_keyword => 'thing';
+      
+          action foo ($some, $args) { ... }
+          thing bar ($whatever) { ... }
+
+      One benefit of this is that you can use this module together with
+      e.g. MooseX::Declare:
+
+          # untested
+          use MooseX::Declare;
+      
+          class Foo {
+              use Method::Signatures::Simple::ParseKeyword method_keyword => 'routine';
+              method x (Int $x) { ... }    # from MooseX::Method::Signatures
+              routine y ($y) { ... }       # from this module
+          }
+
+      If you specify neither method_keyword nor function_keyword, then we
+      default to injecting method and func. If you only specify one of
+      these options, then we only inject that one keyword into your scope.
+
+      Examples:
+
+          # injects 'method' and 'func'
+          use Method::Signatures::Simple::ParseKeyword;
+      
+          # only injects 'action'
+          use Method::Signatures::Simple::ParseKeyword method_keyword => 'action';
+      
+          # only injects 'procedure'
+          use Method::Signatures::Simple::ParseKeyword function_keyword => 'procedure';
+      
+          # injects 'action' and 'function'
+          use Method::Signatures::Simple::ParseKeyword method_keyword   => 'action',
+                                         function_keyword => 'function';
+
+      * install several keywords
+
+      You're not limited to a single use line, so you can install several
+      keywords with the same semantics as 'method' into the current scope:
+
+          use Method::Signatures::Simple::ParseKeyword; # provides 'method' and 'func'
+          use Method::Signatures::Simple::ParseKeyword method_keyword => 'action';
+      
+          method x { ... }
+          func y { ... }
+          action z { ... }
+
+AUTHOR
+
+    Rhesa Rozendaal, <rhesa at cpan.org>
+
+BUGS
+
+    Please report any bugs or feature requests to
+    bug-method-signatures-simple at rt.cpan.org, or through the web
+    interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Method-Signatures-Simple-ParseKeyword.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Method::Signatures::Simple::ParseKeyword
+
+    You can also look for information at:
+
+      * RT: CPAN's request tracker
+
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=Method-Signatures-Simple-ParseKeyword
+
+      * AnnoCPAN: Annotated CPAN documentation
+
+      http://annocpan.org/dist/Method-Signatures-Simple-ParseKeyword
+
+      * CPAN Ratings
+
+      http://cpanratings.perl.org/d/Method-Signatures-Simple-ParseKeyword
+
+      * Search CPAN
+
+      http://search.cpan.org/dist/Method-Signatures-Simple-ParseKeyword
+
+ACKNOWLEDGEMENTS
+
+      * MSTROUT
+
+      For writing Devel::Declare and providing the core concepts.
+
+      * MSCHWERN
+
+      For writing Method::Signatures and publishing about it. This is what
+      got my attention.
+
+      * FLORA
+
+      For helping me abstracting the Devel::Declare bits and suggesting
+      improvements.
+
+      * CHIPS
+
+      For suggesting we add a 'func' keyword.
+
+SEE ALSO
+
+    Parse::Keyword, Method::Signatures, MooseX::Method::Signatures.
+
+COPYRIGHT & LICENSE
+
+    Copyright 2022 Rhesa Rozendaal, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

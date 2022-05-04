@@ -1,0 +1,256 @@
+
+=pod
+
+=head1 NAME
+
+  Math::FakeDD - DoubleDouble precision arithmetic for all architectures
+
+=head1 DEPENDENCIES
+
+  This module needs Math::MPFR, which in turn requires the GMP and MPFR
+  C libraries.
+
+  The GMP library is available from  : https://gmplib.org
+  The MPFR library is available from : https://www.mpfr.org
+
+  See the introductory explanation of "DoubleDouble" arithmetic in the
+  "Double-double arithmetic" section of:
+  https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format
+
+=head1 DESCRIPTION
+
+  Perform DoubleDouble arithmetic operations on all architectures and
+  perl configurations.
+  See ARITMETIC IMPLEMENTATION section below.
+
+=head1 SYNOPSIS
+
+  use Math::FakeDD qw(:all);
+  my $obj = Math::FakeDD->new('0.1');
+  print $obj; # Outputs [0.1 -5.551115123125783e-18] irrespective of
+              # perl's NV type. We see that the more significant double
+              # is 0.1, identical to the double precision representation
+              # of 0.1, and the less signficant double is
+              # -5.551115123125783e-18.
+
+  my $obj =  Math::FakeDD->new(0.1);
+  print $obj; # Outputs [0.1 0.0] if NV type is 'double'.
+              # Outputs [0.1 -5.549759870410176e-18] if NV type is
+              # extended precision 80-bit long double.
+              # Otherwise outputs [0.1 -5.551115123125783e-18], same
+              # as for string arg of '0.1'.
+
+  NOTES: In the following documentation:
+
+   "$arg", "$arg1", "$arg2", etc. are arguments that can be either a
+    string (perl PV), a native perl numeric type (NV or IV or UV), or
+    a Math::FakeDD object.
+
+    "$obj" is a Math::FakeDD object.
+
+    "$mpfr" is a 2098-bit precision Math::MPFR object.
+
+=head1 ASSIGNMENT FUNCTIONS
+
+  $obj = Math::FakeDD->new($arg); # $arg is optional here.
+  $obj = Math::FakeDD::new($arg); # $arg is optional here.
+
+   Returns a Math::FakeDD object with the value represented by $arg,
+   or zero if no argument is provided.
+
+  dd_assign($obj, $arg);
+
+   Assigns the value represented by $arg, to the Math::FakeDD object.
+
+=head1 ARITHMETIC FUNCTIONS
+
+  $obj = dd_add($arg1, $arg2);
+  $obj = dd_sub($arg1, $arg2);
+  $obj = dd_mul($arg1, $arg2);
+  $obj = dd_div($arg1, $arg2);
+
+   Returns a Math::FakeDD object with the value of $arg1
+   (respectively) plus, minus, multiplied by or divided by $arg2.
+
+  dd_add($obj, $arg);
+  dd_sub($obj, $arg);
+  dd_mul($obj, $arg);
+  dd_div($obj, $arg);
+
+   The value in $obj is (respectively) incremented, decremented,
+   multiplied or divided by $arg.
+
+  $obj = dd_pow($arg1, $arg2);
+
+   Return a Math::FakeDD object that contains $arg1 ** $arg2.
+
+  dd_pow_eq($obj, $arg);
+
+   The value held in $obj is raised to the power of $arg.
+   (That is, $obj = $obj ** $arg.)
+
+  $obj = dd_abs($arg);
+
+   Return a Math::FakeDD object containing the absolute value of $arg.
+
+  $obj = dd_int($arg);
+
+   Return a Math::FakeDD object containing the truncated
+   (integer) value of $arg.
+
+=head1 EXPONENTIATION FUNCTIONS
+
+  $obj = dd_exp($arg);
+
+   Return a Math::FakeDD object that contains e ** $arg.
+
+  $obj = dd_log($arg);
+
+   Return a Math::FakeDD object that contains the natural
+   logarithm of $arg.
+
+=head1 TRIGONOMETRY FUNCTIONS
+
+  $obj = dd_cos($arg);
+
+   Return a Math::FakeDD object that contains cos($arg).
+
+  $obj = dd_sin($arg);
+
+   Return a Math::FakeDD object that contains sin($arg).
+
+=head1 COMPARISON FUNCTIONS
+
+  $integer = dd_cmp($arg1, $arg2);
+  $integer = dd_spaceship($arg1, $arg2);
+
+   $integer < 0  if $arg1 <  $arg2.
+   $integer > 0  if $arg1 >  $arg2.
+   $integer == 0 if $arg1 == $arg2.
+
+   dd_spaceship() returns undef if at least one of $arg1
+   and $arg2 is NaN.
+
+  $integer = dd_eq ($arg1, $arg2);
+  $integer = dd_neq($arg1, $arg2);
+  $integer = dd_gt($arg1, $arg2);
+  $integer = dd_gte($arg1, $arg2);
+  $integer = dd_lt($arg1, $arg2);
+  $integer = dd_lte($arg1, $arg2);
+
+   If (respectively) $arg1 == $arg2, $arg1 != $arg2,
+   $arg1 > $arg2, $arg1 >= $arg2, $arg1 < $arg2, $arg1 <= $arg2,
+   then $integer is set to 1.
+   Else $integer is set to 0.
+
+=head1 OUTPUT FUNCTIONS
+
+  $str = dd_stringify($obj);
+
+   Return a string that begins with "[" and ends with "]".
+   In between show, a space-delimited decimal string
+   representation of the more significant double followed by the
+   less significant double. Both doubles  will be shown in as few
+   digits as possible, while not losing any information.
+   The overloading of interpolation uses this function.
+
+  $str = dd_repro($obj); # "repro" short for "reproducible"
+
+   Display the value of $obj in scientific notation, using
+   as few decimal mantissa digits as possible. If this $str
+   is assigned to a new Math::FakeDD object, then the new
+   Math::FakeDD object will be identical to (ie a reproduction
+   of) the Math::FakeDD object from which $str was derived.
+
+  $str = dd_dec($obj); # "dec" short for "decimalize"
+
+   Display the exact value of $obj in scientific notation,
+   using as many digits as required to provide that exactness.
+   As with dd_repro(), if this $str is assigned to a new
+   Math::FakeDD object, then the new Math::FakeDD object will
+   be identical to the Math::FakeDD object from which this
+   $str was derived. However, the number of mantissa digits
+   returned by dd_dec() will be >= (usually greater than) the
+   number of mantissa digits returned by dd_repro().
+
+=head1 OPERATOR OVERLOADING
+
+  The following operations are currently overloaded:
+   "", ==, !=, *, *=, **, **=, +, +=, -, -=, /, /=, <, <=, <=>, >, >=,
+   abs, int, exp, log, sqrt,
+   atan2, cos, sin
+
+  Run
+    my %oloads = Math::FakeDD::oload();
+
+  The keys are the overloaded operations, and their respective values
+  name the functions used in the respective operation.
+  These functions are documented above - except for dd_true() and
+  dd_false() which are documented here:
+
+  dd_true($obj);
+
+   This function is not exported.
+   It is intended to be called only by overloading of 'bool'.
+   Returns 1 unless $obj is NaN or zero; else returns 0.
+   (This is the same criterion as used by Math::MPFR's overloading
+   of 'bool'.)
+
+  dd_false($obj);
+
+   This function is not exported.
+   It is intended to be called only by overloading of '!'.
+   Returns 1 if $obj is NaN or zero; else returns 0.
+   (This is the same criterion as used by Math::MPFR's overloading
+   of '!'.)
+
+=head1 OTHER FUNCTIONS (not exported and might later be removed or altered)
+
+  $obj = mpfr2dd($mpfr);
+
+   Return the value held by the 2098-bit precision Math::MPFR object $mpfr
+   as a Math::FakeDD object $obj.
+   This conversion can lose precision - ie, can be subject to rounding.
+
+  $mpfr = dd2mpfr($obj);
+
+   Return the value held by the Math::FakeDD object $obj as a 2098-bit
+   precision Math::MPFR object $mpfr.
+   No precision is lost in this conversion.
+
+  $mpfr = mpfr2098($in);
+
+   Return the value held by $in as the 2098-bit precision Math::MPFR
+   object $mpfr.
+   $in can be a string (PV), an integer (IV), an unsigned integer (UV),
+   a perl floating point (NV) - but not a Math::FakeDD object.
+   To convert a Math::FakeDD object to a 2098-bit precision Math::MPFR
+   object, use dd2mpfr() instead.
+
+
+=head1 ARITHMETIC IMPLEMENTATION
+
+  Operands are first converted to a 2098-bit value (Math::MPFR object).
+  If the operand is a Math::FakeDD object then the conversion is exact.
+  Else, the conversion might not be exact, depending upon the value.
+  The result of the operation on the 2098-bit operand(s) will also be
+  rounded to 2098 bits, and that value will then be rounded to its
+  DoubleDouble format and returned as a Math::FakeDD object.
+  DoubleDoubles with real values have precision of between 107 and
+  2098 bits (depending upon their value), except for subnormalized
+  double precision values where precision is in the range 1 to 52
+  bits (depending upon value).
+
+  All rounding is done to nearest, with ties to even.
+
+=head1 LICENSE
+
+  This program is free software; you may redistribute it and/or
+  modify it under the same terms as Perl itself.
+  Copyright 2022, Sisyphus
+
+=head1 AUTHOR
+
+  Sisyphus <sisyphus at(@) cpan dot (.) org>
+
+=cut

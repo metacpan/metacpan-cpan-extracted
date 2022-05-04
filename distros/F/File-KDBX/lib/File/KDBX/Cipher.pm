@@ -12,7 +12,7 @@ use Module::Load;
 use Scalar::Util qw(looks_like_number);
 use namespace::clean;
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 my %CIPHERS;
 
@@ -158,7 +158,7 @@ File::KDBX::Cipher - A block cipher mode or cipher stream
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 SYNOPSIS
 
