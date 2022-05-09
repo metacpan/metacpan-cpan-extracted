@@ -1,5 +1,5 @@
 package Selenium::Remote::Commands;
-$Selenium::Remote::Commands::VERSION = '1.46';
+$Selenium::Remote::Commands::VERSION = '1.47';
 use strict;
 use warnings;
 
@@ -521,7 +521,7 @@ Selenium::Remote::Commands - Implement commands for Selenium::Remote::Driver for
 
 =head1 VERSION
 
-version 1.46
+version 1.47
 
 =head1 DESCRIPTION
 

@@ -2,7 +2,7 @@
 # output from Module::Build::Compat version 0.03
 use strict;
 use File::Spec;
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.31;
 
 my $has_os = eval { require Perl::OSType; };
 warn "No Perl::OSType\n" unless ($has_os or $] < 5.014);
@@ -25,6 +25,7 @@ WriteMakefile(
 	  ABSTRACT_FROM	=> 'lib/File/Rename.pm',
 					# retrieve abstract from module
 	  AUTHOR     	=> 'Robin Barker <RMBarker@cpan.org>',
+      LICENSE       => 'perl',
 
 	  NORECURS	=> 1,
 );

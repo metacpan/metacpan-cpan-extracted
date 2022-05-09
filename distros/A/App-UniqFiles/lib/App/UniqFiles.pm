@@ -1,17 +1,17 @@
 package App::UniqFiles;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-01'; # DATE
-our $DIST = 'App-UniqFiles'; # DIST
-our $VERSION = '0.132'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
 
-require Exporter;
-our @ISA       = qw(Exporter);
+use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-05-09'; # DATE
+our $DIST = 'App-UniqFiles'; # DIST
+our $VERSION = '0.133'; # VERSION
+
 our @EXPORT_OK = qw(uniq_files);
 
 our %SPEC;
@@ -411,7 +411,7 @@ App::UniqFiles - Report or omit duplicate file contents
 
 =head1 VERSION
 
-This document describes version 0.132 of App::UniqFiles (from Perl distribution App-UniqFiles), released on 2020-06-01.
+This document describes version 0.133 of App::UniqFiles (from Perl distribution App-UniqFiles), released on 2022-05-09.
 
 =head1 SYNOPSIS
 
@@ -426,7 +426,7 @@ This document describes version 0.132 of App::UniqFiles (from Perl distribution 
 
 Usage:
 
- uniq_files(%args) -> [status, msg, payload, meta]
+ uniq_files(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Report or omit duplicate file contents.
 
@@ -514,12 +514,12 @@ Show the size for each file.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -530,14 +530,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-UniqFi
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-App-UniqFiles>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-UniqFiles>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -551,11 +543,43 @@ a shortcut for C<< uniq-files -D -R . | while read f; do mv "$f" SOMEDIR/; done
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017, 2015, 2014, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2020, 2019, 2017, 2015, 2014, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-UniqFiles>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

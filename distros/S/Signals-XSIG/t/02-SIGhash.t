@@ -27,6 +27,10 @@ ok($XSIG{$s1}[0] eq 'IGNORE', 'assign to @SIG{} changes %XSIG');
 ok($XSIG{$s2}[0] eq 'DEFAULT', '... changes %XSIG');
 ok(tied %SIG, '%SIG is still tied');
 
+# clearing %SIG here sometimes causes a BUS error
+# (8d9e39ce-406b-11e7-a074-e1beba07c9dd) and sometimes
+# it doesn't (3ad3d3ba-404e-11e7-a074-e1beba07c9dd)
+
 if ($] < 5.011) { diag "clearing %SIG" }
 %SIG = ();
 if ($] < 5.011) { diag "cleared %SIG" }

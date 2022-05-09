@@ -22,6 +22,7 @@ t/author-pod-syntax.t
 t/bad/OnePointElevenBad-6.0.1.opm
 t/bad/QuickMergeInvalid-3.3.3.opm
 t/good/AdminEmailTest-6.0.1.opm
+t/good/CustomerWarnAndErr.sopm
 t/good/MultiSMTP.sopm
 t/good/OnePointEleven-6.0.1.opm
 t/good/ProductNews-5.0.9.opm

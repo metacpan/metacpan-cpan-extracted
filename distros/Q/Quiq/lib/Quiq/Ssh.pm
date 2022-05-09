@@ -54,11 +54,12 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.201';
+our $VERSION = '1.202';
 
 use Quiq::Parameters;
 use Net::SSH::Perl ();
 use Quiq::Shell;
+use Quiq::Exit;
 use Encode ();
 
 # -----------------------------------------------------------------------------
@@ -244,7 +245,8 @@ sub exec {
     $exit //= 0;
     if (!$sloppy) {
         # $exit ist als Exitcode kodiert
-        Quiq::Shell->checkError($exit*256,undef,$cmd);
+        # Quiq::Shell->checkError($exit*256,undef,$cmd);
+        Quiq::Exit->check($exit*256,$cmd);
     }
 
     return ($stdout,$stderr,$exit);
@@ -254,7 +256,7 @@ sub exec {
 
 =head1 VERSION
 
-1.201
+1.202
 
 =head1 AUTHOR
 

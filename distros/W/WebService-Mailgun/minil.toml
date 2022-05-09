@@ -3,4 +3,4 @@ badges = ["travis", "coveralls"]
 module_maker = "ModuleBuildTiny"
 markdown_maker = "Pod::Markdown::Github"
 [FileGatherer]
-exclude_match = ["Dockerfile", "docker-compose.yml"]
+exclude_match = ["Dockerfile", "docker-compose.yml", ".pause"]

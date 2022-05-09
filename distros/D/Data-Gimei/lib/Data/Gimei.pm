@@ -1,6 +1,6 @@
 package Data::Gimei;
 
-use version; our $VERSION = version->declare("v0.0.6");
+use version; our $VERSION = version->declare("v0.0.7");
 
 use Data::Gimei::Name;
 use Data::Gimei::Address;
@@ -9,7 +9,6 @@ use Data::Gimei::Word;
 use strict;
 use warnings;
 use feature ':5.12';
-use utf8;
 
 my $seed = srand();
 
@@ -42,7 +41,6 @@ Data::Gimei - a Perl port of Ruby's gimei generates fake data in Japanese.
 
 =head1 SYNOPSIS
 
-  use utf8;
   binmode STDOUT, ":utf8";
   use feature ':5.12';
 

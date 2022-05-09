@@ -36,7 +36,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.201';
+our $VERSION = '1.202';
 
 use Quiq::Assert;
 
@@ -55,6 +55,11 @@ use Quiq::Assert;
 =head4 Attributes
 
 =over 4
+
+=item autoHide => $bool (Default: 0)
+
+Schließe das Menü, wenn der Mauszeiger das Triggerelement
+oder das Menü verlässt.
 
 =item callback => $jsFunction
 
@@ -115,6 +120,7 @@ sub new {
     # @_: @keyVal
 
     my $self = $class->SUPER::new(
+        autoHide => 0,
         callback => undef,
         className => undef,
         items => [],
@@ -155,8 +161,8 @@ sub js {
 
     # Objektattribute
 
-    my ($callback,$className,$itemA,$selector,$trigger) =
-        $self->get(qw/callback className items selector trigger/);
+    my ($autoHide,$callback,$className,$itemA,$selector,$trigger) =
+        $self->get(qw/autoHide callback className items selector trigger/);
 
     # Prüfe Attributwerte
 
@@ -170,6 +176,7 @@ sub js {
         className => $className,
         selector => $selector,
         trigger => $trigger,
+        autoHide => $autoHide? \'true': \'false',
         callback => $j->code($callback),
         items => $j->object(@$itemA),
     ).');';
@@ -179,7 +186,7 @@ sub js {
 
 =head1 VERSION
 
-1.201
+1.202
 
 =head1 AUTHOR
 

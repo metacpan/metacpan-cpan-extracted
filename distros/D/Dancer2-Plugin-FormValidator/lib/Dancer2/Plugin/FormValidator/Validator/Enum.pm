@@ -1,5 +1,8 @@
 package Dancer2::Plugin::FormValidator::Validator::Enum;
 
+use strict;
+use warnings;
+
 use Moo;
 use utf8;
 use List::Util qw(any);

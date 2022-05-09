@@ -17,8 +17,8 @@ use Test::More;
 
 	dies_ok {
 		form_message Requried => 'typo in name';
-	}
-	'typo dies ok';
+		}
+		'typo dies ok';
 
 	note $@;
 

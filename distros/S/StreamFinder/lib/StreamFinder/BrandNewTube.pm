@@ -420,20 +420,24 @@ sub new
 		}
 		if ($html) {
 			$self->{'title'} = ($html =~ m#\<title\>([^\<]+)\<\/title\>#s) ? $1 : '';
-			$self->{'title'} ||= $1  if ($html =~ m#\<meta\s+property\=\"?og\:title\"?\s+content\=\"([^\"]+)\"#s);
+			$self->{'title'} ||= $1  if ($html =~ m#\<meta\s+(?:name|property)\=\"?(?:og|twitter)\:title\"?\s+content\=\"(.+?)\"\s*\/?\>#s);
 
-			if ($html =~ m#<div class="publisher-name(.+)?\/div\>#s) {
+			if ($html =~ m#<div class="publisher-name(.+?)\/div\>#s) {
 				my $publisherHtml = $1;
 				$self->{'artist'} = $1  if ($publisherHtml =~ m#\>([^\<]+)\<\/a#s);
 				$self->{'albumartist'} = $1  if ($publisherHtml =~ m#\<a\s+href\=\"([^\"]+)#s);
-				$self->{'year'} = $1  if ($publisherHtml =~ m#(\d+)\<\/span#s);
+				if ($publisherHtml =~ m#\<span\s+title="Published on\s+([^\"]+)#s) {
+					$self->{'created'} = $1;
+					$self->{'year'} = $1  if ($self->{'created'} =~ /\d\d\d\d$/);
+				}
+				$self->{'year'} ||= $1  if ($publisherHtml =~ m#(\d+)\<\/span#s);
 			}
-			if ($html =~ m#<div class="publisher-avatar(.+)?\/div\>#s) {
+			if ($html =~ m#<div class="publisher-avatar(.+?)\/div\>#s) {
 				my $publisherHtml = $1;
 				$self->{'articonurl'} = $1  if ($publisherHtml =~ m#\<img\s+src\=\"([^\"]+)#s);
 				$self->{'albumartist'} ||= $1  if ($publisherHtml =~ m#\<a\s+href\=\"([^\"]+)#s);
 			}
-			if ($html =~ m#<div class="video-published(.+)?\/div\>#s) {
+			if ($html =~ m#<div class="video-published(.+?)\/div\>#s) {
 				my $publisherHtml = $1;
 				$self->{'genre'} = HTML::Entities::decode_entities($1)  if ($publisherHtml =~ m#\>([^\<]+)\<\/a#s);
 			}
@@ -445,6 +449,12 @@ sub new
 			$self->{'iconurl'} ||= $1  if ($html =~ m#<meta\s+name\=\"(?:og\:|twitter\:)?image\"\s+content\=\"([^\"]+)#s);
 
 			$self->{'imageurl'} = $1  if ($html =~ m# poster\=\"([^\"]+)#s);
+
+			foreach my $i (qw(description title artist genre)) {
+				$self->{$i} = HTML::Entities::decode_entities($self->{$i});
+				$self->{$i} = uri_unescape($self->{$i});
+				$self->{$i} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egso;
+			}
 
 			#TRY TO FETCH STREAMS:
 			while ($html =~ s#\<source\s+src\=\"([^\"]+)\"##so) {
@@ -486,12 +496,17 @@ sub new
 	}
 
 	$self->{'cnt'} = scalar @{$self->{'streams'}};
+	$self->{'title'} =~ s/\s+\-\s+$self->{'artist'}\s*$//;  #CONVERT "Title - Artist" => "Title"
 	foreach my $field (qw(description artist title)) {
 		$self->{$field} = HTML::Entities::decode_entities($self->{$field});
 		$self->{$field} = uri_unescape($self->{$field});
 		$self->{$field} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/eg;
 	}
-	$self->{'title'} =~ s/\s+\-\s+$self->{'artist'}\s*$//;  #CONVERT "Title - Artist" => "Title"
+	#SOME TITLES HAVE WIDE CHARACTERS, REMOVE 'EM!:
+	$self->{'title'} =~ s/(.)/'\x'.sprintf('%02x',ord($1))/eg;
+	$self->{'title'} =~ s/\\x[0-9a-f][0-9a-f][0-9a-f]+//g;
+	$self->{'title'} =~ s/\\x\{?([0-9A-Fa-f]{2})\}?/chr(hex($1))/eg;
+
 	$self->{'imageurl'} ||= $self->{'iconurl'};
 	$self->{'iconurl'} ||= $self->{'imageurl'};
 	$self->{'iconurl'} ||= $self->{'articonurl'}  if ($self->{'articonurl'});
@@ -499,7 +514,7 @@ sub new
 	$self->{'Url'} = ($self->{'cnt'} > 0) ? $self->{'streams'}->[0] : '';
 	print STDERR "--SUCCESS: 1st stream=".$self->{'Url'}."= total=".$self->{'total'}."=\n"
 			if ($DEBUG && $self->{'cnt'} > 0);
-	print STDERR "\n--ID=".$self->{'id'}."=\n--TITLE=".$self->{'title'}."=\n--CNT="
+	print STDERR "\n--ID=".$self->{'id'}."=\n--TITLE=".$self->{'title'}."= ARTIST=".$self->{'artist'}."=\n--CNT="
 			.$self->{'cnt'}."=\n--ICON=".$self->{'iconurl'}."=\n--1ST=".$self->{'Url'}
 			."=\n--streams=".join('|',@{$self->{'streams'}})."=\n"  if ($DEBUG);
 	$self->_log($url);

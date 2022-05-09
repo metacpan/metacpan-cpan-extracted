@@ -76,7 +76,7 @@ sub new {
   local %_ = %{$_[0]};
 
   $_{log}->cc( pr => 'debug', fm => "%s: service %s; called for dn: %s",
-	       ls => [ __PACKAGE__, $_{s}, $_{obj}->dn, ] ) if $_{v} > 2;
+	       ls => [ sprintf("%s:%s",__FILE__,__LINE__), $_{s}, $_{obj}->dn, ] ) if $_{v} > 2;
 
   my $ns_txt_pfx = $_{cf}->get('service', $_{s}, 'ns_txt_pfx');
   my $re    = qr/^$ns_txt_pfx/;
@@ -106,13 +106,13 @@ sub new {
 
     } else {
       $_{log}->cc( pr => 'err', fm => "%s: can't get TXT for zone: %s; %s",
-		   ls => [ __PACKAGE__, $ptr_z, $resolver->errorstring, ] );
+		   ls => [ sprintf("%s:%s",__FILE__,__LINE__), $ptr_z, $resolver->errorstring, ] );
     }
   }
 
   ####### to fix this
   if ( ! scalar(@zones) ) {
-    $_{log}->cc( pr => 'err', fm => "%s: imposible to get zone/s", ls => [ __PACKAGE__ ] );
+    $_{log}->cc( pr => 'err', fm => "%s: imposible to get zone/s", ls => [ sprintf("%s:%s",__FILE__,__LINE__) ] );
     return;
   }
 
@@ -127,7 +127,7 @@ sub new {
       push @servers, $rr[0]->mname;
     } else {
       $_{log}->cc( pr => 'err', fm => "%s: can't get SOA for zone: %s; %s",
-		   ls => [ __PACKAGE__, $ptr_z, $resolver->errorstring, ] );
+		   ls => [ sprintf("%s:%s",__FILE__,__LINE__), $ptr_z, $resolver->errorstring, ] );
     }
   }
 
@@ -186,10 +186,10 @@ sub ldap_sync_add_modify {
   my ( $update, $fqdn_a, $fqdn_ptr, $query, @rr, $ptr, $a, $tmp, $reply);
 
   $self->log->cc( pr => 'debug', fm => "%s: object reverse zone: %s",
-		  ls => [ __PACKAGE__, $self->ptr_z ]) if $self->v > 2;
+		  ls => [ sprintf("%s:%s",__FILE__,__LINE__), $self->ptr_z ]) if $self->v > 2;
 
   $self->log->cc( pr => 'debug', fm => "%s: object hostname: %s",
-		  ls => [ __PACKAGE__, $d_nam, ] ) if $self->v > 2;
+		  ls => [ sprintf("%s:%s",__FILE__,__LINE__), $d_nam, ] ) if $self->v > 2;
 
   my ( $zone, $param );
   foreach $zone ( @{$self->zones} ) {
@@ -213,7 +213,7 @@ sub ldap_sync_add_modify {
 
     $update = new Net::DNS::Update($zone);
     $self->log->cc( pr => 'debug', fm => "%s: object expected %s record: %s",
-		    ls => [ __PACKAGE__, $param->{type},
+		    ls => [ sprintf("%s:%s",__FILE__,__LINE__), $param->{type},
 			    $param->{type} eq 'A' ? $param->{fqdn} : $param->{reverse}, ] );
 
     $query = $self->resolver->query($param->{type} eq 'A' ? $param->{fqdn} : $param->{reverse},
@@ -223,11 +223,11 @@ sub ldap_sync_add_modify {
       $param->{rr} = $param->{type} eq 'A' ? $rr[0]->address : $rr[0]->ptrdname;
 
       $self->log->cc( pr => 'debug', fm => "%s: query type: %s; RR: %s",
-		      ls => [ __PACKAGE__, $param->{type}, $param->{rr} ] ) if $self->v > 2;
+		      ls => [ sprintf("%s:%s",__FILE__,__LINE__), $param->{type}, $param->{rr} ] ) if $self->v > 2;
 
     } else {
       $self->log->cc( pr => 'err', fm => "%s: unable to resolve %s record: %s; error: %s",
-		      ls => [ __PACKAGE__,$param->{type},
+		      ls => [ sprintf("%s:%s",__FILE__,__LINE__),$param->{type},
 			      $param->{type} eq 'A' ? $param->{fqdn} : $param->{reverse},
 			      $self->resolver->errorstring, ] );
     }
@@ -256,7 +256,7 @@ sub ldap_sync_add_modify {
       $update->push( update => rr_del(  $param->{fqdn}) );
 
     } else {
-      $self->log->cc( pr => 'debug', fm => "%s: nothing to update", ls => [ __PACKAGE__ ] );
+      $self->log->cc( pr => 'debug', fm => "%s: nothing to update", ls => [ sprintf("%s:%s",__FILE__,__LINE__) ] );
       next;
     }
 
@@ -264,20 +264,20 @@ sub ldap_sync_add_modify {
       if $self->cf->is_set('service', $self->service, 'ns_keyfile');
 
     $self->log->cc( pr => 'warning', fm => "%s: update->string:\n%s\n",
-		    ls => [ __PACKAGE__, $update->string ] ) if $self->v > 2;
+		    ls => [ sprintf("%s:%s",__FILE__,__LINE__), $update->string ] ) if $self->v > 2;
 
     $reply = $self->resolver->send($update);
 
     if ($reply) {
       if ( $reply->header->rcode eq 'NOERROR' ) {
-    	$self->log->cc( pr => 'debug', fm => "%s: update successful", ls => [ __PACKAGE__ ] );
+    	$self->log->cc( pr => 'debug', fm => "%s: update successful", ls => [ sprintf("%s:%s",__FILE__,__LINE__) ] );
       } else {
     	$self->log->cc( pr => 'err', fm => "%s: update failed: %s",
-    			ls => [ __PACKAGE__, $reply->header->rcode ] );
+    			ls => [ sprintf("%s:%s",__FILE__,__LINE__), $reply->header->rcode ] );
       }
     } else {
       $self->log->cc( pr => 'err', fm => "%s: update failed: %s",
-    		      ls => [ __PACKAGE__, $self->resolver->errorstring ] );
+    		      ls => [ sprintf("%s:%s",__FILE__,__LINE__), $self->resolver->errorstring ] );
     }
 
     undef @rr;

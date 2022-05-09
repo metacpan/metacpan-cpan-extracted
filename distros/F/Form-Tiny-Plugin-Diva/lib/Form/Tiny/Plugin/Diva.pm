@@ -4,7 +4,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Form::Tiny::Plugin::Diva::Adapter;
 use Form::Tiny::Plugin::Diva::MetaRole;
@@ -61,14 +61,16 @@ sub _build_diva
 		push @$push_to, {%field_data, comment => \%field_data};
 	}
 
-	weaken $self;
-	return Form::Tiny::Plugin::Diva::Adapter->new(
+	my $obj = Form::Tiny::Plugin::Diva::Adapter->new(
 		%config,
 		form => \@fields,
 		hidden => \@hidden,
 
 		form_instance => $self,
 	);
+
+	weaken $obj->{form_instance};
+	return $obj;
 }
 
 1;
@@ -222,3 +224,4 @@ at your option, any later version of Perl 5 you may have available.
 
 
 =cut
+

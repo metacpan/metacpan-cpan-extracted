@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<otrs_package version="1.0">
+    <!-- GENERATED WITH OPM::Maker::Command::sopm (1.1.0) -->
+    <Name>CustomerWarnAndErr</Name>
+    <Version>0.6.3</Version>
+    <Framework>6.0.x</Framework>
+    <Vendor>Perl-Services.de</Vendor>
+    <URL>http://www.perl-services.de</URL>
+    <Description Lang="de">Zusätzliche Informationen zu Kunden.</Description>
+    <Description Lang="en">Additional information about customers</Description>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <Filelist>
+        <File Permission="644" Location="Custom/Kernel/Modules/AgentCustomerWarnAndErr.pm" />
+        <File Permission="644" Location="Custom/Kernel/System/Ticket/Event/WarningsArticle.pm" />
+        <File Permission="644" Location="Kernel/Config/Files/XML/CustomerWarnAndErr.xml" />
+        <File Permission="644" Location="Kernel/Output/HTML/FilterElementPost/CustomerWarnAndErr.pm" />
+        <File Permission="644" Location="doc/CustomerWarnAndErr.json" />
+        <File Permission="644" Location="var/httpd/htdocs/js/PS.Core.UI.Notify.js" />
+    </Filelist>
+    <DatabaseInstall Type="post">
+        <TableAlter Name="customer_user">
+            <ColumnAdd Name="customer_warning" Required="false" Type="VARCHAR" Size="1500" />
+            <ColumnAdd Name="customer_error" Required="false" Type="VARCHAR" Size="1500" />
+        </TableAlter>
+        <TableAlter Name="customer_company">
+            <ColumnAdd Name="company_warning" Required="false" Type="VARCHAR" Size="1500" />
+            <ColumnAdd Name="company_error" Required="false" Type="VARCHAR" Size="1500" />
+        </TableAlter>
+    </DatabaseInstall>
+    <DatabaseUninstall Type="pre">
+        <TableAlter Name="customer_company">
+            <ColumnDrop Name="company_warning" />
+            <ColumnDrop Name="company_error" />
+        </TableAlter>
+        <TableAlter Name="customer_user">
+            <ColumnDrop Name="customer_warning" />
+            <ColumnDrop Name="customer_error" />
+        </TableAlter>
+    </DatabaseUninstall>
+    <IntroInstall Type="post"><![CDATA[
+            Add this to your Kernel/Config.pm:<br />
+<br />
+if ( !grep{ $_->[0] eq 'CustomerWarning' }@{ $Self->{CustomerUser}->{Map} } ) {<br />
+    push @{ $Self->{CustomerUser}->{Map} }, [ 'CustomerWarning', 'Warning', 'customer_warning', 1, 0, 'var', '', 0 ];<br />
+    push @{ $Self->{CustomerUser}->{Map} }, [ 'CustomerError', 'Error', 'customer_error', 1, 0, 'var', '', 0 ];<br />
+}<br />
+<br />
+if ( !grep{ $_->[0] eq 'CompanyWarning' }@{ $Self->{CustomerCompany}->{Map} } ) {<br />
+    push @{ $Self->{CustomerCompany}->{Map} }, [ 'CompanyWarning', 'Warning', 'company_warning', 1, 0, 'var', '', 0 ];<br />
+    push @{ $Self->{CustomerCompany}->{Map} }, [ 'CompanyError', 'Error', 'company_error', 1, 0, 'var', '', 0 ];<br />
+}
+    ]]></IntroInstall>
+</otrs_package>

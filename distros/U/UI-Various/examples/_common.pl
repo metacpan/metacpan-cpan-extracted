@@ -28,7 +28,7 @@ BEGIN {
     0 < @ARGV  and  $ARGV[0] =~ m/^[1-4]$/
 	and  @packages = ((PACKAGES)[$ARGV[0] - 1]);
 }
-use UI::Various({use => [@packages], log => 'INFO'});
+use UI::Various({use => [@packages], log => 'INFO', stderr => 1});
 
 #########################################################################
 # handle '-?' or bad parameters:

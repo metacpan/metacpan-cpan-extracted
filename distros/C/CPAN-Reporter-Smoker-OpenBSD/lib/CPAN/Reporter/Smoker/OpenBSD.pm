@@ -7,13 +7,13 @@ use CPAN::HandleConfig;
 
 our @EXPORT_OK = qw(is_distro_ok block_distro);
 
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 =pod
 
 =head1 NAME
 
-CPAN::Reporter::Smoker::OpenBSD - set of scripts to manage a 
+CPAN::Reporter::Smoker::OpenBSD - set of scripts to manage a
 L<CPAN::Reporter::Smoker> on OpenBSD
 
 =head1 DESCRIPTION

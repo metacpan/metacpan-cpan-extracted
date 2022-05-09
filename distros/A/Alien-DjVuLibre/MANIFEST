@@ -1,0 +1,16 @@
+alienfile
+Changes
+DjVuLibre.pm
+examples/ex1.pl
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/Alien-DjVuLibre/01-use.t
+t/Alien-DjVuLibre/02-version.t
+t/Alien-DjVuLibre/03-xs.t
+xt/Alien-DjVuLibre/01-pod_coverage.t
+xt/Alien-DjVuLibre/02-pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

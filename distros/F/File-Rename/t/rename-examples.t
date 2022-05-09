@@ -2,7 +2,7 @@ use strict;
 
 use Test::More;
 
-push @INC, qw(blib/script) if -d 'blib';
+push @INC, qw(blib/script blib/bin) if -d 'blib';
 unshift @INC, qw(t) if -d 't';
 require 'testlib.pl';
 

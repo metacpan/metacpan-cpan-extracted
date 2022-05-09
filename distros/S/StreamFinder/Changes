@@ -434,3 +434,9 @@ Revision history for StreamFinder
         - Add StreamFinder::PodcastAddict (podcastaddict.com podcasts)
         - Improve module-selection speed/efficiency (only require in module 
         matching URL, instead of all modules).
+1.85    2022/05/06
+        - StreamFinder::PodcastAddict - Fix failure of some video URLs to play.
+        - StreamFinder::SermonAudio - Fix failure to fetch some icons properly.
+        - StreamFinder::SermonAudio - Add a "-quality" option to limit streams 
+        returned to "audio", "low", "high", or "any" (default) - see docs.
+        - StreamFinder::BrandNewTube - Several metadata-fetching improvements.

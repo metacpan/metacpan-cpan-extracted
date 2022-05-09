@@ -159,10 +159,6 @@ COMMUNITY
 
       Code repository, Wiki and Issue Tracker
 
-    irc://irc.perl.org/#cpanm
-
-      IRC chat room
-
 AUTHOR
 
     Tatsuhiko Miyagawa
@@ -176,6 +172,8 @@ LICENSE
     This software is licensed under the same terms as Perl itself.
 
 SEE ALSO
+
+    Carmel
 
     cpanm
 

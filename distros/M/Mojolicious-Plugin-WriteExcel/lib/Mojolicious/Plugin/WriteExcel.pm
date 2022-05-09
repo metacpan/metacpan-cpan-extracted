@@ -3,7 +3,7 @@ package Mojolicious::Plugin::WriteExcel;
 use Mojo::Base 'Mojolicious::Plugin';
 use Spreadsheet::WriteExcel::Simple;
 
-our $VERSION = '2.05';
+our $VERSION = '3.00';
 
 # You just have to give guys a chance. Sometimes you meet a guy and
 # think he's a pig, but then later on you realize he actually has a
@@ -27,7 +27,7 @@ sub xls_renderer {
   }
 
   if (ref $settings) {
-    $c->reply->exception("invalid column width")
+    die "invalid column width"
       unless defined $settings->{column_width};
     for my $col (keys %{$settings->{column_width}}) {
       $ss->sheet->set_column($col, $settings->{column_width}->{$col});

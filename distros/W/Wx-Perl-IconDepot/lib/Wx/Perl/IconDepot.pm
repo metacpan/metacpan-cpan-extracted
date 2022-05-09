@@ -10,7 +10,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION);
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Wx qw( :image );
 use File::Basename;
@@ -79,21 +79,22 @@ Others: $ENV{HOME} . '/.local/share/icons', '/usr/share/icons'
 =cut
 
 sub new {
-   my $proto = shift;
-   my $class = ref($proto) || $proto;
+	my ( $proto, $pathlist, $rawlist) = @_;
+	my $class = ref($proto) || $proto;
 
-   my $self = {};
-   bless ($self, $class);
+	my $self = {};
+	bless ($self, $class);
 
-   my $pathlist = shift;
-   unless (defined $pathlist) { $pathlist = \@iconpath };
+	$pathlist = \@iconpath unless defined $pathlist;
+	$rawlist = [] unless defined $rawlist;
 
-   $self->{ACTIVE} = [];
-   $self->{ACTIVENAMES} = [];
-   $self->{DEFAULTSIZE} = 22;
-   $self->{FORCEIMAGE} = 1;
-   $self->{INDEX} = undef;
+	$self->{ACTIVE} = [];
+	$self->{ACTIVENAMES} = [];
+	$self->{DEFAULTSIZE} = 22;
+	$self->{FORCEIMAGE} = 1;
+	$self->{INDEX} = undef;
 	$self->{ICONPATH} = $pathlist;
+	$self->{RAWPATH} = $rawlist;
 	$self->{MISSINGIMAGE} = $self->FindINC('Wx/Perl/IconDepot/image_missing.png');
 	$self->{THEMEPOOL} = {};
 	$self->{THEMES} = $self->CollectThemes;
@@ -234,6 +235,7 @@ of all contexts found in $theme.
 sub AvailableSizes {
 	my ($self, $theme, $name, $context) = @_;
 	my $t = $self->GetTheme($theme);
+	return () unless defined $t;
 
 	my %found = ();
 	if ((not defined $name) and (not defined $context)) {
@@ -310,6 +312,59 @@ except $name are optional.
 
 sub FindImage {
 	my ($self, $name, $size, $context, $resize) = @_;
+	my $img = $self->FindRawImage($name, $size, $resize);
+	return $img if defined $img;
+	return $self->FindLibImage($name, $size, $context, $resize);
+}
+
+###############################################################################
+=item B<FindRawImage>I<($name, >[ I<$size, $context, \$resize> ] I<);>
+
+=over 4
+
+Returns the filename of an image in the library. Finds the best suitable
+version of the image in the library according to $size and $context. If it
+eventually returns an image of another size, it sets $resize to 1. This gives
+the opportunity to scale the image to the requested icon size. All parameters
+except $name are optional.
+
+=back
+
+=cut
+
+sub FindRawImage {
+	my ($self, $name, $size) = @_;
+	my $path = $self->{RAWPATH};
+	for (@$path) {
+		my $folder = $_;
+		opendir(DIR, $folder);
+		my @files = grep(/!$name\.*/, readdir(DIR));
+		closedir(DIR);
+		for (@files) {
+			my $file = "$folder/$_";
+			return $file if $self->IsImage($file);
+		}
+	}
+	return undef
+}
+
+###############################################################################
+=item B<FindLibImage>I<($name, >[ I<$size, $context, \$resize> ] I<);>
+
+=over 4
+
+Returns the filename of an image in the library. Finds the best suitable
+version of the image in the library according to $size and $context. If it
+eventually returns an image of another size, it sets $resize to 1. This gives
+the opportunity to scale the image to the requested icon size. All parameters
+except $name are optional.
+
+=back
+
+=cut
+
+sub FindLibImage {
+	my ($self, $name, $size, $context, $resize) = @_;
 	unless (defined $size) { $size = 'unknown' }
 	unless (defined $context) { $context = 'unknown' }
 	my $active = $self->{ACTIVE};
@@ -355,7 +410,11 @@ image is returned instead of undef when the icon cannot be found.
 
 sub GetBitmap {
 	my $self = shift;
-	return Wx::Bitmap->new($self->GetImage(@_))
+	my $img = $self->GetImage(@_);
+	if (defined($img)) {
+        return Wx::Bitmap->new($img)
+    }
+    return undef
 }
 
 ###############################################################################
@@ -373,11 +432,14 @@ image is returned instead of undef when the icon cannot be found.
 =cut
 
 sub GetIcon {
-   my $self = shift;
-	my $bmp = $self->GetBitmap(@_);
-	my $icon = Wx::Icon->new();
-	$icon->CopyFromBitmap($bmp);
-	return $icon
+    my $self = shift;
+    my $bmp = $self->GetBitmap(@_);
+    if (defined($bmp)) {
+        my $icon = Wx::Icon->new();
+        $icon->CopyFromBitmap($bmp);
+        return $icon
+    }
+    return undef
 }
 
 ###############################################################################
@@ -735,7 +797,8 @@ sub GetTheme {
 			$pool->{$theme} = $index;
 			return $index
 		} else {
-			warn "Setting theme '$theme' failed"
+			warn "Accessing theme '$theme' failed";
+			return undef
 		}
 	}
 }
@@ -754,41 +817,39 @@ It returns a reference to this hash.
 
 sub LoadThemeFile {
 	my ($self, $file) = @_;
-	if (defined $file) {
-		$file = "$file/index.theme";
-		if (open(OFILE, "<", $file)) {
-			my %index = ();
-			my $section;
-			my %inf = ();
-			my $firstline = <OFILE>;
-			unless ($firstline =~ /^\[.+\]$/) {
-				warn "Illegal file format $file";
-			} else {
-				while (<OFILE>) {
-					my $line = $_;
-					chomp $line;
-					if ($line =~ /^\[([^\]]+)\]/) { #new section
-						if (defined $section) { 
-							$index{$section} = { %inf } 
-						} else {
-							$index{general} = { %inf } 
-						}
-						$section = $1;
-						%inf = ();
-					} elsif ($line =~ s/^([^=]+)=//) { #new key
-						$inf{$1} = $line;
-					}
-				}
-				if (defined $section) { 
-					$index{$section} = { %inf } 
-				}
-				close OFILE;
-			}
-			return \%index;
-		} else {
-			warn "Cannot open theme index file: $file"
-		}
-	}
+    $file = "$file/index.theme";
+    if (open(OFILE, "<", $file)) {
+        my %index = ();
+        my $section;
+        my %inf = ();
+        my $firstline = <OFILE>;
+        unless ($firstline =~ /^\[.+\]$/) {
+            warn "Illegal file format $file";
+        } else {
+            while (<OFILE>) {
+                my $line = $_;
+                chomp $line;
+                if ($line =~ /^\[([^\]]+)\]/) { #new section
+                    if (defined $section) { 
+                        $index{$section} = { %inf }
+                    } else {
+                        $index{general} = { %inf }
+                    }
+                    $section = $1;
+                    %inf = ();
+                } elsif ($line =~ s/^([^=]+)=//) { #new key
+                    $inf{$1} = $line;
+                }
+            }
+            if (defined $section) { 
+                $index{$section} = { %inf } 
+            }
+            close OFILE;
+        }
+        return \%index;
+    } else {
+        warn "Cannot open theme index file: $file"
+    }
 }
 
 ###############################################################################

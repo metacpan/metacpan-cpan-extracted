@@ -1,7 +1,5 @@
 package Data::Gimei::Word;
 
-use English;
-use utf8;
 use feature ':5.12';
 
 use Moo;

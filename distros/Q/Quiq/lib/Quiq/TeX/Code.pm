@@ -27,7 +27,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.201';
+our $VERSION = '1.202';
 
 use Quiq::Option;
 use Scalar::Util ();
@@ -609,7 +609,7 @@ sub toLength {
 
 =head1 VERSION
 
-1.201
+1.202
 
 =head1 AUTHOR
 

@@ -1,8 +1,9 @@
 package Dist::Zilla::Plugin::Alien;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Use Alien::Base with Dist::Zilla
-$Dist::Zilla::Plugin::Alien::VERSION = '0.023';
+$Dist::Zilla::Plugin::Alien::VERSION = '0.024';
 use Moose;
+use Data::Dumper;
 extends 'Dist::Zilla::Plugin::ModuleBuild';
 with 'Dist::Zilla::Role::PrereqSource', 'Dist::Zilla::Role::FileGatherer', 'Dist::Zilla::Role::MetaProvider';
 
@@ -239,7 +240,15 @@ sub register_prereqs {
 }
 
 has "+mb_class" => (
-	default => 'Alien::Base::ModuleBuild',
+	lazy => 1,
+	default => sub {
+		my ( $self ) = @_;
+		if( $self->has_bins ) {
+			return 'MyModuleBuild';
+		} else {
+			return 'Alien::Base::ModuleBuild';
+		}
+	},
 );
 
 after gather_files => sub {
@@ -256,19 +265,29 @@ use strict;
 use warnings;
 use File::ShareDir ':ALL';
 use Path::Class;
+use {{ $mod }};
 
-my $abs = file(dist_dir('{{ $dist->name }}'),'bin','{{ $bin }}')->cleanup->absolute;
+my $abs;
+if({{ $mod }}->install_type ne 'system') {
+	$abs = file(dist_dir('{{ $dist->name }}'),'bin','{{ $bin }}')->cleanup->absolute;
+} else {
+	die "{{ $mod }} reinstalled as non-share install. Please remove wrapper at $0";
+}
 
 exec($abs, @ARGV) or print STDERR "couldn't exec {{ $bin }}: $!";
 
 __EOT__
 
+	my @bin_paths;
 	for (@{$self->split_bins}) {
+		my $module = $self->zilla->name;
+		$module =~ s/-/::/g;
 		my $content = $self->fill_in_string(
 			$template,
 			{
 				dist => \($self->zilla),
 				bin => $_,
+				mod => $module,
 			},
 		);
 
@@ -277,8 +296,51 @@ __EOT__
 			name => 'bin/'.$_,
 			mode => 0755,
 		});
+		push @bin_paths, $file->name;
 
 		$self->add_file($file);
+	}
+
+	if( $self->has_bins ) {
+		if( $self->mb_class ne 'MyModuleBuild' ) {
+			die "Unable to set custom subclass mb_class to 'MyModuleBuild' (needed for 'bins')";
+		}
+
+		my $mb_custom_template = <<'__EOT__';
+package # hide from PAUSE
+  MyModuleBuild;
+
+use parent 'Alien::Base::ModuleBuild';
+
+sub process_script_files {
+  my $self = shift;
+
+  if( $self->config_data->{install_type} eq 'system' ) {
+    my $bins;
+    {{ $bin_paths }}
+    my %script_files = map { $_ => 1 } @{ $self->{properties}{script_files} };
+    delete @script_files{ @$bins };
+    $self->{properties}{script_files} = [ keys %script_files ];
+  }
+
+  $self->SUPER::process_script_files;
+}
+
+1;
+__EOT__
+
+		my $mb_custom_content = $self->fill_in_string(
+			$mb_custom_template,
+			{
+				bin_paths => Data::Dumper->Dump( [ \@bin_paths ], [qw(bins)]),
+			}
+		);
+		my $mb_file = Dist::Zilla::File::InMemory->new({
+			content => $mb_custom_content,
+			name => 'inc/' . $self->mb_class . '.pm',
+		});
+
+		$self->add_file($mb_file);
 	}
 };
 
@@ -353,7 +415,7 @@ Dist::Zilla::Plugin::Alien - Use Alien::Base with Dist::Zilla
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 
@@ -380,6 +442,11 @@ In your I<dist.ini>:
 
 =head1 DESCRIPTION
 
+B<NOTE>: This module uses the older, and still supported, but not actively
+developed L<Alien::Base::ModuleBuild> interface for installing aliens. You
+should use L<Dist::Zilla::Plugin::AlienBuild> for new L<Alien>s, and consider
+migration for older code as well.
+
 This is a simple wrapper around Alien::Base, to make it very simple to
 generate a distribution that uses it. You only need to make a module like
 in this case Alien::myapp which extends Alien::Base and additionally a url
@@ -395,6 +462,10 @@ case, this means, you can't just easily use it together with the common
 L<Dist::Zilla::PluginBundle::Basic>, because this includes it. As alternative
 you can use L<Dist::Zilla::PluginBundle::Alien> which is also included in this
 distribution.
+
+You should also consider using L<Dist::Zilla::Plugin::AlienBuild> for new
+development, as it uses the more modern flexible installer L<alienfile> +
+L<Alien::Build>.
 
 =head1 ATTRIBUTES
 
@@ -427,6 +498,9 @@ Instead of providing a pattern you may use this to set the exact filename.
 A space or tab seperated list of all binaries that should be wrapped to be executable
 from the perl environment (if you use perlbrew or local::lib this also
 guarantees that its available via the PATH).
+
+B<NOTE>: If you set this, the build will use a custom subclass of L<Alien::Base::ModuleBuild>
+in order to only install the wrapper scripts for a share install.
 
 =head2 name
 
@@ -572,6 +646,37 @@ installs out of the unpacked distribution for the testing:
 This will do the trick :). Be aware, that you need to add this plugin after
 I<[ModuleBuild]>. You can use L<Dist::Zilla::PluginBundle::Author::GETTY>,
 which directly use this trick in the right combination.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Alien::Base>
+
+Base class for aliens
+
+=item L<Alien::Base::ModuleBuild>
+
+Installer this plugin uses for building L<Alien>s.
+
+=item L<alienfile> + L<Alien::Build>
+
+Modern pluggable installer alternative to L<Alien::Base::ModuleBuild>.
+
+=item L<Dist::Zilla::Plugin::AlienBuild>
+
+Alternative L<Dist::Zilla> plugin that uses L<alienfile> + L<Alien::Build>.
+
+=back
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/PerlAlien/Dist-Zilla-Plugin-Alien/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 

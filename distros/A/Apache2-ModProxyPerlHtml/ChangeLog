@@ -1,3 +1,7 @@
+05 May 2022 - version 4.1
+
+	- Fix a warning in log produced by an unitialized value.
+
 11 May 2020 - version 4.0
 
 	- Update documentation to describe install with Apache 2.4 on distributions

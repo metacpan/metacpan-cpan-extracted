@@ -4,7 +4,7 @@ package Net::Async::Slack;
 use strict;
 use warnings;
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 use parent qw(IO::Async::Notifier Net::Async::Slack::Commands);
 
@@ -79,14 +79,9 @@ sub rtm {
         'rtm_connect',
     ));
     $self->{rtm} //= $self->http_get(
-        uri => URI->new(
-            $self->endpoint(
-                'rtm_connect',
-            )
+        uri => $self->endpoint(
+            'rtm_connect',
         ),
-        headers => {
-            Authorization => 'Bearer ' . $self->token
-        }
     )->then(sub {
         my $result = shift;
         return Future->done(URI->new($result->{url})) if exists $result->{url};
@@ -208,6 +203,39 @@ sub conversations_info {
     )
 }
 
+sub conversations_invite {
+    my ($self, %args) = @_;
+    my $chan = $args{channel} or die 'need a channel';
+    my @users = ref($args{users}) ? $args{users}->@* : $args{users};
+    return $self->http_post(
+        $self->endpoint(
+            'conversations_invite',
+        ),
+        {
+            channel => $chan,
+            users => join(',', @users),
+        }
+    )
+}
+
+async sub users_list {
+    my ($self, %args) = @_;
+    return await $self->http_get(
+        uri => $self->endpoint(
+            'users_list',
+            %args
+        ),
+    )
+}
+async sub conversations_list {
+    my ($self, %args) = @_;
+    return await $self->http_get(
+        uri => $self->endpoint(
+            'conversations_list',
+            %args
+        ),
+    )
+}
 async sub conversations_history {
     my ($self, %args) = @_;
     return await $self->http_get(
@@ -243,6 +271,16 @@ sub join_channel {
             'conversations_join',
         ),
         \@content,
+    )
+}
+
+async sub users_profile_get {
+    my ($self, %args) = @_;
+    return await $self->http_get(
+        uri => $self->endpoint(
+            'users_profile_get',
+            %args
+        ),
     )
 }
 
@@ -370,6 +408,7 @@ sub http_get {
     my ($self, %args) = @_;
 
     my $uri = delete $args{uri};
+    $args{headers} ||= $self->auth_headers;
     $log->tracef("GET %s { %s }", "$uri", \%args);
     $self->http->GET(
         $uri,
@@ -419,7 +458,7 @@ sub http_post {
     $args{headers} ||= $self->auth_headers;
     if(ref $content eq 'HASH') {
         $content = encode_json_utf8($content);
-        $args{content_type} = 'application/json';
+        $args{content_type} = 'application/json; charset=utf-8';
     }
     $self->http->POST(
         $uri,

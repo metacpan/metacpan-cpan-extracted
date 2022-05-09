@@ -5,22 +5,26 @@ use warnings;
 use Carmel;
 use Carmel::Runner;
 use Carp ();
+use Carmel::Builder;
+use Carmel::CPANfile;
 use Carmel::Repository;
+use Carmel::Resolver;
 use Config qw(%Config);
 use CPAN::Meta::Requirements;
 use Getopt::Long ();
-use Module::CoreList;
 use Module::CPANfile;
 use Module::Metadata;
 use Path::Tiny ();
 use Pod::Usage ();
-use File::pushd;
 use Try::Tiny;
+
+# prefer Parse::CPAN::Meta in XS, PP order with JSON.pm
+$ENV{PERL_JSON_BACKEND} = 1
+  unless defined $ENV{PERL_JSON_BACKEND};
 
 use Class::Tiny {
     verbose => sub { 0 },
     perl_arch => sub { "$Config{version}-$Config{archname}" },
-    runner => sub { Carmel::Runner->new },
 };
 
 sub parse_options {
@@ -51,14 +55,15 @@ sub run {
     my $call = $self->can("cmd_$cmd")
       or die "Can't find command '$cmd': run `carmel help` to see the list of commands.\n";
 
+    my $code = 0;
     try {
         $self->$call(@args);
     } catch {
         warn $_;
-        return 255;
+        $code = 1;
     };
 
-    return 0;
+    return $code;
 }
 
 sub repository_base {
@@ -91,23 +96,86 @@ sub cmd_version {
 
 sub cmd_inject {
     my($self, @args) = @_;
-    $self->install("--reinstall", @args);
+    $self->builder->install("--reinstall", @args);
+}
+
+sub cmd_pin {
+    my($self, @args) = @_;
+    die "carmel pin is deprecated. Use `carmel update @args` instead\n";
 }
 
 sub cmd_update {
     my($self, @args) = @_;
 
-    die "Usage: carmel update\n" if @args; # TODO supprot args
+    my $snapshot = $self->snapshot
+      or die "Can't run carmel update without snapshot. Run `carmel install` first.\n";
 
-    # reinstall everything in cpanfile to build artifacts
-    my $cpanfile = $self->try_cpanfile
-      or die "Can't locate 'cpanfile' to load module list.\n";
-    $self->install_with_cpanfile(Module::CPANfile->load($cpanfile));
+    my $target = @args ? join(", ", @args) : "all the modules in the snapshot";
+    print "---> Checking updates for $target...\n";
 
-    # then rebuild the snapshot
-    my @artifacts = $self->install_from_cpanfile(1);
-    $self->dump_bootstrap(\@artifacts);
-    $self->save_snapshot(\@artifacts);
+    my $builder = $self->builder;
+    my $requirements = $self->requirements;
+
+    my $check = sub {
+        my($module, $pathname, $in_args, $version) = @_;
+
+        my $dist = $builder->search_module($module, $version);
+        unless ($dist) {
+            if ($version) {
+                die "Can't find $module ($version) on CPAN\n";
+            } else {
+                # workaround bad main package e.g. LWP => libwww::perl
+                warn "Can't find $module on CPAN\n";
+                return;
+            }
+        }
+
+        if ($dist->pathname ne $pathname) {
+            $snapshot->remove_distributions(sub {
+                my $dist = shift;
+                $dist->provides_module($module);
+            });
+        }
+
+        if (defined $version) {
+            try {
+                $requirements->add_string_requirement($module, $version);
+            } catch {
+                my($err) = /illegal requirements(?: .*?): (.*) at/;
+                my $old = $requirements->requirements_for_module($module);
+                die "Requested version for $module '$version' conflicts with version required in cpanfile '$old': $err\n";
+            };
+        } else {
+            my $want_ver = $dist->version_for($module);
+            try {
+                $requirements->add_string_requirement($module, $want_ver);
+            } catch {
+                # there's an update but it conflicts with specs in cpanfile, ignoring
+                if ($in_args) {
+                    my($err) = /illegal requirements(?: .*?): (.*) at/;
+                    my $old = $requirements->requirements_for_module($module);
+                    die "The update for $module '$want_ver' conflicts with version required in cpanfile '$old' $err\n";
+                }
+            };
+        }
+    };
+
+    if (@args) {
+        for my $arg (@args) {
+            my($module, $version) = split '@', $arg, 2;
+            my $dist = $snapshot->find($module)
+              or die "$module is not found in the snapshot.\n";
+            $check->($module, $dist->pathname, 1, $version ? "== $version" : undef);
+        }
+    } else {
+        $self->resolve(sub {
+            my $artifact = shift;
+            $check->($artifact->package, $artifact->install->{pathname}, 0);
+        });
+    }
+
+    # rebuild the snapshot
+    $self->update_dependencies($requirements, $snapshot);
 }
 
 sub cmd_install {
@@ -115,116 +183,100 @@ sub cmd_install {
 
     die "Usage: carmel install\n" if @args;
 
-    my @artifacts = $self->install_from_cpanfile;
+    $self->update_dependencies($self->requirements, $self->snapshot);
+}
+
+sub update_dependencies {
+    my($self, $root_reqs, $snapshot) = @_;
+
+    my @artifacts = $self->install($root_reqs, $snapshot);
     $self->dump_bootstrap(\@artifacts);
     $self->save_snapshot(\@artifacts);
 }
 
-sub install_from_cpanfile {
-    my($self, $no_snapshot) = @_;
-
-    my $requirements = CPAN::Meta::Requirements->new;
-    $self->resolve(
-        sub {
-            my($artifact) = @_;
-            printf "Using %s (%s)\n", $artifact->package, $artifact->version || '0';
-        },
-        sub {
-            my($module, $want_version, $dist) = @_;
-            if ($dist) {
-                # TODO pass $dist->distfile to cpanfile
-                my $ver = version::->parse($dist->version_for($module));
-                $want_version = $ver > 0 ? "== $ver" : $ver;
-            }
-            $requirements->add_string_requirement($module => $want_version);
-        },
-        1, # strict
-        $no_snapshot,
-    );
-
-    if (my @missing = $requirements->required_modules) {
-        my $cpanfile = Module::CPANfile->from_prereqs({
-            runtime => {
-                requires => $requirements->as_string_hash,
-            },
-        });
-        print "---> Installing new dependencies: ", join(", ", @missing), "\n";
-        $self->install_with_cpanfile($cpanfile, $no_snapshot ? () : $self->snapshot );
-    }
+sub resolve_dependencies {
+    my($self, $root_reqs, $missing, $snapshot) = @_;
 
     my @artifacts;
-    $self->resolve(sub { push @artifacts, $_[0] }, undef, 0, $no_snapshot);
-
-    # $self->requirements has been upgraded at this point with the whole subreqs
-    printf "---> Complete! %d cpanfile dependencies. %d modules installed.\n" .
-      "---> Use `carmel show [module]` to see where a module is installed.\n",
-      scalar(grep { $_ ne 'perl' } $self->build_requirements->required_modules), scalar(@artifacts);
+    $self->resolver(
+        root     => $root_reqs,
+        snapshot => $snapshot,
+        found    => sub {
+            my $artifact = shift;
+            printf "Using %s (%s)\n", $artifact->package, $artifact->version || '0';
+            push @artifacts, $artifact;
+        },
+        missing  => sub {
+            my($module, $want_version) = @_;
+            $missing->add_string_requirement($module => $want_version);
+        },
+    )->resolve;
 
     return @artifacts;
 }
 
-sub is_core {
-    my($self, $module, $want_version) = @_;
-    return unless exists $Module::CoreList::version{$]+0}{$module};
-    $self->accepts($module, $want_version, $Module::CoreList::version{$]+0}{$module});
+sub is_identical_requirement {
+    my($self, $old, $new) = @_;
+
+    return unless $old;
+
+    # not super accurate but enough
+    join(',', sort $old->required_modules) eq join(',', sort $new->required_modules);
 }
 
-sub install_with_cpanfile {
-    my($self, $cpanfile, $snapshot) = @_;
+sub try_install {
+    my($self, $root_reqs, $snapshot) = @_;
 
-    my $path = Path::Tiny->tempfile;
-    $cpanfile->save($path);
+    my $prev;
+    while (1) {
+        my $missing = CPAN::Meta::Requirements->new;
+        my @artifacts = $self->resolve_dependencies($root_reqs, $missing, $snapshot);
 
-    my @options = ("--cpanfile", $path);
+        if (!$missing->required_modules) {
+            return @artifacts;
+        }
 
-    if ($snapshot) {
-        my $path = Path::Tiny->tempfile;
-        $snapshot->write_index($path);
-        push @options,
-          "--mirror-index", $path,
-          "--cascade-search",
-          "--mirror", "http://cpan.metacpan.org";
+        if ($self->is_identical_requirement($prev, $missing)) {
+            my $prereqs = $missing->as_string_hash;
+            my $requirements = join ", ", map "$_ => @{[ $prereqs->{$_} || '0' ]}", keys %$prereqs;
+            die "Can't find an artifact for $requirements\n" .
+              "You need to run `carmel install` first to get the modules installed and artifacts built.\n";
+        }
+
+        $prev = $missing;
+
+        my $cpanfile = Module::CPANfile->from_prereqs({
+            runtime => {
+                requires => $missing->as_string_hash,
+            },
+        });
+        print "---> Installing new dependencies: ", join(", ", $missing->required_modules), "\n";
+        my $builder = $self->builder(cpanfile => $cpanfile, snapshot => $snapshot);
+        $builder->install;
     }
-
-    $self->install("--installdeps", @options, ".");
 }
 
 sub install {
+    my($self, $root_reqs, $snapshot) = @_;
+
+    my @artifacts = $self->try_install($root_reqs, $snapshot);
+
+    # $root_reqs has been mutated at this point. Reload requirements
+    printf "---> Complete! %d cpanfile dependencies. %d modules installed.\n",
+      scalar(grep { $_ ne 'perl' } $self->requirements->required_modules), scalar(@artifacts);
+
+    return @artifacts;
+}
+
+sub builder {
     my($self, @args) = @_;
 
-    my %file_temp = ();
-    $file_temp{CLEANUP} = $ENV{PERL_FILE_TEMP_CLEANUP}
-      if exists $ENV{PERL_FILE_TEMP_CLEANUP};
-
-    my $dir = Path::Tiny->tempdir(%file_temp);
-    local $ENV{PERL_CPANM_HOME} = $dir;
-    local $ENV{PERL_CPANM_OPT};
-
-    my $cpanfile = $self->try_cpanfile
-      or die "Can't locate 'cpanfile' to load module list.\n";
-
-    # one mirror for now
-    my $mirror = Module::CPANfile->load($cpanfile)->mirrors->[0];
-
-    require Menlo::CLI::Compat;
-
-    my $cli = Menlo::CLI::Compat->new;
-    $cli->parse_options(
-        ($self->verbose ? () : "--quiet"),
-        ($mirror ? ("-M", $mirror) : ()),
-        "--notest",
-        "--save-dists", $self->repository_base->child('cache'),
-        "-L", $self->repository_base->child('perl5'),
+    Carmel::Builder->new(
+        repository_base => $self->repository_base,
+        cpanfile_path => $self->cpanfile_path,
+        collect_artifact => sub { $self->repo->import_artifact(@_) },
         @args,
     );
-    $cli->run;
-
-    for my $ent ($dir->child("latest-build")->children) {
-        next unless $ent->is_dir && $ent->child("blib/meta/install.json")->exists;
-        $self->repo->import_artifact($ent);
-    }
-
-    $self->repository_base->child('perl5')->remove_tree({ safe => 0 });
 }
 
 sub quote {
@@ -258,11 +310,10 @@ sub transform {
 sub save_snapshot {
     my($self, $artifacts) = @_;
 
-    require Carton::Dist;
     require Carton::Snapshot;
+    require Carton::Dist;
 
-    my $cpanfile = $self->try_cpanfile;
-    my $snapshot = Carton::Snapshot->new(path => $cpanfile . ".snapshot");
+    my $snapshot = Carton::Snapshot->new(path => $self->cpanfile->snapshot_path);
 
     for my $artifact (@$artifacts) {
         my $dist = Carton::Dist->new(
@@ -296,10 +347,7 @@ sub dump_bootstrap {
         %modules = (%modules, $artifact->module_files);
     }
 
-    my $cpanfile = $self->try_cpanfile
-      or die "Can't locate 'cpanfile' to load module list.\n";
-
-    my $prereqs = Module::CPANfile->load($cpanfile)->prereqs->as_string_hash;
+    my $prereqs = $self->cpanfile->load->prereqs->as_string_hash;
     my $package = "Carmel::MySetup"; # hide from PAUSE
 
     my $file = Path::Tiny->new(".carmel/MySetup.pm");
@@ -323,20 +371,20 @@ EOF
 
 sub cmd_export {
     my($self) = @_;
-    my %env = $self->runner->env;
-    print "export ", join(" ", map qq($_="$env{$_}"), keys %env), "\n";
+    my %env = Carmel::Runner->new->env;
+    print "export ", join(" ", map qq($_="$env{$_}"), sort keys %env), "\n";
 }
 
 sub cmd_env {
     my($self) = @_;
-    my %env = $self->runner->env;
-    print join "", map qq($_=$env{$_}\n), keys %env;
+    my %env = Carmel::Runner->new->env;
+    print join "", map qq($_=$env{$_}\n), sort keys %env;
 }
 
 # TODO remove. just here for testing
 sub cmd_exec {
     my($self, @args) = @_;
-    $self->runner->execute(@args);
+    Carmel::Runner->new->execute(@args);
 }
 
 sub cmd_find {
@@ -371,6 +419,29 @@ sub cmd_list {
     }
 }
 
+sub resolve {
+    my($self, $cb) = @_;
+    $self->resolver(found => $cb)->resolve;
+}
+
+sub resolver {
+    my($self, @args) = @_;
+
+    Carmel::Resolver->new(
+        repo     => $self->repo,
+        root     => $self->requirements,
+        snapshot => scalar $self->snapshot,
+        missing  => sub { $self->missing_default(@_) },
+        @args,
+    );
+}
+
+sub missing_default {
+    my($self, $module, $want_version, $depth) = @_;
+    die "Can't find an artifact for $module => $want_version\n" .
+      "You need to run `carmel install` first to get the modules installed and artifacts built.\n";
+}
+
 sub artifact_for {
     my($self, $module) = @_;
 
@@ -378,7 +449,7 @@ sub artifact_for {
     eval {
         $self->resolve(sub {
             my $artifact = shift;
-            if ($module eq $artifact->package) {
+            if (exists $artifact->provides->{$module}) {
                 $found = $artifact;
                 die "__FOUND__\n";
             }
@@ -405,44 +476,13 @@ sub cmd_rollout {
     my @artifacts;
     $self->resolve(sub { push @artifacts, $_[0] });
 
+    # TODO safe atomic rename
     my $install_base = Path::Tiny->new("local")->absolute;
     $install_base->remove_tree({ safe => 0 }) if $install_base->exists;
 
-    $self->rollout_to($install_base, \@artifacts);
+    $self->builder->rollout($install_base, \@artifacts);
 
-    Path::Tiny->new("local/.carmel")->touch;
-}
-
-sub rollout_to {
-    my($self, $install_base, $artifacts) = @_;
-
-    require ExtUtils::Install;
-    require ExtUtils::InstallPaths;
-
-    for my $artifact (@$artifacts) {
-        my $dir = pushd $artifact->path;
-
-        my $paths = ExtUtils::InstallPaths->new(install_base => $install_base);
-
-        printf "Installing %s to %s\n", $artifact->distname, $install_base;
-
-        # ExtUtils::Install writes to STDOUT
-        open my $fh, ">", \my $output;
-        my $old; $old = select $fh unless $self->verbose;
-
-        my %result;
-        ExtUtils::Install::install([
-            from_to => $paths->install_map,
-            verbose => 0,
-            dry_run => 0,
-            uninstall_shadows => 0,
-            skip => undef,
-            always_copy => 1,
-            result => \%result,
-        ]);
-
-        select $old unless $self->verbose;
-    }
+    $install_base->child(".carmel")->touch;
 }
 
 sub cmd_package {
@@ -454,7 +494,7 @@ sub cmd_package {
     my $target_base = Path::Tiny->new('vendor/cache');
 
     my %done;
-    my $success = 0;
+    my @found;
     for my $package ($index->packages) {
         next if $done{$package->pathname}++;
 
@@ -462,20 +502,20 @@ sub cmd_package {
         my $target = $target_base->child('authors/id', $package->pathname);
 
         if ($source->exists) {
-            print "Copying ", $package->pathname, "\n";
-            $target->parent->mkpath;
-            $source->copy($target);
-            $success++;
+            push @found, sub {
+                print "Copying ", $package->pathname, "\n";
+                $target->parent->mkpath;
+                $source->copy($target);
+            };
         } else {
-            require File::Fetch;
-            print "Fetching ", $package->pathname, " from CPAN\n";
-            my $fetch = File::Fetch->new(uri => "http://cpan.metacpan.org/authors/id/" . $package->pathname);
-            if ($fetch->fetch(to => $target->parent)) {
-                $success++;
-            } else {
-                warn $fetch->error;
-            }
+            die sprintf "%s not found in %s.\n" .
+              "Run `carmel install` to fix this. If that didn't resolve the issue, try removing %s\n",
+              $package->pathname, $source_base, $self->repository_base;
         }
+    }
+
+    for my $copy (@found) {
+        $copy->();
     }
 
     require IO::Compress::Gzip;
@@ -487,7 +527,7 @@ sub cmd_package {
       or die "gzip failed: $IO::Compress::Gzip::GzipError";
     $index->write($out);
 
-    print "---> Complete! $success distributions are packaged in vendor/cache\n";
+    print "---> Complete! ", scalar(@found), " distributions are packaged in vendor/cache\n";
 }
 
 sub cmd_index {
@@ -514,39 +554,17 @@ sub build_index {
     $index;
 }
 
-sub cmd_binstubs {
-    my($self, @package) = @_;
-
-    die "Usage: carmel binstubs Module [...]\n" unless @package;
-
-    for my $package (@package) {
-        my $artifact = $self->artifact_for($package);
-        my %execs = $artifact->executables;
-        for my $bin (keys %execs) {
-            my $path = Path::Tiny->new("bin/$bin");
-            $path->parent->mkpath;
-            $path->spew(<<EOF);
-#!/usr/bin/env perl
-# This file was generated by Carmel
-use Carmel::Setup;
-my \$res = do Carmel::Setup->bin_path('@{[ $artifact->package ]}', '$bin');
-if (!defined \$res and my \$err = \$@ || \$!) { die \$err }
-EOF
-            $path->chmod(0755);
-        }
-    }
-}
-
-sub try_cpanfile {
+sub cpanfile_path {
     my $self = shift;
-    $self->locate_cpanfile($ENV{PERL_CARMEL_CPANFILE});
+    $self->{cpanfile_path} ||= Path::Tiny->new($self->locate_cpanfile)->absolute;
 }
 
 sub locate_cpanfile {
-    my($self, $path) = @_;
+    my $self = shift;
 
+    my $path = $ENV{PERL_CARMEL_CPANFILE};
     if ($path) {
-        return Path::Tiny->new($path)->absolute;
+        return $path;
     }
 
     my $current  = Path::Tiny->cwd;
@@ -554,143 +572,28 @@ sub locate_cpanfile {
 
     until ($current eq '/' or $current eq $previous) {
         my $try = $current->child('cpanfile');
-        return $try->absolute if $try->is_file;
+        return $try if $try->is_file;
         ($previous, $current) = ($current, $current->parent);
     }
 
-    return;
+    return 'cpanfile'; # fallback, most certainly fails later
+}
+
+sub cpanfile {
+    my $self = shift;
+    Carmel::CPANfile->new(path => $self->cpanfile_path);
 }
 
 sub requirements {
     my $self = shift;
-    $self->{requirements} ||= $self->build_requirements;
-}
 
-sub build_requirements {
-    my $self = shift;
-
-    my $cpanfile = $self->try_cpanfile
-      or die "Can't locate 'cpanfile' to load module list.\n";
-
-    return Module::CPANfile->load($cpanfile)
-      ->prereqs->merged_requirements(['runtime', 'test', 'develop'], ['requires']);
-}
-
-sub merge_requirements {
-    my($self, $reqs, $new_reqs, $where) = @_;
-
-    for my $module ($new_reqs->required_modules) {
-        my $new = $new_reqs->requirements_for_module($module);
-        try {
-            $reqs->add_string_requirement($module, $new);
-        } catch {
-            my($err) = /illegal requirements: (.*) at/;
-            my $old = $reqs->requirements_for_module($module);
-            die "Found conflicting requirement for $module: '$old' <=> '$new' ($where): $err";
-        };
-    }
-}
-
-sub resolve_recursive {
-    my($self, $root_reqs, $requirements, $snapshot, $seen, $cb, $missing_cb, $strict, $depth) = @_;
-
-    # TODO rather than mutating $root_reqs directly, we should create a new object
-    # that allows accessing the result $requirements
-    for my $module (sort $requirements->required_modules) {
-        next if $module eq 'perl';
-
-        my $want_version = $root_reqs->requirements_for_module($module);
-
-        my $artifact;
-        my $dist;
-        if ($dist = $self->find_in_snapshot($snapshot, $module, $root_reqs)) {
-            $artifact = $self->repo->find_match($module, sub { $_[0]->distname eq $dist->name });
-            $artifact ||= $self->repo->find($module, $want_version) unless $strict;
-        } elsif ($self->is_core($module, $want_version)) {
-            next;
-        } else {
-            $artifact = $self->repo->find($module, $want_version);
-        }
-
-        # FIXME there's a chance different version of the same module can be loaded here
-        if ($artifact) {
-            warn sprintf "   %s (%s) in %s\n", $module, $artifact->version_for($module), $artifact->path if $self->verbose;
-            next if $seen->{$artifact->path}++;
-            $cb->($artifact, $depth);
-
-            my $reqs = $artifact->requirements;
-            $self->merge_requirements($root_reqs, $reqs, $artifact->distname);
-
-            $self->resolve_recursive($root_reqs, $reqs, $snapshot, $seen, $cb, $missing_cb, $strict, $depth + 1);
-        } else {
-            $missing_cb->($module, $want_version, $dist, $depth);
-        }
-    }
-}
-
-sub resolve {
-    my($self, $cb, $missing_cb, $strict, $no_snapshot) = @_;
-    $missing_cb ||= sub {
-        my($module, $want_version, $dist, $depth) = @_;
-        die "Can't find an artifact for $module => $want_version\n" .
-            "You need to run `carmel install` first to get the modules installed and artifacts built.\n";
-    };
-
-    my $snapshot = $no_snapshot ? undef : $self->snapshot;
-
-    $self->resolve_recursive($self->requirements, $self->requirements->clone, $snapshot,
-                             {}, $cb, $missing_cb, $strict, 0);
-}
-
-sub find_in_snapshot {
-    my($self, $snapshot, $module, $reqs) = @_;
-
-    return unless $snapshot;
-
-    if (my $dist = $snapshot->find($module)) {
-        warn "@{[$dist->name]} found in snapshot for $module\n" if $self->verbose;
-        if ($self->accepts_all($reqs, $dist)) {
-            return $dist;
-        }
-    }
-
-    warn "$module not found in snapshot\n" if $self->verbose;
-
-    return;
-}
-
-sub accepts_all {
-    my($self, $reqs, $dist) = @_;
-
-    my @packages = keys %{$dist->provides};
-
-    for my $pkg (@packages) {
-        my $version = $dist->provides->{$pkg}{version} || '0';
-        return unless $reqs->accepts_module($pkg, $version);
-    }
-
-    return 1;
-}
-
-sub accepts {
-    my($self, $module, $want_version, $version) = @_;
-
-    CPAN::Meta::Requirements->from_string_hash({ $module => $want_version })
-        ->accepts_module($module, $version || '0');
+    return $self->cpanfile->load->prereqs
+      ->merged_requirements(['runtime', 'test', 'develop'], ['requires']);
 }
 
 sub snapshot {
     my $self = shift;
-
-    my $cpanfile = $self->try_cpanfile;
-    if ($cpanfile && -e "$cpanfile.snapshot") {
-        require Carton::Snapshot;
-        my $snapshot = Carton::Snapshot->new(path => "$cpanfile.snapshot");
-        $snapshot->load;
-        return $snapshot;
-    }
-
-    return;
+    $self->cpanfile->load_snapshot;
 }
 
 1;

@@ -63,6 +63,7 @@
             "Data::Dumper" : "0",
             "Data::UUID" : "0",
             "File::Basename" : "0",
+            "File::XDG" : "1.01",
             "Getopt::Long::Descriptive" : "0",
             "List::Util" : "0",
             "Log::Dispatch" : "2.70",
@@ -71,7 +72,8 @@
             "Moo" : "0",
             "Moo::Role" : "0",
             "MooX::StrictConstructor" : "0",
-            "PPI" : "1.273",
+            "PPI" : "1.274",
+            "PPI::Document" : "0",
             "PPIx::Utils::Classification" : "0",
             "Path::Tiny" : "0",
             "Perl::Tidy" : "20220217",
@@ -81,11 +83,12 @@
             "Sereal::Encoder" : "0",
             "Sub::HandlesVia" : "0",
             "Symbol::Get" : "0.10",
+            "TOML::Tiny" : "0.15",
             "Text::SimpleTable::AutoWidth" : "0",
             "Try::Tiny" : "0",
             "Types::Standard" : "0",
             "feature" : "0",
-            "perl" : "v5.12.0",
+            "perl" : "v5.18.0",
             "strict" : "0",
             "utf8" : "0",
             "warnings" : "0"
@@ -98,16 +101,19 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
+            "File::pushd" : "0",
             "Log::Dispatch::Array" : "0",
+            "PPI::Dumper" : "0",
             "Sub::Exporter" : "0",
             "Test::Differences" : "0",
+            "Test::Fatal" : "0",
             "Test::More" : "0",
             "Test::Needs" : "0",
             "Test::RequiresInternet" : "0",
             "Test::Script" : "1.29",
             "Test::Warnings" : "0",
             "lib" : "0",
-            "perl" : "v5.12.0"
+            "perl" : "v5.18.0"
          }
       }
    },
@@ -123,7 +129,7 @@
          "web" : "https://github.com/oalders/App-perlimports"
       }
    },
-   "version" : "0.000036",
+   "version" : "0.000040",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034001"
@@ -175,7 +181,7 @@
             "class" : "Dist::Zilla::Plugin::MakeMaker",
             "config" : {
                "Dist::Zilla::Role::TestRunner" : {
-                  "default_jobs" : "1"
+                  "default_jobs" : "8"
                }
             },
             "name" : "@Author::OALDERS/MakeMaker",
@@ -349,7 +355,7 @@
             "class" : "Dist::Zilla::Plugin::RunExtraTests",
             "config" : {
                "Dist::Zilla::Role::TestRunner" : {
-                  "default_jobs" : "1"
+                  "default_jobs" : "8"
                }
             },
             "name" : "@Author::OALDERS/RunExtraTests",
@@ -678,7 +684,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.000036",
+                  "tag" : "v0.000040",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },

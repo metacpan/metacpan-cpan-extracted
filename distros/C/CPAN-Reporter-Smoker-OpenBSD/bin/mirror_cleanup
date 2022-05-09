@@ -9,7 +9,7 @@ use Pod::Usage 1.69;
 use CPAN::Mini 1.111016;
 use File::Spec;
 
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 my ( $help, $version_check );
 

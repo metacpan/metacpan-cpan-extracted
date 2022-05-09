@@ -6,10 +6,10 @@ use warnings;
 use Chemistry::OpenSMILES qw( is_aromatic is_chiral );
 use Chemistry::OpenSMILES::Parser;
 use Graph::Traversal::DFS;
-use List::Util qw(all uniq);
+use List::Util qw( any uniq );
 
 # ABSTRACT: OpenSMILES format writer
-our $VERSION = '0.7.0'; # VERSION
+our $VERSION = '0.8.0'; # VERSION
 
 require Exporter;
 our @ISA = qw( Exporter );
@@ -92,41 +92,66 @@ sub write_SMILES
             next unless $atom->{chirality} =~ /^@@?$/;
 
             my @neighbours = $graph->neighbours($atom);
-            if( scalar @neighbours != 4 ) {
+            if( scalar @neighbours < 3 || scalar @neighbours > 4 ) {
                 # TODO: process also configurations other than tetrahedral
                 warn "chirality '$atom->{chirality}' observed for atom " .
                      'with ' . scalar @neighbours . ' neighbours, can only ' .
-                     'process tetrahedral chiral centers' . "\n";
+                     'process tetrahedral chiral centers with possible ' .
+                     'lone pairs' . "\n";
                 next;
             }
 
             my $chirality_now = $atom->{chirality};
             if( $atom->{chirality_neighbours} ) {
+                if( scalar @neighbours !=
+                    scalar @{$atom->{chirality_neighbours}} ) {
+                    warn 'number of neighbours does not match the length ' .
+                         "of 'chirality_neighbours' array, cannot process " .
+                         'such chiral centers' . "\n";
+                    next;
+                }
+
                 my %indices;
                 for (0..$#{$atom->{chirality_neighbours}}) {
-                    $indices{$vertex_symbols{$atom->{chirality_neighbours}[$_]}} = $_;
+                    my $pos = $_;
+                    if( scalar @{$atom->{chirality_neighbours}} == 3 && $_ != 0 ) {
+                        # Lone pair is always second in the chiral neighbours array
+                        $pos++;
+                    }
+                    $indices{$vertex_symbols{$atom->{chirality_neighbours}[$_]}} = $pos;
                 }
 
                 my @order_new;
                 # In newly established order, the atom from which this one
                 # is discovered (left hand side) will be the first, if any
                 if( $discovered_from{$atom} ) {
-                    push @order_new, $vertex_symbols{$discovered_from{$atom}};
+                    push @order_new,
+                         $indices{$vertex_symbols{$discovered_from{$atom}}};
                 }
                 # Second, there will be ring bonds as they are added the
                 # first of all the neighbours
                 if( $rings->{$vertex_symbols{$atom}} ) {
-                    push @order_new, sort { $a <=> $b }
+                    push @order_new, map  { $indices{$_} }
+                                     sort { $a <=> $b }
                                      keys %{$rings->{$vertex_symbols{$atom}}};
                 }
                 # Finally, all neighbours are added, uniq will remove duplicates
-                push @order_new, sort { $a <=> $b }
+                push @order_new, map  { $indices{$_} }
+                                 sort { $a <=> $b }
                                  map  { $vertex_symbols{$_} }
                                       @neighbours;
                 @order_new = uniq @order_new;
 
-                if( join( '', _permutation_order( map { $indices{$_} } @order_new ) ) ne
-                    '0123' ) {
+                if( scalar @order_new == 3 ) {
+                    # Accommodate the lone pair
+                    if( $discovered_from{$atom} ) {
+                        @order_new = ( $order_new[0], 1, @order_new[1..2] );
+                    } else {
+                        unshift @order_new, 1;
+                    }
+                }
+
+                if( join( '', _permutation_order( @order_new ) ) ne '0123' ) {
                     $chirality_now = $chirality_now eq '@' ? '@@' : '@';
                 }
             }
@@ -247,8 +272,13 @@ sub _depict_bond
 sub _permutation_order
 {
     # Safeguard against endless cycles due to undefined values
-    return unless scalar @_ == 4;
-    return unless all { defined } @_;
+    if( (scalar @_ != 4) ||
+        (any { !defined || !/^[0-3]$/ } @_) ||
+        (join( ',', sort @_ ) ne '0,1,2,3') ) {
+        warn '_permutation_order() accepts only permutations of numbers ' .
+             "'0', '1', '2' and '3', unexpected input received";
+        return 0..3; # Return original order
+    }
 
     while( $_[2] == 0 || $_[3] == 0 ) {
         @_ = ( $_[0], @_[2..3], $_[1] );

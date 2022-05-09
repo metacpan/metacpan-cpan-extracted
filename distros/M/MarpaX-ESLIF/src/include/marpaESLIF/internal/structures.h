@@ -620,8 +620,11 @@ struct marpaESLIFRecognizer {
   size_t                       previousMaxMatchedl;       /* Always computed */
   size_t                       lastSizel;                 /* Always computed */
   int                          maxStartCompletionsi;
-  int                          numberOfStartCompletionsi; /* Computed only if maxStartCompletionsi != 0 */
   size_t                       lastSizeBeforeCompletionl; /* Computed only if maxStartCompletionsi is != 0 */
+  short                        atStartCompletionb;
+  size_t                       startCompletionl;  /* Number of bytes at the last start completion */
+  size_t                       cumulCompletionl;  /* Number of bytes since the last start completion (or at the very beginning) */
+  int                          numberOfStartCompletionsi; /* Total number of start completions */
 
   marpaESLIFRecognizerOption_t marpaESLIFRecognizerOptionDiscard;
   marpaESLIFValueOption_t      marpaESLIFValueOptionDiscard;

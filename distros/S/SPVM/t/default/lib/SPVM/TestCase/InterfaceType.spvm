@@ -1,5 +1,9 @@
 class TestCase::InterfaceType : interface_t {
-  method interface_shared1 : string ($num : int);
+  interface Stringable;
+
+  required method interface_shared1 : string ($num : int);
   
   method interface_shared2 : string ($num : int);
+  
+  method to_string : string ();
 }

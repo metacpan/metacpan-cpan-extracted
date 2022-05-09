@@ -71,7 +71,6 @@ untied {
     PackageOne::ok($XSIG{$sig}[0] eq *Package::Two::another_unqualified,
         'assignment from *glob in separate package');
   }
-
 }
 
 $XSIG{$sig}[44] = sub { 19 };

@@ -39,7 +39,7 @@ use Text::Wrap;
 $Text::Wrap::huge = 'overflow';
 $Text::Wrap::unexpand = 0;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use UI::Various::core;
 
@@ -56,6 +56,56 @@ The module provides the following common (internal) methods for all
 UI::Various::PoorTerm UI element classes:
 
 =cut
+
+#########################################################################
+
+=head2 B<_cut> - cut string according to width of UI element
+
+    $wrapped_string = $ui_element->_cut($string, ...);
+
+=head3 example:
+
+    print $self->_cut($prefix, ' ', $self->text), "\n";
+
+=head3 parameters:
+
+    $string             the string(s) to be shortened
+
+=head3 description:
+
+This method joins all strings passed to it.  It then checks if they fit
+within the L<maximum line length|UI::Various::Main/max_width ro> and that
+the length of the strings do not exceed the defined width for the UI element
+itself.  Any excess content is cut away.
+
+Note that method is unfit for multi-line strings.  Also note that the
+specific width of the UI element is transitive meaning that it could be
+defined in one of the parents of the UI element itself.
+
+=head3 returns:
+
+the (maybe) shortened string
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+sub _cut($@)
+{
+    my $self = shift;
+    my $string = join('', @_);
+
+    my $len = length($string);
+    my $width = $self->width || 0;
+    my $max_width = $self->top->max_width;
+
+    $width <= $max_width  or  $width = $max_width;
+    if ($len <= $width  or  $width < 1)
+    {
+	return $string;
+    }
+    return substr($string, 0, $width);
+}
 
 #########################################################################
 
@@ -104,7 +154,7 @@ sub _wrap($$$)
 
     my $len_p = length($prefix);
     my $len_s = length($string);
-    my $width = $self->width  ||  0;
+    my $width = $self->width || 0;
     my $max_width = $self->top->max_width;
 
     $width <= $max_width - $len_p  or  $width = $max_width - $len_p;

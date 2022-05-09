@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+
 
 use ExtUtils::MakeMaker;
 
@@ -17,7 +17,6 @@ my %WriteMakefileArgs = (
     "bin/fkpx-agent"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.006",
   "NAME" => "File::KeePass::Agent::KDBX",
   "PREREQ_PM" => {
     "File::KeePass::Agent" => 0,
@@ -33,11 +32,9 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "FindBin" => 0,
-    "IO::Handle" => 0,
-    "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.901",
+  "VERSION" => "0.902",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,8 +47,6 @@ my %FallbackPrereqs = (
   "File::KeePass::KDBX" => 0,
   "File::Spec" => 0,
   "FindBin" => 0,
-  "IO::Handle" => 0,
-  "IPC::Open3" => 0,
   "Module::Load" => 0,
   "Test::More" => 0,
   "namespace::clean" => 0,

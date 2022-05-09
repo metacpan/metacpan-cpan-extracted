@@ -9,10 +9,10 @@ use Test::NoTabs;
 my @files = (
     'bin/fkpx-agent',
     'lib/File/KeePass/Agent/KDBX.pm',
-    't/00-compile.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/agent.t',
+    'xt/author/00-compile.t',
     'xt/author/clean-namespaces.t',
     'xt/author/critic.t',
     'xt/author/distmeta.t',

@@ -8,7 +8,7 @@ use parent qw/MarpaX::ESLIF::Base/;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '6.0.18'; # VERSION
+our $VERSION = '6.0.19'; # VERSION
 
 #
 # Base required class methods
@@ -45,7 +45,7 @@ MarpaX::ESLIF::Grammar - MarpaX::ESLIF's grammar
 
 =head1 VERSION
 
-version 6.0.18
+version 6.0.19
 
 =head1 SYNOPSIS
 

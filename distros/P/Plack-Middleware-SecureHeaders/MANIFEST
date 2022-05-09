@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Plack/Middleware/SecureHeaders.pm
+minil.toml
+t/00_compile.t
+t/01_default_headers.t
+t/02_options.t
+t/03_content_type.t
+t/04_remove_header.t
+META.yml
+MANIFEST

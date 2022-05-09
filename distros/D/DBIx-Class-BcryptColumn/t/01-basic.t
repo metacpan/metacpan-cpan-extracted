@@ -10,7 +10,7 @@ is_deeply User->result_class->_bcrypt_columns_info, +{ password=>{cost=>12} };
 is_deeply [User->result_class->bcrypt_columns], ['password'];
 
 ok my $user = User->create({name=>'Foo', password=>'abc123'});
-ok $user->check_password('abc123');
+ok $user->check_password('abc123'), 'password check passes';
 ok my $id = $user->id;
 ok $hashed_pwd = $user->password;
 

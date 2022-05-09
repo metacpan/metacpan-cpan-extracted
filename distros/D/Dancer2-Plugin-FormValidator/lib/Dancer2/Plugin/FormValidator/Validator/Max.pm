@@ -1,5 +1,8 @@
 package Dancer2::Plugin::FormValidator::Validator::Max;
 
+use strict;
+use warnings;
+
 use Moo;
 use utf8;
 use Scalar::Util qw(looks_like_number);

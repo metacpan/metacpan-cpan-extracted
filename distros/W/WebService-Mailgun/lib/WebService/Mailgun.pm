@@ -14,7 +14,7 @@ use HTTP::Request::Common;
 use File::Temp;
 
 
-our $VERSION = "0.14";
+our $VERSION = "0.15";
 our $API_BASE = 'api.mailgun.net/v3';
 our $API_BASE_EU = 'api.eu.mailgun.net/v3';
 
@@ -291,6 +291,41 @@ sub get_message_from_event {
     $self->decode_response($res);
 }
 
+sub delete_templates {
+    my ($self) = @_;
+
+    my $res = $self->client->delete($self->domain_api_url("templates"));
+    $self->decode_response($res);
+}
+
+sub delete_template {
+    my ($self, $name) = @_;
+
+    my $res = $self->client->delete(
+        $self->domain_api_url("templates/$name"));
+    $self->decode_response($res);
+}
+
+sub add_template {
+    my ($self, $args) = @_;
+
+    my @content;
+    if (ref($args) eq 'HASH') {
+        @content = %$args;
+    }
+    elsif (ref($args) eq 'ARRAY') {
+        @content = @$args;
+    }
+    else {
+        die 'unsupport argument. add_template() need HashRef or ArrayRef.';
+    }
+
+    my $req = POST $self->domain_api_url('templates'), Content_type => 'form-data', Content => \@content;
+
+    my $res = $self->client->request($req);
+    $self->decode_response($res);
+}
+
 1;
 __END__
 
@@ -548,6 +583,38 @@ Get stored message.
 
 L<Stored Message|https://documentation.mailgun.com/en/latest/api-sending.html#retrieving-stored-messages>
 
+=head2 add_template($args)
+
+Add a template
+
+    # add template
+    my $res = $mailgun->add_template({
+        name        => 'welcome',     # Template name
+        template    => 'Hello!',      # Template data
+        engine      => 'handlebars',  # Template engine (optional)
+        description => 'xyz',         # Description of template (optional)
+        tag         => '2.0' ,        # Version tag (optional)
+        comment     => 'Test'         # Version comment (optional)
+    });
+
+L<https://documentation.mailgun.com/en/latest/api-templates.html#templates>
+
+=head2 delete_templates()
+
+Delete all templates
+
+    my $res = $mailgun->delete_templates();
+
+L<https://documentation.mailgun.com/en/latest/api-templates.html#templates>
+
+=head2 delete_template($name)
+
+Delete a template
+
+    my $res = $mailgun->delete_template($name);
+
+L<https://documentation.mailgun.com/en/latest/api-templates.html#templates>
+
 =head1 Event Pooling
 
 event method return previous url. it can use for fetch event.
@@ -559,6 +626,8 @@ event method return previous url. it can use for fetch event.
     // ...
 
 L<Event Polling|https://documentation.mailgun.com/en/latest/api-events.html#event-polling>    
+
+
 
 =head1 TODO
 
@@ -579,6 +648,8 @@ this API not implement yet.
 =item * L<Webhooks|https://documentation.mailgun.com/en/latest/api-webhooks.html>
 
 =item * L<Email Validation|https://documentation.mailgun.com/en/latest/api-email-validation.html>
+
+=item * L<Templates|https://documentation.mailgun.com/en/latest/api-templates.html> (partial)
 
 =back
 

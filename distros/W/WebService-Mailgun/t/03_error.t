@@ -2,7 +2,7 @@ use strict;
 use Test::More 0.98;
 use WebService::Mailgun;
 
-$WebService::Mailgun::API_BASE = 'api.example.com/v0.1';
+$WebService::Mailgun::API_BASE = 'api.example.com./v0.1';
 
 my $mailgun = WebService::Mailgun->new(
     api_key => 'key-389807c554fdfe0a7757adf0650f7768',

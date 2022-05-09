@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.201';
+our $VERSION = '1.202';
 
 =encoding utf8
 
@@ -160,6 +160,10 @@ L<Quiq::Database::DataAnalysis> - Führe Datenanalyse durch
 
 =item *
 
+L<Quiq::Database::Patch> - Definiere Patches für eine Datenbank und wende sie an (Basisklasse)
+
+=item *
+
 L<Quiq::Database::ResultSet> - Liste von Datensätzen (abstrakt)
 
 =item *
@@ -241,6 +245,10 @@ L<Quiq::ExampleCode> - Führe Beispielcode aus
 =item *
 
 L<Quiq::Excel::Writer> - Erzeuge Datei im Excel 2007+ XLSX Format
+
+=item *
+
+L<Quiq::Exit> - Prüfe Exitstatus von Child-Prozess
 
 =item *
 
@@ -756,7 +764,15 @@ L<Quiq::Sendmail> - Versende Mail mit sendmail
 
 =item *
 
-L<Quiq::Shell> - Ausführung von Shell-Kommandos
+L<Quiq::Sftp::Client> - SFTP Client
+
+=item *
+
+L<Quiq::Shell> - Führe Shell-Kommandos aus
+
+=item *
+
+L<Quiq::Smb::Client> - SMB Client
 
 =item *
 
@@ -930,7 +946,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.201
+1.202
 
 =head1 AUTHOR
 

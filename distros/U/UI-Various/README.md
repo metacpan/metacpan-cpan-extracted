@@ -8,9 +8,9 @@ UI::Various - graphical/non-graphical user interface without external programs
 
 # ABSTRACT
 
-**Currently this module is WORK IN PROGRESS and of limited usage!** It is
-updated and uploaded often to get the results of the tests on the various
-different CPAN test platforms.
+**This module is still WORK IN PROGRESS, but already usable with some
+restrictions.** Currently it provides basic functionality only (no dialogues,
+no frills).
 
 Did you ever need to decide if a graphical or text based user interface is
 best for your Perl application?  A GUI may be easier to use, but will not

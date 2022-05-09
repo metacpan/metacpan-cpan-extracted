@@ -104,18 +104,6 @@ PDL::LinearAlgebra::Complex - PDL interface to the lapack linear algebra program
 
 =head1 SYNOPSIS
 
- use PDL::Complex
- use PDL::LinearAlgebra::Complex;
-
- $a = r2C random (100,100);
- $s = r2C zeroes(100);
- $u = r2C zeroes(100,100);
- $v = r2C zeroes(100,100);
- $info = 0;
- $job = 0;
- cgesdd($a, $job, $info, $s , $u, $v);
-
- # or, using native complex numbers:
  use PDL;
  use PDL::LinearAlgebra::Complex;
  $a = random(cdouble, 100, 100);
@@ -199,7 +187,6 @@ its second element.
 
 =for example
 
- use PDL::Complex;
  $dl = random(float, 9) + random(float, 9) * i;
  $d = random(float, 10) + random(float, 10) * i;
  $du = random(float, 9) + random(float, 9) * i;

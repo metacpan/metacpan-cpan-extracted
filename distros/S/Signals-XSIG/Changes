@@ -1,5 +1,8 @@
 Revision history for Signals-XSIG
 
+0.16    2022-05-03
+        Perl 5.36 compatibility changes
+
 0.15    2017-05-22
         Fix for intermittent test failure
 

@@ -1,5 +1,18 @@
 Revision history for Perl extension File::Rename.
 
+1.31    Robin Barker 2022-05-07
+    Add explicit LICENCE field
+    Fix tests for perl 5.8.* and cygwin
+    
+1.30_03 Robin Barker 2022-04-23
+    Add explicit 'cygwin' in test lib and script
+
+1.30_02 Neil Bowers 2021-09-05
+    Add LICENCE=>perl to Makefile.PL
+
+1.30_01 Robin Barker 2021-08-16
+    Fix tests for perl < 5.8.9 (on cygwin)
+
 1.30    Robin Barker 2021-08-16
     Unicode support: --unicode and File::Rename::Unicode
 

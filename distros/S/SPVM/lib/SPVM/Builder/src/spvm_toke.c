@@ -1788,14 +1788,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 break;
               }
               case 'c' : {
-                if (strcmp(symbol_name, "callback_t") == 0) {
-                  SPVM_OP* op_descriptor = SPVM_OP_new_op_descriptor(compiler, SPVM_DESCRIPTOR_C_ID_CALLBACK_T, compiler->cur_file, compiler->cur_line);
-                  yylvalp->opval = op_descriptor;
-                  
-                  is_keyword = 1;
-                  keyword_term = DESCRIPTOR;
-                }
-                else if (strcmp(symbol_name, "case") == 0) {
+                if (strcmp(symbol_name, "case") == 0) {
                   yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_CASE);
                   is_keyword = 1;
                   keyword_term = CASE;
@@ -1916,10 +1909,10 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   is_keyword = 1;
                   keyword_term = HAS;
                 }
-                else if (strcmp(symbol_name, "has_implement") == 0) {
-                  yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_HAS_IMPLEMENT);
+                else if (strcmp(symbol_name, "has_impl") == 0) {
+                  yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_HAS_IMPL);
                   is_keyword = 1;
-                  keyword_term = HAS_IMPLEMENT;
+                  keyword_term = HAS_IMPL;
                 }
                 break;
               }
@@ -1944,10 +1937,10 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   is_keyword = 1;
                   keyword_term = IS_READ_ONLY;
                 }
-                else if (strcmp(symbol_name, "implement") == 0) {
-                  yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_IMPLEMENT);
+                else if (strcmp(symbol_name, "interface") == 0) {
+                  yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_INTERFACE);
                   is_keyword = 1;
-                  keyword_term = IMPLEMENT;
+                  keyword_term = INTERFACE;
                 }
                 else if (strcmp(symbol_name, "int") == 0) {
                   yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_INT);
@@ -2142,6 +2135,12 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_REQUIRE);
                   is_keyword = 1;
                   keyword_term = REQUIRE;
+                }
+                else if (strcmp(symbol_name, "required") == 0) {
+                  SPVM_OP* op_descriptor = SPVM_OP_new_op_descriptor(compiler, SPVM_DESCRIPTOR_C_ID_REQUIRED, compiler->cur_file, compiler->cur_line);
+                  yylvalp->opval = op_descriptor;
+                  is_keyword = 1;
+                  keyword_term = DESCRIPTOR;
                 }
                 else if (strcmp(symbol_name, "rw") == 0) {
                   SPVM_OP* op_descriptor = SPVM_OP_new_op_descriptor(compiler, SPVM_DESCRIPTOR_C_ID_RW, compiler->cur_file, compiler->cur_line);

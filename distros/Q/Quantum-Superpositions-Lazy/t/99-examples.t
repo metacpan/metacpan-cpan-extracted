@@ -10,7 +10,7 @@ use File::Basename;
 # their own test cases.
 ##############################################################################
 
-my $examples_path = dirname(dirname(__FILE__)) . "/examples";
+my $examples_path = dirname(dirname(__FILE__)) . "/ex";
 
 for my $example (glob "$examples_path/*.pl") {
 	subtest "testing $example" => sub {
@@ -21,3 +21,4 @@ for my $example (glob "$examples_path/*.pl") {
 }
 
 done_testing;
+

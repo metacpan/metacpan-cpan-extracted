@@ -1,0 +1,66 @@
+#-*- conf -*-
+[% # OpenVPN LDAP objects are served with this schema
+   # https://puszcza.gnu.org.ua/software/assignments/umi_002eschema.html#umi_002eschema
+   # which is a part of UMI project https://github.com/z-eos/umi
+   #
+   # this .tt changes the second ip address byte to make ip address to belong
+   # to other vpn server network
+-%]
+# !!! AUTOMATICALY GENERATED !!!
+#
+# by [% prog %] on [% date %]
+# OpenVPN client serverside configuration file
+#
+#   entryUUID: [% entryUUID %]
+#    entryCSN: [% entryCSN %]
+#      server: [% server %]
+#          CN: [% CN %]
+#              (assigned to uid: [% uid %])
+[% IF descr -%]
+#
+# description: [% descr.replace('\n', '; ') %]
+[% END -%]
+#
+#   cert SN: [% SN %] not before [% notbefore %] not after [% notafter %]
+#    device: [% device %]
+#        OS: [% OS %]
+#   created: by [% createdby %], on [% createdon %]
+#  modified: by [% modifiedby %], on [% modifiedon %]
+#
+
+[% IF state == 'enabled' -%]# [% END -%]disable
+[%
+ifconfigpush_arr = ifconfigpush.split(' ')
+
+ip_addr_arr = ifconfigpush_arr.item(0).split('\.')
+ip_addr_arr.1 = ip_addr_arr.1 + 96
+ifconfigpush_l = ip_addr_arr.join('.')
+
+gw_addr_arr = ifconfigpush_arr.item(1).split('\.')
+gw_addr_arr.1 = gw_addr_arr.1 + 100
+ifconfigpush_r = gw_addr_arr.join('.')
+
+ifconfigpush_new = "${ifconfigpush_l} ${ifconfigpush_r}"
+-%]
+
+ifconfig-push [% ifconfigpush_new %]
+
+[% IF iroute -%]
+[% FOREACH item IN iroute -%]
+[% IF item != 'NA' -%]iroute [% item %]
+[% END -%]
+[% END -%]
+[% END -%]
+
+[% IF push -%]
+[% FOREACH item IN push -%]
+[% IF item != 'NA' -%]push "[% item %]"
+[% END -%]
+[% END -%]
+[% END -%]
+
+[% IF config && config != 'NA' -%]
+config [% config %]
+[% END -%]
+
+# END

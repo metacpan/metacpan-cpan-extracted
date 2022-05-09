@@ -16,14 +16,14 @@ meta-spec:
   version: '1.4'
 name: DBIx-Class-BcryptColumn
 requires:
-  Crypt::Eksblowfish: '0.009'
+  Crypt::Bcrypt: '0.007'
   Crypt::URandom: '0.36'
   Sub::Name: '0.26'
 resources:
   bugtracker: https://github.com/jjn1056/DBIx-Class-BcryptColumn/issues
   homepage: https://github.com/jjn1056/DBIx-Class-BcryptColumn
   repository: https://github.com/jjn1056/DBIx-Class-BcryptColumn.git
-version: '0.001001'
+version: '0.001003'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

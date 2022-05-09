@@ -1,0 +1,46 @@
+---
+abstract: 'модуль утилит для распознавания кодировки текста (в том числе в файлах) и его декодирования'
+author:
+  - 'Yaroslav O. Kosmina <darviarush@mail.ru>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.16, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Octets-To-Unicode
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Octets::To::Unicode:
+    file: lib/Octets/To/Unicode.pm
+    version: '0.03'
+requires:
+  Encode: '0'
+  Getopt::Long: '0'
+  List::Util: '0'
+  Perl::Tidy: '0'
+  Pod::Usage: '0'
+  Term::ANSIColor: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/darviarush/perl-octets-to-unicode/issues
+  homepage: https://github.com/darviarush/perl-octets-to-unicode
+  repository: https://github.com/darviarush/perl-octets-to-unicode.git
+version: '0.03'
+x_contributors:
+  - 'Iaroslav O. Kosmina <darviarush@ya.ru>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

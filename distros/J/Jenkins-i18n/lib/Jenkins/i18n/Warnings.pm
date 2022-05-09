@@ -7,7 +7,7 @@ use Hash::Util qw(lock_keys);
 use Carp qw(confess);
 use Cwd;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 =pod
 
@@ -46,10 +46,11 @@ sub new {
 
     my $self = {
         types => {
-            empty       => 'Empty',
-            unused      => 'Unused',
-            same        => 'Same',
-            non_jenkins => 'Non Jenkins',
+            empty        => 'Empty',
+            unused       => 'Unused',
+            same         => 'Same',
+            non_jenkins  => 'Non Jenkins',
+            search_found => 'Found match on given term'
         }
     };
 
@@ -218,12 +219,30 @@ sub has_missing {
     return 0;
 }
 
+=head2 has_found
+
+Returns true (1) or false (0) if there are warnings regarding terms that were
+found in the properties values.
+
+=cut
+
+sub has_found {
+    my $self  = shift;
+    my $total = scalar( @{ $self->{search_found} } );
+    return 1 if ( $total > 0 );
+    return 0;
+}
+
 1;
 __END__
 
 =head1 SEE ALSO
 
 =over
+
+=item *
+
+L<Jenkins::i18n::ProcOpts>
 
 =item *
 

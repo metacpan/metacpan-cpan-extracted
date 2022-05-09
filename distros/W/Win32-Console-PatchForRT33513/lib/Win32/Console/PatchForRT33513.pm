@@ -3,7 +3,7 @@ package Win32::Console::PatchForRT33513;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.008';
 
 use Win32::Console qw( );
 
@@ -51,7 +51,7 @@ Win32::Console::PatchForRT33513 - Patch for RT33513.
 
 =head1 VERSION
 
-Version 0.001
+Version 0.008
 
 =cut
 
@@ -71,7 +71,9 @@ Link to the L<patch|https://rt.cpan.org/Public/Bug/Display.html?id=33513#txn-577
 
 The code for this module is from this L<stackoverflow answer|https://stackoverflow.com/a/51909554/198183>.
 
-=head1 LICENSE
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2018-2022 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

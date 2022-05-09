@@ -2,7 +2,6 @@
 
 use strict;
 use warnings;
-use utf8;
 binmode STDOUT, ":utf8";
 use feature ':5.12';
 

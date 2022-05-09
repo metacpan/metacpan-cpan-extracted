@@ -1,18 +1,10 @@
 use strict;
 use warnings;
+
+use FindBin;
 use Test::More tests => 1;
 
-package Validator {
-    use Moo;
-
-    with 'Dancer2::Plugin::FormValidator::Role::Profile';
-
-    sub profile {
-        return {
-            email => [qw(required email)],
-        };
-    }
-}
+require "$FindBin::Bin/lib/validator.pl";
 
 package App {
     use Dancer2;
@@ -30,8 +22,14 @@ package App {
 
     use Dancer2::Plugin::FormValidator;
 
+    my $validator = Validator->new(profile_hash =>
+        {
+            email => [qw(required email)],
+        }
+    );
+
     post '/' => sub {
-        if (not validate profile => Validator->new, lang => 'ru') {
+        if (not validate profile => $validator, lang => 'ru') {
             to_json errors, {utf8 => 0};
         }
     };

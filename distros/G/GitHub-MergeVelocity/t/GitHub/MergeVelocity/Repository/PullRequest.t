@@ -9,7 +9,7 @@ use GitHub::MergeVelocity::Repository::PullRequest;
 
 {
     my $created = DateTime->now->subtract( days => 10 );
-    my $pr = GitHub::MergeVelocity::Repository::PullRequest->new(
+    my $pr      = GitHub::MergeVelocity::Repository::PullRequest->new(
         created_at => $created,
         number     => 99,
         title      => 'Foo',
@@ -20,7 +20,7 @@ use GitHub::MergeVelocity::Repository::PullRequest;
 
     # allow for funkiness if tests run around midnight GMT
     ok( ( $pr->age == 10 || $pr->age == 11 ), 'age checks out' );
-    ok( !$pr->velocity, 'has no velocity' );
+    ok( !$pr->velocity,                       'has no velocity' );
 }
 
 {

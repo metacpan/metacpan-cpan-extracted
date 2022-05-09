@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.750';
+our $VERSION = '1.751';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -258,6 +258,9 @@ sub __modify_options {
     }
     if ( ! defined $self->{prompt} ) {
         $self->{prompt} = defined $self->{wantarray} ? 'Your choice:' : 'Close with ENTER';
+    }
+    if ( defined $self->{margin} ) {
+        ( $self->{t_margin}, $self->{r_margin}, $self->{b_margin}, $self->{l_margin} ) = @{$self->{margin}};
     }
 }
 
@@ -721,10 +724,11 @@ sub __prepare_info_and_prompt_lines {
     }
     my $prompt = '';
     if ( length $self->{info} ) {
-        my $init   = $self->{tabs_info}[0] ? $self->{tabs_info}[0] : 0;
-        my $subseq = $self->{tabs_info}[1] ? $self->{tabs_info}[1] : 0;
+        my $init     = $self->{tabs_info}[0] ? $self->{tabs_info}[0] : 0;
+        my $subseq   = $self->{tabs_info}[1] ? $self->{tabs_info}[1] : 0;
+        my $r_margin = $self->{tabs_info}[2] ? $self->{tabs_info}[2] : 0;
         $prompt .= line_fold(
-            $self->{info}, $info_w,
+            $self->{info}, $info_w - $r_margin,
             { init_tab => ' ' x $init, subseq_tab => ' ' x $subseq, color => $self->{color}, join => 1 }
         );
     }
@@ -732,10 +736,11 @@ sub __prepare_info_and_prompt_lines {
         if ( length $prompt ) {
             $prompt .= "\n";
         }
-        my $init   = $self->{tabs_prompt}[0] ? $self->{tabs_prompt}[0] : 0;
-        my $subseq = $self->{tabs_prompt}[1] ? $self->{tabs_prompt}[1] : 0;
+        my $init     = $self->{tabs_prompt}[0] ? $self->{tabs_prompt}[0] : 0;
+        my $subseq   = $self->{tabs_prompt}[1] ? $self->{tabs_prompt}[1] : 0;
+        my $r_margin = $self->{tabs_prompt}[2] ? $self->{tabs_prompt}[2] : 0;
         $prompt .= line_fold(
-            $self->{prompt}, $info_w,
+            $self->{prompt}, $info_w - $r_margin,
             { init_tab => ' ' x $init, subseq_tab => ' ' x $subseq, color => $self->{color}, join => 1 }
         );
     }
@@ -746,6 +751,9 @@ sub __prepare_info_and_prompt_lines {
     }
     if ( length $self->{search_info} ) {
         $prompt .= "\n" . $self->{search_info} . ':';
+    }
+    if ( $self->{t_margin} ) {
+        $prompt = ( "\n" x $self->{t_margin} ) . $prompt;
     }
     $self->{prompt_copy} = $prompt;
     $self->{prompt_copy} .= "\n\r";
@@ -842,16 +850,24 @@ sub __wr_screen {
     $self->__goto( 0, 0 );
     print "\r" . clear_to_end_of_screen();
     if ( defined $self->{footer_fmt} ) {
-        if ( $self->{margin}[0] && $self->{max_height} ) { #
-            print right( $self->{margin}[0] );
-        }
         my $pp_line = sprintf $self->{footer_fmt}, int( $self->{first_page_row} / $self->{avail_height} ) + 1;
-        print "\n" x $self->{footer_depth};
+        if ( $self->{l_margin} ) {
+            print right( $self->{l_margin} );
+        }
+        print "\n" x ( $self->{avail_height} );
         print $pp_line . "\r";
-        print up( $self->{footer_depth} );
+        if ( $self->{b_margin} ) {
+            print "\n" x $self->{b_margin};
+            print up( $self->{b_margin} );
+        }
+        print up( $self->{avail_height} );
+        # footer on the bottom line with b_margin set:
+        #print "\n" x ( $self->{avail_height} + $self->{b_margin} );
+        #print $pp_line . "\r";
+        #print up( $self->{avail_height} + $self->{b_margin} );
     }
-    if ( $self->{margin}[0] ) {
-        print right( $self->{margin}[0] ); # set left margin after each "\r"
+    if ( $self->{l_margin} ) {
+        print right( $self->{l_margin} ); # left margin after each "\r"
     }
     my $pad_str = ' ' x $self->{pad};
     for my $row ( $self->{first_page_row} .. $self->{last_page_row} ) {
@@ -862,8 +878,8 @@ sub __wr_screen {
             }
         }
         print $line . "\n\r";
-        if ( $self->{margin}[0] ) {
-            print right( $self->{margin}[0] );
+        if ( $self->{l_margin} ) {
+            print right( $self->{l_margin} );
         }
     }
     print up( $self->{last_page_row} - $self->{first_page_row} + 1 );
@@ -882,11 +898,11 @@ sub __prepare_cell {
             my $str = $self->{list}[$idx];
             if ( $emphasised ) {
                 if ( $is_current_pos && $self->{color} == 1 ) {
-                    # no color for selected cell
+                    # no color for the selected cell if color == 1
                     $str =~ s/(\e\[[\d;]*m)//g;
                 }
                 else {
-                    # keep cell marked after color escapes
+                    # keep marked cells marked after color escapes
                     $str =~ s/(\e\[[\d;]*m)/${1}$emphasised/g;
                 }
                 $str = $emphasised . $str;
@@ -1023,20 +1039,17 @@ sub __goto {
 sub __avail_screen_size {
     my ( $self ) = @_;
     ( $self->{avail_width}, $self->{avail_height} ) = ( $self->{term_width}, $self->{term_height} );
-    if ( $self->{margin}[0] ) {
-        $self->{avail_width} -= $self->{margin}[0]; ## limit margin
+    if ( $self->{l_margin} ) {
+        $self->{avail_width} -= $self->{l_margin};
     }
-    if ( $self->{col_width} > $self->{avail_width} && $^O ne 'MSWin32' && $^O ne 'cygwin' ) {
+    if ( $self->{r_margin} ) {
+        $self->{avail_width} -= $self->{r_margin};
+    }
+    if ( $self->{r_margin} || ( $self->{col_width} > $self->{avail_width} && $^O ne 'MSWin32' && $^O ne 'cygwin' ) ) {
         $self->{avail_width} += WIDTH_CURSOR;
-        # + WIDTH_CURSOR: use also the last terminal column if there is only one print-column;
-        #                 with only one print-column the output doesn't get messed up if an item
+        # + WIDTH_CURSOR: use also the last terminal column if there is only one item-column;
+        #                 with only one item-column the output doesn't get messed up if an item
         #                 reaches the right edge of the terminal on a non-MSWin32-OS
-    }
-    #if ( $self->{ll} && $self->{ll} > $self->{avail_width} ) {
-    #    return -2;
-    #}
-    if ( $self->{margin}[1] ) {
-        $self->{avail_width} -= $self->{margin}[1]; ## limit margin
     }
     if ( $self->{max_width} && $self->{avail_width} > $self->{max_width} ) {
         $self->{avail_width} = $self->{max_width};
@@ -1044,6 +1057,9 @@ sub __avail_screen_size {
     if ( $self->{avail_width} < 1 ) {
         $self->{avail_width} = 1;
     }
+    #if ( $self->{ll} && $self->{ll} > $self->{avail_width} ) {
+    #    return -2;
+    #}
     $self->__prepare_info_and_prompt_lines();
     if ( $self->{count_prompt_lines} ) {
         $self->{avail_height} -= $self->{count_prompt_lines};
@@ -1051,15 +1067,14 @@ sub __avail_screen_size {
     if ( $self->{page} ) {
         $self->{avail_height}--;
     }
+    if ( $self->{b_margin} ) {
+        $self->{avail_height} -= $self->{b_margin};
+    }
     if ( $self->{avail_height} < $self->{keep} ) {
         $self->{avail_height} = $self->{term_height} >= $self->{keep} ? $self->{keep} : $self->{term_height};
     }
-    $self->{footer_depth} = $self->{avail_height};
     if ( $self->{max_height} && $self->{max_height} < $self->{avail_height} ) {
         $self->{avail_height} = $self->{max_height};
-        if ( ! $self->{clear_screen} ) {
-            $self->{footer_depth} = $self->{max_height};
-        }
     }
 }
 
@@ -1251,7 +1266,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.750
+Version 1.751
 
 =cut
 
@@ -1643,18 +1658,22 @@ Allowed values: 1 or greater
 
 Experimental
 
-The option I<margin> allows one to set a margin one the left and right of the listed items.
+The option I<margin> allows one to set a margin on all four sides.
 
-I<margin> expects a reference to an array with one or two elements:
+I<margin> expects a reference to an array with four elements in the following order:
 
-- the first element specifies the number spaces that will be placed on the left side
+- top margin (number of terminal lines)
 
-- the second element specifies the number spaces that will be placed on the right side
+- right margin (number of terminal columns)
 
-I<margin> does not affect the I<info> and I<prompt> string. To add whitespaces in front of the I<info> and I<prompt>
-string see I<tabs_info> and I<tabs_prompt>.
+- botton margin (number of terminal lines)
 
-Allowed values: 0 or greater. Elements beyond the second are ignored.
+- left margin (number of terminal columns)
+
+I<margin> does not affect the I<info> and I<prompt> string. To add margins to the I<info> and I<prompt> string see
+I<tabs_info> and I<tabs_prompt>.
+
+Allowed values: 0 or greater. Elements beyond the fourth are ignored.
 
 (default: undefined)
 
@@ -1763,31 +1782,37 @@ Expected value: a regex quoted with the C<qr> operator.
 
 =head3 tabs_info
 
-If I<info> lines are folded, the option I<tabs_info> allows one to insert spaces at beginning of the folded lines.
+If I<info> lines are folded, the option I<tabs_info> allows one to insert spaces at beginning of the folded lines. It is
+also possible, to set a right margin.
 
-The option I<tabs_info> expects a reference to an array with one or two elements:
+The option I<tabs_info> expects a reference to an array with one to three elements:
 
 - the first element (initial tab) sets the number of spaces inserted at beginning of paragraphs
 
-- a second element (subsequent tab) sets the number of spaces inserted at the beginning of all broken lines apart
-from the beginning of paragraphs
+- the second element (subsequent tab) sets the number of spaces inserted at the beginning of all broken lines apart from
+the beginning of paragraphs
 
-Allowed values: 0 or greater. Elements beyond the second are ignored.
+- the third element sets the number of spaces used as a right margin.
+
+Allowed values: 0 or greater. Elements beyond the third are ignored.
 
 (default: undefined)
 
 =head3 tabs_prompt
 
 If I<prompt> lines are folded, the option I<tabs_prompt> allows one to insert spaces at beginning of the folded lines.
+It is also possible, to set a right margin.
 
-The option I<tabs_prompt> expects a reference to an array with one or two elements:
+The option I<tabs_prompt> expects a reference to an array with one to three elements:
 
 - the first element (initial tab) sets the number of spaces inserted at beginning of paragraphs
 
-- a second element (subsequent tab) sets the number of spaces inserted at the beginning of all broken lines apart
-from the beginning of paragraphs
+- the second element (subsequent tab) sets the number of spaces inserted at the beginning of all broken lines apart from
+the beginning of paragraphs
 
-Allowed values: 0 or greater. Elements beyond the second are ignored.
+- the third element sets the number of spaces used as a right margin.
+
+Allowed values: 0 or greater. Elements beyond the third are ignored.
 
 (default: undefined)
 
@@ -1893,12 +1918,7 @@ to a true value, ambiguous width characters are treated as full width.
 =head2 Escape sequences
 
 By default C<Term::Choose> uses C<tput> to get the appropriate escape sequences. If the environment variable
-C<TC_ANSI_ESCAPES> is set to a true value hardcoded ANSI escape sequences are used directly without calling C<tput>.
-
-    BEGIN {
-        $ENV{TC_ANSI_ESCAPES} = 1;
-    }
-    use Term::Choose qw( choose );
+C<TC_ANSI_ESCAPES> is set to a true value, hardcoded ANSI escape sequences are used directly without calling C<tput>.
 
 The escape sequences to enable the I<mouse> mode are always hardcoded.
 

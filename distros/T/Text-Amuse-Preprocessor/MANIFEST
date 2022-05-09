@@ -16,6 +16,7 @@ README
 t/00-load.t
 t/changes.t
 t/chars.t
+t/chinese.t
 t/common.t
 t/crash-on-verb.t
 t/crash_on_loop.t
@@ -45,6 +46,7 @@ t/footnotes/verbatim-exp.muse
 t/footnotes/verbatim-in.muse
 t/html-2.t
 t/html.t
+t/links.t
 t/manifest.t
 t/memory-cycles.t
 t/nbsp.t

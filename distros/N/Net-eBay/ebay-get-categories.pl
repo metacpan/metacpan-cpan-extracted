@@ -36,8 +36,8 @@ my $result = $eBay->submitRequest( "GetCategories",
 
 if( ref $result ) {
   my $vec = $result->{CategoryArray}->{Category};
-  my $comma = "";
   foreach my $cat (@$vec) {
+    my $comma = "";
     foreach my $k (sort keys %$cat) {
       print "$comma$k=$cat->{$k}";
       $comma = ';';

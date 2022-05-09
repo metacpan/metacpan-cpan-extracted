@@ -37,9 +37,10 @@ my %WriteMakefileArgs = (
     "IPC::Run" => 0,
     "Test::DiagINC" => "0.002",
     "Test::More" => "0.96",
-    "Test::XML" => 0
+    "Test::XML" => 0,
+    "version" => 0
   },
-  "VERSION" => "0.14",
+  "VERSION" => "0.15",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,7 +63,8 @@ my %FallbackPrereqs = (
   "Test::More" => "0.96",
   "Test::XML" => 0,
   "XML::Generator" => 0,
-  "namespace::clean" => 0
+  "namespace::clean" => 0,
+  "version" => 0
 );
 
 

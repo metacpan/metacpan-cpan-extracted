@@ -3,24 +3,37 @@ abstract: 'Find Or Download/Build/Install libpcre2 In PCRE2'
 author:
   - 'Will Braswell <wbraswell@cpan.org>'
 build_requires:
-  Alien::Build::MM: '0.25'
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
   Alien::gmake: '0.11'
   Archive::Tar: '0'
+  Capture::Tiny: '0'
   Config: '0'
-  HTML::LinkExtor: '0'
+  Data::Dumper: '0'
+  English: '0'
+  Env: '0'
+  ExtUtils::MakeMaker: '6.52'
+  File::Spec: '0'
   HTTP::Tiny: '0.044'
   IO::Socket::SSL: '1.56'
   IO::Zlib: '0'
+  IPC::Cmd: '0'
+  Mojo::DOM: '0'
+  Mojolicious: '7.00'
   Net::SSLeay: '1.49'
   Sort::Versions: '0'
+  Test2::V0: '0'
+  Test::Alien: '0'
+  Test::Alien::Diag: '0'
+  Test::More: '0'
   URI: '0'
   URI::Escape: '0'
 configure_requires:
-  Alien::Build: '0.66'
-  Alien::Build::MM: '0.25'
-  IO::Socket::SSL: '2.043'
+  Alien::Build: '1.40'
+  Alien::Build::MM: '0.32'
+  ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005'
 keywords:
   - alien
   - pcre
@@ -37,28 +50,32 @@ no_index:
     - t
     - inc
 requires:
+  Alien::Base: '0.038'
   Alien::Build: '0.25'
-  Test2::Suite: '0.000072'
+  base: '0'
+  strict: '0'
+  warnings: '0'
 resources:
   IRC: irc://irc.perl.org/#native
-  Mailinglist: https://lists.exim.org/lurker/list/pcre-dev.html
-  Wiki: https://en.wikipedia.org/wiki/Perl_Compatible_Regular_Expressions
+  X_mailinglist: https://lists.exim.org/lurker/list/pcre-dev.html
+  X_wiki: https://en.wikipedia.org/wiki/Perl_Compatible_Regular_Expressions
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Alien-PCRE2
   homepage: http://www.pcre.org
   license: http://dev.perl.org/licenses/
   repository: git://github.com/wbraswell/alien-pcre2.git
-version: '0.015000'
+version: '0.016000'
 x_alienfile:
-  generated_by: 'Alien::Build::MM version 1.28'
+  generated_by: 'Alien::Build::MM version 2.48'
   requires:
     share:
       Alien::gmake: '0.11'
       Archive::Tar: '0'
       Config: '0'
-      HTML::LinkExtor: '0'
       HTTP::Tiny: '0.044'
       IO::Socket::SSL: '1.56'
       IO::Zlib: '0'
+      Mojo::DOM: '0'
+      Mojolicious: '7.00'
       Net::SSLeay: '1.49'
       Sort::Versions: '0'
       URI: '0'

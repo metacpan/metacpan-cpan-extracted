@@ -21,15 +21,15 @@ BEGIN { $HAS_ZLIB = eval 'use Compress::Zlib (); 1;' }
 
 =head1 NAME
 
-Net::eBay - Perl Interface to XML based eBay API. 
+Net::eBay - Perl Interface to XML based eBay API.
 
 =head1 VERSION
 
-Version 0.61
+Version 0.62
 
 =cut
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 =head1 SYNOPSIS
 
@@ -73,7 +73,7 @@ eBay does not allow bidding via eBay API.
                               ApplicationKey => '...',
                               CertificateKey => '...',
                               Token => '...',
-                             } ); 
+                             } );
 
  my $result = $ebay->submitRequest( "AddItem",
                       {
@@ -211,11 +211,11 @@ sub new {
   my ($type, $hash) = @_;
 
   unless( $hash ) {
-    if( defined $ENV{EBAY_INI_FILE} && -f $ENV{EBAY_INI_FILE} ) {
+    if ( defined $ENV{EBAY_INI_FILE} && -f $ENV{EBAY_INI_FILE} ) {
       $hash = $ENV{EBAY_INI_FILE};
-    } elsif( defined $ENV{HOME} && -f "$ENV{HOME}/.ebay.ini" ) {
+    } elsif ( defined $ENV{HOME} && -f "$ENV{HOME}/.ebay.ini" ) {
       $hash = "$ENV{HOME}/.ebay.ini";
-    } elsif( -f "ebay.ini" ) {
+    } elsif ( -f "ebay.ini" ) {
       $hash = "ebay.ini";
     }
   }
@@ -229,7 +229,7 @@ sub new {
     # this is a filename
     open( F, $hash ) || croak "Cannot open Net::eBay resource file $hash";
     my $h = {};
-    while( my $l = <F> ) {
+    while ( my $l = <F> ) {
       next if $l =~ /^\s*$/;
       next if $l =~ /\s*\#/;
       next unless $l =~ /^\s*(\w+)\s*\=\s*(.*)/;
@@ -238,53 +238,55 @@ sub new {
     close( F );
     $hash = $h;
   }
-  
+
   bless $hash, $type;
 
   $hash->{debug} = undef unless $hash->{debug};
-  
+
+  $hash->{debug} = 1 if $ENV{DEBUG_EBAY_API};
+
   $hash->{siteid} = 0 unless $hash->{siteid};
 
   $hash->{defaults} = {
-      API           => 2,
-      compatibility => 655,
-      timeout       => 50,
-      retries       => 2,
-  };
-  
+                       API           => 2,
+                       compatibility => 655,
+                       timeout       => 50,
+                       retries       => 2,
+                      };
+
   if ( ! $hash->{url} ) {
 
-      return undef unless verifyAndPrint( 
-          defined $hash->{SiteLevel} && $hash->{SiteLevel},
-          "SiteLevel must be defined" 
-      );
+    return undef unless verifyAndPrint(
+                                       defined $hash->{SiteLevel} && $hash->{SiteLevel},
+                                       "SiteLevel must be defined"
+                                      );
 
-      if( $hash->{SiteLevel} eq 'prod' ) {
+    if ( $hash->{SiteLevel} eq 'prod' ) {
 
-        $hash->{url} = 'https://api.ebay.com/ws/api.dll';
-        $hash->{public_url} = 'http://cgi.ebay.com/ws/eBayISAPI.dll';
-        $hash->{finding_url} = 'http://svcs.ebay.com/services/search/FindingService/v1';
+      $hash->{url}         = 'https://api.ebay.com/ws/api.dll';
+      $hash->{public_url}  = 'http://cgi.ebay.com/ws/eBayISAPI.dll';
+      $hash->{finding_url} = 'https://svcs.ebay.com/services/search/FindingService/v1';
 
-      } elsif( $hash->{SiteLevel} eq 'dev' ) {
+    } elsif ( $hash->{SiteLevel} eq 'dev' ) {
 
-        $hash->{url} = 'https://api.sandbox.ebay.com/ws/api.dll';
-        $hash->{public_url} = 'http://cgi.sandbox.ebay.com/ws/eBayISAPI.dll';
-        $hash->{finding_url} = undef; # incomplete work @@@@
+      $hash->{url}         = 'https://api.sandbox.ebay.com/ws/api.dll';
+      $hash->{public_url}  = 'http://cgi.sandbox.ebay.com/ws/eBayISAPI.dll';
+      $hash->{finding_url} = undef; # incomplete work @@@@
 
-      } else {
-        return unless verifyAndPrint( 0, "Parameter SiteLevel is not defined or is wrong: '$hash->{SiteLevel}'" );
-      }
+    } else {
+      return unless verifyAndPrint( 0, "Parameter SiteLevel is not defined or is wrong: '$hash->{SiteLevel}'" );
+    }
   }
-  
+
   $hash->{siteid} = 0 unless $hash->{siteid};
-  
+
   return undef unless verifyAndPrint( $hash->{DeveloperKey}, "'DeveloperKey' field must be defined with eBay Developer key");
   return undef unless verifyAndPrint( $hash->{ApplicationKey}, "'ApplicationKey' field must be defined with eBay application key");
   return undef unless verifyAndPrint( $hash->{CertificateKey}, "'CertificateKey' field must be defined with eBay certificate key");
   return undef unless verifyAndPrint( $hash->{Token}, "'Token' field must be defined with eBay token");
 
   $hash->{SessionCertificate} = "$hash->{DeveloperKey};$hash->{ApplicationKey};$hash->{CertificateKey}";
-  
+
   return $hash;
 }
 
@@ -321,9 +323,9 @@ Example:
 sub setDefaults {
   my ($this, $defaults) = @_;
 
-  if( defined $defaults->{API} ) {
+  if ( defined $defaults->{API} ) {
     my $api = $defaults->{API};
-    if( $api != 1 && $api != 2 ) {
+    if ( $api != 1 && $api != 2 ) {
       croak "Incorrect value of API ($api) is supplied in the hash. Use API => 1 or API => 2.";
     }
     my $old = $this->{defaults}->{API};
@@ -390,7 +392,7 @@ sub submitRequestGetText {
   my ($this, $name, $request) = @_;
 
   my $req = HTTP::Request->new( POST => $this->{url} );
-  if(defined $this->{defaults}->{siteid} ) {
+  if (defined $this->{defaults}->{siteid} ) {
     $req->header( 'X-EBAY-API-SITEID', $this->{defaults}->{siteid} );
   } else {
     $req->header( 'X-EBAY-API-SITEID', $this->{siteid} );
@@ -400,27 +402,27 @@ sub submitRequestGetText {
   $req->header( 'X-EBAY-API-CERT-NAME', $this->{CertificateKey} );
   $req->header( 'X-EBAY-API-APP-NAME', $this->{ApplicationKey} );
   $req->header( 'Content-Type', 'text/xml' );
-  $req->header( 'X-EBAY-API-SESSION-CERTIFICATE', $this->{SessionCertificate} ); 
+  $req->header( 'X-EBAY-API-SESSION-CERTIFICATE', $this->{SessionCertificate} );
 
   # request compressed responses (if we can handle them)
   $req->header( 'Accept-Encoding', 'gzip' ) if $HAS_ZLIB;
 
   my $xml = "";
-  if( $this->{defaults}->{API} == 1 ) {
+  if ( $this->{defaults}->{API} == 1 ) {
     $req->header( 'X-EBAY-API-COMPATIBILITY-LEVEL', $this->{defaults}->{compatibility} );
     $req->header( 'X-EBAY-API-CALL-NAME', $name );
 
     $request->{Verb} = $name unless $request->{Verb};
-    
+
     $xml = "<?xml version='1.0' encoding='UTF-8'?>
 <request>
     <RequestToken>" . $this->{Token} . "</RequestToken>\n";
 
     $xml .= hash2xml( 2, $request );
-    
+
     $xml .= "</request>\n\n";
-    
-  } elsif( $this->{defaults}->{API} == 2 ) {
+
+  } elsif ( $this->{defaults}->{API} == 2 ) {
     $req->header( 'X-EBAY-API-COMPATIBILITY-LEVEL', $this->{defaults}->{compatibility} );
     $req->header( 'X-EBAY-API-CALL_NAME', $name );
 
@@ -428,28 +430,30 @@ sub submitRequestGetText {
 <?xml version='1.0' encoding='utf-8'?>
  <$name"."Request xmlns=\"urn:ebay:apis:eBLBaseComponents\">
  <RequesterCredentials>\n";
- #if request credentials exist, use the username/password
- if(defined $request->{RequesterCredentials}) { 
-   
-   #if username or password is not defined, we can't use request credentials
-   if(not defined $request->{RequesterCredentials}{Username} or
-      not defined $request->{RequesterCredentials}{Password}) {
-     croak "Username or Password missing when using RequesterCredentials\n";
-   }
-   
-   #add to the request header
-   $xml .= "  <Username>$request->{RequesterCredentials}{Username}</Username>\n" .
-           "  <Password>$request->{RequesterCredentials}{Password}</Password>\n";
+    #if request credentials exist, use the username/password
+    if (defined $request->{RequesterCredentials}) {
 
-   #delete from our request beceause we don't actually want to include a request credentials
-   #node within our api call
-   delete $request->{RequesterCredentials};
+      #if username or password is not defined, we can't use request credentials
+      if (not defined $request->{RequesterCredentials}{Username} or
+          not defined $request->{RequesterCredentials}{Password}) {
+        croak "Username or Password missing when using RequesterCredentials\n";
+      }
 
- } else {
-   $xml .= "  <eBayAuthToken>$this->{Token}</eBayAuthToken>\n";
- }
- 
- $xml .= "</RequesterCredentials>
+      #add to the request header
+      $xml .= "  <Username>$request->{RequesterCredentials}{Username}</Username>\n" .
+        "  <Password>$request->{RequesterCredentials}{Password}</Password>\n";
+
+      #delete from our request beceause we don't actually want to include a request credentials
+      #node within our api call
+      delete $request->{RequesterCredentials};
+
+    } else {
+        unless( lc( $this->{Token} ) eq "none" ) {
+            $xml .= "  <eBayAuthToken>$this->{Token}</eBayAuthToken>\n";
+        }
+    }
+
+    $xml .= "</RequesterCredentials>
 " . hash2xml( 2, $request ) . "
 </$name"."Request>
 ";
@@ -460,7 +464,7 @@ sub submitRequestGetText {
 
   $req->content( $xml );
 
-  if( $this->{debug} ) {
+  if ( $this->{debug} ) {
     warn "XML:\n$xml\n";
     warn "Request: " . $req->as_string;
   }
@@ -470,12 +474,12 @@ sub submitRequestGetText {
 
   my $retries = 0;
   my $res;
-  TRY: {
+ TRY: {
     $res = $_ua->request($req);
     return undef unless $res;
     if ( $res->is_error && $retries < $this->{defaults}{retries} ) {
-        $retries++;
-        redo TRY;
+      $retries++;
+      redo TRY;
     }
   }
 
@@ -484,9 +488,9 @@ sub submitRequestGetText {
     warn "Net::eBay: error making request $name ($error_msg).\n";
     return undef;
   }
-  
-  if( $this->{debug} ) {
-    warn "Content (debug of Net::eBay): " . $res->content . "\n";
+
+  if ( $this->{debug} ) {
+    warn "Content (debug of Net::eBay): " . $res->decoded_content . "\n";
   }
 
   return $res->decoded_content;
@@ -495,11 +499,11 @@ sub submitRequestGetText {
 sub submitRequest {
 
   my ($this) = @_;
-  
+
   my $content = submitRequestGetText( @_ );
 
   $this->{last_result_xml} = $content;
-  
+
   $@ = "";
   my $result = undef;
   eval {
@@ -508,9 +512,9 @@ sub submitRequest {
   };
 
   $this->{_last_text} = $content;
-  
+
   return $result if $result;
-  
+
   warn "Error parsing XML ($@). REF(content) = " . ref( $content ) . " CONTENT=$content\n";
   return $content;
 }
@@ -602,12 +606,12 @@ sub submitFindingRequestGetText {
 
   my $retries = 0;
   my $res;
-  TRY: {
+ TRY: {
     $res = $_ua->request($req);
     return undef unless $res;
     if ( $res->is_error && $retries < $this->{defaults}{retries} ) {
-        $retries++;
-        redo TRY;
+      $retries++;
+      redo TRY;
     }
   }
 
@@ -616,8 +620,8 @@ sub submitFindingRequestGetText {
     warn "Net::eBay: error making request $name ($error_msg).\n";
     return undef;
   }
-  
-  if( $this->{debug} ) {
+
+  if ( $this->{debug} ) {
     warn "Content (debug of Net::eBay): " . $res->content . "\n";
   }
 
@@ -696,7 +700,7 @@ sub submitPaginatedFindingRequest {
     }
   }
 
-  delete $request->{Pagination};
+  delete $request->{paginationOutput};
   return $result;
 }
 
@@ -722,7 +726,7 @@ Internal ONLY function
 sub officialTime {
   my ($this) = @_;
   my $result = $this->submitRequest( "GeteBayOfficialTime", {} );
-  if( $result ) {
+  if ( $result ) {
     return $result->{EBayTime} if( $this->{defaults}->{API} == 1 );
     return $result->{Timestamp} if( $this->{defaults}->{API} == 2 );
     croak "Strange, unknown API level '$this->{defaults}->{API}'. bug\n";
@@ -774,7 +778,7 @@ sub hash2xml {
   my ($depth, $request, $optionalKey) = @_;
 
   my $r = ref $request;
-  
+
   unless( ref $request ) {
     my $data = $request;
     #$data =~ s/\</\&lt\;/g;
@@ -783,9 +787,9 @@ sub hash2xml {
   }
 
   my $xml;
-  
-  if( $r =~ /HASH/ ) {
-    if( defined $request->{_value} && defined $request->{_attributes} ) {
+
+  if ( $r =~ /HASH/ ) {
+    if ( defined $request->{_value} && defined $request->{_attributes} ) {
       $xml = "<$optionalKey ";
       foreach my $a ( sort keys %{$request->{_attributes}} ) {
         #print STDERR "a=$a.\n";
@@ -799,11 +803,11 @@ sub hash2xml {
       my $d = " " x $depth;
       foreach my $key (sort keys %$request) {
         my $r = $request->{$key};
-        if( (ref( $r ) =~ /HASH/)
-            && defined $r->{_value}
-            && defined $r->{_attributes} ) {
+        if ( (ref( $r ) =~ /HASH/)
+             && defined $r->{_value}
+             && defined $r->{_attributes} ) {
           $xml .= "$d  " . hash2xml( $depth+2, $r, $key ) . "\n";
-        } elsif( ref( $request->{$key} ) =~ /^ARRAY/ ) {
+        } elsif ( ref( $request->{$key} ) =~ /^ARRAY/ ) {
           $xml .= hash2xml( $depth, $request->{$key}, $key );
         } else {
           my $data = hash2xml( $depth+2, $request->{$key}, $key );
@@ -813,12 +817,12 @@ sub hash2xml {
       }
       $xml .= "$d";
     }
-  } elsif( $r =~ /ARRAY/ ) {
+  } elsif ( $r =~ /ARRAY/ ) {
     foreach my $item ( @$request ) {
       $xml .= hash2xml( $depth+2, { $optionalKey => $item }, $optionalKey );
     }
   }
-  
+
   return $xml;
 }
 
@@ -826,4 +830,4 @@ sub hash2xml {
 $_ua = LWP::UserAgent->new( agent => "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; .NET CLR 1.1.4322)" );
 
 
-1; # End of Net::eBay
+1;                              # End of Net::eBay

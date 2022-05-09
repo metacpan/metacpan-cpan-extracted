@@ -19,7 +19,7 @@ use constant {
 
 use strict;
 
-our $VERSION = '0.30';
+our $VERSION = '0.32';
 $VERSION = eval $VERSION;
 
 @PDL::LinearAlgebra::ISA = qw/PDL::Exporter/;
@@ -139,7 +139,7 @@ sub laerror{
 =for ref
 
 Convenient function for transposing real or complex 2D array(s).
-For PDL::Complex, if conj is true returns conjugate transposed array(s) and doesn't support dataflow.
+For complex data, if conj is true returns conjugate transposed array(s) and doesn't support dataflow.
 Supports threading.
 
 =cut
@@ -1087,10 +1087,10 @@ Works on transposed array(s).
  right eigenvector   : Right eigenvectors returned, none = 0 | all = 1 | selected = 2, default = 0
  select_func	     : Select_func is used to select eigenvalues to sort
 		       to the top left of the Schur form.
-		       An eigenvalue is selected if PerlInt select_func(PDL::Complex(w)) is true;
+		       An eigenvalue is selected if PerlInt select_func(w) is true;
 		       (the inputs are converted to complex ndarrays for you)
 		       Note that a selected complex eigenvalue may no longer
-		       satisfy select_func(PDL::Complex(w)) = 1 after ordering, since
+		       satisfy select_func(w) = 1 after ordering, since
 		       ordering may change the value of complex eigenvalues
 		       (especially if the eigenvalue is ill-conditioned).
 		       All eigenvalues/vectors are selected if select_func is undefined.
@@ -1220,10 +1220,10 @@ Works on transposed array.
  right eigenvector   : Right eigenvectors returned, none = 0 | all = 1 | selected = 2, default = 0
  select_func         : Select_func is used to select eigenvalues to sort
 		       to the top left of the Schur form.
-		       An eigenvalue is selected if PerlInt select_func(PDL::Complex(w)) is true;
+		       An eigenvalue is selected if PerlInt select_func(w) is true;
 		       (the inputs are converted to complex ndarrays for you)
 		       Note that a selected complex eigenvalue may no longer
-		       satisfy select_func(PDL::Complex(w)) = 1 after ordering, since
+		       satisfy select_func(w) = 1 after ordering, since
 		       ordering may change the value of complex eigenvalues
 		       (especially if the eigenvalue is ill-conditioned).
 		       All  eigenvalues/vectors are selected if select_func is undefined.
@@ -1345,7 +1345,7 @@ Works on transposed array.
  select_func	     : Select_func is used to select eigenvalues to sort.
 		       to the top left of the Schur form.
 		       An eigenvalue w = wr(j)+sqrt(-1)*wi(j) is selected if
-		       PerlInt select_func(PDL::Complex(alpha),PDL | PDL::Complex (beta)) is true;
+		       PerlInt select_func(alpha,beta) is true;
 		       (the inputs are converted to complex ndarrays for you)
 		       Note that a selected complex eigenvalue may no longer
 		       satisfy select_func = 1 after ordering, since
@@ -1493,7 +1493,7 @@ from Lapack. Works on transposed array.
  select_func	     : Select_func is used to select eigenvalues to sort.
 		       to the top left of the Schur form.
 		       An eigenvalue w = wr(j)+sqrt(-1)*wi(j) is selected if
-		       PerlInt select_func(PDL::Complex(alpha),PDL | PDL::Complex (beta)) is true;
+		       PerlInt select_func(alpha,beta) is true;
 		       (the inputs are converted to complex ndarrays for you)
 		       Note that a selected complex eigenvalue may no longer
 		       satisfy select_func = 1 after ordering, since
@@ -1596,7 +1596,7 @@ sub PDL::mgschurx{
 =for ref
 
 Computes QR decomposition.
-For complex number needs object of type PDL::Complex.
+Handles complex data.
 Uses L<geqrf|PDL::LinearAlgebra::Real/geqrf> and L<orgqr|PDL::LinearAlgebra::Real/orgqr>
 or L<cgeqrf|PDL::LinearAlgebra::Complex/cgeqrf> and L<cungqr|PDL::LinearAlgebra::Complex/cungqr>
 from Lapack and returns C<Q> in scalar context. Works on transposed array.
@@ -1645,7 +1645,7 @@ sub PDL::mqr {
 =for ref
 
 Computes RQ decomposition.
-For complex number needs object of type PDL::Complex.
+Handles complex data.
 Uses L<gerqf|PDL::LinearAlgebra::Real/gerqf> and L<orgrq|PDL::LinearAlgebra::Real/orgrq>
 or L<cgerqf|PDL::LinearAlgebra::Complex/cgerqf> and L<cungrq|PDL::LinearAlgebra::Complex/cungrq>
 from Lapack and returns C<Q> in scalar context. Works on transposed array.
@@ -1715,7 +1715,7 @@ sub PDL::mrq {
 =for ref
 
 Computes QL decomposition.
-For complex number needs object of type PDL::Complex.
+Handles complex data.
 Uses L<geqlf|PDL::LinearAlgebra::Real/geqlf> and L<orgql|PDL::LinearAlgebra::Real/orgql>
 or L<cgeqlf|PDL::LinearAlgebra::Complex/cgeqlf> and L<cungql|PDL::LinearAlgebra::Complex/cungql>
 from Lapack and returns C<Q> in scalar context. Works on transposed array.
@@ -1785,7 +1785,7 @@ sub PDL::mql {
 =for ref
 
 Computes LQ decomposition.
-For complex number needs object of type PDL::Complex.
+Handles complex data.
 Uses L<gelqf|PDL::LinearAlgebra::Real/gelqf> and L<orglq|PDL::LinearAlgebra::Real/orglq>
 or L<cgelqf|PDL::LinearAlgebra::Complex/cgelqf> and L<cunglq|PDL::LinearAlgebra::Complex/cunglq>
 from Lapack and returns C<Q> in scalar context. Works on transposed array.
@@ -2580,7 +2580,7 @@ sub PDL::mlse {
 Computes eigenvalues and, optionally, the left and/or right eigenvectors of a general square matrix
 (spectral decomposition).
 Eigenvectors are normalized (Euclidean norm = 1) and largest component real.
-The eigenvalues and eigenvectors returned are object of type PDL::Complex.
+The eigenvalues and eigenvectors returned are complex ndarrays.
 If only eigenvalues are requested, info is returned in array context.
 Supports threading.
 Uses L<geev|PDL::LinearAlgebra::Real/geev> or L<cgeev|PDL::LinearAlgebra::Complex/cgeev> from Lapack.
@@ -2620,7 +2620,7 @@ sub PDL::meigen {
 Computes eigenvalues, one-norm and, optionally, the left and/or right eigenvectors of a general square matrix
 (spectral decomposition).
 Eigenvectors are normalized (Euclidean norm = 1) and largest component real.
-The eigenvalues and eigenvectors returned are object of type PDL::Complex.
+The eigenvalues and eigenvectors returned are complex ndarrays.
 Uses L<geevx|PDL::LinearAlgebra::Real/geevx> or
 L<cgeevx|PDL::LinearAlgebra::Complex/cgeevx> from Lapack.
 Works on transposed arrays.
@@ -2723,7 +2723,7 @@ sub PDL::meigenx {
 
 Computes generalized eigenvalues and, optionally, the left and/or right generalized eigenvectors
 for a pair of N-by-N real nonsymmetric matrices (A,B) .
-The alpha from ratio alpha/beta is object of type PDL::Complex.
+The alpha from ratio alpha/beta is a complex ndarray.
 Supports threading. Uses L<ggev|PDL::LinearAlgebra::Real/ggev> or
 L<cggev|PDL::LinearAlgebra::Complex/cggev> from Lapack.
 Works on transposed arrays.
@@ -2762,7 +2762,7 @@ sub PDL::mgeigen {
 
 Computes generalized eigenvalues, one-norms and, optionally, the left and/or right generalized
 eigenvectors for a pair of N-by-N real nonsymmetric matrices (A,B).
-The alpha from ratio alpha/beta is object of type PDL::Complex.
+The alpha from ratio alpha/beta is a complex ndarray.
 Uses L<ggevx|PDL::LinearAlgebra::Real/ggevx> or
 L<cggevx|PDL::LinearAlgebra::Complex/cggevx> from Lapack.
 Works on transposed arrays.
@@ -3246,7 +3246,7 @@ sub PDL::msvd {
 
 Computes generalized (or quotient) singular value decomposition.
 If the effective rank of (A',B')' is 0 return only unitary V, U, Q.
-For complex number, needs object of type PDL::Complex.
+Handles complex data.
 Uses L<ggsvd|PDL::LinearAlgebra::Real/ggsvd> or
 L<cggsvd|PDL::LinearAlgebra::Complex/cggsvd> from Lapack. Works on transposed arrays.
 

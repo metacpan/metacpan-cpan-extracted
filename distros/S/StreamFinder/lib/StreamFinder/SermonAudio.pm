@@ -4,7 +4,7 @@ StreamFinder::SermonAudio - Fetch actual raw streamable URLs on sermonaudio.com
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2021 by
+This module is Copyright (C) 2021-2022 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -103,7 +103,8 @@ One or more stream URLs can be returned for each podcast.
 
 =over 4
 
-=item B<new>(I<ID>|I<url> [, I<-secure> [ => 0|1 ]] [, I<-debug> [ => 0|1|2 ]])
+=item B<new>(I<ID>|I<url> [, "-quality" => I<quality>] [, I<-secure> [ => 0|1 ]] 
+[, I<-debug> [ => 0|1|2 ]])
 
 Accepts a www.sermonaudio.com podcast (sermon) ID or URL and creates and returns a 
 a new podcast object, or I<undef> if the URL is not a valid podcast, or no streams 
@@ -111,6 +112,17 @@ are found.  The URL can be the full URL, ie.
 https://www.sermonaudio.com/sermoninfo.asp?SID=B<sermon-id>, 
 https://www.sermonaudio.com/source_detail.asp?sourceid=B<source-id>, 
 or just I<sermon-id>.
+
+The optional I<-quality> argument, can be set to either "high", "low", "audio", 
+or "any".  "audio" means only accept audio streams, "low" means only accept their 
+"Play Lo-Video" (/medialo/) video streams + all audio streams, "high" means skip 
+these lower-quality video streams, but include all others + audio streams, and 
+"any" or "all" (any other value) means accept all streams found (subject to the 
+I<-secure> argument, if specified).  Unless "audio" is specified, and any video 
+stream is accepted (subject to the above limitations), then the "best" stream 
+returned will be video (video streams are favored over audio).
+
+DEFAULT I<-quality> is "I<any>":  (accept all streams without resolution limit).
 
 The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  If 1 
 then only secure ("https://") streams will be returned.
@@ -277,7 +289,7 @@ L<http://search.cpan.org/dist/StreamFinder-SermonAudio/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2021 Jim Turner.
+Copyright 2021-2022 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -345,10 +357,14 @@ sub new
 		} elsif ($_[0] =~ /^\-?secure$/o) {
 			shift;
 			$self->{'secure'} = (defined $_[0]) ? shift : 1;
+		} elsif ($_[0] =~ /^\-?quality$/o) {
+			shift;
+			$self->{'quality'} = (defined $_[0]) ? shift : 'any';
 		} else {
 			shift;
 		}
 	}
+	$self->{'quality'} = 'any'  unless (defined $self->{'quality'});
 
 	my $isEpisode = 1;
 	$url =~ s#\\##g;
@@ -419,17 +435,33 @@ TRYIT:
 		foreach my $tag ('og:video:secure_url', 'og:video:url', 'og:audio:secure_url', 'og:audio:url', 'og:audio') {
 			if ($html =~ s#\"$tag\"\s+content\=\"([^\"]+)\"##s) {
 				my $mediaurl = $1;
+				if ($mediaurl =~ m#\/video\/#o || $mediaurl =~ m#\.mp4#io) {
+					next  if ($self->{'quality'} =~ /audio/io);
+					next  if ($self->{'quality'} =~ /low/io && $mediaurl !~ m#\/medialo\/#o);
+				}
 				unless (defined($dups{$mediaurl}) || ($self->{'secure'} && $mediaurl !~ /^https/o)) {
 					push @{$self->{'streams'}}, $mediaurl;
+					print STDERR "--stream found=$mediaurl=\n"  if ($DEBUG);
 					$self->{'cnt'}++;
 					$dups{$mediaurl} = 1;
 				}
+			}
+		}
+		if ($self->{'quality'} !~ /(?:high|audio)/io
+				&& $html =~ m#\>Play\s+Lo\-Video\<\/B\>\<\/a\>.*?\<a\s+rel\=\"nofollow\"\s+href\=\"([^\"]+)#s) {
+			my $mediaurl = $1;
+			unless (defined($dups{$mediaurl}) || ($self->{'secure'} && $mediaurl !~ /^https/o)) {
+				push @{$self->{'streams'}}, $mediaurl;
+				print STDERR "--stream found=$mediaurl=\n"  if ($DEBUG);
+				$self->{'cnt'}++;
+				$dups{$mediaurl} = 1;
 			}
 		}
 		while ($html =~ s#\<a\s+rel\=\"nofollow\"\s+href\=\"(https?\:\/\/\S+?$self->{'id'}\.mp3)\"\>##s) {
 			my $audiourl = $1;
 			unless (defined($dups{$audiourl}) || ($self->{'secure'} && $audiourl !~ /^https/o)) {
 				push @{$self->{'streams'}}, $audiourl;
+				print STDERR "--stream found=$audiourl=\n"  if ($DEBUG);
 				$self->{'cnt'}++;
 				$dups{$audiourl} = 1;
 			}
@@ -458,9 +490,15 @@ TRYIT:
 		$self->{'iconurl'} ||= $1  if ($html =~ m#\<meta\s+property\=\"og\:image\"\s+content\=\"([^\"]+)\"\s*\/\>#s);
 		$self->{'iconurl'} ||= $1  if ($html =~ m#\<font\s+class\=ar3\>\<img\s+src\=\"([^\"]+)#s);
 		$self->{'imageurl'} = $self->{'iconurl'};
-		my $articonurl = ($html =~ m#\<img\s+.*?src\=\"([^\"]+)\"\s+width\=\"?60\"?\s+height\=\"?40\"?\s+border\=\"?0#s)
+		$self->{'articonurl'} = ($html =~ m#\<img\s+.*?src\=\"([^\"]+)\"\s+width\=\"?60\"?\s+height\=\"?40\"?\s+border\=\"?0#s)
 				? $1 : '';
-		$self->{'articonurl'} = $articonurl  if ($articonurl);
+		$self->{'artimageurl'} ||= $1  if ($html =~ m#\<img\s+src\=\"(.*?\/images\/speakers\/[^\"]+)#s);
+		$self->{'artimageurl'} = 'https:' . $self->{'artimageurl'}  if ($self->{'artimageurl'} =~ m#^\/\/#);
+		$self->{'artimageurl'} = 'https://media.sermonaudio.com' . $self->{'artimageurl'}  if ($self->{'artimageurl'} =~ m#^\/#);
+		$self->{'articonurl'} ||= $self->{'artimageurl'};
+		$self->{'articonurl'} = 'https:' . $self->{'articonurl'}  if ($self->{'articonurl'} =~ m#^\/\/#);
+		$self->{'articonurl'} = 'https://media.sermonaudio.com' . $self->{'articonurl'}  if ($self->{'articonurl'} =~ m#^\/#);
+		print STDERR "--articon=".$self->{'articonurl'}."=\n"  if ($DEBUG);
 		if ($html =~ s#Speaker\:\<\/font\>\<BR\>\<B\>\<a\s+class\=\S+\shref\=\"([^\"]+)\"\>([^\<]*)##s) {
 			$self->{'albumartist'} = $1;
 			$self->{'artist'} = $2;

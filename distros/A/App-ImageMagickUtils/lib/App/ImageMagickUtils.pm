@@ -8,9 +8,9 @@ use Log::ger;
 use Perinci::Exporter;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-10'; # DATE
+our $DATE = '2022-05-08'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 our %SPEC;
 
@@ -30,11 +30,35 @@ our %argspec0_files = (
     },
 );
 
-our %argspecopt_delete_original = (
+our %argspecs_delete = (
     delete_original => {
+        summary => 'Delete (unlink) the original file after downsizing',
         schema => 'bool*',
+        description => <<'_',
+
+See also the `trash_original` option.
+
+_
         cmdline_aliases => {D=>{}},
     },
+    trash_original => {
+        summary => 'Trash the original file after downsizing',
+        schema => 'bool*',
+        description => <<'_',
+
+This option uses the <pm:File::Trash::FreeDesktop> module to do the trashing.
+Compared to deletion, with this option you can still restore the trashed
+original files from the Trash directory.
+
+See also the `delete_original` option.
+
+_
+        cmdline_aliases => {T=>{}},
+    },
+);
+
+our %args_rels = (
+    choose_one => [qw/delete_original trash_original/],
 );
 
 sub _nearest {
@@ -60,9 +84,10 @@ or (if downsizing is done):
 _
     args => {
         %argspec0_files,
-        q => {
+        quality => {
             schema => ['int*', between=>[0,100]],
             default => 40,
+            cmdline_aliases => {q=>{}},
         },
         downsize_to => {
             schema => ['str*', in=>['', '640', '800', '1024', '1536', '2048']],
@@ -79,10 +104,41 @@ _
             cmdline_aliases => {
                 dont_downsize => {summary=>"Alias for --downsize-to ''", is_flag=>1, code=>sub {$_[0]{downsize_to} = ''}},
                 no_downsize   => {summary=>"Alias for --downsize-to ''", is_flag=>1, code=>sub {$_[0]{downsize_to} = ''}},
+                1536          => {summary=>"Shortcut for --downsize-to=1536", is_flag=>1, code=>sub {$_[0]{downsize_to} = '1536'}},
+                2048          => {summary=>"Shortcut for --downsize-to=2048", is_flag=>1, code=>sub {$_[0]{downsize_to} = '2048'}},
             },
         },
-        %argspecopt_delete_original,
+        skip_whatsapp => {
+            summary => 'Skip WhatsApp images',
+            'summary.alt.bool.not' => 'Do not skip WhatsApp images',
+            schema => 'bool*',
+            default => 1,
+            description => <<'_',
+
+By default, assuming that WhatsApp already compresses images, when given a
+filename that matches a WhatsApp image filename, e.g. `IMG-20220508-WA0001.jpg`
+(will be checked using <pm:Regexp::Pattern::Filename::Image::WhatsApp>), will
+skip downsizing. The `--no-skip-whatsapp` option will process such filenames
+nevertheless.
+
+_
+        },
+        skip_downsized => {
+            summary => 'Skip previously downsized images',
+            'summary.alt.bool.not' => 'Do not skip previously downsized images',
+            schema => 'bool*',
+            default => 1,
+            description => <<'_',
+
+By default, when given a filename that looks like it's already downsized, e.g.
+`foo.1024-q40.jpg` or `foo.q40.jpg`, will skip downsizing. The
+`--no-skip-downsized` option will process such filenames nevertheless.
+
+_
+        },
+        %argspecs_delete,
     },
+    args_rels => \%args_rels,
     features => {
         dry_run => 1,
     },
@@ -113,6 +169,8 @@ sub downsize_image {
 
     my $convert_path = File::Which::which("convert");
     my $downsize_to = $args{downsize_to};
+    my $skip_whatsapp = $args{skip_whatsapp} // 1;
+    my $skip_downsized = $args{skip_downsized} // 1;
 
     unless ($args{-dry_run}) {
         return [400, "Cannot find convert in path"] unless defined $convert_path;
@@ -120,23 +178,40 @@ sub downsize_image {
     }
 
     my ($num_files, $num_success) = (0, 0);
+    my $trash;
+  FILE:
     for my $file (@{$args{files}}) {
         log_info "Processing file %s ...", $file;
         $num_files++;
 
         unless (-f $file) {
             log_error "No such file %s, skipped", $file;
-            next;
+            next FILE;
         }
 
         #my $res = Filename::Image::check_image_filename(filename => $file);
         my ($width, $height, $fmt) = Image::Size::imgsize($file);
         unless ($width) {
             log_error "Filename '%s' is not image (%s), skipped", $file, $fmt;
-            next;
+            next FILE;
         }
 
-        my $q = $args{q} // 40;
+        if ($skip_whatsapp) {
+            require Regexp::Pattern::Filename::Image::WhatsApp;
+            if ($file =~ $Regexp::Pattern::Filename::Image::WhatsApp::RE{filename_image_whatsapp}{pat}) {
+                log_info "Filename '%s' looks like a WhatsApp image, skip downsizing due to --skip-whatsapp option is in effect", $file;
+                next FILE;
+            }
+        }
+
+        if ($skip_downsized) {
+            if ($file =~ /\.(?:\d+p?-)?q(?:\d{1,3})\.\w+\z/) {
+                log_info "Filename '%s' looks like it's already downsized, skip downsizing due to --skip-downsized option is in effect", $file;
+                next FILE;
+            }
+        }
+
+        my $q = $args{quality} // 40;
         my @convert_args = (
             $file,
         );
@@ -164,7 +239,8 @@ sub downsize_image {
 
         if ($args{-dry_run}) {
             log_info "[DRY-RUN] Running $convert_path with args %s ...", \@convert_args;
-            next;
+            $num_success++;
+            next FILE;
         }
 
         IPC::System::Options::system(
@@ -175,9 +251,15 @@ sub downsize_image {
             my ($exit_code, $signal, $core_dump) = ($? < 0 ? $? : $? >> 8, $? & 127, $? & 128);
             log_error "convert for $file failed: exit_code=$exit_code, signal=$signal, core_dump=$core_dump";
         } else {
-            if ($args{delete_original}) {
+            if ($args{trash_original}) {
+                require File::Trash::FreeDesktop;
+                $trash //= File::Trash::FreeDesktop->new;
+                log_info "Trashing original file %s ...", $file;
+                # will die upon failure, currently we don't trap
+                $trash->trash($file);
+            } elsif ($args{delete_original}) {
                 # currently we ignore the results
-                log_trace "Deleting original file %s ...", $file;
+                log_info "Deleting original file %s ...", $file;
                 unlink $file;
             }
             $num_success++;
@@ -209,7 +291,7 @@ _
             req => 1,
             examples => [qw/pdf jpg png/], # for tab completion
         },
-        %argspecopt_delete_original,
+        %argspecs_delete,
     },
     #features => {
     #    dry_run => 1,
@@ -230,6 +312,7 @@ sub convert_image_to {
     my $to = $args{to} or return [400, "Please specify target format in `to`"];
 
     my $envres = Perinci::Object::envresmulti();
+    my $trash;
     for my $file (@{$args{files}}) {
         log_info "Processing file %s ...", $file;
         IPC::System::Options::system(
@@ -240,9 +323,15 @@ sub convert_image_to {
 
         if ($ps->is_success) {
             $envres->add_result(200, "OK", {item_id=>$file});
-            if ($args{delete_original}) {
+            if ($args{trash_original}) {
+                require File::Trash::FreeDesktop;
+                $trash //= File::Trash::FreeDesktop->new;
+                log_info "Trashing original file %s ...", $file;
+                # will die upon failure, currently we don't trap
+                $trash->trash($file);
+            } elsif ($args{delete_original}) {
                 # currently we ignore the result of deletion
-                log_trace "Deleting original file %s ...", $file;
+                log_info "Deleting original file %s ...", $file;
                 unlink $file;
             }
         } else {
@@ -272,7 +361,7 @@ which in turn is equivalent to:
 _
     args => {
         %argspec0_files,
-        %argspecopt_delete_original,
+        %argspecs_delete,
     },
     #features => {
     #    dry_run => 1,
@@ -303,7 +392,7 @@ App::ImageMagickUtils - Utilities related to ImageMagick
 
 =head1 VERSION
 
-This document describes version 0.012 of App::ImageMagickUtils (from Perl distribution App-ImageMagickUtils), released on 2022-02-10.
+This document describes version 0.017 of App::ImageMagickUtils (from Perl distribution App-ImageMagickUtils), released on 2022-05-08.
 
 =head1 DESCRIPTION
 
@@ -353,9 +442,23 @@ Arguments ('*' denotes required arguments):
 
 =item * B<delete_original> => I<bool>
 
+Delete (unlink) the original file after downsizing.
+
+See also the C<trash_original> option.
+
 =item * B<files>* => I<array[filename]>
 
 =item * B<to>* => I<str>
+
+=item * B<trash_original> => I<bool>
+
+Trash the original file after downsizing.
+
+This option uses the L<File::Trash::FreeDesktop> module to do the trashing.
+Compared to deletion, with this option you can still restore the trashed
+original files from the Trash directory.
+
+See also the C<delete_original> option.
 
 
 =back
@@ -401,7 +504,21 @@ Arguments ('*' denotes required arguments):
 
 =item * B<delete_original> => I<bool>
 
+Delete (unlink) the original file after downsizing.
+
+See also the C<trash_original> option.
+
 =item * B<files>* => I<array[filename]>
+
+=item * B<trash_original> => I<bool>
+
+Trash the original file after downsizing.
+
+This option uses the L<File::Trash::FreeDesktop> module to do the trashing.
+Compared to deletion, with this option you can still restore the trashed
+original files from the Trash directory.
+
+See also the C<delete_original> option.
 
 
 =back
@@ -449,6 +566,10 @@ Arguments ('*' denotes required arguments):
 
 =item * B<delete_original> => I<bool>
 
+Delete (unlink) the original file after downsizing.
+
+See also the C<trash_original> option.
+
 =item * B<downsize_to> => I<str> (default: 1024)
 
 Downsizing will only be done if the input image's shortest side is indeed larger
@@ -459,7 +580,35 @@ C<--dont-downsize> on the CLI.
 
 =item * B<files>* => I<array[filename]>
 
-=item * B<q> => I<int> (default: 40)
+=item * B<quality> => I<int> (default: 40)
+
+=item * B<skip_downsized> => I<bool> (default: 1)
+
+Skip previously downsized images.
+
+By default, when given a filename that looks like it's already downsized, e.g.
+C<foo.1024-q40.jpg> or C<foo.q40.jpg>, will skip downsizing. The
+C<--no-skip-downsized> option will process such filenames nevertheless.
+
+=item * B<skip_whatsapp> => I<bool> (default: 1)
+
+Skip WhatsApp images.
+
+By default, assuming that WhatsApp already compresses images, when given a
+filename that matches a WhatsApp image filename, e.g. C<IMG-20220508-WA0001.jpg>
+(will be checked using L<Regexp::Pattern::Filename::Image::WhatsApp>), will
+skip downsizing. The C<--no-skip-whatsapp> option will process such filenames
+nevertheless.
+
+=item * B<trash_original> => I<bool>
+
+Trash the original file after downsizing.
+
+This option uses the L<File::Trash::FreeDesktop> module to do the trashing.
+Compared to deletion, with this option you can still restore the trashed
+original files from the Trash directory.
+
+See also the C<delete_original> option.
 
 
 =back
@@ -516,7 +665,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

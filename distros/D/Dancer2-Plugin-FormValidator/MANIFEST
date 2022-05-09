@@ -2,6 +2,7 @@
 CHANGES
 LICENSE
 MANIFEST
+META.json
 META.yml
 Makefile.PL
 README.MD
@@ -47,3 +48,4 @@ t/13_extensions_from_config.t
 t/14_validators_params.t
 t/15_dsl_validated.t
 t/16_validator_invalid_args.t
+t/lib/validator.pl

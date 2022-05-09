@@ -9,7 +9,7 @@ SPVM::Stringable - A Interface Type to Stringify a Object
 =head1 SYNOPSYS
   
   class Point {
-    implement Stringable;
+    interface Stringable;
   
     method to_string : string ();
       my $x = $sel->x;
@@ -31,6 +31,6 @@ Interface methods.
 
 =head2 to_string
 
-  method to_string : string ();
+  required method to_string : string ();
 
 The implementation must return the string expression.

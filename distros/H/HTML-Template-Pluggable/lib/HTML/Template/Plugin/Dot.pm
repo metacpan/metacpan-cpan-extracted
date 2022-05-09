@@ -1,6 +1,6 @@
 package HTML::Template::Plugin::Dot;
 use vars qw/$VERSION/;
-$VERSION = '1.03';
+$VERSION = '1.04';
 use strict;
 
 use Carp;
@@ -47,6 +47,7 @@ sub _dot_notation {
         my ($exists,@dot_matches) = _exists_in_tmpl($self, $param);
         # We don't have to worry about "die on bad params", because that will be handled
         # by HTML::Template's param().
+        DEBUG and carp("exists: $exists, dot matches: @dot_matches, param: $param");
         next unless $exists;
 
         my $value_type = ref($value);
@@ -64,7 +65,7 @@ sub _dot_notation {
                 else {
                     (ref($param_map->{$dot_match}) eq 'HTML::Template::LOOP') or
                         croak("HTML::Template::param() : attempt to set parameter '$param' with an array ref - parameter is not a TMPL_LOOP!");
-                    $param_map->{$dot_match}[HTML::Template::LOOP::PARAM_SET] = $value_for_tmpl;
+                    $param_map->{$dot_match}[HTML::Template::LOOP::PARAM_SET()] = $value_for_tmpl;
                 }
 
                 # Necessary for plugin system compatibility
@@ -79,7 +80,7 @@ sub _dot_notation {
                 croak("HTML::Template::param() : attempt to set parameter '$param' with an array ref - parameter is not a TMPL_LOOP!");
 
             #  TODO: Use constant names instead of "0"
-            $self->{num_vars_left_in_loop} += keys %{ $param_map->{$param}[HTML::Template::LOOP::TEMPLATE_HASH]{'0'}{'param_map'} } if exists $param_map->{$param}[HTML::Template::LOOP::TEMPLATE_HASH]{'0'};
+            $self->{num_vars_left_in_loop} += keys %{ $param_map->{$param}[HTML::Template::LOOP::TEMPLATE_HASH()]{'0'}{'param_map'} } if exists $param_map->{$param}[HTML::Template::LOOP::TEMPLATE_HASH()]{'0'};
 
         }
         else {
@@ -87,7 +88,9 @@ sub _dot_notation {
                 croak("HTML::Template::param() : attempt to set parameter '$param' with a scalar - parameter is not a TMPL_VAR!");
             # intetionally /don't/ set the values for non-dot notation  params,
             # and don't mark them as done, just that they exist.
-            $self->{num_vars_left_in_loop} -= 1;
+            # but only if there actually are dot params in the template. if there aren't,
+            # this property needs to stay undefined (to fix test 6 in t/RT40714-1.t).
+            $self->{num_vars_left_in_loop} -= 1 if exists $self->{num_vars_left_in_loop};
         }
     }
 }
@@ -180,7 +183,7 @@ THE_REST:
             //xi ) {
         my ($id, $data) = ($1, $2);
         if (blessed($ref)) {
-            if ($ref->can($id)) { # or $ref->can('AUTOLOAD')) {
+            if ($ref->can($id) or ($ref->can('AUTOLOAD') && !$ref->isa("Test::MockObject"))) {
                 my @args = ();
                 if ($data) {
                     $data =~ s/^\(// and $data =~ s/\)$//;

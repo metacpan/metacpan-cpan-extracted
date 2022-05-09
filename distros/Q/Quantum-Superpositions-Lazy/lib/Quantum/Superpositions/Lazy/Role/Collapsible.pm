@@ -1,6 +1,6 @@
 package Quantum::Superpositions::Lazy::Role::Collapsible;
 
-our $VERSION = '1.08';
+our $VERSION = '1.10';
 
 use v5.24;
 use warnings;

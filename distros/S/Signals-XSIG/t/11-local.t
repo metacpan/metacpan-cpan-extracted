@@ -11,6 +11,9 @@ no warnings 'signal';
 # does our %XSIG signal handling framework still work after we
 # local'ize an element of %XSIG or %SIG? If we local'ize all
 # of %XSIG or %SIG?
+#
+# (Partial answer:  local %SIG  doesn't work well with this
+# module after Perl v5.12)
 
 sub foo { 42 }
 sub bar { 43 }
@@ -61,6 +64,7 @@ ok($restored, "hash val restored after local \$SIG{...}");
 
   %z = %SIG;
   SKIP: {
+    untie %SIG if $Config{PERL_VERSION} >= 35;
     local %SIG;
     $SIG{$s} = 'IGNORE';
     ok($SIG{$s} eq 'IGNORE', 'set $SIG{sig}');
@@ -72,6 +76,7 @@ ok($restored, "hash val restored after local \$SIG{...}");
     ok(tied %SIG, "\%SIG tied during localization");   ### 13 ###
     ok($XSIG{$s}[0] eq 'IGNORE', 'set $XSIG{sig}');    ### 14 ###
   }
+  tie %SIG, 'Signals::XSIG::TieSIG' if $Config{PERL_VERSION} >= 35;
 
   # perl 5.6,5.8 - lots of uninitialized warnings here
   no warnings 'uninitialized';

@@ -2,6 +2,9 @@ use v5.10;
 use strict;
 use warnings;
 
+# NOTE: this way of building the form is not covered by backwards compatibility
+# policy. Use for educational purposes only!
+
 {
 
 	package MetaForm;
@@ -40,3 +43,4 @@ my $form = MetaForm->new(
 
 # just for testing
 $form;
+

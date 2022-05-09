@@ -721,47 +721,6 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_PRECOMPILE* precompile, SP
         
         break;
       }
-      case SPVM_OPCODE_C_ID_HAS_CALLBACK:
-      {
-        int32_t cast_basic_type = opcode->operand2;
-        int32_t cast_type_dimension = opcode->operand3;
-        int32_t basic_type_name_id = SPVM_API_RUNTIME_get_basic_type_name_id(runtime, cast_basic_type);
-        const char* basic_type_name = SPVM_API_RUNTIME_get_name(runtime, basic_type_name_id);
-        int32_t dimension = cast_type_dimension;
-        
-        SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
-                                              "    int32_t access_basic_type_id = env->get_basic_type_id(env, \"");
-        SPVM_STRING_BUFFER_add(string_buffer, (char*)basic_type_name);
-        SPVM_STRING_BUFFER_add(string_buffer, "\");\n"
-                                              "    if (access_basic_type_id < 0) {\n"
-                                              "      void* exception = env->new_string_nolen_raw(env, \"Basic type not found:");
-        SPVM_STRING_BUFFER_add(string_buffer, (char*)basic_type_name);
-        SPVM_STRING_BUFFER_add(string_buffer, ":Has callback\");\n"
-                                              "      env->set_exception(env, exception);\n"
-                                              "      exception_flag = 1;\n"
-                                              "    }\n"
-                                              "    if (!exception_flag) {\n"
-                                              "      int32_t callback_basic_type_id = access_basic_type_id;\n"
-                                              "      int32_t callback_type_dimension = ");
-        SPVM_STRING_BUFFER_add_int(string_buffer, dimension);
-        SPVM_STRING_BUFFER_add(string_buffer, ";\n"
-                                              "      void* object = ");
-        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
-        SPVM_STRING_BUFFER_add(string_buffer, ";\n"
-                                              "      if (object) {\n"
-                                              "        int32_t object_basic_type_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_basic_type_id_offset);\n");
-        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
-        SPVM_STRING_BUFFER_add(string_buffer, " = env->has_callback(env, object, callback_basic_type_id);\n"
-                                              "      }\n"
-                                              "      else {\n");
-        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
-        SPVM_STRING_BUFFER_add(string_buffer, " = 0;\n"
-                                              "      }\n"
-                                              "    }\n"
-                                              "  }\n");
-        
-        break;
-      }
       case SPVM_OPCODE_C_ID_HAS_INTERFACE:
       {
         int32_t cast_basic_type = opcode->operand2;
@@ -1674,8 +1633,8 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_PRECOMPILE* precompile, SP
                                               "        void* object = ");
         SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand2);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
-                                              "        int32_t can_assign = env->can_assign_array_element(env, array, object);\n"
-                                              "        if (can_assign) {\n"
+                                              "        int32_t runtime_assignability = env->check_runtime_assignability_array_element(env, array, object);\n"
+                                              "        if (runtime_assignability) {\n"
                                               "          SPVM_API_OBJECT_ASSIGN(element_address, object);\n"
                                               "        }\n"
                                               "        else {\n"
@@ -2926,7 +2885,7 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_PRECOMPILE* precompile, SP
         stack_index += fields_length;
         break;
       }
-      case SPVM_OPCODE_C_ID_MOVE_OBJECT_CHECK_ASSIGN: {
+      case SPVM_OPCODE_C_ID_MOVE_OBJECT_WITH_TYPE_CHECKING: {
         int32_t cast_basic_type = opcode->operand2;
         int32_t cast_type_dimension = opcode->operand3;
 
@@ -2952,8 +2911,8 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_PRECOMPILE* precompile, SP
         SPVM_STRING_BUFFER_add(string_buffer, "      void* object = ");
         SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
-                                              "      int32_t can_assign = env->can_assign(env, cast_basic_type_id, cast_type_dimension, object);\n"
-                                              "      if (can_assign) {\n"
+                                              "      int32_t runtime_assignability = env->check_runtime_assignability(env, cast_basic_type_id, cast_type_dimension, object);\n"
+                                              "      if (runtime_assignability) {\n"
                                               "        SPVM_API_OBJECT_ASSIGN(&");
         SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", ");
@@ -3215,7 +3174,6 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_PRECOMPILE* precompile, SP
             case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_STRING:
             case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CLASS:
             case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE:
-            case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CALLBACK:
             case SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_ANY_OBJECT:
             {
               SPVM_STRING_BUFFER_add(string_buffer, "      SPVM_API_OBJECT_ASSIGN(&");
@@ -3572,13 +3530,11 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_PRECOMPILE* precompile, SP
         break;
       }
       case SPVM_OPCODE_C_ID_LOOKUP_SWITCH: {
-        int32_t switch_id = opcode->operand1;
-        
         // Default branch
-        int32_t default_opcode_rel_index = opcode->operand2;
+        int32_t default_opcode_rel_index = opcode->operand1;
         
         // Cases length
-        int32_t case_infos_length = opcode->operand3;
+        int32_t case_infos_length = opcode->operand2;
 
         SPVM_STRING_BUFFER_add(string_buffer, "  switch(");
         SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0);
@@ -4574,36 +4530,34 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_PRECOMPILE* precompile, SP
                                               "  }\n");
         break;
       }
-      case SPVM_OPCODE_C_ID_HAS_IMPLEMENT: {
-        int32_t implement_method_id = opcode->operand2;
+      case SPVM_OPCODE_C_ID_HAS_IMPL: {
+        int32_t implement_method_id = opcode->operand1;
         int32_t implement_method_name_id = SPVM_API_RUNTIME_get_method_name_id(runtime, implement_method_id);
         const char* implement_method_name = SPVM_API_RUNTIME_get_name(runtime, implement_method_name_id);
 
-        int32_t interface_basic_type_id = opcode->operand3;
+        int32_t interface_basic_type_id = opcode->operand2;
         int32_t interface_basic_type_class_id = SPVM_API_RUNTIME_get_basic_type_class_id(runtime, interface_basic_type_id);
 
-        int32_t interface_id = SPVM_API_RUNTIME_get_basic_type_class_id(runtime, interface_basic_type_class_id);
-        int32_t interface_name_id = SPVM_API_RUNTIME_get_class_name_id(runtime, interface_id);
+        int32_t interface_name_id = SPVM_API_RUNTIME_get_class_name_id(runtime, interface_basic_type_class_id);
         const char* interface_name = SPVM_API_RUNTIME_get_name(runtime, interface_name_id);
         
         int32_t interface_method_id = SPVM_API_RUNTIME_get_method_id_by_name(runtime, interface_name, implement_method_name);
         int32_t interface_method_signature_id = SPVM_API_RUNTIME_get_method_signature_id(runtime, interface_method_id);
         const char* interface_method_signature = SPVM_API_RUNTIME_get_name(runtime, interface_method_signature_id);
-
         const char* implement_method_signature = interface_method_signature;
-        
+
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n"
                                               "    void* object = ");
-        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
+        SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n"
-                                              "    int32_t call_method_id = env->get_instance_method_id(env, object, ");
+                                              "    int32_t call_method_id = env->get_instance_method_id(env, object, \"");
         SPVM_STRING_BUFFER_add(string_buffer, implement_method_name);
-        SPVM_STRING_BUFFER_add(string_buffer, ", ");
+        SPVM_STRING_BUFFER_add(string_buffer, "\", \"");
         SPVM_STRING_BUFFER_add(string_buffer, implement_method_signature);
-        SPVM_STRING_BUFFER_add(string_buffer, ");"
+        SPVM_STRING_BUFFER_add(string_buffer, "\");\n"
                                               "    ");
         SPVM_PRECOMPILE_add_operand(precompile, string_buffer, SPVM_PRECOMPILE_C_CTYPE_ID_INT, 0);
-        SPVM_STRING_BUFFER_add(string_buffer, "  call_method_id >= 0;\n"
+        SPVM_STRING_BUFFER_add(string_buffer, " = call_method_id >= 0;\n"
                                               "  }\n");
 
         break;
@@ -4616,8 +4570,8 @@ void SPVM_PRECOMPILE_build_method_implementation(SPVM_PRECOMPILE* precompile, SP
   
   // No exception
   SPVM_STRING_BUFFER_add(string_buffer, "  if (!exception_flag) {\n");
-  int32_t method_return_type_can_assign_to_any_object = SPVM_API_RUNTIME_get_type_is_object(runtime, method_return_type_id);
-  if (method_return_type_can_assign_to_any_object) {
+  int32_t method_return_type_check_runtime_assignability_to_any_object = SPVM_API_RUNTIME_get_type_is_object(runtime, method_return_type_id);
+  if (method_return_type_check_runtime_assignability_to_any_object) {
     SPVM_STRING_BUFFER_add(string_buffer, "    if (stack[0].oval != NULL) { SPVM_API_DEC_REF_COUNT_ONLY(stack[0].oval); }\n");
   }
   SPVM_STRING_BUFFER_add(string_buffer, "  }\n"

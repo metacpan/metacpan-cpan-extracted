@@ -1,0 +1,14 @@
+Revision history for Monitoring-Sneck-Boop_Snoot
+
+0.1.0   2022-05-07/03:30
+        -Correct the exit code for -n on OK.
+
+0.1.0   2022-05-07/03:30
+        -Add nagios style check capabilities via -n.
+        -Add raw return printing via -r.
+
+0.0.2   2022-05-06/15:45
+        -Regexp fix.
+
+0.0.1   2022-05-05/00:30
+        -First release.

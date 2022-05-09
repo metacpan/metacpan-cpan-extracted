@@ -1,8 +1,5 @@
 #!perl
 
-our $DATE = '2021-06-05'; # DATE
-our $VERSION = '1.068'; # VERSION
-
 use 5.010;
 use strict;
 use warnings;
@@ -11,6 +8,11 @@ use Log::ger; BEGIN { $ENV{LOG_LEVEL} //= 'info' }
 use Module::List::Tiny;
 use Perinci::CmdLine::Any;
 use Perinci::CmdLineX::CommonOptions::SelfUpgrade;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-03-27'; # DATE
+our $DIST = 'App-lcpan'; # DIST
+our $VERSION = '1.070'; # VERSION
 
 my $prefix = '/App/lcpan/';
 my $mods = do {
@@ -65,7 +67,7 @@ lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.068 of lcpan (from Perl distribution App-lcpan), released on 2021-06-05.
+This document describes version 1.070 of lcpan (from Perl distribution App-lcpan), released on 2022-03-27.
 
 =head1 SYNOPSIS
 
@@ -438,6 +440,13 @@ Copy a release file to current directory.
 
 Copy a script's latest release file to current directory.
 
+=head2 B<db-path>
+
+Return database path that is used.
+
+This is a convenience subcommand for use in, e.g. command-line oneliners.
+
+
 =head2 B<delete-rel>
 
 Delete a release record in the database.
@@ -532,6 +541,14 @@ List distributions.
 =head2 B<dists-by-dep-count>
 
 List "heavy" distributions (ranked by number of dependencies).
+
+=head2 B<dists-by-mod-count>
+
+List distributions ranked by number of included modules.
+
+=head2 B<dists-by-script-count>
+
+List distributions ranked by number of included scripts.
 
 =head2 B<doc>
 
@@ -689,9 +706,13 @@ By default, only mentions from other authors are included. Use
 C<--include-self-mentions> to also include mentions from the same author.
 
 
+=head2 B<mods-by-rdep-author-count>
+
+List modules depended "by most number of authors" (modules ranked by number of authors that have dists that depend on the module).
+
 =head2 B<mods-by-rdep-count>
 
-List modules ranked by number of reverse dependencies.
+List "most depended modules" (modules ranked by number of reverse dependencies).
 
 =head2 B<mods-from-same-dist>
 
@@ -2288,6 +2309,34 @@ Return at most this number of results.
 
 =back
 
+=head2 Options for subcommand dists-by-mod-count
+
+=over
+
+=item B<--author>=I<s>, B<-a>
+
+Filter by author.
+
+=item B<-n>=I<s>
+
+Return at most this number of results.
+
+=back
+
+=head2 Options for subcommand dists-by-script-count
+
+=over
+
+=item B<--author>=I<s>, B<-a>
+
+Filter by author.
+
+=item B<-n>=I<s>
+
+Return at most this number of results.
+
+=back
+
 =head2 Options for subcommand doc
 
 =over
@@ -3349,6 +3398,26 @@ Valid values:
  ["content","dist","author"]
 
 =item B<--include-self-mentions>
+
+=item B<-n>=I<s>
+
+Return at most this number of results.
+
+=back
+
+=head2 Options for subcommand mods-by-rdep-author-count
+
+=over
+
+=item B<--all>
+
+Equivalent to --phase ALL --rel ALL.
+
+See C<--phase>.
+
+=item B<--phase>=I<s>
+
+=item B<--rel>=I<s>
 
 =item B<-n>=I<s>
 
@@ -4892,7 +4961,7 @@ repository created by L<OrePAN> (or similar tools).
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/lcpan.conf>, F<~/lcpan.conf>, or F</etc/lcpan.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/dWhtu8vuuY.conf>, F</home/u1/dWhtu8vuuY.conf>, or F</etc/dWhtu8vuuY.conf>.
 
 All found files will be read and merged.
 
@@ -5085,6 +5154,9 @@ List of available configuration parameters:
  overwrite (see --overwrite)
  script (see --script)
 
+=head2 Configuration for subcommand db-path
+
+
 =head2 Configuration for subcommand delete-rel
 
  delete_file (see --delete-file)
@@ -5203,6 +5275,16 @@ List of available configuration parameters:
  n (see -n)
  phase (see --phase)
  rel (see --rel)
+
+=head2 Configuration for subcommand dists-by-mod-count
+
+ author (see --author)
+ n (see -n)
+
+=head2 Configuration for subcommand dists-by-script-count
+
+ author (see --author)
+ n (see -n)
 
 =head2 Configuration for subcommand doc
 
@@ -5407,6 +5489,12 @@ List of available configuration parameters:
  count_per (see --count-per)
  include_self_mentions (see --include-self-mentions)
  n (see -n)
+
+=head2 Configuration for subcommand mods-by-rdep-author-count
+
+ n (see -n)
+ phase (see --phase)
+ rel (see --rel)
 
 =head2 Configuration for subcommand mods-by-rdep-count
 
@@ -5702,17 +5790,96 @@ List of available configuration parameters:
 
 =head1 ENVIRONMENT
 
-=head2 LCPAN_OPT => str
+=head2 DWHTU8VUUY_OPT => str
 
 Specify additional command-line options.
 
 =head1 FILES
 
-F<~/.config/lcpan.conf>
+F</home/u1/.config/dWhtu8vuuY.conf>
 
-F<~/lcpan.conf>
+F</home/u1/dWhtu8vuuY.conf>
 
-F</etc/lcpan.conf>
+F</etc/dWhtu8vuuY.conf>
+
+=head1 EXAMPLES
+
+List all authors:
+
+ % lcpan authors
+
+Find CPAN IDs which start with something:
+
+ % lcpan authors MICHAEL%
+ ERROR MICHAEL: MICHAELW
+
+Use module name:
+
+ % lcpan changes Data::CSel::Parser
+
+List what modules Module-List requires:
+
+ % lcpan deps Module-List
+
+List modules Module-List requires (module name will be converted to distro name):
+
+ % lcpan deps Module::List
+
+List what distribution that contains Sah::Schema::filename requires:
+
+ % lcpan deps --module Sah::Schema::filename
+
+List non-core modules Module-List requires:
+
+ % lcpan deps Module-List --exclude-core
+
+List dependencies of a specific distribution release:
+
+ % lcpan deps Module-List@0.004
+
+List all distributions:
+
+ % lcpan dists --cpan /cpan
+
+List all distributions (latest version only):
+
+ % lcpan dists --cpan /cpan --latest
+
+Grep by distribution name, return detailed record:
+
+ % lcpan dists --cpan /cpan data-table
+
+Filter by author, return JSON:
+
+ % lcpan dists --cpan /cpan --author perlancar --json
+
+Seach module/POD/script named Rinci:
+
+ % lcpan doc Rinci
+
+Specifically choose .pm file:
+
+ % lcpan doc Rinci.pm
+
+Specifically choose .pod file:
+
+ % lcpan doc Rinci.pod
+
+Look for script first named strict:
+
+ % lcpan doc -s strict
+
+Dump the raw POD instead of rendering it:
+
+ % lcpan doc --raw Text::Table::Tiny
+
+List what distributions depend on Sah::Schema::filename:
+
+ % lcpan rdeps Sah::Schema::filename
+
+List what distributions depend on one of the modules in Sah-Schemas-Path:
+
+ % lcpan rdeps --dist Sah-Schemas-Path
 
 =head1 HOMEPAGE
 
@@ -5721,14 +5888,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-lcpan>
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-App-lcpan>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -5744,11 +5903,36 @@ L<lcpanm>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

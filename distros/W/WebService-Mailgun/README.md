@@ -282,6 +282,44 @@ my $msg = $mailgun->get_message_from_event($events->[0]);
 
 [Stored Message](https://documentation.mailgun.com/en/latest/api-sending.html#retrieving-stored-messages)
 
+## add\_template($args)
+
+Add a template
+
+```perl
+# add template
+my $res = $mailgun->add_template({
+    name        => 'welcome',     # Template name
+    template    => 'Hello!',      # Template data
+    engine      => 'handlebars',  # Template engine (optional)
+    description => 'xyz',         # Description of template (optional)
+    tag         => '2.0' ,        # Version tag (optional)
+    comment     => 'Test'         # Version comment (optional)
+});
+```
+
+[https://documentation.mailgun.com/en/latest/api-templates.html#templates](https://documentation.mailgun.com/en/latest/api-templates.html#templates)
+
+## delete\_templates()
+
+Delete all templates
+
+```perl
+my $res = $mailgun->delete_templates();
+```
+
+[https://documentation.mailgun.com/en/latest/api-templates.html#templates](https://documentation.mailgun.com/en/latest/api-templates.html#templates)
+
+## delete\_template($name)
+
+Delete a template
+
+```perl
+my $res = $mailgun->delete_template($name);
+```
+
+[https://documentation.mailgun.com/en/latest/api-templates.html#templates](https://documentation.mailgun.com/en/latest/api-templates.html#templates)
+
 # Event Pooling
 
 event method return previous url. it can use for fetch event.
@@ -307,6 +345,7 @@ this API not implement yet.
 - [Routes](https://documentation.mailgun.com/en/latest/api-routes.html)
 - [Webhooks](https://documentation.mailgun.com/en/latest/api-webhooks.html)
 - [Email Validation](https://documentation.mailgun.com/en/latest/api-email-validation.html)
+- [Templates](https://documentation.mailgun.com/en/latest/api-templates.html) (partial)
 
 # SEE ALSO
 

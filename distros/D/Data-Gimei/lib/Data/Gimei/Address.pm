@@ -1,6 +1,5 @@
 package Data::Gimei::Address;
 
-use utf8;
 use feature ':5.12';
 use File::Share ':all';
 use YAML::XS;

@@ -8,7 +8,23 @@ the [official Jenkins project](https://github.com/jenkinsci/jenkins).
 
 ## Differences from the original tool
 
+`jtt` is:
+
+- faster
+- uses less memory
+- better adapted to development best practices
+
+When compared to `translation-tool.pl`.
+
 ### New features
+
+#### Search for terms on translated values
+
+For use cases that you need to find a term that is used amount the translated
+files, you can use the `--search` options to do that.
+
+If the term is found, warnings are emitted, per file, every time the term was
+matched.
 
 #### Improved online documentation
 
@@ -71,7 +87,7 @@ This is a translation summary:
 
 The script `translation-tool.pl` tried to implement some sort of processing
 results caching, but that didn't work very well. On the other hand, the script
-should procedure results reasonably fast (~2,7s in a Intel i5-7200U 2.50GHz
+should produce results reasonably fast (~2,7s in a Intel i5-7200U 2.50GHz
 with encrypted disk), so it's not an issue per see not having it.
 
 Cache may be implemented in the future again.
@@ -82,12 +98,12 @@ The script `translation-tool.pl` tried to convert Jenkins properties from
 ASCII to UTF-8 and vice-versa using regular expressions. No need to tell how
 well that worked.
 
-The best way to achieve that is to use your preferred IDE, see
+The best way to achieve proper encoding that is to use your preferred IDE, see
 [the suggested workflow](Workflow.md) for more details on that.
 
 ### No editor execution
 
-`jtt` won't execute a given editor per missing file. This might be seems as a
+`jtt` won't execute a given editor per missing file. This might be seem as a
 useful feature, but it can become a real issue if you have hundred of files to
 be open in a IDE.
 

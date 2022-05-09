@@ -7,13 +7,13 @@ subtest 'distribution with ShareDir' => sub {
     my $app = cli();
 
     $app->write_cpanfile(<<EOF);
-requires 'Mojolicious::Plugin::Humane';
+requires 'File::ShareDir';
 EOF
 
-    $app->run("install");
-    $app->run("exec", "perl", "-e", "use File::ShareDir; print File::ShareDir::dist_dir('Mojolicious-Plugin-Humane')");
+    $app->run_ok("install");
+    $app->run_ok("exec", "perl", "-e", "use File::ShareDir; print File::ShareDir::dist_dir('File-ShareDir')");
 
-    like $app->stdout, qr!builds/Mojolicious-Plugin-Humane-.*/blib/lib/auto/share/dist/Mojolicious-Plugin-Humane! or diag $app->stderr;
+    like $app->stdout, qr!builds/File-ShareDir-.*/blib/lib/auto/share/dist/File-ShareDir! or diag $app->stderr;
 };
 
 done_testing;

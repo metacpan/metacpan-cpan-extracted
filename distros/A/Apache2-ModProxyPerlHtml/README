@@ -288,16 +288,14 @@ BUGS
     stable. Please send me email to submit bug reports or feature requests.
 
 COPYRIGHT
-    Copyright (c) 2005-2020 - Gilles Darold
+    Copyright (c) 2005-2022 - Gilles Darold
 
     All rights reserved. This program is free software; you may redistribute
     it and/or modify it under the same terms as Perl itself.
 
 AUTHOR
-    Apache2::ModProxyPerlHtml was created by :
+    Created and maintained by :
 
             Gilles Darold
             <gilles at darold dot net>
-
-    and is currently maintain by me.
 

@@ -1,0 +1,42 @@
+---
+abstract: 'manage security headers middleware'
+author:
+  - 'kfly8 <kfly@cpan.org>'
+build_requires:
+  Module::Build::Tiny: '0.035'
+  Plack::Test: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.17, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-SecureHeaders
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::Middleware::SecureHeaders:
+    file: lib/Plack/Middleware/SecureHeaders.pm
+    version: '0.01'
+requires:
+  HTTP::SecureHeaders: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/kfly8/p5-Plack-Middleware-SecureHeaders/issues
+  homepage: https://github.com/kfly8/p5-Plack-Middleware-SecureHeaders
+  repository: https://github.com/kfly8/p5-Plack-Middleware-SecureHeaders.git
+version: '0.01'
+x_authority: cpan:KFLY
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

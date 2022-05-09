@@ -7,23 +7,31 @@ use IgorBusinessRules;
 use Net::eBay;
 use Data::Dumper;
 
-my $title = undef;
-my $subtitle = undef;
-my $price = undef;
-my $quantity = undef;
-my $category = undef;
-my $bin = undef;
+my $title               = undef;
+my $subtitle            = undef;
+my $price               = undef;
+my $quantity            = undef;
+my $category            = undef;
+my $bin                 = undef;
 my $blockForeignBidders = undef;
-my $call = "ReviseItem";
-my $gallery = undef;
-my $duration = undef;
-my $description = undef;
-my $siteid = 0;
-my $bestoffer = undef;
-my $to_store = undef;
-my $item = undef;
+my $call                = "ReviseItem";
+my $gallery             = undef;
+my $duration            = undef;
+my $description         = undef;
+my $siteid              = 0;
+my $bestoffer           = undef;
+my $nobestoffer         = undef;
+my $to_store            = undef;
+my $pid                 = undef;
+my $item                = undef;
+my $returnpolicy        = undef;
+my $nopaypal            = undef;
+my $nopickup            = undef;
+my $dispatchtimemax     = undef;
+my $flatshipping        = undef;
+my $verbose             = undef;
 
-if( -f 'item.txt' ) {
+if ( -f 'item.txt' ) {
   $item = `cat item.txt`;
   chomp $item;
 }
@@ -34,7 +42,7 @@ my $done = 1;
 
 sub get_argument {
   my ($name,$ref) = @_;
-  if( $ARGV[0] eq "--$name" ) {
+  if ( $ARGV[0] eq "--$name" ) {
     shift @ARGV;
     $$ref = shift @ARGV;
     die "--$name requires an argument!" unless defined $$ref;
@@ -43,30 +51,65 @@ sub get_argument {
   return undef;
 }
 
-while( $done && defined $ARGV[0]) {
+while ( $done && defined $ARGV[0]) {
   $done = 0;
 
-  if( $ARGV[0] eq '--relist' ) {
+  if ( $ARGV[0] eq '--relist' ) {
     $call = 'RelistItem';
     $done = 1;
     shift @ARGV;
     next;
   }
-  
-  if( $ARGV[0] eq '--bestoffer' ) {
+
+  if ( $ARGV[0] eq '--bestoffer' ) {
     $bestoffer = 1;
     $done = 1;
     shift @ARGV;
     next;
   }
-  
-  if( $ARGV[0] eq '--to_store' ) {
+
+  if ( $ARGV[0] eq '--nobestoffer' ) {
+    $nobestoffer = 1;
+    $done = 1;
+    shift @ARGV;
+    next;
+  }
+
+  if ( $ARGV[0] eq '--verbose' ) {
+    $verbose = 1;
+    $done = 1;
+    shift @ARGV;
+    next;
+  }
+
+  if ( $ARGV[0] eq '--to_store' ) {
     $to_store = 1;
     $done = 1;
     shift @ARGV;
     next;
   }
-  
+
+  if ( $ARGV[0] eq '--pid' ) {
+    $pid = 1;
+    $done = 1;
+    shift @ARGV;
+    next;
+  }
+
+  if ( $ARGV[0] eq '--nopaypal' ) {
+    $nopaypal = 1;
+    $done = 1;
+    shift @ARGV;
+    next;
+  }
+
+  if ( $ARGV[0] eq '--nopickup' ) {
+    $nopickup = 1;
+    $done = 1;
+    shift @ARGV;
+    next;
+  }
+
   next if $done = get_argument( 'title', \$title );
   next if $done = get_argument( 'subtitle', \$subtitle );
   next if $done = get_argument( 'price', \$price );
@@ -77,9 +120,12 @@ while( $done && defined $ARGV[0]) {
   next if $done = get_argument( 'gallery', \$gallery );
   next if $done = get_argument( 'duration', \$duration );
   next if $done = get_argument( 'description', \$description );
+  next if $done = get_argument( 'returnpolicy', \$returnpolicy );
+  next if $done = get_argument( 'flatshipping', \$flatshipping );
   next if $done = get_argument( 'block-foreign-bidders', \$blockForeignBidders );
+  next if $done = get_argument( 'dispatchtimemax', \$dispatchtimemax );
 
-  if( $done = get_argument( 'item', \$item ) ) {
+  if ( $done = get_argument( 'item', \$item ) ) {
     $use_descr = undef;
     next;
   }
@@ -97,11 +143,29 @@ my $request = {
 
 
 
-$request->{Item}->{Title}         = $title if ( $title ); 
-$request->{Item}->{SubTitle}      = $subtitle if ( $subtitle ); 
-$request->{Item}->{StartPrice}    = $price if ( $price ); 
-$request->{Item}->{Quantity}      = $quantity if ( $quantity ); 
-$request->{Item}->{BuyItNowPrice} = $bin if ( $bin ); 
+$request->{Item}->{DispatchTimeMax} = $dispatchtimemax if $dispatchtimemax;
+
+$request->{Item}->{Title}         = $title if ( $title );
+$request->{Item}->{SubTitle}      = $subtitle if ( $subtitle );
+$request->{Item}->{StartPrice}    = $price if ( $price );
+$request->{Item}->{Quantity}      = $quantity if ( $quantity );
+$request->{Item}->{BuyItNowPrice} = $bin if ( $bin );
+
+if ( $pid ) {
+  $request->{Item}->{ProductListingDetails} = {
+                                               BrandMPN => {
+                                                            Brand => 'Does not apply',
+                                                            MPN   => 'Does not apply',
+                                                           },
+                                               UPC => 'Does not apply',
+                                              };
+
+  $request->{Item}->{ItemSpecifics}->{NameValueList} =
+    [
+     { Name => 'Brand', Value => 'Does not apply' },
+     { Name => 'MPN', Value => 'Does not apply' },
+    ];
+}
 
 if ( $to_store ) {
   $request->{Item}->{BestOfferDetails}->{BestOfferEnabled} = 'true';
@@ -111,10 +175,12 @@ if ( $to_store ) {
   $request->{Item}->{ListingDuration}      = "Days_$duration" if ( $duration );
 }
 
-$request->{Item}->{PrimaryCategory} = $category if ( $category );
+$request->{Item}->{PrimaryCategory}->{CategoryID} = $category if ( $category );
 
-$request->{Item}->{PictureDetails}->{GalleryURL} = $gallery if ( $gallery ); 
-$request->{Item}->{PictureDetails}->{GalleryType} = 'Gallery' if ( $gallery ); 
+$request->{Item}->{PictureDetails}->{GalleryURL}         = $gallery  if $gallery;
+$request->{Item}->{PictureDetails}->{PictureURL}         = $gallery  if $gallery;
+$request->{Item}->{PictureDetails}->{ExternalPictureURL} = $gallery  if $gallery;
+$request->{Item}->{PictureDetails}->{GalleryType}        = 'Gallery' if $gallery;
 
 $request->{Item}->{BuyerRequirements}->{MinimumFeedbackScore} = -1;
 $request->{Item}->{BuyerRequirements}->{ShipToRegistrationCountry} = $blockForeignBidders if defined $blockForeignBidders;
@@ -125,6 +191,20 @@ $request->{Item}->{UseTaxTable} = 'true';
 $request->{Item}->{BestOfferDetails}->{BestOfferEnabled} = 'true'
   if $bestoffer;
 
+$request->{Item}->{BestOfferDetails}->{BestOfferEnabled} = 'false'
+  if $nobestoffer;
+
+if( $flatshipping ) {
+    $request->{Item}->{ShippingDetails} = 
+    {
+        ShippingServiceOptions => {
+            ShippingService => 'Other',
+            ShippingServiceCost => $flatshipping,
+        },
+        ShippingType => 'Flat',
+    };
+}
+
 if ( $price ) {
   $request->{Item}->{ListingDetails} =
     {
@@ -133,13 +213,57 @@ if ( $price ) {
     };
 }
 
-if( $use_descr ) {
-  die 'no file index.html' unless -f 'index.html';
-  my $descr = $description || `cat index.html`;
+if ( $nopaypal ) {
+  $request->{Item}->{PaymentMethods} = [ 'CashOnPickup', 'AmEx' ];
+}
+
+if ( $nopickup ) {
+  $request->{Item}->{PaymentMethods} = [ 'PayPal' ];
+}
+
+if ( $returnpolicy ) {
+  if ( $returnpolicy eq 'noreturns' ) {
+    $request->{Item}->{ReturnPolicy} = {
+                                        Description           => 'No Returns',
+                                        ReturnsAccepted       => 'No Returns',
+                                        ReturnsAcceptedOption => 'ReturnsNotAccepted',
+                                       };
+  } elsif ( $returnpolicy =~ /^(\d+)\%/ ) {
+    my $pct = $1;
+    $request->{Item}->{ReturnPolicy} = {
+                                        'RefundOption' => 'MoneyBack',
+                                        'RestockingFeeValueOption' => "Percent_$pct",
+                                        'Refund' => 'Money Back',
+                                        'ShippingCostPaidByOption' => 'Buyer',
+                                        'ReturnsWithin' => '14 Days',
+                                        'ReturnsAccepted' => 'Returns Accepted',
+                                        'ShippingCostPaidBy' => 'Buyer',
+                                        'ReturnsWithinOption' => 'Days_14',
+                                        'ReturnsAcceptedOption' => 'ReturnsAccepted',
+                                        'Description' => "Restocking fees: $pct%",
+                                        'RestockingFeeValue' => "$%pct%"
+                                       };
+  } else {
+    die "Error, invalid returnpolicy argument.";
+  }
+}
+
+if ( $use_descr || $description ) {
+  my $descr;
+  if ( $description ) {
+    $descr = $description;
+  } else {
+
+    die 'no file index.html'
+      unless -f 'index.html';
+
+    $descr = `cat index.html`;
+  }
+
   $request->{Item}->{Description} = "<![CDATA[ $descr ]]>";
 
-  
-  if( -f ".picurl" ) {
+
+  if ( -f ".picurl" ) {
     open( PIC, ".picurl" );
     my $picurl = <PIC>;
     chomp $picurl;
@@ -158,12 +282,16 @@ $ebay->setDefaults( { siteid => $siteid } );
 
 #print STDERR "Calling $call...\n";
 
+print Dumper( $request ) if $verbose;
+
 my $result = $ebay->submitRequest( $call, $request );
 
-if( ref $result ) {
+print Dumper( $result ) if $verbose;
 
-  if( $result->{Errors} ) {
-    print "FAILED!!!\n" . Dumper( $result ) . "\n\n";
+if ( ref $result ) {
+
+  if ( $result->{Errors} && !($result->{Fees}) ) {
+    print "FAILED $item!!!\n" . Dumper( $result->{Errors} ) . "\n\n";
     exit 1;
   }
 
@@ -172,19 +300,20 @@ if( ref $result ) {
   my $total = 0;
   foreach my $fee (@{$result->{Fees}->{Fee}}) {
     my $amount = $fee->{Fee}->{content};
-    
+
     next unless $amount > 0 && $fee->{Name} ne 'ListingFee';
-    
+
     print "Fee: $fee->{Name}: $amount.\n";
     $total += $amount;
   }
-  print "TOTAL FEE: $total\n";
 
-  if( $call eq 'RelistItem' ) {
-    if( $result->{ItemID} ) {
-      open( ITEM, ">item.txt" );
-      print ITEM "$result->{ItemID}\n";
-      close( ITEM );
+  print "TOTAL FEE: $total, Item $result->{ItemID}\n";
+
+  if ( $call eq 'RelistItem' ) {
+    if ( $result->{ItemID} ) {
+      #open( ITEM, ">item.txt" );
+      #print ITEM "$result->{ItemID}\n";
+      #close( ITEM );
     } else {
       print STDERR "Strange, no item id given by relisting.\n";
     }

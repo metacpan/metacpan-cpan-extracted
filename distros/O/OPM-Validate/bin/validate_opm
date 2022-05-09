@@ -8,14 +8,19 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.12'; # VERSION
+our $VERSION = '1.13'; # VERSION
 
+use Getopt::Long;
 use OPM::Validate;
+
+GetOptions(
+    'sopm' => \my $is_sopm,
+);
 
 my $file    = _check_args() or do{ print_usage() and exit };
 my $content = do { local (@ARGV, $/) = ($file); <> };
 
-OPM::Validate->validate( $content );
+OPM::Validate->validate( $content, $is_sopm );
 
 sub _check_args {
     return if !@ARGV;
@@ -40,7 +45,7 @@ validate_opm - A short script to validate an opm file
 
 =head1 VERSION
 
-version 1.12
+version 1.13
 
 =head1 AUTHOR
 

@@ -1,6 +1,11 @@
 Revision history for OPM::Validate
 ========================================
 
+1.13   2022-05-04 10:00:00
+
+    * Fix regex: There can be whitespaces before the '>' in ColumnDrop tags
+    * added switch "--sopm" to bin/validate to be able to validate .sopm files
+
 1.12   2022-04-17 07:54:00
 
     * improve regex based on check of publicly available opms

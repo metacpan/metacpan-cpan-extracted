@@ -278,9 +278,11 @@ sub print_error_messages {
   compile_not_ok('TestCase::CompileError::Interface::HaveBlock', qr/interface.+block/i);
   compile_not_ok('TestCase::CompileError::Interface::NativeMethod', qr/interface.+native/i);
   compile_not_ok('TestCase::CompileError::Interface::StaticMethod', qr/interface.+instance/i);
-  compile_not_ok('TestCase::CompileError::Interface::ImplementStatement', qr/implement/i);
   compile_not_ok('TestCase::CompileError::Interface::ArrayElementCantAssign', qr/List to Stringable/i);
-  compile_not_ok('TestCase::CompileError::Interface::AnonMethod', qr/interface.+names/i);
+  compile_not_ok('TestCase::CompileError::Interface::NotHaveInterfaceMethod', qr/TestCase::CompileError::Interface::NotHaveInterfaceMethod.+to_string.*string\(self\).+interface.+Stringable/i);
+  compile_not_ok('TestCase::CompileError::Interface::NoMethods', qr/one required method/i);
+  compile_not_ok('TestCase::CompileError::Interface::MultiRequiredMethods', qr/multiple required method/i);
+  compile_not_ok('TestCase::CompileError::Interface::HasImplNotFound', qr/interface.+TestCase::Pointable.+the method declaration.+not_found/i);
 }
 
 # Syntax

@@ -10,18 +10,18 @@ subtest 'depends on submodules with version undef' => sub {
 
     $app->write_cpanfile(<<EOF);
 requires 'CPAN::Test::Dummy::Perl5::VersionBump', '== 0.01';
-requires 'CPAN::Test::Dummy::Dep::UndefModule';
+requires 'CPAN::Test::Dummy::Perl5::Deps::UndefModule';
 EOF
 
-    $app->run("install");
+    $app->run_ok("install");
     $app->dir->child("cpanfile.snapshot")->remove;
 
     # because it's random, run it twice
  TODO: {
         local $TODO = "Artifact provides are not compared with root cpanfile requirement";
         for (1..2) {
-            $app->run("install");
-            like $app->stdout, qr/Using CPAN::Test::Dummy::Dep::UndefModule/;
+            $app->run_ok("install");
+            like $app->stdout, qr/Using CPAN::Test::Dummy::Perl5::Deps::UndefModule/;
             like $app->stdout, qr/Using CPAN::Test::Dummy::Perl5::VersionBump \(0\.01\)/;
             unlike $app->stdout, qr/Using CPAN::Test::Dummy::Perl5::VersionBump \(0\.02\)/;
         }

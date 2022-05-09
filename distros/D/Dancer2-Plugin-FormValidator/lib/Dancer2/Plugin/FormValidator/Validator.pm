@@ -1,5 +1,8 @@
 package Dancer2::Plugin::FormValidator::Validator;
 
+use strict;
+use warnings;
+
 use Moo;
 use Storable qw(dclone);
 use Hash::Util qw(lock_hashref);
@@ -36,7 +39,7 @@ has registry => (
     is       => 'ro',
     default  => sub {
         return Dancer2::Plugin::FormValidator::Registry->new(
-            extensions => shift->extensions,
+            extensions => $_[0]->extensions,
         );
     }
 );
@@ -52,7 +55,7 @@ sub BUILDARGS {
 }
 
 sub validate {
-    my $self = shift;
+    my ($self) = @_;
 
     my $processor = Dancer2::Plugin::FormValidator::Processor->new(
         input             => $self->input,

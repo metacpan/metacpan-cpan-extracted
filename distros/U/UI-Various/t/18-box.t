@@ -61,29 +61,29 @@ warning_like
 {   $_ = UI::Various::Box->new(columns => {});   }
 {   carped =>
 	qr/^parameter 'columns' must be a positive integer$re_msg_tail/   },
-    'bad button parameter fails';
+    'bad box parameter fails';
 warning_like
 {   $_ = UI::Various::Box->new(columns => '');   }
 {   carped =>
 	qr/^parameter 'columns' must be a positive integer$re_msg_tail/   },
-    'empty button parameter fails';
+    'empty box parameter fails';
 warning_like
 {   $_ = UI::Various::Box->new(columns => 0);   }
 {   carped =>
 	qr/^parameter 'columns' must be a positive integer$re_msg_tail/   },
-    'wrong button parameter fails';
+    'wrong box parameter fails';
 warning_like
 {   $_ = UI::Various::Box->new(rows => {});   }
 {   carped => qr/^parameter 'rows' must be a positive integer$re_msg_tail/   },
-    'bad button parameter fails';
+    'bad box parameter fails';
 warning_like
 {   $_ = UI::Various::Box->new(rows => '');   }
 {   carped => qr/^parameter 'rows' must be a positive integer$re_msg_tail/   },
-    'empty button parameter fails';
+    'empty box parameter fails';
 warning_like
 {   $_ = UI::Various::Box->new(rows => 0);   }
 {   carped => qr/^parameter 'rows' must be a positive integer$re_msg_tail/   },
-    'wrong button parameter fails';
+    'wrong box parameter fails';
 
 my $main = UI::Various::Main->new(width => 40);
 
@@ -326,7 +326,6 @@ $main->remove($box);
 
 ####################################
 # tests with multiple levels of partly filled boxes:
-
 $_ = UI::Various::Box->new(border => 1, rows => 2, columns => 2);
 my $outer_box = $_;
 $_ = UI::Various::Box->new(border => 1, rows => 2, columns => 2);

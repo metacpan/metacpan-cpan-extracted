@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Octets/To/Unicode.pm
+minil.toml
+script/ru-perltidy
+script/ru-utf8
+t/00_compile.t
+t/octets-to-unicode.t
+META.yml
+MANIFEST

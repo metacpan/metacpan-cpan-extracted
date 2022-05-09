@@ -10,6 +10,12 @@ This documentation page is listing all non-backward compatible changes in usage 
 
 =head1 CHANGES
 
+=head2 is_validated and clear_valid methods are deprecated
+
+I<Changed in 2.10>
+
+Forms no longer store their validation state in a dedicated field. These methods did nothing starting with version 2.09, and got later removed.
+
 =head2 Subroutine call parameters got standarized
 
 I<Changed in 2.04>
@@ -199,9 +205,7 @@ Starting from version I<2.00>, any backward incompatible changes will only be in
 
 =head2 Current deprecations
 
-=head3 is_validated and clear_valid methods are deprecated
-
-Forms no longer store their validation state in a dedicated field. These methods do nothing starting with version 2.09, but will be removed at some point in the future.
+None at this time.
 
 =head1 SEE ALSO
 
@@ -210,3 +214,4 @@ Forms no longer store their validation state in a dedicated field. These methods
 =item * L<Form::Tiny::Manual>
 
 =back
+

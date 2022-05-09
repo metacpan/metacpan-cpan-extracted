@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 #########################################################################
 
@@ -57,6 +57,8 @@ our %T =
      => '%s Element benötigt Elternelement',
      _1_may_not_be_empty
      => "'%s' darf nicht leer sein",
+     _1_may_not_be_modified_directly_after_initialisation
+     => "'%s' darf nach der Initialisierung nicht mehr direkt geändert werden",
      _1_may_only_be_called_from_itself
      => '%s darf nur innerhalb der Klasse benutzt werden',
      _1_to_cancel
@@ -81,6 +83,8 @@ our %T =
      => 'Auswahl eingeben',
      include_option_must_be_an_array_reference_or_a_scalar
      => "'include' Option muss ARRAY Referenz oder Skalar sein",
+     invalid_call_to__1__2
+     => 'ungültiger Aufruf von %s::%s',
      invalid_object__1_in_call_to__2
      => 'ungültiges Objekt (%s) in Aufruf von %s',
      invalid_object__1_in_call_to__2__3
@@ -101,6 +105,8 @@ our %T =
      => "ungültiger Wert %s für Parameter '%s' in Aufruf von %s::%s",
      leave_box
      => 'Box verlassen',
+     leave_listbox
+     => 'Listbox verlassen',
      leave_window
      => 'Fenster verlassen',
      mandatory_parameter__1_is_missing
@@ -125,6 +131,10 @@ our %T =
      => "parameter '%s' muß positive ganze Zahl sein",
      parameter__1_must_be_a_positive_integer_in_call_to__2__3
      => "parameter '%s' in Aufruf von %s::%s muß positive ganze Zahl sein",
+     parameter__1_must_be_in__2__3
+     => "parameter '%s' muß im Bereich [%s..%s] liegen",
+     scrolls
+     => '+/- blättert',
      specified_implementation_missing
      => 'spezifische Implementierung fehlt',
      stderr_not_0_1_2_or_3

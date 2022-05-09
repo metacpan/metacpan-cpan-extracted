@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use UI::Various::core;
 use UI::Various::Check;
@@ -123,7 +123,7 @@ sub _show($$$$)
 {
     my ($self, $prefix, $width, $height) = @_;
     # Note that the accessors automatically dereference the SCALARs here:
-    local $_ = $prefix . '[' . ($self->var ? 'X' : ' ') . '] ';
+    local $_ = $prefix . $D{CL} . ($self->var ? 'X' : ' ') . $D{CR} . ' ';
     return $self->_format($_, '', '', $self->text, '', '', $width, $height);
 }
 

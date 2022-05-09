@@ -28,3 +28,4 @@ t/15_chirality.t
 t/16_unsupported_chirality.t
 t/17_max_hydrogen_count_digits.t
 t/18_chirality_reference.t
+t/19_lone_pairs.t

@@ -1,10 +1,10 @@
 package GitHub::MergeVelocity::Repository::Statistics;
-$GitHub::MergeVelocity::Repository::Statistics::VERSION = '0.000007';
-use strict;
-use warnings;
+
+use Moo;
+
+our $VERSION = '0.000009';
 
 use Math::Round qw( nearest round );
-use Moo;
 use Types::Standard qw( Bool Int );
 
 has average_velocity => (
@@ -77,7 +77,7 @@ GitHub::MergeVelocity::Repository::Statistics - Pull request statistics for a gi
 
 =head1 VERSION
 
-version 0.000007
+version 0.000009
 
 =head1 AUTHOR
 

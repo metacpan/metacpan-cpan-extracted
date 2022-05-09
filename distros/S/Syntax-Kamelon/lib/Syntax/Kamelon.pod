@@ -505,6 +505,23 @@ Copyright (c) 2017 by Hans Jeuken, all rights reserved.
 
 Published under the GPLV3 license
 
+=head1 BUGS, ERRORS and DISCLAIMER
+
+We know for a fact that the supplied xml files from Kate do not all produce accurate results.
+Most of them do though.
+
+There are a few instances (Lilypond we know of) where Perl treats regular expressions slightly
+different from Kate. This became obvious as of Perl 5.26.
+
+We have also chosen to not integrate some of Kate's tag features. We think they are a poor design choice.
+Kate allows you to specify tags like 'bold', 'italic' or a colour. We have foregone those. So for some 
+xml definition files you will get different output when comparing it with a Kate editor window.
+
+If you bump into one of these, unfortunately you are on your own.
+
+What you can do is use your own set of xml definitions in a folder of your choice.
+Then edit the xml to your liking.
+
 =head1 SEE ALSO
 
 B<Syntax::Kamelon::Builder>, B<Syntax::Kamelon::Debugger>, B<Syntax::Kamelon::Diagnostics>,

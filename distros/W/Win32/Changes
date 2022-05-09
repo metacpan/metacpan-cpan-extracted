@@ -1,5 +1,9 @@
 Revision history for the Perl extension Win32.
 
+0.59    [2022-05-05]
+        - add Win32::GetChipArch and use it in Win32::GetOSName to support arm/arm64
+          architecture by Pierrick Bouvier [PR/34]
+
 0.58    [2022-01-17]
         - add Win32::HttpGetFile (thanks to Craig Berry for the implementation
           and Tomasz Konojacki for code review) [PR/30]

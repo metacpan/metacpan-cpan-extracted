@@ -23,7 +23,12 @@ foreach my $item (@ARGV) {
                                      }
                                    );
   if( ref $result ) {
-    print Dumper( $result );
+
+    print Dumper( $result )
+      unless $result->{Ack} eq 'Success';
+
+    print "Status: $result->{Ack}\n";
+
   } else {
     print "ERROR: $result\n\n";
   }

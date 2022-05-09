@@ -1,0 +1,243 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use utf8;
+
+use open qw/:std :utf8/;
+
+use Getopt::Long qw(:config no_ignore_case);
+use Pod::Usage;
+use Term::ANSIColor qw/:constants/;
+use List::Util qw/max/;
+
+use Octets::To::Unicode;
+
+my $parse_options_ok = GetOptions(
+    'help|h' => \( my $help = 0 ),
+    'man'    => \( my $man  = 0 ),
+
+    'e|ext=s'       => \( my $ext = 'pm,pl,plx,t,' ),
+    'n|encodings=s' =>
+      \( my $encodings = $ENV{'RU-ENCODINGS'} // 'utf-8,cp1251,koi8-r' ),
+    'b|in-branch' => \( my $in_branch ),
+    'c|command=s' => \( my $command ),
+    'o|overall'   => \( my $overall ),
+);
+
+if ( !$parse_options_ok ) {
+    pod2usage(2);
+}
+elsif ($help) {
+    pod2usage(
+        -sections => "NAME|SYNOPSIS|DESCRIPTION|OPTIONS|SUBCOMMANDS",
+        -verbose  => 99
+    );
+}
+elsif ($man) {
+    pod2usage( -exitval => 0, -verbose => 2 );
+}
+elsif ( !$command ) {
+    print STDERR "use: ru-utf8 -c 'command'\n";
+}
+else {
+
+    my @encodings = split /,/, $encodings;
+
+    my @files = @ARGV;
+
+    if ( !@files ) {
+        $ext =~ s/^(.*),$/,$1/;
+        $ext = join "|", map { $_ eq "" ? '' : "\\.$_" } split /,/, $ext;
+
+        @files = grep length, split "\n",
+          `git diff --name-only --diff-filter=AM origin/master...`
+          if $in_branch;
+
+        @files = map { file_find $_ }
+          map { s/^\s*[\w\?]+\s+//; $_ } grep { !/^\s*D / } split /\n/,
+          `git status -s`
+          if !$in_branch;
+
+        @files = grep test_script($_), grep /($ext)$/, @files;
+    }
+
+    my $max_length = max map length, @files;
+
+    if ($overall) {
+
+        my @tmp_files_and_encodes = map {
+			my ($unicode, $encoding) = file_decode $_, \@encodings;
+			(my $tmp_file = $_) =~ s!(\.[^/.]+)?$!.ru-utf8$&!n;
+			file_write $tmp_file, $unicode;
+			[$tmp_file, $_, $encoding]
+		} @files;
+
+		(my $duplicate_command = $command) =~ s!\$(\d+)|\$\{(\d+)\}!$tmp_files_and_encodes[($1 // $2) - 1][0]!ge;
+
+		$duplicate_command =~ s!\$\*|\$\{\*\}!join " ", map $_->[0], @tmp_files_and_encodes!ge;
+
+        my $result = system $duplicate_command;
+		
+		if($result) {
+			unlink $_->[0] for @tmp_files_and_encodes;
+		} else {
+			for(@tmp_files_and_encodes) {
+				my ($tmp_file, $file, $encoding) = @$_;
+				file_encode $file, $encoding, file_read $tmp_file;
+				unlink $tmp_file;
+			}
+		}
+		
+        exit $result;
+    }
+
+    my $result = 0;
+
+    for my $file (@files) {
+
+		(my $tmp_file = $file) =~ s!(\.[^/.]+)?$!.ru-utf8$&!n;
+		
+		(my $duplicate_command = $command) =~ s!\$[1*]|\$\{[1*]\}!$tmp_file!g;
+
+        my ( $unicode, $encoding ) = file_decode $file, \@encodings;
+        file_write $tmp_file, $unicode;
+		
+		print "$file  ", " " x ( $max_length - length $file ), GREEN, " in ", YELLOW,
+          $encoding, RED, " ⟶ ", RESET, $tmp_file, "\n";
+
+        system $duplicate_command;
+
+        $result = max $?, $result;
+        print WHITE, "[ ", RED, "FAIL", RESET, " # $? ", WHITE, " ]", RESET,
+          "\n"
+          if $?;
+
+        file_encode $file, $encoding, file_read $tmp_file if !$?;
+		unlink $tmp_file;
+    }
+
+    exit $result;
+}
+
+# Если расширение отсутствует, то 1-я строка должна содержать #!
+sub test_script {
+    my ($file) = @_;
+    return 1 if $file =~ /\.[^.\/]*$/;
+    open my $f, "<", $file or die "$file: $!";
+    read $f, my $buf, 2;
+    close $f;
+    return $buf eq "#!";
+}
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+B<ru-utf8> - утилита подмены файлов в национальных кодировках на файлы в utf-8.
+
+=head1 VERSION
+
+Version 0.03
+
+=head1 SYNOPSIS
+
+    ru-utf8 [-h] [--man] [<files> ...] [--ext exts] [--in-branch] --command <command>
+
+=head1 DESCRIPTION
+
+Утилита переводит файлы во временные в кодировке utf-8 (в /tmp) и после выполнения команды и их изменения переписывает обратно в определённой кодировке.
+
+Есть 3 основные режима работы:
+
+	# Обработать все изменённые, но ещё не закомиченные файлы:
+	$ ru-utf8 -c ''
+	
+	# Обработать изменённые и закомиченные файлы в ветке (branch-е):
+	$ ru-utf8 --branch
+
+	# Обработать указанные файлы:
+	$ ru-utf8 file1 /root/file2
+	
+С помощью опции -e (--ext) можно указать расширения файлов для форматирования (по умолчанию это pm,pl,plx,t,):
+
+	$ ru-utf8 -e pm,,t
+	
+Обратите внимание на пустое расширение — оно используется для исполняемых скриптов perl, которые расширения не имеют. При наличие такого расширения будет проверяться так же первая строка файла регуляркой C</^#!.*?\bperl\b/>.
+	
+Так же можно указать кодировки и порядок в котором они будут проверяться:
+
+	$ ru-utf8 -n cp1251,utf-8
+
+`ru-utf8` возвращает максимальный код из возвращённых при запуске команды над файлами.
+
+=head2 OPTIONS
+
+=over 4
+
+=item B<-h>, B<--help>
+
+Показать помощь и выйти.
+
+=item B<--man>
+
+Распечатать мануал и завершиться.
+
+=item B<-e> <exts>, B<--ext> <exts>
+
+Список расширений через запятую.
+
+По умолчанию: B<pm,pl,t,>.
+
+Пустое расширение обозначает файлы без расширений. 
+Однако в них проверяется наличие #! в начале файла.
+
+=item B<-n> encodings, B<--encodings> encodings
+
+Список кодировок через запятую.
+
+По умолчанию берётся из переменной окружения B<RU-ENCODINGS>, а если она пуста, равняется: B<utf-8,cp1251,koi8-r>.
+
+=item B<-b>, B<--in-branch>
+
+Форматировать изменённые и закомиченные файлы в ветке (branch-е).
+
+=item B<-с> command, B<--command> command
+
+Команда. 
+
+Обязательный параметр.
+
+=item B<-o>, B<--overall>
+
+Указывает, что команда одна для всех файлов, а не для каждого по отдельности.
+
+При этом обращение к файлам происходит как в шелле: $1, $2...
+
+Например:
+
+	ru-utf8 file1 file2 -c 'cat $1 $2'
+
+=back
+
+=head2 ARGS
+
+=over 4
+
+=item B<files>...
+
+Файлы или директории с файлами, которые нужно отформатировать.
+
+=back
+
+=head1 LICENSE
+
+⚖ B<GPLv3>
+
+=head1 AUTHOR
+
+Yaroslav O. Kosmina E<lt>darviarush@mail.ruE<gt>
+
+=cut

@@ -15,6 +15,7 @@ use warnings;
 Test::Log::Log4perl->ignore_priority("info");
 
 use lib "t/lib";
+use utf8;
 
 my ($model, $trace) = init_test();
 
@@ -498,6 +499,21 @@ subtest "test sort and insort" => sub {
     eq_or_diff( [$ohon->fetch_all_indexes()],[qw/d g/], "check sorted keys") ;
 };
 
+subtest "test list.ensure" => sub {
+    my $lista = $root->fetch_element('lista');
+    $root->load('lista=a,b,c,d');
+    my @expect = $lista->fetch_all_values;
+
+    $root->load( qq!lista:.ensure(b)! );
+    eq_or_diff( [ $lista->fetch_all_values ], \@expect, "ensure(b) -> no change" );
+
+    $root->load( qq!lista:.ensure(b2)! );
+    eq_or_diff( [ $lista->fetch_all_values ], [qw/a b b2 c d/], "ensure(b2) -> inserted and sorted");
+
+    $root->load( qq!lista:.ensure(c2,f4,b2,c2)! );
+    eq_or_diff( [ $lista->fetch_all_values ], [qw/a b b2 c c2 d f4/], "ensure several values");
+};
+
 subtest "test combination of annotation plus load and some utf8" => sub {
     my $step = 'std_id#std_id_note ! std_id:ab#std_id_ab_note X=Bv X#X_note 
       - std_id:bc X=Av X#X2_note '
@@ -555,9 +571,10 @@ subtest "test deep copy" => sub {
     $root->load("std_id:.copy(ab,copy)");
     is( $root->grab_value('std_id:copy X-Y-Z'), "Av", "check hash copy" );
 
-    is( $root->grab_value('lista:5'), 'e' , "list copy" );
+    $root->load('lista=a,b,c,d,e,f');
+    is( $root->grab_value('lista:5'), 'f' , "list copy" );
     $root->load("lista:.copy(1,5)");
-    is( $root->grab_value('lista:5'), 'b2' , "list copy" );
+    is( $root->grab_value('lista:5'), 'b' , "list copy" );
 };
 
 subtest "test clear instruction" => sub {
@@ -596,6 +613,13 @@ subtest "test load data from JSON file" => sub {
     }
         qr!a_string=\.json\(t/lib/dummy\.json/foo/bar\)!,
         "throws error on dummy json file: check reported command";
+};
+
+subtest "test load data from JSON utf8 file" => sub {
+    $inst->clear_changes;
+
+    $root->load('a_string=.json("t/lib/load-data.json/utf8-value")');
+    is( $root->grab_value('a_string'), "30€ de thé", "extract utf-8 data from json file");
 };
 
 subtest "test load data from YAML file" => sub {

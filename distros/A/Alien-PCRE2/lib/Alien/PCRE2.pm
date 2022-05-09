@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Alien::PCRE2;
 
-our $VERSION = '0.015000';
+our $VERSION = '0.016000';
 
 use base qw( Alien::Base );
 
@@ -41,7 +41,7 @@ William N. Braswell, Jr. <wbraswell@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by William N. Braswell, Jr.;
+This software is copyright (c) 2017, 2022 by William N. Braswell, Jr.;
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

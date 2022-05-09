@@ -4184,6 +4184,10 @@ Destroy the guest using the default approach
 
 Destroy the guest in a graceful manner
 
+=item Sys::Virt::Domain::DESTROY_REMOVE_LOGS
+
+Delete log files associated with the guest
+
 =back
 
 =head2 SHUTDOWN CONSTANTS

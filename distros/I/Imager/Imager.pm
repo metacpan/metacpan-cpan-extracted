@@ -150,7 +150,7 @@ BEGIN {
   if ($ex_version < 5.57) {
     our @ISA = qw(Exporter);
   }
-  $VERSION = '1.014';
+  $VERSION = '1.015';
   require XSLoader;
   XSLoader::load(Imager => $VERSION);
 }
@@ -4373,7 +4373,7 @@ sub _set_error {
 
 # Default guess for the type of an image from extension
 
-my @simple_types = qw(png tga gif raw ico cur xpm mng jng ilbm pcx psd eps webp xwd xpm dng ras);
+my @simple_types = qw(png tga gif raw ico cur xpm mng jng ilbm pcx psd eps webp xwd xpm dng ras qoi jxl);
 
 my %ext_types =
   (
@@ -4494,8 +4494,8 @@ sub Inline {
   # Inline added a new argument at the beginning
   my $lang = $_[-1];
 
-  $lang eq 'C'
-    or die "Only C language supported";
+  $lang eq 'C' || $lang eq 'CPP'
+    or die "Only C or C++ (CPP) language supported";
 
   require Imager::ExtUtils;
   return Imager::ExtUtils->inline_config;

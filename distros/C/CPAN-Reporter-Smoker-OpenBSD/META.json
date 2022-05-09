@@ -58,11 +58,11 @@
    "provides" : {
       "CPAN::Reporter::Smoker::OpenBSD" : {
          "file" : "lib/CPAN/Reporter/Smoker/OpenBSD.pm",
-         "version" : "0.018"
+         "version" : "0.019"
       },
       "CPAN::Reporter::Smoker::OpenBSD::PerlConfig" : {
          "file" : "lib/CPAN/Reporter/Smoker/OpenBSD/PerlConfig.pm",
-         "version" : "0.018"
+         "version" : "0.019"
       }
    },
    "release_status" : "stable",
@@ -77,8 +77,8 @@
          "web" : "https://github.com/glasswalk3r/cpan-openbsd-smoker"
       }
    },
-   "version" : "0.018",
-   "x_generated_by_perl" : "v5.34.0",
+   "version" : "0.019",
+   "x_generated_by_perl" : "v5.35.11",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "GPL-3.0-only"
 }

@@ -1,3 +1,12 @@
+0.8.0 2022-05-05
+
+    - Implementing support for tetrahedral chiral centers having lone
+      pairs.
+    - Safeguarding against infinite cycles in
+      Chemistry::OpenSMILES::Writer::_permutation_order().
+    - Fixing mistake in Chemistry::OpenSMILES::Parser::parse()
+      documentation.
+
 0.7.0 2021-10-30
 
     - Fixing important issue with representing tetrahedral chiral centers

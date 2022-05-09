@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Dumper 2.149;
+package Config::Model::Dumper 2.150;
 
 use Carp;
 use strict;
@@ -262,7 +262,7 @@ Config::Model::Dumper - Serialize data of config tree
 
 =head1 VERSION
 
-version 2.149
+version 2.150
 
 =head1 SYNOPSIS
 

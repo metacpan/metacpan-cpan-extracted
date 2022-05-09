@@ -2,11 +2,14 @@
 
 use strict;
 use warnings;
-  
+
 use Net::eBay;
 use Data::Dumper;
 
+use BSD::Resource;
+
 my $eBay = new Net::eBay;
+
 
 # use new eBay API
 $eBay->setDefaults( { API => 2, debug => 0 } );
@@ -15,6 +18,8 @@ my $nowatch      = 0;
 my $bidsonly     = 0;
 my $highbidders  = undef;
 my $auctionsonly = undef;
+my $cpulimit     = 100;
+my $verbose      = undef;
 
 while( @ARGV ) {
   if( $ARGV[0] eq '--nowatch' ) {
@@ -26,6 +31,9 @@ while( @ARGV ) {
   } elsif( $ARGV[0] eq '--auctionsonly' ) {
     shift @ARGV;
     $auctionsonly = 1;
+  } elsif( $ARGV[0] eq '--verbose' ) {
+    shift @ARGV;
+    $verbose = 1;
   } elsif( $ARGV[0] eq '--highbidders' ) {
     shift @ARGV;
     $highbidders = 1;
@@ -34,12 +42,19 @@ while( @ARGV ) {
   }
 }
 
+setrlimit( RLIMIT_CPU, $cpulimit, $cpulimit );
+
+my $request = {
+               ActiveList => {
+                              Sort => 'TimeLeft',
+                             }
+              };
+
+$request->{ActiveList}->{ListingType} = 'Auction'
+  if $auctionsonly;
+
 my $result = $eBay->submitPaginatedRequest( "GetMyeBaySelling",
-                                            {
-                                             ActiveList => {
-                                                            Sort => 'TimeLeft',
-                                                           }
-                                            },
+                                            $request,
                                             'Item',
                                             200,
                                           );
@@ -52,7 +67,8 @@ my $potential = 0.0;
 my $disinterest = 0;
   
 if( ref $result ) {
-  #print "Result: " . Dumper( $result ) . "\n";
+  print "Result: " . Dumper( $result ) . "\n"
+    if $verbose;
 
   print "   Item        W  B   Price     Bidder  Q   Title\n";
   #      7551933377   0  0   49.99 1 Siliconix Transistor tester IPT II 2 Monitor
@@ -63,8 +79,8 @@ if( ref $result ) {
   foreach my $item (@$items) {
     $items++;
     unless( defined $item->{ItemID} ) {
-      print STDERR "Error! No ItemID!\n" . Dumper( $result ) . "\n\n";
-      exit 1;
+      #print STDERR "Error! No ItemID!\n" . Dumper( $item ) . "\n\n";
+      next;
     }
 
     next if $bidsonly && !$item->{SellingStatus}->{BidCount};

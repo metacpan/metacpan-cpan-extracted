@@ -1,5 +1,5 @@
 package Selenium::Remote::Driver;
-$Selenium::Remote::Driver::VERSION = '1.46';
+$Selenium::Remote::Driver::VERSION = '1.47';
 use strict;
 use warnings;
 
@@ -1890,7 +1890,7 @@ Selenium::Remote::Driver - Perl Client for Selenium Remote Driver
 
 =head1 VERSION
 
-version 1.46
+version 1.47
 
 =head1 SYNOPSIS
 

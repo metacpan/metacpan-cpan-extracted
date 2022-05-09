@@ -9,7 +9,7 @@ use Form::Tiny::Error;
 
 use Moo::Role;
 
-our $VERSION = '2.09';
+our $VERSION = '2.12';
 
 use constant {
 	MARKER_NONE => '',

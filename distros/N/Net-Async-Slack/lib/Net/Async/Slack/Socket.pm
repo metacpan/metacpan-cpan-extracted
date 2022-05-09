@@ -3,7 +3,7 @@ package Net::Async::Slack::Socket;
 use strict;
 use warnings;
 
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use parent qw(IO::Async::Notifier);

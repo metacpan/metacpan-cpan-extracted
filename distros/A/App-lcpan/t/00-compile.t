@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 95 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 99 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/lcpan.pm',
@@ -31,6 +31,7 @@ my @module_files = (
     'App/lcpan/Cmd/copy_mod.pm',
     'App/lcpan/Cmd/copy_rel.pm',
     'App/lcpan/Cmd/copy_script.pm',
+    'App/lcpan/Cmd/db_path.pm',
     'App/lcpan/Cmd/delete_rel.pm',
     'App/lcpan/Cmd/deps.pm',
     'App/lcpan/Cmd/deps_by_dependent_count.pm',
@@ -44,6 +45,8 @@ my @module_files = (
     'App/lcpan/Cmd/dist_scripts.pm',
     'App/lcpan/Cmd/dists.pm',
     'App/lcpan/Cmd/dists_by_dep_count.pm',
+    'App/lcpan/Cmd/dists_by_mod_count.pm',
+    'App/lcpan/Cmd/dists_by_script_count.pm',
     'App/lcpan/Cmd/doc.pm',
     'App/lcpan/Cmd/extract_dist.pm',
     'App/lcpan/Cmd/extract_mod.pm',
@@ -65,6 +68,7 @@ my @module_files = (
     'App/lcpan/Cmd/mod_contents.pm',
     'App/lcpan/Cmd/mods.pm',
     'App/lcpan/Cmd/mods_by_mention_count.pm',
+    'App/lcpan/Cmd/mods_by_rdep_author_count.pm',
     'App/lcpan/Cmd/mods_by_rdep_count.pm',
     'App/lcpan/Cmd/mods_from_same_dist.pm',
     'App/lcpan/Cmd/module.pm',

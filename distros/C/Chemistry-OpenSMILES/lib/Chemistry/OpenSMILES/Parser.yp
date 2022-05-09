@@ -359,6 +359,15 @@ sub parse
                     $atom->{chirality} =~ s/^\@TH1$/@/;
                     $atom->{chirality} =~ s/^\@TH2$/@@/;
                 }
+
+                # Adjust chirality for centers having lone pairs
+                if( is_chiral $atom &&
+                    $atom->{first_of_chain} &&
+                    $atom->{chirality} =~ /^@@?$/ &&
+                    $atom->{chirality_neighbours} &&
+                    scalar @{$atom->{chirality_neighbours}} == 3 ) {
+                    $atom->{chirality} = $atom->{chirality} eq '@' ? '@@' : '@';
+                }
             }
             delete $atom->{first_of_chain};
         }

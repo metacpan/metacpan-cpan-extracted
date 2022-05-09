@@ -28,7 +28,7 @@
             "Test::Rinci" : "0.151"
          },
          "x_spec" : {
-            "Rinci" : "v1.1.96"
+            "Rinci" : "v1.1.102"
          }
       },
       "runtime" : {
@@ -40,8 +40,8 @@
             "Markdown::To::POD" : "0",
             "Perinci::Access::Perl" : "0.87",
             "Perinci::CmdLine::Dump" : "0.120",
-            "Perinci::CmdLine::Lite" : "1.905",
-            "Perinci::Result::Format::Lite" : "0.280",
+            "Perinci::CmdLine::Lite" : "1.915",
+            "Perinci::Result::Format::Lite" : "0.286",
             "Perinci::Sub::To::CLIDocData" : "0.298",
             "Proc::ChildError" : "0",
             "String::ShellQuote" : "0",
@@ -64,7 +64,7 @@
    "provides" : {
       "Perinci::CmdLine::POD" : {
          "file" : "lib/Perinci/CmdLine/POD.pm",
-         "version" : "0.025"
+         "version" : "0.026"
       }
    },
    "release_status" : "stable",
@@ -79,7 +79,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-CmdLine-POD"
       }
    },
-   "version" : "0.025",
+   "version" : "0.026",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -231,7 +231,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.17.1",
+                  "git_version" : "2.35.3",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -244,7 +244,7 @@
          {
             "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",
             "name" : "@Author::PERLANCAR/CopyrightYearFromGit",
-            "version" : "0.006"
+            "version" : "0.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
@@ -423,6 +423,11 @@
                         "version" : "0.009"
                      },
                      {
+                        "class" : "Pod::Weaver::Section::PERLANCAR::Contributing",
+                        "name" : "@Author::PERLANCAR/PERLANCAR/Contributing",
+                        "version" : "0.292"
+                     },
+                     {
                         "class" : "Pod::Weaver::Section::Legal",
                         "name" : "@Author::PERLANCAR/Legal",
                         "version" : "4.018"
@@ -523,7 +528,7 @@
                }
             },
             "name" : "@Author::PERLANCAR/Test::Perl::Critic::Subset",
-            "version" : "3.001.005"
+            "version" : "3.001.006"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Rinci",

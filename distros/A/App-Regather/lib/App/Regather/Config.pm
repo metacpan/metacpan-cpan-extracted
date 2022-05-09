@@ -237,7 +237,7 @@ sub mangle {
     $item = getpwnam( $self->get(qw(core uid)) );
     if ( defined $item ) {
       $self->{logger}->cc( pr => 'info', fm => "%s: setuid user %s(%s) confirmed",
-			   ls => [ __PACKAGE__, $self->get(qw(core uid)), $item ] )
+			   ls => [ sprintf("%s:%s",__FILE__,__LINE__), $self->get(qw(core uid)), $item ] )
 	if $self->{verbose} > 1;
       $self->set('core', 'uid_number', $item);
     } else {
@@ -250,7 +250,7 @@ sub mangle {
     $item = getgrnam( $self->get(qw(core gid)) );
     if ( defined $item ) {
       $self->{logger}->cc( pr => 'info', fm => "%s: setgid group %s(%s) confirmed",
-			   ls => [ __PACKAGE__, $self->get(qw(core gid)), $item ] )
+			   ls => [ sprintf("%s:%s",__FILE__,__LINE__), $self->get(qw(core gid)), $item ] )
 	if $self->{verbose} > 1;
       $self->set('core', 'gid_number', $item);
     } else {
@@ -264,7 +264,7 @@ sub mangle {
       $item = getpwnam( $self->get(qw($svc uid)) );
       if ( defined $item ) {
 	$self->{logger}->cc( pr => 'info', fm => "%s: setuid user %s(%s) confirmed",
-			     ls => [ __PACKAGE__, $self->get(qw($svc uid)), $item ] )
+			     ls => [ sprintf("%s:%s",__FILE__,__LINE__), $self->get(qw($svc uid)), $item ] )
 	  if $self->{verbose} > 1;
 	$self->set($svc, 'uid_number', $item);
       } else {
@@ -277,7 +277,7 @@ sub mangle {
       $item = getgrnam( $self->get($svc, 'gid') );
       if ( defined $item ) {
 	$self->{logger}->cc( pr => 'info', fm => "%s: setgid group %s(%s) confirmed",
-			     ls => [ __PACKAGE__, $self->get(qw($svc gid)), $item ] )
+			     ls => [ sprintf("%s:%s",__FILE__,__LINE__), $self->get(qw($svc gid)), $item ] )
 	  if $self->{verbose} > 1;
 	$self->set($svc, 'gid_number', $item);
       } else {
@@ -292,12 +292,12 @@ sub mangle {
 	if ( $plg eq 'nsupdate' ) {
 	  eval { require Net::DNS };
 	  if ( $@ =~ /$re_mod/ ) {
-	    print "ERROR: ", __PACKAGE__, ": ", $@, "\n";
+	    print "ERROR: ", sprintf("%s:%s",__FILE__,__LINE__), ": ", $@, "\n";
 	    exit 2;
 	  }
 
 	  if ( ! $self->is_set('service', $svc, 'ns_attr') ) {
-	    print __PACKAGE__, ": service $svc lacks ns_attr option\n";
+	    print sprintf("%s:%s",__FILE__,__LINE__), ": service $svc lacks ns_attr option\n";
 	    exit 2;
 	  }
 	}
@@ -305,18 +305,18 @@ sub mangle {
 	if ($plg eq 'configfile' ) {
 	  eval { require Template };
 	  if ( $@ =~ /$re_mod/ ) {
-	    print "ERROR: ", __PACKAGE__, ": ", $@, "\n";
+	    print "ERROR: ", sprintf("%s:%s",__FILE__,__LINE__), ": ", $@, "\n";
 	    exit 2;
 	  }
 
 	  eval { require File::Temp };
 	  if ( $@ =~ /$re_mod/ ) {
-	    print "ERROR: ", __PACKAGE__, ": ", $@, "\n";
+	    print "ERROR: ", sprintf("%s:%s",__FILE__,__LINE__), ": ", $@, "\n";
 	    exit 2;
 	  }
 
 	  if ( ! $self->is_set('service', $svc, 'tt_file') ) {
-	    print __PACKAGE__, ": service $svc lacks tt_file option\n";
+	    print sprintf("%s:%s",__FILE__,__LINE__), ": service $svc lacks tt_file option\n";
 	    exit 2;
 	  }
 	}
@@ -329,7 +329,7 @@ sub mangle {
   if ( $self->is_set(qw(core altroot)) ) {
     chdir($self->get(qw(core altroot))) || do {
       $self->{logger}->cc( pr => 'err', fm => "%s: unable to chdir to %s",
-			   ls => [ __PACKAGE__, $self->get(qw(core altroot)) ] );
+			   ls => [ sprintf("%s:%s",__FILE__,__LINE__), $self->get(qw(core altroot)) ] );
       exit 1;
     };
 
@@ -339,7 +339,7 @@ sub mangle {
 		       new Text::Locus(sprintf("in \"%s\" ", $self->get(qw(core altroot))), 1)) ||
 			 exit 1;
       $self->{logger}->cc( pr => 'debug', fm => "%s: service %s out_path has been changed to %s",
-			   ls => [ __PACKAGE__, $_, $self->get('service', $_, 'out_path') ] )
+			   ls => [ sprintf("%s:%s",__FILE__,__LINE__), $_, $self->get('service', $_, 'out_path') ] )
 	if $self->{verbose} > 1;
     }
   } else {
@@ -396,7 +396,7 @@ sub config_help {
   if ( $self->{verbose} > 0 ) {
     print "\n\n";
     $self->{logger}->cc( fg => 1, pr => 'info', fm => "%s: lexicon():%s\n%s",
-			 ls => [ __PACKAGE__, '-' x 70, $lex ] );
+			 ls => [ sprintf("%s:%s",__FILE__,__LINE__), '-' x 70, $lex ] );
   }
 }
 
@@ -519,7 +519,7 @@ sub error {
 
   $self->{logger}->cc( pr => 'err',
 		       fm => "%s: config parser error: %s%s",
-		       ls => [ __PACKAGE__,
+		       ls => [ sprintf("%s:%s",__FILE__,__LINE__),
 			       exists $_{locus} ? $_{locus} . ': ' : '',
 			       $err ] );
 }

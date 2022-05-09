@@ -16,6 +16,6 @@ plan tests => scalar(@programs);
 
 for my $script (@programs) {
     is( system( $^X, '-cw', File::Spec->catfile( 'bin', $script ) ),
-        0, "$script sintax is OK" );
+        0, "$script syntax is OK" );
 }
 

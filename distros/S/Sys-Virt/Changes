@@ -1,5 +1,9 @@
 Revision history for perl module Sys::Virt
 
+8.3.0 2022-05-03
+
+ - Add VIR_DOMAIN_DESTROY_REMOVE_LOGS constant
+
 8.1.0 2022-03-01
 
  - Add VIR_DOMAIN_SAVE_RESET_NVRAM, VIR_DOMAIN_SNAPSHOT_REVERT_RESET_NVRAM

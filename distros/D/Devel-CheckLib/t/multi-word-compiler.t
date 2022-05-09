@@ -20,19 +20,20 @@ BEGIN {
     }
 }
 
+my $fake_cc = qq{"$^X" $Config{cc}};
 if ($Mock::Config::VERSION) {
-    Mock::Config->import(cc => "$^X $Config{cc}");
+    Mock::Config->import(cc => $fake_cc);
 }
 elsif (defined($ActivePerl::VERSION) && $Config{cc} =~ /\bgcc\b/) {
     my $obj = tied %Config::Config;
-    $obj->{cc} = "$^X $Config{cc}";
+    $obj->{cc} = $fake_cc;
 }
 else {
-    eval { $Config{cc} = "$^X $Config{cc}"; }
+    eval { $Config{cc} = $fake_cc; }
 }
 
 SKIP: {
     skip "Couldn't update %Config", 1 if $@ =~ /%Config::Config is read-only/;
     eval "use Devel::CheckLib";
-    ok(!$@, "Good multi-word compiler is OK");
+    is $@, "", "Good multi-word compiler is OK";
 }

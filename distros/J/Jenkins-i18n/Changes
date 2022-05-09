@@ -1,5 +1,9 @@
 Revision history for Perl extension Jenkins::i18n.
 
+0.02  Fri May  6 20:49 2022
+    - Added the --search feature
+    - Fixed bug for tests running on MS Windows
+
 0.01  Tue Mar  8 13:12:04 2022
 	- original version; created by h2xs 1.23 with options
 		-XA -n Jenkins::i18n

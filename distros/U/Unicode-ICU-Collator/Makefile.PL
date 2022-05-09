@@ -1,6 +1,6 @@
 use 5.008008;
 use strict;
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.46;
 use Text::ParseWords qw(shellwords);
 use ExtUtils::Constant qw(WriteConstants);
 
@@ -45,39 +45,56 @@ my %opts =
     'Test::More' => '0.47',
     XSLoader => 0,
    },
+   AUTHOR => 'Tony Cook <tonyc@cpan.org>',
+   ABSTRACT => 'Wrapper around ICU collation services',
+   LICENSE => 'perl_5',
+   META_MERGE =>
+   {
+     'meta-spec' =>
+     {
+       version => "2",
+       url => "https://metacpan.org/pod/CPAN::Meta::Spec",
+     },
+     resources =>
+     {
+       repository =>
+       {
+         url => "https://github.com/tonycoz/Unicode-ICU.git",
+         web => "https://github.com/tonycoz/Unicode-ICU",
+         type => "git",
+       },
+       bugtracker =>
+       {
+         web => "https://github.com/tonycoz/Unicode-ICU/issues",
+       },
+     },
+     prereqs =>
+     {
+       configure =>
+       {
+         require =>
+         {
+           'ExtUtils::MakeMaker' => '6.46',
+         },
+       },
+       test =>
+       {
+         require =>
+         {
+           'Test::More' => '0.47',
+           XSLoader => 0,
+         },
+       },
+       runtime =>
+       {
+         require =>
+         {
+           XSLoader => 0,
+         },
+       },
+     },
+   },
   );
-my $eu_mmv = eval $ExtUtils::MakeMaker::VERSION;
-if (eval { ExtUtils::MakeMaker->VERSION('6.06'); 1 }) {
-  $opts{AUTHOR} = 'Tony Cook <tonyc@cpan.org>';
-  $opts{ABSTRACT} = 'Wrapper around ICU collation services';
-}
-if (eval { ExtUtils::MakeMaker->VERSION('6.30'); 1 }) {
-  $opts{LICENSE} = 'perl_5';
-}
-
-if (eval { ExtUtils::MakeMaker->VERSION('6.46'); 1 }) {
-  $opts{META_MERGE} =
-    {
-      'meta-spec' =>
-	{
-	  version => "2",
-	  url => "https://metacpan.org/pod/CPAN::Meta::Spec",
-	},
-      resources =>
-	{
-	  repository =>
-	    {
-	      url => "https://github.com/tonycoz/Unicode-ICU.git",
-	      web => "https://github.com/tonycoz/Unicode-ICU",
-	      type => "git",
-	    },
-	  bugtracker =>
-	    {
-	      web => "https://github.com/tonycoz/Unicode-ICU/issues",
-	    },
-	},
-    };
-}
 
 WriteMakefile(%opts);
 

@@ -74,8 +74,8 @@ for my $type (undef, CodeRef) {
 				}
 			],
 		);
-	}
-	"invalid coerce configuration dies";
+		}
+		"invalid coerce configuration dies";
 }
 
 done_testing();

@@ -123,10 +123,10 @@ sub is_windows {
     unless ( $] < 5.014 ) {
 	if ( eval { require Perl::OSType; } ) { 
             return Perl::OSType::is_os_type('Windows'); 
-	}
-	diag $@;
+        }
+        diag $@;
     }
-    return ($^O =~ m{Win}) 
+    return ($^O eq q{MSWin32} or $^O eq q{cygwin}) 
 } 
 
 sub script_name {

@@ -8,7 +8,8 @@ eval { require Time::HiRes };
 
 # running the default emulator of Signals::XSIG should produce the
 # same behavior as not using Signals::XSIG
-# t/20c: signals that are usually ignored
+# t/20c: signals that are usually ignored or used for
+#        special purposes
 
 require "t/20-defaults.tt";
 

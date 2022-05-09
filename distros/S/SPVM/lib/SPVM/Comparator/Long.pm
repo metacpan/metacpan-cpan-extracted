@@ -18,10 +18,10 @@ SPVM::Comparator::Long - A Callback Type for long Comparation
 
 =head1 DESCRIPTION
 
-L<Comparator::Long|SPVM::Comparator::Long> is a callback type to compare two long values.
+L<Comparator::Long|SPVM::Comparator::Long> is an interface type for the callback to compare two long values.
 
-=head1 CALLBACK METHOD
+=head1 INTERFACE METHOD
 
-  method : int ($a : long, $b : long);
+  required method : int ($a : long, $b : long);
 
 The implementation must receive two numbers and return 1 if $a is more than $b, -1 if $x is less than $b, 0 if $a equals $b in the implementation.

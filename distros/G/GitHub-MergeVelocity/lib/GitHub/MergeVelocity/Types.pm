@@ -1,7 +1,9 @@
 package GitHub::MergeVelocity::Types;
-$GitHub::MergeVelocity::Types::VERSION = '0.000007';
+
 use strict;
 use warnings;
+
+our $VERSION = '0.000009';
 
 use DateTime::Format::ISO8601;
 use Type::Library -base, -declare => ('Datetime');
@@ -24,7 +26,7 @@ GitHub::MergeVelocity::Types - Custom types for use by GitHub::MergeVelocity mod
 
 =head1 VERSION
 
-version 0.000007
+version 0.000009
 
 =head1 AUTHOR
 

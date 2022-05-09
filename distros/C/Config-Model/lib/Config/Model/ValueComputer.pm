@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::ValueComputer 2.149;
+package Config::Model::ValueComputer 2.150;
 
 use Mouse;
 use MouseX::StrictConstructor;
@@ -544,7 +544,7 @@ Config::Model::ValueComputer - Provides configuration value computation
 
 =head1 VERSION
 
-version 2.149
+version 2.150
 
 =head1 SYNOPSIS
 

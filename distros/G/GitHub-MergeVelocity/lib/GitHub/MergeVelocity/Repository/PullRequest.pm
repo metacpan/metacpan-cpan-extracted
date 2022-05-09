@@ -1,12 +1,11 @@
 package GitHub::MergeVelocity::Repository::PullRequest;
-$GitHub::MergeVelocity::Repository::PullRequest::VERSION = '0.000007';
-use strict;
-use warnings;
+use Moo;
 
-use DateTime;
+our $VERSION = '0.000009';
+
+use DateTime ();
 use GitHub::MergeVelocity::Types qw( Datetime );
 use Math::Round qw( round );
-use Moo;
 use MooX::StrictConstructor;
 use Types::Standard qw( Bool Int Str );
 
@@ -137,7 +136,7 @@ GitHub::MergeVelocity::Repository::PullRequest - Encapsulate select data about G
 
 =head1 VERSION
 
-version 0.000007
+version 0.000009
 
 =head1 AUTHOR
 

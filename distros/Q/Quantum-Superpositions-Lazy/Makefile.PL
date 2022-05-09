@@ -24,13 +24,14 @@ WriteMakefile(
 	META_MERGE => {
 		resources => {
 			license => 'https://dev.perl.org/licenses',
-			homepage => 'https://brtastic.xyz/project/quantum-superpositions-lazy',
-			bugtracker => 'https://github.com/brtastic/perl-quantum-superpositions-lazy/issues',
-			repository => 'https://github.com/brtastic/perl-quantum-superpositions-lazy',
+			homepage => 'https://bbrtj.eu/project/quantum-superpositions-lazy',
+			bugtracker => 'https://github.com/bbrtj/perl-quantum-superpositions-lazy/issues',
+			repository => 'https://github.com/bbrtj/perl-quantum-superpositions-lazy',
 		},
 	},
 
 	ABSTRACT_FROM => 'lib/Quantum/Superpositions/Lazy.pm',
-	AUTHOR => 'Bartosz Jarzyna <brtastic.dev@gmail.com>',
+	AUTHOR => 'Bartosz Jarzyna <bbrtj.pro@gmail.com>',
 	LICENSE => 'perl',
 );
+

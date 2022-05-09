@@ -1,12 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/UniqFiles/uniq_files
-# and generated automatically using Perinci::CmdLine::Gen version 0.496
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-01'; # DATE
-our $DIST = 'App-UniqFiles'; # DIST
-our $VERSION = '0.132'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.501
 
 use 5.010001;
 use strict;
@@ -14,6 +9,11 @@ use warnings;
 use Log::ger;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-05-09'; # DATE
+our $DIST = 'App-UniqFiles'; # DIST
+our $VERSION = '0.133'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/UniqFiles/uniq_files",
@@ -40,48 +40,17 @@ uniq-files - Report or omit duplicate file contents
 
 =head1 VERSION
 
-This document describes version 0.132 of uniq-files (from Perl distribution App-UniqFiles), released on 2020-06-01.
+This document describes version 0.133 of uniq-files (from Perl distribution App-UniqFiles), released on 2022-05-09.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % uniq-files [-A=s] [-D] [-R] [-a] [--algorithm=s] [-c] [--count] [-d]
-     [--debug] [--digest-args-json=s] [--digest-args=s] [--format=name]
-     [--group-by-digest] [--json] [--log-level=level] [--(no)naked-res]
-     [--no-group-by-digest] [--no-recurse] [--no-report-unique]
-     [--no-show-count] [--no-show-digest] [--no-show-size]
-     [--nogroup-by-digest] [--norecurse] [--noreport-unique]
-     [--noshow-count] [--noshow-digest] [--noshow-size]
-     [--page-result[=program]] [--quiet] [--recurse] [--report-duplicate=s]
-     [--report-unique] [--show-count] [--show-digest] [--show-size]
-     [--trace] [-u] [--verbose] [--view-result[=program]] <files> ...
+% B<uniq-files> [B<--algorithm>=I<str>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--digest-args>=I<s>|B<--digest-args-json>=I<json>|B<-A>=I<s>] [B<--format>=I<name>|B<--json>] [B<--group-by-digest>|B<--no-group-by-digest>|B<--nogroup-by-digest>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--recurse>|B<-R>|B<--no-recurse>|B<--norecurse>] [B<--report-duplicate>=I<int>] [B<--report-unique>|B<-D>|B<-a>|B<-d>|B<-u>|B<--no-report-unique>|B<--noreport-unique>] [B<--show-count>|B<-c>|B<--count>|B<--no-show-count>|B<--noshow-count>] [B<--show-digest>|B<--no-show-digest>|B<--noshow-digest>] [B<--show-size>|B<--no-show-size>|B<--noshow-size>] -- E<lt>I<files>E<gt> ...
 
-Examples:
 
-List all files which do no have duplicate contents:
 
- % uniq-files *
-
-List all files which have duplicate contents:
-
- % uniq-files -d *
-
-Move all duplicate files (except one copy) in this directory (and subdirectories) to .dupes/:
-
- % uniq-files -D -R * | while read f; do mv "$f" .dupes/; done
-
-List number of occurences of contents for duplicate files:
-
- % uniq-files -c *
-
-List number of occurences of contents for all files:
-
- % uniq-files -a -c *
-
-List all files, along with their number of content occurrences and content digest. Use the BLAKE2b digest algorithm. And group the files according to their digest.:
-
- % uniq-files -a -c --show-digest -A BLAKE2,blake2b *
+See examples in the L</EXAMPLES> section.
 
 =head1 DESCRIPTION
 
@@ -123,7 +92,11 @@ Some Digest algorithms require arguments, you can pass them here.
 
 See C<--files>.
 
+Can also be specified as the 1st command-line argument and onwards.
+
 =item B<--files>=I<s@>*
+
+Can also be specified as the 1st command-line argument and onwards.
 
 Can be specified multiple times.
 
@@ -194,15 +167,15 @@ Alias for --report-unique --report-duplicate=1 (report all files).
 
 See C<--no-report-unique>.
 
-=item B<-d>
-
-Alias for --noreport-unique --report-duplicate=1.
-
-See C<--no-report-unique>.
-
 =item B<-D>
 
 Alias for --noreport-unique --report-duplicate=3.
+
+See C<--no-report-unique>.
+
+=item B<-d>
+
+Alias for --noreport-unique --report-duplicate=1.
 
 See C<--no-report-unique>.
 
@@ -335,6 +308,32 @@ It is also recommended to install L<shcompgen> (see above).
 
 For fish and zsh, install L<shcompgen> as described above.
 
+=head1 EXAMPLES
+
+List all files which do no have duplicate contents:
+
+ % uniq-files *
+
+List all files which have duplicate contents:
+
+ % uniq-files -d *
+
+Move all duplicate files (except one copy) in this directory (and subdirectories) to .dupes/:
+
+ % uniq-files -D -R * | while read f; do mv "$f" .dupes/; done
+
+List number of occurences of contents for duplicate files:
+
+ % uniq-files -c *
+
+List number of occurences of contents for all files:
+
+ % uniq-files -a -c *
+
+List all files, along with their number of content occurrences and content digest. Use the BLAKE2b digest algorithm. And group the files according to their digest.:
+
+ % uniq-files -a -c --show-digest -A BLAKE2,blake2b *
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-UniqFiles>.
@@ -343,6 +342,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-UniqFi
 
 Source repository is at L<https://github.com/perlancar/perl-App-UniqFiles>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2020, 2019, 2017, 2015, 2014, 2012, 2011 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-UniqFiles>
@@ -350,16 +378,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020, 2019, 2017, 2015, 2014, 2012, 2011 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

@@ -13,7 +13,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.42';
+$VERSION = '0.43';
 $VERSION = $VERSION;
 
 # internal use
@@ -5333,7 +5333,7 @@ mb - Scripting in Big5, Big5-HKSCS, GBK, Sjis, UHC, UTF-8, ...
   supported perl versions:
     perl version 5.005_03 to newest perl
 
-=head1 INSTALLATION BY MAKE
+=head1 INSTALLATION BY MAKE-COMMAND
 
 To install this software by make, type the following:
 
@@ -5342,7 +5342,7 @@ To install this software by make, type the following:
    make test
    make install
 
-=head1 INSTALLATION WITHOUT MAKE (for DOS-like system)
+=head1 INSTALLATION WITHOUT MAKE-COMMAND (for DOS-like system)
 
 To install this software without make, type the following:
 
@@ -5351,50 +5351,76 @@ To install this software without make, type the following:
 
 =head1 DESCRIPTION
 
-  This software is a source code filter, a transpiler-modulino.
+This software is a source code filter, a transpiler-modulino.
 
-  Perl is said to have been able to handle Unicode since version 5.8. However,
-  unlike JPerl, "Easy jobs easy" has been lost. (but we have got it again :-D)
+Perl is said to have been able to handle Unicode since version 5.8. However,
+unlike JPerl, "Easy jobs easy" has been lost. (but we have got it again :-D)
 
-  In Shift_JIS and similar encodings(Big5, Big5-HKSCS, GB18030, GBK, Sjis, UHC)
-  have any DAMEMOJI who have metacharacters at second octet. Which characters
-  are DAMEMOJI is depends on whether the enclosing delimiter is single quote or
-  double quote.
+In Shift_JIS and similar encodings(Big5, Big5-HKSCS, GB18030, GBK, Sjis, UHC)
+have any DAMEMOJI who have metacharacters at second octet. Which characters
+are DAMEMOJI is depends on whether the enclosing delimiter is single quote or
+double quote.
 
-  This software escapes DAMEMOJI in your script, generate a new script and
-  run it.
+This software escapes DAMEMOJI in your script, generate a new script and
+run it.
 
-  There are some MBCS encodings in the world.
-  in Japan since 1978, JIS C 6226-1978,
-  in China since 1980, GB 2312-80,
-  in Taiwan since 1984, Big5,
-  in South Korea since 1991, KS X 1002:1991,
-  in Hong Kong since 1999, Hong Kong Supplementary Character Set, and more.
-  Even if you are an avid Unicode proponent, you cannot change this fact. These
-  encodings are still used today in most areas except the world wide web.
+There are some MBCS encodings in the world.
 
-  This software ...
-  * supports MBCS literals in Perl scripts
-  * supports Big5, Big5-HKSCS, EUC-JP, GB18030, GBK, Sjis, UHC, UTF-8, and WTF-8
-  * does not use the UTF8 flag to avoid MOJIBAKE
-  * escapes DAMEMOJI in scripts
-  * handles raw encoding to support GAIJI
-  * adds multibyte anchoring to regular expressions
-  * rewrites character classes in regular expressions to work as MBCS codepoint
-  * supports special variables $`, $&, and $'
-  * does not change features of octet-oriented built-in functions
-  * lc(), lcfirst(), uc(), and ucfirst() convert US-ASCII only
-  * codepoint range by hyphen of tr/// and y/// support US-ASCII only
-  * You have to write mb::* subroutines if you want codepoint semantics
+=over 2
 
-  Let's enjoy MBSC scripting in Perl!!
+=item * in Japan since 1978, JIS C 6226-1978,
+
+=item * in China since 1980, GB 2312-80,
+
+=item * in Taiwan since 1984, Big5,
+
+=item * in South Korea since 1991, KS X 1002:1991,
+
+=item * in Hong Kong since 1999, Hong Kong Supplementary Character Set, and more.
+
+=back
+
+Even if you are an avid Unicode proponent, you cannot change this fact. These
+encodings are still used today in most areas except the world wide web.
+
+This software does ...
+
+=over 2
+
+=item * supports MBCS literals of Perl scripts
+
+=item * supports Big5, Big5-HKSCS, EUC-JP, GB18030, GBK, Sjis, UHC, UTF-8, and WTF-8
+
+=item * does not use the UTF8 flag to avoid MOJIBAKE
+
+=item * escapes DAMEMOJI of scripts
+
+=item * handles raw encoding to support GAIJI
+
+=item * adds multibyte anchoring to regular expressions
+
+=item * rewrites character classes in regular expressions to work as MBCS codepoint
+
+=item * supports special variables $`, $&, and $'
+
+=item * does not change features of octet-oriented built-in functions
+
+=item * lc(), lcfirst(), uc(), and ucfirst() convert US-ASCII only
+
+=item * codepoint range by hyphen of tr/// and y/// support US-ASCII only
+
+=item * You have using mb::* subroutines if you want codepoint semantics
+
+=back
+
+Let's enjoy MBSC scripting in Perl!!
 
 =head1 TERMINOLOGY
 
-  To understand and use this software, you must know some terminologies.
-  But now I have no time for write them. So today is July 7th, I have to go to
-  meet Juliet.
-  The necessary terms are listed below. Maybe world wide web will help you.
+To understand and use this software, you must know some terminologies.
+But now I have no time for write them. So today is July 7th, I have to go to
+meet Juliet.
+The necessary terms are listed below. Maybe world wide web will help you.
 
 =over 2
 
@@ -5434,8 +5460,8 @@ To install this software without make, type the following:
 
 =head1 MBCS Encodings supported by this software
 
-  The encodings supported by this software and their range of octets are as
-  follows.
+The encodings supported by this software and their range of octets are as
+follows.
 
   ------------------------------------------------------------------------------
   big5 (Big5)
@@ -5589,11 +5615,11 @@ To install this software without make, type the following:
 
 =head1 MBCS subroutines provided by this software
 
-  This software provides traditional feature "as was." The new MBCS features
-  are provided by subroutines with new names. If you like utf8 pragma, mb::*
-  subroutines will help you. On other hand, If you love JPerl, those
-  subroutines will not help you very much. Traditional functions of Perl are
-  useful still now in octet-oriented semantics.
+This software provides traditional feature "as was." The new MBCS features
+are provided by subroutines with new names. If you like utf8 pragma, mb::*
+subroutines will help you. On other hand, If you love JPerl, those
+subroutines will not help you very much. Traditional functions of Perl are
+useful still now in octet-oriented semantics.
 
   elder <--                            age                              --> younger
   ---------------------------------------------------------------------------------
@@ -5649,15 +5675,18 @@ To install this software without make, type the following:
   ---                ---                ---                $0
   ---------------------------------------------------------------------------------
 
-  DOS-like glob() as MBCS subroutine
+DOS-like glob() as MBCS subroutine
+
   -----------------------------------------------------------------
   MBCS semantics          broken function, not so useful
   -----------------------------------------------------------------
   mb::dosglob             glob, and <globbing*>
   -----------------------------------------------------------------
-  but everybody loves split(/\n/,`dir /b *.* 2>NUL`) since Perl4
 
-  index brothers
+but everybody loves split(/\n/,`dir /b *.* 2>NUL`) since Perl4
+
+index brothers
+
   ------------------------------------------------------------------------------------------
   functions or subs       works as        returns as      considered
   ------------------------------------------------------------------------------------------
@@ -5668,13 +5697,14 @@ To install this software without make, type the following:
   mb::index_byte          codepoint       octet           useful, JPerl like
   mb::rindex_byte         codepoint       octet           useful, JPerl like
   ------------------------------------------------------------------------------------------
-  Sometimes "compatibility" means "compromise." In that case, "best compatibility" means
-  "most useful compromise." That's what mb::index_byte() and mb::rindex_byte() are.
-  But sorry for the long name.
+
+Sometimes "compatibility" means "compromise." In that case, "best compatibility" means
+"most useful compromise." That's what mb::index_byte() and mb::rindex_byte() are.
+But sorry for the long name.
 
 =head1 MBCS special variables provided by this software
 
-  This software provides the following two special variables for convenience.
+This software provides the following two special variables for convenience
 
 =over 2
 
@@ -5697,6 +5727,15 @@ To install this software without make, type the following:
 =back
 
 =head1 Porting from script in bare Perl4, and bare Perl5
+
+=head2 If you want to write US-ASCII scripts from now on, or port existing US-ASCII scripts to mb.pm
+
+Write scripts the usual way.
+Running an US-ASCII script using mb.pm allows you to treat multibyte code points as I/O data.
+
+=head2 On other hand, if you want to write octet-oriented scripts from now on, or port existing octet-oriented scripts to mb.pm
+
+There are only a few places that need to be rewritten.
 
   -----------------------------------------------------------------
   original script in        script with
@@ -5723,9 +5762,21 @@ To install this software without make, type the following:
   use Module                use Module
   use Module qw(ARGUMENTS)  use Module qw(ARGUMENTS)
   use Module ()             use Module ()
+  qq{\Lfoo\E}               qq{@{[CORE::lc("foo")]}}
+  qq{\lfoo\E}               qq{@{[CORE::lcfirst("foo")]}}
+  qq{\Ufoo\E}               qq{@{[CORE::uc("foo")]}}
+  qq{\ufoo\E}               qq{@{[CORE::ucfirst("foo")]}}
   -----------------------------------------------------------------
 
 =head1 Porting from script in JPerl4, and JPerl5
+
+=head2 If you want to write MBCS scripts from now on
+
+If you want to make it multibyte, rewrite the Perl built-in function to the subroutine of the same name in the mb :: * package.
+
+=head2 If you want to port existing JPerl scripts to mb.pm
+
+There are only a few places that need to be rewritten.
 
   -----------------------------------------------------------------
   original script in        script with
@@ -5749,6 +5800,10 @@ To install this software without make, type the following:
   -----------------------------------------------------------------
 
 =head1 Porting from script with utf8 pragma
+
+If you want to port existing scripts that has utf8 pragma to mb.pm
+Like traditional style, Perl's built-in functions without package names provide octet-oriented functionality.
+When you need multibyte functionally, you need to use subroutines in the "mb" package, on every time.
 
   -----------------------------------------------------------------
   original script with      script with
@@ -5779,18 +5834,20 @@ To install this software without make, type the following:
 
 =head1 What are DAMEMOJI?
 
-  In single quote, DAMEMOJI are double-byte characters that include the
-  following metacharacters ('', q{}, <<'END', qw{}, m'', s''', split(''),
-  split(m''), and qr'')
+In single quote, DAMEMOJI are double-byte characters that include the
+following metacharacters ('', q{}, <<'END', qw{}, m'', s''', split(''),
+split(m''), and qr'')
+
   ------------------------------------------------------------------
   hex   character as US-ASCII
   ------------------------------------------------------------------
   5C    [\]    backslashed escapes
   ------------------------------------------------------------------
 
-  In double quote, DAMEMOJI are double-byte characters that include the
-  following metacharacters ("", qq{}, <<END, <<"END", ``, qx{}, <<`END`, //,
-  m//, ??, s///, split(//), split(m//), and qr//)
+In double quote, DAMEMOJI are double-byte characters that include the
+following metacharacters ("", qq{}, <<END, <<"END", ``, qx{}, <<`END`, //,
+m//, ??, s///, split(//), split(m//), and qr//)
+
   ------------------------------------------------------------------
   hex   character as US-ASCII
   ------------------------------------------------------------------
@@ -5829,9 +5886,10 @@ To install this software without make, type the following:
 
 =head1 How to escape 2nd octet of DAMEMOJI
 
-  $ perl mb.pm script.pl
+$ perl mb.pm script.pl
 
-  in script.pl,
+in script "script.pl",
+
     -----------------------------------------
     encoding     DAMEMOJI      hex dump
     -----------------------------------------
@@ -5886,9 +5944,10 @@ To install this software without make, type the following:
                  "マ"          [83 7D]
     -----------------------------------------
 
-  mb.pm modulino escapes literal DAMEMOJI in your script and save as new script.
+mb.pm modulino escapes literal DAMEMOJI in your script and save as new script
 
-  in script.oo.pl,
+in script "script.oo.pl",
+
     -----------------------------------------
     encoding     not DAMEMOJI  hex dump
     -----------------------------------------
@@ -5943,9 +6002,10 @@ To install this software without make, type the following:
                  "ソ}"         [83 [5C] 7D]
     -----------------------------------------
 
-  then mb.pm executes "script.oo.pl"
+then mb.pm executes "script.oo.pl"
 
-  in the perl,
+in perl's memory,
+
     -----------------------------------------
     encoding     memory        hex dump
     -----------------------------------------
@@ -6002,8 +6062,8 @@ To install this software without make, type the following:
 
 =head1 MBCS character casing
 
-  lc("A") makes halfwidth-"a", however lc("乙") does "乙" not "兀", moreover lc("Ａ")
-  does "Ａ" not fullwidth-"ａ".
+lc("A") makes halfwidth-"a", however lc("乙") makes "乙" not "兀", moreover lc("Ａ")
+makes "Ａ" not fullwidth-"ａ".
 
     ----------------------------------------------------------------------------------------------
     encoding    script                         bare Perl4, bare Perl5     mb.pm modulino
@@ -6026,8 +6086,8 @@ To install this software without make, type the following:
 
 =head1 What transpiles to what by this software?
 
-  This software automatically transpiles MBCS literal strings in scripts to
-  octet-oriented strings(OO-quotee).
+This software automatically transpiles MBCS literal strings in scripts to
+octet-oriented strings(OO-quotee)
 
   -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   in your script                             script transpiled by this software
@@ -6242,10 +6302,10 @@ To install this software without make, type the following:
   v1234                                      mb::chr(1234)
   -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-  The transpile-list below is primarily for Microsoft Windows, but it also
-  applies when run on other operating systems to ensure commonality. Even if
-  Perl 5.00503, you can stack file test operators, -r -w -f $file works as
-  -f $file && -w _ && -r _.
+The transpile-list below is primarily for Microsoft Windows, but it also
+applies when run on other operating systems to ensure commonality. Even if
+Perl 5.00503, you can stack file test operators, -r -w -f $file works as
+-f $file && -w _ && -r _.
 
   -----------------------------------------------------------------------------
   in your script                             script transpiled by this software
@@ -6440,8 +6500,8 @@ To install this software without make, type the following:
   -z qq{file}                                mb::_filetest [qw( -z  )], qq{file}
   -----------------------------------------------------------------------------
 
-  Each elements in strings or regular expressions that are double-quote like are
-  transpiled as follows.
+Each elements in strings or regular expressions that are double-quote like are
+transpiled as follows
 
   -----------------------------------------------------------------------------------------------
   in your script                             script transpiled by this software
@@ -6457,7 +6517,7 @@ To install this software without make, type the following:
   "\Q MBCS-quotee \E"                        "@{[quotemeta(qq< OO-quotee >)]}"
   -----------------------------------------------------------------------------------------------
 
-  Each elements in regular expressions are transpiled as follows.
+Each elements in regular expressions are transpiled as follows
 
   ----------------------------------------------------------------------------------------------------------------------
   in your script                             script transpiled by this software (on sjis encoding)
@@ -6592,18 +6652,9 @@ wildcard arguments supplied onto command line. But this software helps it.
 
 =head1 Yet Another Future of Multibyte Perl
 
-JPerl is very useful software. -- Oops, note, this "JPerl" means "Japanized Perl"
-or "Japanese Perl". Therefore, it is unrelated to JPerl of the following.
-
- jperl -  Jamie's PERL scripts for bioinformatics
- https://code.google.com/archive/p/jperl/
-
- Jon Perl jperl
- https://github.com/jperl
-
-Now, the last version of JPerl is 5.005_04 and is not maintained now.
-
-Japanization maintainer WATANABE Hirofumi said,
+JPerl is very useful software. This "JPerl" means "Japanized Perl" or
+"Japanese Perl". The last version of JPerl is 5.005_04 and is not maintained
+now. Japanization maintainer WATANABE Hirofumi-san said this ...
 
   "Because WATANABE am tired I give over maintaing JPerl."
 
@@ -6636,8 +6687,8 @@ I am excited about this software and Perl's future --- I hope you are too.
 
 =head1 DEPENDENCIES
 
-  This mb.pm modulino requires perl5.00503 or later to use. Also requires 'strict'
-  module. It requires the 'warnings' module, too if perl 5.6 or later.
+This mb.pm modulino requires perl5.00503 or later to use. Also requires 'strict'
+module. It requires the 'warnings' module, too if perl 5.6 or later.
 
 =head1 Fatal Bugs Unavoidable
 
@@ -6728,7 +6779,7 @@ slow execution. Both that era and today, capturing by parentheses works well.
 =item * Return Value from tr///s
 
 tr/// (or y///) operator with /s modifier returns 1 always. If you need right
-number, you can use mb::tr().
+value, you can use mb::tr().
 
   $var1 = 'AAA';
   $got = $var1 =~ tr/A/1/s; # works as $got = $var1 =~ s{[\x00-\xFF]*}{mb::tr($&,q/A/,q/1/,'sr')}e;
@@ -6897,7 +6948,7 @@ Multibyte character needs ( ) which is before {n,m}, {n,}, {n}, *, and + in ?? o
 m??. As a result, you need to rewrite a script about $1,$2,$3,... You cannot use
 (?: ), ?, {n,m}?, {n,}?, and {n}? in ?? and m??, because delimiter of m?? is '?'.
 Here's a quote words from Dan Kogai-san.
-"I'm just a programmer, so I can't fix the bug of the spec."
+"(I'm just a programmer,) so I can't fix the bug of the spec."
 
 =item * format
 
@@ -6906,9 +6957,9 @@ difficult to implement and you can write the same script in other any ways.
 
 =back
 
-=head1 UTF8 Flag Considered Harmful, and Our Goals
+=head1 Our Goals (and UTF8 Flag Considered Harmful)
 
-Larry Wall must think that "escaping" is the best solution in this case.
+Maybe Larry Wall-san think that "escaping" is the best solution in this case.
 
 P.401 See chapter 15: Unicode
 of ISBN 0-596-00027-8 Programming Perl Third Edition.
@@ -6967,8 +7018,8 @@ from majority of Perl programmers who are not heavy users.
 How to solve it by returning to an original Perl, let's read page
 402 of the Programming Perl, 3rd edition, again.
 
-  Information processing model beginning with perl3 or this software
-  of UNIX/C-ism.
+Information processing model beginning with perl3 or this software
+of UNIX/C-ism.
 
     +--------------------------------------------+
     |    Text string as Digital octet string     |
@@ -6977,18 +7028,35 @@ How to solve it by returning to an original Perl, let's read page
     |       Not UTF8 Flagged, No MOJIBAKE        |
     +--------------------------------------------+
 
-  In UNIX Everything is a File
-  - In UNIX everything is a stream of bytes
-  - In UNIX the filesystem is used as a universal name space
+In UNIX Everything is a File
 
-  Native Encoding Scripting
-  - native encoding of file contents
-  - native encoding of file name on filesystem
-  - native encoding of command line
-  - native encoding of environment variable
-  - native encoding of API
-  - native encoding of network packet
-  - native encoding of database
+=over 2
+
+=item * In UNIX everything is a stream of bytes
+
+=item * In UNIX the filesystem is used as a universal name space
+
+=back
+
+Native Encoding Scripting is ...
+
+=over 2
+
+=item * native encoding of file contents
+
+=item * native encoding of file name on filesystem
+
+=item * native encoding of command line
+
+=item * native encoding of environment variable
+
+=item * native encoding of API
+
+=item * native encoding of network packet
+
+=item * native encoding of database
+
+=back
 
 Ideally, We'd like to achieve these five Goals:
 
@@ -7090,44 +7158,49 @@ programming environment like at that time.
 
 =head1 Perl's Motto
 
-   Some computer scientists (the reductionists, in particular) would
-  like to deny it, but people have funny-shaped minds. Mental geography
-  is not linear, and cannot be mapped onto a flat surface without
-  severe distortion. But for the last score years or so, computer
-  reductionists have been first bowing down at the Temple of Orthogonality,
-  then rising up to preach their ideas of ascetic rectitude to any who
-  would listen.
- 
-   Their fervent but misguided desire was simply to squash your mind to
-  fit their mindset, to smush your patterns of thought into some sort of
-  Hyperdimensional Flatland. It's a joyless existence, being smushed.
-  --- Learning Perl on Win32 Systems
- 
-  If you think this is a big headache, you're right. No one likes
-  this situation, but Perl does the best it can with the input and
-  encodings it has to deal with. If only we could reset history and
-  not make so many mistakes next time.
-  --- Learning Perl 6th Edition
- 
-   The most important thing for most people to know about handling
-  Unicode data in Perl, however, is that if you don't ever use any Uni-
-  code data -- if none of your files are marked as UTF-8 and you don't
-  use UTF-8 locales -- then you can happily pretend that you're back in
-  Perl 5.005_03 land; the Unicode features will in no way interfere with
-  your code unless you're explicitly using them. Sometimes the twin
-  goals of embracing Unicode but not disturbing old-style byte-oriented
-  scripts has led to compromise and confusion, but it's the Perl way to
-  silently do the right thing, which is what Perl ends up doing.
-  --- Advanced Perl Programming, 2nd Edition
- 
-   However, the ability to have any character in a string means you can
-  create, scan, and manipulate raw binary data as string -- something with
-  which many other utilities would have great difficulty.
-  --- Learning Perl 8th Edition
+Some computer scientists (the reductionists, in particular) would
+like to deny it, but people have funny-shaped minds. Mental geography
+is not linear, and cannot be mapped onto a flat surface without
+severe distortion. But for the last score years or so, computer
+reductionists have been first bowing down at the Temple of Orthogonality,
+then rising up to preach their ideas of ascetic rectitude to any who
+would listen.
+
+Their fervent but misguided desire was simply to squash your mind to
+fit their mindset, to smush your patterns of thought into some sort of
+Hyperdimensional Flatland. It's a joyless existence, being smushed.
+
+--- Learning Perl on Win32 Systems
+
+If you think this is a big headache, you're right. No one likes
+this situation, but Perl does the best it can with the input and
+encodings it has to deal with. If only we could reset history and
+not make so many mistakes next time.
+
+--- Learning Perl 6th Edition
+
+The most important thing for most people to know about handling
+Unicode data in Perl, however, is that if you don't ever use any Uni-
+code data -- if none of your files are marked as UTF-8 and you don't
+use UTF-8 locales -- then you can happily pretend that you're back in
+Perl 5.005_03 land; the Unicode features will in no way interfere with
+your code unless you're explicitly using them. Sometimes the twin
+goals of embracing Unicode but not disturbing old-style byte-oriented
+scripts has led to compromise and confusion, but it's the Perl way to
+silently do the right thing, which is what Perl ends up doing.
+
+--- Advanced Perl Programming, 2nd Edition
+
+However, the ability to have any character in a string means you can
+create, scan, and manipulate raw binary data as string -- something with
+which many other utilities would have great difficulty.
+
+--- Learning Perl 8th Edition
 
 =head1 Combinations of mb.pm Modulino and Other Modules
 
-  The following is a description of all the situations in mb.pm modulino is used in Japan.
+The following is a description of all the situations in mb.pm modulino is used in Japan.
+
   +-------------+--------------+---------------------------------------------------------------------+
   | OS encoding | I/O encoding |                           script encoding                           |
   |             |              |----------------------------------+----------------------------------+
@@ -7149,8 +7222,9 @@ programming environment like at that time.
   |             |    UTF-8     |  use IOas::UTF8; # I/O           |                                  |
   |             |              |  use mb::Encode; # file-path     |                                  |
   +-------------+--------------+----------------------------------+----------------------------------+
-  
-  Some of the above are useful combinations:
+
+Some of the above are useful combinations
+
   +-------------+--------------+---------------------------------------------------------------------+
   | OS encoding | I/O encoding |                           script encoding                           |
   |             |              |----------------------------------+----------------------------------+
@@ -7172,8 +7246,9 @@ programming environment like at that time.
   |             |    UTF-8     |                                  |                                  |
   |             |              |                                  |                                  |
   +-------------+--------------+----------------------------------+----------------------------------+
-  
-  Description of combinations:
+
+Description of combinations
+
   ----------------------------------------------------------------------
   encoding
   O-I-S     description
@@ -7187,8 +7262,10 @@ programming environment like at that time.
   U-U-S     
   U-U-U     Best choice when I/O is UTF-8 encoding
   ----------------------------------------------------------------------
-  see also: 7 superstitions about character encoding I encountered
-  https://qiita.com/tonluqclml/items/d4f8274e0292df393b04
+
+see also: 7 superstitions about character encoding I encountered
+
+https://qiita.com/tonluqclml/items/d4f8274e0292df393b04
 
 =head1 AUTHOR
 

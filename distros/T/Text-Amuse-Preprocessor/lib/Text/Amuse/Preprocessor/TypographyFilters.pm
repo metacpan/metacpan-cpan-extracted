@@ -26,20 +26,40 @@ Activate links in $string and returns it.
 sub linkify {
     my $l = shift;
     return unless defined $l;
-    $l =~ s{(?<!\[) # be sure not to redo the same thing, looking behind
-            ((https?:\/\/) # protocol
+    $l =~ s{(.?) # be sure not to redo the same thing, looking behind #1
+            ((?:https?:\/\/) # protocol
                 (\w[\w\-\.]+\.\w+) # domain
-                (\:\d+)? # the port
-                (/ # a slash
-                    [^\[<>\s]* # everything that is not a space, a < > and a [
+                (?:\:\d+)? # the port
+                (?:
+                    / # a slash
+                    [^\[\]<>\s]* # everything that is not a space or < > [  ]
                     [\w/] # but end with a letter or a slash
+                |
+                    / # or a slash alone
+                |
+                    \?[^\[\]<>\s]*[\w/] # or the query alone
+                |
                 )?
             )
-            (?!\]) # and look around
-       }{[[$1][$3]]}gx;
+            (.?)
+       }{_linkify_link($1, $2, $3, $4)}gmxe;
     return $l;
 }
 
+sub _linkify_link {
+    my ($prefix, $url, $domain, $suffix) = @_;
+    # print "=$prefix, $url, $domain, $suffix=\n";
+    if ($prefix and $prefix eq '[') {
+        # already processed
+        return $prefix . $url . $suffix
+    }
+    elsif ($suffix and $suffix eq ']') {
+        return $prefix . $url . $suffix
+    }
+    else {
+        return $prefix . "[[$url][$domain]]" . $suffix;
+    }
+}
 
 =head2 characters
 
@@ -288,9 +308,19 @@ sub _english_specific {
     return $l;
 }
 
+sub _chinese_specific {
+    my $l = shift;
+    # regexps goes here
+    # $l =~ s/in/out/g;
+
+    # and return the string
+    return $l;
+}
+
 sub specific_filters {
     return {
             en => \&_english_specific,
+            zh => \&_chinese_specific,
            };
 }
 
@@ -303,7 +333,7 @@ Return the specific filter for lang, if present.
 sub specific_filter {
     my ($lang) = @_;
     return unless $lang;
-    return specific_filters->{$lang};
+    return specific_filters()->{$lang};
 }
 
 =head2 filter($lang)

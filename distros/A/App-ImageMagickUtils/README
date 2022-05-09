@@ -2,8 +2,8 @@ NAME
     App::ImageMagickUtils - Utilities related to ImageMagick
 
 VERSION
-    This document describes version 0.012 of App::ImageMagickUtils (from
-    Perl distribution App-ImageMagickUtils), released on 2022-02-10.
+    This document describes version 0.017 of App::ImageMagickUtils (from
+    Perl distribution App-ImageMagickUtils), released on 2022-05-08.
 
 DESCRIPTION
     This distribution includes the following CLI utilities related to
@@ -45,9 +45,23 @@ FUNCTIONS
 
     *   delete_original => *bool*
 
+        Delete (unlink) the original file after downsizing.
+
+        See also the "trash_original" option.
+
     *   files* => *array[filename]*
 
     *   to* => *str*
+
+    *   trash_original => *bool*
+
+        Trash the original file after downsizing.
+
+        This option uses the File::Trash::FreeDesktop module to do the
+        trashing. Compared to deletion, with this option you can still
+        restore the trashed original files from the Trash directory.
+
+        See also the "delete_original" option.
 
     Returns an enveloped result (an array).
 
@@ -88,7 +102,21 @@ FUNCTIONS
 
     *   delete_original => *bool*
 
+        Delete (unlink) the original file after downsizing.
+
+        See also the "trash_original" option.
+
     *   files* => *array[filename]*
+
+    *   trash_original => *bool*
+
+        Trash the original file after downsizing.
+
+        This option uses the File::Trash::FreeDesktop module to do the
+        trashing. Compared to deletion, with this option you can still
+        restore the trashed original files from the Trash directory.
+
+        See also the "delete_original" option.
 
     Returns an enveloped result (an array).
 
@@ -131,6 +159,10 @@ FUNCTIONS
 
     *   delete_original => *bool*
 
+        Delete (unlink) the original file after downsizing.
+
+        See also the "trash_original" option.
+
     *   downsize_to => *str* (default: 1024)
 
         Downsizing will only be done if the input image's shortest side is
@@ -141,7 +173,37 @@ FUNCTIONS
 
     *   files* => *array[filename]*
 
-    *   q => *int* (default: 40)
+    *   quality => *int* (default: 40)
+
+    *   skip_downsized => *bool* (default: 1)
+
+        Skip previously downsized images.
+
+        By default, when given a filename that looks like it's already
+        downsized, e.g. "foo.1024-q40.jpg" or "foo.q40.jpg", will skip
+        downsizing. The "--no-skip-downsized" option will process such
+        filenames nevertheless.
+
+    *   skip_whatsapp => *bool* (default: 1)
+
+        Skip WhatsApp images.
+
+        By default, assuming that WhatsApp already compresses images, when
+        given a filename that matches a WhatsApp image filename, e.g.
+        "IMG-20220508-WA0001.jpg" (will be checked using
+        Regexp::Pattern::Filename::Image::WhatsApp), will skip downsizing.
+        The "--no-skip-whatsapp" option will process such filenames
+        nevertheless.
+
+    *   trash_original => *bool*
+
+        Trash the original file after downsizing.
+
+        This option uses the File::Trash::FreeDesktop module to do the
+        trashing. Compared to deletion, with this option you can still
+        restore the trashed original files from the Trash directory.
+
+        See also the "delete_original" option.
 
     Special arguments:
 
@@ -191,7 +253,7 @@ CONTRIBUTING
     me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2021, 2020 by perlancar
+    This software is copyright (c) 2022, 2020 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

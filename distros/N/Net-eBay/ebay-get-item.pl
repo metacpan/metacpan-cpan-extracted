@@ -52,7 +52,7 @@ foreach my $item (@ARGV) {
   my $result = $eBay->submitRequest( "GetItem",
                                      {
                                       ItemID => $item,
-                                      DetailLevel => $description ? "ReturnAll" : "ItemReturnAttributes",
+                                      DetailLevel => ($detail || $description) ? "ReturnAll" : "ItemReturnAttributes",
                                       # DetailLevel => "ReturnAll",
                                      }
                                    );
@@ -140,7 +140,7 @@ High Bid:        $result->{Item}->{SellingStatus}->{CurrentPrice}->{content}
         #print $fmt->format( $tree->as_text ) . "\n";
       }
 
-      if( 0 ) {
+      if( 1 ) {
         my $hpp = new HTML::PrettyPrinter ('linelength' => 78,
                                            'quote_attr' => 1);
         

@@ -1,5 +1,9 @@
 Revision history for perl module Text-Amuse-Preprocessor
 
+0.66 2022-05-07
+
+ - Improve linkifier. Thanks to @rojenzaman for the report.
+
 0.65 2021-11-20
 
  - Add support for Esperanto

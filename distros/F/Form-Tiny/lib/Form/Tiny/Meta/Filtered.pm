@@ -11,9 +11,9 @@ use Form::Tiny::Hook;
 use Form::Tiny::Filter;
 use Moo::Role;
 
-our $VERSION = '2.09';
+our $VERSION = '2.12';
 
-requires qw(setup);
+requires qw(inherit_from setup);
 
 has 'filters' => (
 	is => 'ro',

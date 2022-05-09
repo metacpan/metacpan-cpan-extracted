@@ -23,8 +23,10 @@ use Jenkins::i18n::ProcOpts;
 my $DATA_START  = tell DATA;
 my $current_dir = getcwd;
 
-my ( $lang, $dir, $add, $remove, $counter, $target, $help, $debug, $man )
-    = ( undef, $current_dir, 0, 0, 0, $current_dir, 0, 0, 0 );
+my (
+    $lang,   $dir,  $add,   $remove, $counter,
+    $target, $help, $debug, $man,    $search
+) = ( undef, $current_dir, 0, 0, 0, $current_dir, 0, 0, 0, undef );
 
 GetOptions(
     'help'     => \$help,
@@ -36,6 +38,7 @@ GetOptions(
     'target=s' => \$target,
     'debug'    => \$debug,
     'man'      => \$man,
+    'search=s' => \$search
 ) or pod2usage( -exitval => 1 );
 
 pod2usage( -exitval => 0, -verbose => 0 ) if ($help);
@@ -55,7 +58,7 @@ my $stats    = Jenkins::i18n::Stats->new;
 my $warnings = Jenkins::i18n::Warnings->new;
 my $processor
     = Jenkins::i18n::ProcOpts->new( $dir, $target, $counter, $remove, $add,
-    $debug, $lang );
+    $debug, $lang, $search );
 
 # process each file
 foreach my $file ( @{$files_ref} ) {
@@ -79,6 +82,7 @@ sub process_file {
 
     # Read .jelly or Message.properties files, and fill a hash with the keys
     # found
+    # TODO: compile the regex as a global constant
     if ( $file =~ m/.jelly$/ ) {
         $entries_ref = load_jelly($file);
         $english_entries_ref
@@ -95,6 +99,7 @@ sub process_file {
     foreach my $entry ( keys %{$entries_ref} ) {
         $stats->inc('keys');
 
+        # TODO: skip increasing missing if operatio is to delete those
         unless (( exists( $lang_entries_ref->{$entry} ) )
             and ( defined( $lang_entries_ref->{$entry} ) ) )
         {
@@ -116,6 +121,7 @@ sub process_file {
         }
     }
 
+    # TODO: create a set of words to ignore as same
     foreach my $entry ( keys %{$lang_entries_ref} ) {
         if (   $lang_entries_ref->{$entry}
             && $english_entries_ref->{$entry}
@@ -126,6 +132,7 @@ sub process_file {
         }
     }
 
+    # TODO: compile the regex as a global constant
     my $hudson_regex = qr/Hudson/;
 
     foreach my $entry ( keys %{$lang_entries_ref} ) {
@@ -136,6 +143,20 @@ sub process_file {
                 ( "$entry -> " . $lang_entries_ref->{$entry} ) );
             $stats->inc('nojenkins');
         }
+    }
+
+    if ( $processor->is_to_search ) {
+        my $term = $processor->search_term;
+
+        foreach my $entry ( keys %{$lang_entries_ref} ) {
+            if (   $lang_entries_ref->{$entry}
+                && $lang_entries_ref->{$entry} =~ $term )
+            {
+                $warnings->add( 'search_found',
+                    ( "$entry -> " . $lang_entries_ref->{$entry} ) );
+            }
+        }
+
     }
 
     $warnings->summary($curr_lang_file);
@@ -213,6 +234,8 @@ jtt - CLI to help internationalization for Jenkins
                           to easily identify match missing translation with value
                           in source code if present
     --target=directory -> optional, target directory for writing files
+    --search=regex     -> optional, search for a given regular expression in the
+                          translation content
     --debug            -> optional, print debugging messages to STDOUT when they
                           are available
 

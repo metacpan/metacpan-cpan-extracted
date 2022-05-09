@@ -44,4 +44,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-CPAN-Get
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-CPAN-Get
-version: '0.07'
+version: '0.08'

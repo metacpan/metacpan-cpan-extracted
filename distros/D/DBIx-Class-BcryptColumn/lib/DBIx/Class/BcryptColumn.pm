@@ -1,10 +1,10 @@
 package DBIx::Class::BcryptColumn;
 
-our $VERSION = '0.001001';
+our $VERSION = '0.001003';
 
 use strict;
 use warnings;
-use Crypt::Eksblowfish::Bcrypt ();
+use Crypt::Bcrypt ();
 use Crypt::URandom ();
 use Sub::Name ();
 
@@ -20,9 +20,9 @@ sub default_cost { return $DEFAULT_COST }
 sub generate_salt {
   my ($self, $size) = @_;
   $size ||= $SALT_SIZE;
-  return Crypt::Eksblowfish::Bcrypt::en_base64(Crypt::URandom::urandom($size));
+  return Crypt::URandom::urandom($size);
 }
-
+ 
 sub _default_check_method_format {
   my ($self, $column, $info) = @_;
   return "check_${column}";
@@ -33,7 +33,7 @@ sub _default_check_generator {
     return sub {
       my ($self, $value_to_check) = @_;
       my $col_value = $self->get_column($column);
-      return Crypt::Eksblowfish::Bcrypt::bcrypt($value_to_check, $col_value) eq $col_value;
+      return Crypt::Bcrypt::bcrypt_check($value_to_check, $col_value);
     };
 }
 
@@ -55,7 +55,7 @@ sub _inject_check_method {
 
 sub bcrypt  {
   my ($self, $password, $cost) = @_;
-  return Crypt::Eksblowfish::Bcrypt::bcrypt($password, join '', '$2', 'a', sprintf('$%02i', $cost), '$', $self->generate_salt);
+  return Crypt::Bcrypt::bcrypt($password, '2b', $cost, $self->generate_salt);
 }
 
 sub register_column {

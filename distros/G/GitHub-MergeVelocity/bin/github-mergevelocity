@@ -11,18 +11,7 @@ use GitHub::MergeVelocity;
 GitHub::MergeVelocity->new_with_options->print_report;
 
 __END__
-
 =pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-github-mergevelocity - CLI for determining how quickly a pull request might get merged
-
-=head1 VERSION
-
-version 0.000007
 
 =head1 SYNOPSIS
 
@@ -32,7 +21,7 @@ version 0.000007
 
 =head2 url
 
-Expects an URL to a Github repository.  Mutliple C<--url> args can be supplied.
+Expects an URL to a Github repository.  Multiple C<--url> args can be supplied.
 
     github-mergevelocity --url oalders/html-restrict --url https://github.com/neilbowers/PAUSE-Packages
 
@@ -45,6 +34,12 @@ If you're really lazy, you can even paste in an entire url which contains the
 repo in it.  Be creative!
 
     github-mergevelocity --url https://github.com/neilbowers/PAUSE-Packages/issues
+
+=head2 org
+
+Expects an Github organization.  Multiple C<--org> args can be supplied.
+
+    github-mergevelocity --org libwww-perl
 
 =head2 github-user
 
@@ -63,16 +58,5 @@ for more information.
 Enable this if you're hitting API limits or need to speed up response time.
 
     github-mergevelocity --url https://github.com/oalders/html-restrict --cache-requests
-
-=head1 AUTHOR
-
-Olaf Alders <olaf@wundercounter.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2015 by Olaf Alders.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

@@ -1,5 +1,9 @@
 Revision history for Perl extension WebService-Mailgun
 
+0.15 2022-05-08T14:09:01Z
+    - support partial template (thanks bjornjac)
+    - fix https test (thanks eserte)
+
 0.14 2022-01-18T01:37:50Z
     - support API region (thanks bjornjac)
 

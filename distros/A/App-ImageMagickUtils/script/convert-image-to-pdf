@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-10'; # DATE
+our $DATE = '2022-05-08'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ImageMagickUtils/convert_image_to_pdf",
@@ -41,13 +41,13 @@ convert-image-to-pdf - Convert images to PDF using ImageMagick's 'convert' utili
 
 =head1 VERSION
 
-This document describes version 0.012 of convert-image-to-pdf (from Perl distribution App-ImageMagickUtils), released on 2022-02-10.
+This document describes version 0.017 of convert-image-to-pdf (from Perl distribution App-ImageMagickUtils), released on 2022-05-08.
 
 =head1 SYNOPSIS
 
 Usage:
 
-% B<convert-image-to-pdf> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--delete-original>|B<-D>|B<--no-delete-original>|B<--nodelete-original>] [(B<--file>=I<filename>)+] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--files-json>=I<json>] -- E<lt>I<file>E<gt> ...
+% B<convert-image-to-pdf> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--delete-original>|B<-D>|B<--no-delete-original>|B<--nodelete-original>] [(B<--file>=I<filename>)+] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--trash-original>|B<-T>|B<--no-trash-original>|B<--notrash-original>] [B<--files-json>=I<json>] -- E<lt>I<file>E<gt> ...
 
 =head1 DESCRIPTION
 
@@ -73,6 +73,11 @@ C<*> marks required options.
 
 =item B<--delete-original>, B<-D>
 
+Delete (unlink) the original file after downsizing.
+
+See also the `trash_original` option.
+
+
 =item B<--file>=I<s@>*
 
 Can also be specified as the 1st command-line argument and onwards.
@@ -84,6 +89,17 @@ Can be specified multiple times.
 See C<--file>.
 
 Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--trash-original>, B<-T>
+
+Trash the original file after downsizing.
+
+This option uses the <pm:File::Trash::FreeDesktop> module to do the trashing.
+Compared to deletion, with this option you can still restore the trashed
+original files from the Trash directory.
+
+See also the `delete_original` option.
+
 
 =back
 
@@ -239,7 +255,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

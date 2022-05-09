@@ -1,5 +1,19 @@
 Revision history for Perl extension Form::Tiny.
 
+2.12 Sun May 8 2022
+	- improve performance and maintainability
+
+2.11 Sun May 8 2022
+	- add missing VERSION to Form::Tiny::Plugin
+	- fix compatibility with perl version 5.10
+
+2.10 Sat May 7 2022
+	- remove deprecated is_validated and clear_valid methods
+	- remove check if field default value passes field type test
+	- fix reapplying form roles from plugins to child forms
+	- add new metaobject method: blueprint (documented in Form::Tiny::Manual::Internals)
+	- improve documentation and add more internals documentation
+
 2.09 Tue Feb 1 2022
 	- is_validated and clear_valid methods are deprecated: see Manual::Compatibility
 	- bugfix: only run after_validate hook if the validation occured at all

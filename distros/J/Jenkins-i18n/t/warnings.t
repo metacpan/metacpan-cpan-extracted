@@ -1,6 +1,6 @@
 use warnings;
 use strict;
-use Test::More tests => 27;
+use Test::More tests => 30;
 use Test::Exception;
 use Test::Warnings qw(:all);
 
@@ -8,7 +8,8 @@ use Jenkins::i18n::Warnings;
 
 my $class = 'Jenkins::i18n::Warnings';
 can_ok( $class,
-    qw(new add has_unused reset summary has_missing _relative_path) );
+    qw(new add has_unused reset summary has_missing _relative_path has_found)
+);
 my $instance = Jenkins::i18n::Warnings->new;
 ok( $instance, 'got an instance' );
 isa_ok( $instance, $class );
@@ -16,7 +17,7 @@ ok( exists( $instance->{types} ), 'instance has types attribute' );
 my @types = sort( keys( %{ $instance->{types} } ) );
 is_deeply(
     \@types,
-    [ 'empty', 'missing', 'non_jenkins', 'same', 'unused' ],
+    [ 'empty', 'missing', 'non_jenkins', 'same', 'search_found', 'unused' ],
     'instance has the expected types'
 );
 dies_ok { $instance->{foo} = 'bar' } 'cannot change attributes of instance';
@@ -46,6 +47,12 @@ is_deeply(
     ],
     'summary works'
 );
+note('Testing search warnings');
+is( $instance->has_found, 0, 'instance has no search warnings' );
+ok( $instance->add( 'search_found', '/foo/bar.properties' ),
+    'adds a search warning' );
+is( $instance->has_found, 1, 'instance has one search warning' );
+note('Reseting warnings');
 ok( $instance->reset, 'instance reset works' );
 is( $instance->has_unused,     0, 'instance has not a unused warning' );
 is( $instance->has_missing,    0, 'instance has not a missing warning' );

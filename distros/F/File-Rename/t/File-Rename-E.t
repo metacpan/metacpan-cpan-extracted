@@ -7,7 +7,7 @@
 # change 'tests => 1' to 'tests => last_test_to_print';
 
 use Test::More tests => 2;
-push @INC, qw(blib/script) if -d 'blib';
+push @INC, qw(blib/script blib/bin) if -d 'blib';
 unshift @INC, 't' if -d 't';
 require 'testlib.pl';
 

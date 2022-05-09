@@ -1,0 +1,48 @@
+Monitoring-Sneck-Boop_Snoot
+
+This his basically a wrapper for smpget and nicely formatting
+the returned output. Also saves one the headache of having to
+remember the OID or have it handy.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Monitoring::Sneck::Boop_Snoot
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Monitoring-Sneck-Boop_Snoot
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Monitoring-Sneck-Boop_Snoot
+
+    Search CPAN
+        https://metacpan.org/release/Monitoring-Sneck-Boop_Snoot
+
+    Github
+        https://github.com/VVelox/Monitoring-Sneck-Boop_Snoot
+
+    Repo
+        https://github.com/VVelox/Monitoring-Sneck-Boop_Snoot.git
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2022 by Zane C. Bowers-Hadley.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

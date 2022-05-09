@@ -106,6 +106,7 @@ my $request =
                   EntriesPerPage => 399,
                   PageNumber => 1,
                  },
+   #sortOrder => 'StartTimeNewest',
   };
 
 $request->{keywords} = $query if $query;
@@ -187,17 +188,19 @@ if( ref $result ) {
     $items = [$items] if( ref $items eq 'HASH' );
     foreach my $item (@$items) {
 
+      next unless defined $item;
+
       # Apply extra filters
       next if $nofeatured && ref $item->{ListingEnhancement};
       next if $nobins     && $item->{BuyItNowPrice};
-      
+
       print "$item->{itemId} ";
-      
+
       my $endtime = $item->{listingInfo}->{endTime};
       $endtime =~ s/T/ /;
       $endtime =~ s/\.\d\d\d//;
       $endtime =~ s/Z/ GMT/;
-      
+
       ############################################################
       # now figure out ending time in the LOCAL timezone
       # (not GMT and not necessarily California time)

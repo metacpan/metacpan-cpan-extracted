@@ -29,10 +29,10 @@ SPVM::EqualityChecker - A Callback Type to Check the Object Equality
 
 =head1 DESCRIPTION
 
-L<EqualityChecker|SPVM::EqualityChecker> is a callback type to check the object equality.
+L<EqualityChecker|SPVM::EqualityChecker> is an interface type for the callback to check the object equality.
 
-=head1 CALLBACK METHOD
+=head1 INTERFACE METHOD
 
-  method : int ($object1 : object, $object2 : object)
+  required method : int ($object1 : object, $object2 : object)
 
 The implementation must receive two objects and if they are equals, return C<1>, otherwise return C<0>.

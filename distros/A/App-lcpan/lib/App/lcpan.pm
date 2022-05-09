@@ -1,9 +1,5 @@
+## no critic: Subroutines::ProhibitExplicitReturnUndef
 package App::lcpan;
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-06-05'; # DATE
-our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.068'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,9 +7,14 @@ use warnings;
 use Log::ger;
 
 use Clone::Util qw(clone modclone);
+use Exporter;
 use List::Util qw(first);
 
-use Exporter;
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-03-27'; # DATE
+our $DIST = 'App-lcpan'; # DIST
+our $VERSION = '1.070'; # VERSION
+
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
                        update
@@ -752,7 +753,7 @@ sub _relpath {
 }
 
 sub _dblog {
-    no strict 'refs';
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
 
     my ($dbh, $level, $category, $summary) = @_;
     $dbh->do("INSERT INTO log (date,lcpan_version,pid, level,category,summary) VALUES (?,?,?, ?,?,?)", {},
@@ -1893,7 +1894,7 @@ sub _update_index {
     # check whether we need to reindex if a sufficiently old (and possibly
     # incorrect) version of us did the reindexing
     {
-        no strict 'refs';
+        no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
         my $our_version = ${__PACKAGE__.'::VERSION'};
 
         my ($indexer_version) = $dbh->selectrow_array("SELECT value FROM meta WHERE name='indexer_version'");
@@ -2573,7 +2574,7 @@ sub _update_index {
 
         # record the module version that does the indexing
         {
-            no strict 'refs';
+            no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
             $dbh->do("INSERT OR REPLACE INTO meta (name,value) VALUES (?,?)",
                      {}, 'indexer_version', ${__PACKAGE__.'::VERSION'});
         }
@@ -4962,7 +4963,7 @@ App::lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.068 of App::lcpan (from Perl distribution App-lcpan), released on 2021-06-05.
+This document describes version 1.070 of App::lcpan (from Perl distribution App-lcpan), released on 2022-03-27.
 
 =head1 SYNOPSIS
 
@@ -6402,6 +6403,22 @@ that contains extra information, much like how HTTP response headers provide add
 
 Return value:  (any)
 
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-lcpan>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-lcpan>.
+
+=head1 SEE ALSO
+
+L<App::lcpan::Manual>
+
+L<CPAN::SQLite>
+
+L<CPAN::Mini>
+
 =head1 HISTORY
 
 This application began as L<CPAN::SQLite::CPANMeta>, an extension of
@@ -6417,37 +6434,13 @@ parse distribution names from it but instead uses C<META.json> and C<META.yml>
 files extracted from the release files. If no C<META.*> files exist, then it
 will use the module name.
 
-=head1 HOMEPAGE
-
-Please visit the project's homepage at L<https://metacpan.org/release/App-lcpan>.
-
-=head1 SOURCE
-
-Source repository is at L<https://github.com/perlancar/perl-App-lcpan>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=head1 SEE ALSO
-
-L<App::lcpan::Manual>
-
-L<CPAN::SQLite>
-
-L<CPAN::Mini>
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Norbert Csongradi perlancar (@pc-office) Steven Haryanto (on Asus Zenbook)
+=for stopwords Norbert Csongradi Steven Haryanto
 
 =over 4
 
@@ -6457,19 +6450,40 @@ Norbert Csongradi <norbert@csongradi.hu>
 
 =item *
 
-perlancar (@pc-office) <perlancar@gmail.com>
-
-=item *
-
-Steven Haryanto (on Asus Zenbook) <stevenharyanto@gmail.com>
+Steven Haryanto <stevenharyanto@gmail.com>
 
 =back
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

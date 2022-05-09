@@ -19,12 +19,14 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.020",
   "NAME" => "OPM::Validate",
-  "PREREQ_PM" => {},
+  "PREREQ_PM" => {
+    "Getopt::Long" => 0
+  },
   "TEST_REQUIRES" => {
     "Pod::Coverage::TrustPod" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.12",
+  "VERSION" => "1.13",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,6 +34,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Getopt::Long" => 0,
   "Pod::Coverage::TrustPod" => 0,
   "Test::More" => 0
 );

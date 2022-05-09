@@ -1,5 +1,21 @@
 Revision history for Alien::PCRE2.
 
+0.016000 2022-05-08 Codename Queen Mother
+
+    - HOLIDAY EDITION: Happy Mother's Day!
+    - Upgrade To PCRE2 v10.34
+    - Enable Minimum Version Checking Via Environmental Variable (thanks Zaki Mughal)
+    - Require PCRE2 v10.34 Minimum Version, Due To Security Vulnerability (thanks Zaki Mughal)
+        https://nvd.nist.gov/vuln/detail/CVE-2019-20454
+    - Require Alien::Build v2.48, Provides Test::Alien::Diag etc.
+    - Require Alien::MSYS v0.14
+    - Require Alien::gmake v0.21
+    - Require IO::Socket::SSL v2.074
+    - Require Test2::Suite v0.000145
+    - Use 'diag' Instead Of 'print {*STDERR}' (thanks Zaki Mughal) 
+    - Enable GitHub CI Testing & Fix Various Build Issues (thanks Zaki Mughal & Hakon Hagland)
+    - Accept PCRE2 Release Candidates (thanks Petr Pisar)
+
 0.015000 2017-11-07
 
 	- Fix "Sorry, you may not have multiple connections.",

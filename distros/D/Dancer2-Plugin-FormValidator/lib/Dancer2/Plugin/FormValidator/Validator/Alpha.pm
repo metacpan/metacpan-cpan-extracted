@@ -1,5 +1,8 @@
 package Dancer2::Plugin::FormValidator::Validator::Alpha;
 
+use strict;
+use warnings;
+
 use Moo;
 use utf8;
 use namespace::clean;
@@ -17,7 +20,7 @@ has encoding => (
 );
 
 sub message {
-    my $encoding = shift->encoding;
+    my $encoding = $_[0]->encoding;
 
     if ($encoding eq UNICODE) {
         return {
@@ -36,6 +39,7 @@ sub message {
 
 sub validate {
     my ($self, $field, $input, $encoding) = @_;
+
     my $regex;
 
     if (defined $encoding and $encoding eq UNICODE) {

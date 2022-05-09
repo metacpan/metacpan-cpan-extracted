@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use lib 't/testlib';
 
-use Test::More tests => 47;
+use Test::More tests => 46;
 use Syntax::Kamelon;
 use KamTest qw(CompareFile InitWorkFolder ClearTimer Format GetTime Parse WriteCleanUp);
 
@@ -35,7 +35,6 @@ my %langs = (
 	'JavaScript' => "highlight.js",
 	'LaTeX' => "highlight.tex",
 	'Lex/Flex' => "highlight.lex",
-	'LilyPond' => "highlight.ly",
 	'Literate Haskell' => "highlight.hs",
 	'Matlab' => "highlight.m",
 	'Octave' => "highlight.m",

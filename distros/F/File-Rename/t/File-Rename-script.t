@@ -7,7 +7,7 @@
 # change 'tests => 1' to 'tests => last_test_to_print';
 
 use Test::More tests => 4;
-push @INC, qw(blib/script) if -d 'blib';
+push @INC, qw(blib/script blib/bin) if -d 'blib';
 unshift @INC, 't' if -d 't';
 require 'testlib.pl';
 
@@ -15,8 +15,12 @@ my $script = script_name();
 my $require_ok =  eval { require($script) };
 ok( $require_ok, 'require script - '. $script);
 die $@ unless $require_ok;
-like( $INC{$script}, qr{/ $script \z}msx, "required $script in \%INC");
+diag $INC{$script};
 
+SKIP: {
+    skip "script may be in blib/bin", 1 if $] < 5.008009; 
+    like( $INC{$script}, qr{/ $script \z}msx, "required $script in \%INC");
+}
 #########################
 
 # Insert your test code below, the Test::More module is use()ed here so read

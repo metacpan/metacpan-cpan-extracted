@@ -1,3 +1,6 @@
 name = "Mojolicious-Plugin-WriteExcel"
 module_maker = "ModuleBuildTiny"
 tag_format = "v%v"
+
+authority = "cpan:ZAKAME"
+badges = ["github-actions/Test on latest supported Perls", "coveralls", "metacpan"]

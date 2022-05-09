@@ -2,8 +2,8 @@ NAME
     Data::TableData::Rank - Add a rank column to a table
 
 VERSION
-    This document describes version 0.001 of Data::TableData::Rank (from
-    Perl distribution Data-TableData-Rank), released on 2021-11-17.
+    This document describes version 0.002 of Data::TableData::Rank (from
+    Perl distribution Data-TableData-Rank), released on 2022-03-27.
 
 FUNCTIONS
   add_rank_column_to_table
@@ -115,7 +115,8 @@ CONTRIBUTING
     me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2022, 2021 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

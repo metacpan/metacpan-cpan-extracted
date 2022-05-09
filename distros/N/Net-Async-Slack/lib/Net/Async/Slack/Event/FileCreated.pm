@@ -3,7 +3,7 @@ package Net::Async::Slack::Event::FileCreated;
 use strict;
 use warnings;
 
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use Net::Async::Slack::EventType;
 

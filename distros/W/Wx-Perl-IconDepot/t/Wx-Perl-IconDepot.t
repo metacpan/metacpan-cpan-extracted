@@ -311,6 +311,7 @@ sub CreateImageTests {
 				$test{method} = $method;
 				$test{args} = [ $name, $size ];
 				$test{expected} = 1;
+				$test{validate} = 'image';
 				push @tests, \%test;
 			}
 		}

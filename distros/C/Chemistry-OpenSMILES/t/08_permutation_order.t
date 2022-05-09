@@ -6,11 +6,23 @@ use warnings;
 use Chemistry::OpenSMILES::Writer;
 use Test::More;
 
-my $cases = 20;
+sub order
+{
+    return join '', Chemistry::OpenSMILES::Writer::_permutation_order( @_ );
+}
 
-plan tests => $cases;
+my $random_cases = 20;
+my @bad_cases = (
+    [ 0..2 ],
+    [ 0..4 ],
+    [ 1..4 ],
+    [ 0..2, undef ],
+    [ 0, 1, 12, '' ],
+);
 
-for (1..$cases) {
+plan tests => $random_cases + (2 * scalar @bad_cases);
+
+for (1..$random_cases) {
     my @order = 0..3;
     for (0..9) {
         if( rand() < 0.5 ) {
@@ -19,7 +31,13 @@ for (1..$cases) {
             @order = ( $order[0], @order[2..3], $order[1] );
         }
     }
-    # is( join( '', @order ), '0123' );
-    is( join( '', Chemistry::OpenSMILES::Writer::_permutation_order( @order ) ),
-        '0123' );
+    is( order( @order ), '0123' );
+}
+
+for (@bad_cases) {
+    my $warning;
+    local $SIG{__WARN__} = sub { $warning = $_[0] };
+
+    is( order( @$_ ), '0123' );
+    ok( defined $warning && $warning =~ /unexpected input received/ );
 }

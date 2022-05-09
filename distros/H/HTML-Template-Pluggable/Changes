@@ -1,5 +1,10 @@
 Revision history for HTML-Template-Pluggable
 
+0.21    2022-05-04  Rhesa Rozendaal <rhesa@cpan.org>
+        * fix all the test failures:
+            * make number formatting test locale-independent
+            * add back support for AUTOLOADed methods
+
 0.20    2022-05-03  Rhesa Rozendaal <rhesa@cpan.org>
         * add prereq for CGI since this is no longer bundled
           with perl core

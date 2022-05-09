@@ -233,7 +233,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.201';
+our $VERSION = '1.202';
 
 use Quiq::Math;
 use Quiq::Json;
@@ -667,7 +667,7 @@ sub html {
                 let dId = name+'-d'+i;
                 Plotly.deleteTraces(dId,0);
                 Plotly.addTraces(dId,trace);
-                $('#'+name+'-c'+i).html(x.length.toString()+' points');
+                $('#'+name+'-c'+i).html(x.length.toString()+' data points');
 
                 return;
             };
@@ -1236,7 +1236,7 @@ sub jsDiagram {
 
 =head1 VERSION
 
-1.201
+1.202
 
 =head1 AUTHOR
 

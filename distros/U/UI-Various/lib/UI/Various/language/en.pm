@@ -74,7 +74,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 #########################################################################
 
@@ -101,6 +101,8 @@ our %T =
      => '%s element must be accompanied by parent',
      _1_may_not_be_empty
      => "'%s' may not be empty",
+     _1_may_not_be_modified_directly_after_initialisation
+     => "'%s' may not be modified directly after initialisation",
      _1_may_only_be_called_from_itself
      => '%s may only be called from itself',
      _1_to_cancel
@@ -125,6 +127,8 @@ our %T =
      => 'enter selection',
      include_option_must_be_an_array_reference_or_a_scalar
      => "'include' option must be an ARRAY reference or a scalar",
+     invalid_call_to__1__2
+     => 'invalid call to %s::%s',
      invalid_object__1_in_call_to__2
      => 'invalid object (%s) in call to %s',
      invalid_object__1_in_call_to__2__3
@@ -145,6 +149,8 @@ our %T =
      => "invalid value %s for parameter '%s' in call to %s::%s",
      leave_box
      => 'leave box',
+     leave_listbox
+     => 'leave listbox',
      leave_window
      => 'leave window',
      mandatory_parameter__1_is_missing
@@ -169,6 +175,10 @@ our %T =
      => "parameter '%s' must be a positive integer",
      parameter__1_must_be_a_positive_integer_in_call_to__2__3
      => "parameter '%s' must be a positive integer in call to %s::%s",
+     parameter__1_must_be_in__2__3
+     => "parameter '%s' must be in [%s..%s]",
+     scrolls
+     => '+/- scrolls',
      specified_implementation_missing
      => 'specified implementation missing',
      stderr_not_0_1_2_or_3

@@ -15,7 +15,6 @@
 #include "spvm_list.h"
 #include "spvm_opcode_array.h"
 #include "spvm_method.h"
-#include "spvm_method.h"
 #include "spvm_field.h"
 #include "spvm_class_var.h"
 #include "spvm_native.h"
@@ -283,7 +282,7 @@ int32_t SPVM_COMPILER_compile_spvm(SPVM_COMPILER* compiler, const char* class_na
         SPVM_ALLOCATOR_free_memory_block_tmp(compiler->allocator, allow);
         break;
       }
-      case SPVM_OP_C_ID_IMPLEMENT: {
+      case SPVM_OP_C_ID_INTERFACE: {
         SPVM_INTERFACE* interface = op->uv.interface;
         SPVM_ALLOCATOR_free_memory_block_tmp(compiler->allocator, interface);
         break;
@@ -613,6 +612,18 @@ int32_t* SPVM_COMPILER_create_spvm_32bit_codes(SPVM_COMPILER* compiler, SPVM_ALL
       runtime_class->destructor_method_id = -1;
     }
     
+    if (class->category == SPVM_CLASS_C_CATEGORY_INTERFACE || class->category == SPVM_CLASS_C_CATEGORY_CALLBACK) {
+      assert(class->required_method);
+    }
+  
+    if (class->required_method) {
+      assert(class->required_method->id >= 0);
+      runtime_class->required_method_id = class->required_method->id;
+    }
+    else {
+      runtime_class->required_method_id = -1;
+    }
+    
     runtime_class->methods_length = class->methods->length;
     if (class->methods->length > 0) {
       SPVM_METHOD* method = SPVM_LIST_get(class->methods, 0);
@@ -780,6 +791,8 @@ int32_t* SPVM_COMPILER_create_spvm_32bit_codes(SPVM_COMPILER* compiler, SPVM_ALL
     runtime_method->return_type_id = method->return_type->id;
     runtime_method->is_native = method->is_native;
     runtime_method->is_precompile = method->is_precompile;
+    runtime_method->is_destructor = method->is_destructor;
+    runtime_method->is_required = method->is_required;
 
     SPVM_CONSTANT_STRING* method_name_string = SPVM_HASH_get(compiler->constant_string_symtable, method->name, strlen(method->name));
     runtime_method->name_id = method_name_string->id;

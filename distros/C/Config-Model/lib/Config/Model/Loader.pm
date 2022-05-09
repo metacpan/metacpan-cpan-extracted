@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Loader 2.149;
+package Config::Model::Loader 2.150;
 
 use Carp;
 use strict;
@@ -20,6 +20,9 @@ use Log::Log4perl qw(get_logger :levels);
 use JSON;
 use Path::Tiny;
 use YAML::Tiny;
+
+use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
 
 my $logger = get_logger("Loader");
 my $verbose_logger = get_logger("Verbose.Loader");
@@ -485,6 +488,7 @@ sub _load_check_list {
             ':.insert_at'     => sub { $_[1]->insert_at( @_[ 5 .. $#_ ] ); return 'ok'; },
             ':.insort'        => sub { $_[1]->insort( @_[ 5 .. $#_ ] ); return 'ok'; },
             ':.insert_before' => \&_insert_before,
+            ':.ensure'        => \&_ensure_list_value,
         },
         'list_*' => {
             ':.copy'          => sub { $_[1]->copy( $_[5], $_[6] ); return 'ok'; },
@@ -557,6 +561,17 @@ sub _insert_before {
     return 'ok';
 }
 
+sub _ensure_list_value {
+    my ( $self, $element, $check, $inst, $cmdref, @values ) = @_;
+    my %content = map { $_ => 1 } $element->fetch_all_values;
+    foreach my $one_value (@values) {
+        next if $content{$one_value};
+        $element->insort($one_value);
+        $content{$one_value} = 1;
+    }
+
+    return 'ok';
+}
 sub _remove_by_id {
     my ( $self, $element, $check, $inst, $cmdref, $id ) = @_;
     $logger->debug("_remove_by_id: removing id '$id'");
@@ -564,11 +579,18 @@ sub _remove_by_id {
     return 'ok';
 }
 
+sub __load_json_file ($file) {
+    # utf8 decode is done by JSON module, so slurp_raw must be used
+    return decode_json($file->slurp_raw);
+}
+
 sub _load_json_vector_data {
     my ( $self, $element, $check, $inst, $cmdref, $vector ) = @_;
     $logger->debug("_load_json_vector_data: loading '$vector'");
     my ($file, @vector) = $self->__get_file_from_vector($element,$inst,$vector);
-    my $data = decode_json($file->slurp_utf8);
+
+    my $data = __load_json_file($file);
+
     # test for diff before clobbering ? What about deep data ???
     $element->load_data(
         data => __data_from_vector($data, @vector),
@@ -1003,7 +1025,7 @@ sub __get_file_from_vector {
 sub _store_json_vector_in_value {
     my ( $self, $element, $value, $check, $instructions, $cmd ) = @_;
     my ($file, @vector) = $self->__get_file_from_vector($element,$instructions,$value);
-    my $data = decode_json($file->slurp_utf8);
+    my $data = __load_json_file($file);
     $element->store(
         value => __data_from_vector($data, @vector),
         check => $check
@@ -1065,7 +1087,7 @@ Config::Model::Loader - Load serialized data into config tree
 
 =head1 VERSION
 
-version 2.149
+version 2.150
 
 =head1 SYNOPSIS
 
@@ -1320,6 +1342,12 @@ C<zz> key and assing value C<vv> so that existing alphanumeric order of keys
 is preserved. Note that all keys are sorted once this instruction is
 called. Putting key order aside, C<xxx:.insort(zz,vv)> has the
 same effect as C<xxx:zz=vv> instruction.
+
+=item xxx:.ensure(zz)
+
+Ensure that list C<xxx> contains value C<zz>. If value C<zz> is
+already stored in C<xxx> list, this function does nothing. In the
+other case, value C<zz> is inserted in alphabetical order.
 
 =item xxx:=z1,z2,z3
 

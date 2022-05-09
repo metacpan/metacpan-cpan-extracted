@@ -1,19 +1,23 @@
 use alienfile;
 
-#our $VERSION = 0.021_000;
+#our $VERSION = 0.022_000;
  
 plugin 'PkgConfig' => (
     # NEED ANSWER: which should we be using below?
     pkg_name =>'libpcre2-8',
 #    pkg_name =>'libpcre2-16',
 #    pkg_name =>'libpcre2-32',
-    minimum_version => '10.30',
+    # NOTE Setting minimum_version to 10.34 due to
+    # <https://nvd.nist.gov/vuln/detail/CVE-2019-20454>.
+    minimum_version =>
+        exists $ENV{ALIEN_PCRE2_MIN_VERSION}
+        ? $ENV{ALIEN_PCRE2_MIN_VERSION}
+        : '10.34',
 );
  
 share {
     plugin Download => (
-#        url => 'ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/',  # ERROR: "Sorry, you may not have multiple connections."
-        url => 'https://wbraswell.github.io/pcre2-mirror/',  # GitHub mirror server
+        url => 'https://github.com/PhilipHazel/pcre2/releases',
 
         filter => qr/^pcre2-.*\.tar\.gz$/,
 

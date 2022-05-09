@@ -1,8 +1,5 @@
 package App::lcpan::Cmd::authors_by_rdep_count;
 
-our $DATE = '2021-06-05'; # DATE
-our $VERSION = '1.068'; # VERSION
-
 use 5.010;
 use strict;
 use warnings;
@@ -10,6 +7,11 @@ use warnings;
 use Function::Fallback::CoreOrPP qw(clone_list);
 
 require App::lcpan;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-03-27'; # DATE
+our $DIST = 'App-lcpan'; # DIST
+our $VERSION = '1.070'; # VERSION
 
 our %SPEC;
 
@@ -48,8 +50,7 @@ sub handle_cmd {
     @where = (1) if !@where;
 
     my $sql = "SELECT
-  m.cpanid id,
-  a.fullname name,
+  m.cpanid author,
   COUNT(DISTINCT f.id) AS rdep_count
 FROM module m
 JOIN dep dp ON dp.module_id=m.id
@@ -66,8 +67,12 @@ ORDER BY rdep_count DESC
     while (my $row = $sth->fetchrow_hashref) {
         push @res, $row;
     }
+
+    require Data::TableData::Rank;
+    Data::TableData::Rank::add_rank_column_to_table(table => \@res, data_columns => ['rdep_count']);
+
     my $resmeta = {};
-    $resmeta->{'table.fields'} = [qw/id name rdep_count/];
+    $resmeta->{'table.fields'} = [qw/rank author rdep_count/];
     [200, "OK", \@res, $resmeta];
 }
 
@@ -86,7 +91,7 @@ App::lcpan::Cmd::authors_by_rdep_count - List authors ranked by number of distri
 
 =head1 VERSION
 
-This document describes version 1.068 of App::lcpan::Cmd::authors_by_rdep_count (from Perl distribution App-lcpan), released on 2021-06-05.
+This document describes version 1.070 of App::lcpan::Cmd::authors_by_rdep_count (from Perl distribution App-lcpan), released on 2022-03-27.
 
 =head1 FUNCTIONS
 
@@ -155,6 +160,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-lcpan>
 
 Source repository is at L<https://github.com/perlancar/perl-App-lcpan>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan>
@@ -162,16 +195,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

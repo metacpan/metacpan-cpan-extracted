@@ -1723,7 +1723,7 @@ sub PDL::macsch {
 =for ref
 
 Return matrix function of second argument of a square matrix.
-Function will be applied on a PDL::Complex object.
+Function will be applied on a complex ndarray.
 
 =for usage
 

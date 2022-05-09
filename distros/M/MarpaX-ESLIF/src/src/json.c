@@ -566,6 +566,9 @@ short marpaESLIFJSON_decodeb(marpaESLIFGrammar_t *marpaESLIFGrammarJSONp, marpaE
 
   MARPAESLIFRECOGNIZER_TRACEF(marpaESLIFRecognizerp, funcs, "Number of items in depositStackp: %d", GENERICSTACK_USED(marpaESLIFJSONDecodeContext.depositStackp));
 
+  if (MARPAESLIF_UNLIKELY(! _marpaESLIFRecognizer_checkStartCompletionb(marpaESLIFRecognizerp, 0 /* lengthl */))) {
+    goto err;
+  }
   if (MARPAESLIF_UNLIKELY(! _marpaESLIFRecognizer_isStartCompleteb(marpaESLIFRecognizerp, &isStartCompleteb))) {
     goto err;
   }

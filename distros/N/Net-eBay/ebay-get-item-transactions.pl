@@ -61,7 +61,8 @@ foreach my $item (@ARGV) {
                                      }
                                    );
   if( ref $result ) {
-    #print "Result: " . Dumper( $result ) . "\n";
+    print "Result: " . Dumper( $result ) . "\n"
+      if $detail;
     
     my $offers = $result->{TransactionArray}->{Transaction};
 

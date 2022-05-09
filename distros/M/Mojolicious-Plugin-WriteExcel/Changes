@@ -1,6 +1,11 @@
 Revision history for Mojolicious-Plugin-WriteExcel (formerly known as
 MojoX-Renderer-WriteExcel)
 
+3.00 2022-05-07T09:20:53Z
+	Use die instead of reply->exception for Mojo 9.25
+	Bump Mojo requirement to 9.25 per above
+	Add GitHub Actions CI and Coveralls
+
 2.05 2015-02-28T06:38:01Z
         Use reply->exception helper, thanks to Bryan Paxton
         Bump Mojo requirement to 5.73 per above

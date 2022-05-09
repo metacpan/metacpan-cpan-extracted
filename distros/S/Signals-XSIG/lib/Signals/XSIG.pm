@@ -19,7 +19,7 @@ our @EXPORT_OK = qw(untied %DEFAULT_BEHAVIOR);
 our %DEFAULT_BEHAVIOR;
 *DEFAULT_BEHAVIOR = \%Signals::XSIG::Default::DEFAULT_BEHAVIOR;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 our (%XSIG, %_XSIG, %SIGTABLE, $_REFRESH, $_DISABLE_WARNINGS);
 our $_INITIALIZED = 0;
 our $SIGTIE = bless {}, 'Signals::XSIG::TieSIG';
@@ -33,8 +33,8 @@ my %alias = ();
 ###
 # to be removed when we get a handle on intermittent t/02 failures
 our ($XDEBUG,$XN,@XLOG) = (0,1001);
-sub XLOG{no warnings"uninitialized";push @XLOG,($XN++)." @_"}
-sub XLOG_DUMP{join"\n",@XLOG}
+sub XLOG{no warnings"uninitialized";push @XLOG,($XN++)." @_";XLOG_DUMP() if $XDEBUG>1}
+sub XLOG_DUMP{my $r = join("\n",@XLOG); @XLOG=(); print "$r\n"}
 ###
 
 
@@ -241,7 +241,7 @@ sub _qualify_handler {
 #
 
 sub Signals::XSIG::TieSIG::TIEHASH {
-    $XDEBUG && XLOG("TIE caller=",caller);
+    $XDEBUG && XLOG("TieSIG::TIE caller=",caller);
     return $SIGTIE;
 }
 
@@ -255,6 +255,7 @@ sub Signals::XSIG::TieSIG::FETCH {
         $XDEBUG && $key ne '__DIE__' && XLOG("    result(1)=",$_XSIG{$key}[0]);
 	return $_XSIG{$key}[0];
     } else {
+	no warnings 'uninitialized';
 	my $r = untied { $SIG{$key} };
         $XDEBUG && $key ne '__DIE__' && XLOG("    result(2)=$r");
 	return $r;
@@ -263,6 +264,7 @@ sub Signals::XSIG::TieSIG::FETCH {
 
 sub Signals::XSIG::TieSIG::STORE {
     my ($self,$key,$value) = @_;
+    no warnings 'uninitialized';
     $XDEBUG && $key ne '__DIE__'
         && XLOG("STORE($key,$value) caller=",caller);
     if (_resolve_signal($key)) {
@@ -292,8 +294,12 @@ sub Signals::XSIG::TieSIG::DELETE {
 	return $old;
     } else {
 	my $old = $self->FETCH($key);
+	no warnings 'uninitialized';
         $XDEBUG && XLOG("    DELETE result(2)=$old");
-	untied { $SIG{$key} = undef; delete $SIG{$key} };
+	untied {
+	    $SIG{$key} = undef;
+	    delete $SIG{$key};
+	};
 	return $old;
     }
 }
@@ -317,7 +323,9 @@ sub Signals::XSIG::TieSIG::CLEAR {
     
     my @sigs = reverse sort keys %_XSIG;
     $XDEBUG && XLOG("    \@sigs = qw(@sigs);");
-    $_XSIG{$_}[0] = undef for @sigs;
+    for (@sigs) {
+	$_XSIG{$_}[0] = undef;
+    }
 
     $XDEBUG && do {
         XLOG("    CLEAR final USR1=",@{$_XSIG{USR1}});
@@ -389,11 +397,17 @@ sub Signals::XSIG::TieArray::STORE {
 	$self->{start}--;
     }
 
+    while ($index > $#{$self->{handlers}}) {
+	push @{$self->{handlers}}, undef;
+    }
+
     my $old = $self->{handlers}[$index];
 
     $handler = _qualify_handler($handler);
     $self->{handlers}[$index] = $handler;
-    $XDEBUG && XLOG("TA::STORE key=$self->{key} index=$index val=",$handler," caller=",caller);
+    $XDEBUG
+	&& XLOG("TA::STORE key=$self->{key} index=$index val=",$handler,
+		" caller=",caller);
     $self->_refresh_SIG();
     return $old;
 }
@@ -425,7 +439,6 @@ sub Signals::XSIG::TieArray::_refresh_SIG {
 
     elsif (@index_list == 1 && 
 	   ($seen_default == 0 || ref($DEFAULT_BEHAVIOR{$sig}) eq '')) {
-#!$seen_default) {
 	$handler_to_install = $handlers[$index_list[0]];
     } else {
 	if ($sig eq '__WARN__') {
@@ -438,7 +451,8 @@ sub Signals::XSIG::TieArray::_refresh_SIG {
     }
     untied {
 	no warnings qw(uninitialized signal); ## no critic (NoWarnings)
-        $XDEBUG && XLOG("_refresh_SIG key=$self->{key} handler=$handler_to_install");
+        $XDEBUG
+	    && XLOG("refresh_SIG key=$self->{key} handler=$handler_to_install");
 	$SIG{$sig} = $handler_to_install;
     };
     return;
@@ -667,7 +681,7 @@ Signals::XSIG - install multiple signal handlers through %XSIG
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =head1 SYNOPSIS
 
@@ -710,11 +724,13 @@ There are at least a couple of use cases for this module:
 You have written a module that raises signals and makes
 use of signal handlers, but you don't want to preclude the
 end-user of your module from doing their own handling of that
-signal. The solution is to install your own signal handler
-into a "non-default" index. Now your module's end-user can
-set and unset C<$SIG{signal}> as much as he or she would like.
-When the signal is trapped, both your module's signal handler
-and the end-user's signal handler (if any) will be invoked.
+signal. This module solves this issue by allowing you to
+install a list of handlers for a signal, and installing your
+own signal handler into a "non-default" index. Now your module's
+end-user can set and unset C<$SIG{signal}> as much as he or she 
+would like. When the signal is trapped, both your module's 
+signal handler and the end-user's signal handler (if any) 
+will be invoked.
 
     package My::Module::With::USR1::Handler;
     use Signals::XSIG;
@@ -731,9 +747,9 @@ and the end-user's signal handler (if any) will be invoked.
     ...
     1;
 
-Now the user of your module can still install their own
+Now users of your module can still install their own
 C<SIGUSR1> handler through C<$SIG{USR1}> without interfering
-with your owm C<SIGUSR1> handler.
+with your own C<SIGUSR1> handler.
 
 =item 2. 
 
@@ -796,7 +812,7 @@ Sets a single signal handler for the given signal.
 
 =item $XSIG{signal}[0] = handler
 
-Identical behavior to the conventional C<$SIG{signal} = handler>
+Behaves identically to the conventional C<$SIG{signal} = handler>
 expression. Installs the specified signal handler as the "main" 
 signal handler. If you are using this module because you don't 
 want your signal handlers to trample on the signal handlers of 
@@ -984,7 +1000,8 @@ Marty O'Brien, C<< <mob at cpan.org> >>
 
 =head1 BUGS AND LIMITATIONS
 
-Using this module may make some other uses of Perl more difficult.
+Using this module may make it more difficult to use Perl
+in some other ways.
 
 =head2 Avoid C<local %SIG>
 
@@ -1004,9 +1021,9 @@ or using modules and functions which localize C<%SIG>
 use this construction 
 [L<https://code.google.com/archive/search?q=local%20%25SIG>]).
 
-Should you identify a code block that localizes C<%SIG> and you can't/don't
-want to avoid using it, the workaround is to save and restore C<%SIG> at
-the end of the local scope:
+If a code block that localizes C<%SIG> can't be avoided, the
+workaround for Perl E<lt>v5.36 is to save C<%SIG> and restore
+at the end of the localizing scope:
 
     use Signals::XSIG;
     ...
@@ -1014,10 +1031,24 @@ the end of the local scope:
     function_call_or_block_that_localizes_SIG();
     %SIG = %temp;
 
+Since Perl v5.36, you must also unforunately untie and retie
+C<%SIG> around localization.
+
+    use Signals::XSIG;
+    ...
+    my %temp = %SIG;
+    untie %SIG if $] >= 5.035;
+    function_call_or_block_that_localizes_SIG();
+    tie %SIG, 'Signals::XSIG::TieSIG' if $] >= 5.035;
+    %SIG = %temp;
+
+
 In addition, the behavior of the tied C<%SIG> while it is C<local>'ized
 is different in different versions of Perl, and all of the features
 of C<Signals::XSIG> might or might not work while a local copy
 of C<%SIG> is in use.
+
+Just avoid C<local %SIG> whenever you can.
 
 Note that it is perfectly fine to C<local>ize an I<element> of C<%SIG>:
 
@@ -1096,7 +1127,7 @@ _head1 ACKNOWLEDGEMENTS
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2017 Marty O'Brien.
+Copyright 2010-2022 Marty O'Brien.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

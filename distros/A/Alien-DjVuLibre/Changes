@@ -1,0 +1,16 @@
+0.03 2022-05-09T08:35:58+02:00
+ - Add README file.
+ - Fix mail link in doc.
+ - Fix signature.
+
+0.02 2022-05-08T23:00:21+02:00
+ - Add alien_diag to test (thanks Zakariyya Mughal).
+ - Add missing dependency for Test::NoWarnings (thanks Zakariyya Mughal).
+ - Add repository and bugtracker to Makefile.PL.
+ - Enable shared and static builds (thanks Zakariyya Mughal).
+ - Enable Decode::SourceForge (thanks Zakariyya Mughal).
+ - Improve build for MacOS and MinGW (thanks Zakariyya Mughal).
+ - Pass HashRef of options to xs_ok in tests (thanks Zakariyya Mughal).
+
+0.01 2022-05-05T01:19:01+02:00
+ - First version.

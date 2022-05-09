@@ -1,3 +1,10 @@
+0.133   2022-05-09  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with updated tools for nicer POD.
+
+
 0.132   2020-06-01  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
 
 	- [incompatible change] For consistency, rename --count to --show-count.

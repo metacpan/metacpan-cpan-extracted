@@ -1,11 +1,11 @@
 package GitHub::MergeVelocity::Repository;
-$GitHub::MergeVelocity::Repository::VERSION = '0.000007';
-use strict;
-use warnings;
 
-use GitHub::MergeVelocity::Repository::PullRequest;
-use GitHub::MergeVelocity::Repository::Statistics;
 use Moo;
+
+our $VERSION = '0.000009';
+
+use GitHub::MergeVelocity::Repository::PullRequest ();
+use GitHub::MergeVelocity::Repository::Statistics  ();
 use MooX::StrictConstructor;
 use Types::Standard qw( ArrayRef Bool InstanceOf Str );
 use URI ();
@@ -82,6 +82,8 @@ sub _get_pull_requests {
         params => { per_page => 100, state => 'all' },
     );
 
+    $result->auto_pagination(1);
+
     my @pulls;
 
     while ( my $row = $result->next ) {
@@ -130,7 +132,7 @@ GitHub::MergeVelocity::Repository - Encapsulate pull request data for a reposito
 
 =head1 VERSION
 
-version 0.000007
+version 0.000009
 
 =head1 AUTHOR
 

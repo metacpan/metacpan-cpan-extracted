@@ -6,13 +6,12 @@ use Carmel::Artifact;
 use CPAN::Meta::Requirements;
 use File::Copy::Recursive ();
 
-use subs 'path';
-use Class::Tiny qw( path );
+use Class::Tiny qw( packages );
 
 sub BUILD {
     my($self, $args) = @_;
     $self->path($args->{path});
-    $self->load_artifacts;
+    $self->packages({});
 }
 
 sub path {
@@ -56,7 +55,7 @@ sub load {
 
 sub add {
     my($self, $package, $artifact) = @_;
-    push @{$self->{$package}}, $artifact;
+    push @{$self->{packages}{$package}}, $artifact;
 }
 
 sub find {
@@ -67,6 +66,17 @@ sub find {
 sub find_all {
     my($self, $package, $want_version) = @_;
     $self->_find($package, $want_version, 1);
+}
+
+sub find_dist {
+    my($self, $package, $distname) = @_;
+
+    my $dir = $self->path->child($distname);
+    if ($dir->exists) {
+        return Carmel::Artifact->new($dir);
+    }
+
+    return $self->find_match($package, sub { $_[0]->distname eq $distname });
 }
 
 sub find_match {
@@ -101,10 +111,13 @@ sub _find {
 
 sub list {
     my($self, $package) = @_;
+
+    $self->load_artifacts unless $self->{_loaded}++;
+
     map { $_->[2] }
       sort { $b->[0] <=> $a->[0] || $b->[1] <=> $a->[1] } # sort by the package version, then the main package version
         map { [ $_->version_for($package), $_->version, $_ ] }
-          @{$self->{$package}};
+          @{$self->{packages}{$package}};
 }
 
 1;

@@ -52,7 +52,7 @@ Form::Tiny::Manual - reference for working with Form::Tiny
 
 =head1 DESCRIPTION
 
-L<Form::Tiny> is a form validation engine that can use all the type constraints you're already familiar with. The module does not ship with any field definitions on its own, instead it provides tools to reuse any type constraints from L<Type::Tiny> and other similar systems.
+L<Form::Tiny> is a form validation engine which can use all the type constraints you're already familiar with. The module does not ship with any field definitions on its own, instead it provides tools to reuse any type constraints from L<Type::Tiny> and other similar systems.
 
 =head2 Policy
 
@@ -227,7 +227,7 @@ C<1> or C<"hard"> - The field has to exist in the input, must be defined and non
 
 A coderef, which should return a scalar value that will be used in place of a non-existent input value. If the field is marked as hard-required as well, the default value will also replace undefined or empty values. It gets passed a single parameter, which is the form instance.
 
-The default value needs to be in line with the type check for the field, if it is specified. It also does not support nested arrays, like C<array.*>. An exception will be thrown if these conditions are not met.
+The default value does not support nested arrays, like C<array.*>. An exception will be thrown at compile time if this condition is not met.
 
 =item message
 
@@ -371,7 +371,7 @@ B<before_mangle> is fired for every field, just before it is changed ("mangled")
 
 =head3 before_validate
 
-B<before_validate> is fired just once for the form, before any field is validated. It is passed a hashref - the input data. This method is free to do anything with the input, but its return value is discarded.
+B<before_validate> is fired just once for the form, before any field is validated. It is passed a hashref - the input data. This method is free to do anything with the input.
 
 	form_hook before_validate => sub {
 		my ($self, $input_data) = @_;
@@ -381,7 +381,7 @@ B<before_validate> is fired just once for the form, before any field is validate
 		# no need to return
 	};
 
-This hook does not require you to return anything and is passed the same data as C<cleanup>.
+This hook does not require you to return anything and is passed the same data as C<cleanup>. Note that it will not be fired if the input data was not a hash reference.
 
 =head3 after_validate
 
@@ -391,7 +391,7 @@ Same as C<cleanup>, but differs in two aspects:
 
 =item * it is ran before C<cleanup>
 
-=item * it is ran regardless of previous validation being successful or not
+=item * it is ran regardless of previous validation being successful or not, but only if the data format is correct
 
 =back
 
@@ -579,10 +579,11 @@ It is required that class parents are specified before any calls to Form::Tiny D
 
 =item * L<Type::Tiny>, the awesome type system
 
-=item * L<Form::Tiny>, the importer class for this distribution
+=item * L<Form::Tiny>, the importer package for this distribution
 
 =item * L<Form::Tiny::Manual::Cookbook>, common tasks performed with Form::Tiny
 
 =item * L<Form::Tiny::Manual::Performance>, how to get the most speed out of the module
 
 =back
+

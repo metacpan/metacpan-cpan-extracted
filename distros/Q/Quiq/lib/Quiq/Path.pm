@@ -31,7 +31,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.201';
+our $VERSION = '1.202';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -47,6 +47,7 @@ use Fcntl qw/:DEFAULT/;
 use Quiq::Perl;
 use Quiq::DirHandle;
 use File::Find ();
+use Quiq::Exit;
 use Quiq::TempDir;
 use Cwd ();
 use Quiq::Time;
@@ -1865,7 +1866,8 @@ sub findProgram {
     my $path = qx/$cmd/;
     chomp $path;
     if (!$sloppy) {
-        Quiq::Shell->checkError($?,$!,$cmd);
+        # Quiq::Shell->checkError($?,$!,$cmd);
+        Quiq::Exit->check($?,$cmd);
     }
 
     return $path eq ''? undef: $path;
@@ -2054,7 +2056,7 @@ sub mkdir {
         }
     }
 
-    return if !$dir;
+    return if !defined($dir) || $dir eq '';
 
     if (-d $dir) {
         if ($mustNotExist) {
@@ -2424,24 +2426,20 @@ sub chmod {
 
 =head4 Synopsis
 
-  $class->delete($path);
+  $this->delete($path);
 
 =head4 Description
 
-Lösche den Pfad aus dem Dateisystem, also entweder die Datei oder
-das Verzeichnis einschließlich Inhalt. Es ist kein Fehler, wenn
-der Pfad im Dateisystem nicht existiert. Existiert der Pfad und
-kann nicht gelöscht werden, wird eine Exception ausgelöst.
-Die Methode liefert keinen Wert zurück.
+Lösche den Pfad aus dem Dateisystem, also die Datei oder das Verzeichnis
+einschließlich Inhalt. Es ist kein Fehler, wenn der Pfad nicht existiert.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub delete {
-    my ($class,$path) = @_;
-
-    $path = $class->expandTilde($path);
+    my $this = shift;
+    my $path = $this->expandTilde(shift);
 
     if (!defined($path) || $path eq '' || !-e $path && !-l $path) {
         # Bei Nichtexistenz nichts tun, aber nur, wenn es
@@ -2453,8 +2451,8 @@ sub delete {
         (my $dir = $path) =~ s/'/\\'/g; # ' quoten
         eval {Quiq::Shell->exec("/bin/rm -r '$dir' >/dev/null 2>&1")};
         if ($@) {
-            $class->throw(
-                'PATH-00001: Verzeichnis löschen fehlgeschlagen',
+            $this->throw(
+                'PATH-00002: Can\'t delete directory',
                 Error => $@,
                 Path => $path,
             );
@@ -2463,8 +2461,8 @@ sub delete {
     else {
         # Datei löschen
         if (!CORE::unlink $path) {
-            Quiq::Path->throw(
-                'PATH-00002: Datei löschen fehlgeschlagen',
+            $this->throw(
+                'PATH-00003: Can\'t delete file',
                 Path => $path,
             );
         }
@@ -3713,7 +3711,7 @@ sub uid {
 
 =head1 VERSION
 
-1.201
+1.202
 
 =head1 AUTHOR
 

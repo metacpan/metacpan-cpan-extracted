@@ -5,7 +5,7 @@ use warnings;
 use Config;
 use Hash::Util qw(lock_hash);
 
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 =pod
 
@@ -43,12 +43,13 @@ sub new {
         osname   => $Config{osname},
         archname => $Config{archname}
     };
+    my $attrib_name = 'useithreads';
 
-    if ( defined( $Config{useithreads} ) ) {
-        $self->{useithreads} = 1;
+    if ( defined( $Config{$attrib_name} ) ) {
+        $self->{$attrib_name} = 1;
     }
     else {
-        $self->{useithreads} = 0;
+        $self->{$attrib_name} = 0;
     }
 
     bless $self, $class;
@@ -65,15 +66,16 @@ This is particulary useful to use with YAML modules C<DumpFile> function.
 =cut
 
 sub dump {
-    my $self    = shift;
-    my %attribs = %{$self};
+    my $self        = shift;
+    my %attribs     = %{$self};
+    my $attrib_name = 'useithreads';
 
-    if ( $self->{useithreads} ) {
-        $attribs{useithreds} = 'define';
+    if ( $self->{$attrib_name} ) {
+        $attribs{$attrib_name} = 'define';
     }
     else {
-        delete( $attribs{useithreads} );
-        $attribs{no_useithreads} = 'define';
+        delete( $attribs{$attrib_name} );
+        $attribs{"no_$attrib_name"} = 'define';
     }
 
     return \%attribs;

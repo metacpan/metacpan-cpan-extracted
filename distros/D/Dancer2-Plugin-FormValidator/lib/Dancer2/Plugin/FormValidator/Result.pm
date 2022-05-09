@@ -1,5 +1,8 @@
 package Dancer2::Plugin::FormValidator::Result;
 
+use strict;
+use warnings;
+
 use Moo;
 use Types::Standard qw(ArrayRef HashRef Bool);
 use namespace::clean;

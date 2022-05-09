@@ -1,6 +1,6 @@
 package Quantum::Superpositions::Lazy::Computation;
 
-our $VERSION = '1.08';
+our $VERSION = '1.10';
 
 use v5.24;
 use warnings;
@@ -68,6 +68,8 @@ sub reset
 			$member->reset;
 		}
 	}
+
+	return $self;
 }
 
 sub _cartesian_product
@@ -191,3 +193,4 @@ Same purpose as in L<Quantum::Superpositions::Lazy::Superposition>.
 =head1 OVERLOADING
 
 Same as L<Quantum::Superpositions::Lazy::Superposition>.
+

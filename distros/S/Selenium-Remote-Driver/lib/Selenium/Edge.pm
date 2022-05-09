@@ -1,5 +1,5 @@
 package Selenium::Edge;
-$Selenium::Edge::VERSION = '1.46';
+$Selenium::Edge::VERSION = '1.47';
 use strict;
 use warnings;
 
@@ -57,7 +57,7 @@ Selenium::Edge - Use EdgeDriver without a Selenium server
 
 =head1 VERSION
 
-version 1.46
+version 1.47
 
 =head1 SYNOPSIS
 

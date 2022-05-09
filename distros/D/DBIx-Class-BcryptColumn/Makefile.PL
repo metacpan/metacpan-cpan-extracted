@@ -16,7 +16,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "DBIx::Class::BcryptColumn",
   "PREREQ_PM" => {
-    "Crypt::Eksblowfish" => "0.009",
+    "Crypt::Bcrypt" => "0.007",
     "Crypt::URandom" => "0.36",
     "Sub::Name" => "0.26"
   },
@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
     "Test::DBIx::Class" => "0.52",
     "Test::More" => "0.86"
   },
-  "VERSION" => "0.001001",
+  "VERSION" => "0.001003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Crypt::Eksblowfish" => "0.009",
+  "Crypt::Bcrypt" => "0.007",
   "Crypt::URandom" => "0.36",
   "DBD::SQLite" => 0,
   "Sub::Name" => "0.26",

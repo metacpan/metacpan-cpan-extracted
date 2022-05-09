@@ -38,5 +38,5 @@ resources:
   bugtracker: https://github.com/tonycoz/imager/issues
   homepage: http://imager.perl.org/
   repository: git://github.com/tonycoz/imager.git
-version: '1.014'
+version: '1.015'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -11,9 +11,7 @@ init_log("testout/t101jpeg.log",1);
 $Imager::formats{"jpeg"}
   or plan skip_all => "no jpeg support";
 
-plan tests => 109;
-
-print STDERR "libjpeg version: ", Imager::File::JPEG::i_libjpeg_version(), "\n";
+diag "libjpeg version: ", Imager::File::JPEG->libjpeg_version(), "\n";
 
 my $green=i_color_new(0,255,0,255);
 my $blue=i_color_new(0,0,255,255);
@@ -457,6 +455,278 @@ SKIP:
 	   "optimization should only change huffman compression, not quality");
 }
 
+SKIP:
+{
+  my $im = test_image();
+  # unknown jpeg_compress_profile always fails, doesn't matter whether we have mozjpeg
+  my $data;
+  ok(!$im->write(data => \$data, type => "jpeg", jpeg_compress_profile => "invalid"),
+     "fail to write with unknown compression profile");
+  like($im->errstr, qr/jpeg_compress_profile=invalid unknown/,
+       "check the error message");
+
+  ok($im->write(data => \$data, type => "jpeg", jpeg_compress_profile => "fastest"),
+     "jpeg_compress_profile=fastest is always available");
+  Imager::File::JPEG->is_mozjpeg
+      and skip "this is mozjpeg", 1;
+  ok(!$im->write(data => \$data, type => "jpeg", jpeg_compress_profile => "max"),
+     "fail to write with max compression profile without mozjpeg");
+  like($im->errstr, qr/jpeg_compress_profile=max requires mozjpeg/,
+       "check the error message");
+}
+
+SKIP:
+{
+  Imager::File::JPEG->is_mozjpeg
+      or skip "this isn't mozjpeg", 1;
+  my $im = test_image();
+  my $base_data;
+  ok($im->write(data => \$base_data, type => "jpeg", jpeg_compress_profile => "fastest"),
+     "write using defaults");
+  my $opt_data;
+  ok($im->write(data => \$opt_data,  type => "jpeg", jpeg_compress_profile => "max"),
+     "write using max compression profile");
+  cmp_ok(length($opt_data), '<', length($base_data),
+         "max compression should be smaller");
+}
+
+SKIP:
+{
+  Imager::File::JPEG->has_arith_coding
+      or skip "arithmetic coding not available", 1;
+  my $im = test_image;
+  my $data;
+  ok($im->write(data => \$data, type => "jpeg", jpeg_arithmetic => 1),
+     "write with arithmetic coding");
+  my $im2 = Imager->new(data => $data);
+  ok($im2, "read back arithmetic coded");
+  ok($im2->tags(name => "jpeg_read_arithmetic"),
+     "and read tag set");
+}
+
+{
+  # default RGB (YCbCr) image has JFIF header
+  my $im = test_image;
+  my $data;
+  ok($im->write(data => \$data, type => "jpeg"),
+     "write default RGB");
+  my $im2 = Imager->new;
+  ok($im2->read(data => $data), "read it back");
+  is($im2->tags(name => "jpeg_read_jfif"), 1, "JFIF detected");
+  ok($im->write(data => \$data, type => "jpeg", jpeg_jfif => 0),
+     "disable the JFIF header");
+  ok($im2->read(data => $data), "read back file without JFIF");
+  is($im2->tags(name => "jpeg_read_jfif"), 0, "no JFIF detected");
+}
+
+{
+  my $im = Imager->new(xsize => 150, ysize => 150);
+  $im->box(filled => 1, color => "#F00", box => [ 15, 15, 84, 84 ]);
+  $im->box(filled => 1, color => "#0F0", box => [ 30, 30, 69, 69 ]);
+  # guesstimate
+  my $smoothed = $im->copy->filter(type => 'gaussian', stddev => 1);
+  my $data_base;
+  ok($im->write(data => \$data_base, type => "jpeg"), "write base image (control)");
+  my $data_smoothed;
+  ok($im->write(data => \$data_smoothed, type => "jpeg", jpeg_smooth => 50),
+     "write smoothed image");
+  my $smim = Imager->new;
+  ok($smim->read(data => $data_smoothed), "read smoothed back");
+  my $diffWvsS = Imager::i_img_diff($smim->{IMG}, $smoothed->{IMG});
+  my $diffWvsB = Imager::i_img_diff($smim->{IMG}, $im->{IMG});
+  cmp_ok($diffWvsS, '<', $diffWvsB,
+	 "written image should be closer to blurred image than base image");
+
+  my $data;
+  ok(!$im->write(data => \$data, type => "jpeg", jpeg_smooth => 101),
+     "invalid smoothing value");
+  like($im->errstr, qr/jpeg_smooth must be an integer from 0 to 100/, "check error message");
+}
+
+{
+  # jpeg_restart
+  my $im = test_image;
+  my $data;
+  ok($im->write(data => \$data,        type => "jpeg"),
+     "write with default restarts");
+  my $data_8_rows;
+  ok($im->write(data => \$data_8_rows, type => "jpeg", jpeg_restart => 8),
+     "write with restart every 8 rows");
+  my $data_8_mcus;
+  ok($im->write(data => \$data_8_mcus, type => "jpeg", jpeg_restart => "8b"),
+     "write with restart every 8 mcus");
+  cmp_ok(length($data), '<', length($data_8_rows),
+         "no restarts smaller than restart every 8 rows");
+  cmp_ok(length($data_8_rows), '<', length($data_8_mcus),
+         "restarts every 8 rows smaller than restart every 8 mcus");
+
+  # error handling
+  ok(!$im->write(data => \$data, type => "jpeg", jpeg_restart => "8c"),
+     "bad units value");
+  like($im->errstr, qr/jpeg_restart must be an integer from 0 to 65535 followed by an optional b/,
+       "check error message");
+  $im->_set_error("");
+  ok(!$im->write(data => \$data, type => "jpeg", jpeg_restart => "65536"),
+     "out of range value");
+  like($im->errstr, qr/jpeg_restart must be an integer from 0 to 65535 followed by an optional b/,
+       "check error message");
+}
+
+SKIP:
+{
+  # jpeg_sample
+  my $im = test_image;
+  my $data_base;
+  ok($im->write(data => \$data_base, type => "jpeg"),
+     "write default");
+  my $data_1x1;
+  ok($im->write(data => \$data_1x1,  type => "jpeg", jpeg_sample => "1x1"),
+     "write with 1x1")
+    or diag $im->errstr;
+  cmp_ok(length($data_base), '<', length($data_1x1),
+         "1x1 sampled file is larger");
+  my $baseim = Imager->new(data => $data_base)
+    or skip "couldn't read back base image", 1;
+  my $im1x1 = Imager->new(data => $data_1x1)
+    or skip "couldn't read back 1x1 image", 1;
+  my $diff_base = Imager::i_img_diff($im->{IMG}, $baseim->{IMG});
+  my $diff_1x1 = Imager::i_img_diff($im->{IMG}, $im1x1->{IMG});
+  cmp_ok($diff_1x1, '<', $diff_base,
+         "1x1 sampled image should be closer to source image");
+
+  # varieties
+  my $data_deftag;
+  ok($im->write(data => \$data_deftag, type => "jpeg", jpeg_sample => "2x2,1x1,1x1"),
+     "specify default by tag");
+  is(length($data_base), length($data_deftag),
+     "default set by tag matches default");
+
+  my $data;
+  my $errq = quotemeta "jpeg_sample: must match /^[1-4]x[1-4](,[1-4]x[1-4]){0,9}\$/aai";
+  my $errqr = qr/$errq/;
+  # failures
+  ok(!$im->write(data => \$data, type => "jpeg", jpeg_sample => "5x1"),
+     "H out of range");
+  like($im->errstr, $errqr, "check error message");
+  $im->_set_error("");
+  ok(!$im->write(data => \$data, type => "jpeg", jpeg_sample => "1x5"),
+     "V out of range");
+  like($im->errstr, $errqr, "check error message");
+  $im->_set_error("");
+  ok(!$im->write(data => \$data, type => "jpeg", jpeg_sample => "1x5."),
+     "non-comma/eof after V");
+  like($im->errstr, $errqr, "check error message");
+  $im->_set_error("");
+  ok(!$im->write(data => \$data, type => "jpeg", jpeg_sample => "1y1"),
+     "non X between H and V");
+  like($im->errstr, $errqr, "check error message");
+  $im->_set_error("");
+  ok(!$im->write(data => \$data, type => "jpeg", jpeg_sample => "1x1,"),
+     "orphan comma at end");
+  like($im->errstr, $errqr, "check error message");
+  $im->_set_error("");
+}
+
+my @bool_tags =
+  qw(jpeg_optimize_scans jpeg_trellis_quant jpeg_trellis_quant_dc
+     jpeg_tresllis_eob_opt jpeg_use_lambda_weight_tbl jpeg_use_scans_in_trellis
+     jpeg_overshoot_deringing);
+
+my @float_tags =
+  qw(jpeg_lambda_log_scale1 jpeg_lambda_log_scale2 jpeg_trellis_delta_dc_weight);
+
+my @int_tags =
+  qw(jpeg_trellis_freq_split jpeg_trellis_num_loops jpeg_base_quant_tbl_idx
+     jpeg_dc_scan_opt_mode);
+SKIP:
+{
+  Imager::File::JPEG->is_mozjpeg
+      or skip "These tags are mozjpeg only", 1;
+
+  # boolean tags
+  for my $tag (@bool_tags) {
+    my $im = test_image();
+    my $data;
+    ok($im->write(data => \$data, type => "jpeg", $tag => 0),
+       "write with boolean tag $tag");
+  }
+  # float tags
+  for my $tag (@float_tags) {
+    my $im = test_image();
+    my $data;
+    ok($im->write(data => \$data, type => "jpeg", $tag => 8.1),
+       "write with float tag $tag");
+  }
+  # int tags
+  for my $tag (@int_tags) {
+    my $im = test_image();
+    my $data;
+    ok($im->write(data => \$data, type => "jpeg", $tag => 2),
+       "write with int tag $tag");
+  }
+}
+
+SKIP:
+{
+  Imager::File::JPEG->is_mozjpeg
+      and skip "Testing absence of mozjpeg", 1;
+
+  # none of these tags should be settable
+  # boolean tags
+  for my $tag (@bool_tags) {
+    my $im = test_image();
+    my $data;
+    ok(!$im->write(data => \$data, type => "jpeg", $tag => 0),
+       "fail write with boolean tag $tag");
+  }
+  # float tags
+  for my $tag (@float_tags) {
+    my $im = test_image();
+    my $data;
+    ok(!$im->write(data => \$data, type => "jpeg", $tag => 8.1),
+       "fail write with float tag $tag");
+  }
+  # int tags
+  for my $tag (@int_tags) {
+    my $im = test_image();
+    my $data;
+    ok(!$im->write(data => \$data, type => "jpeg", $tag => 2),
+       "fail write with int tag $tag");
+  }
+}
+
+SKIP:
+{
+  Imager::File::JPEG->is_mozjpeg
+      or skip "jpeg_tune needs mozjpeg", 1;
+  for my $tune (qw(psnr ssim ms-ssim hvs-psnr)) {
+    my $data;
+    my $im = test_image;
+    ok($im->write(data => \$data, type => "jpeg", jpeg_tune => $tune),
+       "jpeg_tune=$tune");
+    note "size ".length $data;
+  }
+  {
+    my $data;
+    my $im = test_image;
+    ok(!$im->write(data => \$data, type => "jpeg", jpeg_tune => "rubbish"),
+       "fail jpeg_tune=rubbish");
+  }
+}
+
+SKIP:
+{
+  Imager::File::JPEG->is_mozjpeg
+      and skip "testing absence of mozjpeg", 1;
+  for my $tune (qw(psnr ssim ms-ssim hvs-psnr)) {
+    my $data;
+    my $im = test_image;
+    ok(!$im->write(data => \$data, type => "jpeg", jpeg_tune => $tune),
+       "fail jpeg_tune=$tune");
+    note "size ".length $data;
+  }
+}
+
 { # check close failures are handled correctly
   my $im = test_image();
   my $fail_close = sub {
@@ -469,3 +739,5 @@ SKIP:
     like($im->errstr, qr/synthetic close failure/,
 	 "check error message");
 }
+
+done_testing();

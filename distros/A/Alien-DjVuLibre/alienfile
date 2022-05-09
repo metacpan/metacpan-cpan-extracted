@@ -1,0 +1,48 @@
+use alienfile;
+
+plugin 'PkgConfig' => 'ddjvuapi';
+
+share {
+	requires 'ExtUtils::CppGuess';
+	plugin 'Decode::SourceForge';
+	start_url 'https://sourceforge.net/projects/djvu/files/DjVuLibre/3.5.28/';
+	plugin 'Download' => (
+		filter => qr/^djvulibre-[0-9\.]+\.tar\.gz$/,
+		version => qr/^djvulibre-([0-9\.]+)\.tar\.gz$/,
+	);
+	plugin 'Extract' => 'tar.gz';
+	plugin 'Build::Autoconf';
+	build [
+		'%{configure} --disable-xmltools --disable-desktopfiles --enable-shared --enable-static',
+		'%{make}',
+		'%{make} install',
+	];
+	after gather => sub {
+		my ($build) = @_;
+
+		my @extra_compiler_flags;
+
+		if( $^O eq 'MSWin32' ) {
+			# possibly only needed for MinGW
+			push @extra_compiler_flags, qw(-DDDJVUAPI_EXPORT -DMINILISPAPI_EXPORT);
+		}
+
+		my @extra_linker_flags;
+
+		push @extra_linker_flags, ExtUtils::CppGuess->new->linker_flags;
+
+		if( $^O eq 'darwin' ) {
+			push @extra_linker_flags, qw(-framework CoreFoundation);
+		}
+
+		for my $type ('', '_static') {
+			$build->runtime_prop->{"cflags$type"} = join ' ',
+				$build->runtime_prop->{"cflags$type"},
+				@extra_compiler_flags;
+			$build->runtime_prop->{"libs$type"}   = join ' ',
+				$build->runtime_prop->{"libs$type"},
+				@extra_linker_flags;
+		}
+	};
+	plugin 'Gather::IsolateDynamic';
+};

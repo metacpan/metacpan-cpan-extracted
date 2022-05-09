@@ -1,3 +1,44 @@
+0.017   2022-05-08  Released-By: PERLANCAR; Urgency: medium
+
+	- [cli downsize-image] Tweak regex to recognize previously
+	  downsized image.
+
+
+0.016   2022-05-08  Released-By: PERLANCAR; Urgency: medium
+
+        [cli downsize-image]
+
+	- [bugfix] In dry-run mode, operation was
+	  assumed failure.
+
+	- [ux] By default skip previously downsized filenames (to force, use
+          --no-skip-downsized) and WhatsApp images (to force, use
+          --no-skip-whatsapp).
+
+	- Make -q have a long option name: --quality.
+
+
+0.015   2022-05-06  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [ux] [logging] Tweak level of delete message from trace -> info.
+
+
+0.014   2022-05-06  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] --1526 & --2048 were not flag and ate an extra argument.
+
+	- [cli downsize-image] Add option --trash-original (-T) as an
+	  alternative to --delete-original (-D).
+
+
+0.013   2022-05-06  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] [cli downsize-image] Add shortcut options --1536 and --2048
+	  for --downsize-to=1536, --downsize-to=2048, respectively.
+
+
 0.012   2022-02-10  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

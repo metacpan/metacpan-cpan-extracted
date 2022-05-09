@@ -1,3 +1,6 @@
+0.08 2022-05-04T15:01:23+02:00
+ - Fix test on Windows.
+
 0.07 2022-05-03T11:41:09+02:00
  - Improve SEE ALSO section in doc of cpan-get tool.
 

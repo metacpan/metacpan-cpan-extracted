@@ -1,5 +1,5 @@
 ---
-abstract: 'Input validator implementation centered around Type::Tiny'
+abstract: 'Input validator centered around Type::Tiny'
 author:
   - 'Bartosz Jarzyna <bbrtj.pro@gmail.com>'
 build_requires:
@@ -30,5 +30,5 @@ resources:
   homepage: https://bbrtj.eu/project/form-tiny
   license: https://dev.perl.org/licenses
   repository: https://github.com/bbrtj/perl-form-tiny.git
-version: '2.09'
+version: '2.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

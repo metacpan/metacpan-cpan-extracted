@@ -60,7 +60,7 @@ extern int SPVM_yydebug;
     MUTABLE = 270,
     DESCRIPTOR = 271,
     MAKE_READ_ONLY = 272,
-    IMPLEMENT = 273,
+    INTERFACE = 273,
     IF = 274,
     UNLESS = 275,
     ELSIF = 276,
@@ -151,7 +151,7 @@ extern int SPVM_yydebug;
     NEW_STRING_LEN = 361,
     IS_READ_ONLY = 362,
     COPY = 363,
-    HAS_IMPLEMENT = 364,
+    HAS_IMPL = 364,
     INC = 365,
     DEC = 366,
     ARROW = 367

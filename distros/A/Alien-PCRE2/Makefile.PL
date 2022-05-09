@@ -2,25 +2,10 @@
 
 use strict;
 use warnings;
-our $VERSION = 0.018_000;
+our $VERSION = 0.030_000;
 
 use ExtUtils::MakeMaker;
 use Alien::Build::MM;
-
-BEGIN { 
-    use Config;
-    use English qw(-no_match_vars);  # for $OSNAME
-}
-
-# MS Windows OS, fix read-only blib/lib directory & enable GNU configure/make
-my $configure_requires_windows = {};
-if ( $OSNAME eq 'MSWin32' ) {
-    push( @ExtUtils::MakeMaker::Overridable, qw(pm_to_blib) );
-    $configure_requires_windows = {
-        'Alien::MSYS'  => '0.08',
-        'Alien::gmake' => '0.20',
-    };
-}
 
 my $abmm = Alien::Build::MM->new;
 
@@ -33,14 +18,33 @@ WriteMakefile($abmm->mm_args(
     LICENSE          => 'perl_5',
 #    EXE_FILES        => ['bin/pcre2-config', 'bin/pcre2grep', 'bin/pcre2test'],  # error, no rule to make target 'bin/pcre2grep'
 
-    CONFIGURE_REQUIRES => {
-        'IO::Socket::SSL'       => '2.043',
-        'Alien::Build'          => '0.66',  # provides Alien::Build::MM
-        %{$configure_requires_windows}
+    'BUILD_REQUIRES' => {
+        'Alien::Build'          => '0.32',
+        'Alien::Build::MM'      => '0.32',
+        'ExtUtils::MakeMaker'   => '6.52'
     },
-
-    PREREQ_PM => {
-        'Test2::Suite'          => '0.000072',  # provides Test2::V0
+    'CONFIGURE_REQUIRES' => {
+        'Alien::Build'          => '1.40',
+        'Alien::Build::MM'      => '0.32',
+        'ExtUtils::MakeMaker'   => '6.52'
+    },
+    'PREREQ_PM' => {
+        'Alien::Base'           => '0.038',
+        'base'                  => 0,
+        'strict'                => 0,
+        'warnings'              => 0
+    },
+    TEST_REQUIRES => {
+        'Capture::Tiny'         => 0,
+        'Data::Dumper'          => 0,
+        'English'               => 0,
+        'Env'                   => 0,
+        'File::Spec'            => 0,
+        'IPC::Cmd'              => 0,
+        'Test2::V0'             => 0,
+        'Test::Alien'           => 0,
+        'Test::Alien::Diag'     => 0,
+        'Test::More'            => 0,
     },
 
     META_MERGE => {
@@ -68,24 +72,14 @@ WriteMakefile($abmm->mm_args(
     },
 ));
 
-
-package MY;
-BEGIN { use English; }
-
-sub postamble {
-    $abmm->mm_postamble;
-}
-
-sub pm_to_blib {
-    my $self = shift;
-    my $blib = $self->SUPER::pm_to_blib(@_);
-
-    # un-read-only blib/lib for tests to pass, files are modified at runtime there
-    if ( $OSNAME eq 'MSWin32' ) {
-        my ( $lastline, $start ) = qq{\t\$(NOECHO) \$(TOUCH) pm_to_blib\n};
-        ( $start = index( $blib, $lastline ) ) == -1
-            && die "Can't find replacement string for pm_to_blib target";
-        substr( $blib, $start, 0, "\t" . 'attrib -R /S  blib/lib/*' . "\n" );
-    }
-    return $blib;
+{ package
+    MY;
+  sub postamble {
+    $abmm->mm_postamble(@_);
+  }
+  sub install {
+    $abmm->can('mm_install')
+      ? $abmm->mm_install(@_)
+      : shift->SUPER::install(@_);
+  }
 }

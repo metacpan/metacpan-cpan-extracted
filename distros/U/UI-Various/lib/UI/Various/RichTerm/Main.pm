@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use Term::ReadLine;
 

@@ -26,3 +26,4 @@ ebay-official-time.pl
 ebay-revise-item.pl
 ebay-search.pl
 ebay-validate-test-user.pl
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,3 +1,7 @@
+1.18 2022-05-05
+    - Fix t/strict.t on Windows for CPAN testers.
+    - Add diagnostic code to t/syntax-lib.t.
+
 1.17 2022-05-01
     - Add diagnostic code to find failures at CPAN testers.
     - On sigterm ospfview kills dot process and exits gracefully.

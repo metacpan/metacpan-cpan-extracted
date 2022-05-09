@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use UI::Various::core;
 use UI::Various::Radio;
@@ -90,7 +90,7 @@ sub _prepare($$)
 	my ($_w, $_h) =
 	    $self->_size($self->{_button_values}[$_], $content_width);
 	$w > $_w  or  $w = $_w;
-	$h > $_h  or  $h = $_h;
+	$h += $_h;
     }
     return ($w, $h);
 }
@@ -139,8 +139,8 @@ sub _show($$$$)
     my @text = ();
     foreach my $i (0..$#{$self->{_button_keys}})
     {
-	local $_ = ($i == 0 ? $prefix : $blank) . '(';
-	$_ .= ($var  eq  $self->{_button_keys}[$i] ? 'o' : ' ') . ') ';
+	local $_ = ($i == 0 ? $prefix : $blank) . $D{RL};
+	$_ .= ($var  eq  $self->{_button_keys}[$i] ? 'o' : ' ') . $D{RR} . ' ';
 	push @text, $self->_format($_, '', '', $self->{_button_values}[$i],
 				   '', '', $width, 0);
     }

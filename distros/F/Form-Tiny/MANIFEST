@@ -60,6 +60,8 @@ t/250-messages.t
 t/251-form-messages.t
 t/260-additional-validators.t
 t/270-consistent-api.t
+t/280-blueprint.t
+t/281-dynamic-blueprint.t
 t/800-inheritance/010-simple.t
 t/800-inheritance/020-plugins.t
 t/900-plugins/010-subroutine.t
@@ -81,5 +83,6 @@ t/lib/TestInnerForm.pm
 xt/01-object-pad.t
 xt/02-bless.t
 xt/03-autoclean.t
+
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

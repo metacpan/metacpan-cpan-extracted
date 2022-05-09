@@ -40,7 +40,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use UI::Various::core;
 
@@ -124,7 +124,7 @@ sub _cleanup($)
     # order to ease the internal cleanup for L<Curses::UI> itself.  The
     # later is initiated by explicitly removing each element:
     local $_;
-    if ($self->can('remove'))
+    if ($self->can('remove')  and  $self->can('child'))
     {
 	while ($_ = $self->child)
 	{   $_->_cleanup;   }

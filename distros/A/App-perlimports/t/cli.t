@@ -5,11 +5,26 @@ use lib 'test-data/lib', 't/lib';
 
 use App::perlimports::CLI ();
 use Capture::Tiny qw( capture );
+use File::pushd qw( pushd );
 use Path::Tiny ();
 use TestHelper qw( logger );
 use Test::Differences qw( eq_or_diff );
-use Test::More import => [qw( diag done_testing is ok subtest )];
+use Test::More import => [qw( diag done_testing is like ok subtest )];
 use Test::Needs qw( Perl::Critic::Utils );
+
+# Emulate a user with no config file in the current dir and no config file in
+# $ENV{XDG_CONFIG_HOME}
+subtest 'no config file' => sub {
+    my $dir = Path::Tiny->tempdir("testconfigXXXXXXXX");
+    local $ENV{XDG_CONFIG_HOME} = "$dir";
+    local @ARGV = ('--version');
+
+    my $pushd = pushd("$dir");
+
+    my $cli = App::perlimports::CLI->new;
+    my ($stdout) = capture { $cli->run };
+    like( $stdout, qr{$App::perlimports::CLI::VERSION}, 'parses filename' );
+};
 
 subtest '--filename' => sub {
     my $expected = <<'EOF';
@@ -23,7 +38,10 @@ my %foo = (
 );
 EOF
 
-    local @ARGV = ( '-f', 'test-data/var-in-hash-key.pl', );
+    local @ARGV = (
+        '--no-config-file',
+        '-f' => 'test-data/var-in-hash-key.pl',
+    );
     my $cli = App::perlimports::CLI->new( logger => logger( [] ) );
     my ($stdout) = capture {
         $cli->run;
@@ -45,9 +63,10 @@ EOF
 
     my $file = Path::Tiny->tempfile;
     local @ARGV = (
-        '-f',             'test-data/var-in-hash-key.pl',
-        '--log-filename', $file,
-        '--log-level',    'info',
+        '-f'             => 'test-data/var-in-hash-key.pl',
+        '--log-filename' => "$file",
+        '--log-level'    => 'info',
+        '--no-config-file',
     );
     my $cli = App::perlimports::CLI->new;
     my ($stdout) = capture {
@@ -71,15 +90,12 @@ my %foo = (
 EOF
 
     local @ARGV = (
-        '--ignore-modules',
-        'Perl::Critic::Utils',
-        '-f',
-        'test-data/var-in-hash-key.pl',
+        '--no-config-file',
+        '--ignore-modules' => 'Perl::Critic::Utils',
+        '-f'               => 'test-data/var-in-hash-key.pl',
     );
     my $cli = App::perlimports::CLI->new;
-    my ($stdout) = capture {
-        $cli->run;
-    };
+    my ($stdout) = capture { $cli->run };
     is( $stdout, $expected, );
 };
 
@@ -96,15 +112,12 @@ my %foo = (
 EOF
 
     local @ARGV = (
-        '--ignore-modules-pattern',
-        '^Perl::.*',
-        '-f',
-        'test-data/var-in-hash-key.pl',
+        '--no-config-file',
+        '--ignore-modules-pattern' => '^Perl::.*',
+        '-f'                       => 'test-data/var-in-hash-key.pl',
     );
     my $cli = App::perlimports::CLI->new;
-    my ($stdout) = capture {
-        $cli->run;
-    };
+    my ($stdout) = capture { $cli->run };
     is( $stdout, $expected, );
 };
 
@@ -121,15 +134,12 @@ my %foo = (
 EOF
 
     local @ARGV = (
-        '--never-export-modules',
-        'Perl::Critic::Utils',
-        '-f',
-        'test-data/var-in-hash-key.pl',
+        '--no-config-file',
+        '--never-export-modules' => 'Perl::Critic::Utils',
+        '-f'                     => 'test-data/var-in-hash-key.pl',
     );
     my $cli = App::perlimports::CLI->new;
-    my ($stdout) = capture {
-        $cli->run;
-    };
+    my ($stdout) = capture { $cli->run };
     is( $stdout, $expected );
 };
 
@@ -145,11 +155,13 @@ my %foo = (
 );
 EOF
 
-    local @ARGV = ( '--no-padding', '-f', 'test-data/var-in-hash-key.pl', );
+    local @ARGV = (
+        '--no-config-file',
+        '--no-padding',
+        '-f' => 'test-data/var-in-hash-key.pl',
+    );
     my $cli = App::perlimports::CLI->new;
-    my ( $stdout, $stderr ) = capture {
-        $cli->run;
-    };
+    my ( $stdout, $stderr ) = capture { $cli->run };
     is( $stdout, $expected );
 };
 
@@ -165,11 +177,13 @@ BEGIN {
 }
 EOF
 
-    local @ARGV = ( '--libs', 'test-data/lib', '-f', 'test-data/stdout.pl', );
+    local @ARGV = (
+        '--no-config-file',
+        '--libs' => 'test-data/lib',
+        '-f'     => 'test-data/stdout.pl',
+    );
     my $cli = App::perlimports::CLI->new;
-    my ( $stdout, $stderr ) = capture {
-        $cli->run;
-    };
+    my ( $stdout, $stderr ) = capture { $cli->run };
 
     eq_or_diff( $stdout, $expected );
     diag $stderr;

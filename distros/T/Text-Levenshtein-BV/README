@@ -89,6 +89,10 @@ REFERENCES
     approximate string matching. In Proc. 13th Combinatorial Pattern
     Matching (CPM 2002), LNCS 2373, pages 203–224, 2002.
 
+    [Myers99] Myers, Gene. A fast bit-vector algorithm for approximate
+    string matching based on dynamic progamming. Journal of the ACM,
+    46(3):395–415, 1999.
+
 SEE ALSO
 
     Text::Levenshtein
@@ -103,7 +107,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    Copyright 2016-2021 by Helmut Wollmersdorfer
+    Copyright 2016-2022 by Helmut Wollmersdorfer
 
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

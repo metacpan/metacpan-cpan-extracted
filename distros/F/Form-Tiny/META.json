@@ -1,5 +1,5 @@
 {
-   "abstract" : "Input validator implementation centered around Type::Tiny",
+   "abstract" : "Input validator centered around Type::Tiny",
    "author" : [
       "Bartosz Jarzyna <bbrtj.pro@gmail.com>"
    ],
@@ -61,6 +61,6 @@
          "web" : "https://github.com/bbrtj/perl-form-tiny"
       }
    },
-   "version" : "2.09",
+   "version" : "2.12",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

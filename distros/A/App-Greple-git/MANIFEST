@@ -4,6 +4,10 @@ LICENSE
 META.json
 README.md
 cpanfile
+images/git-blame-label-small.jpg
+images/git-blame-label-small.png
+images/git-blame-label.png
+images/git-blame-small.jpg
 images/git-blame-small.png
 images/git-blame.png
 lib/App/Greple/git.pm

@@ -15,6 +15,7 @@ Alders'
 Annotations
 App
 CLI
+Config
 Document
 ExportInspector
 Include

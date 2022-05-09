@@ -9,6 +9,7 @@ eval { require Time::HiRes };
 # running the default emulator of Signals::XSIG should produce the
 # same behavior as not using Signals::XSIG
 # t/20b: signals that usually suspend or resume a process
+#
 
 require "t/20-defaults.tt";
 

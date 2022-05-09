@@ -1,3 +1,9 @@
+0.026   2022-05-08  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] In generated Synopsis, helpfully refer to the EXAMPLES
+	  section if CLI has examples.
+
+
 0.025   2021-08-22  Released-By: PERLANCAR; Urgency: medium
 
 	- Remove superfluous paragraph 'Examples:' in the EXAMPLES section.

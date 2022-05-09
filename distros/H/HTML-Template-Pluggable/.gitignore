@@ -1,0 +1,14 @@
+blib*
+MANIFEST*
+META*
+Makefile*
+Makefile.old
+Build
+_build*
+pm_to_blib*
+*.tar.gz
+.lwpcookies
+HTML-Template-*
+cover_db
+.git*
+

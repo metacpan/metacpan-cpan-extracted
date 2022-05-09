@@ -15,7 +15,7 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(%DEFAULT_BEHAVIOR);
 
 our %DEFAULT_BEHAVIOR;
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 my @snam = split ' ', $Config{sig_name};
 my @snum = split ' ', $Config{sig_num};
@@ -45,6 +45,10 @@ sub import {
 		$DEFAULT_BEHAVIOR{$sig} = $behavior;
 	    }
 	}
+    }
+    if ($ENV{SIGNALS_XSIG_DUMP}) {
+	use Data::Dumper;
+	print STDERR Dumper(\%DEFAULT_BEHAVIOR),"\n";
     }
     return;
 }
@@ -150,7 +154,7 @@ sub killprog_with_signal {
     kill $sig, $$;
     sleep 1 if $^O eq 'MSWin32';
 
-    my $miniprog = q[$SIG{'__SIGNAL__'}='DEFAULT';
+    my $miniprog = q[$SIG{'__SIGNAL__'}='DEFAULT';sleep 4;
                      kill '__SIGNAL__',$$;sleep 1+"MSWin32"eq$^O;die];
     $miniprog =~ s/__SIGNAL__/$sig/g;
     exec($^X, "-e", $miniprog);
@@ -197,7 +201,7 @@ sub default_SIG__DIE__ {          ## no critic (Unpacking)
 
 =head1 NAME
 
-Signals::XSIG::Default
+Signals::XSIG::Default - enumerate/implement default unhandled signal behavior
 
 =head1 DESCRIPTION
 
@@ -289,15 +293,15 @@ __DIE__ [] => IGNORE
 __WARN__ [] => IGNORE
 
 [linux]
-ABRT    [6] => TERMINATE 6
+ABRT    [6] => TERMINATE
 ALRM    [14] => TERMINATE 14
 BUS     [7] => TERMINATE 7
 CHLD    [17] => IGNORE
 CLD     [17] => IGNORE
 CONT    [18] => IGNORE
-FPE     [8] => TERMINATE 8
+FPE     [8] => TERMINATE
 HUP     [1] => TERMINATE 1
-ILL     [4] => TERMINATE 4
+ILL     [4] => TERMINATE
 INT     [2] => TERMINATE 2
 IO      [29] => TERMINATE 29
 IOT     [6] => TERMINATE 6
@@ -310,12 +314,12 @@ PWR     [30] => TERMINATE 30
 QUIT    [3] => TERMINATE 3
 RTMAX   [64] => TERMINATE 64
 RTMIN   [34] => TERMINATE 34
-SEGV    [11] => TERMINATE 11
+SEGV    [11] => TERMINATE
 STKFLT  [16] => TERMINATE 16
 STOP    [19] => SUSPEND
-SYS     [31] => TERMINATE 31
+SYS     [31] => TERMINATE
 TERM    [15] => TERMINATE 15
-TRAP    [5] => TERMINATE 5
+TRAP    [5] => TERMINATE
 TSTP    [20] => SUSPEND
 TTIN    [21] => SUSPEND
 TTOU    [22] => SUSPEND
@@ -326,7 +330,7 @@ USR2    [12] => TERMINATE 12
 VTALRM  [26] => TERMINATE 26
 WINCH   [28] => IGNORE
 XCPU    [24] => TERMINATE 24
-XFSZ    [25] => TERMINATE 25
+XFSZ    [25] => TERMINATE
 ZERO    [0] => IGNORE
 __DIE__ [] => IGNORE
 __WARN__ [] => IGNORE
@@ -510,3 +514,6 @@ XRES    [38] => IGNORE
 ZERO    [] => IGNORE
 __DIE__ [] => IGNORE
 __WARN__ [] => IGNORE
+
+[haiku]
+SEGV    [11] => TERMINATE 11

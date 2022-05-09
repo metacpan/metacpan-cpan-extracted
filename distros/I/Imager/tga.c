@@ -555,7 +555,7 @@ tga_palette_read(io_glue *ig, i_img *img, int bytepp, int colourmaplength) {
   unsigned char *palbuf;
   i_color val;
 
-  palbsize = colourmaplength*bytepp;
+  palbsize = (size_t)colourmaplength * bytepp;
   palbuf   = mymalloc(palbsize);
   
   if (i_io_read(ig, palbuf, palbsize) != palbsize) {
@@ -844,7 +844,7 @@ i_writetga_wiol(i_img *img, io_glue *ig, int wierdpack, int compress, char *idst
 
   mm_log((1,"i_writetga_wiol(img %p, ig %p, idstring %p, idlen %ld, wierdpack %d, compress %d)\n",
 	  img, ig, idstring, (long)idlen, wierdpack, compress));
-  mm_log((1, "virtual %d, paletted %d\n", img->virtual, mapped));
+  mm_log((1, "virtual %d, paletted %d\n", i_img_virtual(img), mapped));
   mm_log((1, "channels %d\n", img->channels));
   
   i_clear_error();
@@ -918,7 +918,7 @@ i_writetga_wiol(i_img *img, io_glue *ig, int wierdpack, int compress, char *idst
   if (img->type == i_palette_type) {
     if (!tga_palette_write(ig, img, bitspp, i_colorcount(img))) return 0;
     
-    if (!img->virtual && !dest.compressed) {
+    if (!i_img_virtual(img) && !dest.compressed) {
       if (i_io_write(ig, img->idata, img->bytes) != img->bytes) {
 	i_push_error(errno, "could not write targa image data");
 	return 0;

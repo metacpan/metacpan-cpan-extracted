@@ -1,5 +1,9 @@
 Revision history for Perl extension TAP::Formatter::JUnit.
 
+0.15      2022-05-06 11:45:06-07:00 America/Vancouver
+    - Use "version.pm" to compare version numbers, in "t/formatter.t".
+      Addresses some CPANTester failures.
+
 0.14      2022-04-30 12:36:14-07:00 America/Vancouver
     - Update "t/formatter.t" to accommodate fixes made in Test::Harness v3.44
       (most specifically w.r.t. the "bailout" test).  david-dot-krupicka++

@@ -29,7 +29,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.201';
+our $VERSION = '1.202';
 
 use Quiq::FileHandle;
 use Encode ();
@@ -98,15 +98,23 @@ Inhalt der E-Mail.
 
 =over 4
 
+=item -contentType => $contentType (Default: 'text/plain')
+
+Content-Type von $subject und $body. Wenn leer, wird
+kein Content-Type-Header gesetzt.
+
 =item -encoding => $charset (Default: 'utf-8')
 
 Encoding von $subject und $body. Wenn leer, wird vor dem Senden
 encode() nicht auf $subject und $body angewendet.
 
-=item -contentType => $contentType (Default: 'text/plain')
+=item -from => $address
 
-Content-Type von $subject und $body. Wenn leer, wird
-kein Content-Type-Header gesetzt.
+Absender, z.B. 'Frank Seitz <fs@fseitz.de>'.
+
+=item -replyTo => $address
+
+Reply-To Adresse.
 
 =back
 
@@ -126,11 +134,13 @@ sub send {
 
     my $contentType = 'text/plain';
     my $encoding = 'utf-8';
+    my $from = undef;
     my $replyTo = undef;
 
     my $optA = $this->parameters(\@_,
         -contentType => \$contentType,
         -encoding => \$encoding,
+        -from => $from,
         -replyTo => \$replyTo,
     );
     
@@ -142,6 +152,9 @@ sub send {
     }
 
     my $fh = Quiq::FileHandle->new('|-','/usr/sbin/sendmail -t');
+    if ($from) {
+        $fh->print("From: $from\n");
+    }
     $fh->print("To: $to\n");
     if ($replyTo) {
         $fh->print("Reply-To: $replyTo\n");
@@ -163,7 +176,7 @@ sub send {
 
 =head1 VERSION
 
-1.201
+1.202
 
 =head1 AUTHOR
 

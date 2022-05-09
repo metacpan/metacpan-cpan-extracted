@@ -1,9 +1,142 @@
 ==================================================
-Changes from 1742-04-22 00:00:00 +0000 to present.
+Changes from 1748-07-21 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.023 at 2016-02-04 02:00:59 +0000
+version 0.024 at 2022-05-05 03:51:48 +0000
+------------------------------------------
+
+  Change: 6139d1f2daca5f12f8a82ab58c5562c446708b3f
+  Author: Zaki Mughal [sivoais] <zaki.mughal@gmail.com>
+  Date : 2022-05-04 23:49:14 +0000
+
+    Merge pull request #21 from PerlAlien/no-bins-on-system
+
+    Do not install bins on system install 
+
+  Change: 2072ceca0f7989d1c8b312e7be04138323d9b98a
+  Author: Zakariyya Mughal <zaki.mughal@gmail.com>
+  Date : 2022-05-04 23:13:25 +0000
+
+    Only use custom Module::Build if bins property set
+
+    Document this case and throw error if not possible to combine custom
+    `mb_class` with `bins`. 
+
+  Change: c0dd002d55317d86d53d023f695ae10d23bc2ba9
+  Author: Zakariyya Mughal <zaki.mughal@gmail.com>
+  Date : 2022-05-03 07:33:22 +0000
+
+    Die if wrapper exists in non-share install 
+
+  Change: 54b69d670df7318f9a8d456e96a95ea126fe86e1
+  Author: Zakariyya Mughal <zaki.mughal@gmail.com>
+  Date : 2022-05-03 06:47:46 +0000
+
+    Add test of bin wrappers for system and share 
+
+  Change: bb734492ebdbadf1f2ea5aa9f583d2d4e67b5b80
+  Author: Zakariyya Mughal <zaki.mughal@gmail.com>
+  Date : 2022-05-02 11:06:43 +0000
+
+    Do not install bins wrappers on system install 
+
+  Change: bea4cc8a4af2a331ed15091a7f742fef523aec86
+  Author: Wouter Verhelst <w@uter.be>
+  Date : 2022-05-02 11:06:43 +0000
+
+    Don't break system utilities on use of bins property
+
+    When alien_version_check is set, we may end up depending on the
+    system-installed version of the built package. In that case, the
+    absolute path in the dist_dir won't be available, and the binaries
+    fail to work.
+
+    Check for that using the ConfigData package, and use the binary in
+    /usr/bin directlry, assuming it's installed there. 
+
+  Change: a37139afac2ca9326d979cd65d2111cb95c026fd
+  Author: Zaki Mughal [sivoais] <zaki.mughal@gmail.com>
+  Date : 2022-05-02 10:56:57 +0000
+
+    Merge pull request #20 from PerlAlien/gha-ci
+
+    Add initial GitHub Actions workflow 
+
+  Change: 1aba448caa966ceb04ccfd226309efed63c033b7
+  Author: Zakariyya Mughal <zaki.mughal@gmail.com>
+  Date : 2022-05-02 10:40:23 +0000
+
+    GHA: Add AUTHOR_TESTING 
+
+  Change: a8faa2d685efacf49511efa8b871cf693400f7e8
+  Author: Zakariyya Mughal <zaki.mughal@gmail.com>
+  Date : 2022-05-02 10:26:40 +0000
+
+    Add initial GitHub Actions workflow 
+
+  Change: 2ce044580f52636218a8ef8aac63a58bdd4e2eb5
+  Author: Grahamâï¸âï¸ <plicease@cpan.org>
+  Date : 2022-03-23 18:20:36 +0000
+
+    Merge pull request #19 from PerlAlien/graham/gh-issue
+
+    use GitHub issues for bug tracker 
+
+  Change: 7ba63e2af2dd9ae36bb2bd234bf664c9c962a319
+  Author: Graham Ollis <plicease@cpan.org>
+  Date : 2022-03-23 18:19:52 +0000
+
+    use GitHub issues for bug tracker 
+
+  Change: aa949567ae60c42fb670c725b8d01acd5871e1b3
+  Author: Grahamâï¸âï¸ <plicease@cpan.org>
+  Date : 2022-03-23 18:15:07 +0000
+
+    Merge pull request #18 from PerlAlien/graham/updates
+
+    disable travis-ci; use main as release branch 
+
+  Change: 6ff149ba4eac6064163183c773478bdbc2e21ada
+  Author: Graham Ollis <plicease@cpan.org>
+  Date : 2022-03-23 18:12:28 +0000
+
+    disable travis-ci; use main as release branch 
+
+  Change: d51b40f25bba9f8bde65dd467f276721a8500c72
+  Author: Zaki Mughal [sivoais] <zaki.mughal@gmail.com>
+  Date : 2022-03-10 12:45:28 +0000
+
+    Merge pull request #17 from PerlAlien/graham/note-alien-build
+
+    more strongly encourage the use of [AlienBuild] 
+
+  Change: 528ab3967951bdee1f7a639838a3dce137b4188f
+  Author: Graham Ollis <plicease@cpan.org>
+  Date : 2022-03-10 10:28:33 +0000
+
+    more strongly encourage the use of [AlienBuild] 
+
+  Change: 13d09c77d1326884a2f0999aa303354ae643ad82
+  Author: Graham Ollis <plicease@cpan.org>
+  Date : 2017-03-28 10:07:11 +0000
+
+    Document modern alternatives
+
+    including
+
+    - Alien::Build + alienfile
+
+    - Dist::Zilla::Plugin::AlienBuild 
+
+  Change: a8dd63fe4eb60097783f907ad8a047855cdd8cd6
+  Author: Graham Ollis <plicease@cpan.org>
+  Date : 2017-03-28 10:02:16 +0000
+
+    update perl versions tested by travis 
+
+------------------------------------------
+version 0.023 at 2016-01-31 14:32:01 +0000
 ------------------------------------------
 
   Change: 11c11b26925d8fe803d7e87431de4e50aa36be40

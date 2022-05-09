@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::IdElementReference 2.149;
+package Config::Model::IdElementReference 2.150;
 
 use Mouse;
 
@@ -190,7 +190,7 @@ Config::Model::IdElementReference - Refer to id element(s) and extract keys
 
 =head1 VERSION
 
-version 2.149
+version 2.150
 
 =head1 SYNOPSIS
 

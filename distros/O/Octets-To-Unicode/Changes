@@ -1,0 +1,10 @@
+Revision history for Perl extension Octets-To-Unicode
+
+0.03 2022-05-04T13:29:10Z
+
+	- Добавлена зависимость Perl::Tidy.
+
+0.02 2022-05-04T12:23:56Z
+
+    - Первая версия программы.
+

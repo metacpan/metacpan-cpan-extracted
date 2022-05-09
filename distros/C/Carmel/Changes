@@ -1,5 +1,57 @@
 Revision history for Carmel
 
+v0.1.51  2022-05-09 09:59:21 PDT
+        - Unified carmel update/pin and deprecated the pin command.
+        - carmel update now runs much faster if you already have the build artifacts for the new version.
+        - Improved the error message when carmel update conflicts with what's in cpanfile
+        - Work around a corner case where carmel update fails with bad NAME in MYMETA e.g. LWP (#51)
+
+v0.1.50  2022-05-09 00:23:17 PDT
+        - Fixed a bug where core modules in the snapshot can be ignored in the fist carmel install (#47)
+        - Carmel now automatically upgrades core modules specified in the snapshot if the version is
+          lower than what's in core, and cpanfile doesn't have any specific requirement. (#49)
+        - Speed up carmel install when all the required versions are in the artifacts
+
+v0.1.49  2022-05-08 11:47:37 PDT
+        - Speed up the artifacts search and snapshot generation with lazy-loading and JSON backend
+
+v0.1.48  2022-05-08 02:44:56 PDT
+        - Huge performance improvements for carmel update to avoid installation when there's no updates (#44)
+
+v0.1.47  2022-05-07 22:12:42 PDT
+        - Fix carmel package to not fetch from CPAN when cache is empty
+        - Internal refactoring of the code base
+
+v0.1.46  2022-05-07 14:10:39 PDT
+        - New command: carmel pin to pin a module version in the snapshot without pinning it in cpanfile (#39)
+        - Improve error message when a conflict is found
+        - Fix a bug where a distribution can appear multiple times when downgrading a distribution (#38)
+        - Make artifacts search always strict after install is done
+        - Improved documentation
+
+v0.1.45  2022-05-07 01:36:08 PDT
+        - Cleanup perl5 temporary library path to avoid missing artifacts when previous
+          installation was cancelled
+        - Add sort to stablize carmel env/export command outputs
+
+v0.1.44  2022-05-06 20:39:25 PDT
+        - Fix a bug where Module::Build::Tiny is not installed on the first run (#34)
+
+v0.1.43  2022-05-06 19:17:34 PDT
+        - Dropped support for perl 5.12
+        - Removed the experimental, undocumented binstubs command
+        - Fixed so carmel command exits with non-zero upon failures
+        - Fixed `carmel show Module` to work with sub-modules in a distribution
+
+v0.1.42  2022-05-06 17:02:09 PDT
+        - Documentation updates
+
+v0.1.41  2022-05-06 14:35:01 PDT
+        - Add support for carmel update Module
+
+v0.1.40  2022-05-06 01:51:17 PDT
+        - Remove the unnecessary pinning of versions restored from the snapshot (#33)
+
 v0.1.39  2022-02-12 21:20:22 PST
         - updated docs
 

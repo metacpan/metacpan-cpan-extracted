@@ -1,4 +1,4 @@
-requires 'Mojolicious', '5.73';
+requires 'Mojolicious', '9.25';
 requires 'Spreadsheet::WriteExcel::Simple', '1.04';
 
 on test => sub {

@@ -50,6 +50,14 @@ file.
 
 	print "Podcast ID=$podcastID\n";
 	
+	my $artist = $podcast->{'artist'};
+
+	print "Artist=$artist\n"  if ($artist);
+	
+	my $genre = $podcast->{'genre'};
+
+	print "Genre=$genre\n"  if ($genre);
+	
 	my $icon_url = $podcast->getIconURL();
 
 	if ($icon_url) {   #SAVE THE ICON TO A TEMP. FILE:
@@ -365,17 +373,17 @@ sub new
 	my $isEpisode;
 
 TRYIT:
-	if ($url2fetch =~ m#^([0-9]+)$#) {  #ASSUME EPISODE-ID AS BOTH PODCAST & EPISODE IDs ARE ALL NUMERIC!:
+	if ($url2fetch =~ m#^([0-9]+)$#) {  #ASSUME EPISODE-ID, AS BOTH PODCAST & EPISODE IDs ARE ALL NUMERIC!:
 		$self->{'id'} = $1;
 		$url2fetch = 'https://podcastaddict.com/episode/'.$self->{'id'};
 		$isEpisode = 1;
-	} elsif ($url2fetch =~ m#\/episode\/(\d+)\/?$#) {
+	} elsif ($url2fetch =~ m#\/episode\/(\d+)\/?$#) {  #SHORT EPISODE URL (ACTUAL ONE LOADED BY BROWSER)
 		$self->{'id'} = $1;
 		$isEpisode = 1;
-	} elsif ($url2fetch =~ m#\/episode\/https?#) {
+	} elsif ($url2fetch =~ m#\/episode\/https?#) {     #LONG EPISODE URL (ON PODCAST PAGES)
 		$self->{'id'} = '';
 		$isEpisode = 1;
-	} elsif ($url2fetch =~ m#\/podcast\/(\d+)\/?$#) {
+	} elsif ($url2fetch =~ m#\/podcast\/(\d+)\/?$#) {  #PODCAST URL
 		$self->{'id'} = $1;
 		$isEpisode = 0;
 	} else {
@@ -408,8 +416,6 @@ TRYIT:
 		}
 		$self->{'artist'} = $1  if ($html =~ m#name\=\"author\"\s+class\=\"[\w\-]+\"\s+value\=\"([^\"]+)#);
 		$self->{'album'} = $1  if ($html =~ m#\<meta\s+itemprop\=\"name\"\s+content\=\"([^\"]+)#s);
-		$self->{'year'} = $1  if ($html =~ m#\<i class\=\"fa fa\-calendar\"\>\<\/i\>.*?(\d\d\d\d)\<\/span\>#);
-		$self->{'description'} = $1  if ($html =~ m#\<meta\s+property\=\"og\:description\"\s+content\=\"([^\"]+)#);
 
 		#WE NEED TO EXTRACT 1ST EPISODE ID, BUT WHILST AT IT, GO AHEAD AND FETCH PLAYLIST DATA HERE TOO!:
 		my $ep1id = '';
@@ -421,6 +427,7 @@ TRYIT:
 
 				$ep1id ||= $streamURL;
 				$stream =~ s#\?utm_source=Podcast.*$##o;
+				$stream =~ s#[\?\&]from\=PodcastAddict$##o;
 				$stream =~ s#\.mp3\?.*$#\.mp3#o;
 				if ($html =~ m#\<h5\>(.+?)\<\/h5\>#o) {
 					my $title = $1;
@@ -439,9 +446,9 @@ TRYIT:
 		print STDERR "-----WE'RE AN EPISODE PAGE!\n"  if ($DEBUG);
 		if ($html =~ m#\<h1\>(.+?)\<\/h1\>#s) {
 			my $h1data = $1;
-			$self->{'id'} ||= $1  if ($h1data =~ m#\<a\s+href\=\"\/podcast\/(\d+)#s);
-			$self->{'articonurl'} ||= 'https://podcastaddict.com/cache/artwork/thumb/'.$1;
-			$self->{'albumartist'} = 'https://podcastaddict.com/podcast/'.$1;
+			$self->{'id'} ||= $1  if ($h1data =~ m#\<a\s+href\=\"\/podcast\/(\d+)#s);  #USE PODCAST'S ID FOR DEFAULT.
+			$self->{'articonurl'} ||= 'https://podcastaddict.com/cache/artwork/thumb/'.$self->{'id'};
+			$self->{'albumartist'} = 'https://podcastaddict.com/podcast/'.$self->{'id'};
 			#NOTE:  podcastaddict DOES NOT INCLUDE THE PODCAST ARTIST'S NAME IN EPISODE PAGES, SO WE 
 			#PUT THE PODCAST NAME IN THE ARTIST FIELD (WHICH WOULD NORMALLY GO IN THE ALBUM FIELD)!
 			#IF WE ALREADY HAVE (THE CORRECT) ARTIST & ALBUM FIELDS, IT MEANS WE FETCHED A PODCAST 
@@ -451,12 +458,20 @@ TRYIT:
 			$self->{'artist'} ||= $1  if ($h1data =~ m#\>(.+?)\<\/a\>#s);
 		}
 		$self->{'title'} = $1  if ($html =~ m#\<h4\>(.+?)\<\/h4\>#s);
+		if ($html =~ m#\<meta\s+property\=\"og\:url\"\s+content\=\"(http[^\"]+)#s) {
+		    my $epiShortURL = $1;
+			$self->{'album'} ||= $epiShortURL;  #SET ALBUM TO THE "SHORT EPISODE URL" B/C THE LONG ONE IS HIDIOUSLY LONG!
+			$self->{'id'} = $1  if ($epiShortURL =~ m#\/(\d+)\/?$#);  #WE FOUND THE PROPER EPISODE ID, SO USE THAT!
+		}
 		$self->{'imageurl'} = $1  if ($html =~ m#Artwork\"\s+src\=\"([^\"]+)#s);
 		$self->{'imageurl'} ||= $1  if ($html =~ m#\<meta\s+property\=\"og\:image\"\s+content\=\"([^\"]+)#);
 		$self->{'iconurl'} = $self->{'imageurl'};
 		$self->{'articonurl'} ||= $self->{'imageurl'};
-		$self->{'year'} = $1  if ($html =~ m#\<i class\=\"fa fa\-calendar\"\>\<\/i\>.*?(\d\d\d\d)\<\/span\>#);
-		$self->{'description'} = $1  if ($html =~ m#\<meta\s+property\=\"og\:description\"\s+content\=\"([^\"]+)#);
+		if ($html =~ m#\<i class\=\"fa fa\-calendar\"\>\<\/i\>(.*?)(\d\d\d\d)\<\/span\>#) {
+			($self->{'created'} = $1 . $2) =~ s/^\s+//;
+			$self->{'year'} = $2;
+		}
+		$self->{'description'} = $1  if ($html =~ m#\<meta\s+property\=\"og\:description\"\s+content\=\"(.+?)\"\>#);
 		while ($html =~ s#\<video(.+?)</video>##sio) {   #GRAB ANY VIDEO STREAMS (PODCASTADDICT SUPPORTS VIDEO PODCASTS!):
 			my $videodata = $1;
 			my $stream = $1  if ($videodata =~ m#src\=\"([^\"]+)#s);
@@ -464,7 +479,8 @@ TRYIT:
 				next  if ($self->{'secure'} && $stream !~ /^https/o);
 
 				$stream =~ s#\?utm\_source\=.*$##o;
-				$stream =~ s#\&from\=PodcastAddict##o;
+#				$stream =~ s#\&from\=PodcastAddict##o;
+				$stream =~ s#[\?\&]from\=PodcastAddict$##o;
 				$stream =~ s#\.mp3\?.*$#\.mp3#o;
 				push @{$self->{'streams'}}, $stream;
 				$self->{'cnt'}++;
@@ -477,7 +493,7 @@ TRYIT:
 				next  if ($self->{'secure'} && $stream !~ /^https/o);
 
 				$stream =~ s#\?utm\_source\=.*$##o;
-				$stream =~ s#\&from\=PodcastAddict##o;
+				$stream =~ s#[\?\&]from\=PodcastAddict$##o;
 				$stream =~ s#\.mp3\?.*$#\.mp3#o;
 				push @{$self->{'streams'}}, $stream;
 				$self->{'cnt'}++;

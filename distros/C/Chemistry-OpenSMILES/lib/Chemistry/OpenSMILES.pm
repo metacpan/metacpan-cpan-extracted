@@ -5,7 +5,7 @@ use warnings;
 use 5.0100;
 
 # ABSTRACT: OpenSMILES format reader and writer
-our $VERSION = '0.7.0'; # VERSION
+our $VERSION = '0.8.0'; # VERSION
 
 require Exporter;
 our @ISA = qw( Exporter );
@@ -23,7 +23,9 @@ sub is_chiral_tetrahedral($);
 sub mirror($);
 
 # Removes chiral setting from tetrahedral chiral centers with less than
-# four distinct neighbours. Returns the affected atoms.
+# four distinct neighbours. Only tetrahedral chiral centers with four atoms
+# are affected, thus three-atom centers (implying lone pairs) are left
+# untouched. Returns the affected atoms.
 #
 # CAVEAT: disregards anomers
 # TODO: check other chiral centers
@@ -98,10 +100,11 @@ sub _validate($@)
     for my $atom (sort { $a->{number} <=> $b->{number} } $moiety->vertices) {
         # TODO: AL chiral centers also have to be checked
         if( is_chiral_tetrahedral( $atom ) ) {
-            if( $moiety->degree($atom) < 4 ) {
+            if( $moiety->degree($atom) < 3 ) {
+                # FIXME: there should be a strict mode to forbid lone pairs
                 # FIXME: tetrahedral allenes are false-positives
                 warn sprintf 'chiral center %s(%d) has %d bonds while ' .
-                             'at least 4 is required' . "\n",
+                             'at least 3 is required' . "\n",
                              $atom->{symbol},
                              $atom->{number},
                              $moiety->degree($atom);
@@ -309,12 +312,12 @@ hydrogen count.
 
 =item C<raw>
 
-With C<raw> set to anything evaluating to false, the parser will not
+With C<raw> set to anything evaluating to true, the parser will not
 convert neither implicit nor explicit hydrogen atoms in square brackets
 to atom hashes of their own. Moreover, it will not attempt to unify the
 representations of chirality. It should be noted, though, that many of
 subroutines of Chemistry::OpenSMILES expect non-raw data structures,
-thus processing raw output may produce weird results.
+thus processing raw output may produce distorted results.
 
 =back
 
@@ -339,6 +342,12 @@ it before attempting reading with Chemistry::OpenSMILES::Parser.
 The derivation of implicit hydrogen counts for aromatic atoms is not
 unambiguously defined in the OpenSMILES specification. Thus only
 aromatic carbon is accounted for as if having valence of 3.
+
+Chiral atoms with three neighbours are interpreted as having a lone
+pair of electrons as the fourth chiral neighbour. The lone pair is
+always understood as being the second in the order of neighbour
+enumeration, except when the atom with the lone pair starts a chain. In
+that case lone pair is the first.
 
 =head1 SEE ALSO
 

@@ -193,7 +193,7 @@ if( $index =~ /FIXED_SHIPPING_COST=(\d+(\.\d*)?)/ ) {
   if ( $shipping eq 'local' ) {
     $shippingDetails = {
                         ShippingServiceOptions => {
-                                                   ShippingService => "LocalDelivery",
+                                                   ShippingService => "Pickup",
                                                    FreeShipping => 'true',
                                                    #ShippingServiceID => 150,
                                                   },
@@ -246,7 +246,7 @@ if( $index =~ /FIXED_SHIPPING_COST=(\d+(\.\d*)?)/ ) {
       my $service = "UPSGround";
       $service = "Freight" if $weight > 150;
 
-      unless ( $d1 && $d2 && d3 ) {
+      unless ( $d1 && $d2 && $d3 ) {
         die "Shipping dimensions not specified.";
       }
       $shippingDetails = {
@@ -332,6 +332,21 @@ my $args =
       UseTaxTable => 'true',
       Description => "<![CDATA[ $index ]]>", 
       ListingDuration => $listingDuration,
+
+      ProductListingDetails => {
+                                BrandMPN => {
+                                             Brand => 'Does not apply',
+                                             MPN   => 'Does not apply',
+                                            },
+                                UPC => 'Does not apply',
+                               },
+      ItemSpecifics => {
+                        NameValueList => {
+                                          Name => 'Brand',
+                                          Value => 'Does not apply',
+                                         },
+                       },
+
       'BuyerRequirements' => {
                               'MaximumUnpaidItemStrikes' => 'true',
                               'ShipToRegistrationCountry' => 'true',
@@ -434,6 +449,7 @@ print "
   Starting Price: $minimumBid
   BIN           : $bin
   Shipping      : $shipping
+  Condition     : $condition
 ";
 
 if( length( $ptitle ) > 80 ) {

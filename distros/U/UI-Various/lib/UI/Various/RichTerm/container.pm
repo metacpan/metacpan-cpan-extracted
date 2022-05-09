@@ -53,7 +53,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use UI::Various::core;
 use UI::Various::RichTerm::base;
@@ -104,6 +104,8 @@ sub _all_active($)
 	{   push @active, $_;   }
 	elsif ($_->can('_all_active'))
 	{   push @active, $_->_all_active();   }
+	if ($_->can('_additional_active'))
+	{   push @active, $_->_additional_active();   }
     }
     return @active;
 }

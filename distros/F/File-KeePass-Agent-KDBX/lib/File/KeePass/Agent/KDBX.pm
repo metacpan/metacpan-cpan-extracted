@@ -10,7 +10,7 @@ use namespace::clean;
 
 use parent 'File::KeePass::Agent';
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 our $KEEPASS_CLASS;
 
@@ -48,7 +48,7 @@ File::KeePass::Agent::KDBX - A KeePass 2 agent
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 SYNOPSIS
 

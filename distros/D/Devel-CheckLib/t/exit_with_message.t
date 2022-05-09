@@ -12,7 +12,7 @@ check_lib_or_exit( qw/lib hlagh/ );
 ENDPRINT
 $fh->close;
 
-my $err = `$^X $fh 2>&1`;
+my $err = `"$^X" $fh 2>&1`;
 
 if($err =~ /Couldn't find your C compiler/) {
     plan skip_all => "Couldn't find your C compiler";

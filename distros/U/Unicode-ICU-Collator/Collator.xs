@@ -2,6 +2,7 @@
 #include "perl.h"
 #include "XSUB.h"
 #include "unicode/ucol.h"
+#include "unicode/ustring.h"
 
 #include "const-c.inc"
 

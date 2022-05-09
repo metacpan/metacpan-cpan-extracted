@@ -177,7 +177,7 @@ skip_or_run('check EN messages', 'fix EN language source 1st',
 	    });
 
 my %re_vers = (builder => '(v5\.14\.0 +\| v5\.6\.0|v5\.22\.0 +\| v5\.21\.8)',
-	       examples => '(v5\.14\.0 +\| v5\.6\.0|~ +\| ~)',
+	       examples => '((v5\.14\.0|~) +\| (v5\.6\.0|v5.4\.5|~))',
 	       lib => '(v5\.14\.0 +\| v5\.[68]\.0)',
 	       t => '(v5\.14\.0 +\| v5\.6\.0|~ +\| (~|v5\.8\.0))');
 foreach my $dir (sort keys %re_vers)

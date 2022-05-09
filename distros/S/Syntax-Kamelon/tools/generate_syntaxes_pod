@@ -67,6 +67,7 @@ for (sort keys %sections) {
 }
 
 print <<__EOF;
+
 =back
 
 =head1 AUTHOR AND COPYRIGHT

@@ -149,7 +149,7 @@ sub PDL::mpart {
 =for ref
 
 Return Hankel matrix also known as persymmetric matrix.
-For complex, needs object of type PDL::Complex.
+Handles complex data.
 
 =for usage
 
@@ -200,7 +200,7 @@ sub PDL::mhankel {
 =for ref
 
 Return toeplitz matrix.
-For complex need object of type PDL::Complex.
+Handles complex data.
 
 =for usage
 

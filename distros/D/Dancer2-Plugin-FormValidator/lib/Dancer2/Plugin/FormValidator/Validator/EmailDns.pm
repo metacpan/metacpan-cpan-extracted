@@ -1,5 +1,8 @@
 package Dancer2::Plugin::FormValidator::Validator::EmailDns;
 
+use strict;
+use warnings;
+
 use Moo;
 use utf8;
 use Email::Valid;

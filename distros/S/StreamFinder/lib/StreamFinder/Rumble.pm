@@ -613,6 +613,7 @@ TRYIT:
 	print STDERR "--SUCCESS: 1st stream=".$self->{'Url'}."= total=".$self->{'total'}."=\n"
 			if ($DEBUG && $self->{'cnt'} > 0);
 	print STDERR "\n--ID=".$self->{'id'}."=\n--TITLE=".$self->{'title'}."=\n--CNT=".$self->{'cnt'}."=\n--ICON=".$self->{'iconurl'}."=\n--1ST=".$self->{'Url'}."=\n--streams=".join('|',@{$self->{'streams'}})."=\n"  if ($DEBUG);
+	print STDERR "--ICON=".$self->{'iconurl'}."= ARTICON=".$self->{'articonurl'}."=\n"  if ($DEBUG);
 	$self->_log($url);
 
 	bless $self, $class;   #BLESS IT!

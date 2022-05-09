@@ -7,6 +7,7 @@ use Test::XML;
 use File::Slurp qw(slurp);
 use TAP::Harness;
 use IO::Scalar;
+use version;
 
 ###############################################################################
 # Figure out how many tests we have to run.
@@ -40,7 +41,7 @@ foreach my $test (@tests) {
     # OVER-RIDE: With Test::Harness prior to v3.44, the "bailout" test would
     # result in zero/no output.  This was fixed in Test::Harness v3.44, but WE
     # need to watch for and provide accommodations for newer/older versions.
-    if ($TAP::Harness::VERSION < 3.44) {
+    if (version->parse($TAP::Harness::VERSION) < version->parse(3.44)) {
       if ($test =~ /bailout/) {
         $expected = '';
       }

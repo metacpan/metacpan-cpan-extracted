@@ -3,7 +3,7 @@
 # Name     : ModProxyPerlHtml.pm
 # Language : perl 5
 # Authors  : Gilles Darold, gilles at darold dot net
-# Copyright: Copyright (c) 2005-2020: Gilles Darold - All rights reserved -
+# Copyright: Copyright (c) 2005-2022, Gilles Darold - All rights reserved -
 # Description : This mod_perl module is a replacement for mod_proxy_html.c
 #		with far better URL HTML rewriting.
 # Usage    : See documentation in this file with perldoc.
@@ -29,7 +29,7 @@ use Apache2::ServerRec;
 use Apache2::URI;
 
 
-$Apache2::ModProxyPerlHtml::VERSION = '4.0';
+$Apache2::ModProxyPerlHtml::VERSION = '4.1';
 
 
 %Apache2::ModProxyPerlHtml::linkElements = (
@@ -247,24 +247,28 @@ sub link_replacement
 	my $i = 0;
 
 	# Detect parts that need to be deobfuscated before replacement
-	if ($rot13elements ne 'All') {
-		foreach my $tag (keys %{$rot13elements}) {
-			while ($$data =~ s/(<$tag\s+[^>]*\b$rot13elements->{$tag}=['"\s]*)([^'"\s>]+)([^>]*>)/ROT13REPLACE_$i\$\$/i) {
-				$ROT13TODOS{$i} = "$1ROT13$2ROT13$3";
-				$i++;
-			}
-		}
-	} elsif ($rot13elements eq 'All') {
-		foreach my $tag (keys %Apache2::ModProxyPerlHtml::linkElements) {
-			next if ($$data !~ /<$tag/i);
-			foreach my $attr (@{$Apache2::ModProxyPerlHtml::linkElements{$tag}}) {
-				while ($$data =~ s/(<$tag\s+[^>]*\b$attr=['"\s]*)([^'"\s>]+)([^>]*>)/ROT13REPLACE_$i\$\$/i) {
+	if (defined $rot13elements)
+	{
+		if ($rot13elements ne 'All') {
+			foreach my $tag (keys %{$rot13elements}) {
+				while ($$data =~ s/(<$tag\s+[^>]*\b$rot13elements->{$tag}=['"\s]*)([^'"\s>]+)([^>]*>)/ROT13REPLACE_$i\$\$/i) {
 					$ROT13TODOS{$i} = "$1ROT13$2ROT13$3";
 					$i++;
 				}
 			}
+		} elsif ($rot13elements eq 'All') {
+			foreach my $tag (keys %Apache2::ModProxyPerlHtml::linkElements) {
+				next if ($$data !~ /<$tag/i);
+				foreach my $attr (@{$Apache2::ModProxyPerlHtml::linkElements{$tag}}) {
+					while ($$data =~ s/(<$tag\s+[^>]*\b$attr=['"\s]*)([^'"\s>]+)([^>]*>)/ROT13REPLACE_$i\$\$/i) {
+						$ROT13TODOS{$i} = "$1ROT13$2ROT13$3";
+						$i++;
+					}
+				}
+			}
 		}
 	}
+
 	# Decode ROT13 links now
 	foreach my $k (keys %ROT13TODOS) {
 		my $repl = rot13_decode($ROT13TODOS{$k});
@@ -315,20 +319,23 @@ sub link_replacement
 	$$data =~ s/\$\$NEEDREPLACE(\d+)\$\$/$TODOS{$1}/g;
 
 	# Detect parts that need to be obfuscated after replacement
-	if ($rot13elements ne 'All') {
-		foreach my $tag (keys %{$rot13elements}) {
-			while ($$data =~ s/(<$tag\s+[^>]*\b$rot13elements->{$tag}=['"\s]*)([^'"\s>]+)([^>]*>)/ROT13REPLACE_$i\$\$/i) {
-				$ROT13TODOS{$i} = "$1ROT13$2ROT13$3";
-				$i++;
-			}
-		}
-	} elsif ($rot13elements eq 'All') {
-		foreach my $tag (keys %Apache2::ModProxyPerlHtml::linkElements) {
-			next if ($$data !~ /<$tag/i);
-			foreach my $attr (@{$Apache2::ModProxyPerlHtml::linkElements{$tag}}) {
-				while ($$data =~ s/(<$tag\s+[^>]*\b$attr=['"\s]*)([^'"\s>]+)([^>]*>)/ROT13REPLACE_$i\$\$/i) {
+	if (defined $rot13elements)
+	{
+		if ($rot13elements ne 'All') {
+			foreach my $tag (keys %{$rot13elements}) {
+				while ($$data =~ s/(<$tag\s+[^>]*\b$rot13elements->{$tag}=['"\s]*)([^'"\s>]+)([^>]*>)/ROT13REPLACE_$i\$\$/i) {
 					$ROT13TODOS{$i} = "$1ROT13$2ROT13$3";
 					$i++;
+				}
+			}
+		} elsif ($rot13elements eq 'All') {
+			foreach my $tag (keys %Apache2::ModProxyPerlHtml::linkElements) {
+				next if ($$data !~ /<$tag/i);
+				foreach my $attr (@{$Apache2::ModProxyPerlHtml::linkElements{$tag}}) {
+					while ($$data =~ s/(<$tag\s+[^>]*\b$attr=['"\s]*)([^'"\s>]+)([^>]*>)/ROT13REPLACE_$i\$\$/i) {
+						$ROT13TODOS{$i} = "$1ROT13$2ROT13$3";
+						$i++;
+					}
 				}
 			}
 		}
@@ -675,17 +682,15 @@ requests.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2005-2020 - Gilles Darold
+Copyright (c) 2005-2022 - Gilles Darold
 
 All rights reserved.  This program is free software; you may redistribute
 it and/or modify it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-Apache2::ModProxyPerlHtml was created by :
+Created and maintained by :
 
 	Gilles Darold
 	<gilles at darold dot net>
-
-and is currently maintain by me.
 

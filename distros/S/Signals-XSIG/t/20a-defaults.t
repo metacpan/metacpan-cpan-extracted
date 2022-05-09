@@ -47,3 +47,7 @@ foreach my $signal (@signals) {
 if (@failed && @ARGV == 0) {
     on_failure_recommend_spike(@failed);
 }
+
+END {
+    unlink glob("*.stackdump");
+}

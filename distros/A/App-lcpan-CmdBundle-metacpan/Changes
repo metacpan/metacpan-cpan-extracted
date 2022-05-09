@@ -1,3 +1,8 @@
+0.008   2022-03-27  Released-By: PERLANCAR; Urgency: medium
+
+        - Update to newer App::lcpan (table 'dist' was removed).
+
+
 0.007   2019-08-02  Released-By: PERLANCAR; Urgency: medium
 
 	- Add subcommand: metacpan-pod.

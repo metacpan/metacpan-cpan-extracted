@@ -35,6 +35,7 @@ lib/Quiq/Database/Config.pm
 lib/Quiq/Database/Connection.pm
 lib/Quiq/Database/Cursor.pm
 lib/Quiq/Database/DataAnalysis.pm
+lib/Quiq/Database/Patch.pm
 lib/Quiq/Database/ResultSet.pm
 lib/Quiq/Database/ResultSet/Array.pm
 lib/Quiq/Database/ResultSet/Object.pm
@@ -56,6 +57,7 @@ lib/Quiq/Eog.pm
 lib/Quiq/Epoch.pm
 lib/Quiq/ExampleCode.pm
 lib/Quiq/Excel/Writer.pm
+lib/Quiq/Exit.pm
 lib/Quiq/ExportFile.pm
 lib/Quiq/FFmpeg.pm
 lib/Quiq/File/Audio.pm
@@ -183,7 +185,9 @@ lib/Quiq/Sdoc/Producer.pm
 lib/Quiq/Section/Object.pm
 lib/Quiq/Section/Parser.pm
 lib/Quiq/Sendmail.pm
+lib/Quiq/Sftp/Client.pm
 lib/Quiq/Shell.pm
+lib/Quiq/Smb/Client.pm
 lib/Quiq/SoapWsdlServiceCgi.pm
 lib/Quiq/SoapWsdlServiceCgi/Demo.pm
 lib/Quiq/Socket.pm
@@ -264,6 +268,7 @@ t/bin/Quiq/Database/Config.t
 t/bin/Quiq/Database/Connection.t
 t/bin/Quiq/Database/Cursor.t
 t/bin/Quiq/Database/DataAnalysis.t
+t/bin/Quiq/Database/Patch.t
 t/bin/Quiq/Database/ResultSet.t
 t/bin/Quiq/Database/ResultSet/Array.t
 t/bin/Quiq/Database/ResultSet/Object.t
@@ -285,6 +290,7 @@ t/bin/Quiq/Eog.t
 t/bin/Quiq/Epoch.t
 t/bin/Quiq/ExampleCode.t
 t/bin/Quiq/Excel/Writer.t
+t/bin/Quiq/Exit.t
 t/bin/Quiq/ExportFile.t
 t/bin/Quiq/FFmpeg.t
 t/bin/Quiq/File/Audio.t
@@ -412,7 +418,9 @@ t/bin/Quiq/Sdoc/Producer.t
 t/bin/Quiq/Section/Object.t
 t/bin/Quiq/Section/Parser.t
 t/bin/Quiq/Sendmail.t
+t/bin/Quiq/Sftp/Client.t
 t/bin/Quiq/Shell.t
+t/bin/Quiq/Smb/Client.t
 t/bin/Quiq/SoapWsdlServiceCgi.t
 t/bin/Quiq/SoapWsdlServiceCgi/Demo.t
 t/bin/Quiq/Socket.t

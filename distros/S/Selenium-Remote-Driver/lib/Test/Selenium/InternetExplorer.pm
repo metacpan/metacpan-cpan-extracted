@@ -1,5 +1,5 @@
 package Test::Selenium::InternetExplorer;
-$Test::Selenium::InternetExplorer::VERSION = '1.46';
+$Test::Selenium::InternetExplorer::VERSION = '1.47';
 use Moo;
 extends 'Selenium::InternetExplorer', 'Test::Selenium::Remote::Driver';
 

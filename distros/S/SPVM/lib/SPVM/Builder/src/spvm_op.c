@@ -246,12 +246,13 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
     "IS_READ_ONLY",
     "MAKE_READ_ONLY",
     "COPY",
-    "IMPLEMENT",
-    "HAS_IMPLEMENT",
+    "INTERFACE",
+    "HAS_IMPL",
     "ELEMENT",
     "OARRAY",
     "ALIAS",
     "OF",
+    "REQUIRED",
   };
   
   return id_names;
@@ -1326,7 +1327,7 @@ int32_t SPVM_OP_get_mem_id(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_ID_STRING_CMP:
     case SPVM_OP_C_ID_ISA:
     case SPVM_OP_C_ID_ISWEAK_FIELD:
-    case SPVM_OP_C_ID_HAS_IMPLEMENT:
+    case SPVM_OP_C_ID_HAS_IMPL:
       return 0;
     default: {
       SPVM_OP* op_var = SPVM_OP_get_target_op_var(compiler, op);
@@ -1393,7 +1394,7 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_ID_IF:
     case SPVM_OP_C_ID_ISWEAK_FIELD:
     case SPVM_OP_C_ID_IS_READ_ONLY:
-    case SPVM_OP_C_ID_HAS_IMPLEMENT:
+    case SPVM_OP_C_ID_HAS_IMPL:
     {
       type = SPVM_TYPE_new_int_type(compiler);
       break;
@@ -1654,16 +1655,19 @@ SPVM_OP* SPVM_OP_build_field_access(SPVM_COMPILER* compiler, SPVM_OP* op_field_a
   return op_field_access;
 }
 
-SPVM_OP* SPVM_OP_build_has_implement(SPVM_COMPILER* compiler, SPVM_OP* op_has_implement, SPVM_OP* op_var, SPVM_OP* op_name) {
+SPVM_OP* SPVM_OP_build_has_impl(SPVM_COMPILER* compiler, SPVM_OP* op_has_impl, SPVM_OP* op_var, SPVM_OP* op_name) {
   
-  // Build op
-  SPVM_OP_insert_child(compiler, op_has_implement, op_has_implement->last, op_var);
-  SPVM_OP_insert_child(compiler, op_has_implement, op_has_implement->last, op_name);
+  if (!op_name) {
+    op_name = SPVM_OP_new_op_name(compiler, "", op_var->file, op_var->line);
+  }
+  
+  SPVM_OP_insert_child(compiler, op_has_impl, op_has_impl->last, op_var);
+  SPVM_OP_insert_child(compiler, op_has_impl, op_has_impl->last, op_name);
 
   SPVM_OP* op_name_var_condition = SPVM_OP_new_op_name(compiler, "$.condition_flag", op_var->file, op_var->line);
   SPVM_OP* op_var_condition = SPVM_OP_new_op_var(compiler, op_name_var_condition);
   SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_var->file, op_var->line);
-  SPVM_OP_build_assign(compiler, op_assign, op_var_condition, op_has_implement);
+  SPVM_OP_build_assign(compiler, op_assign, op_var_condition, op_has_impl);
 
   return op_assign;
 }
@@ -1752,8 +1756,8 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
     // int32_t max length is 10(2147483647)
     int32_t int32_max_length = 10;
     
-    // Create anon sub class name
-    // If Foo::Bar anon sub is defined line 123, sub keyword start pos 32, the anon sub class name become Foo::Bar::anon::123::32. This is uniqe in whole program.
+    // Create anon method class name
+    // If Foo::Bar anon method is defined line 123, method keyword start pos 32, the anon method class name become Foo::Bar::anon::123::32. This is uniqe in whole program.
     const char* anon_method_defined_rel_file_class_name = compiler->cur_rel_file_class_name;
     int32_t anon_method_defined_line = op_method->line;
     int32_t anon_method_defined_column = op_method->column;
@@ -1829,7 +1833,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
   
   class->name = op_name_class->uv.name;
 
-  // Class is callback
+  // Class descriptors
   int32_t class_descriptors_count = 0;
   int32_t access_control_descriptors_count = 0;
   if (op_list_descriptors) {
@@ -1837,11 +1841,6 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
     while ((op_descriptor = SPVM_OP_sibling(compiler, op_descriptor))) {
       SPVM_DESCRIPTOR* descriptor = op_descriptor->uv.descriptor;
       switch (descriptor->id) {
-        case SPVM_DESCRIPTOR_C_ID_CALLBACK_T: {
-          class->category = SPVM_CLASS_C_CATEGORY_CALLBACK;
-          class_descriptors_count++;
-          break;
-        }
         case SPVM_DESCRIPTOR_C_ID_POINTER_T: {
           class->category = SPVM_CLASS_C_CATEGORY_CLASS;
           class->is_pointer = 1;
@@ -1878,7 +1877,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
       }
     }
     if (class_descriptors_count > 1) {
-      SPVM_COMPILER_error(compiler, "callback_t, mulnum_t, pointer_t interface_t can be specified only one at %s line %d", op_list_descriptors->file, op_list_descriptors->line);
+      SPVM_COMPILER_error(compiler, "mulnum_t, pointer_t interface_t can be specified only one at %s line %d", op_list_descriptors->file, op_list_descriptors->line);
     }
     if (access_control_descriptors_count > 1) {
       SPVM_COMPILER_error(compiler, "private, public can be specified only one at %s line %d", op_list_descriptors->file, op_list_descriptors->line);
@@ -1920,9 +1919,9 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
         SPVM_LIST_push(class->allows, op_decl->uv.allow);
       }
       // interface declarations
-      else if (op_decl->id == SPVM_OP_C_ID_IMPLEMENT) {
-        if (class->category != SPVM_CLASS_C_CATEGORY_CLASS) {
-          SPVM_COMPILER_error(compiler, "Non-noramal classes can't have \"implement\" statements at %s line %d", op_decl->file, op_decl->line);
+      else if (op_decl->id == SPVM_OP_C_ID_INTERFACE) {
+        if (class->category == SPVM_CLASS_C_CATEGORY_MULNUM) {
+          SPVM_COMPILER_error(compiler, "Multi-numeric types can't have \"interface\" syntax at %s line %d", op_decl->file, op_decl->line);
         }
         SPVM_LIST_push(class->interface_decls, op_decl->uv.interface);
       }
@@ -1930,10 +1929,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
       else if (op_decl->id == SPVM_OP_C_ID_CLASS_VAR) {
         SPVM_CLASS_VAR* class_var = op_decl->uv.class_var;
 
-        if (class->category == SPVM_CLASS_C_CATEGORY_CALLBACK) {
-          SPVM_COMPILER_error(compiler, "Callback classes can't have class variables at %s line %d", op_decl->file, op_decl->line);
-        }
-        else if (class->category == SPVM_CLASS_C_CATEGORY_INTERFACE) {
+        if (class->category == SPVM_CLASS_C_CATEGORY_INTERFACE) {
           SPVM_COMPILER_error(compiler, "Interface classes can't have class variables at %s line %d", op_decl->file, op_decl->line);
         }
         SPVM_LIST_push(class->class_vars, op_decl->uv.class_var);
@@ -1977,7 +1973,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
         // Setter
         if (class_var->has_setter) {
           
-          // sub SET_FOO : void ($foo : int) {
+          // method SET_FOO : void ($foo : int) {
           //   $FOO = $foo;
           // }
           SPVM_OP* op_method = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_METHOD, op_decl->file, op_decl->line);
@@ -2030,10 +2026,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
       else if (op_decl->id == SPVM_OP_C_ID_FIELD) {
         SPVM_FIELD* field = op_decl->uv.field;
         
-        if (class->category == SPVM_CLASS_C_CATEGORY_CALLBACK) {
-          SPVM_COMPILER_error(compiler, "Callback classes can't have fields at %s line %d", op_decl->file, op_decl->line);
-        }
-        else if (class->category == SPVM_CLASS_C_CATEGORY_INTERFACE) {
+        if (class->category == SPVM_CLASS_C_CATEGORY_INTERFACE) {
           SPVM_COMPILER_error(compiler, "Interface classes can't have fields at %s line %d", op_decl->file, op_decl->line);
         }
         SPVM_LIST_push(class->fields, field);
@@ -2231,38 +2224,12 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
         }
       }
 
-      // If Method is anon, sub must be method
+      // If Method is anon, method must be method
       if (strlen(method_name) == 0 && method->is_class_method) {
         SPVM_COMPILER_error(compiler, "Anon methods must be instance methods at %s line %d", method->op_method->file, method->op_method->line);
       }
 
-      if (class->category == SPVM_CLASS_C_CATEGORY_CALLBACK) {
-        // Method having callback_t descriptor must be method
-        if (method->is_class_method) {
-          SPVM_COMPILER_error(compiler, "Methods of callback classes must be instance methods at %s line %d", method->op_method->file, method->op_method->line);
-        }
-        
-        // Method having callback_t descriptor must be anon
-        if (strlen(method_name) != 0) {
-          SPVM_COMPILER_error(compiler, "Methods of callback classes can't have names at %s line %d", method->op_method->file, method->op_method->line);
-        }
-        
-        // If class is callback, the method must not be native
-        if (method->is_native) {
-          SPVM_COMPILER_error(compiler, "Methods of callback classes  can't have native descriptors at %s line %d", method->op_method->file, method->op_method->line);
-        }
-
-        // If class is callback, the method must not be precompile
-        if (method->is_precompile) {
-          SPVM_COMPILER_error(compiler, "Methods of callback classes can't have precompile descriptors at %s line %d", method->op_method->file, method->op_method->line);
-        }
-        
-        // If class is callback, the method must not be precompile
-        if (method->op_block) {
-          SPVM_COMPILER_error(compiler, "Methods of callback classes can't have the blocks at %s line %d", method->op_method->file, method->op_method->line);
-        }
-      }
-      else if (class->category == SPVM_CLASS_C_CATEGORY_INTERFACE) {
+      if (class->category == SPVM_CLASS_C_CATEGORY_INTERFACE) {
         // Method having interface_t descriptor must be method
         if (method->is_class_method) {
           SPVM_COMPILER_error(compiler, "Methods of interface classes must be instance methods at %s line %d", method->op_method->file, method->op_method->line);
@@ -2282,12 +2249,13 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
         if (method->op_block) {
           SPVM_COMPILER_error(compiler, "Methods of interface classes can't have the blocks at %s line %d", method->op_method->file, method->op_method->line);
         }
-
-        if (strcmp(method_name, "") == 0) {
-          SPVM_COMPILER_error(compiler, "Methods of interfaces must have the names at %s line %d", op_name_method->file, op_name_method->line);
+      }
+      else if (class->category == SPVM_CLASS_C_CATEGORY_CLASS) {
+        if (method->is_required) {
+          SPVM_COMPILER_error(compiler, "A class type can't have required methods at %s line %d", method->op_method->file, method->op_method->line);
         }
       }
-
+      
       if (method->is_native) {
         if (method->op_block) {
           SPVM_COMPILER_error(compiler, "Native methods can't have blocks at %s line %d", method->op_method->file, method->op_method->line);
@@ -2299,7 +2267,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
       if (found_method) {
         SPVM_COMPILER_error(compiler, "Redeclaration of the method \"%s\" at %s line %d", method_name, method->op_method->file, method->op_method->line);
       }
-      // Unknown sub
+      // Unknown method
       else {
         const char* found_method_name = SPVM_HASH_get(class->method_symtable, method_name, strlen(method_name));
         if (found_method_name) {
@@ -2311,6 +2279,13 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           
           if (method->is_destructor) {
             class->destructor_method = method;
+          }
+
+          if (method->is_required) {
+            if (class->required_method) {
+              SPVM_COMPILER_error(compiler, "A interface can't have multiple required method \"%s\" at %s line %d", method_name, method->op_method->file, method->op_method->line);
+            }
+            class->required_method = method;
           }
           
           assert(method->op_method->file);
@@ -2328,11 +2303,10 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
         }
       }
     }
-    
-    // Callback must have only one method
-    if (class->category == SPVM_CLASS_C_CATEGORY_CALLBACK) {
-      if (class->methods->length != 1) {
-        SPVM_COMPILER_error(compiler, "Callback must have only one method at %s line %d", op_class->file, op_class->line);
+
+    if (class->category == SPVM_CLASS_C_CATEGORY_INTERFACE) {
+      if (!class->required_method) {
+        SPVM_COMPILER_error(compiler, "A interface method must have one required method at %s line %d", op_class->file, op_class->line);
       }
     }
     
@@ -2562,12 +2536,12 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
   }
   const char* method_name = op_name_method->uv.name;
   
-  // Block is sub block
+  // Block is method block
   if (op_block) {
     op_block->uv.block->id = SPVM_BLOCK_C_ID_METHOD;
   }
   
-  // Create sub information
+  // Create method information
   method->op_name = op_name_method;
   
   method->name = method->op_name->uv.name;
@@ -2601,6 +2575,10 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
         }
         case SPVM_DESCRIPTOR_C_ID_PRECOMPILE: {
           method->is_precompile = 1;
+          break;
+        }
+        case SPVM_DESCRIPTOR_C_ID_REQUIRED: {
+          method->is_required = 1;
           break;
         }
         case SPVM_DESCRIPTOR_C_ID_NATIVE: {
@@ -2776,7 +2754,7 @@ SPVM_OP* SPVM_OP_build_enumeration_value(SPVM_COMPILER* compiler, SPVM_OP* op_na
   SPVM_OP* op_block = SPVM_OP_new_op_block(compiler, op_name->file, op_name->line);
   SPVM_OP_insert_child(compiler, op_block, op_block->last, op_list_statements);
   
-  // sub
+  // method
   SPVM_OP* op_method = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_METHOD, op_name->file, op_name->line);
   op_method->file = op_name->file;
   op_method->line = op_name->line;
@@ -3175,11 +3153,11 @@ SPVM_OP* SPVM_OP_build_return(SPVM_COMPILER* compiler, SPVM_OP* op_return, SPVM_
   return op_return;
 }
 
-SPVM_OP* SPVM_OP_build_expression_statement(SPVM_COMPILER* compiler, SPVM_OP* op_expression) {
+SPVM_OP* SPVM_OP_build_value_op_statement(SPVM_COMPILER* compiler, SPVM_OP* op_value_op) {
   
-  // Free tmp vars at end of expression statement
-  SPVM_OP* op_free_tmp = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_FREE_TMP, op_expression->file, op_expression->line);
-  SPVM_OP_insert_child(compiler, op_free_tmp, op_free_tmp->last, op_expression);
+  // Free tmp vars at end of value_op statement
+  SPVM_OP* op_free_tmp = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_FREE_TMP, op_value_op->file, op_value_op->line);
+  SPVM_OP_insert_child(compiler, op_free_tmp, op_free_tmp->last, op_value_op);
   
   return op_free_tmp;
 }

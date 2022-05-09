@@ -1,25 +1,14 @@
 use strict;
 use warnings;
 use utf8::all;
-use Test::More tests => 1;
 
+use FindBin;
+use Test::More tests => 1;
 use Dancer2::Plugin::FormValidator::Config;
 use Dancer2::Plugin::FormValidator::Registry;
 use Dancer2::Plugin::FormValidator::Processor;
 
-package Validator {
-    use Moo;
-
-    with 'Dancer2::Plugin::FormValidator::Role::Profile';
-
-    sub profile {
-        return {
-            name   => [qw(restrict is_true)],
-            accept => [qw(required is_true)],
-            email  => [qw(required email)],
-        };
-    };
-}
+require "$FindBin::Bin/lib/validator.pl";
 
 package IsTrue {
     use Moo;
@@ -111,7 +100,14 @@ my $config = Dancer2::Plugin::FormValidator::Config->new(
     },
 );
 
-my $validator = Validator->new;
+my $validator = Validator->new(profile_hash =>
+    {
+        name   => [qw(restrict is_true)],
+        accept => [qw(required is_true)],
+        email  => [qw(required email)],
+    }
+);
+
 my $registry  = Dancer2::Plugin::FormValidator::Registry->new(
     extensions => [Extension->new],
 );

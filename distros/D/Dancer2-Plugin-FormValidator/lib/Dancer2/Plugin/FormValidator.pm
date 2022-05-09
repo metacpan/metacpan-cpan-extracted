@@ -1,6 +1,8 @@
 package Dancer2::Plugin::FormValidator;
 
 use 5.24.0;
+use strict;
+use warnings;
 
 use Dancer2::Plugin;
 use Module::Load qw(autoload);
@@ -9,7 +11,7 @@ use Dancer2::Plugin::FormValidator::Validator;
 use Dancer2::Plugin::FormValidator::Config;
 use Types::Standard qw(InstanceOf HashRef ArrayRef);
 
-our $VERSION = '0.80';
+our $VERSION = '0.83';
 
 # Global var for saving last success validation valid input.
 my $valid_input;
@@ -21,7 +23,7 @@ has config_validator => (
     isa      => InstanceOf['Dancer2::Plugin::FormValidator::Config'],
     builder  => sub {
         return Dancer2::Plugin::FormValidator::Config->new(
-            config => shift->config,
+            config => $_[0]->config,
         );
     }
 );
@@ -30,7 +32,7 @@ has config_extensions => (
     is       => 'ro',
     isa      => HashRef,
     default  => sub {
-        return shift->config->{extensions} // {},
+        return $_[0]->config->{extensions} // {},
     }
 );
 
@@ -38,7 +40,7 @@ has extensions => (
     is       => 'ro',
     isa      => ArrayRef,
     builder  => sub {
-        my $self = shift;
+        my ($self) = @_;
 
         my @extensions = map {
             my $extension = $self->config_extensions->{$_}->{provider};
@@ -56,14 +58,14 @@ has extensions => (
 
 has plugin_deferred => (
     is       => 'ro',
-    isa      => InstanceOf ['Dancer2::Plugin::Deferred'],
+    isa      => InstanceOf['Dancer2::Plugin::Deferred'],
     builder  => sub {
-        return shift->app->with_plugin('Dancer2::Plugin::Deferred');
+        return $_[0]->app->with_plugin('Dancer2::Plugin::Deferred');
     }
 );
 
 sub BUILD {
-    shift->_register_hooks;
+    $_[0]->_register_hooks;
     return;
 }
 
@@ -74,9 +76,9 @@ sub validate {
     undef $valid_input;
 
     # Now works with arguments.
-    my $profile = %args{profile};
-    my $input   = %args{input} // $self->dsl->body_parameters->as_hashref_mixed;
-    my $lang    = %args{lang};
+    my $profile = $args{profile};
+    my $input   = $args{input} // $self->dsl->body_parameters->as_hashref_mixed;
+    my $lang    = $args{lang};
 
     if (defined $lang) {
         $self->_validator_language($lang);
@@ -99,7 +101,6 @@ sub validate {
                 old      => $input,
             },
         );
-
         return undef;
     }
     else {
@@ -116,19 +117,21 @@ sub validated {
 }
 
 sub errors {
-    return shift->_get_deferred->{messages};
+    return $_[0]->_get_deferred->{messages};
 }
 
+# Register Dancer2 hook to add custom template tokens: errors, old.
 sub _register_hooks {
-    my $self = shift;
+    my ($self) = @_;
 
     $self->app->add_hook(
         Dancer2::Core::Hook->new(
             name => 'before_template_render',
             code => sub {
-                my $tokens = shift;
-                my $errors = {};
-                my $old    = {};
+                my ($tokens) = @_;
+
+                my $errors   = {};
+                my $old      = {};
 
                 if (my $deferred = $tokens->{deferred}->{$self->config_validator->session_namespace}) {
                     $errors = delete $deferred->{messages};
@@ -146,14 +149,19 @@ sub _register_hooks {
     return;
 }
 
+# Set validator to language to $lang.
 sub _validator_language {
-    shift->config_validator->language(shift);
+    my ($self, $lang) = @_;
+
+    $self->config_validator->language($lang);
     return;
 }
 
+# Returned deferred message from session storage.
 sub _get_deferred {
-    my $self = shift;
-    return $self->plugin_deferred->deferred($self->config_validator->session_namespace);
+    return $_[0]->plugin_deferred->deferred(
+        $_[0]->config_validator->session_namespace
+    );
 }
 
 1;
@@ -171,26 +179,27 @@ Dancer2::Plugin::FormValidator - neat and easy to start form validation plugin f
 
 =head1 VERSION
 
-version 0.80
+version 0.83
 
 =head1 SYNOPSIS
 
     ### If you need a simple and easy validation in your project,
     ### then this module is what you need.
 
+    use Dancer2;
     use Dancer2::Plugin::FormValidator;
 
     ### First create form validation profile class.
 
     package RegisterForm {
-         use Moo;
-         with 'Dancer2::Plugin::FormValidator::Role::Profile';
+        use Moo;
+        with 'Dancer2::Plugin::FormValidator::Role::Profile';
 
-        ### Here you need to declare validators.
+        ### Here you need to declare fields => validators.
 
         sub profile {
             return {
-                username     => [ qw(required alpha_num_ascii length_min:4 length_max:32) ],
+                username     => [ qw(required alpha_num length_min:4 length_max:32) ],
                 email        => [ qw(required email length_max:127) ],
                 password     => [ qw(required length_max:40) ],
                 password_cnf => [ qw(required same:password) ],
@@ -226,32 +235,7 @@ The html result could be like:
 
 This is alpha version, not stable.
 
-Interfaces may change in future:
-
-=over 4
-
-=item *
-Roles: Dancer2::Plugin::FormValidator::Role::Extension, Dancer2::Plugin::FormValidator::Role::Validator.
-
-=item *
-Validators.
-
-=back
-
-Won't change:
-
-=over 4
-
-=item *
-Dsl keywords.
-
-=item *
-Template tokens.
-
-=item *
-Roles: Dancer2::Plugin::FormValidator::Role::Profile, Dancer2::Plugin::FormValidator::Role::HasMessages, Dancer2::Plugin::FormValidator::Role::ProfileHasMessages.
-
-=back
+Interfaces may change in future.
 
 If you like it - add it to your bookmarks. I intend to complete the development by the summer 2022.
 
@@ -261,18 +245,20 @@ Help is always welcome!
 =head1 DESCRIPTION
 
 This is micro-framework that provides validation in your Dancer2 application.
-It consists of dsl's keywords: validate, validator_language, errors.
+It consists of dsl's keywords: validate, validated, errors.
 It has a set of built-in validators that can be extended by compatible modules (extensions).
 Also proved runtime switching between languages, so you can show proper error messages to users.
 
-Uses simple and declarative approach to validate forms:
+This module has a minimal set of dependencies and does not require the mandatory use of DBIc or Moose.
+
+Uses simple and declarative approach to validate forms.
 
 =head2 Validator
 
 First, you need to create class which will implements
 at least one main role: Dancer2::Plugin::FormValidator::Role::Profile.
 
-This role requires profile method which should return a HashRef Data::FormValidator accepts:
+This role requires profile method which should return a I<HashRef> Data::FormValidator accepts:
 
     package RegisterForm
 
@@ -291,12 +277,14 @@ This role requires profile method which should return a HashRef Data::FormValida
 
 =head3 Profile method
 
-Profile method should always return a HashRef[ArrayRef] where keys are input fields names
+Profile method should always return a I<HashRef[ArrayRef]> where keys are input fields names
 and values are ArrayRef with list of validators.
 
 =head2 Application
 
 Then you need to set basic configuration:
+
+    use Dancer2;
 
      set plugins => {
             FormValidator => {
@@ -308,6 +296,7 @@ Then you need to set basic configuration:
 
 Now you can validate POST parameters in your controller:
 
+    use Dancer2;
     use Dancer2::Plugin::FormValidator;
     use RegisterForm;
 
@@ -329,8 +318,8 @@ Now you can validate POST parameters in your controller:
 
 =head2 Template
 
-In you template you have access to: $errors - this is HashRef with fields names as keys
-and error messages as ArrayRef values and $old - contains old input values.
+In you template you have access to: $errors - this is I<HashRef[ArrayRef]> with fields names as keys
+and error messages values and $old - contains old input values.
 
 Template app/register:
 
@@ -446,7 +435,7 @@ Accept arguments as hash:
 
 Profile is required, input and lang is optional.
 
-Returns valid input HashRef if validation succeed, otherwise returns undef.
+Returns valid input I<HashRef> if validation succeed, otherwise returns undef.
 
     ### You can use HashRef returned from validate.
 
@@ -475,8 +464,8 @@ Returns valid input HashRef if validation succeed, otherwise returns undef.
     validated(): HashRef|undef
 
 No arguments.
-Returns valid input HashRef if validate succeed.
-Undef value will be returned after first call within one validation process.
+Returns valid input I<HashRef> if validate succeed.
+I<Undef> value will be returned after first call within one validation process.
 
     my $valid_hash_ref = validated;
 
@@ -485,7 +474,7 @@ Undef value will be returned after first call within one validation process.
     errors(): HashRef
 
 No arguments.
-Returns HashRef[ArrayRef] if validation failed.
+Returns I<HashRef[ArrayRef]> if validation failed.
 
     my $errors_hash_multi = errors;
 
@@ -493,14 +482,18 @@ Returns HashRef[ArrayRef] if validation failed.
 
 =head3 accepted
 
+    accepted(): Bool
+
 Validates that field B<exists> and one of the listed: (yes on 1).
 
     field => [ qw(accepted) ]
 
-=head3 alpha:encoding=ascii
+=head3 alpha
+
+    alpha(String $encoding = 'a'): Bool
 
 Validate that string only contain of alphabetic symbols.
-By default encoding is ascii, i.e /^[[:alpha:]]+$/a.
+By default encoding is ascii, i.e B</^[[:alpha:]]+$/a>.
 
     field => [ qw(alpha) ]
 
@@ -508,12 +501,14 @@ To set encoding to unicode you need to pass 'u' argument:
 
     field => [ qw(alpha:u) ]
 
-Then the validation rule will be /^[[:alpha:]]+$/.
+Then the validation rule will be B</^[[:alpha:]]+$/>.
 
 =head3 alpha_num
 
+    alpha_num(String $encoding = 'a'): Bool
+
 Validate that string only contain of alphabetic symbols, underscore and numbers 0-9.
-By default encoding is ascii, i.e. /^\w+$/a.
+By default encoding is ascii, i.e. B</^\w+$/a>.
 
     field => [ qw(alpha_num) ]
 
@@ -521,21 +516,27 @@ To set encoding to unicode you need to pass 'u' argument:
 
     field => [ qw(alpha_num:u) ]
 
-Rule will be /^\w+$/.
+Rule will be B</^\w+$/>.
 
 =head3 email
 
-Validate that field is valid email(rfc822).
+    email(): Bool
+
+Validate that field is valid email(B<rfc822>).
 
     field => [ qw(email) ]
 
 =head3 email_dns
 
-Validate that field is valid email(rfc822) and dns exists.
+    email_dns(): Bool
+
+Validate that field is valid email(B<rfc822>) and dns exists.
 
     field => [ qw(email_dns) ]
 
-=head3 enum:value1,value2
+=head3 enum
+
+    enum(Array @values): Bool
 
 Validate that field is one of listed values.
 
@@ -543,29 +544,39 @@ Validate that field is one of listed values.
 
 =head3 integer
 
+    integer(): Bool
+
 Validate that field is integer.
 
     field => [ qw(integer) ]
 
-=head3 length_max:num
+=head3 length_max
+
+    length_max(Int $num): Bool
 
 Validate that string length <= num.
 
     field => [ qw(length_max:32) ]
 
-=head3 length_min:num
+=head3 length_min
+
+    length_min(Int $num): Bool
 
 Validate that string length >= num.
 
     field => [ qw(length_max:4) ]
 
-=head3 max:num
+=head3 max
+
+    max(Int $num): Bool
 
 Validate that field is number <= num.
 
     field => [ qw(max:32) ]
 
-=head3 min:num
+=head3 min
+
+    min(Int $num): Bool
 
 Validate that field is number >= num.
 
@@ -573,17 +584,23 @@ Validate that field is number >= num.
 
 =head3 numeric
 
+    numeric(): Bool
+
 Validate that field is number.
 
     field => [ qw(numeric) ]
 
 =head3 required
 
+    required(): Bool
+
 Validate that field exists and not empty string.
 
     field => [ qw(required) ]
 
-=head3 same:field
+=head3 same
+
+    same(String $field_name): bool
 
 Validate that field is exact value as another.
 
@@ -709,6 +726,43 @@ L<Dancer2::Plugin::FormValidator::Extension::DBIC|https://metacpan.org/pod/Dance
 - for checking fields existence in table rows.
 
 =back
+
+=head1 HINTS
+
+If you don't want to create separated classes for your validation logic,
+you could create one base class and reuse it in your project.
+
+    ### Validator class
+
+    package Validator {
+        use Moo;
+        with 'Dancer2::Plugin::FormValidator::Role::Profile';
+
+        has profile_hash => (
+            is       => 'ro',
+            required => 1,
+        );
+
+        sub profile {
+            return $_[0]->profile_hash;
+        }
+    }
+
+    ### Application
+
+    use Dancer2
+
+    my $validator = Validator->new(profile_hash =>
+        {
+            email => [qw(required email)],
+        }
+    );
+
+    post '/subscribe' => sub {
+        if (not validate profile => $validator) {
+            to_json errors;
+        }
+    };
 
 =head1 TODO
 

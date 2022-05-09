@@ -1,0 +1,42 @@
+---
+abstract: "daemon's helpful creations"
+author:
+  - 'Paul G Webster <daemon@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Author-Daemon
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Author::Daemon:
+    file: lib/Author/Daemon.pm
+    version: '0.001'
+  Author::Daemon::Enviroment::Absorb:
+    file: lib/Author/Daemon/Enviroment/Absorb.pm
+    version: '0.001'
+  Author::Daemon::Log::Basic:
+    file: lib/Author/Daemon/Log/Basic.pm
+    version: '0.001'
+  Author::Daemon::Snippet::Time:
+    file: lib/Author/Daemon/Snippet/Time.pm
+    version: '0.001'
+version: '0.001'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

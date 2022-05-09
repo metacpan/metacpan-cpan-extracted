@@ -1,3 +1,4 @@
+[![Actions Status](https://github.com/zakame/mojox-renderer-writeexcel/workflows/Test%20on%20latest%20supported%20Perls/badge.svg)](https://github.com/zakame/mojox-renderer-writeexcel/actions) [![Coverage Status](https://img.shields.io/coveralls/zakame/mojox-renderer-writeexcel/master.svg?style=flat)](https://coveralls.io/r/zakame/mojox-renderer-writeexcel?branch=master) [![MetaCPAN Release](https://badge.fury.io/pl/Mojolicious-Plugin-WriteExcel.svg)](https://metacpan.org/release/Mojolicious-Plugin-WriteExcel)
 # NAME
 
 Mojolicious::Plugin::WriteExcel - write Excel spreadsheets from Mojolicious
@@ -20,7 +21,7 @@ Mojolicious::Plugin::WriteExcel - write Excel spreadsheets from Mojolicious
 
 # DESCRIPTION
 
-[Mojolicious::Plugin::WriteExcel](https://metacpan.org/pod/Mojolicious::Plugin::WriteExcel) is a plugin for writing Excel
+[Mojolicious::Plugin::WriteExcel](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AWriteExcel) is a plugin for writing Excel
 spreadsheets.
 
 This plugin converts the `result` element in the stash to an Excel
@@ -46,14 +47,14 @@ could be set by passing the settings to `render`:
 
 # METHODS
 
-[Mojolicious::Plugin::WriteExcel](https://metacpan.org/pod/Mojolicious::Plugin::WriteExcel) inherits all methods from
-[Mojolicious::Plugin](https://metacpan.org/pod/Mojolicious::Plugin) and implements the following new ones.
+[Mojolicious::Plugin::WriteExcel](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AWriteExcel) inherits all methods from
+[Mojolicious::Plugin](https://metacpan.org/pod/Mojolicious%3A%3APlugin) and implements the following new ones.
 
 ## `xls_renderer`
 
     $app->renderer->add_handler(xls => \&xls_renderer);
 
-Internal sub talking to [Spreadsheet::WriteExcel::Simple](https://metacpan.org/pod/Spreadsheet::WriteExcel::Simple) to render
+Internal sub talking to [Spreadsheet::WriteExcel::Simple](https://metacpan.org/pod/Spreadsheet%3A%3AWriteExcel%3A%3ASimple) to render
 spreadsheets.
 
 ## `register`
@@ -68,8 +69,8 @@ Zak B. Elep <zakame@cpan.org>
 
 # ACKNOWLEDGEMENTS
 
-Thanks to Graham Barr and his [MojoX::Renderer::YAML](https://metacpan.org/pod/MojoX::Renderer::YAML) module, and
-Sebastian Riedel's core [Mojolicious::Plugin::EpRenderer](https://metacpan.org/pod/Mojolicious::Plugin::EpRenderer) for showing
+Thanks to Graham Barr and his [MojoX::Renderer::YAML](https://metacpan.org/pod/MojoX%3A%3ARenderer%3A%3AYAML) module, and
+Sebastian Riedel's core [Mojolicious::Plugin::EpRenderer](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AEpRenderer) for showing
 how to write renderers for [Mojolicious](https://metacpan.org/pod/Mojolicious)!
 
 Inspiration for this renderer came from this mailing list thread:
@@ -84,4 +85,4 @@ under the same terms as Perl itself.
 
 # SEE ALSO
 
-[Mojolicious](https://metacpan.org/pod/Mojolicious), [Spreadsheet::WriteExcel::Simple](https://metacpan.org/pod/Spreadsheet::WriteExcel::Simple), [http://mojolicious.org](http://mojolicious.org).
+[Mojolicious](https://metacpan.org/pod/Mojolicious), [Spreadsheet::WriteExcel::Simple](https://metacpan.org/pod/Spreadsheet%3A%3AWriteExcel%3A%3ASimple), [http://mojolicious.org](http://mojolicious.org).

@@ -23,7 +23,7 @@ my $pos = superpos(1);
 isa_ok($pos, "Quantum::Superpositions::Lazy::Superposition", "class constructed ok");
 is $pos->collapse, 1, "collapsing a single value ok";
 
-my @data = 1 .. 4;
+my @data = 1 .. 100;
 my $superpos = superpos(@data);
 my %wanted = map { $_ => 1 } @data;
 
@@ -58,3 +58,4 @@ is_deeply
 ok $one_of->is_collapsed, "collapsed ok";
 
 done_testing;
+

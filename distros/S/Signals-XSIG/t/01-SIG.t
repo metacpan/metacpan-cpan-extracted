@@ -9,6 +9,11 @@ use warnings;
 # when we set $SIG{signal}, is the registered signal handler
 # reflected in $XSIG{signal}?
 
+if ($^O eq 'haiku') {
+    diag "[haiku]";
+    diag "Signal numbers: $Config{sig_num}";
+    diag "Signal names:   $Config{sig_name}";
+}
 my $sig = appropriate_signals();
 
 sub ok_sig_is {
@@ -37,7 +42,7 @@ foreach my $func ('DEFAULT', 'IGNORE', '', undef, 'qualified::name',
     if ($Config{PERL_VERSION} == 8 && defined($func) 
 	&& substr($func,0,1) eq '*') {
       skip '5.8: $tiedHash{$key} = *glob assignment not allowed', 2;
-    } elsif ($Config{PERL_VERSION} == 8 && !defined($func)) {
+    } elsif ($Config{PERL_VERSION} <= 8 && !defined($func)) {
       # in 5.8 assignment to undef becomes assignment to ''
       delete $SIG{$sig};
     } else {
@@ -112,7 +117,7 @@ foreach my $func ('DEFAULT', 'IGNORE', '', undef, 'qualified::name',
       skip '5.8: $tiedHash{$key} = *glob assignment not allowed', 4;
     } else {
         my $mnem = rand() > 0.5 ? $sig : $alias;
-        if ($Config{PERL_VERSION} == 8 && !defined($func)) {
+        if ($Config{PERL_VERSION} <= 8 && !defined($func)) {
             delete $SIG{$mnem};
         } else {
             $SIG{$mnem} = $func;

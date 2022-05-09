@@ -1,36 +1,37 @@
---- #YAML:1.0
-name:               Net-eBay
-version:            0.61
-abstract:           XML based communication with eBay API
+---
+abstract: 'XML based communication with eBay API'
 author:
-    - Igor Chudov <ichudov@algebra.com>
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Igor Chudov <ichudov@algebra.com>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Crypt::SSLeay:        0
-    Data::Dumper:         0
-    DateTime::Precise:    0
-    HTML::FormatText:     0
-    HTML::PrettyPrinter:  0
-    HTML::TreeBuilder:    0
-    HTTP::Date:           0
-    HTTP::Request::Common:  0
-    HTTP::Status:         0
-    LWP::UserAgent:       0
-    Net::SSLeay:          0
-    Test::More:           0
-    Text::Format:         0
-    XML::Dumper:          0
-    XML::Simple:          0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.55_02
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-eBay
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Crypt::SSLeay: '0'
+  Data::Dumper: '0'
+  DateTime::Precise: '0'
+  HTML::FormatText: '0'
+  HTML::PrettyPrinter: '0'
+  HTML::TreeBuilder: '0'
+  HTTP::Date: '0'
+  HTTP::Request::Common: '0'
+  HTTP::Status: '0'
+  LWP::UserAgent: '0'
+  Net::SSLeay: '0'
+  Test::More: '0'
+  Text::Format: '0'
+  XML::Dumper: '0'
+  XML::Simple: '0'
+version: '0.62'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

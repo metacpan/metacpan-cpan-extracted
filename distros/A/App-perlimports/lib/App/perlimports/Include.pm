@@ -2,13 +2,13 @@ package App::perlimports::Include;
 
 use Moo;
 
-our $VERSION = '0.000036';
+our $VERSION = '0.000040';
 
 use Data::Dumper qw( Dumper );
 use List::Util qw( any none uniq );
 use Memoize qw( memoize );
 use MooX::StrictConstructor;
-use PPI::Document 1.270 ();
+use PPI::Document ();
 use PPIx::Utils::Classification qw( is_function_call is_perl_builtin );
 use Ref::Util qw( is_plain_arrayref is_plain_hashref );
 use Sub::HandlesVia;
@@ -750,7 +750,7 @@ App::perlimports::Include - Encapsulate one use statement in a document
 
 =head1 VERSION
 
-version 0.000036
+version 0.000040
 
 =head1 METHODS
 

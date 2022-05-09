@@ -1,5 +1,9 @@
 Revision history for Perl extension Data-Gimei
 
+v0.0.7 2022-05-06T05:47:29Z
+
+    - remove unused modules
+
 v0.0.6 2022-04-07T05:28:50Z
 
     - remove requirements of perl version on develop

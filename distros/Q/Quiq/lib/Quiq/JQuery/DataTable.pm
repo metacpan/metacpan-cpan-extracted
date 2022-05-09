@@ -296,7 +296,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.201';
+our $VERSION = '1.202';
 
 use Quiq::Html::Table::List;
 use Quiq::Hash;
@@ -578,7 +578,7 @@ sub instantiate {
             $col{'orderable'} = $orderable? \'true': \'false'; 
         }
         if (my $visible = $col->visible) {
-            $col{'visible'} = $visible; 
+            $col{'visible'} = $visible? \'true': \'false'; 
         }
         if (my $width = $col->width) {
             $col{'width'} = $width; 
@@ -614,7 +614,7 @@ sub instantiate {
 
 =head1 VERSION
 
-1.201
+1.202
 
 =head1 AUTHOR
 

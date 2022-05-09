@@ -6,21 +6,20 @@ use warnings;
 use Types::Standard qw(Maybe ArrayRef InstanceOf HashRef Bool);
 use Carp qw(croak);
 use Scalar::Util qw(blessed);
-use List::Util qw(first);
+use List::Util qw(any);
 
 use Form::Tiny::Error;
 use Form::Tiny::Utils qw(try);
 use Moo::Role;
 
-our $VERSION = '2.09';
+our $VERSION = '2.12';
 
 has 'field_defs' => (
 	is => 'ro',
 	isa => ArrayRef [InstanceOf ['Form::Tiny::FieldDefinition']],
 	clearer => '_ft_clear_field_defs',
 	default => sub {
-		my ($self) = shift;
-		return $self->form_meta->resolved_fields($self);
+		return $_[0]->form_meta->resolved_fields($_[0]);
 	},
 	lazy => 1,
 	init_arg => undef,
@@ -51,7 +50,7 @@ has 'errors' => (
 
 sub _ft_clear_form
 {
-	my ($self) = @_;
+	my $self = shift;
 
 	$self->_ft_clear_field_defs;
 	$self->_ft_clear_fields;
@@ -87,97 +86,11 @@ sub _ft_mangle_field
 	return;
 }
 
-sub _ft_find_field
-{
-	my ($self, $fields, $field_def) = @_;
-	my @path = @{$field_def->get_name_path->path};
-	my @meta = @{$field_def->get_name_path->meta};
-
-	# the result goes here
-	my @found;
-	my $traverser;
-	$traverser = sub {
-		my ($curr_path, $index, $value) = @_;
-
-		if ($index == @meta) {
-
-			# we reached the end of the tree
-			push @found, [$curr_path, $value];
-		}
-		else {
-			my $next = $path[$index];
-			my $meta = $meta[$index];
-
-			if ($meta eq 'ARRAY' && ref $value eq 'ARRAY') {
-				for my $ind (0 .. $#$value) {
-					return    # may be an error, exit early
-						unless $traverser->([@$curr_path, $ind], $index + 1, $value->[$ind]);
-				}
-
-				if (@$value == 0) {
-
-					# we wanted to have a deeper structure, but its not there, so clearly an error
-					return unless $index == $#meta;
-
-					# we had aref here, so we want it back in resulting hash
-					push @found, [$curr_path, [], 1];
-				}
-			}
-			elsif ($meta eq 'HASH' && ref $value eq 'HASH' && exists $value->{$next}) {
-				return $traverser->([@$curr_path, $next], $index + 1, $value->{$next});
-			}
-			else {
-				# something's wrong with the input here - does not match the spec
-				return;
-			}
-		}
-
-		return 1;    # all ok
-	};
-
-	if ($traverser->([], 0, $fields)) {
-		return [
-			map {
-				{
-					path => $_->[0],
-					value => $_->[1],
-					structure => $_->[2]
-				}
-			} @found
-		];
-	}
-	return;
-}
-
-sub _ft_assign_field
-{
-	my ($self, $fields, $field_def, $path_values) = @_;
-
-	my @arrays = map { $_ eq 'ARRAY' } @{$field_def->get_name_path->meta};
-	for my $path_value (@$path_values) {
-		my @parts = @{$path_value->{path}};
-		my $current = \$fields;
-		for my $i (0 .. $#parts) {
-
-			# array_path will contain array indexes for each array marker
-			if ($arrays[$i]) {
-				$current = \${$current}->[$parts[$i]];
-			}
-			else {
-				$current = \${$current}->{$parts[$i]};
-			}
-		}
-
-		$$current = $path_value->{value};
-	}
-}
-
 ### OPTIMIZATION: detect and use faster route for flat forms
 
 sub _ft_validate_flat
 {
 	my ($self, $fields, $dirty, $inline_hook) = @_;
-	my $meta = $self->form_meta;
 
 	foreach my $validator (@{$self->field_defs}) {
 		my $curr_f = $validator->name;
@@ -199,7 +112,7 @@ sub _ft_validate_flat
 			$dirty->{$curr_f} = $validator->get_default($self);
 		}
 		elsif ($validator->required) {
-			$self->add_error($meta->build_error(Required => field => $curr_f));
+			$self->add_error($self->form_meta->build_error(Required => field => $curr_f));
 		}
 	}
 }
@@ -207,12 +120,11 @@ sub _ft_validate_flat
 sub _ft_validate_nested
 {
 	my ($self, $fields, $dirty, $inline_hook) = @_;
-	my $meta = $self->form_meta;
 
 	foreach my $validator (@{$self->field_defs}) {
 		my $curr_f = $validator->name;
 
-		my $current_data = $self->_ft_find_field($fields, $validator);
+		my $current_data = Form::Tiny::Utils::_find_field($fields, $validator);
 		if (defined $current_data) {
 			my $all_ok = 1;
 			my @to_assign;
@@ -227,7 +139,7 @@ sub _ft_validate_nested
 				push @to_assign, $path_value;
 			}
 
-			$self->_ft_assign_field($dirty, $validator, \@to_assign);
+			Form::Tiny::Utils::_assign_field($dirty, $validator, \@to_assign);
 
 			# found and valid, go to the next field
 			next if $all_ok;
@@ -235,7 +147,7 @@ sub _ft_validate_nested
 
 		# for when it didn't pass the existence test
 		if ($validator->has_default) {
-			$self->_ft_assign_field(
+			Form::Tiny::Utils::_assign_field(
 				$dirty,
 				$validator,
 				[
@@ -247,7 +159,7 @@ sub _ft_validate_nested
 			);
 		}
 		elsif ($validator->required) {
-			$self->add_error($meta->build_error(Required => field => $curr_f));
+			$self->add_error($self->form_meta->build_error(Required => field => $curr_f));
 		}
 	}
 }
@@ -288,18 +200,6 @@ sub valid
 	$self->_ft_set_fields($form_valid ? $dirty : undef);
 
 	return $form_valid;
-}
-
-sub is_validated
-{
-	warn '$form->is_validated is deprecated';
-	return 0;
-}
-
-sub clear_valid
-{
-	warn '$form->clear_valid is deprecated';
-	return;
 }
 
 sub check
@@ -346,7 +246,7 @@ sub add_error
 	# check if the field exists
 	for my $name ($error->field) {
 		croak "form does not contain a field definition for $name"
-			if defined $name && !defined first { $_->name eq $name }
+			if defined $name && !any { $_->name eq $name }
 			@{$self->field_defs};
 	}
 
@@ -373,8 +273,7 @@ sub errors_hash
 
 sub has_errors
 {
-	my ($self) = @_;
-	return @{$self->errors} > 0;
+	return @{$_[0]->errors} > 0;
 }
 
 1;

@@ -44,7 +44,7 @@ for my $aref (@data) {
 	is_deeply $form->fields, {%{$aref->[1]}, undefined => undef}, "default value ok";
 }
 
-for my $conf ({name => 'a.*.b'}, {name => 'aoeu.*'}, {name => 'test', type => Int}) {
+for my $conf ({name => 'a.*.b'}, {name => 'aoeu.*'}) {
 	dies_ok {
 		my $form = Form::Tiny::Inline->new(
 			field_defs => [
@@ -56,8 +56,9 @@ for my $conf ({name => 'a.*.b'}, {name => 'aoeu.*'}, {name => 'test', type => In
 		);
 		$form->set_input({});
 		$form->valid;
-	}
-	'invalid form configuration dies';
+		}
+		'invalid form configuration dies';
 }
 
 done_testing();
+

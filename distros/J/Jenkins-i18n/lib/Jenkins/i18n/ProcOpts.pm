@@ -5,8 +5,9 @@ use strict;
 use warnings;
 use Hash::Util qw(lock_hash unlock_value lock_value);
 use Carp qw(confess);
+use File::Spec;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 =pod
 
@@ -65,14 +66,20 @@ A boolean (in Perl terms) if CLI is running in debug mode.
 
 A string identifying the chosen language for processing.
 
+=item 8
+
+An optional string of a regular expression to match the content of the
+translated properties.
+
 =back
 
 =cut
 
 sub new {
-    my ( $class, $source_dir, $target_dir, $use_counter,
-        $is_remove, $is_add, $is_debug, $lang )
-        = @_;
+    my (
+        $class,  $source_dir, $target_dir, $use_counter, $is_remove,
+        $is_add, $is_debug,   $lang,       $search
+    ) = @_;
     my $self = {
         source_dir  => $source_dir,
         target_dir  => $target_dir,
@@ -82,6 +89,7 @@ sub new {
         is_debug    => $is_debug,
         language    => $lang,
         counter     => 0,
+        ext_sep     => qr/\./
     };
 
     foreach my $attrib ( keys( %{$self} ) ) {
@@ -92,9 +100,43 @@ sub new {
     confess
 'Removing or adding translation files are excluding operations, they cannot be both true at the same time'
         if ( $is_remove and $is_add );
+
+    if ( defined($search) ) {
+        $self->{search}     = qr/$search/;
+        $self->{has_search} = 1;
+    }
+    else {
+        $self->{has_search} = 0;
+    }
+
     bless $self, $class;
     lock_hash( %{$self} );
     return $self;
+}
+
+=head2 is_to_search
+
+Returns true (1) or false (0) if there is a defined term to search on the
+translated properties values.
+
+=cut
+
+sub is_to_search {
+    my $self = shift;
+    return $self->{has_search};
+}
+
+=head2 search_term
+
+Returns the compiled regular expression that will be used to match terms in the
+translated properties values.
+
+=cut
+
+sub search_term {
+    my $self = shift;
+    confess 'There is no defined search term' unless ( $self->{has_search} );
+    return $self->{search};
 }
 
 =head2 get_language
@@ -234,13 +276,38 @@ The path to the English file location.
 =cut
 
 sub define_files {
-    my ( $self,           $file )         = @_;
-    my ( $curr_lang_file, $english_file ) = ( $file, $file );
-    $curr_lang_file =~ s/$self->{source_dir}/$self->{target_dir}/;
-    my $lang = '_' . $self->{language} . '.properties';
-    $curr_lang_file =~ s/(\.jelly)|(\.properties)/$lang/;
-    $english_file   =~ s/(\.jelly)/.properties/;
-    return ( $curr_lang_file, $english_file );
+    my ( $self, $file ) = @_;
+    my $filename = ( File::Spec->splitpath($file) )[2];
+    my ( $filename_prefix, $filename_ext )
+        = split( $self->{ext_sep}, $filename );
+    my ( $curr_lang_file, $english_file );
+
+    if ( $filename_ext eq 'jelly' ) {
+        $curr_lang_file
+            = $filename_prefix . '_' . $self->{language} . '.properties';
+        $english_file = "$filename_prefix.properties";
+    }
+    elsif ( $filename_ext eq 'properties' ) {
+        $curr_lang_file
+            = $filename_prefix . '_' . $self->{language} . '.properties';
+        $english_file = $filename;
+    }
+    else {
+        confess "Unexpected file extension '$filename_ext'";
+    }
+
+    if ( $self->{source_dir} eq $self->{target_dir} ) {
+        return (
+            File::Spec->catfile( $self->{source_dir}, $curr_lang_file ),
+            File::Spec->catfile( $self->{source_dir}, $english_file )
+        );
+    }
+
+    return (
+        File::Spec->catfile( $self->{target_dir}, $curr_lang_file ),
+        File::Spec->catfile( $self->{source_dir}, $english_file )
+    );
+
 }
 
 1;

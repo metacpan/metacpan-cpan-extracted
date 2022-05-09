@@ -9,7 +9,7 @@ use CPAN::HandleConfig;
 use CPAN::Reporter::Smoker::OpenBSD::PerlConfig;
 use Config;
 
-my $total_tests = 3;
+my $total_tests = 2;
 plan tests => $total_tests;
 
 SKIP: {
@@ -42,8 +42,6 @@ SKIP: {
     like( $data_ref->{match}->{distribution},
         qr/^\^ARFREITAS/,
         'the created distroprefs has the expected distro name' );
-    note('Testing with stub');
-    is_deeply( $data_ref, $expected, 'block_distro works as expected' );
 
     # to match the current running OS
     update_per_os($expected);
@@ -52,7 +50,8 @@ SKIP: {
         = block_distro( $distro_name, $perl_info->dump, 'Tests hang smoker' );
     delete( $data_ref->{full_path} );
     note('Testing with CPAN::Reporter::Smoker::OpenBSD::PerlConfig');
-    is_deeply( $data_ref, $expected, 'block_distro works as expected' );
+    is_deeply( $data_ref, $expected, 'block_distro works as expected' )
+        or diag( explain($data_ref) );
 }
 
 sub update_per_os {
@@ -60,4 +59,15 @@ sub update_per_os {
     my $shortcut = $expected->{match}->{perlconfig};
     $shortcut->{osname}   = $Config{osname};
     $shortcut->{archname} = $Config{archname};
+    my $attrib_name = 'useithreads';
+
+    if (    ( exists( $Config{$attrib_name} ) )
+        and ( defined( $Config{$attrib_name} ) )
+        and ( $Config{$attrib_name} eq 'define' ) )
+    {
+        delete( $shortcut->{"no_$attrib_name"} );
+        $shortcut->{$attrib_name} = 'define';
+    }
+
+    return 1;
 }

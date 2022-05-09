@@ -250,3 +250,6 @@ Version 0.18 December 14, 2017
 Version 0.19 December 19, 2017
 	Set version requirement of Term::ANSIColor to 4.00
 
+Version 0.20 May 8, 2022
+	Removed Liliypond from bench test
+	Added disclaimer to pod

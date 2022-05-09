@@ -1,6 +1,18 @@
 Revision history for Perl extension UI-Various
 
-0.18 2022-02-28T08:14:39Z
+0.19 2022-05-08T10:59:03Z
+
+0.19 2022-05-08T10:58:14Z
+
+    - minor fix in dod-check.pl
+    - added Listbox widget
+    - examples now use option 'stderr => 1'
+    - stricter check in Tk and Curses base::_cleanup
+    - fixed wrong hard-coded decoration in RichTerm's Check and Radio
+    - minor message fixes
+    - renumbered unit tests
+    - minor documentation fixes
+    - removed stupid formatting bugs in RichTerm's Radio and Box
 
 0.18 2022-02-28T08:11:45Z
 

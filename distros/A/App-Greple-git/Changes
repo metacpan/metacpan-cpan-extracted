@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-git
 
+0.02 2022-05-08T08:49:28Z
+
+    - introduce --color-blame-label option
+
 0.01 2022-04-28T10:50:50Z
 
     - original version

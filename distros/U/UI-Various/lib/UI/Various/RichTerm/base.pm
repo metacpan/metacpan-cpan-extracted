@@ -43,7 +43,7 @@ use Text::Wrap;
 $Text::Wrap::huge = 'overflow';
 $Text::Wrap::unexpand = 0;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use UI::Various::core;
 
@@ -57,8 +57,8 @@ our @EXPORT_OK = qw(%D);
 
 a hash of decoration characters for window borders (C<W1> to C<W9> without
 C<W5>), box borders (C<B*>, C<b*> and C<c5>), check boxes (C<CL> and C<CR>),
-radio buttons (C<RL> and C<RR>), normal buttons (C<BL> and C<BR>) and
-underline (C<UL1> and C<UL0>).
+radio buttons (C<RL> and C<RR>), normal buttons (C<BL> and C<BR>), selected
+(C<SL1> and C<SL0>) and underline (C<UL1> and C<UL0>).
 
 =cut
 
@@ -75,6 +75,7 @@ use constant DECO_ASCII => (W7 => '#', W8 => '=', W9 => '#',
 			    BL => '[', BR => ']',
 			    CL => '[', CR => ']',
 			    RL => '(', RR => ')',
+			    SL1 => "\e[7m", SL0 => "\e[27m",
 			    UL1 => "\e[4m", UL0 => "\e[24m");
 
 # https://www.utf8-chartable.de/unicode-utf8-table.pl?start=9472&number=128
@@ -92,6 +93,7 @@ use constant DECO_UTF8 => (W7 => "\x{2554}", W8 => "\x{2550}", W9 => "\x{2557}",
 			   BL => "\x{2503}", BR => "\x{2503}",
 			   CL => '[', CR => ']',
 			   RL => '(', RR => ')',
+			   SL1 => "\e[7m", SL0 => "\e[27m",
 			   UL1 => "\e[4m", UL0 => "\e[24m");
 
 our %D = DECO_ASCII;
@@ -250,7 +252,7 @@ sub _format($$$$$$$$$)
     # wrap text, if applicable:
     my @text;
     if (ref($text) eq 'ARRAY')
-    {   @text = @{$text};   }
+    {   push @text, split("\n", $_) foreach @{$text};   }
     else
     {
 	$Text::Wrap::columns = $w + 1;

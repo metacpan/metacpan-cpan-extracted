@@ -17,7 +17,7 @@ require Moo::Role;
 
 use namespace::clean;
 
-our $VERSION = '2.09';
+our $VERSION = '2.12';
 
 # more clear error messages in some crucial cases
 our @CARP_NOT = qw(Form::Tiny Form::Tiny::Form);
@@ -42,6 +42,12 @@ has 'is_flat' => (
 	is => 'ro',
 	writer => 'set_flat',
 	default => sub { 1 },
+);
+
+has 'is_dynamic' => (
+	is => 'ro',
+	writer => 'set_dynamic',
+	default => sub { 0 },
 );
 
 has 'hooks' => (
@@ -80,6 +86,13 @@ has 'messages' => (
 	default => sub { {} },
 );
 
+has 'static_blueprint' => (
+	is => 'ro',
+	isa => HashRef,
+	lazy => 1,
+	builder => '_build_blueprint',
+);
+
 sub set_package
 {
 	my ($self, $package) = @_;
@@ -90,10 +103,7 @@ sub set_package
 		no warnings 'redefine';
 
 		*{"${package}::form_meta"} = sub {
-			my ($instance) = @_;
-			my $package = defined blessed $instance ? blessed $instance : $instance;
-
-			return get_package_form_meta($package);
+			return get_package_form_meta(ref $_[0] || $_[0]);
 		};
 		set_subname "${package}::form_meta", *{"${package}::form_meta"};
 	}
@@ -175,6 +185,8 @@ sub bootstrap
 			if @real_parents > 1;
 
 		my ($parent) = @real_parents;
+
+		# this is required so that proper hooks on inherit_from can be fired
 		$self->inherit_roles_from($parent ? $parent->form_meta : undef);
 		$self->inherit_from($parent->form_meta) if $parent;
 	}
@@ -196,7 +208,7 @@ sub resolved_fields
 {
 	my ($self, $object) = @_;
 
-	return [@{$self->fields}] if $self->is_flat;
+	return [@{$self->fields}] if !$self->is_dynamic;
 
 	croak 'resolved_fields requires form object'
 		unless defined blessed $object;
@@ -226,10 +238,13 @@ sub add_field
 	my $builder = Form::Tiny::FieldDefinitionBuilder->new(data => $scalar_param)->build;
 	push @{$self->fields}, $builder;
 
-	if ($self->is_flat && ($builder->isa('Form::Tiny::FieldDefinitionBuilder') || @{$builder->get_name_path->path} > 1))
-	{
-		$self->set_flat(0);
-	}
+	$self->set_dynamic(1)
+		if $builder->isa('Form::Tiny::FieldDefinitionBuilder');
+
+	# NOTE: we can only know if the form is flat if it is not dynamic
+	# otherwise we need to assume it is not flat
+	$self->set_flat(0)
+		if $self->is_dynamic || @{$builder->get_name_path->path} > 1;
 
 	return $builder;
 }
@@ -276,14 +291,12 @@ sub add_message
 	return $self;
 }
 
-# this is required so that proper hooks on inherit_from can be fired
 sub inherit_roles_from
 {
 	my ($self, $parent) = @_;
 
 	if (defined $parent) {
 		$self->set_meta_roles([uniq(@{$parent->meta_roles}, @{$self->meta_roles})]);
-		$self->set_form_roles([uniq(@{$parent->form_roles}, @{$self->form_roles})]);
 	}
 
 	Moo::Role->apply_roles_to_object(
@@ -328,8 +341,63 @@ sub inherit_from
 	);
 
 	$self->set_flat($parent->is_flat);
+	$self->set_dynamic($parent->is_dynamic);
 
 	return $self;
 }
 
+sub _build_blueprint
+{
+	my ($self, $context) = @_;
+	my %result;
+
+	# croak, since we don't know anything about dynamic fields in static context
+	croak "Can't create a blueprint of a dynamic form"
+		if $self->is_dynamic && !$context;
+
+	# if context is given, get the cached resolved fields from it
+	# note: context will never be passed when it is called by Moo to build 'blueprint'
+	my $fields = $context ? $context->field_defs : $self->fields;
+
+	for my $def (@$fields) {
+		my $value = $def;
+		if ($def->is_subform) {
+			my $meta = get_package_form_meta(ref $def->type);
+			$value = $meta->blueprint($def->type);
+		}
+
+		my @meta = @{$def->get_name_path->meta};
+		my @path = @{$def->get_name_path->path};
+
+		# adjust path so that instead of stars (*) we get zeros
+		@path = map { $meta[$_] eq 'ARRAY' ? 0 : $path[$_] } 0 .. $#path;
+
+		Form::Tiny::Utils::_assign_field(
+			\%result,
+			$def, [
+				{
+					path => \@path,
+					value => $value
+				}
+			]
+		);
+	}
+
+	return \%result;
+}
+
+sub blueprint
+{
+	my ($self, $context) = @_;
+
+	if ($self->is_dynamic) {
+		return $self->_build_blueprint($context);
+	}
+	else {
+		# $context can be skipped if the form is not dynamic
+		return $self->static_blueprint;
+	}
+}
+
 1;
+

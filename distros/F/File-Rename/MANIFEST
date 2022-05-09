@@ -17,6 +17,7 @@ t/File-Rename-list-null.t
 t/File-Rename-require.t
 t/File-Rename-unicode.t
 t/File-Rename-V.t
+t/rename-cygwin.t
 t/rename-darwin.t
 t/rename-examples.t
 t/File-Rename-dash.t

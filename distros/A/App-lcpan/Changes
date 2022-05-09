@@ -1,3 +1,16 @@
+1.070   2022-03-27  Released-By: PERLANCAR; Urgency: medium
+
+        - Add subcommand: dists-by-mod-count.
+
+
+1.069   2022-03-27  Released-By: PERLANCAR; Urgency: medium
+
+        - Add proper rank column to ranking subcommands (*-by-*count).
+
+        - Add subcommands: db-path, dists-by-script-count,
+          mods-by-rdep-author-count.
+
+
 1.068   2021-06-05  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] [doc] Add description and cross-mention between mentions-for-mods

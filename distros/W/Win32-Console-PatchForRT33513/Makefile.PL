@@ -12,10 +12,13 @@ WriteMakefile(
     META_MERGE => {
         'meta-spec' => { version => 2 },
         resources   => {
+            bugtracker => {
+                web => "https://github.com/kuerbis/Win32-Console-PatchForRT33513/issues",
+            },
             repository => {
               type => 'git',
-              web  => 'https://github.com/kuerbis/Win32/Console/PatchForRT33513',
-              url  => 'https://github.com/kuerbis/Win32/Console/PatchForRT33513.git',
+              web  => 'https://github.com/kuerbis/Win32-Console-PatchForRT33513',
+              url  => 'https://github.com/kuerbis/Win32-Console-PatchForRT33513.git',
             },
         },
     },

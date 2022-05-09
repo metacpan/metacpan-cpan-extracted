@@ -1,5 +1,8 @@
 package Dancer2::Plugin::FormValidator::Processor;
 
+use strict;
+use warnings;
+
 use Moo;
 use List::Util 1.45 qw(uniqstr);
 use Hash::MultiValue;
@@ -32,7 +35,8 @@ has validator_profile => (
 );
 
 sub result {
-    my $self     = shift;
+    my ($self)   = @_;
+
     my $messages = {};
 
     my ($success, $valid, $invalid) = $self->_validate;
@@ -58,8 +62,11 @@ sub result {
     );
 }
 
+# Apply validators to each fields.
+# Collect valid and invalid fields.
 sub _validate {
-    my $self    = shift;
+    my ($self)  = @_;
+
     my $success = 0;
     my %profile = %{ $self->validator_profile->profile };
     my $is_valid;
@@ -97,13 +104,15 @@ sub _validate {
     return ($success, \@valid, \@invalid)
 }
 
+# Because validator signatures could be validator:params, we need to split it.
 sub _split_validator_declaration {
     return ($_[1] =~ /([^:]+):?(.*)/);
 }
 
+# Generates messages for each invalid field.
 sub _messages {
-    my $self     = shift;
-    my $invalid  = shift;
+    my ($self, $invalid) = @_;
+
     my $messages = Hash::MultiValue->new;
     my $config   = $self->config;
     my $ucfirst  = $config->ucfirst;
@@ -118,6 +127,7 @@ sub _messages {
 
         if ($profile->does('Dancer2::Plugin::FormValidator::Role::HasMessages')) {
             my $profile_messages = $profile->messages;
+
             if (ref $profile_messages eq 'HASH') {
                 $message = $profile_messages->{$field}->{$name} || $message;
             }
@@ -126,14 +136,19 @@ sub _messages {
             }
         }
 
-        $messages->add(
-            $field,
-            sprintf(
-                $message->{$language},
-                $ucfirst ? ucfirst($field) : $field,
-                split(',', $params),
-            )
-        );
+        {
+            # Cause we need this feature.
+            no warnings 'redundant';
+
+            $messages->add(
+                $field,
+                sprintf(
+                    $message->{$language},
+                    $ucfirst ? ucfirst($field) : $field,
+                    split(',', $params),
+                )
+            );
+        }
     }
 
     return $messages->as_hashref_multi;

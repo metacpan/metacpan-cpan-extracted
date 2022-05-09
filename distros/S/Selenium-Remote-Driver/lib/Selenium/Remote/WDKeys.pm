@@ -1,5 +1,5 @@
 package Selenium::Remote::WDKeys;
-$Selenium::Remote::WDKeys::VERSION = '1.46';
+$Selenium::Remote::WDKeys::VERSION = '1.47';
 # ABSTRACT: Representation of keystrokes used by Selenium::Remote::WebDriver
 
 
@@ -85,7 +85,7 @@ Selenium::Remote::WDKeys - Representation of keystrokes used by Selenium::Remote
 
 =head1 VERSION
 
-version 1.46
+version 1.47
 
 =head1 SYNOPSIS
 

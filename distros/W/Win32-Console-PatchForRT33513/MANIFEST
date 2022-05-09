@@ -1,7 +1,11 @@
 Changes
 lib/Win32/Console/PatchForRT33513.pm
+LICENSE
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST
+META.json
+META.yml
+README
 t/00-load.t
 t/01-can.t
 xt/manifest.t
@@ -11,5 +15,3 @@ xt/synopsis.t
 xt/version1.t
 xt/version2.t
 xt/whitespaces.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

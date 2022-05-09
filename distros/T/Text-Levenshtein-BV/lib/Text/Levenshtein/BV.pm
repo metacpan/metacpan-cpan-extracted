@@ -2,7 +2,7 @@ package Text::Levenshtein::BV;
 
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use utf8;
 
@@ -14,7 +14,7 @@ use integer;
 no warnings 'portable'; # for 0xffffffffffffffff
 
 our @masks = (
-# 0x0000000000000000,
+0x0000000000000000,
 0x0000000000000001,0x0000000000000003,0x0000000000000007,0x000000000000000f,
 0x000000000000001f,0x000000000000003f,0x000000000000007f,0x00000000000000ff,
 0x00000000000001ff,0x00000000000003ff,0x00000000000007ff,0x0000000000000fff,
@@ -38,8 +38,6 @@ sub new {
 
     bless @_ ? @_ > 1 ? {@_} : {%{$_[0]}} : {}, ref $class || $class;
 }
-
-use Data::Dumper;
 
 sub SES {
     my ($self, $a, $b) = @_;
@@ -252,16 +250,9 @@ sub _backtrace2 {
     return @ses;
 }
 
-
-my $diag = 0;
-
 # [HN02] Fig. 3 -> Fig. 7
 sub distance {
     my ($self, $a, $b) = @_;
-
-    #TODO: if (@b < @a) {$a = $b; $b = $a}
-
-    ##if ( !scalar(@$a) && !scalar(@$b) ) { return 0 }
 
     my ($amin, $amax, $bmin, $bmax) = (0, $#$a, 0, $#$b);
 
@@ -292,13 +283,15 @@ if (1) {
         my $m_mask = 1 << $m-1;
 
         my $VP = 0;
-        $VP  |= 1 << $_  for 0..$m-1; # TODO: cache table
+
+        $VP = $masks[$m]; # mask from cached table
 
         my $VN  = 0;
 
         my ($PM,$X,$D0,$HN,$HP);
 
         # outer loop [HN02] Fig. 7
+        # 22 instructions
         for my $j ( $bmin .. $bmax ) {
             $PM = $positions->{$b->[$j]} // 0;
             $X  = $PM | $VN;
@@ -309,8 +302,8 @@ if (1) {
             $VN = $X & $D0;
             $VP = ($HN << 1) | ~($X | $D0);
 
-            if ($HP & $m_mask) { $diff++; };
-            if ($HN & $m_mask) { $diff--; };
+            if ($HP & $m_mask) { $diff++; }
+            elsif ($HN & $m_mask) { $diff--; }
 
         }
         return $diff;
@@ -359,7 +352,7 @@ if (1) {
                 $HNcarry = $HN >> ($width-1) & 1;
 
                 if ($HP & $mask[$k]) { $diff++; }
-                if ($HN & $mask[$k]) { $diff--; }
+                elsif ($HN & $mask[$k]) { $diff--; }
             }
         }
         return $diff;
@@ -433,8 +426,6 @@ Text::Levenshtein::BV - Bit Vector (BV) implementation of the
 
 =begin html
 
-<a href="https://travis-ci.org/wollmers/Text-Levenshtein-BV"><img src="https://travis-ci.org/wollmers/Text-Levenshtein-BV.png" alt="LCS-BV"></a>
-<a href='https://coveralls.io/r/wollmers/Text-Levenshtein-BV?branch=master'><img src='https://coveralls.io/repos/wollmers/Text-Levenshtein-BV/badge.png?branch=master' alt='Coverage Status' /></a>
 <a href='http://cpants.cpanauthors.org/dist/Text-Levenshtein-BV'><img src='http://cpants.cpanauthors.org/dist/Text-Levenshtein-BV.png' alt='Kwalitee Score' /></a>
 <a href="http://badge.fury.io/pl/Text-Levenshtein-BV"><img src="https://badge.fury.io/pl/Text-Levenshtein-BV.svg" alt="CPAN version" height="18"></a>
 
@@ -541,6 +532,11 @@ Faster bit-parallel approximate string matching.
 In Proc. 13th Combinatorial Pattern Matching (CPM 2002),
 LNCS 2373, pages 203–224, 2002.
 
+[Myers99]
+Myers, Gene.
+A fast bit-vector algorithm for approximate string matching based on dynamic progamming.
+Journal of the ACM, 46(3):395–415, 1999.
+
 
 =head1 SEE ALSO
 
@@ -562,7 +558,7 @@ Helmut Wollmersdorfer E<lt>helmut@wollmersdorfer.atE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2016-2021 by Helmut Wollmersdorfer
+Copyright 2016-2022 by Helmut Wollmersdorfer
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-10'; # DATE
+our $DATE = '2022-05-08'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ImageMagickUtils/downsize_image",
@@ -39,13 +39,13 @@ downsize-image - Reduce image size, by default via compressing to JPEG quality 4
 
 =head1 VERSION
 
-This document describes version 0.012 of downsize-image (from Perl distribution App-ImageMagickUtils), released on 2022-02-10.
+This document describes version 0.017 of downsize-image (from Perl distribution App-ImageMagickUtils), released on 2022-05-08.
 
 =head1 SYNOPSIS
 
 Usage:
 
-% B<downsize-image> [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--delete-original>|B<-D>|B<--no-delete-original>|B<--nodelete-original>] [B<--downsize-to>=I<str>] [B<--dry-run>|B<-n>] [(B<--file>=I<filename>)+] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<-q>=I<int>] [B<--files-json>=I<json>] [B<--dont-downsize>|B<--no-downsize>] -- E<lt>I<file>E<gt> ...
+% B<downsize-image> [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--delete-original>|B<-D>|B<--no-delete-original>|B<--nodelete-original>] [B<--downsize-to>=I<str>] [B<--dry-run>|B<-n>] [(B<--file>=I<filename>)+] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--quality>=I<int>] [B<--skip-downsized>|B<--no-skip-downsized>|B<--noskip-downsized>] [B<--skip-whatsapp>|B<--no-skip-whatsapp>|B<--noskip-whatsapp>] [B<--trash-original>|B<-T>|B<--no-trash-original>|B<--notrash-original>] [B<--files-json>=I<json>] [B<--1536>|B<--2048>|B<--dont-downsize>|B<--no-downsize>] [B<-q>=I<int>] -- E<lt>I<file>E<gt> ...
 
 =head1 DESCRIPTION
 
@@ -68,7 +68,24 @@ C<*> marks required options.
 
 =over
 
+=item B<--1536>
+
+Shortcut for --downsize-to=1536.
+
+See C<--downsize-to>.
+
+=item B<--2048>
+
+Shortcut for --downsize-to=2048.
+
+See C<--downsize-to>.
+
 =item B<--delete-original>, B<-D>
+
+Delete (unlink) the original file after downsizing.
+
+See also the `trash_original` option.
+
 
 =item B<--dont-downsize>
 
@@ -111,11 +128,42 @@ Alias for --downsize-to ''.
 
 See C<--downsize-to>.
 
-=item B<-q>=I<s>
+=item B<--no-skip-downsized>
+
+Do not skip previously downsized images.
+
+By default, when given a filename that looks like it's already downsized, e.g.
+`foo.1024-q40.jpg` or `foo.q40.jpg`, will skip downsizing. The
+`--no-skip-downsized` option will process such filenames nevertheless.
+
+
+=item B<--no-skip-whatsapp>
+
+Do not skip WhatsApp images.
+
+By default, assuming that WhatsApp already compresses images, when given a
+filename that matches a WhatsApp image filename, e.g. `IMG-20220508-WA0001.jpg`
+(will be checked using <pm:Regexp::Pattern::Filename::Image::WhatsApp>), will
+skip downsizing. The `--no-skip-whatsapp` option will process such filenames
+nevertheless.
+
+
+=item B<--quality>=I<s>, B<-q>
 
 Default value:
 
  40
+
+=item B<--trash-original>, B<-T>
+
+Trash the original file after downsizing.
+
+This option uses the <pm:File::Trash::FreeDesktop> module to do the trashing.
+Compared to deletion, with this option you can still restore the trashed
+original files from the Trash directory.
+
+See also the `delete_original` option.
+
 
 =back
 
@@ -276,7 +324,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/downsize-image.conf>, F</home/u1/downsize-image.conf>, or F</etc/downsize-image.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/s1/.config/downsize-image.conf>, F</home/s1/downsize-image.conf>, or F</etc/downsize-image.conf>.
 
 All found files will be read and merged.
 
@@ -311,7 +359,10 @@ List of available configuration parameters:
  format (see --format)
  log_level (see --log-level)
  naked_res (see --naked-res)
- q (see -q)
+ quality (see --quality)
+ skip_downsized (see --no-skip-downsized)
+ skip_whatsapp (see --no-skip-whatsapp)
+ trash_original (see --trash-original)
 
 =head1 ENVIRONMENT
 
@@ -321,9 +372,9 @@ Specify additional command-line options.
 
 =head1 FILES
 
-F</home/u1/.config/downsize-image.conf>
+F</home/s1/.config/downsize-image.conf>
 
-F</home/u1/downsize-image.conf>
+F</home/s1/downsize-image.conf>
 
 F</etc/downsize-image.conf>
 
@@ -368,7 +419,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

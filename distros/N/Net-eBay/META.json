@@ -1,0 +1,56 @@
+{
+   "abstract" : "XML based communication with eBay API",
+   "author" : [
+      "Igor Chudov <ichudov@algebra.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-eBay",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::SSLeay" : "0",
+            "Data::Dumper" : "0",
+            "DateTime::Precise" : "0",
+            "HTML::FormatText" : "0",
+            "HTML::PrettyPrinter" : "0",
+            "HTML::TreeBuilder" : "0",
+            "HTTP::Date" : "0",
+            "HTTP::Request::Common" : "0",
+            "HTTP::Status" : "0",
+            "LWP::UserAgent" : "0",
+            "Net::SSLeay" : "0",
+            "Test::More" : "0",
+            "Text::Format" : "0",
+            "XML::Dumper" : "0",
+            "XML::Simple" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.62",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

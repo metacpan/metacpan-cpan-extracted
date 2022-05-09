@@ -397,7 +397,8 @@ io_slurp(io_glue *ig, unsigned char **c) {
 
   if (rc != ieb->length) {
     dIMCTXio(ig);
-    im_fatal(aIMCTX,1, "io_slurp: bufchain_read returned an incomplete read: rc = %d, request was %d\n", rc, ieb->length);
+    im_fatal(aIMCTX,1, "io_slurp: bufchain_read returned an incomplete read: rc = %ld, request was %ld\n",
+             (long)rc, (long)ieb->length);
   }
 
   return rc;
@@ -573,12 +574,14 @@ i_io_peekn(io_glue *ig, void *buf, size_t size) {
       && !(ig->buf_eof || ig->error)) {
     i_io_read_fill(ig, size);
   }
-  
-  if (size > ig->read_end - ig->read_ptr)
-    size = ig->read_end - ig->read_ptr;
 
-  if (size)
-    memcpy(buf, ig->read_ptr, size);
+  if (ig->read_ptr && ig->read_end != ig->read_ptr) {
+    if (size > ig->read_end - ig->read_ptr)
+      size = ig->read_end - ig->read_ptr;
+
+    if (size)
+      memcpy(buf, ig->read_ptr, size);
+  }
   else if (ig->buf_eof) {
     IOL_DEB(fprintf(IOL_DEBs, "i_io_peekn() => 0 (eof)\n"));
     return 0;

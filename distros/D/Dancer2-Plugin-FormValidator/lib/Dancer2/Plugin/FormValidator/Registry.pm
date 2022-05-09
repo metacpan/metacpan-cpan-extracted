@@ -1,5 +1,8 @@
 package Dancer2::Plugin::FormValidator::Registry;
 
+use strict;
+use warnings;
+
 use Moo;
 use Carp;
 use Module::Load qw(autoload);
@@ -17,7 +20,8 @@ has validators => (
     isa       => HashRef,
     lazy      => 1,
     builder   => sub {
-        my $self = shift;
+        my ($self) = @_;
+
         my %plugin_validators;
 
         for my $validator (keys % { $self->_validators }) {
@@ -62,7 +66,7 @@ sub get {
             : $class->new;
 
         if (not $validator->does($role)) {
-            Carp::croak "Validator: $class should implement $role\n";
+            Carp::croak("Validator: $class should implement $role\n");
         }
 
         return $validator;
@@ -71,6 +75,7 @@ sub get {
     Carp::croak("$name is not defined\n");
 }
 
+# Validators map.
 sub _validators {
     return {
         accepted        => 'Dancer2::Plugin::FormValidator::Validator::Accepted',

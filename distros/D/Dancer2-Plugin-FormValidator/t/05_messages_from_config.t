@@ -1,23 +1,14 @@
 use strict;
 use warnings;
 use utf8::all;
-use Test::More tests => 2;
 
+use FindBin;
+use Test::More tests => 2;
 use Dancer2::Plugin::FormValidator::Config;
 use Dancer2::Plugin::FormValidator::Registry;
 use Dancer2::Plugin::FormValidator::Processor;
 
-package Validator {
-    use Moo;
-    with 'Dancer2::Plugin::FormValidator::Role::Profile';
-
-    sub profile {
-        return {
-            name  => [qw(required)],
-            email => [qw(required email)],
-        };
-    };
-}
+require "$FindBin::Bin/lib/validator.pl";
 
 my $config = Dancer2::Plugin::FormValidator::Config->new(
     config => {
@@ -40,7 +31,13 @@ my $config = Dancer2::Plugin::FormValidator::Config->new(
     }
 );
 
-my $validator = Validator->new;
+my $validator = Validator->new(profile_hash =>
+    {
+        name  => [qw(required)],
+        email => [qw(required email)],
+    }
+);
+
 my $registry  = Dancer2::Plugin::FormValidator::Registry->new;
 my $input = {
     email => 'alexсpan.org',

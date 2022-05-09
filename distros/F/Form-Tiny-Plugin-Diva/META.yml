@@ -26,5 +26,5 @@ resources:
   bugtracker: https://github.com/bbrtj/perl-form-tiny-plugin-diva/issues
   license: https://dev.perl.org/licenses
   repository: https://github.com/bbrtj/perl-form-tiny-plugin-diva.git
-version: '1.01'
+version: '1.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

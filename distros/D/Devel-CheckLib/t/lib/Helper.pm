@@ -43,7 +43,7 @@ sub create_testlib {
     print {$code_fh} "int libversion() { return 42; }\nint foo() { return 0; }\n";
     $code_fh->close;
 
-    my $cc = $Config{cc};
+    my $cc = (split(/\s+/, $Config{cc}))[0];
     my $gccv = $Config{gccversion};
     my $rv =
         $cc eq 'gcc'    ? _gcc_lib( $libname )  :
@@ -62,20 +62,19 @@ sub _gcc_lib {
     my $ar = find_binary('ar') or return;
     my $ranlib = find_binary('ranlib') or return;
     my $ccflags = $Config{ccflags};
-
-    _quiet_system("$cc $ccflags -c ${libname}.c") and return;
-    _quiet_system("$ar rc lib${libname}.a ${libname}.o") and return;
-    _quiet_system("$ranlib lib${libname}.a") and return;
-    return -f "lib${libname}.a"
+    my $libfile = "lib${libname}.a";
+    _quiet_system(qq{"$cc" $ccflags -c ${libname}.c}) and return;
+    _quiet_system($ar, 'rc', $libfile, "${libname}$Config{_o}") and return;
+    _quiet_system($ranlib, $libfile) and return;
+    return -f $libfile
 }
 
 sub _cl_lib {
     my ($libname) = @_;
     my $cc = find_compiler() or return;
     my $ar = find_binary('lib') or return;
-
     _quiet_system($cc, '/c',  "${libname}.c") and return;
-    _quiet_system($ar, "${libname}.obj") and return;
+    _quiet_system($ar, "${libname}$Config{_o}") and return;
     return -f "${libname}.lib";
 }
 
@@ -115,7 +114,14 @@ sub lib_to_bin {
 }
 
 sub find_compiler {
-    return find_binary($Config{cc});
+    my $result = find_binary($Config{cc});
+    return $result if($result);
+
+    # sometimes $Config{cc} isn't very clean eg it can be 'cc -q32' on AIX
+    return find_binary((split(/\s+/, $Config{cc}))[0])
+        if($Config{cc} =~ /\s/);
+
+    undef;
 }
 
 1; # must be true

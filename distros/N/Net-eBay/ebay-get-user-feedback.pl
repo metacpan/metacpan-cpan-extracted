@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-  
+
 use Net::eBay;
 use Data::Dumper;
 use DateTime::Precise;
@@ -21,7 +21,7 @@ sub printable {
   my $str = shift;
   $str =~ tr/\x80-\xFF//d;
   $str =~ tr/\x00-\x1F//d;
-  return "$str";
+  return $str;
 }
 
 my $eBay = new Net::eBay;
@@ -57,20 +57,20 @@ my $result = $eBay->submitRequest( "GetFeedback", $request );
 
 my $retcode = 1;
 
-if( ref $result ) {
+if ( ref $result ) {
   print "Score $result->{FeedbackSummary}->{UniquePositiveFeedbackCount} -$result->{FeedbackSummary}->{UniqueNegativeFeedbackCount}\n" unless $filter;
-  
+
   my $items = $result->{FeedbackDetailArray}->{FeedbackDetail};
-  if( $items ) { 
+  if ( $items ) {
     $items = [$items] if( ref $items eq 'HASH' );
-    
+
     foreach my $i (@$items) {
       last if $count-- <= 0;
-      
+
       print Dumper( $i ) if $detail;
       next if $filter && (!defined( $i->{ItemTitle} ) || ($i->{ItemTitle} !~ /$filter/i ));
-        
-      if( 0 ) {
+
+      if ( 0 ) {
         my $dummy = {
                      'FeedbackID' => '5556342524',
                      'CommentType' => 'Positive',
@@ -85,14 +85,18 @@ if( ref $result ) {
       }
 
       my $title = "";
-      if( $i->{ItemTitle} ) {
+      if ( $i->{ItemTitle} ) {
         $title .= "\n\t-- $i->{ItemTitle}";
       }
 
       # when we do not want negs
       next if (!$negs && $i->{CommentType} ne 'Positive' );
-      
-      print "$i->{CommentType} $i->{ItemID} " .  sprintf( "%15s", $i->{CommentingUser} ) . " $i->{Role} " . printable( $i->{CommentText} ) . " $title\n";
+
+      my $output =  "$i->{CommentType} $i->{ItemID} " .  sprintf( "%15s", $i->{CommentingUser} ) . " $i->{Role} " . printable( $i->{CommentText} ) . " $title";
+
+      $output =~ s/[[:^print:]]//g;
+
+      print $output . "\n";
       #print "\n";
 
       $retcode = 0;

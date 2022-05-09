@@ -12,7 +12,7 @@ use Form::Tiny::Form;
 use Form::Tiny::Utils qw(trim :meta_handlers);
 require Moo;
 
-our $VERSION = '2.09';
+our $VERSION = '2.12';
 
 sub import
 {
@@ -203,7 +203,7 @@ __END__
 
 =head1 NAME
 
-Form::Tiny - Input validator implementation centered around Type::Tiny
+Form::Tiny - Input validator centered around Type::Tiny
 
 =head1 SYNOPSIS
 
@@ -255,15 +255,18 @@ Form::Tiny is a customizable hashref validator with DSL for form building.
 
 =head1 IMPORTING
 
-When imported, Form::Tiny will turn a package it is imported into a Moo class that does the L<Form::Tiny::Form> role. It will also install helper functions in your package that act as a domain-specific language (DSL) for building your form.
+When imported, Form::Tiny will turn a package into a Moo class that does the L<Form::Tiny::Form> role. It will also install helper functions in your package that act as a domain-specific language (DSL) for building your form.
 
 	package MyForm;
 
 	# imports only basic helpers
 	use Form::Tiny;
 
-	# fully-featured form:
+	# all features offered by base distribution
 	use Form::Tiny -filtered, -strict;
+
+	# external plugins
+	use Form::Tiny plugins => ['Diva'];
 
 After C<use Form::Tiny> statement, your package gains all the Moo keywords, some Form::Tiny keywords (see L</"Available import flags">) and all L<Form::Tiny::Form> methods.
 
@@ -279,13 +282,13 @@ This flag stops Form::Tiny from importing Moo into your namespace. Unless you us
 
 =item * C<-filtered>
 
-This flag enables filters in your form.
+This flag enables field filtering in your form.
 
 Additional installed functions: C<form_filter field_filter form_trim_strings>
 
 =item * C<-strict>
 
-This flag makes your form check for strictness before the validation.
+This flag makes your form check for input data strictness before the validation.
 
 =item * C<< plugins => ['Plugin1', '+Full::Namespace::To::Plugin2'] >>
 
@@ -305,7 +308,7 @@ This helper declares a new field for your form. Each style of calling this funct
 
 In the first (hash) version, C<%arguments> need to be a plain hash (not a hashref) and should B<not> include the name in the hash, as it will be overriden by the first argument C<$name>. This form also sets the context for the form being built: see L<Form::Tiny::Manual/"Context"> for details.
 
-In the second (coderef) version, C<$coderef> gets passed the form instance as its only argument and should return a hashref or a constructed object of L<Form::Tiny::FieldDefinition>. A hashref must contain a C<name>. Note that this creates I<dynamic field>, which will be resolved repeatedly during form validation. As such, it should not contain any randomness.
+In the second (coderef) version, C<$coderef> gets passed the form instance as its only argument and should return a hashref or a constructed object of L<Form::Tiny::FieldDefinition>. A hashref must contain a C<name>. Note that this creates I<dynamic field>, which will be resolved before each form validation. Generally, you should avoid using dynamic fields and only use them when there is something special that you are trying to achieve.
 
 If you need a subclass of the default implementation, and you don't need a dynamic field, you can use the third style of the call, which takes a constructed object of L<Form::Tiny::FieldDefinition> or its subclass.
 
@@ -382,10 +385,10 @@ Bartosz Jarzyna E<lt>bbrtj.pro@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2020 - 2021 by Bartosz Jarzyna
+Copyright (C) 2020 - 2022 by Bartosz Jarzyna
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.10.1 or,
-at your option, any later version of Perl 5 you may have available.
+it under the same terms as Perl itself.
 
 =cut
+

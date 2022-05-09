@@ -38,7 +38,7 @@ $out = render(
     Formatter => $formatter,
     order     => { total_amount => 12.2 }
 );
-is( $out, 'Amount: USD 12.20' );
+is( $out, 'Amount: ' . $formatter->format_price(12.20, 2, 'USD ') );
 
 __END__
 1..0 # SKIP Number::Format required for these tests

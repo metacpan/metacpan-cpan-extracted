@@ -7,7 +7,7 @@ use v5.20;
 use strict;
 use warnings;
 
-our $VERSION = '1.12'; # VERSION
+our $VERSION = '1.13'; # VERSION
 
 my %boundaries = (
     # tag             min max
@@ -347,12 +347,12 @@ sub _grammar {
 
            (?<COLUMN_DROP>
                <ColumnDrop (?{delete $s{Column}})
-                   ( \s+ (?&COLUMN_DROP_ATTR))+ (?:/>|>\s*</ColumnDrop>)
+                   ( \s+ (?&COLUMN_DROP_ATTR))+ \s* (?:/>|>\s*</ColumnDrop>)
                (*COMMIT)
            )
 
            (?<COLUMN_DROP_ATTR>
-               (?:Name=".*?"(?{++$s{Column}->{Name}; $check->('Column.Name',1,1)}))
+               (?:Name="[^"]+?"(?{++$s{Column}->{Name}; $check->('Column.Name',1,1)}))
            )
 
            (?<INSERT>
@@ -504,7 +504,7 @@ OPM::Validate - Validate .opm files
 
 =head1 VERSION
 
-version 1.12
+version 1.13
 
 =head1 SYNOPSIS
 

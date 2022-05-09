@@ -1,6 +1,6 @@
 # http://module-build.sourceforge.net/META-spec.html
 name:         Apache2-ModProxyPerlHtml
-version:      4.0
+version:      4.1
 version_from: ModProxyPerlHtml.pm
 installdirs:  site
 requires:

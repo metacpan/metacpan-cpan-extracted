@@ -66,9 +66,11 @@ sub change_check {
 
     if ($set_checked) {
         $element->set_attribute('checked', 'checked');
+        $element->property_search('checked = true;');
     }
     else {
         $element->remove_attribute('checked');
+        $element->property_search('checked = false;');
     }
     $element->fire_event('change');
     $self->process_page_load;

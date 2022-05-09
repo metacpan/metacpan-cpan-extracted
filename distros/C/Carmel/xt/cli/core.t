@@ -5,19 +5,37 @@ use xt::CLI;
 
 use Module::CoreList;
 
-plan skip_all => "perl $] has HTTP::Tiny 0.056"
+plan skip_all => "perl $] has HTTP::Tiny eq 0.056"
   if $Module::CoreList::version{$]}{"HTTP::Tiny"} eq "0.056";
 
-subtest 'core modules in snapshots' => sub {
+for my $version (qw( 0.056 0.078 )) {
+    for my $clean (0, 1) {
+        subtest "core modules in snapshots (HTTP::Tiny $version) clean=$clean" => sub { test_it($version, $clean) };
+    }
+}
+
+subtest "core modules can still be pinned" => sub {
+    my $app = cli();
+
+    $app->write_cpanfile(<<EOF);
+requires 'HTTP::Tiny', '== 0.056';
+EOF
+    $app->run_ok("install");
+    like $app->stdout, qr/HTTP::Tiny \(0\.056\)/;
+};
+
+sub test_it {
+    my($version, $clean) = @_;
+
     my $app = cli();
 
     $app->write_file('cpanfile.snapshot', <<EOF);
 # carton snapshot format: version 1.0
 DISTRIBUTIONS
-  HTTP-Tiny-0.056
-    pathname: D/DA/DAGOLDEN/HTTP-Tiny-0.056.tar.gz
+  HTTP-Tiny-$version
+    pathname: D/DA/DAGOLDEN/HTTP-Tiny-$version.tar.gz
     provides:
-      HTTP::Tiny 0.056
+      HTTP::Tiny $version
     requirements:
       Carp 0
       Fcntl 0
@@ -31,22 +49,26 @@ DISTRIBUTIONS
       warnings 0
 EOF
 
-    # Perl::Build depends on HTTP::Tiny 0
     $app->write_cpanfile(<<EOF);
-requires 'Perl::Build';
+requires 'HTTP::Tinyish';
 EOF
 
-    # FIXME: we can't inject optional core dependencies properly
- TODO: {
-        local $TODO = "Can't inject core-but-frozen deps to Menlo";
-        for (1..2) {
-            $app->run("install");
-            unlike $app->stderr, qr/Can't find an artifact for HTTP::Tiny/;
-        }
+    my $is_new = $version > $Module::CoreList::version{$]}{"HTTP::Tiny"};
+
+    unless ($clean) {
+        # pull the artifact
+        $app->run_ok('inject', "HTTP::Tiny\@$version");
     }
 
-    $app->run("list");
-    like $app->stdout, qr/HTTP::Tiny \(0\.056\)/;
+    $app->run_ok("install");
+    unlike $app->stderr, qr/Can't find an artifact for HTTP::Tiny/;
+
+    $app->run_ok("list");
+    if ($is_new) {
+        like $app->stdout, qr/HTTP::Tiny \(\Q$version\E\)/;
+    } else {
+        unlike $app->stdout, qr/HTTP::Tiny /;
+    }
 };
 
 done_testing;

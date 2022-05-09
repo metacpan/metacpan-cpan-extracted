@@ -26,7 +26,7 @@ no_index:
 provides:
   App::Greple::git:
     file: lib/App/Greple/git.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   App::Greple: '8.48'
   perl: '5.014'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/greple-git/issues
   homepage: https://github.com/kaz-utashiro/greple-git
   repository: git://github.com/kaz-utashiro/greple-git.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

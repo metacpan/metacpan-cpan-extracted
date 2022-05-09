@@ -11,6 +11,9 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::Prereqs' => '0',
                                       'Dist::Zilla::Plugin::Prereqs::Soften' => '0',
                                       'Dist::Zilla::PluginBundle::Author::CCM' => '0',
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Software::License::Perl_5' => '0',
                                       'Test::CPAN::Changes' => '0.19',
@@ -24,7 +27,8 @@ do { my $x = {
                                       'Test::Pod' => '1.41',
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Pod::No404s' => '0',
-                                      'Test::Portability::Files' => '0'
+                                      'Test::Portability::Files' => '0',
+                                      'perl' => '5.006'
                                     }
                     },
        'runtime' => {
@@ -50,10 +54,7 @@ do { my $x = {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'FindBin' => '0',
-                                   'IO::Handle' => '0',
-                                   'IPC::Open3' => '0',
-                                   'Test::More' => '0',
-                                   'perl' => '5.006'
+                                   'Test::More' => '0'
                                  }
                  }
      };

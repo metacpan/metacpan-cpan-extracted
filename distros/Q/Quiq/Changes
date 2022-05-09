@@ -1,3 +1,36 @@
+1.202 2022-05-05
+================
+
+[Quiq::Database::Patch]
+* Klasse hinzugefügt
+
+[Quiq::Exit]
+* Klasse hinzugefügt
+
+[Quiq::JQuery::ContextMenu]
+* Attribut "autoHide" hinzugefügt
+
+[Quiq::JQuery::DataTable]
+* Attribut "visible" hinzugefügt
+
+[Quiq::Path]
+* delete() - Exceptions übersetzt
+
+[Quiq::PlotlyJs::XY::DiagramGroup]
+* "points" -> "data points"
+
+[Quiq::Sendmail]
+* send() - Option -from hinzugefügt
+
+[Quiq::Smb::Client]
+* Klasse hinzugefügt
+
+[Quiq::Sftp::Client]
+* Klasse hinzugefügt
+
+[Quiq::Web::Navigation]
+* backUrl() - hinzugefügt
+
 1.201 2022-03-27
 ================
 

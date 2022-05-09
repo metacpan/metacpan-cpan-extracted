@@ -136,7 +136,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.201';
+our $VERSION = '1.202';
 
 use Quiq::Path;
 use Quiq::LockedCounter;
@@ -205,7 +205,7 @@ sub new {
     # Navigationsobjekt mit der Rückkehrseite, falls existent
 
     my $self = $class->SUPER::new(
-        backUrl => '',
+        backUrl => undef,
     );
 
     # Allgemeines Navigations-Verzeichnis erzeugen
@@ -236,29 +236,30 @@ sub new {
     my $refererDb = "$sidDir/referer.db";
     my $callDb = "$sidDir/call.db";
 
-    # Wir ermitteln die Request-Id der aktuellen Seite. Der Counter
+    # Wir ermitteln die Request-Id $rid der aktuellen Seite. Der Counter
     # ist gleichzeitig ein Lock, der bis zum Ende des Konstruktors
     # aufrechterhalten wird.
 
     my $cnt = Quiq::LockedCounter->new($ridFile)->increment;
     my $rid = $cnt->count;
 
+    # Wir ermitteln die Request-Id $rrid der Vorgängerseite. Diese
+    # ist unter dem Referer-URL $referer in der Referer-DB gespeichert.
+    # Ferner speichern wir die eigene Request-Id $rid unter
+    # dem eigenen URL $absUrl in der Referer-DB.
+
     my $refererH = Quiq::Hash::Db->new($refererDb,'rw');
-
-    # Wir ermitteln die Request-Id der Vorgängerseite. Von dort übernehmen
-    # die Request-Id der Rückkehr-Seite.
     $rrid ||= $referer && $refererH->{$referer} || '';
-
-    # Wir speichern die Request-Id des aktuellen Seitenaufrufs
     $refererH->{$absUrl} = $rid;
-
     $refererH->close;
 
     # Wir schreiben einen neuen Eintrag in die Call-DB, wobei wir
-    # die Request-Id der Rückkehr-Seite übernehmen
+    # die Request-Id der Rückkehr-Seite ermitteln und speichern
     
     my $callH = Quiq::Hash::Db->new($callDb,'rw');
     if ($brid) {
+        # Request-Id der Rückkehr-Seite ist als Parameter spezifiziert
+
         if ($brid == -1) {
             $brid = $rrid;
         }
@@ -267,16 +268,20 @@ sub new {
         }
     }
     elsif ($rrid) {
+        # Request-Id der Rückkehr-Seite holen wir aus der Call-Datenbank
+
         my $data = $callH->{$rrid} // $class->throw;
         # $url,$rrid,$brid
-        (undef,undef,$brid) = split /\0/,$data,4;
+        (undef,undef,$brid) = split /\0/,$data,3;
     }
     $callH->{$rid} = "$url\0$rrid\0$brid";
 
+    # Rückkehr-URL ermitteln
+
     if ($brid) {
-        my $data = $callH->{$rrid} // $class->throw;
+        my $data = $callH->{$brid} // $self->throw;
         # $url,$rrid,$brid
-        ($url,undef,undef) = split /\0/,$data,4;
+        ($url,undef,undef) = split /\0/,$data,3;
         $self->set(backUrl=>$url);
     }
 
@@ -294,6 +299,17 @@ sub new {
 =head4 Synopsis
 
   $url = $nav->backUrl;
+  $url = $nav->backUrl($defaultUrl);
+
+=head4 Arguments
+
+=over 4
+
+=item (String) $defaultUrl
+
+URL, der geliefert wird, wenn kein Rückkehr-URL definiert ist.
+
+=back
 
 =head4 Returns
 
@@ -301,12 +317,24 @@ sub new {
 
 =head4 Description
 
-Liefere den URL der Rückkehrseite als Zeichenkette. Gibt es keine
-Rückkehrseite, liefere einen Leerstring.
+Liefere den URL der Rückkehrseite als Zeichenkette. Ist keine
+Rückkehrseite definiert, liefere undef.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub backUrl {
+    my $self = shift;
+    my $defaultUrl = shift;
+    return $self->{'backUrl'} // $defaultUrl;
+}
+
+# -----------------------------------------------------------------------------
 
 =head1 VERSION
 
-1.201
+1.202
 
 =head1 AUTHOR
 

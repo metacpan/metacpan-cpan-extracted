@@ -1,5 +1,8 @@
 package Dancer2::Plugin::FormValidator::Role::Validator;
 
+use strict;
+use warnings;
+
 use Moo::Role;
 use Types::Standard qw(ConsumerOf);
 use namespace::clean;

@@ -1,6 +1,6 @@
 package Quantum::Superpositions::Lazy;
 
-our $VERSION = '1.08';
+our $VERSION = '1.10';
 
 use v5.24;
 use warnings;
@@ -316,14 +316,14 @@ calculate accordingly.
 
 =head1 AUTHOR
 
-Bartosz Jarzyna, E<lt>brtastic.dev@gmail.comE<gt>
+Bartosz Jarzyna, E<lt>bbrtj.pro@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2020 by Bartosz Jarzyna
+Copyright (C) 2020 - 2022 by Bartosz Jarzyna
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.24.0 or,
-at your option, any later version of Perl 5 you may have available.
+it under the same terms as Perl itself.
 
 =cut
+

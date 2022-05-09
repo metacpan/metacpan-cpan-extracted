@@ -27,9 +27,6 @@ L<UI::Various>.
 Besides the common attributes inherited from C<UI::Various::widget> the
 C<Check> widget knows only two additional attributes:
 
-Note that the possible values for the variable are C<0> or C<1>, which will
-be changed according Perl's standard true/false conversions.
-
 =head2 Attributes
 
 =over
@@ -44,7 +41,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use UI::Various::core;
 use UI::Various::widget;
@@ -75,6 +72,9 @@ sub text($;$)
 a variable reference for the checkbox
 
 The variable will switched on (C<1>) and off (C<0>) by the checkbox.
+
+Note that the initial values for the variable will be changed to C<0> or
+C<1> according Perl's standard true/false conversions.
 
 =cut
 

@@ -42,7 +42,7 @@ use App::Regather::Plugin;
 use constant SYNST => [ qw( LDAP_SYNC_PRESENT LDAP_SYNC_ADD LDAP_SYNC_MODIFY LDAP_SYNC_DELETE ) ];
 
 # my @DAEMONARGS = ($0, @ARGV);
-our $VERSION   = '0.81.06';
+our $VERSION   = '0.82.00';
 
 sub new {
   my $class = shift;
@@ -141,9 +141,7 @@ sub o {
 sub run {
   my $self = shift;
 
-  $self->l->cc( pr => 'info', fm => "App::Regather::Logg initialized ..." ) if $self->o('v') > 1;
-
-  $self->l->cc( pr => 'info', fm => "%s: options provided from CLI:\n%s", ls => [ __PACKAGE__, $self->o('cli') ] )
+  $self->l->cc( pr => 'info', fm => "%s:%s: options provided from CLI:\n%s", ls => [ __FILE__,__LINE__, $self->o('cli') ] )
     if defined $self->o('cli') && keys( %{$self->o('cli')} ) && $self->o('v') > 1;
 
   $self->l->set_m( $self->cf->getnode('log')->as_hash );
@@ -152,12 +150,12 @@ sub run {
 
   $self->l->cc( pr => 'info', fm => "%s: Dry Run is set on, no file is to be changed\n" )
     if $self->cf->get(qw(core dryrun));
-  $self->l->cc( pr => 'info', fm => "%s: Config::Parse object as hash:\n%s",
-	        ls => [ __PACKAGE__, $self->cf->as_hash ] ) if $self->o('v') > 3;
-  $self->l->cc( pr => 'info', fm => "%s: %s",
-		ls => [ __PACKAGE__, $self->progargs ] );
-  $self->l->cc( pr => 'info', fm => "%s: %s v.%s is starting ...",
-		ls => [ __PACKAGE__, $self->progname, $VERSION, ] );
+  $self->l->cc( pr => 'info', fm => "%s:%s: Config::Parse object as hash:\n%s",
+	        ls => [ __FILE__,__LINE__, $self->cf->as_hash ] ) if $self->o('v') > 3;
+  $self->l->cc( pr => 'info', fm => "%s:%s: %s",
+		ls => [ __FILE__,__LINE__, $self->progargs ] );
+  $self->l->cc( pr => 'info', fm => "%s:%s: %s v.%s is starting ...",
+		ls => [ __FILE__,__LINE__, $self->progname, $VERSION, ] );
 
   @{$self->{_opt}{svc}} = grep { $self->cf->get('service', $_, 'skip') != 1 } $self->cf->names_of('service');
 
@@ -183,8 +181,8 @@ sub run {
     push @{$cfgattrs}, '*'
       if $self->cf->get('service', $i, 'all_attr') != 0;
 
-    $self->l->cc( pr => 'warning', ls => [ __PACKAGE__, $i, ],
-		  fm => "%s: no LDAP attribute to process is mapped for service `%s`" )
+    $self->l->cc( pr => 'warning', ls => [ __FILE__,__LINE__, $i, ],
+		  fm => "%s:%s: no LDAP attribute to process is mapped for service `%s`" )
       if $self->cf->get('service', $i, 'all_attr') == 0 && scalar @svc_map == 0;
 
   }
@@ -209,8 +207,8 @@ sub run {
   while ( $self->o('last_forever') ) {
     if ( $self->cf->is_set(qw(core altroot)) ) {
       chdir($self->cf->get(qw(core altroot))) || do {
-	$self->l->cc( pr => 'err', fm => "%s: main: unable to chdir to %s",
-		  ls => [ __PACKAGE__, $self->cf->get(qw(core altroot)) ] );
+	$self->l->cc( pr => 'err', fm => "%s:%s: main: unable to chdir to %s",
+		  ls => [ __FILE__,__LINE__, $self->cf->get(qw(core altroot)) ] );
 	exit 1;
       };
     }
@@ -218,8 +216,8 @@ sub run {
     $self->{_opt}{ldap} =
       Net::LDAP->new( $uri, @{[ map { $_ => $ldap_opt->{$_} } %$ldap_opt ]} )
 	|| do {
-	  $self->l->cc( pr => 'err', fm => "%s: Unable to connect to %s; error: %s",
-			ls => [ __PACKAGE__, $uri, $! ] );
+	  $self->l->cc( pr => 'err', fm => "%s:%s: Unable to connect to %s; error: %s",
+			ls => [ __FILE__,__LINE__, $uri, $! ] );
 	  if ( $self->o('strict') ) {
 	    exit LDAP_CONNECT_ERROR;
 	  } else {
@@ -235,7 +233,7 @@ sub run {
 	  $self->o('ldap')->start_tls( @{[ map { $_ => $start_tls_options->{$_} } %$start_tls_options ]} );
       };
       if ( $@ ) {
-	$self->l->cc( pr => 'err', fm => "%s: TLS negotiation failed: %s", ls => [ __PACKAGE__, $! ] );
+	$self->l->cc( pr => 'err', fm => "%s:%s: TLS negotiation failed: %s", ls => [ __FILE__,__LINE__, $! ] );
 	if ( $self->o('strict') ) {
 	  exit LDAP_CONNECT_ERROR;
 	} else {
@@ -258,8 +256,8 @@ sub run {
 	if ( $mesg->code ) {
 	  ####### !!!!!!! TODO: to implement exponential delay on error sending to awoid log file/notify
 	  ####### !!!!!!! queue overflow
-	  $self->l->cc( pr => 'err', fm => "%s: bind error: %s",
-			ls => [ __PACKAGE__, $mesg->error ] );
+	  $self->l->cc( pr => 'err', fm => "%s:%s: bind error: %s",
+			ls => [ __FILE__,__LINE__, $mesg->error ] );
 	  if ( $self->o('strict') ) {
 	    exit $mesg->code;
 	  } else {
@@ -285,18 +283,18 @@ sub run {
 				    );
     if ( $mesg->code ) {
       $self->l->cc( pr => 'err',
-		fm => "%s: LDAP search ERROR...\n% 13s%s\n% 13s%s\n% 13s%s\n% 13s%s\n\n",
-		ls => [ __PACKAGE__,
-			'base: ',   $self->cf->get(qw(ldap srch base)),
-			'scope: ',  $self->cf->get(qw(ldap srch scope)),
-			'filter: ', $self->cf->get(qw(ldap srch filter)),
-			'attrs: ',  join("\n", @{$cfgattrs}) ] );
+		    fm => "%s:%s: LDAP search ERROR...\n% 13s%s\n% 13s%s\n% 13s%s\n% 13s%s\n\n",
+		    ls => [ __FILE__,__LINE__,
+			    'base: ',   $self->cf->get(qw(ldap srch base)),
+			    'scope: ',  $self->cf->get(qw(ldap srch scope)),
+			    'filter: ', $self->cf->get(qw(ldap srch filter)),
+			    'attrs: ',  join("\n", @{$cfgattrs}) ] );
       $self->l->cc_ldap_err( mesg => $mesg );
       exit $mesg->code if $self->o('strict');
     } else {
       $self->l->cc( pr => 'info',
-		    fm => "%s: LDAP search:\n% 13s%s\n% 13s%s\n% 13s%s\n% 13s%s\n\n",
-		    ls => [ __PACKAGE__,
+		    fm => "%s:%s: LDAP search:\n% 13s%s\n% 13s%s\n% 13s%s\n% 13s%s\n\n",
+		    ls => [ __FILE__,__LINE__,
 			    'base: ',   $self->cf->get(qw(ldap srch base)),
 			    'scope: ',  $self->cf->get(qw(ldap srch scope)),
 			    'filter: ', $self->cf->get(qw(ldap srch filter)),
@@ -340,12 +338,12 @@ sub daemonize {
 
     $orphaned_pid_mtime = strftime( $self->o('ts_fmt'), localtime( (stat( $self->cf->get(qw(core pid_file)) ))[9] ));
     if ( unlink $self->cf->get(qw(core pid_file)) ) {
-      $self->l->cc( pr => 'debug', fm => "%s: orphaned %s was removed",
-		ls => [ __PACKAGE__, $self->cf->get(qw(core pid_file)) ] )
+      $self->l->cc( pr => 'debug', fm => "%s:%s: orphaned %s was removed",
+		ls => [ __FILE__,__LINE__, $self->cf->get(qw(core pid_file)) ] )
 	if $self->o('v') > 0;
     } else {
-      $self->l->cc( pr => 'err', fm => "%s: orphaned %s (mtime: %s) was not removed: %s",
-		ls => [ __PACKAGE__, $self->cf->get(qw(core pid_file)), $orphaned_pid_mtime, $! ] );
+      $self->l->cc( pr => 'err', fm => "%s:%s: orphaned %s (mtime: %s) was not removed: %s",
+		ls => [ __FILE__,__LINE__, $self->cf->get(qw(core pid_file)), $orphaned_pid_mtime, $! ] );
       exit 2;
     }
 
@@ -372,24 +370,24 @@ sub daemonize {
 
   $SIG{HUP}  =
     sub { my $sig = @_;
-	  $self->l->cc( pr => 'warning', fm => "%s: SIG %s received, restarting", ls => [ __PACKAGE__, $sig ] );
+	  $self->l->cc( pr => 'warning', fm => "%s:%s: SIG %s received, restarting", ls => [ __FILE__,__LINE__, $sig ] );
 	  exec('perl', @{$self->o('_daemonargs')}); };
   $SIG{INT} = $SIG{QUIT} = $SIG{ABRT} = $SIG{TERM} =
     sub { my $sig = @_;
-	  $self->l->cc( pr => 'warning', fm => "%s:  SIG %s received, exiting", ls => [ __PACKAGE__, $sig ] );
+	  $self->l->cc( pr => 'warning', fm => "%s:%s:  SIG %s received, exiting", ls => [ __FILE__,__LINE__, $sig ] );
 	  $self->{_opt}{last_forever} = 0;
 	};
   $SIG{PIPE} = 'ignore';
   $SIG{USR1} =
     sub { my $sig = @_;
-	  $self->l->cc( pr => 'warning', fm => "%s: SIG %s received, doing nothing" ), ls => [ __PACKAGE__, $sig ] };
+	  $self->l->cc( pr => 'warning', fm => "%s:%s: SIG %s received, doing nothing" ), ls => [ __FILE__,__LINE__, $sig ] };
 
   if ( $self->cf->is_set(qw(core uid)) && $self->cf->is_set(qw(core gid)) ) {
     setgid ( $self->cf->get(qw(core gid_number)) ) || do { print "setgid went wrong: $!\n\n"; exit 1; };
     setuid ( $self->cf->get(qw(core uid_number)) ) || do { print "setuid went wrong: $!\n\n"; exit 1; };
   }
 
-  $self->l->cc( pr => 'info', fm => "%s: %s v.%s is started.", ls => [ __PACKAGE__, $self->progname, $VERSION ] );
+  $self->l->cc( pr => 'info', fm => "%s:%s: %s v.%s is started.", ls => [ __FILE__,__LINE__, $self->progname, $VERSION ] );
 }
 
 sub ldap_search_callback {
@@ -408,18 +406,18 @@ sub ldap_search_callback {
   ######## !! not needed ?
   my $out_file_old;
   
-  $self->l->cc( pr => 'debug', fm => "%s: syncstate: %s", ls => [ __PACKAGE__, $syncstate ] )
+  $self->l->cc( pr => 'debug', fm => "%s:%s: syncstate: %s", ls => [ __FILE__,__LINE__, $syncstate ] )
     if $self->o('v') > 5;
-  $self->l->cc( pr => 'debug', fm => "%s: object: %s", ls => [ __PACKAGE__, $obj ] ) if $self->o('v') > 5;
+  $self->l->cc( pr => 'debug', fm => "%s:%s: object: %s", ls => [ __FILE__,__LINE__, $obj ] ) if $self->o('v') > 5;
 
   if ( defined $obj && $obj->isa('Net::LDAP::Entry') ) {
     $rdn = ( split(/=/, ( split(/,/, $obj->dn) )[0]) )[0];
     if ( defined $syncstate && $syncstate->isa('Net::LDAP::Control::SyncState') ) {
-      $self->l->cc( pr => 'debug', fm => "%s: SYNCSTATE:\n%s:", ls => [ __PACKAGE__, $syncstate ] )
+      $self->l->cc( pr => 'debug', fm => "%s:%s: SYNCSTATE:\n%s:", ls => [ __FILE__,__LINE__, $syncstate ] )
 	if $self->o('v') > 4;
       $st = $syncstate->state;
       my %reqmod;
-      $self->l->cc( fm => "%s: received control %s: dn: %s", ls => [ __PACKAGE__, SYNST->[$st], $obj->dn ] );
+      $self->l->cc( fm => "%s:%s: received control %s: dn: %s", ls => [ __FILE__,__LINE__, SYNST->[$st], $obj->dn ] );
 
       #######################################################################
       ####### --- PRELIMINARY STUFF ----------------------------->>>>>>>>> 0
@@ -436,8 +434,8 @@ sub ldap_search_callback {
 			       filter   => '(reqDN=' . $obj->dn . ')', );
 	if ( $mesg->code ) {
 	  $self->l->cc( pr => 'err', nt => 1,
-		    fm => "%s: LDAP accesslog search on %s, error:\n% 13s%s\n% 13s%s\n% 13s%s\n\n",
-		    ls => [ __PACKAGE__, SYNST->[$st],
+		    fm => "%s:%s: LDAP accesslog search on %s, error:\n% 13s%s\n% 13s%s\n% 13s%s\n\n",
+		    ls => [ __FILE__,__LINE__, SYNST->[$st],
 			    'base: ',   $self->cf->get(qw(ldap srch log_base)),
 			    'scope: ',  'sub',
 			    'filter: ', '(reqDN=' . $obj->dn . ')' ] );
@@ -448,8 +446,8 @@ sub ldap_search_callback {
 
 	  if ( ! $entry->isa('Net::LDAP::Entry') ) {
 	    $self->l->cc( pr => 'err', nt => 1,
-		      fm => "%s: LDAP accesslog search on %s, returned no result:\n% 13s%s\n% 13s%s\n% 13s%s\n\n",
-		      ls => [ __PACKAGE__, SYNST->[$st],
+		      fm => "%s:%s: LDAP accesslog search on %s, returned no result:\n% 13s%s\n% 13s%s\n% 13s%s\n\n",
+		      ls => [ __FILE__,__LINE__, SYNST->[$st],
 			      'base: ',   $self->cf->get(qw(ldap srch log_base)),
 			      'scope: ',  'sub',
 			      'filter: ', '(reqDN=' . $obj->dn . ')' ] );
@@ -463,13 +461,13 @@ sub ldap_search_callback {
 	    my ( $file, @err );
 	    open( $file, "<", \$reqold) ||
 	      $self->l->cc( pr => 'err',
-			fm => "%s: Cannot open data from variable to read ldif: %s",
-			ls => [ __PACKAGE__, $! ] );
+			fm => "%s:%s: Cannot open data from variable to read ldif: %s",
+			ls => [ __FILE__,__LINE__, $! ] );
 	    $ldif = Net::LDAP::LDIF->new( $file, "r", onerror => 'warn' );
 	    while ( not $ldif->eof ) {
 	      $entry = $ldif->read_entry;
-	      $self->l->cc( pr => 'err', fm => "%s: Reading LDIF error: %s",
-			ls => [ __PACKAGE__, $ldif->error ] ) if $ldif->error;
+	      $self->l->cc( pr => 'err', fm => "%s:%s: Reading LDIF error: %s",
+			ls => [ __FILE__,__LINE__, $ldif->error ] ) if $ldif->error;
 	    }
 	    $obj = $entry;
 	    $ldif->done;
@@ -484,8 +482,8 @@ sub ldap_search_callback {
 				   filter => '(objectClass=*)', );
 	    if ( $mesg->code ) {
 	      $self->l->cc( pr => 'err', nt => 1,
-			fm => "%s: LDAP search %s %s error:\n% 13s%s\n% 13s%s\n% 13s%s\n\n",
-			ls => [ __PACKAGE__, SYNST->[$st], 'reqType=modify',
+			fm => "%s:%s: LDAP search %s %s error:\n% 13s%s\n% 13s%s\n% 13s%s\n\n",
+			ls => [ __FILE__,__LINE__, SYNST->[$st], 'reqType=modify',
 				'base: ',     $self->cf->get(qw(ldap srch log_base)),
 				'scope: ',    'sub',
 				'filter: ',   '(reqDN=' . $obj->dn . ')' ] );
@@ -496,8 +494,8 @@ sub ldap_search_callback {
 	      $obj->add( map { $_ => $reqmod{$_} } keys %reqmod );
 	      # $obj->add( $_ => $reqmod{$_} ) foreach ( keys %reqmod );
 	    }
-	    $self->l->cc( pr => 'debug', fm => "%s: %s reqType=modify reqMod: %s",
-		      ls => [ __PACKAGE__, SYNST->[$st], \%reqmod ] )	if $self->o('v') > 3;
+	    $self->l->cc( pr => 'debug', fm => "%s:%s: %s reqType=modify reqMod: %s",
+		      ls => [ __FILE__,__LINE__, SYNST->[$st], \%reqmod ] )	if $self->o('v') > 3;
 	  }
 	}
       } elsif ( $st == LDAP_SYNC_MODIFY ) {
@@ -508,8 +506,8 @@ sub ldap_search_callback {
 			       filter   => '(reqDN=' . $obj->dn . ')', );
 	if ( $mesg->code ) {
 	  $self->l->cc( pr => 'err', nt => 1,
-		    fm => "%s: LDAP accesslog search on %s, error:\n% 13s%s\n% 13s%s\n% 13s%s\n\n",
-		    ls => [ __PACKAGE__, SYNST->[$st], nt => 1,
+		    fm => "%s:%s: LDAP accesslog search on %s, error:\n% 13s%s\n% 13s%s\n% 13s%s\n\n",
+		    ls => [ __FILE__,__LINE__, SYNST->[$st], nt => 1,
 			    'base: ',   $self->cf->get(qw(ldap srch log_base)),
 			    'scope: ',  'sub',
 			    'filter: ', '(reqDN=' . $obj->dn . ')' ] );
@@ -533,8 +531,8 @@ sub ldap_search_callback {
 				   filter   => '(reqNewRDN=' . (split(/,/, $obj->dn))[0] . ')', );
 	    if ( $mesg->code ) {
 	      $self->l->cc( pr => 'err', nt => 1,
-			fm => "%s: LDAP accesslog search on %s, error:\n% 13s%s\n% 13s%s\n% 13s%s\n\n",
-			ls => [ __PACKAGE__, SYNST->[$st],
+			fm => "%s:%s: LDAP accesslog search on %s, error:\n% 13s%s\n% 13s%s\n% 13s%s\n\n",
+			ls => [ __FILE__,__LINE__, SYNST->[$st],
 				'base: ',   $self->cf->get(qw(ldap srch log_base)),
 				'scope: ',  'sub',
 				'filter: ', '(reqNewRDN=' . (split(/,/, $obj->dn))[0] . ')' ] );
@@ -575,8 +573,8 @@ sub ldap_search_callback {
 							   $entry->get_value('reqEntryUUID')) );
 		if ( $mesg->code ) {
 		  $self->l->cc( pr => 'err', nt => 1,
-			    fm => "%s: LDAP accesslog search on %s, error:\n% 13s%s\n% 13s%s\n% 13s%s\n\n",
-			    ls => [ __PACKAGE__, SYNST->[$st],
+			    fm => "%s:%s: LDAP accesslog search on %s, error:\n% 13s%s\n% 13s%s\n% 13s%s\n\n",
+			    ls => [ __FILE__,__LINE__, SYNST->[$st],
 				    'base: ',   $self->cf->get(qw(ldap srch log_base)),
 				    'scope: ',  'sub',
 				    'filter: ', sprintf("(reqEntryUUID=%s)",
@@ -593,13 +591,13 @@ sub ldap_search_callback {
 		    $obj->replace( $rdn => $entries[scalar(@entries) - 2]->get_value($rdn) );
 		  } else {
 		    $self->l->cc( pr => 'err', nt => 1,
-			      fm => "%s: %s object (before ModRDN) to delete not found! accesslog reqType=add object nod found\n\nobject reqEntryUUID=%s should be processed manually",
-			      ls => [ __PACKAGE__, SYNST->[$st], $entry->get_value('reqEntryUUID') ] );
+			      fm => "%s:%s: %s object (before ModRDN) to delete not found! accesslog reqType=add object nod found\n\nobject reqEntryUUID=%s should be processed manually",
+			      ls => [ __FILE__,__LINE__, SYNST->[$st], $entry->get_value('reqEntryUUID') ] );
 		  }
 		}
 	      } else {
-		$self->l->cc( pr => 'err', nt => 1, ls => [ __PACKAGE__, SYNST->[$st] ],
-			  fm => "%s: LDAP accesslog search on %s object returned no result\n\n" );
+		$self->l->cc( pr => 'err', nt => 1, ls => [ __FILE__,__LINE__, SYNST->[$st] ],
+			  fm => "%s:%s: LDAP accesslog search on %s object returned no result\n\n" );
 	      }
 	    }
 	  }
@@ -627,8 +625,8 @@ sub ldap_search_callback {
       }
 
       if ( ! defined $s ) {
-	$self->l->cc( pr => 'warning', ls => [ __PACKAGE__, $obj->dn, SYNST->[$st] ],
-		  fm => "%s: dn: %s is not configured to be processed on control: %s" )
+	$self->l->cc( pr => 'warning', ls => [ __FILE__,__LINE__, $obj->dn, SYNST->[$st] ],
+		  fm => "%s:%s: dn: %s is not configured to be processed on control: %s" )
 	  if $self->o('v') > 2;
 	return;
       }
@@ -687,11 +685,11 @@ sub ldap_search_callback {
     $self->o('req')->cookie($syncstate->cookie) if $syncstate->cookie;
 
   } elsif ( defined $obj && $obj->isa('Net::LDAP::Intermediate') ) {
-    $self->l->cc( pr => 'debug', fm => "%s: Received Net::LDAP::Intermediate\n%s", ls => [ __PACKAGE__, $obj ] )
+    $self->l->cc( pr => 'debug', fm => "%s:%s: Received Net::LDAP::Intermediate\n%s", ls => [ __FILE__,__LINE__, $obj ] )
       if $self->o('v') > 3;
     $self->o('req')->cookie($obj->{'asn'}->{'refreshDelete'}->{'cookie'});
   } elsif ( defined $obj && $obj->isa('Net::LDAP::Reference') ) {
-    $self->l->cc( pr => 'debug', fm => "%s: Received Net::LDAP::Reference\n%s", ls => [ __PACKAGE__, $obj ] )
+    $self->l->cc( pr => 'debug', fm => "%s:%s: Received Net::LDAP::Reference\n%s", ls => [ __FILE__,__LINE__, $obj ] )
       if $self->o('v') > 3;
     return;
   } else {

@@ -1,5 +1,12 @@
 Revision history for GitHub-MergeVelocity
 
+0.000009  2022-05-06 18:28:10Z
+    - Study merge velocity for organizations (GH#3) (thibaultduponchelle)
+
+0.000008  2022-05-05 14:55:56Z
+    - Enable auto_pagination for repositories with more than 100 PRs (GH#2)
+      (thibaultduponchelle)
+
 0.000007  2015-02-09 12:25:35-05:00 America/Toronto
     - Bumps minimum version of Moo to 1.007000
 

@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 use Config;
-use Devel::CheckLib qw(check_lib_or_exit);
+use Devel::CheckLib qw(check_lib check_lib_or_exit);
 use ExtUtils::F77;
 
 our %ldloadlibs = ($^O =~ /MSWin/ && $Config{cc} eq 'cl')
@@ -17,11 +17,12 @@ our $inc = '-DF77_USCORE='. (ExtUtils::F77->trail_ ? '_' : '');
 {
   # work around Devel::CheckLib not doing Text::ParseWords::shellwords
   use Text::ParseWords qw(shellwords);
-  my @libpath = map {my $r=$_;$r=~s/^-L//?$r:()} shellwords $libs0;
+  my @libpath = grep -d, map {my $r=$_;$r=~s/^-L//?$r:()} my @sw = shellwords $libs0;
+  my @lib = grep check_lib(lib=>$_), map {my $r=$_;$r=~s/^-l//?$r:()} @sw;
+  $libs0 = join ' ', (map qq{-L"$_"}, @libpath), (map "-l$_", @lib);
   my $f77_uscore = (ExtUtils::F77->trail_ ? '_' : '');
   check_lib_or_exit(
-    lib => 'lapack',
-    libpath => \@libpath,
+    ldflags => $libs0,
     header => [($^O =~ /MSWin/ ? 'float.h' : ()), qw(stdio.h math.h)],
     function => <<EOF,
 

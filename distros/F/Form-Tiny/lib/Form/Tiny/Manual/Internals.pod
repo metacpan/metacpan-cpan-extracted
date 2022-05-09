@@ -25,6 +25,63 @@ Additional behavior like filtering is implemented by composing new roles to the 
 
 The I<1.00> series of the module did not implement a meta object, and in turn implementing DSL keywords ended up being a hack, abusing Perl's ability to replace symbols in the package with strict mode turned off. New implementation allowed to get rid of all that dark magic, replacing it with something readable and reliable.
 
+=head2 Static forms vs dynamic forms
+
+The form metaobject keeps track of whether it is static or dynamic via the C<is_dynamic> property.
+
+A dynamic form is a form that has at least one dynamic field. Dynamic fields are fields that are built by a subroutine.
+
+Static forms are preferred over dynamic forms because they allow us to make certain optimizations and overall know more about a form from just having its metaobject. Dynamic forms are more of a closed box, and the only way to know what's inside is by building them with an instantiated form.
+
+For the sake of completeness and backwards compatibility, we continue to support dynamic forms in the base distribution.
+
+=head2 Form blueprint
+
+Form metaobjects can be used to produce a Perl hash reference with an identical structure to fields data, called I<blueprint>. For example, a form with those fields:
+
+	scalar1
+	array1.*
+	array2.*.*
+	hash1.scalar2
+	hash1.scalar3
+
+Will generate this blueprint:
+
+	{
+		scalar1 => FieldDefinition,
+		array1 => [FieldDefinition],
+		array2 => [
+			[FieldDefinition]
+		],
+		hash1 => {
+			scalar2 => FieldDefinition,
+			scalar3 => FieldDefinition
+		}
+	}
+
+Each leaf will be a L<Form::Tiny::FieldDefinition> instance, and subforms will be turned into their own blueprints and embedded. This can be used to do more post-processing on a C<< $form->fields >> hashref compared to the full form definition, without the need to loop the form fields array and manually handle all the possibilities.
+
+To get the blueprint of a form, call:
+
+	# for dynamic forms or when
+	# it is not known whether the form in dynamic
+	$blueprint = $form_object->form_meta->blueprint($form_object);
+
+	# for static forms - all calls are valid
+	$blueprint = $form_object->form_meta->blueprint;
+	$blueprint = $form_object->form_meta->static_blueprint;
+
+	$blueprint = FormPackage->form_meta->blueprint;
+	$blueprint = FormPackage->form_meta->static_blueprint;
+
+For static forms, the blueprint will be cached and reused on the next call. For dynamic forms, it has to be generated each time, which will impose a performance hit if it is called frequently.
+
+=head2 Finalizing the meta
+
+After creating the meta object with C<create_form_meta> function, the object exists in an incomplete state. It is so that superclasses can be applied before finalizing the metaobject and applying inheritance. Calling C<get_package_form_meta> will apply all changes needed to achieve complete state.
+
+Finalized meta is not really a complete form - the inheritance and basic setup is done, but it still misses all of its parts like hooks and fields. Since we use no keyword just before finishing the package like Moose's C<< meta->make_immutable >>, the form meta has no way of knowing when it has actually been filled with those elements. The current strategy to work around this (when it is needed at all) is to update meta incrementally when adding those elements.
+
 =head2 Using the module without the syntactic sugar
 
 It is entirely possible, although a bit tedious, to use the module without importing L<Form::Tiny> package. The following example declares a form with a single field taken from the example above.
@@ -43,10 +100,6 @@ The code present in C<metaobject.pl> example should result in a form that has th
 
 B<Notice:> building your form like this should be done only for educational purposes. Changes in import procedure are not covered by the 3 month deprecation period policy.
 
-=head2 Finalizing the meta
-
-After creating the meta object with C<create_form_meta> function, the object exists in an incomplete state. It is so that superclasses can be applied before finalizing the metaobject and applying inheritance. Calling C<get_package_form_meta> will apply all changes needed to achieve complete state.
-
 =head1 SEE ALSO
 
 =over
@@ -56,3 +109,4 @@ After creating the meta object with C<create_form_meta> function, the object exi
 =item * L<Form::Tiny::Manual::Compatibility>
 
 =back
+

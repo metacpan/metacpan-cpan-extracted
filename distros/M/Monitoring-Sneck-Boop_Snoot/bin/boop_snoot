@@ -1,0 +1,316 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+boop_snoot - fetches the results of sneck extend via SNMP, printing the return or acting as a Nagios style check
+
+=head1 SYNOPSIS
+
+boop_snoot [B<-v> 1] [B<-c> <community>] [B<-p>] [B<-s>] [B<-d>]] [B<-n>] [B<-r>] <host>
+
+boop_snoot [B<-v> 2c] [B<-c> <community>] [B<-p>] [B<-s>] [B<-d>]] [B<-n>] [B<-r>] <host>
+
+boop_snoot [B<-v> 3] [B<-a> <value>] [B<-A> <value>] [B<-e> <value>] [B<-E> <value>] [B<-l> <value>] [B<-n> <value>] [B<-u> <value>] [B<-x> <value>] [B<-X> <value>] [B<-Z> <value>] [B<-p>] [B<-s>] [B<-d>]] [B<-n>]  [B<-r>] <host>
+
+=head1 DESCRIPTION
+
+This his basically a wrapper for smpget and nicely formatting
+the returned output.
+
+=head1 GENERAL FLAGS
+
+=head2 -p
+
+Do not pretty print the return. Just prints the raw return,
+provided -s and -d is given.
+
+=head2 -s
+
+Do not sort the JSON keys.
+
+=head2 -d
+
+Only print the data hash in the JSON.
+
+=head2 -n
+
+Nagious mode. This will cause it to print a Nagios like message and
+exit code, for the use with Nagios, Icinga, or the like.
+
+=head2 -r
+
+Prints the raw return, equivalaent of -p, -s, and -d.
+
+=head1 SNMP 1/2c FLAGS
+
+=head2 -v <version>
+
+SNMP version to use, 1, 2c, or 3. Defaults to 2c.
+
+=head2 -c <community>
+
+SNMP community to use for 2c or 3.
+
+=head1 SNMP 3 FLAGS
+
+=head2 -a <value>
+
+Set authentication protocol (MD5|SHA|SHA-224|SHA-256|SHA-384|SHA-512)
+
+=head2 -A <value>
+
+Set authentication protocol pass phrase
+
+=head2 -e <value>
+
+Set security engine ID (e.g. 800000020109840301)
+
+=head2 -E <value>
+
+Set context engine ID (e.g. 800000020109840301)
+
+=head2 -l <value>
+
+Set security level (noAuthNoPriv|authNoPriv|authPriv)
+
+=head2 -n <value>
+
+Set context name (e.g. bridge1)
+
+=head2 -u <value>
+
+Set security name (e.g. bert)
+
+=head2 -x <value>
+
+Set privacy protocol (DES|AES)
+
+=head2 -X <value>
+
+Set privacy protocol pass phrase
+
+=head2 -Z <value>
+
+Set destination engine boots/time
+
+=cut
+
+use strict;
+use warnings;
+use Getopt::Long;
+use JSON;
+use Monitoring::Sneck::Boop_Snoot;
+
+sub prog_version {
+	print "sneck v. 0.1.1\n";
+}
+
+sub help {
+	&prog_version;
+
+	print '
+
+boop_snoot <args> <host>
+
+-p                       Do not pretty print.
+
+-s                       Do not Sort the keys.
+
+-d                       Print all of it and not just .data
+
+-n                       Print and exit in a Nagios manner.
+
+-r                       Prints the raw return, equivalaent of -p, -s, and -d. Not compatible with -n.
+
+-v <version >            Version to use. 1, 2c, or 3
+                         Default: 2c
+
+SNMP Version 1 or 2c specific
+-c <community>           SNMP community stream.
+                         Default: public
+
+SNMP Version 3
+-a <value>               Set authentication protocol (MD5|SHA|SHA-224|SHA-256|SHA-384|SHA-512)
+-A <value>               Set authentication protocol pass phrase
+-e <value>               Set security engine ID (e.g. 800000020109840301)
+-E <value>               Set context engine ID (e.g. 800000020109840301)
+-l <value>               Set security level (noAuthNoPriv|authNoPriv|authPriv)
+-n <value>               Set context name (e.g. bridge1)
+-u <value>               Set security name (e.g. bert)
+-x <value>               Set privacy protocol (DES|AES)
+-X <value>               Set privacy protocol pass phrase
+-Z <value>               Set destination engine boots/time
+
+-h                       Print help info.
+--help                   Print help info.
+--version                Print version info.
+
+';
+}
+
+my $community = 'public';
+my $version   = '2c';
+my $a;
+my $A;
+my $e;
+my $E;
+my $l;
+my $n;
+my $u;
+my $x;
+my $X;
+my $Z;
+my $data;
+my $prog_version;
+my $help;
+my $pretty;
+my $sort;
+my $nagios;
+my $raw;
+my $host = $ARGV[0];
+Getopt::Long::Configure('no_ignore_case');
+Getopt::Long::Configure('bundling');
+GetOptions(
+	'version' => \$prog_version,
+	'v'       => \$version,
+	'help'    => \$help,
+	'h'       => \$help,
+	'c=s'     => \$community,
+	'a=s'     => \$a,
+	'A=s'     => \$A,
+	'e=s'     => \$e,
+	'E=s'     => \$E,
+	'l=s'     => \$l,
+	'n=s'     => \$n,
+	'u=s'     => \$u,
+	'x=s'     => \$x,
+	'X=s'     => \$X,
+	'Z=s'     => \$Z,
+	's'       => \$sort,
+	'p'       => \$pretty,
+	'd'       => \$data,
+	'n'       => \$nagios,
+	'r'       => \$raw,
+);
+
+# print version or help if requested
+if ($help) {
+	&help;
+	exit 42;
+}
+if ($prog_version) {
+	&prog_version;
+	exit 42;
+}
+
+# make sure we have a host
+if ( !defined($host) ) {
+	die('No host specified');
+}
+
+use Monitoring::Sneck::Boop_Snoot;
+
+my $sneck_snoot_booper = Monitoring::Sneck::Boop_Snoot->new(
+	{
+		version   => $version,
+		community => $community,
+		a         => $a,
+		A         => $A,
+		e         => $e,
+		E         => $E,
+		l         => $l,
+		n         => $n,
+		u         => $u,
+		x         => $x,
+		X         => $X,
+		Z         => $Z,
+	}
+);
+
+my $raw_json = $sneck_snoot_booper->boop_the_snoot( $ARGV[0] );
+
+# was told to raw print it, so just print and exit
+if (   ( $sort && $pretty && $data )
+	|| ( $raw && !$nagios ) )
+{
+	print $raw_json. "\n";
+	exit;
+}
+
+my $json;
+eval { $json = decode_json($raw_json); };
+if ($@) {
+	die( 'Failed to decode the returned JSON....  ' . $raw_json . '    ... ' . $@ );
+}
+
+my $new_json = JSON->new->utf8;
+
+if ($nagios) {
+	if (   !defined( $json->{data} )
+		|| !defined( $json->{data}{critical} )
+		|| !defined( $json->{data}{warning} )
+		|| !defined( $json->{data}{ok} )
+		|| !defined( $json->{data}{unknown} )
+		|| !defined( $json->{data}{errored} )
+		|| !defined( $json->{data}{alertString} ) )
+	{
+		die( 'The returned JSON lacks one or more required variables....  ' . $raw_json );
+	}
+	chomp( $json->{data}{alertString} );
+	$json->{data}{alertString} =~ s/\n/ \, /g;
+
+	my $alertstring
+		= 'critical='
+		. $json->{data}{unknown} . ', '
+		. 'warning='
+		. $json->{data}{warning} . ', ' . 'ok='
+		. $json->{data}{ok} . ', '
+		. 'unknown='
+		. $json->{data}{unknown} . ', '
+		. 'errored='
+		. $json->{data}{errored} . '   '
+		. $json->{data}{alertString} . "\n";
+
+	if ( $json->{data}{errored} > 0 ) {
+		print 'UNKNWON: ' . $alertstring;
+		exit 3;
+	}
+	elsif ( $json->{data}{unknown} > 0 ) {
+		print 'UNKNWON: ' . $alertstring;
+		exit 3;
+	}
+	elsif ( $json->{data}{critical} > 0 ) {
+		print 'CRITICAL: ' . $alertstring;
+		exit 2;
+	}
+	elsif ( $json->{data}{warning} > 0 ) {
+		print 'WARNING: ' . $alertstring;
+		exit 1;
+	}
+	else {
+		print 'OK: ' . $alertstring;
+		exit 0;
+	}
+
+}
+
+if ( !$data ) {
+	if ( !defined( $json->{data} ) ) {
+		die( 'The returned JSON lacks a $json->{data} section....  ' . $raw_json );
+	}
+	$json = $json->{data};
+}
+
+if ( !$pretty ) {
+	$new_json->pretty(1);
+}
+
+if ( !$sort ) {
+	$new_json->canonical(1);
+}
+
+print $new_json->encode($json);
+
+if ($pretty) {
+	print "\n";
+}

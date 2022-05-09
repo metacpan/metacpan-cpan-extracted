@@ -4,7 +4,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use parent 'Form::Diva';
 

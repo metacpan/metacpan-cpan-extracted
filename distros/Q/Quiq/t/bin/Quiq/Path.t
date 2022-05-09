@@ -273,12 +273,16 @@ sub test_findProgram : Test(1) {
 
 # -----------------------------------------------------------------------------
 
-sub test_mkdir : Test(2) {
+sub test_mkdir : Test(3) {
     my $self = shift;
 
     my $path = "/tmp/mkdir$$/a/b";
     eval {Quiq::Path->mkdir($path)};
     $self->like($@,qr/PATH-00004/);
+
+    $path = "/tmp/mkdir$$";
+    Quiq::Path->mkdir($path);
+    $self->is(-d $path,1);
 
     Quiq::Path->mkdir($path,-recursive=>1);
     $self->ok(-e $path);

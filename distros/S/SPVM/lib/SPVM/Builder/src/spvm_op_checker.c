@@ -577,7 +577,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   return;
                 }
               }
-              // expression == undef
+              // value_op == undef
               else if (!SPVM_TYPE_is_undef_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag) && SPVM_TYPE_is_undef_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
                 SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
                 if (!SPVM_TYPE_is_object_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
@@ -585,7 +585,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   return;
                 }
               }
-              // undef == expression
+              // undef == value_op
               else if (SPVM_TYPE_is_undef_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag) && !SPVM_TYPE_is_undef_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
                 SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_cur->last);
                 if (!SPVM_TYPE_is_object_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
@@ -593,7 +593,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   return;
                 }
               }
-              // expression == expression
+              // value_op == value_op
               else {
                 int32_t is_valid_type;
                 
@@ -643,7 +643,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   return;
                 }
               }
-              // expression == undef
+              // value_op == undef
               else if (!SPVM_TYPE_is_undef_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag) && SPVM_TYPE_is_undef_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
                 SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
                 if (!SPVM_TYPE_is_object_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
@@ -651,7 +651,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   return;
                 }
               }
-              // undef == expression
+              // undef == value_op
               else if (SPVM_TYPE_is_undef_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag) && !SPVM_TYPE_is_undef_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
                 SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_cur->last);
                 if (!SPVM_TYPE_is_object_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
@@ -659,7 +659,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   return;
                 }
               }
-              // expression == expression
+              // value_op == value_op
               else {
                 int32_t is_valid_type;
                 
@@ -1012,7 +1012,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 
                 SPVM_CLASS* new_class = type->basic_type->class;
                 
-                // Anon sub
+                // Anon method
                 if (new_class && new_class->is_anon) {
                   SPVM_OP* op_type = op_cur->first;
                   
@@ -1149,11 +1149,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 else if (SPVM_TYPE_is_object_type(compiler, type->basic_type->id, type->dimension, type->flag)) {
                   SPVM_CLASS* class = SPVM_HASH_get(compiler->class_symtable, type->basic_type->name, strlen(type->basic_type->name));
                   
-                  if (class->category == SPVM_CLASS_C_CATEGORY_CALLBACK) {
-                    SPVM_COMPILER_error(compiler, "Can't create the object of a callback type at %s line %d", op_cur->file, op_cur->line);
-                    return;
-                  }
-                  else if (class->category == SPVM_CLASS_C_CATEGORY_INTERFACE) {
+                  if (class->category == SPVM_CLASS_C_CATEGORY_INTERFACE) {
                     SPVM_COMPILER_error(compiler, "Can't create the object of a interface type at %s line %d", op_cur->file, op_cur->line);
                     return;
                   }
@@ -2430,7 +2426,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               assert(op_cur->first->id == SPVM_OP_C_ID_LIST);
                   
               
-              // Resulve sub
+              // Resolve method
               SPVM_OP_CHECKER_resolve_call_method(compiler, op_cur, class->op_class);
               if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                 return;
@@ -2626,7 +2622,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               {
                 // Enum is replaced to constant value
                 if (call_method->method->is_enum) {
-                  // Replace sub to constant
+                  // Replace method to constant
                   SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_cur);
                   
                   int32_t value = call_method->method->op_inline->uv.constant->value.ival;
@@ -2650,7 +2646,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 }
                 // Simple constructor is inlined
                 else if (call_method->method->is_simple_constructor) {
-                  // Replace sub to constant
+                  // Replace method to constant
                   SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_cur);
                   
                   SPVM_OP* op_type_original = call_method->method->op_inline;
@@ -3153,14 +3149,31 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               
               break;
             }
-            case SPVM_OP_C_ID_HAS_IMPLEMENT: {
+            case SPVM_OP_C_ID_HAS_IMPL: {
               SPVM_OP* op_var = op_cur->first;
-              SPVM_OP* op_name = op_cur->last;
+              SPVM_OP* op_name_method = op_cur->last;
               
               SPVM_TYPE* type = SPVM_OP_get_type(compiler, op_var);
               
               if (!(SPVM_TYPE_is_class_type(compiler, type->basic_type->id, type->dimension, type->flag) || SPVM_TYPE_is_interface_type(compiler, type->basic_type->id, type->dimension, type->flag))) {
-                SPVM_COMPILER_error(compiler, "The invocant of the has_implement operator must be a class type or an interface type at %s line %d", op_cur->file, op_cur->line);
+                SPVM_COMPILER_error(compiler, "The invocant of the has_impl operator must be a class type or an interface type at %s line %d", op_cur->file, op_cur->line);
+                return;
+              }
+              
+              const char* class_name = type->basic_type->name;
+              SPVM_CLASS* class = SPVM_HASH_get(compiler->class_symtable, class_name, strlen(class_name));
+              
+              assert(class);
+              
+              const char* method_name = op_name_method->uv.name;
+              SPVM_METHOD* found_method = SPVM_HASH_get(
+                class->method_symtable,
+                method_name,
+                strlen(method_name)
+              );
+              
+              if (!found_method) {
+                SPVM_COMPILER_error(compiler, "The interface or class \"%s\" doesn't have the method declaration \"%s\" at %s line %d", class_name, method_name, op_name_method->file, op_name_method->line);
                 return;
               }
               
@@ -3641,7 +3654,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
             assert(method->class->module_file);
             
             // Add op var_decl if need
-            if (method->class->category == SPVM_CLASS_C_CATEGORY_CALLBACK || method->class->category == SPVM_CLASS_C_CATEGORY_INTERFACE) {
+            if (method->class->category == SPVM_CLASS_C_CATEGORY_INTERFACE) {
               int32_t arg_index;
               for (arg_index = 0; arg_index < method->args_length; arg_index++) {
                 SPVM_VAR_DECL* arg_var_decl = SPVM_LIST_get(method->var_decls, arg_index);
@@ -4165,14 +4178,14 @@ SPVM_OP* SPVM_OP_CHECKER_check_assign(SPVM_COMPILER* compiler, SPVM_TYPE* dist_t
   int32_t narrowing_conversion_error = 0;
   int32_t mutable_invalid = 0;
   
-  int32_t can_assign = SPVM_TYPE_check_assignability(
+  int32_t runtime_assignability = SPVM_TYPE_check_assignability(
     compiler,
     dist_type_basic_type_id, dist_type_dimension, dist_type_flag,
     src_type_basic_type_id, src_type_dimension, src_type_flag,
     src_constant, &need_implicite_conversion, &narrowing_conversion_error, &mutable_invalid
   );
     
-  if (!can_assign) {
+  if (!runtime_assignability) {
     if (mutable_invalid) {
       SPVM_COMPILER_error(compiler, "Can't assign a non-mutable to a mutable type in %s, at %s line %d", place, file, line);
     }
@@ -4334,12 +4347,12 @@ void SPVM_OP_CHECKER_resolve_call_method(SPVM_COMPILER* compiler, SPVM_OP* op_ca
         );
       }
       else {
-        SPVM_COMPILER_error(compiler, "Class \"%s\" not found at %s line %d", class_name, op_call_method->file, op_call_method->line);
+        SPVM_COMPILER_error(compiler, "The class \"%s\" is not yet loaded at %s line %d", class_name, op_call_method->file, op_call_method->line);
         return;
       }
     }
     else {
-      SPVM_COMPILER_error(compiler, "Unqualified method names are forbbiden \"%s\" at %s line %d", method_name, op_call_method->file, op_call_method->line);
+      SPVM_COMPILER_error(compiler, "A method name must be qualified by a class name or the current class name \"&\" \"%s\" at %s line %d", method_name, op_call_method->file, op_call_method->line);
       return;
     }
   }
@@ -4349,7 +4362,7 @@ void SPVM_OP_CHECKER_resolve_call_method(SPVM_COMPILER* compiler, SPVM_OP* op_ca
   }
   else {
     assert(found_class);
-    SPVM_COMPILER_error(compiler, "Unknown method \"%s->%s\" at %s line %d", found_class->name, method_name, op_call_method->file, op_call_method->line);
+    SPVM_COMPILER_error(compiler, "The method \"%s->%s\" is not found at %s line %d", found_class->name, method_name, op_call_method->file, op_call_method->line);
     return;
   }
 }
@@ -4682,7 +4695,7 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
         return;
       }
       
-      // Is constant sub
+      // Is constant method
       {
         SPVM_OP* op_block = method->op_block;
         if (op_block) {
@@ -4702,7 +4715,7 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
         }
       }
       
-      // Is simple constructor sub
+      // Is simple constructor method
       {
         SPVM_OP* op_block = method->op_block;
         if (op_block) {
@@ -4735,11 +4748,11 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
         return;
       }
 
-      // Create sub signature
+      // Create method signature
       const char* method_signature = SPVM_COMPILER_create_method_signature(compiler, method);
       method->signature = method_signature;
 
-      // Copy has_precomile_descriptor from anon sub defined class
+      // Copy has_precomile_descriptor from anon method defined class
       if (method->anon_method_defined_class_name) {
         SPVM_CLASS* anon_method_defined_class = SPVM_HASH_get(compiler->class_symtable, method->anon_method_defined_class_name, strlen(method->anon_method_defined_class_name));
         SPVM_LIST_push(anon_method_defined_class->anon_methods, method);
@@ -4748,37 +4761,54 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
     }
   }
   
-  // classes must be interface the interface classes 
+  // Add anon methods
   for (int32_t class_index = compiler->cur_class_base; class_index < compiler->classes->length; class_index++) {
     SPVM_CLASS* class = SPVM_LIST_get(compiler->classes, class_index);
     
-    // Add the interfaces to the class
-    for (int32_t i = 0; i < class->interface_decls->length; i++) {
-      SPVM_INTERFACE* interface_decl =  SPVM_LIST_get(class->interface_decls, i);
-
-      SPVM_OP* op_interface = interface_decl->op_interface;
-      
-      const char* interface_name = interface_decl->class_name;
-      
-      SPVM_CLASS* interface = SPVM_HASH_get(compiler->class_symtable, interface_name, strlen(interface_name));
-      
-      if (interface->category != SPVM_CLASS_C_CATEGORY_INTERFACE) {
-        SPVM_COMPILER_error(compiler, "The operand of the interface statment must be the interface class at %s line %d", interface->name, op_interface->file, op_interface->line);
-        return;
-      }
-      
-      SPVM_CLASS* found_interface = SPVM_HASH_get(class->interface_symtable, interface->name, strlen(interface->name));
-      if (!found_interface) {
-        SPVM_LIST_push(class->interfaces, interface);
-        SPVM_HASH_set(class->interface_symtable, interface->name, strlen(interface->name), interface);
-      }
-    }
-
     // Add the anon method
     for (int32_t anon_methods_index = 0; anon_methods_index < class->anon_methods->length; anon_methods_index++) {
       SPVM_METHOD* anon_method = SPVM_LIST_get(class->anon_methods, anon_methods_index);
       anon_method->anon_method_id = compiler->anon_methods->length;
       SPVM_LIST_push(compiler->anon_methods, anon_method);
+    }
+  }
+
+  for (int32_t class_index = compiler->cur_class_base; class_index < compiler->classes->length; class_index++) {
+    SPVM_CLASS* class = SPVM_LIST_get(compiler->classes, class_index);
+    // Add interfaces
+    for (int32_t i = 0; i < class->interface_decls->length; i++) {
+      SPVM_INTERFACE* interface_decl = SPVM_LIST_get(class->interface_decls, i);
+      SPVM_CLASS* interface = SPVM_HASH_get(compiler->class_symtable, interface_decl->class_name, strlen(interface_decl->class_name));
+      assert(interface);
+      
+      SPVM_LIST_push(class->interfaces, interface);
+      SPVM_HASH_set(class->interface_symtable, interface->name, strlen(interface->name), interface);
+    }
+  }
+
+  for (int32_t class_index = compiler->cur_class_base; class_index < compiler->classes->length; class_index++) {
+    SPVM_CLASS* class = SPVM_LIST_get(compiler->classes, class_index);
+    // Check the class has interface methods
+    for (int32_t i = 0; i < class->interfaces->length; i++) {
+      SPVM_CLASS* interface = SPVM_LIST_get(class->interfaces, i);
+      assert(interface);
+      
+      SPVM_METHOD* required_method = interface->required_method;
+      assert(required_method);
+      
+      int32_t method_found = 0;
+      for (int32_t i = 0; i < class->methods->length; i++) {
+        SPVM_METHOD* method = SPVM_LIST_get(class->methods, i);
+        if (strcmp(method->name, required_method->name) == 0) {
+          if (strcmp(method->signature, required_method->signature) == 0) {
+            method_found = 1;
+            break;
+          }
+        }
+      }
+      if (!method_found) {
+        SPVM_COMPILER_error(compiler, "The class \"%s\" must have the method \"%s\" with the signature \"%s\" defined in the interface \"%s\" at %s line %d", class->name, required_method->name, required_method->signature, interface->name, class->op_class->file, class->op_class->line);
+      }
     }
   }
 
@@ -4821,7 +4851,7 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
         else if (method->is_enum) {
           can_precompile = 0;
         }
-        // native method, methods of callback type or interface type
+        // native method, methods of interface type
         else if (!method->op_block) {
           can_precompile = 0;
         }

@@ -17,6 +17,7 @@ MANIFEST
 README
 README.md
 t/01load.t
+t/check.t
 t/cookie.t
 t/drag_and_drop.t
 t/drag_and_drop_mouse.t
@@ -28,6 +29,7 @@ t/logging.t
 t/mouse.t
 t/navigator.t
 t/test/attribute.html
+t/test/check.html
 t/test/confirm.html
 t/test/console_error.html
 t/test/cookie.html

@@ -8,8 +8,7 @@ WriteMakefile(
     EXE_FILES => ['bin/jtt'],
     PREREQ_PM => {
         'Config::Properties' => 1.80,
-        'Set::Tiny' => 0.04,
-        'Text::Wrap' => 2021.0814,
+        'Set::Tiny' => 0.04
     },
     TEST_REQUIRES => {
         'Test::TempDir::Tiny' => 0.018,

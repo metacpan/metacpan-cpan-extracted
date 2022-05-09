@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Minilla/v3.1.17, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,15 +26,18 @@ no_index:
 provides:
   Mojolicious::Plugin::WriteExcel:
     file: lib/Mojolicious/Plugin/WriteExcel.pm
-    version: '2.05'
+    version: '3.00'
 requires:
-  Mojolicious: '5.73'
+  Mojolicious: '9.25'
   Spreadsheet::WriteExcel::Simple: '1.04'
 resources:
   bugtracker: https://github.com/zakame/mojox-renderer-writeexcel/issues
   homepage: https://github.com/zakame/mojox-renderer-writeexcel
-  repository: git://github.com/zakame/mojox-renderer-writeexcel.git
-version: '2.05'
+  repository: https://github.com/zakame/mojox-renderer-writeexcel.git
+version: '3.00'
+x_authority: cpan:ZAKAME
 x_contributors:
   - 'Bryan Paxton <starbelly@pobox.com>'
   - 'Zak B. Elep <zakame@zakame.net>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

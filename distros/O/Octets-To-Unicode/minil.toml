@@ -1,0 +1,5 @@
+name = "Octets-To-Unicode"
+# badges = ["travis-ci.com"]
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+

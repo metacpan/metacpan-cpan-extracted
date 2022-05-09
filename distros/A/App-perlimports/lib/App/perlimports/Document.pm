@@ -3,7 +3,7 @@ package App::perlimports::Document;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000036';
+our $VERSION = '0.000040';
 
 use App::perlimports::Annotations     ();
 use App::perlimports::ExportInspector ();
@@ -14,7 +14,7 @@ use List::Util qw( any uniq );
 use Module::Runtime qw( module_notional_filename );
 use MooX::StrictConstructor;
 use Path::Tiny qw( path );
-use PPI::Document 1.270 ();
+use PPI::Document ();
 use PPIx::Utils::Classification qw(
     is_function_call
     is_hash_key
@@ -1026,7 +1026,7 @@ App::perlimports::Document - Make implicit imports explicit
 
 =head1 VERSION
 
-version 0.000036
+version 0.000040
 
 =head2 inspector_for( $module_name )
 

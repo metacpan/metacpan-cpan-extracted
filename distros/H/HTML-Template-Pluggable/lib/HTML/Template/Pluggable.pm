@@ -2,7 +2,7 @@ package HTML::Template::Pluggable;
 use base 'HTML::Template';
 use Class::Trigger;
 use vars (qw/$VERSION/);
-$VERSION = '0.20';
+$VERSION = '0.21';
 use warnings;
 use strict;
 use Carp;

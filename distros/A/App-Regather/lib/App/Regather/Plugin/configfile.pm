@@ -79,7 +79,7 @@ sub ldap_sync_add_modify {
   my ($tt_vars, $pp, $chin, $chou, $chst, $cher);
 
   $self->log->cc( pr => 'debug', fm => "%s called with arguments: %s",
-		  ls => [ __PACKAGE__, join(',', sort(keys( %{$self}))), ] ) if $self->{v} > 3;
+		  ls => [ sprintf("%s:%s",__FILE__,__LINE__), join(',', sort(keys( %{$self}))), ] ) if $self->{v} > 3;
 
   ### PREPARING OUTPUT RELATED VARIABLES
   my %out_paths = out_paths( cf      => $self->cf,      obj => $self->obj,
@@ -91,15 +91,15 @@ sub ldap_sync_add_modify {
   my $out_to       = $dir . '/' . $out_file;
 
   $self->log->cc( pr => 'debug', fm => "%s: output directory: %s; file: %s",
-		  ls => [ __PACKAGE__, $dir, $out_file ] ) if $self->{v} > 2;
+		  ls => [ sprintf("%s:%s",__FILE__,__LINE__), $dir, $out_file ] ) if $self->{v} > 2;
 
   if ( defined $self->out_file_old ) {
     if ( unlink $dir . '/' . $self->out_file_old ) {
       $self->log->cc( pr => 'info', fm => "%s: file %s deleted (after ModRDN)",
-		ls => [ __PACKAGE__, $dir . '/' . $self->out_file_old ] );
+		ls => [ sprintf("%s:%s",__FILE__,__LINE__), $dir . '/' . $self->out_file_old ] );
     } else {
       $self->log->cc( pr => 'err', fm => "%s: %s not removed (after ModRDN); error: %s",
-		      ls => [ __PACKAGE__, $dir . '/' . $self->out_file_old, $! ], nt => 1, );
+		      ls => [ sprintf("%s:%s",__FILE__,__LINE__), $dir . '/' . $self->out_file_old, $! ], nt => 1, );
     }
   }
 
@@ -110,15 +110,15 @@ sub ldap_sync_add_modify {
 	if ( $i eq 's' && ! $self->obj->exists( $self->cf->get('service', $self->service, 'map', $i, $j)) ) {
 	  if ( $self->cf->get(qw(core dryrun)) ) {
 	    $self->log->cc( pr => 'debug', fm => "%s: DRYRUN: %s to be deleted (no attribute: %s)",
-		      ls => [ __PACKAGE__, $out_to, $self->cf->get('service', $self->service, 'map', $i, $j) ] );
+		      ls => [ sprintf("%s:%s",__FILE__,__LINE__), $out_to, $self->cf->get('service', $self->service, 'map', $i, $j) ] );
 	  } else {
 	    if ( unlink $out_to ) {
 	      $self->log->cc( pr => 'debug', fm => "%s: file %s deleted (no attribute: %s)",
-			ls => [ __PACKAGE__, $out_to, $self->cf->get('service', $self->service, 'map', $i, $j) ] )
+			ls => [ sprintf("%s:%s",__FILE__,__LINE__), $out_to, $self->cf->get('service', $self->service, 'map', $i, $j) ] )
 		if $self->{v} > 0;
 	    } else {
 	      $self->log->cc( pr => 'err', fm => "%s: %s not removed (no attribute: %s); error: %s",
-			ls => [ __PACKAGE__, $out_to, $self->cf->get('service', $self->service, 'map', $i, $j), $! ],
+			ls => [ sprintf("%s:%s",__FILE__,__LINE__), $out_to, $self->cf->get('service', $self->service, 'map', $i, $j), $! ],
 			nt => 1, );
 	    }
 	  }
@@ -170,7 +170,7 @@ sub ldap_sync_add_modify {
 	 (stat($out_to))[9] ) ) {
     $self->log->cc( pr => 'debug',
 	      fm => "%s: skip. object %s is older than target file %s, (object modifyTimestamp: %s is older than file mtime: %s",
-	      ls => [ __PACKAGE__, $self->obj->dn, $out_to,
+	      ls => [ sprintf("%s:%s",__FILE__,__LINE__), $self->obj->dn, $out_to,
 		      strftime( "%F %T",
 				localtime(generalizedTime_to_time($self->obj->get_value('modifyTimestamp')))),
 		      strftime( "%F %T", localtime((stat($out_to))[9])),
@@ -190,7 +190,7 @@ sub ldap_sync_add_modify {
   if ( $self->cf->get(qw(core dryrun)) ) {
 
     $self->log->cc( pr => 'debug', fm => "%s: DRYRUN: %s -> %s",
-	      ls => [ __PACKAGE__,
+	      ls => [ sprintf("%s:%s",__FILE__,__LINE__),
 		     sprintf("%s/%s", $self->cf->get(qw(core tt_path)),
 			     $self->cf->get('service', $self->service, 'tt_file')),
 		     $dir. '/' . $out_file
@@ -198,15 +198,15 @@ sub ldap_sync_add_modify {
 
     if ( $self->cf->is_set($self->service, 'chmod') ) {
       $self->log->cc( pr => 'err', fm => "%s: DRYRUN: chmod %s, %s",
-		ls => [ __PACKAGE__, $self->cf->get('service', $self->service, 'chmod'), $out_to ] );
+		ls => [ sprintf("%s:%s",__FILE__,__LINE__), $self->cf->get('service', $self->service, 'chmod'), $out_to ] );
     } elsif ( $self->cf->is_set(qw(core chmod)) ) {
       $self->log->cc( pr => 'err', fm => "%s: DRYRUN: chmod %s, %s",
-		ls => [ __PACKAGE__, $self->cf->get('core', 'chmod'), $out_to ] );
+		ls => [ sprintf("%s:%s",__FILE__,__LINE__), $self->cf->get('core', 'chmod'), $out_to ] );
     }
 
     if ( $self->cf->is_set($self->service, 'chown') ) {
       $self->log->cc( pr => 'err', fm => "%s: DRYRUN: chown %s, %s, %s",
-		ls => [ __PACKAGE__, $self->obj->get_value('uidNumber'),
+		ls => [ sprintf("%s:%s",__FILE__,__LINE__), $self->obj->get_value('uidNumber'),
 			$self->obj->get_value('gidNumber'),
 			$out_to ] );
     }
@@ -217,7 +217,7 @@ sub ldap_sync_add_modify {
   eval { $tmp_fh = File::Temp->new( UNLINK => 0, DIR => $dir ); };
   if ( $@ ) {
     $self->log->cc( pr => 'err', fm => "%s: File::Temp->new( DIR => %s ); service \"%s\"; err: \"%s\"",
-	      ls => [ __PACKAGE__, $dir, $self->service, $@ ] );
+	      ls => [ sprintf("%s:%s",__FILE__,__LINE__), $dir, $self->service, $@ ] );
     return;
   }
   $tmp_fn = $tmp_fh->filename;
@@ -228,7 +228,7 @@ sub ldap_sync_add_modify {
 			  DEBUG       => $self->log->foreground // $self->cf->get(qw(core tt_debug)) );
 
   $self->log->cc( pr => 'err', fm => "%s: Template->new( OUTPUT_PATH => %s ) for service %s error: %s",
-	    ls => [ __PACKAGE__, $dir, $self->service, $! ] )
+	    ls => [ sprintf("%s:%s",__FILE__,__LINE__), $dir, $self->service, $! ] )
     if ! defined $tt;
 
   $tt->process( sprintf("%s/%s",
@@ -237,33 +237,33 @@ sub ldap_sync_add_modify {
 		$tt_vars,
 		$tmp_fh ) || do {
 		  $self->log->cc( pr => 'err', fm => "%s: %s .tt process error: %s",
-			    ls => [ __PACKAGE__, SYNST->[$self->syncstate], $tt->error ] );
+			    ls => [ sprintf("%s:%s",__FILE__,__LINE__), SYNST->[$self->syncstate], $tt->error ] );
 		  return;
 		};
 
   close( $tmp_fh ) || do {
     $self->log->cc( pr => 'err', fm => "%s: close file (opened for writing), service %s, failed: %s",
-	      ls => [ __PACKAGE__, $self->service, $! ] );
+	      ls => [ sprintf("%s:%s",__FILE__,__LINE__), $self->service, $! ] );
     next;
   };
 
   if ( $self->cf->get(qw(core dryrun)) ) {
     $self->log->cc( pr => 'debug', fm => "%s: DRYRUN: rename %s should be renamed to %s",
-	      ls => [ __PACKAGE__, $tmp_fn, $out_file ] );
+	      ls => [ sprintf("%s:%s",__FILE__,__LINE__), $tmp_fn, $out_file ] );
   } else {
     rename $tmp_fn, $out_to ||
       $self->log->cc( pr => 'err', fm => "%s: rename %s to %s, failed",
-		ls => [ __PACKAGE__, $tmp_fn, $out_to ] );
+		ls => [ sprintf("%s:%s",__FILE__,__LINE__), $tmp_fn, $out_to ] );
 
     if ( -e $out_to ) {
       if ( $self->cf->is_set('service', $self->service, 'chmod') ) {
 	chmod oct($self->cf->get('service', $self->service, 'chmod')), $out_to ||
 	  $self->log->cc( pr => 'err', fm => "%s: chmod for %s failed",
-		    ls => [ __PACKAGE__, $out_to ] );
+		    ls => [ sprintf("%s:%s",__FILE__,__LINE__), $out_to ] );
       } elsif ( $self->cf->is_set(qw(core chmod)) ) {
 	chmod oct($self->cf->(qw(core chmod))), $out_to ||
 	  $self->log->cc( pr => 'err', fm => "%s: chmod for %s failed",
-		    ls => [ __PACKAGE__, $out_to ] );
+		    ls => [ sprintf("%s:%s",__FILE__,__LINE__), $out_to ] );
       }
 
       if ( $self->cf->is_set('service', $self->service, 'chown') ) {
@@ -271,17 +271,18 @@ sub ldap_sync_add_modify {
 	  $self->obj->get_value('gidNumber'),
 	  $out_to ||
 	  $self->log->cc( pr => 'err', fm => "%s: chown (%s:%s) %s failed",
-		    ls => [ __PACKAGE__, $self->obj->get_value('uidNumber'),
+		    ls => [ sprintf("%s:%s",__FILE__,__LINE__), $self->obj->get_value('uidNumber'),
 			    $self->obj->get_value('gidNumber'),
 			    $out_to ] );
       }
     } else {
       $self->log->cc( pr => 'err', fm => "%s: %s disappeared, no such file any more...",
-		ls => [ __PACKAGE__, $out_to ] );
+		ls => [ sprintf("%s:%s",__FILE__,__LINE__), $out_to ] );
     }
   }
   $self->log->cc( pr => 'debug', fm => "%s: control %s: dn: %s processed successfully.",
-	    ls => [ __PACKAGE__, SYNST->[$self->syncstate], $self->obj->dn ] );
+		  ls => [ sprintf("%s:%s",__FILE__,__LINE__), SYNST->[$self->syncstate], $self->obj->dn ] )
+    if $self->{v} > 0;
 
   if ( $self->cf->is_set('service', $self->service, 'post_process') ) {
     foreach $pp ( @{$self->cf->get('service', $self->service, 'post_process')} ) {
@@ -290,7 +291,7 @@ sub ldap_sync_add_modify {
       $chst = $? >> 8;
       if ( $chst ) {
 	$cher .= $_ while ( <$chou> );
-	$self->log->cc( pr => 'err', ls => [ __PACKAGE__, $self->service, $pp, $cher ], nt => 1,
+	$self->log->cc( pr => 'err', ls => [ sprintf("%s:%s",__FILE__,__LINE__), $self->service, $pp, $cher ], nt => 1,
 		  fm => "%s: service %s post_process: %s, error: %s", );
       }
     }
@@ -309,7 +310,7 @@ sub ldap_sync_delete {
   my ($tt_vars, $pp, $chin, $chou, $chst, $cher);
 
   $self->log->cc( pr => 'debug', fm => "%s: %s called with arguments: %s",
-	    ls => [ __PACKAGE__, join(',', sort(keys( %{$self}))), ] ) if $self->{v} > 3;
+	    ls => [ sprintf("%s:%s",__FILE__,__LINE__), join(',', sort(keys( %{$self}))), ] ) if $self->{v} > 3;
 
   ### PREPARING OUTPUT RELATED VARIABLES
   my %out_paths = out_paths( cf      => $self->cf,      obj => $self->obj,
@@ -321,23 +322,23 @@ sub ldap_sync_delete {
   my $out_to       = $dir . '/' . $out_file;
 
   $self->log->cc( pr => 'debug', fm => "%s: output directory: %s; file: %s",
-	    ls => [ __PACKAGE__, $dir, $out_file ] ) if $self->{v} > 2;
+	    ls => [ sprintf("%s:%s",__FILE__,__LINE__), $dir, $out_file ] ) if $self->{v} > 2;
 
   if ( $self->cf->get(qw(core dryrun)) ) {
     $self->log->cc( pr => 'debug', fm => "%s: DRYRUN: file %s should be deleted",
-	      ls => [ __PACKAGE__, $out_to ] );
+	      ls => [ sprintf("%s:%s",__FILE__,__LINE__), $out_to ] );
   } else {
     if ( unlink $out_to ) {
       $self->log->cc( pr => 'debug', fm => "%s: file %s was successfully deleted",
-		ls => [ __PACKAGE__, $out_to ] )
+		ls => [ sprintf("%s:%s",__FILE__,__LINE__), $out_to ] )
 	if $self->{v} > 0;
     } else {
       $self->log->cc( pr => 'err', fm => "%s: file %s was not removed; error: ",
-		ls => [ __PACKAGE__, $out_to, $! ] );
+		ls => [ sprintf("%s:%s",__FILE__,__LINE__), $out_to, $! ] );
     }
   }
   $self->log->cc( pr => 'debug', fm => "%s: control %s: dn: %s processed successfully..",
-	    ls => [ __PACKAGE__, SYNST->[$self->syncstate], $self->obj->dn ] );
+	    ls => [ sprintf("%s:%s",__FILE__,__LINE__), SYNST->[$self->syncstate], $self->obj->dn ] );
 
   if ( $self->cf->is_set('service', $self->service, 'post_process') ) {
     foreach $pp ( @{$self->cf->get('service', $self->service, 'post_process')} ) {
@@ -346,7 +347,7 @@ sub ldap_sync_delete {
       $chst = $? >> 8;
       if ( $chst ) {
 	$cher .= $_ while ( <$chou> );
-	$self->log->cc( pr => 'err', ls => [ __PACKAGE__, $self->service, $pp, $cher ], nt => 1,
+	$self->log->cc( pr => 'err', ls => [ sprintf("%s:%s",__FILE__,__LINE__), $self->service, $pp, $cher ], nt => 1,
 		  fm => "%s: service %s post_process: %s, error: %s", );
       }
     }
@@ -366,7 +367,7 @@ sub out_paths {
     $out_file_pfx = substr($out_file_pfx, 1) if $_{cf}->is_set(qw(core altroot));
     if ( ! -d $out_file_pfx ) {
       $_{log}->cc( pr => 'err', fm => "%s: service %s, target directory %s doesn't exist",
-		   ls => [ __PACKAGE__, $_{service}, $out_file_pfx ] );
+		   ls => [ sprintf("%s:%s",__FILE__,__LINE__), $_{service}, $out_file_pfx ] );
       return ();
     } else {
       $out_file = sprintf("%s%s",
@@ -404,7 +405,7 @@ sub opensslize {
   waitpid( $pid, 0 );
   my $chst = $? >> 8;
 
-  $args->{log}->cc( pr => 'err', fm => "%s: opensslize() error!", ls => [ __PACKAGE__ ] )
+  $args->{log}->cc( pr => 'err', fm => "%s: opensslize() error!", ls => [ sprintf("%s:%s",__FILE__,__LINE__) ] )
     if $chst && $args->{v} > 1;
 
   $arg->{res} .= $_ while ( <$chou> );

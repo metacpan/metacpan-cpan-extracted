@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use UI::Various::core;
 use UI::Various::Box;
@@ -97,26 +97,40 @@ sub _prepare($$$)
 	and  $content_width > $self->{width} - $prefix_length;
     $content_width -= 2  if  $self->border;
 
-    # 2. determine active columns (which need a prefix somewhere):
+    # 2. determine active and/or marked (checkbox or radio button) columns
+    #    (which need prefixes somewhere):
     my @active_column = (0) x $columns;
+    my @marked_column = (0) x $columns;
     my $active_columns = 0;
+    my $marked_width = 0;
     foreach my $column (0..($columns - 1))
     {
 	foreach (0..($rows - 1))
 	{
 	    $_ = $self->field($_, $column);
-	    $active_column[$column] = 1
-		if  defined $_  and  $_->can('_process');
+	    if (defined $_)
+	    {
+		$active_column[$column] = 1  if  $_->can('_process');
+		my $type = ref($_);
+		my $mw = ($type =~ m/::(?:Check|Radio)$/ ? 4 :
+			  0);
+		$marked_column[$column] > $mw
+		    or  $marked_column[$column] = $mw;
+	    }
 	}
 	$active_columns++  if  $active_column[$column];
+	$marked_width += $marked_column[$column];
     }
     $self->{_active} = \@active_column;	# keep list of active columns for _show
+    $self->{_marked} = \@marked_column;	# keep list of marked columns for _show
 
     # 3. determine needed width of each column for even distribution of widths:
     my $text_width =
 	$content_width
 	- $prefix_length * ($active_columns - 1)
+	- $marked_width
 	- $columns + 1;		# borders between columns (visible or not)
+    $text_width > $columns  or  $text_width = $columns;
     my $even_width = int($text_width / $columns);
     my @widths = ($even_width) x $columns;
     my $free_space = $text_width - $even_width * $columns;
@@ -197,6 +211,7 @@ sub _prepare($$$)
     --$columns;
     $w += $widths[$_] foreach (0..$columns);
     $w += $prefix_length * $active_columns;	# here we need the real count!
+    $w += $marked_width;
     $w += $columns;
     $w += 2  if  $self->border;
     $h += $heights[$_] foreach (0..($rows - 1));
@@ -255,6 +270,7 @@ sub _show($$$$$)
 	{
 	    $text .= $D{b8}  if  $column > 0;
 	    $text .= $D{B8} x $self->{_widths}[$column];
+	    $text .= $D{B8} x $self->{_marked}[$column];
 	    $text .= $D{B8} x length($blank) if $self->{_active}[$column];
 	}
 	$text .= $D{B9} . "\n";
@@ -270,6 +286,7 @@ sub _show($$$$$)
 	    {
 		$text .= $D{b5}  if  $column > 0;
 		$text .= $D{c5} x $self->{_widths}[$column];
+		$text .= $D{c5} x $self->{_marked}[$column];
 		$text .= $D{c5} x length($blank) if $self->{_active}[$column];
 	    }
 	    $text .= $D{b6} . "\n";
@@ -326,6 +343,7 @@ sub _show($$$$$)
 	{
 	    $text .= $D{b2}  if  $column > 0;
 	    $text .= $D{B2} x $self->{_widths}[$column];
+	    $text .= $D{B2} x $self->{_marked}[$column];
 	    $text .= $D{B2} x length($blank) if $self->{_active}[$column];
 	}
 	$text .= $D{B3} . "\n";
@@ -333,7 +351,9 @@ sub _show($$$$$)
 
     # 6. final reformatting of whole block:
     $outer_prefix = ' ' x length($outer_prefix);
-    return $self->_format($outer_prefix, '', '', $text, '', '', $width, $height);
+    my @text = split m/\n/, $text;
+    return
+	$self->_format($outer_prefix, '', '', \@text, '', '', $width, $height);
 }
 
 1;

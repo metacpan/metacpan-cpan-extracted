@@ -4,7 +4,7 @@
       "Matthaeus Kiem <cuer2s@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -40,12 +40,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kuerbis/Win32-Console-PatchForRT33513/issues"
+      },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/kuerbis/Win32/Console/PatchForRT33513.git",
-         "web" : "https://github.com/kuerbis/Win32/Console/PatchForRT33513"
+         "url" : "https://github.com/kuerbis/Win32-Console-PatchForRT33513.git",
+         "web" : "https://github.com/kuerbis/Win32-Console-PatchForRT33513"
       }
    },
-   "version" : "0.001",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.008",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

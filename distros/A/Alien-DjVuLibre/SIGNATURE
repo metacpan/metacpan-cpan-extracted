@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 88e02c593c62f20ea1b53406a3c300917e71d02009a267c2170ae736a78177f3 Changes
+SHA256 a664b900fab21c4de82ad506dc6f8b5837993da49d98b3f27d5c079c1dcacbbb DjVuLibre.pm
+SHA256 6a01c8ca9cc78d9c46a65d1b8ae61f1a37b77cdf5f0a4075d85ed227e0d1784b LICENSE
+SHA256 559ad3542b79e58c83fe88c324cc12d34623fb57925410e9ad72dd56a3eeab13 MANIFEST
+SHA256 3cbc18a4b21c0845e332771c63e3d0f01cf10f9ffcb31ed3ce98ab6c6f6e9ca2 META.json
+SHA256 296458e64a6cfa7323180b17be2fe21ebd46cf4f4299b1ccdbe86290406bd639 META.yml
+SHA256 cfd0c693c9253fbb219e0968e2605170656deda6a2d72c653748ed56b046d2c6 Makefile.PL
+SHA256 0efaf248da9d1a97b6a94b99d5b8c160a89e377d8fdfdbc03d8ee179ae66fa82 README
+SHA256 bbdbe897b5433b7c93066489ad5979e3ebbf2297c1a3ccb1ef372245959c838a alienfile
+SHA256 3232a4c7f745cfad0cfb34c3cd01ceefe45b33ee4962316a954a5b5ca1e4ee68 examples/ex1.pl
+SHA256 ee065bfe81f06aece38d9352ac485347eac7dfe621b8304f9e44f7e0dbab34af t/Alien-DjVuLibre/01-use.t
+SHA256 dc1438b850b537c49db5f9ca4a53c192751b79d3861064dc6592fb51f7983ed5 t/Alien-DjVuLibre/02-version.t
+SHA256 7604555faae8094f4aaf226be64c13d5c299510762ac5c610dd60c85efbe28fc t/Alien-DjVuLibre/03-xs.t
+SHA256 dd17d32df2423544a2a90d4dbfd906e78330ef4c39cd5b86b4bbff69afd86b7d xt/Alien-DjVuLibre/01-pod_coverage.t
+SHA256 aa581c1c66c15acdfc4d54897f7e9e55021451c45103ff70fbc99ffa765be23f xt/Alien-DjVuLibre/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEERTLc1QTxqWhVvPeegmqNLzlXaRcFAmJ4tlsACgkQgmqNLzlX
+aRdyRAv/Vjka+8tl58rVRW+/GOnd7yUiVKA6wosYNVzK9H26q92Q6jMifemNCeOd
+4tx5eRPwa9EJbDVKIbseNTvYAQkVcdqgCRZg+FPF9XNdeuDQvv/cjMDhb5bB48TX
+KxEn32z04GzTj5ZINNfcUlmFDYR7LacyA7HRWO0alPnUJALSznhyeYEEfcZ4zIvI
+soLcpSTwy7RxEuBpZ3e8zEVPNGhXu6o/lg/dDgh74v5bCCIRBqyTf7KnJEdoak+0
+CVuXvJMgHql60QWYYzKGJQbuU1J8/v/FrlhDBskvTEYD04l6kk+Yqfx2ugulgVRU
+6lRL0GMK0xugb2al+x4XnhwphMsrYk0AiDwbqqIMPGKm/fJ7w2U9X5Kn+XYmKYGy
+ENKkxbRznipSqADxavXZ3+L82bx5JyGPXNV9pGX2vg0HHD6bn7XwgTuaAubvdW8j
+Da7+1pfgHn/PRXBKSfTEM6fNAhR7ZPzFk0CXVHGL6NgUnD9kZ6xlC/rkmaYe7uK0
+gL+b0rdW
+=3OQT
+-----END PGP SIGNATURE-----

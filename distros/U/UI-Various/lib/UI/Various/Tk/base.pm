@@ -40,7 +40,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use UI::Various::core;
 
@@ -97,7 +97,7 @@ sub _cleanup($)
 
     # We recursively remove our references to Perl/Tk objects first in order
     # to ease the internal cleanup for Perl/Tk itself:
-    if ($self->can('remove'))
+    if ($self->can('remove')  and  $self->can('child'))
     {
 	local $_;
 	while ($_ = $self->child)
