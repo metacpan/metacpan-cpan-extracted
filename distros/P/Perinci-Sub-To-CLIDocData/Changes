@@ -1,3 +1,9 @@
+0.299   2022-05-08  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux][bugfix] In usage, --foo (ospec: foo=s) and its
+	  cmdline_aliases e.g. (--bar, --no-bar) were not grouped together.
+
+
 0.298   2021-07-11  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Usage line: further tweak, group common options by key if

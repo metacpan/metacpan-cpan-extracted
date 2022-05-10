@@ -1,0 +1,32 @@
+use alienfile;
+
+plugin PkgConfig => 'opencv4';
+
+share {
+  start_url 'https://github.com/opencv/opencv/releases';
+
+  meta->before_hook( build => sub {
+          die "Share install not yet supported on MSWin32" if $^O eq 'MSWin32';
+  });
+
+  plugin Download => (
+    filter  => qr/^4\.[0-9\.]+\.zip$/,
+    version => qr/([0-9\.]+)/,
+  );
+  plugin Extract => 'zip';
+  plugin 'Build::CMake';
+  build [
+    ['%{cmake}',
+      @{ meta->prop->{plugin_build_cmake}->{args} },
+      qw(
+        -DBUILD_TESTS=OFF
+      ),
+      # macOS currently has problems during build with zlib
+      ( $^O eq 'darwin' ?  qw(-DBUILD_ZLIB=OFF) : () ),
+      qw(-S), '%{.install.extract}',
+      qw(-B build),
+    ],
+    [ '%{make}', qw( -C build ) ],
+    [ '%{make}', qw( -C build ), 'install' ],
+  ];
+}

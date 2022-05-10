@@ -1,9 +1,13 @@
 package Q::S::L;
 
-use parent Quantum::Superpositions::Lazy;
+our $VERSION = '1.11';
+
+use v5.24;
+use warnings;
+
+use parent 'Quantum::Superpositions::Lazy';
 use Quantum::Superpositions::Lazy qw(:all);
 
-our $VERSION = $Quantum::Superpositions::Lazy::VERSION;
 our @EXPORT = @Quantum::Superpositions::Lazy::EXPORT;
 our @EXPORT_OK = @Quantum::Superpositions::Lazy::EXPORT_OK;
 our %EXPORT_TAGS = %Quantum::Superpositions::Lazy::EXPORT_TAGS;
@@ -27,3 +31,4 @@ Q::S::L - Shortcut for Quantum::Superpositions::Lazy
 
 This module is just a shorter name for L<Quantum::Superpositions::Lazy>. See
 its documentation for details.
+

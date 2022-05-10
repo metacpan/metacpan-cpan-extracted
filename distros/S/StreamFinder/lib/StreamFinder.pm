@@ -487,7 +487,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.85';
+our $VERSION = '1.86';
 our $DEBUG = 0;
 
 require Exporter;
@@ -518,7 +518,7 @@ sub new
 	while (@_) {
 		$arg = shift(@_);
 		if ($arg =~ /^\-?omit$/o) {   #ALLOW USER TO OMIT SPECIFIC INSTALLED SUBMODULE(S):
-			my @omitModules = split(/\,\s*/, shift(@_));
+			my @omitModules = split(/\,\s*/o, shift(@_));
 			foreach my $omit (@omitModules)
 			{
 				$useit{$omit} = 0;

@@ -1,3 +1,7 @@
+0.18 Tue May 10 03:33:29 CST 2022
+
+ * Fix uninitialized warnings when modules were not successfully loaded
+
 0.17 Wed Oct 26 08:34:17 EST 2011
 
  * Warnings avoidance for reloading a module not in %INC

@@ -44,7 +44,7 @@ resources:
   bugtracker: https://github.com/miyagawa/Carmel/issues
   homepage: https://github.com/miyagawa/Carmel
   repository: https://github.com/miyagawa/Carmel.git
-version: v0.1.51
+version: v0.1.52
 x_contributors:
   - 'Jan Seidl <seidl@avast.com>'
   - 'Jarrod Funnell <jfunnell@multiservice.com>'

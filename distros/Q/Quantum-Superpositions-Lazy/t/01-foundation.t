@@ -57,5 +57,12 @@ is_deeply
 
 ok $one_of->is_collapsed, "collapsed ok";
 
+subtest 'empty superposition' => sub {
+	my $pos = superpos();
+	is defined $pos->collapse, defined undef, 'result value ok';
+	is defined $pos->reset->collapse, defined undef, 'reset + result value ok';
+	is scalar $pos->states->@*, 0, 'states ok';
+};
+
 done_testing;
 

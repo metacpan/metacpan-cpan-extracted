@@ -98,4 +98,5 @@ xt/author/pod-spell.t
 xt/author/pod-syntax.t
 xt/author/portability.t
 xt/author/test-version.t
+xt/dependent-modules.t
 xt/release/changes_has_content.t

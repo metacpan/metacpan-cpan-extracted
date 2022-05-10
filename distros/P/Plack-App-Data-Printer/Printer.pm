@@ -8,7 +8,7 @@ use Data::Printer;
 use Error::Pure qw(err);
 use Plack::Util::Accessor qw(data);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 sub call {
 	my ($self, $env) = @_;
@@ -56,6 +56,8 @@ Plack::App::Data::Printer - Plack Data::Printer application.
 
 =head1 METHODS
 
+Class inherites Plack::Component.
+
 =head2 C<new>
 
  my $obj = Plack::App::Data::Printer->new(%parameters);
@@ -63,6 +65,16 @@ Plack::App::Data::Printer - Plack Data::Printer application.
 Constructor.
 
 Returns instance of object.
+
+=over 8
+
+=item * C<data>
+
+Data structure to print out.
+
+Parameter is required.
+
+=back
 
 =head2 C<call>
 
@@ -138,6 +150,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

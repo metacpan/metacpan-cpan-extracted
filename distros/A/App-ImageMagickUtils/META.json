@@ -70,7 +70,7 @@
    "provides" : {
       "App::ImageMagickUtils" : {
          "file" : "lib/App/ImageMagickUtils.pm",
-         "version" : "0.017"
+         "version" : "0.019"
       }
    },
    "release_status" : "stable",
@@ -85,7 +85,7 @@
          "web" : "https://github.com/perlancar/perl-App-ImageMagickUtils"
       }
    },
-   "version" : "0.017",
+   "version" : "0.019",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -466,7 +466,7 @@
                      {
                         "class" : "Pod::Weaver::Section::PERLANCAR::Contributing",
                         "name" : "@Author::PERLANCAR/PERLANCAR/Contributing",
-                        "version" : "0.292"
+                        "version" : "0.293"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Legal",

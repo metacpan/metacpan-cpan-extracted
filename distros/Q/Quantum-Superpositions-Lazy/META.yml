@@ -31,5 +31,5 @@ resources:
   homepage: https://bbrtj.eu/project/quantum-superpositions-lazy
   license: https://dev.perl.org/licenses
   repository: https://github.com/bbrtj/perl-quantum-superpositions-lazy
-version: '1.10'
+version: '1.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

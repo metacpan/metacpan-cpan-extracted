@@ -6,7 +6,7 @@ use warnings;
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -247,6 +247,20 @@ Returns undef.
 L<Class::Utils>,
 L<Error::Pure>.
 
+=head1 SEE ALSO
+
+=over
+
+=item L<Plack::App::Tags::HTML>
+
+Plack application for Tags::HTML objects.
+
+=item L<Plack::Component::Tags::HTML>
+
+Plack component for Tags with HTML output.
+
+=back
+
 =head1 REPOSITORY
 
 L<https://github.com/michal-josef-spacek/Tags-HTML>
@@ -265,6 +279,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

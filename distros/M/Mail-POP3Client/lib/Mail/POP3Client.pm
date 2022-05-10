@@ -3,7 +3,7 @@
 # Description:  POP3Client module - acts as interface to POP3 server
 # Author:       Sean Dowd <pop3client@dowds.net>
 #
-# Copyright (c) 1999-2008  Sean Dowd.  All rights reserved.
+# Copyright (c) 1999-2022  Sean Dowd.  All rights reserved.
 # This module is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
@@ -26,7 +26,7 @@ require Exporter;
 # Do not simply export all your public functions/methods/constants.
 @EXPORT = qw();
 
-$VERSION = '2.19';
+$VERSION = '2.21';
 
 
 # Preloaded methods go here.
@@ -1060,6 +1060,26 @@ sub Xtnd {
 }
 
 #******************************************************************************
+#* UTF8 - submitted by eady@galionlibrary.org
+#******************************************************************************
+sub UTF8 {
+  my $me = shift;
+  if (grep { /^UTF8 USER/ } $me->Capa()) {
+    # my $sock = $me->Socket(); # Is this needed? Xtnd() does it...
+    if ($me->Alive()) {
+       $me->_sockprint("UTF8" . $me->EOL());
+       my $result = $me->_sockread();
+       $result = s/\r?\n$//;
+       $result =~ /^\+OK/ or $me->Message($result) and return;
+       $result =~ s/^\+OK\s*//;
+       $result ||= "[inferred: UTF-8 mode enabled]";
+       return $result;
+    }
+  }
+  return;
+}
+
+#******************************************************************************
 #* NOOP - used to check socket
 #******************************************************************************
 sub NOOP {
@@ -1478,6 +1498,10 @@ capabilities in an array. Valid in all states.
 =item I<XTND>
 
 Optional extended commands.  Transaction state only.
+
+=item I<UTF8>
+
+Add support for UTF8.
 
 =item I<Last>
 

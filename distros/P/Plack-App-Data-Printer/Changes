@@ -1,3 +1,7 @@
+0.04 2022-05-09T21:50:20+02:00
+ - Add 'data' parameter to doc.
+ - Add information about inheritance to doc.
+
 0.03 2022-04-07T09:49:14+02:00
  - Fix minimal dependency of Data::Printer. Lesser versions has issue with
    ANSI sequences. (thanks Slaven Rezić for reporting of issue)

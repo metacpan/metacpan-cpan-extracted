@@ -1,9 +1,10 @@
 package Tags::HTML::Stars;
 
+use base qw(Tags::HTML);
 use strict;
 use warnings;
 
-use Class::Utils qw(set_params);
+use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
 use List::Util qw(max);
 use MIME::Base64;
@@ -32,14 +33,19 @@ Readonly::Scalar our $IMG_STAR_NOTHING => encode_base64(<<'END', '');
 </svg>
 END
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
 	my ($class, @params) = @_;
 
+	# No CSS support.
+	push @params, 'no_css', 1;
+
 	# Create object.
-	my $self = bless {}, $class;
+	my ($object_params_ar, $other_params_ar) = split_params(
+		['public_image_dir', 'star_width'], @params);
+	my $self = $class->SUPER::new(@{$other_params_ar});
 
 	# Public image directory.
 	$self->{'public_image_dir'} = undef;
@@ -47,23 +53,15 @@ sub new {
 	# Star width (300px).
 	$self->{'star_width'} = undef;
 
-	# 'Tags::Output' object.
-	$self->{'tags'} = undef;
-
 	# Process params.
-	set_params($self, @params);
-
-	# Check to 'Tags' object.
-	if (! $self->{'tags'} || ! $self->{'tags'}->isa('Tags::Output')) {
-		err "Parameter 'tags' must be a 'Tags::Output::*' class.";
-	}
+	set_params($self, @{$object_params_ar});
 
 	# Object.
 	return $self;
 }
 
 # Process 'Tags'.
-sub process {
+sub _process {
 	my ($self, $stars_hr) = @_;
 
 	# Main stars.
@@ -188,6 +186,12 @@ Returns undef.
  new():
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
+         From Tags::HTML::new():
+                 Parameter 'tags' must be a 'Tags::Output::*' class.
+
+ process():
+         From Tags::HTML::process():
+                 Parameter 'tags' isn't defined.
 
 =head1 EXAMPLE1
 
@@ -338,6 +342,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

@@ -4,7 +4,7 @@ StreamFinder::Podbean - Fetch actual raw streamable podcast URLs on podbean.com
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2021 by
+This module is Copyright (C) 2021-2022 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -107,11 +107,17 @@ One or more stream URLs can be returned for each podcast.
 
 Accepts a www.podbean.com podcast URL and creates and returns a 
 a new podcast object, or I<undef> if the URL is not a valid podcast, or no 
-streams are found.  The URL MUST be either an I<episode-id> or the full URL, 
+streams are found.  The URL MUST be either a I<CHANNEL-id> or the full URL, 
 ie. https://B<channel-id>.podbean.com/e/B<episode-id>, or 
-https://B<channel-id>.podbean.com, or B<episode-id> or 
-B<channel-id/episode-id>.  If no I<episode-id> is specified (full channel page 
-URL specified), the first (latest) episode for the channel is returned.
+https://B<channel-id>.podbean.com, 
+https://www.podbean.com/podcast-detail/B<channel-id>/..., 
+https://www.podbean.com/ew/B<episode-id>, 
+https://www.podbean.com/media/share/B<episode-id>..., 
+https://www.podbean.com/site/EpisodeDownload/B<episode-id>, B<channel-id> or 
+B<channel-id/episode-id>.  NOTE:  If only a I<channel-id> is specified, it 
+must be the channel-id of a Podbean-hosted podcast channel site 
+(https://I<channel-id>.podbean.com), and for I<all> non-episode URLs, the 
+first (latest) episode for the channel is returned.  
 
 The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  
 If 1 then only secure ("https://") streams will be returned.
@@ -156,9 +162,16 @@ the first valid stream found.  There currently are no valid I<options>.
 =item $podcast->B<count>(['playlist'])
 
 Returns the number of streams found for the podcast.
-If I<"playlist"> is specified, the number of episodes returned in the 
-playlist is returned (the playlist can have more than one item if a 
-podcast page URL is specified).
+If "playlist" is specified, then an extended m3u playlist is returned 
+instead of stream url(s). NOTE:  if an author / channel page url is given for 
+a Podbeam-hosted podcast channel (https://B<channel-id>.podbean.com), 
+get() returns the first (latest?) podcast episode found, and get("playlist") 
+returns an extended m3u playlist containing the urls, titles, etc. for all 
+the podcast episodes found on that page url from latest to oldest.  This 
+playlist containing all episodes feature currently does NOT work for channels 
+actually hosted elsewhere (URL format:  
+https://www.podbean.com/podcast-detail/B<channel-id>/...), as these pages do 
+not contain the playable streams.
 
 =item $podcast->B<getID>()
 
@@ -293,7 +306,7 @@ L<http://search.cpan.org/dist/StreamFinder-Podbean/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2021 Jim Turner.
+Copyright 2021-2022 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -355,11 +368,22 @@ sub new
 	$DEBUG = $self->{'debug'}  if (defined $self->{'debug'});
 
 	$self->{'id'} = '';
+	my $isEpisode = 0;
+	my $isPodbeanHosted = 1;  #True if "https://<channel-id>.podbean.com..."
 	(my $url2fetch = $url) =~ s#\?.*$##;
-	if ($url2fetch =~ m#^https?\:\/\/([a-z0-9]+)\.podbean\.com\/e\/([^\/]+)\/?$#) {
-		$self->{'id'} = $1 . '/' . $2;
-	} elsif ($url2fetch =~ m#^https?\:\/\/([a-z0-9]+)\.podbean\.com\/?$#) {
+	if ($url2fetch =~ m#^https\:\/\/www\.podbean\.com\/(?:ew|media\/share|site/EpisodeDownload)\/([^\/]+)#) { #episode pg:
 		$self->{'id'} = $1;
+		$isEpisode = 1;
+		$isPodbeanHosted = 0;
+	} elsif ($url2fetch =~ m#^https\:\/\/www\.podbean\.com\/podcast\-detail\/([^\/]+)#) { #podcast pg:
+		$self->{'id'} = $1;
+		$isPodbeanHosted = 0;
+	} elsif ($url2fetch =~ m#^https?\:\/\/([a-z0-9]+)\.podbean\.com\/e\w?\/([^\/]+)\/?$#) {  #episode pg:
+		$self->{'id'} = $1 . '/' . $2;
+		$isEpisode = 1;
+	} elsif ($url2fetch =~ m#^https?\:\/\/([a-z0-9]+)\.podbean\.com\/?$#) { #podcast pg:
+		$self->{'id'} = $1;
+	#NOTE:  NON-URL "ID" VALUES CAN ONLY BE PODBEAN-HOSTED CHANNEL-ID OR CHANNEL-ID/EPISODE-ID!:
 	} elsif ($url2fetch =~ m#^https?\:# && $url2fetch =~ m#\/([a-z0-9]+)\/#) {
 		$self->{'id'} = $1;
 	} elsif ($url2fetch =~ m#^([a-z0-9]+\/[^\/]+)$#) {
@@ -372,87 +396,161 @@ sub new
 		return undef;
 	}
 
-	my $html = '';
-	my ($channelID, $episodeID) =($self->{'id'} =~ m#\/#) ? split(m#\/#, $self->{'id'}) : ($self->{'id'}, '');
-	$url2fetch = "https://feed.podbean.com/${channelID}/feed.xml";
-	print STDERR "-0(Podbean): FETCHING URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
-	my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
-	$ua->timeout($self->{'timeout'});
-	$ua->cookie_jar({});
-	$ua->env_proxy;
-	my $response = $ua->get($url2fetch);
-	if ($response->is_success) {
-		$html = $response->decoded_content;
-	} else {
-		print STDERR $response->status_line  if ($DEBUG);
-	}
-	print STDERR "-1a: html=$html=\n"  if ($DEBUG > 1);
-	return undef  unless ($html);  #STEP 1 FAILED, INVALID PODCAST URL, PUNT!
-
 	$self->{'genre'} = 'Podcast';
-	$self->{'albumartist'} = "https://${channelID}.podbean.com";
+	my $html = '';
 	my @epiTitles = ();
 	my @epiStreams = ();
-	$self->{'album'} = $1  if ($html =~ m#\<title\>(.+?)\<\/title\>#s);
-	$self->{'genre'} = $1  if ($html =~ m#\<category\>(.+?)\<\/category\>#s);
-	$self->{'iconurl'} = $self->{'imageurl'} = $1
-			if ($html =~ m#image\s+href\=\"([^\"]+)#);
+	if ($isPodbeanHosted) {
+		my ($channelID, $episodeID) =($self->{'id'} =~ m#\/#) ? split(m#\/#, $self->{'id'}) : ($self->{'id'}, '');
+		$url2fetch = "https://feed.podbean.com/${channelID}/feed.xml";
+		print STDERR "-0(Podbean hosted page): FETCHING URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
+		my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
+		$ua->timeout($self->{'timeout'});
+		$ua->cookie_jar({});
+		$ua->env_proxy;
+		my $response = $ua->get($url2fetch);
+		if ($response->is_success) {
+			$html = $response->decoded_content;
+		} else {
+			print STDERR $response->status_line  if ($DEBUG);
+		}
+		print STDERR "-1a: html=$html=\n"  if ($DEBUG > 1);
+		return undef  unless ($html);  #STEP 1 FAILED, INVALID PODCAST URL, PUNT!
 
-	#FETCH PODCAST PAGE:
+		$self->{'albumartist'} = "https://${channelID}.podbean.com";
+		$self->{'album'} = $1  if ($html =~ m#\<title\>(.+?)\<\/title\>#s);
+		$self->{'genre'} = $1  if ($html =~ m#\<category\>(.+?)\<\/category\>#s);
+		$self->{'iconurl'} = $self->{'imageurl'} = $1
+				if ($html =~ m#image\s+href\=\"([^\"]+)#);
 
-	my $epiFound = 0;
-	while ($html =~ s#\<item\>(.+?)\<\/item\>##so) {
-		my $epidata = $1;
-		if ($epidata =~ m#\<enclosure\s+([^\>]+)#so) {
-			my $streamdata = $1;
-			if ($streamdata =~ m#\burl\=\"([^\"]+)#o) {
-				my $stream = $1;
-				next  if ($self->{'secure'} && $stream !~ /^https/o);
-				if ($epidata =~ m#\<title\>(.+?)\<\/title\>#so) {
-					my $title = $1;
-					unless ($episodeID) {
-						push @epiTitles, $title;
-						push @epiStreams, $stream;
-					}
-					if (!$epiFound && $epidata =~ s#\<link\>\s*(.+?)\<\/link\>##so) {
-						(my $link = $1) =~ s#\s+$##o;
-						if ($link =~ m#\/e\/([\S]+)#o) {
-							(my $epID = $1) =~ s#\/\s*$##o;;
-							if ($episodeID) {
-								next  unless ($epID eq $episodeID);
+		#FETCH PODCAST PAGE:
 
-								push (@{$self->{'streams'}}, $stream);
-								++$self->{'cnt'};
-							} else {
-								$self->{'id'} .= '/' . $epID;
-								push (@{$self->{'streams'}}, $stream);
-								++$self->{'cnt'};
+		my $epiFound = 0;
+		while ($html =~ s#\<item\>(.+?)\<\/item\>##so) {
+			my $epidata = $1;
+			if ($epidata =~ m#\<enclosure\s+([^\>]+)#so) {
+				my $streamdata = $1;
+				if ($streamdata =~ m#\burl\=\"([^\"]+)#o) {
+					my $stream = $1;
+					next  if ($self->{'secure'} && $stream !~ /^https/o);
+					if ($epidata =~ m#\<title\>(.+?)\<\/title\>#so) {
+						my $title = $1;
+						unless ($episodeID) {
+							push @epiTitles, $title;
+							push @epiStreams, $stream;
+						}
+						if (!$epiFound && $epidata =~ s#\<link\>\s*(.+?)\<\/link\>##so) {
+							(my $link = $1) =~ s#\s+$##o;
+							if ($link =~ m#\/e\/([\S]+)#o) {
+								(my $epID = $1) =~ s#\/\s*$##o;;
+								if ($episodeID) {
+									next  unless ($epID eq $episodeID);
+
+									push (@{$self->{'streams'}}, $stream);
+									++$self->{'cnt'};
+								} else {
+									$self->{'id'} .= '/' . $epID;
+									push (@{$self->{'streams'}}, $stream);
+									++$self->{'cnt'};
+								}
+
+								#FETCH REST OF EPISODE DATA:
+
+								++$epiFound;
+								$self->{'title'} ||= $title;
+								if ($epidata =~ s#\<pubDate\>(.+?)\<\/pubDate\>##s) {
+									$self->{'created'} = $1;
+									$self->{'year'} = $1  if ($self->{'created'} =~ /(\d\d\d\d)/);
+								}
+								$self->{'description'} = $1
+										if ($epidata =~ m#\<description\>(.+?)\<\/description\>#s);
+								$self->{'description'} ||= $1
+										if ($epidata =~ m#\<content\:encoded\>(.+?)\<\/content\:encoded\>#s);
+								if ($self->{'description'}) {
+									$self->{'description'} =~ s#\<\!\[CDATA\[##o;
+									$self->{'description'} =~ s#\]\]\>##so;
+								}
+								$self->{'artist'} = $1  if ($epidata =~ m#\bauthor\>([^\<]+)#);
+								last  if ($episodeID);
 							}
-
-							#FETCH REST OF EPISODE DATA:
-
-							++$epiFound;
-							$self->{'title'} ||= $title;
-							if ($epidata =~ s#\<pubDate\>(.+?)\<\/pubDate\>##s) {
-								$self->{'created'} = $1;
-								$self->{'year'} = $1  if ($self->{'created'} =~ /(\d\d\d\d)/);
-							}
-							$self->{'description'} = $1
-									if ($epidata =~ m#\<description\>(.+?)\<\/description\>#s);
-							$self->{'description'} ||= $1
-									if ($epidata =~ m#\<content\:encoded\>(.+?)\<\/content\:encoded\>#s);
-							if ($self->{'description'}) {
-								$self->{'description'} =~ s#\<\!\[CDATA\[##o;
-								$self->{'description'} =~ s#\]\]\>##so;
-							}
-							$self->{'artist'} = $1  if ($epidata =~ m#\bauthor\>([^\<]+)#);
-							last  if ($episodeID);
 						}
 					}
 				}
 			}
 		}
+	} else {
+		unless ($isEpisode) {
+			print STDERR "-0(Podbean unhosted page): FETCHING URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
+			my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
+			$ua->timeout($self->{'timeout'});
+			$ua->cookie_jar({});
+			$ua->env_proxy;
+			my $response = $ua->get($url2fetch);
+			if ($response->is_success) {
+				$html = $response->decoded_content;
+			} else {
+				print STDERR $response->status_line  if ($DEBUG);
+			}
+			print STDERR "-1a: html=$html=\n"  if ($DEBUG > 1);
+			return undef  unless ($html);  #STEP 1 FAILED, INVALID PODCAST URL, PUNT!
+
+			$url2fetch = '';
+			$html =~ s#.+\<tbody\s+class\=\"items\"\>##s;
+			if ($html =~ s#\<tr\>(.+?)\<\/tr\>##s) {  #items:
+				my $epidata = $1;
+				if ($epidata =~ m#<a\s+target\=\"\_blank\"\s+href\=\"([^\"]+)#so) {
+					$url2fetch = $1;
+				}
+			}
+
+			return undef  unless ($url2fetch);  #STEP 1 FAILED, INVALID PODCAST URL, PUNT!
+		}
+
+		#SHOULD NOW HAVE AN EPISODE URL:
+		print STDERR "-1(Podbean unhosted episode): FETCHING URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
+		my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
+		$ua->timeout($self->{'timeout'});
+		$ua->cookie_jar({});
+		$ua->env_proxy;
+		my $response = $ua->get($url2fetch);
+		if ($response->is_success) {
+			$html = $response->decoded_content;
+		} else {
+			print STDERR $response->status_line  if ($DEBUG);
+		}
+		print STDERR "-1a: html=$html=\n"  if ($DEBUG > 1);
+		return undef  unless ($html);  #STEP 1 FAILED, INVALID PODCAST URL, PUNT!
+
+		if ($html =~ m#\<script\s+type\=\"application\/ld\+json"\>(.+?)\<\/script\>#s) {
+			my $epidata = $1;
+			if ($epidata =~ m#\"associatedMedia\"\:\{([^\}]+)#) {
+				my $mediadata = $1;
+				while ($mediadata =~ s#\"contentUrl\"\:\"([^\"]+)\"##) {
+					my $stream = $1;
+					next  if ($self->{'secure'} && $stream !~ /^https/o);
+
+					$stream =~ s#\\\/#\/#g;
+					push (@{$self->{'streams'}}, $stream);
+					++$self->{'cnt'};
+				}
+			}
+			push (@{$self->{'streams'}}, $1)  if ($html =~ m#\<meta\s+property\=\"og\:video\"\s+content\=\"([^\"]+)#s);
+			push (@{$self->{'streams'}}, $1)  if ($html =~ m#\<meta\s+property\=\"og\:audio\"\s+content\=\"([^\"]+)#s);
+			$self->{'albumartist'} = $1  if ($epidata =~ s#\"PodcastEpisode\"\,\"url\"\:\"([^\"]+)\"\,##s);
+			$self->{'albumartist'} =~ s#\\\/#\/#g;
+			$self->{'title'} = $1  if ($epidata =~ s#\"name\"\:\"(.+?)\"\,##s);
+			$self->{'artist'} = $1  if ($epidata =~ s#\"name\"\:\"(.+?)\"\,##s);
+			$self->{'created'} = $1  if ($epidata =~ s#\"datePublished\"\:\"(.+?)\"\,##is);
+			$self->{'year'} = $1  if ($self->{'created'} =~ /(\d\d\d\d)/);
+			$self->{'description'} = $1  if ($epidata =~ s#\"description\"\:\"(.+?)\"\,##is);
+			$self->{'description'} ||= $1  if ($html =~ m#\<meta\s+property\=\"og\:description\"\s+content\=\"([^\"]+)#);
+			$self->{'imageurl'} = $1  if ($html =~ m#\<meta\s+property\=\"og\:image\"\s+content\=\"([^\"]+)#);
+			$self->{'iconurl'} = $self->{'imageurl'};
+			$self->{'genre'} = $1  if ($html =~ m#\<p\s+class\=\"category\"\>(.+?)\<\/p\>#s);
+		}
 	}
+
+
 
 	$self->{'total'} = $self->{'cnt'};
 	print STDERR "-(all)count=".$self->{'cnt'}."= iconurl=".$self->{'iconurl'}."= TITLE="

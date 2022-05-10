@@ -1,3 +1,9 @@
+0.293   2022-05-08  Released-By: PERLANCAR; Urgency: medium
+
+	- In generated Contributing section, mention about installing
+	  Pod::Weaver::PluginBundle::Author::PERLANCAR.
+
+
 0.292   2021-08-10  Released-By: PERLANCAR; Urgency: medium
 
 	- Add Contributing section.

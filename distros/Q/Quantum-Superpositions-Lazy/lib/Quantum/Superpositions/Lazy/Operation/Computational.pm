@@ -1,6 +1,6 @@
 package Quantum::Superpositions::Lazy::Operation::Computational;
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 use v5.24;
 use warnings;
@@ -76,9 +76,10 @@ sub run
 	my ($self, @parameters) = @_;
 
 	my ($param_num, $code) = $types{$self->sign}->@*;
-	@parameters = $self->_clear_parameters($param_num, @parameters);
+	$self->_clear_parameters($param_num, @parameters);
 
 	return $code->(@parameters);
 }
 
 1;
+

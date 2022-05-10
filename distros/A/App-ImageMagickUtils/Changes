@@ -1,3 +1,20 @@
+0.019   2022-05-08  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with newer
+          Pod::Weaver::Section::PERLANCAR::Contributing and
+          Perinci::Sub::To::CLIDocData to tweak generated POD for CLI's.
+
+
+0.018   2022-05-08  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with newer Perinci::CmdLine::POD to helpfully add text
+          in Synopsis to refer to examples in Examples section.
+
+
 0.017   2022-05-08  Released-By: PERLANCAR; Urgency: medium
 
 	- [cli downsize-image] Tweak regex to recognize previously

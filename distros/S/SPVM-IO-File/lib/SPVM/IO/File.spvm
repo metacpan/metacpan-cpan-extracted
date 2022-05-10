@@ -1,0 +1,50 @@
+class IO::File : precompile {
+  use IO::FileHandle;
+  use Fn;
+
+  our $SEEK_SET : ro int;
+  our $SEEK_CUR : ro int;
+  our $SEEK_END : ro int;
+  our $STDIN : ro int;
+  our $STDOUT : ro int;
+  our $STDERR : ro int;
+  
+  has fh : private ro IO::FileHandle;
+  has auto_flush : rw byte;
+  
+  native static method open : IO::File ($file_name : string, $mode : string);
+  
+  native method print : void ($string : string);
+  native method flush : void ();
+  
+  native method read : int ($buf : byte[]);
+  native method readline : string ();
+
+  native static method unlink : void ($file : string);
+  native static method rename : void ($src_file : string, $dist_file : string);
+
+  private native static method init_constant_values : void ();
+  
+  INIT {
+    &init_constant_values();
+  }
+
+  method slurp : string ($file : string) {
+    
+    my $buffer_length = 4096;
+    my $buffer = new byte[$buffer_length];
+    my $string = "";
+    while (1) {
+      my $read_length = $self->read($buffer);
+      
+      if ($read_length < $buffer_length) {
+        $string .= (string)Fn->copy_array_range_byte((byte[])$buffer, 0, $read_length);
+        last;
+      }
+      else {
+        $string .= (string)$buffer;
+      }
+    }
+    return $string;
+  }
+}

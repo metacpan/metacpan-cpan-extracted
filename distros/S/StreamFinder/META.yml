@@ -22,5 +22,5 @@ requires:
   LWP::UserAgent: '0'
   URI::Escape: '0'
   perl: '5.006'
-version: '1.85'
+version: '1.86'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

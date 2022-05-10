@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.83.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,15 +12,15 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA512
+Hash: RIPEMD160
 
-SHA256 57eba229855b5ae83e459d7095a081ac9734d3c2245fa4d6edf7705c2d0dd74e Changes
+SHA256 4d107ecc32d87cccb8d2bd7b50b2554da7a3194d85d82f62cc4c751e1af3fbb5 Changes
 SHA256 9984f7b209d43761721f55f57d3b943c1d5308788d8d1818642db5deac235044 LICENSE
 SHA256 662d92d59c83cc8789acf79f79e786f3f4f020b983635324bdbed86f379a5569 MANIFEST
-SHA256 69eb0b9144c2a49ca511fcb647bd273e4fe3feb6432ab1fd753fca92332c04ce META.yml
-SHA256 2d59320b669f39c0b42f7a60f448dc2eb9488dfb67c1dc1ff4e6ac743d7b9705 Makefile.PL
-SHA256 5ee6543e2870a51855cef8bd6b65d3ea7a84745af11a28603d7639b0bf9ab89b README
-SHA256 29e60ef86b00ae3b2cbd8d1bb63c857a19b4c8c50d5b027401e4a806fb8b494b Stars.pm
+SHA256 d1c286cfa176d683d8f3c1755be4615f27bf38fac008ac58fc241cd7c9fcf656 META.yml
+SHA256 551ecc51bd79bc4f98dd25092085c286687d5fdbae5ebeb1522b7a6faf4a6288 Makefile.PL
+SHA256 b4261acff1cacbfc4824c1575467e078b65734ec3aa0efdc8d949fcf1b03dcec README
+SHA256 e5168aac4b155328ee8fc8a05dc5605b239762e0328c43ca22d1c0b10bdb7ec9 Stars.pm
 SHA256 fafdb4f7a835450925ab55eaac54643bdc08c0231acaf802d4b1d3a8a29d3e9d examples/ex1.pl
 SHA256 3ee79c53264e75cb2287e97dd72bd0d334e02cb8efc583dc31a88a9106ad0a78 examples/ex2.pl
 SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
@@ -35,19 +35,22 @@ SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Modu
 SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
 SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
 SHA256 fe1b54edecbd699c70bfab8849127e6fca6bea466f49223dcfe3f092bd72e1d3 t/Tags-HTML-Stars/01-use.t
-SHA256 128181f695160a896192d1f1a991447488c40bf4de2a8ad89a66ac18e15b338f t/Tags-HTML-Stars/02-version.t
-SHA256 9f5ae12d56c555aae0000c76cc26a0ed8819c7604739dc21322e4b9ce52932fd t/Tags-HTML-Stars/03-new.t
-SHA256 f29a32cd325f0333e1bfc2ee952f19e4c0bcb5f370380fc6034814ede68e6335 t/Tags-HTML-Stars/04-process.t
+SHA256 dd4c8616346af8041df286c1b38f4761b605369d753efd35aaa93b16c75ee6d6 t/Tags-HTML-Stars/02-version.t
+SHA256 c874ca5a6bd7bc6aa480167ce6ad793932c83d72fe35bae1e496194b43d0a68a t/Tags-HTML-Stars/03-new.t
+SHA256 de25b792a91d10b3a36a11df9f5c3200b34b446c9e985e27f04aeb6900d02993 t/Tags-HTML-Stars/04-process.t
 SHA256 97012de249a640d3b036667ba44260650c98554462a99601957e57e2b367295b xt/Tags-HTML-Stars/01-pod_coverage.t
 SHA256 583146e6591f328a68331d66e5e0bc93e2d6f2190fa7a9da4f70bcb12dd0cd73 xt/Tags-HTML-Stars/02-pod.t
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl8qiV4ACgkQKyiOZjWe
-rHarPQf+Nw7bVtxWjgZDUsUGYo8g9YF2L5dhE1duRWlkZEAR4Eqh1kW2/BOSwfMM
-X6Vm+iR6/fbaBBu6JYfrUy904zKhSadzBWXsrLf4hUhusCAEPn8VDCXMrgAwPhXa
-eaWFDmP4InylRIi3WIqo30xQ6snld+4GSYA+yl36x7OahPgm9BfP/XGl8eKygm7y
-/ohB2Wf6NGeCf9K084SMIH/5waxGlSZWf7xXhQJ9u4coyxcEZmZgmNotv6+cIi2R
-MWP/Iz01r+7nDZSz2kinmdpVpUkZik+RZUXTPDT0Gw0g+sWcpZcWfC3IB1n9Smlk
-/SWnrEufNp7l9jV94IAhDRZTnnxCtg==
-=0EFR
+iQGzBAEBAwAdFiEERTLc1QTxqWhVvPeegmqNLzlXaRcFAmJ5f5YACgkQgmqNLzlX
+aRfKnwwAh7Wd/Vc2vN4On6oZmHUBaAvVrw1fU88ARfNaJv2TqZXVjZrcCMa3yVVZ
+tO1hR/PnX3kgAFrhdG9CsTrsVsF60hP3v8c3pzUivEcyWZ8Hc5Hflm7rnS9rJOLy
+F3gKojObU2TD0lzj/P52PrumqCSbS20OnG4MM/YnJB1asHf4YUjUNkdxv/An2gNK
+EieS47dUZDju2BQv0i3mOLWDRglqDZEDcVUiaydmOw4A3YAh8K/3FRvvAzQkWJlN
+AgGlom6IQpGhTHwl88aUBVDEod8xg+Wqife9WYcuFVZzXBrscKxUVOLfKWBYO2wT
+KRFYoPg+/k3MztiYh4IkEljE92vK/ywslGHs6YvublezL5fgFPUy9POwZOvTPw16
+kKGtCjQywhsdeFkn/B71XXiaaPPXsdUANL+AwyHz+wWUgVat/LU+38fsBCJvJCP8
+4cifJ3+iwRDYQ7f8ix5O05SzfwikbvLIh2xVXVocgLCoIPe+HL9uJsbM8ehG9NTJ
+8Q9pYwcf
+=8VKM
 -----END PGP SIGNATURE-----

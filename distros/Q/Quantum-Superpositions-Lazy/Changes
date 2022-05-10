@@ -1,5 +1,10 @@
 Revision history for Perl extension Quantum::Superpositions::Lazy.
 
+1.11 Mon May 9 2022
+	- fix version of Q::S::L
+	- fix return value of empty superposition collapsing
+	- do not filter out undefined parameters from operations
+
 1.10 Sun May 8 2022
 	- greatly improve performance for non-trivial superposition resetting
 	- use binary search instead of linear search in weighted selection

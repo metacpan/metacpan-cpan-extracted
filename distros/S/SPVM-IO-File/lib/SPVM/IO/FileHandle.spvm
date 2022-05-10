@@ -1,0 +1,4 @@
+class IO::FileHandle : pointer_t {
+  
+  native method DESTROY : void ();
+}

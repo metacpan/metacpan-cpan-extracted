@@ -133,6 +133,13 @@ EXAMPLE
 DEPENDENCIES
     Class::Utils, Error::Pure.
 
+SEE ALSO
+    Plack::App::Tags::HTML
+        Plack application for Tags::HTML objects.
+
+    Plack::Component::Tags::HTML
+        Plack component for Tags with HTML output.
+
 REPOSITORY
     <https://github.com/michal-josef-spacek/Tags-HTML>
 
@@ -147,5 +154,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

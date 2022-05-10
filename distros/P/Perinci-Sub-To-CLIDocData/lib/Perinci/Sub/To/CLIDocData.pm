@@ -1,16 +1,16 @@
 package Perinci::Sub::To::CLIDocData;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-11'; # DATE
-our $DIST = 'Perinci-Sub-To-CLIDocData'; # DIST
-our $VERSION = '0.298'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
 use Perinci::Object;
 use Perinci::Sub::Util qw(err);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-05-08'; # DATE
+our $DIST = 'Perinci-Sub-To-CLIDocData'; # DIST
+our $VERSION = '0.299'; # VERSION
 
 our %SPEC;
 
@@ -496,6 +496,7 @@ sub gen_cli_doc_data_from_meta {
                 $key = $ospecmeta->{arg};
             } else {
                 $key = $ospec;
+                $key =~ s/[=:].+\z//;
             }
             $key =~ s/_/-/g;
 
@@ -591,7 +592,7 @@ Perinci::Sub::To::CLIDocData - From Rinci function metadata, generate structure 
 
 =head1 VERSION
 
-This document describes version 0.298 of Perinci::Sub::To::CLIDocData (from Perl distribution Perinci-Sub-To-CLIDocData), released on 2021-07-11.
+This document describes version 0.299 of Perinci::Sub::To::CLIDocData (from Perl distribution Perinci-Sub-To-CLIDocData), released on 2022-05-08.
 
 =head1 SYNOPSIS
 
@@ -659,7 +660,7 @@ Sample result:
            arg         => "bool1",
            arg_spec    => {
                             cmdline_aliases => { z => { summary => "This is summary for option `-z`" } },
-                            schema => ["bool", {}, {}],
+                            schema => ["bool", {}],
                             summary => "Another bool option",
                             tags => ["category:cat1"],
                           },
@@ -676,7 +677,7 @@ Sample result:
            arg         => "flag1",
            arg_spec    => {
                             cmdline_aliases => { f => {} },
-                            schema => ["bool", { is => 1 }, {}],
+                            schema => ["bool", { is => 1 }],
                             tags => ["category:cat1"],
                           },
            categories  => ["Cat1 options"],
@@ -693,7 +694,7 @@ Sample result:
            arg_spec => {
              pos => 0,
              req => 1,
-             schema => ["str", { req => 1 }, {}],
+             schema => ["str", { req => 1 }],
              summary => "A required option as well as positional argument",
            },
            categories => ["Main options"],
@@ -817,14 +818,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Su
 
 Source repository is at L<https://github.com/perlancar/perl-Perinci-Sub-To-CLIOptSpec>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-To-CLIDocData>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Perinci::CmdLine>, L<Perinci::CmdLine::Lite>
@@ -835,11 +828,36 @@ L<Pod::Weaver::Plugin::Rinci>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2019, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021, 2019, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-To-CLIDocData>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

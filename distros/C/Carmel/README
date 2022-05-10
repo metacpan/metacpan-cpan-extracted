@@ -260,7 +260,9 @@ CAVEATS / KNOWN ISSUES
 	* Update cpanfile to explicitly update the version requirement for
 	Foo.
 
-DIFFERENCES WITH CARTON
+COMPARISONS WITH SIMILAR TOOLS
+
+ Carton
 
     Carmel shares the same goal with Carton, where you can manage your
     dependencies by declaring them in cpanfile, and pinning them in
@@ -301,7 +303,7 @@ DIFFERENCES WITH CARTON
       under your project other than the snapshot file. Undoing the change
       in cpanfile.snapshot file immediately reverts the change.
 
-DIFFERENCES WITH CPM
+ cpm
 
     App::cpm is an excellent standalone CPAN installer.
 

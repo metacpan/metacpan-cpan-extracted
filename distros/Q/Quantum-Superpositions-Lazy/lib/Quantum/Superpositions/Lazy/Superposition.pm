@@ -1,6 +1,6 @@
 package Quantum::Superpositions::Lazy::Superposition;
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 use v5.24;
 use warnings;
@@ -108,8 +108,10 @@ sub _observe
 	}
 
 	my $prob = get_rand;
-
 	my @cache = $self->{_lookup}->@*;
+
+	return undef if !@cache;
+
 	my $current = int(@cache / 2);
 	my $step = int(@cache / 4) || 1;
 
@@ -327,7 +329,7 @@ Will produce a superposition with a maximum of each three values of the given su
 	my $boolean = $superposition->compare(sub { shift() =~ /regexp/ });
 	my $matches = fetch_matches { $superposition->compare(sub { /regexp/ }) };
 
-Like </transform>, but performs a logical comparison instead of a state
+Like L</transform>, but performs a logical comparison instead of a state
 mutation. Just like transform, it can accept more superpositions as its
 arguments.
 

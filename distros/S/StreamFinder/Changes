@@ -426,8 +426,6 @@ Revision history for StreamFinder
         classed streams (classed via extension) are rated in the same order as 
         specified in the -keep option (was previously always mp4, then webm 
         regardless of -keep order).
-        - StreamFinder::Podbean - Fix doc. that said that a full URL was 
-        required - the module allows for only an ID to be specified.
 1.83    2022/04/28
         - Add StreamFinder::BrandNewTube (brandnewtube.com videos)
 1.84    2022/04/29
@@ -440,3 +438,10 @@ Revision history for StreamFinder
         - StreamFinder::SermonAudio - Add a "-quality" option to limit streams 
         returned to "audio", "low", "high", or "any" (default) - see docs.
         - StreamFinder::BrandNewTube - Several metadata-fetching improvements.
+1.86    2022/05/09
+        - StreamFinder::Podbean - Fix failure to fetch many current Podbean 
+        URLs, namely ones that are not custom site-hosted by Podbean (ie. 
+        https://www.podbean.com/... as opposed to 
+        https://<channel>.podbean.com/...).  This appears due to Podbean 
+        possibly expanding the types of valid URLs at some point.
+        - Update default user-agent to Firefox 99.

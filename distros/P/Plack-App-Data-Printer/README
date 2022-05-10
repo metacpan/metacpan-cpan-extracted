@@ -9,12 +9,20 @@ SYNOPSIS
      my $app = $obj->to_app;
 
 METHODS
+    Class inherites Plack::Component.
+
   "new"
      my $obj = Plack::App::Data::Printer->new(%parameters);
 
     Constructor.
 
     Returns instance of object.
+
+    *       "data"
+
+            Data structure to print out.
+
+            Parameter is required.
 
   "call"
      my $psgi_ar = $obj->call($env);
@@ -79,5 +87,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

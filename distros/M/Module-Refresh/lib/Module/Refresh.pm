@@ -3,7 +3,7 @@ package Module::Refresh;
 use strict;
 use vars qw( $VERSION %CACHE );
 
-$VERSION = "0.17";
+$VERSION = "0.18";
 
 BEGIN {
 
@@ -162,6 +162,9 @@ Updates the cached "last modified" time for $file.
 sub update_cache {
     my $self      = shift;
     my $module_pm = shift;
+
+    # In case the module was not loaded successfully.
+    return unless defined $INC{$module_pm};
 
     $CACHE{$module_pm} = $self->mtime( $INC{$module_pm} );
 }

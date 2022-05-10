@@ -89,7 +89,7 @@ my %WriteMakefileArgs = (
     "Test::Needs" => 0,
     "Test::RequiresInternet" => 0
   },
-  "VERSION" => "6.64",
+  "VERSION" => "6.65",
   "test" => {
     "TESTS" => "t/*.t t/base/*.t t/base/protocols/*.t t/leak/*.t t/local/*.t t/robot/*.t"
   }
@@ -98,6 +98,7 @@ my %WriteMakefileArgs = (
 %WriteMakefileArgs = (
     %WriteMakefileArgs,
     EXE_FILES => [ map "bin/$_", @prog ],
+    NAME => 'LWP',
 );
 
 my %FallbackPrereqs = (

@@ -1,6 +1,6 @@
 package Quantum::Superpositions::Lazy::Statistics;
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 use v5.24;
 use warnings;

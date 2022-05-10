@@ -1,0 +1,70 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Getopt::Long qw(:config auto_version auto_help);
+use Pod::Usage;
+use YAML::YAML2ADoc;
+
+
+$main::VERSION = $YAML::YAML2ADoc::VERSION;
+
+my $output = '-';
+GetOptions('output=s' => \$output) or pod2usage(1);
+
+
+YAML::YAML2ADoc::run($output, \@ARGV);
+
+
+__END__
+
+=head1 SYNOPSIS
+
+   yaml2adoc [-o output] [file ...]
+
+=head1 DESCRIPTION
+
+This script does something very similar to
+L<https://github.com/debops/yaml2rst>, which is a helper tool to aid in
+documenting I<Ansible> roles used by L<https://debops.org>. All
+C<yaml2rst> basically does is take a YAML file, collect the comment
+lines (starting with C<#>), and output those as text (well,
+I<reStructuredText>). The remaining, I<source> lines are converted to
+literal blocks.
+
+This module does the same, but it outputs I<AsciiDoc> rather than
+I<reStructuredText> for folks like me who would rather document their
+roles using the latter.
+
+You can simply call C<yaml2adoc> with an input file path as a parameter;
+without this, YAML input is read from the standard input. Normally,
+output is written to the standard output, but you may use the C<-o>
+option to specify an output file.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-o> I<output>
+
+Write output to I<output> instead of stdout.
+
+=back
+
+=head1 RETURN VALUE
+
+This script returns 0 on success or a value greater than 0 on failure.
+
+=head1 EXAMPLES
+
+Generate documentation for I<main.yaml>:
+
+    yaml2adoc -o defaults.adoc defaults.yaml
+
+=head1 CAVEATS
+
+This module is as bare-bones as it gets. YAML is not actually parsed,
+simply the leading comment markers are checked.
+
+The implementation is also most likely suboptimal; your contributions
+are welcome :-)

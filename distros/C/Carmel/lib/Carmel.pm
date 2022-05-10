@@ -1,7 +1,7 @@
 package Carmel;
 use strict;
 use 5.012000;
-use version; our $VERSION = version->declare('v0.1.51');
+use version; our $VERSION = version->declare('v0.1.52');
 
 1;
 __END__
@@ -277,7 +277,9 @@ Update C<cpanfile> to explicitly update the version requirement for C<Foo>.
 
 =back
 
-=head1 DIFFERENCES WITH CARTON
+=head1 COMPARISONS WITH SIMILAR TOOLS
+
+=head2 Carton
 
 Carmel shares the same goal with Carton, where you can manage your dependencies
 by declaring them in C<cpanfile>, and pinning them in C<cpanfile.snapshot>. Most
@@ -322,7 +324,7 @@ reverts the change.
 
 =back
 
-=head1 DIFFERENCES WITH CPM
+=head2 cpm
 
 L<App::cpm> is an excellent standalone CPAN installer.
 
