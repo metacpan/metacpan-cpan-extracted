@@ -1,0 +1,7 @@
+Revision history for CPAN-Test-Dummy-Perl5-MakeMakerBadName
+
+0.02  2022-05-09 20:54:25 PDT
+        - Fix dzil config
+
+0.01  2022-05-09 20:46:38 PDT
+        - Initial release

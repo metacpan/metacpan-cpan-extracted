@@ -27,7 +27,7 @@
             "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
             "Archive::Tar" : "0",
             "Config" : "0",
-            "ExtUtils::CppGuess" : "0",
+            "ExtUtils::CppGuess" : "0.13",
             "ExtUtils::MakeMaker" : "6.76",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
@@ -74,7 +74,7 @@
          "url" : "https://github.com/michal-josef-spacek/Alien-DjVuLibre"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.48",
       "requires" : {
@@ -82,7 +82,7 @@
             "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
             "Archive::Tar" : "0",
             "Config" : "0",
-            "ExtUtils::CppGuess" : "0",
+            "ExtUtils::CppGuess" : "0.13",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
             "IO::Zlib" : "0",

@@ -78810,3 +78810,9 @@ T/TU/TURNERJW/StreamFinder-1.86.tar.gz
 S/SK/SKIM/Tags-HTML-0.03.tar.gz
 S/SK/SKIM/Tags-HTML-Stars-0.03.tar.gz
 B/BZ/BZP/YAML-YAML2ADoc-0.1.0.tar.gz
+S/SK/SKIM/Alien-DjVuLibre-0.04.tar.gz
+A/AR/ART/Archive-BagIt-0.093.tar.gz
+M/MI/MIYAGAWA/Carmel-v0.1.53.tar.gz
+M/MI/MIYAGAWA/CPAN-Test-Dummy-Perl5-MakeMakerBadName-0.02.tar.gz
+J/JD/JDDPAUSE/MarpaX-ESLIF-6.0.20.tar.gz
+M/ME/MELMOTHX/Text-Amuse-Compile-1.86.tar.gz

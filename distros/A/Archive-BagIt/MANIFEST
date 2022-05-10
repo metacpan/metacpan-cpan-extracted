@@ -327,8 +327,11 @@ t/00-compile.t
 t/00-load.t
 t/access_bag.t
 t/base.t
+t/blns.license.txt
+t/blns.txt
 t/internal.t
 t/manifest.t
+t/naughty_strings.t
 t/payload_files.t
 t/pod-coverage.t
 t/pod.t

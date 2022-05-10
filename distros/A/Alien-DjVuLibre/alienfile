@@ -3,7 +3,7 @@ use alienfile;
 plugin 'PkgConfig' => 'ddjvuapi';
 
 share {
-	requires 'ExtUtils::CppGuess';
+	requires 'ExtUtils::CppGuess' => '0.13';
 	plugin 'Decode::SourceForge';
 	start_url 'https://sourceforge.net/projects/djvu/files/DjVuLibre/3.5.28/';
 	plugin 'Download' => (

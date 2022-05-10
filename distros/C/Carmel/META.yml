@@ -23,6 +23,7 @@ no_index:
     - xt
 requires:
   CPAN::Common::Index: '0.006'
+  CPAN::DistnameInfo: '0'
   CPAN::Meta::Prereqs: '2.132830'
   CPAN::Meta::Requirements: '2.129'
   Carton: v1.0.35
@@ -44,7 +45,7 @@ resources:
   bugtracker: https://github.com/miyagawa/Carmel/issues
   homepage: https://github.com/miyagawa/Carmel
   repository: https://github.com/miyagawa/Carmel.git
-version: v0.1.52
+version: v0.1.53
 x_contributors:
   - 'Jan Seidl <seidl@avast.com>'
   - 'Jarrod Funnell <jfunnell@multiservice.com>'

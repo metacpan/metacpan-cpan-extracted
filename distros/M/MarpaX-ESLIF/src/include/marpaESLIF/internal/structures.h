@@ -565,6 +565,7 @@ struct marpaESLIFRecognizer {
   marpaESLIF_grammar_t        *grammarp;
   marpaESLIFGrammar_Lshare_t *Lsharep;                       /* Shallow pointer to parent structure's Lsharep - TAKE CARE - can be NULL because sometimes grammarp can be NULL */
   marpaESLIFGrammar_t        *marpaESLIFGrammarp;            /* Shallow pointer to parent structure's marpaESLIFGrammarp - TAKE CARE - can be NULL because sometimes grammarp can be NULL */
+  short                       isLexemeb;                     /* Lexeme mode: the position of terminal matches may change, only size is trustable */
   
   marpaESLIFRecognizerOption_t marpaESLIFRecognizerOption;
   marpaWrapperRecognizer_t    *marpaWrapperRecognizerp; /* Current recognizer */

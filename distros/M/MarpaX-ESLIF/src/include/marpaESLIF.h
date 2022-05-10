@@ -1,7 +1,7 @@
 #ifndef MARPAESLIF_H
 #define MARPAESLIF_H
 
-#include <stddef.h>                 /* For size_t */
+#include <stddef.h>                 /* For size_t and ptrdiff_t */
 #include <stdio.h>                  /* For __int64, eventually */
 #include <limits.h>                 /* For long long, eventually */
 #include <genericLogger.h>
@@ -227,10 +227,11 @@ typedef enum marpaESLIFValueType {
   MARPAESLIF_VALUE_TYPE_STRING,
   MARPAESLIF_VALUE_TYPE_ROW,
   MARPAESLIF_VALUE_TYPE_TABLE,
-  MARPAESLIF_VALUE_TYPE_LONG_DOUBLE
+  MARPAESLIF_VALUE_TYPE_LONG_DOUBLE,
 #ifdef MARPAESLIF_HAVE_LONG_LONG
-  ,MARPAESLIF_VALUE_TYPE_LONG_LONG
+  MARPAESLIF_VALUE_TYPE_LONG_LONG,
 #endif
+  MARPAESLIF_VALUE_TYPE_OFFSET_AND_LENGTH
 } marpaESLIFValueType_t;
 
 /* Value callback definitions */
@@ -321,27 +322,33 @@ typedef long double marpaESLIFValueResultLongDouble_t;
 typedef MARPAESLIF_LONG_LONG marpaESLIFValueResultLongLong_t;
 #endif
 
+typedef struct marpaESLIFValueResultOffsetAndLength {
+  ptrdiff_t                            p;
+  size_t                               sizel;
+} marpaESLIFValueResultOffsetAndLength_t;
+
 struct marpaESLIFValueResult {
   void                      *contextp;          /* Free value meaningful only to the user */
   marpaESLIFRepresentation_t representationp;   /* How a user-land alternative is represented if it was in the input */
   marpaESLIFValueType_t      type;              /* Type for tagging the following union */
   union {
-    marpaESLIFValueResultChar_t        c; /* Value is a char */
-    marpaESLIFValueResultShort_t       b; /* Value is a short */
-    marpaESLIFValueResultInt_t         i; /* Value is an int */
-    marpaESLIFValueResultLong_t        l; /* Value is a long */
-    marpaESLIFValueResultFloat_t       f; /* Value is a float */
-    marpaESLIFValueResultDouble_t      d; /* Value is a double */
-    marpaESLIFValueResultPtr_t         p; /* Value is a pointer */
-    marpaESLIFValueResultArray_t       a; /* Value is a byte array */
-    marpaESLIFValueResultBool_t        y; /* Value is a boolean */
-    marpaESLIFValueResultString_t      s; /* Value is a string */
-    marpaESLIFValueResultRow_t         r; /* Value is a row of values */
-    marpaESLIFValueResultTable_t       t; /* Value is a row of values, where sizel is even */
-    marpaESLIFValueResultLongDouble_t ld; /* Value is a long double */
+    marpaESLIFValueResultChar_t             c; /* Value is a char */
+    marpaESLIFValueResultShort_t            b; /* Value is a short */
+    marpaESLIFValueResultInt_t              i; /* Value is an int */
+    marpaESLIFValueResultLong_t             l; /* Value is a long */
+    marpaESLIFValueResultFloat_t            f; /* Value is a float */
+    marpaESLIFValueResultDouble_t           d; /* Value is a double */
+    marpaESLIFValueResultPtr_t              p; /* Value is a pointer */
+    marpaESLIFValueResultArray_t            a; /* Value is a byte array */
+    marpaESLIFValueResultBool_t             y; /* Value is a boolean */
+    marpaESLIFValueResultString_t           s; /* Value is a string */
+    marpaESLIFValueResultRow_t              r; /* Value is a row of values */
+    marpaESLIFValueResultTable_t            t; /* Value is a row of values, where sizel is even */
+    marpaESLIFValueResultLongDouble_t      ld; /* Value is a long double */
 #ifdef MARPAESLIF_HAVE_LONG_LONG
-    marpaESLIFValueResultLongLong_t   ll; /* Value is a long long */
+    marpaESLIFValueResultLongLong_t        ll; /* Value is a long long */
 #endif
+    marpaESLIFValueResultOffsetAndLength_t  o; /* Value is an offset and length */
   } u;
 };
 /* Now that marpaESLIFValueResult is defined, we can define the pair */

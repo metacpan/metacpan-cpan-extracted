@@ -1,0 +1,26 @@
+NAME
+
+    CPAN::Test::Dummy::Perl5::MakeMakerBadName - Bad NAME in Makefile.PL
+
+DESCRIPTION
+
+    CPAN::Test::Dummy::Perl5::MakeMakerBadName is a test distribution that
+    has a bad NAME parameter pointing to a non-existent package.
+
+AUTHOR
+
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+COPYRIGHT
+
+    Copyright 2022- Tatsuhiko Miyagawa
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+    https://github.com/libwww-perl/libwww-perl/pull/413
+

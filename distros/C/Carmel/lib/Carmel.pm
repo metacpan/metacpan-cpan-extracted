@@ -1,7 +1,7 @@
 package Carmel;
 use strict;
 use 5.012000;
-use version; our $VERSION = version->declare('v0.1.52');
+use version; our $VERSION = version->declare('v0.1.53');
 
 1;
 __END__
@@ -34,6 +34,9 @@ Carmel - CPAN Artifact Repository Manager
 
   # pin modules tp specific versions
   carmel update DBI@1.633 Plack@1.0000
+
+  # show diffs for cpanfile.snapshot in a nice way
+  carmel diff
 
   # Runs your perl script with modules from artifacts
   carmel exec perl ...

@@ -369,6 +369,10 @@ here with the ratio to the text width, like C<0.5>, C<1>.
 With EPUB output, this affects the maximum width, not the actual
 width.
 
+=item * body_only
+
+Skip title, cover pages and final pages. Just produce the body.
+
 =item * nocoverpage
 
 Force the use of the LaTeX article class. If there are chapters
@@ -496,6 +500,7 @@ has coverwidth => (is => 'rw',
                    isa => \&_check_coverwidth,
                    default => sub { 1 });
 
+has body_only => (is => 'rw', isa => Bool, default => sub { 0 });
 has nocoverpage => (is => 'rw', isa => Bool, default => sub { 0 });
 has ignore_cover => (is => 'rw', isa => Bool, default => sub { 0 });
 
@@ -788,6 +793,7 @@ sub config_setters {
                ignore_cover
                linespacing
                parindent
+               body_only
                cover coverwidth nocoverpage notoc
                nofinalpage
                impressum sansfontsections

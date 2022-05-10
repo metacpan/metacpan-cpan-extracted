@@ -11,7 +11,7 @@ use POSIX qw( strftime );
 use Moo;
 with "Archive::BagIt::Role::Portability";
 
-our $VERSION = '0.092'; # VERSION
+our $VERSION = '0.093'; # VERSION
 
 # ABSTRACT: The main module to handle bags.
 
@@ -710,8 +710,8 @@ sub _parse_bag_info { # parses a bag-info textblob
     my @labels;
     while ($textblob =~ s/^([^:\s]+)\s*:\s*//m) { # label if starts with chars not colon or whitespace followed by zero or more spaces, a colon, zero or more spaces
         # label found
-        my $label = $1; my $value="";
-
+        my $label = $1;
+        my $value='';
         if ($textblob =~ s/(.+?)(?=^\S)//ms) {
             # value if rest string starts with chars not \r and/or \n until a non-whitespace after \r\n
             $value = chomp_portable($1);
@@ -719,7 +719,7 @@ sub _parse_bag_info { # parses a bag-info textblob
             $value = chomp_portable($1);
         }
         if (defined $label) {
-            push @labels, { "$label" => "$value" };
+            push @labels, { $label => $value };
         }
     }
     # The RFC does not allow reordering:
@@ -992,7 +992,7 @@ Archive::BagIt - The main module to handle bags.
 
 =head1 VERSION
 
-version 0.092
+version 0.093
 
 =head1 NAME
 

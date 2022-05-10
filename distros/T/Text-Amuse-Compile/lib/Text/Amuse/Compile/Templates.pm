@@ -974,6 +974,9 @@ pdfkeywords={[% tex_metadata.keywords %]}%
 \hyphenation{ [% doc.hyphenation %] }
 [% END %]
 
+
+[% UNLESS safe_options.body_only %]
+
 [% IF safe_options.start_with_empty_page %]
 % start with an empty page
 \thispagestyle{empty}
@@ -1074,6 +1077,8 @@ pdfkeywords={[% tex_metadata.keywords %]}%
      \cleardoublepage
 [% END %]
 
+[% END %]
+
 [% IF safe_options.wants_toc %]
 \tableofcontents
 % start a new right-handed page
@@ -1090,6 +1095,8 @@ pdfkeywords={[% tex_metadata.keywords %]}%
 \printindex[[% idx.name %]]
 [% END %]
 
+
+[% UNLESS safe_options.body_only %]
 
 [% UNLESS safe_options.nofinalpage %]
 % begin final page
@@ -1186,6 +1193,10 @@ pdfkeywords={[% tex_metadata.keywords %]}%
 \end{center}
 
 % end final page with colophon
+[% END %]
+
+% end closing pages
+
 [% END %]
 
 \end{document}

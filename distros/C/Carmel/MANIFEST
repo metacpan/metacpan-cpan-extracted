@@ -13,6 +13,7 @@ lib/Carmel/App.pm
 lib/Carmel/Artifact.pm
 lib/Carmel/Builder.pm
 lib/Carmel/CPANfile.pm
+lib/Carmel/Difftool.pm
 lib/Carmel/Preload.pm
 lib/Carmel/Repository.pm
 lib/Carmel/Resolver.pm
@@ -27,6 +28,7 @@ xt/cli/conflict.t
 xt/cli/core.t
 xt/cli/core_same.t
 xt/cli/devel.t
+xt/cli/diff.t
 xt/cli/dist.t
 xt/cli/exact.t
 xt/cli/exec_dash.t
@@ -56,7 +58,7 @@ xt/cli/subdep_clobbers_root.t
 xt/cli/subdir.t
 xt/cli/submodule_dep.t
 xt/cli/update.t
-xt/cli/update_undef.t
+xt/cli/update_badname.t
 xt/cli/version.t
 xt/cli/xs.t
 xt/mirror/authors/id/D/DA/DAGOLDEN/HTTP-Tiny-0.056.tar.gz

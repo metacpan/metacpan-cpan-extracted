@@ -1,10 +1,38 @@
 ==================================================
-Changes from 2021-02-03 00:00:00 +0000 to present.
+Changes from 2021-05-10 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.092 at 2022-02-03 12:42:41 +0000
+version 0.093 at 2022-05-10 08:45:33 +0000
 ------------------------------------------
+
+  Change: 92da8ff8d6900beed0eb34bc5ff54a8ef220fe3d
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2022-05-10 10:45:02 +0000
+
+    - fixes gathering issue with testfile 
+
+  Change: 4cbd4091c7042373ba35a47af6567174ed438597
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2022-05-10 10:10:25 +0000
+
+    - fixed issues with naughty strings 
+
+  Change: be5eb20e3c884e59d6e9a6c8ecfc185e7885b437
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2022-05-10 10:09:53 +0000
+
+    - added tests for naughty strings 
+
+------------------------------------------
+version 0.092 at 2022-02-03 12:43:15 +0000
+------------------------------------------
+
+  Change: d99ea9bcde706704539ad4dcd88638a5bf0634bb
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2022-02-03 13:43:15 +0000
+
+    Released 0.092 
 
   Change: 6bed7c60d4ba7d13e91768ca17718d6761c79f10
   Author: Andreas Romeyke <art1@andreas-romeyke.de>
@@ -620,58 +648,6 @@ version 0.075 at 2021-06-16 15:30:39 +0000
 
     - added single line parse check 
 
-------------------------------------------
-version 0.074 at 2021-04-28 19:05:48 +0000
-------------------------------------------
-
-  Change: 49387f19402ddb958d8ada027dec60e6d403063b
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2021-04-28 21:05:48 +0000
-
-    Released 0.074 
-
-  Change: b6cccc674e598f0167d21ef5730b922a5bc210d8
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2021-04-28 21:04:23 +0000
-
-    - added #VERSION for dzil - added #ABSTRACT for dzil 
-
-------------------------------------------
-version 0.073 at 2021-04-23 09:52:34 +0000
-------------------------------------------
-
-  Change: 8cd39b512851b3e2024e1e919d39e206b8a38590
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2021-04-23 11:52:34 +0000
-
-    Released 0.073 
-
-  Change: 29e2832beda604262e46c18ebf605ff10f3a946b
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2021-04-23 10:44:41 +0000
-
-    - added missed init 
-
-  Change: dddf40d7ef2be253ae35cd07fa51b28667b74933
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2021-04-20 17:28:50 +0000
-
-    Released 0.073-TRIAL 
-
-  Change: ae2050c06d3065b1871ed54ad79b8d79af78c74a
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2021-04-20 17:26:30 +0000
-
-    - changed to use NET::SSLeay instead Digest::MD5 and Digest::SHA,
-
-    because impressive boost in checksum calculation, because openssl
-
-    delivers highly optimized digest implementaions. As an example,
-
-    a bag with size of 15GB validated in 84s (with Net::SSLeay)
-
-    instead 134s (with Digest::) on my system 
-
 =================================================
-Plus 26 releases after 2021-02-03 00:00:00 +0000.
+Plus 28 releases after 2021-05-10 00:00:00 +0000.
 =================================================

@@ -6,7 +6,7 @@ use warnings;
 use Text::Amuse::Compile;
 use Path::Tiny;
 use Data::Dumper;
-use Test::More tests => 199;
+use Test::More tests => 248;
 
 my $muse = <<"MUSE";
 #title My title
@@ -158,6 +158,7 @@ foreach my $options ({
                       areaset_height => '8cm',
                       areaset_width => '50mm',
                      },
+                     { body_only => 1 },
                     ) {
     my $wd = Path::Tiny->tempdir(CLEANUP => !$ENV{NOCLEANUP});
     path(qw/t resources test.png/)->copy($wd->child('test.png')) or die;
@@ -209,7 +210,7 @@ foreach my $options ({
     else {
         unlike $tex, qr{^\\finalhyphendemerits=10000}ms;
     }
-    if ($options->{ignore_cover}) {
+    if ($options->{ignore_cover} or $options->{body_only}) {
         unlike $tex, qr{^\s*\\includegraphics}ms;
     }
     else {
@@ -245,5 +246,13 @@ foreach my $options ({
     }
     else {
         like $tex, qr{\\setlength\{\\parindent\}\{15pt\}};
+    }
+    if ($options->{body_only}) {
+        unlike $tex, qr{end closing page};
+        unlike $tex, qr{usekomafont\{title\}};
+    }
+    else {
+        like $tex, qr{end closing page};
+        like $tex, qr{usekomafont\{title\}};
     }
 }

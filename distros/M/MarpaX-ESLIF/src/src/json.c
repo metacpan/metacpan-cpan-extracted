@@ -1372,7 +1372,7 @@ static inline short _marpaESLIFJSONDecodeAppendCharb(marpaESLIFRecognizer_t *mar
       /* Escaped UTF-16 characters */
       /* ------------------------- */
 
-      /* It is a sequence of '\uXXXX' by definition, i.e. 6 bytes - so there are (marpaESLIFJSONDecodeContextp->currentValue.u.a.sizel / 6) hex digits */
+      /* It is a sequence of '\uXXXX' by definition, i.e. 6 bytes - so there are inputl/6 hex digits */
       uint32l = inputl / 6;
 
       if (uint32l <= MARPAESLIFJSON_ARRAYL_IN_STRUCTURE) {
@@ -1983,7 +1983,7 @@ static inline short _marpaESLIFJSONDecodePropagateValueb(marpaESLIFRecognizer_t 
 /*****************************************************************************/
 static short _marpaESLIFJSONDecodeValueResultInternalImportb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb)
 /*****************************************************************************/
-/* Internal importer used for marpaESLIFREcognizer_symbol_tryb               */
+/* Internal importer used for marpaESLIFRecognizer_symbol_tryb               */
 /*****************************************************************************/
 {
   static const char             *funcs                        = "_marpaESLIFJSONDecodeValueResultImportb";
@@ -1993,7 +1993,7 @@ static short _marpaESLIFJSONDecodeValueResultInternalImportb(marpaESLIFRecognize
   MARPAESLIFRECOGNIZER_CALLSTACKCOUNTER_INC(marpaESLIFRecognizerp);
   MARPAESLIFRECOGNIZER_TRACE(marpaESLIFRecognizerp, funcs, "start");
 
-  /* We expect a marpaESLIFValueResult_t of type ARRAY and nothing else */
+  /* We expect a marpaESLIFValueResult_t of type ARRAY and nothing else because by definition the recognizer is a top-level recognizer */
   if (marpaESLIFValueResultp->type != MARPAESLIF_VALUE_TYPE_ARRAY) {
     MARPAESLIF_ERRORF(marpaESLIFRecognizerp->marpaESLIFp, "marpaESLIFValueResultp->type is not ARRAY (got %d, %s)",
                       marpaESLIFValueResultp->type,
