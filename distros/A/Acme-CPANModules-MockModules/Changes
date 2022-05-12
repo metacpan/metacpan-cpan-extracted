@@ -1,3 +1,11 @@
+0.002   2022-04-01  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Tweak list summary: begin with 'List of ' (Acme::CPANModules
+          recommendation).
+
+
 0.001   2019-12-26  Released-By: PERLANCAR
 
         - First release.

@@ -79,22 +79,28 @@ This module converts returned values from JavaScript thus:
     - Arrays become Perl array references.
     - “Plain” objects become Perl hash references.
     - Functions become Perl code references.
+    - RegExp objects become Perl [JavaScript::QuickJS::RegExp](https://metacpan.org/pod/JavaScript%3A%3AQuickJS%3A%3ARegExp) objects.
     - Behaviour is **UNDEFINED** for other object types.
 
 # TYPE CONVERSION: PERL → JAVASCRIPT
 
-Generally speaking, it’s the inverse of JS → Perl, though since Perl doesn’t
-differentiate “numeric strings” from “numbers” there’s occasional ambiguity.
-In such cases, behavior is undefined; be sure to typecast in JavaScript
-accordingly.
+Generally speaking, it’s the inverse of JS → Perl:
 
 - Perl strings, numbers, & booleans become corresponding JavaScript
 primitives.
+
+    **IMPORTANT:** Perl versions before 5.36 don’t reliably distinguish “numeric
+    strings” from “numbers”. If your perl predates 5.36, typecast accordingly
+    to prevent your Perl “number” from becoming a JavaScript string. (Even in
+    5.36 and later it’s still a good idea.)
+
 - Perl undef becomes JS null.
 - Unblessed array & hash references become JavaScript arrays and
 “plain” objects.
 - [Types::Serialiser](https://metacpan.org/pod/Types%3A%3ASerialiser) booleans become JavaScript booleans.
 - Perl code references become JavaScript functions.
+- [JavaScript::QuickJS::RegExp](https://metacpan.org/pod/JavaScript%3A%3AQuickJS%3A%3ARegExp) objects become their original
+JavaScript `RegExp` objects.
 - Anything else triggers an exception.
 
 # MEMORY HANDLING NOTES

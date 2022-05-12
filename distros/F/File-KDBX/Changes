@@ -1,5 +1,10 @@
 Revision history for File-KDBX.
 
+0.903     2022-05-11 17:17:13-0600
+
+  * Fixed parsing KDBX4 datetimes on 32-bit perls.
+  * Fixed broken tests on perls < 5.14.
+
 0.902     2022-05-03 19:18:06-0600
 
   * Added support for 32-bit perls.

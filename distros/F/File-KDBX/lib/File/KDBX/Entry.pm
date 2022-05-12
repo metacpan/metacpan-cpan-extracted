@@ -15,13 +15,13 @@ use List::Util qw(first sum0);
 use Ref::Util qw(is_coderef is_hashref is_plain_hashref);
 use Scalar::Util qw(blessed looks_like_number);
 use Storable qw(dclone);
-use Time::Piece;
+use Time::Piece 1.33;
 use boolean;
 use namespace::clean;
 
 extends 'File::KDBX::Object';
 
-our $VERSION = '0.902'; # VERSION
+our $VERSION = '0.903'; # VERSION
 
 my $PLACEHOLDER_MAX_DEPTH = 10;
 my %PLACEHOLDERS;
@@ -681,7 +681,7 @@ File::KDBX::Entry - A KDBX database entry
 
 =head1 VERSION
 
-version 0.902
+version 0.903
 
 =head1 DESCRIPTION
 

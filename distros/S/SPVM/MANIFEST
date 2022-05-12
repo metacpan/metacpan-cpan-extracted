@@ -198,6 +198,7 @@ lib/SPVM/Document/NativeAPI/Compiler.pm
 lib/SPVM/Document/NativeAPI/Precompile.pm
 lib/SPVM/Document/NativeAPI/Runtime.pm
 lib/SPVM/Document/NativeAPI/StringBuffer.pm
+lib/SPVM/Document/NativeMethod.pm
 lib/SPVM/Document/Tutorial.pm
 lib/SPVM/Document/Tutorial/Complex.pm
 lib/SPVM/Double.pm
@@ -307,6 +308,7 @@ solo/SPVM/TestCase/Simple.spvm
 solo/SPVM/TestCase/Weaken.spvm
 solo/SPVM/TestCase/Weaken2.spvm
 SPVM.xs
+spvmdist.sh
 t/builder_config.t
 t/builder_config/libpng.def
 t/builder_config/zlib.def
@@ -359,12 +361,12 @@ t/default/increment.t
 t/default/inline.t
 t/default/interface.t
 t/default/isa.t
-t/default/lexical_var.t
 t/default/lib/SPVM/4foo.spvm
 t/default/lib/SPVM/EmptyClass.spvm
 t/default/lib/SPVM/EmptyPackage.spvm
 t/default/lib/SPVM/foo.spvm
 t/default/lib/SPVM/MinimalMethod.spvm
+t/default/lib/SPVM/MyMath.spvm
 t/default/lib/SPVM/TestCase.spvm
 t/default/lib/SPVM/TestCase/Add.spvm
 t/default/lib/SPVM/TestCase/Alias.spvm
@@ -453,17 +455,17 @@ t/default/lib/SPVM/TestCase/CompileError/Interface/NotHaveInterfaceMethod.spvm
 t/default/lib/SPVM/TestCase/CompileError/Interface/StaticMethod.spvm
 t/default/lib/SPVM/TestCase/CompileError/InvalidType.spvm
 t/default/lib/SPVM/TestCase/CompileError/Isa/LeftIsNotObject.spvm
-t/default/lib/SPVM/TestCase/CompileError/LexVar/LexVarNameColon2Twice.spvm
-t/default/lib/SPVM/TestCase/CompileError/LexVar/LexVarNameContainsUnderScoreTwice.spvm
-t/default/lib/SPVM/TestCase/CompileError/LexVar/LexVarNameEndColon2.spvm
-t/default/lib/SPVM/TestCase/CompileError/LexVar/LexVarNameInvalidColon.spvm
-t/default/lib/SPVM/TestCase/CompileError/LexVar/LexVarNameStartDigit.spvm
 t/default/lib/SPVM/TestCase/CompileError/Literal/Character/InvalidCharacterLiteral.spvm
 t/default/lib/SPVM/TestCase/CompileError/Literal/Character/InvalidCharacterLiteralEmpty.spvm
 t/default/lib/SPVM/TestCase/CompileError/Literal/Character/InvalidHexAscii1.spvm
 t/default/lib/SPVM/TestCase/CompileError/Literal/Character/InvalidHexAscii2.spvm
 t/default/lib/SPVM/TestCase/CompileError/Literal/Character/NotEnd.spvm
 t/default/lib/SPVM/TestCase/CompileError/Literal/Integer/IntOutOfRange.spvm
+t/default/lib/SPVM/TestCase/CompileError/LocalVar/LocalVarNameColon2Twice.spvm
+t/default/lib/SPVM/TestCase/CompileError/LocalVar/LocalVarNameContainsUnderScoreTwice.spvm
+t/default/lib/SPVM/TestCase/CompileError/LocalVar/LocalVarNameEndColon2.spvm
+t/default/lib/SPVM/TestCase/CompileError/LocalVar/LocalVarNameInvalidColon.spvm
+t/default/lib/SPVM/TestCase/CompileError/LocalVar/LocalVarNameStartDigit.spvm
 t/default/lib/SPVM/TestCase/CompileError/LogicalOperator/AndNotExpression.spvm
 t/default/lib/SPVM/TestCase/CompileError/LogicalOperator/NotNotExpression.spvm
 t/default/lib/SPVM/TestCase/CompileError/LogicalOperator/OrNotExpression.spvm
@@ -533,7 +535,6 @@ t/default/lib/SPVM/TestCase/Inline.spvm
 t/default/lib/SPVM/TestCase/Interface.spvm
 t/default/lib/SPVM/TestCase/InterfaceType.spvm
 t/default/lib/SPVM/TestCase/Isa.spvm
-t/default/lib/SPVM/TestCase/LexicalVar.spvm
 t/default/lib/SPVM/TestCase/Lib/Bool.spvm
 t/default/lib/SPVM/TestCase/Lib/Byte.spvm
 t/default/lib/SPVM/TestCase/Lib/ByteList.spvm
@@ -565,6 +566,7 @@ t/default/lib/SPVM/TestCase/Literal/FloatingPoint.spvm
 t/default/lib/SPVM/TestCase/Literal/Integer.spvm
 t/default/lib/SPVM/TestCase/Literal/String.spvm
 t/default/lib/SPVM/TestCase/Literal/Undef.spvm
+t/default/lib/SPVM/TestCase/LocalVar.spvm
 t/default/lib/SPVM/TestCase/LogicalOperator.spvm
 t/default/lib/SPVM/TestCase/Matrix4_16b.spvm
 t/default/lib/SPVM/TestCase/Matrix4_16d.spvm
@@ -645,6 +647,7 @@ t/default/literal_floating_point.t
 t/default/literal_integer.t
 t/default/literal_string.t
 t/default/literal_undef.t
+t/default/local_var.t
 t/default/logical_operator.t
 t/default/method.t
 t/default/mulnum.t

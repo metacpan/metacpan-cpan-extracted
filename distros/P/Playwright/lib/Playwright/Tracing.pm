@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Tracing;
-$Playwright::Tracing::VERSION = '0.019';
+$Playwright::Tracing::VERSION = '1.210';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,21 +22,21 @@ sub spec {
     return $Playwright::spec->{'Tracing'}{members};
 }
 
-sub stopChunk {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'stopChunk',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub startChunk {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'startChunk',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub stopChunk {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'stopChunk',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -106,7 +106,7 @@ Playwright::Tracing - Automatically generated class for Playwright::Tracing
 
 =head1 VERSION
 
-version 0.019
+version 1.210
 
 =head1 CONSTRUCTOR
 
@@ -117,17 +117,17 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 stopChunk(@args)
-
-Execute the Tracing::stopChunk playwright routine.
-
-See L<https://playwright.dev/api/class-Tracing#Tracing-stopChunk> for more information.
-
 =head2 startChunk(@args)
 
 Execute the Tracing::startChunk playwright routine.
 
 See L<https://playwright.dev/api/class-Tracing#Tracing-startChunk> for more information.
+
+=head2 stopChunk(@args)
+
+Execute the Tracing::stopChunk playwright routine.
+
+See L<https://playwright.dev/api/class-Tracing#Tracing-stopChunk> for more information.
 
 =head2 stop(@args)
 

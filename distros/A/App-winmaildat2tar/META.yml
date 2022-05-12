@@ -1,0 +1,56 @@
+---
+abstract: 'Convert winmail.dat (TNEF data) to tentative archive'
+author:
+  - 'Kazumasa Utashiro'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-winmaildat2tar
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::winmaildat2tar:
+    file: lib/App/winmaildat2tar.pm
+    version: '0.99'
+  App::winmaildat2tar::Archive:
+    file: lib/App/winmaildat2tar.pm
+  App::winmaildat2tar::Archive::Ar:
+    file: lib/App/winmaildat2tar.pm
+  App::winmaildat2tar::Archive::Tar:
+    file: lib/App/winmaildat2tar.pm
+  App::winmaildat2tar::Archive::Zip:
+    file: lib/App/winmaildat2tar.pm
+requires:
+  Archive::Ar: '0'
+  Archive::Tar: '0'
+  Archive::Zip: '0'
+  Convert::TNEF: '0'
+  Getopt::EX: '0'
+  Getopt::EX::Hashed: '0'
+  Moo: '0'
+  perl: v5.14.0
+resources:
+  bugtracker: https://github.com/kaz-utashiro/winmaildat2tar/issues
+  homepage: https://github.com/kaz-utashiro/winmaildat2tar
+  repository: git://github.com/kaz-utashiro/winmaildat2tar.git
+version: '0.99'
+x_authority: cpan:UTASHIRO
+x_contributors:
+  - 'Kazumasa Utashiro <kaz@utashiro.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -3,13 +3,17 @@ package Chemistry::OpenSMILES::Writer;
 use strict;
 use warnings;
 
-use Chemistry::OpenSMILES qw( is_aromatic is_chiral );
+use Chemistry::OpenSMILES qw(
+    is_aromatic
+    is_chiral
+    toggle_cistrans
+);
 use Chemistry::OpenSMILES::Parser;
 use Graph::Traversal::DFS;
 use List::Util qw( any uniq );
 
 # ABSTRACT: OpenSMILES format writer
-our $VERSION = '0.8.0'; # VERSION
+our $VERSION = '0.8.1'; # VERSION
 
 require Exporter;
 our @ISA = qw( Exporter );
@@ -262,7 +266,7 @@ sub _depict_bond
     my $bond = $graph->get_edge_attribute( $u, $v, 'bond' );
     return $bond if $bond ne '/' && $bond ne '\\';
     return $bond if $u->{number} < $v->{number};
-    return $bond eq '/' ? '\\' : '/';
+    return toggle_cistrans $bond;
 }
 
 # Reorder a permutation of elements 0, 1, 2 and 3 by taking an element

@@ -3,7 +3,7 @@ package App::perlimports::Document;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000040';
+our $VERSION = '0.000042';
 
 use App::perlimports::Annotations     ();
 use App::perlimports::ExportInspector ();
@@ -1026,7 +1026,7 @@ App::perlimports::Document - Make implicit imports explicit
 
 =head1 VERSION
 
-version 0.000040
+version 0.000042
 
 =head2 inspector_for( $module_name )
 

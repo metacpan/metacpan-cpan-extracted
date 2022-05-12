@@ -13,3 +13,6 @@ get_mac_bsd.c
 get_mac_linux.c
 send_packet_bsd.c
 send_packet_linux.c
+test.pl 
+META.json
+META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -10,7 +10,7 @@ use Crypt::Misc 0.029 qw(decode_b64 encode_b64);
 use File::KDBX::Constants qw(:key_file);
 use File::KDBX::Key;
 use File::Temp qw(tempfile);
-use Test::More;
+use Test::More 1.001004_001;
 
 subtest 'Primitives' => sub {
     my $pkey = File::KDBX::Key->new('password');

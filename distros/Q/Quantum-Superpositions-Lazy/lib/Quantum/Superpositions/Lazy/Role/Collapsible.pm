@@ -1,7 +1,5 @@
 package Quantum::Superpositions::Lazy::Role::Collapsible;
-
-our $VERSION = '1.11';
-
+$Quantum::Superpositions::Lazy::Role::Collapsible::VERSION = '1.12';
 use v5.24;
 use warnings;
 use Quantum::Superpositions::Lazy::Operation::Computational;
@@ -160,3 +158,4 @@ use overload
 	;
 
 1;
+

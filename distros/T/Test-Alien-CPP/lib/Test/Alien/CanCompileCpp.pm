@@ -6,7 +6,7 @@ use base 'Test2::Require';
 use ExtUtils::CBuilder 0.27;
 
 # ABSTRACT: Skip a test file unless a C++ compiler is available
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.03'; # VERSION
 
 
 sub skip
@@ -28,7 +28,7 @@ Test::Alien::CanCompileCpp - Skip a test file unless a C++ compiler is available
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =head1 SYNOPSIS
 
@@ -57,7 +57,7 @@ Roy Storey (KIWIROY)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -18,9 +18,9 @@ with (
 use File::Spec::Functions qw(catfile);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-03-18'; # DATE
+our $DATE = '2022-04-01'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-Acme-CPANModules'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 # either provide filename or filename+filecontent
 sub _get_abstract_from_list_summary {
@@ -128,6 +128,11 @@ sub munge_file {
                 unless $list->{entries};
             $self->log_fatal("List does not have any entries")
                 unless @{ $list->{entries} };
+
+            $self->log_fatal("List does not have 'summary'")
+                unless $list->{summary};
+            $self->log("WARNING: Summary does not begin 'List of ' (it's recommended to begin the summary with 'List of ')")
+                unless $list->{summary} =~ /^List of /;
         } # CHECK_LIST
 
       ADD_PREREQS:
@@ -184,7 +189,7 @@ Dist::Zilla::Plugin::Acme::CPANModules - Plugin to use when building Acme::CPANM
 
 =head1 VERSION
 
-This document describes version 0.004 of Dist::Zilla::Plugin::Acme::CPANModules (from Perl distribution Dist-Zilla-Plugin-Acme-CPANModules), released on 2022-03-18.
+This document describes version 0.005 of Dist::Zilla::Plugin::Acme::CPANModules (from Perl distribution Dist-Zilla-Plugin-Acme-CPANModules), released on 2022-04-01.
 
 =head1 SYNOPSIS
 
@@ -201,7 +206,17 @@ For each F<Acme/CPANModules/*.pm> file:
 
 =over
 
+=item * Check the list
+
+=over
+
 =item * Abort the build if there are no entries in $LIST
+
+=item * Abort the build if list does not have 'summary'
+
+=item * Warn if list summary does not begin with 'List of '
+
+=back
 
 =item * Fill the Abstract from list's summary
 

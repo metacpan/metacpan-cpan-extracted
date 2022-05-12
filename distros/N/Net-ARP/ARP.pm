@@ -2,7 +2,7 @@
 # Perl ARP Extension
 #
 # Programmed by Bastian Ballmann
-# Last update: 27.04.2020
+# Last update: 11.05.2022
 #
 # This program is free software; you can redistribute 
 # it and/or modify it under the terms of the 
@@ -41,7 +41,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '1.0.11';
+our $VERSION = '1.0.12';
 
 require XSLoader;
 XSLoader::load('Net::ARP', $VERSION);
@@ -60,10 +60,10 @@ ARP - Perl extension for creating ARP packets
   use Net::ARP;
   Net::ARP::send_packet('lo',                 # Device
                         '127.0.0.1',          # Source IP
-	                '127.0.0.1',          # Destination IP
-		        'aa:bb:cc:aa:bb:cc',  # Source MAC
-	                'aa:bb:cc:aa:bb:cc',  # Destinaton MAC
-	                'reply');             # ARP operation
+	                      '127.0.0.1',          # Destination IP
+		                    'aa:bb:cc:aa:bb:cc',  # Source MAC
+	                      'aa:bb:cc:aa:bb:cc',  # Destinaton MAC
+	                      'reply');             # ARP operation
 
 $mac = Net::ARP::get_mac("enp3s0f1");
 
@@ -93,10 +93,10 @@ get the mac address of an ethernet interface or ip address.
 
   Net::ARP::send_packet('lo',                 # Device
                         '127.0.0.1',          # Source IP
-	                '127.0.0.1',          # Destination IP
-		        'aa:bb:cc:aa:bb:cc',  # Source MAC
-	                'aa:bb:cc:aa:bb:cc',  # Destinaton MAC
-	                'reply');             # ARP operation
+	                      '127.0.0.1',          # Destination IP
+		                    'aa:bb:cc:aa:bb:cc',  # Source MAC
+	                      'aa:bb:cc:aa:bb:cc',  # Destinaton MAC
+	                      'reply');             # ARP operation
 
   I think this is self documentating.
   ARP operation can be one of the following values:
@@ -104,9 +104,9 @@ get the mac address of an ethernet interface or ip address.
 
 =item B<get_mac()>
 
-  $mac = Net::ARP::get_mac("eth0");
+  $mac = Net::ARP::get_mac("enp3s0f1");
 
-  This gets the MAC address of the eth0 interface and stores 
+  This gets the MAC address of the enp3s0f1 interface and stores 
   it in the variable $mac. The return value is "unknown" if
   the mac cannot be looked up.
 
@@ -131,7 +131,7 @@ get the mac address of an ethernet interface or ip address.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2004-2020 by Bastian Ballmann
+Copyright (C) 2004-2022 by Bastian Ballmann
 
 License: GPLv2
 

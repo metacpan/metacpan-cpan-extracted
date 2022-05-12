@@ -5,22 +5,22 @@ use strict;
 use warnings;
 
 use Dancer2::Plugin;
-use Module::Load qw(autoload);
 use Dancer2::Core::Hook;
-use Dancer2::Plugin::FormValidator::Validator;
 use Dancer2::Plugin::FormValidator::Config;
-use Types::Standard qw(InstanceOf HashRef ArrayRef);
+use Dancer2::Plugin::FormValidator::Factory::Extensions;
+use Dancer2::Plugin::FormValidator::Registry;
+use Dancer2::Plugin::FormValidator::Input;
+use Dancer2::Plugin::FormValidator::Processor;
+use Types::Standard qw(InstanceOf);
 
-our $VERSION = '0.83';
-
-# Global var for saving last success validation valid input.
-my $valid_input;
+our $VERSION = '0.90';
 
 plugin_keywords qw(validate validated errors);
 
-has config_validator => (
+has validator_config => (
     is       => 'ro',
     isa      => InstanceOf['Dancer2::Plugin::FormValidator::Config'],
+    lazy     => 1,
     builder  => sub {
         return Dancer2::Plugin::FormValidator::Config->new(
             config => $_[0]->config,
@@ -28,40 +28,35 @@ has config_validator => (
     }
 );
 
-has config_extensions => (
+has registry => (
     is       => 'ro',
-    isa      => HashRef,
+    isa      => InstanceOf['Dancer2::Plugin::FormValidator::Registry'],
+    lazy     => 1,
     default  => sub {
-        return $_[0]->config->{extensions} // {},
-    }
-);
+        my $factory = Dancer2::Plugin::FormValidator::Factory::Extensions->new(
+            plugin     => $_[0],
+            extensions => $_[0]->config->{extensions} // {},
+        );
 
-has extensions => (
-    is       => 'ro',
-    isa      => ArrayRef,
-    builder  => sub {
-        my ($self) = @_;
-
-        my @extensions = map {
-            my $extension = $self->config_extensions->{$_}->{provider};
-            autoload $extension;
-
-            $extension->new(
-                plugin => $self,
-                config => $self->config_extensions->{$_},
-            );
-        } keys %{ $self->config_extensions };
-
-        return \@extensions;
+        return Dancer2::Plugin::FormValidator::Registry->new(
+            extensions => $factory->build,
+        );
     }
 );
 
 has plugin_deferred => (
     is       => 'ro',
     isa      => InstanceOf['Dancer2::Plugin::Deferred'],
+    lazy     => 1,
     builder  => sub {
         return $_[0]->app->with_plugin('Dancer2::Plugin::Deferred');
     }
+);
+
+# Var for saving last success validation valid input.
+has valid => (
+    is       => 'rwp',
+    clearer  => 1,
 );
 
 sub BUILD {
@@ -72,10 +67,10 @@ sub BUILD {
 sub validate {
     my ($self, %args) = @_;
 
-    # We need to unset value of this global var.
-    undef $valid_input;
+    # We need to unset value of this var (if there was something).
+    $self->clear_valid;
 
-    # Now works with arguments.
+    # Arguments.
     my $profile = $args{profile};
     my $input   = $args{input} // $self->dsl->body_parameters->as_hashref_mixed;
     my $lang    = $args{lang};
@@ -84,18 +79,19 @@ sub validate {
         $self->_validator_language($lang);
     }
 
-    my $validator = Dancer2::Plugin::FormValidator::Validator->new(
-        config            => $self->config_validator,
-        input             => $input,
-        extensions        => $self->extensions,
-        validator_profile => $profile,
+    my $processor = Dancer2::Plugin::FormValidator::Processor->new(
+        input    => Dancer2::Plugin::FormValidator::Input->new(input => $input),
+        profile  => $profile,
+        config   => $self->validator_config,
+        registry => $self->registry,
     );
 
-    my $result = $validator->validate;
+
+    my $result = $processor->run;
 
     if ($result->success != 1) {
         $self->plugin_deferred->deferred(
-            $self->config_validator->session_namespace,
+            $self->validator_config->session_namespace,
             {
                 messages => $result->messages,
                 old      => $input,
@@ -104,16 +100,14 @@ sub validate {
         return undef;
     }
     else {
-        $valid_input = $result->valid;
-        return $valid_input;
+        $self->_set_valid($result->valid);
+
+        return $self->valid;
     }
 }
 
 sub validated {
-    my $valid = $valid_input;
-    undef $valid_input;
-
-    return $valid;
+    return $_[0]->valid;
 }
 
 sub errors {
@@ -133,7 +127,7 @@ sub _register_hooks {
                 my $errors   = {};
                 my $old      = {};
 
-                if (my $deferred = $tokens->{deferred}->{$self->config_validator->session_namespace}) {
+                if (my $deferred = $tokens->{deferred}->{$self->validator_config->session_namespace}) {
                     $errors = delete $deferred->{messages};
                     $old    = delete $deferred->{old};
                 }
@@ -153,14 +147,14 @@ sub _register_hooks {
 sub _validator_language {
     my ($self, $lang) = @_;
 
-    $self->config_validator->language($lang);
+    $self->validator_config->language($lang);
     return;
 }
 
 # Returned deferred message from session storage.
 sub _get_deferred {
     return $_[0]->plugin_deferred->deferred(
-        $_[0]->config_validator->session_namespace
+        $_[0]->validator_config->session_namespace
     );
 }
 
@@ -179,7 +173,7 @@ Dancer2::Plugin::FormValidator - neat and easy to start form validation plugin f
 
 =head1 VERSION
 
-version 0.83
+version 0.90
 
 =head1 SYNOPSIS
 
@@ -230,17 +224,6 @@ The html result could be like:
 </p>
 
 =end html
-
-=head1 DISCLAIMER
-
-This is alpha version, not stable.
-
-Interfaces may change in future.
-
-If you like it - add it to your bookmarks. I intend to complete the development by the summer 2022.
-
-B<Have any ideas?> Find this project on github (repo ref is at the bottom).
-Help is always welcome!
 
 =head1 DESCRIPTION
 
@@ -665,6 +648,8 @@ You can extend the set of validators by writing extensions:
 
 Extension should implement Role: Dancer2::Plugin::FormValidator::Role::Extension.
 
+B<Hint:> you could reassign built-in validator with your custom one.
+
 Custom validators:
 
     package IsTrue {
@@ -727,6 +712,27 @@ L<Dancer2::Plugin::FormValidator::Extension::DBIC|https://metacpan.org/pod/Dance
 
 =back
 
+=head1 ROLES
+
+=over 4
+
+=item *
+Dancer2::Plugin::FormValidator::Role::Profile - for profile classes.
+
+=item *
+Dancer2::Plugin::FormValidator::Role::HasMessages - for classes, that implements custom error messages.
+
+=item *
+Dancer2::Plugin::FormValidator::Role::ProfileHasMessages - brings together Profile and HasMassages.
+
+=item *
+Dancer2::Plugin::FormValidator::Role::Extension - for extension classes.
+
+=item *
+Dancer2::Plugin::FormValidator::Role::Validator - for custom validators.
+
+=back
+
 =head1 HINTS
 
 If you don't want to create separated classes for your validation logic,
@@ -763,21 +769,6 @@ you could create one base class and reuse it in your project.
             to_json errors;
         }
     };
-
-=head1 TODO
-
-=over 4
-
-=item *
-Document all Roles and HashRef structures.
-
-=item *
-Extensions docs.
-
-=item *
-Contribution and help details.
-
-=back
 
 =head1 BUGS AND LIMITATIONS
 

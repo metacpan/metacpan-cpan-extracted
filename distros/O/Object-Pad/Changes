@@ -1,5 +1,13 @@
 Revision history for Object-Pad
 
+0.65    2022-05-10
+        [CHANGES]
+         * Document the required version for :experimental tags
+         * Mention the new Devel::MAT::Tool::Object::Pad in docs
+
+        [BUGFIXES]
+         * Update cv_copy_flags() for SvPADTMP fix; related to RT142468
+
 0.64    2022-04-02
         [CHANGES]
          * Improvements to `:experimental` import tag (RT141801):

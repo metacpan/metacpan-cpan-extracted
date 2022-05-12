@@ -4,11 +4,7 @@ use strict;
 use warnings;
 
 use Moo;
-use Storable qw(dclone);
-use Hash::Util qw(lock_hashref);
-use Dancer2::Plugin::FormValidator::Registry;
-use Dancer2::Plugin::FormValidator::Processor;
-use Types::Standard qw(InstanceOf ConsumerOf HashRef ArrayRef);
+use Types::Standard qw(InstanceOf);
 use namespace::clean;
 
 has config => (
@@ -17,62 +13,57 @@ has config => (
     required => 1,
 );
 
-has extensions => (
-    is       => 'ro',
-    isa      => ArrayRef[ConsumerOf['Dancer2::Plugin::FormValidator::Role::Extension']],
-    required => 1,
-);
-
-has input => (
-    is       => 'ro',
-    isa      => HashRef,
-    required => 1,
-);
-
-has validator_profile => (
-    is       => 'ro',
-    isa      => ConsumerOf['Dancer2::Plugin::FormValidator::Role::Profile'],
-    required => 1,
-);
-
 has registry => (
     is       => 'ro',
-    default  => sub {
-        return Dancer2::Plugin::FormValidator::Registry->new(
-            extensions => $_[0]->extensions,
-        );
-    }
+    isa      => InstanceOf['Dancer2::Plugin::FormValidator::Registry'],
+    required => 1,
 );
 
-sub BUILDARGS {
-    my ($self, %args) = @_;
+# Apply validators to each fields.
+# Collect valid and invalid fields.
+sub validate {
+    my ($self, $profile, $input)  = @_;
 
-    if (my $input = $args{input}) {
-        $args{input} = $self->_clone_and_lock_input($input)
+    my $success = 0;
+    my %profile = %{ $profile->profile };
+    my $is_valid;
+    my @valid;
+    my @invalid;
+
+    for my $field (keys %profile) {
+        $is_valid = 1;
+        my @validators = @{ $profile{$field} };
+
+        for my $validator_declaration (@validators) {
+            if (my ($name, $params) = $self->_split_validator_declaration($validator_declaration)) {
+                my $validator = $self->registry->get($name);
+
+                if (not $validator->validate($field, $input, split(',', $params))) {
+                    push @invalid, [ $field, $name, $params ];
+                    $is_valid = 0;
+                }
+
+                if (!$is_valid && $validator->stop_on_fail) {
+                    last;
+                }
+            }
+        }
+
+        if ($is_valid == 1) {
+            push @valid, $field;
+        }
     }
 
-    return \%args;
+    if (not @invalid) {
+        $success = 1;
+    }
+
+    return ($success, \@valid, \@invalid)
 }
 
-sub validate {
-    my ($self) = @_;
-
-    my $processor = Dancer2::Plugin::FormValidator::Processor->new(
-        input             => $self->input,
-        config            => $self->config,
-        registry          => $self->registry,
-        validator_profile => $self->validator_profile,
-    );
-
-    return $processor->result;
-}
-
-sub _clone_and_lock_input {
-    # Copy input to work with isolated HashRef.
-    my $input = dclone($_[1]);
-
-    # Lock input to prevent accidental modifying.
-    return lock_hashref($input);
+# Because validator signatures could be validator:params, we need to split it.
+sub _split_validator_declaration {
+    return ($_[1] =~ /([^:]+):?(.*)/);
 }
 
 1;

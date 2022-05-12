@@ -1,0 +1,40 @@
+Revision history for Perl extension App-winmaildat2tar
+
+0.99 2022-05-12T11:18:59Z
+
+    - release to CPAN
+    - check if attachments exist
+    - use Getopt::EX::Hashed for option processing
+
+0.08 2021-02-02T02:41:58Z
+
+    - use Moo;
+
+0.07 2020-11-30T14:59:08Z
+
+    - Add option handling error code.
+
+0.06 2020-11-30T13:36:13Z
+
+    - Move script body to module.
+
+0.05 2020-11-30T05:05:59Z
+
+    - Change command name back to winmaildat2tar
+
+0.04 2020-11-30T04:33:03Z
+
+    - Support Tar, Ar and Zip format.
+
+0.03 2020-11-28T13:26:44Z
+
+    - Change command name to winmaildat2xar
+
+0.02 2020-11-28T10:38:50Z
+
+    - Change repository name.
+
+0.01 2020-11-27T16:22:33Z
+
+    - original version
+

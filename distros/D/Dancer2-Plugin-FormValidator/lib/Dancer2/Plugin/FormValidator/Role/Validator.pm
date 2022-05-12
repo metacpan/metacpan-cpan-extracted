@@ -27,7 +27,7 @@ sub _field_defined_and_non_empty {
         exists $input->{$field}
         and defined $input->{$field}
         and $input->{$field} ne ''
-    ){
+    ) {
         return 1;
     }
 

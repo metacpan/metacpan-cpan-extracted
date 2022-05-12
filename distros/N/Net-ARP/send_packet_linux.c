@@ -4,7 +4,7 @@ Send the packet
 Linux code
 
 Programmed by Bastian Ballmann
-Last update: 01.12.2004
+Last update: 11.05.2022
 
 This program is free software; you can redistribute 
 it and/or modify it under the terms of the 
@@ -45,20 +45,20 @@ int send_packet_linux(const char *dev, u_char *packet, u_int packetsize)
   }
 
   // Create socket descriptor
-  if( ( sock = socket(AF_INET,SOCK_TYPE,htons(ETH_P_ALL))) < 0 ) 
-    { 
-      perror("socket"); 
-      return 0;
-    }
+  if( ( sock = socket(AF_PACKET, SOCK_PACKET, htons(ETH_P_ALL))) < 0 ) 
+  { 
+    perror("socket"); 
+    return 0;
+  }
 
   // Set dev and send the packet
-  strncpy(addr.sa_data,dev,sizeof(addr.sa_data));
+  strncpy(addr.sa_data, dev, sizeof(addr.sa_data));
 
-  if( (sendto(sock,packet,packetsize,0,&addr,sizeof(struct sockaddr))) < 0 )
-    {
-      perror("send");
-      return 0;
-    }
+  if( (sendto(sock, packet, packetsize, 0, &addr, sizeof(struct sockaddr))) < 0 )
+  {
+    perror("send");
+    return 0;
+  }
 
   close(sock);
   return 1;

@@ -8,7 +8,7 @@ use JSON::XS    ();
 use Time::HiRes ();
 
 my $header = qq|{"format":"json","version":1}\n|;
-my $json   = JSON::XS->new;
+my $json   = JSON::XS->new->utf8;
 
 sub new {
     my $class = shift;

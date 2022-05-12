@@ -51,6 +51,6 @@
          "web" : "https://github.com/FGasper/p5-JavaScript-QuickJS"
       }
    },
-   "version" : "0.08",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

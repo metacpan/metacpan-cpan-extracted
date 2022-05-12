@@ -19,7 +19,7 @@ name: Dist-Zilla-Plugin-Acme-CPANModules
 provides:
   Dist::Zilla::Plugin::Acme::CPANModules:
     file: lib/Dist/Zilla/Plugin/Acme/CPANModules.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Dist::Zilla::Role::BeforeBuild: '0'
   Dist::Zilla::Role::FileFinderUser: '0'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Acme-CPANModules
   homepage: https://metacpan.org/release/Dist-Zilla-Plugin-Acme-CPANModules
   repository: git://github.com/perlancar/perl-Dist-Zilla-Plugin-Acme-CPANModules.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

@@ -2,8 +2,10 @@ package Catalyst::Plugin::CSRFToken;
 
 use Moo::Role;
 use WWW::CSRF ();
- 
-our $VERSION = '0.002';
+use Bytes::Random::Secure ();
+
+
+our $VERSION = '0.003';
  
 has 'default_csrf_token_secret' => (is=>'ro', required=>1, builder=>'_build_default_csrf_token_secret');
  
@@ -46,12 +48,35 @@ sub default_csrf_session_id {
   return $self->sessionid;
 }
 
+sub random_token {
+  my ($self, $length) = @_;
+  $length = 48 unless $length;
+  return Bytes::Random::Secure::random_bytes_base64($length,'');
+}
+
+sub single_use_csrf_token {
+  my ($self) = @_;
+  my $token = $self->random_token;
+  $self->session(current_csrf_token => $token);
+  return $token;
+}
+
+sub check_single_use_csrf_token {
+  my ($self, %args) = @_;
+  my $token = exists($args{csrf_token}) ? $args{csrf_token} : $self->find_csrf_token_in_request;
+  if(my $session_token = delete($self->session->{current_csrf_token})) {
+    return $session_token eq $token ? 1:0;
+  } else {
+    return 0;
+  }
+}
+
 sub csrf_token {
   my ($self, %args) = @_;
-  my $id = exists($args{id}) ? $args{id} : $self->default_csrf_session_id;
+  my $session = exists($args{session}) ? $args{session} : $self->default_csrf_session_id;
   my $token_secret = exists($args{token_secret}) ? $args{token_secret}  : $self->default_csrf_token_secret;
 
-  return my $token = WWW::CSRF::generate_csrf_token($id, $token_secret);
+  return my $token = WWW::CSRF::generate_csrf_token($session, $token_secret);
 }
 
 sub find_csrf_token_in_request {
@@ -63,21 +88,55 @@ sub find_csrf_token_in_request {
   }
 }
 
+sub is_cstf_token_expired {
+  my ($self, %args) = @_;
+  my $token = exists($args{csrf_token}) ? $args{csrf_token} : $self->find_csrf_token_in_request;
+  my $session = exists($args{session}) ? $args{session} : $self->default_csrf_session_id;
+  my $token_secret = exists($args{token_secret}) ? $args{token_secret}  : $self->default_csrf_token_secret;
+  my $max_age = exists($args{max_age}) ? $args{max_age}  : $self->default_csrf_token_max_age;
+
+  return 0 unless $token;
+  return 1 if WWW::CSRF::check_csrf_token(
+    $session, 
+    $token_secret,
+    $token, 
+    +{ MaxAge=>$max_age }
+  ) == WWW::CSRF::CSRF_EXPIRED;
+  
+  return 0;
+}
+
+sub invalid_csrf_token {
+  return shift->(@_)->check_csrf_token ? 0:1;
+}
+
 sub check_csrf_token {
   my ($self, %args) = @_;
   my $token = exists($args{csrf_token}) ? $args{csrf_token} : $self->find_csrf_token_in_request;
   my $session = exists($args{session}) ? $args{session} : $self->default_csrf_session_id;
   my $token_secret = exists($args{token_secret}) ? $args{token_secret}  : $self->default_csrf_token_secret;
+  my $max_age = exists($args{max_age}) ? $args{max_age}  : $self->default_csrf_token_max_age;
  
   return 0 unless $token;
-  return 0 unless WWW::CSRF::check_csrf_token(
+
+  my $status = WWW::CSRF::check_csrf_token(
     $session, 
     $token_secret,
     $token, 
-    +{ MaxAge=>$self->default_csrf_token_max_age }
-  ) == WWW::CSRF::CSRF_OK;
-  
+    +{ MaxAge=>$max_age }
+  );
+  $self->stash(_last_csrf_token_status => $status);
+
+  return 0 unless  $status == WWW::CSRF::CSRF_OK;
   return 1;
+}
+
+sub last_checked_csrf_token_expired {
+  my ($self) = @_;
+  my $status = $self->stash->{_last_csrf_token_status};
+
+  return Catalyst::Exception->throw(message => 'csrf_token has not been checked yet') unless defined $status;
+  return $status == WWW::CSRF::CSRF_EXPIRED ? 1:0;
 }
 
 sub delegate_failed_csrf_token_check {
@@ -95,8 +154,10 @@ after 'prepare_action', sub {
         ($self->req->method eq 'POST') ||
         ($self->req->method eq 'PUT') ||
         ($self->req->method eq 'PATCH')
-      ) &&
-      !$self->check_csrf_token
+      ) && (
+        !$self->check_csrf_token &&
+        !$self->check_single_use_csrf_token
+      )
   ) {
     return $self->delegate_failed_csrf_token_check;
   }
@@ -168,14 +229,104 @@ via the C<check_csrf_token> method as in the example given above.
 
 This Plugin adds the following methods
 
-=head2 csrf_token
+=head2 random_token
+
+This just returns base64 random string that is cryptographically secure and is generically
+useful for anytime you just need a random token.   Default length is 48 but please note 
+that the actual base64 length will be longer.  
+
+=head2 csrf_token ($session, $token_secret)
 
 Generates a token for the current request path and user session and returns this string
-in a form suitable to put into an HTML form hidden field value.
+in a form suitable to put into an HTML form hidden field value.  Accepts the following 
+positional arguments:
+
+=over 4
+
+=item $session
+
+This is a string of data which is somehow linked to the current user session.   The default
+is to call the method 'default_csrf_session_id' which currently just returns the value of
+'$c->sessionid'.  You can pass something here if you want a tigher scope (for example you
+want a token that is scoped to both the current user id and a given URL path).
+
+=item $token_secret
+
+Default is whatever you set the configuration value 'default_secret' to.
+
+=back
 
 =head2 check_csrf_token
 
-Return true or false depending on if the current request has a token which is valid.
+Return true or false depending on if the current request has a token which is valid.  Accepts the
+following arguments in the form of a hash:
+
+  my $token = exists($args{csrf_token}) ? $args{csrf_token} : $self->find_csrf_token_in_request;
+  my $session = exists($args{session}) ? $args{session} : $self->default_csrf_session_id;
+  my $token_secret = exists($args{token_secret}) ? $args{token_secret}  : $self->default_csrf_token_secret;
+  my $max_age = exists($args{max_age}) ? $args{max_age}  : $self->default_csrf_token_max_age;
+
+=over 4
+
+=item csrf_token
+
+The token to check.   Default behavior is to invoke method C<find_csrf_token_in_request> which
+looks in the HTTP request header and body parameters for the token.  Set this to validate a
+specific token.
+
+=item session
+
+This is a string of data which is somehow linked to the current user session.   The default
+is to call the method 'default_csrf_session_id' which currently just returns the value of
+'$c->sessionid'.  You can pass something here if you want a tigher scope (for example you
+want a token that is scoped to both the current user id and a given URL path).
+
+It should match whatever you passed to C<csrf_token> for the request token you are trying to validate.
+
+=item token_secret
+
+Default is whatever you set the configuration value 'default_secret' to.  Allows you to specify a
+custom secret (it should match whatever you passed to C<csrf_token>).
+
+=item max_age
+
+Defaults to whatever you set configuration value <max_age>.  A value in seconds that measures how
+long a token is considered 'not expired'.  I recommend setting this to as short a value as is 
+reasonable for your users to linger on a form page.
+
+=back
+
+Example:
+
+    $c->check_csrf_token(max_age=>(60*10)); # Don't accept a token that is older than 10 minutes.
+
+B<NOTE>: If the token 
+
+=head2 invalid_csrf_token
+
+Returns true if the token is invalid.  This is just the inverse of 'check_csrf_token' and
+it accepts the same arguments.
+
+=head2 last_checked_csrf_token_expired
+
+Return true if the last checked token was considered expired based on the arguments used to
+check it.  Useful if you are writing custom checking code that wants to return a different
+error if the token was well formed but just too old.   Throws an exception if you haven't
+actually checked a token.
+
+=head2 single_use_csrf_token
+
+Creates a token that is saved in the session.  Unlike 'csrf_token' this token is not crytographically
+signed so intead its saved in the user session and can only be used once.   You might prefer
+this approach for classic HTML forms while the other approach could be better for API applications
+where you don't want the overhead of a user session (or where you'd like the client to be able to
+open multiply connections at once.
+
+
+=head2 check_single_use_csrf_token
+
+Checks a single_use_csrf_token.   Accepts the token to check but defaults to getting it from
+the request if not provided.
 
 =head1 CONFIGURATION
 

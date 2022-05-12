@@ -1,7 +1,5 @@
 package Quantum::Superpositions::Lazy::Util;
-
-our $VERSION = '1.11';
-
+$Quantum::Superpositions::Lazy::Util::VERSION = '1.12';
 use v5.24;
 use warnings;
 use Exporter qw(import);
@@ -68,3 +66,4 @@ sub get_iterator
 }
 
 1;
+

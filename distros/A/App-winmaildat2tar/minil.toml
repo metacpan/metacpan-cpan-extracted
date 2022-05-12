@@ -1,0 +1,11 @@
+name = "App-winmaildat2tar"
+readme_from = "script/winmaildat2tar"
+badges = [ 'github-actions/test', 'metacpan' ]
+authority = "cpan:UTASHIRO"
+
+module_maker = "ModuleBuildTiny"
+static_install = "auto"
+
+[release]
+do_not_upload_to_cpan = 0
+

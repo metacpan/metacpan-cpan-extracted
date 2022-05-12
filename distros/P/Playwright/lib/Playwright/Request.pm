@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Request;
-$Playwright::Request::VERSION = '0.019';
+$Playwright::Request::VERSION = '1.210';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,31 +22,11 @@ sub spec {
     return $Playwright::spec->{'Request'}{members};
 }
 
-sub isNavigationRequest {
+sub headerValue {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'isNavigationRequest',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub frame {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'frame',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub postDataBuffer {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'postDataBuffer',
+        command => 'headerValue',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -62,61 +42,11 @@ sub timing {
     );
 }
 
-sub redirectedFrom {
+sub isNavigationRequest {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'redirectedFrom',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub allHeaders {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'allHeaders',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub sizes {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'sizes',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub method {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'method',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub headers {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'headers',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub response {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'response',
+        command => 'isNavigationRequest',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -132,16 +62,6 @@ sub redirectedTo {
     );
 }
 
-sub postDataJSON {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'postDataJSON',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub postData {
     my $self = shift;
     return $self->_api_request(
@@ -152,11 +72,41 @@ sub postData {
     );
 }
 
-sub headerValue {
+sub resourceType {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'headerValue',
+        command => 'resourceType',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub frame {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'frame',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub method {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'method',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub redirectedFrom {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'redirectedFrom',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -172,11 +122,11 @@ sub url {
     );
 }
 
-sub PostDataJSON {
+sub failure {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'PostDataJSON',
+        command => 'failure',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -192,21 +142,71 @@ sub headersArray {
     );
 }
 
-sub failure {
+sub sizes {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'failure',
+        command => 'sizes',
         object  => $self->{guid},
         type    => $self->{type}
     );
 }
 
-sub resourceType {
+sub response {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'resourceType',
+        command => 'response',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub allHeaders {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'allHeaders',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub PostDataJSON {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'PostDataJSON',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub postDataBuffer {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'postDataBuffer',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub postDataJSON {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'postDataJSON',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub headers {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'headers',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -256,7 +256,7 @@ Playwright::Request - Automatically generated class for Playwright::Request
 
 =head1 VERSION
 
-version 0.019
+version 1.210
 
 =head1 CONSTRUCTOR
 
@@ -267,23 +267,11 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 isNavigationRequest(@args)
+=head2 headerValue(@args)
 
-Execute the Request::isNavigationRequest playwright routine.
+Execute the Request::headerValue playwright routine.
 
-See L<https://playwright.dev/api/class-Request#Request-isNavigationRequest> for more information.
-
-=head2 frame(@args)
-
-Execute the Request::frame playwright routine.
-
-See L<https://playwright.dev/api/class-Request#Request-frame> for more information.
-
-=head2 postDataBuffer(@args)
-
-Execute the Request::postDataBuffer playwright routine.
-
-See L<https://playwright.dev/api/class-Request#Request-postDataBuffer> for more information.
+See L<https://playwright.dev/api/class-Request#Request-headerValue> for more information.
 
 =head2 timing(@args)
 
@@ -291,41 +279,11 @@ Execute the Request::timing playwright routine.
 
 See L<https://playwright.dev/api/class-Request#Request-timing> for more information.
 
-=head2 redirectedFrom(@args)
+=head2 isNavigationRequest(@args)
 
-Execute the Request::redirectedFrom playwright routine.
+Execute the Request::isNavigationRequest playwright routine.
 
-See L<https://playwright.dev/api/class-Request#Request-redirectedFrom> for more information.
-
-=head2 allHeaders(@args)
-
-Execute the Request::allHeaders playwright routine.
-
-See L<https://playwright.dev/api/class-Request#Request-allHeaders> for more information.
-
-=head2 sizes(@args)
-
-Execute the Request::sizes playwright routine.
-
-See L<https://playwright.dev/api/class-Request#Request-sizes> for more information.
-
-=head2 method(@args)
-
-Execute the Request::method playwright routine.
-
-See L<https://playwright.dev/api/class-Request#Request-method> for more information.
-
-=head2 headers(@args)
-
-Execute the Request::headers playwright routine.
-
-See L<https://playwright.dev/api/class-Request#Request-headers> for more information.
-
-=head2 response(@args)
-
-Execute the Request::response playwright routine.
-
-See L<https://playwright.dev/api/class-Request#Request-response> for more information.
+See L<https://playwright.dev/api/class-Request#Request-isNavigationRequest> for more information.
 
 =head2 redirectedTo(@args)
 
@@ -333,23 +291,35 @@ Execute the Request::redirectedTo playwright routine.
 
 See L<https://playwright.dev/api/class-Request#Request-redirectedTo> for more information.
 
-=head2 postDataJSON(@args)
-
-Execute the Request::postDataJSON playwright routine.
-
-See L<https://playwright.dev/api/class-Request#Request-postDataJSON> for more information.
-
 =head2 postData(@args)
 
 Execute the Request::postData playwright routine.
 
 See L<https://playwright.dev/api/class-Request#Request-postData> for more information.
 
-=head2 headerValue(@args)
+=head2 resourceType(@args)
 
-Execute the Request::headerValue playwright routine.
+Execute the Request::resourceType playwright routine.
 
-See L<https://playwright.dev/api/class-Request#Request-headerValue> for more information.
+See L<https://playwright.dev/api/class-Request#Request-resourceType> for more information.
+
+=head2 frame(@args)
+
+Execute the Request::frame playwright routine.
+
+See L<https://playwright.dev/api/class-Request#Request-frame> for more information.
+
+=head2 method(@args)
+
+Execute the Request::method playwright routine.
+
+See L<https://playwright.dev/api/class-Request#Request-method> for more information.
+
+=head2 redirectedFrom(@args)
+
+Execute the Request::redirectedFrom playwright routine.
+
+See L<https://playwright.dev/api/class-Request#Request-redirectedFrom> for more information.
 
 =head2 url(@args)
 
@@ -357,11 +327,11 @@ Execute the Request::url playwright routine.
 
 See L<https://playwright.dev/api/class-Request#Request-url> for more information.
 
-=head2 PostDataJSON(@args)
+=head2 failure(@args)
 
-Execute the Request::PostDataJSON playwright routine.
+Execute the Request::failure playwright routine.
 
-See L<https://playwright.dev/api/class-Request#Request-PostDataJSON> for more information.
+See L<https://playwright.dev/api/class-Request#Request-failure> for more information.
 
 =head2 headersArray(@args)
 
@@ -369,17 +339,47 @@ Execute the Request::headersArray playwright routine.
 
 See L<https://playwright.dev/api/class-Request#Request-headersArray> for more information.
 
-=head2 failure(@args)
+=head2 sizes(@args)
 
-Execute the Request::failure playwright routine.
+Execute the Request::sizes playwright routine.
 
-See L<https://playwright.dev/api/class-Request#Request-failure> for more information.
+See L<https://playwright.dev/api/class-Request#Request-sizes> for more information.
 
-=head2 resourceType(@args)
+=head2 response(@args)
 
-Execute the Request::resourceType playwright routine.
+Execute the Request::response playwright routine.
 
-See L<https://playwright.dev/api/class-Request#Request-resourceType> for more information.
+See L<https://playwright.dev/api/class-Request#Request-response> for more information.
+
+=head2 allHeaders(@args)
+
+Execute the Request::allHeaders playwright routine.
+
+See L<https://playwright.dev/api/class-Request#Request-allHeaders> for more information.
+
+=head2 PostDataJSON(@args)
+
+Execute the Request::PostDataJSON playwright routine.
+
+See L<https://playwright.dev/api/class-Request#Request-PostDataJSON> for more information.
+
+=head2 postDataBuffer(@args)
+
+Execute the Request::postDataBuffer playwright routine.
+
+See L<https://playwright.dev/api/class-Request#Request-postDataBuffer> for more information.
+
+=head2 postDataJSON(@args)
+
+Execute the Request::postDataJSON playwright routine.
+
+See L<https://playwright.dev/api/class-Request#Request-postDataJSON> for more information.
+
+=head2 headers(@args)
+
+Execute the Request::headers playwright routine.
+
+See L<https://playwright.dev/api/class-Request#Request-headers> for more information.
 
 =head2 on(@args)
 

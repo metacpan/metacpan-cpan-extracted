@@ -1,3 +1,9 @@
+0.8.1 2022-05-11
+
+    - Fixing a bug with incomplete cis/trans markers on ring bonds.
+    - Introducing Chemistry::OpenSMILES::toggle_cistrans().
+    - Introducing two functions for bond type determination.
+
 0.8.0 2022-05-05
 
     - Implementing support for tetrahedral chiral centers having lone

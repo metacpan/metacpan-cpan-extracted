@@ -1,2 +1,18 @@
+0.04 2022-05-12T17:13:17+02:00
+ - Add test with inline component.
+ - Fix bugtracker url.
+ - Update README.
+
+0.03 2022-05-12T15:11:34+02:00
+ - Add second example to doc.
+ - Add support for inline package.
+ - Fix test dependencies.
+
+0.02 2022-05-11T10:19:13+02:00
+ - Add ERRORS section to doc.
+ - Add error check for component isa('Tags::HTML').
+ - Fix copyright years.
+ - Fix minimal dependency to Plack::Component::Tags::HTML.
+
 0.01 2022-05-09T23:22:27+02:00
  - First version.

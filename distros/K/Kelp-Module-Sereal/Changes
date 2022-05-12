@@ -1,5 +1,9 @@
 Revision history for Perl extension Kelp::Module::Sereal.
 
+1.01 Wed May 11 2022
+	- maintenance work
+	- switch to Dist::Zilla
+
 1.00 Thu Jan 21 2021
 	- first version
 

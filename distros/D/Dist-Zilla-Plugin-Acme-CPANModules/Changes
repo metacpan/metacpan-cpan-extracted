@@ -1,3 +1,11 @@
+0.005   2022-04-01  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Warn if list summary does not begin with 'List of '
+          (recommendation).
+
+
 0.004   2022-03-18  Released-By: PERLANCAR; Urgency: medium
 
         - Add prereqs (phase=x_lists, rel=x_lists) to listed modules in

@@ -1,3 +1,11 @@
+0.04 2022-05-12T14:17:02+02:00
+ - Rewrite prepare_app() and creating of default 'tags' and 'css' objects.
+   Add errors for bad objects.
+
+0.03 2022-05-11T10:26:21+02:00
+ - Fix copyright years.
+ - Fix doc escape sequences.
+
 0.02 2022-02-28T12:38:08+01:00
  - Fix minimal dependency for Tags::HTML::Page::Begin. There is fix for
    situation without CSS. Fixes GH#1 (Thanks Slaven Rezić).

@@ -1,10 +1,5 @@
 package Pod::Weaver::Plugin::Regexp::Pattern;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-21'; # DATE
-our $DIST = 'Pod-Weaver-Plugin-Regexp-Pattern'; # DIST
-our $VERSION = '0.009'; # VERSION
-
 use 5.010001;
 use Moose;
 with 'Pod::Weaver::Role::AddTextToSection';
@@ -14,6 +9,11 @@ with 'Pod::Weaver::Role::Section';
 #has exclude_module => (is=>'rw');
 
 use Data::Dmp;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-05-08'; # DATE
+our $DIST = 'Pod-Weaver-Plugin-Regexp-Pattern'; # DIST
+our $VERSION = '0.010'; # VERSION
 
 sub _md2pod {
     require Markdown::To::POD;
@@ -26,7 +26,7 @@ sub _md2pod {
 }
 
 sub _process_module {
-    no strict 'refs';
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
 
     my ($self, $document, $input, $package) = @_;
 
@@ -52,8 +52,18 @@ sub _process_module {
     {
         my @pod;
         last unless @patnames;
+        push @pod, "Using with L<Regexp::Pattern>:\n";
+        push @pod, " \n";
         push @pod, " use Regexp::Pattern; # exports re()\n";
         push @pod, " my \$re = re(", dmp("$rp_package\::$patnames[0]"), ");\n";
+        push @pod, " \n";
+        push @pod, " # see Regexp::Pattern for more details on how to use with Regexp::Pattern\n";
+        push @pod, " \n";
+
+        push @pod, "Using the pattern(s) directly:\n";
+        push @pod, " \n";
+        push @pod, " use $package;\n";
+        push @pod, " if ('some string' =~ \$$package\::RE{$patnames[0]}) { ... }\n";
         push @pod, "\n";
 
         $self->add_text_to_section(
@@ -222,7 +232,7 @@ Pod::Weaver::Plugin::Regexp::Pattern - Plugin to use when building Regexp::Patte
 
 =head1 VERSION
 
-This document describes version 0.009 of Pod::Weaver::Plugin::Regexp::Pattern (from Perl distribution Pod-Weaver-Plugin-Regexp-Pattern), released on 2021-07-21.
+This document describes version 0.010 of Pod::Weaver::Plugin::Regexp::Pattern (from Perl distribution Pod-Weaver-Plugin-Regexp-Pattern), released on 2022-05-08.
 
 =head1 SYNOPSIS
 
@@ -259,14 +269,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Pod-Weaver
 
 Source repository is at L<https://github.com/perlancar/perl-Pod-Weaver-Plugin-Regexp-Pattern>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Regexp-Pattern>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Regexp::Pattern>
@@ -277,11 +279,36 @@ L<Dist::Zilla::Plugin::Regexp::Pattern>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Regexp-Pattern>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

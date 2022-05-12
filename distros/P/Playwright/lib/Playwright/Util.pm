@@ -1,5 +1,5 @@
 package Playwright::Util;
-$Playwright::Util::VERSION = '0.019';
+$Playwright::Util::VERSION = '1.210';
 use strict;
 use warnings;
 
@@ -44,9 +44,13 @@ sub request ( $method, $url, $port, $ua, %args ) {
     return $msg;
 }
 
-sub arr2hash ( $array, $primary_key ) {
+sub arr2hash ( $array, $primary_key, $callback = '' ) {
     my $inside_out = {};
-    @$inside_out{ map { $_->{$primary_key} } @$array } = @$array;
+    @$inside_out{
+        map {
+            $callback ? $callback->( $_->{$primary_key} ) : $_->{$primary_key}
+        } @$array
+    } = @$array;
     return $inside_out;
 }
 
@@ -88,7 +92,7 @@ Playwright::Util - Common utility functions for the Playwright module
 
 =head1 VERSION
 
-version 0.019
+version 1.210
 
 =head2 request(STRING method, STRING url, INTEGER port, LWP::UserAgent ua, HASH args) = HASH
 

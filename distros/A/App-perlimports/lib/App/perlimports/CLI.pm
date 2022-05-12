@@ -4,14 +4,16 @@ use Moo;
 use utf8;
 use feature qw( say );
 
-our $VERSION = '0.000040';
+our $VERSION = '0.000042';
 
 use App::perlimports           ();
 use App::perlimports::Config   ();
 use App::perlimports::Document ();
 use Capture::Tiny qw( capture_stdout );
 use Getopt::Long::Descriptive qw( describe_options );
-use Log::Dispatch ();
+use List::Util qw( uniq );
+use Log::Dispatch        ();
+use Path::Iterator::Rule ();
 use Path::Tiny qw( path );
 use Try::Tiny qw( catch try );
 use Types::Standard qw( ArrayRef Bool HashRef InstanceOf Object Str );
@@ -245,8 +247,7 @@ sub _build_config_file {
 
     if ( $self->_opts->config_file ) {
         if ( !-e $self->_opts->config_file ) {
-            warn $self->_opts->config_file . ' not found';
-            exit(1);
+            die $self->_opts->config_file . ' not found';
         }
         return $self->_opts->config_file;
     }
@@ -261,7 +262,7 @@ sub _build_config_file {
 
     my $xdg_config = File::XDG->new( name => 'perlimports', api => 1 );
     my $file       = $xdg_config->config_home->child( $filenames[0] );
-    return -e $file ? $file : q{};
+    return -e $file ? "$file" : q{};
 }
 
 sub _read_config_file {
@@ -276,27 +277,35 @@ sub run {
     my $self = shift;
     my $opts = $self->_opts;
 
-    ( print $VERSION, "\n" )      && return if $opts->version;
-    ( print $self->_usage->text ) && return if $opts->help;
+    ( print $VERSION, "\n" )      && return 0 if $opts->version;
+    ( print $self->_usage->text ) && return 0 if $opts->help;
 
     if ( $opts->verbose_help ) {
-        print $self->_usage->text;
         require Pod::Usage;    ## no perlimports
-        Pod::Usage::pod2usage( ( { -exitval => 0 } ) );
-        return;
+        my $fh = \*STDOUT;
+        Pod::Usage::pod2usage(
+            (
+                {
+                    -exitval => 'NOEXIT',
+                    -message => $self->_usage->text,
+                    -output  => $fh,
+                }
+            )
+        );
+        return 0;
     }
 
     if ( $opts->create_config_file ) {
+        my $exit_code = 0;
         try {
-            my $file
-                = App::perlimports::Config->create_config(
+            App::perlimports::Config->create_config(
                 $opts->create_config_file );
         }
         catch {
             print STDERR $_, "\n";
-            exit(1);
+            $exit_code = 1;
         };
-        exit(0);
+        return $exit_code;
     }
 
     my $input;
@@ -332,18 +341,21 @@ sub run {
         ]
         );
 
-    my @files = ( $opts->filename || @ARGV );
+    my @files = $self->_filter_paths(
+        $opts->filename ? $opts->filename : (),
+        @ARGV
+    );
     unless (@files) {
         say STDERR q{Mandatory parameter 'filename' missing};
         print STDERR $self->_usage->text;
-        exit(1);
+        return 1;
     }
 
     foreach my $filename (@files) {
         if ( !path($filename)->is_file ) {
             say STDERR "$filename does not appear to be a file";
             print STDERR $self->_usage->text;
-            exit(1);
+            return 1;
         }
 
         $logger->notice( '🚀 Starting file: ' . $filename );
@@ -390,6 +402,31 @@ sub run {
             print STDOUT $tidied;
         }
     }
+    return 0;
+}
+
+sub _filter_paths {
+    my $self  = shift;
+    my @paths = @_;
+    my @files;
+    my $rule = Path::Iterator::Rule->new->or(
+        Path::Iterator::Rule->new->perl_module,
+        Path::Iterator::Rule->new->perl_script,
+        Path::Iterator::Rule->new->perl_test,
+    );
+
+    foreach my $path (@paths) {
+        if ( -d $path ) {
+            my $iter = $rule->iter($path);
+            while ( defined( my $file = $iter->() ) ) {
+                push @files, $file;
+            }
+        }
+        else {
+            push @files, $path;
+        }
+    }
+    return uniq @files;
 }
 
 1;
@@ -404,7 +441,7 @@ App::perlimports::CLI - CLI arg parsing for C<perlimports>
 
 =head1 VERSION
 
-version 0.000040
+version 0.000042
 
 =head1 DESCRIPTION
 

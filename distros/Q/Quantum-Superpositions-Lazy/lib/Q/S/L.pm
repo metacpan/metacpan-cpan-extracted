@@ -1,7 +1,5 @@
 package Q::S::L;
-
-our $VERSION = '1.11';
-
+$Q::S::L::VERSION = '1.12';
 use v5.24;
 use warnings;
 

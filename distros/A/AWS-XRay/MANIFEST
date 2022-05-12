@@ -23,6 +23,7 @@ t/10_plugin_ec2_v1.t
 t/10_plugin_ec2_v2.t
 t/11_valid_name.t
 t/12_croak_capture.t
+t/13_json_encoding.t
 t/Util.pm
 xt/01_overhead.t
 META.yml

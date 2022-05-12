@@ -6,6 +6,7 @@
 #define PERL_NS_ROOT "JavaScript::QuickJS"
 
 #define PERL_BOOLEAN_CLASS "Types::Serialiser::Boolean"
+#define PQJS_REGEXP_CLASS PERL_NS_ROOT "::RegExp"
 
 typedef struct {
     JSContext *ctx;
@@ -20,12 +21,19 @@ typedef struct {
 } perl_qjs_func_s;
 
 typedef struct {
+    JSContext *ctx;
+    JSValue regexp;
+    pid_t pid;
+} perl_qjs_regexp_s;
+
+typedef struct {
 #ifdef MULTIPLICITY
     tTHX aTHX;
 #endif
     SV** svs;
     U32 svs_count;
     U32 refcount;
+    JSValue regexp_jsvalue;
 } ctx_opaque_s;
 
 const char* __jstype_name_back[] = {
@@ -50,6 +58,24 @@ const char* __jstype_name_back[] = {
 #define _jstype_name(typenum) __jstype_name_back[ typenum - JS_TAG_FIRST ]
 
 static SV* _JSValue_to_SV (pTHX_ JSContext* ctx, JSValue jsval, SV** err_svp);
+
+static inline SV* _JSValue_regexp_to_SV (pTHX_ JSContext* ctx, JSValue jsval, SV** err_svp) {
+    assert(!*err_svp);
+
+    SV* sv = exs_new_structref(perl_qjs_regexp_s, PQJS_REGEXP_CLASS);
+    perl_qjs_regexp_s* pqjs = exs_structref_ptr(sv);
+
+    *pqjs = (perl_qjs_regexp_s) {
+        .ctx = ctx,
+        .regexp = JS_DupValue(ctx, jsval),
+        .pid = getpid(),
+    };
+
+    ctx_opaque_s* ctxdata = JS_GetContextOpaque(ctx);
+    ctxdata->refcount++;
+
+    return sv;
+}
 
 static inline SV* _JSValue_object_to_SV (pTHX_ JSContext* ctx, JSValue jsval, SV** err_svp) {
     assert(!*err_svp);
@@ -128,6 +154,8 @@ static inline SV* _JSValue_array_to_SV (pTHX_ JSContext* ctx, JSValue jsval, SV*
 
 /* NO JS exceptions allowed here! */
 static SV* _JSValue_to_SV (pTHX_ JSContext* ctx, JSValue jsval, SV** err_svp) {
+    assert(!*err_svp);
+
     SV* RETVAL;
 
     int tag = JS_VALUE_GET_NORM_TAG(jsval);
@@ -189,7 +217,21 @@ static SV* _JSValue_to_SV (pTHX_ JSContext* ctx, JSValue jsval, SV** err_svp) {
                 RETVAL = _JSValue_array_to_SV(aTHX_ ctx, jsval, err_svp);
             }
             else {
-                RETVAL = _JSValue_object_to_SV(aTHX_ ctx, jsval, err_svp);
+
+                ctx_opaque_s* ctxdata = JS_GetContextOpaque(ctx);
+
+                bool is_regexp = JS_IsInstanceOf(
+                    ctx,
+                    jsval,
+                    ctxdata->regexp_jsvalue
+                );
+
+                if (is_regexp) {
+                    RETVAL = _JSValue_regexp_to_SV(aTHX_ ctx, jsval, err_svp);
+                }
+                else {
+                    RETVAL = _JSValue_object_to_SV(aTHX_ ctx, jsval, err_svp);
+                }
             }
 
             break;
@@ -355,6 +397,16 @@ static JSValue _sv_to_jsvalue(pTHX_ JSContext* ctx, SV* value, SV** error_svp) {
                 if (sv_derived_from(value, PERL_BOOLEAN_CLASS)) {
                     return JS_NewBool(ctx, SvTRUE(SvRV(value)));
                 }
+                else if (sv_derived_from(value, PQJS_REGEXP_CLASS)) {
+                    perl_qjs_regexp_s* pqjs = exs_structref_ptr(value);
+
+                    if (LIKELY(pqjs->ctx == ctx)) {
+                        return JS_DupValue(ctx, pqjs->regexp);
+                    }
+
+                    *error_svp = newSVpvf("%s for QuickJS %p given to QuickJS %p!", PQJS_REGEXP_CLASS, pqjs->ctx, ctx);
+                    return JS_NULL;
+                }
 
                 break;
             }
@@ -447,12 +499,17 @@ static JSContext* _create_new_jsctx( pTHX_ JSRuntime *rt ) {
     Newxz(ctxdata, 1, ctx_opaque_s);
     JS_SetContextOpaque(ctx, ctxdata);
 
+    JSValue global = JS_GetGlobalObject(ctx);
+
     *ctxdata = (ctx_opaque_s) {
         .refcount = 1,
+        .regexp_jsvalue = JS_GetPropertyStr(ctx, global, "RegExp"),
 #ifdef MULTIPLICITY
         .aTHX = aTHX,
 #endif
     };
+
+    JS_FreeValue(ctx, global);
 
     return ctx;
 }
@@ -499,6 +556,8 @@ static void _free_jsctx(pTHX_ JSContext* ctx) {
     ctx_opaque_s* ctxdata = JS_GetContextOpaque(ctx);
 
     if (--ctxdata->refcount == 0) {
+        JS_FreeValue(ctx, ctxdata->regexp_jsvalue);
+
         JSRuntime *rt = JS_GetRuntime(ctx);
 
         for (U32 i=0; i<ctxdata->svs_count; i++) {
@@ -538,6 +597,20 @@ static JSModuleDef *pqjs_module_loader(JSContext *ctx,
 
     return moduledef;
 }
+
+/* These must correlate to the ALIAS values below. */
+static const char* _REGEXP_ACCESSORS[] = {
+    "flags",
+    "dotAll",
+    "global",
+    "hasIndices",
+    "ignoreCase",
+    "multiline",
+    "source",
+    "sticky",
+    "unicode",
+    "lastIndex",
+};
 
 /* ---------------------------------------------------------------------- */
 
@@ -733,6 +806,83 @@ eval (SV* self_sv, SV* js_code_sv)
 
     OUTPUT:
         RETVAL
+
+# ----------------------------------------------------------------------
+
+MODULE = JavaScript::QuickJS        PACKAGE = JavaScript::QuickJS::RegExp
+
+SV*
+exec (SV* self_sv, SV* specimen_sv)
+    ALIAS:
+        test = 1
+    CODE:
+        perl_qjs_regexp_s* pqjs = exs_structref_ptr(self_sv);
+        JSContext *ctx = pqjs->ctx;
+
+        STRLEN specimen_len;
+        const char* specimen = SvPVutf8(specimen_sv, specimen_len);
+
+        /* TODO: optimize? */
+        JSAtom prop = JS_NewAtom(ctx, ix ? "test" : "exec");
+
+        JSValue specimen_js = JS_NewStringLen(ctx, specimen, specimen_len);
+
+        JSValue jsret = JS_Invoke(
+            ctx,
+            pqjs->regexp,
+            prop,
+            1,
+            &specimen_js
+        );
+
+        JS_FreeValue(ctx, specimen_js);
+        JS_FreeAtom(ctx, prop);
+
+        RETVAL = _return_jsvalue_or_croak(aTHX_ pqjs->ctx, jsret);
+
+    OUTPUT:
+        RETVAL
+
+SV*
+flags( SV* self_sv)
+    ALIAS:
+        dotAll = 1
+        global = 2
+        hasIndices = 3
+        ignoreCase = 4
+        multiline = 5
+        source = 6
+        sticky = 7
+        unicode = 8
+        lastIndex = 9
+    CODE:
+        perl_qjs_regexp_s* pqjs = exs_structref_ptr(self_sv);
+
+        JSValue myret = JS_GetPropertyStr(pqjs->ctx, pqjs->regexp, _REGEXP_ACCESSORS[ix]);
+
+        SV* err = NULL;
+
+        RETVAL = _JSValue_to_SV(aTHX_ pqjs->ctx, myret, &err);
+
+        JS_FreeValue(pqjs->ctx, myret);
+
+        if (err) croak_sv(err);
+
+    OUTPUT:
+        RETVAL
+
+void
+DESTROY( SV* self_sv )
+    CODE:
+        perl_qjs_regexp_s* pqjs = exs_structref_ptr(self_sv);
+
+        if (PL_dirty && pqjs->pid == getpid()) {
+            warn("DESTROYing %" SVf " at global destruction; memory leak likely!\n", self_sv);
+        }
+
+        JS_FreeValue(pqjs->ctx, pqjs->regexp);
+
+        _free_jsctx(aTHX_ pqjs->ctx);
 
 # ----------------------------------------------------------------------
 # This package isn’t exposed to Perl code; it just exists to facilitate

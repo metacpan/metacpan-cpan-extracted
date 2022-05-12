@@ -1,10 +1,26 @@
 ==================================================
-Changes from 2021-05-10 00:00:00 +0000 to present.
+Changes from 2021-05-12 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.093 at 2022-05-10 08:45:33 +0000
+version 0.094 at 2022-05-12 10:50:56 +0000
 ------------------------------------------
+
+  Change: 0e0fcd8ebfa69b3caa3a9ab544aad6a2ae683302
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2022-05-12 12:50:29 +0000
+
+    - removed unused module 
+
+------------------------------------------
+version 0.093 at 2022-05-10 08:45:52 +0000
+------------------------------------------
+
+  Change: 26ab8bd80c85cd5b5643a7e0bde16f103af7d0a2
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2022-05-10 10:45:52 +0000
+
+    Released 0.093 
 
   Change: 92da8ff8d6900beed0eb34bc5ff54a8ef220fe3d
   Author: Andreas Romeyke <art1@andreas-romeyke.de>
@@ -649,5 +665,5 @@ version 0.075 at 2021-06-16 15:30:39 +0000
     - added single line parse check 
 
 =================================================
-Plus 28 releases after 2021-05-10 00:00:00 +0000.
+Plus 28 releases after 2021-05-12 00:00:00 +0000.
 =================================================

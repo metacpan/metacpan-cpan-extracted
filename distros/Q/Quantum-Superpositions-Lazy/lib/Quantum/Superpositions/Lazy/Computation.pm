@@ -1,7 +1,5 @@
 package Quantum::Superpositions::Lazy::Computation;
-
-our $VERSION = '1.11';
-
+$Quantum::Superpositions::Lazy::Computation::VERSION = '1.12';
 use v5.24;
 use warnings;
 use Moo;

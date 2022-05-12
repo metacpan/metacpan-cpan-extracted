@@ -1,5 +1,8 @@
 Revision history for Perl extension Quantum::Superpositions::Lazy.
 
+1.12 Thu May 12 2022
+	- switch to Dist::Zilla
+
 1.11 Mon May 9 2022
 	- fix version of Q::S::L
 	- fix return value of empty superposition collapsing

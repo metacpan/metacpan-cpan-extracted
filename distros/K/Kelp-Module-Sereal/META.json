@@ -1,10 +1,10 @@
 {
    "abstract" : "Sereal encoder / decoder for Kelp",
    "author" : [
-      "Bartosz Jarzyna <brtastic.dev@gmail.com>"
+      "Bartosz Jarzyna <bbrtj.pro@gmail.com>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,21 +13,15 @@
       "version" : 2
    },
    "name" : "Kelp-Module-Sereal",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
+      "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
       },
-      "configure" : {
+      "develop" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Test::Pod" : "1.41"
          }
       },
       "runtime" : {
@@ -36,24 +30,22 @@
             "Sereal" : "0",
             "perl" : "5.010"
          }
-      },
-      "test" : {
-         "requires" : {}
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/brtastic/perl-kelp-module-sereal/issues"
+         "web" : "https://github.com/bbrtj/perl-kelp-module-sereal/issues"
       },
-      "homepage" : "https://brtastic.xyz/project/kelp",
-      "license" : [
-         "https://dev.perl.org/licenses"
-      ],
       "repository" : {
-         "url" : "https://github.com/brtastic/perl-kelp-module-sereal"
+         "type" : "git",
+         "url" : "git://github.com/bbrtj/perl-kelp-module-sereal.git",
+         "web" : "https://github.com/bbrtj/perl-kelp-module-sereal"
       }
    },
-   "version" : "1.00",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.01",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
+

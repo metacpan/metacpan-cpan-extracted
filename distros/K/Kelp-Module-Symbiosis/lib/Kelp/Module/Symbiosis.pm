@@ -1,7 +1,5 @@
 package Kelp::Module::Symbiosis;
-
-our $VERSION = '1.12';
-
+$Kelp::Module::Symbiosis::VERSION = '1.14';
 use Kelp::Base qw(Kelp::Module);
 use Plack::App::URLMap;
 use Carp;
@@ -297,15 +295,15 @@ Routes specified in symbiosis will be matched before routes in Kelp. Once you mo
 
 =head1 AUTHOR
 
-Bartosz Jarzyna, E<lt>brtastic.dev@gmail.comE<gt>
+Bartosz Jarzyna, E<lt>bbrtj.pro@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2020 by Bartosz Jarzyna
+Copyright (C) 2020 - 2022 by Bartosz Jarzyna
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.10.0 or,
-at your option, any later version of Perl 5 you may have available.
+it under the same terms as Perl itself.
 
 
 =cut
+

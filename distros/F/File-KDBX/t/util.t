@@ -7,7 +7,7 @@ use lib 't/lib';
 use TestCommon;
 
 use File::KDBX::Util qw(:all);
-use Math::BigInt;
+use Math::BigInt 1.993;
 use Scalar::Util qw(blessed);
 use Test::More;
 

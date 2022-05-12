@@ -14,7 +14,7 @@ use namespace::clean;
 BEGIN { mark_as_loaded('Iterator::Simple::Iterator') }
 extends 'Iterator::Simple::Iterator';
 
-our $VERSION = '0.902'; # VERSION
+our $VERSION = '0.903'; # VERSION
 
 
 sub new {
@@ -221,7 +221,7 @@ File::KDBX::Iterator - KDBX database iterator
 
 =head1 VERSION
 
-version 0.902
+version 0.903
 
 =head1 SYNOPSIS
 
@@ -239,7 +239,7 @@ version 0.902
 
 A buffered iterator compatible with and expanding upon L<Iterator::Simple>, this provides an easy way to
 navigate a L<File::KDBX> database. The documentation for B<Iterator::Simple> documents functions and methods
-supported but this iterator that are not documented here, so consider that additional reading.
+supported by this iterator that are not documented here, so consider that additional reading.
 
 =head2 Buffer
 
@@ -330,6 +330,7 @@ B<NOTE:> This method drains the iterator completely, leaving it empty. See L</CA
 =head2 where
 
     \&iterator = $iterator->grep(\&query);
+    \&iterator = $iterator->grep(sub($item) { ... });
 
 Get a new iterator draining from an existing iterator but providing only items that pass a test or are matched
 by a query. In its basic form this method is very much like perl's built-in grep function, except for
@@ -410,7 +411,7 @@ Alias for L</norder_by>.
 
 Get a new iterator draining from an existing iterator but providing only a limited number of items.
 
-C<limit> as an alias for L<< Iterator::Simple/"$iterator->head($count)" >>.
+C<limit> is an alias for L<< Iterator::Simple/"$iterator->head($count)" >>.
 
 =head2 to_array
 
@@ -441,6 +442,9 @@ for infinite iterators because your computer doesn't have infinite memory. This 
 B<File::KDBX> lists which are always finite -- unless you do something weird like force a child group to be
 its own ancestor -- but I'm noting it here as a potential issue if you use this iterator class for other
 things (which you probably shouldn't do).
+
+KDBX databases are always fully-loaded into memory anyway, so there's not a significant memory cost to
+draining an iterator completely.
 
 =head1 BUGS
 

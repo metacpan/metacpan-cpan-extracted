@@ -16,11 +16,11 @@ use Hash::Util::FieldHash qw(fieldhashes);
 use List::Util qw(any first);
 use Ref::Util qw(is_ref is_arrayref is_plain_hashref);
 use Scalar::Util qw(blessed);
-use Time::Piece;
+use Time::Piece 1.33;
 use boolean;
 use namespace::clean;
 
-our $VERSION = '0.902'; # VERSION
+our $VERSION = '0.903'; # VERSION
 our $WARNINGS = 1;
 
 fieldhashes \my (%SAFE, %KEYS);
@@ -1121,7 +1121,7 @@ File::KDBX - Encrypted database to store secret text and files
 
 =head1 VERSION
 
-version 0.902
+version 0.903
 
 =head1 SYNOPSIS
 
@@ -1141,14 +1141,13 @@ version 0.902
     );
 
     # Save the database to the filesystem
-    $kdbx->dump_file('passwords.kdbx', 'M@st3rP@ssw0rd!');
+    $kdbx->dump_file('passwords.kdbx', 'masterpw changeme');
 
     # Load the database from the filesystem into a new database instance
-    my $kdbx2 = File::KDBX->load_file('passwords.kdbx', 'M@st3rP@ssw0rd!');
+    my $kdbx2 = File::KDBX->load_file('passwords.kdbx', 'masterpw changeme');
 
     # Iterate over database entries, print entry titles
-    $kdbx2->entries->each(sub {
-        my ($entry) = @_;
+    $kdbx2->entries->each(sub($entry, @) {
         say 'Entry: ', $entry->title;
     });
 
@@ -2156,8 +2155,7 @@ You generally don't need to call this directly. The loader and dumper use it to 
     my $kdbx = File::KDBX->load_file('mypasswords.kdbx', 'master password CHANGEME');
     $kdbx->unlock;  # cause $entry->password below to be defined
 
-    $kdbx->entries->each(sub {
-        my ($entry) = @_;
+    $kdbx->entries->each(sub($entry, @) {
         say 'Found password for: ', $entry->title;
         say '  Username: ', $entry->username;
         say '  Password: ', $entry->password;

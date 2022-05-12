@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::PlaywrightException;
-$Playwright::PlaywrightException::VERSION = '0.019';
+$Playwright::PlaywrightException::VERSION = '1.210';
 use parent 'Playwright::Base';
 
 sub new {
@@ -66,7 +66,7 @@ Playwright::PlaywrightException - Automatically generated class for Playwright::
 
 =head1 VERSION
 
-version 0.019
+version 1.210
 
 =head1 CONSTRUCTOR
 

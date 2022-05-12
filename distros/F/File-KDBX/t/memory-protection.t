@@ -17,7 +17,7 @@ use List::Util qw(max);
 use POSIX ();
 use Scalar::Util qw(looks_like_number);
 use Scope::Guard;
-use Test::More;
+use Test::More 1.001004_001;
 
 BEGIN {
     if (!$ENV{AUTHOR_TESTING}) {

@@ -1,0 +1,47 @@
+AnyEvent-Sway
+
+This module connects to the Sway window manager using the UNIX socket based
+IPC interface it provides (if enabled in the configuration file). You can
+then subscribe to events or send messages and receive their replies.
+
+This is a simple fork of AnyEvent-I3.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc AnyEvent::Sway
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=AnyEvent-Sway
+
+    The Sway window manager website
+        https://swaywm.org
+
+
+LICENSE AND COPYRIGHT
+
+Forked from AnyEvent-I3 by Michael Stapelberg
+    https://metacpan.org/pod/AnyEvent::I3
+    https://github.com/i3/AnyEvent-I3
+    https://github.com/i3/i3
+
+Copyright (C) 2022 John Mertz (git at john.me.tz)
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See https://dev.perl.org/licenses/ for more information.

@@ -17,6 +17,7 @@ easyxs/easyxs_structref.h
 easyxs/init.h
 easyxs/ppport.h
 lib/JavaScript/QuickJS.pm
+lib/JavaScript/QuickJS/RegExp.pm
 quickjs/Changelog
 quickjs/LICENSE
 quickjs/Makefile

@@ -1,5 +1,10 @@
 Revision history for Math-DCT
 
+0.04    2021-05-11
+        - 1D & 2D iDCT functions added.
+        - Simple benchmarking script added.
+        - Minor (~1-2%) performance improvements.
+
 0.03    2019-11-01
         30% faster function for 1x8 & 8x8 matrices.
 
@@ -8,4 +13,3 @@ Revision history for Math-DCT
 
 0.01    2019-10-28
         First version, released on an unsuspecting world.
-

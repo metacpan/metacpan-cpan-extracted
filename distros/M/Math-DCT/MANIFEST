@@ -1,3 +1,4 @@
+bench/benchmark.pl
 Changes
 DCT.xs
 lib/Math/DCT.pm

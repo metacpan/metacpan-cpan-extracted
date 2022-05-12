@@ -17,7 +17,7 @@ use Types::Standard -types;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.2.6';
+our $VERSION = 'v0.2.7';
 
 
 has resolver => (
@@ -47,6 +47,12 @@ has robots => (
 
 sub _build_robots {
     return [
+
+        {
+            name   => 'Amazonbot',
+            agent  => qr/\bAmazonbot\b/,
+            domain => qr/\.amazonaws\.com$/,
+        },
 
         {
             name   => 'Applebot',
@@ -260,7 +266,7 @@ Robots::Validate - Validate that IP addresses are associated with known robots
 
 =head1 VERSION
 
-version v0.2.6
+version v0.2.7
 
 =head1 SYNOPSIS
 

@@ -14,7 +14,7 @@ use namespace::clean;
 
 extends 'File::KDBX::Cipher';
 
-our $VERSION = '0.902'; # VERSION
+our $VERSION = '0.903'; # VERSION
 
 
 has 'counter',  is => 'ro', default => 0;
@@ -123,7 +123,7 @@ File::KDBX::Cipher::Stream - A cipher stream encrypter/decrypter
 
 =head1 VERSION
 
-version 0.902
+version 0.903
 
 =head1 SYNOPSIS
 

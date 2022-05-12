@@ -1,5 +1,15 @@
 Revision history for Robots-Validate:
 
+v0.2.7    2022-05-12 11:12:06-04:00 EST5EDT
+  [Enhancements]
+  - Added rules for Amazonbot.
+
+  [Documentation]
+  - Fixed encoding of links in README.
+
+  [Toolchain]
+  - Remove bad MANIFEST.SKIP rule.
+
 v0.2.6    2022-02-12 11:36:55+00:00 Europe/London
   [Documentation]
   - Bump copyright year.

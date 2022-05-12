@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Coverage;
-$Playwright::Coverage::VERSION = '0.019';
+$Playwright::Coverage::VERSION = '1.210';
 use parent 'Playwright::Base';
 
 sub new {
@@ -32,21 +32,21 @@ sub stopCSSCoverage {
     );
 }
 
-sub stopJSCoverage {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'stopJSCoverage',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub startCSSCoverage {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'startCSSCoverage',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub stopJSCoverage {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'stopJSCoverage',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -106,7 +106,7 @@ Playwright::Coverage - Automatically generated class for Playwright::Coverage
 
 =head1 VERSION
 
-version 0.019
+version 1.210
 
 =head1 CONSTRUCTOR
 
@@ -123,17 +123,17 @@ Execute the Coverage::stopCSSCoverage playwright routine.
 
 See L<https://playwright.dev/api/class-Coverage#Coverage-stopCSSCoverage> for more information.
 
-=head2 stopJSCoverage(@args)
-
-Execute the Coverage::stopJSCoverage playwright routine.
-
-See L<https://playwright.dev/api/class-Coverage#Coverage-stopJSCoverage> for more information.
-
 =head2 startCSSCoverage(@args)
 
 Execute the Coverage::startCSSCoverage playwright routine.
 
 See L<https://playwright.dev/api/class-Coverage#Coverage-startCSSCoverage> for more information.
+
+=head2 stopJSCoverage(@args)
+
+Execute the Coverage::stopJSCoverage playwright routine.
+
+See L<https://playwright.dev/api/class-Coverage#Coverage-stopJSCoverage> for more information.
 
 =head2 startJSCoverage(@args)
 

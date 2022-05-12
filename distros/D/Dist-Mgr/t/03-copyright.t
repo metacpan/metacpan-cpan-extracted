@@ -20,6 +20,9 @@ my @files = (
 
 copy_module_files();
 
+my ($year) = (localtime)[5];
+$year += 1900;
+
 # bad params
 {
     is eval{copyright_info('not-exist-dir_blah'); 1}, undef, "bad directory croaks ok";
@@ -43,7 +46,7 @@ copy_module_files();
 
     for (0..$#files) {
         is exists $u->{$files[$_]}, 1, "$files[$_] exists in hash";
-        is $u->{$files[$_]}, 2021, "$files[$_] has correct copyright ($year) ok";
+        is $u->{$files[$_]}, $year, "$files[$_] has correct copyright ($year) ok";
 
         open my $fh, '<', $files[$_] or die "Can't open $files[$_]: $!";
         while (my $line = <$fh>) {

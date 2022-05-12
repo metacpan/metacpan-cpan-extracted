@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.64;
+package Object::Pad 0.65;
 
 use v5.14;
 use warnings;
@@ -27,6 +27,8 @@ if( $] >= 5.020 ) {
 require mro;
 
 require Object::Pad::MOP::Class;
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -95,6 +97,8 @@ hopefully eventual stability of the design. See the L</FEEDBACK> section.
 
 =head2 Experimental Features
 
+I<Since version 0.63.>
+
 Some of the features of this module are currently marked as experimental. They
 will provoke warnings in the C<experimental> category, unless silenced.
 
@@ -110,6 +114,8 @@ module to only silence the module's warnings selectively:
    use Object::Pad ':experimental(custom_field_attr)';
 
    use Object::Pad ':experimental';  # all of the above
+
+I<Since version 0.64.>
 
 Multiple experimental features can be enabled at once by giving multiple names
 in the parens, separated by spaces:
@@ -1098,6 +1104,25 @@ async subs which await expressions:
 These three modules combine; there is additionally a cross-module test to
 ensure that object instance fields can be C<dynamically> set during a
 suspended C<async method>.
+
+=head2 Devel::MAT
+
+When using L<Devel::MAT> to help analyse or debug memory issues with programs
+that use C<Object::Pad>, you will likely want to additionally install the
+module L<Devel::MAT::Tool::Object::Pad>. This will provide new commands and
+extend existing ones to better assist with analysing details related to
+C<Object::Pad> classes and instances of them.
+
+   pmat> fields 0x55d7c173d4b8
+   The field AV ARRAY(3)=NativeClass at 0x55d7c173d4b8
+   Ix Field   Value
+   0  $sfield SCALAR(UV) at 0x55d7c173d938 = 123
+   ...
+
+   pmat> identify 0x55d7c17606d8
+   REF() at 0x55d7c17606d8 is:
+   └─the %hfield field of ARRAY(3)=NativeClass at 0x55d7c173d4b8, which is:
+   ...
 
 =head1 DESIGN TODOs
 

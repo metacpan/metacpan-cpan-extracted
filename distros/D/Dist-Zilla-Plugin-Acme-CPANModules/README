@@ -3,9 +3,9 @@ NAME
     Acme::CPANModules::* distribution
 
 VERSION
-    This document describes version 0.004 of
+    This document describes version 0.005 of
     Dist::Zilla::Plugin::Acme::CPANModules (from Perl distribution
-    Dist-Zilla-Plugin-Acme-CPANModules), released on 2022-03-18.
+    Dist-Zilla-Plugin-Acme-CPANModules), released on 2022-04-01.
 
 SYNOPSIS
     In dist.ini:
@@ -18,7 +18,13 @@ DESCRIPTION
 
     For each Acme/CPANModules/*.pm file:
 
-    *   Abort the build if there are no entries in $LIST
+    *   Check the list
+
+        *   Abort the build if there are no entries in $LIST
+
+        *   Abort the build if list does not have 'summary'
+
+        *   Warn if list summary does not begin with 'List of '
 
     *   Fill the Abstract from list's summary
 

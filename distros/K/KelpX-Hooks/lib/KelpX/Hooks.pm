@@ -1,9 +1,9 @@
 package KelpX::Hooks;
-
-our $VERSION = '1.01';
-
+$KelpX::Hooks::VERSION = '1.02';
+use v5.10;
 use strict;
 use warnings;
+
 use Exporter qw(import);
 use Carp qw(croak);
 
@@ -49,6 +49,7 @@ sub hook
 }
 
 1;
+
 __END__
 
 =head1 NAME
@@ -67,7 +68,7 @@ KelpX::Hooks - Override any method in your Kelp application
 
 =head1 DESCRIPTION
 
-This module allows you to override methods in your Kelp application class. The provided C<hook> method can be compared to Moose's C<around>, and it mimics its interface. The difference is in how and when the replacement of the actual method occurs.
+This module allows you to override methods in your Kelp application class. The provided L</hook> method can be compared to Moose's C<around>, and it mimics its interface. The difference is in how and when the replacement of the actual method occurs.
 
 The problem here is that Kelp's modules are modifying the symbol table for the module at the runtime, which makes common attempts to change their methods` behavior futile. You can't override them, you can't change them with method modifiers, you can only replace them with different methods.
 
@@ -98,15 +99,15 @@ L<Kelp>, L<Moose::Manual::MethodModifiers>
 
 =head1 AUTHOR
 
-Bartosz Jarzyna, E<lt>brtastic.dev@gmail.comE<gt>
+Bartosz Jarzyna, E<lt>bbrtj.pro@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2020 by Bartosz Jarzyna
+Copyright (C) 2020 - 2022 by Bartosz Jarzyna
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.10.1 or,
-at your option, any later version of Perl 5 you may have available.
+it under the same terms as Perl itself.
 
 
 =cut
+

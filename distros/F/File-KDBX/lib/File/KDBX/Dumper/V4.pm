@@ -19,7 +19,7 @@ use namespace::clean;
 
 extends 'File::KDBX::Dumper';
 
-our $VERSION = '0.902'; # VERSION
+our $VERSION = '0.903'; # VERSION
 
 has _binaries_written => {}, is => 'ro';
 
@@ -374,7 +374,7 @@ File::KDBX::Dumper::V4 - Dump KDBX4 files
 
 =head1 VERSION
 
-version 0.902
+version 0.903
 
 =head1 BUGS
 

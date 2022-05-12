@@ -10,7 +10,7 @@ use TestCommon;
 use File::KDBX;
 use File::KDBX::Constants qw(:version :kdf);
 use Test::Deep;
-use Test::More;
+use Test::More 1.001004_001;
 use boolean qw(:all);
 
 subtest 'Verify Format400' => sub {
@@ -111,7 +111,7 @@ subtest 'KDBX4.1 upgrade' => sub {
     is $kdbx->minimum_version, KDBX_VERSION_4_1, 'Icon with name requires upgrade';
     $kdbx->remove_custom_icon($icon_uuid);
     is $kdbx->minimum_version, KDBX_VERSION_3_1, 'Reset upgrade requirement';
-    $icon_uuid = $kdbx->add_custom_icon('data2', last_modification_time => gmtime);
+    $icon_uuid = $kdbx->add_custom_icon('data2', last_modification_time => scalar gmtime);
     is $kdbx->minimum_version, KDBX_VERSION_4_1, 'Icon with modtime requires upgrade';
     $kdbx->remove_custom_icon($icon_uuid);
     is $kdbx->minimum_version, KDBX_VERSION_3_1, 'Reset upgrade requirement';

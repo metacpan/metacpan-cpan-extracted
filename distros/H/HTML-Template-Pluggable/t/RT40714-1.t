@@ -4,12 +4,12 @@ use HTML::Template::Plugin::Dot;
 use Carp 'croak';
 
 sub render {
-    my( $template, %vars ) = @_;
+    my( $template, @vars ) = @_;
 
     my $t = HTML::Template::Pluggable->new(
         scalarref => \$template
     );
-    eval { $t->param( %vars ) };
+    eval { $t->param( @vars ) };
 
     return $t->output;
 }
@@ -59,8 +59,9 @@ is( $out, 'somevaluesomevalue' );
 
 $out = render(
     "<tmpl_var name='somevar'>",
+    somevar => 'somevalue6',
     testobj => testclass->new(),
-    somevar => 'somevalue6'
+    nope => 42,
 );
 is( $out, 'somevalue6' );
 

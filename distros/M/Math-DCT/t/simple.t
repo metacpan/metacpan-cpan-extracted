@@ -53,4 +53,9 @@ is(
     "2d - auto"
 );
 
+$result = idct2d([395, -10.6066017177982, -10.6066017177982, -2.5], 2);
+
+is($result->[$_], float($array->[$_]), "2d iDCT matches original")
+    for 0..3;
+
 done_testing;

@@ -12,8 +12,7 @@ use Test::Differences qw( eq_or_diff );
 use Test::More import => [qw( diag done_testing is like ok subtest )];
 use Test::Needs qw( Perl::Critic::Utils );
 
-# Emulate a user with no config file in the current dir and no config file in
-# $ENV{XDG_CONFIG_HOME}
+# Emulate a user with no local or global config file
 subtest 'no config file' => sub {
     my $dir = Path::Tiny->tempdir("testconfigXXXXXXXX");
     local $ENV{XDG_CONFIG_HOME} = "$dir";
@@ -23,7 +22,67 @@ subtest 'no config file' => sub {
 
     my $cli = App::perlimports::CLI->new;
     my ($stdout) = capture { $cli->run };
-    like( $stdout, qr{$App::perlimports::CLI::VERSION}, 'parses filename' );
+    like( $stdout, qr{$App::perlimports::CLI::VERSION}, 'prints version' );
+};
+
+# Emulate a user with only a global config file
+subtest 'no config file' => sub {
+    my $xdg_config_home = Path::Tiny->tempdir('testconfigXXXXXXXX');
+    local $ENV{XDG_CONFIG_HOME} = "$xdg_config_home";
+
+    my $global_config_dir = $xdg_config_home->child('perlimports');
+    $global_config_dir->mkpath;
+    my $global_config = $global_config_dir->child('perlimports.toml');
+
+    local @ARGV = ( '--create-config-file', $global_config );
+    is( App::perlimports::CLI->new->run, '0', 'clean exit code' );
+    ok( -e $global_config, 'file created' );
+
+    my $project_dir = Path::Tiny->tempdir('testconfigXXXXXXXX');
+    my $pushd       = pushd("$project_dir");
+
+    my $cli = App::perlimports::CLI->new;
+    is( $cli->_config_file, $global_config, 'config file found' );
+};
+
+subtest 'help' => sub {
+    local @ARGV = ('--help');
+
+    my $cli = App::perlimports::CLI->new;
+    my ($stdout) = capture { $cli->run };
+    like( $stdout, qr{filename STR}, 'prints help' );
+};
+
+subtest 'verbose help' => sub {
+    local @ARGV = ('--verbose-help');
+    use DDP;
+
+    # Verbose text on $0, which will differ when this is called from
+    # script/perlimports
+    local $0 = 'script/perlimports';
+    my $cli = App::perlimports::CLI->new;
+    my ($stdout) = capture { $cli->run };
+    like(
+        $stdout, qr{We can also make this slightly shorter},
+        'prints help'
+    );
+};
+
+subtest filter_paths => sub {
+    my $cli   = App::perlimports::CLI->new;
+    my @paths = sort $cli->_filter_paths(
+        'test-data/filter-paths',
+        'test-data/filter-paths/foo.t'
+    );
+    eq_or_diff(
+        \@paths,
+        [
+            'test-data/filter-paths/Foo.pl',
+            'test-data/filter-paths/Foo.pm',
+            'test-data/filter-paths/foo',
+            'test-data/filter-paths/foo.t',
+        ]
+    );
 };
 
 subtest '--filename' => sub {
@@ -75,6 +134,15 @@ EOF
     is( $stdout, $expected, 'parses filename' );
 
     ok( $file->lines, 'something was logged to file' );
+};
+
+subtest 'no filename' => sub {
+    local @ARGV;
+    my $cli = App::perlimports::CLI->new;
+    my ( undef, $stderr ) = capture {
+        $cli->run;
+    };
+    like( $stderr, qr{Mandatory parameter 'filename' missing} );
 };
 
 subtest '--ignore-modules' => sub {

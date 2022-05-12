@@ -4,7 +4,7 @@ Lookup the MAC address of an ip address
 BSD code
 
 Programmed by Bastian Ballmann
-Last update: 20.09.2006
+Last update: 11.05.2022
 
 This program is free software; you can redistribute 
 it and/or modify it under the terms of the 
@@ -28,7 +28,9 @@ See the GNU General Public License for more details.
 #include <netinet/if_ether.h>
 #include <arpa/inet.h>
 #include <sys/sysctl.h>
-#include <sys/types.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include "arp.h"
 
 #define ROUNDUP(a) \
@@ -56,40 +58,40 @@ int arp_lookup_bsd(const char *dev, const char *ip, char *mac)
   /* Retrieve routing table */
 
   if(sysctl(mib, 6, NULL, &needed, NULL, 0) < 0)
-    {
-      perror("route-sysctl-estimate");
-      exit(1);
-    }
+  {
+    perror("route-sysctl-estimate");
+    exit(1);
+  }
 
   if((buf = malloc(needed)) == NULL)
-    {
-      perror("malloc");
-      exit(1);
-    }
+  {
+    perror("malloc");
+    exit(1);
+  }
 
   if(sysctl(mib, 6, buf, &needed, NULL, 0) < 0)
-    {
-      perror("retrieval of routing table");
-      exit(1);
-    }
+  {
+    perror("retrieval of routing table");
+    exit(1);
+  }
 
   lim = buf + needed;
   next = buf;
 
   /* Search for the requested ip */
   while (next < lim) 
-    {
-      struct rt_msghdr *rtm = (struct rt_msghdr *)next;
-      struct sockaddr_inarp *sinarp = (struct sockaddr_inarp *)(rtm + 1);
-      struct sockaddr_dl *sdl = (struct sockaddr_dl *)((char *)sinarp + ROUNDUP(sinarp->sin_len));
+  {
+    struct rt_msghdr *rtm = (struct rt_msghdr *)next;
+    struct sockaddr_inarp *sinarp = (struct sockaddr_inarp *)(rtm + 1);
+    struct sockaddr_dl *sdl = (struct sockaddr_dl *)((char *)sinarp + ROUNDUP(sinarp->sin_len));
 
-      if( (sdl->sdl_alen) && (!strcmp(ip,inet_ntoa(sinarp->sin_addr))) )
-	{ 
-	  sprintf(mac,"%s", ether_ntoa((struct ether_addr *)LLADDR(sdl)));
-	}
+    if( (sdl->sdl_alen) && (!strcmp(ip,inet_ntoa(sinarp->sin_addr))) )
+	  { 
+	    sprintf(mac,"%s", ether_ntoa((struct ether_addr *)LLADDR(sdl)));
+	  }
 
-      next += rtm->rtm_msglen;
-    }
+    next += rtm->rtm_msglen;
+  }
 
   free(buf);
   return(0);

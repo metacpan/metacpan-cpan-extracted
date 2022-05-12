@@ -1,3 +1,32 @@
+// Author: Dimitrios Kechagias, dkechag at cpan.org
+// Copyright (C) 2019, SpareRoom.com
+// This program is free software; you can redistribute
+// it and/or modify it under the same terms as Perl itself.
+// Significant code adapted from:
+
+/*
+ * Fast discrete cosine transform algorithms (C)
+ *
+ * Copyright (c) 2017 Project Nayuki. (MIT License)
+ * https://www.nayuki.io/page/fast-discrete-cosine-transform-algorithms
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ * the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ * - The above copyright notice and this permission notice shall be included in
+ *   all copies or substantial portions of the Software.
+ * - The Software is provided "as is", without warranty of any kind, express or
+ *   implied, including but not limited to the warranties of merchantability,
+ *   fitness for a particular purpose and noninfringement. In no event shall the
+ *   authors or copyright holders be liable for any claim, damages or other
+ *   liability, whether in an action of contract, tort or otherwise, arising from,
+ *   out of or in connection with the Software or the use or other dealings in the
+ *   Software.
+ */
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -95,8 +124,9 @@ void dct_1d(
     int i,j;
     for(i = 0; i < size; ++i) {
         double sum = 0;
+        double mult = i*factor;
         for(j = 0; j < size; ++j) {
-            sum += input[j] * cos((j+0.5)*i*factor);
+            sum += input[j] * cos((j+0.5)*mult);
         }
         temp[i]=sum;
     }
@@ -106,13 +136,50 @@ void dct_1d(
     }
 }
 
+void idct_1d(
+    char *inbuf,
+    int   size)
+{
+    double *input  = (double *) inbuf;
+    double  temp[size];
+    double  factor = M_PI/size;
+    float   scale = 2.0 / size;
+
+    int i,j;
+    for (i = 0; i < size; i++) {
+        double sum = input[0] / 2.0;
+        double mult = (i+0.5)*factor;
+        for (j = 1; j < size; j++) {
+            sum += input[j] * cos(j*mult);
+        }
+        temp[i] = sum;
+    }
+
+    for(i = 0; i < size; ++i) {
+        input[i]=temp[i] * scale;
+    }
+}
+
 void dct_coef(int size, double coef[size][size]) {
     double factor = M_PI/size;
 
     int i, j;
     for (i = 0; i < size; i++) {
+        double mult = i*factor;
         for (j = 0; j < size; j++) {
-            coef[j][i] = cos((j+0.5)*i*factor);
+            coef[j][i] = cos((j+0.5)*mult);
+        }
+    }
+}
+
+void idct_coef(int size, double coef[size][size]) {
+    double factor = M_PI/size;
+
+    int i, j;
+    for (i = 0; i < size; i++) {
+        double mult = (i+0.5)*factor;
+        for (j = 0; j < size; j++) {
+            coef[j][i] = cos(j*mult);
         }
     }
 }
@@ -131,10 +198,11 @@ void dct_2d(
     for (x = 0; x < size; x++) {
         for (i = 0; i < size; i++) {
             double sum = 0;
+            y = x * size;
             for (j = 0; j < size; j++) {
-                sum += input[x*size+j] * coef[j][i];
+                sum += input[y+j] * coef[j][i];
             }
-            temp[x*size+i] = sum;
+            temp[y+i] = sum;
         }
     }
 
@@ -145,6 +213,40 @@ void dct_2d(
                 sum += temp[j*size+y] * coef[j][i];
             }
             input[i*size+y] = sum;
+        }
+    }
+}
+
+void idct_2d(
+    char *inbuf,
+    int   size)
+{
+    double *input = (double *) inbuf;
+    double  coef[size][size];
+    double  temp[size*size];
+    float   scale = 2.0 / size;
+    int x, y, i, j;
+
+    idct_coef(size, coef);
+
+    for (x = 0; x < size; x++) {
+        for (i = 0; i < size; i++) {
+            double sum = input[x*size] / 2.0;
+            y = x * size;
+            for (j = 1; j < size; j++) {
+                sum += input[y+j] * coef[j][i];
+            }
+            temp[y+i] = sum * scale;
+        }
+    }
+
+    for (y = 0; y < size; y++) {
+        for (i = 0; i < size; i++) {
+            double sum = temp[y] / 2.0;
+            for (j = 1; j < size; j++) {
+                sum += temp[j*size+y] * coef[j][i];
+            }
+            input[i*size+y] = sum * scale;
         }
     }
 }
@@ -189,7 +291,7 @@ void fast_dct_2d(
     double *input = (double *) inbuf;
     double  coef[size];
     double  temp[size*size];
-    int x,y;
+    int x,y,k;
 
     fast_dct_coef(size, coef);
 
@@ -198,8 +300,9 @@ void fast_dct_2d(
     }
 
     for (x = 0; x < size; x++) {
+        k = x * size;
         for (y = 0; y < size; y++) {
-            temp[y*size+x]=input[x*size+y];
+            temp[y*size+x]=input[k++];
         }
     }
 
@@ -208,8 +311,9 @@ void fast_dct_2d(
     }
 
     for (x = 0; x < size; x++) {
+        k = x * size;
         for (y = 0; y < size; y++) {
-            input[y*size+x]=temp[x*size+y];
+            input[y*size+x]=temp[k++];
         }
     }
 }
@@ -218,22 +322,23 @@ void transform_recursive(double input[], double temp[], int size, double coef[])
     if (size == 1)
         return;
 
-    int i;
+    int i,j;
     int half = size / 2;
 
     for (i = 0; i < half; i++) {
         double x = input[i];
         double y = input[size-1-i];
-        temp[i]  = x+y;
+        temp[i] = x+y;
         temp[i+half] = (x-y)/coef[half+i];
     }
 
     transform_recursive(temp, input, half, coef);
     transform_recursive(&temp[half], input, half, coef);
 
+    j = 0;
     for (i = 0; i < half-1; i++) {
-        input[i*2+0] = temp[i];
-        input[i*2+1] = temp[i+half] + temp[i+half+1];
+        input[j++] = temp[i];
+        input[j++] = temp[i+half] + temp[i+half+1];
     }
     input[size-2] = temp[half-1];
     input[size-1] = temp[size-1];
@@ -295,6 +400,23 @@ dct_1d (inbuf, size)
         return; /* assume stack size is correct */
 
 void
+idct_1d (inbuf, size)
+    char *  inbuf
+    int size
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        idct_1d(inbuf, size);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
+
+void
 dct_2d (inbuf, size)
     char *  inbuf
     int size
@@ -303,6 +425,23 @@ dct_2d (inbuf, size)
         PPCODE:
         temp = PL_markstack_ptr++;
         dct_2d(inbuf, size);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
+
+void
+idct_2d (inbuf, size)
+    char *  inbuf
+    int size
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        idct_2d(inbuf, size);
         if (PL_markstack_ptr != temp) {
           /* truly void, because dXSARGS not invoked */
           PL_markstack_ptr = temp;

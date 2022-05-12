@@ -9,7 +9,7 @@ use namespace::clean;
 
 extends 'File::KDBX::Loader';
 
-our $VERSION = '0.902'; # VERSION
+our $VERSION = '0.903'; # VERSION
 
 sub _read {
     my $self = shift;
@@ -47,7 +47,7 @@ File::KDBX::Loader::Raw - A no-op loader that doesn't do any parsing
 
 =head1 VERSION
 
-version 0.902
+version 0.903
 
 =head1 SYNOPSIS
 

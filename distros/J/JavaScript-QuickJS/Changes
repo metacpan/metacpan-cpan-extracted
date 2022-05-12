@@ -1,5 +1,11 @@
 Revision history for Perl extension JavaScript::QuickJS:
 
+0.10 Thu 12 May 2022
+- Fix missing RegExp module.
+
+0.09 Thu 12 May 2022
+- Add RegExp compatibility.
+
 0.08 Tue 26 Apr 2022
 - BUG FIX: Avoid segfault when passing a function from JS to Perl.
 - BUG FIX: Avoid segfault if an invalid SV is given to a Perl/JS coderef.

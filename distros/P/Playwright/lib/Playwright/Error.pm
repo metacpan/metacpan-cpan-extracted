@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Error;
-$Playwright::Error::VERSION = '0.019';
+$Playwright::Error::VERSION = '1.210';
 use parent 'Playwright::Base';
 
 sub new {
@@ -96,7 +96,7 @@ Playwright::Error - Automatically generated class for Playwright::Error
 
 =head1 VERSION
 
-version 0.019
+version 1.210
 
 =head1 CONSTRUCTOR
 

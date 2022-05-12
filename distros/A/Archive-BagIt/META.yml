@@ -30,43 +30,43 @@ no_index:
 provides:
   Archive::BagIt:
     file: lib/Archive/BagIt.pm
-    version: '0.093'
+    version: '0.094'
   Archive::BagIt::Base:
     file: lib/Archive/BagIt/Base.pm
-    version: '0.093'
+    version: '0.094'
   Archive::BagIt::Plugin::Algorithm::MD5:
     file: lib/Archive/BagIt/Plugin/Algorithm/MD5.pm
-    version: '0.093'
+    version: '0.094'
   Archive::BagIt::Plugin::Algorithm::SHA512:
     file: lib/Archive/BagIt/Plugin/Algorithm/SHA512.pm
-    version: '0.093'
+    version: '0.094'
   Archive::BagIt::Plugin::Manifest::MD5:
     file: lib/Archive/BagIt/Plugin/Manifest/MD5.pm
-    version: '0.093'
+    version: '0.094'
   Archive::BagIt::Plugin::Manifest::SHA512:
     file: lib/Archive/BagIt/Plugin/Manifest/SHA512.pm
-    version: '0.093'
+    version: '0.094'
   Archive::BagIt::Role::Algorithm:
     file: lib/Archive/BagIt/Role/Algorithm.pm
-    version: '0.093'
+    version: '0.094'
   Archive::BagIt::Role::Manifest:
     file: lib/Archive/BagIt/Role/Manifest.pm
-    version: '0.093'
+    version: '0.094'
   Archive::BagIt::Role::OpenSSL:
     file: lib/Archive/BagIt/Role/OpenSSL.pm
-    version: '0.093'
+    version: '0.094'
   Archive::BagIt::Role::OpenSSL::Async:
     file: lib/Archive/BagIt/Role/OpenSSL/Async.pm
-    version: '0.093'
+    version: '0.094'
   Archive::BagIt::Role::OpenSSL::Sync:
     file: lib/Archive/BagIt/Role/OpenSSL/Sync.pm
-    version: '0.093'
+    version: '0.094'
   Archive::BagIt::Role::Plugin:
     file: lib/Archive/BagIt/Role/Plugin.pm
-    version: '0.093'
+    version: '0.094'
   Archive::BagIt::Role::Portability:
     file: lib/Archive/BagIt/Role/Portability.pm
-    version: '0.093'
+    version: '0.094'
 recommends:
   IO::Async: '0'
   IO::Async::Loop: '0'
@@ -82,7 +82,7 @@ requires:
   perl: '5.010'
 resources:
   repository: https://git.fsfe.org/art1pirat/Archive-BagIt.git
-version: '0.093'
+version: '0.094'
 x_contributors:
   - 'Andreas Romeyke <art1@andreas-romeyke.de>'
   - 'Michiel Beijen <michiel.beijen@gmail.com>'

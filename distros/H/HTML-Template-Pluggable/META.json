@@ -34,7 +34,7 @@
    "provides" : {
       "HTML::Template::Pluggable" : {
          "file" : "lib/HTML/Template/Pluggable.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       },
       "HTML::Template::Plugin::Dot" : {
          "file" : "lib/HTML/Template/Plugin/Dot.pm",
@@ -47,6 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.21",
+   "version" : "0.22",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

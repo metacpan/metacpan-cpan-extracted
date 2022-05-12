@@ -12,14 +12,14 @@ use File::KDBX::Error;
 use File::KDBX::Util qw(:class :int erase_scoped gzip snakify);
 use IO::Handle;
 use Scalar::Util qw(blessed isdual looks_like_number);
-use Time::Piece;
+use Time::Piece 1.33;
 use XML::LibXML;
 use boolean;
 use namespace::clean;
 
 extends 'File::KDBX::Dumper';
 
-our $VERSION = '0.902'; # VERSION
+our $VERSION = '0.903'; # VERSION
 
 
 has allow_protection => 1;
@@ -563,7 +563,7 @@ File::KDBX::Dumper::XML - Dump unencrypted XML KeePass files
 
 =head1 VERSION
 
-version 0.902
+version 0.903
 
 =head1 ATTRIBUTES
 

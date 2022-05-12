@@ -44,6 +44,6 @@
          "url" : "https://github.com/joyrex2001/grpc-perl"
       }
    },
-   "version" : "0.36",
+   "version" : "0.37",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

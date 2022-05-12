@@ -15,6 +15,7 @@ lib/Carmel/Builder.pm
 lib/Carmel/CPANfile.pm
 lib/Carmel/Difftool.pm
 lib/Carmel/Preload.pm
+lib/Carmel/ProgressBar.pm
 lib/Carmel/Repository.pm
 lib/Carmel/Resolver.pm
 lib/Carmel/Runner.pm
@@ -38,6 +39,7 @@ xt/cli/exit.t
 xt/cli/first_run.t
 xt/cli/index.t
 xt/cli/install_deps.t
+xt/cli/install_restore.t
 xt/cli/lookup.t
 xt/cli/merge_config.t
 xt/cli/mirror.t
@@ -59,6 +61,8 @@ xt/cli/subdir.t
 xt/cli/submodule_dep.t
 xt/cli/update.t
 xt/cli/update_badname.t
+xt/cli/update_core.t
+xt/cli/update_empty.t
 xt/cli/version.t
 xt/cli/xs.t
 xt/mirror/authors/id/D/DA/DAGOLDEN/HTTP-Tiny-0.056.tar.gz

@@ -27,6 +27,7 @@ no_index:
 requires:
   CSS::Struct::Output::Raw: 0
   Encode: 0
+  Error::Pure: 0
   Plack::Component: 0
   Plack::Util::Accessor: 0
   Readonly: 0
@@ -39,4 +40,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Plack-Component-Tags-HTML
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Plack-Component-Tags-HTML
-version: '0.02'
+version: '0.04'

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::FileChooser;
-$Playwright::FileChooser::VERSION = '0.019';
+$Playwright::FileChooser::VERSION = '1.210';
 use parent 'Playwright::Base';
 
 sub new {
@@ -32,11 +32,11 @@ sub element {
     );
 }
 
-sub page {
+sub setFiles {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'page',
+        command => 'setFiles',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -52,11 +52,11 @@ sub isMultiple {
     );
 }
 
-sub setFiles {
+sub page {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'setFiles',
+        command => 'page',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -106,7 +106,7 @@ Playwright::FileChooser - Automatically generated class for Playwright::FileChoo
 
 =head1 VERSION
 
-version 0.019
+version 1.210
 
 =head1 CONSTRUCTOR
 
@@ -123,11 +123,11 @@ Execute the FileChooser::element playwright routine.
 
 See L<https://playwright.dev/api/class-FileChooser#FileChooser-element> for more information.
 
-=head2 page(@args)
+=head2 setFiles(@args)
 
-Execute the FileChooser::page playwright routine.
+Execute the FileChooser::setFiles playwright routine.
 
-See L<https://playwright.dev/api/class-FileChooser#FileChooser-page> for more information.
+See L<https://playwright.dev/api/class-FileChooser#FileChooser-setFiles> for more information.
 
 =head2 isMultiple(@args)
 
@@ -135,11 +135,11 @@ Execute the FileChooser::isMultiple playwright routine.
 
 See L<https://playwright.dev/api/class-FileChooser#FileChooser-isMultiple> for more information.
 
-=head2 setFiles(@args)
+=head2 page(@args)
 
-Execute the FileChooser::setFiles playwright routine.
+Execute the FileChooser::page playwright routine.
 
-See L<https://playwright.dev/api/class-FileChooser#FileChooser-setFiles> for more information.
+See L<https://playwright.dev/api/class-FileChooser#FileChooser-page> for more information.
 
 =head2 on(@args)
 

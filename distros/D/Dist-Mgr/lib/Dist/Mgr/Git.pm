@@ -36,7 +36,7 @@ our %EXPORT_TAGS = (
     all     => [@EXPORT_OK],
 );
 
-our $VERSION = '1.10';
+our $VERSION = '1.13';
 
 my $spinner_count;
 
@@ -98,7 +98,7 @@ sub _git_clone {
     }
 
     if ( _validate_git()) {
-        _exec("git clone 'https://$user\@github.com/$user/$repo'", $verbose);
+        _exec("git clone 'git\@github.com:/$user/$repo'", $verbose);
 
         if ($? != 0) {
             if ($? == 32768) {
@@ -274,7 +274,7 @@ Steve Bertrand, C<< <steveb at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2021 Steve Bertrand.
+Copyright 2022 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

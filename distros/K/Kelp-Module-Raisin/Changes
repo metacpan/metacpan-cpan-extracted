@@ -1,5 +1,9 @@
 Revision history for Perl extension Kelp::Module::Raisin.
 
+1.01 Wed May 11 2022
+	- maintenance work
+	- switch to Dist::Zilla
+
 1.00 Sat Jan 16 2021
 	- first version
 

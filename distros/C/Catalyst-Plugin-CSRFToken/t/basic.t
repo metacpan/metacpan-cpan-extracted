@@ -19,6 +19,18 @@ use HTTP::Request::Common;
   is $res->content, 'Bad Request';
 }
 
+{
+  ok my $res = request '/in_session';
+  ok my $token = $res->content;
+  {
+    ok my $res = request POST '/test', [csrf_token => $token];
+    is $res->content, 'ok';
+  }
+  {
+    ok my $res = request POST '/test', [csrf_token => $token]; # SHouldn't work the second time
+    is $res->content, 'Bad Request';
+  }
+}
 
 done_testing;
 

@@ -1,5 +1,9 @@
 Revision history for Perl extension Kelp::Module::WebSocket::AnyEvent.
 
+1.05 Wed May 11 2022
+	- maintenance work
+	- switch to Dist::Zilla
+
 1.04 Sun Jan 17 2021
 	- try/catch incoming message decoding (can stay alive now)
 	- add malformed_message event
@@ -21,3 +25,4 @@ Revision history for Perl extension Kelp::Module::WebSocket::AnyEvent.
 
 1.00 Tue Feb 18 2020
 	- First release
+

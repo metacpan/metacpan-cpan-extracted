@@ -6,49 +6,65 @@ SPVM::Document::LanguageSpecification - SPVM Language Specification
 
 =head1 DESCRIPTION
 
-B<SPVM::Document::LanguageSpecification> describes SPVM language specification.
+B<SPVM::Document::LanguageSpecification> defines SPVM language specification.
 
 =head1 Tokenization
 
-Describes the tokenizing of the SPVM language.
+The tokenizing the source codes of SPVM language is explained.
 
 =head2 Character Set
 
-SPVM language are written by UTF-8.
+The source codes of SPVM language are written by C<UTF-8>.
 
 =head2 Line Terminators
 
-Line terminators are C<LF>, C<CR>, and C<CRLF> of ASCII.
+The line terminators are C<LF>, C<CR>, and C<CRLF> of ASCII.
 
-When a line terminator appears, the current line number is incremented. The line terminator is converted to C<LF> of ASCII .
+When a line terminator appears, the current line number is incremented by C<1>. The line terminator is converted to C<LF> of ASCII.
 
 =head2 Space Characters
 
-Space characters are C<SP>, C<HT>, C<FF> of ASCII and L</"Line Terminators">.
+Space characters are C<SP>, C<HT>, C<FF> of ASCII and the L<line terminators|/"Line Terminators">.
 
-Space characters have no meaning in programs.
+=head2 Word Characters
 
-=head2 Identifiers
+The word characters are alphabet(C<a-zA-Z>), number(C<0-9>), and underscore(C<_>) of ASCII.
 
-Identifiers are L</"Class Name">, L</"Method Names">, L</"Field Names">, L</"Class Variable Names">, and L</"Local Variable Names">.
+=head2 Symbol Name
+
+A symbol name is the characters that are composed of L<word characters|/"Word Characters"> and C<::>.
+
+A symbol name can't contains C<__>, and can't begin with a number C<0-9>.
+
+A symbol name can't begin with C<::>, and can't end with C<::>.
+
+A symbol name can't contains C<::::>, and can't begin with a number C<0-9>.
+
+  # Symbol names
+  foo
+  foo_bar2
+  Foo::Bar
+  
+  # Invalid symbol names
+  2foo
+  foo__bar
+  ::Foo
+  Foo::
+  Foo::::Bar
 
 =head2 Class Name
 
-A class names is composed of one or more alphabet(C<a-zA-Z>), number(C<0-9>), underscore(C<_>) or C<::> of ASCII.
+A class name is a L<symbol name|/"Symbol Name">.
 
-The part names of a class name must start uppercase letter. Part names means, for example, "Foo", "Bar", and "Baz" in the class name "Foo:Bar::Baz".
+The part names of a class name must begin uppercase letter. If the class name is C<Foo:Bar::Baz>, part names are C<Foo>, C<Bar>, and C<Baz>.
 
-C<::> cannot be continued twice. The last character cannot end with C<::>.
-
-Underscore C<_> cannot be continued twice.
-
-A class name must be corresponding to the relative name of the module file. If the class name is "Foo::Bar::Baz", the relative name of the module file must be "Foo/Bar/Baz.spvm".
+A class name must be corresponding to the relative name of the module file. If the class name is C<Foo::Bar::Baz>, the relative name of the module file must be C<Foo/Bar/Baz.spvm>.
 
 If class names are invalid, a compilation error will occur.
 
 B<Examples:>
   
-  # Valid class names
+  # Class names
   Foo
   Foo::Bar
   Foo::Bar::Baz3
@@ -62,15 +78,11 @@ B<Examples:>
   Foo__Bar
   Foo::bar
 
-=head2 Method Names
+=head2 Method Name
 
-A method name is composed of one or more alphabet(C<a-zA-Z>), number(C<0-9>), or underscore(C<_>) of ASCII.
+A method name is a L<symbol name|/"Symbol Name"> that doesn't contains C<::>.
 
-The first character must not a number.
-
-Underscore(C<_>) cannot be continued twice.
-
-0-length method name is valid.
+0-length method name is valid. This is used in the L<anon method|/"Anon Method">.
 
 If method names are invalid, a compilation error will occur.
 
@@ -88,26 +100,22 @@ B<Examples:>
   foo__bar
   3foo
 
-A method name can be the same as L</"Keywords">.
+A method name that is same as a L</"Keywords"> is allowed.
   
-  # "if" is a valid method name although this name is the same as the "if" keyword.
+  # "if" is a valid method name
   static method if : void () {
     
   }
 
-=head2 Field Names
+=head2 Field Name
 
-A field name is composed of one or more alphabet(C<a-zA-Z>), number(C<0-9>), or underscore(C<_>) of ASCII.
-
-The first character must not number.
-  
-Underscore(C<_>) cannot be continued twice.
+A field name is a L<symbol name|/"Symbol Name"> that doesn't contains C<::>.
 
 If field names are invalid, a compilation error will occur.
 
 B<Examples:>
 
-  # Valid field names
+  # Field names
   FOO
   FOO_BAR3
   foo
@@ -118,62 +126,86 @@ B<Examples:>
   # Invalid field names
   foo__bar
   3foo
+  Foo::Bar
 
-A field name can be the same as L</"Keywords">.
+The field name that is same as a L</"Keywords"> is allowed.
   
-  # "if" is a valid field name although this name is the same as the "if" keyword.
+  # "if" is a valid field name
   has if : int;
 
-=head2 Class Variable Names
+=head2 Variable Name
 
-A class variable name starts with C<$>, followed alphabets(C<a-zA-Z>), numbers(C<0-9>), underscores(C<_>) or C<::> of ASCII.
+A variable name begins with C<$> and is followed by a L<symbol name|/"Symbol Name">.
 
-The followed character must not start with a number.
+The L<symbol name|/"Symbol Name"> can be wrapped by C<{> and C<}>. If a opening C<{> exists and the closing C<}> doesn't exists, a compilation error will occur.
 
-C<::> cannot be continued twice. Last characters cannot end with C<::>.
+B<Examples:>
 
-Underscore(C<_>) cannot be continued twice.
+  # Variable names
+  $name
+  $my_name
+  ${name}
+  $Foo::name
+  $Foo::Bar::name
+  ${Foo::name}
+
+  # Invalid variable names
+  $::name
+  $name::
+  $Foo::::name
+  $my__name
+  ${name
+
+=head2 Class Variable Name
+
+A class variable name is a L<variable name|/"Variable Name">.
 
 If class variable names are invalid, a compilation error will occur.
 
 B<Examples:>
 
-  # Valid class variable names
-  $FOO::BAR
-  $Foo::Bar3
-  $FOO
-  $FOO_BAR
-  $foo
-
+  # Class variable names
+  $NAME
+  $MY_NAME
+  ${NAME}
+  $FOO::NAME
+  $FOO::BAR::NAME
+  ${FOO::NAME_BRACE}
+  $FOO::name
+  
   # Invalid class variable names
-  $FOO__BAR
+  $::NAME
+  $NAME::
+  $FOO::::NAME
+  $MY__NAME
   $3FOO
+  ${NAME
 
-=head2 Local Variable Names
+=head2 Local Variable Name
 
-A local variable name starts with C<$>, followed alphabets(C<a-zA-Z>), numbers(C<0-9>), underscores(C<_>) of ASCII.
-
-The followed character must not start with a number.
-
-Underscore(C<_>) cannot be continued twice.
-
-If local variable names are invalid, a compilation error will occur.
+A local variable name is a L<variable name|/"Variable Name"> that doesn't contain C<::>.
 
 B<Examples:>
 
-  # Valid local variable names
-  $foo
-  $foo_bar3
-  $_foo
-  $FOO
+  # Local variable names
+  $name
+  $my_name
+  ${name_brace}
+  $_name
+  $NAME
 
   # Invalid local variable names
-  $foo__bar
+  $::name
+  $name::
+  $Foo::name
+  $Foo::::name
+  $my__name
+  ${name
   $3foo
 
 =head2 Keywords
 
-The list of keywords.
+The list of keywords:
 
   alias
   allow
@@ -238,6 +270,7 @@ The list of keywords.
   remul
   return
   require
+  required
   rw
   ro
   static
@@ -263,7 +296,7 @@ The list of keywords.
 
 =head2 Operators for Tokenization
 
-The list of operators for tokenization.
+The list of the operators for tokenization:
 
   !
   !=
@@ -319,41 +352,62 @@ The list of operators for tokenization.
   ->
   =>
 
-Note that operators for tokenization include those that are not really operators, and do not include operators with names.
+Note that the operators for tokenization are different from the operators that are explained in L<Operators|/"Operators">. The operators for tokenization are only for tokenization.
 
 =head2 Comments
 
-A comment begins with "#" and ends with L</"Line Terminators">.
+A comment begins with C<#> and ends with a L<line terminator|/"Line Terminators">.
 
   # Comment
 
-Comments have no meaning in tokenization.
+Comments have no meaning in source codes.
 
 =head2 POD
 
-POD(Plain Old Document) is a syntax to write documents easily.
+POD(Plain Old Document) is a syntax to write documents in source codes.
 
-POD starts from the line beginning with C<=>, followed by any string that is composed of ASCII printable characters, and ending with L</"Line Terminators">.
+The biginning of POD begins with C<=>, and is followed by any string that is composed of ASCII printable characters, and end with a L<line terminator|/"Line Terminators">.
 
-POD ends from the line beginning with C<=cut>, and ending with L</"Line Terminators">.
+The previous line of the biginning of POD must need a L<line terminator|/"Line Terminators">
+
+The lator line of the biginning of POD must need a L<line terminator|/"Line Terminators">
+  
+  =pod
+  
+  =head1
+  
+  =item * foo
+  
+
+The end of POD begins with C<=>, and is followed by C<cut>, and ends with a L<line terminator|/"Line Terminators">.
+
+The previous line of the end of POD must need a L<line terminator|/"Line Terminators">
+
+The lator line of the end of POD must need a L<line terminator|/"Line Terminators">
+
+  
+  =cut
+  
 
 B<Examples:>
 
+  
   =pod
-
+  
   Multi-Line
   Comment
-
+  
   =cut
-
+  
   =head1
-
+  
   Multi-Line
   Comment
-
+  
   =cut
+  
 
-POD has no meaning in tokenization.
+POD has no meaning in source codes.
 
 =head2 Literals
 
@@ -365,17 +419,17 @@ Literals are representations of values in source codes. These are L</"Integer Li
 
 Decimal Representation of Integer Literal is represented by one or more consecutive characters from C<0> to C<9>.
 
-Can be prefixed with "+" or "-".
+Can be prefixed with C<+> or C<->.
 
 L</"Types"> of Integer Literal is L</"int Type"> by default.
 
 If Integer Literal exceeds the range of numbers that can be represented by L</"int Type">, a compilation error will occur.
 
-By suffixing "L" or "l" at the end, that represents L</"long Type"> Integer Literal.
+By suffixing C<L> or C<l> at the end, that represents L</"long Type"> Integer Literal.
 
 If L</"long Type"> Integer Literal  exceeds the range of numbers that can be represented by L</"long Type">,  If it exceeds the range, a compilation error will occur.
 
-"_" can be used as a separator. Separator has no meaning.
+C<_> can be used as a separator. Separator has no meaning.
 
 If Integer Literal is assigned to a L</"byte Type"> variable or passed to L</"byte Type"> Method Argument, and does not exceed the range of numbers that can be represented by L</"byte Type">, the L<numeric narrowing type conversion|/"Numeric Narrowing Type Conversion"> is performed and the value converted to L</"byte Type"> value. If it exceeds the range, a compilation error will occur.
 
@@ -395,7 +449,7 @@ B<Examples:>
 
 Hexadecimal Representation of Integer Literal is represented by the following rule.
 
-Hexadecimal Representation of Integer Literal starts with C<0x> or C<0X>.
+Hexadecimal Representation of Integer Literal begins with C<0x> or C<0X>.
 
 It is followed by one or more consecutive characters C<0> to C<9>, C<a> to C<f>, or C<A> to C<F>.
 
@@ -412,7 +466,7 @@ B<Examples:>
 
 Octal Representation of Integer Literal is represented by the following rule.
 
-Octal Representation of Integer Literal starts with C<0>.
+Octal Representation of Integer Literal begins with C<0>.
 
 It is followed by one or more consecutive characters C<0> to C<7>.
 
@@ -429,7 +483,7 @@ B<Examples:>
 
 Binary Representation of Integer Literal is represented by the following rule.
 
-Binary Representation of Integer Literal starts with C<0b> or C<0B>.
+Binary Representation of Integer Literal begins with C<0b> or C<0B>.
 
 It is followed by one or more consecutive characters C<0> or C<1>.
 
@@ -449,15 +503,15 @@ Floating Point Literal is composed of B<Sign Part>, B<Numeric Part>, B<Exponent 
 
 Floating Point Literal is B<Decimal Floating Point Literal> or B<Hexadecimal Floating Point Literal>.
 
-B<Sign Part> is represented by "+" or "-". Sign Part is optional.
+B<Sign Part> is represented by C<+> or C<->. Sign Part is optional.
 
-Numeric Part of Decimal Floating Point Literal starts one or more C<0> to C<9>.
+Numeric Part of Decimal Floating Point Literal begins one or more C<0> to C<9>.
 
-Numeric Part of Hexadecimal Floating Point Literal starts C<0x> or C<0X>, and is followed by C<0> to C<9>, C<a> to C<f>, or C<A> to C<F>.
+Numeric Part of Hexadecimal Floating Point Literal begins C<0x> or C<0X>, and is followed by C<0> to C<9>, C<a> to C<f>, or C<A> to C<F>.
 
 For that the Literal is Floating Point Literal, Numeric Part contains C<.> or, The Literal have Exponent Part, or have Suffix Part.
 
-Numeric part can contain "_". This is just a Numeric Separator and is ignored.
+Numeric part can contain C<_>. This is just a Numeric Separator and is ignored.
 
 Hexadecimal Floating Point Literal needs Exponent Part.
 
@@ -499,11 +553,11 @@ B<Examples:>
 
 B<Charater Literal> represents one character of ASCII.
 
-Character Literal is enclosed in single quotes "'".
+Character Literal is enclosed in single quotes C<'>.
 
 Content of Character Literal is one printable ASCII character or one Escape Character of Character Literal.
 
-Charater Literal Type is "L</"byte Type">"
+Charater Literal Type is "L</"byte TypeC<>>
 
 L</"Types"> of Charater Literal is L</"byte Type">.
 
@@ -810,7 +864,7 @@ The above is expanded as the following.
   "AAA" . $foo->{x}[3] . "BBB"
   "AAA" . $@ . "BBB"
 
-The variable name can besurround with "{" and "}" to indicate the end of the variable name.
+The variable name can besurround with C<{> and C<}> to indicate the end of the variable name.
 
   "AAA ${foo}_ccc BBB"
 
@@ -818,37 +872,38 @@ The above is expanded as the following.
 
   "AAA " . ${foo} . "_ccc BBB"
 
-If there is no enclosing "{" and "}", up to the valid part as a variable name is interpreted as a Variable. Dereference interpreting is same as this.
+If there is no enclosing C<{> and C<}>, up to the valid part as a variable name is interpreted as a Variable. Dereference interpreting is same as this.
 
 If "->" follows the variable name, it is interpreted as L</"Field Access"> or L</"Array Access">.
 
-[1] If the following Characters are "a-z" "A-Z" "0-9" "_" "{" "[", proceed with the interpretation.
+[1] If the following Characters are "a-zC< >A-ZC< >0-9C< >_C< >{C< >[", proceed with the interpretation.
 
-[2] If the Character following [1] is "}", or "]", then if the next Character is "->", "{", or "[", proceed with the interpretation and return back to [1], otherwise stop interpreting.
+[2] If the Character following [1] is C<}>, or C<]>, then if the next Character is "->", C<{>, or C<[>, proceed with the interpretation and return back to [1], otherwise stop interpreting.
 
-The trailing $is not treated as the start of Variable Expansion. It is treated as "$".
+The trailing $is not treated as the begin of Variable Expansion. It is treated as C<$>.
 
   "AAA$"
 
 =head2 Fat Comma
 
-Fat Comma is a L</"Separators"> represented by "B<=>>".
+The fat comma C<=>> is a L<separator|/"Separators">.
 
   =>
 
-Fat Comma is an alias for Comma "B<,>". Wherever you can use "B<,>" you can use Fat Comma instead.
+The fat comma is an alias for Comma C<,>.
 
   # Comma
   ["a", "b", "c", "d"]
   
-  # Use Fat Comma instead of Comma
+  # Fat Comma
   ["a" => "b", "c" => "d"]
 
-Identifiers other than L</"Class Variable Names"> and L</"Local Variable Names"> placed on the Left of Fat Comma are treated as L</"String Literal">.
+If the characters of the left operand of the fat camma is not wrapped by C<"> and the characters are a L<symbol name|/"Symbol Name"> that does'nt contain C<::>, the characters are treated as a L<string literal|/"String Literal">.
 
-  # Identifiers placed on the Left of Fat Comma are treated as String Literal
-  # a is "a", c is "c"
-  [a => "b", c => "d"]
+  # foo_bar2 is treated as "foo_bar2"
+  [foo_bar2 => "Mark"]
+
+  ["foo_bar2" => "Mark"]
 
 =head1 Syntax Parsing
 
@@ -861,7 +916,7 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
   %token <opval> CLASS HAS METHOD OUR ENUM MY USE AS REQUIRE ALIAS ALLOW CURRENT_CLASS MUTABLE
   %token <opval> DESCRIPTOR MAKE_READ_ONLY INTERFACE
   %token <opval> IF UNLESS ELSIF ELSE FOR WHILE LAST NEXT SWITCH CASE DEFAULT BREAK EVAL
-  %token <opval> NAME VAR_NAME CONSTANT EXCEPTION_VAR
+  %token <opval> SYMBOL_NAME VAR_NAME CONSTANT EXCEPTION_VAR
   %token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT TRUE FALSE END_OF_FILE
   %token <opval> DOT3 FATCAMMA RW RO WO INIT NEW OF
   %token <opval> RETURN WEAKEN DIE WARN PRINT CURRENT_CLASS_NAME UNWEAKEN '[' '{' '('
@@ -1225,8 +1280,8 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
     | field_access '[' value_op ']'
 
   call_spvm_method
-    : CURRENT_CLASS NAME '(' opt_value_ops  ')'
-    | CURRENT_CLASS NAME
+    : CURRENT_CLASS SYMBOL_NAME '(' opt_value_ops  ')'
+    | CURRENT_CLASS SYMBOL_NAME
     | class_name ARROW method_name '(' opt_value_ops  ')'
     | class_name ARROW method_name
     | value_op ARROW method_name '(' opt_value_ops ')'
@@ -1273,7 +1328,7 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
     | ref_type
 
   basic_type
-    : NAME
+    : SYMBOL_NAME
     | BYTE
     | SHORT
     | INT
@@ -1306,16 +1361,16 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
     : OF type
 
   field_name
-    : NAME
+    : SYMBOL_NAME
 
   method_name
-    : NAME
+    : SYMBOL_NAME
 
   class_name
-    : NAME
+    : SYMBOL_NAME
 
   class_alias_name
-    : NAME
+    : SYMBOL_NAME
 
 =head2 Syntax Parsing Tokens
 
@@ -1367,7 +1422,7 @@ The list of syntax parsing tokens:
     <td>CLASS</td><td>class</td>
   </tr>
   <tr>
-    <td>CLASS_VAR_NAME</td><td>A class variable name</td>
+    <td>VAR_NAME</td><td>A variable name</td>
   </tr>
   <tr>
     <td>CONSTANT</td><td>Literal</td>
@@ -1508,7 +1563,7 @@ The list of syntax parsing tokens:
     <td>MY</td><td>my</td>
   </tr>
   <tr>
-    <td>NAME</td><td>name</td>
+    <td>SYMBOL_NAME</td><td>A symbol name</td>
   </tr>
   <tr>
     <td>NEW</td><td>new</td>
@@ -2013,7 +2068,7 @@ Module can contain multiple Classes.
 
 Modules must be placed in the module loading path with the following File Name.
 
-Change "::" to "/". Add ".spvm" at the end.
+Change "::" to C</>. Add ".spvm" at the end.
 
   SPVM/Foo.spvm
   SPVM/Foo/Bar.spvm
@@ -2132,7 +2187,7 @@ The following modules are loaded by default. These modules are deeply related to
 
 =head2 Class Variable Definition
 
-B<Class Variable> is a global variable that belongs to L</"Class"> and exists from the start to the end of the program execution.
+B<Class Variable> is a global variable that belongs to L</"Class"> and exists from the begin to the end of the program execution.
 
 "our" Keyword defines a Class Variable.
 
@@ -2142,7 +2197,7 @@ Class Variable must be defined directly under L</"Class Definition">.
 
 Class Variable Definition must specify L</"Types">. The Type must be L</"Numeric Types"> or L</"Object Types">.
 
-Class variable mames must follows the rule specified in L</"Class Variable Names">, and must not contain "::", otherwise a compilation error will occur.
+Class variable mames must follows the rule specified in L</"Class Variable Name">, and must not contain "::", otherwise a compilation error will occur.
 
 If more than one Class Variable with the same name is defined, a compilation error will occur.
 
@@ -2187,7 +2242,7 @@ List of Class Variable Descriptors.
       <b>ro</b>
     </td>
     <td>
-      This Class Variable has Read Accessor. Read Accessor name is the same as class variable names except removing "$". For example, If the class variable names is "$FOO", Read Accessor name is "FOO".
+      This Class Variable has Read Accessor. Read Accessor name is the same as class variable names except removing C<$>. For example, If the class variable names is "$FOO", Read Accessor name is "FOO".
     </td>
   </tr>
   <tr>
@@ -2195,7 +2250,7 @@ List of Class Variable Descriptors.
       <b>wo</b>
     </td>
     <td>
-      This Class Variable has Write Accessor. Write Accessor name is the same as class variable names except removing "$" and adding "SET_" to top. For example, If the class variable names is "$FOO", Read Accessor name is "SET_FOO".
+      This Class Variable has Write Accessor. Write Accessor name is the same as class variable names except removing C<$> and adding "SET_" to top. For example, If the class variable names is "$FOO", Read Accessor name is "SET_FOO".
     </td>
   </tr>
   <tr>
@@ -2272,7 +2327,7 @@ Field must be defined directly under L</"Class Definition">.
 
 Field Definition must be specify L</"Types">. The Type must be L</"Numeric Types"> or L</"Object Types">.
 
-Field names must follows the rule specified in L</"Field Names">.
+Field names must follows the rule specified in L</"Field Name">.
 
 Field Type must be L</"Numeric Types"> or L</"Object Types">, otherwise a compilation error will occur.
 
@@ -2437,9 +2492,9 @@ The C<method> keyword defines a class method or an instance method.
 
 Methods must be defined directly under L</"Class Definition">.
 
-Method names must be follow the rule of L</"Method Names">.
+Method names must be follow the rule of L</"Method Name">.
 
-The argument names must be follow the rule of L</"Local Variable Names">.
+The argument names must be follow the rule of L</"Local Variable Name">.
 
 The minimal length of arguments is C<0>. The max length of arguments is C<255>.
 
@@ -2687,7 +2742,7 @@ The C<enum> keyword defines an enumeration. An enumeration defines constant valu
 
 An enumeration must be defined directly under L</"Class Definition">.
 
-The first value of an enumeration starts with C<0>. The next value is incremented by C<1>, and this is continued in the same way. In this example, C<FLAG1> is C<0>, C<FALG2> is C<1>, and C<FLAG3> is C<2>.
+The first value of an enumeration begins with C<0>. The next value is incremented by C<1>, and this is continued in the same way. In this example, C<FLAG1> is C<0>, C<FALG2> is C<1>, and C<FLAG3> is C<2>.
 
 The type of a value of an enumeration is the L<int type|/"int Type">.
 
@@ -2856,7 +2911,7 @@ Local Variable is declared using B<my> L</"Keyword">.
 
   my LOCAL_VARIABLE_NAME : TYPE;
 
-The local variable name must be follow the rule of L</"Local Variable Names">.
+The local variable name must be follow the rule of L</"Local Variable Name">.
 
 L</"Types"> must be specified. Type must be L</"Numeric Types">, L</"Object Types">, L</"Multi-Numeric Types">, or L</"Reference Type">.
 
@@ -2933,7 +2988,7 @@ B<Scope> is a range surrounded by L</"Scope Blocks">.
 
   # Scope Blocks 
   {
-    # Start of Scope
+    # Beginning of Scope
     
     # ...
     
@@ -3196,7 +3251,7 @@ Multi-Numeric Types are defined by specifying mulnum_t L</"Class Descriptors"> i
     y : double;
   }
 
-Multi-Numeric Types must end with "_", Number of Fields, L</"Multi-Numeric Types Suffix">.
+Multi-Numeric Types must end with C<_>, Number of Fields, L</"Multi-Numeric Types Suffix">.
 
 The suffix must correspond to L</"Numeric Types">.
 
@@ -4252,7 +4307,7 @@ B<Examples:>
 
 =head2 Assignment Operator
 
-Assignment Operator is a L</"Binary Operators"> for assignment, expressed in "=".
+Assignment Operator is a L</"Binary Operators"> for assignment, expressed in C<=>.
 
   LEFT_OPERAND = RIGHTH_OPERAND
 
@@ -4351,26 +4406,6 @@ Special Assignment Operator Example
   $x >>= 1;
   $x >>>= 1;
   $x .= "abc";
-
-=head2 Reference Operator
-
-The Reference Operator is an operator that retrieves the address of a variable for L</"Numeric Types"> or L</"Multi-Numeric Types">. Designed to achieve c address Operator C<*>.
-
-  \VARIABLE
-
-If the variable is not numeric type or Multi-Numeric Types, a compilation error will occur
-
-Reference Operator returns value_op. The type returned is L</"Reference Type">.
-
-B<Examples:>
-
-  my $num : int;
-  my $num_ref : int* = \$num;
-  
-  my $z : Complex_2d;
-  my $z_ref : Complex_2d* = \$z;
-
-For a detailed description of Reference, see L</"Reference">.
 
 =head2 Array Length Operator
 
@@ -4530,7 +4565,7 @@ The operand must the object that has a L<class type|/"Class Type"> or an L<inter
 
 If the class or the interface doesn't have the method declaration, a compilation error will occur.
 
-The method name must be a L<method name|/"Method Names">, otherwise a compilation error will occur.
+The method name must be a L<method name|/"Method Name">, otherwise a compilation error will occur.
 
 If method name is not specified, the method name become C<"">.
 
@@ -5000,6 +5035,26 @@ B<Examples:>
     
   }
 
+=head2 Reference Operator
+
+The reference operator C<\> is the L<operator|/"Operators"> to create a L<reference|/"Reference">.
+
+  \ OPERAND
+
+The operand must be a L<local variable|/"Local Variable"> that type is a L<numeric type|/"Numeric Types"> or a L<multi-numeric type|/"Multi-Numeric Types">. Otherwise a compilation error will occur.
+
+The return type is the L<reference type|/"Reference Type"> of the operand.
+
+B<Examples:>
+  
+  # Create the reference of a numeric type
+  my $num : int;
+  my $num_ref : int* = \$num;
+  
+  # Create the reference of a multi-numeric type
+  my $z : Complex_2d;
+  my $z_ref : Complex_2d* = \$z;
+
 =head2 Dereference Operators
 
 The dereference operators are the L<operatoers|/"Operators"> to perform a deference.
@@ -5192,7 +5247,7 @@ The above example is same as the following codes.
 The capture is a syntax to pass L<local variables|/"Local Variable"> to an L<anon method|/"Anon Method">.
 
   # Capture
-  [VariableName1 : Type1, VariableName2 : Type2] method MethodNames : int ($x1 : object, $x2 : object) {
+  [VAR_NAME1 : Type1, VAR_NAME2 : Type2] method METHOD_NAME : int ($x1 : object, $x2 : object) {
   
   };
 
@@ -7868,16 +7923,16 @@ The numeric-to-String type conversion is a L<type conversion|/"Type Conversion">
   my $float = 2.5f;
   my $double = 3.3;
   
-  # The string is "1".
+  # The string is 1.
   my $string_byte = (string)$byte;
   
-  # The string is "2".
+  # The string is 2.
   my $string_short = (string)$short;
 
-  # The string is "3".
+  # The string is 3.
   my $string_int = (string)$int;
 
-  # The string is "4".
+  # The string is 4.
   my $string_long = (string)$long;
   
   # The string is "2.5"

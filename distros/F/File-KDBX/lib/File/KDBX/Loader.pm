@@ -14,7 +14,7 @@ use Ref::Util qw(is_ref is_scalarref);
 use Scalar::Util qw(looks_like_number openhandle);
 use namespace::clean;
 
-our $VERSION = '0.902'; # VERSION
+our $VERSION = '0.903'; # VERSION
 
 
 sub new {
@@ -249,7 +249,7 @@ File::KDBX::Loader - Load KDBX files
 
 =head1 VERSION
 
-version 0.902
+version 0.903
 
 =head1 DESCRIPTION
 

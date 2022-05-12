@@ -1,7 +1,5 @@
 package Kelp::Module::Raisin;
-
-our $VERSION = '1.00';
-
+$Kelp::Module::Raisin::VERSION = '1.01';
 use Kelp::Base qw(Kelp::Module::Symbiosis::Base);
 use Plack::Util;
 use Scalar::Util qw(blessed);
@@ -119,15 +117,14 @@ Should be a full name of the package that defines an api using L<Raisin::API>. K
 
 =head1 AUTHOR
 
-Bartosz Jarzyna, E<lt>brtastic.dev@gmail.comE<gt>
+Bartosz Jarzyna, E<lt>bbrtj.pro@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2020 by Bartosz Jarzyna
+Copyright (C) 2020 - 2022 by Bartosz Jarzyna
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.10.1 or,
-at your option, any later version of Perl 5 you may have available.
-
+it under the same terms as Perl itself.
 
 =cut
+

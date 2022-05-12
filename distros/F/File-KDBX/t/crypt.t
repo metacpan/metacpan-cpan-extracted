@@ -15,6 +15,7 @@ use Test::More;
 
 subtest 'Round-trip block stream' => sub {
     plan tests => 3;
+
     my $block_cipher = File::KDBX::Cipher->new(uuid => CIPHER_UUID_AES256, key => 0x01 x 32, iv => 0x01 x 16);
     test_roundtrip($block_cipher,
         'Smell the pretty flowers.',
@@ -24,6 +25,7 @@ subtest 'Round-trip block stream' => sub {
 
 subtest 'Round-trip cipher stream' => sub {
     plan tests => 3;
+
     my $cipher_stream = File::KDBX::Cipher->new(stream_id => 2, key => 0x01 x 16);
     test_roundtrip($cipher_stream,
         'Smell the pretty flowers.',

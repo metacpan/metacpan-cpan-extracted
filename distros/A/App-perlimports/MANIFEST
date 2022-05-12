@@ -129,6 +129,12 @@ test-data/exceptional.pl
 test-data/explodes.pl
 test-data/export-tags.pl
 test-data/exported-variables.pl
+test-data/filter-paths/Foo.pl
+test-data/filter-paths/Foo.pm
+test-data/filter-paths/foo
+test-data/filter-paths/foo.py
+test-data/filter-paths/foo.t
+test-data/filter-paths/foo.txt
 test-data/find-bin.pl
 test-data/foo.pl
 test-data/foo.t

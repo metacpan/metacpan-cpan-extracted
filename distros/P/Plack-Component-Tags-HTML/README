@@ -89,7 +89,7 @@ ACCESSOR METHODS
 
 METHODS TO OVERWRITE
   "_css"
-    Method to set css via "$self-"{'css'}> object. Argument is $self only.
+    Method to set css via "$self->{'css'}" object. Argument is $self only.
 
   "_prepare_app"
     Method to set app preparation part. Called only once on start. Argument
@@ -100,7 +100,7 @@ METHODS TO OVERWRITE
     of output. Argument is $self and $env.
 
   "_tags_middle"
-    Method to set tags via "$self-"{'tags'}> object. Argument is $self only.
+    Method to set tags via "$self->{'tags'}" object. Argument is $self only.
 
 METHODS IMPLEMENTED
   "call"
@@ -124,6 +124,11 @@ METHODS IMPLEMENTED
      status_code()
 
     and run _prepare_app().
+
+ERRORS
+     prepare_app():
+             Accessor 'css' must be a 'CSS::Struct::Output' object.
+             Accessor 'tags' must be a 'Tags::Output' object.
 
 EXAMPLE1
      package App;
@@ -231,10 +236,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © Michal Josef Špaček 2021-2022
+    © Michal Josef Špaček 2020-2022
 
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.04
 

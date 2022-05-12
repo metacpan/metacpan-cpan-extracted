@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::PageAssertions;
-$Playwright::PageAssertions::VERSION = '0.019';
+$Playwright::PageAssertions::VERSION = '1.210';
 use parent 'Playwright::Base';
 
 sub new {
@@ -20,6 +20,36 @@ sub new {
 
 sub spec {
     return $Playwright::spec->{'PageAssertions'}{members};
+}
+
+sub NotToHaveURL {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'NotToHaveURL',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub toHaveTitle {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'toHaveTitle',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub toHaveScreenshot {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'toHaveScreenshot',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
 }
 
 sub NotToHaveTitle {
@@ -37,26 +67,6 @@ sub not {
     return $self->_api_request(
         args    => [@_],
         command => 'not',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub toHaveTitle {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'toHaveTitle',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub NotToHaveURL {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'NotToHaveURL',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -116,7 +126,7 @@ Playwright::PageAssertions - Automatically generated class for Playwright::PageA
 
 =head1 VERSION
 
-version 0.019
+version 1.210
 
 =head1 CONSTRUCTOR
 
@@ -126,6 +136,24 @@ You shouldn't have to call this directly.
 Instead it should be returned to you as the result of calls on Playwright objects, or objects it returns.
 
 =head1 METHODS
+
+=head2 NotToHaveURL(@args)
+
+Execute the PageAssertions::NotToHaveURL playwright routine.
+
+See L<https://playwright.dev/api/class-PageAssertions#PageAssertions-NotToHaveURL> for more information.
+
+=head2 toHaveTitle(@args)
+
+Execute the PageAssertions::toHaveTitle playwright routine.
+
+See L<https://playwright.dev/api/class-PageAssertions#PageAssertions-toHaveTitle> for more information.
+
+=head2 toHaveScreenshot(@args)
+
+Execute the PageAssertions::toHaveScreenshot playwright routine.
+
+See L<https://playwright.dev/api/class-PageAssertions#PageAssertions-toHaveScreenshot> for more information.
 
 =head2 NotToHaveTitle(@args)
 
@@ -138,18 +166,6 @@ See L<https://playwright.dev/api/class-PageAssertions#PageAssertions-NotToHaveTi
 Execute the PageAssertions::not playwright routine.
 
 See L<https://playwright.dev/api/class-PageAssertions#PageAssertions-not> for more information.
-
-=head2 toHaveTitle(@args)
-
-Execute the PageAssertions::toHaveTitle playwright routine.
-
-See L<https://playwright.dev/api/class-PageAssertions#PageAssertions-toHaveTitle> for more information.
-
-=head2 NotToHaveURL(@args)
-
-Execute the PageAssertions::NotToHaveURL playwright routine.
-
-See L<https://playwright.dev/api/class-PageAssertions#PageAssertions-NotToHaveURL> for more information.
 
 =head2 toHaveURL(@args)
 

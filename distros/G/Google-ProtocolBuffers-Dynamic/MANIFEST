@@ -50,6 +50,7 @@ t/032_map.t
 t/033_proto2_map.t
 t/034_map_incomplete.t
 t/035_required.t
+t/036_proto3_packed.t
 t/040_messages.t
 t/042_recursion.t
 t/045_enum.t
@@ -129,6 +130,7 @@ t/proto/oneof.proto
 t/proto/optional_proto3.proto
 t/proto/options.proto
 t/proto/order.proto
+t/proto/packed_proto3.proto
 t/proto/person.pb
 t/proto/person.proto
 t/proto/recurse.proto

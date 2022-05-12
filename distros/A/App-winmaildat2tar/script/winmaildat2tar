@@ -1,0 +1,68 @@
+#!/usr/bin/env perl
+
+use v5.14;
+use warnings;
+use App::winmaildat2tar;
+
+App::winmaildat2tar->new->run(@ARGV);
+
+exit;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+winmaildat2tar - Convert winmail.dat (TNEF data) to tentative archive
+
+=head1 VERSION
+
+Version 0.99
+
+=head1 SYNOPSIS
+
+$ winmaildat2tar winmail.dat > winmail.tar
+
+=head1 DESCRIPTION
+
+This command read C<winmail.dat> file in TNEF format and produce
+another tentative archive formatted data (tar by default).
+
+=over 7
+
+=item B<--format> I<format>, B<-f> ...
+
+Specify archive format from B<tar>, B<ar> or B<zip>.
+Default is B<tar>.
+
+=back
+
+=head1 INSTALL
+
+=head2 CPANMINUS
+
+To get the latest code, use this:
+
+    cpanm App-winmaildat2tar
+
+or
+
+    cpanm https://github.com/kaz-utashiro/winmaildat2tar.git
+
+=head1 SEE ALSO
+
+L<https://github.com/kaz-utashiro/winmaildat2tar>
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
+=head1 LICENSE
+
+Copyright 2020-2022 Kazumasa Utashiro.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

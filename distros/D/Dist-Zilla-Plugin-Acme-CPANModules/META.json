@@ -52,7 +52,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::Acme::CPANModules" : {
          "file" : "lib/Dist/Zilla/Plugin/Acme/CPANModules.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -67,7 +67,7 @@
          "web" : "https://github.com/perlancar/perl-Dist-Zilla-Plugin-Acme-CPANModules"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

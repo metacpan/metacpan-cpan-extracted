@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/App/winmaildat2tar.pm
+minil.toml
+script/winmaildat2tar
+t/00_compile.t
+META.yml
+MANIFEST

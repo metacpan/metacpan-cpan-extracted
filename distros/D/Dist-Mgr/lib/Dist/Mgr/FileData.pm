@@ -3,7 +3,7 @@ package Dist::Mgr::FileData;
 use warnings;
 use strict;
 
-our $VERSION = '1.10';
+our $VERSION = '1.13';
 
 use Exporter qw(import);
 our @ISA = qw(Exporter);
@@ -66,9 +66,9 @@ sub _ci_github_file {
         qq{name: CI},
         qq{on:},
         qq{  push:},
-        qq{    branches: [ master ]},
+        qq{    branches: [ main ]},
         qq{  pull_request:},
-        qq{    branches: [ master ]},
+        qq{    branches: [ main ]},
         qq{  workflow_dispatch:},
         qq{jobs:},
         qq{  build:},
@@ -76,22 +76,27 @@ sub _ci_github_file {
         qq{    strategy:},
         qq{      matrix:},
         qq{        os: $os_matrix},
-        qq{        perl: [ '5.32', '5.24', '5.18', '5.14', '5.10' ]},
+        qq{        perl: [ '5.34', '5.32', '5.28', '5.24', '5.18', '5.14' ]},
         qq{        include:},
         qq{          - perl: '5.32'},
         qq{            os: ubuntu-latest},
         qq{            coverage: true},
         qq{    name: Perl \${{ matrix.perl }} on \${{ matrix.os }}},
         qq{    steps:},
-        qq{      - uses: actions/checkout\@v2},
+        qq{      - uses: actions/checkout\@v3},
         qq{      - name: Set up perl},
         qq{        uses: shogo82148/actions-setup-perl\@v1},
         qq{        with:},
         qq{          perl-version: \${{ matrix.perl }}},
-        qq{      - run: perl -V},
-        qq{      - run: cpanm ExtUtils::PL2Bat},
-        qq{      - run: cpanm ExtUtils::MakeMaker},
-        qq{      - run: cpanm --installdeps .},
+        qq{      - name: Perl version},
+        qq{        run: perl -V},
+        qq{      - name: Set up Windows},
+        qq{        if: matrix.os != 'windows-latest'},
+        qq{        run: cpanm ExtUtils::PL2Bat},
+        qq{      - name: Install prereqs},
+        qq{        run: |},
+        qq{         cpanm ExtUtils::MakeMaker},
+        qq{         cpanm --installdeps .},
         qq{      - name: Run tests (no coverage)},
         qq{        if: \${{ !matrix.coverage }}},
         qq{        run: prove -lv t},
@@ -148,7 +153,7 @@ sub _module_section_ci_badges {
         qq{},
         qq{=for html},
         qq{<a href="https://github.com/$author/$repo/actions"><img src="https://github.com/$author/$repo/workflows/CI/badge.svg"/></a>},
-        qq{<a href='https://coveralls.io/github/$author/$repo?branch=master'><img src='https://coveralls.io/repos/$author/$repo/badge.svg?branch=master&service=github' alt='Coverage Status' /></a>},
+        qq{<a href='https://coveralls.io/github/$author/$repo?branch=main'><img src='https://coveralls.io/repos/$author/$repo/badge.svg?branch=main&service=github' alt='Coverage Status' /></a>},
         qq{},
     );
 }
@@ -275,7 +280,6 @@ sub _manifest_skip_file {
         q{pm_to_blib$},
         q{.git/},
         q{.debug$},
-        q{.github/},
         q{.gitignore$},
         q{^\w+.pl$},
         q{.ignore.txt$},
@@ -290,6 +294,7 @@ sub _manifest_skip_file {
         q{BB-Fail/},
         q{cover_db/},
         q{scrap\.pl},
+        q{^\.github/}
     );
 }
 sub _manifest_t_file {

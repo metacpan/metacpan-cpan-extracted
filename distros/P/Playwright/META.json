@@ -78,215 +78,219 @@
    "provides" : {
       "Playwright" : {
          "file" : "lib/Playwright.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::APIRequest" : {
          "file" : "lib/Playwright/APIRequest.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::APIRequestContext" : {
          "file" : "lib/Playwright/APIRequestContext.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::APIResponse" : {
          "file" : "lib/Playwright/APIResponse.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::APIResponseAssertions" : {
          "file" : "lib/Playwright/APIResponseAssertions.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::Accessibility" : {
          "file" : "lib/Playwright/Accessibility.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::Android" : {
          "file" : "lib/Playwright/Android.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::AndroidDevice" : {
          "file" : "lib/Playwright/AndroidDevice.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::AndroidInput" : {
          "file" : "lib/Playwright/AndroidInput.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::AndroidSocket" : {
          "file" : "lib/Playwright/AndroidSocket.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::AndroidWebView" : {
          "file" : "lib/Playwright/AndroidWebView.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::Base" : {
          "file" : "lib/Playwright/Base.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::Browser" : {
          "file" : "lib/Playwright/Browser.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::BrowserContext" : {
          "file" : "lib/Playwright/BrowserContext.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::BrowserServer" : {
          "file" : "lib/Playwright/BrowserServer.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::BrowserType" : {
          "file" : "lib/Playwright/BrowserType.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::CDPSession" : {
          "file" : "lib/Playwright/CDPSession.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::ConsoleMessage" : {
          "file" : "lib/Playwright/ConsoleMessage.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::Coverage" : {
          "file" : "lib/Playwright/Coverage.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::Dialog" : {
          "file" : "lib/Playwright/Dialog.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::Download" : {
          "file" : "lib/Playwright/Download.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::Electron" : {
          "file" : "lib/Playwright/Electron.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::ElectronApplication" : {
          "file" : "lib/Playwright/ElectronApplication.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::ElementHandle" : {
          "file" : "lib/Playwright/ElementHandle.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::Error" : {
          "file" : "lib/Playwright/Error.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::FileChooser" : {
          "file" : "lib/Playwright/FileChooser.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::FormData" : {
          "file" : "lib/Playwright/FormData.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::Frame" : {
          "file" : "lib/Playwright/Frame.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::FrameLocator" : {
          "file" : "lib/Playwright/FrameLocator.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::JSHandle" : {
          "file" : "lib/Playwright/JSHandle.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::Keyboard" : {
          "file" : "lib/Playwright/Keyboard.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::Locator" : {
          "file" : "lib/Playwright/Locator.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::LocatorAssertions" : {
          "file" : "lib/Playwright/LocatorAssertions.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::Logger" : {
          "file" : "lib/Playwright/Logger.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::ModuleList" : {
          "file" : "lib/Playwright/ModuleList.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::Mouse" : {
          "file" : "lib/Playwright/Mouse.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::Page" : {
          "file" : "lib/Playwright/Page.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::PageAssertions" : {
          "file" : "lib/Playwright/PageAssertions.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::PlaywrightAssertions" : {
          "file" : "lib/Playwright/PlaywrightAssertions.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::PlaywrightException" : {
          "file" : "lib/Playwright/PlaywrightException.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::Request" : {
          "file" : "lib/Playwright/Request.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::RequestOptions" : {
          "file" : "lib/Playwright/RequestOptions.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::Response" : {
          "file" : "lib/Playwright/Response.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::Route" : {
          "file" : "lib/Playwright/Route.pm",
-         "version" : "0.019"
+         "version" : "1.210"
+      },
+      "Playwright::ScreenshotAssertions" : {
+         "file" : "lib/Playwright/ScreenshotAssertions.pm",
+         "version" : "1.210"
       },
       "Playwright::Selectors" : {
          "file" : "lib/Playwright/Selectors.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::TimeoutError" : {
          "file" : "lib/Playwright/TimeoutError.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::Touchscreen" : {
          "file" : "lib/Playwright/Touchscreen.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::Tracing" : {
          "file" : "lib/Playwright/Tracing.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::Util" : {
          "file" : "lib/Playwright/Util.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::Video" : {
          "file" : "lib/Playwright/Video.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::WebSocket" : {
          "file" : "lib/Playwright/WebSocket.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::WebSocketFrame" : {
          "file" : "lib/Playwright/WebSocketFrame.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       },
       "Playwright::Worker" : {
          "file" : "lib/Playwright/Worker.pm",
-         "version" : "0.019"
+         "version" : "1.210"
       }
    },
    "release_status" : "stable",
@@ -301,7 +305,7 @@
          "web" : "https://github.com/teodesian/playwright-perl"
       }
    },
-   "version" : "0.019",
+   "version" : "1.210",
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
 }

@@ -13,7 +13,7 @@ use namespace::clean;
 
 extends 'File::KDBX::IO';
 
-our $VERSION = '0.902'; # VERSION
+our $VERSION = '0.903'; # VERSION
 our $BLOCK_SIZE = 1048576;  # 1MiB
 our $ERROR;
 
@@ -212,7 +212,7 @@ File::KDBX::IO::HmacBlock - HMAC block stream IO handle
 
 =head1 VERSION
 
-version 0.902
+version 0.903
 
 =head1 DESCRIPTION
 

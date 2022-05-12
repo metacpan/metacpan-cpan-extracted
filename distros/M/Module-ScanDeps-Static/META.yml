@@ -1,0 +1,32 @@
+---
+abstract: 'scan modules for dependencies'
+author:
+  - 'Rob Lauer <rlauer6@comcast.net>'
+build_requires:
+  Class::Accessor::Fast: '0.51'
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0'
+  Readonly: '2.05'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Module-ScanDeps-Static
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Module::ScanDeps::Static:
+    file: lib/Module/ScanDeps/Static.pm
+    version: '0.1'
+requires:
+  Class::Accessor::Fast: '0.51'
+  Readonly: '2.05'
+version: '0.1'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

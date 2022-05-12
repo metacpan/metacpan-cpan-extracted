@@ -77,4 +77,4 @@ const char *get_b_value(klass);
     RETVAL = Foo::get_b_value();
   OUTPUT:
     RETVAL
-  
+

@@ -1,7 +1,5 @@
 package Quantum::Superpositions::Lazy::Statistics;
-
-our $VERSION = '1.11';
-
+$Quantum::Superpositions::Lazy::Statistics::VERSION = '1.12';
 use v5.24;
 use warnings;
 use Moo;
@@ -389,3 +387,4 @@ Also note that a I<local> keyword can be used to replace the implementation only
 I<parent> is a weak ref. Because of this, this (and many others) will explode:
 
 	superpos(1)->stats->most_probable;
+

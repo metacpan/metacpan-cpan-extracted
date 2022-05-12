@@ -1,3 +1,9 @@
+0.010   2022-05-08  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] In generated Synopsis, show how to use the pattern(s)
+	  directly without Regexp::Pattern.
+
+
 0.009   2021-07-21  Released-By: PERLANCAR; Urgency: medium
 
 	- Show pattern's tags in generated POD.

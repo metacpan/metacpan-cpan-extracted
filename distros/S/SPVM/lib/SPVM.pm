@@ -1,6 +1,6 @@
 package SPVM;
 
-our $VERSION = '0.9515';
+our $VERSION = '0.9516';
 
 use 5.008007;
 use strict;
@@ -335,15 +335,15 @@ sub call_spvm_method {
 
 =head1 NAME
 
-SPVM - Static Perl Virtual Machine. Fast Calculation, Fast Array Operation, and Easy C/C++ Binding.
+SPVM - SPVM Language
 
 =head1 CAUTHION
 
-B<L<SPVM> is not yet 1.0. Please note L<SPVM> can change without warnings. There can be a lot of changes until I feel good enough.>
+B<C<SPVM> is not yet 1.0 release. C<SPVM> is quit often changed without warnings until I feel the implementation is enough good.>
 
 =head1 SYNOPSIS
 
-SPVM Module:
+Write a SPVM Module:
 
   # lib/SPVM/MyMath.spvm
   class MyMath {
@@ -358,9 +358,9 @@ SPVM Module:
     }
   }
 
-Call SPVM method from Perl:
+Call the SPVM method from Perl:
 
-  # spvm.pl
+  # sum.pl
   use strict;
   use warnings;
   use FindBin;
@@ -371,49 +371,11 @@ Call SPVM method from Perl:
   # Call method
   my $total = SPVM::MyMath->sum([3, 6, 8, 9]);
 
-  print "Total: $total\n";
-
-  # Call method with packed data
-  my $nums_packed = pack('l*', 3, 6, 8, 9);
-  my $sv_nums = SPVM::new_int_array_from_bin($nums_packed);
-  my $total_packed = SPVM::MyMath->sum($sv_nums);
-
-  print "Total Packed: $total_packed\n";
-
-Precompiled SPVM Method. This code is converted to C language and then converted to a shared library.
-
-  # lib/SPVM/MyMath.spvm
-  class MyMath : precompile {
-    static method sum : int ($nums : int[]) {
-
-      my $total = 0;
-      for (my $i = 0; $i < @$nums; $i++) {
-        $total += $nums->[$i];
-      }
-
-      return $total;
-    }
-  }
+  print "$total\n";
 
 =head1 DESCRIPTION
 
-SPVM is a Static Perl Virtual Machine. SPVM is a programming language which has Perlish syntax. SPVM provides fast calculation & easy C/C++ Binding.
-
-=head1 FEATURES
-
-=over 4
-
-=item * Fast calculation, Fast array operation
-
-=item * Precompile Method, Easy way to C/C++ binding, C99 math functions
-
-=item * Perlish syntax, Static typing, Type inference
-
-=item * Reference count GC, Weaken reference, Exception, Module
-
-=item * Object oriented programming
-
-=back
+B<SPVM>(Static Perl Virtual Machine) is a perl-ish static typed programing language. SPVM provides fast calculation, fast array operations, easy C/C++ binding, and creating executable files.
 
 =head1 DOCUMENT
 
@@ -439,16 +401,6 @@ SPVM Language Specification.
 
 =back
 
-=head2 Standard Functions
-
-SPVM Standard Functions
-
-=over 2
-
-=item * L<Standard Functions|SPVM::Fn>
-
-=back
-
 =head2 Standard Modules
 
 SPVM Standard Modules.
@@ -459,19 +411,9 @@ SPVM Standard Modules.
 
 =back
 
-=head2 Performance Benchmark
+=head2 Exchange APIs
 
-SPVM Performance Benchmark.
-
-=over 2
-
-=item * L<Benchmark|SPVM::Document::Benchmark>
-
-=back
-
-=head2 Exchange API
-
-SPVM Exchange API converts Perl data structures to SPVM data structures, and vice versa.
+SPVM Exchange APIs is functions to convert between Perl data structures and SPVM data structures.
 
 =over 2
 
@@ -479,19 +421,29 @@ SPVM Exchange API converts Perl data structures to SPVM data structures, and vic
 
 =back
 
-=head2 Native API
+=head2 Native Method
 
-SPVM Native API is C API used in SPVM native method.
+Native methods are the methods that implementations are writen by native language such as C<C language> or C<C++>.
 
 =over 2
 
-=item * L<NativeAPI|SPVM::Document::NativeAPI>
+=item * L<Native Method|SPVM::Document::NativeMethod>
 
 =back
 
-=head2 Generate Execution File
+=head2 Native APIs
 
-B<spvmcc> is a compiler to compile SPVM source codes to a execution file. The execution file can be run by itself.
+SPVM native APIs are public APIs that are used in native language sources such as C<C language> or C<C++>.
+
+=over 2
+
+=item * L<Native APIs|SPVM::Document::NativeAPI>
+
+=back
+
+=head2 Creating Executable File
+
+C<spvmcc> is the compiler and linker to create the executable file from SPVM source codes.
 
 =over 2
 
@@ -499,9 +451,9 @@ B<spvmcc> is a compiler to compile SPVM source codes to a execution file. The ex
 
 =back
 
-=head2 Generate SPVM Native Modules
+=head2 Creating SPVM Modules
 
-B<spvmgenlib> is the command to generate SPVM native modules.
+C<spvmgenlib> is the command to create SPVM native modules.
 
 =over 2
 
@@ -509,41 +461,41 @@ B<spvmgenlib> is the command to generate SPVM native modules.
 
 =back
 
-=head1 ENVIRONMENT VARIABLE
+=head2 Benchmark
+
+SPVM performance benchmarks.
+
+=over 2
+
+=item * L<Benchmark|SPVM::Document::Benchmark>
+
+=back
+
+=head1 ENVIRONMENT VARIABLES
 
 =head2 SPVM_BUILD_DIR
 
-SPVM build directory for precompile and native method.
-
-If SPVM_BUILD_DIR environment variable is not set, SPVM can't compile precompile method and native method, and a exception occur. You see error message "SPVM_BUILD_DIR environment variable must be set ...".
+SPVM building directory to build C<precompile> and C<native> methods. If the C<SPVM_BUILD_DIR> environment variable is not set, the building of C<precompile> and C<native> methods fails.
 
 B<bash:>
-
-In bash, you can set SPVM_BUILD_DIR to the following.
 
   export SPVM_BUILD_DIR=~/.spvm_build
 
 B<csh:>
 
-In csh, you can set SPVM_BUILD_DIR to the following.
-
   setenv SPVM_BUILD_DIR ~/.spvm_build
 
 =head2 SPVM_CC_DEBUG
 
-Print L<SVPM::Builder::CC> compile and link outputs to stderr.
+Print debug messages of L<SPVM::Builder::CC> to stderr.
 
 =head2 SPVM_CC_FORCE
 
-Force L<SVPM::Builder::CC> compile and link.
-
-=head1 CAUTION
-
-This release is a beta release before SPVM 1.0. The features can change without notice. Use at your own risk.
+Force the compilation and the link of L<SPVM::Builder::CC>.
 
 =head1 REPOSITORY
 
-L<SPVM - Github|https://github.com/yuki-kimoto/SPVM>
+L<Github|https://github.com/yuki-kimoto/SPVM>
 
 =head1 BUG REPORT
 
@@ -579,11 +531,13 @@ motiE<lt>motohiko.ave@gmail.comE<gt>
 
 =item * Yasuaki Omokawa
 
+=item * Suman Khanal
+
 =back
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2018-2021 Yuki Kimoto, all rights reserved.
+Copyright 2018-2022 Yuki Kimoto, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

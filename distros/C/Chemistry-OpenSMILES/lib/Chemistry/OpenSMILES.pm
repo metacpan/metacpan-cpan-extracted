@@ -5,7 +5,7 @@ use warnings;
 use 5.0100;
 
 # ABSTRACT: OpenSMILES format reader and writer
-our $VERSION = '0.8.0'; # VERSION
+our $VERSION = '0.8.1'; # VERSION
 
 require Exporter;
 our @ISA = qw( Exporter );
@@ -13,7 +13,10 @@ our @EXPORT_OK = qw(
     clean_chiral_centers
     is_aromatic
     is_chiral
+    is_cis_trans_bond
+    is_single_bond
     mirror
+    toggle_cistrans
 );
 
 use List::Util qw(any);
@@ -21,6 +24,7 @@ use List::Util qw(any);
 sub is_chiral($);
 sub is_chiral_tetrahedral($);
 sub mirror($);
+sub toggle_cistrans($);
 
 # Removes chiral setting from tetrahedral chiral centers with less than
 # four distinct neighbours. Only tetrahedral chiral centers with four atoms
@@ -77,6 +81,20 @@ sub is_chiral_tetrahedral($)
     }
 }
 
+sub is_cis_trans_bond($)
+{
+    my( $moiety, $a, $b ) = @_;
+    return $moiety->has_edge_attribute( $a, $b, 'bond' ) &&
+           $moiety->get_edge_attribute( $a, $b, 'bond' ) =~ /^[\\\/]$/;
+}
+
+sub is_single_bond($)
+{
+    my( $moiety, $a, $b ) = @_;
+    return !$moiety->has_edge_attribute( $a, $b, 'bond' ) ||
+            $moiety->get_edge_attribute( $a, $b, 'bond' ) eq '-';
+}
+
 sub mirror($)
 {
     my( $what ) = @_;
@@ -90,6 +108,11 @@ sub mirror($)
             mirror( $_ );
         }
     }
+}
+
+sub toggle_cistrans($)
+{
+    return $_[0] eq '/' ? '\\' : '/';
 }
 
 # CAVEAT: requires output from non-raw parsing due issue similar to GH#2
@@ -211,7 +234,7 @@ sub _neighbours_per_bond_type
         }
         if( $bond_type =~ /^[\\\/]$/ &&
             $atom->{number} > $neighbour->{number} ) {
-            $bond_type = $bond_type eq '\\' ? '/' : '\\';
+            $bond_type = toggle_cistrans $bond_type;
         }
         push @{$bond_types{$bond_type}}, $neighbour;
     }

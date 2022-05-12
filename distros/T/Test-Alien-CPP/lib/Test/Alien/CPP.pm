@@ -9,7 +9,7 @@ use Text::ParseWords qw( shellwords );
 use base qw( Exporter );
 
 # ABSTRACT: Testing tools for Alien modules for projects that use C++
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.03'; # VERSION
 
 
 our @EXPORT = @Test::Alien::EXPORT;
@@ -74,12 +74,12 @@ Test::Alien::CPP - Testing tools for Alien modules for projects that use C++
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =head1 SYNOPSIS
 
  use Test2::V0;
- use Test::Alien;
+ use Test::Alien::CPP;
  use Alien::libmycpplib;
  
  alien_ok 'ALien::libmycpplib';
@@ -145,7 +145,7 @@ Roy Storey (KIWIROY)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

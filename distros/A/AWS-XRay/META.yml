@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.18, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +29,7 @@ no_index:
 provides:
   AWS::XRay:
     file: lib/AWS/XRay.pm
-    version: '0.11'
+    version: '0.12'
   AWS::XRay::Buffer:
     file: lib/AWS/XRay/Buffer.pm
   AWS::XRay::Plugin::EC2:
@@ -46,17 +46,18 @@ requires:
   Module::Load: '0'
   Time::HiRes: '0'
   Types::Serialiser: '0'
-  perl: '5.012000'
+  perl: '5.016000'
 resources:
   bugtracker: https://github.com/fujiwara/AWS-XRay/issues
   homepage: https://github.com/fujiwara/AWS-XRay
-  repository: git://github.com/fujiwara/AWS-XRay.git
-version: '0.11'
+  repository: https://github.com/fujiwara/AWS-XRay.git
+version: '0.12'
 x_authority: cpan:FUJIWARA
 x_contributors:
   - 'Ichinose Shogo <shogo82148@gmail.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Pedro Melo <melo@simplicidade.org>'
+  - 'hitode909 <hitode909@gmail.com>'
   - 'moznion <moznion@gmail.com>'
   - 'mutsutoshi.yoshimoto <mutsutoshi.yoshimoto@20202759n.guest.mixi.co.jp>'
   - 'papix <mail@papix.net>'

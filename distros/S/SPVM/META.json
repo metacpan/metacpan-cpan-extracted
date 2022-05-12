@@ -1,16 +1,16 @@
 {
-   "abstract" : "Static Perl Virtual Machine. Fast Calculation, Fast Array Operation, and Easy C/C++ Binding.",
+   "abstract" : "SPVM Language",
    "author" : [
       "Yuki Kimoto<kimoto.yuki@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "SPVM",
    "no_index" : {
@@ -49,6 +49,5 @@
          "web" : "https://github.com/yuki-kimoto/SPVM"
       }
    },
-   "version" : "0.9515",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.9516"
 }

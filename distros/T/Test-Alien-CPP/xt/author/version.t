@@ -6,10 +6,10 @@ BEGIN {
 
   plan skip_all => "test requires Test::Version 2.00"
     unless eval q{
-      use Test::Version 2.00 qw( version_all_ok ), { 
+      use Test::Version 2.00 qw( version_all_ok ), {
         has_version    => 1,
         filename_match => sub { $_[0] !~ m{/(ConfigData|Install/Files)\.pm$} },
-      }; 
+      };
       1
     };
 

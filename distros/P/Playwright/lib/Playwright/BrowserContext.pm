@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::BrowserContext;
-$Playwright::BrowserContext::VERSION = '0.019';
+$Playwright::BrowserContext::VERSION = '1.210';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,251 +22,11 @@ sub spec {
     return $Playwright::spec->{'BrowserContext'}{members};
 }
 
-sub newCDPSession {
+sub serviceWorkers {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'newCDPSession',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub route {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'route',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub exposeBinding {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'exposeBinding',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub grantPermissions {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'grantPermissions',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub addInitScript {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'addInitScript',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub page {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'page',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub backgroundPage {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'backgroundPage',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub clearPermissions {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'clearPermissions',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub setOffline {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'setOffline',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub setGeolocation {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'setGeolocation',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub waitForEvent {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'waitForEvent',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub setDefaultTimeout {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'setDefaultTimeout',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub serviceWorker {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'serviceWorker',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub tracing {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'tracing',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub requestFailed {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'requestFailed',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub backgroundPages {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'backgroundPages',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub close {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'close',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub exposeFunction {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'exposeFunction',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub response {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'response',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub clearCookies {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'clearCookies',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub waitForPage {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'waitForPage',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub requestFinished {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'requestFinished',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub cookies {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'cookies',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub request {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'request',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub browser {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'browser',
+        command => 'serviceWorkers',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -282,11 +42,51 @@ sub setExtraHTTPHeaders {
     );
 }
 
-sub unroute {
+sub backgroundPage {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'unroute',
+        command => 'backgroundPage',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub browser {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'browser',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub exposeFunction {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'exposeFunction',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub clearCookies {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'clearCookies',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub request {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'request',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -302,51 +102,51 @@ sub waitForEvent2 {
     );
 }
 
-sub addCookies {
+sub setOffline {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'addCookies',
+        command => 'setOffline',
         object  => $self->{guid},
         type    => $self->{type}
     );
 }
 
-sub storageState {
+sub page {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'storageState',
+        command => 'page',
         object  => $self->{guid},
         type    => $self->{type}
     );
 }
 
-sub serviceWorkers {
+sub setHTTPCredentials {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'serviceWorkers',
+        command => 'setHTTPCredentials',
         object  => $self->{guid},
         type    => $self->{type}
     );
 }
 
-sub setDefaultNavigationTimeout {
+sub grantPermissions {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'setDefaultNavigationTimeout',
+        command => 'grantPermissions',
         object  => $self->{guid},
         type    => $self->{type}
     );
 }
 
-sub newPage {
+sub waitForPage {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'newPage',
+        command => 'waitForPage',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -362,11 +162,211 @@ sub pages {
     );
 }
 
-sub setHTTPCredentials {
+sub addCookies {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'setHTTPCredentials',
+        command => 'addCookies',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub newPage {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'newPage',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub route {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'route',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub backgroundPages {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'backgroundPages',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub waitForEvent {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'waitForEvent',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub setDefaultNavigationTimeout {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'setDefaultNavigationTimeout',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub newCDPSession {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'newCDPSession',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub requestFinished {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'requestFinished',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub clearPermissions {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'clearPermissions',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub serviceWorker {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'serviceWorker',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub setGeolocation {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'setGeolocation',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub setDefaultTimeout {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'setDefaultTimeout',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub addInitScript {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'addInitScript',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub close {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'close',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub requestFailed {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'requestFailed',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub cookies {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'cookies',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub exposeBinding {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'exposeBinding',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub response {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'response',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub tracing {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'tracing',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub unroute {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'unroute',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub storageState {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'storageState',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -416,7 +416,7 @@ Playwright::BrowserContext - Automatically generated class for Playwright::Brows
 
 =head1 VERSION
 
-version 0.019
+version 1.210
 
 =head1 CONSTRUCTOR
 
@@ -427,155 +427,11 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 newCDPSession(@args)
+=head2 serviceWorkers(@args)
 
-Execute the BrowserContext::newCDPSession playwright routine.
+Execute the BrowserContext::serviceWorkers playwright routine.
 
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-newCDPSession> for more information.
-
-=head2 route(@args)
-
-Execute the BrowserContext::route playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-route> for more information.
-
-=head2 exposeBinding(@args)
-
-Execute the BrowserContext::exposeBinding playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-exposeBinding> for more information.
-
-=head2 grantPermissions(@args)
-
-Execute the BrowserContext::grantPermissions playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-grantPermissions> for more information.
-
-=head2 addInitScript(@args)
-
-Execute the BrowserContext::addInitScript playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-addInitScript> for more information.
-
-=head2 page(@args)
-
-Execute the BrowserContext::page playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-page> for more information.
-
-=head2 backgroundPage(@args)
-
-Execute the BrowserContext::backgroundPage playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-backgroundPage> for more information.
-
-=head2 clearPermissions(@args)
-
-Execute the BrowserContext::clearPermissions playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-clearPermissions> for more information.
-
-=head2 setOffline(@args)
-
-Execute the BrowserContext::setOffline playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-setOffline> for more information.
-
-=head2 setGeolocation(@args)
-
-Execute the BrowserContext::setGeolocation playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-setGeolocation> for more information.
-
-=head2 waitForEvent(@args)
-
-Execute the BrowserContext::waitForEvent playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-waitForEvent> for more information.
-
-=head2 setDefaultTimeout(@args)
-
-Execute the BrowserContext::setDefaultTimeout playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-setDefaultTimeout> for more information.
-
-=head2 serviceWorker(@args)
-
-Execute the BrowserContext::serviceWorker playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-serviceWorker> for more information.
-
-=head2 tracing(@args)
-
-Execute the BrowserContext::tracing playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-tracing> for more information.
-
-=head2 requestFailed(@args)
-
-Execute the BrowserContext::requestFailed playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-requestFailed> for more information.
-
-=head2 backgroundPages(@args)
-
-Execute the BrowserContext::backgroundPages playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-backgroundPages> for more information.
-
-=head2 close(@args)
-
-Execute the BrowserContext::close playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-close> for more information.
-
-=head2 exposeFunction(@args)
-
-Execute the BrowserContext::exposeFunction playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-exposeFunction> for more information.
-
-=head2 response(@args)
-
-Execute the BrowserContext::response playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-response> for more information.
-
-=head2 clearCookies(@args)
-
-Execute the BrowserContext::clearCookies playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-clearCookies> for more information.
-
-=head2 waitForPage(@args)
-
-Execute the BrowserContext::waitForPage playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-waitForPage> for more information.
-
-=head2 requestFinished(@args)
-
-Execute the BrowserContext::requestFinished playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-requestFinished> for more information.
-
-=head2 cookies(@args)
-
-Execute the BrowserContext::cookies playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-cookies> for more information.
-
-=head2 request(@args)
-
-Execute the BrowserContext::request playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-request> for more information.
-
-=head2 browser(@args)
-
-Execute the BrowserContext::browser playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-browser> for more information.
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-serviceWorkers> for more information.
 
 =head2 setExtraHTTPHeaders(@args)
 
@@ -583,11 +439,35 @@ Execute the BrowserContext::setExtraHTTPHeaders playwright routine.
 
 See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-setExtraHTTPHeaders> for more information.
 
-=head2 unroute(@args)
+=head2 backgroundPage(@args)
 
-Execute the BrowserContext::unroute playwright routine.
+Execute the BrowserContext::backgroundPage playwright routine.
 
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-unroute> for more information.
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-backgroundPage> for more information.
+
+=head2 browser(@args)
+
+Execute the BrowserContext::browser playwright routine.
+
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-browser> for more information.
+
+=head2 exposeFunction(@args)
+
+Execute the BrowserContext::exposeFunction playwright routine.
+
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-exposeFunction> for more information.
+
+=head2 clearCookies(@args)
+
+Execute the BrowserContext::clearCookies playwright routine.
+
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-clearCookies> for more information.
+
+=head2 request(@args)
+
+Execute the BrowserContext::request playwright routine.
+
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-request> for more information.
 
 =head2 waitForEvent2(@args)
 
@@ -595,35 +475,35 @@ Execute the BrowserContext::waitForEvent2 playwright routine.
 
 See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-waitForEvent2> for more information.
 
-=head2 addCookies(@args)
+=head2 setOffline(@args)
 
-Execute the BrowserContext::addCookies playwright routine.
+Execute the BrowserContext::setOffline playwright routine.
 
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-addCookies> for more information.
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-setOffline> for more information.
 
-=head2 storageState(@args)
+=head2 page(@args)
 
-Execute the BrowserContext::storageState playwright routine.
+Execute the BrowserContext::page playwright routine.
 
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-storageState> for more information.
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-page> for more information.
 
-=head2 serviceWorkers(@args)
+=head2 setHTTPCredentials(@args)
 
-Execute the BrowserContext::serviceWorkers playwright routine.
+Execute the BrowserContext::setHTTPCredentials playwright routine.
 
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-serviceWorkers> for more information.
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-setHTTPCredentials> for more information.
 
-=head2 setDefaultNavigationTimeout(@args)
+=head2 grantPermissions(@args)
 
-Execute the BrowserContext::setDefaultNavigationTimeout playwright routine.
+Execute the BrowserContext::grantPermissions playwright routine.
 
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-setDefaultNavigationTimeout> for more information.
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-grantPermissions> for more information.
 
-=head2 newPage(@args)
+=head2 waitForPage(@args)
 
-Execute the BrowserContext::newPage playwright routine.
+Execute the BrowserContext::waitForPage playwright routine.
 
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-newPage> for more information.
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-waitForPage> for more information.
 
 =head2 pages(@args)
 
@@ -631,11 +511,131 @@ Execute the BrowserContext::pages playwright routine.
 
 See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-pages> for more information.
 
-=head2 setHTTPCredentials(@args)
+=head2 addCookies(@args)
 
-Execute the BrowserContext::setHTTPCredentials playwright routine.
+Execute the BrowserContext::addCookies playwright routine.
 
-See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-setHTTPCredentials> for more information.
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-addCookies> for more information.
+
+=head2 newPage(@args)
+
+Execute the BrowserContext::newPage playwright routine.
+
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-newPage> for more information.
+
+=head2 route(@args)
+
+Execute the BrowserContext::route playwright routine.
+
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-route> for more information.
+
+=head2 backgroundPages(@args)
+
+Execute the BrowserContext::backgroundPages playwright routine.
+
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-backgroundPages> for more information.
+
+=head2 waitForEvent(@args)
+
+Execute the BrowserContext::waitForEvent playwright routine.
+
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-waitForEvent> for more information.
+
+=head2 setDefaultNavigationTimeout(@args)
+
+Execute the BrowserContext::setDefaultNavigationTimeout playwright routine.
+
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-setDefaultNavigationTimeout> for more information.
+
+=head2 newCDPSession(@args)
+
+Execute the BrowserContext::newCDPSession playwright routine.
+
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-newCDPSession> for more information.
+
+=head2 requestFinished(@args)
+
+Execute the BrowserContext::requestFinished playwright routine.
+
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-requestFinished> for more information.
+
+=head2 clearPermissions(@args)
+
+Execute the BrowserContext::clearPermissions playwright routine.
+
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-clearPermissions> for more information.
+
+=head2 serviceWorker(@args)
+
+Execute the BrowserContext::serviceWorker playwright routine.
+
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-serviceWorker> for more information.
+
+=head2 setGeolocation(@args)
+
+Execute the BrowserContext::setGeolocation playwright routine.
+
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-setGeolocation> for more information.
+
+=head2 setDefaultTimeout(@args)
+
+Execute the BrowserContext::setDefaultTimeout playwright routine.
+
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-setDefaultTimeout> for more information.
+
+=head2 addInitScript(@args)
+
+Execute the BrowserContext::addInitScript playwright routine.
+
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-addInitScript> for more information.
+
+=head2 close(@args)
+
+Execute the BrowserContext::close playwright routine.
+
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-close> for more information.
+
+=head2 requestFailed(@args)
+
+Execute the BrowserContext::requestFailed playwright routine.
+
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-requestFailed> for more information.
+
+=head2 cookies(@args)
+
+Execute the BrowserContext::cookies playwright routine.
+
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-cookies> for more information.
+
+=head2 exposeBinding(@args)
+
+Execute the BrowserContext::exposeBinding playwright routine.
+
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-exposeBinding> for more information.
+
+=head2 response(@args)
+
+Execute the BrowserContext::response playwright routine.
+
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-response> for more information.
+
+=head2 tracing(@args)
+
+Execute the BrowserContext::tracing playwright routine.
+
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-tracing> for more information.
+
+=head2 unroute(@args)
+
+Execute the BrowserContext::unroute playwright routine.
+
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-unroute> for more information.
+
+=head2 storageState(@args)
+
+Execute the BrowserContext::storageState playwright routine.
+
+See L<https://playwright.dev/api/class-BrowserContext#BrowserContext-storageState> for more information.
 
 =head2 on(@args)
 

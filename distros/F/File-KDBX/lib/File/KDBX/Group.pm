@@ -13,13 +13,13 @@ use Hash::Util::FieldHash;
 use List::Util qw(any sum0);
 use Ref::Util qw(is_coderef is_ref);
 use Scalar::Util qw(blessed);
-use Time::Piece;
+use Time::Piece 1.33;
 use boolean;
 use namespace::clean;
 
 extends 'File::KDBX::Object';
 
-our $VERSION = '0.902'; # VERSION
+our $VERSION = '0.903'; # VERSION
 
 
 # has uuid                        => sub { generate_uuid(printable => 1) };
@@ -398,7 +398,7 @@ File::KDBX::Group - A KDBX database group
 
 =head1 VERSION
 
-version 0.902
+version 0.903
 
 =head1 DESCRIPTION
 

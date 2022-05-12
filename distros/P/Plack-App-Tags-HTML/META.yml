@@ -4,6 +4,10 @@ author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: 6.59
+  File::Object: 0
+  HTTP::Request::Common: 0
+  Plack::Test: 0
+  Tags::HTML: 0
   Test::More: 0
   Test::NoWarnings: 0
 configure_requires:
@@ -25,12 +29,13 @@ no_index:
 requires:
   English: 0
   Error::Pure: 0
-  Plack::Component::Tags::HTML: 0
+  Plack::Component::Tags::HTML: 0.02
   Plack::Util::Accessor: 0
+  Symbol::Get: 0
   perl: 5.8.0
 resources:
-  bugtracker: https://github.com/michal-josef-spacek/Plack-App-Tags-HTML
+  bugtracker: https://github.com/michal-josef-spacek/Plack-App-Tags-HTML/issues
   homepage: https://github.com/michal-josef-spacek/Plack-App-Tags-HTML
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Plack-App-Tags-HTML
-version: '0.01'
+version: '0.04'

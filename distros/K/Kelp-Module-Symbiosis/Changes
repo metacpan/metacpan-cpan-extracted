@@ -1,5 +1,12 @@
 Revision history for Perl extension Kelp::Module::Symbiosis.
 
+1.14 Wed May 11 2022
+	- remove broken homepage link
+
+1.13 Wed May 11 2022
+	- maintenance work
+	- switch to Dist::Zilla
+
 1.12 Sun Jul 4 2021
 	- remove deprecated features
 	- add Symbiosis middleware, which work for all the applications

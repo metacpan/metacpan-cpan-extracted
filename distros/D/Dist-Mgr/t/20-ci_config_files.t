@@ -71,7 +71,7 @@ die "We're not in the $ci_dir!" if getcwd() !~ /$ci_dir$/;
     my @ci = ci_github([qw(l)]);
 
     is grep(/\s+ubuntu-latest\s+/, @ci), 1, "l param linux included ok";
-    is grep (/windows-latest/, @ci), 0, "l param no windows included ok";
+    is grep (/os:.*windows-latest/, @ci), 0, "l param no windows included ok";
     is grep (/macos-latest/, @ci), 0, "l param no macos included ok";
 
     my $os_line = "        os: [ ubuntu-latest ]";
@@ -84,7 +84,7 @@ die "We're not in the $ci_dir!" if getcwd() !~ /$ci_dir$/;
     my @ci = ci_github([qw(m)]);
 
     is grep(/ubuntu-latest/, @ci), 1, "m param no linux included ok";
-    is grep (/windows-latest/, @ci), 0, "m param no windows included ok";
+    is grep (/os:.*windows-latest/, @ci), 0, "m param no windows included ok";
     is grep (/\s+macos-latest\s+/, @ci), 1, "m param macos included ok";
 
     my $os_line = "        os: [ macos-latest ]";

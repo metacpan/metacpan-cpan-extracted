@@ -1,7 +1,5 @@
 package Quantum::Superpositions::Lazy::ComputedState;
-
-our $VERSION = '1.11';
-
+$Quantum::Superpositions::Lazy::ComputedState::VERSION = '1.12';
 use v5.24;
 use warnings;
 use Moo;
@@ -80,3 +78,4 @@ determine what kind of operation was performed to obtain the state.
 
 An array reference of state values that were used in the operation (in order).
 The number of elements in the arrayref will depend of the operation type.
+

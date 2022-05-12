@@ -4,7 +4,7 @@ Robots::Validate - Validate that IP addresses are associated with known robots
 
 # VERSION
 
-version v0.2.6
+version v0.2.7
 
 # SYNOPSIS
 
@@ -24,7 +24,7 @@ if ( $rs->validate( $ip, \%opts ) ) { ...  }
 
 ## `resolver`
 
-This is the [Net::DNS::Resolver](https://metacpan.org/pod/Net::DNS::Resolver) used for DNS lookups.
+This is the [Net::DNS::Resolver](https://metacpan.org/pod/Net%3A%3ADNS%3A%3AResolver) used for DNS lookups.
 
 ## `robots`
 

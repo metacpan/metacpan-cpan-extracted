@@ -1,5 +1,19 @@
 Revision history for Dist-Mgr
 
+1.13    2022-05-11
+    - Made changes to CI Github Actions configuration file, modified Perls
+      installed, only install ExtUtils::PL2Bat on Windows systems
+
+1.12    2022-05-10
+    - In the copyright update tests, test year dynamically instead of
+      using the magic number (fixes #51)
+    - Switched all Github access from HTTP to SSH
+    - Added template data for the t/data/distmgr/* tests
+    - Cleaned up deployed MANIFEST.SKIP file
+    - Enhanced file comparison tests with line numbers and full paths
+    - Changed the module CI badges and CI test config file to use 'main' branch
+      instead of 'master' (per changes at Github) (fixes #53)
+
 1.10    2021-11-14
     - Remove -w|--wait flag from 'distmgr cycle' docs (fixes #46)
     - Fix broken links to distmgr POD from module POD (fixes #44)

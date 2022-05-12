@@ -12,7 +12,7 @@ use File::Path;
 use File::Copy;
 use File::Temp qw(tempdir);
 use File::Slurp qw( read_file write_file);
-use Data::Printer;
+
 my $naughty_file = "./blns.txt"; # source: https://github.com/minimaxir/big-list-of-naughty-strings, please read LICENSE in file blns.license.txt
 sub prepare_baginfo_key {
     my $key = shift;

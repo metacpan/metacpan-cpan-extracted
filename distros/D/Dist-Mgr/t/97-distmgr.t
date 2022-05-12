@@ -66,7 +66,6 @@ my %cpan_args = (
 
     after();
 }
-
 # release
 {
     before('release');
@@ -354,7 +353,7 @@ sub compare_files {
                             next;
                         }
                     }
-                    is $nf[$_], $tf[$_], "$nf file matches the template $tf ok";
+                    is $nf[$_], $tf[$_], "$dir/$nf file matches the template $tf line $_ ok";
                 }
                 $file_count++;
             }
@@ -393,4 +392,5 @@ sub remove_config {
 
     is -e $conf_file, undef, "(unlink) config file $conf_file doesn't exist ok";
 }
+
 

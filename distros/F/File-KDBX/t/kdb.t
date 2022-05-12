@@ -9,7 +9,7 @@ use TestCommon;
 use Encode qw(decode);
 use File::KDBX;
 use Test::Deep;
-use Test::More;
+use Test::More 1.001004_001;
 
 eval { require File::KeePass; require File::KeePass::KDBX }
     or plan skip_all => 'File::KeePass and File::KeePass::KDBX required to test KDB files';

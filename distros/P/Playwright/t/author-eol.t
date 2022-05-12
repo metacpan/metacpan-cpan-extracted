@@ -61,6 +61,7 @@ my @files = (
     'lib/Playwright/RequestOptions.pm',
     'lib/Playwright/Response.pm',
     'lib/Playwright/Route.pm',
+    'lib/Playwright/ScreenshotAssertions.pm',
     'lib/Playwright/Selectors.pm',
     'lib/Playwright/TimeoutError.pm',
     'lib/Playwright/Touchscreen.pm',

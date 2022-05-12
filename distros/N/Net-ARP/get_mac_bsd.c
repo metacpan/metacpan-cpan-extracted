@@ -40,27 +40,26 @@ int get_mac_bsd(const char *dev, char *mac)
     return -1;
 
   strncpy(mac,"unknown", HEX_HW_ADDR_LEN);
-  mac[HEX_HW_ADDR_LEN-1] = '\0';
+  mac[HEX_HW_ADDR_LEN - 1] = '\0';
 
   if (getifaddrs(&iface))
     return -1;
 
   iffirst = iface;
   while(iface->ifa_next != NULL)
+  {
+    if(!strcmp(iface->ifa_name,dev))
     {
-      if(!strcmp(iface->ifa_name,dev))
-	{
-	  if (iface->ifa_addr->sa_family == AF_LINK)
-	    {
-	      struct sockaddr_dl *sdl = (struct sockaddr_dl *) iface->ifa_addr;
-	      sprintf(mac, "%s",
-		      ether_ntoa((struct ether_addr *)LLADDR(sdl)));
-	      break;
-	    }
-	}
-
-      iface = iface->ifa_next;	
+      if (iface->ifa_addr->sa_family == AF_LINK)
+      {
+        struct sockaddr_dl *sdl = (struct sockaddr_dl *) iface->ifa_addr;
+        sprintf(mac, "%s", ether_ntoa((struct ether_addr *)LLADDR(sdl)));
+        break;
+      }
     }
+
+    iface = iface->ifa_next;	
+  }
 
   freeifaddrs(iffirst);
   return 0;

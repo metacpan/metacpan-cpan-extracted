@@ -1651,7 +1651,7 @@ SPVM_OP* SPVM_OP_build_field_access(SPVM_COMPILER* compiler, SPVM_OP* op_field_a
   
   field_access->op_term = op_term;
   field_access->op_name = op_name_field;
-  
+
   return op_field_access;
 }
 
@@ -1780,37 +1780,15 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
   class->type = op_type->uv.type;
 
   if (!class->is_anon) {
-
-    // Class name must start with upper case, otherwise compiler error occur.
-    // (Invalid example) Foo::bar
-    if (islower(class_name[0])) {
-      SPVM_COMPILER_error(compiler, "class name \"%s\" must start with upper case at %s line %d", class_name, op_class->file, op_class->line);
-    }
-    else {
-      
-      // If class part name start with lower case, compiler error occur.
-      // (Invalid example) Foo::bar
-      int32_t class_part_name_is_invalid = 0;
-      int32_t class_name_length = strlen(class_name);
-      for (int32_t i = 0; i < class_name_length; i++) {
-        if (i > 1) {
-          if (class_name[i - 2] == ':' && class_name[i - 1] == ':') {
-            if (islower(class_name[i])) {
-              SPVM_COMPILER_error(compiler, "Part name of class \"%s\" must start with upper case at %s line %d", class_name, op_class->file, op_class->line);
-              break;
-            }
-          }
-        }
-      }
-      
-      // If class name is different from the class name corresponding to the module file, compile error occur.
-      if (strcmp(class_name, compiler->cur_rel_file_class_name) != 0) {
-        // If class fail load by if (require xxx) syntax, that is ok
-        const char* not_found_class_class_name = SPVM_HASH_get(compiler->not_found_class_class_symtable, class_name, strlen(class_name));
-        if (!not_found_class_class_name) {
-          SPVM_COMPILER_error(compiler, "Wrong class name \"%s\". The class name must be \"%s\" at %s line %d", class_name, compiler->cur_rel_file_class_name, op_class->file, op_class->line);
-          return op_class;
-        }
+    assert(!islower(class_name[0]));
+    
+    // If class name is different from the class name corresponding to the module file, compile error occur.
+    if (strcmp(class_name, compiler->cur_rel_file_class_name) != 0) {
+      // If class fail load by if (require xxx) syntax, that is ok
+      const char* not_found_class_class_name = SPVM_HASH_get(compiler->not_found_class_class_symtable, class_name, strlen(class_name));
+      if (!not_found_class_class_name) {
+        SPVM_COMPILER_error(compiler, "The class name \"%s\" must be \"%s\" at %s line %d", class_name, compiler->cur_rel_file_class_name, op_class->file, op_class->line);
+        return op_class;
       }
     }
   }
@@ -1897,16 +1875,16 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
         const char* class_alias_name = op_use->uv.use->class_alias_name;
         if (class_alias_name) {
     
-          // Class name must start with upper case, otherwise compiler error occur.
+          // Class name must begin with upper case, otherwise compiler error occur.
           // (Invalid example) Foo::bar
           if (islower(class_alias_name[0])) {
-            SPVM_COMPILER_error(compiler, "Class alias name \"%s\" must start with upper case at %s line %d", class_alias_name, op_decl->file, op_decl->line);
+            SPVM_COMPILER_error(compiler, "The class alias name \"%s\" must begin with a upper case character at %s line %d", class_alias_name, op_decl->file, op_decl->line);
           }
           else {
             const char* use_class_name = op_use->uv.use->class_name;
             const char* use_class_name_exists = SPVM_HASH_get(class->class_alias_symtable, class_alias_name, strlen(class_alias_name));
             if (use_class_name_exists) {
-              SPVM_COMPILER_error(compiler, "Class alias name \"%s\" is already used at %s line %d", class_alias_name, op_decl->file, op_decl->line);
+              SPVM_COMPILER_error(compiler, "The class alias name \"%s\" is already used at %s line %d", class_alias_name, op_decl->file, op_decl->line);
             }
             else {
               SPVM_HASH_set(class->class_alias_symtable, class_alias_name, strlen(class_alias_name), (void*)use_class_name);
@@ -2386,13 +2364,8 @@ SPVM_OP* SPVM_OP_build_our(SPVM_COMPILER* compiler, SPVM_OP* op_class_var, SPVM_
   const char* name = op_name->uv.name;;
   class_var->name = op_name->uv.name;
   
-  int32_t invalid_name = 0;
-  if (strchr(name, ':')) {
-    invalid_name = 1;
-  }
-  
-  if (invalid_name) {
-    SPVM_COMPILER_error(compiler, "Invalid class variable name %s at %s line %d", name, op_name->file, op_name->line);
+  if (strstr(name, "::")) {
+    SPVM_COMPILER_error(compiler, "The class varaible name \"%s\" in the class variable definition can't contain \"::\" at %s line %d", class_var->name, op_name->file, op_name->line);
   }
   
   class_var->op_name = op_name;
@@ -2460,6 +2433,10 @@ SPVM_OP* SPVM_OP_build_has(SPVM_COMPILER* compiler, SPVM_OP* op_field, SPVM_OP* 
   // Field Name
   field->op_name = op_name_field;
   field->name = op_name_field->uv.name;
+
+  if (strstr(field->op_name->uv.name, "::")) {
+    SPVM_COMPILER_error(compiler, "The field name \"%s\" can't contain \"::\" at %s line %d", field->name, op_name_field->file, op_name_field->line);
+  }
 
   // Type
   field->type = op_type->uv.type;
@@ -2535,6 +2512,9 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
     op_name_method = SPVM_OP_new_op_name(compiler, anon_method_name, op_method->file, op_method->line);
   }
   const char* method_name = op_name_method->uv.name;
+  if (strstr(method_name, "::")) {
+    SPVM_COMPILER_error(compiler, "The method name \"%s\" can't contain \"::\" at %s line %d", method_name, op_name_method->file, op_name_method->line);
+  }
   
   // Block is method block
   if (op_block) {
@@ -2850,7 +2830,11 @@ SPVM_OP* SPVM_OP_build_var_decl(SPVM_COMPILER* compiler, SPVM_OP* op_var_decl, S
   var_decl->var = op_var->uv.var;
 
   op_var->uv.var->var_decl = var_decl;
-
+  
+  if (strstr(op_var->uv.var->name, "::")) {
+    SPVM_COMPILER_error(compiler, "The local variable \"%s\" can't contain \"::\" at %s line %d", op_var->uv.var->name, op_var->file, op_var->line);
+  }
+  
   return op_var;
 }
 

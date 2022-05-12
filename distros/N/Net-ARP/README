@@ -16,14 +16,6 @@ You do not need to install any additional libraries like Libnet to compile
 this extension. It uses kernel header files to create the packets.
 
 
----:[ IMPORTANT NOTICE
-
-Version 1.0 will break with the API of PRE-1.0 versions, 
-because the return value of arp_lookup() and get_mac()
-will no longer be passed as parameter, but returned!
-I hope this decision is ok as long as we get a cleaner and more perlish API.
-
-
 ---:[ Installation
 
 To install this module type the following:
@@ -56,7 +48,7 @@ and I like test code ;)
 
 ---:[ COPYRIGHT AND LICENCE
 
-Copyright (C) 2004-2020 by Bastian Ballmann
+Copyright (C) 2004-2022 by Bastian Ballmann
 
 This software is licensed under GPLv2
 

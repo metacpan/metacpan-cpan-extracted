@@ -35,7 +35,7 @@ your system.
 
 use XSLoader;
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 XSLoader::load( __PACKAGE__, $VERSION );
 
@@ -113,6 +113,8 @@ This module converts returned values from JavaScript thus:
 
 =item * Functions become Perl code references.
 
+=item * RegExp objects become Perl L<JavaScript::QuickJS::RegExp> objects.
+
 =item * Behaviour is B<UNDEFINED> for other object types.
 
 =back
@@ -121,15 +123,17 @@ This module converts returned values from JavaScript thus:
 
 =head1 TYPE CONVERSION: PERL → JAVASCRIPT
 
-Generally speaking, it’s the inverse of JS → Perl, though since Perl doesn’t
-differentiate “numeric strings” from “numbers” there’s occasional ambiguity.
-In such cases, behavior is undefined; be sure to typecast in JavaScript
-accordingly.
+Generally speaking, it’s the inverse of JS → Perl:
 
 =over
 
 =item * Perl strings, numbers, & booleans become corresponding JavaScript
 primitives.
+
+B<IMPORTANT:> Perl versions before 5.36 don’t reliably distinguish “numeric
+strings” from “numbers”. If your perl predates 5.36, typecast accordingly
+to prevent your Perl “number” from becoming a JavaScript string. (Even in
+5.36 and later it’s still a good idea.)
 
 =item * Perl undef becomes JS null.
 
@@ -139,6 +143,9 @@ primitives.
 =item * L<Types::Serialiser> booleans become JavaScript booleans.
 
 =item * Perl code references become JavaScript functions.
+
+=item * L<JavaScript::QuickJS::RegExp> objects become their original
+JavaScript C<RegExp> objects.
 
 =item * Anything else triggers an exception.
 

@@ -15,7 +15,7 @@ use File::KDBX::Util qw(int64);
 use Scalar::Util qw(dualvar);
 use namespace::clean -except => 'import';
 
-our $VERSION = '0.902'; # VERSION
+our $VERSION = '0.903'; # VERSION
 
 BEGIN {
     my %CONSTANTS = (
@@ -348,7 +348,7 @@ File::KDBX::Constants - All the KDBX-related constants you could ever want
 
 =head1 VERSION
 
-version 0.902
+version 0.903
 
 =head1 SYNOPSIS
 
@@ -553,7 +553,7 @@ Constants related to identifying the compression state of a file:
 
 =head2 :cipher
 
-Constants related ciphers:
+Constants related to ciphers:
 
 =over 4
 

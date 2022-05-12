@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::APIResponseAssertions;
-$Playwright::APIResponseAssertions::VERSION = '0.019';
+$Playwright::APIResponseAssertions::VERSION = '1.210';
 use parent 'Playwright::Base';
 
 sub new {
@@ -32,21 +32,21 @@ sub toBeOK {
     );
 }
 
-sub NotToBeOK {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'NotToBeOK',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub not {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'not',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub NotToBeOK {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'NotToBeOK',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -96,7 +96,7 @@ Playwright::APIResponseAssertions - Automatically generated class for Playwright
 
 =head1 VERSION
 
-version 0.019
+version 1.210
 
 =head1 CONSTRUCTOR
 
@@ -113,17 +113,17 @@ Execute the APIResponseAssertions::toBeOK playwright routine.
 
 See L<https://playwright.dev/api/class-APIResponseAssertions#APIResponseAssertions-toBeOK> for more information.
 
-=head2 NotToBeOK(@args)
-
-Execute the APIResponseAssertions::NotToBeOK playwright routine.
-
-See L<https://playwright.dev/api/class-APIResponseAssertions#APIResponseAssertions-NotToBeOK> for more information.
-
 =head2 not(@args)
 
 Execute the APIResponseAssertions::not playwright routine.
 
 See L<https://playwright.dev/api/class-APIResponseAssertions#APIResponseAssertions-not> for more information.
+
+=head2 NotToBeOK(@args)
+
+Execute the APIResponseAssertions::NotToBeOK playwright routine.
+
+See L<https://playwright.dev/api/class-APIResponseAssertions#APIResponseAssertions-NotToBeOK> for more information.
 
 =head2 on(@args)
 

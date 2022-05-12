@@ -52,7 +52,7 @@ my $git_ok = _validate_git();
     if (! -e 'test-push') {
 
         capture_merged {
-            `git clone 'https://stevieb9\@github.com/stevieb9/test-push`;
+            `git clone git\@github.com:/stevieb9/test-push`;
         }
         is $?, 0, "git cloned 'test-push' test repo ok";
     }

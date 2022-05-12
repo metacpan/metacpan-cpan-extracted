@@ -1,7 +1,5 @@
 package Kelp::Module::Symbiosis::Base;
-
-our $VERSION = '1.12';
-
+$Kelp::Module::Symbiosis::Base::VERSION = '1.14';
 use Kelp::Base qw(Kelp::Module);
 use Kelp::Module::Symbiosis::_Util;
 
@@ -154,3 +152,4 @@ Should be a string value. If specified, the module will be automatically mounted
 =item * L<Kelp::Module::Symbiosis>, the module manager
 
 =back
+

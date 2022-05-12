@@ -1,7 +1,5 @@
 package Quantum::Superpositions::Lazy::State;
-
-our $VERSION = '1.11';
-
+$Quantum::Superpositions::Lazy::State::VERSION = '1.12';
 use v5.24;
 use warnings;
 use Moo;

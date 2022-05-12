@@ -1,7 +1,5 @@
 package Kelp::Module::Symbiosis::_Util;
-
-our $VERSION = '1.12';
-
+$Kelp::Module::Symbiosis::_Util::VERSION = '1.14';
 use v5.10;
 use warnings;
 use Plack::Util;
@@ -37,3 +35,4 @@ sub load_middleware
 }
 
 1;
+

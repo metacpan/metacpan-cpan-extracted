@@ -13,11 +13,11 @@ use List::Util 1.33 qw(any all);
 use Module::Load;
 use Ref::Util qw(is_arrayref is_coderef is_hashref is_ref is_refref is_scalarref);
 use Scalar::Util qw(blessed looks_like_number readonly);
-use Time::Piece;
+use Time::Piece 1.33;
 use boolean;
 use namespace::clean -except => 'import';
 
-our $VERSION = '0.902'; # VERSION
+our $VERSION = '0.903'; # VERSION
 
 our %EXPORT_TAGS = (
     assert      => [qw(DEBUG assert)],
@@ -422,6 +422,7 @@ sub pack_Ql {
     require Config;
     if ($Config::Config{ivsize} < 8) {
         if (blessed $num && $num->can('as_hex')) {
+            require Math::BigInt;
             return "\xff\xff\xff\xff\xff\xff\xff\xff" if Math::BigInt->new('18446744073709551615') <= $num;
             return "\x00\x00\x00\x00\x00\x00\x00\x80" if $num <= Math::BigInt->new('-9223372036854775808');
             my $neg;
@@ -869,7 +870,7 @@ File::KDBX::Util - Utility functions for working with KDBX files
 
 =head1 VERSION
 
-version 0.902
+version 0.903
 
 =head1 FUNCTIONS
 

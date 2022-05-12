@@ -10,5 +10,12 @@ MyApp->config(
 );
 
 sub sessionid { 23123123123 }
+
+my %session = ();
+sub session {
+  my $self = shift;
+  %session = (%session, @_) if @_;
+  return \%session;
+}
      
 MyApp->setup;

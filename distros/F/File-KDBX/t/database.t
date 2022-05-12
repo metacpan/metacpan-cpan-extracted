@@ -11,7 +11,7 @@ use TestCommon;
 use File::KDBX;
 use File::Temp qw(tempfile);
 use Test::Deep;
-use Test::More;
+use Test::More 1.001004_001;
 use Time::Piece;
 
 subtest 'Create a new database' => sub {
@@ -49,7 +49,7 @@ subtest 'Clone' => sub {
     my @objects = $copy->objects->each;
     subtest 'Cloned objects refer to the cloned database' => sub {
         plan tests => scalar @_;
-        for my $object (@objects) {
+        for my $object (@_) {
             my $object_kdbx = eval { $object->kdbx };
             is $object_kdbx, $copy, 'Object: ' . $object->label;
         }

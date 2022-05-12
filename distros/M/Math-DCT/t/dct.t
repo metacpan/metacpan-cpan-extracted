@@ -12,24 +12,37 @@ foreach my $sz (qw/3 4 8 11 32 64/) {
         push @array2d_fl, @array;
         push @array2d, [@array];
     }
+    my $exp = naive_perl_dct1d(\@array);
     subtest "Size $sz 1D array" => sub {
-        compare_arrays(naive_perl_dct1d(\@array), dct1d(\@array));
-        compare_arrays(naive_perl_dct1d(\@array), @{dct([\@array])});
+        compare_arrays($exp, dct1d(\@array));
+        compare_arrays($exp, @{dct([\@array])});
     };
+    subtest "Size $sz 1D iDCT" => sub {
+        compare_arrays(\@array, idct1d($exp), 1e-4);
+    };
+    $exp = naive_perl_dct2d(\@array2d);
     subtest "Size $sz".'x'."$sz 2D array" => sub {
-        compare_arrays(naive_perl_dct2d(\@array2d), dct2d(\@array2d_fl));
-        compare_arrays(naive_perl_dct2d(\@array2d), dct([@array2d]));
+        compare_arrays($exp, dct2d(\@array2d_fl));
+        compare_arrays($exp, dct([@array2d]));
+    };
+    subtest "Size $sz 2D iDCT" => sub {
+        compare_arrays(\@array2d_fl, idct2d(flat_array($exp)), 1e-4);
     };
 }
 
 done_testing();
 
 sub compare_arrays {
-    my ($ref, $check) = @_;
+    my ($ref, $check, $tolerance) = @_;
+    $tolerance ||= 1e-8;
     $ref   = flat_array($ref)   if ref $ref->[0]   eq 'ARRAY';
     $check = flat_array($check) if ref $check->[0] eq 'ARRAY';
     my $sz = scalar @$ref;
-    is($ref->[$_], float($check->[$_]), "Array item ".($_+1)." of $sz matches.")
+    is(
+        $ref->[$_],
+        float($check->[$_], tolerance => $tolerance),
+        "Array item ".($_+1)." of $sz matches."
+    )
         foreach (0..$sz-1);
 }
 

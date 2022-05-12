@@ -104,4 +104,17 @@ class FClass :does(FRole) {
    is( FClass->onetwothree, 123, 'FClass has a :common ->onetwothree method' );
 }
 
+# Perl #19676
+#   https://github.com/Perl/perl5/issues/19676
+
+role GRole {
+   method a { pack "C", 65 }
+}
+
+class GClass :does(GRole) {}
+
+{
+   is( GClass->new->a, "A", 'GClass ->a method has constant' );
+}
+
 done_testing;

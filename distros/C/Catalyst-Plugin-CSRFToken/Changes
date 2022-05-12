@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst::Plugin::CSRFToken.
 
+0.003 - 2002-05-10
+  - Added some extra utility methods and overall better docs
+  - Added ability to create single use tokens.
+
 0.002 - 2002-05-09
   - Added missing dependency to dist.ini
 

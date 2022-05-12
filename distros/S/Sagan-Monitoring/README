@@ -1,0 +1,50 @@
+Suricata-Monitoring
+
+LibreNMS JSON SNMP extend and Nagios style check for Sagan stats.
+
+For Nagious, this should be ran via NRPE.
+
+For LibreNMS, this should be set up to run from cron and as a snmp extend.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Sagan::Monitoring
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Sagan-Monitoring
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Sagan-Monitoring
+
+    Search CPAN
+        https://metacpan.org/release/Sagan-Monitoring
+
+    Web
+        https://github.com/VVelox/Sagan-Monitoring
+
+    Git Repo
+        git@github.com:VVelox/Sagan-Monitoring.git
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2022 by Zane C. Bowers-Hadley.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

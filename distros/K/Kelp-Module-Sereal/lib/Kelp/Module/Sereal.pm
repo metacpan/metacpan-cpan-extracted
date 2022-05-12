@@ -1,7 +1,5 @@
 package Kelp::Module::Sereal;
-
-our $VERSION = '1.00';
-
+$Kelp::Module::Sereal::VERSION = '1.01';
 use Kelp::Base qw(Kelp::Module);
 use Sereal qw(get_sereal_encoder get_sereal_decoder);
 
@@ -122,15 +120,14 @@ A hashref with all the arguments to L<Sereal::Decoder/new>.
 
 =head1 AUTHOR
 
-Bartosz Jarzyna, E<lt>brtastic.dev@gmail.comE<gt>
+Bartosz Jarzyna, E<lt>bbrtj.pro@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2021 by Bartosz Jarzyna
+Copyright (C) 2021 - 2022 by Bartosz Jarzyna
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.10.1 or,
-at your option, any later version of Perl 5 you may have available.
-
+it under the same terms as Perl itself.
 
 =cut
+

@@ -15,7 +15,7 @@ name: HTML-Template-Pluggable
 provides:
   HTML::Template::Pluggable:
     file: lib/HTML/Template/Pluggable.pm
-    version: '0.21'
+    version: '0.22'
   HTML::Template::Plugin::Dot:
     file: lib/HTML/Template/Plugin/Dot.pm
     version: '1.04'
@@ -29,5 +29,5 @@ requires:
   Test::More: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.21'
+version: '0.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -67,6 +67,8 @@ DESCRIPTION
 
  Experimental Features
 
+    Since version 0.63.
+
     Some of the features of this module are currently marked as
     experimental. They will provoke warnings in the experimental category,
     unless silenced.
@@ -84,6 +86,8 @@ DESCRIPTION
        use Object::Pad ':experimental(custom_field_attr)';
     
        use Object::Pad ':experimental';  # all of the above
+
+    Since version 0.64.
 
     Multiple experimental features can be enabled at once by giving
     multiple names in the parens, separated by spaces:
@@ -1013,6 +1017,25 @@ WITH OTHER MODULES
     These three modules combine; there is additionally a cross-module test
     to ensure that object instance fields can be dynamically set during a
     suspended async method.
+
+ Devel::MAT
+
+    When using Devel::MAT to help analyse or debug memory issues with
+    programs that use Object::Pad, you will likely want to additionally
+    install the module Devel::MAT::Tool::Object::Pad. This will provide new
+    commands and extend existing ones to better assist with analysing
+    details related to Object::Pad classes and instances of them.
+
+       pmat> fields 0x55d7c173d4b8
+       The field AV ARRAY(3)=NativeClass at 0x55d7c173d4b8
+       Ix Field   Value
+       0  $sfield SCALAR(UV) at 0x55d7c173d938 = 123
+       ...
+    
+       pmat> identify 0x55d7c17606d8
+       REF() at 0x55d7c17606d8 is:
+       └─the %hfield field of ARRAY(3)=NativeClass at 0x55d7c173d4b8, which is:
+       ...
 
 DESIGN TODOs
 

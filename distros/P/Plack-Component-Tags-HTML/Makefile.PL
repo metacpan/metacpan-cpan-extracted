@@ -20,6 +20,7 @@ readme_from 'HTML.pm';
 recursive_author_tests('xt');
 requires 'CSS::Struct::Output::Raw' => 0;
 requires 'Encode' => 0;
+requires 'Error::Pure' => 0;
 requires 'Plack::Component' => 0;
 requires 'Plack::Util::Accessor' => 0;
 requires 'Tags::HTML::Page::Begin' => 0.11;
@@ -34,7 +35,7 @@ test_requires 'Plack::Test' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.02';
+version '0.04';
 
 # Run.
 WriteAll();

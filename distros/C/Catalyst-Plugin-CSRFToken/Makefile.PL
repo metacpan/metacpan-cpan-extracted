@@ -16,6 +16,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Catalyst::Plugin::CSRFToken",
   "PREREQ_PM" => {
+    "Bytes::Random::Secure" => "0.29",
     "Catalyst" => "5.90060",
     "Moo" => "2.005004",
     "WWW::CSRF" => "1.00"
@@ -25,7 +26,7 @@ my %WriteMakefileArgs = (
     "HTTP::Request::Common" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -33,6 +34,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Bytes::Random::Secure" => "0.29",
   "Catalyst" => "5.90060",
   "Catalyst::Test" => 0,
   "HTTP::Request::Common" => 0,

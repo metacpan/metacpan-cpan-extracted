@@ -134,7 +134,7 @@ sub before {
     {
         if (! -e 'acme-steveb') {
             capture_merged {
-                `git clone 'https://stevieb9\@github.com/stevieb9/acme-steveb'`;
+                `git clone 'git\@github.com:/stevieb9/acme-steveb'`;
             };
             is $?, 0, "git cloned 'acme-steveb' test repo ok";
         }

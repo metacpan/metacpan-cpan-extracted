@@ -1,7 +1,5 @@
 package KelpX::Symbiosis::Test;
-
-our $VERSION = '1.12';
-
+$KelpX::Symbiosis::Test::VERSION = '1.14';
 use Kelp::Base;
 use Kelp::Test;
 
@@ -75,3 +73,4 @@ Instead of using I<Kelp::Test::new> use I<KelpX::Symbiosis::Test::wrap> with the
 =head1 HOW DOES IT WORK?
 
 The main Kelp instance is wrapped in this module class and the resulting object is passed into Kelp::Test instead. I<KelpX::Symbiosis::Test> autoloads Kelp methods and wraps I<run_all> inside I<run>, which allows L<Kelp::Test> to use it.
+

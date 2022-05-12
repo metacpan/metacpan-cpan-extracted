@@ -15,6 +15,9 @@ my @cases = (
     [ 'Cl/C(=C\1COCN1)C',
       'Cl(/C(=C\1(C(O(C(N/1)))))(C))',
       'C(C(=C1(\N(C(O(C1)))))(\Cl))' ],
+    # The following two cases are synonymous:
+    [ 'C\1CCOC/1=C/O', 'C\1(C(C(O(C/1(=C(/O))))))', 'O(\C(=C/1(O(C(C(C\1))))))' ],
+    [ 'C1CCOC/1=C/O',  'C\1(C(C(O(C/1(=C(/O))))))', 'O(\C(=C/1(O(C(C(C\1))))))' ],
 );
 
 plan tests => 2 * scalar @cases;

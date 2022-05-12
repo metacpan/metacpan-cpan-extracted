@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::PlaywrightAssertions;
-$Playwright::PlaywrightAssertions::VERSION = '0.019';
+$Playwright::PlaywrightAssertions::VERSION = '1.210';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,21 +22,21 @@ sub spec {
     return $Playwright::spec->{'PlaywrightAssertions'}{members};
 }
 
-sub expectAPIResponse {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'expectAPIResponse',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub expectLocator {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'expectLocator',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub expectAPIResponse {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'expectAPIResponse',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -96,7 +96,7 @@ Playwright::PlaywrightAssertions - Automatically generated class for Playwright:
 
 =head1 VERSION
 
-version 0.019
+version 1.210
 
 =head1 CONSTRUCTOR
 
@@ -107,17 +107,17 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 expectAPIResponse(@args)
-
-Execute the PlaywrightAssertions::expectAPIResponse playwright routine.
-
-See L<https://playwright.dev/api/class-PlaywrightAssertions#PlaywrightAssertions-expectAPIResponse> for more information.
-
 =head2 expectLocator(@args)
 
 Execute the PlaywrightAssertions::expectLocator playwright routine.
 
 See L<https://playwright.dev/api/class-PlaywrightAssertions#PlaywrightAssertions-expectLocator> for more information.
+
+=head2 expectAPIResponse(@args)
+
+Execute the PlaywrightAssertions::expectAPIResponse playwright routine.
+
+See L<https://playwright.dev/api/class-PlaywrightAssertions#PlaywrightAssertions-expectAPIResponse> for more information.
 
 =head2 expectPage(@args)
 

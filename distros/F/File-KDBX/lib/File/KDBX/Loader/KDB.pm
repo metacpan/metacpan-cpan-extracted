@@ -11,15 +11,15 @@ use File::KDBX::Util qw(:class :empty :io :uuid load_optional);
 use File::KDBX;
 use Ref::Util qw(is_arrayref is_hashref);
 use Scalar::Util qw(looks_like_number);
-use Time::Piece;
+use Time::Piece 1.33;
 use boolean;
 use namespace::clean;
 
 extends 'File::KDBX::Loader';
 
-our $VERSION = '0.902'; # VERSION
+our $VERSION = '0.903'; # VERSION
 
-my $DEFAULT_EXPIRATION = Time::Piece->new(32503677839); # 2999-12-31 23:59:59
+my $DEFAULT_EXPIRATION = Time::Piece->strptime('2999-12-31 23:59:59', '%Y-%m-%d %H:%M:%S');
 
 sub _read_headers { '' }
 
@@ -397,7 +397,7 @@ File::KDBX::Loader::KDB - Read KDB files
 
 =head1 VERSION
 
-version 0.902
+version 0.903
 
 =head1 DESCRIPTION
 
