@@ -1,3 +1,8 @@
+0.05 2022-05-13T18:14:17+02:00
+ - Add image of example #1 web app to doc.
+ - Fix minimal dependency for Plack::Component::Tags::HTML. For
+   reproductible tests without title element.
+
 0.04 2022-05-12T17:13:17+02:00
  - Add test with inline component.
  - Fix bugtracker url.

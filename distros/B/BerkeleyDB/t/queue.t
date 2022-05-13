@@ -1,17 +1,17 @@
 #!./perl -w
 
-# ID: %I%, %G%   
+# ID: %I%, %G%
 
 use strict ;
 
 use lib 't' ;
-use BerkeleyDB; 
+use BerkeleyDB;
 use Test::More;
 use util;
 
 plan(skip_all => "Queue needs Berkeley DB 3.3.x or better\n" )
     if $BerkeleyDB::db_version < 3.3;
-    
+
 plan tests => 260;
 
 
@@ -51,7 +51,7 @@ umask(0) ;
     my $rec_len = 10 ;
     my $pad = "x" ;
 
-    ok my $db = new BerkeleyDB::Queue -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Queue -Filename => $Dfile,
 				    -Flags    => DB_CREATE,
 				    -Len      => $rec_len,
 				    -Pad      => $pad;
@@ -109,13 +109,13 @@ umask(0) ;
 
     ok my $env = new BerkeleyDB::Env -Flags => DB_CREATE|DB_INIT_MPOOL,@StdErrFile,
     					 -Home => $home ;
-    ok my $db = new BerkeleyDB::Queue -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Queue -Filename => $Dfile,
 				    -Env      => $env,
 				    -Flags    => DB_CREATE,
 				    -Len      => $rec_len;
 
     isa_ok $db->Env, 'BerkeleyDB::Env';
-                    
+
     # Add a k/v pair
     my $value ;
     ok $db->db_put(1, "some value") == 0 ;
@@ -125,7 +125,7 @@ umask(0) ;
     undef $env ;
 }
 
- 
+
 {
     # cursors
 
@@ -133,7 +133,7 @@ umask(0) ;
     my @array ;
     my ($k, $v) ;
     my $rec_len = 5 ;
-    ok my $db = new BerkeleyDB::Queue -Filename  => $Dfile, 
+    ok my $db = new BerkeleyDB::Queue -Filename  => $Dfile,
 				    	  -ArrayBase => 0,
 				    	  -Flags     => DB_CREATE ,
 				    	  -Len       => $rec_len;
@@ -161,9 +161,9 @@ umask(0) ;
     my %copy = %data;
     my $extras = 0 ;
     # sequence forwards
-    while ($cursor->c_get($k, $v, DB_NEXT) == 0) 
+    while ($cursor->c_get($k, $v, DB_NEXT) == 0)
     {
-        if ( fillout($copy{$k}, $rec_len) eq $v ) 
+        if ( fillout($copy{$k}, $rec_len) eq $v )
             { delete $copy{$k} }
 	else
 	    { ++ $extras }
@@ -181,7 +181,7 @@ umask(0) ;
     for ( $status = $cursor->c_get($k, $v, DB_LAST) ;
 	  $status == 0 ;
     	  $status = $cursor->c_get($k, $v, DB_PREV)) {
-        if ( fillout($copy{$k}, $rec_len) eq $v ) 
+        if ( fillout($copy{$k}, $rec_len) eq $v )
             { delete $copy{$k} }
 	else
 	    { ++ $extras }
@@ -193,7 +193,7 @@ umask(0) ;
     ok keys %copy == 0 ;
     ok $extras == 0 ;
 }
- 
+
 {
     # Tied Array interface
 
@@ -247,10 +247,10 @@ umask(0) ;
 
     # unshift isn't allowed
 #    eval {
-#    	$FA ? unshift @array, "red", "green", "blue" 
+#    	$FA ? unshift @array, "red", "green", "blue"
 #        : $db->unshift("red", "green", "blue" ) ;
 #	} ;
-#    ok $@ =~ /^unshift is unsupported with Queue databases/ ;	
+#    ok $@ =~ /^unshift is unsupported with Queue databases/ ;
     $array[0] = "red" ;
     $array[1] = "green" ;
     $array[2] = "blue" ;
@@ -279,7 +279,7 @@ umask(0) ;
     ok (($FA ? shift @array : $db->shift()) == 2) ;
 
     # push
-    $FA ? push @array, "the", "end" 
+    $FA ? push @array, "the", "end"
         : $db->push("the", "end") ;
     ok $cursor->c_get($k, $v, DB_LAST) == 0 ;
     ok $k == 102 ;
@@ -298,8 +298,8 @@ umask(0) ;
 
     undef $cursor;
 
-    # now clear the array 
-    $FA ? @array = () 
+    # now clear the array
+    $FA ? @array = ()
         : $db->clear() ;
     ok $cursor = (tied @array)->db_cursor() ;
     ok $cursor->c_get($k, $v, DB_FIRST) == DB_NOTFOUND ;
@@ -324,7 +324,7 @@ umask(0) ;
     ok $value eq fillout("some value", $rec_len) ;
 
 }
- 
+
 {
     # partial
     # check works via API
@@ -414,7 +414,7 @@ umask(0) ;
 
 {
     # partial
-    # check works via tied array 
+    # check works via tied array
 
     my $lex = new LexFile $Dfile ;
     my @array ;
@@ -509,7 +509,7 @@ umask(0) ;
 				     -Flags => DB_CREATE|DB_INIT_TXN|
 					  	DB_INIT_MPOOL|DB_INIT_LOCK ;
     ok my $txn = $env->txn_begin() ;
-    ok my $db1 = tie @array, 'BerkeleyDB::Queue', 
+    ok my $db1 = tie @array, 'BerkeleyDB::Queue',
 				-Filename => $Dfile,
 				-ArrayBase => 0,
                       		-Flags    =>  DB_CREATE ,
@@ -518,7 +518,7 @@ umask(0) ;
 				-Len      => $rec_len,
 				-Pad      => " " ;
 
-    
+
     ok $txn->txn_commit() == 0 ;
     ok $txn = $env->txn_begin() ;
     $db1->Txn($txn);
@@ -577,14 +577,14 @@ umask(0) ;
     my @array ;
     my ($k, $v) ;
     my $rec_len = 7 ;
-    ok my $db = new BerkeleyDB::Queue -Filename 	=> $Dfile, 
+    ok my $db = new BerkeleyDB::Queue -Filename 	=> $Dfile,
 				     	   -Flags    	=> DB_CREATE,
 					   -Pagesize	=> 4 * 1024,
 				           -Len       => $rec_len,
-				           -Pad       => " " 
+				           -Pad       => " "
 					;
 
-    my $ref = $db->db_stat() ; 
+    my $ref = $db->db_stat() ;
     ok $ref->{$recs} == 0;
     ok $ref->{'qs_pagesize'} == 4 * 1024;
 
@@ -602,7 +602,7 @@ umask(0) ;
     }
     ok $ret == 0 ;
 
-    $ref = $db->db_stat() ; 
+    $ref = $db->db_stat() ;
     ok $ref->{$recs} == 3;
 }
 
@@ -626,14 +626,14 @@ umask(0) ;
    @ISA=qw(BerkeleyDB BerkeleyDB::Queue);
    @EXPORT = @BerkeleyDB::EXPORT ;
 
-   sub db_put { 
+   sub db_put {
 	my $self = shift ;
         my $key = shift ;
         my $value = shift ;
         $self->SUPER::db_put($key, $value * 3) ;
    }
 
-   sub db_get { 
+   sub db_get {
 	my $self = shift ;
         $self->SUPER::db_get($_[0], $_[1]) ;
 	$_[1] -= 2 ;
@@ -653,19 +653,19 @@ EOM
     close FILE ;
 
     use Test::More;
-    BEGIN { push @INC, '.'; }    
+    BEGIN { push @INC, '.'; }
     eval 'use SubDB ; ';
     ok $@ eq "" ;
     my @h ;
     my $X ;
     my $rec_len = 34 ;
     eval '
-	$X = tie(@h, "SubDB", -Filename => "dbqueue.tmp", 
+	$X = tie(@h, "SubDB", -Filename => "dbqueue.tmp",
 			-Flags => DB_CREATE,
 			-Mode => 0640 ,
 	                -Len       => $rec_len,
-	                -Pad       => " " 
-			);		   
+	                -Pad       => " "
+			);
 	' ;
 
     ok $@ eq "" ;
@@ -700,7 +700,7 @@ EOM
     my @array ;
     my $value ;
     my $rec_len = 21 ;
-    ok my $db = tie @array, 'BerkeleyDB::Queue', 
+    ok my $db = tie @array, 'BerkeleyDB::Queue',
 					-Filename  => $Dfile,
                                        	-Flags     => DB_CREATE ,
 	                		-Len       => $rec_len,
@@ -725,7 +725,7 @@ EOM
     my @array ;
     my $db ;
     my $rec_len = 21 ;
-    ok $db = tie @array, 'BerkeleyDB::Queue', 
+    ok $db = tie @array, 'BerkeleyDB::Queue',
                                       	       	-Flags  => DB_CREATE ,
 				    	        -ArrayBase => 0,
 	                		        -Len       => $rec_len,
@@ -806,10 +806,10 @@ EOM
 
     # unshift isn't allowed
 #    eval {
-#    	$FA ? unshift @array, "red", "green", "blue" 
+#    	$FA ? unshift @array, "red", "green", "blue"
 #        : $db->unshift("red", "green", "blue" ) ;
 #	} ;
-#    ok $@ =~ /^unshift is unsupported with Queue databases/ ;	
+#    ok $@ =~ /^unshift is unsupported with Queue databases/ ;
     $array[0] = "red" ;
     $array[1] = "green" ;
     $array[2] = "blue" ;
@@ -838,7 +838,7 @@ EOM
     ok (($FA ? shift @array : $db->shift()) == 2) ;
 
     # push
-    $FA ? push @array, "the", "end" 
+    $FA ? push @array, "the", "end"
         : $db->push("the", "end") ;
     ok $cursor->c_get($k, $v, DB_LAST) == 0 ;
     ok $k == 102 ;
@@ -856,8 +856,8 @@ EOM
     ok (( $FA ? pop @array : $db->pop ) == 200 ) ;
 
     undef $cursor ;
-    # now clear the array 
-    $FA ? @array = () 
+    # now clear the array
+    $FA ? @array = ()
         : $db->clear() ;
     ok $cursor = (tied @array)->db_cursor() ;
     ok $cursor->c_get($k, $v, DB_FIRST) == DB_NOTFOUND ;
@@ -873,11 +873,11 @@ EOM
     my $lex = new LexFile $Dfile ;
     my @array ;
     my $db ;
-    $db = tie @array, 'BerkeleyDB::Queue', 
+    $db = tie @array, 'BerkeleyDB::Queue',
                         -Flags  => DB_CREATE ,
 				    	-Len       => 2,
 						-Filename => $Dfile ;
-    isa_ok $db, 'BerkeleyDB::Queue';                        
+    isa_ok $db, 'BerkeleyDB::Queue';
     $FA ? push @array,  "ab", "cd", "ef", "gh"
         : $db->push("ab", "cd", "ef", "gh") ;
     is scalar(@array), 4;

@@ -2,113 +2,6 @@
 
 # Tests for some Number methods.
 
-assert_eq(inverse_usigma(120), 1..120 -> grep { .usigma == 120 })
-assert_eq(inverse_usigma(5040).len, 38)
-assert_eq(inverse_usigma(5040).map { .usigma }.uniq, [5040])
-
-assert_eq(inverse_sigma(120), 1..120 -> grep { .sigma == 120 })
-assert_eq(inverse_sigma(240), 1..240 -> grep { .sigma == 240 })
-assert_eq(inverse_sigma(5040).len, 33)
-assert_eq(inverse_sigma(5040).map{.sigma}.uniq, [5040])
-
-assert_eq(inverse_sigma(22100, 2), [120, 130, 141])
-
-assert_eq(inverse_phi(120), %n[143, 155, 175, 183, 225, 231, 244, 248, 286, 308, 310, 350, 366, 372, 396, 450, 462])
-assert_eq(inverse_phi(5040).len, 93)
-assert_eq(inverse_phi(5040).map{ .phi }.uniq, [5040])
-
-assert_eq(inverse_psi(240), 1..240 -> grep { .psi == 240 })
-assert_eq(inverse_psi(5040).len, 38)
-assert_eq(inverse_psi(5040).map{.psi}.uniq, [5040])
-
-assert_eq(inverse_uphi(120), %n[121, 143, 144, 155, 164, 183, 220, 231, 240, 242, 286, 310, 366, 462])
-assert_eq(inverse_uphi(5040).len, 90)
-assert_eq(inverse_uphi(5040).map{.uphi}.uniq, [5040])
-
-assert_eq(20.of { .omega },  20.of { .factor_exp.len })
-assert_eq(20.of { .Omega },  20.of { .factor.len })
-
-assert_eq(20.of { .tau },       20.of { .divisors.len })
-assert_eq(20.of { .sigma },     20.of { .divisors.sum })
-assert_eq(20.of { .sigma(2) },  20.of { .divisors.sum { _*_ } })
-
-assert_eq(20.of { .phi },    20.of {|n| 1..n -> count_by { |k| is_coprime(n,k) } })
-assert_eq(20.of { .usigma }, 20.of { _ ? .factor_map { |p,e| p**e + 1 }.prod : 0 })
-assert_eq(20.of { .uphi },   20.of { _ ? .factor_map { |p,e| p**e - 1 }.prod : 0 })
-
-assert_eq(1..100 -> grep { .is_smooth(5) }, 1..100 -> grep { .gpf <= 5 })
-assert_eq(2..100 -> grep { .is_rough(5)  }, 2..100 -> grep { .lpf >= 5 })
-
-assert_eq(50.of { .inverse_phi.len }, 50.of { .inverse_phi_len })
-assert_eq(50.of { .inverse_psi.len }, 50.of { .inverse_psi_len })
-
-assert_eq(50.of { .inverse_phi.max }, 50.of { .inverse_phi_max })
-assert_eq(50.of { .inverse_psi.max }, 50.of { .inverse_psi_max })
-
-assert_eq(50.of { .inverse_phi.min }, 50.of { .inverse_phi_min })
-assert_eq(50.of { .inverse_psi.min }, 50.of { .inverse_psi_min })
-
-assert_eq(50.of { .inverse_sigma.max }, 50.of { .inverse_sigma_max })
-assert_eq(50.of { .inverse_sigma.min }, 50.of { .inverse_sigma_min })
-
-assert_eq(50.of { .inverse_sigma.len }, 50.of { .inverse_sigma_len })
-assert_eq(50.of { .inverse_sigma(2).len }, 50.of { .inverse_sigma_len(2) })
-
-assert_eq(50.of { .inverse_sigma(2).max }, 50.of { .inverse_sigma_max(2) })
-assert_eq(50.of { .inverse_sigma(2).min }, 50.of { .inverse_sigma_min(2) })
-
-assert_eq(inverse_phi(2**64).len, inverse_phi_len(2**64))
-assert_eq(inverse_psi(2**64).len, inverse_psi_len(2**64))
-assert_eq(inverse_sigma(2**64).len, inverse_sigma_len(2**64))
-
-assert_eq(inverse_phi(2**64).max, inverse_phi_max(2**64))
-assert_eq(inverse_phi(2**64).min, inverse_phi_min(2**64))
-
-assert_eq(inverse_psi(2**64).max, inverse_psi_max(2**64))
-assert_eq(inverse_psi(2**64).min, inverse_psi_min(2**64))
-
-assert_eq(inverse_sigma(2**64).max, inverse_sigma_max(2**64))
-assert_eq(inverse_sigma(2**64).min, inverse_sigma_min(2**64))
-
-assert_eq(50.of { .sigma(2) }.sort.uniq.grep { _ <= 50 }, 0..50 -> grep { defined(.inverse_sigma_min(2)) })
-assert_eq(50.of { .sigma(2) }.sort.uniq.grep { _ <= 50 }, 0..50 -> grep { defined(.inverse_sigma_max(2)) })
-
-do {
-    var a = Math.smooth_numbers(2,3,5,7)    # 7-smooth numbers
-    var b = Math.smooth_numbers(2,5,7)      # 7-smooth numbers not divisible by 3
-
-    assert_eq(a.first(30), 30.by { .is_smooth(7) })
-    assert_eq(b.first(30), 30.by {!.is_div(3) && .is_smooth(7) })
-
-    # Iteration is also supported
-    a.each {|k|
-        if (k > 1e5) {
-            assert_eq(k, 100352)
-            break
-        }
-    }
-}
-
-for a,m in (
-[
-    [10, 13],
-    [10, 13**2],
-    [10, 13**3],
-    [10, 13**4],
-    [44, 43*97],
-    [938, 1771],
-    [1313, 3808],
-    [544, 800],
-    [436, 1752],
-    [289, 992],
-    [841, 905],
-    [441, 920],
-    [993, 2048],
-    [13**18 * 5**7 - 1, 13**18 * 5**7]
-]) {
-    assert_eq(Mod(sqrtmod(a, m), m)**2, a, "sqrtmod(#{a}, #{m}) = #{sqrtmod(a, m)}, which is incorrect")
-}
-
 assert_eq(squarefree_sum(1e6), 303961062910)
 assert_eq(squarefree_sum(1e7), 30396557311887)
 
@@ -344,42 +237,10 @@ assert_eq(2.powerful(50, 106).len, 2.powerful_count(50, 106))
 assert_eq(3.powerful(50, 106).len, 3.powerful_count(50, 106))
 assert_eq(3.powerful(49, 105).len, 3.powerful_count(49, 105))
 
-for k in (1..7) {
-    assert_eq(k.omega_prime_count(1e6-2e3, 1e6), k.omega_primes(1e6-2e3, 1e6).len)
-    assert_eq(k.omega_prime_count(1e6-1e4, 1e6), k.omega_primes(1e6-1e4, 1e6).len)
-
-    if (k <= 2) {
-        assert_eq(k.powerful(1e6-2e3, 1e6), range(1e6-2e3, 1e6).grep{.is_powerful(k)})
-        assert_eq(k.powerful(1e6-1e4, 1e6), range(1e6-1e4, 1e6).grep{.is_powerful(k)})
-    }
-
-    assert_eq(k.powerful(1e6-2e3, 1e6).len, k.powerful_count(1e6-2e3, 1e6))
-    assert_eq(k.powerful(1e6-1e4, 1e6).len, k.powerful_count(1e6-1e4, 1e6))
-    assert_eq(k.powerful(1e6-1e5, 1e6).len, k.powerful_count(1e6-1e5, 1e6))
-}
-
 # Almost prime divisors
 
 assert_eq(5040.almost_prime_divisors.flat.sort, 5040.divisors)
 assert_eq(5040.omega_prime_divisors.flat.sort, 5040.divisors)
-
-with (10!) {|n|
-    var divisors = n.divisors
-    for k in (0 .. (1+n.bigomega)) {
-        assert_eq(n.almost_prime_divisors(k), divisors.grep { .is_almost_prime(k) })
-        assert_eq(n.omega_prime_divisors(k), divisors.grep { .is_omega_prime(k) })
-    }
-}
-
-with (21!) {|n|
-    assert_eq(almost_prime_divisors(n, 0), [1])
-    assert_eq(almost_prime_divisors(n, 1), n.prime_divisors)
-    assert_eq(almost_prime_divisors(n, 2), n.prime_divisors.combinations_with_repetition(2).map{.prod}.sort.grep {|d| d `divides` n })
-    assert_eq(almost_prime_divisors(n, 37), n.divisors.grep { .is_almost_prime(37) })
-    assert_eq(almost_prime_divisors(n, n.bigomega), [n])
-    assert_eq(almost_prime_divisors(n, n.bigomega+1), [])
-    assert_eq(omega_prime_divisors(n, n.omega+1), [])
-}
 
 do {
 
@@ -399,96 +260,152 @@ do {
 }
 
 do {
-    func f(n, r) {
-        n.factor_prod {|p|
-            1 - p**r
-        }
-    }
 
-    func powerfree_part_sum(n, r=2) {
-        sum(1..n.iroot(r), {|k|
-            f(k, r) * faulhaber(idiv(n, k**r), 1)
+    var (x1, x2) = iquadratic_formula(161022, 770228, -1589768114)
+
+    assert_eq(x1, 97)
+    assert_eq(x2, -102)
+
+    var tests = [
+        [6, 11, -35],
+        [2, -4, -2],
+        [-4, -7, 12],
+        [20, -15, -10],
+        [1, -1, -3],
+        [-1, 6, 18],
+    ]
+
+    for a,b,c in (tests) {
+        var roots = [quadratic_formula(a,b,c)]
+        var rootsQ = [quadratic_formulaQ(a,b,c)]
+
+        assert_eq(roots.len, 2)
+        assert_eq(rootsQ.len, 2)
+
+        assert(roots.all {|x|
+            a*x**2 + b*x + c -> round(-30) =~= 0
+        })
+
+        assert(rootsQ.all {|x|
+            assert_eq(a*x**2 + b*x + c, 0)
         })
     }
+}
 
-    for k in (1..10) {
-        assert_eq(
-            100.of { powerfree_part_sum(_, k) },
-            100.of { k.powerfree_part_sum(_) }
-        )
+do {
 
-        assert_eq(
-            100.of { k.powerfree_part_sum(_) },
-            100.of { k.powerfree_part(_) }.acc,
-        )
+    var tests = [
+        [1, -6, 11, -6],
+        [1, -23, 142, -120],
+        [5, 2, -5, -3],
+        [1, 4, 6, 5],
+        [1, 5, 2, -8],
+        [1, 4, 7, 6],
+        [-36, 8, -82, 2850986],
+        [15, -22, 8, -7520940423059310542039581],
+    ]
 
-        assert_eq(
-            100.of { k.powerfree_part(_) },
-            100.of { .is_zero ? 0 : .factor_prod {|p,e| p**(e % k) } },
-        )
+    for a,b,c,d in (tests) {
+        var roots = [cubic_formula(a,b,c,d)]
+        assert_eq(roots.len, 3)
+        assert(roots.all {|x|
+            a*x**3 + b*x**2 + c*x + d -> round(-30) =~= 0
+        })
     }
 }
 
 do {
-    func powerfree_sum(n, k=2) {
-        var sum = 0
-        n.iroot(k).each_squarefree {|v|
-            sum += (moebius(v) * v**k * faulhaber(idiv(n, v**k), 1))
-        }
-        return sum
+    var m = (2**16 + 1)
+
+    # OEIS: A020500
+    var x1  = %n[0, 0, 2, 3, 2, 5, 1, 7, 2, 3, 1, 11, 1, 13, 1, 1, 2, 17, 1, 19, 1, 1, 1, 23, 1, 5, 1, 3, 1, 29, 1, 31, 2, 1, 1, 1, 1, 37, 1, 1, 1, 41, 1, 43, 1, 1, 1, 47, 1, 7, 1, 1, 1, 53, 1, 1, 1, 1, 1, 59, 1, 61, 1, 1, 2, 1, 1, 67, 1, 1, 1, 71, 1, 73, 1, 1, 1, 1, 1, 79, 1, 3, 1, 83, 1, 1, 1, 1, 1, 89, 1, 1, 1, 1, 1, 1, 1, 97, 1, 1]
+
+    # OEIS: A020513
+    var xn1 = %n[0, -2, 0, 1, 2, 1, 3, 1, 2, 1, 5, 1, 1, 1, 7, 1, 2, 1, 3, 1, 1, 1, 11, 1, 1, 1, 13, 1, 1, 1, 1, 1, 2, 1, 17, 1, 1, 1, 19, 1, 1, 1, 1, 1, 1, 1, 23, 1, 1, 1, 5, 1, 1, 1, 3, 1, 1, 1, 29, 1, 1, 1, 31, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 37, 1, 1, 1, 1, 1, 1, 1, 41, 1, 1, 1, 43, 1, 1, 1, 1, 1, 1, 1, 47, 1, 1, 1, 7, 1]
+
+    assert_eq(100.of {|n| cyclotomic(n, 1) }, x1)
+    assert_eq(100.of {|n| cyclotomicmod(n, 1, 29) }, x1.map{_ % 29})
+
+    assert_eq(100.of {|n| cyclotomic(n, -1) }, xn1)
+    assert_eq(100.of {|n| cyclotomicmod(n, -1, 29) }, xn1.map {_ % 29})
+
+    for n in (-1 .. 10), x in (-10 .. 10) {
+        assert_eq(Str(cyclotomic(n, x) % m), Str(cyclotomicmod(n, x, m)))
     }
 
-    for k in (2..10) {
-        assert_eq(
-            100.of { powerfree_sum(_, k) },
-            100.of { k.powerfree_sum(_) }
-        )
+    assert_eq(cyclotomicmod(2**127 - 1, 2, 2**127 - 1), 1)
+    assert_eq(cyclotomicmod(2**127 - 1, 2*3*5, 2**127 - 1), 1)
+    assert_eq(cyclotomicmod(2**127 - 1, 2**127 - 1, 2**127 - 1), 1)
 
-        assert_eq(
-            100.of { k.powerfree_sum(_) },
-            100.of { (.is_powerfree(k) ? 1 : 0) * _ }.acc,
-        )
+    assert_eq(cyclotomicmod(2**64 + 1, 5040, 503*863), 287421)
+    assert_eq(cyclotomicmod(2**64 + 1, -5040, 503*863), cyclotomicmod(2**64 + 1, (-5040)%(503*863), 503*863))
+
+    assert_eq(cyclotomicmod(7!, 5040, 2**128 + 1), 235744758223530422383203401596174491694)
+    assert_eq(cyclotomicmod(30!, 5040, 2**128 + 1), 40675970320518606495224484019728682382)
+
+    assert_eq(cyclotomicmod(2**128 - 1, 5040, 2**128 + 1), 258216496104743231120502200247009922076)
+    assert_eq(cyclotomicmod(5040*5704689200685129054721, 2**256 + 1, 2**64 + 1), 1)
+    assert_eq(cyclotomicmod(5040*5704689200685129054721, next_prime(2**64), prev_prime(2**64)), 385968771661381427)
+}
+
+do {
+    assert(%n[294409, 167979421, 1152091655881, 62411762908817281, 1516087654274358001].all{.is_imprimitive_carmichael})
+    assert(42310088783100741554666880481.is_imprimitive_carmichael)
+    assert(21593590390253023722267234622513201.is_imprimitive_carmichael)
+    assert(16412975107923138847512341751620644377601.is_imprimitive_carmichael)
+    assert(325533792014488126487416882038879701391121.is_imprimitive_carmichael)
+    assert(1605045791181700950034233564955898780122791301414374937801.is_imprimitive_carmichael)
+}
+
+do {
+    with (%n[341, 294409, 9972894583, 1264022137981459, 14054662152215842621]) {|a|
+        assert(a.all {.is_super_psp})
+        assert(a.none{.is_over_psp})
+    }
+    assert(192463418472849397730107809253922101.is_super_psp)
+    assert(1347320741392600160214289343906212762456021.is_super_psp)
+    assert(70865138168006643427403953978871929070133095474701.is_super_psp)
+    assert(3363391752747838578311772729701478698952546288306688208857.is_super_psp)
+    assert(132153369641266990823936945628293401491197666138621036175881960329.is_super_psp)
+    assert(9105096650335639994239038954861714246150666715328403635257215036295306537.is_super_psp)
+}
+
+do {
+    for n in (2047, 13421773, 14073748835533, 1376414970248942474729, 48663264978548104646392577273, 294413417279041274238472403168164964689, 98117433931341406381352476618801951316878459720486433149, 1252977736815195675988249271013258909221812482895905512953752551821) {
+        assert(n.is_psp)
+        assert(n.is_over_psp)
+        assert(n.is_strong_psp)
+        assert(n.is_super_psp)
+        assert(n.is_euler_psp)
+        assert(!n.is_pell_psp)
+        assert(!n.is_fib_psp)
+        assert(!n.is_carmichael)
+        assert(!n.is_lucas_psp)
+        assert(!n.is_lucas_carmichael)
+        assert(!n.is_imprimitive_carmichael)
     }
 }
 
 do {
-    func powerfree_count(n, k=2) {
-        var sum = 0
-        n.iroot(k).each_squarefree {|v|
-            sum += (moebius(v) * idiv(n, v**k))
-        }
-        return sum
-    }
-
-    for k in (1..10) {
-        assert_eq(
-            100.of { powerfree_count(_, k) },
-            100.of { k.powerfree_count(_) }
-        )
-
-        assert_eq(
-            100.of { k.powerfree_count(_) },
-            100.of { .is_powerfree(k) ? 1 : 0 }.acc,
-        )
-    }
+    {|n| assert_eq(mbe_factor(n).prod, n||1) }.each(0..30)
+    {|n| assert_eq(flt_factor(n).prod, n||1) }.each(0..30)
+    {|n| assert_eq(dop_factor(n).prod, n||1) }.each(0..30)
+    {|n| assert_eq(cop_factor(n).prod, n||1) }.each(0..30)
+    {|n| assert_eq(fermat_factor(n).prod, n||1) }.each(0..30)
+    {|n| assert_eq(holf_factor(n).prod, n||1) }.each(0..30)
+    {|n| assert_eq(pm1_factor(n).prod, n||1) }.each(0..30)
+    {|n| assert_eq(pp1_factor(n).prod, n||1) }.each(0..30)
+    {|n| assert_eq(chebyshev_factor(n).prod, n||1) }.each(0..30)
+    {|n| assert_eq(ecm_factor(n).prod, n||1) }.each(0..30)
+    {|n| assert_eq(squfof_factor(n).prod, n||1) }.each(0..30)
+    {|n| assert_eq(qs_factor(n).prod, n||1) }.each(0..30)
+    {|n| assert_eq(trial_factor(n).prod, n||1) }.each(0..30)
 }
 
-assert_eq(12.omega_primes(1e13), %n[7420738134810, 8222980095330, 8624101075590, 9426343036110, 9814524629910])
-assert_eq(12.squarefree_almost_primes(1e13), %n[7420738134810, 8222980095330, 8624101075590, 9426343036110, 9814524629910])
-
-assert_eq(65.almost_primes(2**65 - 1e12, 2**65 + 1e12), %n[36893488147419103232])
-assert_eq(16.omega_primes(16.pn_primorial - 100, 16.pn_primorial + 100), %n[32589158477190044730])
-assert_eq(16.squarefree_almost_primes(16.pn_primorial - 100, 16.pn_primorial + 100), %n[32589158477190044730])
-
-# Solve linear congruence
-for a in (1..10), b in (1..10), c in (1..10) {
-
-    var x = solve_lcg(a,b,c)
-
-    if (!x.is_nan) {
-        assert_eq(a*x % c, b % c)
-        assert(is_congruent(a*x, b, c), [a,b,c])
-    }
+do {
+    assert_eq(20.of {.lnsuperprimorial} ~Z=~= 20.of{.superprimorial.ln} -> uniq, [true])
+    assert_eq(20.of {.lnsuperfactorial} ~Z=~= 20.of{.superfactorial.ln} -> uniq, [true])
+    assert_eq(20.of {.lnhyperfactorial} ~Z=~= 20.of{.hyperfactorial.ln} -> uniq, [true])
 }
 
 say "** Tests passed!"

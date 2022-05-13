@@ -33,8 +33,12 @@ Sidef is a modern, high-level, general-purpose programming language, inspired by
 ### WWW
 
 * Gitbook: https://trizen.gitbook.io/sidef-lang/ ([legacy](https://trizen.gitbooks.io/sidef-lang))
-* Tutorial: https://github.com/trizen/sidef/wiki
+* Tutorial: https://notabug.org/trizen/sidef/wiki
 * RosettaCode: https://rosettacode.org/wiki/Sidef
+
+### Q&A
+
+Need help with Sidef? Feel free to ask questions here: https://github.com/trizen/sidef/discussions/categories/q-a
 
 ## EXAMPLES
 
@@ -172,10 +176,10 @@ Output:
 
 ### AVAILABILITY
 
-* **CPAN**: [https://metacpan.org/release/Sidef](https://metacpan.org/release/Sidef)
-* **PKGS**: [https://pkgs.org/download/Sidef](https://pkgs.org/download/Sidef)
-* **Arch Linux**: [https://aur.archlinux.org/packages/sidef/](https://aur.archlinux.org/packages/sidef/)
-* **Slackware**: [https://slackbuilds.org/repository/14.2/perl/perl-Sidef/](https://slackbuilds.org/repository/14.2/perl/perl-Sidef/)
+* **CPAN**: https://metacpan.org/release/Sidef
+* **PKGS**: https://pkgs.org/download/perl-Sidef
+* **Arch Linux**: https://aur.archlinux.org/packages/sidef/
+* **Slackware**: https://slackbuilds.org/repository/15.0/perl/perl-Sidef/
 
 ### LICENSE AND COPYRIGHT
 

@@ -5,7 +5,7 @@ use strict ;
 
 use lib 't' ;
 
-use BerkeleyDB; 
+use BerkeleyDB;
 use util ;
 
 use Test::More ;
@@ -39,18 +39,18 @@ umask(0);
     my ($k, $v, $pk) = ('','','');
 
     # create primary database
-    ok my $primary = new BerkeleyDB::Hash -Filename => $Dfile1, 
+    ok my $primary = new BerkeleyDB::Hash -Filename => $Dfile1,
 				     -Flags    => DB_CREATE ;
 
     # create secondary database
-    ok my $secondary = new BerkeleyDB::Hash -Filename => $Dfile2, 
+    ok my $secondary = new BerkeleyDB::Hash -Filename => $Dfile2,
 				     -Flags    => DB_CREATE ;
 
     # associate primary with secondary
     ok $primary->associate($secondary, \&sec_key) == 0;
 
     # create secondary database
-    ok my $foreign = new BerkeleyDB::Hash -Filename => $Dfile3, 
+    ok my $foreign = new BerkeleyDB::Hash -Filename => $Dfile3,
 				     -Flags    => DB_CREATE ;
 
     # associate primary with secondary
@@ -125,18 +125,18 @@ umask(0);
     my ($k, $v, $pk) = ('','','');
 
     # create primary database
-    ok my $primary = new BerkeleyDB::Hash -Filename => $Dfile1, 
+    ok my $primary = new BerkeleyDB::Hash -Filename => $Dfile1,
 				     -Flags    => DB_CREATE ;
 
     # create secondary database
-    ok my $secondary = new BerkeleyDB::Hash -Filename => $Dfile2, 
+    ok my $secondary = new BerkeleyDB::Hash -Filename => $Dfile2,
 				     -Flags    => DB_CREATE ;
 
     # associate primary with secondary
     ok $primary->associate($secondary, \&sec_key2) == 0;
 
     # create secondary database
-    ok my $foreign = new BerkeleyDB::Hash -Filename => $Dfile3, 
+    ok my $foreign = new BerkeleyDB::Hash -Filename => $Dfile3,
 				     -Flags    => DB_CREATE ;
 
     # associate primary with secondary
@@ -226,18 +226,18 @@ umask(0);
     my ($k, $v, $pk) = ('','','');
 
     # create primary database
-    ok my $primary = new BerkeleyDB::Hash -Filename => $Dfile1, 
+    ok my $primary = new BerkeleyDB::Hash -Filename => $Dfile1,
 				     -Flags    => DB_CREATE ;
 
     # create secondary database
-    ok my $secondary = new BerkeleyDB::Hash -Filename => $Dfile2, 
+    ok my $secondary = new BerkeleyDB::Hash -Filename => $Dfile2,
 				     -Flags    => DB_CREATE ;
 
     # associate primary with secondary
     ok $primary->associate($secondary, \&sec_key3) == 0;
 
     # create secondary database
-    ok my $foreign = new BerkeleyDB::Hash -Filename => $Dfile3, 
+    ok my $foreign = new BerkeleyDB::Hash -Filename => $Dfile3,
 				     -Flags    => DB_CREATE ;
 
     # associate primary with secondary
@@ -300,7 +300,7 @@ umask(0);
     my ($k, $v, $pk) = ('','','');
 
     # create primary database
-    ok my $primary = new BerkeleyDB::Btree -Filename => $Dfile1, 
+    ok my $primary = new BerkeleyDB::Btree -Filename => $Dfile1,
 				     -set_bt_compress    => 1,
 				     -Flags    => DB_CREATE ;
 

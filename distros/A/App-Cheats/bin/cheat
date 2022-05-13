@@ -1,0 +1,179 @@
+#!/usr/bin/env -S perl -l
+
+use FindBin qw/ $RealBin /;
+# use lib "$RealBin/lib";
+
+use v5.30;
+use File::Basename qw/ basename dirname /;
+use Data::Dumper;
+use Getopt::Long;
+
+use My::Color qw/ :all /;
+use My::Opts;
+
+#---------------------------------------------------------
+
+my ( $opts, @search ) = get_input();
+my $all_cheats = get_all_cheats( $opts );
+my $cheats     = get_cheats( $all_cheats, $opts, \@search );
+
+pretty_print( $cheats, $opts, \@search );
+
+#---------------------------------------------------------
+
+sub define_spec {
+   [
+      {
+         desc => "Show this help",
+         spec => "help|h",
+      },
+      {
+         desc => "Be case sensitive",
+         spec => "case_sensitive|i",
+      },
+      {
+         desc => "Use regex in search",
+         spec => "regex|r",
+      },
+      {
+         desc => "Show line numbers,",
+         spec => "show_line_numbers|n",
+      },
+      {
+         desc => "Do not color the output",  # Description.
+         spec => "NoColor|C",                # How to call it.
+      },
+      {
+         desc => "Type: cheats,notes",
+         spec => "type=s",
+      },
+      {
+         desc => "Where to find cheats and notes (colon separated list)",
+         spec => "cheat_dirs=s",
+      },
+      {
+         desc => "Show debugging info",
+         spec => "debug|d:1",
+      },
+   ]
+}
+
+sub get_input {
+   my $opts = My::Opts->new( define_spec() );
+
+   show_help( $opts ) if $opts->{help} or not @ARGV;
+
+   ( $opts, @ARGV );
+}
+
+sub show_help {
+   my ( $opts ) = @_;
+   my $options  = $opts->build_help_options();
+   my $help     = <<~"HELP";
+      
+      # Search for specific keywords in cheats or notes.
+      <SCRIPT> 'KEYWORD'
+      <SCRIPT> 'KEYWORD' 'KEYWORD'
+
+      # Options:
+         $options
+   HELP
+
+   say _colored( $help );
+
+   exit;
+}
+
+sub _colored {
+   my ( $msg ) = @_;
+
+   package My { use Mojo::Base -base };
+   my $my = My->with_roles( "+ColoredHelp" )->new;
+   $my->color_msg( $msg, basename( $0 ) );
+}
+
+sub get_all_cheats {
+   my ( $opts )    = @_;
+   my $cheat_dirs  = $opts->{cheat_dirs} // $ENV{CHEAT_DIRS} // dirname $RealBin;
+   my $type        = $opts->{type} // "cheats";
+   my @cheat_files = map { glob "$_/$type*" } split /:/, $cheat_dirs;
+   my @all;
+   my @group;
+
+   for my $path ( @cheat_files ) {
+      my $file = basename( $path );
+      open my $fh, "<", $path or die "Error with file '$path': $!";
+
+      while ( <$fh> ) {
+         next if not /\S/;
+         chomp;
+
+         # If there is a group already and the current line number is
+         # more than one extra than the last in the group,
+         # That means we are on a new group now.
+         if ( @group and $. > $group[-1]{line_num} + 1 ) {
+            group_to_all( \@group => \@all );
+         }
+         push @group,
+           {
+            data     => $_,
+            file     => $file,
+            line_num => $.,
+           };
+      }
+
+      close $fh;
+
+      group_to_all( \@group => \@all ) if @group;
+   }
+
+   \@all;
+}
+
+sub group_to_all {
+   my ( $group, $all ) = @_;
+
+   my $data = join "\n", map { $_->{data} } @$group;
+   push @$all,
+     [ $data, $group->[0]{file}, $group->[0]{line_num},
+      $group->[-1]{line_num} ];
+
+   @$group = ();
+}
+
+sub get_cheats {
+   my ( $all_cheats, $opts, $parts ) = @_;
+   my $case =
+     $opts->{case_sensitive} ? "(?-i)" : "(?i)";   # Case Insensitive by default
+   my @keys = map { $opts->{regex} ? qr/$case$_/ : qr/$case\Q$_/ }
+     @$parts;                                      # No regex by default
+   my @matches;
+
+   for my $cheat_block ( @$all_cheats ) {
+      my ( $data, $file, $start, $stop ) = @$cheat_block;
+      my $found = 1;
+      for my $key ( @keys ) {
+         if ( $data !~ /$case$key/ ) {
+            $found = 0;
+            last;
+         }
+      }
+      push @matches, $cheat_block if $found;
+   }
+
+   \@matches;
+}
+
+sub pretty_print {
+   my ( $cheat_blocks, $opts, $parts ) = @_;
+
+   for my $cheat_block ( @$cheat_blocks ) {
+      my ( $data, $file, $line_num, $stop ) = @$cheat_block;
+      my $colored_data =
+        $opts->{NoColor} ? $data : apply_color( $data, $parts, $opts );
+      if ( $opts->{show_line_numbers} ) {
+         $colored_data =~ s/ ^ / "$file:" . $line_num++ . ":   " /gmxe;
+      }
+      print "$colored_data\n";
+   }
+}

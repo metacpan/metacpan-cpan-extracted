@@ -80,12 +80,15 @@ t/48translate.t
 t/49literal.t
 t/50xmlxpathparsercache.t
 t/51elementname.t
+t/52matches.t
+t/cleanup.t
 t/rdf.t
 t/remove.t
 t/insert.t
 t/stress.t
 t/meta-json.t
 t/meta-yml.t
+t/manifest.t
 examples/test.xml
 examples/xpath
 META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -3,7 +3,7 @@ package Sidef {
     use utf8;
     use 5.016;
 
-    our $VERSION = '22.03';
+    our $VERSION = '22.05';
 
     our $SPACES      = 0;    # the current number of indentation spaces
     our $SPACES_INCR = 4;    # the number of indentation spaces
@@ -135,7 +135,9 @@ package Sidef {
             return ($self->{dbm_driver} = 'gdbm');
         }
 
-        $self->{dbm_driver} = 'sdbm';
+        warn "No supported database driver was found...\n";
+        warn "Please install DB_File or GDBM_File in order to use this functionality.\n";
+        return;
     }
 
     sub _init_db {

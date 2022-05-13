@@ -5,7 +5,7 @@ use strict ;
 
 
 use lib 't' ;
-use BerkeleyDB; 
+use BerkeleyDB;
 use util ;
 use Test::More;
 
@@ -13,7 +13,7 @@ BEGIN {
     plan(skip_all => "this needs BerkeleyDB 3.3.x or better" )
         if $BerkeleyDB::db_version < 3.3;
 
-    plan tests => 130;    
+    plan tests => 130;
 }
 
 umask(0);
@@ -25,7 +25,7 @@ umask(0);
     my $lex = new LexFile $Dfile ;
     my %hash ;
     my ($k, $v) ;
-    ok my $db = new BerkeleyDB::Hash -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Hash -Filename => $Dfile,
 				     -Flags    => DB_CREATE ;
 
     # create some data
@@ -73,11 +73,11 @@ umask(0);
     my ($k, $v, $pk) = ('','','');
 
     # create primary database
-    ok my $primary = new BerkeleyDB::Hash -Filename => $Dfile1, 
+    ok my $primary = new BerkeleyDB::Hash -Filename => $Dfile1,
 				     -Flags    => DB_CREATE ;
 
     # create secondary database
-    ok my $secondary = new BerkeleyDB::Hash -Filename => $Dfile2, 
+    ok my $secondary = new BerkeleyDB::Hash -Filename => $Dfile2,
 				     -Flags    => DB_CREATE ;
 
     # associate primary with secondary
@@ -121,7 +121,7 @@ umask(0);
     ok my $p_cursor = $primary->db_cursor();
     ok my $s_cursor = $secondary->db_cursor();
 
-    # c_get from primary 
+    # c_get from primary
     $k = 'green';
     ok $p_cursor->c_get($k, $v, DB_SET) == 0;
     is $k, 'green';
@@ -137,7 +137,7 @@ umask(0);
     $k = 1;
     ok $p_cursor->c_pget($k, $pk, $v, DB_FIRST) != 0;
 
-    # c_pget from secondary database 
+    # c_pget from secondary database
     $k = 'flag';
     ok $s_cursor->c_pget($k, $pk, $v, DB_SET) == 0
         or diag "$BerkeleyDB::Error\n";
@@ -195,12 +195,12 @@ umask(0);
     my ($k, $v, $pk) = ('','','');
 
     # create primary database
-    ok my $primary = new BerkeleyDB::Btree -Filename => $Dfile1, 
+    ok my $primary = new BerkeleyDB::Btree -Filename => $Dfile1,
 				     -Compare  => sub { return $_[0] cmp $_[1]},
 				     -Flags    => DB_CREATE ;
 
     # create secondary database
-    ok my $secondary = new BerkeleyDB::Btree -Filename => $Dfile2, 
+    ok my $secondary = new BerkeleyDB::Btree -Filename => $Dfile2,
 				     -Compare  => sub { return $_[0] <=> $_[1]},
 				     -Property => DB_DUP,
 				     -Flags    => DB_CREATE ;
@@ -260,11 +260,11 @@ umask(0);
     my ($k, $v, $pk) = ('','','');
 
     # create primary database
-    ok my $primary = new BerkeleyDB::Recno -Filename => $Dfile1, 
+    ok my $primary = new BerkeleyDB::Recno -Filename => $Dfile1,
 				     -Flags    => DB_CREATE ;
 
     # create secondary database
-    ok my $secondary = new BerkeleyDB::Hash -Filename => $Dfile2, 
+    ok my $secondary = new BerkeleyDB::Hash -Filename => $Dfile2,
 				     -Flags    => DB_CREATE ;
 
     # associate primary with secondary
@@ -308,7 +308,7 @@ umask(0);
     ok my $p_cursor = $primary->db_cursor();
     ok my $s_cursor = $secondary->db_cursor();
 
-    # c_get from primary 
+    # c_get from primary
     $k = 1;
     ok $p_cursor->c_get($k, $v, DB_SET) == 0;
     is $k, 1;
@@ -317,7 +317,7 @@ umask(0);
     # c_get from secondary
     $k = 'sea';
     ok $s_cursor->c_get($k, $v, DB_SET) == 0;
-    is $k, 'sea' 
+    is $k, 'sea'
         or warn "# key [$k]\n";
     is $v, 'sea';
 
@@ -325,7 +325,7 @@ umask(0);
     $k = 1;
     ok $p_cursor->c_pget($k, $pk, $v, DB_FIRST) != 0;
 
-    # c_pget from secondary database 
+    # c_pget from secondary database
     $k = 'sea';
     ok $s_cursor->c_pget($k, $pk, $v, DB_SET) == 0;
     is $k, 'sea' ;
@@ -375,11 +375,11 @@ umask(0);
     my ($k, $v, $pk) = ('','','');
 
     # create primary database
-    ok my $primary = new BerkeleyDB::Hash -Filename => $Dfile1, 
+    ok my $primary = new BerkeleyDB::Hash -Filename => $Dfile1,
 				     -Flags    => DB_CREATE ;
 
     # create secondary database
-    ok my $secondary = new BerkeleyDB::Recno -Filename => $Dfile2, 
+    ok my $secondary = new BerkeleyDB::Recno -Filename => $Dfile2,
                      #-Property => DB_DUP,
 				     -Flags    => DB_CREATE ;
 
@@ -428,7 +428,7 @@ umask(0);
     ok my $p_cursor = $primary->db_cursor();
     ok my $s_cursor = $secondary->db_cursor();
 
-    # c_get from primary 
+    # c_get from primary
     $k = 'green';
     ok $p_cursor->c_get($k, $v, DB_SET) == 0;
     is $k, 'green';
@@ -444,7 +444,7 @@ umask(0);
     $k = 1;
     ok $p_cursor->c_pget($k, $pk, $v, DB_SET) != 0;
 
-    # c_pget from secondary database 
+    # c_pget from secondary database
     $k = 5;
     ok $s_cursor->c_pget($k, $pk, $v, DB_SET) == 0
         or diag "$BerkeleyDB::Error\n";

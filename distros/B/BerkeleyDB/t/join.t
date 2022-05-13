@@ -1,11 +1,11 @@
 #!./perl -w
 
-# ID: %I%, %G%   
+# ID: %I%, %G%
 
 use strict ;
 
 use lib 't';
-use BerkeleyDB; 
+use BerkeleyDB;
 use util ;
 use Test::More;
 
@@ -13,7 +13,7 @@ BEGIN {
     plan(skip_all => "this needs BerkeleyDB 2.5.2 or better" )
         if $BerkeleyDB::db_ver < 2.005002;
 
-    plan tests => 42;    
+    plan tests => 42;
 }
 
 my $Dfile1 = "dbhash1.tmp";
@@ -31,7 +31,7 @@ umask(0) ;
     my $status ;
     my $cursor ;
 
-    ok my $db1 = tie %hash1, 'BerkeleyDB::Hash', 
+    ok my $db1 = tie %hash1, 'BerkeleyDB::Hash',
 				-Filename => $Dfile1,
                                	-Flags     => DB_CREATE,
                                 -DupCompare   => sub { $_[0] lt $_[1] },
@@ -79,7 +79,7 @@ umask(0) ;
 					  	|DB_INIT_MPOOL;
 					  	#|DB_INIT_MPOOL| DB_INIT_LOCK;
     ok my $txn = $env->txn_begin() ;
-    ok my $db1 = tie %hash1, 'BerkeleyDB::Hash', 
+    ok my $db1 = tie %hash1, 'BerkeleyDB::Hash',
 				-Filename => $Dfile1,
                                	-Flags     => DB_CREATE,
                                 -DupCompare   => sub { $_[0] cmp $_[1] },
@@ -88,7 +88,7 @@ umask(0) ;
 			    	-Txn	   => $txn  ;
 				;
 
-    ok my $db2 = tie %hash2, 'BerkeleyDB::Hash', 
+    ok my $db2 = tie %hash2, 'BerkeleyDB::Hash',
 				-Filename => $Dfile2,
                                	-Flags     => DB_CREATE,
                                 -DupCompare   => sub { $_[0] cmp $_[1] },
@@ -96,7 +96,7 @@ umask(0) ;
 			       	-Env 	   => $env,
 			    	-Txn	   => $txn  ;
 
-    ok my $db3 = tie %hash3, 'BerkeleyDB::Btree', 
+    ok my $db3 = tie %hash3, 'BerkeleyDB::Btree',
 				-Filename => $Dfile3,
                                	-Flags     => DB_CREATE,
                                 -DupCompare   => sub { $_[0] cmp $_[1] },
@@ -104,7 +104,7 @@ umask(0) ;
 			       	-Env 	   => $env,
 			    	-Txn	   => $txn  ;
 
-    
+
     ok addData($db1, qw( 	apple		Convenience
     				peach		Shopway
 				pear		Farmer
@@ -145,7 +145,7 @@ umask(0) ;
 
     # sequence forwards
     while ($cursor1->c_get($k, $v) == 0) {
-	delete $expected{$k} 
+	delete $expected{$k}
 	    if defined $expected{$k} && $expected{$k} eq $v ;
 	#print "[$k] [$v]\n" ;
     }
@@ -170,7 +170,7 @@ umask(0) ;
 
     # sequence forwards
     while ($cursor1->c_get($k, $v) == 0) {
-	delete $expected{$k} 
+	delete $expected{$k}
 	    if defined $expected{$k} && $expected{$k} eq $v ;
 	#print "[$k] [$v]\n" ;
     }
@@ -183,17 +183,17 @@ umask(0) ;
     $k = "red" ;
     $v = "" ;
     ok $cursor2->c_get($k, $v, DB_SET) == 0 ;
- 
+
     ok $cursor3 = $db3->db_cursor() ;
     $k = "expensive" ;
     $v = "" ;
     ok $cursor3->c_get($k, $v, DB_SET) == 0 ;
     ok $cursor1 = $db1->db_join([$cursor2, $cursor3]) ;
- 
+
     %expected = qw( apple 1
                         strawberry 1
                 ) ;
- 
+
     # sequence forwards
     $k = "" ;
     $v = "" ;

@@ -1,11 +1,11 @@
 #!./perl -w
 
-# ID: %I%, %G%   
+# ID: %I%, %G%
 
 use strict ;
 
 use lib 't' ;
-use BerkeleyDB; 
+use BerkeleyDB;
 use util ;
 use Test::More;
 plan tests =>  50;
@@ -43,11 +43,11 @@ umask(0) ;
     my $lex = new LexFile $Dfile ;
     ok writeFile($Dfile, "") ;
 
-    ok ! (new BerkeleyDB::Unknown -Filename => $Dfile); 
+    ok ! (new BerkeleyDB::Unknown -Filename => $Dfile);
 
     # now a non-database file
     writeFile($Dfile, "\x2af6") ;
-    ok ! (new BerkeleyDB::Unknown -Filename => $Dfile); 
+    ok ! (new BerkeleyDB::Unknown -Filename => $Dfile);
 }
 
 # check the interface to a Hash database
@@ -56,13 +56,13 @@ umask(0) ;
     my $lex = new LexFile $Dfile ;
 
     # create a hash database
-    ok my $db = new BerkeleyDB::Hash -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Hash -Filename => $Dfile,
 				    -Flags    => DB_CREATE ;
 
     # Add a few k/v pairs
     my $value ;
     my $status ;
-    ok $db->db_put("some key", "some value") == 0 
+    ok $db->db_put("some key", "some value") == 0
         or diag "Cannot db_put: [$!][$BerkeleyDB::Error]\n" ;
 
     ok $db->db_put("key", "value") == 0  ;
@@ -71,7 +71,7 @@ umask(0) ;
     undef $db ;
 
     # now open it with Unknown
-    ok $db = new BerkeleyDB::Unknown -Filename => $Dfile; 
+    ok $db = new BerkeleyDB::Unknown -Filename => $Dfile;
 
     ok $db->type() == DB_HASH ;
     ok $db->db_get("some key", $value) == 0 ;
@@ -95,7 +95,7 @@ umask(0) ;
     my $lex = new LexFile $Dfile ;
 
     # create a hash database
-    ok my $db = new BerkeleyDB::Btree -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Btree -Filename => $Dfile,
 				    -Flags    => DB_CREATE ;
 
     # Add a few k/v pairs
@@ -109,7 +109,7 @@ umask(0) ;
 
     # now open it with Unknown
     # create a hash database
-    ok $db = new BerkeleyDB::Unknown -Filename => $Dfile; 
+    ok $db = new BerkeleyDB::Unknown -Filename => $Dfile;
 
     ok $db->type() == DB_BTREE ;
     ok $db->db_get("some key", $value) == 0 ;
@@ -136,7 +136,7 @@ if(1)
     my $lex = new LexFile $Dfile ;
 
     # create a recno database
-    ok my $db = new BerkeleyDB::Recno -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Recno -Filename => $Dfile,
 				    -Flags    => DB_CREATE ;
 
     # Add a few k/v pairs
@@ -150,7 +150,7 @@ if(1)
 
     # now open it with Unknown
     # create a hash database
-    ok $db = new BerkeleyDB::Unknown -Filename => $Dfile; 
+    ok $db = new BerkeleyDB::Unknown -Filename => $Dfile;
 
     ok $db->type() == DB_RECNO ;
     ok $db->db_get(0, $value) == 0 ;
@@ -180,7 +180,7 @@ SKIP:
     my $lex = new LexFile $Dfile ;
 
     # create a hash database
-    ok my $db = new BerkeleyDB::Heap -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Heap -Filename => $Dfile,
 				    -Flags    => DB_CREATE ;
 
     # Add a few k/v pairs
@@ -196,10 +196,10 @@ SKIP:
 
     # now open it with Unknown
     # create a hash database
-    ok $db = new BerkeleyDB::Unknown -Filename => $Dfile; 
+    ok $db = new BerkeleyDB::Unknown -Filename => $Dfile;
 
     ok $db->type() == DB_HEAP ;
-    ok $db->db_get($key1, $value) == 0 
+    ok $db->db_get($key1, $value) == 0
         or diag "Cannot db_get: [$!][$BerkeleyDB::Error]\n" ;
     ok $value eq "some value" ;
     ok $db->db_get($key2, $value) == 0 ;

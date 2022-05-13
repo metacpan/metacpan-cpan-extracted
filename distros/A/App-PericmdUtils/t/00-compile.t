@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/PericmdUtils.pm'
@@ -15,7 +15,8 @@ my @module_files = (
 my @scripts = (
     'script/detect-pericmd-script',
     'script/dump-pericmd-script',
-    'script/gen-pod-for-pericmd-script'
+    'script/gen-pod-for-pericmd-script',
+    'script/list-pericmd-plugins'
 );
 
 # no fake home requested

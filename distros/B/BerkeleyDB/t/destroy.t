@@ -3,7 +3,7 @@
 use strict ;
 
 use lib 't' ;
-use BerkeleyDB; 
+use BerkeleyDB;
 use util ;
 use Test::More;
 
@@ -34,7 +34,7 @@ umask(0);
     ok $txn->txn_commit() == 0 ;
     ok $txn = $env->txn_begin() ;
     $db1->Txn($txn);
-    
+
     # create some data
     my %data =  (
 		"red"	=> "boat",
@@ -85,7 +85,7 @@ umask(0);
     my %hash ;
     my $cursor ;
     my ($k, $v) = ("", "") ;
-    ok my $db1 = tie %hash, 'BerkeleyDB::Hash', 
+    ok my $db1 = tie %hash, 'BerkeleyDB::Hash',
 		-Filename	=> $Dfile,
                	-Flags		=> DB_CREATE ;
     my $count = 0 ;
@@ -96,5 +96,3 @@ umask(0);
     }
     is $count, 0 ;
 }
-
-

@@ -31,7 +31,7 @@ LIB	= /usr/local/BerkeleyDB/lib
 #    Berkeley DB library from libdb.a to libdb-2.6.4.a  and change the
 #    DBNAME line below to look like this:
 #
-#        DBNAME = -ldb-2.6.4 
+#        DBNAME = -ldb-2.6.4
 #
 #    Note: If you are building this module with Win32, -llibdb will be
 #    used by default.

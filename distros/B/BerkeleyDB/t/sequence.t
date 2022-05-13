@@ -3,12 +3,12 @@ use strict ;
 
 use lib 't' ;
 use Test::More;
-use BerkeleyDB; 
+use BerkeleyDB;
 use util;
 
 plan(skip_all => "Sequence needs Berkeley DB 4.3.x or better\n" )
     if $BerkeleyDB::db_version < 4.3;
-    
+
 plan tests => 13;
 
 {
@@ -25,7 +25,7 @@ isa_ok($env, "BerkeleyDB::Env");
 
 my $db = BerkeleyDB::Btree->new(
     Env => $env,
-    -Filename => $Dfile, 
+    -Filename => $Dfile,
 	-Flags    => DB_CREATE
 );
 

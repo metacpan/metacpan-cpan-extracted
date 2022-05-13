@@ -1,5 +1,5 @@
 package File::IsSorted;
-$File::IsSorted::VERSION = '0.0.6';
+$File::IsSorted::VERSION = '0.2.0';
 use strict;
 use warnings;
 use autodie;
@@ -58,7 +58,7 @@ File::IsSorted - check if the lines of a file are sorted lexicographically
 
 =head1 VERSION
 
-version 0.0.6
+version 0.2.0
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@
 use strict ;
 
 use lib 't';
-use BerkeleyDB; 
+use BerkeleyDB;
 use util ;
 use Test::More;
 
@@ -32,7 +32,7 @@ umask(0) ;
     ok $@ =~ /unknown key value\(s\) Stupid/  ;
 
     eval ' $db = new BerkeleyDB::Heap -Bad => 2, -Mode => 0345, -Stupid => 3; ' ;
-    ok $@ =~ /unknown key value\(s\) (Bad,? |Stupid,? ){2}/  
+    ok $@ =~ /unknown key value\(s\) (Bad,? |Stupid,? ){2}/
         or print "# $@" ;
 
     eval ' $db = new BerkeleyDB::Heap -Env => 2 ' ;
@@ -61,8 +61,8 @@ umask(0) ;
 {
     my $lex = new LexFile $Dfile ;
 
-    ok my $db = new BerkeleyDB::Heap -Filename => $Dfile, 
-				    -Flags    => DB_CREATE 
+    ok my $db = new BerkeleyDB::Heap -Filename => $Dfile,
+				    -Flags    => DB_CREATE
         or diag "Cannot create Heap: [$!][$BerkeleyDB::Error]\n" ;
 
     # Add a k/v pair
@@ -71,20 +71,20 @@ umask(0) ;
     my $key1;
     my $key2;
     is $db->Env, undef;
-    ok $db->db_put($key1, "some value", DB_APPEND) == 0  
+    ok $db->db_put($key1, "some value", DB_APPEND) == 0
         or diag "Cannot db_put: " . $db->status() . "[$!][$BerkeleyDB::Error]\n" ;
     ok $db->status() == 0 ;
-    ok $db->db_get($key1, $value) == 0 
+    ok $db->db_get($key1, $value) == 0
         or diag "Cannot db_get: [$!][$BerkeleyDB::Error]\n" ;
     ok $value eq "some value" ;
     ok $db->db_put($key2, "value", DB_APPEND) == 0  ;
-    ok $db->db_get($key2, $value) == 0 
+    ok $db->db_get($key2, $value) == 0
         or diag "Cannot db_get: [$!][$BerkeleyDB::Error]\n" ;
     ok $value eq "value" ;
     ok $db->db_del($key1) == 0 ;
     ok $db->db_get($key1, $value) == DB_NOTFOUND ;
     ok $db->status() == DB_NOTFOUND ;
-    ok $db->status() =~ $DB_errors{'DB_NOTFOUND'} 
+    ok $db->status() =~ $DB_errors{'DB_NOTFOUND'}
         or diag "Status is [" . $db->status() . "]";
 
     ok $db->db_sync() == 0 ;
@@ -125,7 +125,7 @@ umask(0) ;
 
     ok my $env = new BerkeleyDB::Env -Flags => DB_CREATE|DB_INIT_MPOOL,
     					 @StdErrFile, -Home => $home ;
-    ok my $db = new BerkeleyDB::Heap -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Heap -Filename => $Dfile,
 				    -Env      => $env,
 				    -Flags    => DB_CREATE ;
 
@@ -142,16 +142,16 @@ umask(0) ;
     undef $env ;
 }
 
- 
+
 {
     # cursors
 
     my $lex = new LexFile $Dfile ;
     my %hash ;
     my ($k, $v) ;
-    ok my $db = new BerkeleyDB::Heap -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Heap -Filename => $Dfile,
 				     -Flags    => DB_CREATE ;
-    #print "[$db] [$!] $BerkeleyDB::Error\n" ;				     
+    #print "[$db] [$!] $BerkeleyDB::Error\n" ;
 
     # create some data
     my %data =  ();
@@ -175,7 +175,7 @@ umask(0) ;
     my $extras = 0 ;
     # sequence forwards
     while ($cursor->c_get($k, $v, DB_NEXT) == 0) {
-        if ( $copy{$k} eq $v ) 
+        if ( $copy{$k} eq $v )
             { delete $copy{$k} }
 	else
 	    { ++ $extras }
@@ -192,7 +192,7 @@ umask(0) ;
     for ( $status = $cursor->c_get($k, $v, DB_LAST) ;
 	  $status == 0 ;
     	  $status = $cursor->c_get($k, $v, DB_PREV)) {
-        if ( $copy{$k} eq $v ) 
+        if ( $copy{$k} eq $v )
             { delete $copy{$k} }
 	else
 	    { ++ $extras }
@@ -214,7 +214,7 @@ umask(0) ;
     ok $cursor->c_get($k, $v, DB_GET_BOTH) == DB_NOTFOUND, "DB_NOTFOUND" ;
 
 }
- 
+
 
 
 
@@ -226,7 +226,7 @@ umask(0) ;
     my $fd ;
     my $value ;
     #ok my $db = tie %hash, 'BerkeleyDB::Heap' ;
-    my $db = new BerkeleyDB::Heap 
+    my $db = new BerkeleyDB::Heap
 				     -Flags    => DB_CREATE ;
 
     isa_ok $db, 'BerkeleyDB::Heap' ;
@@ -236,7 +236,7 @@ umask(0) ;
     ok $value eq "some value", "some value" ;
 
 }
- 
+
 if (0)
 {
     # partial
@@ -353,7 +353,7 @@ if (0)
     ok ((my $Z = $txn->txn_commit()) == 0) ;
     ok $txn = $env->txn_begin() ;
     $db1->Txn($txn);
-    
+
     # create some data
     my %data =  (
 		"red"	=> "boat",
@@ -433,7 +433,7 @@ exit;
     ok $cursor->c_get($key, $value, DB_NEXT) == 0 ;
     ok $key eq "Wall" && $value eq "Brick" ;
 
-    #my $ref = $db->db_stat() ; 
+    #my $ref = $db->db_stat() ;
     #ok ($ref->{bt_flags} | DB_DUP) == DB_DUP ;
 #print "bt_flags " . $ref->{bt_flags} . " DB_DUP " . DB_DUP ."\n";
 
@@ -450,13 +450,13 @@ exit;
     my $recs = ($BerkeleyDB::db_version >= 3.1 ? "bt_ndata" : "bt_nrecs") ;
     my %hash ;
     my ($k, $v) ;
-    ok my $db = new BerkeleyDB::Heap -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Heap -Filename => $Dfile,
 				     -Flags    => DB_CREATE,
 				 	-Minkey	=>3 ,
-					-Pagesize	=> 2 **12 
+					-Pagesize	=> 2 **12
 					;
 
-    my $ref = $db->db_stat() ; 
+    my $ref = $db->db_stat() ;
     ok $ref->{$recs} == 0;
     ok $ref->{'bt_minkey'} == 3;
     ok $ref->{'bt_pagesize'} == 2 ** 12;
@@ -474,7 +474,7 @@ exit;
     }
     ok $ret == 0 ;
 
-    $ref = $db->db_stat() ; 
+    $ref = $db->db_stat() ;
     ok $ref->{$recs} == 3;
 }
 
@@ -498,14 +498,14 @@ exit;
    @ISA=qw(BerkeleyDB BerkeleyDB::Heap );
    @EXPORT = @BerkeleyDB::EXPORT ;
 
-   sub db_put { 
+   sub db_put {
 	my $self = shift ;
         my $key = shift ;
         my $value = shift ;
         $self->SUPER::db_put($key, $value * 3) ;
    }
 
-   sub db_get { 
+   sub db_get {
 	my $self = shift ;
         $self->SUPER::db_get($_[0], $_[1]) ;
 	$_[1] -= 2 ;
@@ -525,13 +525,13 @@ EOM
     close FILE ;
 
     use Test::More;
-    BEGIN { push @INC, '.'; }    
+    BEGIN { push @INC, '.'; }
     eval 'use SubDB ; ';
     ok $@ eq "" ;
     my %h ;
     my $X ;
     eval '
-	$X = tie(%h, "SubDB", -Filename => "dbbtree.tmp", 
+	$X = tie(%h, "SubDB", -Filename => "dbbtree.tmp",
 			-Flags => DB_CREATE,
 			-Mode => 0640 );
 	' ;
@@ -560,5 +560,3 @@ EOM
     unlink "SubDB.pm", "dbbtree.tmp" ;
 
 }
-
-

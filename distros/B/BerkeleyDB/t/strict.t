@@ -3,12 +3,12 @@
 use strict ;
 
 use lib 't' ;
-use BerkeleyDB; 
+use BerkeleyDB;
 use util ;
 
 use Test::More ;
 
-plan tests => 44;    
+plan tests => 44;
 
 my $Dfile = "dbhash.tmp";
 my $home = "./fred" ;
@@ -25,12 +25,12 @@ umask(0);
     ok my $env = new BerkeleyDB::Env -Home => $home,@StdErrFile,
                                      -Flags => DB_CREATE|DB_INIT_TXN|
                                                 DB_INIT_MPOOL|DB_INIT_LOCK ;
-					  	
+
     ok my $db1 = tie %hash, 'BerkeleyDB::Hash', -Filename => $Dfile,
                                       	       	-Flags     => DB_CREATE ,
 					       	-Env 	   => $env;
 
-    ok $db1->db_close() == 0 ; 
+    ok $db1->db_close() == 0 ;
 
     eval { $status = $env->db_appexit() ; } ;
     ok $status == 0 ;
@@ -48,7 +48,7 @@ umask(0);
     ok my $env = new BerkeleyDB::Env -Home => $home,@StdErrFile,
                                      -Flags => DB_CREATE|DB_INIT_TXN|
                                                 DB_INIT_MPOOL|DB_INIT_LOCK ;
-					  	
+
     ok my $db1 = tie %hash, 'BerkeleyDB::Hash', -Filename => $Dfile,
                                       	       	-Flags     => DB_CREATE ,
 					       	-Env 	   => $env;
@@ -63,7 +63,7 @@ umask(0);
 }
 
 {
-    # closing a transaction & a database 
+    # closing a transaction & a database
     my $lex = new LexFile $Dfile ;
     my %hash ;
     my $status ;
@@ -114,7 +114,7 @@ umask(0);
 }
 
 {
-    # closing a cursor & a database 
+    # closing a cursor & a database
     my $lex = new LexFile $Dfile ;
     my %hash ;
     my $status ;
@@ -141,7 +141,7 @@ umask(0);
 }
 
 {
-    # closing a transaction & a cursor 
+    # closing a transaction & a cursor
     my $lex = new LexFile $Dfile ;
     my %hash ;
     my $status ;
@@ -170,4 +170,3 @@ umask(0);
     ok $@ eq "" ;
     #print "[$@]\n" ;
 }
-

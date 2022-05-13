@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use utf8;
 use 5.016;
@@ -100,6 +100,7 @@ if (defined $args{t}) {
     local $args{c} = 0;
     my @argv = splice(@ARGV);
 
+    my @fails;
     require Encode;
     while (defined(my $script_name = shift @argv)) {
 
@@ -117,6 +118,7 @@ if (defined $args{t}) {
         my $slept = 0;
         if ($@) {
             warn "[ERROR] Can't parse the script `$script_name`: $@";
+            push @fails, $script_name;
             sleep 2;
             $slept = 1;
         }
@@ -135,8 +137,17 @@ if (defined $args{t}) {
 
         if (not($slept) and $@) {
             warn "[ERROR] Error encountered on script `$script_name`: $@";
+            push @fails, $script_name;
             sleep(2) if @argv;
         }
+    }
+
+    if (@fails) {
+        say "\n";
+        say "-" x 80;
+        say ":: The following scripts failed";
+        say "-" x 80;
+        say "$_" for @fails;
     }
 }
 
@@ -465,6 +476,8 @@ EOT
 
     my $tΔ = 0;
 
+    my @values;
+
   MAINLOOP: {
         my $line = '';
 
@@ -535,6 +548,8 @@ EOT
         $vars          = $copy_hash->($sidef->{parser}{vars});
         $ref_vars_refs = $copy_hash->($sidef->{parser}{ref_vars_refs});
 
+        $line =~ s{#([1-9][0-9]*)\b}{($1 <= scalar(@values)) ? $values[$1-1]->{value} : "#$1"}ge;
+
         my $ccode = eval { $sidef->compile_code($line, $args{r} ? 'Sidef' : ($args{R} || 'Perl')) };
 
         if ($@) {
@@ -550,6 +565,7 @@ EOT
                 $sidef->execute_code('');    # warm-up
                 undef $vars;
                 undef $ref_vars_refs;
+                @values = ();
                 redo;
             }
 
@@ -622,7 +638,13 @@ EOT
             );
             $dump = "($dump)" if @results > 1;
 
-            say "=> $dump";
+            push @values,
+              {
+                type  => ((scalar(@results) == 1) ? 'scalar' : 'list'),
+                value => $dump,
+              };
+
+            say "#" . scalar(@values) . " = $dump";
         }
         redo;
     }
@@ -859,12 +881,14 @@ Outputs:
 The interactive mode (a.k.a. REPL) is available by simply executing the C<sidef> command, or by specifying the C<-i> command-line switch:
 
     $ sidef -i
-    Sidef 22.03, running on Linux, using Perl v5.34.0.
+    Sidef 22.05, running on Linux, using Perl v5.34.1.
     Type "help", "copyright" or "license" for more information.
     >> n = 41
-    => 41
+    #1 = 41
     >> n**2 + n - 1
-    => 1721
+    #2 = 1721
+    >> is_prime(#2)
+    #3 = true
     >>
 
 =head1 SPECIAL REPL COMMANDS
@@ -877,6 +901,12 @@ The REPL supports the following special commands:
 
     >> ##
 
+=item * Refer to a previous output value, using the C<#n> syntax:
+
+    >> 3+4
+    #1 = 7
+    >> sqrt(#1)
+
 =item * Save the code from the REPL inside a file:
 
     >> # save filename.sf
@@ -884,6 +914,10 @@ The REPL supports the following special commands:
 =item * Load a Sidef file inside the REPL:
 
     >> # load filename.sf
+
+=item * Reset the REPL:
+
+    >> reset
 
 =item * Close the REPL:
 
@@ -995,11 +1029,11 @@ You can find more info about Sidef, by clicking on the following links:
 
 =over 2
 
-=item * Github: L<https://github.com/trizen/sidef>
+=item * GitHub: L<https://github.com/trizen/sidef>
 
 =item * Gitbook: L<https://trizen.gitbook.io/sidef-lang/>
 
-=item * Tutorial: L<https://github.com/trizen/sidef/wiki>
+=item * Tutorial: L<https://notabug.org/trizen/sidef/wiki>
 
 =item * RosettaCode: L<https://rosettacode.org/wiki/Sidef>
 

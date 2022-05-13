@@ -1,6 +1,6 @@
 #!./perl -w
 
-use strict ; 
+use strict ;
 
 BEGIN {
     unless(grep /blib/, @INC) {
@@ -10,7 +10,7 @@ BEGIN {
 }
 
 use lib 't';
-use BerkeleyDB; 
+use BerkeleyDB;
 use Test::More;
 use util;
 
@@ -35,11 +35,11 @@ my $redirect = "xyzt" ;
     use strict ;
     use BerkeleyDB ;
     use vars qw( %h $k $v ) ;
-    
+
     my $filename = "fruit" ;
     unlink $filename ;
-    tie %h, "BerkeleyDB::Hash", 
-                -Filename => $filename, 
+    tie %h, "BerkeleyDB::Hash",
+                -Filename => $filename,
 		-Flags    => DB_CREATE
         or die "Cannot open file $filename: $! $BerkeleyDB::Error\n" ;
 
@@ -48,17 +48,17 @@ my $redirect = "xyzt" ;
     $h{"orange"} = "orange" ;
     $h{"banana"} = "yellow" ;
     $h{"tomato"} = "red" ;
-    
+
     # Check for existence of a key
     print "Banana Exists\n\n" if $h{"banana"} ;
-    
+
     # Delete a key/value pair.
     delete $h{"apple"} ;
-    
+
     # print the contents of the file
     while (($k, $v) = each %h)
       { print "$k -> $v\n" }
-      
+
     untie %h ;
     unlink $filename ;
  }
@@ -83,11 +83,11 @@ my $redirect = "xyzt" ;
 
     use strict ;
     use BerkeleyDB ;
-    
+
     my $filename = "fruit" ;
     unlink $filename ;
-    my $db = new BerkeleyDB::Hash 
-                -Filename => $filename, 
+    my $db = new BerkeleyDB::Hash
+                -Filename => $filename,
 		-Flags    => DB_CREATE
         or die "Cannot open file $filename: $! $BerkeleyDB::Error\n" ;
 
@@ -96,19 +96,19 @@ my $redirect = "xyzt" ;
     $db->db_put("orange", "orange") ;
     $db->db_put("banana", "yellow") ;
     $db->db_put("tomato", "red") ;
-    
+
     # Check for existence of a key
     print "Banana Exists\n\n" if $db->db_get("banana", $v) == 0;
-    
+
     # Delete a key/value pair.
     $db->db_del("apple") ;
-    
+
     # print the contents of the file
     my ($k, $v) = ("", "") ;
     my $cursor = $db->db_cursor() ;
     while ($cursor->c_get($k, $v, DB_NEXT) == 0)
       { print "$k -> $v\n" }
-      
+
     undef $cursor ;
     undef $db ;
     unlink $filename ;
@@ -137,8 +137,8 @@ my $redirect = "xyzt" ;
     my $filename = "tree" ;
     unlink $filename ;
     my %h ;
-    tie %h, 'BerkeleyDB::Btree', 
-    		-Filename   => $filename, 
+    tie %h, 'BerkeleyDB::Btree',
+    		-Filename   => $filename,
 	        -Flags      => DB_CREATE
       or die "Cannot open $filename: $! $BerkeleyDB::Error\n" ;
 
@@ -182,8 +182,8 @@ my $redirect = "xyzt" ;
     my $filename = "tree" ;
     unlink $filename ;
     my %h ;
-    tie %h, 'BerkeleyDB::Btree', 
-    		-Filename   => $filename, 
+    tie %h, 'BerkeleyDB::Btree',
+    		-Filename   => $filename,
 	        -Flags      => DB_CREATE,
 		-Compare    => sub { lc $_[0] cmp lc $_[1] }
       or die "Cannot open $filename: $!\n" ;
@@ -229,8 +229,8 @@ my $redirect = "xyzt" ;
     my $filename = "filt.db" ;
     unlink $filename ;
 
-    my $db = tie %hash, 'BerkeleyDB::Hash', 
-    		-Filename   => $filename, 
+    my $db = tie %hash, 'BerkeleyDB::Hash',
+    		-Filename   => $filename,
 	        -Flags      => DB_CREATE
       or die "Cannot open $filename: $!\n" ;
 
@@ -245,8 +245,8 @@ my $redirect = "xyzt" ;
     # ...
     undef $db ;
     untie %hash ;
-    $db = tie %hash, 'BerkeleyDB::Hash', 
-    		-Filename   => $filename, 
+    $db = tie %hash, 'BerkeleyDB::Hash',
+    		-Filename   => $filename,
 	        -Flags      => DB_CREATE
       or die "Cannot open $filename: $!\n" ;
     while (($k, $v) = each %hash)
@@ -277,8 +277,8 @@ my $redirect = "xyzt" ;
     unlink $filename ;
 
 
-    my $db = tie %hash, 'BerkeleyDB::Btree', 
-    		-Filename   => $filename, 
+    my $db = tie %hash, 'BerkeleyDB::Btree',
+    		-Filename   => $filename,
 	        -Flags      => DB_CREATE
       or die "Cannot open $filename: $!\n" ;
 
@@ -288,8 +288,8 @@ my $redirect = "xyzt" ;
     # ...
     undef $db ;
     untie %hash ;
-    $db = tie %hash, 'BerkeleyDB::Btree', 
-    		-Filename   => $filename, 
+    $db = tie %hash, 'BerkeleyDB::Btree',
+    		-Filename   => $filename,
 	        -Flags      => DB_CREATE
       or die "Cannot Open $filename: $!\n" ;
     while (($k, $v) = each %hash)
@@ -322,8 +322,8 @@ my $redirect = "xyzt" ;
     unlink $filename ;
 
     my @h ;
-    tie @h, 'BerkeleyDB::Recno', 
-    		-Filename   => $filename, 
+    tie @h, 'BerkeleyDB::Recno',
+    		-Filename   => $filename,
 	        -Flags      => DB_CREATE,
 		-Property   => DB_RENUMBER
       or die "Cannot open $filename: $!\n" ;
@@ -358,8 +358,8 @@ my $redirect = "xyzt" ;
     unlink $filename ;
 
     my @h ;
-    my $db = tie @h, 'BerkeleyDB::Recno', 
-    		-Filename   => $filename, 
+    my $db = tie @h, 'BerkeleyDB::Recno',
+    		-Filename   => $filename,
 	        -Flags      => DB_CREATE,
 		-Property   => DB_RENUMBER
       or die "Cannot open $filename: $!\n" ;
@@ -400,4 +400,3 @@ Element 1 Exists with value blue
 EOM
 
 }
-

@@ -1,5 +1,8 @@
 Revision history for File-IsSorted
 
+0.2.0       2022-05-13
+    - Add are_sorted2() .
+
 0.0.6       2020-04-28
     - Require minimal version of List::Util for `all()`:
         - CPAN Testers failures, e.g:

@@ -1,11 +1,11 @@
 #!./perl -w
 
-# ID: %I%, %G%   
+# ID: %I%, %G%
 
 use strict ;
 
 use lib 't' ;
-use BerkeleyDB; 
+use BerkeleyDB;
 use util ;
 use Test::More;
 
@@ -45,7 +45,7 @@ umask(0) ;
 {
     my $lex = new LexFile $Dfile ;
 
-    ok my $db = new BerkeleyDB::Hash -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Hash -Filename => $Dfile,
 				    -Flags    => DB_CREATE ;
 
     # Add a k/v pair
@@ -101,12 +101,12 @@ umask(0) ;
 
     ok my $env = new BerkeleyDB::Env -Flags => DB_CREATE| DB_INIT_MPOOL,@StdErrFile,
     					 -Home  => $home ;
-    ok my $db = new BerkeleyDB::Hash -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Hash -Filename => $Dfile,
 				    -Env      => $env,
 				    -Flags    => DB_CREATE ;
 
     isa_ok $db->Env, 'BerkeleyDB::Env';
-                    
+
     # Add a k/v pair
     my $value ;
     ok $db->db_put("some key", "some value") == 0 ;
@@ -122,7 +122,7 @@ umask(0) ;
     my $lex = new LexFile $Dfile ;
     my $value ;
     $::count = 0 ;
-    ok my $db = new BerkeleyDB::Hash -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Hash -Filename => $Dfile,
 				     -Hash     => sub {  ++$::count ; length $_[0] },
 				     -Flags    => DB_CREATE ;
 
@@ -132,14 +132,14 @@ umask(0) ;
     ok $::count > 0 ;
 
 }
- 
+
 {
     # cursors
 
     my $lex = new LexFile $Dfile ;
     my %hash ;
     my ($k, $v) ;
-    ok my $db = new BerkeleyDB::Hash -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Hash -Filename => $Dfile,
 				     -Flags    => DB_CREATE ;
 
     # create some data
@@ -163,7 +163,7 @@ umask(0) ;
     my $extras = 0 ;
     # sequence forwards
     while ($cursor->c_get($k, $v, DB_NEXT) == 0) {
-        if ( $copy{$k} eq $v ) 
+        if ( $copy{$k} eq $v )
             { delete $copy{$k} }
 	else
 	    { ++ $extras }
@@ -180,7 +180,7 @@ umask(0) ;
     for ( $status = $cursor->c_get($k, $v, DB_LAST) ;
 	  $status == 0 ;
     	  $status = $cursor->c_get($k, $v, DB_PREV)) {
-        if ( $copy{$k} eq $v ) 
+        if ( $copy{$k} eq $v )
             { delete $copy{$k} }
 	else
 	    { ++ $extras }
@@ -200,9 +200,9 @@ umask(0) ;
 
     ($k, $v) = ("black", "house") ;
     ok $cursor->c_get($k, $v, DB_GET_BOTH) == DB_NOTFOUND ;
-    
+
 }
- 
+
 {
     # Tied Hash interface
 
@@ -278,7 +278,7 @@ umask(0) ;
     undef $db ;
     untie %hash ;
 }
- 
+
 {
     # partial
     # check works via API
@@ -363,7 +363,7 @@ umask(0) ;
 
 {
     # partial
-    # check works via tied hash 
+    # check works via tied hash
 
     my $lex = new LexFile $Dfile ;
     my %hash ;
@@ -530,7 +530,7 @@ umask(0) ;
     ok $cursor->c_get($key, $value, DB_NEXT) == 0 ;
     ok $key eq "Wall" && $value eq "Brick" ;
 
-    #my $ref = $db->db_stat() ; 
+    #my $ref = $db->db_stat() ;
     #ok $ref->{bt_flags} | DB_DUP ;
 
     # test DB_DUP_NEXT
@@ -544,7 +544,7 @@ umask(0) ;
     ok $cursor->c_get($k, $v, DB_NEXT_DUP) == 0 ;
     ok $k eq "Wall" && $v eq "Brick" ;
     ok $cursor->c_get($k, $v, DB_NEXT_DUP) == DB_NOTFOUND ;
-    
+
 
     undef $db ;
     undef $cursor ;
@@ -557,15 +557,15 @@ umask(0) ;
     my $lex = new LexFile $Dfile, $Dfile2;
     my ($key, $value) ;
     my (%h, %g) ;
-    my @Keys   = qw( 0123 9 12 -1234 9 987654321 9 def  ) ; 
-    my @Values = qw( 1    11 3   dd   x abc      2 0    ) ; 
+    my @Keys   = qw( 0123 9 12 -1234 9 987654321 9 def  ) ;
+    my @Values = qw( 1    11 3   dd   x abc      2 0    ) ;
 
-    ok tie %h, "BerkeleyDB::Hash", -Filename => $Dfile, 
+    ok tie %h, "BerkeleyDB::Hash", -Filename => $Dfile,
 				     -DupCompare   => sub { $_[0] cmp $_[1] },
 				     -Property  => DB_DUP|DB_DUPSORT,
 				     -Flags    => DB_CREATE ;
 
-    ok tie %g, 'BerkeleyDB::Hash', -Filename => $Dfile2, 
+    ok tie %g, 'BerkeleyDB::Hash', -Filename => $Dfile2,
 				     -DupCompare   => sub { $_[0] <=> $_[1] },
 				     -Property  => DB_DUP|DB_DUPSORT,
 				     -Flags    => DB_CREATE ;
@@ -573,7 +573,7 @@ umask(0) ;
     foreach (@Keys) {
         local $^W = 0 ;
 	my $value = shift @Values ;
-        $h{$_} = $value ; 
+        $h{$_} = $value ;
         $g{$_} = $value ;
     }
 
@@ -603,7 +603,7 @@ umask(0) ;
     my $lex = new LexFile $Dfile;
     my %hh ;
 
-    ok my $YY = tie %hh, "BerkeleyDB::Hash", -Filename => $Dfile, 
+    ok my $YY = tie %hh, "BerkeleyDB::Hash", -Filename => $Dfile,
 				     -DupCompare   => sub { $_[0] cmp $_[1] },
 				     -Property  => DB_DUP,
 				     -Flags    => DB_CREATE ;
@@ -613,38 +613,38 @@ umask(0) ;
     $hh{'Wall'} = 'Brick' ; # Note the duplicate key
     $hh{'Smith'} = 'John' ;
     $hh{'mouse'} = 'mickey' ;
-    
+
     # first work in scalar context
     ok scalar $YY->get_dup('Unknown') == 0 ;
     ok scalar $YY->get_dup('Smith') == 1 ;
     ok scalar $YY->get_dup('Wall') == 3 ;
-    
+
     # now in list context
     my @unknown = $YY->get_dup('Unknown') ;
     ok "@unknown" eq "" ;
-    
+
     my @smith = $YY->get_dup('Smith') ;
     ok "@smith" eq "John" ;
-    
+
     {
         my @wall = $YY->get_dup('Wall') ;
         my %wall ;
         @wall{@wall} = @wall ;
-        ok (@wall == 3 && $wall{'Larry'} 
+        ok (@wall == 3 && $wall{'Larry'}
 			&& $wall{'Stone'} && $wall{'Brick'});
     }
-    
+
     # hash
     my %unknown = $YY->get_dup('Unknown', 1) ;
     ok keys %unknown == 0 ;
-    
+
     my %smith = $YY->get_dup('Smith', 1) ;
     ok keys %smith == 1 && $smith{'John'} ;
-    
+
     my %wall = $YY->get_dup('Wall', 1) ;
-    ok keys %wall == 3 && $wall{'Larry'} == 1 && $wall{'Stone'} == 1 
+    ok keys %wall == 3 && $wall{'Larry'} == 1 && $wall{'Stone'} == 1
     		&& $wall{'Brick'} == 1 ;
-    
+
     undef $YY ;
     untie %hh ;
 
@@ -670,14 +670,14 @@ umask(0) ;
    @ISA=qw(BerkeleyDB BerkeleyDB::Hash);
    @EXPORT = @BerkeleyDB::EXPORT ;
 
-   sub db_put { 
+   sub db_put {
 	my $self = shift ;
         my $key = shift ;
         my $value = shift ;
         $self->SUPER::db_put($key, $value * 3) ;
    }
 
-   sub db_get { 
+   sub db_get {
 	my $self = shift ;
         $self->SUPER::db_get($_[0], $_[1]) ;
 	$_[1] -= 2 ;
@@ -697,13 +697,13 @@ EOM
     close FILE ;
 
     use Test::More;
-    BEGIN { push @INC, '.'; }    
+    BEGIN { push @INC, '.'; }
     eval 'use SubDB ; ';
     ok $@ eq "" ;
     my %h ;
     my $X ;
     eval '
-	$X = tie(%h, "SubDB", -Filename => "dbhash.tmp", 
+	$X = tie(%h, "SubDB", -Filename => "dbhash.tmp",
 			-Flags => DB_CREATE,
 			-Mode => 0640 );
 	' ;

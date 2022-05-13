@@ -23,7 +23,7 @@ requires 'Encode' => 0;
 requires 'Error::Pure' => 0;
 requires 'Plack::Component' => 0;
 requires 'Plack::Util::Accessor' => 0;
-requires 'Tags::HTML::Page::Begin' => 0.11;
+requires 'Tags::HTML::Page::Begin' => 0.12;
 requires 'Tags::HTML::Page::End' => 0;
 requires 'Readonly' => 0;
 requires 'Tags::Output::Raw' => 0;
@@ -35,7 +35,7 @@ test_requires 'Plack::Test' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.04';
+version '0.05';
 
 # Run.
 WriteAll();

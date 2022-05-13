@@ -43,6 +43,6 @@
          "web" : "https://github.com/pmqs/BerkeleyDB"
       }
    },
-   "version" : "0.64",
+   "version" : "0.65",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

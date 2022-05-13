@@ -14,7 +14,8 @@ my @files = (
     'lib/Test/File/IsSorted.pm',
     't/00-compile.t',
     't/core-api.t',
-    't/test-test-module.t'
+    't/test-test-module.t',
+    't/test-test-module2.t'
 );
 
 notabs_ok($_) foreach @files;

@@ -143,6 +143,16 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         }
                         else { // add menu to form
                             button = new qx.ui.form.MenuButton(label, null, menu);
+                            if (btCfg.buttonSet) {
+                                var bs = btCfg.buttonSet;
+                                if (bs.label) {
+                                    bs.label = this.xtr(bs.label);
+                                }
+                                button.set(bs);
+                                if (btCfg.key){
+                                    this._buttonSetMap[btCfg.key]=bs;
+                                }
+                            }
                             this.add(button);
                         }
                         if (btCfg.key) {

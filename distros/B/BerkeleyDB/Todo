@@ -28,7 +28,7 @@ Possibles
 
   * allow recno to allow base offset for arrays to be either 0 or 1.
 
-  * when duplicate keys are enabled, allow db_put($key, [$val1, $val2,...]) 
+  * when duplicate keys are enabled, allow db_put($key, [$val1, $val2,...])
 
 
 2.x -> 3.x Upgrade

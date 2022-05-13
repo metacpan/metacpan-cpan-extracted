@@ -1,11 +1,11 @@
 #!./perl -w
 
-# ID: %I%, %G%   
+# ID: %I%, %G%
 
 use strict ;
 
 use lib 't' ;
-use BerkeleyDB; 
+use BerkeleyDB;
 use util ;
 use Test::More;
 
@@ -28,14 +28,14 @@ umask(0) ;
    {
        my($fk, $sk, $fv, $sv) = @_ ;
        return
-           $fetch_key eq $fk && $store_key eq $sk && 
+           $fetch_key eq $fk && $store_key eq $sk &&
 	   $fetch_value eq $fv && $store_value eq $sv &&
 	   $_ eq 'original' ;
    }
-   
-    ok $db = tie %h, 'BerkeleyDB::Hash', 
-    		-Filename   => $Dfile, 
-	        -Flags      => DB_CREATE; 
+
+    ok $db = tie %h, 'BerkeleyDB::Hash',
+    		-Filename   => $Dfile,
+	        -Flags      => DB_CREATE;
 
    $db->filter_fetch_key   (sub { $fetch_key = $_ }) ;
    $db->filter_store_key   (sub { $store_key = $_ }) ;
@@ -59,15 +59,15 @@ umask(0) ;
    ok checkOutput( "fred", "", "", "") ;
 
    # replace the filters, but remember the previous set
-   my ($old_fk) = $db->filter_fetch_key   
+   my ($old_fk) = $db->filter_fetch_key
    			(sub { $_ = uc $_ ; $fetch_key = $_ }) ;
-   my ($old_sk) = $db->filter_store_key   
+   my ($old_sk) = $db->filter_store_key
    			(sub { $_ = lc $_ ; $store_key = $_ }) ;
-   my ($old_fv) = $db->filter_fetch_value 
+   my ($old_fv) = $db->filter_fetch_value
    			(sub { $_ = "[$_]"; $fetch_value = $_ }) ;
-   my ($old_sv) = $db->filter_store_value 
+   my ($old_sv) = $db->filter_store_value
    			(sub { s/o/x/g; $store_value = $_ }) ;
-   
+
    ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    $h{"Fred"} = "Joe" ;
    #                   fk   sk     fv    sv
@@ -125,16 +125,16 @@ umask(0) ;
    unlink $Dfile;
 }
 
-{    
+{
     # DBM Filter with a closure
 
     use strict ;
     my (%h, $db) ;
 
     unlink $Dfile;
-    ok $db = tie %h, 'BerkeleyDB::Hash', 
-    		-Filename   => $Dfile, 
-	        -Flags      => DB_CREATE; 
+    ok $db = tie %h, 'BerkeleyDB::Hash',
+    		-Filename   => $Dfile,
+	        -Flags      => DB_CREATE;
 
     my %result = () ;
 
@@ -144,8 +144,8 @@ umask(0) ;
 	my $count = 0 ;
 	my @kept = () ;
 
-	return sub { ++$count ; 
-		     push @kept, $_ ; 
+	return sub { ++$count ;
+		     push @kept, $_ ;
 		     $result{$name} = "$name - $count: [@kept]" ;
 		   }
     }
@@ -188,7 +188,7 @@ umask(0) ;
     undef $db ;
     untie %h;
     unlink $Dfile;
-}		
+}
 
 {
    # DBM Filter recursion detection
@@ -196,15 +196,15 @@ umask(0) ;
    my (%h, $db) ;
    unlink $Dfile;
 
-    ok $db = tie %h, 'BerkeleyDB::Hash', 
-    		-Filename   => $Dfile, 
-	        -Flags      => DB_CREATE; 
+    ok $db = tie %h, 'BerkeleyDB::Hash',
+    		-Filename   => $Dfile,
+	        -Flags      => DB_CREATE;
 
    $db->filter_store_key (sub { $_ = $h{$_} }) ;
 
    eval '$h{1} = 1234' ;
    ok $@ =~ /^recursion detected in filter_store_key at/ ;
-   
+
    undef $db ;
    untie %h;
    unlink $Dfile;
@@ -218,9 +218,9 @@ umask(0) ;
    my (%h, $db) ;
    unlink $Dfile;
 
-   ok $db = tie %h, 'BerkeleyDB::Hash', 
-    		-Filename   => $Dfile, 
-	        -Flags      => DB_CREATE; 
+   ok $db = tie %h, 'BerkeleyDB::Hash',
+    		-Filename   => $Dfile,
+	        -Flags      => DB_CREATE;
 
    $db->filter_fetch_key   (sub { }) ;
    $db->filter_store_key   (sub { }) ;
@@ -247,7 +247,7 @@ umask(0) ;
    ok($h{"fred"} eq "joe");
 
    ok($db->FIRSTKEY() eq "fred") ;
-   
+
    eval { grep { $h{$_} } (1, 2, 3) };
    ok (! $@);
 
@@ -263,9 +263,9 @@ if(0)
     my (%h, $db) ;
 
     unlink $Dfile;
-    ok $db = tie %h, 'BerkeleyDB::Hash', 
-    		-Filename   => $Dfile, 
-	        -Flags      => DB_CREATE; 
+    ok $db = tie %h, 'BerkeleyDB::Hash',
+    		-Filename   => $Dfile,
+	        -Flags      => DB_CREATE;
 
     my %result = () ;
 
@@ -323,4 +323,3 @@ if(0)
     untie %h;
     unlink $Dfile;
 }
-

@@ -1,11 +1,11 @@
 #!./perl -w
 
-# ID: %I%, %G%   
+# ID: %I%, %G%
 
 use strict ;
 
 use lib 't' ;
-use BerkeleyDB; 
+use BerkeleyDB;
 use util ;
 use Test::More;
 
@@ -28,7 +28,7 @@ BEGIN {
 
 umask(0);
 
-{    
+{
     eval
     {
         my $env = new BerkeleyDB::Env @StdErrFile,
@@ -91,9 +91,9 @@ umask(0);
     my $lex = new LexFile $Dfile ;
     my %hash ;
     my ($k, $v) ;
-    ok my $db = new BerkeleyDB::Hash -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Hash -Filename => $Dfile,
 	                             -Env         => $env,
-				     -Flags       => DB_CREATE, 
+				     -Flags       => DB_CREATE,
 				     -Property    => DB_ENCRYPT ;
 
     # create some data
@@ -115,19 +115,19 @@ umask(0);
     undef $db;
 
     # once the database is created, do not need to specify DB_ENCRYPT
-    ok my $db1 = new BerkeleyDB::Hash -Filename => $Dfile, 
+    ok my $db1 = new BerkeleyDB::Hash -Filename => $Dfile,
 	                              -Env      => $env,
 				      -Flags    => DB_CREATE ;
-    $v = '';				      
+    $v = '';
     ok ! $db1->db_get("red", $v) ;
     ok $v eq $data{"red"},
     undef $db1;
     undef $env;
 
     # open a database without specifying encryption
-    ok ! new BerkeleyDB::Hash -Filename => "$home/$Dfile"; 
+    ok ! new BerkeleyDB::Hash -Filename => "$home/$Dfile";
 
-    ok ! new BerkeleyDB::Env 
+    ok ! new BerkeleyDB::Env
              -Home => $home,
              -Encrypt => {Password => "def",
 	                  Flags    => DB_ENCRYPT_AES
@@ -135,10 +135,10 @@ umask(0);
              -Flags => DB_CREATE | DB_INIT_MPOOL ;
 }
 
-{    
+{
     eval
     {
-        my $env = new BerkeleyDB::Hash 
+        my $env = new BerkeleyDB::Hash
              -Encrypt => 1,
              -Flags => DB_CREATE ;
      };
@@ -146,7 +146,7 @@ umask(0);
 
     eval
     {
-        my $env = new BerkeleyDB::Hash 
+        my $env = new BerkeleyDB::Hash
              -Encrypt => {},
              -Flags => DB_CREATE ;
      };
@@ -154,7 +154,7 @@ umask(0);
 
     eval
     {
-        my $env = new BerkeleyDB::Hash 
+        my $env = new BerkeleyDB::Hash
              -Encrypt => {Password => "fred"},
              -Flags => DB_CREATE ;
      };
@@ -162,7 +162,7 @@ umask(0);
 
     eval
     {
-        my $env = new BerkeleyDB::Hash 
+        my $env = new BerkeleyDB::Hash
              -Encrypt => {Flags => 1},
              -Flags => DB_CREATE ;
      };
@@ -170,7 +170,7 @@ umask(0);
 
     eval
     {
-        my $env = new BerkeleyDB::Hash 
+        my $env = new BerkeleyDB::Hash
              -Encrypt => {Fred => 1},
              -Flags => DB_CREATE ;
      };
@@ -178,10 +178,10 @@ umask(0);
 
 }
 
-{    
+{
     eval
     {
-        my $env = new BerkeleyDB::Btree 
+        my $env = new BerkeleyDB::Btree
              -Encrypt => 1,
              -Flags => DB_CREATE ;
      };
@@ -189,7 +189,7 @@ umask(0);
 
     eval
     {
-        my $env = new BerkeleyDB::Btree 
+        my $env = new BerkeleyDB::Btree
              -Encrypt => {},
              -Flags => DB_CREATE ;
      };
@@ -197,7 +197,7 @@ umask(0);
 
     eval
     {
-        my $env = new BerkeleyDB::Btree 
+        my $env = new BerkeleyDB::Btree
              -Encrypt => {Password => "fred"},
              -Flags => DB_CREATE ;
      };
@@ -205,7 +205,7 @@ umask(0);
 
     eval
     {
-        my $env = new BerkeleyDB::Btree 
+        my $env = new BerkeleyDB::Btree
              -Encrypt => {Flags => 1},
              -Flags => DB_CREATE ;
      };
@@ -213,7 +213,7 @@ umask(0);
 
     eval
     {
-        my $env = new BerkeleyDB::Btree 
+        my $env = new BerkeleyDB::Btree
              -Encrypt => {Fred => 1},
              -Flags => DB_CREATE ;
      };
@@ -221,10 +221,10 @@ umask(0);
 
 }
 
-{    
+{
     eval
     {
-        my $env = new BerkeleyDB::Queue 
+        my $env = new BerkeleyDB::Queue
              -Encrypt => 1,
              -Flags => DB_CREATE ;
      };
@@ -232,7 +232,7 @@ umask(0);
 
     eval
     {
-        my $env = new BerkeleyDB::Queue 
+        my $env = new BerkeleyDB::Queue
              -Encrypt => {},
              -Flags => DB_CREATE ;
      };
@@ -240,7 +240,7 @@ umask(0);
 
     eval
     {
-        my $env = new BerkeleyDB::Queue 
+        my $env = new BerkeleyDB::Queue
              -Encrypt => {Password => "fred"},
              -Flags => DB_CREATE ;
      };
@@ -248,7 +248,7 @@ umask(0);
 
     eval
     {
-        my $env = new BerkeleyDB::Queue 
+        my $env = new BerkeleyDB::Queue
              -Encrypt => {Flags => 1},
              -Flags => DB_CREATE ;
      };
@@ -256,7 +256,7 @@ umask(0);
 
     eval
     {
-        my $env = new BerkeleyDB::Queue 
+        my $env = new BerkeleyDB::Queue
              -Encrypt => {Fred => 1},
              -Flags => DB_CREATE ;
      };
@@ -264,10 +264,10 @@ umask(0);
 
 }
 
-{    
+{
     eval
     {
-        my $env = new BerkeleyDB::Recno 
+        my $env = new BerkeleyDB::Recno
              -Encrypt => 1,
              -Flags => DB_CREATE ;
      };
@@ -275,7 +275,7 @@ umask(0);
 
     eval
     {
-        my $env = new BerkeleyDB::Recno 
+        my $env = new BerkeleyDB::Recno
              -Encrypt => {},
              -Flags => DB_CREATE ;
      };
@@ -283,7 +283,7 @@ umask(0);
 
     eval
     {
-        my $env = new BerkeleyDB::Recno 
+        my $env = new BerkeleyDB::Recno
              -Encrypt => {Password => "fred"},
              -Flags => DB_CREATE ;
      };
@@ -291,7 +291,7 @@ umask(0);
 
     eval
     {
-        my $env = new BerkeleyDB::Recno 
+        my $env = new BerkeleyDB::Recno
              -Encrypt => {Flags => 1},
              -Flags => DB_CREATE ;
      };
@@ -299,7 +299,7 @@ umask(0);
 
     eval
     {
-        my $env = new BerkeleyDB::Recno 
+        my $env = new BerkeleyDB::Recno
              -Encrypt => {Fred => 1},
              -Flags => DB_CREATE ;
      };
@@ -315,9 +315,9 @@ umask(0);
     my $lex = new LexFile $Dfile ;
     my %hash ;
     my ($k, $v) ;
-    ok my $db = new BerkeleyDB::Hash 
-                           -Filename => $Dfile, 
-		           -Flags    => DB_CREATE, 
+    ok my $db = new BerkeleyDB::Hash
+                           -Filename => $Dfile,
+		           -Flags    => DB_CREATE,
                            -Encrypt  => {Password => "beta",
 	                                 Flags    => DB_ENCRYPT_AES
 	                                },
@@ -342,29 +342,29 @@ umask(0);
     undef $db;
 
     # attempt to open a database without specifying encryption
-    ok ! new BerkeleyDB::Hash -Filename => $Dfile, 
+    ok ! new BerkeleyDB::Hash -Filename => $Dfile,
 				      -Flags    => DB_CREATE ;
 
 
-    # try opening with the wrong password				      
-    ok ! new BerkeleyDB::Hash -Filename => $Dfile, 
-                           -Filename => $Dfile, 
+    # try opening with the wrong password
+    ok ! new BerkeleyDB::Hash -Filename => $Dfile,
+                           -Filename => $Dfile,
                            -Encrypt => {Password => "def",
 	                                Flags    => DB_ENCRYPT_AES
 	                               },
 		           -Property    => DB_ENCRYPT ;
 
 
-    # read the encrypted data				      
-    ok my $db1 = new BerkeleyDB::Hash -Filename => $Dfile, 
-                           -Filename => $Dfile, 
+    # read the encrypted data
+    ok my $db1 = new BerkeleyDB::Hash -Filename => $Dfile,
+                           -Filename => $Dfile,
                            -Encrypt => {Password => "beta",
 	                                Flags    => DB_ENCRYPT_AES
 	                               },
 		           -Property    => DB_ENCRYPT ;
 
 
-    $v = '';				      
+    $v = '';
     ok ! $db1->db_get("red", $v) ;
     ok $v eq $data{"red"};
     # check there are three records
@@ -379,9 +379,9 @@ umask(0);
     my $lex = new LexFile $Dfile ;
     my %hash ;
     my ($k, $v) ;
-    ok my $db = new BerkeleyDB::Btree 
-                           -Filename => $Dfile, 
-		           -Flags    => DB_CREATE, 
+    ok my $db = new BerkeleyDB::Btree
+                           -Filename => $Dfile,
+		           -Flags    => DB_CREATE,
                            -Encrypt  => {Password => "beta",
 	                                 Flags    => DB_ENCRYPT_AES
 	                                },
@@ -406,29 +406,29 @@ umask(0);
     undef $db;
 
     # attempt to open a database without specifying encryption
-    ok ! new BerkeleyDB::Btree -Filename => $Dfile, 
+    ok ! new BerkeleyDB::Btree -Filename => $Dfile,
 				      -Flags    => DB_CREATE ;
 
 
-    # try opening with the wrong password				      
-    ok ! new BerkeleyDB::Btree -Filename => $Dfile, 
-                           -Filename => $Dfile, 
+    # try opening with the wrong password
+    ok ! new BerkeleyDB::Btree -Filename => $Dfile,
+                           -Filename => $Dfile,
                            -Encrypt => {Password => "def",
 	                                Flags    => DB_ENCRYPT_AES
 	                               },
 		           -Property    => DB_ENCRYPT ;
 
 
-    # read the encrypted data				      
-    ok my $db1 = new BerkeleyDB::Btree -Filename => $Dfile, 
-                           -Filename => $Dfile, 
+    # read the encrypted data
+    ok my $db1 = new BerkeleyDB::Btree -Filename => $Dfile,
+                           -Filename => $Dfile,
                            -Encrypt => {Password => "beta",
 	                                Flags    => DB_ENCRYPT_AES
 	                               },
 		           -Property    => DB_ENCRYPT ;
 
 
-    $v = '';				      
+    $v = '';
     ok ! $db1->db_get("red", $v) ;
     ok $v eq $data{"red"};
     # check there are three records
@@ -443,11 +443,11 @@ umask(0);
     my $lex = new LexFile $Dfile ;
     my %hash ;
     my ($k, $v) ;
-    ok my $db = new BerkeleyDB::Queue 
-                           -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Queue
+                           -Filename => $Dfile,
                            -Len      => 5,
                            -Pad      => "x",
-		           -Flags    => DB_CREATE, 
+		           -Flags    => DB_CREATE,
                            -Encrypt  => {Password => "beta",
 	                                 Flags    => DB_ENCRYPT_AES
 	                                },
@@ -472,14 +472,14 @@ umask(0);
     undef $db;
 
     # attempt to open a database without specifying encryption
-    ok ! new BerkeleyDB::Queue -Filename => $Dfile, 
+    ok ! new BerkeleyDB::Queue -Filename => $Dfile,
                                    -Len      => 5,
                                    -Pad      => "x",
 				   -Flags    => DB_CREATE ;
 
 
-    # try opening with the wrong password				      
-    ok ! new BerkeleyDB::Queue -Filename => $Dfile, 
+    # try opening with the wrong password
+    ok ! new BerkeleyDB::Queue -Filename => $Dfile,
                                    -Len      => 5,
                                    -Pad      => "x",
                                    -Encrypt => {Password => "def",
@@ -488,8 +488,8 @@ umask(0);
 		                   -Property    => DB_ENCRYPT ;
 
 
-    # read the encrypted data				      
-    ok my $db1 = new BerkeleyDB::Queue -Filename => $Dfile, 
+    # read the encrypted data
+    ok my $db1 = new BerkeleyDB::Queue -Filename => $Dfile,
                                            -Len      => 5,
                                            -Pad      => "x",
                                            -Encrypt => {Password => "beta",
@@ -498,7 +498,7 @@ umask(0);
 		                           -Property    => DB_ENCRYPT ;
 
 
-    $v = '';				      
+    $v = '';
     ok ! $db1->db_get(3, $v) ;
     ok $v eq fillout($data{3}, 5, 'x');
     # check there are three records
@@ -513,9 +513,9 @@ umask(0);
     my $lex = new LexFile $Dfile ;
     my %hash ;
     my ($k, $v) ;
-    ok my $db = new BerkeleyDB::Recno 
-                           -Filename => $Dfile, 
-		           -Flags    => DB_CREATE, 
+    ok my $db = new BerkeleyDB::Recno
+                           -Filename => $Dfile,
+		           -Flags    => DB_CREATE,
                            -Encrypt  => {Password => "beta",
 	                                 Flags    => DB_ENCRYPT_AES
 	                                },
@@ -540,29 +540,29 @@ umask(0);
     undef $db;
 
     # attempt to open a database without specifying encryption
-    ok ! new BerkeleyDB::Recno -Filename => $Dfile, 
+    ok ! new BerkeleyDB::Recno -Filename => $Dfile,
 				      -Flags    => DB_CREATE ;
 
 
-    # try opening with the wrong password				      
-    ok ! new BerkeleyDB::Recno -Filename => $Dfile, 
-                           -Filename => $Dfile, 
+    # try opening with the wrong password
+    ok ! new BerkeleyDB::Recno -Filename => $Dfile,
+                           -Filename => $Dfile,
                            -Encrypt => {Password => "def",
 	                                Flags    => DB_ENCRYPT_AES
 	                               },
 		           -Property    => DB_ENCRYPT ;
 
 
-    # read the encrypted data				      
-    ok my $db1 = new BerkeleyDB::Recno -Filename => $Dfile, 
-                           -Filename => $Dfile, 
+    # read the encrypted data
+    ok my $db1 = new BerkeleyDB::Recno -Filename => $Dfile,
+                           -Filename => $Dfile,
                            -Encrypt => {Password => "beta",
 	                                Flags    => DB_ENCRYPT_AES
 	                               },
 		           -Property    => DB_ENCRYPT ;
 
 
-    $v = '';				      
+    $v = '';
     ok ! $db1->db_get(3, $v) ;
     ok $v eq $data{3};
     # check there are three records
@@ -577,9 +577,9 @@ umask(0);
     my $lex = new LexFile $Dfile ;
     my %hash ;
     my ($k, $v) ;
-    ok my $db = new BerkeleyDB::Hash 
-                           -Filename => $Dfile, 
-		           -Flags    => DB_CREATE, 
+    ok my $db = new BerkeleyDB::Hash
+                           -Filename => $Dfile,
+		           -Flags    => DB_CREATE,
                            -Encrypt  => {Password => "beta",
 	                                 Flags    => DB_ENCRYPT_AES
 	                                },
@@ -604,33 +604,32 @@ umask(0);
     undef $db;
 
     # attempt to open a database without specifying encryption
-    ok ! new BerkeleyDB::Unknown -Filename => $Dfile, 
+    ok ! new BerkeleyDB::Unknown -Filename => $Dfile,
 				      -Flags    => DB_CREATE ;
 
 
-    # try opening with the wrong password				      
-    ok ! new BerkeleyDB::Unknown -Filename => $Dfile, 
-                           -Filename => $Dfile, 
+    # try opening with the wrong password
+    ok ! new BerkeleyDB::Unknown -Filename => $Dfile,
+                           -Filename => $Dfile,
                            -Encrypt => {Password => "def",
 	                                Flags    => DB_ENCRYPT_AES
 	                               },
 		           -Property    => DB_ENCRYPT ;
 
 
-    # read the encrypted data				      
-    ok my $db1 = new BerkeleyDB::Unknown -Filename => $Dfile, 
-                           -Filename => $Dfile, 
+    # read the encrypted data
+    ok my $db1 = new BerkeleyDB::Unknown -Filename => $Dfile,
+                           -Filename => $Dfile,
                            -Encrypt => {Password => "beta",
 	                                Flags    => DB_ENCRYPT_AES
 	                               },
 		           -Property    => DB_ENCRYPT ;
 
 
-    $v = '';				      
+    $v = '';
     ok ! $db1->db_get("red", $v) ;
     ok $v eq $data{"red"};
     # check there are three records
     ok countRecords($db1) == 3 ;
     undef $db1;
 }
-

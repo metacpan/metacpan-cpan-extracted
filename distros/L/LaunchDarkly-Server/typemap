@@ -1,0 +1,67 @@
+LDBoolean		    			T_IV
+LDJSONType				    	T_PTROBJ
+const struct LDDetails *	    T_PTROBJ
+enum LDEvalErrorKind			T_PTROBJ
+enum LDEvalReason				T_PTROBJ
+struct LDAllFlagsState *		T_PTROBJ
+struct LDClient *				T_PTROBJ
+struct LDConfig *				T_PTROBJ
+struct LDDetails *				T_PTROBJ
+struct LDStoreInterface *		T_PTROBJ
+
+# The following mappings are re-defined to allow passing non-constant values
+# as arguments to functions accepting constants.
+struct LDUser *					T_PTROBJ_USER
+const struct LDUser *			T_PTROBJ_CONST_USER
+struct LDJSON *					T_PTROBJ_JSON
+const struct LDJSON *			T_PTROBJ_CONST_JSON
+
+INPUT
+
+T_PTROBJ_USER
+	if (SvROK($arg) && sv_derived_from($arg, \"${ntype}\")) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = INT2PTR($type,tmp);
+	}
+	else
+	    Perl_croak_nocontext(\"%s: %s is not of type %s\",
+			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+			\"$var\", \"$ntype\")
+T_PTROBJ_CONST_USER
+	if (SvROK($arg) && (sv_derived_from($arg, \"${ntype}\") || sv_derived_from($arg, \"struct LDUserPtr\"))) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = INT2PTR($type,tmp);
+	}
+	else
+	    Perl_croak_nocontext(\"%s: %s is not of type %s\",
+			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+			\"$var\", \"$ntype\")
+T_PTROBJ_JSON
+	if (SvROK($arg) && sv_derived_from($arg, \"${ntype}\")) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = INT2PTR($type,tmp);
+	}
+	else
+	    Perl_croak_nocontext(\"%s: %s is not of type %s\",
+			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+			\"$var\", \"$ntype\")
+T_PTROBJ_CONST_JSON
+	if (SvROK($arg) && (sv_derived_from($arg, \"${ntype}\") || sv_derived_from($arg, \"struct LDJSONPtr\"))) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = INT2PTR($type,tmp);
+	}
+	else
+	    Perl_croak_nocontext(\"%s: %s is not of type %s\",
+			${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+			\"$var\", \"$ntype\")
+
+OUTPUT
+
+T_PTROBJ_USER
+	sv_setref_pv($arg, \"${ntype}\", (void*)$var);
+T_PTROBJ_CONST_USER
+	sv_setref_pv($arg, \"${ntype}\", (void*)$var);
+T_PTROBJ_JSON
+	sv_setref_pv($arg, \"${ntype}\", (void*)$var);
+T_PTROBJ_CONST_JSON
+	sv_setref_pv($arg, \"${ntype}\", (void*)$var);

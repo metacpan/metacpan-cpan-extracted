@@ -54,30 +54,30 @@ $TRACE = "-DTRACE" if $ENV{BERKELEYDB_DEFINE_TRACE} ;
 WriteMakefile(
 	NAME 		=> 'BerkeleyDB',
 	LIBS 		=> ["-L${LIB_DIR} $LIBS"],
-	#MAN3PODS        => {},         # Pods will be built by installman. 
+	#MAN3PODS        => {},         # Pods will be built by installman.
 	INC		=> "-I$INC_DIR",
 	VERSION_FROM	=> 'BerkeleyDB.pm',
 	XSPROTOARG	=> '-noprototypes',
 	DEFINE		=> "$OS2 $WALL $TRACE",
 	#'macro'		=> { INSTALLDIRS => 'perl' },
-        'dist'          => {COMPRESS=>'gzip', SUFFIX=>'gz'},    
+        'dist'          => {COMPRESS=>'gzip', SUFFIX=>'gz'},
 	($] >= 5.005
 	    ? (ABSTRACT_FROM	=> 'BerkeleyDB.pod',
 	       AUTHOR  	=> 'Paul Marquess <pmqs@cpan.org>')
 	    : ()
 	),
-    ((ExtUtils::MakeMaker->VERSION() gt '6.30') 
-        ?  ('LICENSE'  => 'perl')         
+    ((ExtUtils::MakeMaker->VERSION() gt '6.30')
+        ?  ('LICENSE'  => 'perl')
         : ()
     ),
 
-     ( eval { ExtUtils::MakeMaker->VERSION(6.46) }  
+     ( eval { ExtUtils::MakeMaker->VERSION(6.46) }
         ? ( META_MERGE  => {
-    
+
                 "meta-spec" => { version => 2 },
-                
+
                 resources   => {
-                
+
                     bugtracker  => {
                         web     => 'https://github.com/pmqs/BerkeleyDB/issues'
                     },
@@ -88,10 +88,10 @@ WriteMakefile(
                         type    => 'git',
                         url     => 'git://github.com/pmqs/BerkeleyDB.git',
                         web     => 'https://github.com/pmqs/BerkeleyDB',
-                    },        
+                    },
                 },
-            } 
-            ) 
+            }
+            )
         : ()
     ),
 
@@ -104,13 +104,13 @@ sub MY::libscan
     my $path = shift ;
 
     return undef
-        if $path =~ /(~|\.bak)$/ || 
+        if $path =~ /(~|\.bak)$/ ||
            $path =~ /^\..*\.swp$/ ;
 
-    return $path;    
+    return $path;
 }
 
-    
+
 sub MY::postamble {
 	'
 $(NAME).pod:	$(NAME).pod.P t/examples.t.T t/examples3.t.T mkpod
@@ -119,7 +119,7 @@ $(NAME).pod:	$(NAME).pod.P t/examples.t.T t/examples3.t.T mkpod
 $(NAME).xs:	typemap
 	$(TOUCH) $(NAME).xs
 
-Makefile:	config.in 
+Makefile:	config.in
 
 
 ' ;
@@ -163,7 +163,7 @@ sub ParseCONFIG
 
     # check parsed values
     my @missing = () ;
-    die "The following keys are missing from $CONFIG file: [@missing]\n" 
+    die "The following keys are missing from $CONFIG file: [@missing]\n"
         if @missing = keys %Parsed ;
 
     $INC_DIR =  $ENV{'BERKELEYDB_INCLUDE'} || $Info{'INCLUDE'} ;

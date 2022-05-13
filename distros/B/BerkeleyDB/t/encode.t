@@ -3,14 +3,14 @@
 use strict ;
 
 use lib 't' ;
-use BerkeleyDB; 
+use BerkeleyDB;
 use util ;
 use Test::More ;
 
-BEGIN 
+BEGIN
 {
     eval { require Encode; };
-    
+
     plan skip_all => "Encode is not available"
         if $@;
 
@@ -37,9 +37,9 @@ umask(0) ;
    my (%h, $db) ;
    unlink $Dfile;
 
-   ok $db = tie %h, 'BerkeleyDB::Hash', 
-    		-Filename   => $Dfile, 
-	        -Flags      => DB_CREATE; 
+   ok $db = tie %h, 'BerkeleyDB::Hash',
+    		-Filename   => $Dfile,
+	        -Flags      => DB_CREATE;
 
    $db->filter_fetch_key   (sub { $_ = Encode::decode_utf8($_) if defined $_ });
    $db->filter_store_key   (sub { $_ = Encode::encode_utf8($_) if defined $_ });
@@ -56,9 +56,9 @@ umask(0) ;
    untie %h;
 
    my %newH;
-   ok $db = tie %newH, 'BerkeleyDB::Hash', 
-    		-Filename   => $Dfile, 
-	        -Flags      => DB_CREATE; 
+   ok $db = tie %newH, 'BerkeleyDB::Hash',
+    		-Filename   => $Dfile,
+	        -Flags      => DB_CREATE;
 
    $newH{"fred"} = "joe" ;
    is $newH{"fred"}, "joe";

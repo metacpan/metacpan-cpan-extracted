@@ -35,23 +35,31 @@
       "runtime" : {
          "requires" : {
             "Class::Accessor::Fast" : "0.51",
-            "Readonly" : "2.05"
+            "IO::Scalar" : "2.111",
+            "JSON::PP" : "2.97001",
+            "Pod::Find" : "0",
+            "Readonly" : "2.05",
+            "version" : "0"
          }
       },
       "test" : {
          "requires" : {
             "Class::Accessor::Fast" : "0.51",
-            "Readonly" : "2.05"
+            "IO::Scalar" : "2.111",
+            "JSON::PP" : "2.97001",
+            "Pod::Find" : "0",
+            "Readonly" : "2.05",
+            "version" : "0"
          }
       }
    },
    "provides" : {
       "Module::ScanDeps::Static" : {
          "file" : "lib/Module/ScanDeps/Static.pm",
-         "version" : "0.1"
+         "version" : "0.3"
       }
    },
    "release_status" : "stable",
-   "version" : "0.1",
+   "version" : "0.3",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

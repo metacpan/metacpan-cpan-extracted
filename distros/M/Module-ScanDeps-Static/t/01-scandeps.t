@@ -15,22 +15,20 @@ subtest 'use' => sub {
   my $scanner = Module::ScanDeps::Static->new( { handle => *DATA } );
 
   my @dependencies = $scanner->parse;
+  my $require      = $scanner->get_require;
 
   ok( scalar @dependencies > 0, 'found dependencies' );
+  isa_ok( $require, 'HASH', 'require is a HASH' );
 
-  my $module_names = join '', map { $_->{'name'} } @dependencies;
-  is( $module_names, 'Buz::BazCarpFoo::Bar', 'sorted dependencies' );
+  my $module_names = join '', @dependencies;
 
-  isa_ok( $dependencies[2], 'HASH', 'return hash' );
+  is( $module_names,    'Buz::BazCarpFoo::Bar', 'sorted dependencies' );
+  is( $dependencies[2], 'Foo::Bar',             'Foo::Bar' );
 
-  ok( exists $dependencies[2]->{'name'}, 'name in hash' );
+  ok( exists $require->{'Foo::Bar'}, 'version for Foo::Bar in hash' );
+  is( $require->{'Foo::Bar'}, q{}, 'version is empty string' );
 
-  is( $dependencies[2]->{'name'}, 'Foo::Bar', 'Foo::Bar' );
-
-  ok( exists $dependencies[2]->{'version'}, 'name in hash' );
-
-  is( $dependencies[2]->{'version'}, q{},    'version is empty string' );
-  is( $dependencies[0]->{'version'}, q{1.0}, 'version is 1.0' )
+  is( $require->{'Buz::Baz'}, q{1.0}, 'version of Buz::Baz is 1.0' )
     or diag( Dumper \@dependencies );
 
 };
@@ -41,12 +39,15 @@ subtest 'require' => sub {
   my $scanner = Module::ScanDeps::Static->new( { handle => *DATA } );
 
   my @dependencies = $scanner->parse;
+  my $require      = $scanner->get_require;
 
   ok( @dependencies, 'found 3 dependencies' )
     or diag( Dumper \@dependencies );
 
-  ok( $dependencies[1]->{'name'} eq 'Carp',  'found require' );
-  ok( defined $dependencies[1]->{'version'}, 'version defined' );
+  ok( grep {/Carp/} @dependencies, 'found require Carp' )
+    or diag( Dumper \@dependencies );
+
+  ok( defined $require->{'Carp'}, 'version defined' );
 
 };
 

@@ -3,12 +3,12 @@
 use strict ;
 
 use lib 't' ;
-use BerkeleyDB; 
+use BerkeleyDB;
 use util ;
 
 use Test::More ;
 
-plan tests => 58;    
+plan tests => 58;
 
 my $Dfile = "dbhash.tmp";
 
@@ -52,7 +52,7 @@ umask(0);
 					       	-Env 	   => $env,
 					    	-Txn	   => $txn  ;
 
-    
+
     ok $txn->txn_commit() == 0 ;
     ok $txn = $env->txn_begin() ;
     $db1->Txn($txn);
@@ -126,7 +126,7 @@ umask(0);
     ok $txn->txn_commit() == 0 ;
     ok $txn = $env->txn_begin() ;
     $db1->Txn($txn);
-    
+
     # create some data
     my %data =  (
 		"red"	=> "boat",
@@ -193,7 +193,7 @@ umask(0);
 					       	-Env 	   => $env,
 					    	-Txn	   => $txn  ;
 
-    
+
     ok $txn->txn_commit() == 0 ;
     ok $txn = $env->txn_begin() ;
     $db1->Txn($txn);
@@ -266,7 +266,7 @@ umask(0);
     ok $txn->txn_commit() == 0 ;
     ok $txn = $env->txn_begin() ;
     $db1->Txn($txn);
-    
+
     # create some data
     my %data =  (
 		"red"	=> "boat",
@@ -313,4 +313,3 @@ umask(0);
     undef $env ;
     untie %hash ;
 }
-

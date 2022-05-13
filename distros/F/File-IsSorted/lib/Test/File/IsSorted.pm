@@ -1,5 +1,5 @@
 package Test::File::IsSorted;
-$Test::File::IsSorted::VERSION = '0.0.6';
+$Test::File::IsSorted::VERSION = '0.2.0';
 use strict;
 use warnings;
 
@@ -13,17 +13,34 @@ my $CLASS = __PACKAGE__;
 sub are_sorted
 {
     my ( $paths, $name ) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 
+    no locale;
+    return are_sorted2( [ sort @$paths ], $name );
+}
+
+sub are_sorted2
+{
+    my ( $paths, $name ) = @_;
+
+    #    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    no locale;
+    my $paths_text = join "\n", @$paths, "";
     my $tb = $CLASS->builder;
 
     my $checker = File::IsSorted->new;
-    return $tb->ok(
-        scalar(
-            all { $checker->is_file_sorted( +{ path => $_ } ); }
-            @$paths
-        ),
+    open my $fh, '<', \$paths_text;
+    scalar( $checker->is_filehandle_sorted( { fh => $fh, } ) );
+    close($fh);
+
+    # $tb->plan(2);
+    my $ok = $tb->ok(
+        scalar( all { $checker->is_file_sorted( +{ path => $_ } ); } @$paths ),
         $name
     );
+
+    return !$ok;
 }
 
 1;
@@ -40,7 +57,7 @@ Test::File::IsSorted - test files for being lexicographical sorted.
 
 =head1 VERSION
 
-version 0.0.6
+version 0.2.0
 
 =head1 SYNOPSIS
 
@@ -64,6 +81,12 @@ O(n) instead of O(n*log(n)) time and keeps O(1) lines instead of O(n).
 =head2 are_sorted([@paths], $blurb);
 
 Checks if all of the filesystem paths are sorted.
+
+=head2 are_sorted2([@paths], $blurb);
+
+Checks if all of the filesystem paths are sorted. Also checks that @paths are sorted.
+
+Added in version v0.2.0.
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

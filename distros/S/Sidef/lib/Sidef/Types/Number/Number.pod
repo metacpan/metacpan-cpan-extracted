@@ -989,6 +989,18 @@ Aliases: I<bell_number>
 
 =cut
 
+=head2 bellmod
+
+    bellmod(n, m)
+
+Returns the n-th Bell number modulo m.
+
+For large n > 1000, this is faster than:
+
+    bell(n) % m
+
+=cut
+
 =head2 bern
 
     n.bern
@@ -1048,6 +1060,20 @@ The beta function (also called the Euler integral of the first kind).
 Defined as:
 
     beta(a, b) = gamma(a)*gamma(b) / gamma(a+b)
+
+=cut
+
+=head2 binomialmod
+
+    binomialmod(n, k, m)
+
+Returns the binomial coefficient binomial(n,k) modulo m, computed efficiently.
+
+    say binomialmod(1e10, 1e5, 20!)     #=> 286953611424480000
+
+Equivalent with (but much faster):
+
+    binomial(n,k) % m
 
 =cut
 
@@ -1319,6 +1345,28 @@ Can also be used to compute very good rational approximations to a given real nu
 When C<k> is omitted, it uses the default floating-point precision to deduce C<k>.
 
 Aliases: I<as_cfrac>
+
+=cut
+
+=head2 chebyshev_factor
+
+    n.chebyshev_factor
+    n.chebyshev_factor(B)
+    n.chebyshev_factor(B,x)
+
+Integer factorization method, based on Chebyshev polynomials, which have the following nesting property:
+
+    T_{m n}(x) = T_m(T_n(x))
+
+which are efficiently computed using the Lucas V function C<V_n(P,Q)>:
+
+    T_n(x) = (1/2) * V_n(2x, 1)
+
+This method is particularly effective for numbers that have a prime factor C<p> such that C<p-1> or C<p+1> is B-smooth.
+
+    say chebyshev_factor(1124075136413 * 3556516507813, 4000, 3)
+
+The product of the factors, will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -1600,13 +1648,15 @@ Returns an array with the continued fraction convergents for a given real number
 
 =head2 cop_factor
 
-    cop_factor(n, reps=n.ilog2)
+    cop_factor(n, tries=n.ilog2)
 
 Congruence of Powers (CoP) factorization method, trying to find algebraic factors of C<n>.
 
     say cop_factor((5**48 + 1)*(3**120 + 1))
 
 An additional argument can be given to limit the number of iterations.
+
+The product of the factors, will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -1716,6 +1766,16 @@ Returns the cube of C<x>. Equivalent with C<x**3>.
 
 =cut
 
+=head2 cubic_formula
+
+    cubic_formula(a, b, c, d)
+
+Returns a list of (complex) solutions C<(x_1, x_2, x_3)> to the cubic equation:
+
+    a*x^3 + b*x^2 + c*x + d = 0
+
+=cut
+
 =head2 cyclotomic
 
     cyclotomic(n)
@@ -1730,6 +1790,18 @@ When C<x> is omitted, a Polynomial object is returned:
     say cyclotomic(12)          #=> x^4 - x^2 + 1
 
 Aliases: I<cyclotomic_polynomial>
+
+=cut
+
+=head2 cyclotomicmod
+
+    cyclotomicmod(n, x, m)
+
+Returns the n-th Cyclotomic polynomial evaluated at C<x>, computed modulo C<m>.
+
+    say cyclotomicmod(30!, 5040, 2**128 + 1)
+
+It returns NaN when C<moebius(d) = -1> and C<gcd(n/d, m) != 1>, for some C<d|n>.
 
 =cut
 
@@ -1803,6 +1875,16 @@ Aliases: I<arithmetic_derivative>
 
 =cut
 
+=head2 difference_of_squares
+
+    difference_of_squares(n)
+
+Returns an array of C<[a,b]> pairs with all the possible solutions to the equation: C<a^2 - b^2 = n>.
+
+    say difference_of_squares(48)   #=> [[7, 1], [8, 4], [13, 11]]
+
+=cut
+
 =head2 digit
 
     n.digit(k, b=10)
@@ -1822,6 +1904,21 @@ It also supports negative indices:
     say 9111.digit(-1)        #=> 9
     say 1811.digit(-2)        #=> 8
     say 1234.digit(-42)       #=> nil
+
+=cut
+
+=head2 digital_root
+
+    digital_root(n, b=10)
+
+Returns the digital root of C<n>, with respect to base C<b>.
+
+    say 30.of { .digital_root }               #=> OEIS: A010888
+    say 30.of { .digital_root(.isqrt+1) }     #=> OEIS: A122197
+
+Also known as "repeated digital sum".
+
+Both C<n> and C<b> can be arbitrary large, as long as b > 1.
 
 =cut
 
@@ -1971,13 +2068,15 @@ When three arguments are given, it does integer modular division: C<(a/b) % m>.
 
 =head2 dop_factor
 
-    dop_factor(n, reps=n.ilog2)
+    dop_factor(n, tries=n.ilog2)
 
 Difference of Powers (DoP) factorization method, trying to find algebraic factors of C<n>.
 
     say dop_factor(2**120 + 1)
 
 An additional argument can be given to limit the number of iterations.
+
+The product of the factors, will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -2153,11 +2252,13 @@ Aliases: I<squarefree_almost_primes_each>
 
 =head2 ecm_factor
 
-    n.ecm_factor()
-    n.ecm_factor(B)
-    n.ecm_factor(B,reps)
+    n.ecm_factor
+    n.ecm_factor(B1)
+    n.ecm_factor(B1, curves)
 
 Hendrik Lenstra's elliptic curve factorization method (ECM).
+
+The product of the factors, will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -2258,8 +2359,11 @@ Returns back C<x>.
 =head2 exp
 
     exp(x)
+    exp(b, x)
 
 Exponential function: C<e^x>.
+
+When two arguments are given, it does floating-point exponentiation: C<b^x>.
 
 =cut
 
@@ -2350,7 +2454,11 @@ Aliases: I<factors_exp>
 
     factorialmod(n,m)
 
-Factorial of n modulo m (faster than C<n! % m>).
+Returns the factorial of n modulo m.
+
+Equivalent with (but much faster):
+
+    factorial(n) % m
 
 =cut
 
@@ -2489,6 +2597,8 @@ Tries to factorize a given number using Fermat's factorization method (using at 
 
 Works for odd composite non-power numbers C<n> that have two divisors close to C<sqrt(n)>.
 
+The product of the factors, will give back C<n>. However, some factors may be composite.
+
 =cut
 
 =head2 fib
@@ -2561,11 +2671,13 @@ Round C<x> towards -Infinity.
 
 Tries to find a factor of C<n>, using a new factorization method, inspired by Fermat's Little Theorem (FLT).
 
-The method is particularly effective for numbers that have factors closed to each other, or have a factor C<k> for which C<znorder(2,k)> is small.
+This method is particularly effective for numbers that have factors closed to each other, or have a factor C<k> for which C<znorder(2,k)> is small.
 
 Example (try with base 3 and give up after 10^6 iterations):
 
     say flt_factor(2**64 + 1, 3, 1e6)   #=> [274177, 67280421310721]
+
+The product of the factors, will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -2714,15 +2826,18 @@ Aliases: I<hermite_polynomialHe>
 
 =head2 holf_factor
 
-    n.holf_factor(reps)
+    n.holf_factor
+    n.holf_factor(tries)
 
 Hart's OLF method (variant of Fermat's method).
+
+The product of the factors, will give back C<n>. However, some factors may be composite.
 
 =cut
 
 =head2 hyperfactorial
 
-    Number.hyperfactorial()
+    hyperfactorial(n)
 
 Hyperfactorial of C<n>, defined as C<Prod_{k=1..n} k^k>.
 
@@ -4292,12 +4407,21 @@ Equivalent to:
 
 =head2 liouville_sum
 
-    n.liouville_sum
+    liouville_sum(n)
+    liouville_sum(a,b)
 
-Computes partial sums of the Liouville lambda function.
+Computes partial sums of the Liouville lambda function:
 
-    say liouville_sum(10**9)    #=> -25216
-    say liouville_sum(10**10)   #=> -116026
+    Sum_{k=1..n} liouville(k)
+
+When an additional argument is given, the returned result is:
+
+    Sum_{k=a..b} liouville(k)
+
+Example:
+
+    say liouville_sum(10**9)           #=> -25216
+    say liouville_sum(10**9, 10**10)   #=> -90809
 
 =cut
 
@@ -4344,6 +4468,16 @@ Aliases: I<gamma_log>
 Natural logarithm of C<superfactorial(n)>.
 
 Aliases: I<superfactorial_ln>, I<superfactorial_log>
+
+=cut
+
+=head2 lnsuperprimorial
+
+    lnsuperprimorial(n)
+
+Natural logarithm of C<superprimorial(n)>.
+
+Aliases: I<superprimorial_ln>, I<superprimorial_log>
 
 =cut
 
@@ -4424,6 +4558,8 @@ Returns the n-th Lucas number.
 Effective in factoring Carmichael numbers, Fermat pseudoprimes, Lucas pseudoprimes and Lucas-Carmichael numbers.
 
     say lucas_factor(2425361208749736840354501506901183117777758034612345610725789878400467)
+
+The product of the factors, will give back C<n>. However, some factors may be composite.
 
 Aliases: I<lucas_miller_factor>
 
@@ -4525,6 +4661,24 @@ Returns the maximum value from a list of numbers.
 
 =cut
 
+=head2 mbe_factor
+
+    n.mbe_factor(tries=10)
+
+Tries to find a factor of C<n>, by using the "Modular Binary Exponentiation" factorization method (randomized version).
+
+This method is particularly effective for numbers that contain a prime factor C<p> such that C<p-1> is sufficiently smooth.
+
+The running time of the method, is: C<O(tries * log(n)^2)>.
+
+Example:
+
+    say mbe_factor(2**64 + 1, 1)   #=> [274177, 67280421310721]
+
+The product of the factors, will give back C<n>. However, some factors may be composite.
+
+=cut
+
 =head2 mertens
 
     mertens(n)
@@ -4569,6 +4723,8 @@ It returns an array with the factors of C<n>. However, sometimes, not all factor
 
     say miller_factor(58571442634534443082821160508299574798027946748324125518533225605795841)
 
+The product of the factors, will give back C<n>. However, some factors may be composite.
+
 Aliases: I<miller_rabin_factor>
 
 =cut
@@ -4586,6 +4742,22 @@ Return true if C<n> passes the Miller-Rabin primality test with C<k> random base
     min(...)
 
 Returns the smallest value from a list of numbers.
+
+=cut
+
+=head2 modular_quadratic_formula
+
+    modular_quadratic_formula(a,b,c,m)
+
+Returns an array with all the positive solutions for C<x> to the following modular quadratic equation:
+
+    a*x^2 + b*x + c == 0 (mod m)
+
+where a,b,c are rational values and m is a positive integer.
+
+Example:
+
+    say modular_quadratic_formula(3,4,5,124)  #=> [47, 55, 109, 117]
 
 =cut
 
@@ -5034,9 +5206,12 @@ Returns an array with the real and imaginary parts of C<x>.
 
 =head2 pbrent_factor
 
-    n.pbrent_factor(reps)
+    n.pbrent_factor
+    n.pbrent_factor(tries)
 
 Pollard-Brent rho factorization method.
+
+The product of the factors, will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -5086,9 +5261,12 @@ Aliases: I<almost_primepi>, I<almost_prime_count>
 
 =head2 pm1_factor
 
+    n.pm1_factor
     n.pm1_factor(B)
 
 Pollard p-1 factorization method.
+
+The product of the factors, will give back C<n>. However, some factors may be composite.
 
 Aliases: I<pminus1_factor>
 
@@ -5422,6 +5600,8 @@ Returns the number of the k-th power unitary divisors of n.
 
 Williams' p+1 factorization method.
 
+The product of the factors, will give back C<n>. However, some factors may be composite.
+
 Aliases: I<pplus1_factor>
 
 =cut
@@ -5481,9 +5661,12 @@ Returns the previous prime smaller than n.
 
 =head2 prho_factor
 
-    n.prho_factor(reps)
+    n.prho_factor
+    n.prho_factor(tries)
 
 Pollard rho factorization method.
+
+The product of the factors, will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -5850,6 +6033,8 @@ Aliases: I<quadratic_nonresidue>
 
 Pomerance's Quadratic Sieve factorization method (SIMPQS).
 
+The product of the factors, will give back C<n>. However, some factors may be composite.
+
 =cut
 
 =head2 quadratic_formula
@@ -5863,6 +6048,20 @@ Returns a list of solutions C<(x_1, x_2)> to the quadratic equation: C<a*x^2 + b
 Example:
 
     say [quadratic_formula(13, -42, -34)]     #=> [3.9011...., -0.6704...]
+
+=cut
+
+=head2 quadratic_formulaQ
+
+    quadratic_formulaQ(a,b,c)
+
+Returns a list of Quadratic objects, which are solutions C<(x_1, x_2)> to the quadratic equation: C<a*x^2 + b*x + c = 0>.
+
+    say [quadratic_formulaQ(3,4,5)]
+
+Outputs:
+
+    [Quadratic(-2/3, 1/6, -44), Quadratic(-2/3, -1/6, -44)]
 
 =cut
 
@@ -6291,6 +6490,25 @@ Returns the number of k-smooth numbers <= n, or in the range C<a..b>.
 
 =cut
 
+=head2 smooth_numbers
+
+    smooth_numbers(limit, [p1,p2,...])
+    smooth_numbers(limit, [p1,p2,...], {|n,p| ... })
+
+Returns an array containing all the smooth numbers that factorize over the given array of primes.
+
+    say smooth_numbers(100, [2,3,5])    # 5-smooth numbers <= 100
+
+An optional block can be provided, which is called with two arguments, C<n> and C<p>, where C<p> is the current prime and C<n> is a smooth number that is a multiple of C<p>. If the block returns true, then the number C<n> will be included in the returned array.
+
+    # 5-smooth numbers <= 100 that are squarefree
+    say smooth_numbers(100, [2,3,5], {|n,p| n.valuation(p) < 2 })
+
+    # 5-smooth numbers <= 100 that are cubefree
+    say smooth_numbers(100, [2,3,5], {|n,p| n.valuation(p) < 3 })
+
+=cut
+
 =head2 smooth_part
 
     n.smooth_part(k)
@@ -6658,9 +6876,12 @@ Returns the number of unitary square divisors of C<n>.
 
 =head2 squfof_factor
 
-    n.squfof_factor(reps)
+    n.squfof_factor
+    n.squfof_factor(tries)
 
 Shanks' SQUFOF method.
+
+The product of the factors, will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -6728,6 +6949,24 @@ Returns an array with the subsets of the integers in the range C<0..n-1>, or ite
 
 =cut
 
+=head2 sum_of_squares
+
+    sum_of_squares(n)
+
+Returns an array of C<[a,b]> pairs containing all the positive solutions to the equation:
+
+    n = a^2 + b^2
+
+Example:
+
+    say sum_of_squares(99025)
+
+Output:
+
+    [[41, 312], [48, 311], [95, 300], [104, 297], [183, 256], [220, 225]]
+
+=cut
+
 =head2 sum_remainders
 
     sum_remainders(n, v)
@@ -6736,6 +6975,8 @@ Returns the following sum: C<Sum_{k=1..n} v % k>, computed in C<O(sqrt(v))> step
 
     say 20.of {|n| sum_remainders(n, n) }        #=> OEIS: A004125
     say 20.of {|n| sum_remainders(n, n.prime) }  #=> OEIS: A099726
+
+Negative values of C<v> are also supported.
 
 =cut
 
@@ -6847,6 +7088,8 @@ Aliases: I<euler_phi>, I<eulerphi>, I<euler_totient>
     n.trial_factor(limit)
 
 Trial division.
+
+The product of the factors, will give back C<n>. However, some factors may be composite.
 
 =cut
 

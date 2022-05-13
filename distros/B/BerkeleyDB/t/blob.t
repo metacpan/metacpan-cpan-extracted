@@ -3,7 +3,7 @@
 use strict ;
 
 use lib 't';
-use BerkeleyDB; 
+use BerkeleyDB;
 use util ;
 use Test::More;
 
@@ -39,13 +39,13 @@ for my $TYPE ( qw(BerkeleyDB::Hash BerkeleyDB::Btree ))
     my $lexd = new LexDir $home ;
     my $threshold = 1234 ;
 
-    ok my $env = new BerkeleyDB::Env 
+    ok my $env = new BerkeleyDB::Env
                         Flags => DB_CREATE|DB_INIT_MPOOL,
-                        #@StdErrFile, 
+                        #@StdErrFile,
                         BlobDir => $home,
                         Home => $home ;
 
-    ok my $db = new $TYPE Filename => $Dfile, 
+    ok my $db = new $TYPE Filename => $Dfile,
 				    Env      => $env,
                     BlobThreshold => $threshold,
 				    Flags    => DB_CREATE ;
@@ -102,7 +102,7 @@ for my $TYPE ( qw(BerkeleyDB::Hash BerkeleyDB::Btree ))
     ok $dbstream->write($newData) == 0 , "write";
 
     substr($bigData, 0, length($newData)) = $newData;
-    
+
     my $new1;
     ok $dbstream->read($new, 0, 5) == 0 , "read";
     is $new, "hello";
@@ -163,4 +163,3 @@ for my $TYPE ( qw(BerkeleyDB::Hash BerkeleyDB::Btree ))
     is $d2, $smallData;
 
 }
-

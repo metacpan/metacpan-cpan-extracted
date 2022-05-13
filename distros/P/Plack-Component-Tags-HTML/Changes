@@ -1,3 +1,8 @@
+0.05 2022-05-13T18:01:38+02:00
+ - Add test for app without title.
+ - Fix minimal dependency for Tags::HTML::Page::Begin. With optional title
+   element.
+
 0.04 2022-05-12T14:17:02+02:00
  - Rewrite prepare_app() and creating of default 'tags' and 'css' objects.
    Add errors for bad objects.

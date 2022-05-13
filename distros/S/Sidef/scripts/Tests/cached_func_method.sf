@@ -20,3 +20,73 @@ class Fib {
 var fib = Fib();
 say fib.nth(120);
 say fib+120;
+
+do {
+    # Tests for Block.cache and Block.uncache
+
+    var arr = []
+
+    func foo(n) { arr << n }
+    func bar(n) { arr << n }
+
+    foo.cache
+    foo(42)
+    foo(42)
+    assert_eq(arr, %n[42])
+    foo.uncache
+    foo(42)
+    assert_eq(arr, %n[42, 42])
+    foo.uncache
+    foo(42)
+    assert_eq(arr, %n[42, 42, 42])
+    bar.uncache
+    bar(99)
+    bar(99)
+    assert_eq(arr, %n[42, 42, 42, 99, 99])
+
+    arr = []
+
+    foo.cache
+    foo.cache
+    foo(42)
+    foo(42)
+    assert_eq(arr, %n[42])
+    foo.flush_cache
+    foo(42)
+    assert_eq(arr, %n[42, 42])
+    foo(42)
+    assert_eq(arr, %n[42, 42])
+    bar.flush_cache
+    bar(99)
+    assert_eq(arr, %n[42, 42, 99])
+    bar(99)
+    assert_eq(arr, %n[42, 42, 99, 99])
+}
+
+do {
+    var arr = []
+
+    func f(n) is cached {
+        arr << n
+        return n+1
+    }
+
+    f(12)
+    assert_eq(arr, %n[12])
+    f(12)
+    assert_eq(arr, %n[12])
+
+    f.uncache
+
+    f(12)
+    assert_eq(arr, %n[12, 12])
+    f(12)
+    assert_eq(arr, %n[12, 12, 12])
+
+    f.cache
+
+    f(12)
+    assert_eq(arr, %n[12, 12, 12, 12])
+    f(12)
+    assert_eq(arr, %n[12, 12, 12, 12])
+}

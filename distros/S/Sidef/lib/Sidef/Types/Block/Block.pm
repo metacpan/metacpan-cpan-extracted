@@ -454,7 +454,7 @@ package Sidef::Types::Block::Block {
                         bless({ module => $module }, "$ref");
                     }
                 }
-                       };
+            };
 
             return $code;
         }
@@ -572,7 +572,7 @@ package Sidef::Types::Block::Block {
                 push @array, $self->run(@_);
             },
             @objs
-                );
+        );
 
         Sidef::Types::Array::Array->new(\@array);
     }
@@ -589,7 +589,7 @@ package Sidef::Types::Block::Block {
                 }
             },
             @objs
-                );
+        );
 
         Sidef::Types::Array::Array->new(\@array);
     }
@@ -612,7 +612,7 @@ package Sidef::Types::Block::Block {
                 }
             },
             $range
-                );
+        );
 
         defined($n)
           ? Sidef::Types::Array::Array->new(\@array)
@@ -640,7 +640,7 @@ package Sidef::Types::Block::Block {
                 }
             },
             $range
-                );
+        );
 
         return $nth;
     }
@@ -661,15 +661,29 @@ package Sidef::Types::Block::Block {
 
     sub cache {
         my ($self) = @_;
-        require Memoize;
-        $self->{code} = Memoize::memoize($self->{code});
+        $self->{is_cached} && return $self;
+        state $x = require Memoize;
+        $self->{code}      = Memoize::memoize($self->{code});
+        $self->{is_cached} = 1;
         $self;
     }
 
     sub uncache {
         my ($self) = @_;
-        require Memoize;
-        $self->{code} = Memoize::unmemoize($self->{code});
+        $self->{is_cached} || return $self;
+        state $x = require Memoize;
+        if (defined(my $uncached = eval { Memoize::unmemoize($self->{code}) })) {
+            $self->{code}      = $uncached;
+            $self->{is_cached} = 0;
+        }
+        $self;
+    }
+
+    sub flush_cache {
+        my ($self) = @_;
+        $self->{is_cached} || return $self;
+        state $x = require Memoize;
+        eval { Memoize::flush_cache($self->{code}) };
         $self;
     }
 

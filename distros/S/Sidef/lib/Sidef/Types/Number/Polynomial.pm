@@ -15,8 +15,8 @@ package Sidef::Types::Number::Polynomial {
     use overload
       q{bool} => sub { (@_) = ($_[0]); goto &__boolify__ },
       q{""}   => sub { (@_) = ($_[0]); goto &__stringify__ },
-      q{${}}  => sub { \$_[0] },
-      q{0+}   => sub { $_[0] };
+      q{${}}  => \&to_n,
+      q{0+}   => \&to_n;
 
     sub new {
         my (undef, @args) = @_;
@@ -40,7 +40,7 @@ package Sidef::Types::Number::Polynomial {
             return __PACKAGE__->new(0 => $value);
         }
 
-        my %coeff;
+        my %poly;
 
         while (@args) {
             my ($key, $value) = splice(@args, 0, 2);
@@ -50,11 +50,11 @@ package Sidef::Types::Number::Polynomial {
             $value = Sidef::Types::Number::Number->new($value) if !UNIVERSAL::isa($value, 'Sidef::Types::Number::Number');
 
             unless ($value->is_zero) {
-                $coeff{"$key"} = $value;
+                $poly{"$key"} = $value;
             }
         }
 
-        bless \%coeff;
+        bless \%poly;
     }
 
     *call = \&new;
@@ -70,11 +70,10 @@ package Sidef::Types::Number::Polynomial {
         return Sidef::Types::Number::Number::ZERO if ($d == 0);
 
         if ($d == 1 and exists $x->{0}) {
-            return $x->{0};
+            return $x->{0}->to_n;
         }
 
-        ## return Sidef::Types::Number::Number::ZERO;
-        return $x;    # maybe we should return zero?
+        return Sidef::Types::Number::Number::nan();
     }
 
     sub real {
@@ -183,6 +182,8 @@ package Sidef::Types::Number::Polynomial {
         Sidef::Types::String::String->new($x->__stringify__);
     }
 
+    *stringify = \&to_s;
+
     sub dump {
         my ($x) = @_;
         Sidef::Types::String::String->new($x->__dump__);
@@ -199,6 +200,11 @@ package Sidef::Types::Number::Polynomial {
             }
         }
         Sidef::Types::Number::Number::_set_int($degree);
+    }
+
+    sub derivative {
+        my ($x) = @_;
+        __PACKAGE__->new(map { ($_ - 1, $x->{$_}->mul(Sidef::Types::Number::Number::_set_int($_))) } CORE::keys(%$x));
     }
 
     sub eval {
@@ -345,6 +351,11 @@ package Sidef::Types::Number::Polynomial {
             # When the result of division is NaN, the loop never stops
             if ($q->is_nan) {
                 return (__PACKAGE__->new(0 => Sidef::Types::Number::Number::nan()), __PACKAGE__->new());
+            }
+
+            # Stop when the degree is < 0
+            if ($key_x < $key_y) {
+                last;
             }
 
             my $t = __PACKAGE__->new($key_x - $key_y, $q);

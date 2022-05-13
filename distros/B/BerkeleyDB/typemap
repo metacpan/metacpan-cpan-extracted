@@ -1,12 +1,12 @@
 # typemap for Perl 5 interface to Berkeley DB version 2 & 3
 #
-# SCCS: %I%, %G%     
+# SCCS: %I%, %G%
 #
 # written by Paul Marquess <pmqs@cpan.org>
 #
 #################################### DB SECTION
 #
-# 
+#
 
 SVnull*         T_SV_NULL
 void *			T_PV
@@ -175,8 +175,8 @@ T_PV_64
 
 T_IO_NULL
 	if ($arg == &PL_sv_undef)
-	    $var = NULL ; 
-	else 
+	    $var = NULL ;
+	else
             $var = IoOFP(sv_2io($arg))
 
 T_PTROBJ_NULL
@@ -217,8 +217,8 @@ T_dbtkeydatum
 	    DBT_clear($var) ;
             SvGETMAGIC($arg) ;
 	    if (db->recno_or_queue) {
-	        Value = GetRecnoKey(db, SvIV(my_sv)) ; 
-	        $var.data = & Value; 
+	        Value = GetRecnoKey(db, SvIV(my_sv)) ;
+	        $var.data = & Value;
 	        $var.size = (int)sizeof(db_recno_t);
 	    }
 	    else {
@@ -251,8 +251,8 @@ T_dbtkeydatum_btree
             SvGETMAGIC($arg) ;
 	    if (db->recno_or_queue ||
 		    (db->type == DB_BTREE && flagSet(DB_SET_RECNO))) {
-	        Value = GetRecnoKey(db, SvIV(my_sv)) ; 
-	        $var.data = & Value; 
+	        Value = GetRecnoKey(db, SvIV(my_sv)) ;
+	        $var.data = & Value;
 	        $var.size = (int)sizeof(db_recno_t);
 	    }
 	    else {
@@ -292,10 +292,10 @@ T_dbtkeydatum_btree_r
 	    DBM_ckFilter(my_sv, filter_store_key, \"filter_store_key\");
 	    DBT_clear($var) ;
             SvGETMAGIC($arg) ;
-	    if (db->recno_or_queue || 
+	    if (db->recno_or_queue ||
 		    (db->type == DB_BTREE && flagSet(DB_SET_RECNO))) {
-	        Value = GetRecnoKey(db, SvIV(my_sv)) ; 
-	        $var.data = & Value; 
+	        Value = GetRecnoKey(db, SvIV(my_sv)) ;
+	        $var.data = & Value;
 	        $var.size = (int)sizeof(db_recno_t);
 	    }
 	    else {
@@ -313,10 +313,10 @@ T_dbtkeydatum_btree_pr
 	    DBM_ckFilter(my_sv, filter_store_key, \"filter_store_key\");
 	    DBT_clear($var) ;
             SvGETMAGIC($arg) ;
-	    if (db->recno_or_queue || 
+	    if (db->recno_or_queue ||
 		    (db->type == DB_BTREE && flagSet(DB_SET_RECNO))) {
-	        Value = GetRecnoKey(db, SvIV(my_sv)) ; 
-	        $var.data = & Value; 
+	        Value = GetRecnoKey(db, SvIV(my_sv)) ;
+	        $var.data = & Value;
 	        $var.size = (int)sizeof(db_recno_t);
 	    }
 	    else {
@@ -344,7 +344,7 @@ T_dbtdatum
     	    $var.dlen  = db->dlen ;
 	    $var.doff  = db->doff ;
 	}
-	
+
 T_dbtdatum_opt
 	DBT_clear($var) ;
 	if (flagSetBoth()) {
@@ -358,7 +358,7 @@ T_dbtdatum_opt
     	   $var.dlen  = db->dlen ;
 	   $var.doff  = db->doff ;
 	}
-	
+
 T_dbtdatum_btree
 	DBT_clear($var) ;
 	if (flagSetBoth()) {
@@ -372,7 +372,7 @@ T_dbtdatum_btree
     	    $var.dlen  = db->dlen ;
 	    $var.doff  = db->doff ;
 	}
-	
+
 
 OUTPUT
 

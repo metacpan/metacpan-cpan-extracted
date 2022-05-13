@@ -5,7 +5,7 @@ use strict ;
 
 use lib 't' ;
 
-use BerkeleyDB; 
+use BerkeleyDB;
 use util ;
 
 use Test::More ;

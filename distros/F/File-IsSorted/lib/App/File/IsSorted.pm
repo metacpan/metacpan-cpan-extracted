@@ -1,5 +1,5 @@
 package App::File::IsSorted;
-$App::File::IsSorted::VERSION = '0.0.6';
+$App::File::IsSorted::VERSION = '0.2.0';
 use strict;
 use warnings;
 use 5.016;
@@ -19,7 +19,7 @@ App::File::IsSorted - see L<is-sorted>
 
 =head1 VERSION
 
-version 0.0.6
+version 0.2.0
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,24 @@
 CHANGES
 -------
 
+  2.104 13 April 2022
+
+      * Merge pull request #11 from monkburger/symbol_fix_2
+        Fri May 13 07:17:19 2022 +0100
+        64aea2d3f78946d7df4096eadfa0d7267f4439a5
+
+      * perl_crz -> Perl_crz
+        Tue May 3 18:19:24 2022 +0000
+        20502e6c2eba8ddcad80b20574e840457c0cb369
+
+      * This is a slightly different way to fix https://github.com/pmqs/Compress-Raw-Zlib/issues/8
+        Tue May 3 18:06:48 2022 +0000
+        d9cd27fb212da7455b6ba44729ca11bb441f3950
+
+      * add tests for crc32/adler32_combine
+        Mon May 2 16:18:13 2022 +0100
+        dcfe9ef439790f1a4fae81cf3eac38cfeb848294
+
   2.103 3 April 2022
 
       * Sync upstream fix for CVE-2018-25032

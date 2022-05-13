@@ -9,7 +9,7 @@ BEGIN {
     $ENV{LC_ALL} = 'de_DE@euro';
 }
 
-use BerkeleyDB; 
+use BerkeleyDB;
 use util ;
 
 use Test::More ;
@@ -130,7 +130,7 @@ sub chkMsg
     my $ErrMsg = join "|", map { "$prefix$_" }
                         'illegal flag specified to (db_open|DB->open)',
                        '(BDB\d+ )?DB_AUTO_COMMIT may not be specified in non-transactional environment';
-    
+
     return 1 if $BerkeleyDB::Error =~ /^$ErrMsg/ ;
     warn "# $BerkeleyDB::Error\n" ;
     return 0;
@@ -142,7 +142,7 @@ sub chkMsg
     my $home = "./fred" ;
     ok my $lexD = new LexDir($home), "lexdir" ;
     my $lex = new LexFile $errfile ;
-    ok my $env = new BerkeleyDB::Env( -ErrFile => $errfile, 
+    ok my $env = new BerkeleyDB::Env( -ErrFile => $errfile,
     					  -Flags => DB_CREATE,
 					  -Home   => $home) ;
     my $db = new BerkeleyDB::Hash -Filename => $Dfile,
@@ -152,7 +152,7 @@ sub chkMsg
 
     my $ErrMsg = join "'", 'illegal flag specified to (db_open|DB->open)',
                            'DB_AUTO_COMMIT may not be specified in non-transactional environment';
-    
+
     ok chkMsg();
     ok -e $errfile ;
     my $contents = docat($errfile) ;
@@ -170,7 +170,7 @@ sub chkMsg
     ok my $lexD = new LexDir($home) ;
     my $lex = new LexFile $errfile ;
     my $fh = new IO::File ">$errfile" ;
-    ok my $env = new BerkeleyDB::Env( -ErrFile => $fh, 
+    ok my $env = new BerkeleyDB::Env( -ErrFile => $fh,
     					  -Flags => DB_CREATE,
 					  -Home   => $home) ;
     my $db = new BerkeleyDB::Hash -Filename => $Dfile,
@@ -261,7 +261,7 @@ sub chkMsg
     # The test below is not portable -- the error message returned by
     # $BerkeleyDB::Error is locale dependant.
 
-    #ok $version_major == 2 ? 1 
+    #ok $version_major == 2 ? 1
     #                           : $BerkeleyDB::Error =~ /No such file or directory/ ;
     #    or print "# BerkeleyDB::Error is $BerkeleyDB::Error\n";
     chdir ".." ;

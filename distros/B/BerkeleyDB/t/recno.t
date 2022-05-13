@@ -1,11 +1,11 @@
 #!./perl -w
 
-# ID: %I%, %G%   
+# ID: %I%, %G%
 
 use strict ;
 
 use lib 't' ;
-use BerkeleyDB; 
+use BerkeleyDB;
 use util ;
 use Test::More;
 
@@ -44,7 +44,7 @@ umask(0) ;
 {
     my $lex = new LexFile $Dfile ;
 
-    ok my $db = new BerkeleyDB::Recno -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Recno -Filename => $Dfile,
 				    -Flags    => DB_CREATE ;
 
     is $db->Env, undef;
@@ -97,12 +97,12 @@ umask(0) ;
     ok my $env = new BerkeleyDB::Env -Flags => DB_CREATE|DB_INIT_MPOOL,@StdErrFile,
     					 -Home => $home ;
 
-    ok my $db = new BerkeleyDB::Recno -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Recno -Filename => $Dfile,
 				    -Env      => $env,
 				    -Flags    => DB_CREATE ;
 
     isa_ok $db->Env, 'BerkeleyDB::Env';
-                    
+
     # Add a k/v pair
     my $value ;
     ok $db->db_put(1, "some value") == 0 ;
@@ -112,14 +112,14 @@ umask(0) ;
     undef $env ;
 }
 
- 
+
 {
     # cursors
 
     my $lex = new LexFile $Dfile ;
     my @array ;
     my ($k, $v) ;
-    ok my $db = new BerkeleyDB::Recno -Filename  => $Dfile, 
+    ok my $db = new BerkeleyDB::Recno -Filename  => $Dfile,
 				    	  -ArrayBase => 0,
 				    	  -Flags     => DB_CREATE ;
 
@@ -146,9 +146,9 @@ umask(0) ;
     my %copy = %data;
     my $extras = 0 ;
     # sequence forwards
-    while ($cursor->c_get($k, $v, DB_NEXT) == 0) 
+    while ($cursor->c_get($k, $v, DB_NEXT) == 0)
     {
-        if ( $copy{$k} eq $v ) 
+        if ( $copy{$k} eq $v )
             { delete $copy{$k} }
 	else
 	    { ++ $extras }
@@ -166,7 +166,7 @@ umask(0) ;
     for ( $status = $cursor->c_get($k, $v, DB_LAST) ;
 	  $status == 0 ;
     	  $status = $cursor->c_get($k, $v, DB_PREV)) {
-        if ( $copy{$k} eq $v ) 
+        if ( $copy{$k} eq $v )
             { delete $copy{$k} }
 	else
 	    { ++ $extras }
@@ -178,7 +178,7 @@ umask(0) ;
     ok keys %copy == 0 ;
     ok $extras == 0 ;
 }
- 
+
 {
     # Tied Array interface
 
@@ -236,7 +236,7 @@ umask(0) ;
     ok $values == 2022 ;
 
     # unshift
-    $FA ? unshift @array, "red", "green", "blue" 
+    $FA ? unshift @array, "red", "green", "blue"
         : $db->unshift("red", "green", "blue" ) ;
     ok $array[1] eq "red" ;
     ok $cursor->c_get($k, $v, DB_FIRST) == 0 ;
@@ -262,7 +262,7 @@ umask(0) ;
     ok (($FA ? shift @array : $db->shift()) == 2) ;
 
     # push
-    $FA ? push @array, "the", "end" 
+    $FA ? push @array, "the", "end"
         : $db->push("the", "end") ;
     ok $cursor->c_get($k, $v, DB_LAST) == 0 ;
     ok $k == 1001 ;
@@ -280,8 +280,8 @@ umask(0) ;
     ok (( $FA ? pop @array : $db->pop ) == 2000)  ;
 
     undef $cursor;
-    # now clear the array 
-    $FA ? @array = () 
+    # now clear the array
+    $FA ? @array = ()
         : $db->clear() ;
     ok $cursor = $db->db_cursor() ;
     ok $cursor->c_get($k, $v, DB_FIRST) == DB_NOTFOUND ;
@@ -304,7 +304,7 @@ umask(0) ;
     ok $value eq "some value" ;
 
 }
- 
+
 {
     # partial
     # check works via API
@@ -390,7 +390,7 @@ umask(0) ;
 
 {
     # partial
-    # check works via tied array 
+    # check works via tied array
 
     my $lex = new LexFile $Dfile ;
     my @array ;
@@ -470,14 +470,14 @@ umask(0) ;
 				     -Flags => DB_CREATE|DB_INIT_TXN|
 					  	DB_INIT_MPOOL|DB_INIT_LOCK ;
     ok my $txn = $env->txn_begin() ;
-    ok my $db1 = tie @array, 'BerkeleyDB::Recno', 
+    ok my $db1 = tie @array, 'BerkeleyDB::Recno',
 				-Filename => $Dfile,
 				-ArrayBase => 0,
                       		-Flags    =>  DB_CREATE ,
 		        	-Env 	  => $env,
 		        	-Txn	  => $txn ;
 
-    
+
     ok $txn->txn_commit() == 0 ;
     ok $txn = $env->txn_begin() ;
     $db1->Txn($txn);
@@ -535,12 +535,12 @@ umask(0) ;
     my $recs = ($BerkeleyDB::db_version >= 3.1 ? "bt_ndata" : "bt_nrecs") ;
     my @array ;
     my ($k, $v) ;
-    ok my $db = new BerkeleyDB::Recno -Filename 	=> $Dfile, 
+    ok my $db = new BerkeleyDB::Recno -Filename 	=> $Dfile,
 				     	   -Flags    	=> DB_CREATE,
 					   -Pagesize	=> 4 * 1024,
 					;
 
-    my $ref = $db->db_stat() ; 
+    my $ref = $db->db_stat() ;
     ok $ref->{$recs} == 0;
     ok $ref->{'bt_pagesize'} == 4 * 1024;
 
@@ -558,7 +558,7 @@ umask(0) ;
     }
     ok $ret == 0 ;
 
-    $ref = $db->db_stat() ; 
+    $ref = $db->db_stat() ;
     ok $ref->{$recs} == 3;
 }
 
@@ -582,14 +582,14 @@ umask(0) ;
    @ISA=qw(BerkeleyDB BerkeleyDB::Recno);
    @EXPORT = @BerkeleyDB::EXPORT ;
 
-   sub db_put { 
+   sub db_put {
 	my $self = shift ;
         my $key = shift ;
         my $value = shift ;
         $self->SUPER::db_put($key, $value * 3) ;
    }
 
-   sub db_get { 
+   sub db_get {
 	my $self = shift ;
         $self->SUPER::db_get($_[0], $_[1]) ;
 	$_[1] -= 2 ;
@@ -608,14 +608,14 @@ EOM
 
     close FILE ;
 
-    BEGIN { push @INC, '.'; }    
+    BEGIN { push @INC, '.'; }
     use Test::More;
     eval 'use SubDB ; ';
     ok $@ eq "" ;
     my @h ;
     my $X ;
     eval '
-	$X = tie(@h, "SubDB", -Filename => "dbrecno.tmp", 
+	$X = tie(@h, "SubDB", -Filename => "dbrecno.tmp",
 			-Flags => DB_CREATE,
 			-Mode => 0640 );
 	' ;
@@ -764,7 +764,7 @@ EOM
     my $lex = new LexFile $Dfile;
     my @array ;
     my $value ;
-    ok my $db = tie @array, 'BerkeleyDB::Recno', 
+    ok my $db = tie @array, 'BerkeleyDB::Recno',
 					-Filename  => $Dfile,
                                        	-Flags     => DB_CREATE ;
 
@@ -807,7 +807,7 @@ EOM
     touch $Dfile2 ;
     my @array ;
     my $value ;
-    ok tie @array, 'BerkeleyDB::Recno', 
+    ok tie @array, 'BerkeleyDB::Recno',
 						-ArrayBase => 0,
                                       	       	-Flags  => DB_CREATE ,
 						-Source	=> $Dfile2 ,
@@ -850,7 +850,7 @@ EOM
     touch $Dfile2 ;
     my @array ;
     my $value ;
-    ok tie @array, 'BerkeleyDB::Recno', 
+    ok tie @array, 'BerkeleyDB::Recno',
 						-ArrayBase => 0,
                                       	       	-Flags  => DB_CREATE ,
 				    	    	-Property => DB_RENUMBER,
@@ -871,7 +871,7 @@ EOM
     my $lex = new LexFile $Dfile ;
     my @array ;
     my $db ;
-    ok $db = tie @array, 'BerkeleyDB::Recno', 
+    ok $db = tie @array, 'BerkeleyDB::Recno',
 						-ArrayBase => 0,
                                       	       	-Flags  => DB_CREATE ,
 				    	    	-Property => DB_RENUMBER,
@@ -892,7 +892,7 @@ EOM
     my $lex = new LexFile $Dfile ;
     my @array ;
     my $db ;
-    ok $db = tie @array, 'BerkeleyDB::Recno', 
+    ok $db = tie @array, 'BerkeleyDB::Recno',
 						-ArrayBase => 0,
                                       	       	-Flags  => DB_CREATE ,
 				    	    	-Property => DB_RENUMBER,
@@ -912,13 +912,13 @@ SKIP:
 if(0)
 {
     # RT #75691: scalar(@array) returns incorrect value after shift() on tied array
-    skip "Test needs Berkeley DB 3.2 or better", 4 
+    skip "Test needs Berkeley DB 3.2 or better", 4
         if $BerkeleyDB::db_version < 3.3;
 
     my $lex = new LexFile $Dfile ;
     my @array ;
     my $db ;
-    ok $db = tie @array, 'BerkeleyDB::Recno', 
+    ok $db = tie @array, 'BerkeleyDB::Recno',
                         -Flags  => DB_CREATE ,
 						-Filename => $Dfile ;
 

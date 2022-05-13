@@ -223,6 +223,14 @@ Returns the
 
 =cut
 
+=head2 derivative
+
+    Polynomial.derivative()
+
+Returns the
+
+=cut
+
 =head2 divmod
 
     Polynomial.divmod()
@@ -426,5 +434,7 @@ Returns the
     Polynomial.to_s()
 
 Returns the
+
+Aliases: I<stringify>
 
 =cut

@@ -10,7 +10,7 @@
 #    Tagged source files end with .T
 #    Output from the code ends with .O
 #    Pre-Pod file ends with .P
-#    
+#
 # Tags
 #
 #    ## BEGIN tagname
@@ -35,8 +35,8 @@ foreach $file (glob("*.M"))
     {
         # Skip blank & comment lines
         next if /^\s*$/ || /^\s*#/ ;
-	
-	# 
+
+	#
 	($name, $expand) = split (/\t+/, $_, 2) ;
 
 	$expand =~ s/^\s*// ;
@@ -130,7 +130,7 @@ foreach $ppod (@ppods)
         {
             warn "No code insert '$1' available\n"
 	        unless $Section{$1} ;
-    
+
 	    print "Expanding section $1\n" if $Verbose ;
 	    print POD $Section{$1} ;
         }
@@ -140,7 +140,7 @@ foreach $ppod (@ppods)
 	    print POD $line ;
         }
     }
-    
+
     close PPOD ;
     close POD ;
 }

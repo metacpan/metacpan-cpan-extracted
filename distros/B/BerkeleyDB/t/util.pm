@@ -33,7 +33,7 @@ $FA = 0 ;
 {
     sub try::TIEARRAY { bless [], "try" }
     sub try::FETCHSIZE { $FA = 1 }
-    my @a ; 
+    my @a ;
     tie @a, 'try' ;
     my $a = @a ;
 }
@@ -83,15 +83,15 @@ $FA = 0 ;
     {
         my $self = shift ;
         my $dir = shift ;
-    
+
         rmtree $dir if -e $dir ;
-    
+
         mkdir $dir, 0777 or return undef ;
 
         return bless [ $dir ], $self ;
     }
-    
-    sub DESTROY 
+
+    sub DESTROY
     {
         my $self = shift ;
         my $dir = $self->[0];
@@ -152,7 +152,7 @@ sub docat
 }
 
 sub docat_del
-{ 
+{
     my $file = shift;
     local $/ = undef;
     open(CAT,$file) || die "Cannot open $file: $!";
@@ -161,10 +161,10 @@ sub docat_del
     unlink $file ;
     $result = normalise($result);
     return $result;
-}   
+}
 
 sub docat_del_sort
-{ 
+{
     my $file = shift;
     open(CAT,$file) || die "Cannot open $file: $!";
     my @got = <CAT>;
@@ -175,7 +175,7 @@ sub docat_del_sort
     unlink $file ;
     $result = normalise($result);
     return $result;
-}   
+}
 
 sub readFile
 {

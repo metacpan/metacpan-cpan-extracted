@@ -3,7 +3,7 @@
 use strict ;
 
 use lib 't' ;
-use BerkeleyDB; 
+use BerkeleyDB;
 use Test::More ;
 use util ;
 
@@ -20,7 +20,7 @@ if (1)
     my $home = "./fred" ;
     ok my $lexD = new LexDir($home) ;
     my $lex = new LexFile $msgfile ;
-    ok my $env = new BerkeleyDB::Env( -MsgFile => $msgfile, 
+    ok my $env = new BerkeleyDB::Env( -MsgFile => $msgfile,
     				  -Flags => DB_CREATE,
 				  -Home   => $home) ;
     $env->stat_print();
@@ -38,7 +38,7 @@ if (1)
     ok my $lexD = new LexDir($home) ;
     my $lex = new LexFile $msgfile ;
     my $fh = new IO::File ">$msgfile" ;
-    ok my $env = new BerkeleyDB::Env( -MsgFile => $fh, 
+    ok my $env = new BerkeleyDB::Env( -MsgFile => $fh,
     					  -Flags => DB_CREATE,
 					  -Home   => $home) ;
     is $env->stat_print(), 0;
@@ -58,10 +58,10 @@ if (1)
     my $Dfile = "db.db";
     my $lex1 = new LexFile $Dfile ;
     my $fh = new IO::File ">$msgfile" ;
-    ok my $env = new BerkeleyDB::Env( -MsgFile => $fh, 
+    ok my $env = new BerkeleyDB::Env( -MsgFile => $fh,
     					  -Flags => DB_CREATE|DB_INIT_MPOOL,
 					  -Home   => $home) ;
-    ok my $db = new BerkeleyDB::Btree -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Btree -Filename => $Dfile,
 				    -Env      => $env,
 				    -Flags    => DB_CREATE ;
     is $db->stat_print(), 0;
@@ -80,7 +80,7 @@ if (1)
     ok my $lexD = new LexDir($home) ;
     my $lex = new LexFile $msgfile ;
     my $fh = new IO::File ">$msgfile" ;
-    ok my $env = new BerkeleyDB::Env( -MsgFile => $fh, 
+    ok my $env = new BerkeleyDB::Env( -MsgFile => $fh,
     					  -Flags => DB_CREATE|DB_INIT_TXN,
 					  -Home   => $home) ;
     is $env->txn_stat_print(), 0

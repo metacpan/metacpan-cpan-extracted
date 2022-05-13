@@ -2,7 +2,7 @@
 
 use strict ;
 use lib 't';
-use BerkeleyDB; 
+use BerkeleyDB;
 use Test::More;
 use util ;
 

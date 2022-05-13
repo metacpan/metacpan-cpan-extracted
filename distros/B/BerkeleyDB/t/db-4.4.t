@@ -3,7 +3,7 @@
 use strict ;
 
 use lib 't' ;
-use BerkeleyDB; 
+use BerkeleyDB;
 use Test::More ;
 use util ;
 
@@ -20,7 +20,7 @@ plan tests => 12;
     my $Dfile;
     my $lex = new LexFile $Dfile ;
     my ($k, $v) ;
-    ok my $db = new BerkeleyDB::Btree -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Btree -Filename => $Dfile,
 				     -Flags    => DB_CREATE ;
 
     # create some data
@@ -74,7 +74,7 @@ plan tests => 12;
     ok $env ;
 
     # something crazy small
-    #is($env->set_lg_max(1024), 0); 
+    #is($env->set_lg_max(1024), 0);
 
     ok my $txn = $env->txn_begin() ;
 

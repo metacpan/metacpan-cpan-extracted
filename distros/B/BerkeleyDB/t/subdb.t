@@ -3,7 +3,7 @@
 use strict ;
 
 use lib 't' ;
-use BerkeleyDB; 
+use BerkeleyDB;
 use Test::More ;
 use util ;
 
@@ -38,7 +38,7 @@ sub countDatabases
     ok $status == DB_NOTFOUND;
 
     return wantarray ? sort @dbnames : scalar @dbnames ;
-    
+
 
 }
 
@@ -73,7 +73,7 @@ sub countDatabases
 
     my $lex = new LexFile $Dfile ;
 
-    ok my $db = new BerkeleyDB::Hash -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Hash -Filename => $Dfile,
 				        -Flags    => DB_CREATE ;
 
     # Add a k/v pair
@@ -89,9 +89,9 @@ sub countDatabases
 
     undef $db ;
 
-    $db = new BerkeleyDB::Hash -Filename => $Dfile, 
+    $db = new BerkeleyDB::Hash -Filename => $Dfile,
 			       -Subname  => "fred" ;
-    ok ! $db ;				    
+    ok ! $db ;
 
     ok -e $Dfile ;
     ok ! BerkeleyDB::db_remove(-Filename => $Dfile)  ;
@@ -105,7 +105,7 @@ sub countDatabases
 
     my $lex = new LexFile $Dfile ;
 
-    ok my $db = new BerkeleyDB::Hash -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Hash -Filename => $Dfile,
 				         -Subname  => "fred" ,
 				         -Flags    => DB_CREATE ;
 
@@ -122,10 +122,10 @@ sub countDatabases
 
     undef $db ;
 
-    $db = new BerkeleyDB::Hash -Filename => $Dfile, 
+    $db = new BerkeleyDB::Hash -Filename => $Dfile,
 				    -Subname  => "joe" ;
 
-    ok !$db ;				    
+    ok !$db ;
 
 }
 
@@ -134,7 +134,7 @@ sub countDatabases
 
     my $lex = new LexFile $Dfile ;
 
-    ok my $db = new BerkeleyDB::Hash -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Hash -Filename => $Dfile,
 				        -Subname  => "fred" ,
 				        -Flags    => DB_CREATE ;
 
@@ -161,12 +161,12 @@ sub countDatabases
     # of the subdatabase names
 
     my $lex = new LexFile $Dfile ;
-  
-    ok my $db1 = new BerkeleyDB::Hash -Filename => $Dfile, 
+
+    ok my $db1 = new BerkeleyDB::Hash -Filename => $Dfile,
 				        -Subname  => "fred" ,
 				        -Flags    => DB_CREATE ;
 
-    ok my $db2 = new BerkeleyDB::Btree -Filename => $Dfile, 
+    ok my $db2 = new BerkeleyDB::Btree -Filename => $Dfile,
 				        -Subname  => "joe" ,
 				        -Flags    => DB_CREATE ;
 
@@ -184,20 +184,20 @@ sub countDatabases
 
     undef $db1 ;
     undef $db2 ;
-  
+
     is join(",", countDatabases($Dfile)), "fred,joe";
 
     ok BerkeleyDB::db_remove(-Filename => $Dfile, -Subname => "harry") != 0;
     ok BerkeleyDB::db_remove(-Filename => $Dfile, -Subname => "fred") == 0 ;
-    
+
     # should only be one subdatabase
     is join(",", countDatabases($Dfile)), "joe";
 
     # can't delete an already deleted subdatabase
     ok BerkeleyDB::db_remove(-Filename => $Dfile, -Subname => "fred") != 0;
-    
+
     ok BerkeleyDB::db_remove(-Filename => $Dfile, -Subname => "joe") == 0 ;
-    
+
     # should only be one subdatabase
     is countDatabases($Dfile), 0;
 

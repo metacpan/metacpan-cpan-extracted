@@ -1,6 +1,6 @@
 #!./perl -w
 
-use strict ; 
+use strict ;
 
 BEGIN {
     unless(grep /blib/, @INC) {
@@ -10,11 +10,11 @@ BEGIN {
 }
 
 use lib 't';
-use BerkeleyDB; 
+use BerkeleyDB;
 use Test::More;
 use util ;
 
-#BEGIN 
+#BEGIN
 #{
 #    if ($BerkeleyDB::db_version < 3) {
 #        print "1..0 # Skipping test, this needs Berkeley DB 3.x or better\n" ;
@@ -48,11 +48,11 @@ my $redirect = "xyzt" ;
 
     use strict ;
     use BerkeleyDB ;
-    
+
     my $filename = "fruit" ;
     unlink $filename ;
-    my $db = new BerkeleyDB::Hash 
-                -Filename => $filename, 
+    my $db = new BerkeleyDB::Hash
+                -Filename => $filename,
 		-Flags    => DB_CREATE,
 		-Property  => DB_DUP
         or die "Cannot open file $filename: $! $BerkeleyDB::Error\n" ;
@@ -64,13 +64,13 @@ my $redirect = "xyzt" ;
     $db->db_put("yellow", "banana") ;
     $db->db_put("red", "tomato") ;
     $db->db_put("green", "apple") ;
-    
+
     # print the contents of the file
     my ($k, $v) = ("", "") ;
     my $cursor = $db->db_cursor() ;
     while ($cursor->c_get($k, $v, DB_NEXT) == 0)
       { print "$k -> $v\n" }
-      
+
     undef $cursor ;
     undef $db ;
     unlink $filename ;
@@ -96,11 +96,11 @@ my $redirect = "xyzt" ;
 
     use strict ;
     use BerkeleyDB ;
-    
+
     my $filename = "fruit" ;
     unlink $filename ;
-    my $db = new BerkeleyDB::Hash 
-                -Filename => $filename, 
+    my $db = new BerkeleyDB::Hash
+                -Filename => $filename,
 		-Flags    => DB_CREATE,
 		-Property  => DB_DUP | DB_DUPSORT
         or die "Cannot open file $filename: $! $BerkeleyDB::Error\n" ;
@@ -112,13 +112,13 @@ my $redirect = "xyzt" ;
     $db->db_put("yellow", "banana") ;
     $db->db_put("red", "tomato") ;
     $db->db_put("green", "apple") ;
-    
+
     # print the contents of the file
     my ($k, $v) = ("", "") ;
     my $cursor = $db->db_cursor() ;
     while ($cursor->c_get($k, $v, DB_NEXT) == 0)
       { print "$k -> $v\n" }
-      
+
     undef $cursor ;
     undef $db ;
     unlink $filename ;
@@ -135,5 +135,3 @@ yellow -> banana
 EOM
 
 }
-
-

@@ -3,7 +3,7 @@
 use strict ;
 
 use lib 't';
-use BerkeleyDB; 
+use BerkeleyDB;
 use util ;
 use Test::More;
 
@@ -25,7 +25,7 @@ umask(0) ;
     ok $@ =~ /unknown key value\(s\) Stupid/  ;
 
     eval ' $db = new BerkeleyDB::Btree -Bad => 2, -Mode => 0345, -Stupid => 3; ' ;
-    ok $@ =~ /unknown key value\(s\) (Bad,? |Stupid,? ){2}/  
+    ok $@ =~ /unknown key value\(s\) (Bad,? |Stupid,? ){2}/
         or print "# $@" ;
 
     eval ' $db = new BerkeleyDB::Btree -Env => 2 ' ;
@@ -44,7 +44,7 @@ umask(0) ;
 {
     my $lex = new LexFile $Dfile ;
 
-    ok my $db = new BerkeleyDB::Btree -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Btree -Filename => $Dfile,
 				    -Flags    => DB_CREATE ;
 
     # Add a k/v pair
@@ -61,7 +61,7 @@ umask(0) ;
     ok $db->db_del("some key") == 0 ;
     ok $db->db_get("some key", $value) == DB_NOTFOUND ;
     ok $db->status() == DB_NOTFOUND ;
-    ok $db->status() =~ $DB_errors{'DB_NOTFOUND'} 
+    ok $db->status() =~ $DB_errors{'DB_NOTFOUND'}
         or diag "Status is [" . $db->status() . "]";
 
     ok $db->db_sync() == 0 ;
@@ -101,7 +101,7 @@ umask(0) ;
 
     ok my $env = new BerkeleyDB::Env -Flags => DB_CREATE|DB_INIT_MPOOL,
     					 @StdErrFile, -Home => $home ;
-    ok my $db = new BerkeleyDB::Btree -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Btree -Filename => $Dfile,
 				    -Env      => $env,
 				    -Flags    => DB_CREATE ;
 
@@ -117,16 +117,16 @@ umask(0) ;
     undef $env ;
 }
 
- 
+
 {
     # cursors
 
     my $lex = new LexFile $Dfile ;
     my %hash ;
     my ($k, $v) ;
-    ok my $db = new BerkeleyDB::Btree -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Btree -Filename => $Dfile,
 				     -Flags    => DB_CREATE ;
-    #print "[$db] [$!] $BerkeleyDB::Error\n" ;				     
+    #print "[$db] [$!] $BerkeleyDB::Error\n" ;
 
     # create some data
     my %data =  (
@@ -149,7 +149,7 @@ umask(0) ;
     my $extras = 0 ;
     # sequence forwards
     while ($cursor->c_get($k, $v, DB_NEXT) == 0) {
-        if ( $copy{$k} eq $v ) 
+        if ( $copy{$k} eq $v )
             { delete $copy{$k} }
 	else
 	    { ++ $extras }
@@ -166,7 +166,7 @@ umask(0) ;
     for ( $status = $cursor->c_get($k, $v, DB_LAST) ;
 	  $status == 0 ;
     	  $status = $cursor->c_get($k, $v, DB_PREV)) {
-        if ( $copy{$k} eq $v ) 
+        if ( $copy{$k} eq $v )
             { delete $copy{$k} }
 	else
 	    { ++ $extras }
@@ -188,7 +188,7 @@ umask(0) ;
     ok $cursor->c_get($k, $v, DB_GET_BOTH) == DB_NOTFOUND ;
 
 }
- 
+
 {
     # Tied Hash interface
 
@@ -253,29 +253,29 @@ umask(0) ;
     my $lex = new LexFile $Dfile, $Dfile2, $Dfile3 ;
     my $value ;
     my (%h, %g, %k) ;
-    my @Keys = qw( 0123 12 -1234 9 987654321 def  ) ; 
-    ok tie %h, "BerkeleyDB::Btree", -Filename => $Dfile, 
+    my @Keys = qw( 0123 12 -1234 9 987654321 def  ) ;
+    ok tie %h, "BerkeleyDB::Btree", -Filename => $Dfile,
 				     -Compare   => sub { $_[0] <=> $_[1] },
 				     -Flags    => DB_CREATE ;
 
-    ok tie %g, 'BerkeleyDB::Btree', -Filename => $Dfile2, 
+    ok tie %g, 'BerkeleyDB::Btree', -Filename => $Dfile2,
 				     -Compare   => sub { $_[0] cmp $_[1] },
 				     -Flags    => DB_CREATE ;
 
-    ok tie %k, 'BerkeleyDB::Btree', -Filename => $Dfile3, 
+    ok tie %k, 'BerkeleyDB::Btree', -Filename => $Dfile3,
 				   -Compare   => sub { length $_[0] <=> length $_[1] },
 				   -Flags    => DB_CREATE ;
 
     my @srt_1 ;
     { local $^W = 0 ;
-      @srt_1 = sort { $a <=> $b } @Keys ; 
+      @srt_1 = sort { $a <=> $b } @Keys ;
     }
     my @srt_2 = sort { $a cmp $b } @Keys ;
     my @srt_3 = sort { length $a <=> length $b } @Keys ;
 
     foreach (@Keys) {
         local $^W = 0 ;
-        $h{$_} = 1 ; 
+        $h{$_} = 1 ;
         $g{$_} = 1 ;
         $k{$_} = 1 ;
     }
@@ -290,26 +290,26 @@ umask(0) ;
     my $lex = new LexFile $Dfile, $Dfile2, $Dfile3 ;
     my $value ;
     my (%h, %g, %k) ;
-    my @Keys   = qw( 0123 9 12 -1234 9 987654321 def  ) ; 
-    my @Values = qw( 1    0 3   dd   x abc       0    ) ; 
-    ok tie %h, "BerkeleyDB::Btree", -Filename => $Dfile, 
+    my @Keys   = qw( 0123 9 12 -1234 9 987654321 def  ) ;
+    my @Values = qw( 1    0 3   dd   x abc       0    ) ;
+    ok tie %h, "BerkeleyDB::Btree", -Filename => $Dfile,
 				     -Compare   => sub { $_[0] <=> $_[1] },
 				     -Property  => DB_DUP,
 				     -Flags    => DB_CREATE ;
 
-    ok tie %g, 'BerkeleyDB::Btree', -Filename => $Dfile2, 
+    ok tie %g, 'BerkeleyDB::Btree', -Filename => $Dfile2,
 				     -Compare   => sub { $_[0] cmp $_[1] },
 				     -Property  => DB_DUP,
 				     -Flags    => DB_CREATE ;
 
-    ok tie %k, 'BerkeleyDB::Btree', -Filename => $Dfile3, 
+    ok tie %k, 'BerkeleyDB::Btree', -Filename => $Dfile3,
 				   -Compare   => sub { length $_[0] <=> length $_[1] },
 				   -Property  => DB_DUP,
 				   -Flags    => DB_CREATE ;
 
     my @srt_1 ;
     { local $^W = 0 ;
-      @srt_1 = sort { $a <=> $b } @Keys ; 
+      @srt_1 = sort { $a <=> $b } @Keys ;
     }
     my @srt_2 = sort { $a cmp $b } @Keys ;
     my @srt_3 = sort { length $a <=> length $b } @Keys ;
@@ -317,7 +317,7 @@ umask(0) ;
     foreach (@Keys) {
         local $^W = 0 ;
         my $value = shift @Values ;
-        $h{$_} = $value ; 
+        $h{$_} = $value ;
         $g{$_} = $value ;
         $k{$_} = $value ;
     }
@@ -359,33 +359,33 @@ umask(0) ;
     my $lex = new LexFile $Dfile, $Dfile2;
     my $value ;
     my (%h, %g) ;
-    my @Keys   = qw( 0123 9 12 -1234 9 987654321 9 def  ) ; 
-    my @Values = qw( 1    11 3   dd   x abc      2 0    ) ; 
-    ok tie %h, "BerkeleyDB::Btree", -Filename => $Dfile, 
+    my @Keys   = qw( 0123 9 12 -1234 9 987654321 9 def  ) ;
+    my @Values = qw( 1    11 3   dd   x abc      2 0    ) ;
+    ok tie %h, "BerkeleyDB::Btree", -Filename => $Dfile,
 				     -Compare   => sub { $_[0] <=> $_[1] },
 				     -DupCompare   => sub { $_[0] cmp $_[1] },
 				     -Property  => DB_DUP,
 				     -Flags    => DB_CREATE ;
 
-    ok tie %g, 'BerkeleyDB::Btree', -Filename => $Dfile2, 
+    ok tie %g, 'BerkeleyDB::Btree', -Filename => $Dfile2,
 				     -Compare   => sub { $_[0] cmp $_[1] },
 				     -DupCompare   => sub { $_[0] <=> $_[1] },
 				     -Property  => DB_DUP,
-				     
-				     
-				     
+
+
+
 				     -Flags    => DB_CREATE ;
 
     my @srt_1 ;
     { local $^W = 0 ;
-      @srt_1 = sort { $a <=> $b } @Keys ; 
+      @srt_1 = sort { $a <=> $b } @Keys ;
     }
     my @srt_2 = sort { $a cmp $b } @Keys ;
 
     foreach (@Keys) {
         local $^W = 0 ;
         my $value = shift @Values ;
-        $h{$_} = $value ; 
+        $h{$_} = $value ;
         $g{$_} = $value ;
     }
 
@@ -401,7 +401,7 @@ umask(0) ;
     my $lex = new LexFile $Dfile;
     my %hh ;
 
-    ok my $YY = tie %hh, "BerkeleyDB::Btree", -Filename => $Dfile, 
+    ok my $YY = tie %hh, "BerkeleyDB::Btree", -Filename => $Dfile,
 				     -DupCompare   => sub { $_[0] cmp $_[1] },
 				     -Property  => DB_DUP,
 				     -Flags    => DB_CREATE ;
@@ -411,37 +411,37 @@ umask(0) ;
     $hh{'Wall'} = 'Brick' ; # Note the duplicate key
     $hh{'Smith'} = 'John' ;
     $hh{'mouse'} = 'mickey' ;
-    
+
     # first work in scalar context
     ok scalar $YY->get_dup('Unknown') == 0 ;
     ok scalar $YY->get_dup('Smith') == 1 ;
     ok scalar $YY->get_dup('Wall') == 3 ;
-    
+
     # now in list context
     my @unknown = $YY->get_dup('Unknown') ;
     ok "@unknown" eq "" ;
-    
+
     my @smith = $YY->get_dup('Smith') ;
     ok "@smith" eq "John" ;
-    
+
     {
     my @wall = $YY->get_dup('Wall') ;
     my %wall ;
     @wall{@wall} = @wall ;
     ok (@wall == 3 && $wall{'Larry'} && $wall{'Stone'} && $wall{'Brick'});
     }
-    
+
     # hash
     my %unknown = $YY->get_dup('Unknown', 1) ;
     ok keys %unknown == 0 ;
-    
+
     my %smith = $YY->get_dup('Smith', 1) ;
     ok keys %smith == 1 && $smith{'John'} ;
-    
+
     my %wall = $YY->get_dup('Wall', 1) ;
-    ok keys %wall == 3 && $wall{'Larry'} == 1 && $wall{'Stone'} == 1 
+    ok keys %wall == 3 && $wall{'Larry'} == 1 && $wall{'Stone'} == 1
     		&& $wall{'Brick'} == 1 ;
-    
+
     undef $YY ;
     untie %hh ;
 
@@ -461,7 +461,7 @@ umask(0) ;
     ok $value eq "some value" ;
 
 }
- 
+
 {
     # partial
     # check works via API
@@ -545,7 +545,7 @@ umask(0) ;
 
 {
     # partial
-    # check works via tied hash 
+    # check works via tied hash
 
     my $lex = new LexFile $Dfile ;
     my %hash ;
@@ -634,7 +634,7 @@ umask(0) ;
     ok ((my $Z = $txn->txn_commit()) == 0) ;
     ok $txn = $env->txn_begin() ;
     $db1->Txn($txn);
-    
+
     # create some data
     my %data =  (
 		"red"	=> "boat",
@@ -712,7 +712,7 @@ umask(0) ;
     ok $cursor->c_get($key, $value, DB_NEXT) == 0 ;
     ok $key eq "Wall" && $value eq "Brick" ;
 
-    #my $ref = $db->db_stat() ; 
+    #my $ref = $db->db_stat() ;
     #ok ($ref->{bt_flags} | DB_DUP) == DB_DUP ;
 #print "bt_flags " . $ref->{bt_flags} . " DB_DUP " . DB_DUP ."\n";
 
@@ -729,13 +729,13 @@ umask(0) ;
     my $recs = ($BerkeleyDB::db_version >= 3.1 ? "bt_ndata" : "bt_nrecs") ;
     my %hash ;
     my ($k, $v) ;
-    ok my $db = new BerkeleyDB::Btree -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Btree -Filename => $Dfile,
 				     -Flags    => DB_CREATE,
 				 	-Minkey	=>3 ,
-					-Pagesize	=> 2 **12 
+					-Pagesize	=> 2 **12
 					;
 
-    my $ref = $db->db_stat() ; 
+    my $ref = $db->db_stat() ;
     ok $ref->{$recs} == 0;
     ok $ref->{'bt_minkey'} == 3;
     ok $ref->{'bt_pagesize'} == 2 ** 12;
@@ -753,7 +753,7 @@ umask(0) ;
     }
     ok $ret == 0 ;
 
-    $ref = $db->db_stat() ; 
+    $ref = $db->db_stat() ;
     ok $ref->{$recs} == 3;
 }
 
@@ -777,14 +777,14 @@ umask(0) ;
    @ISA=qw(BerkeleyDB BerkeleyDB::Btree );
    @EXPORT = @BerkeleyDB::EXPORT ;
 
-   sub db_put { 
+   sub db_put {
 	my $self = shift ;
         my $key = shift ;
         my $value = shift ;
         $self->SUPER::db_put($key, $value * 3) ;
    }
 
-   sub db_get { 
+   sub db_get {
 	my $self = shift ;
         $self->SUPER::db_get($_[0], $_[1]) ;
 	$_[1] -= 2 ;
@@ -804,13 +804,13 @@ EOM
     close FILE ;
 
     use Test::More;
-    BEGIN { push @INC, '.'; }    
+    BEGIN { push @INC, '.'; }
     eval 'use SubDB ; ';
     ok $@ eq "" ;
     my %h ;
     my $X ;
     eval '
-	$X = tie(%h, "SubDB", -Filename => "dbbtree.tmp", 
+	$X = tie(%h, "SubDB", -Filename => "dbbtree.tmp",
 			-Flags => DB_CREATE,
 			-Mode => 0640 );
 	' ;
@@ -846,8 +846,8 @@ EOM
     my $lex = new LexFile $Dfile ;
     my %hash ;
     my ($k, $v) = ("", "");
-    ok my $db = new BerkeleyDB::Btree 
-				-Filename  => $Dfile, 
+    ok my $db = new BerkeleyDB::Btree
+				-Filename  => $Dfile,
 			     	-Flags     => DB_CREATE,
 			     	-Property  => DB_RECNUM ;
 
@@ -920,4 +920,3 @@ EOM
     ok $v == 4 ;
 
 }
-

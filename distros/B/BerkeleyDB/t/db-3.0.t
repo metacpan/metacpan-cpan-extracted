@@ -5,7 +5,7 @@
 use strict ;
 
 use lib 't';
-use BerkeleyDB; 
+use BerkeleyDB;
 use util ;
 
 use Test::More ;
@@ -14,7 +14,7 @@ BEGIN {
     plan(skip_all => "this needs BerkeleyDB 3.x or better" )
         if $BerkeleyDB::db_version < 3;
 
-    plan tests => 14;    
+    plan tests => 14;
 }
 
 my $Dfile = "dbhash.tmp";
@@ -40,7 +40,7 @@ umask(0);
     my $lex = new LexFile $Dfile ;
     my %hash ;
     my ($k, $v) ;
-    ok my $db = new BerkeleyDB::Hash -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Hash -Filename => $Dfile,
 				     -Flags    => DB_CREATE ;
 
     # create some data
@@ -80,6 +80,5 @@ umask(0);
     ok $dup_cursor->c_get($k, $v, DB_CURRENT) == 0;
     ok $k eq "green" ;
     ok $v eq "house" ;
-    
-}
 
+}

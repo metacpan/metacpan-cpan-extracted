@@ -5,7 +5,7 @@
 use strict ;
 use lib 't' ;
 
-use BerkeleyDB; 
+use BerkeleyDB;
 use util ;
 use Test::More;
 
@@ -15,7 +15,7 @@ BEGIN {
     plan(skip_all => "this needs BerkeleyDB 2.x or better" )
         if $BerkeleyDB::db_version < 2;
 
-    plan tests => 12;    
+    plan tests => 12;
 }
 
 
@@ -35,7 +35,7 @@ umask(0) ;
     ok my $env = new BerkeleyDB::Env -Flags => DB_CREATE|DB_INIT_MPOOL,
     					 -Home => $home, @StdErrFile ;
 
-    ok my $db = new BerkeleyDB::Btree -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Btree -Filename => $Dfile,
 				    -Env      => $env,
 				    -Flags    => DB_CREATE ;
 
@@ -58,7 +58,7 @@ umask(0) ;
     ok my $env = new BerkeleyDB::Env -Flags => DB_INIT_CDB|DB_CREATE|DB_INIT_MPOOL,
     					 -Home => $home, @StdErrFile ;
 
-    ok my $db = new BerkeleyDB::Btree -Filename => $Dfile, 
+    ok my $db = new BerkeleyDB::Btree -Filename => $Dfile,
 				    -Env      => $env,
 				    -Flags    => DB_CREATE ;
 

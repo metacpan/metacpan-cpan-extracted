@@ -1,11 +1,11 @@
 #!./perl -w
 
-# ID: %I%, %G%   
+# ID: %I%, %G%
 
 use strict ;
 
 use lib 't' ;
-use BerkeleyDB; 
+use BerkeleyDB;
 use util ;
 
 use Test::More ;
@@ -14,7 +14,7 @@ BEGIN {
     plan(skip_all => "this needs BerkeleyDB 3.2.x or better" )
         if $BerkeleyDB::db_version < 3.2;
 
-    plan tests => 6;    
+    plan tests => 6;
 }
 
 my $Dfile = "dbhash.tmp";
@@ -40,8 +40,8 @@ umask(0) ;
     ok my $env = new BerkeleyDB::Env -Home => $home, @StdErrFile,
                                          -Flags => DB_CREATE ,
                                          -SetFlags => DB_NOMMAP ;
- 
-    undef $env ;                      
+
+    undef $env ;
 }
 
 {
@@ -52,6 +52,6 @@ umask(0) ;
     ok my $env = new BerkeleyDB::Env -Home => $home, @StdErrFile,
                                          -Flags => DB_CREATE ;
     ok ! $env->set_flags(DB_NOMMAP, 1);
- 
-    undef $env ;                      
+
+    undef $env ;
 }

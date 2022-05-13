@@ -24,6 +24,7 @@ t/Plack-Component-Tags-HTML/02-version.t
 t/Plack-Component-Tags-HTML/03-app-minimal.t
 t/Plack-Component-Tags-HTML/04-app-psgi_app.t
 t/Plack-Component-Tags-HTML/05-app-tags_middle.t
-t/Plack-Component-Tags-HTML/06-app-xml_error.t
+t/Plack-Component-Tags-HTML/06-app-tags_middle_without_title.t
+t/Plack-Component-Tags-HTML/07-app-xml_error.t
 xt/Plack-Component-Tags-HTML/01-pod_coverage.t
 xt/Plack-Component-Tags-HTML/02-pod.t

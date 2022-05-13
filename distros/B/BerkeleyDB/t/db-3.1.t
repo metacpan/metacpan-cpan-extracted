@@ -5,11 +5,11 @@ use strict ;
 use lib 't';
 use util ;
 
-use Test::More ; 
+use Test::More ;
 
-use BerkeleyDB; 
+use BerkeleyDB;
 
-plan(skip_all =>  "1..0 # Skip: this needs Berkeley DB 3.1.x or better\n") 
+plan(skip_all =>  "1..0 # Skip: this needs Berkeley DB 3.1.x or better\n")
     if $BerkeleyDB::db_version < 3.1 ;
 
 plan(tests => 48) ;
@@ -122,13 +122,13 @@ umask(0) ;
     title "rename a subdb";
 
     my $lex = new LexFile $Dfile ;
-  
-    my $db1 = new BerkeleyDB::Hash -Filename => $Dfile, 
+
+    my $db1 = new BerkeleyDB::Hash -Filename => $Dfile,
 				        -Subname  => "fred" ,
 				        -Flags    => DB_CREATE ;
     isa_ok $db1, 'BerkeleyDB::Hash', "  create database ok";
 
-    my $db2 = new BerkeleyDB::Btree -Filename => $Dfile, 
+    my $db2 = new BerkeleyDB::Btree -Filename => $Dfile,
 				        -Subname  => "joe" ,
 				        -Flags    => DB_CREATE ;
     isa_ok $db2, 'BerkeleyDB::Btree', "  create database ok";
@@ -148,12 +148,12 @@ umask(0) ;
     undef $db1 ;
     undef $db2 ;
 
-    # now rename 
-    cmp_ok BerkeleyDB::db_rename(-Filename => $Dfile, 
+    # now rename
+    cmp_ok BerkeleyDB::db_rename(-Filename => $Dfile,
                               -Subname => "fred",
                               -Newname => "harry"), '==', 0, "  rename ok";
-  
-    my $db3 = new BerkeleyDB::Hash -Filename => $Dfile, 
+
+    my $db3 = new BerkeleyDB::Hash -Filename => $Dfile,
 				        -Subname  => "harry" ;
     isa_ok $db3, 'BerkeleyDB::Hash', "  verify rename";
 
@@ -163,13 +163,13 @@ umask(0) ;
     title "rename a file";
 
     my $lex = new LexFile $Dfile, $Dfile2 ;
-  
-    my $db1 = new BerkeleyDB::Hash -Filename => $Dfile, 
+
+    my $db1 = new BerkeleyDB::Hash -Filename => $Dfile,
 				        -Subname  => "fred" ,
 				        -Flags    => DB_CREATE;
     isa_ok $db1, 'BerkeleyDB::Hash', "  create database ok";
 
-    my $db2 = new BerkeleyDB::Hash -Filename => $Dfile, 
+    my $db2 = new BerkeleyDB::Hash -Filename => $Dfile,
 				        -Subname  => "joe" ,
 				        -Flags    => DB_CREATE ;
     isa_ok $db2, 'BerkeleyDB::Hash', "  create database ok";
@@ -189,11 +189,11 @@ umask(0) ;
     undef $db1 ;
     undef $db2 ;
 
-    # now rename 
-    cmp_ok BerkeleyDB::db_rename(-Filename => $Dfile, -Newname => $Dfile2), 
+    # now rename
+    cmp_ok BerkeleyDB::db_rename(-Filename => $Dfile, -Newname => $Dfile2),
             '==',  0, "  rename file to $Dfile2 ok";
-  
-    my $db3 = new BerkeleyDB::Hash -Filename => $Dfile2, 
+
+    my $db3 = new BerkeleyDB::Hash -Filename => $Dfile2,
 				        -Subname  => "fred" ;
     isa_ok $db3, 'BerkeleyDB::Hash', "  verify rename"
         or diag "$! $BerkeleyDB::Error";
@@ -206,8 +206,8 @@ umask(0) ;
     title "verify";
 
     my $lex = new LexFile $Dfile, $Dfile2 ;
-  
-    my $db1 = new BerkeleyDB::Hash -Filename => $Dfile, 
+
+    my $db1 = new BerkeleyDB::Hash -Filename => $Dfile,
 				        -Subname  => "fred" ,
 				        -Flags    => DB_CREATE ;
     isa_ok $db1, 'BerkeleyDB::Hash', "  create database ok";
@@ -225,18 +225,17 @@ umask(0) ;
 
     undef $db1 ;
 
-    # now verify 
-    cmp_ok BerkeleyDB::db_verify(-Filename => $Dfile, 
+    # now verify
+    cmp_ok BerkeleyDB::db_verify(-Filename => $Dfile,
                               -Subname => "fred",
                               ), '==', 0, "  verify ok";
 
     # now verify & dump
-    cmp_ok BerkeleyDB::db_verify(-Filename => $Dfile, 
+    cmp_ok BerkeleyDB::db_verify(-Filename => $Dfile,
                               -Subname => "fred",
                               -Outfile => $Dfile2,
                               ), '==', 0, "  verify and dump ok";
-  
+
 }
 
 # db_remove with env
-

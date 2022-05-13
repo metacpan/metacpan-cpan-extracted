@@ -132,13 +132,19 @@ You can find more info about Sidef, by clicking on the following links:
 
 =over 2
 
+=item * GitHub: L<https://github.com/trizen/sidef>
+
 =item * Gitbook: L<https://trizen.gitbook.io/sidef-lang/>
 
-=item * Tutorial: L<https://github.com/trizen/sidef/wiki>
+=item * Tutorial: L<https://notabug.org/trizen/sidef/wiki>
 
 =item * RosettaCode: L<https://rosettacode.org/wiki/Sidef>
 
 =back
+
+=head1 QUESTIONS & ANSWERS
+
+Need help with Sidef? Feel free to ask questions here: L<https://github.com/trizen/sidef/discussions/categories/q-a>
 
 =head1 LICENSE AND COPYRIGHT
 

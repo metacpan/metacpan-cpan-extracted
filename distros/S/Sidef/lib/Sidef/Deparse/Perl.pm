@@ -473,6 +473,7 @@ HEADER
                     '{name=>'
                   . $self->_dump_string($_->{name})
                   . (exists($_->{slurpy})    ? (',slurpy=>' . $_->{slurpy})                       : '')
+                  . (exists($_->{array})     ? (',array=>' . $_->{array})                         : '')
                   . (exists($_->{ref_type})  ? (',type=>' . $self->_dump_reftype($_->{ref_type})) : '')
                   . (exists($_->{subset})    ? (',subset=>' . $self->_dump_reftype($_->{subset})) : '')
                   . (exists($_->{has_value}) ? (',has_value=>1')                                  : '')
@@ -688,10 +689,7 @@ HEADER
 
                     # Memoize the method/function (when "is cached" trait is specified)
                     if ($obj->{cached}) {
-                        $self->top_add("require Memoize;");
-                        $code =
-                            "do{$code;"
-                          . "\$${alphaname}$refaddr\->{code}=Memoize::memoize(\$${alphaname}${refaddr}->{code});\$${alphaname}$refaddr}";
+                        $code = "do{$code;" . "\$${alphaname}$refaddr\->cache;\$${alphaname}$refaddr}";
                     }
 
                     if ($obj->{type} eq 'func' and !$obj->{parent}) {

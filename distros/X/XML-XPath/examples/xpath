@@ -1,19 +1,25 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
+use XML::XPath;
+use I18N::Langinfo qw/langinfo CODESET/;
+use Encode qw/decode/;
+use open ':std', ':locale';
 
 $| = 1;
 
-use utf8;
-use XML::XPath;
-use open ':std', ':encoding(UTF-8)';
+my $codeset = langinfo(CODESET);
+if ($codeset ne "") {
+    @ARGV = map { decode $codeset, $_ } @ARGV;
+}
 
 my $SUFFIX = "\n";
 my $PREFIX = "";
 my $quiet  = 0;
 
 my @paths;
+# TODO: Use Getopt::Long for parsing?
 PARSE: while ((@ARGV >= 1) && ($ARGV[0] =~ /^-./ )) {
     OPTIONS: {
         if ($ARGV[0] eq "-e") {
@@ -73,7 +79,8 @@ do {
     }
     else {
         $filename = 'stdin';
-        $xpath    = XML::XPath->new(ioref => \*STDIN);
+        binmode STDIN, ':raw'; # Let the XML parser decode the input
+	$xpath    = XML::XPath->new(ioref => \*STDIN);
     }
 
     my $nodes = $xpath->find(shift @curpaths);

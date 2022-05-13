@@ -5,7 +5,7 @@ use strict ;
 use lib 't';
 use Test::More ;
 
-BEGIN 
+BEGIN
 {
 	plan skip_all => "this is Perl $], skipping test\n"
         if $] < 5.005 ;
@@ -25,7 +25,7 @@ BEGIN
         plan skip_all =>  "MLDBM is not installed on this system.\n";
     }
 
-    plan tests => 12;    
+    plan tests => 12;
 }
 
 use lib 't' ;
@@ -33,15 +33,15 @@ use util ;
 
 {
     package BTREE ;
-    
+
     use BerkeleyDB ;
-    use MLDBM qw(BerkeleyDB::Btree) ; 
+    use MLDBM qw(BerkeleyDB::Btree) ;
     use Data::Dumper;
     use Test::More;
-    
+
     my $filename = "";
     my $lex = new LexFile $filename;
-    
+
     $MLDBM::UseDB = "BerkeleyDB::Btree" ;
     my %o ;
     my $db = tie %o, 'MLDBM', -Filename => $filename,
@@ -49,7 +49,7 @@ use util ;
     		or die $!;
     ok $db ;
     ok $db->type() == DB_BTREE ;
-    
+
     my $c = [\'c'];
     my $b = {};
     my $a = [1, $b, $c];
@@ -60,13 +60,13 @@ use util ;
     $o{d} = "{once upon a time}";
     $o{e} = 1024;
     $o{f} = 1024.1024;
-    
+
     my $struct = [@o{qw(a b c)}];
     ok ::_compare([$a, $b, $c], $struct);
     ok $o{d} eq "{once upon a time}" ;
     ok $o{e} == 1024 ;
     ok $o{f} eq 1024.1024 ;
-    
+
 }
 
 {
@@ -74,7 +74,7 @@ use util ;
     package HASH ;
 
     use BerkeleyDB ;
-    use MLDBM qw(BerkeleyDB::Hash) ; 
+    use MLDBM qw(BerkeleyDB::Hash) ;
     use Data::Dumper;
 
     my $filename = "";
