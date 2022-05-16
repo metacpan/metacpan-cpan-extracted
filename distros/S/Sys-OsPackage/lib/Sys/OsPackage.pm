@@ -14,7 +14,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package Sys::OsPackage;
-$Sys::OsPackage::VERSION = '0.1.2';
+$Sys::OsPackage::VERSION = '0.1.3';
 use Config;
 use Carp qw(carp croak confess);
 use Sys::OsRelease;
@@ -1048,7 +1048,7 @@ Sys::OsPackage - install OS packages and determine if CPAN modules are packaged 
 
 =head1 VERSION
 
-version 0.1.2
+version 0.1.3
 
 =head1 SYNOPSIS
 

@@ -1,14 +1,14 @@
 package Log::ger::Plugin::Multisets;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-11'; # DATE
-our $DIST = 'Log-ger-Plugin-Multisets'; # DIST
-our $VERSION = '0.003'; # VERSION
-
 use strict;
 use warnings;
 
 use Log::ger ();
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-05-16'; # DATE
+our $DIST = 'Log-ger-Plugin-Multisets'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 sub meta { +{
     v => 2,
@@ -18,7 +18,7 @@ sub get_hooks {
     my %plugin_conf = @_;
 
     die "Please specify at least one of ".
-        "log_sub_prefixes|is_sub_prefixes|log_method_prefixes|is_method_prefixes"
+        "logger_sub_prefixes|level_checker_sub_prefixes|logger_method_prefixes|level_checker_method_prefixes"
         unless
         $plugin_conf{logger_sub_prefixes} ||
         $plugin_conf{level_checker_sub_prefixes} ||
@@ -68,7 +68,7 @@ Log::ger::Plugin::Multisets - Create multiple sets of logger routines, each set 
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -143,7 +143,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -3,7 +3,7 @@ NAME
     each set with its own init arguments
 
 VERSION
-    version 0.003
+    version 0.004
 
 SYNOPSIS
     Instead of having to resort to OO style to log to different categories:
@@ -66,7 +66,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2022, 2020 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

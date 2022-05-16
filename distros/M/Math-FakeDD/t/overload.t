@@ -9,7 +9,7 @@ use warnings;
 use Math::FakeDD qw(:all);
 use Test::More;
 
-cmp_ok($Math::FakeDD::VERSION, '==', 0.01, "Version number is correct");
+cmp_ok($Math::FakeDD::VERSION, '==', 0.02, "Version number is correct");
 
 my $obj = Math::FakeDD->new();
 
@@ -114,7 +114,10 @@ cmp_ok(Math::FakeDD->new()                          , '==', 0, "Math::FakeDD->ne
 # object passed to mpfr2dd() is 2098. Hence:
 
 my $mpfr_nan = Math::MPFR::Rmpfr_init2(2098);
-cmp_ok(Math::FakeDD::mpfr2dd($mpfr_nan), '==', 0, "Math::FakeDD->new(NaN) returns false");
+my $bool = 0;
+$bool = 1 if mpfr2dd($mpfr_nan);
+
+cmp_ok($bool, '==', 0, "Math::FakeDD->new(NaN) is false in boolean context");
 
 my $atan1 = dd_atan2(0.5, '0.3');
 cmp_ok($atan1, '==', atan2(Math::FakeDD->new(0.5), Math::FakeDD->new('0.3')), "1: atan2 ok");
@@ -124,6 +127,15 @@ cmp_ok($atan2, '==', atan2('0.3', Math::FakeDD->new(0.5)), "2: atan2 ok");
 
 cmp_ok(approx($atan1, 0.0000000001, '1.0303768265243125'), '==', 1, "3: atan2 ok");
 cmp_ok(approx($atan2, 0.0000000001, '0.54041950027058416'), '==', 1, "4: atan2 ok");
+
+my $nan = Math::FakeDD->new('nan');
+
+cmp_ok($nan                                   , '!=', $nan               , "NaN != NaN");
+cmp_ok($nan                                   , '!=', Math::FakeDD->new(), "NaN != 0");
+cmp_ok(defined($nan <=> Math::FakeDD->new(1)), '==', 0, "1: NaN with spaceship op returns undef");
+
+cmp_ok(defined(Math::FakeDD->new(1) <=> $nan), '==', 0, "2: NaN with spaceship op returns undef");
+
 
 
 done_testing();

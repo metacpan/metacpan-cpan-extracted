@@ -27,7 +27,7 @@ my %WriteMakefileArgs =
 
    'PREREQ_PM'          => {
                             'Math::BigInt'        => 1.999830,
-                            'Math::BigRat'        => 0.2621,
+                            'Math::BigRat'        => 0.2623,
                             #'Math::BigInt::Lite'  => 0.03,      # optional
                             'Carp'                => 1.22,
                            },

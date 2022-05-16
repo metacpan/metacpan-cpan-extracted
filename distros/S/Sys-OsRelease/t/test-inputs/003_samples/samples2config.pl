@@ -77,7 +77,7 @@ foreach my $sample (@samples) {
 
     # save the tests for this file
     $config{files}{$sample} = \%tests;
-    $count += 2*(scalar keys %tests)+1;
+    $count += 3*(scalar keys %tests)+2;
 }
 $config{count} = $count;
 

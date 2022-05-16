@@ -1,5 +1,8 @@
 Revision history for OpenAPI-Modern
 
+0.029     2022-05-16 04:20:20Z
+          - fix missing prereq for result serialization tests
+
 0.028     2022-05-14 21:11:50Z
           - now only checking for readOnly values in request bodies and
             writeOnly values in response bodies (not path

@@ -20,9 +20,9 @@ no_index:
 requires:
   Carp: '1.22'
   Math::BigInt: '1.99983'
-  Math::BigRat: '0.2621'
+  Math::BigRat: '0.2623'
   perl: '5.006'
 resources:
   repository: https://github.com/pjacklam/p5-bignum.git
-version: '0.65'
+version: '0.66'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

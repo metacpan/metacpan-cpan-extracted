@@ -1,6 +1,21 @@
 Change log for Sys::OsRelease
 
-0.2.3 2022-05-15T00:38:27-07:00 America/Los_Angeles
+0.3.0 2022-05-15T21:58:03-07:00 America/Los_Angeles
+ [DOCS]
+ - document auto-generated accessor methods for standard attributes
+ - reorganize POD docs to separate methods into subsections for class,
+   auto-generated and instance methods
+ - remove NAME section from source POD. I didn't notice until now that
+   Pod::Weaver was adding a duplicate.
+
+ [MINOR]
+ - remove auto-generation of non-standard attribute accessor methods
+   (writing docs, couldn't recommend using them)
+
+ [REVISION]
+ - add found_attrs() method with 100+ test cases
+
+0.2.3 2022-05-15T00:46:55-07:00 America/Los_Angeles
  [DOCS]
  - remove NAME section from source POD. I didn't notice until now that
    Pod::Weaver was adding a duplicate.

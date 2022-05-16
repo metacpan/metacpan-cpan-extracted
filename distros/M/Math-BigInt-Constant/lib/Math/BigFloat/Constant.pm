@@ -5,7 +5,7 @@ package Math::BigFloat::Constant;
 use strict;
 use warnings;
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 
 use Math::BigFloat '1.999802';
 our @ISA = qw( Math::BigFloat );
@@ -39,12 +39,6 @@ sub copy {
 
     return Math::BigFloat->new($x) unless ref($x);
     Math::BigFloat->copy($x);
-}
-
-sub as_int {
-    my $x = shift;
-
-    die("Can not modify ", ref($x), " $x via as_int()\n");
 }
 
 1;

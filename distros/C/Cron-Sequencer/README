@@ -1,0 +1,35 @@
+Cron::Sequencer
+===============
+
+Show the sequence of commands that cron would run.
+
+This distribution contains a module Cron::Sequencer that takes one or more
+crontabs and show the sequence of commands that they would run, and a script
+cron-sequencer that provides a convenient command-line interface to this.
+
+INSTALLATION
+
+The easiest way to install this module is to run
+
+     cpan .
+
+in the unpacked the source directory.
+
+This automates the following steps:
+
+     perl Makefile.PL
+     ... install the dependencies listed ...
+     make
+     make test
+     make install
+
+COPYRIGHT
+
+This distribution was written for Humanstate Sàrl by Nicholas Clark
+
+It is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. If you would like to contribute
+documentation, features, bug fixes, or anything else then please raise
+an issue / pull request:
+
+    https://github.com/Humanstate/cron-sequencer

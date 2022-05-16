@@ -26,7 +26,7 @@ no_index:
 provides:
   App::winmaildat2tar:
     file: lib/App/winmaildat2tar.pm
-    version: '0.9901'
+    version: '0.9902'
   App::winmaildat2tar::Archive:
     file: lib/App/winmaildat2tar.pm
   App::winmaildat2tar::Archive::Ar:
@@ -48,7 +48,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/winmaildat2tar/issues
   homepage: https://github.com/kaz-utashiro/winmaildat2tar
   repository: git://github.com/kaz-utashiro/winmaildat2tar.git
-version: '0.9901'
+version: '0.9902'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

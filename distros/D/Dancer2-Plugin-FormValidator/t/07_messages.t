@@ -37,14 +37,14 @@ my $validator = Dancer2::Plugin::FormValidator::Validator->new(
     registry => $registry,
 );
 
-my ($success, $valid, $invalid) = $validator->validate($profile, $input->get);
+my ($success, $valid, $invalid) = $validator->validate($profile->profile, $input->get);
 
 my $messages_factory = Dancer2::Plugin::FormValidator::Factory::Messages->new(
     config   => $config,
     registry => $registry,
 );
 
-my $messages = $messages_factory->build($profile, $invalid);
+my $messages = $messages_factory->build($invalid);
 
 is_deeply(
     $messages,

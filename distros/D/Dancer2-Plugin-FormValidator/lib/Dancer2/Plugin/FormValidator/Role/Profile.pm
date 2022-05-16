@@ -7,4 +7,10 @@ use Moo::Role;
 
 requires 'profile';
 
+sub hook_before {
+    my ($self, $profile, $input) = @_;
+
+    return $profile;
+}
+
 1;

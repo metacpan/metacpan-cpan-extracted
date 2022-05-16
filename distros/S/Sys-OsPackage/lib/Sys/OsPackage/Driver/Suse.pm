@@ -14,7 +14,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package Sys::OsPackage::Driver::Suse;
-$Sys::OsPackage::Driver::Suse::VERSION = '0.1.2';
+$Sys::OsPackage::Driver::Suse::VERSION = '0.1.3';
 use base "Sys::OsPackage::Driver";
 
 # check if packager command found (zypper)
@@ -109,7 +109,7 @@ Sys::OsPackage::Driver::Suse - SUSE/OpenSUSE Zypper packaging handler for Sys::O
 
 =head1 VERSION
 
-version 0.1.2
+version 0.1.3
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,11 @@
+0.66 2022-05-16
+
+ * Fix documentation errors.
+
+ * Add more tests.
+
+ * Remove redunant code.
+
 0.65 2022-04-12
 
  * Restore the upgrading and downgrading in "bignum", with the exception of

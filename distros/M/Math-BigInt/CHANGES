@@ -1,3 +1,14 @@
+1.999831 2022-05-16
+
+ * Further improvements to upgrading, downgrading, and rounding.
+
+ * New stringification method bfstr() for representing numbers as fractions.
+   E.g., Math::BigFloat -> new("1.25") -> bfstr() returns "5/4".
+
+ * Miscellaneous bug fixes.
+
+ * Fixed errors and typos in the documentation.
+
 1.999830 2022-04-11
 
  * Improve upgrading and downgrading. This work is not complete. Some methods

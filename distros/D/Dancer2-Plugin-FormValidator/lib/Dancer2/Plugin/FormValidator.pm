@@ -13,7 +13,7 @@ use Dancer2::Plugin::FormValidator::Input;
 use Dancer2::Plugin::FormValidator::Processor;
 use Types::Standard qw(InstanceOf);
 
-our $VERSION = '0.90';
+our $VERSION = '1.00';
 
 plugin_keywords qw(validate validated errors);
 
@@ -85,7 +85,6 @@ sub validate {
         config   => $self->validator_config,
         registry => $self->registry,
     );
-
 
     my $result = $processor->run;
 
@@ -173,12 +172,12 @@ Dancer2::Plugin::FormValidator - neat and easy to start form validation plugin f
 
 =head1 VERSION
 
-version 0.90
+version 1.00
 
 =head1 SYNOPSIS
 
     ### If you need a simple and easy validation in your project,
-    ### then this module is what you need.
+    ### This module is what you need.
 
     use Dancer2;
     use Dancer2::Plugin::FormValidator;
@@ -581,9 +580,18 @@ Validate that field exists and not empty string.
 
     field => [ qw(required) ]
 
+=head3 required_with
+
+    required_with(String $field_name): Bool
+
+Validate that field exists and not empty string if another field is exists and not empty.
+
+    field_1 => [ qw(required) ]
+    field_2 => [ qw(required_with:field_1) ]
+
 =head3 same
 
-    same(String $field_name): bool
+    same(String $field_name): Bool
 
 Validate that field is exact value as another.
 
@@ -597,7 +605,6 @@ Role: Dancer2::Plugin::FormValidator::Role::ProfileHasMessages.
 
     package Validator {
         use Moo;
-
         with 'Dancer2::Plugin::FormValidator::Role::ProfileHasMessages';
 
         sub profile {
@@ -626,6 +633,23 @@ Role: Dancer2::Plugin::FormValidator::Role::ProfileHasMessages.
         }
     }
 
+=head1 HOOKS
+
+There is hook_before method available, which allows your Profile object to make
+decisions depending on the input data. You could use it with Moo around modifier:
+
+    around hook_before => sub {
+        my ($orig, $self, $profile, $input) = @_;
+
+        # If there is specific input value.
+        if ($input->{name} eq 'Secret') {
+            # Delete all validators for field 'surname'.
+            delete $profile->{surname};
+        }
+
+        return $orig->($self, $profile, $input);
+    };
+
 =head1 EXTENSIONS
 
 =head2 Writing custom extensions
@@ -634,7 +658,6 @@ You can extend the set of validators by writing extensions:
 
     package Extension {
         use Moo;
-
         with 'Dancer2::Plugin::FormValidator::Role::Extension';
 
         sub validators {
@@ -654,7 +677,6 @@ Custom validators:
 
     package IsTrue {
         use Moo;
-
         with 'Dancer2::Plugin::FormValidator::Role::Validator';
 
         sub message {

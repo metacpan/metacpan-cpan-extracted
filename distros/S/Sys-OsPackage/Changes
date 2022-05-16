@@ -1,11 +1,15 @@
 Change log for Sys::OsRelease
 
+0.1.3 2022-05-15T21:58:39-07:00 America/Los_Angeles
+ [REVISION]
+ - remove // operator incompatibile with Perl <5.10 in
+   Sys::OsPackage::Driver::RPM (from CPAN Testers feedback)
+
 0.1.2 2022-05-15T01:08:10-07:00 America/Los_Angeles
  [DOCS]
  - remove NAME section from source POD. I didn't notice until now that
    Pod::Weaver was adding a duplicate.
-
- [REVISION]
+ - [REVISION]
  - fix Windows failure due to lack of a uname command (from CPAN Testers
    feedback)
  - Sys:OsRelease 0.2.3 dependency avoids 0.2.2 glitch where experiment with

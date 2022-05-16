@@ -4,10 +4,12 @@
 
 #include "ppport.h"
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include <openssl/ssl.h>
 #include <openssl/bio.h>
 #include <openssl/bn.h>
 #include <openssl/cmac.h>
@@ -67,6 +69,104 @@ int ecdh_pkey_raw(EVP_PKEY *pkey_priv, EVP_PKEY *pkey_peer_pub, unsigned char **
 
 int pem_write_evp_pkey(char* dst_fname, EVP_PKEY* pkey, int is_priv)
 
+char* pem_read_priv_hex(char* keyfile) 
+
+char* pem_read_pub_hex(char* keyfile, int point_compress_t)
+
+int aead_encrypt_raw(unsigned char *cipher_name, unsigned char *plaintext, int plaintext_len, unsigned char *aad, int aad_len, unsigned char *key, unsigned char *iv, int iv_len, unsigned char **ciphertext, unsigned char *tag, int tag_len)
+
+int aead_decrypt_raw( unsigned char *cipher_name, unsigned char *ciphertext, int ciphertext_len, unsigned char *aad, int aad_len, unsigned char *tag, int tag_len, unsigned char *key, unsigned char *iv, int iv_len, unsigned char **plaintext)
+
+SV* aead_decrypt(cipher_name, ciphertext_SV, aad_SV, tag_SV, key_SV, iv_SV)
+    unsigned char *cipher_name;
+    SV* ciphertext_SV;
+    SV* aad_SV;
+    SV* tag_SV;
+    SV* key_SV; 
+    SV* iv_SV;
+  PREINIT:
+    SV *res;
+    unsigned char *plaintext;
+    int plaintext_len;
+    unsigned char *ciphertext;
+    STRLEN ciphertext_len;
+    unsigned char *aad;
+    STRLEN aad_len;
+    unsigned char *tag;
+    STRLEN tag_len;
+    unsigned char *key;
+    STRLEN key_len;
+    unsigned char *iv;
+    STRLEN iv_len;
+  CODE:
+{
+    const EVP_CIPHER *cipher = EVP_get_cipherbyname(cipher_name);
+
+    ciphertext = (unsigned char*) SvPV( ciphertext_SV, ciphertext_len );
+    aad = (unsigned char*) SvPV( aad_SV, aad_len );
+    tag = (unsigned char*) SvPV( tag_SV, tag_len );
+    key = (unsigned char*) SvPV( key_SV, key_len );
+    iv = (unsigned char*) SvPV( iv_SV, iv_len );
+
+    plaintext = malloc(ciphertext_len);
+    plaintext_len = aead_decrypt_raw(cipher_name, ciphertext, (int) ciphertext_len, aad, (int) aad_len, tag, (int) tag_len, key, iv, (int) iv_len, &plaintext);
+
+    res = newSVpv(plaintext, plaintext_len);
+
+    RETVAL = res;
+}
+  OUTPUT:
+    RETVAL
+
+SV* aead_encrypt(cipher_name, plaintext_SV, aad_SV, key_SV, iv_SV, tag_len)
+    unsigned char *cipher_name;
+    SV* plaintext_SV;
+    SV* aad_SV;
+    SV* key_SV; 
+    SV* iv_SV;
+    int tag_len;
+  PREINIT:
+    SV* ciphertext_SV ;
+    SV* tag_SV ;
+    unsigned char *plaintext;
+    STRLEN plaintext_len;
+    unsigned char *aad;
+    STRLEN aad_len;
+    unsigned char *key;
+    STRLEN key_len;
+    unsigned char *iv;
+    STRLEN iv_len;
+    unsigned char *ciphertext;
+    int ciphertext_len;
+    unsigned char *tag;
+  CODE:
+{
+    AV* av = newAV();
+    RETVAL = newRV_noinc((SV*)av);
+
+    const EVP_CIPHER *cipher = EVP_get_cipherbyname(cipher_name);
+
+    plaintext = (unsigned char*) SvPV( plaintext_SV, plaintext_len );
+    aad = (unsigned char*) SvPV( aad_SV, aad_len );
+    key = (unsigned char*) SvPV( key_SV, key_len );
+    iv = (unsigned char*) SvPV( iv_SV, iv_len );
+
+    tag = malloc(tag_len);
+    ciphertext = malloc(plaintext_len);
+    ciphertext_len = aead_encrypt_raw(cipher_name, plaintext, plaintext_len, aad, aad_len, key, iv, iv_len, &ciphertext, tag, tag_len);
+
+    ciphertext_SV = newSVpv(ciphertext, ciphertext_len);
+    tag_SV = newSVpv(tag, tag_len);
+
+    av_push(av, ciphertext_SV);
+    av_push(av, tag_SV);
+
+    /*SV* res = newSVsv(ciphertext_SV);*/
+    /*sv_catsv(res, tag_SV);*/
+    /*RETVAL = res;*/
+}
+  OUTPUT:
+    RETVAL
 
 
 EC_POINT*

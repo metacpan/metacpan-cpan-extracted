@@ -50,7 +50,8 @@ t/import-bigrat.t
 t/in_effect.t
 t/infnan-bigfloat.t
 t/infnan-bigint.t
-t/infnan-bignum.t
+t/infnan-bignum-mbf.t
+t/infnan-bignum-mbr.t
 t/infnan-bigrat.t
 t/option_a-bignum.t
 t/option_a.t

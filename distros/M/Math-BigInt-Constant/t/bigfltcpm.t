@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 179;
+plan tests => 175;
 
 use Math::BigFloat::Constant;
 
@@ -23,8 +23,8 @@ _is($x, $x->bsstr(), '8e+0', 'bsstr');
 #_is($x, $x->bfloor(), 8, 'floor');
 #_is($x, $x->bceil(), 8, 'ceil');
 
-#_is($x, $x->as_int(), 8, 'as_int');
-#_is($x, $x->as_number(), 8, 'as_number');
+_is($x, $x->as_int(), 8, 'as_int');
+_is($x, $x->as_number(), 8, 'as_number');
 
 _is($x, $x->is_pos(), 1, 'is_pos');
 _is($x, $x->is_int(), 1, 'is_int');
@@ -37,7 +37,7 @@ _is($x, $x->is_zero() || 0, 0, 'is_zero');
 
 _is($x, $x->bstr(), '8', 'bstr');
 _is($x, $x->bsstr(), '8e+0', 'bsstr');
-#_is($x, $x->digit(0), '8', 'digit');
+#_is($x, $x->digit(0), '8', 'digit');    # there's no Math::BigFloat->digit()
 
 _is($x, $x->as_hex(), '0x8', 'as_hex');
 _is($x, $x->as_bin(), '0b1000', 'as_bin');
@@ -60,11 +60,10 @@ is($x->blcm($y, $z), 19*53*8, 'lcm');
 # unary operations
 
 foreach my $method (qw/
-               bfloor bceil as_int as_number
-               binc bdec bfac bnot bneg babs
-               bzero bone binf bnan
-           /)
-{
+                          bfloor bceil
+                          binc bdec bfac bnot bneg babs
+                          bzero bone binf bnan
+                      /) {
     is(ref $x, 'Math::BigFloat::Constant', 'ref x still ok');
     $@ = '';
     my $test = "\$x->$method();";
@@ -77,13 +76,12 @@ foreach my $method (qw/
 # binary operations
 
 foreach my $method (qw/
-               badd bsub bmul bdiv bmod
-               bxor bior band bpow blsft brsft
-               broot bsqrt bexp bnok blog
-               bfround bround
-               from_bin from_oct from_hex
-           /)
-{
+                          badd bsub bmul bdiv bmod
+                          bxor bior band bpow blsft brsft
+                          broot bsqrt bexp bnok blog
+                          bfround bround
+                          from_bin from_oct from_hex
+                      /) {
     is(ref $x, 'Math::BigFloat::Constant', 'ref x still ok');
     $@ = '';
     my $test = "\$x->$method(1);";
@@ -96,9 +94,8 @@ foreach my $method (qw/
 # ternary operations
 
 foreach my $method (qw/
-               bmodpow bmodinv
-           /)
-{
+                          bmodpow bmodinv
+                      /) {
     $@ = '';
     my $test = "\$x->$method(2, 3);";
     my $out  = eval $test;
@@ -113,7 +110,6 @@ sub _is {
     my ($x, $a, $b, $c) = @_;
 
     is($a, $b, $c);
-    is(ref $x, 'Math::BigFloat::Constant', 'ref');
+    is(ref($x), 'Math::BigFloat::Constant',
+       '$x is a Math::BigFloat::Constant');
 }
-
-1;

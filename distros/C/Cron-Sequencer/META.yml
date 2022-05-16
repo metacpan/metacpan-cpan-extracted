@@ -1,0 +1,34 @@
+---
+abstract: unknown
+author:
+  - 'Nicholas Clark <nick@ccl4.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Deep: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Cron-Sequencer
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Algorithm::Cron: '0'
+  DateTime: '0'
+  Try::Tiny: '0'
+  perl: '5.020000'
+resources:
+  bugtracker: https://github.com/Humanstate/cron-sequencer/issues
+  homepage: https://metacpan.org/module/Cron::Sequencer
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/Humanstate/cron-sequencer
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -40,6 +40,9 @@
               # Otherwise outputs [0.1 -5.551115123125783e-18], same
               # as for string arg of '0.1'.
 
+  Generally, providing a string argument will DWYW, whereas providing a
+  floating-point (NV) argument won't.
+
   NOTES: In the following documentation:
 
    "$arg", "$arg1", "$arg2", etc. are arguments that can be either a
@@ -145,6 +148,34 @@
 
 =head1 OUTPUT FUNCTIONS
 
+  $str = dd_dec($obj); # "dec" short for "decimalize"
+
+   Represent the *exact* value of $obj in scientific notation,
+   using as few digits as required to provide that exactness.
+   As with dd_repro(), if this $str is assigned to a new
+   Math::FakeDD object, then the new Math::FakeDD object will
+   be identical to the Math::FakeDD object from which this
+   $str was derived. However, the number of mantissa digits
+   returned by dd_dec() will be >= (usually greater than) the
+   number of mantissa digits returned by dd_repro().
+
+  $str = dd_hex($obj);
+
+   As for dd_dec(), except that the value placed in $str is in
+   hex ("%a") format.
+
+
+  $str = dd_repro($obj); # "repro" short for "reproducible"
+
+   Represent the value of $obj in decimal scientific notation,
+   using as few decimal mantissa digits as possible, such that if
+   this $str is assigned to a new Math::FakeDD object, then the
+   new Math::FakeDD object will be identical to (ie a reproduction
+   of) the Math::FakeDD object from which $str was derived.
+
+   NOTE: This representation, unlike that provided by dd_dec()
+         and dd_hex(), might not represent the value *exactly*.
+
   $str = dd_stringify($obj);
 
    Return a string that begins with "[" and ends with "]".
@@ -154,30 +185,29 @@
    digits as possible, while not losing any information.
    The overloading of interpolation uses this function.
 
-  $str = dd_repro($obj); # "repro" short for "reproducible"
+  printx($obj);
 
-   Display the value of $obj in scientific notation, using
-   as few decimal mantissa digits as possible. If this $str
-   is assigned to a new Math::FakeDD object, then the new
-   Math::FakeDD object will be identical to (ie a reproduction
-   of) the Math::FakeDD object from which $str was derived.
+   Same as doing:
+     print(sprintx($obj)); # see below for sprintx documentation.
 
-  $str = dd_dec($obj); # "dec" short for "decimalize"
+  $str = sprintx($obj);
 
-   Display the exact value of $obj in scientific notation,
-   using as many digits as required to provide that exactness.
-   As with dd_repro(), if this $str is assigned to a new
-   Math::FakeDD object, then the new Math::FakeDD object will
-   be identical to the Math::FakeDD object from which this
-   $str was derived. However, the number of mantissa digits
-   returned by dd_dec() will be >= (usually greater than) the
-   number of mantissa digits returned by dd_repro().
+   Same as dd_stringify($obj), except that the 2 doubles are
+   presented in hex ("%a") format, instead of decimal format.
+
+  $str = unpackx($obj);
+
+   Same as dd_stringify($obj), except that the 2 doubles have
+   each been unpacked into hex format by doing:
+
+     unpack "H*", pack "d>", $double;
 
 =head1 OPERATOR OVERLOADING
 
   The following operations are currently overloaded:
    "", ==, !=, *, *=, **, **=, +, +=, -, -=, /, /=, <, <=, <=>, >, >=,
    abs, int, exp, log, sqrt,
+   bool, !,
    atan2, cos, sin
 
   Run
@@ -188,7 +218,7 @@
   These functions are documented above - except for dd_true() and
   dd_false() which are documented here:
 
-  dd_true($obj);
+  $iv = dd_true($obj);
 
    This function is not exported.
    It is intended to be called only by overloading of 'bool'.
@@ -196,7 +226,7 @@
    (This is the same criterion as used by Math::MPFR's overloading
    of 'bool'.)
 
-  dd_false($obj);
+  $iv = dd_false($obj);
 
    This function is not exported.
    It is intended to be called only by overloading of '!'.
@@ -204,13 +234,35 @@
    (This is the same criterion as used by Math::MPFR's overloading
    of '!'.)
 
-=head1 OTHER FUNCTIONS (not exported and might later be removed or altered)
+=head1 OTHER FUNCTIONS
 
-  $obj = mpfr2dd($mpfr);
+  $obj = dd_inf([$iv]); # $iv is an optional arg, which will be
+                        # evaluated in (signed) numeric context
 
-   Return the value held by the 2098-bit precision Math::MPFR object $mpfr
-   as a Math::FakeDD object $obj.
-   This conversion can lose precision - ie, can be subject to rounding.
+    If the optional arg $iv, is less than 0 (in numeric context, then
+    a Math::FakeDD object with value -Inf is returned.
+    Else return a +Inf Math::FakeDD object.
+
+  $obj = dd_nan();
+
+    Return a NaN Math::FakeDD object.
+
+  $iv = dd_is_inf($obj);
+
+    Returns 1 if $obj is an infinity.
+    Else returns 0.
+
+  $iv = dd_is_nan($obj);
+
+    Returns 1 if $obj is a NaN.
+    Else returns 0.
+
+  $obj = mpfr2dd         ($mpfr); # Precision of $mpfr is 2098 bits.
+  $obj = mpfr_any_prec2dd($mpfr); # Precision of $mpfr is unrestricted.
+
+   Return the value held by the 2 Math::MPFR object $mpfr as the
+   Math::FakeDD object $obj.
+   Precision can be (and often is) lost in this conversion.
 
   $mpfr = dd2mpfr($obj);
 
@@ -230,7 +282,7 @@
 
 =head1 ARITHMETIC IMPLEMENTATION
 
-  Operands are first converted to a 2098-bit value (Math::MPFR object).
+  Operands are first converted to a 2098-bit Math::MPFR object value.
   If the operand is a Math::FakeDD object then the conversion is exact.
   Else, the conversion might not be exact, depending upon the value.
   The result of the operation on the 2098-bit operand(s) will also be

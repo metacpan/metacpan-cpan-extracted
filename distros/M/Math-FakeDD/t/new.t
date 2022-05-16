@@ -4,7 +4,7 @@ use warnings;
 use Math::FakeDD qw(:all);
 use Test::More;
 
-cmp_ok($Math::FakeDD::VERSION, '==', 0.01, "Version number is correct");
+cmp_ok($Math::FakeDD::VERSION, '==', 0.02, "Version number is correct");
 
 eval { Math::FakeDD->new(1,2) };
 like($@, qr/Too many args given to new/, "method call: To many args");

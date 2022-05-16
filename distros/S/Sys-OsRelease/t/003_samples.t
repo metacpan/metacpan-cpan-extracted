@@ -38,15 +38,29 @@ plan tests => $test_config->{count};
 
 # run tests in each file
 foreach my $file (sort keys %{$test_config->{files}}) {
+    # instantiate
     my $osrelease = Sys::OsRelease->instance(search_path => [$input_dir], file_name => $file);
     #require Data::Dumper;
     #print STDERR "osrelease: ".Data::Dumper::Dumper($osrelease);
     #print STDERR "test: ".Data::Dumper::Dumper($test_config->{files}{$file});
+
+    # check has_attr() and get() can access the attributes
     isa_ok($osrelease, "Sys::OsRelease", "$file: instance is correct type");
     foreach my $attr (sort keys %{$test_config->{files}{$file}}) {
         ok($osrelease->has_attr($attr), "$file: found attribute $attr");
         is($osrelease->get($attr), $test_config->{files}{$file}{$attr},
             "$file: $attr => '".$test_config->{files}{$file}{$attr}."'");
     }
+
+    # check found_attrs() method returned a list of existing attributes
+    my @found_attrs = $osrelease->found_attrs;
+    my $expected_attr_count = scalar keys %{$test_config->{files}{$file}};
+    is(scalar @found_attrs, $expected_attr_count,
+        "$file: ref->found_attrs() returned list of size $expected_attr_count");
+    foreach my $found_attr (@found_attrs) {
+        ok(exists $test_config->{files}{$file}{$found_attr}, "$file: ref->found_attrs contains $found_attr");
+    }
+
+    # clean up the test instance
     Sys::OsRelease->clear_instance();
 }

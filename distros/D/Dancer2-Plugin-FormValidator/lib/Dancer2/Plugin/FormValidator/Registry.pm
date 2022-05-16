@@ -91,6 +91,7 @@ sub _validators {
         min             => 'Dancer2::Plugin::FormValidator::Validator::Min',
         numeric         => 'Dancer2::Plugin::FormValidator::Validator::Numeric',
         required        => 'Dancer2::Plugin::FormValidator::Validator::Required',
+        required_with   => 'Dancer2::Plugin::FormValidator::Validator::RequiredWith',
         same            => 'Dancer2::Plugin::FormValidator::Validator::Same',
     };
 }

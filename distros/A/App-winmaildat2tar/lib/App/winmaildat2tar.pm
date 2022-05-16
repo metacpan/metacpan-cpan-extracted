@@ -1,9 +1,10 @@
 package App::winmaildat2tar;
 
+our $VERSION = "0.9902";
+
 use v5.14;
 use warnings;
-our $VERSION = "0.9901";
-
+use Pod::Usage;
 use Getopt::EX::Long qw(:DEFAULT Configure ExConfigure);
 ExConfigure BASECLASS => [ __PACKAGE__, "Getopt::EX" ];
 Configure "bundling";
@@ -11,13 +12,19 @@ Configure "bundling";
 my $default_format = $0 =~ /2(\w+)$/ ? $1 : 'tar';
 
 use Getopt::EX::Hashed; {
-    has format => 'f =s', is => 'ro', default => $default_format;
+    has format  => 'f =s' , is => 'ro', default => $default_format;
+    has verbose => 'v   ' , is => 'ro';
+
+    has help    => 'h',
+	action  => sub { pod2usage -verbose => 99, -sections => [ qw(SYNOPSIS VERSION) ] };
+    has version => ' ',
+	action  => sub { say $VERSION; exit };
 }
 no  Getopt::EX::Hashed;
 
 sub run {
     (my $app, local @ARGV) = splice @_;
-    $app->getopt or usage();
+    $app->getopt or pod2usage();
 
     my $archive;
 
@@ -32,6 +39,7 @@ sub run {
 	};
 	for my $ent (@attachments) {
 	    my $name = $ent->longname // $ent->name // unknown();
+	    warn "$name\n" if $app->verbose;
 	    ($archive //= App::winmaildat2tar::Archive->new($app->format))
 		->add($name, $ent->data);
 	}
@@ -40,10 +48,6 @@ sub run {
     print $archive->write if $archive;
 
     exit;
-}
-
-sub usage {
-    die sprintf "Usage: %s winmail.dat\n", $0 =~ s|.*/||r;
 }
 
 sub unknown {

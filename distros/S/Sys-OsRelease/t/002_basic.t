@@ -16,7 +16,7 @@ use Config;
 use Test::More;                      # last test to print
 
 my @std_attrs = Sys::OsRelease::std_attrs();
-plan tests => (22 + 3 * scalar @std_attrs);
+plan tests => (26 + 3 * scalar @std_attrs);
 
 {
     # instantiation (3 tests)
@@ -26,7 +26,7 @@ plan tests => (22 + 3 * scalar @std_attrs);
     my $osrelease2 = Sys::OsRelease->instance();
     is($osrelease, $osrelease2, "same instance from 2nd call to instance()");
 
-    # module data (9+std_attrs tests)
+    # module data (11+std_attrs tests)
     my @std_search_path = Sys::OsRelease::std_search_path();
     ok(scalar @std_search_path > 0, "std_search_path() returned non-empty list");
     ok(scalar @std_attrs > 0, "std_attrs() returned non-empty list");
@@ -43,6 +43,12 @@ plan tests => (22 + 3 * scalar @std_attrs);
     ok((defined $platform1)?1:0, "ref->platform() returns a value"); # actual value reflects system running test
     ok((defined $platform2)?1:0, "class->platform() returns a value"); # actual value reflects system running test
     ok($platform1 eq $platform2, "ref->platform() and class->platform() return the same value");
+    my $expected_attr_count = (scalar keys %$osrelease2)-1;
+    is(scalar ($osrelease2->found_attrs()), $expected_attr_count,
+        "ref->found_attrs() returns list with $expected_attr_count items (specific to test platform)");
+    is(scalar (Sys::OsRelease->found_attrs()), $expected_attr_count,
+        "class->found_attrs() returns list with $expected_attr_count items (specific to test platform)");
+
 
     # check if os-release exists on the system performing the tests (2 tests)
     # alternate tests are given for whether os-release file exists or not on the system performing the test
@@ -74,7 +80,7 @@ is(Sys::OsRelease->defined_instance(), 0, "cleared: instance undefined after cle
 my $osrelease3 = Sys::OsRelease->instance();
 isa_ok($osrelease3, "Sys::OsRelease", "cleared: instance set again by instance()");
 
-# test for empty object if os-release file wasn't found - set empty search path to force test (6+std_attrs tests)
+# test for empty object if os-release file wasn't found - set empty search path to force test (8+std_attrs tests)
 Sys::OsRelease->clear_instance();
 foreach my $attr (map {lc $_} @std_attrs) {
     ok((Sys::OsRelease->can($attr))?0:1, "empty: $attr() method does not exist");
@@ -86,3 +92,5 @@ ok((exists $osrelease4->{_config}{osrelease_path}) ? 0 : 1, "empty: _config/osre
 is(scalar keys %$osrelease4, 1, "empty: total keys = 1 including _config");
 is($osrelease4->platform(), $Config{osname}, "empty: ref->platform() returns Perl's osname ($Config{osname})");
 is(Sys::OsRelease->platform(), $Config{osname}, "empty: class->platform() returns Perl's osname ($Config{osname})");
+is(scalar ($osrelease4->found_attrs()), 0, "empty: ref->found_attrs() returns empty list");
+is(scalar (Sys::OsRelease->found_attrs()), 0, "empty: class->found_attrs() returns empty list");

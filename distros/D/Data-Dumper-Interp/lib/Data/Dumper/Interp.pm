@@ -17,7 +17,7 @@
 use strict; use warnings FATAL => 'all'; use utf8; use 5.020;
 use feature qw(say state);
 package  Data::Dumper::Interp;
-$Data::Dumper::Interp::VERSION = '3.1';
+$Data::Dumper::Interp::VERSION = '3.2';
 
 package  # newline prevents Dist::Zilla::Plugin::PkgVersion from adding $VERSION
   DB;
@@ -52,7 +52,7 @@ sub _dbrawstr(_) { "«".(length($_[0])>$_dbmaxlen ? substr($_[0],0,$_dbmaxlen-3)
 sub _dbstr($) {
   local $_ = shift;
   s/\n/\N{U+2424}/sg; # a special NL glyph
-  s/[\x{00}-\x{20}]/ chr( ord($&)+0x2400 ) /aseg;
+  s/[\x{00}-\x{1F}]/ chr( ord($&)+0x2400 ) /aseg;
   _dbrawstr($_) . " (".length().")";
 }
 sub _dbstrposn($$) {
@@ -65,9 +65,10 @@ sub _dbstrposn($$) {
 sub oops(@) { @_ = ("\n".__PACKAGE__." oops:",@_,"\n  "); goto &Carp::confess }
 
 use Exporter 'import';
-our @EXPORT    = qw(vis  avis  alvis  ivis  dvis  hvis  hlvis
+our @EXPORT    = qw(visnew
+                    vis  avis  alvis  ivis  dvis  hvis  hlvis
                     visq avisq alvisq ivisq dvisq hvisq hlvisq
-                    u quotekey qsh _forceqsh qshpath);
+                    u quotekey qsh __forceqsh qshpath);
 
 our @EXPORT_OK = qw($Debug $MaxStringwidth $Truncsuffix $Overloads $Foldwidth
                     $Useqq $Quotekeys $Sortkeys $Sparseseen
@@ -77,12 +78,20 @@ our @ISA       = ('Data::Dumper'); # see comments at new()
 
 ############### Utility Functions #################
 
+sub __stringify($) {
+  if (defined(my $class = blessed($_[0]))) {
+    return "$_[0]" if overload::Method($class,'""');
+  }
+  $_[0]  # includes undef, ordinary ref, or non-stringifyable object
+}
+
 sub u(_) { $_[0] // "undef" }
 sub quotekey(_); # forward.  Implemented after regex declarations.
-sub _forceqsh(_) {
+
+sub __forceqsh(_) {
   # Unlike Perl, /bin/sh does not recognize any backslash escapes in '...'
   local $_ = shift;
-  return "undef" if !defined;
+  return "undef" if !defined;  # undef without quotes
   $_ = vis($_) if ref;
   # Prefer "double quoted" if no shell escapes would be needed
   if (/["\$`!\\\x{00}-\x{1F}\x{7F}]/) {
@@ -93,12 +102,13 @@ sub _forceqsh(_) {
   }
 }
 sub qsh(_) {
-  local $_ = shift;
-  defined && !/[^-=\w_\/:\.,]/ && $_ ne "" && !ref ? $_ : _forceqsh
+  local $_ = __stringify(shift());
+  defined && !ref && !/[^-=\w_\/:\.,]/ 
+    && $_ ne "" && $_ ne "undef" ? $_ : __forceqsh
 }
 sub qshpath(_) {  # like qsh but does not quote initial ~ or ~username
-  local $_ = shift;
-  return qsh if !defined or ref;
+  local $_ = __stringify(shift());
+  return qsh($_) if !defined or ref;
   my ($tilde_prefix, $rest) = /^( (?:\~[^\/\\]*[\/\\]?+)? )(.*)/xs or die;
   $rest eq "" ? $tilde_prefix : $tilde_prefix.qsh($rest)
 }
@@ -186,7 +196,7 @@ sub new {
 ########### Subs callable as either a Function or Method #############
 
 sub __chop_loc($) {
-  (local $_ = shift) =~ s/ at .*? line \d+[^\n]*\n?\z//s;
+  (local $_ = shift) =~ s/ at \(eval[^\)]*\) line \d+[^\n]*\n?\z//s;
   $_
 }
 sub __getobj {
@@ -202,6 +212,8 @@ sub __getobj_h {
   $o ->Values([{@_}])
 }
 
+sub visnew()  { __PACKAGE__->new() }  # shorthand
+
 # These can be called as *FUNCTIONS* or as *METHODS*
 sub vis(_)    { &__getobj_s ->_vistype('s' )->Dump; }
 sub visq(_)   { &__getobj_s ->_vistype('s' )->Useqq(0)->Dump; }
@@ -216,8 +228,8 @@ sub hlvisq(@) { substr &hvisq, 1, -1 }
 
 # Trampolines which replace the call frame with a call directly to the
 # interpolation code which uses $package DB to access the user's context.
-sub ivis(_) { @_=(&__getobj,          shift,'s');goto &_Interpolate }
-sub ivisq(_){ @_=(&__getobj->Useqq(0),shift,'s');goto &_Interpolate }
+sub ivis(_) { @_=(&__getobj,          shift,'i');goto &_Interpolate }
+sub ivisq(_){ @_=(&__getobj->Useqq(0),shift,'i');goto &_Interpolate }
 sub dvis(_) { @_=(&__getobj,          shift,'d');goto &_Interpolate }
 sub dvisq(_){ @_=(&__getobj->Useqq(0),shift,'d');goto &_Interpolate }
 
@@ -286,40 +298,48 @@ sub _doedits {
       }
     }
   }
-  #if (my $class = blessed($item)) {
-  if (overload::Overloaded($item)) {
-    my $class = blessed($item) // oops;
-    if (any { ref() eq "Regexp" ? $class =~ $_
-                                : ($_ eq "1" || $_ eq $class) 
-            } @$overloads) {
-      # Stringify objects which have the stringification operator
-      if (overload::Method($class,'""')) {
-        return __COPY_NEEDED if $testonly;
-        my $prefix = _show_as_number($item) ? $magic_num_prefix : "";
-        $item = "${prefix}($class)".$item;  # *calls stringify operator*
-      }
-      # Substitute the virtual value behind an overloaded deref operator
-      elsif (overload::Method($class,'@{}')) {
-        return __COPY_NEEDED if $testonly;
-        $item = \@{ $item };
-      }
-      elsif (overload::Method($class,'%{}')) {
-        return __COPY_NEEDED if $testonly;
-        $item = \%{ $item };
-      }
-      elsif (overload::Method($class,'${}')) {
-        return __COPY_NEEDED if $testonly;
-        $item = \${ $item };
-      }
-      elsif (overload::Method($class,'&{}')) {
-        return __COPY_NEEDED if $testonly;
-        $item = \&{ $item };
-      }
-      elsif (overload::Method($class,'*{}')) {
-        return __COPY_NEEDED if $testonly;
-        $item = \*{ $item };
+  my $overload_depth;
+  while (overload::Overloaded($item) && ref($item)) {
+    # N.B. Overloaded(...) also returns true if it's a NAME of an overloaded package
+    my $class = blessed($item) // oops; # overloaded ref is not blessed !?
+    last unless any { ref() eq "Regexp" ? $class =~ $_
+                                        : ($_ eq "1" || $_ eq $class) 
+                    } @$overloads;
+    warn("Recursive overloads on $item ?\n"),last
+      if $overload_depth++ > 10;
+    # Stringify objects which have the stringification operator
+    if (overload::Method($class,'""')) {
+      return __COPY_NEEDED if $testonly;
+      my $prefix = _show_as_number($item) ? $magic_num_prefix : "";
+      $item = $item.""; # stringify;
+      if ($item !~ /^${class}=REF/) {
+        $item = "${prefix}($class)$item"; 
+      } else {
+        # The "stringification" looks like Perl's default, so don't prefix it
       }
     }
+    # Substitute the virtual value behind an overloaded deref operator
+    elsif (overload::Method($class,'@{}')) {
+      return __COPY_NEEDED if $testonly;
+      $item = \@{ $item };
+    }
+    elsif (overload::Method($class,'%{}')) {
+      return __COPY_NEEDED if $testonly;
+      $item = \%{ $item };
+    }
+    elsif (overload::Method($class,'${}')) {
+      return __COPY_NEEDED if $testonly;
+      $item = \${ $item };
+    }
+    elsif (overload::Method($class,'&{}')) {
+      return __COPY_NEEDED if $testonly;
+      $item = \&{ $item };
+    }
+    elsif (overload::Method($class,'*{}')) {
+      return __COPY_NEEDED if $testonly;
+      $item = \*{ $item };
+    }
+    else { last; }  # nothing we care about
   }
   # Prepend a "magic prefix" (later removed) to items which Data::Dumper is
   # likely to represent wrongly or anyway not how we want:
@@ -333,9 +353,9 @@ sub _doedits {
   #     most likely to be what the programmer used to create the datum.
   #
   #  2. Floating point values come out as "strings" to avoid some
-  #     cross-platform problem issue.  For our purposes we want all numbers 
-  #     to appear as numbers.
-  if (!reftype($item) && looks_like_number($item)) {
+  #     cross-platform issue.  For our purposes we want all numbers 
+  #     to appear as numbers.  
+  if (!reftype($item) && $item !~ /^0\d/ && looks_like_number($item) ) {
     return __COPY_NEEDED if $testonly;
     my $prefix = _show_as_number($item) ? $magic_num_prefix 
                                         : $magic_numstr_prefix;
@@ -549,6 +569,32 @@ my $anyvname_re =
 
 my $anyvname_or_refexpr_re = qr/ ${anyvname_re} | ${curlies_re} /x;
 
+sub __unesc_unicode() {  # edits $_
+  if (/^"/) {
+    # Data::Dumper with Useqq(1) outputs wide characters as hex escapes 
+  
+    s{ \G (?: [^\\]++ | \\[^x] )*+ \K (?<w> \\x\{ (?<hex>[a-fA-F0-9]+) \} )
+     }{
+        my $orig = $+{w};
+        local $_ = hex( length($+{hex}) > 6 ? '0' : $+{hex} );
+        $_ = $_ > 0x10FFFF ? "\0" : chr($_); # 10FFFF is Unicode limit
+        # Using 'lc' so regression tests do not depend on Data::Dumper's
+        # choice of case when escaping wide characters.
+        m<\P{XPosixGraph}|[\0-\177]> ? lc($orig) : $_
+      }xesg;
+  } 
+}
+
+sub __change_quotechars($) {  # edits $_
+  if (s/^"//) {
+    oops unless s/"$//;
+    s/\\"/"/g;
+    my ($l, $r) = split //, $_[0]; oops unless $r;
+    s/([\Q$l$r\E])/\\$1/g;
+    $_ = "qq".$l.$_.$r;
+  } 
+}
+
 my %qqesc2controlpic = (
   '\0' => "\N{SYMBOL FOR NULL}",
   '\a' => "\N{SYMBOL FOR BELL}",
@@ -559,22 +605,6 @@ my %qqesc2controlpic = (
   '\r' => "\N{SYMBOL FOR CARRIAGE RETURN}",
   '\t' => "\N{SYMBOL FOR HORIZONTAL TABULATION}",
 );
-
-sub __unesc_unicode() {  # edits $_
-  if (/^"/) {
-    # Data::Dumper outputs wide characters as escapes with Useqq(1).
-  
-    s{ \G (?: [^\\]++ | \\[^x] )*+ \K (?<w> \\x\{ (?<hex>[a-fA-F0-9]+) \} )
-     }{
-        my $orig = $+{w};
-        local $_ = hex( length($+{hex}) > 6 ? '0' : $+{hex} );
-        $_ = $_ > 0x10FFFF ? "\0" : chr($_); # 10FFFF is Unicode limit
-        # Using 'lc' so regression tests do not depend on Data::Dumper's
-        # choice of case when escaping wide characters.
-        m<\P{XPosixGraph}|[\0-\377]> ? lc($orig) : $_
-      }xesg;
-  } 
-}
 sub __subst_controlpics() {  # edits $_
   if (/^"/) {
     s{ \G (?: [^\\]++ | \\[^0abefnrt] )*+ \K ( \\[abefnrt] | \\0(?![0-7]) )
@@ -629,7 +659,8 @@ sub _postprocess_DD_result {
     = @$self{qw/Debug _vistype Foldwidth Foldwidth1/};
   my $useqq = $self->Useqq();
   my $unesc_unicode = $useqq =~ /utf|unic/;
-  my $controlpics = $useqq =~ /pic/;
+  my $controlpics   = $useqq =~ /pic/;
+  my $qq            = $useqq =~ /qq(?:=(..))?/ ? ($1//'{}') : '';
 
   oops if @stack or $reserved;
   $reserved = 0;
@@ -741,6 +772,7 @@ sub _postprocess_DD_result {
 
     __unesc_unicode if $unesc_unicode;
     __subst_controlpics if $controlpics;
+    __change_quotechars($qq) if $qq;
 
 say "atom ",_dbrawstr($_),_fmt_flags($flags), "  stack:", _fmt_stack(), " os=",_dbstr($outstr)
   if $debug;
@@ -914,7 +946,7 @@ sub _RestorePunct() {
 }
 
 sub _Interpolate {
-  my ($self, $input, $s_or_d) = @_;
+  my ($self, $input, $i_or_d) = @_;
   return "<undef arg>" if ! defined $input;
 
   &_SaveAndResetPunct;
@@ -922,11 +954,14 @@ sub _Interpolate {
   my $debug = $self->Debug;
   my $useqq = $self->Useqq;
 
-  my @pieces;  # list of [visfuncname or "", inputstring]
+  my $q = $useqq ? "" : "q";
+  my $funcname = $i_or_d . "vis" .$q;
+
+  my @pieces;  # list of [visfuncname or 'p' or 'e', inputstring]
   { local $_ = $input;
     if (/\b((?:ARRAY|HASH)\(0x[a-fA-F0-9]+\))/) {
       state $warned=0;
-      carp("Warning: String passed to ${s_or_d}vis may have been interpolated by Perl\n(use 'single quotes' to avoid this)\n") unless $warned++;
+      carp("Warning: String passed to $funcname may have been interpolated by Perl\n(use 'single quotes' to avoid this)\n") unless $warned++;
     }
     while (
       /\G (
@@ -973,10 +1008,10 @@ sub _Interpolate {
       local $_ = $1; oops unless length() > 0;
       if (/^[\$\@\%]/) {
         my $sigl = substr($_,0,1);
-        if ($s_or_d eq 'd') {
-          # Inject a "plain text" fragment containing the dvis "expr=" prefix,
+        if ($i_or_d eq 'd') {
+          # Inject a "plain text" fragment containing the "expr=" prefix,
           # omitting the '$' sigl if the expr is a plain '$name'.
-          push @pieces, ["=", (/^\$(?!_)(${userident_re})\z/ ? $1 : $_)."="];
+          push @pieces, ['p', (/^\$(?!_)(${userident_re})\z/ ? $1 : $_)."="];
         }
         if ($sigl eq '$') {
           push @pieces, ["vis", $_];
@@ -991,22 +1026,27 @@ sub _Interpolate {
       } else {
         if (/^.+?(?<!\\)([\$\@\%])/) { confess __PACKAGE__." bug: Missed '$1' in «$_»" }
         # Due to the need to simplify the big regexp above, \x{abcd} is now 
-        # split into "\x" and "{abcd}".  Accumlate everything as a single 
-        # passthru ("=") and convert later to "e" if an eval if needed.
-        if (@pieces && $pieces[-1]->[0] eq "=") {
+        # split into "\x" and "{abcd}".  Combine consecutive pass-thrus
+        # into a single passthru ('p') and convert later to 'e' if 
+        # an eval if needed.
+        if (@pieces && $pieces[-1]->[0] eq 'p') {
           $pieces[-1]->[1] .= $_;
         } else {
-          push @pieces, [ "=", $_ ];
+          push @pieces, [ 'p', $_ ];
         }
       }
     }
     if (!defined(pos) || pos() < length($_)) {
       my $leftover = substr($_,pos()//0);
-      confess __PACKAGE__." Bug:LEFTOVER «$leftover»";
+      # Try to recognize user syntax errors
+      croak "Invalid expression syntax starting at '$leftover' in $funcname arg"
+        if $leftover =~ /^[\$\@\%][\s\%\@]/;
+      # Otherwise we may have a parser bug
+      confess "Invalid expression (or ".__PACKAGE__." bug):\n«$leftover»";
     }
     foreach (@pieces) {
       my ($meth, $str) = @$_;
-      next unless $meth eq "=" && $str =~ /\\[abtnfrexXN0-7]/;
+      next unless $meth eq 'p' && $str =~ /\\[abtnfrexXN0-7]/;
       $str =~ s/([()\$\@\%])/\\$1/g;  # don't hide \-escapes to be interpolated!
       $str =~ s/\$\\/\$\\\\/g;
       $_->[1] = "qq(" . $str . ")";
@@ -1014,14 +1054,15 @@ sub _Interpolate {
     }
   } #local $_
 
-  my $q = $useqq ? "" : "q";
-  my $funcname = $s_or_d . "vis" .$q;
   @_ = ($self, $funcname, \@pieces);
   goto &DB::DB_Vis_Interpolate
 }
 
 sub quotekey(_) { # Quote a hash key if not a valid bareword
-  $_[0] =~ /\A${userident_re}\z/s ? $_[0] : visq("$_[0]")
+  $_[0] =~ /\A${userident_re}\z/s ? $_[0] : 
+            $_[0] =~ /(?!.*')["\$\@]/  ? visq("$_[0]") : 
+            $_[0] =~ /\W/ && !looks_like_number($_[0]) ? vis("$_[0]") : 
+            "\"$_[0]\""
 }
 
 package 
@@ -1033,10 +1074,10 @@ sub DB_Vis_Interpolate {
   my $result = "";
   foreach my $p (@$pieces) {
     my ($methname, $arg) = @$p;
-    if ($methname eq "=") {
+    if ($methname eq 'p') {
       $result .= $arg;
     }
-    elsif ($methname eq "e") {
+    elsif ($methname eq 'e') {
       $result .= DB::DB_Vis_Eval($funcname, $arg);
     } else {
       # Reduce indent before first wrap to account for stuff alrady there
@@ -1100,7 +1141,7 @@ sub DB_Vis_Eval($$) {
 
   if ($errmsg) {
     $errmsg = Data::Dumper::Interp::__chop_loc($errmsg);
-    Carp::croak("${label_for_errmsg}: Error interpolating '$evalarg' at $fname line $lno:\n$errmsg\n");
+    Carp::croak("${label_for_errmsg}: Error interpolating '$evalarg':\n$errmsg\n");
   }
 
   wantarray ? @result : (do{die "bug" if @result>1}, $result[0])
@@ -1159,7 +1200,9 @@ Data::Dumper::Interp - Data::Dumper for humans, with interpolation
   #-------- OO API --------
 
   say Data::Dumper::Interp->new()
-      ->MaxStringwidth(50)->Maxdepth($levels)->vis($datum);
+            ->MaxStringwidth(50)->Maxdepth($levels)->vis($datum);
+
+  say visnew->MaxStringwidth(50)->Maxdepth($levels)->vis($datum);
 
   #-------- UTILITY FUNCTIONS --------
   say u($might_be_undef);  # $_[0] // "undef"
@@ -1173,20 +1216,21 @@ Data::Dumper::Interp - Data::Dumper for humans, with interpolation
 
 =head1 DESCRIPTION
 
-This is a wrapper for Data::Dumper optimized for use by humans
+This is a wrapper for Data::Dumper optimized for consumption by humans
 instead of machines; the output defaults to higher-level 
 forms which may not be 'eval'able.
 
-The namesake feature of this module is interpolating Data::Dumper output 
+The namesake feature is interpolating Data::Dumper output 
 into strings, but simple functions are also provided to 
 visualize a scalar, array, or hash.
 
-Casual debug messages are a primary use case.
+Diagnostic and debug messages are primary use cases.
 
 Internally, Data::Dumper is called to visualize (i.e. format) data
 with pre- and postprocessing to "improve" the results:
-Output omits a trailing newline and is compact (1 line if possibe,
-otherwise folded at your terminal width);
+
+Output is compact (1 line if possibe,
+otherwise folded at your terminal width), and OMITS a trailing newline.
 Unicode characters appear as themselves,
 objects like Math:BigInt are stringified, "virtual" values behind
 overloaded array/hash-deref operators are shown, and 
@@ -1200,7 +1244,7 @@ Finally, a few utilities are provided to quote strings for /bin/sh.
 =head2 ivis 'string to be interpolated'
 
 Returns the argument with variable references and escapes interpolated
-as in in Perl double-quotish strings, using Data::Dumper to
+as in in Perl double-quotish strings, but using Data::Dumper to
 format variable values.
 
 C<$var> is replaced by its value,
@@ -1235,13 +1279,13 @@ and returns the resulting string.
 
 C<avis> formats an array (or any list) as comma-separated values in parenthesis.
 
-C<hvis> formats a hash as key => value pairs in parenthesis.
+C<hvis> formats key => value pairs in parenthesis.
 
 =head2 alvis LIST
 
 =head2 hlvis EVENLIST
 
-These "l" variants return a bare list without the enclosing parenthesis.
+The "l" variants return a bare list without the enclosing parenthesis.
 
 =head2 ivisq 'string to be interpolated'
 
@@ -1268,18 +1312,25 @@ if wide characters are present.
 
 =head2 Data::Dumper::Interp->new()
 
+=head2 visnew
+
 Creates an object initialized from the global configuration
-variables listed below.  C<new> takes no arguments.
+variables listed below
+(the function C<visnew> is simply a short-hand wrapper).
+
+No arguments are permitted.
 
 The functions described above may then be called as I<methods>
-on a C<Data::Dumper::Interp> object
-(when not called as a method they create a new object internally).
+on the object
+(when not called as a method the functions create a new object internally).
 
 For example:
 
    $msg = Data::Dumper::Interp->new()->Foldwidth(40)->avis(@ARGV);
+ and
+   $msg = visnew->Foldwidth(40)->avis(@ARGV);
 
-returns the same string as
+return the same string as
 
    local $Data::Dumper::Interp::Foldwidth = 40;
    $msg = avis(@ARGV);
@@ -1288,8 +1339,8 @@ returns the same string as
 
 These work the same way as variables/methods in Data::Dumper.
 
-For each of the following configuration items, there is a global
-variable in package C<Data::Dumper::Interp> which provides the default value,
+For each configuration value, there is a global
+variable in package C<Data::Dumper::Interp> which provides the default,
 and a I<method> of the same name which sets or retrieves a config value
 on a specific object.
 
@@ -1318,11 +1369,13 @@ Defaults to the terminal width at the time of first use.
 A I<false> value disables stringification or evaluation of overloaded
 deref operators.
 
-A "1" (the default) enables stringification or showing "virtual" values
-behind overloaded deref operators for all applicable objects 
-(i.e. those which overload the "", @{} or %{} operator).
+A "1" (the default) enables for all objects, otherwise only 
+for the specified class name(s).
 
-Otherwise this is enabled only for the specified class name(s).
+If enabled, then objects are checked for an overloaded stringification
+('""') operator, or array-, hash-, scalar-, or glob- deref operators,
+in that order.  The first overloaded operator found will be evaluated and 
+the object ref replaced by the result.  The check is then repeated.
 
 =head2 Sortkeys(subref)
 
@@ -1341,7 +1394,7 @@ Non-ASCII charcters will be shown as hex escapes.
 
 Otherwise generate "double quoted" strings enhanced according to option
 keywords given as a :-separated list, e.g. Useqq("unicode:controlpic").
-The two avilable options are:
+The avilable options are:
 
 =over 4
 
@@ -1358,10 +1411,17 @@ Similarly for \0 \a \b \e \f \r and \t.
 
 This is sometimes useful for debugging because every character occupies 
 the same space with a fixed-width font.  
-The commonly-used "Last Resort" font draws these symbols 
-with single-pixel lines, which on modern high-res displays
-can be dim and hard to read.  If you experience this problem,
-set C<Useqq> to "unicode" to see traditional \n etc. backslash escapes.
+The commonly-used "Last Resort" font for these characters
+can be hard to read on modern high-res displays.
+You can set C<Useqq> to just "unicode" to see traditional \n etc. 
+backslash escapes while still seeing wide characters as themselves.
+
+=item "qq"
+
+=item "qq=XY"
+
+Show using Perl's qq{...} syntax, or qqX...Y if deliters are specified,
+rather than "...".
 
 =back
 
@@ -1408,15 +1468,14 @@ by /bin/sh, which has different quoting rules than Perl.
 
 If the string contains only "shell-safe" ASCII characters
 it is returned as-is, without quotes.
-Otherwise "double quotes" are used when no escapes would be needed,
-otherwise 'single quotes'.
 
 C<qshpath> is like C<qsh> except that an initial ~ or ~username is left
 unquoted.  Useful for paths given to bash or csh.
 
-If the argument is a ref it is first formatted as with C<vis()> and the
-resulting string quoted.
-Undefined values appear as C<undef> without quotes.
+If the argument is a ref but is not an object which stringifies,
+then vis() is called and the resulting string quoted.
+An undefined value is shown as C<undef> without quotes; 
+as a special case to avoid ambiguity the string 'undef' is always "quoted".
 
 =head1 LIMITATIONS
 

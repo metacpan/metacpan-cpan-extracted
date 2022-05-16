@@ -14,7 +14,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package Sys::OsRelease;
-$Sys::OsRelease::VERSION = '0.2.3';
+$Sys::OsRelease::VERSION = '0.3.0';
 use Config;
 use Carp qw(carp croak);
 
@@ -291,6 +291,14 @@ sub osrelease_path
     return;
 }
 
+# return list of attributes found in os-release file
+sub found_attrs
+{
+    my ($class_or_obj) = @_;
+    my $self = class_or_obj($class_or_obj);
+    return grep { $_ ne "_config" } keys %$self;
+}
+
 # attribute existence checker
 sub has_attr
 {
@@ -333,17 +341,12 @@ sub _gen_accessors
     my ($class_or_obj) = @_;
     my $self = class_or_obj($class_or_obj);
 
-    # generate read-only accessors for attributes actually found in os-release
-    foreach my $key (sort keys %{$self}) {
-        next if $key eq "_config"; # protect special/reserved attribute
-        $self->_gen_accessor($key);
-    }
-
-    # generate undef accessors for standardized attributes which were not found in os-release
+    # generate accessors for standardized attributes whether or not they were not found in os-release
+    # for attributes which exist, it makes a read-only accessor
+    # for attributes which don't exist, it makes an undef accessor
     foreach my $std_attr (@std_attrs) {
         next if $std_attr eq "_config"; # protect special/reserved attribute
         my $fc_attr = fold_case($std_attr);
-        next if $self->has_attr($fc_attr);
         $self->_gen_accessor($fc_attr);
     }
     return;
@@ -407,7 +410,7 @@ Sys::OsRelease - read operating system details from standard /etc/os-release fil
 
 =head1 VERSION
 
-version 0.2.3
+version 0.3.0
 
 =head1 SYNOPSIS
 
@@ -457,6 +460,13 @@ Folded to lower case, the attribute names are used as keys in an internal hash s
 
 =head1 METHODS
 
+=head2 Class methods
+
+I<Sys::OsRelease> uses a singleton model. So there is only one instance.
+Class methods manage the singleton instance, or import those methods to another cooperating class' namespace.
+
+Class methods must be called using the class name, like C<Sys::OsRelease->instance()> .
+
 =over 1
 
 =item init([key => value, ...])
@@ -504,6 +514,53 @@ os-release files, to indicate which system they came from.
 
 =back
 
+=item defined_instance()
+
+returns true if the singleton instance is defined, false if it is not yet defined or has been cleared.
+
+=item clear_instance()
+
+removes the singleton instance of the class if it was defined.
+Under normal circumstances it is not necessary to call this since the class destructor will call it automatically.
+It is currently only used for testing, where it is necessary to clear the instance before loading a new one with
+different parameters.
+
+Since this class is based on the singleton model, there is only one instance.
+The instance(), new() and init() methods will only initialize the instance if it is not already initialized.
+
+=item import_singleton()
+
+The singleton-management methods I<init>, I<new>, I<instance>, I<defined_instance> and I<clear_instance>
+can be imported by another class by using the import_singleton() method.
+That was done for L<Sys::OsPackage>, to allow it to avoid copying those methods.
+But other classes with a similar need to minimize module dependencies which already
+use I<Sys::OsRelease> can do this too.
+This helps maintain minimal prerequisites among modules working to set up Perl on containers or new systems.
+
+=back
+
+=head2 Auto-generated Accessor Methods
+
+For convenience, I<Sys::OsRelease> generates read-only accessor methods for each of the standard 
+attribute names, converted to lower case. For example, from the list above they are I<name()>, I<id()>,
+I<id_like()>, etc. The auto-generated methods do not require any parameters, and ignore any if provided.
+
+Accessor methods are not generated for non-standard atttributes because it would be unreliable to try to
+call methods named for transient data that may or may not exist on a given platform, and for the possibility
+they could conflict with existing functions in the I<Sys::OsRelease> namespace.  Use the I<found_attrs()>,
+I<has_attr()> and I<get()> methods to detect and access non-standard attributes.
+
+=head2 Instance methods
+
+Object methods, including auto-generated accessors described above, access the data from the singleton instance,
+either read from an os-release file or empty to indicate no os-release file was found on the system.
+
+Instance methods may be called either via the class name or a reference to the singleton instance.
+Each of these functions can determine whether they were called as a class or object method, and obtain the
+reference to the singleton instance if needed.
+
+=over 1
+
 =item platform()
 
 returns a string with the platform type. On systems with /etc/os-release (or os-release in any location
@@ -528,9 +585,9 @@ The default search path is /etc, /usr/lib and /run/host as defined by the standa
 The search path can be replaced by providing a "search_path" parameter to instance()/new() with an arrayref
 containing the directories to search. This feature is currently only used for testing purposes.
 
-=item defined_instance()
+=item found_attrs()
 
-returns true if the singleton instance is defined, false if it is not yet defined or has been cleared.
+returns a list of attribute names found in the os-release file, empty if os-release doesn't exist on the platform.
 
 =item has_attr(name)
 
@@ -552,25 +609,6 @@ returns a boolean which is true if Sys::OsRelease contains a configuration setti
 is a read/write accessor for the configuration setting named by the string parameter "name".
 If no value parameter is provided, it returns the value of the parameter, or undef if it doesn't exist.
 If a value parameter is provided, it assigns that to the configuration setting and returns the same value.
-
-=item clear_instance()
-
-removes the singleton instance of the class if it was defined.
-Under normal circumstances it is not necessary to call this since the class destructor will call it automatically.
-It is currently only used for testing, where it is necessary to clear the instance before loading a new one with
-different parameters.
-
-Since this class is based on the singleton model, there is only one instance.
-The instance(), new() and init() methods will only initialize the instance if it is not already initialized.
-
-=item import_singleton
-
-The singleton-management methods I<init>, I<new>, I<instance>, I<defined_instance> and I<clear_instance>
-can be imported by another class by using the import_singleton() method.
-That was done for L<Sys::OsPackage>, to allow it to avoid copying those methods.
-But other classes with a similar need to minimize module dependencies which already
-use I<Sys::OsRelease> can do this too.
-This helps maintain minimal prerequisites among modules working to set up Perl on containers or new systems.
 
 =back
 

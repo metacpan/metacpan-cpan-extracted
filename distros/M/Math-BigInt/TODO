@@ -7,7 +7,7 @@ General:
  * run config() and die_on_nan() tests under Subclass.pm
 
 Math::BigFloat:
- * finish upgrading and downgrading
+ * finish downgrading (and upgrading?)
  * ! bround()/bfround(): some bugs may lurk in there
  * accuracy() & precision() maybe not finished (bnorm() in every op, testcases)
  * do not reduce numbers in new(), rather do it in anything that outputs it
@@ -20,6 +20,9 @@ Math::BigFloat:
  * finish broot() by using different algorithm
 
 Math::BigInt:
+ * finish upgrading (and downgrading?)
+ * Better testing of upgrading, e.g., Math::BigInt->bmod($x,$y) where $x and $y
+   are Math::BigFloat objects.
  * Finite non-integers should be handled consistently. The may appear as input
    and as a result of a computation. Alternatives are: round, truncate, die,
    and return NaN.

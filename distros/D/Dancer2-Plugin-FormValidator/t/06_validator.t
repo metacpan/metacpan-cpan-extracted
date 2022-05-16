@@ -38,7 +38,7 @@ my $validator = Dancer2::Plugin::FormValidator::Validator->new(
     registry => $registry,
 );
 
-my ($success, $valid, $invalid) = $validator->validate($profile, $input->get);
+my ($success, $valid, $invalid) = $validator->validate($profile->profile, $input->get);
 
 is(
     $success,

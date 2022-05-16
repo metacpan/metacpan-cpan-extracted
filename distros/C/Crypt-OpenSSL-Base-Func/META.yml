@@ -37,5 +37,5 @@ resources:
   homepage: http://github.com/abbypan/Crypt-OpenSSL-Base-Func
   license: http://dev.perl.org/licenses/
   repository: http://github.com/abbypan/Crypt-OpenSSL-Base-Func
-version: '0.034'
+version: '0.035'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

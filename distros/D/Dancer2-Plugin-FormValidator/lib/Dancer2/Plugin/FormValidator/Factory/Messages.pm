@@ -23,7 +23,7 @@ has registry => (
 
 # Generates messages for each invalid field.
 sub build {
-    my ($self, $profile, $invalid) = @_;
+    my ($self, $invalid, $profile_messages) = @_;
 
     my $messages = Hash::MultiValue->new;
     my $config   = $self->config;
@@ -36,17 +36,15 @@ sub build {
         my $validator = $self->registry->get($name);
         my $message = $self->config->messages_validators->{$name} || $validator->message;
 
-        if ($profile->does('Dancer2::Plugin::FormValidator::Role::HasMessages')) {
-            my $profile_messages = $profile->messages;
-
-            if (ref $profile_messages eq 'HASH') {
-                $message = $profile_messages->{$field}->{$name} || $message;
-            }
-            else {
+        if (defined $profile_messages) {
+            if (ref $profile_messages ne 'HASH') {
                 Carp::croak("Messages should be a HashRef\n")
             }
+
+            $message = $profile_messages->{$field}->{$name} || $message;
         }
 
+        # Create and add message.
         {
             # Cause we need this feature.
             no warnings 'redundant';

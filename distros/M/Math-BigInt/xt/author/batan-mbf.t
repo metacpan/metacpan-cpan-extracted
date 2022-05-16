@@ -3,11 +3,61 @@
 use strict;
 use warnings;
 
-use Test::More tests => 42;
-
-use Math::Complex ();
+use Test::More tests => 12 + 42;
 
 use Math::BigFloat;
+
+note("batan() as a class method");
+
+cmp_ok(Math::BigFloat -> batan("-inf"), "==",
+       "-1.570796326794896619231321691639751442098",
+       'Math::BigFloat -> batan("-inf")');
+
+cmp_ok(Math::BigFloat -> batan("-2"), "==",
+       "-1.107148717794090503017065460178537040070",
+       'Math::BigFloat -> batan("-2")');
+
+cmp_ok(Math::BigFloat -> batan(0), "==", "0",
+       'Math::BigFloat -> batan(0)');
+
+cmp_ok(Math::BigFloat -> batan("2"), "==",
+       "1.107148717794090503017065460178537040070",
+       'Math::BigFloat -> batan("2")');
+
+cmp_ok(Math::BigFloat -> batan("inf"), "==",
+       "1.570796326794896619231321691639751442098",
+       'Math::BigFloat -> batan("inf")');
+
+is(Math::BigFloat -> batan("NaN"), "NaN",
+   'Math::BigFloat -> batan("NaN")');
+
+note("batan() as an instance method");
+
+cmp_ok(Math::BigFloat -> new("-inf") -> batan(), "==",
+       "-1.570796326794896619231321691639751442098",
+       'Math::BigFloat -> new("-inf")');
+
+cmp_ok(Math::BigFloat -> new("-2") -> batan(), "==",
+       "-1.107148717794090503017065460178537040070",
+       'Math::BigFloat -> new("-2")');
+
+cmp_ok(Math::BigFloat -> new(0) -> batan(), "==", "0",
+       'Math::BigFloat -> new(0)');
+
+cmp_ok(Math::BigFloat -> new("2") -> batan(), "==",
+       "1.107148717794090503017065460178537040070",
+       'Math::BigFloat -> new("2")');
+
+cmp_ok(Math::BigFloat -> new("inf") -> batan(), "==",
+       "1.570796326794896619231321691639751442098",
+       'Math::BigFloat -> new("inf")');
+
+is(Math::BigFloat -> new("NaN") -> batan(), "NaN",
+   'Math::BigFloat -> new("NaN")');
+
+################################################################################
+
+use Math::Complex ();
 
 my $inf = $Math::Complex::Inf;
 my $nan = $inf - $inf;

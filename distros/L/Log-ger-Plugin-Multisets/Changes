@@ -1,3 +1,9 @@
+0.004   2022-05-16  Released-By: PERLANCAR; Urgency: low
+
+        - Fix error message when unknown argument is passed (GH#1, thanks
+          annibale-x).
+
+
 0.003   2020-03-11  Released-By: PERLANCAR; Urgency: medium
 
 	- Bump v to 2 to comply to Log::ger 0.037.

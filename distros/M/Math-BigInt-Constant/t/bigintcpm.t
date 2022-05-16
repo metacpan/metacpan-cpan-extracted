@@ -62,8 +62,7 @@ is($x->blcm($y, $z), 19*53*8, 'lcm');
 foreach my $method (qw/
                           binc bdec bfac bnot bneg babs
                           bzero bone binf bnan
-                      /)
-{
+                      /) {
     is(ref $x, 'Math::BigInt::Constant', 'ref x still ok');
     $@ = '';
     my $test = "\$x->$method();";
@@ -81,8 +80,7 @@ foreach my $method (qw/
                           broot bsqrt bexp bnok blog
                           bfround bround
                           from_bin from_oct from_hex
-                      /)
-{
+                      /) {
     is(ref $x, 'Math::BigInt::Constant', 'ref x still ok');
     $@ = '';
     my $test = "\$x->$method(1);";
@@ -96,8 +94,7 @@ foreach my $method (qw/
 
 foreach my $method (qw/
                           bmodpow bmodinv
-                      /)
-{
+                      /) {
     $@ = '';
     my $test = "\$x->$method(2, 3);";
     my $out  = eval $test;
@@ -112,7 +109,6 @@ sub _is {
     my ($x, $a, $b, $c) = @_;
 
     is($a, $b, $c);
-    is(ref $x, 'Math::BigInt::Constant', 'ref');
+    is(ref($x), 'Math::BigInt::Constant',
+       '$x is a Math::BigInt::Constant');
 }
-
-1;

@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Moo;
+use Carp;
 use Types::Standard qw(InstanceOf);
 use namespace::clean;
 
@@ -24,8 +25,12 @@ has registry => (
 sub validate {
     my ($self, $profile, $input)  = @_;
 
+    if (ref $profile ne 'HASH') {
+        Carp::croak("Profile should be a HashRef\n")
+    }
+
     my $success = 0;
-    my %profile = %{ $profile->profile };
+    my %profile = %{ $profile };
     my $is_valid;
     my @valid;
     my @invalid;

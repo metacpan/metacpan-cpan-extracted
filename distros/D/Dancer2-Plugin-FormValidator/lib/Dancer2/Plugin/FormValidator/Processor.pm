@@ -47,7 +47,7 @@ has validator => (
     }
 );
 
-has messages => (
+has messages_factory => (
     is       => 'ro',
     isa      => InstanceOf ['Dancer2::Plugin::FormValidator::Factory::Messages'],
     lazy     => 1,
@@ -62,30 +62,56 @@ has messages => (
 sub run {
     my ($self) = @_;
 
+    my $profile  = $self->profile->profile;
     my $input    = $self->input->get;
     my $messages = {};
 
-    my ($success, $valid, $invalid) = $self->validator->validate($self->profile, $input);
+    # Run hook before.
+    $profile = $self->profile->hook_before($profile, $input);
 
+    # Now run validation.
+    my ($success, $valid, $invalid) = $self->validator->validate($profile, $input);
+
+    # If no success, build messages.
     if ($success != 1) {
-        $messages = $self->messages->build($self->profile, $invalid);
+        $messages = $self->_build_messages($invalid);
     }
 
     # Flatten $invalid array ref and leave only unique fields.
     my @invalid_fields = uniqstr map { $_->[0] } @{ $invalid };
 
     # Collect valid values from input.
+    my $valid_input = $self->_collect_valid($valid);
+
+    return Dancer2::Plugin::FormValidator::Result->new(
+        success  => $success,
+        valid    => $valid_input,
+        invalid  => \@invalid_fields,
+        messages => $messages,
+    );
+}
+
+sub _build_messages {
+    my ($self, $invalid) = @_;
+
+    if ($self->profile->does('Dancer2::Plugin::FormValidator::Role::HasMessages')) {
+        return $self->messages_factory->build($invalid, $self->profile->messages);
+    }
+
+    return $self->messages_factory->build($invalid);
+}
+
+sub _collect_valid {
+    my ($self, $valid) = @_;
+
+    my $input = $self->input->get;
+
     my %valid_input;
     for my $field (@ { $valid }) {
         $valid_input{$field} = $input->{$field};
     }
 
-    return Dancer2::Plugin::FormValidator::Result->new(
-        success  => $success,
-        valid    => \%valid_input,
-        invalid  => \@invalid_fields,
-        messages => $messages,
-    );
+    return \%valid_input;
 }
 
 1;

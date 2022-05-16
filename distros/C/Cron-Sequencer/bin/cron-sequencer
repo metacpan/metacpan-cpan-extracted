@@ -1,0 +1,216 @@
+#!/usr/bin/perl
+
+use v5.20.0;
+use warnings;
+
+use Cron::Sequencer::CLI qw(parse_argv);
+require Cron::Sequencer::Output;
+require Cron::Sequencer;
+require Pod::Usage;
+
+$main::VERSION = $Cron::Sequencer::VERSION;
+my ($start, $end, $output, @input) = parse_argv(\&Pod::Usage::pod2usage, @ARGV);
+
+=head1 NAME
+
+cron-sequencer - show the sequence of commands that cron would run
+
+=head1 SYNOPSIS
+
+  cron-sequencer crontab-file             # show today's events
+  cron-sequencer --show tomorrow cronfile # or tomorrow's
+  cron-sequencer cronfile1 cronfile2      # show events from both crontabs
+  cron-sequencer --ignore 6,9,43 file     # ignore events from these lines
+
+=head1 DESCRIPTION
+
+B<cron-sequencer> takes one or more crontab files, and shows the sequence of
+commands that C<cron> would run, with the source line and time fields that
+triggered the event at that timestamp. The default is to show events for
+I<today>, and to show environment variables set in the crontab file.
+
+=head1 GLOBAL OPTIONS
+
+=over 4
+
+=item --show I<period>
+
+Show events for the given period. Options are
+
+=over 4
+
+=item *
+
+today
+
+=item *
+
+yesterday
+
+=item *
+
+tomorrow
+
+=item *
+
+last week
+
+=item *
+
+this week
+
+=item *
+
+next week
+
+=back
+
+All are treated as starting at midnight (inclusive) and ending at midnight
+(exclusive). The default is I<today>
+
+=item --from I<epoch time>
+
+=item --to I<epoch time>
+
+Specify an exact range of events to show. The start time is inclusive, the end
+time exclusive. Values can be
+
+=over 4
+
+=item I<positive integer>
+
+Absolute time in Unix epoch seconds (I<ie> seconds since 1970-01-01)
+
+=item I<+integer>
+
+Relative time offset in seconds. For I<from>, this specifies a start time
+relative to midnight gone. For I<to> this specifies an end time relative to the
+start time (so gives the number of seconds of crontab events to show)
+
+=item I<-integer>
+
+A negative integer is only permitted for I<from>, and specifies a start time
+before midnight gone.
+
+=back
+
+Hence C<--from +0 --to +3600> shows events from midnight until 00:59 inclusive.
+
+=item --hide-env
+
+Don't show environment variables in the output.
+
+=item --help
+
+Shows this documentation
+
+=item --version
+
+Shows the version
+
+=back
+
+=head1 PER-FILE OPTIONS
+
+These options can be specified independently for each crontab file (or group of
+crontab files), and can be repeated multiple times.
+
+=over 4
+
+=item --ignore <line numbers>
+
+Ignore the given line(s) in the crontab. Specify line numbers as comma-separated
+lists of integers or integer ranges (just like crontab time files, aside from
+you can't use I<*> or skip syntax such as I</2>). Line numbers start at 1.
+
+"Ignore" is the first action of the parser, so you can ignore all of
+
+=over 4
+
+=item *
+
+command entries (particularly "chatty" entries such as C<* * * * *>)
+
+=item *
+
+setting environment variables
+
+=item *
+
+lines with syntax errors that otherwise would abort the parse
+
+=back
+
+=item --env I<NAME=value>
+
+Pre-define an environment variable for this crontab file. The variable
+declaration B<won't> be shown in the output if the crontab defines the variable
+with the same value. Without this a crontab that starts
+
+     MAILTO=god@heaven.mil
+
+and has 42 events to show would generate 42 lines of C<MAILTO=god@heaven.mil>
+output, once for each command.
+
+If you define an environment variable on that command line that isn't set in
+scope in the crontab file then an C<unset ...> line is shown. This makes it
+clear that the event doesn't match your expected default value.
+
+You can't declare both I<--env> and I<--hide-env>
+
+=item --
+
+Use a pair of dashes to separate options for different files on the command
+line. Effectively C<--> resets the state to no lines ignored and no environment
+variables defined.
+
+=back
+
+=head1 EXAMPLES
+
+  cron-sequencer cronfile1 cronfile2
+
+Shows events from both crontab files for today, in time order, annotated with
+file name, line number, time specification and environment variables.
+
+  cron-sequencer --env MAILTO=alice cron1 -- --env MAILTO=bob cron2
+
+Shows events from both files, but will create clearer output if F<cron1>
+declares C<MAILTO=alice> and F<cron2> declares C<MAILTO=bob>
+
+  cron-sequencer -- cron1 --env MAILTO=alice -- --env MAILTO=bob cron2
+
+Identical output. (This is a side effect of how options are parsed first, and
+then filenames.)
+
+  cron-sequencer --env MAILTO=bob cron1 cron2 -- --ignore 3-5 cron3
+
+Shows events from the first two files assuming the both declare C<MAILTO=bob>,
+along with events from cron3 except for lines 3, 4 and 5 (with all environment
+variables shown, unless they were declared on the ignored lines 3, 4 and 5)
+
+=head1 BUGS
+
+Currently the code assumes that all crontabs are run with a system timezone of
+B<UTC>. Similarly all display output is shown for UTC. The work systems all run
+in UTC, so we don't have pressing need to fix this ourselves.
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. If you would like to contribute documentation,
+features, bug fixes, or anything else then please raise an issue / pull request:
+
+    https://github.com/Humanstate/cron-sequencer
+
+=head1 AUTHOR
+
+Nicholas Clark - C<nick@ccl4.org>
+
+=cut
+
+my $crontab = Cron::Sequencer->new(@input);
+
+my $formatter = Cron::Sequencer::Output->new(@$output);
+
+print $formatter->render($crontab->sequence($start, $end));

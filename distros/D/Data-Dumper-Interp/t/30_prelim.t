@@ -45,7 +45,10 @@ is( vis { aaa => \\\12 }, do{chomp(my $str=<<'EOF'); $str} );
 EOF
 
 for my $fw (15..17) {
-  is( Data::Dumper::Interp->new()->Foldwidth($fw)->vis({C => {a => 1}}), '{C => {a => 1}}', "fw=$fw" );
+  my $item = {C => {a => 1}};
+  my $expected = '{C => {a => 1}}';
+  is( Data::Dumper::Interp->new()->Foldwidth($fw)->vis($item), $expected, "fw=$fw" );
+  is(                    visnew()->Foldwidth($fw)->vis($item), $expected, "fw=$fw" );
 }
 for my $fw (12..14) {
   is( Data::Dumper::Interp->new()->Foldwidth($fw)->vis({C => {a => 1}}), do{chomp($_=<<'EOF'); $_}, "fw=$fw" );
@@ -103,14 +106,14 @@ EOF
 
 is( vis [12345678,4], '[12345678,4]' );
 
-is( vis [123456789,4], do{chomp(my $_=<<'EOF'); $_} );
+is( vis [123456789,4], do{chomp(local $_=<<'EOF'); $_} );
 [ 123456789,
   4
 ]
 EOF
 
 is( vis {bxxxxxxxxxxxxxxxxxxxxxxxxxbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb=>42},
-    do{chomp(my $_=<<'EOF'); $_} );
+    do{chomp(local $_=<<'EOF'); $_} );
 {
   bxxxxxxxxxxxxxxxxxxxxxxxxxbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
     => 42
@@ -118,7 +121,7 @@ is( vis {bxxxxxxxxxxxxxxxxxxxxxxxxxbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb=>42},
 EOF
 
 is( vis [[[[[[[[[[[[[42]]]]]]]]]]]]],
-    do{chomp(my $_=<<'EOF'); $_} );
+    do{chomp(local $_=<<'EOF'); $_} );
 [
   [
     [
@@ -150,7 +153,7 @@ EOF
 
 # Once hit an assertion
 is( vis [ \undef, \\undef ],
-    do{chomp(my $_=<<'EOF'); $_} );
+    do{chomp(local $_=<<'EOF'); $_} );
 [ \undef,
   \$VAR1->[0]
 ]
@@ -166,7 +169,7 @@ is( Data::Dumper::Interp->new()->Foldwidth(0)
 #say vis bless( do{ \(my $x = []) } );
 
 is( Data::Dumper::Interp->new()->Foldwidth(4)->vis( [ [ ], 12345 ] ),
-    do{chomp(my $_=<<'EOF'); $_} );
+    do{chomp(local $_=<<'EOF'); $_} );
 [
   [
   ],

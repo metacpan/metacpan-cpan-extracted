@@ -21,7 +21,7 @@ use Scalar::Util qw< blessed >;
 
 use Math::BigFloat ();
 
-our $VERSION = '0.2622';
+our $VERSION = '0.2623';
 
 our @ISA = qw(Math::BigFloat);
 
@@ -200,12 +200,6 @@ use overload
 BEGIN {
     *objectify = \&Math::BigInt::objectify;  # inherit this from BigInt
     *AUTOLOAD  = \&Math::BigFloat::AUTOLOAD; # can't inherit AUTOLOAD
-    # We inherit these from BigFloat because currently it is not possible that
-    # Math::BigFloat has a different $LIB variable than we, because
-    # Math::BigFloat also uses Math::BigInt::config->('lib') (there is always
-    # only one library loaded)
-    *_e_add = \&Math::BigFloat::_e_add;
-    *_e_sub = \&Math::BigFloat::_e_sub;
     *as_number = \&as_int;
     *is_pos = \&is_positive;
     *is_neg = \&is_negative;
@@ -307,7 +301,8 @@ sub new {
     unless (defined $d) {
         #return $n -> copy($n)               if $n -> isa('Math::BigRat');
         if ($n -> isa('Math::BigRat')) {
-            return $downgrade -> new($n) if defined($downgrade) && $n -> is_int();
+            return $downgrade -> new($n)
+              if defined($downgrade) && $n -> is_int();
             return $class -> copy($n);
         }
 
@@ -320,7 +315,8 @@ sub new {
         }
 
         if ($n -> isa('Math::BigInt')) {
-            $self -> {_n}   = $LIB -> _new($n -> copy() -> babs() -> bstr());
+            $self -> {_n}   = $LIB -> _new($n -> copy() -> babs(undef, undef)
+                                              -> bstr());
             $self -> {_d}   = $LIB -> _one();
             $self -> {sign} = $n -> sign();
             return $downgrade -> new($n) if defined $downgrade;
@@ -328,8 +324,8 @@ sub new {
         }
 
         if ($n -> isa('Math::BigFloat')) {
-            my $m = $n -> mantissa() -> babs();
-            my $e = $n -> exponent();
+            my $m = $n -> mantissa(undef, undef) -> babs(undef, undef);
+            my $e = $n -> exponent(undef, undef);
             $self -> {_n} = $LIB -> _new($m -> bstr());
             $self -> {_d} = $LIB -> _one();
 
@@ -340,7 +336,8 @@ sub new {
                 $self -> {_d} = $LIB -> _lsft($self -> {_d},
                                               $LIB -> _new(-$e -> bstr()), 10);
 
-                my $gcd = $LIB -> _gcd($LIB -> _copy($self -> {_n}), $self -> {_d});
+                my $gcd = $LIB -> _gcd($LIB -> _copy($self -> {_n}),
+                                       $self -> {_d});
                 if (!$LIB -> _is_one($gcd)) {
                     $self -> {_n} = $LIB -> _div($self->{_n}, $gcd);
                     $self -> {_d} = $LIB -> _div($self->{_d}, $gcd);
@@ -348,7 +345,8 @@ sub new {
             }
 
             $self -> {sign} = $n -> sign();
-            return $downgrade -> new($n) if defined($downgrade) && $n -> is_int();
+            return $downgrade -> new($n, undef, undef)
+              if defined($downgrade) && $n -> is_int();
             return $self;
         }
 
@@ -771,55 +769,6 @@ sub bneg {
 }
 
 ##############################################################################
-# special values
-
-sub _bnan {
-    # used by parent class bnan() to initialize number to NaN
-    my $self = shift;
-
-    if ($_trap_nan) {
-        my $class = ref($self);
-        # "$self" below will stringify the object, this blows up if $self is a
-        # partial object (happens under trap_nan), so fix it beforehand
-        $self->{_d} = $LIB->_zero() unless defined $self->{_d};
-        $self->{_n} = $LIB->_zero() unless defined $self->{_n};
-        croak ("Tried to set $self to NaN in $class\::_bnan()");
-    }
-    $self->{_n} = $LIB->_zero();
-    $self->{_d} = $LIB->_zero();
-}
-
-sub _binf {
-    # used by parent class bone() to initialize number to +inf/-inf
-    my $self = shift;
-
-    if ($_trap_inf) {
-        my $class = ref($self);
-        # "$self" below will stringify the object, this blows up if $self is a
-        # partial object (happens under trap_nan), so fix it beforehand
-        $self->{_d} = $LIB->_zero() unless defined $self->{_d};
-        $self->{_n} = $LIB->_zero() unless defined $self->{_n};
-        croak ("Tried to set $self to inf in $class\::_binf()");
-    }
-    $self->{_n} = $LIB->_zero();
-    $self->{_d} = $LIB->_zero();
-}
-
-sub _bone {
-    # used by parent class bone() to initialize number to +1/-1
-    my $self = shift;
-    $self->{_n} = $LIB->_one();
-    $self->{_d} = $LIB->_one();
-}
-
-sub _bzero {
-    # used by parent class bzero() to initialize number to 0
-    my $self = shift;
-    $self->{_n} = $LIB->_zero();
-    $self->{_d} = $LIB->_one();
-}
-
-##############################################################################
 # mul/add/div etc
 
 sub badd {
@@ -866,7 +815,7 @@ sub badd {
     my $m = $LIB->_mul($LIB->_copy($y->{_n}), $x->{_d});
 
     # 5 * 3 + 7 * 4
-    ($x->{_n}, $x->{sign}) = _e_add($x->{_n}, $m, $x->{sign}, $y->{sign});
+    ($x->{_n}, $x->{sign}) = $LIB -> _sadd($x->{_n}, $x->{sign}, $m, $y->{sign});
 
     # 4 * 3
     $x->{_d} = $LIB->_mul($x->{_d}, $y->{_d});

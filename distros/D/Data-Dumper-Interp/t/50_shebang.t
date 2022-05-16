@@ -299,10 +299,8 @@ $_ = "GroupA.GroupB";
 
 { my $code = 'qsh("a b")';           check $code, '"a b"',  eval $code; }
 { my $code = 'qsh(undef)';           check $code, "undef",  eval $code; }
-#qsh no longer accepts multiple args
-#{ my $code = 'qsh("a b","c d","e",undef,"g",q{\'ab\'"cd"})';
-#   check $code, ['"a b"','"c d"',"e","undef","g","''\\''ab'\\''\"cd\"'"], eval $code; }
-#{ my $code = 'qshpath("a b")';       check $code, '"a b"',  eval $code; }
+{ my $code = 'qsh("undef")';         check $code, "\"undef\"",  eval $code; }
+{ my $code = 'qshpath("a b")';       check $code, '"a b"',  eval $code; }
 { my $code = 'qshpath("~user")';     check $code, "~user",  eval $code; }
 { my $code = 'qshpath("~user/a b")'; check $code, '~user/"a b"', eval $code; }
 { my $code = 'qshpath("~user/ab")';  check $code, "~user/ab", eval $code; }
@@ -313,7 +311,6 @@ $_ = "GroupA.GroupB";
 { my $code = 'qshpath($_)';          check $code, "${_}",   eval $code; }
 { my $code = 'qshpath()';            check $code, "${_}",   eval $code; }
 { my $code = 'qshpath';              check $code, "${_}",   eval $code; }
-{ my $code = '_forceqsh($_)';         check $code, "\"${_}\"", eval $code; }
 
 # Basic checks
 { my $code = 'vis($_)'; check $code, "\"${_}\"", eval $code; }
@@ -352,16 +349,16 @@ $_ = "GroupA.GroupB";
 
 # Data::Dumper::Interp 2.12 : hex escapes including illegal code points:
 #   10FFFF is the highest legal Unicode code point which will ever be assigned.
-{ my $code = q(my $v = "beyondmax:\x{110000}\x{FFFFFF}\x{FFFFFFFF}"; dvis('$v')); 
-  check $code, 'v="beyondmax:\x{110000}\x{ffffff}\x{ffffffff}"', eval $code; }
+# Perl (v5.34 at least) mandates code points be <= max signed integer,
+# which on 32 bit systems is 7FFFFFFF.
+{ my $code = q(my $v = "beyondmax:\x{110000}\x{FFFFFF}\x{7FFFFFFF}"; dvis('$v')); 
+  check $code, 'v="beyondmax:\x{110000}\x{ffffff}\x{7fffffff}"', eval $code; }
 
 # Check that $1 etc. can be passed (this was once a bug...)
 # The duplicated calls are to check that $1 is preserved
 { my $code = '" a~b" =~ / (.*)()/ && qsh($1); die unless $1 eq "a~b";qsh($1)'; 
   check $code, '"a~b"', eval $code; }
 { my $code = '" a~b" =~ / (.*)()/ && qshpath($1); die unless $1 eq "a~b";qshpath($1)'; 
-  check $code, '"a~b"', eval $code; }
-{ my $code = '" a~b" =~ / (.*)()/ && _forceqsh($1); die unless $1 eq "a~b";_forceqsh($1)'; 
   check $code, '"a~b"', eval $code; }
 { my $code = '" a~b" =~ / (.*)()/ && vis($1); die unless $1 eq "a~b";vis($1)'; 
   check $code, '"a~b"', eval $code; }
@@ -493,19 +490,38 @@ sub doquoting($$) {
   my ($input, $useqq) = @_;
   my $quoted = $input;
   if ($useqq) {
-    $quoted =~ s/([\$\@"\\])/\\$1/gs;
-    if ($useqq =~ /controlp/) {
+    my %subopts;
+    if ($useqq ne "1") {
+      foreach my $item (split /:/, $useqq) {
+        if ($item =~ /^([^=]+)=(.*)/) {
+          $subopts{$1} = $2;
+        } else {
+          $subopts{$item} = 1;
+        }
+      }
+    }
+    $quoted =~ s/([\$\@\\])/\\$1/gs;
+    if (delete $subopts{controlpic}) {
       $quoted =~ s/\n/\N{SYMBOL FOR NEWLINE}/gs;
       $quoted =~ s/\t/\N{SYMBOL FOR HORIZONTAL TABULATION}/gs;
     } else {
       $quoted =~ s/\n/\\n/gs;
       $quoted =~ s/\t/\\t/gs;
     }
-    if ($useqq !~ /unicode|utf/) {
+    my $unicode = delete $subopts{unicode} || delete $subopts{utf8};
+    if (!$unicode) {
       $quoted = join("", map{ ord($_) > 127 ? sprintf("\\x{%x}", ord($_)) : $_ } 
                            split //,$quoted);
     }
-    $quoted = "\"${quoted}\"";
+    if (my $arg = delete $subopts{qq}) {
+      my ($left, $right) = split //, ($arg eq 1 ? "{}" : $arg);
+      $quoted =~ s/([\Q${left}${right}\E])/\\$1/g;
+      $quoted = "qq" . $left . $quoted . $right;
+    } else {
+      $quoted =~ s/"/\\"/g;
+      $quoted = '"' . $quoted . '"';
+    }
+    confess "testbug: Useqq subopt: '",keys(%subopts),"'\n" if %subopts;
   } else {
     $quoted =~ s/([\\'])/\\$1/gs;
     $quoted = "'${quoted}'";
@@ -526,6 +542,7 @@ my $unicode_str = join "", map { chr($_) } (0x263A .. 0x2650);
 my $byte_str = join "",map { chr $_ } 10..30;
 
 sub get_closure(;$) {
+
  my ($clobber) = @_;
 
  my %closure_h = (%toplex_h);
@@ -834,7 +851,9 @@ EOF
         $actual);
     }
 
-    for my $useqq (0, 1, "utf", "unicode", "unicode|controlpic") {
+    for my $useqq (0, 1, "utf8", "unicode", "unicode:controlpic",
+                   "unicode:qq", "unicode:qq=()", "qq",
+                  ) {
       my $input = $expected.$dvis_input.'qqq@_(\(\))){\{\}\""'."'"; # gnarly
       # Now Data::Dumper (version 2.174) forces "double quoted" output
       # if there are any Unicode characters present.

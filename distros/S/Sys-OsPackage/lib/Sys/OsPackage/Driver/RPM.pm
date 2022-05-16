@@ -14,7 +14,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package Sys::OsPackage::Driver::RPM;
-$Sys::OsPackage::Driver::RPM::VERSION = '0.1.2';
+$Sys::OsPackage::Driver::RPM::VERSION = '0.1.3';
 use base "Sys::OsPackage::Driver";
 
 # check if packager command found (rpm)
@@ -74,7 +74,7 @@ sub install
     }
 
     # install the packages
-    my $pkgcmd = $ospkg->sysenv("dnf") // $ospkg->sysenv("yum");
+    my $pkgcmd = (defined $ospkg->sysenv("dnf")) ? $ospkg->sysenv("dnf") : $ospkg->sysenv("yum");
     return $ospkg->run_cmd($pkgcmd, qw(install --quiet --assumeyes --setopt=install_weak_deps=false), @packages);
 }
 
@@ -102,7 +102,7 @@ Sys::OsPackage::Driver::RPM - RedHat/Fedora RPM packaging handler for Sys::OsPac
 
 =head1 VERSION
 
-version 0.1.2
+version 0.1.3
 
 =head1 SYNOPSIS
 

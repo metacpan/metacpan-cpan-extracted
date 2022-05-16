@@ -13,7 +13,7 @@ use Crypt::OpenSSL::Bignum;
 use Math::BigInt;
 use POSIX;
 
-our $VERSION = '0.034';
+our $VERSION = '0.035';
 
 our @ISA = qw(Exporter);
 
@@ -52,12 +52,35 @@ pem_write_evp_pkey
 random_bn
 sn_hex2point
 sn_point2hex
+pem_read_priv_hex
+pem_read_pub_hex
+aead_encrypt_raw
+aead_encrypt
+aead_encrypt_split
+aead_decrypt_raw
+aead_decrypt
 ); 
 
 our @EXPORT_OK = @EXPORT;
 
 require XSLoader;
 XSLoader::load( 'Crypt::OpenSSL::Base::Func', $VERSION );
+
+#sub aead_encrypt_main {
+    #my ($cipher_name, $plaintext, $aad, $key, $iv, $tag_len) = @_;
+    
+    #my $res = aead_encrypt($cipher_name, $plaintext, $aad, $key, $iv, $tag_len);
+    #my ($ciphertext, $tag) = aead_encrypt_split($res, $tag_len);
+    
+    #return ($ciphertext, $tag);
+#}
+
+sub aead_encrypt_split {
+    my ($res, $tag_len) = @_;
+    my $ciphertext = substr $res, 0, length($res) - $tag_len;
+    my $tag = substr $res, length($res) - $tag_len, $tag_len;
+    return ($ciphertext, $tag);
+}
 
 sub sn_hex2point {
     my ($group_name, $point_hex) = @_;

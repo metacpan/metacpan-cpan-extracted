@@ -14,7 +14,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package Sys::OsPackage::Driver;
-$Sys::OsPackage::Driver::VERSION = '0.1.2';
+$Sys::OsPackage::Driver::VERSION = '0.1.3';
 # demonstrate module is accessible without launching packaging commands
 # all drivers inherit this to respond to ping for testing
 sub ping
@@ -41,7 +41,7 @@ Sys::OsPackage::Driver - parent class for packaging handler drivers for Sys::OsP
 
 =head1 VERSION
 
-version 0.1.2
+version 0.1.3
 
 =head1 SYNOPSIS
 

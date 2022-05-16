@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use utf8::all;
-use Test::More tests => 72;
+use Test::More tests => 77;
 
 use Dancer2::Plugin::FormValidator::Validator::Accepted;
 use Dancer2::Plugin::FormValidator::Validator::Alpha;
@@ -16,6 +16,7 @@ use Dancer2::Plugin::FormValidator::Validator::Max;
 use Dancer2::Plugin::FormValidator::Validator::Min;
 use Dancer2::Plugin::FormValidator::Validator::Numeric;
 use Dancer2::Plugin::FormValidator::Validator::Required;
+use Dancer2::Plugin::FormValidator::Validator::RequiredWith;
 use Dancer2::Plugin::FormValidator::Validator::Same;
 
 my $validator;
@@ -565,4 +566,39 @@ is_deeply(
         de => '%s darf nur lateinische Zeichen enthalten',
     },
     'TEST 16: Dancer2::Plugin::FormValidator::Validator::AlphaNumAscii messages hash'
+);
+
+# TEST 17.
+## Check Dancer2::Plugin::FormValidator::Validators::RequiredWith.
+
+$validator = Dancer2::Plugin::FormValidator::Validator::RequiredWith->new;
+
+is(
+    ref $validator->message,
+    'HASH',
+    'TEST 1: Dancer2::Plugin::FormValidator::Validator::RequiredWith messages hash'
+);
+
+is(
+    $validator->stop_on_fail,
+    1,
+    'TEST 1: Dancer2::Plugin::FormValidator::Validator::RequiredWith stop_on_fail',
+);
+
+isnt(
+    $validator->validate('email', {'name' => 'Alex'}, 'name'),
+    1,
+    'TEST 1: Dancer2::Plugin::FormValidator::Validator::RequiredWith not valid',
+);
+
+isnt(
+    $validator->validate('email', {email => '', 'name' => 'Alex'}, 'name'),
+    1,
+    'TEST 1: Dancer2::Plugin::FormValidator::Validator::RequiredWith not valid',
+);
+
+is(
+    $validator->validate('email', {email => 'alex@cpan.org', 'name' => 'Alex'}, 'name'),
+    1,
+    'TEST 1: Dancer2::Plugin::FormValidator::Validator::RequiredWith valid',
 );
