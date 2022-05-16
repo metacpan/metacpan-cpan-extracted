@@ -12,7 +12,7 @@ use XML::LibXSLT ();
 
 use vars qw( $VERSION );
 
-$VERSION = '2.000000';
+$VERSION = '2.001000';
 
 sub stylesheet
 {
@@ -92,12 +92,17 @@ sub generic_transform
     my $stylesheet = $self->stylesheet();
 
     my $ret;
+    my $params = {};
     if ( ref($source) eq '' )
     {
         $source = $xml_parser->parse_string($source);
     }
     elsif ( ref($source) eq 'HASH' )
     {
+        if ( my $p = $source->{'params'} )
+        {
+            $params = $p;
+        }
         my $type = $source->{type};
         if (0)
         {
@@ -111,9 +116,9 @@ sub generic_transform
             Carp::confess("unknown source type");
         }
     }
-    my $results  = $stylesheet->transform( $source, );
-    my $calc_ret = sub {
-        return ( $ret //= $stylesheet->output_as_chars( $results, ) );
+    my $dom_results = $stylesheet->transform( $source, %$params, );
+    my $calc_ret    = sub {
+        return ( $ret //= $stylesheet->output_as_chars( $dom_results, ) );
     };
     my $destref = ref($dest);
     if ( $destref eq "SCALAR" )
@@ -137,7 +142,7 @@ sub generic_transform
         }
         elsif ( $type eq "dom" )
         {
-            return $results;
+            return $dom_results;
         }
         elsif ( $type eq "file" )
         {
@@ -185,6 +190,8 @@ sub transform_into_chars
 
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 XML::LibXSLT::Quick - a quicker interface to XML::LibXSLT
@@ -202,7 +209,7 @@ XML::LibXSLT::Quick - a quicker interface to XML::LibXSLT
             type => 'file',
             path => $out_fn,
         },
-        $source,
+        $xml1_text,
     );
 
 =head1 DESCRIPTION
@@ -242,5 +249,33 @@ Delegating from $obj->stylesheet() . See L<XML::LibXSLT> .
 L<XML::LibXSLT::Easy> by Yuval Kogman - requires some MooseX modules.
 
 L<XML::LibXSLT> - used as the backend of this module.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2022 by Shlomi Fish
+
+This program is distributed under the MIT / Expat License:
+L<http://www.opensource.org/licenses/mit-license.php>
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
 
 =cut

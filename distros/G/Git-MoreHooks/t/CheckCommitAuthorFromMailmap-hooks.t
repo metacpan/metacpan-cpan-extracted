@@ -103,34 +103,66 @@ sub check_cannot_commit {    ## no critic (Subroutines::ProhibitManyArgs)
 setup_repos();
 
 # Normal config
-$repo->run( qw/config user.name My Self/,             { env => {%git_test_env} } );
-$repo->run( qw/config user.email myself@example.com/, { env => {%git_test_env} } );
+{
+    $repo->run( qw/config user.name My Self/,             { env => {%git_test_env} } );
+    $repo->run( qw/config user.email myself@example.com/, { env => {%git_test_env} } );
 
-# Overriding variables (because you never know...)
-my %env = (
-    GIT_AUTHOR_NAME     => 'My Self',
-    GIT_AUTHOR_EMAIL    => 'myself@example.com',
-    GIT_COMMITTER_NAME  => 'My Self',
-    GIT_COMMITTER_EMAIL => 'myself@example.com',
-);
+    # Overriding variables (because you never know...)
+    my %env = (
+        GIT_AUTHOR_NAME     => 'My Self',
+        GIT_AUTHOR_EMAIL    => 'myself@example.com',
+        GIT_COMMITTER_NAME  => 'My Self',
+        GIT_COMMITTER_EMAIL => 'myself@example.com',
+    );
 
-check_can_commit( 'commit sans configuration', 'file.txt', undef, undef, \%env );
+    check_can_commit( 'commit sans configuration', 'file.txt', undef, undef, \%env );
 
-check_can_commit( 'commit .mailmap', '.mailmap', 'truncate', $mailmap, \%env );
+    check_can_commit( 'commit .mailmap', '.mailmap', 'truncate', $mailmap, \%env );
+}
 
+# Put the hook into use.
 $repo->run( qw/config githooks.plugin Git::MoreHooks::CheckCommitAuthorFromMailmap/, { env => {%git_test_env} } );
+{
+    my $name  = 'My Self';
+    my $email = 'myself@example.com';
+    my %env   = (
+        GIT_AUTHOR_NAME     => $name,
+        GIT_AUTHOR_EMAIL    => $email,
+        GIT_COMMITTER_NAME  => $name,
+        GIT_COMMITTER_EMAIL => $email,
+    );
 
-check_cannot_commit( 'fail commit file', undef, 'file.txt', undef, undef, \%env );
+    my $regex = "Commit author '$name <$email>' has no match in mailmap file.";
+    check_cannot_commit( 'fail commit file', $regex, 'file.txt', undef, undef, \%env );
+}
 
-$repo->run( qw/config user.name MeIMyself/,          { env => {%git_test_env} } );
-$repo->run( qw/config user.email me.myself@comp.xx/, { env => {%git_test_env} } );
-%env = (
-    GIT_AUTHOR_NAME     => 'MeIMyself',
-    GIT_AUTHOR_EMAIL    => 'me.myself@comp.xx',
-    GIT_COMMITTER_NAME  => 'MeIMyself',
-    GIT_COMMITTER_EMAIL => 'me.myself@comp.xx',
-);
+{
+    $repo->run( qw/config user.name MeIMyself/,          { env => {%git_test_env} } );
+    $repo->run( qw/config user.email me.myself@comp.xx/, { env => {%git_test_env} } );
+    my %env = (
+        GIT_AUTHOR_NAME     => 'MeIMyself',
+        GIT_AUTHOR_EMAIL    => 'me.myself@comp.xx',
+        GIT_COMMITTER_NAME  => 'MeIMyself',
+        GIT_COMMITTER_EMAIL => 'me.myself@comp.xx',
+    );
 
-check_can_commit( 'commit file', 'file.txt', undef, undef, \%env );
+    check_can_commit( 'commit file', 'file.txt', undef, undef, \%env );
+}
+
+{
+    my $name  = 'Out Sider';
+    my $email = 'out.sider@sider.out';
+    $repo->run( 'config', 'user.name',  $name,  { env => {%git_test_env} } );
+    $repo->run( 'config', 'user.email', $email, { env => {%git_test_env} } );
+    my %env = (
+        GIT_AUTHOR_NAME     => $name,
+        GIT_AUTHOR_EMAIL    => $email,
+        GIT_COMMITTER_NAME  => $name,
+        GIT_COMMITTER_EMAIL => $email,
+    );
+
+    my $regex = "Commit author '$name <$email>' has no match in mailmap file.";
+    check_cannot_commit( 'fail commit file', $regex, 'file.txt', undef, undef, \%env );
+}
 
 done_testing();

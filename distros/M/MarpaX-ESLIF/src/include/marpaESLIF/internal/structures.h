@@ -199,7 +199,9 @@ struct marpaESLIF_terminal {
   short                          pseudob;             /* Pseudo terminal */
   int                            eventSeti;           /* Remember eventSeti */
   short                          byte2failureb;       /* True if the willfailb array is filled */
-  short                          willfailb[256];      /* For string and character class terminals, pre-computation of expected failure for the 256 ASCII bytes */
+  short                          willfailasciib[256]; /* For string and character class ASCII terminals, pre-computation of expected failure for the 256 ASCII bytes */
+  short                          utf2failureb;        /* True if the willfailb array is filled */
+  short                          willfailutfb[256];   /* For string and character class UTF-8 terminals, pre-computation of expected failure for the first 256 characters (matches ASCII for the first 128 codepoints) */
 };
 
 /* Matcher return values */

@@ -1,5 +1,20 @@
 Change history for Sodium-FFI
 
+0.007     2022-05-14
+    - Added crypto_box_easy
+    - Added crypto_box_keypair
+    - Added crypto_box_open_easy
+    - Added crypto_box_seed_keypair
+    - Added crypto_scalarmult_base
+    - Added constants:
+      crypto_box_SEALBYTES
+      crypto_box_PUBLICKEYBYTES
+      crypto_box_SECRETKEYBYTES
+      crypto_box_MACBYTES
+      crypto_box_NONCEBYTES
+      crypto_box_SEEDBYTES
+      crypto_box_BEFORENMBYTES
+
 0.006     2022-03-06
     - Added crypto_sign_keypair
     - Added crypto_sign_seed_keypair

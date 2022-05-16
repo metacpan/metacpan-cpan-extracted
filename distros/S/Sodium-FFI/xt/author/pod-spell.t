@@ -22,6 +22,7 @@ capoeirab
 chacha
 cwhitener
 decrypt
+decrypts
 deterministically
 lib
 libsodium

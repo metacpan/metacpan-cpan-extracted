@@ -1,0 +1,47 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Drummer-Tiny);
+use MIDI::Drummer::Tiny::Syncopate;
+use Music::RhythmSet::Util qw(rand_onsets);
+
+my $bpm = shift || 100;
+
+my $d = MIDI::Drummer::Tiny::Syncopate->new(
+    bpm    => $bpm,
+    file   => "$0.mid",
+    kick   => 36,
+    snare  => 40,
+    reverb => 15,
+);
+
+my @patterns = map { join '', @{ rand_onsets(2, 4) } } 1 .. 4;
+
+$d->sync(
+    \&snare,
+    \&kick,
+    \&hhat,
+);
+
+$d->write;
+
+sub snare {
+    $d->combinatorial( $d->snare, {
+        count    => 1,
+        repeat   => 2,
+        patterns => \@patterns,
+    } );
+}
+
+sub kick {
+    $d->combinatorial( $d->kick, {
+        negate   => 1,
+        repeat   => 2,
+        patterns => \@patterns,
+    } );
+}
+
+sub hhat {
+    $d->steady( $d->closed_hh );
+}

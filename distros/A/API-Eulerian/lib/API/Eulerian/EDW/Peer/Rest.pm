@@ -62,7 +62,7 @@ sub new
   # Setup Rest Peer Default attributes values
   $self->{ _ACCEPT } = $setup->{accept} || 'application/json';
   $self->{ _ENCODING } = 'gzip';
-  $self->{ _WDIR } = '/tmp';
+  $self->{ _WDIR } = $setup->{wdir} || '/tmp';
   $self->{ _UUID } = 0;
 
   # Setup Rest Peer Attributes

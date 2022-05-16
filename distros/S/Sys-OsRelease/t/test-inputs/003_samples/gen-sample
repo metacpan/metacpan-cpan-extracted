@@ -1,2 +1,15 @@
-name=$1
-podman run --tty $name:latest cat /etc/os-release > os-release-$name
+#!/bin/sh
+# usage: gen-sample [imagename [...]]
+# where imagename is a container image name loadable from podman
+if [ $# -eq 0 ]
+then
+    names="almalinux alpine archlinux debian fedora opensuse/leap rockylinux ubuntu"
+else
+    names=$1
+fi
+for name in $names
+do
+    echo "running $name container"
+    filename=os-release-$(echo $name | sed 's/[/][/]*/-/')
+    podman run --tty $name:latest cat /etc/os-release | sed 's/\r$//' > $filename
+done

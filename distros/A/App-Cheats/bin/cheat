@@ -7,6 +7,7 @@ use v5.30;
 use File::Basename qw/ basename dirname /;
 use Data::Dumper;
 use Getopt::Long;
+use Term::ANSIColor qw( colored );
 
 use My::Color qw/ :all /;
 use My::Opts;
@@ -48,7 +49,7 @@ sub define_spec {
          spec => "type=s",
       },
       {
-         desc => "Where to find cheats and notes (colon separated list)",
+         desc => "Colon separated path",
          spec => "cheat_dirs=s",
       },
       {
@@ -99,6 +100,19 @@ sub get_all_cheats {
    my @cheat_files = map { glob "$_/$type*" } split /:/, $cheat_dirs;
    my @all;
    my @group;
+
+   if(not @cheat_files){
+      my $help = <<~HELP;
+
+         No cheat files found!
+
+         Refer to:
+            perldoc App::Cheats
+      HELP
+
+      say colored($help, "RED");
+      exit 1;
+   }
 
    for my $path ( @cheat_files ) {
       my $file = basename( $path );

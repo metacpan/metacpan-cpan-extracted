@@ -7,14 +7,14 @@
 # This module must be maintained for minimal dependencies so it can be used to build systems and containers.
 
 ## no critic (Modules::RequireExplicitPackage)
-# This solves a catch-22 where conflicting Perl::Critic rules want package and strictures each before the other
+# This resolves conflicting Perl::Critic rules which want package and strictures each before the other
 use strict;
 use warnings;
 use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package Sys::OsRelease;
-$Sys::OsRelease::VERSION = '0.2.0';
+$Sys::OsRelease::VERSION = '0.2.3';
 use Config;
 use Carp qw(carp croak);
 
@@ -32,8 +32,11 @@ my @std_attrs = qw(NAME ID ID_LIKE PRETTY_NAME CPE_NAME VARIANT VARIANT_ID VERSI
 
 # OS ID strings which are preferred as common if found in ID_LIKE
 my %common_id = (
+    alpine => 1,
+    arch => 1,
     fedora => 1,
     debian => 1,
+    opensuse => 1,
 );
 
 # call destructor when program ends
@@ -72,7 +75,7 @@ sub instance
     my ($class, @params) = @_;
 
     # initialize if not already done
-    if (not defined $_instances{$class}) {
+    if (not $class->defined_instance()) {
         $_instances{$class} = $class->_new_instance(@params);
     }
 
@@ -84,7 +87,7 @@ sub instance
 sub defined_instance
 {
     my $class = shift;
-    return ((defined $_instances{$class}) and $_instances{$class}->isa($class)) ? 1 : 0;
+    return ((exists $_instances{$class}) and $_instances{$class}->isa($class)) ? 1 : 0;
 }
 
 # clear instance for exit-cleanup or for re-use in testing
@@ -98,7 +101,7 @@ sub clear_instance
         }
 
         # dereferencing will destroy singleton instance
-        undef $_instances{$class};
+        delete $_instances{$class};
     }
     return;
 }
@@ -114,7 +117,7 @@ sub import_singleton
     foreach my $method_name (qw(init new instance defined_instance clear_instance)) {
         ## no critic (TestingAndDebugging::ProhibitNoStrict)
         no strict 'refs';
-        *{$caller_class."::".$method_name} = \&{__PACKAGE__."::".$method_name};
+        *{$caller_class."::".$method_name} = \&{$class."::".$method_name};
     }
     return;
 }
@@ -404,7 +407,7 @@ Sys::OsRelease - read operating system details from standard /etc/os-release fil
 
 =head1 VERSION
 
-version 0.2.0
+version 0.2.3
 
 =head1 SYNOPSIS
 
@@ -423,8 +426,8 @@ object-oriented:
 =head1 DESCRIPTION
 
 Sys::OsRelease is a helper library to read the /etc/os-release file, as defined by FreeDesktop.Org.
-The os-release file is used to define an operating system environment,
-in widespread use among Linux distributions since 2017 and BSD variants since 2020.
+The os-release file is used to define an operating system environment.
+It has been in widespread use among Linux distributions since 2017 and BSD variants since 2020.
 It was started on Linux systems which use the systemd software, but then spread to other Linux, BSD and
 Unix-based systems.
 Its purpose is to identify the system to any software which needs to know.
@@ -436,7 +439,7 @@ The first time it's called, it instantiates it.
 On following calls, it returns a reference to the singleton instance.
 
 This module maintains minimal prerequisites, and only those which are usually included with Perl.
-(Suggestions of new features and code will largely depend on following this rule.)
+(Suggestions of new features and code will have to follow this rule.)
 That is intended to be acceptable for establishing system or container environments which contain Perl programs.
 It can also be used for installing or configuring software that needs to know about the system environment.
 
@@ -449,12 +452,8 @@ Current attributes recognized by Sys::OsRelease are:
     IMAGE_VERSION HOME_URL DOCUMENTATION_URL SUPPORT_URL BUG_REPORT_URL PRIVACY_POLICY_URL LOGO ANSI_COLOR
     DEFAULT_HOSTNAME SYSEXT_LEVEL
 
-If other attributes are found in the os-release file, they will be honored.
+If other attributes are found in the os-release file, they will be accepted.
 Folded to lower case, the attribute names are used as keys in an internal hash structure.
-
-=head1 NAME
-
-Sys::OsRelease - read operating system details from standard /etc/os-release file
 
 =head1 METHODS
 
@@ -580,6 +579,21 @@ This helps maintain minimal prerequisites among modules working to set up Perl o
 FreeDesktop.Org's os-release standard: L<https://www.freedesktop.org/software/systemd/man/os-release.html>
 
 GitHub repository for Sys::OsRelease: L<https://github.com/ikluft/Sys-OsRelease>
+
+Related modules:
+
+=over 1
+
+=item L<Sys::OsPackage>
+
+installs Perl modules, for example as dependencies of a script, via OS packages if available or otherwise via CPAN -
+uses Sys::OsRelease to determine OS type
+
+=item L<System::Info>
+
+system information collected from multiple sources including system architecture, hardware, OS release data
+
+=back
 
 =head1 BUGS AND LIMITATIONS
 

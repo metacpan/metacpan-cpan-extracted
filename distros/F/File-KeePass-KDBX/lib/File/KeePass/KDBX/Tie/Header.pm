@@ -12,7 +12,7 @@ use namespace::clean;
 
 use parent 'File::KeePass::KDBX::Tie::Hash';
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 my @META_FIELDS = qw(
     Generator
@@ -216,7 +216,7 @@ File::KeePass::KDBX::Tie::Header - Database headers
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 BUGS
 

@@ -3,7 +3,7 @@ package Module::ScanDeps::Static;
 use strict;
 use warnings;
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 use 5.010;
 
@@ -47,6 +47,8 @@ Readonly my $NEWLINE      => qq{\n};
 Readonly my $SLASH        => q{/};
 Readonly my $SPACE        => q{ };
 
+Readonly my $DEFAULT_MIN_CORE_VERSION => '5.8.9';
+
 our $HAVE_VERSION = eval {
   require version;
   return $TRUE;
@@ -74,9 +76,10 @@ sub new {
   } ## end foreach my $k ( keys %options)
 
   # defaults
-  $options{'core'}            //= $TRUE;
-  $options{'include_require'} //= $FALSE;
-  $options{'add_version'}     //= $TRUE;
+  $options{'core'}             //= $TRUE;
+  $options{'include_require'}  //= $FALSE;
+  $options{'add_version'}      //= $TRUE;
+  $options{'min_core_version'} //= $DEFAULT_MIN_CORE_VERSION;
 
   my $self = $class->SUPER::new( \%options );
 
@@ -156,9 +159,13 @@ sub is_core {
     # test modules against Perls that are older than 5.8.9 - however,
     # some modules like JSON::PP did not appear until > 5.10
 
+    # print {*STDERR} "$first_release_version $min_core_version";
+
     $core = $first_release_version <= $min_core_version;
 
   } ## end if (@ms)
+
+  # print {*STDERR} "$module: [$core]\n";
 
   return $core;
 } ## end sub is_core
@@ -455,7 +462,9 @@ sub parse {
       or croak 'could not close file ' . $self->get_path . "$OS_ERROR\n";
   } ## end if ( $self->get_path )
 
-  return sort keys %{ $self->get_require };
+  my @sorted_dependencies = sort keys %{ $self->get_require };
+
+  return @sorted_dependencies;
 } ## end sub parse
 
 ########################################################################
@@ -727,7 +736,7 @@ Module::ScanDeps::Static - a cleanup of rpmbuild's perl.req
 
  my $scanner = Module::ScanDeps::Static->new({ file => 'myfile.pl' });
  $scanner->parse;
- print $scanner->get_dependencies;
+ print $scanner->format_text;
 
 =head1 DESCRIPTION
 
@@ -752,11 +761,11 @@ want a recursive search for dependencies, use C<scandeps.pl>>
 
 I<!!EXPERIMENTAL!!>
 
-I<The methods and output of this module is subject to revision!>
+I<The methods and output of this module are subject to revision!>
 
 =head1 USAGE
 
-scandeps-static.pl [options] Module
+ scandeps-static.pl [options] Module
 
 If "Module" is not provided, the script will read from STDIN.
 
@@ -1015,7 +1024,7 @@ contain the keys "name" and "version" for each dependency.
 
 =head1 VERSION
 
-0.3
+0.4
 
 =head1 AUTHOR
 

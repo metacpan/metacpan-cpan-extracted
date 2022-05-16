@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package OpenAPI::Modern; # git description: v0.026-4-g1ec0924
+package OpenAPI::Modern; # git description: v0.027-3-g9314695
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.027';
+our $VERSION = '0.028';
 
 use 5.020;
 use Moo;
@@ -526,7 +526,19 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
   return 1 if not defined $schema;
 
   $state = { %$state, schema_path => jsonp($state->{schema_path}, 'content', $media_type, 'schema') };
-  $self->_evaluate_subschema($content_ref->$*, $schema, $state);
+  my $result = $self->_evaluate_subschema($content_ref->$*, $schema, $state);
+
+  my $type = (split('/', $state->{data_path}, 3))[1];
+  my $keyword = $type eq 'request' ? 'readOnly' : $type eq 'response' ? 'writeOnly' : die "unknown type $type";
+
+  foreach my $annotation (grep $_->keyword eq $keyword && $_->annotation, $result->annotations) {
+    push $state->{errors}->@*, JSON::Schema::Modern::Error->new(
+      (map +($_ => $annotation->$_), qw(keyword instance_location keyword_location absolute_keyword_location)),
+      error => ($keyword =~ s/O/-o/r).' value is present',
+    );
+  }
+
+  return !!$result;
 }
 
 # wrap a result object around the errors
@@ -587,17 +599,7 @@ sub _evaluate_subschema ($self, $data, $schema, $state) {
   push $state->{errors}->@*, $result->errors;
   push $state->{annotations}->@*, $result->annotations;
 
-  my $type = (split('/', $state->{data_path}, 3))[1];
-  my $keyword = $type eq 'request' ? 'readOnly' : $type eq 'response' ? 'writeOnly' : die "unknown type $type";
-
-  foreach my $annotation (grep $_->keyword eq $keyword && $_->annotation, $result->annotations) {
-    push $state->{errors}->@*, JSON::Schema::Modern::Error->new(
-      (map +($_ => $annotation->$_), qw(keyword instance_location keyword_location absolute_keyword_location)),
-      error => ($keyword =~ s/O/-o/r).' value is present',
-    );
-  }
-
-  return !!$result;
+  return $result;
 }
 
 # returned object supports ->path
@@ -667,7 +669,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI docume
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 SYNOPSIS
 

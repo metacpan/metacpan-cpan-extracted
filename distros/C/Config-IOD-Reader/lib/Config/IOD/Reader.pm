@@ -1,13 +1,15 @@
 package Config::IOD::Reader;
 
-our $DATE = '2021-06-23'; # DATE
-our $VERSION = '0.343'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
 use parent qw(Config::IOD::Base);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-05-02'; # DATE
+our $DIST = 'Config-IOD-Reader'; # DIST
+our $VERSION = '0.344'; # VERSION
 
 sub _merge {
     my ($self, $section) = @_;
@@ -162,9 +164,14 @@ sub _read_string {
         }
 
         # key line
-        if ($line =~ /^\s*([^=]+?)\s*=\s*(.*)/) {
+        if ($line =~ /^\s*([^=]+?)\s*=(\s*)(.*)/) {
             my $key = $1;
-            my $val = $2;
+            my $space = $2;
+            my $val = $3;
+
+            if ($self->{warn_perl} && !$space && $val =~ /\A>/) {
+                $self->_warn("Probably using Perl syntax instead of INI: $line");
+            }
 
             # the common case is that value are not decoded or
             # quoted/bracketed/braced, so we avoid calling _parse_raw_value here
@@ -230,7 +237,7 @@ Config::IOD::Reader - Read IOD/INI configuration files
 
 =head1 VERSION
 
-This document describes version 0.343 of Config::IOD::Reader (from Perl distribution Config-IOD-Reader), released on 2021-06-23.
+This document describes version 0.344 of Config::IOD::Reader (from Perl distribution Config-IOD-Reader), released on 2022-05-02.
 
 =head1 SYNOPSIS
 
@@ -315,12 +322,6 @@ refer to the already mentioned key.
 
 Code will be compiled using Perl's C<eval()> in the
 C<Config::IOD::Expr::_Compiled> namespace, with C<no strict>, C<no warnings>.
-
-=head1 CONTRIBUTOR
-
-=for stopwords Steven Haryanto
-
-Steven Haryanto <sharyanto@cpan.org>
 
 =head1 ATTRIBUTES
 
@@ -481,6 +482,15 @@ simply be ignored as a regular comment.
 
 B<NOTE: Turning this setting on violates IOD specification.>
 
+=head2 warn_perl => bool (default: 0)
+
+Emit warning if configuration contains key line like these:
+
+ foo=>"bar"
+ foo => bar,
+
+which suggest user is assuming configuration is in Perl format instead of INI.
+
 =head1 METHODS
 
 =head2 new(%attrs) => obj
@@ -535,14 +545,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Config-IOD
 
 Source repository is at L<https://github.com/perlancar/perl-Config-IOD-Reader>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Config-IOD-Reader>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<IOD> - specification
@@ -555,11 +557,42 @@ L<IOD::Examples> - sample documents
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Config-IOD-Reader>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

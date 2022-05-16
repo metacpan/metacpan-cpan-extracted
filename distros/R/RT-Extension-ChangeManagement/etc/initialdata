@@ -188,8 +188,8 @@ push @ACL,
     };
 
 our @Attributes = (
-    { Name => 'Search - Changes Scheduled, Next 7 Days',
-      Description => 'Change management requests due in the next 7 days', # loc
+    { Name => 'SavedSearch',
+      Description => 'Changes Scheduled, Next 7 Days', # loc
       Content     =>
       { Format =>  q{'<a href="__WebPath__/Ticket/Display.html?id=__id__">__id__</a>/TITLE:#',}
                  . q{'<a href="__WebPath__/Ticket/Display.html?id=__id__">__Subject__</a>/TITLE:Subject',}
@@ -198,8 +198,8 @@ our @Attributes = (
         OrderBy  => 'due ASC',
       },
     },
-    { Name => 'Search - Changes Deployed, Last 30 Days',
-      Description => 'Change management requests completed in the last 30 days', # loc
+    { Name => 'SavedSearch',
+      Description => 'Changes Deployed, Last 30 Days', # loc
       Content     =>
       { Format =>  q{'<a href="__WebPath__/Ticket/Display.html?id=__id__">__id__</a>/TITLE:#',}
                  . q{'<a href="__WebPath__/Ticket/Display.html?id=__id__">__Subject__</a>/TITLE:Subject',}
@@ -256,21 +256,24 @@ our @Final = sub {
 
     if ($ret) {
         my @searches;
-        for my $search_name ( 'Changes Scheduled, Next 7 Days', 'Changes Deployed, Last 30 Days' ) {
-            my ($search) = RT::System->new( RT->SystemUser )->Attributes->Named( 'Search - ' . $search_name );
-            if ($search) {
+        for my $search_desc ( 'Changes Scheduled, Next 7 Days', 'Changes Deployed, Last 30 Days' ) {
+            my $search = RT::Attribute->new( RT->SystemUser );
+            ( $ret, $msg ) = $search->LoadByCols(
+                Name        => 'SavedSearch',
+                Description => $search_desc,
+            );
+            if ($search && $ret) {
                 push @searches,
                     {
                     pane         => 'body',
                     portlet_type => 'search',
                     id           => $search->Id,
-                    description  => "Saved Search: $search_name",
+                    description  => "Saved Search: $search_desc",
                     privacy      => join( '-', ref( RT->System ), RT->System->Id ),
                     };
-            }
-            else {
-                RT->Logger->error("Couldn't find search $search_name");
-            }
+                } else {
+                    RT->Logger->error( "Could not load saved search '$search_desc': $msg" );
+                }
         }
 
         my $panes = {
@@ -280,7 +283,7 @@ our @Final = sub {
         };
 
         # fill content
-        my ( $ret, $msg ) = $dashboard->Update( Panes => $panes );
+        ( $ret, $msg ) = $dashboard->Update( Panes => $panes );
         if ( !$ret ) {
             RT->Logger->error("Couldn't update content for dashboard Change Management: $msg");
         }

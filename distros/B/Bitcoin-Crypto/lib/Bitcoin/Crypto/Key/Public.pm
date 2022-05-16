@@ -1,7 +1,5 @@
 package Bitcoin::Crypto::Key::Public;
-
-our $VERSION = "1.005";
-
+$Bitcoin::Crypto::Key::Public::VERSION = '1.007';
 use v5.10;
 use strict;
 use warnings;
@@ -36,6 +34,11 @@ sub witness_program
 sub get_legacy_address
 {
 	my ($self) = @_;
+
+	Bitcoin::Crypto::Exception::AddressGenerate->raise(
+		'legacy addresses can only be created with BIP44 in legacy (BIP44) mode'
+	) if $self->has_purpose && $self->purpose != 44;
+
 	my $pkh = $self->network->p2pkh_byte . $self->key_hash;
 	return encode_base58check($pkh);
 }
@@ -43,6 +46,15 @@ sub get_legacy_address
 sub get_compat_address
 {
 	my ($self) = @_;
+
+	# network field is not required, lazy check for completeness
+	Bitcoin::Crypto::Exception::NetworkConfig->raise(
+		"this network does not support segregated witness"
+	) unless $self->network->supports_segwit;
+
+	Bitcoin::Crypto::Exception::AddressGenerate->raise(
+		'compat addresses can only be created with BIP44 in compat (BIP49) mode'
+	) if $self->has_purpose && $self->purpose != 49;
 
 	my $program = Bitcoin::Crypto::Script->new(network => $self->network);
 	$program->add_operation("OP_" . Bitcoin::Crypto::Config::witness_version)
@@ -56,8 +68,12 @@ sub get_segwit_address
 
 	# network field is not required, lazy check for completeness
 	Bitcoin::Crypto::Exception::NetworkConfig->raise(
-		"no segwit_hrp found in network configuration"
-	) unless defined $self->network->segwit_hrp;
+		"this network does not support segregated witness"
+	) unless $self->network->supports_segwit;
+
+	Bitcoin::Crypto::Exception::AddressGenerate->raise(
+		'segwit addresses can only be created with BIP44 in segwit (BIP84) mode'
+	) if $self->has_purpose && $self->purpose != 84;
 
 	return encode_segwit($self->network->segwit_hrp, $self->witness_program);
 }
@@ -170,7 +186,9 @@ Character encoding note: C<$message> should be encoded in the proper encoding be
 
 	$address_string = $object->get_legacy_address()
 
-Returns string containing Base58Check encoded public key hash (p2pkh address)
+Returns string containing Base58Check encoded public key hash (p2pkh address).
+
+If the public key was obtained through BIP44 derivation scheme, this method will check whether the purpose was C<44> and raise an exception otherwise.
 
 =head2 get_compat_address
 
@@ -178,11 +196,15 @@ Returns string containing Base58Check encoded public key hash (p2pkh address)
 
 Returns string containing Base58Check encoded script hash containing a witness program for compatibility purposes (p2sh(p2wpkh) address)
 
+If the public key was obtained through BIP44 derivation scheme, this method will check whether the purpose was C<49> and raise an exception otherwise.
+
 =head2 get_segwit_address
 
 	$address_string = $object->get_segwit_address()
 
 Returns string containing Bech32 encoded witness program (p2wpkh address)
+
+If the public key was obtained through BIP44 derivation scheme, this method will check whether the purpose was C<89> and raise an exception otherwise.
 
 =head1 EXCEPTIONS
 
@@ -195,6 +217,8 @@ This module throws an instance of L<Bitcoin::Crypto::Exception> if it encounters
 =item * Verify - couldn't verify the message correctly
 
 =item * NetworkConfig - incomplete or corrupted network configuration
+
+=item * AddressGenerate - address could not be generated (see BIP44 constraint notes)
 
 =back
 
@@ -213,3 +237,4 @@ This module throws an instance of L<Bitcoin::Crypto::Exception> if it encounters
 =back
 
 =cut
+

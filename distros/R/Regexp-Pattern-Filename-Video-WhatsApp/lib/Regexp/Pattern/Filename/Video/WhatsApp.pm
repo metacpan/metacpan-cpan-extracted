@@ -8,7 +8,7 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-05-08'; # DATE
 our $DIST = 'Regexp-Pattern-Filename-Video-WhatsApp'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our %RE;
 
@@ -38,12 +38,21 @@ Regexp::Pattern::Filename::Video::WhatsApp - Video filename saved by WhatsApp
 
 =head1 VERSION
 
-This document describes version 0.001 of Regexp::Pattern::Filename::Video::WhatsApp (from Perl distribution Regexp-Pattern-Filename-Video-WhatsApp), released on 2022-05-08.
+This document describes version 0.002 of Regexp::Pattern::Filename::Video::WhatsApp (from Perl distribution Regexp-Pattern-Filename-Video-WhatsApp), released on 2022-05-08.
 
 =head1 SYNOPSIS
 
+Using with L<Regexp::Pattern>:
+ 
  use Regexp::Pattern; # exports re()
  my $re = re("Filename::Video::WhatsApp::filename_video_whatsapp");
+ 
+ # see Regexp::Pattern for more details on how to use with Regexp::Pattern
+ 
+Using the pattern(s) directly:
+ 
+ use Regexp::Pattern::Filename::Video::WhatsApp;
+ if ('some string' =~ $Regexp::Pattern::Filename::Video::WhatsApp::RE{filename_video_whatsapp}) { ... }
 
 =head1 DESCRIPTION
 

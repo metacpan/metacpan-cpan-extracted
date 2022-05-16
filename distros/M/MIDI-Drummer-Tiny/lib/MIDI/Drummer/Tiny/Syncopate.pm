@@ -1,5 +1,5 @@
 package MIDI::Drummer::Tiny::Syncopate;
-$MIDI::Drummer::Tiny::Syncopate::VERSION = '0.2100';
+$MIDI::Drummer::Tiny::Syncopate::VERSION = '0.2101';
 our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Syncopation logic
@@ -15,13 +15,26 @@ extends 'MIDI::Drummer::Tiny';
 
 
 
+has duration => (
+    is      => 'ro',
+    default => sub { 'qn' },
+);
+
+
+has repeat => (
+    is      => 'ro',
+    default => sub { 4 },
+);
+
+
 sub steady {
     my ( $self, $instrument, $opts ) = @_;
 
     $instrument ||= $self->closed_hh;
 
-    $opts->{duration} ||= $self->quarter;
+    $opts->{duration} ||= $self->duration;
 
+    # XXX This is not right
     for my $n ( 1 .. $self->counter ) {
         $self->note( $opts->{duration}, $instrument );
     }
@@ -36,8 +49,8 @@ sub combinatorial {
     $opts->{negate}   ||= 0;
     $opts->{count}    ||= 0;
     $opts->{beats}    ||= $self->beats;
-    $opts->{repeat}   ||= 4;
-    $opts->{duration} ||= $self->quarter;
+    $opts->{repeat}   ||= $self->repeat;
+    $opts->{duration} ||= $self->duration;
     $opts->{vary}     ||= {
         0 => sub { $self->rest( $opts->{duration} ) },
         1 => sub { $self->note( $opts->{duration}, $instrument ) },
@@ -78,7 +91,7 @@ MIDI::Drummer::Tiny::Syncopate - Syncopation logic
 
 =head1 VERSION
 
-version 0.2100
+version 0.2101
 
 =head1 SYNOPSIS
 
@@ -109,7 +122,17 @@ F<eg/syncopation/*> lessons.
 
 =head1 ATTRIBUTES
 
-=head2 none yet...
+=head2 duration
+
+  $duration = $d->duration;
+
+Default: C<quarter>
+
+=head2 repeat
+
+  $repeat = $d->repeat;
+
+Default: C<4>
 
 =head1 METHODS
 
@@ -132,8 +155,8 @@ B<counter> attribute.
 Defaults:
 
   instrument: closed_hh
-  Option:
-    duration: quarter
+  Options:
+    duration: given by constructor
 
 =head2 combinatorial
 
@@ -155,12 +178,11 @@ Defaults:
 
   instrument: snare
   Options:
-    duration: quarter
+    duration: given by constructor
     count: 0
     negate: 0
-    beats: beats
-    repeat: 4
-    duration: quarter
+    beats: given by constructor
+    repeat: given by constructor
     vary:
         0 => sub { $self->rest( $options->{duration} ) },
         1 => sub { $self->note( $options->{duration}, $instrument ) },

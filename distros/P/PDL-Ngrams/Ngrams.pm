@@ -26,7 +26,7 @@ our %EXPORT_TAGS =
    Func => [@EXPORT_OK],               ##-- respect PDL conventions (hopefully)
   );
 
-our $VERSION = '0.10'; ##-- use perl-reversion to update
+our $VERSION = '0.11'; ##-- use perl-reversion to update
 
 ##======================================================================
 ## pod: header
@@ -217,7 +217,7 @@ from a PDL vector, before rsp. after constructing a vector of N-gram vectors.
 
 Add block-delimiters (e.g. BOS,EOS) to a vector of raw tokens.
 
-See L<PDL::Ngrams::ngutils/"ng_delimit">.
+See L<PDL::Ngrams::Utils/"ng_delimit">.
 
 =cut
 
@@ -231,7 +231,7 @@ See L<PDL::Ngrams::ngutils/"ng_delimit">.
 
 Remove block-delimiters (e.g. BOS,EOS) from a vector of delimited tokens.
 
-See L<PDL::Ngrams::ngutils/"ng_undelimit">.
+See L<PDL::Ngrams::Utils/"ng_undelimit">.
 
 =cut
 
@@ -246,9 +246,9 @@ See L<PDL::Ngrams::ngutils/"ng_undelimit">.
 =head2 Low-Level Functions
 
 Some additional low-level functions are provided in the
-PDL::Ngrams::ngutils
+PDL::Ngrams::Utils
 package.
-See L<PDL::Ngrams::ngutils> for details.
+See L<PDL::Ngrams::Utils> for details.
 
 =cut
 
@@ -268,13 +268,13 @@ PDL by Karl Glazebrook, Tuomas J. Lukka, Christian Soeller, and others.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007-2015, Bryan Jurish.  All rights reserved.
+Copyright (c) 2007-2022, Bryan Jurish.  All rights reserved.
 
 This package is free software.  You may redistribute it
 and/or modify it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-perl(1), PDL(3perl), PDL::Ngrams::ngutils(3perl)
+perl(1), PDL(3perl), PDL::Ngrams::Utils(3perl)
 
 =cut

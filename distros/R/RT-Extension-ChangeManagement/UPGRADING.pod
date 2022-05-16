@@ -1,0 +1,27 @@
+=head1 UPGRADING FROM 0.01
+
+The upgrade process is very similar to installation:
+
+=over
+
+=item C<perl Makefile.PL>
+
+=item C<make>
+
+=item C<make install>
+
+=back
+
+Once C<make install> finishes, the database upgrade can be performed:
+
+    /opt/rt5/sbin/rt-setup-database --action insert --datafile etc/upgrade/0.02/content \
+        --package RT::Extension::ChangeManagement --ext-version 0.02
+
+Finally, clear your mason cache:
+
+    rm -rf /opt/rt5/var/mason_data/obj
+
+and restart your webserver.
+
+=cut
+

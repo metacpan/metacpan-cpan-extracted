@@ -1,0 +1,308 @@
+# NAME
+
+Dancer2::Plugin::Auth::Extensible::Provider::DBIxClass - authenticate via the Dancer2::Plugin::DBIx:Class plugin
+
+# VERSION
+
+version 0.0900
+
+# DESCRIPTION
+
+This class is an authentication provider designed to authenticate users against
+a database, using [Dancer2::Plugin::DBIx::Class](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3ADBIx%3A%3AClass) to access a database.
+
+See [Dancer2::Plugin::DBIx::Class](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3ADBIx%3A%3AClass) for how to configure a database connection
+appropriately; see the ["CONFIGURATION"](#configuration) section below for how to configure this
+authentication provider with database details.
+
+See [Dancer2::Plugin::Auth::Extensible](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3AAuth%3A%3AExtensible) for details on how to use the
+authentication framework.
+
+# NAME 
+
+Dancer2::Plugin::Auth::Extensible::Provider::DBIxClass - authenticate via the
+[Dancer2::Plugin::DBIx:Class](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3ADBIx%3AClass) plugin
+
+# CONFIGURATION
+
+This provider tries to use sensible defaults, in the same manner as
+[Dancer2::Plugin::Auth::Extensible::Provider::Database](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3AAuth%3A%3AExtensible%3A%3AProvider%3A%3ADatabase), so you may not need
+to provide much configuration if your database tables look similar to those.
+
+The most basic configuration, assuming defaults for all options, and defining a
+single authentication realm named 'users':
+
+    plugins:
+        Auth::Extensible:
+            realms:
+                users:
+                    provider: 'DBIxClass'  # Note--no dash or '::' here!
+
+You would still need to have provided suitable database connection details to
+[Dancer2::Plugin::DBIx::Class](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3ADBIx%3A%3AClass), of course;  see the docs for that plugin for full
+details, but it could be as simple as, e.g.:
+
+    plugins:
+        Auth::Extensible:
+            realms:
+                users:
+                    provider: 'DBIxClass'   # Note--no dash or '::' here!
+                    users_resultset: 'User'
+                    roles_resultset: Role
+                    user_roles_resultset: UserRole
+        DBIx::Class:
+            default:
+                dsn: dbi:mysql:database=mydb;host=localhost
+                schema_class: MyApp::Schema
+                user: user
+                password: secret
+
+A full example showing all options:
+
+    plugins:
+        Auth::Extensible:
+            realms:
+                users:
+                    provider: 'DBIxClass'   # Note--no dash or '::' here!
+
+                    # Should get_user_details return an inflated DBIC row
+                    # object? Defaults to false which will return a hashref
+                    # inflated using DBIx::Class::ResultClass::HashRefInflator
+                    # instead. This also affects what `logged_in_user` returns.
+                    user_as_object: 1
+
+                    # Optionally specify the DBIC resultset names if you don't
+                    # use the defaults (as shown). These and the column names are the
+                    # only settings you might need. The relationships between
+                    # these resultsets is automatically introspected by
+                    # inspection of the schema.
+                    users_resultset: User
+                    roles_resultset: Role
+                    user_roles_resultset: UserRole
+
+                    # optionally set the column names
+                    users_username_column: username
+                    users_password_column: password
+                    roles_role_column: role
+
+                    # This plugin supports the DPAE record_lastlogin functionality.
+                    # Optionally set the column name:
+                    users_lastlogin_column: lastlogin
+
+                    # Optionally set columns for user_password functionality in
+                    # Dancer2::Plugin::Auth::Extensible
+                    users_pwresetcode_column: pw_reset_code
+                    users_pwchanged_column:   # Time of reset column. No default.
+
+                    # Days after which passwords expire. See logged_in_user_password_expired
+                    # functionality in Dancer2::Plugin::Auth::Extensible
+                    password_expiry_days:       # No default
+
+                    # Optionally set the name of the DBIC schema
+                    schema_name: myschema
+
+                    # Optionally set additional conditions when searching for the
+                    # user in the database. These are the same format as required
+                    # by DBIC, and are passed directly to the DBIC resultset search
+                    user_valid_conditions:
+                        deleted: 0
+                        account_request:
+                            "<": 1
+
+                    # Optionally specify a key for the user's roles to be returned in.
+                    # Roles will be returned as role_name => 1 hashref pairs
+                    roles_key: roles
+
+                    # Optionally specify the algorithm when encrypting new passwords
+                    encryption_algorithm: SHA-512
+
+                    # Optional: To validate passwords using a method called
+                    # 'check_password' in users_resultset result class
+                    # which takes the password to check as a single argument:
+                    users_password_check: check_password
+
+## But what about the `::`?
+
+[Dancer2::Plugin::Auth::Extensible](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3AAuth%3A%3AExtensible) insists that you either give it just the provider
+name--which must be a single "word", not containing `::`, or the full name of the module.
+As module names cannot contain dashes, I chose `DBIxClass` for the provider name; aren't
+you glad I didn't make you type `Dancer2::Plugin::Auth::Extensible::Provider::DBIx::Class`?
+
+- user\_as\_object
+
+    Defaults to false.
+
+    By default a row object is returned as a simple hash reference using
+    [DBIx::Class::ResultClass::HashRefInflator](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AResultClass%3A%3AHashRefInflator). Setting this to true
+    causes normal row objects to be returned instead.
+
+- users\_resultset
+
+    Defaults to `User`.
+
+    Specifies the [DBIx::Class::ResultSet](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AResultSet) that contains the users.
+    The relationship to user\_roles\_source will be introspected from the schema.
+
+- roles\_resultset
+
+    Defaults to `Roles`.
+
+    Specifies the [DBIx::Class::ResultSet](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AResultSet) that contains the roles.
+    The relationship to user\_roles\_source will be introspected from the schema.
+
+- user\_roles\_resultset
+
+    Defaults to `User`.
+
+    Specifies the [DBIx::Class::ResultSet](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AResultSet) that contains the user\_roles joining table.
+    The relationship to the user and role source will be introspected from the schema.
+
+- users\_username\_column
+
+    Specifies the column name of the username column in the users table
+
+- users\_password\_column
+
+    Specifies the column name of the password column in the users table
+
+- roles\_role\_column
+
+    Specifies the column name of the role name column in the roles table
+
+- schema\_name
+
+    Specfies the name of the [Dancer2::Plugin::DBIx::Class](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3ADBIx%3A%3AClass) schema to use. If not
+    specified, will default in the same manner as the DBIx::Class plugin.
+
+- user\_valid\_conditions
+
+    Specifies additional search parameters when looking up a user in the users table.
+    For example, you might want to exclude any account this is flagged as deleted
+    or disabled.
+
+    The value of this parameter will be passed directly to DBIC as a search condition.
+    It is therefore possible to nest parameters and use different operators for the
+    condition. See the example config above for an example.
+
+- roles\_key
+
+    Specifies a key for the returned user hash to also return the user's roles in.
+    The value of this key will contain a hash ref, which will contain each
+    permission with a value of 1. In your code you might then have:
+
+        my $user = logged_in_user;
+        return foo_bar($user);
+
+        sub foo_bar
+        {   my $user = shift;
+            if ($user->{roles}->{beer_drinker}) {
+               ...
+            }
+        }
+
+    This isn't intended to replace the ["user\_has\_role" in Dancer2::Plugin::Auth::Extensible](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3AAuth%3A%3AExtensible#user_has_role)
+    keyword. Instead it is intended to make it easier to access a user's roles if the
+    user hash is being passed around (without requiring access to the user\_has\_role
+    keyword in other modules).
+
+# DEPRECATED SETTINGS
+
+- user\_source
+- user\_table
+
+    Specifies the source name that contains the users. This will be camelized to generate
+    the resultset name. The relationship to user\_roles\_source will be introspected from
+    the schema.
+
+- role\_source
+- role\_table
+
+    Specifies the source name that contains the roles. This will be camelized to generate
+    the resultset name. The relationship to user\_roles\_source will be introspected from
+    the schema.
+
+- user\_roles\_source
+- user\_roles\_table
+
+Specifies the source name that contains the user\_roles joining table. This will be
+camelized to generate the resultset name. The relationship to the user and role
+source will be introspected from the schema.
+
+# SUGGESTED SCHEMA
+
+If you use a schema similar to the examples provided here, you should need minimal 
+configuration to get this authentication provider to work for you.  The examples 
+given here should be MySQL-compatible; minimal changes should be required to use 
+them with other database engines.
+
+## user Table
+
+You'll need a table to store user accounts in, of course. A suggestion is something 
+like:
+
+     CREATE TABLE user (
+         id int(11) NOT NULL AUTO_INCREMENT,
+                 username varchar(32) NOT NULL,
+         password varchar(40) DEFAULT NULL,
+         name varchar(128) DEFAULT NULL,
+         email varchar(255) DEFAULT NULL,
+         deleted tinyint(1) NOT NULL DEFAULT '0',
+         lastlogin datetime DEFAULT NULL,
+         pw_changed datetime DEFAULT NULL,
+         pw_reset_code varchar(255) DEFAULT NULL,
+         PRIMARY KEY (id)
+     );
+
+All columns from the users table will be returned by the `logged_in_user` keyword 
+for your convenience.
+
+## role Table
+
+You'll need a table to store a list of available groups in.
+
+         CREATE TABLE role (
+         id int(11) NOT NULL AUTO_INCREMENT,
+         role varchar(32) NOT NULL,
+         PRIMARY KEY (id)
+     );
+
+## user\_role Table
+
+Also requred is a table mapping the users to the roles.
+
+     CREATE TABLE user_role (
+         user_id int(11) NOT NULL,
+         role_id int(11) NOT NULL,
+         PRIMARY KEY (user_id, role_id),
+         FOREIGN KEY (user_id) REFERENCES user(id),
+         FOREIGN KEY (role_id) REFERENCES role(id)
+     );
+
+# SEE ALSO
+
+[Dancer2::Plugin::Auth::Extensible](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3AAuth%3A%3AExtensible)
+
+[Dancer2::Plugin::DBIx::Class](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3ADBIx%3A%3AClass)
+
+[Dancer2::Plugin::Auth::Extensible::Provider::Database](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3AAuth%3A%3AExtensible%3A%3AProvider%3A%3ADatabase)
+
+# PRIOR WORK
+
+This plugin is a fork of [Dancer2::Plugin::Auth::Extensible::Provider::DBIC](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3AAuth%3A%3AExtensible%3A%3AProvider%3A%3ADBIC), authored
+by Andrew Beverley `<a.beverley@ctrlo.com>`, with a rewrite for Plugin2 by
+Peter Mottram, `<peter@sysnix.com>`.
+
+Forked by, and this fork maintained by:
+
+D Ruth Holloway `<ruth@hiruthie.me>`
+
+# AUTHOR
+
+D Ruth Holloway <ruth@hiruthie.me>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022 by D Ruth Holloway.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

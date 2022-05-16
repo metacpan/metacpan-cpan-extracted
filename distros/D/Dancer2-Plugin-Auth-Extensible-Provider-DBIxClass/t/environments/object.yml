@@ -1,0 +1,62 @@
+plugins:
+  DBIx::Class:
+    schema1:
+      dsn: 'dbi:SQLite:dbname=:memory:'
+      on_connect_do: ['PRAGMA foreign_keys = ON']
+      schema_class: Schema1
+      quote_names: 1
+    schema2:
+      dsn: 'dbi:SQLite:dbname=:memory:'
+      on_connect_do: ['PRAGMA foreign_keys = ON']
+      schema_class: Schema2
+      quote_names: 1
+    schema3:
+      dsn: 'dbi:SQLite:dbname=:memory:'
+      on_connect_do: ['PRAGMA foreign_keys = ON']
+      schema_class: Schema3
+      quote_names: 1
+  Auth::Extensible:
+    record_lastlogin: 1
+    realms:
+      config1:
+        provider: DBIxClass
+        user_as_object: 1
+        schema_name: schema1
+        users_resultset: User
+        roles_resultset: Role
+        roles_key: role
+        user_roles_resultset: UserRole
+        record_lastlogin: 1
+        users_pwchanged_column: pw_changed
+        password_expiry_days: 1
+        user_valid_conditions:
+            deleted: 0
+        encryption_algorithm: SHA-512
+      config2:
+        priority: 10
+        provider: DBIxClass
+        user_as_object: 1
+        schema_name: schema2
+        users_resultset: Myuser
+        roles_resultset: Myrole
+        roles_key: role
+        user_roles_resultset: MyuserRole
+        users_username_column: myusername
+        users_password_column: mypassword
+        roles_role_column: rolename
+        record_lastlogin: 0
+      config3:
+        priority: 2
+        provider: DBIxClass
+        user_as_object: 1
+        schema_name: schema3
+        users_resultset: User
+        roles_resultset: Role
+        roles_key: role
+        user_roles_resultset: UserRole
+        record_lastlogin: 1
+        users_pwchanged_column: pw_changed
+        password_expiry_days: 1
+        user_valid_conditions:
+            deleted: 0
+        encryption_algorithm: SHA-512

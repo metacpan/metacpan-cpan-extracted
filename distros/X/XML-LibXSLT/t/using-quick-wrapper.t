@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use autodie;
 
-use Test::More tests => 20;
+use Test::More tests => 23;
 
 use XML::LibXML         ();
 use XML::LibXSLT        ();
@@ -60,6 +60,7 @@ ok( $xml1_dom, '$xml1_dom' );
 }
 
 my $expected_output;
+my $param_expected_output;
 {
     my $xslt_parser = XML::LibXSLT->new();
     my $stylesheet  = XML::LibXSLT::Quick->new(
@@ -76,6 +77,25 @@ my $expected_output;
     # TEST
     ok( $out1, 'output' );
 }
+{
+    my $xslt_parser = XML::LibXSLT->new();
+    my $stylesheet  = XML::LibXSLT::Quick->new(
+        {
+            xslt_parser => $xslt_parser,
+            location    => 'example/1.xsl',
+        }
+    );
+    my $results = $stylesheet->transform( $xml1_dom, 'yearfrom' => "'1999'", );
+    my $out1    = $stylesheet->output_as_chars($results);
+
+    $param_expected_output = $out1;
+
+    # TEST
+    ok( $out1, 'output' );
+}
+
+# TEST
+isnt( $expected_output, $param_expected_output, "non-identical", );
 
 {
     my $stylesheet =
@@ -104,6 +124,7 @@ foreach my $rec (
     },
     )
 {
+    # TEST
     # TEST:FILTER(MULT(3))
     my $name   = $rec->{name};
     my $source = $rec->{source};
@@ -136,21 +157,45 @@ foreach my $rec (
         my $stylesheet =
             XML::LibXSLT::Quick->new( { location => 'example/1.xsl', } );
         my $out_fn = 'foo.xml';
-        $stylesheet->generic_transform(
-            +{
-                type => 'file',
-                path => $out_fn,
+        {
+            $stylesheet->generic_transform(
+                +{
+                    type => 'file',
+                    path => $out_fn,
 
-            },
-            $source,
-        );
+                },
+                $source,
+            );
 
-        my $out_str = _utf8_slurp($out_fn);
+            my $out_str = _utf8_slurp($out_fn);
 
-        # TEST
-        is( $out_str, $expected_output,
-            "generic_transform() : ${name} -> file path name" );
-        unlink($out_fn);
+            # TEST
+            is( $out_str, $expected_output,
+                "generic_transform() : ${name} -> file path name" );
+            unlink($out_fn);
+        }
+        if ( $name eq 'from file' )
+        {
+            $out_fn = 'pppp0.xml';
+            $stylesheet->generic_transform(
+                +{
+                    type => 'file',
+                    path => $out_fn,
+                },
+                +{
+                    %$source,
+                    params => +{
+                        'yearfrom' => "'1999'",
+                    },
+                },
+            );
+
+            my $out_str = _utf8_slurp($out_fn);
+
+            is( $out_str, $param_expected_output,
+                "generic_transform() : ${name} -> file path name" );
+            unlink($out_fn);
+        }
     }
 
     {

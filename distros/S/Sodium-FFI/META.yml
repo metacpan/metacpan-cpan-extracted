@@ -8,6 +8,8 @@ build_requires:
   Test::More: '0.88'
   perl: '5.008'
 configure_requires:
+  Alien::Base::Wrapper: '0'
+  Alien::Sodium: '2.00'
   ExtUtils::MakeMaker: '0'
   FFI::Build::MM: '0.83'
   perl: '5.008'
@@ -29,7 +31,7 @@ no_index:
 provides:
   Sodium::FFI:
     file: lib/Sodium/FFI.pm
-    version: '0.006'
+    version: '0.007'
 requires:
   Alien::Base::Wrapper: '0'
   Alien::Sodium: '2.000'
@@ -52,7 +54,7 @@ resources:
   bugtracker: https://github.com/genio/sodium-ffi/issues
   homepage: https://github.com/genio/sodium-ffi
   repository: https://github.com/genio/sodium-ffi.git
-version: '0.006'
+version: '0.007'
 x_contributors:
   - 'Chase Whitener <cwhitener@gmail.com>'
 x_generated_by_perl: v5.30.0

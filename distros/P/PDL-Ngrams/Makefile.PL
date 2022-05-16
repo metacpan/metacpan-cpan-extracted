@@ -1,7 +1,6 @@
 use ExtUtils::MakeMaker;
 
-use lib '.'; ##-- fix RT bug #121661?
-require "pdlmaker.plm";
+require "./pdlmaker.plm";
 pdlmaker_init();
 
 ##-- common prerequisites
@@ -28,4 +27,14 @@ WriteMakefile(
 	      realclean => {
 			    FILES => '*~ *.tmp README.txt',
 			   },
+	      META_MERGE => {
+			     "meta-spec" => { version => 2 },
+			     resources => {
+					   repository => {
+							  url => 'git://github.com/moocow-the-bovine/PDL-Ngrams.git',
+							  type => 'git',
+							  web => 'https://github.com/moocow-the-bovine/PDL-Ngrams',
+							 },
+					  },
+			    },
 	     );

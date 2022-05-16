@@ -9,7 +9,6 @@ use Sodium::FFI qw(
     randombytes_buf
 );
 
-
 ok(crypto_auth_KEYBYTES, 'crypto_auth_KEYBYTES: got the constant');
 ok(crypto_auth_BYTES, 'crypto_auth_BYTES: got the constant');
 

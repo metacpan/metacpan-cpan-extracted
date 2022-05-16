@@ -4,7 +4,7 @@ use v5.14;
 use warnings;
 use App::winmaildat2tar;
 
-App::winmaildat2tar->new->run(@ARGV);
+App::winmaildat2tar->new->run(splice @ARGV);
 
 exit;
 
@@ -18,7 +18,7 @@ winmaildat2tar - Convert winmail.dat (TNEF data) to tentative archive
 
 =head1 VERSION
 
-Version 0.99
+Version 0.9901
 
 =head1 SYNOPSIS
 
@@ -31,10 +31,13 @@ another tentative archive formatted data (tar by default).
 
 =over 7
 
-=item B<--format> I<format>, B<-f> ...
+=item B<--format> B<tar>|B<zip>, B<-f> ...
 
-Specify archive format from B<tar>, B<ar> or B<zip>.
-Default is B<tar>.
+Specify archive format.  Default is B<tar>.  Curretly B<tar>, B<ar>
+and B<zip> are supported.
+
+If the command is executed as a name of I<winmaildat2xxx>, I<xxx> part
+is used as a format name.
 
 =back
 
@@ -42,9 +45,9 @@ Default is B<tar>.
 
 =head2 CPANMINUS
 
-To get the latest code, use this:
+Install from CPAN
 
-    cpanm App-winmaildat2tar
+    cpanm App::winmaildat2tar
 
 or
 
@@ -52,7 +55,9 @@ or
 
 =head1 SEE ALSO
 
-L<https://github.com/kaz-utashiro/winmaildat2tar>
+L<App::winmaildat2tar>, L<https://github.com/kaz-utashiro/winmaildat2tar>
+
+L<Convert::TNEF>, L<Archive::Tar>, L<Archive::Ar>, L<Archive::Zip>
 
 =head1 AUTHOR
 

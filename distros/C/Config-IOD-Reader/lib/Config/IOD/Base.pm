@@ -1,12 +1,14 @@
 package Config::IOD::Base;
 
-our $DATE = '2021-06-23'; # DATE
-our $VERSION = '0.343'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 #use Carp; # avoided to shave a bit of startup time
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-05-02'; # DATE
+our $DIST = 'Config-IOD-Reader'; # DIST
+our $VERSION = '0.344'; # VERSION
 
 use constant +{
     COL_V_ENCODING => 0, # either "!j"... or '"', '[', '{', '~'
@@ -35,6 +37,7 @@ sub new {
     # disallow_encodings
     # allow_directives
     # disallow_directives
+    # warn_perl
     bless \%attrs, $class;
 }
 
@@ -103,7 +106,7 @@ sub _parse_command_line {
     push @argv, $buf if defined $buf;
 
     if ($escaped || $single_quoted || $double_quoted) {
-        return undef;
+        return undef; ## no critic: Subroutines::ProhibitExplicitReturnUndef
     }
 
     \@argv;
@@ -356,7 +359,7 @@ sub _get_user_home_dir {
 
     if ($^O eq 'MSWin32') {
         # not yet implemented
-        return undef;
+        return undef; ## no critic: Subroutines::ProhibitExplicitReturnUndef
     } else {
         # IF and only if we have getpwuid support, and the name of the user is
         # our own, shortcut to my_home. This is needed to handle HOME
@@ -370,7 +373,7 @@ sub _get_user_home_dir {
             return $home if $home and -d $home;
         }
 
-        return undef;
+        return undef; ## no critic: Subroutines::ProhibitExplicitReturnUndef
     }
 
 }
@@ -433,7 +436,7 @@ sub _decode_expr {
     require Config::IOD::Expr;
 
     my ($self, $val) = @_;
-    no strict 'refs';
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
     local *{"Config::IOD::Expr::_Compiled::val"} = sub {
         my $arg = shift;
         if ($arg =~ /(.+)\.(.+)/) {
@@ -443,6 +446,16 @@ sub _decode_expr {
         }
     };
     Config::IOD::Expr::_parse_expr($val);
+}
+
+sub _warn {
+    my ($self, $msg) = @_;
+    warn join(
+        "",
+        @{ $self->{_include_stack} } ? "$self->{_include_stack}[0] " : "",
+        "line $self->{_linum}: ",
+        $msg
+    );
 }
 
 sub _err {
@@ -491,7 +504,7 @@ sub _init_read {
     # set expr variables
     {
         last unless $self->{enable_expr};
-        no strict 'refs';
+        no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
         my $pkg = \%{"Config::IOD::Expr::_Compiled::"};
         undef ${"Config::IOD::Expr::_Compiled::$_"} for keys %$pkg;
         my $vars = $self->{expr_vars};
@@ -543,7 +556,7 @@ Config::IOD::Base - Base class for Config::IOD and Config::IOD::Reader
 
 =head1 VERSION
 
-This document describes version 0.343 of Config::IOD::Base (from Perl distribution Config-IOD-Reader), released on 2021-06-23.
+This document describes version 0.344 of Config::IOD::Base (from Perl distribution Config-IOD-Reader), released on 2022-05-02.
 
 =head1 EXPRESSION
 
@@ -764,6 +777,15 @@ simply be ignored as a regular comment.
 
 B<NOTE: Turning this setting on violates IOD specification.>
 
+=head2 warn_perl => bool (default: 0)
+
+Emit warning if configuration contains key line like these:
+
+ foo=>"bar"
+ foo => bar,
+
+which suggest user is assuming configuration is in Perl format instead of INI.
+
 =for END_BLOCK: attributes
 
 =head1 METHODS
@@ -788,6 +810,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/Config-IOD
 
 Source repository is at L<https://github.com/perlancar/perl-Config-IOD-Reader>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2021, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Config-IOD-Reader>
@@ -795,16 +845,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

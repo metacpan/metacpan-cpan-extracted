@@ -12,7 +12,8 @@ use_ok qw{ Module::ScanDeps::Static };
 my $data_start_pos = tell DATA;
 
 subtest 'use' => sub {
-  my $scanner = Module::ScanDeps::Static->new( { handle => *DATA } );
+  my $scanner
+    = Module::ScanDeps::Static->new( { handle => *DATA, add_version => 1 } );
 
   my @dependencies = $scanner->parse;
   my $require      = $scanner->get_require;

@@ -1,0 +1,120 @@
+#!/bin/sh
+# Sys::OsPackage test container startup script
+# Ian Kluft
+
+# shell function to match platform name via ID or ID_LIKE from /etc/os-release or kernel from uname
+platform()
+{
+    match="$1" # string to match
+    if [ "$ID" = "$match" ]
+    then
+        return 0
+    fi
+    for str in $ID_LIKE
+    do
+        if [ "$str" = "$match" ]
+        then
+            return 0
+        fi
+    done
+    if [ "$str" = $(uname -s) ]
+    then
+        return 0
+    fi
+    return 1
+}
+
+# This is the first thing to run inside the container. It needs to install dependencies for the unit test script.
+cd /work
+
+# distro-specific setup
+if [ -f /etc/os-release ]
+then
+    . /etc/os-release
+fi
+platform=${ID:-$(uname)}
+
+# This is too chatty for most test runs - redirect output to /dev/null unless CONTAINER_TEST_LOG is set
+if [ -z "$CONTAINER_TEST_LOG" ]
+then
+    output="/dev/null"
+    echo "container setup may take minutes - set CONTAINER_TEST_LOG=1 to log output"
+else
+    output="/work/log-$platform-$CONTAINER_TEST_TIMESTAMP"
+    echo "container setup may take minutes - logging output to $output"
+fi
+
+(
+    echo "system platform: $platform"
+    if platform debian || platform ubuntu
+    then
+        apt update --yes --quiet
+        apt install --yes --quiet perl-modules libmodule-build-perl libyaml-perl make tar
+    elif  platform fedora || platform centos || platform rhel
+    then
+        dnf upgrade --quiet --assumeyes
+        dnf --assumeyes --quiet install perl perl-Module-Build perl-YAML make tar < /dev/null
+    elif  platform alpine
+    then
+        apk update --quiet
+        apk add --quiet perl perl-module-build perl-yaml make tar < /dev/null
+    elif platform arch
+    then
+        pacman --sync --refresh --quiet
+        pacman --sync --needed --quiet --noconfirm perl perl-module-build perl-yaml make tar
+    elif platform opensuse || platform suse
+    then
+        zypper --non-interactive --quiet update
+        zypper --non-interactive --quiet install perl perl-Module-Build perl-YAML make tar gzip < /dev/null
+    fi
+) >>$output 2>&1
+
+# run /etc/profile if it exists to set up OS environment
+# PATH is mostly what we need from it - this is how the OS tells us where it hides everything
+if [ -f /etc/profile ]
+then
+    . /etc/profile >>$output 2>&1
+fi
+
+# adjust PERL5LIB
+perl5dirs=$([ -d /usr/share/perl5 ] && echo /usr/share/perl5; [ -d /usr/share/perl ] && echo /usr/share/perl/*)
+export PERL5LIB=$(perl -e 'print join(":", qw(/work/lib), @INC, qw('"$perl5dirs"'))."\n";')
+
+# unpack Sys::OsRelease tarball
+cleandirs=""
+for mod in Sys-OsRelease Sys-OsPackage
+do
+    tarball="$(ls -1 $mod-*.tar.gz 2>>$output | tail -1)"
+    [ -f "$tarball" ] || continue;
+    basemod="$(basename $tarball .tar.gz)"
+    (
+        [ -d $basemod ] && rm -rf $basemod
+        tar -xf $tarball \
+            && cd $basemod \
+            && perl Build.PL \
+            && perl Build \
+            && perl Build test \
+            && perl Build install
+    ) >>$output 2>&1
+    cleandirs="$cleandirs $basemod"
+done
+
+# load modules (as OS pacakges if possible) needed for container-tests.pl to run
+bin/fetch-reqs.pl container-tests.pl >>$output 2>&1 || exit 1
+
+# run tests now that their dependencies are loaded
+if [ -n "$CONTAINER_TEST_DEBUG" ]
+then
+    export SYS_OSPACKAGE_DEBUG=1
+fi
+./container-tests.pl
+
+# clean up
+for cleandir in $cleandirs bin lib build
+do
+    if [ -d "$cleandir" ]
+    then
+        rm -rf "$cleandir"
+    fi
+    rm -f $cleandir.tar.gz
+done >>$output 2>&1

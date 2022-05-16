@@ -1,7 +1,5 @@
 package Bitcoin::Crypto::Key::ExtPrivate;
-
-our $VERSION = "1.005";
-
+$Bitcoin::Crypto::Key::ExtPrivate::VERSION = '1.007';
 use v5.10;
 use strict;
 use warnings;
@@ -109,7 +107,9 @@ sub get_public_key
 		$self->parent_fingerprint,
 		$self->depth
 	);
+
 	$public->set_network($self->network);
+	$public->set_purpose($self->purpose);
 
 	return $public;
 }
@@ -283,8 +283,6 @@ Same as C<from_seed>, but C<$seed> is treated as hex string.
 
 Returns the key serialized in format specified in BIP32 as byte string.
 
-B<Note:> different prefixes defined in BIP49 and BIP84 are not yet supported.
-
 =head2 to_serialized_base58
 
 	$serialized_base58 = $object->to_serialized_base58()
@@ -298,8 +296,6 @@ Behaves the same as C<to_serialized>, but performs Base58Check encoding on the r
 Tries to unserialize byte string C<$serialized> with format specified in BIP32.
 
 Dies on errors. If multiple networks match serialized data specify C<$network> manually (id of the network) to avoid exception.
-
-B<Note:> different prefixes defined in BIP49 and BIP84 are not yet supported.
 
 =head2 from_serialized_base58
 
@@ -343,6 +339,8 @@ Returns a new extended key instance - result of a derivation.
 
 A helper that constructs a L<Bitcoin::Crypto::BIP44> path from C<%data> and calls L</derive_key> with it. Refer to L<Bitcoin::Crypto::BIP44/PROPERTIES> to see what you can include in C<%data>.
 
+Using this method instead of specifying BIP44 path yourself will make sure all features of BIP44 derivation will be enabled, like different prefixes for extended keys (C<xprv> / C<yprv> / C<zprv>) and address type generation checking.
+
 I<Note: coin_type parameter will be ignored, and the current network configuration set in the extended key will be used.>
 
 =head2 get_fingerprint
@@ -380,3 +378,4 @@ This module throws an instance of L<Bitcoin::Crypto::Exception> if it encounters
 =back
 
 =cut
+

@@ -6,6 +6,8 @@
 #define PERL_NS_ROOT "JavaScript::QuickJS"
 
 #define PERL_BOOLEAN_CLASS "Types::Serialiser::Boolean"
+
+#define PQJS_FUNCTION_CLASS PERL_NS_ROOT "::Function"
 #define PQJS_REGEXP_CLASS PERL_NS_ROOT "::RegExp"
 
 typedef struct {
@@ -191,7 +193,13 @@ static SV* _JSValue_to_SV (pTHX_ JSContext* ctx, JSValue jsval, SV** err_svp) {
 
         case JS_TAG_OBJECT:
             if (JS_IsFunction(ctx, jsval)) {
-                SV* func_sv = exs_new_structref(perl_qjs_func_s, PERL_NS_ROOT "::Function");
+                load_module(
+                    PERL_LOADMOD_NOIMPORT,
+                    newSVpvs(PQJS_FUNCTION_CLASS),
+                    NULL
+                );
+
+                SV* func_sv = exs_new_structref(perl_qjs_func_s, PQJS_FUNCTION_CLASS);
                 perl_qjs_func_s* pqjs = exs_structref_ptr(func_sv);
 
                 *pqjs = (perl_qjs_func_s) {
@@ -203,15 +211,7 @@ static SV* _JSValue_to_SV (pTHX_ JSContext* ctx, JSValue jsval, SV** err_svp) {
                 ctx_opaque_s* ctxdata = JS_GetContextOpaque(ctx);
                 ctxdata->refcount++;
 
-                CV* perlfunc = get_cv(PERL_NS_ROOT "::_wrap_jsfunc", 0);
-                assert(perlfunc);
-
-                SV* perlargs[] = {
-                    func_sv,
-                    NULL,
-                };
-
-                RETVAL = exs_call_sv_scalar((SV*) perlfunc, perlargs);
+                RETVAL = func_sv;
             }
             else if (JS_IsArray(ctx, jsval)) {
                 RETVAL = _JSValue_array_to_SV(aTHX_ ctx, jsval, err_svp);
@@ -338,6 +338,8 @@ static JSValue __do_perl_callback(JSContext *ctx, JSValueConst this_val, int arg
         if (from_perl) {
             JSValue to_js = _sv_to_jsvalue(aTHX_ ctx, from_perl, &error_sv);
 
+            sv_2mortal(from_perl);
+
             if (!error_sv) return to_js;
         }
     }
@@ -396,6 +398,16 @@ static JSValue _sv_to_jsvalue(pTHX_ JSContext* ctx, SV* value, SV** error_svp) {
             if (sv_isobject(value)) {
                 if (sv_derived_from(value, PERL_BOOLEAN_CLASS)) {
                     return JS_NewBool(ctx, SvTRUE(SvRV(value)));
+                }
+                else if (sv_derived_from(value, PQJS_FUNCTION_CLASS)) {
+                    perl_qjs_func_s* pqjs = exs_structref_ptr(value);
+
+                    if (LIKELY(pqjs->ctx == ctx)) {
+                        return JS_DupValue(ctx, pqjs->jsfunc);
+                    }
+
+                    *error_svp = newSVpvf("%s for QuickJS %p given to QuickJS %p!", PQJS_FUNCTION_CLASS, pqjs->ctx, ctx);
+                    return JS_NULL;
                 }
                 else if (sv_derived_from(value, PQJS_REGEXP_CLASS)) {
                     perl_qjs_regexp_s* pqjs = exs_structref_ptr(value);
@@ -611,6 +623,14 @@ static const char* _REGEXP_ACCESSORS[] = {
     "unicode",
     "lastIndex",
 };
+
+/* These must correlate to the ALIAS values below. */
+static const char* _FUNCTION_ACCESSORS[] = {
+    "length",
+    "name",
+};
+
+#define FUNC_CALL_INITIAL_ARGS 2
 
 /* ---------------------------------------------------------------------- */
 
@@ -885,8 +905,6 @@ DESTROY( SV* self_sv )
         _free_jsctx(aTHX_ pqjs->ctx);
 
 # ----------------------------------------------------------------------
-# This package isn’t exposed to Perl code; it just exists to facilitate
-# calling JS functions from Perl. All instances are wrapped in closures.
 
 MODULE = JavaScript::QuickJS        PACKAGE = JavaScript::QuickJS::Function
 
@@ -903,20 +921,50 @@ DESTROY( SV* self_sv )
 
         _free_jsctx(aTHX_ pqjs->ctx);
 
+SV*
+_give_self( SV* self_sv, ... )
+    CODE:
+        RETVAL = SvREFCNT_inc(self_sv);
+    OUTPUT:
+        RETVAL
 
 SV*
-call( SV* self_sv, ... )
+length( SV* self_sv)
+    ALIAS:
+        name = 1
     CODE:
         perl_qjs_func_s* pqjs = exs_structref_ptr(self_sv);
 
-        U32 params_count = items - 1;
+        JSValue myret = JS_GetPropertyStr(pqjs->ctx, pqjs->jsfunc, _FUNCTION_ACCESSORS[ix]);
 
-        JSValue jsvars[params_count];
+        SV* err = NULL;
+
+        RETVAL = _JSValue_to_SV(aTHX_ pqjs->ctx, myret, &err);
+
+        JS_FreeValue(pqjs->ctx, myret);
+
+        if (err) croak_sv(err);
+
+    OUTPUT:
+        RETVAL
+
+
+SV*
+call( SV* self_sv, SV* this_sv=&PL_sv_undef, ... )
+    CODE:
+        perl_qjs_func_s* pqjs = exs_structref_ptr(self_sv);
+
+        U32 params_count = items - FUNC_CALL_INITIAL_ARGS;
 
         SV* error = NULL;
 
+        JSValue thisjs = _sv_to_jsvalue(aTHX_ pqjs->ctx, this_sv, &error);
+        if (error) croak_sv(error);
+
+        JSValue jsvars[params_count];
+
         for (int32_t i=0; i<params_count; i++) {
-            SV* cur_sv = ST(i+1);
+            SV* cur_sv = ST(i + FUNC_CALL_INITIAL_ARGS);
 
             JSValue jsval = _sv_to_jsvalue(aTHX_ pqjs->ctx, cur_sv, &error);
 
@@ -931,9 +979,11 @@ call( SV* self_sv, ... )
             jsvars[i] = jsval;
         }
 
-        JSValue jsret = JS_Call(pqjs->ctx, pqjs->jsfunc, JS_NULL, params_count, jsvars);
+        JSValue jsret = JS_Call(pqjs->ctx, pqjs->jsfunc, thisjs, params_count, jsvars);
 
         RETVAL = _return_jsvalue_or_croak(aTHX_ pqjs->ctx, jsret);
+
+        JS_FreeValue(pqjs->ctx, thisjs);
 
         for (uint32_t i=0; i<params_count; i++) {
             JS_FreeValue(pqjs->ctx, jsvars[i]);

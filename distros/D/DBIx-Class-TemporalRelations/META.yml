@@ -1,0 +1,145 @@
+---
+abstract: 'Establish and introspect time-based relationships between tables.'
+author:
+  - 'D Ruth Holloway <ruth@hiruthie.me>'
+build_requires:
+  DBIx::Class::Candy: '0'
+  DBIx::Class::Core: '0'
+  DBIx::Class::Schema: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::Plugin::ExitSummary: '0'
+  Test2::Plugin::NoWarnings: '0'
+  Test2::Plugin::Times: '0'
+  Test2::V0: '0'
+  Test::DBIx::Class: '0'
+  Test::More: '0'
+  base: '0'
+  lib: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: '0'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-TemporalRelations
+provides:
+  DBIx::Class::TemporalRelations:
+    file: lib/DBIx/Class/TemporalRelations.pm
+    version: '0.9000'
+requires:
+  Carp: '0'
+  DBIx::Class::Candy::Exports: '0'
+  DBIx::Class::Relationship::Base: '0'
+  Lingua::EN::Inflexion: '0'
+  Modern::Perl: '0'
+  Sub::Quote: '0'
+  parent: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://gitlab.com/GeekRuthie/DBIx-Class-TemporalRelations/-/issues
+  homepage: https://p3rl.org/DBIx::Class::TemporalRelations
+  repository: https://gitlab.com/GeekRuthie/DBIx-Class-TemporalRelations.git
+version: '0.9000'
+x_BuiltWith:
+  failures:
+    DBIx::Class::Core: 'Module::MetaData could not parse a version from /home/geekruthie/perl5/perlbrew/perls/perl-5.34.0/lib/site_perl/5.34.0/DBIx/Class/Core.pm'
+    DBIx::Class::Relationship::Base: 'Module::MetaData could not parse a version from /home/geekruthie/perl5/perlbrew/perls/perl-5.34.0/lib/site_perl/5.34.0/DBIx/Class/Relationship/Base.pm'
+    DBIx::Class::Schema: 'Module::MetaData could not parse a version from /home/geekruthie/perl5/perlbrew/perls/perl-5.34.0/lib/site_perl/5.34.0/DBIx/Class/Schema.pm'
+  modules:
+    CPAN::Meta: '2.150010'
+    Carp: '1.52'
+    DBIx::Class::Candy: '0.005003'
+    DBIx::Class::Candy::Exports: '0.005003'
+    Dist::Zilla: '6.024'
+    Dist::Zilla::Plugin::Authority: '1.009'
+    Dist::Zilla::Plugin::AutoPrereqs: '6.024'
+    Dist::Zilla::Plugin::CPANFile: '6.024'
+    Dist::Zilla::Plugin::ChangeStats::Git: 0.6.0
+    Dist::Zilla::Plugin::CheckChangesHasContent: '0.011'
+    Dist::Zilla::Plugin::CoalescePod: 0.3.0
+    Dist::Zilla::Plugin::ConfirmRelease: '6.024'
+    Dist::Zilla::Plugin::ContributorCovenant: '2.000000'
+    Dist::Zilla::Plugin::ContributorsFile: 0.3.0
+    Dist::Zilla::Plugin::CopyFilesFromBuild: '0.170880'
+    Dist::Zilla::Plugin::CopyrightYearFromGit: '0.009'
+    Dist::Zilla::Plugin::Covenant: 0.1.2
+    Dist::Zilla::Plugin::ExecDir: '6.024'
+    Dist::Zilla::Plugin::Git::Check: '2.048'
+    Dist::Zilla::Plugin::Git::Commit: '2.048'
+    Dist::Zilla::Plugin::Git::CommitBuild: '2.048'
+    Dist::Zilla::Plugin::Git::Contributors: '0.036'
+    Dist::Zilla::Plugin::Git::GatherDir: '2.048'
+    Dist::Zilla::Plugin::Git::Push: '2.048'
+    Dist::Zilla::Plugin::Git::Tag: '2.048'
+    Dist::Zilla::Plugin::GitLab::Meta: '1.0002'
+    Dist::Zilla::Plugin::GitLab::Update: '1.0002'
+    Dist::Zilla::Plugin::INI::Baked: '0.002002'
+    Dist::Zilla::Plugin::InstallGuide: '1.200014'
+    Dist::Zilla::Plugin::InstallRelease: '0.008'
+    Dist::Zilla::Plugin::License: '6.024'
+    Dist::Zilla::Plugin::MakeMaker: '6.024'
+    Dist::Zilla::Plugin::Manifest: '6.024'
+    Dist::Zilla::Plugin::ManifestSkip: '6.024'
+    Dist::Zilla::Plugin::MetaData::BuiltWith: '1.004005'
+    Dist::Zilla::Plugin::MetaJSON: '6.024'
+    Dist::Zilla::Plugin::MetaProvides::Package: '2.004003'
+    Dist::Zilla::Plugin::MetaYAML: '6.024'
+    Dist::Zilla::Plugin::MinimumPerl: '1.006'
+    Dist::Zilla::Plugin::NextRelease: '6.024'
+    Dist::Zilla::Plugin::NextVersion::Semantic: 0.2.6
+    Dist::Zilla::Plugin::OurPkgVersion: '0.21'
+    Dist::Zilla::Plugin::PodWeaver: '4.009'
+    Dist::Zilla::Plugin::Prereqs::Plugins: '1.003003'
+    Dist::Zilla::Plugin::PreviousVersion::Changelog: 0.2.6
+    Dist::Zilla::Plugin::ReadmeMarkdownFromPod: '0.141140'
+    Dist::Zilla::Plugin::RunExtraTests: '0.029'
+    Dist::Zilla::Plugin::SchwartzRatio: 0.3.4
+    Dist::Zilla::Plugin::Test::Compile: '2.058'
+    Dist::Zilla::Plugin::Test::ReportPrereqs: '0.028'
+    Dist::Zilla::Plugin::TestRelease: '6.024'
+    Dist::Zilla::Plugin::UploadToCPAN: '6.024'
+    ExtUtils::MakeMaker: '7.62'
+    File::Spec: '3.80'
+    FindBin: '1.52'
+    IO::Handle: '1.46'
+    IPC::Open3: '1.21'
+    Lingua::EN::Inflexion: '0.002007'
+    Modern::Perl: '1.20200211'
+    Sub::Quote: '2.006006'
+    Test2::Plugin::ExitSummary: '0.000144'
+    Test2::Plugin::NoWarnings: '0.09'
+    Test2::Plugin::Times: '0.000144'
+    Test2::V0: '0.000144'
+    Test::DBIx::Class: '0.52'
+    Test::More: '1.302183'
+    base: '2.27'
+    lib: '0.65'
+    parent: '0.238'
+    strict: '1.12'
+    warnings: '1.51'
+  perl:
+    original: v5.34.0
+    qv: 1
+    version:
+      - 5
+      - 34
+      - 0
+  platform: linux
+x_author_pledge:
+  version: '1'
+x_authority: cpan:GEEKRUTH
+x_contributor_covenant:
+  version: '0.02'
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -1,26 +1,38 @@
 Revision history for Perl extension Bitcoin::Crypto.
 
-1.005 Sat Nov 6 16:00:00 2021
+1.007 Sat May 14 2022
+	- extended keys derived using BIP44 scheme now use specific serialization according to BIP49 and BIP84
+	- basic keys derived using BIP44 scheme now prevent incorrect type of address from being generated
+	- Segregated Witness compatibility addresses can no longer be generated when there's no segwit_hrp config in network
+
+1.006 Fri May 13 2022
+	- add predefined 'dogecoin' and 'dogecoin_testnet' networks (thanks @chromatic)
+	- add 'get_account' option to BIP44 to get derivation path only up the account part
+	- BIP44 'index' is no longer required - uses 0 by default
+	- slightly improved documentation
+	- switch to Dist::Zilla
+
+1.005 Sat Nov 6 2021
 	- update CryptX dependency to fix compatibility with the latest Math::BigInt
 
-1.004 Sat Oct 30 10:00:00 2021
+1.004 Sat Oct 30 2021
 	- BIP44 implementation now also supports BIP49 and BIP84 via its 'purpose' parameter
 
-1.003 Sat Oct 9 18:00:00 2021
+1.003 Sat Oct 9 2021
 	- fix return value of set_network method in key instances to match documentation
 	- update CryptX dependency and check the version of optional GMP dependency to fix testers
 
-1.002 Wed Sep 22 12:00:00 2021
+1.002 Wed Sep 22 2021
 	- implement bech32m encoding and use it in segwit v1+ addresses
 	- fix bech32 encoding by removing mandatory bit translation - old behavior can be achieved by using new translate_ functions
 	- change encode_bech32 and decode_bech32 input and output format
 	- add new Bitcoin::Crypto::Bech32 exported functions: translate_5to8 and translate_8to5
 	- remove Bitcoin::Crypto::Bech32::split_bech32 from exported functions
 
-1.001 Thu Sep 9 15:00:00 2021
+1.001 Thu Sep 9 2021
 	- prefer GMP to LTM backend in Math::BigInt
 
-1.000 Sun Sep 5 11:00:00 2021
+1.000 Sun Sep 5 2021
 	- end of the beta phase
 	- imported mnemonics must now be proper unicode strings (important for non-english mnemonics)
 	- module will now use Crypt::Perl when available to produce deterministic signatures
@@ -28,7 +40,7 @@ Revision history for Perl extension Bitcoin::Crypto.
 	- set_compressed method on keys now properly handles undefined values
 	- code refactors and documentation improvements
 
-0.997 Fri Jun 11 00:00:00 2021
+0.997 Fri Jun 11 2021
 	- implement BIP44 derivation paths
 	- add derive_key_bip44 helper to extended private key class
 	- remove previously deprecated Exception::KeySign
@@ -37,7 +49,7 @@ Revision history for Perl extension Bitcoin::Crypto.
 	- fix distribution metadata
 	- change how internal constants are handled
 
-0.996 Thu Jan 7 23:00:00 2021
+0.996 Thu Jan 7 2021
 	- deprecate Exception::KeySign in favor of Exception::Sign
 	- add Exception::Verify, trapping CryptX exceptions during signature verification
 	- replace Throwable dependency with custom error class
@@ -47,13 +59,13 @@ Revision history for Perl extension Bitcoin::Crypto.
 	- improve documentation
 	- improved test suite (now covers some edge cases)
 
-0.995 Wed Sep 16 18:00:00 2020
+0.995 Wed Sep 16 2020
 	- downgrade and fix dependencies
 	- fix minimum perl version
 	- improve documentation
 	- explicitly document beta version
 
-0.994 Sun Sep 06 22:00:00 2020
+0.994 Sun Sep 06 2020
 	- remove Math::EllipticCurve::Prime dependency - replaced with custom function
 	- remove Math::BigInt::GMP dependency - replaced with LTM
 	- replace most of Base58 module internals with CryptX, leave the module for Base58Check
@@ -67,23 +79,23 @@ Revision history for Perl extension Bitcoin::Crypto.
 	- improve documentation
 	- tidy up source files with perltidy
 
-0.993 Thu Jan 30 23:00:00 2020
+0.993 Thu Jan 30 2020
 	- replace some dependencies with CryptX functions
 	- add shortcut functions in Bitcoin::Crypto package (autoloading of important classes)
 	- more tests and docs
 	- repo cleanup
 
-0.992 Sun Jan 12 10:00:00 2020
+0.992 Sun Jan 12 2020
 	- change Bitcoin::Crypto::Network register method to accept a plain hash (instead of a hashref)
 	- run examples during tests
 
-0.991 Wed Jan 08 22:00:00 2020
+0.991 Wed Jan 08 2020
 	- rewrite Bitcoin::Crypto::Network to Moo (changed interface)
 	- add examples directory and bip44 implementation example
 	- 32 bit compatibility attempt
 	- add the missing test to distribution
 
-0.99 Sun Jan 05 20:00:00 2020
+0.99 Sun Jan 05 2020
 	- almost complete rewrite of the module
 	- added extended keys
 	- added segwit compatibility
@@ -91,10 +103,11 @@ Revision history for Perl extension Bitcoin::Crypto.
 	- many small improvements
 	- beta relase - yet to be tested in a realistic environment
 
-0.02 Fri Nov 23 22:00:00 2018
+0.02 Fri Nov 23 2018
 	- enable package on ealier Perl versions
 	- remove pack_hex from Bitcoin::Crypto::Util
 	- add pad_hex to Bitoin::Crypto::Helpers
 
-0.01  Mon Nov 15 21:58:51 2018
+0.01  Mon Nov 15 2018
 	- first version
+

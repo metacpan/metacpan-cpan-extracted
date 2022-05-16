@@ -648,12 +648,6 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/response/header/a',
-          keywordLocation => jsonp(qw(/paths /foo post responses 200 headers a schema writeOnly)),
-          absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo post responses 200 headers a schema writeOnly)))->to_string,
-          error => 'write-only value is present',
-        },
-        {
           instanceLocation => '/response/body/c',
           keywordLocation => jsonp(qw(/paths /foo post responses 200 content application/json schema properties c writeOnly)),
           absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo post responses 200 content application/json schema properties c writeOnly)))->to_string,

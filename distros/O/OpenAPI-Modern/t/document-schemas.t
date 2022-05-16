@@ -42,14 +42,26 @@ subtest 'bad subschemas' => sub {
   );
 
   cmp_deeply(
-    ($doc->errors)[0]->TO_JSON,
-    {
-      instanceLocation => '/components/schemas/alpha_schema/not/minimum',
-      keywordLocation => re(qr{/\$ref/properties/minimum/type$}),
-      absoluteKeywordLocation => 'https://json-schema.org/draft/2020-12/meta/validation#/properties/minimum/type',
+    ($doc->errors)[0],
+    methods(
+      instance_location => '/components/schemas/alpha_schema/not/minimum',
+      keyword_location => re(qr{/\$ref/properties/minimum/type$}),
+      absolute_keyword_location => str('https://json-schema.org/draft/2020-12/meta/validation#/properties/minimum/type'),
       error => 'got string, not number',
-    },
+      mode => 'evaluate',
+    ),
     'subschemas identified, and error found',
+  );
+
+  my $serialized = JSON::Schema::Modern::Result->new(
+    valid => 0,
+    errors => [ $doc->errors ],
+    exception => 1,
+  );
+
+  is(
+    index($serialized, "at '/components/schemas/alpha_schema/not/minimum': got string, not number\n"), 0,
+    'errors serialize using the instance locations within the document',
   );
 };
 

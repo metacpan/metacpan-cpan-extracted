@@ -1,6 +1,10 @@
 Revision history for Term::TablePrint
 
 
+0.151   2022-05-14
+        - Search function: use the qr// operator.
+        - Removed warnings for removed options.
+
 0.150   2022-04-06
         - Search: 'readline' is now in Term::From::ReadLine.
         - Update year copyright.

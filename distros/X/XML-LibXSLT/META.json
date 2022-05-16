@@ -48,6 +48,6 @@
          "web" : "https://github.com/shlomif/perl-XML-LibXSLT"
       }
    },
-   "version" : "2.000000",
+   "version" : "2.001000",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

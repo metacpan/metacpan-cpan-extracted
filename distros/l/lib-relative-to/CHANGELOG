@@ -1,1 +1,7 @@
+1.1000   2022-05-12
+
+- add Directory::relative::to which provides the same functionality
+  but returning fully-qualified directory names instead of sticking
+  them in @INC
+
 1.0000   2020-02-20   First release

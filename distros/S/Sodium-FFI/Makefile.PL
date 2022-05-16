@@ -11,6 +11,8 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "FFI implementation of libsodium",
   "AUTHOR" => "Chase Whitener <capoeirab\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
+    "Alien::Base::Wrapper" => 0,
+    "Alien::Sodium" => "2.00",
     "ExtUtils::MakeMaker" => 0,
     "FFI::Build::MM" => "0.83"
   },
@@ -40,7 +42,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t t/aead/*.t t/pub_key_crypto/*.t"
   }

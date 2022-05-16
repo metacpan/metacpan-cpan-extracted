@@ -1,0 +1,24 @@
+use strict;
+use warnings;
+
+our @Final = (
+    sub {
+        RT->Logger->debug("Converting attributes");
+
+        my $attribute = RT::Attribute->new( RT->SystemUser );
+        $attribute->LoadByNameAndObject( Name => 'Search - Changes Scheduled, Next 7 Days', Object => RT->System );
+        my ($status, $msg) = $attribute->__Set( Field => 'Name', Value => 'SavedSearch' );
+        RT->Logger->warning( "Couldn't change attribute $msg" ) unless $status;
+        ($status, $msg) = $attribute->__Set( Field => 'Description', Value => 'Changes Scheduled, Next 7 Days' );
+        RT->Logger->warning( "Couldn't change attribute $msg" ) unless $status;
+
+        $attribute = RT::Attribute->new( RT->SystemUser );
+        $attribute->LoadByNameAndObject( Name => 'Search - Changes Deployed, Last 30 Days', Object => RT->System );
+        ($status, $msg) = $attribute->__Set( Field => 'Name', Value => 'SavedSearch' );
+        RT->Logger->warning( "Couldn't change attribute $msg" ) unless $status;
+        ($status, $msg) = $attribute->__Set( Field => 'Description', Value => 'Changes Deployed, Last 30 Days' );
+        RT->Logger->warning( "Couldn't change attribute $msg" ) unless $status;
+    },
+);
+
+

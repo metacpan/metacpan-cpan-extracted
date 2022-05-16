@@ -1,17 +1,43 @@
 Change log for Sys::OsRelease
 
-0.2.0 2022-04-28T22:57:58-07:00 America/Los_Angeles
+0.2.3 2022-05-15T00:38:27-07:00 America/Los_Angeles
+ [DOCS]
+ - remove NAME section from source POD. I didn't notice until now that
+   Pod::Weaver was adding a duplicate.
+
+0.2.2 2022-05-13T15:49:53-07:00 America/Los_Angeles
+ [DOCS]
+ - minor updates to POD docs
+
+ [REVISION]
+ - build updates
+
+0.2.1 2022-05-12T23:39:12-07:00 America/Los_Angeles
+ [DOCS]
+ - add reciprocal see-also link to System::Info
+
+ [REVISION]
+ - add Dist::Zilla plugin Test::UnusedVars and fix one function which it
+   flagged
+ - update t/test-inputs/003_samples/gen-sample to regenerate sample data
+   from all distros if no arguments
+ - add more Open Source community distros recongized as common
+ - update tests for sample os-release from opensuse/leap
+ - add basic tests for import of singleton-management methods (just check
+   if they landed)
+
+0.2.0 2022-04-28T22:58:00-07:00 America/Los_Angeles
  [ENHANCEMENTS]
  - add import_singleton() so new module Sys::OsPackage can import rather
    than copy the singleton-management methods
 
-0.1.1 2022-04-28T16:04:09Z America/Los_Angeles
+0.1.1 2022-04-28T16:04:09-07:00 America/Los_Angeles
  [REVISION]
  - based on CPAN Testers feedback, remove occurrences of // operator which
    did not exist prior to Perl 5.10 (in keeping with module's minimal
    prerequisites)
 
-0.1.0 2022-04-27T14:47:00Z America/Los_Angeles
+0.1.0 2022-04-27T14:47:00-07:00 America/Los_Angeles
  [BUG FIXES]
  - all methods now correctly handle being called via class name in addition
    to instance reference
@@ -23,7 +49,7 @@ Change log for Sys::OsRelease
  - added tests for method calls from the class name in addition to object
    reference
 
-0.0.2 2022-04-26T23:22:00Z America/Los_Angeles
+0.0.2 2022-04-26T23:22:00-07:00 America/Los_Angeles
  [BUG FIXES]
  - fix from CPAN Testers results: on mswin32 init empty rather than bail
    out
@@ -37,6 +63,6 @@ Change log for Sys::OsRelease
  - add unit tests for empty configurations simulating systems where
    os-release doesn't exist (using empty search path)
 
-0.0.1 2022-04-26T00:18:04Z America/Los_Angeles
+0.0.1 2022-04-26T00:18:04-07:00 America/Los_Angeles
  [REVISION]
  - initial revision

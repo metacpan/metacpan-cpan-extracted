@@ -1,7 +1,7 @@
 ---
 abstract: 'scan modules for dependencies'
 author:
-  - 'Rob Lauer <rlauer6@comcast.net>'
+  - 'BIGFOOT <bigfoot@cpan.org>'
 build_requires:
   Class::Accessor::Fast: '0.51'
   ExtUtils::MakeMaker: '0'
@@ -28,7 +28,7 @@ no_index:
 provides:
   Module::ScanDeps::Static:
     file: lib/Module/ScanDeps/Static.pm
-    version: '0.3'
+    version: '0.4'
 requires:
   Class::Accessor::Fast: '0.51'
   IO::Scalar: '2.111'
@@ -36,5 +36,5 @@ requires:
   Pod::Find: '0'
   Readonly: '2.05'
   version: '0'
-version: '0.3'
+version: '0.4'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

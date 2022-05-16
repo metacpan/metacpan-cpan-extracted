@@ -1,7 +1,7 @@
 {
    "abstract" : "scan modules for dependencies",
    "author" : [
-      "Rob Lauer <rlauer6@comcast.net>"
+      "BIGFOOT <bigfoot@cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
@@ -56,10 +56,10 @@
    "provides" : {
       "Module::ScanDeps::Static" : {
          "file" : "lib/Module/ScanDeps/Static.pm",
-         "version" : "0.3"
+         "version" : "0.4"
       }
    },
    "release_status" : "stable",
-   "version" : "0.3",
+   "version" : "0.4",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

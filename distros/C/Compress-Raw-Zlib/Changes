@@ -1,6 +1,40 @@
 CHANGES
 -------
 
+  2.104 14 April 2022
+
+      * Add Compress::Raw::Zlib::VERSION to output
+        Sat May 14 15:16:57 2022 +0100
+        3e22c93169a67986017f64d9a2e5085c417d8624
+
+      * Dump version info when running test harness
+        Sat May 14 15:10:17 2022 +0100
+        ca9f33ba0323d0abc91a83800636f180b2b44162
+
+      * Fix use of ZLIB_INCLUDE/LIB
+        Sat May 14 09:01:38 2022 +0100
+        8a7d4a97d7441b61a8a888342766419044fa5a33
+
+      * More fixes for BUILD_ZLIB off
+        Sat May 14 08:54:04 2022 +0100
+        2d9650094dab90858ef58bfbda62f3bc60e159e4
+
+      * Add BUILD_ZLIB to the matrix
+        Sat May 14 08:31:54 2022 +0100
+        b61b92fc9d06bf04f1adec337357ffbd39535901
+
+      * Merge branch 'master' of https://github.com/pmqs/Compress-Raw-Zlib
+        Sat May 14 08:27:14 2022 +0100
+        3ac7d0d3d45ae263402fab1ebb3835e2ae16c5a6
+
+      * Fix for BUILD_ZLIB disabled
+        Sat May 14 08:25:34 2022 +0100
+        b0f04e37fb58a34ef01767ad16a8f63ca868eec6
+
+      * Add BUILD_ZLIB to the matrix
+        Sat May 14 08:22:56 2022 +0100
+        aa8f5ff981c7305c995d4e2f798ae0d7d45866a5
+
   2.104 13 April 2022
 
       * Merge pull request #11 from monkburger/symbol_fix_2

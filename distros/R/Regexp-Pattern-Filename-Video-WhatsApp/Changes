@@ -1,3 +1,11 @@
+0.002   2022-05-08  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with newer Pod::Weaver::Plugin::Regexp::Pattern
+          (0.010) to tweak Synopsis (show how to use without Regexp::Pattern).
+
+
 0.001   2022-05-08  Released-By: PERLANCAR
 
         - First release.

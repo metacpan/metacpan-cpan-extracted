@@ -1,0 +1,25 @@
+Change log for Sys::OsRelease
+
+0.1.2 2022-05-15T01:08:10-07:00 America/Los_Angeles
+ [DOCS]
+ - remove NAME section from source POD. I didn't notice until now that
+   Pod::Weaver was adding a duplicate.
+
+ [REVISION]
+ - fix Windows failure due to lack of a uname command (from CPAN Testers
+   feedback)
+ - Sys:OsRelease 0.2.3 dependency avoids 0.2.2 glitch where experiment with
+   MinimumPerl incorrectly chose 5.10
+
+0.1.1 2022-05-14T17:05:56-07:00 America/Los_Angeles
+ [DOCS]
+ - add see-also links to docs on packaging systems in each of the driver
+   modules
+
+ [REVISION]
+ - require Sys::OsRelease 0.2.0 due to dependency on import_singleton()
+   method (due to CPAN Testers feedback)
+
+0.1.0 2022-05-14T00:07:10-07:00 America/Los_Angeles
+ [MINOR]
+ - refactored into a module from personal scripts repository

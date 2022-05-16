@@ -1,7 +1,5 @@
 package Bitcoin::Crypto::Config;
-
-our $VERSION = "1.005";
-
+$Bitcoin::Crypto::Config::VERSION = '1.007';
 use v5.10;
 use strict;
 use warnings;
@@ -17,3 +15,4 @@ use constant {
 };
 
 1;
+

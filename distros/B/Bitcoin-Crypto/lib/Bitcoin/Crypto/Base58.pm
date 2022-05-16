@@ -1,7 +1,5 @@
 package Bitcoin::Crypto::Base58;
-
-our $VERSION = "1.005";
-
+$Bitcoin::Crypto::Base58::VERSION = '1.007';
 use v5.10;
 use strict;
 use warnings;
@@ -73,7 +71,7 @@ sub decode_base58check
 __END__
 =head1 NAME
 
-Bitcoin::Crypto::Base58 - Bitcoin's Base58 helpers in Perl
+Bitcoin::Crypto::Base58 - Bitcoin's Base58 helpers
 
 =head1 SYNOPSIS
 
@@ -90,7 +88,7 @@ Bitcoin::Crypto::Base58 - Bitcoin's Base58 helpers in Perl
 
 =head1 DESCRIPTION
 
-Implementation of Base58Check algorithm and alias to CryptX encode_b58b / decode_b58b
+Implementation of Base58Check algorithm and alias to CryptX C<encode_b58b> / C<decode_b58b>
 
 =head1 FUNCTIONS
 
@@ -106,8 +104,8 @@ Encoding takes one argument which is byte string.
 
 Decoding takes base58-encoded string
 
-These two functions are just aliases to I<encode_b58b> and I<decode_b58b> from
-L<Crypt::Misc> with some error checking.
+These two functions are just aliases to L<Crypt::Misc/encode_b58b> and
+L<Crypt::Misc/decode_b58b> with some error checking.
 
 =head2 encode_base58check
 
@@ -136,6 +134,8 @@ This module throws an instance of L<Bitcoin::Crypto::Exception> if it encounters
 
 =over 2
 
+=item L<Crypt::Misc>
+
 =item L<Bitcoin::Crypto::Key::Private>
 
 =item L<Bitcoin::Crypto::Key::Public>
@@ -143,3 +143,4 @@ This module throws an instance of L<Bitcoin::Crypto::Exception> if it encounters
 =back
 
 =cut
+

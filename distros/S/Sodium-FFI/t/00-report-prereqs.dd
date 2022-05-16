@@ -1,6 +1,8 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
+                                        'Alien::Base::Wrapper' => '0',
+                                        'Alien::Sodium' => '2.00',
                                         'ExtUtils::MakeMaker' => '0',
                                         'FFI::Build::MM' => '0.83',
                                         'perl' => '5.008'

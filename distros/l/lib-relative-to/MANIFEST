@@ -21,5 +21,6 @@ t/fakesvncheckout/trunk/t/svn-checkout.t
 t/fakesvncheckout/trunk/.svn/entries
 MANIFEST.SKIP
 t/fakesvncheckout/trunk/lib/placeholder
+lib/Directory/relative/to.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

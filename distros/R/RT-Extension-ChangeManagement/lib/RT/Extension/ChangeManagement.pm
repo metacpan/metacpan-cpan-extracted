@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::ChangeManagement;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 NAME
 
@@ -42,6 +42,11 @@ you may end up with duplicate data in your database.
 =item Restart your webserver
 
 =back
+
+=head1 UPGRADING
+
+To upgrade from an earlier version, see the instructions in the L<UPGRADING|UPGRADING.pod>
+document.
 
 =head1 DESCRIPTION
 

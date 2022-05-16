@@ -20,6 +20,7 @@ t/aead/aes256gcm.t
 t/aead/chacha20poly1305.t
 t/aead/chacha20poly1305_ietf.t
 t/crypto_auth.t
+t/pub_key_crypto/box.t
 t/pub_key_crypto/pubkey_sig.t
 xt/author/00-compile.t
 xt/author/pod-coverage.t

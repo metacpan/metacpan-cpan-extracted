@@ -1,9 +1,9 @@
 This archive contains the distribution Git-MoreHooks,
-version 0.012:
+version 0.013:
 
   More plugins (Git hooks) for package Git::Hooks.
 
-This software is copyright (c) 2021 by Mikko Koivunalho.
+This software is copyright (c) 2022 by Mikko Koivunalho.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

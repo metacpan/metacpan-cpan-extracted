@@ -35,7 +35,7 @@ your system.
 
 use XSLoader;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 XSLoader::load( __PACKAGE__, $VERSION );
 
@@ -66,7 +66,7 @@ Like C<std()> but for QuickJS’s C<os> module.
 
 =head2 $VALUE = I<OBJ>->eval( $JS_CODE )
 
-Comparable to running C<qjs -e '...'>. Returns the last value from $JS_CODE;
+Comparable to running C<qjs -e '...'>. Returns $JS_CODE’s last value;
 see below for details on type conversions from JavaScript to Perl.
 
 Untrapped exceptions in JavaScript will be rethrown as Perl exceptions.
@@ -111,7 +111,7 @@ This module converts returned values from JavaScript thus:
 
 =item * “Plain” objects become Perl hash references.
 
-=item * Functions become Perl code references.
+=item * Function objects become Perl L<JavaScript::QuickJS::Function> objects.
 
 =item * RegExp objects become Perl L<JavaScript::QuickJS::RegExp> objects.
 
@@ -144,6 +144,9 @@ to prevent your Perl “number” from becoming a JavaScript string. (Even in
 
 =item * Perl code references become JavaScript functions.
 
+=item * L<JavaScript::QuickJS::Function> objects become their original
+JavaScript C<Function> objects.
+
 =item * L<JavaScript::QuickJS::RegExp> objects become their original
 JavaScript C<RegExp> objects.
 
@@ -157,14 +160,9 @@ If any instance of a class of this distribution is DESTROY()ed at Perl’s
 global destruction, we assume that this is a memory leak, and a warning is
 thrown. To prevent this, avoid circular references.
 
-Callbacks make that tricky. As noted above, JavaScript functions
-given to Perl become Perl code references. Those code references are
-closures around the QuickJS context & runtime; once the code reference
-is destroyed, we release its reference to QuickJS.
-
-Perl code references given to JavaScript become JavaScript functions;
-however, QuickJS exposes no facility analogous to Perl C<DESTROY()>. Thus,
-we retain those Perl code references as part of the QuickJS context.
+Callbacks make that tricky. When you give a JavaScript function to Perl,
+that Perl object holds a reference to the QuickJS context. Only once that
+object is C<DESTROY()>ed do we release that QuickJS context reference.
 
 Consider the following:
 
@@ -174,30 +172,40 @@ Consider the following:
 
     $js->eval('__return( a => a )');
 
-Here $js retains a reference to the C<__return> callback. That callback
-refers to C<$return>. Once we run C<eval()>, Perl $return stores
-I<another> callback, which stores a reference to $js. Here we have a
-circular reference. The way to break it is simply:
+This sets $return to be a L<JavaScript::QuickJS::Function> instance. That
+object holds a reference to $js. $js also stores C<__return()>,
+which is a Perl code reference that closes around $return. Thus, we have
+a reference cycle: $return refers to $js, and $js refers to $return. Those
+two values will thus leak, and you’ll see a warning about it at Perl’s
+global destruction time.
+
+To break the reference cycle, just do:
 
     undef $return;
 
-… which is ugly, but it is what it is for now.
+… once you’re done with that variable.
 
-Note also that the C<__return> callback ends with C<()>. Recall that, in
-Perl, a function’s last statement value is the function’s default return
-value. Without the C<()>, then, our callback would return C<$return>,
-which would create yet I<another> reference cycle.
+You I<might> have thought you could instead do:
+
+    $js->set_globals( __return => undef )
+
+… but that doesn’t work because $js holds a reference to all Perl code
+references it B<ever> receives. This is because QuickJS, unlike Perl,
+doesn’t expose object destructors (C<DESTROY()> in Perl), so there’s no
+good way to release that reference to the code reference.
 
 =head1 CHARACTER ENCODING NOTES
 
-Although QuickJS (like all JS engines) assumes its strings are text,
-you can oftentimes pass in byte strings and get a reasonable result.
+QuickJS (like all JS engines) assumes its strings are text. Since Perl
+can’t distinguish text from bytes, though, it’s possible to convert
+Perl byte strings to JavaScript strings. It often yields a reasonable
+result, but not always.
 
 One place where this falls over, though, is ES6 modules. QuickJS, when
 it loads an ES6 module, decodes that module’s string literals to characters.
 Thus, if you pass in byte strings from Perl, QuickJS will treat your
 Perl byte strings’ code points as character code points, and when you
-combine those code points with the ones from your ES6 module you may
+combine those code points with those from your ES6 module you may
 get mangled output.
 
 Another place that may create trouble is if your argument to C<eval()>
@@ -225,11 +233,11 @@ For example, in Perl 5.34 C<print 1000000000000001.0> prints C<1e+15>.
 
 To counteract this loss of precision, add 0 to Perl’s numeric scalars
 (e.g., C<print 0 + 1000000000000001.0>); this will encourage Perl to store
-numbers as integers when possible, which fixes the precision problem.
+numbers as integers when possible, which fixes this precision problem.
 
 =item * Long-double and quad-math perls may lose precision when converting
 numbers to/from JavaScript. To see if this affects your perl—which, if
-you’re unsure, it probably doesn’t—run C<perl -V>, and see if the
+you’re unsure, it probably doesn’t—run C<perl -V>, and see if that perl’s
 compile-time options mention long doubles or quad math.
 
 =back
@@ -265,18 +273,14 @@ L<SpiderMonkey|https://spidermonkey.dev/> engine to Perl.
 
 =head1 LICENSE & COPYRIGHT
 
-Copyright 2022 Gasper Software Consulting.
+This library is copyright 2022 Gasper Software Consulting.
 
 This library is licensed under the same terms as Perl itself.
 See L<perlartistic>.
 
+QuickJS is copyright Fabrice Bellard and Charlie Gordon. It is released
+under the L<MIT license|https://opensource.org/licenses/MIT>.
+
 =cut
-
-#----------------------------------------------------------------------
-
-sub _wrap_jsfunc {
-    my $jsfunc_obj = $_[0];
-    return sub { $jsfunc_obj->call(@_) };
-}
 
 1;

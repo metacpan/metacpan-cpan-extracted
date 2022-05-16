@@ -65,6 +65,15 @@ ffi_pl_bundle_constant(const char* package, ffi_platypus_constant_t* c)
     _uint(crypto_sign_SECRETKEYBYTES);
     _uint(crypto_sign_BYTES);
     _uint(crypto_sign_SEEDBYTES);
+
+    /* crypto box */
+    _uint(crypto_box_SEALBYTES);
+    _uint(crypto_box_PUBLICKEYBYTES);
+    _uint(crypto_box_SECRETKEYBYTES);
+    _uint(crypto_box_MACBYTES);
+    _uint(crypto_box_NONCEBYTES);
+    _uint(crypto_box_SEEDBYTES);
+    _uint(crypto_box_BEFORENMBYTES);
 }
 
 void

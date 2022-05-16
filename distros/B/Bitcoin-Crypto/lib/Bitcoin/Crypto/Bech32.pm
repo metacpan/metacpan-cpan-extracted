@@ -1,7 +1,5 @@
 package Bitcoin::Crypto::Bech32;
-
-our $VERSION = "1.005";
-
+$Bitcoin::Crypto::Bech32::VERSION = '1.007';
 use v5.10;
 use strict;
 use warnings;
@@ -432,3 +430,4 @@ This module throws an instance of L<Bitcoin::Crypto::Exception> if it encounters
 =back
 
 =cut
+

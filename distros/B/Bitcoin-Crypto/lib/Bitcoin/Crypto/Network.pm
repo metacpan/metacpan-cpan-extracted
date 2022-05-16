@@ -1,13 +1,11 @@
 package Bitcoin::Crypto::Network;
-
-our $VERSION = "1.005";
-
+$Bitcoin::Crypto::Network::VERSION = '1.007';
 use v5.10;
 use strict;
 use warnings;
 use Moo;
 use Scalar::Util qw(blessed);
-use Types::Standard qw(Str Int Str);
+use Types::Standard qw(Str Int);
 use Types::Common::String qw(StrLength);
 
 use Bitcoin::Crypto::Exception;
@@ -65,6 +63,30 @@ has "extpub_version" => (
 	required => 0,
 );
 
+has "extprv_compat_version" => (
+	is => "ro",
+	isa => Int,
+	required => 0,
+);
+
+has "extpub_compat_version" => (
+	is => "ro",
+	isa => Int,
+	required => 0,
+);
+
+has "extprv_segwit_version" => (
+	is => "ro",
+	isa => Int,
+	required => 0,
+);
+
+has "extpub_segwit_version" => (
+	is => "ro",
+	isa => Int,
+	required => 0,
+);
+
 has "bip44_coin" => (
 	is => "ro",
 	isa => Int,
@@ -97,6 +119,13 @@ sub set_default
 	return $self;
 }
 
+sub supports_segwit
+{
+	my ($self) = @_;
+
+	return defined $self->segwit_hrp;
+}
+
 sub find
 {
 	my ($class, $sub) = @_;
@@ -123,15 +152,32 @@ sub get
 	return $network;
 }
 
+### PREDEFINED NETWORKS SECTION
+# When adding a network, make sure to:
+# - code in valid constants of the network below
+# - provide resources that will confirm these constant values (in the merge request)
+# - add your network to the POD documentation below
+# - add your network to test file 17-predefined-networks.t
+
+### BITCOIN
+
 __PACKAGE__->register(
 	id => "bitcoin",
 	name => "Bitcoin Mainnet",
 	p2pkh_byte => "\x00",
 	p2sh_byte => "\x05",
-	segwit_hrp => "bc",
 	wif_byte => "\x80",
+	segwit_hrp => "bc",
+
 	extprv_version => 0x0488ade4,
 	extpub_version => 0x0488b21e,
+
+	extprv_compat_version => 0x049d7878,
+	extpub_compat_version => 0x049d7cb2,
+
+	extprv_segwit_version => 0x04b2430c,
+	extpub_segwit_version => 0x04b24746,
+
 	bip44_coin => 0,
 )->set_default;
 
@@ -140,10 +186,46 @@ __PACKAGE__->register(
 	name => "Bitcoin Testnet",
 	p2pkh_byte => "\x6f",
 	p2sh_byte => "\xc4",
-	segwit_hrp => "tb",
 	wif_byte => "\xef",
+	segwit_hrp => "tb",
+
 	extprv_version => 0x04358394,
 	extpub_version => 0x043587cf,
+
+	extprv_compat_version => 0x044a4e28,
+	extpub_compat_version => 0x044a5262,
+
+	extprv_segwit_version => 0x045f18bc,
+	extpub_segwit_version => 0x045f1cf6,
+
+	bip44_coin => 1,
+);
+
+### DOGECOIN
+
+__PACKAGE__->register(
+	id => "dogecoin",
+	name => "Dogecoin Mainnet",
+	p2pkh_byte => "\x1e",
+	p2sh_byte => "\x16",
+	wif_byte => "\x9e",
+
+	extprv_version => 0x02fac398,
+	extpub_version => 0x02facafd,
+
+	bip44_coin => 3,
+);
+
+__PACKAGE__->register(
+	id => "dogecoin_testnet",
+	name => "Dogecoin Testnet",
+	p2pkh_byte => "\x71",
+	p2sh_byte => "\xc4",
+	wif_byte => "\xf1",
+
+	extprv_version => 0x04358394,
+	extpub_version => 0x043587cf,
+
 	bip44_coin => 1,
 );
 
@@ -206,31 +288,35 @@ Bitcoin::Crypto::Network - Management tool for cryptocurrency networks
 
 This package allows you to manage non-bitcoin cryptocurrencies.
 Before you start producing keys and addresses for your favorite crypto
-you have to configure it's network first.
+you have to configure its network first.
 
 =head1 PREDEFINED NETWORKS
 
-There are a couple of networks that are already defined and can be used without defining them:
-
-=over
-
-=item * Bitcoin Mainnet
-
-defined with id: C<bitcoin>
-
-=item * Bitcoin Testnet
-
-defined with id: C<bitcoin_testnet>
-
-=back
+Here is a list of networks that are already defined and can be used without defining them.
 
 If you want to see more predefined networks added and you're willing to make
 some research to find out the correct values for the configuration fields,
 consider opening a pull request on Github.
 
+=head2 Bitcoin Mainnet
+
+defined with id: C<bitcoin>
+
+=head2 Bitcoin Testnet
+
+defined with id: C<bitcoin_testnet>
+
+=head2 Dogecoin Mainnet
+
+defined with id: C<dogecoin>
+
+=head2 Dogecoin Testnet
+
+defined with id: C<dogecoin_testnet>
+
 =head1 CONFIGURATION
 
-Right now networks only require four keys, which are marked with (*)
+Right now networks only require four keys, which are marked with C<(*)>
 
 	my %config = (
 		id             => "(*) identifier for the network",
@@ -239,9 +325,15 @@ Right now networks only require four keys, which are marked with (*)
 		wif_byte       => "(*) WIF private key prefix byte, eg. 0x80",
 		p2sh_byte      => "p2sh address prefix byte, eg. 0x05",
 		segwit_hrp     => "segwit native address human readable part, eg. 'bc'",
-		extprv_version => "version of extended private keys, eg. 0x0488ade4",
-		extpub_version => "version of extended public keys, eg. 0x0488b21e",
-		bip44_coin     => "bip44 coin number, eg. 0",
+
+		extprv_version        => "version prefix of serialized extended private keys, eg. 0x0488ade4",
+		extpub_version        => "version prefix of serialized extended public keys, eg. 0x0488b21e",
+		extprv_compat_version => "same as extprv_version, but for BIP49",
+		extpub_compat_version => "same as extpub_version, but for BIP49",
+		extprv_segwit_version => "same as extprv_version, but for BIP84",
+		extpub_segwit_version => "same as extpub_version, but for BIP84",
+
+		bip44_coin => "bip44 coin number, eg. 0",
 	);
 
 After you register a network with this hashref your program will be able to import keys for that
@@ -275,6 +367,12 @@ Returns the network instance.
 Sets the network as default one. All newly created private and public keys will be bound to this network.
 
 Returns the network instance.
+
+=head2 supports_segwit
+
+	$bool = $object->supports_segwit()
+
+Returns a boolean which can be used to determine whether a given network has segwit configured.
 
 =head2 new
 
@@ -323,3 +421,4 @@ test will be returned. Example:
 =back
 
 =cut
+

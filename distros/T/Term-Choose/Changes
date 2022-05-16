@@ -1,6 +1,10 @@
 Revision history for Term::Choose
 
 
+1.752   2022-05-14
+    - Bugfix option 'margin'.
+    - Update ValidateOptions.pm.
+
 1.751   2022-05-07
     - Update options 'margin', 'tabs_info' and 'tabs_prompt'.
 
@@ -870,7 +874,7 @@ Revision history for Term::Choose
 1.031   2013-04-09
         - Option "prompt": the value '' (empty string) means now no promptline.
         - Skip checking string-length in layout "3" if "length_longest" <= "maxcols".
-        - The opton "length_longest" is now called also "ll".
+        - The option "length_longest" is now called also "ll".
         - Changed mininum Perl version from "5.10.1" to "5.10.0".
         - Code cleanup.
         - Updated documentation.

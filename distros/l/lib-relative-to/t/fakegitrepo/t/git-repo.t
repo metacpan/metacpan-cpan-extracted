@@ -38,6 +38,8 @@ use Test::More;
 
 use lib::relative::to GitRepository => 'lib';
 
+use Directory::relative::to qw(relative_dir);
+
 my $lookfor = abs_path(File::Spec->catdir(
     cwd(),
     qw(t fakegitrepo lib)
@@ -48,5 +50,11 @@ ok(
     (grep { $_ eq $lookfor } @INC),
     "Found '$lookfor' in \@INC"
 ) || diag('@INC contains ['.join(', ', @INC).']');
+
+is_deeply(
+    [relative_dir( GitRepository => 'lib' )],
+    [$lookfor],
+    "relative_dir() returns the correct directories"
+);
 
 done_testing();

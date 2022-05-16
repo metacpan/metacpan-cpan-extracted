@@ -46,7 +46,7 @@ foreach my $file (sort keys %{$test_config->{files}}) {
     foreach my $attr (sort keys %{$test_config->{files}{$file}}) {
         ok($osrelease->has_attr($attr), "$file: found attribute $attr");
         is($osrelease->get($attr), $test_config->{files}{$file}{$attr},
-            "$file: $attr => ".$test_config->{files}{$file}{$attr});
+            "$file: $attr => '".$test_config->{files}{$file}{$attr}."'");
     }
     Sys::OsRelease->clear_instance();
 }

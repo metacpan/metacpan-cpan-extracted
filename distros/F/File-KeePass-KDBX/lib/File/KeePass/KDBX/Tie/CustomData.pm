@@ -6,7 +6,7 @@ use strict;
 
 use parent 'File::KeePass::KDBX::Tie::Hash';
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 sub keys {
     my $self = shift;
@@ -31,7 +31,7 @@ File::KeePass::KDBX::Tie::CustomData - Database custom data
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 BUGS
 

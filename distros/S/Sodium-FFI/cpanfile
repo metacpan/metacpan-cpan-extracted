@@ -1,3 +1,8 @@
+on 'configure' => sub {
+    requires 'Alien::Base::Wrapper';
+    requires 'Alien::Sodium' => '2.00';
+};
+
 on 'runtime' => sub {
     requires 'strict';
     requires 'warnings';

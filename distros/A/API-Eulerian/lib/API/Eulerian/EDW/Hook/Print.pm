@@ -98,8 +98,7 @@ sub on_add
 
   for my $row ( @$rows ) {
     for my $col ( @$row ) {
-      $col = '' if ( !defined $col );
-      $string .= "$col | ";
+      $string .= defined( $col ) ? "$col | " : "NULL | ";
     }
     $string .= "\n";
   }
@@ -120,8 +119,7 @@ sub on_replace
 
   for my $row ( @$rows ) {
     for my $col ( @$row ) {
-      $col = '' if ( !defined $col );
-      $string .= "$col | ";
+      $string .= defined( $col ) ? "$col | " : "NULL | ";
     }
     $string .= "\n";
   }

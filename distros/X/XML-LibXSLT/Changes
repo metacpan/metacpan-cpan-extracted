@@ -1,5 +1,9 @@
 Revision history for Perl extension XML::LibXSLT.
 
+2.001000    2022-05-16
+    - lib/XML/LibXSLT/Quick.pm .
+        - Add 'params' support for generic_transform().
+
 2.000000    2022-04-09
     - Add lib/XML/LibXSLT/Quick.pm .
     - Cleanups.

@@ -1,3 +1,11 @@
+##-*- Mode: Change-Log; coding: utf-8; -*-
+##
+## Change log for perl distribution PDL::Ngrams
+
+v0.11 Sat, 14 May 2022 21:29:00 +0200 moocow
+	+ add MetaCPAN metadata to Makefile.PL
+	+ fix bogus "PDL::Ngrams::ngutils" references in PODs (github issue #1)
+
 v0.10 Tue, 06 Jun 2017 11:00:36 +0200 moocow
 	+ added 'use lib "."' to top-level Makefile.PL (RT bug #121661)
 

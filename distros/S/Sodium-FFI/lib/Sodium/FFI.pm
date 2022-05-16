@@ -2,7 +2,7 @@ package Sodium::FFI;
 use strict;
 use warnings;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use Carp qw(croak);
 use Exporter qw(import);
@@ -34,6 +34,8 @@ push @EXPORT_OK, qw(
     crypto_aead_chacha20poly1305_IETF_KEYBYTES crypto_aead_chacha20poly1305_IETF_NPUBBYTES
     crypto_aead_chacha20poly1305_IETF_ABYTES
     crypto_sign_SEEDBYTES crypto_sign_BYTES crypto_sign_SECRETKEYBYTES crypto_sign_PUBLICKEYBYTES
+    crypto_box_SEALBYTES crypto_box_PUBLICKEYBYTES crypto_box_SECRETKEYBYTES
+    crypto_box_MACBYTES crypto_box_NONCEBYTES crypto_box_SEEDBYTES crypto_box_BEFORENMBYTES
 );
 
 our $ffi;
@@ -398,6 +400,132 @@ our %function = (
                 return $xsub->();
             }
             return 0;
+        }
+    ],
+
+    # int
+    # crypto_box_easy(unsigned char *c, const unsigned char *m,
+    #   unsigned long long mlen, const unsigned char *n,
+    #   const unsigned char *pk, const unsigned char *sk);
+    'crypto_box_easy' => [
+        ['string', 'string', 'size_t', 'string', 'string', 'string'] => 'int',
+        sub {
+            my ($xsub, $msg, $nonce, $pk, $sk) = @_;
+            my $msg_len = length($msg);
+            my $nonce_len = length($nonce);
+            my $pk_len = length($pk);
+            my $sk_len = length($sk);
+            my $SIZE_MAX = Sodium::FFI::SIZE_MAX;
+            if ($nonce_len != Sodium::FFI::crypto_box_NONCEBYTES) {
+                croak("The nonce must be crypto_box_NONCEBYTES in length");
+            }
+            if ($pk_len != Sodium::FFI::crypto_box_PUBLICKEYBYTES) {
+                croak("The public key must be crypto_box_PUBLICKEYBYTES in length");
+            }
+            if ($sk_len != Sodium::FFI::crypto_box_SECRETKEYBYTES) {
+                croak("The secret key must be crypto_box_SECRETKEYBYTES in length");
+            }
+            if ($SIZE_MAX - $msg_len <= Sodium::FFI::crypto_box_MACBYTES) {
+                croak("Arithmetic overflow");
+            }
+            my $cipher_len = Sodium::FFI::crypto_box_MACBYTES + $msg_len;
+            my $cipher_text = "\0" x $cipher_len;
+            my $ret = $xsub->($cipher_text, $msg, $msg_len, $nonce, $pk, $sk);
+            if ($ret != 0) {
+                croak("Some internal error happened");
+            }
+            return $cipher_text;
+        }
+    ],
+
+    # int
+    # crypto_box_keypair(unsigned char *pk, unsigned char *sk);
+    'crypto_box_keypair' => [
+        ['string', 'string'] => 'int',
+        sub {
+            my ($xsub) = @_;
+            my $pubkey = "\0" x Sodium::FFI::crypto_box_PUBLICKEYBYTES ;
+            my $seckey = "\0" x Sodium::FFI::crypto_box_SECRETKEYBYTES;
+            my $ret = $xsub->($pubkey, $seckey);
+            if ($ret != 0) {
+                croak("Some internal error happened");
+            }
+            return ($pubkey, $seckey);
+        }
+    ],
+
+    # int
+    # crypto_box_open_easy(unsigned char *m, const unsigned char *c,
+    #   unsigned long long clen, const unsigned char *n,
+    #   const unsigned char *pk, const unsigned char *sk);
+    'crypto_box_open_easy' => [
+        ['string', 'string', 'size_t', 'string', 'string', 'string'] => 'int',
+        sub {
+            my ($xsub, $cipher_text, $nonce, $pk, $sk) = @_;
+            my $cipher_len = length($cipher_text);
+            my $nonce_len = length($nonce);
+            my $pk_len = length($pk);
+            my $sk_len = length($sk);
+            my $SIZE_MAX = Sodium::FFI::SIZE_MAX;
+            if ($nonce_len != Sodium::FFI::crypto_box_NONCEBYTES) {
+                croak("The nonce must be crypto_box_NONCEBYTES in length");
+            }
+            if ($pk_len != Sodium::FFI::crypto_box_PUBLICKEYBYTES) {
+                croak("The public key must be crypto_box_PUBLICKEYBYTES in length");
+            }
+            if ($sk_len != Sodium::FFI::crypto_box_SECRETKEYBYTES) {
+                croak("The secret key must be crypto_box_SECRETKEYBYTES in length");
+            }
+            if ($cipher_len <= Sodium::FFI::crypto_box_MACBYTES) {
+                croak("The cipher text should be larger than crypto_box_MACBYTES bytes");
+            }
+
+            my $msg_len = $cipher_len - Sodium::FFI::crypto_box_MACBYTES;
+            my $msg = "\0" x $msg_len;
+            my $ret = $xsub->($msg, $cipher_text, $cipher_len, $nonce, $pk, $sk);
+            if ($ret != 0) {
+                croak("Some internal error happened");
+            }
+            return $msg;
+        }
+    ],
+
+    # int
+    # crypto_box_seed_keypair(unsigned char *pk, unsigned char *sk, const unsigned char *seed);
+    'crypto_box_seed_keypair' => [
+        ['string', 'string', 'string'] => 'int',
+        sub {
+            my ($xsub, $seed) = @_;
+            my $seed_len = length($seed);
+            unless ($seed_len == Sodium::FFI::crypto_box_SEEDBYTES) {
+                croak("Seed length must be crypto_box_SEEDBYTES in length");
+            }
+            my $pubkey = "\0" x Sodium::FFI::crypto_box_PUBLICKEYBYTES;
+            my $seckey = "\0" x Sodium::FFI::crypto_box_SECRETKEYBYTES;
+            my $ret = $xsub->($pubkey, $seckey, $seed);
+            if ($ret != 0) {
+                croak("Some internal error happened");
+            }
+            return ($pubkey, $seckey);
+        }
+    ],
+
+    # int
+    # crypto_scalarmult_base(unsigned char *q, const unsigned char *n);
+    'crypto_scalarmult_base' => [
+        ['string', 'string'] => 'int',
+        sub {
+            my ($xsub, $secret_key) = @_;
+            my $sk_len = length($secret_key);
+            unless ($sk_len == Sodium::FFI::crypto_box_SECRETKEYBYTES) {
+                croak("Secret Key length must be crypto_box_SECRETKEYBYTES in length");
+            }
+            my $pubkey = "\0" x Sodium::FFI::crypto_box_PUBLICKEYBYTES;
+            my $ret = $xsub->($pubkey, $secret_key);
+            if ($ret != 0) {
+                croak("Some internal error happened");
+            }
+            return $pubkey;
         }
     ],
 
@@ -1197,6 +1325,69 @@ as a string of bytes.
 
 The L<crypto_aead_chacha20poly1305_ietf_keygen|https://doc.libsodium.org/secret-key_cryptography/aead/chacha20-poly1305/ietf_chacha20-poly1305_construction#detached-mode>
 function returns a byte string of C<crypto_aead_chacha20poly1305_IETF_KEYBYTES> bytes.
+
+=head1 Public Key Cryptography - Crypto Boxes
+
+LibSodium provides a few
+L<Public Key Authenticated Encryption|https://doc.libsodium.org/public-key_cryptography/authenticated_encryption>
+and
+L<Sealed Box Encryption|https://doc.libsodium.org/public-key_cryptography/sealed_boxes>
+functions to allow sending messages using authenticated encryption.
+
+=head2 crypto_box_easy
+
+    use Sodium::FFI qw(crypto_box_keypair crypto_box_easy randombytes_buf crypto_box_NONCEBYTES);
+    my $nonce = randombytes_buf(crypto_box_NONCEBYTES);
+    my ($public_key, $secret_key) = crypto_box_keypair();
+    my $msg = "test";
+    my $cipher_text = crypto_box_easy($msg, $nonce, $public_key, $secret_key);
+
+The L<crypto_box_easy|https://doc.libsodium.org/public-key_cryptography/authenticated_encryption#combined-mode>
+function encrypts a message using the recipient's public key, the sender's secret key, and a nonce.
+
+=head2 crypto_box_keypair
+
+    use Sodium::FFI qw(crypto_box_keypair);
+    my ($public_key, $secret_key) = crypto_box_keypair();
+
+The L<crypto_box_keypair|https://doc.libsodium.org/public-key_cryptography/authenticated_encryption#key-pair-generation>
+function randomly generates a secret key and a corresponding public key.
+
+=head2 crypto_box_open_easy
+
+    use Sodium::FFI qw(crypto_box_keypair crypto_box_easy crypto_box_open_easy randombytes_buf crypto_box_NONCEBYTES);
+    my $nonce = randombytes_buf(crypto_box_NONCEBYTES);
+    my ($public_key, $secret_key) = crypto_box_keypair();
+    my $msg = "test";
+    my $cipher_text = crypto_box_easy($msg, $nonce, $public_key, $secret_key);
+    my $decrypted = crypto_box_open_easy($cipher_text, $nonce, $public_key, $secret_key);
+    if ($decrypted eq $msg) {
+        say "Yay!";
+    }
+
+The L<crypto_box_open_easy|https://doc.libsodium.org/public-key_cryptography/authenticated_encryption#combined-mode>
+function decrypts a cipher text produced by L<crypto_box_easy>.
+
+=head2 crypto_box_seed_keypair
+
+    use Sodium::FFI qw(crypto_box_seed_keypair crypto_sign_SEEDBYTES randombytes_buf);
+    my $seed = randombytes_buf(crypto_sign_SEEDBYTES);
+    my ($public_key, $secret_key) = crypto_box_seed_keypair($seed);
+
+The L<crypto_box_seed_keypair|https://doc.libsodium.org/public-key_cryptography/authenticated_encryption#key-pair-generation>
+function randomly generates a secret key deterministically derived from a single key seed.
+
+=head2 crypto_scalarmult_base
+
+    use Sodium::FFI qw(crypto_box_keypair crypto_scalarmult_base);
+    my ($public_key, $secret_key) = crypto_box_keypair();
+    my $computed_public = crypto_scalarmult_base($secret_key);
+    if ($public_key eq $computed_public) {
+        say "Yay!";
+    }
+
+The L<crypto_scalarmult_base|https://doc.libsodium.org/public-key_cryptography/authenticated_encryption#key-pair-generation>
+function can be used to compute the public key given a secret key previously generated with L<crypto_box_keypair>.
 
 =head1 Public Key Cryptography - Public Key Signatures
 

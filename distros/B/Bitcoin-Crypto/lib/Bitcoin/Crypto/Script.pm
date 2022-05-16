@@ -1,7 +1,5 @@
 package Bitcoin::Crypto::Script;
-
-our $VERSION = "1.005";
-
+$Bitcoin::Crypto::Script::VERSION = '1.007';
 use v5.10;
 use strict;
 use warnings;
@@ -365,6 +363,11 @@ sub get_compat_address
 {
 	my ($self) = @_;
 
+	# network field is not required, lazy check for completeness
+	Bitcoin::Crypto::Exception::NetworkConfig->raise(
+		"this network does not support segregated witness"
+	) unless $self->network->supports_segwit;
+
 	my $program = Bitcoin::Crypto::Script->new(network => $self->network);
 	$program->add_operation("OP_" . Bitcoin::Crypto::Config::witness_version)
 		->push_bytes(sha256($self->get_script));
@@ -377,8 +380,8 @@ sub get_segwit_address
 
 	# network field is not required, lazy check for completeness
 	Bitcoin::Crypto::Exception::NetworkConfig->raise(
-		"no segwit_hrp found in network configuration"
-	) unless defined $self->network->segwit_hrp;
+		"this network does not support segregated witness"
+	) unless $self->network->supports_segwit;
 
 	return encode_segwit($self->network->segwit_hrp, $self->witness_program);
 }
@@ -521,3 +524,4 @@ This module throws an instance of L<Bitcoin::Crypto::Exception> if it encounters
 =back
 
 =cut
+

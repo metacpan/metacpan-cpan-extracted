@@ -1481,12 +1481,6 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/uri/query/a',
-          keywordLocation => jsonp(qw(/paths /foo post parameters 0 schema readOnly)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 0 schema readOnly)))->to_string,
-          error => 'read-only value is present',
-        },
-        {
           instanceLocation => '/request/body/c',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json schema properties c readOnly)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json schema properties c readOnly)))->to_string,

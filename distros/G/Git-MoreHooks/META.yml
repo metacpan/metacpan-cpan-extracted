@@ -24,22 +24,22 @@ name: Git-MoreHooks
 provides:
   Git::MoreHooks:
     file: lib/Git/MoreHooks.pm
-    version: '0.012'
+    version: '0.013'
   Git::MoreHooks::CheckCommitAuthorFromMailmap:
     file: lib/Git/MoreHooks/CheckCommitAuthorFromMailmap.pm
-    version: '0.012'
+    version: '0.013'
   Git::MoreHooks::CheckCommitBase:
     file: lib/Git/MoreHooks/CheckCommitBase.pm
-    version: '0.012'
+    version: '0.013'
   Git::MoreHooks::CheckIndent:
     file: lib/Git/MoreHooks/CheckIndent.pm
-    version: '0.012'
+    version: '0.013'
   Git::MoreHooks::GitRepoAdmin:
     file: lib/Git/MoreHooks/GitRepoAdmin.pm
-    version: '0.012'
+    version: '0.013'
   Git::MoreHooks::TriggerJenkins:
     file: lib/Git/MoreHooks/TriggerJenkins.pm
-    version: '0.012'
+    version: '0.013'
 requires:
   Carp: '0'
   Const::Fast: '0'
@@ -62,7 +62,7 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Git-MoreHooks
   homepage: https://metacpan.org/release/Git-MoreHooks
   repository: https://github.com/mikkoi/git-morehooks.git
-version: '0.012'
+version: '0.013'
 x_contributors:
   - 'Gustavo L. de M. Chaves <gnustavo@cpan.org>'
 x_generated_by_perl: v5.28.2

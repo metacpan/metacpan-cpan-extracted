@@ -10,11 +10,11 @@ TimTools - Some common functions.
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -68,4 +68,4 @@ This is free software, licensed under:
 
 =cut
 
-1; # End of TimTools
+1;    # End of TimTools

@@ -1,7 +1,5 @@
 package Bitcoin::Crypto::Helpers;
-
-our $VERSION = "1.005";
-
+$Bitcoin::Crypto::Helpers::VERSION = '1.007';
 use v5.10;
 use strict;
 use warnings;
@@ -10,10 +8,12 @@ use Crypt::Digest::RIPEMD160 qw(ripemd160);
 use Crypt::Digest::SHA256 qw(sha256);
 use List::Util qw(max);
 use Crypt::PK::ECC;
-use Math::BigInt 1.999808 try => 'GMP,LTM';
 
 use Bitcoin::Crypto::Config;
 use Bitcoin::Crypto::Exception;
+
+# make sure Math::BigInt is loaded - this module loads it
+use Bitcoin::Crypto::Types;
 
 our @EXPORT_OK = qw(
 	new_bigint
@@ -152,3 +152,4 @@ sub add_ec_points
 }
 
 1;
+

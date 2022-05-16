@@ -1,7 +1,5 @@
 package Bitcoin::Crypto::Key::Private;
-
-our $VERSION = "1.005";
-
+$Bitcoin::Crypto::Key::Private::VERSION = '1.007';
 use v5.10;
 use strict;
 use warnings;
@@ -91,6 +89,8 @@ sub get_public_key
 	my $public = Bitcoin::Crypto::Key::Public->new($self->raw_key("public"));
 	$public->set_compressed($self->compressed);
 	$public->set_network($self->network);
+	$public->set_purpose($self->purpose);
+
 	return $public;
 }
 
@@ -279,3 +279,4 @@ This module throws an instance of L<Bitcoin::Crypto::Exception> if it encounters
 =back
 
 =cut
+

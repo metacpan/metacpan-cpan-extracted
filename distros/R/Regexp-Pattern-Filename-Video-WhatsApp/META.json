@@ -50,7 +50,7 @@
    "provides" : {
       "Regexp::Pattern::Filename::Video::WhatsApp" : {
          "file" : "lib/Regexp/Pattern/Filename/Video/WhatsApp.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -65,7 +65,7 @@
          "web" : "https://github.com/perlancar/perl-Regexp-Pattern-Filename-Video-WhatsApp"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -451,7 +451,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Regexp::Pattern",
                         "name" : "-Regexp::Pattern",
-                        "version" : "0.009"
+                        "version" : "0.010"
                      }
                   ]
                }

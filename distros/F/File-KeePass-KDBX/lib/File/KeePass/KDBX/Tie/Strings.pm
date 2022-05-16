@@ -6,7 +6,7 @@ use strict;
 
 use parent 'File::KeePass::KDBX::Tie::Hash';
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 my %STANDARD = map { $_ => 1 } qw(Notes Password Title UserName URL);
 
@@ -33,7 +33,7 @@ File::KeePass::KDBX::Tie::Strings - Entry strings
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 BUGS
 

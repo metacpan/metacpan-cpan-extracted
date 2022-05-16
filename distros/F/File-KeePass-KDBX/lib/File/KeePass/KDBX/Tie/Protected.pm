@@ -9,7 +9,7 @@ use namespace::clean;
 
 use parent 'File::KeePass::KDBX::Tie::Hash';
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 my %GET = (
     comment     => sub { $_[0]->string('Notes')     ->{protect} ? 1 : 0 },
@@ -57,7 +57,7 @@ File::KeePass::KDBX::Tie::Protected - Entry memory protection flags
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 BUGS
 

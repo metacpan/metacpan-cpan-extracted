@@ -1,5 +1,5 @@
 ---
-count: 177
+count: 198
 files:
   os-release-almalinux:
     almalinux_mantisbt_project: AlmaLinux-8
@@ -66,6 +66,17 @@ files:
     version: 35 (Container Image)
     version_codename: ''
     version_id: 35
+  os-release-opensuse-leap:
+    ansi_color: 0;32
+    bug_report_url: https://bugs.opensuse.org
+    cpe_name: cpe:/o:opensuse:leap:15.3
+    home_url: https://www.opensuse.org/
+    id: opensuse-leap
+    id_like: suse opensuse
+    name: openSUSE Leap
+    pretty_name: openSUSE Leap 15.3
+    version: 15.3
+    version_id: 15.3
   os-release-rockylinux:
     ansi_color: 0;32
     bug_report_url: https://bugs.rockylinux.org/

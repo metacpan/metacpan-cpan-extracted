@@ -13,7 +13,7 @@ use DynaLoader;
 
 
 
-   $PDL::Ngrams::Utils::VERSION = 0.10;
+   $PDL::Ngrams::Utils::VERSION = 0.11;
    @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Ngrams::Utils $VERSION;
@@ -28,12 +28,12 @@ use strict;
 
 =head1 NAME
 
-PDL::Ngrams::ngutils - Basic N-Gram utilities for PDL: low-level utilities
+PDL::Ngrams::Utils - Basic N-Gram utilities for PDL: low-level utilities
 
 =head1 SYNOPSIS
 
  use PDL;
- use PDL::Ngrams::ngutils;
+ use PDL::Ngrams::Utils;
 
  ##---------------------------------------------------------------------
  ## ... stuff happens
@@ -207,7 +207,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head2 Copyright Policy
 
-Copyright (C) 2007, Bryan Jurish. All rights reserved.
+Copyright (C) 2007-2022, Bryan Jurish. All rights reserved.
 
 This package is free software, and entirely without warranty.
 You may redistribute it and/or modify it under the same terms

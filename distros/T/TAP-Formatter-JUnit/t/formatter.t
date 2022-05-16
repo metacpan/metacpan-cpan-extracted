@@ -38,10 +38,11 @@ foreach my $test (@tests) {
 
     my $expected = slurp($junit);
 
-    # OVER-RIDE: With Test::Harness prior to v3.44, the "bailout" test would
-    # result in zero/no output.  This was fixed in Test::Harness v3.44, but WE
-    # need to watch for and provide accommodations for newer/older versions.
-    if (version->parse($TAP::Harness::VERSION) < version->parse(3.44)) {
+    # OVER-RIDE: With Test::Harness prior to v3.43, the "bailout" test would
+    # result in zero/no output.  This was fixed in Test::Harness v3.43_0*
+    # development releases, but WE need to watch for and provide accommodations
+    # for newer/older versions.
+    unless (version->parse($TAP::Harness::VERSION) > version->parse(3.43)) {
       if ($test =~ /bailout/) {
         $expected = '';
       }

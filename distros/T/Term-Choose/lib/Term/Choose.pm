@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.751';
+our $VERSION = '1.752';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -861,10 +861,10 @@ sub __wr_screen {
             print up( $self->{b_margin} );
         }
         print up( $self->{avail_height} );
-        # footer on the bottom line with b_margin set:
-        #print "\n" x ( $self->{avail_height} + $self->{b_margin} );
-        #print $pp_line . "\r";
-        #print up( $self->{avail_height} + $self->{b_margin} );
+    }
+    elsif ( $self->{b_margin} ) {
+        print "\n" x ( $self->{avail_height} + $self->{b_margin} );
+        print up( $self->{avail_height} + $self->{b_margin} );
     }
     if ( $self->{l_margin} ) {
         print right( $self->{l_margin} ); # left margin after each "\r"
@@ -1266,7 +1266,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.751
+Version 1.752
 
 =cut
 

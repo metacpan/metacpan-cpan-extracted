@@ -47,7 +47,7 @@ Like `std()` but for QuickJS’s `os` module.
 
 ## $VALUE = _OBJ_->eval( $JS\_CODE )
 
-Comparable to running `qjs -e '...'`. Returns the last value from $JS\_CODE;
+Comparable to running `qjs -e '...'`. Returns $JS\_CODE’s last value;
 see below for details on type conversions from JavaScript to Perl.
 
 Untrapped exceptions in JavaScript will be rethrown as Perl exceptions.
@@ -78,7 +78,7 @@ This module converts returned values from JavaScript thus:
 - JS objects …
     - Arrays become Perl array references.
     - “Plain” objects become Perl hash references.
-    - Functions become Perl code references.
+    - Function objects become Perl [JavaScript::QuickJS::Function](https://metacpan.org/pod/JavaScript%3A%3AQuickJS%3A%3AFunction) objects.
     - RegExp objects become Perl [JavaScript::QuickJS::RegExp](https://metacpan.org/pod/JavaScript%3A%3AQuickJS%3A%3ARegExp) objects.
     - Behaviour is **UNDEFINED** for other object types.
 
@@ -99,6 +99,8 @@ primitives.
 “plain” objects.
 - [Types::Serialiser](https://metacpan.org/pod/Types%3A%3ASerialiser) booleans become JavaScript booleans.
 - Perl code references become JavaScript functions.
+- [JavaScript::QuickJS::Function](https://metacpan.org/pod/JavaScript%3A%3AQuickJS%3A%3AFunction) objects become their original
+JavaScript `Function` objects.
 - [JavaScript::QuickJS::RegExp](https://metacpan.org/pod/JavaScript%3A%3AQuickJS%3A%3ARegExp) objects become their original
 JavaScript `RegExp` objects.
 - Anything else triggers an exception.
@@ -109,14 +111,9 @@ If any instance of a class of this distribution is DESTROY()ed at Perl’s
 global destruction, we assume that this is a memory leak, and a warning is
 thrown. To prevent this, avoid circular references.
 
-Callbacks make that tricky. As noted above, JavaScript functions
-given to Perl become Perl code references. Those code references are
-closures around the QuickJS context & runtime; once the code reference
-is destroyed, we release its reference to QuickJS.
-
-Perl code references given to JavaScript become JavaScript functions;
-however, QuickJS exposes no facility analogous to Perl `DESTROY()`. Thus,
-we retain those Perl code references as part of the QuickJS context.
+Callbacks make that tricky. When you give a JavaScript function to Perl,
+that Perl object holds a reference to the QuickJS context. Only once that
+object is `DESTROY()`ed do we release that QuickJS context reference.
 
 Consider the following:
 
@@ -126,30 +123,40 @@ Consider the following:
 
     $js->eval('__return( a => a )');
 
-Here $js retains a reference to the `__return` callback. That callback
-refers to `$return`. Once we run `eval()`, Perl $return stores
-_another_ callback, which stores a reference to $js. Here we have a
-circular reference. The way to break it is simply:
+This sets $return to be a [JavaScript::QuickJS::Function](https://metacpan.org/pod/JavaScript%3A%3AQuickJS%3A%3AFunction) instance. That
+object holds a reference to $js. $js also stores `__return()`,
+which is a Perl code reference that closes around $return. Thus, we have
+a reference cycle: $return refers to $js, and $js refers to $return. Those
+two values will thus leak, and you’ll see a warning about it at Perl’s
+global destruction time.
+
+To break the reference cycle, just do:
 
     undef $return;
 
-… which is ugly, but it is what it is for now.
+… once you’re done with that variable.
 
-Note also that the `__return` callback ends with `()`. Recall that, in
-Perl, a function’s last statement value is the function’s default return
-value. Without the `()`, then, our callback would return `$return`,
-which would create yet _another_ reference cycle.
+You _might_ have thought you could instead do:
+
+    $js->set_globals( __return => undef )
+
+… but that doesn’t work because $js holds a reference to all Perl code
+references it **ever** receives. This is because QuickJS, unlike Perl,
+doesn’t expose object destructors (`DESTROY()` in Perl), so there’s no
+good way to release that reference to the code reference.
 
 # CHARACTER ENCODING NOTES
 
-Although QuickJS (like all JS engines) assumes its strings are text,
-you can oftentimes pass in byte strings and get a reasonable result.
+QuickJS (like all JS engines) assumes its strings are text. Since Perl
+can’t distinguish text from bytes, though, it’s possible to convert
+Perl byte strings to JavaScript strings. It often yields a reasonable
+result, but not always.
 
 One place where this falls over, though, is ES6 modules. QuickJS, when
 it loads an ES6 module, decodes that module’s string literals to characters.
 Thus, if you pass in byte strings from Perl, QuickJS will treat your
 Perl byte strings’ code points as character code points, and when you
-combine those code points with the ones from your ES6 module you may
+combine those code points with those from your ES6 module you may
 get mangled output.
 
 Another place that may create trouble is if your argument to `eval()`
@@ -174,11 +181,11 @@ For example, in Perl 5.34 `print 1000000000000001.0` prints `1e+15`.
 
     To counteract this loss of precision, add 0 to Perl’s numeric scalars
     (e.g., `print 0 + 1000000000000001.0`); this will encourage Perl to store
-    numbers as integers when possible, which fixes the precision problem.
+    numbers as integers when possible, which fixes this precision problem.
 
 - Long-double and quad-math perls may lose precision when converting
 numbers to/from JavaScript. To see if this affects your perl—which, if
-you’re unsure, it probably doesn’t—run `perl -V`, and see if the
+you’re unsure, it probably doesn’t—run `perl -V`, and see if that perl’s
 compile-time options mention long doubles or quad math.
 
 # OS SUPPORT
@@ -205,7 +212,10 @@ V8 versions.
 
 # LICENSE & COPYRIGHT
 
-Copyright 2022 Gasper Software Consulting.
+This library is copyright 2022 Gasper Software Consulting.
 
 This library is licensed under the same terms as Perl itself.
 See [perlartistic](https://metacpan.org/pod/perlartistic).
+
+QuickJS is copyright Fabrice Bellard and Charlie Gordon. It is released
+under the [MIT license](https://opensource.org/licenses/MIT).

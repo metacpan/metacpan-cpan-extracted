@@ -1,5 +1,15 @@
 Revision history for Perl extension JavaScript::QuickJS:
 
+0.11 Sun 15 May 2022
+- BREAKING CHANGE: JavaScript Functions converted to Perl now become
+  instances of a new class, JavaScript::QuickJS::Function. That class
+  is overloaded to act as a coderef, so MOST calling code should still
+  work, but anything that expects a CODE reference will now instead find
+  a blessed object.
+- BUG FIX: Fix leaked scalars returned from Perl callbacks.
+- Tweak discussion of memory-leak detection.
+- Add missing regexp test.
+
 0.10 Thu 12 May 2022
 - Fix missing RegExp module.
 

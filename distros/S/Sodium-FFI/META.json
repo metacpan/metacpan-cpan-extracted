@@ -26,6 +26,8 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
+            "Alien::Base::Wrapper" : "0",
+            "Alien::Sodium" : "2.00",
             "ExtUtils::MakeMaker" : "0",
             "FFI::Build::MM" : "0.83",
             "perl" : "5.008"
@@ -82,7 +84,7 @@
    "provides" : {
       "Sodium::FFI" : {
          "file" : "lib/Sodium/FFI.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -97,7 +99,7 @@
          "web" : "https://github.com/genio/sodium-ffi"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_contributors" : [
       "Chase Whitener <cwhitener@gmail.com>"
    ],

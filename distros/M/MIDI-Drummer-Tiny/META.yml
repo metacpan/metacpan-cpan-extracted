@@ -32,7 +32,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-Drummer-Tiny
   repository: https://github.com/ology/MIDI-Drummer-Tiny.git
-version: '0.2100'
+version: '0.2101'
 x_Dist_Zilla:
   perl:
     version: '5.032001'

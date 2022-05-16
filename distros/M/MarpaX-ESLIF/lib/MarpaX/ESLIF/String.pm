@@ -11,7 +11,7 @@ use Carp qw/croak/;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '6.0.20'; # VERSION
+our $VERSION = '6.0.21'; # VERSION
 
 
 sub new {
@@ -85,7 +85,7 @@ MarpaX::ESLIF::String - ESLIF String is any string value with encoding attribute
 
 =head1 VERSION
 
-version 6.0.20
+version 6.0.21
 
 =head1 DESCRIPTION
 

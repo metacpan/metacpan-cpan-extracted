@@ -6,7 +6,7 @@ use strict;
 
 use parent 'File::KeePass::KDBX::Tie::Hash';
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 my %GET = (
     window  => sub { $_[0]->{window} },
@@ -34,7 +34,7 @@ File::KeePass::KDBX::Tie::Association - Auto-type window association
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 BUGS
 

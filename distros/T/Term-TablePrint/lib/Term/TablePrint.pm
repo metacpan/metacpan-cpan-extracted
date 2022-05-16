@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.150';
+our $VERSION = '0.151';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -50,22 +50,16 @@ sub new {
 
 sub _valid_options {
     return {
-        choose_columns    => '[ 0 1 ]',   # removed 04.06.2021
-        keep_header       => '[ 0 1 ]',   # removed 04.06.2021
-        f3                => '[ 0 1 2 ]', # renamed 20.08.2021
-        grid              => '[ 0 1 2 ]', # removed 04.06.2021
-        table_name        => 'Str',       # renamed 24.06.2021
-
         binary_filter     => '[ 0 1 ]',
         codepage_mapping  => '[ 0 1 ]',
         hide_cursor       => '[ 0 1 ]', # documentation
         mouse             => '[ 0 1 ]',
         squash_spaces     => '[ 0 1 ]',
+        table_expand      => '[ 0 1 ]',
         trunc_fract_first => '[ 0 1 ]',
         color             => '[ 0 1 2 ]',
         page              => '[ 0 1 2 ]', # undocumented
         search            => '[ 0 1 2 ]', #
-        table_expand      => '[ 0 1 2 ]', # '[ 0 1 ]',  04.06.2021
         keep              => '[ 1-9 ][ 0-9 ]*', # undocumented
         max_rows          => '[ 0-9 ]+',
         min_col_width     => '[ 0-9 ]+', ##
@@ -86,16 +80,13 @@ sub _defaults {
     return {
         binary_filter     => 0,
         binary_string     => 'BNRY',
-        choose_columns    => 0, # removed 04.06.2021
         codepage_mapping  => 0,
         color             => 0,
         decimal_separator => '.',
         footer            => undef,
-        grid              => 1, # removed 04.06.2021
         hide_cursor       => 1,
         info              => undef,
         keep              => undef,
-        keep_header       => 1, # removed 04.06.2021
         max_rows          => 200000,
         min_col_width     => 30,
         mouse             => 0,
@@ -106,7 +97,6 @@ sub _defaults {
         squash_spaces     => 0,
         tab_width         => 2,
         table_expand      => 1,
-        table_name        => undef,
         trunc_fract_first => 1,
         undef             => '',
         thsd_sep          => ',', #
@@ -148,26 +138,6 @@ sub print_table {
     croak "print_table: requires an ARRAY reference as its first argument."            if ref $tbl_orig  ne 'ARRAY';
     if ( defined $opt ) {
         croak "print_table: the (optional) second argument is not a HASH reference."   if ref $opt ne 'HASH';
-        ###############################################################################################
-        my @removed = qw( choose_columns f3 keep_header grid table_name );
-        my @message;
-        for my $r ( @removed ) {
-            if ( exists $opt->{$r} ) {
-                push @message, "The option '$r' has been removed or renamed.";
-                delete $opt->{$r};
-            }
-        }
-        if ( @message ) {
-            unshift @message, "'print_table':";
-            push @message, "Upgrade 'App::DBBrowser' to the latest version.";
-            my $prompt = join "\n", @message;
-            choose(
-                [ 'Continue with ENTER' ],
-                { prompt => $prompt, layout => 0, clear_screen => 1 }
-            );
-            print hide_cursor;
-        }
-        ###############################################################################################
         validate_options( _valid_options(), $opt, 'print_table' );
         for my $key ( keys %$opt ) {
             $self->{$key} = $opt->{$key} if defined $opt->{$key};
@@ -222,7 +192,6 @@ sub print_table {
 
     my $tbl_copy = $self->__copy_table( $tbl_orig, $progress );
     my $ds = quotemeta( $self->{decimal_separator} );
-    #my $regex_digits = qr/^([-+]?[0-9]*)($ds[0-9]+)?\z/; # slower
     my $regex_digits = "^([-+]?[0-9]*)(${ds}[0-9]+)?\\z";
     my ( $w_head, $w_cols, $w_int, $w_fract ) = $self->__calc_col_width( $tbl_copy, $progress, $regex_digits );
     my $cc = {  # These values don't change.
@@ -330,7 +299,7 @@ sub __write_table {
     if ( $self->{footer} ) {
         $footer = $self->{footer};
         if ( $vs->{filter} ) {
-            $footer .= '/' . $vs->{filter} . '/';
+            $footer .= $vs->{filter};
         }
     }
     my $old_row = exists $ENV{TC_POS_AT_SEARCH} && ! $vs->{filter} ? delete( $ENV{TC_POS_AT_SEARCH} ) : 0;
@@ -773,7 +742,7 @@ sub __search {
         }
         print "\r${prompt}${string}";
         if ( ! eval {
-            $vs->{filter} = $self->{search} == 1 ? "(?i)$string" : $string;
+            $vs->{filter} = $self->{search} == 1 ? qr/$string/i : qr/$string/;
             'Teststring' =~ $vs->{filter};
             1
         } ) {
@@ -884,7 +853,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.150
+Version 0.151
 
 =cut
 
@@ -919,7 +888,7 @@ cursor reaches the topmost line, the previous page is shown automatically if it 
 If the terminal is too narrow to print the table, the columns are adjusted to the available width automatically.
 
 If the option L</table_expand> is enabled and a row is selected with C<Return>, each column of that row is output in its
-own line preceded by the column name. This might be useful if the columns were cut due to the too low terminal width.
+own line preceded by the column name.
 
 =head2 KEYS
 
@@ -1190,11 +1159,6 @@ If I<table_expand> is set to 0, the cursor jumps to the to first row (if not alr
 1 - on
 
 Default: 1
-
-=head3 table_name RENAMDED
-
-The option I<table_name> has been renamed to I<footer>. Use I<footer> instead of I<table_name>. The I<table_name> will
-be removed.
 
 =head3 trunc_fract_first
 

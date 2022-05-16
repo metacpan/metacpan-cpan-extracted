@@ -79,12 +79,11 @@ sub __parse {
          key  => $_,
          spec => $opt_spec,
          list => \@opt_list,
-         arg  => $arg         // "",
-         desc => $opt_desc        // "...",
+         arg  => $arg      // "",
+         desc => $opt_desc // "...",
       };
 
-     }
-     $s->{_spec}->@*;
+   } $s->{_spec}->@*;
 
    \@parsed;
 }

@@ -1,5 +1,10 @@
 Revision history for OpenAPI-Modern
 
+0.028     2022-05-14 21:11:50Z
+          - now only checking for readOnly values in request bodies and
+            writeOnly values in response bodies (not path
+            parameters/headers/query parameters).
+
 0.027     2022-05-01 01:41:48Z
           - permit the use of unevaluatedProperties, unevaluatedItems in
             openapi subschemas, and collect annotations into the evaluation

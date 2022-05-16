@@ -1,15 +1,14 @@
 package Bitcoin::Crypto::BIP44;
-
-our $VERSION = "1.005";
-
+$Bitcoin::Crypto::BIP44::VERSION = '1.007';
 use v5.10;
 use strict;
 use warnings;
 use Moo;
-use Types::Standard qw(Enum);
+use Types::Standard qw(Enum Bool);
 use Types::Common::Numeric qw(PositiveOrZeroInt);
 use Scalar::Util qw(blessed);
 
+use Bitcoin::Crypto::Types qw(BIP44Purpose);
 use Bitcoin::Crypto::Network;
 use Bitcoin::Crypto::Exception;
 
@@ -30,7 +29,7 @@ use namespace::clean;
 
 has 'purpose' => (
 	is => 'ro',
-	isa => Enum[44, 49, 84],
+	isa => BIP44Purpose,
 	default => sub { 44 },
 );
 
@@ -70,7 +69,19 @@ has 'change' => (
 has 'index' => (
 	is => 'ro',
 	isa => PositiveOrZeroInt,
-	required => 1,
+	default => sub { 0 },
+);
+
+has 'get_account' => (
+	is => 'ro',
+	isa => Bool,
+	default => sub { 0 },
+);
+
+has 'get_from_account' => (
+	is => 'ro',
+	isa => Bool,
+	default => sub { 0 },
 );
 
 use overload
@@ -83,8 +94,18 @@ sub as_string
 
 	# https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki
 	# m / purpose' / coin_type' / account' / change / address_index
-	return sprintf "m/%u'/%u'/%u'/%u/%u",
-		$self->purpose, $self->coin_type, $self->account, $self->change, $self->index;
+
+	my $path = sprintf "m/%u'/%u'/%u'",
+		$self->purpose, $self->coin_type, $self->account;
+
+	return $path
+		if $self->get_account;
+
+	$path = 'm'
+		if $self->get_from_account;
+
+	return sprintf "%s/%u/%u",
+		$path, $self->change, $self->index;
 }
 
 1;
@@ -150,11 +171,26 @@ By default, the value C<0> is used.
 =head2 change
 
 Needs to be a number C<1> (for addresses to be used as change outputs) or C<0> (for addresses that are to be used only internally).
+
 By default, the value C<0> is used.
 
 =head2 index
 
-Required. Needs to be a non-negative integer number. It should be less than C<2^31> (but will not check for that).
+Needs to be a non-negative integer number. It should be less than C<2^31> (but will not check for that).
+
+By default, the value C<0> is used.
+
+=head2 get_account
+
+If passed C<1>, the resulting derivation path will only go as far as to the account part. L</index> and L</change> values will be ignored. Use this to get extended key for the account.
+
+By default, you will get the full derivation path.
+
+=head2 get_from_account
+
+If passed C<1>, the resulting derivation path will start after the account part. L</purpose>, L</coin_type> and L</account> values will be ignored. Use this to further derive key that was only derived up to the account part.
+
+By default, you will get the full derivation path.
 
 =head1 METHODS
 
@@ -193,3 +229,4 @@ This module throws an instance of L<Bitcoin::Crypto::Exception> if it encounters
 =back
 
 =cut
+

@@ -5,7 +5,7 @@ use Sodium::FFI qw(
     crypto_aead_aes256gcm_is_available crypto_aead_aes256gcm_keygen
     crypto_aead_aes256gcm_decrypt crypto_aead_aes256gcm_encrypt
     randombytes_buf
-    
+
     crypto_aead_aes256gcm_KEYBYTES
     crypto_aead_aes256gcm_ABYTES crypto_aead_aes256gcm_NPUBBYTES
 );

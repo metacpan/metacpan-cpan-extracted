@@ -1,0 +1,183 @@
+# NAME
+
+DBIx::Class::TemporalRelations - Establish and introspect time-based relationships between tables.
+
+# VERSION
+
+version 0.9000
+
+# SYNOPSIS
+
+    package My::Schema::Result::Person;
+    
+    use parent qw(DBIx::Class::Core);
+    __PACKAGE__->load_components('TemporalRelations');
+    
+    # or, if you're a Candy user:
+    use DBIx::Class::Candy -components => [qw/TemporalRelations/];
+    
+    
+    # Normally, you would choose one way of doing this, for the entire table.
+    # But we're doing this to show that you can do it any way you like.
+    
+    # Direct injection into source_info
+    __PACKAGE__->source_info(
+       {
+          temporal_relationships => {
+             'contraptions' => [
+                { verb => 'purchased', temporal_column => 'purchase_dt' }
+             ]
+          }
+       }
+    );
+    
+    # Direct single relationship method
+    __PACKAGE__->make_temporal_relationship( 'created', 'doodads', 'created_dt' );
+
+    # Make a whole bunch at once!
+    __PACKAGE__->make_temporal_relationships(
+       'modified'  => [
+           [ 'doodads', 'modified_dt' ],
+           [ 'doohickies_modified', 'modified_dt' ], ],
+       'purchased' => [ 'doohickies_purchased', 'purchased_dt' ],
+    );
+    
+    # Later code:
+    use My::Schema;
+
+    ...
+
+    # There can be only one!
+    my $person = $schema->resultset('Person')->find({ name => 'D Ruth Holloway'});
+    my @doodads_she_modified = $person->doodads_modified;  # Doodad rows
+    my $first_doodad = $person->first_doodad_created;  # Doodad row or undef
+    my @doohickies = $person->doohickies_modified;  # Doohickey rows
+
+# DESCRIPTION
+
+This module sets up some convenience methods describing temporal relationships between
+data elements. A fairly-common construct would be to have a table of users, who are
+creating things, and we want to see lists of the things that they created, in a time
+order. In SQL, this might be:
+
+    SELECT id, serial_number, created_dt 
+    FROM thing 
+    WHERE creator = (SELECT id FROM user WHERE username = 'geekruthie')
+    ORDER BY created_dt;
+
+And in conventional [DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass) parlance:
+
+    $schema->resultset('User')->find({ username => 'geekruthie'} )->things
+       ->search({},{ order_by => 'created_dt'});
+
+Easy enough, but with this module, you can do some more things that would require a bit more yak-shaving:
+
+    my $user = $schema->resultset('User')->find({username => 'geekruthie'});
+    @things = $user->things_created;
+    @things = $user->things_created_before($ts);
+    @things = $user->things_created_after($ts);
+
+These methods let you order things in reverse-date order:
+
+    @things = $user->most_recent_things_created;
+    @things = $user->most_recent_things_created_before($ts);
+    @things = $user->most_recent_things_created_after($ts);
+
+...and let's pick a specific thing, shall we?
+
+    $thing = $user->first_thing_created;
+    $thing = $user->last_thing_created;
+    $thing = $user->first_thing_created_after($ts);
+    $thing = $user->last_thing_created_before($ts);
+
+And if you could also **modify** things, and stashed the last time the thing was modified, and by whom, in the
+`thing` table:
+
+    @thing = $user->things_modified;
+    $thing = $user->last_thing_modified;
+
+(...but see ["BUGS AND LIMITATIONS"](#bugs-and-limitations) for an important limitation on this behavior!)
+
+# CONFIGURATION
+
+In your Result class, once you've loaded this component, you have three ways to 
+add temporal relationships:
+
+## Direct injection into `source_info`
+
+    __PACKAGE__->source_info(
+       {
+          temporal_relationships =>
+             { 'contraptions' => [ { verb => 'purchased', temporal_column => 'purchase_dt' } ] }
+       }
+    );
+
+The `temporal_relationships` sub-hash of `source_info` can be manually populated. It is a
+hashref, defined thusly:
+
+    {  '<relationship accessor>' => [
+          { verb => '<desired_verb>',                               # mandatory
+            temporal_column => '<column_name_to_use_for_ordering>', # mandatory
+            singular => '<singular_noun>',                          # optional
+            plural => '<plural_noun>'                               # optional 
+          },
+       ...],
+    ...}
+
+If you do not specify the `singular` or `plural` terms, they will be inflected from
+the `relationship_accessor`.
+
+## Single method call
+
+    __PACKAGE__->make_temporal_relationship(
+       '<desired_verb>',                    # mandatory
+       '<relationship_accessor>',           # mandatory
+       '<column_name_to_use_for_ordering>', # mandatory
+       '<singular_noun>'                    # optional
+       '<plural_noun>'                      # optional
+    );
+
+## Multiple-relationship method call
+
+    __PACKAGE__->make_temporal_relationships(
+      '<desired_verb>'  => [
+          [ '<relationship_accessor>',          # mandatory
+            '<column_name_to_use_for_ordering>' # mandatory
+            '<singular_noun>'                   # optional
+            '<plural_noun>'                     # optional
+          ], [...]
+       ],
+       ...
+    );
+
+# DEPENDENCIES
+
+- [DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass)
+- Optionally, [DBIx::Class::Candy](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ACandy)
+- [Lingua::EN::Inflexion](https://metacpan.org/pod/Lingua%3A%3AEN%3A%3AInflexion)
+- [Sub::Quote](https://metacpan.org/pod/Sub%3A%3AQuote)
+
+# BUGS AND LIMITATIONS
+
+- Overwriteable fields
+
+    If you set a temporal relationship on a field that can be overwritten, for example `modified_by`, realize
+    that the temporal relationship will disappear. This isn't a full activity log! For that, you probably want
+    something like [DBIx::Class::AuditAny](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AAuditAny) or other similar journaling module.
+
+# ACKNOWLEDGEMENTS
+
+Thanks goes out to my employer, Clearbuilt, for letting me spend some work time on this module.
+
+Blame goes to [Jason Crome](https://metacpan.org/author/CROMEDOME) for encouraging me in this sort of madness.
+
+# AUTHOR
+
+D Ruth Holloway <ruth@hiruthie.me>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022 by D Ruth Holloway.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

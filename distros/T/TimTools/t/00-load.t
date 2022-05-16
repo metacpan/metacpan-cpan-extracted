@@ -7,7 +7,7 @@ use Test::More;
 plan tests => 1;
 
 BEGIN {
-    use_ok( 'TimTools' ) || print "Bail out!\n";
+   use_ok( 'TimTools' ) || print "Bail out!\n";
 }
 
 diag( "Testing TimTools $TimTools::VERSION, Perl $], $^X" );

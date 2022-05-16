@@ -8,7 +8,7 @@ use File::Spec;
 
 use lib ();
 
-our $VERSION = '1.0000';
+our $VERSION = '1.1000';
 our $called_from;
 
 sub import {
@@ -19,6 +19,7 @@ sub import {
     return unless($class eq __PACKAGE__);
 
     $called_from = Cwd::abs_path((caller(0))[1]);
+
     lib->import(
         $class->_load_plugin($plugin)
               ->_find(@plugin_args)
@@ -50,13 +51,13 @@ lib::relative::to
 
 =head1 DESCRIPTION
 
-Add a path to C<@INC> that is relative to something else
+Add paths to C<@INC> that is relative to something else
 
 =head1 SYNOPSIS
 
 Both of these will look up through the parent directories of the file that
 contains this code until it finds the root of a git repository, then add the
-'lib' directory in that repository's root to C<@INC>.
+'lib' and 't/lib' directories in that repository's root to C<@INC>.
 
     use lib::relative::to
         GitRepository => qw(lib t/lib);
@@ -120,7 +121,7 @@ In general the argument list takes the form:
 
 =back
 
-and the plugin will use the C<plugin_argument> to add C<list_of_directories> to
+and the plugin will use the C<plugin_configuration> to add C<list_of_directories> to
 C<@INC>. In the L</SYNOPSIS> above you can see that
 L<ParentContaining|lib::relative::to::ParentContaining> and
 L<GitRepository|lib::relative::to::GitRepository> are plugins, that

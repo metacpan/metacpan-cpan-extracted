@@ -1,7 +1,5 @@
 package Bitcoin::Crypto::Role::BasicKey;
-
-our $VERSION = "1.005";
-
+$Bitcoin::Crypto::Role::BasicKey::VERSION = '1.007';
 use v5.10;
 use strict;
 use warnings;
@@ -86,3 +84,4 @@ sub to_bytes
 }
 
 1;
+

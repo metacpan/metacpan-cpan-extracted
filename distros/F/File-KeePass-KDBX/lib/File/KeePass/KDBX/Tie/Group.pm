@@ -6,7 +6,7 @@ use strict;
 
 use parent 'File::KeePass::KDBX::Tie::Hash';
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 my %GET = (
     accessed            => sub { File::KeePass::KDBX::_decode_datetime($_[0]->last_access_time) },
@@ -66,7 +66,7 @@ File::KeePass::KDBX::Tie::Group - Database group
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 BUGS
 

@@ -2,8 +2,8 @@ NAME
     Config::IOD::Reader - Read IOD/INI configuration files
 
 VERSION
-    This document describes version 0.343 of Config::IOD::Reader (from Perl
-    distribution Config-IOD-Reader), released on 2021-06-23.
+    This document describes version 0.344 of Config::IOD::Reader (from Perl
+    distribution Config-IOD-Reader), released on 2022-05-02.
 
 SYNOPSIS
      use Config::IOD::Reader;
@@ -86,9 +86,6 @@ EXPRESSION
     Code will be compiled using Perl's "eval()" in the
     "Config::IOD::Expr::_Compiled" namespace, with "no strict", "no
     warnings".
-
-CONTRIBUTOR
-    Steven Haryanto <sharyanto@cpan.org>
 
 ATTRIBUTES
   default_section => str (default: "GLOBAL")
@@ -240,6 +237,15 @@ ATTRIBUTES
 
     NOTE: Turning this setting on violates IOD specification.
 
+  warn_perl => bool (default: 0)
+    Emit warning if configuration contains key line like these:
+
+     foo=>"bar"
+     foo => bar,
+
+    which suggest user is assuming configuration is in Perl format instead
+    of INI.
+
 METHODS
   new(%attrs) => obj
   $reader->read_file($filename[ , $callback ]) => hash
@@ -287,13 +293,6 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Config-IOD-Reader>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Config-IOD-Reader>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     IOD - specification
 
@@ -305,10 +304,36 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2019, 2018, 2017, 2016, 2015, 2014
-    by perlancar@cpan.org.
+    This software is copyright (c) 2022, 2021, 2019, 2018, 2017, 2016, 2015,
+    2014 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Config-IOD-Reader>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

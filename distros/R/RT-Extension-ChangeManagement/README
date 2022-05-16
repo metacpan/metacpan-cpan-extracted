@@ -24,6 +24,10 @@ INSTALLATION
 
     Restart your webserver
 
+UPGRADING
+    To upgrade from an earlier version, see the instructions in the
+    UPGRADING document.
+
 DESCRIPTION
     This extension provides the configuration to implement a change
     management process in Request Tracker

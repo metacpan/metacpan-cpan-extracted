@@ -1,7 +1,5 @@
 package Bitcoin::Crypto::Exception;
-
-our $VERSION = "1.005";
-
+$Bitcoin::Crypto::Exception::VERSION = '1.007';
 use v5.10;
 use strict;
 use warnings;
@@ -95,6 +93,7 @@ sub as_string
 {
 
 	package Bitcoin::Crypto::Exception::Sign;
+$Bitcoin::Crypto::Exception::Sign::VERSION = '1.007';
 	use parent -norequire, "Bitcoin::Crypto::Exception";
 
 }
@@ -102,96 +101,119 @@ sub as_string
 {
 
 	package Bitcoin::Crypto::Exception::Verify;
+$Bitcoin::Crypto::Exception::Verify::VERSION = '1.007';
 	use parent -norequire, "Bitcoin::Crypto::Exception";
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::KeyCreate;
+$Bitcoin::Crypto::Exception::KeyCreate::VERSION = '1.007';
 	use parent -norequire, "Bitcoin::Crypto::Exception";
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::KeyDerive;
+$Bitcoin::Crypto::Exception::KeyDerive::VERSION = '1.007';
 	use parent -norequire, "Bitcoin::Crypto::Exception";
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::MnemonicGenerate;
+$Bitcoin::Crypto::Exception::MnemonicGenerate::VERSION = '1.007';
 	use parent -norequire, "Bitcoin::Crypto::Exception";
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::MnemonicCheck;
+$Bitcoin::Crypto::Exception::MnemonicCheck::VERSION = '1.007';
 	use parent -norequire, "Bitcoin::Crypto::Exception";
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Base58InputFormat;
+$Bitcoin::Crypto::Exception::Base58InputFormat::VERSION = '1.007';
 	use parent -norequire, "Bitcoin::Crypto::Exception";
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Base58InputChecksum;
+$Bitcoin::Crypto::Exception::Base58InputChecksum::VERSION = '1.007';
 	use parent -norequire, "Bitcoin::Crypto::Exception";
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Bech32InputFormat;
+$Bitcoin::Crypto::Exception::Bech32InputFormat::VERSION = '1.007';
 	use parent -norequire, "Bitcoin::Crypto::Exception";
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Bech32InputData;
+$Bitcoin::Crypto::Exception::Bech32InputData::VERSION = '1.007';
 	use parent -norequire, "Bitcoin::Crypto::Exception";
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Bech32Type;
+$Bitcoin::Crypto::Exception::Bech32Type::VERSION = '1.007';
 	use parent -norequire, "Bitcoin::Crypto::Exception";
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::Bech32InputChecksum;
+$Bitcoin::Crypto::Exception::Bech32InputChecksum::VERSION = '1.007';
 	use parent -norequire, "Bitcoin::Crypto::Exception";
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::SegwitProgram;
+$Bitcoin::Crypto::Exception::SegwitProgram::VERSION = '1.007';
 	use parent -norequire, "Bitcoin::Crypto::Exception";
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::ValidationTest;
+$Bitcoin::Crypto::Exception::ValidationTest::VERSION = '1.007';
 	use parent -norequire, "Bitcoin::Crypto::Exception";
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::ScriptOpcode;
+$Bitcoin::Crypto::Exception::ScriptOpcode::VERSION = '1.007';
 	use parent -norequire, "Bitcoin::Crypto::Exception";
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::ScriptPush;
+$Bitcoin::Crypto::Exception::ScriptPush::VERSION = '1.007';
 	use parent -norequire, "Bitcoin::Crypto::Exception";
 }
 
 {
 
 	package Bitcoin::Crypto::Exception::NetworkConfig;
+$Bitcoin::Crypto::Exception::NetworkConfig::VERSION = '1.007';
+	use parent -norequire, "Bitcoin::Crypto::Exception";
+}
+
+{
+
+	package Bitcoin::Crypto::Exception::AddressGenerate;
+$Bitcoin::Crypto::Exception::AddressGenerate::VERSION = '1.007';
 	use parent -norequire, "Bitcoin::Crypto::Exception";
 }
 
@@ -280,3 +302,4 @@ Executes the subroutine given as the only parameter inside an C<eval>. Any excep
 	});
 
 =cut
+

@@ -1,19 +1,21 @@
 package Test::Config::IOD::Common;
 
-our $DATE = '2021-06-23'; # DATE
-our $VERSION = '0.343'; # VERSION
-
 use 5.010;
 use strict;
 use warnings;
 
 use Test::More 0.98;
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-05-02'; # DATE
+our $DIST = 'Config-IOD-Reader'; # DIST
+our $VERSION = '0.344'; # VERSION
+
 our $CLASS = "Config::IOD::Reader";
 
 sub test_common_iod {
 
-    eval "require $CLASS"; die if $@;
+    eval "require $CLASS"; die if $@; ## no critic: BuiltinFunctions::ProhibitStringyEval
 
     subtest "opt: default_section" => sub {
         test_read_iod(
@@ -304,7 +306,7 @@ Test::Config::IOD::Common - Common tests for Config::IOD and Config::IOD::Reader
 
 =head1 VERSION
 
-This document describes version 0.343 of Test::Config::IOD::Common (from Perl distribution Config-IOD-Reader), released on 2021-06-23.
+This document describes version 0.344 of Test::Config::IOD::Common (from Perl distribution Config-IOD-Reader), released on 2022-05-02.
 
 =for Pod::Coverage .+
 
@@ -316,6 +318,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/Config-IOD
 
 Source repository is at L<https://github.com/perlancar/perl-Config-IOD-Reader>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2021, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Config-IOD-Reader>
@@ -323,16 +353,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

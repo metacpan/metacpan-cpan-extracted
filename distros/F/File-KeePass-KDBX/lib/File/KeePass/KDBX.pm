@@ -17,7 +17,7 @@ use Scalar::Util qw(blessed looks_like_number weaken);
 use boolean;
 use namespace::clean;
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 fieldhashes \my (%KDBX, %TIED);
 
@@ -129,7 +129,7 @@ sub parse_db {
 
     my $ref = ref $buf ? $buf : \$buf;
 
-    open(my $fh, '<:raw', $ref) or die "Could not open buffer: $!\n";
+    open(my $fh, '<', $ref) or die "Could not open buffer: $!\n";
     $self->_load($fh, $pass, $args);
 }
 
@@ -544,7 +544,7 @@ File::KeePass::KDBX - Read and write KDBX files (using the File::KDBX backend)
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 SYNOPSIS
 
