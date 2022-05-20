@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "Tk",
       "Tcl",
@@ -46,13 +46,22 @@
          "requires" : {
             "Class::ISA" : "0.36",
             "Sub::Name" : "0.05",
-            "Tcl" : "0.9",
+            "Tcl" : "0.90",
+            "Time::HiRes" : "0",
             "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/chrstphrchvz/perl-tcl-ptk/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/chrstphrchvz/perl-tcl-ptk.git",
@@ -60,6 +69,6 @@
       },
       "x_MailingList" : "mailto:tcltk@perl.org"
    },
-   "version" : "1.08",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "1.09",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

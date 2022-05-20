@@ -10,7 +10,7 @@ use Test;
 # for most testers. See RT #131091
 plan test => 7, todo => [1..7];
 
-#use Tk; # verified against Perl/Tk for compatability
+#use Tk; # verified against Perl/Tk for compatibility
 use Tcl::pTk;
 
 my $mw = MainWindow->new;

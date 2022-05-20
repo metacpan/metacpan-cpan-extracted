@@ -1,5 +1,22 @@
 Revision history for Map::Tube
 
+3.68  2022-05-19T19:20:00+00:00
+      - Removed reference to CPAN search.
+      - Removed reference to RT - issues.
+      - Updated copyright year details.
+
+3.67  2022-05-19T14:30:00+00:00
+      - Updated pod w.r.t the new map Map::Tube::Hongkong.
+
+3.66  2022-05-19T00:15:00+00:00
+      - Handle reverse map when start and end share common line.
+
+3.65  2022-05-18T20:50:00+00:00
+      - Fixed the flaw in logic in sub _get_next_link().
+        (If start station is linked to station which is on
+         the same line as end station then follow the link
+         first before trying any other linked stations).
+
 3.64  2019-07-05T16:45:00+00:00
       - Moved author test scripts to xt/ subfolder.
 

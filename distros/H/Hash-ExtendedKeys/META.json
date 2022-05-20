@@ -32,9 +32,9 @@
       },
       "runtime" : {
          "requires" : {
-            "Hash::Util" : "0",
+            "Hash::Util" : "0.25",
             "Struct::Match" : "1.00",
-            "perl" : "5.006"
+            "perl" : "5.010"
          }
       },
       "test" : {
@@ -44,6 +44,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -65,10 +65,10 @@ if(!$@) {
             : warn "# mpfr library thresholds file: $evaluate\n";
 }
 
-if($Math::MPFR::VERSION eq '4.22') {print "ok 1\n"}
+if($Math::MPFR::VERSION eq '4.23') {print "ok 1\n"}
 else {print "not ok 1 $Math::MPFR::VERSION\n"}
 
-if(Math::MPFR::_get_xs_version() eq '4.22') {print "ok 2\n"}
+if(Math::MPFR::_get_xs_version() eq '4.23') {print "ok 2\n"}
 else {
   warn "Module version: $Math::MPFR::VERSION\nXS version: ", Math::MPFR::_get_xs_version(), "\n";
   print "not ok 2\n";

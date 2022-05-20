@@ -1,5 +1,15 @@
 Revision history for Perl extension XML::LibXSLT.
 
+2.002000    2022-05-17
+    - lib/XML/LibXSLT/Quick.pm .
+        - clarify license
+            - https://github.com/shlomif/perl-XML-LibXSLT/issues/5
+        - add docs and a $source 'string' type
+    - Makefile.PL
+        - cleanups
+        - Require perl-5.14.0 at a minimum
+            - https://github.com/shlomif/supporting-older-perl5-releases
+
 2.001000    2022-05-16
     - lib/XML/LibXSLT/Quick.pm .
         - Add 'params' support for generic_transform().

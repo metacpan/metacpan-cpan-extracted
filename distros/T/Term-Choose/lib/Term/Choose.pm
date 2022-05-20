@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.752';
+our $VERSION = '1.753';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -723,6 +723,9 @@ sub __prepare_info_and_prompt_lines {
         $info_w = $self->{max_width};
     }
     my $prompt = '';
+    if ( $self->{t_margin} ) {
+        $prompt .= "\n" x $self->{t_margin};
+    }
     if ( length $self->{info} ) {
         my $init     = $self->{tabs_info}[0] ? $self->{tabs_info}[0] : 0;
         my $subseq   = $self->{tabs_info}[1] ? $self->{tabs_info}[1] : 0;
@@ -744,16 +747,17 @@ sub __prepare_info_and_prompt_lines {
             { init_tab => ' ' x $init, subseq_tab => ' ' x $subseq, color => $self->{color}, join => 1 }
         );
     }
+    if ( length $self->{search_info} ) {
+        $prompt .= "\n";
+        if ( $self->{l_margin} ) {
+            $prompt .= ' ' x $self->{l_margin};
+        }
+        $prompt .= $self->{search_info};
+    }
     if ( $prompt eq '' ) {
         $self->{prompt_copy} = '';
         $self->{count_prompt_lines} = 0;
         return;
-    }
-    if ( length $self->{search_info} ) {
-        $prompt .= "\n" . $self->{search_info} . ':';
-    }
-    if ( $self->{t_margin} ) {
-        $prompt = ( "\n" x $self->{t_margin} ) . $prompt;
     }
     $self->{prompt_copy} = $prompt;
     $self->{prompt_copy} .= "\n\r";
@@ -1266,7 +1270,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.752
+Version 1.753
 
 =cut
 
@@ -1655,8 +1659,6 @@ Allowed values: 1 or greater
 (default: undefined)
 
 =head3 margin
-
-Experimental
 
 The option I<margin> allows one to set a margin on all four sides.
 

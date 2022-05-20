@@ -6,7 +6,7 @@ use Types::Standard qw/Str ArrayRef HashRef/;
 
 extends 'Pod::Simple';
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 attributes(
     pod => [ rw, ArrayRef, { lzy_array, clr } ],
@@ -46,6 +46,14 @@ for (qw/parse_file parse_from_file parse_string_document/) {
         $self->$orig($args);
         return $self->pod;
     };
+}
+
+sub find {
+	my @sections;
+	for ($_[0]->aoh) {
+		push @sections, $_ if $_->{$_[1]} =~ m/$_[2]/i;
+	}
+	return wantarray ? @sections : $sections[0];
 }
 
 sub get {
@@ -123,7 +131,7 @@ Pod::Simpler::Aoh - Parse pod into an array of hashes.
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =head1 SYNOPSIS
 
@@ -171,6 +179,12 @@ Returns the parsed pod as an array of hashes.
 =head2 get
 
 Accepts an index, returns a single *section* of pod.
+
+=head2 find
+
+Accepts an key and a value and searches the POD for it.
+
+	$pod->find('title', 'NAME');
 
 =head1 AUTHOR
 

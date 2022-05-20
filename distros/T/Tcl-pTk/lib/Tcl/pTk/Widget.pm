@@ -6,8 +6,9 @@
 
 package Tcl::pTk::Widget;
 
-our ($VERSION) = ('1.08');
+our ($VERSION) = ('1.09');
 
+use Config;
 use IO::Handle; 
 
 use Class::ISA;  # Used for finding the base class of a derived widget
@@ -363,14 +364,14 @@ sub cget {
     if( defined($option) && !ref($option) && ( $option =~ /^-\w+/ )){
             if( $option =~ /command|cmd$/  ){ # Check the option for something like -command
         
-                    # Retreive callback from the configuration store of the widget
+                    # Retrieve callback from the configuration store of the widget
                     #   This is to be compatible with perltk's method of storing subrefs as callback objects
                     #     (as opposed to raw subrefs)
                     return $self->Tcl::pTk::Derived::_cget(@args);
             }
             if( $option =~ /variable$/) { # Check the option for something like -textvariable
-                    # Retreive scalar ref from the configuration store of the widget
-                    #   This is to be compatible with perltk way of being able to retreive the scalar
+                    # Retrieve scalar ref from the configuration store of the widget
+                    #   This is to be compatible with perltk way of being able to retrieve the scalar
                     #     -textvariable using a cget call.
                     return $self->Tcl::pTk::Derived::_cget(@args);
             }
@@ -1109,6 +1110,14 @@ sub Darken {
     sprintf('#%02x%02x%02x',$red,$green,$blue);
 }
 
+sub Widget {
+    my $self = shift;
+    my $pathname = shift;
+    my $interp = $self->interp;
+    return $interp->mainwindow if $pathname eq '.';
+    return $interp->widget($pathname) if $interp->icall('winfo', 'exists', $pathname);
+    return undef;
+}
 sub PathName {
     my $wid = shift;
     return $wid->path;
@@ -1250,7 +1259,7 @@ sub repeat
 #################################################
 
 #
-# Getimage compatability routine
+# Getimage compatibility routine
 #
 
 my %image_formats =
@@ -1657,7 +1666,7 @@ sub _addcascade {
     # Create submenu with predefined naming convention ($mnu.m+1), so we can return it
     #  if the menu method is called on the menu button
     my $entries = $mnu->index('end');
-    $entries = -1 if ($entries eq 'none');
+    $entries = -1 if (!defined($entries) or $entries eq 'none');
     $entries++;
     my $smnu = $int->widget($mnu->call('menu',"$mnu.m$entries"), "Tcl::pTk::Menu");
     #my $smnu = $mnu->Menu; # return unique widget id
@@ -1916,17 +1925,18 @@ sub declareAutoWidget{
 #    Input: Widget Name
 sub setAutoWidgetISAs{
     my $widgetname = shift;
+    my $widgetISA = "Tcl::pTk::${widgetname}::ISA";
 
     no strict 'refs'; # Allow us to refer to package ISAs variables by string
     
-    unless( @{"Tcl::pTk::${widgetname}::ISA"} ){ # only create ISA if it is empty (i.e. hasn't been set)
+    unless( @{$widgetISA} ){ # only create ISA if it is empty (i.e. hasn't been set)
             if( defined($ptk2tcltk_ISAs{$widgetname})){ # Use lookup table, if it is there 
                     my $ISAentry = $ptk2tcltk_ISAs{$widgetname};
-                    @{"Tcl::pTk::${widgetname}::ISA"} = @$ISAentry;
+                    @{$widgetISA} = @$ISAentry;
                     #print STDERR "Declaring autowidget $widgetname ".join(", ", @$ISAentry)."\n";
             }
             else{ # Not defined in table, use default
-                    @{"Tcl::pTk::${widgetname}::ISA"} = qw(Tcl::pTk::Widget);                    
+                    @{$widgetISA} = qw(Tcl::pTk::Widget);
                     #print STDERR "Declaring Default autowidget $widgetname Tcl::pTk::Widget\n";
             }
     }
@@ -2134,12 +2144,26 @@ sub Unbusy
 #   TODO. Modify the Tcl package to support the Tcl's CreateFileHandler sub so we can implement
 #         fileevent similar to the way perl/tk and python's tkinter does it.
 
-# Include ioctl defaults for non-windows
-unless( $^O eq 'MSWin32'){
-    eval { require 'sys/ioctl.ph' };
-    # Store any error for later
-    # (e.g. no sys/ioctl.ph available)
-    $Tcl::pTk::_FE_unavailable = $@;
+if (
+    $^O eq 'darwin' or
+    $^O eq 'dragonfly' or
+    $^O eq 'freebsd' or
+    $^O eq 'netbsd' or
+    $^O eq 'openbsd'
+) {
+    # FIONREAD has not changed on BSD OSes; try computing it
+    # rather than requiring sys/ioctl.ph (often unavailable)
+    # See https://rt.cpan.org/Ticket/Display.html?id=125662
+    *FIONREAD = sub {
+        # See <sys/filio.h> and <sys/ioccom.h>
+        return (0x40000000 | ($Config{'intsize'} << 16) | (ord('f') << 8) | 127);
+    };
+} elsif ( $^O ne 'MSWin32'){
+    # Include ioctl defaults for non-Windows
+    eval { require 'sys/ioctl.ph'; 1; } or do {
+        # Store any error for later (e.g. sys/ioctl.ph unavailable)
+        $Tcl::pTk::_FE_unavailable = $@ || 'unknown error';
+    };
 }
 
 sub fileevent{

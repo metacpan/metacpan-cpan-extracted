@@ -21,7 +21,7 @@ use MIME::Base64;
 use File::Glob;
 use Hash::Util qw( lock_hashref unlock_hashref lock_ref_keys );
 
-our $VERSION = '1.29';
+our $VERSION = '1.30';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(

@@ -1,5 +1,10 @@
 Revision history for Perl module Math::FakeDD
 
+0.03
+ - Allow for mpfr versions older than 4.0.0, as they set minimum allowed precision
+   to 2 bits. (Beginning with 4.0.0, this minimum has been set to 1.)
+ - Correct the 'repository' settings in Makefile.PL
+
 0.02
  - Add (and export) dd_inf, dd_nan, dd_is_inf, dd_is_nan, sprintx, printx, unpackx, dd_hex.
  - Export dd2mpfr, mpfr2dd, mpfr2098.

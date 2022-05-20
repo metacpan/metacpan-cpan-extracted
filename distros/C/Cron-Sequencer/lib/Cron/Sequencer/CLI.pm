@@ -3,33 +3,63 @@
 use v5.20.0;
 use warnings;
 
+# The parts of this that we use have been stable and unchanged since v5.20.0:
+use feature qw(postderef);
+no warnings 'experimental::postderef';
+
 package Cron::Sequencer::CLI;
 
 use parent qw(Exporter);
 require DateTime;
 use Getopt::Long qw(GetOptionsFromArray);
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 our @EXPORT_OK = qw(calculate_start_end parse_argv);
+
+my %known_json = map { $_, 1 } qw(seq split pretty canonical);
 
 sub parse_argv {
     my ($pod2usage, @argv) = @_;
 
     my @groups;
     my $current = [];
+    my $json;
 
     # Split the command line into sections:
     for my $item (@argv) {
         if ($item eq '--') {
             push @groups, $current;
             $current = [];
+        } elsif ($item =~ /\A--json(?:=(.*)|)\z/s && !@groups) {
+            # GetOpt::Long doesn't appear to have a way to specify to specify an
+            # option that can take an argument, but it so, the argument must be
+            # given in the '=' form.
+            # We'd like to support `--json` and `--json=pretty` but have
+            # `--json pretty` mean the same as `./pretty --json`
+
+            if (length $1) {
+                for my $opt (split ',', $1) {
+                    $pod2usage->(exitval => 255,
+                                 message => "Unknown --json option '$opt'")
+                        unless $known_json{$opt};
+                    $json->{$opt} = 1;
+                }
+                $pod2usage->(exitval => 255,
+                             message => "Can't use --json=seq with --json=split")
+                    if $json->{seq} && $json->{split};
+            } else {
+                # Flag that we saw --json
+                $json //= {};
+            }
         } else {
             push @$current, $item;
         }
     }
     push @groups, $current;
 
-    my %global_options;
+    my %global_options = (
+        group => 1,
+    );
 
     Getopt::Long::Configure('pass_through', 'auto_version', 'auto_help');
     unless(GetOptionsFromArray($groups[0], \%global_options,
@@ -37,6 +67,7 @@ sub parse_argv {
                                'from=s',
                                'to=s',
                                'hide-env',
+                               'group!',
                            )) {
         $pod2usage->(exitval => 255, verbose => 1);
     }
@@ -64,7 +95,11 @@ sub parse_argv {
     $pod2usage->(exitval => 255)
         unless @input;
 
-    my $output = [%global_options{qw(hide-env)}, count => scalar @input];
+    my $output = [%global_options{qw(hide-env group)}, count => scalar @input];
+
+    push @$output, json => $json
+        if $json;
+
     return ($start, $end, $output, @input);
 }
 
@@ -106,19 +141,38 @@ sub calculate_start_end {
             if $end <= $start;
     } else {
         my $show = $options->{show} // 'today';
-        if ($show =~ /\A\s*(last|this|next)\s+week\s*\z/) {
+        if ($show =~ /\A\s*(last|this|next)\s+(hour|day|week)\s*\z/) {
             my $which = $1;
-            my $start_of_week = DateTime->now()->truncate(to => 'week');
+            my $what = $2;
+            my $start_of_period = DateTime->now()->truncate(to => $what);
             if ($which eq 'last') {
-                $end = $start_of_week->epoch();
-                $start_of_week->subtract(weeks => 1);
-                $start = $start_of_week->epoch();
+                $end = $start_of_period->epoch();
+                $start_of_period->subtract($what . 's' => 1);
+                $start = $start_of_period->epoch();
             } else {
-                $start_of_week->add(weeks => 1)
+                $start_of_period->add($what . 's' => 1)
                     if $which eq 'next';
-                $start = $start_of_week->epoch();
-                $start_of_week->add(weeks => 1);
-                $end = $start_of_week->epoch();
+                $start = $start_of_period->epoch();
+                $start_of_period->add($what . 's' => 1);
+                $end = $start_of_period->epoch();
+            }
+        } elsif ($show =~ /\A\s*(last|next)\s+([1-9][0-9]*)\s+(hour|day|week)s\s*\z/) {
+            my $which = $1;
+            my $count = $2;
+            my $what = $3;
+
+            # I was going to name this $now, but then realised that if I add or
+            # subtract on it, it won't be very "now" any more...
+            my $aargh_mutable = DateTime->now();
+
+            if ($which eq 'last') {
+                $end = $aargh_mutable->epoch();
+                $aargh_mutable->subtract($what . 's' => $count);
+                $start = $aargh_mutable->epoch();
+            } else {
+                $start= $aargh_mutable->epoch();
+                $aargh_mutable->add($what . 's' => $count);
+                $end = $aargh_mutable->epoch();
             }
         } elsif ($show =~ /\A\s*yesterday\s*\z/) {
             my $midnight = DateTime->today();

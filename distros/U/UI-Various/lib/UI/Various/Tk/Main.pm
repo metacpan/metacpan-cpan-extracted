@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use UI::Various::core;
 use UI::Various::Main;
@@ -152,12 +152,11 @@ sub _mainloop_run($)
     my ($self) = @_;
     MainLoop;
     $self->{_running} = 0;
-    # TODO: How to handle windows added later??? overload add, SUPER::add
 }
 
 #########################################################################
 
-=head2 B<window> - and new window to application
+=head2 B<window> - add new window to application
 
 C<Tk>'s overload of L<UI::Various::Main::window|UI::Various::Main/window -
 and new window to application>.  If the C<Mainloop> of L<Tk> is running, we

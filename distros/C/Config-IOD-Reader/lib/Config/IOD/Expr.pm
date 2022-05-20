@@ -7,7 +7,7 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-05-02'; # DATE
 our $DIST = 'Config-IOD-Reader'; # DIST
-our $VERSION = '0.344'; # VERSION
+our $VERSION = '0.345'; # VERSION
 
 my $EXPR_RE = qr{
 
@@ -99,7 +99,7 @@ Config::IOD::Expr - Parse expression
 
 =head1 VERSION
 
-This document describes version 0.344 of Config::IOD::Expr (from Perl distribution Config-IOD-Reader), released on 2022-05-02.
+This document describes version 0.345 of Config::IOD::Expr (from Perl distribution Config-IOD-Reader), released on 2022-05-02.
 
 =head1 SYNOPSIS
 

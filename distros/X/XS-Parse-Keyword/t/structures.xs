@@ -117,6 +117,16 @@ static const struct XSParseKeywordHooks hooks_scope_paren = {
   .build = &build_op,
 };
 
+static const struct XSParseKeywordHooks hooks_scope_args = {
+  .permit_hintkey = hintkey,
+
+  .pieces = (const struct XSParseKeywordPieceType []){
+    XPK_ARGSCOPE( XPK_TERMEXPR ),
+    {0}
+  },
+  .build = &build_op,
+};
+
 static const struct XSParseKeywordHooks hooks_scope_bracket = {
   .permit_hintkey = hintkey,
 
@@ -161,6 +171,7 @@ BOOT:
   register_xs_parse_keyword("structcommalist", &hooks_commalist, NULL);
 
   register_xs_parse_keyword("scopeparen",   &hooks_scope_paren,   NULL);
+  register_xs_parse_keyword("scopeargs",    &hooks_scope_args,    NULL);
   register_xs_parse_keyword("scopebracket", &hooks_scope_bracket, NULL);
   register_xs_parse_keyword("scopebrace",   &hooks_scope_brace,   NULL);
   register_xs_parse_keyword("scopechevron", &hooks_scope_chevron, NULL);

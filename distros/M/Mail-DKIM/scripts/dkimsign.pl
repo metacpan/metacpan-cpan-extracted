@@ -11,65 +11,56 @@ use warnings;
 
 use Mail::DKIM::Signer;
 use Mail::DKIM::TextWrap;
-use Getopt::Long;
+use Getopt::Long::Descriptive;
 use Pod::Usage;
 
-my $type = "dkim";
-my $selector = "selector1";
-my $algorithm = "rsa-sha1";
-my $method = "simple";
-my $domain; # undef => auto-select domain
-my $expiration;
-my $identity;
-my $key_file = "private.key";
-my $key_protocol;
-my @extra_tag;
-my $debug_canonicalization;
-my $binary;
-my $help;
-GetOptions(
-		"type=s" => \$type,
-		"algorithm=s" => \$algorithm,
-		"method=s" => \$method,
-		"selector=s" => \$selector,
-		"domain=s" => \$domain,
-		"expiration=i" => \$expiration,
-		"identity=s" => \$identity,
-		"key=s" => \$key_file,
-		"key-protocol=s" => \$key_protocol,
-		"debug-canonicalization=s" => \$debug_canonicalization,
-		"extra-tag=s" => \@extra_tag,
-		"binary" => \$binary,
-		"help|?" => \$help,
-		)
-	or pod2usage(2);
-pod2usage(1) if $help;
-pod2usage("Error: unrecognized argument(s)")
-	unless (@ARGV == 0);
+my ($opt, $usage) = describe_options(
+  "%c %o < original_email.txt",
+  [ "type=s" => "Determine the desired signature type 'dkim' or 'domainkeys'", {default=>'dkim'} ],
+  [ "algorithm=s" => "Algorithm to sign with", {default=>"rsa-sha256"} ],
+  [ "method=s" => "Specify the desired canonicalization method, Possible values are simple, simple/simple, simple/relaxed, relaxed, relaxed/relaxed, relaxed/simple", {default=>"simple"} ],
+  [ "selector=s" => "Signing selector", {default=>'selector1'} ],
+  [ "domain=s" => "Signing domain" ],
+  [ "expiration=s" => "Optional signature expiration, as delta from current timestamp" ],
+  [ "identity=s" => "Optional identity to use for signing" ],
+  [ "key=s" => "File containing private key, without BEGIN or END lines.", {default=>"private.key"} ],
+  [ "key-protocol=s" => "Optional key protocol to use" ],
+  [ "debug-canonicalization=s" => "Outputs the canonicalized message to the specified file, in addition to computing the DKIM signature. This is helpful for debugging canonicalization methods." ],
+  [ "extra-tag=s@" => "Extra tags to use in signing" ],
+  [ "timestamp=i" => "Timestamp to sign with, defaults to now", {default=>time} ],
+  [ "binary" => "Read input in binary mode" ],
+  [ "help|?" => "Show help" ],
+  {show_defaults=>1},
+);
+
+if ($opt->help) {
+  print $usage->text;
+  exit 1;
+}
 
 my $debugfh;
-if (defined $debug_canonicalization)
+if (defined $opt->debug_canonicalization)
 {
-	open $debugfh, ">", $debug_canonicalization
-		or die "Error: cannot write $debug_canonicalization: $!\n";
+	open $debugfh, ">", $opt->debug_canonicalization
+		or die "Error: cannot write ".$opt->debug_canonicalization.": $!\n";
 }
-if ($binary)
+if ($opt->binary)
 {
 	binmode STDIN;
 }
 
 my $dkim = new Mail::DKIM::Signer(
 		Policy => \&signer_policy,
-		Algorithm => $algorithm,
-		Method => $method,
-		Selector => $selector,
-		KeyFile => $key_file,
+		Algorithm => $opt->algorithm,
+		Method => $opt->method,
+		Selector => $opt->selector,
+		KeyFile => $opt->key,
 		Debug_Canonicalization => $debugfh,
 		);
 
 while (<STDIN>)
 {
-	unless ($binary)
+	unless ($opt->binary)
 	{
 		chomp $_;
 		s/\015?$/\015\012/s;
@@ -81,7 +72,7 @@ $dkim->CLOSE;
 if ($debugfh)
 {
 	close $debugfh;
-	print STDERR "wrote canonicalized message to $debug_canonicalization\n";
+	print STDERR "wrote canonicalized message to ".$opt->debug_canonicalization."\n";
 }
 
 print $dkim->signature->as_string . "\n";
@@ -92,25 +83,29 @@ sub signer_policy
 
 	use Mail::DKIM::DkSignature;
 
-	$dkim->domain($domain || $dkim->message_sender->host);
+	$dkim->domain($opt->domain || $dkim->message_sender->host);
 
-	my $class = $type eq "domainkeys" ? "Mail::DKIM::DkSignature" :
-			$type eq "dkim" ? "Mail::DKIM::Signature" :
-				die "unknown signature type '$type'\n";
+	my $class = $opt->type eq "domainkeys" ? "Mail::DKIM::DkSignature" :
+			$opt->type eq "dkim" ? "Mail::DKIM::Signature" :
+				die "unknown signature type '".$opt->type."'\n";
+        my $timestamp = $opt->timestamp ? $opt->timestamp : time();
 	my $sig = $class->new(
 			Algorithm => $dkim->algorithm,
 			Method => $dkim->method,
 			Headers => $dkim->headers,
 			Domain => $dkim->domain,
 			Selector => $dkim->selector,
-			defined($expiration) ? (Expiration => time() + $expiration) : (),
-			defined($identity) ? (Identity => $identity) : (),
+			defined($opt->timestamp) ? (Timestamp => $opt->expiration) : (),
+			defined($opt->expiration) ? (Expiration => $timestamp + $opt->expiration) : (),
+			defined($opt->identity) ? (Identity => $opt->identity) : (),
 		);
-	$sig->protocol($key_protocol) if defined $key_protocol;
-	foreach my $extra (@extra_tag)
-	{
-		my ($n, $v) = split /=/, $extra, 2;
-		$sig->set_tag($n, $v);
+	$sig->protocol($opt->key_protocol) if defined $opt->key_protocol;
+        if ($opt->extra_tag) {
+	        foreach my $extra ($opt->extra_tag->@*)
+	        {
+		        my ($n, $v) = split /=/, $extra, 2;
+	        	$sig->set_tag($n, $v);
+                }
 	}
 	$dkim->add_signature($sig);
 	return;
@@ -135,37 +130,11 @@ dkimsign.pl - computes a DKIM signature for an email message
   dkimsign.pl --help
     to see a full description of the various options
 
-=head1 OPTIONS
-
-=over
-
-=item B<--expiration>
-
-Optional. Specify the desired signature expiration, as a delta
-from the signature timestamp.
-
-=item B<--type>
-
-Determines the desired signature. Use dkim for a DKIM-Signature, or
-domainkeys for a DomainKey-Signature.
-
-=item B<--method>
-
-Determines the desired canonicalization method. Possible values are
-simple, simple/simple, simple/relaxed, relaxed, relaxed/relaxed,
-relaxed/simple.
-
-=item B<--debug-canonicalization>
-
-Outputs the canonicalized message to the specified file, in addition
-to computing the DKIM signature. This is helpful for debugging
-canonicalization methods.
-
-=back
-
 =head1 AUTHOR
 
 Jason Long, E<lt>jlong@messiah.eduE<gt>
+
+Marc Bradshaw, E<lt>marc@marcbradshaw.netE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

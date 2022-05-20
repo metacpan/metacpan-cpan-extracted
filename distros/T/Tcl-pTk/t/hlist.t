@@ -60,7 +60,7 @@ foreach my $item (@list)
  $hl->add("deleteItem", -itemtype => 'text', -text => 'deleteItem');
  $hl->delete("entry", "deleteItem");
  
- # Check that we can store and retreive data
+ # Check that we can store and retrieve data
  $hl->add("dataItem", -itemtype => 'text', -text => 'dataItem', -data => [ 1..20 ]); 
  my $data = $hl->entrycget("dataItem",'-data');  #get the data ref for this entry
  ok(scalar(@$data), 20, "Hlist data storage");

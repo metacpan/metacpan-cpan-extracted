@@ -9,7 +9,7 @@ use Test::More 0.98;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-05-02'; # DATE
 our $DIST = 'Config-IOD-Reader'; # DIST
-our $VERSION = '0.344'; # VERSION
+our $VERSION = '0.345'; # VERSION
 
 our $CLASS = "Config::IOD::Reader";
 
@@ -306,7 +306,7 @@ Test::Config::IOD::Common - Common tests for Config::IOD and Config::IOD::Reader
 
 =head1 VERSION
 
-This document describes version 0.344 of Test::Config::IOD::Common (from Perl distribution Config-IOD-Reader), released on 2022-05-02.
+This document describes version 0.345 of Test::Config::IOD::Common (from Perl distribution Config-IOD-Reader), released on 2022-05-02.
 
 =for Pod::Coverage .+
 

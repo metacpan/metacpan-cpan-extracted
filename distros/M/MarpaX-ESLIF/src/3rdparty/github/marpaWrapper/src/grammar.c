@@ -294,13 +294,13 @@ void marpaWrapperGrammar_freev(marpaWrapperGrammar_t *marpaWrapperGrammarp)
     }
 
     MARPAWRAPPER_TRACE(genericLoggerp, funcs, "Freeing symbol table");
-    manageBuf_freev(genericLoggerp, (void **) &(marpaWrapperGrammarp->symbolArrayp));
+    MARPAWRAPPER_FREEBUF(marpaWrapperGrammarp->symbolArrayp);
 
     MARPAWRAPPER_TRACE(genericLoggerp, funcs, "Freeing rule table");
-    manageBuf_freev(genericLoggerp, (void **) &(marpaWrapperGrammarp->ruleArrayp));
+    MARPAWRAPPER_FREEBUF(marpaWrapperGrammarp->ruleArrayp);
 
     MARPAWRAPPER_TRACE(genericLoggerp, funcs, "Freeing last list of events");
-    manageBuf_freev(genericLoggerp, (void **) &(marpaWrapperGrammarp->eventArrayp));
+    MARPAWRAPPER_FREEBUF(marpaWrapperGrammarp->eventArrayp);
 
     MARPAWRAPPER_TRACEF(genericLoggerp, funcs, "free(%p)", marpaWrapperGrammarp);
     free(marpaWrapperGrammarp);
@@ -342,13 +342,7 @@ int marpaWrapperGrammar_newSymboli(marpaWrapperGrammar_t *marpaWrapperGrammarp, 
 
   /* Allocate room for the new symbol */
   nSymboll = marpaSymbolIdi + 1;
-  if (MARPAWRAPPER_UNLIKELY(manageBuf_createp(genericLoggerp,
-                                              (void **) &(marpaWrapperGrammarp->symbolArrayp),
-                                              &(marpaWrapperGrammarp->sizeSymboll),
-                                              nSymboll,
-                                              sizeof(marpaWrapperGrammarSymbol_t)) == NULL)) {
-    goto err;
-  }
+  MARPAWRAPPER_MANAGEBUF(genericLoggerp, marpaWrapperGrammarp->symbolArrayp, marpaWrapperGrammarp->sizeSymboll, nSymboll, sizeof(marpaWrapperGrammarSymbol_t));
 
   marpaWrapperSymbolp = &(marpaWrapperGrammarp->symbolArrayp[marpaSymbolIdi]);
   marpaWrapperGrammarp->nSymboll = nSymboll;
@@ -544,13 +538,7 @@ int marpaWrapperGrammar_newRulei(marpaWrapperGrammar_t *marpaWrapperGrammarp, ma
 
   /* Allocate room for the new rule */
   nRulel = marpaRuleIdi + 1;
-  if (MARPAWRAPPER_UNLIKELY(manageBuf_createp(genericLoggerp,
-                                              (void **) &(marpaWrapperGrammarp->ruleArrayp),
-                                              &(marpaWrapperGrammarp->sizeRulel),
-                                              nRulel,
-                                              sizeof(marpaWrapperGrammarRule_t)) == NULL)) {
-    goto err;
-  }
+  MARPAWRAPPER_MANAGEBUF(genericLoggerp, marpaWrapperGrammarp->ruleArrayp, marpaWrapperGrammarp->sizeRulel, nRulel, sizeof(marpaWrapperGrammarRule_t));
 
   marpaWrapperRulep = &(marpaWrapperGrammarp->ruleArrayp[marpaRuleIdi]);
   marpaWrapperRulep->marpaRuleIdi                  = marpaRuleIdi;
@@ -598,22 +586,20 @@ int marpaWrapperGrammar_newRuleExti(marpaWrapperGrammar_t *marpaWrapperGrammarp,
 
   va_start(ap, lhsSymboli);
   while ((rhsSymboli = va_arg(ap, int)) >= 0) {
-    if (MARPAWRAPPER_UNLIKELY(manageBuf_createp(genericLoggerp, (void **) &rhsSymbolip, &sizeSymboll, nSymboll + 1, sizeof(marpaWrapperGrammarSymbol_t)) == NULL)) {
-      goto err;
-    }
+    MARPAWRAPPER_MANAGEBUF(genericLoggerp, rhsSymbolip, sizeSymboll, nSymboll + 1, sizeof(marpaWrapperGrammarSymbol_t));
     rhsSymbolip[nSymboll++] = rhsSymboli;
   }
   va_end(ap);
 
   rulei = marpaWrapperGrammar_newRulei(marpaWrapperGrammarp, &marpaWrapperGrammarRuleOption, lhsSymboli, nSymboll, rhsSymbolip);
-  manageBuf_freev(genericLoggerp, (void **) &rhsSymbolip);
+  MARPAWRAPPER_FREEBUF(rhsSymbolip);
 
   return rulei;
 
  err:
   if (rhsSymbolip != NULL) {
     int errnoi = errno;
-    manageBuf_freev(genericLoggerp, (void **) &rhsSymbolip);
+    MARPAWRAPPER_FREEBUF(rhsSymbolip);
     errno = errnoi;
   }
 
@@ -805,9 +791,7 @@ short marpaWrapperGrammar_eventb(marpaWrapperGrammar_t *marpaWrapperGrammarp, si
         case MARPA_EVENT_EXHAUSTED:
           if (exhaustionEventb) {
             /* Generate an event */
-            if (MARPAWRAPPER_UNLIKELY(manageBuf_createp(genericLoggerp, (void **) &(marpaWrapperGrammarp->eventArrayp), &(marpaWrapperGrammarp->sizeEventl), subscribedEventi + 1, sizeof(marpaWrapperGrammarEvent_t)) == NULL)) {
-              goto err;
-            }
+            MARPAWRAPPER_MANAGEBUF(genericLoggerp, marpaWrapperGrammarp->eventArrayp, marpaWrapperGrammarp->sizeEventl, subscribedEventi + 1, sizeof(marpaWrapperGrammarEvent_t));
             eventp = &(marpaWrapperGrammarp->eventArrayp[subscribedEventi]);
 
             eventp->eventType = MARPAWRAPPERGRAMMAR_EVENT_EXHAUSTED;
@@ -829,9 +813,7 @@ short marpaWrapperGrammar_eventb(marpaWrapperGrammar_t *marpaWrapperGrammarp, si
           /* Event value is the id of the symbol */
           eventValuei = marpa_g_event_value(&event);
           MARPAWRAPPER_TRACEF(genericLoggerp, funcs, "marpa_g_event_value(%p) returns %d", &event, eventValuei);
-          if (MARPAWRAPPER_UNLIKELY(manageBuf_createp(genericLoggerp, (void **) &(marpaWrapperGrammarp->eventArrayp), &(marpaWrapperGrammarp->sizeEventl), subscribedEventi + 1, sizeof(marpaWrapperGrammarEvent_t)) == NULL)) {
-            goto err;
-          }
+          MARPAWRAPPER_MANAGEBUF(genericLoggerp, marpaWrapperGrammarp->eventArrayp, marpaWrapperGrammarp->sizeEventl, subscribedEventi + 1, sizeof(marpaWrapperGrammarEvent_t));
           eventp = &(marpaWrapperGrammarp->eventArrayp[subscribedEventi]);
 
           eventp->eventType = (eventType == MARPA_EVENT_SYMBOL_COMPLETED) ? MARPAWRAPPERGRAMMAR_EVENT_COMPLETED : ((eventType == MARPA_EVENT_SYMBOL_NULLED) ? MARPAWRAPPERGRAMMAR_EVENT_NULLED : MARPAWRAPPERGRAMMAR_EVENT_EXPECTED);

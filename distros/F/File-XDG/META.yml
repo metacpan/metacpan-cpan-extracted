@@ -28,7 +28,7 @@ resources:
   bugtracker: https://github.com/uperl/File-XDG/issues
   homepage: https://metacpan.org/pod/File::XDG
   repository: git://github.com/uperl/File-XDG.git
-version: '1.01'
+version: '1.02'
 x_contributors:
   - 'Síle Ekaterin Aman'
   - 'Graham Ollis <plicease@cpan.org>'

@@ -34,13 +34,13 @@ _NTH_MONDAY: {
         my $month        = $row->[1];
         my $n            = $row->[2];
         my $correct_date = $row->[3];
-    
+
         cmp_ok(
             Date::Holidays::CA::_nth_monday($year, $month, $n),
-            '==', 
-            $correct_date,  
+            '==',
+            $correct_date,
             "$year $month $correct_date is Monday #$n of the month",
-        );    
+        );
     }
 } # _NTH_MONDAY:
 
@@ -50,12 +50,12 @@ _NEAREST_MONDAY: {
         my $month        = $row->[1];
         my $day          = $row->[2];
         my $correct_date = $row->[3];
-    
+
         cmp_ok(
             Date::Holidays::CA::_nearest_monday($year, $month, $day),
-            '==', 
-            $correct_date,  
+            '==',
+            $correct_date,
             "Nearest Monday to $year $month $day is $correct_date",
-        );    
+        );
     }
 } # _NEAREST_MONDAY:

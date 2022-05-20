@@ -1,6 +1,6 @@
 package Map::Tube::CLI::Option;
 
-$Map::Tube::CLI::Option::VERSION   = '0.66';
+$Map::Tube::CLI::Option::VERSION   = '0.67';
 $Map::Tube::CLI::Option::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::CLI::Option - Option as Moo Role for Map::Tube::CLI.
 
 =head1 VERSION
 
-Version 0.66
+Version 0.67
 
 =cut
 
@@ -48,7 +48,7 @@ L<https://github.com/manwar/Map-Tube-CLI>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-map-tube-cli at rt.cpan.org>,
-or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Map-Tube-CLI>.
+or through the web interface at L<https://github.com/manwar/Map-Tube-CLI/issues>.
 I will  be notified and then you'll automatically be notified of progress on your
 bug as I make changes.
 
@@ -62,9 +62,9 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * BUG report
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Map-Tube-CLI>
+L<https://github.com/manwar/Map-Tube-CLI/issues>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
@@ -74,15 +74,15 @@ L<http://annocpan.org/dist/Map-Tube-CLI>
 
 L<http://cpanratings.perl.org/d/Map-Tube-CLI>
 
-=item * Search CPAN
+=item * Search MetaCPAN
 
-L<http://search.cpan.org/dist/Map-Tube-CLI/>
+L<http://metacpan.org/dist/Map-Tube-CLI/>
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 - 2019 Mohammad S Anwar.
+Copyright (C) 2015 - 2022 Mohammad S Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain  a copy of the full

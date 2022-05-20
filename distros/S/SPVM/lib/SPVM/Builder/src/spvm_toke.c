@@ -54,6 +54,17 @@ int32_t SPVM_TOKE_is_white_space(SPVM_COMPILER* compiler, char ch) {
   }
 }
 
+int32_t SPVM_TOKE_is_hex_number(SPVM_COMPILER* compiler, char ch) {
+  (void)compiler;
+  // SP, CR, LF, HT, FF
+  if (isdigit(ch) || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F')) {
+    return 1;
+  }
+  else {
+    return 0;
+  }
+}
+
 int32_t SPVM_TOKE_is_valid_unicode_codepoint(int32_t uc) {
   return (((uint32_t)uc)-0xd800 > 0x07ff) && ((uint32_t)uc < 0x110000);
 }
@@ -94,7 +105,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
   compiler->befbufptr = compiler->bufptr;
 
   // Constant minus sign
-  int32_t minus = 0;
+  int32_t before_char_is_minus = 0;
   
   // Expect sub name
   int32_t expect_method_name = compiler->expect_method_name;
@@ -475,16 +486,9 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
       case '-': {
         compiler->bufptr++;
         
-        // Decimal Literal or Floating point Literal allow minus
-        if (
-          isdigit(*compiler->bufptr)
-          &&
-          (
-            (*compiler->bufptr != '0')
-            || ((*compiler->bufptr == '0') && (*(compiler->bufptr + 1) == '.')))
-          )
-        {
-          minus = 1;
+        // "-" is the sign of a numeric literal
+        if (isdigit(*compiler->bufptr)) {
+          before_char_is_minus = 1;
           continue;
         }
         else if (*compiler->bufptr == '>') {
@@ -859,84 +863,89 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         char ch = 0;
         
         if (*compiler->bufptr == '\'') {
-          SPVM_COMPILER_error(compiler, "Character literals must have at least one character at %s line %d", compiler->cur_file, compiler->cur_line);
+          SPVM_COMPILER_error(compiler, "A character literal can't be empty at %s line %d", compiler->cur_file, compiler->cur_line);
           compiler->bufptr++;
         }
         else {
           if (*compiler->bufptr == '\\') {
             compiler->bufptr++;
             if (*compiler->bufptr == '0') {
-              ch = '\0';
+              ch = 0x00; // NUL
               compiler->bufptr++;
             }
             else if (*compiler->bufptr == 'a') {
-              ch = '\a';
-              compiler->bufptr++;
-            }
-            else if (*compiler->bufptr == 'f') {
-              ch = '\f';
+              ch = 0x07; // BEL
               compiler->bufptr++;
             }
             else if (*compiler->bufptr == 't') {
-              ch = '\t';
-              compiler->bufptr++;
-            }
-            else if (*compiler->bufptr == 'r') {
-              ch = '\r';
+              ch = 0x09; // HT
               compiler->bufptr++;
             }
             else if (*compiler->bufptr == 'n') {
-              ch = '\n';
+              ch = 0x0a; // 
+              compiler->bufptr++;
+            }
+            else if (*compiler->bufptr == 'f') {
+              ch = 0x0c; // FF
+              compiler->bufptr++;
+            }
+            else if (*compiler->bufptr == 'r') {
+              ch = 0x0d; // LF
               compiler->bufptr++;
             }
             else if (*compiler->bufptr == '\'') {
-              ch = '\'';
+              ch = 0x27; // '
               compiler->bufptr++;
             }
             else if (*compiler->bufptr == '"') {
-              ch = '\"';
+              ch = 0x22; // "
               compiler->bufptr++;
             }
             else if (*compiler->bufptr == '\\') {
-              ch = '\\';
+              ch = 0x5c; /* \ */
               compiler->bufptr++;
             }
             // Hex ascii code
             else if (*compiler->bufptr == 'x') {
               compiler->bufptr++;
-              if (isdigit(*compiler->bufptr)
-                  || (*compiler->bufptr >= 'a' && *compiler->bufptr <= 'f')
-                  || (*compiler->bufptr >= 'A' && *compiler->bufptr <= 'F'))
-              {
-                int32_t memory_blocks_count_tmp = compiler->allocator->memory_blocks_count_tmp;
-                
-                char* num_str = SPVM_ALLOCATOR_alloc_memory_block_tmp(compiler->allocator, 3);
-                num_str[0] = *compiler->bufptr;
+
+              // {
+              int32_t has_brace = 0;
+              if (*compiler->bufptr == '{') {
+                has_brace = 1;
                 compiler->bufptr++;
-                if (
-                  isdigit(*compiler->bufptr)
-                  || (*compiler->bufptr >= 'a' && *compiler->bufptr <= 'f')
-                  || (*compiler->bufptr >= 'A' && *compiler->bufptr <= 'F'))
-                {
-                  num_str[1] = *compiler->bufptr;
-                  compiler->bufptr++;
-                  char *end;
-                  ch = (char)strtol(num_str, &end, 16);
+              }
+              
+              char hex_escape_char[3] = {0};
+              int32_t hex_escape_char_index = 0;
+              while (SPVM_TOKE_is_hex_number(compiler, *compiler->bufptr)) {
+                if (hex_escape_char_index >= 2) {
+                  break;
                 }
-                else {
-                  SPVM_COMPILER_error(compiler, "A invalid hexadecimal ascii code \"\\x%c%c\" in the second hexadecimal character of the charater literal at %s line %d", *(compiler->bufptr - 1), *compiler->bufptr, compiler->cur_file, compiler->cur_line);
-                  compiler->bufptr++;
-                }
-                SPVM_ALLOCATOR_free_memory_block_tmp(compiler->allocator, num_str);
-                assert(compiler->allocator->memory_blocks_count_tmp == memory_blocks_count_tmp);
+                hex_escape_char[hex_escape_char_index] = *compiler->bufptr;
+                compiler->bufptr++;
+                hex_escape_char_index++;
+              }
+              
+              if (strlen(hex_escape_char) > 0) {
+                char* end;
+                ch = (char)strtol(hex_escape_char, &end, 16);
               }
               else {
-                SPVM_COMPILER_error(compiler, "A invalid hexadecimal ascii code \"\\x%c%c\" in the first hexadecimal character of the charater literal at %s line %d", *compiler->bufptr, *(compiler->bufptr + 1), compiler->cur_file, compiler->cur_line);
-                compiler->bufptr += 2;
+                SPVM_COMPILER_error(compiler, "After \"\\x\" of the charater literal hexadecimal escape character, one or tow hexadecimal numbers must follow at %s line %d", compiler->cur_file, compiler->cur_line);
+              }
+              
+              if (has_brace) {
+                if (*compiler->bufptr == '}') {
+                  compiler->bufptr++;
+                }
+                else {
+                  SPVM_COMPILER_error(compiler, "The charater literal hexadecimal escape character that has the opening \"{\" must have the closing \"}\" at %s line %d", compiler->cur_file, compiler->cur_line);
+                }
               }
             }
             else {
-              SPVM_COMPILER_error(compiler, "A invalid escape character \"\\%c\" in the charater literal at %s line %d", *compiler->bufptr, compiler->cur_file, compiler->cur_line);
+              SPVM_COMPILER_error(compiler, "Invalid charater literal escape character \"\\%c\" at %s line %d", *compiler->bufptr, compiler->cur_file, compiler->cur_line);
               compiler->bufptr++;
             }
           }
@@ -949,7 +958,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             compiler->bufptr++;
           }
           else {
-            SPVM_COMPILER_error(compiler, "A character literal must ends with \"'\" of the character literal at %s line %d", compiler->cur_file, compiler->cur_line);
+            SPVM_COMPILER_error(compiler, "A character literal must ends with \"'\" at %s line %d", compiler->cur_file, compiler->cur_line);
           }
         }
         
@@ -1171,12 +1180,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                     char* num_str = SPVM_ALLOCATOR_alloc_memory_block_tmp(compiler->allocator, 3);
                     num_str[0] = *char_ptr;
                     char_ptr++;
-                    if (
-                      isdigit(*char_ptr)
-                      || *char_ptr == 'a'  || *char_ptr == 'b'  || *char_ptr == 'c'  || *char_ptr == 'd'  || *char_ptr == 'e'  || *char_ptr == 'f'
-                      || *char_ptr == 'A'  || *char_ptr == 'B'  || *char_ptr == 'C'  || *char_ptr == 'D'  || *char_ptr == 'E'  || *char_ptr == 'F'
-                    )
-                    {
+                    if (SPVM_TOKE_is_hex_number(compiler, *char_ptr)) {
                       num_str[1] = *char_ptr;
                       char_ptr++;
                       char *end;
@@ -1202,12 +1206,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                     char* char_start_ptr = char_ptr;
                     int32_t unicode_chars_length = 0;
                     
-                    while (
-                      isdigit(*char_ptr)
-                      || *char_ptr == 'a'  || *char_ptr == 'b'  || *char_ptr == 'c'  || *char_ptr == 'd'  || *char_ptr == 'e'  || *char_ptr == 'f'
-                      || *char_ptr == 'A'  || *char_ptr == 'B'  || *char_ptr == 'C'  || *char_ptr == 'D'  || *char_ptr == 'E'  || *char_ptr == 'F'
-                    )
-                    {
+                    while (SPVM_TOKE_is_hex_number(compiler, *char_ptr)) {
                       char_ptr++;
                       unicode_chars_length++;
                     }
@@ -1485,17 +1484,15 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             return VAR_NAME;
           }
         }
-        // Number Literal
+        // Numeric literal
         else if (isdigit(ch)) {
-          const char* cur_token_ptr;
+          const char* number_literal_begin_ptr = compiler->bufptr;
           
-          // Before character is minus
-          if (minus) {
-            cur_token_ptr = compiler->bufptr - 1;
-            minus = 0;
-          }
-          else {
-            cur_token_ptr = compiler->bufptr;
+          // The before character is "-"
+          int32_t minus = 0;
+          if (before_char_is_minus) {
+            before_char_is_minus = 0;
+            minus = 1;
           }
           
           int32_t digit = 0;
@@ -1509,8 +1506,12 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               digit = 2;
             }
             // Octal Literal
-            else if (isdigit(*(compiler->bufptr + 1))) {
+            else if (isdigit(*(compiler->bufptr + 1)) || *(compiler->bufptr + 1) == '_') {
               digit = 8;
+            }
+            // 0...
+            else {
+              digit = 10;
             }
           }
           // Decimal Literal
@@ -1526,10 +1527,8 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           if (digit == 16) {
             compiler->bufptr += 2;
             while(
-              isdigit(*compiler->bufptr)
-              || *compiler->bufptr == 'a' || *compiler->bufptr == 'b' || *compiler->bufptr == 'c' || *compiler->bufptr == 'd' || *compiler->bufptr == 'e' || *compiler->bufptr == 'f'
-              || *compiler->bufptr == 'A' || *compiler->bufptr == 'B' || *compiler->bufptr == 'C' || *compiler->bufptr == 'D' || *compiler->bufptr == 'E' || *compiler->bufptr == 'F'
-              || *compiler->bufptr == '_' || *compiler->bufptr == '.' || *compiler->bufptr == 'p' || *compiler->bufptr == 'P' || *compiler->bufptr == '-' || *compiler->bufptr == '+'
+              SPVM_TOKE_is_hex_number(compiler, *compiler->bufptr) || *compiler->bufptr == '_'
+              || *compiler->bufptr == '.' || *compiler->bufptr == 'p' || *compiler->bufptr == 'P' || *compiler->bufptr == '-' || *compiler->bufptr == '+'
             )
             {
               // Floating point literal
@@ -1570,48 +1569,57 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           }
           
           // First is space for + or -
-          int32_t str_len = (compiler->bufptr - cur_token_ptr);
+          int32_t str_len = (compiler->bufptr - number_literal_begin_ptr);
           
           // Ignore under line
-          int32_t num_str_memoyr_blocks_count = compiler->allocator->memory_blocks_count_tmp;
-          char* num_str = (char*)SPVM_ALLOCATOR_alloc_memory_block_tmp(compiler->allocator, str_len + 2);
+          int32_t numeric_literal_memoyr_blocks_count = compiler->allocator->memory_blocks_count_tmp;
+          char* numeric_literal = (char*)SPVM_ALLOCATOR_alloc_memory_block_tmp(compiler->allocator, str_len + 1);
           int32_t pos = 0;
           {
             int32_t i;
             for (i = 0; i < str_len; i++) {
-              if (*(cur_token_ptr + i) != '_') {
-                *(num_str + pos) = *(cur_token_ptr + i);
+              if (*(number_literal_begin_ptr + i) != '_') {
+                *(numeric_literal + pos) = *(number_literal_begin_ptr + i);
                 pos++;
               }
             }
-            num_str[pos] = '\0';
+            numeric_literal[pos] = '\0';
           }
           // Back suffix such as "f" or "F" when hex floating number
           if (is_hex_floating_number && !isdigit(*(compiler->bufptr - 1))) {
             compiler->bufptr--;
-            num_str[pos - 1] = '\0';
+            numeric_literal[pos - 1] = '\0';
           }
-
+          
           // Constant
           SPVM_TYPE* constant_type;
           
+          // suffix
+          char suffix[2];
+          suffix[1] = '\0';
+          
           // long suffix
           if (*compiler->bufptr == 'l' || *compiler->bufptr == 'L')  {
+            suffix[0] = *compiler->bufptr;
             constant_type = SPVM_TYPE_new_long_type(compiler);
             compiler->bufptr++;
           }
           // float suffix
           else if (*compiler->bufptr == 'f' || *compiler->bufptr == 'F')  {
+            suffix[0] = *compiler->bufptr;
             constant_type = SPVM_TYPE_new_float_type(compiler);
             compiler->bufptr++;
           }
           // double suffix
           else if (*compiler->bufptr == 'd' || *compiler->bufptr == 'D')  {
+            suffix[0] = *compiler->bufptr;
             constant_type = SPVM_TYPE_new_double_type(compiler);
             compiler->bufptr++;
           }
           // no suffix
           else {
+            suffix[0] = '\0';
+            
             // floating point
             if (is_floating_number) {
               constant_type = SPVM_TYPE_new_double_type(compiler);
@@ -1622,137 +1630,190 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             }
           }
           
-          char *end;
           SPVM_VALUE num;
           
-          // float
-          if (constant_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT) {
-            num.dval = strtof(num_str, &end);
+          // Parse Interger literal - int
+          if (constant_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_INT) {
+            
+            errno = 0;
+            int32_t out_of_range = 0;
+            
+            int32_t parse_start_offset;
+            if (digit == 16) {
+              parse_start_offset = 2;
+            }
+            else if (digit == 8) {
+              parse_start_offset = 1;
+            }
+            else if (digit == 2) {
+              parse_start_offset = 2;
+            }
+            else if (digit == 10) {
+              parse_start_offset = 0;
+            }
+            else {
+              assert(0);
+            }
+            
+            char *end;
+            uint64_t num_uint64_nosign = strtoull(numeric_literal + parse_start_offset, &end, digit);
+            if (*end != '\0') {
+              out_of_range = 1;
+            }
+            else if (errno == ERANGE) {
+              out_of_range = 1;
+            }
+            else {
+              if (digit == 16 || digit == 8 || digit == 2) {
+                if (num_uint64_nosign > UINT32_MAX) {
+                  out_of_range = 1;
+                }
+              }
+              else {
+                if (minus) {
+                  if (num_uint64_nosign > ((uint32_t)INT32_MAX + 1)) {
+                    out_of_range = 1;
+                  }
+                }
+                else {
+                  if (num_uint64_nosign > INT32_MAX) {
+                    out_of_range = 1;
+                  }
+                }
+              }
+            }
+            
+            if (out_of_range) {
+              SPVM_COMPILER_error(compiler, "The numeric literal \"%s%s\" is out of range of maximum and minimum values of int type at %s line %d", minus ? "-" : "", numeric_literal, compiler->cur_file, compiler->cur_line);
+            }
+            
+            if (digit == 16 || digit == 8 || digit == 2) {
+              num.ival = (int32_t)(uint32_t)num_uint64_nosign;
+              if (minus) {
+                num.ival = -num.ival;
+              }
+            }
+            else {
+              num.ival = minus ? (int32_t)-num_uint64_nosign : (int32_t)num_uint64_nosign;
+            }
+          }
+          // Parse Interger literal - long
+          else if (constant_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_LONG) {
+            errno = 0;
+            int32_t invalid = 0;
+            
+            int32_t parse_start_offset;
+            if (digit == 16) {
+              parse_start_offset = 2;
+            }
+            else if (digit == 8) {
+              parse_start_offset = 1;
+            }
+            else if (digit == 2) {
+              parse_start_offset = 2;
+            }
+            else if (digit == 10) {
+              parse_start_offset = 0;
+            }
+            else {
+              assert(0);
+            }
+            
+            char *end;
+            uint64_t num_uint64_nosign = strtoull(numeric_literal + parse_start_offset, &end, digit);
+            if (*end != '\0') {
+              invalid = 1;
+            }
+            else if (errno == ERANGE) {
+              invalid = 1;
+            }
+            else {
+              if (digit == 16 || digit == 8 || digit == 2) {
+                if (num_uint64_nosign > UINT64_MAX) {
+                  invalid = 1;
+                }
+              }
+              else {
+                if (minus) {
+                  if (num_uint64_nosign > ((uint64_t)INT64_MAX + 1)) {
+                    invalid = 1;
+                  }
+                }
+                else {
+                  if (num_uint64_nosign > INT64_MAX) {
+                    invalid = 1;
+                  }
+                }
+              }
+            }
+            
+            if (invalid) {
+              SPVM_COMPILER_error(compiler, "The numeric literal \"%s%s%s\" is out of range of maximum and minimum values of long type at %s line %d", minus ? "-" : "", numeric_literal, suffix, compiler->cur_file, compiler->cur_line);
+            }
+            
+            if (digit == 16 || digit == 8 || digit == 2) {
+              num.lval = (int64_t)(uint64_t)num_uint64_nosign;
+              if (minus) {
+                num.lval = -num.lval;
+              }
+            }
+            else {
+              num.lval = minus ? (int64_t)-num_uint64_nosign : (int64_t)num_uint64_nosign;
+            }
+          }
+          // Parse floating point literal - float
+          else if (constant_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT) {
+            char *end;
+            num.fval = strtof(numeric_literal, &end);
             if (*end != '\0') {
               SPVM_COMPILER_error(compiler, "Invalid float literal at %s line %d", compiler->cur_file, compiler->cur_line);
             }
-          }
-          // double
-          else if (constant_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE) {
             
-            num.dval = strtod(num_str, &end);
+            if (minus) {
+              num.fval = -num.fval;
+            }
+          }
+          // Parse floating point literal - double
+          else if (constant_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE) {
+            char *end;
+            num.dval = strtod(numeric_literal, &end);
             if (*end != '\0') {
               SPVM_COMPILER_error(compiler, "Invalid double literal at %s line %d", compiler->cur_file, compiler->cur_line);
             }
-          }
-          // int
-          else if (constant_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_INT) {
-            errno = 0;
-            int32_t out_of_range = 0;
-            int32_t invalid = 0;
-            
-            if (digit == 16 || digit == 8 || digit == 2) {
-              char* num_str_only_num;
-              if (digit == 16) {
-                num_str_only_num = num_str + 2;
-              }
-              else if (digit == 8) {
-                num_str_only_num = num_str + 1;
-              }
-              else if (digit == 2) {
-                num_str_only_num = num_str + 2;
-              }
-              else {
-                assert(0);
-              }
-              uint64_t unum = (uint64_t)strtoull(num_str_only_num, &end, digit);
-              if (*end != '\0') {
-                invalid = 1;
-              }
-              else if (unum > UINT32_MAX || errno == ERANGE) {
-                out_of_range = 1;
-              }
-              num.lval = (int64_t)unum;
-            }
-            else {
-              num.lval = (int64_t)strtoll(num_str, &end, 10);
-              if (*end != '\0') {
-                invalid = 1;
-              }
-              else if (num.lval < INT32_MIN || num.lval > INT32_MAX || errno == ERANGE) {
-                out_of_range = 1;
-              }
-            }
-            
-            if (invalid) {
-              SPVM_COMPILER_error(compiler, "Invalid int literal at %s line %d", compiler->cur_file, compiler->cur_line);
-            }
-            else if (out_of_range) {
-              SPVM_COMPILER_error(compiler, "int literal out of range at %s line %d", compiler->cur_file, compiler->cur_line);
-            }
-          }
-          // long
-          else if (constant_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_LONG) {
-            errno = 0;
-            int32_t out_of_range = 0;
-            int32_t invalid = 0;
-            
-            if (digit == 16 || digit == 8 || digit == 2) {
-              char* num_str_only_num;
-              if (digit == 16) {
-                num_str_only_num = num_str + 2;
-              }
-              else if (digit == 8) {
-                num_str_only_num = num_str + 1;
-              }
-              else if (digit == 2) {
-                num_str_only_num = num_str + 2;
-              }
-              else {
-                assert(0);
-              }
-              uint64_t unum = (uint64_t)strtoull(num_str_only_num, &end, digit);
-              if (*end != '\0') {
-                invalid = 1;
-              }
-              else if (unum > UINT64_MAX || errno == ERANGE) {
-                out_of_range = 1;
-              }
-              num.lval = (int64_t)unum;
-            }
-            else {
-              num.lval = (int64_t)strtoll(num_str, &end, 10);
-              if (*end != '\0') {
-                invalid = 1;
-              }
-              else if (num.lval < INT64_MIN || num.lval > INT64_MAX || errno == ERANGE) {
-                out_of_range = 1;
-              }
-            }
-            
-            if (invalid) {
-              SPVM_COMPILER_error(compiler, "Invalid long literal at %s line %d", compiler->cur_file, compiler->cur_line);
-            }
-            else if (out_of_range) {
-              SPVM_COMPILER_error(compiler, "long literal out of range at %s line %d", compiler->cur_file, compiler->cur_line);
+            if (minus) {
+              num.dval = -num.dval;
             }
           }
           else {
             assert(0);
           }
-          SPVM_ALLOCATOR_free_memory_block_tmp(compiler->allocator, num_str);
-          assert(compiler->allocator->memory_blocks_count_tmp == num_str_memoyr_blocks_count);
+          SPVM_ALLOCATOR_free_memory_block_tmp(compiler->allocator, numeric_literal);
+          assert(compiler->allocator->memory_blocks_count_tmp == numeric_literal_memoyr_blocks_count);
 
           // Constant op
           SPVM_OP* op_constant;
-          if (constant_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT) {
-            op_constant = SPVM_OP_new_op_constant_float(compiler, (float)num.dval, compiler->cur_file, compiler->cur_line);
+          switch (constant_type->basic_type->id) {
+            case SPVM_NATIVE_C_BASIC_TYPE_ID_INT: {
+              op_constant = SPVM_OP_new_op_constant_int(compiler, num.ival, compiler->cur_file, compiler->cur_line);
+              break;
+            }
+            case SPVM_NATIVE_C_BASIC_TYPE_ID_LONG: {
+              op_constant = SPVM_OP_new_op_constant_long(compiler, num.lval, compiler->cur_file, compiler->cur_line);
+              break;
+            }
+            case SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT: {
+              op_constant = SPVM_OP_new_op_constant_float(compiler, num.fval, compiler->cur_file, compiler->cur_line);
+              break;
+            }
+            case SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE: {
+              op_constant = SPVM_OP_new_op_constant_double(compiler, num.dval, compiler->cur_file, compiler->cur_line);
+              break;
+            }
+            default: {
+              assert(0);
+            }
           }
-          else if (constant_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE) {
-            op_constant = SPVM_OP_new_op_constant_double(compiler, num.dval, compiler->cur_file, compiler->cur_line);
-          }
-          else if (constant_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_INT) {
-            op_constant = SPVM_OP_new_op_constant_int(compiler, num.lval, compiler->cur_file, compiler->cur_line);
-          }
-          else if (constant_type->basic_type->id == SPVM_NATIVE_C_BASIC_TYPE_ID_LONG) {
-            op_constant = SPVM_OP_new_op_constant_long(compiler, num.lval, compiler->cur_file, compiler->cur_line);
-          }
-          
+
           yylvalp->opval = op_constant;
           
           return CONSTANT;

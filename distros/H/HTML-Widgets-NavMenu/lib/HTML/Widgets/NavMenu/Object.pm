@@ -1,5 +1,5 @@
 package HTML::Widgets::NavMenu::Object;
-$HTML::Widgets::NavMenu::Object::VERSION = '1.0900';
+$HTML::Widgets::NavMenu::Object::VERSION = '1.0902';
 use strict;
 use warnings;
 
@@ -80,7 +80,7 @@ HTML::Widgets::NavMenu::Object - a base object for HTML::Widgets::NavMenu
 
 =head1 VERSION
 
-version 1.0900
+version 1.0902
 
 =head1 SYNOPSIS
 

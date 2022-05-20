@@ -9,7 +9,7 @@ use parent qw(Config::IOD::Base);
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-05-02'; # DATE
 our $DIST = 'Config-IOD-Reader'; # DIST
-our $VERSION = '0.344'; # VERSION
+our $VERSION = '0.345'; # VERSION
 
 sub _merge {
     my ($self, $section) = @_;
@@ -237,7 +237,7 @@ Config::IOD::Reader - Read IOD/INI configuration files
 
 =head1 VERSION
 
-This document describes version 0.344 of Config::IOD::Reader (from Perl distribution Config-IOD-Reader), released on 2022-05-02.
+This document describes version 0.345 of Config::IOD::Reader (from Perl distribution Config-IOD-Reader), released on 2022-05-02.
 
 =head1 SYNOPSIS
 
@@ -487,9 +487,15 @@ B<NOTE: Turning this setting on violates IOD specification.>
 Emit warning if configuration contains key line like these:
 
  foo=>"bar"
- foo => bar,
+ foo => 123,
 
 which suggest user is assuming configuration is in Perl format instead of INI.
+
+If you enable this option, but happens to have a value that begins with ">", to
+avoid this warning you can quote the value first:
+
+ foo=">the value does begins with a greater-than sign"
+ bar=">the value does begins with a greater-than sign and ends with a comma,"
 
 =head1 METHODS
 

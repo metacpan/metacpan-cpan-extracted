@@ -3,7 +3,7 @@ NAME
     each set with its own init arguments
 
 VERSION
-    version 0.004
+    version 0.005
 
 SYNOPSIS
     Instead of having to resort to OO style to log to different categories:
@@ -35,11 +35,12 @@ SYNOPSIS
      );
      use Log::ger;
 
-     access_info "goes to access log";
-     access_warn "goes to access log";
-     log_warn    "goes to error log";
-     log_debug   "goes to error log";
-     ...
+     log_warn    "goes to error log";   # a logger sub for the 'error' category, using the "log_" prefix
+     log_debug   "goes to error log";   # another
+     access_info "goes to access log";  # a logger sub for the 'access' category, using the "access_" prefix
+     access_warn "goes to access log";  # another
+     if (is_debug()) { ... }            # a level checker sub for the 'error' category, using the "is_" prefix
+     if (access_is_trace()) { ... }     # a level checker sub for the 'access' category, using the "access_is_" prefix
 
 DESCRIPTION
     This plugin lets you create multiple sets of logger subroutines, each

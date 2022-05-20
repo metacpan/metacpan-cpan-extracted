@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Hash::ExtendedKeys::Tie;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use overload '%{}' => sub { ${$_[0]}->{hash}; }, fallback => 1;
 
@@ -27,7 +27,7 @@ Hash::ExtendedKeys - Hash Keys
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 
@@ -57,6 +57,17 @@ Perhaps a little code snippet.
 	$hash{$ref} = 1;
 	$hash{[qw/a b c/]}++;
 
+=head1 METHODS
+
+=cut
+
+=head2 new
+
+Instantiate a new Hash::ExtendedKeys object.
+
+	Hash::ExtendedKeys->new();
+
+=cut
 
 =head1 AUTHOR
 

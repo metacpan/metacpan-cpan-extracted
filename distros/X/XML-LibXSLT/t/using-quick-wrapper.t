@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use autodie;
 
-use Test::More tests => 23;
+use Test::More tests => 29;
 
 use XML::LibXML         ();
 use XML::LibXSLT        ();
@@ -122,10 +122,17 @@ foreach my $rec (
             path => $fn,
         }
     },
+    +{
+        name   => 'params from str',
+        source => +{
+            type   => 'string',
+            string => $xml1_text,
+        }
+    },
     )
 {
-    # TEST
-    # TEST:FILTER(MULT(3))
+    # TEST*2
+    # TEST:FILTER(MULT(4))
     my $name   = $rec->{name};
     my $source = $rec->{source};
     {
@@ -174,7 +181,7 @@ foreach my $rec (
                 "generic_transform() : ${name} -> file path name" );
             unlink($out_fn);
         }
-        if ( $name eq 'from file' )
+        if ( ( $name eq 'from file' ) or ( $name eq 'params from str' ) )
         {
             $out_fn = 'pppp0.xml';
             $stylesheet->generic_transform(
@@ -234,7 +241,28 @@ foreach my $rec (
 }
 __END__
 
+=encoding utf8
+
 =head1 COPYRIGHT & LICENSE
+
+B<NOTE!!! :> this licence applies to this file alone. The blanket licence
+for the distribution is "same as Perl 5".
+
+(I am not a lawyer (= "IANAL") / etc. )
+
+For more information, consult:
+
+=over 4
+
+=item * L<https://www.shlomifish.org/philosophy/computers/open-source/foss-licences-wars/rev2/#which-licence-same-as-perl>
+
+=item * L<https://github.com/shlomif/perl-XML-LibXSLT/issues/5>
+
+=item * L<https://en.wikiquote.org/w/index.php?title=Rick_Cook&oldid=3060266>
+
+“Programming today is a race between software engineers striving to build bigger and better idiot-proof programs, and the Universe trying to produce bigger and better idiots. So far, the Universe is winning.”
+
+=back
 
 Copyright 2022 by Shlomi Fish
 

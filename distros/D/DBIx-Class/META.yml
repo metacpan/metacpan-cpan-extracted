@@ -62,7 +62,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-Class
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Perl5/DBIx-Class
-version: 0.082842
+version: 0.082843
 x_authority: cpan:RIBASUSHI
 x_contributors:
   - 'abraxxa: Alexander Hartmaier <abraxxa@cpan.org>'
@@ -167,6 +167,7 @@ x_contributors:
   - 'kkane: Kevin L. Kane <kevin.kane@gmail.com>'
   - 'konobi: Scott McWhirter <konobi@cpan.org>'
   - 'lejeunerenard: Sean Zellmer <sean@lejeunerenard.com>'
+  - 'leont: Leon Timmermans <fawaka@gmail.com>'
   - 'littlesavage: Alexey Illarionov <littlesavage@orionet.ru>'
   - 'lukes: Luke Saunders <luke.saunders@gmail.com>'
   - 'marcus: Marcus Ramberg <mramberg@cpan.org>'

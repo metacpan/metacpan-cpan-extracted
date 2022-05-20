@@ -17,7 +17,7 @@ use strict;
 #use PDL::PP; ##-- do NOT do this!
 use Exporter;
 
-our $VERSION = '1.0.18'; ##-- v1.0.4: use perl-reversion from Perl::Version instead
+our $VERSION = '1.0.20'; ##-- v1.0.4: use perl-reversion from Perl::Version instead
 our @ISA = qw(Exporter);
 our @EXPORT_OK =
   (
@@ -68,6 +68,7 @@ PDL::VectorValued::Dev provides some developer utilities for
 vector-valued PDLs.  It produces code for processing with PDL::PP.
 
 =cut
+
 
 ##======================================================================
 ## PP Utiltiies
@@ -442,7 +443,7 @@ and $imin if all values in $vals($imin:$imax-1) are strictly greater than $find.
 =item $options{cmpvar}
 
 If specified, temporary indices and comparison values will be stored in
-in the C variables $options{lovar}, $options{hivar}, $options{midvar}, and $options{cmpvar}.
+the C variables $options{lovar}, $options{hivar}, $options{midvar}, and $options{cmpvar}.
 If unspecified, new locally scoped C variables
 C<_vvpp_lb_loval> etc. will be declared and used.
 
@@ -542,9 +543,11 @@ All of these functions would be more intuitive if implemented directly
 as PDL::PP macros, and thus expanded directly by pp_def() rather
 than requiring vvpp_def().
 
-Unfortunately, I don't currently have the time to figure out how to
-use the (undocumented) PDL::PP macro expansion mechanism.
-Feel free to add real macro support.
+At the time of this module's writing, I was unable to figure out how to
+use the (then undocumented) PDL::PP macro expansion mechanism.
+As of 2022, PDL::PP offers support for user-defined macros, and
+this module should be refactored to take advantage of that... but that
+hasn't happened yet.
 
 =cut
 

@@ -23,7 +23,7 @@ use Test::Output;
 BEGIN {
     eval { require Curses::UI; };
     $@  and  plan skip_all => 'Curses::UI not found';
-    plan tests => 36;
+    plan tests => 39;
 
     # define fixed environment for unit tests:
     delete $ENV{DISPLAY};
@@ -306,16 +306,55 @@ is_deeply(\@selected, [0, 2, 3], 'listbox had correct final selection');
 is(@{$main->{children}}, 0, 'main 4 no longer has children');
 
 ####################################
+# test standard behaviour of a dialogue:
+
+$text1 = UI::Various::Text->new(text => 'Dialogue!');
+my $run_dialog = 0;
+$button1 =
+    UI::Various::Button->new(text => 'Back',
+			     code => sub {
+				 $_[0]->destroy;
+				 $run_dialog++;
+			     });
+my $text = 'Window!';		# We need a referenced item outside of dialogue.
+$text2 = UI::Various::Text->new(text => \$text);
+$button2 =
+    UI::Various::Button->new(text => 'Dialogue',
+			     code => sub {
+				 $main->dialog({title => 'DIA',
+						width => 12,
+						height => 5},
+					       $text1, $button1); });
+my $button3 = UI::Various::Button->new(text => 'Quit',
+				       code => sub {   $w->destroy;   });
+$w = $main->window({title => 'WIN', width => 20}, $text1, $button2, $button3);
+
+@chars_to_read = (' ',		# select button 2 in WIN
+		  ' ',		# select button in DIA
+		  "\t", ' ');	# select button 3 in WIN
+combined_like
+{   $main->mainloop;   }
+    # Note that we can apparently only match some parts of the window here:
+    qr/^.*\bDialogue!.*\bWIN\b.*Dialogue\b.*Quit\b.*/s,
+    'mainloop 5 produces correct output';
+is($run_dialog, 1, 'dialogue did run');
+is(@{$main->{children}}, 0, 'main 5 no longer has children');
+
+####################################
 # test unused behaviour (and get 100% coverage):
 
 $w1 = UI::Various::Window->new(title => 'hello');
-$w2 = UI::Various::Window->new(title => 'dummy');
-is(@{$main->{children}}, 2, 'main has new children');
+$w2 = UI::Various::Window->new(title => 'dummy 1');
+my $d1 = UI::Various::Dialog->new(title => 'dummy 2', height => 2);
+my $d2 = $main->dialog({title => 'dummy 3', height => 3});
+is(@{$main->{children}}, 4, 'main has new children');
 is($w1->title(), 'hello', 'window constructor sets title');
 $w1->add($text1);
 is(@{$w1->{children}}, 1, 'Window has 1 child');
 $w1->destroy();
 $w2->destroy();
+$d1->destroy();
+$d2->destroy();
 is(@{$main->{children}}, 0, 'main is clean again');
 
 $main->mainloop();		# an additional empty call just for the coverage

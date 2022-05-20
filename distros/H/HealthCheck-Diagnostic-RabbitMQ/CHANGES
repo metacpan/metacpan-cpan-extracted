@@ -1,6 +1,12 @@
 Changelog for HealthCheck-Diagnostic-RabbitMQ
 
-v1.1.6 2020-07-03T00:25:37
+v1.2.0 2022-05-16T18:46:21
+ - Update copyright (Andrew Hewus Fresh)
+ - Pull request #5: SM-2947 (Mitch McCracken)
+ - Switch to sprintf() and avoid 80-char width issue (Mitch McCracken)
+ - Improve info for failing health checks (Matthew Ito)
+
+v1.1.6 2020-07-03T00:25:23
  - Update README (Andrew Hewus Fresh)
  - SM-2578  Allow specifying "should_disconnect" (Larry Leszczynski)
 

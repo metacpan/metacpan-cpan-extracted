@@ -131,7 +131,7 @@ is($_, "1234567\n123    ",
    '_show (7,2) returns correct output');
 
 my $button1 = UI::Various::Button->new(text => 'OK', height => 2,
-				      code => sub { print "OK!\n"; });
+				       code => sub { print "OK!\n"; });
 is(ref($button1), 'UI::Various::RichTerm::Button', 'Button is concrete class');
 ($w, $h) = $button1->_prepare(10);
 is($w, 4, '_prepare returns correct width');
@@ -320,7 +320,7 @@ stdout_is(sub {   $win2->_show();   }, $output2,
 	  '_show 6 prints correct text');
 
 $main->add($win1);
-$prompt = "enter selection: ";
+$prompt = 'enter selection: ';
 
 combined_is			# 2nd window is displayed 1st!
 {   _call_with_stdin("-\n1\nx\n2\n+\n0\n-\n1\n", sub { $main->mainloop; });   }

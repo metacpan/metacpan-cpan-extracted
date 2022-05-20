@@ -1,5 +1,5 @@
 package HTML::Widgets::NavMenu::TagGen;
-$HTML::Widgets::NavMenu::TagGen::VERSION = '1.0900';
+$HTML::Widgets::NavMenu::TagGen::VERSION = '1.0902';
 use strict;
 use warnings;
 
@@ -65,7 +65,7 @@ HTML::Widgets::NavMenu::TagGen - class to generate tags.
 
 =head1 VERSION
 
-version 1.0900
+version 1.0902
 
 =head1 SYNOPSIS
 

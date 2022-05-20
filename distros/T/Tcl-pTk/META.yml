@@ -4,10 +4,11 @@ author:
   - unknown
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::Deep: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 keywords:
   - Tk
   - Tcl
@@ -30,10 +31,12 @@ no_index:
 requires:
   Class::ISA: '0.36'
   Sub::Name: '0.05'
-  Tcl: '0.9'
+  Tcl: '0.90'
+  Time::HiRes: '0'
   perl: '5.008'
 resources:
   MailingList: mailto:tcltk@perl.org
+  bugtracker: https://github.com/chrstphrchvz/perl-tcl-ptk/issues
   repository: https://github.com/chrstphrchvz/perl-tcl-ptk.git
-version: '1.08'
+version: '1.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

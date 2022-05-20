@@ -14,10 +14,10 @@ INSTANTIATION: {
 
 DEFAULTS: {
     my $calendar = Date::Holidays::CA->new();
-    is($calendar->get('province'), 'CA',    
+    is($calendar->get('province'), 'CA',
         'Default province set to CA'
     );
-    is($calendar->get('language'), 'EN/FR', 
+    is($calendar->get('language'), 'EN/FR',
         'Default language set to EN/FR'
     );
 }
@@ -26,13 +26,13 @@ CASE_INSENSITIVITY: {
     my $ON_calendar = Date::Holidays::CA->new(
         {province => 'ON', language => 'EN'}
     );
-    
+
     my $on_calendar = Date::Holidays::CA->new(
         {province => 'on', language => 'en'}
     );
-    
+
     is_deeply(
-        $ON_calendar, $on_calendar, 
+        $ON_calendar, $on_calendar,
         'Province and language names are case-insensitive'
     );
 }

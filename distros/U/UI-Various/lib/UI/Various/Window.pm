@@ -40,7 +40,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use UI::Various::core;
 use UI::Various::toplevel;
@@ -122,6 +122,11 @@ freeing all memory used by the UI.  (This may vary depending on the
 underlying UI package used.)  If the window was the last one of the
 application, this also causes the C<L<main loop|UI::Various::Main/mainloop
 - main event loop of an application>> to be finished.
+
+Note that a window can not be reused again after destruction as it's broken
+down into its components to get rid of circular dependencies that may block
+clean-up of memory.  If you want to open the same window again, you have to
+recreate it.
 
 =cut
 

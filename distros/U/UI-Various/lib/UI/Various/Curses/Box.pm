@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use UI::Various::core;
 use UI::Various::Box;
@@ -134,14 +134,10 @@ sub _prepare($$$)
 	    return $self->{-height};
 	}
 	sub delete {
-	    my $self = shift;
-	    local $_;
-	    while ($_ = $self->{_various_ui}->child)
-	    {
-		$_ = $_->_cui;
-		next unless $_->can('delete');
-		$_->delete();
-	    }
+	    my ($self, $cid) = @_;
+	    my $parent_cui = $self->{_various_ui}->parent->_cui;
+	    $parent_cui->delete($cid);
+	    return $self;	# do what Curses::UI::Container::delete does
 	};
 	# uncoverable statement
     };

@@ -1,9 +1,9 @@
 package Tapper::TAP::Harness;
-# git description: v5.0.6-1-g66ded60
+# git description: v5.0.8-1-gcd69c25
 
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Tapper - Tapper specific TAP handling
-$Tapper::TAP::Harness::VERSION = '5.0.7';
+$Tapper::TAP::Harness::VERSION = '5.0.9';
 use 5.010;
 use strict;
 use warnings;
@@ -138,7 +138,7 @@ sub tap_single_plan
 {
         my ($self) = @_;
         return if $self->tap_is_archive;
-        my @plans = ($self->tap) =~ m/(1\.\.\d+)/mg;
+        my @plans = ($self->tap) =~ m/^(1\.\.\d+)/mg;
         return(int(@plans) == 1);
 }
 
@@ -619,7 +619,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2022 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

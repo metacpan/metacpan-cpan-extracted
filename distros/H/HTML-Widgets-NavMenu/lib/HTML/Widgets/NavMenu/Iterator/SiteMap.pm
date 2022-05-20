@@ -1,5 +1,5 @@
 package HTML::Widgets::NavMenu::Iterator::SiteMap;
-$HTML::Widgets::NavMenu::Iterator::SiteMap::VERSION = '1.0900';
+$HTML::Widgets::NavMenu::Iterator::SiteMap::VERSION = '1.0902';
 use strict;
 use warnings;
 
@@ -64,7 +64,7 @@ HTML::Widgets::NavMenu::Iterator::SiteMap - a site-map iterator.
 
 =head1 VERSION
 
-version 1.0900
+version 1.0902
 
 =head1 SYNOPSIS
 

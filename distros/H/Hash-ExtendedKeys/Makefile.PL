@@ -9,7 +9,7 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/Hash/ExtendedKeys.pm',
     ABSTRACT_FROM    => 'lib/Hash/ExtendedKeys.pm',
     LICENSE          => 'artistic_2',
-    MIN_PERL_VERSION => '5.006',
+    MIN_PERL_VERSION => '5.010',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },
@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'Hash::Util' => '0',
+        'Hash::Util' => '0.25',
         'Struct::Match' => '1.00',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

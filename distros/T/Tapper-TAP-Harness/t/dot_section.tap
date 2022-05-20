@@ -8,8 +8,7 @@ TAP Version 13
 ok - get memcount data
   ---
   BenchmarkAnythingData:
-  -
-    NAME: hw_info.memcount
+  - NAME: hw_info.memcount
     VALUE: 2438400
   ...
 1..1
@@ -21,8 +20,7 @@ ok - get memcount data
 ok - get memcount data
   ---
   BenchmarkAnythingData:
-  -
-    NAME: hw_info.memcount
+  - NAME: hw_info.memcount
     VALUE: 2438400
   ...
 1..1
@@ -34,8 +32,7 @@ ok - get memcount data
 ok - get memcount data
   ---
   BenchmarkAnythingData:
-  -
-    NAME: hw_info.memcount
+  - NAME: hw_info.memcount
     VALUE: 2438400
   ...
 1..1
@@ -48,8 +45,7 @@ ok - get memcount data
 ok - get memcount data
   ---
   BenchmarkAnythingData:
-  -
-    NAME: hw_info.memcount
+  - NAME: hw_info.memcount
     VALUE: 2438400
   ...
 

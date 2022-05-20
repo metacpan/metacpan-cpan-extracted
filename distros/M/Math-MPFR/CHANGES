@@ -1,9 +1,17 @@
+4.23
+ - Fix bug in overload_spaceship() handling of NaN. If the first arg was non-nan
+   and thesecond arg was a Math::MPFR nan object, then the spaceship operator
+   returned 0 instead of undef.  (Added a test for this to t/overload.t.)
+ - Fix overload_dec() to handle DEAL_WITH_NANFLAG_BUG_OVERLOADED macro.
+   See https://github.com/sisyphus/math-mpfr/pull/5
+
 4.22
  - Add overloading of '<<' and '>>'. (Left shifts and right shifts don't make a lot of
    sense in floating-point environments. These overloads simply call mul_2ui or mul_2si
    or (respectively) div_2ui or div_2si, thereby altering  the value of the exponent,
    but having no effect on the mantissa.
- - Work around perl bug in https://github.com/Perl/perl5/issues/19550
+ - Work around perl bug in https://github.com/Perl/perl5/issues/19550.
+   (Affected only perl-5.35.10.)
 
 4.21
  - Fix bug re inconsistent settings of POK and NOK flag, which manifests itself as (eg):

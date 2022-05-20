@@ -167,6 +167,7 @@ static OP *S_unwrap_list(pTHX_ OP *o, bool may_unwrap_anonlist)
     if(kid->op_type == OP_PADAV) {
       /* \@padav can just yield the array directly */
       cLISTOPx(cUNOPo->op_first)->op_first = NULL;
+      cLISTOPx(cUNOPo->op_first)->op_flags &= ~OPf_KIDS;
       op_free(o);
 
       kid->op_flags &= ~(OPf_MOD|OPf_REF);
@@ -177,6 +178,7 @@ static OP *S_unwrap_list(pTHX_ OP *o, bool may_unwrap_anonlist)
        * or something else, but whatever it is we might as well do it
        */
       cLISTOPx(cUNOPo->op_first)->op_first = NULL;
+      cLISTOPx(cUNOPo->op_first)->op_flags &= ~OPf_KIDS;
       op_free(o);
 
       kid->op_flags &= ~(OPf_MOD|OPf_REF);

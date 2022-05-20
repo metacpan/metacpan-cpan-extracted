@@ -74,7 +74,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 #########################################################################
 
@@ -149,6 +149,8 @@ our %T =
      => "invalid value %s for parameter '%s' in call to %s::%s",
      leave_box
      => 'leave box',
+     leave_dialog
+     => 'leave dialogue',
      leave_listbox
      => 'leave listbox',
      leave_window

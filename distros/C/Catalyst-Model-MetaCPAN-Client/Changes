@@ -1,0 +1,9 @@
+Revision history for Catalyst-Model-MetaCPAN-Client
+
+0.02    2022/05/20
+	- update dependencies
+	- Write a test mocking the client as to not actually make requests.
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

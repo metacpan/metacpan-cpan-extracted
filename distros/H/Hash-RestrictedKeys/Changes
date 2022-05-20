@@ -1,5 +1,11 @@
 Revision history for Hash-RestrictedKeys
 
+0.03    2022/05/18
+	- explicit keys to fix failing tests in older perls
+
+0.02    2022/05/18
+	- Improve test coverage to 100%
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

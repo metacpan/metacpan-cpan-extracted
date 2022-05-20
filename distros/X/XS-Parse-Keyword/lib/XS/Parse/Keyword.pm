@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Keyword 0.22;
+package XS::Parse::Keyword 0.23;
 
 use v5.14;
 use warnings;
@@ -283,6 +283,19 @@ A brace-delimited block of code is expected, and assembled into the body of a
 new anonymous subroutine. This will be passed as a protosub CV in the I<cv>
 field.
 
+=head2 XPK_ARITHEXPR
+
+I<atomic, emits op.>
+
+   XPK_ARITHEXPR
+
+An arithmetic expression is expected, parsed using C<parse_arithexpr()>, and
+passed as an optree in the I<op> field.
+
+=head2 XPK_ARITHEXPR_VOIDCTX, XPK_ARITHEXPR_SCALARCTX
+
+Variants of C<XPK_ARITHEXPR> which puts the expression in void or scalar context.
+
 =head2 XPK_TERMEXPR
 
 I<atomic, emits op.>
@@ -438,8 +451,19 @@ Generally it is best reserved just for the first component of a
 C<XPK_OPTIONAL> or C<XPK_REPEATED> sequence, to provide a "secondary keyword"
 that such a repeated item can look out for.
 
-This was previously called C<XPK_STRING>, and is provided as a synonym for
-back-compatibility but new code should use this new name instead.
+=head2 XPK_KEYWORD
+
+I<atomic, can probe, emits nothing.>
+
+   XPK_KEYWORD("keyword")
+
+A literal string match is expected. No argument value is passed.
+
+This is similar to C<XPK_LITERAL> except that it additionally checks that the
+following character is not an identifier character. This ensures that the
+expected keyword-like behaviour is preserved. For example, given the input
+C<"keyword">, the piece C<XPK_LITERAL("key")> would match it, whereas
+C<XPK_KEYWORD("key")> would not because of the subsequent C<"w"> character.
 
 =head2 XPK_SEQUENCE
 
@@ -538,6 +562,20 @@ I<structural, can probe, emits nothing.>
 
 A structural type which expects to find a sequence of pieces, all contained in
 parentheses as C<( ... )>. This will pass no extra arguments.
+
+=head2 XPK_ARGSCOPE
+
+I<structural, emits nothing.>
+
+   XPK_ARGSCOPE(pieces ...)
+
+A structural type similar to C<XPK_PARENSCOPE>, except that the parentheses
+themselves are optional; much like Perl's parsing of calls to known functions.
+
+If parentheses are encountered in the input, they will be consumed by this
+piece and it will behave identically to C<XPK_PARENSCOPE>. If there is no open
+parenthesis, this piece will behave like C<XPK_SEQUENCE> and consume all the
+pieces inside it, without expecting a closing parenthesis.
 
 =head2 XPK_BRACKETSCOPE
 

@@ -19,8 +19,8 @@ no_index:
     - t
     - inc
 requires:
-  Hash::Util: '0'
+  Hash::Util: '0.25'
   Struct::Match: '1.00'
-  perl: '5.006'
-version: '0.02'
+  perl: '5.010'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

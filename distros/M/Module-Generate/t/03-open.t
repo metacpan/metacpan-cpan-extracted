@@ -7,6 +7,7 @@ BEGIN {
 	*CORE::GLOBAL::mkdir = sub {
 		return 0;
 	};
+
 }
 
 use Module::Generate;
@@ -38,5 +39,14 @@ subtest 'generate' => sub {
 	};
 	like($@, qr/Cannot open file/);
 };
+
+subtest 'generate_tlib' => sub {
+	eval { 
+		Module::Generate::_generate_tlib('Foo', './t/');
+	};
+	like($@, qr/Cannot open file/);
+};
+
+
 
 done_testing;

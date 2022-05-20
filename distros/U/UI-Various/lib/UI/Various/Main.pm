@@ -48,7 +48,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use UI::Various::core;
 use UI::Various::container;
@@ -196,7 +196,7 @@ sub new($;\[@$])
 
 #########################################################################
 
-=head2 B<window> - and new window to application
+=head2 B<window> - add new window to application
 
     $window = $main->window([$rh_attributes,] @ui_elements);
 
@@ -260,6 +260,77 @@ sub window($@)
     my $window = UI::Various::Window->new($rh_attributes);
     $window->add($_) foreach @ui_elements;
     return $window;
+}
+
+#########################################################################
+
+=head2 B<dialog> - add new dialogue to application
+
+    $dialog = $main->dialog([$rh_attributes,] @ui_elements);
+
+=head3 example:
+
+    $main->dialog(UI::Various::Text->new(text => 'Hello World!'),
+                  UI::Various::Button->new(text => 'Quit',
+                                           code => sub{ exit(); }));
+
+=head3 parameters:
+
+    $rh_attributes      optional reference to hash with attributes
+    @ui_elements        array with possible UI elements of a dialogue
+
+=head3 description:
+
+Add a new dialogue to the application.  An optional attribute HASH is passed
+on to the created dialogue while optional other UI elements are added in the
+specified sequence.
+
+Note that in C<Curses> the call blocks until the dialogue has finished!  (It
+will therefore return C<undef> in those cases.)
+
+=head3 returns:
+
+the new dialogue or undef in case of an error (and always in C<Curses>)
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+sub dialog($@)
+{
+    debug(2, __PACKAGE__, '::dialog');
+    my $self = shift;
+    local $_;
+
+    my @ui_elements = ();
+    my $rh_attributes = {};
+    while ($_ = shift)
+    {
+	if (ref($_) eq 'HASH')
+	{
+	    $rh_attributes = $_; # last definition wins!
+	}
+	elsif ($_->isa('UI::Various::widget'))
+	{
+	    if ($_->isa('UI::Various::Window')  or
+		$_->isa('UI::Various::Dialog'))
+	    {
+		error('invalid_object__1_in_call_to__2__3',
+		      ref($_), __PACKAGE__, 'dialog');
+		return undef;
+	    }
+	    push @ui_elements, $_;
+	}
+	else
+	{
+	    error('invalid_parameter__1_in_call_to__2__3',
+		  ref($_), __PACKAGE__, 'dialog');
+	    return undef;
+	}
+    }
+    my $dialog = UI::Various::Dialog->new($rh_attributes);
+    $dialog->add($_) foreach @ui_elements;
+    return $dialog;
 }
 
 #########################################################################

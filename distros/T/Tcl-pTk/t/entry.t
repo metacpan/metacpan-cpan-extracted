@@ -22,8 +22,6 @@ my $TOP = MainWindow->new();
 
     my $selectPresent = $e2->selectionPresent;
     ok($selectPresent, 0, "camelCase call check");
-    
-$TOP->after(1000,sub{$TOP->destroy});
 
 ok(1, 1, "Entry Widget Creation");
 
@@ -39,4 +37,4 @@ my $t = Tcl::pTk::timeofday;
 print "# timeofday: $t\n";
 ok(1, 1, "timeofday check");
 
-MainLoop;
+(@ARGV) ? MainLoop : $TOP->destroy;

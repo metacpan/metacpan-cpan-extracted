@@ -13,6 +13,7 @@ t/02-cover.t
 t/03-open.t
 t/04-test.t
 t/05-keyword.t
+t/06-coverage.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

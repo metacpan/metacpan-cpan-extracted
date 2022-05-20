@@ -1,0 +1,13 @@
+Revision history for Perl extension Map::Tube::Hongkong.
+
+0.03  Wed May 19 03:00:00 2022
+    - fix pod
+    - correct Makefile.PL (by Mohammad S Anwar, the author of Map::Tube)
+
+0.02  Wed, May 18, 2022 PM03:16:48 HKT
+    - fix pod
+
+0.01  Wed May 18 15:07:47 2022
+	- original version; created by h2xs 1.23 with options
+		-AX Map::Tube::Hongkong
+

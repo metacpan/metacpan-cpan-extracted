@@ -3,7 +3,7 @@ package MooX::Purple;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 use Keyword::Declare;
 our ($PREFIX, %MACROS);
 
@@ -258,7 +258,7 @@ MooX::Purple - MooX::Purple
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 

@@ -126,6 +126,8 @@ xt/author/lib-property-_len.t
 xt/author/lib-property-_zeros.t
 xt/author/lib.ini
 xt/author/lib.t
+xt/author/lib_load-mbf-mbi.t
+xt/author/lib_load-mbi-mbf.t
 xt/release/changelog.t
 xt/release/cpan-changes.t
 xt/release/dist-manifest.t

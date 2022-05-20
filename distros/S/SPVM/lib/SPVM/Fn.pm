@@ -2,6 +2,8 @@ package SPVM::Fn;
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 SPVM::Fn - SPVM Starndard Functions
@@ -328,6 +330,14 @@ If the string is C<undef> or the length is zero, does nothing.
   static method chompr : string ($string : string)
 
 Copy the string and remove "\n" of the end of the string and return it.
+
+=head2 chr
+
+  static method chr : string ($unicode_code_point : int) {
+
+Convert Unicode code point to a UTF-8 character. If the Unicode code point is not a Unicode scalar value, return C<undef>.
+
+See also L<Unicode->is_unicode_scalar_value|SPVM::Unicode/"is_unicode_scalar_value">.
 
 =head2 copy_array_byte
 
@@ -1139,6 +1149,18 @@ Source offset + length must be within the range of the source array, otherwise a
 
 Create a new generic object array as the same type as the given array.
 
+=head2 ord
+
+  static method ord : int ($utf8_character : string)
+
+Gets the Unicode code point from the first character of the specified <UTF-8> string.
+
+If the specified C<UTF-8> character is C<undef>, returns a negative value.
+
+If the length of the specified C<UTF-8> string is C<0>, returns a negative value.
+
+If the specified C<UTF-8> character is invalid C<UTF-8> character, returns a negative value.
+
 =head2 powi
 
   static method powi : int ($x : int, $y : int)
@@ -1167,6 +1189,21 @@ B<Examples:>
   my $seed = (int)Time->time;
   my $rand0 = Fn->rand(\$seed);
   my $rand1 = Fn->rand(\$seed);
+
+=head2 repeat
+
+  static method repeat : double ($string : string, $count : int)
+
+Gets the repeat string.
+
+If the string is not defined, an exception will be thrown.
+
+If the repeat is not more than C<0>, an exception will be thrown.
+
+B<Examples:>
+  
+  # "abcabcabc"
+  my $repeat_string = Fn->repeat("abc", 3);
 
 =head2 rindex
 
@@ -1319,69 +1356,87 @@ Split a string by the specific separator.
 
   static method sprintf : string ($format : string, $args : object[]...)
 
-Create a formatted string with the format and the embdded values.
+Create a formatted string with the format and the values.
 
 =begin html
 
 <table>
-  <tr><th>Format Specifier</th></tr><tr><th>Description</th></tr>
-  <tr><td>%d</td></tr><tr><td>32bit Integer</td></tr>
-  <tr><td>%u</td></tr><tr><td>Unsigned 32bit Integer</td></tr>
-  <tr><td>%ld</td></tr><tr><td>64bit Integer</td></tr>
-  <tr><td>%lu</td></tr><tr><td>Unsigned 64bit Integer</td></tr>
-  <tr><td>%f</td></tr><tr><td>64bit Floating Point</td></tr>
-  <tr><td>%c</td></tr><tr><td></td>Character</tr>
-  <tr><td>%s</td></tr><tr><td></td>String</tr>
-  <tr><td>%U</td></tr><tr><td></td>Unicode Code Point to UTF-8</tr>
+  <tr><th>Specifiers</th><th>Descriptions</th><th>Acceptable Types</th></tr>
+  <tr><td>%c</td><td>An <code>UTF-8</code> character</td><td><a href="https://metacpan.org/pod/SPVM::Byte">Byte</a>, <a href="https://metacpan.org/pod/SPVM::Int">Int</a></td></tr>
+  <tr><td>%d</td><td>Signed 32bit integer</td><td><a href="https://metacpan.org/pod/SPVM::Int">Int</a></td></tr>
+  <tr><td>%u</td><td>Unsigned 32bit integer</td><td><a href="https://metacpan.org/pod/SPVM::Int">Int</a></td></tr>
+  <tr><td>%x</td><td>Unsiged 32 bit integer to a hexadecimal string using <code>0-9a-z</code></td><td><a href="https://metacpan.org/pod/SPVM::Int">Int</a></td></tr>
+  <tr><td>%X</td><td>Unsiged 32 bit integer to a hexadecimal string using <code>0-9A-Z</code></td><td><a href="https://metacpan.org/pod/SPVM::Int">Int</a></td></tr>
+  <tr><td>%ld</td><td>Signed 64bit integer</td><td><a href="https://metacpan.org/pod/SPVM::Long">Long</a></td></tr>
+  <tr><td>%lu</td><td>Unsigned 64bit integer</td><td><a href="https://metacpan.org/pod/SPVM::Long">Long</a></td></tr>
+  <tr><td>%lx</td><td>Unsiged 64 bit integer to a hexadecimal string using <code>0-9a-z</code></td><td><a href="https://metacpan.org/pod/SPVM::Long">Long</a></td></tr>
+  <tr><td>%lX</td><td>Unsiged 64 bit integer to a hexadecimal string using <code>0-9A-Z</code></td><td><a href="https://metacpan.org/pod/SPVM::Long">Long</a></td></tr>
+  <tr><td>%f</td><td>64bit floating point</td><td><a href="https://metacpan.org/pod/SPVM::Double">Double</a>, <a href="https://metacpan.org/pod/SPVM::Float">Float</a></td></tr>
+  <tr><td>%s</td><td>String</td><td>string</td></tr>
+  <tr><td>%U</td><td>Unicode Code Point to a UTF-8 character</td><td></td></tr>
 </table>
 
 =end html
 
-=head3 Format Options
+B<Specifier Options:>
 
-=head4 Zero Padding
-  
-  # Format
-  "%05d"
-  
-  # Value
-  123
-  
-  # Output
-  "00123"
+Specifier options can be written between C<%> and the character of specifier such as C<d>, C<f>.
 
-=head4 Plus
+=begin html
 
-  # Format
-  %+d
-  
-  # Value
-  123
-  
-  # Output
-  "+123"
+<table>
+  <tr><th>Specifier options</th><th>Descriptions</th></tr>
+  <tr><td>0[DECIMAL_NUMBERS]</td><td>Zero padding</td></tr>
+  <tr><td>+</td><td>Adding a plus sign</td></tr>
+  <tr><td>-</td><td>Left justified</td></tr>
+  <tr><td>.[DECIMAL_NUMBERS]</td><td>Precision</td></tr>
+</table>
 
-=head4 Left Justified
+=end html
 
-  # Format
-  "%-5d"
+B<Examples:>
+    
+  # %d - "123"
+  my $formatted_string = Fn->sprintf("%d", 123);
   
-  # Value
-  123
-  
-  # Output
-  "123  "
+  # %5d - "  123"
+  my $formatted_string = Fn->sprintf("%5d", 123);
 
-=head4 Number of Decimal Places Displayed
+  # %05d - "00123"
+  my $formatted_string = Fn->sprintf("%05d", 123);
+  
+  # %+d - "+123"
+  my $formatted_string = Fn->sprintf("%+d", 123);
+  
+  # %-5d - "123  "
+  my $formatted_string = Fn->sprintf("%-5d", 123);
+  
+  # %d - "x"
+  my $formatted_string = Fn->sprintf("%c", 'x');
+  
+  # %c - "あ"
+  my $formatted_string = Fn->sprintf("%c", Fn->ord("あ"));
 
-  # Format
-  "%.2f"
+  # %s - "ABC"
+  my $formatted_string = Fn->sprintf("%s", "ABC") eq "ABC");
   
-  # Value
-  3.1415
+  # %u - "4294967295"
+  my $formatted_string = Fn->sprintf("%u", -1) eq "4294967295");
   
-  # Output
-  "3.14"
+  # %f - "3.141500"
+  my $formatted_string = Fn->sprintf("%f", 3.1415) eq "3.141500");
+  
+  # %.2f - "3.14"
+  my $formatted_string = Fn->sprintf("%.2f", 3.1415) eq "3.14");
+  
+  # %g - "3.14"
+  my $formatted_string = Fn->sprintf("%g", 3.14) eq "3.14");
+  
+  # %x - "ff"
+  my $formatted_string = Fn->sprintf("%x", 255) eq "ff");
+    
+  # %x - "ffffffff"
+  my $formatted_string = Fn->sprintf("%x", -1) eq "ffffffff");
 
 =head2 substr
 

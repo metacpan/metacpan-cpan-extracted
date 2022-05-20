@@ -1,5 +1,8 @@
 Revision history for File-XDG
 
+1.02      2022-05-18 15:34:26 -0600
+  - Correct location of the default state directory (gh#24,gh#25)
+
 1.01      2022-02-23 08:06:52 -0700
   - Production release identical to 1.00_01
 

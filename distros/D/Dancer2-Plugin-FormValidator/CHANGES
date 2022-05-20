@@ -1,3 +1,10 @@
+1.01 2022-05-16 22:22:22 Europe/Moscow
+    [BUGS]
+    * Fix access to input field, that not exists
+
+    [DOCS]
+    * Typos
+
 1.00 2022-05-16 19:41:32 Europe/Moscow
     [FEATURES]
     * Implement hook_before

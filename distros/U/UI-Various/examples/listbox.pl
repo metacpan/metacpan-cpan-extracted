@@ -7,7 +7,7 @@
 # the example with the different possible UIs:
 ($_ = $0) =~ s|[^/]+$|_common.pl|;
 m|^/|  or  $_ = './' . $_;
-do "$_";
+do "$_"  or  exit;
 
 #########################################################################
 # Example using a listbox with multiple selection:

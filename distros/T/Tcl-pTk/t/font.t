@@ -35,10 +35,7 @@ $mw->geometry("+10+10");
 ##  opps,  looks like fault of ptksh
 {
   eval { $mw->fontActual; };
-  ok(
-	( $@ =~ /wrong # args: should be "font/), 1,
-	"Warning should match /^wrong # args: should be \"font/ but was '". $@ . "'"
-    );
+  ok($@, qr/wrong # args: should be "font/, "Warning should match");
 }
 ##
 ## Stephen O. Lidie reported that Tk800.003

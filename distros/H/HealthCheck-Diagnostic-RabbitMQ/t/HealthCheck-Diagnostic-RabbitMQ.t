@@ -316,6 +316,9 @@ my $rabbit_mq = sub { My::RabbitMQ->new };
         my $status = $limit =~ /critical/  ? 'CRITICAL'  : 'WARNING';
         my $value  = $limit =~ /min/       ? 50          : 2;
         my $info   = $limit =~ /listeners/ ? 'Listeners' : 'Messages';
+        my $have   = $info eq "Listeners"  ? 3           : 100;
+        my $minmax = $limit =~ /min/       ? "min"       : "max";
+        $info      = "$info out of range! Expected $minmax: $value have: $have";
 
         is_deeply(
             HealthCheck::Diagnostic::RabbitMQ->check(
@@ -324,7 +327,7 @@ my $rabbit_mq = sub { My::RabbitMQ->new };
                 $limit    => $value,
             ),
             {   status => $status,
-                info   => "$info out of range!",
+                info   => $info,
                 data   => {
                     queue   => 'a.queue',
                     channel => 1,
@@ -340,14 +343,19 @@ my $rabbit_mq = sub { My::RabbitMQ->new };
     }
 
 
-    foreach my $limits (
-        { listeners_min_critical => 5, listeners_min_warning => 4 },
-        { listeners_max_critical => 2, listeners_max_warning => 1 },
-        { messages_critical => 50, messages_warning => 25 },
+    foreach (
+        { limits => { listeners_min_critical => 5, listeners_min_warning => 4 },
+          expect => "Listeners out of range! Expected min: 5 have: 3"
+        },
+        { limits => { listeners_max_critical => 2, listeners_max_warning => 1 },
+          expect => "Listeners out of range! Expected max: 2 have: 3"
+        },
+        { limits => { messages_critical => 50, messages_warning => 25 },
+          expect => "Messages out of range! Expected max: 50 have: 100"
+        },
     ) {
-        my ($limit) = keys %{$limits};
-        $limit =~ s/_[^_]+$//;
-        my $info = $limit =~ /listeners/ ? 'Listeners' : 'Messages';
+        my $limits = $_->{limits};
+        my $expect = $_->{expect};
         is_deeply(
             HealthCheck::Diagnostic::RabbitMQ->check(
                 rabbit_mq => $rabbit_mq->(),
@@ -355,7 +363,7 @@ my $rabbit_mq = sub { My::RabbitMQ->new };
                 %{ $limits },
             ),
             {   status => 'CRITICAL',
-                info   => "$info out of range!",
+                info   => $expect,
                 data   => {
                     queue   => 'a.queue',
                     channel => 1,
@@ -366,7 +374,7 @@ my $rabbit_mq = sub { My::RabbitMQ->new };
                     listeners => 3,
                 },
             },
-            "[$limit] critical overides warning"
+            "Critical overides warning: $expect"
         );
     }
 }

@@ -2,7 +2,7 @@ package SVG::XML;
 use strict;
 use warnings;
 
-our $VERSION = '2.86';
+our $VERSION = '2.87';
 
 =pod
 
@@ -21,11 +21,6 @@ L<SVG::DOM>,
 L<SVG::Element>,
 L<SVG::Parser>,
 L<SVG::Extension>
-
-For Commercial Perl/SVG development, refer to the following sites:
-L<ROASP.com: Serverside SVG server|http://www.roitsystems.com/>,
-L<ROIT Systems: Commercial SVG perl solutions|http://www.roitsystems.com/>,
-L<SVG at the W3C|http://www.w3c.org/Graphics/SVG/>
 
 =cut
 

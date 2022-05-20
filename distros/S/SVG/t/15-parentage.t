@@ -31,7 +31,7 @@ is( $parent->removeChild($child1),    0,       'no such child' );
 is( $parent->findChildIndex($child1), -1,      'child1 is gone' );
 
 is( $parent->insertAtIndex( $child1, 0 ), 1 );
-is( $parent->findChildIndex($child1), 0,  'child1 is back' );
-is( $parent->removeAtIndex(0),        $child1 );
-is( $parent->findChildIndex($child1), -1, 'child1 is gone again' );
+is( $parent->findChildIndex($child1),     0, 'child1 is back' );
+is( $parent->removeAtIndex(0),            $child1 );
+is( $parent->findChildIndex($child1),     -1, 'child1 is gone again' );
 

@@ -1,38 +1,37 @@
-# -------------------------------------------------------------------------- #
-# $Id$
-# -------------------------------------------------------------------------- #
-# Makefile.PL for XML::LibXML.
-# This file is required to generate a localized Makefile
-# -------------------------------------------------------------------------- #
-
 use strict;
 use warnings;
+use 5.014;
 
 use vars qw/$DEVNULL $is_Win32/;
 
-BEGIN {
-  if ($] < 5.008_001) {
-    warn "\nSorry, at least Perl 5.8.1 is required for this module!\n\n";
-    exit;
-  }
-}
-
 use ExtUtils::MakeMaker;
 use Config;
+use Cwd qw/ cwd /;
+use File::Spec ();
 
+BEGIN {
+    $::is_Win32 = ($^O =~ /Win32/);
+    if ($::is_Win32) {
+        $DEVNULL = 'DEVNULL';
+    }
+    else {
+        $DEVNULL = eval { File::Spec->devnull };
+        if ($@) { $DEVNULL = '/dev/null' }
+    }
+};
 
-$|=0;
+STDOUT->autoflush(1);
 
 my %config;
 
-while($_ = shift) {
-    my ($key, $val) = split(/=/, $_, 2);
+while (my $arg = shift(@ARGV)) {
+    my ($key, $val) = split(/=/, $arg, 2);
     $config{$key} = $val;
 }
 
 my $DEBUG = delete $config{DEBUG};
 
-if ( $] < 5.008 or $config{NO_THREADS} ) {
+if ( $config{NO_THREADS} ) {
   warn "disabling XML::LibXML support for Perl threads\n";
   $config{DEFINE} .= " -DNO_XML_LIBXML_THREADS";
 }
@@ -106,7 +105,7 @@ EOF
             $config{LIBS} = '-L/usr/local/lib -L/usr/lib -lxslt -lxml2 -lz -lm';
             $config{INC} = '-I/usr/local/include -I/usr/include';
 
-            print <<OPT;
+            print <<"OPT";
 options:
   LIBS='$config{LIBS}'
   INC='$config{INC}'
@@ -121,15 +120,15 @@ OPT
 if ($config{LIBS} !~ /\-l(lib)?xslt\b/) {
     # in this case we are not able to run xml2-config. therefore we need to
     # expand the libz as well.
-  if ($::is_Win32) {
-    if( $ENV{ACTIVEPERL_MINGW} ) {
-      $config{LIBS} .= ' -llibxslt.lib -llibxml2.lib';
+    if ($::is_Win32) {
+        if( $ENV{ACTIVEPERL_MINGW} ) {
+            $config{LIBS} .= ' -llibxslt.lib -llibxml2.lib';
+        } else {
+            $config{LIBS} .= ' -llibxslt -llibxml2';
+        }
     } else {
-      $config{LIBS} .= ' -llibxslt -llibxml2';
+        $config{LIBS} .= ' -lxml2 -lz';
     }
-  } else {
-    $config{LIBS} .= ' -lxml2 -lz';
-  }
 }
 
 if ($config{LIBS} !~ /\-lz(lib)?\b/ and !($::is_Win32 && $config{LIBS} !~ /\-lzlib\b/)) {
@@ -141,15 +140,15 @@ if ($config{LIBS} !~ /\-lz(lib)?\b/ and !($::is_Win32 && $config{LIBS} !~ /\-lzl
         warn "zlib was not configured\n";
         warn "set zlib\n" if $::is_Win32;
     }
-  if ($::is_Win32) {
-    if( $ENV{ACTIVEPERL_MINGW} ) {
-      $config{LIBS} .= '';
+    if ($::is_Win32) {
+        if( $ENV{ACTIVEPERL_MINGW} ) {
+            $config{LIBS} .= '';
+        } else {
+            $config{LIBS} .= ' -lzlib';
+        }
     } else {
-      $config{LIBS} .= ' -lzlib';
+        $config{LIBS} .= ' -lz';
     }
-  } else {
-    $config{LIBS} .= ' -lz';
-  }
 }
 
 if ($config{LIBS} !~ /\-lm\b/) {
@@ -158,7 +157,7 @@ if ($config{LIBS} !~ /\-lm\b/) {
 }
 
 if (!have_library($::is_Win32 ? "libxslt" : "xslt")) {
-    print STDERR <<DEATH;
+    print STDERR <<"DEATH";
 libxslt not found
 Try setting LIBS and INC values on the command line
 Or get libxslt and libxml2 from
@@ -199,8 +198,8 @@ if (have_library($::is_Win32 ? "libexslt" : "exslt")) {
 }
 
 if ($DEBUG) {
-  print "LIBS: $config{LIBS}\n";
-  print "INC: $config{INC}\n";
+    print "LIBS: $config{LIBS}\n";
+    print "INC: $config{INC}\n";
 }
 
 my $ldflags = delete $config{LDFLAGS};
@@ -213,28 +212,9 @@ if ($ldflags) {
 # To handle this we are gonna rename module's DLL to LibXSLT.xs.dll.
 if ($::is_Win32)
 {
-    if ($] eq '5.010000')
-    {
-        print STDERR <<'BUG';
-******************************** !!!WARNING!!! ********************************
-According to the version string you are running a win32 perl 5.10.0 that is
-known to be suffering from dynaloader bug that prevents using non-default
-module's DLL name. Therefore we have to use LibXSLT.dll that will clash with the
-standard name of xslt library DLL. Please consider renaming your xslt library
-to e.g. libxslt_win32.dll and then make the appropriate changes to this module's
-build process to look for that instead of standard libxslt.dll. If you do not
-make the proposed changes you will got during the tests many error popups with
-slightly confusing message about "xsltApplyOneTemplate" function.
-This bug is not present in perl 5.8.* and will be fixed in 5.10.1.
-*******************************************************************************
-BUG
-    }
-    else
-    {
-        # Fix for RT #94516 :
-        # https://rt.cpan.org/Ticket/Display.html?id=94516
-        $config{DLEXT} = 'xs.'.$Config{dlext};
-    }
+    # Fix for RT #94516 :
+    # https://rt.cpan.org/Ticket/Display.html?id=94516
+    $config{DLEXT} = 'xs.'.$Config{dlext};
 }
 
 WriteMakefile(
@@ -252,7 +232,7 @@ WriteMakefile(
     },
     'OBJECT'     => '$(O_FILES)',
     (($ExtUtils::MakeMaker::VERSION >= 6.48)
-        ? (MIN_PERL_VERSION => '5.008001',)
+        ? (MIN_PERL_VERSION => '5.014',)
         : ()
     ),
     'META_MERGE' => {
@@ -275,28 +255,11 @@ WriteMakefile(
 #  - these should really be in MakeMaker... But &shrug;
 ###################################################################
 
-use Config;
-use Cwd;
-use Symbol;
-use File::Spec;
-
-
-BEGIN {
-    $::is_Win32 = ($^O =~ /Win32/);
-    if ($::is_Win32) {
-        $DEVNULL = 'DEVNULL';
-    }
-    else {
-        $DEVNULL = eval { File::Spec->devnull };
-        if ($@) { $DEVNULL = '/dev/null' }
-    }
-}
-
 sub rm_f {
     my @files = @_;
     my @realfiles;
-    foreach (@files) {
-        push @realfiles, glob($_);
+    foreach my $pat (@files) {
+        push @realfiles, glob($pat);
     }
     if (@realfiles) {
         chmod(0777, @realfiles);
@@ -307,8 +270,8 @@ sub rm_f {
 sub rm_fr {
     my @files = @_;
     my @realfiles;
-    foreach (@files) {
-        push @realfiles, glob($_);
+    foreach my $pat (@files) {
+        push @realfiles, glob($pat);
     }
     foreach my $file (@realfiles) {
         if (-d $file) {
@@ -326,7 +289,7 @@ sub rm_fr {
 }
 
 sub xsystem {
-  my (@command)=@_;
+    my (@command)=@_;
     if ($DEBUG) {
         print "@command\n";
         if (system(@command) != 0) {
@@ -373,9 +336,36 @@ sub backtick {
     return $results;
 }
 
+sub _write_utf8_file
+{
+    my ($out_path, $contents) = @_;
+
+    open my $out_fh, '>:encoding(utf8)', $out_path
+        or die "Cannot open '$out_path' for writing - $!";
+
+    print {$out_fh} $contents;
+
+    close($out_fh);
+
+    return;
+}
+
+sub _write_raw_file
+{
+    my ($out_path, $contents) = @_;
+
+    open my $out_fh, '>:raw', $out_path
+        or die "Cannot open '$out_path' for writing - $!";
+
+    print {$out_fh} $contents;
+
+    close($out_fh);
+
+    return;
+}
+
 sub try_link0 {
     my ($src, $opt) = @_;
-    my $cfile = gensym();
     # local $config{LIBS};
     # $config{LIBS} .= $opt;
     unless (mkdir(".testlink", 0777)) {
@@ -383,8 +373,7 @@ sub try_link0 {
         mkdir(".testlink", 0777) || die "Cannot create .testlink dir: $!";
     }
     chdir(".testlink");
-    open($cfile, ">Conftest.xs") || die "Cannot write to file Conftest.xs: $!";
-print $cfile <<EOT;
+    _write_utf8_file("Conftest.xs", <<"EOT");
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -394,19 +383,15 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-EOT
-    print $cfile $src;
-    print $cfile <<EOT;
+$src
 
 MODULE = Conftest          PACKAGE = Conftest
 
 PROTOTYPES: DISABLE
 
 EOT
-    close($cfile);
-    open($cfile, ">Conftest.pm") || die "Cannot write to file Conftest.pm: $!";
-    print $cfile <<'EOT';
+
+    _write_utf8_file("Conftest.pm", <<'EOT');
 package Conftest;
 $VERSION = 1.0;
 require DynaLoader;
@@ -414,9 +399,7 @@ require DynaLoader;
 bootstrap Conftest $VERSION;
 1;
 EOT
-    close($cfile);
-    open($cfile, ">Makefile.PL") || die "Cannot write to file Makefile.PL: $!";
-    print $cfile <<'EOT';
+_write_utf8_file("Makefile.PL", <<'EOT');
 use ExtUtils::MakeMaker;
 my %config;
 while($_ = shift @ARGV) {
@@ -426,14 +409,13 @@ while($_ = shift @ARGV) {
 }
 WriteMakefile(NAME => "Conftest", VERSION_FROM => "Conftest.pm", %config);
 EOT
-    close($cfile);
-    open($cfile, ">test.pl") || die "Cannot write to file test.pl: $!";
-    print $cfile <<EOT;
-use Test; BEGIN { plan tests => 1; } END { ok(\$loaded) }
-use Conftest; \$loaded++;
+    _write_utf8_file("test.pl", <<"EOT");
+use Test::More tests => 1;
+use Conftest;
+++\$::loaded;
+ok(\$::loaded, "loaded") ;
 EOT
-    close($cfile);
-    xsystem($^X,'Makefile.PL',map "$_=$config{$_}", keys %config);
+    xsystem($^X, 'Makefile.PL', map { "$_=$config{$_}" } keys %config);
     xsystem($Config{make},
 	    ($config{MAKEAPERL} ? qw(-f Makefile.aperl FIRST_MAKEFILE=Makefile.aperl) : ()),
 	    'test'); #,"OTHERLDFLAGS=".$opt);
@@ -452,8 +434,14 @@ sub try_link {
 
 sub have_library {
     my ($lib, $func) = (@_, "blank");
-    printf("checking for %s() in -l%s... ", $func, $lib) if $func ne "blank";
-    printf("looking for -l%s... ", $lib) if $func eq "blank";
+    if ($func eq "blank")
+    {
+        printf("looking for -l%s... ", $lib);
+    }
+    else
+    {
+        printf("checking for %s() in -l%s... ", $func, $lib);
+    }
 
     my $result;
     if ($func) {
@@ -510,4 +498,3 @@ distruntest: distdir
 
 MAKE_FRAG
 }
-

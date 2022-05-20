@@ -1,0 +1,51 @@
+NAME
+    marc-list - Script to get MARC field/subfield unique list.
+
+SYNOPSIS
+     marc-list [-h] [--version] marc_xml_file field subfield
+
+DESCRIPTION
+    It supports MARC XML files now.
+
+ARGUMENTS
+    *       "-h"
+
+             Print help.
+
+    *       "--version"
+
+             Print version of script.
+
+    *       "marc_xml_file"
+
+            MARC XML file name.
+
+    *       "field"
+
+            MARC field.
+
+    *       "subfield"
+
+            MARC subfield.
+
+    *       "module_version"
+
+EXAMPLE
+     marc-list __MARC.xml__ 015 a
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-MARC-List>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2022 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

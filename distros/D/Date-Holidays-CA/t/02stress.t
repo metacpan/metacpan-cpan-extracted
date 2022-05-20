@@ -16,22 +16,22 @@ GET_NO_FIELD: {
 
 GET_NONEXISTENT_FIELD: {
     my $calendar = Date::Holidays::CA->new();
-    dies_ok { 
-        $calendar->get('tim_hortons'); 
+    dies_ok {
+        $calendar->get('tim_hortons');
     } 'Exception thrown when invalid field passed to get()';
 }
 
 SET_NONEXISTENT_FIELD: {
     my $calendar = Date::Holidays::CA->new();
-    dies_ok { 
-        $calendar->set({ poutine => 'bien sur' }); 
+    dies_ok {
+        $calendar->set({ poutine => 'bien sur' });
     } 'Exception thrown when invalid field passed to set()';
 }
 
 SET_INVALID_PROVINCE: {
     my $calendar = Date::Holidays::CA->new();
-    dies_ok { 
-        $calendar->set({ province => 'mi' }); 
+    dies_ok {
+        $calendar->set({ province => 'mi' });
     } 'Exception thrown when invalid province given to set()';
 }
 
@@ -55,8 +55,8 @@ NEW_INVALID_PROVINCE: {
 NEW_INVALID_LANGUAGE: {
     dies_ok {
         my $calendar = Date::Holidays::CA->new({
-            language => 'RU',                     
+            language => 'RU',
         });
-    } 'Exception thrown when invalid language given to new()'; 
+    } 'Exception thrown when invalid language given to new()';
 }
 

@@ -90,13 +90,7 @@ marpaWrapperRecognizer_t *marpaWrapperRecognizer_newp(marpaWrapperGrammar_t *mar
 
   nSymboll = highestSymbolIdi + 1;
   MARPAWRAPPER_TRACEF(genericLoggerp, funcs, "Pre-allocating room for %d symbols", nSymboll);
-  if (MARPAWRAPPER_UNLIKELY(manageBuf_createp(genericLoggerp,
-                                              (void **) &(marpaWrapperRecognizerp->symbolip),
-                                              &(marpaWrapperRecognizerp->sizeSymboll),
-                                              nSymboll,
-                                              sizeof(int)) == NULL)) {
-    goto err;
-  }
+  MARPAWRAPPER_MANAGEBUF(genericLoggerp, marpaWrapperRecognizerp->symbolip, marpaWrapperRecognizerp->sizeSymboll, nSymboll, sizeof(int));
 
   /* Events can happen */
   if (MARPAWRAPPER_UNLIKELY(marpaWrapperGrammar_eventb(marpaWrapperGrammarp, NULL, NULL, marpaWrapperRecognizerOptionp->exhaustionEventb, 1) == 0)) {
@@ -237,9 +231,11 @@ short marpaWrapperRecognizer_latestb(marpaWrapperRecognizer_t *marpaWrapperRecog
   MARPAWRAPPER_TRACE(GENERICLOGGERP(marpaWrapperRecognizerp), funcs, "return 1");
   return 1;
 
+#ifndef NDEBUG
  err:
   MARPAWRAPPER_TRACE(GENERICLOGGERP(marpaWrapperRecognizerp), funcs, "return 0");
   return 0;
+#endif
 }
 
 /****************************************************************************/
@@ -394,9 +390,11 @@ short marpaWrapperRecognizer_exhaustedb(marpaWrapperRecognizer_t *marpaWrapperRe
   }
   return 1;
 
+#ifndef NDEBUG
  err:
   MARPAWRAPPER_TRACE(GENERICLOGGERP(marpaWrapperRecognizerp), funcs, "return 0");
   return 0;
+#endif
 }
 
 /****************************************************************************/
@@ -471,13 +469,7 @@ short marpaWrapperRecognizer_progressb(marpaWrapperRecognizer_t *marpaWrapperRec
 	goto err;
       }
 
-      if (MARPAWRAPPER_UNLIKELY(manageBuf_createp(GENERICLOGGERP(marpaWrapperRecognizerp),
-                                                  (void **) &(marpaWrapperRecognizerp->progressp),
-                                                  &(marpaWrapperRecognizerp->sizeProgressl),
-                                                  nProgressl + 1,
-                                                  sizeof(marpaWrapperRecognizerProgress_t)) == NULL)) {
-	goto err;
-      }
+      MARPAWRAPPER_MANAGEBUF(GENERICLOGGERP(marpaWrapperRecognizerp), marpaWrapperRecognizerp->progressp, marpaWrapperRecognizerp->sizeProgressl, nProgressl + 1, sizeof(marpaWrapperRecognizerProgress_t));
 
       marpaWrapperRecognizerp->progressp[nProgressl].earleySetIdi     = (int) earleySetIdi;
       marpaWrapperRecognizerp->progressp[nProgressl].earleySetOrigIdi = (int) earleySetOrigIdi;
@@ -669,10 +661,10 @@ void marpaWrapperRecognizer_freev(marpaWrapperRecognizer_t *marpaWrapperRecogniz
     }
 
     MARPAWRAPPER_TRACE(genericLoggerp, funcs, "Freeing symbol table");
-    manageBuf_freev(genericLoggerp, (void **) &(marpaWrapperRecognizerp->symbolip));
+    MARPAWRAPPER_FREEBUF(marpaWrapperRecognizerp->symbolip);
 
     MARPAWRAPPER_TRACE(genericLoggerp, funcs, "Freeing progress table");
-    manageBuf_freev(genericLoggerp, (void **) &(marpaWrapperRecognizerp->progressp));
+    MARPAWRAPPER_FREEBUF(marpaWrapperRecognizerp->progressp);
 
     MARPAWRAPPER_TRACEF(genericLoggerp, funcs, "free(%p)", marpaWrapperRecognizerp);
     free(marpaWrapperRecognizerp);
@@ -805,9 +797,11 @@ short marpaWrapperRecognizer_currentEarlemeb(marpaWrapperRecognizer_t *marpaWrap
   MARPAWRAPPER_TRACE(GENERICLOGGERP(marpaWrapperRecognizerp), funcs, "return 1");
   return 1;
 
+#ifndef NDEBUG
  err:
   MARPAWRAPPER_TRACE(GENERICLOGGERP(marpaWrapperRecognizerp), funcs, "return 0");
   return 0;
+#endif
 }
 
 /****************************************************************************/
@@ -882,7 +876,9 @@ short marpaWrapperRecognizer_furthestEarlemeb(marpaWrapperRecognizer_t *marpaWra
   MARPAWRAPPER_TRACE(GENERICLOGGERP(marpaWrapperRecognizerp), funcs, "return 1");
   return 1;
 
+#ifndef NDEBUG
  err:
   MARPAWRAPPER_TRACE(GENERICLOGGERP(marpaWrapperRecognizerp), funcs, "return 0");
   return 0;
+#endif
 }

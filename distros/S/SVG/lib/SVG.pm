@@ -7,7 +7,7 @@ use SVG::XML;
 use parent qw(SVG::Element SVG::Extension);
 use Scalar::Util qw/weaken/;
 
-our $VERSION = '2.86';
+our $VERSION = '2.87';
 
 =pod
 
@@ -121,7 +121,7 @@ That you can either embed directly into HTML or can include it using:
 
 =for HTML <p><img src="http://perlmaven.com/img/svg/circle.svg" alt="SVG example circle" /></p>
 
-See also the B<examples> directory in this distribution which contain several fully documented examples.
+See also the B<examples> directory in this distribution which contains several fully documented examples.
 
 =head1 DESCRIPTION
 
@@ -144,7 +144,7 @@ Generating SVG is a simple three step process:
 
 =back
 
-The L<"xmlify"> method takes a number of optional arguments that control how SVG
+The L</xmlify> method takes a number of optional arguments that control how SVG
 renders the object into XML, and in particular determine whether a standalone
 SVG document or an inline SVG document fragment is generated:
 
@@ -155,7 +155,7 @@ elements may be optionally specified.
 
 =head2 -inline
 
-An inline SVG document fragment with no DTD that be embedded within other XML
+An inline SVG document fragment with no DTD that is embedded within other XML
 content. As with standalone documents, an alternate namespace may be specified.
 
 No XML content is generated until the third step is reached. Up until this
@@ -166,12 +166,12 @@ from which they can be accessed and modified.
 
 None. However, SVG permits both options and additional element methods to be
 specified in the import list. These options and elements are then available
-for all SVG instances that are created with the L<"new"> constructor. For example,
+for all SVG instances that are created with the L</new> constructor. For example,
 to change the indent string to two spaces per level:
 
     use SVG (-indent => "  ");
 
-With the exception of -auto, all options may also be specified to the L<"new">
+With the exception of -auto, all options may also be specified to the L</new>
 constructor. The currently supported options and their default value are:
 
     # processing options
@@ -241,7 +241,6 @@ Resulting XML snippet:
       <!--
         Generated using the Perl SVG Module V2.50
           by Ronan Oger
-        Info: http://www.roitsystems.com/
       -->
 
 =head1 METHODS
@@ -308,7 +307,7 @@ may also be set in xmlify, overriding any corresponding values set in the SVG->n
 
 =head2 xmlify (alias: to_xml render serialise serialize)
 
-$string = $svg->xmlify(%attributes);
+    $string = $svg->xmlify(%attributes);
 
 Returns xml representation of svg document.
 
@@ -326,7 +325,7 @@ B<XML Declaration>
 
 =head2 tag (alias: element)
 
-$tag = $svg->tag($name, %attributes)
+    $tag = $svg->tag($name, %attributes)
 
 Generic element generator. Creates the element named $name with the attributes
 specified in %attributes. This method is the basis of most of the explicit
@@ -337,7 +336,7 @@ element generators.
 
 =head2 anchor
 
-$tag = $svg->anchor(%attributes)
+    $tag = $svg->anchor(%attributes)
 
 Generate an anchor element. Anchors are put around objects to make them
 'live' (i.e. clickable). It therefore requires a drawn object or group element
@@ -345,7 +344,7 @@ as a child.
 
 =head3 optional anchor attributes
 
-the following attributes are expected for anchor tags (any any tags which use -href links):
+The following attributes are expected for anchor tags (any any tags which use -href links):
 
 =head2 -href    required
 
@@ -377,7 +376,7 @@ B<Example:>
 
     );
 
-for more information about the options above, refer to Link  section in the SVG recommendation: L<http://www.w3.org/TR/SVG11/linking.html#Links>
+For more information about the options above, refer to Link  section in the SVG recommendation: L<http://www.w3.org/TR/SVG11/linking.html#Links>
 
     # add a circle to the anchor. The circle can be clicked on.
     $tag->circle(cx => 10, cy => 10, r => 1);
@@ -404,7 +403,7 @@ for more information about the options above, refer to Link  section in the SVG 
 
 =head2 circle
 
-$tag = $svg->circle(%attributes)
+    $tag = $svg->circle(%attributes)
 
 Draw a circle at (cx,cy) with radius r.
 
@@ -412,7 +411,7 @@ Draw a circle at (cx,cy) with radius r.
 
 =head2 ellipse
 
-$tag = $svg->ellipse(%attributes)
+    $tag = $svg->ellipse(%attributes)
 
 Draw an ellipse at (cx,cy) with radii rx,ry.
 
@@ -459,7 +458,7 @@ Draw a rectangle at (x,y) with width 'width' and height 'height' and side radii
 
 =head2 image
 
- $tag = $svg->image(%attributes)
+    $tag = $svg->image(%attributes)
 
 Draw an image at (x,y) with width 'width' and height 'height' linked to image
 resource '-href'. See also L<"use">.
@@ -479,7 +478,7 @@ B<Output:>
 
 =head2 use
 
-$tag = $svg->use(%attributes)
+    $tag = $svg->use(%attributes)
 
 Retrieve the content from an entity within an SVG document and apply it at
 (x,y) with width 'width' and height 'height' linked to image resource '-href'.
@@ -502,7 +501,7 @@ single element within an external SVG file.
 
 =head2 polygon
 
-$tag = $svg->polygon(%attributes)
+    $tag = $svg->polygon(%attributes)
 
 Draw an n-sided polygon with vertices at points defined by a string of the form
 'x1,y1,x2,y2,x3,y3,... xy,yn'. The L<"get_path"> method is provided as a
@@ -530,7 +529,7 @@ L<"polyline">, L<"path">, L<"get_path">.
 
 =head2 polyline
 
-$tag = $svg->polyline(%attributes)
+    $tag = $svg->polyline(%attributes)
 
 Draw an n-point polyline with points defined by a string of the form
 'x1,y1,x2,y2,x3,y3,... xy,yn'. The L<"get_path"> method is provided as a
@@ -558,7 +557,7 @@ convenience to generate a suitable string from coordinate data.
 
 =head2 line
 
-$tag = $svg->line(%attributes)
+    $tag = $svg->line(%attributes)
 
 Draw a straight line between two points (x1,y1) and (x2,y2).
 
@@ -574,12 +573,12 @@ To draw multiple connected lines, use L<"polyline">.
 
 =head2 text
 
-$text = $svg->text(%attributes)->cdata();
+    $text = $svg->text(%attributes)->cdata();
 
-$text_path = $svg->text(-type=>'path');
-$text_span = $text_path->text(-type=>'span')->cdata('A');
-$text_span = $text_path->text(-type=>'span')->cdata('B');
-$text_span = $text_path->text(-type=>'span')->cdata('C');
+    $text_path = $svg->text(-type=>'path');
+    $text_span = $text_path->text(-type=>'span')->cdata('A');
+    $text_span = $text_path->text(-type=>'span')->cdata('B');
+    $text_span = $text_path->text(-type=>'span')->cdata('C');
 
 Define the container for a text string to be drawn in the image.
 
@@ -616,7 +615,7 @@ L<"desc">, L<"cdata">.
 
 =head2 title
 
-$tag = $svg->title(%attributes)
+    $tag = $svg->title(%attributes)
 
 Generate the title of the image.
 
@@ -624,7 +623,7 @@ Generate the title of the image.
 
 =head2 desc
 
-$tag = $svg->desc(%attributes)
+    $tag = $svg->desc(%attributes)
 
 Generate the description of the image.
 
@@ -632,7 +631,7 @@ Generate the description of the image.
 
 =head2 comment
 
-$tag = $svg->comment(@comments)
+    $tag = $svg->comment(@comments)
 
 Generate the description of the image.
 
@@ -640,7 +639,7 @@ Generate the description of the image.
 
 =head2 pi (Processing Instruction)
 
-$tag = $svg->pi(@pi)
+    $tag = $svg->pi(@pi)
 
 Generate a set of processing instructions
 
@@ -653,7 +652,7 @@ Generate a set of processing instructions
 
 =head2 script
 
-$tag = $svg->script(%attributes)
+    $tag = $svg->script(%attributes)
 
 Generate a script container for dynamic (client-side) scripting using
 ECMAscript, Javascript or other compatible scripting language.
@@ -677,7 +676,7 @@ ECMAscript, Javascript or other compatible scripting language.
 
 =head2 path
 
-$tag = $svg->path(%attributes)
+    $tag = $svg->path(%attributes)
 
 Draw a path element. The path vertices may be provided as a parameter or
 calculated using the L<"get_path"> method.
@@ -708,7 +707,7 @@ SEE ALSO: L<"get_path">.
 
 =head2 get_path
 
-$path = $svg->get_path(%attributes)
+    $path = $svg->get_path(%attributes)
 
 Returns the text string of points correctly formatted to be incorporated into
 the multi-point SVG drawing object definitions (path, polyline, polygon)
@@ -750,7 +749,7 @@ B<Aliases:> get_path set_path
 
 =head2 animate
 
-$tag = $svg->animate(%attributes)
+    $tag = $svg->animate(%attributes)
 
 Generate an SMIL animation tag. This is allowed within any nonempty tag. Refer
 to the W3C for detailed information on the subtleties of the animate SMIL
@@ -807,7 +806,7 @@ B<Inputs:> -method = Transform | Motion | Color
 
 =head2 group
 
-$tag = $svg->group(%attributes)
+    $tag = $svg->group(%attributes)
 
 Define a group of objects with common properties. Groups can have style,
 animation, filters, transformations, and mouse actions assigned to them.
@@ -824,7 +823,7 @@ animation, filters, transformations, and mouse actions assigned to them.
 
 =head2 defs
 
-$tag = $svg->defs(%attributes)
+    $tag = $svg->defs(%attributes)
 
 define a definition segment. A Defs requires children when defined using SVG.pm
 
@@ -832,14 +831,14 @@ define a definition segment. A Defs requires children when defined using SVG.pm
 
 =head2 style
 
-$svg->tag('style', %styledef);
+    $svg->tag('style', %styledef);
 
-Sets/Adds style-definition for the following objects being created.
+Sets/adds style-definition for the following objects being created.
 
 Style definitions apply to an object and all its children for all properties for
 which the value of the property is not redefined by the child.
 
-  $tag = $SVG->style(%attributes)
+    $tag = $SVG->style(%attributes)
 
 Generate a style container for inline or xlink:href based styling instructions
 
@@ -859,20 +858,17 @@ Generate a style container for inline or xlink:href based styling instructions
     # Create a external CSS stylesheet reference
     my $tag2 = $SVG->style(type=>"text/css", -href="/resources/example.css");
 
-=pod
-
-
 =head2 mouseaction
 
-$svg->mouseaction(%attributes)
+    $svg->mouseaction(%attributes)
 
 Sets/Adds mouse action definitions for tag
 
 =head2 attrib
 
-  $svg->attrib($name, $value)
+    $svg->attrib($name, $value)
 
-Sets/Adds attributes of an element.
+Sets/adds attributes of an element.
 
 Retrieve an attribute:
 
@@ -896,11 +892,11 @@ Remove an attribute:
 
 B<Aliases:> attr attribute
 
-Sets/Replaces attributes for a tag.
+Sets/replaces attributes for a tag.
 
 =head2 cdata
 
-$svg->cdata($text)
+    $svg->cdata($text)
 
 Sets cdata to $text. SVG.pm allows you to set cdata for any tag. If the tag is
 meant to be an empty tag, SVG.pm will not complain, but the rendering agent will
@@ -926,16 +922,16 @@ L<"CDATA">, L<"desc">, L<"title">, L<"text">, L<"script">.
 
 =head2 cdata_noxmlesc
 
- $script = $svg->script();
- $script->cdata_noxmlesc($text);
+    $script = $svg->script();
+    $script->cdata_noxmlesc($text);
 
 Generates cdata content for text and similar tags which do not get xml-escaped.
 In othe words, does not parse the content and inserts the exact string into the cdata location.
 
 =head2 CDATA
 
- $script = $svg->script();
- $script->CDATA($text);
+    $script = $svg->script();
+    $script->CDATA($text);
 
 Generates a <![CDATA[ ... ]]> tag with the contents of $text rendered exactly as supplied. SVG.pm allows you to set cdata for any tag. If the tag is
 meant to be an empty tag, SVG.pm will not complain, but the rendering agent will
@@ -992,9 +988,9 @@ SEE ALSO: L<"cdata">, L<"script">.
 
 =head2 xmlescp and xmlescape
 
-$string = $svg->xmlescp($string)
-$string = $svg->xmlesc($string)
-$string = $svg->xmlescape($string)
+    $string = $svg->xmlescp($string)
+    $string = $svg->xmlesc($string)
+    $string = $svg->xmlescape($string)
 
 SVG module does not xml-escape characters that are incompatible with the XML specification. B<xmlescp> and B<xmlescape> provides this functionality. It is a helper function which generates an XML-escaped string for reserved characters such as ampersand, open and close brackets, etcetera.
 
@@ -1011,7 +1007,7 @@ The behaviour of xmlesc is to apply the following transformation to the input st
 
 =head2 filter
 
-$tag = $svg->filter(%attributes)
+    $tag = $svg->filter(%attributes)
 
 Generate a filter. Filter elements contain L<"fe"> filter sub-elements.
 
@@ -1030,7 +1026,7 @@ SEE ALSO: L<"fe">.
 
 =head2 fe
 
-$tag = $svg->fe(-type=>'type', %attributes)
+    $tag = $svg->fe(-type=>'type', %attributes)
 
 Generate a filter sub-element. Must be a child of a L<"filter"> element.
 
@@ -1102,10 +1098,9 @@ SEE ALSO: L<"filter">.
 
 =head2 pattern
 
-$tag = $svg->pattern(%attributes)
+    $tag = $svg->pattern(%attributes)
 
 Define a pattern for later reference by url.
-
 
     my $pattern = $svg->pattern(
         id     => "Argyle_1",
@@ -1117,7 +1112,7 @@ Define a pattern for later reference by url.
 
 =head2 set
 
-$tag = $svg->set(%attributes)
+    $tag = $svg->set(%attributes)
 
 Set a definition for an SVG object in one section, to be referenced in other
 sections as needed.
@@ -1132,7 +1127,7 @@ sections as needed.
 
 =head2 stop
 
-$tag = $svg->stop(%attributes)
+    $tag = $svg->stop(%attributes)
 
 Define a stop boundary for L<"gradient">
 
@@ -1146,7 +1141,7 @@ Define a stop boundary for L<"gradient">
 
 =head2 gradient
 
-$tag = $svg->gradient(%attributes)
+    $tag = $svg->gradient(%attributes)
 
 Define a color gradient. Can be of type B<linear> or B<radial>
 
@@ -1210,7 +1205,7 @@ The following elements are generically supported by SVG:
 
 =head2 * vkern
 
-See e.g. L<"pattern"> for an example of the use of these methods.
+See e.g. L</pattern> for an example of the use of these methods.
 
 =head1 METHODS IMPORTED BY SVG::DOM
 
@@ -1262,7 +1257,6 @@ The following L<SVG::DOM> elements are accessible through SVG:
 
 =head2 * cloneNode
 
-
 =cut
 
 #-------------------------------------------------------------------------------
@@ -1291,7 +1285,7 @@ my %default_attrs = (
     -xml_xlink => 'http://www.w3.org/1999/xlink',
     -standalone => 'yes',
     -pubid      => '-//W3C//DTD SVG 1.0//EN',    # formerly -identifier
-    -sysid => 'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd',
+    -sysid      => 'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd',
 );
 
 sub import {
@@ -1498,7 +1492,7 @@ sub xmlify {
         or $self->{-docref}{-creditsinserted} )
     {
         $self->comment(
-            "\n\tGenerated using the Perl SVG Module V$VERSION\n\tby Ronan Oger\n\tInfo: http://www.roitsystems.com/\n\t"
+            "\n\tGenerated using the Perl SVG Module V$VERSION\n\tby Ronan Oger\n\n\t"
         );
         $self->{-docref}{-creditsinserted} = 1;
     }
@@ -1558,10 +1552,10 @@ patches, testing, suggestions, and other nice tidbits:
 
 Peter Wainwright, Excellent ideas, beta-testing, writing SVG::Parser and much of SVG::DOM.
 Fredo, http://www.penguin.at0.net/~fredo/ - provided example code and initial feedback for early SVG.pm versions and the idea of a simplified svg generator.
-Adam Schneider,
-Brial Pilpré,
+Adam Schneider
+Brial Pilpré
 Ian Hickson
-Steve Lihn,
+Steve Lihn
 Allen Day
 Martin Owens - SVG::DOM improvements in version 3.34
 

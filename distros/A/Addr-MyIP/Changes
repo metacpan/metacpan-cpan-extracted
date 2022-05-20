@@ -1,0 +1,19 @@
+Revision history for Addr-MyIP
+
+0.05    2022-05-17
+    - Renamed distribution to Addr::MyIP from Net::MyIP due to the latter being
+      in BackPAN, breaking my release
+
+0.04    2022-05-13
+    - s/distmgr/myip/ in module POD description
+
+0.03    2022-05-11
+    - Print response content (error message) if API failure occurs
+    - Add prereq of Hook::Output::Tiny for testing a non-200 API response
+
+0.02    2022-05-11
+    - POD fixes
+    - Modifications to Github CI Actions configuration
+
+0.01    2022-05-11
+    - Auto generated distribution with Dist::Mgr

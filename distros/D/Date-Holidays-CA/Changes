@@ -1,16 +1,32 @@
-0.01  Initial version; released Tue Sep 1 2009.
+Revision history for Perl extension Date::Holidays::CA.
 
-0.02  Released Tue Nov 17 2009.
+0.05 -- Wed May 18 18:57:16 ADT 2022
 
-      Fix missed dep on Test::Exception.  Closes RT 50695.
-      Thanks to ANDK (Andreas J. König) for this one.  
+    - b794c1a Add .gitignore file
+    - c5eabc4 Update for release version
+    - e2bc144 v0.04
 
-      Add Family Day to Ontario Holiday list.  Closes RT 50525.
-      Thanks to Kevin Field for pointing this one out. 
+0.04 -- Tue May 17 21:07:46 ADT 2022
+
+    - 6ba0c58 Reverse order of the Changes and add Automated release update
+    - 10fa5ab Move build to Dist::Zilla
+    - baf98e8 Remove spaces on line endings
+    - 01d48da Add National Day for Truth and Reconciliation and update Holidays
 
 0.03  Released Fri Sep 24 2010.
 
       Fix mojibake in Date::Holidays::CA pod by properly declaring
       encoding to be utf8.  Thanks to Chris McMahon for pointing it out.
 
-      Change build toolkit from Extutils::MakeMaker to Module::Build. 
+      Change build toolkit from Extutils::MakeMaker to Module::Build.
+
+0.02  Released Tue Nov 17 2009.
+
+      Fix missed dep on Test::Exception.  Closes RT 50695.
+      Thanks to ANDK (Andreas J. König) for this one.
+
+      Add Family Day to Ontario Holiday list.  Closes RT 50525.
+      Thanks to Kevin Field for pointing this one out.
+
+0.01  Initial version; released Tue Sep 1 2009.
+

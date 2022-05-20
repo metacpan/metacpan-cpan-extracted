@@ -8,9 +8,9 @@ sub ttknote{
         my($demo) = @_;
         $TOP = $MW->WidgetDemo(
                 -name     => $demo,
-                -title    => 'Tile Widget PanedWindow Demo',
+                -title    => 'Ttk Notebook Widget',
                 -text	  => '',
-                -iconname => 'ttkpane',
+                -iconname => 'ttknote',
         );
 
         my $frame = $TOP->ttkFrame()->pack(qw/ -fill both -expand 1/);

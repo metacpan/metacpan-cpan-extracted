@@ -4,13 +4,13 @@
       "Ronan Oger <ronan@cpan.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "SVG",
    "no_index" : {
@@ -52,23 +52,23 @@
    "provides" : {
       "SVG" : {
          "file" : "lib/SVG.pm",
-         "version" : "2.86"
+         "version" : "2.87"
       },
       "SVG::DOM" : {
          "file" : "lib/SVG/DOM.pm",
-         "version" : "2.86"
+         "version" : "2.87"
       },
       "SVG::Element" : {
          "file" : "lib/SVG/Element.pm",
-         "version" : "2.86"
+         "version" : "2.87"
       },
       "SVG::Extension" : {
          "file" : "lib/SVG/Extension.pm",
-         "version" : "2.86"
+         "version" : "2.87"
       },
       "SVG::XML" : {
          "file" : "lib/SVG/XML.pm",
-         "version" : "2.86"
+         "version" : "2.87"
       }
    },
    "release_status" : "stable",
@@ -79,7 +79,7 @@
          "web" : "https://github.com/manwar/SVG"
       }
    },
-   "version" : "2.86",
+   "version" : "2.87",
    "x_contributors" : [
       "Peter Wainwright",
       "Ian Hickson",
@@ -89,5 +89,5 @@
       "Gabor Szabo",
       "Mohammad S Anwar"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

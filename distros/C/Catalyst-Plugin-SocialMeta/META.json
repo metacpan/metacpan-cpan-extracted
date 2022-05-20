@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Catalyst::Runtime" : "5.80001",
-            "HTML::SocialMeta" : "0.74004",
+            "HTML::SocialMeta" : "0.74006",
             "perl" : "5.006"
          }
       },
@@ -46,6 +46,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

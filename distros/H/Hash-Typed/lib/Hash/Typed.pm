@@ -1,5 +1,5 @@
 package Hash::Typed;
-use strict; use warnings; our $VERSION = '0.04';
+use strict; use warnings; our $VERSION = '0.05';
 use Carp qw/croak/; use Tie::Hash; our (@ISA);
 
 BEGIN { 
@@ -85,7 +85,7 @@ sub DELETE {
 		my($i) = $self->[0]{$key};
 		$self->[0]{ $self->[1][$_] }--
 			for ($i+1..$#{$self->[1]});
-		$self->[3]-- if ( $i == $self->[3]-1 );
+		$self->[3]--  if ( $i == $self->[3]-1 );
 		delete $self->[0]{$key};
 		splice @{$self->[1]}, $i, 1;
 		return (splice(@{$self->[2]}, $i, 1))[0];
@@ -118,10 +118,14 @@ sub PARSE {
 	tie(%described, 'Hash::Typed');
 	while (@{$spec}) {
 		my ($key, $value) = (shift @{$spec}, shift @{$spec});
-		if ($key eq 'keys' && ref $value eq 'ARRAY') {
-			($value) = $self->PARSE($value);
-			my $i = 0;
-			%keys = map { $_ => $i++ } keys %{$value}; 
+		if ($key eq 'keys') {
+			if (ref $value eq 'ARRAY') {
+				($value) = $self->PARSE($value);
+				my $i = 0;
+				%keys = map { $_ => $i++ } keys %{$value}; 
+			} else {
+				croak "keys spec must currently be an ARRAY";
+			}
 		}
 		$described{$key} = $value;
 	}
@@ -148,7 +152,7 @@ Hash::Typed - Ordered typed tied hashes.
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 

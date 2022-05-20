@@ -7,7 +7,7 @@ use SVG qw(-inline 1);
 # test: -inline
 
 my $svg1 = SVG->new();
-isa_ok $svg1, 'SVG';
+isa_ok $svg1,                                    'SVG';
 isa_ok $svg1->text->cdata("An inline document"), 'SVG::Element';
 
 my $xml1a = $svg1->render();

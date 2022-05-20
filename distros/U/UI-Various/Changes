@@ -1,6 +1,15 @@
 Revision history for Perl extension UI-Various
 
-0.19 2022-05-08T10:59:03Z
+0.20 2022-05-20T10:52:44Z
+
+0.20 2022-05-20T10:44:06Z
+
+    - added Dialog widget
+    - fixed wrong deletion behaviour of DummyBox in Curses::Box
+    - code routines of Button now all get references to top and themselves
+    - fixed missing selection prefix for empty input fields in RichTerm
+    - fixed bad numbering of Radio buttons in RichTerm
+    - fixed parameter handling in examples
 
 0.19 2022-05-08T10:58:14Z
 

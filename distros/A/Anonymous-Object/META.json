@@ -47,7 +47,7 @@
    "provides" : {
       "Anonymous::Object" : {
          "file" : "lib/Anonymous/Object.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -58,6 +58,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Anonymous-Object"
       }
    },
-   "version" : 0.05,
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : 0.06,
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

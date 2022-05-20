@@ -12,7 +12,7 @@ package Data::Tools::CSV;
 use strict;
 use Exporter;
 
-our $VERSION = '1.29';
+our $VERSION = '1.30';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -36,7 +36,8 @@ our %EXPORT_TAGS = (
 
 sub parse_csv
 {
-  my $csv_data = shift;
+  my $csv_data = shift();
+  my $delim    = shift();
   
   my @csv_data = grep /\S/, split /[\r\n]+/, $csv_data;
   
@@ -44,7 +45,7 @@ sub parse_csv
   my @res;
   for my $line ( @csv_data )
     {
-    push @res, parse_csv_line( $line );
+    push @res, parse_csv_line( $line, $delim );
     }
 
   return \@res;
@@ -52,13 +53,14 @@ sub parse_csv
 
 sub parse_csv_line
 {
-  my @line = split //, shift;
+  my @line = split //, shift();
+  my $delim = shift() || ',';
   my @out;
   my $fld;
   my $q;
   for( @line, undef )
     {
-    if( ( /,/ and $q % 2 == 0 ) or ! defined )
+    if( ( $_ eq $delim and $q % 2 == 0 ) or ! defined )
       {
       $fld =~ s/^"(.*?)"$/$1/;
       $fld =~ s/""/"/g;
@@ -77,16 +79,17 @@ sub parse_csv_line
 
 sub parse_csv_to_hash_array
 {
-  my $csv_data = shift;
+  my $csv_data = shift();
+  my $delim    = shift();
   
   my @csv_data = grep /\S/, split /[\r\n]+/, $csv_data;
   
-  my $head = parse_csv_line( shift @csv_data );
+  my $head = parse_csv_line( shift @csv_data, $delim );
   
   my @res;
   for my $line ( @csv_data )
     {
-    my $line_array = parse_csv_line( $line );
+    my $line_array = parse_csv_line( $line, $delim );
     push @res, { map { $_ => shift @$line_array } @$head };
     }
 
@@ -126,15 +129,19 @@ sub parse_csv_to_hash_array
 
 =head1 FUNCTIONS
 
-=head2 parse_csv( $csv_data_string )
+In all functions the '$delim' argument is optional and sets the delimiter to
+be used. Default one is comma ',' (accordingly to RFC4180, see below).
+
+=head2 parse_csv( $csv_data_string, $delim )
 
 Parses multi-line CSV text
 
-=head2 parse_csv_line( $single_csv_line )
+=head2 parse_csv_line( $single_csv_line, $delim )
 
-Parses single line CSV data.
+Parses single line CSV data. This function will NOT strip trailing CR/LFs.
+However, parse_csv() and parse_csv_to_hash_array() will strip CR/LFs.
 
-=head2 parse_csv_to_hash_array( $csv_data )
+=head2 parse_csv_to_hash_array( $csv_data, $delim )
 
 This function uses first line as hash key names to produce array of hashes
 for the rest of the data.

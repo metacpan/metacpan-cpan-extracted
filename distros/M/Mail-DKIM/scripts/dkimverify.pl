@@ -10,19 +10,25 @@ use strict;
 use warnings;
 
 use Mail::DKIM::Verifier;
-use Getopt::Long;
+use Getopt::Long::Descriptive;
 
-my $debug_canonicalization;
-GetOptions(
-		"debug-canonicalization=s" => \$debug_canonicalization,
-		)
-	or die "Error: invalid argument(s)\n";
+my ($opt, $usage) = describe_options(
+  "%c %o < original_email.txt",
+  [ "debug-canonicalization=s" => "Output canonicalized message to file for DKIM debugging" ],
+  [ "help|?" => "Show help" ],
+  {show_defaults=>1},
+);
+
+if ($opt->help) {
+  print $usage->text;
+  exit 1;
+}
 
 my $debugfh;
-if (defined $debug_canonicalization)
+if (defined $opt->debug_canonicalization)
 {
-	open $debugfh, ">", $debug_canonicalization
-		or die "Error: cannot write to $debug_canonicalization: $!\n";
+	open $debugfh, ">", $opt->debug_canonicalization
+		or die "Error: cannot write to ".$opt->debug_canonicalization.": $!\n";
 }
 
 # recommended, but may cause compatibility problems with old firewalls
@@ -42,7 +48,7 @@ $dkim->CLOSE;
 if ($debugfh)
 {
 	close $debugfh;
-	print STDERR "wrong canonicalized message to $debug_canonicalization\n";
+	print STDERR "wrong canonicalized message to ".$opt->debug_canonicalization."\n";
 }
 
 print "originator address: " . $dkim->message_originator->address . "\n";
@@ -76,21 +82,11 @@ dkimverify.pl - verifies DKIM signatures on an email message
   dkimverify.pl --help
     to see a full description of the various options
 
-=head1 OPTIONS
-
-=over
-
-=item B<--debug-canonicalization>
-
-Outputs the canonicalized message to the specified file, in addition
-to computing the DKIM signature. This is helpful for debugging
-canonicalization methods.
-
-=back
-
 =head1 AUTHOR
 
 Jason Long, E<lt>jlong@messiah.eduE<gt>
+
+Marc Bradshaw, E<lt>marc@marcbradshaw.netE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

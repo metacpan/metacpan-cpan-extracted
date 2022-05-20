@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
         'Catalyst::Runtime' => '5.80001',
-	'HTML::SocialMeta' => '0.74004',
+	'HTML::SocialMeta' => '0.74006',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Catalyst-Plugin-SocialMeta-*' },

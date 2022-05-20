@@ -1,0 +1,26 @@
+---
+abstract: 'Perl package to generate ExtUtils::MakeMaker META_MERGE for GitHub repositories'
+author:
+  - 'Michael R. Davis'
+build_requires:
+  ExtUtils::MakeMaker: '6.46'
+  Test::Simple: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ExtUtils-MakeMaker-META_MERGE-GitHub
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  bugtracker: https://github.com/mrdvt92/perl-ExtUtils-MakeMaker-META_MERGE-GitHub/issues
+  homepage: https://github.com/mrdvt92/perl-ExtUtils-MakeMaker-META_MERGE-GitHub
+  repository: https://github.com/mrdvt92/perl-ExtUtils-MakeMaker-META_MERGE-GitHub.git
+version: '0.01'

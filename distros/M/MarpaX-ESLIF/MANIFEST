@@ -342,7 +342,6 @@ src/3rdparty/github/marpaWrapper/include/marpaWrapper/recognizer.h
 src/3rdparty/github/marpaWrapper/include/marpaWrapper/value.h
 src/3rdparty/github/marpaWrapper/src/asf.c
 src/3rdparty/github/marpaWrapper/src/grammar.c
-src/3rdparty/github/marpaWrapper/src/internal/manageBuf.c
 src/3rdparty/github/marpaWrapper/src/recognizer.c
 src/3rdparty/github/marpaWrapper/src/value.c
 src/3rdparty/github/tconv/3rdparty/github/dlfcn-win32/CMakeLists.txt
@@ -529,6 +528,7 @@ src/include/marpaESLIF/internal/eslif.h
 src/include/marpaESLIF/internal/eslif/G1.h
 src/include/marpaESLIF/internal/eslif/L0.h
 src/include/marpaESLIF/internal/eslif/L0_join_G1.h
+src/include/marpaESLIF/internal/iqsort.h
 src/include/marpaESLIF/internal/json.h
 src/include/marpaESLIF/internal/logging.h
 src/include/marpaESLIF/internal/lua.h

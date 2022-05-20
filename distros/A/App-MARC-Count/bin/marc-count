@@ -1,0 +1,79 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::MARC::Count;
+
+our $VERSION = 0.02;
+
+# Run.
+exit App::MARC::Count->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+marc-count - Script to count records in MARC file.
+
+=head1 SYNOPSIS
+
+ marc-count [-h] [--version] marc_xml_file
+
+=head1 DESCRIPTION
+
+It supports MARC XML files now.
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-h>
+
+Print help.
+
+=item * C<--version>
+
+Print version of script.
+
+=item * C<marc_xml_file>
+
+MARC XML file name.
+
+=back
+
+=head1 EXAMPLE
+
+ marc-count __MARC.xml__
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/App-MARC-Count>
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2022 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 VERSION
+
+0.02
+
+=cut

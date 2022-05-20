@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use UI::Various::core;
 use UI::Various::Radio;
@@ -179,7 +179,7 @@ sub _process($)
 	$prompt .= Text::Wrap::wrap(sprintf($prefix, $i + 1), $blank,
 				    $self->{_button_values}[$i]);
 	$prompt .= "\n";
-	$var eq $self->{_button_keys}[$i]  and  $selected = $i;
+	$var eq $self->{_button_keys}[$i]  and  $selected = $i + 1;
     }
     $prompt .= Text::Wrap::wrap('', '', msg('enter_selection') . ' (' .
 				sprintf(msg('_1_to_cancel'), 0) . '): ');

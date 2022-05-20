@@ -15,12 +15,16 @@ use warnings 'once';
 
 use Cwd;
 
+#########################################################################
+# find the module's sources automatically:
 BEGIN {
     my $cwd = cwd();
     $cwd =~ s|/examples/?$||;
     unshift @INC, $cwd.'/lib'  if  $cwd =~ m|UI-Various(?:-\d\.\d+)?$|;
 }
 
+#########################################################################
+# prepare selection of packages:
 use constant PACKAGES => qw(Tk Curses RichTerm PoorTerm);
 my @packages;
 BEGIN {
@@ -28,20 +32,26 @@ BEGIN {
     0 < @ARGV  and  $ARGV[0] =~ m/^[1-4]$/
 	and  @packages = ((PACKAGES)[$ARGV[0] - 1]);
 }
-use UI::Various({use => [@packages], log => 'INFO', stderr => 1});
 
 #########################################################################
 # handle '-?' or bad parameters:
 unless (0 == @ARGV  or
 	1 == @ARGV  and  $ARGV[0] =~ m/^([1-4]|-[h?]|--help)$/i)
 {
-    die "\n", 'usage: ', $0, " [1|2|3|4|-?|-h|--help]\n";
+    warn "\n", 'usage: ', $0, " [1|2|3|4|-?|-h|--help]\n";
+    exit 1;
 }
 unless (0 == @ARGV  or  $ARGV[0] =~ m/\d/)
 {
     warn("\n", 'usage: ', $0, " [1|2|3|4|-?|-h|--help]\n\n",
 	 "The example knows the following UIs:\n\n");
     warn $_+1, "\t", $packages[$_], "\n" foreach 0..$#packages;
-    exit 0;
+    exit 1;
 }
+
+#########################################################################
+# load module:
+use UI::Various({use => [@packages], log => 'INFO'});
 UI::Various::stderr(2)  if  'Curses' eq UI::Various::using();
+
+1;

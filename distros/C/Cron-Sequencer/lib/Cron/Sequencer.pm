@@ -5,7 +5,7 @@ use warnings;
 
 package Cron::Sequencer;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 use Carp qw(croak confess);
 
@@ -54,10 +54,20 @@ sub _next {
     my @retval;
 
     for my $entry (@found) {
-        push @retval, {
-            %$entry{qw(file lineno when command env unset)},
-            time => $when,
-        };
+        my %published = (
+            time => $when, %$entry{qw(file lineno when command)},
+        );
+        # Be careful not to set these if they are not present in the input hash
+        # (If the key is present the value is always defined, so it doesn't
+        # actually matter if we do an exists test or a defined test. It's sort
+        # of annoying that the hash key-value slice syntax always provides a
+        # list pair ($key, undef) for missing keys, but the current behaviour is
+        # also useful in other cases, and we only have one syntax available)
+        for my $key (qw(env unset)) {
+            $published{$key} = $entry->{$key}
+                if exists $entry->{$key};
+        }
+        push @retval, \%published;
 
         # We've "consumed" this firing, so update the cached value
         $entry->{next} = $entry->{whenever}->next_time($when);
@@ -117,7 +127,7 @@ C<new> takes a list of arguments each representing a crontab file, passes each
 in turn to C<< Cron::Sequence::Parser->new >>, and then combines the parsed
 files into a single set of crontab events.
 
-See L<Cron::Sequence::Parser/new> for the various formats to specify a crontab
+See L<Cron::Sequencer::Parser/new> for the various formats to specify a crontab
 file or its contents.
 
 =head2 sequence I<from> I<to>

@@ -17,6 +17,7 @@ ok($an->add_method({
 
 my $obj = $an->build;
 
+ok($obj->new);
 is($obj->get_test, 'abc');
 is($obj->has_test, 1);
 ok($obj->clear_test);
@@ -36,6 +37,7 @@ ok($an->add_method({
 
 $obj = $an->build;
 
+ok($obj->new);
 is($obj->get_test, 'abc');
 is($obj->has_test, 1);
 ok($obj->clear_test);

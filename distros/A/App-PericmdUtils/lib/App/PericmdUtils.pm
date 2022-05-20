@@ -7,7 +7,7 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-05-02'; # DATE
 our $DIST = 'App-PericmdUtils'; # DIST
-our $VERSION = '0.051'; # VERSION
+our $VERSION = '0.052'; # VERSION
 
 our %SPEC;
 
@@ -41,15 +41,31 @@ sub list_pericmd_plugins {
         my $name = $mod; $name =~ s/^Perinci::CmdLine::Plugin:://;
         my $row = {name => $name};
         if ($args{detail}) {
-            require Module::Abstract;
-            $row->{abstract} = Module::Abstract::module_abstract($mod);
+            #require Module::Abstract;
+            #$row->{abstract} = Module::Abstract::module_abstract($mod);
+
+            (my $modpm = "$mod.pm") =~ s!::!/!g;
+            require $modpm;
+            my $meta = $mod->meta;
+            $row->{summary} = $meta->{summary};
+            $row->{conf} = join(", ", sort keys %{$meta->{conf}});
+            $row->{tags} = join(", ", @{$meta->{tags}});
+
+            require Package::Stash;
+            my $stash = Package::Stash->new($mod);
+            $row->{hooks} = join(", ", (grep /^(on_|after_|before_)/, $stash->list_all_symbols('CODE')));
+
+            {
+                no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
+                $row->{dist} = ${"$mod\::DIST"};
+            }
         }
         push @rows, $row;
     }
 
     my %resmeta;
     if ($args{detail}) {
-        $resmeta{'table.fields'} = ['name', 'abstract'];
+        $resmeta{'table.fields'} = ['name', 'summary'];
     } else {
         @rows = map { $_->{name} } @rows;
     }
@@ -72,7 +88,7 @@ App::PericmdUtils - Some utilities related to Perinci::CmdLine
 
 =head1 VERSION
 
-This document describes version 0.051 of App::PericmdUtils (from Perl distribution App-PericmdUtils), released on 2022-05-02.
+This document describes version 0.052 of App::PericmdUtils (from Perl distribution App-PericmdUtils), released on 2022-05-02.
 
 =head1 DESCRIPTION
 

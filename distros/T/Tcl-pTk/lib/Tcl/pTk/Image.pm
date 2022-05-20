@@ -3,7 +3,7 @@
 # modify it under the same terms as Perl itself.
 package Tcl::pTk::Image;
 
-our ($VERSION) = ('1.08');
+our ($VERSION) = ('1.09');
 
 # This module does for images what Tk::Widget does for widgets:
 # provides a base class for them to inherit from.
@@ -23,7 +23,7 @@ sub new
  my $leaf = $package->Tk_image;
  my $obj = $int->declare_widget($widget->call('image','create', $leaf, @_),
          $package);
- return bless $obj,$package;
+ return $obj;
 }
 
 sub Install
@@ -53,8 +53,8 @@ sub Tcl::pTk::Widget::imageNames
  foreach my $name(@names){
          my $type = $w->call('image', 'type', $name);
          $type = ucfirst($type);
-         my $package = "Tcl::pTk::Widget::$type";
-         my $obj = $w->interp->declare_widget($name, $package);
+         my $package = "Tcl::pTk::$type";
+         my $obj = $w->interp->widget($name, $package);
 
          push @imageObj, $obj;
  }

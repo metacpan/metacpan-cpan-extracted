@@ -2,7 +2,7 @@ package SVG::Extension;
 use strict;
 use warnings;
 
-our $VERSION = '2.86';
+our $VERSION = '2.87';
 
 =head1 NAME
 

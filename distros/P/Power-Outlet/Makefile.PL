@@ -1,11 +1,17 @@
 use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker::META_MERGE::GitHub;
+my $mm = ExtUtils::MakeMaker::META_MERGE::GitHub->new(owner=>"mrdvt92", repo=>"perl-Power-Outlet");
 WriteMakefile(
+    $mm->META_MERGE,
     NAME         => 'Power::Outlet',
     VERSION_FROM => 'lib/Power/Outlet.pm',
     AUTHOR       => 'Michael R. Davis (mrdvt92@yahoo.com)',
     ABSTRACT     => 'Control and query network attached power switches',
+    BUILD_REQUIRES => {
+                       'ExtUtils::MakeMaker' => 6.46,
+                       'Test::Simple'        => 0.44,
+                      },
     PREREQ_PM    => {
-                     'Test::Simple'             => 0.44,
                      'Package::New'             => 0,
                      'Time::HiRes'              => 0,
                      'Parallel::ForkManager'    => 1.01, #for CGI app
@@ -20,21 +26,6 @@ WriteMakefile(
                      'List::MoreUtils'          => 0,    #for iBootBarGroup
                      'Package::Role::ini'       => 0.07, #for Config
                     },
-    META_MERGE       => {
-          'meta-spec' =>  { version => 2 },
-          'resources' =>  {
-                            homepage   => 'https://github.com/mrdvt92/perl-Power-Outlet',
-                            bugtracker => {
-                                web  => 'https://github.com/mrdvt92/perl-Power-Outlet/issues',
-                            },
-                            repository => {
-                                type => 'git',
-                                url  => 'git@github.com:mrdvt92/perl-Power-Outlet.git',
-                                web  => 'https://github.com/mrdvt92/perl-Power-Outlet.git',
-                            },
-                          },
-                        },
-
     EXE_FILES    => [
                     qw{
                        scripts/power-outlet

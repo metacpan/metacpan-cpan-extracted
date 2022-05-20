@@ -1,16 +1,16 @@
 package HTML::Widgets::NavMenu;
-$HTML::Widgets::NavMenu::VERSION = '1.0900';
+$HTML::Widgets::NavMenu::VERSION = '1.0902';
 use strict;
 use warnings;
 
 use 5.012;
 
 package HTML::Widgets::NavMenu::Error;
-$HTML::Widgets::NavMenu::Error::VERSION = '1.0900';
+$HTML::Widgets::NavMenu::Error::VERSION = '1.0902';
 use parent "HTML::Widgets::NavMenu::Object";
 
 package HTML::Widgets::NavMenu::Error::Redirect;
-$HTML::Widgets::NavMenu::Error::Redirect::VERSION = '1.0900';
+$HTML::Widgets::NavMenu::Error::Redirect::VERSION = '1.0902';
 use strict;
 use vars qw(@ISA);
 @ISA = ("HTML::Widgets::NavMenu::Error");
@@ -26,7 +26,7 @@ sub CGIpm_perform_redirect
 }
 
 package HTML::Widgets::NavMenu::NodeDescription;
-$HTML::Widgets::NavMenu::NodeDescription::VERSION = '1.0900';
+$HTML::Widgets::NavMenu::NodeDescription::VERSION = '1.0902';
 use strict;
 
 use parent qw(HTML::Widgets::NavMenu::Object);
@@ -48,13 +48,13 @@ sub _init
 1;
 
 package HTML::Widgets::NavMenu::LeadingPath::Component;
-$HTML::Widgets::NavMenu::LeadingPath::Component::VERSION = '1.0900';
+$HTML::Widgets::NavMenu::LeadingPath::Component::VERSION = '1.0902';
 use vars qw(@ISA);
 
 @ISA = (qw(HTML::Widgets::NavMenu::NodeDescription));
 
 package HTML::Widgets::NavMenu::Iterator::GetCurrentlyActive;
-$HTML::Widgets::NavMenu::Iterator::GetCurrentlyActive::VERSION = '1.0900';
+$HTML::Widgets::NavMenu::Iterator::GetCurrentlyActive::VERSION = '1.0902';
 use parent 'HTML::Widgets::NavMenu::Iterator::Base';
 
 __PACKAGE__->mk_acc_ref(
@@ -780,6 +780,22 @@ sub render
         { %args, _iter_method => '_get_nav_menu_traverser', } );
 }
 
+sub _is_top_coords
+{
+    my ( $self, $coords, $only_empty, ) = @_;
+
+    return (
+        defined($coords)
+        ? (
+              ( @$coords == 0 ) ? 1
+            : $only_empty       ? ''
+            : ( @$coords == 1 ) ? ( $coords->[0] == 0 )
+            :                     ''
+            )
+        : 1
+    );
+}
+
 sub _render_generic
 {
     my $self = shift;
@@ -804,12 +820,17 @@ sub _render_generic
         'up'  => scalar( $self->_get_up_coords() ),
         'top' => scalar( $self->_get_top_coords() ),
     );
+    my $IS_TOP =
+        $self->_is_top_coords( $self->_current_coords(), $self->coords_stop(),
+        );
 
     while ( my ( $link_rel, $coords ) = each(%links_proto) )
     {
         # This is so we would avoid coordinates that point to the
         # root ($coords == []).
-        if ( defined($coords) && @$coords == 0 )
+        if ( $IS_TOP
+            and ( $link_rel =~ /\A(?:prev|top|up)\z/ms )
+            )    # $self->_is_top_coords( $coords, 1 ) )
         {
             undef($coords);
         }
@@ -846,7 +867,7 @@ HTML::Widgets::NavMenu - A Perl Module for Generating HTML Navigation Menus
 
 =head1 VERSION
 
-version 1.0900
+version 1.0902
 
 =head1 SYNOPSIS
 

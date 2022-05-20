@@ -1,0 +1,34 @@
+=head1 NAME
+
+update-ip - Dynamically update the IP address associated with a DNS A record on
+your GoDaddy domain
+
+=for html
+<a href="https://github.com/stevieb9/net-dyndns-godaddy/actions"><img src="https://github.com/stevieb9/net-dyndns-godaddy/workflows/CI/badge.svg"/></a>
+<a href='https://coveralls.io/github/stevieb9/net-dyndns-godaddy?branch=main'><img src='https://coveralls.io/repos/stevieb9/dist-mgr/badge.svg?branch=main&service=github' alt='Coverage Status' /></a>
+
+=head1 DESCRIPTION
+
+Updates a GoDaddy domain's DNS A record with either the current local external
+IP address, or a specified one.
+
+=head1 USAGE
+
+    update-ip hostname domain.name [IP address]
+
+If the IP address isn't sent in, we'll fetch the one that's currently set as
+your external public facing one.
+
+=head1 AUTHOR
+
+Steve Bertrand, C<< <steveb at cpan.org> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2020-2021 Steve Bertrand.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>

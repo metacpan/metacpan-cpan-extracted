@@ -1,5 +1,5 @@
 package HTML::Widgets::NavMenu::JQueryTreeView;
-$HTML::Widgets::NavMenu::JQueryTreeView::VERSION = '1.0900';
+$HTML::Widgets::NavMenu::JQueryTreeView::VERSION = '1.0902';
 use strict;
 use warnings;
 
@@ -30,7 +30,7 @@ sub-class
 
 =head1 VERSION
 
-version 1.0900
+version 1.0902
 
 =head1 DESCRIPTION
 

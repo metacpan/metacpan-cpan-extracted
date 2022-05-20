@@ -1,5 +1,10 @@
 Revision history for Perl extension SVG.
 
+2.87  2022.05.19 MANWAR
+      - Indent doc for text PR #15, thanks @benkasminbullock.
+      - Remove dead links to domain-squatted site PR #16, thanks @benkasminbullock.
+      - Perldity code base (still 2 not happy).
+
 2.86  2021.04.22 MANWAR
       - Replace last use of "vars" with "our", thanks @JRaspass.
 

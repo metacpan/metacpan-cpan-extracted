@@ -6,7 +6,7 @@ use Tcl::pTk;
 use Test;
 $| = 1;
 
-plan tests => 5;
+plan tests => 6, todo => [1];
 
 my $TOP = MainWindow->new();
 
@@ -18,7 +18,13 @@ my $e1 = $TOP->Entry( -textvariable => \$perlscalar)->pack();
 $TOP->traceVariable( \$perlscalar, 'wr' => \&update_sub );
 
 # Testing of reading the perl variable (should trigger a read from Tcl)
-$TOP->after(1000, sub{ $e1->insert("end", "new value")});
+$TOP->after(1000, sub {
+        $e1->insert('end', 'new value');
+
+        # TODO: updating textvariable from Tcl fails to enter trace callback
+        # unlike Perl/Tk: https://rt.cpan.org/Ticket/Display.html?id=128677
+        ok( $updateSubVar, 'new value', 'variable tie from tcl to perl');
+});
 
 $TOP->after(2000, 
         sub{ 
@@ -40,7 +46,7 @@ $TOP->after(5000, sub{
         $TOP->traceVdelete(\$perlscalar);
         $e1->insert("end", "321");
         ok( $perlscalar,   "new value2321", "variable tie from tcl to perl after traceVdelete");
-        $TOP->destroy;
+        $TOP->destroy unless (@ARGV);
 });
 
 MainLoop();

@@ -1,0 +1,13 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+use Addr::MyIP;
+
+if (scalar @ARGV && $ARGV[0] == 6) {
+    print myip6() . "\n";
+}
+else {
+    print myip() . "\n";
+}

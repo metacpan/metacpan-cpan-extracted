@@ -9,7 +9,7 @@ use Perl::Tidy;
 use Data::Dumper;
 use Module::Starter;
 $Data::Dumper::Deparse = 1;
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 our %CLASS;
 our $SUB_INDEX = 1;
 
@@ -311,21 +311,24 @@ sub generate {
 		open(my $fh, '>', $file) or die "Cannot open file to write $!";
 		print $fh $cls;
 		close $fh;
-		if ($tlib) {
-			my $test_file = _perl_tidy(
-				sprintf(
-					qq{use Test::More; use strict; use warnings;%sdone_testing();},
-						_build_tests($CLASS{$class})
-				)
-			);
-			$class =~ s/\:\:/-/g;
-			my $file = sprintf "%s/%s.t", $tlib,  $class;
-			_make_path($file);
-			open(my $fh, '>', $file) or die "Cannot open file to write $!";
-			print $fh $test_file;
-			close $fh;
-		}
+		_generate_tlib($class, $tlib) if ($tlib);
 	}
+}
+
+sub _generate_tlib {
+	my ($class, $tlib) = @_;
+	my $test_file = _perl_tidy(
+		sprintf(
+			qq{use Test::More; use strict; use warnings;%sdone_testing();},
+				_build_tests($CLASS{$class})
+		)
+	);
+	$class =~ s/\:\:/-/g;
+	my $file = sprintf "%s/%s.t", $tlib,  $class;
+	_make_path($file);
+	open(my $fh, '>', $file) or die "Cannot open file to write $!";
+	print $fh $test_file;
+	close $fh;
 }
 
 
@@ -401,7 +404,6 @@ sub _build_subs {
 	my ($class) = @_;
 	my @codes;
 	delete $class->{SUBS}{CURRENT};
-
 	my $MACROS = join '|', map { quotemeta($_) } keys %{$CLASS{MACRO}};
 	for my $sub (sort {
 		$class->{SUBS}{$a}{INDEX} <=> $class->{SUBS}{$b}{INDEX}
@@ -415,7 +417,7 @@ sub _build_subs {
 				$MACROS,
 				((ref($meta->{CODE}) || "") eq "ARRAY" ? @{$meta->{CODE}} : $meta->{CODE})
 			) if defined $meta->{CODE};
-			$code = $keyword->{CODE}->($meta, $keyword->{KEYWORDS});
+			$code = $keyword->{CODE} ? $keyword->{CODE}->($meta, $keyword->{KEYWORDS}) : $meta->{CODE};
 		} elsif ($class->{SUBS}{$sub}{CODE}) {
 			$code = ref $class->{SUBS}{$sub}{CODE} ? Dumper $class->{SUBS}{$sub}{CODE} : $class->{SUBS}{$sub}{CODE};
 			$code =~ s/\$VAR1 = //;
@@ -545,7 +547,6 @@ sub _build_tests {
 			$c++;
 		}
 	}
-
 	if ($class->{SUBS}->{new}->{TEST}) {
 		$tests .= sprintf "subtest 'new' => sub { plan tests => %s; %s };",
 			scalar @{$class->{SUBS}->{new}->{TEST}},
@@ -684,7 +685,7 @@ Module::Generate - Assisting with module generation.
 
 =head1 VERSION
 
-Version 0.26
+Version 0.27
 
 =cut
 

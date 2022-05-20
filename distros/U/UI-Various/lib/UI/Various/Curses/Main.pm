@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Curses::UI;
 
@@ -131,11 +131,11 @@ sub mainloop($)
 
 #########################################################################
 
-=head2 B<window> - and new window to application
+=head2 B<window> - add new window to application
 
 C<Curses>'s overload of L<UI::Various::Main::window|UI::Various::Main/window
-- and new window to application>.  If the C<Mainloop> of L<Curses::UI> is
-running, we need to directly prepare and show the window / dialogue.
+- add new window to application>.  If the C<Mainloop> of L<Curses::UI> is
+running, we need to directly prepare and show the window.
 
 =cut
 
@@ -150,6 +150,37 @@ sub window($@)
     {
 	$_->_prepare;
 	$self->_focus(0);
+    }
+    return $_;
+}
+
+#########################################################################
+
+=head2 B<dialog> - add new dialog to application
+
+C<Curses>'s overload of L<UI::Various::Main::dialog|UI::Various::Main/dialog
+- add new dialog to application>.  If the C<Mainloop> of L<Curses::UI> is
+running, we need to directly prepare and show the dialogue.
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+sub dialog($@)
+{
+    debug(2, __PACKAGE__, '::dialog');
+    my $self = shift;
+    local $_ = $self->SUPER::dialog(@_);
+    if ($self->{_running})
+    {
+	$_->_prepare;
+	$_->_cui->modalfocus();
+	# If Curses is already running we're stuck here until destruction of
+	# the dialogue!  Afterwards we update all references and redraw
+	# everything:
+	$self->_update_all_references;
+	$self->_cui->draw;
+	$_ = undef;
     }
     return $_;
 }

@@ -87,8 +87,8 @@ void MY_lex_expect_unichar(pTHX_ int c)
     croak("parse failed--compilation aborted")
 
 /* TODO: Only ASCII */
-#define lex_probe_str(s)   MY_lex_probe_str(aTHX_ s)
-STRLEN MY_lex_probe_str(pTHX_ const char *s)
+#define lex_probe_str(s, b)   MY_lex_probe_str(aTHX_ s, b)
+STRLEN MY_lex_probe_str(pTHX_ const char *s, bool boundarycheck)
 {
   STRLEN i;
   for(i = 0; s[i]; i++) {
@@ -96,13 +96,16 @@ STRLEN MY_lex_probe_str(pTHX_ const char *s)
       return 0;
   }
 
+  if(boundarycheck && isALNUM(PL_parser->bufptr[i]))
+    return 0;
+
   return i;
 }
 
-#define lex_expect_str(s)  MY_lex_expect_str(aTHX_ s)
-void MY_lex_expect_str(pTHX_ const char *s)
+#define lex_expect_str(s, b)  MY_lex_expect_str(aTHX_ s, b)
+void MY_lex_expect_str(pTHX_ const char *s, bool boundarycheck)
 {
-  STRLEN len = lex_probe_str(s);
+  STRLEN len = lex_probe_str(s, boundarycheck);
   if(!len)
     yycroakf("Expected \"%s\"", s);
 
@@ -168,6 +171,8 @@ static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
 #endif
     CopLINE(PL_curcop);
 
+  bool is_special  = !!(piece->type & XPK_TYPEFLAG_SPECIAL);
+
   U32 type = piece->type & 0xFFFF;
 
   switch(type) {
@@ -181,7 +186,7 @@ static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
 
     case XS_PARSE_KEYWORD_LITERALSTR:
     {
-      STRLEN len = lex_probe_str(piece->u.str);
+      STRLEN len = lex_probe_str(piece->u.str, is_special);
       if(!len)
         return FALSE;
 
@@ -303,6 +308,9 @@ static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
     }
 
     case XS_PARSE_KEYWORD_PARENSCOPE:
+      if(piece->type & XPK_TYPEFLAG_MAYBEPARENS)
+        croak("TODO: probe_piece on type=PARENSCOPE+MAYBEPARENS");
+
       if(lex_peek_unichar(0) != '(')
         return FALSE;
 
@@ -372,7 +380,7 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       return;
 
     case XS_PARSE_KEYWORD_LITERALSTR:
-      lex_expect_str(piece->u.str);
+      lex_expect_str(piece->u.str, is_special);
       return;
 
     case XS_PARSE_KEYWORD_AUTOSEMI:
@@ -455,6 +463,7 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       return;
     }
 
+    case XS_PARSE_KEYWORD_ARITHEXPR:
     case XS_PARSE_KEYWORD_TERMEXPR:
       /* TODO: This auto-parens behaviour ought to be tuneable, depend on how
        * many args, open at i=0 and close at i=MAX, etc...
@@ -471,7 +480,14 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
         lex_expect_unichar(')');
       }
       else {
-        THISARG.op = parse_termexpr(0);
+        switch(type) {
+          case XS_PARSE_KEYWORD_ARITHEXPR:
+            THISARG.op = parse_arithexpr(0);
+            break;
+          case XS_PARSE_KEYWORD_TERMEXPR:
+            THISARG.op = parse_termexpr(0);
+            break;
+        }
         CHECK_PARSEFAIL;
       }
 
@@ -646,21 +662,34 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       return;
 
     case XS_PARSE_KEYWORD_PARENSCOPE:
+    {
+      bool has_paren = (lex_peek_unichar(0) == '(');
+
       if(is_optional) {
         THISARG.i = 0;
         (*argidx)++;
-        if(lex_peek_unichar(0) != '(') return;
+        if(!has_paren) return;
         THISARG.i++;
       }
 
-      lex_expect_unichar('(');
-      lex_read_space(0);
+      if(has_paren) {
+        lex_expect_unichar('(');
+        lex_read_space(0);
 
-      parse_pieces(aTHX_ argsv, argidx, piece->u.pieces, hookdata);
+        parse_pieces(aTHX_ argsv, argidx, piece->u.pieces, hookdata);
 
-      lex_expect_unichar(')');
+        lex_expect_unichar(')');
+      }
+      else if(piece->type & XPK_TYPEFLAG_MAYBEPARENS) {
+        /* We didn't find a '(' but that's OK; they're optional */
+        parse_pieces(aTHX_ argsv, argidx, piece->u.pieces, hookdata);
+      }
+      else
+        /* We know this should fail */
+        lex_expect_unichar('(');
 
       return;
+    }
 
     case XS_PARSE_KEYWORD_BRACKETSCOPE:
       if(is_optional) {

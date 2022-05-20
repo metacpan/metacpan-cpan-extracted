@@ -12,7 +12,7 @@ my $mw  = MainWindow->new();
 $mw->geometry('+100+100');
 
 # This will skip if Tix not present
-my $imagePresent = $mw->interp->pkg_require('Img');
+my $imagePresent = defined($Tcl::pTk::VERSION) && $mw->interp->pkg_require('Img');
 
 
 plan tests => 7;
@@ -36,7 +36,7 @@ ok($type, 'photo', 'Unexpected type');
 # Make sure image names returns a Photo object.
 my @names = $mw->imageNames();
 #print "Names = ".join(", ", @names)."\n";
-ok(ref($names[0]) =~ /Photo/i); # Check for image name being a image object
+ok(scalar(grep {$_ == $photo} @names), 1, 'Check for image name being a image object');
 
 my @types = $mw->imageTypes;
 #print "imageTypes = ".join(", ", @types)."\n";

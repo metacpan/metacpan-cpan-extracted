@@ -1137,7 +1137,7 @@
             "id" : "K014"
          },
          {
-            "link" : "H036,S012",
+            "link" : "H036,G003",
             "name" : "Knightsbridge",
             "line" : "Piccadilly:33",
             "id" : "K015"
@@ -1703,9 +1703,9 @@
          },
          {
             "id" : "S012",
-            "link" : "S006,G003,K015",
+            "link" : "S006,G003",
             "name" : "South Kensington",
-            "line" : "Circle:31,District:30,Piccadilly:32"
+            "line" : "Circle:31,District:30"
          },
          {
             "link" : "K007,N010",

@@ -19,7 +19,7 @@ sub TIEARRAY {
 	my ($class, @params) = @_;
 	my $self = {
 		array => [
-			$class->OBJECTIFY(@params)
+			$class->_OBJECTIFY(@params)
 		],
 	};
 	bless $self, $class;
@@ -30,9 +30,14 @@ sub CLEAR {
 	$self->{array} = [];
 }
 
+sub STORESIZE {
+	my $self = shift;
+	return scalar @{$self->{array}};
+}
+
 sub STORE {
     	my ($self, $index, $value) = @_;
-	$self->{array}->{$index} = $self->OBJECTIFY($value);
+	($self->{array}->[$index]) = $self->_OBJECTIFY($value);
 }
 
  
@@ -48,7 +53,7 @@ sub FETCH {
 
 sub PUSH {
 	my $self = shift;
-	push @{$self->{array}}, $self->OBJECTIFY(@_);
+	push @{$self->{array}}, $self->_OBJECTIFY(@_);
 }
  
 sub POP {
@@ -63,10 +68,10 @@ sub SHIFT {
  
 sub UNSHIFT {
 	my $self = shift;
-	unshift @{$self->{array}}, $self->OBJECTIFY(@_);
+	unshift @{$self->{array}}, $self->_OBJECTIFY(@_);
 }
 
-sub OBJECTIFY {
+sub _OBJECTIFY {
 	my ($self, @params) = @_;
 	map {
 		my $method = $OBJECTIFY{ref($_)};

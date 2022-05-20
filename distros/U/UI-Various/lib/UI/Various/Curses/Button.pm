@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use UI::Various::core;
 use UI::Various::Button;
@@ -95,7 +95,11 @@ sub _prepare($$$)
 		->add($self->_cid,
 		      'Buttonbox', -x => $column, -y => $row,
 		      -buttons =>
-		      [{-label => $self->text, -onpress => $self->code}]));
+		      [{-label => $self->text,
+			-onpress => sub {
+			    local $_ = $self->code;
+			    &$_($self->_toplevel, $self);
+			}}]));
     return 0;
 }
 

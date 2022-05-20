@@ -1,0 +1,97 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::MARC::Filter;
+
+our $VERSION = 0.02;
+
+# Run.
+exit App::MARC::Filter->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+marc-filter - Script to filter records in MARC dataset.
+
+=head1 SYNOPSIS
+
+ marc-filter [-h] [-o format] [-r] [--version] marc_xml_file field subfield value
+
+=head1 DESCRIPTION
+
+It supports MARC XML files now.
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-h>
+
+Print help.
+
+=item * C<-o format>
+
+Output MARC format.
+
+Possible formats are ascii, xml.
+
+=item * C<-r>
+
+Use value as Perl regexp.
+
+=item * C<--version>
+
+Print version of script.
+
+=item * C<marc_xml_file>
+
+MARC XML file name.
+
+=item * C<field>
+
+MARC field.
+
+=item * C<subfield>
+
+MARC subfield.
+
+=item * C<value>
+
+MARC field/subfield value to filter.
+
+=back
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/App-MARC-Filter>
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2022 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 VERSION
+
+0.02
+
+=cut

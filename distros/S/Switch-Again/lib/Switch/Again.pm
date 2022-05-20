@@ -1,5 +1,5 @@
 package Switch::Again;
-use 5.006; use strict; use warnings; our $VERSION = '0.07';
+use 5.006; use strict; use warnings; our $VERSION = '1.00';
 use Struct::Match qw/struct/;
 use base qw/Import::Export/;
 
@@ -54,7 +54,7 @@ Switch::Again - Switch`ing
 
 =head1 VERSION
 
-Version 0.07
+Version 1.00
 
 =cut
 
@@ -101,9 +101,37 @@ Version 0.07
 
 =head2 switch
 
+Keyword for either generating a reusable switch statement or calling the generated switch function directly, it accepts key/value pairs where the key is to be evaluated against any passed variable and the value is what is returned when the key matches. To generate a reusable switch pass an even number of params, to evaluate a single switch statement pass an odd number of params where the first param is the value that will be evaluated. Optionally a default key can be set which will be called if no other 'key' matches are met. keys can be any type of data struct as internally B<Struct::Match> is used.
+
+Reusable:
+
+	my $switch = switch
+		string => sub { ... },
+		qr/match this regex/ => sub { ... },
+		sr('(search)', 'replace') => sub { ... },
+		sub { $_[0] eq 'evaluate' } => sub { ... },
+		{ a => 'b', c => 'd' } => sub { ... },
+		[ 'e', 'f' ] => sub { ... },
+		default => { 'the fallback' }	
+
+Single:
+
+	my $switch = switch 'find search'
+		string => sub { ... },
+		qr/match this regex/ => sub { ... },
+		sr('(search)', 'replace') => sub { ... },
+		sub { $_[0] eq 'evaluate' } => sub { ... },
+		{ a => 'b', c => 'd' } => sub { ... },
+		[ 'e', 'f' ] => sub { ... },		
+		default => { 'the fallback' }	
+
 =cut
 
 =head2 sr
+
+A helper function to be used in conjunction with the switch statement, it allows you to search and replace the value being evaluated by the switch statement, if the search and replace is successfull then that keys value will be executed with the updated string.
+
+	sr('(search)', 'replace');
 
 =cut
 

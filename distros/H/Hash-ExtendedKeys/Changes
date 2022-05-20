@@ -1,5 +1,11 @@
 Revision history for Hash-ExtendedKeys
 
+0.04    2022/05/18
+	- Set min perl version for fieldhash support
+
+0.01    2022/05/18
+	- Improve test coverage to 100%
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

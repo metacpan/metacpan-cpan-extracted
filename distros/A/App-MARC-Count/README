@@ -1,0 +1,41 @@
+NAME
+    marc-count - Script to count records in MARC file.
+
+SYNOPSIS
+     marc-count [-h] [--version] marc_xml_file
+
+DESCRIPTION
+    It supports MARC XML files now.
+
+ARGUMENTS
+    *       "-h"
+
+            Print help.
+
+    *       "--version"
+
+            Print version of script.
+
+    *       "marc_xml_file"
+
+            MARC XML file name.
+
+EXAMPLE
+     marc-count __MARC.xml__
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-MARC-Count>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2022 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

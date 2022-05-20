@@ -42,3 +42,6 @@ Revision history for Module-Generate
 
 0.26    2020-09-01
 	- Fix parsing of compile phase blocks
+
+0.27    2020-09-01
+	- Improve test coverage to 94.8%

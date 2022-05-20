@@ -109,6 +109,9 @@ Methods, member variables, etc. starting with an underscore (C<_>) are
 considered to be internal only.  Their usage and interfaces may change
 between versions in an incompatible way!
 
+We (try to) use US English for identifiers while using GB English for the
+documentation.  This is intended and not a bug!
+
 =cut
 
 #########################################################################
@@ -121,7 +124,7 @@ use warnings 'once';
 
 use Carp;			# may only be used in import!
 
-our $VERSION = "0.19";
+our $VERSION = "0.20";
 
 BEGIN  {  require UI::Various::core;  }
 

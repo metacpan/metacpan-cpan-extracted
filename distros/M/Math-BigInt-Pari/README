@@ -1,59 +1,67 @@
-Math-BigInt-Pari
+NAME
+    Math::BigInt::Pari - a math backend library based on Math::Pari
 
-Math::BigInt::Pari is a replacement library for Math::BigInt::Calc. It can be
-used via:
+SYNOPSIS
+        # to use it with Math::BigInt
+        use Math::BigInt lib => 'Pari';
 
-    use Math::BigInt lib => 'Pari';
+        # to use it with Math::BigFloat
+        use Math::BigFloat lib => 'Pari';
 
-If Math::Pari is not installed, this will safely fall back to Calc, the
-default library of Math::BigInt.
+        # to use it with Math::BigRat
+        use Math::BigRat lib => 'Pari';
 
-Please read the documentation under PERFORMANCE in Math::BigInt on when to
-use this module and when not.
+DESCRIPTION
+    Math::BigInt::Pari inherits from Math::BigInt::Lib.
 
-INSTALLATION
+    Provides support for big integer in Math::BigInt et al. calculations via
+    means of Math::Pari, an XS layer on top of the very fast PARI library.
 
-To install this module, unpack the distribution file, and run the following
-commands:
-
-    perl Makefile.PL
-    make
-    make test
-    make install
+BUGS
+    Please report any bugs or feature requests to "bug-math-bigint-pari at
+    rt.cpan.org", or through the web interface at
+    <https://rt.cpan.org/Ticket/Create.html?Queue=Math-BigInt-Pari>
+    (requires login). We will be notified, and then you'll automatically be
+    notified of progress on your bug as I make changes.
 
 SUPPORT
+    After installing, you can find documentation for this module with the
+    perldoc command.
 
-After installing, you can find documentation for this module with the
-perldoc command.
+        perldoc Math::BigInt::Pari
 
-    perldoc Math::BigInt::Pari
-
-You can also look for information at:
+    You can also look for information at:
 
     GitHub
-        https://github.com/pjacklam/p5-Math-BigInt-Pari
+        <https://github.com/pjacklam/p5-Math-BigInt-Pari>
 
     RT: CPAN's request tracker
-        https://rt.cpan.org/Dist/Display.html?Name=Math-BigInt-Pari
+        <https://rt.cpan.org/Dist/Display.html?Name=Math-BigInt-Pari>
 
     MetaCPAN
-        https://metacpan.org/release/Math-BigInt-Pari
+        <https://metacpan.org/release/Math-BigInt-Pari>
 
     CPAN Testers Matrix
-        http://matrix.cpantesters.org/?dist=Math-BigInt-Pari
+        <http://matrix.cpantesters.org/?dist=Math-BigInt-Pari>
 
     CPAN Ratings
-        https://cpanratings.perl.org/dist/Math-BigInt-Pari
+        <https://cpanratings.perl.org/dist/Math-BigInt-Pari>
 
-COPYRIGHT AND LICENCE
+LICENSE
+    This program is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
 
-Mark Biggar, overloaded interface by Ilya Zakharevich, 1996-2001.
+AUTHOR
+    Original Math::BigInt::Pari written by Benjamin Trott 2001,
+    <ben@rhumba.pair.com>.
 
-Tels http://bloodgate.com, 2001-2008.
+    Extended and maintained by Tels 2001-2007 <http://bloodgate.com>
 
-Florian Ragwitz flora@cpan.org, 2010.
+    Maintained by Peter John Acklam <pjacklam@gmail.com> 2010-2021.
 
-Peter John Acklam pjacklam@gmail.com, 2011-.
+    Math::Pari was written by Ilya Zakharevich.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+SEE ALSO
+    Math::BigInt, Math::BigFloat, Math::Pari, and the other backends
+    Math::BigInt::Calc, Math::BigInt::GMP, and Math::BigInt::Pari.
+

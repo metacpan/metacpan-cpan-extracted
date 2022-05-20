@@ -22,7 +22,7 @@ sub spin {
         qw/-from 1 -to 10 -width 10 -validate key/,
         -validatecommand => sub {
 	    my ($proposed, $changes, $current, $index, $type) = @_;
-	    return not $proposed =~ m/[^\d]/g;
+	    return $proposed !~ m/[^\d]/g;
 	},
     );
     my $s2 = $TOP->Spinbox(

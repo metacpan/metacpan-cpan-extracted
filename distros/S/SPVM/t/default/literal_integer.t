@@ -8,44 +8,31 @@ use Test::More;
 
 use SPVM 'TestCase::Literal::Integer';
 
-
-
 # Start objects count
 my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
-# Decimal Literal
+# Integer Literal - decimal notation
 {
-  ok(SPVM::TestCase::Literal::Integer->decimal_all_numbers());
-  ok(SPVM::TestCase::Literal::Integer->decimal_plus_max());
-  ok(SPVM::TestCase::Literal::Integer->decimal_minus_max());
-  ok(SPVM::TestCase::Literal::Integer->decimal_underline());
-  ok(SPVM::TestCase::Literal::Integer->decimal_long_minus_max());
-  ok(SPVM::TestCase::Literal::Integer->decimal_long_lower_case());
-  ok(SPVM::TestCase::Literal::Integer->decimal_long_underline());
-  ok(SPVM::TestCase::Literal::Integer->decimal_byte_norrowing_convertion());
-  ok(SPVM::TestCase::Literal::Integer->decimal_short_norrowing_convertion());
+  ok(SPVM::TestCase::Literal::Integer->integer_literal_decimal_notation);
+  ok(SPVM::TestCase::Literal::Integer->integer_literal_decimal_notation_extra);
 }
 
-# Hex Literal
+# Integer Literal - hexadecimal notation
 {
-  ok(SPVM::TestCase::Literal::Integer->hex_all_numbers());
-  ok(SPVM::TestCase::Literal::Integer->hex_all_f());
-  ok(SPVM::TestCase::Literal::Integer->hex_max_int());
-  ok(SPVM::TestCase::Literal::Integer->hex_min_int());
-  ok(SPVM::TestCase::Literal::Integer->hex_combination());
-  ok(SPVM::TestCase::Literal::Integer->hex_long_all_f());
+  ok(SPVM::TestCase::Literal::Integer->integer_literal_hex_notation);
+  ok(SPVM::TestCase::Literal::Integer->integer_literal_hex_notation_extra);
 }
 
-# Octal Literal
+# Integer Literal - octal notation
 {
-  ok(SPVM::TestCase::Literal::Integer->octal_all_numbers());
-  ok(SPVM::TestCase::Literal::Integer->octal_combination());
+  ok(SPVM::TestCase::Literal::Integer->integer_literal_octal_notation);
+  ok(SPVM::TestCase::Literal::Integer->integer_literal_octal_notation_extra);
 }
 
-# Binary Literal
+# Integer Literal - binary notation
 {
-  ok(SPVM::TestCase::Literal::Integer->binary_all_numbers());
-  ok(SPVM::TestCase::Literal::Integer->binary_combination());
+  ok(SPVM::TestCase::Literal::Integer->integer_literal_binary_notation);
+  ok(SPVM::TestCase::Literal::Integer->integer_literal_binary_notation_extra);
 }
 
 # All object is freed

@@ -63,10 +63,37 @@ this week
 
 next week
 
+=item *
+
+last hour
+
+=item *
+
+this hour
+
+=item *
+
+next hour
+
+=item *
+
+I<(next|last) (\d*) (hours|days|weeks)>
+
 =back
 
-All are treated as starting at midnight (inclusive) and ending at midnight
-(exclusive). The default is I<today>
+Single days and weeks are treated as starting at midnight (inclusive) and ending
+at midnight (exclusive). Single hours start at the start of the current hour.
+The default is I<today>
+
+The counted forms (I<next 2 days>, I<last 24 hours>, I<etc>) start or end from
+the current time. Truncating to the day or hour would introduce ambiguities -
+doing so would mean "next 2 hours" usually wouldn't show events 119 minutes in
+the future, or it would mean showing between 120 and 179 minutes of events.
+Neither choice makes sense.
+
+(For completeness and consistency, C<this day> is provided as an alias for
+C<today>, as well as aliases C<next day> and C<last day>, but it's probably less
+clear to use these.)
 
 =item --from I<epoch time>
 
@@ -99,6 +126,68 @@ Hence C<--from +0 --to +3600> shows events from midnight until 00:59 inclusive.
 =item --hide-env
 
 Don't show environment variables in the output.
+
+=item --no-group
+
+Don't group events that happen at the same time. By default, the timestamp is
+shown once and then all events firing at that time are grouped together, to make
+it clearer that they are run simultaneously. With the C<--no-group> option,
+each event is treated independently and shown with its own timestamp.
+
+=item --json
+
+Generate JSON output. This intended for machine consumption, and the plan is
+to keep it stable (deletion or changes subject to deprecation cycles, but be
+preparated for new keys to be added). Please don't parse the default text
+output, as this is intended to be human-readable and might have minor changes
+without warning.
+
+The default JSON output is a single JSON value with the top level an array.
+Within this, the default is arrays grouping events that happen at the same time,
+with the events represented as hashes. If C<--no-group> is used, then the inner
+arrays are removed, and the top level array contains the hashes directly.
+
+If you need JSON output in structures that these options don't offer, consider
+piping the output of this program to a tool such as C<jq>.
+
+Value(s) can be provided to --json to tweak the output
+
+=over 4
+
+=item pretty
+
+=item canonical
+
+Set these options on the JSON serialiser. See L<JSON::PP/pretty> and
+L<JSON::PP/canonical> for details.
+
+=item split
+
+Instead of serialising a single JSON value encoding an array of structures
+(arrays of hashes by default, hashes with C<--no-group>) instead output that
+list of structures as a sequence of JSON values, with newlines between them.
+
+=item seq
+
+Similar to C<split>, but output C<application/json-seq> format - each value
+is preceded with an ASCII C<record separator> character and followed by a
+newline. See L<RFC 7464|https://www.rfc-editor.org/rfc/rfc7464.txt>
+
+=back
+
+C<split> and C<seq> are mutually exclusive.
+
+The C<--json> option is parsed differently from other options with arguments -
+to specify arguments you must use the C<=> form - I<eg> C<--json=pretty>
+Without this special parsing you could also have written C<--json pretty>, but
+that would mean either that C<--json> would B<always> need an argument, or that
+C<--json pretty> would be an option but C<--json foobar> would be "display
+I<foobar> as I<JSON>" -- with silent breakage if we ever wanted to introduce a
+C<--json=foobar> option.
+
+The first choice JSON serialiser is L<Cpanel::JSON::XS> which behaves
+identically, but as it doesn't provide direct link targets in its documentation
+this document links to the relevant sections in C<JSON::PP>.
 
 =item --help
 

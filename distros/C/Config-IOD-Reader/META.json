@@ -63,23 +63,23 @@
    "provides" : {
       "Config::IOD::Base" : {
          "file" : "lib/Config/IOD/Base.pm",
-         "version" : "0.344"
+         "version" : "0.345"
       },
       "Config::IOD::Expr" : {
          "file" : "lib/Config/IOD/Expr.pm",
-         "version" : "0.344"
+         "version" : "0.345"
       },
       "Config::IOD::INI::Reader" : {
          "file" : "lib/Config/IOD/INI/Reader.pm",
-         "version" : "0.344"
+         "version" : "0.345"
       },
       "Config::IOD::Reader" : {
          "file" : "lib/Config/IOD/Reader.pm",
-         "version" : "0.344"
+         "version" : "0.345"
       },
       "Test::Config::IOD::Common" : {
          "file" : "lib/Test/Config/IOD/Common.pm",
-         "version" : "0.344"
+         "version" : "0.345"
       }
    },
    "release_status" : "stable",
@@ -94,7 +94,7 @@
          "web" : "https://github.com/perlancar/perl-Config-IOD-Reader"
       }
    },
-   "version" : "0.344",
+   "version" : "0.345",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

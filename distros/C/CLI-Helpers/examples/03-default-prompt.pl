@@ -13,3 +13,6 @@ output( sprintf "pwprompt got %d bytes. ", length pwprompt() );
 output( sprintf "Password length is %d.", length prompt("password: ") );
 output( sprintf "Password length is %d.", length prompt("passwd: ") );
 output( sprintf "Password length is %d.", length prompt("Enter Your Password: ") );
+
+my $ans = prompt("Tell me a story:");
+output( sprintf "Interesting, you said: %s", $ans );

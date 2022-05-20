@@ -1,6 +1,6 @@
 package Tcl::pTk;
 
-our ($VERSION) = ('1.08');
+our ($VERSION) = ('1.09');
 
 use strict;
 use Tcl;
@@ -73,6 +73,9 @@ if($DEBUG){
 
 # Variable to indicate whether Tile/Ttk widgets are available
 our ( $_Tile_available );
+# Variable to indicate whether Tcl/Tk 8.5.9 or later, or Tile 0.8.4.0
+# for Tcl/Tk 8.4, is available; needed by certain features
+our ( $_Tile_ge_0840 );
 
 @Tcl::pTk::ISA = qw(Tcl);
 
@@ -333,7 +336,8 @@ interpreter.
 
 =head3 Perl/Tk syntax
 
-C<Tcl::pTk> fully supports perl/Tk widget syntax of the L<Tk> package, which has been used for many years. This means that any C<Tcl::pTk> widget
+C<Tcl::pTk> fully supports perl/Tk widget syntax of the L<Tk> package,
+which has been used for many years. This means that any C<Tcl::pTk> widget
 has a number of methods like C<Button>, C<Frame>, C<Text>, C<Canvas> and so
 on, and invoking those methods will create an appropriate child widget.
 C<Tcl::pTk> will generate an unique path-name for a newly created widget.
@@ -378,7 +382,8 @@ compatibile with the perl/Tk syntax. Examples of this type of widget are the Tex
 =item Megawidgets
 
 These are widgets that are composed of one-or-more other base widget types. Pure-perl megawidgets are supported in Tcl::pTk,
-just like they are in perl/Tk. Examples of these types of widgets are ProgressBar, LabEntry, BrowseEntry, and SlideSwitch (one of the test cases in the source distribution).
+just like they are in perl/Tk. Examples of these types of widgets are ProgressBar, LabEntry, BrowseEntry, and SlideSwitch
+(one of the test cases in the source distribution).
 
 =item Derived Widgets
 
@@ -593,8 +598,8 @@ You can also intermix the perl/tk and Tcl/Tk syntax like this:
 
 For the documentation of standard perl/tk widgets (like Button, Entry, Menu, etc), you can refer
 to the the perl/tk docs L<Tk> (We may move a copy of the perl/tk docs to Tcl::pTk in the future). For non-standard
-widgets (like the BLTNotebook widget example above) you have to use the Tcl docs on the widget for the widget documentation. (Most Tcl/Tk
-docs can be found at http://www.tcl.tk/ )
+widgets (like the BLTNotebook widget example above) you have to use the Tcl docs on the widget for the widget documentation.
+(Most Tcl/Tk docs can be found at http://www.tcl.tk/ )
 
 When reading Tcl/Tk widget documentation about widgets, you can apply the following guidelines to determine how
 to use the widget in C<Tcl::pTk> using perl/tk syntax.
@@ -676,8 +681,8 @@ and widget-elements.
 
 =head1 Terminology
 
-In the documentation and comments for this package, I<perl/Tk>, I<Tcl/Tk>, I<Tcl::pTk>, I<Tcl.pm>, and I<Tcl> are used. These terms have the
-following meanings in the context of this package.
+In the documentation and comments for this package, I<perl/Tk>, I<Tcl/Tk>, I<Tcl::pTk>, I<Tcl.pm>, and I<Tcl> are used.
+These terms have the following meanings in the context of this package.
 
 =over 1
 
@@ -876,6 +881,11 @@ sub MainWindow {
     # (included in Tcl/Tk 8.5+, or as an extension for Tcl/Tk 8.4)
     $Tcl::pTk::_Tile_available = $interp->pkg_require('tile');
     if ($Tcl::pTk::_Tile_available) {
+        # Certain features require Tcl/Tk 8.5.9 or later,
+        # or Tile 0.8.4.0 for Tcl/Tk 8.4
+        $Tcl::pTk::_Tile_ge_0840 = ($interp->Eval(
+            "package vcompare $Tcl::pTk::_Tile_available 0.8.4.0"
+        ) != -1);
         require Tcl::pTk::Tile;
         Tcl::pTk::Tile::_declareTileWidgets($interp);
     }
@@ -938,23 +948,19 @@ sub after{
     my $callback = shift;
     
     $ms = int($ms) if( $ms =~ /\d/ ); # Make into an integer to keep tk from complaining
-    
-    if( defined($callback)){
-            # Turn into callback, if not one already
-            unless( blessed($callback) and $callback->isa('Tcl::pTk::Callback')){
-                    $callback = Tcl::pTk::Callback->new($callback);
-            }
-            
-            my $sub = sub{ $callback->Call()};
-            #print "Tcl::pTk::after: setting after on $sub\n";
-            my $ret = $int->call('after', $ms, $sub );
-            return $int->declare_widget($ret);
+
+    # If no Callback defined, just do a sleep
+    return $int->call('after', $ms) unless defined($callback);
+
+    # Turn into callback, if not one already
+    unless( blessed($callback) and $callback->isa('Tcl::pTk::Callback')){
+        $callback = Tcl::pTk::Callback->new($callback);
     }
-    else{ # No Callback defined, just do a sleep
-            return $int->call('after', $ms );
-    }
-    
-    return($int->call('after', $ms));
+
+    my $sub = sub{ $callback->Call()};
+    #print "Tcl::pTk::after: setting after on $sub\n";
+    my $ret = $int->call('after', $ms, $sub );
+    return $int->declare_widget($ret);
 }
 
 
@@ -1620,28 +1626,7 @@ sub call {
     # A SvIV will become a Tcl_IntObj, ARRAY refs will become Tcl_ListObjs,
     # and so on.  The return result from icall will do the opposite,
     # converting a Tcl_Obj to an SV.
-    if (!$Tcl::STACK_TRACE) {
-	return $interp->icall(@args);
-    }
-    elsif (wantarray) {
-	my @res;
-	eval { @res = $interp->icall(@args); };
-	if ($@) {
-	    require Carp;
-	    Carp::confess ("Tcl error '$@' while invoking array result call:\n" .
-		"\t\"@args\"");
-	}
-	return @res;
-    } else {
-	my $res;
-	eval { $res = $interp->icall(@args); };
-	if ($@) {
-	    require Carp;
-	    Carp::confess ("Tcl error '$@' while invoking scalar result call:\n" .
-		"\t\"@args\"");
-	}
-	return $res;
-    }
+    return $interp->icall(@args);
 }
 
 #############################################################################################

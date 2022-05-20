@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use UI::Various::core;
 use UI::Various::Button;
@@ -147,7 +147,7 @@ sub _process($)
     my ($self) = @_;
 
     local $_ = $self->code;
-    &$_($self);
+    &$_($self->_toplevel, $self);
 }
 
 1;

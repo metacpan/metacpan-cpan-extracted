@@ -30,7 +30,7 @@ BEGIN
 
     require Exporter;
 
-    $VERSION = '2.001000';
+    $VERSION = '2.002000';
 
     require DynaLoader;
 
@@ -1216,9 +1216,11 @@ Matt Sergeant, matt@sergeant.org
 
 Security callbacks implementation contributed by Shane Corgatelli.
 
+Petr Pajas , pajas@matfyz.org
+
 =head1 MAINTAINER
 
-Petr Pajas , pajas@matfyz.org
+Shlomi Fish, L<https://www.shlomifish.org/me/contact-me/> .
 
 =head1 BUGS
 
@@ -1228,6 +1230,6 @@ Please report bugs via
 
 =head1 SEE ALSO
 
-XML::LibXML
+L<XML::LibXML> , L<XML::LibXSLT::Quick> .
 
 =cut

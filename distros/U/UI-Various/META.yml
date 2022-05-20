@@ -30,178 +30,193 @@ provides:
     file: lib/UI/Various/Curses/Box.pm
   UI::Various:
     file: lib/UI/Various.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::Box:
     file: lib/UI/Various/Box.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::Button:
     file: lib/UI/Various/Button.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::Check:
     file: lib/UI/Various/Check.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::Curses::Box:
     file: lib/UI/Various/Curses/Box.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::Curses::Button:
     file: lib/UI/Various/Curses/Button.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::Curses::Check:
     file: lib/UI/Various/Curses/Check.pm
-    version: '0.19'
+    version: '0.20'
+  UI::Various::Curses::Dialog:
+    file: lib/UI/Various/Curses/Dialog.pm
+    version: '0.20'
   UI::Various::Curses::Input:
     file: lib/UI/Various/Curses/Input.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::Curses::Listbox:
     file: lib/UI/Various/Curses/Listbox.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::Curses::Main:
     file: lib/UI/Various/Curses/Main.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::Curses::Radio:
     file: lib/UI/Various/Curses/Radio.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::Curses::Text:
     file: lib/UI/Various/Curses/Text.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::Curses::Window:
     file: lib/UI/Various/Curses/Window.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::Curses::base:
     file: lib/UI/Various/Curses/base.pm
-    version: '0.19'
+    version: '0.20'
+  UI::Various::Dialog:
+    file: lib/UI/Various/Dialog.pm
+    version: '0.20'
   UI::Various::Input:
     file: lib/UI/Various/Input.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::Listbox:
     file: lib/UI/Various/Listbox.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::Main:
     file: lib/UI/Various/Main.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::PoorTerm::Box:
     file: lib/UI/Various/PoorTerm/Box.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::PoorTerm::Button:
     file: lib/UI/Various/PoorTerm/Button.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::PoorTerm::Check:
     file: lib/UI/Various/PoorTerm/Check.pm
-    version: '0.19'
+    version: '0.20'
+  UI::Various::PoorTerm::Dialog:
+    file: lib/UI/Various/PoorTerm/Dialog.pm
+    version: '0.20'
   UI::Various::PoorTerm::Input:
     file: lib/UI/Various/PoorTerm/Input.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::PoorTerm::Listbox:
     file: lib/UI/Various/PoorTerm/Listbox.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::PoorTerm::Main:
     file: lib/UI/Various/PoorTerm/Main.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::PoorTerm::Radio:
     file: lib/UI/Various/PoorTerm/Radio.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::PoorTerm::Text:
     file: lib/UI/Various/PoorTerm/Text.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::PoorTerm::Window:
     file: lib/UI/Various/PoorTerm/Window.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::PoorTerm::base:
     file: lib/UI/Various/PoorTerm/base.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::PoorTerm::container:
     file: lib/UI/Various/PoorTerm/container.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::Radio:
     file: lib/UI/Various/Radio.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::RichTerm::Box:
     file: lib/UI/Various/RichTerm/Box.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::RichTerm::Button:
     file: lib/UI/Various/RichTerm/Button.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::RichTerm::Check:
     file: lib/UI/Various/RichTerm/Check.pm
-    version: '0.19'
+    version: '0.20'
+  UI::Various::RichTerm::Dialog:
+    file: lib/UI/Various/RichTerm/Dialog.pm
+    version: '0.20'
   UI::Various::RichTerm::Input:
     file: lib/UI/Various/RichTerm/Input.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::RichTerm::Listbox:
     file: lib/UI/Various/RichTerm/Listbox.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::RichTerm::Main:
     file: lib/UI/Various/RichTerm/Main.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::RichTerm::Radio:
     file: lib/UI/Various/RichTerm/Radio.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::RichTerm::Text:
     file: lib/UI/Various/RichTerm/Text.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::RichTerm::Window:
     file: lib/UI/Various/RichTerm/Window.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::RichTerm::base:
     file: lib/UI/Various/RichTerm/base.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::RichTerm::container:
     file: lib/UI/Various/RichTerm/container.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::Text:
     file: lib/UI/Various/Text.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::Tk::Box:
     file: lib/UI/Various/Tk/Box.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::Tk::Button:
     file: lib/UI/Various/Tk/Button.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::Tk::Check:
     file: lib/UI/Various/Tk/Check.pm
-    version: '0.19'
+    version: '0.20'
+  UI::Various::Tk::Dialog:
+    file: lib/UI/Various/Tk/Dialog.pm
+    version: '0.20'
   UI::Various::Tk::Input:
     file: lib/UI/Various/Tk/Input.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::Tk::Listbox:
     file: lib/UI/Various/Tk/Listbox.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::Tk::Main:
     file: lib/UI/Various/Tk/Main.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::Tk::Radio:
     file: lib/UI/Various/Tk/Radio.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::Tk::Text:
     file: lib/UI/Various/Tk/Text.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::Tk::Window:
     file: lib/UI/Various/Tk/Window.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::Tk::base:
     file: lib/UI/Various/Tk/base.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::Window:
     file: lib/UI/Various/Window.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::container:
     file: lib/UI/Various/container.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::core:
     file: lib/UI/Various/core.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::language::de:
     file: lib/UI/Various/language/de.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::language::en:
     file: lib/UI/Various/language/en.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::toplevel:
     file: lib/UI/Various/toplevel.pm
-    version: '0.19'
+    version: '0.20'
   UI::Various::widget:
     file: lib/UI/Various/widget.pm
-    version: '0.19'
+    version: '0.20'
 recommends:
   Curses::UI: '0.9603'
   Tk: '804.030'
@@ -214,7 +229,7 @@ resources:
   bugtracker: https://gitlab.com/thdorner/ui-various/issues
   homepage: https://gitlab.com/thdorner/ui-various
   repository: git://gitlab.com/thdorner/ui-various.git
-version: '0.19'
+version: '0.20'
 x_contributors:
   - 'Thomas Dorner <dorner@cpan.org>'
   - 'Thomas Dorner <td-gitlab@th-dorner.de>'

@@ -1,0 +1,6 @@
+0.02 2022-05-17T11:12:34+02:00
+ - Add test with error.
+ - Fix minimal dependency to MARC::File::XML (fixing of warning in tests).
+
+0.01 2022-05-16T22:03:51+02:00
+ - First version.

@@ -1,6 +1,6 @@
 package Tcl::pTk::ttkTixNoteBook;
 
-our ($VERSION) = ('1.08');
+our ($VERSION) = ('1.09');
 
 =head1 NAME 
 
@@ -22,7 +22,7 @@ Tcl::pTk::ttkTixNoteBook - Tix NoteBook compatible wrapper for ttkNotebook
 
 =head1 DESCRIPTION
 
-L<Tcl::pTk::ttkTixNoteBook> is a wrapper around the Tile widget I<ttkNotebood> that is compatible with L<Tcl::pTk::Notebook>.
+L<Tcl::pTk::ttkTixNoteBook> is a wrapper around the Tile widget I<ttkNotebook> that is compatible with L<Tcl::pTk::Notebook>.
 It is provided for a quick upgrade of existing code to use the newer Notebook widget with a upgraded look/feel.
 
 =head1 OPTIONS
@@ -100,7 +100,7 @@ Not implemented. Ignored if supplied.
 
 =item B<-label>
 
-Implemented with the ttkNotebood I<-text> option.
+Implemented with the ttkNotebook I<-text> option.
 
 =item B<-justify>
 
@@ -116,11 +116,11 @@ Not implemented. Ignored if supplied.
 
 =item B<-state>
 
-Implemented with the ttkNotebood I<-state> option.
+Implemented with the ttkNotebook I<-state> option.
 
 =item B<-underline>
 
-Implemented with the ttkNotebood I<-underline> option.
+Implemented with the ttkNotebook I<-underline> option.
 
 =item B<-wraplength>
 
@@ -408,8 +408,7 @@ sub raised{
 # Tcl/Tk 8.5.9 or later, or Tile 0.8.4.0 for Tcl/Tk 8.4
 # https://rt.cpan.org/Ticket/Display.html?id=132075
 sub _identify_unavailable {
-    my $cw = shift;
-    return $cw->interp->Eval("package vcompare $Tcl::pTk::_Tile_available 0.8.4.0") == -1;
+    return not $Tcl::pTk::_Tile_ge_0840;
 }
 
 #----------------------------------------------

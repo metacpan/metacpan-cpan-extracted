@@ -7,12 +7,58 @@ use utf8;
 use Carp qw(croak);
 use Getopt::Long ();
 use List::Util qw(first);
-use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
-my $opt_comment_re = qr{\s+\#\s+};
-our ($OPTIONS, $SUBCOMMANDS);
+our ($OPT_COMMENT_RE, $OPTIONS, $SUBCOMMANDS) = (qr{\s+\#\s+});
+
+sub bundle {
+  my ($class, $script, $OUT) = (@_, \*STDOUT);
+  my ($package, @script);
+
+  open my $SCRIPT, '<', $script or croak "Can't read $script: $!";
+  while (my $line = readline $SCRIPT) {
+    if ($line =~ m!^\s*package\s+\S+\s*;!) {    # look for app class name
+      $package .= $line;
+      last;
+    }
+    elsif ($. == 1) {                           # look for hashbang
+      $line =~ m/^#!/ ? print {$OUT} $line : do { print {$OUT} "#!$^X\n"; push @script, $line };
+    }
+    else {
+      push @script, $line;
+      last if $line =~ m!^[^#]+;!;
+    }
+  }
+
+  my $out_line = '';
+  open my $SELF, '<', __FILE__ or croak "Can't read Getopt::App: $!";
+  while (my $line = readline $SELF) {
+    next if $line =~ m!(?:\bVERSION\s|^\s*$)!;                 # TODO: Should version get skipped?
+    next if $line =~ m!^sub bundle\s\{! .. $line =~ m!^}$!;    # skip bundle()
+    last if $line =~ m!^1;\s*$!;                               # do not include POD
+
+    chomp $line;
+    if ($line =~ m!^sub\s!) {
+      print {$OUT} $out_line, "\n" if $out_line;
+      $line =~ m!\}$! ? print {$OUT} $line, "\n" : ($out_line = $line);
+    }
+    elsif ($line =~ m!^}$!) {
+      print {$OUT} $out_line, $line, "\n";
+      $out_line = '';
+    }
+    else {
+      $line =~ s!^[ ]{2,}!!;    # remove leading white space
+      $line =~ s!\#\s.*!!;      # remove comments
+      $out_line .= $line;
+    }
+  }
+
+  print {$OUT} qq(BEGIN{\$INC{'Getopt/App.pm'}='BUNDLED'}\n);
+  print {$OUT} +($package || "package main\n");
+  print {$OUT} @script;
+  print {$OUT} $_ while readline $SCRIPT;
+}
 
 sub capture {
   my ($app, $argv) = @_;
@@ -100,37 +146,38 @@ sub run {
   my $cb   = pop @rules;
   my $argv = ref $rules[0] eq 'ARRAY' ? shift @rules : [@ARGV];
   local $OPTIONS = [@rules];
-  @rules = map {s!$opt_comment_re.*$!!r} @rules;
+  @rules = map {s!$OPT_COMMENT_RE.*$!!r} @rules;
 
   my $app = $class->new;
-  _hook($app, pre_process_argv => $argv);
+  _call($app, getopt_pre_process_argv => $argv);
 
-  local $SUBCOMMANDS = _hook($app, 'subcommands');
+  local $SUBCOMMANDS = _call($app, 'getopt_subcommands');
   my $exit_value = $SUBCOMMANDS ? _subcommand($app, $SUBCOMMANDS, $argv) : undef;
   return $exit_value if defined $exit_value;
 
-  my @configure = _hook($app, 'configure');
+  my @configure = _call($app, 'getopt_configure');
   my $prev      = Getopt::Long::Configure(@configure);
   my $valid     = Getopt::Long::GetOptionsFromArray($argv, $app, @rules) ? 1 : 0;
   Getopt::Long::Configure($prev);
-  _hook($app, post_process_argv => $argv, {valid => $valid});
+  _call($app, getopt_post_process_argv => $argv, {valid => $valid});
 
   $exit_value = $valid ? $app->$cb(@$argv) : 1;
-  _hook($app, post_process_exit_value => \$exit_value);
-  $exit_value = 0       unless looks_like_number $exit_value;
+  $exit_value = _call($app, getopt_post_process_exit_value => $exit_value) // $exit_value;
+  $exit_value = 0   unless $exit_value and $exit_value =~ m!^\d{1,3}$!;
+  $exit_value = 255 unless $exit_value < 255;
   exit(int $exit_value) unless $Getopt::App::APP_CLASS;
   return $exit_value;
 }
 
-sub _hook {
-  my ($app, $name) = (shift, shift);
-  my $hook = $app->can("getopt_$name") || __PACKAGE__->can("_hook_$name");
-  return $hook ? $app->$hook(@_) : undef;
+sub _call {
+  my ($app, $method) = (shift, shift);
+  my $cb = $app->can($method) || __PACKAGE__->can("_$method");
+  return $cb ? $app->$cb(@_) : undef;
 }
 
-sub _hook_configure {qw(bundling no_auto_abbrev no_ignore_case pass_through require_order)}
+sub _getopt_configure {qw(bundling no_auto_abbrev no_ignore_case pass_through require_order)}
 
-sub _hook_post_process_argv {
+sub _getopt_post_process_argv {
   my ($app, $argv, $state) = @_;
   return unless $state->{valid};
   return unless $argv->[0] and $argv->[0] =~ m!^-!;
@@ -158,7 +205,7 @@ sub _usage_for_options {
 
   my ($len, @options) = (0);
   for (@$rules) {
-    my @o = split $opt_comment_re, $_, 2;
+    my @o = split $OPT_COMMENT_RE, $_, 2;
     $o[0] =~ s/(=[si][@%]?|\!|\+)$//;
     $o[0] = join ', ',
       map { length($_) == 1 ? "-$_" : "--$_" } sort { length($b) <=> length($a) } split /\|/, $o[0];
@@ -291,15 +338,15 @@ hyphen, and C<die> with an error message if so:
 
 =head2 getopt_post_process_exit_value
 
-  $app->getopt_post_process_exit_value($exit_value_ref);
+  $exit_value = $app->getopt_post_process_exit_value($exit_value);
 
-A hook to be run after the C</run> function has been called. C<$exit_value_ref>
-is a scalar ref, holding the return value from L</run> which could be any
-value, not just 0-255. This value can then be changed to change the exit value
-from the program.
+A method to be called after the L</run> function has been called.
+C<$exit_value> holds the return value from L</run> which could be any value,
+not just 0-255. This value can then be changed to change the exit value from
+the program.
 
   sub getopt_post_process_exit_value ($app, $exit_value) {
-    $$exit_value = int(1 + rand 10);
+    return int(1 + rand 10);
   }
 
 =head2 getopt_pre_process_argv
@@ -310,7 +357,7 @@ This method can be defined to pre-process C<$argv> before it is passed on to
 L<Getopt::Long/GetOptionsFromArray>. Example:
 
   sub getopt_pre_process_argv ($app, $argv) {
-    $app->{subcommand} = shift @$argv if @$argv and $argv->[0] =~ m!^[a-z]!;
+    $app->{first_non_option} = shift @$argv if @$argv and $argv->[0] =~ m!^[a-z]!;
   }
 
 This method can C<die> and optionally set C<$!> to avoid calling the actual
@@ -328,7 +375,7 @@ array-refs like this:
 
 The first element in each array-ref "subname" will be matched against the first
 argument passed to the script, and when matched the "sub-command-script" will
-be sourced and run inside the same Perl process. The sub command script must
+be sourced and run inside the same perl process. The sub command script must
 also use L<Getopt::App> for this to work properly.
 
 See L<https://github.com/jhthorsen/getopt-app/tree/main/example> for a working
@@ -349,12 +396,14 @@ be set to C<$!>.
 
 =head2 extract_usage
 
+  # Default to "SYNOPSIS" from current file
   my $str = extract_usage($section, $file);
-  my $str = extract_usage(); # Default to "SYNOPSIS" from current file
+  my $str = extract_usage($section);
+  my $str = extract_usage();
 
-Will extract a C<$section> from POD C<$file> and append command line options
-when called from inside of L</run>. Command line options can optionally have a
-description with "spaces-hash-spaces-description", like this:
+Will extract a C<$section> from POD C<$file> and append command line option
+descriptions when called from inside of L</run>. Command line options can
+optionally have a description with "spaces-hash-spaces-description", like this:
 
   run(
     'o|option  # Some description',
@@ -413,6 +462,22 @@ In the example above, C<@extra> gets populated, since there is a non-flag value
 "cool" after a list of valid command line options.
 
 =head1 METHODS
+
+=head2 bundle
+
+  Getopt::App->bundle($path_to_script);
+  Getopt::App->bundle($path_to_script, $fh);
+
+This method can be used to combine L<Getopt::App> and C<$path_to_script> into a
+a single script that does not need to have L<Getopt::App> installed from CPAN.
+This is for example useful for sysadmin scripts that otherwize only depends on
+core Perl modules.
+
+The script will be printed to C<$fh>, which defaults to C<STDOUT>.
+
+Example usage:
+
+  perl -MGetopt::App -e'Getopt::App->bundle(shift)' ./src/my-script.pl > ./bin/my-script;
 
 =head2 import
 

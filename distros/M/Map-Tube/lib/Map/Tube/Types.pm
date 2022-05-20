@@ -1,6 +1,6 @@
 package Map::Tube::Types;
 
-$Map::Tube::Types::VERSION   = '3.64';
+$Map::Tube::Types::VERSION   = '3.68';
 $Map::Tube::Types::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Types - Attribute type definition for Map::Tube.
 
 =head1 VERSION
 
-Version 3.64
+Version 3.68
 
 =cut
 
@@ -70,8 +70,7 @@ L<https://github.com/manwar/Map-Tube>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-map-tube at rt.cpan.org>,  or
-through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Map-Tube>.
+Please report any bugs or feature requests through the web interface at L<https://github.com/manwar/Map-Tube/issues>.
 I will be notified, and then you'll automatically be notified of progress on your
 bug as I make changes.
 
@@ -85,9 +84,9 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * BUG Report
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Map-Tube>
+L<https://github.com/manwar/Map-Tube/issues>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
@@ -97,15 +96,15 @@ L<http://annocpan.org/dist/Map-Tube>
 
 L<http://cpanratings.perl.org/d/Map-Tube>
 
-=item * Search CPAN
+=item * Search MetaCPAN
 
-L<http://search.cpan.org/dist/Map-Tube/>
+L<https://metacpan.org/dist/Map-Tube/>
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 - 2016 Mohammad S Anwar.
+Copyright (C) 2010 - 2022 Mohammad S Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic License  (2.0). You may obtain a copy of the full

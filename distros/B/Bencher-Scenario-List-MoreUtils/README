@@ -1,0 +1,233 @@
+NAME
+    Bencher::Scenario::List::MoreUtils - Benchmark List::MoreUtils::PP vs
+    List::MoreUtils::XS
+
+VERSION
+    This document describes version 0.041 of
+    Bencher::Scenario::List::MoreUtils (from Perl distribution
+    Bencher-Scenario-List-MoreUtils), released on 2022-05-06.
+
+SYNOPSIS
+    To run benchmark with default option:
+
+     % bencher -m List::MoreUtils
+
+    To run module startup overhead benchmark:
+
+     % bencher --module-startup -m List::MoreUtils
+
+    For more options (dump scenario, list/include/exclude/add participants,
+    list/include/exclude/add datasets, etc), see bencher or run "bencher
+    --help".
+
+DESCRIPTION
+    EARLY VERSION, ONLY A FEW FUNCTIONS HAVE BEEN BENCHMARKED.
+
+    Packaging a benchmark script as a Bencher scenario makes it convenient
+    to include/exclude/add participants/datasets (either via CLI or Perl
+    code), send the result to a central repository, among others . See
+    Bencher and bencher (CLI) for more details.
+
+BENCHMARKED MODULES
+    Version numbers shown below are the versions used when running the
+    sample benchmark.
+
+    List::MoreUtils::PP 0.430
+
+    List::MoreUtils::XS 0.430
+
+BENCHMARK PARTICIPANTS
+    *   List::MoreUtils::PP::uniq (perl_code) [arg1]
+
+        Function call template:
+
+         List::MoreUtils::PP::uniq(@{<list>})
+
+    *   List::MoreUtils::XS::uniq (perl_code) [arg1]
+
+        Code template:
+
+         List::MoreUtils::uniq(@{<list>})
+
+    *   List::MoreUtils::PP::minmax (perl_code) [arg1]
+
+        Function call template:
+
+         List::MoreUtils::PP::minmax(@{<list>})
+
+    *   List::MoreUtils::XS::minmax (perl_code) [arg1]
+
+        Code template:
+
+         List::MoreUtils::minmax(@{<list>})
+
+    *   List::MoreUtils::PP::firstidx (perl_code) [arg1]
+
+        Code template:
+
+         List::MoreUtils::PP::firstidx(sub{$_==-1}, @{<list>})
+
+    *   List::MoreUtils::XS::firstidx (perl_code) [arg1]
+
+        Code template:
+
+         List::MoreUtils::firstidx(sub{$_==-1}, @{<list>})
+
+BENCHMARK DATASETS
+    *   num10
+
+    *   num100
+
+    *   num1000
+
+BENCHMARK SAMPLE RESULTS
+  Sample benchmark #1
+    Run on: perl: *v5.34.0*, CPU: *Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz
+    (4 cores)*, OS: *GNU/Linux LinuxMint version 19*, OS kernel: *Linux
+    version 5.3.0-68-generic*.
+
+    Benchmark command (default options):
+
+     % bencher -m List::MoreUtils
+
+    Result formatted as table:
+
+     #table1#
+     +-------------------------------+---------+-----------+------------+-----------------------+-----------------------+---------+---------+
+     | participant                   | dataset | rate (/s) | time (μs)  | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     +-------------------------------+---------+-----------+------------+-----------------------+-----------------------+---------+---------+
+     | List::MoreUtils::PP::firstidx | num1000 |    4310   | 232        |                 0.00% |             68620.78% | 5.3e-08 |      20 |
+     | List::MoreUtils::PP::uniq     | num1000 |    4300   | 230        |                 0.55% |             68243.38% | 4.8e-07 |      20 |
+     | List::MoreUtils::XS::uniq     | num1000 |    5600   | 180        |                30.51% |             52554.65% | 2.1e-07 |      20 |
+     | List::MoreUtils::PP::minmax   | num1000 |    8720   | 115        |               102.42% |             33850.21% | 5.3e-08 |      20 |
+     | List::MoreUtils::XS::firstidx | num1000 |   31000   |  33        |               611.35% |              9560.55% |   4e-08 |      20 |
+     | List::MoreUtils::PP::firstidx | num100  |   42400.6 |  23.5846   |               884.80% |              6878.16% |   0     |      20 |
+     | List::MoreUtils::XS::minmax   | num1000 |   48400   |  20.7      |              1023.99% |              6014.01% |   6e-09 |      25 |
+     | List::MoreUtils::PP::uniq     | num100  |   55495.7 |  18.0194   |              1188.95% |              5231.55% |   0     |      31 |
+     | List::MoreUtils::PP::minmax   | num100  |   85764   |  11.6599   |              1891.96% |              3349.91% |   0     |      20 |
+     | List::MoreUtils::XS::uniq     | num100  |   96800   |  10.3      |              2147.28% |              2957.96% | 3.3e-09 |      20 |
+     | List::MoreUtils::XS::firstidx | num100  |  289948   |   3.44889  |              6634.36% |               920.45% |   0     |      22 |
+     | List::MoreUtils::PP::uniq     | num10   |  352000   |   2.84     |              8075.78% |               740.54% | 8.3e-10 |      20 |
+     | List::MoreUtils::PP::firstidx | num10   |  375000   |   2.67     |              8602.35% |               689.68% | 6.6e-10 |      32 |
+     | List::MoreUtils::XS::minmax   | num100  |  462586   |   2.16176  |             10644.04% |               539.62% |   0     |      21 |
+     | List::MoreUtils::PP::minmax   | num10   |  675000   |   1.48     |             15579.94% |               338.27% | 1.2e-09 |      22 |
+     | List::MoreUtils::XS::uniq     | num10   |  857878   |   1.16567  |             19825.12% |               244.90% |   0     |      20 |
+     | List::MoreUtils::XS::firstidx | num10   | 1891970   |   0.528549 |             43843.04% |                56.39% |   0     |      20 |
+     | List::MoreUtils::XS::minmax   | num10   | 3000000   |   0.34     |             68620.78% |                 0.00% | 4.2e-10 |      20 |
+     +-------------------------------+---------+-----------+------------+-----------------------+-----------------------+---------+---------+
+
+    The above result formatted in Benchmark.pm style:
+
+                          Rate  LMP:f num1000  LMP:u num1000  LMX:u num1000  LMP:m num1000  LMX:f num1000  LMP:f num100  LMX:m num1000  LMP:u num100  LMP:m num100  LMX:u num100  LMX:f num100  LMP:u num10  LMP:f num10  LMX:m num100  LMP:m num10  LMX:u num10  LMX:f num10  LMX:m num10 
+      LMP:f num1000     4310/s             --             0%           -22%           -50%           -85%          -89%           -91%          -92%          -94%          -95%          -98%         -98%         -98%          -99%         -99%         -99%         -99%         -99% 
+      LMP:u num1000     4300/s             0%             --           -21%           -50%           -85%          -89%           -91%          -92%          -94%          -95%          -98%         -98%         -98%          -99%         -99%         -99%         -99%         -99% 
+      LMX:u num1000     5600/s            28%            27%             --           -36%           -81%          -86%           -88%          -89%          -93%          -94%          -98%         -98%         -98%          -98%         -99%         -99%         -99%         -99% 
+      LMP:m num1000     8720/s           101%           100%            56%             --           -71%          -79%           -82%          -84%          -89%          -91%          -97%         -97%         -97%          -98%         -98%         -98%         -99%         -99% 
+      LMX:f num1000    31000/s           603%           596%           445%           248%             --          -28%           -37%          -45%          -64%          -68%          -89%         -91%         -91%          -93%         -95%         -96%         -98%         -98% 
+      LMP:f num100   42400.6/s           883%           875%           663%           387%            39%            --           -12%          -23%          -50%          -56%          -85%         -87%         -88%          -90%         -93%         -95%         -97%         -98% 
+      LMX:m num1000    48400/s          1020%          1011%           769%           455%            59%           13%             --          -12%          -43%          -50%          -83%         -86%         -87%          -89%         -92%         -94%         -97%         -98% 
+      LMP:u num100   55495.7/s          1187%          1176%           898%           538%            83%           30%            14%            --          -35%          -42%          -80%         -84%         -85%          -88%         -91%         -93%         -97%         -98% 
+      LMP:m num100     85764/s          1889%          1872%          1443%           886%           183%          102%            77%           54%            --          -11%          -70%         -75%         -77%          -81%         -87%         -90%         -95%         -97% 
+      LMX:u num100     96800/s          2152%          2133%          1647%          1016%           220%          128%           100%           74%           13%            --          -66%         -72%         -74%          -79%         -85%         -88%         -94%         -96% 
+      LMX:f num100    289948/s          6626%          6568%          5119%          3234%           856%          583%           500%          422%          238%          198%            --         -17%         -22%          -37%         -57%         -66%         -84%         -90% 
+      LMP:u num10     352000/s          8069%          7998%          6238%          3949%          1061%          730%           628%          534%          310%          262%           21%           --          -5%          -23%         -47%         -58%         -81%         -88% 
+      LMP:f num10     375000/s          8589%          8514%          6641%          4207%          1135%          783%           675%          574%          336%          285%           29%           6%           --          -19%         -44%         -56%         -80%         -87% 
+      LMX:m num100    462586/s         10631%         10539%          8226%          5219%          1426%          990%           857%          733%          439%          376%           59%          31%          23%            --         -31%         -46%         -75%         -84% 
+      LMP:m num10     675000/s         15575%         15440%         12062%          7670%          2129%         1493%          1298%         1117%          687%          595%          133%          91%          80%           46%           --         -21%         -64%         -77% 
+      LMX:u num10     857878/s         19802%         19631%         15341%          9765%          2730%         1923%          1675%         1445%          900%          783%          195%         143%         129%           85%          26%           --         -54%         -70% 
+      LMX:f num10    1891970/s         43793%         43415%         33955%         21657%          6143%         4362%          3816%         3309%         2106%         1848%          552%         437%         405%          308%         180%         120%           --         -35% 
+      LMX:m num10    3000000/s         68135%         67547%         52841%         33723%          9605%         6836%          5988%         5199%         3329%         2929%          914%         735%         685%          535%         335%         242%          55%           -- 
+ 
+     Legends:
+       LMP:f num10: dataset=num10 participant=List::MoreUtils::PP::firstidx
+       LMP:f num100: dataset=num100 participant=List::MoreUtils::PP::firstidx
+       LMP:f num1000: dataset=num1000 participant=List::MoreUtils::PP::firstidx
+       LMP:m num10: dataset=num10 participant=List::MoreUtils::PP::minmax
+       LMP:m num100: dataset=num100 participant=List::MoreUtils::PP::minmax
+       LMP:m num1000: dataset=num1000 participant=List::MoreUtils::PP::minmax
+       LMP:u num10: dataset=num10 participant=List::MoreUtils::PP::uniq
+       LMP:u num100: dataset=num100 participant=List::MoreUtils::PP::uniq
+       LMP:u num1000: dataset=num1000 participant=List::MoreUtils::PP::uniq
+       LMX:f num10: dataset=num10 participant=List::MoreUtils::XS::firstidx
+       LMX:f num100: dataset=num100 participant=List::MoreUtils::XS::firstidx
+       LMX:f num1000: dataset=num1000 participant=List::MoreUtils::XS::firstidx
+       LMX:m num10: dataset=num10 participant=List::MoreUtils::XS::minmax
+       LMX:m num100: dataset=num100 participant=List::MoreUtils::XS::minmax
+       LMX:m num1000: dataset=num1000 participant=List::MoreUtils::XS::minmax
+       LMX:u num10: dataset=num10 participant=List::MoreUtils::XS::uniq
+       LMX:u num100: dataset=num100 participant=List::MoreUtils::XS::uniq
+       LMX:u num1000: dataset=num1000 participant=List::MoreUtils::XS::uniq
+
+  Sample benchmark #2
+    Benchmark command (benchmarking module startup overhead):
+
+     % bencher -m List::MoreUtils --module-startup
+
+    Result formatted as table:
+
+     #table2#
+     +---------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
+     | participant         | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
+     +---------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
+     | List::MoreUtils::XS |         9 |                 6 |                 0.00% |               187.07% |   0.00021 |      20 |
+     | List::MoreUtils::PP |         9 |                 6 |                10.12% |               160.69% |   0.00012 |      20 |
+     | perl -e1 (baseline) |         3 |                 0 |               187.07% |                 0.00% | 7.2e-05   |      20 |
+     +---------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
+
+    The above result formatted in Benchmark.pm style:
+
+                              Rate  LM:X  LM:P  perl -e1 (baseline) 
+      LM:X                 111.1/s    --    0%                 -66% 
+      LM:P                 111.1/s    0%    --                 -66% 
+      perl -e1 (baseline)  333.3/s  200%  200%                   -- 
+ 
+     Legends:
+       LM:P: mod_overhead_time=6 participant=List::MoreUtils::PP
+       LM:X: mod_overhead_time=6 participant=List::MoreUtils::XS
+       perl -e1 (baseline): mod_overhead_time=0 participant=perl -e1 (baseline)
+
+    To display as an interactive HTML table on a browser, you can add option
+    "--format html+datatables".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenario-List-MoreUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenario-List-MoreUtils>.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022, 2017, 2016, 2015 by perlancar
+    <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenario-List
+    -MoreUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

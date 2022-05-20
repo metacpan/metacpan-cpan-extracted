@@ -3,20 +3,21 @@
 use strict;
 use warnings;
 
-use IO::All qw/ io /;
+use Path::Tiny qw/ path /;
 
 my ($version) =
     ( map { m{\$VERSION *= *'([^']+)'} ? ($1) : () }
-        io->file('LibXSLT.pm')->getlines() );
+        path('lib/XML/LibXSLT.pm')->lines_utf8() );
 
 if ( !defined($version) )
 {
     die "Version is undefined!";
 }
 
-my @cmd = (
-    "git", "tag", "-m", "Tagging the XML-LibXSLT release as $version",
-    "XML-LibXSLT-$version",
+my $DIST = "XML-LibXSLT";
+my @cmd  = (
+    "git", "tag", "-m", "Tagging the $DIST release as $version",
+    "${DIST}-$version",
 );
 
 print join( " ", map { /\s/ ? qq{"$_"} : $_ } @cmd ), "\n";

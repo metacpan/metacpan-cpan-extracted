@@ -34,7 +34,7 @@
          "requires" : {
             "Encode" : "0",
             "XML::LibXML" : "1.70",
-            "perl" : "5.008001",
+            "perl" : "5.014",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -48,6 +48,6 @@
          "web" : "https://github.com/shlomif/perl-XML-LibXSLT"
       }
    },
-   "version" : "2.001000",
+   "version" : "2.002000",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

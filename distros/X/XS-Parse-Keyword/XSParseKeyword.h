@@ -31,8 +31,8 @@ enum {
 
   XS_PARSE_KEYWORD_BLOCK = 0x10,      /* op */
   XS_PARSE_KEYWORD_ANONSUB,           /* cv */
-  /* TODO: XS_PARSE_KEYWORD_ARITHEXPR = 0x12 */
-  XS_PARSE_KEYWORD_TERMEXPR = 0x13,   /* op */
+  XS_PARSE_KEYWORD_ARITHEXPR,         /* op */
+  XS_PARSE_KEYWORD_TERMEXPR,          /* op */
   XS_PARSE_KEYWORD_LISTEXPR,          /* op */
   /* TODO: XS_PARSE_KEYWORD_FULLEXPR = 0x15 */
   XS_PARSE_KEYWORD_IDENT = 0x16,      /* sv */
@@ -66,7 +66,8 @@ enum {
 
 enum {
   XPK_TYPEFLAG_OPT      = (1<<16),
-  XPK_TYPEFLAG_SPECIAL  = (1<<17), /* on XPK_BLOCK: scoped
+  XPK_TYPEFLAG_SPECIAL  = (1<<17), /* on XPK_LITERALSTR: keyword
+                                      on XPK_BLOCK: scoped
                                       on XPK_LEXVAR: my */
 
   /* These three are shifted versions of perl's G_VOID, G_SCALAR, G_LIST */
@@ -75,6 +76,8 @@ enum {
   XPK_TYPEFLAG_G_LIST   = (3<<18),
 
   XPK_TYPEFLAG_ENTERLEAVE = (1<<20), /* wrap ENTER/LEAVE pair around the item */
+
+  XPK_TYPEFLAG_MAYBEPARENS = (1<<21), /* parens themselves are optional on PARENSCOPE */
 };
 
 #define XPK_BLOCK_flags(flags) {.type = XS_PARSE_KEYWORD_BLOCK|(flags), .u.pieces = NULL}
@@ -92,6 +95,10 @@ enum {
 
 #define XPK_ANONSUB {.type = XS_PARSE_KEYWORD_ANONSUB}
 
+#define XPK_ARITHEXPR_flags(flags) {.type = XS_PARSE_KEYWORD_ARITHEXPR|(flags)}
+#define XPK_ARITHEXPR              XPK_ARITHEXPR_flags(0)
+#define XPK_ARITHEXPR_VOIDCTX      XPK_ARITHEXPR_flags(XPK_TYPEFLAG_G_VOID)
+#define XPK_ARITHEXPR_SCALARCTX    XPK_ARITHEXPR_flags(XPK_TYPEFLAG_G_SCALAR)
 #define XPK_TERMEXPR_flags(flags) {.type = XS_PARSE_KEYWORD_TERMEXPR|(flags)}
 #define XPK_TERMEXPR              XPK_TERMEXPR_flags(0)
 #define XPK_TERMEXPR_VOIDCTX      XPK_TERMEXPR_flags(XPK_TYPEFLAG_G_VOID)
@@ -121,6 +128,7 @@ enum {
 #define XPK_LITERAL(s) {.type = XS_PARSE_KEYWORD_LITERALSTR, .u.str = (const char *)s}
 #define XPK_STRING(s)  XPK_LITERAL(s)
 #define XPK_AUTOSEMI   {.type = XS_PARSE_KEYWORD_AUTOSEMI}
+#define XPK_KEYWORD(s) {.type = XS_PARSE_KEYWORD_LITERALSTR|XPK_TYPEFLAG_SPECIAL, .u.str = (const char *)s}
 
 #define XPK_INFIX(select) {.type = XS_PARSE_KEYWORD_INFIX, .u.c = select}
 #define XPK_INFIX_RELATION       XPK_INFIX(XPI_SELECT_RELATION)
@@ -153,6 +161,9 @@ enum {
   {.type = XS_PARSE_KEYWORD_PARENSCOPE, .u.pieces = (const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }}
 #define XPK_PARENSCOPE_OPT(...) \
   {.type = XS_PARSE_KEYWORD_PARENSCOPE|XPK_TYPEFLAG_OPT, .u.pieces = (const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }}
+
+#define XPK_ARGSCOPE(...) \
+  {.type = XS_PARSE_KEYWORD_PARENSCOPE|XPK_TYPEFLAG_MAYBEPARENS, .u.pieces = (const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }}
 
 #define XPK_BRACKETSCOPE(...) \
   {.type = XS_PARSE_KEYWORD_BRACKETSCOPE, .u.pieces = (const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }}

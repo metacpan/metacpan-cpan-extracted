@@ -40,13 +40,13 @@ t/Sandbox.t
 t/after.t
 t/annotations.t
 t/args-in-import.t
-t/builtin.pl
+t/builtin.t
 t/carp.t
 t/cast-in-regex.t
 t/cast.t
 t/cli-args.t
 t/cli.t
-t/config-in-import.pl
+t/config-in-import.t
 t/cpan-modules/pithub.t
 t/cpan-modules/test2-v0.t
 t/datetime.t
@@ -81,7 +81,7 @@ t/moose.t
 t/moosex-types-moose.t
 t/nested-quotes.t
 t/never-exports.t
-t/original-imports.pl
+t/original-imports.t
 t/padding.t
 t/perl-imports.t
 t/perl.t
@@ -94,9 +94,9 @@ t/quoted-var.t
 t/re-export-via-sub-exporter.t
 t/regex-replacement.t
 t/require.t
-t/respace-include.pl
+t/respace-include.t
 t/script-with-inner-packages.t
-t/signatures.pl
+t/signatures.t
 t/skip-all.t
 t/socket.t
 t/sort-imports.t
@@ -108,7 +108,7 @@ t/test-most.t
 t/typeglob.t
 t/unnest-quotes.t
 t/use-and-require.t
-t/var-in-hash-key.pl
+t/var-in-hash-key.t
 t/var-in-regex.t
 t/variable.t
 t/with-version.t

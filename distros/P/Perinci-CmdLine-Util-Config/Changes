@@ -1,3 +1,8 @@
+1.726   2022-05-02  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Enable warn_perl attribute of Config::IOD::Reader.
+
+
 1.725   2021-07-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Update to Data::Sah::Resolve 0.010.

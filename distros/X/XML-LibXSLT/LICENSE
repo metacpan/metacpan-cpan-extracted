@@ -6,6 +6,8 @@ Perl itself.
 
 Copyright 2001-2006 AxKit.com Ltd.
 
+NOTE that individual files may be licensed under different but compatible
+licenses - https://github.com/shlomif/perl-XML-LibXSLT/issues/5 .
 
 DISCLAIMER
 ==========

@@ -1,7 +1,7 @@
 package Mail::DKIM::AuthorDomainPolicy;
 use strict;
 use warnings;
-our $VERSION = '1.20220408'; # VERSION
+our $VERSION = '1.20220520'; # VERSION
 # ABSTRACT: represents an Author Domain Signing Practices (ADSP) record
 
 # Copyright 2005-2009 Messiah College.
@@ -195,7 +195,7 @@ Mail::DKIM::AuthorDomainPolicy - represents an Author Domain Signing Practices (
 
 =head1 VERSION
 
-version 1.20220408
+version 1.20220520
 
 =head1 DESCRIPTION
 

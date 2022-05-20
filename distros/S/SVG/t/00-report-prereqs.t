@@ -87,7 +87,7 @@ if (   $source
 }
 else {
     $cpan_meta_error = $@; # capture error from CPAN::Meta->load_file($source)
-    $source = 'static metadata';
+    $source          = 'static metadata';
 }
 
 my @full_reports;

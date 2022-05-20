@@ -108,7 +108,9 @@ sub _collect_valid {
 
     my %valid_input;
     for my $field (@ { $valid }) {
-        $valid_input{$field} = $input->{$field};
+        if (exists $input->{$field}) {
+            $valid_input{$field} = $input->{$field};
+        }
     }
 
     return \%valid_input;

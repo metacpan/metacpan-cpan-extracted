@@ -1,7 +1,7 @@
 package Mail::DKIM::KeyValueList;
 use strict;
 use warnings;
-our $VERSION = '1.20220408'; # VERSION
+our $VERSION = '1.20220520'; # VERSION
 # ABSTRACT: Represents a Key/Value list
 
 # Copyright 2005-2007 Messiah College. All rights reserved.
@@ -195,7 +195,7 @@ Mail::DKIM::KeyValueList - Represents a Key/Value list
 
 =head1 VERSION
 
-version 1.20220408
+version 1.20220520
 
 =head1 AUTHORS
 

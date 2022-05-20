@@ -1,25 +1,27 @@
 package Acme::Backwards; 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 use Keyword::Declare;
 sub import {
 	keytype OKAY is m{(?:fisle (?&PerlNWS)(?&PerlExpression).*?;|esle (?&PerlNWS).*?;)?+}xms;
+	keyword rof (/(my\s*\$\w+)?/ $declare, Expr $test, /.+?;$/ $code) {_backwards('for', ($declare ? $declare : ()), $test, $code);};
 	keyword fi (Expr $test, /.+?;/ $code, OKAY @next) {_backwards('if', $test, $code)._process_backwards(@next);};
 	keyword sselnu (Expr $test, /.+?;/ $code, OKAY @next) {_backwards('unless', $test, $code)._process_backwards(@next);};
 }
 sub _process_backwards {join' ',map{$_=~m/(fisle|esle)(.*)$/;return"_$1"->($2)}@_;}
 sub _esle {_backwards('else','',shift)}
 sub _fisle {shift=~m/\s*((?&PerlExpression))\s*(.*?;) $PPR::GRAMMAR/gxm;_backwards('elsif', $1, $2);}
-sub _backwards {sprintf"%s %s { %s }",@_;}
+sub _backwards {scalar@_>3?sprintf"%s %s %s { %s }",@_:sprintf"%s %s { %s }",@_;}
+
 1;
 __END__
 
 =head1 NAME
 
-Acme::Backwards - One line fi, esle, fisle, sselnu
+Acme::Backwards - One line fi, esle, fisle, sselnu, rof
 
 =head1 VERSION
 
-Version 0.03
+Version 0.05
 
 =cut
 
@@ -39,6 +41,11 @@ Perhaps a little code snippet.
 	fi ( $str eq 'forwards' ) say $str;
 	fisle ( $str eq 'backwards' ) say $str;
 	esle die $str;
+
+	my $int = 0;
+	rof (qw/1 2 3/) $int += $_;
+	rof my $var (qw/4 5 6/) $int += $var;
+	rof my $nest (qw/7 8/) fi ($nest == 7) print "one"; esle print "line";
 
 =head1 AUTHOR
 

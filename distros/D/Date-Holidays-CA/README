@@ -1,42 +1,376 @@
-Date-Holidays-CA version 0.02
-=============================
+NAME
+    Date::Holidays::CA - Date::Holidays::CA determines public holidays for
+    Canadian jurisdictions
 
-OVERVIEW
+VERSION
+    version 0.05
 
-This module determines public holidays for Canadian jurisdictions.
+SYNOPSIS
+        # procedural approach
 
+        use Date::Holidays::CA qw(:all);
 
-DEVELOPMENT STATUS
+        my ($year, $month, $day) = (localtime)[ 5, 4, 3 ];
+        $year  += 1900;
+        $month += 1;
 
-Alpha.  I'm very interested in feedback on dependencies, interface,
-features, and which holidays should be considered "canonical" stat holidays
-by default.  
+        print 'Woot!' if is_holiday($year, $month, $day, {province => 'BC'});
 
-
-INSTALLATION
-
-Install this module with the usual dance: 
-
-   perl Makefile.PL
-   make
-   make test
-   make install
+        my $calendar = holidays($year, {province => 'BC'});
+        print $calendar->('0701');              # "Canada Day/Fête du Canada"
 
 
-DEPENDENCIES
+        # object-oriented approach
 
-Perl 5.6 or later 
+        use DateTime;
+        use Date::Holidays::CA;
 
-Carp
-DateTime
-DateTime::Event::Easter
-Test::More
-Test::Exception
+        my $dhc = Date::Holidays::CA->new({ province => 'QC' });
 
+        print 'Woot!' if $dhc->is_holiday(DateTime->today);
 
-COPYRIGHT AND LICENCE
+        my $calendar = $dhc->holidays_dt(DateTime->today->year);
+        print join keys %$calendar, "\n";       # lists holiday names for QC
 
-Copyright (C) 2006-2009 by Rick Scott
+DESCRIPTION
+    Date::Holidays::CA determines public holidays for Canadian
+    jurisdictions. Its interface is a superset of that provided by
+    Date::Holidays -- read on for details.
 
-This module is free software!  You can copy, modify, share and
-distribute it under the same license as Perl itself.
+NAME
+    Date::Holidays::CA - Holidays for Canadian locales
+
+FUNCTIONS / METHODS
+  Class Methods
+   new()
+    Create a new Date::Holidays::CA object. Parameters should be given as a
+    hashref of key-value pairs.
+
+        my $dhc = Date::Holidays::CA->new();        # defaults
+
+        my $dhc = Date::Holidays::CA->new({
+            province => 'ON', language => 'EN'
+        });
+
+    Two parameters can be specified: province and language.
+
+   Province
+    *   CA
+
+        Canadian Federal holidays (the default).
+
+    *   AB
+
+        Alberta
+
+    *   BC
+
+        British Columbia
+
+    *   MB
+
+        Manitoba
+
+    *   NB
+
+        New Brunswick
+
+    *   NL
+
+        Newfoundland & Labrador
+
+    *   NS
+
+        Nova Scotia
+
+    *   NT
+
+        Northwest Territories
+
+    *   NU
+
+        Nunavut
+
+    *   ON
+
+        Ontario
+
+    *   PE
+
+        Prince Edward Island
+
+    *   QC
+
+        Quebec
+
+    *   SK
+
+        Saskatchewan
+
+    *   YT
+
+        Yukon Territory
+
+   Language
+    *   EN/FR
+
+        English text followed by French text.
+
+    *   FR/EN
+
+        French text followed by English text.
+
+    *   EN
+
+        English text only.
+
+    *   FR
+
+        French text only.
+
+  Object Methods
+   get()
+    Retrieve fields of a Date::Holidays::CA object.
+
+        $prov = $dhc->('province');
+
+   set()
+    Alter fields of a Date::Holidays::CA object. Specify parameters just as
+    with new().
+
+        $dhc->set({province => 'QC', language => 'FR/EN'});
+
+  Combination Methods
+    These methods are callable in either object-oriented or procedural
+    style.
+
+   is_holiday()
+    For a given year, month (1-12) and day (1-31), return 1 if the given day
+    is a holiday; 0 if not. When using procedural calling style, an
+    additional hashref of options can be specified.
+
+        $holiday_p = is_holiday($year, $month, $day);
+
+        $holiday_p = is_holiday($year, $month, $day, {
+            province => 'BC', language => 'EN'
+        });
+
+        $holiday_p = $dhc->is_holiday($year, $month, $day);
+
+   is_ca_holiday()
+    Similar to "is_holiday". Return the name of the holiday occurring on the
+    specified date if there is one; "undef" if there isn't.
+
+        print $dhc->is_ca_holiday(2001, 1, 1);          # "New Year's Day"
+
+   is_holiday_dt()
+    As is_holiday, but accepts a DateTime object in place of a numeric year,
+    month, and day.
+
+        $holiday_p = is_holiday($dt, {province => 'SK', language => 'EN'});
+
+        $holiday_p = $dhc->is_holiday($dt);
+
+   holidays()
+    For the given year, return a hashref containing all the holidays for
+    that year. The keys are the date of the holiday in "mmdd" format (eg
+    '1225' for December 25); the values are the holiday names.
+
+        my $calendar = holidays($year, {province => 'MB', language => 'EN'});
+        print $calendar->('0701');               # "Canada Day"
+
+        my $calendar = $dhc->holidays($year);
+        print $calendar->('1111');               # "Remembrance Day"
+
+   ca_holidays()
+    Same as "holidays()".
+
+   holidays_dt()
+    Similar to "holidays()", after a fashion: returns a hashref with the
+    holiday names as the keys and DateTime objects as the values.
+
+        my $calendar = $dhc->holidays_dt($year);
+
+SPECIFICATIONS
+    The following holidays are recognized:
+
+    *New Year's Day*
+        January 1.
+
+    *Islander Day*
+        PE. Originally added in 2009 as the second Monday in February, this
+        holiday will be revised to the third Monday in February starting in
+        2010. *This module shows Islander Day as falling on the third
+        Monday* -- see the *KNOWN BUGS* section.
+
+    *Family Day / Louis Riel Day*
+        The Third Monday of February is Family Day in AB, SK, and ON, and
+        Louis Riel Day in MB.
+
+    *St. Patrick's Day*
+        NL. Nearest Monday to March 17.
+
+    *Good Friday*
+        The Friday falling before Easter Sunday.
+
+    *Easter Monday*
+        CA, QC. The Monday following Easter Sunday.
+
+    *St. Patrick's Day*
+        NL. Nearest Monday to April 23.
+
+    *Victoria Day*
+        Monday falling on or before May 24.
+
+    *National Aboriginal Day*
+        NT. June 21.
+
+    *Saint-Jean-Baptiste Day*
+        QC. June 24.
+
+    *Discovery Day*
+        There are actually two holidays named "Discovery Day". Newfoundland
+        observes Discovery Day on the Monday nearest June 24, and the Yukon
+        observes Discovery Day on the third Monday of August.
+
+    *Canada Day*
+        July 1.
+
+    *Nunavut Day*
+        NU. July 9.
+
+    *Orangemen's Day*
+        NL. Monday nearest July 12.
+
+    *Civic Holiday*
+        AB, BC, MB, NB, NS, NT, NU, ON, PE, SK (that is to say, not CA, NL,
+        QC, or YT). First Monday of August.
+
+        Different provinces call this holiday different things -- eg "BC
+        Day" in British Columbia, "Alberta Heritage Day" in Alberta, "Natal
+        Day" in Nova Scotia and PEI, and so forth.
+
+    *Labour Day*
+        First Monday of September.
+
+    *Thanksgiving Day*
+        Second Monday of October.
+
+    *Remembrance Day*
+        All but ON and QC. November 11.
+
+    *Christmas Day*
+        December 25.
+
+    *Boxing Day*
+        CA, NL, NT, NU, ON, PE. December 26.
+
+    *National Day for Truth and Reconciliation*
+        CA and PE. September 30.
+
+REFERENCES
+    <http://en.wikipedia.org/wiki/Public_holidays_in_Canada>
+
+    <http://www.craigmarlatt.com/canada/symbols_facts&lists/holidays.html>
+
+    <http://www.craigmarlatt.com/canada/symbols_facts&lists/august_holiday.h
+    tml>
+
+    <http://geonames.nrcan.gc.ca/info/prov_abr_e.php> (Provincial
+    abbreviations)
+
+    A grillion government web pages listing official statutory holidays, all
+    of which seem to have gone offline or moved.
+
+    <http://www.gov.mb.ca/labour/standards/doc,louis-riel_day,factsheet.html
+    > (MB's Louis Riel Day)
+
+    <http://www.theguardian.pe.ca/index.cfm?sid=244766&sc=98> (PEI's
+    Islander Day)
+
+KNOWN BUGS
+    Historical holidays are not supported; the current set of holidays will
+    be projected into the past or future. For instance, Louis Riel Day was
+    added as a Manitoba holiday in 2008, but if you use this module to
+    generate a holiday list for 2007, Louis Riel Day will be present. Also,
+    PEI's Islander Day was first observed on the second Monday of 2009, but
+    will subsequently be observed on the third Monday of the month; this
+    module will always show it as occurring on the third Monday. This will
+    be addressed if there is demand to do so.
+
+    Several lesser holidays are not yet implemented:
+
+    *Calgary Stampede*
+        I am told that the morning of the Stampede Parade is commonly given
+        as a half-day holiday by employers within the city of Calgary, but I
+        haven't been able to verify this, nor does there seem to be a way to
+        mathematically calculate when parade day will be scheduled.
+
+    *St Johns Regatta Day*
+        Regatta Day is a municipal holiday in St Johns, NL, and it is
+        scheduled for the first Wednesday in August. However, if the weather
+        on Quidi Vidi Lake does not look promising on Regatta morning, the
+        event *(and the attendant holiday)* are postponed until the next
+        suitable day.
+
+        How to programatically determine the day of this holiday has not yet
+        been satisfactorily ascertained. Acme::Test::Weather has been
+        considered.
+
+    *Gold Cup and Saucer Day (PEI)*
+        Some few employees apparently get the day of the Gold Cup and Saucer
+        harness race as a holiday, but I haven't been able to independently
+        verify this.
+
+    *Construction Holiday (Quebec)*
+        In Quebec, the vast majority of the construction industry gets the
+        last full two weeks of July off, and it's also a popular time for
+        other folks to book vacation. Since this technically only applies to
+        a single industry, I haven't added it to this module, but I will if
+        there is sufficient demand.
+
+HELP WANTED
+    As you can see from the *KNOWN BUGS* section above, our holiday
+    structure can be fairly baroque. Different provinces and cities get
+    different holidays; sometimes these are paid statutory holidays that are
+    included in Employment Standards legislation; other times they are
+    unofficial holidays that are given by convention and codified only in
+    collective agreements and municipal by-laws. Thus, it's hard to know
+    what's commonly considered "a holiday" in the various regions of the
+    country without actually having lived and worked there.
+
+    I only have direct experience with British Columbia and Ontario; my
+    impression of what folks in other provinces consider to be a holiday is
+    based on research on the WWW. I've tried to define a holiday as any day
+    when "the majority of the workforce either get the day off (paid or
+    unpaid) or receive pay in lieu." If the holidays list in this module
+    doesn't accurately reflect the application of that definition to your
+    region of Canada, I'd like to hear about it.
+
+    Assistance with French translations of the holiday names and this
+    documentation is most welcome. My French isn't all that great, but I'm
+    happy to learn. =)
+
+    Finally, I'd appreciate an email from any users of this module. I'm
+    curious to know who has picked it up, and any feedback you might have
+    will shape its future development.
+
+CAVEATS
+    For reasons outlined in the two sections above, please be forewarned
+    that what days are considered holidays may change with versions of the
+    module.
+
+SEE ALSO
+    Date::Holidays
+    DateTime
+    DateTime::Event::Easter
+
+AUTHOR
+    Rick Scott <rick@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2006-2022 by Rick Scott.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

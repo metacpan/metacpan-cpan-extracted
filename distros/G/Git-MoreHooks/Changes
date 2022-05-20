@@ -1,5 +1,7 @@
 Revision history for Git-MoreHooks
 
+0.014     2022-05-17 22:38:18+02:00 Europe/Stockholm
+
 0.013     2022-05-15 10:13:21+02:00 Europe/Stockholm
             * Fix bug in CheckCommitAuthorFromMailmap.
             * Use HOOK DRIVERS in CheckCommitAuthorFromMailmap.

@@ -266,6 +266,20 @@ PIECES AND PIECE TYPES
     body of a new anonymous subroutine. This will be passed as a protosub
     CV in the cv field.
 
+ XPK_ARITHEXPR
+
+    atomic, emits op.
+
+       XPK_ARITHEXPR
+
+    An arithmetic expression is expected, parsed using parse_arithexpr(),
+    and passed as an optree in the op field.
+
+ XPK_ARITHEXPR_VOIDCTX, XPK_ARITHEXPR_SCALARCTX
+
+    Variants of XPK_ARITHEXPR which puts the expression in void or scalar
+    context.
+
  XPK_TERMEXPR
 
     atomic, emits op.
@@ -424,8 +438,20 @@ PIECES AND PIECE TYPES
     XPK_OPTIONAL or XPK_REPEATED sequence, to provide a "secondary keyword"
     that such a repeated item can look out for.
 
-    This was previously called XPK_STRING, and is provided as a synonym for
-    back-compatibility but new code should use this new name instead.
+ XPK_KEYWORD
+
+    atomic, can probe, emits nothing.
+
+       XPK_KEYWORD("keyword")
+
+    A literal string match is expected. No argument value is passed.
+
+    This is similar to XPK_LITERAL except that it additionally checks that
+    the following character is not an identifier character. This ensures
+    that the expected keyword-like behaviour is preserved. For example,
+    given the input "keyword", the piece XPK_LITERAL("key") would match it,
+    whereas XPK_KEYWORD("key") would not because of the subsequent "w"
+    character.
 
  XPK_SEQUENCE
 
@@ -528,6 +554,22 @@ PIECES AND PIECE TYPES
 
     A structural type which expects to find a sequence of pieces, all
     contained in parentheses as ( ... ). This will pass no extra arguments.
+
+ XPK_ARGSCOPE
+
+    structural, emits nothing.
+
+       XPK_ARGSCOPE(pieces ...)
+
+    A structural type similar to XPK_PARENSCOPE, except that the
+    parentheses themselves are optional; much like Perl's parsing of calls
+    to known functions.
+
+    If parentheses are encountered in the input, they will be consumed by
+    this piece and it will behave identically to XPK_PARENSCOPE. If there
+    is no open parenthesis, this piece will behave like XPK_SEQUENCE and
+    consume all the pieces inside it, without expecting a closing
+    parenthesis.
 
  XPK_BRACKETSCOPE
 

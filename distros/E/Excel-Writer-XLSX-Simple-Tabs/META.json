@@ -1,0 +1,55 @@
+{
+   "abstract" : "Simple Interface to the Excel::Writer::XLSX Package",
+   "author" : [
+      "Michael R. Davis"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Excel-Writer-XLSX-Simple-Tabs",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.46",
+            "ExtUtils::MakeMaker::META_MERGE::GitHub" : "0",
+            "Test::Simple" : "0.44"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Excel::Writer::XLSX" : "0",
+            "IO::Scalar" : "0",
+            "Package::New" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mrdvt92/perl-Excel-Writer-XLSX-Simple-Tabs/issues"
+      },
+      "homepage" : "https://github.com/mrdvt92/perl-Excel-Writer-XLSX-Simple-Tabs",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mrdvt92/perl-Excel-Writer-XLSX-Simple-Tabs.git"
+      }
+   },
+   "version" : "0.02"
+}

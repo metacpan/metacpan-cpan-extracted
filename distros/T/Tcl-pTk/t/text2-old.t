@@ -117,7 +117,7 @@ $t->bind("<Any-Enter>", sub { $t->focus });
 # Setup so we can tell that OnDestroy callbacks happen before <Destroy> bindings
 my $destroyText = '';
 $t->Subwidget('text')->OnDestroy(sub { 
-        print "Destroyed!\n"; 
+        print "# Destroyed!\n";
         $destroyText  .= "OnDestroy";
         # print $t->get('1.0','end') # Doesn't work for Tcl/pTk 8.5
 });

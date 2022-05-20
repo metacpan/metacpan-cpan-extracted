@@ -1,53 +1,134 @@
-Math-BigInt-GMPz
+NAME
+    Math::BigInt::GMPz - a math backend library based on Math::GMPz
 
-Math::BigInt::GMPz is a replacement library for Math::BigInt::Calc. It can be
-used via:
+SYNOPSIS
+        # to use it with Math::BigInt
+        use Math::BigInt lib => 'GMPz';
 
-    use Math::BigInt lib => 'GMPz';
+        # to use it with Math::BigFloat
+        use Math::BigFloat lib => 'GMPz';
 
-If Math::GMPz is not installed, this will safely fall back to Calc, the
-default library of Math::BigInt.
+        # to use it with Math::BigRat
+        use Math::BigRat lib => 'GMPz';
 
-Please read the documentation under PERFORMANCE in Math::BigInt on when to
-use this module and when not.
+DESCRIPTION
+    Math::BigInt::GMPz is a backend library for Math::BigInt,
+    Math::BigFloat, Math::BigRat and related modules. It is not indended to
+    be used directly.
 
-INSTALLATION
+    Math::BigInt::GMPz uses Math::GMPz objects for the calculations.
+    Math::GMPz is an XS layer on top of the very fast gmplib library. See
+    https://gmplib.org/
 
-To install this module, unpack the distribution file, and run the following
-commands:
+    Math::BigInt::GMPz inherits from Math::BigInt::Lib.
 
-    perl Makefile.PL
-    make
-    make test
-    make install
+METHODS
+    The following methods are implemented.
+
+    _new()
+    _zero()
+    _one()
+    _two()
+    _ten()
+    _from_bin()
+    _from_oct()
+    _from_hex()
+    _from_bytes()
+    _from_base()
+    _1ex()
+    _add()
+    _mul()
+    _div()
+    _sub()
+    _dec()
+    _inc()
+    _mod()
+    _sqrt()
+    _root()
+    _fac()
+    _dfac()
+    _pow()
+    _modinv()
+    _modpow()
+    _rsft()
+    _lsft()
+    _gcd()
+    _lcm()
+    _and()
+    _or()
+    _xor()
+    _is_zero()
+    _is_one()
+    _is_two()
+    _is_ten()
+    _is_even()
+    _is_odd()
+    _acmp()
+    _str()
+    _as_bin()
+    _as_oct()
+    _as_hex()
+    _to_bin()
+    _to_oct()
+    _to_hex()
+    _to_bytes()
+    _to_base()
+    _num()
+    _copy()
+    _len()
+    _zeros()
+    _digit()
+    _check()
+    _nok()
+    _fib()
+    _lucas()
+    _alen()
+    _set()
+
+BUGS
+    Please report any bugs or feature requests to "bug-math-bigint-gmpz at
+    rt.cpan.org", or through the web interface at
+    <https://rt.cpan.org/Ticket/Create.html?Queue=Math-BigInt-GMPz>
+    (requires login). We will be notified, and then you'll automatically be
+    notified of progress on your bug as I make changes.
 
 SUPPORT
+    After installing, you can find documentation for this module with the
+    perldoc command.
 
-After installing, you can find documentation for this module with the
-perldoc command.
+        perldoc Math::BigInt::GMPz
 
-    perldoc Math::BigInt::GMPz
-
-You can also look for information at:
+    You can also look for information at:
 
     GitHub
-        https://github.com/pjacklam/p5-Math-BigInt-GMPz
+        <https://github.com/pjacklam/p5-Math-BigInt-GMPz>
 
     RT: CPAN's request tracker
-        https://rt.cpan.org/Dist/Display.html?Name=Math-BigInt-GMPz
+        <https://rt.cpan.org/Dist/Display.html?Name=Math-BigInt-GMPz>
 
     MetaCPAN
-        https://metacpan.org/release/Math-BigInt-GMPz
+        <https://metacpan.org/release/Math-BigInt-GMPz>
 
     CPAN Testers Matrix
-        http://matrix.cpantesters.org/?dist=Math-BigInt-GMPz
+        <http://matrix.cpantesters.org/?dist=Math-BigInt-GMPz>
 
     CPAN Ratings
-        https://cpanratings.perl.org/dist/Math-BigInt-GMPz
+        <https://cpanratings.perl.org/dist/Math-BigInt-GMPz>
 
-COPYRIGHT AND LICENCE
+LICENSE
+    This program is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
 
-Peter John Acklam pjacklam@gmail.com, 2016-.
+AUTHOR
+    Peter John Acklam <pjacklam@gmail.com>
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+    Math::GMPz was written by Sisyphus Sisyphus <sisyphus at(@) cpan dot (.)
+    org>
+
+SEE ALSO
+    End user libraries Math::BigInt, Math::BigFloat, Math::BigRat, as well
+    as bigint, bigrat, and bignum.
+
+    Other backend libraries, e.g., Math::BigInt::Calc,
+    Math::BigInt::FastCalc, Math::BigInt::GMP, and Math::BigInt::Pari.
+

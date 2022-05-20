@@ -4,7 +4,7 @@
       "Michael R. Davis (mrdvt92@yahoo.com)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "unknown"
    ],
@@ -22,7 +22,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.46",
+            "Test::Simple" : "0.44"
          }
       },
       "configure" : {
@@ -42,7 +43,6 @@
             "Package::Role::ini" : "0.07",
             "Parallel::ForkManager" : "1.01",
             "Path::Class" : "0",
-            "Test::Simple" : "0.44",
             "Time::HiRes" : "0",
             "URI" : "0",
             "XML::LibXML::LazyBuilder" : "0"
@@ -50,5 +50,15 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.43"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mrdvt92/perl-Power-Outlet/issues"
+      },
+      "homepage" : "https://github.com/mrdvt92/perl-Power-Outlet",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mrdvt92/perl-Power-Outlet.git"
+      }
+   },
+   "version" : "0.44"
 }

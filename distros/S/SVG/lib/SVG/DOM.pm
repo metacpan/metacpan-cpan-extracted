@@ -4,7 +4,7 @@ use warnings;
 
 use Scalar::Util qw/weaken/;
 
-our $VERSION = '2.86';
+our $VERSION = '2.87';
 
 # this module extends SVG::Element
 package SVG::Element;
@@ -542,7 +542,7 @@ sub findChildIndex {
         $index++;
     }
 
-    return -1;                # Child not found
+    return -1;    # Child not found
 }
 
 # ---------------

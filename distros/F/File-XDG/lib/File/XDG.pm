@@ -8,7 +8,7 @@ use Ref::Util qw( is_coderef is_arrayref );
 use if $^O eq 'MSWin32', 'Win32';
 
 # ABSTRACT: Basic implementation of the XDG base directory specification
-our $VERSION = '1.01'; # VERSION
+our $VERSION = '1.02'; # VERSION
 
 
 
@@ -86,7 +86,7 @@ sub new {
         $self->{data}        = $ENV{XDG_DATA_HOME}   || "$local\\.local\\share\\";
         $self->{cache}       = $ENV{XDG_CACHE_HOME}  || "$local\\.cache\\";
         $self->{config}      = $ENV{XDG_CONFIG_HOME} || "$local\\.config\\";
-        $self->{state}       = $ENV{XDG_STATE_HOME}  || "$local\\.state\\";
+        $self->{state}       = $ENV{XDG_STATE_HOME}  || "$local\\.local\\state\\";
         $self->{data_dirs}   = $ENV{XDG_DATA_DIRS}   || '';
         $self->{config_dirs} = $ENV{XDG_CONFIG_DIRS} || '';
     } else {
@@ -94,7 +94,7 @@ sub new {
         $self->{home}        = $home;
         $self->{data}        = $ENV{XDG_DATA_HOME}   || "$home/.local/share/";
         $self->{cache}       = $ENV{XDG_CACHE_HOME}  || "$home/.cache/";
-        $self->{state}       = $ENV{XDG_STATE_HOME}  || "$home/.state/";
+        $self->{state}       = $ENV{XDG_STATE_HOME}  || "$home/.local/state/";
         $self->{config}      = $ENV{XDG_CONFIG_HOME} || "$home/.config/";
         $self->{data_dirs}   = $ENV{XDG_DATA_DIRS}   || '/usr/local/share:/usr/share';
         $self->{config_dirs} = $ENV{XDG_CONFIG_DIRS} || '/etc/xdg';
@@ -265,7 +265,7 @@ File::XDG - Basic implementation of the XDG base directory specification
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =head1 SYNOPSIS
 

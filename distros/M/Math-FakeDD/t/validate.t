@@ -64,6 +64,7 @@ for(my $i = -300; $i <= 300; $i++) {
     my $check1 = Math::FakeDD->new($repro);
     cmp_ok($check1, '==', $orig, "$str: round trip achieved");
 
+    # round down by removing the least significant mantissa digit
     my @chop  = split /e/i, $repro;
     chop($chop[0]);
     next if $chop[0] =~ /\.$/;

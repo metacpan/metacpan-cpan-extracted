@@ -2,6 +2,10 @@
 ##
 ## Change log for perl distribution PDL::Ngrams
 
+v0.12 Tue, 17 May 2022 21:45:51 +0200 moocow
+	+ use https git URL in CPAN metadata as suggested by mowhawk2
+	  - avoid future headaches due to https://github.blog/2021-09-01-improving-git-protocol-security-github/
+
 v0.11 Sat, 14 May 2022 21:29:00 +0200 moocow
 	+ add MetaCPAN metadata to Makefile.PL
 	+ fix bogus "PDL::Ngrams::ngutils" references in PODs (github issue #1)

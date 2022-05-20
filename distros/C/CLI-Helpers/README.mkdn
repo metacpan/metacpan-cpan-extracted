@@ -4,7 +4,7 @@ CLI::Helpers - Subroutines for making simple command line scripts
 
 # VERSION
 
-version 1.8
+version 1.9
 
 # SYNOPSIS
 
@@ -37,7 +37,7 @@ Use this module to make writing intelligent command line scripts easier.
     # Ask for a favorite animal
     my $favorite = menu("Select your favorite animal:", [qw(dog cat pig fish otter)]);
 
-Running as test.pl:
+Running:
 
     $ ./test.pl
     Hello, World!
@@ -76,7 +76,7 @@ This module provides a library of useful functions for constructing simple comma
 line interfaces.  It is able to extract information from the environment and your
 ~/.gitconfig to display data in a reasonable manner.
 
-Using this module adds argument parsing using [Getopt::Long](https://metacpan.org/pod/Getopt::Long) to your script.  It
+Using this module adds argument parsing using [Getopt::Long](https://metacpan.org/pod/Getopt%3A%3ALong) to your script.  It
 enables pass-through, so you can still use your own argument parsing routines or
 Getopt::Long in your script.
 
@@ -233,7 +233,7 @@ See also: **text\_input**
 
 # EXPORT
 
-This module uses [Sub::Exporter](https://metacpan.org/pod/Sub::Exporter) for flexible imports, the defaults provided by
+This module uses [Sub::Exporter](https://metacpan.org/pod/Sub%3A%3AExporter) for flexible imports, the defaults provided by
 :all are as follows.
 
 ## Exported Functions
@@ -297,9 +297,9 @@ From CLI::Helpers:
 
 # NOPASTE
 
-This is optional and will only work if you have [App::Nopaste](https://metacpan.org/pod/App::Nopaste) installed.  If
+This is optional and will only work if you have [App::Nopaste](https://metacpan.org/pod/App%3A%3ANopaste) installed.  If
 you just specify `--nopaste`, any output that would be displayed to the screen
-is submitted to the [App::Nopaste::Service::Shadowcat](https://metacpan.org/pod/App::Nopaste::Service::Shadowcat) paste bin.  This
+is submitted to the [App::Nopaste::Service::Shadowcat](https://metacpan.org/pod/App%3A%3ANopaste%3A%3AService%3A%3AShadowcat) paste bin.  This
 paste service is pretty simple, but works reliably.
 
 During the `END` block, the output is submitted and the URL of the paste is
@@ -416,7 +416,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Brad Lhotsky.
+This software is Copyright (c) 2022 by Brad Lhotsky.
 
 This is free software, licensed under:
 

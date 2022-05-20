@@ -15,6 +15,12 @@ BEGIN { $^H{"t::structures/permit"} = 1; }
    is( scopeparen ( "abc" ), "abc", 'parenthesis scope' );
 }
 
+# arg scope - parens are optional
+{
+   is( scopeargs ( "123" ), "123", 'arguments scope with parens' );
+   is( scopeargs "123",     "123", 'arguments scope without parens' );
+}
+
 # bracket scope
 {
    is( scopebracket [ "def" ], "def", 'bracket scope' );

@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use UI::Various::core;
 use UI::Various::Button;
@@ -92,7 +92,11 @@ sub _prepare($$$)
 	return 1;
     }
     $self->_tk(	$_->_tk
-		->Button(-text => $self->text, -command => $self->code)
+		->Button(-text => $self->text,
+			 -command => sub {
+			     local $_ = $self->code;
+			     &$_($self->_toplevel, $self);
+			})
 		->grid(-row => $row, -column => $column));
     return 0;
 }

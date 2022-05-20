@@ -1,0 +1,60 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+use Addr::MyIP;
+use Data::Dumper;
+use Net::DynDNS::GoDaddy qw(:all);
+
+my ($host, $domain, $new_ip) = @ARGV;
+
+if (! defined $host || ! defined $domain) {
+    help();
+}
+
+if (! -e Net::DynDNS::GoDaddy::_api_key_file()) {
+    print "\nPlease enter your GoDaddy API key and hit ENTER: ";
+    my $key = <STDIN>;
+    print "\nPlease enter your GoDaddy API secret and hit ENTER: ";
+    my $secret = <STDIN>;
+
+    chomp $key;
+    chomp $secret;
+
+    api_key_set($key, $secret);
+}
+
+my $local_ip;
+
+if (defined $new_ip) {
+    if ($new_ip !~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/) {
+        print "IP address '$new_ip' is invalid.\n";
+        exit;
+    }
+
+    $local_ip = $new_ip;
+}
+else {
+    $local_ip = myip();
+}
+
+my $current_ip = host_ip_get($host, $domain);
+
+if ($current_ip ne $local_ip) {
+    my $result = host_ip_set($host, $domain, $local_ip);
+
+    if ($result) {
+        print "Updated record for '$host.$domain' from $current_ip to $local_ip\n";
+    }
+    else {
+        print "Encountered an error, couldn't update record\n";
+    }
+}
+else {
+    print "Not updating the '$host.$domain' record, IPs are the same\n";
+}
+
+sub help {
+    print "\n\nUsage: update-ip host domain.name [ip.addr]\n\n";
+    exit;
+}

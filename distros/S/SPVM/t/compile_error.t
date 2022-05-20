@@ -133,20 +133,6 @@ sub print_error_messages {
   compile_not_ok_file('TestCase::CompileError::OArray::AssignNumericArray');
 }
 
-# Literal
-{
-  # Caharater
-  {
-    compile_not_ok_file('TestCase::CompileError::Literal::Character::InvalidCharacterLiteralEmpty');
-    compile_not_ok_file('TestCase::CompileError::Literal::Character::InvalidCharacterLiteral');
-    compile_not_ok_file('TestCase::CompileError::Literal::Character::NotEnd');
-    compile_not_ok_file('TestCase::CompileError::Literal::Character::InvalidHexAscii1');
-    compile_not_ok_file('TestCase::CompileError::Literal::Character::InvalidHexAscii2');
-  }
-  # Integer
-  compile_not_ok_file('TestCase::CompileError::Literal::Integer::IntOutOfRange');
-}
-
 # Enum
 {
   compile_not_ok_file('TestCase::CompileError::Enum::PrivateAccess');
@@ -162,10 +148,10 @@ sub print_error_messages {
   }
 }
 
-# Value
+# Multi-numeric
 {
-  compile_not_ok_file('TestCase::CompileError::Value::FieldsZero');
-  compile_not_ok_file('TestCase::CompileError::Value::Fields17');
+  compile_not_ok_file('TestCase::CompileError::MultiNumeric::FieldsZero');
+  compile_not_ok_file('TestCase::CompileError::MultiNumeric::Fields17');
 }
 
 # Call method
@@ -241,7 +227,7 @@ sub print_error_messages {
   compile_not_ok_file('TestCase::CompileError::Convert::ConvertFromStringToByteArray');
   compile_not_ok_file('TestCase::CompileError::Convert::ConvertToRef');
   compile_not_ok_file('TestCase::CompileError::Convert::ConvertFromRef');
-  compile_not_ok_file('TestCase::CompileError::Convert::ConvertFromValueType');
+  compile_not_ok_file('TestCase::CompileError::Convert::ConvertFromMultiNumericType');
 }
 
 # Concat
@@ -410,7 +396,7 @@ sub print_error_messages {
 
 # Method
 {
-  compile_not_ok_file('TestCase::CompileError::Method::Begin');
+  compile_not_ok_file('TestCase::CompileError::Method::INIT');
   compile_not_ok_file('TestCase::CompileError::Method::TooManyArguments', qr/Too many arguments/i);
   compile_not_ok_file('TestCase::CompileError::Method::TooManyArgumentsMulnum'. qr/Too many arguments/i);
   
@@ -442,5 +428,200 @@ sub print_error_messages {
     }
   }
 }
+
+# Subtraction Operator
+{
+  # The beginning of the number is an integer literal
+  {
+    {
+      my $source = 'class Tmp { static method main : void () { my $num = 0; $num-2; } }';
+      compile_not_ok($source, qr/Unexpected token "-2"/);
+    }
+  }
+}
+
+# Literal
+{
+  # Integer literal
+  {
+    # Integer literal decimal notation
+    {
+      compile_not_ok_file('TestCase::CompileError::Literal::Integer::IntOutOfRange', qr/The numeric literal "8232624535311216194" is out of range of maximum and minimum values of int type/);
+      {
+        # Greater than int max value
+        my $source = 'class Tmp { static method main : void () { 2147483648; } }';
+        compile_not_ok($source, qr/The numeric literal "2147483648" is out of range of maximum and minimum values of int type/);
+      }
+      {
+        # Less than int minimal value
+        my $source = 'class Tmp { static method main : void () { -2147483649; } }';
+        compile_not_ok($source, qr/The numeric literal "-2147483649" is out of range of maximum and minimum values of int type/);
+      }
+      {
+        # Greater than long max value
+        my $source = 'class Tmp { static method main : void () { 9223372036854775808L; } }';
+        compile_not_ok($source, qr/The numeric literal "9223372036854775808L" is out of range of maximum and minimum values of long type/);
+      }
+      {
+        # Less than long minimal value
+        my $source = 'class Tmp { static method main : void () { -9223372036854775809L; } }';
+        compile_not_ok($source, qr/The numeric literal "-9223372036854775809L" is out of range of maximum and minimum values of long type/);
+      }
+      {
+        # Invalid "_"
+        my $source = 'class Tmp { static method main : void () { _-123; } }';
+        compile_not_ok($source, qr/Unexpected token "-123"/);
+      }
+      {
+        # Invalid "_"
+        my $source = 'class Tmp { static method main : void () { -_123; } }';
+        compile_not_ok($source, qr/Unexpected token ";"/);
+      }
+      {
+        # Invalid "_"
+        my $source = 'class Tmp { static method main : void () { 123L_; } }';
+        compile_not_ok($source, qr/Unexpected token "_"/);
+      }
+    }
+
+    # Integer literal hexadecimal notation
+    {
+      {
+        # Greater than int max value
+        my $source = 'class Tmp { static method main : void () { 0x100000000; } }';
+        compile_not_ok($source, qr/The numeric literal "0x100000000" is out of range of maximum and minimum values of int type at/);
+      }
+      {
+        # Greater than long max value
+        my $source = 'class Tmp { static method main : void () { 0x10000000000000000L; } }';
+        compile_not_ok($source, qr/The numeric literal "0x10000000000000000L" is out of range of maximum and minimum values of long type at/);
+      }
+      {
+        # Invalid "_"
+        my $source = 'class Tmp { static method main : void () { _-0xFF; } }';
+        compile_not_ok($source, qr/Unexpected token "-0xFF"/);
+      }
+      {
+        # Invalid "_"
+        my $source = 'class Tmp { static method main : void () { -0_xFF; } }';
+        compile_not_ok($source, qr/Unexpected token "xFF"/);
+      }
+      {
+        # Invalid "_"
+        my $source = 'class Tmp { static method main : void () { 0xFFL_; } }';
+        compile_not_ok($source, qr/Unexpected token "_"/);
+      }
+    }
+
+    # Integer literal octal notation
+    {
+      {
+        # Greater than int max value
+        my $source = 'class Tmp { static method main : void () { 040000000000; } }';
+        compile_not_ok($source, qr/The numeric literal "040000000000" is out of range of maximum and minimum values of int type at/);
+      }
+      {
+        # Greater than long max value
+        my $source = 'class Tmp { static method main : void () { 0x2000000000000000000000L; } }';
+        compile_not_ok($source, qr/The numeric literal "0x2000000000000000000000L" is out of range of maximum and minimum values of long type at/);
+      }
+      {
+        # Invalid "_"
+        my $source = 'class Tmp { static method main : void () { _-077; } }';
+        compile_not_ok($source, qr/Unexpected token "-077"/);
+      }
+      {
+        # Invalid "_"
+        my $source = 'class Tmp { static method main : void () { 0x77L_; } }';
+        compile_not_ok($source, qr/Unexpected token "_"/);
+      }
+    }
+
+    # Integer literal binary notation
+    {
+      {
+        # Greater than int max value
+        my $source = 'class Tmp { static method main : void () { 0b100000000000000000000000000000000; } }';
+        compile_not_ok($source, qr/The numeric literal "0b100000000000000000000000000000000" is out of range of maximum and minimum values of int type at/);
+      }
+      {
+        # Greater than long max value
+        my $source = 'class Tmp { static method main : void () { 0b10000000000000000000000000000000000000000000000000000000000000000L; } }';
+        compile_not_ok($source, qr/The numeric literal "0b10000000000000000000000000000000000000000000000000000000000000000L" is out of range of maximum and minimum values of long type at/);
+      }
+      {
+        # Invalid "_"
+        my $source = 'class Tmp { static method main : void () { _-0b11; } }';
+        compile_not_ok($source, qr/Unexpected token "-0b11"/);
+      }
+      {
+        # Invalid "_"
+        my $source = 'class Tmp { static method main : void () { -0_b11; } }';
+        compile_not_ok($source, qr/Unexpected token "b11"/);
+      }
+      {
+        # Invalid "_"
+        my $source = 'class Tmp { static method main : void () { 0b11L_; } }';
+        compile_not_ok($source, qr/Unexpected token "_"/);
+      }
+    }
+  }
+  
+  # Floating point literal
+  {
+    # Floating point literal decimal notation
+    {
+      {
+        # Invalid "_"
+        my $source = 'class Tmp { static method main : void () { _-1.23; } }';
+        compile_not_ok($source, qr/Unexpected token "-1.23"/);
+      }
+      {
+        # Invalid "_"
+        my $source = 'class Tmp { static method main : void () { -_1.23; } }';
+        compile_not_ok($source, qr/Unexpected token "."/);
+      }
+      {
+        # Invalid "_"
+        my $source = 'class Tmp { static method main : void () { 1.23f_; } }';
+        compile_not_ok($source, qr/Unexpected token "_"/);
+      }
+    }
+
+    # Floating point literal dexadecimal notation
+    {
+      {
+        # Invalid "_"
+        my $source = 'class Tmp { static method main : void () { _-0xFF.FF; } }';
+        compile_not_ok($source, qr/Unexpected token "-0xFF.FF"/);
+      }
+      {
+        # Invalid "_"
+        my $source = 'class Tmp { static method main : void () { -0_xFF.FF; } }';
+        compile_not_ok($source, qr/Unexpected token "xFF"/);
+      }
+      {
+        # Invalid "_"
+        my $source = 'class Tmp { static method main : void () { 0xFF.FFp5F_; } }';
+        compile_not_ok($source, qr/Unexpected token "_"/);
+      }
+    }
+  }
+
+  # Caharater literal
+  {
+    compile_not_ok_file('TestCase::CompileError::Literal::Character::InvalidCharacterLiteralEmpty', qr/A character literal can't be empty/);
+    compile_not_ok_file('TestCase::CompileError::Literal::Character::InvalidCharacterLiteral', qr/\QInvalid charater literal escape character "\A"/);
+    compile_not_ok_file('TestCase::CompileError::Literal::Character::NotEnd', qr/A character literal must ends with "'"/);
+    compile_not_ok_file('TestCase::CompileError::Literal::Character::InvalidHexAscii1', qr/\QAfter "\x" of the charater literal hexadecimal escape character, one or tow hexadecimal numbers must follow/);
+    compile_not_ok_file('TestCase::CompileError::Literal::Character::InvalidHexAscii2', qr/A character literal must ends with "'"/);
+    {
+      # Invalid "_"
+      my $source = q|class Tmp { static method main : void () { '\x{a' } }|;
+      compile_not_ok($source, qr/The charater literal hexadecimal escape character that has the opening "\{" must have the closing "\}"/);
+    }
+  }
+}
+
 
 done_testing;

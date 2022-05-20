@@ -13,39 +13,42 @@ use warnings;
 use Mail::DKIM::ARC::Verifier;
 use Net::DNS::Resolver::Mock;
 use Mail::DKIM;
-use Getopt::Long;
+use Getopt::Long::Descriptive;
 use Pod::Usage;
 
-my ($as_canonicalization, $ams_canonicalization);
-my ($details, $dns, $help);
 my $FakeResolver;
 
-GetOptions(
-		"as-canonicalization=s" => \$as_canonicalization,
-		"ams-canonicalization=s" => \$ams_canonicalization,
-		"dns=s" => \$dns,
-		"details" => \$details,
-		"help" => \$help,
-		)
-	or pod2usage(2);
-pod2usage(1) if $help or @ARGV > 0;
+my ($opt, $usage) = describe_options(
+  "%c %o < original_email.txt",
+  [ "as-canonicalization=s" => "Output canonicalized message to file for ARC-Seal debugging" ],
+  [ "ams-canonicalization=s" => "Output canonicalized message to file for ARC-Message-Signature debugging" ],
+  [ "dns=s" => "Use DNS records from this file rather than using real DNS" ],
+  [ "details" => "Show details of ARC evaluation" ],
+  [ "help|?" => "Show help" ],
+  {show_defaults=>1},
+);
 
-my ($asfh, $amsfh);
-if (defined $as_canonicalization)
-{
-	open $asfh, ">", $as_canonicalization
-		or die "Error: cannot write to $as_canonicalization: $!\n";
+if ($opt->help) {
+  print $usage->text;
+  exit 1;
 }
 
-if (defined $ams_canonicalization)
+my ($asfh, $amsfh);
+if (defined $opt->as_canonicalization)
 {
-	open $amsfh, ">", $ams_canonicalization
-		or die "Error: cannot write to $ams_canonicalization: $!\n";
+	open $asfh, ">", $opt->as_canonicalization
+		or die "Error: cannot write to ".$opt->as_canonicalization.": $!\n";
+}
+
+if (defined $opt->ams_canonicalization)
+{
+	open $amsfh, ">", $opt->ams_canonicalization
+		or die "Error: cannot write to ".$opt->ams_canonicalization.": $!\n";
 }
 
 # use fake DNS records
-if($dns) {
-	open(DNSR, "<$dns") or die "cannot open $dns";
+if($opt->dns) {
+	open(DNSR, "<", $opt->dns) or die "cannot open ".$opt->dns;
 	my $dnsrecs = join("", <DNSR>);
 	close DNSR;
 
@@ -69,7 +72,7 @@ $arc->CLOSE;
 
 print "RESULT: " . $arc->result . "\n";
 
-if($details) {
+if($opt->details) {
 	printf "DETAILS: %s\nRESULTS: %s\n", $arc->{details}, $arc->result_detail;
 
 	my @sigs = @{$arc->{signatures}};
@@ -103,33 +106,13 @@ arcverify.pl - verifies ARC signatures on an email message
   arcverify.pl --help
     to see a full description of the various options
 
-=head1 OPTIONS
-
-=over
-
-=item B<--as-canonicalization>
-=item B<--ams-canonicalization>
-
-Outputs the canonicalized message used for the ARC-Seal or ARC-Message-Signature
-to the specified file, in addition
-to computing the ARC signature. This is helpful for debugging
-canonicalization methods.
-
-=item B<--details>
-
-Print details of ARC evaluation.
-
-=item B<--dnsrecords=FILE>
-
-Use DNS records from that file rather than the real DNS.
-
-=back
-
 =head1 AUTHOR
 
 Jason Long, E<lt>jlong@messiah.eduE<gt>
 
 John Levine, E<lt>john.levine@standcore.comE<gt>
+
+Marc Bradshaw, E<lt>marc@marcbradshaw.netE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Hash::RestrictedKeys::Tie;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 use overload '%{}' => sub { ${$_[0]}->{hash}; }, fallback => 1;
 
@@ -31,7 +31,7 @@ Hash::RestrictedKeys - restricted hash keys
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 
@@ -60,7 +60,16 @@ Perhaps a little code snippet.
 	$foo{two} = 2;
 	$foo{three} = 3;
 	$foo->{four} = 'kaput'; # Invalid key four. Allowed keys: one, two, three
-	
+
+=head1 METHODS
+
+=cut
+
+=head2 new
+
+Instantiate a new Hash::RestrictedKeys Object which is a wrapper around Hash::RestrictedKeys::Tie.
+
+	Hash::RestrictedKeys->new();	
 
 =head1 AUTHOR
 

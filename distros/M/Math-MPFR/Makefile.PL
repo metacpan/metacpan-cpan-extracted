@@ -19,7 +19,7 @@ my $have_float128   = undef; # Default value
 my $want_float128   = undef; # Default value
 my $checklib        = 1;     # Check for availability of mpfr and gmp libraries.
 
-print " Running some (possibly noisy) pre-build checks\n to see what's available ....\n";
+print " Running some (possibly noisy) pre-build checks\n to find out what's available ....\n\n";
 
 my $SAVE;
 my $save = open $SAVE, '>', 'save_config.txt';
@@ -108,7 +108,10 @@ if(!defined($have_decimal64)) { # _Decimal64 support still undetermined
 
     if(-e 'try_dec64.exe') {
       $out = $^O =~ /MSWin32/i ? `try_dec64.exe` : `./try_dec64.exe`;
-      if($out == 42) {$have_decimal64 = 1}
+      {
+        no warnings 'numeric';
+        if($out == 42) {$have_decimal64 = 1}
+      }
       if($save) {print $SAVE "try_dec64.exe: $out\n"}
     }
   }
@@ -155,7 +158,10 @@ if(!defined($have_decimal128)) { # _Decimal128 support still undetermined
 
     if(-e 'try_dec128.exe') {
       $out = $^O =~ /MSWin32/i ? `try_dec128.exe` : `./try_dec128.exe`;
-      if($out == 128) {$have_decimal128 = 1}
+      {
+        no warnings 'numeric';
+        if($out == 128) {$have_decimal128 = 1}
+      }
       if($save) {print $SAVE "try_dec128.exe: $out\n"}
     }
   }
@@ -224,13 +230,18 @@ if(!defined($have_float128)) { # __float128 support, having not yet been
     my $out = `$mycc $ccflags -o try_flt128.exe -x c try_flt128.in $mkinc $mylibs 2>&1`;
 
     if($out) {
-      print "$out\n";
+      # print "$out\n"; # No need to confuse people by
+                        # displaying contents of $out.
+
       if($save) {print $SAVE "try_flt128 build: $out\n"}
     }
 
     if(-e 'try_flt128.exe') {
       $out = $^O =~ /MSWin32/i ? `try_flt128.exe` : `./try_flt128.exe`;
-      if($out == 42) {$have_float128 = 1}
+      {
+        no warnings 'numeric';
+        if($out == 42) {$have_float128 = 1}
+      }
       if($save) {print $SAVE "try_flt128.exe: $out\n"}
     }
   }
@@ -238,7 +249,7 @@ if(!defined($have_float128)) { # __float128 support, having not yet been
 
 close $SAVE or warn "Couldn't close save_config.txt";
 
-print "Pre-build checks completed\n";
+print " .... pre-build checks completed\n\n";
 
 my $float128_message = $have_float128 ? "Attempting to build with Math::Float128 support\n"
                                       : "Building without Math::Float128 support\n";
@@ -247,7 +258,7 @@ my $defines = $] < 5.008 ? "-DOLDPERL" : "-DNEWPERL";
 
 ####################################
 # Next, we check to see whether there's some unhelpful beaviour regarding
-# the setting of the POK flag - but only if $] < 5.035010..
+# the setting of the POK flag - but only if $] < 5.035010.
 # This typically occurs in versions of perl prior to 5.22.0, but it can
 # arise elsewhere, eg:
 # http://www.cpantesters.org/cpan/report/dc17e330-900b-11ec-bfc9-d1f1448276d4

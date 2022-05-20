@@ -13,7 +13,7 @@ use DynaLoader;
 
 
 
-   $PDL::Ngrams::Utils::VERSION = 0.11;
+   $PDL::Ngrams::Utils::VERSION = 0.12;
    @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Ngrams::Utils $VERSION;

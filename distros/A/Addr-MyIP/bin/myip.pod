@@ -1,0 +1,35 @@
+=head1 NAME
+
+myip - Get your public IPv4 or IPv6 address
+
+=for html
+<a href="https://github.com/stevieb9/addr-myip/actions"><img src="https://github.com/stevieb9/addr-myip/workflows/CI/badge.svg"/></a>
+<a href='https://coveralls.io/github/stevieb9/addr-myip?branch=main'><img src='https://coveralls.io/repos/stevieb9/addr-myip/badge.svg?branch=main&service=github' alt='Coverage Status' /></a>
+
+=head1 DESCRIPTION
+
+Command line utility to get and display your public IPv4 or IPv6 address.
+
+=head1 USAGE
+
+    # Display IPv4 address
+
+    myip
+
+    # Display IPv6 address (if available)
+
+    myip 6
+
+=head1 AUTHOR
+
+Steve Bertrand, C<< <steveb at cpan.org> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2020-2021 Steve Bertrand.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>

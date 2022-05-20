@@ -13,7 +13,7 @@ use Dancer2::Plugin::FormValidator::Input;
 use Dancer2::Plugin::FormValidator::Processor;
 use Types::Standard qw(InstanceOf);
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 plugin_keywords qw(validate validated errors);
 
@@ -172,7 +172,7 @@ Dancer2::Plugin::FormValidator - neat and easy to start form validation plugin f
 
 =head1 VERSION
 
-version 1.00
+version 1.01
 
 =head1 SYNOPSIS
 
@@ -472,7 +472,7 @@ Validates that field B<exists> and one of the listed: (yes on 1).
 
 =head3 alpha
 
-    alpha(String $encoding = 'a'): Bool
+    alpha(Str $encoding = 'a'): Bool
 
 Validate that string only contain of alphabetic symbols.
 By default encoding is ascii, i.e B</^[[:alpha:]]+$/a>.
@@ -487,7 +487,7 @@ Then the validation rule will be B</^[[:alpha:]]+$/>.
 
 =head3 alpha_num
 
-    alpha_num(String $encoding = 'a'): Bool
+    alpha_num(Str $encoding = 'a'): Bool
 
 Validate that string only contain of alphabetic symbols, underscore and numbers 0-9.
 By default encoding is ascii, i.e. B</^\w+$/a>.
@@ -582,7 +582,7 @@ Validate that field exists and not empty string.
 
 =head3 required_with
 
-    required_with(String $field_name): Bool
+    required_with(Str $field_name): Bool
 
 Validate that field exists and not empty string if another field is exists and not empty.
 
@@ -591,7 +591,7 @@ Validate that field exists and not empty string if another field is exists and n
 
 =head3 same
 
-    same(String $field_name): Bool
+    same(Str $field_name): Bool
 
 Validate that field is exact value as another.
 

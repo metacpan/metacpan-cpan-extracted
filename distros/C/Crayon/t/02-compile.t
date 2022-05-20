@@ -1,7 +1,6 @@
 use Test::More;
 
 use Crayon;
-
 compile_test(
 	{
 		body => {
@@ -22,7 +21,6 @@ body .other {
 }
 |,
 );
-
 
 compile_test(
 	{

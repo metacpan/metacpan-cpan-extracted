@@ -1,0 +1,7 @@
+0.02 2022-05-19T17:00:17+02:00
+ - Add tests for missing input values (field and subfield).
+ - Fix test dependencies.
+ - Remove unused module.
+
+0.01 2022-05-18T22:16:29+02:00
+ - First version.

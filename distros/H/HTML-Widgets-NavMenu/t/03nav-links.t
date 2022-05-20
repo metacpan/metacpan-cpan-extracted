@@ -54,7 +54,7 @@ my @site_args = (
 
     # TEST
     ok(
-        ( scalar( keys(%$nav_links) ) == 1 )
+        ( 1 ? ( scalar( keys(%$nav_links) ) == 1 ) : 1 )
             && ( exists( $nav_links->{'next'} ) ),
         "Lack of Nav-Links in the First Page"
     );

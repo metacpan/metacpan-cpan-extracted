@@ -77,7 +77,7 @@ $t->SelectionHandle( -selection => 'CLIPBOARD',
                 #print "selection handle args ".join(", ", @args)."\n";
                 
                 ok($args[0], 0, "1st SelectionHandle Arg is zero");
-                ok($args[1] =~ /^\d+$/, 1, "2nd SelectionHandle Arg is number");
+                ok($args[1], qr/^\d+$/, "2nd SelectionHandle Arg is number");
 
                 return "Selection Handle Return";
         }

@@ -24,7 +24,7 @@ my $e1 = $TOP->Entry(@relief,
             -validatecommand => sub {
                     ($proposed, $changes, $current, $index, $type) = @_;
                     #print join(", ", $proposed, $changes, $current, $index, $type)."\n";
-                    return not $proposed =~ m/[^\d]/g;
+                    return $proposed !~ m/[^\d]/g;
             },
             -invalidcommand => sub{ $invalid = 1; return 0}  # invalid will be set to 1 if called
 )->pack(@pl);

@@ -1,6 +1,31 @@
 Summary of Changes to Tcl::pTk
 
-Release 1.08:  2020-07-17
+1.09  2022-05-19
+
+ * Support ttk::treeview `cellselection` command (Tk 8.7 TIP 552)
+ * Workaround Tk Aqua bug f16cdb6d04 in bgerror1.t, tkHijack_bgerror1.t,
+   and tkHijack_bgerror3.t
+ * Workaround Tk Aqua bug fc5073a451 in mainloopMult.t, multMainWindow1.t,
+   and tkHijack_bgerror1.t
+ * Implement $w->Widget() method
+ * Improve $w->imageNames() method; fix bitmapSubClass.t and photoSubClass.t
+ * Fix Tcl::pTk::Widget::_addcascade() for Tk 8.7
+
+1.08_02  2021-04-04
+
+ * Specify GitHub issues as bugtracker
+ * Avoid requiring sys/ioctl.ph for emulated fileevent
+   on BSD and macOS (RT #125662)
+
+1.08_01  2020-07-18
+
+ * Add internal variable $Tcl::pTk::_Tile_ge_0840 to indicate whether Tile/Ttk
+   version is 0.8.4.0 or later, which is needed by certain features.
+   Use this variable to address new test failures in tileTree.t on CentOS 6.
+ * Make Time::HiRes dependency explicit: it is a core module, but is not
+   installed by default on some distributions, e.g. CentOS 6.
+
+1.08  2020-07-17
 
  * Improved support for ttk::treeview `item`, `selection`, and `tag` commands
    as ttkTreeview methods: these now return Perl lists rather than string
@@ -8,11 +33,11 @@ Release 1.08:  2020-07-17
  * Emulate timeofday() with Time::HiRes::time()
    instead of Tcl 8.5+ [clock microseconds]
 
-Release 1.07:  2020-03-13
+1.07  2020-03-13
 
  * Allow '.' in Cascade labels (RT #125058)
 
-Release 1.06_01:  2020-03-12
+1.06_01  2020-03-12
 
  * ttkTixNoteBook (RT #132075):
    - add method _identify_unavailable to check if Tile version is too old
@@ -26,26 +51,26 @@ Release 1.06_01:  2020-03-12
    - photoTk.t: skip PNG output tests for Tcl/Tk 8.6.5-8.6.6
      (which output invalid PNG files: RT #128803)
 
-Release 1.06:  2020-03-10
+1.06  2020-03-10
 
  * Mark wmStackorder.t as TODO due to unresolved failures (RT #132100)
 
-Release 1.05:  2020-03-09
+1.05  2020-03-09
 
  * Support $toplevel->stackorder method (as used with Perl/Tk)
  * Experimental workaround for regression in Tcl/Tk 8.6.10
    which causes an error when using facelifted LabEntry widgets
 
-Release 1.04_03:  2020-03-07
+1.04_03  2020-03-07
 
  * Facelift/Hijack tests: don't skip when Tix is unavailable
    for tests that don't depend on Tix
 
-Release 1.04_02:  2020-03-07
+1.04_02  2020-03-07
 
  * Add tests in repository but missing from MANIFEST and distribution
 
-Release 1.04_01:  2020-03-07
+1.04_01  2020-03-07
 
  * configureReturn.t:
    - fix check for skipping Tix widget tests
@@ -53,13 +78,13 @@ Release 1.04_01:  2020-03-07
    - Workaround for RT #128804: manually destroy $mw at end of test
      to avoid segmentation fault (observed on CentOS 6.10)
 
-Release 1.04:  2020-03-07
+1.04  2020-03-07
 
  * Replaced README with improved markdown README.md;
    documentation fixes (contributions from Vadim Konovalov)
  * Update MANIFEST (README.md was missing from 1.03)
 
-Release 1.03:  2020-03-02
+1.03  2020-03-02
 
  * Mark focusMethods.t as TODO due to unresolved failures (RT #131091)
  * Add internal variable `$Tcl::pTk::_Tile_available` to indicate whether
@@ -70,17 +95,17 @@ Release 1.03:  2020-03-02
  * $Tcl::pTk::platform should be 'unix' when using X11 Tk in Cygwin
    (contribution from Vadim Konovalov)
 
-Release 1.02:  2019-06-29
+1.02  2019-06-29
 
  * Support focusNext and focusPrev methods as used with Perl/Tk
 
-Release 1.01_01:  2019-06-24
+1.01_01  2019-06-24
 
  * Makefile.PL: fix some of the issues reported by CPAN indexer and CPANTS
    - Specify minimum Perl version for ExtUtils::MakeMaker
    - Don't index unauthorized package MainWindow to avoid permission issue
 
-Release 1.01:  2019-06-23
+1.01  2019-06-23
 
  * More adjustments for macOS Aqua dark mode (Tk 8.6.10 or later)
    - DialogBox: do not set default foreground color
@@ -89,7 +114,7 @@ Release 1.01:  2019-06-23
      (black text on yellow background, rather than white text on
      yellow background)
 
-Release 1.00:  2019-06-19
+1.00  2019-06-19
 
  * Fix POD errors (`=cut` outside POD block) reported by CPANTS
    (contribution from Mohammad S Anwar)
@@ -113,7 +138,7 @@ Release 1.00:  2019-06-19
    in test report (reason can't be printed on separate line)
  * Various spelling fixes
 
-Release 0.96:  2019-03-03
+0.96  2019-03-03
 
  * For consistency, use the exact platform name strings when checking `$^O`,
    and use `eq`/`ne` if checking for only one particular platform
@@ -127,7 +152,7 @@ Release 0.96:  2019-03-03
  * Mark fileevent tests as TODO on BSD/macOS rather than
    skipping immediately (RT #125662)
 
-Release 0.95:  2019-02-25
+0.95  2019-02-25
 
  * Improve several tests: can now PASS
    on recent Windows, macOS, FreeBSD, and Linux
@@ -185,7 +210,7 @@ Release 0.95:  2019-02-25
  * Cleanup duplicated/misplaced comments
  * Non-functional code style adjustments
 
-Release 0.94:  2018-07-28
+0.94  2018-07-28
 
  * Change `use Tk;` to `use Tcl::pTk;` in text2.t
  * Allow abbreviated mode flag for search() (used by text2.t)
@@ -196,7 +221,7 @@ Release 0.94:  2018-07-28
  * Keep canIndex.t running if command line arg present (for debugging)
  * Various spelling fixes
 
-Release 0.93:  2018-07-13
+0.93  2018-07-13
 
  * Add missing module `Sub::Name` to PREREQ_PM (RT #116432)
  * Replace corrupted teapot.ppm, mark as binary (RT #125421)
@@ -218,7 +243,7 @@ Release 0.93:  2018-07-13
    renamed to text2-old.t, and the new text2.t was copied)
  * Various spelling and POD formatting fixes
 
-Release 0.92:  2016-08-21
+0.92  2016-08-21
 
  * Updated to work with Tcl.pm versions > 1.02. Tcl.pm versions > 1.02 broke compatibility
      with Tcl::pTk, so the Tcl 1.02 interface was moved to Tcl/pTk.pm 
@@ -229,7 +254,7 @@ Release 0.92:  2016-08-21
  * Fix for a problem with the dialog box widget that would pop up off the screen if running from
    two displays. Added a test case for this condition.
            
-Release 0.90:  2015-07-04
+0.90  2015-07-04
 
  * Updates to work with Tcl/Tk 8.6.
  * Added background error handling (including a ErrorDialog.pm file like perl/tk) that is
@@ -237,31 +262,31 @@ Release 0.90:  2015-07-04
  * Fixed bug where a repeat call would create a TCL-command in TCL-land for each repeated event. 
    Changed to reuse the Tcl-command. Added test case (repeatSubReuse.t)
            
-Release 0.85:  2010-11-05
+0.85  2010-11-05
 
  * Bug-fix Release. Tweaks to HList to support returning photo objects
    when calling entrycget with -image option.
 
-Release 0.84:  2010-10-05
+0.84  2010-10-05
 
  * Bug-fix Release
 
-Release 0.83:  2010-09-05
+0.83  2010-09-05
 
  * Minor updates to be more compatible with Tcl 8.4 installation (although Tcl 8.5 is preferred)
 
-Release 0.82:  2010-08-25
+0.82  2010-08-25
 
  * Minor updates to remove the requirement for the tcl package snit. This is not needed anymore. 
 
-Release 0.81:  2010-08-21
+0.81  2010-08-21
 
  * Minor updates so the CPAN indexer won't index demo directories. 
  * Changed order of execution in Makefile.PL so that CPAN testers will get the proper prereqs
    before the test-for-tk script is run.
 
 
-Release 0.8:  2010-08-18
+0.8  2010-08-18
 
  * First Public Release.
 

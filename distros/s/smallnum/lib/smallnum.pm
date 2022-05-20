@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use POSIX ();
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use overload fallback => 1, 
 	'""' => \&_num,
@@ -54,7 +54,7 @@ smallnum - Transparent "SmallNumber" support for Perl
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 

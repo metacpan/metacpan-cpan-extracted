@@ -2,6 +2,15 @@
 ##
 ## Change log for perl distribution PDL::VectorValued
 
+v1.0.20 Fri, 20 May 2022 17:03:57 +0200 moocow
+	* add rleND, rldND to %VV_IMPORT
+
+v1.0.19 Wed, 18 May 2022 14:41:44 +0200 moocow
+	* add vv_ prefix to all VectorValued::Utils functions
+	* add conditional aliases in VectorValued.pm BEGIN block for github issue #5
+	  - import %VV_IMPORT symbols from PDL core if available
+	  - export vv_FOO as PDL::FOO otherwise (compatibility)
+
 v1.0.18 Wed, 16 Mar 2022 20:23:23 +0100 moocow
 	* removed redundant mv(1,0)->...->mv(0,1) from setops trimming expressions
 

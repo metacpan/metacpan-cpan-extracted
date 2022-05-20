@@ -3,6 +3,8 @@ ignore.txt
 lib/Pod/Simpler/Aoh.pm
 Makefile.PL
 MANIFEST			This list of files
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
 README
 README.md
 t/00-load.t
@@ -10,6 +12,7 @@ t/01-basic.t
 t/02-social-meta.t
 t/03-basic-moo.t
 t/04-basic-moose.t
+t/05-find.t
 t/data/moo.pod
 t/data/moose.pod
 t/data/perlfaq.pod
@@ -19,5 +22,3 @@ t/manifest.t
 t/pod-coverage.t
 t/pod.t
 xt/boilerplate.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

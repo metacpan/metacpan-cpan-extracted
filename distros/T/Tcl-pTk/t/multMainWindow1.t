@@ -11,6 +11,7 @@ plan tests=>2;
 
 my $window1Destroyed;
 my $window1 = MainWindow->new;
+$window1->idletasks;
 my $button1 = $window1->Button(-text => 'Window1', 
 	-command => 
 	sub{
@@ -23,6 +24,7 @@ my $wid = $Tcl::pTk::Wpath;
 
 my $window2Destroyed;
 my $window2 = MainWindow->new;
+$window2->idletasks;
 
 my $button2 = $window2->Button(-text => 'Window2', 
 	-command => 

@@ -1,7 +1,7 @@
 Revision history for Anonymous-Object
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+0.05    2022/05/19
+	- Increase test coverage to 95.1%
 
 0.05    2020/10/24
 	- Add POD description

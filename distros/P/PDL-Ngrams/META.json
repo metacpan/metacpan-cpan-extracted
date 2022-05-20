@@ -44,10 +44,10 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/moocow-the-bovine/PDL-Ngrams.git",
+         "url" : "https://github.com/moocow-the-bovine/PDL-Ngrams.git",
          "web" : "https://github.com/moocow-the-bovine/PDL-Ngrams"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

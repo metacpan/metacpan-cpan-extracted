@@ -1,5 +1,5 @@
 package JSON::Schema::Generate;
-use 5.006; use strict; use warnings; our $VERSION = '0.07';
+use 5.006; use strict; use warnings; our $VERSION = '0.08';
 use Tie::IxHash; use Types::Standard qw/Str HashRef Bool/;
 use Compiled::Params::OO qw/cpo/; use JSON; use Blessed::Merge;
 
@@ -66,7 +66,8 @@ sub new {
 		$self->{merge} = Blessed::Merge->new(
 			blessed => 0,
 			unique_array => 1,
-			unique_hash => 1
+			unique_hash => 1,
+			same => 0
 		);
 	}
 	return $self;
@@ -107,7 +108,6 @@ sub _build_props {
 	my ($self, $props, $data, $path) = @_;
 
 	my $ref = ref $data;
-
 	if ($ref eq 'HASH') {
 		$self->_add_type($props, 'object');
 		$self->_unique_examples($props, $data);
@@ -145,7 +145,7 @@ sub _build_props {
 	} elsif (! defined $data) {
 		$self->_add_type($props, 'null');
 		$self->_unique_examples($props, undef);
-	} elsif ($ref eq 'SCALAR' || $ref =~ m/Boolean$/) {
+	} elsif ($ref eq 'SCALAR' or $ref =~ m/Boolean$/i) {
 		$self->_add_type($props, 'boolean');
 		$self->_unique_examples($props, \1, \0);
 	} elsif ($data =~ m/^\d+$/) {
@@ -184,7 +184,6 @@ sub _add_type {
 sub _unique_examples {
 	my ($self, $props, @examples) = @_;
 	for my $example (@examples) {
-		use Data::Dumper;
 		if ((ref($example) || 'SCALAR') ne 'SCALAR' && $props->{examples} && $self->{merge_examples}) {
 			$props->{examples}->[0] = $self->{merge}->merge($props->{examples}->[0], $example);
 		} else {
@@ -205,7 +204,7 @@ JSON::Schema::Generate - Generate JSON Schemas from data!
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 

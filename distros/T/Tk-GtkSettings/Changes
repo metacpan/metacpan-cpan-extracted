@@ -1,0 +1,16 @@
+Revision history for Perl extension Tk::GtkSettings.
+
+0.01  Sun Feb  6 18:10:57 2022
+	- original version; created by h2xs 1.23 with options
+		-X Tk::GtkSettings
+
+0.02  May 17 2022
+	- Fixed incorrect handling of appNmae
+	- Updated documentation
+	- Added applyGtkSettings 
+	- Updated dependencies in Makefile.pl
+	- Added repository to Makefile.pl
+
+0.03  May 18 2022
+	- Fixed generateOUtput, now 'main' group is handled first
+	- Corrected a typo and some errors in documentation

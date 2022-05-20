@@ -13,14 +13,14 @@ sub TIEHASH {
 }
 
 sub STORE {
-	$_[0]->{hash}->{$_[0]->VALIDKEY($_[1])} = $_[2];
+	$_[0]->{hash}->{$_[0]->_VALIDKEY($_[1])} = $_[2];
 }
 
 sub FETCH {
-	$_[0]->{hash}->{$_[0]->VALIDKEY($_[1])};
+	$_[0]->{hash}->{$_[0]->_VALIDKEY($_[1])};
 }
 
-sub VALIDKEY {
+sub _VALIDKEY {
 	croak sprintf('Invalid key %s. Allowed keys: %s', $_[1], join( ', ', @{$_[0]->{allowed_keys}})) 
 		unless grep { $_ eq $_[1] } @{$_[0]->{allowed_keys}};
 	return $_[1];
@@ -35,11 +35,11 @@ sub NEXTKEY {
 }
 
 sub EXISTS {
-	exists $_[0]->{hash}->{$_[0]->VALIDKEY($_[1])};
+	exists $_[0]->{hash}->{$_[0]->_VALIDKEY($_[1])};
 }
 
 sub DELETE {
-	delete $_[0]->{hash}->{$_[0]->VALIDKEY($_[1])};
+	delete $_[0]->{hash}->{$_[0]->_VALIDKEY($_[1])};
 }
 
 sub CLEAR {
@@ -47,7 +47,7 @@ sub CLEAR {
 }
 
 sub SCALAR {
-	scalar %{$_[0]->{hash}};
+	scalar keys %{$_[0]->{hash}};
 }
 
 1;

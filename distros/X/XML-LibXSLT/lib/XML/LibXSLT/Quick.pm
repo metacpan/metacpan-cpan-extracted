@@ -12,7 +12,7 @@ use XML::LibXSLT ();
 
 use vars qw( $VERSION );
 
-$VERSION = '2.001000';
+$VERSION = '2.002000';
 
 sub stylesheet
 {
@@ -111,6 +111,10 @@ sub generic_transform
         {
             $source = $xml_parser->parse_file( $source->{path} );
         }
+        elsif ( $type eq "string" )
+        {
+            $source = $xml_parser->parse_string( $source->{string} );
+        }
         else
         {
             Carp::confess("unknown source type");
@@ -194,7 +198,7 @@ __END__
 
 =head1 NAME
 
-XML::LibXSLT::Quick - a quicker interface to XML::LibXSLT
+XML::LibXSLT::Quick - an easier to use (= "quicker") interface to XML::LibXSLT
 
 =head1 SYNOPSIS
 
@@ -216,6 +220,10 @@ XML::LibXSLT::Quick - a quicker interface to XML::LibXSLT
 
 This is a module that wraps L<XML::LibXSLT> with an easier to use interface.
 
+It can be used to process XML documents using
+L<XSLT (Extensible Stylesheet Language Transformations)|https://en.wikipedia.org/wiki/XSLT>
+stylesheets.
+
 =head1 METHODS
 
 =head2 XML::LibXSLT::Quick->new({ location=>"./xslt/my.xslt", });
@@ -236,6 +244,24 @@ To be discussed.
 
 See C<t/using-quick-wrapper.t> .
 
+$dest can be:
+
+C<\$my_string_var>
+
+C<<< {type => 'dom', } >>> - the DOM will be returned.
+
+C<<< {type => 'path', path => $filepath, } >>> - the output string will be written to $filepath .
+
+C<<< {type => 'return', } >>> - the output string will be returned.
+
+$source can be:
+
+A string.
+
+C<<< {type => 'file', path => $filepath, params => +{}, } >>> - the file will be parsed.
+
+C<<< {type => 'string', string => $my_xml_string, params => +{}, } >>> - the string will be parsed.
+
 =head2 $obj->output_as_chars($dom)
 
 =head2 $obj->transform(...)
@@ -251,6 +277,25 @@ L<XML::LibXSLT::Easy> by Yuval Kogman - requires some MooseX modules.
 L<XML::LibXSLT> - used as the backend of this module.
 
 =head1 COPYRIGHT & LICENSE
+
+B<NOTE!!! :> this licence applies to this file alone. The blanket licence
+for the distribution is "same as Perl 5".
+
+(I am not a lawyer (= "IANAL") / etc. )
+
+For more information, consult:
+
+=over 4
+
+=item * L<https://www.shlomifish.org/philosophy/computers/open-source/foss-licences-wars/rev2/#which-licence-same-as-perl>
+
+=item * L<https://github.com/shlomif/perl-XML-LibXSLT/issues/5>
+
+=item * L<https://en.wikiquote.org/w/index.php?title=Rick_Cook&oldid=3060266>
+
+“Programming today is a race between software engineers striving to build bigger and better idiot-proof programs, and the Universe trying to produce bigger and better idiots. So far, the Universe is winning.”
+
+=back
 
 Copyright 2022 by Shlomi Fish
 

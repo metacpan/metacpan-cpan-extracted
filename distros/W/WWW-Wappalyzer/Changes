@@ -1,5 +1,9 @@
 Revision history for WWW-Wappalyzer
 
+2.00    11 May 2022 Alexander Nalobin
+        Support recent version of Wappalyzer https://github.com/wappalyzer/wappalyzer/releases/tag/v6.10.26.
+        This release breaks backward compatibility. Refer to updated POD of module.
+
 0.21    11 Dec 2017 Alexander Nalobin
         Added multi-valued headers field support.
         'headers' parameter does not allow blessed hashref anymore.

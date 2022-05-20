@@ -1,0 +1,4 @@
+#!/usr/bin/env perl
+package Test::Cool;
+use Getopt::App;
+run(sub { shift; say "@_" });

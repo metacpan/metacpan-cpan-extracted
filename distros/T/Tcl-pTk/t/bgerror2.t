@@ -146,10 +146,10 @@ while( <INFILE> ){
 close INFILE;
 
 # Check error messages for key components
-ok( $errMessages =~ /Undefined subroutine\s+\&main\:\:bogus/);
-ok( $errMessages =~ /command executed by scale/);
-ok( $errMessages =~ /Error Started at $ok_file line $ok3_line/);
-ok( $errMessages =~ / Undefined subroutine \&main::bogus called at $ok_file line $ok4_line/);
+ok( $errMessages, qr/Undefined subroutine\s+\&main\:\:bogus/);
+ok( $errMessages, qr/command executed by scale/);
+ok( $errMessages, qr/Error Started at $ok_file line $ok3_line/);
+ok( $errMessages, qr/ Undefined subroutine \&main::bogus called at $ok_file line $ok4_line/);
 
 
 unlink 'serr.out';

@@ -101,6 +101,9 @@ Methods, member variables, etc. starting with an underscore (`_`) are
 considered to be internal only.  Their usage and interfaces may change
 between versions in an incompatible way!
 
+We (try to) use US English for identifiers while using GB English for the
+documentation.  This is intended and not a bug!
+
 # METHODS
 
 ## **import** - import and initialisation of UI::Various package

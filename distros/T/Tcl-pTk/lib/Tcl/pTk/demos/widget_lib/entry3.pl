@@ -26,7 +26,7 @@ sub entry3 {
         -validate        => 'focus',
         -validatecommand => sub {
 	    my ($proposed, $changes, $current, $index, $type) = @_;
-	    return not $proposed =~ m/[^\d]/g;
+	    return $proposed !~ m/[^\d]/g;
 	},
     );
     $e1->configure(

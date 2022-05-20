@@ -1,193 +1,36 @@
 ==================================================
-Changes from 2018-03-30 00:00:00 +0000 to present.
+Changes from 2020-05-17 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 1.8 at 2020-03-29 17:40:24 +0000
+version 1.9 at 2022-05-17 20:16:56 +0000
 ----------------------------------------
 
-  Change: a50996aee321069d7b3eceee2b5f90ff4d59c9ff
+  Change: e2dba9c373b8246ba53c2918b080ac4ac677914b
   Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2020-03-29 10:34:32 +0000
+  Date : 2022-05-17 12:42:59 +0000
 
-    Disable @ARGV processing during initialization
+    More optimizations for loading
 
-    The previous release disabled `@ARGV` processing everywhere except when
-    imported from the `main` namespace. This continues that work by disabling
-    the preprocessing of `@ARGV` entirely. This switches the behavior of the
-    module to `delay_argv`. It's still possible to preprocess the `@ARGV`
-    during the runtime by using:
+    * Don't exec `git` when we're not running in a interactive environment *
+    Adds `IO::Interactive` as a prereq * Make the input functions smart enough
+    to know if we're using a
 
-    ``` use CLI::Helpers qw(:preprocess_argv output); ```
+    terminal or not * Now that we use `IO::Interactive`, don't implement the
+    readline
 
-    Otherwise, the processing of `@ARGV` will happen at the first call to a
-    function which needs it. This is generally safer as it prevents
-    interference with other processing of `@ARGV` by scripts and modules.
+    monkey-patch as it's probably not required any longer * Recommend
+    `Term::ReadLine::Gnu` as it provides a better feature set 
 
-    Also corrected the option processing parameters so options requiring a
-    value declare it correctly. 
-
-----------------------------------------
-version 1.7 at 2019-12-12 20:09:23 +0000
-----------------------------------------
-
-  Change: 0b5fe2c5ebcb16d8115db6e4e714567f4e7adb5a
+  Change: 0b28fadad5cbb740696d4601e70bd769885d929d
   Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-12-12 12:09:23 +0000
+  Date : 2022-05-17 10:11:18 +0000
 
-    Remove Sub::Exporter and handle import locally
+    More optimizations for loading
 
-    Sub::Exporter is awesome, but I needed to provide a custom `import()`
-    function to be able to detect the importing package and change the default
-    behavior. I had attempted this with `Hook::LexWrap`, but that caused
-    unexpected issues with the `import()` routine in certain situations. This
-    code is cleaner, has fewer deps, but lacks the extended functionality of
-    `Sub::Exporter`. 
-
-  Change: f8cbb98a7c2445eff7b69a88f962e9cdc5b8a02a
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-12-05 13:15:02 +0000
-
-    Add basic testing to the distribution 
-
-  Change: 54e693928bcc50fb8212e21a9072ab84dee350e2
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-12-03 13:55:24 +0000
-
-    Change default behavior if importing outside of main
-
-    It doesn't make much sense for a module you're including to mess with
-    `@ARGV` by default. This patch uses `Hook::LexWrap` to wrap `import` and
-    check the calling package. If the calling package is `main`, we'll do the
-    `@ARGV` parsing by default. If it's not, we'll skip the initialization
-    until it's used. You can override this behavior if you specify:
-
-    package YOLO;
-
-    use CLI::Helpers qw(:output at_import);
-
-    In the module. 
-
-  Change: 63c285e75f3c34aa0700b9252fe8b2f8e5d0a398
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-12-03 08:35:27 +0000
-
-    Alternative initialization with an array
-
-    * Instead of initiliazing solely on `@ARGV`,
-
-    `cli_helpers_initialization` may now be called with an array
-
-    reference. If so, it'll process that array instead of messing with
-
-    the global `@ARGV`. * Add an `at_import` import time configuration. This is
-    the default,
-
-    but if the default behavior changes, this configuration will ensure
-
-    it's always handled correctly. 
-
-  Change: 771ed53929d0670e276616b874bead399954862d
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-12-02 21:50:13 +0000
-
-    Handle @ARGV Smarter
-
-    This release adds the ability to delay `@ARGV` processing until it's
-    necessary through the `delay_argv` import option.
-
-    Alternatively, a user can import with `copy_argv` flag to make
-    `CLI::Helpers` operate on a copy of `@ARGV`.
-
-    A `global_argv` import option has been added as well. This is a flag to
-    enable what is now the current behavior, operating on the global `@ARGV` at
-    import time, unless `delay_argv` is specified.
-
-    Migrate all the argument processing into it's own
-    `cli_helpers_initialize()` function. This is called during import unless
-    `delay_argv` is passed as an import flag. 
-
-----------------------------------------
-version 1.6 at 2019-06-25 02:24:08 +0000
-----------------------------------------
-
-  Change: ebc44e2e79fd7fc99fc1c810ea2ebfa630e97db7
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-06-24 19:24:08 +0000
-
-    Default to sane privacy settings
-
-    * An explicit --nopaste-service OR environment variable (NOPASTE_SERVICES)
-
-    must be present for the paste to happen. * Default all pastes to private
-    unless the --nopaste-public option is
-
-    specified. * Process --tags before the `kv` option is processed * Instead
-    of using `@input`, use a color stripped `@output` for the
-
-    content of the paste 
-
-----------------------------------------
-version 1.5 at 2019-06-24 16:33:14 +0000
-----------------------------------------
-
-  Change: c138ce745818524db2ce8f4193b2d5c5ee16640d
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-06-24 09:33:14 +0000
-
-    Version 1.5 to fix handling of service pass through
-
-    To facilitate both environment variables and a sane default of a working
-    paste service, I reworked how the `service` parameter is passed to
-    `App::Nopaste`. Now the correct thing will happen given:
-
-    * `$ENV{NOPASTE_SERVICES}` is set it will be used unless
-
-    * `--nopaste-service` is set, in which case it'll be parsed as comma
-
-    separated list
-
-    * Barring those cases, `App::Nopaste::Service::Shadowcat` will be
-
-    used 
-
-----------------------------------------
-version 1.4 at 2019-06-22 04:16:30 +0000
-----------------------------------------
-
-  Change: c5891e80dab8a6426fa7c2a2f599e33857be0e0b
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-06-21 21:16:30 +0000
-
-    Release Version 1.4 Ready
-
-    * Adding --tags to support selective output using tagged messages * Add
-    optional App::Nopaste support to the module
-
-    * If App::Nopaste is installed and --nopaste is specified paste to
-    Shadowcat * Convert from IPC::Run3 to Capture::Tiny * Documentation and
-    testing updates 
-
-  Change: 423e3c5dadb8d00151cf9038715b8e5b86f3acc0
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-11-12 21:27:46 +0000
-
-    POD and test fixups
-
-    POD spelling and tests fix-up. 
-
-  Change: d06aaad52cc48dbf611654ec67dbab66b7e8639f
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-11-12 21:18:03 +0000
-
-    Add spelling checks 
-
-  Change: 51122cb1672978d31f0993311f98a1284aaafd2a
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-11-13 06:17:05 +0000
-
-    More fixes for dist.ini 
+    * Don't exec `git` when we're not running in a interactive environment *
+    Adds `IO::Interactive` as a prereq 
 
 =================================================
-Plus 13 releases after 2018-03-30 00:00:00 +0000.
+Plus 18 releases after 2020-05-17 00:00:00 +0000.
 =================================================

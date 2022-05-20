@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.64';
+$Map::Tube::VERSION   = '3.68';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 3.64
+Version 3.68
 
 =cut
 
@@ -89,11 +89,13 @@ documented in L<Map::Tube::Cookbook>.
     | Marco Fontani       | MFONTANI | 1 (Milan)                                |
     |                     |          |                                          |
     | Soren Lund          | SLU      | 1 (Copenhagen)                           |
+    |                     |          |                                          |
+    | FUNG Cheok Yin      | CYFUNG   | 1 (Hongkong)                             |
     +---------------------+----------+------------------------------------------+
 
 =cut
 
-has [qw(name name_to_id plugins _active_link _other_links _line_stations _common_lines)] => (is => 'rw');
+has [qw(name name_to_id plugins _active_link _other_links _line_stations _line_station_index _common_lines)] => (is => 'rw');
 has experimental => (is => 'ro', default => sub { 0 });
 has nodes   => (is => 'rw', isa => NodeMap);
 has lines   => (is => 'rw', isa => Lines  );
@@ -187,6 +189,28 @@ sub get_shortest_route {
 
     $self->_capture_common_lines($_from, $_to);
 
+    my $reverse = 0;
+
+    # Found common lines between start and end nodes.
+    if (@{$self->{_common_lines}}) {
+        my $_common_line = $self->{_common_lines}->[0];
+        my $from_index   = $self->{_line_station_index}
+                                ->{uc($_common_line)}
+                                ->{$_from->id};
+        my $to_index     = $self->{_line_station_index}
+                                ->{uc($_common_line)}
+                                ->{$_to->id};
+
+        $reverse = 1 if (defined $from_index
+                         && defined $to_index
+                         && ($from_index < $to_index));
+    }
+
+    if ($reverse) {
+        ($from, $to) = ($to, $from);
+        ($_from, $_to) = ($_to, $_from);
+    }
+
     $self->_get_shortest_route($from);
 
     my $nodes = [];
@@ -197,10 +221,21 @@ sub get_shortest_route {
 
     push @$nodes, $_from;
 
+    my $_nodes;
+
+    if ($reverse) {
+        $_nodes = [ @$nodes ];
+    }
+    else {
+        $_nodes = [ reverse(@$nodes) ];
+    }
+
     return Map::Tube::Route->new(
-        { from  => $_from,
-          to    => $_to,
-          nodes => [ reverse(@$nodes) ] } );
+        { from  => $_nodes->[0],
+          to    => $_nodes->[-1],
+          nodes => $_nodes,
+        }
+    );
 }
 
 =head2 get_all_routes($from, $to) *** EXPERIMENTAL ***
@@ -990,12 +1025,32 @@ sub _capture_common_lines {
     $self->{_common_lines} = [ common_lines($from_lines, $to_lines) ];
 }
 
+sub _get_common_lines {
+    my ($nodes, $active_links) = @_;
+
+    my %_unique_links = ();
+    foreach (@{$active_links}) {
+        $_unique_links{$_} = 1;
+    }
+
+    my %_common_lines = ();
+    foreach my $_link (keys %_unique_links) {
+        foreach my $_link_line (@{$nodes->{$_link}->line}) {
+            $_common_lines{$_link_line->id} = 1;
+        }
+    }
+
+    return (keys %_common_lines);
+}
+
 sub _get_next_link {
     my ($self, $from, $seen, $links) = @_;
 
     my $nodes        = $self->{nodes};
     my $active_links = $self->{_active_links};
-    my @common_lines = common_lines($active_links->[0], $active_links->[1]);
+    my @common_lines = _get_common_lines(
+        $nodes, [ @{$active_links->[0]}, @{$active_links->[1]} ]
+    );
 
     if ($self->{experimental} && scalar(@{$self->{_common_lines}})) {
         @common_lines = (@{$self->{_common_lines}}, @common_lines);
@@ -1165,6 +1220,7 @@ sub _capture_line_station {
 
     my ($line_id, $sequence) = split /\:/, $line, 2;
     $self->{_line_stations}->{uc($line_id)}->{$sequence} = $station_id;
+    $self->{_line_station_index}->{uc($line_id)}->{$station_id} = $sequence;
 
     return $line_id;
 }
@@ -1347,8 +1403,7 @@ L<https://github.com/manwar/Map-Tube>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-map-tube at rt.cpan.org>,  or
-through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Map-Tube>.
+Please report any bugs or feature requests through the web interface at L<https://github.com/manwar/Map-Tube/issues>.
 I will  be notified and then you'll automatically be notified of progress on your
 bug as I make changes.
 
@@ -1362,9 +1417,9 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * BUG Report
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Map-Tube>
+L<https://github.com/manwar/Map-Tube/issues>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
@@ -1374,15 +1429,15 @@ L<http://annocpan.org/dist/Map-Tube>
 
 L<http://cpanratings.perl.org/d/Map-Tube>
 
-=item * Search CPAN
+=item * Search MetaCPAN
 
-L<http://search.cpan.org/dist/Map-Tube/>
+L<https://metacpan.org/dist/Map-Tube/>
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 - 2016 Mohammad S Anwar.
+Copyright (C) 2010 - 2022 Mohammad S Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain a  copy of the full

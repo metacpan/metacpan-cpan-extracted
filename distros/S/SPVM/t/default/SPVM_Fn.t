@@ -138,10 +138,14 @@ my $nan_re = qr/(nan|ind)/i;
   ok(SPVM::TestCase::Lib::Fn1->sprintf_ld);
   ok(SPVM::TestCase::Lib::Fn1->sprintf_lu);
   ok(SPVM::TestCase::Lib::Fn1->sprintf_f);
+  ok(SPVM::TestCase::Lib::Fn1->sprintf_g);
   ok(SPVM::TestCase::Lib::Fn1->sprintf_c);
   ok(SPVM::TestCase::Lib::Fn1->sprintf_s);
-  ok(SPVM::TestCase::Lib::Fn1->sprintf_U);
   ok(SPVM::TestCase::Lib::Fn1->sprintf_percent);
+  ok(SPVM::TestCase::Lib::Fn1->sprintf_x);
+  ok(SPVM::TestCase::Lib::Fn1->sprintf_X);
+  ok(SPVM::TestCase::Lib::Fn1->sprintf_lx);
+  ok(SPVM::TestCase::Lib::Fn1->sprintf_lX);
   ok(SPVM::TestCase::Lib::Fn1->sprintf_all);
 }
 
@@ -458,6 +462,21 @@ my $nan_re = qr/(nan|ind)/i;
 # rindex_len
 {
   ok(SPVM::TestCase::Lib::Fn3->rindex_len);
+}
+
+# chr
+{
+  ok(SPVM::TestCase::Lib::Fn1->chr);
+}
+
+# ord
+{
+  ok(SPVM::TestCase::Lib::Fn1->ord);
+}
+
+# repeat
+{
+  ok(SPVM::TestCase::Lib::Fn1->repeat);
 }
 
 # All object is freed

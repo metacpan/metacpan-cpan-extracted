@@ -2,9 +2,9 @@
 #define MARPAWRAPPER_INTERNAL_ASF_H
 
 #include <stddef.h>
-#include <genericStack.h>
-#include <genericHash.h>
-#include <genericSparseArray.h>
+#include "genericStack.h"
+#include "genericHash.h"
+#include "genericSparseArray.h"
 #include "marpaWrapper/asf.h"
 #include "marpa.h"
 

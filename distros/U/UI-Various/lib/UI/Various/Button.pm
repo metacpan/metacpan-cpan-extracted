@@ -38,7 +38,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use UI::Various::core;
 use UI::Various::widget;
@@ -53,6 +53,11 @@ our @EXPORT_OK = qw();
 =item code [rw, recommended]
 
 the command invoked by the button
+
+Note that the command gets a reference to the top-level widget (C<Window> or
+C<Dialog>) as first and a reference to itself as second parameter.  This is
+especially useful to end a dialogue, as those might not return a usable
+reference on creation, e.g. in C<Curses>.
 
 =cut
 

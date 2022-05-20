@@ -5,13 +5,11 @@ use Test::More tests => 8;
 use SVG;
 
 my $svg = SVG->new;
-
 my $tag = $svg->script( type => "text/ecmascript" );
 
-# populate the script tag with cdata
-# be careful to manage the javascript line ends.
-# qq│text│ or qq§text§ where text is the script
-# works well for this.
+# populate the script tag with cdata be careful to manage the
+# javascript line ends. q│text│ or qq§text§ where text is the
+# script works well for this.
 
 $tag->CDATA(
     qq|

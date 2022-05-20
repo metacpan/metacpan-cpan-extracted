@@ -39,7 +39,8 @@ sub FETCH {
 	return $k ? $self->{fieldhash}->{$k}->{value}  : undef;
 }
 
-sub FINDKEY {
+sub FINDKEY { 
+	# uncoverable pod
 	for my $k (keys %{$_[0]->{fieldhash}}) {
 		if (match($_[0]->{fieldhash}->{$k}->{key}, $_[1])) {
 			return $_[0]->{fieldhash}->{$k}->{key};
@@ -73,7 +74,7 @@ sub CLEAR {
 }
 
 sub SCALAR { 
-	scalar %{$_[0]->{fieldhash}} 
+	scalar keys %{$_[0]->{fieldhash}} 
 }
 
 1;

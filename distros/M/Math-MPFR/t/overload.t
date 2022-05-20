@@ -3,7 +3,7 @@ use warnings;
 use Math::MPFR qw(:mpfr);
 use Math::BigInt; # for some error tests
 
-print "1..66\n";
+print "1..69\n";
 
 print  "# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 print  "# Using mpfr library version ", MPFR_VERSION_STRING, "\n";
@@ -322,7 +322,10 @@ else {print "not ok 12\n"}
 $ok = adjust($p!=$frac).adjust($p==$frac).adjust($p>$frac).adjust($p>=$frac)
 .adjust($p<$frac).adjust($p<=$frac).adjust($p<=>$frac);
 if($ok eq '1011001') {print "ok 13\n"}
-else {print "not ok 13\n"}
+else {
+   warn "\nExpected: '1011001'\n Got:     '$ok\n";
+   print "not ok 13\n";
+}
 
 $ok = adjust($ui!=$p).adjust($ui==$p).adjust($ui>$p).adjust($ui>=$p)
 .adjust($ui<$p).adjust($ui<=$p).adjust($ui<=>$p);
@@ -1073,6 +1076,32 @@ if(Math::MPFR::nnumflag() == 16) { print "ok 66\n" }
 else {
   warn "nnumflag(): expected 16, got ", Math::MPFR::nnumflag(), "\n";
   print "not ok 66\n";
+}
+
+# Check that Math::MPFR->new(6) <=> Math::MPFR->new() returns undef,
+# and also that the erangeflag is set.
+# Neither of these events occurred in 4.22 and (probably) earlier.
+
+Rmpfr_clear_erangeflag();
+
+if(!Rmpfr_erangeflag_p()) { print "ok 67\n" }
+else {
+  warn "erangeflag not cleared\n";
+  print "not ok 67\n";
+}
+
+my $cmpflag = Math::MPFR->new(1) <=> Math::MPFR->new();
+
+if(!defined($cmpflag)) { print "ok 68\n" }
+else {
+  warn "comparison with NaN Math::MPFR object returned a defined value\n";
+  print "not ok 68\n";
+}
+
+if(Rmpfr_erangeflag_p()) { print "ok 69\n" }
+else {
+  warn "erangeflag not set\n";
+  print "not ok 69\n";
 }
 
 sub adjust {

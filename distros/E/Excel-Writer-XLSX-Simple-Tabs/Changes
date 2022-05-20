@@ -1,0 +1,11 @@
+Revision history for Perl module Excel::Writer::XLSX::Simple::Tabs 
+
+TODO
+  - Anybody using IO::Scalar should consider porting to IO::String, which is smaller, lighter, and is implemented to be perfectly compatible with regular seekable filehandles.
+  - localize data in _add_data method
+
+0.02 2022-05-19
+  - Clean up for GitHub and CPAN
+
+0.01 2017-04-18
+  - Forked from Spreadsheet::WriteExcel::Simple::Tabs 0.10

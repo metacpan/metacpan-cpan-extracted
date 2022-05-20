@@ -24,7 +24,7 @@ open(my $stderr, '>', 'serr.out');
 my $lb = $mw->Listbox->pack;
 $lb->configure(-yscrollcommand =>  \&bogus);
 $lb->insert(qw/0 foo/);
-$lb->update;
+$lb->update; $lb->eventGenerate('<Expose>'); $lb->update; # send <Expose> to workaround https://core.tcl-lang.org/tk/info/f16cdb6d04
 $ok3_line = __LINE__ - 1; # Line to look for in error output
 
 $mw->after(2000, [$mw, 'destroy']);
@@ -44,8 +44,8 @@ while( <INFILE> ){
 close INFILE;
 
 # Check error messages for key components
-ok( $errMessages =~ /Undefined subroutine\s+\&main\:\:bogus/);
-ok( $errMessages =~ /vertical scrolling command executed by listbox/);
-ok( $errMessages =~ /Error Started at $ok_file line $ok3_line/);
+ok( $errMessages, qr/Undefined subroutine\s+\&main\:\:bogus/);
+ok( $errMessages, qr/vertical scrolling command executed by listbox/);
+ok( $errMessages, qr/Error Started at $ok_file line $ok3_line/);
 
 unlink 'serr.out';

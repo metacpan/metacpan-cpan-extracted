@@ -1,0 +1,25 @@
+0.040   2022-05-06  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename dist
+	  Bencher-Scenario-{IPCSystemOptions,IPC-System-Options}.
+
+
+0.03    2017-01-25  Released-By: PERLANCAR
+
+	- No functional changes.
+
+        - [build] Rebuild with updated Dist::Zilla::Plugin::Bencher::Scenario
+          (0.16) to add benchmarked modules as prereq with phase=x_benchmarks,
+          type=x_benchmarks.
+
+
+0.02    2016-06-26  Released-By: PERLANCAR
+
+        - No functional changes.
+
+        - [build] Rebuild to show abstract.
+
+
+0.01    2016-01-06  Released-By: PERLANCAR
+
+        - First release.

@@ -1,9 +1,9 @@
 use Test::More;
+no warnings;
 
 use Module::Generate;
 
 mkdir 't/lib/unable';
-
 subtest "start" => sub  {
 	ok(my $start = Module::Generate->start());
 	is(ref $start, 'Module::Generate');
@@ -21,6 +21,7 @@ subtest "dist" => sub {
 	%class = %Module::Generate::CLASS;
 	is($class{DIST}, 'Testing');
 };
+
 subtest "class" => sub {
 	ok(my $class = Module::Generate->class('Test'));
 	is(ref $class, 'Module::Generate');
@@ -314,6 +315,7 @@ subtest 'generate' => sub {
 };
 
 subtest _perl_tidy => sub {
+	local $SIG{__WARN__} = sub { };
 	eval { my $kaput = Module::Generate::_perl_tidy(q|kaput[{]}|) };
 	like ($@, qr/Exiting because of serious errors/);
 };

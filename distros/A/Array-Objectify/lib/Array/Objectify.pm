@@ -3,7 +3,7 @@ package Array::Objectify;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 use Array::Objectify::Tie;
 
 use overload '@{}' => sub { ${$_[0]}->{array}; }, fallback => 1;
@@ -30,7 +30,7 @@ Array::Objectify - objectify an array
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
@@ -85,6 +85,18 @@ Perhaps a little code snippet.
 	$array->[3]->d # 1;
 
 
+=head1 Methods
+
+=cut
+
+=head2 new
+
+Instantiate a new Array::Objectify object which is a wrapper arround Array::Objectify::Tie.
+
+	Array::Objectify->new(...);
+
+=cut
+
 =head1 AUTHOR
 
 LNATION, C<< <email at lnation.org> >>
@@ -94,9 +106,6 @@ LNATION, C<< <email at lnation.org> >>
 Please report any bugs or feature requests to C<bug-array-objectify at rt.cpan.org>, or through
 the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Array-Objectify>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
-
-
-
 
 =head1 SUPPORT
 

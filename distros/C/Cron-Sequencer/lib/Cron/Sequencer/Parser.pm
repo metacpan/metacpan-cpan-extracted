@@ -3,9 +3,13 @@
 use v5.20.0;
 use warnings;
 
+# The parts of this that we use have been stable and unchanged since v5.20.0:
+use feature qw(postderef);
+no warnings 'experimental::postderef';
+
 package Cron::Sequencer::Parser;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Carp qw(croak confess);
 

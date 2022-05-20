@@ -2,7 +2,7 @@ package Anonymous::Object;
 use strict;
 use warnings;
 use Data::Dumper;
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 our $UNIQUE;
 BEGIN {
@@ -39,10 +39,10 @@ sub new {
 			? $args{$accessor}
 			: $accessors{$accessor}->{default};
 		my $value
-			= $self->$accessor( $accessors{$accessor}->{builder}
-			? $accessors{$accessor}->{builder}->( $self, $param )
+			= $self->$accessor( $args{"build_$accessor"}
+			? $args{"build_$accessor"}->( $self, $param )
 			: $param );
-		unless ( !$accessors{$accessor}->{required} || defined $value ) {
+		unless ( defined $value ) {
 			die "$accessor accessor is required";
 		}
 	}
@@ -220,16 +220,15 @@ sub add_new {
 
 sub add_methods {
 	my ( $self, $methods ) = @_;
-	if ( !defined($methods) || ( ref($methods) || "" ) ne "ARRAY" ) {
+	if ( ( ref($methods) || "" ) ne "ARRAY" ) {
 		$methods = defined $methods ? $methods : 'undef';
 		die
 			qq{ArrayRef: invalid value $methods for variable \$methods in method add_methods};
 	}
-
 	for my $method ( @{$methods} ) {
 		$self->add_method($method);
 	}
-
+	return $self;
 }
 
 sub add_method {
@@ -318,7 +317,6 @@ sub add_method {
 sub build {
 	my ($self) = @_;
 
-
 	$self->meta->{new} = $self->add_new( $self->default );
 
 	my $class = sprintf q|%s::%s|, $self->{object_name}, $UNIQUE++;
@@ -335,14 +333,18 @@ sub build {
 			%s
 			1;
 		|, $class, $self->type_library, join(" ", keys %{$self->types}), join( "\n", @methods) );
+	
 	eval $c;
+	if ($@) {
+		die $@;
+	}
 	return $class->new;
 }
 
 sub stringify_struct {
 	my ( $self, $struct ) = @_;
-	$struct = ref $struct ? Dumper $struct : "'$struct'";
 	return 'undefined' unless defined $struct;
+	$struct = ref $struct ? Dumper $struct : "'$struct'";
 	$struct =~ s/\$VAR1 = //;
 	$struct =~ s/\s*\n*\s*package Module\:\:Generate\;|use warnings\;|use strict\;//g;
 	$struct =~ s/{\s*\n*/{/;
@@ -353,6 +355,7 @@ sub stringify_struct {
 sub add_type {
 	my ($self, $value) = @_;
 	if ( ! defined $value || ref $value ) {
+		$value = defined $value ? $value : 'undef';
 		die qq{Str: invalid value $value for method push_type};
 	}
 	$self->{types}->{$value}++;
@@ -364,11 +367,12 @@ sub identify_type {
 	my $ref = ref $value;
 	return $type_map->{default}
 		if (! defined $value);
-	return $type_map->{$ref} || $type_map->{REF}
+	return $type_map->{$ref} ? $type_map->{$ref} : $type_map->{REF}
 		if ($ref);
 	return $type_map->{NUM} if $value =~ m/\d+\.\d+/;
 	return $type_map->{INT} if $value =~ m/\d+/;
-	return $type_map->{STRING} if $value =~ m/\s+/;
+	return $type_map->{STRING} if $value =~ m/\w+/;
+	return $type_map->{default};
 }
 
 
@@ -382,7 +386,7 @@ Anonymous::Object - Generate Anonymous Objects
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 

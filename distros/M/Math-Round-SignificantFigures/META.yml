@@ -1,0 +1,22 @@
+---
+abstract: 'Perl package for rounding numbers to a specified number of Significant Figures'
+author:
+  - 'Michael R. Davis'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-Round-SignificantFigures
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  POSIX: '0'
+version: '0.01'

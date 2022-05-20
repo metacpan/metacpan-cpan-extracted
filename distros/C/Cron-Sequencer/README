@@ -23,6 +23,9 @@ This automates the following steps:
      make test
      make install
 
+If you can't (or don't want to) install modules to the system perl path, an easy
+way set up a user local installation is https://metacpan.org/pod/local::lib
+
 COPYRIGHT
 
 This distribution was written for Humanstate Sàrl by Nicholas Clark

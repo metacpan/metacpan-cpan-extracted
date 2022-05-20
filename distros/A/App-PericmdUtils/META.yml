@@ -19,7 +19,7 @@ name: App-PericmdUtils
 provides:
   App::PericmdUtils:
     file: lib/App/PericmdUtils.pm
-    version: '0.051'
+    version: '0.052'
 requires:
   Data::Sah::Compiler::perl::TH::any: '0.911'
   Data::Sah::Compiler::perl::TH::array: '0.911'
@@ -29,8 +29,8 @@ requires:
   Data::Sah::Compiler::perl::TH::str: '0.911'
   Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix: '0'
   Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix: '0'
-  Module::Abstract: '0'
   Module::List::Tiny: '0'
+  Package::Stash: '0'
   Perinci::CmdLine::Any: '0.152'
   Perinci::CmdLine::Dump: '0.120'
   Perinci::CmdLine::Lite: '1.915'
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-PericmdUtils
   homepage: https://metacpan.org/release/App-PericmdUtils
   repository: git://github.com/perlancar/perl-App-PericmdUtils.git
-version: '0.051'
+version: '0.052'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

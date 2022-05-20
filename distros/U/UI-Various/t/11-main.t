@@ -127,15 +127,15 @@ is($_, $main->width(),
 combined_like
 {   $main->window(Dummy->new());   }
     qr/^invalid parameter 'Dummy' in call to UI::.*::Main::window$re_msg_tail/,
-    'wrong object in window should fail';
+    'wrong object 1 in window should fail';
 combined_like
 {   $main->window(UI::Various::Window->new());   }
     qr/^invalid object \(UI::.*::Window\) in call to .*::window$re_msg_tail/,
-    'wrong object in window should fail';
+    'wrong object 2 in window should fail';
 combined_like
 {   $main->window(UI::Various::Dialog->new());   }
     qr/^invalid object \(UI::.*::Dialog\) in call to .*::window$re_msg_tail/,
-    'wrong object in window should fail';
+    'wrong object 3 in window should fail';
 
 eval {   $_ = UI::Various::Main::mainloop($main);   };
 like($@,

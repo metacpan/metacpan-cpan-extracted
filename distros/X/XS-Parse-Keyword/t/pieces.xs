@@ -42,7 +42,8 @@ static int build_prefixedblock(pTHX_ OP **out, XSParseKeywordPiece *args[], size
 
 static int build_anonsub(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *hookdata)
 {
-  *out = newSVOP(OP_CONST, 0, newRV_noinc((SV *)cv_clone(arg0->cv)));
+  *out = newUNOP(OP_REFGEN, 0,
+    newSVOP(OP_ANONCODE, 0, (SV *)arg0->cv));
   return KEYWORD_PLUGIN_EXPR;
 }
 
@@ -176,6 +177,13 @@ static const struct XSParseKeywordHooks hooks_anonsub = {
   .build1 = &build_anonsub,
 };
 
+static const struct XSParseKeywordHooks hooks_arithexpr = {
+  .permit_hintkey = hintkey,
+
+  .piece1 = XPK_ARITHEXPR,
+  .build1 = &build_expr,
+};
+
 static const struct XSParseKeywordHooks hooks_termexpr = {
   .permit_hintkey = hintkey,
 
@@ -277,6 +285,13 @@ static const struct XSParseKeywordHooks hooks_str = {
   .build1 = &build_literal,
 };
 
+static const struct XSParseKeywordHooks hooks_kw = {
+  .permit_hintkey = hintkey,
+
+  .piece1 = XPK_KEYWORD("bar"),
+  .build1 = &build_literal,
+};
+
 static const struct XSParseKeywordHooks hooks_autosemi = {
   .permit_hintkey = hintkey,
 
@@ -297,6 +312,7 @@ BOOT:
   register_xs_parse_keyword("pieceprefixedblock_VAR", &hooks_prefixedblock_VAR, "$VAR");
 
   register_xs_parse_keyword("pieceanonsub", &hooks_anonsub, NULL);
+  register_xs_parse_keyword("piecearithexpr", &hooks_arithexpr, NULL);
   register_xs_parse_keyword("piecetermexpr", &hooks_termexpr, NULL);
   register_xs_parse_keyword("piecelistexpr", &hooks_listexpr, NULL);
 
@@ -318,5 +334,6 @@ BOOT:
   register_xs_parse_keyword("piececolon", &hooks_colon, newSVpvs("colon"));
 
   register_xs_parse_keyword("piecestr", &hooks_str, newSVpvs("foo"));
+  register_xs_parse_keyword("piecekw",  &hooks_kw,  newSVpvs("bar"));
 
   register_xs_parse_keyword("pieceautosemi", &hooks_autosemi, newSVpvs("EOS"));

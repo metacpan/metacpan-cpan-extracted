@@ -2,7 +2,7 @@ package HealthCheck::Diagnostic::RabbitMQ;
 
 # ABSTRACT: Check connectivity and queues on a RabbitMQ server
 use version;
-our $VERSION = 'v1.1.6'; # VERSION
+our $VERSION = 'v1.2.0'; # VERSION
 
 use 5.010;
 use strict;
@@ -170,8 +170,13 @@ sub run {
                 and $params{listeners_min_critical} >= $listeners )
             )
         {
+            my $min = $params{listeners_min_critical};
+            my $max = $params{listeners_max_critical};
             $res{status} = 'CRITICAL';
-            $res{info} = "Listeners out of range!";
+            my $info = "Listeners out of range! Expected";
+            $info .= " min: $min" if defined $min;
+            $info .= " max: $max" if defined $max;
+            $res{info} = "$info have: $listeners";
         }
         elsif (
             (   defined $params{listeners_max_warning}
@@ -181,8 +186,13 @@ sub run {
                 and $params{listeners_min_warning} >= $listeners )
             )
         {
+            my $min = $params{listeners_min_warning};
+            my $max = $params{listeners_max_warning};
             $res{status} = 'WARNING';
-            $res{info} = "Listeners out of range!";
+            my $info = "Listeners out of range! Expected";
+            $info .= " min: $min" if defined $min;
+            $info .= " max: $max" if defined $max;
+            $res{info} = "$info have: $listeners";
         }
     }
 
@@ -192,13 +202,21 @@ sub run {
             and $params{messages_critical} <= $messages )
         {
             $res{status} = 'CRITICAL';
-            $res{info} = "Messages out of range!";
+            $res{info} = sprintf(
+                "Messages out of range! Expected max: %d have: %d",
+                $params{messages_critical},
+                $messages,
+            );
         }
         elsif ( defined $params{messages_warning}
             and $params{messages_warning} <= $messages )
         {
             $res{status} = 'WARNING';
-            $res{info} = "Messages out of range!";
+            $res{info} = sprintf(
+                "Messages out of range! Expected max: %d have: %d",
+                $params{messages_warning},
+                $messages,
+            );
         }
     }
 
@@ -219,7 +237,7 @@ HealthCheck::Diagnostic::RabbitMQ - Check connectivity and queues on a RabbitMQ 
 
 =head1 VERSION
 
-version v1.1.6
+version v1.2.0
 
 =head1 SYNOPSIS
 
@@ -391,7 +409,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 - 2020 by Grant Street Group.
+This software is Copyright (c) 2018 - 2022 by Grant Street Group.
 
 This is free software, licensed under:
 

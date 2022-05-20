@@ -2,6 +2,7 @@
 #define MARPAWRAPPER_INTERNAL_LOGGING_H
 
 #include <stddef.h>
+#include <genericLogger.h>
 #include "marpa.h"
 #include "marpa_codes.h"
 

@@ -19,6 +19,7 @@ my $obj = $an->hash_to_object({
 });
 
 is(ref $obj, 'Colouring::In::0');
+ok($obj->new);
 is ($obj->a, 1);
 is ($obj->b, 2);
 is ($obj->c, 3);
@@ -38,6 +39,7 @@ my $obj2 = $an->hash_to_object({
 	next => sub { return 1 }
 });
 
+ok($obj2->new);
 is (ref $obj2, 'Colouring::In::1');
 is ($obj2->a, 1);
 is ($obj2->b, 2);

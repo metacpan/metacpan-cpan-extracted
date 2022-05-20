@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- from 15th May 2022 -->
+<tube name="Hongkong">
+  <lines>
+    <line color="#ED1D24" name_alt="荃灣綫" name="Tsuen Wan Line" id="twl" />
+    <line color="#00AB4E" name_alt="觀塘綫" name="Kwun Tong Line" id="ktl" />
+    <line color="#007DC5" name_alt="港島綫" name="Island Line" id="isl" />
+    <line color="#7D499D" name_alt="將軍澳綫" name="Tseung Kwan O Line" id="tko" />
+    <line color="#F7943E" name_alt="東涌綫" name="Tung Chung Line" id="tcl" />
+    <line color="#F173AC" name_alt="迪士尼綫" name="Disneyland Resort Line" id="disneyland" />
+    <line color="#00888A" name_alt="機場快綫" name="Airport Express" id="airport" />
+    <line color="#53B7E8" name_alt="東鐵綫" name="East Rail Line" id="east" />
+    <line color="#923011" name_alt="屯馬綫" name="Tuen Ma Line" id="tml" />
+    <line color="#BAC429" name_alt="南港島綫" name="South Island Line" id="sil" />
+    <!-- <line color="#94989A" name_alt="昂坪360" name="Ngong Ping Cable Car" id="npcc" /> -->
+  </lines>
+  <stations>
+    <station link="SHS" name_alt="羅湖" name="Lo Wu" id="LOW" line="east:1" />
+    <station link="SHS" name_alt="落馬洲" name="Lok Ma Chau" id="LMC" line="east:2" />
+    <station link="LMC,LOW,FAN" name_alt="上水" name="Sheung Shui" id="SHS" line="east:3" />
+    <station link="SHS,TWO" name_alt="粉嶺" name="Fanling" id="FAN" line="east:4" />
+    <station link="FAN,TAP" name_alt="太和" name="Tai Wo" id="TWO" line="east:5" />
+    <station link="TWO,UNI" name_alt="大埔墟" name="Tai Po Market" id="TAP" line="east:6" />
+    <station link="RAC,FOT,TAP" name_alt="大學" name="University" id="UNI" line="east:7" />
+    <station link="UNI,SHT" name_alt="馬場" name="Racecourse" id="RAC" line="east:8" />
+    <station link="UNI,SHT" name_alt="火炭" name="Fo Tan" id="FOT" line="east:9" />
+    <station link="RAC,FOT,TAW" name_alt="沙田" name="Sha Tin" id="SHT" line="east:10" />
+    <station link="SHT,KOT,HIK,CKT" name_alt="大圍" name="Tai Wai" id="TAW" line="east:11,tml:9" /> 
+    <station link="SKM,LOF,TAW,MKK" name_alt="九龍塘" name="Kowloon Tong" id="KOT" line="east:12,ktl:7" />
+    <station link="KOT,HUH" name_alt="旺角東" name="Mong Kok East" id="MKK" line="east:13" />
+    <station link="MKK,HOM,ETS,EXC" name_alt="紅磡" name="Hung Hom" id="HUH" line="east:14,tml:16" />
+    <station link="HOM,ADM" name_alt="會展" name="Exhibition Centre" id="EXC" line="east:15" />
+    <station link="HOM" name_alt="黃埔" name="Whampoa" id="WHA" line="ktl:1" />
+    <station link="WHA,YMT,TKW,HUH" name_alt="何文田" name="Ho Man Tin" id="HOM" line="ktl:2,tml:15" />
+    <station link="HOM,MOK" name_alt="油麻地" name="Yau Ma Tei" id="YMT" line="ktl:3,twl:12" />
+    <station link="YMT,PRE" name_alt="旺角" name="Mong Kok" id="MOK" line="ktl:4,twl:11" />
+    <station link="MOK,SKM" name_alt="太子" name="Prince Edward" id="PRE" line="ktl:5,twl:10" /> 
+    <station link="PRE,KOT" name_alt="石峽尾" name="Shek Kip Mei" id="SKM" line="ktl:6" />
+    <station link="KOT,WTS" name_alt="樂富" name="Lok Fu" id="LOF" line="ktl:8" />
+    <station link="LOF,DIH" name_alt="黃大仙" name="Wong Tai Sin" id="WTS" line="ktl:9" />
+    <station link="WTS,CHH,HIK,KAT" name_alt="鑽石山" name="Diamond Hill" id="DIH" line="ktl:10,tml:11" />
+    <station link="DIH,KOB" name_alt="彩虹" name="Choi Hung" id="CHH" line="ktl:11" />
+    <station link="CHH,NTK" name_alt="九龍灣" name="Kowloon Bay" id="KOB" line="ktl:12" />
+    <station link="KOB,KWT" name_alt="牛頭角" name="Ngau Tau Kok" id="NTK" line="ktl:13" />
+    <station link="NTK,LAT" name_alt="觀塘" name="Kwun Tong" id="KWT" line="ktl:14" />
+    <station link="KWT,YAT" name_alt="藍田" name="Lam Tin" id="LAT" line="ktl:15" />
+    <station link="LAT,TIK,QUB" name_alt="油塘" name="Yau Tong" id="YAT" line="ktl:16,tko:6" />
+    <station link="YAT,TKO" name_alt="調景嶺" name="Tiu Keng Leng" id="TIK" line="ktl:17,tko:5" />
+
+    <station link="TWH" name_alt="荃灣" name="Tsuen Wan" id="TSW" line="twl:1" />
+    <station link="TSW,KWH" name_alt="大窩口" name="Tai Wo Hau" id="TWH" line="twl:2" />
+    <station link="TWH,KWF" name_alt="葵興" name="Kwai Hing" id="KWH" line="twl:3" />
+    <station link="KWH,LAK" name_alt="葵芳" name="Kwai Fong" id="KWF" line="twl:4" />
+    <station link="KWF,MEF,TSY,NAC" name_alt="荔景" name="Lai King" id="LAK" line="twl:5,tcl:4" />
+    <station link="LAK,LCK,TWW,NAC" name_alt="美孚" name="Mei Foo" id="MEF" line="twl:6,tml:20" />
+
+
+    <station link="MEF,CSW" name_alt="荔枝角" name="Lai Chi Kok" id="LCK" line="twl:7" />
+    <station link="LCK,SSP" name_alt="長沙灣" name="Cheung Sha Wan" id="CSW" line="twl:8" />
+    <station link="CSW,PRE" name_alt="深水埗" name="Sham Shui Po" id="SSP" line="twl:9" />
+    <station link="YMT,TST" name_alt="佐敦" name="Jordan" id="JOR" line="twl:13" />
+    <station link="JOR,ADM" name_alt="尖沙咀" name="Tsim Sha Tsui" id="TST" line="twl:14"  other_link="Tunnel:ETS" />
+
+    <station link="TST,CEN,WAC,OCP,EXC" name_alt="金鐘" name="Admiralty" id="ADM" line="twl:15,isl:6,sil:5,east:16" />
+    <station link="ADM,SHW" name_alt="中環" name="Central" id="CEN" line="twl:16,isl:5" other_link="Tunnel:HOK" />
+    <station link="HKU" name_alt="堅尼地城" name="Kennedy Town" id="KET" line="isl:1" />
+    <station link="KET,SYP" name_alt="香港大學" name="HKU" id="HKU" line="isl:2" />
+    <station link="HKU,SHW" name_alt="西營盤" name="Sai Ying Pun" id="SYP" line="isl:3" />
+    <station link="SYP,CEN" name_alt="上環" name="Sheung Wan" id="SHW" line="isl:4" />
+    <station link="ADM,CAB" name_alt="灣仔" name="Wan Chai" id="WAC" line="isl:7" />
+    <station link="WAC,TIH" name_alt="銅鑼灣" name="Causeway Bay" id="CAB" line="isl:8" />
+    <station link="CAB,FOH" name_alt="天后" name="Tin Hau" id="TIH" line="isl:9" />
+    <station link="TIH,NOP" name_alt="炮台山" name="Fortress Hill" id="FOH" line="isl:10" />
+    <station link="FOH,QUB" name_alt="北角" name="North Point" id="NOP" line="isl:11,tko:8" />
+    <station link="NOP,TAK,YAT" name_alt="鰂魚涌" name="Quarry Bay" id="QUB" line="isl:12,tko:7" />
+    <station link="QUB,SWH" name_alt="太古" name="Tai Koo" id="TAK" line="isl:13" />
+    <station link="TAK,SKW" name_alt="西灣河" name="Sai Wan Ho" id="SWH" line="isl:14" />
+    <station link="SWH,HFC" name_alt="筲箕灣" name="Shau Kei Wan" id="SKW" line="isl:15" />
+    <station link="SKW,CHW" name_alt="杏花邨" name="Heng Fa Chuen" id="HFC" line="isl:16" />
+    <station link="HFC" name_alt="柴灣" name="Chai Wan" id="CHW" line="isl:17" />
+
+    <station link="SUN" name_alt="東涌" name="Tung Chung" id="TUC" line="tcl:1" />
+    <station link="DIS,TUC" name_alt="欣澳" name="Sunny Bay" id="SUN" line="disneyland:2,tcl:2" />
+    <station link="SUN,LAK,AIR,KOW" name_alt="青衣" name="Tsing Yi" id="TSY" line="tcl:3,airport:3" />
+    <station link="LAK,AUS,MEF" name_alt="南昌" name="Nam Cheong" id="NAC" line="tml:19,tcl:5" />
+
+    <station link="NAC,KOW" name_alt="奧運" name="Olympic" id="OLY" line="tcl:6" />
+    <station link="OLY,HOK,TSY" name_alt="九龍" name="Kowloon" id="KOW" line="tcl:7,airport:2" />
+    <station link="KOW" name_alt="香港" name="Hong Kong" id="HOK" line="tcl:8,airport:1" other_link="Tunnel:CEN"/>
+
+    <station link="AIR" name_alt="博覽館" name="AsiaWorld–Expo" id="AWE" line="airport:5" />
+    <station link="AWE,TSY" name_alt="機場" name="Airport" id="AIR" line="airport:4" />
+
+    <station link="HAH" name_alt="寶琳" name="Po Lam" id="POA" line="tko:1" />
+    <station link="POA,TKO" name_alt="坑口" name="Hang Hau" id="HAH" line="tko:2" />
+    <station link="TKO" name_alt="康城" name="LOHAS Park" id="LHP" line="tko:3" />
+    <station link="TIK,HAH,LHP" name_alt="將軍澳" name="Tseung Kwan O" id="TKO" line="tko:4" />
+
+    <station link="SIH" name_alt="屯門" name="Tuen Mun" id="TUM" line="tml:27" />
+    <station link="TUM,TIS" name_alt="兆康" name="Siu Hong" id="SIH" line="tml:26" />
+    <station link="SIH" name_alt="天水圍" name="Tin Shui Wai" id="TIS" line="tml:25" />
+    <station link="TIS,YUL" name_alt="朗屏" name="Long Ping" id="LOP" line="tml:24" />
+    <station link="LOP,KSR" name_alt="元朗" name="Yuen Long" id="YUL" line="tml:23" />
+    <station link="YUL,TWW" name_alt="錦上路" name="Kam Sheung Road" id="KSR" line="tml:22" />
+    <station link="KSR,MEF" name_alt="荃灣西" name="Tsuen Wan West" id="TWW" line="tml:21" />
+    <station link="NAC,ETS" name_alt="柯士甸" name="Austin" id="AUS" line="tml:18" />
+    <station link="AUS,HUH" name_alt="尖東" name="East Tsim Sha Tsui" id="ETS" line="tml:17" other_link="TUNNEL:TST" />
+    <station link="HOM,SUW" name_alt="土瓜灣" name="To Kwa Wan" id="TKW" line="tml:14" />
+    <station link="TKW,KAT" name_alt="宋皇臺" name="Sung Wong Toi" id="SUW" line="tml:13" />
+    <station link="SUW,DIH" name_alt="啟德" name="Kai Tak" id="KAT" line="tml:12" />
+    <station link="DIH,TAW" name_alt="顯徑" name="Hin Keng" id="HIK" line="tml:10" />
+
+    <station link="TAW,STW" name_alt="車公廟" name="Che Kung Temple" id="CKT" line="tml:8" />
+    <station link="CKT,CIO" name_alt="沙田圍" name="Sha Tin Wai" id="STW" line="tml:7" />
+    <station link="STW,SHM" name_alt="第一城" name="City One" id="CIO" line="tml:6" />
+    <station link="CIO,TSH" name_alt="石門" name="Shek Mun" id="SHM" line="tml:5" />
+    <station link="SHM,HEO" name_alt="大水坑" name="Tai Shui Hang" id="TSH" line="tml:4" />
+    <station link="TSH,MOS" name_alt="恆安" name="Heng On" id="HEO" line="tml:3" />
+    <station link="HEO,WKS" name_alt="馬鞍山" name="Ma On Shan" id="MOS" line="tml:2" />
+    <station link="MOS" name_alt="烏溪沙" name="Wu Kai Sha" id="WKS" line="tml:1" />
+
+    <station link="SUN" name_alt="迪士尼" name="Disneyland Resort" id="DIS" line="disneyland:1" />
+
+    <station link="LET" name_alt="海怡半島" name="South Horizons" id="SOH" line="sil:1" />
+    <station link="SOH,WCH" name_alt="利東" name="Lei Tung" id="LET" line="sil:2" />
+    <station link="LET,OCP" name_alt="黃竹坑" name="Wong Chuk Hang" id="WCH" line="sil:3" />
+    <station link="WCH,ADM" name_alt="海洋公園" name="Ocean Park" id="OCP" line="sil:4" />
+
+  </stations>
+</tube>

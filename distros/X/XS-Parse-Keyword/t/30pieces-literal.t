@@ -21,6 +21,11 @@ BEGIN { $^H{"t::pieces/permit"} = 1; }
 }
 
 {
+   my $ret = piecekw bar ;
+   is( $ret, "bar", 'result of piecekw' );
+}
+
+{
    my $ret1 = do { pieceautosemi; };
    is( $ret1, "EOS", 'result of pieceautosemi with ;' );
 

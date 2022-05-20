@@ -12,7 +12,7 @@ plan tests => 1;
 my $passedMainLoop;
 
 my $TOP = MainWindow->new();
-
+$TOP->idletasks;
 
 # This sets up a second mainloop, similar to loading a standalone script like
 #   the widgetTclpTk demo does

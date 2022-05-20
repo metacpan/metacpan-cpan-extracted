@@ -4,7 +4,7 @@
 #
 package PDL::VectorValued::Utils;
 
-@EXPORT_OK  = qw( PDL::PP rlevec PDL::PP rldvec PDL::PP enumvec PDL::PP enumvecg PDL::PP rleseq PDL::PP rldseq PDL::PP vsearchvec PDL::PP cmpvec vv_qsortvec vv_qsortveci PDL::PP vv_union PDL::PP vv_intersect PDL::PP vv_setdiff PDL::PP v_union PDL::PP v_intersect PDL::PP v_setdiff PDL::PP vv_vcos );
+@EXPORT_OK  = qw( PDL::PP vv_rlevec PDL::PP vv_rldvec PDL::PP vv_enumvec PDL::PP vv_enumvecg PDL::PP vv_rleseq PDL::PP vv_rldseq PDL::PP vv_vsearchvec PDL::PP vv_cmpvec vv_qsortvec vv_qsortveci PDL::PP vv_union PDL::PP vv_intersect PDL::PP vv_setdiff PDL::PP v_union PDL::PP v_intersect PDL::PP v_setdiff PDL::PP vv_vcos );
 %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
@@ -13,7 +13,7 @@ use DynaLoader;
 
 
 
-   $PDL::VectorValued::Utils::VERSION = 1.0.18;
+   $PDL::VectorValued::Utils::VERSION = 1.0.20;
    @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::VectorValued::Utils $VERSION;
@@ -66,7 +66,7 @@ PDL::VectorValued::Utils - Low-level utilities for vector-valued PDLs
 
 
 
-=head2 rlevec
+=head2 vv_rlevec
 
 =for sig
 
@@ -91,7 +91,7 @@ See also: PDL::Slices::rle, PDL::Ufunc::qsortvec, PDL::Primitive::uniqvec
 
 =for bad
 
-rlevec does not process bad values.
+vv_rlevec does not process bad values.
 It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
@@ -102,13 +102,13 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
-*rlevec = \&PDL::rlevec;
+*vv_rlevec = \&PDL::vv_rlevec;
 
 
 
 
 
-=head2 rldvec
+=head2 vv_rldvec
 
 =for sig
 
@@ -127,7 +127,7 @@ See also: PDL::Slices::rld.
 
 =for bad
 
-rldvec does not process bad values.
+vv_rldvec does not process bad values.
 It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
@@ -136,7 +136,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
-sub PDL::rldvec {
+sub PDL::vv_rldvec {
   my ($a,$b,$c) = @_;
   if (!defined($c)) {
 # XXX Need to improve emulation of threading in auto-generating c
@@ -146,18 +146,18 @@ sub PDL::rldvec {
     shift(@dims);
     $c = $b->zeroes($b->type,$rowlen,$size,@dims);
   }
-  &PDL::_rldvec_int($a,$b,$c);
+  &PDL::_vv_rldvec_int($a,$b,$c);
   return $c;
 }
 
 
-*rldvec = \&PDL::rldvec;
+*vv_rldvec = \&PDL::vv_rldvec;
 
 
 
 
 
-=head2 enumvec
+=head2 vv_enumvec
 
 =for sig
 
@@ -176,7 +176,7 @@ If you need global keys, see enumvecg().
 
 =for bad
 
-enumvec does not process bad values.
+vv_enumvec does not process bad values.
 It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
@@ -187,13 +187,13 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
-*enumvec = \&PDL::enumvec;
+*vv_enumvec = \&PDL::vv_enumvec;
 
 
 
 
 
-=head2 enumvecg
+=head2 vv_enumvecg
 
 =for sig
 
@@ -213,7 +213,7 @@ Basically does the same thing as:
 
 =for bad
 
-enumvecg does not process bad values.
+vv_enumvecg does not process bad values.
 It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
@@ -224,13 +224,13 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
-*enumvecg = \&PDL::enumvecg;
+*vv_enumvecg = \&PDL::vv_enumvecg;
 
 
 
 
 
-=head2 rleseq
+=head2 vv_rleseq
 
 =for sig
 
@@ -249,7 +249,7 @@ See also PDL::Slices::rle.
 
 =for bad
 
-rleseq does not process bad values.
+vv_rleseq does not process bad values.
 It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
@@ -260,13 +260,13 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
-*rleseq = \&PDL::rleseq;
+*vv_rleseq = \&PDL::vv_rleseq;
 
 
 
 
 
-=head2 rldseq
+=head2 vv_rldseq
 
 =for sig
 
@@ -288,7 +288,7 @@ See also: PDL::Slices::rld.
 
 =for bad
 
-rldseq does not process bad values.
+vv_rldseq does not process bad values.
 It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
@@ -297,7 +297,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
-sub PDL::rldseq {
+sub PDL::vv_rldseq {
   my ($a,$b,$c) = @_;
   if (!defined($c)) {
     my $size   = $a->sumover->max;
@@ -305,18 +305,18 @@ sub PDL::rldseq {
     shift(@dims);
     $c = $b->zeroes($b->type,$size,@dims);
   }
-  &PDL::_rldseq_int($a,$b,$c);
+  &PDL::_vv_rldseq_int($a,$b,$c);
   return $c;
 }
 
 
-*rldseq = \&PDL::rldseq;
+*vv_rldseq = \&PDL::vv_rldseq;
 
 
 
 
 
-=head2 vsearchvec
+=head2 vv_vsearchvec
 
 =for sig
 
@@ -328,7 +328,7 @@ Routine for searching N-dimensional values - akin to vsearch() for vectors.
 
 =for usage
 
- $found   = ccs_vsearchvec($find, $which);
+ $found   = vsearchvec($find, $which);
  $nearest = $which->dice_axis(1,$found);
 
 Returns for each row-vector in C<$find> the index along dimension N
@@ -345,7 +345,7 @@ See also: PDL::Primitive::vsearch().
 
 =for bad
 
-vsearchvec does not process bad values.
+vv_vsearchvec does not process bad values.
 It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
@@ -356,7 +356,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
-*vsearchvec = \&PDL::vsearchvec;
+*vv_vsearchvec = \&PDL::vv_vsearchvec;
 
 
 
@@ -377,7 +377,7 @@ for a bug in PDL-2.4.3, which has long since been fixed.
 
 
 
-=head2 cmpvec
+=head2 vv_cmpvec
 
 =for sig
 
@@ -391,7 +391,7 @@ Lexicographically compare a pair of vectors.
 
 =for bad
 
-cmpvec does not process bad values.
+vv_cmpvec does not process bad values.
 It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
@@ -402,7 +402,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
-*cmpvec = \&PDL::cmpvec;
+*vv_cmpvec = \&PDL::vv_cmpvec;
 
 
 

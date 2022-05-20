@@ -31,7 +31,7 @@ WriteMakefile(
 			     "meta-spec" => { version => 2 },
 			     resources => {
 					   repository => {
-							  url => 'git://github.com/moocow-the-bovine/PDL-Ngrams.git',
+							  url => 'https://github.com/moocow-the-bovine/PDL-Ngrams.git',
 							  type => 'git',
 							  web => 'https://github.com/moocow-the-bovine/PDL-Ngrams',
 							 },

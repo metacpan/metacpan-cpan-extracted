@@ -1,5 +1,5 @@
 package HTML::Widgets::NavMenu::Tree::Node;
-$HTML::Widgets::NavMenu::Tree::Node::VERSION = '1.0900';
+$HTML::Widgets::NavMenu::Tree::Node::VERSION = '1.0902';
 use strict;
 use warnings;
 
@@ -165,7 +165,7 @@ HTML::Widgets::NavMenu::Tree::Node - an iterator for HTML.
 
 =head1 VERSION
 
-version 1.0900
+version 1.0902
 
 =head1 SYNOPSIS
 

@@ -5,7 +5,7 @@
 ##======================================================================
 
 #require "../VectorValued/Version.pm"; ##-- use perl-reversion from Perl::Version instead
-my $VERSION = '1.0.18';
+my $VERSION = '1.0.20';
 pp_setversion($VERSION);
 
 require "../VectorValued/Dev.pm";
@@ -76,7 +76,7 @@ EOPM
 
 ##------------------------------------------------------
 ## rlevec()
-pp_def('rlevec',
+pp_def('vv_rlevec',
        Pars => "c(M,N); $INDX \[o]a(N); [o]b(M,N)",
        Code =><<'EOC',
   PDL_Indx cn,bn=0, sn=$SIZE(N), matches;
@@ -126,10 +126,10 @@ EOD
 
 ##------------------------------------------------------
 ## rldvec()
-pp_def('rldvec',
+pp_def('vv_rldvec',
        Pars => 'int a(N); b(M,N); [o]c(M,N)',
        PMCode=><<'EOC',
-sub PDL::rldvec {
+sub PDL::vv_rldvec {
   my ($a,$b,$c) = @_;
   if (!defined($c)) {
 # XXX Need to improve emulation of threading in auto-generating c
@@ -139,7 +139,7 @@ sub PDL::rldvec {
     shift(@dims);
     $c = $b->zeroes($b->type,$rowlen,$size,@dims);
   }
-  &PDL::_rldvec_int($a,$b,$c);
+  &PDL::_vv_rldvec_int($a,$b,$c);
   return $c;
 }
 EOC
@@ -169,7 +169,7 @@ EOD
 
 ##------------------------------------------------------
 ## enumvec()
-pp_def('enumvec',
+pp_def('vv_enumvec',
        Pars => 'v(M,N); int [o]k(N)',
        Code =><<'EOC',
   int vn, kn, sn=$SIZE(N), matches;
@@ -202,7 +202,7 @@ EOD
 
 ##------------------------------------------------------
 ## enumvecg()
-pp_def('enumvecg',
+pp_def('vv_enumvecg',
        Pars => 'v(M,N); int [o]k(N)',
        Code =><<'EOC',
   int vn, vnprev, sn=$SIZE(N), ki;
@@ -236,7 +236,7 @@ EOD
 
 ##------------------------------------------------------
 ## rleseq()
-pp_def('rleseq',
+pp_def('vv_rleseq',
        Pars => "c(N); $INDX \[o]a(N); [o]b(N)",
        Code=><<'EOC',
   PDL_Indx j=0, sizeN=$SIZE(N);
@@ -275,10 +275,10 @@ EOD
 
 ##------------------------------------------------------
 ## rldseq()
-pp_def('rldseq',
+pp_def('vv_rldseq',
        Pars => 'int a(N); b(N); [o]c(M)',
        PMCode=><<'EOC',
-sub PDL::rldseq {
+sub PDL::vv_rldseq {
   my ($a,$b,$c) = @_;
   if (!defined($c)) {
     my $size   = $a->sumover->max;
@@ -286,7 +286,7 @@ sub PDL::rldseq {
     shift(@dims);
     $c = $b->zeroes($b->type,$size,@dims);
   }
-  &PDL::_rldseq_int($a,$b,$c);
+  &PDL::_vv_rldseq_int($a,$b,$c);
   return $c;
 }
 EOC
@@ -324,7 +324,7 @@ EOD
 ##------------------------------------------------------
 ## vsearchvec() : binary search on a (sorted) vector list
 vvpp_def
-  ('vsearchvec',
+  ('vv_vsearchvec',
    Pars => 'find(M); which(M,N); int [o]found();',
    Code =>
 (q(
@@ -368,7 +368,7 @@ Routine for searching N-dimensional values - akin to vsearch() for vectors.
 
 =for usage
 
- $found   = ccs_vsearchvec($find, $which);
+ $found   = vsearchvec($find, $which);
  $nearest = $which->dice_axis(1,$found);
 
 Returns for each row-vector in C<$find> the index along dimension N
@@ -408,7 +408,7 @@ EOPM
 ##------------------------------------------------------
 ## cmpvec() : make vector comparison available in perl
 vvpp_def
-  ('cmpvec',
+  ('vv_cmpvec',
    Pars => 'a(N); b(N); int [o]cmp()',
    Code => q($CMPVEC('$a()','$b()','N','$cmp()')),
    Doc=><<'EOD'

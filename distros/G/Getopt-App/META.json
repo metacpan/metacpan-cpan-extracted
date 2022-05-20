@@ -52,7 +52,7 @@
          "web" : "https://github.com/jhthorsen/getopt-app"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_contributors" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],

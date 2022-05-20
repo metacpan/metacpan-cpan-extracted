@@ -1,5 +1,9 @@
 This file summarizes what's changed between releases of Mail-DKIM.
 
+1.20220520 2022-05-20 UTC
+  + Change default algorithm in dkimsign.pl to sha-256
+  + Use Getopt::Long::Descriptive in scripts for better command help
+
 1.20220408 2022-04-08 UTC
   + Add support for signatures with an Expiration value
 

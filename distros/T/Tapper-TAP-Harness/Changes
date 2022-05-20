@@ -1,5 +1,12 @@
 Revision history for Tapper-TAP-Harness
 
+5.0.9     2022-05-20
+        - version bump to fix upload to wrong user
+
+5.0.8     2022-05-20
+        - fix bug in single-tap detection on section splitting
+        - fix test with more strict embedded YAML rules
+
 5.0.7     2016-07-29
         - version bump only to fix dependency errors
 

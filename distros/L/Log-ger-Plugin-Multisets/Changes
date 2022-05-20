@@ -1,3 +1,10 @@
+0.005   2022-05-16  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Add some more examples and comment in the Synopsis.
+
+
 0.004   2022-05-16  Released-By: PERLANCAR; Urgency: low
 
         - Fix error message when unknown argument is passed (GH#1, thanks

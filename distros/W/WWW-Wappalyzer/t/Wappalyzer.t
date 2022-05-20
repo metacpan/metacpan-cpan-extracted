@@ -2,16 +2,18 @@
 
 use utf8;
 use FindBin qw($Bin);
-use Test::More tests => 16;
+use Test::More tests => 23;
 
 BEGIN {
     use_ok( 'WWW::Wappalyzer' ) || print "Bail out!\n";
 }
 
-my @cats = WWW::Wappalyzer::get_categories();
+ok my $wappalyzer = WWW::Wappalyzer->new;
+ok $wappalyzer->isa( WWW::Wappalyzer );
 
-ok scalar @cats, 'get_categories';
-ok scalar( grep { $_ eq 'cms' } @cats ), 'get_categories cms';
+my @cats = $wappalyzer->get_categories_names();
+ok scalar @cats, 'get_categories_names';
+ok scalar( grep { $_ eq 'CMS' } @cats ), 'get_categories_names cms';
 
 my $html = q{<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru-ru" lang="ru-ru" >
@@ -28,7 +30,7 @@ my $html = q{<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "htt
   <script type="text/javascript" src="/media/system/js/jquery.1.5.4.js"></script>
   <script type="text/javascript" src="/media/system/js/caption.js"></script>};
 
-my %detected = WWW::Wappalyzer::detect(
+my %detected = $wappalyzer->detect(
     html     => $html,
     headers  => {
         Server => 'nginx',
@@ -37,27 +39,27 @@ my %detected = WWW::Wappalyzer::detect(
 );
 
 is_deeply \%detected, {
-    'web-servers' => [ 'Nginx' ],
-    cms => [ 'Joomla' ],
-    'javascript-frameworks' => [ 'jQuery' ],
-    'hosting-panels' => [ 'Plesk' ],
+    'Web servers'           => [ 'Nginx'  ],
+    'Reverse proxies'       => [ 'Nginx'  ],
+    'CMS'                   => [ 'Joomla' ],
+    'JavaScript libraries'  => [ 'jQuery' ],
+    'Hosting panels'        => [ 'Plesk'  ],
 }, 'detect by html & headers';
 
-%detected = WWW::Wappalyzer::detect( url => 'http://myblog.livejournal.com' );
+%detected = $wappalyzer->detect( url => 'http://myblog.livejournal.com' );
+is_deeply \%detected, { Blogs => [ 'LiveJournal' ] }, 'detect by url';
 
-is_deeply \%detected, { blogs => [ 'LiveJournal' ] }, 'detect by url';
-
-%detected = WWW::Wappalyzer::detect(
+%detected = $wappalyzer->detect(
     headers  => { Server => 'nginx' },
-    cats => [ 'web-servers' ],
+    cats => [ 'Web servers' ],
 );
-is_deeply \%detected, { 'web-servers' => [ 'Nginx' ] }, 'detect single cat';
+is_deeply \%detected, { 'Web servers' => [ 'Nginx' ] }, 'detect single cat';
 
-%detected = WWW::Wappalyzer::detect(
+%detected = $wappalyzer->detect(
     html => q{<link href="./dist/css/bootstrap.css" rel="stylesheet">},
-    cats => [ 'web-frameworks' ],
+    cats => [ 'UI frameworks' ],
 );
-is_deeply \%detected, { 'web-frameworks' => [ 'Twitter Bootstrap' ] }, 're with html entity';
+is_deeply \%detected, { 'UI frameworks' => [ 'Bootstrap' ] }, 're with html entity';
 
 $html = q{
 var rls = {b1: {position: '1',use_from: '0',start: '0',end: '9',amount: '10',type: 'manual'}}</script>
@@ -66,21 +68,63 @@ var rls = {b1: {position: '1',use_from: '0',start: '0',end: '9',amount: '10',typ
 <a class="ad_sense_help" href="https://www.google.com/adsense/support/bin/request.py?
 };
 
-%detected = WWW::Wappalyzer::detect( html => $html );
-is_deeply \%detected, {}, 'detect before add clues file';
+%detected = $wappalyzer->detect( html => $html );
+is_deeply \%detected, {}, 'detect before add techs file';
+$wappalyzer->add_categories_files( "$Bin/add_categories.json" );
+$wappalyzer->add_technologies_files( "$Bin/add_techs.json" );
 
-WWW::Wappalyzer::add_clues_file( "$Bin/add.json" );
-
-%detected = WWW::Wappalyzer::detect(
+%detected = $wappalyzer->detect(
     html => $html,
     headers  => { Server => 'nginx' },
 );
-is_deeply \%detected, { parkings => [ 'sedoparking' ], 'web-servers' => [ 'Nginx' ] }, 'detect after add clues file';
+is_deeply
+    \%detected,
+    {
+        Parkings          => [ 'sedoparking' ],
+        'Web servers'     => [ 'Nginx' ],
+        'Reverse proxies' => [ 'Nginx' ]
+    },
+    'detect after add files'
+;
 
-%detected = WWW::Wappalyzer::detect(
+$wappalyzer->reload_files();
+%detected = $wappalyzer->detect(
+    html => $html,
+    headers  => { Server => 'nginx' },
+);
+is_deeply
+    \%detected,
+    {
+        Parkings          => [ 'sedoparking' ],
+        'Web servers'     => [ 'Nginx' ],
+        'Reverse proxies' => [ 'Nginx' ]
+    },
+    'detect still works after reload files'
+;
+
+$wappalyzer = WWW::Wappalyzer->new(
+    categories => [ "$Bin/add_categories.json" ],
+    technologies => [ "$Bin/add_techs.json" ],
+);
+
+%detected = $wappalyzer->detect(
+    html => $html,
+    headers  => { Server => 'nginx' },
+);
+is_deeply
+    \%detected,
+    {
+        Parkings          => [ 'sedoparking' ],
+        'Web servers'     => [ 'Nginx' ],
+        'Reverse proxies' => [ 'Nginx' ]
+    },
+    'detect works when add files in constructor'
+;
+
+%detected = $wappalyzer->detect(
     html => 'aaa { bbb',
 );
-is_deeply \%detected, { parkings => [ 'open_curly_bracket' ] }, 'detect open curly bracket';
+is_deeply \%detected, { Parkings => [ 'open_curly_bracket' ] }, 'detect open curly bracket';
 
 $html = q{
 <!doctype html>
@@ -92,11 +136,18 @@ $html = q{
 <TITLE>SALVADOR регистрация доменов RU,COM,NET,ORG,etc,...</TITLE>
 };
 
-%detected = WWW::Wappalyzer::detect(
+%detected = $wappalyzer->detect(
     html => $html,
     headers  => { Server => 'nginx' },
 );
-is_deeply \%detected, { 'web-servers' => [ 'Nginx' ] }, 'detect parking with confidence, 50% found';
+is_deeply
+    \%detected,
+    {
+        'Web servers'     => [ 'Nginx' ],
+        'Reverse proxies' => [ 'Nginx' ],
+    },
+    'detect parking with confidence, 50% found'
+;
 
 $html .= q{
     <meta http-equiv="Content-Language" Content="ru">
@@ -106,26 +157,53 @@ $html .= q{
 <LINK REL="SHORTCUT ICON" href="/favicon.ico">
 };
 
-%detected = WWW::Wappalyzer::detect(
+%detected = $wappalyzer->detect(
     html => $html,
     headers  => { Server => 'nginx' },
 );
-is_deeply \%detected, { parkings => [ '1reg.online' ], 'web-servers' => [ 'Nginx' ] }, 'detect parking with confidence, 100% found';
+is_deeply
+    \%detected,
+    {
+        Parkings => [ '1reg.online' ],
+        'Web servers'     => [ 'Nginx' ],
+        'Reverse proxies' => [ 'Nginx' ],
+     },
+     'detect parking with confidence, 100% found';
 
-eval { WWW::Wappalyzer::detect(
+eval { $wappalyzer->detect(
     html => 1,
     headers => 'bad',
 ) };
 like $@, qr/Bad headers/;
 
-eval { WWW::Wappalyzer::detect(
+eval { $wappalyzer->detect(
     html => 1,
     headers => { key => { 1 => 2 } },
 ) };
 ok !$@, 'header skip hashes';
 
-%detected = WWW::Wappalyzer::detect( headers => { 'seT-Cookie' => 'C' } );
-is_deeply \%detected, { parkings => [ 'header-value-test' ] }, 'header single value';
+%detected = $wappalyzer->detect( headers => { 'seT-Header' => 'C' } );
+is_deeply \%detected, { Parkings => [ 'header-value-test' ] }, 'header single value';
 
-%detected = WWW::Wappalyzer::detect( headers => { 'Set-Cookie' => [ 'a', 'b', 'c' ] } );
-is_deeply \%detected, { parkings => [ 'header-value-test' ] }, 'header multi value';
+%detected = $wappalyzer->detect( headers => { 'Set-Header' => [ 'a', 'b', 'c' ] } );
+is_deeply \%detected, { Parkings => [ 'header-value-test' ] }, 'header multi value';
+
+my @cookies = (
+    'ZezzionId=ddd; Expires=Mon, 21-May-2012 12:58:39 GMT; Domain=.yandex.ru; Path=/',
+);
+%detected = $wappalyzer->detect( headers => { 'Set-Cookie' => \@cookies } );
+is_deeply \%detected, { Parkings => [ 'cookies-empty-re' ] }, 'cookies-empty-re';
+
+@cookies = (
+    '_ym_d=; Expires=Mon, 21-May-2012 12:58:39 GMT; Domain=.yandex.ru; Path=/',
+    'maps_routes_travel_mode=kkk123lll; Expires=Mon, 21-May-2012 12:58:39 GMT; Domain=.yandex.ru; Path=/',
+    'skid=; Expires=Mon, 21-May-2012 12:58:39 GMT; Domain=.yandex.ru; Path=/',
+);
+%detected = $wappalyzer->detect( headers => { 'Set-Cookie' => \@cookies } );
+is_deeply \%detected, { Parkings => [ 'cookies-simple-re' ] }, 'cookies-simple-re';
+
+@cookies = (
+    '_numeric_session=12345; Expires=Mon, 21-May-2012 12:58:39 GMT; Domain=.yandex.ru; Path=/',
+);
+%detected = $wappalyzer->detect( headers => { 'Set-Cookie' => \@cookies } );
+is_deeply \%detected, { Parkings => [ 'cookies-whole-string-re' ] }, 'cookies-whole-string-re';

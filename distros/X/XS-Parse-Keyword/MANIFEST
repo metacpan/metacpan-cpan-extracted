@@ -16,7 +16,11 @@ lib/XS/Parse/Keyword.pm
 lib/XS/Parse/Keyword.xs
 lib/XS/Parse/Keyword/Builder.pm
 lib/XS/Parse/Keyword/Builder_data.pm.PL
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 src/infix.c
 src/infix.h
 src/keyword.c
@@ -27,6 +31,7 @@ t/11stages-check.t
 t/30pieces-literal.t
 t/31pieces-block.t
 t/32pieces-anonsub.t
+t/33pieces-arithexpr.t
 t/33pieces-listexpr.t
 t/33pieces-termexpr.t
 t/34pieces-ident.t
@@ -54,7 +59,3 @@ t/structures.xs
 t/testcase.pm
 XSParseInfix.h
 XSParseKeyword.h
-README
-LICENSE
-META.yml
-META.json

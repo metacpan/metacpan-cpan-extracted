@@ -54,7 +54,10 @@
 typedef struct marpaESLIFRecognizer        marpaESLIFRecognizer_t;
 typedef struct marpaESLIFValue             marpaESLIFValue_t;
 typedef struct marpaESLIFValueResult       marpaESLIFValueResult_t;
-typedef enum   marpaESLIFValueResultBool   marpaESLIFValueResultBool_t;
+typedef enum   marpaESLIFValueResultBool {
+  MARPAESLIFVALUERESULTBOOL_FALSE = 0,
+  MARPAESLIFVALUERESULTBOOL_TRUE = 1
+}                                          marpaESLIFValueResultBool_t;
 typedef int                                marpaESLIFValueResultInt_t;
 typedef struct marpaESLIFValueResultString marpaESLIFValueResultString_t;
 typedef struct marpaESLIFEvent             marpaESLIFEvent_t;
@@ -290,10 +293,6 @@ typedef struct marpaESLIFValueResultArray {
   marpaESLIFValueResultFreeCallback_t  freeCallbackp;
   size_t                               sizel;
 } marpaESLIFValueResultArray_t;
-enum marpaESLIFValueResultBool {
-  MARPAESLIFVALUERESULTBOOL_FALSE = 0,
-  MARPAESLIFVALUERESULTBOOL_TRUE = 1
-};
 struct marpaESLIFValueResultString {
   unsigned char                       *p;
   short                                shallowb;

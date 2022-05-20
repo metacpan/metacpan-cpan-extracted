@@ -43,7 +43,7 @@ use Text::Wrap;
 $Text::Wrap::huge = 'overflow';
 $Text::Wrap::unexpand = 0;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use UI::Various::core;
 
@@ -243,7 +243,7 @@ sub _format($$$$$$$$$)
 
     my $len_p = length($prefix);
     my ($len_d_bef, $len_d_aft) = (length($deco_before), length($deco_after));
-    my $prefix2 = ' ' x $len_p;
+    my $blank_prefix = ' ' x $len_p;
     local $_;
 
     # TODO L8R: handle colour (add to front of DECO-1, reset after DECO-2)
@@ -269,14 +269,19 @@ sub _format($$$$$$$$$)
 	    # TODO: this is only the code for the alignments 1/4/7:
 	    {   $text[$_] .= ' ' x ($w - $l);   }
 	}
-	$text[$_] = ($_ == 0 ? $prefix : $prefix2)
+	$text[$_] = ($_ == 0 ? $prefix : $blank_prefix)
 	    . $deco_before . $text[$_] . $deco_after;
     }
     if ($h > @text)
     {
-	$_ = ' ' x ($w + $len_p + $len_d_bef + $len_d_aft);
-	# TODO: this is only the code for the alignments 7/8/9:
-	{   push @text, ($_) x ($h - @text);   }
+	my $empty = ' ' x ($len_d_bef + $w + $len_d_aft);
+	foreach (scalar(@text)..$h-1)
+	{
+	    my $p = $_ == 0 ? $prefix : $blank_prefix;
+	    # TODO: this is only the code for the alignments 7/8/9:
+	    {   push @text, $p . $empty;   }
+
+	}
     }
 
     return join("\n", @text);

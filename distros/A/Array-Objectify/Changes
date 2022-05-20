@@ -1,5 +1,8 @@
 Revision history for Array-Objectify
 
+0.02    2022/05/19
+	- Improve test coverage to 100%
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

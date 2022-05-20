@@ -12,7 +12,6 @@ The complete  POD  documentation  for SVG resides in the SVG module itself - typ
 "perldoc SVG" on the command line.
 
 (c) 2001-2008  Ronan Oger, RO IT Systems,
-GmbH homepage: http://www.roitsystems.com
 
 CONTACT POINT
 -------------
@@ -46,9 +45,6 @@ RESOURCES
 
 The following URLs offer additional resources for users of SVG.pm:
 
-* Perl SVG tutorials http://www.roitsystems.com/tutorial/
-* Perl SVG Zone homepage http://www.roitsystems.com/
-* gallery of the use of SVG.pm on the web http://roitsystems.com/gallery/svg/index.html
 * W3 Consortium http://www.w3.org/Graphics/SVG/
 * Sams Publishing, "SVG Unleashed", September 2002. There is a Perl chapter
 * SVG Open Conference proceedings http://www.svgopen.org/

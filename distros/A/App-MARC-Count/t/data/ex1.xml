@@ -1,0 +1,167 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+  <collection xmlns="http://www.loc.gov/MARC21/slim"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+    <record xmlns="http://www.loc.gov/MARC21/slim"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+      <leader>     nam a22        4500</leader>
+      <controlfield tag="001">ck8300078</controlfield>
+      <controlfield tag="003">CZ PrNK</controlfield>
+      <controlfield tag="005">20210309121951.0</controlfield>
+      <controlfield tag="007">tu</controlfield>
+      <controlfield tag="008">830304s1982    xr a         u0|0 | cze</controlfield>
+      <datafield tag="015" ind1=" " ind2=" ">
+        <subfield code="a">cnb000000096</subfield>
+      </datafield>
+      <datafield tag="020" ind1=" " ind2=" ">
+        <subfield code="q">(Brož.) :</subfield>
+        <subfield code="c">9 Kčs</subfield>
+      </datafield>
+      <datafield tag="035" ind1=" " ind2=" ">
+        <subfield code="a">(OCoLC)39560664</subfield>
+      </datafield>
+      <datafield tag="040" ind1=" " ind2=" ">
+        <subfield code="a">ABA001</subfield>
+        <subfield code="b">cze</subfield>
+        <subfield code="d">ABA001</subfield>
+      </datafield>
+      <datafield tag="080" ind1=" " ind2=" ">
+        <subfield code="a">352/353</subfield>
+        <subfield code="2">undef</subfield>
+      </datafield>
+      <datafield tag="080" ind1=" " ind2=" ">
+        <subfield code="a">338.46</subfield>
+        <subfield code="2">undef</subfield>
+      </datafield>
+      <datafield tag="100" ind1="1" ind2=" ">
+        <subfield code="a">Gabriel, Vladislav</subfield>
+        <subfield code="7">mzk2014852723</subfield>
+        <subfield code="4">aut</subfield>
+      </datafield>
+      <datafield tag="245" ind1="1" ind2="0">
+        <subfield code="a">Služby v systému národních výborů :</subfield>
+        <subfield code="b">vybrané kapitoly : určeno pro posl. fak. obchodní, obor Ekonomika služeb a cestovního ruchu /</subfield>
+        <subfield code="c">Vladislav Gabriel, Ladislav Zapadlo</subfield>
+      </datafield>
+      <datafield tag="250" ind1=" " ind2=" ">
+        <subfield code="a">1. vyd.</subfield>
+      </datafield>
+      <datafield tag="260" ind1=" " ind2=" ">
+        <subfield code="a">Praha :</subfield>
+        <subfield code="b">SPN,</subfield>
+        <subfield code="c">1982</subfield>
+        <subfield code="e">(Příbram :</subfield>
+        <subfield code="f">TZ 66)</subfield>
+      </datafield>
+      <datafield tag="300" ind1=" " ind2=" ">
+        <subfield code="a">192 s. :</subfield>
+        <subfield code="b">schémata ;</subfield>
+        <subfield code="c">30 cm</subfield>
+      </datafield>
+      <datafield tag="500" ind1=" " ind2=" ">
+        <subfield code="a">Rozmn.</subfield>
+      </datafield>
+      <datafield tag="500" ind1=" " ind2=" ">
+        <subfield code="a">300 výt.</subfield>
+      </datafield>
+      <datafield tag="500" ind1=" " ind2=" ">
+        <subfield code="a">Kap. 4. naps. Růžena Dudová, kap. 8. je sest. z příspěvků růz. autorů</subfield>
+      </datafield>
+      <datafield tag="550" ind1=" " ind2=" ">
+        <subfield code="a">Vydavatel: VŠE v Praze</subfield>
+      </datafield>
+      <datafield tag="655" ind1=" " ind2="7">
+        <subfield code="a">učebnice vysokých škol</subfield>
+        <subfield code="7">fd133772</subfield>
+        <subfield code="2">czenas</subfield>
+      </datafield>
+      <datafield tag="700" ind1="1" ind2=" ">
+        <subfield code="a">Zapadlo, Ladislav</subfield>
+        <subfield code="4">aut</subfield>
+      </datafield>
+      <datafield tag="710" ind1="2" ind2=" ">
+        <subfield code="a">Vysoká škola ekonomická v Praze</subfield>
+        <subfield code="7">kn20010709403</subfield>
+      </datafield>
+      <datafield tag="998" ind1=" " ind2=" ">
+        <subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=000000096&amp;local_base=CNB</subfield>
+      </datafield>
+    </record>
+
+<record xmlns="http://www.loc.gov/MARC21/slim"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+  <leader>     nam a22        4500</leader>
+  <controlfield tag="001">ck8300080</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20050517094212.0</controlfield>
+  <controlfield tag="007">tu</controlfield>
+  <controlfield tag="008">830316s1983    xr           u0|0   cze</controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb000000098</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="q">(Brož.) :</subfield>
+    <subfield code="c">30 Kčs</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">(OCoLC)39560688</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="d">ABA001</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">339.923</subfield>
+    <subfield code="2">undef</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">338.45</subfield>
+    <subfield code="2">undef</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Vladyka, Josef</subfield>
+    <subfield code="7">jx20050628036</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">Vývoj a plány rozvoje průmyslu evropských zemí RVHP 1976-1985 /</subfield>
+    <subfield code="c">vyprac. Josef Vladyka</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">Praha :</subfield>
+    <subfield code="b">ÚVTEI,</subfield>
+    <subfield code="c">1983</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">55 s. :</subfield>
+    <subfield code="b">tb. ;</subfield>
+    <subfield code="c">30 cm</subfield>
+  </datafield>
+  <datafield tag="490" ind1="1" ind2=" ">
+    <subfield code="a">Publikace SIVO ;</subfield>
+    <subfield code="v">1894</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Přehl. lit</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Rozmn.</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Pozn.</subfield>
+  </datafield>
+  <datafield tag="830" ind1=" " ind2="0">
+    <subfield code="a">Publikace SIVO</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=000000098&amp;local_base=CNB</subfield>
+  </datafield>
+</record>
+
+</collection>

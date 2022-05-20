@@ -32,7 +32,7 @@ BEGIN {
     $ENV{DISPLAY}  or  plan skip_all => 'DISPLAY not found';
     eval { require Tk; };
     $@  and  plan skip_all => 'Perl/Tk not found';
-    plan tests => 11;
+    plan tests => 14;
 
     # define fixed environment for unit tests:
     delete $ENV{UI};
@@ -80,6 +80,7 @@ my $listbox2 = UI::Various::Listbox->new(texts => \@text8, height => 3,
 my @selection = ();
 my @counts = ();
 
+my $ww2 = 0;
 my $button1 = UI::Various::Button->new
     (text => 'Bye',
      code => sub {
@@ -94,7 +95,7 @@ my $button1 = UI::Various::Button->new
 	 push @counts, scalar(@{$listbox2->texts});
 	 $listbox2->remove(8);
 	 push @counts, scalar(@{$listbox2->texts});
-	 $_ = $win2->width;
+	 $ww2 = $win2->width;
 	 @selection = $listbox2->selected();
 	 $button2->_tk()->invoke;
      });
@@ -110,20 +111,66 @@ combined_like
     $main->_mainloop_run;
 }
     qr{\A(?:^Devel::Cover: .*lib/Tk/Frame.pm .*\n)*\Z}m,
-    'mainloop produces correct empty output';
+    'mainloop "2 windows" produces correct empty output';
 is(@{$main->{children}}, 0, 'main again no longer has children');
-is($_, 42, '$win2 had correct fixed width');
+is($ww2, 42, '$win2 had correct fixed width');
 is($counts[0], 9, 'listbox has correct 1st count');
 is($counts[1], 8, 'listbox has correct 2nd count');
 is_deeply(\@selection, [1, 2, 4], 'listbox had correct final selection');
 
 ####################################
+# test window and dialogue:
+
+$main = UI::Various::Main->new();
+my ($dialog, $button5);
+my $flow = 1;
+my $button3 = UI::Various::Button->new(text => 'Close',
+				       code => sub{
+					   $flow *= 2;
+					   $dialog->destroy;
+					   $button5->_tk()->invoke;
+				       });
+my $button4 = UI::Various::Button->new(text => 'Dialogue',
+				       code => sub{
+					   $dialog = $main->dialog($button3);
+					   $dialog->_prepare();
+					   $button3->_tk()->invoke;
+					   $flow += 1;
+				       });
+$button5 = UI::Various::Button->new(text => 'Quit',
+				    code => sub{ $win1->destroy; });
+$win1 = $main->window({title => 'Dialog'}, $button4, $button5);
+combined_like
+{
+    $main->_mainloop_prepare;
+    $button4->_tk()->invoke;
+    $main->_mainloop_run;
+}
+    qr{\A(?:^Devel::Cover: .*lib/Tk/Frame.pm .*\n)*\Z}m,
+    'mainloop "dialogue" produces correct empty output';
+is(@{$main->{children}}, 0, 'main yet again no longer has children');
+is($flow, 3, 'flow looks correct');
+
+####################################
 # test unused behaviour (and get 100% coverage):
 
-$_ = UI::Various::Window->new(title => 'hello');
-is(@{$main->{children}}, 1, 'main has new child');
-is($_->title(), 'hello', 'window constructor sets title');
-$_->destroy();
+$win1 = UI::Various::Window->new(title => 'hello');
+$dialog = UI::Various::Dialog->new();
+my $dialog2 = UI::Various::Dialog->new(height => 5);
+my $dialog3 = UI::Various::Dialog->new(height => 5, width => 10);
+
+is(@{$main->{children}}, 4, 'main has new children');
+is($win1->title(), 'hello', 'window constructor sets title');
+
+$dialog2->_prepare();
+
+$win1->destroy();
+$dialog->destroy();
+$dialog2->destroy();
+
+$dialog3->_prepare();
+$dialog3->destroy();
+
 is(@{$main->{children}}, 0, 'main is clean again');
 
 $main->mainloop();		# an additional empty call just for the coverage

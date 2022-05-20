@@ -3,9 +3,13 @@
 use v5.20.0;
 use warnings;
 
+# The parts of this that we use have been stable and unchanged since v5.20.0:
+use feature qw(postderef);
+no warnings 'experimental::postderef';
+
 package Cron::Sequencer::Output;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 use Carp qw(confess croak);
 
@@ -15,16 +19,25 @@ sub new {
     confess('new() called as an instance method')
         if ref $class;
 
-    my %state = %opts{count};
-    if ($opts{'hide-env'}) {
-        ++$state{hide_env};
-    }
+    my %state = %opts{qw(count group hide-env json)};
 
     return bless \%state;
 }
 
 sub render {
     my ($self, @groups) = @_;
+
+    return $self->{json}
+        ? $self->render_json(@groups) : $self->render_text(@groups);
+}
+
+sub render_text {
+    my ($self, @groups) = @_;
+
+    # We assume that you normally want things grouped, so we aren't particularly
+    # optimising the "flat" --no-group path:
+    @groups = map { [$_] } map { @$_ } @groups
+        unless $self->{group};
 
     my @output;
 
@@ -73,6 +86,58 @@ sub render {
     pop @output;
 
     return join "\n", @output;
+}
+
+sub render_json {
+    my ($self, @groups) = @_;
+    require JSON::MaybeXS;
+
+    my %opts = $self->{json}->%*;
+
+    # CLI parser forbids 'seq' and 'split' simultaneously.
+    my $seq = delete $opts{seq};
+    my $start = $seq ? "\x1E" : "";
+    my $split = delete $opts{split} || $seq;
+
+    my $json = JSON::MaybeXS->new(%opts);
+
+    my $munged;
+    if ($self->{'hide-env'}) {
+        # We shouldn't mutate our input, so we need to make a copy. As we need
+        # to loop over the data anyway for --no-groups, combine the two loops
+        if ($self->{group}) {
+            for my $group (@groups) {
+                # We need to create new anon arrays to hold our cleaned entries:
+                my @cleaned;
+                for my $entry (@$group) {
+                    my %copy = %$entry;
+                    # Clean
+                    delete @copy{qw(unset env)};
+                    # and flatten
+                    push @cleaned, \%copy;
+                }
+                push @$munged, \@cleaned;
+            }
+        } else {
+            for my $entry (map { @$_ } @groups) {
+                my %copy = %$entry;
+                # Clean
+                delete @copy{qw(unset env)};
+                # and flatten
+                push @$munged, \%copy;
+            }
+        }
+    } elsif ($self->{group}) {
+        # Nothing to do!
+        $munged = \@groups;
+    } else {
+        @$munged = map { @$_ } @groups;
+    }
+
+    return $json->encode($munged) . "\n"
+        unless $split;
+
+    return join '', map { $start . $json->encode($_) . "\n" } @$munged;
 }
 
 # TODO - improve this documentation, as a side effect of adding other output

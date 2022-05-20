@@ -383,6 +383,7 @@ t/ttkTixNoteBook.t
 t/unicode.t
 t/virtualEv.t
 t/widgetDelete.t
+t/widgetMethod.t
 t/widgetName.t
 t/wmForget.t
 t/wmStackorder.t

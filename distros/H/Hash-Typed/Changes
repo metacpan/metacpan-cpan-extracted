@@ -1,5 +1,8 @@
 Revision history for Hash-Typed
 
+0.05    18/05/2022
+	- Improve test coverage to 100%
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

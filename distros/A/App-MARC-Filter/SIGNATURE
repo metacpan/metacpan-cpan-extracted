@@ -1,0 +1,60 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 ace2f10ed68bddf489b43abeeb06cd61792ce0e2b1ce1922ac99cd2f4d4cba88 CONCEPT
+SHA256 a2172c94081d7ab5728d3d4026b6bb9cf19ba0cc7a844fcf18022c2097e925f4 Changes
+SHA256 534765ff7320bbe92bd5abc71b801c2454f88f21152e7f6385c41318116e8b7a Filter.pm
+SHA256 6a01c8ca9cc78d9c46a65d1b8ae61f1a37b77cdf5f0a4075d85ed227e0d1784b LICENSE
+SHA256 68c384bf8c566a3253a08a706bfad6829b180bd7d81148d11762e9ec6a38fa8c MANIFEST
+SHA256 dc882be825e0393b7c789c5b9de844825ca050f23aa5f771aaf08dfc268aa102 META.yml
+SHA256 3909bd886502a1a0253955748be9be768f829825abdfeb22c4c9626cc88cfc77 Makefile.PL
+SHA256 a6297f89939d5c159492f911ffe45062952a77c110e66514239933ef7b2ed0fa README
+SHA256 bf49c21e3e744a62ad378f9cc5a20e4a8bd6ed866538428f10af603b5ff2dfd9 bin/marc-filter
+SHA256 2deb5a12c581bf9a304ba6232b718866485c9476b8dae96cd249a4c6fba34540 examples/ex1.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 751bc4e2f98074c05c9e23d484f2406cef042099664b6c87a73d6530bbeda427 inc/Module/Install/Scripts.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 393f2c2c22c634ac482f019ab8435b3490f491f94031c1c7e5dc27fdd1a8ab7d t/App-MARC-Filter/01-use.t
+SHA256 8cd28ced3aed5a6b55193cbd22bda99ce0782edcd0dd639d92b6e2009b9a305e t/App-MARC-Filter/02-version.t
+SHA256 2deced5bd8882b79293a940fbf96084826719c4fa79e776b852b70b627cbd29e t/App-MARC-Filter/03-new.t
+SHA256 bfb6e5b8f8b9e0c84eaf08421063e7bf793696e31fc06d679d1feaacc8d4eb24 t/App-MARC-Filter/04-run.t
+SHA256 7e47f7d3516715d4708f4b230fe2536a31b3b4c86565edbd5950432c1b4ac625 t/data/ex1.xml
+SHA256 a8f9541bbf8addff6f7daafc8a1084c7fcce33f68afa7f9d0b52861b3034edc4 t/data/ex2.xml
+SHA256 2703cab2f1b8aacc0a6588060afd88a5b808c83dc7f52c92c01da597f371c542 xt/App-MARC-Filter/01-pod_coverage.t
+SHA256 579ea17193a421d9570a341d6abca194ec76e97cf851ac6907fe738fde1611f6 xt/App-MARC-Filter/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEERTLc1QTxqWhVvPeegmqNLzlXaRcFAmKEycoACgkQgmqNLzlX
+aReDCwv+LBdscebfQrjbDd/Ci8jeZaF5fqDy405NnpvuQWMZbX0ENj7EIfI9P8yb
+wQqiW4e1esyYXWbLgW99cYuLFt/4dma0DLI1nTFLb2EPFNwMHp/Qb+BMSwUoCySl
+AmdGaKur1s1atPAT/aNZnuqbwKr6Hgdi4EyxgrKkAo5voC/ajrzCadMnrsKP8/nF
+DWCFUgutz1w7TNPlbk7ZU5/fcm3KRnI1kd86fZqzpPG5Z4j1TV4AFwq78bKFuD2o
+6VbEVOlrHT1/P7oCHKK4LYUhSS3F/aq8aC+HtWxIeqnzqwE22mGamdlT6iULNZ+0
+eJw8FxVoMedcTNHaIO6xHjfOlunHGP+H1pKiHjqSqNuqdTTEQJeBtBBmcSN74Fdh
+6Rmq16UDmojnXckOdpPrtUKSWcMgsKvt4wVbBlMyPofYVB8AtJLbBd8FgNlFpD9G
+ZdilrisMIfIppNSXhrtcsav6SWCaQoVUl2Tk6C3lt/b7/75Dc3y8zMYbB09rKDfE
+olPOCVGm
+=OWgp
+-----END PGP SIGNATURE-----

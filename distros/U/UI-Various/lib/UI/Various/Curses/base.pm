@@ -40,7 +40,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use UI::Various::core;
 
@@ -131,10 +131,12 @@ sub _cleanup($)
     }
     foreach (keys %references)
     {   defined $references{$_}{$self}  and  delete $references{$_}{$self};   }
-    $self->{_cui}  and  delete $self->{_cui};
 
     $_ = $self->parent;
+    $_ = $_->parent while ref($_) eq 'DummyBox';
     $_->{_cui}  and  $_->{_cui}->delete($self->_cid);
+    $self->{_cui}  and  delete $self->{_cui};
+
     $_->remove($self);
 }
 
@@ -176,6 +178,40 @@ sub _reference($$;$)
 	next if $_ eq $self;
 	$_ = $references{$scalar}{$_};
 	$_->can('_update')  and  $_->_update();
+    }
+}
+
+#########################################################################
+
+=head2 B<_update_all_references> - update all SCALAR refereneces
+
+    $self->_update_all_references();
+
+=head3 parameters:
+
+    $self               unused reference object
+
+=head3 description:
+
+This method updates all stored SCALAR references for all objects.  Currently
+it's only used after destroying a L<UI::Various::Curses::Dialog>.
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+sub _update_all_references($)
+{
+    my ($self) = @_;
+    debug(4, __PACKAGE__, '::_update_all_references ', $self->_cid);
+
+    local $_;
+    foreach my $scalar (keys %references)
+    {
+	foreach (keys %{$references{$scalar}})
+	{
+	    $_ = $references{$scalar}{$_};
+	    $_->can('_update')  and  $_->_update();
+	}
     }
 }
 

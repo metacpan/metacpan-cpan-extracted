@@ -130,7 +130,7 @@
          "web" : "https://github.com/uperl/File-XDG"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_contributors" : [
       "S\u00edle Ekaterin Aman",
       "Graham Ollis <plicease@cpan.org>"

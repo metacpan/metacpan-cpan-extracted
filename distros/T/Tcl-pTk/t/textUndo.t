@@ -114,7 +114,7 @@ ok(
 $t->bind("<Any-Enter>", sub { $t->focus });
 
 $t->Subwidget('textundo')->OnDestroy(sub {
-        print "Destroyed!\n"; 
+        print "# Destroyed!\n";
         # print $t->get('1.0','end') # Doesn't work for Tcl/pTk 8.5
 });
 

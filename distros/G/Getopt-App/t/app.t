@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
+my $methods_app  = methods_app();
 my $synopsis_app = synopsis_app();
 
 subtest import => sub {
@@ -20,6 +21,7 @@ subtest constructor => sub {
 };
 
 subtest run => sub {
+  local $main::exit_value = 42;
   is $synopsis_app->([]),               42, 'empty';
   is $synopsis_app->([qw(--name foo)]), 0,  'name';
   is $synopsis_app->([qw(-vv)]),        2,  'verbose';
@@ -41,15 +43,35 @@ subtest post_process_argv => sub {
   is_deeply [@main::POST_PROGRESS], [[], {valid => 0}], 'invalid args';
 };
 
-subtest hooks => sub {
-  my $hooks_app = hooks_app();
-  is $hooks_app->([qw(-x 40)]),      42, 'default exit value';
-  is $hooks_app->([qw(four -x 40)]), 4,  'four exit value';
+subtest methods => sub {
+  local $main::exit_value = 42;
+  is $methods_app->([qw(-x 40)]),      42, 'default exit value';
+  is $methods_app->([qw(four -x 40)]), 4,  'four exit value';
+};
+
+subtest exit_value => sub {
+  local $main::exit_value = undef;
+  is $methods_app->([qw(-x 40)]), 0, 'exit value undef';
+
+  local $main::exit_value = 0;
+  is $methods_app->([qw(-x 40)]), 0, 'exit value 0';
+
+  local $main::exit_value = 1;
+  is $methods_app->([qw(-x 40)]), 1, 'exit value 1';
+
+  local $main::exit_value = 255;
+  is $methods_app->([qw(-x 40)]), 255, 'exit value 255';
+
+  local $main::exit_value = 256;
+  is $methods_app->([qw(-x 40)]), 255, 'exit value 256';
+
+  local $main::exit_value = 'foo';
+  is $methods_app->([qw(-x 40)]), 0, 'exit value foo';
 };
 
 done_testing;
 
-sub hooks_app {
+sub methods_app {
   eval <<'HERE' or die $@;
     package My::Hooks;
     use Getopt::App;
@@ -61,10 +83,7 @@ sub hooks_app {
       $app->{subcommand} = shift @$argv if @$argv and $argv->[0] =~ m!^[a-z]!;
     }
 
-    sub getopt_post_process_exit_value {
-      my ($app, $exit_value) = @_;
-      $$exit_value ||= 42;
-    }
+    sub getopt_post_process_exit_value { $_[1] || $main::exit_value }
 
     run('x=i', sub {
       my ($app, @extra) = @_;

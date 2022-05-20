@@ -1,5 +1,9 @@
 Revision history for Map::Tube::CLI
 
+0.67  Thu May 19 18:55:00 2022
+      - Upgraded dependency on Map::Tube v3.67.
+      - Added support for Map::Tube::Hongkong.
+
 0.66  Fri Sep 06 15:05:00 2019
       - Moved author test scripts to xt/ subfolder.
 

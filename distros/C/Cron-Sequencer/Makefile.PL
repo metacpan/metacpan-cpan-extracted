@@ -14,6 +14,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Algorithm::Cron'  => 0,
         'DateTime'         => 0,
+        'JSON::MaybeXS'    => 0,
         'Try::Tiny'        => 0,
     },
     TEST_REQUIRES => {
@@ -29,4 +30,7 @@ WriteMakefile(
             repository => 'https://github.com/Humanstate/cron-sequencer'
         },
     },
+    EXE_FILES => [
+        'bin/cron-sequencer',
+    ],
 );

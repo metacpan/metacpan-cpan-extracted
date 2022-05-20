@@ -2,7 +2,7 @@ NAME
     App::PericmdUtils - Some utilities related to Perinci::CmdLine
 
 VERSION
-    This document describes version 0.051 of App::PericmdUtils (from Perl
+    This document describes version 0.052 of App::PericmdUtils (from Perl
     distribution App-PericmdUtils), released on 2022-05-02.
 
 DESCRIPTION

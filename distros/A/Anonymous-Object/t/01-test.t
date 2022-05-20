@@ -17,6 +17,7 @@ my $obj = $an->hash_to_object({
 });
 
 is(ref $obj, 'Anonymous::Object::0');
+ok($obj->new);
 is ($obj->a, 1);
 is ($obj->b, 2);
 is ($obj->c, 3);
@@ -37,6 +38,7 @@ my $obj2 = $an->hash_to_object({
 });
 
 is (ref $obj2, 'Anonymous::Object::1');
+ok($obj2->new);
 is ($obj2->a, 1);
 is ($obj2->b, 2);
 is ($obj2->c, 3);
@@ -56,6 +58,7 @@ my $obj3 = $an->hash_to_object({
 	next => sub { return 1 }
 });
 
+ok($obj3->new);
 is (ref $obj3, 'Anonymous::Object::2');
 is ($obj3->a, 1);
 is ($obj3->b, 2);

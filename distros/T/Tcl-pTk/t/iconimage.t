@@ -1,5 +1,5 @@
 # Test of iconimage method. This method is implemented in Tcl as the iconphoto method,
-#  which only exists is Tcl/pTk > 8.5
+#  which only exists in Tcl/Tk >= 8.5
 use warnings;
 use strict;
 
@@ -9,12 +9,9 @@ use Test;
 
 my $top = MainWindow->new();
 
-my $version = $top->tclVersion;
-# print "version = $version\n";
-
-# Skip if Tcl/pTk version is < 8.5
-if( $version < 8.5 ){
-    print "1..0 # Skipped: iconimage only works for Tcl >= 8.5\n";
+# Skip if Tcl/Tk version is < 8.5
+if( $top->interp->Eval('package vcompare $tk_version 8.5') == -1 ){
+    print "1..0 # Skipped: iconimage only works for Tcl/Tk >= 8.5\n";
     $top->destroy;
     exit;
 }

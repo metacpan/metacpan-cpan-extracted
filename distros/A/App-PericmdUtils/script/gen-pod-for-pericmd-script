@@ -12,7 +12,7 @@ use Perinci::CmdLine::Any;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-05-02'; # DATE
 our $DIST = 'App-PericmdUtils'; # DIST
-our $VERSION = '0.051'; # VERSION
+our $VERSION = '0.052'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Perinci/CmdLine/POD/gen_pod_for_pericmd_script",
@@ -36,7 +36,7 @@ gen-pod-for-pericmd-script - Generate POD for Perinci::CmdLine-based CLI script
 
 =head1 VERSION
 
-This document describes version 0.051 of gen-pod-for-pericmd-script (from Perl distribution App-PericmdUtils), released on 2022-05-02.
+This document describes version 0.052 of gen-pod-for-pericmd-script (from Perl distribution App-PericmdUtils), released on 2022-05-02.
 
 =head1 SYNOPSIS
 

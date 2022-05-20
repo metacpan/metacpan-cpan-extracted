@@ -1,5 +1,21 @@
 Revision history for XS-Parse-Keyword
 
+0.23    2022-05-18
+        [CHANGES]
+         * Defined XPK_KEYWORD, a better version of XPK_LITERAL for
+           keyword-like tokens
+         * Defined XPK_ARITHEXPR, a higher-precedence version of XPK_TERMEXPR
+         * Defined XPK_ARGSCOPE, a variant of XPK_PARENSCOPE where the parens
+           themselves are optional
+         * Undocument the old XPK_STRING token type
+
+        [BUGFIXES]
+         * Fixes for bugs that affect -DDEBUGGING-enabled perls
+            + Remember to clear OPf_KIDS when stealing the op_first of a
+              LISTOP (RT142770)
+            + Don't call cv_clone() at compiletime when unit testing; generate
+              an OP_ANONCODE instead (RT142771)
+
 0.22    2022-02-21
         [CHANGES]
          * Added XPK_AUTOSEMI piece type

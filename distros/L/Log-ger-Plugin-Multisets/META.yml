@@ -22,7 +22,7 @@ name: Log-ger-Plugin-Multisets
 provides:
   Log::ger::Plugin::Multisets:
     file: lib/Log/ger/Plugin/Multisets.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Log::ger: '0.038'
   strict: '0'
@@ -31,7 +31,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-Plugin-Multisets
   homepage: https://metacpan.org/release/Log-ger-Plugin-Multisets
   repository: git://github.com/perlancar/perl-Log-ger-Plugin-Multisets.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

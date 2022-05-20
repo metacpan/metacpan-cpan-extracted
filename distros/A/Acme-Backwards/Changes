@@ -1,7 +1,10 @@
 Revision history for Acme-Backwards
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+0.05    2020-02-18
+	Add support for nested fi, fisle, sselnu and esle inside rof loops.
+
+0.04    2020-02-17
+	Add support for rof (for)
 
 0.02    2020-02-17
-	require Keyword::Declare 0.001017.    
+	require Keyword::Declare 0.001017.

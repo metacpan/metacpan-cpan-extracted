@@ -1,0 +1,60 @@
+NAME
+    marc-filter - Script to filter records in MARC dataset.
+
+SYNOPSIS
+     marc-filter [-h] [-o format] [-r] [--version] marc_xml_file field subfield value
+
+DESCRIPTION
+    It supports MARC XML files now.
+
+ARGUMENTS
+    *       "-h"
+
+            Print help.
+
+    *       "-o format"
+
+            Output MARC format.
+
+            Possible formats are ascii, xml.
+
+    *       "-r"
+
+            Use value as Perl regexp.
+
+    *       "--version"
+
+            Print version of script.
+
+    *       "marc_xml_file"
+
+            MARC XML file name.
+
+    *       "field"
+
+            MARC field.
+
+    *       "subfield"
+
+            MARC subfield.
+
+    *       "value"
+
+            MARC field/subfield value to filter.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-MARC-Filter>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2022 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

@@ -28,6 +28,12 @@ also reduces the memory footprint.
 
 Math::BigInt::GMP inherits from Math::BigInt::Lib.
 
+# STATIC FUNCTIONS
+
+## $str = gmp\_version();
+
+Returns the underlying GMP library's version as a string, e.g., `6.2.1`.
+
 # BUGS
 
 Please report any bugs or feature requests to
@@ -70,7 +76,7 @@ You can also look for information at:
 This program is free software; you may redistribute it and/or modify it under
 the same terms as Perl itself.
 
-# AUTHOR
+# AUTHORS
 
 Tels &lt;http://bloodgate.com/> in 2001-2007.
 
@@ -78,6 +84,8 @@ Thanks to Chip Turner (CHIPT on CPAN) for providing Math::GMP, which was
 inspiring my work.
 
 Maintained by Peter John Acklam <pjacklam@gmail.com> 2010-2021.
+
+gmp\_version() provided by FGasper on GitHub.
 
 # SEE ALSO
 

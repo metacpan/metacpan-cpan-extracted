@@ -20,6 +20,6 @@ no_index:
 requires:
   Math::MPFR: '4.22'
 resources:
-  repository: https://github.com/sisyphus/math-nv.git
-version: '0.02'
+  repository: https://github.com/sisyphus/math-fakedd.git
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

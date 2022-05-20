@@ -1,6 +1,6 @@
 package Tcl::pTk::Tile;
 
-our ($VERSION) = ('1.08');
+our ($VERSION) = ('1.09');
 
 use strict;
 use warnings;
@@ -203,6 +203,10 @@ sub Tcl::pTk::ttkTreeview::item {
 sub Tcl::pTk::ttkTreeview::tag {
     my $self = shift;
     $self->call($self->path, 'tag', @_);
+}
+sub Tcl::pTk::ttkTreeview::cellselection {
+    my $self = shift;
+    $self->call($self->path, 'cellselection', @_);
 }
 
 1;

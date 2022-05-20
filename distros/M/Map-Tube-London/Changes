@@ -1,5 +1,15 @@
 Revision history for Map::Tube::London
 
+1.35  2022-05-19
+      - Updated dependency on Map::Tube v3.66
+      - Fixed line for South Kensington station.
+      - Fixed unit test to respect the changes to Map::Tube.
+
+1.34  2022-05-18
+      - Updated dependency on Map::Tube v3.65
+      - Fixed map data (South Kensington is not linked to Knightsbridge)
+      - Fixed unit test to respect the changes to Map::Tube.
+
 1.33  2019-08-29
       - Moved author test scripts to xt/ subfolder.
 

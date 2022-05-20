@@ -146,7 +146,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.152';
+our $VERSION = '0.153';
 our @EXPORT_OK = qw{
     shell
 
@@ -303,7 +303,8 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	'cosmos-2251-debris' => { name => 'Cosmos 2251 debris' },
 	'iridium-33-debris' => { name => 'Iridium 33 debris' },
 	'2012-044'	=> { name => 'BREEZE-M R/B Breakup (2012-044C)' },
-	'2019-006'	=> { name => 'Indian ASAT Test Debris' },
+	# Removed 2022-05-12
+	# '2019-006'	=> { name => 'Indian ASAT Test Debris' },
     },
     celestrak_supplemental => {
 	gps		=> { name => 'GPS',		rms => 1, match => 1 },

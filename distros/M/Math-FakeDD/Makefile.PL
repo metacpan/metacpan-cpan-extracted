@@ -15,8 +15,8 @@ my %options = %{
     resources => {
       repository => {
         type => 'git',
-        url => 'https://github.com/sisyphus/math-nv.git',
-        web => 'https://github.com/sisyphus/math-nv',
+        url => 'https://github.com/sisyphus/math-fakedd.git',
+        web => 'https://github.com/sisyphus/math-fakedd',
       },
     },
   },

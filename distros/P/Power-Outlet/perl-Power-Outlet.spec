@@ -1,7 +1,7 @@
 %define lowername  power-outlet
 
 Name:           perl-Power-Outlet
-Version:        0.43
+Version:        0.44
 Release:        1%{?dist}
 Summary:        Control and query network attached power outlets
 License:        GPL+ or Artistic
@@ -11,6 +11,7 @@ Source0:        http://www.cpan.org/modules/by-module/Power/Power-Outlet-%{versi
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(ExtUtils::MakeMaker::META_MERGE::GitHub)
 BuildRequires:  perl(Test::Simple) >= 0.44
 BuildRequires:  perl(Package::New)
 BuildRequires:  perl(Package::Role::ini) >= 0.07
@@ -126,14 +127,14 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0755,root,root) %{_bindir}/%{lowername}-mqtt-listener.pl
 %attr(0744,root,root) %config(noreplace) %{_sysconfdir}/%{lowername}-mqtt-listener.yml
 %attr(0644,root,root) %{_unitdir}/%{lowername}-mqtt-listener.service
-%{_mandir}/man1/%{lowername}-mqtt-listener.pl.1
+%{_mandir}/man1/%{lowername}-mqtt-listener.pl.1.gz
 
 %files
 %defattr(-,root,root,-)
-%doc Changes LICENSE perl-Power-Outlet.spec README.md
+%doc Changes LICENSE
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
-%{_mandir}/man1/%{lowername}.1
+%{_mandir}/man1/%{lowername}.1.gz
 %attr(0755,root,root) %{_bindir}/%{lowername}
 
 %post mqtt-listener

@@ -67,7 +67,7 @@ require Exporter;
 
 %Math::FakeDD::EXPORT_TAGS = (all =>[@Math::FakeDD::EXPORT_OK]);
 
-$Math::FakeDD::VERSION =  '0.02';
+$Math::FakeDD::VERSION =  '0.03';
 
 sub new {
 
@@ -740,10 +740,24 @@ sub dd_repro {
       # msd is subnormal; the exponent, with the mpfr
       # library, will be in the range (-1022 .. -1073)
       # Rmpfr_prec_round($mpfr, $v[1] + 1074, MPFR_RNDN);
+
+      if(RMPFR_PREC_MIN == 2) {
+        # Prior to mpfr-4.0, min allowed precision is 2 bits,
+        # but DBL_DENORM_MIN calls for a precision of one bit.
+        # We therefore return the hard coded value for this case.
+
+        if(Rmpfr_get_exp($mpfr) == -1073) {
+          # $mpfr is 2 ** -1074
+          my $ret = $neg ? '-5e-324' : '5e-324';
+          return $ret;
+        }
+      }
       Rmpfr_prec_round($mpfr, Rmpfr_get_exp($mpfr) + 1074, MPFR_RNDN);
     }
   }
-  else {
+  else { # TODO: It seems to work fine, but is
+         # there a better way to handle this ?
+
     $v[0] =~ s/0+$//; # remove all trailing zeroes
     my $m_lsd = Rmpfr_init2(53);
     Rmpfr_set_d($m_lsd, $arg->{lsd}, MPFR_RNDN);

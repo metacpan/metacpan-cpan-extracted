@@ -14,9 +14,9 @@
 ^graveyard\.
 \bMakefile$
 ^testme\.perl$
-\bngutils.pm$
-\bngutils.xs$
-\bngutils.c$
+\bUtils.pm$
+\bUtils.xs$
+\bUtils.c$
 \bREADME\.pod$
 \bREADME\.rpod$
 \.moo$
@@ -25,3 +25,5 @@
 ^#Makefile#$
 ^MYMETA\.
 ^reversion\.sh$
+^\.git
+^svntag\.rc$

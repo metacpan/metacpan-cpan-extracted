@@ -44,6 +44,7 @@ Build in the usual way:
  make
  make test
  make install
+ make realclean (must be run before re-building.)
 
 When building this module, the GMP and MPFR libraries will need to be
 accessible. If those files are in a location where your compiler does

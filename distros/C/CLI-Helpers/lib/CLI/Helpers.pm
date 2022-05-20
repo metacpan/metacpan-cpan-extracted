@@ -1,13 +1,16 @@
 package CLI::Helpers;
 # ABSTRACT: Subroutines for making simple command line scripts
 # RECOMMEND PREREQ: App::Nopaste
+# RECOMMEND PREREQ: Term::ReadLine::Gnu
 
 use strict;
+use feature qw(state);
 use warnings;
 
 use Capture::Tiny qw(capture);
 use File::Basename;
 use Getopt::Long qw(GetOptionsFromArray :config pass_through);
+use IO::Interactive qw( is_interactive );
 use Module::Load qw(load);
 use Ref::Util qw(is_ref is_arrayref is_hashref);
 use Sys::Syslog qw(:standard);
@@ -16,21 +19,13 @@ use Term::ReadKey;
 use Term::ReadLine;
 use YAML;
 
-our $VERSION = '1.8'; # VERSION
+our $VERSION = '1.9'; # VERSION
 
 # Capture ARGV at Load
 my @ORIG_ARGS;
 BEGIN {
     @ORIG_ARGS = @ARGV;
 }
-
-{ # Work-around for CPAN Smoke Test Failure
-    # Details: http://perldoc.perl.org/5.8.9/Term/ReadLine.html#CAVEATS
-    open( my $FH, '<', "/dev/tty" )
-        or eval { sub Term::ReadLine::findConsole { ("&STDIN", "&STDERR") } };
-    die $@ if $@;
-    close $FH;
-} # End Work-around
 
 
 require Exporter;
@@ -260,6 +255,8 @@ sub def { return exists $DEF{$_[0]} ? $DEF{$_[0]} : undef }
 
 
 sub git_color_check {
+    return unless is_interactive();
+
     my @cmd = qw(git config --global --get color.ui);
     my($stdout,$stderr,$rc) = capture {
         system @cmd;
@@ -272,6 +269,7 @@ sub git_color_check {
     if( $stdout =~ /auto/ || $stdout =~ /true/ ) {
         return 1;
     }
+
     return 0;
 }
 
@@ -452,14 +450,13 @@ sub confirm {
     my ($question) = @_;
 
     # Initialize Globals
-    $TERM ||= Term::ReadLine->new($0);
     $_Confirm_Valid ||= {qw(y 1 yes 1 n 0 no 0)};
 
     $question =~ s/\s*$/ [yN] /;
     my $answer = undef;
     until( defined $answer && exists $_Confirm_Valid->{$answer} ) {
         output({color=>'red',stderr=>1},"ERROR: must be one of 'y','n','yes','no'") if defined $answer;
-        $answer = lc $TERM->readline($question);
+        $answer = lc _get_input($question);
     }
     return $_Confirm_Valid->{$answer};
 }
@@ -477,9 +474,6 @@ sub text_input {
     }
     $question .= "$terminator ";
 
-    # Initialize Term
-    $TERM ||= Term::ReadLine->new($0);
-
     # Make sure there's a space before the prompt
     $question =~ s/\s*$/ /;
     my $validate = exists $args{validate} ? $args{validate} : {};
@@ -490,21 +484,8 @@ sub text_input {
         output({color=>'red',stderr=>1},"ERROR: $error") if defined $error;
 
         # Try to have the user answer the question
-        $error=undef;
-        if( exists $args{noecho} ) {
-            # Disable all the Term ReadLine magic
-            local $|=1;
-            print STDOUT $question;
-            ReadMode('noecho');
-            $text = ReadLine();
-            ReadMode('restore');
-            print STDOUT "\n";
-            chomp($text);
-        }
-        else {
-            $text = $TERM->readline($question);
-            $TERM->addhistory($text) if $text =~ /\S/;
-        }
+        $text  = _get_input($question => \%args);
+        $error = undef;
 
         # Check the default if the person just hit enter
         if( exists $args{default} && length($text) == 0 ) {
@@ -528,9 +509,6 @@ sub menu {
     my ($question,$opts) = @_;
     my %desc = ();
 
-    # Initialize Term
-    $TERM ||= Term::ReadLine->new($0);
-
     # Determine how to handle this list
     if( is_arrayref($opts) ) {
         %desc = map { $_ => $_ } @{ $opts };
@@ -538,9 +516,8 @@ sub menu {
     elsif( is_hashref($opts) ) {
         %desc = %{ $opts };
     }
-    my $OUT = $TERM->OUT || \*STDOUT;
 
-    print $OUT "$question\n\n";
+    print "$question\n\n";
     my %ref = ();
     my $id  = 0;
     foreach my $key (sort keys %desc) {
@@ -551,11 +528,10 @@ sub menu {
     until( defined $choice && exists $ref{$choice} ) {
         output({color=>'red',stderr=>1},"ERROR: invalid selection") if defined $choice;
         foreach my $id (sort { $a <=> $b } keys %ref) {
-            printf $OUT "    %d. %s\n", $id, $desc{$ref{$id}};
+            printf "    %d. %s\n", $id, $desc{$ref{$id}};
         }
-        print $OUT "\n";
-        $choice = $TERM->readline("Selection (1-$id): ");
-        $TERM->addhistory($choice) if $choice =~ /\S/;
+        print "\n";
+        $choice = _get_input("Selection (1-$id): ");
     }
     return $ref{$choice};
 }
@@ -592,6 +568,49 @@ sub prompt {
     return text_input($prompt,%args);
 }
 
+sub _get_input {
+    my ($prompt,$args) = @_;
+
+    state $interactive = is_interactive();
+    state $term;
+
+    my $text = '';
+    if( $interactive ) {
+        # Initialize Term
+        $term ||= Term::ReadLine->new($0);
+        $args ||= {};
+        if( exists $args->{noecho} ) {
+            my $attrs = $term->Attribs;
+            if( $attrs->{shadow_redisplay} ) {
+                my $restore = $attrs->{redisplay_function};
+                $attrs->{redisplay_function} = $attrs->{shadow_redisplay};
+                $text = $term->readline($prompt);
+                $attrs->{redisplay_function} = $restore;
+            }
+            else {
+                # Disable all the Term ReadLine magic
+                local $|=1;
+                print $prompt;
+                ReadMode('noecho');
+                1 until ReadKey(-1);
+                $text = ReadLine();
+                ReadMode('restore');
+                print "\n";
+                chomp($text);
+            }
+        }
+        else {
+            $text = $term->readline($prompt);
+            $term->addhistory($text) if length $text && $text =~ /\S/;
+        }
+    }
+    else {
+        # Read one line from STDIN
+        $text = <>;
+    }
+    return $text;
+}
+
 
 
 # Return True
@@ -609,7 +628,7 @@ CLI::Helpers - Subroutines for making simple command line scripts
 
 =head1 VERSION
 
-version 1.8
+version 1.9
 
 =head1 SYNOPSIS
 
@@ -642,7 +661,7 @@ Use this module to make writing intelligent command line scripts easier.
     # Ask for a favorite animal
     my $favorite = menu("Select your favorite animal:", [qw(dog cat pig fish otter)]);
 
-Running as test.pl:
+Running:
 
     $ ./test.pl
     Hello, World!
@@ -1033,7 +1052,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Brad Lhotsky.
+This software is Copyright (c) 2022 by Brad Lhotsky.
 
 This is free software, licensed under:
 

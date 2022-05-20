@@ -11,16 +11,16 @@ static int call_free(pTHX_ SV* var, MAGIC* magic) {
 	}
 	PUSHSTACKi(PERLSI_MAGIC);
 	PUSHMARK(SP);
-	if (SvTYPE(var) < SVt_PVGV) {
-		PUSHs(var);
-		PUTBACK;
-	}
 	call_sv(magic->mg_obj, G_VOID | G_DISCARD | G_EVAL | G_KEEPERR);
 	POPSTACK;
 	return 0;
 }
 
-static const MGVTBL magic_table  = { 0, 0, 0, 0, call_free };
+static int call_local(pTHX_ SV* var, MAGIC* magic) {
+	return 0;
+}
+
+static const MGVTBL magic_table  = { NULL, NULL, NULL, NULL, call_free, NULL, NULL, call_local };
 
 MODULE = Variable::OnDestruct				PACKAGE = Variable::OnDestruct
 
@@ -32,4 +32,5 @@ on_destruct(variable, subref)
 	CODE:
 	if (!SvROK(variable))
 		Perl_croak(aTHX_ "Invalid argument!");
-	sv_magicext(SvRV(variable), (SV*)subref, PERL_MAGIC_ext, &magic_table, NULL, 0);
+	MAGIC* magic = sv_magicext(SvRV(variable), (SV*)subref, PERL_MAGIC_ext, &magic_table, NULL, 0);
+	magic->mg_flags |= MGf_LOCAL;

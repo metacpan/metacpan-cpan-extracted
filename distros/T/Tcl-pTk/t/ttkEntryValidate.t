@@ -31,7 +31,7 @@ my $e1 = $TOP->ttkEntry(
             -validatecommand => sub {
                     ($proposed, $changes, $current, $index, $type) = @_;
                     #print join(", ", $proposed, $changes, $current, $index, $type)."\n";
-                    return not $proposed =~ m/[^\d]/g;
+                    return $proposed !~ m/[^\d]/g;
             },
             -invalidcommand => sub{ $invalid = 1; return 0}  # invalid will be set to 1 if called
 )->pack(@pl);
@@ -44,10 +44,7 @@ $TOP->after(1000, sub{
                 $e1->eventGenerate('<Key-a>'); # 
 }        );
 
-$TOP->after(2000, sub{
-                $TOP->destroy;
-}        );
-
+$TOP->after(2000, sub {$TOP->destroy}) unless (@ARGV);
 MainLoop;
 
 ok($index, -1, "Validate Command index problem");

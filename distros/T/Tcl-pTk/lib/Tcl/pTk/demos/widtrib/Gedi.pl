@@ -109,7 +109,6 @@ $textwindow = $text_frame->Scrolled(
 	# and the line counters go off the screen.
 	# seems to be a problem with the Tk::pack command;
 #	height => 40,
-	-background => 'white',
 	-wrap=> 'none',
 	-setgrid => 'true', # use this for autosizing
 	-scrollbars =>'se')

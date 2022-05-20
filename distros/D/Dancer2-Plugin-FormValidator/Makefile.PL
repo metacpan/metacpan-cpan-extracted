@@ -49,7 +49,7 @@ my %WriteMakefileArgs = (
     "URI::Escape" => 0,
     "utf8::all" => 0
   },
-  "VERSION" => "1.00",
+  "VERSION" => "1.01",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
     "English" => 0,
     "File::Spec" => 0,
     "File::Temp" => 0,
-    "Git::Hooks" => "2.008000",
+    "Git::Hooks" => "3.000000",
     "Git::Mailmap" => 0,
     "Jenkins::API" => 0,
     "Log::Any" => 0,
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "Log::Any::Adapter" => 0,
     "Test2::V0" => 0
   },
-  "VERSION" => "0.013",
+  "VERSION" => "0.014",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,7 +54,7 @@ my %FallbackPrereqs = (
   "English" => 0,
   "File::Spec" => 0,
   "File::Temp" => 0,
-  "Git::Hooks" => "2.008000",
+  "Git::Hooks" => "3.000000",
   "Git::Hooks::Test" => 0,
   "Git::Mailmap" => 0,
   "Git::Repository" => 0,

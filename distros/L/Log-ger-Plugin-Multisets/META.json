@@ -49,7 +49,7 @@
    "provides" : {
       "Log::ger::Plugin::Multisets" : {
          "file" : "lib/Log/ger/Plugin/Multisets.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -64,7 +64,7 @@
          "web" : "https://github.com/perlancar/perl-Log-ger-Plugin-Multisets"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

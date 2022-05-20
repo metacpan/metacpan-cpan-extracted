@@ -9,6 +9,7 @@ t/01-odea.t
 t/02-object.t
 t/03-synopsis.t
 t/04-required.t
+t/05-coverage.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

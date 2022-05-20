@@ -1,3 +1,6 @@
+0.153		2022-05-20	T. R. Wyant
+    CelesTrak Indian ASAT Debris data set retired.
+
 0.152		2022-03-30	T. R. Wyant
     Add match data to celestrak_supplemental.  This is accessed with the
     --match option.  This option may not be specified with the --rms

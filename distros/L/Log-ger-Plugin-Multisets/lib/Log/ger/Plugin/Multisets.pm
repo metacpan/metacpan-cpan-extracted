@@ -8,7 +8,7 @@ use Log::ger ();
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-05-16'; # DATE
 our $DIST = 'Log-ger-Plugin-Multisets'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 sub meta { +{
     v => 2,
@@ -68,7 +68,7 @@ Log::ger::Plugin::Multisets - Create multiple sets of logger routines, each set 
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -101,11 +101,12 @@ you can instead:
  );
  use Log::ger;
 
- access_info "goes to access log";
- access_warn "goes to access log";
- log_warn    "goes to error log";
- log_debug   "goes to error log";
- ...
+ log_warn    "goes to error log";   # a logger sub for the 'error' category, using the "log_" prefix
+ log_debug   "goes to error log";   # another
+ access_info "goes to access log";  # a logger sub for the 'access' category, using the "access_" prefix
+ access_warn "goes to access log";  # another
+ if (is_debug()) { ... }            # a level checker sub for the 'error' category, using the "is_" prefix
+ if (access_is_trace()) { ... }     # a level checker sub for the 'access' category, using the "access_is_" prefix
 
 =head1 DESCRIPTION
 

@@ -4,6 +4,12 @@ TODO
   - RE-write Net::UPnP interfaces as Net:UPnP is not good at error trapping or timeouts.
   - Update error handling for Power::Outlet::Hue->name
 
+0.44 2022-05-19
+  - Updated Makefile.PL and rebuilt to fix GitHub info
+
+0.43 2021-12-30
+  - Updated Makefile.PL to added GitHub repo
+
 0.42 2021-02-20
   - Updated scripts/power-outlet.cgi - Added action property to support Tasmota Power0 toggle behavior
   - Updated lib/Power/Outlet/Common.pm - Added action method

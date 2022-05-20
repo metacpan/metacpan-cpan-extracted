@@ -11,12 +11,9 @@ use Test;
 
 my $TOP = MainWindow->new;
 
-my $version = $TOP->tclVersion;
-# print "version = $version\n";
-
-# Skip if Tcl/pTk version is < 8.5
-if( $version < 8.5 ){
-    print "1..0 # Skipped: Wm manage only works for Tcl >= 8.5\n";
+# Skip if Tcl/Tk version is < 8.5
+if( $TOP->interp->Eval('package vcompare $tk_version 8.5') == -1 ){
+    print "1..0 # Skipped: Wm manage only works for Tcl/Tk >= 8.5\n";
     $TOP->destroy;
     exit;
 }
