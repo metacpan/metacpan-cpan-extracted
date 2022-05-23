@@ -3,7 +3,7 @@ package TestAppNeitherWith;
 use Dancer2;
 
 BEGIN {
-   set logger     => 'null';
+   set logger => 'null';
    set serializer => 'JSON';
 
    set plugins => {
@@ -24,14 +24,12 @@ use Dancer2::Plugin::DBIx::Class;
 
 get '/test_rs'        => sub { [ rs('Human')->result_source->columns ] };
 get '/test_rset'      => sub { [ rset('Human')->result_source->columns ] };
-get '/test_resultset' =>
-   sub { [ resultset('Human')->result_source->columns ] };
-get '/test_schema' =>
-   sub { [ schema->resultset('Human')->result_source->columns ] };
+get '/test_resultset' => sub { [ resultset('Human')->result_source->columns ] };
+get '/test_schema'    => sub { [ schema->resultset('Human')->result_source->columns ] };
 get '/test_defschema' =>
-   sub { [ schema('default')->resultset('Human')->result_source->columns ] };
+    sub { [ schema('default')->resultset('Human')->result_source->columns ] };
 get '/test_otherschema' =>
-   sub { [ schema('second')->resultset('Human')->result_source->columns ] };
+    sub { [ schema('second')->resultset('Human')->result_source->columns ] };
 get '/test_humans' => sub { [ humans->result_source->columns ] };
 get '/test_human'  => sub {
    my %human = human(1)->get_columns();
@@ -39,12 +37,12 @@ get '/test_human'  => sub {
 };
 
 get '/test_mugs' => sub { [ mugs->result_source->columns ] };
-get '/test_mug'  => sub {
+get '/test_mug' => sub {
    my %mug = mug(1)->get_columns();
    return \%mug;
 };
 get '/test_cars' => sub { [ cars->result_source->columns ] };
-get '/test_car'  => sub {
+get '/test_car' => sub {
    my %car = car(1)->get_columns();
    return \%car;
 };

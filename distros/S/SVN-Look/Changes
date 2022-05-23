@@ -1,5 +1,12 @@
 Revision history for SVN-Look. -*- text -*-
 
+0.43      2022-05-21 11:30:57-03:00 America/Sao_Paulo
+
+[Fixes]
+
+- Skip failing tests that depend on previous ones. Also, show diagnostics when
+  tests fail.
+
 0.42      2020-10-08 22:35:29-03:00 America/Sao_Paulo
 
 [Fixes]

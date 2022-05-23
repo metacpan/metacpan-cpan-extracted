@@ -18,3 +18,9 @@ Revision history for MooX-Purple
 
 0.16    2020-04-10
 	- Experimental push on scalar is now forbidden
+
+0.18    2022-05-23
+	- Fix MooX::Purple::G pod rendering in metacpan.
+
+0.19    2022-05-23
+	- See if Test::Lib fix the failing tests on SREZIC smoker systems.

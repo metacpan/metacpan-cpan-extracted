@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Session;
 # ABSTRACT: Context of work for database interactions
-$Neo4j::Driver::Session::VERSION = '0.28';
+$Neo4j::Driver::Session::VERSION = '0.30';
 
 use Carp qw();
 our @CARP_NOT = qw(Neo4j::Driver);
@@ -128,7 +128,7 @@ Neo4j::Driver::Session - Context of work for database interactions
 
 =head1 VERSION
 
-version 0.28
+version 0.30
 
 =head1 SYNOPSIS
 
@@ -160,6 +160,13 @@ necessary.
 Only one open transaction per session at a time is supported. To
 work with multiple concurrent transactions, simply use more than
 one session.
+On C<http:> and C<https:> connections, you can
+alternatively enable concurrent transactions within the same
+session through a config option (currently experimental);
+see L<Neo4j::Driver/"Concurrent transactions in HTTP sessions">
+for details.
+
+To create a new session, call L<Neo4j::Driver/"session">.
 
 =head1 METHODS
 
@@ -203,7 +210,8 @@ these features.
 
 =head2 Concurrent transactions
 
- $session = Neo4j::Driver->new('http://...')->basic_auth(...)->session;
+ %config = ( uri => 'http://...', concurrent_tx => 1 );
+ $session = Neo4j::Driver->new(\%config)->session;
  $tx1 = $session->begin_transaction;
  $tx2 = $session->begin_transaction;
  $tx3 = $session->run(...);
@@ -212,9 +220,10 @@ Since HTTP is a stateless protocol, the Neo4j HTTP API effectively
 allows multiple concurrently open transactions without special
 client-side considerations. This driver exposes this feature to the
 client and will continue to do so, but the interface is not yet
-finalised.
+finalised. See L<Neo4j::Driver/"Concurrent transactions in HTTP sessions">
+for further details.
 
-The Bolt protocol does not support concurrent transactions (also
+The Bolt protocol does not support concurrent transactions (sometimes
 known as "nested transactions") within the same session.
 
 =head1 SECURITY CONSIDERATIONS
@@ -225,7 +234,7 @@ references to the authentication credentials used to contact the
 Neo4j server. Objects of these classes should therefore not be
 passed to untrusted modules. However, objects of the
 L<ServerInfo|Neo4j::Driver::ServerInfo> class and the
-L<Result|Neo4j::Driver::Result> class do not
+L<Result|Neo4j::Driver::Result> class (if detached) do not
 contain a reference to these credentials and are safe in this
 regard.
 
@@ -241,8 +250,8 @@ L<Neo4j::Driver::B<Result>>
 
 =item * Equivalent documentation for the official Neo4j drivers:
 L<Session (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/Session.html>,
-L<Session (JavaScript)|https://neo4j.com/docs/api/javascript-driver/4.3/class/lib6/session.js~Session.html>,
-L<ISession (.NET)|https://neo4j.com/docs/api/dotnet-driver/4.0/html/6bcf5d8c-98e7-b521-03e7-210cd6155850.htm>
+L<Session (JavaScript)|https://neo4j.com/docs/api/javascript-driver/4.4/class/lib6/session.js~Session.html>,
+L<ISession (.NET)|https://neo4j.com/docs/api/dotnet-driver/4.4/html/6bcf5d8c-98e7-b521-03e7-210cd6155850.htm>
 
 =back
 

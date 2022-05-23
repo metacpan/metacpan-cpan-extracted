@@ -2,7 +2,7 @@ package ExtUtils::MakeMaker::META_MERGE::GitHub;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
@@ -11,24 +11,32 @@ ExtUtils::MakeMaker::META_MERGE::GitHub - Perl package to generate ExtUtils::Mak
 
 =head1 SYNOPSIS
 
-Plugin to your Makefile.PL
+Run the included script then copy and paste into your Makefile.PL
 
-  use ExtUtils::MakeMaker;
-  use ExtUtils::MakeMaker::META_MERGE::GitHub;
-  my $mm = ExtUtils::MakeMaker::META_MERGE::GitHub->new(owner=>"myowner", repo=>"myrepo");
-  WriteMakefile(
-                ...
-                $mm->META_MERGE,
-                ...
-               );
+  perl-ExtUtils-MakeMaker-META_MERGE-GitHub.pl
 
-Copy and paste into your Makefile.PL
+or
+
+  perl-ExtUtils-MakeMaker-META_MERGE-GitHub.pl owner repository_name
+
+Generate the META_MERGE then copy and paste into your Makefile.PL
 
   use ExtUtils::MakeMaker::META_MERGE::GitHub;
   use Data::Dumper qw{Dumper};
   my $mm = ExtUtils::MakeMaker::META_MERGE::GitHub->new(owner=>"myowner", repo=>"myrepo");
   my %META_MERGE = $mm->META_MERGE;
   print Dumper(\%META_MERGE);
+
+Plugin to your Makefile.PL
+
+  use ExtUtils::MakeMaker;
+  use ExtUtils::MakeMaker::META_MERGE::GitHub;
+  my $mm = ExtUtils::MakeMaker::META_MERGE::GitHub->new(owner=>"myowner", repo=>"myrepo");
+  WriteMakefile(
+                CONFIGURE_REQUIRES => {'ExtUtils::MakeMaker::META_MERGE::GitHub' => 0},
+                $mm->META_MERGE,
+                ...
+               );
 
 =head1 DESCRIPTION
 

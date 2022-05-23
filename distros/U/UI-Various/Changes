@@ -1,6 +1,14 @@
 Revision history for Perl extension UI-Various
 
-0.20 2022-05-20T10:52:44Z
+0.22 2022-05-23T08:44:32Z
+
+0.22 2022-05-23T08:43:44Z
+
+    - trying to track down Xvfb/Tk problem on some CPAN test servers
+
+0.21 2022-05-21T11:40:41Z
+
+    - split Tk tests to avoid bug with too many mainloop invocations
 
 0.20 2022-05-20T10:44:06Z
 

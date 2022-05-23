@@ -20,6 +20,8 @@ my @strings = (
         "http://programming.reddit.com",
         "http://github.com/antirez/smaz/tree/master",
         "/media/hdb1/music/Alben/The Bla",
+	"A",
+	"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasidfasdfgsdfdsafdsafsadfsadfasdfdsafdsafsadfdsvcxnmcdscf mdsfknsefdjsafdc vcdskFSDCN DFVGSDFKNCX NSFdkl;dsdCNX FL SLDFJSDFMNBCX MVFJLsfemb xzcljfasdmb zcxljsafdnmcx ljkvdsafknxzcnljvsfDJM LSFJDSKNVCNSvafldj nsljdfBNsacxlxjCV Sdvfjldfsnc;xkVFDSNK LSafnksdc,nc xlkFSDj x,CNLVjkzDFNKasfDDzsdfsdfljefwkncxznmlj ∂∑åœ®∑œfsd sergewfrw abcd#5sdf∂ƒßƒ∂aeaesefsvccxvbmkhewrdj mcxvnmfagasdfGD"
 );
 
 for my $string (@strings) {

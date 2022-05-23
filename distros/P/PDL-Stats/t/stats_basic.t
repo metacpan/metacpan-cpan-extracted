@@ -190,9 +190,7 @@ SKIP: {
     is( tapprox( sum(abs($a_bad - $ans_bad)), 0 ), 1, '_array_to_pdl with missing value BAD correctly coded' );
 }
 
-
 done_testing();
-
 
 __DATA__
 999	90	91	92	93	94	

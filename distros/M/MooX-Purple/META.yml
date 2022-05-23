@@ -5,6 +5,7 @@ author:
 build_requires:
   JSON: '0'
   Scalar::Util: '0'
+  Test::Lib: '0.03'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -27,5 +28,5 @@ requires:
   MooX::ValidateSubs: '1.012005'
   Perl::Tidy: '20200110'
   perl: '5.018'
-version: '0.17'
+version: '0.19'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

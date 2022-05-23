@@ -1,5 +1,8 @@
 Revision history for MooX-Private-Attribute
 
+1.01    2022/05/23
+	Improve test coverage to 100%
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

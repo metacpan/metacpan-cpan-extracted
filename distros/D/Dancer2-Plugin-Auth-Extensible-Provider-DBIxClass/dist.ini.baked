@@ -119,3 +119,7 @@ install_command = cpanm .
 
 [MinimumPerl / Dist::Zilla::PluginBundle::Author::GEEKRUTH/MinimumPerl]
 default_version = 5.012
+
+[Prereqs / TestRequires]
+SQL::Translator = 0
+DateTime::Format::SQLite = 0

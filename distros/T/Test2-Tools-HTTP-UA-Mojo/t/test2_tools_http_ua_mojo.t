@@ -46,7 +46,7 @@ http_request(
   }
 );
 
-http_tx->note;  
+http_tx->note;
 
 http_request(
   GET('/bar'),

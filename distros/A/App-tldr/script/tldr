@@ -16,13 +16,14 @@ tldr - a perl tldr client
   Usage: tldr [command]
 
   Options:
-   -o, --os=OS       os (osx, sunos or linux)
-   -h, --help        show this help
-   -v, --version     show version
-       --pager=CMD   specify pager command
-       --no-pager    turn off paging
-       --unicode     use fancy unicode characters (defaults to true if LANG =~ /UTF-8/)
-       --no-unicode  do not use unicode characters
+   -o, --os=OS         os (osx, sunos or linux)
+   -l, --language=lang use other language
+   -h, --help          show this help
+   -v, --version       show version
+       --pager=CMD     specify pager command
+       --no-pager      turn off paging
+       --unicode       use fancy unicode characters (defaults to true if LANG =~ /UTF-8/)
+       --no-unicode    do not use unicode characters
 
   Environment variables:
    * TLDR_REPOSITORY=/path/to/tldr-pages/tldr
@@ -33,6 +34,7 @@ tldr - a perl tldr client
 
   Examples:
    $ tldr tar
+   $ tldr -l zh tar
    $ tldr -o osx brew
    $ TLDR_REPOSITORY=/path/to/tldr-pages/tldr tldr gzip
 

@@ -216,7 +216,7 @@ Options:
 
 =head1 VERSION
 
-Version 4.22.0
+Version 4.22.1
 
 =head1 EXAMPLES
 

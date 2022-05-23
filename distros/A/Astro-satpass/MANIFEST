@@ -15,7 +15,6 @@ eg/sh_script
 eg/solstice
 eg/tle_period.t
 eg/usno-seasons
-eg/visual
 eg/xml
 inc/Astro/Coord/ECI/TLE/Period.pm
 inc/My/Module/Build.pm
@@ -67,6 +66,7 @@ t/tle_parse.t
 t/tle_pass.t
 t/tle_pass_extra.t
 tools/heavens-above-mag
+tools/visual
 xt/author/basic.t
 xt/author/changes.t
 xt/author/critic.t

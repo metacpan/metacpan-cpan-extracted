@@ -1,6 +1,6 @@
 package Dancer2::Plugin::Auth::Extensible::Provider::DBIxClass;
 use Modern::Perl;
-our $VERSION = '0.0900'; # VERSION
+our $VERSION = '0.0902'; # VERSION
 our $AUTHORITY = 'cpan:GEEKRUTH'; # AUTHORITY
 # ABSTRACT: authenticate via the Dancer2::Plugin::DBIx:Class plugin
 use Carp;
@@ -527,7 +527,7 @@ Dancer2::Plugin::Auth::Extensible::Provider::DBIxClass - authenticate via the Da
 
 =head1 VERSION
 
-version 0.0900
+version 0.0902
 
 =head1 DESCRIPTION
 

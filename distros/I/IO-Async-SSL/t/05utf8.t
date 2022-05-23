@@ -20,7 +20,7 @@ use Encode qw( encode_utf8 decode_utf8 );
 my $loop = IO::Async::Loop->new;
 
 # A message containing non-8859-1 characters as this tests Perl more interestingly
-my $message = "Ĉu vi ĉi tio vidas?";
+my $message = "Ĉu vi ĉi tion vidas?";
 
 sub chomped { chomp( my $tmp = $_[0] ); return $tmp }
 

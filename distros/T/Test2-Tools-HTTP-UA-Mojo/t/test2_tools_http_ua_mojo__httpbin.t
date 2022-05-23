@@ -5,6 +5,7 @@ use Test2::Tools::JSON::Pointer;
 use Test2::Require::Internet -tcp => [ $ENV{TEST2_TOOLS_HTTP_HTTPBIN_HOST} || 'httpbin.org', $ENV{TEST2_TOOLS_HTTP_HTTPBIN_PORT} || 80 ];
 use HTTP::Request::Common;
 use Mojo::UserAgent;
+use List::SomeUtils qw( any );
 
 http_ua(Mojo::UserAgent->new);
 
@@ -95,7 +96,7 @@ is(
 is(
   intercept {
     $ret = http_request(
-      GET('http://bogus.httpbin.org/status/200'),
+      GET('http://bogus.httpbin.org./status/200'),
     );
   },
   array {
@@ -198,7 +199,7 @@ note "decodable = $_" for HTTP::Message::decodable();
 
 subtest 'gzip' => sub {
 
-  skip_all 'test requires gzip decoding' unless grep /gzip/, HTTP::Message::decodable;
+  skip_all 'test requires gzip decoding' unless any { /gzip/ } HTTP::Message::decodable;
 
   http_request(
     GET('/gzip'),

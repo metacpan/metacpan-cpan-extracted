@@ -9,7 +9,7 @@ no warnings 'experimental::postderef';
 
 package Cron::Sequencer::Output;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Carp qw(confess croak);
 
@@ -60,8 +60,7 @@ sub render_text {
                 push @cluster, "line $entry->{lineno}: $entry->{when}";
             }
 
-            unless ($self->{hide_env}) {
-                local *_;
+            unless ($self->{'hide-env'}) {
                 push @cluster, map "unset $_", $entry->{unset}->@*
                     if $entry->{unset};
                 my $env = $entry->{env};

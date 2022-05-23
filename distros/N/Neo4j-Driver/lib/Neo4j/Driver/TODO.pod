@@ -26,6 +26,17 @@ It seems there are about four types that would need to be distinguished: illegal
 usage errors, internal driver errors, Network errors, and Neo4j server errors.
 See also L<#7|https://github.com/johannessen/neo4j-driver-perl/issues/7>.
 
+L<perlmodstyle/"Error handling and messages"> doesn't help us much. The only
+other relevant option (aside from error objects and C<croak()>) on that list
+is a global var, which would not be thread-safe.
+
+Perhaps a reasonable solution would be like an C<error> config option that
+accepts an error handler sub. That sub should then be expected to never return
+(i.e. it should C<croak()> or C<die()>; not dying should be a usage error
+that causes the driver to croak with a special message in order to force the
+user to really consider error handling for themselves, and keep options for
+later expansion).
+
 =back
 
 =head2 Experimental features
@@ -36,10 +47,6 @@ See also L<#7|https://github.com/johannessen/neo4j-driver-perl/issues/7>.
 
 =item * L<Neo4j::Driver/"Custom networking modules">: make stable, but
 not until at least part of the C<result_handlers> API has been specified
-
-=item * L<Neo4j::Driver::Result/"Control result stream attachment">:
-deprecate, as it really doesn't seem to be needed (also, this feature used
-to be available in I<one> of the official drivers, but it no longer is now)
 
 =item * L<Neo4j::Driver::Result/"Look ahead in the result stream">:
 make C<peek()> stable once C<fetch()> reliably buffers two records
@@ -55,11 +62,6 @@ L<in Path|Neo4j::Driver::Type::Path/"Calling in scalar context">,
 L<in Result|Neo4j::Driver::Result/"Calling in scalar context">, and
 L<in ResultSummary|Neo4j::Driver::ResultSummary/"Calling in scalar context">):
 make stable
-
-=item * Jolt: The C<jolt> config option will be deprecated once
-Jolt implementation is fully complete. Those who use a modern Neo4j
-version and still want to get plain old JSON responses can easily
-write their own net module overriding the C<Accept> header.
 
 =back
 
@@ -214,6 +216,10 @@ attached longer than desirable in cases where the client knows in advance
 how many records there will be and calls C<fetch()> exactly that number of
 times. (In theory, such a change might even slightly improve performance
 if the driver uses Perl threads to fill the buffer in the background.)
+
+=item * C<size()> doesn't need to exhaust the result stream. It only needs to
+detach it. The official drivers don't have C<size()>, so we're free to redefine
+it in order to make it more useful to Perl users.
 
 =item * Consider unrolling C<deep_bless> recursion. Based on initial profiling,
 this may save up to about 5% CPU time (for a specific HTTP test query cached in

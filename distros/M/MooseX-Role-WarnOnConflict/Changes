@@ -1,0 +1,5 @@
+Revision history for MooseX-Role-WarnOnConflict
+
+0.01      2022-05-21 11:31:42 CEST
+
+          - First pass at warning on role conflict

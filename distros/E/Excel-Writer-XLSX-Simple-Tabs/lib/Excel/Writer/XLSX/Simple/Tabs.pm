@@ -5,7 +5,7 @@ use base qw{Package::New};
 use IO::Scalar qw{};
 use Excel::Writer::XLSX qw{};
 
-our $VERSION='0.02';
+our $VERSION='0.03';
 our $PACKAGE=__PACKAGE__;
 
 =head1 NAME
@@ -204,6 +204,7 @@ Please report issues on L<GitHub|https://github.com/mrdvt92/perl-Excel-Writer-XL
 =head1 COPYRIGHT
 
 Copyright (c) 2022 Michael R. Davis
+
 Copyright (c) 2001-2005 Tony Bowden (IO::Scalar portion used here "under the same terms as Perl itself")
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

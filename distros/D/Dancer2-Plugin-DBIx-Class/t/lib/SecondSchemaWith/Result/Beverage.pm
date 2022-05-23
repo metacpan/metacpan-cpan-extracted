@@ -8,7 +8,6 @@ __PACKAGE__->table('beverage');
 __PACKAGE__->add_columns(qw(id type));
 __PACKAGE__->set_primary_key('id');
 
-__PACKAGE__->has_many( 'mugs' => 'SecondSchemaWith::Result::Mug',
-   'beverage' );
+__PACKAGE__->has_many('mugs' => 'SecondSchemaWith::Result::Mug', 'beverage');
 
 1;

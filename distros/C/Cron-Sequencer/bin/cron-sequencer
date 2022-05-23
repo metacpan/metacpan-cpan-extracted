@@ -77,7 +77,7 @@ next hour
 
 =item *
 
-I<(next|last) (\d*) (hours|days|weeks)>
+I<(next|last) (\d*) (minutes|hours|days|weeks)>
 
 =back
 
@@ -93,7 +93,8 @@ Neither choice makes sense.
 
 (For completeness and consistency, C<this day> is provided as an alias for
 C<today>, as well as aliases C<next day> and C<last day>, but it's probably less
-clear to use these.)
+clear to use these. Likewise C<last minute> I<etc> also exist, but they seem
+unlikely to be useful as the results shown will rapidly change.)
 
 =item --from I<epoch time>
 
@@ -122,6 +123,16 @@ before midnight gone.
 =back
 
 Hence C<--from +0 --to +3600> shows events from midnight until 00:59 inclusive.
+
+Beware - because of how Unix shells split command line arguments, and how option
+parsing requires a single argument to be the value, for the options that have
+spaces you will need to escape the spaces. So you'd need to write:
+
+  cron-sequencer --show "last week" cronfile
+
+or
+
+  cron-sequencer "--show=last 3 days" cronfile
 
 =item --hide-env
 

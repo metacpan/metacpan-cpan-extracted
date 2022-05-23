@@ -1,10 +1,11 @@
 package Pod::Query;
 
-use 5.030;
+use v5.24;    # Postfix defef :)
 use strict;
 use warnings;
 use FindBin qw/ $RealBin /;
-use lib "$RealBin/Pod-LOL/lib";
+
+# use lib "$RealBin/Pod-LOL/lib";
 use Mojo::Base qw/ -base -signatures /;
 use Mojo::Util qw/ dumper class_to_path /;
 use Mojo::ByteStream qw/ b/;
@@ -19,11 +20,11 @@ Pod::Query - Query pod documents
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 
-our $VERSION       = '0.02';
+our $VERSION       = '0.04';
 our $DEBUG_TREE    = 0;
 our $DEBUG_FIND    = 0;
 our $DEBUG_INVERT  = 0;
@@ -96,7 +97,7 @@ Inline (Debugging)
 This module takes a class name, extracts the POD
 and provides methods to query specific information.
 
-=head1 METHODS
+=head1 SUBROUTINES/METHODS
 
 =head2 new
 
@@ -127,7 +128,7 @@ sub new ( $class, $pod_class, $path_only = 0 ) {
          # Normally =for and =begin would otherwise be skipped.
          $parser->accept_targets( '*' );
 
-         $parser->parse_file( $s->path )->root;
+         $parser->parse_file( $s->path )->{root};
       }
    };
 
@@ -241,7 +242,8 @@ sub _lol_to_tree ( $lol ) {
       return unless %$q;             # only if queue
       my $sub = $q->{sub};           # sub tags
       my $has = _has_head( $sub );
-      $q->{sub} = _lol_to_tree( $sub ) if $has;
+      $q->{sub} = _lol_to_tree( $sub )
+        if $has;    # TODO: rename "sub" to "inside" or "inner".
       push @main, $q;
       $q = {};
    };
@@ -347,31 +349,6 @@ sub _structure_over ( $text_list ) {
 }
 
 
-=pod
-   $pod->find(@sections)
-
-   Where each section can contain:
-   {
-      tag      => "TAG_NAME",     # Find all matching tags.
-      text     => "TEXT_NAME",    # Find all matching texts.
-      keep     => 1,              # Capture the text.
-      keep_all => 1,              # Capture entire section.
-      nth      => 0,              # Use only the nth match.
-   }
-
-   # Return contents of entire head section:
-   find (
-      {tag => "head", text => "a", keep_all => 1},
-   )
-
-   # Results:
-   # [
-   #    "  my \$app = a('/hel...",
-   #    {text => "Create a route with ...", wrap => 1},
-   #    "  \$ perl -Mojo -E ...",
-   # ]
-=cut
-
 =head2 find_title
 
 Extracts the title information.
@@ -379,7 +356,7 @@ Extracts the title information.
 =cut
 
 sub find_title ( $s ) {
-   $s->find(
+   scalar $s->find(
       {
          tag  => "head1",
          text => "NAME",
@@ -400,11 +377,10 @@ Extracts the complete method information.
 =cut
 
 sub find_method ( $s, $method ) {
-   my $FunctionCall = qr/ (?: \( [^()]* \) )? /x;
    $s->find(
       {
          tag       => qr/ ^ head \d $ /x,
-         text      => quotemeta( $method ) . $FunctionCall,
+         text      => quotemeta( $method ) . $s->_is_function_call,
          nth_group => 0,
          keep_all  => 1,
       },
@@ -419,11 +395,10 @@ Extracts the method summary.
 =cut
 
 sub find_method_summary ( $s, $method ) {
-   my $FunctionCall = qr/ (?: \( [^()]* \) )? /x;
-   $s->find(
+   scalar $s->find(
       {
          tag  => qr/ ^ head \d $ /x,
-         text => quotemeta( $method ) . $FunctionCall,
+         text => quotemeta( $method ) . $s->_is_function_call,
          nth  => 0,
       },
       {
@@ -434,9 +409,27 @@ sub find_method_summary ( $s, $method ) {
 }
 
 
+=head2 _is_function_call
+
+Regex for function call parenthesis.
+
+=cut
+
+sub _is_function_call {
+
+   # Optional "()".
+   qr/ (?:
+         \( [^()]* \)
+      )?
+   /x;
+}
+
+
 =head2 find_events
 
 Extracts a list of events with a description.
+
+Returns a list of key value pairs.
 
 =cut
 
@@ -461,7 +454,32 @@ sub find_events ( $s ) {
 
 =head2 find
 
-Generic extraction command
+Generic extraction command.
+
+context sensitive!
+
+   $pod->find(@sections)
+
+   Where each section can contain:
+   {
+      tag      => "TAG_NAME",     # Find all matching tags.
+      text     => "TEXT_NAME",    # Find all matching texts.
+      keep     => 1,              # Capture the text.
+      keep_all => 1,              # Capture entire section.
+      nth      => 0,              # Use only the nth match.
+   }
+
+   # Return contents of entire head section:
+   find (
+      {tag => "head", text => "a", keep_all => 1},
+   )
+
+   # Results:
+   # [
+   #    "  my \$app = a('/hel...",
+   #    {text => "Create a route with ...", wrap => 1},
+   #    "  \$ perl -Mojo -E ...",
+   # ]
 
 =cut
 
@@ -969,17 +987,22 @@ sub get_term_width {
 }
 
 
+=head1 SEE ALSO
+
+L<App::Pod>
+
+L<Pod::LOL>
+
+L<Pod::Text>
+
+
 =head1 AUTHOR
 
 Tim Potapov, C<< <tim.potapov[AT]gmail.com> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-pod-query at rt.cpan.org>, or through
-the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Pod-Query>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
+Please report any bugs or feature requests to L<https://github.com/poti1/pod-query/issues>.
 
 
 =head1 SUPPORT
@@ -991,25 +1014,13 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Pod-Query>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Pod-Query>
-
-=item * Search CPAN
-
-L<https://metacpan.org/release/Pod-Query>
-
-=back
+L<https://metacpan.org/pod/Pod::Query>
+L<https://github.com/poti1/pod-query>
 
 
 =head1 ACKNOWLEDGEMENTS
 
+TBD
 
 =head1 LICENSE AND COPYRIGHT
 

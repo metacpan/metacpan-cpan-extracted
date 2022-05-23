@@ -1,5 +1,9 @@
 Revision history for Task-Devel-Essentials
 
+0.016   Sun, 22 May 2022 08:28:47 +0200
+        upgraded versions
+        added provides metadata
+
 0.015   Mon, 25 Jan 2021 23:30:46 +0100
         upgraded versions
         added resources metadata

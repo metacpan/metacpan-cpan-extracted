@@ -1,5 +1,8 @@
 Revision history for Cron-Sequencer
 
+0.04  2022-05-23 NWCLARK
+        - Fix --hide-env regression; --show 'last 30 minutes'
+
 0.03  2022-05-19 NWCLARK
         - JSON output; --show 'next 3 hours', --show 'last 2 days' etc
 

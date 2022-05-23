@@ -17,10 +17,8 @@ subtest 'Check ResultSetNames' => sub {
    plan tests => 6;
 
    $res = $test->request( GET '/test_humans' );
-   is(
-      decode_json( $res->content ),
-      [qw(id name)], 'Plural on first DB returns resultset'
-   );
+   is( decode_json( $res->content ),
+      [qw(id name)], 'Plural on first DB returns resultset' );
 
    $res = $test->request( GET '/test_human' );
    is(
@@ -43,13 +41,13 @@ subtest 'Check ResultSetNames' => sub {
       'Singular on second DB does a find()'
    );
 
-   $res = $test->request( GET '/test_session' );
+   $res = $test->request( GET '/test_session');
    like(
       decode_json( $res->content ),
       { status => 500, exception => qr/Can't call method "get_columns"/ },
       'Singular on sesion dies (DSL keyword collision prevented)'
    );
-   $res = $test->request( GET '/test_sessions' );
+   $res = $test->request( GET '/test_sessions');
    is(
       decode_json( $res->content ),
       [qw(id created_at session_key)],

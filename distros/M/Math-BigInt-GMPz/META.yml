@@ -23,5 +23,5 @@ requires:
   perl: '5.006002'
 resources:
   repository: https://github.com/pjacklam/p5-Math-BigInt-GMPz.git
-version: '0.0009'
+version: '0.0010'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

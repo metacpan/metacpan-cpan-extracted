@@ -5,7 +5,7 @@ use warnings;
 
 use MooX::ReturnModifiers;
 use B;
-our $VERSION = '1.012005';
+our $VERSION = '1.012006';
 
 sub import {
 	my $target	= caller;
@@ -35,7 +35,7 @@ sub import {
 						sub {
 							my ( $orig, $self, @params ) = @_;
 							my @caller = caller;
-    			
+							
 							if (! ref $self) {
 								$self = $self->new;
 							}
@@ -95,7 +95,7 @@ MooX::ValidateSubs - Validating sub routines via Type::Tiny.
 
 =head1 VERSION
 
-Version 1.012005
+Version 1.012006
 
 =cut
 

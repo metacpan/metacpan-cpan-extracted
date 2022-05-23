@@ -1,16 +1,9 @@
-#!/usr/bin/perl 
-
 use strict;
 use warnings;
 use Test::More;
-
-BEGIN {
-    plan tests => 23;
-    use_ok( 'PDL::Stats::TS' );
-}
-
 use PDL::LiteF;
 use PDL::NiceSlice;
+use PDL::Stats::TS;
 
 sub tapprox {
   my($a,$b, $eps) = @_;
@@ -105,6 +98,7 @@ sub tapprox {
   is( tapprox(sum(abs($ms - $ans_ms)), 0), 1, 'season_m ms' );
 }
 
+done_testing;
 
 sub lvalue_assign_detour {
     my ($pdl, $index, $new_value) = @_;

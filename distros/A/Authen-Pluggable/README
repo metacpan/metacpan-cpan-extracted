@@ -1,0 +1,117 @@
+NAME
+    Authen::Pluggable - A Perl module to authenticate users via pluggable
+    modules
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+      use Authen::Pluggable;
+
+      my $auth = Authen::Pluggable->new();
+      $auth->provider('plugin1','plugin2');
+      $auth->plugin1->cfg({...});
+      $auth->plugin2->cfg({...});
+
+      my $user_info = $auth->authen($username, $password) || die "Login failed";
+
+DESCRIPTION
+    Authen::Pluggable is a Perl module to authenticate users via pluggable
+    modules
+
+    Every plugin class is in namespace "Authen::Pluggable::*" so you must
+    omit it
+
+METHODS
+  new
+    This method takes a hash of parameters. The following options are valid:
+
+    log Any object that supports debug, info, error and warn.
+
+          log => Log::Log4perl->get_logger('Authen::Simple::LDAP')
+
+  provider($provider, $plugin [opt])
+    If $plugin is omitted "Authen::Pluggable::$provider" is loaded. If
+    $plugin is set "Authen::Pluggable::$plugin" is loaded with $provider as
+    alias.
+
+    It return the plugin object.
+
+  providers(@providers)
+    If @providers items are scalar, they are considered as plugin name and
+    they are loaded. Else they can be hashref items. The hash key is
+    considered as plugin name if there isn't a provider key inside else it's
+    considered as alias name while provider key are considered as plugin
+    name.
+
+      $auth->providers('plugin1', 'plugin2')
+
+    loads "Authen::Pluggable::plugin1" and "Authen::Pluggable::plugin2"
+
+      $auth->providers(
+        {   alias1 => {
+                provider => 'plugin1',
+                ... other configurations ...
+            },
+            alias2 => {
+                provider => 'plugin1',
+                ... other configurations ...
+            }
+        }
+      ),
+
+    loads "Authen::Pluggable::plugin1" two times, one with provider name
+    "alias1" and one with "alias2". See "50-alias.t" in test folder for an
+    example with two different password files
+
+    It always return the object itself.
+
+EXAMPLE FOR CONFIGURING PROVIDERS
+    There are various methods to select the providers where autenticate and
+    to configure it. Here some example using chaining.
+
+    This load and configure Passwd plugin
+
+      $auth->provider('Passwd')->cfg(
+        'file' => ...
+      );
+
+    This load and confgure AD plugin
+
+      $auth->provider('AD')->cfg(%opt)
+
+    Multiple configuration at one time via autoloaded methods
+
+      $auth->providers( 'Passwd', 'AD' )
+        ->Passwd->cfg('file' => ...)
+        ->AD->cfg(%opt);
+
+    Same but via providers hashref configuration
+
+      $auth->providers({
+        'Passwd' => { 'file' => ... },
+        'AD'     => \%opt,
+      });
+
+BUGS/CONTRIBUTING
+    Please report any bugs through the web interface at
+    <https://github.com/EmilianoBruni/authen-pluggable/issues>
+
+    If you want to contribute changes or otherwise involve yourself in
+    development, feel free to fork the Git repository from
+    <https://github.com/EmilianoBruni/authen-pluggable/>.
+
+SUPPORT
+    You can find this documentation with the perldoc command too.
+
+        perldoc Authen::Pluggable
+
+AUTHOR
+    Emiliano Bruni <info@ebruni.it>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022 by Emiliano Bruni.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

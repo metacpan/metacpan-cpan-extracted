@@ -3,8 +3,8 @@ NAME
     post
 
 VERSION
-    This document describes version 0.012 of App::org2wp (from Perl
-    distribution App-org2wp), released on 2022-05-01.
+    This document describes version 0.013 of App::org2wp (from Perl
+    distribution App-org2wp), released on 2022-05-02.
 
 FUNCTIONS
   org2wp
@@ -21,6 +21,7 @@ FUNCTIONS
 
     First, create "~/org2wp.conf" containing the API credentials, e.g.:
 
+     ; use INI (IOD) format for this file
      proxy=https://YOURBLOGNAME.wordpress.com/xmlrpc.php
      username=YOURUSERNAME
      password=YOURPASSWORD
@@ -34,6 +35,7 @@ FUNCTIONS
     You can also put multiple credentials in the configuration file using
     profile sections, e.g.:
 
+     ; use INI (IOD) format for this file
      [profile=blog1]
      proxy=https://YOURBLOG1NAME.wordpress.com/xmlrpc.php
      username=YOURUSERNAME

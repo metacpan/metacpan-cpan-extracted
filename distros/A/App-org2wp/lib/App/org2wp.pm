@@ -9,9 +9,9 @@ use Perinci::Object qw(envresmulti);
 use POSIX qw(strftime);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-01'; # DATE
+our $DATE = '2022-05-02'; # DATE
 our $DIST = 'App-org2wp'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our %SPEC;
 
@@ -33,6 +33,7 @@ of being an Emacs package, it is a CLI script written in Perl.
 
 First, create `~/org2wp.conf` containing the API credentials, e.g.:
 
+    ; use INI (IOD) format for this file
     proxy=https://YOURBLOGNAME.wordpress.com/xmlrpc.php
     username=YOURUSERNAME
     password=YOURPASSWORD
@@ -46,6 +47,7 @@ uses the same terminology.
 You can also put multiple credentials in the configuration file using profile
 sections, e.g.:
 
+    ; use INI (IOD) format for this file
     [profile=blog1]
     proxy=https://YOURBLOG1NAME.wordpress.com/xmlrpc.php
     username=YOURUSERNAME
@@ -683,7 +685,7 @@ App::org2wp - Publish Org document (or heading) to WordPress as blog post
 
 =head1 VERSION
 
-This document describes version 0.012 of App::org2wp (from Perl distribution App-org2wp), released on 2022-05-01.
+This document describes version 0.013 of App::org2wp (from Perl distribution App-org2wp), released on 2022-05-02.
 
 =head1 FUNCTIONS
 
@@ -703,6 +705,7 @@ of being an Emacs package, it is a CLI script written in Perl.
 
 First, create C<~/org2wp.conf> containing the API credentials, e.g.:
 
+ ; use INI (IOD) format for this file
  proxy=https://YOURBLOGNAME.wordpress.com/xmlrpc.php
  username=YOURUSERNAME
  password=YOURPASSWORD
@@ -716,6 +719,7 @@ uses the same terminology.
 You can also put multiple credentials in the configuration file using profile
 sections, e.g.:
 
+ ; use INI (IOD) format for this file
  [profile=blog1]
  proxy=https://YOURBLOG1NAME.wordpress.com/xmlrpc.php
  username=YOURUSERNAME

@@ -1,0 +1,9 @@
+class IO::Socket : interface_t {
+  
+  required method is_io_socket : void ();
+  
+  method read : int ($buffer : byte[]);
+  method write : int ($buffer : string, $length : int);
+  method close : void ();
+  method fileno : int ();
+}

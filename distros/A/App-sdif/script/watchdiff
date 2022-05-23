@@ -20,7 +20,7 @@ __END__
 
 =head1 NAME
 
-watchdiff - repeat command and watch a difference
+watchdiff - repeat command and watch differences
 
 =head1 SYNOPSIS
 
@@ -49,7 +49,7 @@ Options:
 
 =head1 VERSION
 
-Version 4.22.0
+Version 4.22.1
 
 =head1 EXAMPLES
 
@@ -75,6 +75,10 @@ Version 4.22.0
 
 Use C<^C> to terminate.
 
+Basically B<watchdiff> command expect the command output is small
+enough to fit within a terminal screen size.  If the output is longer
+than the screen height, only the final part is shown.  Use B<-U>
+option if the output is large and you want to see modified part only.
 
 =head1 AUTHOR
 
@@ -93,7 +97,12 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
+L<App::sdif>
+
 L<diff(1)>, L<cdif(1)>, L<sdif(1)>
 
 
 =cut
+
+#  LocalWords:  watchdiff diff Kazumasa Utashiro ifconfig df netstat
+#  LocalWords:  icmp iostat sdif

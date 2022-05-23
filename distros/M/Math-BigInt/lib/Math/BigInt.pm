@@ -23,7 +23,7 @@ use warnings;
 use Carp          qw< carp croak >;
 use Scalar::Util  qw< blessed refaddr >;
 
-our $VERSION = '1.999831';
+our $VERSION = '1.999833';
 $VERSION =~ tr/_//d;
 
 require Exporter;
@@ -265,6 +265,7 @@ BEGIN {
     # set up some handy alias names
     *is_pos = \&is_positive;
     *is_neg = \&is_negative;
+    *as_number = \&as_int;
 }
 
 ###############################################################################
@@ -1217,63 +1218,95 @@ sub bpi {
 }
 
 sub copy {
-    my $self    = shift;
-    my $selfref = ref $self;
-    my $class   = $selfref || $self;
-    my @r       = @_;
+    my ($x, $class);
+    if (ref($_[0])) {           # $y = $x -> copy()
+        $x = shift;
+        $class = ref($x);
+    } else {                    # $y = Math::BigInt -> copy($y)
+        $class = shift;
+        $x = shift;
+    }
 
-    carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
-
-    # If called as a class method, the object to copy is the next argument.
-
-    $self = shift() unless $selfref;
+    carp "Rounding is not supported for ", (caller(0))[3], "()" if @_;
 
     my $copy = bless {}, $class;
 
-    $copy->{sign}  = $self->{sign};
-    $copy->{value} = $LIB->_copy($self->{value});
-    $copy->{_a}    = $self->{_a} if exists $self->{_a};
-    $copy->{_p}    = $self->{_p} if exists $self->{_p};
+    $copy->{sign}  = $x->{sign};
+    $copy->{value} = $LIB->_copy($x->{value});
+    $copy->{_a}    = $x->{_a} if exists $x->{_a};
+    $copy->{_p}    = $x->{_p} if exists $x->{_p};
 
     return $copy;
 }
 
 sub as_int {
     my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
-
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
-    $x -> copy();
-}
+    # If called as an instance method, and the instance class is something we
+    # upgrade to, $x might not be a Math::BigInt, so don't just call copy().
 
-sub as_number {
-    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
+    return $x -> copy() if $x -> isa("Math::BigInt");
 
-    # An object might be asked to return itself as bigint on certain overloaded
-    # operations. This does exactly this, so that sub classes can simple inherit
-    # it or override with their own integer conversion routine.
+    # disable upgrading and downgrading
 
-    carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
+    my $upg = Math::BigInt -> upgrade();
+    my $dng = Math::BigInt -> downgrade();
+    Math::BigInt -> upgrade(undef);
+    Math::BigInt -> downgrade(undef);
 
-    $x -> copy();
+    my $y = Math::BigInt -> new($x);
+
+    # reset upgrading and downgrading
+
+    Math::BigInt -> upgrade($upg);
+    Math::BigInt -> downgrade($dng);
+
+    return $y;
 }
 
 sub as_float {
     my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
-
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
+    # disable upgrading and downgrading
+
     require Math::BigFloat;
-    Math::BigFloat -> new($x);
+    my $upg = Math::BigFloat -> upgrade();
+    my $dng = Math::BigFloat -> downgrade();
+    Math::BigFloat -> upgrade(undef);
+    Math::BigFloat -> downgrade(undef);
+
+    my $y = Math::BigFloat -> new($x);
+
+    # reset upgrading and downgrading
+
+    Math::BigFloat -> upgrade($upg);
+    Math::BigFloat -> downgrade($dng);
+
+    return $y;
 }
 
 sub as_rat {
     my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
-
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
+    # disable upgrading and downgrading
+
     require Math::BigRat;
-    Math::BigRat -> new($x);
+    my $upg = Math::BigRat -> upgrade();
+    my $dng = Math::BigRat -> downgrade();
+    Math::BigRat -> upgrade(undef);
+    Math::BigRat -> downgrade(undef);
+
+    my $y = Math::BigRat -> new($x);
+
+    # reset upgrading and downgrading
+
+    Math::BigRat -> upgrade($upg);
+    Math::BigRat -> downgrade($dng);
+
+    return $y;
 }
 
 ###############################################################################
@@ -1395,7 +1428,8 @@ sub bcmp {
 
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
-    return $upgrade->bcmp($x, $y) if defined $upgrade;
+    return $upgrade->bcmp($x, $y)
+      if defined($upgrade) && (!$x->is_int() || !$y->is_int());
 
     if (($x->{sign} !~ /^[+-]$/) || ($y->{sign} !~ /^[+-]$/)) {
         # handle +-inf and NaN
@@ -1437,7 +1471,8 @@ sub bacmp {
 
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
-    return $upgrade->bacmp($x, $y) if defined $upgrade;
+    return $upgrade->bacmp($x, $y)
+      if defined($upgrade) && (!$x->is_int() || !$y->is_int());
 
     if (($x->{sign} !~ /^[+-]$/) || ($y->{sign} !~ /^[+-]$/)) {
         # handle +-inf and NaN
@@ -1719,7 +1754,8 @@ sub badd {
 
     $r[3] = $y;                 # no push!
 
-    return $upgrade->badd($x, $y, @r) if defined $upgrade;
+    return $upgrade->badd($x, $y, @r)
+      if defined($upgrade) && (!$x->is_int() || !$y->is_int());
 
     # Inf and NaN handling
     if ($x->{sign} !~ /^[+-]$/ || $y->{sign} !~ /^[+-]$/) {
@@ -1755,7 +1791,8 @@ sub bsub {
 
     return $x if $x -> modify('bsub');
 
-    return $upgrade -> bsub($x, $y, @r) if defined $upgrade;
+    return $upgrade -> bsub($x, $y, @r)
+      if defined($upgrade) && (!$x->is_int() || !$y->is_int());
 
     return $x -> round(@r) if $y -> is_zero();
 
@@ -1800,7 +1837,8 @@ sub bmul {
         return $x->binf('-', @r);
     }
 
-    return $upgrade->bmul($x, $y, @r) if defined $upgrade;
+    return $upgrade->bmul($x, $y, @r)
+      if defined($upgrade) && (!$x->is_int() || !$y->is_int());
 
     $r[3] = $y;                 # no push here
 
@@ -1830,7 +1868,9 @@ sub bmuladd {
         $y->{sign} =~ /^[+-]$/ &&
         $z->{sign} =~ /^[+-]$/)
     {
-        return $upgrade->bmuladd($x, $y, $z, @r) if defined $upgrade;
+        return $upgrade->bmuladd($x, $y, $z, @r)
+          if defined($upgrade)
+               && (!$x->is_int() || !$y->is_int() || !$z->is_int());
 
         # TODO: what if $y and $z have A or P set?
         $r[3] = $z;             # no push here
@@ -2717,6 +2757,8 @@ sub bnok {
                            ? (undef, @_)
                            : objectify(2, @_);
 
+    carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
+
     return $n if $n->modify('bnok');
 
     # All cases where at least one argument is NaN.
@@ -3305,6 +3347,8 @@ sub brsft {
     $b = 2 if !defined $b;
     return $x -> bnan(@r) if $b <= 0 || $y -> {sign} eq '-';
 
+    return $upgrade -> brsft($x, $y, $b, @r) if defined $upgrade;
+
     # this only works for negative numbers when shifting in base 2
     if (($x -> {sign} eq '-') && ($b == 2)) {
         return $x -> round(@r) if $x -> is_one('-'); # -1 => -1
@@ -3724,7 +3768,9 @@ sub sign {
 
 sub digit {
     # return the nth decimal digit, negative values count backward, 0 is right
-    my (undef, $x, $n) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my (undef, $x, $n, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+
+    carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
     $n = $n->numify() if ref($n);
     $LIB->_digit($x->{value}, $n || 0);
@@ -3846,6 +3892,8 @@ sub sparts {
     my $nzeros = $LIB -> _zeros($mant -> {value});
     $mant = $mant -> brsft($nzeros, 10) if $nzeros != 0;
     $mant = $mant -> round(@r);
+    $mant = $downgrade -> new($mant, @r)
+      if defined($downgrade) && $mant -> is_int();
     return $mant unless wantarray;
 
     my $expo = $class -> new($nzeros, @r);
@@ -4039,9 +4087,19 @@ sub bsstr {
         return 'inf';                                   # +inf
     }
 
-    my ($m, $e) = $x -> parts();
-    ($x->{sign} eq '-' ? '-' : '') . $LIB->_str($m->{value})
-      . 'e+' . $LIB->_str($e->{value});
+    my ($m, $e) = $x -> sparts();
+
+    # If upgrading is enabled, but not downgrading, $m and $e might not be
+    # Math::BigInt objects.
+
+    my $str;
+    $str .= '-' if $x->{sign} eq '-';
+    $str .= $m -> isa("Math::BigInt") ? $LIB->_str($m->{value})
+                                      : $m -> bdstr();
+    $str .= 'e' . $e->{sign};
+    $str .= $e -> isa("Math::BigInt") ? $LIB->_str($e->{value})
+                                      : $m -> babs() -> bdstr();
+    return $str;
 }
 
 # Normalized notation, e.g., "12345" is written as "12345e+0".
@@ -4058,7 +4116,7 @@ sub bnstr {
 
     return $x -> bstr() if $x -> is_nan() || $x -> is_inf();
 
-    my ($mant, $expo) = $x -> parts();
+    my ($mant, $expo) = $x -> sparts();
 
     # The "fraction posision" is the position (offset) for the decimal point
     # relative to the end of the digit string.
@@ -4134,6 +4192,8 @@ sub bdstr {
 
 sub bfstr {
     my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+
+    carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
     if ($x->{sign} ne '+' && $x->{sign} ne '-') {
         return $x->{sign} unless $x->{sign} eq '+inf'; # -inf, NaN

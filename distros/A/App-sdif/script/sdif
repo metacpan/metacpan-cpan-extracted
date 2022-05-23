@@ -16,7 +16,7 @@ sdif - side-by-side diff viewer for ANSI terminal
 
 =head1 VERSION
 
-Version 4.22.0
+Version 4.22.1
 
 =head1 SYNOPSIS
 
@@ -1004,7 +1004,7 @@ specified by B<--cdifopts>.
 
 =head2 EXIT STATUS
 
-B<sdif> always exit with status zero unless error occured.
+B<sdif> always exit with status zero unless error occurred.
 
 =head1 OPTIONS
 
@@ -1084,10 +1084,12 @@ Specify options for back-end B<cdif> command.
 
 =item B<--mecab>
 
-These options are simply sent to back-end B<cdif> command.  Default is
-B<--unit>=C<word> and C<char> and I<mecab> can be used.  Option
-B<--by> is an alias for B<--unit>.  Option B<--mecab> is same as
-B<--unit=mecab>.  Use B<--cdifopts> to set other options.
+These options are simply sent to back-end B<cdif> command.  Choose
+value from C<word> (default), C<letter>, C<char> or I<mecab>.  Option
+B<--by> is an alias for B<--unit>.  Option B<--mecab> is shortcut for
+B<--unit=mecab>.  Consult L<cdif> manual for detail.
+
+Use B<--cdifopts> to set other options.
 
 =item B<--diff>=I<command>
 
@@ -1175,10 +1177,10 @@ output.
 
 =item B<-->[B<no->]B<lenience>
 
-Supress warning message for unexpected input from diff command.  True
+Suppress warning message for unexpected input from diff command.  True
 by default.
 
-=item B<--visible> I<chaname>=[0,1]
+=item B<--visible> I<charname>=[0,1]
 
 =item B<--tabhead>=I<char>
 
@@ -1191,7 +1193,7 @@ B<--tabhead> and B<--tabspace> option.
 
     $ sdif --visible ht=1 --tabhead=T --tabspace=.
 
-If the option value is longer than single characger, it is evaluated
+If the option value is longer than single character, it is evaluated
 as unicode name.
 
     $ sdif --visible ht=1 \
@@ -1211,7 +1213,7 @@ characters at once according to the given style name.  Select from
 C<space>, C<dot>, C<symbol>, C<shade>, C<bar>, C<dash> and others.
 See L<Text::ANSI::Fold/tabstyle> for available styles.
 
-Mutiple styles can be mixed up like C<symbol,space>.  In this case,
+Multiple styles can be mixed up like C<symbol,space>.  In this case,
 tabhead and tabspace are taken from C<symbol> and C<space> style
 respectively.
 
@@ -1292,7 +1294,7 @@ terminal :
 or color names enclosed by angle bracket :
 
     <red> <blue> <green> <cyan> <magenta> <yellow>
-    <aliceblue> <honeydue> <hotpink> <mooccasin>
+    <aliceblue> <honeydue> <hotpink> <moccasin>
     <medium_aqua_marine>
 
 with other special effects :
@@ -1408,7 +1410,10 @@ L<https://taku910.github.io/mecab/>
 =cut
 
 #  LocalWords:  perldoc colormap autocolor termcolor onword cdifopts
-#  LocalWords:  mecab CJK diffopts colortable Unicode OCOMMAND
+#  LocalWords:  mecab CJK diffopts colortable Unicode OCOMMAND cdif
 #  LocalWords:  NCOMMAND OFILE MCOMMAND NFILE MFILE OMARK NMARK MMARK
 #  LocalWords:  UMARK OLINE NLINE MLINE ULINE OTEXT NTEXT MTEXT UTEXT
-#  LocalWords:  Cyan RGB SDIFOPTS Kazumasa Utashiro watchdiff
+#  LocalWords:  Cyan RGB SDIFOPTS Kazumasa Utashiro watchdiff sdif
+#  LocalWords:  sdiff diff sdifrc CMY cmy macOS iTerm XTerm runin
+#  LocalWords:  runout regex lenience tabhead tabspace unicode cyan
+#  LocalWords:  tabstyle tabstop perl

@@ -2,24 +2,30 @@
 abstract: 'distribute points aesthetically in R^n'
 author:
   - 'Max Maischein <corion@cpan.org>'
-build_requires: {}
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Random-PoissonDisc
 no_index:
   directory:
     - t
     - inc
 requires:
-  List::Util: 0
-  Math::Random::MT::Auto: 0
-  perl: 5.006
+  List::Util: '0'
+  Math::Random::MT::Auto: '0'
+  perl: '5.010'
 resources:
-  repository: http://github.com/Corion/random-poissondisc
-version: 0.02
+  bugtracker: https://github.com/Corion/Random-PoissonDisc/issues
+  license: https://dev.perl.org/licenses/
+  repository: git://github.com/Corion/random-poissondisc.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

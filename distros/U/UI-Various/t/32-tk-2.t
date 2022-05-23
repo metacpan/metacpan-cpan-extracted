@@ -30,15 +30,20 @@ use Test::Output;
 
 BEGIN {
     $ENV{DISPLAY}  or  plan skip_all => 'DISPLAY not found';
+sleep 2;				# TODO: trying work-around for Xvfb
     eval { require Tk; };
+diag('Tk has been initialised');	# TODO: temporary diagnostics
     $@  and  plan skip_all => 'Perl/Tk not found';
-    plan tests => 14;
+    plan tests => 8;
 
     # define fixed environment for unit tests:
     delete $ENV{UI};
 }
 
+sleep 2;				# TODO: trying work-around for Xvfb
 use UI::Various({use => ['Tk']});
+diag('V::UI::Tk has been initialised');	# TODO: temporary diagnostics
+sleep 2;				# TODO: trying work-around for Xvfb
 
 #########################################################################
 # specific check for problematic configuration, is sub-test as the
@@ -56,10 +61,6 @@ if ($_)
 	 ' apparently has a strange font configuration (no default font?).',
 	 '  This will hurt!');
 }
-
-#########################################################################
-# identical parts of messages:
-my $re_msg_tail = qr/ at $0 line \d{2,}\.?$/;
 
 ####################################
 # test variant two windows with either width or height, but not both:
@@ -117,60 +118,3 @@ is($ww2, 42, '$win2 had correct fixed width');
 is($counts[0], 9, 'listbox has correct 1st count');
 is($counts[1], 8, 'listbox has correct 2nd count');
 is_deeply(\@selection, [1, 2, 4], 'listbox had correct final selection');
-
-####################################
-# test window and dialogue:
-
-$main = UI::Various::Main->new();
-my ($dialog, $button5);
-my $flow = 1;
-my $button3 = UI::Various::Button->new(text => 'Close',
-				       code => sub{
-					   $flow *= 2;
-					   $dialog->destroy;
-					   $button5->_tk()->invoke;
-				       });
-my $button4 = UI::Various::Button->new(text => 'Dialogue',
-				       code => sub{
-					   $dialog = $main->dialog($button3);
-					   $dialog->_prepare();
-					   $button3->_tk()->invoke;
-					   $flow += 1;
-				       });
-$button5 = UI::Various::Button->new(text => 'Quit',
-				    code => sub{ $win1->destroy; });
-$win1 = $main->window({title => 'Dialog'}, $button4, $button5);
-combined_like
-{
-    $main->_mainloop_prepare;
-    $button4->_tk()->invoke;
-    $main->_mainloop_run;
-}
-    qr{\A(?:^Devel::Cover: .*lib/Tk/Frame.pm .*\n)*\Z}m,
-    'mainloop "dialogue" produces correct empty output';
-is(@{$main->{children}}, 0, 'main yet again no longer has children');
-is($flow, 3, 'flow looks correct');
-
-####################################
-# test unused behaviour (and get 100% coverage):
-
-$win1 = UI::Various::Window->new(title => 'hello');
-$dialog = UI::Various::Dialog->new();
-my $dialog2 = UI::Various::Dialog->new(height => 5);
-my $dialog3 = UI::Various::Dialog->new(height => 5, width => 10);
-
-is(@{$main->{children}}, 4, 'main has new children');
-is($win1->title(), 'hello', 'window constructor sets title');
-
-$dialog2->_prepare();
-
-$win1->destroy();
-$dialog->destroy();
-$dialog2->destroy();
-
-$dialog3->_prepare();
-$dialog3->destroy();
-
-is(@{$main->{children}}, 0, 'main is clean again');
-
-$main->mainloop();		# an additional empty call just for the coverage

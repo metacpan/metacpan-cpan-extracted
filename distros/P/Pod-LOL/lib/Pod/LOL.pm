@@ -1,134 +1,175 @@
 package Pod::LOL;
 
-use 5.030;
+use 5.012;    # Pod::Simple, parent.
 use strict;
 use warnings;
-use Mojo::Base qw/ -base Pod::Simple -signatures /;
-use Mojo::Util qw/ dumper /;
+use parent qw( Pod::Simple );
+use Data::Dumper;
 
 =head1 NAME
 
-Pod::LOL - Transform POD into a list of lists
+Pod::LOL - parse Pod into a list of lists (LOL)
 
 =head1 VERSION
 
-Version 0.02
+Version 0.06
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.06';
 our $DEBUG   = 0;
 
-has [qw/ _pos root /];
 
 =head1 SYNOPSIS
 
-Transform POD into a list of lists (lol)
+   % cat my.pod
 
-   use Pod::LOL;
-	my $lol = Pod::LOL->new->parse_file($path)->root;
+   =head1 NAME
 
-$lol contains:
+   Pod::LOL - parse Pod into a list of lists (LOL)
 
-    [
-	  [
-	    "head1",
-	    "NAME"
-	  ],
-	  [
-	    "Para",
-	    "Pod::LOL - Transform POD into a list of lists"
-	  ],
-	  [
-	    "head1",
-	    "VERSION"
-	  ],
-	  ...
-	],
 
-Inline (Debugging)
+   % perl -MPod::LOL -MData::Dumper -e 'print Dumper( Pod::LOL->new_root("my.pod") )'
 
-    perl -Ilib -MPod::LOL -MMojo::Util=dumper -E "say dumper(Pod::LOL->new->parse_file('lib/Pod/LOL.pm')->root)"
+Returns:
+
+   [
+      [
+         "head1",
+         "NAME"
+      ],
+      [
+         "Para",
+         "Pod::LOL - parse Pod into a list of lists (LOL)"
+      ],
+   ]
+
 
 =head1 DESCRIPTION
 
-This module takes a path a extracts the pod information
-into a list of lists.
+This class may be of interest for anyone writing a Pod parser.
 
-=head1 METHODS
+This module takes Pod (as a file) and returns a list of lists (LOL) structure.
 
-This module overwrites the following methods
-from Pod::Simple:
+This is a subclass of L<Pod::Simple> and inherits all of its methods.
 
-=head2 _handle_element_start
+=head1 SUBROUTINES/METHODS
 
-Executed when a new pod element starts.
+=head2 new_root
+
+Convenience method to do this:
+
+   Pod::LOL->new->parse_file( $file )->{root};
 
 =cut
 
-sub _handle_element_start ( $s, $tag, $attr ) {
-   $DEBUG and say "TAG_START: $tag";
+sub new_root {
+   my ( $class, $file ) = @_;
 
-   if ( $s->_pos ) {
+   my $parser = $class->new;
+
+   # Normally =for and =begin would otherwise be skipped.
+   $parser->accept_targets( '*' );
+
+   my $s = $parser->parse_file( $file );
+
+
+   # TODO: Add error check here.
+
+
+   $s->{root};
+}
+
+=head2 _handle_element_start
+
+Overrides Pod::Simple.
+Executed when a new pod element starts such as:
+
+   "head1"
+   "Para"
+
+=cut
+
+sub _handle_element_start {
+   my ( $s, $tag ) = @_;
+   $DEBUG and print STDERR "TAG_START: $tag";
+
+   if ( $s->{_pos} ) {    # We already have a position.
       my $x =
-        ( length( $tag ) == 1 ) ? [] : [$tag];    # Ignore single character tags
-      push $s->_pos->[0]->@*, $x;                 # Append to root
-      unshift $s->_pos->@*, $x;                   # Set as current position
+        ( length( $tag ) == 1 ) ? [] : [$tag];   # Ignore single character tags.
+      push @{ $s->{_pos}[0] }, $x;               # Append to root.
+      unshift @{ $s->{_pos} }, $x;               # Set as current position.
    }
    else {
       my $x = [];
-      $s->root( $x );                             # Set root
-      $s->_pos( [$x] );                           # Set current position
+      $s->{root} = $x;                           # Set root.
+      $s->{_pos} = [$x];                         # Set current position.
    }
 
-   $DEBUG and say "_pos: ", dumper $s->_pos;
+   $DEBUG and print STDERR "{_pos}: " . Dumper $s->{_pos};
 }
 
 =head2 _handle_text
 
-Executed for each text element.
+Overrides Pod::Simple.
+Executed for each text element such as:
+
+   "NAME"
+   "Pod::LOL - parse Pod into a list of lists (LOL)"
 
 =cut
 
-sub _handle_text ( $s, $text ) {
-   $DEBUG and say "TEXT: $text";
+sub _handle_text {
+   my ( $s, $text ) = @_;
+   $DEBUG and print STDERR "TEXT: $text";
 
-   push $s->_pos->[0]->@*, $text;    # Add text
+   push @{ $s->{_pos}[0] }, $text;    # Add the new text.
 
-   $DEBUG and say "_pos: ", dumper $s->_pos;
+   $DEBUG and print STDERR "{_pos}: " . Dumper $s->{_pos};
 }
 
 =head2 _handle_element_end
 
+Overrides Pod::Simple.
 Executed when a pod element ends.
+Such as when these tags end:
+
+   "head1"
+   "Para"
 
 =cut
 
 sub _handle_element_end {
    my ( $s, $tag ) = @_;
-   $DEBUG and say "TAG_END: $tag";
-   shift $s->_pos->@*;
+   $DEBUG and print STDERR "TAG_END: $tag";
+   shift @{ $s->{_pos} };
 
    if ( length $tag == 1 ) {
 
       # Single character tags (like L<>) should be on the same level as text.
-      $s->_pos->[0][-1] = join "", $s->_pos->[0][-1]->@*;
-      $DEBUG and say "TAG_END_TEXT: @{[ $s->_pos->[0][-1] ]}";
+      $s->{_pos}[0][-1] = join "", @{ $s->{_pos}[0][-1] };
+      $DEBUG and print STDERR "TAG_END_TEXT: @{[ $s->{_pos}[0][-1] ]}";
    }
    elsif ( $tag eq "Para" ) {
 
       # Should only have 2 elements: tag, entire text
-      my ( $_tag, @text ) = $s->_pos->[0][-1]->@*;
+      my ( $_tag, @text ) = @{ $s->{_pos}[0][-1] };
       my $text = join "", @text;
-      $s->_pos->[0][-1]->@* = ( $_tag, $text );
+      @{ $s->{_pos}[0][-1] } = ( $_tag, $text );
    }
 
-   $DEBUG and say "_pos: ", dumper $s->_pos;
+   $DEBUG and print STDERR "{_pos}: " . Dumper $s->{_pos};
 }
+
 
 =head1 SEE ALSO
 
-L<Module::Functions>
+L<App::Pod>
+
+L<Pod::Query>
+
+L<Pod::Simple>
+
 
 =head1 AUTHOR
 
@@ -136,9 +177,8 @@ Tim Potapov, C<< <tim.potapov[AT]gmail.com> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-pod-lol at rt.cpan.org>, or through
-the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Pod-LOL>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to L<https://github.com/poti1/pod-lol/issues>.
+
 
 =head1 SUPPORT
 
@@ -146,27 +186,16 @@ You can find documentation for this module with the perldoc command.
 
     perldoc Pod::LOL
 
+
 You can also look for information at:
 
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Pod-LOL>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Pod-LOL>
-
-=item * Search CPAN
-
-L<https://metacpan.org/release/Pod-LOL>
-
-=back
+L<https://metacpan.org/pod/Pod::LOL>
+L<https://github.com/poti1/pod-lol>
 
 
 =head1 ACKNOWLEDGEMENTS
 
+TBD
 
 =head1 LICENSE AND COPYRIGHT
 

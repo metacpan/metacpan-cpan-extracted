@@ -14,7 +14,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package Sys::OsPackage::Driver::Arch;
-$Sys::OsPackage::Driver::Arch::VERSION = '0.1.3';
+$Sys::OsPackage::Driver::Arch::VERSION = '0.1.4';
 use base "Sys::OsPackage::Driver";
 
 # check if packager command found (arch)
@@ -101,7 +101,7 @@ Sys::OsPackage::Driver::Arch - Arch Pacman packaging handler for Sys::OsPackage
 
 =head1 VERSION
 
-version 0.1.3
+version 0.1.4
 
 =head1 SYNOPSIS
 

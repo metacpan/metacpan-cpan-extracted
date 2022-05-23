@@ -20,7 +20,7 @@ my $s = $driver->session;
 # those features or moved elsewhere once the features are documented
 # and thus officially supported.
 
-use Test::More 0.96 tests => 12 + 1;
+use Test::More 0.96 tests => 8 + 1;
 use Test::Exception;
 use Test::Warnings qw(warnings);
 
@@ -210,18 +210,6 @@ subtest 'multiple statements' => sub {
 };
 
 
-subtest 'result stream interface: attachment' => sub {
-	plan tests => 5;
-	$r = $s->run('RETURN 42');
-	my ($a, $c);
-	lives_ok { $a = $r->attached } 'is attached';
-	lives_ok { $c = $r->detach } 'detach';
-	is $c, ($a ? 1 : 0), 'one row detached';
-	lives_and { ok ! $r->attached } 'not attached';
-	lives_and { ok $r->has_next } 'not exhausted';
-};
-
-
 subtest 'result stream interface: discard result stream' => sub {
 	plan tests => 4;
 	$r = $s->run('RETURN 7 AS n UNION RETURN 11 AS n');
@@ -250,63 +238,6 @@ subtest 'result stream interface: look ahead' => sub {
 	is $peek, $v, 'peek matches fetch 2nd';
 	lives_and { ok ! $r->fetch } 'no fetch 3rd';
 	throws_ok { $r->peek } qr/\bexhausted\b/i, 'peek dies 3rd';
-};
-
-
-subtest 'nested transactions: explicit (REST)' => sub {
-	plan skip_all => '(currently testing Bolt)' if $Neo4j_Test::bolt;
-	plan tests => 4 if ! $Neo4j_Test::bolt;
-	my $session = $driver->session;
-	my ($t1, $t2);
-	lives_ok {
-		$t1 = $session->begin_transaction;
-		$t1->run("CREATE (nested1:Test)");
-	} 'explicit nested transactions: 1st';
-	lives_ok {
-		$t2 = $session->begin_transaction;
-		$t2->run("CREATE (nested2:Test)");
-	} 'explicit nested transactions: 2nd';
-	lives_ok { $t1->rollback; } 'explicit nested transactions: close 1st';
-	lives_ok { $t2->rollback; } 'explicit nested transactions: close 2nd';
-};
-
-
-subtest 'nested transactions: explicit (Bolt)' => sub {
-	plan skip_all => '(currently testing HTTP)' if ! $Neo4j_Test::bolt;
-	plan tests => 4 if $Neo4j_Test::bolt;
-	my $session = $driver->session;
-	my ($t1, $t2);
-	lives_ok {
-		$t1 = $session->begin_transaction;
-		$t1->run("CREATE (nested1:Test)");
-	} 'explicit nested transactions: 1st';
-	throws_ok {
-		$t2 = $session->begin_transaction;
-		$t2->run("CREATE (nested2:Test)");
-	} qr/\bnested\b/i, 'explicit nested transactions: 2nd';
-	lives_ok { $t1->rollback; } 'explicit nested transactions: close 1st';
-	dies_ok { $t2->rollback; } 'explicit nested transactions: close 2nd';
-};
-
-
-subtest 'nested transactions: autocommit' => sub {
-	plan tests => 2;
-	my $session = $driver->session;
-	my $value = 0;
-	my $t = $session->begin_transaction;
-	$t->run("CREATE (explicit1:Test)");
-	lives_ok {
-		$value = $session->run("RETURN 42")->single->get(0);
-		$t->run("CREATE (explicit2:Test)");
-		$t->rollback;
-	} 'nested autocommit transactions: success' if ! $Neo4j_Test::bolt;
-	throws_ok {
-		$value = $session->run("RETURN 42")->single->get(0);
-		$t->run("CREATE (explicit2:Test)");
-		$t->rollback;
-	} qr/support.*Bolt/i, 'nested autocommit transactions: no success' if $Neo4j_Test::bolt;
-	my $expected = $Neo4j_Test::bolt ? 0 : 42;
-	is $value, $expected, 'nested autocommit transactions: result';
 };
 
 

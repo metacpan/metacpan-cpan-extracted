@@ -17,10 +17,8 @@ subtest 'Check ResultSetNames' => sub {
    plan tests => 4;
 
    $res = $test->request( GET '/test_humans' );
-   is(
-      decode_json( $res->content ),
-      [qw(id name)], 'Plural on first DB returns resultset'
-   );
+   is( decode_json( $res->content ),
+      [qw(id name)], 'Plural on first DB returns resultset' );
 
    $res = $test->request( GET '/test_human' );
    is(
@@ -32,7 +30,7 @@ subtest 'Check ResultSetNames' => sub {
    $res = $test->request( GET '/test_mugs' );
    like(
       decode_json( $res->content ),
-      { status => 500, exception => qr/Can't locate object method/ },
+      { status => 500,  exception => qr/Can't locate object method/ },
       'Plural on second DB dies'
    );
 

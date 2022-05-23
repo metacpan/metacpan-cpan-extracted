@@ -1,10 +1,11 @@
-MANIFEST
 CHANGELOG
+lib/PerlIO/via/UnPod.pm
+Makefile.PL
+MANIFEST
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module meta-data (added by MakeMaker)
 README
+t/coverage.t
+t/UnPod.t
 TODO
 VERSION
-Makefile.PL
-lib/PerlIO/via/UnPod.pm
-t/UnPod.t
-META.yml                                Module meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

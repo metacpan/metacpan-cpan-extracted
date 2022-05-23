@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Net::Bolt;
 # ABSTRACT: Networking delegate for Neo4j Bolt
-$Neo4j::Driver::Net::Bolt::VERSION = '0.28';
+$Neo4j::Driver::Net::Bolt::VERSION = '0.30';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -35,6 +35,8 @@ my $RESULT_MODULE = 'Neo4j::Driver::Result::Bolt';
 sub new {
 	# uncoverable pod
 	my ($class, $driver) = @_;
+	
+	croak "Concurrent transactions are unsupported in Bolt; use multiple sessions" if $driver->{concurrent_tx};
 	
 	my $uri = $driver->{uri};
 	if ($driver->{auth}) {

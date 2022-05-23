@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::ServerInfo;
 # ABSTRACT: Provides Neo4j server address and version
-$Neo4j::Driver::ServerInfo::VERSION = '0.28';
+$Neo4j::Driver::ServerInfo::VERSION = '0.30';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Session);
@@ -37,8 +37,6 @@ sub protocol {
 	# uncoverable pod (see Deprecations.pod)
 	my ($self) = @_;
 	warnings::warnif deprecated => __PACKAGE__ . "->protocol() is deprecated; use protocol_version() instead";
-	my $protocol = $self->{protocol_string};
-	return $protocol if defined $protocol;
 	my $bolt_version = $self->{protocol};
 	return "Bolt/$bolt_version" if $bolt_version;
 	return defined $bolt_version ? "Bolt" : "HTTP";
@@ -78,7 +76,7 @@ Neo4j::Driver::ServerInfo - Provides Neo4j server address and version
 
 =head1 VERSION
 
-version 0.28
+version 0.30
 
 =head1 SYNOPSIS
 
@@ -93,6 +91,8 @@ version 0.28
 
 Provides some basic information of the server where the result
 is obtained from.
+
+To obtain server info, call L<Neo4j::Driver::Session/"server">.
 
 =head1 METHODS
 

@@ -1,9 +1,12 @@
 TO DO:
 
-0.01 20110603
-    . Released on an unsuspecting world
+0.03 2022-05-22
+    * Add `avoid_edge` and `center` options, documentation improvements
+      provided by Gene Boggs ( GH #2 )
 
-0.02 20140826
-    . Fix biased distribution, as found, explained and fixed by Johan Eidenvall
+0.02 2014-08-26
+    * Fix biased distribution, as found, explained and fixed by Johan Eidenvall
 
-     
+0.01 2011-06-03
+    * Released on an unsuspecting world
+

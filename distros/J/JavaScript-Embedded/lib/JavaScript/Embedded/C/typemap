@@ -1,0 +1,14 @@
+TYPEMAP
+duk_idx_t T_INT
+duk_int_t T_INT
+duk_ret_t T_INT
+duk_codepoint_t T_INT
+duk_bool_t T_INT
+duk_errcode_t T_INT
+duk_size_t T_UV
+duk_uarridx_t T_UV
+duk_uint_t T_UV
+duk_uarridx_t T_INT
+duk_double_t T_DOUBLE
+duk_context* T_PTRREF
+duk_c_function* T_PTRREF

@@ -39,7 +39,7 @@ sub platconf_count
 }
 
 # count tests
-plan tests => 14
+plan tests => 17
     + (2 * scalar @sysconf_keys)
     + platconf_count()
     + (2 * scalar keys %perlconf_keys);
@@ -68,7 +68,7 @@ foreach my $perlconf_key (sort keys %perlconf_keys) {
     isa_ok($value, $perlconf_keys{$perlconf_key}, "perlconf($perlconf_key)");
 }
 
-# system environment tests (6 tests)
+# system environment tests (9 tests)
 my $test_str = "__test__";
 $ospkg->sysenv("platform", $test_str);
 is($ospkg->sysenv("platform"), $test_str, "sysenv(platform) returns same value written to it");
@@ -78,6 +78,9 @@ $ospkg->sysenv("packager", $test_str);
 is($ospkg->sysenv("packager"), $test_str, "sysenv(packager) returns same value written to it");
 is($ospkg->packager(), $test_str, "ref->packager() returns same value as sysenv(packager)");
 is(Sys::OsPackage->packager(), $test_str, "class->packager() returns same value as sysenv(packager)");
+ok(defined $ospkg->sysenv("perlbase"), "sysenv(perlbase) is defined");
+ok(-d $ospkg->sysenv("perlbase"), "sysenv(perlbase) points to an existing directory");
+ok(-d $ospkg->sysenv("perlbase")."/lib/perl5", "sysenv(perlbase)/lib/perl5 is an existing directory");
 
 # platform configuration (n tests)
 ok((defined Sys::OsPackage->platconf("__notfound__")) ? 0 : 1, "platconf(__notfound__) not found as expected");

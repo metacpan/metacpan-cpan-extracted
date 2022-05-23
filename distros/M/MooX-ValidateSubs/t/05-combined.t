@@ -61,4 +61,14 @@ eval { $maybe->hash( three => 'cannot be set' ) };
 my $errors = $@;
 like( $errors, qr/Unrecognized parameter: three/, "a list fails");
 
+is_deeply({One::Two::Three::hash('One::Two::Three')}, { 
+    one => 'Hello World', 
+    two => 'Goodbye World', 
+    three => 'Add a value', 
+    four => 'I live in my own world', 
+    five => { one => 'two' } 
+}, "list returns 5 key/value pairs");
+
+
+
 done_testing();

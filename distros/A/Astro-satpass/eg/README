@@ -100,12 +100,4 @@ xml
     and displays the results as XML, using XML::Writer. The pass_variant
     attribute is used to control what events of a pass are displayed.
 
-visual
-    This script has nothing directly to do with this package. What it
-    does is to download the Celestrak web site's list of visual
-    satellites, and Mike McCants' visual list (with magnitudes) and
-    compares the two. With the -merge option, it also gets McCants'
-    total list and produces a magnitude table suitable for
-    Astro::Coord::ECI::TLE, which is why this script is here.
-
 # ex: set textwidth=72 autoindent :

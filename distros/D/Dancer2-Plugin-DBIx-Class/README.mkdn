@@ -1,0 +1,153 @@
+# NAME
+
+Dancer2::Plugin::DBIx::Class - syntactic sugar for DBIx::Class in Dancer2, optionally with DBIx::Class::Schema::ResultSetNames
+
+# VERSION
+
+version 1.1001
+
+# SYNOPSIS
+
+    # In your Dancer2 app, without DBIx::Class::Schema::ResultSetNames
+    # (but why would you?)
+       my $results = resultset('Human')->search( { . . .} );
+    #
+    # or, with DBIx::Class::Schema::ResultSetNames
+       my $results = humans->search( { . . . } );
+       my $single_person = human($human_id);
+
+# DESCRIPTION
+
+Dancer2::Plugin::DBIx::Class adds convenience keywords to the DSL for [Dancer2](https://metacpan.org/pod/Dancer2), in order to make
+database calls more semantically-friendly. This module is intended to be a forklift-upgrade for
+[Dancer2::Plugin::DBIC](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3ADBIC) enabling the user to deploy this plugin on already-running Dancer2 apps,
+then add [DBIx::Class::Schema::ResultSetNames](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ASchema%3A%3AResultSetNames) to new code.
+
+# CONFIGURATION
+
+The configuration for this plugin can go in your config.yml, or in your environment:
+
+    plugins:
+      DBIx::Class:
+        default:
+          dsn: dbi:SQLite:dbname=my.db    # Just about any DBI-compatible DSN goes here
+          schema_class: MyApp::Schema
+          export_prefix: 'db'             # Optional, unless a table name (singular or plural)
+                                          # is also a DSL keyword.
+        second:                           # You can use multiple schemas!
+          dsn: dbi:Pg:dbname=foo
+          schema_class: Foo::Schema
+          user: bob
+          password: secret
+          options:
+            RaiseError: 1
+            PrintError: 1
+        third:
+          alias: 'default'                # Yep, aliases work too.
+
+# YOU HAVE BEEN WARNED
+
+The "optional" `export_prefix` configuration adds the given prefix to the ResultSet names, if you
+are using [DBIx::Class::Schema::ResultSetNames](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ASchema%3A%3AResultSetNames). You don't need to include an underscore at the 
+end, you get that for free. It is wise to do this, if you have table names whose singular or plural
+terms collide with [Dancer2::Core::DSL](https://metacpan.org/pod/Dancer2%3A%3ACore%3A%3ADSL) keywords, or those added by other plugins. In the event
+that your term collides with a [Dancer2::Core::DSL](https://metacpan.org/pod/Dancer2%3A%3ACore%3A%3ADSL) keyword, it will not be added to this plugin,
+and the functionality of the DSL keyword will take precedence.
+
+# FUNCTIONS
+
+## schema
+
+This keyword returns the related [DBIx::Class::Schema](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ASchema) object, ready for use.  Given without parameters,
+it will return the 'default' schema, or the first one that was created, or the only one, if there is
+only one.
+
+## resultset, rset, rs
+
+These three keywords are syntactically identical, and, given a name of a [DBIx::Class::ResultSet](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AResultSet)
+object, will return the resultset, ready for searching, or any other method you can use on a ResultSet:
+
+    my $cars = rs('Car')->search({ . . .});
+
+If you specify these without a `schema` call before it, it will assume the default schema, as above.
+
+# NAMED RESULT SETS
+
+[DBIx::Class::Schema::ResultSetNames](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ASchema%3A%3AResultSetNames) adds both singular and plural method accessors for all resultsets.
+
+So, instead of this:
+
+    my $result_set = resultset('Author')->search({...});
+
+you may choose to this:
+
+    my $result_set = authors->search({...});
+
+And instead of this:
+
+    my $result = resultset('Author')->find($id);
+
+you may choose to this:
+
+    my $result = author($id)
+
+The usual caveats apply to `find()` returning multiple records; that behavior is deprecated, so if you
+try to do something like:
+
+    my $result = author( { first_name => 'John'} );
+
+...odds are things will blow up in your face a lot.  Using a unique key in `find()` is important.
+
+# BUT THAT'S NOT ALL!
+
+If you combine this module, [DBIx::Class::Schema::ResultSetNames](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ASchema%3A%3AResultSetNames), and [DBIx::Class::Helper::ResultSet::Shortcut](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AHelper%3A%3AResultSet%3A%3AShortcut),
+you can do some really fabulous, easy-to-read things in a [Dancer2](https://metacpan.org/pod/Dancer2) route, like:
+
+    # find all the books for an author, give me an array of
+    #    their books as Row objects, with the editions prefetched.
+    #
+    my @books = author($id)->books->prefetch('edition')->all 
+    
+    # send a JSON-encoded list of hashrefs of authors with first names
+    #    that start with 'John' and their works to your front-end framework
+    #    (Some, like DevExtreme, do not cope well with the objects.)
+    #
+    send_as JSON => [ authors->like( 'first_name', 'John%')->prefetch('books')->hri->all ];
+
+There are many really snazzy things to be found in [DBIx::Class::Helpers](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AHelpers). Many of them can make
+your code much more readable. Definitely worth a look-see.
+
+Remember: your code has two developers: you, and you six months from now.
+
+Remember also: You should write your code like the next developer to work on it is
+a psychopath who knows where you live. 
+
+# SEE ALSO
+
+- [DBIx::Class::ResultSet](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AResultSet)
+- [DBIx::Class::Schema::ResultSetNames](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ASchema%3A%3AResultSetNames)
+- [DBIx::Class::Schema](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ASchema)
+
+# CREDIT WHERE CREDIT IS DUE
+
+Practically all of this code is the work of [Matt S Trout (mst)](https://metacpan.org/author/MSTROUT).
+I just tidied things up and wrote documentation.
+
+# SOURCE
+
+[https://gitlab.com/geekruthie/Dancer2-Plugin-DBIx-Class](https://gitlab.com/geekruthie/Dancer2-Plugin-DBIx-Class)
+
+# HOMEPAGE
+
+[https://metacpan.org/release/Dancer2-Plugin-DBIx-Classs](https://metacpan.org/release/Dancer2-Plugin-DBIx-Classs)
+
+# AUTHOR
+
+D Ruth Holloway <ruth@hiruthie.me>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2021 by D Ruth Holloway.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

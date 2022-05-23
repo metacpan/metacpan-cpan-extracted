@@ -6,7 +6,7 @@ use warnings;
 
 package SVN::Look;
 # ABSTRACT: Caching wrapper around the svnlook command
-$SVN::Look::VERSION = '0.42';
+$SVN::Look::VERSION = '0.43';
 use Carp;
 use File::Spec::Functions;
 use List::MoreUtils qw{uniq};
@@ -386,7 +386,7 @@ SVN::Look - Caching wrapper around the svnlook command
 
 =head1 VERSION
 
-version 0.42
+version 0.43
 
 =head1 SYNOPSIS
 
@@ -638,7 +638,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by CPqD.
+This software is copyright (c) 2022 by CPqD.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

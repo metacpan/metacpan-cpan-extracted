@@ -17,7 +17,7 @@ my $builder = Module::Build->new(
         'Test::More' => '0',
     },
     requires => {
-        'Mojolicious' => '9.19',
+      # 'Mojolicious' => '9.19',
     },
     add_to_cleanup     => [ 'Pod-LOL-*' ],
 );

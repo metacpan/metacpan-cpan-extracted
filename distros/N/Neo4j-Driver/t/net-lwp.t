@@ -5,7 +5,7 @@ use lib qw(./lib t/lib);
 
 use Test::More 0.88;
 use Test::Exception;
-use Test::Warnings;
+use Test::Warnings qw(warning);
 use Mock::Quick;
 
 
@@ -48,17 +48,21 @@ subtest 'static' => sub {
 
 
 subtest 'agent' => sub {
-	plan tests => 7;
-	lives_ok { $ua = 0; $ua = $m->agent() } 'agent';
-	isa_ok $ua, 'LWP::UserAgent', 'agent type';
+	plan tests => 9;
+	my $w;
+	lives_ok { $w = ''; $w = warning { my $p = $m->agent() }; } 'agent lives';
+	like $w, qr/\bagent\b.*\bdeprecated\b/i, 'agent deprecated'
+		or diag 'got warning(s): ', explain $w;
+	lives_ok { $ua = 0; $ua = $m->ua() } 'ua';
+	isa_ok $ua, 'LWP::UserAgent', 'ua type';
 	lives_and { ok $ua->default_header('X-Stream') } 'X-Stream';
 	my $mver;
 	local $Neo4j::Driver::Net::HTTP::LWP::VERSION = '0.00';
 	lives_ok { $mver = Neo4j::Driver::Net::HTTP::LWP->new($driver) } 'ver lives';
-	lives_and { like $mver->agent->agent(), qr|\bNeo4j-Driver/0\.00 libwww-perl\b| } 'ver User-Agent';
+	lives_and { like $mver->ua->agent(), qr|\bNeo4j-Driver/0\.00 libwww-perl\b| } 'ver User-Agent';
 	local $Neo4j::Driver::Net::HTTP::LWP::VERSION = undef;
 	lives_ok { $mver = Neo4j::Driver::Net::HTTP::LWP->new($driver) } 'no ver lives';
-	lives_and { like $mver->agent->agent(), qr|\bNeo4j-Driver libwww-perl\b| } 'no ver User-Agent';
+	lives_and { like $mver->ua->agent(), qr|\bNeo4j-Driver libwww-perl\b| } 'no ver User-Agent';
 };
 
 
@@ -113,7 +117,7 @@ subtest 'response' => sub {
 	lives_and { is $m->http_header->{status}, '200' } 'status';
 	lives_and { ok $m->http_header->{success} } 'success';
 	lives_and { is $m->http_reason(), 'OK' } 'reason';
-	lives_and { is $m->protocol(), 'HTTP/1.1' } 'protocol';
+	lives_and { my $p; warning { $p = $m->protocol() }; is $p, 'HTTP/1.1' } 'protocol';  # deprecated
 };
 
 
@@ -127,7 +131,7 @@ subtest 'response error' => sub {
 	lives_and { is $m->http_header->{status}, '300' } 'status error';
 	lives_and { ok ! $m->http_header->{success} } 'no success';
 	lives_and { is $m->http_reason(), '' } 'reason no default';
-	lives_and { is $m->protocol(), 'HTTP' } 'protocol no version';
+	lives_and { my $p; warning { $p = $m->protocol() }; is $p, 'HTTP' } 'protocol no version';  # deprecated
 	$m->{response} = HTTP::Response->new;
 	SKIP: { skip "(HTTP::Status too old)", 2 if $HTTP::Headers::VERSION lt '6.12';
 		lives_and { is $m->http_header->{status}, '' } 'status empty';
@@ -201,8 +205,8 @@ subtest 'tls' => sub {
 			$m = Neo4j::Driver::Net::HTTP::LWP->new($driver);
 		} 'https ca_file lives';
 		lives_and { like $m->uri(), qr|^https://c|i } 'https ca_file uri';
-		lives_and { is $m->agent->ssl_opts('SSL_ca_file'), $ca_file } 'https ca_file';
-		lives_and { ok $m->agent->ssl_opts('verify_hostname') } 'https verify_hostname';
+		lives_and { is $m->ua->ssl_opts('SSL_ca_file'), $ca_file } 'https ca_file';
+		lives_and { ok $m->ua->ssl_opts('verify_hostname') } 'https verify_hostname';
 	}
 };
 

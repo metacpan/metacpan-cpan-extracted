@@ -154,6 +154,6 @@
          "web" : "https://github.com/steve-m-hay/perl-libnet"
       }
    },
-   "version" : "3.13",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "3.14",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -3,4 +3,8 @@ Test multiline item lists
     appropriately.
 
     This is a test.
+    Example with only verbatim content
+         {
+           "json": "stuff"
+         }
 

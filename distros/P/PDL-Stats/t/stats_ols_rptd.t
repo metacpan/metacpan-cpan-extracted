@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 use strict;
 use warnings;
 
@@ -7,10 +5,6 @@ use PDL::LiteF;
 use PDL::Stats;
 use PDL::NiceSlice;
 use Test::More;
-
-BEGIN {
-  plan tests => 7;
-}
 
 sub tapprox {
   my($a,$b, $eps) = @_;
@@ -43,7 +37,7 @@ is( tapprox( sumover($r{ss_err} - pdl(23.036272, 10.827623, 5.0104731)), 0 ) , 1
 is( tapprox( sumover($r{coeff} - pdl(0.33337285, 0.45858933, 0.15162986)), 0 ) , 1, 'coeff' );
 is( tapprox( sumover($r{F} - pdl(7.208473, 61.354153, 1.0243311)), 0 ) , 1, 'F' );
 
-
+done_testing();
 
 # Lorch and Myers (1990) data
 

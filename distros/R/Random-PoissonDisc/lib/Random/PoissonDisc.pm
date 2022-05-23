@@ -4,7 +4,7 @@ use List::Util qw(sum);
 use Math::Random::MT::Auto qw(rand gaussian);
 
 use vars qw($VERSION %grid_neighbours);
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 # %grid_neighbours caches the vectors pointing to
 # neighbours
@@ -79,6 +79,23 @@ the longer the algorithm will run for generating a number of points.
 
 In the algorithm description, this constant is named I<k>.
 
+=item *
+
+C<< avoid_edge >> - The distance from the edge of the plot.
+
+Default is C<0>
+
+If greater than zero, this will not plot points within that distance from the edge.
+
+=item *
+
+C<< center >> - Start adding points at the center of the plot.
+
+Default is C<0>
+
+If this is set to the default, the initial point will be added at a
+random position in the plot.
+
 =back
 
 =cut
@@ -86,6 +103,8 @@ In the algorithm description, this constant is named I<k>.
 sub points {
     my ($class,%options) = @_;
     
+    $options{center}     ||= 0;
+    $options{avoid_edge} ||= 0;
     $options{candidates} ||= 30;
     $options{dimensions} ||= [100,100]; # do we only create integral points?
     $options{r} ||= 10;
@@ -97,8 +116,10 @@ sub points {
     my @result;
     my @work;
         
-    # Create a first random point somewhere in our cube:
-    my $p = [map { rnd(0,$_) } @{ $options{ dimensions }}];
+    # Create a first point in our cube - either at random or in the center:
+    my $p = $options{ center }
+        ? [map { $_ / 2 } @{ $options{ dimensions }}]
+        : [map { rnd(0,$_) } @{ $options{ dimensions }}];
     push @result, $p;
     push @work, $p;
     my $c = grid_coords($grid_size, $p);
@@ -122,8 +143,8 @@ sub points {
             # Check whether our point lies within the dimensions
             for (0..$#$p) {
                  next CANDIDATE
-                    if   $p->[$_] >= $options{ dimensions }->[ $_ ]
-                      or $p->[$_] < 0
+                    if   $p->[$_] >= $options{ dimensions }->[ $_ ] - $options{ avoid_edge }
+                      or $p->[$_] < $options{ avoid_edge }
             };
             
             # check discs by using the grid

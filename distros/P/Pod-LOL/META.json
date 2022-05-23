@@ -1,5 +1,5 @@
 {
-   "abstract" : "Transform POD into a list of lists",
+   "abstract" : "parse Pod into a list of lists (LOL)",
    "author" : [
       "Tim Potapov <tim.potapov[AT]gmail.com>"
    ],
@@ -19,11 +19,6 @@
             "Module::Build" : "0.4004"
          }
       },
-      "runtime" : {
-         "requires" : {
-            "Mojolicious" : "9.19"
-         }
-      },
       "test" : {
          "requires" : {
             "Test::More" : "0"
@@ -33,7 +28,7 @@
    "provides" : {
       "Pod::LOL" : {
          "file" : "lib/Pod/LOL.pm",
-         "version" : "0.02"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -42,6 +37,6 @@
          "http://www.perlfoundation.org/artistic_license_2_0"
       ]
    },
-   "version" : "0.02",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

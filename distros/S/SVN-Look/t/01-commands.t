@@ -53,13 +53,18 @@ system("svn ci -q -mlog \"$ab\"");
 # Try without specifying a revision or a transaction
 $look = SVN::Look->new($repo);
 
-my $pl = eval { $look->proplist('a b.txt') };
+SKIP: {
+    my $pl = eval { $look->proplist('a b.txt') };
 
-ok(defined $pl, 'can call proplist in a file with spaces in the name');
+    ok(defined $pl, 'can call proplist in a file with spaces in the name')
+        or diag "Failed to proplist file 'a b.txt': ", $@;
 
-ok(exists $pl->{'svn:mime-type'}, 'proplist finds the expected property');
+    skip "Proplist failed", 2 unless defined $pl;
 
-is($pl->{'svn:mime-type'}, 'text/plain', 'proplist finds the correct property value');
+    ok(exists $pl->{'svn:mime-type'}, 'proplist finds the expected property');
+
+    is($pl->{'svn:mime-type'}, 'text/plain', 'proplist finds the correct property value');
+}
 
 my $youngest = eval { $look->youngest() };
 
@@ -82,3 +87,6 @@ ok(defined $lock && ref $lock eq 'HASH', 'lock');
 my @tree = eval { $look->tree('--full-paths') };
 
 is(scalar(@tree), 3, 'tree');
+
+1;
+

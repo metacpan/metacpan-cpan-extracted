@@ -5,7 +5,9 @@ use warnings;
 
 use Test::More;
 use Test::Deep;
+use Test::Fatal;
 require DateTime;
+require JSON::MaybeXS;
 
 use Cron::Sequencer::CLI qw(calculate_start_end);
 
@@ -114,6 +116,18 @@ for (['this day', 'today'],
                "'$alias' is the same as '$target'");
 }
 
+for my $when (qw (last this next)) {
+    my @minutes = calculate_start_end({ show => "$when minute" });
+    cmp_deeply(\@minutes, $two_integers, '"$when minutes" is also 2 integers');
+}
+
+my @minutes = calculate_start_end({ show => 'last 5 minutes' });
+cmp_deeply(\@minutes, $two_integers, '"last 5 minutes" is also 2 integers');
+is($minutes[1], $nowish, 'last 5 minutes ends now');
+$duration = $minutes[1] - $minutes[0];
+cmp_ok($duration, '>=', 299, 'at most 1 leap second short');
+cmp_ok($duration, '<=', 302, 'at most 2 leap seconds long');
+
 my @hours = calculate_start_end({ show => 'next 11 hours' });
 cmp_deeply(\@hours, $two_integers, '"next 11 hours" is also 2 integers');
 is($hours[0], $nowish, 'next 3 hours starts now');
@@ -170,6 +184,32 @@ for (['{from => 42}', [42, 3642]],
         or BAIL_OUT("The author's test source '$raw' is not a HASH reference");
 
     cmp_deeply([calculate_start_end($input)], $want, "calculate_start_end($raw)");
+}
+
+my $json = JSON::MaybeXS->new({ space_after => 1, canonical => 1, });
+
+for ([qr/: Can't use --show with --from or --to\n\z/,
+      { from => '+0', show => 'today' }],
+     [qr/: Can't use --show with --from or --to\n\z/,
+      { to => '+0', show => 'today' }],
+     [qr/: Can't parse 'woof' for --from\n\z/,
+      { from => 'woof' }],
+     [qr/: Can't parse 'woof' for --to\n\z/,
+      { to => 'woof' }],
+     [qr/: Unknown time period 'woof' for --show\n\z/,
+      { show => 'woof' }],
+     [qr/: End 42 must be after start 54 \(--from=54 --to=42\)\n\z/,
+      { from => 54, to => 42 }],
+ ) {
+    my ($want, $args) = @$_;
+    my $desc = $json->encode($args);
+    like(exception { calculate_start_end($args) }, $want, "exception for $desc");
+}
+
+for my $word (qw(last this next)) {
+    like(exception { calculate_start_end({show => $word}) },
+         qr/: Unknown time period '$word' for --show \(did you forget to escape the space after it\?\)\n\z/,
+         "exception for --show $word");
 }
 
 done_testing();

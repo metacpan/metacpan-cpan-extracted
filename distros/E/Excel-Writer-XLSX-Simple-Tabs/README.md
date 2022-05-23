@@ -16,7 +16,7 @@ Excel::Writer::XLSX::Simple::Tabs - Simple Interface to the Excel::Writer::XLSX 
 
 # DESCRIPTION
 
-This is a simple wrapper around Excel::Writer::XLSX that creates tabs for data.  It is ment to be simple not full featured.  I use this package to export data from the [DBIx::Array](https://metacpan.org/pod/DBIx::Array) sqlarrayarrayname method which is an array of array references where the first array is the column headings.
+This is a simple wrapper around Excel::Writer::XLSX that creates tabs for data.  It is meant to be simple not full featured.  I use this package to export data from the [DBIx::Array](https://metacpan.org/pod/DBIx::Array) sqlarrayarrayname method which is an array of array references where the first array is the column headings.
 
 # USAGE
 
@@ -80,6 +80,7 @@ Please report issues on [GitHub](https://github.com/mrdvt92/perl-Excel-Writer-XL
 # COPYRIGHT
 
 Copyright (c) 2022 Michael R. Davis
+
 Copyright (c) 2001-2005 Tony Bowden (IO::Scalar portion used here "under the same terms as Perl itself")
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

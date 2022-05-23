@@ -3,14 +3,14 @@
    "author" : [
       "Max Maischein <corion@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Random-PoissonDisc",
    "no_index" : {
@@ -21,7 +21,9 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {}
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
       },
       "configure" : {
          "requires" : {
@@ -32,15 +34,30 @@
          "requires" : {
             "List::Util" : "0",
             "Math::Random::MT::Auto" : "0",
-            "perl" : "5.006"
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Corion/Random-PoissonDisc/issues"
+      },
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ],
       "repository" : {
-         "url" : "http://github.com/Corion/random-poissondisc"
+         "type" : "git",
+         "url" : "git://github.com/Corion/random-poissondisc.git",
+         "web" : "https://github.com/Corion/random-poissondisc"
       }
    },
-   "version" : "0.02"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_static_install" : 1
 }

@@ -56,6 +56,14 @@ done_testing;
 	my @arg = @_;
 	my $resp;
 
+	my ( $want, $name ) = splice @arg, -2, 2;
+
+	unless ( defined $want ) {
+	    my $builder = Test::More->builder();
+	    $builder->skip( "$name unused" );
+	    return;
+	}
+
 	if ( $arg[0] =~ m/ \A \w+ : /smx ) {
 	    $ua ||= LWP::UserAgent->new();
 	    $resp = $ua->head( shift @arg );
@@ -64,8 +72,6 @@ done_testing;
 	    my ( $src, $catalog ) = splice @arg, 0, 2;
 	    $resp = $st->$src( $catalog );
 	}
-
-	my ( $want, $name ) = @arg;
 
 	unless ( $resp->is_success() ) {
 	    @_ = "$name: " . $resp->status_line();

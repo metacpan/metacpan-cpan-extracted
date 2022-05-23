@@ -32,8 +32,10 @@ is_deeply $mdp->motif, [ ('qn') x 4 ], 'motif';
 $mdp = new_ok 'Music::Duration::Partition' => [ pool => [qw/ tqn /] ];
 is_deeply $mdp->motif, [ ('tqn') x 6 ], 'motif';
 
-$mdp = new_ok 'Music::Duration::Partition' => [ pool => [qw/ qn tqn /] ];
-$mdp->pool_select( sub { return $mdp->pool->[0] } );
+$mdp = new_ok 'Music::Duration::Partition' => [
+    pool        => [qw/ qn tqn /],
+    pool_select => sub { my $self = shift; return $self->pool->[0] }
+];
 is_deeply $mdp->motif, [ ('qn') x 4 ], 'motif';
 $mdp->pool_select( sub { return $mdp->pool->[-1] } );
 is_deeply $mdp->motif, [ ('tqn') x 6 ], 'motif';

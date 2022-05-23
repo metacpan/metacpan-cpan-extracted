@@ -1,5 +1,5 @@
 Name:           perl-ExtUtils-MakeMaker-META_MERGE-GitHub
-Version:        0.01
+Version:        0.02
 Release:        1%{?dist}
 Summary:        Perl package to generate ExtUtils::MakeMaker META_MERGE for GitHub repositories
 License:        GPL+ or Artistic
@@ -40,9 +40,11 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%doc Changes META.json README.md
+%doc Changes README.md
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
+%{_mandir}/man1/*
+%{_bindir}/*
 
 %changelog
 * Thu May 19 2022 Michael R. Davis <mrdvt@cpan.org> 0.01-1

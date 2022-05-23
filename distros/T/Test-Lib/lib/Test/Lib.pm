@@ -2,8 +2,8 @@ package Test::Lib;
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
-$VERSION = eval $VERSION;
+our $VERSION = '0.003';
+$VERSION =~ tr/_/d/;
 
 use File::Spec;
 use Cwd ();
@@ -29,7 +29,8 @@ sub import {
             }
         }
     }
-    die "unable to find t/lib directory in $dir";
+    require Carp;
+    Carp::croak("unable to find t/lib directory in $dir");
 }
 
 1;
@@ -45,7 +46,7 @@ Test::Lib - Use libraries from a t/lib directory
     use Test::Lib;
     use Test::More;
     use Private::Testing::Module;
-    
+
     ok 1, 'passing test';
     my_test 'test from private module';
 
@@ -65,6 +66,7 @@ Graham Knop <haarg@haarg.org>
 
 This software is Copyright (c) 2012 by Graham Knop.
 
-This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.
 
 =cut

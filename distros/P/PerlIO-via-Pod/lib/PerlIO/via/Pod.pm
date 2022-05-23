@@ -1,6 +1,6 @@
 package PerlIO::via::Pod;
 
-$VERSION= '0.06';
+$VERSION= '0.07';
 
 # be as struct as possible
 use strict;
@@ -64,7 +64,7 @@ sub WRITE {
         # not at end of pod
 	if ( m#^=[a-zA-Z]# ) {
             if ($_[0]->{inpod} = !m#^=cut#) {
-                return -1 if !print { $_[2] } $_;
+		    return -1 if !print { $_[2] } $_;
             }
         }
 
@@ -97,7 +97,7 @@ PerlIO::via::Pod - PerlIO layer for extracting plain old documentation
 
 =head1 VERSION
 
-This documentation describes version 0.06.
+This documentation describes version 0.07.
 
 =head1 DESCRIPTION
 
@@ -121,6 +121,20 @@ A script that only lets plain old documentation pass.
  use PerlIO::via::Pod;
  binmode( STDIN,':via(Pod)' ); # could also be STDOUT
  print while <STDIN>;
+
+=head1 METHODS
+
+=head2 PUSHED
+
+Instantiate a new PerlIO::via::Pod object.
+
+=head2 FILL
+
+Parse the file extracting POD.
+
+=head2 WRITE
+
+Write the file containing only POD.
 
 =head1 SEE ALSO
 

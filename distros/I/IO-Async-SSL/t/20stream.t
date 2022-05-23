@@ -20,7 +20,7 @@ my $a_stream;
 $loop->SSL_listen(
    family  => "inet",
    host    => "localhost",
-   service => "4433",
+   service => "0",
 
    SSL_key_file  => "t/privkey.pem",
    SSL_cert_file => "t/server.pem",
@@ -40,7 +40,7 @@ my $c_stream;
 $loop->SSL_connect(
    family  => "inet",
    host    => "localhost",
-   service => "4433",
+   service => $listen_sock->sockport,
 
    SSL_verify_mode => 0,
 

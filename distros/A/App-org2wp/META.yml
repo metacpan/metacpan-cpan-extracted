@@ -19,7 +19,7 @@ name: App-org2wp
 provides:
   App::org2wp:
     file: lib/App/org2wp.pm
-    version: '0.012'
+    version: '0.013'
 requires:
   Data::Sah::Coerce::perl::To_date::From_float::epoch: '0'
   Data::Sah::Coerce::perl::To_date::From_obj::datetime: '0'
@@ -53,7 +53,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-org2wp
   homepage: https://metacpan.org/release/App-org2wp
   repository: git://github.com/perlancar/perl-App-org2wp.git
-version: '0.012'
+version: '0.013'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

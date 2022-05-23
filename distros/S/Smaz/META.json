@@ -47,7 +47,7 @@
    "provides" : {
       "Smaz" : {
          "file" : "lib/Smaz.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       }
    },
    "release_status" : "stable",
@@ -58,6 +58,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/SMAZ"
       }
    },
-   "version" : "1.01",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "1.02",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

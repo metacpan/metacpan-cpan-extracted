@@ -1,0 +1,101 @@
+class IO::Select {
+  use IntList;
+  
+  has handles : IntList;
+  
+  static method new : IO::Select () {
+    my $self = new IO::Select;
+    
+    $self->{handles} = IntList->new(undef);
+    
+    return $self;
+  }
+
+  method add : int ($new_handle : int) {
+    
+    my $found = 0;
+    my $handles = $self->{handles};
+    
+    for (my $i = 0; $i < $handles->length; $i++) {
+      my $handle = $handles->get($i);
+      
+      if ((int)$handle == $new_handle) {
+        $found = 1;
+        last;
+      }
+    }
+    
+    if ($found) {
+      return 0;
+    }
+    else {
+      $handles->push($new_handle);
+      return 1;
+    }
+  }
+
+  method remove : int ($remove_handle : int) {
+    
+    my $new_handles = IntList->new(undef);
+    my $handles = $self->{handles};
+    
+    my $removed = 0;
+    for (my $i = 0; $i < $handles->length; $i++) {
+      my $handle = $handles->get($i);
+      
+      if ((int)$handle == $remove_handle) {
+        $removed = 1;
+      }
+      else {
+        $new_handles->push($handle);
+      }
+    }
+    
+    $self->{handles} = $new_handles;
+    
+    return $removed;
+  }
+  
+  method exists : int ($check_handle : int) {
+    
+    my $handles = $self->{handles};
+    
+    for (my $i = 0; $i < $handles->length; $i++) {
+      my $handle = $handles->get($i);
+      
+      if ((int)$handle == $check_handle) {
+        return 1;
+      }
+    }
+    
+    return 0;
+  }
+
+  method handles : int[] () {
+    return $self->{handles}->to_array;
+  }
+
+  method can_read : int[] ($timeout : double) {
+    my $handles = $self->{handles};
+    
+    return $self->_can_read($handles->to_array, $timeout);
+  }
+  
+  native private method _can_read : int[] ($handles : int[], $timeout : double);
+
+  method can_write : int[] ($timeout : double) {
+    my $handles = $self->{handles};
+    
+    return $self->_can_write($handles->to_array, $timeout);
+  }
+  
+  native private method _can_write : int[] ($handles : int[], $timeout : double);
+
+  method has_exception : int[] ($timeout : double) {
+    my $handles = $self->{handles};
+    
+    return $self->_has_exception($handles->to_array, $timeout);
+  }
+  
+  native private method _has_exception : int[] ($handles : int[], $timeout : double);
+}

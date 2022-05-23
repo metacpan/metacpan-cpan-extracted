@@ -25,6 +25,12 @@ WriteMakefile(
                                        },
                         'meta-spec' => {
                                          'version' => 2
-                                       }
+                                       },
                       },
+    EXE_FILES    => [
+                    qw{
+                       scripts/perl-ExtUtils-MakeMaker-META_MERGE-GitHub.pl
+                      }
+                    ],
+
 );

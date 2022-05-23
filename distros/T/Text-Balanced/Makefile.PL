@@ -22,7 +22,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-use ExtUtils::MakeMaker 6.64;
+use ExtUtils::MakeMaker;
 use ExtUtils::MakeMaker qw(WriteMakefile);
 
 #===============================================================================
@@ -130,7 +130,7 @@ MAIN: {
         },
 
         TEST_REQUIRES => {
-            'Test::More' => '0.47',
+            'Test::More' => '0.88', # done_testing
             'vars'       => '0'
         },
 

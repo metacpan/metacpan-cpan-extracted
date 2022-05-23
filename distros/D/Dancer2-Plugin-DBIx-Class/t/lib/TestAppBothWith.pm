@@ -16,7 +16,9 @@ BEGIN {
             schema_class => 'SecondSchemaWith',
             dsn          => 'dbi:SQLite:t/db/test_database2.sqlite3',
          },
-         third => { alias => 'second' }
+         third => {
+            alias => 'second'
+         }
       }
    };
 }
@@ -25,16 +27,13 @@ use Dancer2::Plugin::DBIx::Class;
 
 get '/test_rs'        => sub { [ rs('Human')->result_source->columns ] };
 get '/test_rset'      => sub { [ rset('Human')->result_source->columns ] };
-get '/test_resultset' =>
-   sub { [ resultset('Human')->result_source->columns ] };
-get '/test_schema' =>
-   sub { [ schema->resultset('Human')->result_source->columns ] };
+get '/test_resultset' => sub { [ resultset('Human')->result_source->columns ] };
+get '/test_schema'    => sub { [ schema->resultset('Human')->result_source->columns ] };
 get '/test_defschema' =>
-   sub { [ schema('default')->resultset('Human')->result_source->columns ] };
+    sub { [ schema('default')->resultset('Human')->result_source->columns ] };
 get '/test_otherschema' =>
-   sub { [ schema('second')->resultset('Human')->result_source->columns ] };
-get '/test_alias' =>
-   sub { [ schema('third')->resultset('Human')->result_source->columns ] };
+    sub { [ schema('second')->resultset('Human')->result_source->columns ] };
+get '/test_alias'  => sub { [ schema('third')->resultset('Human')->result_source->columns ] };
 get '/test_humans' => sub { [ humans->result_source->columns ] };
 get '/test_human'  => sub {
    my %human = human(1)->get_columns();

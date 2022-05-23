@@ -1,5 +1,16 @@
 Revision history for Perl distribution libnet
 
+3.14 2022-05-22
+
+    - Remove broken link in Net::FTP manpage.  [Mike Blackwell]
+
+    - Fix EBCDIC detection.  [Karl Williamson, PR#45]
+
+    - Fix non-deterministic output in libnet.cfg.  [Sergei Trofimovich, PR#44]
+
+    - Fix TLS session reuse for dataconn with TLS 1.3 when using passive mode.
+      [Steffen Ullrich, PR#41]
+
 3.13 2020-12-23
 
     - Revert "Fix EINTR interruption in sysread for getline method."  [Mario

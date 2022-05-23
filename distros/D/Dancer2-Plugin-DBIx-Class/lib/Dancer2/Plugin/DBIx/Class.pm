@@ -1,15 +1,18 @@
-package Dancer2::Plugin::DBIx::Class 1.06;
+package Dancer2::Plugin::DBIx::Class;
 use Modern::Perl;
+our $VERSION = '1.1001'; # VERSION
+our $AUTHORITY = 'cpan:GEEKRUTH'; # AUTHORITY
+# ABSTRACT: syntactic sugar for DBIx::Class in Dancer2, optionally with DBIx::Class::Schema::ResultSetNames
 use Carp;
 use Class::C3::Componentised;
 use Dancer2::Plugin::DBIx::Class::ExportBuilder;
-use Dancer2::Plugin;
+use Dancer2::Plugin 0.154000;
 
 my $_schemas = {};
 
 sub BUILD {
-   my ($self)  = @_;
-   my $config  = $self->config;
+   my ($self) = @_;
+   my $config = $self->config;
    my $call_rs = sub { shift->schema->resultset(@_) };
    @{ $self->keywords }{'rs'}        = $call_rs;
    @{ $self->keywords }{'rset'}      = $call_rs;
@@ -17,13 +20,11 @@ sub BUILD {
    @{ $self->keywords }{'schema'}    = sub { shift->schema(@_) };
    if ( defined $config->{default} ) {
       if ( !$config->{default}->{alias} ) {
-         my $export_builder
-            = Dancer2::Plugin::DBIx::Class::ExportBuilder->new(
+         my $export_builder = Dancer2::Plugin::DBIx::Class::ExportBuilder->new(
             map { $_ => $config->{default}->{$_} }
-               qw(schema_class dsn user password export_prefix) );
+            qw(schema_class dsn user password export_prefix) );
          my %new_keywords = $export_builder->exports;
-         foreach
-            my $dsl_keyword ( keys %{ Dancer2::Core::DSL->dsl_keywords } ) {
+         foreach my $dsl_keyword ( keys %{ Dancer2::Core::DSL->dsl_keywords } ) {
             delete $new_keywords{$dsl_keyword};
          }
          @{ $self->keywords }{ keys %new_keywords } = values %new_keywords;
@@ -32,10 +33,9 @@ sub BUILD {
    foreach my $schema ( keys %$config ) {
       next if $schema eq 'default';
       next if $config->{$schema}->{alias};
-      my $export_builder
-         = Dancer2::Plugin::DBIx::Class::ExportBuilder->new(
+      my $export_builder = Dancer2::Plugin::DBIx::Class::ExportBuilder->new(
          map { $_ => $config->{$schema}->{$_} }
-            qw(schema_class dsn user password export_prefix) );
+         qw(schema_class dsn user password export_prefix) );
       my %new_keywords = $export_builder->exports;
       foreach my $dsl_keyword ( keys %{ Dancer2::Core::DSL->dsl_keywords } ) {
          delete $new_keywords{$dsl_keyword};
@@ -54,14 +54,14 @@ sub schema {
 
    if ( not defined $name ) {
       my @names = keys %{$cfg}
-         or croak('No schemas are configured');
+          or croak('No schemas are configured');
 
       # Either pick the only one in the config or the default
       $name = @names == 1 ? $names[0] : 'default';
    }
 
    my $options = $cfg->{$name}
-      or croak "The schema $name is not configured";
+       or croak "The schema $name is not configured";
 
    if ($schema_cfg) {
       return $self->_create_schema( $name, $schema_cfg );
@@ -71,7 +71,7 @@ sub schema {
 
    if ( my $alias = $options->{alias} ) {
       $options = $cfg->{$alias}
-         or croak "The schema alias $alias does not exist in the config";
+          or croak "The schema alias $alias does not exist in the config";
       return $_schemas->{$alias} if $_schemas->{$alias};
    }
 
@@ -81,10 +81,10 @@ sub schema {
 
 sub _create_schema {
    my ( $self, $name, $options ) = @_;
-   my @conn_info
-      = $options->{connect_info}
-      ? @{ $options->{connect_info} }
-      : @$options{qw(dsn user password options)};
+   my @conn_info =
+       $options->{connect_info}
+       ? @{ $options->{connect_info} }
+       : @$options{qw(dsn user password options)};
    if ( exists $options->{pass} ) {
       warn 'The pass option is deprecated. Use password instead.';
       $conn_info[2] = $options->{pass};
@@ -93,14 +93,8 @@ sub _create_schema {
    my $schema;
    if ( my $schema_class = $options->{schema_class} ) {
       $schema_class =~ s/-/::/g;
-      eval {
-         Class::C3::Componentised->ensure_class_loaded(
-            $options->{schema_class} );
-         1;
-      }
-         or croak 'Schema class '
-         . $options->{schema_class}
-         . ' unable to load';
+      eval { Class::C3::Componentised->ensure_class_loaded( $options->{schema_class} ); 1; }
+          or croak 'Schema class ' . $options->{schema_class} . ' unable to load';
       if ( my $replicated = $options->{replicated} ) {
          $schema = $schema_class->clone;
          my %storage_options;
@@ -111,18 +105,14 @@ sub _create_schema {
          }
          $schema->storage_type( [ '::DBI::Replicated', \%storage_options ] );
          $schema->connection(@conn_info);
-         $schema->storage->connect_replicants(
-            @{ $replicated->{replicants} } );
-      }
-      else {
+         $schema->storage->connect_replicants( @{ $replicated->{replicants} } );
+      } else {
          $schema = $schema_class->connect(@conn_info);
       }
-   }
-   else {
+   } else {
       my $dbic_loader = 'DBIx::Class::Schema::Loader';
       eval { Class::C3::Componentised->ensure_class_loaded($dbic_loader) }
-         or croak
-         "You must provide a schema_class option or install $dbic_loader.";
+          or croak "You must provide a schema_class option or install $dbic_loader.";
       $dbic_loader->naming( $options->{schema_loader_naming} || 'v7' );
       $schema = DBIx::Class::Schema::Loader->connect(@conn_info);
    }
@@ -131,6 +121,8 @@ sub _create_schema {
 }
 
 1;
+
+__END__
 
 =pod
 
@@ -142,7 +134,7 @@ Dancer2::Plugin::DBIx::Class - syntactic sugar for DBIx::Class in Dancer2, optio
 
 =head1 VERSION
 
-version 1.06
+version 1.1001
 
 =head1 SYNOPSIS
 
@@ -297,14 +289,9 @@ D Ruth Holloway <ruth@hiruthie.me>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by D Ruth Holloway.
+This software is copyright (c) 2022, 2021 by D Ruth Holloway.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-__END__
-
-# ABSTRACT: syntactic sugar for DBIx::Class in Dancer2, optionally with DBIx::Class::Schema::ResultSetNames
-

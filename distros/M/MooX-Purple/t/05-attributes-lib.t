@@ -1,8 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
-
-use lib 't/lib';
+use Test::Lib;
 use BasicAttributes;
 my $basics = BasicAttributes->new;
 

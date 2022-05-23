@@ -1,7 +1,7 @@
 Revision history for Smaz
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+1.02 	2022/05/21
+	- Improve test coverage to 92.8%
 
 1.01 	2020/10/27
 	- Remove the MIME::Base64 dependency from test file

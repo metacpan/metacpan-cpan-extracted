@@ -8,20 +8,23 @@ use Math::BigInt::Lib 1.999801;
 
 our @ISA = qw< Math::BigInt::Lib >;
 
-our $VERSION = '0.0009';
+our $VERSION = '0.0010';
 
 use Math::GMPz 0.36 qw< :mpz >;
 
 ###############################################################################
 # It might be that Math::GMPz was built with an newer version of GMP than the
-# one that is currently accessible. Checking Math::GMPz::gmp_v() won't help,
+# one that is currently available. Checking Math::GMPz::gmp_v() won't help,
 # since it returns the version of GMP used when Math::GMPz was built, not the
-# version of GMP that is currently accessible.
+# version of GMP that is currently available.
 
 eval { my $x = Rmpz_init(); Rmpz_2fac_ui($x, 0); };
+
 # If Rmpz_2fac_ui() is not implemented, Math::GMPz dies with the message:
 # "Rmpz_2fac_ui not implemented - gmp-5.1.0 (or later) is needed"
+
 die "gmp-5.1.0 (or later) is needed" if $@;
+
 ###############################################################################
 
 sub import { }
@@ -350,8 +353,7 @@ sub _len {
 
 sub _zeros {
     return 0 unless Rmpz_cmp($_[1], $zero);     # 0 has no trailing zeros
-    my $str = Rmpz_get_str($_[1], 10);
-    $str =~ /(0*)\z/;
+    Rmpz_get_str($_[1], 10) =~ /(0*)\z/;
     return length($1);
 }
 

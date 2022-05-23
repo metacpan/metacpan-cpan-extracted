@@ -2,6 +2,8 @@ Changes
 lib/DateTime/Ordinal.pm
 Makefile.PL
 MANIFEST			This list of files
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
 README
 t/00-load.t
 t/01-ordinal.t
@@ -10,9 +12,8 @@ t/03-strftime.t
 t/04-num2text.t
 t/05-language.t
 t/06-strptime.t
+t/07-coverage.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
 xt/boilerplate.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,5 +1,8 @@
 Revision history for Tapper-Installer
 
+5.0.1     2022-05-23
+        - weak deps to Linux::Personality
+
 5.0.0     2016-02-15
         - fix experimental given/when
 

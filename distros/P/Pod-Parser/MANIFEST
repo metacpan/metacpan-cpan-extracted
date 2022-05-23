@@ -52,3 +52,4 @@ t/pod/testpods/lib/Pod/Stuff.pm -- test POD for t/pod/find.t
 t/pod/contains_bad_pod.xr -- expected results
 
 META.yml                                Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

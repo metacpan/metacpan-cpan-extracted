@@ -1,5 +1,42 @@
 Revision history for Perl distribution Text-Balanced.
 
+2.05 2022-05-22
+
+    - Released with no further code changes.
+
+2.04_02 2022-03-09
+
+    - Fix missed case of spotting expression ending ")" or "]".  [mohawk2]
+
+    - Fix too-loosely allowing ?...? as RE (often actually conditional op).
+      [mohawk2]
+
+2.04_01 2022-03-05
+
+    - Performance optimizations.  [mohawk2, PR#5]
+
+    - Fix "<<=" being seen as heredoc, misparsing of "y=>".  [mohawk2, PR#6]
+
+    - Update documentation to clarify extract_tagged() takes regexes.  [Jay
+      Hannah, GH#3]
+
+    - Modernize tests.  [mohawk2, GH#2]
+
+    - Fix extract_variable() not recognising ${var} end of string.  [Ed J, CPAN
+      RT#70007]
+
+    - Fix string-comparing $@ causing exception.  [Ed J, CPAN RT#74994)
+
+    - Update documentation to correct CSV example.  [djerius@cpan.org, CPAN
+      RT#140408]
+
+    - Fix extract_codeblock() being confused by //.  [Ed J, CPAN RT#78313]
+
+    - Improve here-doc detection.  [Ed J, CPAN RT#74714]
+
+    - Fix extract_multiple() to track whether to allow /.../ as quotelike.
+      [Ed J, CPAN RT#5722]
+
 2.04 2020-12-11
 
     - Fixed INSTALLDIRS to account for the @INC reordering change in Perl 5.12.

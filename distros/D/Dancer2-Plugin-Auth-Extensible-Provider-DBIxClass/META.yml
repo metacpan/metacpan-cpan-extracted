@@ -10,6 +10,7 @@ build_requires:
   Dancer2::Plugin::Auth::Extensible::Test: '0'
   Dancer2::Plugin::Auth::Extensible::Test::App: '0'
   Dancer2::Plugin::DBIx::Class: '0'
+  DateTime::Format::SQLite: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   HTTP::Cookies: '0'
@@ -17,6 +18,7 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Plack::Test: '0'
+  SQL::Translator: '0'
   Test::Deep: '0'
   Test::MockObject: '0'
   Test::More: '0'
@@ -39,7 +41,7 @@ name: Dancer2-Plugin-Auth-Extensible-Provider-DBIxClass
 provides:
   Dancer2::Plugin::Auth::Extensible::Provider::DBIxClass:
     file: lib/Dancer2/Plugin/Auth/Extensible/Provider/DBIxClass.pm
-    version: '0.0900'
+    version: '0.0902'
 requires:
   Carp: '0'
   DBIx::Class::ResultClass::HashRefInflator: '0'
@@ -56,7 +58,7 @@ resources:
   bugtracker: https://gitlab.com/GeekRuthie/dancer2-plugin-auth-extensible-provider-dbixclass/-/issues
   homepage: https://p3rl.org/Dancer2::Plugin::Auth::Extensible::Provider::DBIxClass
   repository: https://gitlab.com/GeekRuthie/dancer2-plugin-auth-extensible-provider-dbixclass.git
-version: '0.0900'
+version: '0.0902'
 x_BuiltWith:
   failures:
     DBIx::Class::Core: 'Module::MetaData could not parse a version from /home/geekruthie/perl5/perlbrew/perls/perl-5.34.0/lib/site_perl/5.34.0/DBIx/Class/Core.pm'
@@ -74,6 +76,7 @@ x_BuiltWith:
     Dancer2::Plugin::Auth::Extensible::Test::App: '0.710'
     Dancer2::Plugin::DBIx::Class: '1.06'
     DateTime: '1.55'
+    DateTime::Format::SQLite: '0.11'
     Dist::Zilla: '6.024'
     Dist::Zilla::Plugin::Authority: '1.009'
     Dist::Zilla::Plugin::AutoPrereqs: '6.024'
@@ -113,6 +116,7 @@ x_BuiltWith:
     Dist::Zilla::Plugin::NextVersion::Semantic: 0.2.6
     Dist::Zilla::Plugin::OurPkgVersion: '0.21'
     Dist::Zilla::Plugin::PodWeaver: '4.009'
+    Dist::Zilla::Plugin::Prereqs: '6.024'
     Dist::Zilla::Plugin::Prereqs::Plugins: '1.003003'
     Dist::Zilla::Plugin::PreviousVersion::Changelog: 0.2.6
     Dist::Zilla::Plugin::ReadmeMarkdownFromPod: '0.141140'
@@ -130,6 +134,7 @@ x_BuiltWith:
     IPC::Open3: '1.21'
     Modern::Perl: '1.20200211'
     Moo: '2.005004'
+    SQL::Translator: '1.62'
     Scalar::Util: '1.60'
     String::CamelCase: '0.04'
     Test::Deep: '1.130'

@@ -23,7 +23,7 @@ my $bottom_patch = 42;
 my $score = setup_score( bpm => $bpm );
 
 $score->synch(
-    \&top,
+#    \&top,
     \&bottom,
     \&pulse,
 );

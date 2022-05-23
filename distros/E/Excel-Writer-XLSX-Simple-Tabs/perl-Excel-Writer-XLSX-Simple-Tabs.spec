@@ -1,5 +1,5 @@
 Name:           perl-Excel-Writer-XLSX-Simple-Tabs
-Version:        0.02
+Version:        0.03
 Release:        1%{?dist}
 Summary:        Simple Interface to the Excel::Writer::XLSX Package
 License:        GPL+ or Artistic

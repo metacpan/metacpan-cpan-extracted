@@ -13,6 +13,7 @@ t/03-add_method.t
 t/04-hash_to_nested_object.t
 t/05-autotype.t
 t/06-coverage.t
+t/07-hash_to_objext_context.t
 t/Anonymous-Object.t
 t/manifest.t
 t/pod-coverage.t

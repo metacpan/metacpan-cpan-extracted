@@ -12,11 +12,14 @@ all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 43476190
 CPAN
+Karl
 Marek
 Nicolas
 Pod
 Rouchal
 Usage
+Williamson
+khw
 lib
 marek
 marekr

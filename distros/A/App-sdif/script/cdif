@@ -915,7 +915,7 @@ cdif - word context diff
 
 =head1 VERSION
 
-Version 4.22.0
+Version 4.22.1
 
 =head1 SYNOPSIS
 
@@ -964,7 +964,7 @@ by default).  If you want to compare text character-by-character, use
 option B<--unit=char>.  Option B<--unit=mecab> tells to use external
 B<mecab> command as a tokenizer for Japanese text.
 
-If single or no file is specified, cdif reads that file or STDIN as a
+If single or no file is specified, cdif reads that file or STDIN as an
 output from diff command.
 
 Lines those don't look like diff output are simply ignored and
@@ -975,7 +975,7 @@ printed.
 B<cdif> utilizes Perl L<Getopt::EX> module, and reads I<~/.cdifrc>
 file if available when starting up.  You can define original and
 default option there.  Next line enables B<--mecab> option and add
-cossed-out effect for deleted words.
+crossed-out effect for deleted words.
 
     option default --mecab --cm DELETE=+X
 
@@ -1010,7 +1010,7 @@ set preferred color in your F<~/.cdifrc> like:
 Automatic setting is done by L<Getopt::EX::termcolor> module and it
 works with macOS Terminal.app and iTerm.app, and other XTerm
 compatible terminals.  This module accept environment variable
-L<TERM_BGCOLOR> as a terminal background color.  For exapmle, use
+L<TERM_BGCOLOR> as a terminal background color.  For example, use
 C<000> or C<#000000> for black and C<555> or C<#FFFFFF> for white.
 
 Option B<--autocolor> is set by default, so override it to do nothing
@@ -1020,7 +1020,7 @@ to disable.
 
 =head2 EXIT STATUS
 
-B<cdif> always exit with status zero unless error occured.
+B<cdif> always exit with status zero unless error occurred.
 
 =head1 OPTIONS
 
@@ -1145,7 +1145,7 @@ terminal :
 or color names enclosed by angle bracket :
 
     <red> <blue> <green> <cyan> <magenta> <yellow>
-    <aliceblue> <honeydue> <hotpink> <mooccasin>
+    <aliceblue> <honeydue> <hotpink> <moccasin>
     <medium_aqua_marine>
 
 with other special effects :
@@ -1251,7 +1251,7 @@ Specify prefix pattern in regex.  Default pattern is:
 This pattern matches B<git> graph style and whitespace indented diff
 output.
 
-=item B<--visible> I<chaname>=[0,1]
+=item B<--visible> I<charname>=[0,1]
 
 Set visible attribute for specified characters.  Visible character is
 converted to corresponding Unicode symbol character.  Default visible:
@@ -1364,6 +1364,7 @@ as a back-end processor to compare words.
 
 #  LocalWords:  cdif diff rcs rcsdiff colormap commandcolor markcolor
 #  LocalWords:  textcolor stdin OMARK NMARK OTEXT NTEXT OCHANGE CMARK
-#  LocalWords:  NCHANGE CTEXT MMARK MTEXT Cyan RGB nomark stat
+#  LocalWords:  NCHANGE CTEXT MMARK MTEXT Cyan RGB nomark stat cdifrc
 #  LocalWords:  watchdiff mecab tokenizer Unicode lenience CDIFOPTS
-#  LocalWords:  Kazumasa Utashiro sdif
+#  LocalWords:  Kazumasa Utashiro sdif perldoc CMY cmy autocolor perl
+#  LocalWords:  macOS XTerm subdiff LESSANSIENDCHARS

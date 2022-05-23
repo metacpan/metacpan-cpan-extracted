@@ -2,7 +2,7 @@ package MooX::Private::Attribute;
 use strict;
 use warnings;
 use MooX::ReturnModifiers;
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 sub import {
 	my $target    = caller;
@@ -37,7 +37,7 @@ MooX::Private::Attribute - private attributes
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 

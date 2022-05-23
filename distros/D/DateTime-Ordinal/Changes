@@ -1,5 +1,9 @@
 Revision history for DateTime-Ordinal
 
+0.04    2022/05/21
+	- Fix several bugs inside strftime
+	- Improve test coverage to 89.2%
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

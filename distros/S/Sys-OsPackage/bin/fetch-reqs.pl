@@ -70,7 +70,7 @@ fetch-reqs.pl
 
 =head1 VERSION
 
-version 0.1.3
+version 0.1.4
 
 =head1 NAME
 
@@ -85,6 +85,10 @@ fetch-reqs.pl - install prerequisite modules for a Perl script with minimal prer
 The files listed on the command line should all be Perl scripts or modules to scan for dependencies.
 Each file's Perl module dependencies will be installed by L<Sys::OsPackage> by operating system packages
 if available, or otherwise via CPAN.
+
+L<Sys::OsPackage> currently contains OS packaging drivers for Fedora/RHEL/CentOS, Debian/Ubuntu, SuSE/OpenSuSE, Arch
+and Alpine Linux and their derivatives.
+More drivers can be added by creating new subclasses of L<Sys::OsPackage::Driver>.
 
 =head1 EXIT STATUS
 

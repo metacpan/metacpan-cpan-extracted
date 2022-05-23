@@ -1,6 +1,6 @@
 package Tapper::Installer::Precondition::Rawimage;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Installer::Precondition::Rawimage::VERSION = '5.0.0';
+$Tapper::Installer::Precondition::Rawimage::VERSION = '5.0.1';
 use strict;
 use warnings;
 
@@ -105,7 +105,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2022 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

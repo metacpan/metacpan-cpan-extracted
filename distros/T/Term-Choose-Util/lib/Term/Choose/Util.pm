@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.133';
+our $VERSION = '0.134';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf );
@@ -80,17 +80,9 @@ sub __prepare_opt {
                 $self->{$key} = $opt->{$key};
             }
         }
-        ###############################################################
-        if ( $self->{layout} == 3 ) {
-            $self->{layout} = 2;
-            my @message = ( $caller, 'Option "layout": \'3\' is no longer a valid value.' );
-            my $prompt = join "\n", @message;
-            choose(
-                [ 'Continue with ENTER' ],
-                { prompt => $prompt, layout => 0, clear_screen => 1 }
-            );
-        }
-        ###############################################################
+    }
+    if ( defined $self->{margin} && ! defined $self->{tabs_prompt} ) {
+        $self->{tabs_prompt} = [ $self->{margin}[3] // 0, $self->{margin}[3] // 0, $self->{margin}[1] // 0 ];
     }
 }
 
@@ -110,12 +102,12 @@ sub _valid_options {
         small_first         => '[ 0 1 ]',
         alignment           => '[ 0 1 2 ]',
         color               => '[ 0 1 2 ]',
+        layout              => '[ 0 1 2 ]',
         page                => '[ 0 1 2 ]',       # undocumented
-        layout              => '[ 0 1 2 3 ]',
         keep                => '[ 1-9 ][ 0-9 ]*', # undocumented
         default_number      => '[ 0-9 ]+',
+        margin              => 'Array_Int',
         mark                => 'Array_Int',
-        solo                => 'Array_Int',       # experimental
         tabs_info           => 'Array_Int',
         tabs_prompt         => 'Array_Int',
         busy_string         => 'Str',
@@ -166,6 +158,7 @@ sub _defaults {
         #tabs_prompt        => undef,
         back                => 'BACK',
         confirm             => 'CONFIRM',
+        #margin             => undef,
         #mark               => undef,
         mouse               => 0,
         order               => 1,
@@ -174,7 +167,6 @@ sub _defaults {
         #prompt             => undef,
         show_hidden         => 1,
         small_first         => 0,
-        #solo               => undef,    # experimental
         cs_begin            => '',
         cs_end              => '',
         #cs_label           => undef,
@@ -190,7 +182,7 @@ sub _defaults {
 
 sub _routine_options {
     my ( $caller ) = @_;
-    my @every = ( qw( info prompt clear_screen mouse hide_cursor confirm back color tabs_info tabs_prompt page footer keep ) );
+    my @every = ( qw( back clear_screen color confirm footer hide_cursor info keep margin mouse page prompt tabs_info tabs_prompt ) );
     my $options;
     if ( $caller eq 'choose_directories' ) {
         $options = [ @every, qw( init_dir layout order alignment show_hidden decoded ) ];
@@ -205,7 +197,7 @@ sub _routine_options {
         $options = [ @every, qw( small_first reset thousands_separator default_number cs_label ) ];
     }
     elsif ( $caller eq 'choose_a_subset' ) {
-        $options = [ @every, qw( layout order alignment keep_chosen index prefix all_by_default cs_label cs_begin cs_end cs_separator mark busy_string solo ) ];
+        $options = [ @every, qw( layout order alignment keep_chosen index prefix all_by_default cs_label cs_begin cs_end cs_separator mark busy_string ) ];
     }
     elsif ( $caller eq 'settings_menu' ) {
         $options = [ @every, qw( cs_label cs_begin cs_end cs_separator ) ];
@@ -257,7 +249,7 @@ sub __available_dirs {
         choose(
             [ 'Press Enter:' ],
             { prompt => '', hide_cursor => $self->{hide_cursor}, mouse => $self->{mouse}, page => $self->{page},
-              footer => $self->{footer}, keep => $self->{keep} }
+              footer => $self->{footer}, keep => $self->{keep}, margin => $self->{margin} }
         );
         return;
     }
@@ -300,9 +292,10 @@ sub choose_directories {
         # Choose
         my $choice = choose(
             [ undef, $confirm, $change_path, $add_dirs ],
-            { info => $self->{info}, prompt => $prompt, layout => 2, mouse => $self->{mouse},
+            { info => $self->{info}, prompt => $prompt, layout => 2, mouse => $self->{mouse}, margin => $self->{margin},
               clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor}, page => $self->{page},
-              footer => $self->{footer}, keep => $self->{keep}, undef => '  ' . $self->{back} }
+              footer => $self->{footer}, keep => $self->{keep}, undef => '  ' . $self->{back},
+              tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt} }
         );
         if ( ! defined $choice ) {
             if ( @bu ) {
@@ -318,10 +311,14 @@ sub choose_directories {
             return $decoded ? $chosen_dirs : [ map { encode 'locale_fs', $_ } @$chosen_dirs ];
         }
         elsif ( $choice eq $change_path ) {
-             my $prompt_fmt = $key_path . "%s\n" . ( defined $self->{prompt} ? $self->{prompt} : 'Choose:' );
-             my $tmp_dir = $self->__choose_a_path( $dir, $prompt_fmt, '<<', 'OK' );
-             if ( defined $tmp_dir ) {
-                $dir = $tmp_dir;
+            my $prompt_fmt = $key_path . "%s";
+            my $prompt = $self->{prompt} // 'Choose: ';
+            if ( length $prompt ) {
+               $prompt_fmt .= "\n" . $prompt;
+            }
+            my $tmp_dir = $self->__choose_a_path( $dir, $prompt_fmt, '<<', 'OK' );
+            if ( defined $tmp_dir ) {
+               $dir = $tmp_dir;
             }
         }
         elsif ( $choice eq $add_dirs ) {
@@ -329,23 +326,23 @@ sub choose_directories {
             if ( ! defined $avail_dirs ) {
                 next CHOOSE_MODE;
             }
-            my $prompt = $path . "\n" . ( length $self->{prompt} ? $self->{prompt} : 'Choose:' );
             my %bu_opt;
             my $options = _routine_options( 'choose_directories' );
             for my $o ( @$options ) {
                 $bu_opt{$o} = $self->{$o};
             }
-            my @tmp_info;
-            if ( length $self->{info} ) {
-                push @tmp_info, $self->{info};
-            }
-            push @tmp_info, line_fold( $dirs_chosen, $term_w, { subseq_tab => ' ' x length( $key_dirs ), join => 0 } );
-            my $info = join "\n", @tmp_info;
+            my @tmp_cs_label = (
+                line_fold( $dirs_chosen, $term_w, { subseq_tab => ' ' x length( $key_dirs ), join => 0 } )
+            );
+            push @tmp_cs_label, $path;
+            push @tmp_cs_label, 'Dirs to add: ';
+            my $cs_label = join "\n", @tmp_cs_label;
             # choose_a_subset
             my $idxs = $self->choose_a_subset(
                 [ sort @$avail_dirs ],
-                { info => $info, prompt => $prompt, back => '<<', confirm => 'OK', cs_begin => undef, cs_label => 'Add to Dirs: ',
-                  page => $self->{page}, footer => $self->{footer}, keep => $self->{keep}, index => 1 }
+                { info => $self->{info}, prompt => $self->{prompt} // '', back => '<<', confirm => 'OK', cs_begin => undef,
+                  cs_label => $cs_label, page => $self->{page}, footer => $self->{footer}, keep => $self->{keep},
+                  index => 1, margin => $self->{margin} }
             );
             for my $o ( keys %bu_opt ) {
                 $self->{$o} = $bu_opt{$o};
@@ -371,7 +368,14 @@ sub choose_a_file {
     my $curr_dir = $init_dir;
 
     CHOOSE_DIR: while ( 1 ) {
-        my $prompt_fmt = "File-Directory: %s\n" . ( length $self->{prompt} ? $self->{prompt} : 'Choose:' );
+        my $prompt_fmt = "File-Directory: %s";
+        my $prompt = $self->{prompt} // 'Choose: ';
+        if ( length $prompt ) {
+            $prompt_fmt .= "\n" . $prompt;
+        }
+        if ( length $self->{prompt} ) {
+            $prompt_fmt .= "\n" . $self->{prompt};
+        }
         my $chosen_dir = $self->__choose_a_path( $init_dir, $prompt_fmt, '<<', 'OK' );
         if ( ! defined $chosen_dir ) {
             $self->__restore_defaults(); #
@@ -400,7 +404,11 @@ sub choose_a_directory {
     }
     $self->__prepare_opt( $opt );
     my $init_dir = $self->__prepare_path();
-    my $prompt_fmt = $opt->{cs_label} . "%s\n" . ( length $self->{prompt} ? $self->{prompt} : 'Choose:' );
+    my $prompt_fmt = $opt->{cs_label} . "%s";
+    my $prompt = $self->{prompt} // 'Choose: ';
+    if ( length $prompt ) {
+        $prompt_fmt .= "\n" . $prompt;
+    }
     my $chosen_dir = $self->__choose_a_path( $init_dir, $prompt_fmt, $self->{back}, $self->{confirm} );
     my $decoded = $self->{decoded};
     $self->__restore_defaults();
@@ -427,7 +435,7 @@ sub __choose_a_path {
             choose(
                 [ 'Press Enter:' ],
                 { prompt => '', hide_cursor => $self->{hide_cursor}, mouse => $self->{mouse}, page => $self->{page},
-                  footer => $self->{footer}, keep => $self->{keep} }
+                  footer => $self->{footer}, keep => $self->{keep}, margin => $self->{margin} }
             );
             $dir = dirname $dir;
             next;
@@ -448,7 +456,7 @@ sub __choose_a_path {
             [ @pre, sort( @dirs ) ],
             { info => $self->{info}, prompt => $prompt, alignment => $self->{alignment},
               layout => $self->{layout}, order => $self->{order}, mouse => $self->{mouse},
-              clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor},
+              clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor}, margin => $self->{margin},
               color => $self->{color}, tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt},
               page => $self->{page}, footer => $self->{footer}, keep => $self->{keep}, undef => $back }
         );
@@ -493,7 +501,7 @@ sub __a_file {
             choose(
                 [ 'Press Enter:' ],
                 { prompt => '', hide_cursor => $self->{hide_cursor}, mouse => $self->{mouse}, page => $self->{page},
-                  footer => $self->{footer}, keep => $self->{keep} }
+                  footer => $self->{footer}, keep => $self->{keep}, margin => $self->{margin} }
             );
             return;
         }
@@ -507,8 +515,11 @@ sub __a_file {
         my @tmp_prompt;
         push @tmp_prompt, 'File-Directory: ' . $dir;
         push @tmp_prompt, 'File: ' . ( length $prev_dir ? $prev_dir : '' );
-        push @tmp_prompt, length $self->{prompt} ? $self->{prompt} : 'Choose:';
-        my $prompt = join( "\n", @tmp_prompt );
+        my $prompt = $self->{prompt} // 'Choose: ';
+        if ( length $prompt ) {
+            push @tmp_prompt, $prompt;
+        }
+        $prompt = join( "\n", @tmp_prompt );
         if ( ! @files ) {
             $prompt .= "\n";
             if ( $self->{filter} ) {
@@ -522,7 +533,7 @@ sub __a_file {
                 [ ' < ' ],
                 { info => $self->{info}, prompt => $prompt, hide_cursor => $self->{hide_cursor},
                   mouse => $self->{mouse}, color => $self->{color}, page => $self->{page}, footer => $self->{footer},
-                  keep => $self->{keep} }
+                  keep => $self->{keep}, margin => $self->{margin} }
             );
             return;
         }
@@ -537,7 +548,7 @@ sub __a_file {
               order => $self->{order}, mouse => $self->{mouse}, clear_screen => $self->{clear_screen},
               hide_cursor => $self->{hide_cursor}, color => $self->{color}, tabs_info => $self->{tabs_info},
               tabs_prompt => $self->{tabs_prompt}, page => $self->{page}, footer => $self->{footer},
-              keep => $self->{keep}, undef => $self->{back} }
+              keep => $self->{keep}, undef => $self->{back}, margin => $self->{margin} }
         );
         if ( ! length $chosen_file ) {
             if ( length $prev_dir ) {
@@ -637,7 +648,7 @@ sub choose_a_number {
             { info => $self->{info}, prompt => $prompt, layout => 2, alignment => 1, mouse => $self->{mouse},
               clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor}, color => $self->{color},
               tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt}, page => $self->{page},
-              footer => $self->{footer}, keep => $self->{keep}, undef => $back_tmp }
+              footer => $self->{footer}, keep => $self->{keep}, undef => $back_tmp, margin => $self->{margin} }
         );
         if ( ! defined $range ) {
             if ( defined $result ) {
@@ -666,7 +677,8 @@ sub choose_a_number {
             { info => $self->{info}, prompt => $prompt, layout => 1, alignment => 2, order => 0,
               mouse => $self->{mouse}, clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor},
               color => $self->{color}, tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt},
-              page => $self->{page}, footer => $self->{footer}, keep => $self->{keep}, undef => '<<' }
+              page => $self->{page}, footer => $self->{footer}, keep => $self->{keep}, undef => '<<',
+              margin => $self->{margin} }
         );
         next if ! defined $number;
         if ( $number eq $self->{reset} ) {
@@ -723,22 +735,10 @@ sub choose_a_subset {
             push @tmp_prompt, $self->{prompt};
         }
         my $mark;
-        my $solo;
-        if ( defined $self->{solo} ) {
-            $solo = [ map { $_ + @pre } @{$self->{solo}} ];
-            if ( defined $self->{mark} && @{$self->{mark}} ) {
-                for my $m ( map { $_ + @pre } @{$self->{mark}} ) {
-                    next if any { $m == $_ } @$solo;    # solo elements are not markable with the SpaceBar
-                    push @$mark, $m;
-                }
-            }
+        if ( defined $self->{mark} && @{$self->{mark}} ) {
+            $mark = [ map { $_ + @pre } @{$self->{mark}} ];
         }
-        else {
-            if ( defined $self->{mark} && @{$self->{mark}} ) {
-                $mark = [ map { $_ + @pre } @{$self->{mark}} ];
-            }
-        }
-        my $meta_items = [ 0 .. $#pre, @{$solo||[]} ];
+        my $meta_items = [ 0 .. $#pre ];
         my $prompt = join "\n", @tmp_prompt;
         # Choose
         my @idx = choose(
@@ -749,7 +749,7 @@ sub choose_a_subset {
               clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor},
               color => $self->{color}, tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt},
               page => $self->{page}, footer => $self->{footer}, keep => $self->{keep}, undef => $self->{back},
-              busy_string => $self->{busy_string} }
+              busy_string => $self->{busy_string}, margin => $self->{margin} }
         );
         $self->{mark} = $mark = undef;
         if ( ! defined $idx[0] || $idx[0] == 0 ) {
@@ -759,20 +759,6 @@ sub choose_a_subset {
             }
             $self->__restore_defaults();
             return;
-        }
-        if ( defined $self->{solo} ) {
-            my $solo_idx;
-            for my $i ( @idx ) {                    # Experimental (may be removed):
-                if ( any { $_ == $i } @$solo ) {    # If a solo element is chosen, it is returned solo. Only one solo
-                    $solo_idx = $i - @pre;          # element can be chosen, because the SpaceBar doesn't work for solo
-                    last;                           # elements. Other elements marked with the SpaceBar are ignored when
-                }                                   # a solo element is chosen.
-            }                                       # A chosen solo element returns immediately (without a CONFIRM)
-            if ( defined $solo_idx ) {
-                my $return_indexes = $self->{index}; # because __restore_defaults resets $self->{index}
-                $self->__restore_defaults();
-                return [ $return_indexes ? $solo_idx : $available->[ $solo_idx ] ];
-            }
         }
         push @$bu, [ [ @$curr_avail ], [ @$new_idx ] ];
         my $ok;
@@ -794,15 +780,7 @@ sub choose_a_subset {
         push @$new_idx, reverse @tmp_idx;
         if ( $ok ) {
             if ( ! @$new_idx && $opt->{all_by_default} ) {
-                if ( defined $self->{solo} ) {
-                    for my $e ( 0 .. $#{$available} ) {
-                        next if any { $e == $_ } @{$self->{solo}};
-                        push @$new_idx, $e;
-                    }
-                }
-                else {
-                    $new_idx = [ 0 .. $#{$available} ];
-                }
+                $new_idx = [ 0 .. $#{$available} ];
             }
             my $return_indexes = $self->{index}; # because __restore_defaults resets $self->{index}
             $self->__restore_defaults();
@@ -859,7 +837,8 @@ sub settings_menu {
             { info => $self->{info}, prompt => $prompt, index => 1, default => $default, layout => 2, alignment => 0,
               mouse => $self->{mouse}, clear_screen => $self->{clear_screen}, hide_cursor => $self->{hide_cursor},
               color => $self->{color}, tabs_info => $self->{tabs_info}, tabs_prompt => $self->{tabs_prompt},
-              page => $self->{page}, footer => $self->{footer}, keep => $self->{keep}, undef => $self->{back} }
+              page => $self->{page}, footer => $self->{footer}, keep => $self->{keep}, undef => $self->{back},
+              margin => $self->{margin} }
         );
         if ( ! $idx ) {
             $self->__restore_defaults();
@@ -997,47 +976,9 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.133
+Version 0.134
 
 =cut
-
-=head1 Backward incompatible changes
-
-=head3 choose_directories
-
-=over
-
-=item Option I<enchanted> removed.
-
-=item Options I<add_dirs>, I<parent_dir> and I<cs_label> removed.
-
-=item The option I<init_dir> expects always a decoded string, regardless of how the option I<decoded> is set.
-
-=back
-
-=head3 choose_a_file
-
-=over
-
-=item Option I<enchanted> removed.
-
-=item Options I<show_files>, I<parent_dir> and I<cs_label> removed.
-
-=item The option I<init_dir> expects always a decoded string, regardless of how the option I<decoded> is set.
-
-=back
-
-=head3 choose_a_directory
-
-=over
-
-=item Option I<enchanted> removed.
-
-=item Option I<parent_dir> removed.
-
-=item The option I<init_dir> expects always a decoded string, regardless of how the option I<decoded> is set.
-
-=back
 
 =head1 SYNOPSIS
 
@@ -1078,6 +1019,14 @@ Options are passed as a hash reference. The options argument is the last (or the
 
 =item
 
+back
+
+Customize the string of the menu entry "I<back>".
+
+Default: C<BACK>
+
+=item
+
 clear_screen
 
 If enabled, the screen is cleared before the output.
@@ -1092,6 +1041,14 @@ Setting I<color> to C<1> enables the support for color and text formatting escap
 selected element. If set to C<2>, also for the current selected element the color support is enabled (inverted colors).
 
 Values: [0],1,2.
+
+=item
+
+confirm
+
+Customize the string of the menu entry "I<confirm>".
+
+Default: C<CONFIRM>.
 
 =item
 
@@ -1111,6 +1068,30 @@ Default: undef
 
 =item
 
+margin
+
+The option I<margin> allows one to set a margin on all four sides.
+
+I<margin> expects a reference to an array with four elements in the following order:
+
+- top margin (number of terminal lines)
+
+- right margin (number of terminal columns)
+
+- botton margin (number of terminal lines)
+
+- left margin (number of terminal columns)
+
+I<margin> does not affect the I<info> string. To add margins to the I<info> string see I<tabs_info>.
+
+I<margin> changes the default values of I<tabs_prompt>.
+
+Allowed values: 0 or greater. Elements beyond the fourth are ignored.
+
+Default: undef
+
+=item
+
 mouse
 
 Enable the mouse mode. An item can be chosen with the left mouse key, the right mouse key can be used instead of the
@@ -1124,23 +1105,46 @@ prompt
 
 A string placed on top of the available choices.
 
+Default: undef, C<Choose:>
+
+=item
+
+tabs_info
+
+The option I<tabs_info> allows one to insert spaces at the beginning and the end of I<info> lines.
+
+I<tabs_info> expects a reference to an array with one to three elements:
+
+- the first element (initial tab) sets the number of spaces inserted at beginning of paragraphs
+
+- the second element (subsequent tab) sets the number of spaces inserted at the beginning of all broken lines apart from
+the beginning of paragraphs
+
+- the third element sets the number of spaces used as a right margin.
+
+Allowed values: 0 or greater. Elements beyond the third are ignored.
+
 Default: undef
 
 =item
 
-back
+tabs_prompt
 
-Customize the string of the menu entry "I<back>".
+The option I<tabs_prompt> allows one to insert spaces at the beginning and the end of I<prompt> lines.
 
-Default: C<BACK>
+I<tabs_prompt> expects a reference to an array with one to three elements:
 
-=item
+- the first element (initial tab) sets the number of spaces inserted at beginning of paragraphs
 
-confirm
+- the second element (subsequent tab) sets the number of spaces inserted at the beginning of all broken lines apart from
+the beginning of paragraphs
 
-Customize the string of the menu entry "I<confirm>".
+- the third element sets the number of spaces used as a right margin.
 
-Default: C<CONFIRM>.
+Allowed values: 0 or greater. Elements beyond the third are ignored.
+
+default: If I<margin> is defined, C<initial tab> and C<subsequent tab> are set to C<left-margin> and the right margin is
+set to C<right-margin>. If I<margin> is not defined the default of I<tabs_prompt> is undefined.
 
 =back
 
@@ -1168,7 +1172,7 @@ To return the current working-directory as the chosen directory choose the "I<co
 
 The "I<back>" menu entry causes C<choose_a_directory> to return nothing.
 
-Options:
+These options can be passed in a hash-reference:
 
 =over
 
@@ -1243,7 +1247,7 @@ Values: 0,[1].
 Choose the file directory and then choose a file from the chosen directory. To return the chosen file select the
 "I<confirm>" menu entry.
 
-Options:
+These options can be passed in a hash-reference:
 
 =over
 
@@ -1378,7 +1382,7 @@ This function lets you choose/compose a number (unsigned integer) which is retur
 The fist argument is an integer and determines the range of the available numbers. For example setting the
 first argument to 4 would offer a range from 0 to 9999.
 
-Options:
+With the optional second argument (hash-reference), these options can be passed:
 
 =over
 
@@ -1428,7 +1432,7 @@ C<choose_a_subset> lets you choose a subset from a list.
 
 The first argument is a reference to an array which provides the available list.
 
-Options:
+With the optional second argument (hash-reference), these options can be passed:
 
 =over
 
@@ -1591,7 +1595,7 @@ the values (C<0> if not defined) are the indexes of the current value of the res
 
 =back
 
-With the optional third argument can be passed these options:
+With the optional third argument (hash-reference), these options can be passed:
 
 =over
 
@@ -1669,7 +1673,7 @@ L<stackoverflow|http://stackoverflow.com> for the help.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014-2021 Matthäus Kiem.
+Copyright 2014-2022 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

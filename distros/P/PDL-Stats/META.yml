@@ -4,7 +4,7 @@ author:
   - 'Maggie J. Xiong  <maggiexyz users.sourceforge.net>'
 build_requires:
   PDL::Core: '2.008'
-  Test::More: '0'
+  Test::More: '0.88'
 configure_requires:
   PDL::Core: '2.008'
 dynamic_config: 1
@@ -25,5 +25,5 @@ requires:
   PDL: '2.057'
 resources:
   repository: git://github.com/PDLPorters/PDL-Stats
-version: '0.81'
+version: '0.82'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,15 +1,7 @@
-#!/usr/bin/perl 
-
 use strict;
 use warnings;
 use Test::More;
-
-BEGIN {
-    plan tests => 46;
-      # 1
-    use_ok( 'PDL::Stats::Distr' );
-}
-
+use PDL::Stats::Distr;
 use PDL::LiteF;
 
 sub tapprox {
@@ -153,3 +145,5 @@ sub tapprox {
   $a += 171;
   ok( $a->pmf_poisson_stirling(10)->sum );  # the result is so close to 0 it's pointless to test with tapprox
 }
+
+done_testing;

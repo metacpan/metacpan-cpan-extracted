@@ -4,7 +4,7 @@ Dancer2::Plugin::Auth::Extensible::Provider::DBIxClass - authenticate via the Da
 
 # VERSION
 
-version 0.0900
+version 0.0902
 
 # DESCRIPTION
 

@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 91;
+use Test::More tests => 93;
 
 use Math::BigInt   upgrade   => 'Math::BigFloat';
 use Math::BigFloat downgrade => 'Math::BigInt';
@@ -87,7 +87,7 @@ subtest '$x = Math::BigFloat -> new(2); $y = $x -> blog(16);' => sub {
 
 note("Enable downgrading, and see if constructors downgrade");
 
-# new()
+note("testing new()");
 
 $x = Math::BigFloat -> new("0.5");
 subtest '$x = Math::BigFloat -> new("0.5")' => sub {
@@ -131,7 +131,7 @@ subtest '$x = Math::BigFloat -> new("NaN")' => sub {
     is(ref $x, "Math::BigInt", "downgrades to Math::BigInt");
 };
 
-# bzero()
+note("testing bzero()");
 
 $x = Math::BigFloat -> bzero();
 subtest '$x = Math::BigFloat -> bzero()' => sub {
@@ -140,7 +140,7 @@ subtest '$x = Math::BigFloat -> bzero()' => sub {
     is(ref $x, 'Math::BigInt', 'downgrades to Math::BigInt');
 };
 
-# bone()
+note("testing bone()");
 
 $x = Math::BigFloat -> bone();
 subtest '$x = Math::BigFloat -> bone()' => sub {
@@ -149,7 +149,7 @@ subtest '$x = Math::BigFloat -> bone()' => sub {
     is(ref $x, 'Math::BigInt', 'downgrades to Math::BigInt');
 };
 
-# binf()
+note("testing binf()");
 
 $x = Math::BigFloat -> binf();
 subtest '$x = Math::BigFloat -> binf()' => sub {
@@ -158,7 +158,7 @@ subtest '$x = Math::BigFloat -> binf()' => sub {
     is(ref $x, 'Math::BigInt', 'downgrades to Math::BigInt');
 };
 
-# bnan()
+note("testing bnan()");
 
 $x = Math::BigFloat -> bnan();
 subtest '$x = Math::BigFloat -> bnan()' => sub {
@@ -167,7 +167,7 @@ subtest '$x = Math::BigFloat -> bnan()' => sub {
     is(ref $x, 'Math::BigInt', 'downgrades to Math::BigInt');
 };
 
-# from_dec()
+note("testing from_dec()");
 
 $x = Math::BigFloat -> from_dec('3.14e2');
 subtest '$x = Math::BigFloat -> from_dec("3.14e2")' => sub {
@@ -176,7 +176,7 @@ subtest '$x = Math::BigFloat -> from_dec("3.14e2")' => sub {
     is(ref $x, 'Math::BigInt', 'downgrades to Math::BigInt');
 };
 
-# from_hex()
+note("testing from_hex()");
 
 $x = Math::BigFloat -> from_hex('0x1.3ap+8');
 subtest '$x = Math::BigFloat -> from_hex("3.14e2")' => sub {
@@ -185,7 +185,7 @@ subtest '$x = Math::BigFloat -> from_hex("3.14e2")' => sub {
     is(ref $x, 'Math::BigInt', 'downgrades to Math::BigInt');
 };
 
-# from_oct()
+note("testing from_oct()");
 
 $x = Math::BigFloat -> from_oct('0o1.164p+8');
 subtest '$x = Math::BigFloat -> from_oct("0o1.164p+8")' => sub {
@@ -194,7 +194,7 @@ subtest '$x = Math::BigFloat -> from_oct("0o1.164p+8")' => sub {
     is(ref $x, 'Math::BigInt', 'downgrades to Math::BigInt');
 };
 
-# from_bin()
+note("testing from_bin()");
 
 $x = Math::BigFloat -> from_bin('0b1.0011101p+8');
 subtest '$x = Math::BigFloat -> from_bin("0b1.0011101p+8")' => sub {
@@ -203,7 +203,7 @@ subtest '$x = Math::BigFloat -> from_bin("0b1.0011101p+8")' => sub {
     is(ref $x, 'Math::BigInt', 'downgrades to Math::BigInt');
 };
 
-# from_ieee754()
+note("testing from_ieee754()");
 
 $x = Math::BigFloat -> from_ieee754("\x43\x9d\x00\x00", "binary32");
 subtest '$x = Math::BigFloat -> from_ieee754("\x43\x9d\x00\x00", "binary32")' => sub {
@@ -216,15 +216,17 @@ note("Disable downgrading, and see if constructors downgrade");
 
 Math::BigFloat -> downgrade(undef);
 
-my $half = Math::BigFloat -> new("0.5");
-my $four = Math::BigFloat -> new("4");
 my $zero = Math::BigFloat -> bzero();
+my $half = Math::BigFloat -> new("0.5");
+my $one  = Math::BigFloat -> bone();
+my $four = Math::BigFloat -> new("4");
 my $inf  = Math::BigFloat -> binf();
 my $nan  = Math::BigFloat -> bnan();
 
-is(ref $half, "Math::BigFloat", "Creating a 0.5 does not downgrade");
-is(ref $four, "Math::BigFloat", "Creating a 4 does not downgrade");
 is(ref $zero, "Math::BigFloat", "Creating a 0 does not downgrade");
+is(ref $half, "Math::BigFloat", "Creating a 0.5 does not downgrade");
+is(ref $one,  "Math::BigFloat", "Creating a 1 does not downgrade");
+is(ref $four, "Math::BigFloat", "Creating a 4 does not downgrade");
 is(ref $inf,  "Math::BigFloat", "Creating an Inf does not downgrade");
 is(ref $nan,  "Math::BigFloat", "Creating a NaN does not downgrade");
 
@@ -233,11 +235,7 @@ is(ref $nan,  "Math::BigFloat", "Creating a NaN does not downgrade");
 
 Math::BigFloat -> downgrade("Math::BigInt");
 
-# This shouldn't be necessary, but it is. Fixme!
-
-Math::BigInt -> upgrade(undef);
-
-# bneg()
+note("testing bneg()");
 
 $x = $zero -> copy() -> bneg();
 subtest '$x = $zero -> copy() -> bneg();' => sub {
@@ -267,7 +265,7 @@ subtest '$x = $nan -> copy() -> bneg();' => sub {
     is(ref($x), 'Math::BigInt', '-(NaN) => Math::BigInt');
 };
 
-# bnorm()
+note("testing bnorm()");
 
 $x = $zero -> copy() -> bnorm();
 subtest '$x = $zero -> copy() -> bnorm();' => sub {
@@ -297,7 +295,7 @@ subtest '$x = $nan -> copy() -> bnorm();' => sub {
     is(ref($x), 'Math::BigInt', 'bnorm(NaN) => Math::BigInt');
 };
 
-# binc()
+note("testing binc()");
 
 $x = $zero -> copy() -> binc();
 subtest '$x = $zero -> copy() -> binc();' => sub {
@@ -327,7 +325,7 @@ subtest '$x = $nan -> copy() -> binc();' => sub {
     is(ref($x), 'Math::BigInt', 'binc(NaN) => Math::BigInt');
 };
 
-# bdec()
+note("testing bdec()");
 
 $x = $zero -> copy() -> bdec();
 subtest '$x = $zero -> copy() -> bdec();' => sub {
@@ -357,7 +355,7 @@ subtest '' => sub {
     is(ref($x), 'Math::BigInt', 'bdec(NaN) => Math::BigInt');
 };
 
-# badd()
+note("testing badd()");
 
 $x = $half -> copy() -> badd($nan);
 subtest '$x = $half -> copy() -> badd($nan);' => sub {
@@ -415,7 +413,7 @@ subtest '$x = $nan -> copy() -> badd($four);' => sub {
     is(ref($x), 'Math::BigInt', 'NaN + 4 => Math::BigInt');
 };
 
-# bsub()
+note("testing bsub()");
 
 $x = $half -> copy() -> bsub($nan);
 subtest '$x = $half -> copy() -> bsub($nan);' => sub {
@@ -473,7 +471,7 @@ subtest '$x = $nan -> copy() -> bsub($four);' => sub {
     is(ref($x), 'Math::BigInt', 'NaN - 4 => Math::BigInt');
 };
 
-# bmul()
+note("testing bmul()");
 
 $x = $zero -> copy() -> bmul($four);
 subtest '$x = $zero -> copy() -> bmul($four);' => sub {
@@ -510,7 +508,7 @@ subtest '' => sub {
     is(ref($x), 'Math::BigInt', 'bmul(4, 0.5) => Math::BigInt');
 };
 
-# bmuladd()
+note("testing bmuladd()");
 
 $x = $zero -> copy() -> bmuladd($four, $four);
 subtest '$x = $zero -> copy() -> bmuladd($four, $four);' => sub {
@@ -548,8 +546,7 @@ subtest '$x = $inf -> copy() -> bmuladd($four, $four);' => sub {
 };
 
 $x = $nan -> copy() -> bmuladd($four, $four);
-subtest '$x = $nan -> copy() -> bmuladd($four, $four);
-' => sub {
+subtest '$x = $nan -> copy() -> bmuladd($four, $four);' => sub {
     plan tests => 2;
     is($x, 'NaN', 'bmuladd(NaN, 4, 4) = NaN');
     is(ref($x), 'Math::BigInt', 'bmuladd(NaN, 4, 4) => Math::BigInt');
@@ -562,55 +559,62 @@ subtest '$x = $four -> copy() -> bmuladd("0.5", $four);' => sub {
     is(ref($x), 'Math::BigInt', 'bmuladd(4, 0.5, 4) => Math::BigInt');
 };
 
-# bdiv()
+note("testing bdiv()");
 
-# bmod()
+$x = $zero -> copy() -> bdiv($one);
+subtest '$x = $zero -> copy() -> bdiv($one);' => sub {
+    plan tests => 2;
+    cmp_ok($x, '==', 0, 'bdiv(0, 1) = 0');
+    is(ref($x), 'Math::BigInt', 'bdiv(0, 1) => Math::BigInt');
+};
 
-# bmodpow()
+note("testing bmod()");
 
-# bpow()
+note("testing bmodpow()");
 
-# blog()
+note("testing bpow()");
 
-# bexp()
+note("testing blog()");
 
-# bnok()
+note("testing bexp()");
 
-# bsin()
+note("testing bnok()");
 
-# bcos()
+note("testing bsin()");
 
-# batan()
+note("testing bcos()");
 
-# batan()
+note("testing batan()");
 
-# bsqrt()
+note("testing batan()");
 
-# broot()
+note("testing bsqrt()");
 
-# bfac()
+note("testing broot()");
 
-# bdfac()
+note("testing bfac()");
 
-# btfac()
+note("testing bdfac()");
 
-# bmfac()
+note("testing btfac()");
 
-# blsft()
+note("testing bmfac()");
 
-# brsft()
+note("testing blsft()");
 
-# band()
+note("testing brsft()");
 
-# bior()
+note("testing band()");
 
-# bxor()
+note("testing bior()");
 
-# bnot()
+note("testing bxor()");
 
-# bround()
+note("testing bnot()");
 
-# Add tests for rounding a non-integer to an integer. Fixme!
+note("testing bround()");
+
+note("testing Add tests for rounding a non-integer to an integer. Fixme!");
 
 $x = $zero -> copy() -> bround();
 subtest '$x = $zero -> copy() -> bround();' => sub {
@@ -636,9 +640,9 @@ subtest '$x = $nan -> copy() -> bround();' => sub {
     is(ref($x), 'Math::BigInt', 'bround(NaN) => Math::BigInt');
 };
 
-# bfround()
+note("testing bfround()");
 
-# Add tests for rounding a non-integer to an integer. Fixme!
+note("testing Add tests for rounding a non-integer to an integer. Fixme!");
 
 $x = $zero -> copy() -> bfround();
 subtest '$x = $zero -> copy() -> bfround();' => sub {
@@ -664,7 +668,7 @@ subtest '$x = $nan -> copy() -> bfround();' => sub {
     is(ref($x), 'Math::BigInt', 'bfround(NaN) => Math::BigInt');
 };
 
-# bfloor()
+note("testing bfloor()");
 
 $x = $half -> copy() -> bfloor();
 subtest '$x = $half -> copy() -> bfloor();' => sub {
@@ -684,7 +688,7 @@ subtest '$x = $nan -> copy() -> bfloor();' => sub {
     is(ref($x), 'Math::BigInt', 'bfloor(NaN) => Math::BigInt');
 };
 
-# bceil()
+note("testing bceil()");
 
 $x = $half -> copy() -> bceil();
 subtest '$x = $half -> copy() -> bceil();' => sub {
@@ -704,7 +708,7 @@ subtest '$x = $nan -> copy() -> bceil();' => sub {
     is(ref($x), 'Math::BigInt', 'bceil(NaN) => Math::BigInt');
 };
 
-# bint()
+note("testing bint()");
 
 $x = $half -> copy() -> bint();
 subtest '$x = $half -> copy() -> bint();' => sub {
@@ -724,28 +728,26 @@ subtest '$x = $nan -> copy() -> bint();' => sub {
     is(ref($x), 'Math::BigInt', 'bint(NaN) => Math::BigInt');
 };
 
-# bgcd()
+note("testing bgcd()");
 
-# blcm()
+note("testing blcm()");
 
-# mantissa() ?
+note("testing mantissa()");
 
-# exponent() ?
+note("testing exponent()");
 
-# parts() ?
+note("testing parts()");
 
-# sparts()
+note("testing sparts()");
 
-# nparts()
+note("testing nparts()");
 
-# eparts()
+note("testing eparts()");
 
-# dparts()
+note("testing dparts()");
 
-# fparts()
+note("testing fparts()");
 
-# numerator()
+note("testing numerator()");
 
-# denominator()
-
-#require 'upgrade.inc'; # all tests here for sharing
+note("testing denominator()");

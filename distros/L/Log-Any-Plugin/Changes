@@ -1,5 +1,9 @@
 Revision History for perl module Log::Any::Plugin
 
+0.012     2022-05-23T16:24:18AEST+1000
+
+    - Add ContextStack plugin
+
 0.011     2019-10-30T12:47:28AEDT+1100
 
     - Add separator option to Stringify plugin - thanks Kamal Advani

@@ -1,21 +1,10 @@
-#!/usr/bin/perl 
-
 use strict;
 use warnings;
 use Test::More;
-
-BEGIN {
-    use_ok( 'PDL::Stats::Basic' );
-    use_ok( 'PDL::Stats::GLM' );
-}
-
+use PDL::Stats::Basic;
+use PDL::Stats::GLM;
 use PDL::LiteF;
 use PDL::NiceSlice;
-
-eval { require PDL::Slatec; };
-if ($@) {
-  warn "No PDL::Slatec. Fall back on PDL::MatrixOps.\n";
-}
 
 sub tapprox {
   my($a,$b, $eps) = @_;
@@ -648,7 +637,6 @@ sub t_anova_rptd_mixed_4w {
 
 done_testing();
 
-
 sub lvalue_assign_detour {
     my ($pdl, $index, $new_value) = @_;
 
@@ -659,7 +647,6 @@ sub lvalue_assign_detour {
 
     return pdl(\@arr)->reshape($pdl->dims)->sever;
 }
-
 
 __DATA__
 subj	age	Apple-android	beer	wings	recall

@@ -3,11 +3,11 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Partition a musical duration into rhythmic phrases
 
-our $VERSION = '0.0706';
+our $VERSION = '0.0707';
 
 use Math::Random::Discrete;
 use MIDI::Simple ();
-use List::Util qw/ min /;
+use List::Util qw(min);
 
 use Moo;
 use strictures 2;
@@ -139,7 +139,7 @@ sub motif {
     my $group_name = '';
 
     while ( $sum < $self->size ) {
-        my $name = $self->pool_select->(); # Chooses a note duration
+        my $name = $self->pool_select->($self); # Chooses a note duration
 
         # Compute grouping
         if ($group_num) {
@@ -216,7 +216,7 @@ Music::Duration::Partition - Partition a musical duration into rhythmic phrases
 
 =head1 VERSION
 
-version 0.0706
+version 0.0707
 
 =head1 SYNOPSIS
 
@@ -227,9 +227,8 @@ version 0.0706
   my $mdp = Music::Duration::Partition->new(
     size => 8,                  # 2 measures in 4/4 time
     pool => [qw(hn dqn qn en)], # Made from these durations
+    pool_select => sub { my $self = shift; ... }, # optional
   );
-
-  $mdp->pool_select(sub { ... }); # optional
 
   my $motif = $mdp->motif; # Random list-ref of pool members
 

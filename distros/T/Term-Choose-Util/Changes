@@ -1,6 +1,11 @@
 Revision history for Term::Choose::Util
 
 
+0.134   2022-05-23
+        - Removed layout-3 warnings.
+        - Removed experimental option solo.
+        - New options 'margin', 'tabs_info' and 'tabs_prompt'.
+
 0.133   2021-11-11
         - Raised Perl minimum version to 5.10.0.
 

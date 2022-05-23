@@ -1,0 +1,37 @@
+Changes
+lib/SPVM/IO.pm
+lib/SPVM/IO/File.c
+lib/SPVM/IO/File.config
+lib/SPVM/IO/File.pm
+lib/SPVM/IO/File.spvm
+lib/SPVM/IO/FileHandle.c
+lib/SPVM/IO/FileHandle.config
+lib/SPVM/IO/FileHandle.pm
+lib/SPVM/IO/FileHandle.spvm
+lib/SPVM/IO/Select.c
+lib/SPVM/IO/Select.config
+lib/SPVM/IO/Select.pm
+lib/SPVM/IO/Select.spvm
+lib/SPVM/IO/Socket.pm
+lib/SPVM/IO/Socket.spvm
+lib/SPVM/IO/Socket/INET.c
+lib/SPVM/IO/Socket/INET.config
+lib/SPVM/IO/Socket/INET.pm
+lib/SPVM/IO/Socket/INET.spvm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/io_socket_inet.t
+t/lib/SPVM/TestCase/IO/Select.spvm
+t/lib/SPVM/TestCase/IO/Socket/INET.spvm
+t/lib/SPVM/TestCase/Lib/IO/File.spvm
+t/lib/SPVM/TestCase/Lib/IO/FileHandle.spvm
+t/lib/TestFile.pm
+t/SPVM_IO_File.t
+t/SPVM_IO_FileHandle.t
+t/test_files/file_eof.txt
+t/test_files/fread.txt
+t/test_files/fread_eof.txt
+t/test_files/long_line.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

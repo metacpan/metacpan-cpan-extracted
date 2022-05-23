@@ -1,9 +1,9 @@
 package Tapper::Installer;
-# git description: v4.1.1-6-g129f830
+# git description: v5.0.0-1-g5a9665f
 
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Tapper - Install everything needed for a test
-$Tapper::Installer::VERSION = '5.0.0';
+$Tapper::Installer::VERSION = '5.0.1';
 use strict;
 use warnings;
 
@@ -78,7 +78,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2022 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

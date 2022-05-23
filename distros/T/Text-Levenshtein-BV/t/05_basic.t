@@ -20,6 +20,7 @@ use_ok($class);
 my $object = new_ok($class);
 
 if (1) {
+    ok( $object = Text::Levenshtein::BV::new($class), 'Text::Levenshtein::BV::new($class)' );
     ok( $object = $class->new(), '$class->new()' );
     is( scalar keys %$object, 0, 'is scalar keys %$object, 0' );
 
@@ -36,7 +37,6 @@ if (1) {
     is( $object->{a}, 1, 'is $object->{a}, 1' );
     is( $object->{b}, 2, 'is $object->{b}, 2' );
 
-    ok( $object->new(), '$object->new()' );
 }
 
 done_testing;

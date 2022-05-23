@@ -4,11 +4,7 @@ examples/delayed_sclient.pl
 examples/sclient.pl
 lib/IO/Async/SSL.pm
 lib/IO/Async/SSLStream.pm
-LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
-README
 t/00use.t
 t/01upgrade.t
 t/02protocol-upgrade.t
@@ -24,3 +20,7 @@ t/99pod.t
 t/dhparam.pem
 t/privkey.pem
 t/server.pem
+README
+LICENSE
+META.yml
+META.json

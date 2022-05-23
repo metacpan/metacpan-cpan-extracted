@@ -4,7 +4,7 @@ package PerlIO::Via::Base64;
 # Set the version info
 
 use strict;
-$PerlIO::Via::Base64::VERSION = 0.03;
+$PerlIO::Via::Base64::VERSION = 0.04;
 
 # Make sure the encoding/decoding stuff is available
 
@@ -130,8 +130,6 @@ handle.
 
 =head1 CLASS METHODS
 
-There is one class method.
-
 =head2 eol
 
  $eol = PerlIO::Via::Base64->eol;  # obtain current setting
@@ -151,6 +149,18 @@ that file.
 If it were possible to pass parameters such as this to the layer while opening
 the file, that would have been the approach taken.  Since that is not possible
 yet, this way of doing it seems to be the next best thing.
+
+=head2 PUSHED
+
+Instantiate a new PerlIO::Via::Base64 Object.
+
+=head2 FILL
+
+Base64 decode a line of a file.
+
+=head2 FLUSH
+
+Base64 encode the content and write to a file.
 
 =head1 CAVEAT
 

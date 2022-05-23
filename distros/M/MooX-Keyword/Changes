@@ -1,0 +1,11 @@
+Revision history for MooX-Keyword
+
+0.03    2022/05/23
+	- Remove useless declaration of use feature qw/state/ to fix failing tests
+
+0.02    2022/05/21
+	- Add a basic test for inheritance + example in synopsis.
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

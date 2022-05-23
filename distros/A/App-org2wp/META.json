@@ -75,7 +75,7 @@
    "provides" : {
       "App::org2wp" : {
          "file" : "lib/App/org2wp.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       }
    },
    "release_status" : "stable",
@@ -90,7 +90,7 @@
          "web" : "https://github.com/perlancar/perl-App-org2wp"
       }
    },
-   "version" : "0.012",
+   "version" : "0.013",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

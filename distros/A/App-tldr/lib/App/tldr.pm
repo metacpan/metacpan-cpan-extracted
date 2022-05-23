@@ -15,9 +15,9 @@ use Text::Fold ();
 use constant DEBUG => $ENV{TLDR_DEBUG};
 use constant REPOSITORY => $ENV{TLDR_REPOSITORY};
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
-my $URL = "https://raw.githubusercontent.com/tldr-pages/tldr/main/pages/%s/%s.md";
+my $URL = "https://raw.githubusercontent.com/tldr-pages/tldr/main/pages%s/%s/%s.md";
 
 sub new {
     my ($class, %option) = @_;
@@ -32,14 +32,19 @@ sub parse_options {
 
     $self->{unicode} = ($ENV{LANG} || "") =~ /UTF-8/i ? 1 : 0;
     GetOptions
-        "h|help"    => sub { print $self->_help; exit },
-        "o|os=s@"   => \($self->{platform}),
-        "v|version" => sub { printf "%s %s\n", ref $self, $self->VERSION; exit },
-        "pager=s"   => \my $pager,
-        "no-pager"  => \my $no_pager,
-        "unicode!" => \$self->{unicode},
+        "h|help"       => sub { print $self->_help; exit },
+        "l|language=s" => \my $language,
+        "o|os=s@"      => \($self->{platform}),
+        "v|version"    => sub { printf "%s %s\n", ref $self, $self->VERSION; exit },
+        "pager=s"      => \my $pager,
+        "no-pager"     => \my $no_pager,
+        "unicode!"     => \$self->{unicode},
     or exit(2);
     $self->{argv} = \@ARGV;
+    if ($language) {
+        $language = $language =~ /^\./ ? $language : ".$language";
+    }
+    $self->{language} = $language || '';
     if (!$no_pager and -t STDOUT and my $guess = $self->_guess_pager($pager)) {
         $self->{pager} = $guess;
     }
@@ -95,7 +100,7 @@ sub _get {
 
 sub _http_get {
     my ($self, $query, $platform) = @_;
-    my $url = sprintf $URL, $platform, $query;
+    my $url = sprintf $URL, $self->{language}, $platform, $query;
     my $res = $self->{http}->get($url);
     if ($res->{success}) {
         (Encode::decode_utf8($res->{content}), undef);
@@ -106,7 +111,7 @@ sub _http_get {
 
 sub _local_get {
     my ($self, $query, $platform) = @_;
-    my $file = File::Spec->catfile(REPOSITORY, "pages", $platform, "$query.md");
+    my $file = File::Spec->catfile(REPOSITORY, "pages$self->{language}", $platform, "$query.md");
     if (-f $file) {
         open my $fh, "<:utf8", $file or die "$file: $!";
         local $/;

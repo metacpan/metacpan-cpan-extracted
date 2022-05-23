@@ -2,141 +2,145 @@ package Text::Levenshtein::BV;
 
 use strict;
 use warnings;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use utf8;
 
-use 5.010001;
+#use standard;
 
-our $width = int 0.999+log(~0)/log(2);
+use 5.010.001;
+
+our $width = int 0.999 + log( ~0 ) / log(2);
 
 use integer;
-no warnings 'portable'; # for 0xffffffffffffffff
+no warnings 'portable';    # for 0xffffffffffffffff
+
+use Data::Dumper;
 
 our @masks = (
-0x0000000000000000,
-0x0000000000000001,0x0000000000000003,0x0000000000000007,0x000000000000000f,
-0x000000000000001f,0x000000000000003f,0x000000000000007f,0x00000000000000ff,
-0x00000000000001ff,0x00000000000003ff,0x00000000000007ff,0x0000000000000fff,
-0x0000000000001fff,0x0000000000003fff,0x0000000000007fff,0x000000000000ffff,
-0x000000000001ffff,0x000000000003ffff,0x000000000007ffff,0x00000000000fffff,
-0x00000000001fffff,0x00000000003fffff,0x00000000007fffff,0x0000000000ffffff,
-0x0000000001ffffff,0x0000000003ffffff,0x0000000007ffffff,0x000000000fffffff,
-0x000000001fffffff,0x000000003fffffff,0x000000007fffffff,0x00000000ffffffff,
-0x00000001ffffffff,0x00000003ffffffff,0x00000007ffffffff,0x0000000fffffffff,
-0x0000001fffffffff,0x0000003fffffffff,0x0000007fffffffff,0x000000ffffffffff,
-0x000001ffffffffff,0x000003ffffffffff,0x000007ffffffffff,0x00000fffffffffff,
-0x00001fffffffffff,0x00003fffffffffff,0x00007fffffffffff,0x0000ffffffffffff,
-0x0001ffffffffffff,0x0003ffffffffffff,0x0007ffffffffffff,0x000fffffffffffff,
-0x001fffffffffffff,0x003fffffffffffff,0x007fffffffffffff,0x00ffffffffffffff,
-0x01ffffffffffffff,0x03ffffffffffffff,0x07ffffffffffffff,0x0fffffffffffffff,
-0x1fffffffffffffff,0x3fffffffffffffff,0x7fffffffffffffff,0xffffffffffffffff,
+    0x0000000000000000,
+    0x0000000000000001, 0x0000000000000003, 0x0000000000000007, 0x000000000000000f,
+    0x000000000000001f, 0x000000000000003f, 0x000000000000007f, 0x00000000000000ff,
+    0x00000000000001ff, 0x00000000000003ff, 0x00000000000007ff, 0x0000000000000fff,
+    0x0000000000001fff, 0x0000000000003fff, 0x0000000000007fff, 0x000000000000ffff,
+    0x000000000001ffff, 0x000000000003ffff, 0x000000000007ffff, 0x00000000000fffff,
+    0x00000000001fffff, 0x00000000003fffff, 0x00000000007fffff, 0x0000000000ffffff,
+    0x0000000001ffffff, 0x0000000003ffffff, 0x0000000007ffffff, 0x000000000fffffff,
+    0x000000001fffffff, 0x000000003fffffff, 0x000000007fffffff, 0x00000000ffffffff,
+    0x00000001ffffffff, 0x00000003ffffffff, 0x00000007ffffffff, 0x0000000fffffffff,
+    0x0000001fffffffff, 0x0000003fffffffff, 0x0000007fffffffff, 0x000000ffffffffff,
+    0x000001ffffffffff, 0x000003ffffffffff, 0x000007ffffffffff, 0x00000fffffffffff,
+    0x00001fffffffffff, 0x00003fffffffffff, 0x00007fffffffffff, 0x0000ffffffffffff,
+    0x0001ffffffffffff, 0x0003ffffffffffff, 0x0007ffffffffffff, 0x000fffffffffffff,
+    0x001fffffffffffff, 0x003fffffffffffff, 0x007fffffffffffff, 0x00ffffffffffffff,
+    0x01ffffffffffffff, 0x03ffffffffffffff, 0x07ffffffffffffff, 0x0fffffffffffffff,
+    0x1fffffffffffffff, 0x3fffffffffffffff, 0x7fffffffffffffff, 0xffffffffffffffff,
 );
 
 sub new {
     my $class = shift;
 
-    bless @_ ? @_ > 1 ? {@_} : {%{$_[0]}} : {}, ref $class || $class;
+    return bless(
+        @_ ? (@_ > 1 ? {@_} : {%{$_[0]}} ) : {}, $class
+    );
 }
 
 sub SES {
-    my ($self, $a, $b) = @_;
+    my ( $self, $a, $b ) = @_;
 
-    if ( !scalar(@$a) && !scalar(@$b) ) { return [] }
+    if ( !scalar(@{$a}) && !scalar(@{$b}) ) { return [] }
 
-    my ($amin, $amax, $bmin, $bmax) = (0, $#$a, 0, $#$b);
+    my ( $amin, $amax, $bmin, $bmax ) = ( 0, $#{$a}, 0, $#{$b} );
 
-# NOTE: prefix / suffix optimisation does not work reliable yet
-if (0) {
-    while ($amin <= $amax and $bmin <= $bmax and $a->[$amin] eq $b->[$bmin]) {
-        $amin++;
-        $bmin++;
+    if (1) {
+        while ( $amin <= $amax and $bmin <= $bmax and $a->[$amin] eq $b->[$bmin] ) {
+            $amin++;
+            $bmin++;
+        }
+        while ( $amin <= $amax and $bmin <= $bmax and $a->[$amax] eq $b->[$bmax] ) {
+            $amax--;
+            $bmax--;
+        }
     }
-    while ($amin <= $amax and $bmin <= $bmax and $a->[$amax] eq $b->[$bmax]) {
-        $amax--;
-        $bmax--;
-    }
 
-    ##print '$amin: ',$amin, ' $amax: ',$amax, ' $bmin: ',$bmin, ' $bmax: ',$bmax, "\n";
-    # if one of the sequences is a complete subset of the other
-
-    if ( ($amax < $amin) && ($bmax < $bmin) ) {
+    if ( ( $amax < $amin ) && ( $bmax < $bmin ) ) {
         return [
-            map( [$_ => $_], 0 .. $#$b ),
+            ( map { [ $_, $_ ] } (0 .. $#{$b})  ),
         ];
     }
-    elsif ( ($amax < $amin) ) {
+    elsif ( ( $amax < $amin ) ) {
         return [
-            map( [$_ => $_], 0 .. ($bmin-1) ),
-            map( ['-1' => $_], $bmin .. $bmax ),
-            map( [++$amax => $_], ($bmax+1) .. $#$b )
+            ( map { [ $_,      $_ ] } (0 .. ( $bmin - 1 )) ),
+            ( map { [ '-1',    $_ ] } ($bmin .. $bmax)     ),
+            ( map { [ ++$amax, $_ ] } ($bmax+1 .. $#{$b})  ),
         ];
     }
-    elsif ( ($bmax < $bmin) ) {
+    elsif ( ( $bmax < $bmin ) ) {
         return [
-            map( [$_ => $_], 0 .. ($amin-1) ),
-            map( [$_ => '-1'], $amin .. $amax ),
-            map( [$_ => ++$bmax], ($amax+1) .. $#$a )
+            ( map { [ $_, $_      ] } (0 .. ( $amin - 1 )) ),
+            ( map { [ $_, '-1'    ] } ($amin .. $amax)     ),
+            ( map { [ $_, ++$bmax ] } ($amax+1  .. $#{$a}) ),
         ];
     }
-}
 
     my $positions;
 
-    if (($amax - $amin) < $width ) {
-        $positions->{$a->[$_+$amin]} |= 1 << $_  for 0..($amax-$amin);
+    if ( ( $amax - $amin ) < $width ) {
+        $positions->{ $a->[ $_ + $amin ] } |= 1 << $_ for 0 .. ( $amax - $amin );
 
         my $VPs = [];
         my $VNs = [];
         my $VP  = ~0;
         my $VN  = 0;
 
-        my ($PM, $X, $D0, $HN, $HP);
+        my ( $PM, $X, $D0, $HN, $HP );
 
         # outer loop [HN02] Fig. 7
         for my $j ( $bmin .. $bmax ) {
-            $PM = $positions->{$b->[$j]} // 0;
-            $X  = $PM | $VN;
-            $D0 = (($VP + ($X & $VP)) ^ $VP) | $X;
-            $HN = $VP & $D0;
-            $HP = $VN | ~($VP|$D0);
-            $X  = ($HP << 1) | 1;
-            $VN = $X & $D0;
-            $VP = ($HN << 1) | ~($X | $D0);
-            $VPs->[$j] = $VP;
-            $VNs->[$j] = $VN;
+            $PM        = $positions->{ $b->[$j] } // 0;
+            $X         = $PM | $VN;
+            $D0        = ( ( $VP + ( $X & $VP ) ) ^ $VP ) | $X;
+            $HN        = $VP & $D0;
+            $HP        = $VN | ~( $VP | $D0 );
+            $X         = ( $HP << 1 ) | 1;
+            $VN        = $X & $D0;
+            $VP        = ( $HN << 1 ) | ~( $X | $D0 );
+
+            $VPs->[$j-$bmin] = $VP;
+            $VNs->[$j-$bmin] = $VN;
         }
         return [
-            #map( [$_ => $_], 0 .. ($bmin-1) ) ,
-            _backtrace($VPs, $VNs, $amin, $amax, $bmin, $bmax),
-            #map( [++$amax => $_], ($bmax+1) .. $#$b )
+            ( map { [ $_, $_      ] } (0 .. ($bmin-1)) ),
+            _backtrace( $VPs, $VNs, $amin, $amax, $bmin, $bmax ),
+            ( map { [ ++$amax, $_ ] } (($bmax+1) .. $#{$b}) ),
         ];
     }
     else {
 
-        my $m = $amax-$amin +1;
+        my $m    = $amax - $amin + 1;
         my $diff = $m;
 
         my $kmax = ($m) / $width;
-        $kmax++ if (($m) % $width);
+        $kmax++ if ( ($m) % $width );
 
-        $positions->{$a->[$_+$amin]}->[$_/$width] |= 1 << ($_ % $width) for 0..($amax-$amin);
+        $positions->{ $a->[ $_ + $amin ] }->[ $_ / $width ] |= 1 << ( $_ % $width )
+            for 0 .. ( $amax - $amin );
 
         my @mask;
 
-        $mask[$_] = 0 for (0..$kmax-1);
-        $mask[$kmax-1] = 1 << (($m-1) % $width);
+        $mask[$_] = 0 for ( 0 .. $kmax - 1 );
+        $mask[ $kmax - 1 ] = 1 << ( ( $m - 1 ) % $width );
 
         my @VPs;
-        $VPs[$_ / $width]  |= 1 << ($_ % $width)  for 0..$m-1;
+        $VPs[ $_ / $width ] |= 1 << ( $_ % $width ) for 0 .. $m - 1;
 
         my @VNs;
-        $VNs[$_] = 0 for (0..$kmax-1);
+        $VNs[$_] = 0 for ( 0 .. $kmax - 1 );
 
         my $VPS = [];
         my $VNS = [];
 
-        my ($PM,$X,$D0,$HN,$HP);
+        my ( $PM, $X, $D0, $HN, $HP );
 
         my $HNcarry;
         my $HPcarry;
@@ -145,27 +149,27 @@ if (0) {
 
             $HNcarry = 0;
             $HPcarry = 1;
-            for (my $k=0; $k < $kmax; $k++ ) {
-                $PM = $positions->{$b->[$j]}->[$k] // 0;
-                $X  = $PM | $HNcarry | $VNs[$k];
-                $D0 = (($VPs[$k] + ($X & $VPs[$k])) ^ $VPs[$k]) | $X;
-                $HN = $VPs[$k] & $D0;
-                $HP = $VNs[$k] | ~($VPs[$k] | $D0);
-                $X  = ($HP << 1) | $HPcarry;
-                $HPcarry = $HP >> ($width-1) & 1;
-                $VNs[$k] = ($X & $D0);
-                $VPs[$k] = ($HN << 1) | ($HNcarry) | ~($X | $D0);
+            for ( my $k = 0; $k < $kmax; $k++ ) {
+                $PM      = $positions->{ $b->[$j] }->[$k] // 0;
+                $X       = $PM | $HNcarry | $VNs[$k];
+                $D0      = ( ( $VPs[$k] + ( $X & $VPs[$k] ) ) ^ $VPs[$k] ) | $X;
+                $HN      = $VPs[$k] & $D0;
+                $HP      = $VNs[$k] | ~( $VPs[$k] | $D0 );
+                $X       = ( $HP << 1 ) | $HPcarry;
+                $HPcarry = $HP >> ( $width - 1 ) & 1;
+                $VNs[$k] = ( $X & $D0 );
+                $VPs[$k] = ( $HN << 1 ) | ($HNcarry) | ~( $X | $D0 );
 
-                $VPS->[$j][$k] = $VPs[$k];
-                $VNS->[$j][$k] = $VNs[$k];
+                $VPS->[$j-$bmin][$k] = $VPs[$k];
+                $VNS->[$j-$bmin][$k] = $VNs[$k];
 
-                $HNcarry = $HN >> ($width-1) & 1;
+                $HNcarry = $HN >> ( $width - 1 ) & 1;
             }
         }
         return [
-            #map([$_ => $_], 0 .. ($bmin-1)),
-            _backtrace2($VPS, $VNS, $amin, $amax, $bmin, $bmax),
-            #map([++$amax => $_], ($bmax+1) .. $#$b)
+            ( map { [ $_, $_      ] } (0 .. ($bmin-1)) ),
+            _backtrace2( $VPS, $VNS, $amin, $amax, $bmin, $bmax, $kmax ),
+            ( map { [ ++$amax, $_ ] } (($bmax+1) .. $#{$b}) ),
         ];
     }
 }
@@ -173,7 +177,7 @@ if (0) {
 # Hyyrö, Heikki. (2004). A Note on Bit-Parallel Alignment Computation. 79-87.
 # Fig. 3
 sub _backtrace {
-    my ($VPs, $VNs, $amin, $amax, $bmin, $bmax) = @_;
+    my ( $VPs, $VNs, $amin, $amax, $bmin, $bmax ) = @_;
 
     # recover alignment
     my $i = $amax;
@@ -183,35 +187,40 @@ sub _backtrace {
 
     my $none = '-1';
 
-    while ($i >= $amin && $j >= $bmin) {
-        if ($VPs->[$j] & (1<<$i)) {
-            unshift @ses,[$i, $none];
+    while ( $i >= $amin && $j >= $bmin ) {
+
+        if ( $VPs->[$j-$bmin] & ( 1 << ($i-$amin) ) ) {
+            unshift @ses, [ $i, $none ];
             $i--;
         }
         else {
-            if (($j > 0) && ($VNs->[$j-1] & (1<<$i))) {
-                  unshift @ses, [$none, $j];
-                  $j--;
+            if ( ( $j > $bmin  ) && ( $VNs->[ $j - $bmin - 1 ]
+                & ( 1 << ($i-$amin) ) ) ) {
+                unshift @ses, [ $none, $j ];
+                $j--;
             }
             else {
-                unshift @ses, [$i, $j];
-                $i--;$j--;
+                unshift @ses, [ $i, $j ];
+                $i--;
+                $j--;
             }
         }
     }
-    while ($i >= $amin) {
-        unshift @ses,[$i+$amin,$none];
+
+    while ( $i >= $amin ) {
+        unshift @ses, [ $i + $amin, $none ];
         $i--;
     }
-    while ($j >= $bmin) {
-        unshift @ses,[$none,$j];
+    while ( $j >= $bmin ) {
+        unshift @ses, [ $none, $j ];
         $j--;
     }
+
     return @ses;
 }
 
 sub _backtrace2 {
-    my ($VPs, $VNs, $amin, $amax, $bmin, $bmax) = @_;
+    my ( $VPs, $VNs, $amin, $amax, $bmin, $bmax, $kmax ) = @_;
 
     # recover alignment
     my $i = $amax;
@@ -221,116 +230,120 @@ sub _backtrace2 {
 
     my $none = '-1';
 
-    while ($i >= $amin && $j >= $bmin) {
-        my $k = $i / $width;
-        if ( $VPs->[$j]->[$k] & (1<<($i % $width)) ) {
-            unshift @ses, [$i, $none];
+    while ( $i >= $amin && $j >= $bmin ) {
+        my $k = ($i - $amin) / $width;
+
+        if ( $VPs->[$j-$bmin]->[$k] & ( 1 << ( ($i - $amin) % $width ) ) ) {
+            unshift @ses, [ $i, $none ];
             $i--;
         }
         else {
-            if ( ($j > 0) && ($VNs->[$j-1]->[$k] & (1<<($i % $width))) ) {
-            ##if ( ($VNs->[$j-1]->[$k] & (1<<($i % $width))) ) {
-                  unshift @ses, [$none, $j];
-                  $j--;
+            if ( ( $j > $bmin ) && ( $VNs->[ $j - $bmin - 1 ]->[$k]
+                & ( 1 << ( ($i - $amin) % $width ) ) ) ) {
+                unshift @ses, [ $none, $j ];
+                $j--;
             }
             else {
-                unshift @ses, [$i, $j];
-                $i--;$j--;
+                unshift @ses, [ $i, $j ];
+                $i--;
+                $j--;
             }
         }
     }
-    while ($i >= $amin) {
-        unshift @ses, [$i, $none];
+    while ( $i >= $amin ) {
+        unshift @ses, [ $i, $none ];
         $i--;
     }
-    while ($j >= $bmin) {
-        unshift @ses, [$none, $j];
+    while ( $j >= $bmin ) {
+        unshift @ses, [ $none, $j ];
         $j--;
     }
+
     return @ses;
 }
 
 # [HN02] Fig. 3 -> Fig. 7
 sub distance {
-    my ($self, $a, $b) = @_;
+    my ( $self, $a, $b ) = @_;
 
-    my ($amin, $amax, $bmin, $bmax) = (0, $#$a, 0, $#$b);
+    my ( $amin, $amax, $bmin, $bmax ) = ( 0, $#{$a}, 0, $#{$b} );
 
-if (1) {
-    while ($amin <= $amax and $bmin <= $bmax and $a->[$amin] eq $b->[$bmin]) {
-        $amin++;
-        $bmin++;
+    if (1) {
+        while ( $amin <= $amax and $bmin <= $bmax and $a->[$amin] eq $b->[$bmin] ) {
+            $amin++;
+            $bmin++;
+        }
+        while ( $amin <= $amax and $bmin <= $bmax and $a->[$amax] eq $b->[$bmax] ) {
+            $amax--;
+            $bmax--;
+        }
     }
-    while ($amin <= $amax and $bmin <= $bmax and $a->[$amax] eq $b->[$bmax]) {
-        $amax--;
-        $bmax--;
-    }
-}
 
     # if one of the sequences is a complete subset of the other,
     # return difference of lengths.
-    if (($amax < $amin) || ($bmax < $bmin)) { return abs(@$a - @$b); }
+    if ( ( $amax < $amin ) || ( $bmax < $bmin ) ) { return abs( @{$a} - @{$b} ); }
 
     my $positions;
 
-    if (($amax - $amin) < $width ) {
+    if ( ( $amax - $amin ) < $width ) {
 
-        $positions->{$a->[$_+$amin]} |= 1 << $_  for 0..($amax-$amin);
+        $positions->{ $a->[ $_ + $amin ] } |= 1 << $_ for 0 .. ( $amax - $amin );
 
-        my $m = $amax-$amin +1;
+        my $m    = $amax - $amin + 1;
         my $diff = $m;
 
-        my $m_mask = 1 << $m-1;
+        my $m_mask = 1 << $m - 1;
 
         my $VP = 0;
 
-        $VP = $masks[$m]; # mask from cached table
+        $VP = $masks[$m];    # mask from cached table
 
-        my $VN  = 0;
+        my $VN = 0;
 
-        my ($PM,$X,$D0,$HN,$HP);
+        my ( $PM, $X, $D0, $HN, $HP );
 
         # outer loop [HN02] Fig. 7
         # 22 instructions
         for my $j ( $bmin .. $bmax ) {
-            $PM = $positions->{$b->[$j]} // 0;
+            $PM = $positions->{ $b->[$j] } // 0;
             $X  = $PM | $VN;
-            $D0 = (($VP + ($X & $VP)) ^ $VP) | $X;
+            $D0 = ( ( $VP + ( $X & $VP ) ) ^ $VP ) | $X;
             $HN = $VP & $D0;
-            $HP = $VN | ~($VP|$D0);
-            $X  = ($HP << 1) | 1;
+            $HP = $VN | ~( $VP | $D0 );
+            $X  = ( $HP << 1 ) | 1;
             $VN = $X & $D0;
-            $VP = ($HN << 1) | ~($X | $D0);
+            $VP = ( $HN << 1 ) | ~( $X | $D0 );
 
-            if ($HP & $m_mask) { $diff++; }
-            elsif ($HN & $m_mask) { $diff--; }
+            if    ( $HP & $m_mask ) { $diff++; }
+            elsif ( $HN & $m_mask ) { $diff--; }
 
         }
         return $diff;
     }
     else {
 
-        my $m = $amax-$amin +1;
+        my $m    = $amax - $amin + 1;
         my $diff = $m;
 
         my $kmax = ($m) / $width;
-        $kmax++ if (($m) % $width);
+        $kmax++ if ( ($m) % $width );
 
         # m * 3
-        $positions->{$a->[$_+$amin]}->[$_ / $width] |= 1 << ($_ % $width) for 0..($amax-$amin);
+        $positions->{ $a->[ $_ + $amin ] }->[ $_ / $width ] |= 1 << ( $_ % $width )
+            for 0 .. ( $amax - $amin );
 
         my @mask;
 
-        $mask[$_] = 0 for (0..$kmax-1);
-        $mask[$kmax-1] = 1 << (($m-1) % $width);
+        $mask[$_] = 0 for ( 0 .. $kmax - 1 );
+        $mask[ $kmax - 1 ] = 1 << ( ( $m - 1 ) % $width );
 
         my @VPs;
-        $VPs[$_ / $width]  |= 1 << ($_ % $width)  for 0..$m-1;
+        $VPs[ $_ / $width ] |= 1 << ( $_ % $width ) for 0 .. $m - 1;
 
         my @VNs;
-        $VNs[$_] = 0 for (0..$kmax-1);
+        $VNs[$_] = 0 for ( 0 .. $kmax - 1 );
 
-        my ($PM,$X,$D0,$HN,$HP);
+        my ( $PM, $X, $D0, $HN, $HP );
 
         my $HNcarry;
         my $HPcarry;
@@ -339,20 +352,20 @@ if (1) {
 
             $HNcarry = 0;
             $HPcarry = 1;
-            for (my $k=0; $k < $kmax; $k++ ) {
-                $PM = $positions->{$b->[$j]}->[$k] // 0;
-                $X  = $PM | $HNcarry | $VNs[$k];
-                $D0 = (($VPs[$k] + ($X & $VPs[$k])) ^ $VPs[$k]) | $X;
-                $HN = $VPs[$k] & $D0;
-                $HP = $VNs[$k] | ~($VPs[$k] | $D0);
-                $X  = ($HP << 1) | $HPcarry;
-                $HPcarry = $HP >> ($width-1) & 1;
-                $VNs[$k] = ($X & $D0);
-                $VPs[$k] = ($HN << 1) | ($HNcarry) | ~($X | $D0);
-                $HNcarry = $HN >> ($width-1) & 1;
+            for ( my $k = 0; $k < $kmax; $k++ ) {
+                $PM      = $positions->{ $b->[$j] }->[$k] // 0;
+                $X       = $PM | $HNcarry | $VNs[$k];
+                $D0      = ( ( $VPs[$k] + ( $X & $VPs[$k] ) ) ^ $VPs[$k] ) | $X;
+                $HN      = $VPs[$k] & $D0;
+                $HP      = $VNs[$k] | ~( $VPs[$k] | $D0 );
+                $X       = ( $HP << 1 ) | $HPcarry;
+                $HPcarry = $HP >> ( $width - 1 ) & 1;
+                $VNs[$k] = ( $X & $D0 );
+                $VPs[$k] = ( $HN << 1 ) | ($HNcarry) | ~( $X | $D0 );
+                $HNcarry = $HN >> ( $width - 1 ) & 1;
 
-                if ($HP & $mask[$k]) { $diff++; }
-                elsif ($HN & $mask[$k]) { $diff--; }
+                if    ( $HP & $mask[$k] ) { $diff++; }
+                elsif ( $HN & $mask[$k] ) { $diff--; }
             }
         }
         return $diff;
@@ -360,53 +373,57 @@ if (1) {
 }
 
 sub sequences2hunks {
-    my ($self, $a, $b) = @_;
-    return [ map { [ $a->[$_], $b->[$_] ] } 0..$#$a ];
+    my ( $self, $a, $b ) = @_;
+
+    return [ map { [ $a->[$_], $b->[$_] ] } 0 .. $#{$a} ];
 }
 
 sub hunks2sequences {
-    my ($self, $hunks) = @_;
+    my ( $self, $hunks ) = @_;
 
     my $a = [];
     my $b = [];
 
-    for my $hunk (@$hunks) {
-        push @$a, $hunk->[0];
-        push @$b, $hunk->[1];
+    for my $hunk (@{$hunks}) {
+        push @{$a}, $hunk->[0];
+        push @{$b}, $hunk->[1];
     }
-    return ($a,$b);
+    return ( $a, $b );
 }
 
 sub sequence2char {
-    my ($self, $a, $sequence, $gap) = @_;
+    my ( $self, $a, $sequence, $gap ) = @_;
 
-    $gap = (defined $gap) ? $gap : '_';
+    $gap = ( defined $gap ) ? $gap : '_';
 
-    return [ map { ($_ >= 0) ? $a->[$_] : $gap } @$sequence ];
+    return [ map { ( $_ >= 0 ) ? $a->[$_] : $gap } @{$sequence} ];
 }
 
 sub hunks2distance {
-    my ($self, $a, $b, $hunks) = @_;
+    my ( $self, $a, $b, $hunks ) = @_;
 
     my $distance = 0;
 
-    for my $hunk (@$hunks) {
-        if (($hunk->[0] < 0) || ($hunk->[1] < 0)) { $distance++ }
-        elsif ($a->[$hunk->[0]] ne $b->[$hunk->[1]]) { $distance++ }
+    if ( scalar(@{$hunks} ) == 0) { return 0; }
+
+    for my $hunk ( @{$hunks} ) {
+        if ( scalar(@{$hunk} ) == 0) { next; }
+        elsif    ( ( $hunk->[0] < 0 ) || ( $hunk->[1] < 0 ) ) { $distance++ }
+        elsif ( $a->[ $hunk->[0] ] ne $b->[ $hunk->[1] ] ) { $distance++ }
     }
     return $distance;
 }
 
 sub hunks2char {
-    my ($self, $a, $b, $hunks) = @_;
+    my ( $self, $a, $b, $hunks ) = @_;
 
     my $chars = [];
 
-    for my $hunk (@$hunks) {
-        my $char1 = ($hunk->[0] >= 0) ? $a->[$hunk->[0]] : '_';
-        my $char2 = ($hunk->[1] >= 0) ? $a->[$hunk->[1]] : '_';
+    for my $hunk (@{$hunks}) {
+        my $char1 = ( $hunk->[0] >= 0 ) ? $a->[ $hunk->[0] ] : '_';
+        my $char2 = ( $hunk->[1] >= 0 ) ? $a->[ $hunk->[1] ] : '_';
 
-        push @$chars, [$char1,$char2];
+        push @{$chars}, [ $char1, $char2 ];
     }
     return $chars;
 }

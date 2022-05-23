@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
+use Test::More tests => 7;
 use Scalar::Util qw< refaddr >;
 
 use Math::BigFloat;
@@ -44,4 +44,37 @@ subtest '$x = Math::BigFloat -> new("2.5"); $y = $x -> as_float();' => sub {
     is(ref($y), 'Math::BigFloat', '$y is a Math::BigFloat');
     cmp_ok($y, "==", 2.5, '$y == 2.5');
     isnt(refaddr($x), refaddr($y), '$x and $y are different objects');
+};
+
+note("as_float() returns a Math::BigFloat regardless of upgrading/downgrading");
+
+require Math::BigInt;
+Math::BigInt -> upgrade("Math::BigFloat");
+Math::BigFloat -> downgrade("Math::BigInt");
+Math::BigFloat -> upgrade("Math::BigRat");
+
+$x = Math::BigFloat -> new("3");
+$y = $x -> as_float();
+
+subtest '$x = Math::BigFloat -> new("3"); $y = $x -> as_float();' => sub {
+    plan tests => 3;
+    is(ref($x), 'Math::BigInt', 'class of $x');
+    is(ref($y), 'Math::BigFloat', 'class of $y');
+    cmp_ok(eval("$y"), "==", 3, 'value of $y');
+};
+
+$y = Math::BigFloat -> as_float("3");
+
+subtest '$y = Math::BigFloat -> as_float("3");' => sub {
+    plan tests => 2;
+    is(ref($y), 'Math::BigFloat', 'class of $y');
+    cmp_ok(eval("$y"), "==", 3, 'value of $y');
+};
+
+$y = Math::BigFloat -> as_float("3.5");
+
+subtest '$y = Math::BigFloat -> as_float("3.5");' => sub {
+    plan tests => 2;
+    is(ref($y), 'Math::BigFloat', 'class of $y');
+    cmp_ok(eval("$y"), "==", 3.5, 'value of $y');
 };

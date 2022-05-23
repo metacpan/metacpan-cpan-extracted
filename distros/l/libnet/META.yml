@@ -71,5 +71,5 @@ requires:
   vars: '0'
 resources:
   repository: https://github.com/steve-m-hay/perl-libnet
-version: '3.13'
+version: '3.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

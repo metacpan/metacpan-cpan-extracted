@@ -156,6 +156,8 @@ xt/author/bzero-mbi.t
 xt/author/const-mbf.t
 xt/author/const-mbi.t
 xt/author/constructors-a-p-r.t
+xt/author/copy-mbf.t
+xt/author/copy-mbi.t
 xt/author/dparts-mbf.t
 xt/author/dparts-mbi.t
 xt/author/eparts-mbf.t
@@ -298,6 +300,7 @@ xt/author/sparts-mbi.t
 xt/author/to_base-mbi.t
 xt/author/to_base_num-mbi.t
 xt/author/to_ieee754-mbf.t
+xt/author/upgrade-mbi-mbf.t
 xt/release/cpan-changes.t
 xt/release/dist-manifest.t
 xt/release/distmeta.t

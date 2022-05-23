@@ -14,7 +14,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package Sys::OsPackage::Driver::RPM;
-$Sys::OsPackage::Driver::RPM::VERSION = '0.1.3';
+$Sys::OsPackage::Driver::RPM::VERSION = '0.1.4';
 use base "Sys::OsPackage::Driver";
 
 # check if packager command found (rpm)
@@ -102,7 +102,7 @@ Sys::OsPackage::Driver::RPM - RedHat/Fedora RPM packaging handler for Sys::OsPac
 
 =head1 VERSION
 
-version 0.1.3
+version 0.1.4
 
 =head1 SYNOPSIS
 

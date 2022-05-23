@@ -2,7 +2,7 @@ package Anonymous::Object;
 use strict;
 use warnings;
 use Data::Dumper;
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 our $UNIQUE;
 BEGIN {
@@ -122,6 +122,33 @@ sub type_map {
 		$self->{type_map} = $value;
 	}
 	return $self->{type_map};
+}
+
+sub hash_to_object_context {
+	my ( $self, $hash, %accessors ) = @_;
+	if ( ( ref($hash) || "" ) ne "HASH" ) {
+		$hash = defined $hash ? $hash : 'undef';
+		die
+			qq{HashRef: invalid value $hash for variable \$hash in method hash_to_object_context};
+	}
+	$self = $self->clean();
+	$self->default({});
+	for my $key ( keys %{$hash} ) {
+		$self->add_method(
+			{
+				name => $key,
+				set => 1,
+				code => qq|return shift->{$key}->(splice \@_, 1)|,
+				%accessors
+			}
+		);
+	}
+	my $build = $self->build;
+	for my $key ( keys %{$hash} ) {
+		my $meth = "set_${key}";
+		$build->$meth($hash->{$key});
+	}
+	return $build;
 }
 
 sub hash_to_object {
@@ -386,7 +413,7 @@ Anonymous::Object - Generate Anonymous Objects
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
@@ -517,6 +544,22 @@ Convert a perl hash into a single level perl object. Expects param $hash to be a
 	$hash->one; # 1
 	$hash->three->{four}; # 4
 	$hash->three->{five}->[0]->{six}; # 6
+
+=head2 hash_to_object_context
+
+Convert a perl hash that contain values which are sub routines where you need to keep context. 
+	
+	my $num = 1;
+	my $hash = {
+		add => { $num += $_[0] },
+		minus => { $num -= $_[0] },
+	};
+
+	my $obj = $obj->hash_to_object_context($hash, %method_options)
+
+	$hash->add(1); # 2
+	$hash->minus(1); # 1
+
 
 =head2 hash_to_nested_object
 

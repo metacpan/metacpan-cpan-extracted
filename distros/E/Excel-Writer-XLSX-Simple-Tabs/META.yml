@@ -27,4 +27,4 @@ resources:
   bugtracker: https://github.com/mrdvt92/perl-Excel-Writer-XLSX-Simple-Tabs/issues
   homepage: https://github.com/mrdvt92/perl-Excel-Writer-XLSX-Simple-Tabs
   repository: https://github.com/mrdvt92/perl-Excel-Writer-XLSX-Simple-Tabs.git
-version: '0.02'
+version: '0.03'

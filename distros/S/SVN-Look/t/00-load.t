@@ -13,3 +13,5 @@ else {
 }
 
 require_ok('SVN::Look');
+
+1;

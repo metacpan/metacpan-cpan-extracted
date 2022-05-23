@@ -1,10 +1,12 @@
-MANIFEST
 CHANGELOG
+lib/PerlIO/via/Pod.pm
+Makefile.PL
+MANIFEST
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module meta-data (added by MakeMaker)
 README
+t/coverage.t
+t/coverage2.t
+t/Pod.t
 TODO
 VERSION
-Makefile.PL
-lib/PerlIO/via/Pod.pm
-t/Pod.t
-META.yml                                Module meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

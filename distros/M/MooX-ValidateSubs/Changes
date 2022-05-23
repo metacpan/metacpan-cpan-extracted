@@ -25,3 +25,6 @@ Revision history for MooX-ValidateSubs
 
 1.012003 19/11/2017
 		Aparently I was in a special mood this morning no caveats - no stringification of indexed params. Everything should work.
+
+1.012006 23/05/2022
+	Improve test coverage to 95.4%

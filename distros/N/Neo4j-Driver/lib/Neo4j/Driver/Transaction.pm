@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Transaction;
 # ABSTRACT: Logical container for an atomic unit of work
-$Neo4j::Driver::Transaction::VERSION = '0.28';
+$Neo4j::Driver::Transaction::VERSION = '0.30';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(
@@ -111,7 +111,7 @@ use Try::Tiny;
 sub _begin {
 	my ($self) = @_;
 	
-	croak 'Nested transactions unsupported in Bolt' if $self->{net}->{active_tx};
+	croak "Concurrent transactions are unsupported in Bolt (there is already an open transaction in this session)" if $self->{net}->{active_tx};
 	
 	$self->{bolt_txn} = $self->{net}->_new_tx;
 	$self->{net}->{active_tx} = 1;
@@ -123,7 +123,7 @@ sub _begin {
 sub _run_autocommit {
 	my ($self, $query, @parameters) = @_;
 	
-	croak 'Nested transactions unsupported in Bolt' if $self->{net}->{active_tx};
+	croak "Concurrent transactions are unsupported in Bolt (there is already an open transaction in this session)" if $self->{net}->{active_tx};
 	
 	$self->{net}->{active_tx} = 1;  # run() requires an active tx
 	my $results;
@@ -283,7 +283,7 @@ Neo4j::Driver::Transaction - Logical container for an atomic unit of work
 
 =head1 VERSION
 
-version 0.28
+version 0.30
 
 =head1 SYNOPSIS
 
@@ -318,6 +318,9 @@ complete at specific points to fulfill its contracts. If you require
 execution of a statement to have completed, you need to use the
 L<Result|Neo4j::Driver::Result>, for example by calling
 one of the methods C<fetch()>, C<list()> or C<summary()>.
+
+To create a new (unmanaged) transaction, call
+L<Neo4j::Driver::Session/"begin_transaction">.
 
 =head1 METHODS
 
@@ -434,17 +437,17 @@ you intend to continue using the same session even after an error
 condition, I<and> you want to be absolutely sure the session is in
 a defined state, you can roll back a failed transaction manually:
 
- use Try::Tiny;
+ use feature 'try';
  $tx = $session->begin_transaction;
  try {
    ...;
    $tx->commit;
  }
- catch {
-   say "Database error: $_";
+ catch ($e) {
+   say "Database error: $e";
    ...;
    $tx->rollback if $tx->is_open;
- };
+ }
  # at this point, $session is safe to use
 
 =head1 EXPERIMENTAL FEATURES
@@ -485,11 +488,13 @@ L<Neo4j::Driver::Net/"USE OF INTERNAL APIS">.
 
 =item * Equivalent documentation for the official Neo4j drivers:
 L<Transaction (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/Transaction.html>,
-L<Transaction (JavaScript)|https://neo4j.com/docs/api/javascript-driver/4.3/class/lib6/transaction.js~Transaction.html>,
-L<ITransaction (.NET)|https://neo4j.com/docs/api/dotnet-driver/4.0/html/b64c7dfe-87e9-8b85-5a02-8ff03800b67b.htm>,
+L<Transaction (JavaScript)|https://neo4j.com/docs/api/javascript-driver/4.4/class/lib6/transaction.js~Transaction.html>,
+L<ITransaction (.NET)|https://neo4j.com/docs/api/dotnet-driver/4.4/html/b64c7dfe-87e9-8b85-5a02-8ff03800b67b.htm>,
 L<Sessions & Transactions (Python)|https://neo4j.com/docs/api/python-driver/current/api.html#transaction>
 
-=item * Neo4j L<Transactional Cypher HTTP API|https://neo4j.com/docs/developer-manual/3.0/http-api/>
+=item * Neo4j L<Transactional Cypher HTTP API|https://neo4j.com/docs/http-api/4.4/actions/>
+
+=item * L<Feature::Compat::Try>
 
 =back
 

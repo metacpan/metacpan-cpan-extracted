@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result;
 # ABSTRACT: Result of running a Cypher statement (a stream of records)
-$Neo4j::Driver::Result::VERSION = '0.28';
+$Neo4j::Driver::Result::VERSION = '0.30';
 
 use parent 'Neo4j::Driver::StatementResult';
 
@@ -155,17 +155,19 @@ sub has_next {
 
 
 sub attached {
-	# uncoverable pod (experimental feature)
+	# uncoverable pod (see Deprecations.pod)
 	my ($self) = @_;
 	
+	warnings::warnif deprecated => __PACKAGE__ . "->attached is deprecated";
 	return $self->{attached};
 }
 
 
 sub detach {
-	# uncoverable pod (experimental feature)
+	# uncoverable pod (see Deprecations.pod)
 	my ($self) = @_;
 	
+	warnings::warnif deprecated => __PACKAGE__ . "->detach is deprecated";
 	return $self->_fill_buffer;
 }
 
@@ -215,7 +217,7 @@ Neo4j::Driver::Result - Result of running a Cypher statement (a stream of record
 
 =head1 VERSION
 
-version 0.28
+version 0.30
 
 =head1 SYNOPSIS
 
@@ -259,6 +261,8 @@ is run on the same session or (if the result was retrieved within
 an explicit transaction) until the transaction is closed, whichever
 comes first. When a result stream has become invalid I<before> it
 was detached, calling any methods in this class may fail.
+
+To obtain a query result, call L<Neo4j::Driver::Transaction/"run">.
 
 Until version 0.18, this module was named C<StatementResult>.
 
@@ -361,21 +365,6 @@ context.
 
 Until version 0.25, it returned an array reference instead.
 
-=head2 Control result stream attachment
-
- $buffered = $result->attached;  # boolean
- $count = $result->detach;  # number of records fetched
-
-If necessary, C<detach()> can force the entire result stream to
-be buffered locally, so that it will be available to C<fetch()>
-indefinitely, irrespective of other statements run on the same
-session. Essentially, the outcome is the same as calling C<list()>,
-except that C<fetch()> can continue to be used because the result
-is not exhausted.
-
-Most of the official drivers do not offer these methods. Their
-usefulness is doubtful. They may be removed in future versions.
-
 =head2 Discarding the result stream
 
  $result->consume;
@@ -389,6 +378,9 @@ exhausts the result stream.
 As a side effect, discarding the result yields a summary of it.
 
  $result_summary = $result->consume;
+
+Using a result after this method has been called is discouraged.
+This may become a fatal error in future versions.
 
 All of the official drivers offer this method, but it doesn't appear
 to be necessary here, since L<Neo4j::Bolt::ResultStream> reliably
@@ -416,8 +408,8 @@ L<Neo4j::Driver::B<ResultSummary>>
 =item * Equivalent documentation for the official Neo4j drivers:
 L<Result (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/Result.html>,
 L<Result (Python)|https://neo4j.com/docs/api/python-driver/current/api.html#result>,
-L<Result (JavaScript)|https://neo4j.com/docs/api/javascript-driver/4.3/class/lib6/result.js~Result.html>,
-L<IResult (.NET)|https://neo4j.com/docs/api/dotnet-driver/4.0/html/f1ac31ec-c6dd-798b-b5d6-3ca0794d7502.htm>
+L<Result (JavaScript)|https://neo4j.com/docs/api/javascript-driver/4.4/class/lib6/result.js~Result.html>,
+L<IResult (.NET)|https://neo4j.com/docs/api/dotnet-driver/4.4/html/f1ac31ec-c6dd-798b-b5d6-3ca0794d7502.htm>
 
 =back
 

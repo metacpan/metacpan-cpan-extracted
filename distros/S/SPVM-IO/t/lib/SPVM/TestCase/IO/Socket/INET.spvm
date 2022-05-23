@@ -1,0 +1,111 @@
+class TestCase::IO::Socket::INET {
+  use IO::Socket::INET;
+  use IO::Socket;
+
+  static method basic : int () {
+
+    # Socket
+    my $host = "google.com";
+    my $port = 80;
+    my $socket = IO::Socket::INET->new($host, $port);
+    
+    my $write_buffer = "GET / HTTP/1.0\r\n\r\n";
+    $socket->write($write_buffer, length $write_buffer);
+    
+    my $read_buffer = new byte[100];
+    while (1) {
+      my $read_length = $socket->read($read_buffer);
+      
+      if ($read_length < 0) {
+        die "Read error";
+      }
+      
+      # print((string)sliceb($read_buffer, 0, $read_length));
+      
+      if ($read_length < @$read_buffer) {
+        last;
+      }
+    }
+    
+    $socket->close;
+    
+    return 1;
+  }
+
+
+  static method basic_interface : int () {
+
+    # Socket
+    my $host = "google.com";
+    my $port = 80;
+    my $socket = (IO::Socket)IO::Socket::INET->new($host, $port);
+    
+    my $write_buffer = "GET / HTTP/1.0\r\n\r\n";
+    $socket->write($write_buffer, length $write_buffer);
+    
+    my $read_buffer = new byte[100];
+    while (1) {
+      my $read_length = $socket->read($read_buffer);
+      
+      if ($read_length < 0) {
+        die "Read error";
+      }
+      
+      # print((string)sliceb($read_buffer, 0, $read_length));
+      
+      if ($read_length < @$read_buffer) {
+        last;
+      }
+    }
+    
+    $socket->close;
+    
+    return 1;
+  }
+
+  static method basic_auto_close : int () {
+    
+    # Socket
+    my $host = "google.com";
+    my $port = 80;
+    my $socket = IO::Socket::INET->new($host, $port);
+    
+    my $write_buffer = "GET / HTTP/1.0\r\n\r\n";
+    $socket->write($write_buffer, length $write_buffer);
+    
+    my $read_buffer = new byte[100];
+    while (1) {
+      my $read_length = $socket->read($read_buffer);
+      
+      if ($read_length < 0) {
+        die "Read error";
+      }
+      
+      # print((string)sliceb($read_buffer, 0, $read_length));
+      
+      if ($read_length < @$read_buffer) {
+        last;
+      }
+    }
+    
+    return 1;
+  }
+
+  static method fileno : int () {
+
+    # Socket
+    my $host = "google.com";
+    my $port = 80;
+    my $socket = IO::Socket::INET->new($host, $port);
+    
+    my $fileno = $socket->fileno;
+    
+    unless ($fileno > 2) {
+      return 0;
+    }
+    
+    
+    return 1;
+  }
+
+}

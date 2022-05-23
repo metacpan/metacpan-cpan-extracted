@@ -1,3 +1,7 @@
+0.0010 2022-05-21
+
+ * Add a check to Makefile.PL to verify that GMP 5.1.0 or higher is available.
+
 0.0009 2022-05-17
 
  * Sync test files with Math-BigInt.

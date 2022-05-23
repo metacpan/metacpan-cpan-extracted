@@ -13,7 +13,7 @@ use parent qw(Exporter);
 require DateTime;
 use Getopt::Long qw(GetOptionsFromArray);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our @EXPORT_OK = qw(calculate_start_end parse_argv);
 
 my %known_json = map { $_, 1 } qw(seq split pretty canonical);
@@ -109,7 +109,7 @@ sub calculate_start_end {
     my ($start, $end);
 
     if (defined $options->{from} || defined $options->{to}) {
-        die "$0: Can't use --show with --from or --to"
+        die "$0: Can't use --show with --from or --to\n"
             if defined $options->{show};
 
         # Default is midnight gone
@@ -137,11 +137,11 @@ sub calculate_start_end {
             die "$0: Can't parse '$to' for --to\n";
         }
 
-        die "$0: End $end must be after start $start (--from=$from --to=$to)"
+        die "$0: End $end must be after start $start (--from=$from --to=$to)\n"
             if $end <= $start;
     } else {
         my $show = $options->{show} // 'today';
-        if ($show =~ /\A\s*(last|this|next)\s+(hour|day|week)\s*\z/) {
+        if ($show =~ /\A\s*(last|this|next)\s+(minute|hour|day|week)\s*\z/) {
             my $which = $1;
             my $what = $2;
             my $start_of_period = DateTime->now()->truncate(to => $what);
@@ -156,7 +156,7 @@ sub calculate_start_end {
                 $start_of_period->add($what . 's' => 1);
                 $end = $start_of_period->epoch();
             }
-        } elsif ($show =~ /\A\s*(last|next)\s+([1-9][0-9]*)\s+(hour|day|week)s\s*\z/) {
+        } elsif ($show =~ /\A\s*(last|next)\s+([1-9][0-9]*)\s+(minute|hour|day|week)s\s*\z/) {
             my $which = $1;
             my $count = $2;
             my $what = $3;
@@ -186,6 +186,8 @@ sub calculate_start_end {
             $start = $midnight->epoch();
             $midnight->add(days => 1);
             $end = $midnight->epoch();
+        } elsif ($show =~ /\A(?:last|this|next)\z/) {
+            die "$0: Unknown time period '$show' for --show (did you forget to escape the space after it?)\n";
         } else {
             die "$0: Unknown time period '$show' for --show\n";
         }

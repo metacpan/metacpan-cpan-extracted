@@ -3,12 +3,14 @@ Changes
 ignore.txt
 lib/Pod/LOL.pm
 MANIFEST			This list of files
+META.json
+META.yml
 README
 t/00-load.t
-t/01-usage.t
+t/01-usage-simple.t
+t/02-usage-ojo.t
+t/03-usage-mojo-useragent.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
 xt/boilerplate.t
-META.yml
-META.json

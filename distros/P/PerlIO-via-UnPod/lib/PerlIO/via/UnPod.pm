@@ -1,6 +1,6 @@
 package PerlIO::via::UnPod;
 
-$VERSION= '0.06';
+$VERSION= '0.08';
 
 # be as strict as possible
 use strict;
@@ -94,7 +94,7 @@ PerlIO::via::UnPod - PerlIO layer for removing plain old documentation
 
 =head1 VERSION
 
-This documentation describes version 0.06.
+This documentation describes version 0.08.
 
 =head1 DESCRIPTION
 
@@ -118,6 +118,20 @@ A script that only lets source code pass.
  use PerlIO::via::UnPod;
  binmode( STDIN,':via(UnPod)' ); # could also be STDOUT
  print while <STDIN>;
+
+=head1 METHODS
+
+=head2 PUSHED
+
+Instantiate a new PerlIO::via::UnPod object.
+
+=head2 FILL
+
+Parse the file removed POD.
+
+=head2 WRITE
+
+Write the file with all POD removed.
 
 =head1 SEE ALSO
 

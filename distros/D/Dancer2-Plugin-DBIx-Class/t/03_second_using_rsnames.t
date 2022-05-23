@@ -17,18 +17,13 @@ subtest 'Check ResultSetNames' => sub {
    plan tests => 6;
 
    $res = $test->request( GET '/test_humans' );
-   is(
-      decode_json( $res->content ),
-      [qw(id name birthdate)], 'Plural on humans returns second resultset'
-   );
+   is( decode_json( $res->content ),
+      [qw(id name birthdate)], 'Plural on humans returns second resultset' );
 
    $res = $test->request( GET '/test_human' );
    is(
       decode_json( $res->content ),
-      {
-         id        => 1, name => 'Wolfgang Amadaeus Mozart',
-         birthdate => '1756-01-27'
-      },
+      { id => 1, name => 'Wolfgang Amadaeus Mozart', birthdate => '1756-01-27' },
       'Singular on human does a find() on second db'
    );
 
@@ -49,7 +44,7 @@ subtest 'Check ResultSetNames' => sub {
    $res = $test->request( GET '/test_cars' );
    like(
       decode_json( $res->content ),
-      { status => 500, exception => qr/Can't locate object method/ },
+      { status => 500,  exception => qr/Can't locate object method/ },
       'Plural on first DB dies'
    );
 

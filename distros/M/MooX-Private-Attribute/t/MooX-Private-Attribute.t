@@ -3,13 +3,14 @@ use strict;
 use warnings;
 
 subtest 'import' => sub {
-	plan tests => 7;
+	plan tests => 8;
 	ok( 
 		my $obj = do { eval q{
 			package FooBar;
 			use Moo;
 			use MooX::Private::Attribute;
 			has bar => ( is => 'rw', private => 1 );
+			has public => ( is => 'rw' );
 			sub foo { return $_[0]->bar(defined $_[1] ? $_[1] : ()); }
 			1;
 		}; 1; } && FooBar->new,
@@ -22,6 +23,7 @@ subtest 'import' => sub {
 			1;
 		}; 1; } && FooBar->new|
 	);
+	is( $obj->public('bar'), 'bar');
 	is( $obj->foo, undef );
 	is( $obj->foo('foo'), 'foo' );
 	is( $obj->foo, 'foo' );

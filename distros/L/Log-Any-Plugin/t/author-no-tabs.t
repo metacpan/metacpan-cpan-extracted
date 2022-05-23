@@ -16,18 +16,21 @@ use Test::NoTabs;
 
 my @files = (
     'lib/Log/Any/Plugin.pm',
+    'lib/Log/Any/Plugin/ContextStack.pm',
     'lib/Log/Any/Plugin/Encode.pm',
     'lib/Log/Any/Plugin/Levels.pm',
     'lib/Log/Any/Plugin/Stringify.pm',
     'lib/Log/Any/Plugin/Util.pm',
     't/00-compile.t',
     't/author-critic.t',
+    't/author-distmeta.t',
     't/author-eol.t',
     't/author-no-tabs.t',
     't/author-pod-coverage.t',
     't/author-pod-syntax.t',
     't/author-portability.t',
     't/author-synopsis.t',
+    't/plugin/context-stack.t',
     't/plugin/encode-custom.t',
     't/plugin/encode-default.t',
     't/plugin/encode-rationale.t',
@@ -36,7 +39,6 @@ my @files = (
     't/plugin/stringify.t',
     't/release-check-changes.t',
     't/release-cpan-changes.t',
-    't/release-distmeta.t',
     't/release-meta-json.t',
     't/util.t'
 );

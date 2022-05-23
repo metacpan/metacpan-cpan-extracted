@@ -13,7 +13,7 @@ Neo4j::Driver::Net - Explains the design of the networking modules
 
 =head1 VERSION
 
-version 0.28
+version 0.30
 
 =head1 OVERVIEW
 
@@ -65,7 +65,12 @@ See L</"USE OF INTERNAL APIS">.
 =head1 WARNING: EXPERIMENTAL
 
 The design of the networking helper APIs is not entirely finalised.
-While no further I<major> changes are expected, you should probably
+In particular, it is expected that the driver's C<net_module> config
+option will be replaced with a new option that allows specifying
+multiple plugins instead of just a single module. Existing
+networking modules will work as plugins with only minimal changes.
+
+You should probably
 let me know if you already are creating networking extensions, so
 that I can try to accommodate your use case and give you advance
 notice of changes.

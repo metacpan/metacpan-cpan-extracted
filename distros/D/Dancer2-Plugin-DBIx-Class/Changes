@@ -1,129 +1,14 @@
-==================================================
-Changes from 2020-10-16 00:00:00 +0000 to present.
-==================================================
+Revision history for Dancer2::Plugin::DBIx::Class
 
------------------------------------------
-version 1.06 at 2021-10-16 21:50:31 +0000
------------------------------------------
+1.1001 2022-05-23T09:16:47-04:00 America/New_York
+ [BUG FIXES]
+ - Update minimum Dancer2 version
 
-  Change: c9bb6161c5248d63898f22c646d295eb2eed90ff
-  Author: D Ruth Holloway <ruth@hiruthie.me>
-  Date : 2021-10-16 17:48:21 +0000
+ [STATISTICS]
+ - code churn: 2 files changed, 25 insertions(+), 4 deletions(-)
 
-    Missed a couple of spots! Grrr.... 
+1.1000 2022-05-22T14:08:50-04:00 America/New_York
+ - First version that actually has a Changes file. :-)
 
-  Change: 48fdc5961f3ca05448c9e9213add602699a3827c
-  Author: D Ruth Holloway <ruth@hiruthie.me>
-  Date : 2021-10-16 17:30:28 +0000
-
-    Fix a couple of bugs, update a docs bug. 
-
-  Change: 6cc408a50b61a874eb770324b5ee9ca18d390436
-  Author: D Ruth Holloway <ruth@hiruthie.me>
-  Date : 2021-10-13 21:27:25 +0000
-
-    Update version number 
-
-  Change: fbb6528e4ec88bfba175f3a9bd9b8d223179e45a
-  Author: D Ruth Holloway <ruth@hiruthie.me>
-  Date : 2021-10-13 21:19:04 +0000
-
-    Update version number 
-
-  Change: ff623ff9232648ed1a5d60b44625a699376cce78
-  Author: D Ruth Holloway <ruth@hiruthie.me>
-  Date : 2021-10-13 21:13:43 +0000
-
-    Add DSL collision prevention, and rework docs 
-
-  Change: e313c1ebfca5a6c5d1e5224de831ae2127cfcb03
-  Author: D Ruth Holloway <ruth@hiruthie.me>
-  Date : 2021-10-13 20:21:32 +0000
-
-    Finish tests, add alias capability 
-
-  Change: a9d320f5ad6f07ae4d6ca155155fba44be391786
-  Author: D Ruth Holloway <ruth@hiruthie.me>
-  Date : 2021-10-03 21:08:33 +0000
-
-    Add second test routine 
-
-  Change: 82ee7790e84ce12170d01fe391afe0d24663600b
-  Author: D Ruth Holloway <ruth@hiruthie.me>
-  Date : 2021-10-03 20:30:43 +0000
-
-    Get tests working on second schema with RSnames 
-
-  Change: 83c917f797b5bf8a94f46e989717a0f09367317b
-  Author: D Ruth Holloway <ruth@hiruthie.me>
-  Date : 2021-10-03 19:32:28 +0000
-
-    Rearrange tests to make more sense for multiple schema 
-
-  Change: 1b35395a99120e8979177bb63977900c60ac69d0
-  Author: D Ruth Holloway <ruth@hiruthie.me>
-  Date : 2021-10-03 18:46:33 +0000
-
-    Modify to handle multiple schema 
-
-  Change: 5a74a89bef087e16436868206f1d78f3762a397d
-  Author: D Ruth Holloway <ruth@hiruthie.me>
-  Date : 2021-09-26 14:14:25 +0000
-
-    remove cruft from test db 
-
-  Change: 3d5e5a2117ac42d8fd50cf6a9c6610a0ec63fa63
-  Author: D Ruth Holloway <ruth@hiruthie.me>
-  Date : 2021-09-24 20:57:28 +0000
-
-    Apply mst's patch for indirection, set up VSCode environment 
-
-  Change: 2b174ae48472d3ddfb3c11c60fa76de6633033d7
-  Author: Ruth Holloway <ruth@hiruthie.me>
-  Date : 2021-05-21 00:35:04 +0000
-
-    Merge branch 'docs/fix-config' into 'main'
-
-    Fix an incorrect config key
-
-    See merge request GeekRuthie/Dancer2-Plugin-DBIx-Class!1 
-
-  Change: aa30b63b9cd4e9c86712bb475814bb60e1ebd34a
-  Author: Jason A. Crome <jason@crome-plated.com>
-  Date : 2021-05-20 17:07:07 +0000
-
-    Fix an incorrect config key. 
-
-  Change: dd079852caa4ef50fe336f16270e00371612c180
-  Author: D Ruth Holloway <ruthh@clearbuilt.com>
-  Date : 2021-03-05 19:47:44 +0000
-
-    Add dependency that was breaking automated tests. 
-
-  Change: b84de345cc42888442fe0f33684b38cff9c76260
-  Author: D Ruth Holloway <ruthh@clearbuilt.com>
-  Date : 2021-02-27 17:57:06 +0000
-
-    Minor doc updates 
-
-  Change: 754bf339c9516de57917804d606c63fd7d694bc9
-  Author: D Ruth Holloway <ruth@hiruthie.me>
-  Date : 2021-02-26 19:46:48 +0000
-
-    V 1.0 release prep 
-
-  Change: a5201f358ea9424411f8b0e196db7eec6d46c011
-  Author: D Ruth Holloway <ruthh@clearbuilt.com>
-  Date : 2021-01-18 19:18:14 +0000
-
-    Tidy up, write tests 
-
-  Change: 26a4cec2632aa86a5cb731100612721b48f4dcd6
-  Author: D Ruth Holloway <ruthh@clearbuilt.com>
-  Date : 2021-01-17 19:02:24 +0000
-
-    Initial commit 
-
-================
-End of releases.
-================
+ [STATISTICS]
+ - code churn: 6 files changed, 31 insertions(+), 112 deletions(-)

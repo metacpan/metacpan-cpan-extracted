@@ -1,5 +1,9 @@
 Revision history for Perl distribution PerlIO-via-QuotedPrint.
 
+0.10 2022-05-22
+
+    - Add missing exit() to t/QuotedPrint.t.  [Karl Williamson, PR#1]
+
 0.09 2020-12-08
 
     - Added INSTALLDIRS, accounting for the @INC reordering change in Perl 5.12.

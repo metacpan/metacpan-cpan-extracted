@@ -4,7 +4,7 @@ author:
   - 'Damian Conway <damian@conway.org>, Adam Kennedy <adamk@cpan.org>, Steve Hay <shay@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Test::More: '0.47'
+  Test::More: '0.88'
   vars: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
@@ -44,5 +44,5 @@ requires:
   vars: '0'
 resources:
   repository: https://github.com/steve-m-hay/Text-Balanced
-version: '2.04'
+version: '2.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

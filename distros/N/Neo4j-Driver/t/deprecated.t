@@ -18,7 +18,7 @@ my $s = $driver->session;
 # functionality. If the behaviour of such functionality changes, we
 # want it to be a conscious decision, hence we test for it.
 
-use Test::More 0.96 tests => 15 + 3;
+use Test::More 0.96 tests => 17 + 3;
 use Test::Exception;
 use Test::Warnings qw(warning warnings);
 my $transaction = $driver->session->begin_transaction;
@@ -147,6 +147,28 @@ subtest 'driver mutability (config/auth)' => sub {
 };
 
 
+subtest 'jolt config option' => sub {
+	plan tests => 13;
+	lives_ok { $d = 0; $d = Neo4j_Test->driver_maybe(); } 'get driver';
+	lives_ok { $w = ''; $w = warning { $d->config(jolt => 1); }; } 'jolt 1 lives';
+	like $w, qr/\bjolt\b.*\bdeprecated\b/i, 'jolt 1 deprecated'
+		or diag 'got warning(s): ', explain $w;
+	is $d->{jolt}, 1, 'jolt 1';
+	lives_ok { $w = ''; $w = warning { $d->config(jolt => 0); }; } 'jolt 0 lives';
+	like $w, qr/\bjolt\b.*\bdeprecated\b/i, 'jolt 0 deprecated'
+		or diag 'got warning(s): ', explain $w;
+	is $d->{jolt}, 0, 'jolt 0';
+	lives_ok { $w = ''; $w = warning { $d->config(jolt => undef); }; } 'jolt undef lives';
+	is_deeply $w, [], 'jolt undef not deprecated'
+		or diag 'got warning(s): ', explain $w;
+	is $d->{jolt}, undef, 'jolt undef';
+	lives_ok { $w = ''; $w = warning { $d->config(jolt => 'foo'); }; } 'jolt mode lives';
+	like $w, qr/\bjolt\b.*\bdeprecated\b/i, 'jolt mode deprecated'
+		or diag 'got warning(s): ', explain $w;
+	is $d->{jolt}, 'foo', 'jolt mode';
+};
+
+
 subtest 'cypher_filter' => sub {
 	plan tests => 13;
 	my ($t, @q);
@@ -180,7 +202,7 @@ use parent 'Neo4j_Test::MockHTTP';
 sub can { return if $_[1] eq 'protocol'; return shift->SUPER::can(@_); }
 }
 subtest 'ServerInfo protocol()' => sub {
-	plan tests => 14;
+	plan tests => 10;
 	my ($si, $w);
 	my %uri = (uri => URI->new('http:'));
 	lives_and { ok $si = Neo4j::Driver::ServerInfo->new({%uri}) } 'new undef';
@@ -193,10 +215,6 @@ subtest 'ServerInfo protocol()' => sub {
 	lives_and { is $si->protocol(), 'Bolt' } 'protocol empty';
 	lives_and { ok $si = Neo4j::Driver::ServerInfo->new({%uri, protocol => '2.2'}) } 'new version';
 	lives_and { is $si->protocol(), 'Bolt/2.2' } 'protocol version';
-	lives_and { ok $si = Neo4j::Driver::ServerInfo->new({%uri, protocol_string => 'HTTP/0.9'}) } 'new string';
-	lives_and { is $si->protocol(), 'HTTP/0.9' } 'protocol string';
-	lives_and { ok $si = Neo4j::Driver::ServerInfo->new({%uri, protocol => '0.1', protocol_string => 'HTTP/1.0'}) } 'new both';
-	lives_and { is $si->protocol(), 'HTTP/1.0' } 'protocol string precedence';
 	my $d = Neo4j::Driver->new('http:');
 	$d->config(net_module => 'Neo4j_Test::MockHTTP::NoProtocol');
 	lives_and { $si = 0; ok $si = $d->session(database => 'dummy')->server } 'no protocol()';
@@ -262,6 +280,23 @@ subtest 'multiple statements via run([])' => sub {
 	like $w, qr/\bmultiple statements\b.*\bdeprecated\b/i, 'wantarray multiple statements deprecated'
 		or diag 'got warning(s): ', explain $w;
 	lives_and { is $a[0]->single->get * $a[1]->single->get, 7 * 11 } 'wantarray values';
+};
+
+
+subtest 'result stream interface: attachment' => sub {
+	plan tests => 8;
+	$r = $s->run('RETURN 42');
+	my ($a, $c);
+	lives_ok { $w = ''; $w = warning { $a = $r->attached } } 'is attached lives';
+	like $w, qr/\battached\b.*\bdeprecated\b/i, 'attached deprecated'
+		or diag 'got warning(s): ', explain $w;
+	lives_ok { $w = ''; $w = warning { $c = $r->detach } } 'detach lives';
+	like $w, qr/\bdetach\b.*\bdeprecated\b/i, 'detach deprecated'
+		or diag 'got warning(s): ', explain $w;
+	is $c, ($a ? 1 : 0), 'one row detached';
+	lives_ok { warning { $a = $r->attached } } 'not attached lives';
+	ok ! $a, 'not attached';
+	lives_and { ok $r->has_next } 'not exhausted';
 };
 
 

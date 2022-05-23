@@ -1,3 +1,9 @@
+
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/random-poissondisc?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/random-poissondisc)
+[![Windows](https://github.com/Corion/Random-PoissonDisc/workflows/windows/badge.svg)](https://github.com/Corion/Random-PoissonDisc/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/Random-PoissonDisc/workflows/macos/badge.svg)](https://github.com/Corion/Random-PoissonDisc/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/Random-PoissonDisc/workflows/linux/badge.svg)](https://github.com/Corion/Random-PoissonDisc/actions?query=workflow%3Alinux)
+
 # NAME
 
 Random::PoissonDisc - distribute points aesthetically in R^n
@@ -59,6 +65,19 @@ ew neighbours can be placed around a point.
     the longer the algorithm will run for generating a number of points.
 
     In the algorithm description, this constant is named _k_.
+
+- `avoid_edge` - The distance from the edge of the plot.
+
+    Default is `0`
+
+    If greater than zero, this will not plot points within that distance from the edge.
+
+- `center` - Start adding points at the center of the plot.
+
+    Default is `0`
+
+    If this is set to the default, the initial point will be added at a
+    random position in the plot.
 
 ## INTERNAL SUBROUTINES
 
@@ -136,7 +155,7 @@ The public support forum of this module is
 
 Please report bugs in this module via the RT CPAN bug queue at
 [https://rt.cpan.org/Public/Dist/Display.html?Name=Random-PoissonDisc](https://rt.cpan.org/Public/Dist/Display.html?Name=Random-PoissonDisc)
-or via mail to [random-poissondisc@rt.cpan.org](https://metacpan.org/pod/random-poissondisc@rt.cpan.org).
+or via mail to [random-poissondisc@rt.cpan.org](https://metacpan.org/pod/random-poissondisc%40rt.cpan.org).
 
 # AUTHOR
 

@@ -1,5 +1,14 @@
 Revision history for Neo4j::Driver
 
+0.30  2022-05-20
+
+ - Add experimental config option concurrent_tx to explicitly enable support
+   for multiple concurrent transactions within the same HTTP session
+ - Deprecate experimental config option jolt that allowed disabling Jolt
+ - Deprecate experimental methods Result->attached() and Result->detach()
+ - Deprecate method protocol() in experimental LWP net module
+ - Rename method agent() to ua() in experimental LWP net module
+
 0.28  2022-01-25
 
  - Deprecate experimental return of results in JSON "graph" format

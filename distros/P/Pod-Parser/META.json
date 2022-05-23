@@ -1,0 +1,44 @@
+{
+   "abstract" : "Modules for parsing/translating POD format documents",
+   "author" : [
+      "Brad Appleton <bradapp@enteract.com>, Marek Rouchal <marekr@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pod-Parser",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "Test::More" : "0.6"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.65",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

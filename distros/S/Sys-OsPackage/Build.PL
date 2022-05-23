@@ -18,7 +18,7 @@ my %module_build_args = (
     "Ian Kluft <cpan-dev\@iankluft.com>"
   ],
   "dist_name" => "Sys-OsPackage",
-  "dist_version" => "0.1.3",
+  "dist_version" => "0.1.4",
   "license" => "artistic_2",
   "module_name" => "Sys::OsPackage",
   "recursive_test_files" => 1,
@@ -42,8 +42,7 @@ my %module_build_args = (
     "Cwd" => 0,
     "File::Copy::Recursive" => 0,
     "Getopt::Long" => 0,
-    "Test::More" => 0,
-    "YAML" => 0
+    "Test::More" => 0
   }
 );
 
@@ -53,8 +52,7 @@ my %fallback_build_requires = (
   "File::Copy::Recursive" => 0,
   "Getopt::Long" => 0,
   "Module::Build" => "0.28",
-  "Test::More" => 0,
-  "YAML" => 0
+  "Test::More" => 0
 );
 
 

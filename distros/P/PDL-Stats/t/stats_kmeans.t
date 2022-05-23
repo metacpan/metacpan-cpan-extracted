@@ -1,5 +1,3 @@
-#!/usr/bin/perl 
-
 use strict;
 use warnings;
 use Test::More;
@@ -258,8 +256,6 @@ sub t_pca_cluster {
 }
 
 done_testing();
-
-
 
 sub lvalue_assign_detour {
     my ($pdl, $index, $new_value) = @_;

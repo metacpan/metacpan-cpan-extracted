@@ -1,8 +1,5 @@
 use ExtUtils::MakeMaker;
-use ExtUtils::MakeMaker::META_MERGE::GitHub;
-my $mm = ExtUtils::MakeMaker::META_MERGE::GitHub->new(owner=>"mrdvt92", repo=>"perl-Excel-Writer-XLSX-Simple-Tabs");
 WriteMakefile(
-    $mm->META_MERGE,
     NAME           => 'Excel::Writer::XLSX::Simple::Tabs',
     VERSION_FROM   => 'lib/Excel/Writer/XLSX/Simple/Tabs.pm',
     AUTHOR         => 'Michael R. Davis',
@@ -17,5 +14,21 @@ WriteMakefile(
                       'Package::New'                            => 0,
                       'IO::Scalar'                              => 0, #package is IO-stringy
                       'Excel::Writer::XLSX'                     => 0,
+                     },
+    META_MERGE    => {
+                      'resources' => {
+                                       'repository' => {
+                                                         'web' => 'https://github.com/mrdvt92/perl-Excel-Writer-XLSX-Simple-Tabs.git',
+                                                         'url' => 'git@github.com:mrdvt92/perl-Excel-Writer-XLSX-Simple-Tabs.git',
+                                                         'type' => 'git'
+                                                       },
+                                       'homepage' => 'https://github.com/mrdvt92/perl-Excel-Writer-XLSX-Simple-Tabs',
+                                       'bugtracker' => {
+                                                         'web' => 'https://github.com/mrdvt92/perl-Excel-Writer-XLSX-Simple-Tabs/issues'
+                                                       }
+                                     },
+                      'meta-spec' => {
+                                       'version' => 2
+                                     },
                      },
 );

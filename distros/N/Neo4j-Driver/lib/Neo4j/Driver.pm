@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver;
 # ABSTRACT: Neo4j community graph database driver for Bolt and HTTP
-$Neo4j::Driver::VERSION = '0.28';
+$Neo4j::Driver::VERSION = '0.30';
 
 use Carp qw(croak);
 
@@ -33,6 +33,7 @@ my %OPTIONS = (
 	cypher_types => 'cypher_types',
 	encrypted => 'tls',
 	jolt => 'jolt',
+	concurrent_tx => 'concurrent_tx',
 	net_module => 'net_module',
 	timeout => 'http_timeout',
 	tls => 'tls',
@@ -168,6 +169,7 @@ sub _parse_options {
 		croak "Unimplemented cypher filter '$options{cypher_filter}'" if $options{cypher_filter} ne 'params';
 		$options{cypher_params} = v2;
 	}
+	warnings::warnif deprecated => "Config option jolt is deprecated: Jolt is now enabled by default" if defined $options{jolt};
 	
 	my @unsupported = ();
 	foreach my $key (keys %options) {
@@ -210,7 +212,7 @@ Neo4j::Driver - Neo4j community graph database driver for Bolt and HTTP
 
 =head1 VERSION
 
-version 0.28
+version 0.30
 
 =head1 SYNOPSIS
 
@@ -232,17 +234,18 @@ version 0.28
 
 =head1 DESCRIPTION
 
-This is an unofficial Perl implementation of the
-L<Neo4j Driver API|https://neo4j.com/docs/driver-manual/current/>.
-It enables interacting with a Neo4j database server using the
-same classes and method calls as the official Neo4j drivers do.
+This software is a community driver for the
+L<Neo4j|https://neo4j.com/> graph database server.
+It is designed to follow the Neo4j Driver API, allowing
+clients to interact with a Neo4j server using the same
+classes and method calls as the official Neo4j drivers do.
+This extends the uniformity across languages, which is a
+stated goal of the Neo4j Driver API, to Perl.
 
-This driver extends the uniformity across languages, which is a
-stated goal of the Neo4j Driver API, to Perl. The downside is that
-this driver doesn't offer fully-fledged object bindings like the
-existing L<REST::Neo4p> module does. Nor does it offer any L<DBI>
-integration. However, it avoids the legacy C<cypher> endpoint,
-assuring compatibility with Neo4j versions 2.3, 3.x and 4.x.
+This driver targets the Neo4j community edition,
+version 2.3, 3.x and 4.x. The Neo4j enterprise edition
+and AuraDB are only supported as far as practical,
+but patches will be accepted.
 
 Two different network protocols exist for connecting to Neo4j.
 By default, Neo4j servers offer both, but this can be changed
@@ -261,7 +264,7 @@ lagging after major updates to Neo4j.
 
 This driver supports Bolt, but doesn't bundle the necessary XS
 packages. You will need to install L<Neo4j::Bolt> separately
-to enable Bolt.
+to enable Bolt for this driver.
 
 =item HTTP / HTTPS
 
@@ -269,6 +272,10 @@ Support for HTTP is built into this driver, so it is always
 available. HTTP is still fast enough for many use cases and
 works even in a "Pure Perl" environment. It may also be
 quicker than Bolt to add support for future changes in Neo4j.
+
+HTTP connections will use B<Jolt> (JSON Bolt) when available.
+For older Neo4j servers (before S<version 4.2>), the driver
+will automatically fall back to slower REST-style JSON.
 
 The driver also supports encrypted communication using HTTPS,
 but doesn't bundle the necessary packages. You will need to
@@ -279,19 +286,34 @@ install L<LWP::Protocol::https> separately to enable HTTPS.
 The protocol is automatically chosen based on the URI scheme.
 See L</"uri"> for details.
 
-B<As of version 0.13, the interface of this software may be
-considered stable.>
+B<This driver's development is not yet considered finalised.>
 
-However, bugs may still exist. Also, experimental features may be
-changed or deprecated at any time. If you find yourself reliant on
-an experimental feature, please file a new issue requesting that it
-be made stable.
+As of version 0.30, the major open items are:
 
-There is an ongoing effort to clean up the experimental features.
-For each of them, the goal is to eventually either declare it stable
-or deprecate it. There is also ongoing work to further improve
-general stability and reliability of this software. However, there
-is no schedule for the completion of these efforts.
+=over
+
+=item *
+
+Finalising the API for custom networking modules.
+(This is expected to require moving closer to a plugin API,
+in addition to formal specification of the result handler API.)
+
+=item *
+
+Support for the C<neo4j:> URI scheme in some fashion.
+(No implementation of Bolt routing is currently planned.)
+
+=item *
+
+Managed transactions through transaction functions.
+
+=back
+
+Once the above items are implemented, this driver will
+move to S<version 1.00,> removing L<deprecated
+functionality|Neo4j::Driver::Deprecations>.
+There is an ongoing effort to work on these and other
+items, but there is no schedule for their completion.
 
 =head1 METHODS
 
@@ -370,24 +392,6 @@ These are subject to unannounced modification or removal in future
 versions. Expect your code to break if you depend upon these
 features.
 
-=head2 Disable or enforce Jolt
-
- $d->config(jolt => undef);  # prefer Jolt (the default)
- $d->config(jolt => 0);      # accept only JSON
- $d->config(jolt => 1);      # accept only Jolt
-
-The L<Jolt|https://neo4j.com/docs/http-api/4.3/actions/result-format/#_jolt>
-response format (JSON Bolt) is preferred for HTTP connections
-because the older JSON response format has several known issues
-and is much slower than Jolt.
-
-The Jolt format can be enforced or disabled as shown above.
-If you use the scalars C<'sparse'>, C<'strict'> or C<'ndjson'>
-instead of just C<1>, the driver will request that particular
-Jolt mode from the server. However, there is generally no
-advantage to enforcing Jolt or to manually selecting one
-of these modes. This feature is for testing purposes only.
-
 =head2 Custom networking modules
 
  use Local::MyNetworkAgent;
@@ -410,6 +414,48 @@ auto-detection.
 This config option is experimental because the API for custom
 networking modules is still evolving. See L<Neo4j::Driver::Net>
 for details.
+
+It is likely that this option will soon be replaced with a new
+option that allows specifying multiple plugins instead of just a
+single module. Existing networking modules will work as plugins
+with only minimal changes.
+
+=head2 Concurrent transactions in HTTP sessions
+
+ $session = Neo4j::Driver->new({
+   concurrent_tx => 1,
+   uri => 'http://...',
+ })->session;
+ $tx1 = $session->begin_transaction;
+ $tx2 = $session->begin_transaction;
+ $tx3 = $session->run(...);
+
+The Neo4j Driver API officially doesn't allow multiple concurrent
+transactions (sometimes called "nested transactions") to be open
+within the same session. The standard way to work with multiple
+concurrent transactions is to simply use multiple sessions. However,
+since HTTP is a stateless protocol, concurrent transactions are
+still possible on connections which use the C<http:> or C<https:>
+protocol scheme.
+
+This driver allows concurrent transactions on HTTP when the
+C<concurrent_tx> config option is enabled. Trying to enable this
+option on a Bolt connection is a fatal error.
+
+The default for HTTP connections is currently to enable concurrent
+transactions, but this will likely change in a future version.
+The driver will currently give warnings on a best-effort basis
+when using concurrent transactions on HTTP I<without> enabling this
+option, but these warnings may become fatal errors in future.
+
+When using HTTP, you should consider making a conscious choice
+regarding whether or not to use concurrent transactions, and
+configuring your driver accordingly. This can help to avoid
+surprising behaviour in case you switch to Bolt at a later point
+in time.
+
+This config option is experimental because its name and semantics
+are still evolving.
 
 =head2 Parameter syntax conversion
 
@@ -467,7 +513,7 @@ Specifies whether to use secure communication using TLS. This
 L<implies|IO::Socket::SSL/"Essential Information About SSL/TLS">
 not just encryption, but also verification of the server's identity.
 
-By default, the local system's trust store will be used to verify
+By default, a trust store on the local system will be used to verify
 the server's identity. This will fail unless your Neo4j installation
 uses a key pair that is trusted and verifiable through the global
 CA infrastructure. If that's not the case, you may need to
@@ -540,17 +586,19 @@ if no port is specified, the protocol's default port will be used.
  $driver->config(uri => 'http://localhost');
  $driver->config(uri => 'http://localhost:7474/');
 
+The C<neo4j> URI scheme is not yet implemented. Once it is added
+to a future version of this driver, the default URI scheme will
+likely change to C<neo4j>.
+
 =head1 ENVIRONMENT
 
-This software currently targets Neo4j versions 2.3, 3.x and 4.x.
-
 This software requires at least Perl 5.10, though you should consider
-using Perl 5.16 or newer if you can.
+using Perl 5.26 or newer if you can.
 
 =head1 DIAGNOSTICS
 
 Neo4j::Driver currently dies as soon as an error condition is
-discovered. Use C<eval>, L<Try::Tiny> or similar to catch this.
+discovered. Use L<C<try>|perlsyn/"Try"> or C<eval> to catch this.
 
 Warnings are given when deprecated or ambiguous method calls are used.
 These warnings may be disabled if desired.
@@ -569,9 +617,6 @@ languages. Differences between this driver and the official Neo4j drivers in
 either the API or the behaviour are generally to be regarded as bugs unless
 there is a compelling reason for a different approach in Perl.
 
-Due to lack of resources, only the Neo4j community edition is targeted by this
-driver at present.
-
 =head1 SEE ALSO
 
 =over
@@ -581,7 +626,7 @@ driver at present.
 =item * Official API documentation:
 L<Neo4j Driver API Specification|https://7687.org/driver_api/driver-api-specification.html>,
 L<Neo4j Drivers Manual|https://neo4j.com/docs/driver-manual/4.1/>,
-L<Neo4j HTTP API Docs|https://neo4j.com/docs/http-api/4.3/>
+L<Neo4j HTTP API Docs|https://neo4j.com/docs/http-api/4.4/>
 
 =item * Other modules for working with Neo4j:
 L<DBD::Neo4p>,
@@ -598,7 +643,7 @@ Special thanks go to Mark A. Jensen (MAJENSEN). Without the
 inspiration of his L<REST::Neo4p>, this driver project I<probably>
 would never have been even gotten started. And without Mark's
 tremendous work on L<Neo4j::Bolt> and libneo4j-client, this
-driver I<certainly> would be a far cry from what it is today.
+driver I<certainly> would be in much worse shape than it is today.
 
 =head1 AUTHOR
 

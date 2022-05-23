@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::ResultSummary;
 # ABSTRACT: Details about the result of running a statement
-$Neo4j::Driver::ResultSummary::VERSION = '0.28';
+$Neo4j::Driver::ResultSummary::VERSION = '0.30';
 
 use Carp qw(croak);
 
@@ -90,7 +90,7 @@ Neo4j::Driver::ResultSummary - Details about the result of running a statement
 
 =head1 VERSION
 
-version 0.28
+version 0.30
 
 =head1 SYNOPSIS
 
@@ -119,6 +119,8 @@ The result summary of running a statement. The result summary can be
 used to investigate details about the result, like the Neo4j server
 version, how many and which kinds of updates have been executed, and
 query plan information if available.
+
+To obtain a result summary, call L<Neo4j::Driver::Result/"summary">.
 
 =head1 METHODS
 
@@ -198,8 +200,8 @@ L<Neo4j::Driver::B<SummaryCounters>>
 
 =item * Equivalent documentation for the official Neo4j drivers:
 L<ResultSummary (Java)|https://neo4j.com/docs/api/java-driver/current/index.html?org/neo4j/driver/summary/ResultSummary.html>,
-L<ResultSummary (JavaScript)|https://neo4j.com/docs/api/javascript-driver/4.3/class/lib6/result-summary.js~ResultSummary.html>,
-L<IResultSummary (.NET)|https://neo4j.com/docs/api/dotnet-driver/4.0/html/17958e2b-d923-ab62-bb96-697556493c2e.htm>
+L<ResultSummary (JavaScript)|https://neo4j.com/docs/api/javascript-driver/4.4/class/lib6/result-summary.js~ResultSummary.html>,
+L<IResultSummary (.NET)|https://neo4j.com/docs/api/dotnet-driver/4.4/html/17958e2b-d923-ab62-bb96-697556493c2e.htm>
 
 =back
 

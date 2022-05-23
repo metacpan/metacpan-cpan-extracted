@@ -1,5 +1,8 @@
 Revision history for Test2-Tools-HTTP-UA-Mojo
 
+0.05      2022-05-21 07:04:59 -0600
+  - Use a more reliably bogus domain for bogus URL test (gh#5, gh#6)
+
 0.04      2019-05-15 21:12:09 -0600
   - Fix compatability with latest version of Test2::Suite (gh#2)
 

@@ -2,7 +2,7 @@ package MooX::Purple::G;
 use strict;
 use warnings;
 use 5.006;
-our $VERSION = '0.16';
+our $VERSION = '0.19';
 use PPR;
 use Perl::Tidy;
 use Cwd qw/abs_path/;
@@ -411,26 +411,26 @@ sub prepare_pod {
 	my $class = shift;
 	if (!$POD{$class}) {
 		$POD{$class} = $POD{CURRENT} = { PARSED => 0, DATA => [] };
-		push @{$POD{$class}{DATA}}, "=head1 NAME
+		push @{$POD{$class}{DATA}}, "	=head1 NAME
 
-$class - The great new $class!
+	$class - The great new $class!
 
-=cut";
-		push @{$POD{$class}{DATA}}, "=head1 Version
+	=cut";
+		push @{$POD{$class}{DATA}}, "	=head1 Version
 
-Version $DIST_VERSION
+	Version $DIST_VERSION
 
-=cut";
-		push @{$POD{$class}{DATA}}, "=head1 SYNOPSIS
+	=cut";
+		push @{$POD{$class}{DATA}}, "	=head1 SYNOPSIS
 
-	use $class;
+		use $class;
 
-	$class\-\>new(\\%args)
+		$class\-\>new(\\%args)
 
-=cut";
-		push @{$POD{$class}{DATA}}, "=head1 SUBROUTINES/METHODS
+	=cut";
+		push @{$POD{$class}{DATA}}, "	=head1 SUBROUTINES/METHODS
 
-=cut";
+	=cut";
 		return 0;
 	}
 	return 1;
@@ -441,96 +441,96 @@ sub render_pod {
 	if ($POD{$class}) {
 		if (!$POD{$class}{PARSED}) {
 			(my $url_class = $class) =~ s/\:\:/-/g;
-			push @{$POD{$class}{DATA}}, "=head1 AUTHOR
+			push @{$POD{$class}{DATA}}, "	=head1 AUTHOR
 
-$AUTHOR, C<< <$AUTHOR_EMAIL> >>
+	$AUTHOR, C<< <$AUTHOR_EMAIL> >>
 
-=cut";
-			push @{$POD{$class}{DATA}}, "=head1 BUGS
+	=cut";
+			push @{$POD{$class}{DATA}}, "	=head1 BUGS
 
-Please report any bugs or feature requests to C<bug-moox-purple at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=$url_class>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+	Please report any bugs or feature requests to C<bug-moox-purple at rt.cpan.org>, or through
+	the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=$url_class>.  I will be notified, and then you'll
+	automatically be notified of progress on your bug as I make changes.
 
-=cut";
-			push @{$POD{$class}{DATA}}, "=head1 SUPPORT
+	=cut";
+			push @{$POD{$class}{DATA}}, "	=head1 SUPPORT
 
-You can find documentation for this module with the perldoc command.
+	You can find documentation for this module with the perldoc command.
 
-    perldoc $class
+	    perldoc $class
 
 
-You can also look for information at:
+	You can also look for information at:
 
-=over 4
+	=over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+	=item * RT: CPAN's request tracker (report bugs here)
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=$url_class>
+	L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=$url_class>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+	=item * AnnoCPAN: Annotated CPAN documentation
 
-L<http://annocpan.org/dist/$url_class>
+	L<http://annocpan.org/dist/$url_class>
 
-=item * CPAN Ratings
+	=item * CPAN Ratings
 
-L<http://cpanratings.perl.org/d/$url_class>
+	L<http://cpanratings.perl.org/d/$url_class>
 
-=item * Search CPAN
+	=item * Search CPAN
 
-L<http://search.cpan.org/dist/$url_class/>
+	L<http://search.cpan.org/dist/$url_class/>
 
-=back
+	=back
 
-=cut";
-			push @{$POD{$class}{DATA}}, "=head1 ACKNOWLEDGEMENTS
+	=cut";
+			push @{$POD{$class}{DATA}}, "	=head1 ACKNOWLEDGEMENTS
 
-=cut";
+	=cut";
 
-			push @{$POD{$class}{DATA}}, "=head1 LICENSE AND COPYRIGHT
+			push @{$POD{$class}{DATA}}, "	=head1 LICENSE AND COPYRIGHT
 
-Copyright 2019 $AUTHOR.
+	Copyright 2019 $AUTHOR.
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
+	This program is free software; you can redistribute it and/or modify it
+	under the terms of the the Artistic License (2.0). You may obtain a
+	copy of the full license at:
 
-L<http://www.perlfoundation.org/artistic_license_2_0>
+	L<http://www.perlfoundation.org/artistic_license_2_0>
 
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
+	Any use, modification, and distribution of the Standard or Modified
+	Versions is governed by this Artistic License. By using, modifying or
+	distributing the Package, you accept this license. Do not use, modify,
+	or distribute the Package, if you do not accept this license.
 
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
+	If your Modified Version has been derived from a Modified Version made
+	by someone other than you, you are nevertheless required to ensure that
+	your Modified Version complies with the requirements of this license.
 
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
+	This license does not grant you the right to use any trademark, service
+	mark, tradename, or logo of the Copyright Holder.
 
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
+	This license includes the non-exclusive, worldwide, free-of-charge
+	patent license to make, have made, use, offer to sell, sell, import and
+	otherwise transfer the Package with respect to any patent claims
+	licensable by the Copyright Holder that are necessarily infringed by the
+	Package. If you institute patent litigation (including a cross-claim or
+	counterclaim) against any party alleging that the Package constitutes
+	direct or contributory patent infringement, then this Artistic License
+	to you shall terminate on the date that such litigation is filed.
 
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS 'AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+	Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+	AND CONTRIBUTORS 'AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+	THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+	PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+	YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+	CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+	CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+	EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=cut";
+	=cut";
 
 		}
-		return join "\n", @{$POD{$class}{DATA}};
+		return join "\n", map { my $v = $_; $v =~ s/^\t//gm; $v; } @{$POD{$class}{DATA}};
 	}
 	return '';
 }
@@ -589,13 +589,13 @@ sub public {
 		$args{pod} = eval $1;
 	} 
 	$args{pod} //= '';
-	push @{ $POD{CURRENT}{DATA} }, "=head2 $args{method}
+	push @{ $POD{CURRENT}{DATA} }, "	=head2 $args{method}
 
-$args{pod}
+	$args{pod}
 
-	\$class->$args{method}
+		\$class->$args{method}
 
-=cut" if $args{generate_pod};
+	=cut" if $args{generate_pod};
 	$args{block} = macro_replacement($args{block});
 	$args{block} =~ s/(^{)|(}$)//g;
 	return "sub $args{method} { 
@@ -603,22 +603,6 @@ $args{pod}
 		$args{block}
 	}";
 }
-
-=pod
-sub _parse_role_attrs {
-	my @roles = @_;
-	my %attrs;
-	for (@roles) {
-		if ($_ =~ m/\s*use\s*((?!qw)(?&PerlQualifiedIdentifier))\s*((?&PerlList)) $PPR::GRAMMAR/xms) {
-			push @{$attrs{use}}, sprintf "%s %s", $1, $2;
-			next;
-		}
-		$_ =~ m/(with|allow|is|use)(.*)/i;
-		push @{$attrs{$1}}, eval $2 || do { (my $g = $2) =~ s/^\s*//; $g; };
-	}
-	return %attrs;
-}
-=cut
 
 sub _parse_role_attrs {
 	my @roles = @_;
@@ -710,7 +694,7 @@ MooX::Purple - MooX::Purple::G
 
 =head1 VERSION
 
-Version 0.16
+Version 0.19
 
 =cut
 

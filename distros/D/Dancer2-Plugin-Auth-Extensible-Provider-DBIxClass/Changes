@@ -1,4 +1,15 @@
 Revision history for Dancer2-Plugin-Auth-Extensible-Provider-DBIxClass
 
+0.0902 2022-05-21T22:15:11-04:00 America/New_York
+ [BUG FIXES]
+ - Add needed distros for testing
+
+ [STATISTICS]
+ - code churn: 2 files changed, 22 insertions(+), 1 deletion(-)
+
+0.0901 2022-05-20T19:31:31-04:00 America/New_York
+ [STATISTICS]
+ - code churn: 2 files changed, 5 insertions(+), 1 deletion(-)
+
 0.0900 2022-05-14T08:34:55-04:00 America/New_York
  - First version.

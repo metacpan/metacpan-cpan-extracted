@@ -1879,8 +1879,10 @@ next(iter, count_sv= NULL)
 				ST(0)= ix == 0? sv_2mortal(TreeRBXS_wrap_item(iter->item))
 					: ix == 2? iter->item->value
 					: sv_2mortal(TreeRBXS_item_wrap_key(iter->item));
-				if (ix == 3)
+				if (ix == 3) {
+					EXTEND(SP, 2);
 					ST(1)= iter->item->value;
+				}
 			}
 			else {
 				pos= rbtree_node_index(&iter->item->rbnode);

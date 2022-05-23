@@ -1,0 +1,14 @@
+Revision history for GitHub-EmptyRepository
+
+0.00002   2022-05-23 06:20:15Z
+    - Add GitHub meta
+
+0.00001   2022-05-23 06:14:47Z
+    - Initial release
+    - Check commits
+    - Check branches
+    - Check whitelisted files
+    - Check pull requests
+    - Use single github client
+    - More than half of credits goes to @oalders
+

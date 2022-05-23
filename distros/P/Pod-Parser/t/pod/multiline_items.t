@@ -26,6 +26,12 @@ is
 a
 test.
 
+=item Example with only verbatim content
+
+ {
+   "json": "stuff"
+ }
+
 =back
 
 =cut

@@ -492,7 +492,7 @@ sub item {
         $output =~ s/[\r\n]*$/\n/;
         $self->output ($output);
         $$self{MARGIN} = $margin;
-        $self->output ($self->reformat ($_)) if /\S/;
+        $self->output ($self->reformat ($_)) if defined && /\S/;
     } else {
         $_ = $self->reformat ($_);
         s/^ /:/ if ($$self{alt} && $indent > 0);
@@ -621,8 +621,8 @@ Pod::PlainText - Convert POD data to formatted ASCII text
 
 =head1 DESCRIPTION
 
-B<NOTE: This module is considered legacy; modern Perl releases (5.18 and
-higher) are going to remove Pod-Parser from core and use L<Pod-Simple>
+B<NOTE: This module is considered legacy; modern Perl releases (5.31.1 and
+higher) are going to remove Pod-Parser from core and use L<Pod::Simple>
 for all things POD.>
 
 Pod::PlainText is a module that can convert documentation in the POD format (the

@@ -17,7 +17,8 @@ WriteMakefile(
 	BUILD_REQUIRES => {
 		'Test::More' => '0',
 		'JSON' => '0',
-		'Scalar::Util' => '0'
+		'Scalar::Util' => '0',
+		'Test::Lib' => '0.03',
 	},
 	PREREQ_PM => {
 		'Keyword::Declare' => '0.001017',

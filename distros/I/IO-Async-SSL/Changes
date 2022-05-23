@@ -1,5 +1,11 @@
 Revision history for IO-Async-SSL
 
+0.23    2022-05-23
+        [BUGFIXES]
+         * Force IPv4 in openssl s_client
+         * Declare dependency on Test::Identity
+         * Pick port dynamically in t/20stream.t
+
 0.22    2018-06-06 12:01:54
         [BUGFIXES]
          * Increase IO::Socket::SSL version dependency to 2.003 due to

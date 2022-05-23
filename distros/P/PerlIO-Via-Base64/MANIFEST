@@ -1,10 +1,11 @@
-MANIFEST
 CHANGELOG
+lib/PerlIO/Via/Base64.pm
+Makefile.PL
+MANIFEST
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
 README
+t/01basic.t
+t/coverage.t
 TODO
 VERSION
-Makefile.PL
-lib/PerlIO/Via/Base64.pm
-t/01basic.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

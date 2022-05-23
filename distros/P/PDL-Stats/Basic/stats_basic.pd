@@ -1381,7 +1381,7 @@ sub rtable {
     $opt{R_ID} and push @$id_r, shift @entries;
   
       # rudimentary check for numeric entry 
-    for (@entries) { $_ = $opt{MISSN} unless defined $_ and /\d\b/ }
+    for (@entries) { $_ = $opt{MISSN} unless defined $_ and m/\d\b/ }
 
     push @data, pdl( $opt{TYPE}, \@entries );
     $c_row ++;

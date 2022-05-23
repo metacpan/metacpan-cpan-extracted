@@ -1,5 +1,11 @@
 Change log for Sys::OsRelease
 
+0.1.4 2022-05-22T23:53:34-07:00 America/Los_Angeles
+ [BUG FIXES]
+ - remove residual code that tried to symlink non-root user's perl lib
+   directory onto itself if we had to create it
+ - expand containerized release tests to also run tests as non-root user
+
 0.1.3 2022-05-15T21:58:39-07:00 America/Los_Angeles
  [REVISION]
  - remove // operator incompatibile with Perl <5.10 in

@@ -1,3 +1,10 @@
+0.013   2022-05-02  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [ux] Add helpful hint about the config file being in INI format.
+
+
 0.012   2022-05-01  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

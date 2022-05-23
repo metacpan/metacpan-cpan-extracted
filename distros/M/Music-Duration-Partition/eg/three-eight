@@ -58,19 +58,9 @@ sub bass {
         pitches   => \@pitches,
         intervals => \@intervals,
     );
-
     my @notes = map { [ map { $voice->rand } @$_ ] } @motifs;
 
-    for my $n (1 .. $d->bars) {
-        my $index = int rand @motifs;
-        my $motif = $motifs[$index];
-        my $pitch = $notes[$index];
-        for my $i (0 .. $#$motif) {
-            $d->note($motif->[$i], $pitch->[$i]);
-        }
-    }
-
-    $d->note($d->dotted_quarter, $pitches[0]);
+    add_notes($d, \@motifs, \@notes, \@pitches);
 }
 
 sub top {
@@ -78,8 +68,8 @@ sub top {
 
     my $mdp = Music::Duration::Partition->new(
         size => 1.5,
-        pool => [qw(en sn)],
-        weights => [1, 2],
+        pool => [qw(qn en sn)],
+        weights => [1, 2, 3],
     );
     my @motifs = map { $mdp->motif } 1 .. 8;
 
@@ -92,19 +82,24 @@ sub top {
         pitches   => \@pitches,
         intervals => \@intervals,
     );
-
     my @notes = map { [ map { $voice->rand } @$_ ] } @motifs;
 
+    add_notes($d, \@motifs, \@notes, \@pitches);
+}
+
+sub add_notes {
+    my ($d, $motifs, $notes, $pitches) = @_;
+
     for my $n (1 .. $d->bars) {
-        my $index = int rand @motifs;
-        my $motif = $motifs[$index];
-        my $pitch = $notes[$index];
+        my $index = int rand @$motifs;
+        my $motif = $motifs->[$index];
+        my $pitch = $notes->[$index];
         for my $i (0 .. $#$motif) {
             $d->note($motif->[$i], $pitch->[$i]);
         }
     }
 
-    $d->note($d->dotted_quarter, $pitches[0]);
+    $d->note($d->dotted_quarter, $pitches->[0]);
 }
 
 sub drums {

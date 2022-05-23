@@ -24,6 +24,7 @@
          "requires" : {
             "JSON" : "0",
             "Scalar::Util" : "0",
+            "Test::Lib" : "0.03",
             "Test::More" : "0"
          }
       },
@@ -45,6 +46,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.17",
+   "version" : "0.19",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

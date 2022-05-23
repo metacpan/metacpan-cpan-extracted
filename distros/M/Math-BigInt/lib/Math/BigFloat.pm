@@ -20,7 +20,7 @@ use Carp          qw< carp croak >;
 use Scalar::Util  qw< blessed >;
 use Math::BigInt  qw< >;
 
-our $VERSION = '1.999831';
+our $VERSION = '1.999833';
 $VERSION =~ tr/_//d;
 
 require Exporter;
@@ -260,6 +260,8 @@ BEGIN {
     # whether it is valid or not.
     $rnd_mode   = 'even';
     tie $rnd_mode, 'Math::BigFloat';
+
+    *as_number = \&as_int;
 }
 
 sub DESTROY {
@@ -1179,10 +1181,14 @@ EOF
             }
         }
 
-        # Append the exponent and convert to an object.
+        # Convert to an object.
 
-        my $str = $digits . 'e-' . ($n - 1);
-        $pi = Math::BigFloat -> new($digits . 'e-' . ($n - 1));
+        $pi = bless {
+                     sign => '+',
+                     _m   => $LIB -> _new($digits),
+                     _es  => '-',
+                     _e   => $LIB -> _new($n - 1),
+                    }, $class;
 
     } else {
 
@@ -1198,16 +1204,16 @@ EOF
              $HALF -> copy() -> bmul($HALF), $class -> bone);
         while ($pn < $n) {
             my $prev_an = $an -> copy();
-            $an -> badd($bn) -> bmul($HALF, $n);
-            $bn -> bmul($prev_an) -> bsqrt($n);
-            $prev_an -> bsub($an);
-            $tn -> bsub($pn * $prev_an * $prev_an);
-            $pn -> badd($pn);
+            $an = $an -> badd($bn) -> bmul($HALF, $n);
+            $bn = $bn -> bmul($prev_an) -> bsqrt($n);
+            $prev_an = $prev_an -> bsub($an);
+            $tn = $tn -> bsub($pn * $prev_an * $prev_an);
+            $pn = $pn -> badd($pn);
         }
-        $an -> badd($bn);
-        $an -> bmul($an, $n) -> bdiv(4 * $tn, $n);
+        $an = $an -> badd($bn);
+        $an = $an -> bmul($an, $n) -> bdiv(4 * $tn, $n);
 
-        $an -> round(@r);
+        $an = $an -> round(@r);
         $pi = $an;
     }
 
@@ -1227,63 +1233,89 @@ EOF
 }
 
 sub copy {
-    my $self    = shift;
-    my $selfref = ref $self;
-    my $class   = $selfref || $self;
+    my ($x, $class);
+    if (ref($_[0])) {           # $y = $x -> copy()
+        $x = shift;
+        $class = ref($x);
+    } else {                    # $y = Math::BigInt -> copy($y)
+        $class = shift;
+        $x = shift;
+    }
 
-    # If called as a class method, the object to copy is the next argument.
-
-    $self = shift() unless $selfref;
+    carp "Rounding is not supported for ", (caller(0))[3], "()" if @_;
 
     my $copy = bless {}, $class;
 
-    $copy->{sign} = $self->{sign};
-    $copy->{_es}  = $self->{_es};
-    $copy->{_m}   = $LIB->_copy($self->{_m});
-    $copy->{_e}   = $LIB->_copy($self->{_e});
-    $copy->{_a}   = $self->{_a} if exists $self->{_a};
-    $copy->{_p}   = $self->{_p} if exists $self->{_p};
+    $copy->{sign} = $x->{sign};
+    $copy->{_es}  = $x->{_es};
+    $copy->{_m}   = $LIB->_copy($x->{_m});
+    $copy->{_e}   = $LIB->_copy($x->{_e});
+    $copy->{_a}   = $x->{_a} if exists $x->{_a};
+    $copy->{_p}   = $x->{_p} if exists $x->{_p};
 
     return $copy;
 }
 
 sub as_int {
     # return copy as a bigint representation of this Math::BigFloat number
-    my ($class, $x) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
+    carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
-    if (!$x->isa('Math::BigFloat')) {
-        # if the object can as_number(), use it
-        return $x->as_number() if $x->can('as_number');
-        # otherwise, get us a float and then a number
-        $x = $x->can('as_float') ? $x->as_float() : $class->new(0+"$x");
+    return $x -> copy() if $x -> isa("Math::BigInt");
+
+    # disable upgrading and downgrading
+
+    require Math::BigFloat;
+    my $upg = Math::BigInt -> upgrade();
+    my $dng = Math::BigInt -> downgrade();
+    Math::BigInt -> upgrade(undef);
+    Math::BigInt -> downgrade(undef);
+
+    my $y;
+    if ($x -> is_inf()) {
+        $y = Math::BigInt -> binf($x->sign());
+    } elsif ($x -> is_nan()) {
+        $y = Math::BigInt -> bnan();
+    } else {
+        $y = $LIB->_copy($x->{_m});
+        if ($x->{_es} eq '-') {                     # < 0
+            $y = $LIB->_rsft($y, $x->{_e}, 10);
+        } elsif (! $LIB->_is_zero($x->{_e})) {      # > 0
+            $y = $LIB->_lsft($y, $x->{_e}, 10);
+        }
+        $y = Math::BigInt->new($x->{sign} . $LIB->_str($y));
     }
 
-    return Math::BigInt->binf($x->sign()) if $x->is_inf();
-    return Math::BigInt->bnan()           if $x->is_nan();
+    # reset upgrading and downgrading
 
-    my $z = $LIB->_copy($x->{_m});
-    if ($x->{_es} eq '-') {                     # < 0
-        $z = $LIB->_rsft($z, $x->{_e}, 10);
-    } elsif (! $LIB->_is_zero($x->{_e})) {      # > 0
-        $z = $LIB->_lsft($z, $x->{_e}, 10);
-    }
-    $z = Math::BigInt->new($x->{sign} . $LIB->_str($z));
-    $z;
-}
+    Math::BigInt -> upgrade($upg);
+    Math::BigInt -> downgrade($dng);
 
-sub as_number {
-    # return copy as a bigint representation of this Math::BigFloat number
-    my ($class, $x) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
-
-    (shift) -> as_int(@_);
+    return $y;
 }
 
 sub as_float {
-    my $self    = shift;
-    my $selfref = ref $self;
-    my $class   = $selfref || $self;
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
+    carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
-    return $selfref ? $self -> copy() : $class -> new(shift);
+    return $x -> copy() if $x -> isa("Math::BigFloat");
+
+    # disable upgrading and downgrading
+
+    require Math::BigFloat;
+    my $upg = Math::BigInt -> upgrade();
+    my $dng = Math::BigInt -> downgrade();
+    Math::BigInt -> upgrade(undef);
+    Math::BigInt -> downgrade(undef);
+
+    my $y = Math::BigFloat -> new($x);
+
+    # reset upgrading and downgrading
+
+    Math::BigInt -> upgrade($upg);
+    Math::BigInt -> downgrade($dng);
+
+    return $y;
 }
 
 ###############################################################################
@@ -1569,14 +1601,17 @@ sub bneg {
 }
 
 sub bnorm {
-    # bnorm() can't support rounding, bround() and bfround() call bnorm().
+    # bnorm() can't support rounding, because bround() and bfround() call
+    # bnorm(), which would recurse indefinitely.
 
     # adjust m and e so that m is smallest possible
-    my (undef, $x) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+
+    carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
     # inf, nan etc
     if ($x->{sign} !~ /^[+-]$/) {
-        return $downgrade -> new($x -> bdstr()) if defined $downgrade;
+        return $downgrade -> new($x) if defined $downgrade;
         return $x;
     }
 
@@ -1605,7 +1640,7 @@ sub bnorm {
         }
     }
 
-    return $downgrade -> new($x -> bdstr())
+    return $downgrade -> new($x)
       if defined($downgrade) && $x->is_int();
     return $x;
 }
@@ -1975,6 +2010,8 @@ sub bdiv {
         my ($quo, $rem);
         if ($wantarray) {
             $rem = $x -> copy() -> round(@r);
+            $rem = $downgrade -> new($rem, @r)
+              if defined($downgrade) && $rem -> is_int();
         }
         if ($x -> is_zero()) {
             $quo = $x -> bnan(@r);
@@ -2011,6 +2048,8 @@ sub bdiv {
         if ($wantarray) {
             if ($x -> is_zero() || $x -> bcmp(0) == $y -> bcmp(0)) {
                 $rem = $x -> copy() -> round(@r);
+                $rem = $downgrade -> new($rem, @r)
+                  if defined($downgrade) && $rem -> is_int();
                 $quo = $x -> bzero(@r);
             } else {
                 $rem = $class -> binf($y -> {sign}, @r);
@@ -2020,9 +2059,9 @@ sub bdiv {
         } else {
             if ($y -> is_inf()) {
                 if ($x -> is_nan() || $x -> is_inf()) {
-                    return $x -> bnan();
+                    return $x -> bnan(@r);
                 } else {
-                    return $x -> bzero();
+                    return $x -> bzero(@r);
                 }
             }
         }
@@ -2032,7 +2071,17 @@ sub bdiv {
     # the denominator (divisor) is non-zero.
 
     # x == 0?
-    return wantarray ? ($x, $class->bzero()) : $x if $x->is_zero();
+    if ($x->is_zero()) {
+        my ($quo, $rem);
+        $quo = $x->round(@r);
+        $quo = $downgrade -> new($quo, @r)
+          if defined($downgrade) && $quo -> is_int();
+        if ($wantarray) {
+            $rem = $class -> bzero(@r);
+            return $quo, $rem;
+        }
+        return $quo;
+    }
 
     # we need to limit the accuracy to protect against overflow
     my $fallback = 0;
@@ -2142,7 +2191,7 @@ sub bdiv {
         return ($x, $rem);
     }
 
-    $x = $downgrade -> new($x -> bdstr(), @r)
+    $x = $downgrade -> new($x, @r)
       if defined($downgrade) && $x -> is_int();
     $x;         # rounding already done above
 }
@@ -2386,7 +2435,7 @@ sub bpow {
 
     $x = $x -> round($a, $p, $r, $y);
 
-    return $downgrade -> new($x -> bdstr())
+    return $downgrade -> new($x)
       if defined($downgrade) && ($x->is_int() || $x->is_inf() || $x->is_nan());
     return $x;
 }
@@ -2518,7 +2567,7 @@ sub blog {
     # can stop right here.
 
     if (defined($base) && $base -> is_int() && $x -> is_int()) {
-        my $x_lib = $LIB -> _new($x    -> bdstr());
+        my $x_lib = $LIB -> _new($x -> bdstr());
         my $b_lib = $LIB -> _new($base -> bdstr());
         ($x_lib, my $exact) = $LIB -> _log_int($x_lib, $b_lib);
         if ($exact) {
@@ -2764,6 +2813,8 @@ sub bnok {
                             ? (ref($_[0]), @_)
                             : objectify(2, @_);
 
+    carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
+
     return $x if $x->modify('bnok');
 
     return $x->bnan() if $x->is_nan() || $y->is_nan();
@@ -2868,9 +2919,9 @@ sub bsin {
         # calculate things for the next term
         $over = $over->bmul($x2);                       # $x*$x
         $below = $below->bmul($factorial);              # n*(n+1)
-        $factorial->binc();
-        $below = $below->bmul($factorial);              # n*(n+1)
-        $factorial->binc();
+        $factorial = $factorial->binc();
+        $below = $below -> bmul($factorial);              # n*(n+1)
+        $factorial = $factorial->binc();
     }
 
     # shortcut to not run through _find_round_parameters again
@@ -2966,9 +3017,9 @@ sub bcos {
         # calculate things for the next term
         $over = $over->bmul($x2);                       # $x*$x
         $below = $below->bmul($factorial);              # n*(n+1)
-        $factorial->binc();
+        $factorial = $factorial -> binc();
         $below = $below->bmul($factorial);              # n*(n+1)
-        $factorial->binc();
+        $factorial = $factorial -> binc();
     }
 
     # shortcut to not run through _find_round_parameters again
@@ -3876,7 +3927,7 @@ sub bround {
 
     my ($scale, $mode) = $x->_scale_a(@a);
     if (!defined $scale) {         # no-op
-        return $downgrade -> new($x -> bdstr()) if defined($downgrade)
+        return $downgrade -> new($x) if defined($downgrade)
           && ($x->is_int() || $x->is_inf() || $x->is_nan());
         return $x;
     }
@@ -3887,7 +3938,7 @@ sub bround {
     # round a number with A=5 to 5 digits afterwards again
 
     if (defined $x->{_a} && $x->{_a} < $scale) {
-        return $downgrade -> new($x -> bdstr()) if defined($downgrade)
+        return $downgrade -> new($x) if defined($downgrade)
           && ($x->is_int() || $x->is_inf() || $x->is_nan());
         return $x;
     }
@@ -3897,7 +3948,7 @@ sub bround {
     # never round a +-inf, NaN
 
     if ($scale <= 0 || $x->{sign} !~ /^[+-]$/) {
-        return $downgrade -> new($x -> bdstr()) if defined($downgrade)
+        return $downgrade -> new($x) if defined($downgrade)
           && ($x->is_int() || $x->is_inf() || $x->is_nan());
         return $x;
     }
@@ -3906,7 +3957,7 @@ sub bround {
     # 2: if we should keep more digits than the mantissa has, do nothing
     if ($x->is_zero() || $LIB->_len($x->{_m}) <= $scale) {
         $x->{_a} = $scale if !defined $x->{_a} || $x->{_a} > $scale;
-        return $downgrade -> new($x -> bdstr()) if defined($downgrade)
+        return $downgrade -> new($x) if defined($downgrade)
           && ($x->is_int() || $x->is_inf() || $x->is_nan());
         return $x;
     }
@@ -3934,7 +3985,7 @@ sub bfround {
 
     my ($scale, $mode) = $x->_scale_p(@p);
     if (!defined $scale) {
-        return $downgrade -> new($x -> bdstr()) if defined($downgrade)
+        return $downgrade -> new($x) if defined($downgrade)
           && ($x->is_int() || $x->is_inf() || $x->is_nan());
         return $x;
     }
@@ -3943,20 +3994,20 @@ sub bfround {
 
     if ($x->is_zero()) {
         $x->{_p} = $scale if !defined $x->{_p} || $x->{_p} < $scale; # -3 < -2
-        return $downgrade -> new($x -> bdstr()) if defined($downgrade)
+        return $downgrade -> new($x) if defined($downgrade)
           && ($x->is_int() || $x->is_inf() || $x->is_nan());
         return $x;
     }
 
     if ($x->{sign} !~ /^[+-]$/) {
-        return $downgrade -> new($x -> bdstr()) if defined($downgrade)
+        return $downgrade -> new($x) if defined($downgrade)
           && ($x->is_int() || $x->is_inf() || $x->is_nan());
         return $x;
     }
 
     # don't round if x already has lower precision
     if (defined $x->{_p} && $x->{_p} < 0 && $scale < $x->{_p}) {
-        return $downgrade -> new($x -> bdstr()) if defined($downgrade)
+        return $downgrade -> new($x) if defined($downgrade)
           && ($x->is_int() || $x->is_inf() || $x->is_nan());
         return $x;
     }
@@ -3967,7 +4018,7 @@ sub bfround {
         # round right from the '.'
 
         if ($x->{_es} eq '+') { # e >= 0 => nothing to round
-            return $downgrade -> new($x -> bdstr()) if defined($downgrade)
+            return $downgrade -> new($x) if defined($downgrade)
               && ($x->is_int() || $x->is_inf() || $x->is_nan());
             return $x;
         }
@@ -3992,7 +4043,7 @@ sub bfround {
         # do not round after/right of the $dad
 
         if ($scale > $dad) { # 0.123, scale >= 3 => exit
-            return $downgrade -> new($x -> bdstr()) if defined($downgrade)
+            return $downgrade -> new($x) if defined($downgrade)
               && ($x->is_int() || $x->is_inf() || $x->is_nan());
             return $x;
         }
@@ -4001,7 +4052,7 @@ sub bfround {
         # 0.0065, scale -2, round last '0' with following '65' (scale == zad
         # case)
         if ($scale < $zad) {
-            return $downgrade -> new($x -> bdstr()) if defined($downgrade)
+            return $downgrade -> new($x) if defined($downgrade)
               && ($x->is_int() || $x->is_inf() || $x->is_nan());
             return $x->bzero();
         }
@@ -4030,7 +4081,7 @@ sub bfround {
         $scale = 1 if $scale == 0;
         # shortcut if already integer
         if ($scale == 1 && $dbt <= $dbd) {
-            return $downgrade -> new($x -> bdstr()) if defined($downgrade)
+            return $downgrade -> new($x) if defined($downgrade)
               && ($x->is_int() || $x->is_inf() || $x->is_nan());
             return $x;
         }
@@ -4039,7 +4090,7 @@ sub bfround {
 
         if ($scale > $dbd) {
             # not enough digits before dot, so round to zero
-            return $downgrade -> new($x -> bdstr()) if defined($downgrade);
+            return $downgrade -> new($x) if defined($downgrade);
             return $x->bzero;
         } elsif ($scale == $dbd) {
             # maximum
@@ -4162,7 +4213,7 @@ sub bgcd {
     }
     $x = $x -> babs();
 
-    return $downgrade -> new($x -> bdstr())
+    return $downgrade -> new($x)
       if defined $downgrade && $x->is_int();
     return $x;
 }
@@ -4191,7 +4242,7 @@ sub blcm {
 
     $x = $x -> babs();
 
-    return $downgrade -> new($x -> bdstr())
+    return $downgrade -> new($x)
       if defined $downgrade && $x->is_int();
     return $x;
 }
@@ -4552,7 +4603,9 @@ sub bstr {
     # (ref to BFLOAT or num_str) return num_str
     # Convert number from internal format to (non-scientific) string format.
     # internal format is always normalized (no leading zeros, "-0" => "+0")
-    my (undef, $x) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+
+    carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
     if ($x->{sign} !~ /^[+-]$/) {
         return $x->{sign} unless $x->{sign} eq '+inf'; # -inf, NaN
@@ -4609,7 +4662,9 @@ sub bstr {
 # Decimal notation, e.g., "12345.6789".
 
 sub bdstr {
-    my (undef, $x) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+
+    carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
     if ($x->{sign} ne '+' && $x->{sign} ne '-') {
         return $x->{sign} unless $x->{sign} eq '+inf'; # -inf, NaN
@@ -4637,7 +4692,9 @@ sub bdstr {
 # "12345.6789" is written as "123456789e-4".
 
 sub bsstr {
-    my (undef, $x) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+
+    carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
     if ($x->{sign} ne '+' && $x->{sign} ne '-') {
         return $x->{sign} unless $x->{sign} eq '+inf'; # -inf, NaN
@@ -4651,7 +4708,9 @@ sub bsstr {
 # Normalized notation, e.g., "12345.6789" is written as "1.23456789e+4".
 
 sub bnstr {
-    my (undef, $x) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+
+    carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
     if ($x->{sign} ne '+' && $x->{sign} ne '-') {
         return $x->{sign} unless $x->{sign} eq '+inf'; # -inf, NaN
@@ -4669,7 +4728,9 @@ sub bnstr {
 # Engineering notation, e.g., "12345.6789" is written as "12.3456789e+3".
 
 sub bestr {
-    my (undef, $x) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+
+    carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
     if ($x->{sign} ne '+' && $x->{sign} ne '-') {
         return $x->{sign} unless $x->{sign} eq '+inf'; # -inf, NaN
@@ -4690,6 +4751,8 @@ sub bestr {
 sub bfstr {
     my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), $_[0]) : objectify(1, @_);
 
+    carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
+
     if ($x->{sign} ne '+' && $x->{sign} ne '-') {
         return $x->{sign} unless $x->{sign} eq '+inf'; # -inf, NaN
         return 'inf';                                  # +inf
@@ -4702,7 +4765,9 @@ sub bfstr {
 
 sub to_hex {
     # return number as hexadecimal string (only for integers defined)
-    my (undef, $x) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+
+    carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
     return $x->bstr() if $x->{sign} !~ /^[+-]$/; # inf, nan etc
     return '0' if $x->is_zero();
@@ -4719,7 +4784,9 @@ sub to_hex {
 
 sub to_oct {
     # return number as octal digit string (only for integers defined)
-    my (undef, $x) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+
+    carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
     return $x->bstr() if $x->{sign} !~ /^[+-]$/; # inf, nan etc
     return '0' if $x->is_zero();
@@ -4736,7 +4803,9 @@ sub to_oct {
 
 sub to_bin {
     # return number as binary digit string (only for integers defined)
-    my (undef, $x) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+
+    carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
     return $x->bstr() if $x->{sign} !~ /^[+-]$/; # inf, nan etc
     return '0' if $x->is_zero();
@@ -4752,7 +4821,9 @@ sub to_bin {
 }
 
 sub to_ieee754 {
-    my ($class, $x, $format) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
+    my ($class, $x, $format, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
+
+    carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
     my $enc;            # significand encoding (applies only to decimal)
     my $k;              # storage width in bits
@@ -4987,7 +5058,9 @@ sub to_ieee754 {
 sub as_hex {
     # return number as hexadecimal string (only for integers defined)
 
-    my (undef, $x) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+
+    carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
     return $x->bstr() if $x->{sign} !~ /^[+-]$/; # inf, nan etc
     return '0x0' if $x->is_zero();
@@ -5005,7 +5078,9 @@ sub as_hex {
 sub as_oct {
     # return number as octal digit string (only for integers defined)
 
-    my (undef, $x) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+
+    carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
     return $x->bstr() if $x->{sign} !~ /^[+-]$/; # inf, nan etc
     return '00' if $x->is_zero();
@@ -5023,7 +5098,9 @@ sub as_oct {
 sub as_bin {
     # return number as binary digit string (only for integers defined)
 
-    my (undef, $x) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+
+    carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
     return $x->bstr() if $x->{sign} !~ /^[+-]$/; # inf, nan etc
     return '0b0' if $x->is_zero();
@@ -5041,7 +5118,9 @@ sub as_bin {
 sub numify {
     # Make a Perl scalar number from a Math::BigFloat object.
 
-    my (undef, $x) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+
+    carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
     if ($x -> is_nan()) {
         require Math::Complex;
@@ -5056,6 +5135,7 @@ sub numify {
     }
 
     # Create a string and let Perl's atoi()/atof() handle the rest.
+
     return 0 + $x -> bnstr();
 }
 
@@ -5221,14 +5301,14 @@ sub _log {
     my ($limit, $v, $u, $below, $factor, $next, $over, $f);
 
     $v = $x->copy();
-    $v->binc();                         # v = x+1
+    $v = $v -> binc();                  # v = x+1
     $x = $x->bdec();
     $u = $x->copy();                    # u = x-1; x = x-1
     $x = $x->bdiv($v, $scale);          # first term: u/v
     $below = $v->copy();
     $over = $u->copy();
-    $u *= $u;                           # u^2
-    $v *= $v;                           # v^2
+    $u = $u -> bmul($u);                # u^2
+    $v = $v -> bmul($v);                # v^2
     $below = $below->bmul($v);          # u^3, v^3
     $over = $over->bmul($u);
     $factor = $class->new(3);

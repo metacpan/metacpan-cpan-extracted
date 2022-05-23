@@ -11,7 +11,7 @@ package Pod::Select;
 use strict;
 
 use vars qw($VERSION @ISA @EXPORT $MAX_HEADING_LEVEL %myData @section_headings @selected_sections);
-$VERSION = '1.63'; ## Current version of this package
+$VERSION = '1.65'; ## Current version of this package
 require  5.005;    ## requires this Perl version or later
 
 #############################################################################
@@ -71,8 +71,8 @@ podselect()
 
 =head1 DESCRIPTION
 
-B<NOTE: This module is considered legacy; modern Perl releases (5.18 and
-higher) are going to remove Pod-Parser from core and use L<Pod-Simple>
+B<NOTE: This module is considered legacy; modern Perl releases (5.31.1 and
+higher) are going to remove Pod-Parser from core and use L<Pod::Simple>
 for all things POD.>
 
 B<podselect()> is a function which will extract specified sections of

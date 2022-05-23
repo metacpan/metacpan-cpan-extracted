@@ -51,7 +51,7 @@ my $kid = $loop->spawn_child(
       stdout => $ssl_wr,
       stderr => [ open => ">", "/dev/null" ],
    ],
-   command => [ "openssl", "s_client", "-host", "localhost", "-port", $port, "-quiet" ],
+   command => [ "openssl", "s_client", "-4", "-host", "localhost", "-port", $port, "-quiet" ],
    on_exit => sub {
       my ( $pid, $exitcode ) = @_;
 

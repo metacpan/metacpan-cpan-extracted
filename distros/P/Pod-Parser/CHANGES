@@ -3,6 +3,19 @@ ATTENTION!
 Before using this for any _new_ software, please consider using Pod::Simple,
 it is a modern replacement for this module.
 
+ 21-May-2022           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.65
+ + fix CPAN#124881 - warning from Pod::PlainText
+ + fix CPAN#125860 - fix version where Pod::Parser was removed from core
+
+
+ 21-May-2022           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.64
+ + fix CPAN#112113: link to Pod::Simple not working
+
+
  10-Feb-2015           Marek Rouchal                        <marekr@cpan.org>
  -----------------------------------------------------------------------------
  Version 1.63

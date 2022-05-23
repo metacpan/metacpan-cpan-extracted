@@ -5,12 +5,12 @@ use utf8;
 
 package Neo4j::Driver::Net::HTTP;
 # ABSTRACT: Networking delegate for Neo4j HTTP
-$Neo4j::Driver::Net::HTTP::VERSION = '0.28';
+$Neo4j::Driver::Net::HTTP::VERSION = '0.30';
 
 # This package is not part of the public Neo4j::Driver API.
 
 
-use Carp qw(croak);
+use Carp qw(carp croak);
 our @CARP_NOT = qw(Neo4j::Driver::Transaction Neo4j::Driver::Transaction::HTTP);
 
 use Time::Piece 1.20 qw();
@@ -44,6 +44,7 @@ sub new {
 		server_info => $driver->{server_info},
 		http_agent => $net_module->new($driver),
 		want_jolt => $driver->{jolt},
+		want_concurrent => $driver->{concurrent_tx} // 1,
 		active_tx => {},
 	}, $class;
 	
@@ -81,7 +82,6 @@ sub _server {
 	$self->{server_info} = Neo4j::Driver::ServerInfo->new({
 		uri => $self->{http_agent}->uri,
 		version => "Neo4j/$neo4j_version",
-		protocol_string => $self->{http_agent}->can('protocol') ? $self->{http_agent}->protocol : undef,
 		time_diff => Time::Piece->new - $date,
 		tx_endpoint => $tx_endpoint,
 	});
@@ -110,6 +110,12 @@ sub _set_database {
 # Send statements to the Neo4j server and return a list of all results.
 sub _run {
 	my ($self, $tx, @statements) = @_;
+	
+	if ( ! $self->{want_concurrent} ) {
+		my $is_concurrent = %{$self->{active_tx}} && ! defined $tx->{commit_endpoint};
+		$is_concurrent ||= keys %{$self->{active_tx}} > 1;
+		$is_concurrent and carp "Concurrent transactions for HTTP are disabled; use multiple sessions or enable the concurrent_tx config option (this warning may become fatal in a future Neo4j::Driver version)";
+	}
 	
 	my $json = { statements => \@statements };
 	return $self->_request($tx, 'POST', $json)->_results;

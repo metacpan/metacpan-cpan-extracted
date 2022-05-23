@@ -102,6 +102,7 @@ t/19-listbox.t
 t/20-dialog.t
 t/31-tk-1.t
 t/32-tk-2.t
+t/33-tk-3.t
 t/41-curses.t
 t/51-rich-term.t
 t/52-rich-term-box.t

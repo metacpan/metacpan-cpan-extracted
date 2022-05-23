@@ -1,6 +1,6 @@
 package Log::Any::Plugin::Levels;
 # ABSTRACT: Logging-level filtering plugin for log adapters
-$Log::Any::Plugin::Levels::VERSION = '0.011';
+$Log::Any::Plugin::Levels::VERSION = '0.012';
 use strict;
 use warnings;
 use Carp qw(croak);
@@ -94,7 +94,7 @@ Log::Any::Plugin::Levels - Logging-level filtering plugin for log adapters
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -182,7 +182,7 @@ Stephen Thirlwall <sdt@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2011 by Stephen Thirlwall.
+This software is copyright (c) 2022, 2019, 2017, 2015, 2014 by Stephen Thirlwall.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

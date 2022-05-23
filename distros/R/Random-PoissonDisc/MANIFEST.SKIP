@@ -1,6 +1,8 @@
 .cvsignore$
 ^.git/
+^.github/
 ^.lwpcookies
+^.prove
 ^.releaserc
 ^blib/
 ^Random-PoissonDisc-.*

@@ -1,15 +1,12 @@
 use ExtUtils::MakeMaker;
-use ExtUtils::MakeMaker::META_MERGE::GitHub;
-my $mm = ExtUtils::MakeMaker::META_MERGE::GitHub->new(owner=>"mrdvt92", repo=>"perl-Power-Outlet");
 WriteMakefile(
-    $mm->META_MERGE,
     NAME         => 'Power::Outlet',
     VERSION_FROM => 'lib/Power/Outlet.pm',
     AUTHOR       => 'Michael R. Davis (mrdvt92@yahoo.com)',
     ABSTRACT     => 'Control and query network attached power switches',
     BUILD_REQUIRES => {
-                       'ExtUtils::MakeMaker' => 6.46,
-                       'Test::Simple'        => 0.44,
+                       'ExtUtils::MakeMaker'                     => 6.46,
+                       'Test::Simple'                            => 0.44,
                       },
     PREREQ_PM    => {
                      'Package::New'             => 0,
@@ -25,6 +22,22 @@ WriteMakefile(
                      'File::Spec'               => 0,    #for Virtual
                      'List::MoreUtils'          => 0,    #for iBootBarGroup
                      'Package::Role::ini'       => 0.07, #for Config
+                    },
+    META_MERGE   => {
+                      'resources' => {
+                                       'repository' => {
+                                                         'web' => 'https://github.com/mrdvt92/perl-Power-Outlet.git',
+                                                         'url' => 'git@github.com:mrdvt92/perl-Power-Outlet.git',
+                                                         'type' => 'git'
+                                                       },
+                                       'homepage' => 'https://github.com/mrdvt92/perl-Power-Outlet',
+                                       'bugtracker' => {
+                                                         'web' => 'https://github.com/mrdvt92/perl-Power-Outlet/issues'
+                                                       }
+                                     },
+                      'meta-spec' => {
+                                       'version' => 2
+                                     }
                     },
     EXE_FILES    => [
                     qw{

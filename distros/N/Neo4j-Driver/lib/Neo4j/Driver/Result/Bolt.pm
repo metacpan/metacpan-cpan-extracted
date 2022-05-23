@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result::Bolt;
 # ABSTRACT: Bolt result handler
-$Neo4j::Driver::Result::Bolt::VERSION = '0.28';
+$Neo4j::Driver::Result::Bolt::VERSION = '0.30';
 
 use parent 'Neo4j::Driver::Result';
 
@@ -204,7 +204,7 @@ Neo4j::Driver::Result::Bolt - Bolt result handler
 
 =head1 VERSION
 
-version 0.28
+version 0.30
 
 =head1 DESCRIPTION
 

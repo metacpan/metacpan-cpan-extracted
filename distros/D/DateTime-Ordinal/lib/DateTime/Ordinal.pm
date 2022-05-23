@@ -4,9 +4,9 @@ use 5.006;
 use strict;
 use warnings;
 
-use base 'DateTime';
-
-our $VERSION = '0.03';
+use parent 'DateTime';
+use POSIX qw( floor );
+our $VERSION = '0.04';
 
 our (%strftime_patterns, %sub_format, @ORDINALS, @NTT);
 BEGIN {
@@ -71,7 +71,7 @@ BEGIN {
 		},
 		'C' => sub {
 			my $y = int( $_[0]->year / 100 );
-			return $_[1] ? _cardinal($y) : $y;
+			return $_[1] ? _ordinal($y) : $y;
 		},
 		'd' => sub { $_[1] ? $_[0]->day_of_month($_[1]) : sprintf( '%02d', $_[0]->day_of_month ) },
 		'D' => sub { $_[0]->strftime('%m/%d/%y') },
@@ -79,7 +79,7 @@ BEGIN {
 		'F' => sub { $_[0]->strftime('%Y-%m-%d') },
 		'g' => sub {
 			my $w = substr( $_[0]->week_year, -2 );
-			return $_[1] ? _cardinal($w) : $w;
+			return $_[1] ? _ordinal($w) : $w;
 		},
 		'G' => sub { $_[0]->week_year($_[1]) },
 		'H' => sub { $_[1] ? $_[0]->hour($_[1]) : sprintf( '%02d', $_[0]->hour ) },
@@ -243,7 +243,19 @@ sub _sub {
 }
 
 sub _ordinal {
-	return $_[1] ? '' : $_[0] . $ORDINALS[$_[0] =~ m{(?<!1)([123])$} ? $1 : 0];
+	return ($_[1] ? '' : $_[0]) . $ORDINALS[$_[0] =~ m{(?<!1)([123])$} ? $1 : 0];
+}
+ 
+sub _format_nanosecs {
+    my $self = shift;
+    my $precision = @_ ? shift : 9;
+ 
+    my $divide_by = 10**( 9 - $precision );
+ 
+    return sprintf(
+        '%0' . $precision . 'u',
+        floor( $self->{rd_nanosecs} / $divide_by )
+    );
 }
 
 sub _num2text {
@@ -300,7 +312,7 @@ DateTime::Ordinal - The great new DateTime::Ordinal!
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 

@@ -1,0 +1,25 @@
+---
+abstract: 'A console-based implementation of Blackjack'
+author:
+  - 'Greg Donald <gdonald@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Console-Blackjack
+provides:
+  Console::Blackjack:
+    file: lib/Console/Blackjack.pm
+    version: '0.02'
+requires:
+  Storable: '3.25'
+resources:
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

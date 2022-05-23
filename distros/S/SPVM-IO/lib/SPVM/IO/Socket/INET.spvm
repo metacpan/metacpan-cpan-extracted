@@ -1,0 +1,19 @@
+class IO::Socket::INET {
+
+  method is_io_socket : void () { }
+
+  has handle : int;
+  
+  native static method new : IO::Socket::INET ($host : string, $port : int);
+  native method read : int ($buffer : byte[]);
+  native method write : int ($buffer : string, $length : int);
+  native method close : void ();
+  native method fileno : int ();
+  
+  method DESTROY : void () {
+    $self->_cleanup_wsa;
+    $self->close;
+  }
+
+  private native method _cleanup_wsa : void ();
+}

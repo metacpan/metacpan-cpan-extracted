@@ -1,3 +1,10 @@
+0.007   2022-05-02  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli pcplist] Show more information about policy, add filtering
+          options --default-severity, --max-default-severity,
+          --min-default-severity.
+
+
 0.006   2021-12-01  Released-By: PERLANCAR; Urgency: medium
 
 	- [cli pcplist] Allow filtering with keyword, e.g. 'pcplist

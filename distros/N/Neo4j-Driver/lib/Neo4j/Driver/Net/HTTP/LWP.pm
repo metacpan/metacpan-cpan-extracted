@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Net::HTTP::LWP;
 # ABSTRACT: HTTP agent adapter for libwww-perl
-$Neo4j::Driver::Net::HTTP::LWP::VERSION = '0.28';
+$Neo4j::Driver::Net::HTTP::LWP::VERSION = '0.30';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(Neo4j::Driver::Net::HTTP);
@@ -51,7 +51,7 @@ sub new {
 		croak "HTTPS does not support unencrypted communication; use HTTP" if $unencrypted;
 		$agent->ssl_opts( verify_hostname => 1 );
 		if (defined( my $trust_ca = $driver->config('trust_ca') )) {
-			croak "tls_ca file '$trust_ca' can't be used: $!" if ! open(my $fh, '<', $trust_ca);
+			croak "trust_ca file '$trust_ca' can't be used: $!" if ! open(my $fh, '<', $trust_ca);
 			$agent->ssl_opts( SSL_ca_file => $trust_ca );
 		}
 	}
@@ -63,15 +63,29 @@ sub new {
 }
 
 
-sub agent { shift->{agent} }
+sub protocol {
+	# uncoverable pod (see Deprecations.pod)
+	my ($self) = @_;
+	warnings::warnif deprecated => __PACKAGE__ . "->protocol() is deprecated";
+	return $self->{response}->protocol // 'HTTP';
+}
+
+
+sub agent {
+	# uncoverable pod (see Deprecations.pod)
+	my ($self) = @_;
+	warnings::warnif deprecated => __PACKAGE__ . "->agent() is deprecated; call ua() instead";
+	return $self->{agent};
+}
+
+
+sub ua { shift->{agent} }
 
 sub uri { shift->{uri_base} }
 
 sub json_coder { shift->{json_coder} }
 
 sub result_handlers { }
-
-sub protocol { shift->{response}->protocol // 'HTTP' }
 
 sub http_reason { shift->{response}->message // '' }
 
@@ -140,7 +154,7 @@ Neo4j::Driver::Net::HTTP::LWP - HTTP agent adapter for libwww-perl
 
 =head1 VERSION
 
-version 0.28
+version 0.30
 
 =head1 SYNOPSIS
 
@@ -156,7 +170,7 @@ You can also extend this module through inheritance:
  use parent 'Neo4j::Driver::Net::HTTP::LWP';
  sub new {
    my $self = shift->SUPER::new(@_);
-   $self->agent->proxy('http', 'http://proxy.example.net:8081/');
+   $self->ua->proxy('http', 'http://proxy.example.net:8081/');
    return $self;
  }
 
@@ -202,25 +216,19 @@ has been fully received. Therefore none of the other methods will
 ever block.
 
 In addition to the methods listed above,
-L<Neo4j::Driver::Net::HTTP::LWP> implements the following methods.
+L<Neo4j::Driver::Net::HTTP::LWP> implements the following method.
 
-=head2 agent
+=head2 ua
 
  use parent 'Neo4j::Driver::Net::HTTP::LWP';
  sub foo {
    my $self = shift;
-   $ua = $self->agent;
+   $ua = $self->ua;
    ...
  }
 
 Returns the L<LWP::UserAgent> instance in use.
 Meant to facilitate subclassing.
-
-=head2 protocol
-
-Returns the HTTP version of the last response (typically
-C<"HTTP/1.1">). Since version 0.26, this method is no longer
-required for a net module and using it is now discouraged.
 
 =head1 BUGS
 

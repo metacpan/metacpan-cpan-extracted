@@ -33,7 +33,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.20';
+our $VERSION = '0.22';
 
 use UI::Various::core;
 use UI::Various::Window;

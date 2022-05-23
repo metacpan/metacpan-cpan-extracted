@@ -14,7 +14,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package Sys::OsPackage;
-$Sys::OsPackage::VERSION = '0.1.3';
+$Sys::OsPackage::VERSION = '0.1.4';
 use Config;
 use Carp qw(carp croak confess);
 use Sys::OsRelease;
@@ -487,6 +487,22 @@ sub user_perldir_search_loop
     return;
 }
 
+# make sure directory path exists
+sub build_path
+{
+    my @path_parts = @_;
+    my $need_path;
+    foreach my $need_dir (@path_parts) {
+        $need_path = (defined $need_path) ? "$need_path/$need_dir" : $need_dir;
+        if (not -d $need_path) {
+            no autodie;
+            mkdir $need_path, 0755
+                or croak "failed to create $need_path: $!";
+        }
+    }
+    return;
+}
+
 # if the user's local perl library doesn't exist, create it
 sub user_perldir_create
 {
@@ -495,19 +511,10 @@ sub user_perldir_create
 
     if (not defined $self->sysenv("perlbase")) {
         # use a default that complies with XDG directory structure
-        my $need_path;
-        foreach my $need_dir ($self->sysenv("home"), ".local", "perl", "lib", "perl5") {
-            $need_path = (defined $need_path) ? "$need_path/$need_dir" : $need_dir;
-            if (not -d $need_path) {
-                no autodie;
-                mkdir $need_path, 0755
-                    or croak "failed to create $need_path: $!";
-            }
-        }
+        build_path($self->sysenv("home"), ".local", "perl");
         $self->sysenv("perlbase", $self->sysenv("home")."/.local/perl");
-        symlink $self->sysenv("home")."/.local/perl", $self->sysenv("perlbase")
-            or croak "failed to symlink ".$self->sysenv("home")."/.local/perl to ".$self->sysenv("perlbase").": $!";
     }
+    build_path($self->sysenv("perlbase"), "lib", "perl5");
     return;
 }
 
@@ -1048,7 +1055,7 @@ Sys::OsPackage - install OS packages and determine if CPAN modules are packaged 
 
 =head1 VERSION
 
-version 0.1.3
+version 0.1.4
 
 =head1 SYNOPSIS
 
@@ -1079,6 +1086,8 @@ Ubuntu is supported by the Debian driver.
 Other packaging systems for Unix-like operating systems should be feasible to add by writing a driver module.
 
 =head1 SEE ALSO
+
+L<fetch-reqs.pl> comes with I<Sys::OsPackage> to provide a command-line interface.
 
 L<Sys::OsPackage::Driver>
 

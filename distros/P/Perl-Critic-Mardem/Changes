@@ -1,0 +1,14 @@
+Revision history for Perl-Critic-Mardem
+========================================
+
+0.02 2022-05-22
+
+    * removed regex /aa to support perl 5.10 and 5.12
+    * renamed dist Mardem-RefactoringPerlCriticPolicies to Perl-Critic-Mardem
+    * moved Mardem::RefactoringPerlCriticPolicies to Perl::Critic::Mardem
+    * moved Mardem::RefactoringPerlCriticPolicies::Util to Perl::Critic::Mardem::Util
+    * fixed GitHub URL
+
+0.01 2022-05-10
+
+    + initial release

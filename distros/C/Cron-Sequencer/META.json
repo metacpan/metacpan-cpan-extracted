@@ -60,6 +60,6 @@
          "url" : "https://github.com/Humanstate/cron-sequencer"
       }
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.09"
 }

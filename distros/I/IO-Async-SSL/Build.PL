@@ -16,6 +16,7 @@ my $build = Module::Build->new(
    test_requires => {
       'IO::Async::OS' => 0,
       'IO::Async::Test' => '0.68',
+      'Test::Identity' => 0,
       'Test::More' => '0.88', # done_testing
    },
    configure_requires => {

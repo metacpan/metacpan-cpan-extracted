@@ -1,0 +1,54 @@
+---
+abstract: 'Warn if classes override role methods without excluding them'
+author:
+  - 'Curtis "Ovid" Poe <curtis.poe@gmail.com>'
+build_requires:
+  Capture::Tiny: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-Role-WarnOnConflict
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  MooseX::Meta::Role::WarnOnConflict:
+    file: lib/MooseX/Meta/Role/WarnOnConflict.pm
+    version: '0.01'
+  MooseX::Role::WarnOnConflict:
+    file: lib/MooseX/Role/WarnOnConflict.pm
+    version: '0.01'
+requires:
+  Carp: '0'
+  Moose: '0'
+  Moose::Exporter: '0'
+  Moose::Meta::Role: '0'
+  Moose::Meta::Role::Application::ToClass: '0'
+  Moose::Role: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Ovid/moosex-role-warnonconflict/issues
+  homepage: https://github.com/Ovid/moosex-role-warn-on-conflict
+  repository: https://github.com/Ovid/moosex-role-warnonconflict.git
+version: '0.01'
+x_contributors:
+  - 'Ovid <ovid@cpan.org>'
+x_generated_by_perl: v5.28.3
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0

@@ -13,7 +13,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150001'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,7 +32,6 @@ requires:
   Hash::Merge::Simple: '0'
   IO::Handle: '0'
   IO::Select: '0'
-  Linux::Personality: '0'
   Log::Log4perl: '0'
   Moose: '0'
   MooseX::Log::Log4perl: '0'
@@ -51,7 +50,7 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Tapper-Installer
   homepage: http://metacpan.org/release/Tapper-Installer
   repository: git://github.com/tapper/Tapper-Installer.git
-version: 5.0.0
+version: 5.0.1
 x_Dist_Zilla:
   perl:
     version: '5.022000'
@@ -68,78 +67,78 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@TAPPER/GatherDir'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@TAPPER/PruneCruft'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@TAPPER/ManifestSkip'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@TAPPER/MetaYAML'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@TAPPER/Readme'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@TAPPER/ExtraTests'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@TAPPER/ExecDir'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@TAPPER/ShareDir'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@TAPPER/MakeMaker'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@TAPPER/Manifest'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@TAPPER/TestRelease'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@TAPPER/ConfirmRelease'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@TAPPER/UploadToCPAN'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@TAPPER/MetaConfig'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@TAPPER/MetaJSON'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@TAPPER/PkgVersion'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@TAPPER/PodSyntaxTests'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@TAPPER/MetaResources'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Authority
       name: '@TAPPER/Authority'
@@ -235,11 +234,11 @@ x_Dist_Zilla:
               name: '@TAPPER/Encoding'
               version: '0.03'
       name: '@TAPPER/PodWeaver'
-      version: '4.006'
+      version: '4.008'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@TAPPER/AutoPrereqs'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Git::Describe
       name: '@TAPPER/Git::Describe'
@@ -251,7 +250,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@TAPPER/NextRelease'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Git::NextVersion
       config:
@@ -303,7 +302,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v5.0.0
+          tag: v5.0.1
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -324,56 +323,67 @@ x_Dist_Zilla:
       name: '@TAPPER/@Git/Push'
       version: '2.036'
     -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: suggests
+      name: RuntimeSuggests
+      version: '6.024'
+    -
       class: Dist::Zilla::Plugin::AssertOS
       name: AssertOS
       version: '0.06'
     -
       class: Dist::Zilla::Plugin::Encoding
       name: Encoding
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '5.041'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '5.041'
+      version: '6.024'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '5.041'
+    version: '6.024'
 x_authority: cpan:TAPPER
+x_generated_by_perl: v5.22.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: BSD-2-Clause-FreeBSD

@@ -2,10 +2,11 @@ package Test2::Tools::HTTP::UA::Mojo::Proxy;
 
 use strict;
 use warnings;
+use 5.016;
 use Mojo::Base 'Mojo::UserAgent::Proxy';
 
 # ABSTRACT: Proxy class for Test2::Tools::HTTP::UA::Mojo
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 has 'apps';
@@ -14,7 +15,7 @@ has 'apps_proxy_url';
 sub prepare
 {
   my ($self, $tx) = @_;
-  
+
   if($self->apps->uri_to_app($tx->req->url.""))
   {
     $tx->req->proxy($self->apps_proxy_url);
@@ -40,7 +41,7 @@ Test2::Tools::HTTP::UA::Mojo::Proxy - Proxy class for Test2::Tools::HTTP::UA::Mo
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -65,7 +66,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Graham Ollis.
+This software is copyright (c) 2018-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

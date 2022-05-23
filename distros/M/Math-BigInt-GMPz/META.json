@@ -49,6 +49,6 @@
          "web" : "https://github.com/pjacklam/p5-Math-BigInt-GMPz"
       }
    },
-   "version" : "0.0009",
+   "version" : "0.0010",
    "x_serialization_backend" : "JSON::PP version 4.08"
 }

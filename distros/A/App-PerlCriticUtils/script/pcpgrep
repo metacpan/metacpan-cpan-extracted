@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/PerlCriticUtils/pcpgrep
-# and generated automatically using Perinci::CmdLine::Gen version 0.500
+# and generated automatically using Perinci::CmdLine::Gen version 0.501
 
 use 5.010001;
 use strict;
@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-12-01'; # DATE
+our $DATE = '2022-05-02'; # DATE
 our $DIST = 'App-PerlCriticUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/PerlCriticUtils/pcpgrep",
@@ -38,7 +38,7 @@ pcpgrep - Grep from list of installed Perl::Critic policy module names (abstract
 
 =head1 VERSION
 
-This document describes version 0.006 of pcpgrep (from Perl distribution App-PerlCriticUtils), released on 2021-12-01.
+This document describes version 0.007 of pcpgrep (from Perl distribution App-PerlCriticUtils), released on 2022-05-02.
 
 =head1 SYNOPSIS
 
@@ -183,22 +183,22 @@ For fish and zsh, install L<shcompgen> as described above.
 What's that policy that prohibits returning undef explicitly?:
 
  % pcpgrep undef
- +------------------------------------------+-----------------------------------------------------------------------------------------------+
- | name                                     | abstract                                                                                      |
- +------------------------------------------+-----------------------------------------------------------------------------------------------+
- | BuiltinFunctions::ProhibitSleepViaSelect | Use L<Time::HiRes|Time::HiRes> instead of something like C<select(undef, undef, undef, .05)>. |
- | InputOutput::ProhibitJoinedReadline      | Use C<local $/ = undef> or L<Path::Tiny|Path::Tiny> instead of joined readline.               |
- | Subroutines::ProhibitExplicitReturnUndef | Return failure with bare C<return> instead of C<return undef>.                                |
- +------------------------------------------+-----------------------------------------------------------------------------------------------+
+ +------------------------------------------+-----------------------------------------------------------------------------------------------+------------------+------------------+--------------------------+----------------------+
+ | name                                     | abstract                                                                                      | applies_to       | default_severity | default_themes           | supported_parameters |
+ +------------------------------------------+-----------------------------------------------------------------------------------------------+------------------+------------------+--------------------------+----------------------+
+ | BuiltinFunctions::ProhibitSleepViaSelect | Use L<Time::HiRes|Time::HiRes> instead of something like C<select(undef, undef, undef, .05)>. | PPI::Token::Word | 5                | core, pbp, bugs          |                      |
+ | InputOutput::ProhibitJoinedReadline      | Use C<local $/ = undef> or L<Path::Tiny|Path::Tiny> instead of joined readline.               | PPI::Token::Word | 3                | core, pbp, performance   |                      |
+ | Subroutines::ProhibitExplicitReturnUndef | Return failure with bare C<return> instead of C<return undef>.                                | PPI::Token::Word | 5                | core, pbp, bugs, certrec |                      |
+ +------------------------------------------+-----------------------------------------------------------------------------------------------+------------------+------------------+--------------------------+----------------------+
 
 What's that policy that requires using strict?:
 
  % pcpgrep req strict
- +---------------------------------------+-----------------------+
- | name                                  | abstract              |
- +---------------------------------------+-----------------------+
- | TestingAndDebugging::RequireUseStrict | Always C<use strict>. |
- +---------------------------------------+-----------------------+
+ +---------------------------------------+-----------------------+---------------+------------------+------------------------------------+----------------------+
+ | name                                  | abstract              | applies_to    | default_severity | default_themes                     | supported_parameters |
+ +---------------------------------------+-----------------------+---------------+------------------+------------------------------------+----------------------+
+ | TestingAndDebugging::RequireUseStrict | Always C<use strict>. | PPI::Document | 5                | core, pbp, bugs, certrule, certrec | equivalent_modules   |
+ +---------------------------------------+-----------------------+---------------+------------------+------------------------------------+----------------------+
 
 =head1 HOMEPAGE
 
@@ -231,7 +231,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2018, 2017 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2018, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
