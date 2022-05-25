@@ -3,7 +3,7 @@ package Net::FullAuto::ISets::Local::EmailServer_is;
 ### OPEN SOURCE LICENSE - GNU AFFERO PUBLIC LICENSE Version 3.0 #######
 #
 #    Net::FullAuto - Powerful Network Process Automation Software
-#    Copyright © 2000-2021  Brian M. Kelly
+#    Copyright © 2000-2022  Brian M. Kelly
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -2868,6 +2868,7 @@ END
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'postconf -e \'smtpd_sasl_auth_enable = yes\'',
+         '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'postconf -e \'smtpd_tls_received_headers = yes\'',
          '__display__');
@@ -3751,6 +3752,11 @@ END
       'crontab -u www-data -l | { cat; echo "18 11 * * * '.
       '/var/www/html/roundcube/bin/cleandb.sh"; } | '.
       'sudo crontab -u www-data -','__display__');
+   # https://serverfault.com/questions/790772/cron-job-for-lets-encrypt-renewal/790776
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'crontab -u root -l | { cat; echo -e "43 6 * * * '.
+      'certbot renew --post-hook \\x22systemctl reload nginx\\x22"; } | '.
+      'sudo crontab -u root -','__display__');
 
    my $install_redis=<<'END';
 
@@ -4821,7 +4827,7 @@ END
           |_| \_|\___|\__|     |_|   \__,_|_|_/_/   \_\__,_|\__\___/ (C)
 
 
-   Copyright (C) 2000-2021  Brian M. Kelly  Brian.Kelly@FullAuto.com
+   Copyright (C) 2000-2022  Brian M. Kelly  Brian.Kelly@FullAuto.com
 
 END
    eval {

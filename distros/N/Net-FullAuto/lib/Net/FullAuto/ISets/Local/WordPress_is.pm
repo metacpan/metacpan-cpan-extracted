@@ -3,7 +3,7 @@ package Net::FullAuto::ISets::Local::WordPress_is;
 ### OPEN SOURCE LICENSE - GNU AFFERO PUBLIC LICENSE Version 3.0 #######
 #
 #    Net::FullAuto - Powerful Network Process Automation Software
-#    Copyright © 2000-2021  Brian M. Kelly
+#    Copyright © 2000-2022  Brian M. Kelly
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -107,9 +107,27 @@ my $configure_wordpress=sub {
          '/usr/local/lib64:$LD_LIBRARY_PATH" '.
          '"PATH=/usr/local/mysql/scripts:$PATH" ';
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "hostnamectl set-hostname mail.$domain_url");
+      "hostnamectl set-hostname $domain_url");
    ($stdout,$stderr)=setup_aws_security(
       'WordPressSecurityGroup','WordPress.com Security Group');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'if [ -f /var/www/html/wordpress/wp-config.php ]; '.
+      'then echo EXISTS;else echo NONE; fi');
+   if ($stdout=~/EXISTS/) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'cat /var/www/html/wordpress/wp-config.php');
+      my $curpass=$stdout;
+      $curpass=~s/^.*DB_PASSWORD['][,]\s+?['](.*?)['].*$/$1/s;
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'mysqldump -u wordpressuser -p'.$curpass.
+         ' --verbose --databases wordpress >'.
+         '/var/www/html/wordpress/gw_dbbackup.sql',
+         '__display__');
+      #mysql -u wordpressuser -p wordpress < gw_dbbackup.sql
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'tar zcvf /home/www-data/gw_backup.tar '.
+         '/var/www/html/wordpress','__display__');
+   }
    ($stdout,$stderr)=$handle->cmd($sudo.'id www-data');
    if ($stdout=~/no such user/ || $stderr=~/no such user/) {
       ($stdout,$stderr)=$handle->cmd($sudo.'groupadd www-data');
@@ -1216,12 +1234,6 @@ END
        '%NL%            include fastcgi_params;'.
        '%NL%        }'.
        '%NL%'.
-       '%NL%        location /rspamd {'.
-       '%NL%            proxy_pass http://127.0.0.1:11334/;'.
-       '%NL%            proxy_set_header Host $host;'.
-       '%NL%            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;'.
-       '%NL%        }'.
-       '%NL%'.
        '%NL%        location ~ ^/(README.md|INSTALL|LICENSE|CHANGELOG|UPGRADING)$ {'.
        '%NL%            deny all;'.
        '%NL%        }'.
@@ -1336,7 +1348,7 @@ END
    } else {
       ($stdout,$stderr)=$handle->cmd($sudo.
          "sed -i \'s/server_name  localhost/".
-         "server_name mail.$domain_url/\' ".
+         "server_name $domain_url/\' ".
          "$nginx_path/nginx/nginx.conf");
       ($stdout,$stderr)=$handle->cmd($sudo.
          "sed -i 's/#user  nobody;/user  www-data;/' ".
@@ -1357,7 +1369,7 @@ END
          'yum -y install certbot-nginx','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'certbot -n --nginx --debug --agree-tos --email '.
-         "$email_address -d mail.$domain_url",
+         "$email_address -d $domain_url",
          '__display__');
       # https://ssldecoder.org
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1442,16 +1454,6 @@ END
 END
    print $install_mysql;sleep 10;
    print "\n\n";
-   ($stdout,$stderr)=$handle->cwd('/opt/source');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'ls -1 /opt/source/mariadb');
-   if ($stdout=~/libmariadb/) {
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'mkdir -vp /opt/mariadb','__display__');
-      ($stdout,$stderr)=$handle->cwd('/opt/source/mariadb');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'mv -fv *rpm /opt/mariadb','__display__');
-   }
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.'which mysql');
    my $mysql_status='';my $mysql_version='';
@@ -1720,14 +1722,14 @@ END
          sleep 1;
          next;
       } elsif ($cmd_sent==2 && $output=~/MariaDB.*?>\s*$/) {
-         my $cmd='DROP USER wordpress@localhost;';
+         my $cmd='DROP USER wordpressuser@localhost;';
          print "$cmd\n";
          $handle->print($cmd);
          $cmd_sent++;
          sleep 1;
          next;
       } elsif ($cmd_sent==3 && $output=~/MariaDB.*?>\s*$/) {
-         my $cmd='CREATE USER wordpress@localhost IDENTIFIED BY '.
+         my $cmd='CREATE USER wordpressuser@localhost IDENTIFIED BY '.
                  "'".$service_and_cert_password."';";
          print "$cmd\n";
          $handle->print($cmd);
@@ -1736,7 +1738,7 @@ END
          next;
       } elsif ($cmd_sent==4 && $output=~/MariaDB.*?>\s*$/) {
          my $cmd='GRANT ALL PRIVILEGES ON wordpress.*'.
-                 ' TO wordpress@localhost;';
+                 ' TO wordpressuser@localhost;';
          print "$cmd\n";
          $handle->print($cmd);
          $cmd_sent++;
@@ -1767,15 +1769,6 @@ END
    }
    # https://shaunfreeman.name/compiling-php-7-on-centos/
    # https://www.vultr.com/docs/how-to-install-php-7-x-on-centos-7
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'ls -1 /opt/source/mariadb');
-   if ($stdout=~/[Mm]aria[Dd][Bb].*rpm/) {
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'mkdir -vp /opt/mariadb','__display__');
-      ($stdout,$stderr)=$handle->cwd('/opt/source/mariadb');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'mv -fv *rpm /opt/mariadb','__display__');
-   }
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    #
    #  Set PHP 7 or 8 here
@@ -2267,6 +2260,9 @@ END
       "sed -i 's/database_name_here/wordpress/' wp-config.php");
    ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i 's/username_here/wordpressuser/' wp-config.php");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "sed -i 's#localhost#localhost:".
+      "/var/run/mysqld/mysqld.sock#' wp-config.php");
    my $esc_pass=$service_and_cert_password;
    $esc_pass=~s/[&]/\\&/g;
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -2364,7 +2360,7 @@ if ($do==1) {
           |_| \_|\___|\__|     |_|   \__,_|_|_/_/   \_\__,_|\__\___/ (C)
 
 
-   Copyright (C) 2000-2021  Brian M. Kelly  Brian.Kelly@FullAuto.com
+   Copyright (C) 2000-2022  Brian M. Kelly  Brian.Kelly@FullAuto.com
 
 END
    eval {
@@ -2701,7 +2697,7 @@ our $test_letsencrypt=sub {
    my $domain_url="]I[{'domain_url',1}";
    my $handle=connect_shell();
    my ($stdout,$stderr)=$handle->cmd(
-      "wget -qO- https://crt.sh/?Identity=mail.$domain_url");
+      "wget -qO- https://crt.sh/?Identity=$domain_url");
    my $tr=0;my $certid='';
    unless ($stdout=~/None found/s) {
       my $nextline=0;my $tr=0;
