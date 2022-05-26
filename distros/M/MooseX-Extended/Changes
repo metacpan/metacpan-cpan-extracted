@@ -1,0 +1,47 @@
+Revision history for MooseX-Extended
+
+0.06      2022-05-26 14:32:54 CEST
+
+          - Make it very easy to exclude features and include types.
+
+
+0.05      2022-05-26 10:24:35 CEST
+
+          - Assert a minimum version of various Type:: modules due to CPAN
+            test failures from old versions released eight years ago!
+
+0.04      2022-05-25 10:41:10 CEST
+          - Moved critic and tidy tests to xt/author to prevent false
+            negatives on CPAN testers
+          - Use github actions to have proper CI for linux and windows
+
+0.03      2022-05-24 18:28:10 CEST
+          - Don't disable namespace::autoclean while using debugger
+
+0.02      2022-05-24 10:06:47 CEST
+
+          - support postderef_qq (thanks, haarg)
+          - Fix broken POD name, causing the overview to not be linked
+
+0.01      2022-05-24 09:44:44 CEST
+
+          - Reorganize docs to provide links to a manual
+          - Make cloning much more flexible (thanks to Leon Timmermans for
+            pointing out that my previous approach wasn't enough).
+          - Start adding exceptions
+          - Throw exceptions if attribute names or shortcut names are invalid
+          - Support v5.20.0
+          - Add github actions
+          - Add postderef support
+          - Trial support for `clone => 1`
+          - Roles will now warn if a class overrides a role method without
+            excluding it (in Moose, the class silently ignores the role method)
+          - Add shortcuts for writer, clearer, builder, predicate
+          - Role support added
+          - make_immutable is now the default (thanks, haarg)
+          - no need to add a true value to the end of your module (thanks, haarg)
+          - Clean up and test mro setting (thanks, haarg!)
+          - use MooseX::HasDefaults::RO to allow the RO default
+          - Start building out a TODO wishlist in the POD
+          - Add [CPANFile] Dist::Zilla plugin (thanks, Happy Barney)
+          - First pass at experimental Moose version

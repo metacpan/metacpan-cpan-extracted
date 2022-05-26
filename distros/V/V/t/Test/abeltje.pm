@@ -3,7 +3,7 @@ use v5.10.1;
 use warnings;
 use strict;
 
-our $VERSION = '1.01';
+our $VERSION = '1.06';
 
 use parent 'Test::Builder::Module';
 
@@ -73,6 +73,6 @@ This module works by the use of L<Test::Builder::Module/import_extra()>.
 
 =head1 COPYRIGHT
 
-(c) MMXX - Abe Timmerman <abeltje@cpan.org>
+E<copy> MMXX - Abe Timmerman <abeltje@cpan.org>
 
 =cut

@@ -14,7 +14,6 @@ t/11_read_string.t
 t/12_write.t
 t/13_write_string.t
 t/20_subclass.t
-t/21_yamlpm_compat.t
 t/30_yaml_spec_tml.t
 t/31_local_tml.t
 t/32_world_tml.t

@@ -28,7 +28,7 @@ sparsenauty(sg, lab, ptn, options)
 
         /* Increasing workspace to handle larger or more intricate
            graphs */
-        size_t worksize = 2000;
+        size_t worksize = 6400;
         setword workspace[worksize];
         nauty( (graph*)&sg, lab, ptn, NULL, orbits, &options, &stats,
                workspace, worksize, SETWORDSNEEDED(sg.nv), sg.nv, (graph*)&sg2 );

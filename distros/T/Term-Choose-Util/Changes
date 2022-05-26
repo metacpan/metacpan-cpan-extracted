@@ -1,6 +1,9 @@
 Revision history for Term::Choose::Util
 
 
+0.135   2022-05-26
+        - Update and bugfix option 'prompt'.
+
 0.134   2022-05-23
         - Removed layout-3 warnings.
         - Removed experimental option solo.

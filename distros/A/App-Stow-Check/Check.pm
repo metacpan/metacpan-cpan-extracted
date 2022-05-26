@@ -11,7 +11,7 @@ use Readonly;
 
 Readonly::Scalar our $DEFAULT_STOW_DIR => '/usr/local/stow';
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -36,7 +36,7 @@ sub run {
 	if (! getopts('d:h', $self->{'_opts'}) || $self->{'_opts'}->{'h'} || @ARGV < 1) {
 		print STDERR "Usage: $0 [-d stow_dir] [-h] [--version] command\n";
 		print STDERR "\t-d stow_dir\tStow directory (default value is '$DEFAULT_STOW_DIR').\n";
-		print STDERR "\t-h\t\tHelp.\n";
+		print STDERR "\t-h\t\tPrint help.\n";
 		print STDERR "\t--version\tPrint version.\n";
 		print STDERR "\tcommand\t\tCommand for which is stow dist looking.\n";
 		return 1;
@@ -144,7 +144,7 @@ Returns exit code.
  # Output:
  # Usage: ./ex1.pl [-d stow_dir] [-h] [--version] command
  #         -d stow_dir     Stow directory (default value is '/usr/local/stow').
- #         -h              Help.
+ #         -h              Print help.
  #         --version       Print version.
  #         command         Command for which is stow dist looking.
 
@@ -168,12 +168,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021 Michal Josef Špaček
+© 2021-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

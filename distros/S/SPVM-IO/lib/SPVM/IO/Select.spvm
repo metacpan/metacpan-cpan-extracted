@@ -6,7 +6,7 @@ class IO::Select {
   static method new : IO::Select () {
     my $self = new IO::Select;
     
-    $self->{handles} = IntList->new(undef);
+    $self->{handles} = IntList->new((int[])undef);
     
     return $self;
   }
@@ -36,7 +36,7 @@ class IO::Select {
 
   method remove : int ($remove_handle : int) {
     
-    my $new_handles = IntList->new(undef);
+    my $new_handles = IntList->new((int[])undef);
     my $handles = $self->{handles};
     
     my $removed = 0;

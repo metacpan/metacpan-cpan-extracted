@@ -29,6 +29,10 @@ subtest 'dispatch' => sub {
   $res = capture($app, [qw(coffee b 42)]);
   is $res->[2], 12, 'invalid exit';
   like $res->[0], qr{\bcoffee\.pl/b/42$}, 'coffee stdout' or diag "ERROR: $res->[1]";
+
+  $res = capture($app, [qw(help)]);
+  like $res->[0],   qr{Usage:},       'help stdout'    or diag "ERROR: $res->[1]";
+  unlike $res->[0], qr{Subcommands:}, 'no subcommands' or diag "ERROR: $res->[1]";
 };
 
 subtest 'help' => sub {
@@ -37,12 +41,32 @@ subtest 'help' => sub {
 Subcommands:
   beans    Try beans.pl
   coffee   Try coffee.pl
+  help     Try help.pl
   invalid  Try invalid.pl
+  unknown  Try unknown.pl
 
 Options:
   -h  
 
 HERE
+};
+
+subtest 'unknown subcommand' => sub {
+  my $res = capture($app, [qw(unknown)]);
+  is $res->[0], "ok\n", 'ok stdout'     or diag "ERROR: $res->[1]";
+  is $res->[2], 0,      'ok exit value' or diag "ERROR: $res->[1]";
+
+  $res = capture($app, [qw(unknown foo)]);
+  is $res->[0], "unknown\n", 'foo stdout'     or diag "ERROR: $res->[1]";
+  is $res->[2], 0,           'foo exit value' or diag "ERROR: $res->[1]";
+
+  $res = capture($app, [qw(unknown 42)]);
+  is $res->[0], '', 'number stdout'     or diag "ERROR: $res->[1]";
+  is $res->[1], '', 'number stderr'     or diag "ERROR: $res->[1]";
+  is $res->[2], 42, 'number exit value' or diag "ERROR: $res->[1]";
+
+  $res = capture($app, [qw(unknown die)]);
+  like $res->[1], qr{not cool}, 'die stderr' or diag "ERROR: $res->[0]";
 };
 
 done_testing;

@@ -1,0 +1,420 @@
+# PODNAME: MooseX::Extended::Manual::Overview
+# ABSTRACT: Work-in-progress overview for MooseX::Extended
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+MooseX::Extended::Manual::Overview - Work-in-progress overview for MooseX::Extended
+
+=head1 VERSION
+
+version 0.06
+
+=head1 CONVERTING FROM MOOSE
+
+For most sane codebases, converting from L<Moose> to L<MooseX::Extended> is as
+simple as C<< s/Moose/MooseX::Extended/ >>. We I<try> to be
+backwards-compatible, but some issues are glaring enough that they can't be
+fixed. Run your tests, folks.
+
+From there, convert your various C<has> attributes to C<field> or C<param>
+(and run your tests), and you can also delete the annoying C<<
+__PACKAGE__->meta->make_immutable >> at the end of every package (run your
+tests, folks).
+
+From there, if you're not using signatures, convert your methods to
+using signatures. You'll almost definitely get test failures there as many
+functions handle arguments poorly.
+
+For roles, just C<< s/Moose::Role/MooseX::Extended::Roles/ >> and repeat the
+process (and run your tests, folks).
+
+Along the way, you can probably delete your references to
+L<namespace::autoclean> and friends because we provide that for you.
+
+=head1 RATIONALE
+
+You can skip this section if you like.
+
+L<MooseX::Extended> is built on years of experience hacking on L<Moose> and
+being the lead designer of the L<Corinna|https://github.com/Ovid/Cor> project
+to bring modern OO to the Perl language. We love Moose, but over the years,
+it's become clear that there are some problematic design choices. Plus,
+Corinna is not yet in core as We write this (though the Perl Steering Committee
+has accepted it), so for now, let's see how far we can push the envelope.
+
+=head1 BOILERPLATE
+
+This:
+
+    package My::Class {
+        use MooseX::Extended;
+
+        ... your code here
+    }
+
+Is sort of the equivalent to:
+
+    package My::Class {
+        use v5.20.0;
+        use Moose;
+        use MooseX::StrictConstructor;
+        use feature 'signatures';
+        no warnings 'experimental::signatures';
+        use namespace::autoclean;
+        use Carp;
+        use mro 'c3';
+
+        ... your code here
+
+        __PACKAGE__->meta->make_immutable;
+    }
+
+    1;
+
+We get tired of typing a lot of boilerplate, so C<MooseX::Extended> does away
+with it.
+
+=head1 CONSTRUCTOR
+
+The constructor behavior for Moose could use some love.
+
+=head1 What's allowed in the constructor?
+
+We've regularly face the following problem:
+
+    package Some::Class;
+
+    use Moose;
+
+    has name     => (...);
+    has uuid     => (...);
+    has id       => (...);
+    has backlog  => (...);
+    has auth     => (...);
+    has username => (...);
+    has password => (...);
+    has cache    => (...);
+    has this     => (...);
+    has that     => (...);
+
+Which of those should be passed to the constructor and which should not? Just
+because you I<can> pass something to the constructor doesn't mean you
+I<should>. Unfortunately, Moose defaults to "opt-out" rather than "opt-in" for
+constructor arguments. This makes it really easy to build objects, but means
+that you can pass things to the constructor and it won't always work the way
+you want it to.
+
+There's an arcane C<< init_arg => undef >> pair to pass to each to say "this
+cannot be set via the constructor," but many developers are either unaware of
+this is simply forget about it. C<MooseX::Extended> solves with by separating
+C<has> into C<param> (allowed in the constructor, but you can also use
+C<default> or C<builder>) and C<field>, which if forbidden in the constructor.
+We can rewrite the above as this:
+
+    package Some::Class;
+
+    use Moose;
+
+    param name     => (...);
+    param backlog  => (...);
+    param auth     => (...);
+    param username => (...);
+    param password => (...);
+
+    field cache    => (...);
+    field this     => (...);
+    field that     => (...);
+    field uuid     => (...);
+    field id       => (...);
+
+And now you can instantly see what is and is not I<intended> to be allowed in
+the constructor.
+
+Note that in our experience, C<field> attributes often depend on C<param>
+attributes, so they're lazy by default (a nice performance win if you don't
+call them), but you can still pass C<< lazy => 0 >> to override this.
+
+=head2 Unknown arguments to the constructor
+
+Here's another fun bug:
+
+    my $object = Some::Class->new(
+        name   => $name,
+        seriel => $serial,
+    );
+
+    # later in your code
+
+    if ( $gbject->serial ) {
+        # unreachable code
+    }
+
+This is because Moose, by default, ignores any unknown arguments to the
+constructor and in the above example, we misspelled "serial" as "seriel".
+
+C<MooseX::Extended> applies C<MooseX::StrictConstructor> to your class so you
+never have to face this problem again.
+
+B<WARNING>: Be careful when using this in existing class hierarchies. While
+C<MooseX::Extended> is compatible with Moose (Moose classes can always use
+C<MooseX::Extended> classes and roles), the reverse isn't always true. We've
+found, for example, that trying to use C<MooseX::StrictConstructor> with
+L<DBIx::Class> does not work.
+
+=head2 Method Resolution Order (mro)
+
+If you don't use multiple inheritance, you won't need to worry about this.
+However, by now, it's generally agreed that the C3 method resolution order
+(breadth-first, for Perl) is superior to the depth-first default. You can read
+about L<the diamond inheritance
+problem|https://en.wikipedia.org/wiki/Multiple_inheritance> if you'd like to
+learn more.
+
+Rather than remembering to include C<use mro 'c3'> in your code,
+L<MooseX::Extended> does it for you.
+
+If you have existing code that breaks under this, you should investigate
+carefully. You probably have a bug in your code.
+
+=head2 Making Your Class Immutable
+
+It's recommended that you end your Moose classes with this:
+
+    __PACKAGE__->meta->make_immutable;
+
+That causes a lot of things to happen under the hood. It makes your class much
+harder to debug as you're in a twisty maze of C<eval>ed methods, but it makes
+your class run much faster. The performance gain is often significant and you
+almost always want to use this, but it's easy to forget, so we add it for you.
+
+To do this, we use the C<after_runtime> function from C<B::Hooks::AtRuntime>.
+However, that doesn't work under the debugger. So if you're running under the
+debugger, we disable this. Please keep that in mind. As a convenience, when
+running under the debugger, we issue a series of warnings for every class that
+is impacted. For a large codebase, that could be a considerable number of
+classes if they use C<MooseX::Extended>:
+
+    We are running under the debugger. My::Name is not immutable
+    We are running under the debugger. My::Product is not immutable
+    We are running under the debugger. My::Order is not immutable
+
+=head1 IMMUTABLE OBJECTS
+
+The subject of immutable objects has been done to death. If We set the value of
+an attribute but another section of the code has already fetched that value,
+you might have two sections of the code operating under completely different
+assumptions of what they're allowed to do. So by default, all attributes are
+"read-only":
+
+    param name  => ( isa => NonEmptyStr );
+    field cache => ( isa => HashRef );
+
+You can change this if you need to:
+
+    param name  => ( is => 'rw', isa => NonEmptyStr );
+    field cache => ( is => 'rw', isa => HashRef );
+
+However, what's going on with that C<cache> attribute? It returns a reference.
+If your code mutates that reference, every bit of code holding a reference to
+that object I<silently has its state changed>. So we fixed that, too:
+
+    field cache => ( isa => HashRef, clone => 1 );
+
+Now, every time you get or set that data, it's cloned, ensuring that you can
+do this:
+
+    # assumes that the original ->cache has a SeKreT key.
+    my $hash1 = $object->cache;
+    delete $hash1->{SeKreT};
+    my $hash2 = $object->cache;
+    my $SeKreT = $hash2->{SeKreT}; # you get the original value
+
+Internally, we use L<Storable>'s C<dclone> method for this. Be aware that many
+things cannot be safely cloned (e.g., database handles).
+
+The C<< clone => 1 >> feature is safest when you don't have objects that
+you're trying to clone. As a result, this feature is B<EXPERIMENTAL>.
+
+=head1 ATTRIBUTES
+
+By now, you know that C<< is => 'ro' >> is the default for all C<param> and
+C<field> attributes. You can still use C<has>, but you will still need to use
+C<< is => ... >> with that:
+
+    has name => ( is => 'ro, ... );
+
+However, I hate typing out something like C<< predicate => 'is_assigned' >>.
+Or should it be C<< predicate => 'has_assigned' >>? For a variety of
+attributes, we've made this simpler.
+
+When using C<field> or C<param>, we have some attribute shortcuts:
+
+    param name => (
+        isa       => NonEmptyStr,
+        writer    => 1,   # set_name
+        reader    => 1,   # get_name
+        predicate => 1,   # has_name
+        clearer   => 1,   # clear_name
+        builder   => 1,   # _build_name
+    );
+
+    sub _build_name ($self) {
+        ...
+    }
+
+These can also be used when you pass an array reference to the function:
+
+    package Point {
+        use MooseX::Extended types => [qw/Int/];
+
+        param [ 'x', 'y' ] => (
+            isa     => Int,
+            clearer => 1,     # clear_x and clear_y available
+            default => 0,
+        ) :;
+    }
+
+Note that these are I<shortcuts> and they make attributes easier to write and more consistent.
+However, you can still use full names:
+
+    field authz_delegate => (
+        builder => '_build_my_darned_authz_delegate',
+    );
+
+=head2 C<writer>
+
+If an attribute has C<writer> is set to C<1> (the number one), a method
+named C<set_$attribute_name> is created.
+
+This:
+
+    param title => (
+        isa       => Undef | NonEmptyStr,
+        default   => undef,
+        writer => 1,
+    );
+
+Is the same as this:
+
+    has title => (
+        is      => 'rw',                  # we change this from 'ro'
+        isa     => Undef | NonEmptyStr,
+        default => undef,
+        writer  => 'set_title',
+    );
+
+=head2 C<reader>
+
+By default, the reader (accessor) for the attribute is the same as the name.
+You can always change this:
+
+    has payload => ( is => 'ro', reader => 'the_payload' );
+
+However, if you want to change the reader name
+
+If an attribute has C<reader> is set to C<1> (the number one), a method
+named C<get_$attribute_name> is created.
+
+This:
+
+    param title => (
+        isa       => Undef | NonEmptyStr,
+        default   => undef,
+        reader => 1,
+    );
+
+Is the same as this:
+
+    has title => (
+        is      => 'rw',                  # we change this from 'ro'
+        isa     => Undef | NonEmptyStr,
+        default => undef,
+        reader  => 'get_title',
+    );
+
+=head2 C<predicate>
+
+If an attribute has C<predicate> is set to C<1> (the number one), a method
+named C<has_$attribute_name> is created.
+
+This:
+
+    param title => (
+        isa       => Undef | NonEmptyStr,
+        default   => undef,
+        predicate => 1,
+    );
+
+Is the same as this:
+
+    has title => (
+        is        => 'ro',
+        isa       => Undef | NonEmptyStr,
+        default   => undef,
+        predicate => 'has_title',
+    );
+
+=head2 C<clearer>
+
+If an attribute has C<clearer> is set to C<1> (the number one), a method
+named C<clear_$attribute_name> is created.
+
+This:
+
+    param title => (
+        isa     => Undef | NonEmptyStr,
+        default => undef,
+        clearer => 1,
+    );
+
+Is the same as this:
+
+    has title => (
+        is      => 'ro',
+        isa     => Undef | NonEmptyStr,
+        default => undef,
+        clearer => 'clear_title',
+    );
+
+=head2 C<builder>
+
+If an attribute has C<builder> is set to C<1> (the number one), a method
+named C<_build_$attribute_name>.
+
+This:
+
+    param title => (
+        isa     =>  NonEmptyStr,
+        builder => 1,
+    );
+
+Is the same as this:
+
+    has title => (
+        is      => 'ro',
+        isa     => NonEmptyStr,
+        builder => '_build_title',
+    );
+
+Obviously, a "private" attribute, such as C<_auth_token> would get a build named
+C<_build__auth_token> (note the two underscores between "build" and "auth_token").
+
+=head1 AUTHOR
+
+Curtis "Ovid" Poe <curtis.poe@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2022 by Curtis "Ovid" Poe.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

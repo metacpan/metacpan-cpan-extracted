@@ -15,7 +15,7 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Graph-Nauty",
-  "LICENSE" => "perl",
+  "LICENSE" => "bsd",
   "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Graph::Nauty",
   "PREREQ_PM" => {
@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "Graph::Undirected" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.3.7",
+  "VERSION" => "0.4.0",
   "test" => {
     "TESTS" => "t/*.t"
   }

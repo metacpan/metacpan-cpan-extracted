@@ -1,4 +1,4 @@
-# $Id: URPM.pm 2370 2013-01-03 19:26:49Z guillomovitch $
+# $Id: URPM.pm 2471 2022-04-23 16:07:19Z guillomovitch $
 package Youri::Package::RPM::URPM;
 
 =head1 NAME
@@ -32,6 +32,12 @@ use URPM;
 use Youri::Package::Change;
 use Youri::Package::File;
 use Youri::Package::Relationship;
+
+my $relationship_pattern = qr/^
+    ([^\s*]+)      # name: everything BUT space and * characters
+    (?:\[\*\])   ? # optional scriptlet flag
+    (?:\[(.+)\]) ? # optional version suffix
+    $/x;
 
 =head1 CLASS METHODS
 
@@ -245,10 +251,8 @@ sub get_requires {
     my ($self) = @_;
     croak "Not a class method" unless ref $self;
 
-    my $pattern = qr/^([^[]+)(?:\[\*\])?(?:\[(.+)\])?$/;
-
     return map {
-        $_ =~ $pattern;
+        $_ =~ $relationship_pattern;
         Youri::Package::Relationship->new($1, $2)
     } $self->{_header}->requires();
 }
@@ -257,11 +261,9 @@ sub get_provides {
     my ($self) = @_;
     croak "Not a class method" unless ref $self;
 
-    my $pattern = qr/^([^[]+)(?:\[(.+)\])?$/;
-
     return map {
-        $_ =~ /$pattern/;
-        Youri::Package::Relationship->new($1, $2 && $2 ne '*' ?  $2 : undef)
+        $_ =~ $relationship_pattern;
+        Youri::Package::Relationship->new($1, $2)
     } $self->{_header}->provides();
 }
 
@@ -269,11 +271,9 @@ sub get_obsoletes {
     my ($self) = @_;
     croak "Not a class method" unless ref $self;
 
-    my $pattern = qr/^([^[]+)(?:\[(.+)\])?$/;
-
     return map {
-        $_ =~ $pattern;
-        Youri::Package::Relationship->new($1, $2 && $2 ne '*' ?  $2 : undef)
+        $_ =~ $relationship_pattern;
+        Youri::Package::Relationship->new($1, $2)
     } $self->{_header}->obsoletes();
 }
 
@@ -281,11 +281,9 @@ sub get_conflicts {
     my ($self) = @_;
     croak "Not a class method" unless ref $self;
 
-    my $pattern = qr/^([^[]+)(?:\[(.+)\])?$/;
-
     return map {
-        $_ =~ $pattern;
-        Youri::Package::Relationship->new($1, $2 && $2 ne '*' ?  $2 : undef)
+        $_ =~ $relationship_pattern;
+        Youri::Package::Relationship->new($1, $2)
     } return $self->{_header}->conflicts();
 }
 

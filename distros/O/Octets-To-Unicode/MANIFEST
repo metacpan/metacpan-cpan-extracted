@@ -6,6 +6,7 @@ README.md
 cpanfile
 lib/Octets/To/Unicode.pm
 minil.toml
+script/ru-encode
 script/ru-perltidy
 script/ru-utf8
 t/00_compile.t

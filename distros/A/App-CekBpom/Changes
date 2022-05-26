@@ -1,3 +1,19 @@
+0.022   2022-05-26  Released-By: PERLANCAR; Urgency: medium
+
+        - Add more information (columns) from the product detail
+          (--get-product-detail): issue_date, expiry_date, bpom_division,
+          product_category, dosage_form, ingredients.
+
+
+0.021   2022-05-08  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [cli cek-bpom-products-browser] Add Description.
+
+        - [build] Rebuild with newer tools to tweak POD.
+
+
 0.020   2022-04-21  Released-By: PERLANCAR; Urgency: medium
 
         - Add script: cek-bpom-products-browser.

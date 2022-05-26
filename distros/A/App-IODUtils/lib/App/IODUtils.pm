@@ -1,9 +1,13 @@
 package App::IODUtils;
 
-our $VERSION = '0.162'; # VERSION
-our $DATE = '2019-01-17'; # DATE
-
 use 5.010001;
+use strict;
+use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-05-03'; # DATE
+our $DIST = 'App-IODUtils'; # DIST
+our $VERSION = '0.163'; # VERSION
 
 our %common_args = (
     iod => {
@@ -90,6 +94,11 @@ our %common_args = (
         default => 0,
         tags    => ['common', 'category:parser'],
     },
+    warn_perl => {
+        schema  => 'bool',
+        default => 0,
+        tags    => ['common', 'category:parser'],
+    },
     expr_vars => {
         'x.name.is_plural' => 1,
         'x.name.singular' => 'expr_var',
@@ -151,6 +160,7 @@ sub _get_parser_options {
         (expr_vars                => $args->{expr_vars})          x !!(defined $args->{expr_vars}),
         allow_duplicate_key      => $args->{allow_duplicate_key},
         ignore_unknown_directive => $args->{ignore_unknown_directive},
+        warn_perl                => $args->{warn_perl},
     );
 }
 
@@ -187,7 +197,7 @@ App::IODUtils - IOD utilities
 
 =head1 VERSION
 
-This document describes version 0.162 of App::IODUtils (from Perl distribution App-IODUtils), released on 2019-01-17.
+This document describes version 0.163 of App::IODUtils (from Perl distribution App-IODUtils), released on 2022-05-03.
 
 =head1 SYNOPSIS
 
@@ -229,14 +239,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-IODUti
 
 Source repository is at L<https://github.com/perlancar/perl-App-IODUtils>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-IODUtils>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<App::INIUtils>
@@ -254,6 +256,8 @@ L<App::IODUtils>, utilities related to L<IOD> configuration files.
 
 L<App::LedgerUtils>, utilities related to Ledger CLI files.
 
+L<App::PerlReleaseUtils>, utilities related to Perl distribution releases.
+
 L<App::PlUtils>, utilities related to Perl scripts.
 
 L<App::PMUtils>, utilities related to Perl modules.
@@ -266,11 +270,42 @@ L<App::WeaverUtils>, utilities related to L<Pod::Weaver>.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-IODUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

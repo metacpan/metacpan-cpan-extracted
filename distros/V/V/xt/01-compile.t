@@ -1,4 +1,4 @@
-#! perl I. -w
+#! perl -I. -w
 use t::Test::abeltje;
 
 use File::Spec::Functions qw/:DEFAULT devnull/;

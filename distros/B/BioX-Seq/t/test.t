@@ -19,6 +19,7 @@ my $test_fa         = 'test_data/test.fa';
 my $test2_fa        = 'test_data/test2.fa';
 my $test_fq         = 'test_data/test.fq.bz2';
 my $test_gz         = 'test_data/test2.fa.gz';
+my $test_gz_gt      = 'test_data/test3.fa.gz';
 my $test_zst        = 'test_data/test2.fa.zst';
 my $test_fai        = 'test_data/test2.fa.gz.fai';
 my $test_fai_expl   = 'test_data/foo.fai';
@@ -401,9 +402,9 @@ my $l = $parser->length($ids[2]);
 ok( $parser->length($ids[2]) == 23, "length comparison" );
 
 # now try to get descriptions
-$parser = BioX::Seq::Fetch->new($test_gz, with_description => 1);
+$parser = BioX::Seq::Fetch->new($test_gz_gt, with_description => 1);
 $seq = $parser->fetch_seq('Test1|another');
-ok( $seq->desc eq 'This is a second test' );
+ok( $seq->desc eq 'This is a description containing the > character' );
 
 # non-gzipped
 $parser = BioX::Seq::Fetch->new($test2_fa, with_description => 0);

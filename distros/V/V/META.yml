@@ -4,12 +4,12 @@ author:
   - 'Abe Timmerman <abeltje@cpan.org>'
 build_requires:
   Test::Fatal: '0'
-  Test::More: '0'
+  Test::Simple: '0.88'
   Test::Warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,5 +25,6 @@ requires:
 resources:
   homepage: https://github.com/abeltje/V
   repository: https://github.com/abeltje/V.git
-version: '0.15'
+version: '0.16'
 x_IRC: irc://irc.perl.org/#amsterdam.pm
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

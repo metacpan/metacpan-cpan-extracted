@@ -13,7 +13,7 @@ our @EXPORT_OK = qw(
     orbits_are_same
 );
 
-our $VERSION = '0.3.7'; # VERSION
+our $VERSION = '0.4.0'; # VERSION
 
 require XSLoader;
 XSLoader::load('Graph::Nauty', $VERSION);
@@ -98,6 +98,36 @@ sub _nauty_graph
     push @breaks, 0;
 
     return ( $nauty_graph, [ 0..$n-1 ], \@breaks );
+}
+
+# Converts Graph to dreadnaut input
+sub _to_dreadnaut
+{
+    my( $graph, $color_sub, $order_sub ) = @_;
+
+    my( $nauty_graph, undef, $breaks ) = _nauty_graph( @_ );
+
+    my $out = 'n=' .  $nauty_graph->{nv} . " g\n";
+
+    my $offset = 0;
+    my @neighbour_list;
+    for my $v (0..$nauty_graph->{nv}-1) {
+        my $neighbour_count = $nauty_graph->{d}[$v];
+        push @neighbour_list,
+             join( ' ', @{$nauty_graph->{e}}[$offset..$offset+$neighbour_count-1] );
+        $offset += $neighbour_count;
+    }
+    $out .= join( ";\n", @neighbour_list ) . ".\n";
+
+    my $partition = '';
+    $partition .= 0 if $nauty_graph->{nv};
+    for (0..$#$breaks-1) {
+        $partition .= $breaks->[$_] ? ',' : '|';
+        $partition .= $_ + 1;
+    }
+    $out .= "f=[$partition]\n";
+
+    return $out;
 }
 
 sub automorphism_group_size

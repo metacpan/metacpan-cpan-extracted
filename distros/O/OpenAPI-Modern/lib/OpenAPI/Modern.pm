@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package OpenAPI::Modern; # git description: v0.028-2-g681e7fd
+package OpenAPI::Modern; # git description: v0.029-2-gd6e0964
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.029';
+our $VERSION = '0.030';
 
 use 5.020;
 use Moo;
@@ -142,9 +142,11 @@ sub validate_request ($self, $request, $options = {}) {
         if not exists $request_parameters_processed->{path}{$path_name};
     }
 
+    $state->{data_path} = jsonp($state->{data_path}, 'body');
+    $state->{schema_path} = jsonp($state->{schema_path}, $method);
+
     if (my $body_obj = $operation->{requestBody}) {
-      $state->{schema_path} = jsonp($state->{schema_path}, $method, 'requestBody');
-      $state->{data_path} = jsonp($state->{data_path}, 'body');
+      $state->{schema_path} = jsonp($state->{schema_path}, 'requestBody');
 
       while (my $ref = $body_obj->{'$ref'}) {
         $body_obj = $self->_resolve_ref($ref, $state);
@@ -156,6 +158,10 @@ sub validate_request ($self, $request, $options = {}) {
       elsif ($body_obj->{required}) {
         ()= E({ %$state, keyword => 'required' }, 'request body is required but missing');
       }
+    }
+    else {
+      ()= E($state, 'unspecified body is present in %s request', uc $method)
+        if ($method eq 'get' or $method eq 'head') and _body_size($request);
     }
   }
   catch ($e) {
@@ -669,7 +675,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI docume
 
 =head1 VERSION
 
-version 0.029
+version 0.030
 
 =head1 SYNOPSIS
 

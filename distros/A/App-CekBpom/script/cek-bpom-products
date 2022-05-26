@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-04-21'; # DATE
+our $DATE = '2022-05-26'; # DATE
 our $DIST = 'App-CekBpom'; # DIST
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CekBpom/cek_bpom_products",
@@ -38,13 +38,15 @@ cek-bpom-products - Search BPOM products via https://cekbpom.pom.go.id/
 
 =head1 VERSION
 
-This document describes version 0.020 of cek-bpom-products (from Perl distribution App-CekBpom), released on 2022-04-21.
+This document describes version 0.022 of cek-bpom-products (from Perl distribution App-CekBpom), released on 2022-05-26.
 
 =head1 SYNOPSIS
 
-Usage:
-
 % B<cek-bpom-products> [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--get-product-detail>|B<--no-get-product-detail>|B<--noget-product-detail>] [B<--(no)naked-res>] [B<--no-env>] [B<--note>=I<str>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--query-log-file>=I<filename>] [(B<--query>=I<str>)+] [B<--result-dump-dir>=I<dirname>] [(B<--search-type>=I<str>)+] [B<--queries-json>=I<json>] [B<--search-types-json>=I<json>|B<-P>|B<--bentuk-sediaan>|B<--jumlah-dan-kemasan>|B<--komposisi>|B<-m>|B<--merk>|B<--nama-pendaftar>|B<--nama-produk>|B<--nomor-registrasi>|B<--npwp-pendaftar>|B<-p>|(B<-t>=I<str>)+] -- E<lt>I<query>E<gt> ...
+
+
+
+See examples in the L</EXAMPLES> section.
 
 =head1 DESCRIPTION
 
@@ -168,15 +170,15 @@ Shortcut for --search-type=merk.
 
 See C<--search-type>.
 
-=item B<-P>
-
-Shortcut for --search-type=nama_pendaftar.
-
-See C<--search-type>.
-
 =item B<-p>
 
 Shortcut for --search-type=nama_produk.
+
+See C<--search-type>.
+
+=item B<-P>
+
+Shortcut for --search-type=nama_pendaftar.
 
 See C<--search-type>.
 

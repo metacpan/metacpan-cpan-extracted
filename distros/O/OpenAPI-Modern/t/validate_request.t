@@ -1492,6 +1492,65 @@ YAML
   );
 };
 
+subtest 'no bodies in GET or HEAD requests without requestBody' => sub {
+  my $openapi = OpenAPI::Modern->new(
+    openapi_uri => '/api',
+    evaluator => JSON::Schema::Modern->new,
+    openapi_schema => $yamlpp->load_string(<<YAML));
+$openapi_preamble
+paths:
+  /foo:
+    head: {}
+    get: {}
+    post: {}
+YAML
+
+  my $result;
+  cmp_deeply(
+    ($result = $openapi->validate_request(request($_, 'https://example.com/foo', [], 'content')))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/body',
+          keywordLocation => jsonp(qw(/paths /foo), lc),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo), lc))->to_string,
+          error => 'unspecified body is present in '.$_.' request',
+        },
+      ],
+    },
+    'no body permitted for '.$_,
+  ) foreach qw(GET HEAD);
+
+  cmp_deeply(
+    ($result = $openapi->validate_request(request('POST', 'https://example.com/foo', [], 'content')))->TO_JSON,
+    { valid => true },
+    'no errors from POST with body',
+  );
+
+  cmp_deeply(
+    ($result = $openapi->validate_request(request($_, 'https://example.com/foo', [ 'Content-Length' => 1])))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/body',
+          keywordLocation => jsonp(qw(/paths /foo), lc),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo), lc))->to_string,
+          error => 'unspecified body is present in '.$_.' request',
+        },
+      ],
+    },
+    'non-zero Content-Length not permitted for '.$_,
+  ) foreach qw(GET HEAD);
+
+  cmp_deeply(
+    ($result = $openapi->validate_request(request('POST', 'https://example.com/foo', [ 'Content-Length' => 1])))->TO_JSON,
+    { valid => true },
+    'no errors from POST with Content-Length',
+  );
+};
+
 goto START if ++$type_index < @::TYPES;
 
 done_testing;

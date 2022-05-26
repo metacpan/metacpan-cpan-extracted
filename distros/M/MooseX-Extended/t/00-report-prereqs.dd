@@ -1,0 +1,70 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Most' => '0',
+                                      'Test::Perl::Critic' => '0',
+                                      'Test::PerlTidy' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'B::Hooks::AtRuntime' => '0',
+                                      'Carp' => '0',
+                                      'Data::Printer' => '0',
+                                      'Exporter' => '0',
+                                      'Import::Into' => '0',
+                                      'Moose' => '0',
+                                      'Moose::Exception' => '0',
+                                      'Moose::Exception::Role::Class' => '0',
+                                      'Moose::Exporter' => '0',
+                                      'Moose::Meta::Role' => '0',
+                                      'Moose::Role' => '0',
+                                      'Moose::Util' => '0',
+                                      'MooseX::Role::WarnOnConflict' => '0',
+                                      'MooseX::StrictConstructor' => '0',
+                                      'Ref::Util' => '0',
+                                      'Storable' => '0',
+                                      'Type::Library' => '1.012004',
+                                      'Type::Params' => '1.012004',
+                                      'Type::Utils' => '1.012004',
+                                      'Types::Common::Numeric' => '1.012004',
+                                      'Types::Common::String' => '1.012004',
+                                      'Types::Standard' => '1.012004',
+                                      'feature' => '0',
+                                      'mro' => '0',
+                                      'namespace::autoclean' => '0',
+                                      'parent' => '0',
+                                      'perl' => 'v5.20.0',
+                                      'strict' => '0',
+                                      'true' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'DateTime' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'List::Util' => '0',
+                                   'Scalar::Util' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Most' => '0',
+                                   'lib' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

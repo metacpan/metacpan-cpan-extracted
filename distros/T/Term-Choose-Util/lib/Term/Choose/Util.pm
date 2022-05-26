@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.134';
+our $VERSION = '0.135';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf );
@@ -164,7 +164,7 @@ sub _defaults {
         order               => 1,
         #page               => undef,
         prefix              => '',
-        #prompt             => undef,
+        prompt              => 'Your choice: ',
         show_hidden         => 1,
         small_first         => 0,
         cs_begin            => '',
@@ -312,9 +312,8 @@ sub choose_directories {
         }
         elsif ( $choice eq $change_path ) {
             my $prompt_fmt = $key_path . "%s";
-            my $prompt = $self->{prompt} // 'Choose: ';
-            if ( length $prompt ) {
-               $prompt_fmt .= "\n" . $prompt;
+            if ( length $self->{prompt} ) {
+               $prompt_fmt .= "\n" . $self->{prompt};
             }
             my $tmp_dir = $self->__choose_a_path( $dir, $prompt_fmt, '<<', 'OK' );
             if ( defined $tmp_dir ) {
@@ -340,7 +339,7 @@ sub choose_directories {
             # choose_a_subset
             my $idxs = $self->choose_a_subset(
                 [ sort @$avail_dirs ],
-                { info => $self->{info}, prompt => $self->{prompt} // '', back => '<<', confirm => 'OK', cs_begin => undef,
+                { info => $self->{info}, prompt => $self->{prompt}, back => '<<', confirm => 'OK', cs_begin => undef,
                   cs_label => $cs_label, page => $self->{page}, footer => $self->{footer}, keep => $self->{keep},
                   index => 1, margin => $self->{margin} }
             );
@@ -369,10 +368,6 @@ sub choose_a_file {
 
     CHOOSE_DIR: while ( 1 ) {
         my $prompt_fmt = "File-Directory: %s";
-        my $prompt = $self->{prompt} // 'Choose: ';
-        if ( length $prompt ) {
-            $prompt_fmt .= "\n" . $prompt;
-        }
         if ( length $self->{prompt} ) {
             $prompt_fmt .= "\n" . $self->{prompt};
         }
@@ -405,9 +400,8 @@ sub choose_a_directory {
     $self->__prepare_opt( $opt );
     my $init_dir = $self->__prepare_path();
     my $prompt_fmt = $opt->{cs_label} . "%s";
-    my $prompt = $self->{prompt} // 'Choose: ';
-    if ( length $prompt ) {
-        $prompt_fmt .= "\n" . $prompt;
+    if ( length $self->{prompt} ) {
+        $prompt_fmt .= "\n" . $self->{prompt};
     }
     my $chosen_dir = $self->__choose_a_path( $init_dir, $prompt_fmt, $self->{back}, $self->{confirm} );
     my $decoded = $self->{decoded};
@@ -515,11 +509,10 @@ sub __a_file {
         my @tmp_prompt;
         push @tmp_prompt, 'File-Directory: ' . $dir;
         push @tmp_prompt, 'File: ' . ( length $prev_dir ? $prev_dir : '' );
-        my $prompt = $self->{prompt} // 'Choose: ';
-        if ( length $prompt ) {
-            push @tmp_prompt, $prompt;
+        if ( length $self->{prompt} ) {
+            push @tmp_prompt, $self->{prompt};
         }
-        $prompt = join( "\n", @tmp_prompt );
+        my $prompt = join( "\n", @tmp_prompt );
         if ( ! @files ) {
             $prompt .= "\n";
             if ( $self->{filter} ) {
@@ -798,9 +791,6 @@ sub settings_menu {
     }
     my ( $self, $menu, $curr, $opt ) = @_;
     $self->__prepare_opt( $opt );
-    if ( ! defined $self->{prompt} ) {
-        $self->{prompt} = 'Choose:'; # choose default prompt
-    }
     my $longest = 0;
     my $new     = {};
     my $name_w  = {};
@@ -827,7 +817,7 @@ sub settings_menu {
         if ( defined $self->{cs_label} ) {
             push @tmp_prompt, $self->{cs_label} . $self->{cs_begin} . join( $self->{cs_separator}, map { "$_=$new->{$_}" } keys %$new ) . $self->{cs_end};
         }
-        if ( defined $self->{prompt} && length $self->{prompt} ) {
+        if ( length $self->{prompt} ) {
             push @tmp_prompt, $self->{prompt};
         }
         my $prompt = join( "\n", @tmp_prompt );
@@ -976,7 +966,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.134
+Version 0.135
 
 =cut
 
@@ -1103,9 +1093,9 @@ Values: [0],1.
 
 prompt
 
-A string placed on top of the available choices.
+A string placed on top of the available choices. I<prompt> set to the empty string means no prompt line.
 
-Default: undef, C<Choose:>
+Default: C<Your choice:>
 
 =item
 

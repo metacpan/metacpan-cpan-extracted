@@ -1,3 +1,8 @@
+0.4.0 2022-05-26
+
+    - Relicensed as BSD-3-Clause, added license fulltext (GH#9).
+    - Increased the workspace size to 6400 to handle even larger graphs.
+
 0.3.7 2021-10-04
 
     - Replaced av_top_index() with av_len() to retain backwards

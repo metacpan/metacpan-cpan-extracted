@@ -1,0 +1,186 @@
+# PODNAME: MooseX::Extended::Manual::Shortcuts
+# ABSTRACT: Shortcuts to make your Moose easier to write
+
+our $VERSION = '0.01';
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+MooseX::Extended::Manual::Shortcuts - Shortcuts to make your Moose easier to write
+
+=head1 VERSION
+
+version 0.06
+
+=head1 ATTRIBUTE SHORTCUTS
+
+When using C<field> or C<param>, we have some attribute shortcuts:
+
+    param name => (
+        isa       => NonEmptyStr,
+        writer    => 1,   # set_name
+        reader    => 1,   # get_name
+        predicate => 1,   # has_name
+        clearer   => 1,   # clear_name
+        builder   => 1,   # _build_name
+    );
+
+    sub _build_name ($self) {
+        ...
+    }
+
+These can also be used when you pass an array reference to the function:
+
+    package Point {
+        use MooseX::Extended types => ['Int'];
+
+        param [ 'x', 'y' ] => (
+            isa     => Int,
+            clearer => 1,     # clear_x and clear_y available
+            default => 0,
+        ) :;
+    }
+
+Note that these are I<shortcuts> and they make attributes easier to write and more consistent.
+However, you can still use full names:
+
+    field authz_delegate => (
+        builder => '_build_my_darned_authz_delegate',
+    );
+
+=head2 C<writer>
+
+If an attribute has C<writer> is set to C<1> (the number one), a method
+named C<set_$attribute_name> is created.
+
+This:
+
+    param title => (
+        isa       => Undef | NonEmptyStr,
+        default   => undef,
+        writer => 1,
+    );
+
+Is the same as this:
+
+    has title => (
+        is      => 'rw',                  # we change this from 'ro'
+        isa     => Undef | NonEmptyStr,
+        default => undef,
+        writer  => 'set_title',
+    );
+
+=head2 C<reader>
+
+By default, the reader (accessor) for the attribute is the same as the name.
+You can always change this:
+
+    has payload => ( is => 'ro', reader => 'the_payload' );
+
+However, if you want to change the reader name
+
+If an attribute has C<reader> is set to C<1> (the number one), a method
+named C<get_$attribute_name> is created.
+
+This:
+
+    param title => (
+        isa       => Undef | NonEmptyStr,
+        default   => undef,
+        reader => 1,
+    );
+
+Is the same as this:
+
+    has title => (
+        is      => 'rw',                  # we change this from 'ro'
+        isa     => Undef | NonEmptyStr,
+        default => undef,
+        reader  => 'get_title',
+    );
+
+=head2 C<predicate>
+
+If an attribute has C<predicate> is set to C<1> (the number one), a method
+named C<has_$attribute_name> is created.
+
+This:
+
+    param title => (
+        isa       => Undef | NonEmptyStr,
+        default   => undef,
+        predicate => 1,
+    );
+
+Is the same as this:
+
+    has title => (
+        is        => 'ro',
+        isa       => Undef | NonEmptyStr,
+        default   => undef,
+        predicate => 'has_title',
+    );
+
+=head2 C<clearer>
+
+If an attribute has C<clearer> is set to C<1> (the number one), a method
+named C<clear_$attribute_name> is created.
+
+This:
+
+    param title => (
+        isa     => Undef | NonEmptyStr,
+        default => undef,
+        clearer => 1,
+    );
+
+Is the same as this:
+
+    has title => (
+        is      => 'ro',
+        isa     => Undef | NonEmptyStr,
+        default => undef,
+        clearer => 'clear_title',
+    );
+
+=head2 C<builder>
+
+If an attribute has C<builder> is set to C<1> (the number one), a method
+named C<_build_$attribute_name>.
+
+This:
+
+    param title => (
+        isa     =>  NonEmptyStr,
+        builder => 1,
+    );
+
+Is the same as this:
+
+    has title => (
+        is      => 'ro',
+        isa     => NonEmptyStr,
+        builder => '_build_title',
+    );
+
+Obviously, a "private" attribute, such as C<_auth_token> would get a build named
+C<_build__auth_token> (note the two underscores between "build" and "auth_token").
+
+=head1 AUTHOR
+
+Curtis "Ovid" Poe <curtis.poe@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2022 by Curtis "Ovid" Poe.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

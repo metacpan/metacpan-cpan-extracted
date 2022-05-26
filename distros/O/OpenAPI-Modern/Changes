@@ -1,5 +1,9 @@
 Revision history for OpenAPI-Modern
 
+0.030     2022-05-26 05:17:26Z
+          - prohibit request bodies for HEAD and GET request unless
+            requestBody explicitly specified, as this is a smuggling vector
+
 0.029     2022-05-16 04:20:20Z
           - fix missing prereq for result serialization tests
 

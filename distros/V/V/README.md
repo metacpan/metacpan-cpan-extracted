@@ -1,4 +1,4 @@
-# **V** version 0.14
+# **V** version 0.16
 
 This module uses stolen code from
 [`Module::Info`](https://metacpan.org/pod/Module::Info) to find the location

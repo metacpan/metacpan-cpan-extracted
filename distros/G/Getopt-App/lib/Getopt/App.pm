@@ -8,9 +8,9 @@ use Carp qw(croak);
 use Getopt::Long ();
 use List::Util qw(first);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
-our ($OPT_COMMENT_RE, $OPTIONS, $SUBCOMMANDS) = (qr{\s+\#\s+});
+our ($OPT_COMMENT_RE, $OPTIONS, $SUBCOMMANDS, %APPS) = (qr{\s+\#\s+});
 
 sub bundle {
   my ($class, $script, $OUT) = (@_, \*STDOUT);
@@ -177,6 +177,14 @@ sub _call {
 
 sub _getopt_configure {qw(bundling no_auto_abbrev no_ignore_case pass_through require_order)}
 
+sub _getopt_load_subcommand {
+  my ($self, $subcommand, $argv) = @_;
+  ($@, $!) = ('', 0);
+  my $code = do $subcommand->[1];
+  croak "Unable to load subcommand $subcommand->[0]: $@ ($!)" if $@ or $!;
+  return $code;
+}
+
 sub _getopt_post_process_argv {
   my ($app, $argv, $state) = @_;
   return unless $state->{valid};
@@ -185,18 +193,26 @@ sub _getopt_post_process_argv {
   die "Invalid argument or argument order: @$argv\n";
 }
 
+sub _getopt_unknown_subcommand {
+  my ($self, $argv) = @_;
+  die "Unknown subcommand: $argv->[0]\n";
+}
+
 sub _subcommand {
   my ($app, $subcommands, $argv) = @_;
-  return undef unless $argv->[0] and $argv->[0] =~ m!^[a-z]!;
+  return undef unless $argv->[0] and $argv->[0] =~ m!^\w!;
 
-  die "Unknown subcommand: $argv->[0]\n"
+  return _call($app, getopt_unknown_subcommand => $argv)
     unless my $subcommand = first { $_->[0] eq $argv->[0] } @$subcommands;
 
   local $Getopt::App::APP_CLASS;
-  local $@;
-  my $subapp = do($subcommand->[1]);
-  croak "Unable to load subcommand $argv->[0]: $@" if $@;
-  return $subapp->([@$argv[1 .. $#$argv]]);
+  local $0 = $subcommand->[1];
+  unless ($APPS{$subcommand->[1]}) {
+    $APPS{$subcommand->[1]} = _call($app, getopt_load_subcommand => $subcommand, $argv);
+    croak "Can't load code ref from $subcommand->[0]" unless ref $APPS{$subcommand->[1]} eq 'CODE';
+  }
+
+  return $APPS{$subcommand->[1]}->([@$argv[1 .. $#$argv]]);
 }
 
 sub _usage_for_options {
@@ -302,6 +318,10 @@ L<Getopt::Long> with a very simple API. In addition it makes it very easy to
 test your script, since the script file can be sourced without actually being
 run.
 
+L<Getopt::App> also supports infinite nested L<subcommands|/getopt_subcommands>
+and a method for L<bundling|/bundle> this module with your script to prevent
+depending on a module from CPAN.
+
 This module is currently EXPERIMENTAL, but is unlikely to change much.
 
 =head1 APPLICATION METHODS
@@ -319,6 +339,16 @@ differently. The default return value is:
   qw(bundling no_auto_abbrev no_ignore_case pass_through require_order)
 
 The default return value is currently EXPERIMENTAL.
+
+=head2 getopt_load_subcommand
+
+  $code = $app->getopt_subcommand($subcommand, [@ARGV]);
+
+Takes the subcommand found in the L</getopt_subcommands> list and the command
+line arguments and must return a CODE block. The default implementation is
+simply:
+
+    $code = do($subcommand->[1]);
 
 =head2 getopt_post_process_argv
 
@@ -380,6 +410,18 @@ also use L<Getopt::App> for this to work properly.
 
 See L<https://github.com/jhthorsen/getopt-app/tree/main/example> for a working
 example.
+
+=head2 getopt_unknown_subcommand
+
+  $exit_value = $app->getopt_unknown_subcommand($argv);
+
+Will be called when L</getopt_subcommands> is defined but C<$argv> does not
+match an item in the list. Default behavior is to C<die> with an error message:
+
+  Unknown subcommand: $argv->[0]\n
+
+Returning C<undef> instead of dieing or a number (0-255) will cause the L</run>
+callback to be called.
 
 =head1 EXPORTED FUNCTIONS
 

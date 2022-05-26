@@ -1,5 +1,5 @@
 ---
-abstract: 'модуль утилит для распознавания кодировки текста (в том числе в файлах) и его декодирования'
+abstract: 'модуль и утилиты ru-perltidy и ru-utf8 для распознавания кодировки текста (в том числе в файлах) и его декодирования.'
 author:
   - 'Yaroslav O. Kosmina <darviarush@mail.ru>'
 build_requires:
@@ -26,7 +26,7 @@ no_index:
 provides:
   Octets::To::Unicode:
     file: lib/Octets/To/Unicode.pm
-    version: '0.03'
+    version: '0.06'
 requires:
   Encode: '0'
   Getopt::Long: '0'
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/darviarush/perl-octets-to-unicode/issues
   homepage: https://github.com/darviarush/perl-octets-to-unicode
   repository: https://github.com/darviarush/perl-octets-to-unicode.git
-version: '0.03'
+version: '0.06'
 x_contributors:
   - 'Iaroslav O. Kosmina <darviarush@ya.ru>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

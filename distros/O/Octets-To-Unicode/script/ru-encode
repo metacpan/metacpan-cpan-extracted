@@ -1,0 +1,217 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use utf8;
+
+use open qw/:std :utf8/;
+
+use Getopt::Long qw(:config no_ignore_case);
+use Pod::Usage;
+use Term::ANSIColor qw/:constants/;
+use List::Util qw/max/;
+
+use Octets::To::Unicode;
+
+my $parse_options_ok = GetOptions(
+    'help|h' => \( my $help = 0 ),
+    'man'    => \( my $man  = 0 ),
+
+    'e|ext=s'          => \( my $ext          = 'pm,pl,plx,t' ),
+    'i|interpreters=s' => \( my $interpreters = 'perl,perl5' ),
+    'n|encodings=s'    =>
+      \( my $encodings = $ENV{'RU-ENCODINGS'} // 'utf-8,cp1251,koi8-r' ),
+    't|to=s'      => \( my $to_encoding = 'utf-8' ),
+    'b|in-branch' => \( my $in_branch ),
+    'd|in-dir=s'  => \( my $in_dir ),
+);
+
+if ( !$parse_options_ok ) {
+    pod2usage(2);
+}
+elsif ($help) {
+    pod2usage(
+        -sections => "NAME|SYNOPSIS|DESCRIPTION|OPTIONS|SUBCOMMANDS",
+        -verbose  => 99
+    );
+}
+elsif ($man) {
+    pod2usage( -exitval => 0, -verbose => 2 );
+}
+else {
+
+    my @encodings = split /,/, $encodings;
+
+    my @files =
+      @ARGV ? @ARGV
+      : test_files(
+        [
+              $in_branch ? change_files_in_branch()
+            : $in_dir    ? map( file_find($_), split /,/, $in_dir )
+            :              change_files()
+        ],
+        $ext,
+        $interpreters
+      );
+
+    my $result     = 0;
+    my $max_length = max map length, @files;
+
+    for my $file (@files) {
+
+        print "$file  ", " " x ( $max_length - length $file );
+
+        my ( $unicode, $encoding ) = file_decode $file, \@encodings;
+
+        if ( !$encoding ) {
+            print RED, "failed";
+            $result = 1;
+        }
+        elsif ( $encoding eq $to_encoding ) {
+            print CYAN, "equals";
+        }
+        else {
+            file_encode $file, $to_encoding, $unicode;
+            print GREEN, "encode";
+        }
+
+        print RESET, " in ", YELLOW, $encoding, RESET, "\n";
+    }
+
+    exit $result;
+}
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+B<ru-encode> - утилита группового перекодирования файлов в указанную кодировку.
+
+=head1 VERSION
+
+Version 0.06
+
+=head1 SYNOPSIS
+
+    ru-encode [-h] [--man] [<files> ...] [--ext exts] [--interpreters interpreters] [--in-branch]
+
+=head1 DESCRIPTION
+
+Утилита определяет кодировку файла и переводит его в указанную.
+
+	$ ru-encode -t cp1251
+
+Есть 4 основные режима работы:
+
+	# Отформатировать все изменённые, но ещё не закомиченные файлы:
+	$ ru-encode
+	
+	# Обработать изменённые и закомиченные файлы в ветке (branch-е):
+	$ ru-encode --in-branch
+
+	# Обработать файлы в директориях:
+	$ ru-encode --in-dir .,/tmp/mydir
+
+	# Отформатировать указанные файлы:
+	$ ru-encode file1 /root/file2
+	
+С помощью опции -e (--ext) можно указать расширения файлов для форматирования (по умолчанию это pm,pl,plx,t):
+
+	$ ru-encode -e pm,t
+
+А для файлов, которые расширений не имеют, можно указать список интерпретаторов, указываемых в первой строке скрипта (#!/usr/bin/env perl):
+
+	$ ru-encode -i perl,perl5
+	
+Так же можно указать кодировки и порядок в котором они будут проверяться:
+
+	$ ru-encode -n cp1251,utf-8
+	
+=head3 LEGENDS
+
+На консоль утилита выведет файлы, которые были изменены с указанием: 
+
+=over 4
+
+=item C<equals> — кодировка файла совпадает с указанной.
+
+=item C<encode> — кодировка файла изменена на указанную.
+
+=item C<failed> — кодировка файла не определена.
+
+=back
+
+В случае, если хоть один из файлов C<failed>, код завершения процесса будет равен 1.
+
+=head2 OPTIONS
+
+=over 4
+
+=item B<-h>, B<--help>
+
+Показать помощь и выйти.
+
+=item B<--man>
+
+Распечатать мануал и завершиться.
+
+=item B<-t> encoding, B<--to> encoding
+
+Кодировка в которую переводить файлы.
+
+Необязательный. По умолчанию: C<utf-8>.
+
+=item B<-e> exts, B<--ext> exts
+
+Список расширений через запятую.
+
+По умолчанию: B<pm,pl,plx,t>.
+
+Пустая строка обозначает любые расширения.
+
+=item B<-i> interpreters, B<--interpreters> interpreters
+
+Список интерпретаторов через запятую.
+
+По умолчанию: B<perl,perl5>.
+
+Пустая строка отменяет файлы без расширений.
+
+=item B<-n> encodings, B<--encodings> encodings
+
+Список кодировок через запятую.
+
+По умолчанию берётся из переменной окружения B<RU-ENCODINGS>, а если она пуста, равняется: B<utf-8,cp1251,koi8-r>.
+
+=item B<-b>, B<--in-branch>
+
+Перекодировать изменённые и закомиченные файлы в ветке (branch-е).
+
+=item B<-d> dirs, B<--in-dir> dirs
+
+Перекодировать изменённые и закомиченные файлы в директориях. 
+Директории через запятую.
+
+=back
+
+=head2 ARGS
+
+=over 4
+
+=item B<files>...
+
+Файлы или директории с файлами, которые нужно отформатировать.
+
+=back
+
+=head1 LICENSE
+
+? B<GPLv3>
+
+=head1 AUTHOR
+
+Yaroslav O. Kosmina E<lt>darviarush@mail.ruE<gt>
+
+=cut

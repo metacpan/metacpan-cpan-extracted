@@ -2,7 +2,7 @@ package V;
 use strict;
 
 use vars qw( $VERSION $NO_EXIT );
-$VERSION  = '0.15';
+$VERSION  = '0.16';
 
 $NO_EXIT ||= 0; # prevent import() from exit()ing and fall of the edge
 
@@ -207,39 +207,49 @@ sub version {
 
     my $parsefile = $self->file;
 
-    local *MOD;
-    open(MOD, $parsefile) or die $!;
+    open(my $mod, '<', $parsefile) or die "open($parsefile): $!";
 
     my $inpod = 0;
     my $result;
     local $_;
-    while (<MOD>) {
+    while (<$mod>) {
         $inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
         next if $inpod || /^\s*#/;
 
         chomp;
-        next unless m/([\$*])(([\w\:\']*)\bVERSION)\b.*\=/;
-        { local($1, $2); ($_ = $_) = m/(.*)/; } # untaint
-        my $eval = qq{
-            package V::Module::Info::_version;
-            no strict;
+        my $eval;
+        if (m/([\$*])(([\w\:\']*)\bVERSION)\b.*\=/) {
+            { local($1, $2); ($_ = $_) = m/(.*)/; } # untaint
+            $eval = qq{
+                package V::Module::Info::_version;
+                no strict;
 
-            local $1$2;
-            \$$2=undef; do {
-                $_
-            }; \$$2
-        };
-        local $^W = 0;
-        $result = eval($eval);
-        warn "Could not eval '$eval' in $parsefile: $@" if $@;
-        $result = "undef" unless defined $result;
+                local $1$2;
+                \$$2=undef; do {
+                    $_
+                }; \$$2
+            };
+        }
+        # perl 5.12.0+
+        elsif (m/^\s* package \s+ [^\s]+ \s+ ([^;\{]+) [;\{]/x) {
+            $eval = qq{
+                package V::Module::Info::_version $1;
+                V::Module::Info::_version->VERSION;;
+            };
+        }
+        if (defined($eval)) {
+            local $^W = 0;
+            $result = eval($eval);
+            warn "Could not eval '$eval' in $parsefile: $@" if $@;
+            $result = "undef" unless defined $result;
 
-        # use the version modulue to deal with v-strings
-        require version;
-        $result = version->parse($result);
-        last;
+            # use the version modulue to deal with v-strings
+            require version;
+            $result = version->parse($result);
+            last;
+        }
     }
-    close MOD;
+    close($mod);
     return $result;
 }
 

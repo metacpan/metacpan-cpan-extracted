@@ -1,4 +1,4 @@
-package BioX::Seq 0.008005;
+package BioX::Seq 0.008006;
 
 use 5.016;
 use strict;
@@ -467,10 +467,10 @@ FASTQ (default: 20).
 
 If the sequence object comes from a C<BioX::Seq::Stream> instance, this method
 will format the sequence to match the input format, calling either
-C<BioX::Seq::as_fasta> or <BioX::Seq::as_fastq> as appropriate. The optional
+C<BioX::Seq::as_fasta> or C<BioX::Seq::as_fastq> as appropriate. The optional
 argument, if given, will be passed on to the appropriate method and evaluated
 in that context. Throws an error if the input format cannot be deduced
-(probably because the object was not created by a parser).
+(probably because the object was not created by a C<BioX::Seq::Stream> parser).
 
 =back
 
@@ -486,15 +486,16 @@ scalar containing the sequence string. You will likely know if this happens
 throw an error if you try to perform a class method on the (now) unblessed
 scalar.
 
-Please report bugs to the author.
+Please reports bugs or feature requests through the issue tracker at
+L<https://github.com/jvolkening/p5-BioX-Seq/issues>.
 
 =head1 AUTHOR
 
-Jeremy Volkening <jeremy *at* base2bio.com>
+Jeremy Volkening <jeremy.volkening *at* base2bio.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2014 Jeremy Volkening
+Copyright 2014-2022 Jeremy Volkening
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software

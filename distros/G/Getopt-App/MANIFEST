@@ -4,7 +4,9 @@ example/bin/bundle
 example/bin/cool
 example/lib/Test/Cool/commands/beans.pl
 example/lib/Test/Cool/commands/coffee.pl
+example/lib/Test/Cool/commands/help.pl
 example/lib/Test/Cool/commands/invalid.pl
+example/lib/Test/Cool/commands/unknown.pl
 lib/Getopt/App.pm
 Makefile.PL
 MANIFEST			This list of files

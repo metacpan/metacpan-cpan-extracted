@@ -1,6 +1,10 @@
 Revision history for BioX-Seq
 
-0.009 2022-04-30
+0.008006 2022-05-26
+         Fix fatal error in Bio::Seq::Fetch where description is requested and
+         contains the greater-than sign
+
+0.008005 2022-04-30
          Add support for writing as input format
 
 0.008004 2022-01-21

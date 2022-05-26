@@ -1,4 +1,4 @@
-#! usr/bin/perl -w
+#! /usr/bin/env perl -w
 use v5.10.1;
 use strict;
 
@@ -11,7 +11,7 @@ WriteMakefile(
     AUTHOR        => 'Abe Timmerman <abeltje@cpan.org>',
 
     BUILD_REQUIRES => {
-        'Test::More'     => 0,
+        'Test::Simple'   => 0.88,
         'Test::Fatal'    => 0,
         'Test::Warnings' => 0,
     },

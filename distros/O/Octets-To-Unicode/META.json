@@ -1,5 +1,5 @@
 {
-   "abstract" : "модуль утилит для распознавания кодировки текста (в том числе в файлах) и его декодирования",
+   "abstract" : "модуль и утилиты ru-perltidy и ru-utf8 для распознавания кодировки текста (в том числе в файлах) и его декодирования.",
    "author" : [
       "Yaroslav O. Kosmina <darviarush@mail.ru>"
    ],
@@ -60,7 +60,7 @@
    "provides" : {
       "Octets::To::Unicode" : {
          "file" : "lib/Octets/To/Unicode.pm",
-         "version" : "0.03"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -75,7 +75,7 @@
          "web" : "https://github.com/darviarush/perl-octets-to-unicode"
       }
    },
-   "version" : "0.03",
+   "version" : "0.06",
    "x_contributors" : [
       "Iaroslav O. Kosmina <darviarush@ya.ru>"
    ],

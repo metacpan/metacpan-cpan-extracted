@@ -8,9 +8,9 @@ use Log::ger;
 use Time::HiRes qw(time);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-04-21'; # DATE
+our $DATE = '2022-05-26'; # DATE
 our $DIST = 'App-CekBpom'; # DIST
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(cek_bpom_products);
@@ -34,6 +34,12 @@ my %known_search_types = (
 sub _encode {
     my $str = shift;
     $str =~ s/[^A-Za-z_0-9-]+/-/g;
+    $str;
+}
+
+sub _strip_tags {
+    my $str = shift;
+    $str =~ s!</?[^>]+>!!g;
     $str;
 }
 
@@ -294,12 +300,63 @@ sub cek_bpom_products {
                 next;
             }
             my $ct = $res->content;
-            $ct =~ m!<td[^>]*>Diproduksi Oleh</td><td><a href="[^"]+sarana/[^"]+/id/([^"]+)"[^>]*>\s*([^<]+?)\s*</a> - ([^<]+?)\s*</td>! or do {
-                log_warn "Cannot get manufacturer detail for $row->{reg_id} ($row->{nama}), skipped";
+
+            ($ct =~ m!<td[^>]*>Diproduksi Oleh</td><td><a href="[^"]+sarana/[^"]+/id/([^"]+)"[^>]*>\s*([^<]+?)\s*</a> - ([^<]+?)\s*</td>! or
+             $ct =~ m!<td[^>]*>Diproduksi Oleh</td><td><a href="[^"]+sarana/[^"]+/id/([^"]+)"[^>]*>\s*([^<]+?)\s* - ([^<]+?)\s*</a></td>!) and do {
+                $row->{sarana_id} = $1;
+                $row->{sarana_nama} = $2;
+                $row->{sarana_negara} = $3;
+            } or do {
+                log_warn "Cannot get manufacturer detail ('Diproduksi Oleh') for $row->{reg_id} ($row->{nama})";
             };
-            $row->{sarana_id} = $1;
-            $row->{sarana_nama} = $2;
-            $row->{sarana_negara} = $3;
+
+            $ct =~ m!<td[^>]*>Produk</td><td>(.*?)</td>! and do {
+                $row->{product_category} = $1;
+            } or do {
+                log_warn "Cannot get product_category ('Produk') for $row->{reg_id} ($row->{nama})";
+                $row->{product_category} = ''; # to avoid undef warning
+            };
+
+            $ct =~ m!<td[^>]*>Masa Berlaku s/d</td><td>([0-9][0-9])-([0-9][0-9])-([0-9][0-9][0-9][0-9])! and do {
+                $row->{expiry_date} = "$3-$2-$1";
+            } or do {
+                # cosmetics usually have issue_date instead of expiry_date
+                # drugs usually have both
+                if ($row->{product_category} !~ /Kosmetika/) {
+                    log_warn "Cannot get expiry_date ('Masa Berlaku s/d') for $row->{reg_id} ($row->{nama})";
+                }
+            };
+
+            $ct =~ m!<td[^>]*>Tanggal Terbit</td><td>([0-9][0-9])-([0-9][0-9])-([0-9][0-9][0-9][0-9])! and do {
+                $row->{issue_date} = "$3-$2-$1";
+            } or do {
+                if ($row->{product_category} =~ /Kosmetika|Obat/) {
+                    log_warn "Cannot get issue_date ('Tanggal Terbit') for $row->{reg_id} ($row->{nama})";
+                }
+            };
+
+            $ct =~ m!<td[^>]*>Bentuk Sediaan</td><td>(.*?)</td>! and do {
+                $row->{dosage_form} = $1;
+            } or do {
+                if ($row->{product_category} =~ /Obat/) {
+                    log_warn "Cannot get dosage_form ('Bentuk Sediaan') for $row->{reg_id} ($row->{nama})";
+                }
+            };
+
+            $ct =~ m!<td[^>]*>Komposisi</td><td>(.*?)</td>! and do {
+                $row->{ingredients} = _strip_tags($1);
+            } or do {
+                if ($row->{product_category} =~ /Obat/) {
+                    log_warn "Cannot get ingredients ('Komposisi') for $row->{reg_id} ($row->{nama})";
+                }
+            };
+
+            $ct =~ m!<td[^>]*>Diterbitkan Oleh</td><td>(.*?)</td>! and do {
+                $row->{bpom_division} = $1;
+            } or do {
+                log_warn "Cannot get bpom_division ('Diterbitkan Oleh') for $row->{reg_id} ($row->{nama})";
+            };
+
             my $session_id = $1;
         }
     } # GET_PRODUCT_DETAIL
@@ -387,7 +444,7 @@ App::CekBpom - Check registered products & manufacturers (CLIs for cekbpom.pom.g
 
 =head1 VERSION
 
-This document describes version 0.020 of App::CekBpom (from Perl distribution App-CekBpom), released on 2022-04-21.
+This document describes version 0.022 of App::CekBpom (from Perl distribution App-CekBpom), released on 2022-05-26.
 
 =head1 DESCRIPTION
 

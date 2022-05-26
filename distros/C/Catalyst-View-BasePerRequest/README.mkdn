@@ -1,0 +1,371 @@
+# NAME
+
+Catalyst::View::Template::BasePerRequest - Catalyst base view for per request, strongly typed templates
+
+# SYNOPSIS
+
+    package Example::View::Hello;
+
+    use Moose;
+
+    extends 'Catalyst::View::BasePerRequest';
+
+    has name => (is=>'ro', required=>1);
+    has age => (is=>'ro', required=>1);
+
+    sub render {
+      my ($self, $c) = @_;
+      return "<div>Hello @{[ $self->name] }",
+        "I see you are @{[ $self->age]} years old!</div>";
+    }
+
+    __PACKAGE__->config(
+      content_type=>'text/html',
+      status_codes=>[200]
+    );
+
+    __PACKAGE__->meta->make_immutable();
+
+One way to use it in a controller:
+
+    package Example::Controller::Root;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+
+    extends 'Catalyst::Controller';
+
+    sub root :Chained(/) PathPart('') CaptureArgs(0) { } 
+
+      sub hello :Chained(root) Args(0) {
+        my ($self, $c) = @_;
+        return $c->view(Hello =>
+          name => 'John',
+          age => 53
+        )->http_ok;
+      }
+
+    __PACKAGE__->config(namespace=>'');
+    __PACKAGE__->meta->make_immutable;
+
+# DESCRIPTION
+
+**NOTE**: This is early access code.  Although it's based on several other internal projects
+which have iterated over this concept for a number of years I still reserve the right
+to make breaking changes as needed.
+
+**NOTE**: You probably won't actually use this directly, it's intended to be a base framework
+for building / prototyping strongly typed / per request views in [Catalyst](https://metacpan.org/pod/Catalyst). This
+documentation serves as an overview of the concept.  In particular please note that
+this code does not address any issues around HTML / Javascript injection attacks or
+provides any auto escaping. You'll need to bake those features into whatver you
+build on top of this.  Because of this the following documentation is light and is mostly
+intended to help anyone who is planning to build something on top of this framework
+rather than use it directly.
+
+**NOTE**: This distribution's `/example` directory gives you a toy prototype using [HTML::Tags](https://metacpan.org/pod/HTML%3A%3ATags)
+as the basis to a view as well as some raw examples using this code directly (again,
+not recommended for anything other than learning).
+
+In a classic [Catalyst](https://metacpan.org/pod/Catalyst) application with server side templates, the canonical approach
+is to use a 'view' as a sort of handler for an underlying template system (such as 
+[Template::Toolkit](https://metacpan.org/pod/Template%3A%3AToolkit) or [Xslate](https://metacpan.org/pod/Xslate)) and to send data to this template by populating
+the stash.  These views are very lean, and in general don't provide much in the way
+of view logic processing; they generally are just a thin proxy for the underlying
+templating system.
+
+This approach has the upside of being very simple to understand and in general works
+ok with a simple websites.  There are however downsides as your site becomes more
+complex. First of all the stash as a means to pass data from the Controller to the
+template can be fragile.  For example just making a simple typo in the stash key
+can break your templates in ways that might not be easy to figure out.  Also your
+template can't enforce its requirements very easily (and its not easy for someone
+working in the controller to know exactly what things need to go into the stash in
+order for the template to function as desired.)  The view itself has no way of 
+providing view / display oriented logic; generally that logic ends up creeping back up
+into the controller in ways that break the notion of MVC's separation of concerns.
+
+Lastly the controller doesn't have a defined API with the view. All it can ask the view
+is 'go ahead and process yourself using the current context' and all it gets back from
+the view is a string response.  If the controller wishes to introspect this response
+or modify it in some way prior to it being sent back to the client, you have few options
+apart from using regular expression matching to try and extract the required information
+or to modify the response string.
+
+Basically the classic approach works acceptable well for a simple website but starts to
+break down as your site becomes more complicated.
+
+An alternative approach, which is explored in this distribution, is to have a defined view for
+each desired response anf for it to define an explicit API that the controller uses to provide the required
+and optional data to the view.  This defined view can further define its own methods
+used to generate suitable information for display.   Such an approach is more initial work
+as well as learning for the website developers, but in the long term it can provide
+an easier path to sustainable development and maintainence with hopefully fewer bugs 
+and overall site issues.
+
+# EXAMPLE: Basic
+
+The most minimal thing your view must provide in a `render` method.   This method gets
+the view object and the context (it can also receive additional arguments if this view is
+being called from other views as a wrapper or parent view; more on that later).
+
+The `render` method should return a string or array of strings suitable for the body of
+the response> **NOTE** if you return an array of strings we flatten the array into a single
+string since the `body` method of [Catalyst::Response](https://metacpan.org/pod/Catalyst%3A%3AResponse) can't take an array.
+
+Here's a minimal example:
+
+    package Example::View::Hello;
+
+    use Moose;
+
+    extends 'Catalyst::View::BasePerRequest';
+
+    sub render {
+      my ($self, $c) = @_;
+      return "<p>Hello</p>";
+    }
+
+    __PACKAGE__->config(content_type=>'text/html');
+
+And here's an example view with attributes:
+
+    package Example::View::HelloPerson;
+
+    use Moose;
+
+    extends 'Catalyst::View::BasePerRequest';
+
+    has name => (is=>'ro', required=>1);
+
+    sub render {
+      my ($self, $c) = @_;
+      return qq[
+        <div>
+          Hello  @{[ $self->name ]}
+        </div>];
+    }
+
+    __PACKAGE__->meta->make_immutable();
+
+One way to invoke this view from the controller using the traditional `forward` method:
+
+    package Example::Controller::Root;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+
+    extends 'Catalyst::Controller';
+
+    sub root :Chained(/) PathPart('') CaptureArgs(0) { }
+
+      sub hello :Chained(root) Args(0) {
+        my ($self, $c) = @_;
+        my $view = $c->view(HelloPerson => (name => 'John'));
+        return $c->forward($view);
+      }
+
+    __PACKAGE__->config(namespace=>'');
+    __PACKAGE__->meta->make_immutable;
+
+Alternatively using ["RESPONSE HELPERS"](#response-helpers):
+
+    package Example::Controller::Root;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+
+    extends 'Catalyst::Controller';
+
+    sub root :Chained(/) PathPart('') CaptureArgs(0) { }
+
+      sub hello :Chained(root) Args(0) {
+        my ($self, $c) = @_;
+        return $c->view(HelloPerson => (name => 'John'))->http_ok;
+      }
+
+    __PACKAGE__->config(namespace=>'');
+    __PACKAGE__->meta->make_immutable;
+
+# METHODS
+
+The following methods are considered part of this classes public API
+
+## process
+
+Renders a view and sets up the response object.  Generally this is called from a
+controller via the `forward` method and not directly:
+
+    $c->forward($view);
+
+## respond
+
+Accepts an HTTP status code and a hashref of key / values used to set HTTP headers for a
+response.  Example:
+
+    $view->respond(201, +{ location=>$url });
+
+Returns the view object to make it easier to do method chaining
+
+## detach
+
+Just a shortcut to ->detach via the context
+
+# CONTENT BLOCK HELPERS
+
+Content block helpers are an optional feature to make it easy to create and populate content
+areas between different views.  Although you can also do this with object attributes you may
+wish to separate template / text from data.  Example:
+
+    package Example::View::Layout;
+
+    use Moose;
+
+    extends 'Catalyst::View::BasePerRequest';
+
+    has title => (is=>'ro', required=>1, default=>'Missing Title');
+
+    sub render {
+      my ($self, $c, $inner) = @_;
+      return "
+        <html>
+          <head>
+            <title>@{[ $self->title ]}</title>
+            @{[ $self->content('css') ]}
+          </head>
+          <body>$inner</body>
+        </html>";
+    }
+
+    __PACKAGE__->config(content_type=>'text/html');
+    __PACKAGE__->meta->make_immutable();
+
+    package Example::View::Hello;
+
+    use Moose;
+
+    extends 'Catalyst::View::BasePerRequest';
+
+    has name => (is=>'ro', required=>1);
+
+    sub render {
+      my ($self, $c) = @_;
+      return $c->view(Layout => title=>'Hello', sub {
+        my $layout = shift;
+        $self->content_for('css', "<style>...</style>");
+        return "<div>Hello @{[ $self->name ]}!</div>";
+      });
+    }
+
+    __PACKAGE__->config(content_type=>'text/html', status_codes=>[200]);
+    __PACKAGE__->meta->make_immutable();
+
+## content
+
+Gets a content block string.  If the named content block does not exist, returns a zero length'
+string instead.
+
+## content\_for
+
+Sets a named content block or throws an exception if the content block already exists.
+
+## content\_append
+
+Appends to a named content block or throws an exception if the content block doesn't exist.
+
+## content\_replace
+
+Replaces a named content block or throws an exception if the content block doesn't exist.
+
+## content\_around
+
+Wraps an existing content with new content.  Throws an exception if the named content block doesn't exist.
+
+    $self->content_around('footer', sub {
+      my $footer = shift;
+      return "wrapped $footer end wrap";
+    });
+
+# RESPONSE HELPERS
+
+When you create a view instance the actual response is not send to the client until
+the ["respond"](#respond) method is called (either directly, via ["process"](#process) or thru the generated
+response helpers).
+
+Response helpers are just methods that call ["respond"](#respond) with the correct status code
+and using a more easy to remember name (and possibly a more self documenting one).
+
+For example:
+
+    $c->view('Login')->http_ok;
+
+calls the ["respond"](#respond) method with the expected http status code.  You can also pass
+arguments to the response helper which are send to ["respond"](#respond) and used to add HTTP
+headers to the response.
+
+    $c->view("NewUser")
+      ->http_created(location=>$url);
+
+Please note that calling a response helper only sets up the response object, it doesn't
+stop any future actions in you controller.   If you really want to stop action processing
+you'll need to call ["detach"](#detach):
+
+    return $c->view("Error")
+      ->http_bad_request
+      ->detach;
+
+Response helpers are just lowercased names you'll find for the codes listed in [HTTP::Status](https://metacpan.org/pod/HTTP%3A%3AStatus).
+Some of the most common ones I find in my code:
+
+    http_ok
+    http_created
+    http_bad_request
+    http_unauthorized
+    http_not_found
+    http_internal_server_error
+
+By default we create response helpers for all the status codes in [HTTP::Status](https://metacpan.org/pod/HTTP%3A%3AStatus).  However
+if you set the `status_codes` configuration key (see ["status\_codes"](#status_codes)) you can limit the
+generated helpers to specific codes.  This can be useful since most views are only meaningful
+with a limited set of response codes.
+
+# RUNTIME HOOKS
+
+This class defines the following method hooks you may optionally defined in your
+view subclass in order to control or otherwise influence how the view works.
+
+## $class->modify\_init\_args($app, $args)
+
+Runs when `COMPONENT` is called during `setup_components`.  This gets a reference
+to the merged arguments from all configuration.  You should return this reference
+after modification.
+
+# CONFIGURATION
+
+This Catalyst Component supports the following configuation.
+
+## content\_type
+
+The HTTP content type of the response.   For example 'text/html'. Required.
+
+## status\_codes
+
+An ArrayRef of HTTP status codes used to provide response helpers.  This is optional
+but it allows you to specify the permitted HTTP response codes that a template can
+generate.  for example a NotFound view probably makes no sense to return anything
+other than a 404 Not Found code.
+
+# ALSO SEE
+
+[Catalyst](https://metacpan.org/pod/Catalyst)
+
+# AUTHORS & COPYRIGHT
+
+John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+# LICENSE
+
+Copyright 2022, John Napiorkowski  [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

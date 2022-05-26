@@ -6,6 +6,9 @@ build_requires:
   English: 0
   Error::Pure::Utils: 0
   ExtUtils::MakeMaker: 6.59
+  File::Object: 0
+  File::Spec::Functions: 0
+  Test::LWP::UserAgent: 0
   Test::More: 0
   Test::NoWarnings: 0
   Test::Output: 0
@@ -37,4 +40,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-Stow-Check
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-Stow-Check
-version: '0.02'
+version: '0.03'

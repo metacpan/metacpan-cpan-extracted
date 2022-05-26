@@ -232,7 +232,15 @@ sub fetch_seq {
             seek $fh, $p, 0;
             read($fh, $chr, 1)
                 or die "Error during backtrack read: $@\n";
-            last BACK if $chr eq '>';
+            # stop at record separator
+            if ($chr eq '>') {
+                last BACK if ($p == 0);
+                my $prev;
+                seek $fh, $p-1, 0;
+                read($fh, $prev, 1);
+                last BACK if ($prev =~ /[\r\n]/);
+            }
+
             $string = $chr . $string;
         }
 

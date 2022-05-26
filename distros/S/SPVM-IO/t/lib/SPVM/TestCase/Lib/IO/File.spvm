@@ -176,7 +176,7 @@ class TestCase::Lib::IO::File {
       die "Can't open file $file";
     }
     
-    my $lstrings = StringList->new(undef);
+    my $lstrings = StringList->new((string[])undef);
     while (my $line = $io_file->readline) {
       $lstrings->push($line);
     }
@@ -314,7 +314,7 @@ class TestCase::Lib::IO::File {
       die "Can't open file $file";
     }
     
-    my $lstrings = StringList->new(undef);
+    my $lstrings = StringList->new((string[])undef);
     while (my $line = $io_file->readline) {
       $line = Fn->chompr($line);
       $lstrings->push($line);

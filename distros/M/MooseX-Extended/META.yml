@@ -1,0 +1,88 @@
+---
+abstract: 'Extend Moose with safe defaults and useful features'
+author:
+  - 'Curtis "Ovid" Poe <curtis.poe@gmail.com>'
+build_requires:
+  DateTime: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  List::Util: '0'
+  Scalar::Util: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-Extended
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Moose::Exception::InvalidAttributeDefinition:
+    file: lib/Moose/Exception/InvalidAttributeDefinition.pm
+    version: '0.06'
+  MooseX::Extended:
+    file: lib/MooseX/Extended.pm
+    version: '0.06'
+  MooseX::Extended::Core:
+    file: lib/MooseX/Extended/Core.pm
+    version: '0.06'
+  MooseX::Extended::Role:
+    file: lib/MooseX/Extended/Role.pm
+    version: '0.06'
+  MooseX::Extended::Types:
+    file: lib/MooseX/Extended/Types.pm
+    version: '0.06'
+requires:
+  B::Hooks::AtRuntime: '0'
+  Carp: '0'
+  Data::Printer: '0'
+  Exporter: '0'
+  Import::Into: '0'
+  Moose: '0'
+  Moose::Exception: '0'
+  Moose::Exception::Role::Class: '0'
+  Moose::Exporter: '0'
+  Moose::Meta::Role: '0'
+  Moose::Role: '0'
+  Moose::Util: '0'
+  MooseX::Role::WarnOnConflict: '0'
+  MooseX::StrictConstructor: '0'
+  Ref::Util: '0'
+  Storable: '0'
+  Type::Library: '1.012004'
+  Type::Params: '1.012004'
+  Type::Utils: '1.012004'
+  Types::Common::Numeric: '1.012004'
+  Types::Common::String: '1.012004'
+  Types::Standard: '1.012004'
+  feature: '0'
+  mro: '0'
+  namespace::autoclean: '0'
+  parent: '0'
+  perl: v5.20.0
+  strict: '0'
+  'true': '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Ovid/moosex-extreme/issues
+  homepage: https://github.com/Ovid/moosex-extreme
+  repository: https://github.com/Ovid/moosex-extreme.git
+version: '0.06'
+x_contributors:
+  - 'Marco Fontani <MFONTANI@cpan.org>'
+  - 'Ovid <ovid@cpan.org>'
+x_generated_by_perl: v5.28.3
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0

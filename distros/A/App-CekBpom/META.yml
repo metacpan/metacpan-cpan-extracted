@@ -19,7 +19,7 @@ name: App-CekBpom
 provides:
   App::CekBpom:
     file: lib/App/CekBpom.pm
-    version: '0.020'
+    version: '0.022'
 requires:
   Data::Sah::Compiler::perl::TH::array: '0.911'
   Data::Sah::Compiler::perl::TH::bool: '0.911'
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CekBpom
   homepage: https://metacpan.org/release/App-CekBpom
   repository: git://github.com/perlancar/perl-App-CekBpom.git
-version: '0.020'
+version: '0.022'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

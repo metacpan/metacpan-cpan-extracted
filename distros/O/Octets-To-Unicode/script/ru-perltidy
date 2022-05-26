@@ -18,9 +18,12 @@ my $parse_options_ok = GetOptions(
     'help|h' => \( my $help = 0 ),
     'man'    => \( my $man  = 0 ),
 
-    'e|ext=s'       => \( my $ext       = 'pm,pl,plx,t,' ),
-    'n|encodings=s' => \( my $encodings = $ENV{'RU-ENCODINGS'} // 'utf-8,cp1251,koi8-r' ),
-    'b|in-branch'   => \( my $in_branch ),
+    'e|ext=s'          => \( my $ext          = 'pm,pl,plx,t' ),
+    'i|interpreters=s' => \( my $interpreters = 'perl,perl5' ),
+    'n|encodings=s'    =>
+      \( my $encodings = $ENV{'RU-ENCODINGS'} // 'utf-8,cp1251,koi8-r' ),
+    'b|in-branch' => \( my $in_branch ),
+    'd|in-dir=s'  => \( my $in_dir ),
 );
 
 if ( !$parse_options_ok ) {
@@ -39,23 +42,17 @@ else {
 
     my @encodings = split /,/, $encodings;
 
-    my @files = @ARGV;
-
-    if ( !@files ) {
-        $ext =~ s/^(.*),$/,$1/;
-        $ext = join "|", map { $_ eq "" ? '' : "\\.$_" } split /,/, $ext;
-
-        @files = grep length, split "\n",
-          `git diff --name-only --diff-filter=AM origin/master...`
-          if $in_branch;
-
-        @files = map { file_find $_ }
-          map { s/^\s*[\w\?]+\s+//; $_ } grep { !/^\s*D / } split /\n/,
-          `git status -s`
-          if !$in_branch;
-
-        @files = grep test_perl_script($_), grep /($ext)$/, @files;
-    }
+    my @files =
+      @ARGV ? @ARGV
+      : test_files(
+        [
+              $in_branch ? change_files_in_branch()
+            : $in_dir    ? map( file_find($_), split /,/, $in_dir )
+            :              change_files()
+        ],
+        $ext,
+        $interpreters
+      );
 
     my $result     = 0;
     my $max_length = max map length, @files;
@@ -66,15 +63,16 @@ else {
 
         my ( $unicode, $encoding ) = file_decode $file, \@encodings;
 
+		local @ARGV = ();
         Perl::Tidy::perltidy(
             source      => \$unicode,
             destination => \my $tidied_code,
         );
 
-        if ( $unicode eq $tidied_code ) {
+        if ( defined $tidied_code and $unicode eq $tidied_code ) {
             print CYAN, "equals";
         }
-        elsif ( length $tidied_code ) {
+        elsif ( defined $tidied_code and length $tidied_code ) {
             file_encode $file, $encoding, $tidied_code;
             print GREEN, "tidied";
         }
@@ -89,16 +87,6 @@ else {
     exit $result;
 }
 
-# Тест: если расширение отсутствует, то 1-я строка должна содержать perl
-sub test_perl_script {
-    my ($file) = @_;
-    return 1 if $file =~ /\.[^.\/]*$/;
-    open my $f, "<", $file or die "$file: $!";
-    my $first_line = <$f>;
-    close $f;
-    return $first_line =~ /^#!.*?\bperl\b/;
-}
-
 __END__
 
 =encoding utf-8
@@ -109,32 +97,37 @@ B<ru-perltidy> - утилита для форматирования файлов
 
 =head1 VERSION
 
-Version 0.03
+Version 0.06
 
 =head1 SYNOPSIS
 
-    ru-perltidy [-h] [--man] [<files> ...] [--ext exts] [--in-branch]
+    ru-perltidy [-h] [--man] [<files> ...] [--ext exts] [--interpreters interpreters] [--in-branch]
 
 =head1 DESCRIPTION
 
 Форматирует файлы через perltidy c определением их кодировки.
 
-Есть 3 основные режима работы:
+Есть 4 основные режима работы:
 
 	# Отформатировать все изменённые, но ещё не закомиченные файлы:
 	$ ru-perltidy
 	
-	# Отформатировать изменённые и закомиченные файлы в ветке (branch-е):
-	$ ru-perltidy --branch
+	# Обработать изменённые и закомиченные файлы в ветке (branch-е):
+	$ ru-perltidy --in-branch
+
+	# Обработать файлы в директориях:
+	$ ru-perltidy --in-dir .,/tmp/mydir
 
 	# Отформатировать указанные файлы:
 	$ ru-perltidy file1 /root/file2
 	
-С помощью опции -e (--ext) можно указать расширения файлов для форматирования (по умолчанию это pm,pl,plx,t,):
+С помощью опции -e (--ext) можно указать расширения файлов для форматирования (по умолчанию это pm,pl,plx,t):
 
-	$ ru-perltidy -e pm,,t
-	
-Обратите внимание на пустое расширение — оно используется для исполняемых скриптов perl, которые расширения не имеют. При наличие такого расширения будет проверяться так же первая строка файла регуляркой C</^#!.*?\bperl\b/>.
+	$ ru-perltidy -e pm,t
+
+А для файлов, которые расширений не имеют, можно указать список интерпретаторов, указываемых в первой строке скрипта (#!/usr/bin/env perl):
+
+	$ ru-perltidy -i perl,perl5
 	
 Так же можно указать кодировки и порядок в котором они будут проверяться:
 
@@ -172,9 +165,17 @@ Version 0.03
 
 Список расширений через запятую.
 
-По умолчанию: B<pm,pl,t,>.
+По умолчанию: B<pm,pl,plx,t>.
 
-Пустое расширение обозначает файлы без расширений.
+Пустая строка обозначает любые расширения.
+
+=item B<-i> interpreters, B<--interpreters> interpreters
+
+Список интерпретаторов через запятую.
+
+По умолчанию: B<perl,perl5>.
+
+Пустая строка отменяет файлы без расширений.
 
 =item B<-n> encodings, B<--encodings> encodings
 
@@ -185,6 +186,11 @@ Version 0.03
 =item B<-b>, B<--in-branch>
 
 Форматировать изменённые и закомиченные файлы в ветке (branch-е).
+
+=item B<-d> dirs, B<--in-dir> dirs
+
+Форматировать изменённые и закомиченные файлы в директориях. 
+Директории через запятую.
 
 =back
 

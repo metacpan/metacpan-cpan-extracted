@@ -1,0 +1,125 @@
+# PODNAME: MooseX::Extended::Manual::Construction
+# ABSTRACT: Objected construction for MooseX::Extended
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+MooseX::Extended::Manual::Construction - Objected construction for MooseX::Extended
+
+=head1 VERSION
+
+version 0.06
+
+=head1 OBJECT CONSTRUCTION
+
+The normal C<new>, C<BUILD>, and C<BUILDARGS> functions work as expected.
+However, we apply L<MooseX::StrictConstructor> to avoid this problem:
+
+    my $soldier = Soldier->new(
+        name   => $name,
+        rank   => $rank,
+        seriel => $serial, # should be serial
+    );
+
+By default, misspelled arguments to the L<Moose> constructor are silently discarded,
+leading to hard-to-diagnose bugs. With L<MooseX::Extended>, they're a fatal error.
+
+If you need to pass arbitrary "sideband" data, explicitly declare it as such:
+
+    param sideband => ( isa => HashRef, default => sub { {} } );
+
+Naturally, because we bundle C<MooseX::Extended::Types>, you can do much
+finer-grained data validation on that, if needed.
+
+=head1 FUNCTIONS
+
+The following two functions are exported into your namespace.
+
+=head2 C<param>
+
+    param name => ( isa => NonEmptyStr );
+
+A similar function to Moose's C<has>. A C<param> is required. You may pass it
+to the constructor, or use a C<default> or C<builder> to supply this value.
+
+The above C<param> definition is equivalent to:
+
+    has name => (
+        is       => 'ro',
+        isa      => NonEmptyStr,
+        required => 1,
+    );
+
+If you want a parameter that has no C<default> or C<builder> and can
+I<optionally> be passed to the constructor, just use C<< required => 0 >>.
+
+    param title => ( isa => Str, required => 0 );
+
+Note that C<param>, like C<field>, defaults to read-only, C<< is => 'ro' >>.
+You can override this:
+
+    param name => ( is => 'rw', isa => NonEmptyStr );
+
+Otherwise, it behaves like C<has>. You can pass in any arguments that C<has>
+accepts.
+
+    # we'll make it private, but allow it to be passed to the constructor
+    # as `name`
+    param _name   => ( isa => NonEmptyStr, init_arg => 'name' );
+
+=head2 C<field>
+
+    field created => ( isa => PositiveInt, default => sub { time } );
+
+A similar function to Moose's C<has>. A C<field> is never allowed to be passed
+to the constructor, but you can still use C<default> or C<builder>, as normal.
+
+The above C<field> definition is equivalent to:
+
+    has created => (
+        is       => 'ro',
+        isa      => PositiveInt,
+        init_arg => undef,        # not allowed in the constructor
+        default  => sub { time },
+        lazy     => 1,
+    );
+
+Note that C<field>, like C<param>, defaults to read-only, C<< is => 'ro' >>.
+You can override this:
+
+    field some_data => ( is => 'rw', isa => NonEmptyStr );
+
+Otherwise, it behaves like C<has>. You can pass in any arguments that C<has>
+accepts.
+
+B<WARNING>: if you pass C<field> an C<init_arg> with a defined value, The code
+will C<croak>. A C<field> is just for instance data the class uses. It's not
+to be passed to the constructor. If you want that, just use C<param>.
+
+Later, we'll add proper exceptions.
+
+=head3 Lazy Fields
+
+Every C<field> is lazy by default. This is because there's no guarantee the code will call
+them, but this makes it very easy for a C<field> to rely on a C<param> value being present.
+
+Every C<param> is not lazy by default, but you can add C<< lazy => 1 >> if you need to.
+
+=head1 AUTHOR
+
+Curtis "Ovid" Poe <curtis.poe@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2022 by Curtis "Ovid" Poe.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut
