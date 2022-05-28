@@ -113,12 +113,17 @@ required.
 
 ### Reviewed command line options
 
-Command line options are now are properly handled with parsing and validation.
+Command line options are now properly handled with parsing and validation.
 
 ### Always includes original sentences
 
 When there are new keys to translate, the original English text will always be
 included with the `---TranslateMe` prefix (which must be removed, obviously).
+
+### Known terms are skipped
+
+Some known key values like URLs and proper names are just ignored when comparing
+the original values (in English) with the selected language (`--lang`).
 
 ## See also
 

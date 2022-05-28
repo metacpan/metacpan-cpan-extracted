@@ -1,5 +1,9 @@
 Revision history for Git-MoreHooks
 
+0.015     2022-05-27 11:28:03+02:00 Europe/Stockholm
+            * New hook CheckPerl.
+                - Supports only Perl::Critic for now.
+
 0.014     2022-05-17 22:38:18+02:00 Europe/Stockholm
 
 0.013     2022-05-15 10:13:21+02:00 Europe/Stockholm

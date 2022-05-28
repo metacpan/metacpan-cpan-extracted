@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::ReturnShipment;
-$Shipment::Purolator::WSDL::Types::ReturnShipment::VERSION = '3.06';
+$Shipment::Purolator::WSDL::Types::ReturnShipment::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,71 +20,67 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %SenderInformation_of : ATTR(:get<SenderInformation>);
-    my %ReceiverInformation_of : ATTR(:get<ReceiverInformation>);
-    my %PackageInformation_of : ATTR(:get<PackageInformation>);
-    my %PaymentInformation_of : ATTR(:get<PaymentInformation>);
-    my %PickupInformation_of : ATTR(:get<PickupInformation>);
-    my %NotificationInformation_of : ATTR(:get<NotificationInformation>);
-    my %TrackingReferenceInformation_of :
-      ATTR(:get<TrackingReferenceInformation>);
-    my %OtherInformation_of : ATTR(:get<OtherInformation>);
+my %SenderInformation_of :ATTR(:get<SenderInformation>);
+my %ReceiverInformation_of :ATTR(:get<ReceiverInformation>);
+my %PackageInformation_of :ATTR(:get<PackageInformation>);
+my %PaymentInformation_of :ATTR(:get<PaymentInformation>);
+my %PickupInformation_of :ATTR(:get<PickupInformation>);
+my %NotificationInformation_of :ATTR(:get<NotificationInformation>);
+my %TrackingReferenceInformation_of :ATTR(:get<TrackingReferenceInformation>);
+my %OtherInformation_of :ATTR(:get<OtherInformation>);
 
-    __PACKAGE__->_factory(
-        [   qw(        SenderInformation
-              ReceiverInformation
-              PackageInformation
-              PaymentInformation
-              PickupInformation
-              NotificationInformation
-              TrackingReferenceInformation
-              OtherInformation
+__PACKAGE__->_factory(
+    [ qw(        SenderInformation
+        ReceiverInformation
+        PackageInformation
+        PaymentInformation
+        PickupInformation
+        NotificationInformation
+        TrackingReferenceInformation
+        OtherInformation
 
-            )
-        ],
-        {   'SenderInformation'            => \%SenderInformation_of,
-            'ReceiverInformation'          => \%ReceiverInformation_of,
-            'PackageInformation'           => \%PackageInformation_of,
-            'PaymentInformation'           => \%PaymentInformation_of,
-            'PickupInformation'            => \%PickupInformation_of,
-            'NotificationInformation'      => \%NotificationInformation_of,
-            'TrackingReferenceInformation' =>
-              \%TrackingReferenceInformation_of,
-            'OtherInformation' => \%OtherInformation_of,
-        },
-        {   'SenderInformation' =>
-              'Shipment::Purolator::WSDL::Types::SenderInformation',
-            'ReceiverInformation' =>
-              'Shipment::Purolator::WSDL::Types::ReceiverInformation',
-            'PackageInformation' =>
-              'Shipment::Purolator::WSDL::Types::PackageInformation',
-            'PaymentInformation' =>
-              'Shipment::Purolator::WSDL::Types::PaymentInformation',
-            'PickupInformation' =>
-              'Shipment::Purolator::WSDL::Types::PickupInformation',
-            'NotificationInformation' =>
-              'Shipment::Purolator::WSDL::Types::NotificationInformation',
-            'TrackingReferenceInformation' =>
-              'Shipment::Purolator::WSDL::Types::TrackingReferenceInformation',
-            'OtherInformation' =>
-              'Shipment::Purolator::WSDL::Types::OtherInformation',
-        },
-        {
+    ) ],
+    {
+        'SenderInformation' => \%SenderInformation_of,
+        'ReceiverInformation' => \%ReceiverInformation_of,
+        'PackageInformation' => \%PackageInformation_of,
+        'PaymentInformation' => \%PaymentInformation_of,
+        'PickupInformation' => \%PickupInformation_of,
+        'NotificationInformation' => \%NotificationInformation_of,
+        'TrackingReferenceInformation' => \%TrackingReferenceInformation_of,
+        'OtherInformation' => \%OtherInformation_of,
+    },
+    {
+        'SenderInformation' => 'Shipment::Purolator::WSDL::Types::SenderInformation',
+        'ReceiverInformation' => 'Shipment::Purolator::WSDL::Types::ReceiverInformation',
+        'PackageInformation' => 'Shipment::Purolator::WSDL::Types::PackageInformation',
+        'PaymentInformation' => 'Shipment::Purolator::WSDL::Types::PaymentInformation',
+        'PickupInformation' => 'Shipment::Purolator::WSDL::Types::PickupInformation',
+        'NotificationInformation' => 'Shipment::Purolator::WSDL::Types::NotificationInformation',
+        'TrackingReferenceInformation' => 'Shipment::Purolator::WSDL::Types::TrackingReferenceInformation',
+        'OtherInformation' => 'Shipment::Purolator::WSDL::Types::OtherInformation',
+    },
+    {
 
-            'SenderInformation'            => 'SenderInformation',
-            'ReceiverInformation'          => 'ReceiverInformation',
-            'PackageInformation'           => 'PackageInformation',
-            'PaymentInformation'           => 'PaymentInformation',
-            'PickupInformation'            => 'PickupInformation',
-            'NotificationInformation'      => 'NotificationInformation',
-            'TrackingReferenceInformation' => 'TrackingReferenceInformation',
-            'OtherInformation'             => 'OtherInformation',
-        }
-    );
+        'SenderInformation' => 'SenderInformation',
+        'ReceiverInformation' => 'ReceiverInformation',
+        'PackageInformation' => 'PackageInformation',
+        'PaymentInformation' => 'PaymentInformation',
+        'PickupInformation' => 'PickupInformation',
+        'NotificationInformation' => 'NotificationInformation',
+        'TrackingReferenceInformation' => 'TrackingReferenceInformation',
+        'OtherInformation' => 'OtherInformation',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -101,7 +97,7 @@ Shipment::Purolator::WSDL::Types::ReturnShipment
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

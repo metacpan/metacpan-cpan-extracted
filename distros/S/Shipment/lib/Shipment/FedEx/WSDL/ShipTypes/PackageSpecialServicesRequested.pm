@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::PackageSpecialServicesRequested;
-$Shipment::FedEx::WSDL::ShipTypes::PackageSpecialServicesRequested::VERSION = '3.06';
+$Shipment::FedEx::WSDL::ShipTypes::PackageSpecialServicesRequested::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/ship/v9'}
+sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,55 +20,57 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %SpecialServiceTypes_of : ATTR(:get<SpecialServiceTypes>);
-    my %CodDetail_of : ATTR(:get<CodDetail>);
-    my %DangerousGoodsDetail_of : ATTR(:get<DangerousGoodsDetail>);
-    my %DryIceWeight_of : ATTR(:get<DryIceWeight>);
-    my %SignatureOptionDetail_of : ATTR(:get<SignatureOptionDetail>);
-    my %PriorityAlertDetail_of : ATTR(:get<PriorityAlertDetail>);
+my %SpecialServiceTypes_of :ATTR(:get<SpecialServiceTypes>);
+my %CodDetail_of :ATTR(:get<CodDetail>);
+my %DangerousGoodsDetail_of :ATTR(:get<DangerousGoodsDetail>);
+my %DryIceWeight_of :ATTR(:get<DryIceWeight>);
+my %SignatureOptionDetail_of :ATTR(:get<SignatureOptionDetail>);
+my %PriorityAlertDetail_of :ATTR(:get<PriorityAlertDetail>);
 
-    __PACKAGE__->_factory(
-        [   qw(        SpecialServiceTypes
-              CodDetail
-              DangerousGoodsDetail
-              DryIceWeight
-              SignatureOptionDetail
-              PriorityAlertDetail
+__PACKAGE__->_factory(
+    [ qw(        SpecialServiceTypes
+        CodDetail
+        DangerousGoodsDetail
+        DryIceWeight
+        SignatureOptionDetail
+        PriorityAlertDetail
 
-            )
-        ],
-        {   'SpecialServiceTypes'   => \%SpecialServiceTypes_of,
-            'CodDetail'             => \%CodDetail_of,
-            'DangerousGoodsDetail'  => \%DangerousGoodsDetail_of,
-            'DryIceWeight'          => \%DryIceWeight_of,
-            'SignatureOptionDetail' => \%SignatureOptionDetail_of,
-            'PriorityAlertDetail'   => \%PriorityAlertDetail_of,
-        },
-        {   'SpecialServiceTypes' =>
-              'Shipment::FedEx::WSDL::ShipTypes::PackageSpecialServiceType',
-            'CodDetail' => 'Shipment::FedEx::WSDL::ShipTypes::CodDetail',
-            'DangerousGoodsDetail' =>
-              'Shipment::FedEx::WSDL::ShipTypes::DangerousGoodsDetail',
-            'DryIceWeight' => 'Shipment::FedEx::WSDL::ShipTypes::Weight',
-            'SignatureOptionDetail' =>
-              'Shipment::FedEx::WSDL::ShipTypes::SignatureOptionDetail',
-            'PriorityAlertDetail' =>
-              'Shipment::FedEx::WSDL::ShipTypes::PriorityAlertDetail',
-        },
-        {
+    ) ],
+    {
+        'SpecialServiceTypes' => \%SpecialServiceTypes_of,
+        'CodDetail' => \%CodDetail_of,
+        'DangerousGoodsDetail' => \%DangerousGoodsDetail_of,
+        'DryIceWeight' => \%DryIceWeight_of,
+        'SignatureOptionDetail' => \%SignatureOptionDetail_of,
+        'PriorityAlertDetail' => \%PriorityAlertDetail_of,
+    },
+    {
+        'SpecialServiceTypes' => 'Shipment::FedEx::WSDL::ShipTypes::PackageSpecialServiceType',
+        'CodDetail' => 'Shipment::FedEx::WSDL::ShipTypes::CodDetail',
+        'DangerousGoodsDetail' => 'Shipment::FedEx::WSDL::ShipTypes::DangerousGoodsDetail',
+        'DryIceWeight' => 'Shipment::FedEx::WSDL::ShipTypes::Weight',
+        'SignatureOptionDetail' => 'Shipment::FedEx::WSDL::ShipTypes::SignatureOptionDetail',
+        'PriorityAlertDetail' => 'Shipment::FedEx::WSDL::ShipTypes::PriorityAlertDetail',
+    },
+    {
 
-            'SpecialServiceTypes'   => 'SpecialServiceTypes',
-            'CodDetail'             => 'CodDetail',
-            'DangerousGoodsDetail'  => 'DangerousGoodsDetail',
-            'DryIceWeight'          => 'DryIceWeight',
-            'SignatureOptionDetail' => 'SignatureOptionDetail',
-            'PriorityAlertDetail'   => 'PriorityAlertDetail',
-        }
-    );
+        'SpecialServiceTypes' => 'SpecialServiceTypes',
+        'CodDetail' => 'CodDetail',
+        'DangerousGoodsDetail' => 'DangerousGoodsDetail',
+        'DryIceWeight' => 'DryIceWeight',
+        'SignatureOptionDetail' => 'SignatureOptionDetail',
+        'PriorityAlertDetail' => 'PriorityAlertDetail',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -85,7 +87,7 @@ Shipment::FedEx::WSDL::ShipTypes::PackageSpecialServicesRequested
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

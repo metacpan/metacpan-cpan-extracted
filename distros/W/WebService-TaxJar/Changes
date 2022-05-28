@@ -1,3 +1,7 @@
+0.0002 - May 27, 2022
+ * Fix link to github repo, thanks to manwar for providing a pull request for that
+ * Add the optional x-api-version header
+
 0.0001 - February 22, 2019
  * Initial public release.
 

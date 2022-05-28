@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::PickupInformation;
-$Shipment::Purolator::WSDL::Types::PickupInformation::VERSION = '3.06';
+$Shipment::Purolator::WSDL::Types::PickupInformation::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,24 +20,32 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %PickupType_of : ATTR(:get<PickupType>);
+my %PickupType_of :ATTR(:get<PickupType>);
 
-    __PACKAGE__->_factory(
-        [   qw(        PickupType
+__PACKAGE__->_factory(
+    [ qw(        PickupType
 
-            )
-        ],
-        {'PickupType' => \%PickupType_of,},
-        {'PickupType' => 'Shipment::Purolator::WSDL::Types::PickupType',},
-        {
+    ) ],
+    {
+        'PickupType' => \%PickupType_of,
+    },
+    {
+        'PickupType' => 'Shipment::Purolator::WSDL::Types::PickupType',
+    },
+    {
 
-            'PickupType' => 'PickupType',
-        }
-    );
+        'PickupType' => 'PickupType',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -54,7 +62,7 @@ Shipment::Purolator::WSDL::Types::PickupInformation
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

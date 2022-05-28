@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::LiabilityCoverageDetail;
-$Shipment::FedEx::WSDL::RateTypes::LiabilityCoverageDetail::VERSION = '3.06';
+$Shipment::FedEx::WSDL::RateTypes::LiabilityCoverageDetail::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/rate/v9'}
+sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %CoverageType_of : ATTR(:get<CoverageType>);
-    my %CoverageAmount_of : ATTR(:get<CoverageAmount>);
+my %CoverageType_of :ATTR(:get<CoverageType>);
+my %CoverageAmount_of :ATTR(:get<CoverageAmount>);
 
-    __PACKAGE__->_factory(
-        [   qw(        CoverageType
-              CoverageAmount
+__PACKAGE__->_factory(
+    [ qw(        CoverageType
+        CoverageAmount
 
-            )
-        ],
-        {   'CoverageType'   => \%CoverageType_of,
-            'CoverageAmount' => \%CoverageAmount_of,
-        },
-        {   'CoverageType' =>
-              'Shipment::FedEx::WSDL::RateTypes::LiabilityCoverageType',
-            'CoverageAmount' => 'Shipment::FedEx::WSDL::RateTypes::Money',
-        },
-        {
+    ) ],
+    {
+        'CoverageType' => \%CoverageType_of,
+        'CoverageAmount' => \%CoverageAmount_of,
+    },
+    {
+        'CoverageType' => 'Shipment::FedEx::WSDL::RateTypes::LiabilityCoverageType',
+        'CoverageAmount' => 'Shipment::FedEx::WSDL::RateTypes::Money',
+    },
+    {
 
-            'CoverageType'   => 'CoverageType',
-            'CoverageAmount' => 'CoverageAmount',
-        }
-    );
+        'CoverageType' => 'CoverageType',
+        'CoverageAmount' => 'CoverageAmount',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -62,7 +67,7 @@ Shipment::FedEx::WSDL::RateTypes::LiabilityCoverageDetail
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

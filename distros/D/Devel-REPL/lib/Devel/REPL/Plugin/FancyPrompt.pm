@@ -3,7 +3,7 @@ use warnings;
 package Devel::REPL::Plugin::FancyPrompt;
 # ABSTRACT: Facilitate user-defined prompts
 
-our $VERSION = '1.003028';
+our $VERSION = '1.003029';
 
 use Devel::REPL::Plugin;
 use namespace::autoclean;
@@ -72,7 +72,7 @@ Devel::REPL::Plugin::FancyPrompt - Facilitate user-defined prompts
 
 =head1 VERSION
 
-version 1.003028
+version 1.003029
 
 =head1 SYNOPSIS
 

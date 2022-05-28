@@ -12,9 +12,9 @@ use IO::Interactive qw(is_interactive);
 
 # put global variables alphabetically here
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-04-21'; # DATE
+our $DATE = '2022-05-27'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.920'; # VERSION
+our $VERSION = '1.921'; # VERSION
 
 # TODO: this class can actually be a role instead of base class for pericmd &
 # pericmd-lite.
@@ -176,6 +176,14 @@ our %copts = (
     format => {
         getopt  => 'format=s',
         summary => 'Choose output format, e.g. json, text',
+        description => <<'_',
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+_
         value_label => 'name',
         handler => sub {
             my ($go, $val, $r) = @_;
@@ -200,6 +208,12 @@ our %copts = (
     page_result => {
         getopt  => "page-result:s",
         summary => "Filter output through a pager",
+        description => <<'_',
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. `less` is chosen.
+
+_
         value_label => 'program',
         handler => sub {
             my ($go, $val, $r) = @_;
@@ -213,6 +227,13 @@ our %copts = (
     view_result => {
         getopt  => "view-result:s",
         summary => "View output using a viewer",
+        description => <<'_',
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+_
         value_label => 'program',
         handler => sub {
             my ($go, $val, $r) = @_;
@@ -272,6 +293,12 @@ _
     cmd => {
         getopt  => "cmd=s",
         summary => 'Select subcommand',
+        description => <<'_',
+
+This is useful if a default subcommand exists, where that subcommand will be
+chosen if user does not specify another explicitly.
+
+_
         value_label => 'subcommand_name',
         handler => sub {
             my ($go, $val, $r) = @_;
@@ -294,6 +321,12 @@ _
         getopt  => 'config-path=s@',
         schema  => ['array*', of => 'filename*'],
         summary => 'Set path to configuration file',
+        description => <<'_',
+
+Can actually be specified multiple times to instruct application to read from
+multiple configuration files (and merge them).
+
+_
         value_label=>'path',
         handler => sub {
             my ($go, $val, $r) = @_;
@@ -306,6 +339,12 @@ _
     no_config => {
         getopt  => 'no-config',
         summary => 'Do not use any configuration file',
+        description => <<'_',
+
+If you specify `--no-config`, the application will not read any configuration
+file.
+
+_
         handler => sub {
             my ($go, $val, $r) = @_;
             $r->{read_config} = 0;
@@ -316,6 +355,12 @@ _
     no_env => {
         getopt  => 'no-env',
         summary => 'Do not read environment for default options',
+        description => <<'_',
+
+If you specify `--no-env`, the application wil not read any environment
+variable.
+
+_
         handler => sub {
             my ($go, $val, $r) = @_;
             $r->{read_env} = 0;
@@ -325,6 +370,24 @@ _
     config_profile => {
         getopt  => 'config-profile=s',
         summary => 'Set configuration profile to use',
+        description => <<'_',
+
+A single configuration file can contain profiles, i.e. alternative sets of
+values that can be selected. For example:
+
+    [profile=dev]
+    username=foo
+    pass=beaver
+
+    [profile=production]
+    username=bar
+    pass=honey
+
+When you specify `--config-profile=dev`, `username` will be set to `foo` and
+`password` to `beaver`. When you specify `--config-profile=production`,
+`username` will be set to `bar` and `password` to `honey`.
+
+_
         value_label=>'profile',
         handler => sub {
             my ($go, $val, $r) = @_;
@@ -394,6 +457,19 @@ _
     log_level => {
         getopt  => 'log-level=s',
         summary => 'Set log level',
+        description => <<'_',
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): `trace`, `debug`, `info`,
+`warn`/`warning`, `error`, `fatal`. By default, the level is usually set to
+`warn`, which means that log statements with level `info` and less important
+levels will not be shown. To increase verbosity, choose `info`, `debug`, or
+`fatal`.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see <pm:Log::ger>.
+
+_
         schema  => ['str*' => in => [
             qw/trace debug info warn warning error fatal/]],
         value_label=>'level',
@@ -1892,7 +1968,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.920 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2022-04-21.
+This document describes version 1.921 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2022-05-27.
 
 =head1 DESCRIPTION
 

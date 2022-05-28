@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::DangerousGoodsDetail;
-$Shipment::FedEx::WSDL::RateTypes::DangerousGoodsDetail::VERSION = '3.06';
+$Shipment::FedEx::WSDL::RateTypes::DangerousGoodsDetail::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/rate/v9'}
+sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,57 +20,57 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Accessibility_of : ATTR(:get<Accessibility>);
-    my %CargoAircraftOnly_of : ATTR(:get<CargoAircraftOnly>);
-    my %Options_of : ATTR(:get<Options>);
-    my %HazardousCommodities_of : ATTR(:get<HazardousCommodities>);
-    my %Packaging_of : ATTR(:get<Packaging>);
-    my %EmergencyContactNumber_of : ATTR(:get<EmergencyContactNumber>);
+my %Accessibility_of :ATTR(:get<Accessibility>);
+my %CargoAircraftOnly_of :ATTR(:get<CargoAircraftOnly>);
+my %Options_of :ATTR(:get<Options>);
+my %HazardousCommodities_of :ATTR(:get<HazardousCommodities>);
+my %Packaging_of :ATTR(:get<Packaging>);
+my %EmergencyContactNumber_of :ATTR(:get<EmergencyContactNumber>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Accessibility
-              CargoAircraftOnly
-              Options
-              HazardousCommodities
-              Packaging
-              EmergencyContactNumber
+__PACKAGE__->_factory(
+    [ qw(        Accessibility
+        CargoAircraftOnly
+        Options
+        HazardousCommodities
+        Packaging
+        EmergencyContactNumber
 
-            )
-        ],
-        {   'Accessibility'          => \%Accessibility_of,
-            'CargoAircraftOnly'      => \%CargoAircraftOnly_of,
-            'Options'                => \%Options_of,
-            'HazardousCommodities'   => \%HazardousCommodities_of,
-            'Packaging'              => \%Packaging_of,
-            'EmergencyContactNumber' => \%EmergencyContactNumber_of,
-        },
-        {   'Accessibility' =>
-              'Shipment::FedEx::WSDL::RateTypes::DangerousGoodsAccessibilityType',
-            'CargoAircraftOnly' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-            'Options' =>
-              'Shipment::FedEx::WSDL::RateTypes::HazardousCommodityOptionType',
-            'HazardousCommodities' =>
-              'Shipment::FedEx::WSDL::RateTypes::HazardousCommodityContent',
-            'Packaging' =>
-              'Shipment::FedEx::WSDL::RateTypes::HazardousCommodityPackagingDetail',
-            'EmergencyContactNumber' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'Accessibility' => \%Accessibility_of,
+        'CargoAircraftOnly' => \%CargoAircraftOnly_of,
+        'Options' => \%Options_of,
+        'HazardousCommodities' => \%HazardousCommodities_of,
+        'Packaging' => \%Packaging_of,
+        'EmergencyContactNumber' => \%EmergencyContactNumber_of,
+    },
+    {
+        'Accessibility' => 'Shipment::FedEx::WSDL::RateTypes::DangerousGoodsAccessibilityType',
+        'CargoAircraftOnly' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+        'Options' => 'Shipment::FedEx::WSDL::RateTypes::HazardousCommodityOptionType',
+        'HazardousCommodities' => 'Shipment::FedEx::WSDL::RateTypes::HazardousCommodityContent',
+        'Packaging' => 'Shipment::FedEx::WSDL::RateTypes::HazardousCommodityPackagingDetail',
+        'EmergencyContactNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'Accessibility'          => 'Accessibility',
-            'CargoAircraftOnly'      => 'CargoAircraftOnly',
-            'Options'                => 'Options',
-            'HazardousCommodities'   => 'HazardousCommodities',
-            'Packaging'              => 'Packaging',
-            'EmergencyContactNumber' => 'EmergencyContactNumber',
-        }
-    );
+        'Accessibility' => 'Accessibility',
+        'CargoAircraftOnly' => 'CargoAircraftOnly',
+        'Options' => 'Options',
+        'HazardousCommodities' => 'HazardousCommodities',
+        'Packaging' => 'Packaging',
+        'EmergencyContactNumber' => 'EmergencyContactNumber',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -87,7 +87,7 @@ Shipment::FedEx::WSDL::RateTypes::DangerousGoodsDetail
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

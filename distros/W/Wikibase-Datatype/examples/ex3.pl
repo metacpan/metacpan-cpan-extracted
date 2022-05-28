@@ -3,28 +3,14 @@
 use strict;
 use warnings;
 
-use Wikibase::Datatype::Reference;
-use Wikibase::Datatype::Snak;
-use Wikibase::Datatype::Value::String;
+use Test::Shared::Fixture::Wikibase::Datatype::Value::Item::Wikidata::Dog;
+use Wikibase::Datatype::Print::Value::Item;
 
 # Object.
-my $obj = Wikibase::Datatype::Reference->new(
-        'snaks' => [
-                Wikibase::Datatype::Snak->new(
-                        'datatype' => 'string',
-                        'datavalue' => Wikibase::Datatype::Value::String->new(
-                                'value' => 'text',
-                        ),
-                        'property' => 'P11',
-                ),
-        ],
-);
+my $obj = Test::Shared::Fixture::Wikibase::Datatype::Value::Item::Wikidata::Dog->new;
 
-# Get value.
-my $snaks_ar = $obj->snaks;
-
-# Print out number of snaks.
-print "Number of snaks: ".@{$snaks_ar}."\n";
+# Print out.
+print scalar Wikibase::Datatype::Print::Value::Item::print($obj);
 
 # Output:
-# Number of snaks: 1
+# Q144

@@ -6,13 +6,15 @@ use warnings;
 use FindBin qw/ $RealBin /;
 
 # use lib "$RealBin/Pod-LOL/lib";
+use Carp qw/ croak /;
+use List::Util qw/ first /;
+use Text::ParseWords qw/ parse_line shellwords /;
 use Mojo::Base qw/ -base -signatures /;
 use Mojo::Util qw/ dumper class_to_path /;
 use Mojo::ByteStream qw/ b/;
 use Term::ReadKey qw/ GetTerminalSize /;
 use Pod::Text();
 use Pod::LOL;
-use Carp qw/ croak /;
 
 =head1 NAME
 
@@ -20,21 +22,22 @@ Pod::Query - Query pod documents
 
 =head1 VERSION
 
-Version 0.04
+Version 0.09
 
 =cut
 
-our $VERSION       = '0.04';
-our $DEBUG_TREE    = 0;
-our $DEBUG_FIND    = 0;
-our $DEBUG_INVERT  = 0;
-our $DEBUG_RENDER  = 0;
-our $MOCK_ROOT     = 0;
-our $MOCK_SECTIONS = 0;
+our $VERSION         = '0.09';
+our $DEBUG_TREE      = 0;
+our $DEBUG_FIND      = 0;
+our $DEBUG_FIND_DUMP = 0;
+our $DEBUG_INVERT    = 0;
+our $DEBUG_RENDER    = 0;
+our $MOCK_ROOT       = 0;
 
 
 has [
-   qw/ path lol
+   qw/
+     path lol
      tree
      title
      events
@@ -45,52 +48,23 @@ has [
 
 Query POD information from a file
 
-	use Pod::Query;
-	my $pod = Pod::Query->new('Pod::LOL');
+   % perl -MPod::Query -E 'say for Pod::Query->new("ojo")->find("head1[0]")'
 
-$pod contains the Pod::LOL object and a tree like:
+   NAME
+   ojo - Fun one-liners with Mojo
 
- "tree" => [
-    {
-      "sub" => [
-        {
-          "tag" => "Para",
-          "text" => [
-            "Pod::LOL - Transform POD into a list of lists"
-          ]
-        }
-      ],
-      "tag" => "head1",
-      "text" => [
-        "NAME"
-      ]
-    },
-    {
-      "sub" => [
-        {
-          "tag" => "Para",
-          "text" => [
-            "Version 0.01"
-          ]
-        }
-      ],
-      "tag" => "head1",
-      "text" => [
-        "VERSION"
-      ]
-    },
-    ...
+   % perl -MPod::Query -E 'say Pod::Query->new("ojo")->find("head1[0]/Para[0]")'
+
+   ojo - Fun one-liners with Mojo
 
 Find Methods:
 
-	say $pod->find_title;
-	say $pod->find_method;
-	say $pod->find_method_summary;
-	say $pod->find_events;
-	say $pod->find(@queries);
-
-Inline (Debugging)
-	perl -IPod-Query/lib -MPod::Query -MMojo::Util=dumper -E "say dumper(Pod::Query->new('Pod::LOL'))"
+	find_title;
+	find_method;
+	find_method_summary;
+	find_events;
+	find($query_sting);
+	find(@query_structs);
 
 =head1 DESCRIPTION
 
@@ -102,6 +76,13 @@ and provides methods to query specific information.
 =head2 new
 
 Create a new object.
+Return value is cached (bash on the class of the pod file).
+
+	use Pod::Query;
+	my $pod = Pod::Query->new('Pod::LOL', PATH_ONLY=0);
+
+PATH_ONLY can be used to determine the path to the pod
+document without having to do much unnecessary work.
 
 =cut
 
@@ -118,27 +99,11 @@ sub new ( $class, $pod_class, $path_only = 0 ) {
 
    return $s if $path_only;
 
-   my $lol = do {
-      if ( $MOCK_ROOT ) {
-         _mock_root();
-      }
-      else {
-         my $parser = Pod::LOL->new;
-
-         # Normally =for and =begin would otherwise be skipped.
-         $parser->accept_targets( '*' );
-
-         $parser->parse_file( $s->path )->{root};
-      }
-   };
-
+   my $lol = $MOCK_ROOT ? _mock_root() : Pod::LOL->new_root( $s->path );
    $lol = _flatten_for_tags( $lol );
 
    $s->lol( $lol );
    $s->tree( _lol_to_tree( $lol ) );
-
-   # say dumper $s;
-   # exit;
 
    $CACHE{$pod_class} = $s;
 
@@ -149,6 +114,7 @@ sub new ( $class, $pod_class, $path_only = 0 ) {
 =head2 _class_to_path
 
 Given a class name, retuns the path to the pod file.
+Return value is cached (bash on the class of the pod file).
 
 =cut
 
@@ -227,77 +193,93 @@ sub _flatten_for_tags ( $lol ) {
 
 =head2 _lol_to_tree
 
-Transforms a Pod::LOL object into a structured
-tree.
+Generates a tree from a Pod::LOL object.
+The structure of the tree is based on the N (level) in "=headN".
+
+Starting as "=head2", until we see "=head1" or another "=head2",
+all tags will be grouped "under" the "=head1" as a child (aka kid).
+
+For example:
+
+   =head1 FUNCTIONS
+
+   =Para  Description of Functions
+
+   =head2 Function1
+
+   =Para  Description of Function1
+
+   =head1 AUTHOR
+
+   =cut
+
+This will be grouped as:
+   =head1 FUNCTIONS
+      =Para Description of Functions
+      =head2 Function1
+         =Para Description of Function1
+   =head1 AUTHOR
 
 =cut
 
 sub _lol_to_tree ( $lol ) {
    my ( $is_in, $is_out );
-   my $is_head = qr/ ^ head (\d) $ /x;
-   my @main;
-   my $q = {};
+   my %heads_table = __PACKAGE__->_define_heads_regex_table();
+   my $is_head     = qr/ ^ head (\d) $ /x;
+   my $node        = {};
+   my @tree;
 
-   my $push = sub {    # push to main list
-      return unless %$q;             # only if queue
-      my $sub = $q->{sub};           # sub tags
-      my $has = _has_head( $sub );
-      $q->{sub} = _lol_to_tree( $sub )
-        if $has;    # TODO: rename "sub" to "inside" or "inner".
-      push @main, $q;
-      $q = {};
+   my $push = sub {    # push to tree.
+      return if not %$node;
+      my $kids = $node->{kids};
+      $node->{kids} = _lol_to_tree( $kids )
+        if ref( $kids ) && first { $_->{tag} =~ /$is_head/ } @$kids;
+      push @tree, $node;
+      $node = {};
    };
 
-   $DEBUG_TREE
-     and say "\n_ROOT_TO_TREE()";
+   say "\n_ROOT_TO_TREE()" if $DEBUG_TREE;
 
    for ( $lol->@* ) {
-      $DEBUG_TREE
-        and say "\n_=", dumper $_;
+      say "\n_=", dumper $_ if $DEBUG_TREE;
 
       my $leaf = _make_leaf( $_ );
-      my $tag  = $leaf->{tag};
+      say "\nleaf=", dumper $leaf if $DEBUG_TREE;
 
-      $DEBUG_TREE
-        and say "\nleaf=", dumper $leaf;
-
-      if ( not $is_in or $tag =~ /$is_out/ ) {
+      # Outer tag.
+      if ( not $is_in or $leaf->{tag} =~ /$is_out/ ) {
          $push->();
-         $q = $leaf;
-         next unless $tag =~ /$is_head/;
-         ( $is_in, $is_out ) = _get_heads_regex( $1 );
+         $node = $leaf;
+         if ( $leaf->{tag} =~ /$is_head/ ) {
+            ( $is_in, $is_out ) = $heads_table{$1}->@*;
+         }
       }
       else {
-         $q->{sub} //= [];
-         push $q->{sub}->@*, $leaf;
-         $DEBUG_TREE
-           and say "q: ", dumper $q;
+         push $node->{kids}->@*, $leaf;
+         say "node: ", dumper $node if $DEBUG_TREE;
       }
    }
 
    $push->();
 
-   \@main;
+   \@tree;
 }
 
 
-=head2 _has_head
+=head2 _define_heads_regex_table
 
-Check if the node has sub heads.
+Generates the regexes for head elements inside
+and outside the current head.
 
 =cut
 
-sub _has_head ( $list ) {
-   return unless ref $list;
+sub _define_heads_regex_table {
+   map {
+      my $inner = join "", $_ + 1 .. 5;    # num=2, inner=345
+      my $outer = join "", 0 .. $_;        # num=2, outer=012
 
-   $DEBUG_TREE
-     and say "\nlist=", dumper $list;
-
-   my $is_head = qr/ ^ head (\d) $ /x;
-
-   my $any_head = grep { $_->{tag} =~ /$is_head/; } @$list;
-
-   $any_head;
+      $_ => [ map { qr/ ^ head ([$_]) $ /x } $inner, $outer ]
+   } 1 .. 4;
 }
 
 
@@ -316,8 +298,10 @@ sub _make_leaf ( $node ) {
       text => \@text,
    };
 
+   # TODO: Why have this since most pod are not using "over-text"?
    if ( $tag eq "over-text" ) {
-      $leaf->{is_over} = 1, $leaf->{text} = _structure_over( \@text ),;
+      $leaf->{is_over} = 1;
+      $leaf->{text}    = _structure_over( \@text );
    }
 
    $leaf;
@@ -356,17 +340,7 @@ Extracts the title information.
 =cut
 
 sub find_title ( $s ) {
-   scalar $s->find(
-      {
-         tag  => "head1",
-         text => "NAME",
-         nth  => 0,
-      },
-      {
-         tag => "Para",
-         nth => 0,
-      },
-   );
+   scalar $s->find( 'head1=NAME[0]/Para[0]' );
 }
 
 
@@ -377,14 +351,8 @@ Extracts the complete method information.
 =cut
 
 sub find_method ( $s, $method ) {
-   $s->find(
-      {
-         tag       => qr/ ^ head \d $ /x,
-         text      => quotemeta( $method ) . $s->_is_function_call,
-         nth_group => 0,
-         keep_all  => 1,
-      },
-   );
+   $s->find( sprintf '~head=~^%s\b.*$[0]**',
+      $s->_clean_method_name( $method ) );
 }
 
 
@@ -395,33 +363,19 @@ Extracts the method summary.
 =cut
 
 sub find_method_summary ( $s, $method ) {
-   scalar $s->find(
-      {
-         tag  => qr/ ^ head \d $ /x,
-         text => quotemeta( $method ) . $s->_is_function_call,
-         nth  => 0,
-      },
-      {
-         tag => qr/ (?: Data | Para ) /x,
-         nth => 0,
-      },
-   );
+   scalar $s->find( sprintf '~head=~^%s\b.*$[0]/~(Data|Para)[0]',
+      $s->_clean_method_name( $method ) );
 }
 
 
-=head2 _is_function_call
+=head2 _clean_method_name
 
-Regex for function call parenthesis.
+Returns a method name without any possible parenthesis.
 
 =cut
 
-sub _is_function_call {
-
-   # Optional "()".
-   qr/ (?:
-         \( [^()]* \)
-      )?
-   /x;
+sub _clean_method_name ( $s, $name ) {
+   $name =~ s/[^a-zA-Z0-9_]+//gr;
 }
 
 
@@ -434,21 +388,7 @@ Returns a list of key value pairs.
 =cut
 
 sub find_events ( $s ) {
-   $s->find(
-      {
-         tag  => qr/ ^ head \d $ /x,
-         text => "EVENTS",
-         nth  => 0,
-      },
-      {
-         tag  => qr/ ^ head \d $ /x,
-         keep => 1,
-      },
-      {
-         tag       => "Para",
-         nth_group => 0,
-      },
-   );
+   $s->find( '~head=EVENTS[0]/~head*/(Para)[0]' );
 }
 
 
@@ -458,15 +398,19 @@ Generic extraction command.
 
 context sensitive!
 
-   $pod->find(@sections)
+   $query->find($condition)
+      Where condtion is a string as described in L</"_query_string_to_struct">
 
-   Where each section can contain:
+   $query->find(@conditions)
+
+   Where each condition can contain:
    {
-      tag      => "TAG_NAME",     # Find all matching tags.
-      text     => "TEXT_NAME",    # Find all matching texts.
-      keep     => 1,              # Capture the text.
-      keep_all => 1,              # Capture entire section.
-      nth      => 0,              # Use only the nth match.
+      tag       => "TAG_NAME",    # Find all matching tags.
+      text      => "TEXT_NAME",   # Find all matching texts.
+      keep      => 1,             # Capture the text.
+      keep_all  => 1,             # Capture entire section.
+      nth       => 0,             # Use only the nth match.
+      nth_in_group => 0,             # Use only the nth matching group.
    }
 
    # Return contents of entire head section:
@@ -483,50 +427,137 @@ context sensitive!
 
 =cut
 
-sub find ( $s, @find_sections ) {
-   @find_sections = (
+sub find ( $s, @raw_conditions ) {
 
-      # {
-      #    tag      => "Para",
-      #    text     => "SKIP1",
-      #    keep     => 1,
-      #    keep_all => 1,
-      #    nth      => 1,
-      # },
-   ) if $MOCK_SECTIONS;
+   my $find_conditions;
 
-   _check_sections( \@find_sections );
-   _set_section_defaults( \@find_sections );
+   # If the find condition is a single string.
+   if ( @raw_conditions == 1 and not ref $raw_conditions[0] ) {
+      $find_conditions = $s->_query_string_to_struct( $raw_conditions[0] );
+   }
+   else {
+      $find_conditions = \@raw_conditions;
+   }
+
+   _check_conditions( $find_conditions );
+   _set_condition_defaults( $find_conditions );
 
    my @tree = $s->tree->@*;
    my $kept_all;
 
-   for my $find ( @find_sections ) {
-      @tree = _find( $find, @tree );
-      if ( $find->{keep_all} ) {
+   for ( @$find_conditions ) {
+      @tree = _find( $_, @tree );
+      if ( $_->{keep_all} ) {
          $kept_all++;
          last;
       }
    }
 
+   say dumper \@tree if $DEBUG_FIND_DUMP;
+
    if ( not $kept_all ) {
       @tree = _invert( @tree );
    }
-
-   # say "tree= ", dumper \@tree;
-   # exit;
 
    _render( $kept_all, @tree );
 }
 
 
-=head2 _check_sections
+=head2 _query_string_to_struct
+
+Convert a pod query string into a structure based on these rules:
+
+   1. Split string by '/'.
+      Each piece is a separate list of conditions.
+
+   2. Remove an optional '*' or '**' from the last condition.
+      Keep is set if we have '*'.
+      Keep all is set if we have '**'.
+
+   3. Remove an optional [N] from the last condition.
+      (Where N is a decimal).
+      Set nth base on 'N'.
+      Set nth_in_group if previous word is surrounded by ():
+         (WORD)[N]
+
+   4. Double and single quotes are removed from the ends (if matching).
+
+   5. Split each list of conditions by '='.
+      First word is the tag.
+      Second word is the text (if any).
+      If  either starts with '~', then the word
+         is treated like a pattern.
+
+   Precedence:
+      If quoted and ~, left wins:
+      ~"head1" => qr/"head"/,
+      "~head1" => qr/head/,
+
+=cut
+
+sub _query_string_to_struct ( $s, $query_string ) {
+   my $is_nth          = qr/ \[ (-?\d+) \] $ /x;
+   my $is_nth_in_group = qr/ ^ \( (.+) \) $is_nth /x;
+   my $is_keep         = qr/ \* $ /x;
+   my $is_keep_all     = qr/ \* \* $ /x;
+
+   my @query_struct =
+     map {
+      my @condition = parse_line( '=', "1", $_ );
+      my $set       = {};
+
+      # Set flags based on last condition.
+      for ( $condition[-1] ) {
+         if ( s/$is_keep_all// ) {
+            $set->{keep_all}++;
+         }
+         elsif ( s/$is_keep// ) {
+            $set->{keep}++;
+         }
+
+         if ( s/$is_nth_in_group// ) {
+            $_ = $1;
+            $set->{nth_in_group} = $2;
+         }
+         elsif ( s/$is_nth// ) {
+            $set->{nth} = $1;
+         }
+      }
+
+      # Remove outer quotes (if any).
+      for ( @condition ) {
+         for my $quote ( qw/ " ' / ) {
+            if ( $quote eq substr( $_, 0, 1 ) and $quote eq substr( $_, -1 ) ) {
+               $_ = substr( $_, 1, -1 );    # Strip first and last characters.
+               last;                        # Skip multi quoting.
+            }
+         }
+      }
+
+      # say "_: $_";
+      # say "cond: " . dumper \@condition;
+
+      # Regex or literal.
+      for ( qw/ tag text / ) {
+         last if not @condition;
+         my $cond = shift @condition;
+         $set->{$_} = ( $cond =~ s/^~// ) ? qr/$cond/ : $cond;
+      }
+
+      $set;
+     } parse_line( '/', 1, $query_string );
+
+   \@query_struct;
+}
+
+
+=head2 _check_conditions
 
 Check if queries are valid.
 
 =cut
 
-sub _check_sections ( $sections ) {
+sub _check_conditions ( $sections ) {
 
    my $error_message = <<~'ERROR';
 
@@ -534,22 +565,29 @@ sub _check_sections ( $sections ) {
 
       Syntax:
 
+         $pod->find( 'QUERY' )         # As explained in _query_string_to_struct().
+
+         # OR:
+
          $pod->find(
             # section1
             {
-               tag       => "TAG",
-               text      => "TEXT",
-               keep      => 1,      # Must only be in last section.
-               keep_all  => 1,
-               nth       => 0,      # These options ...
-               nth_group => 0,      #   are exclusive.
+               tag          => "TAG",  # Search to look for.
+               text         => "TEXT", # Text of the tag to find.
+               keep         => 1,      # Must only be in last section.
+               keep_all     => 1,      # Keep this tag and sub tags.
+               nth          => 0,      # Stop searching after find so many matches.
+               nth_in_group => 0,      # Nth only in the current group.
             },
             # ...
-            # sectionN
+            # conditionN
          );
    ERROR
 
-   die "$error_message" if grep { ref() ne ref {} } @$sections;
+   die "$error_message"
+     if not $sections
+     or not @$sections
+     or grep { ref() ne ref {} } @$sections;
 
    # keep_all should only be in the last section
    my $last = $#$sections;
@@ -558,85 +596,75 @@ sub _check_sections ( $sections ) {
         if $section->{keep_all} and $n < $last;
    }
 
-   # Cannot use both nth and nth_group (makes no sense, plus may cause errors)
+  # Cannot use both nth and nth_in_group (makes no sense, plus may cause errors)
    while ( my ( $n, $section ) = each @$sections ) {
-      die "Error: nth and nth_group are exclusive!\n"
+      die "Error: nth and nth_in_group are exclusive!\n"
         if defined $section->{nth}
-        and defined $section->{nth_group};
+        and defined $section->{nth_in_group};
    }
 }
 
 
-=head2 _set_section_defaults
+=head2 _set_condition_defaults
 
 Assigns default query options.
 
 =cut
 
-sub _set_section_defaults ( $sections ) {
-   for my $section ( @$sections ) {
+sub _set_condition_defaults ( $conditions ) {
+   for my $condition ( @$conditions ) {
 
       # Text Options
       for ( qw/ tag text / ) {
-         if ( defined $section->{$_} ) {
-            if ( ref $section->{$_} ne ref qr// ) {
-               $section->{$_} = qr/ ^ $section->{$_} $ /x;
+         if ( defined $condition->{$_} ) {
+            if ( ref $condition->{$_} ne ref qr// ) {
+               $condition->{$_} = qr/^$condition->{$_}$/;
             }
          }
          else {
-            $section->{$_} = qr/./;
+            $condition->{$_} = qr/./;
          }
       }
 
       # Bit Options
       for ( qw/ keep keep_all / ) {
-         if ( defined $section->{$_} ) {
-            $section->{$_} = !!$section->{$_};
+         if ( defined $condition->{$_} ) {
+            $condition->{$_} = !!$condition->{$_};
          }
          else {
-            $section->{$_} = 0;
+            $condition->{$_} = 0;
          }
       }
 
       # Range Options
-      my $zero     = "0 but true";
       my $is_digit = qr/ ^ -?\d+ $ /x;
-      for ( qw/ nth nth_group / ) {
-         my $v = $section->{$_};
+      for ( qw/ nth nth_in_group / ) {
+         my $v = $condition->{$_};
          if ( defined $v and $v =~ /$is_digit/ ) {
-            $v ||= $zero;
-            my $end  = ( $v >= 0 ) ? "pos" : "neg";
-            my $name = "_${_}_$end";
-            $section->{$name} = $v;
+            $v ||= "0 but true";
+            my $end  = ( $v >= 0 ) ? "pos" : "neg";    # Set negative or
+            my $name = "_${_}_$end";                   # positive form.
+            $condition->{$name} = $v;
          }
       }
 
    }
-}
 
-
-=head2 _get_heads_regex
-
-Generates the regexes for head elements inside
-and outside the current head.
-
-=cut
-
-sub _get_heads_regex ( $num ) {
-
-   # Make regex for inner and outer =head tags
-   my $inner  = join "", grep { $_ > $num } 0 .. 5;
-   my $outer  = join "", grep { $_ <= $num } 0 .. 5;
-   my $is_in  = qr/ ^ head ([$inner]) $ /x;
-   my $is_out = qr/ ^ head ([$outer]) $ /x;
-
-   ( $is_in, $is_out );
+   # Last condition should be keep or keep_all.
+   # (otherwise, why even query for it?)
+   for ( $conditions->[-1] ) {
+      if ( not $_->{keep} || $_->{keep_all} ) {
+         $_->{keep} = 1;
+      }
+   }
 }
 
 
 =head2 _find
 
 Lower level find command.
+
+TODO: Need to clean this up and possibly restructure.
 
 =cut
 
@@ -647,140 +675,98 @@ sub _find ( $need, @groups ) {
       say "groups: ", dumper \@groups;
    }
 
-   my $tag         = $need->{tag};
-   my $text        = $need->{text};
-   my $keep        = $need->{keep};
-   my $nth         = $need->{nth};
-   my $nth_p       = $need->{_nth_pos};
-   my $nth_n       = $need->{_nth_neg};
-   my $nth_group   = $need->{nth_group};
-   my $nth_group_p = $need->{_nth_grou_pos};
-   my $nth_group_n = $need->{_nth_grou_neg};
+   my $nth_p          = $need->{_nth_pos};       # Simplify code by already
+   my $nth_n          = $need->{_nth_neg};       # knowing if neg or pos.
+   my $nth_in_group_p = $need->{_nth_grou_pos};  # Set in _set_section_defaults.
+   my $nth_in_group_n = $need->{_nth_grou_neg};
    my @found;
 
- GROUP: for my $group ( @groups ) {
-      my @tries = ( $group );
-      my $prev  = $group->{prev} // [];
-      $prev = [@$prev];    # shallow copy
+ GROUP:
+   for my $group ( @groups ) {
+      my @tries = ( $group );                  # Assume single group to process.
+      my @prev  = @{ $group->{prev} // [] };
       my $locked_prev = 0;
-      my @q;
+      my @found_in_group;
       if ( $DEBUG_FIND ) {
-         say "\nprev: ", dumper $prev;
+         say "\nprev: ", dumper \@prev;
          say "group:  ", dumper $group;
       }
 
-      while ( my $try = shift @tries ) {
-         $DEBUG_FIND
-           and say "\nTrying: try=", dumper $try;
+    TRY:
+      while ( my $try = shift @tries ) {   # Can add to this queue if a sub tag.
+         say "\nTrying: try=", dumper $try if $DEBUG_FIND;
 
-         my $_tag      = $try->{tag};
-         my ( $_text ) = $try->{text}->@*;
-         my $_sub      = $try->{sub};
-         my $_keep     = $try->{keep};
+         my ( $try_text ) = $try->{text}->@*;   # TODO: why only the first text?
+         say "text=$try_text"             if $DEBUG_FIND;
+         say "next->{tag}=$need->{tag}"   if $DEBUG_FIND;
+         say "next->{text}=$need->{text}" if $DEBUG_FIND;
 
-         if ( defined $_keep ) {
-            $DEBUG_FIND
-              and say "ENFORCING: keep";
+         if ( defined $try->{keep} ) {          # TODO; Why empty block?
+            say "ENFORCING: keep" if $DEBUG_FIND;
          }
-         elsif ($_tag =~ /$tag/
-            and $_text =~ /$text/ )
+         elsif ($try->{tag} =~ /$need->{tag}/
+            and $try_text =~ /$need->{text}/ )
          {
-            $DEBUG_FIND
-              and say "Found:  tag=$_tag, text=$_text";
-            push @q,
-              {
-               %$try,
-               prev => $prev,
-               keep => $keep,
-              };
+            say "Found:  tag=$try->{tag}, text=$try_text" if $DEBUG_FIND;
+            push @found_in_group, {
+               %$try,                    # Copy current search options.
+               prev => \@prev,           # Need this for the inversion step.
+               keep => $need->{keep},    # Remember for later.
+            };
 
             # Specific match (positive)
-            if ( $nth_p and @q > $nth_p ) {
-               $DEBUG_FIND
-                 and say "ENFORCING: nth=$nth";
-               @found = $q[$nth_p];
+            say "nth_p:$nth_p and found_in_group:" . dumper \@found_in_group
+              if $DEBUG_FIND;
+            if ( $nth_p and @found + @found_in_group > $nth_p ) {
+               say "ENFORCING: nth=$nth_p" if $DEBUG_FIND;
+               @found = $found_in_group[-1];
                last GROUP;
             }
 
             # Specific group match (positive)
-            elsif ( $nth_group_p and @q > $nth_group_p ) {
-               $DEBUG_FIND
-                 and say "ENFORCING: nth_group=$nth_group";
-               @q = $q[$nth_group_p];
-               last;
+            elsif ( $nth_in_group_p and @found_in_group > $nth_in_group_p ) {
+               say "ENFORCING: nth_in_group=$nth_in_group_p" if $DEBUG_FIND;
+               @found_in_group = $found_in_group[-1];
+               last TRY;
             }
+
+            next TRY;
          }
 
-         if ( $_sub and not @q ) {
-            $DEBUG_FIND
-              and say "Got sub and nothing yet in queue";
-            unshift @tries, @$_sub;
-            if ( $_keep and not $locked_prev++ ) {
-               unshift @$prev,
+         if ( $try->{kids} and not @found_in_group ) {
+            say "Got kids and nothing yet in queue" if $DEBUG_FIND;
+            unshift @tries, $try->{kids}->@*;    # Process kids tags.
+            if ( $try->{keep} and not $locked_prev++ ) {
+               unshift @prev,
                  {
-                  tag  => $_tag,
-                  text => [$_text],
+                  tag  => $try->{tag},
+                  text => [$try_text],
+                  keep => $try->{keep},
                  };
-               $DEBUG_FIND
-                 and say "prev changed: ", dumper $prev;
+               say "prev changed: ", dumper \@prev if $DEBUG_FIND;
             }
-            $DEBUG_FIND
-              and say "locked_prev: $locked_prev";
+            say "locked_prev: $locked_prev" if $DEBUG_FIND;
          }
       }
 
       # Specific group match (negative)
-      if ( $nth_group_n and @q >= abs $nth_group_n ) {
-         $DEBUG_FIND
-           and say "ENFORCING: nth_group_n=$nth_group_n";
-         @q = $q[$nth_group_n];
+      if ( $nth_in_group_n and @found_in_group >= abs $nth_in_group_n ) {
+         say "ENFORCING: nth_in_group_n=$nth_in_group_n" if $DEBUG_FIND;
+         @found_in_group = $found_in_group[$nth_in_group_n];
       }
 
-      push @found, splice @q if @q;
+      push @found, splice @found_in_group if @found_in_group;
    }
 
    # Specific match (negative)
    if ( $nth_n and @found >= abs $nth_n ) {
-      $DEBUG_FIND
-        and say "ENFORCING: nth=$nth";
+      say "ENFORCING: nth=$nth_n" if $DEBUG_FIND;
       @found = $found[$nth_n];
    }
 
-   $DEBUG_FIND
-     and say "found: ", dumper \@found;
+   say "found: ", dumper \@found if $DEBUG_FIND;
+
    @found;
-}
-
-
-=head2 _to_list
-
-NOT USED
-
-Converts a tree to a plain list.
-
-=cut
-
-sub _to_list ( $groups, $recursive = 0 ) {
-   my @groups = @$groups;
-   my @list;
-
-   say "\n_TO_LIST()";
-   say "groups: ", dumper \@groups;
-
-   while ( my $group = shift @groups ) {
-      my ( $tag, $text, $sub, $opts ) = @$group;
-      push @list,
-        {
-         tag  => $tag,
-         text => $text,
-        };
-
-      if ( $sub and $recursive ) {
-         unshift @groups, @$sub;
-      }
-   }
-
-   @list;
 }
 
 
@@ -804,7 +790,7 @@ sub _invert ( @groups ) {
    my %navi;
 
    for my $group ( @groups ) {
-      push @tree, { %$group{qw/tag text sub is_over/} };
+      push @tree, { %$group{qw/ tag text keep kids is_over /} };
       if ( $DEBUG_INVERT ) {
          say "\nInverting: group=", dumper $group;
          say "tree: ",              dumper \@tree;
@@ -826,15 +812,14 @@ sub _invert ( @groups ) {
          }
          else {
             $prev_node = $navi{$prev} = [ $tree[-1] ];
-            $tree[-1] = { %$prev, sub => $prev_node };
+            $tree[-1] = { %$prev, kids => $prev_node };
             if ( $DEBUG_INVERT ) {
                say "NEW: prev_node=", dumper $prev_node;
             }
          }
       }
 
-      $DEBUG_INVERT
-        and say "tree end: ", dumper \@tree;
+      say "tree end: ", dumper \@tree if $DEBUG_INVERT;
    }
 
    @tree;
@@ -863,36 +848,35 @@ sub _render ( $kept_all, @tree ) {
 
    for my $group ( @tree ) {
       my @tries = ( $group );
-      $DEBUG_RENDER
-        and say "\ngroup:  ", dumper $group;
+      say "\ngroup:  ", dumper $group if $DEBUG_RENDER;
 
       while ( my $try = shift @tries ) {
-         $DEBUG_RENDER
-           and say "\nTrying: try=", dumper $try;
+         say "\nTrying: try=", dumper $try if $DEBUG_RENDER;
 
-         my $_tag  = $try->{tag};
          my $_text = $try->{text}[0];
-         my $_sub  = $try->{sub};
+         say "_text=$_text" if $DEBUG_RENDER;
 
-         if ( $try->{is_over} ) {
-            $_text = _render_over( $try->{text}, $kept_all, );
-         }
-         elsif ( $kept_all ) {
-            $_text .= ":" if ++$n == 1;
-            if ( $_tag eq "Para" ) {
-               $DEBUG_RENDER
-                 and say "USING FORMATTER";
+         if ( $kept_all ) {
+            $_text .= ":" if ++$n == 1;    # Only for the first line.
+            if ( $try->{tag} eq "Para" ) {
+               say "USING FORMATTER" if $DEBUG_RENDER;
                $_text = $formatter->reformat( $_text );
             }
+            push @lines, $_text, "";
+         }
+         elsif ( $try->{keep} ) {
+            say "keeping" if $DEBUG_RENDER;
+            if ( $try->{is_over} ) {
+               $_text = _render_over( $try->{text}, $kept_all );
+            }
+            say "_text2=$_text" if $DEBUG_RENDER;
+            push @lines, $_text;
          }
 
-         push @lines, $_text;
-         push @lines, "" if $kept_all;
-
-         if ( $_sub ) {
-            unshift @tries, @$_sub;
+         if ( $try->{kids} ) {
+            unshift @tries, $try->{kids}->@*;
             if ( $DEBUG_RENDER ) {
-               say "Got subs";
+               say "Got kids";
                say "tries:  ", dumper \@tries;
             }
          }
@@ -901,8 +885,7 @@ sub _render ( $kept_all, @tree ) {
 
    }
 
-   $DEBUG_RENDER
-     and say "lines: ", dumper \@lines;
+   say "lines: ", dumper \@lines if $DEBUG_RENDER;
 
    return @lines if wantarray;
    join "\n", @lines;
@@ -936,15 +919,13 @@ sub _render_over ( $list, $kept_all ) {
    for my $items ( @$list ) {
       my $n;
       for ( @$items ) {
-         $DEBUG_RENDER
-           and say "over-item=", dumper $_;
+         say "over-item=", dumper $_ if $DEBUG_RENDER;
 
          my ( $tag, $text ) = @$_;
 
          if ( $kept_all ) {
-            $DEBUG_RENDER
-              and say "USING FORMATTER";
-            $text .= ":" if ++$n == 1;
+            say "USING FORMATTER" if $DEBUG_RENDER;
+            $text .= ":"          if ++$n == 1;
             if ( $tag eq "item-text" ) {
                $text = $f_norm->reformat( $text );
             }
@@ -961,8 +942,7 @@ sub _render_over ( $list, $kept_all ) {
 
    my $new_text = join "\n", @txt;
 
-   $DEBUG_RENDER
-     and say "Changed over-text to: $new_text";
+   say "Changed over-text to: $new_text" if $DEBUG_RENDER;
 
    $new_text;
 }
@@ -1003,6 +983,14 @@ Tim Potapov, C<< <tim.potapov[AT]gmail.com> >>
 =head1 BUGS
 
 Please report any bugs or feature requests to L<https://github.com/poti1/pod-query/issues>.
+
+
+=head1 CAVEAT
+
+
+These options to _find() appear to only be currently working if set to o or -1:
+   nth
+   nth_in_group
 
 
 =head1 SUPPORT

@@ -1,16 +1,12 @@
 package Shipment::Temando::WSDL::Types::DispatchDetails;
-$Shipment::Temando::WSDL::Types::DispatchDetails::VERSION = '3.06';
+$Shipment::Temando::WSDL::Types::DispatchDetails::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(0);
 
-sub get_xmlns {
-    'http://'
-      . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url
-      . '/schema/2009_06/common.xsd';
-}
+sub get_xmlns { 'http://' . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url . '/schema/2009_06/common.xsd' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -24,293 +20,287 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %reference_of : ATTR(:get<reference>);
-    my %carrierName_of : ATTR(:get<carrierName>);
-    my %carrierId_of : ATTR(:get<carrierId>);
-    my %accountNo_of : ATTR(:get<accountNo>);
-    my %creatorId_of : ATTR(:get<creatorId>);
-    my %currency_of : ATTR(:get<currency>);
-    my %changedCarrier_of : ATTR(:get<changedCarrier>);
-    my %consignmentEdited_of : ATTR(:get<consignmentEdited>);
-    my %consignmentNumber_of : ATTR(:get<consignmentNumber>);
-    my %consignmentDate_of : ATTR(:get<consignmentDate>);
-    my %deliveryMethod_of : ATTR(:get<deliveryMethod>);
-    my %rateName_of : ATTR(:get<rateName>);
-    my %description_of : ATTR(:get<description>);
-    my %distanceMeasurementType_of : ATTR(:get<distanceMeasurementType>);
-    my %weightMeasurementType_of : ATTR(:get<weightMeasurementType>);
-    my %length_of : ATTR(:get<length>);
-    my %width_of : ATTR(:get<width>);
-    my %height_of : ATTR(:get<height>);
-    my %actualWeight_of : ATTR(:get<actualWeight>);
-    my %chargeableWeight_of : ATTR(:get<chargeableWeight>);
-    my %actualCubic_of : ATTR(:get<actualCubic>);
-    my %chargeableCubic_of : ATTR(:get<chargeableCubic>);
-    my %actualQuantity_of : ATTR(:get<actualQuantity>);
-    my %chargeableQuantity_of : ATTR(:get<chargeableQuantity>);
-    my %basePrice_of : ATTR(:get<basePrice>);
-    my %surcharges_of : ATTR(:get<surcharges>);
-    my %tax_of : ATTR(:get<tax>);
-    my %totalPrice_of : ATTR(:get<totalPrice>);
-    my %originZoneName_of : ATTR(:get<originZoneName>);
-    my %originContactName_of : ATTR(:get<originContactName>);
-    my %originCompanyName_of : ATTR(:get<originCompanyName>);
-    my %originStreet_of : ATTR(:get<originStreet>);
-    my %originSuburb_of : ATTR(:get<originSuburb>);
-    my %originState_of : ATTR(:get<originState>);
-    my %originCode_of : ATTR(:get<originCode>);
-    my %originCountry_of : ATTR(:get<originCountry>);
-    my %originPhone1_of : ATTR(:get<originPhone1>);
-    my %originPhone2_of : ATTR(:get<originPhone2>);
-    my %originFax_of : ATTR(:get<originFax>);
-    my %originEmail_of : ATTR(:get<originEmail>);
-    my %destinationZoneName_of : ATTR(:get<destinationZoneName>);
-    my %destinationContactName_of : ATTR(:get<destinationContactName>);
-    my %destinationCompanyName_of : ATTR(:get<destinationCompanyName>);
-    my %destinationStreet_of : ATTR(:get<destinationStreet>);
-    my %destinationSuburb_of : ATTR(:get<destinationSuburb>);
-    my %destinationState_of : ATTR(:get<destinationState>);
-    my %destinationCode_of : ATTR(:get<destinationCode>);
-    my %destinationCountry_of : ATTR(:get<destinationCountry>);
-    my %destinationPhone1_of : ATTR(:get<destinationPhone1>);
-    my %destinationPhone2_of : ATTR(:get<destinationPhone2>);
-    my %destinationFax_of : ATTR(:get<destinationFax>);
-    my %destinationEmail_of : ATTR(:get<destinationEmail>);
+my %reference_of :ATTR(:get<reference>);
+my %carrierName_of :ATTR(:get<carrierName>);
+my %carrierId_of :ATTR(:get<carrierId>);
+my %accountNo_of :ATTR(:get<accountNo>);
+my %creatorId_of :ATTR(:get<creatorId>);
+my %currency_of :ATTR(:get<currency>);
+my %changedCarrier_of :ATTR(:get<changedCarrier>);
+my %consignmentEdited_of :ATTR(:get<consignmentEdited>);
+my %consignmentNumber_of :ATTR(:get<consignmentNumber>);
+my %consignmentDate_of :ATTR(:get<consignmentDate>);
+my %deliveryMethod_of :ATTR(:get<deliveryMethod>);
+my %rateName_of :ATTR(:get<rateName>);
+my %description_of :ATTR(:get<description>);
+my %distanceMeasurementType_of :ATTR(:get<distanceMeasurementType>);
+my %weightMeasurementType_of :ATTR(:get<weightMeasurementType>);
+my %length_of :ATTR(:get<length>);
+my %width_of :ATTR(:get<width>);
+my %height_of :ATTR(:get<height>);
+my %actualWeight_of :ATTR(:get<actualWeight>);
+my %chargeableWeight_of :ATTR(:get<chargeableWeight>);
+my %actualCubic_of :ATTR(:get<actualCubic>);
+my %chargeableCubic_of :ATTR(:get<chargeableCubic>);
+my %actualQuantity_of :ATTR(:get<actualQuantity>);
+my %chargeableQuantity_of :ATTR(:get<chargeableQuantity>);
+my %basePrice_of :ATTR(:get<basePrice>);
+my %surcharges_of :ATTR(:get<surcharges>);
+my %tax_of :ATTR(:get<tax>);
+my %totalPrice_of :ATTR(:get<totalPrice>);
+my %originZoneName_of :ATTR(:get<originZoneName>);
+my %originContactName_of :ATTR(:get<originContactName>);
+my %originCompanyName_of :ATTR(:get<originCompanyName>);
+my %originStreet_of :ATTR(:get<originStreet>);
+my %originSuburb_of :ATTR(:get<originSuburb>);
+my %originState_of :ATTR(:get<originState>);
+my %originCode_of :ATTR(:get<originCode>);
+my %originCountry_of :ATTR(:get<originCountry>);
+my %originPhone1_of :ATTR(:get<originPhone1>);
+my %originPhone2_of :ATTR(:get<originPhone2>);
+my %originFax_of :ATTR(:get<originFax>);
+my %originEmail_of :ATTR(:get<originEmail>);
+my %destinationZoneName_of :ATTR(:get<destinationZoneName>);
+my %destinationContactName_of :ATTR(:get<destinationContactName>);
+my %destinationCompanyName_of :ATTR(:get<destinationCompanyName>);
+my %destinationStreet_of :ATTR(:get<destinationStreet>);
+my %destinationSuburb_of :ATTR(:get<destinationSuburb>);
+my %destinationState_of :ATTR(:get<destinationState>);
+my %destinationCode_of :ATTR(:get<destinationCode>);
+my %destinationCountry_of :ATTR(:get<destinationCountry>);
+my %destinationPhone1_of :ATTR(:get<destinationPhone1>);
+my %destinationPhone2_of :ATTR(:get<destinationPhone2>);
+my %destinationFax_of :ATTR(:get<destinationFax>);
+my %destinationEmail_of :ATTR(:get<destinationEmail>);
 
-    __PACKAGE__->_factory(
-        [   qw(        reference
-              carrierName
-              carrierId
-              accountNo
-              creatorId
-              currency
-              changedCarrier
-              consignmentEdited
-              consignmentNumber
-              consignmentDate
-              deliveryMethod
-              rateName
-              description
-              distanceMeasurementType
-              weightMeasurementType
-              length
-              width
-              height
-              actualWeight
-              chargeableWeight
-              actualCubic
-              chargeableCubic
-              actualQuantity
-              chargeableQuantity
-              basePrice
-              surcharges
-              tax
-              totalPrice
-              originZoneName
-              originContactName
-              originCompanyName
-              originStreet
-              originSuburb
-              originState
-              originCode
-              originCountry
-              originPhone1
-              originPhone2
-              originFax
-              originEmail
-              destinationZoneName
-              destinationContactName
-              destinationCompanyName
-              destinationStreet
-              destinationSuburb
-              destinationState
-              destinationCode
-              destinationCountry
-              destinationPhone1
-              destinationPhone2
-              destinationFax
-              destinationEmail
+__PACKAGE__->_factory(
+    [ qw(        reference
+        carrierName
+        carrierId
+        accountNo
+        creatorId
+        currency
+        changedCarrier
+        consignmentEdited
+        consignmentNumber
+        consignmentDate
+        deliveryMethod
+        rateName
+        description
+        distanceMeasurementType
+        weightMeasurementType
+        length
+        width
+        height
+        actualWeight
+        chargeableWeight
+        actualCubic
+        chargeableCubic
+        actualQuantity
+        chargeableQuantity
+        basePrice
+        surcharges
+        tax
+        totalPrice
+        originZoneName
+        originContactName
+        originCompanyName
+        originStreet
+        originSuburb
+        originState
+        originCode
+        originCountry
+        originPhone1
+        originPhone2
+        originFax
+        originEmail
+        destinationZoneName
+        destinationContactName
+        destinationCompanyName
+        destinationStreet
+        destinationSuburb
+        destinationState
+        destinationCode
+        destinationCountry
+        destinationPhone1
+        destinationPhone2
+        destinationFax
+        destinationEmail
 
-            )
-        ],
-        {   'reference'               => \%reference_of,
-            'carrierName'             => \%carrierName_of,
-            'carrierId'               => \%carrierId_of,
-            'accountNo'               => \%accountNo_of,
-            'creatorId'               => \%creatorId_of,
-            'currency'                => \%currency_of,
-            'changedCarrier'          => \%changedCarrier_of,
-            'consignmentEdited'       => \%consignmentEdited_of,
-            'consignmentNumber'       => \%consignmentNumber_of,
-            'consignmentDate'         => \%consignmentDate_of,
-            'deliveryMethod'          => \%deliveryMethod_of,
-            'rateName'                => \%rateName_of,
-            'description'             => \%description_of,
-            'distanceMeasurementType' => \%distanceMeasurementType_of,
-            'weightMeasurementType'   => \%weightMeasurementType_of,
-            'length'                  => \%length_of,
-            'width'                   => \%width_of,
-            'height'                  => \%height_of,
-            'actualWeight'            => \%actualWeight_of,
-            'chargeableWeight'        => \%chargeableWeight_of,
-            'actualCubic'             => \%actualCubic_of,
-            'chargeableCubic'         => \%chargeableCubic_of,
-            'actualQuantity'          => \%actualQuantity_of,
-            'chargeableQuantity'      => \%chargeableQuantity_of,
-            'basePrice'               => \%basePrice_of,
-            'surcharges'              => \%surcharges_of,
-            'tax'                     => \%tax_of,
-            'totalPrice'              => \%totalPrice_of,
-            'originZoneName'          => \%originZoneName_of,
-            'originContactName'       => \%originContactName_of,
-            'originCompanyName'       => \%originCompanyName_of,
-            'originStreet'            => \%originStreet_of,
-            'originSuburb'            => \%originSuburb_of,
-            'originState'             => \%originState_of,
-            'originCode'              => \%originCode_of,
-            'originCountry'           => \%originCountry_of,
-            'originPhone1'            => \%originPhone1_of,
-            'originPhone2'            => \%originPhone2_of,
-            'originFax'               => \%originFax_of,
-            'originEmail'             => \%originEmail_of,
-            'destinationZoneName'     => \%destinationZoneName_of,
-            'destinationContactName'  => \%destinationContactName_of,
-            'destinationCompanyName'  => \%destinationCompanyName_of,
-            'destinationStreet'       => \%destinationStreet_of,
-            'destinationSuburb'       => \%destinationSuburb_of,
-            'destinationState'        => \%destinationState_of,
-            'destinationCode'         => \%destinationCode_of,
-            'destinationCountry'      => \%destinationCountry_of,
-            'destinationPhone1'       => \%destinationPhone1_of,
-            'destinationPhone2'       => \%destinationPhone2_of,
-            'destinationFax'          => \%destinationFax_of,
-            'destinationEmail'        => \%destinationEmail_of,
-        },
-        {   'reference' => 'Shipment::Temando::WSDL::Types::CarrierReference',
-            'carrierName' => 'Shipment::Temando::WSDL::Types::CompanyName',
-            'carrierId'   => 'Shipment::Temando::WSDL::Types::CarrierId',
-            'accountNo'   =>
-              'Shipment::Temando::WSDL::Types::CarrierAccountNumber',
-            'creatorId' => 'Shipment::Temando::WSDL::Types::CarrierCreatorId',
-            'currency'  => 'Shipment::Temando::WSDL::Types::CurrencyType',
-            'changedCarrier' => 'Shipment::Temando::WSDL::Types::YesNoOption',
-            'consignmentEdited' =>
-              'Shipment::Temando::WSDL::Types::YesNoOption',
-            'consignmentNumber' =>
-              'Shipment::Temando::WSDL::Types::ConsignmentNumber',
-            'consignmentDate' => 'Shipment::Temando::WSDL::Types::Date',
-            'deliveryMethod'  =>
-              'Shipment::Temando::WSDL::Types::DeliveryMethod',
-            'rateName'    => 'Shipment::Temando::WSDL::Types::RateName',
-            'description' => 'Shipment::Temando::WSDL::Types::ItemDescription',
-            'distanceMeasurementType' =>
-              'Shipment::Temando::WSDL::Types::DistanceMeasurementType',
-            'weightMeasurementType' =>
-              'Shipment::Temando::WSDL::Types::WeightMeasurementType',
-            'length'             => 'Shipment::Temando::WSDL::Types::Length',
-            'width'              => 'Shipment::Temando::WSDL::Types::Width',
-            'height'             => 'Shipment::Temando::WSDL::Types::Height',
-            'actualWeight'       => 'Shipment::Temando::WSDL::Types::Weight',
-            'chargeableWeight'   => 'Shipment::Temando::WSDL::Types::Weight',
-            'actualCubic'        => 'Shipment::Temando::WSDL::Types::Cubic',
-            'chargeableCubic'    => 'Shipment::Temando::WSDL::Types::Cubic',
-            'actualQuantity'     => 'Shipment::Temando::WSDL::Types::Quantity',
-            'chargeableQuantity' => 'Shipment::Temando::WSDL::Types::Quantity',
-            'basePrice'  => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
-            'surcharges' => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
-            'tax'        => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
-            'totalPrice' => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
-            'originZoneName'    => 'Shipment::Temando::WSDL::Types::ZoneName',
-            'originContactName' =>
-              'Shipment::Temando::WSDL::Types::ContactName',
-            'originCompanyName' =>
-              'Shipment::Temando::WSDL::Types::CompanyName',
-            'originStreet'  => 'Shipment::Temando::WSDL::Types::Address',
-            'originSuburb'  => 'Shipment::Temando::WSDL::Types::Suburb',
-            'originState'   => 'Shipment::Temando::WSDL::Types::State',
-            'originCode'    => 'Shipment::Temando::WSDL::Types::PostalCode',
-            'originCountry' => 'Shipment::Temando::WSDL::Types::CountryCode',
-            'originPhone1'  => 'Shipment::Temando::WSDL::Types::Phone',
-            'originPhone2'  => 'Shipment::Temando::WSDL::Types::Phone',
-            'originFax'     => 'Shipment::Temando::WSDL::Types::Fax',
-            'originEmail'   => 'Shipment::Temando::WSDL::Types::Email',
-            'destinationZoneName' =>
-              'Shipment::Temando::WSDL::Types::ZoneName',
-            'destinationContactName' =>
-              'Shipment::Temando::WSDL::Types::ContactName',
-            'destinationCompanyName' =>
-              'Shipment::Temando::WSDL::Types::CompanyName',
-            'destinationStreet' => 'Shipment::Temando::WSDL::Types::Address',
-            'destinationSuburb' => 'Shipment::Temando::WSDL::Types::Suburb',
-            'destinationState'  => 'Shipment::Temando::WSDL::Types::State',
-            'destinationCode' => 'Shipment::Temando::WSDL::Types::PostalCode',
-            'destinationCountry' =>
-              'Shipment::Temando::WSDL::Types::CountryCode',
-            'destinationPhone1' => 'Shipment::Temando::WSDL::Types::Phone',
-            'destinationPhone2' => 'Shipment::Temando::WSDL::Types::Phone',
-            'destinationFax'    => 'Shipment::Temando::WSDL::Types::Fax',
-            'destinationEmail'  => 'Shipment::Temando::WSDL::Types::Email',
-        },
-        {
+    ) ],
+    {
+        'reference' => \%reference_of,
+        'carrierName' => \%carrierName_of,
+        'carrierId' => \%carrierId_of,
+        'accountNo' => \%accountNo_of,
+        'creatorId' => \%creatorId_of,
+        'currency' => \%currency_of,
+        'changedCarrier' => \%changedCarrier_of,
+        'consignmentEdited' => \%consignmentEdited_of,
+        'consignmentNumber' => \%consignmentNumber_of,
+        'consignmentDate' => \%consignmentDate_of,
+        'deliveryMethod' => \%deliveryMethod_of,
+        'rateName' => \%rateName_of,
+        'description' => \%description_of,
+        'distanceMeasurementType' => \%distanceMeasurementType_of,
+        'weightMeasurementType' => \%weightMeasurementType_of,
+        'length' => \%length_of,
+        'width' => \%width_of,
+        'height' => \%height_of,
+        'actualWeight' => \%actualWeight_of,
+        'chargeableWeight' => \%chargeableWeight_of,
+        'actualCubic' => \%actualCubic_of,
+        'chargeableCubic' => \%chargeableCubic_of,
+        'actualQuantity' => \%actualQuantity_of,
+        'chargeableQuantity' => \%chargeableQuantity_of,
+        'basePrice' => \%basePrice_of,
+        'surcharges' => \%surcharges_of,
+        'tax' => \%tax_of,
+        'totalPrice' => \%totalPrice_of,
+        'originZoneName' => \%originZoneName_of,
+        'originContactName' => \%originContactName_of,
+        'originCompanyName' => \%originCompanyName_of,
+        'originStreet' => \%originStreet_of,
+        'originSuburb' => \%originSuburb_of,
+        'originState' => \%originState_of,
+        'originCode' => \%originCode_of,
+        'originCountry' => \%originCountry_of,
+        'originPhone1' => \%originPhone1_of,
+        'originPhone2' => \%originPhone2_of,
+        'originFax' => \%originFax_of,
+        'originEmail' => \%originEmail_of,
+        'destinationZoneName' => \%destinationZoneName_of,
+        'destinationContactName' => \%destinationContactName_of,
+        'destinationCompanyName' => \%destinationCompanyName_of,
+        'destinationStreet' => \%destinationStreet_of,
+        'destinationSuburb' => \%destinationSuburb_of,
+        'destinationState' => \%destinationState_of,
+        'destinationCode' => \%destinationCode_of,
+        'destinationCountry' => \%destinationCountry_of,
+        'destinationPhone1' => \%destinationPhone1_of,
+        'destinationPhone2' => \%destinationPhone2_of,
+        'destinationFax' => \%destinationFax_of,
+        'destinationEmail' => \%destinationEmail_of,
+    },
+    {
+        'reference' => 'Shipment::Temando::WSDL::Types::CarrierReference',
+        'carrierName' => 'Shipment::Temando::WSDL::Types::CompanyName',
+        'carrierId' => 'Shipment::Temando::WSDL::Types::CarrierId',
+        'accountNo' => 'Shipment::Temando::WSDL::Types::CarrierAccountNumber',
+        'creatorId' => 'Shipment::Temando::WSDL::Types::CarrierCreatorId',
+        'currency' => 'Shipment::Temando::WSDL::Types::CurrencyType',
+        'changedCarrier' => 'Shipment::Temando::WSDL::Types::YesNoOption',
+        'consignmentEdited' => 'Shipment::Temando::WSDL::Types::YesNoOption',
+        'consignmentNumber' => 'Shipment::Temando::WSDL::Types::ConsignmentNumber',
+        'consignmentDate' => 'Shipment::Temando::WSDL::Types::Date',
+        'deliveryMethod' => 'Shipment::Temando::WSDL::Types::DeliveryMethod',
+        'rateName' => 'Shipment::Temando::WSDL::Types::RateName',
+        'description' => 'Shipment::Temando::WSDL::Types::ItemDescription',
+        'distanceMeasurementType' => 'Shipment::Temando::WSDL::Types::DistanceMeasurementType',
+        'weightMeasurementType' => 'Shipment::Temando::WSDL::Types::WeightMeasurementType',
+        'length' => 'Shipment::Temando::WSDL::Types::Length',
+        'width' => 'Shipment::Temando::WSDL::Types::Width',
+        'height' => 'Shipment::Temando::WSDL::Types::Height',
+        'actualWeight' => 'Shipment::Temando::WSDL::Types::Weight',
+        'chargeableWeight' => 'Shipment::Temando::WSDL::Types::Weight',
+        'actualCubic' => 'Shipment::Temando::WSDL::Types::Cubic',
+        'chargeableCubic' => 'Shipment::Temando::WSDL::Types::Cubic',
+        'actualQuantity' => 'Shipment::Temando::WSDL::Types::Quantity',
+        'chargeableQuantity' => 'Shipment::Temando::WSDL::Types::Quantity',
+        'basePrice' => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
+        'surcharges' => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
+        'tax' => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
+        'totalPrice' => 'Shipment::Temando::WSDL::Types::CurrencyAmount',
+        'originZoneName' => 'Shipment::Temando::WSDL::Types::ZoneName',
+        'originContactName' => 'Shipment::Temando::WSDL::Types::ContactName',
+        'originCompanyName' => 'Shipment::Temando::WSDL::Types::CompanyName',
+        'originStreet' => 'Shipment::Temando::WSDL::Types::Address',
+        'originSuburb' => 'Shipment::Temando::WSDL::Types::Suburb',
+        'originState' => 'Shipment::Temando::WSDL::Types::State',
+        'originCode' => 'Shipment::Temando::WSDL::Types::PostalCode',
+        'originCountry' => 'Shipment::Temando::WSDL::Types::CountryCode',
+        'originPhone1' => 'Shipment::Temando::WSDL::Types::Phone',
+        'originPhone2' => 'Shipment::Temando::WSDL::Types::Phone',
+        'originFax' => 'Shipment::Temando::WSDL::Types::Fax',
+        'originEmail' => 'Shipment::Temando::WSDL::Types::Email',
+        'destinationZoneName' => 'Shipment::Temando::WSDL::Types::ZoneName',
+        'destinationContactName' => 'Shipment::Temando::WSDL::Types::ContactName',
+        'destinationCompanyName' => 'Shipment::Temando::WSDL::Types::CompanyName',
+        'destinationStreet' => 'Shipment::Temando::WSDL::Types::Address',
+        'destinationSuburb' => 'Shipment::Temando::WSDL::Types::Suburb',
+        'destinationState' => 'Shipment::Temando::WSDL::Types::State',
+        'destinationCode' => 'Shipment::Temando::WSDL::Types::PostalCode',
+        'destinationCountry' => 'Shipment::Temando::WSDL::Types::CountryCode',
+        'destinationPhone1' => 'Shipment::Temando::WSDL::Types::Phone',
+        'destinationPhone2' => 'Shipment::Temando::WSDL::Types::Phone',
+        'destinationFax' => 'Shipment::Temando::WSDL::Types::Fax',
+        'destinationEmail' => 'Shipment::Temando::WSDL::Types::Email',
+    },
+    {
 
-            'reference'               => 'reference',
-            'carrierName'             => 'carrierName',
-            'carrierId'               => 'carrierId',
-            'accountNo'               => 'accountNo',
-            'creatorId'               => 'creatorId',
-            'currency'                => 'currency',
-            'changedCarrier'          => 'changedCarrier',
-            'consignmentEdited'       => 'consignmentEdited',
-            'consignmentNumber'       => 'consignmentNumber',
-            'consignmentDate'         => 'consignmentDate',
-            'deliveryMethod'          => 'deliveryMethod',
-            'rateName'                => 'rateName',
-            'description'             => 'description',
-            'distanceMeasurementType' => 'distanceMeasurementType',
-            'weightMeasurementType'   => 'weightMeasurementType',
-            'length'                  => 'length',
-            'width'                   => 'width',
-            'height'                  => 'height',
-            'actualWeight'            => 'actualWeight',
-            'chargeableWeight'        => 'chargeableWeight',
-            'actualCubic'             => 'actualCubic',
-            'chargeableCubic'         => 'chargeableCubic',
-            'actualQuantity'          => 'actualQuantity',
-            'chargeableQuantity'      => 'chargeableQuantity',
-            'basePrice'               => 'basePrice',
-            'surcharges'              => 'surcharges',
-            'tax'                     => 'tax',
-            'totalPrice'              => 'totalPrice',
-            'originZoneName'          => 'originZoneName',
-            'originContactName'       => 'originContactName',
-            'originCompanyName'       => 'originCompanyName',
-            'originStreet'            => 'originStreet',
-            'originSuburb'            => 'originSuburb',
-            'originState'             => 'originState',
-            'originCode'              => 'originCode',
-            'originCountry'           => 'originCountry',
-            'originPhone1'            => 'originPhone1',
-            'originPhone2'            => 'originPhone2',
-            'originFax'               => 'originFax',
-            'originEmail'             => 'originEmail',
-            'destinationZoneName'     => 'destinationZoneName',
-            'destinationContactName'  => 'destinationContactName',
-            'destinationCompanyName'  => 'destinationCompanyName',
-            'destinationStreet'       => 'destinationStreet',
-            'destinationSuburb'       => 'destinationSuburb',
-            'destinationState'        => 'destinationState',
-            'destinationCode'         => 'destinationCode',
-            'destinationCountry'      => 'destinationCountry',
-            'destinationPhone1'       => 'destinationPhone1',
-            'destinationPhone2'       => 'destinationPhone2',
-            'destinationFax'          => 'destinationFax',
-            'destinationEmail'        => 'destinationEmail',
-        }
-    );
+        'reference' => 'reference',
+        'carrierName' => 'carrierName',
+        'carrierId' => 'carrierId',
+        'accountNo' => 'accountNo',
+        'creatorId' => 'creatorId',
+        'currency' => 'currency',
+        'changedCarrier' => 'changedCarrier',
+        'consignmentEdited' => 'consignmentEdited',
+        'consignmentNumber' => 'consignmentNumber',
+        'consignmentDate' => 'consignmentDate',
+        'deliveryMethod' => 'deliveryMethod',
+        'rateName' => 'rateName',
+        'description' => 'description',
+        'distanceMeasurementType' => 'distanceMeasurementType',
+        'weightMeasurementType' => 'weightMeasurementType',
+        'length' => 'length',
+        'width' => 'width',
+        'height' => 'height',
+        'actualWeight' => 'actualWeight',
+        'chargeableWeight' => 'chargeableWeight',
+        'actualCubic' => 'actualCubic',
+        'chargeableCubic' => 'chargeableCubic',
+        'actualQuantity' => 'actualQuantity',
+        'chargeableQuantity' => 'chargeableQuantity',
+        'basePrice' => 'basePrice',
+        'surcharges' => 'surcharges',
+        'tax' => 'tax',
+        'totalPrice' => 'totalPrice',
+        'originZoneName' => 'originZoneName',
+        'originContactName' => 'originContactName',
+        'originCompanyName' => 'originCompanyName',
+        'originStreet' => 'originStreet',
+        'originSuburb' => 'originSuburb',
+        'originState' => 'originState',
+        'originCode' => 'originCode',
+        'originCountry' => 'originCountry',
+        'originPhone1' => 'originPhone1',
+        'originPhone2' => 'originPhone2',
+        'originFax' => 'originFax',
+        'originEmail' => 'originEmail',
+        'destinationZoneName' => 'destinationZoneName',
+        'destinationContactName' => 'destinationContactName',
+        'destinationCompanyName' => 'destinationCompanyName',
+        'destinationStreet' => 'destinationStreet',
+        'destinationSuburb' => 'destinationSuburb',
+        'destinationState' => 'destinationState',
+        'destinationCode' => 'destinationCode',
+        'destinationCountry' => 'destinationCountry',
+        'destinationPhone1' => 'destinationPhone1',
+        'destinationPhone2' => 'destinationPhone2',
+        'destinationFax' => 'destinationFax',
+        'destinationEmail' => 'destinationEmail',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -327,7 +317,7 @@ Shipment::Temando::WSDL::Types::DispatchDetails
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

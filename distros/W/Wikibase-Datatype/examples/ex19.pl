@@ -3,34 +3,15 @@
 use strict;
 use warnings;
 
-use Wikibase::Datatype::Value::Time;
+use Wikibase::Datatype::Utils qw(check_property);
 
-# Object.
-my $obj = Wikibase::Datatype::Value::Time->new(
-        'precision' => 10,
-        'value' => '+2020-09-01T00:00:00Z',
-);
-
-# Get calendar model.
-my $calendarmodel = $obj->calendarmodel;
-
-# Get precision.
-my $precision = $obj->precision;
-
-# Get type.
-my $type = $obj->type;
-
-# Get value.
-my $value = $obj->value;
+my $self = {
+        'key' => 'P123',
+};
+check_property($self, 'key');
 
 # Print out.
-print "Calendar model: $calendarmodel\n";
-print "Precision: $precision\n";
-print "Type: $type\n";
-print "Value: $value\n";
+print "ok\n";
 
 # Output:
-# Calendar model: Q1985727
-# Precision: 10
-# Type: time
-# Value: +2020-09-01T00:00:00Z
+# ok

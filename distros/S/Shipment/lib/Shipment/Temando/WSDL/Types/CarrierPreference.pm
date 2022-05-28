@@ -1,16 +1,12 @@
 package Shipment::Temando::WSDL::Types::CarrierPreference;
-$Shipment::Temando::WSDL::Types::CarrierPreference::VERSION = '3.06';
+$Shipment::Temando::WSDL::Types::CarrierPreference::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(0);
 
-sub get_xmlns {
-    'http://'
-      . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url
-      . '/schema/2009_06/common.xsd';
-}
+sub get_xmlns { 'http://' . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url . '/schema/2009_06/common.xsd' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -24,76 +20,86 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %carrierId_of : ATTR(:get<carrierId>);
-    my %deliveryMethods_of : ATTR(:get<deliveryMethods>);
+my %carrierId_of :ATTR(:get<carrierId>);
+my %deliveryMethods_of :ATTR(:get<deliveryMethods>);
 
-    __PACKAGE__->_factory(
-        [   qw(        carrierId
-              deliveryMethods
+__PACKAGE__->_factory(
+    [ qw(        carrierId
+        deliveryMethods
 
-            )
-        ],
-        {   'carrierId'       => \%carrierId_of,
-            'deliveryMethods' => \%deliveryMethods_of,
-        },
-        {   'carrierId' => 'Shipment::Temando::WSDL::Types::CarrierId',
+    ) ],
+    {
+        'carrierId' => \%carrierId_of,
+        'deliveryMethods' => \%deliveryMethods_of,
+    },
+    {
+        'carrierId' => 'Shipment::Temando::WSDL::Types::CarrierId',
 
-            'deliveryMethods' =>
-              'Shipment::Temando::WSDL::Types::CarrierPreference::_deliveryMethods',
-        },
-        {
+        'deliveryMethods' => 'Shipment::Temando::WSDL::Types::CarrierPreference::_deliveryMethods',
+    },
+    {
 
-            'carrierId'       => 'carrierId',
-            'deliveryMethods' => 'deliveryMethods',
-        }
-    );
+        'carrierId' => 'carrierId',
+        'deliveryMethods' => 'deliveryMethods',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
 
 
 package Shipment::Temando::WSDL::Types::CarrierPreference::_deliveryMethods;
-$Shipment::Temando::WSDL::Types::CarrierPreference::_deliveryMethods::VERSION
-  = '3.06';
+$Shipment::Temando::WSDL::Types::CarrierPreference::_deliveryMethods::VERSION = '3.07';
 use strict;
 use warnings;
 {
-    our $XML_ATTRIBUTE_CLASS;
-    undef $XML_ATTRIBUTE_CLASS;
+our $XML_ATTRIBUTE_CLASS;
+undef $XML_ATTRIBUTE_CLASS;
 
-    sub __get_attr_class {
-        return $XML_ATTRIBUTE_CLASS;
+sub __get_attr_class {
+    return $XML_ATTRIBUTE_CLASS;
+}
+
+use Class::Std::Fast::Storable constructor => 'none';
+use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+Class::Std::initialize();
+
+{ # BLOCK to scope variables
+
+my %deliveryMethod_of :ATTR(:get<deliveryMethod>);
+
+__PACKAGE__->_factory(
+    [ qw(        deliveryMethod
+
+    ) ],
+    {
+        'deliveryMethod' => \%deliveryMethod_of,
+    },
+    {
+        'deliveryMethod' => 'Shipment::Temando::WSDL::Types::DeliveryMethod',
+    },
+    {
+
+        'deliveryMethod' => 'deliveryMethod',
     }
+);
 
-    use Class::Std::Fast::Storable constructor => 'none';
-    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+} # end BLOCK
 
-    Class::Std::initialize();
 
-    {    # BLOCK to scope variables
 
-        my %deliveryMethod_of : ATTR(:get<deliveryMethod>);
 
-        __PACKAGE__->_factory(
-            [   qw(        deliveryMethod
-
-                )
-            ],
-            {'deliveryMethod' => \%deliveryMethod_of,},
-            {   'deliveryMethod' =>
-                  'Shipment::Temando::WSDL::Types::DeliveryMethod',
-            },
-            {
-
-                'deliveryMethod' => 'deliveryMethod',
-            }
-        );
-
-    }    # end BLOCK
 
 
 }
+
+
+
+
 
 
 1;
@@ -110,7 +116,7 @@ Shipment::Temando::WSDL::Types::CarrierPreference
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

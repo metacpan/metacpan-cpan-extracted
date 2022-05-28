@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::ContentRecord;
-$Shipment::FedEx::WSDL::TrackTypes::ContentRecord::VERSION = '3.06';
+$Shipment::FedEx::WSDL::TrackTypes::ContentRecord::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/track/v9'}
+sub get_xmlns { 'http://fedex.com/ws/track/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,42 +20,47 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %PartNumber_of : ATTR(:get<PartNumber>);
-    my %ItemNumber_of : ATTR(:get<ItemNumber>);
-    my %ReceivedQuantity_of : ATTR(:get<ReceivedQuantity>);
-    my %Description_of : ATTR(:get<Description>);
+my %PartNumber_of :ATTR(:get<PartNumber>);
+my %ItemNumber_of :ATTR(:get<ItemNumber>);
+my %ReceivedQuantity_of :ATTR(:get<ReceivedQuantity>);
+my %Description_of :ATTR(:get<Description>);
 
-    __PACKAGE__->_factory(
-        [   qw(        PartNumber
-              ItemNumber
-              ReceivedQuantity
-              Description
+__PACKAGE__->_factory(
+    [ qw(        PartNumber
+        ItemNumber
+        ReceivedQuantity
+        Description
 
-            )
-        ],
-        {   'PartNumber'       => \%PartNumber_of,
-            'ItemNumber'       => \%ItemNumber_of,
-            'ReceivedQuantity' => \%ReceivedQuantity_of,
-            'Description'      => \%Description_of,
-        },
-        {   'PartNumber'       => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'ItemNumber'       => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'ReceivedQuantity' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-            'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'PartNumber' => \%PartNumber_of,
+        'ItemNumber' => \%ItemNumber_of,
+        'ReceivedQuantity' => \%ReceivedQuantity_of,
+        'Description' => \%Description_of,
+    },
+    {
+        'PartNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'ItemNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'ReceivedQuantity' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'PartNumber'       => 'PartNumber',
-            'ItemNumber'       => 'ItemNumber',
-            'ReceivedQuantity' => 'ReceivedQuantity',
-            'Description'      => 'Description',
-        }
-    );
+        'PartNumber' => 'PartNumber',
+        'ItemNumber' => 'ItemNumber',
+        'ReceivedQuantity' => 'ReceivedQuantity',
+        'Description' => 'Description',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -72,7 +77,7 @@ Shipment::FedEx::WSDL::TrackTypes::ContentRecord
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

@@ -22,7 +22,7 @@ use true;
 use feature _enabled_features();
 no warnings _disabled_warnings();
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 my ( $import, undef, $init_meta ) = Moose::Exporter->setup_import_methods(
     with_meta => [ 'field', 'param' ],
@@ -132,7 +132,7 @@ MooseX::Extended::Role - MooseX::Extended roles
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

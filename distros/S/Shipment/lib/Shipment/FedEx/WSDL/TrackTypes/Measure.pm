@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::Measure;
-$Shipment::FedEx::WSDL::TrackTypes::Measure::VERSION = '3.06';
+$Shipment::FedEx::WSDL::TrackTypes::Measure::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/track/v9'}
+sub get_xmlns { 'http://fedex.com/ws/track/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,31 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Quantity_of : ATTR(:get<Quantity>);
-    my %Units_of : ATTR(:get<Units>);
+my %Quantity_of :ATTR(:get<Quantity>);
+my %Units_of :ATTR(:get<Units>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Quantity
-              Units
+__PACKAGE__->_factory(
+    [ qw(        Quantity
+        Units
 
-            )
-        ],
-        {   'Quantity' => \%Quantity_of,
-            'Units'    => \%Units_of,
-        },
-        {   'Quantity' => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
-            'Units'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'Quantity' => \%Quantity_of,
+        'Units' => \%Units_of,
+    },
+    {
+        'Quantity' => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
+        'Units' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'Quantity' => 'Quantity',
-            'Units'    => 'Units',
-        }
-    );
+        'Quantity' => 'Quantity',
+        'Units' => 'Units',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -61,7 +67,7 @@ Shipment::FedEx::WSDL::TrackTypes::Measure
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

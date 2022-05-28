@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::ShippingDocumentDispositionDetail;
-$Shipment::FedEx::WSDL::RateTypes::ShippingDocumentDispositionDetail::VERSION = '3.06';
+$Shipment::FedEx::WSDL::RateTypes::ShippingDocumentDispositionDetail::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/rate/v9'}
+sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,45 +20,47 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %DispositionType_of : ATTR(:get<DispositionType>);
-    my %Grouping_of : ATTR(:get<Grouping>);
-    my %EMailDetail_of : ATTR(:get<EMailDetail>);
-    my %PrintDetail_of : ATTR(:get<PrintDetail>);
+my %DispositionType_of :ATTR(:get<DispositionType>);
+my %Grouping_of :ATTR(:get<Grouping>);
+my %EMailDetail_of :ATTR(:get<EMailDetail>);
+my %PrintDetail_of :ATTR(:get<PrintDetail>);
 
-    __PACKAGE__->_factory(
-        [   qw(        DispositionType
-              Grouping
-              EMailDetail
-              PrintDetail
+__PACKAGE__->_factory(
+    [ qw(        DispositionType
+        Grouping
+        EMailDetail
+        PrintDetail
 
-            )
-        ],
-        {   'DispositionType' => \%DispositionType_of,
-            'Grouping'        => \%Grouping_of,
-            'EMailDetail'     => \%EMailDetail_of,
-            'PrintDetail'     => \%PrintDetail_of,
-        },
-        {   'DispositionType' =>
-              'Shipment::FedEx::WSDL::RateTypes::ShippingDocumentDispositionType',
-            'Grouping' =>
-              'Shipment::FedEx::WSDL::RateTypes::ShippingDocumentGroupingType',
-            'EMailDetail' =>
-              'Shipment::FedEx::WSDL::RateTypes::ShippingDocumentEMailDetail',
-            'PrintDetail' =>
-              'Shipment::FedEx::WSDL::RateTypes::ShippingDocumentPrintDetail',
-        },
-        {
+    ) ],
+    {
+        'DispositionType' => \%DispositionType_of,
+        'Grouping' => \%Grouping_of,
+        'EMailDetail' => \%EMailDetail_of,
+        'PrintDetail' => \%PrintDetail_of,
+    },
+    {
+        'DispositionType' => 'Shipment::FedEx::WSDL::RateTypes::ShippingDocumentDispositionType',
+        'Grouping' => 'Shipment::FedEx::WSDL::RateTypes::ShippingDocumentGroupingType',
+        'EMailDetail' => 'Shipment::FedEx::WSDL::RateTypes::ShippingDocumentEMailDetail',
+        'PrintDetail' => 'Shipment::FedEx::WSDL::RateTypes::ShippingDocumentPrintDetail',
+    },
+    {
 
-            'DispositionType' => 'DispositionType',
-            'Grouping'        => 'Grouping',
-            'EMailDetail'     => 'EMailDetail',
-            'PrintDetail'     => 'PrintDetail',
-        }
-    );
+        'DispositionType' => 'DispositionType',
+        'Grouping' => 'Grouping',
+        'EMailDetail' => 'EMailDetail',
+        'PrintDetail' => 'PrintDetail',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -75,7 +77,7 @@ Shipment::FedEx::WSDL::RateTypes::ShippingDocumentDispositionDetail
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

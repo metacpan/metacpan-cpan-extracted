@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::FreightShipmentDetail;
-$Shipment::FedEx::WSDL::RateTypes::FreightShipmentDetail::VERSION = '3.06';
+$Shipment::FedEx::WSDL::RateTypes::FreightShipmentDetail::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/rate/v9'}
+sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,129 +20,112 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %FedExFreightAccountNumber_of : ATTR(:get<FedExFreightAccountNumber>);
-    my %FedExFreightBillingContactAndAddress_of :
-      ATTR(:get<FedExFreightBillingContactAndAddress>);
-    my %FedExNationalFreightAccountNumber_of :
-      ATTR(:get<FedExNationalFreightAccountNumber>);
-    my %FedExNationalFreightBillingContactAndAddress_of :
-      ATTR(:get<FedExNationalFreightBillingContactAndAddress>);
-    my %Role_of : ATTR(:get<Role>);
-    my %PaymentType_of : ATTR(:get<PaymentType>);
-    my %DeclaredValuePerUnit_of : ATTR(:get<DeclaredValuePerUnit>);
-    my %DeclaredValueUnits_of : ATTR(:get<DeclaredValueUnits>);
-    my %LiabilityCoverageDetail_of : ATTR(:get<LiabilityCoverageDetail>);
-    my %Coupons_of : ATTR(:get<Coupons>);
-    my %TotalHandlingUnits_of : ATTR(:get<TotalHandlingUnits>);
-    my %ClientDiscountPercent_of : ATTR(:get<ClientDiscountPercent>);
-    my %PalletWeight_of : ATTR(:get<PalletWeight>);
-    my %ShipmentDimensions_of : ATTR(:get<ShipmentDimensions>);
-    my %Comment_of : ATTR(:get<Comment>);
-    my %SpecialServicePayments_of : ATTR(:get<SpecialServicePayments>);
-    my %LineItems_of : ATTR(:get<LineItems>);
+my %FedExFreightAccountNumber_of :ATTR(:get<FedExFreightAccountNumber>);
+my %FedExFreightBillingContactAndAddress_of :ATTR(:get<FedExFreightBillingContactAndAddress>);
+my %FedExNationalFreightAccountNumber_of :ATTR(:get<FedExNationalFreightAccountNumber>);
+my %FedExNationalFreightBillingContactAndAddress_of :ATTR(:get<FedExNationalFreightBillingContactAndAddress>);
+my %Role_of :ATTR(:get<Role>);
+my %PaymentType_of :ATTR(:get<PaymentType>);
+my %DeclaredValuePerUnit_of :ATTR(:get<DeclaredValuePerUnit>);
+my %DeclaredValueUnits_of :ATTR(:get<DeclaredValueUnits>);
+my %LiabilityCoverageDetail_of :ATTR(:get<LiabilityCoverageDetail>);
+my %Coupons_of :ATTR(:get<Coupons>);
+my %TotalHandlingUnits_of :ATTR(:get<TotalHandlingUnits>);
+my %ClientDiscountPercent_of :ATTR(:get<ClientDiscountPercent>);
+my %PalletWeight_of :ATTR(:get<PalletWeight>);
+my %ShipmentDimensions_of :ATTR(:get<ShipmentDimensions>);
+my %Comment_of :ATTR(:get<Comment>);
+my %SpecialServicePayments_of :ATTR(:get<SpecialServicePayments>);
+my %LineItems_of :ATTR(:get<LineItems>);
 
-    __PACKAGE__->_factory(
-        [   qw(        FedExFreightAccountNumber
-              FedExFreightBillingContactAndAddress
-              FedExNationalFreightAccountNumber
-              FedExNationalFreightBillingContactAndAddress
-              Role
-              PaymentType
-              DeclaredValuePerUnit
-              DeclaredValueUnits
-              LiabilityCoverageDetail
-              Coupons
-              TotalHandlingUnits
-              ClientDiscountPercent
-              PalletWeight
-              ShipmentDimensions
-              Comment
-              SpecialServicePayments
-              LineItems
+__PACKAGE__->_factory(
+    [ qw(        FedExFreightAccountNumber
+        FedExFreightBillingContactAndAddress
+        FedExNationalFreightAccountNumber
+        FedExNationalFreightBillingContactAndAddress
+        Role
+        PaymentType
+        DeclaredValuePerUnit
+        DeclaredValueUnits
+        LiabilityCoverageDetail
+        Coupons
+        TotalHandlingUnits
+        ClientDiscountPercent
+        PalletWeight
+        ShipmentDimensions
+        Comment
+        SpecialServicePayments
+        LineItems
 
-            )
-        ],
-        {   'FedExFreightAccountNumber' => \%FedExFreightAccountNumber_of,
-            'FedExFreightBillingContactAndAddress' =>
-              \%FedExFreightBillingContactAndAddress_of,
-            'FedExNationalFreightAccountNumber' =>
-              \%FedExNationalFreightAccountNumber_of,
-            'FedExNationalFreightBillingContactAndAddress' =>
-              \%FedExNationalFreightBillingContactAndAddress_of,
-            'Role'                    => \%Role_of,
-            'PaymentType'             => \%PaymentType_of,
-            'DeclaredValuePerUnit'    => \%DeclaredValuePerUnit_of,
-            'DeclaredValueUnits'      => \%DeclaredValueUnits_of,
-            'LiabilityCoverageDetail' => \%LiabilityCoverageDetail_of,
-            'Coupons'                 => \%Coupons_of,
-            'TotalHandlingUnits'      => \%TotalHandlingUnits_of,
-            'ClientDiscountPercent'   => \%ClientDiscountPercent_of,
-            'PalletWeight'            => \%PalletWeight_of,
-            'ShipmentDimensions'      => \%ShipmentDimensions_of,
-            'Comment'                 => \%Comment_of,
-            'SpecialServicePayments'  => \%SpecialServicePayments_of,
-            'LineItems'               => \%LineItems_of,
-        },
-        {   'FedExFreightAccountNumber' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'FedExFreightBillingContactAndAddress' =>
-              'Shipment::FedEx::WSDL::RateTypes::ContactAndAddress',
-            'FedExNationalFreightAccountNumber' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'FedExNationalFreightBillingContactAndAddress' =>
-              'Shipment::FedEx::WSDL::RateTypes::ContactAndAddress',
-            'Role' =>
-              'Shipment::FedEx::WSDL::RateTypes::FreightShipmentRoleType',
-            'PaymentType' =>
-              'Shipment::FedEx::WSDL::RateTypes::FreightAccountPaymentType',
-            'DeclaredValuePerUnit' =>
-              'Shipment::FedEx::WSDL::RateTypes::Money',
-            'DeclaredValueUnits' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'LiabilityCoverageDetail' =>
-              'Shipment::FedEx::WSDL::RateTypes::LiabilityCoverageDetail',
-            'Coupons' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'TotalHandlingUnits' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-            'ClientDiscountPercent' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
-            'PalletWeight'       => 'Shipment::FedEx::WSDL::RateTypes::Weight',
-            'ShipmentDimensions' =>
-              'Shipment::FedEx::WSDL::RateTypes::Dimensions',
-            'Comment' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'SpecialServicePayments' =>
-              'Shipment::FedEx::WSDL::RateTypes::FreightSpecialServicePayment',
-            'LineItems' =>
-              'Shipment::FedEx::WSDL::RateTypes::FreightShipmentLineItem',
-        },
-        {
+    ) ],
+    {
+        'FedExFreightAccountNumber' => \%FedExFreightAccountNumber_of,
+        'FedExFreightBillingContactAndAddress' => \%FedExFreightBillingContactAndAddress_of,
+        'FedExNationalFreightAccountNumber' => \%FedExNationalFreightAccountNumber_of,
+        'FedExNationalFreightBillingContactAndAddress' => \%FedExNationalFreightBillingContactAndAddress_of,
+        'Role' => \%Role_of,
+        'PaymentType' => \%PaymentType_of,
+        'DeclaredValuePerUnit' => \%DeclaredValuePerUnit_of,
+        'DeclaredValueUnits' => \%DeclaredValueUnits_of,
+        'LiabilityCoverageDetail' => \%LiabilityCoverageDetail_of,
+        'Coupons' => \%Coupons_of,
+        'TotalHandlingUnits' => \%TotalHandlingUnits_of,
+        'ClientDiscountPercent' => \%ClientDiscountPercent_of,
+        'PalletWeight' => \%PalletWeight_of,
+        'ShipmentDimensions' => \%ShipmentDimensions_of,
+        'Comment' => \%Comment_of,
+        'SpecialServicePayments' => \%SpecialServicePayments_of,
+        'LineItems' => \%LineItems_of,
+    },
+    {
+        'FedExFreightAccountNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'FedExFreightBillingContactAndAddress' => 'Shipment::FedEx::WSDL::RateTypes::ContactAndAddress',
+        'FedExNationalFreightAccountNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'FedExNationalFreightBillingContactAndAddress' => 'Shipment::FedEx::WSDL::RateTypes::ContactAndAddress',
+        'Role' => 'Shipment::FedEx::WSDL::RateTypes::FreightShipmentRoleType',
+        'PaymentType' => 'Shipment::FedEx::WSDL::RateTypes::FreightAccountPaymentType',
+        'DeclaredValuePerUnit' => 'Shipment::FedEx::WSDL::RateTypes::Money',
+        'DeclaredValueUnits' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'LiabilityCoverageDetail' => 'Shipment::FedEx::WSDL::RateTypes::LiabilityCoverageDetail',
+        'Coupons' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'TotalHandlingUnits' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+        'ClientDiscountPercent' => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
+        'PalletWeight' => 'Shipment::FedEx::WSDL::RateTypes::Weight',
+        'ShipmentDimensions' => 'Shipment::FedEx::WSDL::RateTypes::Dimensions',
+        'Comment' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'SpecialServicePayments' => 'Shipment::FedEx::WSDL::RateTypes::FreightSpecialServicePayment',
+        'LineItems' => 'Shipment::FedEx::WSDL::RateTypes::FreightShipmentLineItem',
+    },
+    {
 
-            'FedExFreightAccountNumber' => 'FedExFreightAccountNumber',
-            'FedExFreightBillingContactAndAddress' =>
-              'FedExFreightBillingContactAndAddress',
-            'FedExNationalFreightAccountNumber' =>
-              'FedExNationalFreightAccountNumber',
-            'FedExNationalFreightBillingContactAndAddress' =>
-              'FedExNationalFreightBillingContactAndAddress',
-            'Role'                    => 'Role',
-            'PaymentType'             => 'PaymentType',
-            'DeclaredValuePerUnit'    => 'DeclaredValuePerUnit',
-            'DeclaredValueUnits'      => 'DeclaredValueUnits',
-            'LiabilityCoverageDetail' => 'LiabilityCoverageDetail',
-            'Coupons'                 => 'Coupons',
-            'TotalHandlingUnits'      => 'TotalHandlingUnits',
-            'ClientDiscountPercent'   => 'ClientDiscountPercent',
-            'PalletWeight'            => 'PalletWeight',
-            'ShipmentDimensions'      => 'ShipmentDimensions',
-            'Comment'                 => 'Comment',
-            'SpecialServicePayments'  => 'SpecialServicePayments',
-            'LineItems'               => 'LineItems',
-        }
-    );
+        'FedExFreightAccountNumber' => 'FedExFreightAccountNumber',
+        'FedExFreightBillingContactAndAddress' => 'FedExFreightBillingContactAndAddress',
+        'FedExNationalFreightAccountNumber' => 'FedExNationalFreightAccountNumber',
+        'FedExNationalFreightBillingContactAndAddress' => 'FedExNationalFreightBillingContactAndAddress',
+        'Role' => 'Role',
+        'PaymentType' => 'PaymentType',
+        'DeclaredValuePerUnit' => 'DeclaredValuePerUnit',
+        'DeclaredValueUnits' => 'DeclaredValueUnits',
+        'LiabilityCoverageDetail' => 'LiabilityCoverageDetail',
+        'Coupons' => 'Coupons',
+        'TotalHandlingUnits' => 'TotalHandlingUnits',
+        'ClientDiscountPercent' => 'ClientDiscountPercent',
+        'PalletWeight' => 'PalletWeight',
+        'ShipmentDimensions' => 'ShipmentDimensions',
+        'Comment' => 'Comment',
+        'SpecialServicePayments' => 'SpecialServicePayments',
+        'LineItems' => 'LineItems',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -159,7 +142,7 @@ Shipment::FedEx::WSDL::RateTypes::FreightShipmentDetail
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

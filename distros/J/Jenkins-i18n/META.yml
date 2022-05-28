@@ -24,5 +24,5 @@ requires:
   Config::Properties: '1.8'
   Set::Tiny: '0.04'
   perl: '5.014004'
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

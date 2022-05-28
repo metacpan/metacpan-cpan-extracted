@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentEMailDetail;
-$Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentEMailDetail::VERSION = '3.06';
+$Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentEMailDetail::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/close/v2'}
+sub get_xmlns { 'http://fedex.com/ws/close/v2' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,33 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %EMailRecipients_of : ATTR(:get<EMailRecipients>);
-    my %Grouping_of : ATTR(:get<Grouping>);
+my %EMailRecipients_of :ATTR(:get<EMailRecipients>);
+my %Grouping_of :ATTR(:get<Grouping>);
 
-    __PACKAGE__->_factory(
-        [   qw(        EMailRecipients
-              Grouping
+__PACKAGE__->_factory(
+    [ qw(        EMailRecipients
+        Grouping
 
-            )
-        ],
-        {   'EMailRecipients' => \%EMailRecipients_of,
-            'Grouping'        => \%Grouping_of,
-        },
-        {   'EMailRecipients' =>
-              'Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentEMailRecipient',
-            'Grouping' =>
-              'Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentEMailGroupingType',
-        },
-        {
+    ) ],
+    {
+        'EMailRecipients' => \%EMailRecipients_of,
+        'Grouping' => \%Grouping_of,
+    },
+    {
+        'EMailRecipients' => 'Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentEMailRecipient',
+        'Grouping' => 'Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentEMailGroupingType',
+    },
+    {
 
-            'EMailRecipients' => 'EMailRecipients',
-            'Grouping'        => 'Grouping',
-        }
-    );
+        'EMailRecipients' => 'EMailRecipients',
+        'Grouping' => 'Grouping',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -63,7 +67,7 @@ Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentEMailDetail
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

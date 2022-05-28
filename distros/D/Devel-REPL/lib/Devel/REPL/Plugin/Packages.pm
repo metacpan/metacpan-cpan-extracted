@@ -3,7 +3,7 @@ use warnings;
 package Devel::REPL::Plugin::Packages;
 # ABSTRACT: Keep track of which package the user is in
 
-our $VERSION = '1.003028';
+our $VERSION = '1.003029';
 
 use Devel::REPL::Plugin;
 use namespace::autoclean;
@@ -69,7 +69,7 @@ Devel::REPL::Plugin::Packages - Keep track of which package the user is in
 
 =head1 VERSION
 
-version 1.003028
+version 1.003029
 
 =head1 SUPPORT
 

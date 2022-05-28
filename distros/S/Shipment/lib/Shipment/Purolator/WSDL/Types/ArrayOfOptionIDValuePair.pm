@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::ArrayOfOptionIDValuePair;
-$Shipment::Purolator::WSDL::Types::ArrayOfOptionIDValuePair::VERSION = '3.06';
+$Shipment::Purolator::WSDL::Types::ArrayOfOptionIDValuePair::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,26 +20,32 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %OptionIDValuePair_of : ATTR(:get<OptionIDValuePair>);
+my %OptionIDValuePair_of :ATTR(:get<OptionIDValuePair>);
 
-    __PACKAGE__->_factory(
-        [   qw(        OptionIDValuePair
+__PACKAGE__->_factory(
+    [ qw(        OptionIDValuePair
 
-            )
-        ],
-        {'OptionIDValuePair' => \%OptionIDValuePair_of,},
-        {   'OptionIDValuePair' =>
-              'Shipment::Purolator::WSDL::Types::OptionIDValuePair',
-        },
-        {
+    ) ],
+    {
+        'OptionIDValuePair' => \%OptionIDValuePair_of,
+    },
+    {
+        'OptionIDValuePair' => 'Shipment::Purolator::WSDL::Types::OptionIDValuePair',
+    },
+    {
 
-            'OptionIDValuePair' => 'OptionIDValuePair',
-        }
-    );
+        'OptionIDValuePair' => 'OptionIDValuePair',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -56,7 +62,7 @@ Shipment::Purolator::WSDL::Types::ArrayOfOptionIDValuePair
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

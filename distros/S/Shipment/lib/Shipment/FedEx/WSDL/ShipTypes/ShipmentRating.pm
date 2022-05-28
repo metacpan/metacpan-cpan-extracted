@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::ShipmentRating;
-$Shipment::FedEx::WSDL::ShipTypes::ShipmentRating::VERSION = '3.06';
+$Shipment::FedEx::WSDL::ShipTypes::ShipmentRating::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/ship/v9'}
+sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,39 +20,42 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %ActualRateType_of : ATTR(:get<ActualRateType>);
-    my %EffectiveNetDiscount_of : ATTR(:get<EffectiveNetDiscount>);
-    my %ShipmentRateDetails_of : ATTR(:get<ShipmentRateDetails>);
+my %ActualRateType_of :ATTR(:get<ActualRateType>);
+my %EffectiveNetDiscount_of :ATTR(:get<EffectiveNetDiscount>);
+my %ShipmentRateDetails_of :ATTR(:get<ShipmentRateDetails>);
 
-    __PACKAGE__->_factory(
-        [   qw(        ActualRateType
-              EffectiveNetDiscount
-              ShipmentRateDetails
+__PACKAGE__->_factory(
+    [ qw(        ActualRateType
+        EffectiveNetDiscount
+        ShipmentRateDetails
 
-            )
-        ],
-        {   'ActualRateType'       => \%ActualRateType_of,
-            'EffectiveNetDiscount' => \%EffectiveNetDiscount_of,
-            'ShipmentRateDetails'  => \%ShipmentRateDetails_of,
-        },
-        {   'ActualRateType' =>
-              'Shipment::FedEx::WSDL::ShipTypes::ReturnedRateType',
-            'EffectiveNetDiscount' =>
-              'Shipment::FedEx::WSDL::ShipTypes::Money',
-            'ShipmentRateDetails' =>
-              'Shipment::FedEx::WSDL::ShipTypes::ShipmentRateDetail',
-        },
-        {
+    ) ],
+    {
+        'ActualRateType' => \%ActualRateType_of,
+        'EffectiveNetDiscount' => \%EffectiveNetDiscount_of,
+        'ShipmentRateDetails' => \%ShipmentRateDetails_of,
+    },
+    {
+        'ActualRateType' => 'Shipment::FedEx::WSDL::ShipTypes::ReturnedRateType',
+        'EffectiveNetDiscount' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
+        'ShipmentRateDetails' => 'Shipment::FedEx::WSDL::ShipTypes::ShipmentRateDetail',
+    },
+    {
 
-            'ActualRateType'       => 'ActualRateType',
-            'EffectiveNetDiscount' => 'EffectiveNetDiscount',
-            'ShipmentRateDetails'  => 'ShipmentRateDetails',
-        }
-    );
+        'ActualRateType' => 'ActualRateType',
+        'EffectiveNetDiscount' => 'EffectiveNetDiscount',
+        'ShipmentRateDetails' => 'ShipmentRateDetails',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -69,7 +72,7 @@ Shipment::FedEx::WSDL::ShipTypes::ShipmentRating
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

@@ -1,74 +1,75 @@
 
 package Shipment::Temando::WSDL::Elements::getLocations;
-$Shipment::Temando::WSDL::Elements::getLocations::VERSION = '3.06';
+$Shipment::Temando::WSDL::Elements::getLocations::VERSION = '3.07';
 use strict;
 use warnings;
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    sub get_xmlns {
-        'http://'
-          . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url
-          . '/schema/2009_06/server.xsd';
+sub get_xmlns { 'http://' . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url . '/schema/2009_06/server.xsd' }
+
+__PACKAGE__->__set_name('getLocations');
+__PACKAGE__->__set_nillable();
+__PACKAGE__->__set_minOccurs();
+__PACKAGE__->__set_maxOccurs();
+__PACKAGE__->__set_ref();
+
+use base qw(
+    SOAP::WSDL::XSD::Typelib::Element
+    SOAP::WSDL::XSD::Typelib::ComplexType
+);
+
+our $XML_ATTRIBUTE_CLASS;
+undef $XML_ATTRIBUTE_CLASS;
+
+sub __get_attr_class {
+    return $XML_ATTRIBUTE_CLASS;
+}
+
+use Class::Std::Fast::Storable constructor => 'none';
+use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+Class::Std::initialize();
+
+{ # BLOCK to scope variables
+
+my %clientId_of :ATTR(:get<clientId>);
+my %description_of :ATTR(:get<description>);
+my %type_of :ATTR(:get<type>);
+
+__PACKAGE__->_factory(
+    [ qw(        clientId
+        description
+        type
+
+    ) ],
+    {
+        'clientId' => \%clientId_of,
+        'description' => \%description_of,
+        'type' => \%type_of,
+    },
+    {
+        'clientId' => 'Shipment::Temando::WSDL::Types::ClientId',
+        'description' => 'Shipment::Temando::WSDL::Types::LocationName',
+        'type' => 'Shipment::Temando::WSDL::Types::LocationPosition',
+    },
+    {
+
+        'clientId' => 'clientId',
+        'description' => 'description',
+        'type' => 'type',
     }
+);
 
-    __PACKAGE__->__set_name('getLocations');
-    __PACKAGE__->__set_nillable();
-    __PACKAGE__->__set_minOccurs();
-    __PACKAGE__->__set_maxOccurs();
-    __PACKAGE__->__set_ref();
-
-    use base qw(
-      SOAP::WSDL::XSD::Typelib::Element
-      SOAP::WSDL::XSD::Typelib::ComplexType
-    );
-
-    our $XML_ATTRIBUTE_CLASS;
-    undef $XML_ATTRIBUTE_CLASS;
-
-    sub __get_attr_class {
-        return $XML_ATTRIBUTE_CLASS;
-    }
-
-    use Class::Std::Fast::Storable constructor => 'none';
-    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-    Class::Std::initialize();
-
-    {    # BLOCK to scope variables
-
-        my %clientId_of : ATTR(:get<clientId>);
-        my %description_of : ATTR(:get<description>);
-        my %type_of : ATTR(:get<type>);
-
-        __PACKAGE__->_factory(
-            [   qw(        clientId
-                  description
-                  type
-
-                )
-            ],
-            {   'clientId'    => \%clientId_of,
-                'description' => \%description_of,
-                'type'        => \%type_of,
-            },
-            {   'clientId'    => 'Shipment::Temando::WSDL::Types::ClientId',
-                'description' =>
-                  'Shipment::Temando::WSDL::Types::LocationName',
-                'type' => 'Shipment::Temando::WSDL::Types::LocationPosition',
-            },
-            {
-
-                'clientId'    => 'clientId',
-                'description' => 'description',
-                'type'        => 'type',
-            }
-        );
-
-    }    # end BLOCK
+} # end BLOCK
 
 
-}    # end of BLOCK
+
+
+
+
+} # end of BLOCK
+
 
 
 1;
@@ -85,7 +86,7 @@ Shipment::Temando::WSDL::Elements::getLocations
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::EtdDetail;
-$Shipment::FedEx::WSDL::RateTypes::EtdDetail::VERSION = '3.06';
+$Shipment::FedEx::WSDL::RateTypes::EtdDetail::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/rate/v9'}
+sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,39 +20,42 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %RequestedDocumentCopies_of : ATTR(:get<RequestedDocumentCopies>);
-    my %Documents_of : ATTR(:get<Documents>);
-    my %DocumentReferences_of : ATTR(:get<DocumentReferences>);
+my %RequestedDocumentCopies_of :ATTR(:get<RequestedDocumentCopies>);
+my %Documents_of :ATTR(:get<Documents>);
+my %DocumentReferences_of :ATTR(:get<DocumentReferences>);
 
-    __PACKAGE__->_factory(
-        [   qw(        RequestedDocumentCopies
-              Documents
-              DocumentReferences
+__PACKAGE__->_factory(
+    [ qw(        RequestedDocumentCopies
+        Documents
+        DocumentReferences
 
-            )
-        ],
-        {   'RequestedDocumentCopies' => \%RequestedDocumentCopies_of,
-            'Documents'               => \%Documents_of,
-            'DocumentReferences'      => \%DocumentReferences_of,
-        },
-        {   'RequestedDocumentCopies' =>
-              'Shipment::FedEx::WSDL::RateTypes::RequestedShippingDocumentType',
-            'Documents' =>
-              'Shipment::FedEx::WSDL::RateTypes::UploadDocumentDetail',
-            'DocumentReferences' =>
-              'Shipment::FedEx::WSDL::RateTypes::UploadDocumentReferenceDetail',
-        },
-        {
+    ) ],
+    {
+        'RequestedDocumentCopies' => \%RequestedDocumentCopies_of,
+        'Documents' => \%Documents_of,
+        'DocumentReferences' => \%DocumentReferences_of,
+    },
+    {
+        'RequestedDocumentCopies' => 'Shipment::FedEx::WSDL::RateTypes::RequestedShippingDocumentType',
+        'Documents' => 'Shipment::FedEx::WSDL::RateTypes::UploadDocumentDetail',
+        'DocumentReferences' => 'Shipment::FedEx::WSDL::RateTypes::UploadDocumentReferenceDetail',
+    },
+    {
 
-            'RequestedDocumentCopies' => 'RequestedDocumentCopies',
-            'Documents'               => 'Documents',
-            'DocumentReferences'      => 'DocumentReferences',
-        }
-    );
+        'RequestedDocumentCopies' => 'RequestedDocumentCopies',
+        'Documents' => 'Documents',
+        'DocumentReferences' => 'DocumentReferences',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -69,7 +72,7 @@ Shipment::FedEx::WSDL::RateTypes::EtdDetail
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

@@ -1870,9 +1870,7 @@ $   DECK
 
 If you or somebody else will be maintaining perl at your site, please
 fill in the correct e-mail address here so that they may be contacted
-if necessary. Currently, the "perlbug" program included with perl
-will send mail to this address in addition to perlbug@perl.org. You may
-enter "none" for no administrator.
+if necessary. You may enter "none" for no administrator.
 $   EOD
 $ ENDIF
 $ dflt = "''cf_email'"
@@ -5603,6 +5601,8 @@ $ THEN
 $   vms_cc_type="decc"
 $ ENDIF
 $ d_faststdio="define"
+$ d_ffs="undef"
+$ d_ffsl="undef"
 $ d_getenv_preserves_other_thread="define"
 $ d_locconv="define"
 $ d_mblen="define"
@@ -5610,6 +5610,7 @@ $ d_mbstowcs="define"
 $ d_mbtowc="define"
 $ d_mktime="define"
 $ d_nl_langinfo="define"
+$ d_non_int_bitfields="define"
 $ d_setlocale="define"
 $ d_setlocale_accepts_any_locale_name="undef"
 $ d_stdiobase="define"
@@ -5618,6 +5619,7 @@ $ d_stdio_ptr_lval="define"
 $ d_stdstdio="define"
 $ d_strcoll="define"
 $ d_strxfrm="define"
+$ d_strxfrm_l="undef"
 $ i_langinfo="define"
 $ i_locale="define"
 $ d_stdio_ptr_lval_sets_cnt="undef"
@@ -6213,6 +6215,8 @@ $ WC "d_fdclose='undef'"
 $ WC "d_fdim='" + d_fdim + "'"
 $ WC "d_fds_bits='define'"
 $ WC "d_fegetround='undef'"
+$ WC "d_ffs='undef'"
+$ WC "d_ffsl='undef'"
 $ WC "d_fgetpos='define'"
 $ IF use_ieee_math
 $ THEN
@@ -6399,6 +6403,8 @@ $ WC "d_nextafter='" + d_nextafter + "'"
 $ WC "d_nexttoward='" + d_nexttoward + "'"
 $ WC "d_nice='define'"
 $ WC "d_nl_langinfo='" + d_nl_langinfo + "'"
+$ WC "d_nl_langinfo_l='undef'"
+$ WC "d_non_int_bitfields='define'"
 $ WC "d_getenv_preserves_other_thread='" + d_getenv_preserves_other_thread + "'"
 $ WC "d_nv_preserves_uv='" + d_nv_preserves_uv + "'"
 $ WC "nv_overflows_integers_at='" + nv_overflows_integers_at + "'"
@@ -6546,6 +6552,7 @@ $ WC "d_statfs_f_flags='undef'"
 $ WC "d_statfs_s='undef'"
 $ WC "d_statfsflags='undef'"
 $ WC "d_static_inline='define'"
+$ WC "d_thread_local='undef'" ! see perl_thread_local
 $ WC "d_stdio_cnt_lval='" + d_stdio_cnt_lval + "'"
 $ WC "d_stdio_ptr_lval='" + d_stdio_ptr_lval + "'"
 $ WC "d_stdio_ptr_lval_nochange_cnt='" + d_stdio_ptr_lval_nochange_cnt + "'"
@@ -6571,6 +6578,7 @@ $ WC "d_strtoul='define'"
 $ WC "d_strtoull='" + d_strtoull + "'"
 $ WC "d_strtouq='" + d_strtouq + "'"
 $ WC "d_strxfrm='" + d_strxfrm  + "'"
+$ WC "d_strxfrm_l='" + d_strxfrm_l  + "'"
 $ WC "d_suidsafe='undef'"
 $ WC "d_symlink='" + d_symlink + "'"
 $ WC "d_syscall='undef'"
@@ -6781,6 +6789,7 @@ $ WC "i_vfork='undef'"
 $ WC "i_wchar='define'"
 $ WC "i_wctype='define'"
 $ WC "i_xlocale='undef'"
+$ WC "xlocale_needed='undef'"
 $ WC "inc_version_list='0'"
 $ WC "inc_version_list_init='0'"
 $ WC "installarchlib='" + installarchlib + "'"
@@ -6877,6 +6886,7 @@ $ WC "perllibs='" + perllibs + "'"
 $ WC "perlpath='" + "''vms_prefix':[000000]Perl''exe_ext'" + "'"
 $ WC "perl_static_inline='static inline'"
 $ WC "perl_symbol='" + perl_symbol + "'"  ! VMS specific
+$ WC "perl_thread_local=''" ! FIXME - as this is ia64 ABI, it may well be supported
 $ WC "perl_verb='" + perl_verb + "'"      ! VMS specific
 $ WC "pgflquota='" + pgflquota + "'"
 $ WC "pidtype='" + pidtype + "'"
@@ -6961,6 +6971,8 @@ $ WC "src='" + src + "'"
 $ WC "ssizetype='int'"
 $ WC "startperl=" + startperl ! This one's special--no enclosing single quotes
 $ WC "static_ext='" + static_ext + "'"
+$ WC "st_dev_size='"4"'"
+$ WC "st_dev_sign='1'"
 $ WC "st_ino_size='" + st_ino_size + "'"
 $ WC "st_ino_sign='1'"
 $ WC "stdchar='" + stdchar + "'"

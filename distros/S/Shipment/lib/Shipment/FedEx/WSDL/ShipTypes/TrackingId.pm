@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::TrackingId;
-$Shipment::FedEx::WSDL::ShipTypes::TrackingId::VERSION = '3.06';
+$Shipment::FedEx::WSDL::ShipTypes::TrackingId::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/ship/v9'}
+sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,42 +20,47 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %TrackingIdType_of : ATTR(:get<TrackingIdType>);
-    my %FormId_of : ATTR(:get<FormId>);
-    my %UspsApplicationId_of : ATTR(:get<UspsApplicationId>);
-    my %TrackingNumber_of : ATTR(:get<TrackingNumber>);
+my %TrackingIdType_of :ATTR(:get<TrackingIdType>);
+my %FormId_of :ATTR(:get<FormId>);
+my %UspsApplicationId_of :ATTR(:get<UspsApplicationId>);
+my %TrackingNumber_of :ATTR(:get<TrackingNumber>);
 
-    __PACKAGE__->_factory(
-        [   qw(        TrackingIdType
-              FormId
-              UspsApplicationId
-              TrackingNumber
+__PACKAGE__->_factory(
+    [ qw(        TrackingIdType
+        FormId
+        UspsApplicationId
+        TrackingNumber
 
-            )
-        ],
-        {   'TrackingIdType'    => \%TrackingIdType_of,
-            'FormId'            => \%FormId_of,
-            'UspsApplicationId' => \%UspsApplicationId_of,
-            'TrackingNumber'    => \%TrackingNumber_of,
-        },
-        {   'TrackingIdType' =>
-              'Shipment::FedEx::WSDL::ShipTypes::TrackingIdType',
-            'FormId'            => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'UspsApplicationId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'TrackingNumber'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'TrackingIdType' => \%TrackingIdType_of,
+        'FormId' => \%FormId_of,
+        'UspsApplicationId' => \%UspsApplicationId_of,
+        'TrackingNumber' => \%TrackingNumber_of,
+    },
+    {
+        'TrackingIdType' => 'Shipment::FedEx::WSDL::ShipTypes::TrackingIdType',
+        'FormId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'UspsApplicationId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'TrackingNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'TrackingIdType'    => 'TrackingIdType',
-            'FormId'            => 'FormId',
-            'UspsApplicationId' => 'UspsApplicationId',
-            'TrackingNumber'    => 'TrackingNumber',
-        }
-    );
+        'TrackingIdType' => 'TrackingIdType',
+        'FormId' => 'FormId',
+        'UspsApplicationId' => 'UspsApplicationId',
+        'TrackingNumber' => 'TrackingNumber',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -72,7 +77,7 @@ Shipment::FedEx::WSDL::ShipTypes::TrackingId
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

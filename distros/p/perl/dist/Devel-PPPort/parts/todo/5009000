@@ -9,6 +9,7 @@ MY_CXT_CLONE                   # E
 MY_CXT_INIT                    # E
 new_version                    # U
 parser_dup                     # U
+Perl_my_cxt_init               # U
 _pMY_CXT                       # X added by devel/scanprov
 pMY_CXT                        # E
 pMY_CXT_                       # X added by devel/scanprov

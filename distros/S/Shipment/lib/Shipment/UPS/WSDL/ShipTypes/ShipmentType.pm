@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::ShipmentType;
-$Shipment::UPS::WSDL::ShipTypes::ShipmentType::VERSION = '3.06';
+$Shipment::UPS::WSDL::ShipTypes::ShipmentType::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,233 +20,214 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Description_of : ATTR(:get<Description>);
-    my %ReturnService_of : ATTR(:get<ReturnService>);
-    my %DocumentsOnlyIndicator_of : ATTR(:get<DocumentsOnlyIndicator>);
-    my %Shipper_of : ATTR(:get<Shipper>);
-    my %ShipTo_of : ATTR(:get<ShipTo>);
-    my %ShipFrom_of : ATTR(:get<ShipFrom>);
-    my %PaymentInformation_of : ATTR(:get<PaymentInformation>);
-    my %FRSPaymentInformation_of : ATTR(:get<FRSPaymentInformation>);
-    my %GoodsNotInFreeCirculationIndicator_of :
-      ATTR(:get<GoodsNotInFreeCirculationIndicator>);
-    my %ShipmentRatingOptions_of : ATTR(:get<ShipmentRatingOptions>);
-    my %MovementReferenceNumber_of : ATTR(:get<MovementReferenceNumber>);
-    my %ReferenceNumber_of : ATTR(:get<ReferenceNumber>);
-    my %Service_of : ATTR(:get<Service>);
-    my %InvoiceLineTotal_of : ATTR(:get<InvoiceLineTotal>);
-    my %ShipmentServiceOptions_of : ATTR(:get<ShipmentServiceOptions>);
-    my %Package_of : ATTR(:get<Package>);
+my %Description_of :ATTR(:get<Description>);
+my %ReturnService_of :ATTR(:get<ReturnService>);
+my %DocumentsOnlyIndicator_of :ATTR(:get<DocumentsOnlyIndicator>);
+my %Shipper_of :ATTR(:get<Shipper>);
+my %ShipTo_of :ATTR(:get<ShipTo>);
+my %ShipFrom_of :ATTR(:get<ShipFrom>);
+my %PaymentInformation_of :ATTR(:get<PaymentInformation>);
+my %FRSPaymentInformation_of :ATTR(:get<FRSPaymentInformation>);
+my %GoodsNotInFreeCirculationIndicator_of :ATTR(:get<GoodsNotInFreeCirculationIndicator>);
+my %ShipmentRatingOptions_of :ATTR(:get<ShipmentRatingOptions>);
+my %MovementReferenceNumber_of :ATTR(:get<MovementReferenceNumber>);
+my %ReferenceNumber_of :ATTR(:get<ReferenceNumber>);
+my %Service_of :ATTR(:get<Service>);
+my %InvoiceLineTotal_of :ATTR(:get<InvoiceLineTotal>);
+my %ShipmentServiceOptions_of :ATTR(:get<ShipmentServiceOptions>);
+my %Package_of :ATTR(:get<Package>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Description
-              ReturnService
-              DocumentsOnlyIndicator
-              Shipper
-              ShipTo
-              ShipFrom
-              PaymentInformation
-              FRSPaymentInformation
-              GoodsNotInFreeCirculationIndicator
-              ShipmentRatingOptions
-              MovementReferenceNumber
-              ReferenceNumber
-              Service
-              InvoiceLineTotal
-              ShipmentServiceOptions
-              Package
+__PACKAGE__->_factory(
+    [ qw(        Description
+        ReturnService
+        DocumentsOnlyIndicator
+        Shipper
+        ShipTo
+        ShipFrom
+        PaymentInformation
+        FRSPaymentInformation
+        GoodsNotInFreeCirculationIndicator
+        ShipmentRatingOptions
+        MovementReferenceNumber
+        ReferenceNumber
+        Service
+        InvoiceLineTotal
+        ShipmentServiceOptions
+        Package
 
-            )
-        ],
-        {   'Description'            => \%Description_of,
-            'ReturnService'          => \%ReturnService_of,
-            'DocumentsOnlyIndicator' => \%DocumentsOnlyIndicator_of,
-            'Shipper'                => \%Shipper_of,
-            'ShipTo'                 => \%ShipTo_of,
-            'ShipFrom'               => \%ShipFrom_of,
-            'PaymentInformation'     => \%PaymentInformation_of,
-            'FRSPaymentInformation'  => \%FRSPaymentInformation_of,
-            'GoodsNotInFreeCirculationIndicator' =>
-              \%GoodsNotInFreeCirculationIndicator_of,
-            'ShipmentRatingOptions'   => \%ShipmentRatingOptions_of,
-            'MovementReferenceNumber' => \%MovementReferenceNumber_of,
-            'ReferenceNumber'         => \%ReferenceNumber_of,
-            'Service'                 => \%Service_of,
-            'InvoiceLineTotal'        => \%InvoiceLineTotal_of,
-            'ShipmentServiceOptions'  => \%ShipmentServiceOptions_of,
-            'Package'                 => \%Package_of,
-        },
-        {   'Description'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'ReturnService' =>
-              'Shipment::UPS::WSDL::ShipTypes::ReturnServiceType',
-            'DocumentsOnlyIndicator' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Shipper'  => 'Shipment::UPS::WSDL::ShipTypes::ShipperType',
-            'ShipTo'   => 'Shipment::UPS::WSDL::ShipTypes::ShipToType',
-            'ShipFrom' => 'Shipment::UPS::WSDL::ShipTypes::ShipFromType',
-            'PaymentInformation' =>
-              'Shipment::UPS::WSDL::ShipTypes::PaymentInfoType',
-            'FRSPaymentInformation' =>
-              'Shipment::UPS::WSDL::ShipTypes::FRSPaymentInfoType',
-            'GoodsNotInFreeCirculationIndicator' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'ShipmentRatingOptions' =>
-              'Shipment::UPS::WSDL::ShipTypes::RateInfoType',
-            'MovementReferenceNumber' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'ReferenceNumber' =>
-              'Shipment::UPS::WSDL::ShipTypes::ReferenceNumberType',
-            'Service' => 'Shipment::UPS::WSDL::ShipTypes::ServiceType',
-            'InvoiceLineTotal' =>
-              'Shipment::UPS::WSDL::ShipTypes::CurrencyMonetaryType',
+    ) ],
+    {
+        'Description' => \%Description_of,
+        'ReturnService' => \%ReturnService_of,
+        'DocumentsOnlyIndicator' => \%DocumentsOnlyIndicator_of,
+        'Shipper' => \%Shipper_of,
+        'ShipTo' => \%ShipTo_of,
+        'ShipFrom' => \%ShipFrom_of,
+        'PaymentInformation' => \%PaymentInformation_of,
+        'FRSPaymentInformation' => \%FRSPaymentInformation_of,
+        'GoodsNotInFreeCirculationIndicator' => \%GoodsNotInFreeCirculationIndicator_of,
+        'ShipmentRatingOptions' => \%ShipmentRatingOptions_of,
+        'MovementReferenceNumber' => \%MovementReferenceNumber_of,
+        'ReferenceNumber' => \%ReferenceNumber_of,
+        'Service' => \%Service_of,
+        'InvoiceLineTotal' => \%InvoiceLineTotal_of,
+        'ShipmentServiceOptions' => \%ShipmentServiceOptions_of,
+        'Package' => \%Package_of,
+    },
+    {
+        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'ReturnService' => 'Shipment::UPS::WSDL::ShipTypes::ReturnServiceType',
+        'DocumentsOnlyIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Shipper' => 'Shipment::UPS::WSDL::ShipTypes::ShipperType',
+        'ShipTo' => 'Shipment::UPS::WSDL::ShipTypes::ShipToType',
+        'ShipFrom' => 'Shipment::UPS::WSDL::ShipTypes::ShipFromType',
+        'PaymentInformation' => 'Shipment::UPS::WSDL::ShipTypes::PaymentInfoType',
+        'FRSPaymentInformation' => 'Shipment::UPS::WSDL::ShipTypes::FRSPaymentInfoType',
+        'GoodsNotInFreeCirculationIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'ShipmentRatingOptions' => 'Shipment::UPS::WSDL::ShipTypes::RateInfoType',
+        'MovementReferenceNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'ReferenceNumber' => 'Shipment::UPS::WSDL::ShipTypes::ReferenceNumberType',
+        'Service' => 'Shipment::UPS::WSDL::ShipTypes::ServiceType',
+        'InvoiceLineTotal' => 'Shipment::UPS::WSDL::ShipTypes::CurrencyMonetaryType',
 
-            'ShipmentServiceOptions' =>
-              'Shipment::UPS::WSDL::ShipTypes::ShipmentType::_ShipmentServiceOptions',
-            'Package' => 'Shipment::UPS::WSDL::ShipTypes::PackageType',
-        },
-        {
+        'ShipmentServiceOptions' => 'Shipment::UPS::WSDL::ShipTypes::ShipmentType::_ShipmentServiceOptions',
+        'Package' => 'Shipment::UPS::WSDL::ShipTypes::PackageType',
+    },
+    {
 
-            'Description'                        => 'Description',
-            'ReturnService'                      => 'ReturnService',
-            'DocumentsOnlyIndicator'             => 'DocumentsOnlyIndicator',
-            'Shipper'                            => 'Shipper',
-            'ShipTo'                             => 'ShipTo',
-            'ShipFrom'                           => 'ShipFrom',
-            'PaymentInformation'                 => 'PaymentInformation',
-            'FRSPaymentInformation'              => 'FRSPaymentInformation',
-            'GoodsNotInFreeCirculationIndicator' =>
-              'GoodsNotInFreeCirculationIndicator',
-            'ShipmentRatingOptions'   => 'ShipmentRatingOptions',
-            'MovementReferenceNumber' => 'MovementReferenceNumber',
-            'ReferenceNumber'         => 'ReferenceNumber',
-            'Service'                 => 'Service',
-            'InvoiceLineTotal'        => 'InvoiceLineTotal',
-            'ShipmentServiceOptions'  => 'ShipmentServiceOptions',
-            'Package'                 => 'Package',
-        }
-    );
+        'Description' => 'Description',
+        'ReturnService' => 'ReturnService',
+        'DocumentsOnlyIndicator' => 'DocumentsOnlyIndicator',
+        'Shipper' => 'Shipper',
+        'ShipTo' => 'ShipTo',
+        'ShipFrom' => 'ShipFrom',
+        'PaymentInformation' => 'PaymentInformation',
+        'FRSPaymentInformation' => 'FRSPaymentInformation',
+        'GoodsNotInFreeCirculationIndicator' => 'GoodsNotInFreeCirculationIndicator',
+        'ShipmentRatingOptions' => 'ShipmentRatingOptions',
+        'MovementReferenceNumber' => 'MovementReferenceNumber',
+        'ReferenceNumber' => 'ReferenceNumber',
+        'Service' => 'Service',
+        'InvoiceLineTotal' => 'InvoiceLineTotal',
+        'ShipmentServiceOptions' => 'ShipmentServiceOptions',
+        'Package' => 'Package',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
 
 
 package Shipment::UPS::WSDL::ShipTypes::ShipmentType::_ShipmentServiceOptions;
-$Shipment::UPS::WSDL::ShipTypes::ShipmentType::_ShipmentServiceOptions::VERSION
-  = '3.06';
+$Shipment::UPS::WSDL::ShipTypes::ShipmentType::_ShipmentServiceOptions::VERSION = '3.07';
 use strict;
 use warnings;
 {
-    our $XML_ATTRIBUTE_CLASS;
-    undef $XML_ATTRIBUTE_CLASS;
+our $XML_ATTRIBUTE_CLASS;
+undef $XML_ATTRIBUTE_CLASS;
 
-    sub __get_attr_class {
-        return $XML_ATTRIBUTE_CLASS;
-    }
+sub __get_attr_class {
+    return $XML_ATTRIBUTE_CLASS;
+}
 
 
-    use base qw(Shipment::UPS::WSDL::ShipTypes::ShipmentServiceOptionsType);
-
+use base qw(Shipment::UPS::WSDL::ShipTypes::ShipmentServiceOptionsType);
 # Variety: sequence
-    use Class::Std::Fast::Storable constructor => 'none';
-    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+use Class::Std::Fast::Storable constructor => 'none';
+use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
-    Class::Std::initialize();
+Class::Std::initialize();
 
-    {    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-        my %SaturdayDeliveryIndicator_of :
-          ATTR(:get<SaturdayDeliveryIndicator>);
-        my %OnCall_of : ATTR(:get<OnCall>);
-        my %COD_of : ATTR(:get<COD>);
-        my %Notification_of : ATTR(:get<Notification>);
-        my %LabelDelivery_of : ATTR(:get<LabelDelivery>);
-        my %InternationalForms_of : ATTR(:get<InternationalForms>);
-        my %DeliveryConfirmation_of : ATTR(:get<DeliveryConfirmation>);
-        my %ReturnOfDocumentIndicator_of :
-          ATTR(:get<ReturnOfDocumentIndicator>);
-        my %ImportControlIndicator_of : ATTR(:get<ImportControlIndicator>);
-        my %LabelMethod_of : ATTR(:get<LabelMethod>);
-        my %CommercialInvoiceRemovalIndicator_of :
-          ATTR(:get<CommercialInvoiceRemovalIndicator>);
-        my %UPScarbonneutralIndicator_of :
-          ATTR(:get<UPScarbonneutralIndicator>);
+my %SaturdayDeliveryIndicator_of :ATTR(:get<SaturdayDeliveryIndicator>);
+my %OnCall_of :ATTR(:get<OnCall>);
+my %COD_of :ATTR(:get<COD>);
+my %Notification_of :ATTR(:get<Notification>);
+my %LabelDelivery_of :ATTR(:get<LabelDelivery>);
+my %InternationalForms_of :ATTR(:get<InternationalForms>);
+my %DeliveryConfirmation_of :ATTR(:get<DeliveryConfirmation>);
+my %ReturnOfDocumentIndicator_of :ATTR(:get<ReturnOfDocumentIndicator>);
+my %ImportControlIndicator_of :ATTR(:get<ImportControlIndicator>);
+my %LabelMethod_of :ATTR(:get<LabelMethod>);
+my %CommercialInvoiceRemovalIndicator_of :ATTR(:get<CommercialInvoiceRemovalIndicator>);
+my %UPScarbonneutralIndicator_of :ATTR(:get<UPScarbonneutralIndicator>);
 
-        __PACKAGE__->_factory(
-            [   qw(        SaturdayDeliveryIndicator
-                  OnCall
-                  COD
-                  Notification
-                  LabelDelivery
-                  InternationalForms
-                  DeliveryConfirmation
-                  ReturnOfDocumentIndicator
-                  ImportControlIndicator
-                  LabelMethod
-                  CommercialInvoiceRemovalIndicator
-                  UPScarbonneutralIndicator
+__PACKAGE__->_factory(
+    [ qw(        SaturdayDeliveryIndicator
+        OnCall
+        COD
+        Notification
+        LabelDelivery
+        InternationalForms
+        DeliveryConfirmation
+        ReturnOfDocumentIndicator
+        ImportControlIndicator
+        LabelMethod
+        CommercialInvoiceRemovalIndicator
+        UPScarbonneutralIndicator
 
-                )
-            ],
-            {   'SaturdayDeliveryIndicator' => \%SaturdayDeliveryIndicator_of,
-                'OnCall'                    => \%OnCall_of,
-                'COD'                       => \%COD_of,
-                'Notification'              => \%Notification_of,
-                'LabelDelivery'             => \%LabelDelivery_of,
-                'InternationalForms'        => \%InternationalForms_of,
-                'DeliveryConfirmation'      => \%DeliveryConfirmation_of,
-                'ReturnOfDocumentIndicator' => \%ReturnOfDocumentIndicator_of,
-                'ImportControlIndicator'    => \%ImportControlIndicator_of,
-                'LabelMethod'               => \%LabelMethod_of,
-                'CommercialInvoiceRemovalIndicator' =>
-                  \%CommercialInvoiceRemovalIndicator_of,
-                'UPScarbonneutralIndicator' => \%UPScarbonneutralIndicator_of,
-            },
-            {   'SaturdayDeliveryIndicator' =>
-                  'SOAP::WSDL::XSD::Typelib::Builtin::string',
-                'OnCall'       => 'Shipment::UPS::WSDL::ShipTypes::OnCallType',
-                'COD'          => 'Shipment::UPS::WSDL::ShipTypes::CODType',
-                'Notification' =>
-                  'Shipment::UPS::WSDL::ShipTypes::NotificationType',
-                'LabelDelivery' =>
-                  'Shipment::UPS::WSDL::ShipTypes::LabelDeliveryType',
-                'InternationalForms' =>
-                  'Shipment::UPS::WSDL::ShipTypes::InternationalFormType',
-                'DeliveryConfirmation' =>
-                  'Shipment::UPS::WSDL::ShipTypes::DeliveryConfirmationType',
-                'ReturnOfDocumentIndicator' =>
-                  'SOAP::WSDL::XSD::Typelib::Builtin::string',
-                'ImportControlIndicator' =>
-                  'SOAP::WSDL::XSD::Typelib::Builtin::string',
-                'LabelMethod' =>
-                  'Shipment::UPS::WSDL::ShipTypes::LabelMethodType',
-                'CommercialInvoiceRemovalIndicator' =>
-                  'SOAP::WSDL::XSD::Typelib::Builtin::string',
-                'UPScarbonneutralIndicator' =>
-                  'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            },
-            {
+    ) ],
+    {
+        'SaturdayDeliveryIndicator' => \%SaturdayDeliveryIndicator_of,
+        'OnCall' => \%OnCall_of,
+        'COD' => \%COD_of,
+        'Notification' => \%Notification_of,
+        'LabelDelivery' => \%LabelDelivery_of,
+        'InternationalForms' => \%InternationalForms_of,
+        'DeliveryConfirmation' => \%DeliveryConfirmation_of,
+        'ReturnOfDocumentIndicator' => \%ReturnOfDocumentIndicator_of,
+        'ImportControlIndicator' => \%ImportControlIndicator_of,
+        'LabelMethod' => \%LabelMethod_of,
+        'CommercialInvoiceRemovalIndicator' => \%CommercialInvoiceRemovalIndicator_of,
+        'UPScarbonneutralIndicator' => \%UPScarbonneutralIndicator_of,
+    },
+    {
+        'SaturdayDeliveryIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'OnCall' => 'Shipment::UPS::WSDL::ShipTypes::OnCallType',
+        'COD' => 'Shipment::UPS::WSDL::ShipTypes::CODType',
+        'Notification' => 'Shipment::UPS::WSDL::ShipTypes::NotificationType',
+        'LabelDelivery' => 'Shipment::UPS::WSDL::ShipTypes::LabelDeliveryType',
+        'InternationalForms' => 'Shipment::UPS::WSDL::ShipTypes::InternationalFormType',
+        'DeliveryConfirmation' => 'Shipment::UPS::WSDL::ShipTypes::DeliveryConfirmationType',
+        'ReturnOfDocumentIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'ImportControlIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'LabelMethod' => 'Shipment::UPS::WSDL::ShipTypes::LabelMethodType',
+        'CommercialInvoiceRemovalIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'UPScarbonneutralIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-                'SaturdayDeliveryIndicator' => 'SaturdayDeliveryIndicator',
-                'OnCall'                    => 'OnCall',
-                'COD'                       => 'COD',
-                'Notification'              => 'Notification',
-                'LabelDelivery'             => 'LabelDelivery',
-                'InternationalForms'        => 'InternationalForms',
-                'DeliveryConfirmation'      => 'DeliveryConfirmation',
-                'ReturnOfDocumentIndicator' => 'ReturnOfDocumentIndicator',
-                'ImportControlIndicator'    => 'ImportControlIndicator',
-                'LabelMethod'               => 'LabelMethod',
-                'CommercialInvoiceRemovalIndicator' =>
-                  'CommercialInvoiceRemovalIndicator',
-                'UPScarbonneutralIndicator' => 'UPScarbonneutralIndicator',
-            }
-        );
+        'SaturdayDeliveryIndicator' => 'SaturdayDeliveryIndicator',
+        'OnCall' => 'OnCall',
+        'COD' => 'COD',
+        'Notification' => 'Notification',
+        'LabelDelivery' => 'LabelDelivery',
+        'InternationalForms' => 'InternationalForms',
+        'DeliveryConfirmation' => 'DeliveryConfirmation',
+        'ReturnOfDocumentIndicator' => 'ReturnOfDocumentIndicator',
+        'ImportControlIndicator' => 'ImportControlIndicator',
+        'LabelMethod' => 'LabelMethod',
+        'CommercialInvoiceRemovalIndicator' => 'CommercialInvoiceRemovalIndicator',
+        'UPScarbonneutralIndicator' => 'UPScarbonneutralIndicator',
+    }
+);
 
-    }    # end BLOCK
+} # end BLOCK
+
+
+
+
 
 
 }
+
+
+
+
 
 
 1;
@@ -263,7 +244,7 @@ Shipment::UPS::WSDL::ShipTypes::ShipmentType
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

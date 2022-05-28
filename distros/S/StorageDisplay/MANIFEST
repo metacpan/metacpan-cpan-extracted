@@ -42,6 +42,7 @@ dist.ini
 lib/StorageDisplay.pm
 lib/StorageDisplay/Collect.pm
 run-on
+t/000-report-versions.t
 t/05_round.t
 t/06_int-data-dumper.t
 t/10_reference.t

@@ -26,6 +26,7 @@ MY_CXT                         # E
 MY_CXT_INIT                    # E
 new_version                    # U
 parser_dup                     # E
+Perl_my_cxt_init               # U
 Perl_sv_free2                  # F added by devel/scanprov
 PL_cv_has_eval                 # Z added by devel/scanprov
 pMY_CXT                        # E

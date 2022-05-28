@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::NaftaProducer;
-$Shipment::FedEx::WSDL::RateTypes::NaftaProducer::VERSION = '3.06';
+$Shipment::FedEx::WSDL::RateTypes::NaftaProducer::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/rate/v9'}
+sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,31 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Id_of : ATTR(:get<Id>);
-    my %Producer_of : ATTR(:get<Producer>);
+my %Id_of :ATTR(:get<Id>);
+my %Producer_of :ATTR(:get<Producer>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Id
-              Producer
+__PACKAGE__->_factory(
+    [ qw(        Id
+        Producer
 
-            )
-        ],
-        {   'Id'       => \%Id_of,
-            'Producer' => \%Producer_of,
-        },
-        {   'Id'       => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Producer' => 'Shipment::FedEx::WSDL::RateTypes::Party',
-        },
-        {
+    ) ],
+    {
+        'Id' => \%Id_of,
+        'Producer' => \%Producer_of,
+    },
+    {
+        'Id' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Producer' => 'Shipment::FedEx::WSDL::RateTypes::Party',
+    },
+    {
 
-            'Id'       => 'Id',
-            'Producer' => 'Producer',
-        }
-    );
+        'Id' => 'Id',
+        'Producer' => 'Producer',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -61,7 +67,7 @@ Shipment::FedEx::WSDL::RateTypes::NaftaProducer
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

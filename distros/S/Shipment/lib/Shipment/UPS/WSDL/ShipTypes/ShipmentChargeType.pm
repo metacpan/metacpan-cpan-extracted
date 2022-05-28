@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::ShipmentChargeType;
-$Shipment::UPS::WSDL::ShipTypes::ShipmentChargeType::VERSION = '3.06';
+$Shipment::UPS::WSDL::ShipTypes::ShipmentChargeType::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,49 +20,52 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Type_of : ATTR(:get<Type>);
-    my %BillShipper_of : ATTR(:get<BillShipper>);
-    my %BillReceiver_of : ATTR(:get<BillReceiver>);
-    my %BillThirdParty_of : ATTR(:get<BillThirdParty>);
-    my %ConsigneeBilledIndicator_of : ATTR(:get<ConsigneeBilledIndicator>);
+my %Type_of :ATTR(:get<Type>);
+my %BillShipper_of :ATTR(:get<BillShipper>);
+my %BillReceiver_of :ATTR(:get<BillReceiver>);
+my %BillThirdParty_of :ATTR(:get<BillThirdParty>);
+my %ConsigneeBilledIndicator_of :ATTR(:get<ConsigneeBilledIndicator>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Type
-              BillShipper
-              BillReceiver
-              BillThirdParty
-              ConsigneeBilledIndicator
+__PACKAGE__->_factory(
+    [ qw(        Type
+        BillShipper
+        BillReceiver
+        BillThirdParty
+        ConsigneeBilledIndicator
 
-            )
-        ],
-        {   'Type'                     => \%Type_of,
-            'BillShipper'              => \%BillShipper_of,
-            'BillReceiver'             => \%BillReceiver_of,
-            'BillThirdParty'           => \%BillThirdParty_of,
-            'ConsigneeBilledIndicator' => \%ConsigneeBilledIndicator_of,
-        },
-        {   'Type'        => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'BillShipper' => 'Shipment::UPS::WSDL::ShipTypes::BillShipperType',
-            'BillReceiver' =>
-              'Shipment::UPS::WSDL::ShipTypes::BillReceiverType',
-            'BillThirdParty' =>
-              'Shipment::UPS::WSDL::ShipTypes::BillThirdPartyChargeType',
-            'ConsigneeBilledIndicator' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'Type' => \%Type_of,
+        'BillShipper' => \%BillShipper_of,
+        'BillReceiver' => \%BillReceiver_of,
+        'BillThirdParty' => \%BillThirdParty_of,
+        'ConsigneeBilledIndicator' => \%ConsigneeBilledIndicator_of,
+    },
+    {
+        'Type' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'BillShipper' => 'Shipment::UPS::WSDL::ShipTypes::BillShipperType',
+        'BillReceiver' => 'Shipment::UPS::WSDL::ShipTypes::BillReceiverType',
+        'BillThirdParty' => 'Shipment::UPS::WSDL::ShipTypes::BillThirdPartyChargeType',
+        'ConsigneeBilledIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'Type'                     => 'Type',
-            'BillShipper'              => 'BillShipper',
-            'BillReceiver'             => 'BillReceiver',
-            'BillThirdParty'           => 'BillThirdParty',
-            'ConsigneeBilledIndicator' => 'ConsigneeBilledIndicator',
-        }
-    );
+        'Type' => 'Type',
+        'BillShipper' => 'BillShipper',
+        'BillReceiver' => 'BillReceiver',
+        'BillThirdParty' => 'BillThirdParty',
+        'ConsigneeBilledIndicator' => 'ConsigneeBilledIndicator',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -79,7 +82,7 @@ Shipment::UPS::WSDL::ShipTypes::ShipmentChargeType
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

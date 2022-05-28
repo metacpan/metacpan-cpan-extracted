@@ -52,10 +52,6 @@
 # include <sys/resource.h>
 #endif
 
-#ifdef NETWARE
-NETDB_DEFINE_CONTEXT
-#endif
-
 #ifdef HAS_SELECT
 # ifdef I_SYS_SELECT
 #  include <sys/select.h>
@@ -876,11 +872,12 @@ PP(pp_tie)
         {
             HE *entry;
             methname = "TIEHASH";
-            if (HvLAZYDEL(varsv) && (entry = HvEITER((HV *)varsv))) {
+            if (HvLAZYDEL(varsv) && (entry = HvEITER_get((HV *)varsv))) {
                 HvLAZYDEL_off(varsv);
-                hv_free_ent((HV *)varsv, entry);
+                hv_free_ent(NULL, entry);
             }
             HvEITER_set(MUTABLE_HV(varsv), 0);
+            HvRITER_set(MUTABLE_HV(varsv), -1);
             break;
         }
         case SVt_PVAV:
@@ -941,7 +938,7 @@ PP(pp_tie)
                /* If the glob doesn't name an existing package, using
                 * SVfARG(*MARK) would yield "*Foo::Bar" or *main::Foo. So
                 * generate the name for the error message explicitly. */
-               SV *stashname = sv_2mortal(newSV(0));
+               SV *stashname = sv_newmortal();
                gv_fullname4(stashname, (GV *) *MARK, NULL, FALSE);
                DIE(aTHX_ "Can't locate object method \"%s\" via package \"%" SVf "\"",
                    methname, SVfARG(stashname));
@@ -949,7 +946,7 @@ PP(pp_tie)
            else {
                SV *stashname = !SvPOK(*MARK) ? &PL_sv_no
                              : SvCUR(*MARK)  ? *MARK
-                             :                 sv_2mortal(newSVpvs("main"));
+                             :                 newSVpvs_flags("main", SVs_TEMP);
                DIE(aTHX_ "Can't locate object method \"%s\" via package \"%" SVf "\""
                    " (perhaps you forgot to load \"%" SVf "\"?)",
                    methname, SVfARG(stashname), SVfARG(stashname));
@@ -1032,6 +1029,18 @@ PP(pp_untie)
         }
     }
     sv_unmagic(sv, how) ;
+
+    if (SvTYPE(sv) == SVt_PVHV) {
+        /* If the tied hash was partway through iteration, free the iterator and
+         * any key that it is pointing to. */
+        HE *entry;
+        if (HvLAZYDEL(sv) && (entry = HvEITER_get((HV *)sv))) {
+            HvLAZYDEL_off(sv);
+            hv_free_ent(NULL, entry);
+            HvEITER_set(MUTABLE_HV(sv), 0);
+        }
+    }
+
     RETPUSHYES;
 }
 
@@ -1280,7 +1289,7 @@ PP(pp_sselect)
     }
 
     PUSHi(nfound);
-    if (GIMME_V == G_ARRAY && tbuf) {
+    if (GIMME_V == G_LIST && tbuf) {
         value = (NV)(timebuf.tv_sec) +
                 (NV)(timebuf.tv_usec) / 1000000.0;
         mPUSHn(value);
@@ -2688,7 +2697,8 @@ PP(pp_ssockopt)
         goto nuts;
     switch (optype) {
     case OP_GSOCKOPT:
-        SvGROW(sv, 257);
+        /* Note: there used to be an explicit SvGROW(sv,257) here, but
+         * this is redundant given the sv initialization ternary above */
         (void)SvPOK_only(sv);
         SvCUR_set(sv,256);
         *SvEND(sv) ='\0';
@@ -2707,13 +2717,14 @@ PP(pp_ssockopt)
     case OP_SSOCKOPT: {
             const char *buf;
             int aint;
+            SvGETMAGIC(sv);
             if (SvPOKp(sv)) {
                 STRLEN l;
-                buf = SvPV_const(sv, l);
+                buf = SvPVbyte_nomg(sv, l);
                 len = l;
             }
             else {
-                aint = (int)SvIV(sv);
+                aint = (int)SvIV_nomg(sv);
                 buf = (const char *) &aint;
                 len = sizeof(int);
             }
@@ -2906,7 +2917,7 @@ PP(pp_stat)
     }
 
     gimme = GIMME_V;
-    if (gimme != G_ARRAY) {
+    if (gimme != G_LIST) {
         if (gimme != G_VOID)
             XPUSHs(boolSV(max));
         RETURN;
@@ -2914,7 +2925,38 @@ PP(pp_stat)
     if (max) {
         EXTEND(SP, max);
         EXTEND_MORTAL(max);
+#if ST_DEV_SIZE < IVSIZE || (ST_DEV_SIZE == IVSIZE && ST_DEV_SIGN < 0)
         mPUSHi(PL_statcache.st_dev);
+#elif ST_DEV_SIZE == IVSIZE
+        mPUSHu(PL_statcache.st_dev);
+#else
+#  if ST_DEV_SIGN < 0
+        if (LIKELY((IV)PL_statcache.st_dev == PL_statcache.st_dev)) {
+            mPUSHi((IV)PL_statcache.st_dev);
+        }
+#  else
+        if (LIKELY((UV)PL_statcache.st_dev == PL_statcache.st_dev)) {
+            mPUSHu((UV)PL_statcache.st_dev);
+        }
+#  endif
+        else {
+            char buf[sizeof(PL_statcache.st_dev)*3+1];
+            /* sv_catpvf() casts 'j' size values down to IV, so it
+               isn't suitable for use here.
+            */
+#    if defined(I_INTTYPES) && defined(HAS_SNPRINTF)
+#      if ST_DEV_SIGN < 0
+            int size = snprintf(buf, sizeof(buf), "%" PRIdMAX, (intmax_t)PL_statcache.st_dev);
+#      else
+            int size = snprintf(buf, sizeof(buf), "%" PRIuMAX, (uintmax_t)PL_statcache.st_dev);
+#      endif
+            STATIC_ASSERT_STMT(sizeof(intmax_t) >= sizeof(PL_statcache.st_dev));
+            mPUSHp(buf, size);
+#    else
+#      error extraordinarily large st_dev but no inttypes.h or no snprintf
+#    endif
+        }
+#endif
         {
             /*
              * We try to represent st_ino as a native IV or UV where
@@ -4038,9 +4080,9 @@ PP(pp_readdir)
         if (!(IoFLAGS(io) & IOf_UNTAINT))
             SvTAINTED_on(sv);
         mXPUSHs(sv);
-    } while (gimme == G_ARRAY);
+    } while (gimme == G_LIST);
 
-    if (!dp && gimme != G_ARRAY)
+    if (!dp && gimme != G_LIST)
         RETPUSHUNDEF;
 
     RETURN;
@@ -4048,7 +4090,7 @@ PP(pp_readdir)
   nope:
     if (!errno)
         SETERRNO(EBADF,RMS_ISI);
-    if (gimme == G_ARRAY)
+    if (gimme == G_LIST)
         RETURN;
     else
         RETPUSHUNDEF;
@@ -4323,7 +4365,7 @@ PP(pp_system)
             sv_2mortal(copysv);
             if (SvPOK(origsv) || SvPOKp(origsv)) {
                 pv = SvPV_nomg(origsv, len);
-                sv_setpvn(copysv, pv, len);
+                sv_setpvn_fresh(copysv, pv, len);
                 SvPOK_off(copysv);
             }
             if (SvIOK(origsv) || SvIOKp(origsv))
@@ -4673,7 +4715,7 @@ PP(pp_tms)
     (void)PerlProc_times(&timesbuf);
 
     mPUSHn(((NV)timesbuf.tms_utime)/(NV)PL_clocktick);
-    if (GIMME_V == G_ARRAY) {
+    if (GIMME_V == G_LIST) {
         mPUSHn(((NV)timesbuf.tms_stime)/(NV)PL_clocktick);
         mPUSHn(((NV)timesbuf.tms_cutime)/(NV)PL_clocktick);
         mPUSHn(((NV)timesbuf.tms_cstime)/(NV)PL_clocktick);
@@ -4683,7 +4725,7 @@ PP(pp_tms)
     dSP;
     mPUSHn(0.0);
     EXTEND(SP, 4);
-    if (GIMME_V == G_ARRAY) {
+    if (GIMME_V == G_LIST) {
          mPUSHn(0.0);
          mPUSHn(0.0);
          mPUSHn(0.0);
@@ -4766,7 +4808,7 @@ PP(pp_gmtime)
                        "%s(%.0" NVff ") failed", opname, when);
     }
 
-    if (GIMME_V != G_ARRAY) {	/* scalar context */
+    if (GIMME_V != G_LIST) {	/* scalar context */
         EXTEND(SP, 1);
         if (err == NULL)
             RETPUSHUNDEF;
@@ -5017,12 +5059,14 @@ PP(pp_ghostent)
         }
 #endif
 
-    if (GIMME_V != G_ARRAY) {
+    if (GIMME_V != G_LIST) {
         PUSHs(sv = sv_newmortal());
         if (hent) {
             if (which == OP_GHBYNAME) {
-                if (hent->h_addr)
-                    sv_setpvn(sv, hent->h_addr, hent->h_length);
+                if (hent->h_addr) {
+                    sv_upgrade(sv, SVt_PV);
+                    sv_setpvn_fresh(sv, hent->h_addr, hent->h_length);
+                }
             }
             else
                 sv_setpv(sv, (char*)hent->h_name);
@@ -5104,7 +5148,7 @@ PP(pp_gnetent)
 #endif
 
     EXTEND(SP, 4);
-    if (GIMME_V != G_ARRAY) {
+    if (GIMME_V != G_LIST) {
         PUSHs(sv = sv_newmortal());
         if (nent) {
             if (which == OP_GNBYNAME)
@@ -5168,7 +5212,7 @@ PP(pp_gprotoent)
 #endif
 
     EXTEND(SP, 3);
-    if (GIMME_V != G_ARRAY) {
+    if (GIMME_V != G_LIST) {
         PUSHs(sv = sv_newmortal());
         if (pent) {
             if (which == OP_GPBYNAME)
@@ -5234,7 +5278,7 @@ PP(pp_gservent)
 #endif
 
     EXTEND(SP, 4);
-    if (GIMME_V != G_ARRAY) {
+    if (GIMME_V != G_LIST) {
         PUSHs(sv = sv_newmortal());
         if (sent) {
             if (which == OP_GSBYNAME) {
@@ -5470,7 +5514,7 @@ PP(pp_gpwent)
     }
 
     EXTEND(SP, 10);
-    if (GIMME_V != G_ARRAY) {
+    if (GIMME_V != G_LIST) {
         PUSHs(sv = sv_newmortal());
         if (pwent) {
             if (which == OP_GPWNAM)
@@ -5557,7 +5601,9 @@ PP(pp_gpwent)
 #   endif
 
 #   ifdef PWGECOS
-        PUSHs(sv = sv_2mortal(newSVpv(pwent->pw_gecos, 0)));
+        PUSHs(sv = newSVpvn_flags(pwent->pw_gecos,
+            pwent->pw_gecos == NULL ? 0 : strlen(pwent->pw_gecos),
+            SVs_TEMP));
 #   else
         PUSHs(sv = sv_mortalcopy(&PL_sv_no));
 #   endif
@@ -5566,7 +5612,9 @@ PP(pp_gpwent)
 
         mPUSHs(newSVpv(pwent->pw_dir, 0));
 
-        PUSHs(sv = sv_2mortal(newSVpv(pwent->pw_shell, 0)));
+        PUSHs(sv = newSVpvn_flags(pwent->pw_shell,
+            pwent->pw_shell == NULL ? 0 : strlen(pwent->pw_shell),
+            SVs_TEMP));
         /* pw_shell is tainted because user himself can diddle with it. */
         SvTAINTED_on(sv);
 
@@ -5612,7 +5660,7 @@ PP(pp_ggrent)
 #endif
 
     EXTEND(SP, 4);
-    if (GIMME_V != G_ARRAY) {
+    if (GIMME_V != G_LIST) {
         SV * const sv = sv_newmortal();
 
         PUSHs(sv);

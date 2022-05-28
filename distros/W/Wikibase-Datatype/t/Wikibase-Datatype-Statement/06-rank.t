@@ -9,7 +9,6 @@ use Wikibase::Datatype::Value::String;
 
 # Test.
 my $obj = Wikibase::Datatype::Statement->new(
-	'entity' => 'Q42',
 	'snak' => Wikibase::Datatype::Snak->new(
 		'datavalue' => Wikibase::Datatype::Value::String->new(
 			'value' => 'foo',

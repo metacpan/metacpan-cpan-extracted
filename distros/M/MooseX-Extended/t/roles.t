@@ -7,8 +7,11 @@ pass 'this';
 use Not::Corinna;
 pass 'that';
 subtest 'miscellaneous features' => sub {
-    ok +Not::Corinna->meta->is_immutable,
-      'We should be able to define an immutable class';
+    SKIP: {
+        skip "Classes cannot be immutable while running under the debugger", 1 if $^P;
+        ok +Not::Corinna->meta->is_immutable,
+          'We should be able to define an immutable class';
+    }
     is mro::get_mro('Not::Corinna'), 'c3', "Our class's mro should be c3";
 };
 

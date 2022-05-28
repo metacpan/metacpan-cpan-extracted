@@ -36,7 +36,6 @@ BEGIN {
 
 use strict;
 use Test::More;
-plan tests => 3904;
 
 use feature (sprintf(":%vd", $^V)); # to avoid relying on the feature
                                     # logic to add CORE::
@@ -82,20 +81,21 @@ sub testit {
         my $code_ref;
         if ($lexsub) {
             package lexsubtest;
-            no warnings 'experimental::lexical_subs', 'experimental::isa';
+            no warnings 'experimental::lexical_subs';
             use feature 'lexical_subs';
             no strict 'vars';
             $code = "sub { state sub $keyword; ${vars}() = $expr }";
             $code = "use feature 'isa';\n$code" if $keyword eq "isa";
+            $code = "use feature 'switch';\n$code" if $keyword eq "break";
             $code_ref = eval $code or die "$@ in $expr";
         }
         else {
             package test;
-            no warnings 'experimental::isa';
             use subs ();
             import subs $keyword;
             $code = "no strict 'vars'; sub { ${vars}() = $expr }";
             $code = "use feature 'isa';\n$code" if $keyword eq "isa";
+            $code = "use feature 'switch';\n$code" if $keyword eq "break";
             $code_ref = eval $code or die "$@ in $expr";
         }
 
@@ -364,8 +364,10 @@ my %not_tested = map { $_ => 1} qw(
     UNITCHECK
     catch
     default
+    defer
     else
     elsif
+    finally
     for
     foreach
     format
@@ -431,6 +433,8 @@ SKIP:
     }
     ok($pass, "sanity checks");
 }
+
+done_testing();
 
 __DATA__
 #
@@ -637,7 +641,7 @@ sin              01    $
 sleep            01    -
 socket           4     p
 socketpair       5     p
-sort             @     p1+
+sort             12    p+
 # split handled specially
 # splice handled specially
 sprintf          123   p

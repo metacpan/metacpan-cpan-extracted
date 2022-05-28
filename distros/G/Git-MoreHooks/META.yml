@@ -7,10 +7,11 @@ build_requires:
   Git::Repository: '0'
   Log::Any::Adapter: '0'
   Test2::V0: '0'
-  perl: '5.010000'
+  Test::Git: '0'
+  perl: '5.016'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.010000'
+  perl: '5.016000'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 keywords:
@@ -24,24 +25,28 @@ name: Git-MoreHooks
 provides:
   Git::MoreHooks:
     file: lib/Git/MoreHooks.pm
-    version: '0.014'
+    version: '0.015'
   Git::MoreHooks::CheckCommitAuthorFromMailmap:
     file: lib/Git/MoreHooks/CheckCommitAuthorFromMailmap.pm
-    version: '0.014'
+    version: '0.015'
   Git::MoreHooks::CheckCommitBase:
     file: lib/Git/MoreHooks/CheckCommitBase.pm
-    version: '0.014'
+    version: '0.015'
   Git::MoreHooks::CheckIndent:
     file: lib/Git/MoreHooks/CheckIndent.pm
-    version: '0.014'
+    version: '0.015'
+  Git::MoreHooks::CheckPerl:
+    file: lib/Git/MoreHooks/CheckPerl.pm
+    version: '0.015'
   Git::MoreHooks::GitRepoAdmin:
     file: lib/Git/MoreHooks/GitRepoAdmin.pm
-    version: '0.014'
+    version: '0.015'
   Git::MoreHooks::TriggerJenkins:
     file: lib/Git/MoreHooks/TriggerJenkins.pm
-    version: '0.014'
+    version: '0.015'
 requires:
   Carp: '0'
+  Config::Tiny: '0'
   Const::Fast: '0'
   Cwd: '0'
   English: '0'
@@ -50,11 +55,15 @@ requires:
   Git::Hooks: '3.000000'
   Git::Mailmap: '0'
   Jenkins::API: '0'
+  List::MoreUtils: '0'
   Log::Any: '0'
+  Module::Load: '0'
   Params::Validate: '0'
   Path::Tiny: '0'
   Template: '0'
-  perl: '5.010000'
+  Text::Glob: '0'
+  feature: '0'
+  perl: '5.016'
   strict: '0'
   utf8: '0'
   warnings: '0'
@@ -62,7 +71,7 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Git-MoreHooks
   homepage: https://metacpan.org/release/Git-MoreHooks
   repository: https://github.com/mikkoi/git-morehooks.git
-version: '0.014'
+version: '0.015'
 x_contributors:
   - 'Gustavo L. de M. Chaves <gnustavo@cpan.org>'
 x_generated_by_perl: v5.28.2

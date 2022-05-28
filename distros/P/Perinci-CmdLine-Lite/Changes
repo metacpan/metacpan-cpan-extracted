@@ -1,3 +1,13 @@
+1.921   2022-05-27  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [ux] Give description for some common command-line options like
+          --log-level, --no-config, --no-env, --format, etc.
+
+        - [doc] [plugin Flow::Exit] Fix typo in Synopsis.
+
+
 1.920   2022-04-21  Released-By: PERLANCAR; Urgency: medium
 
         - Use Browser::Find::Windows to set a default viewer on Windows.

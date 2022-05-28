@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Interfaces::ServiceAvailabilityService::ServiceAvailabilityServiceEndpoint;
-$Shipment::Purolator::WSDL::Interfaces::ServiceAvailabilityService::ServiceAvailabilityServiceEndpoint::VERSION = '3.06';
+$Shipment::Purolator::WSDL::Interfaces::ServiceAvailabilityService::ServiceAvailabilityServiceEndpoint::VERSION = '3.07';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -9,246 +9,207 @@ use base qw(SOAP::WSDL::Client::Base);
 
 # only load if it hasn't been loaded before
 require Shipment::Purolator::WSDL::Typemaps::ServiceAvailabilityService
-  if not Shipment::Purolator::WSDL::Typemaps::ServiceAvailabilityService->can(
-    'get_class');
+    if not Shipment::Purolator::WSDL::Typemaps::ServiceAvailabilityService->can('get_class');
 
 
 sub START {
 
     my $proxy_domain = $_[2]->{proxy_domain} || 'devwebservices.purolator.com';
 
-    $_[0]->set_proxy('https://'
-          . $proxy_domain
-          . '/EWS/V1/ServiceAvailability/ServiceAvailabilityService.asmx')
-      if not $_[2]->{proxy};
+    $_[0]->set_proxy('https://' . $proxy_domain . '/EWS/V1/ServiceAvailability/ServiceAvailabilityService.asmx') if not $_[2]->{proxy};
 
-    $_[0]->set_class_resolver(
-        'Shipment::Purolator::WSDL::Typemaps::ServiceAvailabilityService')
-      if not $_[2]->{class_resolver};
+    $_[0]->set_class_resolver('Shipment::Purolator::WSDL::Typemaps::ServiceAvailabilityService')
+        if not $_[2]->{class_resolver};
 
     $_[0]->set_prefix($_[2]->{use_prefix}) if exists $_[2]->{use_prefix};
 
     my $options = $_[2];
     ## provide credentials
-    eval { use SOAP::Lite; };
+    eval {
+      use SOAP::Lite;
+    };
     if ($@) {
-        warn "SOAP::Lite not installed, using builtin SOAP::WSDL Transport";
-        *SOAP::WSDL::Transport::HTTP::get_basic_credentials =
-          sub { return ($options->{key}, $options->{password}); };
+      warn "SOAP::Lite not installed, using builtin SOAP::WSDL Transport";
+      *SOAP::WSDL::Transport::HTTP::get_basic_credentials = sub { return ($options->{key}, $options->{password}); };
     }
     else {
-        *SOAP::Transport::HTTP::Client::get_basic_credentials =
-          sub { return ($options->{key}, $options->{password}); };
+      *SOAP::Transport::HTTP::Client::get_basic_credentials = sub { return ($options->{key}, $options->{password}); };
     }
 
 }
 
 sub GetServicesOptions {
     my ($self, $body, $header) = @_;
-    die
-      "GetServicesOptions must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'GetServicesOptions',
-            soap_action =>
-              'http://purolator.com/pws/service/v1/GetServicesOptions',
-            style => 'document',
-            body  => {
+    die "GetServicesOptions must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'GetServicesOptions',
+        soap_action => 'http://purolator.com/pws/service/v1/GetServicesOptions',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         => [
-                    qw( Shipment::Purolator::WSDL::Elements::GetServicesOptionsRequest )
-                ],
-            },
-            header => {
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Purolator::WSDL::Elements::RequestContext )],
-
-            },
-            headerfault => {
-
-            },
-            response => {
-                header => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::Purolator::WSDL::Elements::ResponseContext )
-                    ],
-                },
-                body => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::Purolator::WSDL::Elements::GetServicesOptionsResponse )
-                    ],
-                },
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Purolator::WSDL::Elements::GetServicesOptionsRequest )],
         },
-        $body,
-        $header
-    );
+        header => {
+            
+           'use' => 'literal',
+            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle => '',
+            parts => [qw( Shipment::Purolator::WSDL::Elements::RequestContext )],
+
+        },
+        headerfault => {
+            
+        },
+        response => {
+            header => {
+                
+
+
+           'use' => 'literal',
+            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle => '',
+            parts => [qw( Shipment::Purolator::WSDL::Elements::ResponseContext )],
+            },
+            body => {
+                
+
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Purolator::WSDL::Elements::GetServicesOptionsResponse )],
+            },
+        }
+    }, $body, $header);
 }
 
 
 sub GetServiceRules {
     my ($self, $body, $header) = @_;
-    die "GetServiceRules must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'GetServiceRules',
-            soap_action =>
-              'http://purolator.com/pws/service/v1/GetServiceRules',
-            style => 'document',
-            body  => {
+    die "GetServiceRules must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'GetServiceRules',
+        soap_action => 'http://purolator.com/pws/service/v1/GetServiceRules',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         => [
-                    qw( Shipment::Purolator::WSDL::Elements::GetServiceRulesRequest )
-                ],
-            },
-            header => {
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Purolator::WSDL::Elements::RequestContext )],
-
-            },
-            headerfault => {
-
-            },
-            response => {
-                header => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::Purolator::WSDL::Elements::ResponseContext )
-                    ],
-                },
-                body => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::Purolator::WSDL::Elements::GetServiceRulesResponse )
-                    ],
-                },
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Purolator::WSDL::Elements::GetServiceRulesRequest )],
         },
-        $body,
-        $header
-    );
+        header => {
+            
+           'use' => 'literal',
+            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle => '',
+            parts => [qw( Shipment::Purolator::WSDL::Elements::RequestContext )],
+
+        },
+        headerfault => {
+            
+        },
+        response => {
+            header => {
+                
+
+
+           'use' => 'literal',
+            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle => '',
+            parts => [qw( Shipment::Purolator::WSDL::Elements::ResponseContext )],
+            },
+            body => {
+                
+
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Purolator::WSDL::Elements::GetServiceRulesResponse )],
+            },
+        }
+    }, $body, $header);
 }
 
 
 sub ValidateCityPostalCodeZip {
     my ($self, $body, $header) = @_;
-    die
-      "ValidateCityPostalCodeZip must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'ValidateCityPostalCodeZip',
-            soap_action =>
-              'http://purolator.com/pws/service/v1/ValidateCityPostalCodeZip',
-            style => 'document',
-            body  => {
+    die "ValidateCityPostalCodeZip must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'ValidateCityPostalCodeZip',
+        soap_action => 'http://purolator.com/pws/service/v1/ValidateCityPostalCodeZip',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         => [
-                    qw( Shipment::Purolator::WSDL::Elements::ValidateCityPostalCodeZipRequest )
-                ],
-            },
-            header => {
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::Purolator::WSDL::Elements::RequestContext )],
-
-            },
-            headerfault => {
-
-            },
-            response => {
-                header => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::Purolator::WSDL::Elements::ResponseContext )
-                    ],
-                },
-                body => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::Purolator::WSDL::Elements::ValidateCityPostalCodeZipResponse )
-                    ],
-                },
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Purolator::WSDL::Elements::ValidateCityPostalCodeZipRequest )],
         },
-        $body,
-        $header
-    );
+        header => {
+            
+           'use' => 'literal',
+            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle => '',
+            parts => [qw( Shipment::Purolator::WSDL::Elements::RequestContext )],
+
+        },
+        headerfault => {
+            
+        },
+        response => {
+            header => {
+                
+
+
+           'use' => 'literal',
+            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle => '',
+            parts => [qw( Shipment::Purolator::WSDL::Elements::ResponseContext )],
+            },
+            body => {
+                
+
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::Purolator::WSDL::Elements::ValidateCityPostalCodeZipResponse )],
+            },
+        }
+    }, $body, $header);
 }
+
+
+
 
 
 sub _get_name_resolver {
 
     my $prefix_1 = {
-        'attribute' => 'Shipment::Purolator::WSDL::Attributes',
-        'typemap'   => 'Shipment::Purolator::WSDL::Typemaps',
-        'interface' => 'Shipment::Purolator::WSDL::Interfaces',
-        'type'      => 'Shipment::Purolator::WSDL::Types',
-        'server'    => 'Shipment::Purolator::WSDL::Server',
-        'element'   => 'Shipment::Purolator::WSDL::Elements'
-    };
+              'attribute' => 'Shipment::Purolator::WSDL::Attributes',
+              'typemap' => 'Shipment::Purolator::WSDL::Typemaps',
+              'interface' => 'Shipment::Purolator::WSDL::Interfaces',
+              'type' => 'Shipment::Purolator::WSDL::Types',
+              'server' => 'Shipment::Purolator::WSDL::Server',
+              'element' => 'Shipment::Purolator::WSDL::Elements'
+            };
 
 
-    return SOAP::WSDL::Generator::Template::Plugin::XSD->new(
-        {   prefix_resolver => SOAP::WSDL::Generator::PrefixResolver->new(
-                {   namespace_prefix_map => {
-                        'http://www.w3.org/2001/XMLSchema' =>
-                          'SOAP::WSDL::XSD::Typelib::Builtin',
-                    },
-                    namespace_map => {},
-                    prefix        => $prefix_1,
-                }
-            )
-        }
-    );
+    return SOAP::WSDL::Generator::Template::Plugin::XSD->new({
+        prefix_resolver => SOAP::WSDL::Generator::PrefixResolver->new({
+            namespace_prefix_map => {
+                'http://www.w3.org/2001/XMLSchema' => 'SOAP::WSDL::XSD::Typelib::Builtin',
+            },
+            namespace_map => {
+            },
+            prefix => $prefix_1,
+        })
+    });
 }
 
 1;
@@ -265,7 +226,7 @@ Shipment::Purolator::WSDL::Interfaces::ServiceAvailabilityService::ServiceAvaila
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 SYNOPSIS
 

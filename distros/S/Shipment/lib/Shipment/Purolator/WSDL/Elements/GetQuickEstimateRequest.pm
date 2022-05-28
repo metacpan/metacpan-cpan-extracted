@@ -1,22 +1,22 @@
 
 package Shipment::Purolator::WSDL::Elements::GetQuickEstimateRequest;
-$Shipment::Purolator::WSDL::Elements::GetQuickEstimateRequest::VERSION = '3.06';
+$Shipment::Purolator::WSDL::Elements::GetQuickEstimateRequest::VERSION = '3.07';
 use strict;
 use warnings;
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' }
 
-    __PACKAGE__->__set_name('GetQuickEstimateRequest');
-    __PACKAGE__->__set_nillable(1);
-    __PACKAGE__->__set_minOccurs();
-    __PACKAGE__->__set_maxOccurs();
-    __PACKAGE__->__set_ref();
-    use base qw(
-      SOAP::WSDL::XSD::Typelib::Element
-      Shipment::Purolator::WSDL::Types::GetQuickEstimateRequestContainer
-    );
+__PACKAGE__->__set_name('GetQuickEstimateRequest');
+__PACKAGE__->__set_nillable(1);
+__PACKAGE__->__set_minOccurs();
+__PACKAGE__->__set_maxOccurs();
+__PACKAGE__->__set_ref();
+use base qw(
+    SOAP::WSDL::XSD::Typelib::Element
+    Shipment::Purolator::WSDL::Types::GetQuickEstimateRequestContainer
+);
 
 }
 
@@ -34,7 +34,7 @@ Shipment::Purolator::WSDL::Elements::GetQuickEstimateRequest
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

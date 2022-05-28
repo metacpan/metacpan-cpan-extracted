@@ -3,7 +3,7 @@ package App::perlimports::Config;
 use Moo;
 use MooX::StrictConstructor;
 
-our $VERSION = '0.000043';
+our $VERSION = '0.000044';
 
 use List::Util qw( uniq );
 use Path::Tiny qw( path );
@@ -201,7 +201,7 @@ App::perlimports::Config - Generic configuration options for C<perlimports>
 
 =head1 VERSION
 
-version 0.000043
+version 0.000044
 
 =head1 DESCRIPTION
 
@@ -243,6 +243,7 @@ ignore_modules_filename         = ""
 ignore_modules_pattern          = "" # regex like "^(Foo|Foo::Bar)"
 ignore_modules_pattern_filename = ""
 libs                            = ["lib", "t/lib"]
+log_filename                    = ""
 log_level                       = "warn"
 never_export_modules            = []
 never_export_modules_filename   = ""

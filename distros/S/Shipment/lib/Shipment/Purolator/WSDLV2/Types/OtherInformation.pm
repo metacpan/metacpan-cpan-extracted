@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDLV2::Types::OtherInformation;
-$Shipment::Purolator::WSDLV2::Types::OtherInformation::VERSION = '3.06';
+$Shipment::Purolator::WSDLV2::Types::OtherInformation::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %CostCentre_of : ATTR(:get<CostCentre>);
-    my %SpecialInstructions_of : ATTR(:get<SpecialInstructions>);
+my %CostCentre_of :ATTR(:get<CostCentre>);
+my %SpecialInstructions_of :ATTR(:get<SpecialInstructions>);
 
-    __PACKAGE__->_factory(
-        [   qw(        CostCentre
-              SpecialInstructions
+__PACKAGE__->_factory(
+    [ qw(        CostCentre
+        SpecialInstructions
 
-            )
-        ],
-        {   'CostCentre'          => \%CostCentre_of,
-            'SpecialInstructions' => \%SpecialInstructions_of,
-        },
-        {   'CostCentre' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'SpecialInstructions' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'CostCentre' => \%CostCentre_of,
+        'SpecialInstructions' => \%SpecialInstructions_of,
+    },
+    {
+        'CostCentre' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'SpecialInstructions' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'CostCentre'          => 'CostCentre',
-            'SpecialInstructions' => 'SpecialInstructions',
-        }
-    );
+        'CostCentre' => 'CostCentre',
+        'SpecialInstructions' => 'SpecialInstructions',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -62,7 +67,7 @@ Shipment::Purolator::WSDLV2::Types::OtherInformation
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

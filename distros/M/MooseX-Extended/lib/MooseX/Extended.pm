@@ -11,6 +11,7 @@ use Moose                     ();
 use MooseX::StrictConstructor ();
 use mro                       ();
 use namespace::autoclean      ();
+use Module::Load 'load';
 use MooseX::Extended::Core qw(
   field
   param
@@ -23,9 +24,8 @@ use B::Hooks::AtRuntime 'after_runtime';
 use Import::Into;
 
 no warnings _disabled_warnings();
-use true;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 my ( $import, undef, $init_meta ) = Moose::Exporter->setup_import_methods(
     with_meta => [ 'field', 'param' ],
@@ -122,20 +122,39 @@ sub init_meta ( $class, %params ) {
         say STDERR "We are running under the debugger. $for_class is not immutable";
     }
     else {
-        # after_runtime is loaded too late under the debugger
-        after_runtime {
-            $for_class->meta->make_immutable;
-            if ( $config->{debug} ) {
+        unless ( $config->{excludes}{immutable} ) {
 
-                # they're doing debug on a class-by-class basis, so
-                # turn this off after the class compiles
-                $MooseX::Extended::Debug = 0;
-            }
+            # after_runtime is loaded too late under the debugger
+            eval {
+                load B::Hooks::AtRuntime, 'after_runtime';
+                after_runtime {
+                    $for_class->meta->make_immutable;
+                    if ( $config->{debug} ) {
+
+                        # they're doing debug on a class-by-class basis, so
+                        # turn this off after the class compiles
+                        $MooseX::Extended::Debug = 0;
+                    }
+                };
+                1;
+            } or do {
+                my $error = $@;
+                warn
+                  "Could not load 'B::Hooks::AtRuntime': $error. You class is not immutable. You can `use MooseX::Extended excludes => ['immutable'];` to suppress this warning.";
+            };
         }
-        unless $config->{excludes}{immutable};
     }
-    true->import    # no need for `1` at the end of the module
-      unless $config->{excludes}{true};
+    unless ( $config->{excludes}{true} ) {
+        eval {
+            load true;
+            true->import;    # no need for `1` at the end of the module
+            1;
+        } or do {
+            my $error = $@;
+            warn
+              "Could not load 'true': $error. Your class must end in a true value. You can `use MooseX::Extended excludes => ['true'];` to suppress this warning.";
+        };
+    }
 
     # If we never use multiple inheritance, this should not be needed.
     mro::set_mro( $for_class, 'c3' )
@@ -159,7 +178,7 @@ MooseX::Extended - Extend Moose with safe defaults and useful features
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -194,7 +213,8 @@ version 0.06
 
 =head1 DESCRIPTION
 
-This module is B<ALPHA> code.
+This module is B<BETA> code. It's feature-complete for release and has no
+known bugs, but more testing is warranted.
 
 This class attempts to create a safer version of Moose that defaults to
 read-only attributes and is easier to read and write.
@@ -236,6 +256,30 @@ A C<param> is a required parameter (defaults may be used). A C<field> is not
 allowed to be passed to the constructor.
 
 Note that the C<has> function is still available, even if it's not needed.
+
+Also, while your author likes the postfix block syntax, it's not required. You
+can even safely inline multiple packages in the same file:
+
+    package My::Point;
+    use MooseX::Extended types => [qw/Num/];
+
+    param [ 'x', 'y' ] => ( isa => Num );
+
+    package My::Point::Mutable;
+    use MooseX::Extended;
+    extends 'My::Point';
+
+    param [ '+x', '+y' ] => ( writer => 1, clearer => 1, default => 0 );
+
+    sub invert ($self) {
+        my ( $x, $y ) = ( $self->x, $self->y );
+        $self->set_x($y);
+        $self->set_y($x);
+    }
+
+# MooseX::Extended will causet this to return true, even if we try to return
+# false
+0;
 
 =head1 CONFIGURATION
 

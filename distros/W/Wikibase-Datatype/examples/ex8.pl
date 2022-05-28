@@ -3,18 +3,14 @@
 use strict;
 use warnings;
 
-use Error::Pure;
-use Wikibase::Datatype::Utils qw(check_entity);
+use Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::Image::Dog;;
+use Wikibase::Datatype::Print::Snak;
 
-$Error::Pure::TYPE = 'Error';
-
-my $self = {
-        'key' => 'bad_entity',
-};
-check_entity($self, 'key');
+# Object.
+my $obj = Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::Image::Dog->new;
 
 # Print out.
-print "ok\n";
+print scalar Wikibase::Datatype::Print::Snak::print($obj);
 
-# Output like:
-# #Error [/../Wikibase/Datatype/Utils.pm:?] Parameter 'key' must begin with 'Q' and number after it.
+# Output:
+# P18: Canadian Inuit Dog.jpg

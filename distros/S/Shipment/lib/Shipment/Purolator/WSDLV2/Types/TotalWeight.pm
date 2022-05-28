@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDLV2::Types::TotalWeight;
-$Shipment::Purolator::WSDLV2::Types::TotalWeight::VERSION = '3.06';
+$Shipment::Purolator::WSDLV2::Types::TotalWeight::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,31 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Value_of : ATTR(:get<Value>);
-    my %WeightUnit_of : ATTR(:get<WeightUnit>);
+my %Value_of :ATTR(:get<Value>);
+my %WeightUnit_of :ATTR(:get<WeightUnit>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Value
-              WeightUnit
+__PACKAGE__->_factory(
+    [ qw(        Value
+        WeightUnit
 
-            )
-        ],
-        {   'Value'      => \%Value_of,
-            'WeightUnit' => \%WeightUnit_of,
-        },
-        {   'Value'      => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
-            'WeightUnit' => 'Shipment::Purolator::WSDLV2::Types::WeightUnit',
-        },
-        {
+    ) ],
+    {
+        'Value' => \%Value_of,
+        'WeightUnit' => \%WeightUnit_of,
+    },
+    {
+        'Value' => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
+        'WeightUnit' => 'Shipment::Purolator::WSDLV2::Types::WeightUnit',
+    },
+    {
 
-            'Value'      => 'Value',
-            'WeightUnit' => 'WeightUnit',
-        }
-    );
+        'Value' => 'Value',
+        'WeightUnit' => 'WeightUnit',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -61,7 +67,7 @@ Shipment::Purolator::WSDLV2::Types::TotalWeight
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::TransactionDetail;
-$Shipment::FedEx::WSDL::ShipTypes::TransactionDetail::VERSION = '3.06';
+$Shipment::FedEx::WSDL::ShipTypes::TransactionDetail::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/ship/v9'}
+sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %CustomerTransactionId_of : ATTR(:get<CustomerTransactionId>);
-    my %Localization_of : ATTR(:get<Localization>);
+my %CustomerTransactionId_of :ATTR(:get<CustomerTransactionId>);
+my %Localization_of :ATTR(:get<Localization>);
 
-    __PACKAGE__->_factory(
-        [   qw(        CustomerTransactionId
-              Localization
+__PACKAGE__->_factory(
+    [ qw(        CustomerTransactionId
+        Localization
 
-            )
-        ],
-        {   'CustomerTransactionId' => \%CustomerTransactionId_of,
-            'Localization'          => \%Localization_of,
-        },
-        {   'CustomerTransactionId' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Localization' => 'Shipment::FedEx::WSDL::ShipTypes::Localization',
-        },
-        {
+    ) ],
+    {
+        'CustomerTransactionId' => \%CustomerTransactionId_of,
+        'Localization' => \%Localization_of,
+    },
+    {
+        'CustomerTransactionId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Localization' => 'Shipment::FedEx::WSDL::ShipTypes::Localization',
+    },
+    {
 
-            'CustomerTransactionId' => 'CustomerTransactionId',
-            'Localization'          => 'Localization',
-        }
-    );
+        'CustomerTransactionId' => 'CustomerTransactionId',
+        'Localization' => 'Localization',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -62,7 +67,7 @@ Shipment::FedEx::WSDL::ShipTypes::TransactionDetail
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

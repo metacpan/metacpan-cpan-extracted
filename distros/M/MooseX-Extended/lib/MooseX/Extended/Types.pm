@@ -11,7 +11,7 @@ use Types::Standard qw(
   slurpy
 );
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 our @EXPORT_OK;
 
 BEGIN {
@@ -42,7 +42,7 @@ MooseX::Extended::Types - Keep our type tools organized
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

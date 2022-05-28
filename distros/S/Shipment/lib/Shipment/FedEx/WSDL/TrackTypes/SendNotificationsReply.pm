@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::SendNotificationsReply;
-$Shipment::FedEx::WSDL::TrackTypes::SendNotificationsReply::VERSION = '3.06';
+$Shipment::FedEx::WSDL::TrackTypes::SendNotificationsReply::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/track/v9'}
+sub get_xmlns { 'http://fedex.com/ws/track/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,66 +20,67 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %HighestSeverity_of : ATTR(:get<HighestSeverity>);
-    my %Notifications_of : ATTR(:get<Notifications>);
-    my %TransactionDetail_of : ATTR(:get<TransactionDetail>);
-    my %Version_of : ATTR(:get<Version>);
-    my %DuplicateWaybill_of : ATTR(:get<DuplicateWaybill>);
-    my %MoreDataAvailable_of : ATTR(:get<MoreDataAvailable>);
-    my %PagingToken_of : ATTR(:get<PagingToken>);
-    my %Packages_of : ATTR(:get<Packages>);
+my %HighestSeverity_of :ATTR(:get<HighestSeverity>);
+my %Notifications_of :ATTR(:get<Notifications>);
+my %TransactionDetail_of :ATTR(:get<TransactionDetail>);
+my %Version_of :ATTR(:get<Version>);
+my %DuplicateWaybill_of :ATTR(:get<DuplicateWaybill>);
+my %MoreDataAvailable_of :ATTR(:get<MoreDataAvailable>);
+my %PagingToken_of :ATTR(:get<PagingToken>);
+my %Packages_of :ATTR(:get<Packages>);
 
-    __PACKAGE__->_factory(
-        [   qw(        HighestSeverity
-              Notifications
-              TransactionDetail
-              Version
-              DuplicateWaybill
-              MoreDataAvailable
-              PagingToken
-              Packages
+__PACKAGE__->_factory(
+    [ qw(        HighestSeverity
+        Notifications
+        TransactionDetail
+        Version
+        DuplicateWaybill
+        MoreDataAvailable
+        PagingToken
+        Packages
 
-            )
-        ],
-        {   'HighestSeverity'   => \%HighestSeverity_of,
-            'Notifications'     => \%Notifications_of,
-            'TransactionDetail' => \%TransactionDetail_of,
-            'Version'           => \%Version_of,
-            'DuplicateWaybill'  => \%DuplicateWaybill_of,
-            'MoreDataAvailable' => \%MoreDataAvailable_of,
-            'PagingToken'       => \%PagingToken_of,
-            'Packages'          => \%Packages_of,
-        },
-        {   'HighestSeverity' =>
-              'Shipment::FedEx::WSDL::TrackTypes::NotificationSeverityType',
-            'Notifications' =>
-              'Shipment::FedEx::WSDL::TrackTypes::Notification',
-            'TransactionDetail' =>
-              'Shipment::FedEx::WSDL::TrackTypes::TransactionDetail',
-            'Version' => 'Shipment::FedEx::WSDL::TrackTypes::VersionId',
-            'DuplicateWaybill' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-            'MoreDataAvailable' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-            'PagingToken' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Packages'    =>
-              'Shipment::FedEx::WSDL::TrackTypes::TrackNotificationPackage',
-        },
-        {
+    ) ],
+    {
+        'HighestSeverity' => \%HighestSeverity_of,
+        'Notifications' => \%Notifications_of,
+        'TransactionDetail' => \%TransactionDetail_of,
+        'Version' => \%Version_of,
+        'DuplicateWaybill' => \%DuplicateWaybill_of,
+        'MoreDataAvailable' => \%MoreDataAvailable_of,
+        'PagingToken' => \%PagingToken_of,
+        'Packages' => \%Packages_of,
+    },
+    {
+        'HighestSeverity' => 'Shipment::FedEx::WSDL::TrackTypes::NotificationSeverityType',
+        'Notifications' => 'Shipment::FedEx::WSDL::TrackTypes::Notification',
+        'TransactionDetail' => 'Shipment::FedEx::WSDL::TrackTypes::TransactionDetail',
+        'Version' => 'Shipment::FedEx::WSDL::TrackTypes::VersionId',
+        'DuplicateWaybill' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+        'MoreDataAvailable' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+        'PagingToken' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Packages' => 'Shipment::FedEx::WSDL::TrackTypes::TrackNotificationPackage',
+    },
+    {
 
-            'HighestSeverity'   => 'HighestSeverity',
-            'Notifications'     => 'Notifications',
-            'TransactionDetail' => 'TransactionDetail',
-            'Version'           => 'Version',
-            'DuplicateWaybill'  => 'DuplicateWaybill',
-            'MoreDataAvailable' => 'MoreDataAvailable',
-            'PagingToken'       => 'PagingToken',
-            'Packages'          => 'Packages',
-        }
-    );
+        'HighestSeverity' => 'HighestSeverity',
+        'Notifications' => 'Notifications',
+        'TransactionDetail' => 'TransactionDetail',
+        'Version' => 'Version',
+        'DuplicateWaybill' => 'DuplicateWaybill',
+        'MoreDataAvailable' => 'MoreDataAvailable',
+        'PagingToken' => 'PagingToken',
+        'Packages' => 'Packages',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -96,7 +97,7 @@ Shipment::FedEx::WSDL::TrackTypes::SendNotificationsReply
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

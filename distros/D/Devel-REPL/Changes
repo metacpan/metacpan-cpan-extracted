@@ -1,5 +1,8 @@
 Revision history for Devel-REPL
 
+1.003029   2022-05-28 03:31:29Z
+  - removed File::HomeDir dependency
+
 1.003028   2016-02-16 01:13:08Z
   - increase the required version of Data::Dump::Streamer (see RT#105466)
 

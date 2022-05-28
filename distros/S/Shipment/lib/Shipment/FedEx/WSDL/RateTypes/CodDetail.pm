@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::CodDetail;
-$Shipment::FedEx::WSDL::RateTypes::CodDetail::VERSION = '3.06';
+$Shipment::FedEx::WSDL::RateTypes::CodDetail::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/rate/v9'}
+sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,49 +20,52 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %CodCollectionAmount_of : ATTR(:get<CodCollectionAmount>);
-    my %AddTransportationCharges_of : ATTR(:get<AddTransportationCharges>);
-    my %CollectionType_of : ATTR(:get<CollectionType>);
-    my %CodRecipient_of : ATTR(:get<CodRecipient>);
-    my %ReferenceIndicator_of : ATTR(:get<ReferenceIndicator>);
+my %CodCollectionAmount_of :ATTR(:get<CodCollectionAmount>);
+my %AddTransportationCharges_of :ATTR(:get<AddTransportationCharges>);
+my %CollectionType_of :ATTR(:get<CollectionType>);
+my %CodRecipient_of :ATTR(:get<CodRecipient>);
+my %ReferenceIndicator_of :ATTR(:get<ReferenceIndicator>);
 
-    __PACKAGE__->_factory(
-        [   qw(        CodCollectionAmount
-              AddTransportationCharges
-              CollectionType
-              CodRecipient
-              ReferenceIndicator
+__PACKAGE__->_factory(
+    [ qw(        CodCollectionAmount
+        AddTransportationCharges
+        CollectionType
+        CodRecipient
+        ReferenceIndicator
 
-            )
-        ],
-        {   'CodCollectionAmount'      => \%CodCollectionAmount_of,
-            'AddTransportationCharges' => \%AddTransportationCharges_of,
-            'CollectionType'           => \%CollectionType_of,
-            'CodRecipient'             => \%CodRecipient_of,
-            'ReferenceIndicator'       => \%ReferenceIndicator_of,
-        },
-        {   'CodCollectionAmount' => 'Shipment::FedEx::WSDL::RateTypes::Money',
-            'AddTransportationCharges' =>
-              'Shipment::FedEx::WSDL::RateTypes::CodAddTransportationChargesType',
-            'CollectionType' =>
-              'Shipment::FedEx::WSDL::RateTypes::CodCollectionType',
-            'CodRecipient'       => 'Shipment::FedEx::WSDL::RateTypes::Party',
-            'ReferenceIndicator' =>
-              'Shipment::FedEx::WSDL::RateTypes::CodReturnReferenceIndicatorType',
-        },
-        {
+    ) ],
+    {
+        'CodCollectionAmount' => \%CodCollectionAmount_of,
+        'AddTransportationCharges' => \%AddTransportationCharges_of,
+        'CollectionType' => \%CollectionType_of,
+        'CodRecipient' => \%CodRecipient_of,
+        'ReferenceIndicator' => \%ReferenceIndicator_of,
+    },
+    {
+        'CodCollectionAmount' => 'Shipment::FedEx::WSDL::RateTypes::Money',
+        'AddTransportationCharges' => 'Shipment::FedEx::WSDL::RateTypes::CodAddTransportationChargesType',
+        'CollectionType' => 'Shipment::FedEx::WSDL::RateTypes::CodCollectionType',
+        'CodRecipient' => 'Shipment::FedEx::WSDL::RateTypes::Party',
+        'ReferenceIndicator' => 'Shipment::FedEx::WSDL::RateTypes::CodReturnReferenceIndicatorType',
+    },
+    {
 
-            'CodCollectionAmount'      => 'CodCollectionAmount',
-            'AddTransportationCharges' => 'AddTransportationCharges',
-            'CollectionType'           => 'CollectionType',
-            'CodRecipient'             => 'CodRecipient',
-            'ReferenceIndicator'       => 'ReferenceIndicator',
-        }
-    );
+        'CodCollectionAmount' => 'CodCollectionAmount',
+        'AddTransportationCharges' => 'AddTransportationCharges',
+        'CollectionType' => 'CollectionType',
+        'CodRecipient' => 'CodRecipient',
+        'ReferenceIndicator' => 'ReferenceIndicator',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -79,7 +82,7 @@ Shipment::FedEx::WSDL::RateTypes::CodDetail
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

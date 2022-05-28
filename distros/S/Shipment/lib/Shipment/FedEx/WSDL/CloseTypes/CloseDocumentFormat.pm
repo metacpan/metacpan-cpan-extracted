@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::CloseTypes::CloseDocumentFormat;
-$Shipment::FedEx::WSDL::CloseTypes::CloseDocumentFormat::VERSION = '3.06';
+$Shipment::FedEx::WSDL::CloseTypes::CloseDocumentFormat::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/close/v2'}
+sub get_xmlns { 'http://fedex.com/ws/close/v2' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,57 +20,57 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Dispositions_of : ATTR(:get<Dispositions>);
-    my %TopOfPageOffset_of : ATTR(:get<TopOfPageOffset>);
-    my %ImageType_of : ATTR(:get<ImageType>);
-    my %StockType_of : ATTR(:get<StockType>);
-    my %ProvideInstructions_of : ATTR(:get<ProvideInstructions>);
-    my %Localization_of : ATTR(:get<Localization>);
+my %Dispositions_of :ATTR(:get<Dispositions>);
+my %TopOfPageOffset_of :ATTR(:get<TopOfPageOffset>);
+my %ImageType_of :ATTR(:get<ImageType>);
+my %StockType_of :ATTR(:get<StockType>);
+my %ProvideInstructions_of :ATTR(:get<ProvideInstructions>);
+my %Localization_of :ATTR(:get<Localization>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Dispositions
-              TopOfPageOffset
-              ImageType
-              StockType
-              ProvideInstructions
-              Localization
+__PACKAGE__->_factory(
+    [ qw(        Dispositions
+        TopOfPageOffset
+        ImageType
+        StockType
+        ProvideInstructions
+        Localization
 
-            )
-        ],
-        {   'Dispositions'        => \%Dispositions_of,
-            'TopOfPageOffset'     => \%TopOfPageOffset_of,
-            'ImageType'           => \%ImageType_of,
-            'StockType'           => \%StockType_of,
-            'ProvideInstructions' => \%ProvideInstructions_of,
-            'Localization'        => \%Localization_of,
-        },
-        {   'Dispositions' =>
-              'Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentDispositionDetail',
-            'TopOfPageOffset' =>
-              'Shipment::FedEx::WSDL::CloseTypes::LinearMeasure',
-            'ImageType' =>
-              'Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentImageType',
-            'StockType' =>
-              'Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentStockType',
-            'ProvideInstructions' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-            'Localization' =>
-              'Shipment::FedEx::WSDL::CloseTypes::Localization',
-        },
-        {
+    ) ],
+    {
+        'Dispositions' => \%Dispositions_of,
+        'TopOfPageOffset' => \%TopOfPageOffset_of,
+        'ImageType' => \%ImageType_of,
+        'StockType' => \%StockType_of,
+        'ProvideInstructions' => \%ProvideInstructions_of,
+        'Localization' => \%Localization_of,
+    },
+    {
+        'Dispositions' => 'Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentDispositionDetail',
+        'TopOfPageOffset' => 'Shipment::FedEx::WSDL::CloseTypes::LinearMeasure',
+        'ImageType' => 'Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentImageType',
+        'StockType' => 'Shipment::FedEx::WSDL::CloseTypes::ShippingDocumentStockType',
+        'ProvideInstructions' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+        'Localization' => 'Shipment::FedEx::WSDL::CloseTypes::Localization',
+    },
+    {
 
-            'Dispositions'        => 'Dispositions',
-            'TopOfPageOffset'     => 'TopOfPageOffset',
-            'ImageType'           => 'ImageType',
-            'StockType'           => 'StockType',
-            'ProvideInstructions' => 'ProvideInstructions',
-            'Localization'        => 'Localization',
-        }
-    );
+        'Dispositions' => 'Dispositions',
+        'TopOfPageOffset' => 'TopOfPageOffset',
+        'ImageType' => 'ImageType',
+        'StockType' => 'StockType',
+        'ProvideInstructions' => 'ProvideInstructions',
+        'Localization' => 'Localization',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -87,7 +87,7 @@ Shipment::FedEx::WSDL::CloseTypes::CloseDocumentFormat
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

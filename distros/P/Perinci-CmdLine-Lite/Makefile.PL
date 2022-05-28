@@ -70,7 +70,7 @@ my %WriteMakefileArgs = (
     "Test::Perinci::CmdLine" => "1.480",
     "YAML::Old" => 0
   },
-  "VERSION" => "1.920",
+  "VERSION" => "1.921",
   "test" => {
     "TESTS" => "t/*.t"
   }

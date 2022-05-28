@@ -3,164 +3,78 @@
 use strict;
 use warnings;
 
-use Wikibase::Datatype::Lexeme;
-use Wikibase::Datatype::Reference;
-use Wikibase::Datatype::Snak;
-use Wikibase::Datatype::Statement;
+use Wikibase::Datatype::MediainfoSnak;
+use Wikibase::Datatype::MediainfoStatement;
 use Wikibase::Datatype::Value::Item;
-use Wikibase::Datatype::Value::Monolingual;
 use Wikibase::Datatype::Value::String;
-use Wikibase::Datatype::Value::Time;
 
 # Object.
-my $statement1 = Wikibase::Datatype::Statement->new(
-        # instance of (P31) human (Q5)
-        'snak' => Wikibase::Datatype::Snak->new(
-                 'datatype' => 'wikibase-item',
-                 'datavalue' => Wikibase::Datatype::Value::Item->new(
-                         'value' => 'Q5',
-                 ),
-                 'property' => 'P31',
+my $obj = Wikibase::Datatype::MediainfoStatement->new(
+        'id' => 'M123$00C04D2A-49AF-40C2-9930-C551916887E8',
+
+        # creator (P170)
+        'snak' => Wikibase::Datatype::MediainfoSnak->new(
+                 'property' => 'P170',
+                 'snaktype' => 'novalue',
         ),
         'property_snaks' => [
-                # of (P642) alien (Q474741)
-                Wikibase::Datatype::Snak->new(
-                         'datatype' => 'wikibase-item',
-                         'datavalue' => Wikibase::Datatype::Value::Item->new(
-                                 'value' => 'Q474741',
+                # Wikimedia username (P4174): Lviatour
+                Wikibase::Datatype::MediainfoSnak->new(
+                         'datavalue' => Wikibase::Datatype::Value::String->new(
+                                 'value' => 'Lviatour',
                          ),
-                         'property' => 'P642',
+                         'property' => 'P4174',
+                ),
+
+                # URL (P2699): https://commons.wikimedia.org/wiki/user:Lviatour
+                Wikibase::Datatype::MediainfoSnak->new(
+                         'datavalue' => Wikibase::Datatype::Value::String->new(
+                                 'value' => 'https://commons.wikimedia.org/wiki/user:Lviatour',
+                         ),
+                         'property' => 'P2699',
+                ),
+
+                # author name string (P2093): Lviatour
+                Wikibase::Datatype::MediainfoSnak->new(
+                         'datavalue' => Wikibase::Datatype::Value::String->new(
+                                 'value' => 'Lviatour',
+                         ),
+                         'property' => 'P2093',
+                ),
+
+                # object has role (P3831): photographer (Q33231)
+                Wikibase::Datatype::MediainfoSnak->new(
+                         'datavalue' => Wikibase::Datatype::Value::Item->new(
+                                 'value' => 'Q33231',
+                         ),
+                         'property' => 'P3831',
                 ),
         ],
-        'references' => [
-                 Wikibase::Datatype::Reference->new(
-                         'snaks' => [
-                                 # stated in (P248) Virtual International Authority File (Q53919)
-                                 Wikibase::Datatype::Snak->new(
-                                          'datatype' => 'wikibase-item',
-                                          'datavalue' => Wikibase::Datatype::Value::Item->new(
-                                                  'value' => 'Q53919',
-                                          ),
-                                          'property' => 'P248',
-                                 ),
-
-                                 # VIAF ID (P214) 113230702
-                                 Wikibase::Datatype::Snak->new(
-                                          'datatype' => 'external-id',
-                                          'datavalue' => Wikibase::Datatype::Value::String->new(
-                                                  'value' => '113230702',
-                                          ),
-                                          'property' => 'P214',
-                                 ),
-
-                                 # retrieved (P813) 7 December 2013
-                                 Wikibase::Datatype::Snak->new(
-                                          'datatype' => 'time',
-                                          'datavalue' => Wikibase::Datatype::Value::Time->new(
-                                                  'value' => '+2013-12-07T00:00:00Z',
-                                          ),
-                                          'property' => 'P813',
-                                 ),
-                         ],
-                 ),
-        ],
-);
-my $statement2 = Wikibase::Datatype::Statement->new(
-        # sex or gender (P21) male (Q6581097)
-        'snak' => Wikibase::Datatype::Snak->new(
-                 'datatype' => 'wikibase-item',
-                 'datavalue' => Wikibase::Datatype::Value::Item->new(
-                         'value' => 'Q6581097',
-                 ),
-                 'property' => 'P21',
-        ),
-        'references' => [
-                 Wikibase::Datatype::Reference->new(
-                         'snaks' => [
-                                 # stated in (P248) Virtual International Authority File (Q53919)
-                                 Wikibase::Datatype::Snak->new(
-                                          'datatype' => 'wikibase-item',
-                                          'datavalue' => Wikibase::Datatype::Value::Item->new(
-                                                  'value' => 'Q53919',
-                                          ),
-                                          'property' => 'P248',
-                                 ),
-
-                                 # VIAF ID (P214) 113230702
-                                 Wikibase::Datatype::Snak->new(
-                                          'datatype' => 'external-id',
-                                          'datavalue' => Wikibase::Datatype::Value::String->new(
-                                                  'value' => '113230702',
-                                          ),
-                                          'property' => 'P214',
-                                 ),
-
-                                 # retrieved (P813) 7 December 2013
-                                 Wikibase::Datatype::Snak->new(
-                                          'datatype' => 'time',
-                                          'datavalue' => Wikibase::Datatype::Value::Time->new(
-                                                  'value' => '+2013-12-07T00:00:00Z',
-                                          ),
-                                          'property' => 'P813',
-                                 ),
-                         ],
-                 ),
-        ],
-);
-
-# Main item.
-my $obj = Wikibase::Datatype::Lexeme->new(
-        'lemmas' => [
-                Wikibase::Datatype::Value::Monolingual->new(
-                        'language' => 'cs',
-                        'value' => 'pes',
-                ),
-        ],
-        'statements' => [
-                $statement1,
-                $statement2,
-        ],
-        'title' => 'Lexeme:L469',
 );
 
 # Print out.
-print "Title: ".$obj->title."\n";
-print "Statements:\n";
-foreach my $statement (@{$obj->statements}) {
-        print "\tStatement:\n";
-        print "\t\t".$statement->snak->property.' -> '.$statement->snak->datavalue->value."\n";
-        print "\t\tQualifers:\n";
-        foreach my $property_snak (@{$statement->property_snaks}) {
-                print "\t\t\t".$property_snak->property.' -> '.
-                        $property_snak->datavalue->value."\n";
-        }
-        print "\t\tReferences:\n";
-        foreach my $reference (@{$statement->references}) {
-                print "\t\t\tReference:\n";
-                foreach my $reference_snak (@{$reference->snaks}) {
-                        print "\t\t\t".$reference_snak->property.' -> '.
-                                $reference_snak->datavalue->value."\n";
-                }
-        }
+print 'Id: '.$obj->id."\n";
+print 'Statement: '.$obj->snak->property.' -> ';
+if ($obj->snak->snaktype eq 'value') {
+        print $obj->snak->datavalue->value."\n";
+} elsif ($obj->snak->snaktype eq 'novalue') {
+        print "-\n";
+} elsif ($obj->snak->snaktype eq 'somevalue') {
+        print "?\n";
 }
+print "Qualifiers:\n";
+foreach my $property_snak (@{$obj->property_snaks}) {
+        print "\t".$property_snak->property.' -> '.
+                $property_snak->datavalue->value."\n";
+}
+print 'Rank: '.$obj->rank."\n";
 
 # Output:
-# Title: Lexeme:L469
-# Statements:
-#         Statement:
-#                 P31 -> Q5
-#                 Qualifers:
-#                         P642 -> Q474741
-#                 References:
-#                         Reference:
-#                         P248 -> Q53919
-#                         P214 -> 113230702
-#                         P813 -> +2013-12-07T00:00:00Z
-#         Statement:
-#                 P21 -> Q6581097
-#                 Qualifers:
-#                 References:
-#                         Reference:
-#                         P248 -> Q53919
-#                         P214 -> 113230702
-#                         P813 -> +2013-12-07T00:00:00Z
+# Id: M123$00C04D2A-49AF-40C2-9930-C551916887E8
+# Statement: P170 -> -
+# Qualifiers:
+#         P4174 -> Lviatour
+#         P2699 -> https://commons.wikimedia.org/wiki/user:Lviatour
+#         P2093 -> Lviatour
+#         P3831 -> Q33231
+# Rank: normal

@@ -3,24 +3,15 @@
 use strict;
 use warnings;
 
-use Wikibase::Datatype::Value;
+use Wikibase::Datatype::Utils qw(check_entity);
 
-# Object.
-my $obj = Wikibase::Datatype::Value->new(
-        'value' => 'foo',
-        'type' => 'string',
-);
-
-# Get value.
-my $value = $obj->value;
-
-# Get type.
-my $type = $obj->type;
+my $self = {
+        'key' => 'Q123',
+};
+check_entity($self, 'key');
 
 # Print out.
-print "Value: $value\n";
-print "Type: $type\n";
+print "ok\n";
 
 # Output:
-# Value: foo
-# Type: string
+# ok

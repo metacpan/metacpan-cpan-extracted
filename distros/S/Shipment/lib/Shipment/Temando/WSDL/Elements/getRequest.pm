@@ -1,81 +1,80 @@
 
 package Shipment::Temando::WSDL::Elements::getRequest;
-$Shipment::Temando::WSDL::Elements::getRequest::VERSION = '3.06';
+$Shipment::Temando::WSDL::Elements::getRequest::VERSION = '3.07';
 use strict;
 use warnings;
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    sub get_xmlns {
-        'http://'
-          . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url
-          . '/schema/2009_06/server.xsd';
+sub get_xmlns { 'http://' . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url . '/schema/2009_06/server.xsd' }
+
+__PACKAGE__->__set_name('getRequest');
+__PACKAGE__->__set_nillable();
+__PACKAGE__->__set_minOccurs();
+__PACKAGE__->__set_maxOccurs();
+__PACKAGE__->__set_ref();
+
+use base qw(
+    SOAP::WSDL::XSD::Typelib::Element
+    SOAP::WSDL::XSD::Typelib::ComplexType
+);
+
+our $XML_ATTRIBUTE_CLASS;
+undef $XML_ATTRIBUTE_CLASS;
+
+sub __get_attr_class {
+    return $XML_ATTRIBUTE_CLASS;
+}
+
+use Class::Std::Fast::Storable constructor => 'none';
+use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+Class::Std::initialize();
+
+{ # BLOCK to scope variables
+
+my %requestId_of :ATTR(:get<requestId>);
+my %bookingNumber_of :ATTR(:get<bookingNumber>);
+my %reference_of :ATTR(:get<reference>);
+my %detail_of :ATTR(:get<detail>);
+
+__PACKAGE__->_factory(
+    [ qw(        requestId
+        bookingNumber
+        reference
+        detail
+
+    ) ],
+    {
+        'requestId' => \%requestId_of,
+        'bookingNumber' => \%bookingNumber_of,
+        'reference' => \%reference_of,
+        'detail' => \%detail_of,
+    },
+    {
+        'requestId' => 'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',
+        'bookingNumber' => 'Shipment::Temando::WSDL::Types::BookingNumber',
+        'reference' => 'Shipment::Temando::WSDL::Types::ClientReference',
+        'detail' => 'Shipment::Temando::WSDL::Types::Detail',
+    },
+    {
+
+        'requestId' => 'requestId',
+        'bookingNumber' => 'bookingNumber',
+        'reference' => 'reference',
+        'detail' => 'detail',
     }
+);
 
-    __PACKAGE__->__set_name('getRequest');
-    __PACKAGE__->__set_nillable();
-    __PACKAGE__->__set_minOccurs();
-    __PACKAGE__->__set_maxOccurs();
-    __PACKAGE__->__set_ref();
-
-    use base qw(
-      SOAP::WSDL::XSD::Typelib::Element
-      SOAP::WSDL::XSD::Typelib::ComplexType
-    );
-
-    our $XML_ATTRIBUTE_CLASS;
-    undef $XML_ATTRIBUTE_CLASS;
-
-    sub __get_attr_class {
-        return $XML_ATTRIBUTE_CLASS;
-    }
-
-    use Class::Std::Fast::Storable constructor => 'none';
-    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-    Class::Std::initialize();
-
-    {    # BLOCK to scope variables
-
-        my %requestId_of : ATTR(:get<requestId>);
-        my %bookingNumber_of : ATTR(:get<bookingNumber>);
-        my %reference_of : ATTR(:get<reference>);
-        my %detail_of : ATTR(:get<detail>);
-
-        __PACKAGE__->_factory(
-            [   qw(        requestId
-                  bookingNumber
-                  reference
-                  detail
-
-                )
-            ],
-            {   'requestId'     => \%requestId_of,
-                'bookingNumber' => \%bookingNumber_of,
-                'reference'     => \%reference_of,
-                'detail'        => \%detail_of,
-            },
-            {   'requestId' =>
-                  'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',
-                'bookingNumber' =>
-                  'Shipment::Temando::WSDL::Types::BookingNumber',
-                'reference' =>
-                  'Shipment::Temando::WSDL::Types::ClientReference',
-                'detail' => 'Shipment::Temando::WSDL::Types::Detail',
-            },
-            {
-
-                'requestId'     => 'requestId',
-                'bookingNumber' => 'bookingNumber',
-                'reference'     => 'reference',
-                'detail'        => 'detail',
-            }
-        );
-
-    }    # end BLOCK
+} # end BLOCK
 
 
-}    # end of BLOCK
+
+
+
+
+} # end of BLOCK
+
 
 
 1;
@@ -92,7 +91,7 @@ Shipment::Temando::WSDL::Elements::getRequest
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

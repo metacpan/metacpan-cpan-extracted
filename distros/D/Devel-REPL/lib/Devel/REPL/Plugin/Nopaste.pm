@@ -3,7 +3,7 @@ use warnings;
 package Devel::REPL::Plugin::Nopaste;
 # ABSTRACT: #nopaste to upload session's input and output
 
-our $VERSION = '1.003028';
+our $VERSION = '1.003029';
 
 use Devel::REPL::Plugin;
 use Moose::Util::TypeConstraints 'enum';
@@ -109,7 +109,7 @@ Devel::REPL::Plugin::Nopaste - #nopaste to upload session's input and output
 
 =head1 VERSION
 
-version 1.003028
+version 1.003029
 
 =head1 COMMANDS
 

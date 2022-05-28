@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Devel::REPL::Plugin;
 
-our $VERSION = '1.003028';
+our $VERSION = '1.003029';
 
 use Devel::REPL::Meta::Plugin;
 use Moose::Role ();

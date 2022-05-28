@@ -1,10 +1,24 @@
 ==================================================
-Changes from 2021-04-15 00:00:00 +0000 to present.
+Changes from 2021-05-26 00:00:00 +0000 to present.
 ==================================================
 
-------------------------------------------
-version 1.0.8 at 2022-04-15 08:51:35 +0000
-------------------------------------------
+-------------------------------------------
+version 1.0.10 at 2022-05-26 20:39:28 +0000
+-------------------------------------------
+
+  Change: 155b3f8684a515b7607f92f403ee6a122c9d9950
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2022-05-26 22:39:18 +0000
+
+    Force minimal version for bignum and bigrat
+
+    0.42 generates error on CPAN testers 
+
+  Change: 0f14cd76764f0ccd4d67f864a21d443ef5593f87
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2022-05-26 22:30:22 +0000
+
+    Report modules version at test time 
 
   Change: 62ceefb78477bb532746a7b6d9331a00b732723e
   Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>

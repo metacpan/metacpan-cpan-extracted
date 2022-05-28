@@ -13,7 +13,6 @@ my $obj = Wikibase::Datatype::Value::Monolingual->new(
 my $ret = $obj->value;
 is($ret, 'Example', 'Get value().');
 
-
 # Test.
 $obj = Wikibase::Datatype::Value::Monolingual->new(
 	'value' => decode_utf8('čeština'),

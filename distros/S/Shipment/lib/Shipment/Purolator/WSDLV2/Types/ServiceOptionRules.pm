@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDLV2::Types::ServiceOptionRules;
-$Shipment::Purolator::WSDLV2::Types::ServiceOptionRules::VERSION = '3.06';
+$Shipment::Purolator::WSDLV2::Types::ServiceOptionRules::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,38 +20,42 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %ServiceID_of : ATTR(:get<ServiceID>);
-    my %Exclusions_of : ATTR(:get<Exclusions>);
-    my %Inclusions_of : ATTR(:get<Inclusions>);
+my %ServiceID_of :ATTR(:get<ServiceID>);
+my %Exclusions_of :ATTR(:get<Exclusions>);
+my %Inclusions_of :ATTR(:get<Inclusions>);
 
-    __PACKAGE__->_factory(
-        [   qw(        ServiceID
-              Exclusions
-              Inclusions
+__PACKAGE__->_factory(
+    [ qw(        ServiceID
+        Exclusions
+        Inclusions
 
-            )
-        ],
-        {   'ServiceID'  => \%ServiceID_of,
-            'Exclusions' => \%Exclusions_of,
-            'Inclusions' => \%Inclusions_of,
-        },
-        {   'ServiceID'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Exclusions' =>
-              'Shipment::Purolator::WSDLV2::Types::ArrayOfOptionIDValuePair',
-            'Inclusions' =>
-              'Shipment::Purolator::WSDLV2::Types::ArrayOfOptionIDValuePair',
-        },
-        {
+    ) ],
+    {
+        'ServiceID' => \%ServiceID_of,
+        'Exclusions' => \%Exclusions_of,
+        'Inclusions' => \%Inclusions_of,
+    },
+    {
+        'ServiceID' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Exclusions' => 'Shipment::Purolator::WSDLV2::Types::ArrayOfOptionIDValuePair',
+        'Inclusions' => 'Shipment::Purolator::WSDLV2::Types::ArrayOfOptionIDValuePair',
+    },
+    {
 
-            'ServiceID'  => 'ServiceID',
-            'Exclusions' => 'Exclusions',
-            'Inclusions' => 'Inclusions',
-        }
-    );
+        'ServiceID' => 'ServiceID',
+        'Exclusions' => 'Exclusions',
+        'Inclusions' => 'Inclusions',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -68,7 +72,7 @@ Shipment::Purolator::WSDLV2::Types::ServiceOptionRules
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

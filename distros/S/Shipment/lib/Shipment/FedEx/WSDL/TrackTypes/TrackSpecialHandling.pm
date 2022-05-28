@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackSpecialHandling;
-$Shipment::FedEx::WSDL::TrackTypes::TrackSpecialHandling::VERSION = '3.06';
+$Shipment::FedEx::WSDL::TrackTypes::TrackSpecialHandling::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/track/v9'}
+sub get_xmlns { 'http://fedex.com/ws/track/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,38 +20,42 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Type_of : ATTR(:get<Type>);
-    my %Description_of : ATTR(:get<Description>);
-    my %PaymentType_of : ATTR(:get<PaymentType>);
+my %Type_of :ATTR(:get<Type>);
+my %Description_of :ATTR(:get<Description>);
+my %PaymentType_of :ATTR(:get<PaymentType>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Type
-              Description
-              PaymentType
+__PACKAGE__->_factory(
+    [ qw(        Type
+        Description
+        PaymentType
 
-            )
-        ],
-        {   'Type'        => \%Type_of,
-            'Description' => \%Description_of,
-            'PaymentType' => \%PaymentType_of,
-        },
-        {   'Type' =>
-              'Shipment::FedEx::WSDL::TrackTypes::TrackSpecialHandlingType',
-            'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'PaymentType' =>
-              'Shipment::FedEx::WSDL::TrackTypes::TrackPaymentType',
-        },
-        {
+    ) ],
+    {
+        'Type' => \%Type_of,
+        'Description' => \%Description_of,
+        'PaymentType' => \%PaymentType_of,
+    },
+    {
+        'Type' => 'Shipment::FedEx::WSDL::TrackTypes::TrackSpecialHandlingType',
+        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'PaymentType' => 'Shipment::FedEx::WSDL::TrackTypes::TrackPaymentType',
+    },
+    {
 
-            'Type'        => 'Type',
-            'Description' => 'Description',
-            'PaymentType' => 'PaymentType',
-        }
-    );
+        'Type' => 'Type',
+        'Description' => 'Description',
+        'PaymentType' => 'PaymentType',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -68,7 +72,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackSpecialHandling
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

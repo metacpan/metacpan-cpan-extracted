@@ -1,71 +1,76 @@
 
 package Shipment::UPS::WSDL::ShipElements::ShipmentRequest;
-$Shipment::UPS::WSDL::ShipElements::ShipmentRequest::VERSION = '3.06';
+$Shipment::UPS::WSDL::ShipElements::ShipmentRequest::VERSION = '3.07';
 use strict;
 use warnings;
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0' }
 
-    __PACKAGE__->__set_name('ShipmentRequest');
-    __PACKAGE__->__set_nillable();
-    __PACKAGE__->__set_minOccurs();
-    __PACKAGE__->__set_maxOccurs();
-    __PACKAGE__->__set_ref();
+__PACKAGE__->__set_name('ShipmentRequest');
+__PACKAGE__->__set_nillable();
+__PACKAGE__->__set_minOccurs();
+__PACKAGE__->__set_maxOccurs();
+__PACKAGE__->__set_ref();
 
-    use base qw(
-      SOAP::WSDL::XSD::Typelib::Element
-      SOAP::WSDL::XSD::Typelib::ComplexType
-    );
+use base qw(
+    SOAP::WSDL::XSD::Typelib::Element
+    SOAP::WSDL::XSD::Typelib::ComplexType
+);
 
-    our $XML_ATTRIBUTE_CLASS;
-    undef $XML_ATTRIBUTE_CLASS;
+our $XML_ATTRIBUTE_CLASS;
+undef $XML_ATTRIBUTE_CLASS;
 
-    sub __get_attr_class {
-        return $XML_ATTRIBUTE_CLASS;
+sub __get_attr_class {
+    return $XML_ATTRIBUTE_CLASS;
+}
+
+use Class::Std::Fast::Storable constructor => 'none';
+use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+Class::Std::initialize();
+
+{ # BLOCK to scope variables
+
+my %Request_of :ATTR(:get<Request>);
+my %Shipment_of :ATTR(:get<Shipment>);
+my %LabelSpecification_of :ATTR(:get<LabelSpecification>);
+
+__PACKAGE__->_factory(
+    [ qw(        Request
+        Shipment
+        LabelSpecification
+
+    ) ],
+    {
+        'Request' => \%Request_of,
+        'Shipment' => \%Shipment_of,
+        'LabelSpecification' => \%LabelSpecification_of,
+    },
+    {
+        'Request' => 'Shipment::UPS::WSDL::ShipElements::Request',
+
+        'Shipment' => 'Shipment::UPS::WSDL::ShipTypes::ShipmentType',
+        'LabelSpecification' => 'Shipment::UPS::WSDL::ShipTypes::LabelSpecificationType',
+    },
+    {
+
+        'Request' => '',
+        'Shipment' => 'Shipment',
+        'LabelSpecification' => 'LabelSpecification',
     }
+);
 
-    use Class::Std::Fast::Storable constructor => 'none';
-    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-    Class::Std::initialize();
-
-    {    # BLOCK to scope variables
-
-        my %Request_of : ATTR(:get<Request>);
-        my %Shipment_of : ATTR(:get<Shipment>);
-        my %LabelSpecification_of : ATTR(:get<LabelSpecification>);
-
-        __PACKAGE__->_factory(
-            [   qw(        Request
-                  Shipment
-                  LabelSpecification
-
-                )
-            ],
-            {   'Request'            => \%Request_of,
-                'Shipment'           => \%Shipment_of,
-                'LabelSpecification' => \%LabelSpecification_of,
-            },
-            {   'Request' => 'Shipment::UPS::WSDL::ShipElements::Request',
-
-                'Shipment' => 'Shipment::UPS::WSDL::ShipTypes::ShipmentType',
-                'LabelSpecification' =>
-                  'Shipment::UPS::WSDL::ShipTypes::LabelSpecificationType',
-            },
-            {
-
-                'Request'            => '',
-                'Shipment'           => 'Shipment',
-                'LabelSpecification' => 'LabelSpecification',
-            }
-        );
-
-    }    # end BLOCK
+} # end BLOCK
 
 
-}    # end of BLOCK
+
+
+
+
+} # end of BLOCK
+
 
 
 1;
@@ -82,7 +87,7 @@ Shipment::UPS::WSDL::ShipElements::ShipmentRequest
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::XAVTypes::AddressKeyFormatType;
-$Shipment::UPS::WSDL::XAVTypes::AddressKeyFormatType::VERSION = '3.06';
+$Shipment::UPS::WSDL::XAVTypes::AddressKeyFormatType::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/xav/v1.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/xav/v1.0' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,75 +20,77 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %ConsigneeName_of : ATTR(:get<ConsigneeName>);
-    my %AttentionName_of : ATTR(:get<AttentionName>);
-    my %AddressLine_of : ATTR(:get<AddressLine>);
-    my %PoliticalDivision2_of : ATTR(:get<PoliticalDivision2>);
-    my %PoliticalDivision1_of : ATTR(:get<PoliticalDivision1>);
-    my %PostcodePrimaryLow_of : ATTR(:get<PostcodePrimaryLow>);
-    my %PostcodeExtendedLow_of : ATTR(:get<PostcodeExtendedLow>);
-    my %Region_of : ATTR(:get<Region>);
-    my %Urbanization_of : ATTR(:get<Urbanization>);
-    my %CountryCode_of : ATTR(:get<CountryCode>);
+my %ConsigneeName_of :ATTR(:get<ConsigneeName>);
+my %AttentionName_of :ATTR(:get<AttentionName>);
+my %AddressLine_of :ATTR(:get<AddressLine>);
+my %PoliticalDivision2_of :ATTR(:get<PoliticalDivision2>);
+my %PoliticalDivision1_of :ATTR(:get<PoliticalDivision1>);
+my %PostcodePrimaryLow_of :ATTR(:get<PostcodePrimaryLow>);
+my %PostcodeExtendedLow_of :ATTR(:get<PostcodeExtendedLow>);
+my %Region_of :ATTR(:get<Region>);
+my %Urbanization_of :ATTR(:get<Urbanization>);
+my %CountryCode_of :ATTR(:get<CountryCode>);
 
-    __PACKAGE__->_factory(
-        [   qw(        ConsigneeName
-              AttentionName
-              AddressLine
-              PoliticalDivision2
-              PoliticalDivision1
-              PostcodePrimaryLow
-              PostcodeExtendedLow
-              Region
-              Urbanization
-              CountryCode
+__PACKAGE__->_factory(
+    [ qw(        ConsigneeName
+        AttentionName
+        AddressLine
+        PoliticalDivision2
+        PoliticalDivision1
+        PostcodePrimaryLow
+        PostcodeExtendedLow
+        Region
+        Urbanization
+        CountryCode
 
-            )
-        ],
-        {   'ConsigneeName'       => \%ConsigneeName_of,
-            'AttentionName'       => \%AttentionName_of,
-            'AddressLine'         => \%AddressLine_of,
-            'PoliticalDivision2'  => \%PoliticalDivision2_of,
-            'PoliticalDivision1'  => \%PoliticalDivision1_of,
-            'PostcodePrimaryLow'  => \%PostcodePrimaryLow_of,
-            'PostcodeExtendedLow' => \%PostcodeExtendedLow_of,
-            'Region'              => \%Region_of,
-            'Urbanization'        => \%Urbanization_of,
-            'CountryCode'         => \%CountryCode_of,
-        },
-        {   'ConsigneeName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'AttentionName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'AddressLine'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'PoliticalDivision2' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'PoliticalDivision1' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'PostcodePrimaryLow' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'PostcodeExtendedLow' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Region'       => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Urbanization' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'CountryCode'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'ConsigneeName' => \%ConsigneeName_of,
+        'AttentionName' => \%AttentionName_of,
+        'AddressLine' => \%AddressLine_of,
+        'PoliticalDivision2' => \%PoliticalDivision2_of,
+        'PoliticalDivision1' => \%PoliticalDivision1_of,
+        'PostcodePrimaryLow' => \%PostcodePrimaryLow_of,
+        'PostcodeExtendedLow' => \%PostcodeExtendedLow_of,
+        'Region' => \%Region_of,
+        'Urbanization' => \%Urbanization_of,
+        'CountryCode' => \%CountryCode_of,
+    },
+    {
+        'ConsigneeName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'AttentionName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'AddressLine' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'PoliticalDivision2' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'PoliticalDivision1' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'PostcodePrimaryLow' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'PostcodeExtendedLow' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Region' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Urbanization' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'CountryCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'ConsigneeName'       => 'ConsigneeName',
-            'AttentionName'       => 'AttentionName',
-            'AddressLine'         => 'AddressLine',
-            'PoliticalDivision2'  => 'PoliticalDivision2',
-            'PoliticalDivision1'  => 'PoliticalDivision1',
-            'PostcodePrimaryLow'  => 'PostcodePrimaryLow',
-            'PostcodeExtendedLow' => 'PostcodeExtendedLow',
-            'Region'              => 'Region',
-            'Urbanization'        => 'Urbanization',
-            'CountryCode'         => 'CountryCode',
-        }
-    );
+        'ConsigneeName' => 'ConsigneeName',
+        'AttentionName' => 'AttentionName',
+        'AddressLine' => 'AddressLine',
+        'PoliticalDivision2' => 'PoliticalDivision2',
+        'PoliticalDivision1' => 'PoliticalDivision1',
+        'PostcodePrimaryLow' => 'PostcodePrimaryLow',
+        'PostcodeExtendedLow' => 'PostcodeExtendedLow',
+        'Region' => 'Region',
+        'Urbanization' => 'Urbanization',
+        'CountryCode' => 'CountryCode',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -105,7 +107,7 @@ Shipment::UPS::WSDL::XAVTypes::AddressKeyFormatType
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

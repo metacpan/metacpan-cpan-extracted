@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::ResponseContext;
-$Shipment::Purolator::WSDL::Types::ResponseContext::VERSION = '3.06';
+$Shipment::Purolator::WSDL::Types::ResponseContext::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,24 +20,32 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %ResponseReference_of : ATTR(:get<ResponseReference>);
+my %ResponseReference_of :ATTR(:get<ResponseReference>);
 
-    __PACKAGE__->_factory(
-        [   qw(        ResponseReference
+__PACKAGE__->_factory(
+    [ qw(        ResponseReference
 
-            )
-        ],
-        {'ResponseReference' => \%ResponseReference_of,},
-        {'ResponseReference' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',},
-        {
+    ) ],
+    {
+        'ResponseReference' => \%ResponseReference_of,
+    },
+    {
+        'ResponseReference' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'ResponseReference' => 'ResponseReference',
-        }
-    );
+        'ResponseReference' => 'ResponseReference',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -54,7 +62,7 @@ Shipment::Purolator::WSDL::Types::ResponseContext
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

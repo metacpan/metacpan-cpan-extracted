@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::RateTypes::CommodityType;
-$Shipment::UPS::WSDL::RateTypes::CommodityType::VERSION = '3.06';
+$Shipment::UPS::WSDL::RateTypes::CommodityType::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,31 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %FreightClass_of : ATTR(:get<FreightClass>);
-    my %NMFC_of : ATTR(:get<NMFC>);
+my %FreightClass_of :ATTR(:get<FreightClass>);
+my %NMFC_of :ATTR(:get<NMFC>);
 
-    __PACKAGE__->_factory(
-        [   qw(        FreightClass
-              NMFC
+__PACKAGE__->_factory(
+    [ qw(        FreightClass
+        NMFC
 
-            )
-        ],
-        {   'FreightClass' => \%FreightClass_of,
-            'NMFC'         => \%NMFC_of,
-        },
-        {   'FreightClass' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'NMFC' => 'Shipment::UPS::WSDL::RateTypes::NMFCCommodityType',
-        },
-        {
+    ) ],
+    {
+        'FreightClass' => \%FreightClass_of,
+        'NMFC' => \%NMFC_of,
+    },
+    {
+        'FreightClass' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'NMFC' => 'Shipment::UPS::WSDL::RateTypes::NMFCCommodityType',
+    },
+    {
 
-            'FreightClass' => 'FreightClass',
-            'NMFC'         => 'NMFC',
-        }
-    );
+        'FreightClass' => 'FreightClass',
+        'NMFC' => 'NMFC',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -61,7 +67,7 @@ Shipment::UPS::WSDL::RateTypes::CommodityType
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

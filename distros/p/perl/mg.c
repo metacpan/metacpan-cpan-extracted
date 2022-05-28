@@ -877,7 +877,7 @@ Perl_sv_string_from_errnum(pTHX_ int errnum, SV *tgtsv)
 {
     char const *errstr;
     if(!tgtsv)
-        tgtsv = sv_newmortal();
+        tgtsv = newSV_type_mortal(SVt_PV);
     errstr = my_strerror(errnum);
     if(errstr) {
         sv_setpv(tgtsv, errstr);
@@ -1044,11 +1044,7 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
         if (strEQ(remaining, "AST_FH")) {
             if (PL_last_in_gv && (SV*)PL_last_in_gv != &PL_sv_undef) {
                 assert(isGV_with_GP(PL_last_in_gv));
-                SV_CHECK_THINKFIRST_COW_DROP(sv);
-                prepare_SV_for_RV(sv);
-                SvOK_off(sv);
-                SvRV_set(sv, SvREFCNT_inc_simple_NN(PL_last_in_gv));
-                SvROK_on(sv);
+                sv_setrv_inc(sv, MUTABLE_SV(PL_last_in_gv));
                 sv_rvweaken(sv);
             }
             else
@@ -1240,7 +1236,13 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
                 Safefree(gary);
             }
         }
-        (void)SvIOK_on(sv);	/* what a wonderful hack! */
+
+        /*
+            Set this to avoid warnings when the SV is used as a number.
+            Avoid setting the public IOK flag so that serializers will
+            use the PV.
+        */
+        (void)SvIOKp_on(sv);	/* what a wonderful hack! */
 #endif
         break;
     case '0':
@@ -1314,7 +1316,7 @@ Perl_magic_setenv(pTHX_ SV *sv, MAGIC *mg)
     }
 #endif
 
-#if !defined(OS2) && !defined(WIN32) && !defined(MSDOS)
+#if !defined(OS2) && !defined(WIN32)
                             /* And you'll never guess what the dog had */
                             /*   in its mouth... */
     if (TAINTING_get) {
@@ -1348,6 +1350,11 @@ Perl_magic_setenv(pTHX_ SV *sv, MAGIC *mg)
 #endif /* VMS */
         if (s && memEQs(key, klen, "PATH")) {
             const char * const strend = s + len;
+#ifdef __VMS  /* Hmm.  How do we get $Config{path_sep} from C? */
+            const char path_sep = PL_perllib_sep;
+#else
+            const char path_sep = ':';
+#endif
 
             /* set MGf_TAINTEDDIR if any component of the new path is
              * relative or world-writeable */
@@ -1355,11 +1362,6 @@ Perl_magic_setenv(pTHX_ SV *sv, MAGIC *mg)
                 char tmpbuf[256];
                 Stat_t st;
                 I32 i;
-#ifdef __VMS  /* Hmm.  How do we get $Config{path_sep} from C? */
-                const char path_sep = PL_perllib_sep;
-#else
-                const char path_sep = ':';
-#endif
                 s = delimcpy_no_escape(tmpbuf, tmpbuf + sizeof tmpbuf,
                              s, strend, path_sep, &i);
                 s++;
@@ -1379,7 +1381,7 @@ Perl_magic_setenv(pTHX_ SV *sv, MAGIC *mg)
             }
         }
     }
-#endif /* neither OS2 nor WIN32 nor MSDOS */
+#endif /* neither OS2 nor WIN32 */
 
     return 0;
 }
@@ -1553,6 +1555,9 @@ Perl_csighandler3(int sig, Siginfo_t *sip PERL_UNUSED_DECL, void *uap PERL_UNUSE
 #endif
 #ifdef SIGSEGV
            sig == SIGSEGV ||
+#endif
+#ifdef SIGFPE
+           sig == SIGFPE ||
 #endif
            (PL_signals & PERL_SIGNALS_UNSAFE_FLAG))
         /* Call the perl level handler now--
@@ -1825,6 +1830,24 @@ Perl_magic_setsig(pTHX_ SV *sv, MAGIC *mg)
     return 0;
 }
 #endif /* !PERL_MICRO */
+
+int
+Perl_magic_setsigall(pTHX_ SV* sv, MAGIC* mg)
+{
+    PERL_ARGS_ASSERT_MAGIC_SETSIGALL;
+    PERL_UNUSED_ARG(mg);
+
+    if (PL_localizing == 2) {
+        HV* hv = (HV*)sv;
+        HE* current;
+        hv_iterinit(hv);
+        while ((current = hv_iternext(hv))) {
+            SV* sigelem = hv_iterval(hv, current);
+            mg_set(sigelem);
+        }
+    }
+    return 0;
+}
 
 int
 Perl_magic_setisa(pTHX_ SV *sv, MAGIC *mg)
@@ -3344,6 +3367,16 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
         else sv_setiv(mg->mg_obj, (IV)PerlProc_getpid());
         break;
     case '0':
+        if (!sv_utf8_downgrade(sv, /* fail_ok */ TRUE)) {
+
+            /* Since we are going to set the string's UTF8-encoded form
+               as the process name we should update $0 itself to contain
+               that same (UTF8-encoded) value. */
+            sv_utf8_encode(GvSV(mg->mg_obj));
+
+            Perl_ck_warner_d(aTHX_ packWARN(WARN_UTF8), "Wide character in %s", "$0");
+        }
+
         LOCK_DOLLARZERO_MUTEX;
         S_set_dollarzero(aTHX_ sv);
         UNLOCK_DOLLARZERO_MUTEX;

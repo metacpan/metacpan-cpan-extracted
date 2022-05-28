@@ -2,8 +2,8 @@ NAME
     Text::Table::Any - Generate text table using one of several backends
 
 VERSION
-    This document describes version 0.111 of Text::Table::Any (from Perl
-    distribution Text-Table-Any), released on 2022-01-23.
+    This document describes version 0.114 of Text::Table::Any (from Perl
+    distribution Text-Table-Any), released on 2022-05-27.
 
 SYNOPSIS
      use Text::Table::Any qw/generate_table/;
@@ -111,16 +111,12 @@ DIFFERENCES WITH TEXT::TABLE::TINY
         Probably won't be supported. You can pass this option to
         Text::Table::Tiny backend via "backend_opts" option.
 
-    *   'align' option from Text::Table::Tiny is not supported
-
-        Will be supported in the future.
-
     *   'style' option from Text::Table::Tiny is not supported
 
         Won't be supported because this is specific to Text::Table::Tiny. If
         you want custom border styles, here are some alternative backends
-        you can use: Text::Table::TinyBorderStyle, Text::Table::More,
-        Text::UnicodeBox::Table.
+        you can use: Text::ANSITable, Text::Table::TinyBorderStyle,
+        Text::Table::More, Text::UnicodeBox::Table.
 
     *   'indent' option from Text::Table::Tiny is not supported
 
@@ -224,37 +220,37 @@ FUNCTIONS
 
         Support matrix for each backend:
 
-         +-------------------------------+--------------+------------------------------------------------------------------------------------------------+---------+------------+------+---------------+
-         | backend                       | backend_opts | backend_opts_note                                                                              | caption | header_row | rows | separate_rows |
-         +-------------------------------+--------------+------------------------------------------------------------------------------------------------+---------+------------+------+---------------+
-         | Term::Table                   |              |                                                                                                | 0       | 1          | 1    | 0             |
-         | Term::TablePrint              |              |                                                                                                | 0       | 1          | 1    | 0             |
-         | Text::ANSITable               |              |                                                                                                | 0       | 1          | 1    | 1             |
-         | Text::ASCIITable              |              |                                                                                                | 0       | 1          | 1    | 0             |
-         | Text::FormatTable             |              |                                                                                                | 0       | 0          | 1    | 0             |
-         | Text::MarkdownTable           |              |                                                                                                | 0       | 1          | 1    | 0             |
-         | Text::Table                   |              |                                                                                                | 0       | 0          | 1    | 0             |
-         | Text::Table::ASV              | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 0             |
-         | Text::Table::CSV              | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 0             |
-         | Text::Table::HTML             | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 1       | 1          | 1    | 0             |
-         | Text::Table::HTML::DataTables | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 1       | 1          | 1    | 0             |
-         | Text::Table::LTSV             | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 0          | 1    | 0             |
-         | Text::Table::Manifold         |              |                                                                                                | 0       | 1          | 1    | 0             |
-         | Text::Table::More             | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 1             |
-         | Text::Table::Org              | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 1             |
-         | Text::Table::Paragraph        | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 0             |
-         | Text::Table::Sprintf          | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 1             |
-         | Text::Table::TSV              | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 0          | 1    | 0             |
-         | Text::Table::TickitWidget     | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 0             |
-         | Text::Table::Tiny             | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 1             |
-         | Text::Table::TinyBorderStyle  | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 1             |
-         | Text::Table::TinyColor        | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 1             |
-         | Text::Table::TinyColorWide    | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 1             |
-         | Text::Table::TinyWide         | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 1             |
-         | Text::Table::XLSX             | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 0             |
-         | Text::TabularDisplay          |              |                                                                                                | 0       | 0          | 1    | 0             |
-         | Text::UnicodeBox::Table       |              |                                                                                                | 0       | 1          | 1    | 0             |
-         +-------------------------------+--------------+------------------------------------------------------------------------------------------------+---------+------------+------+---------------+
+         +-------------------------------+-------+--------------------------------------------------------------+--------------+------------------------------------------------------------------------------------------------+---------+------------+------+---------------+
+         | backend                       | align | align_note                                                   | backend_opts | backend_opts_note                                                                              | caption | header_row | rows | separate_rows |
+         +-------------------------------+-------+--------------------------------------------------------------+--------------+------------------------------------------------------------------------------------------------+---------+------------+------+---------------+
+         | Term::Table                   | 0     |                                                              |              |                                                                                                | 0       | 1          | 1    | 0             |
+         | Term::TablePrint              | 0     |                                                              |              |                                                                                                | 0       | 1          | 1    | 0             |
+         | Text::ANSITable               | 1     |                                                              |              |                                                                                                | 0       | 1          | 1    | 1             |
+         | Text::ASCIITable              | 1     |                                                              |              |                                                                                                | 0       | 1          | 1    | 0             |
+         | Text::FormatTable             | 1     | c(enter) alignment is not supported, will fallback to l(eft) |              |                                                                                                | 0       | 0          | 1    | 0             |
+         | Text::MarkdownTable           | 0     |                                                              |              |                                                                                                | 0       | 1          | 1    | 0             |
+         | Text::Table                   | 1     |                                                              |              |                                                                                                | 0       | 0          | 1    | 0             |
+         | Text::Table::ASV              | 0     |                                                              | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 0             |
+         | Text::Table::CSV              | 0     |                                                              | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 0             |
+         | Text::Table::HTML             | 0     | TODO, backend does not support yet, parameter already passed | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 1       | 1          | 1    | 0             |
+         | Text::Table::HTML::DataTables | 0     | TODO, backend does not support yet, parameter already passed | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 1       | 1          | 1    | 0             |
+         | Text::Table::LTSV             | 0     |                                                              | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 0          | 1    | 0             |
+         | Text::Table::Manifold         | 1     |                                                              |              |                                                                                                | 0       | 1          | 1    | 0             |
+         | Text::Table::More             | 1     |                                                              | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 1             |
+         | Text::Table::Org              | 0     |                                                              | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 1             |
+         | Text::Table::Paragraph        | 0     |                                                              | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 0             |
+         | Text::Table::Sprintf          | 0     |                                                              | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 1             |
+         | Text::Table::TSV              | 0     |                                                              | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 0          | 1    | 0             |
+         | Text::Table::TickitWidget     | 0     |                                                              | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 0             |
+         | Text::Table::Tiny             | 1     |                                                              | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 1             |
+         | Text::Table::TinyBorderStyle  | 0     | TODO, backend does not support yet, parameter already passed | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 1             |
+         | Text::Table::TinyColor        | 0     | TODO, backend does not support yet, parameter already passed | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 1             |
+         | Text::Table::TinyColorWide    | 0     | TODO, backend does not support yet, parameter already passed | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 1             |
+         | Text::Table::TinyWide         | 0     | TODO, backend does not support yet, parameter already passed | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 1             |
+         | Text::Table::XLSX             | 0     |                                                              | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 0             |
+         | Text::TabularDisplay          | 0     |                                                              |              |                                                                                                | 0       | 0          | 1    | 0             |
+         | Text::UnicodeBox::Table       | 0     | TODO: backend supports left/right                            |              |                                                                                                | 0       | 1          | 1    | 0             |
+         +-------------------------------+-------+--------------------------------------------------------------+--------------+------------------------------------------------------------------------------------------------+---------+------------+------+---------------+
 
     *   rows
 
@@ -278,6 +274,22 @@ FUNCTIONS
     *   caption
 
         Optional. Str. Caption of the table.
+
+    *   align
+
+        Optional. Array of Str or Str.
+
+        This takes an array ref with one entry per column, to specify the
+        alignment of that column. Legal values are 'l', 'c', and 'r'. You
+        can also specify a single alignment for all columns. ANSI escape
+        codes are handled.
+
+        Note that some backends like Text::ANSITable and Text::Table::More
+        support per-row or per-cell or even conditional alignment. Some
+        backends like Text::ASCIITable and Text::Table can also align beyond
+        just l(eft), c(enter), r(right), e.g. "justify" or align on a
+        decimal point. To do more fine-grained alignment setting, you can
+        use the "backend_opts" parameter.
 
     *   backend_opts
 
@@ -323,8 +335,8 @@ CONTRIBUTING
     me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016, 2015
-    by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016,
+    2015 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

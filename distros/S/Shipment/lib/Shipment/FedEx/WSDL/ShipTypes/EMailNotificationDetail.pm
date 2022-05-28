@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::EMailNotificationDetail;
-$Shipment::FedEx::WSDL::ShipTypes::EMailNotificationDetail::VERSION = '3.06';
+$Shipment::FedEx::WSDL::ShipTypes::EMailNotificationDetail::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/ship/v9'}
+sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,38 +20,42 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %AggregationType_of : ATTR(:get<AggregationType>);
-    my %PersonalMessage_of : ATTR(:get<PersonalMessage>);
-    my %Recipients_of : ATTR(:get<Recipients>);
+my %AggregationType_of :ATTR(:get<AggregationType>);
+my %PersonalMessage_of :ATTR(:get<PersonalMessage>);
+my %Recipients_of :ATTR(:get<Recipients>);
 
-    __PACKAGE__->_factory(
-        [   qw(        AggregationType
-              PersonalMessage
-              Recipients
+__PACKAGE__->_factory(
+    [ qw(        AggregationType
+        PersonalMessage
+        Recipients
 
-            )
-        ],
-        {   'AggregationType' => \%AggregationType_of,
-            'PersonalMessage' => \%PersonalMessage_of,
-            'Recipients'      => \%Recipients_of,
-        },
-        {   'AggregationType' =>
-              'Shipment::FedEx::WSDL::ShipTypes::EMailNotificationAggregationType',
-            'PersonalMessage' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Recipients'      =>
-              'Shipment::FedEx::WSDL::ShipTypes::EMailNotificationRecipient',
-        },
-        {
+    ) ],
+    {
+        'AggregationType' => \%AggregationType_of,
+        'PersonalMessage' => \%PersonalMessage_of,
+        'Recipients' => \%Recipients_of,
+    },
+    {
+        'AggregationType' => 'Shipment::FedEx::WSDL::ShipTypes::EMailNotificationAggregationType',
+        'PersonalMessage' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Recipients' => 'Shipment::FedEx::WSDL::ShipTypes::EMailNotificationRecipient',
+    },
+    {
 
-            'AggregationType' => 'AggregationType',
-            'PersonalMessage' => 'PersonalMessage',
-            'Recipients'      => 'Recipients',
-        }
-    );
+        'AggregationType' => 'AggregationType',
+        'PersonalMessage' => 'PersonalMessage',
+        'Recipients' => 'Recipients',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -68,7 +72,7 @@ Shipment::FedEx::WSDL::ShipTypes::EMailNotificationDetail
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

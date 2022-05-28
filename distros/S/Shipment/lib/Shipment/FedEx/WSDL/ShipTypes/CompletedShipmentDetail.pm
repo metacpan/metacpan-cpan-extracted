@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::CompletedShipmentDetail;
-$Shipment::FedEx::WSDL::ShipTypes::CompletedShipmentDetail::VERSION = '3.06';
+$Shipment::FedEx::WSDL::ShipTypes::CompletedShipmentDetail::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/ship/v9'}
+sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,127 +20,112 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %UsDomestic_of : ATTR(:get<UsDomestic>);
-    my %CarrierCode_of : ATTR(:get<CarrierCode>);
-    my %MasterTrackingId_of : ATTR(:get<MasterTrackingId>);
-    my %ServiceTypeDescription_of : ATTR(:get<ServiceTypeDescription>);
-    my %PackagingDescription_of : ATTR(:get<PackagingDescription>);
-    my %RoutingDetail_of : ATTR(:get<RoutingDetail>);
-    my %AccessDetail_of : ATTR(:get<AccessDetail>);
-    my %TagDetail_of : ATTR(:get<TagDetail>);
-    my %SmartPostDetail_of : ATTR(:get<SmartPostDetail>);
-    my %ShipmentRating_of : ATTR(:get<ShipmentRating>);
-    my %CodReturnDetail_of : ATTR(:get<CodReturnDetail>);
-    my %CompletedHoldAtLocationDetail_of :
-      ATTR(:get<CompletedHoldAtLocationDetail>);
-    my %IneligibleForMoneyBackGuarantee_of :
-      ATTR(:get<IneligibleForMoneyBackGuarantee>);
-    my %ExportComplianceStatement_of : ATTR(:get<ExportComplianceStatement>);
-    my %CompletedEtdDetail_of : ATTR(:get<CompletedEtdDetail>);
-    my %ShipmentDocuments_of : ATTR(:get<ShipmentDocuments>);
-    my %CompletedPackageDetails_of : ATTR(:get<CompletedPackageDetails>);
+my %UsDomestic_of :ATTR(:get<UsDomestic>);
+my %CarrierCode_of :ATTR(:get<CarrierCode>);
+my %MasterTrackingId_of :ATTR(:get<MasterTrackingId>);
+my %ServiceTypeDescription_of :ATTR(:get<ServiceTypeDescription>);
+my %PackagingDescription_of :ATTR(:get<PackagingDescription>);
+my %RoutingDetail_of :ATTR(:get<RoutingDetail>);
+my %AccessDetail_of :ATTR(:get<AccessDetail>);
+my %TagDetail_of :ATTR(:get<TagDetail>);
+my %SmartPostDetail_of :ATTR(:get<SmartPostDetail>);
+my %ShipmentRating_of :ATTR(:get<ShipmentRating>);
+my %CodReturnDetail_of :ATTR(:get<CodReturnDetail>);
+my %CompletedHoldAtLocationDetail_of :ATTR(:get<CompletedHoldAtLocationDetail>);
+my %IneligibleForMoneyBackGuarantee_of :ATTR(:get<IneligibleForMoneyBackGuarantee>);
+my %ExportComplianceStatement_of :ATTR(:get<ExportComplianceStatement>);
+my %CompletedEtdDetail_of :ATTR(:get<CompletedEtdDetail>);
+my %ShipmentDocuments_of :ATTR(:get<ShipmentDocuments>);
+my %CompletedPackageDetails_of :ATTR(:get<CompletedPackageDetails>);
 
-    __PACKAGE__->_factory(
-        [   qw(        UsDomestic
-              CarrierCode
-              MasterTrackingId
-              ServiceTypeDescription
-              PackagingDescription
-              RoutingDetail
-              AccessDetail
-              TagDetail
-              SmartPostDetail
-              ShipmentRating
-              CodReturnDetail
-              CompletedHoldAtLocationDetail
-              IneligibleForMoneyBackGuarantee
-              ExportComplianceStatement
-              CompletedEtdDetail
-              ShipmentDocuments
-              CompletedPackageDetails
+__PACKAGE__->_factory(
+    [ qw(        UsDomestic
+        CarrierCode
+        MasterTrackingId
+        ServiceTypeDescription
+        PackagingDescription
+        RoutingDetail
+        AccessDetail
+        TagDetail
+        SmartPostDetail
+        ShipmentRating
+        CodReturnDetail
+        CompletedHoldAtLocationDetail
+        IneligibleForMoneyBackGuarantee
+        ExportComplianceStatement
+        CompletedEtdDetail
+        ShipmentDocuments
+        CompletedPackageDetails
 
-            )
-        ],
-        {   'UsDomestic'                    => \%UsDomestic_of,
-            'CarrierCode'                   => \%CarrierCode_of,
-            'MasterTrackingId'              => \%MasterTrackingId_of,
-            'ServiceTypeDescription'        => \%ServiceTypeDescription_of,
-            'PackagingDescription'          => \%PackagingDescription_of,
-            'RoutingDetail'                 => \%RoutingDetail_of,
-            'AccessDetail'                  => \%AccessDetail_of,
-            'TagDetail'                     => \%TagDetail_of,
-            'SmartPostDetail'               => \%SmartPostDetail_of,
-            'ShipmentRating'                => \%ShipmentRating_of,
-            'CodReturnDetail'               => \%CodReturnDetail_of,
-            'CompletedHoldAtLocationDetail' =>
-              \%CompletedHoldAtLocationDetail_of,
-            'IneligibleForMoneyBackGuarantee' =>
-              \%IneligibleForMoneyBackGuarantee_of,
-            'ExportComplianceStatement' => \%ExportComplianceStatement_of,
-            'CompletedEtdDetail'        => \%CompletedEtdDetail_of,
-            'ShipmentDocuments'         => \%ShipmentDocuments_of,
-            'CompletedPackageDetails'   => \%CompletedPackageDetails_of,
-        },
-        {   'UsDomestic'  => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-            'CarrierCode' =>
-              'Shipment::FedEx::WSDL::ShipTypes::CarrierCodeType',
-            'MasterTrackingId' =>
-              'Shipment::FedEx::WSDL::ShipTypes::TrackingId',
-            'ServiceTypeDescription' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'PackagingDescription' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'RoutingDetail' =>
-              'Shipment::FedEx::WSDL::ShipTypes::ShipmentRoutingDetail',
-            'AccessDetail' =>
-              'Shipment::FedEx::WSDL::ShipTypes::PendingShipmentAccessDetail',
-            'TagDetail' =>
-              'Shipment::FedEx::WSDL::ShipTypes::CompletedTagDetail',
-            'SmartPostDetail' =>
-              'Shipment::FedEx::WSDL::ShipTypes::CompletedSmartPostDetail',
-            'ShipmentRating' =>
-              'Shipment::FedEx::WSDL::ShipTypes::ShipmentRating',
-            'CodReturnDetail' =>
-              'Shipment::FedEx::WSDL::ShipTypes::CodReturnShipmentDetail',
-            'CompletedHoldAtLocationDetail' =>
-              'Shipment::FedEx::WSDL::ShipTypes::CompletedHoldAtLocationDetail',
-            'IneligibleForMoneyBackGuarantee' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-            'ExportComplianceStatement' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'CompletedEtdDetail' =>
-              'Shipment::FedEx::WSDL::ShipTypes::CompletedEtdDetail',
-            'ShipmentDocuments' =>
-              'Shipment::FedEx::WSDL::ShipTypes::ShippingDocument',
-            'CompletedPackageDetails' =>
-              'Shipment::FedEx::WSDL::ShipTypes::CompletedPackageDetail',
-        },
-        {
+    ) ],
+    {
+        'UsDomestic' => \%UsDomestic_of,
+        'CarrierCode' => \%CarrierCode_of,
+        'MasterTrackingId' => \%MasterTrackingId_of,
+        'ServiceTypeDescription' => \%ServiceTypeDescription_of,
+        'PackagingDescription' => \%PackagingDescription_of,
+        'RoutingDetail' => \%RoutingDetail_of,
+        'AccessDetail' => \%AccessDetail_of,
+        'TagDetail' => \%TagDetail_of,
+        'SmartPostDetail' => \%SmartPostDetail_of,
+        'ShipmentRating' => \%ShipmentRating_of,
+        'CodReturnDetail' => \%CodReturnDetail_of,
+        'CompletedHoldAtLocationDetail' => \%CompletedHoldAtLocationDetail_of,
+        'IneligibleForMoneyBackGuarantee' => \%IneligibleForMoneyBackGuarantee_of,
+        'ExportComplianceStatement' => \%ExportComplianceStatement_of,
+        'CompletedEtdDetail' => \%CompletedEtdDetail_of,
+        'ShipmentDocuments' => \%ShipmentDocuments_of,
+        'CompletedPackageDetails' => \%CompletedPackageDetails_of,
+    },
+    {
+        'UsDomestic' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+        'CarrierCode' => 'Shipment::FedEx::WSDL::ShipTypes::CarrierCodeType',
+        'MasterTrackingId' => 'Shipment::FedEx::WSDL::ShipTypes::TrackingId',
+        'ServiceTypeDescription' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'PackagingDescription' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'RoutingDetail' => 'Shipment::FedEx::WSDL::ShipTypes::ShipmentRoutingDetail',
+        'AccessDetail' => 'Shipment::FedEx::WSDL::ShipTypes::PendingShipmentAccessDetail',
+        'TagDetail' => 'Shipment::FedEx::WSDL::ShipTypes::CompletedTagDetail',
+        'SmartPostDetail' => 'Shipment::FedEx::WSDL::ShipTypes::CompletedSmartPostDetail',
+        'ShipmentRating' => 'Shipment::FedEx::WSDL::ShipTypes::ShipmentRating',
+        'CodReturnDetail' => 'Shipment::FedEx::WSDL::ShipTypes::CodReturnShipmentDetail',
+        'CompletedHoldAtLocationDetail' => 'Shipment::FedEx::WSDL::ShipTypes::CompletedHoldAtLocationDetail',
+        'IneligibleForMoneyBackGuarantee' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+        'ExportComplianceStatement' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'CompletedEtdDetail' => 'Shipment::FedEx::WSDL::ShipTypes::CompletedEtdDetail',
+        'ShipmentDocuments' => 'Shipment::FedEx::WSDL::ShipTypes::ShippingDocument',
+        'CompletedPackageDetails' => 'Shipment::FedEx::WSDL::ShipTypes::CompletedPackageDetail',
+    },
+    {
 
-            'UsDomestic'                    => 'UsDomestic',
-            'CarrierCode'                   => 'CarrierCode',
-            'MasterTrackingId'              => 'MasterTrackingId',
-            'ServiceTypeDescription'        => 'ServiceTypeDescription',
-            'PackagingDescription'          => 'PackagingDescription',
-            'RoutingDetail'                 => 'RoutingDetail',
-            'AccessDetail'                  => 'AccessDetail',
-            'TagDetail'                     => 'TagDetail',
-            'SmartPostDetail'               => 'SmartPostDetail',
-            'ShipmentRating'                => 'ShipmentRating',
-            'CodReturnDetail'               => 'CodReturnDetail',
-            'CompletedHoldAtLocationDetail' => 'CompletedHoldAtLocationDetail',
-            'IneligibleForMoneyBackGuarantee' =>
-              'IneligibleForMoneyBackGuarantee',
-            'ExportComplianceStatement' => 'ExportComplianceStatement',
-            'CompletedEtdDetail'        => 'CompletedEtdDetail',
-            'ShipmentDocuments'         => 'ShipmentDocuments',
-            'CompletedPackageDetails'   => 'CompletedPackageDetails',
-        }
-    );
+        'UsDomestic' => 'UsDomestic',
+        'CarrierCode' => 'CarrierCode',
+        'MasterTrackingId' => 'MasterTrackingId',
+        'ServiceTypeDescription' => 'ServiceTypeDescription',
+        'PackagingDescription' => 'PackagingDescription',
+        'RoutingDetail' => 'RoutingDetail',
+        'AccessDetail' => 'AccessDetail',
+        'TagDetail' => 'TagDetail',
+        'SmartPostDetail' => 'SmartPostDetail',
+        'ShipmentRating' => 'ShipmentRating',
+        'CodReturnDetail' => 'CodReturnDetail',
+        'CompletedHoldAtLocationDetail' => 'CompletedHoldAtLocationDetail',
+        'IneligibleForMoneyBackGuarantee' => 'IneligibleForMoneyBackGuarantee',
+        'ExportComplianceStatement' => 'ExportComplianceStatement',
+        'CompletedEtdDetail' => 'CompletedEtdDetail',
+        'ShipmentDocuments' => 'ShipmentDocuments',
+        'CompletedPackageDetails' => 'CompletedPackageDetails',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -157,7 +142,7 @@ Shipment::FedEx::WSDL::ShipTypes::CompletedShipmentDetail
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

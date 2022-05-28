@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::PackageInformation;
-$Shipment::Purolator::WSDL::Types::PackageInformation::VERSION = '3.06';
+$Shipment::Purolator::WSDL::Types::PackageInformation::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,62 +20,62 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %ServiceID_of : ATTR(:get<ServiceID>);
-    my %Description_of : ATTR(:get<Description>);
-    my %TotalWeight_of : ATTR(:get<TotalWeight>);
-    my %TotalPieces_of : ATTR(:get<TotalPieces>);
-    my %PiecesInformation_of : ATTR(:get<PiecesInformation>);
-    my %DangerousGoodsDeclarationDocumentIndicator_of :
-      ATTR(:get<DangerousGoodsDeclarationDocumentIndicator>);
-    my %OptionsInformation_of : ATTR(:get<OptionsInformation>);
+my %ServiceID_of :ATTR(:get<ServiceID>);
+my %Description_of :ATTR(:get<Description>);
+my %TotalWeight_of :ATTR(:get<TotalWeight>);
+my %TotalPieces_of :ATTR(:get<TotalPieces>);
+my %PiecesInformation_of :ATTR(:get<PiecesInformation>);
+my %DangerousGoodsDeclarationDocumentIndicator_of :ATTR(:get<DangerousGoodsDeclarationDocumentIndicator>);
+my %OptionsInformation_of :ATTR(:get<OptionsInformation>);
 
-    __PACKAGE__->_factory(
-        [   qw(        ServiceID
-              Description
-              TotalWeight
-              TotalPieces
-              PiecesInformation
-              DangerousGoodsDeclarationDocumentIndicator
-              OptionsInformation
+__PACKAGE__->_factory(
+    [ qw(        ServiceID
+        Description
+        TotalWeight
+        TotalPieces
+        PiecesInformation
+        DangerousGoodsDeclarationDocumentIndicator
+        OptionsInformation
 
-            )
-        ],
-        {   'ServiceID'         => \%ServiceID_of,
-            'Description'       => \%Description_of,
-            'TotalWeight'       => \%TotalWeight_of,
-            'TotalPieces'       => \%TotalPieces_of,
-            'PiecesInformation' => \%PiecesInformation_of,
-            'DangerousGoodsDeclarationDocumentIndicator' =>
-              \%DangerousGoodsDeclarationDocumentIndicator_of,
-            'OptionsInformation' => \%OptionsInformation_of,
-        },
-        {   'ServiceID'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'TotalWeight' => 'Shipment::Purolator::WSDL::Types::TotalWeight',
-            'TotalPieces' => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
-            'PiecesInformation' =>
-              'Shipment::Purolator::WSDL::Types::ArrayOfPiece',
-            'DangerousGoodsDeclarationDocumentIndicator' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-            'OptionsInformation' =>
-              'Shipment::Purolator::WSDL::Types::OptionsInformation',
-        },
-        {
+    ) ],
+    {
+        'ServiceID' => \%ServiceID_of,
+        'Description' => \%Description_of,
+        'TotalWeight' => \%TotalWeight_of,
+        'TotalPieces' => \%TotalPieces_of,
+        'PiecesInformation' => \%PiecesInformation_of,
+        'DangerousGoodsDeclarationDocumentIndicator' => \%DangerousGoodsDeclarationDocumentIndicator_of,
+        'OptionsInformation' => \%OptionsInformation_of,
+    },
+    {
+        'ServiceID' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'TotalWeight' => 'Shipment::Purolator::WSDL::Types::TotalWeight',
+        'TotalPieces' => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
+        'PiecesInformation' => 'Shipment::Purolator::WSDL::Types::ArrayOfPiece',
+        'DangerousGoodsDeclarationDocumentIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+        'OptionsInformation' => 'Shipment::Purolator::WSDL::Types::OptionsInformation',
+    },
+    {
 
-            'ServiceID'         => 'ServiceID',
-            'Description'       => 'Description',
-            'TotalWeight'       => 'TotalWeight',
-            'TotalPieces'       => 'TotalPieces',
-            'PiecesInformation' => 'PiecesInformation',
-            'DangerousGoodsDeclarationDocumentIndicator' =>
-              'DangerousGoodsDeclarationDocumentIndicator',
-            'OptionsInformation' => 'OptionsInformation',
-        }
-    );
+        'ServiceID' => 'ServiceID',
+        'Description' => 'Description',
+        'TotalWeight' => 'TotalWeight',
+        'TotalPieces' => 'TotalPieces',
+        'PiecesInformation' => 'PiecesInformation',
+        'DangerousGoodsDeclarationDocumentIndicator' => 'DangerousGoodsDeclarationDocumentIndicator',
+        'OptionsInformation' => 'OptionsInformation',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -92,7 +92,7 @@ Shipment::Purolator::WSDL::Types::PackageInformation
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

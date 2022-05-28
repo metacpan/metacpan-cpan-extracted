@@ -1,22 +1,22 @@
 
 package Shipment::FedEx::WSDL::ShipElements::CancelPendingShipmentReply;
-$Shipment::FedEx::WSDL::ShipElements::CancelPendingShipmentReply::VERSION = '3.06';
+$Shipment::FedEx::WSDL::ShipElements::CancelPendingShipmentReply::VERSION = '3.07';
 use strict;
 use warnings;
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    sub get_xmlns {'http://fedex.com/ws/ship/v9'}
+sub get_xmlns { 'http://fedex.com/ws/ship/v9' }
 
-    __PACKAGE__->__set_name('CancelPendingShipmentReply');
-    __PACKAGE__->__set_nillable();
-    __PACKAGE__->__set_minOccurs();
-    __PACKAGE__->__set_maxOccurs();
-    __PACKAGE__->__set_ref();
-    use base qw(
-      SOAP::WSDL::XSD::Typelib::Element
-      Shipment::FedEx::WSDL::ShipTypes::CancelPendingShipmentReply
-    );
+__PACKAGE__->__set_name('CancelPendingShipmentReply');
+__PACKAGE__->__set_nillable();
+__PACKAGE__->__set_minOccurs();
+__PACKAGE__->__set_maxOccurs();
+__PACKAGE__->__set_ref();
+use base qw(
+    SOAP::WSDL::XSD::Typelib::Element
+    Shipment::FedEx::WSDL::ShipTypes::CancelPendingShipmentReply
+);
 
 }
 
@@ -34,7 +34,7 @@ Shipment::FedEx::WSDL::ShipElements::CancelPendingShipmentReply
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

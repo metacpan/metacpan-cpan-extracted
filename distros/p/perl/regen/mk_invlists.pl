@@ -14,6 +14,7 @@ use Unicode::UCD qw(prop_aliases
 require './regen/regen_lib.pl';
 require './regen/charset_translations.pl';
 require './lib/unicore/UCD.pl';
+require './regen/mph.pl';
 use re "/aa";
 
 # This program outputs charclass_invlists.h, which contains various inversion
@@ -1543,10 +1544,15 @@ sub output_LB_table() {
         }
     }
 
-    # LB30b Do not break between an emoji base and an emoji modifier.
+    # LB30b Do not break between an emoji base (or potential emoji) and an
+    # emoji modifier.
+
     # EB × EM
+    # [\p{Extended_Pictographic}&\p{Cn}] × EM
     $lb_table[$lb_enums{'E_Base'}][$lb_enums{'E_Modifier'}]
                                                 = $lb_actions{'LB_NOBREAK'};
+    $lb_table[$lb_enums{'Unassigned_Extended_Pictographic_Ideographic'}]
+                      [$lb_enums{'E_Modifier'}] = $lb_actions{'LB_NOBREAK'};
 
     # LB30a Break between two regional indicator symbols if and only if there
     # are an even number of regional indicators preceding the position of the
@@ -1561,6 +1567,8 @@ sub output_LB_table() {
     # parentheses.
 
     # (AL | HL | NU) × [OP-[\p{ea=F}\p{ea=W}\p{ea=H}]]
+    # (what we call CP and OP here have already been modified by mktables to
+    # exclude the ea items
     $lb_table[$lb_enums{'Alphabetic'}][$lb_enums{'Open_Punctuation'}]
                                                 = $lb_actions{'LB_NOBREAK'};
     $lb_table[$lb_enums{'Hebrew_Letter'}][$lb_enums{'Open_Punctuation'}]
@@ -1595,18 +1603,6 @@ sub output_LB_table() {
                                                 = $lb_actions{'LB_NOBREAK'};
 
     # LB27 Treat a Korean Syllable Block the same as ID.
-    # (JL | JV | JT | H2 | H3) × IN
-    $lb_table[$lb_enums{'JL'}][$lb_enums{'Inseparable'}]
-                                                = $lb_actions{'LB_NOBREAK'};
-    $lb_table[$lb_enums{'JV'}][$lb_enums{'Inseparable'}]
-                                                = $lb_actions{'LB_NOBREAK'};
-    $lb_table[$lb_enums{'JT'}][$lb_enums{'Inseparable'}]
-                                                = $lb_actions{'LB_NOBREAK'};
-    $lb_table[$lb_enums{'H2'}][$lb_enums{'Inseparable'}]
-                                                = $lb_actions{'LB_NOBREAK'};
-    $lb_table[$lb_enums{'H3'}][$lb_enums{'Inseparable'}]
-                                                = $lb_actions{'LB_NOBREAK'};
-
     # (JL | JV | JT | H2 | H3) × PO
     $lb_table[$lb_enums{'JL'}][$lb_enums{'Postfix_Numeric'}]
                                                 = $lb_actions{'LB_NOBREAK'};
@@ -1783,6 +1779,9 @@ sub output_LB_table() {
     # PR × (ID | EB | EM)
     $lb_table[$lb_enums{'Prefix_Numeric'}][$lb_enums{'Ideographic'}]
                                                 = $lb_actions{'LB_NOBREAK'};
+    $lb_table[$lb_enums{'Prefix_Numeric'}]
+        [$lb_enums{'Unassigned_Extended_Pictographic_Ideographic'}]
+                                                = $lb_actions{'LB_NOBREAK'};
     $lb_table[$lb_enums{'Prefix_Numeric'}][$lb_enums{'E_Base'}]
                                                 = $lb_actions{'LB_NOBREAK'};
     $lb_table[$lb_enums{'Prefix_Numeric'}][$lb_enums{'E_Modifier'}]
@@ -1791,6 +1790,8 @@ sub output_LB_table() {
     # (ID | EB | EM) × PO
     $lb_table[$lb_enums{'Ideographic'}][$lb_enums{'Postfix_Numeric'}]
                                                 = $lb_actions{'LB_NOBREAK'};
+    $lb_table[$lb_enums{'Unassigned_Extended_Pictographic_Ideographic'}]
+                 [$lb_enums{'Postfix_Numeric'}] = $lb_actions{'LB_NOBREAK'};
     $lb_table[$lb_enums{'E_Base'}][$lb_enums{'Postfix_Numeric'}]
                                                 = $lb_actions{'LB_NOBREAK'};
     $lb_table[$lb_enums{'E_Modifier'}][$lb_enums{'Postfix_Numeric'}]
@@ -2414,6 +2415,14 @@ sub sanitize_name ($) {
     return $sanitized;
 }
 
+sub token_name
+{
+    my $name = sanitize_name(shift);
+    warn "$name contains non-word" if $name =~ /\W/;
+
+    return "$table_name_prefix\U$name"
+}
+
 switch_pound_if ('ALL', 'PERL_IN_REGCOMP_C');
 
 output_invlist("Latin1", [ 0, 256 ]);
@@ -2462,7 +2471,7 @@ my @props;
 push @props, sort { prop_name_for_cmp($a) cmp prop_name_for_cmp($b) } qw(
                     &UpperLatin1
                     _Perl_GCB,EDGE,E_Base,E_Base_GAZ,E_Modifier,Glue_After_Zwj,LV,Prepend,Regional_Indicator,SpacingMark,ZWJ,ExtPict_XX
-                    _Perl_LB,EDGE,Close_Parenthesis,Hebrew_Letter,Next_Line,Regional_Indicator,ZWJ,Contingent_Break,E_Base,E_Modifier,H2,H3,JL,JT,JV,Word_Joiner,East_Asian_CP,East_Asian_OP
+                    _Perl_LB,EDGE,Close_Parenthesis,Hebrew_Letter,Next_Line,Regional_Indicator,ZWJ,Contingent_Break,E_Base,E_Modifier,H2,H3,JL,JT,JV,Word_Joiner,East_Asian_CP,East_Asian_OP,Unassigned_Extended_Pictographic_Ideographic
                     _Perl_SB,EDGE,SContinue,CR,Extend,LF
                     _Perl_WB,Perl_Tailored_HSpace,EDGE,UNKNOWN,CR,Double_Quote,E_Base,E_Base_GAZ,E_Modifier,Extend,Glue_After_Zwj,Hebrew_Letter,LF,MidNumLet,Newline,Regional_Indicator,Single_Quote,ZWJ,ExtPict_XX,ExtPict_LE
                     _Perl_SCX,Latin,Inherited,Unknown,Kore,Jpan,Hanb,INVALID
@@ -3341,14 +3350,15 @@ my $uni_pl = open_new('lib/unicore/uni_keywords.pl', '>',
 
 read_only_bottom_close_and_rename($uni_pl, \@sources);
 
-require './regen/mph.pl';
+if (my $file= $ENV{DUMP_KEYWORDS_FILE}) {
+    require Data::Dumper;
 
-sub token_name
-{
-    my $name = sanitize_name(shift);
-    warn "$name contains non-word" if $name =~ /\W/;
-
-    return "$table_name_prefix\U$name"
+    open my $ofh, ">", $file
+        or die "Failed to open DUMP_KEYWORDS_FILE '$file' for write: $!";
+    print $ofh Data::Dumper->new([\%keywords],['*keywords'])
+                           ->Sortkeys(1)->Useqq(1)->Dump();
+    close $ofh;
+    print "Wrote keywords to '$file'.\n";
 }
 
 my $keywords_fh = open_new('uni_keywords.h', '>',
@@ -3357,12 +3367,19 @@ my $keywords_fh = open_new('uni_keywords.h', '>',
 
 print $keywords_fh "\n#if defined(PERL_CORE) || defined(PERL_EXT_RE_BUILD)\n\n";
 
-my ($second_level, $seed1, $length_all_keys, $smart_blob, $rows)
-                        = MinimalPerfectHash::make_mph_from_hash(\%keywords);
-print $keywords_fh MinimalPerfectHash::make_algo($second_level, $seed1,
-                                                 $length_all_keys, $smart_blob,
-                                                 $rows, undef, undef, undef,
-                                                 'match_uniprop' );
+my $mph= MinimalPerfectHash->new(
+    source_hash => \%keywords,
+    match_name => "match_uniprop",
+    simple_split => $ENV{SIMPLE_SPLIT} // 0,
+    randomize_squeeze => $ENV{RANDOMIZE_SQUEEZE} // 1,
+    max_same_in_squeeze => $ENV{MAX_SAME} // 5,
+    srand_seed => (lc($ENV{SRAND_SEED}//"") eq "auto")
+                  ? undef
+                  : $ENV{SRAND_SEED} // 1785235451, # I let perl pick a number
+);
+$mph->make_mph_with_split_keys();
+print $keywords_fh $mph->make_algo();
+
 print $keywords_fh "\n#endif /* #if defined(PERL_CORE) || defined(PERL_EXT_RE_BUILD) */\n";
 
 push @sources, 'regen/mph.pl';

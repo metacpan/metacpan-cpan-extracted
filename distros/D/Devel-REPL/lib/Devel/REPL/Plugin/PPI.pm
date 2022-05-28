@@ -3,7 +3,7 @@ use warnings;
 package Devel::REPL::Plugin::PPI;
 # ABSTRACT: PPI dumping of Perl code
 
-our $VERSION = '1.003028';
+our $VERSION = '1.003029';
 
 use Devel::REPL::Plugin;
 use PPI;
@@ -37,7 +37,7 @@ Devel::REPL::Plugin::PPI - PPI dumping of Perl code
 
 =head1 VERSION
 
-version 1.003028
+version 1.003029
 
 =head1 SYNOPSIS
 

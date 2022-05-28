@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010000;
+use 5.016;
 
 use ExtUtils::MakeMaker;
 
@@ -14,10 +14,11 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Git-MoreHooks",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010000",
+  "MIN_PERL_VERSION" => "5.016",
   "NAME" => "Git::MoreHooks",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Config::Tiny" => 0,
     "Const::Fast" => 0,
     "Cwd" => 0,
     "English" => 0,
@@ -26,10 +27,14 @@ my %WriteMakefileArgs = (
     "Git::Hooks" => "3.000000",
     "Git::Mailmap" => 0,
     "Jenkins::API" => 0,
+    "List::MoreUtils" => 0,
     "Log::Any" => 0,
+    "Module::Load" => 0,
     "Params::Validate" => 0,
     "Path::Tiny" => 0,
     "Template" => 0,
+    "Text::Glob" => 0,
+    "feature" => 0,
     "strict" => 0,
     "utf8" => 0,
     "warnings" => 0
@@ -38,9 +43,10 @@ my %WriteMakefileArgs = (
     "Git::Hooks::Test" => 0,
     "Git::Repository" => 0,
     "Log::Any::Adapter" => 0,
-    "Test2::V0" => 0
+    "Test2::V0" => 0,
+    "Test::Git" => 0
   },
-  "VERSION" => "0.014",
+  "VERSION" => "0.015",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,6 +55,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Config::Tiny" => 0,
   "Const::Fast" => 0,
   "Cwd" => 0,
   "English" => 0,
@@ -59,12 +66,17 @@ my %FallbackPrereqs = (
   "Git::Mailmap" => 0,
   "Git::Repository" => 0,
   "Jenkins::API" => 0,
+  "List::MoreUtils" => 0,
   "Log::Any" => 0,
   "Log::Any::Adapter" => 0,
+  "Module::Load" => 0,
   "Params::Validate" => 0,
   "Path::Tiny" => 0,
   "Template" => 0,
   "Test2::V0" => 0,
+  "Test::Git" => 0,
+  "Text::Glob" => 0,
+  "feature" => 0,
   "strict" => 0,
   "utf8" => 0,
   "warnings" => 0

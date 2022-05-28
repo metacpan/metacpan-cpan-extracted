@@ -1,5 +1,5 @@
 package Shipment::Activity;
-$Shipment::Activity::VERSION = '3.06';
+$Shipment::Activity::VERSION = '3.07';
 use strict;
 use warnings;
 
@@ -14,8 +14,8 @@ use namespace::clean;
 
 
 has 'description' => (
-    is  => 'rw',
-    isa => Str,
+  is => 'rw',
+  isa => Str,
 );
 
 
@@ -27,9 +27,10 @@ has 'date' => (
 
 
 has 'location' => (
-    is  => 'rw',
-    isa => InstanceOf ['Shipment::Address'],
+  is => 'rw',
+  isa => InstanceOf['Shipment::Address'],
 );
+
 
 
 1;
@@ -46,7 +47,7 @@ Shipment::Activity
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 SYNOPSIS
 

@@ -210,9 +210,9 @@ Perl_av_extend_guts(pTHX_ AV *av, SSize_t key, SSize_t *maxp, SV ***allocp,
 =for apidoc av_fetch
 
 Returns the SV at the specified index in the array.  The C<key> is the
-index.  If lval is true, you are guaranteed to get a real SV back (in case
+index.  If C<lval> is true, you are guaranteed to get a real SV back (in case
 it wasn't real before), which you can then modify.  Check that the return
-value is non-null before dereferencing it to a C<SV*>.
+value is non-NULL before dereferencing it to a C<SV*>.
 
 See L<perlguts/"Understanding the Magic of Tied Hashes and Arrays"> for
 more information on how to use this function on tied arrays. 
@@ -267,8 +267,7 @@ Perl_av_fetch(pTHX_ AV *av, SSize_t key, I32 lval)
                         return NULL;
             }
 
-            sv = sv_newmortal();
-            sv_upgrade(sv, SVt_PVLV);
+            sv = newSV_type_mortal(SVt_PVLV);
             mg_copy(MUTABLE_SV(av), sv, 0, key);
             if (!tied_magic) /* for regdata, force leavesub to make copies */
                 SvTEMP_off(sv);
@@ -292,7 +291,7 @@ Perl_av_fetch(pTHX_ AV *av, SSize_t key, I32 lval)
 
     if (!AvARRAY(av)[key]) {
       emptyness:
-        return lval ? av_store(av,key,newSV(0)) : NULL;
+        return lval ? av_store(av,key,newSV_type(SVt_NULL)) : NULL;
     }
 
     return &AvARRAY(av)[key];
@@ -394,11 +393,53 @@ Perl_av_store(pTHX_ AV *av, SSize_t key, SV *val)
 }
 
 /*
+=for apidoc av_new_alloc
+
+This implements L<perlapi/C<newAV_alloc_x>>
+and L<perlapi/C<newAV_alloc_xz>>, which are the public API for this
+functionality.
+
+Creates a new AV and allocates its SV* array.
+
+This is similar to, but more efficient than doing:
+
+    AV *av = newAV();
+    av_extend(av, key);
+
+The size parameter is used to pre-allocate a SV* array large enough to
+hold at least elements C<0..(size-1)>.  C<size> must be at least 1.
+
+The C<zeroflag> parameter controls whether or not the array is NULL
+initialized.
+
+=cut
+*/
+
+AV *
+Perl_av_new_alloc(pTHX_ SSize_t size, bool zeroflag)
+{
+    AV * const av = newAV();
+    SV** ary;
+    PERL_ARGS_ASSERT_AV_NEW_ALLOC;
+    assert(size > 0);
+
+    Newx(ary, size, SV*); /* Newx performs the memwrap check */
+    AvALLOC(av) = ary;
+    AvARRAY(av) = ary;
+    AvMAX(av) = size - 1;
+
+    if (zeroflag)
+        Zero(ary, size, SV*);
+
+    return av;
+}
+
+/*
 =for apidoc av_make
 
-Creates a new AV and populates it with a list of SVs.  The SVs are copied
-into the array, so they may be freed after the call to C<av_make>.  The new AV
-will have a reference count of 1.
+Creates a new AV and populates it with a list (C<**strp>, length C<size>) of
+SVs.  A copy is made of each SV, so their refcounts are not changed.  The new
+AV will have a reference count of 1.
 
 Perl equivalent: C<my @new_array = ($scalar1, $scalar2, $scalar3...);>
 
@@ -436,7 +477,7 @@ Perl_av_make(pTHX_ SSize_t size, SV **strp)
 
             SvGETMAGIC(*strp); /* before newSV, in case it dies */
             AvFILLp(av)++;
-            ary[i] = newSV(0);
+            ary[i] = newSV_type(SVt_NULL);
             sv_setsv_flags(ary[i], *strp,
                            SV_DO_COW_SVSETSV|SV_NOSTEAL);
             strp++;
@@ -1087,7 +1128,7 @@ Perl_av_iter_p(pTHX_ AV *av) {
 
 SV *
 Perl_av_nonelem(pTHX_ AV *av, SSize_t ix) {
-    SV * const sv = newSV(0);
+    SV * const sv = newSV_type(SVt_NULL);
     PERL_ARGS_ASSERT_AV_NONELEM;
     if (!av_store(av,ix,sv))
         return sv_2mortal(sv); /* has tie magic */

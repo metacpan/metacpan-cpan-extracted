@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::SCReportType;
-$Shipment::UPS::WSDL::ShipTypes::SCReportType::VERSION = '3.06';
+$Shipment::UPS::WSDL::ShipTypes::SCReportType::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,24 +20,32 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Image_of : ATTR(:get<Image>);
+my %Image_of :ATTR(:get<Image>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Image
+__PACKAGE__->_factory(
+    [ qw(        Image
 
-            )
-        ],
-        {'Image' => \%Image_of,},
-        {'Image' => 'Shipment::UPS::WSDL::ShipTypes::ImageType',},
-        {
+    ) ],
+    {
+        'Image' => \%Image_of,
+    },
+    {
+        'Image' => 'Shipment::UPS::WSDL::ShipTypes::ImageType',
+    },
+    {
 
-            'Image' => 'Image',
-        }
-    );
+        'Image' => 'Image',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -54,7 +62,7 @@ Shipment::UPS::WSDL::ShipTypes::SCReportType
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

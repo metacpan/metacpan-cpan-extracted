@@ -13,10 +13,12 @@ __DATA__
 AnnoCPAN
 CPAN
 Chaves
+CheckCommit
 CheckCommitAuthor
 CheckCommitAuthorFromMailmap
 CheckCommitBase
 CheckIndent
+CheckPerl
 Gerrit
 Git
 GitRepoAdmin
@@ -44,6 +46,7 @@ Timestamp
 TriggerJenkins
 VCS
 alnum
+applypatch
 ascii
 aws
 cas

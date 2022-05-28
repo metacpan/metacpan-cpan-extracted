@@ -9,7 +9,7 @@ use POSIX qw(ceil);
 use WWW::Twilio::API;
 use namespace::clean;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our $MAX_TWILIO_LENGTH = 160;   # max length of SMS message allowed by Twilio
 
 sub new {
@@ -52,7 +52,7 @@ sub log_message {
 
     my @to_send = $self->_expand_message($msg{message});
     foreach my $entry (@to_send) {
-        my $res = $twilio->POST('SMS/Messages',
+        my $res = $twilio->POST('Messages',
             From => $self->{from},
             To   => $self->{to},
             Body => $entry,

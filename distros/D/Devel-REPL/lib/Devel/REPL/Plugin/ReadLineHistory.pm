@@ -8,15 +8,14 @@ use warnings;
 package Devel::REPL::Plugin::ReadLineHistory;
 # ABSTRACT: Integrate history with the facilities provided by L<Term::ReadLine>
 
-our $VERSION = '1.003028';
+our $VERSION = '1.003029';
 
 use Devel::REPL::Plugin;
-use File::HomeDir;
 use File::Spec;
 use namespace::autoclean;
 
 my $hist_file = $ENV{PERLREPL_HISTFILE} ||
-    File::Spec->catfile(File::HomeDir->my_home, '.perlreplhist');
+    File::Spec->catfile(($^O eq 'MSWin32' && "$]" < 5.016 ? $ENV{HOME} || $ENV{USERPROFILE} : (<~>)[0]), '.perlreplhist');
 
 # HISTLEN should probably be in a config file to stop people accidentally
 # truncating their history if they start the program and forget to set
@@ -84,7 +83,7 @@ Devel::REPL::Plugin::ReadLineHistory - Integrate history with the facilities pro
 
 =head1 VERSION
 
-version 1.003028
+version 1.003029
 
 =head1 DESCRIPTION
 

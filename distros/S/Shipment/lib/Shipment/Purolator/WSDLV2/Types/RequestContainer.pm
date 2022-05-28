@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDLV2::Types::RequestContainer;
-$Shipment::Purolator::WSDLV2::Types::RequestContainer::VERSION = '3.06';
+$Shipment::Purolator::WSDLV2::Types::RequestContainer::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,21 +20,27 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
 
-    __PACKAGE__->_factory(
-        [   qw(
-            )
-        ],
-        {},
-        {},
-        {
+__PACKAGE__->_factory(
+    [ qw(
+    ) ],
+    {
+    },
+    {
+    },
+    {
 
-        }
-    );
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -51,7 +57,7 @@ Shipment::Purolator::WSDLV2::Types::RequestContainer
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

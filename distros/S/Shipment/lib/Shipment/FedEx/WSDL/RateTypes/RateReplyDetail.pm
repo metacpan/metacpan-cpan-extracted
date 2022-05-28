@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::RateReplyDetail;
-$Shipment::FedEx::WSDL::RateTypes::RateReplyDetail::VERSION = '3.06';
+$Shipment::FedEx::WSDL::RateTypes::RateReplyDetail::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/rate/v9'}
+sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,123 +20,112 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %ServiceType_of : ATTR(:get<ServiceType>);
-    my %PackagingType_of : ATTR(:get<PackagingType>);
-    my %AppliedOptions_of : ATTR(:get<AppliedOptions>);
-    my %AppliedSubOptions_of : ATTR(:get<AppliedSubOptions>);
-    my %DeliveryStation_of : ATTR(:get<DeliveryStation>);
-    my %DeliveryDayOfWeek_of : ATTR(:get<DeliveryDayOfWeek>);
-    my %DeliveryTimestamp_of : ATTR(:get<DeliveryTimestamp>);
-    my %CommitDetails_of : ATTR(:get<CommitDetails>);
-    my %DestinationAirportId_of : ATTR(:get<DestinationAirportId>);
-    my %IneligibleForMoneyBackGuarantee_of :
-      ATTR(:get<IneligibleForMoneyBackGuarantee>);
-    my %OriginServiceArea_of : ATTR(:get<OriginServiceArea>);
-    my %DestinationServiceArea_of : ATTR(:get<DestinationServiceArea>);
-    my %TransitTime_of : ATTR(:get<TransitTime>);
-    my %MaximumTransitTime_of : ATTR(:get<MaximumTransitTime>);
-    my %SignatureOption_of : ATTR(:get<SignatureOption>);
-    my %ActualRateType_of : ATTR(:get<ActualRateType>);
-    my %RatedShipmentDetails_of : ATTR(:get<RatedShipmentDetails>);
+my %ServiceType_of :ATTR(:get<ServiceType>);
+my %PackagingType_of :ATTR(:get<PackagingType>);
+my %AppliedOptions_of :ATTR(:get<AppliedOptions>);
+my %AppliedSubOptions_of :ATTR(:get<AppliedSubOptions>);
+my %DeliveryStation_of :ATTR(:get<DeliveryStation>);
+my %DeliveryDayOfWeek_of :ATTR(:get<DeliveryDayOfWeek>);
+my %DeliveryTimestamp_of :ATTR(:get<DeliveryTimestamp>);
+my %CommitDetails_of :ATTR(:get<CommitDetails>);
+my %DestinationAirportId_of :ATTR(:get<DestinationAirportId>);
+my %IneligibleForMoneyBackGuarantee_of :ATTR(:get<IneligibleForMoneyBackGuarantee>);
+my %OriginServiceArea_of :ATTR(:get<OriginServiceArea>);
+my %DestinationServiceArea_of :ATTR(:get<DestinationServiceArea>);
+my %TransitTime_of :ATTR(:get<TransitTime>);
+my %MaximumTransitTime_of :ATTR(:get<MaximumTransitTime>);
+my %SignatureOption_of :ATTR(:get<SignatureOption>);
+my %ActualRateType_of :ATTR(:get<ActualRateType>);
+my %RatedShipmentDetails_of :ATTR(:get<RatedShipmentDetails>);
 
-    __PACKAGE__->_factory(
-        [   qw(        ServiceType
-              PackagingType
-              AppliedOptions
-              AppliedSubOptions
-              DeliveryStation
-              DeliveryDayOfWeek
-              DeliveryTimestamp
-              CommitDetails
-              DestinationAirportId
-              IneligibleForMoneyBackGuarantee
-              OriginServiceArea
-              DestinationServiceArea
-              TransitTime
-              MaximumTransitTime
-              SignatureOption
-              ActualRateType
-              RatedShipmentDetails
+__PACKAGE__->_factory(
+    [ qw(        ServiceType
+        PackagingType
+        AppliedOptions
+        AppliedSubOptions
+        DeliveryStation
+        DeliveryDayOfWeek
+        DeliveryTimestamp
+        CommitDetails
+        DestinationAirportId
+        IneligibleForMoneyBackGuarantee
+        OriginServiceArea
+        DestinationServiceArea
+        TransitTime
+        MaximumTransitTime
+        SignatureOption
+        ActualRateType
+        RatedShipmentDetails
 
-            )
-        ],
-        {   'ServiceType'                     => \%ServiceType_of,
-            'PackagingType'                   => \%PackagingType_of,
-            'AppliedOptions'                  => \%AppliedOptions_of,
-            'AppliedSubOptions'               => \%AppliedSubOptions_of,
-            'DeliveryStation'                 => \%DeliveryStation_of,
-            'DeliveryDayOfWeek'               => \%DeliveryDayOfWeek_of,
-            'DeliveryTimestamp'               => \%DeliveryTimestamp_of,
-            'CommitDetails'                   => \%CommitDetails_of,
-            'DestinationAirportId'            => \%DestinationAirportId_of,
-            'IneligibleForMoneyBackGuarantee' =>
-              \%IneligibleForMoneyBackGuarantee_of,
-            'OriginServiceArea'      => \%OriginServiceArea_of,
-            'DestinationServiceArea' => \%DestinationServiceArea_of,
-            'TransitTime'            => \%TransitTime_of,
-            'MaximumTransitTime'     => \%MaximumTransitTime_of,
-            'SignatureOption'        => \%SignatureOption_of,
-            'ActualRateType'         => \%ActualRateType_of,
-            'RatedShipmentDetails'   => \%RatedShipmentDetails_of,
-        },
-        {   'ServiceType'   => 'Shipment::FedEx::WSDL::RateTypes::ServiceType',
-            'PackagingType' =>
-              'Shipment::FedEx::WSDL::RateTypes::PackagingType',
-            'AppliedOptions' =>
-              'Shipment::FedEx::WSDL::RateTypes::ServiceOptionType',
-            'AppliedSubOptions' =>
-              'Shipment::FedEx::WSDL::RateTypes::ServiceSubOptionDetail',
-            'DeliveryStation'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'DeliveryDayOfWeek' =>
-              'Shipment::FedEx::WSDL::RateTypes::DayOfWeekType',
-            'DeliveryTimestamp' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
-            'CommitDetails' =>
-              'Shipment::FedEx::WSDL::RateTypes::CommitDetail',
-            'DestinationAirportId' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'IneligibleForMoneyBackGuarantee' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-            'OriginServiceArea' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'DestinationServiceArea' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'TransitTime' =>
-              'Shipment::FedEx::WSDL::RateTypes::TransitTimeType',
-            'MaximumTransitTime' =>
-              'Shipment::FedEx::WSDL::RateTypes::TransitTimeType',
-            'SignatureOption' =>
-              'Shipment::FedEx::WSDL::RateTypes::SignatureOptionType',
-            'ActualRateType' =>
-              'Shipment::FedEx::WSDL::RateTypes::ReturnedRateType',
-            'RatedShipmentDetails' =>
-              'Shipment::FedEx::WSDL::RateTypes::RatedShipmentDetail',
-        },
-        {
+    ) ],
+    {
+        'ServiceType' => \%ServiceType_of,
+        'PackagingType' => \%PackagingType_of,
+        'AppliedOptions' => \%AppliedOptions_of,
+        'AppliedSubOptions' => \%AppliedSubOptions_of,
+        'DeliveryStation' => \%DeliveryStation_of,
+        'DeliveryDayOfWeek' => \%DeliveryDayOfWeek_of,
+        'DeliveryTimestamp' => \%DeliveryTimestamp_of,
+        'CommitDetails' => \%CommitDetails_of,
+        'DestinationAirportId' => \%DestinationAirportId_of,
+        'IneligibleForMoneyBackGuarantee' => \%IneligibleForMoneyBackGuarantee_of,
+        'OriginServiceArea' => \%OriginServiceArea_of,
+        'DestinationServiceArea' => \%DestinationServiceArea_of,
+        'TransitTime' => \%TransitTime_of,
+        'MaximumTransitTime' => \%MaximumTransitTime_of,
+        'SignatureOption' => \%SignatureOption_of,
+        'ActualRateType' => \%ActualRateType_of,
+        'RatedShipmentDetails' => \%RatedShipmentDetails_of,
+    },
+    {
+        'ServiceType' => 'Shipment::FedEx::WSDL::RateTypes::ServiceType',
+        'PackagingType' => 'Shipment::FedEx::WSDL::RateTypes::PackagingType',
+        'AppliedOptions' => 'Shipment::FedEx::WSDL::RateTypes::ServiceOptionType',
+        'AppliedSubOptions' => 'Shipment::FedEx::WSDL::RateTypes::ServiceSubOptionDetail',
+        'DeliveryStation' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'DeliveryDayOfWeek' => 'Shipment::FedEx::WSDL::RateTypes::DayOfWeekType',
+        'DeliveryTimestamp' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
+        'CommitDetails' => 'Shipment::FedEx::WSDL::RateTypes::CommitDetail',
+        'DestinationAirportId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'IneligibleForMoneyBackGuarantee' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+        'OriginServiceArea' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'DestinationServiceArea' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'TransitTime' => 'Shipment::FedEx::WSDL::RateTypes::TransitTimeType',
+        'MaximumTransitTime' => 'Shipment::FedEx::WSDL::RateTypes::TransitTimeType',
+        'SignatureOption' => 'Shipment::FedEx::WSDL::RateTypes::SignatureOptionType',
+        'ActualRateType' => 'Shipment::FedEx::WSDL::RateTypes::ReturnedRateType',
+        'RatedShipmentDetails' => 'Shipment::FedEx::WSDL::RateTypes::RatedShipmentDetail',
+    },
+    {
 
-            'ServiceType'                     => 'ServiceType',
-            'PackagingType'                   => 'PackagingType',
-            'AppliedOptions'                  => 'AppliedOptions',
-            'AppliedSubOptions'               => 'AppliedSubOptions',
-            'DeliveryStation'                 => 'DeliveryStation',
-            'DeliveryDayOfWeek'               => 'DeliveryDayOfWeek',
-            'DeliveryTimestamp'               => 'DeliveryTimestamp',
-            'CommitDetails'                   => 'CommitDetails',
-            'DestinationAirportId'            => 'DestinationAirportId',
-            'IneligibleForMoneyBackGuarantee' =>
-              'IneligibleForMoneyBackGuarantee',
-            'OriginServiceArea'      => 'OriginServiceArea',
-            'DestinationServiceArea' => 'DestinationServiceArea',
-            'TransitTime'            => 'TransitTime',
-            'MaximumTransitTime'     => 'MaximumTransitTime',
-            'SignatureOption'        => 'SignatureOption',
-            'ActualRateType'         => 'ActualRateType',
-            'RatedShipmentDetails'   => 'RatedShipmentDetails',
-        }
-    );
+        'ServiceType' => 'ServiceType',
+        'PackagingType' => 'PackagingType',
+        'AppliedOptions' => 'AppliedOptions',
+        'AppliedSubOptions' => 'AppliedSubOptions',
+        'DeliveryStation' => 'DeliveryStation',
+        'DeliveryDayOfWeek' => 'DeliveryDayOfWeek',
+        'DeliveryTimestamp' => 'DeliveryTimestamp',
+        'CommitDetails' => 'CommitDetails',
+        'DestinationAirportId' => 'DestinationAirportId',
+        'IneligibleForMoneyBackGuarantee' => 'IneligibleForMoneyBackGuarantee',
+        'OriginServiceArea' => 'OriginServiceArea',
+        'DestinationServiceArea' => 'DestinationServiceArea',
+        'TransitTime' => 'TransitTime',
+        'MaximumTransitTime' => 'MaximumTransitTime',
+        'SignatureOption' => 'SignatureOption',
+        'ActualRateType' => 'ActualRateType',
+        'RatedShipmentDetails' => 'RatedShipmentDetails',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -153,7 +142,7 @@ Shipment::FedEx::WSDL::RateTypes::RateReplyDetail
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

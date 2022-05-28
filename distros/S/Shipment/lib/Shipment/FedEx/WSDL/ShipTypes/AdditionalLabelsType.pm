@@ -1,13 +1,14 @@
 package Shipment::FedEx::WSDL::ShipTypes::AdditionalLabelsType;
-$Shipment::FedEx::WSDL::ShipTypes::AdditionalLabelsType::VERSION = '3.06';
+$Shipment::FedEx::WSDL::ShipTypes::AdditionalLabelsType::VERSION = '3.07';
 use strict;
 use warnings;
 
-sub get_xmlns {'http://fedex.com/ws/ship/v9'}
+sub get_xmlns { 'http://fedex.com/ws/ship/v9'};
 
 # derivation by restriction
 use base qw(
-  SOAP::WSDL::XSD::Typelib::Builtin::string);
+    SOAP::WSDL::XSD::Typelib::Builtin::string);
+
 
 
 1;
@@ -24,7 +25,7 @@ Shipment::FedEx::WSDL::ShipTypes::AdditionalLabelsType
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

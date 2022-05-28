@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::TrackInterfaces::TrackService::TrackPort;
-$Shipment::UPS::WSDL::TrackInterfaces::TrackService::TrackPort::VERSION = '3.06';
+$Shipment::UPS::WSDL::TrackInterfaces::TrackService::TrackPort::VERSION = '3.07';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -9,73 +9,64 @@ use base qw(SOAP::WSDL::Client::Base);
 
 # only load if it hasn't been loaded before
 require Shipment::UPS::WSDL::TrackTypemaps::TrackService
-  if not Shipment::UPS::WSDL::TrackTypemaps::TrackService->can('get_class');
+    if not Shipment::UPS::WSDL::TrackTypemaps::TrackService->can('get_class');
 
 
 sub START {
 
     my $proxy_domain = $_[2]->{proxy_domain} || 'wwwcie.ups.com';
 
-    $_[0]->set_proxy('https://' . $proxy_domain . '/webservices/Track')
-      if not $_[2]->{proxy};
+    $_[0]->set_proxy('https://' . $proxy_domain . '/webservices/Track') if not $_[2]->{proxy};
 
-    $_[0]
-      ->set_class_resolver('Shipment::UPS::WSDL::TrackTypemaps::TrackService')
-      if not $_[2]->{class_resolver};
+    $_[0]->set_class_resolver('Shipment::UPS::WSDL::TrackTypemaps::TrackService')
+        if not $_[2]->{class_resolver};
 
     $_[0]->set_prefix($_[2]->{use_prefix}) if exists $_[2]->{use_prefix};
 }
 
 sub ProcessTrack {
     my ($self, $body, $header) = @_;
-    die "ProcessTrack must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'ProcessTrack',
-            soap_action =>
-              'http://onlinetools.ups.com/webservices/TrackBinding/v2.0',
-            style => 'document',
-            body  => {
+    die "ProcessTrack must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'ProcessTrack',
+        soap_action => 'http://onlinetools.ups.com/webservices/TrackBinding/v2.0',
+        style => 'document',
+        body => {
 
 
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::UPS::WSDL::TrackElements::TrackRequest )],
-            },
-            header => {
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         =>
-                  [qw( Shipment::UPS::WSDL::TrackElements::UPSSecurity )],
-
-            },
-            headerfault => {
-
-            },
-            response => {
-                header => {
-
-                },
-                body => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::UPS::WSDL::TrackElements::TrackResponse )
-                    ],
-                },
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::UPS::WSDL::TrackElements::TrackRequest )],
         },
-        $body,
-        $header
-    );
+        header => {
+
+           'use' => 'literal',
+            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle => '',
+            parts => [qw( Shipment::UPS::WSDL::TrackElements::UPSSecurity )],
+
+        },
+        headerfault => {
+            
+        },
+        response => {
+            header => {
+                
+            },
+            body => {
+
+
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::UPS::WSDL::TrackElements::TrackResponse )],
+            },
+        }
+    }, $body, $header);
 }
+
+
 
 
 1;
@@ -92,7 +83,7 @@ Shipment::UPS::WSDL::TrackInterfaces::TrackService::TrackPort
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 SYNOPSIS
 

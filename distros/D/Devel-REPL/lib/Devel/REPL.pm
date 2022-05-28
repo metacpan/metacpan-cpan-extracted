@@ -1,7 +1,7 @@
-package Devel::REPL; # git description: v1.003027-6-gfa625b2
+package Devel::REPL; # git description: v1.003028-7-g0b5d243
 # ABSTRACT: A modern perl interactive shell
 
-our $VERSION = '1.003028';
+our $VERSION = '1.003029';
 
 use Term::ReadLine;
 use Moose;
@@ -166,7 +166,7 @@ Devel::REPL - A modern perl interactive shell
 
 =head1 VERSION
 
-version 1.003028
+version 1.003029
 
 =head1 SYNOPSIS
 
@@ -432,7 +432,7 @@ Refresh plugin - automatically reload libraries with Module::Refresh
 
 =item *
 
-L<A comparison of various REPLs|http://shadow.cat/blog/matt-s-trout/mstpan-17/>
+L<A comparison of various REPLs|https://www.shadowcat.co.uk/blog/matt-s-trout/mstpan-17/>
 
 =back
 
@@ -450,7 +450,7 @@ Matt S Trout - mst (at) shadowcatsystems.co.uk (L<http://www.shadowcatsystems.co
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Shawn M Moore Chris Marshall Matt S Trout Oliver Gorwits יובל קוג'מן (Yuval Kogman) Arthur Axel 'fREW' Schmidt Andrew Alexis Sukrieh Tomas Doran (t0m) epitaph Norbert Buchmuller Jesse Luehrs Dave Houston Dagfinn Ilmari Mannsåker Zakariyya Mughal Ryan Niebur Justin Hunter Ash Berlin naquad Stevan Little
+=for stopwords Karen Etheridge Shawn M Moore Chris Marshall Matt S Trout Oliver Gorwits יובל קוג'מן (Yuval Kogman) Arthur Axel 'fREW' Schmidt Alexis Sukrieh Andrew epitaph Jesse Luehrs Norbert Buchmuller Tomas Doran (t0m) Dagfinn Ilmari Mannsåker Dave Houston Zakariyya Mughal Ash Berlin Justin Hunter mgrimes naquad Ryan Niebur Stevan Little
 
 =over 4
 
@@ -484,15 +484,11 @@ Arthur Axel 'fREW' Schmidt <frioux@gmail.com>
 
 =item *
 
-Andrew Moore <amoore@cpan.org>
-
-=item *
-
 Alexis Sukrieh <sukria+perl@sukria.net>
 
 =item *
 
-Tomas Doran (t0m) <bobtfish@bobtfish.net>
+Andrew Moore <amoore@cpan.org>
 
 =item *
 
@@ -500,15 +496,15 @@ epitaph <unknown>
 
 =item *
 
-Norbert Buchmuller <norbi@nix.hu>
-
-=item *
-
 Jesse Luehrs <doy@tozt.net>
 
 =item *
 
-Dave Houston <dhouston@cpan.org>
+Norbert Buchmuller <norbi@nix.hu>
+
+=item *
+
+Tomas Doran (t0m) <bobtfish@bobtfish.net>
 
 =item *
 
@@ -516,15 +512,11 @@ Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
 
 =item *
 
+Dave Houston <dhouston@cpan.org>
+
+=item *
+
 Zakariyya Mughal <zaki.mughal@gmail.com>
-
-=item *
-
-Ryan Niebur <ryan@debian.org>
-
-=item *
-
-Justin Hunter <justin.d.hunter@gmail.com>
 
 =item *
 
@@ -532,7 +524,19 @@ Ash Berlin <ash_github@firemirror.com>
 
 =item *
 
+Justin Hunter <justin.d.hunter@gmail.com>
+
+=item *
+
+mgrimes <mgrimes@cpan.org>
+
+=item *
+
 naquad <naquad@bd8105ee-0ff8-0310-8827-fb3f25b6796d>
+
+=item *
+
+Ryan Niebur <ryan@debian.org>
 
 =item *
 

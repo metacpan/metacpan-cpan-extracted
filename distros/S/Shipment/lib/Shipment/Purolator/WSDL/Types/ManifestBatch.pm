@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::ManifestBatch;
-$Shipment::Purolator::WSDL::Types::ManifestBatch::VERSION = '3.06';
+$Shipment::Purolator::WSDL::Types::ManifestBatch::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,39 +20,42 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %ShipmentManifestDate_of : ATTR(:get<ShipmentManifestDate>);
-    my %ManifestCloseDateTime_of : ATTR(:get<ManifestCloseDateTime>);
-    my %ManifestBatchDetails_of : ATTR(:get<ManifestBatchDetails>);
+my %ShipmentManifestDate_of :ATTR(:get<ShipmentManifestDate>);
+my %ManifestCloseDateTime_of :ATTR(:get<ManifestCloseDateTime>);
+my %ManifestBatchDetails_of :ATTR(:get<ManifestBatchDetails>);
 
-    __PACKAGE__->_factory(
-        [   qw(        ShipmentManifestDate
-              ManifestCloseDateTime
-              ManifestBatchDetails
+__PACKAGE__->_factory(
+    [ qw(        ShipmentManifestDate
+        ManifestCloseDateTime
+        ManifestBatchDetails
 
-            )
-        ],
-        {   'ShipmentManifestDate'  => \%ShipmentManifestDate_of,
-            'ManifestCloseDateTime' => \%ManifestCloseDateTime_of,
-            'ManifestBatchDetails'  => \%ManifestBatchDetails_of,
-        },
-        {   'ShipmentManifestDate' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'ManifestCloseDateTime' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'ManifestBatchDetails' =>
-              'Shipment::Purolator::WSDL::Types::ArrayOfManifestBatchDetail',
-        },
-        {
+    ) ],
+    {
+        'ShipmentManifestDate' => \%ShipmentManifestDate_of,
+        'ManifestCloseDateTime' => \%ManifestCloseDateTime_of,
+        'ManifestBatchDetails' => \%ManifestBatchDetails_of,
+    },
+    {
+        'ShipmentManifestDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'ManifestCloseDateTime' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'ManifestBatchDetails' => 'Shipment::Purolator::WSDL::Types::ArrayOfManifestBatchDetail',
+    },
+    {
 
-            'ShipmentManifestDate'  => 'ShipmentManifestDate',
-            'ManifestCloseDateTime' => 'ManifestCloseDateTime',
-            'ManifestBatchDetails'  => 'ManifestBatchDetails',
-        }
-    );
+        'ShipmentManifestDate' => 'ShipmentManifestDate',
+        'ManifestCloseDateTime' => 'ManifestCloseDateTime',
+        'ManifestBatchDetails' => 'ManifestBatchDetails',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -69,7 +72,7 @@ Shipment::Purolator::WSDL::Types::ManifestBatch
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

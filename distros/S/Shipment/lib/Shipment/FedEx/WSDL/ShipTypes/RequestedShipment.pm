@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::RequestedShipment;
-$Shipment::FedEx::WSDL::ShipTypes::RequestedShipment::VERSION = '3.06';
+$Shipment::FedEx::WSDL::ShipTypes::RequestedShipment::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/ship/v9'}
+sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,211 +20,187 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %ShipTimestamp_of : ATTR(:get<ShipTimestamp>);
-    my %DropoffType_of : ATTR(:get<DropoffType>);
-    my %ServiceType_of : ATTR(:get<ServiceType>);
-    my %PackagingType_of : ATTR(:get<PackagingType>);
-    my %TotalWeight_of : ATTR(:get<TotalWeight>);
-    my %TotalInsuredValue_of : ATTR(:get<TotalInsuredValue>);
-    my %TotalDimensions_of : ATTR(:get<TotalDimensions>);
-    my %Shipper_of : ATTR(:get<Shipper>);
-    my %Recipient_of : ATTR(:get<Recipient>);
-    my %RecipientLocationNumber_of : ATTR(:get<RecipientLocationNumber>);
-    my %Origin_of : ATTR(:get<Origin>);
-    my %ShippingChargesPayment_of : ATTR(:get<ShippingChargesPayment>);
-    my %SpecialServicesRequested_of : ATTR(:get<SpecialServicesRequested>);
-    my %ExpressFreightDetail_of : ATTR(:get<ExpressFreightDetail>);
-    my %FreightShipmentDetail_of : ATTR(:get<FreightShipmentDetail>);
-    my %DeliveryInstructions_of : ATTR(:get<DeliveryInstructions>);
-    my %VariableHandlingChargeDetail_of :
-      ATTR(:get<VariableHandlingChargeDetail>);
-    my %CustomsClearanceDetail_of : ATTR(:get<CustomsClearanceDetail>);
-    my %PickupDetail_of : ATTR(:get<PickupDetail>);
-    my %SmartPostDetail_of : ATTR(:get<SmartPostDetail>);
-    my %BlockInsightVisibility_of : ATTR(:get<BlockInsightVisibility>);
-    my %ErrorLabelBehavior_of : ATTR(:get<ErrorLabelBehavior>);
-    my %LabelSpecification_of : ATTR(:get<LabelSpecification>);
-    my %ShippingDocumentSpecification_of :
-      ATTR(:get<ShippingDocumentSpecification>);
-    my %RateRequestTypes_of : ATTR(:get<RateRequestTypes>);
-    my %CustomerSelectedActualRateType_of :
-      ATTR(:get<CustomerSelectedActualRateType>);
-    my %EdtRequestType_of : ATTR(:get<EdtRequestType>);
-    my %MasterTrackingId_of : ATTR(:get<MasterTrackingId>);
-    my %CodReturnTrackingId_of : ATTR(:get<CodReturnTrackingId>);
-    my %PackageCount_of : ATTR(:get<PackageCount>);
-    my %PackageDetail_of : ATTR(:get<PackageDetail>);
-    my %RequestedPackageLineItems_of : ATTR(:get<RequestedPackageLineItems>);
+my %ShipTimestamp_of :ATTR(:get<ShipTimestamp>);
+my %DropoffType_of :ATTR(:get<DropoffType>);
+my %ServiceType_of :ATTR(:get<ServiceType>);
+my %PackagingType_of :ATTR(:get<PackagingType>);
+my %TotalWeight_of :ATTR(:get<TotalWeight>);
+my %TotalInsuredValue_of :ATTR(:get<TotalInsuredValue>);
+my %TotalDimensions_of :ATTR(:get<TotalDimensions>);
+my %Shipper_of :ATTR(:get<Shipper>);
+my %Recipient_of :ATTR(:get<Recipient>);
+my %RecipientLocationNumber_of :ATTR(:get<RecipientLocationNumber>);
+my %Origin_of :ATTR(:get<Origin>);
+my %ShippingChargesPayment_of :ATTR(:get<ShippingChargesPayment>);
+my %SpecialServicesRequested_of :ATTR(:get<SpecialServicesRequested>);
+my %ExpressFreightDetail_of :ATTR(:get<ExpressFreightDetail>);
+my %FreightShipmentDetail_of :ATTR(:get<FreightShipmentDetail>);
+my %DeliveryInstructions_of :ATTR(:get<DeliveryInstructions>);
+my %VariableHandlingChargeDetail_of :ATTR(:get<VariableHandlingChargeDetail>);
+my %CustomsClearanceDetail_of :ATTR(:get<CustomsClearanceDetail>);
+my %PickupDetail_of :ATTR(:get<PickupDetail>);
+my %SmartPostDetail_of :ATTR(:get<SmartPostDetail>);
+my %BlockInsightVisibility_of :ATTR(:get<BlockInsightVisibility>);
+my %ErrorLabelBehavior_of :ATTR(:get<ErrorLabelBehavior>);
+my %LabelSpecification_of :ATTR(:get<LabelSpecification>);
+my %ShippingDocumentSpecification_of :ATTR(:get<ShippingDocumentSpecification>);
+my %RateRequestTypes_of :ATTR(:get<RateRequestTypes>);
+my %CustomerSelectedActualRateType_of :ATTR(:get<CustomerSelectedActualRateType>);
+my %EdtRequestType_of :ATTR(:get<EdtRequestType>);
+my %MasterTrackingId_of :ATTR(:get<MasterTrackingId>);
+my %CodReturnTrackingId_of :ATTR(:get<CodReturnTrackingId>);
+my %PackageCount_of :ATTR(:get<PackageCount>);
+my %PackageDetail_of :ATTR(:get<PackageDetail>);
+my %RequestedPackageLineItems_of :ATTR(:get<RequestedPackageLineItems>);
 
-    __PACKAGE__->_factory(
-        [   qw(        ShipTimestamp
-              DropoffType
-              ServiceType
-              PackagingType
-              TotalWeight
-              TotalInsuredValue
-              TotalDimensions
-              Shipper
-              Recipient
-              RecipientLocationNumber
-              Origin
-              ShippingChargesPayment
-              SpecialServicesRequested
-              ExpressFreightDetail
-              FreightShipmentDetail
-              DeliveryInstructions
-              VariableHandlingChargeDetail
-              CustomsClearanceDetail
-              PickupDetail
-              SmartPostDetail
-              BlockInsightVisibility
-              ErrorLabelBehavior
-              LabelSpecification
-              ShippingDocumentSpecification
-              RateRequestTypes
-              CustomerSelectedActualRateType
-              EdtRequestType
-              MasterTrackingId
-              CodReturnTrackingId
-              PackageCount
-              PackageDetail
-              RequestedPackageLineItems
+__PACKAGE__->_factory(
+    [ qw(        ShipTimestamp
+        DropoffType
+        ServiceType
+        PackagingType
+        TotalWeight
+        TotalInsuredValue
+        TotalDimensions
+        Shipper
+        Recipient
+        RecipientLocationNumber
+        Origin
+        ShippingChargesPayment
+        SpecialServicesRequested
+        ExpressFreightDetail
+        FreightShipmentDetail
+        DeliveryInstructions
+        VariableHandlingChargeDetail
+        CustomsClearanceDetail
+        PickupDetail
+        SmartPostDetail
+        BlockInsightVisibility
+        ErrorLabelBehavior
+        LabelSpecification
+        ShippingDocumentSpecification
+        RateRequestTypes
+        CustomerSelectedActualRateType
+        EdtRequestType
+        MasterTrackingId
+        CodReturnTrackingId
+        PackageCount
+        PackageDetail
+        RequestedPackageLineItems
 
-            )
-        ],
-        {   'ShipTimestamp'                => \%ShipTimestamp_of,
-            'DropoffType'                  => \%DropoffType_of,
-            'ServiceType'                  => \%ServiceType_of,
-            'PackagingType'                => \%PackagingType_of,
-            'TotalWeight'                  => \%TotalWeight_of,
-            'TotalInsuredValue'            => \%TotalInsuredValue_of,
-            'TotalDimensions'              => \%TotalDimensions_of,
-            'Shipper'                      => \%Shipper_of,
-            'Recipient'                    => \%Recipient_of,
-            'RecipientLocationNumber'      => \%RecipientLocationNumber_of,
-            'Origin'                       => \%Origin_of,
-            'ShippingChargesPayment'       => \%ShippingChargesPayment_of,
-            'SpecialServicesRequested'     => \%SpecialServicesRequested_of,
-            'ExpressFreightDetail'         => \%ExpressFreightDetail_of,
-            'FreightShipmentDetail'        => \%FreightShipmentDetail_of,
-            'DeliveryInstructions'         => \%DeliveryInstructions_of,
-            'VariableHandlingChargeDetail' =>
-              \%VariableHandlingChargeDetail_of,
-            'CustomsClearanceDetail'        => \%CustomsClearanceDetail_of,
-            'PickupDetail'                  => \%PickupDetail_of,
-            'SmartPostDetail'               => \%SmartPostDetail_of,
-            'BlockInsightVisibility'        => \%BlockInsightVisibility_of,
-            'ErrorLabelBehavior'            => \%ErrorLabelBehavior_of,
-            'LabelSpecification'            => \%LabelSpecification_of,
-            'ShippingDocumentSpecification' =>
-              \%ShippingDocumentSpecification_of,
-            'RateRequestTypes'               => \%RateRequestTypes_of,
-            'CustomerSelectedActualRateType' =>
-              \%CustomerSelectedActualRateType_of,
-            'EdtRequestType'            => \%EdtRequestType_of,
-            'MasterTrackingId'          => \%MasterTrackingId_of,
-            'CodReturnTrackingId'       => \%CodReturnTrackingId_of,
-            'PackageCount'              => \%PackageCount_of,
-            'PackageDetail'             => \%PackageDetail_of,
-            'RequestedPackageLineItems' => \%RequestedPackageLineItems_of,
-        },
-        {   'ShipTimestamp' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
-            'DropoffType'   => 'Shipment::FedEx::WSDL::ShipTypes::DropoffType',
-            'ServiceType'   => 'Shipment::FedEx::WSDL::ShipTypes::ServiceType',
-            'PackagingType' =>
-              'Shipment::FedEx::WSDL::ShipTypes::PackagingType',
-            'TotalWeight'       => 'Shipment::FedEx::WSDL::ShipTypes::Weight',
-            'TotalInsuredValue' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
-            'TotalDimensions'   =>
-              'Shipment::FedEx::WSDL::ShipTypes::Dimensions',
-            'Shipper'   => 'Shipment::FedEx::WSDL::ShipTypes::Party',
-            'Recipient' => 'Shipment::FedEx::WSDL::ShipTypes::Party',
-            'RecipientLocationNumber' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Origin' => 'Shipment::FedEx::WSDL::ShipTypes::ContactAndAddress',
-            'ShippingChargesPayment' =>
-              'Shipment::FedEx::WSDL::ShipTypes::Payment',
-            'SpecialServicesRequested' =>
-              'Shipment::FedEx::WSDL::ShipTypes::ShipmentSpecialServicesRequested',
-            'ExpressFreightDetail' =>
-              'Shipment::FedEx::WSDL::ShipTypes::ExpressFreightDetail',
-            'FreightShipmentDetail' =>
-              'Shipment::FedEx::WSDL::ShipTypes::FreightShipmentDetail',
-            'DeliveryInstructions' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'VariableHandlingChargeDetail' =>
-              'Shipment::FedEx::WSDL::ShipTypes::VariableHandlingChargeDetail',
-            'CustomsClearanceDetail' =>
-              'Shipment::FedEx::WSDL::ShipTypes::CustomsClearanceDetail',
-            'PickupDetail' => 'Shipment::FedEx::WSDL::ShipTypes::PickupDetail',
-            'SmartPostDetail' =>
-              'Shipment::FedEx::WSDL::ShipTypes::SmartPostShipmentDetail',
-            'BlockInsightVisibility' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-            'ErrorLabelBehavior' =>
-              'Shipment::FedEx::WSDL::ShipTypes::ErrorLabelBehaviorType',
-            'LabelSpecification' =>
-              'Shipment::FedEx::WSDL::ShipTypes::LabelSpecification',
-            'ShippingDocumentSpecification' =>
-              'Shipment::FedEx::WSDL::ShipTypes::ShippingDocumentSpecification',
-            'RateRequestTypes' =>
-              'Shipment::FedEx::WSDL::ShipTypes::RateRequestType',
-            'CustomerSelectedActualRateType' =>
-              'Shipment::FedEx::WSDL::ShipTypes::ReturnedRateType',
-            'EdtRequestType' =>
-              'Shipment::FedEx::WSDL::ShipTypes::EdtRequestType',
-            'MasterTrackingId' =>
-              'Shipment::FedEx::WSDL::ShipTypes::TrackingId',
-            'CodReturnTrackingId' =>
-              'Shipment::FedEx::WSDL::ShipTypes::TrackingId',
-            'PackageCount' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-            'PackageDetail' =>
-              'Shipment::FedEx::WSDL::ShipTypes::RequestedPackageDetailType',
-            'RequestedPackageLineItems' =>
-              'Shipment::FedEx::WSDL::ShipTypes::RequestedPackageLineItem',
-        },
-        {
+    ) ],
+    {
+        'ShipTimestamp' => \%ShipTimestamp_of,
+        'DropoffType' => \%DropoffType_of,
+        'ServiceType' => \%ServiceType_of,
+        'PackagingType' => \%PackagingType_of,
+        'TotalWeight' => \%TotalWeight_of,
+        'TotalInsuredValue' => \%TotalInsuredValue_of,
+        'TotalDimensions' => \%TotalDimensions_of,
+        'Shipper' => \%Shipper_of,
+        'Recipient' => \%Recipient_of,
+        'RecipientLocationNumber' => \%RecipientLocationNumber_of,
+        'Origin' => \%Origin_of,
+        'ShippingChargesPayment' => \%ShippingChargesPayment_of,
+        'SpecialServicesRequested' => \%SpecialServicesRequested_of,
+        'ExpressFreightDetail' => \%ExpressFreightDetail_of,
+        'FreightShipmentDetail' => \%FreightShipmentDetail_of,
+        'DeliveryInstructions' => \%DeliveryInstructions_of,
+        'VariableHandlingChargeDetail' => \%VariableHandlingChargeDetail_of,
+        'CustomsClearanceDetail' => \%CustomsClearanceDetail_of,
+        'PickupDetail' => \%PickupDetail_of,
+        'SmartPostDetail' => \%SmartPostDetail_of,
+        'BlockInsightVisibility' => \%BlockInsightVisibility_of,
+        'ErrorLabelBehavior' => \%ErrorLabelBehavior_of,
+        'LabelSpecification' => \%LabelSpecification_of,
+        'ShippingDocumentSpecification' => \%ShippingDocumentSpecification_of,
+        'RateRequestTypes' => \%RateRequestTypes_of,
+        'CustomerSelectedActualRateType' => \%CustomerSelectedActualRateType_of,
+        'EdtRequestType' => \%EdtRequestType_of,
+        'MasterTrackingId' => \%MasterTrackingId_of,
+        'CodReturnTrackingId' => \%CodReturnTrackingId_of,
+        'PackageCount' => \%PackageCount_of,
+        'PackageDetail' => \%PackageDetail_of,
+        'RequestedPackageLineItems' => \%RequestedPackageLineItems_of,
+    },
+    {
+        'ShipTimestamp' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
+        'DropoffType' => 'Shipment::FedEx::WSDL::ShipTypes::DropoffType',
+        'ServiceType' => 'Shipment::FedEx::WSDL::ShipTypes::ServiceType',
+        'PackagingType' => 'Shipment::FedEx::WSDL::ShipTypes::PackagingType',
+        'TotalWeight' => 'Shipment::FedEx::WSDL::ShipTypes::Weight',
+        'TotalInsuredValue' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
+        'TotalDimensions' => 'Shipment::FedEx::WSDL::ShipTypes::Dimensions',
+        'Shipper' => 'Shipment::FedEx::WSDL::ShipTypes::Party',
+        'Recipient' => 'Shipment::FedEx::WSDL::ShipTypes::Party',
+        'RecipientLocationNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Origin' => 'Shipment::FedEx::WSDL::ShipTypes::ContactAndAddress',
+        'ShippingChargesPayment' => 'Shipment::FedEx::WSDL::ShipTypes::Payment',
+        'SpecialServicesRequested' => 'Shipment::FedEx::WSDL::ShipTypes::ShipmentSpecialServicesRequested',
+        'ExpressFreightDetail' => 'Shipment::FedEx::WSDL::ShipTypes::ExpressFreightDetail',
+        'FreightShipmentDetail' => 'Shipment::FedEx::WSDL::ShipTypes::FreightShipmentDetail',
+        'DeliveryInstructions' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'VariableHandlingChargeDetail' => 'Shipment::FedEx::WSDL::ShipTypes::VariableHandlingChargeDetail',
+        'CustomsClearanceDetail' => 'Shipment::FedEx::WSDL::ShipTypes::CustomsClearanceDetail',
+        'PickupDetail' => 'Shipment::FedEx::WSDL::ShipTypes::PickupDetail',
+        'SmartPostDetail' => 'Shipment::FedEx::WSDL::ShipTypes::SmartPostShipmentDetail',
+        'BlockInsightVisibility' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+        'ErrorLabelBehavior' => 'Shipment::FedEx::WSDL::ShipTypes::ErrorLabelBehaviorType',
+        'LabelSpecification' => 'Shipment::FedEx::WSDL::ShipTypes::LabelSpecification',
+        'ShippingDocumentSpecification' => 'Shipment::FedEx::WSDL::ShipTypes::ShippingDocumentSpecification',
+        'RateRequestTypes' => 'Shipment::FedEx::WSDL::ShipTypes::RateRequestType',
+        'CustomerSelectedActualRateType' => 'Shipment::FedEx::WSDL::ShipTypes::ReturnedRateType',
+        'EdtRequestType' => 'Shipment::FedEx::WSDL::ShipTypes::EdtRequestType',
+        'MasterTrackingId' => 'Shipment::FedEx::WSDL::ShipTypes::TrackingId',
+        'CodReturnTrackingId' => 'Shipment::FedEx::WSDL::ShipTypes::TrackingId',
+        'PackageCount' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+        'PackageDetail' => 'Shipment::FedEx::WSDL::ShipTypes::RequestedPackageDetailType',
+        'RequestedPackageLineItems' => 'Shipment::FedEx::WSDL::ShipTypes::RequestedPackageLineItem',
+    },
+    {
 
-            'ShipTimestamp'                 => 'ShipTimestamp',
-            'DropoffType'                   => 'DropoffType',
-            'ServiceType'                   => 'ServiceType',
-            'PackagingType'                 => 'PackagingType',
-            'TotalWeight'                   => 'TotalWeight',
-            'TotalInsuredValue'             => 'TotalInsuredValue',
-            'TotalDimensions'               => 'TotalDimensions',
-            'Shipper'                       => 'Shipper',
-            'Recipient'                     => 'Recipient',
-            'RecipientLocationNumber'       => 'RecipientLocationNumber',
-            'Origin'                        => 'Origin',
-            'ShippingChargesPayment'        => 'ShippingChargesPayment',
-            'SpecialServicesRequested'      => 'SpecialServicesRequested',
-            'ExpressFreightDetail'          => 'ExpressFreightDetail',
-            'FreightShipmentDetail'         => 'FreightShipmentDetail',
-            'DeliveryInstructions'          => 'DeliveryInstructions',
-            'VariableHandlingChargeDetail'  => 'VariableHandlingChargeDetail',
-            'CustomsClearanceDetail'        => 'CustomsClearanceDetail',
-            'PickupDetail'                  => 'PickupDetail',
-            'SmartPostDetail'               => 'SmartPostDetail',
-            'BlockInsightVisibility'        => 'BlockInsightVisibility',
-            'ErrorLabelBehavior'            => 'ErrorLabelBehavior',
-            'LabelSpecification'            => 'LabelSpecification',
-            'ShippingDocumentSpecification' => 'ShippingDocumentSpecification',
-            'RateRequestTypes'              => 'RateRequestTypes',
-            'CustomerSelectedActualRateType' =>
-              'CustomerSelectedActualRateType',
-            'EdtRequestType'            => 'EdtRequestType',
-            'MasterTrackingId'          => 'MasterTrackingId',
-            'CodReturnTrackingId'       => 'CodReturnTrackingId',
-            'PackageCount'              => 'PackageCount',
-            'PackageDetail'             => 'PackageDetail',
-            'RequestedPackageLineItems' => 'RequestedPackageLineItems',
-        }
-    );
+        'ShipTimestamp' => 'ShipTimestamp',
+        'DropoffType' => 'DropoffType',
+        'ServiceType' => 'ServiceType',
+        'PackagingType' => 'PackagingType',
+        'TotalWeight' => 'TotalWeight',
+        'TotalInsuredValue' => 'TotalInsuredValue',
+        'TotalDimensions' => 'TotalDimensions',
+        'Shipper' => 'Shipper',
+        'Recipient' => 'Recipient',
+        'RecipientLocationNumber' => 'RecipientLocationNumber',
+        'Origin' => 'Origin',
+        'ShippingChargesPayment' => 'ShippingChargesPayment',
+        'SpecialServicesRequested' => 'SpecialServicesRequested',
+        'ExpressFreightDetail' => 'ExpressFreightDetail',
+        'FreightShipmentDetail' => 'FreightShipmentDetail',
+        'DeliveryInstructions' => 'DeliveryInstructions',
+        'VariableHandlingChargeDetail' => 'VariableHandlingChargeDetail',
+        'CustomsClearanceDetail' => 'CustomsClearanceDetail',
+        'PickupDetail' => 'PickupDetail',
+        'SmartPostDetail' => 'SmartPostDetail',
+        'BlockInsightVisibility' => 'BlockInsightVisibility',
+        'ErrorLabelBehavior' => 'ErrorLabelBehavior',
+        'LabelSpecification' => 'LabelSpecification',
+        'ShippingDocumentSpecification' => 'ShippingDocumentSpecification',
+        'RateRequestTypes' => 'RateRequestTypes',
+        'CustomerSelectedActualRateType' => 'CustomerSelectedActualRateType',
+        'EdtRequestType' => 'EdtRequestType',
+        'MasterTrackingId' => 'MasterTrackingId',
+        'CodReturnTrackingId' => 'CodReturnTrackingId',
+        'PackageCount' => 'PackageCount',
+        'PackageDetail' => 'PackageDetail',
+        'RequestedPackageLineItems' => 'RequestedPackageLineItems',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -241,7 +217,7 @@ Shipment::FedEx::WSDL::ShipTypes::RequestedShipment
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

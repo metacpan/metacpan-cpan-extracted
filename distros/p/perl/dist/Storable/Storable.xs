@@ -35,27 +35,8 @@
 #endif
 
 /*
- * Pre PerlIO time when none of USE_PERLIO and PERLIO_IS_STDIO is defined
- * Provide them with the necessary defines so they can build with pre-5.004.
- */
-#ifndef USE_PERLIO
-#ifndef PERLIO_IS_STDIO
-#define PerlIO FILE
-#define PerlIO_getc(x) getc(x)
-#define PerlIO_putc(f,x) putc(x,f)
-#define PerlIO_read(x,y,z) fread(y,1,z,x)
-#define PerlIO_write(x,y,z) fwrite(y,1,z,x)
-#define PerlIO_stdoutf printf
-#endif	/* PERLIO_IS_STDIO */
-#endif	/* USE_PERLIO */
-
-/*
  * Earlier versions of perl might be used, we can't assume they have the latest!
  */
-
-#ifndef HvSHAREKEYS_off
-#define HvSHAREKEYS_off(hv)	/* Ignore */
-#endif
 
 /* perl <= 5.8.2 needs this */
 #ifndef SvIsCOW
@@ -92,10 +73,6 @@
 #  define SvTRULYREADONLY(sv)	SvREADONLY(sv)
 #else
 #  define SvTRULYREADONLY(sv)	(SvREADONLY(sv) && !SvIsCOW(sv))
-#endif
-
-#ifndef SvPVCLEAR
-#  define SvPVCLEAR(sv) sv_setpvs(sv, "")
 #endif
 
 #ifndef strEQc
@@ -304,7 +281,6 @@ typedef STRLEN ntag_t;
  * Conditional UTF8 support.
  *
  */
-#ifdef SvUTF8_on
 #define STORE_UTF8STR(pv, len)	STORE_PV_LEN(pv, len, SX_UTF8STR, SX_LUTF8STR)
 #define HAS_UTF8_SCALARS
 #ifdef HeKUTF8
@@ -312,10 +288,6 @@ typedef STRLEN ntag_t;
 #define HAS_UTF8_ALL
 #else
 /* 5.6 perl has utf8 scalars but not hashes */
-#endif
-#else
-#define SvUTF8(sv) 0
-#define STORE_UTF8STR(pv, len) CROAK(("panic: storing UTF8 in non-UTF8 perl"))
 #endif
 #ifndef HAS_UTF8_ALL
 #define UTF8_CROAK() CROAK(("Cannot retrieve UTF8 data in non-UTF8 perl"))
@@ -519,14 +491,9 @@ static MAGIC *THX_sv_magicext(pTHX_
 
 #if defined(MULTIPLICITY) || defined(PERL_OBJECT) || defined(PERL_CAPI)
 
-#if PERL_VERSION_LT(5,4,68)
-#define dSTCXT_SV                                               \
-    SV *perinterp_sv = get_sv(MY_VERSION, 0)
-#else	/* >= perl5.004_68 */
 #define dSTCXT_SV						\
     SV *perinterp_sv = *hv_fetch(PL_modglobal,                  \
 				 MY_VERSION, sizeof(MY_VERSION)-1, TRUE)
-#endif	/* < perl5.004_68 */
 
 #define dSTCXT_PTR(T,name)					\
     T name = ((perinterp_sv                                     \
@@ -1010,9 +977,7 @@ static const char byteorderstr_56[] = {BYTEORDER_BYTES_56, 0};
 #define STORABLE_BIN_MAJOR	2		/* Binary major "version" */
 #define STORABLE_BIN_MINOR	11		/* Binary minor "version" */
 
-#if PERL_VERSION_LT(5,6,0)
-#define STORABLE_BIN_WRITE_MINOR	4
-#elif !defined (SvVOK)
+#if !defined (SvVOK)
 /*
  * Perl 5.6.0-5.8.0 can do weak references, but not vstring magic.
 */
@@ -1023,7 +988,7 @@ static const char byteorderstr_56[] = {BYTEORDER_BYTES_56, 0};
 #define STORABLE_BIN_WRITE_MINOR	11
 #else
 #define STORABLE_BIN_WRITE_MINOR	9
-#endif /* PERL_VERSION_LT(5,6,0) */
+#endif
 
 #if PERL_VERSION_LT(5,8,1)
 #define PL_sv_placeholder PL_sv_undef
@@ -1247,7 +1212,7 @@ static const char byteorderstr_56[] = {BYTEORDER_BYTES_56, 0};
 #    define Sntohl(x) (x)
 #  else
 static U32 Sntohl(U32 x) {
-    return ((x & 0xFF) << 24) + ((x * 0xFF00) << 8)
+    return (((U8) x) << 24) + ((x & 0xFF00) << 8)
 	+ ((x & 0xFF0000) >> 8) + ((x & 0xFF000000) >> 24);
 }
 #  endif
@@ -1449,7 +1414,8 @@ static SV *get_larray(pTHX_ stcxt_t *cxt, UV len, const char *cname);
 static SV *get_lhash(pTHX_ stcxt_t *cxt, UV len, int hash_flags, const char *cname);
 static int store_lhash(pTHX_ stcxt_t *cxt, HV *hv, unsigned char hash_flags);
 #endif
-static int store_hentry(pTHX_ stcxt_t *cxt, HV* hv, UV i, HE *he, unsigned char hash_flags);
+static int store_hentry(pTHX_ stcxt_t *cxt, HV* hv, UV i, HEK *hek, SV *val,
+                        unsigned char hash_flags);
 
 typedef SV* (*sv_retrieve_t)(pTHX_ stcxt_t *cxt, const char *name);
 
@@ -1648,11 +1614,9 @@ static void init_store_context(pTHX_
      *
      * It is reported fixed in 5.005, hence the #if.
      */
-#if PERL_VERSION_GE(5,5,0)
 #define HBUCKETS	4096		/* Buckets for %hseen */
 #ifndef USE_PTR_TABLE
     HvMAX(cxt->hseen) = HBUCKETS - 1;	/* keys %hseen = $HBUCKETS; */
-#endif
 #endif
 
     /*
@@ -1665,9 +1629,7 @@ static void init_store_context(pTHX_
 
     cxt->hclass = newHV();		/* Where seen classnames are stored */
 
-#if PERL_VERSION_GE(5,5,0)
     HvMAX(cxt->hclass) = HBUCKETS - 1;	/* keys %hclass = $HBUCKETS; */
-#endif
 
     /*
      * The 'hook' hash table is used to keep track of the references on
@@ -2225,7 +2187,7 @@ static AV *array_call(pTHX_
     XPUSHs(sv_2mortal(newSViv(cloning)));	/* Cloning flag */
     PUTBACK;
 
-    count = call_sv(hook, G_ARRAY);	/* Go back to Perl code */
+    count = call_sv(hook, G_LIST);	/* Go back to Perl code */
 
     SPAGAIN;
 
@@ -2984,12 +2946,6 @@ static int store_hash(pTHX_ stcxt_t *cxt, HV *hv)
 
             keyval = SvPV(key, keylen_tmp);
             keylen = keylen_tmp;
-#ifdef HAS_UTF8_HASHES
-            /* If you build without optimisation on pre 5.6
-               then nothing spots that SvUTF8(key) is always 0,
-               so the block isn't optimised away, at which point
-               the linker dislikes the reference to
-               bytes_from_utf8.  */
             if (SvUTF8(key)) {
                 const char *keysave = keyval;
                 bool is_utf8 = TRUE;
@@ -3014,7 +2970,6 @@ static int store_hash(pTHX_ stcxt_t *cxt, HV *hv)
                     flags |= SHV_K_UTF8;
                 }
             }
-#endif
 
             if (flagged_hash) {
                 PUTMARK(flags);
@@ -3061,82 +3016,8 @@ static int store_hash(pTHX_ stcxt_t *cxt, HV *hv)
             if (val == 0)
                 return 1;		/* Internal error, not I/O error */
 
-            if ((ret = store_hentry(aTHX_ cxt, hv, i, he, hash_flags)))
+            if ((ret = store_hentry(aTHX_ cxt, hv, i, HeKEY_hek(he), val, hash_flags)))
                 goto out;
-#if 0
-            /* Implementation of restricted hashes isn't nicely
-               abstracted:  */
-            flags = (((hash_flags & SHV_RESTRICTED)
-                      && SvTRULYREADONLY(val))
-                     ? SHV_K_LOCKED : 0);
-
-            if (val == &PL_sv_placeholder) {
-                flags |= SHV_K_PLACEHOLDER;
-                val = &PL_sv_undef;
-            }
-
-            /*
-             * Store value first.
-             */
-
-            TRACEME(("(#%d) value 0x%" UVxf, (int)i, PTR2UV(val)));
-
-            if ((ret = store(aTHX_ cxt, val)))	/* Extra () for -Wall */
-                goto out;
-
-
-            hek = HeKEY_hek(he);
-            len = HEK_LEN(hek);
-            if (len == HEf_SVKEY) {
-                /* This is somewhat sick, but the internal APIs are
-                 * such that XS code could put one of these in
-                 * a regular hash.
-                 * Maybe we should be capable of storing one if
-                 * found.
-                 */
-                key_sv = HeKEY_sv(he);
-                flags |= SHV_K_ISSV;
-            } else {
-                /* Regular string key. */
-#ifdef HAS_HASH_KEY_FLAGS
-                if (HEK_UTF8(hek))
-                    flags |= SHV_K_UTF8;
-                if (HEK_WASUTF8(hek))
-                    flags |= SHV_K_WASUTF8;
-#endif
-                key = HEK_KEY(hek);
-            }
-            /*
-             * Write key string.
-             * Keys are written after values to make sure retrieval
-             * can be optimal in terms of memory usage, where keys are
-             * read into a fixed unique buffer called kbuf.
-             * See retrieve_hash() for details.
-             */
-
-            if (flagged_hash) {
-                PUTMARK(flags);
-                TRACEME(("(#%d) key '%s' flags %x", (int)i, key, flags));
-            } else {
-                /* This is a workaround for a bug in 5.8.0
-                   that causes the HEK_WASUTF8 flag to be
-                   set on an HEK without the hash being
-                   marked as having key flags. We just
-                   cross our fingers and drop the flag.
-                   AMS 20030901 */
-                assert (flags == 0 || flags == SHV_K_WASUTF8);
-                TRACEME(("(#%d) key '%s'", (int)i, key));
-            }
-            if (flags & SHV_K_ISSV) {
-                int ret;
-                if ((ret = store(aTHX_ cxt, key_sv)))
-                    goto out;
-            } else {
-                WLEN(len);
-                if (len)
-                    WRITE(key, len);
-            }
-#endif
         }
     }
 
@@ -3155,15 +3036,16 @@ static int store_hash(pTHX_ stcxt_t *cxt, HV *hv)
 }
 
 static int store_hentry(pTHX_
-	stcxt_t *cxt, HV* hv, UV i, HE *he, unsigned char hash_flags)
+	stcxt_t *cxt, HV* hv, UV i, HEK *hek, SV *val, unsigned char hash_flags)
 {
     int ret = 0;
-    SV* val = hv_iterval(hv, he);
     int flagged_hash = ((SvREADONLY(hv)
 #ifdef HAS_HASH_KEY_FLAGS
                          || HvHASKFLAGS(hv)
 #endif
                          ) ? 1 : 0);
+    /* Implementation of restricted hashes isn't nicely
+       abstracted:  */
     unsigned char flags = (((hash_flags & SHV_RESTRICTED)
                             && SvTRULYREADONLY(val))
                            ? SHV_K_LOCKED : 0);
@@ -3182,7 +3064,6 @@ static int store_hentry(pTHX_
     TRACEME(("(#%d) value 0x%" UVxf, (int)i, PTR2UV(val)));
 
     {
-        HEK* hek = HeKEY_hek(he);
         I32  len = HEK_LEN(hek);
         SV *key_sv = NULL;
         char *key = 0;
@@ -3190,7 +3071,13 @@ static int store_hentry(pTHX_
         if ((ret = store(aTHX_ cxt, val)))
             return ret;
         if (len == HEf_SVKEY) {
-            key_sv = HeKEY_sv(he);
+            /* This is somewhat sick, but the internal APIs are
+             * such that XS code could put one of these in
+             * a regular hash.
+             * Maybe we should be capable of storing one if
+             * found.
+             */
+            key_sv = (SV *)HEK_KEY(hek);
             flags |= SHV_K_ISSV;
         } else {
             /* Regular string key. */
@@ -3282,15 +3169,15 @@ static int store_lhash(pTHX_ stcxt_t *cxt, HV *hv, unsigned char hash_flags)
     array = HvARRAY(hv);
     for (i = 0; i <= (Size_t)HvMAX(hv); i++) {
         HE* entry = array[i];
-        if (!entry) continue;
-        if ((ret = store_hentry(aTHX_ cxt, hv, ix++, entry, hash_flags)))
-            return ret;
-        while ((entry = HeNEXT(entry))) {
-            if ((ret = store_hentry(aTHX_ cxt, hv, ix++, entry, hash_flags)))
+
+        while (entry) {
+            SV* val = hv_iterval(hv, entry);
+            if ((ret = store_hentry(aTHX_ cxt, hv, ix++, HeKEY_hek(entry), val, hash_flags)))
                 return ret;
+            entry = HeNEXT(entry);
         }
     }
-    if (recur_sv == (SV*)hv && cxt->max_recur_depth_hash != -1 && cxt->recur_depth > 0) {
+    if (recur_sv != (SV*)hv && cxt->max_recur_depth_hash != -1 && cxt->recur_depth > 0) {
         TRACEME(("recur_depth --%" IVdf, cxt->recur_depth));
         --cxt->recur_depth;
     }
@@ -3309,12 +3196,6 @@ static int store_lhash(pTHX_ stcxt_t *cxt, HV *hv, unsigned char hash_flags)
  */
 static int store_code(pTHX_ stcxt_t *cxt, CV *cv)
 {
-#if PERL_VERSION_LT(5,6,0)
-    /*
-     * retrieve_code does not work with perl 5.005 or less
-     */
-    return store_other(aTHX_ cxt, (SV*)cv);
-#else
     dSP;
     STRLEN len;
     STRLEN count, reallen;
@@ -3405,7 +3286,6 @@ static int store_code(pTHX_ stcxt_t *cxt, CV *cv)
     TRACEME(("ok (code)"));
 
     return 0;
-#endif
 }
 
 #if PERL_VERSION_LT(5,8,0)
@@ -3438,7 +3318,7 @@ static int get_regexp(pTHX_ stcxt_t *cxt, SV* sv, SV **re, SV **flags) {
     XPUSHs(rv);
     PUTBACK;
     /* optimize to call the XS directly later */
-    count = call_sv((SV*)cv, G_ARRAY);
+    count = call_sv((SV*)cv, G_LIST);
     SPAGAIN;
     if (count < 2)
       CROAK(("re::regexp_pattern returned only %d results", (int)count));
@@ -6687,9 +6567,6 @@ static SV *retrieve_flag_hash(pTHX_ stcxt_t *cxt, const char *cname)
  */
 static SV *retrieve_code(pTHX_ stcxt_t *cxt, const char *cname)
 {
-#if PERL_VERSION_LT(5,6,0)
-    CROAK(("retrieve_code does not work with perl 5.005 or less\n"));
-#else
     dSP;
     I32 type, count;
     IV tagnum;
@@ -6811,7 +6688,6 @@ static SV *retrieve_code(pTHX_ stcxt_t *cxt, const char *cname)
     av_store(cxt->aseen, tagnum, SvREFCNT_inc(sv));
 
     return sv;
-#endif
 }
 
 static SV *retrieve_regexp(pTHX_ stcxt_t *cxt, const char *cname) {
@@ -7580,22 +7456,7 @@ static SV *do_retrieve(
 
     if (!sv) {
         TRACEMED(("retrieve ERROR"));
-#if PERL_VERSION_LT(5,5,0)
-        /* perl 5.00405 seems to screw up at this point with an
-           'attempt to modify a read only value' error reported in the
-           eval { $self = pretrieve(*FILE) } in _retrieve.
-           I can't see what the cause of this error is, but I suspect a
-           bug in 5.004, as it seems to be capable of issuing spurious
-           errors or core dumping with matches on $@. I'm not going to
-           spend time on what could be a fruitless search for the cause,
-           so here's a bodge. If you're running 5.004 and don't like
-           this inefficiency, either upgrade to a newer perl, or you are
-           welcome to find the problem and send in a patch.
-        */
-        return newSV(0);
-#else
         return &PL_sv_undef;		/* Something went wrong, return undef */
-#endif
     }
 
     TRACEMED(("retrieve got %s(0x%" UVxf ")",

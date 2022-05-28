@@ -1,10 +1,21 @@
 Revision history for Perl extension Jenkins::i18n.
 
+0.04 Fri May 27 20:48 2022
+    - Fixed bug in define_files regarding relative paths
+    - Fixed bug in define_files regarding file extension
+    - Included the --version in the jtt CLI
+    - Now jtt ignore known terms for "same" and "empty" validations
+    - Refactorings to improve performance
+
+0.03  Mon May  9 00:29 2002
+    - Fixed bugs regarding paths in MS Windows
+    - Refactored code to improve performance
+
 0.02  Fri May  6 20:49 2022
     - Added the --search feature
     - Fixed bug for tests running on MS Windows
 
 0.01  Tue Mar  8 13:12:04 2022
-	- original version; created by h2xs 1.23 with options
+    - original version; created by h2xs 1.23 with options
 		-XA -n Jenkins::i18n
 

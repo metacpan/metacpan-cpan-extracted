@@ -3,7 +3,7 @@ use warnings;
 package Devel::REPL::Plugin::OutputCache;
 # ABSTRACT: Remember past results, _ is most recent
 
-our $VERSION = '1.003028';
+our $VERSION = '1.003029';
 
 use Devel::REPL::Plugin;
 use namespace::autoclean;
@@ -65,7 +65,7 @@ Devel::REPL::Plugin::OutputCache - Remember past results, _ is most recent
 
 =head1 VERSION
 
-version 1.003028
+version 1.003029
 
 =head1 SYNOPSIS
 

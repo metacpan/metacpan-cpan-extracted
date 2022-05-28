@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::ReturnShipmentDetail;
-$Shipment::FedEx::WSDL::ShipTypes::ReturnShipmentDetail::VERSION = '3.06';
+$Shipment::FedEx::WSDL::ShipTypes::ReturnShipmentDetail::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/ship/v9'}
+sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,42 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %ReturnType_of : ATTR(:get<ReturnType>);
-    my %Rma_of : ATTR(:get<Rma>);
-    my %ReturnEMailDetail_of : ATTR(:get<ReturnEMailDetail>);
+my %ReturnType_of :ATTR(:get<ReturnType>);
+my %Rma_of :ATTR(:get<Rma>);
+my %ReturnEMailDetail_of :ATTR(:get<ReturnEMailDetail>);
 
-    __PACKAGE__->_factory(
-        [   qw(        ReturnType
-              Rma
-              ReturnEMailDetail
+__PACKAGE__->_factory(
+    [ qw(        ReturnType
+        Rma
+        ReturnEMailDetail
 
-            )
-        ],
-        {   'ReturnType'        => \%ReturnType_of,
-            'Rma'               => \%Rma_of,
-            'ReturnEMailDetail' => \%ReturnEMailDetail_of,
-        },
-        {   'ReturnType' => 'Shipment::FedEx::WSDL::ShipTypes::ReturnType',
-            'Rma'        => 'Shipment::FedEx::WSDL::ShipTypes::Rma',
-            'ReturnEMailDetail' =>
-              'Shipment::FedEx::WSDL::ShipTypes::ReturnEMailDetail',
-        },
-        {
+    ) ],
+    {
+        'ReturnType' => \%ReturnType_of,
+        'Rma' => \%Rma_of,
+        'ReturnEMailDetail' => \%ReturnEMailDetail_of,
+    },
+    {
+        'ReturnType' => 'Shipment::FedEx::WSDL::ShipTypes::ReturnType',
+        'Rma' => 'Shipment::FedEx::WSDL::ShipTypes::Rma',
+        'ReturnEMailDetail' => 'Shipment::FedEx::WSDL::ShipTypes::ReturnEMailDetail',
+    },
+    {
 
-            'ReturnType'        => 'ReturnType',
-            'Rma'               => 'Rma',
-            'ReturnEMailDetail' => 'ReturnEMailDetail',
-        }
-    );
+        'ReturnType' => 'ReturnType',
+        'Rma' => 'Rma',
+        'ReturnEMailDetail' => 'ReturnEMailDetail',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -67,7 +72,7 @@ Shipment::FedEx::WSDL::ShipTypes::ReturnShipmentDetail
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

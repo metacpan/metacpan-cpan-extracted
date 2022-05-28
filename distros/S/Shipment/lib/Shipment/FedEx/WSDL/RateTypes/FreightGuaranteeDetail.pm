@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::FreightGuaranteeDetail;
-$Shipment::FedEx::WSDL::RateTypes::FreightGuaranteeDetail::VERSION = '3.06';
+$Shipment::FedEx::WSDL::RateTypes::FreightGuaranteeDetail::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/rate/v9'}
+sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,36 +20,42 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Type_of : ATTR(:get<Type>);
-    my %Date_of : ATTR(:get<Date>);
-    my %Time_of : ATTR(:get<Time>);
+my %Type_of :ATTR(:get<Type>);
+my %Date_of :ATTR(:get<Date>);
+my %Time_of :ATTR(:get<Time>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Type
-              Date
-              Time
+__PACKAGE__->_factory(
+    [ qw(        Type
+        Date
+        Time
 
-            )
-        ],
-        {   'Type' => \%Type_of,
-            'Date' => \%Date_of,
-            'Time' => \%Time_of,
-        },
-        {   'Type' => 'Shipment::FedEx::WSDL::RateTypes::FreightGuaranteeType',
-            'Date' => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
-            'Time' => 'SOAP::WSDL::XSD::Typelib::Builtin::time',
-        },
-        {
+    ) ],
+    {
+        'Type' => \%Type_of,
+        'Date' => \%Date_of,
+        'Time' => \%Time_of,
+    },
+    {
+        'Type' => 'Shipment::FedEx::WSDL::RateTypes::FreightGuaranteeType',
+        'Date' => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
+        'Time' => 'SOAP::WSDL::XSD::Typelib::Builtin::time',
+    },
+    {
 
-            'Type' => 'Type',
-            'Date' => 'Date',
-            'Time' => 'Time',
-        }
-    );
+        'Type' => 'Type',
+        'Date' => 'Date',
+        'Time' => 'Time',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -66,7 +72,7 @@ Shipment::FedEx::WSDL::RateTypes::FreightGuaranteeDetail
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

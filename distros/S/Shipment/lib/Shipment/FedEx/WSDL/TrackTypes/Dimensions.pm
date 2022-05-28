@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::Dimensions;
-$Shipment::FedEx::WSDL::TrackTypes::Dimensions::VERSION = '3.06';
+$Shipment::FedEx::WSDL::TrackTypes::Dimensions::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/track/v9'}
+sub get_xmlns { 'http://fedex.com/ws/track/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,43 +20,47 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Length_of : ATTR(:get<Length>);
-    my %Width_of : ATTR(:get<Width>);
-    my %Height_of : ATTR(:get<Height>);
-    my %Units_of : ATTR(:get<Units>);
+my %Length_of :ATTR(:get<Length>);
+my %Width_of :ATTR(:get<Width>);
+my %Height_of :ATTR(:get<Height>);
+my %Units_of :ATTR(:get<Units>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Length
-              Width
-              Height
-              Units
+__PACKAGE__->_factory(
+    [ qw(        Length
+        Width
+        Height
+        Units
 
-            )
-        ],
-        {   'Length' => \%Length_of,
-            'Width'  => \%Width_of,
-            'Height' => \%Height_of,
-            'Units'  => \%Units_of,
-        },
-        {   'Length' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-            'Width' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-            'Height' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-            'Units' => 'Shipment::FedEx::WSDL::TrackTypes::LinearUnits',
-        },
-        {
+    ) ],
+    {
+        'Length' => \%Length_of,
+        'Width' => \%Width_of,
+        'Height' => \%Height_of,
+        'Units' => \%Units_of,
+    },
+    {
+        'Length' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+        'Width' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+        'Height' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+        'Units' => 'Shipment::FedEx::WSDL::TrackTypes::LinearUnits',
+    },
+    {
 
-            'Length' => 'Length',
-            'Width'  => 'Width',
-            'Height' => 'Height',
-            'Units'  => 'Units',
-        }
-    );
+        'Length' => 'Length',
+        'Width' => 'Width',
+        'Height' => 'Height',
+        'Units' => 'Units',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -73,7 +77,7 @@ Shipment::FedEx::WSDL::TrackTypes::Dimensions
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

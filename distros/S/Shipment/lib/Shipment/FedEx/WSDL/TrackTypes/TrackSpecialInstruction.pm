@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackSpecialInstruction;
-$Shipment::FedEx::WSDL::TrackTypes::TrackSpecialInstruction::VERSION = '3.06';
+$Shipment::FedEx::WSDL::TrackTypes::TrackSpecialInstruction::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/track/v9'}
+sub get_xmlns { 'http://fedex.com/ws/track/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,59 +20,57 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Description_of : ATTR(:get<Description>);
-    my %DeliveryOption_of : ATTR(:get<DeliveryOption>);
-    my %StatusDetail_of : ATTR(:get<StatusDetail>);
-    my %OriginalEstimatedDeliveryTimestamp_of :
-      ATTR(:get<OriginalEstimatedDeliveryTimestamp>);
-    my %OriginalRequestTime_of : ATTR(:get<OriginalRequestTime>);
-    my %RequestedAppointmentTime_of : ATTR(:get<RequestedAppointmentTime>);
+my %Description_of :ATTR(:get<Description>);
+my %DeliveryOption_of :ATTR(:get<DeliveryOption>);
+my %StatusDetail_of :ATTR(:get<StatusDetail>);
+my %OriginalEstimatedDeliveryTimestamp_of :ATTR(:get<OriginalEstimatedDeliveryTimestamp>);
+my %OriginalRequestTime_of :ATTR(:get<OriginalRequestTime>);
+my %RequestedAppointmentTime_of :ATTR(:get<RequestedAppointmentTime>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Description
-              DeliveryOption
-              StatusDetail
-              OriginalEstimatedDeliveryTimestamp
-              OriginalRequestTime
-              RequestedAppointmentTime
+__PACKAGE__->_factory(
+    [ qw(        Description
+        DeliveryOption
+        StatusDetail
+        OriginalEstimatedDeliveryTimestamp
+        OriginalRequestTime
+        RequestedAppointmentTime
 
-            )
-        ],
-        {   'Description'                        => \%Description_of,
-            'DeliveryOption'                     => \%DeliveryOption_of,
-            'StatusDetail'                       => \%StatusDetail_of,
-            'OriginalEstimatedDeliveryTimestamp' =>
-              \%OriginalEstimatedDeliveryTimestamp_of,
-            'OriginalRequestTime'      => \%OriginalRequestTime_of,
-            'RequestedAppointmentTime' => \%RequestedAppointmentTime_of,
-        },
-        {   'Description'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'DeliveryOption' =>
-              'Shipment::FedEx::WSDL::TrackTypes::TrackDeliveryOptionType',
-            'StatusDetail' =>
-              'Shipment::FedEx::WSDL::TrackTypes::SpecialInstructionStatusDetail',
-            'OriginalEstimatedDeliveryTimestamp' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
-            'OriginalRequestTime' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
-            'RequestedAppointmentTime' =>
-              'Shipment::FedEx::WSDL::TrackTypes::AppointmentDetail',
-        },
-        {
+    ) ],
+    {
+        'Description' => \%Description_of,
+        'DeliveryOption' => \%DeliveryOption_of,
+        'StatusDetail' => \%StatusDetail_of,
+        'OriginalEstimatedDeliveryTimestamp' => \%OriginalEstimatedDeliveryTimestamp_of,
+        'OriginalRequestTime' => \%OriginalRequestTime_of,
+        'RequestedAppointmentTime' => \%RequestedAppointmentTime_of,
+    },
+    {
+        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'DeliveryOption' => 'Shipment::FedEx::WSDL::TrackTypes::TrackDeliveryOptionType',
+        'StatusDetail' => 'Shipment::FedEx::WSDL::TrackTypes::SpecialInstructionStatusDetail',
+        'OriginalEstimatedDeliveryTimestamp' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
+        'OriginalRequestTime' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
+        'RequestedAppointmentTime' => 'Shipment::FedEx::WSDL::TrackTypes::AppointmentDetail',
+    },
+    {
 
-            'Description'                        => 'Description',
-            'DeliveryOption'                     => 'DeliveryOption',
-            'StatusDetail'                       => 'StatusDetail',
-            'OriginalEstimatedDeliveryTimestamp' =>
-              'OriginalEstimatedDeliveryTimestamp',
-            'OriginalRequestTime'      => 'OriginalRequestTime',
-            'RequestedAppointmentTime' => 'RequestedAppointmentTime',
-        }
-    );
+        'Description' => 'Description',
+        'DeliveryOption' => 'DeliveryOption',
+        'StatusDetail' => 'StatusDetail',
+        'OriginalEstimatedDeliveryTimestamp' => 'OriginalEstimatedDeliveryTimestamp',
+        'OriginalRequestTime' => 'OriginalRequestTime',
+        'RequestedAppointmentTime' => 'RequestedAppointmentTime',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -89,7 +87,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackSpecialInstruction
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

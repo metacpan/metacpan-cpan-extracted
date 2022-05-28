@@ -1513,7 +1513,7 @@ S_mess_alloc(pTHX)
     return sv;
 }
 
-#if defined(PERL_IMPLICIT_CONTEXT)
+#if defined(MULTIPLICITY)
 char *
 Perl_form_nocontext(const char* pat, ...)
 {
@@ -1526,7 +1526,7 @@ Perl_form_nocontext(const char* pat, ...)
     va_end(args);
     return retval;
 }
-#endif /* PERL_IMPLICIT_CONTEXT */
+#endif /* MULTIPLICITY */
 
 /*
 =for apidoc_section $display
@@ -1597,7 +1597,7 @@ already have the thread context.
 =cut
 */
 
-#if defined(PERL_IMPLICIT_CONTEXT)
+#if defined(MULTIPLICITY)
 SV *
 Perl_mess_nocontext(const char *pat, ...)
 {
@@ -1610,7 +1610,7 @@ Perl_mess_nocontext(const char *pat, ...)
     va_end(args);
     return retval;
 }
-#endif /* PERL_IMPLICIT_CONTEXT */
+#endif /* MULTIPLICITY */
 
 SV *
 Perl_mess(pTHX_ const char *pat, ...)
@@ -1880,15 +1880,10 @@ S_invoke_exception_hook(pTHX_ SV *ex, bool warn)
 
 /*
 =for apidoc die_sv
-=for apidoc_item die_nocontext
 
-These ehave the same as L</croak_sv>, except for the return type.
+This behaves the same as L</croak_sv>, except for the return type.
 It should be used only where the C<OP *> return type is required.
-The functions never actually return.
-
-The two forms differ only in that C<die_nocontext> does not take a thread
-context (C<aTHX>) parameter, so is used in situations where the caller doesn't
-already have the thread context.
+The function never actually returns.
 
 =cut
 */
@@ -1906,16 +1901,21 @@ Perl_die_sv(pTHX_ SV *baseex)
 MSVC_DIAG_RESTORE
 
 /*
-=for apidoc die
+=for apidoc      die
+=for apidoc_item die_nocontext
 
-Behaves the same as L</croak>, except for the return type.
-It should be used only where the C<OP *> return type is required.
-The function never actually returns.
+These behave the same as L</croak>, except for the return type.
+They should be used only where the C<OP *> return type is required.
+They never actually return.
+
+The two forms differ only in that C<die_nocontext> does not take a thread
+context (C<aTHX>) parameter, so is used in situations where the caller doesn't
+already have the thread context.
 
 =cut
 */
 
-#if defined(PERL_IMPLICIT_CONTEXT)
+#if defined(MULTIPLICITY)
 
 /* silence __declspec(noreturn) warnings */
 MSVC_DIAG_IGNORE(4646 4645)
@@ -1932,7 +1932,7 @@ Perl_die_nocontext(const char* pat, ...)
 }
 MSVC_DIAG_RESTORE
 
-#endif /* PERL_IMPLICIT_CONTEXT */
+#endif /* MULTIPLICITY */
 
 /* silence __declspec(noreturn) warnings */
 MSVC_DIAG_IGNORE(4646 4645)
@@ -2041,7 +2041,7 @@ when you are about to throw an exception.
 =cut
 */
 
-#if defined(PERL_IMPLICIT_CONTEXT)
+#if defined(MULTIPLICITY)
 void
 Perl_croak_nocontext(const char *pat, ...)
 {
@@ -2052,7 +2052,7 @@ Perl_croak_nocontext(const char *pat, ...)
     NOT_REACHED; /* NOTREACHED */
     va_end(args);
 }
-#endif /* PERL_IMPLICIT_CONTEXT */
+#endif /* MULTIPLICITY */
 
 /* saves machine code for a common noreturn idiom typically used in Newx*() */
 GCC_DIAG_IGNORE_DECL(-Wunused-function);
@@ -2192,7 +2192,7 @@ already have the thread context.
 =cut
 */
 
-#if defined(PERL_IMPLICIT_CONTEXT)
+#if defined(MULTIPLICITY)
 void
 Perl_warn_nocontext(const char *pat, ...)
 {
@@ -2203,7 +2203,7 @@ Perl_warn_nocontext(const char *pat, ...)
     vwarn(pat, &args);
     va_end(args);
 }
-#endif /* PERL_IMPLICIT_CONTEXT */
+#endif /* MULTIPLICITY */
 
 void
 Perl_warn(pTHX_ const char *pat, ...)
@@ -2264,7 +2264,7 @@ This is like C<L</warner>>, but C<args> are an encapsulated argument list.
 =cut
 */
 
-#if defined(PERL_IMPLICIT_CONTEXT)
+#if defined(MULTIPLICITY)
 void
 Perl_warner_nocontext(U32 err, const char *pat, ...)
 {
@@ -2275,7 +2275,7 @@ Perl_warner_nocontext(U32 err, const char *pat, ...)
     vwarner(err, pat, &args);
     va_end(args);
 }
-#endif /* PERL_IMPLICIT_CONTEXT */
+#endif /* MULTIPLICITY */
 
 void
 Perl_ck_warner_d(pTHX_ U32 err, const char* pat, ...)
@@ -2466,7 +2466,7 @@ S_env_alloc(void *current, Size_t l1, Size_t l2, Size_t l3, Size_t size)
 #  endif
 
 
-#  if !defined(WIN32) && !defined(NETWARE)
+#  if !defined(WIN32)
 
 /*
 =for apidoc_section $utility
@@ -2606,7 +2606,7 @@ my_setenv_out:
 #    endif
 }
 
-#  else /* WIN32 || NETWARE */
+#  else /* WIN32 */
 
 void
 Perl_my_setenv(pTHX_ const char *nam, const char *val)
@@ -2625,7 +2625,7 @@ Perl_my_setenv(pTHX_ const char *nam, const char *val)
     safesysfree(envstr);
 }
 
-#  endif /* WIN32 || NETWARE */
+#  endif /* WIN32 */
 
 #endif /* USE_ENVIRON_ARRAY */
 
@@ -2646,10 +2646,34 @@ Perl_unlnk(pTHX_ const char *f)	/* unlink all versions of a file */
 }
 #endif
 
+#if defined(OEMVS)
+  #if (__CHARSET_LIB == 1)
+  static int chgfdccsid(int fd, unsigned short ccsid) 
+  {
+    attrib_t attr;
+    memset(&attr, 0, sizeof(attr));
+    attr.att_filetagchg = 1;
+    attr.att_filetag.ft_ccsid = ccsid;
+    if (ccsid != FT_BINARY) {
+      attr.att_filetag.ft_txtflag = 1;
+    }
+    return __fchattr(fd, &attr, sizeof(attr));
+  }
+  #endif
+#endif
+
+/*
+=for apidoc my_popen_list
+
+Implementing function on some systems for PerlProc_popen_list()
+
+=cut
+*/
+
 PerlIO *
 Perl_my_popen_list(pTHX_ const char *mode, int n, SV **args)
 {
-#if (!defined(DOSISH) || defined(HAS_FORK)) && !defined(OS2) && !defined(VMS) && !defined(NETWARE) && !defined(__LIBCATAMOUNT__) && !defined(__amigaos4__)
+#if (!defined(DOSISH) || defined(HAS_FORK)) && !defined(OS2) && !defined(VMS) && !defined(__LIBCATAMOUNT__) && !defined(__amigaos4__)
     int p[2];
     I32 This, that;
     Pid_t pid;
@@ -2693,6 +2717,12 @@ Perl_my_popen_list(pTHX_ const char *mode, int n, SV **args)
         /* Close parent's end of error status pipe (if any) */
         if (did_pipes)
             PerlLIO_close(pp[0]);
+#if defined(OEMVS)
+  #if (__CHARSET_LIB == 1)
+        chgfdccsid(p[THIS], 819);
+        chgfdccsid(p[THAT], 819);
+  #endif
+#endif
         /* Now dup our end of _the_ pipe to right position */
         if (p[THIS] != (*mode == 'r')) {
             PerlLIO_dup2(p[THIS], *mode == 'r');
@@ -2768,7 +2798,20 @@ Perl_my_popen_list(pTHX_ const char *mode, int n, SV **args)
     }
     if (did_pipes)
          PerlLIO_close(pp[0]);
+#if defined(OEMVS)
+  #if (__CHARSET_LIB == 1)
+    PerlIO* io = PerlIO_fdopen(p[This], mode);
+    if (io) {
+      chgfdccsid(p[This], 819);
+    }
+    return io;
+  #else
     return PerlIO_fdopen(p[This], mode);
+  #endif
+#else
+    return PerlIO_fdopen(p[This], mode);
+#endif
+
 #else
 #  if defined(OS2)	/* Same, without fork()ing and all extra overhead... */
     return my_syspopen4(aTHX_ NULL, mode, n, args);
@@ -2783,6 +2826,17 @@ Perl_my_popen_list(pTHX_ const char *mode, int n, SV **args)
 
     /* VMS' my_popen() is in VMS.c, same with OS/2 and AmigaOS 4. */
 #if (!defined(DOSISH) || defined(HAS_FORK)) && !defined(VMS) && !defined(__LIBCATAMOUNT__) && !defined(__amigaos4__)
+
+/*
+=for apidoc_section $io
+=for apidoc my_popen
+
+A wrapper for the C library L<popen(3)>.  Don't use the latter, as the Perl
+version knows things that interact with the rest of the perl interpreter.
+
+=cut
+*/
+
 PerlIO *
 Perl_my_popen(pTHX_ const char *cmd, const char *mode)
 {
@@ -2835,6 +2889,12 @@ Perl_my_popen(pTHX_ const char *cmd, const char *mode)
 #define THAT This
         if (did_pipes)
             PerlLIO_close(pp[0]);
+#if defined(OEMVS)
+  #if (__CHARSET_LIB == 1)
+        chgfdccsid(p[THIS], 819);
+        chgfdccsid(p[THAT], 819);
+  #endif
+#endif
         if (p[THIS] != (*mode == 'r')) {
             PerlLIO_dup2(p[THIS], *mode == 'r');
             PerlLIO_close(p[THIS]);
@@ -2921,19 +2981,19 @@ Perl_my_popen(pTHX_ const char *cmd, const char *mode)
     }
     if (did_pipes)
          PerlLIO_close(pp[0]);
+#if defined(OEMVS)
+  #if (__CHARSET_LIB == 1)
+    PerlIO* io = PerlIO_fdopen(p[This],	mode);
+    if (io) {
+      chgfdccsid(p[This], 819);
+    }
+    return io;
+  #else
     return PerlIO_fdopen(p[This], mode);
-}
-#elif defined(DJGPP)
-FILE *djgpp_popen();
-PerlIO *
-Perl_my_popen(pTHX_ const char *cmd, const char *mode)
-{
-    PERL_FLUSHALL_FOR_CHILD;
-    /* Call system's popen() to get a FILE *, then import it.
-       used 0 for 2nd parameter to PerlIO_importFILE;
-       apparently not used
-    */
-    return PerlIO_importFILE(djgpp_popen(cmd, mode), 0);
+  #endif
+#else
+    return PerlIO_fdopen(p[This], mode);
+#endif
 }
 #elif defined(__LIBCATAMOUNT__)
 PerlIO *
@@ -2993,6 +3053,18 @@ Perl_atfork_unlock(void)
     OP_REFCNT_UNLOCK;
 #endif
 }
+
+/*
+=for apidoc_section $concurrency
+=for apidoc my_fork
+
+This is for the use of C<PerlProc_fork> as a wrapper for the C library
+L<fork(2)> on some platforms to hide some platform quirks.  It should not be
+used except through C<PerlProc_fork>.
+
+=cut
+*/
+
 
 Pid_t
 Perl_my_fork(void)
@@ -3059,8 +3131,10 @@ dup2(int oldfd, int newfd)
 =for apidoc_section $signals
 =for apidoc rsignal
 
-A wrapper for the C library L<signal(2)>.  Don't use the latter, as the Perl
-version knows things that interact with the rest of the perl interpreter.
+A wrapper for the C library functions L<sigaction(2)> or L<signal(2)>.
+Use this instead of those libc functions, as the Perl version gives the
+safest available implementation, and knows things that interact with the
+rest of the perl interpreter.
 
 =cut
 */
@@ -3092,6 +3166,16 @@ Perl_rsignal(pTHX_ int signo, Sighandler_t handler)
     else
         return (Sighandler_t) oact.sa_handler;
 }
+
+/*
+=for apidoc_section $signals
+=for apidoc rsignal_state
+
+Returns a the current signal handler for signal C<signo>.
+See L</C<rsignal>>.
+
+=cut
+*/
 
 Sighandler_t
 Perl_rsignal_state(pTHX_ int signo)
@@ -3210,7 +3294,18 @@ Perl_rsignal_restore(pTHX_ int signo, Sigsave_t *save)
 #endif /* !HAS_SIGACTION */
 #endif /* !PERL_MICRO */
 
-    /* VMS' my_pclose() is in VMS.c; same with OS/2 */
+    /* VMS' my_pclose() is in VMS.c */
+
+/*
+=for apidoc_section $io
+=for apidoc my_pclose
+
+A wrapper for the C library L<pclose(3)>.  Don't use the latter, as the Perl
+version knows things that interact with the rest of the perl interpreter.
+
+=cut
+*/
+
 #if (!defined(DOSISH) || defined(HAS_FORK)) && !defined(VMS) && !defined(__LIBCATAMOUNT__) && !defined(__amigaos4__)
 I32
 Perl_my_pclose(pTHX_ PerlIO *ptr)
@@ -3224,10 +3319,14 @@ Perl_my_pclose(pTHX_ PerlIO *ptr)
     const int fd = PerlIO_fileno(ptr);
     bool should_wait;
 
-    svp = av_fetch(PL_fdpid,fd,TRUE);
-    pid = (SvTYPE(*svp) == SVt_IV) ? SvIVX(*svp) : -1;
-    SvREFCNT_dec(*svp);
-    *svp = NULL;
+    svp = av_fetch(PL_fdpid, fd, FALSE);
+    if (svp) {
+        pid = (SvTYPE(*svp) == SVt_IV) ? SvIVX(*svp) : -1;
+        SvREFCNT_dec(*svp);
+        *svp = NULL;
+    } else {
+        pid = -1;
+    }
 
 #if defined(USE_PERLIO)
     /* Find out whether the refcount is low enough for us to wait for the
@@ -3238,7 +3337,7 @@ Perl_my_pclose(pTHX_ PerlIO *ptr)
 #endif
 
 #ifdef OS2
-    if (pid == -1) {			/* Opened by popen. */
+    if (pid == -2) {                    /* Opened by popen. */
         return my_syspclose(ptr);
     }
 #endif
@@ -3265,7 +3364,7 @@ Perl_my_pclose(pTHX_ PerlIO *ptr)
 }
 #endif /* !DOSISH */
 
-#if  (!defined(DOSISH) || defined(OS2) || defined(WIN32) || defined(NETWARE)) && !defined(__LIBCATAMOUNT__)
+#if  (!defined(DOSISH) || defined(OS2) || defined(WIN32)) && !defined(__LIBCATAMOUNT__)
 I32
 Perl_wait4pid(pTHX_ Pid_t pid, int *statusp, int flags)
 {
@@ -3354,7 +3453,7 @@ Perl_wait4pid(pTHX_ Pid_t pid, int *statusp, int flags)
     }
     return result;
 }
-#endif /* !DOSISH || OS2 || WIN32 || NETWARE */
+#endif /* !DOSISH || OS2 || WIN32 */
 
 #ifdef PERL_USES_PL_PIDSTATUS
 void
@@ -3388,19 +3487,15 @@ Perl_my_pclose(pTHX_ PerlIO *ptr)
 }
 #endif
 
-#if defined(DJGPP)
-int djgpp_pclose();
-I32
-Perl_my_pclose(pTHX_ PerlIO *ptr)
-{
-    /* Needs work for PerlIO ! */
-    FILE * const f = PerlIO_findFILE(ptr);
-    I32 result = djgpp_pclose(f);
-    result = (result << 8) & 0xff00;
-    PerlIO_releaseFILE(ptr,f);
-    return result;
-}
-#endif
+/*
+=for apidoc repeatcpy
+
+Make C<count> copies of the C<len> bytes beginning at C<from>, placing them
+into memory beginning at C<to>, which must be big enough to accommodate them
+all.
+
+=cut
+*/
 
 #define PERL_REPEATCPY_LINEAR 4
 void
@@ -3708,6 +3803,15 @@ Perl_find_script(pTHX_ const char *scriptname, bool dosearch,
 
 #ifndef PERL_GET_CONTEXT_DEFINED
 
+/*
+=for apidoc_section $embedding
+=for apidoc get_context
+
+Implements L<perlapi/C<PERL_GET_CONTEXT>>, which you should use instead.
+
+=cut
+*/
+
 void *
 Perl_get_context(void)
 {
@@ -3728,16 +3832,30 @@ Perl_get_context(void)
 #endif
 }
 
+/*
+=for apidoc_section $embedding
+=for apidoc set_context
+
+Implements L<perlapi/C<PERL_SET_CONTEXT>>, which you should use instead.
+
+=cut
+*/
+
 void
 Perl_set_context(void *t)
 {
-#if defined(USE_ITHREADS)
-#endif
     PERL_ARGS_ASSERT_SET_CONTEXT;
 #if defined(USE_ITHREADS)
+#  ifdef PERL_USE_THREAD_LOCAL
+    PL_current_context = t;
+#  endif
 #  ifdef I_MACH_CTHREADS
     cthread_set_data(cthread_self(), t);
 #  else
+    /* We set thread-specific value always, as C++ code has to read it with
+     * pthreads, beacuse the declaration syntax for thread local storage for C11
+     * is incompatible with C++, meaning that we can't expose the thread local
+     * variable to C++ code. */
     {
         const int error = pthread_setspecific(PL_thr_key, t);
         if (error)
@@ -3808,6 +3926,15 @@ Perl_get_vtbl(pTHX_ int vtbl_id)
     return (vtbl_id < 0 || vtbl_id >= magic_vtable_max)
         ? NULL : (MGVTBL*)PL_magic_vtables + vtbl_id;
 }
+
+/*
+=for apidoc_section $io
+=for apidoc my_fflush_all
+
+Implements C<PERL_FLUSHALL_FOR_CHILD> on some platforms.
+
+=cut
+ */
 
 I32
 Perl_my_fflush_all(pTHX)
@@ -4598,6 +4725,16 @@ S_socketpair_udp (int fd[2]) {
 #endif /*  EMULATE_SOCKETPAIR_UDP */
 
 #if !defined(HAS_SOCKETPAIR) && defined(HAS_SOCKET) && defined(AF_INET) && defined(PF_INET)
+
+/*
+=for apidoc my_socketpair
+
+Emulates L<socketpair(2)> on systems that don't have it, but which do have
+enough functionality for the emulation.
+
+=cut
+*/
+
 int
 Perl_my_socketpair (int family, int type, int protocol, int fd[2]) {
     /* Stevens says that family must be AF_LOCAL, protocol 0.
@@ -4918,11 +5055,16 @@ Perl_get_hash_seed(pTHX_ unsigned char * const seed_buffer)
 
     PERL_ARGS_ASSERT_GET_HASH_SEED;
 
+    Zero(seed_buffer, PERL_HASH_SEED_BYTES, U8);
+    Zero((U8*)PL_hash_state_w, PERL_HASH_STATE_BYTES, U8);
+
 #ifndef NO_PERL_HASH_ENV
     env_pv= PerlEnv_getenv("PERL_HASH_SEED");
 
     if ( env_pv )
     {
+        if (DEBUG_h_TEST)
+            PerlIO_printf(Perl_debug_log,"Got PERL_HASH_SEED=<%s>\n", env_pv);
         /* ignore leading spaces */
         while (isSPACE(*env_pv))
             env_pv++;
@@ -4963,19 +5105,12 @@ Perl_get_hash_seed(pTHX_ unsigned char * const seed_buffer)
         }
     }
 #ifdef USE_PERL_PERTURB_KEYS
-    {   /* initialize PL_hash_rand_bits from the hash seed.
-         * This value is highly volatile, it is updated every
-         * hash insert, and is used as part of hash bucket chain
-         * randomization and hash iterator randomization. */
-        PL_hash_rand_bits= 0xbe49d17f; /* I just picked a number */
-        for( i = 0; i < sizeof(UV) ; i++ ) {
-            PL_hash_rand_bits += seed_buffer[i % PERL_HASH_SEED_BYTES];
-            PL_hash_rand_bits = ROTL_UV(PL_hash_rand_bits,8);
-        }
-    }
 #  ifndef NO_PERL_HASH_ENV
     env_pv= PerlEnv_getenv("PERL_PERTURB_KEYS");
     if (env_pv) {
+        if (DEBUG_h_TEST)
+            PerlIO_printf(Perl_debug_log,
+                "Got PERL_PERTURB_KEYS=<%s>\n", env_pv);
         if (strEQ(env_pv,"0") || strEQ(env_pv,"NO")) {
             PL_hash_rand_bits_enabled= 0;
         } else if (strEQ(env_pv,"1") || strEQ(env_pv,"RANDOM")) {
@@ -4987,8 +5122,71 @@ Perl_get_hash_seed(pTHX_ unsigned char * const seed_buffer)
         }
     }
 #  endif
+    {   /* initialize PL_hash_rand_bits from the hash seed.
+         * This value is highly volatile, it is updated every
+         * hash insert, and is used as part of hash bucket chain
+         * randomization and hash iterator randomization. */
+        if (PL_hash_rand_bits_enabled == 1) {
+            /* random mode initialize from seed() like we would our RNG() */
+            PL_hash_rand_bits= seed();
+        }
+        else {
+            /* Use a constant */
+            PL_hash_rand_bits= 0xbe49d17f; /* I just picked a number */
+            /* and then mix in the leading bytes of the hash seed */
+            for( i = 0; i < sizeof(UV) ; i++ ) {
+                PL_hash_rand_bits ^= seed_buffer[i % PERL_HASH_SEED_BYTES];
+                PL_hash_rand_bits = ROTL_UV(PL_hash_rand_bits,8);
+            }
+        }
+        if (!PL_hash_rand_bits) {
+            /* we use an XORSHIFT RNG to munge PL_hash_rand_bits,
+             * which means it cannot be 0 or it will stay 0 for the
+             * lifetime of the process, so if by some insane chance we
+             * ended up with a 0 after the above initialization
+             * then set it to this. This really should not happen, or
+             * very very very rarely.
+             */
+            PL_hash_rand_bits = 0x8110ba9d; /* a randomly chosen prime */
+        }
+    }
 #endif
 }
+
+void
+Perl_debug_hash_seed(pTHX_ bool via_debug_h)
+{
+    PERL_ARGS_ASSERT_DEBUG_HASH_SEED;
+#if (defined(USE_HASH_SEED) || defined(USE_HASH_SEED_DEBUG)) && !defined(NO_PERL_HASH_SEED_DEBUG)
+    {
+        const char * const s = PerlEnv_getenv("PERL_HASH_SEED_DEBUG");
+        bool via_env = cBOOL(s && strNE(s, "0") && strNE(s,""));
+
+        if ( via_env != via_debug_h ) {
+            const unsigned char *seed= PERL_HASH_SEED;
+            const unsigned char *seed_end= PERL_HASH_SEED + PERL_HASH_SEED_BYTES;
+            PerlIO_printf(Perl_debug_log, "HASH_FUNCTION = %s HASH_SEED = 0x", PERL_HASH_FUNC);
+            while (seed < seed_end) {
+                PerlIO_printf(Perl_debug_log, "%02x", *seed++);
+            }
+#ifdef PERL_HASH_RANDOMIZE_KEYS
+            PerlIO_printf(Perl_debug_log, " PERTURB_KEYS = %d (%s)",
+                    PL_HASH_RAND_BITS_ENABLED,
+                    PL_HASH_RAND_BITS_ENABLED == 0 ? "NO" :
+                    PL_HASH_RAND_BITS_ENABLED == 1 ? "RANDOM"
+                                                   : "DETERMINISTIC");
+            if (DEBUG_h_TEST)
+                PerlIO_printf(Perl_debug_log,
+                        " RAND_BITS=0x%" UVxf, PL_hash_rand_bits);
+#endif
+            PerlIO_printf(Perl_debug_log, "\n");
+        }
+    }
+#endif /* #if (defined(USE_HASH_SEED) ... */
+}
+
+
+
 
 #ifdef PERL_MEM_LOG
 
@@ -5483,15 +5681,21 @@ Perl_my_clearenv(pTHX)
 #endif /* PERL_MICRO */
 }
 
-#ifdef PERL_IMPLICIT_CONTEXT
+#ifdef MULTIPLICITY
 
+/*
+=for apidoc my_cxt_init
 
-/* Implements the MY_CXT_INIT macro. The first time a module is loaded,
-the global PL_my_cxt_index is incremented, and that value is assigned to
-that module's static my_cxt_index (who's address is passed as an arg).
-Then, for each interpreter this function is called for, it makes sure a
-void* slot is available to hang the static data off, by allocating or
-extending the interpreter's PL_my_cxt_list array */
+Implements the L<perlxs/C<MY_CXT_INIT>> macro, which you should use instead.
+
+The first time a module is loaded, the global C<PL_my_cxt_index> is incremented,
+and that value is assigned to that module's static C<my_cxt_index> (whose
+address is passed as an arg).  Then, for each interpreter this function is
+called for, it makes sure a C<void*> slot is available to hang the static data
+off, by allocating or extending the interpreter's C<PL_my_cxt_list> array
+
+=cut
+*/
 
 void *
 Perl_my_cxt_init(pTHX_ int *indexp, size_t size)
@@ -5538,7 +5742,7 @@ Perl_my_cxt_init(pTHX_ int *indexp, size_t size)
     return p;
 }
 
-#endif /* PERL_IMPLICIT_CONTEXT */
+#endif /* MULTIPLICITY */
 
 
 /* Perl_xs_handshake():
@@ -5584,7 +5788,8 @@ Perl_xs_handshake(const U32 key, void * v_my_perl, const char * file, ...)
     U32 items, ax;
     void * got;
     void * need;
-#ifdef PERL_IMPLICIT_CONTEXT
+    const char *stage = "first";
+#ifdef MULTIPLICITY
     dTHX;
     tTHX xs_interp;
 #else
@@ -5603,7 +5808,7 @@ Perl_xs_handshake(const U32 key, void * v_my_perl, const char * file, ...)
    2nd threaded perl interp DLL never initialized its TLS/PERL_SYS_INIT3 so
    dTHX call from 2nd interp DLL can't return the my_perl that pp_entersub
    passed to the XS DLL */
-#ifdef PERL_IMPLICIT_CONTEXT
+#ifdef MULTIPLICITY
     xs_interp = (tTHX)v_my_perl;
     got = xs_interp;
     need = my_perl;
@@ -5620,12 +5825,13 @@ Perl_xs_handshake(const U32 key, void * v_my_perl, const char * file, ...)
     got = xs_spp;
     need = &PL_stack_sp;
 #endif
+    stage = "second";
     if(UNLIKELY(got != need)) {
         bad_handshake:/* recycle branch and string from above */
         if(got != (void *)HSf_NOCHK)
             noperl_die("%s: loadable library and perl binaries are mismatched"
-                       " (got handshake key %p, needed %p)\n",
-                file, got, need);
+                       " (got %s handshake key %p, needed %p)\n",
+                       file, stage, got, need);
     }
 
     if(key & HSf_SETXSUBFN) {     /* this might be called from a module bootstrap */
@@ -5795,12 +6001,6 @@ Perl_my_strlcpy(char *dst, const char *src, Size_t size)
 }
 #endif
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1300) && (_MSC_VER < 1400) && (WINVER < 0x0500)
-/* VC7 or 7.1, building with pre-VC7 runtime libraries. */
-long _ftol( double ); /* Defined by VC6 C libs. */
-long _ftol2( double dblSource ) { return _ftol( dblSource ); }
-#endif
-
 PERL_STATIC_INLINE bool
 S_gv_has_usable_name(pTHX_ GV *gv)
 {
@@ -5871,6 +6071,16 @@ Perl_get_db_sub(pTHX_ SV **svp, CV *cv)
 #endif
 }
 
+/*
+=for apidoc_section $io
+=for apidoc my_dirfd
+
+The C library C<L<dirfd(3)>> if available, or a Perl implementation of it, or die
+if not easily emulatable.
+
+=cut
+*/
+
 int
 Perl_my_dirfd(DIR * dir) {
 
@@ -5934,6 +6144,15 @@ S_my_mkostemp(char *templte, int flags) {
 #endif
 
 #ifndef HAS_MKOSTEMP
+
+/*
+=for apidoc my_mkostemp
+
+The C library C<L<mkostemp(3)>> if available, or a Perl implementation of it.
+
+=cut
+*/
+
 int
 Perl_my_mkostemp(char *templte, int flags)
 {
@@ -5943,6 +6162,15 @@ Perl_my_mkostemp(char *templte, int flags)
 #endif
 
 #ifndef HAS_MKSTEMP
+
+/*
+=for apidoc my_mkstemp
+
+The C library C<L<mkstemp(3)>> if available, or a Perl implementation of it.
+
+=cut
+*/
+
 int
 Perl_my_mkstemp(char *templte)
 {

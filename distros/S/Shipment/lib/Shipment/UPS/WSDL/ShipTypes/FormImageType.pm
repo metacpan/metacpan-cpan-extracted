@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::FormImageType;
-$Shipment::UPS::WSDL::ShipTypes::FormImageType::VERSION = '3.06';
+$Shipment::UPS::WSDL::ShipTypes::FormImageType::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,31 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %ImageFormat_of : ATTR(:get<ImageFormat>);
-    my %GraphicImage_of : ATTR(:get<GraphicImage>);
+my %ImageFormat_of :ATTR(:get<ImageFormat>);
+my %GraphicImage_of :ATTR(:get<GraphicImage>);
 
-    __PACKAGE__->_factory(
-        [   qw(        ImageFormat
-              GraphicImage
+__PACKAGE__->_factory(
+    [ qw(        ImageFormat
+        GraphicImage
 
-            )
-        ],
-        {   'ImageFormat'  => \%ImageFormat_of,
-            'GraphicImage' => \%GraphicImage_of,
-        },
-        {   'ImageFormat' => 'Shipment::UPS::WSDL::ShipTypes::ImageFormatType',
-            'GraphicImage' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'ImageFormat' => \%ImageFormat_of,
+        'GraphicImage' => \%GraphicImage_of,
+    },
+    {
+        'ImageFormat' => 'Shipment::UPS::WSDL::ShipTypes::ImageFormatType',
+        'GraphicImage' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'ImageFormat'  => 'ImageFormat',
-            'GraphicImage' => 'GraphicImage',
-        }
-    );
+        'ImageFormat' => 'ImageFormat',
+        'GraphicImage' => 'GraphicImage',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -61,7 +67,7 @@ Shipment::UPS::WSDL::ShipTypes::FormImageType
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

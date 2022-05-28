@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::CreditCardInformation;
-$Shipment::Purolator::WSDL::Types::CreditCardInformation::VERSION = '3.06';
+$Shipment::Purolator::WSDL::Types::CreditCardInformation::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,51 +20,57 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Type_of : ATTR(:get<Type>);
-    my %Number_of : ATTR(:get<Number>);
-    my %Name_of : ATTR(:get<Name>);
-    my %ExpiryMonth_of : ATTR(:get<ExpiryMonth>);
-    my %ExpiryYear_of : ATTR(:get<ExpiryYear>);
-    my %CVV_of : ATTR(:get<CVV>);
+my %Type_of :ATTR(:get<Type>);
+my %Number_of :ATTR(:get<Number>);
+my %Name_of :ATTR(:get<Name>);
+my %ExpiryMonth_of :ATTR(:get<ExpiryMonth>);
+my %ExpiryYear_of :ATTR(:get<ExpiryYear>);
+my %CVV_of :ATTR(:get<CVV>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Type
-              Number
-              Name
-              ExpiryMonth
-              ExpiryYear
-              CVV
+__PACKAGE__->_factory(
+    [ qw(        Type
+        Number
+        Name
+        ExpiryMonth
+        ExpiryYear
+        CVV
 
-            )
-        ],
-        {   'Type'        => \%Type_of,
-            'Number'      => \%Number_of,
-            'Name'        => \%Name_of,
-            'ExpiryMonth' => \%ExpiryMonth_of,
-            'ExpiryYear'  => \%ExpiryYear_of,
-            'CVV'         => \%CVV_of,
-        },
-        {   'Type'   => 'Shipment::Purolator::WSDL::Types::CreditCardType',
-            'Number' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Name'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'ExpiryMonth' => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
-            'ExpiryYear'  => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
-            'CVV'         => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'Type' => \%Type_of,
+        'Number' => \%Number_of,
+        'Name' => \%Name_of,
+        'ExpiryMonth' => \%ExpiryMonth_of,
+        'ExpiryYear' => \%ExpiryYear_of,
+        'CVV' => \%CVV_of,
+    },
+    {
+        'Type' => 'Shipment::Purolator::WSDL::Types::CreditCardType',
+        'Number' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Name' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'ExpiryMonth' => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
+        'ExpiryYear' => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
+        'CVV' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'Type'        => 'Type',
-            'Number'      => 'Number',
-            'Name'        => 'Name',
-            'ExpiryMonth' => 'ExpiryMonth',
-            'ExpiryYear'  => 'ExpiryYear',
-            'CVV'         => 'CVV',
-        }
-    );
+        'Type' => 'Type',
+        'Number' => 'Number',
+        'Name' => 'Name',
+        'ExpiryMonth' => 'ExpiryMonth',
+        'ExpiryYear' => 'ExpiryYear',
+        'CVV' => 'CVV',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -81,7 +87,7 @@ Shipment::Purolator::WSDL::Types::CreditCardInformation
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

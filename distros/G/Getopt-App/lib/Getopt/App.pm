@@ -8,7 +8,7 @@ use Carp qw(croak);
 use Getopt::Long ();
 use List::Util qw(first);
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 our ($OPT_COMMENT_RE, $OPTIONS, $SUBCOMMANDS, %APPS) = (qr{\s+\#\s+});
 
@@ -180,8 +180,7 @@ sub _getopt_configure {qw(bundling no_auto_abbrev no_ignore_case pass_through re
 sub _getopt_load_subcommand {
   my ($self, $subcommand, $argv) = @_;
   ($@, $!) = ('', 0);
-  my $code = do $subcommand->[1];
-  croak "Unable to load subcommand $subcommand->[0]: $@ ($!)" if $@ or $!;
+  croak "Unable to load subcommand $subcommand->[0]: $@ ($!)" unless my $code = do $subcommand->[1];
   return $code;
 }
 
@@ -209,7 +208,7 @@ sub _subcommand {
   local $0 = $subcommand->[1];
   unless ($APPS{$subcommand->[1]}) {
     $APPS{$subcommand->[1]} = _call($app, getopt_load_subcommand => $subcommand, $argv);
-    croak "Can't load code ref from $subcommand->[0]" unless ref $APPS{$subcommand->[1]} eq 'CODE';
+    croak "$subcommand->[0] did not return a code ref" unless ref $APPS{$subcommand->[1]} eq 'CODE';
   }
 
   return $APPS{$subcommand->[1]}->([@$argv[1 .. $#$argv]]);

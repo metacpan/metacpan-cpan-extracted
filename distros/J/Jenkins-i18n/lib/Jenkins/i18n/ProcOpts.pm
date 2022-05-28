@@ -7,7 +7,7 @@ use Hash::Util qw(lock_hash unlock_value lock_value);
 use Carp qw(confess);
 use File::Spec;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =pod
 
@@ -277,9 +277,10 @@ The path to the English file location.
 
 sub define_files {
     my ( $self, $file ) = @_;
-    my $filename = ( File::Spec->splitpath($file) )[2];
-    my ( $filename_prefix, $filename_ext )
-        = split( $self->{ext_sep}, $filename );
+    my ( $volume, $dirs, $filename ) = File::Spec->splitpath($file);
+    my @file_parts      = split( $self->{ext_sep}, $filename );
+    my $filename_ext    = pop(@file_parts);
+    my $filename_prefix = join( '.', @file_parts );
     my ( $curr_lang_file, $english_file );
 
     if ( $filename_ext eq 'jelly' ) {
@@ -293,20 +294,21 @@ sub define_files {
         $english_file = $filename;
     }
     else {
-        confess "Unexpected file extension '$filename_ext'";
+        confess "Unexpected file extension '$filename_ext' in $file";
     }
+
+    my $english_file_path
+        = File::Spec->catfile( $volume, $dirs, $english_file );
 
     if ( $self->{source_dir} eq $self->{target_dir} ) {
-        return (
-            File::Spec->catfile( $self->{source_dir}, $curr_lang_file ),
-            File::Spec->catfile( $self->{source_dir}, $english_file )
-        );
+        return ( File::Spec->catfile( $volume, $dirs, $curr_lang_file ),
+            $english_file_path );
     }
 
-    return (
-        File::Spec->catfile( $self->{target_dir}, $curr_lang_file ),
-        File::Spec->catfile( $self->{source_dir}, $english_file )
-    );
+    $dirs =~ s/$self->{source_dir}/$self->{target_dir}/;
+
+    return ( File::Spec->catfile( $volume, $dirs, $curr_lang_file ),
+        $english_file_path );
 
 }
 

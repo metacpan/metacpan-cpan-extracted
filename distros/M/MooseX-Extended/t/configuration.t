@@ -30,8 +30,11 @@ package My::Names {
 }
 
 subtest 'miscellaneous features' => sub {
-    ok +My::Names->meta->is_immutable,
-      'We should be able to define an immutable class';
+    SKIP: {
+        skip "Classes cannot be immutable while running under the debugger", 1 if $^P;
+        ok +My::Names->meta->is_immutable,
+          'We should be able to define an immutable class';
+    }
     isnt mro::get_mro('My::Names'), 'c3', "... but we can exclude the C3 mro if we want";
 
     ok my $instance = My::Names->new(

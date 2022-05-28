@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::Money;
-$Shipment::FedEx::WSDL::ShipTypes::Money::VERSION = '3.06';
+$Shipment::FedEx::WSDL::ShipTypes::Money::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/ship/v9'}
+sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,31 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Currency_of : ATTR(:get<Currency>);
-    my %Amount_of : ATTR(:get<Amount>);
+my %Currency_of :ATTR(:get<Currency>);
+my %Amount_of :ATTR(:get<Amount>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Currency
-              Amount
+__PACKAGE__->_factory(
+    [ qw(        Currency
+        Amount
 
-            )
-        ],
-        {   'Currency' => \%Currency_of,
-            'Amount'   => \%Amount_of,
-        },
-        {   'Currency' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Amount'   => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
-        },
-        {
+    ) ],
+    {
+        'Currency' => \%Currency_of,
+        'Amount' => \%Amount_of,
+    },
+    {
+        'Currency' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Amount' => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
+    },
+    {
 
-            'Currency' => 'Currency',
-            'Amount'   => 'Amount',
-        }
-    );
+        'Currency' => 'Currency',
+        'Amount' => 'Amount',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -61,7 +67,7 @@ Shipment::FedEx::WSDL::ShipTypes::Money
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

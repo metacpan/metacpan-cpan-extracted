@@ -7,7 +7,12 @@ META.json
 META.yml
 README
 t/00-load.t
+t/01-usage-simple.t
+t/02-usage-ojo.t
+t/03-usage-mojo-useragent.t
+t/04-method-query_string_to_struct.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+t/Role/Test/Module.pm
 xt/boilerplate.t

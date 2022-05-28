@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::OptionsInformation;
-$Shipment::Purolator::WSDL::Types::OptionsInformation::VERSION = '3.06';
+$Shipment::Purolator::WSDL::Types::OptionsInformation::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,33 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Options_of : ATTR(:get<Options>);
-    my %ExpressChequeAddress_of : ATTR(:get<ExpressChequeAddress>);
+my %Options_of :ATTR(:get<Options>);
+my %ExpressChequeAddress_of :ATTR(:get<ExpressChequeAddress>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Options
-              ExpressChequeAddress
+__PACKAGE__->_factory(
+    [ qw(        Options
+        ExpressChequeAddress
 
-            )
-        ],
-        {   'Options'              => \%Options_of,
-            'ExpressChequeAddress' => \%ExpressChequeAddress_of,
-        },
-        {   'Options' =>
-              'Shipment::Purolator::WSDL::Types::ArrayOfOptionIDValuePair',
-            'ExpressChequeAddress' =>
-              'Shipment::Purolator::WSDL::Types::Address',
-        },
-        {
+    ) ],
+    {
+        'Options' => \%Options_of,
+        'ExpressChequeAddress' => \%ExpressChequeAddress_of,
+    },
+    {
+        'Options' => 'Shipment::Purolator::WSDL::Types::ArrayOfOptionIDValuePair',
+        'ExpressChequeAddress' => 'Shipment::Purolator::WSDL::Types::Address',
+    },
+    {
 
-            'Options'              => 'Options',
-            'ExpressChequeAddress' => 'ExpressChequeAddress',
-        }
-    );
+        'Options' => 'Options',
+        'ExpressChequeAddress' => 'ExpressChequeAddress',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -63,7 +67,7 @@ Shipment::Purolator::WSDL::Types::OptionsInformation
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

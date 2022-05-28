@@ -3,15 +3,28 @@
 use strict;
 use warnings;
 
-use Wikibase::Datatype::Utils qw(check_property);
+use Wikibase::Datatype::Reference;
+use Wikibase::Datatype::Snak;
+use Wikibase::Datatype::Value::String;
 
-my $self = {
-        'key' => 'P123',
-};
-check_property($self, 'key');
+# Object.
+my $obj = Wikibase::Datatype::Reference->new(
+        'snaks' => [
+                Wikibase::Datatype::Snak->new(
+                        'datatype' => 'string',
+                        'datavalue' => Wikibase::Datatype::Value::String->new(
+                                'value' => 'text',
+                        ),
+                        'property' => 'P11',
+                ),
+        ],
+);
 
-# Print out.
-print "ok\n";
+# Get value.
+my $snaks_ar = $obj->snaks;
+
+# Print out number of snaks.
+print "Number of snaks: ".@{$snaks_ar}."\n";
 
 # Output:
-# ok
+# Number of snaks: 1

@@ -3,7 +3,7 @@ use warnings;
 package Devel::REPL::Plugin::FindVariable;
 # ABSTRACT: Finds variables by name
 
-our $VERSION = '1.003028';
+our $VERSION = '1.003029';
 
 use Devel::REPL::Plugin;
 use namespace::autoclean;
@@ -47,7 +47,7 @@ Devel::REPL::Plugin::FindVariable - Finds variables by name
 
 =head1 VERSION
 
-version 1.003028
+version 1.003029
 
 =head1 SUPPORT
 

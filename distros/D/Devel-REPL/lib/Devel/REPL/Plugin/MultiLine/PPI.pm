@@ -3,7 +3,7 @@ use warnings;
 package Devel::REPL::Plugin::MultiLine::PPI;
 # ABSTRACT: Read lines until all blocks are closed
 
-our $VERSION = '1.003028';
+our $VERSION = '1.003029';
 
 use Devel::REPL::Plugin;
 use PPI;
@@ -97,7 +97,7 @@ Devel::REPL::Plugin::MultiLine::PPI - Read lines until all blocks are closed
 
 =head1 VERSION
 
-version 1.003028
+version 1.003029
 
 =head1 SYNOPSIS
 

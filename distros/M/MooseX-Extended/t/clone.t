@@ -74,12 +74,9 @@ ok my $recovered = $object->payload, 'We should be able to fetch our object payl
 eq_or_diff $recovered, $payload, '... and it should have the correct data';
 cmp_ok refaddr($recovered), '!=', refaddr($payload), '... but it should not be an alias to the original data structure';
 $payload->{that}{foo} = 42;
-TODO: {
-    local $TODO = 'Bug: the first time we set the value via new(), it does not get cloned properly';
-    ok !exists $object->payload->{that}{foo}, '... and mutating the state of the original data structure should not change our data structure';
-}
-my $recovered2 = $object->payload;
+ok !exists $object->payload->{that}{foo}, '... and mutating the state of the original data structure should not change our data structure';
 
+my $recovered2 = $object->payload;
 cmp_ok refaddr($recovered2), '!=', refaddr($payload),   '... but it should not be an alias to the original data structure';
 cmp_ok refaddr($recovered2), '!=', refaddr($recovered), '... but it should not be an alias to the original data structure';
 

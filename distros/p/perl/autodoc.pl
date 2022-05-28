@@ -11,7 +11,10 @@ use Text::Tabs;
 #
 #    embed.fnc
 #    plus all the core .c, .h, and .pod files listed in MANIFEST
-#
+#    plus %extra_input_pods
+
+my %extra_input_pods = ( 'dist/ExtUtils-ParseXS/lib/perlxs.pod' => 1 );
+
 # Has an optional arg, which is the directory to chdir to before reading
 # MANIFEST and the files
 #
@@ -66,9 +69,10 @@ use Text::Tabs;
 use strict;
 use warnings;
 
-# 80 column terminal - 2 for pager adding 2 columns; -4 for indent for
-# non-heading lines;
-my $max_width = 80 - 2 - 4;
+my $nroff_min_indent = 4;   # for non-heading lines
+# 80 column terminal - 2 for pager adding 2 columns;
+my $max_width = 80 - 2 - $nroff_min_indent;
+my $standard_indent = 4;  # Any additional indentations
 
 if (@ARGV) {
     my $workdir = shift;
@@ -108,24 +112,25 @@ my $scope_scn = 'Compile-time scope hooks';
 my $compiler_scn = 'Compiler and Preprocessor information';
 my $directives_scn = 'Compiler directives';
 my $concurrency_scn = 'Concurrency';
-my $COP_scn = 'COP Hint Hashes';
+my $COP_scn = 'COPs and Hint Hashes';
 my $CV_scn = 'CV Handling';
 my $custom_scn = 'Custom Operators';
 my $debugging_scn = 'Debugging';
 my $display_scn = 'Display functions';
-my $embedding_scn = 'Embedding and Interpreter Cloning';
+my $embedding_scn = 'Embedding, Threads, and Interpreter Cloning';
 my $errno_scn = 'Errno';
 my $exceptions_scn = 'Exception Handling (simple) Macros';
 my $filesystem_scn = 'Filesystem configuration values';
-my $floating_scn = 'Floating point configuration values';
-my $formats_scn = 'Formats';
+my $filters_scn = 'Source Filters';
+my $floating_scn = 'Floating point';
 my $genconfig_scn = 'General Configuration';
 my $globals_scn = 'Global Variables';
-my $GV_scn = 'GV Handling';
+my $GV_scn = 'GV Handling and Stashes';
 my $hook_scn = 'Hook manipulation';
 my $HV_scn = 'HV Handling';
 my $io_scn = 'Input/Output';
-my $integer_scn = 'Integer configuration values';
+my $io_formats_scn = 'I/O Formats';
+my $integer_scn = 'Integer';
 my $lexer_scn = 'Lexer interface';
 my $locale_scn = 'Locales';
 my $magic_scn = 'Magic';
@@ -133,22 +138,27 @@ my $memory_scn = 'Memory Management';
 my $MRO_scn = 'MRO';
 my $multicall_scn = 'Multicall Functions';
 my $numeric_scn = 'Numeric Functions';
-my $optree_construction_scn = 'Optree construction';
-my $optree_manipulation_scn = 'Optree Manipulation Functions';
+
+# Now combined, as unclear which functions go where, but separate names kept
+# to avoid 1) other code changes; 2) in case it seems better to split again
+my $optrees_scn = 'Optrees';
+my $optree_construction_scn = $optrees_scn; # Was 'Optree construction';
+my $optree_manipulation_scn = $optrees_scn; # Was 'Optree Manipulation Functions'
 my $pack_scn = 'Pack and Unpack';
 my $pad_scn = 'Pad Data Structures';
 my $password_scn = 'Password and Group access';
+my $reports_scn = 'Reports and Formats';
 my $paths_scn = 'Paths to system commands';
 my $prototypes_scn = 'Prototype information';
 my $regexp_scn = 'REGEXP Functions';
 my $signals_scn = 'Signals';
 my $site_scn = 'Site configuration';
 my $sockets_scn = 'Sockets configuration values';
-my $filters_scn = 'Source Filters';
 my $stack_scn = 'Stack Manipulation Macros';
 my $string_scn = 'String Handling';
 my $SV_flags_scn = 'SV Flags';
 my $SV_scn = 'SV Handling';
+my $tainting_scn = 'Tainting';
 my $time_scn = 'Time';
 my $typedefs_scn = 'Typedef names';
 my $unicode_scn = 'Unicode Support';
@@ -190,6 +200,7 @@ my %valid_sections = (
             Also see L</List of capability HAS_foo symbols>.
             EOT
         },
+    $filters_scn => {},
     $floating_scn => {
         header => <<~'EOT',
             Also L</List of capability HAS_foo symbols> lists capabilities
@@ -197,21 +208,6 @@ my %valid_sections = (
             hyperbolic sine function.
             EOT
         },
-    $formats_scn => {
-        header => <<~'EOT',
-            These are used for formatting the corresponding type For example,
-            instead of saying
-
-             Perl_newSVpvf(pTHX_ "Create an SV with a %d in it\n", iv);
-
-            use
-
-             Perl_newSVpvf(pTHX_ "Create an SV with a " IVdf " in it\n", iv);
-
-            This keeps you from having to know if, say an IV, needs to be
-            printed as C<%d>, C<%ld>, or something else.
-            EOT
-      },
     $genconfig_scn => {
         header => <<~'EOT',
             This section contains configuration information not otherwise
@@ -221,7 +217,7 @@ my %valid_sections = (
             need to C<#include> files to get the corresponding functionality.
             EOT
 
-        footer => <<~'EOT',
+        footer => <<~EOT,
 
             =head2 List of capability C<HAS_I<foo>> symbols
 
@@ -234,7 +230,7 @@ my %valid_sections = (
             think that the expansion would add little or no value and take up
             a lot of space (because there are so many).  If you think certain
             ones should be expanded, send email to
-            L<perl5-porters@perl.org|mailto:perl5-porters@perl.org>.
+            L<perl5-porters\@perl.org|mailto:perl5-porters\@perl.org>.
 
             Each symbol here will be C<#define>d if and only if the platform
             has the capability.  If you need more detail, see the
@@ -250,7 +246,7 @@ my %valid_sections = (
 
             Example usage:
 
-            =over
+            =over $standard_indent
 
              #ifdef HAS_STRNLEN
                use strnlen()
@@ -272,7 +268,7 @@ my %valid_sections = (
 
             Example usage:
 
-            =over
+            =over $standard_indent
 
              #ifdef I_WCHAR
                #include <wchar.h>
@@ -286,6 +282,21 @@ my %valid_sections = (
     $hook_scn => {},
     $HV_scn => {},
     $io_scn => {},
+    $io_formats_scn => {
+        header => <<~'EOT',
+            These are used for formatting the corresponding type For example,
+            instead of saying
+
+             Perl_newSVpvf(pTHX_ "Create an SV with a %d in it\n", iv);
+
+            use
+
+             Perl_newSVpvf(pTHX_ "Create an SV with a " IVdf " in it\n", iv);
+
+            This keeps you from having to know if, say an IV, needs to be
+            printed as C<%d>, C<%ld>, or something else.
+            EOT
+      },
     $integer_scn => {},
     $lexer_scn => {},
     $locale_scn => {},
@@ -294,6 +305,7 @@ my %valid_sections = (
     $MRO_scn => {},
     $multicall_scn => {},
     $numeric_scn => {},
+    $optrees_scn => {},
     $optree_construction_scn => {},
     $optree_manipulation_scn => {},
     $pack_scn => {},
@@ -302,6 +314,12 @@ my %valid_sections = (
     $paths_scn => {},
     $prototypes_scn => {},
     $regexp_scn => {},
+    $reports_scn => {
+        header => <<~"EOT",
+            These are used in the simple report generation feature of Perl.
+            See L<perlform>.
+            EOT
+      },
     $signals_scn => {},
     $site_scn => {
         header => <<~'EOT',
@@ -311,7 +329,6 @@ my %valid_sections = (
             EOT
       },
     $sockets_scn => {},
-    $filters_scn => {},
     $stack_scn => {},
     $string_scn => {
         header => <<~EOT,
@@ -320,6 +337,7 @@ my %valid_sections = (
       },
     $SV_flags_scn => {},
     $SV_scn => {},
+    $tainting_scn => {},
     $time_scn => {},
     $typedefs_scn => {},
     $unicode_scn => {
@@ -351,7 +369,7 @@ my $apidoc_re = qr/ ^ (\s*)            # $1
                       (.*?)            # $7
                       \s* \n /x;
 # Only certain flags, dealing with display, are acceptable for apidoc_item
-my $display_flags = "fFnDopsT";
+my $display_flags = "fFnDopsTx";
 
 sub check_api_doc_line ($$) {
     my ($file, $in) = @_;
@@ -363,8 +381,9 @@ sub check_api_doc_line ($$) {
                          && length $2 > 0
                          && length $3 == 0
                          && length $4 > 0
-                         && length $6 > 0
-                         && length $7 > 0;
+                         && length $7 > 0
+                         && (    length $6 > 0
+                             || ($is_item && substr($7, 0, 1) eq '|'));
     my $proto_in_file = $7;
     my $proto = $proto_in_file;
     $proto = "||$proto" if $proto !~ /\|/;
@@ -410,6 +429,8 @@ my %initial_file_section = (
                             'av.c' => $AV_scn,
                             'av.h' => $AV_scn,
                             'cv.h' => $CV_scn,
+                            'deb.c' => $debugging_scn,
+                            'dist/ExtUtils-ParseXS/lib/perlxs.pod' => $XS_scn,
                             'doio.c' => $io_scn,
                             'gv.c' => $GV_scn,
                             'gv.h' => $GV_scn,
@@ -432,6 +453,10 @@ my %initial_file_section = (
                             'pp_sort.c' => $SV_scn,
                             'regcomp.c' => $regexp_scn,
                             'regexp.h' => $regexp_scn,
+                            'sv.h' => $SV_scn,
+                            'sv.c' => $SV_scn,
+                            'sv_inline.h' => $SV_scn,
+                            'taint.c' => $tainting_scn,
                             'unicode_constants.h' => $unicode_scn,
                             'utf8.c' => $unicode_scn,
                             'utf8.h' => $unicode_scn,
@@ -504,7 +529,7 @@ sub autodoc ($$) { # parse a file and extract documentation info
             }
 
             die "flag '$1' is not legal (for function $element_name (from $file))"
-                        if $flags =~ / ( [^AabCDdEeFfGhiMmNnTOoPpRrSsUuWXxy] ) /x;
+                        if $flags =~ / ( [^AabCDdEeFfGhiIMmNnTOoPpRrSsUuWXxy] ) /x;
 
             die "'u' flag must also have 'm' or 'y' flags' for $element_name"
                                             if $flags =~ /u/ && $flags !~ /[my]/;
@@ -610,7 +635,6 @@ sub autodoc ($$) { # parse a file and extract documentation info
             # Here, we have accumulated into $text, the pod for $element_name
             my $where = $flags =~ /A/ ? 'api' : 'guts';
 
-            $section = "Functions in file $file" unless defined $section;
             die "No =for apidoc_section nor =head1 in $file for '$element_name'\n"
                                                     unless defined $section;
             if (exists $docs{$where}{$section}{$element_name}) {
@@ -998,7 +1022,7 @@ sub parse_config_h {
             elsif (   $name =~ / ^ [[:alpha:]]+ f $ /x
                    && $configs{$name}{pod} =~ m/ \b format \b /ix)
             {
-                $configs{$name}{'section'} = $formats_scn;
+                $configs{$name}{'section'} = $io_formats_scn;
             }
             elsif ($name =~ /  DOUBLE | FLOAT | LONGDBL | LDBL | ^ NV
                             | $sb CASTFLAGS $sb
@@ -1030,7 +1054,7 @@ sub parse_config_h {
             elsif (   $name =~ / ^ PERL_ ( PRI | SCN ) | $sb FORMAT $sb /x
                     && $configs{$name}{pod} =~ m/ \b format \b /ix)
             {
-                $configs{$name}{'section'} = $formats_scn;
+                $configs{$name}{'section'} = $io_formats_scn;
             }
             elsif ($name =~ / BACKTRACE /x) {
                 $configs{$name}{'section'} = $debugging_scn;
@@ -1192,7 +1216,7 @@ sub format_pod_indexes($) {
     return $text;
 }
 
-sub docout ($$$) { # output the docs for one function
+sub docout ($$$) { # output the docs for one function group
     my($fh, $element_name, $docref) = @_;
 
     # Trim trailing space
@@ -1224,21 +1248,55 @@ sub docout ($$$) { # output the docs for one function
         print $fh "\n";
     }
 
+    my @deprecated;
+    my @experimental;
     for my $item (@items) {
-        if ($item->{flags} =~ /D/) {
-            print $fh <<~"EOT";
+        push @deprecated,   "C<$item->{name}>" if $item->{flags} =~ /D/;
+        push @experimental, "C<$item->{name}>" if $item->{flags} =~ /x/;
+    }
 
-                C<B<DEPRECATED!>>  It is planned to remove C<$item->{name}> from a
-                future release of Perl.  Do not use it for new code; remove it from
-                existing code.
-                EOT
-        }
-        elsif ($item->{flags} =~ /x/) {
-            print $fh <<~"EOT";
+    for my $which (\@deprecated, \@experimental) {
+        if ($which->@*) {
+            my $is;
+            my $it;
+            my $list;
 
-                NOTE: C<$item->{name}> is B<experimental> and may change or be
-                removed without notice.
-                EOT
+            if ($which->@* == 1) {
+                $is = 'is';
+                $it = 'it';
+                $list = $which->[0];
+            }
+            elsif ($which->@* == @items) {
+                $is = 'are';
+                $it = 'them';
+                $list = (@items == 2)
+                         ? "both forms"
+                         : "all these forms";
+            }
+            else {
+                $is = 'are';
+                $it = 'them';
+                my $final = pop $which->@*;
+                $list = "the " . join ", ", $which->@*;
+                $list .= "," if $which->@* > 1;
+                $list .= " and $final forms";
+            }
+
+            if ($which == \@deprecated) {
+                print $fh <<~"EOT";
+
+                    C<B<DEPRECATED!>>  It is planned to remove $list
+                    from a future release of Perl.  Do not use $it for
+                    new code; remove $it from existing code.
+                    EOT
+            }
+            else {
+                print $fh <<~"EOT";
+
+                    NOTE: $list $is B<experimental> and may change or be
+                    removed without notice.
+                    EOT
+            }
         }
     }
 
@@ -1252,10 +1310,10 @@ sub docout ($$$) { # output the docs for one function
         print $fh "\nNOTE: the C<perl_$item_name()> form is B<deprecated>.\n"
                                                     if $item_flags =~ /O/;
         # Is Perl_, but no #define foo # Perl_foo
-        if (($item_flags =~ /p/ && $item_flags =~ /o/ && $item_flags !~ /M/)
+        if (   ($item_flags =~ /p/ && $item_flags =~ /o/ && $item_flags !~ /M/)
 
-             # Can't handle threaded varargs
-         || ($item_flags =~ /f/ && $item_flags !~ /T/))
+                # Can't handle threaded varargs
+            || ($item_flags =~ /f/ && $item_flags !~ /T/))
         {
             $item->{name} = "Perl_$item_name";
             print $fh <<~"EOT";
@@ -1292,7 +1350,8 @@ sub docout ($$$) { # output the docs for one function
             }
 
             # Look through all the items in this entry.  If all have the same
-            # return type and arguments, only the main entry is displayed.
+            # return type and arguments (including thread context), only the
+            # main entry is displayed.
             # Also, find the longest return type and longest name so that if
             # multiple ones are shown, they can be vertically aligned nicely
             my $need_individual_usage = 0;
@@ -1300,12 +1359,15 @@ sub docout ($$$) { # output the docs for one function
             my $base_ret_type = $items[0]->{ret_type};
             my $longest_ret = length $base_ret_type;
             my @base_args = $items[0]->{args}->@*;
+            my $base_thread_context = $items[0]->{flags} =~ /T/;
             for (my $i = 1; $i < @items; $i++) {
                 no warnings 'experimental::smartmatch';
                 my $item = $items[$i];
                 $need_individual_usage = 1
                                     if    $item->{ret_type} ne $base_ret_type
-                                    || ! ($item->{args}->@* ~~ @base_args);
+                                    || ! ($item->{args}->@* ~~ @base_args)
+                                    ||   (   $item->{flags} =~ /T/
+                                          != $base_thread_context);
                 my $ret_length = length $item->{ret_type};
                 $longest_ret = $ret_length if $ret_length > $longest_ret;
                 my $name_length = length $item->{name};
@@ -1505,13 +1567,17 @@ sub construct_missings_section {
     # can accommodate all the data.  This algorithm doesn't require the
     # resulting columns to all have the same width.  This can allow for
     # as tight of packing as the data will possibly allow.
-    for ($columns = 7; $columns > 1; $columns--) {
+    for ($columns = 7; $columns >= 1; $columns--) {
 
         # For this many columns, we will need this many rows (final row might
         # not be completely filled)
         $rows = (@missings + $columns - 1) / $columns;
 
-        my $row_width = 0;
+        # We only need to execute this final iteration to calculate the number
+        # of rows, as we can't get fewer than a single column.
+        last if $columns == 1;
+
+        my $row_width = 1;  # For 1 space indent
         my $i = 0;  # Which missing element
 
         # For each column ...
@@ -1561,7 +1627,7 @@ sub construct_missings_section {
     # required to list the elements.  @col_widths contains the width of each
     # column.
 
-    $text .= "\n\n=over $description_indent\n\n";
+    $text .= "\n";
 
     # Assemble the output
     for my $row (0 .. $rows - 1) {
@@ -1583,8 +1649,6 @@ sub construct_missings_section {
 
         $text .= "\n";  # End of row
     }
-
-    $text .= "\n=back\n";
 
     return $text;
 }
@@ -1673,9 +1737,9 @@ open my $fh, '<', 'MANIFEST'
 while (my $line = <$fh>) {
     next unless my ($file) = $line =~ /^(\S+\.(?:[ch]|pod))\t/;
 
-    # Don't pick up pods from these.  (We may pick up generated stuff from
-    # /lib though)
-    next if $file =~ m! ^ ( cpan | dist | ext ) / !x;
+    # Don't pick up pods from these.
+    next if $file =~ m! ^ ( cpan | dist | ext ) / !x
+         && ! defined $extra_input_pods{$file};
 
     open F, '<', $file or die "Cannot open $file for docs: $!\n";
     autodoc(\*F,$file);
@@ -1702,7 +1766,7 @@ my @missing_api = grep $funcflags{$_}{flags} =~ /A/
                     && !$docs{api}{$_}, keys %funcflags;
 push @missing_api, keys %missing_macros;
 
-my @other_places = ( qw(perlclib perlxs), keys %described_elsewhere );
+my @other_places = ( qw(perlclib ), keys %described_elsewhere );
 my $places_other_than_intern = join ", ",
             map { "L<$_>" } sort dictionary_order 'perlapi', @other_places;
 my $places_other_than_api = join ", ",
@@ -1798,7 +1862,7 @@ output('perlapi', <<"_EOB_", $docs{api}, \@missing_api, <<"_EOE_");
 |
 |The sections in this document currently are
 |
-|=over
+|=over $standard_indent
 
 |$section_list
 |

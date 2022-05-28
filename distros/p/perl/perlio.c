@@ -42,7 +42,7 @@
 #define PERL_IN_PERLIO_C
 #include "perl.h"
 
-#ifdef PERL_IMPLICIT_CONTEXT
+#ifdef MULTIPLICITY
 #  undef dSYS
 #  define dSYS dTHX
 #endif
@@ -123,11 +123,7 @@ perlsio_binmode(FILE *fp, int iotype, int mode)
 #ifdef DOSISH
     dTHX;
     PERL_UNUSED_ARG(iotype);
-#  ifdef NETWARE
-    if (PerlLIO_setmode(fp, mode) != -1) {
-#  else
     if (PerlLIO_setmode(fileno(fp), mode) != -1) {
-#  endif
         return 1;
     }
     else
@@ -248,11 +244,7 @@ PerlIO_fdupopen(pTHX_ PerlIO *f, CLONE_PARAMS *param, int flags)
         const int fd = PerlLIO_dup_cloexec(PerlIO_fileno(f));
         if (fd >= 0) {
             char mode[8];
-#      ifdef DJGPP
-            const int omode = djgpp_get_stream_mode(f);
-#      else
             const int omode = fcntl(fd, F_GETFL);
-#      endif
             PerlIO_intmode2str(omode,mode,NULL);
             /* the r+ is a hack */
             return PerlIO_fdopen(fd, mode);
@@ -1064,12 +1056,6 @@ PerlIO_default_layers(pTHX)
         PERLIO_FUNCS_DECL(*osLayer) = &PerlIO_unix;
         PL_def_layerlist = PerlIO_list_alloc(aTHX);
         PerlIO_define_layer(aTHX_ PERLIO_FUNCS_CAST(&PerlIO_unix));
-#if defined(WIN32)
-        PerlIO_define_layer(aTHX_ PERLIO_FUNCS_CAST(&PerlIO_win32));
-#  if 0
-        osLayer = &PerlIO_win32;
-#  endif
-#endif
         PerlIO_define_layer(aTHX_ PERLIO_FUNCS_CAST(&PerlIO_raw));
         PerlIO_define_layer(aTHX_ PERLIO_FUNCS_CAST(&PerlIO_perlio));
         PerlIO_define_layer(aTHX_ PERLIO_FUNCS_CAST(&PerlIO_stdio));
@@ -1991,7 +1977,7 @@ PerlIOBase_pushed(pTHX_ PerlIO *f, const char *mode, SV *arg, PerlIO_funcs *tab)
             SETERRNO(EINVAL, LIB_INVARG);
             return -1;
         }
-#ifdef EBCDIC
+#ifdef __MVS__  /* XXX Perhaps should be be OEMVS instead of __MVS__ */
         {
         /* The mode variable contains one positional parameter followed by
          * optional keyword parameters.  The positional parameters must be
@@ -2943,7 +2929,7 @@ PerlIO_importFILE(FILE *stdio, const char *mode)
 {
     dTHX;
     PerlIO *f = NULL;
-#ifdef EBCDIC
+#ifdef __MVS__
          int rc;
          char filename[FILENAME_MAX];
          fldata_t fileinfo;
@@ -2952,7 +2938,7 @@ PerlIO_importFILE(FILE *stdio, const char *mode)
         PerlIOStdio *s;
         int fd0 = fileno(stdio);
         if (fd0 < 0) {
-#ifdef EBCDIC
+#ifdef __MVS__
                           rc = fldata(stdio,filename,&fileinfo);
                           if(rc != 0){
                                   return NULL;
@@ -3000,7 +2986,7 @@ PerlIO_importFILE(FILE *stdio, const char *mode)
                 PerlIOUnix_refcnt_inc(fd0);
                 setfd_cloexec_or_inhexec_by_sysfdness(fd0);
             }
-#ifdef EBCDIC
+#ifdef __MVS__
                 else{
                         rc = fldata(stdio,filename,&fileinfo);
                         if(rc != 0){
@@ -3411,12 +3397,12 @@ PerlIOStdio_unread(pTHX_ PerlIO *f, const void *vbuf, Size_t count)
         STDCHAR *eptr = (STDCHAR*)PerlSIO_get_ptr(s);
         STDCHAR *buf = ((STDCHAR *) vbuf) + count;
         while (count > 0) {
-            const int ch = *--buf & 0xFF;
+            const int ch = (U8) *--buf;
             if (ungetc(ch,s) != ch) {
                 /* ungetc did not work */
                 break;
             }
-            if ((STDCHAR*)PerlSIO_get_ptr(s) != --eptr || ((*eptr & 0xFF) != ch)) {
+            if ((STDCHAR*)PerlSIO_get_ptr(s) != --eptr || (((U8) *eptr) != ch)) {
                 /* Did not change pointer as expected */
                 if (fgetc(s) != EOF)  /* get char back again */
                     break;
@@ -4913,7 +4899,7 @@ PerlIO *
 PerlIO_open(const char *path, const char *mode)
 {
     dTHX;
-    SV *name = sv_2mortal(newSVpv(path, 0));
+    SV *name = newSVpvn_flags(path, path == NULL ? 0 : strlen(path), SVs_TEMP);
     return PerlIO_openn(aTHX_ NULL, mode, -1, 0, 0, NULL, 1, &name);
 }
 
@@ -4922,7 +4908,7 @@ PerlIO *
 PerlIO_reopen(const char *path, const char *mode, PerlIO *f)
 {
     dTHX;
-    SV *name = sv_2mortal(newSVpv(path,0));
+    SV *name = newSVpvn_flags(path, path == NULL ? 0 : strlen(path), SVs_TEMP);
     return PerlIO_openn(aTHX_ NULL, mode, -1, 0, 0, f, 1, &name);
 }
 
@@ -5137,6 +5123,8 @@ Perl_PerlIO_restore_errno(pTHX_ PerlIO *f)
 const char *
 Perl_PerlIO_context_layers(pTHX_ const char *mode)
 {
+    /* Returns the layers set by "use open" */
+
     const char *direction = NULL;
     SV *layers;
     /*

@@ -3,7 +3,7 @@ use warnings;
 package Devel::REPL::Plugin::Peek;
 # ABSTRACT: L<Devel::Peek> plugin for L<Devel::REPL>.
 
-our $VERSION = '1.003028';
+our $VERSION = '1.003029';
 
 use Devel::REPL::Plugin;
 use Devel::Peek qw(Dump);
@@ -43,7 +43,7 @@ Devel::REPL::Plugin::Peek - L<Devel::Peek> plugin for L<Devel::REPL>.
 
 =head1 VERSION
 
-version 1.003028
+version 1.003029
 
 =head1 SYNOPSIS
 

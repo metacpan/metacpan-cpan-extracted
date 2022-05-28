@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackChargeDetail;
-$Shipment::FedEx::WSDL::TrackTypes::TrackChargeDetail::VERSION = '3.06';
+$Shipment::FedEx::WSDL::TrackTypes::TrackChargeDetail::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/track/v9'}
+sub get_xmlns { 'http://fedex.com/ws/track/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Type_of : ATTR(:get<Type>);
-    my %ChargeAmount_of : ATTR(:get<ChargeAmount>);
+my %Type_of :ATTR(:get<Type>);
+my %ChargeAmount_of :ATTR(:get<ChargeAmount>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Type
-              ChargeAmount
+__PACKAGE__->_factory(
+    [ qw(        Type
+        ChargeAmount
 
-            )
-        ],
-        {   'Type'         => \%Type_of,
-            'ChargeAmount' => \%ChargeAmount_of,
-        },
-        {   'Type' =>
-              'Shipment::FedEx::WSDL::TrackTypes::TrackChargeDetailType',
-            'ChargeAmount' => 'Shipment::FedEx::WSDL::TrackTypes::Money',
-        },
-        {
+    ) ],
+    {
+        'Type' => \%Type_of,
+        'ChargeAmount' => \%ChargeAmount_of,
+    },
+    {
+        'Type' => 'Shipment::FedEx::WSDL::TrackTypes::TrackChargeDetailType',
+        'ChargeAmount' => 'Shipment::FedEx::WSDL::TrackTypes::Money',
+    },
+    {
 
-            'Type'         => 'Type',
-            'ChargeAmount' => 'ChargeAmount',
-        }
-    );
+        'Type' => 'Type',
+        'ChargeAmount' => 'ChargeAmount',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -62,7 +67,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackChargeDetail
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

@@ -3,7 +3,7 @@ use warnings;
 package Devel::REPL::Plugin::CompletionDriver::Methods;
 # ABSTRACT: Complete class or object method names
 
-our $VERSION = '1.003028';
+our $VERSION = '1.003029';
 
 use Devel::REPL::Plugin;
 use Devel::REPL::Plugin::Completion;    # die early if cannot load
@@ -82,7 +82,7 @@ Devel::REPL::Plugin::CompletionDriver::Methods - Complete class or object method
 
 =head1 VERSION
 
-version 1.003028
+version 1.003029
 
 =head1 SUPPORT
 

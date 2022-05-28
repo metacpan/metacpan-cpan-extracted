@@ -36,8 +36,8 @@ eval {
 		'value' => 'foo',
 	);
 };
-is($EVAL_ERROR, "Language with ISO 639-1 code 'xx' doesn't exist.\n",
-	"Language with ISO 639-1 code 'xx' doesn't exist.");
+is($EVAL_ERROR, "Language code 'xx' isn't ISO 639-1 code.\n",
+	"Language code 'xx' isn't ISO 639-1 code.");
 
 # Test.
 eval {

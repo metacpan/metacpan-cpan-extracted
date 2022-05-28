@@ -1666,7 +1666,7 @@ my_syspopen4(pTHX_ char *cmd, char *mode, I32 cnt, SV** args)
 #  endif 
     sv = *av_fetch(PL_fdpid, PerlIO_fileno(res), TRUE);
     (void)SvUPGRADE(sv,SVt_IV);
-    SvIVX(sv) = -1;			/* A cooky. */
+    SvIVX(sv) = -2;                     /* A cooky. */
     return res;
 
 #endif /* USE_POPEN */
@@ -1990,7 +1990,7 @@ XS(XS_OS2_perfSysCall)
         if (total) {
             int i,j;
 
-            if (GIMME_V != G_ARRAY) {
+            if (GIMME_V != G_LIST) {
                 PUSHn(u[0][0]);		/* Total ticks on the first processor */
                 XSRETURN(1);
             }

@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::CompletedTagDetail;
-$Shipment::FedEx::WSDL::ShipTypes::CompletedTagDetail::VERSION = '3.06';
+$Shipment::FedEx::WSDL::ShipTypes::CompletedTagDetail::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/ship/v9'}
+sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,53 +20,57 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %ConfirmationNumber_of : ATTR(:get<ConfirmationNumber>);
-    my %AccessTime_of : ATTR(:get<AccessTime>);
-    my %CutoffTime_of : ATTR(:get<CutoffTime>);
-    my %Location_of : ATTR(:get<Location>);
-    my %DeliveryCommitment_of : ATTR(:get<DeliveryCommitment>);
-    my %DispatchDate_of : ATTR(:get<DispatchDate>);
+my %ConfirmationNumber_of :ATTR(:get<ConfirmationNumber>);
+my %AccessTime_of :ATTR(:get<AccessTime>);
+my %CutoffTime_of :ATTR(:get<CutoffTime>);
+my %Location_of :ATTR(:get<Location>);
+my %DeliveryCommitment_of :ATTR(:get<DeliveryCommitment>);
+my %DispatchDate_of :ATTR(:get<DispatchDate>);
 
-    __PACKAGE__->_factory(
-        [   qw(        ConfirmationNumber
-              AccessTime
-              CutoffTime
-              Location
-              DeliveryCommitment
-              DispatchDate
+__PACKAGE__->_factory(
+    [ qw(        ConfirmationNumber
+        AccessTime
+        CutoffTime
+        Location
+        DeliveryCommitment
+        DispatchDate
 
-            )
-        ],
-        {   'ConfirmationNumber' => \%ConfirmationNumber_of,
-            'AccessTime'         => \%AccessTime_of,
-            'CutoffTime'         => \%CutoffTime_of,
-            'Location'           => \%Location_of,
-            'DeliveryCommitment' => \%DeliveryCommitment_of,
-            'DispatchDate'       => \%DispatchDate_of,
-        },
-        {   'ConfirmationNumber' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'AccessTime' => 'SOAP::WSDL::XSD::Typelib::Builtin::duration',
-            'CutoffTime' => 'SOAP::WSDL::XSD::Typelib::Builtin::time',
-            'Location'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'DeliveryCommitment' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
-            'DispatchDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
-        },
-        {
+    ) ],
+    {
+        'ConfirmationNumber' => \%ConfirmationNumber_of,
+        'AccessTime' => \%AccessTime_of,
+        'CutoffTime' => \%CutoffTime_of,
+        'Location' => \%Location_of,
+        'DeliveryCommitment' => \%DeliveryCommitment_of,
+        'DispatchDate' => \%DispatchDate_of,
+    },
+    {
+        'ConfirmationNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'AccessTime' => 'SOAP::WSDL::XSD::Typelib::Builtin::duration',
+        'CutoffTime' => 'SOAP::WSDL::XSD::Typelib::Builtin::time',
+        'Location' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'DeliveryCommitment' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
+        'DispatchDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
+    },
+    {
 
-            'ConfirmationNumber' => 'ConfirmationNumber',
-            'AccessTime'         => 'AccessTime',
-            'CutoffTime'         => 'CutoffTime',
-            'Location'           => 'Location',
-            'DeliveryCommitment' => 'DeliveryCommitment',
-            'DispatchDate'       => 'DispatchDate',
-        }
-    );
+        'ConfirmationNumber' => 'ConfirmationNumber',
+        'AccessTime' => 'AccessTime',
+        'CutoffTime' => 'CutoffTime',
+        'Location' => 'Location',
+        'DeliveryCommitment' => 'DeliveryCommitment',
+        'DispatchDate' => 'DispatchDate',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -83,7 +87,7 @@ Shipment::FedEx::WSDL::ShipTypes::CompletedTagDetail
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

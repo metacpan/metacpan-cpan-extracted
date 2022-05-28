@@ -223,7 +223,7 @@ S_mul128(pTHX_ SV *sv, U8 m)
 #define TYPE_IS_PACK		0x800
 #define TYPE_ENDIANNESS_MASK	(TYPE_IS_BIG_ENDIAN|TYPE_IS_LITTLE_ENDIAN)
 #define TYPE_MODIFIERS(t)	((t) & ~0xFF)
-#define TYPE_NO_MODIFIERS(t)	((t) & 0xFF)
+#define TYPE_NO_MODIFIERS(t)	((U8) (t))
 
 # define TYPE_ENDIANNESS(t)	((t) & TYPE_ENDIANNESS_MASK)
 # define TYPE_NO_ENDIANNESS(t)	((t) & ~TYPE_ENDIANNESS_MASK)
@@ -263,7 +263,7 @@ utf8_to_byte(pTHX_ const char **s, const char *end, I32 datumtype)
         Perl_ck_warner(aTHX_ packWARN(WARN_UNPACK),
                        "Character in '%c' format wrapped in unpack",
                        (int) TYPE_NO_MODIFIERS(datumtype));
-        val &= 0xff;
+        val = (U8) val;
     }
     *s += retlen;
     return (U8)val;
@@ -296,7 +296,7 @@ S_utf8_to_bytes(pTHX_ const char **s, const char *end, const char *buf, SSize_t 
         } else from += retlen;
         if (val >= 0x100) {
             bad |= 2;
-            val &= 0xff;
+            val = (U8) val;
         }
         if (UNLIKELY(needs_swap))
             *(U8 *)--buf = (U8)val;
@@ -453,6 +453,7 @@ S_measure_struct(pTHX_ tempsym_t* symptr)
             /* endianness doesn't influence the size of a type */
             switch(TYPE_NO_ENDIANNESS(symptr->code)) {
             default:
+                /* diag_listed_as: Invalid type '%s' in %s */
                 Perl_croak(aTHX_ "Invalid type '%c' in %s",
                            (int)TYPE_NO_MODIFIERS(symptr->code),
                            _action( symptr ) );
@@ -608,12 +609,15 @@ S_next_symbol(pTHX_ tempsym_t* symptr )
         patptr++;
     } else {
       /* We should have found a template code */
-      I32 code = *patptr++ & 0xFF;
+      I32 code = (U8) *patptr++;
       U32 inherited_modifiers = 0;
 
-      if (code == ','){ /* grandfather in commas but with a warning */
+      /* unrecognised characters in pack/unpack formats were made fatal in
+       * 5.004, with an exception added in 5.004_04 for ',' to "just" warn: */
+      if (code == ','){
         if (((symptr->flags & FLAG_COMMA) == 0) && ckWARN(WARN_UNPACK)){
           symptr->flags |= FLAG_COMMA;
+          /* diag_listed_as: Invalid type '%s' in %s */
           Perl_warner(aTHX_ packWARN(WARN_UNPACK),
                       "Invalid type ',' in %s", _action( symptr ) );
         }
@@ -916,6 +920,7 @@ S_unpack_rec(pTHX_ tempsym_t* symptr, const char *s, const char *strbeg, const c
 
         switch(TYPE_NO_ENDIANNESS(datumtype)) {
         default:
+            /* diag_listed_as: Invalid type '%s' in %s */
             Perl_croak(aTHX_ "Invalid type '%c' in unpack", (int)TYPE_NO_MODIFIERS(datumtype) );
 
         case '%':
@@ -1315,16 +1320,12 @@ S_unpack_rec(pTHX_ tempsym_t* symptr, const char *s, const char *strbeg, const c
                     len = UTF8SKIP(result);
                     if (!S_utf8_to_bytes(aTHX_ &ptr, strend,
                                       (char *) &result[1], len-1, 'U')) break;
-                    auv = NATIVE_TO_UNI(utf8n_to_uvchr(result,
-                                                       len,
-                                                       &retlen,
-                                                       UTF8_ALLOW_DEFAULT));
+                    auv = utf8n_to_uvchr(result, len, &retlen,
+                                         UTF8_ALLOW_DEFAULT);
                     s = ptr;
                 } else {
-                    auv = NATIVE_TO_UNI(utf8n_to_uvchr((U8*)s,
-                                                       strend - s,
-                                                       &retlen,
-                                                       UTF8_ALLOW_DEFAULT));
+                    auv = utf8n_to_uvchr((U8*)s, strend - s, &retlen,
+                                         UTF8_ALLOW_DEFAULT);
                     if (retlen == (STRLEN) -1)
                         Perl_croak(aTHX_ "Malformed UTF-8 string in unpack");
                     s += retlen;
@@ -2185,6 +2186,7 @@ S_pack_rec(pTHX_ SV *cat, tempsym_t* symptr, SV **beglist, SV **endlist )
            doesn't simply leave using break */
         switch (TYPE_NO_ENDIANNESS(datumtype)) {
         default:
+            /* diag_listed_as: Invalid type '%s' in %s */
             Perl_croak(aTHX_ "Invalid type '%c' in pack",
                        (int) TYPE_NO_MODIFIERS(datumtype));
         case '%':
@@ -2573,7 +2575,7 @@ S_pack_rec(pTHX_ SV *cat, tempsym_t* symptr, SV **beglist, SV **endlist )
                 if ((-128 > aiv || aiv > 127))
                     Perl_ck_warner(aTHX_ packWARN(WARN_PACK),
                                    "Character in 'c' format wrapped in pack");
-                PUSH_BYTE(utf8, cur, (U8)(aiv & 0xff));
+                PUSH_BYTE(utf8, cur, (U8)aiv);
             }
             break;
         case 'C':
@@ -2588,7 +2590,7 @@ S_pack_rec(pTHX_ SV *cat, tempsym_t* symptr, SV **beglist, SV **endlist )
                 if ((0 > aiv || aiv > 0xff))
                     Perl_ck_warner(aTHX_ packWARN(WARN_PACK),
                                    "Character in 'C' format wrapped in pack");
-                PUSH_BYTE(utf8, cur, (U8)(aiv & 0xff));
+                PUSH_BYTE(utf8, cur, (U8)aiv);
             }
             break;
         case 'W': {
@@ -2628,7 +2630,7 @@ S_pack_rec(pTHX_ SV *cat, tempsym_t* symptr, SV **beglist, SV **endlist )
                         }
                         Perl_ck_warner(aTHX_ packWARN(WARN_PACK),
                                        "Character in 'W' format wrapped in pack");
-                        auv &= 0xff;
+                        auv = (U8) auv;
                     }
                     if (cur >= end) {
                         *cur = '\0';
@@ -2662,7 +2664,7 @@ S_pack_rec(pTHX_ SV *cat, tempsym_t* symptr, SV **beglist, SV **endlist )
                 auv = SvUV_no_inf(fromstr, datumtype);
                 if (utf8) {
                     U8 buffer[UTF8_MAXLEN+1], *endb;
-                    endb = uvchr_to_utf8_flags(buffer, UNI_TO_NATIVE(auv), 0);
+                    endb = uvchr_to_utf8_flags(buffer, auv, 0);
                     if (cur+(endb-buffer)*UTF8_EXPAND >= end) {
                         *cur = '\0';
                         SvCUR_set(cat, cur - start);
@@ -2678,9 +2680,7 @@ S_pack_rec(pTHX_ SV *cat, tempsym_t* symptr, SV **beglist, SV **endlist )
                         GROWING(0, cat, start, cur, len+UTF8_MAXLEN);
                         end = start+SvLEN(cat)-UTF8_MAXLEN;
                     }
-                    cur = (char *) uvchr_to_utf8_flags((U8 *) cur,
-                                                       UNI_TO_NATIVE(auv),
-                                                       0);
+                    cur = (char *) uvchr_to_utf8_flags((U8 *) cur, auv, 0);
                 }
             }
             break;

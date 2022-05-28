@@ -3,7 +3,7 @@ use warnings;
 package Devel::REPL::Plugin::Interrupt;
 # ABSTRACT: Traps SIGINT to kill long-running lines
 
-our $VERSION = '1.003028';
+our $VERSION = '1.003029';
 
 use Devel::REPL::Plugin;
 use Sys::SigAction qw(set_sig_handler);
@@ -60,7 +60,7 @@ Devel::REPL::Plugin::Interrupt - Traps SIGINT to kill long-running lines
 
 =head1 VERSION
 
-version 1.003028
+version 1.003029
 
 =head1 DESCRIPTION
 

@@ -6,7 +6,7 @@ use Dancer2::Plugin::Passphrase::Core;
 use Dancer2::Plugin::Passphrase::Hashed;
 use Dancer2::Plugin;
 
-our $VERSION = '3.3.4';
+our $VERSION = '3.4.0';
 
 plugin_keywords 'passphrase';
 
@@ -15,6 +15,11 @@ plugin_keywords 'passphrase';
 =head1 NAME
 
 Dancer2::Plugin::Passphrase - Passphrases and Passwords as objects for Dancer2
+
+=head1 DEPRECATION WARNING
+
+B<NOTE:> This module is DEPRECATED, and it is advised that you switch
+to L<Dancer2::Plugin::CryptPassphrase> if possible.
 
 =head1 SYNOPSIS
 

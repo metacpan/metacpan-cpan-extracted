@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::WebAuthenticationCredential;
-$Shipment::FedEx::WSDL::TrackTypes::WebAuthenticationCredential::VERSION = '3.06';
+$Shipment::FedEx::WSDL::TrackTypes::WebAuthenticationCredential::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/track/v9'}
+sub get_xmlns { 'http://fedex.com/ws/track/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,31 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Key_of : ATTR(:get<Key>);
-    my %Password_of : ATTR(:get<Password>);
+my %Key_of :ATTR(:get<Key>);
+my %Password_of :ATTR(:get<Password>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Key
-              Password
+__PACKAGE__->_factory(
+    [ qw(        Key
+        Password
 
-            )
-        ],
-        {   'Key'      => \%Key_of,
-            'Password' => \%Password_of,
-        },
-        {   'Key'      => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Password' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'Key' => \%Key_of,
+        'Password' => \%Password_of,
+    },
+    {
+        'Key' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Password' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'Key'      => 'Key',
-            'Password' => 'Password',
-        }
-    );
+        'Key' => 'Key',
+        'Password' => 'Password',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -61,7 +67,7 @@ Shipment::FedEx::WSDL::TrackTypes::WebAuthenticationCredential
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::CustomerExceptionRequestDetail;
-$Shipment::FedEx::WSDL::TrackTypes::CustomerExceptionRequestDetail::VERSION = '3.06';
+$Shipment::FedEx::WSDL::TrackTypes::CustomerExceptionRequestDetail::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/track/v9'}
+sub get_xmlns { 'http://fedex.com/ws/track/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,41 +20,47 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Id_of : ATTR(:get<Id>);
-    my %StatusCode_of : ATTR(:get<StatusCode>);
-    my %StatusDescription_of : ATTR(:get<StatusDescription>);
-    my %CreateTime_of : ATTR(:get<CreateTime>);
+my %Id_of :ATTR(:get<Id>);
+my %StatusCode_of :ATTR(:get<StatusCode>);
+my %StatusDescription_of :ATTR(:get<StatusDescription>);
+my %CreateTime_of :ATTR(:get<CreateTime>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Id
-              StatusCode
-              StatusDescription
-              CreateTime
+__PACKAGE__->_factory(
+    [ qw(        Id
+        StatusCode
+        StatusDescription
+        CreateTime
 
-            )
-        ],
-        {   'Id'                => \%Id_of,
-            'StatusCode'        => \%StatusCode_of,
-            'StatusDescription' => \%StatusDescription_of,
-            'CreateTime'        => \%CreateTime_of,
-        },
-        {   'Id'                => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'StatusCode'        => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'StatusDescription' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'CreateTime' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
-        },
-        {
+    ) ],
+    {
+        'Id' => \%Id_of,
+        'StatusCode' => \%StatusCode_of,
+        'StatusDescription' => \%StatusDescription_of,
+        'CreateTime' => \%CreateTime_of,
+    },
+    {
+        'Id' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'StatusCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'StatusDescription' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'CreateTime' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
+    },
+    {
 
-            'Id'                => 'Id',
-            'StatusCode'        => 'StatusCode',
-            'StatusDescription' => 'StatusDescription',
-            'CreateTime'        => 'CreateTime',
-        }
-    );
+        'Id' => 'Id',
+        'StatusCode' => 'StatusCode',
+        'StatusDescription' => 'StatusDescription',
+        'CreateTime' => 'CreateTime',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -71,7 +77,7 @@ Shipment::FedEx::WSDL::TrackTypes::CustomerExceptionRequestDetail
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

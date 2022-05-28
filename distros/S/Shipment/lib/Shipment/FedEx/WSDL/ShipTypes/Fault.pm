@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::Fault;
-$Shipment::FedEx::WSDL::ShipTypes::Fault::VERSION = '3.06';
+$Shipment::FedEx::WSDL::ShipTypes::Fault::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/ship/v9'}
+sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,31 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %errorCode_of : ATTR(:get<errorCode>);
-    my %reason_of : ATTR(:get<reason>);
+my %errorCode_of :ATTR(:get<errorCode>);
+my %reason_of :ATTR(:get<reason>);
 
-    __PACKAGE__->_factory(
-        [   qw(        errorCode
-              reason
+__PACKAGE__->_factory(
+    [ qw(        errorCode
+        reason
 
-            )
-        ],
-        {   'errorCode' => \%errorCode_of,
-            'reason'    => \%reason_of,
-        },
-        {   'errorCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'reason'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'errorCode' => \%errorCode_of,
+        'reason' => \%reason_of,
+    },
+    {
+        'errorCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'reason' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'errorCode' => 'errorCode',
-            'reason'    => 'reason',
-        }
-    );
+        'errorCode' => 'errorCode',
+        'reason' => 'reason',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -61,7 +67,7 @@ Shipment::FedEx::WSDL::ShipTypes::Fault
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

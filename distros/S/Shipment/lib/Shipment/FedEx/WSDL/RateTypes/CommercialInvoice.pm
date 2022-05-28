@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::CommercialInvoice;
-$Shipment::FedEx::WSDL::RateTypes::CommercialInvoice::VERSION = '3.06';
+$Shipment::FedEx::WSDL::RateTypes::CommercialInvoice::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/rate/v9'}
+sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,95 +20,92 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Comments_of : ATTR(:get<Comments>);
-    my %FreightCharge_of : ATTR(:get<FreightCharge>);
-    my %TaxesOrMiscellaneousCharge_of : ATTR(:get<TaxesOrMiscellaneousCharge>);
-    my %PackingCosts_of : ATTR(:get<PackingCosts>);
-    my %HandlingCosts_of : ATTR(:get<HandlingCosts>);
-    my %SpecialInstructions_of : ATTR(:get<SpecialInstructions>);
-    my %DeclarationStatment_of : ATTR(:get<DeclarationStatment>);
-    my %PaymentTerms_of : ATTR(:get<PaymentTerms>);
-    my %Purpose_of : ATTR(:get<Purpose>);
-    my %PurposeOfShipmentDescription_of :
-      ATTR(:get<PurposeOfShipmentDescription>);
-    my %CustomerInvoiceNumber_of : ATTR(:get<CustomerInvoiceNumber>);
-    my %OriginatorName_of : ATTR(:get<OriginatorName>);
-    my %TermsOfSale_of : ATTR(:get<TermsOfSale>);
+my %Comments_of :ATTR(:get<Comments>);
+my %FreightCharge_of :ATTR(:get<FreightCharge>);
+my %TaxesOrMiscellaneousCharge_of :ATTR(:get<TaxesOrMiscellaneousCharge>);
+my %PackingCosts_of :ATTR(:get<PackingCosts>);
+my %HandlingCosts_of :ATTR(:get<HandlingCosts>);
+my %SpecialInstructions_of :ATTR(:get<SpecialInstructions>);
+my %DeclarationStatment_of :ATTR(:get<DeclarationStatment>);
+my %PaymentTerms_of :ATTR(:get<PaymentTerms>);
+my %Purpose_of :ATTR(:get<Purpose>);
+my %PurposeOfShipmentDescription_of :ATTR(:get<PurposeOfShipmentDescription>);
+my %CustomerInvoiceNumber_of :ATTR(:get<CustomerInvoiceNumber>);
+my %OriginatorName_of :ATTR(:get<OriginatorName>);
+my %TermsOfSale_of :ATTR(:get<TermsOfSale>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Comments
-              FreightCharge
-              TaxesOrMiscellaneousCharge
-              PackingCosts
-              HandlingCosts
-              SpecialInstructions
-              DeclarationStatment
-              PaymentTerms
-              Purpose
-              PurposeOfShipmentDescription
-              CustomerInvoiceNumber
-              OriginatorName
-              TermsOfSale
+__PACKAGE__->_factory(
+    [ qw(        Comments
+        FreightCharge
+        TaxesOrMiscellaneousCharge
+        PackingCosts
+        HandlingCosts
+        SpecialInstructions
+        DeclarationStatment
+        PaymentTerms
+        Purpose
+        PurposeOfShipmentDescription
+        CustomerInvoiceNumber
+        OriginatorName
+        TermsOfSale
 
-            )
-        ],
-        {   'Comments'                     => \%Comments_of,
-            'FreightCharge'                => \%FreightCharge_of,
-            'TaxesOrMiscellaneousCharge'   => \%TaxesOrMiscellaneousCharge_of,
-            'PackingCosts'                 => \%PackingCosts_of,
-            'HandlingCosts'                => \%HandlingCosts_of,
-            'SpecialInstructions'          => \%SpecialInstructions_of,
-            'DeclarationStatment'          => \%DeclarationStatment_of,
-            'PaymentTerms'                 => \%PaymentTerms_of,
-            'Purpose'                      => \%Purpose_of,
-            'PurposeOfShipmentDescription' =>
-              \%PurposeOfShipmentDescription_of,
-            'CustomerInvoiceNumber' => \%CustomerInvoiceNumber_of,
-            'OriginatorName'        => \%OriginatorName_of,
-            'TermsOfSale'           => \%TermsOfSale_of,
-        },
-        {   'Comments'      => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'FreightCharge' => 'Shipment::FedEx::WSDL::RateTypes::Money',
-            'TaxesOrMiscellaneousCharge' =>
-              'Shipment::FedEx::WSDL::RateTypes::Money',
-            'PackingCosts'        => 'Shipment::FedEx::WSDL::RateTypes::Money',
-            'HandlingCosts'       => 'Shipment::FedEx::WSDL::RateTypes::Money',
-            'SpecialInstructions' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'DeclarationStatment' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'PaymentTerms' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Purpose'      =>
-              'Shipment::FedEx::WSDL::RateTypes::PurposeOfShipmentType',
-            'PurposeOfShipmentDescription' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'CustomerInvoiceNumber' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'OriginatorName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'TermsOfSale'    =>
-              'Shipment::FedEx::WSDL::RateTypes::TermsOfSaleType',
-        },
-        {
+    ) ],
+    {
+        'Comments' => \%Comments_of,
+        'FreightCharge' => \%FreightCharge_of,
+        'TaxesOrMiscellaneousCharge' => \%TaxesOrMiscellaneousCharge_of,
+        'PackingCosts' => \%PackingCosts_of,
+        'HandlingCosts' => \%HandlingCosts_of,
+        'SpecialInstructions' => \%SpecialInstructions_of,
+        'DeclarationStatment' => \%DeclarationStatment_of,
+        'PaymentTerms' => \%PaymentTerms_of,
+        'Purpose' => \%Purpose_of,
+        'PurposeOfShipmentDescription' => \%PurposeOfShipmentDescription_of,
+        'CustomerInvoiceNumber' => \%CustomerInvoiceNumber_of,
+        'OriginatorName' => \%OriginatorName_of,
+        'TermsOfSale' => \%TermsOfSale_of,
+    },
+    {
+        'Comments' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'FreightCharge' => 'Shipment::FedEx::WSDL::RateTypes::Money',
+        'TaxesOrMiscellaneousCharge' => 'Shipment::FedEx::WSDL::RateTypes::Money',
+        'PackingCosts' => 'Shipment::FedEx::WSDL::RateTypes::Money',
+        'HandlingCosts' => 'Shipment::FedEx::WSDL::RateTypes::Money',
+        'SpecialInstructions' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'DeclarationStatment' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'PaymentTerms' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Purpose' => 'Shipment::FedEx::WSDL::RateTypes::PurposeOfShipmentType',
+        'PurposeOfShipmentDescription' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'CustomerInvoiceNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'OriginatorName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'TermsOfSale' => 'Shipment::FedEx::WSDL::RateTypes::TermsOfSaleType',
+    },
+    {
 
-            'Comments'                     => 'Comments',
-            'FreightCharge'                => 'FreightCharge',
-            'TaxesOrMiscellaneousCharge'   => 'TaxesOrMiscellaneousCharge',
-            'PackingCosts'                 => 'PackingCosts',
-            'HandlingCosts'                => 'HandlingCosts',
-            'SpecialInstructions'          => 'SpecialInstructions',
-            'DeclarationStatment'          => 'DeclarationStatment',
-            'PaymentTerms'                 => 'PaymentTerms',
-            'Purpose'                      => 'Purpose',
-            'PurposeOfShipmentDescription' => 'PurposeOfShipmentDescription',
-            'CustomerInvoiceNumber'        => 'CustomerInvoiceNumber',
-            'OriginatorName'               => 'OriginatorName',
-            'TermsOfSale'                  => 'TermsOfSale',
-        }
-    );
+        'Comments' => 'Comments',
+        'FreightCharge' => 'FreightCharge',
+        'TaxesOrMiscellaneousCharge' => 'TaxesOrMiscellaneousCharge',
+        'PackingCosts' => 'PackingCosts',
+        'HandlingCosts' => 'HandlingCosts',
+        'SpecialInstructions' => 'SpecialInstructions',
+        'DeclarationStatment' => 'DeclarationStatment',
+        'PaymentTerms' => 'PaymentTerms',
+        'Purpose' => 'Purpose',
+        'PurposeOfShipmentDescription' => 'PurposeOfShipmentDescription',
+        'CustomerInvoiceNumber' => 'CustomerInvoiceNumber',
+        'OriginatorName' => 'OriginatorName',
+        'TermsOfSale' => 'TermsOfSale',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -125,7 +122,7 @@ Shipment::FedEx::WSDL::RateTypes::CommercialInvoice
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

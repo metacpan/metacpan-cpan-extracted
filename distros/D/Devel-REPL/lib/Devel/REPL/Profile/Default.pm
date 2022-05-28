@@ -1,6 +1,6 @@
 package Devel::REPL::Profile::Default;
 
-our $VERSION = '1.003028';
+our $VERSION = '1.003029';
 
 use Moose;
 use namespace::autoclean;

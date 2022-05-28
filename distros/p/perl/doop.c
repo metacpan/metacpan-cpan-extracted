@@ -635,6 +635,28 @@ Perl_do_trans(pTHX_ SV *sv)
     }
 }
 
+/*
+=for apidoc_section $string
+=for apidoc do_join
+
+This performs a Perl L<C<join>|perlfunc/join>, placing the joined output
+into C<sv>.
+
+The elements to join are in SVs, stored in a C array of pointers to SVs, from
+C<**mark> to S<C<**sp - 1>>.  Hence C<*mark> is a reference to the first SV.
+Each SV will be coerced into a PV if not one already.
+
+C<delim> contains the string (or coerced into a string) that is to separate
+each of the joined elements.
+
+If any component is in UTF-8, the result will be as well, and all non-UTF-8
+components will be converted to UTF-8 as necessary.
+
+Magic and tainting are handled.
+
+=cut
+*/
+
 void
 Perl_do_join(pTHX_ SV *sv, SV *delim, SV **mark, SV **sp)
 {
@@ -701,6 +723,22 @@ Perl_do_join(pTHX_ SV *sv, SV *delim, SV **mark, SV **sp)
     SvSETMAGIC(sv);
 }
 
+/*
+=for apidoc_section $string
+=for apidoc do_sprintf
+
+This performs a Perl L<C<sprintf>|perlfunc/sprintf> placing the string output
+into C<sv>.
+
+The elements to format are in SVs, stored in a C array of pointers to SVs of
+length C<len>> and beginning at C<**sarg>.  The element referenced by C<*sarg>
+is the format.
+
+Magic and tainting are handled.
+
+=cut
+*/
+
 void
 Perl_do_sprintf(pTHX_ SV *sv, SSize_t len, SV **sarg)
 {
@@ -731,7 +769,7 @@ Perl_do_sprintf(pTHX_ SV *sv, SSize_t len, SV **sarg)
 UV
 Perl_do_vecget(pTHX_ SV *sv, STRLEN offset, int size)
 {
-    STRLEN srclen, len, avail, uoffset, bitoffs = 0;
+    STRLEN srclen;
     const I32 svpv_flags = ((PL_op->op_flags & OPf_MOD || LVRET)
                                           ? SV_UNDEF_RETURNS_NULL : 0);
     unsigned char *s = (unsigned char *)
@@ -744,7 +782,7 @@ Perl_do_vecget(pTHX_ SV *sv, STRLEN offset, int size)
 
     PERL_ARGS_ASSERT_DO_VECGET;
 
-    if (size < 1 || (size & (size-1))) /* size < 1 or not a power of two */
+    if (size < 1 || ! isPOWER_OF_2(size))
         Perl_croak(aTHX_ "Illegal number of bits in vec");
 
     if (SvUTF8(sv)) {
@@ -758,131 +796,66 @@ Perl_do_vecget(pTHX_ SV *sv, STRLEN offset, int size)
         }
     }
 
-    if (size < 8) {
-        bitoffs = ((offset%8)*size)%8;
-        uoffset = offset/(8/size);
-    }
-    else if (size > 8) {
-        int n = size/8;
-        if (offset > Size_t_MAX / n - 1) /* would overflow */
+    if (size <= 8) {
+        STRLEN bitoffs = ((offset % 8) * size) % 8;
+        STRLEN uoffset = offset / (8 / size);
+
+        if (uoffset >= srclen)
             return 0;
-        uoffset = offset*n;
-    }
-    else
-        uoffset = offset;
 
-    if (uoffset >= srclen)
-        return 0;
-
-    len   = (bitoffs + size + 7)/8; /* required number of bytes */
-    avail = srclen - uoffset;       /* available number of bytes */
-
-    /* Does the byte range overlap the end of the string? If so,
-     * handle specially. */
-    if (avail < len) {
-        if (size <= 8)
-            retnum = 0;
-        else {
-            if (size == 16) {
-                assert(avail == 1);
-                retnum = (UV) s[uoffset] <<  8;
-            }
-            else if (size == 32) {
-                assert(avail >= 1 && avail <= 3);
-                if (avail == 1)
-                    retnum =
-                        ((UV) s[uoffset    ] << 24);
-                else if (avail == 2)
-                    retnum =
-                        ((UV) s[uoffset    ] << 24) +
-                        ((UV) s[uoffset + 1] << 16);
-                else
-                    retnum =
-                        ((UV) s[uoffset    ] << 24) +
-                        ((UV) s[uoffset + 1] << 16) +
-                        (     s[uoffset + 2] <<  8);
-            }
-#ifdef UV_IS_QUAD
-            else if (size == 64) {
-                Perl_ck_warner(aTHX_ packWARN(WARN_PORTABLE),
-                               "Bit vector size > 32 non-portable");
-                assert(avail >= 1 && avail <= 7);
-                if (avail == 1)
-                    retnum =
-                        (UV) s[uoffset     ] << 56;
-                else if (avail == 2)
-                    retnum =
-                        ((UV) s[uoffset    ] << 56) +
-                        ((UV) s[uoffset + 1] << 48);
-                else if (avail == 3)
-                    retnum =
-                        ((UV) s[uoffset    ] << 56) +
-                        ((UV) s[uoffset + 1] << 48) +
-                        ((UV) s[uoffset + 2] << 40);
-                else if (avail == 4)
-                    retnum =
-                        ((UV) s[uoffset    ] << 56) +
-                        ((UV) s[uoffset + 1] << 48) +
-                        ((UV) s[uoffset + 2] << 40) +
-                        ((UV) s[uoffset + 3] << 32);
-                else if (avail == 5)
-                    retnum =
-                        ((UV) s[uoffset    ] << 56) +
-                        ((UV) s[uoffset + 1] << 48) +
-                        ((UV) s[uoffset + 2] << 40) +
-                        ((UV) s[uoffset + 3] << 32) +
-                        ((UV) s[uoffset + 4] << 24);
-                else if (avail == 6)
-                    retnum =
-                        ((UV) s[uoffset    ] << 56) +
-                        ((UV) s[uoffset + 1] << 48) +
-                        ((UV) s[uoffset + 2] << 40) +
-                        ((UV) s[uoffset + 3] << 32) +
-                        ((UV) s[uoffset + 4] << 24) +
-                        ((UV) s[uoffset + 5] << 16);
-                else
-                    retnum =
-                        ((UV) s[uoffset    ] << 56) +
-                        ((UV) s[uoffset + 1] << 48) +
-                        ((UV) s[uoffset + 2] << 40) +
-                        ((UV) s[uoffset + 3] << 32) +
-                        ((UV) s[uoffset + 4] << 24) +
-                        ((UV) s[uoffset + 5] << 16) +
-                        ((UV) s[uoffset + 6] <<  8);
-            }
-#endif
-        }
-    }
-    else if (size < 8)
         retnum = (s[uoffset] >> bitoffs) & nBIT_MASK(size);
+    }
     else {
-        if (size == 8)
-            retnum = s[uoffset];
-        else if (size == 16)
-            retnum =
-                ((UV) s[uoffset] <<      8) +
-                      s[uoffset + 1];
-        else if (size == 32)
-            retnum =
-                ((UV) s[uoffset    ] << 24) +
-                ((UV) s[uoffset + 1] << 16) +
-                (     s[uoffset + 2] <<  8) +
-                      s[uoffset + 3];
+        int n = size / 8;            /* required number of bytes */
+        SSize_t uoffset;
+
 #ifdef UV_IS_QUAD
-        else if (size == 64) {
+
+        if (size == 64) {
             Perl_ck_warner(aTHX_ packWARN(WARN_PORTABLE),
                            "Bit vector size > 32 non-portable");
-            retnum =
-                ((UV) s[uoffset    ] << 56) +
-                ((UV) s[uoffset + 1] << 48) +
-                ((UV) s[uoffset + 2] << 40) +
-                ((UV) s[uoffset + 3] << 32) +
-                ((UV) s[uoffset + 4] << 24) +
-                ((UV) s[uoffset + 5] << 16) +
-                (     s[uoffset + 6] <<  8) +
-                      s[uoffset + 7];
         }
 #endif
+        if (offset > Size_t_MAX / n - 1) /* would overflow */
+            return 0;
+
+        uoffset = offset * n;
+
+        /* Switch on the number of bytes available, but no more than the number
+         * required */
+        switch (MIN(n, (SSize_t) srclen - uoffset)) {
+
+#ifdef UV_IS_QUAD
+
+          case 8:
+            retnum += ((UV) s[uoffset + 7]);
+            /* FALLTHROUGH */
+          case 7:
+            retnum += ((UV) s[uoffset + 6] <<  8);  /* = size - 56 */
+            /* FALLTHROUGH */
+          case 6:
+            retnum += ((UV) s[uoffset + 5] << 16);  /* = size - 48 */
+            /* FALLTHROUGH */
+          case 5:
+            retnum += ((UV) s[uoffset + 4] << 24);  /* = size - 40 */
+#endif
+            /* FALLTHROUGH */
+          case 4:
+            retnum += ((UV) s[uoffset + 3] << (size - 32));
+            /* FALLTHROUGH */
+          case 3:
+            retnum += ((UV) s[uoffset + 2] << (size - 24));
+            /* FALLTHROUGH */
+          case 2:
+            retnum += ((UV) s[uoffset + 1] << (size - 16));
+            /* FALLTHROUGH */
+          case 1:
+            retnum += ((UV) s[uoffset    ] << (size - 8));
+            break;
+
+          default:
+            return 0;
+        }
     }
 
     return retnum;
@@ -962,33 +935,28 @@ Perl_do_vecset(pTHX_ SV *sv)
         s[offset] &= ~(mask << bitoffs);
         s[offset] |= lval << bitoffs;
     }
-    else {
-        if (size == 8)
-            s[offset  ] = (U8)( lval        & 0xff);
-        else if (size == 16) {
-            s[offset  ] = (U8)((lval >>  8) & 0xff);
-            s[offset+1] = (U8)( lval        & 0xff);
-        }
-        else if (size == 32) {
-            s[offset  ] = (U8)((lval >> 24) & 0xff);
-            s[offset+1] = (U8)((lval >> 16) & 0xff);
-            s[offset+2] = (U8)((lval >>  8) & 0xff);
-            s[offset+3] = (U8)( lval        & 0xff);
-        }
+    else switch (size) {
+
 #ifdef UV_IS_QUAD
-        else if (size == 64) {
-            Perl_ck_warner(aTHX_ packWARN(WARN_PORTABLE),
-                           "Bit vector size > 32 non-portable");
-            s[offset  ] = (U8)((lval >> 56) & 0xff);
-            s[offset+1] = (U8)((lval >> 48) & 0xff);
-            s[offset+2] = (U8)((lval >> 40) & 0xff);
-            s[offset+3] = (U8)((lval >> 32) & 0xff);
-            s[offset+4] = (U8)((lval >> 24) & 0xff);
-            s[offset+5] = (U8)((lval >> 16) & 0xff);
-            s[offset+6] = (U8)((lval >>  8) & 0xff);
-            s[offset+7] = (U8)( lval        & 0xff);
-        }
+
+      case 64:
+        Perl_ck_warner(aTHX_ packWARN(WARN_PORTABLE),
+                       "Bit vector size > 32 non-portable");
+        s[offset+7] = (U8)( lval      );    /* = size - 64 */
+        s[offset+6] = (U8)( lval >>  8);    /* = size - 56 */
+        s[offset+5] = (U8)( lval >> 16);    /* = size - 48 */
+        s[offset+4] = (U8)( lval >> 24);    /* = size - 40 */
 #endif
+        /* FALLTHROUGH */
+      case 32:
+        s[offset+3] = (U8)( lval >> (size - 32));
+        s[offset+2] = (U8)( lval >> (size - 24));
+        /* FALLTHROUGH */
+      case 16:
+        s[offset+1] = (U8)( lval >> (size - 16));
+        /* FALLTHROUGH */
+      case 8:
+        s[offset  ] = (U8)( lval >> (size - 8));
     }
     SvSETMAGIC(targ);
 }
@@ -1246,7 +1214,7 @@ Perl_do_kv(pTHX)
 
     if (gimme == G_SCALAR) {
         if (PL_op->op_flags & OPf_MOD || LVRET) {	/* lvalue */
-            SV * const ret = sv_2mortal(newSV_type(SVt_PVLV));  /* Not TARG RT#67838 */
+            SV * const ret = newSV_type_mortal(SVt_PVLV);  /* Not TARG RT#67838 */
             sv_magic(ret, NULL, PERL_MAGIC_nkeys, NULL, 0);
             LvTYPE(ret) = 'k';
             LvTARG(ret) = SvREFCNT_inc_simple(keys);

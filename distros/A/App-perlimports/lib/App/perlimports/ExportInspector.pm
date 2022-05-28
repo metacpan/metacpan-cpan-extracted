@@ -4,7 +4,7 @@ use Moo;
 
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
-our $VERSION = '0.000043';
+our $VERSION = '0.000044';
 
 use App::perlimports::Sandbox ();
 use Class::Inspector          ();
@@ -390,7 +390,10 @@ EOF
     my $logger_cb = sub {
         my $msg   = shift;
         my $level = 'info';
-        if ( $msg =~ qr{Can't locate} ) {
+
+        # Mojo classes tend to throw "Can't locate :all.pm in @INC". This is
+        # expected and shouldn't be raised to the warning level.
+        if ( $msg =~ qr{Can't locate} && $msg !~ m{\:all\.pm in \@INC} ) {
             $level = 'warning';
         }
 
@@ -519,7 +522,7 @@ App::perlimports::ExportInspector - Inspect code for exportable symbols
 
 =head1 VERSION
 
-version 0.000043
+version 0.000044
 
 =head1 SYNOPSIS
 

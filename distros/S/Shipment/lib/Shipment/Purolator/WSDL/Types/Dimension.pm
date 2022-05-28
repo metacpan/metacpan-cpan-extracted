@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::Dimension;
-$Shipment::Purolator::WSDL::Types::Dimension::VERSION = '3.06';
+$Shipment::Purolator::WSDL::Types::Dimension::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Value_of : ATTR(:get<Value>);
-    my %DimensionUnit_of : ATTR(:get<DimensionUnit>);
+my %Value_of :ATTR(:get<Value>);
+my %DimensionUnit_of :ATTR(:get<DimensionUnit>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Value
-              DimensionUnit
+__PACKAGE__->_factory(
+    [ qw(        Value
+        DimensionUnit
 
-            )
-        ],
-        {   'Value'         => \%Value_of,
-            'DimensionUnit' => \%DimensionUnit_of,
-        },
-        {   'Value'         => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
-            'DimensionUnit' =>
-              'Shipment::Purolator::WSDL::Types::DimensionUnit',
-        },
-        {
+    ) ],
+    {
+        'Value' => \%Value_of,
+        'DimensionUnit' => \%DimensionUnit_of,
+    },
+    {
+        'Value' => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
+        'DimensionUnit' => 'Shipment::Purolator::WSDL::Types::DimensionUnit',
+    },
+    {
 
-            'Value'         => 'Value',
-            'DimensionUnit' => 'DimensionUnit',
-        }
-    );
+        'Value' => 'Value',
+        'DimensionUnit' => 'DimensionUnit',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -62,7 +67,7 @@ Shipment::Purolator::WSDL::Types::Dimension
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

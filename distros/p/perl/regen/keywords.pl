@@ -49,6 +49,8 @@ my %feature_kw = (
     isa       => 'isa',
     try       => 'try',
     catch     => 'try',
+    finally   => 'try',
+    defer     => 'defer',
 );
 
 my %pos = map { ($_ => 1) } @{$by_strength{'+'}};
@@ -152,6 +154,7 @@ __END__
 -dbmclose
 -dbmopen
 +default
++defer
 +defined
 +delete
 -die
@@ -177,6 +180,7 @@ __END__
 -fc
 -fcntl
 -fileno
++finally
 -flock
 +for
 +foreach

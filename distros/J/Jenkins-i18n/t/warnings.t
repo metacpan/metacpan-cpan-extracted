@@ -17,7 +17,10 @@ ok( exists( $instance->{types} ), 'instance has types attribute' );
 my @types = sort( keys( %{ $instance->{types} } ) );
 is_deeply(
     \@types,
-    [ 'empty', 'missing', 'non_jenkins', 'same', 'search_found', 'unused' ],
+    [
+        'empty', 'ignored',      'missing', 'non_jenkins',
+        'same',  'search_found', 'unused'
+    ],
     'instance has the expected types'
 );
 dies_ok { $instance->{foo} = 'bar' } 'cannot change attributes of instance';

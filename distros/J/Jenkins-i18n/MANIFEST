@@ -9,6 +9,8 @@ LICENSE
 Makefile.PL
 MANIFEST
 README.md
+History.md
+Workflow.md
 t/find_files.t
 t/Jenkins-i18n.t
 t/load_jelly.t

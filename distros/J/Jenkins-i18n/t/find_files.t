@@ -10,7 +10,7 @@ my $files_ref;
 dies_ok { $files_ref = find_files() } 'dies without directory parameter';
 like $@, qr/invalid\sdirectory\sparameter/, 'get the expected error message';
 dies_ok { $files_ref = find_files( [] ) } 'dies without directory parameter';
-like $@, qr/invalid\sdirectory\sparameter/, 'get the expected error message';
+like $@, qr/reference/, 'get the expected error message';
 dies_ok { $files_ref = find_files('/tmp/foobar') }
 'dies with non-existing directory parameter';
 like $@, qr/must\sexists/, 'get the expected error message';

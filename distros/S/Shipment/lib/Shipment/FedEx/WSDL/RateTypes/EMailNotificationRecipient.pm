@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::EMailNotificationRecipient;
-$Shipment::FedEx::WSDL::RateTypes::EMailNotificationRecipient::VERSION = '3.06';
+$Shipment::FedEx::WSDL::RateTypes::EMailNotificationRecipient::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/rate/v9'}
+sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,62 +20,62 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %EMailNotificationRecipientType_of :
-      ATTR(:get<EMailNotificationRecipientType>);
-    my %EMailAddress_of : ATTR(:get<EMailAddress>);
-    my %NotifyOnShipment_of : ATTR(:get<NotifyOnShipment>);
-    my %NotifyOnException_of : ATTR(:get<NotifyOnException>);
-    my %NotifyOnDelivery_of : ATTR(:get<NotifyOnDelivery>);
-    my %Format_of : ATTR(:get<Format>);
-    my %Localization_of : ATTR(:get<Localization>);
+my %EMailNotificationRecipientType_of :ATTR(:get<EMailNotificationRecipientType>);
+my %EMailAddress_of :ATTR(:get<EMailAddress>);
+my %NotifyOnShipment_of :ATTR(:get<NotifyOnShipment>);
+my %NotifyOnException_of :ATTR(:get<NotifyOnException>);
+my %NotifyOnDelivery_of :ATTR(:get<NotifyOnDelivery>);
+my %Format_of :ATTR(:get<Format>);
+my %Localization_of :ATTR(:get<Localization>);
 
-    __PACKAGE__->_factory(
-        [   qw(        EMailNotificationRecipientType
-              EMailAddress
-              NotifyOnShipment
-              NotifyOnException
-              NotifyOnDelivery
-              Format
-              Localization
+__PACKAGE__->_factory(
+    [ qw(        EMailNotificationRecipientType
+        EMailAddress
+        NotifyOnShipment
+        NotifyOnException
+        NotifyOnDelivery
+        Format
+        Localization
 
-            )
-        ],
-        {   'EMailNotificationRecipientType' =>
-              \%EMailNotificationRecipientType_of,
-            'EMailAddress'      => \%EMailAddress_of,
-            'NotifyOnShipment'  => \%NotifyOnShipment_of,
-            'NotifyOnException' => \%NotifyOnException_of,
-            'NotifyOnDelivery'  => \%NotifyOnDelivery_of,
-            'Format'            => \%Format_of,
-            'Localization'      => \%Localization_of,
-        },
-        {   'EMailNotificationRecipientType' =>
-              'Shipment::FedEx::WSDL::RateTypes::EMailNotificationRecipientType',
-            'EMailAddress'     => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'NotifyOnShipment' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-            'NotifyOnException' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-            'NotifyOnDelivery' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-            'Format'           =>
-              'Shipment::FedEx::WSDL::RateTypes::EMailNotificationFormatType',
-            'Localization' => 'Shipment::FedEx::WSDL::RateTypes::Localization',
-        },
-        {
+    ) ],
+    {
+        'EMailNotificationRecipientType' => \%EMailNotificationRecipientType_of,
+        'EMailAddress' => \%EMailAddress_of,
+        'NotifyOnShipment' => \%NotifyOnShipment_of,
+        'NotifyOnException' => \%NotifyOnException_of,
+        'NotifyOnDelivery' => \%NotifyOnDelivery_of,
+        'Format' => \%Format_of,
+        'Localization' => \%Localization_of,
+    },
+    {
+        'EMailNotificationRecipientType' => 'Shipment::FedEx::WSDL::RateTypes::EMailNotificationRecipientType',
+        'EMailAddress' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'NotifyOnShipment' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+        'NotifyOnException' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+        'NotifyOnDelivery' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+        'Format' => 'Shipment::FedEx::WSDL::RateTypes::EMailNotificationFormatType',
+        'Localization' => 'Shipment::FedEx::WSDL::RateTypes::Localization',
+    },
+    {
 
-            'EMailNotificationRecipientType' =>
-              'EMailNotificationRecipientType',
-            'EMailAddress'      => 'EMailAddress',
-            'NotifyOnShipment'  => 'NotifyOnShipment',
-            'NotifyOnException' => 'NotifyOnException',
-            'NotifyOnDelivery'  => 'NotifyOnDelivery',
-            'Format'            => 'Format',
-            'Localization'      => 'Localization',
-        }
-    );
+        'EMailNotificationRecipientType' => 'EMailNotificationRecipientType',
+        'EMailAddress' => 'EMailAddress',
+        'NotifyOnShipment' => 'NotifyOnShipment',
+        'NotifyOnException' => 'NotifyOnException',
+        'NotifyOnDelivery' => 'NotifyOnDelivery',
+        'Format' => 'Format',
+        'Localization' => 'Localization',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -92,7 +92,7 @@ Shipment::FedEx::WSDL::RateTypes::EMailNotificationRecipient
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

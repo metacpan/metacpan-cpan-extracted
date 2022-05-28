@@ -3,7 +3,7 @@ use warnings;
 package Devel::REPL::Plugin::DDC;
 # ABSTRACT: Format results with Data::Dumper::Concise
 
-our $VERSION = '1.003028';
+our $VERSION = '1.003029';
 
 use Devel::REPL::Plugin;
 use Data::Dumper::Concise ();
@@ -40,7 +40,7 @@ Devel::REPL::Plugin::DDC - Format results with Data::Dumper::Concise
 
 =head1 VERSION
 
-version 1.003028
+version 1.003029
 
 =head1 SYNOPSIS
 

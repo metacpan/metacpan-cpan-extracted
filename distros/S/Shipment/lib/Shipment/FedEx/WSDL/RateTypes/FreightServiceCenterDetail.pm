@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::FreightServiceCenterDetail;
-$Shipment::FedEx::WSDL::RateTypes::FreightServiceCenterDetail::VERSION = '3.06';
+$Shipment::FedEx::WSDL::RateTypes::FreightServiceCenterDetail::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/rate/v9'}
+sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,81 +20,82 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %InterlineCarrierCode_of : ATTR(:get<InterlineCarrierCode>);
-    my %InterlineCarrierName_of : ATTR(:get<InterlineCarrierName>);
-    my %AdditionalDays_of : ATTR(:get<AdditionalDays>);
-    my %LocalService_of : ATTR(:get<LocalService>);
-    my %LocalDistance_of : ATTR(:get<LocalDistance>);
-    my %LocalDuration_of : ATTR(:get<LocalDuration>);
-    my %LocalServiceScheduling_of : ATTR(:get<LocalServiceScheduling>);
-    my %LimitedServiceDays_of : ATTR(:get<LimitedServiceDays>);
-    my %GatewayLocationId_of : ATTR(:get<GatewayLocationId>);
-    my %Location_of : ATTR(:get<Location>);
-    my %ContactAndAddress_of : ATTR(:get<ContactAndAddress>);
+my %InterlineCarrierCode_of :ATTR(:get<InterlineCarrierCode>);
+my %InterlineCarrierName_of :ATTR(:get<InterlineCarrierName>);
+my %AdditionalDays_of :ATTR(:get<AdditionalDays>);
+my %LocalService_of :ATTR(:get<LocalService>);
+my %LocalDistance_of :ATTR(:get<LocalDistance>);
+my %LocalDuration_of :ATTR(:get<LocalDuration>);
+my %LocalServiceScheduling_of :ATTR(:get<LocalServiceScheduling>);
+my %LimitedServiceDays_of :ATTR(:get<LimitedServiceDays>);
+my %GatewayLocationId_of :ATTR(:get<GatewayLocationId>);
+my %Location_of :ATTR(:get<Location>);
+my %ContactAndAddress_of :ATTR(:get<ContactAndAddress>);
 
-    __PACKAGE__->_factory(
-        [   qw(        InterlineCarrierCode
-              InterlineCarrierName
-              AdditionalDays
-              LocalService
-              LocalDistance
-              LocalDuration
-              LocalServiceScheduling
-              LimitedServiceDays
-              GatewayLocationId
-              Location
-              ContactAndAddress
+__PACKAGE__->_factory(
+    [ qw(        InterlineCarrierCode
+        InterlineCarrierName
+        AdditionalDays
+        LocalService
+        LocalDistance
+        LocalDuration
+        LocalServiceScheduling
+        LimitedServiceDays
+        GatewayLocationId
+        Location
+        ContactAndAddress
 
-            )
-        ],
-        {   'InterlineCarrierCode'   => \%InterlineCarrierCode_of,
-            'InterlineCarrierName'   => \%InterlineCarrierName_of,
-            'AdditionalDays'         => \%AdditionalDays_of,
-            'LocalService'           => \%LocalService_of,
-            'LocalDistance'          => \%LocalDistance_of,
-            'LocalDuration'          => \%LocalDuration_of,
-            'LocalServiceScheduling' => \%LocalServiceScheduling_of,
-            'LimitedServiceDays'     => \%LimitedServiceDays_of,
-            'GatewayLocationId'      => \%GatewayLocationId_of,
-            'Location'               => \%Location_of,
-            'ContactAndAddress'      => \%ContactAndAddress_of,
-        },
-        {   'InterlineCarrierCode' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'InterlineCarrierName' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'AdditionalDays' => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
-            'LocalService'  => 'Shipment::FedEx::WSDL::RateTypes::ServiceType',
-            'LocalDistance' => 'Shipment::FedEx::WSDL::RateTypes::Distance',
-            'LocalDuration' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'LocalServiceScheduling' =>
-              'Shipment::FedEx::WSDL::RateTypes::FreightServiceSchedulingType',
-            'LimitedServiceDays' =>
-              'Shipment::FedEx::WSDL::RateTypes::DayOfWeekType',
-            'GatewayLocationId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Location'          => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'ContactAndAddress' =>
-              'Shipment::FedEx::WSDL::RateTypes::ContactAndAddress',
-        },
-        {
+    ) ],
+    {
+        'InterlineCarrierCode' => \%InterlineCarrierCode_of,
+        'InterlineCarrierName' => \%InterlineCarrierName_of,
+        'AdditionalDays' => \%AdditionalDays_of,
+        'LocalService' => \%LocalService_of,
+        'LocalDistance' => \%LocalDistance_of,
+        'LocalDuration' => \%LocalDuration_of,
+        'LocalServiceScheduling' => \%LocalServiceScheduling_of,
+        'LimitedServiceDays' => \%LimitedServiceDays_of,
+        'GatewayLocationId' => \%GatewayLocationId_of,
+        'Location' => \%Location_of,
+        'ContactAndAddress' => \%ContactAndAddress_of,
+    },
+    {
+        'InterlineCarrierCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'InterlineCarrierName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'AdditionalDays' => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
+        'LocalService' => 'Shipment::FedEx::WSDL::RateTypes::ServiceType',
+        'LocalDistance' => 'Shipment::FedEx::WSDL::RateTypes::Distance',
+        'LocalDuration' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'LocalServiceScheduling' => 'Shipment::FedEx::WSDL::RateTypes::FreightServiceSchedulingType',
+        'LimitedServiceDays' => 'Shipment::FedEx::WSDL::RateTypes::DayOfWeekType',
+        'GatewayLocationId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Location' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'ContactAndAddress' => 'Shipment::FedEx::WSDL::RateTypes::ContactAndAddress',
+    },
+    {
 
-            'InterlineCarrierCode'   => 'InterlineCarrierCode',
-            'InterlineCarrierName'   => 'InterlineCarrierName',
-            'AdditionalDays'         => 'AdditionalDays',
-            'LocalService'           => 'LocalService',
-            'LocalDistance'          => 'LocalDistance',
-            'LocalDuration'          => 'LocalDuration',
-            'LocalServiceScheduling' => 'LocalServiceScheduling',
-            'LimitedServiceDays'     => 'LimitedServiceDays',
-            'GatewayLocationId'      => 'GatewayLocationId',
-            'Location'               => 'Location',
-            'ContactAndAddress'      => 'ContactAndAddress',
-        }
-    );
+        'InterlineCarrierCode' => 'InterlineCarrierCode',
+        'InterlineCarrierName' => 'InterlineCarrierName',
+        'AdditionalDays' => 'AdditionalDays',
+        'LocalService' => 'LocalService',
+        'LocalDistance' => 'LocalDistance',
+        'LocalDuration' => 'LocalDuration',
+        'LocalServiceScheduling' => 'LocalServiceScheduling',
+        'LimitedServiceDays' => 'LimitedServiceDays',
+        'GatewayLocationId' => 'GatewayLocationId',
+        'Location' => 'Location',
+        'ContactAndAddress' => 'ContactAndAddress',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -111,7 +112,7 @@ Shipment::FedEx::WSDL::RateTypes::FreightServiceCenterDetail
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::DocTabContent;
-$Shipment::FedEx::WSDL::RateTypes::DocTabContent::VERSION = '3.06';
+$Shipment::FedEx::WSDL::RateTypes::DocTabContent::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/rate/v9'}
+sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,39 +20,42 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %DocTabContentType_of : ATTR(:get<DocTabContentType>);
-    my %Zone001_of : ATTR(:get<Zone001>);
-    my %Barcoded_of : ATTR(:get<Barcoded>);
+my %DocTabContentType_of :ATTR(:get<DocTabContentType>);
+my %Zone001_of :ATTR(:get<Zone001>);
+my %Barcoded_of :ATTR(:get<Barcoded>);
 
-    __PACKAGE__->_factory(
-        [   qw(        DocTabContentType
-              Zone001
-              Barcoded
+__PACKAGE__->_factory(
+    [ qw(        DocTabContentType
+        Zone001
+        Barcoded
 
-            )
-        ],
-        {   'DocTabContentType' => \%DocTabContentType_of,
-            'Zone001'           => \%Zone001_of,
-            'Barcoded'          => \%Barcoded_of,
-        },
-        {   'DocTabContentType' =>
-              'Shipment::FedEx::WSDL::RateTypes::DocTabContentType',
-            'Zone001' =>
-              'Shipment::FedEx::WSDL::RateTypes::DocTabContentZone001',
-            'Barcoded' =>
-              'Shipment::FedEx::WSDL::RateTypes::DocTabContentBarcoded',
-        },
-        {
+    ) ],
+    {
+        'DocTabContentType' => \%DocTabContentType_of,
+        'Zone001' => \%Zone001_of,
+        'Barcoded' => \%Barcoded_of,
+    },
+    {
+        'DocTabContentType' => 'Shipment::FedEx::WSDL::RateTypes::DocTabContentType',
+        'Zone001' => 'Shipment::FedEx::WSDL::RateTypes::DocTabContentZone001',
+        'Barcoded' => 'Shipment::FedEx::WSDL::RateTypes::DocTabContentBarcoded',
+    },
+    {
 
-            'DocTabContentType' => 'DocTabContentType',
-            'Zone001'           => 'Zone001',
-            'Barcoded'          => 'Barcoded',
-        }
-    );
+        'DocTabContentType' => 'DocTabContentType',
+        'Zone001' => 'Zone001',
+        'Barcoded' => 'Barcoded',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -69,7 +72,7 @@ Shipment::FedEx::WSDL::RateTypes::DocTabContent
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

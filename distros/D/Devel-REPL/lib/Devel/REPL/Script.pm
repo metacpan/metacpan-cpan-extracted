@@ -1,10 +1,9 @@
 package Devel::REPL::Script;
 
-our $VERSION = '1.003028';
+our $VERSION = '1.003029';
 
 use Moose;
 use Devel::REPL;
-use File::HomeDir;
 use File::Spec;
 use Module::Runtime 'use_module';
 use namespace::autoclean;
@@ -49,7 +48,7 @@ sub load_rcfile {
 
   # plain name => ~/.re.pl/${rc_file}
   if ($rc_file !~ m!/!) {
-    $rc_file = File::Spec->catfile(File::HomeDir->my_home, '.re.pl', $rc_file);
+    $rc_file = File::Spec->catfile(($^O eq 'MSWin32' && "$]" < 5.016 ? $ENV{HOME} || $ENV{USERPROFILE} : (<~>)[0]), '.re.pl', $rc_file);
   }
 
   $self->apply_script($rc_file);

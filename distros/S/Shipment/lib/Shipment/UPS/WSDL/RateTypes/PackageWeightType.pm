@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::RateTypes::PackageWeightType;
-$Shipment::UPS::WSDL::RateTypes::PackageWeightType::VERSION = '3.06';
+$Shipment::UPS::WSDL::RateTypes::PackageWeightType::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %UnitOfMeasurement_of : ATTR(:get<UnitOfMeasurement>);
-    my %Weight_of : ATTR(:get<Weight>);
+my %UnitOfMeasurement_of :ATTR(:get<UnitOfMeasurement>);
+my %Weight_of :ATTR(:get<Weight>);
 
-    __PACKAGE__->_factory(
-        [   qw(        UnitOfMeasurement
-              Weight
+__PACKAGE__->_factory(
+    [ qw(        UnitOfMeasurement
+        Weight
 
-            )
-        ],
-        {   'UnitOfMeasurement' => \%UnitOfMeasurement_of,
-            'Weight'            => \%Weight_of,
-        },
-        {   'UnitOfMeasurement' =>
-              'Shipment::UPS::WSDL::RateTypes::CodeDescriptionType',
-            'Weight' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'UnitOfMeasurement' => \%UnitOfMeasurement_of,
+        'Weight' => \%Weight_of,
+    },
+    {
+        'UnitOfMeasurement' => 'Shipment::UPS::WSDL::RateTypes::CodeDescriptionType',
+        'Weight' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'UnitOfMeasurement' => 'UnitOfMeasurement',
-            'Weight'            => 'Weight',
-        }
-    );
+        'UnitOfMeasurement' => 'UnitOfMeasurement',
+        'Weight' => 'Weight',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -62,7 +67,7 @@ Shipment::UPS::WSDL::RateTypes::PackageWeightType
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

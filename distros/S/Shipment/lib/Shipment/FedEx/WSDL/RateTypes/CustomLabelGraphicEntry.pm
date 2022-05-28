@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::CustomLabelGraphicEntry;
-$Shipment::FedEx::WSDL::RateTypes::CustomLabelGraphicEntry::VERSION = '3.06';
+$Shipment::FedEx::WSDL::RateTypes::CustomLabelGraphicEntry::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/rate/v9'}
+sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,38 +20,42 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Position_of : ATTR(:get<Position>);
-    my %PrinterGraphicId_of : ATTR(:get<PrinterGraphicId>);
-    my %FileGraphicFullName_of : ATTR(:get<FileGraphicFullName>);
+my %Position_of :ATTR(:get<Position>);
+my %PrinterGraphicId_of :ATTR(:get<PrinterGraphicId>);
+my %FileGraphicFullName_of :ATTR(:get<FileGraphicFullName>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Position
-              PrinterGraphicId
-              FileGraphicFullName
+__PACKAGE__->_factory(
+    [ qw(        Position
+        PrinterGraphicId
+        FileGraphicFullName
 
-            )
-        ],
-        {   'Position'            => \%Position_of,
-            'PrinterGraphicId'    => \%PrinterGraphicId_of,
-            'FileGraphicFullName' => \%FileGraphicFullName_of,
-        },
-        {   'Position' =>
-              'Shipment::FedEx::WSDL::RateTypes::CustomLabelPosition',
-            'PrinterGraphicId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'FileGraphicFullName' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'Position' => \%Position_of,
+        'PrinterGraphicId' => \%PrinterGraphicId_of,
+        'FileGraphicFullName' => \%FileGraphicFullName_of,
+    },
+    {
+        'Position' => 'Shipment::FedEx::WSDL::RateTypes::CustomLabelPosition',
+        'PrinterGraphicId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'FileGraphicFullName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'Position'            => 'Position',
-            'PrinterGraphicId'    => 'PrinterGraphicId',
-            'FileGraphicFullName' => 'FileGraphicFullName',
-        }
-    );
+        'Position' => 'Position',
+        'PrinterGraphicId' => 'PrinterGraphicId',
+        'FileGraphicFullName' => 'FileGraphicFullName',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -68,7 +72,7 @@ Shipment::FedEx::WSDL::RateTypes::CustomLabelGraphicEntry
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDLV2::Types::ValidateCityPostalCodeZipRequestContainer;
-$Shipment::Purolator::WSDLV2::Types::ValidateCityPostalCodeZipRequestContainer::VERSION = '3.06';
+$Shipment::Purolator::WSDLV2::Types::ValidateCityPostalCodeZipRequestContainer::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -17,33 +17,38 @@ sub __get_attr_class {
 
 
 use base qw(Shipment::Purolator::WSDLV2::Types::RequestContainer);
-
 # Variety: sequence
 use Class::Std::Fast::Storable constructor => 'none';
 use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Addresses_of : ATTR(:get<Addresses>);
+my %Addresses_of :ATTR(:get<Addresses>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Addresses
+__PACKAGE__->_factory(
+    [ qw(        Addresses
 
-            )
-        ],
-        {'Addresses' => \%Addresses_of,},
-        {   'Addresses' =>
-              'Shipment::Purolator::WSDLV2::Types::ArrayOfShortAddress',
-        },
-        {
+    ) ],
+    {
+        'Addresses' => \%Addresses_of,
+    },
+    {
+        'Addresses' => 'Shipment::Purolator::WSDLV2::Types::ArrayOfShortAddress',
+    },
+    {
 
-            'Addresses' => 'Addresses',
-        }
-    );
+        'Addresses' => 'Addresses',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -60,7 +65,7 @@ Shipment::Purolator::WSDLV2::Types::ValidateCityPostalCodeZipRequestContainer
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

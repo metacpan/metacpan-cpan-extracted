@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::ProducerType;
-$Shipment::UPS::WSDL::ShipTypes::ProducerType::VERSION = '3.06';
+$Shipment::UPS::WSDL::ShipTypes::ProducerType::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/IF/v1.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/IF/v1.0' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,42 +20,47 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Option_of : ATTR(:get<Option>);
-    my %CompanyName_of : ATTR(:get<CompanyName>);
-    my %TaxIdentificationNumber_of : ATTR(:get<TaxIdentificationNumber>);
-    my %Address_of : ATTR(:get<Address>);
+my %Option_of :ATTR(:get<Option>);
+my %CompanyName_of :ATTR(:get<CompanyName>);
+my %TaxIdentificationNumber_of :ATTR(:get<TaxIdentificationNumber>);
+my %Address_of :ATTR(:get<Address>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Option
-              CompanyName
-              TaxIdentificationNumber
-              Address
+__PACKAGE__->_factory(
+    [ qw(        Option
+        CompanyName
+        TaxIdentificationNumber
+        Address
 
-            )
-        ],
-        {   'Option'                  => \%Option_of,
-            'CompanyName'             => \%CompanyName_of,
-            'TaxIdentificationNumber' => \%TaxIdentificationNumber_of,
-            'Address'                 => \%Address_of,
-        },
-        {   'Option'      => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'CompanyName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'TaxIdentificationNumber' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Address' => 'Shipment::UPS::WSDL::ShipTypes::AddressType',
-        },
-        {
+    ) ],
+    {
+        'Option' => \%Option_of,
+        'CompanyName' => \%CompanyName_of,
+        'TaxIdentificationNumber' => \%TaxIdentificationNumber_of,
+        'Address' => \%Address_of,
+    },
+    {
+        'Option' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'CompanyName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'TaxIdentificationNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Address' => 'Shipment::UPS::WSDL::ShipTypes::AddressType',
+    },
+    {
 
-            'Option'                  => 'Option',
-            'CompanyName'             => 'CompanyName',
-            'TaxIdentificationNumber' => 'TaxIdentificationNumber',
-            'Address'                 => 'Address',
-        }
-    );
+        'Option' => 'Option',
+        'CompanyName' => 'CompanyName',
+        'TaxIdentificationNumber' => 'TaxIdentificationNumber',
+        'Address' => 'Address',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -72,7 +77,7 @@ Shipment::UPS::WSDL::ShipTypes::ProducerType
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

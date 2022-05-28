@@ -1,7 +1,7 @@
 package Devel::REPL::Profile;
 # ABSTRACT: Code to execute when re.pl starts
 
-our $VERSION = '1.003028';
+our $VERSION = '1.003029';
 
 use Moose::Role;
 requires 'apply_profile';
@@ -21,7 +21,7 @@ Devel::REPL::Profile - Code to execute when re.pl starts
 
 =head1 VERSION
 
-version 1.003028
+version 1.003029
 
 =head1 SYNOPSIS
 

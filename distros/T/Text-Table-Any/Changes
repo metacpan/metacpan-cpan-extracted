@@ -1,3 +1,28 @@
+0.114   2022-05-27  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Linkify backends.
+
+
+0.113   2022-05-03  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] [bugfix] Show align_note in matrix.
+
+
+0.112   2022-05-03  Released-By: PERLANCAR; Urgency: medium
+
+        - Support parameter 'align'.
+
+        - [bugfix] An extraneous newline was added to the output of
+          Text::Table::More.
+
+        - [bugfix] header_row parameter defaulted to true. It now defaults to
+          false, like in Text::Table::Tiny.
+
+
 0.111   2022-01-23  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	- [incompatible change] Rename 'title' option to 'caption'.

@@ -13,7 +13,7 @@ MooseX::Extended::Manual::Overview - Work-in-progress overview for MooseX::Exten
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 CONVERTING FROM MOOSE
 
@@ -114,12 +114,12 @@ There's an arcane C<< init_arg => undef >> pair to pass to each to say "this
 cannot be set via the constructor," but many developers are either unaware of
 this is simply forget about it. C<MooseX::Extended> solves with by separating
 C<has> into C<param> (allowed in the constructor, but you can also use
-C<default> or C<builder>) and C<field>, which if forbidden in the constructor.
+C<default> or C<builder>) and C<field>, which is forbidden in the constructor.
 We can rewrite the above as this:
 
     package Some::Class;
 
-    use Moose;
+    use MooseX::Extended;
 
     param name     => (...);
     param backlog  => (...);

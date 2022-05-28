@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::XAVTypes::CandidateType;
-$Shipment::UPS::WSDL::XAVTypes::CandidateType::VERSION = '3.06';
+$Shipment::UPS::WSDL::XAVTypes::CandidateType::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/xav/v1.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/xav/v1.0' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,33 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %AddressClassification_of : ATTR(:get<AddressClassification>);
-    my %AddressKeyFormat_of : ATTR(:get<AddressKeyFormat>);
+my %AddressClassification_of :ATTR(:get<AddressClassification>);
+my %AddressKeyFormat_of :ATTR(:get<AddressKeyFormat>);
 
-    __PACKAGE__->_factory(
-        [   qw(        AddressClassification
-              AddressKeyFormat
+__PACKAGE__->_factory(
+    [ qw(        AddressClassification
+        AddressKeyFormat
 
-            )
-        ],
-        {   'AddressClassification' => \%AddressClassification_of,
-            'AddressKeyFormat'      => \%AddressKeyFormat_of,
-        },
-        {   'AddressClassification' =>
-              'Shipment::UPS::WSDL::XAVTypes::AddressClassificationType',
-            'AddressKeyFormat' =>
-              'Shipment::UPS::WSDL::XAVTypes::AddressKeyFormatType',
-        },
-        {
+    ) ],
+    {
+        'AddressClassification' => \%AddressClassification_of,
+        'AddressKeyFormat' => \%AddressKeyFormat_of,
+    },
+    {
+        'AddressClassification' => 'Shipment::UPS::WSDL::XAVTypes::AddressClassificationType',
+        'AddressKeyFormat' => 'Shipment::UPS::WSDL::XAVTypes::AddressKeyFormatType',
+    },
+    {
 
-            'AddressClassification' => 'AddressClassification',
-            'AddressKeyFormat'      => 'AddressKeyFormat',
-        }
-    );
+        'AddressClassification' => 'AddressClassification',
+        'AddressKeyFormat' => 'AddressKeyFormat',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -63,7 +67,7 @@ Shipment::UPS::WSDL::XAVTypes::CandidateType
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,12 @@
 Revision history for Perl extension Log::Dispatch::Twilio
 
+0.04      2022-05-26 13:07:57-07:00 America/Vancouver
+    - Switch from Twilio `SMS/Messages` endpoint, to `Messages`; Twilio
+      announced that the old `SMS/Messages` endpoint is to be shut down on
+      November 28, 2022.
+      - If you make use of Log::Dispatch::Twilio, it is CRITICAL that you update
+        to this new release prior to that date.
+
 0.03      2021-01-10 23:31:32-08:00 America/Vancouver
     - Augment tests to ensure we split/truncate at correct position
     - Switch to Dist::Zilla for release management

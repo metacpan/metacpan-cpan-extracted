@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::CertificateOfOriginDetail;
-$Shipment::FedEx::WSDL::RateTypes::CertificateOfOriginDetail::VERSION = '3.06';
+$Shipment::FedEx::WSDL::RateTypes::CertificateOfOriginDetail::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/rate/v9'}
+sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,33 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %DocumentFormat_of : ATTR(:get<DocumentFormat>);
-    my %CustomerImageUsages_of : ATTR(:get<CustomerImageUsages>);
+my %DocumentFormat_of :ATTR(:get<DocumentFormat>);
+my %CustomerImageUsages_of :ATTR(:get<CustomerImageUsages>);
 
-    __PACKAGE__->_factory(
-        [   qw(        DocumentFormat
-              CustomerImageUsages
+__PACKAGE__->_factory(
+    [ qw(        DocumentFormat
+        CustomerImageUsages
 
-            )
-        ],
-        {   'DocumentFormat'      => \%DocumentFormat_of,
-            'CustomerImageUsages' => \%CustomerImageUsages_of,
-        },
-        {   'DocumentFormat' =>
-              'Shipment::FedEx::WSDL::RateTypes::ShippingDocumentFormat',
-            'CustomerImageUsages' =>
-              'Shipment::FedEx::WSDL::RateTypes::CustomerImageUsage',
-        },
-        {
+    ) ],
+    {
+        'DocumentFormat' => \%DocumentFormat_of,
+        'CustomerImageUsages' => \%CustomerImageUsages_of,
+    },
+    {
+        'DocumentFormat' => 'Shipment::FedEx::WSDL::RateTypes::ShippingDocumentFormat',
+        'CustomerImageUsages' => 'Shipment::FedEx::WSDL::RateTypes::CustomerImageUsage',
+    },
+    {
 
-            'DocumentFormat'      => 'DocumentFormat',
-            'CustomerImageUsages' => 'CustomerImageUsages',
-        }
-    );
+        'DocumentFormat' => 'DocumentFormat',
+        'CustomerImageUsages' => 'CustomerImageUsages',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -63,7 +67,7 @@ Shipment::FedEx::WSDL::RateTypes::CertificateOfOriginDetail
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

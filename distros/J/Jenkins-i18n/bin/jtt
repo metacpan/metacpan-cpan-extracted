@@ -20,16 +20,19 @@ use Jenkins::i18n::Stats;
 use Jenkins::i18n::Warnings;
 use Jenkins::i18n::ProcOpts;
 
+our $VERSION = '0.04';
+
 my $DATA_START  = tell DATA;
 my $current_dir = getcwd;
 
 my (
-    $lang,   $dir,  $add,   $remove, $counter,
-    $target, $help, $debug, $man,    $search
-) = ( undef, $current_dir, 0, 0, 0, $current_dir, 0, 0, 0, undef );
+    $lang, $dir,   $add, $remove, $counter, $target,
+    $help, $debug, $man, $search, $version
+) = ( undef, $current_dir, 0, 0, 0, $current_dir, 0, 0, 0, undef, 0 );
 
 GetOptions(
     'help'     => \$help,
+    'version'  => \$version,
     'lang=s'   => \$lang,
     'dir=s'    => \$dir,
     'add'      => \$add,
@@ -41,6 +44,11 @@ GetOptions(
     'search=s' => \$search
 ) or pod2usage( -exitval => 1 );
 
+if ($version) {
+    print "jtt version $VERSION\n";
+    exit(0);
+}
+
 pod2usage( -exitval => 0, -verbose => 0 ) if ($help);
 pod2usage( -exitval => 0, -verbose => 2 ) if ($man);
 
@@ -49,6 +57,20 @@ unless ( $lang and ( $lang ne 'en' ) ) {
     pod2usage( -exitval => 1, -verbose => 1 );
 }
 
+my $empty_regex  = qr/empty/i;
+my $jelly_regex  = qr/.jelly$/;
+my $hudson_regex = qr/Hudson/;
+my $ignore_same  = Set::Tiny->new(
+    (
+        'https://www.jenkins.io/redirect/log-levels',
+        'Maven',
+        'Jenkins',
+        'JDK',
+        'Javadoc',
+        'https://www.jenkins.io/redirect/fingerprint',
+        'https://www.jenkins.io/redirect/search-box'
+    )
+);
 print "Searching for files ...\n";
 
 # look for Message.properties and *.jelly files in the provided folder
@@ -82,8 +104,7 @@ sub process_file {
 
     # Read .jelly or Message.properties files, and fill a hash with the keys
     # found
-    # TODO: compile the regex as a global constant
-    if ( $file =~ m/.jelly$/ ) {
+    if ( $file =~ $jelly_regex ) {
         $entries_ref = load_jelly($file);
         $english_entries_ref
             = load_properties( $english_file, $processor->is_debug );
@@ -99,7 +120,7 @@ sub process_file {
     foreach my $entry ( keys %{$entries_ref} ) {
         $stats->inc('keys');
 
-        # TODO: skip increasing missing if operatio is to delete those
+        # TODO: skip increasing missing if operation is to delete those
         unless (( exists( $lang_entries_ref->{$entry} ) )
             and ( defined( $lang_entries_ref->{$entry} ) ) )
         {
@@ -109,8 +130,13 @@ sub process_file {
         }
 
         if ( $lang_entries_ref->{$entry} eq '' ) {
-            $stats->inc('empty');
-            $warnings->add( 'empty', $entry );
+            unless ( $entry =~ $empty_regex ) {
+                $stats->inc('empty');
+                $warnings->add( 'empty', $entry );
+            }
+            else {
+                $warnings->add( 'ignored', $entry );
+            }
         }
     }
 
@@ -121,19 +147,20 @@ sub process_file {
         }
     }
 
-    # TODO: create a set of words to ignore as same
     foreach my $entry ( keys %{$lang_entries_ref} ) {
         if (   $lang_entries_ref->{$entry}
             && $english_entries_ref->{$entry}
             && $lang_entries_ref->{$entry} eq $english_entries_ref->{$entry} )
         {
-            $stats->inc('same');
-            $warnings->add( 'same', $entry );
+            unless ( $ignore_same->has( $lang_entries_ref->{$entry} ) ) {
+                $stats->inc('same');
+                $warnings->add( 'same', $entry );
+            }
+            else {
+                $warnings->add( 'ignored', $entry );
+            }
         }
     }
-
-    # TODO: compile the regex as a global constant
-    my $hudson_regex = qr/Hudson/;
 
     foreach my $entry ( keys %{$lang_entries_ref} ) {
         if (   $lang_entries_ref->{$entry}
@@ -225,6 +252,7 @@ jtt - CLI to help internationalization for Jenkins
     --dir=directory    -> source folder for searching files, optional
     --help             -> print this help message and exits
     --man              -> provides this CLI manpage and exits
+    --version          -> prints the CLI version and exits
     --lang=xx          -> language code to use
     --add              -> optional, generate new files and add new keys to existing
                           files if present

@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::ShippingDocumentEMailRecipient;
-$Shipment::FedEx::WSDL::RateTypes::ShippingDocumentEMailRecipient::VERSION = '3.06';
+$Shipment::FedEx::WSDL::RateTypes::ShippingDocumentEMailRecipient::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/rate/v9'}
+sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %RecipientType_of : ATTR(:get<RecipientType>);
-    my %Address_of : ATTR(:get<Address>);
+my %RecipientType_of :ATTR(:get<RecipientType>);
+my %Address_of :ATTR(:get<Address>);
 
-    __PACKAGE__->_factory(
-        [   qw(        RecipientType
-              Address
+__PACKAGE__->_factory(
+    [ qw(        RecipientType
+        Address
 
-            )
-        ],
-        {   'RecipientType' => \%RecipientType_of,
-            'Address'       => \%Address_of,
-        },
-        {   'RecipientType' =>
-              'Shipment::FedEx::WSDL::RateTypes::EMailNotificationRecipientType',
-            'Address' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'RecipientType' => \%RecipientType_of,
+        'Address' => \%Address_of,
+    },
+    {
+        'RecipientType' => 'Shipment::FedEx::WSDL::RateTypes::EMailNotificationRecipientType',
+        'Address' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'RecipientType' => 'RecipientType',
-            'Address'       => 'Address',
-        }
-    );
+        'RecipientType' => 'RecipientType',
+        'Address' => 'Address',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -62,7 +67,7 @@ Shipment::FedEx::WSDL::RateTypes::ShippingDocumentEMailRecipient
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

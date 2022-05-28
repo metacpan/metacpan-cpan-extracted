@@ -111,6 +111,7 @@ t/use-and-require.t
 t/var-in-hash-key.t
 t/var-in-regex.t
 t/variable.t
+t/warning.t
 t/with-version.t
 test-data/annotate-everything.pl
 test-data/annotation.pl
@@ -178,6 +179,7 @@ test-data/messy-imports.pl
 test-data/meta.t
 test-data/method.pl
 test-data/missing-semicolon-in-import.pl
+test-data/mojo-url.pl
 test-data/moosex-types-moose.pl
 test-data/more-find-bin.pl
 test-data/nested-quotes.pl

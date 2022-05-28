@@ -5,7 +5,10 @@ package MooseX::Extended::Core;
 use v5.20.0;
 use warnings;
 use parent 'Exporter';
-use Moose::Util 'throw_exception';
+use Moose::Util qw(
+  add_method_modifier
+  throw_exception
+);
 use feature qw(signatures postderef);
 no warnings qw(experimental::signatures experimental::postderef);
 
@@ -16,7 +19,7 @@ use Ref::Util qw(
 );
 use Carp 'croak';
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 our @EXPORT_OK = qw(
   field
@@ -116,6 +119,7 @@ sub _maybe_add_cloning_method ( $meta, $name, %opt_for ) {
     return %opt_for unless my $clone = delete $opt_for{clone};
 
     no warnings 'numeric';    ## no critic (TestingAndDebugging::ProhibitNoWarning)
+
     my ( $use_dclone, $use_coderef, $use_method );
     if ( 1 == length($clone) && 1 == $clone ) {
         $use_dclone = 1;
@@ -166,6 +170,25 @@ sub _maybe_add_cloning_method ( $meta, $name, %opt_for ) {
         return $new_value;
     };
 
+    # this fixes a bug where we could set the value in the constructor
+    # but it would remain a reference to the original data, so we could do
+    # this:
+    #
+    #     my $date = DateTime->now;
+    #     my $object = Some::Classs->new( created => $date );
+    #
+    # Any subsequent code calling $object->created was getting a reference to
+    # $date, so any changes to date would be propagated.
+    $meta->add_before_method_modifier(
+        BUILD => sub ( $self, @ ) {
+            my $attr = $meta->get_attribute($name);
+
+            # before BUILD is even called, let's make sure we fetch a cloned
+            # value and set it.
+            $attr->set_value( $self, $self->$reader_method );
+        }
+    );
+
     if ( $is eq 'ro' ) {
         _debug("Adding read-only reader for $name");
         $meta->add_method( $reader => $reader_method );
@@ -214,7 +237,7 @@ MooseX::Extended::Core - Internal module for MooseX::Extended
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 DESCRIPTION
 

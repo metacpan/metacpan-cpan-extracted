@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::ShipInterfaces::ShipService::ShipServicePort;
-$Shipment::FedEx::WSDL::ShipInterfaces::ShipService::ShipServicePort::VERSION = '3.06';
+$Shipment::FedEx::WSDL::ShipInterfaces::ShipService::ShipServicePort::VERSION = '3.07';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -9,371 +9,312 @@ use base qw(SOAP::WSDL::Client::Base);
 
 # only load if it hasn't been loaded before
 require Shipment::FedEx::WSDL::ShipTypemaps::ShipService
-  if not Shipment::FedEx::WSDL::ShipTypemaps::ShipService->can('get_class');
+    if not Shipment::FedEx::WSDL::ShipTypemaps::ShipService->can('get_class');
 
 
 sub START {
 
     my $proxy_domain = $_[2]->{proxy_domain} || 'wsbeta.fedex.com:443';
 
-    $_[0]->set_proxy('https://' . $proxy_domain . '/web-services/ship')
-      if not $_[2]->{proxy};
+    $_[0]->set_proxy('https://' . $proxy_domain . '/web-services/ship') if not $_[2]->{proxy};
 
-    $_[0]
-      ->set_class_resolver('Shipment::FedEx::WSDL::ShipTypemaps::ShipService')
-      if not $_[2]->{class_resolver};
+    $_[0]->set_class_resolver('Shipment::FedEx::WSDL::ShipTypemaps::ShipService')
+        if not $_[2]->{class_resolver};
 
     $_[0]->set_prefix($_[2]->{use_prefix}) if exists $_[2]->{use_prefix};
 }
 
 sub processTag {
     my ($self, $body, $header) = @_;
-    die "processTag must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'processTag',
-            soap_action => 'processTag',
-            style       => 'document',
-            body        => {
+    die "processTag must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'processTag',
+        soap_action => 'processTag',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         => [
-                    qw( Shipment::FedEx::WSDL::ShipElements::ProcessTagRequest )
-                ],
-            },
-            header => {
-
-            },
-            headerfault => {
-
-            },
-            response => {
-                header => {
-
-                },
-                body => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::FedEx::WSDL::ShipElements::ProcessTagReply )
-                    ],
-                },
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::FedEx::WSDL::ShipElements::ProcessTagRequest )],
         },
-        $body,
-        $header
-    );
+        header => {
+            
+        },
+        headerfault => {
+            
+        },
+        response => {
+            header => {
+                
+            },
+            body => {
+                
+
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::FedEx::WSDL::ShipElements::ProcessTagReply )],
+            },
+        }
+    }, $body, $header);
 }
 
 
 sub createPendingShipment {
     my ($self, $body, $header) = @_;
-    die
-      "createPendingShipment must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'createPendingShipment',
-            soap_action => 'createPendingShipment',
-            style       => 'document',
-            body        => {
+    die "createPendingShipment must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'createPendingShipment',
+        soap_action => 'createPendingShipment',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         => [
-                    qw( Shipment::FedEx::WSDL::ShipElements::CreatePendingShipmentRequest )
-                ],
-            },
-            header => {
-
-            },
-            headerfault => {
-
-            },
-            response => {
-                header => {
-
-                },
-                body => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::FedEx::WSDL::ShipElements::CreatePendingShipmentReply )
-                    ],
-                },
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::FedEx::WSDL::ShipElements::CreatePendingShipmentRequest )],
         },
-        $body,
-        $header
-    );
+        header => {
+            
+        },
+        headerfault => {
+            
+        },
+        response => {
+            header => {
+                
+            },
+            body => {
+                
+
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::FedEx::WSDL::ShipElements::CreatePendingShipmentReply )],
+            },
+        }
+    }, $body, $header);
 }
 
 
 sub cancelPendingShipment {
     my ($self, $body, $header) = @_;
-    die
-      "cancelPendingShipment must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'cancelPendingShipment',
-            soap_action => 'cancelPendingShipment',
-            style       => 'document',
-            body        => {
+    die "cancelPendingShipment must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'cancelPendingShipment',
+        soap_action => 'cancelPendingShipment',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         => [
-                    qw( Shipment::FedEx::WSDL::ShipElements::CancelPendingShipmentRequest )
-                ],
-            },
-            header => {
-
-            },
-            headerfault => {
-
-            },
-            response => {
-                header => {
-
-                },
-                body => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::FedEx::WSDL::ShipElements::CancelPendingShipmentReply )
-                    ],
-                },
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::FedEx::WSDL::ShipElements::CancelPendingShipmentRequest )],
         },
-        $body,
-        $header
-    );
+        header => {
+            
+        },
+        headerfault => {
+            
+        },
+        response => {
+            header => {
+                
+            },
+            body => {
+                
+
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::FedEx::WSDL::ShipElements::CancelPendingShipmentReply )],
+            },
+        }
+    }, $body, $header);
 }
 
 
 sub processShipment {
     my ($self, $body, $header) = @_;
-    die "processShipment must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'processShipment',
-            soap_action => 'processShipment',
-            style       => 'document',
-            body        => {
+    die "processShipment must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'processShipment',
+        soap_action => 'processShipment',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         => [
-                    qw( Shipment::FedEx::WSDL::ShipElements::ProcessShipmentRequest )
-                ],
-            },
-            header => {
-
-            },
-            headerfault => {
-
-            },
-            response => {
-                header => {
-
-                },
-                body => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::FedEx::WSDL::ShipElements::ProcessShipmentReply )
-                    ],
-                },
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::FedEx::WSDL::ShipElements::ProcessShipmentRequest )],
         },
-        $body,
-        $header
-    );
+        header => {
+            
+        },
+        headerfault => {
+            
+        },
+        response => {
+            header => {
+                
+            },
+            body => {
+                
+
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::FedEx::WSDL::ShipElements::ProcessShipmentReply )],
+            },
+        }
+    }, $body, $header);
 }
 
 
 sub deleteTag {
     my ($self, $body, $header) = @_;
-    die "deleteTag must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'deleteTag',
-            soap_action => 'deleteTag',
-            style       => 'document',
-            body        => {
+    die "deleteTag must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'deleteTag',
+        soap_action => 'deleteTag',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         => [
-                    qw( Shipment::FedEx::WSDL::ShipElements::DeleteTagRequest )
-                ],
-            },
-            header => {
-
-            },
-            headerfault => {
-
-            },
-            response => {
-                header => {
-
-                },
-                body => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::FedEx::WSDL::ShipElements::ShipmentReply )
-                    ],
-                },
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::FedEx::WSDL::ShipElements::DeleteTagRequest )],
         },
-        $body,
-        $header
-    );
+        header => {
+            
+        },
+        headerfault => {
+            
+        },
+        response => {
+            header => {
+                
+            },
+            body => {
+                
+
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::FedEx::WSDL::ShipElements::ShipmentReply )],
+            },
+        }
+    }, $body, $header);
 }
 
 
 sub validateShipment {
     my ($self, $body, $header) = @_;
-    die "validateShipment must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'validateShipment',
-            soap_action => 'validateShipment',
-            style       => 'document',
-            body        => {
+    die "validateShipment must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'validateShipment',
+        soap_action => 'validateShipment',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         => [
-                    qw( Shipment::FedEx::WSDL::ShipElements::ValidateShipmentRequest )
-                ],
-            },
-            header => {
-
-            },
-            headerfault => {
-
-            },
-            response => {
-                header => {
-
-                },
-                body => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::FedEx::WSDL::ShipElements::ShipmentReply )
-                    ],
-                },
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::FedEx::WSDL::ShipElements::ValidateShipmentRequest )],
         },
-        $body,
-        $header
-    );
+        header => {
+            
+        },
+        headerfault => {
+            
+        },
+        response => {
+            header => {
+                
+            },
+            body => {
+                
+
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::FedEx::WSDL::ShipElements::ShipmentReply )],
+            },
+        }
+    }, $body, $header);
 }
 
 
 sub deleteShipment {
     my ($self, $body, $header) = @_;
-    die "deleteShipment must be called as object method (\$self is <$self>)"
-      if not blessed($self);
-    return $self->SUPER::call(
-        {   operation   => 'deleteShipment',
-            soap_action => 'deleteShipment',
-            style       => 'document',
-            body        => {
+    die "deleteShipment must be called as object method (\$self is <$self>)" if not blessed($self);
+    return $self->SUPER::call({
+        operation => 'deleteShipment',
+        soap_action => 'deleteShipment',
+        style => 'document',
+        body => {
+            
 
-
-                'use'         => 'literal',
-                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                encodingStyle => '',
-                parts         => [
-                    qw( Shipment::FedEx::WSDL::ShipElements::DeleteShipmentRequest )
-                ],
-            },
-            header => {
-
-            },
-            headerfault => {
-
-            },
-            response => {
-                header => {
-
-                },
-                body => {
-
-
-                    'use'         => 'literal',
-                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
-                    encodingStyle => '',
-                    parts         => [
-                        qw( Shipment::FedEx::WSDL::ShipElements::ShipmentReply )
-                    ],
-                },
-            }
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::FedEx::WSDL::ShipElements::DeleteShipmentRequest )],
         },
-        $body,
-        $header
-    );
+        header => {
+            
+        },
+        headerfault => {
+            
+        },
+        response => {
+            header => {
+                
+            },
+            body => {
+                
+
+           'use'            => 'literal',
+            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
+            encodingStyle   => '',
+            parts           =>  [qw( Shipment::FedEx::WSDL::ShipElements::ShipmentReply )],
+            },
+        }
+    }, $body, $header);
 }
+
+
+
 
 
 sub _get_name_resolver {
 
     my $prefix_1 = {
-        'attribute' => 'Shipment::FedEx::WSDL::ShipAttributes',
-        'typemap'   => 'Shipment::FedEx::WSDL::ShipTypemaps',
-        'interface' => 'Shipment::FedEx::WSDL::ShipInterfaces',
-        'type'      => 'Shipment::FedEx::WSDL::ShipTypes',
-        'server'    => 'Shipment::FedEx::WSDL::ShipServer',
-        'element'   => 'Shipment::FedEx::WSDL::ShipElements'
-    };
+              'attribute' => 'Shipment::FedEx::WSDL::ShipAttributes',
+              'typemap' => 'Shipment::FedEx::WSDL::ShipTypemaps',
+              'interface' => 'Shipment::FedEx::WSDL::ShipInterfaces',
+              'type' => 'Shipment::FedEx::WSDL::ShipTypes',
+              'server' => 'Shipment::FedEx::WSDL::ShipServer',
+              'element' => 'Shipment::FedEx::WSDL::ShipElements'
+            };
 
 
-    return SOAP::WSDL::Generator::Template::Plugin::XSD->new(
-        {   prefix_resolver => SOAP::WSDL::Generator::PrefixResolver->new(
-                {   namespace_prefix_map => {
-                        'http://www.w3.org/2001/XMLSchema' =>
-                          'SOAP::WSDL::XSD::Typelib::Builtin',
-                    },
-                    namespace_map => {},
-                    prefix        => $prefix_1,
-                }
-            )
-        }
-    );
+    return SOAP::WSDL::Generator::Template::Plugin::XSD->new({
+        prefix_resolver => SOAP::WSDL::Generator::PrefixResolver->new({
+            namespace_prefix_map => {
+                'http://www.w3.org/2001/XMLSchema' => 'SOAP::WSDL::XSD::Typelib::Builtin',
+            },
+            namespace_map => {
+            },
+            prefix => $prefix_1,
+        })
+    });
 }
 
 1;
@@ -390,7 +331,7 @@ Shipment::FedEx::WSDL::ShipInterfaces::ShipService::ShipServicePort
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 SYNOPSIS
 

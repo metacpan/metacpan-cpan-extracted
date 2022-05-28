@@ -3,23 +3,18 @@
 use strict;
 use warnings;
 
-use Wikibase::Datatype::Value::String;
+use Error::Pure;
+use Wikibase::Datatype::Utils qw(check_property);
 
-# Object.
-my $obj = Wikibase::Datatype::Value::String->new(
-        'value' => 'foo',
-);
+$Error::Pure::TYPE = 'Error';
 
-# Get type.
-my $type = $obj->type;
-
-# Get value.
-my $value = $obj->value;
+my $self = {
+        'key' => 'bad_property',
+};
+check_property($self, 'key');
 
 # Print out.
-print "Type: $type\n";
-print "Value: $value\n";
+print "ok\n";
 
-# Output:
-# Type: string
-# Value: foo
+# Output like:
+# #Error [/../Wikibase/Datatype/Utils.pm:?] Parameter 'key' must begin with 'P' and number after it.

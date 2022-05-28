@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::DelayDetail;
-$Shipment::FedEx::WSDL::RateTypes::DelayDetail::VERSION = '3.06';
+$Shipment::FedEx::WSDL::RateTypes::DelayDetail::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/rate/v9'}
+sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,51 +20,57 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Date_of : ATTR(:get<Date>);
-    my %DayOfWeek_of : ATTR(:get<DayOfWeek>);
-    my %Level_of : ATTR(:get<Level>);
-    my %Point_of : ATTR(:get<Point>);
-    my %Type_of : ATTR(:get<Type>);
-    my %Description_of : ATTR(:get<Description>);
+my %Date_of :ATTR(:get<Date>);
+my %DayOfWeek_of :ATTR(:get<DayOfWeek>);
+my %Level_of :ATTR(:get<Level>);
+my %Point_of :ATTR(:get<Point>);
+my %Type_of :ATTR(:get<Type>);
+my %Description_of :ATTR(:get<Description>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Date
-              DayOfWeek
-              Level
-              Point
-              Type
-              Description
+__PACKAGE__->_factory(
+    [ qw(        Date
+        DayOfWeek
+        Level
+        Point
+        Type
+        Description
 
-            )
-        ],
-        {   'Date'        => \%Date_of,
-            'DayOfWeek'   => \%DayOfWeek_of,
-            'Level'       => \%Level_of,
-            'Point'       => \%Point_of,
-            'Type'        => \%Type_of,
-            'Description' => \%Description_of,
-        },
-        {   'Date'      => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
-            'DayOfWeek' => 'Shipment::FedEx::WSDL::RateTypes::DayOfWeekType',
-            'Level'     => 'Shipment::FedEx::WSDL::RateTypes::DelayLevelType',
-            'Point'     => 'Shipment::FedEx::WSDL::RateTypes::DelayPointType',
-            'Type' => 'Shipment::FedEx::WSDL::RateTypes::CommitmentDelayType',
-            'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'Date' => \%Date_of,
+        'DayOfWeek' => \%DayOfWeek_of,
+        'Level' => \%Level_of,
+        'Point' => \%Point_of,
+        'Type' => \%Type_of,
+        'Description' => \%Description_of,
+    },
+    {
+        'Date' => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
+        'DayOfWeek' => 'Shipment::FedEx::WSDL::RateTypes::DayOfWeekType',
+        'Level' => 'Shipment::FedEx::WSDL::RateTypes::DelayLevelType',
+        'Point' => 'Shipment::FedEx::WSDL::RateTypes::DelayPointType',
+        'Type' => 'Shipment::FedEx::WSDL::RateTypes::CommitmentDelayType',
+        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'Date'        => 'Date',
-            'DayOfWeek'   => 'DayOfWeek',
-            'Level'       => 'Level',
-            'Point'       => 'Point',
-            'Type'        => 'Type',
-            'Description' => 'Description',
-        }
-    );
+        'Date' => 'Date',
+        'DayOfWeek' => 'DayOfWeek',
+        'Level' => 'Level',
+        'Point' => 'Point',
+        'Type' => 'Type',
+        'Description' => 'Description',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -81,7 +87,7 @@ Shipment::FedEx::WSDL::RateTypes::DelayDetail
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

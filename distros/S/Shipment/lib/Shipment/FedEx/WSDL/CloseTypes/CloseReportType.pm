@@ -1,13 +1,14 @@
 package Shipment::FedEx::WSDL::CloseTypes::CloseReportType;
-$Shipment::FedEx::WSDL::CloseTypes::CloseReportType::VERSION = '3.06';
+$Shipment::FedEx::WSDL::CloseTypes::CloseReportType::VERSION = '3.07';
 use strict;
 use warnings;
 
-sub get_xmlns {'http://fedex.com/ws/close/v2'}
+sub get_xmlns { 'http://fedex.com/ws/close/v2'};
 
 # derivation by restriction
 use base qw(
-  SOAP::WSDL::XSD::Typelib::Builtin::string);
+    SOAP::WSDL::XSD::Typelib::Builtin::string);
+
 
 
 1;
@@ -24,7 +25,7 @@ Shipment::FedEx::WSDL::CloseTypes::CloseReportType
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::BillShipperType;
-$Shipment::UPS::WSDL::ShipTypes::BillShipperType::VERSION = '3.06';
+$Shipment::UPS::WSDL::ShipTypes::BillShipperType::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,31 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %AccountNumber_of : ATTR(:get<AccountNumber>);
-    my %CreditCard_of : ATTR(:get<CreditCard>);
+my %AccountNumber_of :ATTR(:get<AccountNumber>);
+my %CreditCard_of :ATTR(:get<CreditCard>);
 
-    __PACKAGE__->_factory(
-        [   qw(        AccountNumber
-              CreditCard
+__PACKAGE__->_factory(
+    [ qw(        AccountNumber
+        CreditCard
 
-            )
-        ],
-        {   'AccountNumber' => \%AccountNumber_of,
-            'CreditCard'    => \%CreditCard_of,
-        },
-        {   'AccountNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'CreditCard' => 'Shipment::UPS::WSDL::ShipTypes::CreditCardType',
-        },
-        {
+    ) ],
+    {
+        'AccountNumber' => \%AccountNumber_of,
+        'CreditCard' => \%CreditCard_of,
+    },
+    {
+        'AccountNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'CreditCard' => 'Shipment::UPS::WSDL::ShipTypes::CreditCardType',
+    },
+    {
 
-            'AccountNumber' => 'AccountNumber',
-            'CreditCard'    => 'CreditCard',
-        }
-    );
+        'AccountNumber' => 'AccountNumber',
+        'CreditCard' => 'CreditCard',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -61,7 +67,7 @@ Shipment::UPS::WSDL::ShipTypes::BillShipperType
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

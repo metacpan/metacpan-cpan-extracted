@@ -1576,7 +1576,7 @@ sed <<!GROK!THIS! >$CONFIG_H -e 's!^#undef\(.*/\)\*!/\*#define\1 \*!' -e 's!^#un
 #$d_endpent HAS_ENDPROTOENT		/**/
 
 /* HAS_ENDPWENT:
- *	This symbol, if defined, indicates that the getgrent routine is
+ *	This symbol, if defined, indicates that the endpwent routine is
  *	available for finalizing sequential access of the passwd database.
  */
 #$d_endpwent HAS_ENDPWENT		/**/
@@ -2339,6 +2339,13 @@ sed <<!GROK!THIS! >$CONFIG_H -e 's!^#undef\(.*/\)\*!/\*#define\1 \*!' -e 's!^#un
  */
 #$d_atanh HAS_ATANH		/**/
 
+/* HAS_NON_INT_BITFIELDS:
+ *	This symbol, if defined, indicates that the C compiler accepts, without
+ *	error or warning, struct bitfields that are declared with sizes other
+ *	than plain 'int'; for example 'unsigned char' is accepted.
+ */
+#$d_non_int_bitfields HAS_NON_INT_BITFIELDS	/**/
+
 /* HAS_BUILTIN_CHOOSE_EXPR:
  *	Can we handle GCC builtin for compile-time ternary-like expressions
  */
@@ -2514,6 +2521,19 @@ sed <<!GROK!THIS! >$CONFIG_H -e 's!^#undef\(.*/\)\*!/\*#define\1 \*!' -e 's!^#un
  *	mode.
  */
 #$d_fegetround HAS_FEGETROUND	/**/
+
+/* HAS_FFS:
+ *	This symbol, if defined, indicates that the ffs routine is available
+ *	to find the first bit set in its argument.  If it's not available,
+ *	roll your own.
+ */
+/* HAS_FFSL:
+ *	This symbol, if defined, indicates that the ffsl routine is available
+ *	to find the first bit set in its argument.  If it's not available,
+ *	roll your own.
+ */
+#$d_ffs HAS_FFS		/**/
+#$d_ffsl HAS_FFSL		/**/
 
 /* HAS_FINITE:
  *	This symbol, if defined, indicates that the finite routine is
@@ -3122,14 +3142,19 @@ sed <<!GROK!THIS! >$CONFIG_H -e 's!^#undef\(.*/\)\*!/\*#define\1 \*!' -e 's!^#un
  *	available to return the name of the locale for a category mask.
  */
 /* I_XLOCALE:
- *	This symbol, if defined, indicates to the C program that it should
- *	include <xlocale.h> to get uselocale() and its friends.
+ *	This symbol, if defined, indicates to the C program that the
+ *	header xlocale.h is available.  See also NEED_XLOCALE_H
+ */
+/* NEED_XLOCALE_H:
+ *	This symbol, if defined, indicates that the C program should
+ *	include <xlocale.h> to get newlocale() and its friends.
  */
 #$d_newlocale	HAS_NEWLOCALE	/**/
 #$d_freelocale	HAS_FREELOCALE	/**/
 #$d_uselocale	HAS_USELOCALE	/**/
 #$d_duplocale	HAS_DUPLOCALE	/**/
 #$d_querylocale	HAS_QUERYLOCALE	/**/
+#$xlocale_needed	NEED_XLOCALE_H	/**/
 #$i_xlocale	I_XLOCALE               /**/
 
 /* HAS_NEXTAFTER:
@@ -3453,6 +3478,12 @@ sed <<!GROK!THIS! >$CONFIG_H -e 's!^#undef\(.*/\)\*!/\*#define\1 \*!' -e 's!^#un
  *	available to convert strings to unsigned long longs (quads).
  */
 #$d_strtouq HAS_STRTOUQ		/**/
+
+/* HAS_STRXFRM_L:
+ *	This symbol, if defined, indicates that the strxfrm_l() routine is
+ *	available to transform strings.
+ */
+#$d_strxfrm_l HAS_STRXFRM_L	/**/
 
 /* HAS_SYSCALL_PROTO:
  *	This symbol, if defined, indicates that the system provides
@@ -4166,6 +4197,16 @@ sed <<!GROK!THIS! >$CONFIG_H -e 's!^#undef\(.*/\)\*!/\*#define\1 \*!' -e 's!^#un
  *	the latter.  This is only useful if you have select(), naturally.
  */
 #define SELECT_MIN_BITS	$selectminbits	/**/
+
+/* ST_DEV_SIZE:
+ *	This variable contains the size of struct stat's st_dev in bytes.
+ */
+/* ST_DEV_SIGN:
+ *	This symbol holds the signedness of struct stat's st_dev.
+ *	1 for unsigned, -1 for signed.
+ */
+#define ST_DEV_SIGN $st_dev_sign	/* st_dev sign */
+#define ST_DEV_SIZE $st_dev_size	/* st_dev size */
 
 /* ST_INO_SIZE:
  *	This variable contains the size of struct stat's st_ino in bytes.
@@ -4908,10 +4949,15 @@ sed <<!GROK!THIS! >$CONFIG_H -e 's!^#undef\(.*/\)\*!/\*#define\1 \*!' -e 's!^#un
  */
 #$d_mbrtowc HAS_MBRTOWC	/**/
 
+/* HAS_NL_LANGINFO_L:
+ *	This symbol, when defined, indicates presence of the nl_langinfo_l()
+ *	function
+ */
 /* HAS_THREAD_SAFE_NL_LANGINFO_L:
  *	This symbol, when defined, indicates presence of the nl_langinfo_l()
  *	function, and that it is thread-safe.
  */
+#$d_nl_langinfo_l HAS_NL_LANGINFO_L	/**/
 #$d_thread_safe_nl_langinfo_l HAS_THREAD_SAFE_NL_LANGINFO_L	/**/
 
 /* OLD_PTHREAD_CREATE_JOINABLE:
@@ -5129,6 +5175,18 @@ sed <<!GROK!THIS! >$CONFIG_H -e 's!^#undef\(.*/\)\*!/\*#define\1 \*!' -e 's!^#un
  *	available to convert strings to long doubles.
  */
 #$d_strtold_l HAS_STRTOLD_L		/**/
+
+/* PERL_THREAD_LOCAL:
+ *	This symbol, if defined, gives a linkage specification for thread-local
+ *	storage. For example, for a C11 compiler this will be _Thread_local.
+ *	Beware, some compilers are sensitive to the C language standard they are
+ *	told to parse. For example, suncc defaults to C11, so our probe will
+ *	report that _Thread_local can be used. However, if the -std=c99 is later
+ *	added to the compiler flags, then _Thread_local will become a syntax
+ *	error. Hence it is important for these flags to be consistent between
+ *	probing and use.
+ */
+#$d_thread_local PERL_THREAD_LOCAL $perl_thread_local	/**/
 
 /* HAS_TMPNAM_R:
  *	This symbol, if defined, indicates that the tmpnam_r routine

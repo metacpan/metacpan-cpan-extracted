@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::CustomerImageUsage;
-$Shipment::FedEx::WSDL::ShipTypes::CustomerImageUsage::VERSION = '3.06';
+$Shipment::FedEx::WSDL::ShipTypes::CustomerImageUsage::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/ship/v9'}
+sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %Type_of : ATTR(:get<Type>);
-    my %Id_of : ATTR(:get<Id>);
+my %Type_of :ATTR(:get<Type>);
+my %Id_of :ATTR(:get<Id>);
 
-    __PACKAGE__->_factory(
-        [   qw(        Type
-              Id
+__PACKAGE__->_factory(
+    [ qw(        Type
+        Id
 
-            )
-        ],
-        {   'Type' => \%Type_of,
-            'Id'   => \%Id_of,
-        },
-        {   'Type' =>
-              'Shipment::FedEx::WSDL::ShipTypes::CustomerImageUsageType',
-            'Id' => 'Shipment::FedEx::WSDL::ShipTypes::ImageId',
-        },
-        {
+    ) ],
+    {
+        'Type' => \%Type_of,
+        'Id' => \%Id_of,
+    },
+    {
+        'Type' => 'Shipment::FedEx::WSDL::ShipTypes::CustomerImageUsageType',
+        'Id' => 'Shipment::FedEx::WSDL::ShipTypes::ImageId',
+    },
+    {
 
-            'Type' => 'Type',
-            'Id'   => 'Id',
-        }
-    );
+        'Type' => 'Type',
+        'Id' => 'Id',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -62,7 +67,7 @@ Shipment::FedEx::WSDL::ShipTypes::CustomerImageUsage
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

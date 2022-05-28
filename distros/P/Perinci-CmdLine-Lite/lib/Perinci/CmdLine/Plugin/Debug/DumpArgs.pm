@@ -10,9 +10,9 @@ use parent 'Perinci::CmdLine::PluginBase';
 
 # put global variables alphabetically here
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-04-21'; # DATE
+our $DATE = '2022-05-27'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.920'; # VERSION
+our $VERSION = '1.921'; # VERSION
 
 sub meta {
     return {
@@ -47,7 +47,7 @@ Perinci::CmdLine::Plugin::Debug::DumpArgs - Dump command-line arguments ($r->{ar
 
 =head1 VERSION
 
-This document describes version 1.920 of Perinci::CmdLine::Plugin::Debug::DumpArgs (from Perl distribution Perinci-CmdLine-Lite), released on 2022-04-21.
+This document describes version 1.921 of Perinci::CmdLine::Plugin::Debug::DumpArgs (from Perl distribution Perinci-CmdLine-Lite), released on 2022-05-27.
 
 =head1 SYNOPSIS
 

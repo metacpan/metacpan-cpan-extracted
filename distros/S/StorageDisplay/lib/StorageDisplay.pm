@@ -13,7 +13,7 @@ use 5.14.0;
 package StorageDisplay;
 # ABSTRACT: Collect and display storages on linux machines
 
-our $VERSION = '1.0.8'; # VERSION
+our $VERSION = '1.0.10'; # VERSION
 
 1;
 
@@ -5077,7 +5077,7 @@ StorageDisplay - Collect and display storages on linux machines
 
 =head1 VERSION
 
-version 1.0.8
+version 1.0.10
 
 Replay commands
 

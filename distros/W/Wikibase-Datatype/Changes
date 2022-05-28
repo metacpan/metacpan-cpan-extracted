@@ -1,3 +1,11 @@
+0.11 2022-05-28T15:13:50+02:00
+ - Add test instances.
+ - Fix check_language().
+ - Fix Unicode conversions in Item doc example.
+ - Improve example in Form documentation.
+ - Improve example in Sense documentation.
+ - Update copyright years.
+
 0.10 2021-07-17T15:11:15+02:00
  - Add test for Wikibase::Datatype::Value::Monolingual with utf8 text.
  - Improve doc for Snak.

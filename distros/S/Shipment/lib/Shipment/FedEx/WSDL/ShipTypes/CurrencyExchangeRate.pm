@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::CurrencyExchangeRate;
-$Shipment::FedEx::WSDL::ShipTypes::CurrencyExchangeRate::VERSION = '3.06';
+$Shipment::FedEx::WSDL::ShipTypes::CurrencyExchangeRate::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/ship/v9'}
+sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,36 +20,42 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %FromCurrency_of : ATTR(:get<FromCurrency>);
-    my %IntoCurrency_of : ATTR(:get<IntoCurrency>);
-    my %Rate_of : ATTR(:get<Rate>);
+my %FromCurrency_of :ATTR(:get<FromCurrency>);
+my %IntoCurrency_of :ATTR(:get<IntoCurrency>);
+my %Rate_of :ATTR(:get<Rate>);
 
-    __PACKAGE__->_factory(
-        [   qw(        FromCurrency
-              IntoCurrency
-              Rate
+__PACKAGE__->_factory(
+    [ qw(        FromCurrency
+        IntoCurrency
+        Rate
 
-            )
-        ],
-        {   'FromCurrency' => \%FromCurrency_of,
-            'IntoCurrency' => \%IntoCurrency_of,
-            'Rate'         => \%Rate_of,
-        },
-        {   'FromCurrency' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'IntoCurrency' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Rate'         => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
-        },
-        {
+    ) ],
+    {
+        'FromCurrency' => \%FromCurrency_of,
+        'IntoCurrency' => \%IntoCurrency_of,
+        'Rate' => \%Rate_of,
+    },
+    {
+        'FromCurrency' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'IntoCurrency' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Rate' => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
+    },
+    {
 
-            'FromCurrency' => 'FromCurrency',
-            'IntoCurrency' => 'IntoCurrency',
-            'Rate'         => 'Rate',
-        }
-    );
+        'FromCurrency' => 'FromCurrency',
+        'IntoCurrency' => 'IntoCurrency',
+        'Rate' => 'Rate',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -66,7 +72,7 @@ Shipment::FedEx::WSDL::ShipTypes::CurrencyExchangeRate
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

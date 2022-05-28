@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package WebService::TaxJar;
-$WebService::TaxJar::VERSION = '0.0001';
+$WebService::TaxJar::VERSION = '0.0002';
 use HTTP::Thin;
 use HTTP::Request::Common qw/GET DELETE PUT POST/;
 use HTTP::CookieJar;
@@ -16,7 +16,7 @@ WebService::TaxJar - A simple client to L<TaxJar's REST API|https://www.taxjar.c
 
 =head1 VERSION
 
-version 0.0001
+version 0.0002
 
 =head1 SYNOPSIS
 
@@ -28,7 +28,7 @@ version 0.0001
 
 =head1 DESCRIPTION
 
-A light-weight wrapper for TaxJar's RESTful API (an example of which can be found at: L<https://www.thegamecrafter.com/developer/>). This wrapper basically hides the request cycle from you so that you can get down to the business of using the API. It doesn't attempt to manage the data structures or objects the web service interfaces with.
+A light-weight wrapper for TaxJar's RESTful API (an example of which can be found at: L<https://https://developers.taxjar.com/api/reference/>). This wrapper basically hides the request cycle from you so that you can get down to the business of using the API. It doesn't attempt to manage the data structures or objects the web service interfaces with.
 
 The module takes care of all of these things for you:
 
@@ -84,7 +84,13 @@ Your key for accessing TaxJar's API.  Required.
 
 =item version
 
-The version of the API that you are using, like 'v1', 'v2', etc.  Required.
+The version of the API that you are using, like 'v1', 'v2', etc.  Optional, defaults to 'v2'.
+
+=item api_version
+
+Tax Jar decided to move away from a numbered scheme where the version is in the URL to a date based version in the HTTP headers.  This flag is optional, and defaults
+to '2022-01-24', which is the default date as of May 2022.  The date must be in the version of 'YYYY-MM-DD' to be accepted by TaxJar, but this module will not validate
+your date flag.
 
 =item sandbox
 
@@ -112,7 +118,14 @@ has api_key => (
 
 has version => (
     is          => 'ro',
-    required    => 1,
+    required    => 0,
+    default     => sub { 'v2' },
+);
+
+has api_version => (
+    is          => 'ro',
+    required    => 0,
+    default     => sub { '2022-01-24' },
 );
 
 has sandbox => (
@@ -289,10 +302,20 @@ sub _add_auth_header {
     return;
 }
 
+sub _add_version_header {
+    my $self    = shift;
+    my $request = shift;
+    if ($self->api_version) {
+        $request->header( 'x-api-version' => $self->api_version() );
+    }
+    return;
+}
+
 sub _process_request {
     my $self = shift;
     my $request = shift;
     $self->_add_auth_header($request);
+    $self->_add_version_header($request);
     my $response = $self->agent->request($request);
     $response->request($request);
     $self->last_response($response);

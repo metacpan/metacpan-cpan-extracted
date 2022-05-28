@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::FreightCommitDetail;
-$Shipment::FedEx::WSDL::RateTypes::FreightCommitDetail::VERSION = '3.06';
+$Shipment::FedEx::WSDL::RateTypes::FreightCommitDetail::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/rate/v9'}
+sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,38 +20,42 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %OriginDetail_of : ATTR(:get<OriginDetail>);
-    my %DestinationDetail_of : ATTR(:get<DestinationDetail>);
-    my %TotalDistance_of : ATTR(:get<TotalDistance>);
+my %OriginDetail_of :ATTR(:get<OriginDetail>);
+my %DestinationDetail_of :ATTR(:get<DestinationDetail>);
+my %TotalDistance_of :ATTR(:get<TotalDistance>);
 
-    __PACKAGE__->_factory(
-        [   qw(        OriginDetail
-              DestinationDetail
-              TotalDistance
+__PACKAGE__->_factory(
+    [ qw(        OriginDetail
+        DestinationDetail
+        TotalDistance
 
-            )
-        ],
-        {   'OriginDetail'      => \%OriginDetail_of,
-            'DestinationDetail' => \%DestinationDetail_of,
-            'TotalDistance'     => \%TotalDistance_of,
-        },
-        {   'OriginDetail' =>
-              'Shipment::FedEx::WSDL::RateTypes::FreightServiceCenterDetail',
-            'DestinationDetail' =>
-              'Shipment::FedEx::WSDL::RateTypes::FreightServiceCenterDetail',
-            'TotalDistance' => 'Shipment::FedEx::WSDL::RateTypes::Distance',
-        },
-        {
+    ) ],
+    {
+        'OriginDetail' => \%OriginDetail_of,
+        'DestinationDetail' => \%DestinationDetail_of,
+        'TotalDistance' => \%TotalDistance_of,
+    },
+    {
+        'OriginDetail' => 'Shipment::FedEx::WSDL::RateTypes::FreightServiceCenterDetail',
+        'DestinationDetail' => 'Shipment::FedEx::WSDL::RateTypes::FreightServiceCenterDetail',
+        'TotalDistance' => 'Shipment::FedEx::WSDL::RateTypes::Distance',
+    },
+    {
 
-            'OriginDetail'      => 'OriginDetail',
-            'DestinationDetail' => 'DestinationDetail',
-            'TotalDistance'     => 'TotalDistance',
-        }
-    );
+        'OriginDetail' => 'OriginDetail',
+        'DestinationDetail' => 'DestinationDetail',
+        'TotalDistance' => 'TotalDistance',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -68,7 +72,7 @@ Shipment::FedEx::WSDL::RateTypes::FreightCommitDetail
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

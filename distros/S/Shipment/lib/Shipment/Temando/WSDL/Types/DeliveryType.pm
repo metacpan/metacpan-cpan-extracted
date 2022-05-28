@@ -1,17 +1,14 @@
 package Shipment::Temando::WSDL::Types::DeliveryType;
-$Shipment::Temando::WSDL::Types::DeliveryType::VERSION = '3.06';
+$Shipment::Temando::WSDL::Types::DeliveryType::VERSION = '3.07';
 use strict;
 use warnings;
 
-sub get_xmlns {
-    'http://'
-      . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url
-      . '/schema/2009_06/common.xsd';
-}
+sub get_xmlns { 'http://' . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url . '/schema/2009_06/common.xsd'};
 
 # derivation by restriction
 use base qw(
-  SOAP::WSDL::XSD::Typelib::Builtin::string);
+    SOAP::WSDL::XSD::Typelib::Builtin::string);
+
 
 
 1;
@@ -28,7 +25,7 @@ Shipment::Temando::WSDL::Types::DeliveryType
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

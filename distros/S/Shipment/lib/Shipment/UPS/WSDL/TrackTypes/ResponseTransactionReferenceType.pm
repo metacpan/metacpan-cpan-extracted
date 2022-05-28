@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::TrackTypes::ResponseTransactionReferenceType;
-$Shipment::UPS::WSDL::TrackTypes::ResponseTransactionReferenceType::VERSION = '3.06';
+$Shipment::UPS::WSDL::TrackTypes::ResponseTransactionReferenceType::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %CustomerContext_of : ATTR(:get<CustomerContext>);
-    my %TransactionIdentifier_of : ATTR(:get<TransactionIdentifier>);
+my %CustomerContext_of :ATTR(:get<CustomerContext>);
+my %TransactionIdentifier_of :ATTR(:get<TransactionIdentifier>);
 
-    __PACKAGE__->_factory(
-        [   qw(        CustomerContext
-              TransactionIdentifier
+__PACKAGE__->_factory(
+    [ qw(        CustomerContext
+        TransactionIdentifier
 
-            )
-        ],
-        {   'CustomerContext'       => \%CustomerContext_of,
-            'TransactionIdentifier' => \%TransactionIdentifier_of,
-        },
-        {   'CustomerContext' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'TransactionIdentifier' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'CustomerContext' => \%CustomerContext_of,
+        'TransactionIdentifier' => \%TransactionIdentifier_of,
+    },
+    {
+        'CustomerContext' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'TransactionIdentifier' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'CustomerContext'       => 'CustomerContext',
-            'TransactionIdentifier' => 'TransactionIdentifier',
-        }
-    );
+        'CustomerContext' => 'CustomerContext',
+        'TransactionIdentifier' => 'TransactionIdentifier',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -62,7 +67,7 @@ Shipment::UPS::WSDL::TrackTypes::ResponseTransactionReferenceType
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

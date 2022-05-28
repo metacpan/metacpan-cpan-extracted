@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::EMailNotificationRecipient;
-$Shipment::FedEx::WSDL::TrackTypes::EMailNotificationRecipient::VERSION = '3.06';
+$Shipment::FedEx::WSDL::TrackTypes::EMailNotificationRecipient::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/track/v9'}
+sub get_xmlns { 'http://fedex.com/ws/track/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,54 +20,52 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %EMailNotificationRecipientType_of :
-      ATTR(:get<EMailNotificationRecipientType>);
-    my %EMailAddress_of : ATTR(:get<EMailAddress>);
-    my %NotificationEventsRequested_of :
-      ATTR(:get<NotificationEventsRequested>);
-    my %Format_of : ATTR(:get<Format>);
-    my %Localization_of : ATTR(:get<Localization>);
+my %EMailNotificationRecipientType_of :ATTR(:get<EMailNotificationRecipientType>);
+my %EMailAddress_of :ATTR(:get<EMailAddress>);
+my %NotificationEventsRequested_of :ATTR(:get<NotificationEventsRequested>);
+my %Format_of :ATTR(:get<Format>);
+my %Localization_of :ATTR(:get<Localization>);
 
-    __PACKAGE__->_factory(
-        [   qw(        EMailNotificationRecipientType
-              EMailAddress
-              NotificationEventsRequested
-              Format
-              Localization
+__PACKAGE__->_factory(
+    [ qw(        EMailNotificationRecipientType
+        EMailAddress
+        NotificationEventsRequested
+        Format
+        Localization
 
-            )
-        ],
-        {   'EMailNotificationRecipientType' =>
-              \%EMailNotificationRecipientType_of,
-            'EMailAddress'                => \%EMailAddress_of,
-            'NotificationEventsRequested' => \%NotificationEventsRequested_of,
-            'Format'                      => \%Format_of,
-            'Localization'                => \%Localization_of,
-        },
-        {   'EMailNotificationRecipientType' =>
-              'Shipment::FedEx::WSDL::TrackTypes::EMailNotificationRecipientType',
-            'EMailAddress' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'NotificationEventsRequested' =>
-              'Shipment::FedEx::WSDL::TrackTypes::EMailNotificationEventType',
-            'Format' =>
-              'Shipment::FedEx::WSDL::TrackTypes::EMailNotificationFormatType',
-            'Localization' =>
-              'Shipment::FedEx::WSDL::TrackTypes::Localization',
-        },
-        {
+    ) ],
+    {
+        'EMailNotificationRecipientType' => \%EMailNotificationRecipientType_of,
+        'EMailAddress' => \%EMailAddress_of,
+        'NotificationEventsRequested' => \%NotificationEventsRequested_of,
+        'Format' => \%Format_of,
+        'Localization' => \%Localization_of,
+    },
+    {
+        'EMailNotificationRecipientType' => 'Shipment::FedEx::WSDL::TrackTypes::EMailNotificationRecipientType',
+        'EMailAddress' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'NotificationEventsRequested' => 'Shipment::FedEx::WSDL::TrackTypes::EMailNotificationEventType',
+        'Format' => 'Shipment::FedEx::WSDL::TrackTypes::EMailNotificationFormatType',
+        'Localization' => 'Shipment::FedEx::WSDL::TrackTypes::Localization',
+    },
+    {
 
-            'EMailNotificationRecipientType' =>
-              'EMailNotificationRecipientType',
-            'EMailAddress'                => 'EMailAddress',
-            'NotificationEventsRequested' => 'NotificationEventsRequested',
-            'Format'                      => 'Format',
-            'Localization'                => 'Localization',
-        }
-    );
+        'EMailNotificationRecipientType' => 'EMailNotificationRecipientType',
+        'EMailAddress' => 'EMailAddress',
+        'NotificationEventsRequested' => 'NotificationEventsRequested',
+        'Format' => 'Format',
+        'Localization' => 'Localization',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -84,7 +82,7 @@ Shipment::FedEx::WSDL::TrackTypes::EMailNotificationRecipient
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

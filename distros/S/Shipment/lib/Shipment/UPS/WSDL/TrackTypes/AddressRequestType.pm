@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::TrackTypes::AddressRequestType;
-$Shipment::UPS::WSDL::TrackTypes::AddressRequestType::VERSION = '3.06';
+$Shipment::UPS::WSDL::TrackTypes::AddressRequestType::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,31 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %PostalCode_of : ATTR(:get<PostalCode>);
-    my %CountryCode_of : ATTR(:get<CountryCode>);
+my %PostalCode_of :ATTR(:get<PostalCode>);
+my %CountryCode_of :ATTR(:get<CountryCode>);
 
-    __PACKAGE__->_factory(
-        [   qw(        PostalCode
-              CountryCode
+__PACKAGE__->_factory(
+    [ qw(        PostalCode
+        CountryCode
 
-            )
-        ],
-        {   'PostalCode'  => \%PostalCode_of,
-            'CountryCode' => \%CountryCode_of,
-        },
-        {   'PostalCode'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'CountryCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'PostalCode' => \%PostalCode_of,
+        'CountryCode' => \%CountryCode_of,
+    },
+    {
+        'PostalCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'CountryCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'PostalCode'  => 'PostalCode',
-            'CountryCode' => 'CountryCode',
-        }
-    );
+        'PostalCode' => 'PostalCode',
+        'CountryCode' => 'CountryCode',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -61,7 +67,7 @@ Shipment::UPS::WSDL::TrackTypes::AddressRequestType
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

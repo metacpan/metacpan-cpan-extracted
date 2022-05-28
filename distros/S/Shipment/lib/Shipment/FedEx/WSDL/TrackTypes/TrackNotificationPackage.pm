@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackNotificationPackage;
-$Shipment::FedEx::WSDL::TrackTypes::TrackNotificationPackage::VERSION = '3.06';
+$Shipment::FedEx::WSDL::TrackTypes::TrackNotificationPackage::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/track/v9'}
+sub get_xmlns { 'http://fedex.com/ws/track/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,57 +20,57 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %TrackingNumber_of : ATTR(:get<TrackingNumber>);
-    my %TrackingNumberUniqueIdentifiers_of :
-      ATTR(:get<TrackingNumberUniqueIdentifiers>);
-    my %CarrierCode_of : ATTR(:get<CarrierCode>);
-    my %ShipDate_of : ATTR(:get<ShipDate>);
-    my %Destination_of : ATTR(:get<Destination>);
-    my %RecipientDetails_of : ATTR(:get<RecipientDetails>);
+my %TrackingNumber_of :ATTR(:get<TrackingNumber>);
+my %TrackingNumberUniqueIdentifiers_of :ATTR(:get<TrackingNumberUniqueIdentifiers>);
+my %CarrierCode_of :ATTR(:get<CarrierCode>);
+my %ShipDate_of :ATTR(:get<ShipDate>);
+my %Destination_of :ATTR(:get<Destination>);
+my %RecipientDetails_of :ATTR(:get<RecipientDetails>);
 
-    __PACKAGE__->_factory(
-        [   qw(        TrackingNumber
-              TrackingNumberUniqueIdentifiers
-              CarrierCode
-              ShipDate
-              Destination
-              RecipientDetails
+__PACKAGE__->_factory(
+    [ qw(        TrackingNumber
+        TrackingNumberUniqueIdentifiers
+        CarrierCode
+        ShipDate
+        Destination
+        RecipientDetails
 
-            )
-        ],
-        {   'TrackingNumber'                  => \%TrackingNumber_of,
-            'TrackingNumberUniqueIdentifiers' =>
-              \%TrackingNumberUniqueIdentifiers_of,
-            'CarrierCode'      => \%CarrierCode_of,
-            'ShipDate'         => \%ShipDate_of,
-            'Destination'      => \%Destination_of,
-            'RecipientDetails' => \%RecipientDetails_of,
-        },
-        {   'TrackingNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'TrackingNumberUniqueIdentifiers' =>
-              'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'CarrierCode' =>
-              'Shipment::FedEx::WSDL::TrackTypes::CarrierCodeType',
-            'ShipDate'         => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
-            'Destination'      => 'Shipment::FedEx::WSDL::TrackTypes::Address',
-            'RecipientDetails' =>
-              'Shipment::FedEx::WSDL::TrackTypes::TrackNotificationRecipientDetail',
-        },
-        {
+    ) ],
+    {
+        'TrackingNumber' => \%TrackingNumber_of,
+        'TrackingNumberUniqueIdentifiers' => \%TrackingNumberUniqueIdentifiers_of,
+        'CarrierCode' => \%CarrierCode_of,
+        'ShipDate' => \%ShipDate_of,
+        'Destination' => \%Destination_of,
+        'RecipientDetails' => \%RecipientDetails_of,
+    },
+    {
+        'TrackingNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'TrackingNumberUniqueIdentifiers' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'CarrierCode' => 'Shipment::FedEx::WSDL::TrackTypes::CarrierCodeType',
+        'ShipDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
+        'Destination' => 'Shipment::FedEx::WSDL::TrackTypes::Address',
+        'RecipientDetails' => 'Shipment::FedEx::WSDL::TrackTypes::TrackNotificationRecipientDetail',
+    },
+    {
 
-            'TrackingNumber'                  => 'TrackingNumber',
-            'TrackingNumberUniqueIdentifiers' =>
-              'TrackingNumberUniqueIdentifiers',
-            'CarrierCode'      => 'CarrierCode',
-            'ShipDate'         => 'ShipDate',
-            'Destination'      => 'Destination',
-            'RecipientDetails' => 'RecipientDetails',
-        }
-    );
+        'TrackingNumber' => 'TrackingNumber',
+        'TrackingNumberUniqueIdentifiers' => 'TrackingNumberUniqueIdentifiers',
+        'CarrierCode' => 'CarrierCode',
+        'ShipDate' => 'ShipDate',
+        'Destination' => 'Destination',
+        'RecipientDetails' => 'RecipientDetails',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -87,7 +87,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackNotificationPackage
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

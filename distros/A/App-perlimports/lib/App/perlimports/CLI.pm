@@ -4,7 +4,7 @@ use Moo;
 use utf8;
 use feature qw( say );
 
-our $VERSION = '0.000043';
+our $VERSION = '0.000044';
 
 use App::perlimports           ();
 use App::perlimports::Config   ();
@@ -442,7 +442,7 @@ App::perlimports::CLI - CLI arg parsing for C<perlimports>
 
 =head1 VERSION
 
-version 0.000043
+version 0.000044
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,10 @@
 Revision history for Dancer2-Plugin-Passphrase
 
+3.4.0 Sat 28 May 12:45:00 CEST 2020
+
+    * Changed bcrypt backend in Digest::Bcrypt v1.210 (GH#5 Peter Mottram)
+    * Mark module as deprecated
+
 3.3.4 Mon 11 April 18:55:00 EDT 220
 
     * Fix example for Bcrypt configuration in POD (Sergiy Borodych)

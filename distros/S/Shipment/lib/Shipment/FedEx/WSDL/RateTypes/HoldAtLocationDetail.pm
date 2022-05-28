@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::HoldAtLocationDetail;
-$Shipment::FedEx::WSDL::RateTypes::HoldAtLocationDetail::VERSION = '3.06';
+$Shipment::FedEx::WSDL::RateTypes::HoldAtLocationDetail::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://fedex.com/ws/rate/v9'}
+sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,48 +20,52 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %PhoneNumber_of : ATTR(:get<PhoneNumber>);
-    my %LocationContactAndAddress_of : ATTR(:get<LocationContactAndAddress>);
-    my %LocationType_of : ATTR(:get<LocationType>);
-    my %LocationId_of : ATTR(:get<LocationId>);
-    my %LocationNumber_of : ATTR(:get<LocationNumber>);
+my %PhoneNumber_of :ATTR(:get<PhoneNumber>);
+my %LocationContactAndAddress_of :ATTR(:get<LocationContactAndAddress>);
+my %LocationType_of :ATTR(:get<LocationType>);
+my %LocationId_of :ATTR(:get<LocationId>);
+my %LocationNumber_of :ATTR(:get<LocationNumber>);
 
-    __PACKAGE__->_factory(
-        [   qw(        PhoneNumber
-              LocationContactAndAddress
-              LocationType
-              LocationId
-              LocationNumber
+__PACKAGE__->_factory(
+    [ qw(        PhoneNumber
+        LocationContactAndAddress
+        LocationType
+        LocationId
+        LocationNumber
 
-            )
-        ],
-        {   'PhoneNumber'               => \%PhoneNumber_of,
-            'LocationContactAndAddress' => \%LocationContactAndAddress_of,
-            'LocationType'              => \%LocationType_of,
-            'LocationId'                => \%LocationId_of,
-            'LocationNumber'            => \%LocationNumber_of,
-        },
-        {   'PhoneNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'LocationContactAndAddress' =>
-              'Shipment::FedEx::WSDL::RateTypes::ContactAndAddress',
-            'LocationType' =>
-              'Shipment::FedEx::WSDL::RateTypes::FedExLocationType',
-            'LocationId'     => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'LocationNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
-        },
-        {
+    ) ],
+    {
+        'PhoneNumber' => \%PhoneNumber_of,
+        'LocationContactAndAddress' => \%LocationContactAndAddress_of,
+        'LocationType' => \%LocationType_of,
+        'LocationId' => \%LocationId_of,
+        'LocationNumber' => \%LocationNumber_of,
+    },
+    {
+        'PhoneNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'LocationContactAndAddress' => 'Shipment::FedEx::WSDL::RateTypes::ContactAndAddress',
+        'LocationType' => 'Shipment::FedEx::WSDL::RateTypes::FedExLocationType',
+        'LocationId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'LocationNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
+    },
+    {
 
-            'PhoneNumber'               => 'PhoneNumber',
-            'LocationContactAndAddress' => 'LocationContactAndAddress',
-            'LocationType'              => 'LocationType',
-            'LocationId'                => 'LocationId',
-            'LocationNumber'            => 'LocationNumber',
-        }
-    );
+        'PhoneNumber' => 'PhoneNumber',
+        'LocationContactAndAddress' => 'LocationContactAndAddress',
+        'LocationType' => 'LocationType',
+        'LocationId' => 'LocationId',
+        'LocationNumber' => 'LocationNumber',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -78,7 +82,7 @@ Shipment::FedEx::WSDL::RateTypes::HoldAtLocationDetail
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

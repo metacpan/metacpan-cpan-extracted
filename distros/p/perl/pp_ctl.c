@@ -63,7 +63,7 @@ PP(pp_wantarray)
     }
 
     switch (cx->blk_gimme) {
-    case G_ARRAY:
+    case G_LIST:
         RETPUSHYES;
     case G_SCALAR:
         RETPUSHNO;
@@ -218,7 +218,7 @@ PP(pp_substcont)
 
         SvGETMAGIC(TOPs); /* possibly clear taint on $1 etc: #67962 */
 
-        /* See "how taint works" above pp_subst() */
+        /* See "how taint works": pp_subst() in pp_hot.c */
         sv_catsv_nomg(dstr, POPs);
         if (UNLIKELY(TAINT_get))
             cx->sb_rxtainted |= SUBST_TAINT_REPL;
@@ -264,7 +264,7 @@ PP(pp_substcont)
 
             /* update the taint state of various variables in
              * preparation for final exit.
-             * See "how taint works" above pp_subst() */
+             * See "how taint works": pp_subst() in pp_hot.c */
             if (TAINTING_get) {
                 if ((cx->sb_rxtainted & SUBST_TAINT_PAT) ||
                     ((cx->sb_rxtainted & (SUBST_TAINT_STR|SUBST_TAINT_RETAINT))
@@ -351,7 +351,7 @@ PP(pp_substcont)
         (void)ReREFCNT_inc(rx);
     /* update the taint state of various variables in preparation
      * for calling the code block.
-     * See "how taint works" above pp_subst() */
+     * See "how taint works": pp_subst() in pp_hot.c */
     if (TAINTING_get) {
         if (RX_MATCH_TAINTED(rx)) /* run time pattern taint, eg locale */
             cx->sb_rxtainted |= SUBST_TAINT_PAT;
@@ -1055,7 +1055,7 @@ PP(pp_mapwhile)
         }
         /* copy the new items down to the destination list */
         dst = PL_stack_base + (PL_markstack_ptr[-2] += items) - 1;
-        if (gimme == G_ARRAY) {
+        if (gimme == G_LIST) {
             /* add returned items to the collection (making mortal copies
              * if necessary), then clear the current temps stack frame
              * *except* for those items. We do this splicing the items
@@ -1121,7 +1121,7 @@ PP(pp_mapwhile)
                 dTARGET;
                 XPUSHi(items);
         }
-        else if (gimme == G_ARRAY)
+        else if (gimme == G_LIST)
             SP += items;
         RETURN;
     }
@@ -1148,7 +1148,7 @@ PP(pp_mapwhile)
 PP(pp_range)
 {
     dTARG;
-    if (GIMME_V == G_ARRAY)
+    if (GIMME_V == G_LIST)
         return NORMAL;
     GETTARGET;
     if (SvTRUE_NN(targ))
@@ -1161,7 +1161,7 @@ PP(pp_flip)
 {
     dSP;
 
-    if (GIMME_V == G_ARRAY) {
+    if (GIMME_V == G_LIST) {
         RETURNOP(((LOGOP*)cUNOP->op_first)->op_other);
     }
     else {
@@ -1219,7 +1219,7 @@ PP(pp_flop)
 {
     dSP;
 
-    if (GIMME_V == G_ARRAY) {
+    if (GIMME_V == G_LIST) {
         dPOPPOPssrl;
 
         SvGETMAGIC(left);
@@ -1325,6 +1325,7 @@ static const char * const context_name[] = {
     "format",
     "eval",
     "substitution",
+    "defer block",
 };
 
 STATIC I32
@@ -1383,7 +1384,14 @@ S_dopoptolabel(pTHX_ const char *label, STRLEN len, U32 flags)
     return i;
 }
 
+/*
+=for apidoc_section $callback
+=for apidoc dowantarray
 
+Implements the deprecated L<perlapi/C<GIMME>>.
+
+=cut
+*/
 
 U8
 Perl_dowantarray(pTHX)
@@ -1408,6 +1416,14 @@ Perl_block_gimme(pTHX)
     return gimme;
 }
 
+/*
+=for apidoc is_lvalue_sub
+
+Returns non-zero if the sub calling this function is being called in an lvalue
+context.  Returns 0 otherwise.
+
+=cut
+*/
 
 I32
 Perl_is_lvalue_sub(pTHX)
@@ -1622,6 +1638,7 @@ Perl_dounwind(pTHX_ I32 cxix)
             break;
         case CXt_BLOCK:
         case CXt_NULL:
+        case CXt_DEFER:
             /* these two don't have a POPFOO() */
             break;
         case CXt_FORMAT:
@@ -1687,16 +1704,14 @@ S_pop_eval_context_maybe_croak(pTHX_ PERL_CONTEXT *cx, SV *errsv, int action)
     if (do_croak) {
         const char *fmt;
         HV *inc_hv = GvHVn(PL_incgv);
-        I32  klen  = SvUTF8(namesv) ? -(I32)SvCUR(namesv) : (I32)SvCUR(namesv);
-        const char *key = SvPVX_const(namesv);
 
         if (action == 1) {
-            (void)hv_delete(inc_hv, key, klen, G_DISCARD);
+            (void)hv_delete_ent(inc_hv, namesv, G_DISCARD, 0);
             fmt = "%" SVf " did not return a true value";
             errsv = namesv;
         }
         else {
-            (void)hv_store(inc_hv, key, klen, &PL_sv_undef, 0);
+            (void)hv_store_ent(inc_hv, namesv, &PL_sv_undef, 0);
             fmt = "%" SVf "Compilation failed in require";
             if (!errsv)
                 errsv = newSVpvs_flags("Unknown error\n", SVs_TEMP);
@@ -1941,7 +1956,7 @@ PP(pp_caller)
 
     cx = caller_cx(count + !!(PL_op->op_private & OPpOFFBYONE), &dbcx);
     if (!cx) {
-        if (gimme != G_ARRAY) {
+        if (gimme != G_LIST) {
             EXTEND(SP, 1);
             RETPUSHUNDEF;
         }
@@ -1953,7 +1968,7 @@ PP(pp_caller)
     stash_hek = SvTYPE(CopSTASH(cx->blk_oldcop)) == SVt_PVHV
       ? HvNAME_HEK((HV*)CopSTASH(cx->blk_oldcop))
       : NULL;
-    if (gimme != G_ARRAY) {
+    if (gimme != G_LIST) {
         EXTEND(SP, 1);
         if (!stash_hek)
             PUSHs(&PL_sv_undef);
@@ -2001,7 +2016,7 @@ PP(pp_caller)
     if (gimme == G_VOID)
         PUSHs(&PL_sv_undef);
     else
-        PUSHs(boolSV((gimme & G_WANT) == G_ARRAY));
+        PUSHs(boolSV((gimme & G_WANT) == G_LIST));
     if (CxTYPE(cx) == CXt_EVAL) {
         /* eval STRING */
         if (CxOLD_OP_TYPE(cx) == OP_ENTEREVAL) {
@@ -2105,7 +2120,7 @@ PP(pp_dbstate)
     {
         dSP;
         PERL_CONTEXT *cx;
-        const U8 gimme = G_ARRAY;
+        const U8 gimme = G_LIST;
         GV * const gv = PL_DBgv;
         CV * cv = NULL;
 
@@ -2444,7 +2459,7 @@ PP(pp_leavesublv)
             }
         }
         else {
-            assert(gimme == G_ARRAY);
+            assert(gimme == G_LIST);
             assert (!(lval & OPpDEREF));
 
             if (is_lval) {
@@ -2481,6 +2496,11 @@ PP(pp_leavesublv)
     return retop;
 }
 
+static const char *S_defer_blockname(PERL_CONTEXT *cx)
+{
+    return (cx->cx_type & CXp_FINALLY) ? "finally" : "defer";
+}
+
 
 PP(pp_return)
 {
@@ -2490,6 +2510,15 @@ PP(pp_return)
 
     assert(cxstack_ix >= 0);
     if (cxix < cxstack_ix) {
+        I32 i;
+        /* Check for  defer { return; } */
+        for(i = cxstack_ix; i > cxix; i--) {
+            if(CxTYPE(&cxstack[i]) == CXt_DEFER)
+                /* diag_listed_as: Can't "%s" out of a "defer" block */
+                /* diag_listed_as: Can't "%s" out of a "finally" block */
+                Perl_croak(aTHX_ "Can't \"%s\" out of a \"%s\" block",
+                        "return", S_defer_blockname(&cxstack[i]));
+        }
         if (cxix < 0) {
             if (!(       PL_curstackinfo->si_type == PERLSI_SORT
                   || (   PL_curstackinfo->si_type == PERLSI_MULTICALL
@@ -2564,7 +2593,7 @@ PP(pp_return)
         if (oldsp != MARK) {
             SSize_t nargs = SP - MARK;
             if (nargs) {
-                if (cx->blk_gimme == G_ARRAY) {
+                if (cx->blk_gimme == G_LIST) {
                     /* shift return args to base of call stack frame */
                     Move(MARK + 1, oldsp + 1, nargs, SV*);
                     PL_stack_sp  = oldsp + nargs;
@@ -2629,8 +2658,18 @@ S_unwind_loop(pTHX)
                                                     label_len,
                                                     label_flags | SVs_TEMP)));
     }
-    if (cxix < cxstack_ix)
+    if (cxix < cxstack_ix) {
+        I32 i;
+        /* Check for  defer { last ... } etc */
+        for(i = cxstack_ix; i > cxix; i--) {
+            if(CxTYPE(&cxstack[i]) == CXt_DEFER)
+                /* diag_listed_as: Can't "%s" out of a "defer" block */
+                /* diag_listed_as: Can't "%s" out of a "finally" block */
+                Perl_croak(aTHX_ "Can't \"%s\" out of a \"%s\" block",
+                        OP_NAME(PL_op), S_defer_blockname(&cxstack[i]));
+        }
         dounwind(cxix);
+    }
     return &cxstack[cxix];
 }
 
@@ -2781,8 +2820,11 @@ S_dofindlabel(pTHX_ OP *o, const char *label, STRLEN len, U32 flags, OP **opstac
                 first_kid_of_binary = TRUE;
                 ops--;
             }
-            if ((o = dofindlabel(kid, label, len, flags, ops, oplimit)))
+            if ((o = dofindlabel(kid, label, len, flags, ops, oplimit))) {
+                if (kid->op_type == OP_PUSHDEFER)
+                    Perl_croak(aTHX_ "Can't \"goto\" into a \"defer\" block");
                 return o;
+            }
             if (first_kid_of_binary)
                 *ops++ = UNENTERABLE;
         }
@@ -2873,6 +2915,14 @@ PP(pp_goto)
             }
             else if (CxMULTICALL(cx))
                 DIE(aTHX_ "Can't goto subroutine from a sort sub (or similar callback)");
+
+            /* Check for  defer { goto &...; } */
+            for(ix = cxstack_ix; ix > cxix; ix--) {
+                if(CxTYPE(&cxstack[ix]) == CXt_DEFER)
+                    /* diag_listed_as: Can't "%s" out of a "defer" block */
+                    Perl_croak(aTHX_ "Can't \"%s\" out of a \"%s\" block",
+                            "goto", S_defer_blockname(&cxstack[ix]));
+            }
 
             /* First do some returnish stuff. */
 
@@ -3112,6 +3162,9 @@ PP(pp_goto)
             case CXt_FORMAT:
             case CXt_NULL:
                 DIE(aTHX_ "Can't \"goto\" out of a pseudo block");
+            case CXt_DEFER:
+                /* diag_listed_as: Can't "%s" out of a "defer" block */
+                DIE(aTHX_ "Can't \"%s\" out of a \"%s\" block", "goto", S_defer_blockname(cx));
             default:
                 if (ix)
                     DIE(aTHX_ "panic: goto, type=%u, ix=%ld",
@@ -3260,7 +3313,7 @@ S_save_lines(pTHX_ AV *array, SV *sv)
         else
             t = send;
 
-        sv_setpvn(tmpstr, s, t - s);
+        sv_setpvn_fresh(tmpstr, s, t - s);
         av_store(array, line++, tmpstr);
         s = t;
     }
@@ -3501,6 +3554,7 @@ S_doeval_compile(pTHX_ U8 gimme, CV* outside, U32 seq, HV *hh)
     SAVEHINTS();
     if (clear_hints) {
         PL_hints = HINTS_DEFAULT;
+        PL_prevailing_version = 0;
         hv_clear(GvHV(PL_hintgv));
         CLEARFEATUREBITS();
     }
@@ -3587,7 +3641,7 @@ S_doeval_compile(pTHX_ U8 gimme, CV* outside, U32 seq, HV *hh)
         if (!*(SvPV_nolen_const(errsv)))
             sv_setpvs(errsv, "Compilation error");
 
-        if (gimme != G_ARRAY) PUSHs(&PL_sv_undef);
+        if (gimme != G_LIST) PUSHs(&PL_sv_undef);
         PUTBACK;
         return FALSE;
     }
@@ -4049,9 +4103,9 @@ S_require_file(pTHX_ SV *sv)
                         loader = l;
                     }
                     if (sv_isobject(loader))
-                        count = call_method("INC", G_ARRAY);
+                        count = call_method("INC", G_LIST);
                     else
-                        count = call_sv(loader, G_ARRAY);
+                        count = call_sv(loader, G_LIST);
                     SPAGAIN;
 
                     if (count > 0) {
@@ -4348,7 +4402,7 @@ S_require_file(pTHX_ SV *sv)
            than hanging another SV from it. In turn, filter_add() optionally
            takes the SV to use as the filter (or creates a new SV if passed
            NULL), so simply pass in whatever value filter_cache has.  */
-        SV * const fc = filter_cache ? newSV(0) : NULL;
+        SV * const fc = filter_cache ? newSV_type(SVt_NULL) : NULL;
         SV *datasv;
         if (fc) sv_copypv(fc, filter_cache);
         datasv = filter_add(S_run_user_filter, fc);
@@ -5131,12 +5185,10 @@ S_do_smartmatch(pTHX_ HV *seen_this, HV *seen_other, const bool copied)
                 const Size_t other_len = av_count(other_av);
 
                 if (NULL == seen_this) {
-                    seen_this = newHV();
-                    (void) sv_2mortal(MUTABLE_SV(seen_this));
+                    seen_this = (HV*)newSV_type_mortal(SVt_PVHV);
                 }
                 if (NULL == seen_other) {
-                    seen_other = newHV();
-                    (void) sv_2mortal(MUTABLE_SV(seen_other));
+                    seen_other = (HV*)newSV_type_mortal(SVt_PVHV);
                 }
                 for(i = 0; i < other_len; ++i) {
                     SV * const * const this_elem = av_fetch(MUTABLE_AV(SvRV(e)), i, FALSE);
@@ -5434,6 +5486,64 @@ PP(pp_break)
     PL_stack_sp = PL_stack_base + cx->blk_oldsp;
 
     return cx->blk_givwhen.leave_op;
+}
+
+static void
+_invoke_defer_block(pTHX_ U8 type, void *_arg)
+{
+    OP *start = (OP *)_arg;
+#ifdef DEBUGGING
+    I32 was_cxstack_ix = cxstack_ix;
+#endif
+
+    cx_pushblock(type, G_VOID, PL_stack_sp, PL_savestack_ix);
+    ENTER;
+    SAVETMPS;
+
+    SAVEOP();
+    PL_op = start;
+
+    CALLRUNOPS(aTHX);
+
+    FREETMPS;
+    LEAVE;
+
+    {
+        PERL_CONTEXT *cx;
+
+        cx = CX_CUR();
+        assert(CxTYPE(cx) == CXt_DEFER);
+
+        PL_stack_sp = PL_stack_base + cx->blk_oldsp;
+
+        CX_LEAVE_SCOPE(cx);
+        cx_popblock(cx);
+        CX_POP(cx);
+    }
+
+    assert(cxstack_ix == was_cxstack_ix);
+}
+
+static void
+invoke_defer_block(pTHX_ void *_arg)
+{
+    _invoke_defer_block(aTHX_ CXt_DEFER, _arg);
+}
+
+static void
+invoke_finally_block(pTHX_ void *_arg)
+{
+    _invoke_defer_block(aTHX_ CXt_DEFER|CXp_FINALLY, _arg);
+}
+
+PP(pp_pushdefer)
+{
+    if(PL_op->op_private & OPpDEFER_FINALLY)
+        SAVEDESTRUCTOR_X(invoke_finally_block, cLOGOP->op_other);
+    else
+        SAVEDESTRUCTOR_X(invoke_defer_block, cLOGOP->op_other);
+
+    return NORMAL;
 }
 
 static MAGIC *
@@ -5786,7 +5896,7 @@ S_run_user_filter(pTHX_ int idx, SV *buf_sv, int maxlen)
        don't want to pass it in a second time.
        I'm going to use a mortal in case the upstream filter croaks.  */
     upstream = ((SvOK(buf_sv) && sv_len(buf_sv)) || SvGMAGICAL(buf_sv))
-        ? sv_newmortal() : buf_sv;
+        ? newSV_type_mortal(SVt_PV) : buf_sv;
     SvUPGRADE(upstream, SVt_PV);
         
     if (filter_has_file) {

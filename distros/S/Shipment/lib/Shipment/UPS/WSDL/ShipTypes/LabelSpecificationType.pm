@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::LabelSpecificationType;
-$Shipment::UPS::WSDL::ShipTypes::LabelSpecificationType::VERSION = '3.06';
+$Shipment::UPS::WSDL::ShipTypes::LabelSpecificationType::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0'}
+sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,38 +20,42 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %LabelImageFormat_of : ATTR(:get<LabelImageFormat>);
-    my %HTTPUserAgent_of : ATTR(:get<HTTPUserAgent>);
-    my %LabelStockSize_of : ATTR(:get<LabelStockSize>);
+my %LabelImageFormat_of :ATTR(:get<LabelImageFormat>);
+my %HTTPUserAgent_of :ATTR(:get<HTTPUserAgent>);
+my %LabelStockSize_of :ATTR(:get<LabelStockSize>);
 
-    __PACKAGE__->_factory(
-        [   qw(        LabelImageFormat
-              HTTPUserAgent
-              LabelStockSize
+__PACKAGE__->_factory(
+    [ qw(        LabelImageFormat
+        HTTPUserAgent
+        LabelStockSize
 
-            )
-        ],
-        {   'LabelImageFormat' => \%LabelImageFormat_of,
-            'HTTPUserAgent'    => \%HTTPUserAgent_of,
-            'LabelStockSize'   => \%LabelStockSize_of,
-        },
-        {   'LabelImageFormat' =>
-              'Shipment::UPS::WSDL::ShipTypes::LabelImageFormatType',
-            'HTTPUserAgent'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'LabelStockSize' =>
-              'Shipment::UPS::WSDL::ShipTypes::LabelStockSizeType',
-        },
-        {
+    ) ],
+    {
+        'LabelImageFormat' => \%LabelImageFormat_of,
+        'HTTPUserAgent' => \%HTTPUserAgent_of,
+        'LabelStockSize' => \%LabelStockSize_of,
+    },
+    {
+        'LabelImageFormat' => 'Shipment::UPS::WSDL::ShipTypes::LabelImageFormatType',
+        'HTTPUserAgent' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'LabelStockSize' => 'Shipment::UPS::WSDL::ShipTypes::LabelStockSizeType',
+    },
+    {
 
-            'LabelImageFormat' => 'LabelImageFormat',
-            'HTTPUserAgent'    => 'HTTPUserAgent',
-            'LabelStockSize'   => 'LabelStockSize',
-        }
-    );
+        'LabelImageFormat' => 'LabelImageFormat',
+        'HTTPUserAgent' => 'HTTPUserAgent',
+        'LabelStockSize' => 'LabelStockSize',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -68,7 +72,7 @@ Shipment::UPS::WSDL::ShipTypes::LabelSpecificationType
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 

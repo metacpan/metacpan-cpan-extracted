@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::ShortAddress;
-$Shipment::Purolator::WSDL::Types::ShortAddress::VERSION = '3.06';
+$Shipment::Purolator::WSDL::Types::ShortAddress::VERSION = '3.07';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
+sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,41 +20,47 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{    # BLOCK to scope variables
+{ # BLOCK to scope variables
 
-    my %City_of : ATTR(:get<City>);
-    my %Province_of : ATTR(:get<Province>);
-    my %Country_of : ATTR(:get<Country>);
-    my %PostalCode_of : ATTR(:get<PostalCode>);
+my %City_of :ATTR(:get<City>);
+my %Province_of :ATTR(:get<Province>);
+my %Country_of :ATTR(:get<Country>);
+my %PostalCode_of :ATTR(:get<PostalCode>);
 
-    __PACKAGE__->_factory(
-        [   qw(        City
-              Province
-              Country
-              PostalCode
+__PACKAGE__->_factory(
+    [ qw(        City
+        Province
+        Country
+        PostalCode
 
-            )
-        ],
-        {   'City'       => \%City_of,
-            'Province'   => \%Province_of,
-            'Country'    => \%Country_of,
-            'PostalCode' => \%PostalCode_of,
-        },
-        {   'City'       => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Province'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'Country'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-            'PostalCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        },
-        {
+    ) ],
+    {
+        'City' => \%City_of,
+        'Province' => \%Province_of,
+        'Country' => \%Country_of,
+        'PostalCode' => \%PostalCode_of,
+    },
+    {
+        'City' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Province' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'Country' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        'PostalCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    },
+    {
 
-            'City'       => 'City',
-            'Province'   => 'Province',
-            'Country'    => 'Country',
-            'PostalCode' => 'PostalCode',
-        }
-    );
+        'City' => 'City',
+        'Province' => 'Province',
+        'Country' => 'Country',
+        'PostalCode' => 'PostalCode',
+    }
+);
 
-}    # end BLOCK
+} # end BLOCK
+
+
+
+
+
 
 
 1;
@@ -71,7 +77,7 @@ Shipment::Purolator::WSDL::Types::ShortAddress
 
 =head1 VERSION
 
-version 3.06
+version 3.07
 
 =head1 DESCRIPTION
 
