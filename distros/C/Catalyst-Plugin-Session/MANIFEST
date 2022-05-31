@@ -1,32 +1,21 @@
 Changes
-inc/Module/Install.pm
-inc/Module/Install/AuthorTests.pm
-inc/Module/Install/Base.pm
-inc/Module/Install/Can.pm
-inc/Module/Install/Fetch.pm
-inc/Module/Install/Makefile.pm
-inc/Module/Install/Metadata.pm
-inc/Module/Install/Win32.pm
-inc/Module/Install/WriteAll.pm
 lib/Catalyst/Plugin/Session.pm
 lib/Catalyst/Plugin/Session/State.pm
 lib/Catalyst/Plugin/Session/Store.pm
 lib/Catalyst/Plugin/Session/Store/Dummy.pm
 lib/Catalyst/Plugin/Session/Test/Store.pm
 lib/Catalyst/Plugin/Session/Tutorial.pod
+maint/Makefile.PL.include
 Makefile.PL
 MANIFEST			This list of files
-META.yml
-README
 t/00_basic_sanity.t
 t/01_setup.t
 t/03_flash.t
 t/05_semi_persistent_flash.t
-t/author/pod.t
-t/author/podcoverage.t
 t/cat_test.t
 t/lib/FlashTestApp.pm
 t/lib/FlashTestApp/Controller/Root.pm
+t/lib/MiniUA.pm
 t/lib/SessionExpiry.pm
 t/lib/SessionExpiry/Controller/Root.pm
 t/lib/SessionTestApp.pm
@@ -40,3 +29,9 @@ t/live_session_fixation.t
 t/live_verify_address.t
 t/live_verify_user_agent.t
 t/session_valid.t
+xt/pod.t
+xt/podcoverage.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)
+LICENSE                                  LICENSE file (added by Distar)

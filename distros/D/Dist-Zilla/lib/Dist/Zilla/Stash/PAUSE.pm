@@ -1,4 +1,4 @@
-package Dist::Zilla::Stash::PAUSE 6.024;
+package Dist::Zilla::Stash::PAUSE 6.025;
 # ABSTRACT: a stash of your PAUSE credentials
 
 use Moose;
@@ -52,7 +52,7 @@ Dist::Zilla::Stash::PAUSE - a stash of your PAUSE credentials
 
 =head1 VERSION
 
-version 6.024
+version 6.025
 
 =head1 OVERVIEW
 
@@ -77,7 +77,7 @@ Ricardo SIGNES 😏 <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -42,7 +42,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 use UI::Various::core;
 use UI::Various::widget;
@@ -53,6 +53,20 @@ our @ISA = qw(UI::Various::widget);
 our @EXPORT_OK = qw();
 
 #########################################################################
+
+=item first [ro]
+
+the index of the first element to be shown
+
+The last element shown will have the index C<first> + C<height> - 1, if
+C<texts> is long enough.
+
+=cut
+
+sub first($)
+{
+    return get('first', $_[0]);
+}
 
 =item height [rw]
 
@@ -73,6 +87,32 @@ sub height($;$)
 			  error('parameter__1_must_be_a_positive_integer',
 				'height');
 			  $_ = 5;
+		      }
+		  },
+		  @_);
+}
+
+=item on_select [rw, optional]
+
+an optional callback called after changing the selection
+
+Note that the callback routine is called without parameters.  If you need to
+access the current selection, use the method C<L<selected|/selected - get
+current selection of listbox>>.  Also note that when a user drags a
+selection in L<Tk> the callback is called for each and every change, not
+only for the final one after releasing the mouse button.
+
+=cut
+
+sub on_select($;$)
+{
+    return access('on_select',
+		  sub{
+		      unless (ref($_) eq 'CODE')
+		      {
+			  error('_1_attribute_must_be_a_2_reference',
+				'on_select', 'CODE');
+			  return undef;
 		      }
 		  },
 		  @_);
@@ -153,26 +193,13 @@ sub texts($\@)
 	 @_);
 }
 
-=item first [ro]
-
-the index of the first element to be shown
-
-The last element shown will have the index C<first> + C<height> - 1, if
-C<texts> is long enough.
-
-=cut
-
-sub first($)
-{
-    return get('first', $_[0]);
-}
-
 #########################################################################
 #
 # internal constants and data:
 
 use constant ALLOWED_PARAMETERS =>
-    (UI::Various::widget::COMMON_PARAMETERS, qw(first selection texts));
+    (UI::Various::widget::COMMON_PARAMETERS,
+     qw(first on_select selection texts));
 use constant DEFAULT_ATTRIBUTES => (first => -1, selection => 2, texts => []);
 
 #########################################################################

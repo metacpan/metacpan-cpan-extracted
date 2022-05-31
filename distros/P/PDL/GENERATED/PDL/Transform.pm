@@ -377,7 +377,7 @@ sub invert {
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 948 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -731,7 +731,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 #line 1573 "transform.pd"
@@ -740,9 +740,9 @@ sub PDL::match {
   # Set default for rectification to 0 for simple matching...
   push @_, {} if ref($_[-1]) ne 'HASH';
   my @k = grep(m/^r(e(c(t)?)?)?/,sort keys %{$_[-1]});
-#line 1067 "../../blib/lib/PDL/PP.pm"
-#line 1067 "../../blib/lib/PDL/PP.pm"
-#line 1069 "../../blib/lib/PDL/PP.pm"
+#line 957 "../../blib/lib/PDL/PP.pm"
+#line 957 "../../blib/lib/PDL/PP.pm"
+#line 959 "../../blib/lib/PDL/PP.pm"
 #line 1578 "transform.pd"
   unless(@k) {
       $_[-1]->{rectify} = 0;
@@ -774,9 +774,9 @@ sub map {
     my($x);
     if(defined ($x = $tmp->gethdr)) {
       my(%b) = %{$x};
-#line 1101 "../../blib/lib/PDL/PP.pm"
-#line 1099 "../../blib/lib/PDL/PP.pm"
-#line 1103 "../../blib/lib/PDL/PP.pm"
+#line 991 "../../blib/lib/PDL/PP.pm"
+#line 989 "../../blib/lib/PDL/PP.pm"
+#line 993 "../../blib/lib/PDL/PP.pm"
 #line 1608 "transform.pd"
       $ohdr = \%b;
     }
@@ -787,9 +787,9 @@ sub map {
     }
     # deep-copy fits header into output
     my %foo = %{$tmp};
-#line 1114 "../../blib/lib/PDL/PP.pm"
-#line 1110 "../../blib/lib/PDL/PP.pm"
-#line 1116 "../../blib/lib/PDL/PP.pm"
+#line 1004 "../../blib/lib/PDL/PP.pm"
+#line 1000 "../../blib/lib/PDL/PP.pm"
+#line 1006 "../../blib/lib/PDL/PP.pm"
 #line 1617 "transform.pd"
     $ohdr = \%foo;
   } elsif(ref $tmp eq 'ARRAY') {
@@ -988,9 +988,9 @@ sub map {
           ### These are the CROTA<n>, PCi_j, and CDi_j.
           delete @{$out->hdr}{
               grep /(^CROTA\d*$)|(^(CD|PC)\d+_\d+[A-Z]?$)/, keys %{$out->hdr}
-#line 1315 "../../blib/lib/PDL/PP.pm"
-#line 1309 "../../blib/lib/PDL/PP.pm"
-#line 1317 "../../blib/lib/PDL/PP.pm"
+#line 1205 "../../blib/lib/PDL/PP.pm"
+#line 1199 "../../blib/lib/PDL/PP.pm"
+#line 1207 "../../blib/lib/PDL/PP.pm"
 #line 1814 "transform.pd"
           };
       } else {
@@ -1036,9 +1036,9 @@ sub map {
           ## Eliminate competing header pointing tags if they exist
           delete @{$out->hdr}{
               grep /(^CROTA\d*$)|(^(PC)\d+_\d+[A-Z]?$)|(CDELT\d*$)/, keys %{$out->hdr}
-#line 1363 "../../blib/lib/PDL/PP.pm"
-#line 1355 "../../blib/lib/PDL/PP.pm"
-#line 1365 "../../blib/lib/PDL/PP.pm"
+#line 1253 "../../blib/lib/PDL/PP.pm"
+#line 1245 "../../blib/lib/PDL/PP.pm"
+#line 1255 "../../blib/lib/PDL/PP.pm"
 #line 1858 "transform.pd"
           };
       }
@@ -1150,12 +1150,12 @@ sub map {
   }
   return $out;
 }
-#line 1477 "../../blib/lib/PDL/PP.pm"
+#line 1367 "../../blib/lib/PDL/PP.pm"
 #line 1155 "Transform.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 *map = \&PDL::map;
 #line 1162 "Transform.pm"
@@ -1585,7 +1585,7 @@ sub t_lookup {
 
   $o = {} unless(ref $o eq 'HASH');
 
-  my($me) = PDL::Transform::new($class);
+  my($me) = $class->new;
 
   my($bound) = _opt($o,['b','bound','boundary','Boundary']);
   my($method)= _opt($o,['m','meth','method','Method']);
@@ -1829,11 +1829,13 @@ the type/unit fields are currently ignored by t_linear.
 
 =cut
 
-@PDL::Transform::Linear::ISA = ('PDL::Transform');
+{ package PDL::Transform::Linear;
+our @ISA = ('PDL::Transform');
+*_opt = \&PDL::Transform::_opt;
 
-sub t_linear { new PDL::Transform::Linear(@_); }
+sub PDL::Transform::t_linear { PDL::Transform::Linear->new(@_); }
 
-sub PDL::Transform::Linear::new {
+sub new {
   my($class) = shift;
   my($o) = $_[0];
   pop @_ if (($#_ % 2 ==0) && !defined($_[-1]));
@@ -1844,32 +1846,32 @@ sub PDL::Transform::Linear::new {
     $o = {@_};
   }
 
-  my($me) = PDL::Transform::new($class);
+  my($me) = __PACKAGE__->SUPER::new;
 
   $me->{name} = "linear";
 
   $me->{params}{pre} = _opt($o,['pre','Pre','preoffset','offset',
                                   'Offset','PreOffset','Preoffset'],0);
-  $me->{params}{pre} = pdl($me->{params}{pre})
+  $me->{params}{pre} = PDL->pdl($me->{params}{pre})
     if(defined $me->{params}{pre});
 
   $me->{params}{post} = _opt($o,['post','Post','postoffset','PostOffset',
                                    'shift','Shift'],0);
-  $me->{params}{post} = pdl($me->{params}{post})
+  $me->{params}{post} = PDL->pdl($me->{params}{post})
     if(defined $me->{params}{post});
 
   $me->{params}{matrix} = _opt($o,['m','matrix','Matrix','mat','Mat']);
-  $me->{params}{matrix} = pdl($me->{params}{matrix})
+  $me->{params}{matrix} = PDL->pdl($me->{params}{matrix})
     if(defined $me->{params}{matrix});
 
   $me->{params}{rot} = _opt($o,['r','rot','rota','rotation','Rotation'], 0);
-  $me->{params}{rot} = pdl($me->{params}{rot});
+  $me->{params}{rot} = PDL->pdl($me->{params}{rot});
 
   my $o_dims = _opt($o,['d','dim','dims','Dims']);
-  $o_dims = pdl($o_dims) if defined($o_dims);
+  $o_dims = PDL->pdl($o_dims) if defined($o_dims);
 
   my $scale  = _opt($o,['s','scale','Scale']);
-  $scale = pdl($scale) if defined($scale);
+  $scale = PDL->pdl($scale) if defined($scale);
 
   # Figure out the number of dimensions to transform, and,
   # if necessary, generate a new matrix.
@@ -1926,7 +1928,7 @@ sub PDL::Transform::Linear::new {
                          if(UNIVERSAL::isa($angle,'PDL'));
 
                        my($x) = $angle * $PDL::Transform::DEG2RAD;
-                       $subm .= $subm x pdl([cos($x),-sin($x)],[sin($x),cos($x)]);
+                       $subm .= $subm x PDL->pdl([cos($x),-sin($x)],[sin($x),cos($x)]);
                        $m .= $m x $i;
                      };
 
@@ -1938,9 +1940,9 @@ sub PDL::Transform::Linear::new {
 
         # Do these in reverse order to make it more like
         # function composition!
-        &$subrot(pdl(0,1),$rot->at(2),$rm);
-        &$subrot(pdl(2,0),$rot->at(1),$rm);
-        &$subrot(pdl(1,2),$rot->at(0),$rm);
+        &$subrot(PDL->pdl(0,1),$rot->at(2),$rm);
+        &$subrot(PDL->pdl(2,0),$rot->at(1),$rm);
+        &$subrot(PDL->pdl(1,2),$rot->at(0),$rm);
 
         $me->{params}{matrix} .= $me->{params}{matrix} x $rm;
       } else {
@@ -1948,7 +1950,7 @@ sub PDL::Transform::Linear::new {
       }
     } else {
         if($rot != 0  and  $me->{params}{matrix}->dim(0)>1) {
-          &$subrot(pdl(0,1),$rot,$me->{params}{matrix});
+          &$subrot(PDL->pdl(0,1),$rot,$me->{params}{matrix});
         }
     }
   }
@@ -1998,8 +2000,7 @@ sub PDL::Transform::Linear::new {
   return $me;
 }
 
-sub PDL::Transform::Linear::stringify {
-  package PDL::Transform::Linear;
+sub stringify {
   my($me) = shift;  my($out) = SUPER::stringify $me;
   my $mp = $me->{params};
 
@@ -2032,11 +2033,12 @@ sub PDL::Transform::Linear::stringify {
   $out =~ s/\n/\n  /go;
   $out;
 }
-#line 2036 "Transform.pm"
+}
+#line 2038 "Transform.pm"
 
 
 
-#line 2845 "transform.pd"
+#line 2846 "transform.pd"
 
 
 =head2 t_scale
@@ -2058,16 +2060,16 @@ sub t_scale {
     my($scale) = shift;
     my($y) = shift;
     return t_linear(scale=>$scale,%{$y})
-#line 2062 "Transform.pm"
-#line 2866 "transform.pd"
+#line 2064 "Transform.pm"
+#line 2867 "transform.pd"
         if(ref $y eq 'HASH');
     t_linear(Scale=>$scale,$y,@_);
 }
-#line 2067 "Transform.pm"
+#line 2069 "Transform.pm"
 
 
 
-#line 2873 "transform.pd"
+#line 2874 "transform.pd"
 
 
 =head2 t_offset
@@ -2089,17 +2091,17 @@ sub t_offset {
     my($pre) = shift;
     my($y) = shift;
     return t_linear(pre=>$pre,%{$y})
-#line 2093 "Transform.pm"
-#line 2894 "transform.pd"
+#line 2095 "Transform.pm"
+#line 2895 "transform.pd"
         if(ref $y eq 'HASH');
 
     t_linear(pre=>$pre,$y,@_);
 }
-#line 2099 "Transform.pm"
+#line 2101 "Transform.pm"
 
 
 
-#line 2902 "transform.pd"
+#line 2903 "transform.pd"
 
 
 =head2 t_rot
@@ -2122,17 +2124,17 @@ sub t_rotate    {
     my $rot = shift;
     my($y) = shift;
     return t_linear(rot=>$rot,%{$y})
-#line 2126 "Transform.pm"
-#line 2924 "transform.pd"
+#line 2128 "Transform.pm"
+#line 2925 "transform.pd"
         if(ref $y eq 'HASH');
 
     t_linear(rot=>$rot,$y,@_);
 }
-#line 2132 "Transform.pm"
+#line 2134 "Transform.pm"
 
 
 
-#line 2934 "transform.pd"
+#line 2935 "transform.pd"
 
 
 =head2 t_fits
@@ -2297,11 +2299,11 @@ sub t_fits {
 
   return $me;
 }
-#line 2301 "Transform.pm"
+#line 2303 "Transform.pm"
 
 
 
-#line 3106 "transform.pd"
+#line 3107 "transform.pd"
 
 
 =head2 t_code
@@ -2380,7 +2382,7 @@ sub t_code {
     $inv = undef;
   }
 
-  my($me) = PDL::Transform::new($class);
+  my($me) = $class->new;
   $me->{name} = _opt($o,['n','name','Name']) || "code";
   $me->{func} = $func;
   $me->{inv} = $inv;
@@ -2394,11 +2396,11 @@ sub t_code {
 
   $me;
 }
-#line 2398 "Transform.pm"
+#line 2400 "Transform.pm"
 
 
 
-#line 3205 "transform.pd"
+#line 3206 "transform.pd"
 
 
 =head2 t_cylindrical
@@ -2499,7 +2501,7 @@ sub t_radial {
     $o = { @_ };
   }
 
-  my($me) = PDL::Transform::new($class);
+  my($me) = $class->new;
 
   $me->{params}{origin} = _opt($o,['o','origin','Origin']);
   $me->{params}{origin} = pdl(0,0)
@@ -2573,11 +2575,11 @@ sub t_radial {
 
   $me;
 }
-#line 2577 "Transform.pm"
+#line 2579 "Transform.pm"
 
 
 
-#line 3383 "transform.pd"
+#line 3384 "transform.pd"
 
 
 =head2 t_quadratic
@@ -2652,7 +2654,7 @@ sub t_quadratic {
     if(ref $o ne 'HASH') {
         $o = {@_};
     }
-    my($me) = PDL::Transform::new($class);
+    my($me) = $class->new;
 
     $me->{params}->{origin} = _opt($o,['o','origin','Origin'],pdl(0));
     $me->{params}->{l0} = _opt($o,['r0','l','l0','length','Length'],pdl(1));
@@ -2693,11 +2695,11 @@ sub t_quadratic {
     };
     $me;
 }
-#line 2697 "Transform.pm"
+#line 2699 "Transform.pm"
 
 
 
-#line 3502 "transform.pd"
+#line 3503 "transform.pd"
 
 
 =head2 t_cubic
@@ -2755,7 +2757,7 @@ sub t_cubic {
     if(ref $o ne 'HASH') {
         $o = {@_};
     }
-    my($me) = PDL::Transform::new($class);
+    my($me) = $class->new;
 
     $me->{params}->{dim} = _opt($o,['d','dim','dims','Dims'],undef);
     $me->{params}->{origin} = _opt($o,['o','origin','Origin'],pdl(0));
@@ -2839,11 +2841,11 @@ sub t_cubic {
 
     $me;
 }
-#line 2843 "Transform.pm"
+#line 2845 "Transform.pm"
 
 
 
-#line 3648 "transform.pd"
+#line 3649 "transform.pd"
 
 
 =head2 t_quartic
@@ -2922,7 +2924,7 @@ sub t_quartic {
     if(ref $o ne 'HASH') {
         $o = {@_};
     }
-    my($me) = PDL::Transform::new($class);
+    my($me) = $class->new;
 
     $me->{params}->{origin} = _opt($o,['o','origin','Origin'],pdl(0));
     $me->{params}->{l0} = _opt($o,['r0','l','l0','length','Length'],pdl(1));
@@ -2963,11 +2965,11 @@ sub t_quartic {
     };
     $me;
 }
-#line 2967 "Transform.pm"
+#line 2969 "Transform.pm"
 
 
 
-#line 3771 "transform.pd"
+#line 3772 "transform.pd"
 
 
 =head2 t_spherical
@@ -3033,7 +3035,7 @@ sub t_spherical {
         $o = { @_ } ;
     }
 
-    my($me) = PDL::Transform::new($class);
+    my($me) = $class->new;
 
     $me->{idim}=3;
     $me->{odim}=3;
@@ -3102,11 +3104,11 @@ sub t_spherical {
 
     $me;
   }
-#line 3106 "Transform.pm"
+#line 3108 "Transform.pm"
 
 
 
-#line 3909 "transform.pd"
+#line 3910 "transform.pd"
 
 
 =head2 t_projective
@@ -3179,7 +3181,7 @@ sub t_projective {
     $o = { @_ };
   }
 
-  my($me) = PDL::Transform::new($class);
+  my($me) = $class->new;
 
   $me->{name} = "projective";
 
@@ -3260,7 +3262,7 @@ sub t_projective {
 
   $me;
 }
-#line 3264 "Transform.pm"
+#line 3266 "Transform.pm"
 
 
 
@@ -3333,7 +3335,7 @@ sub stringify {
   $out .= "fwd ". ((defined ($me->{func})) ? ( (ref($me->{func}) eq 'CODE') ? "ok" : "non-CODE(!!)" ): "missing")."; ";
   $out .= "inv ". ((defined ($me->{inv})) ?  ( (ref($me->{inv}) eq 'CODE') ? "ok" : "non-CODE(!!)" ):"missing").".\n";
 }
-#line 3337 "Transform.pm"
+#line 3339 "Transform.pm"
 
 
 

@@ -6,14 +6,14 @@ BEGIN {
   eval 'use Test::Memory::Cycle;1' or Mojo::Util::monkey_patch(main => memory_cycle_ok => sub { });
 }
 
-my $fork   = Mojo::IOLoop::ReadWriteFork->new;
+my $rwf    = Mojo::IOLoop::ReadWriteFork->new;
 my $drain  = 0;
 my $output = '';
 
-$fork->on(close => sub { Mojo::IOLoop->stop; });
-$fork->on(read  => sub { $output .= $_[1]; });
-$fork->write("line one\n", sub { $drain++; });
-$fork->start(
+$rwf->on(close => sub { Mojo::IOLoop->stop; });
+$rwf->on(read  => sub { $output .= $_[1]; });
+$rwf->write("line one\n", sub { $drain++; });
+$rwf->start(
   program => sub {
     print sysread STDIN, my $buf, 1024;
     print "\n$buf";
@@ -23,9 +23,9 @@ $fork->start(
 
 Mojo::IOLoop->timer(3 => sub { Mojo::IOLoop->stop });    # guard
 Mojo::IOLoop->start;
-memory_cycle_ok $fork, 'no cycle after run';
+memory_cycle_ok $rwf, 'no cycle after run';
 
 like $output, qr/^9\nline one\nline two\n/, 'can write() before start()' or diag $output;
-is $drain,    1,                            'drain callback was called';
+is $drain, 1, 'drain callback was called';
 
 done_testing;

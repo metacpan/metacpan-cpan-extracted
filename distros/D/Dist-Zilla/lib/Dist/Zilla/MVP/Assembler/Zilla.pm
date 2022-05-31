@@ -1,4 +1,4 @@
-package Dist::Zilla::MVP::Assembler::Zilla 6.024;
+package Dist::Zilla::MVP::Assembler::Zilla 6.025;
 # ABSTRACT: Dist::Zilla::MVP::Assembler for the Dist::Zilla object
 
 use Moose;
@@ -90,7 +90,7 @@ Dist::Zilla::MVP::Assembler::Zilla - Dist::Zilla::MVP::Assembler for the Dist::Z
 
 =head1 VERSION
 
-version 6.024
+version 6.025
 
 =head1 OVERVIEW
 
@@ -137,7 +137,7 @@ Ricardo SIGNES 😏 <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -6,7 +6,7 @@
       "Michael Fuhr"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -56,19 +56,20 @@
             "PerlIO" : "1.05",
             "Scalar::Util" : "1.25",
             "Time::Local" : "1.19",
-            "perl" : "5.008008"
+            "perl" : "5.008009"
          }
       },
       "test" : {
          "requires" : {
             "File::Find" : "1.05",
             "File::Spec" : "0.86",
+            "IO::File" : "1.08",
             "Test::Builder" : "0",
             "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.33",
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "version" : "1.34",
+   "x_serialization_backend" : "JSON::PP version 4.08"
 }

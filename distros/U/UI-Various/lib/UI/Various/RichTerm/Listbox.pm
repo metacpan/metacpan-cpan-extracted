@@ -34,7 +34,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 use UI::Various::core;
 use UI::Various::Listbox;
@@ -282,6 +282,7 @@ sub _process($$)
 	{
 	    $self->{_selected}[$_] = $self->{_selected}[$_] eq ' ' ? '*' : ' ';
 	}
+	defined $self->{on_select}  and  &{$self->{on_select}};
     }
     else
     {

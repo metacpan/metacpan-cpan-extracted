@@ -1,5 +1,10 @@
 Revision history for Perl extension Algorithm::QuadTree.
 
+0.3   Mon May 30 22:00:00 2022
+	[Other changes]
+		- the module now has pluggable backends
+		- switch Dist::Zilla
+
 0.2   Thu Apr 21 21:00:00 2022
 	[New features]
 		- New method: ->clear

@@ -4,7 +4,8 @@ Makefile.PL
 README
 lib/Signals/XSIG.pm
 lib/Signals/XSIG/Default.pm
-lib/Signals/XSIG/TieArray56.pm
+lib/Signals/XSIG/Meta.pm
+lib/Signals/XSIG/Meta56.pm
 spike/analyze_default_signal_behavior.pl
 t/SignalHandlerTest.pm
 t/00-load.t
@@ -15,6 +16,7 @@ t/04-XSIGarray.t
 t/05-XSIGhash.t
 t/10-handlers.t
 t/11-local.t
+t/12-unimport.t
 t/20-defaults.tt
 t/20a-defaults.t
 t/20b-defaults.t

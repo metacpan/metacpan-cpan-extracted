@@ -10,6 +10,11 @@ use warnings;
 
 # are signal handlers registered correctly when we
 # set %XSIG directly?
+#
+#    %XSIG = (signal1 => [handler11, handler12, ...],
+#             signal2 => [handler21, handler22, ...],
+#             ...)
+      
 
 sub oof { 42 } ;
 
@@ -25,7 +30,7 @@ ok($XSIG{$s1}[0] eq 'main::foo',
    'element assignment from @XSIG{@KEYS}=@VALUES style initializer');
 ok($XSIG{$s2}[0] eq 'main::bar', 'element assignment from initializer');
 ok($XSIG{$s2}[2] eq \&oof, 'element assignment from initializer');
-ok($XSIG{"bogus"}[0] eq 'arbitrary', 'bogus key in initializer list ok');
+ok(!defined $XSIG{"bogus"}[0], 'initialization fails for bogus key');
 ok(tied @{$XSIG{$s1}} && tied @{$XSIG{$s2}},
    "\@{\$XSIG{sig}} still tied for $s1,$s2 after assignment");
 ok(!defined($XSIG{$s2}[1]), 'assignment of 2nd sighandler to undef respected');
@@ -53,13 +58,13 @@ ok($XSIG{$s1}[2] eq 'main::qwert',
    'element qualified in %XSIG=... assignment');
 ok($XSIG{$s2}[0] eq $XSIG{$s2}[1] && $XSIG{$s2}[0] eq \&oof,
    'code ref element initialized in %XSIG=... assignment');
-ok($XSIG{'bogus'} eq 'arbitrary',
-   'unrecognized key initialized in %XSIG=... assignment');
+ok(!@{$XSIG{'bogus'}},
+   'assignment to unrecognized key fails in %XSIG=... assignment');
 ok(tied @{$XSIG{$s1}} && tied @{$XSIG{$s2}},
    '@{$XSIG{sig}} still tied after %XSIG=(key-value list) style assignment');
 
-ok(ref $XSIG{'bogus'} ne 'ARRAY',
-   'non-signame %XSIG element not cast to array');
+ok(ref $XSIG{'bogus'} eq 'ARRAY',
+   'bogus $XSIG{} element always cast to array');
 
 
 ($s1,$s2) = alias_pair();
@@ -69,6 +74,6 @@ ok(exists $XSIG{$s1} && exists $XSIG{$s2},
    '%XSIG still has elements after clear');
 ok(!exists $XSIG{'bogus'},
    '%XSIG does not have non-signame elements after clear');
-ok(tied @{$XSIG{$s1}} && @{$XSIG{$s2}},
+ok(tied @{$XSIG{$s1}} && tied @{$XSIG{$s2}},
    '%XSIG elements still tied after clear');
 

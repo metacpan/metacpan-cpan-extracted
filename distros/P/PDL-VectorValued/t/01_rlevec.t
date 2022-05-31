@@ -25,7 +25,7 @@ my ($tmp);
 ## 1..2: test rlevec()
 my $p = pdl([[1,2],[1,2],[1,2],[3,4],[3,4],[5,6]]);
 
-my ($pf,$pv)  = rlevec($p);
+my ($pf,$pv)  = vv_rlevec($p);
 my $pf_expect = pdl(long,[3,2,1,0,0,0]);
 my $pv_expect = pdl([[1,2],[3,4],[5,6],[0,0],[0,0],[0,0]]);
 
@@ -33,15 +33,15 @@ pdlok("rlevec():counts",  $pf, $pf_expect);
 pdlok("rlevec():elts",    $pv, $pv_expect);
 
 ## 3..3: test rldvec()
-my $pd = rldvec($pf,$pv);
+my $pd = vv_rldvec($pf,$pv);
 pdlok("rldvec()", $pd, $p);
 
 ## 4..4: test enumvec
-my $pk = enumvec($p);
+my $pk = vv_enumvec($p);
 pdlok("enumvec()", $pk, pdl(long,[0,1,2,0,1,0]));
 
 ## 5..5: test enumvecg
-$pk = enumvecg($p);
+$pk = vv_enumvecg($p);
 pdlok("enumvecg()", $pk, pdl(long,[0,0,0,1,1,2]));
 
 
@@ -49,12 +49,12 @@ pdlok("enumvecg()", $pk, pdl(long,[0,0,0,1,1,2]));
 ## rleND, rldND: 2d
 
 ## 6..7: test rleND(): 2d
-($pf,$pv) = rleND($p);
+($pf,$pv) = vv_rleND($p);
 pdlok("rleND():2d:counts", $pf, $pf_expect);
 pdlok("rleND():2d:elts",   $pv, $pv_expect);
 
 ## 8..8: test rldND(): 2d
-$pd = rldND($pf,$pv);
+$pd = vv_rldND($pf,$pv);
 pdlok("rldND():2d", $pd, $p);
 
 ##--------------------------------------------------------------
@@ -70,18 +70,18 @@ my $pv_expect_nd = zeroes($p_nd->type, $p_nd->dims);
 ($tmp=$pv_expect_nd->slice(",,0:3")) .= $p_nd->dice_axis(-1,[0,3,5,6]);
 
 ## 9..10: test rleND(): Nd
-my ($pf_nd,$pv_nd) = rleND($p_nd);
+my ($pf_nd,$pv_nd) = vv_rleND($p_nd);
 pdlok("rleND():Nd:counts", $pf_nd, $pf_expect_nd);
 pdlok("rleND():Nd:elts",   $pv_nd, $pv_expect_nd);
 
 ## 11..11: test rldND(): Nd
-my $pd_nd = rldND($pf_nd,$pv_nd);
+my $pd_nd = vv_rldND($pf_nd,$pv_nd);
 pdlok("rldND():Nd", $pd_nd, $p_nd);
 
 ##--------------------------------------------------------------
 ## 12..12: test enumvec(): nd
 my $v_nd = $p_nd->clump(2);
-my $k_nd = $v_nd->enumvec();
+my $k_nd = $v_nd->vv_enumvec();
 pdlok("enumvec():Nd", $k_nd, pdl(long,[0,1,2,0,1,0,0]));
 
 ##--------------------------------------------------------------
@@ -92,15 +92,14 @@ my $seqs = zeroes(short, 0);
 $seqs  = $seqs->append(sequence(short,$_)) foreach ($lens->list);
 $seqs += $lens->rld($offs);
 
-my $seqs_got = $lens->rldseq($offs);
+my $seqs_got = $lens->vv_rldseq($offs);
 isok("rldseq():type", $seqs_got->type, $seqs->type);
 pdlok("rldseq():data", $seqs_got, $seqs);
 
-my ($len_got,$off_got) = $seqs->rleseq();
+my ($len_got,$off_got) = $seqs->vv_rleseq();
 isok("rleseq():type", $off_got->type, $seqs->type);
 pdlok("rleseq():lens",  $len_got->where($len_got), $lens->where($lens));
 pdlok("rleseq():offs",  $off_got->where($len_got), $offs->where($lens));
 
 print "\n";
 # end of t/01_rlevec.t
-

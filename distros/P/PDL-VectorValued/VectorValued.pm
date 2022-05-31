@@ -7,6 +7,7 @@
 
 package PDL::VectorValued;
 use strict;
+use warnings;
 
 ##======================================================================
 ## Export hacks
@@ -55,9 +56,9 @@ BEGIN {
   @EXPORT_OK = @VV_SYMBOLS;
   foreach my $vv_sym (@VV_SYMBOLS) {
     no strict 'refs';
-
     if ($VV_IMPORT{$vv_sym} && defined($VV_IMPORT{$vv_sym}{p})) {
       # function lives in PDL core: import it here, and clobber $vv_sym here (but not in VV::Utils)
+      no warnings 'redefine';
       *$vv_sym = *{$VV_IMPORT{$vv_sym}{vv}} = $VV_IMPORT{$vv_sym}{p};
     }
     elsif ($VV_IMPORT{$vv_sym}) {
@@ -77,7 +78,7 @@ our %EXPORT_TAGS =
   );
 
 ## VERSION was formerly set by PDL::VectorValued::Version, now use perl-reversion from Perl::Version instead
-our $VERSION = '1.0.20';
+our $VERSION = '1.0.21';
 
 ##======================================================================
 ## pod: header
@@ -250,8 +251,8 @@ See also: PDL::Slices::rle, PDL::Ngrams::VectorValued::Utils::vv_rlevec.
 
 =cut
 
-*PDL::vv_rleND = \&vv_rleND;
-sub rleND {
+*PDL::vv_rleND = \&vv_rleND if !defined &PDL::vv_rleND;
+*rleND = sub {
   my $data   = shift;
   my @vdimsN = $data->dims;
 
@@ -263,7 +264,7 @@ sub rleND {
   vv_rlevec($data->clump($#vdimsN), $counts, $elts->clump($#vdimsN));
 
   return ($counts,$elts);
-}
+} if !defined &rleND;
 
 ##----------------------------------------------------------------------
 ## rldND()
@@ -289,8 +290,8 @@ See also: PDL::Slices::rld, PDL::VectorValued::Utils::rldvec
 
 =cut
 
-*PDL::vv_rldND = \&vv_rldND;
-sub vv_rldND {
+*PDL::vv_rldND = \&vv_rldND if !defined &PDL::vv_rldND;
+*rldND = sub {
   my ($counts,$elts) = (shift,shift);
   my @vdimsN        = $elts->dims;
 
@@ -308,7 +309,7 @@ sub vv_rldND {
   vv_rldvec($counts, $elts->clump($#vdimsN), $data->clump($#vdimsN));
 
   return $data;
-}
+} if !defined &rldND;
 
 ##======================================================================
 ## pod: Functions: datatype utilities

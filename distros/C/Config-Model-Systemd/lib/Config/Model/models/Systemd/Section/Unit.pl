@@ -80,7 +80,7 @@ has the alias C<dbus-org.freedesktop.network1.service>, created during installat
 a symlink, so when systemd is asked through D-Bus to load
 C<dbus-org.freedesktop.network1.service>, it'll load
 C<systemd-networkd.service>. As another example, C<default.target> \x{2014}
-the default system target started at boot \x{2014} is commonly symlinked (aliased) to either
+the default system target started at boot \x{2014} is commonly aliased to either
 C<multi-user.target> or C<graphical.target> to select what is started
 by default. Alias names may be used in commands like disable,
 start, stop, status, and similar, and in all
@@ -96,8 +96,12 @@ another template (in which case the alias applies to all instances of the templa
 template instance (e.g. C<alias\@inst.service>) may be a symlink to different template
 (e.g. C<template\@inst.service>). In that case, just this specific instance is aliased,
 while other instances of the template (e.g. C<alias\@foo.service>,
-C<alias\@bar.service>) are not aliased. Those rule preserve the requirement that the
-instance (if any) is always uniquely defined for a given unit and all its aliases.
+C<alias\@bar.service>) are not aliased. Those rules preserve the requirement that the
+instance (if any) is always uniquely defined for a given unit and all its aliases. The target of alias
+symlink must point to a valid unit file location, i.e. the symlink target name must match the symlink
+source name as described, and the destination path must be in one of the unit search paths, see UNIT FILE
+LOAD PATH section below for more details. Note that the target file may not exist, i.e. the symlink may
+be dangling.
 
 Unit files may specify aliases through the C<Alias> directive in the [Install]
 section. When the unit is enabled, symlinks will be created for those names, and removed when the unit is
@@ -117,11 +121,18 @@ implicitly added as dependencies of type C<Wants> to the unit. Similar functiona
 exists for C<Requires> type dependencies as well, the directory suffix is
 C<.requires/> in this case. This functionality is useful to hook units into the
 start-up of other units, without having to modify their unit files. For details about the semantics of
-C<Wants>, see below. The preferred way to create symlinks in the
-C<.wants/> or C<.requires/> directory of a unit file is by embedding
-the dependency in [Install] section of the target unit, and creating the symlink in the file system with
-the enable or preset commands of
-L<systemctl(1)>.
+C<Wants> and C<Requires>, see below. The preferred way to create
+symlinks in the C<.wants/> or C<.requires/> directories is by
+specifying the dependency in [Install] section of the target unit, and creating the symlink in the file
+system with the enable or preset commands of
+L<systemctl(1)>.  The
+target can be a normal unit (either plain or a specific instance of a template unit). In case when the
+source unit is a template, the target can also be a template, in which case the instance will be
+\"propagated\" to the target unit to form a valid unit instance. The target of symlinks in
+C<.wants/> or C<.requires/> must thus point to a valid unit file
+location, i.e. the symlink target name must satisfy the described requirements, and the destination path
+must be in one of the unit search paths, see UNIT FILE LOAD PATH section below for more details. Note
+that the target file may not exist, i.e. the symlink may be dangling.
 
 Along with a unit file C<foo.service>, a \"drop-in\" directory
 C<foo.service.d/> may exist. All files with the suffix
@@ -219,13 +230,30 @@ would be used based on compilation options and current environment use
 
 
 
-Moreover, additional units might be loaded into systemd from
-directories not on the unit load path by creating a symlink pointing to a
-unit file in the directories. You can use systemctl link
-for this operation. See
-L<systemctl(1)>
-for its usage and precaution.
+Moreover, additional units might be loaded into systemd from directories not on the unit load path
+by creating a symlink pointing to a unit file in the directories. You can use systemctl
+link for this; see
+L<systemctl(1)>. The file
+system where the linked unit files are located must be accessible when systemd is started (e.g. anything
+underneath C</home/> or C</var/> is not allowed, unless those
+directories are located on the root file system).
 
+It is important to distinguish \"linked unit files\" from \"unit file aliases\": any symlink where the
+symlink target is within the unit load path becomes an alias: the source name and
+the target file name must satisfy specific constraints listed above in the discussion of aliases, but the
+symlink target doesn't have to exist, and in fact the symlink target path is not used, except to check
+whether the target is within the unit load path. In contrast, a symlink which goes outside of the unit
+load path signifies a linked unit file. The symlink is followed when loading the file, but the
+destination name is otherwise unused (and may even not be a valid unit file name). For example, symlinks
+C</etc/systemd/system/alias1.service> \x{2192} C<service1.service>,
+C</etc/systemd/system/alias2.service> \x{2192} C</usr/lib/systemd/service1.service>,
+C</etc/systemd/system/alias3.service> \x{2192} C</etc/systemd/system/service1.service>
+are all valid aliases and C<service1.service> will have
+four names, even if the unit file is located at
+C</run/systemd/system/service1.service>. In contrast,
+a symlink C</etc/systemd/system/link1.service> \x{2192} C<../link1_service_file>
+means that C<link1.service> is a \"linked unit\" and the contents of
+C</etc/systemd/link1_service_file> provide its configuration.
 
 Unit files may also include a number of C<Condition\x{2026}=> and C<Assert\x{2026}=> settings. Before the unit is started, systemd will verify that the
 specified conditions and asserts are true. If not, the starting of the unit will be (mostly silently)
@@ -353,8 +381,8 @@ C<.requires/> directory accompanying the unit file.
 If this unit gets activated, the units listed will be activated as well. If one of
 the other units fails to activate, and an ordering dependency C<After> on the
 failing unit is set, this unit will not be started. Besides, with or without specifying
-C<After>, this unit will be stopped if one of the other units is explicitly
-stopped.
+C<After>, this unit will be stopped (or restarted) if one of the other units is
+explicitly stopped (or restarted).
 
 Often, it is a better choice to use C<Wants> instead of
 C<Requires> in order to achieve a system that is more robust when dealing with

@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Test2::V0;
 
+use Test2::Require::Module 'Git::MoreHooks::CheckCommitAuthorFromMailmap';
 use Git::MoreHooks::CheckCommitAuthorFromMailmap;
 
 BEGIN {

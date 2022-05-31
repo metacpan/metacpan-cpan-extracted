@@ -9,7 +9,7 @@ $RETRIES = 4;   # times
 
 use strict;
 use Socket;
-use Net::DNS::Resolver;
+use Net::DNS::Resolver 1.05;
 use IO::Lambda qw(:all);
 
 # given the options, returns new dns lambda
@@ -64,7 +64,7 @@ readable {
 		$! = $err;
 		return "socket error: $!";
 	}
-	return again unless $obj-> bgisready($bg_obj);
+	return again if $obj-> bgbusy($bg_obj);
 
 	my $packet = $obj-> bgread( $bg_obj);
 	undef $sock;

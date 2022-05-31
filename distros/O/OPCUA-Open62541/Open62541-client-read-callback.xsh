@@ -2,7 +2,11 @@
 
 static void
 clientAsyncReadBooleanCallback(UA_Client *client, void *userdata,
-    UA_UInt32 requestId, UA_Boolean *var)
+    UA_UInt32 requestId,
+#ifdef HAVE_UA_CLIENTASYNCOPERATIONCALLBACK
+    UA_StatusCode status,
+#endif
+    UA_Boolean *var)
 {
 	dTHX;
 	SV *sv;
@@ -11,12 +15,17 @@ clientAsyncReadBooleanCallback(UA_Client *client, void *userdata,
 	if (var != NULL)
 		XS_pack_UA_Boolean(sv, *var);
 
+	/* XXX we do not propagate the status code */
 	clientCallbackPerl(client, userdata, requestId, sv);
 }
 
 static void
 clientAsyncReadByteCallback(UA_Client *client, void *userdata,
-    UA_UInt32 requestId, UA_Byte *var)
+    UA_UInt32 requestId,
+#ifdef HAVE_UA_CLIENTASYNCOPERATIONCALLBACK
+    UA_StatusCode status,
+#endif
+    UA_Byte *var)
 {
 	dTHX;
 	SV *sv;
@@ -25,12 +34,40 @@ clientAsyncReadByteCallback(UA_Client *client, void *userdata,
 	if (var != NULL)
 		XS_pack_UA_Byte(sv, *var);
 
+	/* XXX we do not propagate the status code */
 	clientCallbackPerl(client, userdata, requestId, sv);
 }
 
+#ifdef HAVE_UA_CLIENTASYNCREADVALUEATTRIBUTECALLBACK_DATAVALUE
+
+static void
+clientAsyncReadDataValueCallback(UA_Client *client, void *userdata,
+    UA_UInt32 requestId,
+#ifdef HAVE_UA_CLIENTASYNCOPERATIONCALLBACK
+    UA_StatusCode status,
+#endif
+    UA_DataValue *var)
+{
+	dTHX;
+	SV *sv;
+
+	sv = newSV(0);
+	if (var != NULL)
+		XS_pack_UA_DataValue(sv, *var);
+
+	/* XXX we do not propagate the status code */
+	clientCallbackPerl(client, userdata, requestId, sv);
+}
+
+#endif
+
 static void
 clientAsyncReadDoubleCallback(UA_Client *client, void *userdata,
-    UA_UInt32 requestId, UA_Double *var)
+    UA_UInt32 requestId,
+#ifdef HAVE_UA_CLIENTASYNCOPERATIONCALLBACK
+    UA_StatusCode status,
+#endif
+    UA_Double *var)
 {
 	dTHX;
 	SV *sv;
@@ -39,12 +76,17 @@ clientAsyncReadDoubleCallback(UA_Client *client, void *userdata,
 	if (var != NULL)
 		XS_pack_UA_Double(sv, *var);
 
+	/* XXX we do not propagate the status code */
 	clientCallbackPerl(client, userdata, requestId, sv);
 }
 
 static void
 clientAsyncReadInt32Callback(UA_Client *client, void *userdata,
-    UA_UInt32 requestId, UA_Int32 *var)
+    UA_UInt32 requestId,
+#ifdef HAVE_UA_CLIENTASYNCOPERATIONCALLBACK
+    UA_StatusCode status,
+#endif
+    UA_Int32 *var)
 {
 	dTHX;
 	SV *sv;
@@ -53,12 +95,17 @@ clientAsyncReadInt32Callback(UA_Client *client, void *userdata,
 	if (var != NULL)
 		XS_pack_UA_Int32(sv, *var);
 
+	/* XXX we do not propagate the status code */
 	clientCallbackPerl(client, userdata, requestId, sv);
 }
 
 static void
 clientAsyncReadLocalizedTextCallback(UA_Client *client, void *userdata,
-    UA_UInt32 requestId, UA_LocalizedText *var)
+    UA_UInt32 requestId,
+#ifdef HAVE_UA_CLIENTASYNCOPERATIONCALLBACK
+    UA_StatusCode status,
+#endif
+    UA_LocalizedText *var)
 {
 	dTHX;
 	SV *sv;
@@ -67,12 +114,17 @@ clientAsyncReadLocalizedTextCallback(UA_Client *client, void *userdata,
 	if (var != NULL)
 		XS_pack_UA_LocalizedText(sv, *var);
 
+	/* XXX we do not propagate the status code */
 	clientCallbackPerl(client, userdata, requestId, sv);
 }
 
 static void
 clientAsyncReadNodeClassCallback(UA_Client *client, void *userdata,
-    UA_UInt32 requestId, UA_NodeClass *var)
+    UA_UInt32 requestId,
+#ifdef HAVE_UA_CLIENTASYNCOPERATIONCALLBACK
+    UA_StatusCode status,
+#endif
+    UA_NodeClass *var)
 {
 	dTHX;
 	SV *sv;
@@ -81,12 +133,19 @@ clientAsyncReadNodeClassCallback(UA_Client *client, void *userdata,
 	if (var != NULL)
 		XS_pack_UA_NodeClass(sv, *var);
 
+	/* XXX we do not propagate the status code */
 	clientCallbackPerl(client, userdata, requestId, sv);
 }
 
+#ifdef HAVE_UA_CLIENT_READNODEIDATTRIBUTE_ASYNC
+
 static void
 clientAsyncReadNodeIdCallback(UA_Client *client, void *userdata,
-    UA_UInt32 requestId, UA_NodeId *var)
+    UA_UInt32 requestId,
+#ifdef HAVE_UA_CLIENTASYNCOPERATIONCALLBACK
+    UA_StatusCode status,
+#endif
+    UA_NodeId *var)
 {
 	dTHX;
 	SV *sv;
@@ -95,12 +154,19 @@ clientAsyncReadNodeIdCallback(UA_Client *client, void *userdata,
 	if (var != NULL)
 		XS_pack_UA_NodeId(sv, *var);
 
+	/* XXX we do not propagate the status code */
 	clientCallbackPerl(client, userdata, requestId, sv);
 }
 
+#endif
+
 static void
 clientAsyncReadQualifiedNameCallback(UA_Client *client, void *userdata,
-    UA_UInt32 requestId, UA_QualifiedName *var)
+    UA_UInt32 requestId,
+#ifdef HAVE_UA_CLIENTASYNCOPERATIONCALLBACK
+    UA_StatusCode status,
+#endif
+    UA_QualifiedName *var)
 {
 	dTHX;
 	SV *sv;
@@ -109,12 +175,17 @@ clientAsyncReadQualifiedNameCallback(UA_Client *client, void *userdata,
 	if (var != NULL)
 		XS_pack_UA_QualifiedName(sv, *var);
 
+	/* XXX we do not propagate the status code */
 	clientCallbackPerl(client, userdata, requestId, sv);
 }
 
 static void
 clientAsyncReadUInt32Callback(UA_Client *client, void *userdata,
-    UA_UInt32 requestId, UA_UInt32 *var)
+    UA_UInt32 requestId,
+#ifdef HAVE_UA_CLIENTASYNCOPERATIONCALLBACK
+    UA_StatusCode status,
+#endif
+    UA_UInt32 *var)
 {
 	dTHX;
 	SV *sv;
@@ -123,12 +194,19 @@ clientAsyncReadUInt32Callback(UA_Client *client, void *userdata,
 	if (var != NULL)
 		XS_pack_UA_UInt32(sv, *var);
 
+	/* XXX we do not propagate the status code */
 	clientCallbackPerl(client, userdata, requestId, sv);
 }
 
+#ifdef HAVE_UA_CLIENTASYNCREADVALUEATTRIBUTECALLBACK_VARIANT
+
 static void
 clientAsyncReadVariantCallback(UA_Client *client, void *userdata,
-    UA_UInt32 requestId, UA_Variant *var)
+    UA_UInt32 requestId,
+#ifdef HAVE_UA_CLIENTASYNCOPERATIONCALLBACK
+    UA_StatusCode status,
+#endif
+    UA_Variant *var)
 {
 	dTHX;
 	SV *sv;
@@ -137,7 +215,10 @@ clientAsyncReadVariantCallback(UA_Client *client, void *userdata,
 	if (var != NULL)
 		XS_pack_UA_Variant(sv, *var);
 
+	/* XXX we do not propagate the status code */
 	clientCallbackPerl(client, userdata, requestId, sv);
 }
+
+#endif
 
 /* end generated by script/client-server-read-write.pl */

@@ -1,5 +1,9 @@
 Revision history for Perl extension Otogiri-Plugin-Count
 
+0.02 2022-05-30T07:51:27Z
+
+    - fix for arrayref condition
+
 0.01 2015-05-13T14:25:24Z
 
     - original version

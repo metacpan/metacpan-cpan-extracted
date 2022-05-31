@@ -14,10 +14,12 @@ use Time::Piece;
 my $perl_versions = [
     '5.32',
     '5.34',
+    '5.36',
 ];
 my $perl_versions_al2 = [
     '5.32',
     '5.34',
+    '5.36',
 ];
 
 my $flavors = {
@@ -66,11 +68,14 @@ EOF
 
 # the amazon/aws-lambda-provided:al2 image doesn't have unzip,
 # so we use the amazonlinux:2 image here
-FROM public.ecr.aws/amazonlinux/amazonlinux:2
+# we just do unzip in this image
+# so we use the build platform here.
+FROM --platform=\$BUILDPLATFORM public.ecr.aws/amazonlinux/amazonlinux:2
 RUN yum install -y curl unzip
+ARG TARGETARCH
 RUN cd /opt && \\
-    case \$(uname -m) in "x86_64") ARCH=x86_64;; "aarch64") ARCH=arm64;; *) echo "unknown architecture: \$(uname -m)"; exit 1;; esac && \\
-    curl -sSL https://shogo82148-lambda-perl-runtime-us-east-1.s3.amazonaws.com/perl-$version-runtime-al2-\$ARCH.zip -o runtime.zip && \\
+    case \${TARGETARCH} in "amd64") ARCH=x86_64;; "arm64") ARCH=arm64;; *) echo "unknown architecture: \${TARGETARCH}"; exit 1;; esac && \\
+    curl -sSL https://shogo82148-lambda-perl-runtime-us-east-1.s3.amazonaws.com/perl-$version-runtime-al2-\${ARCH}.zip -o runtime.zip && \\
     unzip -o runtime.zip && rm runtime.zip
 
 FROM public.ecr.aws/lambda/provided:al2
@@ -146,17 +151,19 @@ EOF
 
 # the amazon/aws-lambda-provided:al2 image doesn't have unzip,
 # so we use the amazonlinux:2 image here
-FROM public.ecr.aws/amazonlinux/amazonlinux:2
+FROM --platform=\$BUILDPLATFORM public.ecr.aws/amazonlinux/amazonlinux:2
 RUN yum install -y curl unzip
+ARG TARGETARCH
 RUN cd /opt && \\
-    case \$(uname -m) in "x86_64") ARCH=x86_64;; "aarch64") ARCH=arm64;; *) echo "unknown architecture: \$(uname -m)"; exit 1;; esac && \\
+    case \${TARGETARCH} in "amd64") ARCH=x86_64;; "arm64") ARCH=arm64;; *) echo "unknown architecture: \${TARGETARCH}"; exit 1;; esac && \\
     curl -sSL https://shogo82148-lambda-perl-runtime-us-east-1.s3.amazonaws.com/perl-$version-runtime-al2-\$ARCH.zip -o runtime.zip && \\
     unzip -o runtime.zip && rm runtime.zip
 
-FROM public.ecr.aws/amazonlinux/amazonlinux:2
+FROM --platform=\$BUILDPLATFORM public.ecr.aws/amazonlinux/amazonlinux:2
 RUN yum install -y curl unzip
+ARG TARGETARCH
 RUN cd /opt && \\
-    case \$(uname -m) in "x86_64") ARCH=x86_64;; "aarch64") ARCH=arm64;; *) echo "unknown architecture: \$(uname -m)"; exit 1;; esac && \\
+    case \${TARGETARCH} in "amd64") ARCH=x86_64;; "arm64") ARCH=arm64;; *) echo "unknown architecture: \${TARGETARCH}"; exit 1;; esac && \\
     curl -sSL https://shogo82148-lambda-perl-runtime-us-east-1.s3.amazonaws.com/perl-$version-paws-al2-\$ARCH.zip -o paws.zip && \\
     unzip -o paws.zip && rm paws.zip
 
@@ -362,10 +369,11 @@ EOF
             return <<"EOF"
 # the provided.al2 image doesn't have curl and unzip,
 # so we use the build-provided.al2 image here
-FROM public.ecr.aws/amazonlinux/amazonlinux:2
+FROM --platform=\$BUILDPLATFORM public.ecr.aws/amazonlinux/amazonlinux:2
 RUN yum install -y curl unzip
+ARG TARGETARCH
 RUN cd /opt && \\
-    case \$(uname -m) in "x86_64") ARCH=x86_64;; "aarch64") ARCH=arm64;; *) echo "unknown architecture: \$(uname -m)"; exit 1;; esac && \\
+    case \${TARGETARCH} in "amd64") ARCH=x86_64;; "arm64") ARCH=arm64;; *) echo "unknown architecture: \${TARGETARCH}"; exit 1;; esac && \\
     curl -sSL https://shogo82148-lambda-perl-runtime-us-east-1.s3.amazonaws.com/perl-$version-runtime-al2-\$ARCH.zip -o runtime.zip && \\
     unzip -o runtime.zip && rm runtime.zip
 
@@ -427,17 +435,19 @@ EOF
             return <<"EOF"
 # the provided.al2 image doesn't have curl and unzip,
 # so we use the public.ecr.aws/amazonlinux/amazonlinux:2 image here
-FROM public.ecr.aws/amazonlinux/amazonlinux:2
+FROM --platform=\$BUILDPLATFORM public.ecr.aws/amazonlinux/amazonlinux:2
 RUN yum install -y curl unzip
+ARG TARGETARCH
 RUN cd /opt && \\
-    case \$(uname -m) in "x86_64") ARCH=x86_64;; "aarch64") ARCH=arm64;; *) echo "unknown architecture: \$(uname -m)"; exit 1;; esac && \\
+    case \${TARGETARCH} in "amd64") ARCH=x86_64;; "arm64") ARCH=arm64;; *) echo "unknown architecture: \${TARGETARCH}"; exit 1;; esac && \\
     curl -sSL https://shogo82148-lambda-perl-runtime-us-east-1.s3.amazonaws.com/perl-$version-runtime-al2-\$ARCH.zip -o runtime.zip && \\
     unzip -o runtime.zip && rm runtime.zip
 
-FROM public.ecr.aws/amazonlinux/amazonlinux:2
+FROM --platform=\$BUILDPLATFORM public.ecr.aws/amazonlinux/amazonlinux:2
 RUN yum install -y curl unzip
+ARG TARGETARCH
 RUN cd /opt && \\
-    case \$(uname -m) in "x86_64") ARCH=x86_64;; "aarch64") ARCH=arm64;; *) echo "unknown architecture: \$(uname -m)"; exit 1;; esac && \\
+    case \${TARGETARCH} in "amd64") ARCH=x86_64;; "arm64") ARCH=arm64;; *) echo "unknown architecture: \${TARGETARCH}"; exit 1;; esac && \\
     curl -sSL https://shogo82148-lambda-perl-runtime-us-east-1.s3.amazonaws.com/perl-$version-paws-al2-\$ARCH.zip -o paws.zip && \\
     unzip -o paws.zip && rm paws.zip
 
@@ -504,15 +514,15 @@ sub build {
             }
             say STDERR "building $tag...";
             chdir "$FindBin::Bin/$perl/$flavor" or die "failed to chdir: $!";
-            for my $registory (qw(shogo82148/p5-aws-lambda public.ecr.aws/shogo82148/p5-aws-lambda)) {
+            for my $registory (qw(shogo82148/p5-aws-lambda public.ecr.aws/shogo82148/p5-aws-lambda ghcr.io/shogo82148/p5-aws-lambda)) {
                 if ($is_al2) {
+                    docker('buildx', 'build', '--platform', 'linux/amd64,linux/arm64', '--push', '-t', "$registory:$tag-$date", '.');
                     docker('buildx', 'build', '--platform', 'linux/amd64', '--push', '-t', "$registory:$tag-$date-x86_64", '.');
                     docker('buildx', 'build', '--platform', 'linux/arm64', '--push', '-t', "$registory:$tag-$date-arm64", '.');
-                    docker('buildx', 'build', '--platform', 'linux/amd64,linux/arm64', '--push', '-t', "$registory:$tag-$date", '.');
 
+                    docker('buildx', 'build', '--platform', 'linux/amd64,linux/arm64', '--push', '-t', "$registory:$tag", '.');
                     docker('buildx', 'build', '--platform', 'linux/amd64', '--push', '-t', "$registory:$tag-x86_64", '.');
                     docker('buildx', 'build', '--platform', 'linux/arm64', '--push', '-t', "$registory:$tag-arm64", '.');
-                    docker('buildx', 'build', '--platform', 'linux/amd64,linux/arm64', '--push', '-t', "$registory:$tag", '.');
                 } else {
                     docker('buildx', 'build', '--platform', 'linux/amd64', '--push', '-t', "$registory:$tag-$date", '.');
                     docker('buildx', 'build', '--platform', 'linux/amd64', '--push', '-t', "$registory:$tag", '.');
@@ -580,7 +590,20 @@ sub needs_build {
 }
 
 sub docker {
-    system('docker', @_) == 0 or croak 'failed to run docker';
+    if (system('docker', @_) == 0) {
+        return;
+    }
+    print STDERR "failed to build, try...";
+    sleep(5);
+    if (system('docker', @_) == 0) {
+        return;
+    }
+    print STDERR "failed to build, try...";
+    sleep(10);
+    if (system('docker', @_) == 0) {
+        return;
+    }
+    croak 'gave up, failed to run docker';
 }
 
 sub inspect_id {

@@ -17,7 +17,7 @@ sub https_wrapper
 	my ($sock, $deadline) = @_;
 	tail {
 		my ( $bytes, $error) = @_;
-		warn 
+		warn
 			"SSL on fh(", fileno($sock), ") = ",
 			(defined($bytes) ? "$bytes bytes" : "error $error"),
 			"\n" if $DEBUG;
@@ -28,7 +28,7 @@ sub https_wrapper
 			warn "SSL_WANT_READ on fh(", fileno($sock), ")\n" if $DEBUG;
 			my @ctx = context;
 			context $sock, $deadline;
-			readable { 
+			readable {
 				return 'timeout' unless shift;
 				context @ctx;
 				https_wrapper($sock, $deadline)
@@ -37,13 +37,13 @@ sub https_wrapper
 			warn "SSL_WANT_WRITE on fh(", fileno($sock), ")\n" if $DEBUG;
 			my @ctx = context;
 			context $sock, $deadline;
-			writable { 
+			writable {
 				return 'timeout' unless shift;
 				context @ctx;
 				https_wrapper($sock, $deadline)
 			}
 		} else {
-			warn 
+			warn
 				"SSL retry on fh(", fileno($sock), ") = ",
 				(defined($bytes) ? "$bytes bytes" : "error $error"),
 				"\n" if $DEBUG;
@@ -54,8 +54,15 @@ sub https_wrapper
 
 sub https_connect
 {
-	my ($sock, $deadline) = @_;
-	IO::Socket::SSL-> start_SSL( $sock, SSL_startHandshake => 0 );
+	my ($sock, $host, $port, $deadline) = @_;
+	my $ssl_ok = IO::Socket::SSL-> start_SSL( $sock,
+		SSL_startHandshake => 0,
+		SSL_verify_mode    => SSL_VERIFY_NONE(),
+		PeerAddr           => $host,
+		PeerPort           => $port,
+		Blocking           => 0,
+	);
+	return lambda { (undef, $SSL_ERROR ) } unless $ssl_ok;
 
 	lambda {
 		# emulate sysreader/syswriter to be able to 
@@ -108,7 +115,7 @@ sub https_syscall_watcher
 
 sub https_writer
 {
-	my $cached = shift;
+	my ($cached, $host, $port) = @_;
 	my $writer = https_syscall_watcher(0);
 
 	lambda {
@@ -117,11 +124,12 @@ sub https_writer
 			context $writer, $sock, $req, $length, $offset, $deadline;
 			return https_wrapper($sock, $deadline);
 		}
-		context https_connect($sock, $deadline);
+		context https_connect($sock, $host, $port, $deadline);
 	tail {
 		my ( $bytes, $error) = @_;
 		return @_ if defined $error;
 
+		$cached++;
 		context $writer, $sock, $req, $length, $offset, $deadline;
 		https_wrapper($sock, $deadline);
 	}}

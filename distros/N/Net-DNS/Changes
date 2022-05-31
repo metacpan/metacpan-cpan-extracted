@@ -1,4 +1,15 @@
-$Id: Changes 1861 2021-12-16 11:21:07Z willem $                       -*-text-*-
+$Id: Changes 1867 2022-05-30 10:07:36Z willem $                       -*-text-*-
+
+
+**** 1.34 May 30, 2022
+
+	Improve robustness of EDNS option compose/decompose functions.
+
+	Simplify code in Makefile.PL.
+
+Fix rt.cpan.org #142426
+
+	Avoid "Useless use of a constant in void context" warning.
 
 
 **** 1.33 Dec 16, 2021

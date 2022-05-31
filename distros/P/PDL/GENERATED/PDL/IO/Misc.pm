@@ -68,7 +68,7 @@ use strict;
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 948 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -93,14 +93,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 *bswap2 = \&PDL::bswap2;
 #line 100 "Misc.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 948 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -125,14 +125,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 *bswap4 = \&PDL::bswap4;
 #line 132 "Misc.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 948 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -157,7 +157,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 *bswap8 = \&PDL::bswap8;
 #line 164 "Misc.pm"
@@ -1340,7 +1340,7 @@ sub rcube {
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 *_rasc = \&PDL::_rasc;
 #line 1347 "Misc.pm"

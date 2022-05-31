@@ -19,11 +19,11 @@ done_testing;
 
 sub start_rwf {
   Mojo::IOLoop->stop if $attempts++ >= $max_loop;
-  my $fork   = Mojo::IOLoop::ReadWriteFork->new(conduit => {type => 'pty'});
+  my $rwf    = Mojo::IOLoop::ReadWriteFork->new(conduit => {type => 'pty'});
   my $output = '';
-  $fork->run(sub { printf "%s\n", 'a' x $len; }, {env => {}});
-  $fork->on(read => sub { $output .= $_[1] });
-  $fork->on(
+  $rwf->run(sub { printf "%s\n", 'a' x $len; }, {env => {}});
+  $rwf->on(read => sub { $output .= $_[1] });
+  $rwf->on(
     finish => sub {
       $output =~ s/\r?\n//g;
       $recv += length $output;

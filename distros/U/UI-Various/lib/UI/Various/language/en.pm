@@ -74,7 +74,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 #########################################################################
 

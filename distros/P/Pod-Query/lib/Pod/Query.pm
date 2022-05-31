@@ -4,8 +4,6 @@ use v5.24;    # Postfix defef :)
 use strict;
 use warnings;
 use FindBin qw/ $RealBin /;
-
-# use lib "$RealBin/Pod-LOL/lib";
 use Carp qw/ croak /;
 use List::Util qw/ first /;
 use Text::ParseWords qw/ parse_line shellwords /;
@@ -22,11 +20,11 @@ Pod::Query - Query pod documents
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
-our $VERSION         = '0.09';
+our $VERSION         = '0.10';
 our $DEBUG_TREE      = 0;
 our $DEBUG_FIND      = 0;
 our $DEBUG_FIND_DUMP = 0;
@@ -76,7 +74,7 @@ and provides methods to query specific information.
 =head2 new
 
 Create a new object.
-Return value is cached (bash on the class of the pod file).
+Return value is cached (based on the class of the pod file).
 
 	use Pod::Query;
 	my $pod = Pod::Query->new('Pod::LOL', PATH_ONLY=0);
@@ -114,7 +112,7 @@ sub new ( $class, $pod_class, $path_only = 0 ) {
 =head2 _class_to_path
 
 Given a class name, retuns the path to the pod file.
-Return value is cached (bash on the class of the pod file).
+Return value is cached (based on the class of the pod file).
 
 =cut
 
@@ -137,14 +135,13 @@ sub _class_to_path ( $pod_class ) {
 
 =head2 _mock_root
 
-For debugging only.
-Builds a sample object.
+For debugging and/or testing.
+Builds a sample object (overwrite this in a test file).
 
 =cut
 
 sub _mock_root {
    [
-
       [ "head1",    "HEAD1", ],
       [ "head2",    "HEAD2_1", ],
       [ "Verbatim", "HEAD2_1-VERBATIM_1", ],
@@ -166,7 +163,6 @@ sub _mock_root {
       ],
       [ "Verbatim", "HEAD2_2-VERBATIM_2", ],
       [ "Para",     "HEAD2_2-PARA_2", ],
-
    ]
 }
 
@@ -196,10 +192,7 @@ sub _flatten_for_tags ( $lol ) {
 Generates a tree from a Pod::LOL object.
 The structure of the tree is based on the N (level) in "=headN".
 
-Starting as "=head2", until we see "=head1" or another "=head2",
-all tags will be grouped "under" the "=head1" as a child (aka kid).
-
-For example:
+This example pod:
 
    =head1 FUNCTIONS
 
@@ -214,11 +207,30 @@ For example:
    =cut
 
 This will be grouped as:
+
    =head1 FUNCTIONS
       =Para Description of Functions
       =head2 Function1
          =Para Description of Function1
    =head1 AUTHOR
+
+In summary:
+
+=over 2
+
+=item *
+
+Non "head" tags are always grouped "below".
+
+=item *
+
+HeadN tags with a higher N with also be grouped below.
+
+=item *
+
+HeadN tags with the same or lower N will be grouped higher.
+
+=back
 
 =cut
 
@@ -396,14 +408,16 @@ sub find_events ( $s ) {
 
 Generic extraction command.
 
-context sensitive!
+Note: This function is Scalar/List context sensitive!
 
    $query->find($condition)
-      Where condtion is a string as described in L</"_query_string_to_struct">
+
+Where condtion is a string as described in L</"_query_string_to_struct">
 
    $query->find(@conditions)
 
-   Where each condition can contain:
+Where each condition can contain:
+
    {
       tag       => "TAG_NAME",    # Find all matching tags.
       text      => "TEXT_NAME",   # Find all matching texts.
@@ -413,17 +427,19 @@ context sensitive!
       nth_in_group => 0,             # Use only the nth matching group.
    }
 
-   # Return contents of entire head section:
+Return contents of entire head section:
+
    find (
       {tag => "head", text => "a", keep_all => 1},
    )
 
-   # Results:
-   # [
-   #    "  my \$app = a('/hel...",
-   #    {text => "Create a route with ...", wrap => 1},
-   #    "  \$ perl -Mojo -E ...",
-   # ]
+Results:
+
+   [
+      "  my \$app = a('/hel...",
+      {text => "Create a route with ...", wrap => 1},
+      "  \$ perl -Mojo -E ...",
+   ]
 
 =cut
 
@@ -831,6 +847,8 @@ sub _invert ( @groups ) {
 Transforms a tree of found nodes in a simple list
 or a string depending on context.
 
+Pod::Text formatter is used for C<Para> tags when C<keep_all> is set.
+
 =cut
 
 sub _render ( $kept_all, @tree ) {
@@ -839,6 +857,8 @@ sub _render ( $kept_all, @tree ) {
       say "tree: ",     dumper \@tree;
       say "kept_all: ", dumper $kept_all;
    }
+
+   delete $ENV{COLUMNS};
 
    my $formatter = Pod::Text->new( width => get_term_width(), );
    $formatter->{MARGIN} = 2;
@@ -950,17 +970,21 @@ sub _render_over ( $list, $kept_all ) {
 
 =head2 get_term_width
 
-Caches and returns the terminal width.
+Determines, caches and returns the terminal width.
+
+=head3 Error: Unable to get Terminal Size
+
+If terminal width cannot be detected, 80 will be assumed.
 
 =cut
-
 
 sub get_term_width {
    state $term_width;
 
    if ( not $term_width ) {
-      ( $term_width ) = GetTerminalSize();
-      $term_width--;
+      ( $term_width ) = eval { GetTerminalSize() };
+      $term_width ||= 80;    # Safe default.
+      $term_width--;         # Padding.
    }
 
    $term_width;
@@ -984,14 +1008,9 @@ Tim Potapov, C<< <tim.potapov[AT]gmail.com> >>
 
 Please report any bugs or feature requests to L<https://github.com/poti1/pod-query/issues>.
 
-
 =head1 CAVEAT
 
-
-These options to _find() appear to only be currently working if set to o or -1:
-   nth
-   nth_in_group
-
+Nothing to report.
 
 =head1 SUPPORT
 

@@ -22,7 +22,7 @@ subtest 'count', sub {
     is( $count_with_cond, 2 );
 };
 
-subtest 'cond in 2nd argument', sub {
+subtest 'cond in 2nd argument (hashref)', sub {
     my $db = _setup();
     $db->load_plugin('Count');
     $db->fast_insert('person', { name => 'Sherlock Shellingford', age => 15 });
@@ -32,6 +32,18 @@ subtest 'cond in 2nd argument', sub {
 
     my $count_with_cond= $db->count('person', { name => { like => '%e%' } }, { group_by => 'age', having => { age => 17 } });
     is( $count_with_cond, 1);
+};
+
+subtest 'cond in 2nd argument(arrayref)', sub {
+    my $db = _setup();
+    $db->load_plugin('Count');
+    $db->fast_insert('person', { name => 'Sherlock Shellingford', age => 15 });
+    $db->fast_insert('person', { name => 'Nero Yuzurizaki',       age => 15 });
+    $db->fast_insert('person', { name => 'Hercule Barton',        age => 16 });
+    $db->fast_insert('person', { name => 'Cordelia Glauca',       age => 17 });
+
+    my $count_with_cond= $db->count('person', [ name => { like => '%e%' } ], { group_by => 'age', having => { age => 15 } });
+    is( $count_with_cond, 2);
 };
 
 

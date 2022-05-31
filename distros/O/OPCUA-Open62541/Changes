@@ -1,5 +1,22 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+1.00 2022-05-30
+    - Bump major version.  OPCUA::Open62541 compiles with open62541
+      version 1.0.6, 1.1.6, 1.2.4, 1.3.  While this is enough to
+      be API compatible with all versions, the tests fail from API
+      1.2 on.  Do not expect a working open62541 wrapper for anything
+      else than the old 1.0 API.
+    - Switch to X.YY version number format.  Three minor digits are
+      not needed.
+    - Generate and merge constants for 1.0 and 1.3 API.
+    - Optionally support highlevel client async interface of 1.3 API.
+    - 1.3 API removed Server Config set Custom Hostname function.
+    - 1.3 API removed typeIndex from UA_DataType, use pointer
+      arithmetic as workaround.
+    - Use github CI runner to build and test with open62541 API
+      1.0, 1.1, 1.2, and 1.3.
+    - Regenerate ppport.h with Devel::PPPort version 3.64.
+
 0.029 2021-08-13
     - Cleanup monitored item delete callback, newer open62541 behaves
       differently.  Cover both cases.

@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Rubric::Entry::Query;
+package Rubric::Entry::Query 0.157;
 # ABSTRACT: construct and execute a complex query
-$Rubric::Entry::Query::VERSION = '0.156';
+
 #pod =head1 DESCRIPTION
 #pod
 #pod Rubric::Entry::Query builds a query based on a simple hash of parameters,
@@ -317,12 +317,21 @@ Rubric::Entry::Query - construct and execute a complex query
 
 =head1 VERSION
 
-version 0.156
+version 0.157
 
 =head1 DESCRIPTION
 
 Rubric::Entry::Query builds a query based on a simple hash of parameters,
 performs that query, and returns the rendered report on the results.
+
+=head1 PERL VERSION
+
+This code is effectively abandonware.  Although releases will sometimes be made
+to update contact info or to fix packaging flaws, bug reports will mostly be
+ignored.  Feature requests are even more likely to be ignored.  (If someone
+takes up maintenance of this code, they will presumably remove this notice.)
+This means that whatever version of perl is currently required is unlikely to
+change -- but also that it might change at any new maintainer's whim.
 
 =head1 METHODS
 
@@ -413,7 +422,7 @@ The prepositions are as follows:
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

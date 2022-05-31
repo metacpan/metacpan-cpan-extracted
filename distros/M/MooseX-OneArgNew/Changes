@@ -1,5 +1,8 @@
 Revision history for MooseX-OneArgNew
 
+0.006     2022-05-29 15:48:22-04:00 America/New_York
+        - update metadata: author address, support window, etc.
+
 0.005     2015-07-14 21:52:35-04:00 America/New_York
         - bump required version of MXRP
 

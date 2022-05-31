@@ -9,6 +9,9 @@ use warnings;
 
 # are signal handlers registered correctly when we
 # set $XSIG{signal} or @{$XSIG{signal}} directly?
+#
+#    $XSIG{signal} = [ handler1, handler2, ... ]
+#    @{$XSIG{signal}} = ( handler1, handler2, ... )
 
 sub foo { 42 }
 
@@ -78,13 +81,17 @@ ok(!tied $XSIG{$sig}, 'no scalar tie for bogus signal');
 ok(!tied @{$XSIG{$sig}}, 'no array tie for bogus signal');
 
 $XSIG{$sig} = ['foo'];
-ok(ref $XSIG{$sig} eq 'ARRAY', 'assign list to bogus signal');
-ok($XSIG{$sig}[0] eq 'foo', 'retrieve list assignment to bogus signal');
+ok(@{$XSIG{$sig}} == 0, 'assign list to bogus signal has no effect');
+ok(!defined $XSIG{$sig}[0], 'retrieve list assignment to bogus signal');
 
-$XSIG{$sig} = 'oof';
-ok(ref $XSIG{$sig} eq '', 'assign scalar to bogus signal');
-ok($XSIG{$sig} eq 'oof', 'retrieve scalar assignment to bogus signal');
-
+{
+    no warnings 'uninitialized';
+    $XSIG{$sig} = 'oof';
+    ok(ref $XSIG{$sig} eq 'ARRAY', '$XSIG{bogus} returns ARRAY');
+    ok($XSIG{$sig}[0] !~ /oof/,
+       'scalar assignment to bogus signal has no effect');
+}
+    
 #####################################################
 
 $sig = appropriate_signals();

@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.70      2022-05-30 11:33:54 -0600
+  - Do not attempt to add negative perlcritic configs [-whatever]
+
 2.69      2021-11-28 05:21:20 -0700
   - An extra } crept into the Changes template during a refactor.
     The extra } has been removed, and a warning will be displayed

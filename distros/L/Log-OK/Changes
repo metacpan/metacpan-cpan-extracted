@@ -1,3 +1,10 @@
+0.1.2   Mon 30 May 2022 03:23:40 AEST
+
+        - Disabled tests requiring installation of logging modules
+        - Fixed an issue where no hash specified at main program level
+          prevented autodetection of logging system in other modules
+          with no hash specified
+
 0.1.1   Fri 15 Apr 2022 22:22:44 AEST
 	
 	- Fixed tests calling wrong perl command

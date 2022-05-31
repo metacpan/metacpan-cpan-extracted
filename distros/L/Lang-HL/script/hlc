@@ -35,8 +35,40 @@ sub process_file {
 
 $code =~ s/[\r\n\f]+//g;
 
+$code =~ s/\b\{/ { /g;
+$code =~ s/ \{\b/ { /g;
+
+$code =~ s/\b\}/ } /g;
+$code =~ s/ \}\b/ } /g;
+
+$code =~ s/\b\[/ [ /g;
+$code =~ s/ \[\b/ [ /g;
+
+$code =~ s/\b\]/ ] /g;
+$code =~ s/ \]\b/ ] /g;
+
+$code =~ s/\b\(/ ( /g;
+$code =~ s/ \(\b/ ( /g;
+
+$code =~ s/\b\)/ ) /g;
+$code =~ s/ \)\b/ ) /g;
+
+$code =~ s/\b\</ < /g;
+$code =~ s/ \<\b/ < /g;
+
+$code =~ s/\b\>/ > /g;
+$code =~ s/ \>\b/ > /g;
+
+$code =~ s/\b\,/ , /g;
+$code =~ s/\b\.\.\./ ... /g;
+
+$code =~ s/\b=\>/ =\> /g;
+$code =~ s/ =\>\b/ =\> /g;
+
 my @code = split(" ", $code);
 $code = join(" ", @code);
+
+#print($code, "\n");
 
 my $hlObject = Lang::HL->new();
 my $generatedCode = $hlObject->parse($code);

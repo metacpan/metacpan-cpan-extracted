@@ -123,7 +123,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "strict" => 0
   },
-  "VERSION" => "6.024",
+  "VERSION" => "6.025",
   "test" => {
     "TESTS" => "t/*.t t/commands/*.t t/diagnostics/*.t t/plugins/*.t"
   }

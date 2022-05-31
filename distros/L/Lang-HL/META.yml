@@ -22,5 +22,5 @@ requires:
   Lang::HL::Export: '0'
   Perl::Tidy: '0'
   Regexp::Grammars: '0'
-version: '5.016'
+version: '5.052'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

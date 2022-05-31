@@ -113,7 +113,7 @@ and so may not be installed.
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 948 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -145,7 +145,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 sub PDL::fft {
 	# Convert the first argument to decimal and check for trouble.
@@ -179,14 +179,14 @@ sub PDL::fft {
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 *fft = \&PDL::fft;
 #line 186 "FFT.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 948 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -218,7 +218,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 sub PDL::ifft {
 	# Convert the first argument to decimal and check for trouble.
@@ -252,7 +252,7 @@ sub PDL::ifft {
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 *ifft = \&PDL::ifft;
 #line 259 "FFT.pm"

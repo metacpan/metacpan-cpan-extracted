@@ -35,7 +35,7 @@
    "provides" : {
       "Pod::Query" : {
          "file" : "lib/Pod/Query.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -44,6 +44,6 @@
          "http://www.perlfoundation.org/artistic_license_2_0"
       ]
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -1,5 +1,28 @@
 Revision history for MIDI-Drummer
 
+0.4001 2022-05-30 12:11:34
+    - Improve documentation.
+    - Actually add the fill-replaced phrase to the score. Whoops :)
+
+0.4000 2022-05-30 10:57:58
+    - Add verbose mode finally.
+    - Add the add_fill() method!
+
+0.3003 2022-05-29 15:02:26
+    - Compute the size and duration in the pattern() method.
+
+0.3002 2022-05-28 22:02:12
+    - Add the sync_patterns() method to execute the patterns() method for multiple voices.
+    - Improve documentation.
+
+0.3001 2022-05-28 17:07:43
+    - Include the missing Math::Bezier in the prerequisites.
+
+0.3000 2022-05-28 16:59:11
+    - Pass the object itself to the callback in combinatorial().
+    - Port the patterns() method from Syncopate::combinatorial().
+    - Reduce the reverb!!
+
 0.2101 2022-05-15 17:15:16
     - Refactor *::Syncopate to use attributes.
     - Remove syncopation SYNOPSIS leftover examples.

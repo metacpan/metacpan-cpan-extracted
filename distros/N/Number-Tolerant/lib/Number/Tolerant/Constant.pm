@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Number::Tolerant::Constant;
+package Number::Tolerant::Constant 1.709;
 # ABSTRACT: a blessed constant type
-$Number::Tolerant::Constant::VERSION = '1.708';
+
 #pod =head1 SYNOPSIS
 #pod
 #pod  use Number::Tolerant;
@@ -78,7 +78,7 @@ Number::Tolerant::Constant - a blessed constant type
 
 =head1 VERSION
 
-version 1.708
+version 1.709
 
 =head1 SYNOPSIS
 
@@ -97,9 +97,19 @@ will catch these constants and return them as Number::Tolerant objects.
 I wrote this module to make it simpler to use tolerances with Class::DBI, which
 would otherwise complain that the constructor hadn't returned a blessed object.
 
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -14,11 +14,11 @@ WriteMakefile(
     PL_FILES         => {},
     PREREQ_PM => {
         'Test::More' => 0,
+        'Crypt::Bcrypt' => '0.006',
         'Dancer2'    => '0.200000',
-        'Digest::Bcrypt' => 0,
+        'Digest::Bcrypt' => '1.212',
         'Digest::SHA' => 5.74,
         'Data::Entropy' => 0.007,
-        'version' => 0.77,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Dancer2-Plugin-Passphrase-*' },

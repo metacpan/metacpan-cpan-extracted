@@ -1,9 +1,10 @@
-#!/usr/bin/perl
-
 package Catalyst::Plugin::Session::Test::Store;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.42';
+$VERSION =~ tr/_//d;
 
 use utf8;
 
@@ -57,7 +58,8 @@ sub import {
         use Catalyst qw/Session SessionStateTest/;
         push our (@ISA), $m;
 
-        our $VERSION = "123"; # Do not remove
+        our $VERSION # make unparseable
+            = "123"; # Do not remove
 
         use strict;
         use warnings;
@@ -105,7 +107,8 @@ sub import {
         use Catalyst qw/Session SessionStateTest/;
         push our (@ISA), $m;
 
-        our $VERSION = "123";
+        our $VERSION # make unparseable
+            = "123";
 
         use Test::More;
 
@@ -150,7 +153,7 @@ sub import {
         use Catalyst::Test "SessionStoreTest";
 
         # idiotic void context warning workaround
-        
+
         my $x = get("/create_session");
         $x = get("/recover_session");
         $x = get("/after_session");

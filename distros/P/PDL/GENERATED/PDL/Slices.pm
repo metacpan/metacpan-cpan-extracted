@@ -3,7 +3,7 @@
 #
 package PDL::Slices;
 
-our @EXPORT_OK = qw(index index1d index2d indexND indexNDb rangeb rld rle _clump_int xchg mv using diagonal lags splitdim rotate broadcastI unbroadcast dice dice_axis slice );
+our @EXPORT_OK = qw(index index1d index2d indexND indexNDb rangeb rld rle rlevec rldvec rleseq rldseq rleND rldND _clump_int xchg mv using diagonal lags splitdim rotate broadcastI unbroadcast dice dice_axis slice );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -101,7 +101,7 @@ use Scalar::Util 'blessed';
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 948 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -184,14 +184,14 @@ index barfs if any of the index values are bad.
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 *index = \&PDL::index;
 #line 191 "Slices.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 948 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -274,14 +274,14 @@ index1d propagates BAD index elements to the output variable.
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 *index1d = \&PDL::index1d;
 #line 281 "Slices.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 948 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -364,14 +364,14 @@ index2d barfs if either of the index values are bad.
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 *index2d = \&PDL::index2d;
 #line 371 "Slices.pm"
 
 
 
-#line 245 "slices.pd"
+#line 241 "slices.pd"
 
 =head2 indexNDb
 
@@ -425,7 +425,7 @@ sub PDL::indexND {
 
 
 
-#line 297 "slices.pd"
+#line 293 "slices.pd"
 
 
 sub PDL::range {
@@ -471,7 +471,7 @@ sub PDL::range {
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 948 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -490,7 +490,6 @@ Engine for L</range>
 Same calling convention as L</range>, but you must supply all
 parameters.  C<rangeb> is marginally faster as it makes a direct PP call,
 avoiding the perl argument-parsing step.
-
 
 =head2 range
 
@@ -740,7 +739,6 @@ DEVEL NOTES
 makes it easier to loop over the index array but a little more brain-bending
 to tease out the algorithm.
 
-=cut
 
 
 =for bad
@@ -750,18 +748,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 754 "Slices.pm"
+#line 752 "Slices.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 *rangeb = \&PDL::rangeb;
-#line 761 "Slices.pm"
+#line 759 "Slices.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 948 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -791,11 +789,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 795 "Slices.pm"
+#line 793 "Slices.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 sub PDL::rld {
   my ($x,$y) = @_;
@@ -812,18 +810,18 @@ sub PDL::rld {
   &PDL::_rld_int($x,$y,$c);
   $c;
 }
-#line 816 "Slices.pm"
+#line 814 "Slices.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 *rld = \&PDL::rld;
-#line 823 "Slices.pm"
+#line 821 "Slices.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 948 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -879,11 +877,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 883 "Slices.pm"
+#line 881 "Slices.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 sub PDL::rle {
   my $c = shift;
@@ -893,25 +891,318 @@ sub PDL::rle {
                                 ($x!=0)->clump(1..$x->ndims-1)->sumover->max->sclr-1;
   return ($x->slice("0:$max_ind"),$y->slice("0:$max_ind"));
 }
-#line 897 "Slices.pm"
+#line 895 "Slices.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 *rle = \&PDL::rle;
-#line 904 "Slices.pm"
+#line 902 "Slices.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 948 "../../blib/lib/PDL/PP.pm"
+
+
+
+=head2 rlevec
+
+=for sig
+
+  Signature: (c(M,N); indx [o]a(N); [o]b(M,N))
+
+=for ref
+
+Run-length encode a set of vectors.
+
+Higher-order rle(), for use with qsortvec().
+
+Given set of vectors $c, generate a vector $a with the number of occurrences of each element
+(where an "element" is a vector of length $M ocurring in $c),
+and a set of vectors $b containing the unique values.
+As for rle(), only the elements up to the first instance of 0 in $a should be considered.
+
+Can be used together with clump() to run-length encode "values" of arbitrary dimensions.
+Can be used together with rotate(), cat(), append(), and qsortvec() to count N-grams
+over a 1d PDL.
+
+See also: L</rle>, L<PDL::Ufunc/qsortvec>, L<PDL::Primitive/uniqvec>
+Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
+
+
+
+=for bad
+
+rlevec does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+
+=cut
+#line 943 "Slices.pm"
+
+
+
+#line 950 "../../blib/lib/PDL/PP.pm"
+
+*rlevec = \&PDL::rlevec;
+#line 950 "Slices.pm"
+
+
+
+#line 948 "../../blib/lib/PDL/PP.pm"
+
+
+
+=head2 rldvec
+
+=for sig
+
+  Signature: (indx a(N); b(M,N); [o]c(M,N))
+
+=for ref
+
+Run-length decode a set of vectors, akin to a higher-order rld().
+
+Given a vector $a() of the number of occurrences of each row, and a set $c()
+of row-vectors each of length $M, run-length decode to $c().
+
+Can be used together with clump() to run-length decode "values" of arbitrary dimensions.
+
+See also: L</rld>.
+Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
+
+
+=for bad
+
+rldvec does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+
+=cut
+#line 984 "Slices.pm"
+
+
+
+#line 949 "../../blib/lib/PDL/PP.pm"
+
+sub PDL::rldvec {
+  my ($a,$b,$c) = @_;
+  if (!defined($c)) {
+# XXX Need to improve emulation of threading in auto-generating c
+    my ($rowlen) = $b->dim(0);
+    my ($size) = $a->sumover->max;
+    my (@dims) = $a->dims;
+    shift(@dims);
+    $c = $b->zeroes($b->type,$rowlen,$size,@dims);
+  }
+  &PDL::_rldvec_int($a,$b,$c);
+  return $c;
+}
+#line 1003 "Slices.pm"
+
+
+
+#line 950 "../../blib/lib/PDL/PP.pm"
+
+*rldvec = \&PDL::rldvec;
+#line 1010 "Slices.pm"
+
+
+
+#line 948 "../../blib/lib/PDL/PP.pm"
+
+
+
+=head2 rleseq
+
+=for sig
+
+  Signature: (c(N); indx [o]a(N); [o]b(N))
+
+=for ref
+
+Run-length encode a vector of subsequences.
+
+Given a vector of $c() of concatenated variable-length, variable-offset subsequences,
+generate a vector $a containing the length of each subsequence
+and a vector $b containing the subsequence offsets.
+As for rle(), only the elements up to the first instance of 0 in $a should be considered.
+
+See also L</rle>.
+Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
+
+
+=for bad
+
+rleseq does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+
+=cut
+#line 1044 "Slices.pm"
+
+
+
+#line 950 "../../blib/lib/PDL/PP.pm"
+
+*rleseq = \&PDL::rleseq;
+#line 1051 "Slices.pm"
+
+
+
+#line 948 "../../blib/lib/PDL/PP.pm"
+
+
+
+=head2 rldseq
+
+=for sig
+
+  Signature: (indx a(N); b(N); [o]c(M))
+
+=for ref
+
+Run-length decode a subsequence vector.
+
+Given a vector $a() of sequence lengths
+and a vector $b() of corresponding offsets,
+decode concatenation of subsequences to $c(),
+as for:
+
+ $c = null;
+ $c = $c->append($b($_)+sequence($a->type,$a($_))) foreach (0..($N-1));
+
+See also: L</rld>.
+Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
+
+
+=for bad
+
+rldseq does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+
+=cut
+#line 1088 "Slices.pm"
+
+
+
+#line 949 "../../blib/lib/PDL/PP.pm"
+
+sub PDL::rldseq {
+  my ($a,$b,$c) = @_;
+  if (!defined($c)) {
+    my $size   = $a->sumover->max;
+    my (@dims) = $a->dims;
+    shift(@dims);
+    $c = $b->zeroes($b->type,$size,@dims);
+  }
+  &PDL::_rldseq_int($a,$b,$c);
+  return $c;
+}
+#line 1105 "Slices.pm"
+
+
+
+#line 950 "../../blib/lib/PDL/PP.pm"
+
+*rldseq = \&PDL::rldseq;
+#line 1112 "Slices.pm"
+
+
+
+#line 1346 "slices.pd"
+
+=head2 rleND
+
+=for sig
+
+  Signature: (data(@vdims,N); int [o]counts(N); [o]elts(@vdims,N))
+
+=for ref
+
+Run-length encode a set of (sorted) n-dimensional values.
+
+Generalization of rle() and vv_rlevec():
+given set of values $data, generate a vector $counts with the number of occurrences of each element
+(where an "element" is a matrix of dimensions @vdims ocurring as a sequential run over the
+final dimension in $data), and a set of vectors $elts containing the elements which begin a run.
+Really just a wrapper for clump() and rlevec().
+
+See also: L</rle>, L</rlevec>.
+Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
+
+=cut
+
+*PDL::rleND = \&rleND;
+sub rleND {
+  my $data   = shift;
+  my @vdimsN = $data->dims;
+
+  ##-- construct output pdls
+  my $counts = $#_ >= 0 ? $_[0] : zeroes(long, $vdimsN[$#vdimsN]);
+  my $elts   = $#_ >= 1 ? $_[1] : zeroes($data->type, @vdimsN);
+
+  ##-- guts: call rlevec()
+  rlevec($data->clump($#vdimsN), $counts, $elts->clump($#vdimsN));
+
+  return ($counts,$elts);
+}
+
+=head2 rldND
+
+=for sig
+
+  Signature: (int counts(N); elts(@vdims,N); [o]data(@vdims,N);)
+
+=for ref
+
+Run-length decode a set of (sorted) n-dimensional values.
+
+Generalization of rld() and rldvec():
+given a vector $counts() of the number of occurrences of each @vdims-dimensioned element,
+and a set $elts() of @vdims-dimensioned elements, run-length decode to $data().
+
+Really just a wrapper for clump() and rldvec().
+
+See also: L</rld>, L</rldvec>.
+Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
+
+=cut
+
+*PDL::rldND = \&rldND;
+sub rldND {
+  my ($counts,$elts) = (shift,shift);
+  my @vdimsN        = $elts->dims;
+
+  ##-- construct output pdl
+  my ($data);
+  if ($#_ >= 0) { $data = $_[0]; }
+  else {
+    my $size      = $counts->sumover->max; ##-- get maximum size for Nth-dimension for small encodings
+    my @countdims = $counts->dims;
+    shift(@countdims);
+    $data         = zeroes($elts->type, @vdimsN, @countdims);
+  }
+
+  ##-- guts: call rldvec()
+  rldvec($counts, $elts->clump($#vdimsN), $data->clump($#vdimsN));
+
+  return $data;
+}
+#line 1195 "Slices.pm"
+
+
+
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 *_clump_int = \&PDL::_clump_int;
-#line 911 "Slices.pm"
+#line 1202 "Slices.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 948 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -947,18 +1238,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 951 "Slices.pm"
+#line 1242 "Slices.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 *xchg = \&PDL::xchg;
-#line 958 "Slices.pm"
+#line 1249 "Slices.pm"
 
 
 
-#line 1269 "slices.pd"
+#line 1502 "slices.pd"
 
 
 =head2 reorder
@@ -1079,11 +1370,11 @@ sub PDL::reorder {
         # a quicker way to do the reorder
         return $pdl->broadcast(@newDimOrder)->unbroadcast(0);
 }
-#line 1083 "Slices.pm"
+#line 1374 "Slices.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 948 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1119,18 +1410,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1123 "Slices.pm"
+#line 1414 "Slices.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 *mv = \&PDL::mv;
-#line 1130 "Slices.pm"
+#line 1421 "Slices.pm"
 
 
 
-#line 1445 "slices.pd"
+#line 1675 "slices.pd"
 
 
 =head2 using
@@ -1161,11 +1452,11 @@ sub PDL::using {
   }
   @ind;
 }
-#line 1165 "Slices.pm"
+#line 1456 "Slices.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 948 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1227,25 +1518,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1231 "Slices.pm"
+#line 1522 "Slices.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 sub PDL::diagonal { shift->_diagonal_int(my $o=PDL->null, \@_); $o }
-#line 1238 "Slices.pm"
+#line 1529 "Slices.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 *diagonal = \&PDL::diagonal;
-#line 1245 "Slices.pm"
+#line 1536 "Slices.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 948 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1295,18 +1586,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1299 "Slices.pm"
+#line 1590 "Slices.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 *lags = \&PDL::lags;
-#line 1306 "Slices.pm"
+#line 1597 "Slices.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 948 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1342,18 +1633,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1346 "Slices.pm"
+#line 1637 "Slices.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 *splitdim = \&PDL::splitdim;
-#line 1353 "Slices.pm"
+#line 1644 "Slices.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 948 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1375,18 +1666,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1379 "Slices.pm"
+#line 1670 "Slices.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 *rotate = \&PDL::rotate;
-#line 1386 "Slices.pm"
+#line 1677 "Slices.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 948 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1415,18 +1706,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1419 "Slices.pm"
+#line 1710 "Slices.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 *broadcastI = \&PDL::broadcastI;
-#line 1426 "Slices.pm"
+#line 1717 "Slices.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 948 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1434,7 +1725,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (P(); C(); int atind)
+  Signature: (P(); C(); PDL_Indx atind)
 
 =for ref
 
@@ -1450,18 +1741,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1454 "Slices.pm"
+#line 1745 "Slices.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 *unbroadcast = \&PDL::unbroadcast;
-#line 1461 "Slices.pm"
+#line 1752 "Slices.pm"
 
 
 
-#line 1890 "slices.pd"
+#line 2110 "slices.pd"
 
 
 =head2 dice
@@ -1557,7 +1848,6 @@ sub PDL::dice {
 }
 *dice = \&PDL::dice;
 
-
 =head2 dice_axis
 
 =for ref
@@ -1613,11 +1903,11 @@ sub PDL::dice_axis {
   return $self->mv($axis,0)->index1d($ix)->mv(0,$axis);
 }
 *dice_axis = \&PDL::dice_axis;
-#line 1617 "Slices.pm"
+#line 1907 "Slices.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 948 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1791,11 +2081,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1795 "Slices.pm"
+#line 2085 "Slices.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 sub PDL::slice {
     my ($source, @others) = @_;
@@ -1833,20 +2123,20 @@ sub PDL::slice {
     PDL::_slice_int($source,my $o=$source->initialize,\@others);
     $o;
 }
-#line 1837 "Slices.pm"
+#line 2127 "Slices.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 *slice = \&PDL::slice;
-#line 1844 "Slices.pm"
+#line 2134 "Slices.pm"
 
 
 
 
 
-#line 2381 "slices.pd"
+#line 2599 "slices.pd"
 
 
 =head1 BUGS
@@ -1872,7 +2162,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 1876 "Slices.pm"
+#line 2166 "Slices.pm"
 
 
 

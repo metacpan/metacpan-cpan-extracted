@@ -9,6 +9,10 @@ Lang-HL-1.007.tar.gz
 Lang-HL-1.071.tar.gz
 Lang-HL-5.005.tar.gz
 Lang-HL-5.010.tar.gz
+Lang-HL-5.016.tar.gz
+Lang-HL-5.037.tar.gz
+Lang-HL-5.043.tar.gz
+Lang-HL-5.044.tar.gz
 lib/Lang/HL.pm
 Makefile.PL
 MANIFEST

@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 use UI::Various::core;
 use UI::Various::Listbox;
@@ -96,14 +96,23 @@ sub _prepare($$$)
 	 ($self->width < $self->top->max_width ? (-width => $self->width) : ()),
 	 -height => $self->height, # height is mandatory, width is not!
 	 ($self->selection == 2 ? (-selectmode => 'extended') :
-	  $self->selection == 1 ? (-selectmode => 'browse') :
-	  (			   -state => 'disabled')),
+	  (			   -selectmode => 'browse')),
 	 -exportselection => 0);
     my $tk_listbox =
 	$_->_tk->Scrolled('Listbox', @options)
 	->grid(-row => $row, -column => $column);
     $self->_tk($tk_listbox);
     $tk_listbox->insert(0, @{$self->{texts}});
+    if ($self->selection == 0)
+    {				# disable selection-bindings:
+	$tk_listbox->bind('Tk::Listbox', $_, '')
+	    foreach ('<B1-Enter>', '<B1-Leave>', '<B1-Motion>',
+		     '<Button-1>', '<Shift-Button-1>');
+    }
+    if ($self->{on_select})
+    {
+	$tk_listbox->bind('<<ListboxSelect>>', $self->{on_select});
+    }
     return 0;
 }
 

@@ -1,0 +1,53 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "XML-Schematron",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Check::ISA" : "0",
+            "Moose" : "0",
+            "MooseX::NonMoose" : "0",
+            "MooseX::Traits" : "0",
+            "MooseX::Types::Path::Class" : "0",
+            "XML::Filter::BufferText" : "0",
+            "XML::SAX" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/asb-capfan/XML-Schematron"
+      }
+   },
+   "version" : "1.10",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

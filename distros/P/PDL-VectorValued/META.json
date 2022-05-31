@@ -45,6 +45,6 @@
          "web" : "https://github.com/moocow-the-bovine/PDL-VectorValued"
       }
    },
-   "version" : "v1.0.20",
+   "version" : "v1.0.21",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -1,15 +1,14 @@
 #!/usr/bin/perl
-# $Id: 03-parameters.t 1812 2020-10-07 18:09:53Z willem $	-*-perl-*-
+# $Id: 03-parameters.t 1865 2022-05-21 09:57:49Z willem $	-*-perl-*-
 #
 
 use strict;
 use warnings;
 
 use Net::DNS::Parameters qw(:class :type :opcode :rcode :ednsoption :dsotype);
-local $Net::DNS::Parameters::DNSEXTLANG;			# suppress Extlang type queries
 
 use Test::More tests => ( 5 + scalar keys %Net::DNS::Parameters::classbyval ) +
-		( 6 + scalar keys %Net::DNS::Parameters::typebyval ) +
+		( 3 + scalar keys %Net::DNS::Parameters::typebyval ) +
 		( 3 + scalar keys %Net::DNS::Parameters::opcodebyval ) +
 		( 3 + scalar keys %Net::DNS::Parameters::rcodebyval ) +
 		( 2 + scalar keys %Net::DNS::Parameters::ednsoptionbyval ) +
@@ -39,8 +38,7 @@ use Test::More tests => ( 5 + scalar keys %Net::DNS::Parameters::classbyval ) +
 
 
 {					## check type conversion functions
-	my $anon = 65500;
-	foreach ( sort { $a <=> $b } $anon, keys %Net::DNS::Parameters::typebyval ) {
+	foreach ( sort { $a <=> $b } keys %Net::DNS::Parameters::typebyval ) {
 		my $name	= typebyval($_);
 		my $code	= eval { typebyname($name) };
 		my ($exception) = split /\n/, "$@\n";
@@ -49,7 +47,7 @@ use Test::More tests => ( 5 + scalar keys %Net::DNS::Parameters::classbyval ) +
 	is( typebyname('*'), typebyname('ANY'), "typebyname(*)" );
 
 	my $large = 65536;
-	foreach my $testcase ( "BOGUS", "Bogus", "TYPE$large" ) {
+	foreach my $testcase ("TYPE$large") {
 		eval { typebyname($testcase); };
 		my ($exception) = split /\n/, "$@\n";
 		ok( $exception, "typebyname($testcase)\t[$exception]" );
@@ -129,14 +127,6 @@ use Test::More tests => ( 5 + scalar keys %Net::DNS::Parameters::classbyval ) +
 		ok( $exception, "dsotypebyname($testcase)\t[$exception]" );
 	}
 }
-
-
-## exercise but do not test ad hoc RRtype registration
-Net::DNS::Parameters::register( 'TOY', 65280 );			# RR type name and number
-Net::DNS::Parameters::register( 'TOY', 65280 );			# ignore duplicate entry
-eval { Net::DNS::Parameters::register('ANY') };			# reject CLASS identifier
-eval { Net::DNS::Parameters::register('A') };			# reject conflicting type name
-eval { Net::DNS::Parameters::register( 'Z', 1 ) };		# reject conflicting type number
 
 
 exit;

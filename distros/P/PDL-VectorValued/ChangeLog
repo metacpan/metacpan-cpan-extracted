@@ -2,6 +2,10 @@
 ##
 ## Change log for perl distribution PDL::VectorValued
 
+v1.0.21 Sun, 29 May 2022 21:58:45 +0200 moocow
+	* suppress "redefined" warnings under PDL v2.080 which break Debian (contributed by mohawk2)
+	* fix bogus POD references to non-existant PDL::Ngrams::ngutils
+
 v1.0.20 Fri, 20 May 2022 17:03:57 +0200 moocow
 	* add rleND, rldND to %VV_IMPORT
 

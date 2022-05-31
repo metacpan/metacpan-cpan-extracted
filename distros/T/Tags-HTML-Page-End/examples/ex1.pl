@@ -11,6 +11,7 @@ use Tags::Output::Indent;
 # Object.
 my $tags = Tags::Output::Indent->new(
         'preserved' => ['style'],
+        'xml' => 1,
 );
 my $css = CSS::Struct::Output::Indent->new;
 my $begin = Tags::HTML::Page::Begin->new(
@@ -22,7 +23,12 @@ my $end = Tags::HTML::Page::End->new(
 );
 
 # Process page
-$begin->process_css;
+$css->put(
+       ['s', 'div'],
+       ['d', 'color', 'red'],
+       ['d', 'background-color', 'black'],
+       ['e'],
+);
 $begin->process;
 $tags->put(
        ['b', 'div'],
@@ -36,25 +42,18 @@ print $tags->flush;
 
 # Output:
 # <!DOCTYPE html>
-# <html>
+# <html lang="en">
 #   <head>
-#     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-#     </meta>
+#     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+#     <meta name="generator" content=
+#       "Perl module: Tags::HTML::Page::Begin, Version: 0.13" />
 #     <title>
 #       Page title
 #     </title>
 #     <style type="text/css">
-# .okay {
-# 	background: #9f9;
-# }
-# .warning {
-# 	background: #ff9;
-# }
-# .alert {
-# 	background: #f99;
-# }
-# .offline {
-# 	color: #999;
+# div {
+#         color: red;
+#         background-color: black;
 # }
 # </style>
 #   </head>

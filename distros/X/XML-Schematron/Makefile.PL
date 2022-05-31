@@ -13,4 +13,9 @@ WriteMakefile(
         Check::ISA                  => 0,
         MooseX::Traits              => 0,
      },
+     'META_MERGE'     => {
+        resources => {
+            repository => 'https://github.com/asb-capfan/XML-Schematron',
+        },
+     },
 );

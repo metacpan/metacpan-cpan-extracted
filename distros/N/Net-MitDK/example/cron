@@ -1,0 +1,11 @@
+#
+# This renews a lease every 10 minutes, for all profiles.
+# If cannot, it dies, once, hoping that the notification reaches you via cron/mail.
+# Further expiration notices are suppressed not to spam you
+#
+# Remember the full path! $PATH is not initialized in cronjobs.
+# Also, you probably don't want log redirection - if it will fail to
+# reauthenticate, it will die, but only once, so you'll get a notification
+# with cron mail.
+#
+*/10 * * * * ..PATH../mitdk-renew-lease -a

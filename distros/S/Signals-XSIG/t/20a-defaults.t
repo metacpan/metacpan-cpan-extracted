@@ -1,5 +1,6 @@
 use Signals::XSIG;
-use Test::More tests => 81;
+use Test::More tests => 78;
+use lib '.'; # 5.26 compatibility
 use strict;
 use warnings;
 use POSIX ();
@@ -19,7 +20,7 @@ require "t/20-defaults.tt";
 my @failed = ();
 my @signals 
   = qw(USR1 USR2 HUP INT QUIT ILL TRAP ABRT EMT FPE KILL BUS
-       SEGV SYS PIPE ALRM TERM URG XCPU XFSZ VTALRM PROF LOST
+       SEGV SYS PIPE ALRM TERM XCPU XFSZ VTALRM PROF LOST
        STKFLT IOT BREAK FOO);
 
 if (@ARGV > 0) {
@@ -36,7 +37,16 @@ foreach my $signal (@signals) {
         }
         next;
     }
+    if ($^O eq 'MSWin32') {
+        # having trouble sending some signals on MSWin32 without
+        # aborting the whole test
+      SKIP: {
+	  skip "Skip terminating signals on MSWin32", 3;
+	}
+	next;
+    }
 
+    diag "signal = $signal" if $^O eq 'MSWin32';
     my ($basic, $module, @unlink) = test_default_behavior_for_signal($signal);
     if (!ok_test_behavior($basic, $module, $signal)) {
         push @failed, $signal;
@@ -45,6 +55,13 @@ foreach my $signal (@signals) {
 }
 
 if (@failed && @ARGV == 0) {
+    no warnings 'once';
+    diag "Failures detected with PAUSE_TIME=$main::PAUSE_TIME";
+    diag "If these are intermittent failures, they might go away if you";
+    diag "increase the pause time. Try";
+    diag "";
+    diag "     PAUSE_TIME=10 make test";
+    diag "";
     on_failure_recommend_spike(@failed);
 }
 

@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use Test::Shared::Fixture::Wikibase::Datatype::Reference::Wikidata::ReferenceURL;
 
 # Test.
-is($Test::Shared::Fixture::Wikibase::Datatype::Reference::Wikidata::ReferenceURL::VERSION, undef, 'Version.');
+is($Test::Shared::Fixture::Wikibase::Datatype::Reference::Wikidata::ReferenceURL::VERSION, 0.12, 'Version.');

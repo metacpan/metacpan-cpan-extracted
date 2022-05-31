@@ -14,8 +14,8 @@ sub get_pdls {my($this) = @_; return ($this->{ParNames},$this->{ParObjs});}
 
 my @code_args_always = qw(BadFlag SignatureObj GenericTypes ExtraGenericSwitches HaveBroadcasting Name);
 sub make_args {
-  my ($which) = @_;
-  ("Parsed$which", [$which,\"Bad$which",@code_args_always]);
+  my ($target) = @_;
+  ("${target}CodeParsed", ["${target}CodeUnparsed",\"Bad${target}CodeUnparsed",@code_args_always]);
 }
 
 # Do the appropriate substitutions in the code.
@@ -289,9 +289,10 @@ sub separate_code {
     ( $broadcastloops, $coderef, $sizeprivs );
 } # sub: separate_code()
 
+my $macro_pat = qr/\w+/;
 sub expand {
     my ($this, $text) = @_;
-    my (undef, $pdl, $inds, $rest) = PDL::PP::Rule::Substitute::macro_extract($text);
+    my (undef, $pdl, $inds, $rest) = PDL::PP::Rule::Substitute::macro_extract($text, $macro_pat);
     my @add;
     if($pdl =~ /^T/) {@add = PDL::PP::MacroAccess->new($pdl,$inds,
 			   $this->{Generictypes},$this->{Name});}
@@ -304,18 +305,15 @@ sub expand {
 	    $name = $1;
 	    $inds = substr $inds, 1, -1; # chop off brackets
 	} elsif ($get eq 'PP') {
-	    ($name, $inds) = split /\s*,\s*/, $inds;
+	    ($name, $inds) = PDL::PP::Rule::Substitute::split_cpp($inds);
 	} else {
-	    ($inds, $name) = $inds =~ /(.*)\s*,\s*(\w+)/;
+	    ($inds, $name) = PDL::PP::Rule::Substitute::split_cpp($inds);
 	}
 	@add = PDL::PP::BadAccess->new($opcode,$get,$name,$inds,$this);
     }
     elsif($this->{ParObjs}{$pdl}) {@add = PDL::PP::Access->new($pdl,$inds)}
     else {
-	@add = "\$$pdl(";
-	# assumption: the only "control" that will happen in macro args is another macro
-	$this->process($inds, [\@add], undef, undef);
-	push @add, ")";
+	confess "unknown construct $pdl($inds)";
     }
     ($rest, @add);
 }
@@ -602,7 +600,7 @@ sub get_str {
 package PDL::PP::Access;
 use Carp;
 
-sub new { my($type,$pdl,$inds,$parent) = @_;
+sub new { my($type,$pdl,$inds) = @_;
     bless [$pdl,$inds],$type;
 }
 
@@ -619,8 +617,8 @@ use Carp;
 
 sub new {
     my ( $type, $opcode, $get, $name, $inds, $parent ) = @_;
-    die "\nIt looks like you have tried a \$${opcode}() macro on an\n" .
-	"  unknown ndarray <$name($inds)>\n"
+    die "\nIt looks like you have tried a $get \$${opcode}() macro on an" .
+	" unknown ndarray <$name($inds)>\n"
 	unless defined($parent->{ParObjs}{$name});
     bless [$opcode, $get, $name, $inds], $type;
 }
@@ -667,8 +665,8 @@ sub new {
     $pdl =~ /^\s*T([A-Z]+)\s*$/
       or confess("Macroaccess wrong in $name (allowed types $types): was '$pdl'\n");
     my @ilst = split '', $1;
-    my @lst = split ',', $inds, -1;
-    confess "Macroaccess: different nos of args $pdl $inds\n" if @lst != @ilst;
+    my @lst = PDL::PP::Rule::Substitute::split_cpp($inds);
+    confess "Macroaccess: different nos of args $pdl (@{[scalar @lst]}=@lst) vs (@{[scalar @ilst]}=@ilst)\n" if @lst != @ilst;
     my %type2value; @type2value{@ilst} = @lst;
     confess "$name has no Macro for generic type $_ (has $pdl)\n"
 	for grep !exists $type2value{$_}, @$gentypes;

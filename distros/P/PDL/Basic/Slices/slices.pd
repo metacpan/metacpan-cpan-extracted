@@ -70,10 +70,6 @@ use Scalar::Util 'blessed';
 
 EOD
 
-=head1
-FUNCTIONS
-=cut
-
 # $::PP_VERBOSE=1;
 
 pp_addhdr(<<'EOH');
@@ -350,8 +346,6 @@ Engine for L</range>
 Same calling convention as L</range>, but you must supply all
 parameters.  C<rangeb> is marginally faster as it makes a direct PP call,
 avoiding the perl argument-parsing step.
-
-=cut
 
 =head2 range
 
@@ -686,11 +680,11 @@ switch(ind_pdl->datatype) {
 
   if(blen == 0) {
     /* If no boundary is specified then every dim gets forbidden */
-    int i;
+    PDL_Indx i;
     for (i=0;i<$COMP(rdim);i++)
       $COMP(boundary[i]) = 0;
   } else {
-    int i;
+    PDL_Indx i;
     for(i=0;i<$COMP(rdim);i++) {
       switch(bstr[i < blen ? i : blen-1 ]) {
       case '0': case 'f': case 'F':               /* forbid */
@@ -837,20 +831,20 @@ if ($COMP(size_pdl_destroy))
 EOD-MakeComp
 
         RedoDims => <<'EOD-RedoDims' ,
-PDL_Indx stdim = $PARENT(ndims) - $COMP(rdim);
+PDL_Indx stdim = $PDL(PARENT)->ndims - $COMP(rdim);
 PDL_Indx dim,inc;
 PDL_Indx i,rdvalid;
 
   // Speed bump for ludicrous cases
-  if( $COMP(rdim) > $PARENT(ndims)+5 && $COMP(nsizes) != $COMP(rdim)) {
+  if( $COMP(rdim) > $PDL(PARENT)->ndims+5 && $COMP(nsizes) != $COMP(rdim)) {
     $CROAK(
       "Ludicrous number of extra dims in range index; leaving child null.\n"
       "  (%"IND_FLAG" implicit dims is > 5; index has %"IND_FLAG" dims; source has %"IND_FLAG" dim%s.)\n"
       "  This often means that your index PDL is incorrect.\n"
       "  To avoid this message, allocate dummy dims in\n"
       "  the source or use %"IND_FLAG" dims in range's size field.\n",
-      $COMP(rdim)-$PARENT(ndims),$COMP(rdim),$PARENT(ndims),
-      $PARENT(ndims)>1?"s":"",$COMP(rdim)
+      $COMP(rdim)-$PDL(PARENT)->ndims,$COMP(rdim),$PDL(PARENT)->ndims,
+      $PDL(PARENT)->ndims>1?"s":"",$COMP(rdim)
     );
   }
 
@@ -858,7 +852,7 @@ PDL_Indx i,rdvalid;
     stdim = 0;
 
   /* Set dimensionality of child */
-  $CHILD(ndims) = $COMP(itdim) + $COMP(ntsize) + stdim;
+  $PDL(CHILD)->ndims = $COMP(itdim) + $COMP(ntsize) + stdim;
   $SETNDIMS($COMP(itdim)+$COMP(ntsize)+stdim);
 
   inc = 1;
@@ -867,35 +861,35 @@ PDL_Indx i,rdvalid;
   for(i=rdvalid=0;i<$COMP(rdim);i++) {
     if($COMP(sizes[i])) {
       rdvalid++;
-      $CHILD(dimincs[dim]) = inc;
-      inc *= ($CHILD(dims[dim++]) = $COMP(sizes[i])); /* assignment */
+      $PDL(CHILD)->dimincs[dim] = inc;
+      inc *= ($PDL(CHILD)->dims[dim++] = $COMP(sizes[i])); /* assignment */
     }
   }
 
   /* Copy index broadcast dimensions to child */
   for(dim=0; dim<$COMP(itdim); dim++) {
-    $CHILD(dimincs[dim]) = inc;
-    inc *= ($CHILD(dims[dim]) = $COMP(itdims[dim])); /* assignment */
+    $PDL(CHILD)->dimincs[dim] = inc;
+    inc *= ($PDL(CHILD)->dims[dim] = $COMP(itdims[dim])); /* assignment */
   }
 
   /* Copy source broadcast dimensions to child */
   dim = $COMP(itdim) + rdvalid;
   for(i=0;i<stdim;i++) {
-    $CHILD(dimincs[dim]) = inc;
-    inc *= ($CHILD(dims[dim++]) = $PARENT(dims[i+$COMP(rdim)])); /* assignment */
+    $PDL(CHILD)->dimincs[dim] = inc;
+    inc *= ($PDL(CHILD)->dims[dim++] = $PDL(PARENT)->dims[i+$COMP(rdim)]); /* assignment */
   }
 
   /* Cover bizarre case where the source PDL is empty - in that case, change */
   /* all non-barfing boundary conditions to truncation, since we have no data */
   /* to reflect, extend, or mirror. */
-  if($PARENT(dims[0]) == 0) {
+  if($PDL(PARENT)->dims[0] == 0) {
     for(dim=0; dim<$COMP(rdim); dim++) {
       if($COMP(boundary[dim]))
         $COMP(boundary[dim]) = 1; // force truncation
     }
   }
 
-$CHILD(datatype) = $PARENT(datatype);
+$PDL(CHILD)->datatype = $PDL(PARENT)->datatype;
 $SETDIMS();
 EOD-RedoDims
 
@@ -1050,10 +1044,6 @@ for(item=0; item<$COMP(nitems); item++) {
 EOD-EquivCPOffsCode
 );
 
-
-=head2 rld
-=cut
-
 pp_def(
         'rld',
         GenericTypes => [ppdefs_all],
@@ -1102,9 +1092,6 @@ decode to C<$c>.
 
 EOD
 );
-
-=head2 rle
-=cut
 
 pp_def(
         'rle',
@@ -1185,30 +1172,281 @@ first instance of C<0> in each row of C<$x> should be considered.
 EOD
 );
 
+pp_def('rlevec',
+       Pars => "c(M,N); indx [o]a(N); [o]b(M,N)",
+       Code =><<'EOC',
+  PDL_Indx cn,bn=0, sn=$SIZE(N), matches;
+  loop (M) %{ $b(N=>0)=$c(N=>0); %}
+  $a(N=>0) = 1;
+  for (cn=1; cn<sn; cn++) {
+     matches=1;
+     loop (M) %{
+       if ($c(N=>cn) != $b(N=>bn)) {
+         matches=0;
+         break;
+       }
+     %}
+     if (matches) {
+       $a(N=>bn)++;
+     } else {
+       bn++;
+       loop (M) %{ $b(N=>bn) = $c(N=>cn); %}
+       $a(N=>bn) = 1;
+     }
+   }
+   for (bn++; bn<sn; bn++) {
+     $a(N=>bn) = 0;
+     loop (M) %{ $b(N=>bn) = 0; %}
+   }
+EOC
+       Doc =><<'EOD',
+=for ref
+
+Run-length encode a set of vectors.
+
+Higher-order rle(), for use with qsortvec().
+
+Given set of vectors $c, generate a vector $a with the number of occurrences of each element
+(where an "element" is a vector of length $M ocurring in $c),
+and a set of vectors $b containing the unique values.
+As for rle(), only the elements up to the first instance of 0 in $a should be considered.
+
+Can be used together with clump() to run-length encode "values" of arbitrary dimensions.
+Can be used together with rotate(), cat(), append(), and qsortvec() to count N-grams
+over a 1d PDL.
+
+See also: L</rle>, L<PDL::Ufunc/qsortvec>, L<PDL::Primitive/uniqvec>
+Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
+
+EOD
+);
+
+pp_def('rldvec',
+       Pars => 'indx a(N); b(M,N); [o]c(M,N)',
+       PMCode=><<'EOC',
+sub PDL::rldvec {
+  my ($a,$b,$c) = @_;
+  if (!defined($c)) {
+# XXX Need to improve emulation of threading in auto-generating c
+    my ($rowlen) = $b->dim(0);
+    my ($size) = $a->sumover->max;
+    my (@dims) = $a->dims;
+    shift(@dims);
+    $c = $b->zeroes($b->type,$rowlen,$size,@dims);
+  }
+  &PDL::_rldvec_int($a,$b,$c);
+  return $c;
+}
+EOC
+       Code =><<'EOC',
+  PDL_Indx i,nrows,bn,cn=0, sn=$SIZE(N);
+  for (bn=0; bn<sn; bn++) {
+    nrows = $a(N=>bn);
+    for (i=0; i<nrows; i++) {
+      loop (M) %{ $c(N=>cn) = $b(N=>bn); %}
+      cn++;
+    }
+   }
+EOC
+       Doc =><<'EOD'
+=for ref
+
+Run-length decode a set of vectors, akin to a higher-order rld().
+
+Given a vector $a() of the number of occurrences of each row, and a set $c()
+of row-vectors each of length $M, run-length decode to $c().
+
+Can be used together with clump() to run-length decode "values" of arbitrary dimensions.
+
+See also: L</rld>.
+Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
+EOD
+);
+
+pp_def('rleseq',
+       Pars => "c(N); indx [o]a(N); [o]b(N)",
+       Code=><<'EOC',
+  PDL_Indx j=0, sizeN=$SIZE(N);
+  $GENERIC(c) coff;
+  coff     = $c(N=>0);
+  $b(N=>0) = coff;
+  $a(N=>0) = 0;
+  loop (N) %{
+    if ($c() == coff+$a(N=>j)) {
+      $a(N=>j)++;
+    } else {
+      j++;
+      $b(N=>j) = coff = $c();
+      $a(N=>j) = 1;
+    }
+  %}
+  for (j++; j<sizeN; j++) {
+    $a(N=>j) = 0;
+    $b(N=>j) = 0;
+  }
+EOC
+       Doc =><<'EOD',
+=for ref
+
+Run-length encode a vector of subsequences.
+
+Given a vector of $c() of concatenated variable-length, variable-offset subsequences,
+generate a vector $a containing the length of each subsequence
+and a vector $b containing the subsequence offsets.
+As for rle(), only the elements up to the first instance of 0 in $a should be considered.
+
+See also L</rle>.
+Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
+EOD
+);
+
+pp_def('rldseq',
+       Pars => 'indx a(N); b(N); [o]c(M)',
+       PMCode=><<'EOC',
+sub PDL::rldseq {
+  my ($a,$b,$c) = @_;
+  if (!defined($c)) {
+    my $size   = $a->sumover->max;
+    my (@dims) = $a->dims;
+    shift(@dims);
+    $c = $b->zeroes($b->type,$size,@dims);
+  }
+  &PDL::_rldseq_int($a,$b,$c);
+  return $c;
+}
+EOC
+       Code =><<'EOC',
+  size_t mi=0;
+  loop (N) %{
+    size_t     len = $a(), li;
+    for (li=0; li < len; ++li, ++mi) {
+      $c(M=>mi) = $b() + li;
+    }
+  %}
+EOC
+       Doc =><<'EOD'
+=for ref
+
+Run-length decode a subsequence vector.
+
+Given a vector $a() of sequence lengths
+and a vector $b() of corresponding offsets,
+decode concatenation of subsequences to $c(),
+as for:
+
+ $c = null;
+ $c = $c->append($b($_)+sequence($a->type,$a($_))) foreach (0..($N-1));
+
+See also: L</rld>.
+Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
+EOD
+);
+
+pp_add_exported('','rleND rldND');
+pp_addpm(<<'EOF');
+=head2 rleND
+
+=for sig
+
+  Signature: (data(@vdims,N); int [o]counts(N); [o]elts(@vdims,N))
+
+=for ref
+
+Run-length encode a set of (sorted) n-dimensional values.
+
+Generalization of rle() and vv_rlevec():
+given set of values $data, generate a vector $counts with the number of occurrences of each element
+(where an "element" is a matrix of dimensions @vdims ocurring as a sequential run over the
+final dimension in $data), and a set of vectors $elts containing the elements which begin a run.
+Really just a wrapper for clump() and rlevec().
+
+See also: L</rle>, L</rlevec>.
+Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
+
+=cut
+
+*PDL::rleND = \&rleND;
+sub rleND {
+  my $data   = shift;
+  my @vdimsN = $data->dims;
+
+  ##-- construct output pdls
+  my $counts = $#_ >= 0 ? $_[0] : zeroes(long, $vdimsN[$#vdimsN]);
+  my $elts   = $#_ >= 1 ? $_[1] : zeroes($data->type, @vdimsN);
+
+  ##-- guts: call rlevec()
+  rlevec($data->clump($#vdimsN), $counts, $elts->clump($#vdimsN));
+
+  return ($counts,$elts);
+}
+
+=head2 rldND
+
+=for sig
+
+  Signature: (int counts(N); elts(@vdims,N); [o]data(@vdims,N);)
+
+=for ref
+
+Run-length decode a set of (sorted) n-dimensional values.
+
+Generalization of rld() and rldvec():
+given a vector $counts() of the number of occurrences of each @vdims-dimensioned element,
+and a set $elts() of @vdims-dimensioned elements, run-length decode to $data().
+
+Really just a wrapper for clump() and rldvec().
+
+See also: L</rld>, L</rldvec>.
+Contributed by Bryan Jurish E<lt>moocow@cpan.orgE<gt>.
+
+=cut
+
+*PDL::rldND = \&rldND;
+sub rldND {
+  my ($counts,$elts) = (shift,shift);
+  my @vdimsN        = $elts->dims;
+
+  ##-- construct output pdl
+  my ($data);
+  if ($#_ >= 0) { $data = $_[0]; }
+  else {
+    my $size      = $counts->sumover->max; ##-- get maximum size for Nth-dimension for small encodings
+    my @countdims = $counts->dims;
+    shift(@countdims);
+    $data         = zeroes($elts->type, @vdimsN, @countdims);
+  }
+
+  ##-- guts: call rldvec()
+  rldvec($counts, $elts->clump($#vdimsN), $data->clump($#vdimsN));
+
+  return $data;
+}
+EOF
+
 # the perl wrapper clump is now defined in Core.pm
 # this is just the low level interface
 pp_def(
         '_clump_int',
-        OtherPars => 'int n',
+        OtherPars => 'PDL_Indx n',
         P2Child => 1,
-        RedoDims => 'int i; PDL_Indx d1;
+        RedoDims => 'PDL_Indx i, d1;
 
 	         /* truncate overly long clumps to just clump existing dimensions */
-		 if($COMP(n) > $PARENT(ndims))
-                        $COMP(n) = $PARENT(ndims);
+		 if($COMP(n) > $PDL(PARENT)->ndims)
+                        $COMP(n) = $PDL(PARENT)->ndims;
 
 		 if($COMP(n) < -1)
-                        $COMP(n) = $PARENT(ndims) + $COMP(n) + 1;
+                        $COMP(n) = $PDL(PARENT)->ndims + $COMP(n) + 1;
 
-                 PDL_Indx nrem = ($COMP(n) == -1 ? $PARENT(broadcastids[0]) : $COMP(n));
-                 $SETNDIMS($PARENT(ndims) - nrem + 1);
+                 PDL_Indx nrem = ($COMP(n) == -1 ? $PDL(PARENT)->broadcastids[0] : $COMP(n));
+                 $SETNDIMS($PDL(PARENT)->ndims - nrem + 1);
                  d1=1;
                  for(i=0; i<nrem; i++) {
-                        d1 *= $PARENT(dims[i]);
+                        d1 *= $PDL(PARENT)->dims[i];
                  }
-                 $CHILD(dims[0]) = d1;
-                 for(; i<$PARENT(ndims); i++) {
-                        $CHILD(dims[i-nrem+1]) = $PARENT(dims[i]);
+                 $PDL(CHILD)->dims[0] = d1;
+                 for(; i<$PDL(PARENT)->ndims; i++) {
+                        $PDL(CHILD)->dims[i-nrem+1] = $PDL(PARENT)->dims[i];
                  }
                  $SETDIMS();
                  $SETDELTABROADCASTIDS(1-nrem);
@@ -1223,11 +1461,6 @@ pp_def(
         Doc => 'internal',
 );
 
-
-
-=head2 xchg
-=cut
-
 pp_def(
         'xchg',
         OtherPars => 'PDL_Indx n1; PDL_Indx n2;',
@@ -1235,13 +1468,13 @@ pp_def(
         P2Child => 1,
         AffinePriv => 1,
         EquivDimCheck => 'if ($COMP(n1) <0)
-                                $COMP(n1) += $PARENT(broadcastids[0]);
+                                $COMP(n1) += $PDL(PARENT)->broadcastids[0];
                           if ($COMP(n2) <0)
-                                $COMP(n2) += $PARENT(broadcastids[0]);
+                                $COMP(n2) += $PDL(PARENT)->broadcastids[0];
           if (PDLMIN($COMP(n1),$COMP(n2)) <0 ||
-              PDLMAX($COMP(n1),$COMP(n2)) >= $PARENT(broadcastids[0]))
+              PDLMAX($COMP(n1),$COMP(n2)) >= $PDL(PARENT)->broadcastids[0])
                 $CROAK("One of dims %"IND_FLAG", %"IND_FLAG" out of range: should be 0<=dim<%"IND_FLAG"",
-                    $COMP(n1),$COMP(n2),$PARENT(broadcastids[0]));',
+                    $COMP(n1),$COMP(n2),$PDL(PARENT)->broadcastids[0]);',
         EquivPDimExpr => '(($CDIM == $COMP(n1)) ? $COMP(n2) : ($CDIM == $COMP(n2)) ? $COMP(n1) : $CDIM)',
         Doc => <<'EOD',
 =for ref
@@ -1389,9 +1622,6 @@ sub PDL::reorder {
 
 EOD
 
-=head2 mv
-=cut
-
 pp_addhdr(<<'EOF');
 #define EQUIVDIM(dima,dimb,cdim,inc) \
   ((cdim < PDLMIN(dima,dimb) || cdim > PDLMAX(dima,dimb)) ? \
@@ -1404,13 +1634,13 @@ pp_def(
         P2Child => 1,
         AffinePriv => 1,
         EquivDimCheck => 'if ($COMP(n1) <0)
-                                $COMP(n1) += $PARENT(broadcastids[0]);
+                                $COMP(n1) += $PDL(PARENT)->broadcastids[0];
                           if ($COMP(n2) <0)
-                                $COMP(n2) += $PARENT(broadcastids[0]);
+                                $COMP(n2) += $PDL(PARENT)->broadcastids[0];
           if (PDLMIN($COMP(n1),$COMP(n2)) <0 ||
-              PDLMAX($COMP(n1),$COMP(n2)) >= $PARENT(broadcastids[0]))
+              PDLMAX($COMP(n1),$COMP(n2)) >= $PDL(PARENT)->broadcastids[0])
                 $CROAK("One of dims %"IND_FLAG", %"IND_FLAG" out of range: should be 0<=dim<%"IND_FLAG"",
-                    $COMP(n1),$COMP(n2),$PARENT(broadcastids[0]));',
+                    $COMP(n1),$COMP(n2),$PDL(PARENT)->broadcastids[0]);',
         EquivPDimExpr => '(
           $COMP(n1) == $COMP(n2) ? $CDIM :
           $COMP(n1) < $COMP(n2) ? EQUIVDIM($COMP(n1),$COMP(n2),$CDIM,1) :
@@ -1501,19 +1731,19 @@ pp_def(
                         cmp_pdll);
         '),
         RedoDims => pp_line_numbers(__LINE__-1, '
-                int nthp,nthc,nthd; int cd = $COMP(whichdims[0]);
-                $SETNDIMS($PARENT(ndims)-$COMP(whichdims_count)+1);
+                PDL_Indx nthp,nthc,nthd, cd = $COMP(whichdims[0]);
+                $SETNDIMS($PDL(PARENT)->ndims-$COMP(whichdims_count)+1);
                 $DOPRIVALLOC();
                 $PRIV(offs) = 0;
-                if ($COMP(whichdims)[$COMP(whichdims_count)-1] >= $PARENT(ndims) ||
+                if ($COMP(whichdims)[$COMP(whichdims_count)-1] >= $PDL(PARENT)->ndims ||
                         $COMP(whichdims)[0] < 0)
                         $CROAK("dim out of range");
                 nthd=0; nthc=0;
-                for(nthp=0; nthp<$PARENT(ndims); nthp++)
+                for(nthp=0; nthp<$PDL(PARENT)->ndims; nthp++)
                         if (nthd < $COMP(whichdims_count) &&
                             nthp == $COMP(whichdims)[nthd]) {
                                 if (!nthd) {
-                                        $CHILD(dims)[cd] = $PARENT(dims)[cd];
+                                        $PDL(CHILD)->dims[cd] = $PDL(PARENT)->dims[cd];
                                         nthc++;
                                         $PRIV(incs)[cd] = 0;
                                 }
@@ -1521,16 +1751,16 @@ pp_def(
                                     $COMP(whichdims)[nthd-1])
                                        $CROAK("dims must be unique");
                                 nthd++; /* advance pointer into whichdims */
-                                if($CHILD(dims)[cd] !=
-                                    $PARENT(dims)[nthp]) {
+                                if($PDL(CHILD)->dims[cd] !=
+                                    $PDL(PARENT)->dims[nthp]) {
                                         $CROAK("Different dims %"IND_FLAG" and %"IND_FLAG"",
-                                                $CHILD(dims)[cd],
-                                                $PARENT(dims)[nthp]);
+                                                $PDL(CHILD)->dims[cd],
+                                                $PDL(PARENT)->dims[nthp]);
                                 }
-                                $PRIV(incs)[cd] += $PARENT(dimincs)[nthp];
+                                $PRIV(incs)[cd] += $PDL(PARENT)->dimincs[nthp];
                         } else {
-                                $PRIV(incs)[nthc] = $PARENT(dimincs)[nthp];
-                                $CHILD(dims)[nthc] = $PARENT(dims)[nthp];
+                                $PRIV(incs)[nthc] = $PDL(PARENT)->dimincs[nthp];
+                                $PDL(CHILD)->dims[nthc] = $PDL(PARENT)->dims[nthp];
                                 nthc++;
                         }
                 $SETDIMS();
@@ -1586,9 +1816,6 @@ NOTE: diagonal doesn't handle broadcastids correctly. XXX FIX
 EOD
 );
 
-=head2 lags
-=cut
-
 pp_def(
         'lags',
         Doc => <<'EOD',
@@ -1632,38 +1859,35 @@ EOD
         RedoDims => '
                 PDL_Indx i;
                 if ($COMP(nthdim) < 0)  /* the usual conventions */
-                   $COMP(nthdim) += $PARENT(ndims);
-                if ($COMP(nthdim) < 0 || $COMP(nthdim) >= $PARENT(ndims))
+                   $COMP(nthdim) += $PDL(PARENT)->ndims;
+                if ($COMP(nthdim) < 0 || $COMP(nthdim) >= $PDL(PARENT)->ndims)
                    $CROAK("dim out of range");
                 if ($COMP(n) < 1)
                    $CROAK("number of lags must be positive");
                 if ($COMP(step) < 1)
                    $CROAK("step must be positive");
                 $PRIV(offs) = 0;
-                $SETNDIMS($PARENT(ndims)+1);
+                $SETNDIMS($PDL(PARENT)->ndims+1);
                 $DOPRIVALLOC();
                 for(i=0; i<$COMP(nthdim); i++) {
-                        $CHILD(dims)[i] = $PARENT(dims)[i];
-                        $PRIV(incs)[i] = $PARENT(dimincs)[i];
+                        $PDL(CHILD)->dims[i] = $PDL(PARENT)->dims[i];
+                        $PRIV(incs)[i] = $PDL(PARENT)->dimincs[i];
                 }
-                $CHILD(dims)[i] = $PARENT(dims)[i] - $COMP(step) * ($COMP(n)-1);
-                if ($CHILD(dims)[i] < 1)
+                $PDL(CHILD)->dims[i] = $PDL(PARENT)->dims[i] - $COMP(step) * ($COMP(n)-1);
+                if ($PDL(CHILD)->dims[i] < 1)
                   $CROAK("product of step size and number of lags too large");
-                $CHILD(dims)[i+1] = $COMP(n);
-                $PRIV(incs)[i] = ($PARENT(dimincs)[i]);
-                $PRIV(incs)[i+1] = - $PARENT(dimincs)[i] * $COMP(step);
-                $PRIV(offs) += ($CHILD(dims)[i+1] - 1) * (-$PRIV(incs)[i+1]);
+                $PDL(CHILD)->dims[i+1] = $COMP(n);
+                $PRIV(incs)[i] = ($PDL(PARENT)->dimincs[i]);
+                $PRIV(incs)[i+1] = - $PDL(PARENT)->dimincs[i] * $COMP(step);
+                $PRIV(offs) += ($PDL(CHILD)->dims[i+1] - 1) * (-$PRIV(incs)[i+1]);
                 i++;
-                for(; i<$PARENT(ndims); i++) {
-                        $CHILD(dims)[i+1] = $PARENT(dims)[i];
-                        $PRIV(incs)[i+1] = $PARENT(dimincs)[i];
+                for(; i<$PDL(PARENT)->ndims; i++) {
+                        $PDL(CHILD)->dims[i+1] = $PDL(PARENT)->dims[i];
+                        $PRIV(incs)[i+1] = $PDL(PARENT)->dimincs[i];
                 }
                 $SETDIMS();
         '
 );
-
-=head2 splitdim
-=cut
 
 pp_def(
         'splitdim',
@@ -1696,31 +1920,31 @@ EOD
                 PDL_Indx nsp = $COMP(nsp);
                 if(nsp == 0) {$CROAK("Cannot split to 0\n");}
                 if (i < 0)
-                        i = $COMP(nthdim) += $PARENT(ndims);
-                if (i < 0 || i >= $PARENT(ndims))
+                        i = $COMP(nthdim) += $PDL(PARENT)->ndims;
+                if (i < 0 || i >= $PDL(PARENT)->ndims)
                         $CROAK("nthdim %"IND_FLAG" after adjusting for negative must not be negative or greater or equal to number of dims %"IND_FLAG"\n",
-                                i, $PARENT(ndims));
-                if (nsp > $PARENT(dims[i]))
+                                i, $PDL(PARENT)->ndims);
+                if (nsp > $PDL(PARENT)->dims[i])
                         $CROAK("nsp %"IND_FLAG" cannot be greater than dim %"IND_FLAG"\n",
-                                nsp, $PARENT(dims[i]));
-                if (($PARENT(dims)[i] % nsp) != 0)
+                                nsp, $PDL(PARENT)->dims[i]);
+                if (($PDL(PARENT)->dims[i] % nsp) != 0)
                         $CROAK("nsp %"IND_FLAG" non-divisible into dim %"IND_FLAG"\n",
-                                nsp, $PARENT(dims[i]));
+                                nsp, $PDL(PARENT)->dims[i]);
                 $PRIV(offs) = 0;
-                $SETNDIMS($PARENT(ndims)+1);
+                $SETNDIMS($PDL(PARENT)->ndims+1);
                 $DOPRIVALLOC();
                 for(i=0; i<$COMP(nthdim); i++) {
-                        $CHILD(dims)[i] = $PARENT(dims)[i];
-                        $PRIV(incs)[i] = $PARENT(dimincs)[i];
+                        $PDL(CHILD)->dims[i] = $PDL(PARENT)->dims[i];
+                        $PRIV(incs)[i] = $PDL(PARENT)->dimincs[i];
                 }
-                $CHILD(dims)[i] = $COMP(nsp);
-                $CHILD(dims)[i+1] = $PARENT(dims)[i] / $COMP(nsp);
-                $PRIV(incs)[i] = $PARENT(dimincs)[i];
-                $PRIV(incs)[i+1] = $PARENT(dimincs)[i] * $COMP(nsp);
+                $PDL(CHILD)->dims[i] = $COMP(nsp);
+                $PDL(CHILD)->dims[i+1] = $PDL(PARENT)->dims[i] / $COMP(nsp);
+                $PRIV(incs)[i] = $PDL(PARENT)->dimincs[i];
+                $PRIV(incs)[i+1] = $PDL(PARENT)->dimincs[i] * $COMP(nsp);
                 i++;
-                for(; i<$PARENT(ndims); i++) {
-                        $CHILD(dims)[i+1] = $PARENT(dims)[i];
-                        $PRIV(incs)[i+1] = $PARENT(dimincs)[i];
+                for(; i<$PDL(PARENT)->ndims; i++) {
+                        $PDL(CHILD)->dims[i+1] = $PDL(PARENT)->dims[i];
+                        $PRIV(incs)[i+1] = $PDL(PARENT)->dimincs[i];
                 }
                 $SETDIMS();
         ',
@@ -1797,14 +2021,14 @@ EOD
                 ',
         RedoDims => '
                 PDL_Indx nthc,i,j,flag;
-                $SETNDIMS($PARENT(ndims));
+                $SETNDIMS($PDL(PARENT)->ndims);
                 $DOPRIVALLOC();
                 $PRIV(offs) = 0;
                 nthc=0;
-                for(i=0; i<$PARENT(ndims); i++) {
+                for(i=0; i<$PDL(PARENT)->ndims; i++) {
                         flag=0;
-                        if($PARENT(nbroadcastids) > $COMP(id) && $COMP(id) >= 0 &&
-                           i == $PARENT(broadcastids[$COMP(id)])) {
+                        if($PDL(PARENT)->nbroadcastids > $COMP(id) && $COMP(id) >= 0 &&
+                           i == $PDL(PARENT)->broadcastids[$COMP(id])) {
                            nthc += $COMP(whichdims_count);
                         }
                         for(j=0; j<$COMP(whichdims_count); j++) {
@@ -1813,42 +2037,38 @@ EOD
                         if(flag) {
                                 continue;
                         }
-                        $CHILD(dims[nthc]) = $PARENT(dims[i]);
-                        $PRIV(incs[nthc]) = $PARENT(dimincs[i]);
+                        $PDL(CHILD)->dims[nthc] = $PDL(PARENT)->dims[i];
+                        $PRIV(incs[nthc]) = $PDL(PARENT)->dimincs[i];
                         nthc++;
                 }
                 for(i=0; i<$COMP(whichdims_count); i++) {
-                        int cdim,pdim;
+                        PDL_Indx cdim,pdim;
                         cdim = i +
-                         ($PARENT(nbroadcastids) > $COMP(id) && $COMP(id) >= 0?
-                          $PARENT(broadcastids[$COMP(id)]) : $PARENT(ndims))
+                         ($PDL(PARENT)->nbroadcastids > $COMP(id) && $COMP(id) >= 0?
+                          $PDL(PARENT)->broadcastids[$COMP(id)] : $PDL(PARENT)->ndims)
                           - $COMP(nrealwhichdims);
                         pdim = $COMP(whichdims[i]);
                         if(pdim == -1) {
-                                $CHILD(dims[cdim]) = 1;
+                                $PDL(CHILD)->dims[cdim] = 1;
                                 $PRIV(incs[cdim]) = 0;
                         } else {
-                                $CHILD(dims[cdim]) = $PARENT(dims[pdim]);
-                                $PRIV(incs[cdim]) = $PARENT(dimincs[pdim]);
+                                $PDL(CHILD)->dims[cdim] = $PDL(PARENT)->dims[pdim];
+                                $PRIV(incs[cdim]) = $PDL(PARENT)->dimincs[pdim];
                         }
                 }
                 $SETDIMS();
-                PDL_RETERROR(PDL_err, PDL->reallocbroadcastids($CHILD_PTR(),
-                                PDLMAX($COMP(id)+1, $PARENT(nbroadcastids))));
-                for(i=0; i<$CHILD(nbroadcastids)-1; i++) {
-                        $CHILD(broadcastids[i]) =
-                         ($PARENT(nbroadcastids) > i ?
-                          $PARENT(broadcastids[i]) : $PARENT(ndims)) +
+                PDL_RETERROR(PDL_err, PDL->reallocbroadcastids($PDL(CHILD),
+                                PDLMAX($COMP(id)+1, $PDL(PARENT)->nbroadcastids)));
+                for(i=0; i<$PDL(CHILD)->nbroadcastids-1; i++) {
+                        $PDL(CHILD)->broadcastids[i] =
+                         ($PDL(PARENT)->nbroadcastids > i ?
+                          $PDL(PARENT)->broadcastids[i] : $PDL(PARENT)->ndims) +
                          (i <= $COMP(id) ? - $COMP(nrealwhichdims) :
                           $COMP(whichdims_count) - $COMP(nrealwhichdims));
                 }
-                $CHILD(broadcastids[$CHILD(nbroadcastids)-1]) = $CHILD(ndims);
+                $PDL(CHILD)->broadcastids[$PDL(CHILD)->nbroadcastids-1] = $PDL(CHILD)->ndims;
                 ',
 );
-
-
-=head2 unbroadcast
-=cut
 
 pp_def(
         'unbroadcast',
@@ -1863,23 +2083,23 @@ EOD
         P2Child => 1,
         TwoWay => 1,
         AffinePriv => 1,
-        OtherPars => 'int atind;',
+        OtherPars => 'PDL_Indx atind;',
         RedoDims => '
-                int i;
-                $SETNDIMS($PARENT(ndims));
+                PDL_Indx i;
+                $SETNDIMS($PDL(PARENT)->ndims);
                 $DOPRIVALLOC();
                 $PRIV(offs) = 0;
-                for(i=0; i<$PARENT(ndims); i++) {
-                        int corc;
+                for(i=0; i<$PDL(PARENT)->ndims; i++) {
+                        PDL_Indx corc;
                         if(i<$COMP(atind)) {
                                 corc = i;
-                        } else if(i < $PARENT(broadcastids[0])) {
-                                corc = i + $PARENT(ndims)-$PARENT(broadcastids[0]);
+                        } else if(i < $PDL(PARENT)->broadcastids[0]) {
+                                corc = i + $PDL(PARENT)->ndims-$PDL(PARENT)->broadcastids[0];
                         } else {
-                                corc = i - $PARENT(broadcastids[0]) + $COMP(atind);
+                                corc = i - $PDL(PARENT)->broadcastids[0] + $COMP(atind);
                         }
-                        $CHILD(dims[corc]) = $PARENT(dims[i]);
-                        $PRIV(incs[corc]) = $PARENT(dimincs[i]);
+                        $PDL(CHILD)->dims[corc] = $PDL(PARENT)->dims[i];
+                        $PRIV(incs[corc]) = $PDL(PARENT)->dimincs[i];
                 }
                 $SETDIMS();
         ',
@@ -1981,7 +2201,6 @@ sub PDL::dice {
         return $outputPDL;
 }
 *dice = \&PDL::dice;
-
 
 =head2 dice_axis
 
@@ -2257,7 +2476,7 @@ EOD-slice
 #  inc[]    - maps argno to increment of slice range
 #  end[]    - maps argno to end index of slice range (inclusive)
 #
-        Comp => 'int nargs;
+        Comp => 'PDL_Indx nargs;
                  PDL_Indx odim[$COMP(nargs)];
                  PDL_Indx idim[$COMP(nargs)];
                  PDL_Indx idim_top;
@@ -2269,13 +2488,12 @@ EOD-slice
         AffinePriv => 1,
         TwoWay => 1,
         MakeComp => <<'SLICE-MC'
-                int nargs = 0;
+                PDL_Indx nargs = 0;
                 pdl_slice_args *argsptr = arglist;
                 while (argsptr) nargs++, argsptr = argsptr->next;
                 $COMP(nargs) = nargs;
                 $DOCOMPALLOC();
-                int i;
-                PDL_Indx idim, odim, imax;
+                PDL_Indx i, idim, odim, imax;
                 argsptr = arglist;
                 for(odim=idim=i=0; i<nargs; i++) {
                   /* Copy parsed values into the limits */
@@ -2294,7 +2512,7 @@ SLICE-MC
            RedoDims => q{
                   PDL_Indx i;
 		  PDL_Indx PDIMS;
-                  int o_ndims_extra = PDLMAX(0, $PARENT(ndims) - $COMP(idim_top));
+                  PDL_Indx o_ndims_extra = PDLMAX(0, $PDL(PARENT)->ndims - $COMP(idim_top));
 
                   /* slurped dims from the arg parsing, plus any extra broadcast dims */
                   $SETNDIMS( $COMP(odim_top) + o_ndims_extra );
@@ -2304,20 +2522,20 @@ SLICE-MC
                   for(i=0; i<$COMP(nargs); i++) {
                       /** Belt-and-suspenders **/
                       if( ($COMP(idim[i]) < 0)  && ($COMP(odim[i]) < 0)  ) {
-                        PDL->changed($CHILD_PTR(), PDL_PARENTDIMSCHANGED, 0);
+                        PDL->changed($PDL(CHILD), PDL_PARENTDIMSCHANGED, 0);
                         $CROAK("Hmmm, both dummy and squished -- this can never happen.  I quit.");
                       }
 
                       /** First handle dummy dims since there's no input from the parent **/
                       if( $COMP(idim[i]) < 0 ) {
                          /* dummy dim - offset or diminc. */
-                         $CHILD( dims[ $COMP(odim[i]) ] ) = $COMP(end[i]) - $COMP(start[i]) + 1;
+                         $PDL(CHILD)->dims[ $COMP(odim[i]) ] = $COMP(end[i]) - $COMP(start[i]) + 1;
                          $PRIV( incs[ $COMP(odim[i]) ] ) = 0;
                       } else {
                         /** This is not a dummy dim -- deal with a regular slice along it.     **/
                         /** Get parent dim size for this idim, and/or allow permissive slicing **/
-			PDL_Indx pdsize = $COMP(idim[i]) < $PARENT(ndims) ?
-			    $PARENT(dims)[$COMP(idim)[i]] : 1;
+			PDL_Indx pdsize = $COMP(idim[i]) < $PDL(PARENT)->ndims ?
+			    $PDL(PARENT)->dims[$COMP(idim)[i]] : 1;
 			PDL_Indx start = $COMP(start)[i];
 			PDL_Indx end = $COMP(end)[i];
 			if(
@@ -2327,16 +2545,16 @@ SLICE-MC
                           /* the values given when PDL::slice gets empty ndarray for index */
                           (start==1 && end==0 && $COMP(inc[i]) == 1)
                         ) {
-			  $CHILD(dims)[$COMP(odim)[i]] = 0;
+			  $PDL(CHILD)->dims[$COMP(odim)[i]] = 0;
 			  $PRIV(incs)[$COMP(odim)[i]] = 0;
 			} else {
 			  /** Regularize and bounds-check the start location **/
 			  if(start < 0)
 			    start += pdsize;
 			  if( start < 0 || start >= pdsize ) {
-			    PDL->changed($CHILD_PTR(), PDL_PARENTDIMSCHANGED, 0);
-			    if(i >= $PARENT( ndims )) {
-			      $CROAK("slice has too many dims (indexes dim %"IND_FLAG"; highest is %"IND_FLAG")",i,$PARENT( ndims )-1);
+			    PDL->changed($PDL(CHILD), PDL_PARENTDIMSCHANGED, 0);
+			    if(i >= $PDL(PARENT)->ndims) {
+			      $CROAK("slice has too many dims (indexes dim %"IND_FLAG"; highest is %"IND_FLAG")",i,$PDL(PARENT)->ndims-1);
 			    } else {
 			  $CROAK("slice starts out of bounds in pos %"IND_FLAG" (start is %"IND_FLAG"; source dim %"IND_FLAG" runs 0 to %"IND_FLAG")",i,start,$COMP(idim[i]),pdsize-1);
 			    }
@@ -2345,21 +2563,21 @@ SLICE-MC
 			    /* squished dim - just update the offset. */
 			    /* start is always defined and regularized if we are here here, since */
 			    /* both idim[i] and odim[i] can't be <0 */
-			    $PRIV(offs) += start * $PARENT( dimincs[ $COMP(idim[i]) ] );
+			    $PRIV(offs) += start * $PDL(PARENT)->dimincs[ $COMP(idim[i]) ];
 			  } else /* normal operation */ {
 			    /** Regularize and bounds-check the end location **/
 			    if(end<0) end += pdsize;
 			    if( end < 0 || end >= pdsize ) {
-			      PDL->changed($CHILD_PTR(), PDL_PARENTDIMSCHANGED, 0);
+			      PDL->changed($PDL(CHILD), PDL_PARENTDIMSCHANGED, 0);
 			      $CROAK("slice ends out of bounds in pos %"IND_FLAG" (end is %"IND_FLAG"; source dim %"IND_FLAG" runs 0 to %"IND_FLAG")",i,end,$COMP(idim[i]),pdsize-1);
 			    }
 			    /* regularize inc */
 			    PDL_Indx inc = $COMP(inc)[i];
 			    if(!inc)
 			      inc = (start <= end) ? 1 : -1;
-			    $CHILD( dims )[ $COMP(odim)[i] ] = PDLMAX(0, (end - start + inc) / inc);
-			    $PRIV(  incs )[ $COMP(odim)[i] ] = $PARENT(dimincs)[ $COMP(idim)[i] ] * inc;
-			    $PRIV(offs) += start * $PARENT( dimincs )[ $COMP(idim)[i] ];
+			    $PDL(CHILD)->dims[ $COMP(odim)[i] ] = PDLMAX(0, (end - start + inc) / inc);
+			    $PRIV(  incs )[ $COMP(odim)[i] ] = $PDL(PARENT)->dimincs[ $COMP(idim)[i] ] * inc;
+			    $PRIV(offs) += start * $PDL(PARENT)->dimincs[ $COMP(idim)[i] ];
 			  } /* end of normal slice case */
 			} /* end of trapped strange slice case */
                       } /* end of non-dummy slice case */
@@ -2368,8 +2586,8 @@ SLICE-MC
                   /* Now fill in broadcast dimensions as needed.  idim and odim persist from the parsing loop */
                   /* up above. */
                   for(i=0; i<o_ndims_extra; i++) {
-                    $CHILD(dims)[ $COMP(odim_top) + i ] = $PARENT(dims)[ $COMP(idim_top) + i ];
-                    $PRIV(incs)[ $COMP(odim_top) + i ] = $PARENT(dimincs)[ $COMP(idim_top) + i ];
+                    $PDL(CHILD)->dims[ $COMP(odim_top) + i ] = $PDL(PARENT)->dims[ $COMP(idim_top) + i ];
+                    $PRIV(incs)[ $COMP(odim_top) + i ] = $PDL(PARENT)->dimincs[ $COMP(idim_top) + i ];
                   }
 
                 $SETDIMS();

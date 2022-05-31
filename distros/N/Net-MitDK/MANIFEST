@@ -1,0 +1,21 @@
+MANIFEST
+README.md
+LICENSE
+Changes
+Makefile.PL
+lib/Net/MitDK.pm
+bin/mitdk2pop
+bin/mitdk-dump
+bin/mitdk-authenticate
+bin/mitdk-renew-lease
+bin/mitdk-install-win32
+t/01.t
+example/cron
+example/fetchmailrc
+example/procmailrc.forward.simple
+example/procmailrc.forward.srs
+example/procmailrc.local
+example/mitdk2pop.debian
+example/mitdk2pop.freebsd
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

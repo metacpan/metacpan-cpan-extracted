@@ -59,11 +59,11 @@
    "provides" : {
       "Bencher::Scenario::Games::Wordlist::startup" : {
          "file" : "lib/Bencher/Scenario/Games/Wordlist/startup.pm",
-         "version" : "0.050"
+         "version" : "0.051"
       },
       "Bencher::Scenarios::Games::Wordlist" : {
          "file" : "lib/Bencher/Scenarios/Games/Wordlist.pm",
-         "version" : "0.050"
+         "version" : "0.051"
       }
    },
    "release_status" : "stable",
@@ -78,7 +78,7 @@
          "web" : "https://github.com/perlancar/perl-Bencher-Scenarios-Games-Wordlist"
       }
    },
-   "version" : "0.050",
+   "version" : "0.051",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

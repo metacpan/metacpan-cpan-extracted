@@ -2,7 +2,7 @@ package Log::OK;
 
 use strict;
 use warnings;
-use version; our $VERSION=version->declare("v0.1.1");
+use version; our $VERSION=version->declare("v0.1.2");
 
 use Carp qw<croak>;
 use constant::more ();
@@ -25,7 +25,8 @@ sub import {
 	my $p=shift;
 	my $hr=shift;
 
-	return unless $hr;
+	#return unless $hr;
+	$hr={} unless $hr;
 
 	my $caller=caller;
 	

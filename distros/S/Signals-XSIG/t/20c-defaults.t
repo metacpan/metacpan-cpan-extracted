@@ -1,5 +1,6 @@
 use Signals::XSIG;
 use Test::More tests => 18;
+use lib '.'; # 5.26 compatibility
 use strict;
 use warnings;
 use POSIX ();
@@ -39,5 +40,12 @@ foreach my $signal (@signals) {
 }
 
 if (@failed && @ARGV == 0) {
+    no warnings 'once';
+    diag "Failures detected with PAUSE_TIME=$main::PAUSE_TIME";
+    diag "If these are intermittent failures, they might go away if you";
+    diag "increase the pause time. Try";
+    diag "";
+    diag "     PAUSE_TIME=10 make test";
+    diag "";
     on_failure_recommend_spike(@failed);
 }

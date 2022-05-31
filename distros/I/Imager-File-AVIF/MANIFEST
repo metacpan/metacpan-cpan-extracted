@@ -1,0 +1,13 @@
+AVIF.pm
+AVIF.xs
+imavif.c
+imavif.h
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/00load.t
+t/10image.t
+t/90pod.t
+t/91manifest.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

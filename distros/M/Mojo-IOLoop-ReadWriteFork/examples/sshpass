@@ -1,0 +1,54 @@
+#!/usr/bin/env perl
+use Mojo::Base -strict;
+
+use IO::Handle;
+use Mojo::IOLoop::ReadWriteFork;
+use Mojo::Util qw(getopt);
+use Term::ReadKey qw(ReadMode);
+
+my $password;
+getopt('f=s' => \&read_password_from_file, 'e' => \&read_password_from_env);
+abort("Can't start without valid -e or -f <file>") unless $password;
+run_program(@ARGV);
+
+sub abort                  { warn "$_[0]\n"; exit($! || 1) }
+sub read_password_from_env { $password = $ENV{SSHPASS} }
+
+sub read_password_from_file {
+  my ($name, $file) = @_;
+  open my $FH, '<', $file or abort("Can't read $file: $!");
+  $password = readline $FH;
+  chomp $password;
+}
+
+sub run_program {
+  my @program = @_;
+  my $rwf     = Mojo::IOLoop::ReadWriteFork->new->conduit({clone_winsize_from => \*STDIN, type => 'pty3'});
+
+  STDIN->binmode;
+  my $stdin = Mojo::IOLoop::Stream->new(\*STDIN);
+  $rwf->ioloop->stream($stdin);
+  $stdin->on(error => sub { abort($_[1]) });
+  $stdin->on(read  => sub { $rwf->write($_[1]) });
+  $rwf->once(stdout => sub { ReadMode 5 });
+
+  $rwf->on(error  => sub { abort($_[1]) });
+  $rwf->on(pty    => \&write_password);
+  $rwf->on(stderr => \&rwf_stderr);
+  $rwf->on(stdout => \&rwf_stdout);
+  $rwf->run_p(@program)->catch(sub { warn @_ })->wait;
+}
+
+sub rwf_stderr { STDERR->binmode; STDERR->syswrite($_[1]) }
+sub rwf_stdout { STDOUT->binmode; STDOUT->syswrite($_[1]) }
+
+sub write_password {
+  my ($rwf, $chunk) = @_;
+  return unless $chunk =~ m![Pp]assword:!;
+
+  state $seen_password = 0;
+  abort("Can't retry same password") if $seen_password++;
+  $rwf->write("$password\n");
+}
+
+END { ReadMode 0 }

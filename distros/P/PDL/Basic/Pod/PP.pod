@@ -95,7 +95,10 @@ Add extra XS code to the generated XS file
 =for ref
 
 Add extra C<$MACRO()> definitions for these functions. Note these generate
-C code.
+C code. As of 2.080, they will be passed the list of arguments they were
+called with, rather than a single string, split like the C pre-processor
+on commas except if in C<""> or C<()>, with leading and trailing
+whitespace removed.
 
 =for example
 
@@ -1551,23 +1554,6 @@ the following macros are provided. They are named assuming you will have
 the first parameter as C<PARENT> and the second as C<CHILD>, which is
 the case if you passed a true C<P2Child> value, which you will basically
 always want to do for this scenario.
-
-=over
-
-=item $CHILD_PTR()
-
-=item $PARENT_PTR()
-
-These expand to a C<pdl *> pointer, e.g. to pass to a PDL API function.
-
-=item $CHILD()
-
-=item $PARENT()
-
-These expand to a lookup into C<pdl> struct, e.g. C<$CHILD(ndims)>
-looks up the C<ndims> value for the child parameter.
-
-=back
 
 =head3 RedoDims generated from EquivPDimExpr and EquivDimCheck
 

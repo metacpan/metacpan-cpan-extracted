@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Rubric::DBI;
+package Rubric::DBI 0.157;
 # ABSTRACT: Rubric's subclass of Class::DBI
-$Rubric::DBI::VERSION = '0.156';
+
 #pod =head1 DESCRIPTION
 #pod
 #pod Rubric::DBI subclasses Class::DBI.  It sets the connection by using the DSN
@@ -60,12 +60,21 @@ Rubric::DBI - Rubric's subclass of Class::DBI
 
 =head1 VERSION
 
-version 0.156
+version 0.157
 
 =head1 DESCRIPTION
 
 Rubric::DBI subclasses Class::DBI.  It sets the connection by using the DSN
 retrieved from Rubric::Config.
+
+=head1 PERL VERSION
+
+This code is effectively abandonware.  Although releases will sometimes be made
+to update contact info or to fix packaging flaws, bug reports will mostly be
+ignored.  Feature requests are even more likely to be ignored.  (If someone
+takes up maintenance of this code, they will presumably remove this notice.)
+This means that whatever version of perl is currently required is unlikely to
+change -- but also that it might change at any new maintainer's whim.
 
 =head1 METHODS
 
@@ -76,7 +85,7 @@ longer needed.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -9,6 +9,7 @@ README
 README.md
 Session.vim
 cpanfile
+cpanfile.snapshot
 dzil-generated-cpanfile
 lib/Git/MoreHooks.pm
 lib/Git/MoreHooks/CheckCommitAuthorFromMailmap.pm
@@ -24,7 +25,6 @@ t/CheckPerl-functions.t
 t/CheckPerl-hooks.t
 t/GitRepoAdmin-functions.t
 t/GitRepoAdmin-load.t
-t/TriggerJenkins-functions.t
 xt/author/distmeta.t
 xt/author/eol.t
 xt/author/pod-coverage.t

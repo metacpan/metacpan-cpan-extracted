@@ -1,5 +1,8 @@
 Revision history for Number::Tolerant
 
+1.709     2022-05-29 15:46:10-04:00 America/New_York
+        - update release metadata
+
 1.708     2015-11-01 14:33:27-05:00 America/New_York
         [MAYBE JUST POSSIBLY A BREAKING CHANGE]
         - ...but probably not

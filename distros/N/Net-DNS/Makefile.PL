@@ -1,26 +1,28 @@
 #
-# $Id: Makefile.PL 1814 2020-10-14 21:49:16Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1864 2022-04-14 15:18:49Z willem $	-*-perl-*-
 #
 
-use 5.008008;
+use 5.008009;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 my $MM = $ExtUtils::MakeMaker::VERSION;
 
+my $distro = 'Net::DNS';
+my $module = join '/', 'lib', split /::/, "$distro.pm";
+my @author = ( 'Dick Franks', 'Olaf Kolkman', 'Michael Fuhr' );
+
 
 # See perldoc ExtUtils::MakeMaker for details of how to influence
 # the contents of the Makefile that is written.
 
-my @author = ( 'Dick Franks', 'Olaf Kolkman', 'Michael Fuhr' );
-
 my %metadata = (
-	NAME		   => 'Net::DNS',
-	VERSION_FROM	   => 'lib/Net/DNS.pm',
-	ABSTRACT_FROM	   => 'lib/Net/DNS.pm',
+	NAME		   => "$distro",
+	VERSION_FROM	   => "$module",
+	ABSTRACT_FROM	   => "$module",
 	AUTHOR		   => $MM < 6.58 ? "$author[0] et al" : [@author],
 	LICENSE		   => 'mit',
-	MIN_PERL_VERSION   => '5.008008',
+	MIN_PERL_VERSION   => '5.008009',
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => 6.66,
 		'Getopt::Long'	      => 2.43,
@@ -30,6 +32,7 @@ my %metadata = (
 	TEST_REQUIRES => {
 		'File::Find'	=> 1.05,
 		'File::Spec'	=> 0.86,
+		'IO::File'	=> 1.08,
 		'Test::Builder' => 0,
 		'Test::More'	=> 0,
 		} );
@@ -135,7 +138,7 @@ EOT
 #
 # Enable tests if we have internet connection	(code lifted from LWP)
 #
-use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.38; 1;';	## no critic
+use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.38; 1;';    ## no critic
 require IO::Socket::INET unless USE_SOCKET_IP;
 
 if ($online_tests) {
@@ -206,6 +209,8 @@ WriteMakefile(				## Makefile & distribution metadata
 	clean	   => {FILES	  => "@debris"},
 	);
 
+exit;
+
 
 package MY;				## customise generated Makefile
 
@@ -238,9 +243,10 @@ sub install {
 		s|([/])[/]+|$1|g;				# remove gratuitous //s
 	}
 
-	my @version = ( 'version', eval { require Net::DNS; $Net::DNS::VERSION; } );
+	eval "require $distro";		## no critic
+	my @version = ( 'version', eval { $distro->VERSION } );
 
-	my $nameregex = '\W+Net\W+DNS.pm$';
+	my $nameregex = join '\W+', '', split /::/, "$distro.pm\$";
 	my @installed = grep { $_ && m/$nameregex/io } values %INC;
 	my %occluded;
 
@@ -261,7 +267,7 @@ sub install {
 	my $message;
 	warn $message = <<"AMEN";
 ##
-##	The install location for this version of Net::DNS differs
+##	The install location for this version of $distro differs
 ##	from the existing @version in your perl library at
 ##	@installed
 ##

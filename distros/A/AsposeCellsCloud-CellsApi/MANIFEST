@@ -266,6 +266,8 @@ lib/AsposeCellsCloud/Object/AutoShapeResponse.pm
 lib/AsposeCellsCloud/Object/AutoShapes.pm
 lib/AsposeCellsCloud/Object/AutoShapesResponse.pm
 lib/AsposeCellsCloud/Object/Border.pm
+lib/AsposeCellsCloud/Object/BarcodeResponse.pm
+lib/AsposeCellsCloud/Object/BarcodeResponseList.pm
 lib/AsposeCellsCloud/Object/BatchConvertRequest.pm
 lib/AsposeCellsCloud/Object/CalculationOptions.pm
 lib/AsposeCellsCloud/Object/Cell.pm

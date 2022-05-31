@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 
+BEGIN { $ENV{ALGORITHM_QUADTREE_BACKEND} = 'Algorithm::QuadTree::PP'; }
+
 use Test::More;
 use Algorithm::QuadTree;
 

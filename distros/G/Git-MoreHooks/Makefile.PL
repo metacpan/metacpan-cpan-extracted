@@ -43,10 +43,12 @@ my %WriteMakefileArgs = (
     "Git::Hooks::Test" => 0,
     "Git::Repository" => 0,
     "Log::Any::Adapter" => 0,
+    "Test2::Require::Module" => 0,
     "Test2::V0" => 0,
-    "Test::Git" => 0
+    "Test::Git" => 0,
+    "Test::Requires::Git" => 0
   },
-  "VERSION" => "0.015",
+  "VERSION" => "0.016",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -73,8 +75,10 @@ my %FallbackPrereqs = (
   "Params::Validate" => 0,
   "Path::Tiny" => 0,
   "Template" => 0,
+  "Test2::Require::Module" => 0,
   "Test2::V0" => 0,
   "Test::Git" => 0,
+  "Test::Requires::Git" => 0,
   "Text::Glob" => 0,
   "feature" => 0,
   "strict" => 0,

@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.69 {
+package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.70 {
 
   use 5.020;
   use Moose;
@@ -200,6 +200,7 @@ package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.69 {
     {
       foreach my $policy (grep { $_ ne '_' } sort keys Config::INI::Reader->read_string($perlcritic_file->content)->%*)
       {
+        next if $policy =~ /^-/;
         $self->zilla->register_prereqs({
           type  => 'recommends',
           phase => 'develop',
@@ -292,7 +293,7 @@ Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs - Special prereq handling
 
 =head1 VERSION
 
-version 2.69
+version 2.70
 
 =head1 SYNOPSIS
 

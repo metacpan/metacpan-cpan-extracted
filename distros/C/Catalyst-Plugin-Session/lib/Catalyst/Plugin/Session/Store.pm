@@ -1,9 +1,10 @@
-#!/usr/bin/perl
-
 package Catalyst::Plugin::Session::Store;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.42';
+$VERSION =~ tr/_//d;
 
 __PACKAGE__;
 
@@ -27,7 +28,7 @@ This class doesn't actually provide any functionality, but when the
 C<Catalyst::Plugin::Session> module sets up it will check to see that
 C<< YourApp->isa("Catalyst::Plugin::Session::Store") >>. When you write
 a session storage plugin you should subclass this module for this
-reason. This documentation is intended for authors of session storage 
+reason. This documentation is intended for authors of session storage
 plugins, not for end users.
 
 =head1 WRITING STORE PLUGINS
@@ -66,7 +67,7 @@ The only assurance stores are required to make is that given
 
     $c->store_session_data( $x, $y );
 
-for any $x, 
+for any $x,
 
     $y == $c->get_session_data( $x )
 

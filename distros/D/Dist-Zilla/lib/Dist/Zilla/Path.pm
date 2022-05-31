@@ -1,4 +1,4 @@
-package Dist::Zilla::Path 6.024;
+package Dist::Zilla::Path 6.025;
 # ABSTRACT: a helper to get Path::Tiny objects
 
 # BEGIN BOILERPLATE
@@ -39,7 +39,9 @@ sub file {
   my ($self, @file) = @_;
 
   my ($package, $pmfile, $line) = caller;
-  unless ($warned{ $pmfile, $line }++) {
+
+  my $key = join qq{\0}, $pmfile, $line;
+  unless ($warned{ $key }++) {
     Carp::carp("->file called on a Dist::Zilla::Path object; this will cease to work in Dist::Zilla v7; downstream code should be updated to use Path::Tiny API, not Path::Class");
   }
 
@@ -68,7 +70,7 @@ Dist::Zilla::Path - a helper to get Path::Tiny objects
 
 =head1 VERSION
 
-version 6.024
+version 6.025
 
 =head1 PERL VERSION
 
@@ -88,7 +90,7 @@ Ricardo SIGNES 😏 <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

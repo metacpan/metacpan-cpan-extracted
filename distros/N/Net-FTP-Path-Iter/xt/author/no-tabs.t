@@ -12,6 +12,7 @@ my @files = (
     'lib/Net/FTP/Path/Iter/Entry.pm',
     'lib/Net/FTP/Path/Iter/File.pm',
     't/00-compile.t',
+    't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/ftp.t'
 );

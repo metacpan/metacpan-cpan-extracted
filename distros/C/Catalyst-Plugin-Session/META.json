@@ -1,0 +1,81 @@
+{
+   "abstract" : "Generic Session plugin - ties together server side storage and client side state required to maintain session data.",
+   "author" : [
+      "Yuval Kogman <nothingmuch@woobling.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Catalyst-Plugin-Session",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {},
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Runtime" : "5.71001",
+            "Digest" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "HTML::Entities" : "0",
+            "List::Util" : "0",
+            "MRO::Compat" : "0",
+            "Moose" : "0.76",
+            "MooseX::Emulate::Class::Accessor::Fast" : "0.00801",
+            "Object::Signature" : "0",
+            "Test::More" : "0.88",
+            "namespace::clean" : "0.10",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Plack::Test" : "0",
+            "Test::Deep" : "0",
+            "Test::Needs" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Catalyst-Plugin-Session@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Plugin-Session"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/perl-catalyst/Catalyst-Plugin-Session.git",
+         "web" : "https://github.com/perl-catalyst/Catalyst-Plugin-Session"
+      }
+   },
+   "version" : "0.42",
+   "x_breaks" : {
+      "Catalyst::Plugin::Session::State::Cookie" : "< 0.03",
+      "Catalyst::Plugin::Session::State::URI" : "< 0.02"
+   },
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

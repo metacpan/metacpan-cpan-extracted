@@ -1,0 +1,87 @@
+#!env perl
+use strict;
+use warnings;
+#BEGIN { $ENV{IO_LAMBDA_DEBUG} = 'http=2' };
+use Net::MitDK;
+use Getopt::Long;
+
+my %opt = (
+	profile    => 'default',
+	'list-messages' => 0,
+	output     => 'mitdk.mbox',
+	n          => undef,
+	help       => 0,
+);
+
+my $version = 0.01;
+
+sub usage
+{
+	print <<USAGE;
+
+$0
+
+   --profile       - Profile name ( $opt{profile} )
+   --list-messages - Display list of available messages
+   --output        - output mail box ( $opt{output} )
+   -n NUMBER       - dump only message NUMBER
+   --help 
+
+USAGE
+	exit 1;
+}
+
+GetOptions(\%opt,
+	"help|h",
+	"profile|p=s",
+	"list-messages|l",
+	"output|o=s",
+	"n=i",
+) or usage;
+
+$opt{help} and usage();
+
+
+my ($e, $error) = Net::MitDK->new(profile => $opt{profile});
+die "error: $error\n" unless $e;
+
+print "Logging in...\n";
+my ($m);
+
+($m, $error) = $e->mailboxes->wait;
+die "error: $error\n" if defined $error;
+
+print "Getting list of folders...\n";
+my ($folders, $list, $msg);
+($folders, $error) = $e->folders->wait;
+die "error: $error\n" if defined $error;
+
+print "Getting list of messages in Inbox...\n";
+($list, $error) = $e->list_all_messages(undef, $folders->{Inbox}->{id})->wait;
+die "error: $error\n" if defined $error;
+
+print "Got ", scalar(@$list), " messages ... \n";
+if ( $opt{'list-messages'} ) {
+	my $n = 0;
+	for my $msg ( @$list ) {
+		$n++;
+		$msg->{createdDateTime} =~ m/^(.*)T/;
+		print "#$n $1: $msg->{label} from $msg->{sender}->{label}\n";
+	}
+	exit;
+}
+
+open F, ">", $opt{output} or die "Cannot write $opt{output}:$!";
+
+my $n = 0;
+for my $msg ( @$list ) {
+	$n++;
+	next if defined $opt{n} && $opt{n} != $n;
+	print "Fetching #$n: $msg->{label} from $msg->{receivedDateTime}...\n";
+	my ( $attachments, $error ) = $e->fetch_message_and_attachments( $msg )-> wait;
+	die "error: $error\n" if defined $error;
+	print F $e->assemble_mail($msg, $attachments);
+}
+
+close F;
+print "Saved in $opt{output} as a mailbox. Open in your mail agent an enjoy!\n";

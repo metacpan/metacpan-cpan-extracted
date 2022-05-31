@@ -64,7 +64,7 @@ none
 
 
 
-#line 133 "ops.pd"
+#line 132 "ops.pd"
 
 {
   my ($foo, $overload_sub);
@@ -130,7 +130,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 133 "ops.pd"
+#line 132 "ops.pd"
 
 {
   my ($foo, $overload_sub);
@@ -196,7 +196,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 133 "ops.pd"
+#line 132 "ops.pd"
 
 {
   my ($foo, $overload_sub);
@@ -262,7 +262,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 133 "ops.pd"
+#line 132 "ops.pd"
 
 {
   my ($foo, $overload_sub);
@@ -328,7 +328,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 133 "ops.pd"
+#line 132 "ops.pd"
 
 {
   my ($foo, $overload_sub);
@@ -390,7 +390,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 133 "ops.pd"
+#line 132 "ops.pd"
 
 {
   my ($foo, $overload_sub);
@@ -452,7 +452,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 133 "ops.pd"
+#line 132 "ops.pd"
 
 {
   my ($foo, $overload_sub);
@@ -514,7 +514,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 133 "ops.pd"
+#line 132 "ops.pd"
 
 {
   my ($foo, $overload_sub);
@@ -576,7 +576,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 133 "ops.pd"
+#line 132 "ops.pd"
 
 {
   my ($foo, $overload_sub);
@@ -638,7 +638,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 133 "ops.pd"
+#line 132 "ops.pd"
 
 {
   my ($foo, $overload_sub);
@@ -700,7 +700,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 133 "ops.pd"
+#line 132 "ops.pd"
 
 {
   my ($foo, $overload_sub);
@@ -766,7 +766,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 133 "ops.pd"
+#line 132 "ops.pd"
 
 {
   my ($foo, $overload_sub);
@@ -832,7 +832,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 133 "ops.pd"
+#line 132 "ops.pd"
 
 {
   my ($foo, $overload_sub);
@@ -898,7 +898,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 133 "ops.pd"
+#line 132 "ops.pd"
 
 {
   my ($foo, $overload_sub);
@@ -964,7 +964,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 133 "ops.pd"
+#line 132 "ops.pd"
 
 {
   my ($foo, $overload_sub);
@@ -1030,7 +1030,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 309 "ops.pd"
+#line 308 "ops.pd"
 
 BEGIN { $OVERLOADS{'~'} = sub { PDL::bitnot($_[0]) } }
 #line 1037 "Ops.pm"
@@ -1079,7 +1079,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 242 "ops.pd"
+#line 241 "ops.pd"
 
 {
   my ($foo, $overload_sub);
@@ -1145,7 +1145,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 242 "ops.pd"
+#line 241 "ops.pd"
 
 {
   my ($foo, $overload_sub);
@@ -1207,7 +1207,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 242 "ops.pd"
+#line 241 "ops.pd"
 
 {
   my ($foo, $overload_sub);
@@ -1273,7 +1273,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 242 "ops.pd"
+#line 241 "ops.pd"
 
 {
   my ($foo, $overload_sub);
@@ -1335,7 +1335,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 309 "ops.pd"
+#line 308 "ops.pd"
 
 BEGIN { $OVERLOADS{'sqrt'} = sub { PDL::sqrt($_[0]) } }
 #line 1342 "Ops.pm"
@@ -1384,7 +1384,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 309 "ops.pd"
+#line 308 "ops.pd"
 
 BEGIN { $OVERLOADS{'sin'} = sub { PDL::sin($_[0]) } }
 #line 1391 "Ops.pm"
@@ -1433,7 +1433,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 309 "ops.pd"
+#line 308 "ops.pd"
 
 BEGIN { $OVERLOADS{'cos'} = sub { PDL::cos($_[0]) } }
 #line 1440 "Ops.pm"
@@ -1482,7 +1482,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 309 "ops.pd"
+#line 308 "ops.pd"
 
 BEGIN { $OVERLOADS{'!'} = sub { PDL::not($_[0]) } }
 #line 1489 "Ops.pm"
@@ -1531,7 +1531,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 309 "ops.pd"
+#line 308 "ops.pd"
 
 BEGIN { $OVERLOADS{'exp'} = sub { PDL::exp($_[0]) } }
 #line 1538 "Ops.pm"
@@ -1580,7 +1580,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 309 "ops.pd"
+#line 308 "ops.pd"
 
 BEGIN { $OVERLOADS{'log'} = sub { PDL::log($_[0]) } }
 #line 1587 "Ops.pm"
@@ -1970,7 +1970,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 571 "ops.pd"
+#line 570 "ops.pd"
 
 
 =head2 abs
@@ -1986,14 +1986,14 @@ sub PDL::abs { $_[0]->type->real ? goto &PDL::_rabs : goto &PDL::_cabs }
 
 
 
-#line 583 "ops.pd"
+#line 582 "ops.pd"
 
 BEGIN { $OVERLOADS{'abs'} = sub { PDL::abs($_[0]) } }
 #line 1993 "Ops.pm"
 
 
 
-#line 585 "ops.pd"
+#line 584 "ops.pd"
 
 
 =head2 abs2
@@ -2097,7 +2097,7 @@ sub PDL::i2C ($) {
 
 
 
-#line 628 "ops.pd"
+#line 627 "ops.pd"
 
 # This is to used warn if an operand is non-numeric or non-PDL.
 sub warn_non_numeric_op_wrapper {

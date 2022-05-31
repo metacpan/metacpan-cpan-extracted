@@ -7,7 +7,7 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-03-20'; # DATE
 our $DIST = 'Bencher-Scenarios-Games-Wordlist'; # DIST
-our $VERSION = '0.050'; # VERSION
+our $VERSION = '0.051'; # VERSION
 
 our $scenario = {
     summary => 'Benchmark startup overhead of Games::Word::Wordlist::* modules',
@@ -38,7 +38,7 @@ Bencher::Scenarios::Games::Wordlist
 
 =head1 VERSION
 
-This document describes version 0.050 of Bencher::Scenarios::Games::Wordlist (from Perl distribution Bencher-Scenarios-Games-Wordlist), released on 2022-03-20.
+This document describes version 0.051 of Bencher::Scenarios::Games::Wordlist (from Perl distribution Bencher-Scenarios-Games-Wordlist), released on 2022-03-20.
 
 =head1 DESCRIPTION
 

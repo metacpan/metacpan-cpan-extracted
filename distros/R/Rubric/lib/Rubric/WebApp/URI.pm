@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Rubric::WebApp::URI;
+package Rubric::WebApp::URI 0.157;
 # ABSTRACT: URIs for Rubric web requests
-$Rubric::WebApp::URI::VERSION = '0.156';
+
 #pod =head1 DESCRIPTION
 #pod
 #pod This module provides methods for generating the URIs for Rubric requests.
@@ -233,11 +233,20 @@ Rubric::WebApp::URI - URIs for Rubric web requests
 
 =head1 VERSION
 
-version 0.156
+version 0.157
 
 =head1 DESCRIPTION
 
 This module provides methods for generating the URIs for Rubric requests.
+
+=head1 PERL VERSION
+
+This code is effectively abandonware.  Although releases will sometimes be made
+to update contact info or to fix packaging flaws, bug reports will mostly be
+ignored.  Feature requests are even more likely to be ignored.  (If someone
+takes up maintenance of this code, they will presumably remove this notice.)
+This means that whatever version of perl is currently required is unlikely to
+change -- but also that it might change at any new maintainer's whim.
 
 =head1 METHODS
 
@@ -311,7 +320,7 @@ URI for documentation page.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

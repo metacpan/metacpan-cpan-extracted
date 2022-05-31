@@ -288,5 +288,3 @@ test_v_thread_dimensions();
 print "\n";
 done_testing();
 # end of t/03_setops.t
-
-

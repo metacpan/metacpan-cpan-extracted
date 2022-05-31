@@ -3,14 +3,14 @@
 use strict;
 use warnings;
 
-use Test::Shared::Fixture::Wikibase::Datatype::Value::Item::Wikidata::Human;
+use Test::Shared::Fixture::Wikibase::Datatype::Value::Item::Wikidata::Male;
 use Wikibase::Datatype::Print::Value::Item;
 
 # Object.
-my $obj = Test::Shared::Fixture::Wikibase::Datatype::Value::Item::Wikidata::Human->new;
+my $obj = Test::Shared::Fixture::Wikibase::Datatype::Value::Item::Wikidata::Male->new;
 
 # Print out.
 print scalar Wikibase::Datatype::Print::Value::Item::print($obj);
 
 # Output:
-# Q5
+# Q6581097

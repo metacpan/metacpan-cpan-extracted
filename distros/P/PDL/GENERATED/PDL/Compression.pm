@@ -73,7 +73,7 @@ use warnings;
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 948 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -142,7 +142,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 sub PDL::rice_compress {
     my $in = shift;
@@ -168,14 +168,14 @@ sub PDL::rice_compress {
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 *rice_compress = \&PDL::rice_compress;
 #line 175 "Compression.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 948 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -206,7 +206,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 sub PDL::rice_expand {
     my $squished = shift;
@@ -221,7 +221,7 @@ sub PDL::rice_expand {
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 *rice_expand = \&PDL::rice_expand;
 #line 228 "Compression.pm"

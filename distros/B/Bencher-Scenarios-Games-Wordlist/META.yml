@@ -20,10 +20,10 @@ name: Bencher-Scenarios-Games-Wordlist
 provides:
   Bencher::Scenario::Games::Wordlist::startup:
     file: lib/Bencher/Scenario/Games/Wordlist/startup.pm
-    version: '0.050'
+    version: '0.051'
   Bencher::Scenarios::Games::Wordlist:
     file: lib/Bencher/Scenarios/Games/Wordlist.pm
-    version: '0.050'
+    version: '0.051'
 requires:
   Games::Word::Wordlist::Enable: '0'
   Games::Word::Wordlist::SGB: '0'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenarios-Games-Wordlist
   homepage: https://metacpan.org/release/Bencher-Scenarios-Games-Wordlist
   repository: git://github.com/perlancar/perl-Bencher-Scenarios-Games-Wordlist.git
-version: '0.050'
+version: '0.051'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

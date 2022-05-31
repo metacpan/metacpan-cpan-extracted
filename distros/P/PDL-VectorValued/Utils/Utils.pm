@@ -13,7 +13,7 @@ use DynaLoader;
 
 
 
-   $PDL::VectorValued::Utils::VERSION = 1.0.20;
+   $PDL::VectorValued::Utils::VERSION = 1.0.21;
    @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::VectorValued::Utils $VERSION;

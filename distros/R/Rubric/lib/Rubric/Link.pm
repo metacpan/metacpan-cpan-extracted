@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Rubric::Link;
+package Rubric::Link 0.157;
 # ABSTRACT: a link (URI) against which entries have been made
-$Rubric::Link::VERSION = '0.156';
+
 #pod =head1 DESCRIPTION
 #pod
 #pod This class provides an interface to links in the Rubric.  It inherits from
@@ -131,12 +131,21 @@ Rubric::Link - a link (URI) against which entries have been made
 
 =head1 VERSION
 
-version 0.156
+version 0.157
 
 =head1 DESCRIPTION
 
 This class provides an interface to links in the Rubric.  It inherits from
 Rubric::DBI, which is a Class::DBI class.
+
+=head1 PERL VERSION
+
+This code is effectively abandonware.  Although releases will sometimes be made
+to update contact info or to fix packaging flaws, bug reports will mostly be
+ignored.  Feature requests are even more likely to be ignored.  (If someone
+takes up maintenance of this code, they will presumably remove this notice.)
+This means that whatever version of perl is currently required is unlikely to
+change -- but also that it might change at any new maintainer's whim.
 
 =head1 COLUMNS
 
@@ -176,7 +185,7 @@ stringification for Rubric::Link objects.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

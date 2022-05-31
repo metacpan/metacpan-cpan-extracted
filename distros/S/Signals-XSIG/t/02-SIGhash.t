@@ -11,6 +11,8 @@ use warnings;
 
 # when we set %SIG directly, are the installed signal handlers
 # reflected in %XSIG?
+#
+#    %SIG = (signal1 => handler1, signal2 => handler2, ...)
 
 ok(tied %SIG, "\%SIG is tied");
 

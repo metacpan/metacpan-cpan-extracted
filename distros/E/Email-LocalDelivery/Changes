@@ -1,5 +1,8 @@
 Release history for Email-LocalDelivery
 
+1.201     2022-05-29 15:36:53-04:00 America/New_York
+          update dist metadata
+
 1.200     2013-08-08 21:24:39 America/New_York
           crank the version number *way* up to bring all the module versions in
           sync without rolling any of them back

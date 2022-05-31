@@ -1,0 +1,307 @@
+#!perl
+use strict;
+use warnings;
+# BEGIN { $ENV{IO_LAMBDA_DEBUG} = 'http=2' }
+use IO::Socket::INET;
+use IO::Lambda qw(:all);
+use IO::Lambda::HTTP::Client qw(http_request);
+use IO::Lambda::HTTP::Server;
+use IO::Lambda::HTTP::UserAgent;
+use URI;
+use URI::QueryParam;
+use URI::Escape;
+use HTTP::Request;
+use HTTP::Request::Common;
+use HTTP::Response;
+use MIME::Base64 qw(encode_base64url);
+use Digest::SHA qw(sha256);
+use JSON::XS qw(decode_json);
+use Net::MitDK;
+
+$|++;
+
+my $win32_install = (( $ARGV[0] // '' ) eq '--win32-install');
+my $port = 9999;
+my ($server, $error, $e);
+my ($state, $code_challenge, $code_verifier, $nonce);
+my $ua = IO::Lambda::HTTP::UserAgent->new;
+my $mgr = Net::MitDK::ProfileManager->new;
+my $profile = [$mgr->list]->[0] // 'default';
+
+sub socket_check
+{
+	return IO::Socket::INET-> new(
+		PeerAddr => '127.0.0.1',
+		PeerPort => shift,
+		Proto    => 'tcp',
+	);
+}
+
+sub randstr($) { encode_base64url(join('', map { chr rand(255) } 1..$_[0])) }
+sub init_oauth
+{
+	$state          = randstr(23);
+	$nonce          = randstr(93);
+	$code_verifier  = randstr(93);
+	$code_challenge = encode_base64url(sha256($code_verifier));
+}
+
+sub mailcheck { '<p><a href="/testmail">Test MitDK login</a>'  }
+sub quit      { '<p><a href="/abort">Quit the wizard</a><p>' }
+sub main      { '<p><a href="/">Go back to the start</a><p>' }
+sub profile   { '<p><a href="/profile">Change profile (' . $profile . ')</a><p>' }
+
+sub html($)
+{
+	my $html = $_[0];
+	$html = "<html><body>$html</body></html>";
+	HTTP::Response->new( 200, "OK", [
+		'Content-Type'   => 'text/html',
+		'Content-Length' => length($html),
+	], $html)
+}
+
+sub h2($)      { html "<h2>$_[0]</h2>" . main . quit }
+sub h2x($$)    { html "<h2>$_[0]</h2><p>$_[1]" . main . quit } 
+sub error($)   { h2x( 'Error', $_[0] ) }
+
+sub handle_saml
+{
+	my $resp = shift;
+
+	return error "Cannot get NemID ticket" unless $resp->content =~ /name="(SAMLResponse)" value="(.*?)"/;
+	my $saml = "$1=" . uri_escape($2);
+
+	$resp = $ua->request( HTTP::Request::Common::POST(
+		'https://gateway.digitalpost.dk/auth/s9/nemlogin/ssoack',
+		Content => $saml
+	))->wait;
+	return error("NemID ticket is received but cannot login. Did you regsiter at <a href='https://mit.dk'>Digital Post</a>?")
+		unless ($resp->header('Location') // '') =~ m[(com.netcompany.mitdk://nem-callback)\?.*code=([^\&]+)];
+
+	$resp = $ua->request( HTTP::Request::Common::POST(
+		'https://gateway.mit.dk/view/client/authorization/token?'.
+			'grant_type=authorization_code&'.
+			"redirect_uri=$1&".
+			'client_id=view-client-id-mobile-prod-1-id&'.
+			"code=$2&".
+			"code_verifier=$code_verifier"
+		))->wait;
+	return error("NemID ticket is received but cannot authorize to MitDK") unless
+		$resp->is_success && $resp->header('Content-Type') eq 'application/json';
+
+	my $json;
+	eval { $json = decode_json( $resp->content ); };
+	return error("Got bad response from MitDK") unless $json && $json->{access_token};
+
+	my ($ok, $error) = Net::MitDK->new(profile => $profile)->first_login($json)->wait;
+	return error("Cannot get first re-authorization: $error") unless $ok;
+
+	return html '<h2>Logged in to MidDK!</h2><p>Now you can start the mitdk server' . mailcheck . main . quit;
+}
+
+my %routes;
+%routes = (
+	'/profile' => sub {
+		my $combo = '';
+		for ($mgr->list) {
+			$combo .= "<option value='$_' " .
+				(($_ eq $profile) ? ' selected="selected"' : '').
+				">$_</option>\n";
+		}
+		html <<PROFILE . main
+<h2>Change profile</h2>
+<p>
+Current profile: <b>$profile</b>.
+<p>
+<form action="/profile_do" method="POST">
+<select name="profile">$combo</select><p>
+Create new profile:<br><input type="text" value="" name="new"><p>
+<input type="submit" name="submit" value="Change">
+</form>
+PROFILE
+	},
+
+	'/profile_do' => sub {
+		my $req = shift;
+		return error("bad response") unless $req->method eq 'POST';
+		my %param = map { m/^(\w+)=(.*)$/ } split '&', $req->content;
+		my $pr = length($param{new}) ? $param{new} : $param{profile};
+		return error("only alphanumerics please") unless $pr =~ m/^\w+$/;
+		$profile = $pr;
+		if ( length $param{new}) {
+			my ( $ok, $error ) = $mgr->create($profile, ok_if_exists => 1);
+			return error($error) unless $ok;
+		}
+		return $routes{'/'}->();
+	},
+
+	'/win32_install' => sub { html <<'WIN32_INSTALL' . mailcheck . profile . quit
+<h2>Welcome to the MitDK/Nemid setup</h2><p>
+First you need to install a POP3 proxy server and lease refresh server that will start with Windows.<p>
+<form action="/win32_install_do" method="POST">
+<input type="submit" name="install" value="Install">
+<input type="submit" name="remove" value="Remove">
+<input type="submit" name="stop" value="Stop">
+<input type="submit" name="start" value="Start">
+<input type="submit" name="check" value="Check">
+</form>
+<p><a href="/auth">Skip to MitDK authentication</a><p>
+WIN32_INSTALL
+	},
+
+	'/win32_install_do' => sub {
+		my $req = shift;
+		return error("bad response") unless $req->method eq 'POST';
+		if ( $req->content =~ /^install/) {
+			my $resp = `mitdk-install-win32 install 2>&1`;
+			return error "Something wrong happened:<p><pre>$resp</pre>" unless $resp =~ /LOOKS OKAY/;
+			system "mitdk-install-win32 start";
+			return error 'POP3 proxy installed but not started, please start manually or wait and recheck' unless socket_check(8111);
+			return error 'Refresher server installed but not started, please start manually or wait and recheck' unless socket_check(8112);
+			return h2x 'Proxy installed okay', '<a href="/auth">Continue to MitDK authentication</a>';
+		} elsif ( $req->content =~ /^start/) {
+			system "mitdk-install-win32 start";
+			goto DO_CHECK;
+		} elsif ( $req->content =~ /^stop/) {
+			system "mitdk-install-win32 stop";
+			goto DO_CHECK;
+		} elsif ( $req->content =~ /^remove/) {
+			system "mitdk-install-win32 stop";
+			system "mitdk-install-win32 remove";
+			return h2 'Servers removed';
+		} elsif ( $req->content =~ /^check/) {
+		DO_CHECK:
+			my $pop3 = socket_check(8111);
+			my $refr = socket_check(8112);
+			$_ = "<font color='#".($_ ? '080' : 'c00') . "'>".($_ ? 'running' : 'not running')."</font>"
+				for $pop3, $refr;
+			return h2 "POP3: $pop3<br>Refresher: $refr"; 
+		} else {
+			return $routes{'/'}->();
+		}
+	},
+	'/auth' => sub {
+
+		html <<INIT . ($win32_install ? main : '' ) . mailcheck . profile . quit;
+<h2>Welcome to the MitDK/Nemid authenticator setup</h2>
+<p>
+You shall need to login to NemID to create an initial login token for this mitdk program.
+Thereafter the program should be able to login to MitID by itself.<br>The token will be saved in
+<code>${\($mgr->homepath . q(/) . $profile . q(.profile))}</code>. Refer to the documentation
+if you need more than one user per installation.
+
+<form action="/step2" method="POST">
+
+<p> On the next page you will be presented
+the standard NemID dialog, that you need to login as you usually do.<br>
+If you are going to authorize the login with your NemID app, make sure that
+the requestor is "Mit-DK login".
+
+<p>
+<input type="submit" value="NemID Login">
+</form>
+INIT
+	},
+
+	'/step2' => sub {
+		init_oauth();
+		$ua->cookie_jar->clear;
+		$ua->request( HTTP::Request->new(
+			GET => 'https://gateway.mit.dk/view/client/authorization/login?'.
+				'client_id=view-client-id-mobile-prod-1-id&'.
+				'response_type=code&'.
+				'scope=openid&'.
+				"state=$state&".
+				"code_challenge=$code_challenge&".
+				'code_challenge_method=S256&'.
+				'response_mode=query&'.
+				"nonce=$nonce&".
+				'redirect_uri=com.netcompany.mitdk://nem-callback&'.
+				'deviceName=mitdk-authenticator-perl&'.
+				'deviceId=pc&'.
+				'lang=en_US'
+			),
+			max_redirect => 20,
+		);
+	},
+
+	# case with private only
+	'/noeglekort' => sub {
+		my $req = shift;
+		$req->uri("https://nemlog-in.mitid.dk/login.aspx/noeglekort");
+		$req->header( Referer => 'https://nemlog-in.mitid.dk/login.aspx/noeglekort');
+		$req->header( Host    => 'nemlog-in.mitid.dk');
+		$req->header( Origin  => 'https://nemlog-in.mitid.dk');
+		$req->header( 'Accept-Encoding' => 'identity');
+		$req->headers->remove_header('Cookie');
+		my $resp = $ua->request($req)->wait;
+		return $resp unless $resp->is_success;
+		return $resp if $resp->request->uri->path =~ /LoginOption.aspx/;
+		return handle_saml($resp);
+	},
+
+	# case with sub-select (private and firma(s))
+	'/LoginOption.aspx' => sub  {
+		my $req = shift;
+		$req->uri("https://nemlog-in.mitid.dk".$req->uri);
+		$req->header( Host    => 'nemlog-in.mitid.dk');
+		$req->header( Origin  => 'https://nemlog-in.mitid.dk');
+		$req->header( Referer => 'https://nemlog-in.mitid.dk/LoginOption.aspx');
+		$req->header( 'Accept-Encoding' => 'identity');
+		$req->headers->remove_header('Cookie');
+		my $resp = $ua->request($req)->wait;
+		return $resp unless $resp->is_success;
+		return handle_saml($resp);
+	},
+
+	'/testmail' => sub {
+		my ($e, $error) = Net::MitDK->new( profile => $profile );
+		return error $error unless $e;
+		my $m;
+		($m, $error) = $e->mailboxes->wait;
+		return error $error unless $m;
+		return html "<h2>Welcome, $m->{ownerName}!</h2><p>".
+			'Looks like you have it configured and logged in correctly' . profile . main . quit;
+	},
+
+	'/abort' => sub {
+		$server->shutdown;
+		return html '<h2>Setup finished.</h2>';
+	},
+);
+
+$routes{'/'} = $win32_install ? $routes{'/win32_install'} : $routes{'/auth'};
+
+($server, $error) = http_server {
+	my $req = shift;
+	if ( my $cb = $routes{$req->uri}) {
+		return $cb->($req);
+	} else {
+		$req->uri("https://nemlog-in.mitid.dk" . $req->uri->path);
+		$req->header( Host    => 'nemlog-in.mitid.dk');
+		if ( my $origin = $req->header('Origin')) {
+			$origin =~ s[http://localhost:9999][https://nemlog-in.mitid.dk];
+			$req->header( Origin => $origin);
+		}
+		if ( my $referer = $req->header('Referer')) {
+			$referer =~ s[http://localhost:9999/step2][https://nemlog-in.mitid.dk/login.aspx/noeglekort];
+			$req->header( Referer => $referer);
+		}
+		$req->headers->remove_header('Cookie');
+		$req->header( 'Accept-Encoding' => 'identity');
+
+		return $ua->request($req);
+	}
+} "localhost:$port", timeout => 10;
+die $error unless $server;
+
+if ( $win32_install ) {
+	require Win32API::File;
+	import Win32API::File qw(GetOsFHandle SetHandleInformation HANDLE_FLAG_INHERIT);
+	warn $^E unless SetHandleInformation(GetOsFHandle($server->{socket}), HANDLE_FLAG_INHERIT(), 0);
+}
+
+print "Open a browser and go to this address:\n";
+print "\n   http://localhost:$port/\n\n";
+$server->wait;

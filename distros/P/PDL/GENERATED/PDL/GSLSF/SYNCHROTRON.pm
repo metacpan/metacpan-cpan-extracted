@@ -49,7 +49,7 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-#line 1058 "../../../../blib/lib/PDL/PP.pm"
+#line 948 "../../../../blib/lib/PDL/PP.pm"
 
 
 
@@ -74,14 +74,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1060 "../../../../blib/lib/PDL/PP.pm"
+#line 950 "../../../../blib/lib/PDL/PP.pm"
 
 *gsl_sf_synchrotron_1 = \&PDL::gsl_sf_synchrotron_1;
 #line 81 "SYNCHROTRON.pm"
 
 
 
-#line 1058 "../../../../blib/lib/PDL/PP.pm"
+#line 948 "../../../../blib/lib/PDL/PP.pm"
 
 
 
@@ -106,7 +106,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1060 "../../../../blib/lib/PDL/PP.pm"
+#line 950 "../../../../blib/lib/PDL/PP.pm"
 
 *gsl_sf_synchrotron_2 = \&PDL::gsl_sf_synchrotron_2;
 #line 113 "SYNCHROTRON.pm"

@@ -34,34 +34,34 @@ lives_ok {
 is $score->Channel, 1, 'Channel';
 
 my $x = midi_dump('volume');
-is $x->[-1], 'fff => 127', 'volume';
+is $x->{fff}, 127, 'volume';
 
 $x = midi_dump('length');
-is $x->[-1], 'ddwn => 7', 'length';
+is $x->{ddwn}, 7, 'length';
 
 $x = midi_dump('ticks');
-is $x->[-1], 'ddwn => 672', 'ticks';
+is $x->{ddwn}, 672, 'ticks';
 
 $x = midi_dump('note');
-is $x->[-1], 'B => 11', 'note';
+is $x->{B}, 11, 'note';
 
 $x = midi_dump('note2number');
-is $x->[-1], 'G10 => 127', 'note2number';
+is $x->{G10}, 127, 'note2number';
 
 $x = midi_dump('number2note');
-is $x->[-1], '127 => G10', 'number2note';
+is $x->{127}, 'G10', 'number2note';
 
 $x = midi_dump('patch2number');
-is $x->[-1], 'Gunshot => 127', 'patch2number';
+is $x->{Gunshot}, 127, 'patch2number';
 
 $x = midi_dump('number2patch');
-is $x->[-1], '127 => Gunshot', 'number2patch';
+is $x->{127}, 'Gunshot', 'number2patch';
 
 $x = midi_dump('notenum2percussion');
-is $x->[-1], '81 => Open Triangle', 'notenum2percussion';
+is $x->{81}, 'Open Triangle', 'notenum2percussion';
 
 $x = midi_dump('percussion2notenum');
-is $x->[-1], 'Open Triangle => 81', 'percussion2notenum';
+is $x->{'Open Triangle'}, 81, 'percussion2notenum';
 
 $x = midi_dump('all_events');
 is $x->[-1], 'raw_data', 'all_events';

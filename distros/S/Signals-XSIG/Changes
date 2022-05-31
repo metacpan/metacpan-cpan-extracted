@@ -1,5 +1,14 @@
 Revision history for Signals-XSIG
 
+1.00	2022-05-30
+        Major rewrite of internals
+        - low-level Signals::XSIG reference type
+        - all %SIG, %XSIG interactions manipulate Signals::XSIG::Meta objects
+        - removed need to untie-retie %SIG
+        - local %SIG  now causes fewer problems
+        unimport/import can disable/re-enable the module
+        Improvements to Signals::XSIG::Default
+
 0.16    2022-05-03
         Perl 5.36 compatibility changes
 

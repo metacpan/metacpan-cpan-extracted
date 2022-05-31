@@ -37,7 +37,7 @@ ok($cpmgmt->login, 'login to Checkpoint Manager successful');
 diag("using api version " . $cpmgmt->api_version);
 
 is( $cpmgmt->api_versions, array {
-    all_items match qr/^\d(\.\d)?$/;
+    all_items match qr/^\d(\.\d)?(\.\d)?$/;
     etc();
 }, 'api_versions successful');
 

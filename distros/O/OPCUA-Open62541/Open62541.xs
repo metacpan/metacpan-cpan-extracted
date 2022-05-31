@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2020-2021 Alexander Bluhm
- * Copyright (c) 2020-2021 Anton Borowka
+ * Copyright (c) 2020-2022 Alexander Bluhm
+ * Copyright (c) 2020-2022 Anton Borowka
  * Copyright (c) 2020 Marvin Knoblauch
  *
  * This is free software; you can redistribute it and/or modify it under
@@ -198,6 +198,15 @@ typedef struct MonitoredItemArrays {
 	UA_Client_DataChangeNotificationCallback *	ma_change;
 	UA_Client_DeleteMonitoredItemCallback *		ma_delete;
 } * OPCUA_Open62541_MonitoredItemArrays;
+
+static UA_UInt16
+dataType2Index(OPCUA_Open62541_DataType dataType)
+{
+	if (dataType < &UA_TYPES[0] || dataType >= &UA_TYPES[UA_TYPES_COUNT])
+		CROAK("DataType %p is not in UA_TYPES %p array",
+		    dataType, UA_TYPES);
+	return (dataType - UA_TYPES);
+}
 
 static void XS_pack_OPCUA_Open62541_DataType(SV *, OPCUA_Open62541_DataType)
     __attribute__((unused));
@@ -805,18 +814,20 @@ OPCUA_Open62541_Variant_setScalar(OPCUA_Open62541_Variant variant, SV *in,
     OPCUA_Open62541_DataType type)
 {
 	void *scalar;
+	UA_UInt16 index;
 
-	if (unpack_UA_table[type->typeIndex] == NULL) {
+	index = dataType2Index(type);
+	if (unpack_UA_table[index] == NULL) {
 		CROAK("No unpack conversion for type '%s' index %u",
-		    type->typeName, type->typeIndex);
+		    type->typeName, index);
 	}
 
 	scalar = UA_new(type);
 	if (scalar == NULL) {
 		CROAKE("UA_new type '%s' index %u",
-		    type->typeName, type->typeIndex);
+		    type->typeName, index);
 	}
-	(unpack_UA_table[type->typeIndex])(in, scalar);
+	(unpack_UA_table[index])(in, scalar);
 
 	UA_Variant_setScalar(variant, scalar, type);
 }
@@ -831,14 +842,16 @@ OPCUA_Open62541_Variant_setArray(OPCUA_Open62541_Variant variant, SV *in,
 	ssize_t i, top;
 	char *p;
 	void *array;
+	UA_UInt16 index;
 
 	if (!SvOK(in)) {
 		UA_Variant_setArray(variant, NULL, 0, type);
 		return;
 	}
-	if (unpack_UA_table[type->typeIndex] == NULL) {
+	index = dataType2Index(type);
+	if (unpack_UA_table[index] == NULL) {
 		CROAK("No pack conversion for type '%s' index %u",
-		    type->typeName, type->typeIndex);
+		    type->typeName, index);
 	}
 
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVAV)
@@ -848,12 +861,12 @@ OPCUA_Open62541_Variant_setArray(OPCUA_Open62541_Variant variant, SV *in,
 	array = UA_Array_new(top + 1, type);
 	if (array == NULL)
 		CROAKE("UA_Array_new size %zd, type '%s' index %u",
-		    top + 1, type->typeName, type->typeIndex);
+		    top + 1, type->typeName, index);
 	p = array;
 	for (i = 0; i <= top; i++) {
 		svp = av_fetch(av, i, 0);
 		if (svp != NULL) {
-			(unpack_UA_table[type->typeIndex])(*svp, p);
+			(unpack_UA_table[index])(*svp, p);
 		}
 		p += type->memSize;
 	}
@@ -929,12 +942,15 @@ XS_unpack_UA_Variant(SV *in)
 static void
 OPCUA_Open62541_Variant_getScalar(OPCUA_Open62541_Variant variant, SV *out)
 {
-	if (pack_UA_table[variant->type->typeIndex] == NULL) {
+	UA_UInt16 index;
+
+	index = dataType2Index(variant->type);
+	if (pack_UA_table[index] == NULL) {
 		/* XXX memory leak in caller */
 		CROAK("No pack conversion for type '%s' index %u",
-		    variant->type->typeName, variant->type->typeIndex);
+		    variant->type->typeName, index);
 	}
-	(pack_UA_table[variant->type->typeIndex])(out, variant->data);
+	(pack_UA_table[index])(out, variant->data);
 }
 
 static void
@@ -945,15 +961,17 @@ OPCUA_Open62541_Variant_getArray(OPCUA_Open62541_Variant variant, SV *out)
 	AV *av;
 	char *p;
 	size_t i;
+	UA_UInt16 index;
 
 	if (variant->data == NULL) {
 		sv_set_undef(out);
 		return;
 	}
-	if (pack_UA_table[variant->type->typeIndex] == NULL) {
+	index = dataType2Index(variant->type);
+	if (pack_UA_table[index] == NULL) {
 		/* XXX memory leak in caller */
 		CROAK("No pack conversion for type '%s' index %u",
-		    variant->type->typeName, variant->type->typeIndex);
+		    variant->type->typeName, index);
 	}
 
 	av = newAV();
@@ -961,7 +979,7 @@ OPCUA_Open62541_Variant_getArray(OPCUA_Open62541_Variant variant, SV *out)
 	p = variant->data;
 	for (i = 0; i < variant->arrayLength; i++) {
 		sv = newSV(0);
-		(pack_UA_table[variant->type->typeIndex])(sv, p);
+		(pack_UA_table[index])(sv, p);
 		av_push(av, sv);
 		p += variant->type->memSize;
 	}
@@ -1024,6 +1042,7 @@ XS_unpack_UA_ExtensionObject(SV *in)
 	IV encoding;
 	void *data;
 	OPCUA_Open62541_DataType type;
+	UA_UInt16 index;
 
 	SvGETMAGIC(in);
 	if (!SvROK(in) || SvTYPE(SvRV(in)) != SVt_PVHV) {
@@ -1066,9 +1085,10 @@ XS_unpack_UA_ExtensionObject(SV *in)
 		if (svp == NULL)
 			CROAK("No ExtensionObject_content_type in HASH");
 		type = XS_unpack_OPCUA_Open62541_DataType(*svp);
-		if (unpack_UA_table[type->typeIndex] == NULL) {
+		index = dataType2Index(type);
+		if (unpack_UA_table[index] == NULL) {
 			CROAK("No unpack conversion for type '%s' index %u",
-			    type->typeName, type->typeIndex);
+			    type->typeName, index);
 		}
 		out.content.decoded.type = type;
 
@@ -1079,9 +1099,9 @@ XS_unpack_UA_ExtensionObject(SV *in)
 		data = UA_new(type);
 		if (data == NULL) {
 			CROAK("UA_new type '%s' index %u",
-			    type->typeName, type->typeIndex);
+			    type->typeName, index);
 		}
-		(unpack_UA_table[type->typeIndex])(*svp, data);
+		(unpack_UA_table[index])(*svp, data);
 		out.content.decoded.data = data;
 
 		break;
@@ -1095,10 +1115,11 @@ static void
 XS_pack_UA_ExtensionObject(SV *out, UA_ExtensionObject in)
 {
 	dTHX;
-	OPCUA_Open62541_DataType type;
 	SV *sv;
 	HV *hv = newHV();
 	HV *content = newHV();
+	OPCUA_Open62541_DataType type;
+	UA_UInt16 index;
 
 	sv = newSV(0);
 	XS_pack_UA_Int32(sv, in.encoding);
@@ -1120,10 +1141,11 @@ XS_pack_UA_ExtensionObject(SV *out, UA_ExtensionObject in)
 	case UA_EXTENSIONOBJECT_DECODED:
 	case UA_EXTENSIONOBJECT_DECODED_NODELETE:
 		type = in.content.decoded.type;
-		if (pack_UA_table[type->typeIndex] == NULL) {
+		index = dataType2Index(type);
+		if (pack_UA_table[index] == NULL) {
 			/* XXX memory leak in caller */
 			CROAK("No pack conversion for type '%s' index %u",
-			    type->typeName, type->typeIndex);
+			    type->typeName, index);
 		}
 
 		sv = newSV(0);
@@ -1131,7 +1153,7 @@ XS_pack_UA_ExtensionObject(SV *out, UA_ExtensionObject in)
 		hv_stores(content, "ExtensionObject_content_type", sv);
 
 		sv = newSV(0);
-		(pack_UA_table[type->typeIndex])(sv, in.content.decoded.data);
+		(pack_UA_table[index])(sv, in.content.decoded.data);
 		hv_stores(content, "ExtensionObject_content_data", sv);
 
 		break;
@@ -1161,7 +1183,7 @@ static void
 XS_pack_OPCUA_Open62541_DataType(SV *out, OPCUA_Open62541_DataType in)
 {
 	dTHX;
-	sv_setuv(out, in->typeIndex);
+	sv_setuv(out, dataType2Index(in));
 }
 
 /* 6.1.25 DataValue, types.h */
@@ -2005,7 +2027,11 @@ clientAsyncBrowseNextCallback(UA_Client *client, void *userdata,
 
 static void
 clientAsyncReadDataTypeCallback(UA_Client *client, void *userdata,
-    UA_UInt32 requestId, UA_NodeId *nodeId)
+    UA_UInt32 requestId,
+#ifdef HAVE_UA_CLIENTASYNCOPERATIONCALLBACK
+    UA_StatusCode status,
+#endif
+    UA_NodeId *nodeId)
 {
 	dTHX;
 	SV *sv;
@@ -2025,6 +2051,7 @@ clientAsyncReadDataTypeCallback(UA_Client *client, void *userdata,
 			XS_pack_OPCUA_Open62541_DataType(sv, &UA_TYPES[index]);
 	}
 
+	/* XXX we do not propagate the status code */
 	clientCallbackPerl(client, userdata, requestId, sv);
 }
 
@@ -2670,6 +2697,23 @@ STATUSCODE_UNKNOWN()
 INCLUDE: Open62541-statuscode.xsh
 
 #############################################################################
+#ifdef HAVE_UA_CLIENTSTATE
+
+INCLUDE: Open62541-clientstate.xsh
+
+#else
+
+#ifdef HAVE_UA_SECURECHANNELSTATE_FRESH
+
+INCLUDE: Open62541-securechannelstate.xsh
+
+#endif
+
+INCLUDE: Open62541-sessionstate.xsh
+
+#endif
+
+#############################################################################
 INCLUDE: Open62541-destroy.xsh
 
 #############################################################################
@@ -2748,7 +2792,7 @@ UA_Variant_getType(variant)
     CODE:
 	if (UA_Variant_isEmpty(variant))
 		XSRETURN_UNDEF;
-	RETVAL = variant->type->typeIndex;
+	RETVAL = dataType2Index(variant->type);
     OUTPUT:
 	RETVAL
 
@@ -3330,6 +3374,8 @@ UA_ServerConfig_setMinimal(config, portNumber, certificate)
     OUTPUT:
 	RETVAL
 
+#ifdef HAVE_UA_SERVERCONFIG_SETCUSTOMHOSTNAME
+
 void
 UA_ServerConfig_setCustomHostname(config, customHostname)
 	OPCUA_Open62541_ServerConfig	config
@@ -3337,6 +3383,8 @@ UA_ServerConfig_setCustomHostname(config, customHostname)
     CODE:
 	UA_ServerConfig_setCustomHostname(config->svc_serverconfig,
 	    *customHostname);
+
+#endif
 
 #ifdef HAVE_UA_SERVER_SETADMINSESSIONCONTEXT
 

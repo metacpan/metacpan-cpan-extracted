@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Rubric::Entry::Formatter::HTMLEscape;
+package Rubric::Entry::Formatter::HTMLEscape 0.157;
 # ABSTRACT: format into HTML by escaping entities
-$Rubric::Entry::Formatter::HTMLEscape::VERSION = '0.156';
+
 #pod =head1 DESCRIPTION
 #pod
 #pod This formatter only handles formatting to HTML, and outputs the original
@@ -56,7 +56,7 @@ Rubric::Entry::Formatter::HTMLEscape - format into HTML by escaping entities
 
 =head1 VERSION
 
-version 0.156
+version 0.157
 
 =head1 DESCRIPTION
 
@@ -66,11 +66,20 @@ content with HTML-unsafe characters escaped and paragraphs broken.
 This is equivalent to filtering with Template::Filters' C<html> and
 C<html_para> filters.
 
+=head1 PERL VERSION
+
+This code is effectively abandonware.  Although releases will sometimes be made
+to update contact info or to fix packaging flaws, bug reports will mostly be
+ignored.  Feature requests are even more likely to be ignored.  (If someone
+takes up maintenance of this code, they will presumably remove this notice.)
+This means that whatever version of perl is currently required is unlikely to
+change -- but also that it might change at any new maintainer's whim.
+
 =head1 METHODS
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

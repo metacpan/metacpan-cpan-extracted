@@ -1,0 +1,172 @@
+#!env perl
+use strict;
+use warnings;
+use Fcntl ':flock', ':seek';
+use IO::Handle;
+use IO::Socket;
+use Net::MitDK;
+use Getopt::Long;
+
+# */10 * * * * nobody mitdk-renew-lease -a
+
+my %opt = (
+	profile    => 'default',
+	help       => 0,
+	all        => 0,
+	verbose    => 0,
+	loop       => 0,
+	port       => 0,
+	dry        => 0,
+);
+
+sub usage
+{
+	print <<USAGE;
+
+$0
+
+   --profile       - Profile name ( $opt{profile} )
+   --all|-a        - All profiles
+   --dry|-d        - Do not actually renew the lease, run readonly
+   --verbose|-v    - Verbose
+   --loop|-l       - Never exit, renew every 10 minutes
+   --port|-p PORT  - Listen on PORT as control connection
+   --help
+
+USAGE
+	exit 1;
+}
+
+GetOptions(\%opt,
+	"help|h",
+	"all|a",
+	"dry|d",
+	"verbose|v",
+	"loop|l",
+	"profile|s=s",
+	"port|p=s",
+) or usage;
+
+$opt{help} and usage();
+
+sub renew
+{
+	my $profile = shift;
+	my ($e, $error) = Net::MitDK->new(profile => $profile);
+	die "error (profile=$profile): $error\n" unless $e;
+	die "error (profile=$profile): bad profile\n" unless ref($e->config) eq 'HASH';
+
+	unless ( $e->token ) {
+		print "$profile: no first login yet\n" if $opt{verbose};
+		return;
+	}
+
+	print "loaded profile $profile, expires on " . localtime($e->token->{dpp}->{expires_on}) . "\n" if $opt{verbose};
+
+	my $maybe_expired = time > $e->token->{dpp}->{expires_on};
+	if ( $maybe_expired && $e->config->{renewer}->{expired} ) {
+		print "is expired and notification was done already, skipping\n" if $opt{verbose};
+		return;
+	}
+
+	if ( $opt{dry}) {
+		print "not renewed as running read-only\n" if $opt{verbose};
+		return;
+	}
+
+	if ( exists $e->config->{renewer}->{expired}) {
+		delete $e->config->{renewer}->{expired};
+		$e->update_config;
+	}
+
+	my $ok;
+	($ok, $error) = $e->renew_lease->wait;
+	if ( !$ok ) {
+		if ( $maybe_expired ) {
+			print "will skip this error next time\n" if $opt{verbose};
+			$e->config->{renewer}->{expired} = 1;
+			$e->update_config;
+		}
+		die "error (profile=$profile): $error\n";
+	}
+
+	print "renewed, expires on " . localtime($e->token->{dpp}->{expires_on}) . "\n" if $opt{verbose};
+}
+
+my ($server, $sno);
+if ( $opt{port} ) {
+	unless ($opt{loop}) {
+		warn "--port ignored without --loop\n";
+	} else {
+		$server = IO::Socket::INET-> new(
+			Listen    => 5,
+			LocalAddr => '0.0.0.0',
+			LocalPort => $opt{port},
+			Blocking  => 0,
+			ReuseAddr => ($^O !~ /win32/i),
+		);
+		die "Cannot listen on port $opt{port} : $!\n" unless $server;
+		print "Listening on $opt{port}\n" if $opt{verbose};
+		$sno = '';
+		vec($sno, fileno($server), 1) = 1;
+	}
+}
+
+my $lockfile;
+if ($opt{loop}) {
+	my $path = Net::MitDK::ProfileManager->new->homepath;
+	$lockfile = "$path/renew-lease.lock";
+	if ( open F, "<", $lockfile ) {
+		die "Error: another instance is running\n" unless flock( F, LOCK_NB | LOCK_EX);
+	} elsif ( ! open F, ">", $lockfile) {
+		die "Error: cannot create $lockfile\n";
+	} else {
+		die "Error: cannot lock $lockfile\n" unless flock(F, LOCK_NB | LOCK_EX);
+	}
+}
+END { unlink $lockfile if defined $lockfile };
+
+AGAIN:
+if ( $opt{all}) {
+	my $exitcode = 0;
+	for (Net::MitDK::ProfileManager->new->list) {
+		eval { renew($_) };
+		next unless $@;
+		warn $@;
+		$exitcode = 1;
+	}
+	exit $exitcode unless $opt{loop};
+} else {
+	eval { renew($opt{profile}); };
+	if ( $@ ) {
+		if ( $opt{loop} ) {
+			warn $@;
+		} else {
+			die $@;
+		}
+	}
+}
+if ($opt{loop}) {
+	my $timeout = 600;
+	if ( $sno ) {
+		my $R = $sno;
+		my $n = select($R, undef, undef, $timeout);
+		if ( $n ) {
+			my $h = IO::Handle-> new;
+			print "New control connection\n" if $opt{verbose};
+			if ( accept( $h, $server) ) {
+				my $cmd = <$h>;
+				chomp $cmd;
+				print "Got command: $cmd\n" if $opt{verbose};
+				close $h;
+				if ( $cmd eq 'stop') {
+					print "Exiting\n" if $opt{verbose};
+					exit(0);
+				}
+			}
+		}
+	} else {
+		sleep($timeout);
+	}
+	goto AGAIN;
+}

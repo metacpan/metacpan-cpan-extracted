@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION = '1.33';
+$VERSION = '1.34';
 $VERSION = eval { $VERSION };
-our $SVNVERSION = (qw$Id: DNS.pm 1861 2021-12-16 11:21:07Z willem $)[2];
+our $SVNVERSION = (qw$Id: DNS.pm 1867 2022-05-30 10:07:36Z willem $)[2];
 
 
 =head1 NAME

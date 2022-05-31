@@ -1,5 +1,5 @@
 package Net::Checkpoint::Management::v1::Role::ObjectMethods;
-$Net::Checkpoint::Management::v1::Role::ObjectMethods::VERSION = '0.001009';
+$Net::Checkpoint::Management::v1::Role::ObjectMethods::VERSION = '0.001010';
 # ABSTRACT: Role for Checkpoint Management API version 1.x method generation
 
 use 5.024;
@@ -126,7 +126,7 @@ Net::Checkpoint::Management::v1::Role::ObjectMethods - Role for Checkpoint Manag
 
 =head1 VERSION
 
-version 0.001009
+version 0.001010
 
 =head1 SYNOPSIS
 

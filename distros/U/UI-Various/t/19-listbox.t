@@ -19,7 +19,7 @@ no multidimensional;
 
 use Cwd 'abs_path';
 
-use Test::More tests => 46;
+use Test::More tests => 49;
 use Test::Output;
 use Test::Warn;
 
@@ -66,6 +66,11 @@ warning_like
 {   carped =>
 	qr/^'texts' attribute must be a ARRAY reference$re_msg_tail/   },
     'bad texts parameter fails';
+warning_like
+{   $_ = UI::Various::Listbox->new(height => 1, on_select => '');   }
+{   carped =>
+	qr/^'on_select' attribute must be a CODE reference$re_msg_tail/   },
+    'bad on_select parameter fails';
 
 ####################################
 # test other error messages:
@@ -183,8 +188,9 @@ is($_, 7,
 my @text12 = ('1st entry', '2nd entry', '3rd entry', '4th entry',
 	      '5th entry', '6th entry', '7th entry', '8th entry',
 	      '9th entry', '10th entry', '11th entry', '12th entry');
-my $lb12 = UI::Various::Listbox->new(texts => [],
-				     height => 10, selection => 2);
+my $counter = 0;
+my $lb12 = UI::Various::Listbox->new(texts => [], height => 10, selection => 2,
+				     on_select => sub { $counter++; });
 $lb12->texts(\@text12);		# reassigning an empty array is allowed!
 
 $main->add($lb12);			# now we have a maximum width
@@ -222,6 +228,7 @@ stdout_is
 my @result = $lb12->selected;
 is_deeply(\@result, [1, 5, 7, 11],
 	  'selected after processing listbox 12-2 returns correct selection');
+is($counter, 3, 'counter for listbox 12-2 has correct 1st value');
 
 ####################################
 # test add and remove as well as some errors not covered before:
@@ -325,6 +332,7 @@ combined_is
 @result = $lb12->selected;
 is_deeply(\@result, [1, 9, 10, 11],
 	  'selected after processing listbox 12-2 returns correct selection');
+is($counter, 4, 'counter for listbox 12-2 has correct 2nd value');
 
 $main->remove($lb12);
 

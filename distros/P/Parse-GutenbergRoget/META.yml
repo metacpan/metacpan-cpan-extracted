@@ -1,13 +1,13 @@
 ---
 abstract: "parse Project Gutenberg's Roget's Thesaurus"
 author:
-  - 'Ricardo Signes <rjbs@cpan.org>'
+  - 'Ricardo Signes <rjbs@semiotic.systems>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141520'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,7 +21,7 @@ requires:
   Test::More: '0'
   Text::CSV_XS: '0'
 resources:
-  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Parse-GutenbergRoget
   license: http://dev.perl.org/licenses/
   repository: https://github.com/rjbs/Parse-GutenbergRoget
-version: '0.022'
+version: '0.023'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

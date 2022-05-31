@@ -7,6 +7,7 @@ lib/IO/Lambda/HTTP.pm
 lib/IO/Lambda/HTTP/HTTPS.pm
 lib/IO/Lambda/HTTP/Server.pm
 lib/IO/Lambda/HTTP/Client.pm
+lib/IO/Lambda/HTTP/UserAgent.pm
 lib/IO/Lambda/SNMP.pm
 lib/IO/Lambda/DNS.pm
 lib/IO/Lambda/Signal.pm

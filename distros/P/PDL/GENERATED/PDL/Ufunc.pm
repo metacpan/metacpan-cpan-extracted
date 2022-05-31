@@ -955,7 +955,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 309 "ufunc.pd"
+#line 304 "ufunc.pd"
 
 =head2 avgover
 
@@ -1022,7 +1022,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 309 "ufunc.pd"
+#line 304 "ufunc.pd"
 
 =head2 cavgover
 
@@ -1089,7 +1089,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 309 "ufunc.pd"
+#line 304 "ufunc.pd"
 
 =head2 davgover
 
@@ -1159,7 +1159,7 @@ for ways of masking NaNs.
 
 
 
-#line 309 "ufunc.pd"
+#line 304 "ufunc.pd"
 
 =head2 minover
 
@@ -1210,7 +1210,7 @@ for ways of masking NaNs.
 
 
 
-#line 309 "ufunc.pd"
+#line 304 "ufunc.pd"
 
 =head2 minover_ind
 
@@ -1268,7 +1268,7 @@ for ways of masking NaNs.
 #line 1059 "../../blib/lib/PDL/PP.pm"
 
 
-#line 416 "ufunc.pd"
+#line 409 "ufunc.pd"
 sub PDL::minimum_n_ind {
   my ($a, $c, $m_size) = @_;
   $m_size //= ref($c) ? $c->dim(0) : $c; # back-compat with pre-2.077
@@ -1290,7 +1290,7 @@ sub PDL::minimum_n_ind {
 
 
 
-#line 309 "ufunc.pd"
+#line 304 "ufunc.pd"
 
 =head2 minover_n_ind
 
@@ -1360,7 +1360,7 @@ for ways of masking NaNs.
 
 
 
-#line 309 "ufunc.pd"
+#line 304 "ufunc.pd"
 
 =head2 maxover
 
@@ -1411,7 +1411,7 @@ for ways of masking NaNs.
 
 
 
-#line 309 "ufunc.pd"
+#line 304 "ufunc.pd"
 
 =head2 maxover_ind
 
@@ -1469,7 +1469,7 @@ for ways of masking NaNs.
 #line 1059 "../../blib/lib/PDL/PP.pm"
 
 
-#line 416 "ufunc.pd"
+#line 409 "ufunc.pd"
 sub PDL::maximum_n_ind {
   my ($a, $c, $m_size) = @_;
   $m_size //= ref($c) ? $c->dim(0) : $c; # back-compat with pre-2.077
@@ -1491,7 +1491,7 @@ sub PDL::maximum_n_ind {
 
 
 
-#line 309 "ufunc.pd"
+#line 304 "ufunc.pd"
 
 =head2 maxover_n_ind
 
@@ -1551,7 +1551,7 @@ since they will not contain any bad values.
 
 
 
-#line 309 "ufunc.pd"
+#line 304 "ufunc.pd"
 
 =head2 minmaxover
 
@@ -1566,7 +1566,7 @@ since they will not contain any bad values.
 
 
 
-#line 552 "ufunc.pd"
+#line 543 "ufunc.pd"
 
 =head2 avg
 
@@ -1596,7 +1596,7 @@ sub PDL::avg {
 
 
 
-#line 552 "ufunc.pd"
+#line 543 "ufunc.pd"
 
 =head2 sum
 
@@ -1626,7 +1626,7 @@ sub PDL::sum {
 
 
 
-#line 552 "ufunc.pd"
+#line 543 "ufunc.pd"
 
 =head2 prod
 
@@ -1656,7 +1656,7 @@ sub PDL::prod {
 
 
 
-#line 552 "ufunc.pd"
+#line 543 "ufunc.pd"
 
 =head2 davg
 
@@ -1686,7 +1686,7 @@ sub PDL::davg {
 
 
 
-#line 552 "ufunc.pd"
+#line 543 "ufunc.pd"
 
 =head2 dsum
 
@@ -1716,7 +1716,7 @@ sub PDL::dsum {
 
 
 
-#line 552 "ufunc.pd"
+#line 543 "ufunc.pd"
 
 =head2 dprod
 
@@ -1746,7 +1746,7 @@ sub PDL::dprod {
 
 
 
-#line 552 "ufunc.pd"
+#line 543 "ufunc.pd"
 
 =head2 zcheck
 
@@ -1776,7 +1776,7 @@ sub PDL::zcheck {
 
 
 
-#line 552 "ufunc.pd"
+#line 543 "ufunc.pd"
 
 =head2 and
 
@@ -1806,7 +1806,7 @@ sub PDL::and {
 
 
 
-#line 552 "ufunc.pd"
+#line 543 "ufunc.pd"
 
 =head2 band
 
@@ -1836,7 +1836,7 @@ sub PDL::band {
 
 
 
-#line 552 "ufunc.pd"
+#line 543 "ufunc.pd"
 
 =head2 or
 
@@ -1866,7 +1866,7 @@ sub PDL::or {
 
 
 
-#line 552 "ufunc.pd"
+#line 543 "ufunc.pd"
 
 =head2 bor
 
@@ -1896,7 +1896,7 @@ sub PDL::bor {
 
 
 
-#line 552 "ufunc.pd"
+#line 543 "ufunc.pd"
 
 =head2 min
 
@@ -1926,7 +1926,7 @@ sub PDL::min {
 
 
 
-#line 552 "ufunc.pd"
+#line 543 "ufunc.pd"
 
 =head2 max
 
@@ -1956,7 +1956,7 @@ sub PDL::max {
 
 
 
-#line 552 "ufunc.pd"
+#line 543 "ufunc.pd"
 
 =head2 median
 
@@ -1986,7 +1986,7 @@ sub PDL::median {
 
 
 
-#line 552 "ufunc.pd"
+#line 543 "ufunc.pd"
 
 =head2 mode
 
@@ -2016,7 +2016,7 @@ sub PDL::mode {
 
 
 
-#line 552 "ufunc.pd"
+#line 543 "ufunc.pd"
 
 =head2 oddmedian
 
@@ -2046,7 +2046,7 @@ sub PDL::oddmedian {
 
 
 
-#line 582 "ufunc.pd"
+#line 573 "ufunc.pd"
 
 
 =head2 any
@@ -2413,7 +2413,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 943 "ufunc.pd"
+#line 934 "ufunc.pd"
 
 =head2 pct
 
@@ -2439,7 +2439,7 @@ sub PDL::pct {
 
 
 
-#line 943 "ufunc.pd"
+#line 934 "ufunc.pd"
 
 =head2 oddpct
 
@@ -2658,7 +2658,7 @@ for L</qsortvec>.
 
 
 
-#line 1191 "ufunc.pd"
+#line 1182 "ufunc.pd"
 
 
 =head1 AUTHOR

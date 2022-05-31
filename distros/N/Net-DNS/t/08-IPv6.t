@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 08-IPv6.t 1847 2021-08-11 10:02:44Z willem $ -*-perl-*-
+# $Id: 08-IPv6.t 1865 2022-05-21 09:57:49Z willem $ -*-perl-*-
 #
 
 use strict;
@@ -68,7 +68,7 @@ my $IP = eval {
 	$resolver->nameservers(@nsdname);
 	$resolver->force_v6(1);
 	[$resolver->nameservers()];
-};
+} || [];
 exit( plan skip_all => 'Unable to resolve nameserver name' ) unless scalar @$IP;
 
 diag join( "\n\t", 'will use nameservers', @$IP ) if $debug;
@@ -76,7 +76,7 @@ diag join( "\n\t", 'will use nameservers', @$IP ) if $debug;
 Net::DNS::Resolver->debug($debug);
 
 
-plan tests => 66;
+plan tests => 65;
 
 NonFatalBegin();
 
@@ -461,11 +461,6 @@ SKIP: {
 	delete ${*$socket}{net_dns_bg};				# state vector
 	while ( $resolver->bgbusy($socket) ) { sleep 1 }
 	ok( !$resolver->bgbusy($socket), 'bgbusy()	SpamAssassin workaround' );
-}
-
-
-{					## exercise Net::DNS::Extlang query
-	ok( Net::DNS::RR->new('. MD'), 'Net::DNS::Extlang query' );
 }
 
 

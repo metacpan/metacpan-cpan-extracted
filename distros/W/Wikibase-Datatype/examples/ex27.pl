@@ -3,34 +3,38 @@
 use strict;
 use warnings;
 
-use Wikibase::Datatype::Value::Time;
+use Wikibase::Datatype::Snak;
+use Wikibase::Datatype::Value::Item;
 
 # Object.
-my $obj = Wikibase::Datatype::Value::Time->new(
-        'precision' => 10,
-        'value' => '+2020-09-01T00:00:00Z',
+my $obj = Wikibase::Datatype::Snak->new(
+        'datatype' => 'wikibase-item',
+        'datavalue' => Wikibase::Datatype::Value::Item->new(
+                'value' => 'Q5',
+        ),
+        'property' => 'P31',
 );
 
-# Get calendar model.
-my $calendarmodel = $obj->calendarmodel;
-
-# Get precision.
-my $precision = $obj->precision;
-
-# Get type.
-my $type = $obj->type;
-
 # Get value.
-my $value = $obj->value;
+my $datavalue = $obj->datavalue->value;
+
+# Get datatype.
+my $datatype = $obj->datatype;
+
+# Get property.
+my $property = $obj->property;
+
+# Get snak type.
+my $snaktype = $obj->snaktype;
 
 # Print out.
-print "Calendar model: $calendarmodel\n";
-print "Precision: $precision\n";
-print "Type: $type\n";
-print "Value: $value\n";
+print "Property: $property\n";
+print "Type: $datatype\n";
+print "Value: $datavalue\n";
+print "Snak type: $snaktype\n";
 
 # Output:
-# Calendar model: Q1985727
-# Precision: 10
-# Type: time
-# Value: +2020-09-01T00:00:00Z
+# Property: P31
+# Type: wikibase-item
+# Value: Q5
+# Snak type: value

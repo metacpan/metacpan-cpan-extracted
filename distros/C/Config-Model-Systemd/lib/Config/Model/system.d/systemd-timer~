@@ -1,4 +1,0 @@
-model = Systemd::Timer
-require_backend_argument = 1
-config_dir = /etc/systemd/system/
-support_info = https://github.com/dod38fr/config-model-systemd/issues

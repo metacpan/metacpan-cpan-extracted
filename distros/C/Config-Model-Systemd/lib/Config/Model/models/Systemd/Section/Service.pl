@@ -924,15 +924,23 @@ above.',
       },
       'OOMPolicy',
       {
-        'description' => 'Configure the Out-Of-Memory (OOM) killer policy. On Linux, when memory becomes scarce
-the kernel might decide to kill a running process in order to free up memory and reduce memory
+        'description' => 'Configure the out-of-memory (OOM) kernel killer policy. Note that the userspace OOM
+killer
+L<systemd-oomd.service(8)>
+is a more flexible solution that aims to prevent out-of-memory situations for the userspace, not just
+the kernel.
+
+On Linux, when memory becomes scarce to the point that the kernel has trouble allocating memory
+for itself, it might decide to kill a running process in order to free up memory and reduce memory
 pressure. This setting takes one of C<continue>, C<stop> or
 C<kill>. If set to C<continue> and a process of the service is
 killed by the kernel\'s OOM killer this is logged but the service continues running. If set to
 C<stop> the event is logged but the service is terminated cleanly by the service
 manager. If set to C<kill> and one of the service\'s processes is killed by the OOM
-killer the kernel is instructed to kill all remaining processes of the service, too. Defaults to the
-setting C<DefaultOOMPolicy> in
+killer the kernel is instructed to kill all remaining processes of the service too, by setting the
+C<memory.oom.group> attribute to C<1>; also see L<kernel documentation|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html>.
+
+Defaults to the setting C<DefaultOOMPolicy> in
 L<systemd-system.conf(5)>
 is set to, except for services where C<Delegate> is turned on, where it defaults to
 C<continue>.
@@ -941,7 +949,11 @@ Use the C<OOMScoreAdjust> setting to configure whether processes of the unit
 shall be considered preferred or less preferred candidates for process termination by the Linux OOM
 killer logic. See
 L<systemd.exec(5)> for
-details.',
+details.
+
+This setting also applies to systemd-oomd, similar to the kernel OOM kills
+this setting determines the state of the service after systemd-oomd kills a cgroup
+associated with the service.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },

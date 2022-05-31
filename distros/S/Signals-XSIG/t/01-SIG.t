@@ -8,6 +8,8 @@ use warnings;
 
 # when we set $SIG{signal}, is the registered signal handler
 # reflected in $XSIG{signal}?
+#
+#   $SIG{signal} = handler
 
 if ($^O eq 'haiku') {
     diag "[haiku]";

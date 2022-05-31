@@ -4362,6 +4362,7 @@ XS_pack_UA_SessionlessInvokeRequestType(SV *out, UA_SessionlessInvokeRequestType
 	size_t i;
 	HV *hv = newHV();
 
+#ifdef HAVE_UA_SESSIONLESSINVOKEREQUESTTYPE_URISVERSIONSIZE
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.urisVersionSize);
 	for (i = 0; i < in.urisVersionSize; i++) {
@@ -4370,6 +4371,11 @@ XS_pack_UA_SessionlessInvokeRequestType(SV *out, UA_SessionlessInvokeRequestType
 		av_push(av, sv);
 	}
 	hv_stores(hv, "SessionlessInvokeRequestType_urisVersion", newRV_inc((SV*)av));
+#else
+	sv = newSV(0);
+	XS_pack_UA_UInt32(sv, in.urisVersion);
+	hv_stores(hv, "SessionlessInvokeRequestType_urisVersion", sv);
+#endif
 
 	av = (AV*)sv_2mortal((SV*)newAV());
 	av_extend(av, in.namespaceUrisSize);
@@ -4423,6 +4429,7 @@ XS_unpack_UA_SessionlessInvokeRequestType(SV *in)
 	UA_SessionlessInvokeRequestType_init(&out);
 	hv = (HV*)SvRV(in);
 
+#ifdef HAVE_UA_SESSIONLESSINVOKEREQUESTTYPE_URISVERSIONSIZE
 	svp = hv_fetchs(hv, "SessionlessInvokeRequestType_urisVersion", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVAV) {
@@ -4442,6 +4449,11 @@ XS_unpack_UA_SessionlessInvokeRequestType(SV *in)
 		}
 		out.urisVersionSize = i;
 	}
+#else
+	svp = hv_fetchs(hv, "SessionlessInvokeRequestType_urisVersion", 0);
+	if (svp != NULL)
+		out.urisVersion = XS_unpack_UA_UInt32(*svp);
+#endif
 
 	svp = hv_fetchs(hv, "SessionlessInvokeRequestType_namespaceUris", 0);
 	if (svp != NULL) {
@@ -20479,9 +20491,15 @@ XS_pack_UA_ProgramDiagnostic2DataType(SV *out, UA_ProgramDiagnostic2DataType in)
 	XS_pack_UA_DateTime(sv, in.lastMethodCallTime);
 	hv_stores(hv, "ProgramDiagnostic2DataType_lastMethodCallTime", sv);
 
+#ifdef HAVE_UA_PROGRAMDIAGNOSTIC2DATATYPE_STATUSRESULT
 	sv = newSV(0);
 	XS_pack_UA_StatusResult(sv, in.lastMethodReturnStatus);
 	hv_stores(hv, "ProgramDiagnostic2DataType_lastMethodReturnStatus", sv);
+#else
+	sv = newSV(0);
+	XS_pack_UA_StatusCode(sv, in.lastMethodReturnStatus);
+	hv_stores(hv, "ProgramDiagnostic2DataType_lastMethodReturnStatus", sv);
+#endif
 
 	sv_setsv(out, sv_2mortal(newRV_noinc((SV*)hv)));
 }
@@ -20612,9 +20630,15 @@ XS_unpack_UA_ProgramDiagnostic2DataType(SV *in)
 	if (svp != NULL)
 		out.lastMethodCallTime = XS_unpack_UA_DateTime(*svp);
 
+#ifdef HAVE_UA_PROGRAMDIAGNOSTIC2DATATYPE_STATUSRESULT
 	svp = hv_fetchs(hv, "ProgramDiagnostic2DataType_lastMethodReturnStatus", 0);
 	if (svp != NULL)
 		out.lastMethodReturnStatus = XS_unpack_UA_StatusResult(*svp);
+#else
+	svp = hv_fetchs(hv, "ProgramDiagnostic2DataType_lastMethodReturnStatus", 0);
+	if (svp != NULL)
+		out.lastMethodReturnStatus = XS_unpack_UA_StatusCode(*svp);
+#endif
 
 	return out;
 }

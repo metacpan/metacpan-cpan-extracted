@@ -34,7 +34,7 @@ ok(my $buildinfo = $config->getBuildInfo(), "buildinfo get");
 no_leaks_ok { $config->getBuildInfo() } "buildinfo leak";
 my %info = (
     BuildInfo_buildDate => re(qr/^\d+$/),  # '132325380645571530',
-    BuildInfo_buildNumber => re(qr/^\w+$/),  # 'deb',
+    BuildInfo_buildNumber => re(qr/^.+$/),  # 'deb',
     BuildInfo_manufacturerName => 'open62541',
     BuildInfo_productName => 'open62541 OPC UA Server',
     BuildInfo_productUri => 'http://open62541.org',

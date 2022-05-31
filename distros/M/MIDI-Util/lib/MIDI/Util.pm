@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: MIDI Utilities
 
-our $VERSION = '0.1002';
+our $VERSION = '0.1101';
 
 use strict;
 use warnings;
@@ -15,6 +15,7 @@ use Exporter 'import';
 
 our @EXPORT = qw(
     midi_dump
+    reverse_dump
     midi_format
     set_chan_patch
     set_time_signature
@@ -72,74 +73,74 @@ sub midi_dump {
     my ($key) = @_;
 
     if ( lc $key eq 'volume' ) {
-        return [
-            map { "$_ => $MIDI::Simple::Volume{$_}" }
+        return {
+            map { $_ => $MIDI::Simple::Volume{$_} }
                 sort { $MIDI::Simple::Volume{$a} <=> $MIDI::Simple::Volume{$b} }
                     keys %MIDI::Simple::Volume
-        ];
+        };
     }
     elsif ( lc $key eq 'length' ) {
-        return [
-            map { "$_ => $MIDI::Simple::Length{$_}" }
+        return {
+            map { $_ => $MIDI::Simple::Length{$_} }
                 sort { $MIDI::Simple::Length{$a} <=> $MIDI::Simple::Length{$b} }
                     keys %MIDI::Simple::Length
-        ];
+        };
     }
     elsif ( lc $key eq 'ticks' ) {
-        return [
-            map { "$_ => " . $MIDI::Simple::Length{$_} * TICKS }
+        return {
+            map { $_ => $MIDI::Simple::Length{$_} * TICKS }
                 sort { $MIDI::Simple::Length{$a} <=> $MIDI::Simple::Length{$b} }
                     keys %MIDI::Simple::Length
-        ];
+        };
     }
     elsif ( lc $key eq 'note' ) {
-        return [
-            map { "$_ => $MIDI::Simple::Note{$_}" }
+        return {
+            map { $_ => $MIDI::Simple::Note{$_} }
                 sort { $MIDI::Simple::Note{$a} <=> $MIDI::Simple::Note{$b} }
                     keys %MIDI::Simple::Note
-        ];
+        };
     }
     elsif ( lc $key eq 'note2number' ) {
-        return [
-            map { "$_ => $MIDI::note2number{$_}" }
+        return {
+            map { $_ => $MIDI::note2number{$_} }
                 sort { $MIDI::note2number{$a} <=> $MIDI::note2number{$b} }
                     keys %MIDI::note2number
-        ];
+        };
     }
     elsif ( lc $key eq 'number2note' ) {
-        return [
-            map { "$_ => $MIDI::number2note{$_}" }
+        return {
+            map { $_ => $MIDI::number2note{$_} }
                 sort { $a <=> $b }
                     keys %MIDI::number2note
-        ];
+        };
     }
     elsif ( lc $key eq 'patch2number' ) {
-        return [
-            map { "$_ => $MIDI::patch2number{$_}" }
+        return {
+            map { $_ => $MIDI::patch2number{$_} }
                 sort { $MIDI::patch2number{$a} <=> $MIDI::patch2number{$b} }
                     keys %MIDI::patch2number
-        ];
+        };
     }
     elsif ( lc $key eq 'number2patch' ) {
-        return [
-            map { "$_ => $MIDI::number2patch{$_}" }
+        return {
+            map { $_ => $MIDI::number2patch{$_} }
                 sort { $a <=> $b }
                     keys %MIDI::number2patch
-        ];
+        };
     }
     elsif ( lc $key eq 'notenum2percussion' ) {
-        return [
-            map { "$_ => $MIDI::notenum2percussion{$_}" }
+        return {
+            map { $_ => $MIDI::notenum2percussion{$_} }
                 sort { $a <=> $b }
                     keys %MIDI::notenum2percussion
-        ];
+        };
     }
     elsif ( lc $key eq 'percussion2notenum' ) {
-        return [
-            map { "$_ => $MIDI::percussion2notenum{$_}" }
+        return {
+            map { $_ => $MIDI::percussion2notenum{$_} }
                 sort { $MIDI::percussion2notenum{$a} <=> $MIDI::percussion2notenum{$b} }
                     keys %MIDI::percussion2notenum
-        ];
+        };
     }
     elsif ( lc $key eq 'all_events' ) {
         return \@MIDI::Event::All_events;
@@ -159,6 +160,26 @@ sub midi_dump {
     else {
         return [];
     }
+}
+
+
+sub reverse_dump {
+    my ($name, $precision) = @_;
+
+    $precision //= -1;
+
+    my %by_value;
+
+    my $dump = midi_dump($name); # dumps an arrayref
+
+    for my $key (keys %$dump) {
+        my $val = $name eq 'length' && $precision >= 0
+            ? sprintf('%.*f', $precision, $dump->{$key})
+            : $dump->{$key};
+        $by_value{$val} = $key;
+    }
+
+    return \%by_value;
 }
 
 
@@ -236,7 +257,7 @@ MIDI::Util - MIDI Utilities
 
 =head1 VERSION
 
-version 0.1002
+version 0.1101
 
 =head1 SYNOPSIS
 
@@ -245,7 +266,7 @@ version 0.1002
   my $dump = midi_dump('volume'); # length, etc.
   print Dumper $dump;
 
-  my $size = dura_size('dqn');
+  my $size = dura_size('dqn'); # 1.5
 
   my $score = setup_score( bpm => 120, etc => '...', );
 
@@ -313,26 +334,35 @@ Positional parameters and defaults:
 
 =head2 midi_dump
 
-  $dump = midi_dump($list_name);
+  $dump = midi_dump($name);
 
-Return sorted array references of the following L<MIDI>,
+Return a hash or array reference of the following L<MIDI>,
 L<MIDI::Simple>, and L<MIDI::Event> internal lists:
 
-  Volume
-  Length
-  TICKS
-  Note
-  note2number
-  number2note
-  patch2number
-  number2patch
-  notenum2percussion
-  percussion2notenum
-  All_events
-  MIDI_events
-  Meta_events
-  Text_events
-  Nontext_meta_events
+  Hashes:
+    Volume
+    Length
+    TICKS
+    Note
+    note2number
+    number2note
+    patch2number
+    number2patch
+    notenum2percussion
+    percussion2notenum
+  Arrays:
+    All_events
+    MIDI_events
+    Meta_events
+    Text_events
+    Nontext_meta_events
+
+=head2 reverse_dump
+
+  $by_value = reverse_dump($name);
+  $by_value = reverse_dump($name, $precision); # for name = length
+
+Return the reversed hashref from the B<midi_dump> routine hashes section.
 
 =head2 midi_format
 
@@ -340,6 +370,9 @@ L<MIDI::Simple>, and L<MIDI::Event> internal lists:
 
 Change sharp C<#> and flat C<b>, in the list of named notes, to the
 L<MIDI::Simple> C<s> and C<f> respectively.
+
+Also change accidentals and double-accidentals into their note
+equivalents, e.g. C<Cb> to C<B>, C<C##> to C<D>, etc.
 
 =head2 set_time_signature
 
@@ -366,7 +399,9 @@ Return the B<score> ticks.
 
 =head1 SEE ALSO
 
-The F<t/01-functions.t> test file in this distribution
+The F<t/01-functions.t> test file and F<eg/*> in this distribution
+
+L<Exporter>
 
 L<MIDI>
 

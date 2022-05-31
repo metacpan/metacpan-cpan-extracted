@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+use 5.018;
+use warnings;
+use File::Basename;
+use Mojo::Util qw(dumper);
+
+if ( $ARGV[0] =~ /^\d+\.\d+\.\d+\.\d+\/\d+$/ ) {
+  my ( $ipstring, $mask ) = split '/', $ARGV[0];
+  my @ip = split /\./, $ipstring;
+  if ( $ip[0] < 256 and $ip[1] < 256 and $ip[2] < 256 and $ip[3] < 256 and $mask < 33 ) {
+    my $ipnum   = ( $ip[0] << 24 ) + ( $ip[1] << 16 ) + ( $ip[2] << 8 ) + ( $ip[3] );
+    my $masknum = ( 1 << 32 ) - ( 1 << ( 32 - $mask ) );
+    my $min     = $ipnum & $masknum;
+    my $max     = $min + ( 1 << ( 32 - $mask ) ) - 1;
+    print "min:$min\n" . "max:$max\n";
+    say changenumtoip($min);
+    say changenumtoip($max);
+  }
+  else {
+    say "ip wrong!";
+  }
+}
+else {
+  say "ip wrong!";
+}
+
+sub changenumtoip {
+  my ($ipnum) = @_;
+  my $ipstr   = '';
+  my $mask    = 255;
+  my $i;
+  for ( $i = 0; $i < 4; $i++ ) {
+    $ipstr = ( ( $ipnum >> ( $i * 8 ) ) & $mask ) . ( $i ? '.' : '' ) . $ipstr;
+  }
+  return $ipstr;
+}

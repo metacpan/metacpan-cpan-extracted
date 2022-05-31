@@ -1,5 +1,8 @@
 Changes file for Email::Filter
 
+1.035     2022-05-29 15:27:07-04:00 America/New_York
+          update support window: none; this is abandonware
+
 1.034     2013-12-31 10:12:19 America/New_York
           update github links
 

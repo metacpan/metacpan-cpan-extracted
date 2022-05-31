@@ -1,18 +1,19 @@
 .github/workflows/ci.yaml
 .perltidyrc
-.pls_cache/index
 .ship.conf
 Changes
 cpanfile
-example/rwf.pl
-example/sshp.pl
-example/tail.pl
+examples/rwf.pl
+examples/sshp.pl
+examples/sshpass
+examples/tail.pl
 lib/Mojo/IOLoop/ReadWriteFork.pm
 lib/Mojo/IOLoop/ReadWriteFork/SIGCHLD.pm
 Makefile.PL
 MANIFEST			This list of files
 README.md
 t/00-basic.t
+t/conduit-pty3.t
 t/event-asset.t
 t/event-drain.t
 t/event-finish.t

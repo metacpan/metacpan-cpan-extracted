@@ -6,9 +6,8 @@ use 5.010;
 
 use strict;
 use warnings;
-use experimental 'switch';
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 use Carp;
 use Fcntl qw[ :mode ];
@@ -25,15 +24,15 @@ use overload
 
 use Class::Tiny qw[
   name type size mtime mode parent server path
-  ], { _has_attrs => 0 };
+], { _has_attrs => 0 };
 
-#pod =begin pod_coverage
-#pod
-#pod =head3 BUILD
-#pod
-#pod =end pod_coverage
-#pod
-#pod =cut
+
+
+
+
+
+
+
 
 
 sub BUILD {
@@ -51,25 +50,21 @@ sub _statit {
     $self->_retrieve_attrs
       unless $self->_has_attrs;
 
-    for ( $op ) {
+    if    ( $op eq 'd' ) { return $self->is_dir }
 
-        when ( 'd' ) { return $self->is_dir }
+    elsif ( $op eq 'f' ) { return $self->is_file }
 
-        when ( 'f' ) { return $self->is_file }
+    elsif ( $op eq 's' ) { return $self->size }
 
-        when ( 's' ) { return $self->size }
+    elsif ( $op eq 'z' ) { return $self->size != 0 }
 
-        when ( 'z' ) { return $self->size != 0 }
+    elsif ( $op eq 'r' ) { return S_IROTH & $self->mode }
 
-        when ( 'r' ) { return S_IROTH & $self->mode }
+    elsif ( $op eq 'R' ) { return S_IROTH & $self->mode }
 
-        when ( 'R' ) { return S_IROTH & $self->mode }
+    elsif ( $op eq 'l' ) { return 0 }
 
-        when ( 'l' ) { return 0 }
-
-        default { croak( "unsupported file test: -$op\n" ) }
-
-    }
+    else { croak( "unsupported file test: -$op\n" ) }
 
 }
 
@@ -99,7 +94,7 @@ sub _get_entries {
             my %attr;
             @attr{qw[ name type size mtime mode]} = @$entry;
             $attr{parent}                         = $path;
-            $attr{_has_attrs}                      = 1;
+            $attr{_has_attrs}                     = 1;
 
             push @entries, \%attr;
 
@@ -130,7 +125,11 @@ sub _get_entries {
 
 1;
 
+__END__
+
 =pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
 
 =head1 NAME
 
@@ -138,7 +137,7 @@ Net::FTP::Path::Iter::Entry - Class representing a Filesystem Entry
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 DESCRIPTION
 
@@ -150,7 +149,7 @@ returning paths to iterators.  These subclasses have no unique methods
 or attributes of their own; they only have those of this, their parent
 class.
 
-=head1 ATTRIBUTES
+=head1 OBJECT ATTRIBUTES
 
 =head2 mode
 
@@ -218,16 +217,29 @@ returns true if the entry is a directory.
 
 returns true if the entry is a file.
 
+=head1 INTERNALS
+
 =begin pod_coverage
 
 =head3 BUILD
 
 =end pod_coverage
 
-=head1 BUGS AND LIMITATIONS
+=head1 SUPPORT
 
-You can make new bug reports, and view existing ones, through the
-web interface at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Net-FTP-Path-Iter>.
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-net-ftp-path-iter@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-FTP-Path-Iter
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/net-ftp-path-iter
+
+and may be cloned from
+
+  https://gitlab.com/djerius/net-ftp-path-iter.git
 
 =head1 SEE ALSO
 
@@ -254,86 +266,3 @@ This is free software, licensed under:
   The GNU General Public License, Version 3, June 2007
 
 =cut
-
-__END__
-
-#pod =pod
-#pod
-#pod =method is_dir
-#pod
-#pod   $bool = $entry->is_dir;
-#pod
-#pod returns true if the entry is a directory.
-#pod
-#pod =method is_file
-#pod
-#pod   $bool = $entry->is_file;
-#pod
-#pod returns true if the entry is a file.
-#pod
-#pod =attr mode
-#pod
-#pod The entry mode as returned by L<stat>.
-#pod
-#pod =attr mtime
-#pod
-#pod The entry modification time.
-#pod
-#pod =attr name
-#pod
-#pod The entry name.
-#pod
-#pod =attr path
-#pod
-#pod The complete path to the entry
-#pod
-#pod =attr parent
-#pod
-#pod The parent directory of the entry
-#pod
-#pod =attr server
-#pod
-#pod The L<Net::FTP> server object
-#pod
-#pod =attr size
-#pod
-#pod The size of the entry
-#pod
-#pod =attr type
-#pod
-#pod The type of the entry, one of
-#pod
-#pod =over
-#pod
-#pod =item f
-#pod
-#pod file
-#pod
-#pod =item d
-#pod
-#pod directory
-#pod
-#pod =item l
-#pod
-#pod symbolic link. See however L<Net::FTP::Path::Iter/Symbolic Links>
-#pod
-#pod =item ?
-#pod
-#pod unknown
-#pod
-#pod
-#pod =back
-#pod
-#pod =cut
-
-
-#pod =head1 DESCRIPTION
-#pod
-#pod A B<Net::FTP::Path::Iter::Entry> object represents an entry in the remote
-#pod FTP filesystem.  It is rarely seen in the wild. Rather,
-#pod L<Net::FTP::Path::Iter> uses the subclasses B<Net::FTP::Path::Iter::Entry::File>
-#pod and B<Net::FTP::Path::Iter::Entry::Dir> when passing paths to callbacks or
-#pod returning paths to iterators.  These subclasses have no unique methods
-#pod or attributes of their own; they only have those of this, their parent
-#pod class.
-#pod

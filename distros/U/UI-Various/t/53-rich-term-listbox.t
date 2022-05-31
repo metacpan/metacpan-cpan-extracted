@@ -41,7 +41,7 @@ BEGIN {
     chomp $_;
     -c $_  and  -w $_
 	or  plan skip_all => 'required TTY (' . $_ . ') not available';
-    plan tests => 15;
+    plan tests => 17;
 
     # define fixed environment for unit tests:
     delete $ENV{DISPLAY};
@@ -151,9 +151,10 @@ stdout_is
     'simple 8-5-0 mainloop runs correctly';
 
 ####################################
-# list without single selection:
-$lb8 = UI::Various::Listbox->new(texts => \@text8, height => 5,
-				 selection => 1);
+# list with single selection:
+my $counter = 0;
+$lb8 = UI::Various::Listbox->new(texts => \@text8, height => 5, selection => 1,
+				 on_select => sub { $counter++; });
 $win = $main->window({title => '8-5-1'}, $lb8, $quit);
 stdout_is
 {   _call_with_stdin("1\n2\n1\n3\n7\n", sub { $main->mainloop; });   }
@@ -207,11 +208,12 @@ stdout_is
     'simple 8-5-1 mainloop runs correctly';
 $_ = $lb8->selected;
 is($_, 1, 'selected after processing listbox 8-5-1 returns correct selection');
+is($counter, 2, 'counter has correct 1st value');
 
 ####################################
 # list with multiple selection:
-$lb8 = UI::Various::Listbox->new(texts => \@text8, height => 5,
-				 selection => 2);
+$lb8 = UI::Various::Listbox->new(texts => \@text8, height => 5, selection => 2,
+				 on_select => sub { $counter++; });
 $win = $main->window({title => '8-5-2'}, $lb8, $quit);
 stdout_is
 {   _call_with_stdin("1\n2\n1\n3\n7\n", sub { $main->mainloop; });   }
@@ -266,7 +268,7 @@ stdout_is
 @result = $lb8->selected;
 is_deeply(\@result, [1, 3],
 	  'selected after processing listbox 8-5-2 returns correct selection');
-
+is($counter, 4, 'counter has correct 2nd value');
 
 ####################################
 # short list with multiple selection:

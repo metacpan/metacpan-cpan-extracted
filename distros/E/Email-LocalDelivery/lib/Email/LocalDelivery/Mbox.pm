@@ -1,11 +1,13 @@
 use strict;
 use warnings;
-package Email::LocalDelivery::Mbox;
-{
-  $Email::LocalDelivery::Mbox::VERSION = '1.200';
-}
+package Email::LocalDelivery::Mbox 1.201;
 # ABSTRACT: deliver mail to an mbox
 
+#pod =head1 INSTEAD...
+#pod
+#pod Instead, consider using L<Email::Sender::Transport::Maildir>.
+#pod
+#pod =cut
 
 use File::Path;
 use File::Basename;
@@ -120,13 +122,24 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Email::LocalDelivery::Mbox - deliver mail to an mbox
 
 =head1 VERSION
 
-version 1.200
+version 1.201
+
+=head1 PERL VERSION
+
+This code is effectively abandonware.  Although releases will sometimes be made
+to update contact info or to fix packaging flaws, bug reports will mostly be
+ignored.  Feature requests are even more likely to be ignored.  (If someone
+takes up maintenance of this code, they will presumably remove this notice.)
+This means that whatever version of perl is currently required is unlikely to
+change -- but also that it might change at any new maintainer's whim.
 
 =head1 INSTEAD...
 
@@ -146,7 +159,7 @@ Casey West <casey@geeknest.com>
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =back
 

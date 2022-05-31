@@ -33,14 +33,23 @@ if ($Config{"PERL_VERSION"} == 8) {
 __END_WARNING__;
 }
 
+my $MM_VERSION = eval $ExtUtils::MakeMaker::VERSION;
+my %META_MERGE = (
+    'no_index' => {
+	'package' => [
+	    'Signals::XSIG::Meta',
+	    'Signals::XSIG::Meta56',
+	    ],
+    }
+    );
+
 WriteMakefile(
     NAME                => 'Signals::XSIG',
     AUTHOR              => q{Marty O'Brien <mob@cpan.org>},
     VERSION_FROM        => 'lib/Signals/XSIG.pm',
     ABSTRACT_FROM       => 'lib/Signals/XSIG.pm',
-    (eval $ExtUtils::MakeMaker::VERSION >= 6.3002
-      ? ('LICENSE'=> 'perl')
-      : ()),
+    ($MM_VERSION >= 6.3002 ? ('LICENSE'=> 'perl') : ()),
+    ($MM_VERSION >= 6.46 ? ('META_MERGE' => \%META_MERGE) : ()),
     PREREQ_PM => {
         'Test::More' => 0,
     },

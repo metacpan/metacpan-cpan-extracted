@@ -5,10 +5,8 @@ package CGI::Capture::TieSTDIN;
 use 5.006;
 use strict;
 use warnings;
-use vars qw{$VERSION};
-BEGIN {
-	$VERSION = '1.14';
-}
+
+our $VERSION = '1.15';
 
 sub TIEHANDLE {
 	my $class  = shift;
@@ -60,3 +58,35 @@ sub CLOSE {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+CGI::Capture::TieSTDIN
+
+=head1 VERSION
+
+version 1.15
+
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Capture>
+(or L<bug-CGI-Capture@rt.cpan.org|mailto:bug-CGI-Capture@rt.cpan.org>).
+
+=head1 AUTHOR
+
+Adam Kennedy <adamk@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2004 by Adam Kennedy.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

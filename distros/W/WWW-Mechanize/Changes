@@ -1,5 +1,10 @@
 Revision history for WWW::Mechanize
 
+2.08      2022-05-30 17:32:33Z
+    [TESTS]
+    - Drop CGI and HTTP::Server::Simple::CGI test dependencies (GH#327) (Graham
+      Knop)
+
 2.07      2022-04-29 15:39:17Z
     [FIXED]
     - Don't follow redirects in some tests (GH#326) (Olaf Alders)

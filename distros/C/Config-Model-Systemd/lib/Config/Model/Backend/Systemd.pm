@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Systemd ;
-$Config::Model::Backend::Systemd::VERSION = '0.250.1';
+$Config::Model::Backend::Systemd::VERSION = '0.251.1';
 use strict;
 use warnings;
 use 5.020;
@@ -96,7 +96,6 @@ sub read_systemd_units ($self, %args) {
     # config_dir => /etc/foo',    # absolute path
     # config_file       => 'foo.conf',   # file name
     # file_path  => './my_test/etc/foo/foo.conf'
-    # io_handle  => $io           # IO::File object
     # check      => yes|no|skip
 
     my $app = $self->instance->application;
@@ -256,7 +255,7 @@ Config::Model::Backend::Systemd - R/W backend for systemd configurations files
 
 =head1 VERSION
 
-version 0.250.1
+version 0.251.1
 
 =head1 SYNOPSIS
 

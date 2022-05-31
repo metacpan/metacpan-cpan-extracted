@@ -3,13 +3,13 @@ package Net::DNS::Parameters;
 ################################################
 ##
 ##	Domain Name System (DNS) Parameters
-##	(last updated 2021-11-22)
+##	(last updated 2022-04-01)
 ##
 ################################################
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Parameters.pm 1855 2021-11-26 11:33:48Z willem $)[2];
+our $VERSION = (qw$Id: Parameters.pm 1865 2022-05-21 09:57:49Z willem $)[2];
 
 use integer;
 use Carp;
@@ -360,48 +360,41 @@ sub dsotypebyval {
 }
 
 
-sub register {				## register( 'TOY', 1234 )	(NOT part of published API)
-	my ( $mnemonic, $rrtype ) = @_;				# uncoverable pod
-	$rrtype = rand(255) + 65280 unless $rrtype;
-	croak qq["$mnemonic" is a CLASS identifier] if defined $classbyname{$mnemonic = uc($mnemonic)};
-	for ( typebyval( $rrtype = int $rrtype ) ) {
-		return $rrtype if /^$mnemonic$/;		# duplicate registration
-		croak qq["$mnemonic" conflicts with TYPE$rrtype ($_)] unless /^TYPE\d+$/;
-		my $known = $typebyname{$mnemonic};
-		croak qq["$mnemonic" conflicts with TYPE$known] if $known;
-	}
-	$typebyval{$rrtype} = $mnemonic;
-	return $typebyname{$mnemonic} = $rrtype;
-}
-
-
 use constant EXTLANG => defined eval { require Net::DNS::Extlang };
 
-our $DNSEXTLANG = EXTLANG ? eval { Net::DNS::Extlang->new()->domain } : undef;
-
 sub _typespec {
-	eval {				## draft-levine-dnsextlang
-		<<'END' } if EXTLANG && $DNSEXTLANG;
-	my ($node) = @_;
+	my $generate = defined wantarray;
+	return EXTLANG ? eval <<'END' : '';			# no critic
+	my ($node) = @_;		## draft-levine-dnsextlang
+	my $instance = Net::DNS::Extlang->new();
+	my $basename = $instance->domain || return '';
 
 	require Net::DNS::Resolver;
-	my $resolver = Net::DNS::Resolver->new() || return;
-	my $response = $resolver->send( "$node.$DNSEXTLANG", 'TXT' ) || return;
+	my $resolver = Net::DNS::Resolver->new();
+	my $response = $resolver->send( "$node.$basename", 'TXT' ) || return '';
 
 	foreach my $txt ( grep { $_->type eq 'TXT' } $response->answer ) {
 		my @stanza = $txt->txtdata;
 		my ( $tag, $identifier, @attribute ) = @stanza;
 		next unless defined($tag) && $tag =~ /^RRTYPE=\d+$/;
-		register( $1, $2 ) if $identifier =~ /^(\w+):(\d+)\W*/;
-		return unless defined wantarray;
+		if ( $identifier =~ /^(\w+):(\d+)\W*/ ) {
+			my ( $mnemonic, $rrtype ) = ( uc($1), $2 );
+			croak qq["$mnemonic" is a CLASS identifier] if $classbyname{$mnemonic};
+			for ( typebyval($rrtype) ) {
+				next if /^$mnemonic$/i;		# duplicate registration
+				croak qq["$mnemonic" conflicts with TYPE$rrtype ($_)] unless /^TYPE\d+$/;
+				my $known = $typebyname{$mnemonic};
+				croak qq["$mnemonic" conflicts with TYPE$known] if $known;
+				$typebyval{$rrtype} = $mnemonic;
+				$typebyname{$mnemonic} = $rrtype;
+			}
+		}
+		return unless $generate;
 
-		my $extobj = Net::DNS::Extlang->new();
-		my $recipe = $extobj->xlstorerecord( $identifier, @attribute );
-		my @source = split /\n/, $extobj->compilerr($recipe);
-		return sub { defined( $_ = shift @source ) };
+		my $recipe = $instance->xlstorerecord( $identifier, @attribute );
+		return $instance->compilerr($recipe);
 	}
 END
-	return;
 }
 
 

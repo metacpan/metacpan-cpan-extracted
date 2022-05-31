@@ -7,7 +7,7 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-03-20'; # DATE
 our $DIST = 'Bencher-Scenarios-Games-Wordlist'; # DIST
-our $VERSION = '0.050'; # VERSION
+our $VERSION = '0.051'; # VERSION
 
 our $scenario = {
     summary => 'Benchmark startup overhead of Games::Word::Wordlist::* modules',
@@ -33,7 +33,7 @@ Bencher::Scenario::Games::Wordlist::startup - Benchmark startup overhead of Game
 
 =head1 VERSION
 
-This document describes version 0.050 of Bencher::Scenario::Games::Wordlist::startup (from Perl distribution Bencher-Scenarios-Games-Wordlist), released on 2022-03-20.
+This document describes version 0.051 of Bencher::Scenario::Games::Wordlist::startup (from Perl distribution Bencher-Scenarios-Games-Wordlist), released on 2022-03-20.
 
 =head1 SYNOPSIS
 
@@ -83,22 +83,22 @@ Benchmark with default options (C<< bencher -m Games::Wordlist::startup >>):
  +-------------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
  | participant                   | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
  +-------------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
- | Games::Word::Wordlist::SGB    |      30.6 |              24.7 |                 0.00% |               417.01% | 1.5e-05 |      20 |
- | Games::Word::Wordlist::Enable |      30.6 |              24.7 |                 0.06% |               416.70% | 1.6e-05 |      20 |
- | perl -e1 (baseline)           |       5.9 |               0   |               417.01% |                 0.00% | 7.7e-06 |      22 |
+ | Games::Word::Wordlist::Enable |     30.6  |             24.72 |                 0.00% |               420.93% | 1.4e-05 |      20 |
+ | Games::Word::Wordlist::SGB    |     30.6  |             24.72 |                 0.21% |               419.83% |   1e-05 |      20 |
+ | perl -e1 (baseline)           |      5.88 |              0    |               420.93% |                 0.00% | 4.5e-06 |      20 |
  +-------------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
 
 
 Formatted as L<Benchmark.pm|Benchmark> result:
 
-                          Rate  GWW:S  GWW:E  perl -e1 (baseline) 
-  GWW:S                 32.7/s     --     0%                 -80% 
-  GWW:E                 32.7/s     0%     --                 -80% 
-  perl -e1 (baseline)  169.5/s   418%   418%                   -- 
+                          Rate  GWW:E  GWW:S  perl -e1 (baseline) 
+  GWW:E                 32.7/s     --     0%                 -80% 
+  GWW:S                 32.7/s     0%     --                 -80% 
+  perl -e1 (baseline)  170.1/s   420%   420%                   -- 
  
  Legends:
-   GWW:E: mod_overhead_time=24.7 participant=Games::Word::Wordlist::Enable
-   GWW:S: mod_overhead_time=24.7 participant=Games::Word::Wordlist::SGB
+   GWW:E: mod_overhead_time=24.72 participant=Games::Word::Wordlist::Enable
+   GWW:S: mod_overhead_time=24.72 participant=Games::Word::Wordlist::SGB
    perl -e1 (baseline): mod_overhead_time=0 participant=perl -e1 (baseline)
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.

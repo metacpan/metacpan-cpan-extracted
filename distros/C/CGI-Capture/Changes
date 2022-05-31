@@ -1,29 +1,33 @@
 Revision history for Perl extension CGI-Capture
 
-1.14 Sat  6 Feb 2010
+1.15      2022-05-30 21:17:23Z
+        - tooling updates
+        - fix bad use of %config variable (RT#142935)
+
+1.14      2010-02-06
 	- Updating to Module::Install::DSL 0.92
 	- Show the details of the errors
 
-1.13 Wed 22 Apr 2009
+1.13      2009-04-22
 	- Updating to Module::Install::DSL 0.85
 	- Adding missing IO::Scalar dependency
 	- Switching to use Params::Util for type checking
 
-1.12 Tue 21 Apr 2009
+1.12      2009-04-21
 	- Updating to Module::Install::DSL 0.83
 	- Switching to IO::Scalar in the hope it ties properly
 
-1.11 Thu  6 Dec 2007
+1.11      2007-12-06
 	- Updating YAML::Tiny to ensure a bug fix is
 	  made for TERMCAP strings with unprintable
 	  characters in them. This was causing a large
 	  percentage of install attempts to spuriously fail.
 
-1.10 Mon 22 Oct 2007
+1.10      2007-10-22
 	- No functional changes
 	- Upgrading to newer AUTOMATED_TESTING tests
 
-1.09 Sat Jul 14 2007
+1.09      2007-07-14
 	- Now CGI::Capture is even MORE correct! :)
 	- Store and check the $INC{Config.pm} to be absolutely sure
 	  that the script is being run in the exact same perl binary.
@@ -32,37 +36,37 @@ Revision history for Perl extension CGI-Capture
         - Reverting to using Storable by default.
         - Skip YAML tests on platforms with a TERMCAP
 
-1.08 Tue Jun 26 2007
+1.08      2007-06-26
 	- Adding the cgicapture program for CGI debugging
 
-1.07 Tue Jun 26 2007
+1.07      2007-06-26
 	- Adding YAML (de)serialization support
 	- A few minor updates and cleanups
 
-1.06 Tue May  2 2006
+1.06      2006-05-02
 	- No functional changes
 	- IO::String is entirely more sane than IO::Scalar
 	- Upgraded Module::Install to much saner 0.62 as well
 
-1.05 Fri Dec 30 2005
+1.05      2005-12-30
 	- Moved from CVS to new SVN repository
 	- Upgraded Module::Install
 	- Moved to production version number.
 
-0.04 Tue Feb 15 2005
+0.04      2005-02-15
 	- Removing braindead Build.PL
 
-0.03 Sun Dec 12 2004
+0.03      2004-12-12
 	- Fixed a documentation bug
 
-0.02 Fri Dec 10 2004
+0.02      2004-12-10
 	- Oops, left the warning in
 
-0.01 Thu Dec  9 2004
+0.01      2004-12-09
 	- Confident the main functionality works
 
-0.00_02  Thu Dec  9 2004
+0.00_02   2004-12-09
 	- Bug fix
 
-0.00_01  Wed Dec  8 2004
+0.00_01   2004-12-08
 	- original version

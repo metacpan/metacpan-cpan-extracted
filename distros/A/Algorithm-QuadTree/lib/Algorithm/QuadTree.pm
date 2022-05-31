@@ -1,10 +1,8 @@
 package Algorithm::QuadTree;
-
+$Algorithm::QuadTree::VERSION = '0.3';
 use strict;
 use warnings;
 use Carp;
-
-our $VERSION = '0.2';
 
 ###############################
 #
@@ -21,6 +19,18 @@ our $VERSION = '0.2';
 # -depth => depth of tree
 #
 ###############################
+
+BEGIN {
+	require Algorithm::QuadTree::PP;
+	my $backend = 'Algorithm::QuadTree::PP';
+
+	my $check_backend = $ENV{ALGORITHM_QUADTREE_BACKEND} || 'Algorithm::QuadTree::XS';
+	if (eval "require $check_backend; 1;") {
+		$backend = $check_backend;
+	}
+
+	$backend->import;
+}
 
 sub new
 {
@@ -39,152 +49,19 @@ sub new
 		$obj->{uc $arg} = $args{"-$arg"};
 	}
 
-	$obj->{BACKREF} = {};
 	$obj->{ORIGIN} = [0, 0];
 	$obj->{SCALE} = 1;
-	$obj->{ROOT} = $obj->_addLevel(
-		1,    #current depth
-		$obj->{XMIN},
-		$obj->{YMIN},
-		$obj->{XMAX},
-		$obj->{YMAX},
-	);
+
+	_AQT_init($obj);
 
 	return $obj;
 }
 
-# recursive method which adds levels to the quadtree
-sub _addLevel
+sub DESTROY
 {
-	my ($self, $depth, @coords) = @_;
-	my $node = {
-		AREA => \@coords,
-	};
+	my ($self) = @_;
 
-	if ($depth < $self->{DEPTH}) {
-		my ($xmin, $ymin, $xmax, $ymax) = @coords;
-		my $xmid = $xmin + ($xmax - $xmin) / 2;
-		my $ymid = $ymin + ($ymax - $ymin) / 2;
-		$depth += 1;
-
-		# segment in the following order:
-		# top left, top right, bottom left, bottom right
-		$node->{CHILDREN} = [
-			$self->_addLevel($depth, $xmin, $ymid, $xmid, $ymax),
-			$self->_addLevel($depth, $xmid, $ymid, $xmax, $ymax),
-			$self->_addLevel($depth, $xmin, $ymin, $xmid, $ymid),
-			$self->_addLevel($depth, $xmid, $ymin, $xmax, $ymid),
-		];
-	}
-	else {
-		# leaves must have empty aref in objects
-		$node->{OBJECTS} = [];
-	}
-
-	return $node;
-}
-
-# this private method executes $code on every leaf node of the tree
-# which is within the circular shape
-sub _loopOnNodesInCircle
-{
-	my ($self, @coords) = @_;
-
-	# this is a bounding box of a circle
-	# it will help us filter out all the far away shapes
-	my @box = (
-		$coords[0] - $coords[2],
-		$coords[1] - $coords[2],
-		$coords[0] + $coords[2],
-		$coords[1] + $coords[2],
-	);
-
-	# avoid squaring the radius on each iteration
-	my $radius_squared = $coords[2] ** 2;
-
-	my @nodes;
-	for my $current (@{$self->_loopOnNodesInRectangle(@box)}) {
-		my ($cxmin, $cymin, $cxmax, $cymax) = @{$current->{AREA}};
-
-		my $cx = $coords[0] < $cxmin
-			? $cxmin
-			: $coords[0] > $cxmax
-				? $cxmax
-				: $coords[0]
-		;
-
-		my $cy = $coords[1] < $cymin
-			? $cymin
-			: $coords[1] > $cymax
-				? $cymax
-				: $coords[1]
-		;
-
-		push @nodes, $current
-			if ($coords[0] - $cx) ** 2 + ($coords[1] - $cy) ** 2
-			<= $radius_squared;
-	}
-
-	return \@nodes;
-}
-
-# this private method executes $code on every leaf node of the tree
-# which is within the rectangular shape
-sub _loopOnNodesInRectangle
-{
-	my ($self, @coords) = @_;
-
-	my @nodes;
-	my @loopargs = $self->{ROOT};
-	for my $current (@loopargs) {
-
-		# first check if obj overlaps current segment.
-		next if
-			$coords[0] > $current->{AREA}[2] ||
-			$coords[2] < $current->{AREA}[0] ||
-			$coords[1] > $current->{AREA}[3] ||
-			$coords[3] < $current->{AREA}[1];
-
-		if ($current->{CHILDREN}) {
-			push @loopargs, @{$current->{CHILDREN}};
-		} else {
-			# segment is a leaf and overlaps the obj
-			push @nodes, $current;
-		}
-	}
-
-	return \@nodes;
-}
-
-# choose the right function based on argument count
-# first argument is always $self, the rest are coords
-sub _loopOnNodes
-{
-	goto \&_loopOnNodesInCircle if @_ == 4;
-	goto \&_loopOnNodesInRectangle;
-}
-
-sub _addObject
-{
-	my ($self, $object, @coords) = @_;
-
-	for my $node (@{$self->_loopOnNodes(@coords)}) {
-		push @{$node->{OBJECTS}}, $object;
-		push @{$self->{BACKREF}{$object}}, $node;
-	}
-}
-
-sub _checkOverlap
-{
-	my ($self, @coords) = @_;
-
-	# map returned nodes to an array containing all of
-	# their objects
-	return [
-		map {
-			@{$_->{OBJECTS}}
-		} @{$self->_loopOnNodes(@coords)}
-	];
+	_AQT_deinit($self);
 }
 
 # modify coords according to window
@@ -231,7 +108,7 @@ sub add
 			if $coords[3] < $coords[1];
 	}
 
-	$self->_addObject($object, @coords);
+	_AQT_addObject($self, $object, @coords);
 
 	return;
 }
@@ -240,13 +117,7 @@ sub delete
 {
 	my ($self, $object) = @_;
 
-	return unless exists $self->{BACKREF}{$object};
-
-	for my $node (@{$self->{BACKREF}{$object}}) {
-		$node->{OBJECTS} = [ grep {$_ ne $object} @{$node->{OBJECTS}} ];
-	}
-
-	delete $self->{BACKREF}{$object};
+	_AQT_delete($self, $object);
 
 	return;
 }
@@ -255,12 +126,7 @@ sub clear
 {
 	my $self = shift;
 
-	for my $key (keys %{$self->{BACKREF}}) {
-		for my $node (@{$self->{BACKREF}{$key}}) {
-			$node->{OBJECTS} = [];
-		}
-	}
-	$self->{BACKREF} = {};
+	_AQT_clear($self);
 
 	return;
 }
@@ -272,7 +138,7 @@ sub getEnclosedObjects
 	@coords = $self->_adjustCoords(@coords)
 		unless $self->{SCALE} == 1;
 
-	my @results = @{$self->_checkOverlap(@coords)};
+	my @results = @{_AQT_findObjects($self, @coords)};
 
 	# uniq results
 	my %temp = map { $_ => $_ } @results;
@@ -507,6 +373,22 @@ NOTE: You are free, of course, to make the coordinate transformation yourself.
 This method resets the window region to the full map.
 
 =back
+
+=head2 Backends
+
+By default, the module uses L<Algorithm::QuadTree::PP>, which is the pure perl backend.
+
+If you install L<Algorithm::QuadTree::XS>, the module will load and use that
+instead. This behavior can be controlled by setting
+L<ALGORITHM_QUADTREE_BACKEND> environmental variable to the package name, which
+should be used as the backend.
+
+I<Note: the environmental variable must be present before loading Algorithm::QuadTree for the first time>
+
+	# will load pure perl backend regardless of XS availability
+	$ENV{ALGORITHM_QUADTREE_BACKEND} = 'Algorithm::QuadTree::PP';
+
+	use Algorithm::QuadTree;
 
 =head1 AUTHORS
 

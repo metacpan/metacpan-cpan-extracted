@@ -1,0 +1,120 @@
+# carton snapshot format: version 1.0
+DISTRIBUTIONS
+  Class-Inspector-1.36
+    pathname: P/PL/PLICEASE/Class-Inspector-1.36.tar.gz
+    provides:
+      Class::Inspector 1.36
+      Class::Inspector::Functions 1.36
+    requirements:
+      ExtUtils::MakeMaker 0
+      File::Spec 0.80
+      base 0
+      perl 5.008
+  Class-Tiny-1.008
+    pathname: D/DA/DAGOLDEN/Class-Tiny-1.008.tar.gz
+    provides:
+      Class::Tiny 1.008
+      Class::Tiny::Object 1.008
+    requirements:
+      Carp 0
+      ExtUtils::MakeMaker 6.17
+      perl 5.006
+      strict 0
+      warnings 0
+  Data-Gimei-v0.1.0
+    pathname: Y/YO/YOUPONG/Data-Gimei-v0.1.0.tar.gz
+    provides:
+      Data::Gimei v0.1.0
+      Data::Gimei::Address undef
+      Data::Gimei::Name undef
+      Data::Gimei::Random undef
+      Data::Gimei::Word undef
+    requirements:
+      Carp 0
+      Class::Tiny 0
+      File::Share 0
+      Math::Random 0
+      Module::Build::Tiny 0.035
+      YAML::XS 0
+      feature 0
+      perl 5.022001
+      version 0
+  File-Share-0.25
+    pathname: I/IN/INGY/File-Share-0.25.tar.gz
+    provides:
+      File::Share 0.25
+    requirements:
+      ExtUtils::MakeMaker 6.30
+      File::ShareDir 1.03
+  File-ShareDir-1.118
+    pathname: R/RE/REHSACK/File-ShareDir-1.118.tar.gz
+    provides:
+      File::ShareDir 1.118
+    requirements:
+      Carp 0
+      Class::Inspector 1.12
+      ExtUtils::MakeMaker 0
+      File::ShareDir::Install 0.13
+      File::Spec 0.80
+      perl 5.008001
+      warnings 0
+  File-ShareDir-Install-0.13
+    pathname: E/ET/ETHER/File-ShareDir-Install-0.13.tar.gz
+    provides:
+      File::ShareDir::Install 0.13
+    requirements:
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      File::Spec 0
+      IO::Dir 0
+      perl 5.006
+      strict 0
+      warnings 0
+  Getopt-Long-2.52
+    pathname: J/JV/JV/Getopt-Long-2.52.tar.gz
+    provides:
+      Getopt::Long 2.52
+      Getopt::Long::CallBack 2.52
+      Getopt::Long::Parser 2.52
+    requirements:
+      ExtUtils::MakeMaker 0
+      Pod::Usage 1.14
+  Math-Random-0.72
+    pathname: G/GR/GROMMEL/Math-Random-0.72.tar.gz
+    provides:
+      Math::Random 0.72
+    requirements:
+      ExtUtils::MakeMaker 0
+  Perl-Tidy-20220217
+    pathname: S/SH/SHANCOCK/Perl-Tidy-20220217.tar.gz
+    provides:
+      Perl::Tidy 20220217
+      Perl::Tidy::Debugger 20220217
+      Perl::Tidy::DevNull 20220217
+      Perl::Tidy::Diagnostics 20220217
+      Perl::Tidy::FileWriter 20220217
+      Perl::Tidy::Formatter 20220217
+      Perl::Tidy::HtmlWriter 20220217
+      Perl::Tidy::IOScalar 20220217
+      Perl::Tidy::IOScalarArray 20220217
+      Perl::Tidy::IndentationItem 20220217
+      Perl::Tidy::LineBuffer 20220217
+      Perl::Tidy::LineSink 20220217
+      Perl::Tidy::LineSource 20220217
+      Perl::Tidy::Logger 20220217
+      Perl::Tidy::Tokenizer 20220217
+      Perl::Tidy::VerticalAligner 20220217
+      Perl::Tidy::VerticalAligner::Alignment 20220217
+      Perl::Tidy::VerticalAligner::Line 20220217
+    requirements:
+      ExtUtils::MakeMaker 0
+  YAML-LibYAML-0.83
+    pathname: T/TI/TINITA/YAML-LibYAML-0.83.tar.gz
+    provides:
+      YAML::LibYAML 0.83
+      YAML::XS 0.83
+      YAML::XS::LibYAML undef
+    requirements:
+      ExtUtils::MakeMaker 0
+      perl 5.008001

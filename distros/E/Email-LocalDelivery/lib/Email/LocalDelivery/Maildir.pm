@@ -1,14 +1,16 @@
 use strict;
 use warnings;
-package Email::LocalDelivery::Maildir;
-{
-  $Email::LocalDelivery::Maildir::VERSION = '1.200';
-}
+package Email::LocalDelivery::Maildir 1.201;
 # ABSTRACT: deliver mail to a Maildir
 use Email::Simple;
 use File::Path;
 use Symbol qw(gensym);
 
+#pod =head1 INSTEAD...
+#pod
+#pod Instead, consider using L<Email::Sender::Transport::Maildir>.
+#pod
+#pod =cut
 
 my $maildir_time    = 0;
 my $maildir_counter = 0;
@@ -115,13 +117,24 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Email::LocalDelivery::Maildir - deliver mail to a Maildir
 
 =head1 VERSION
 
-version 1.200
+version 1.201
+
+=head1 PERL VERSION
+
+This code is effectively abandonware.  Although releases will sometimes be made
+to update contact info or to fix packaging flaws, bug reports will mostly be
+ignored.  Feature requests are even more likely to be ignored.  (If someone
+takes up maintenance of this code, they will presumably remove this notice.)
+This means that whatever version of perl is currently required is unlikely to
+change -- but also that it might change at any new maintainer's whim.
 
 =head1 INSTEAD...
 
@@ -141,7 +154,7 @@ Casey West <casey@geeknest.com>
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =back
 

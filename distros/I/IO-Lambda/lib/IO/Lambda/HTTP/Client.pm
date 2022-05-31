@@ -15,9 +15,9 @@ use IO::Lambda qw(:lambda :stream);
 use IO::Lambda::Socket qw(connect);
 use Time::HiRes qw(time);
 
-sub http_request(&) 
+sub http_request(&)
 {
-	__PACKAGE__-> new(context)-> 
+	__PACKAGE__-> new(context)->
 		condition(shift, \&http_request, 'http_request')
 }
 
@@ -51,10 +51,18 @@ sub new
 	}
 
 	require IO::Lambda::DNS if $self-> {async_dns};
-	
+
 	my $h = $req-> headers;
 	while ( my ($k, $v) = each %headers) {
 		$h-> header($k, $v) unless defined $h-> header($k);
+	}
+
+	if ( $options{cookie_jar} //= {} ) {
+		if ( ref($options{cookie_jar}) eq 'HASH') {
+			require HTTP::Cookies;
+			$options{cookie_jar} = HTTP::Cookies->new(%{$options{cookie_jar}});
+		}
+		$self->{cookie_jar} = $options{cookie_jar};
 	}
 
 	return $self-> handle_redirect( $req);
@@ -64,7 +72,6 @@ sub new
 sub finalize_response
 {
 	my ( $self, $req, $response) = @_;
-	$response-> request($req);
 	return $response;
 }
 
@@ -72,7 +79,7 @@ sub finalize_response
 sub handle_redirect
 {
 	my ( $self, $req) = @_;
-		
+
 	my $was_redirected = 0;
 	my $was_failed_auth = 0;
 
@@ -87,27 +94,42 @@ sub handle_redirect
 			$method = $self-> get_authenticator( $req, $x);
 			undef $auth;
 		}
+		$self->{cookie_jar}->add_cookie_header($req) if
+			$self->{cookie_jar} &&
+			!$req->headers->header('Cookie');
 		context $method || $self-> handle_connection( $req);
 	tail   {
 		# request is finished
 		my $response = shift;
 		return $response unless ref($response);
 
-		if ( $response-> code =~ /^3/) {
+		$response-> request($req);
+		$self->{cookie_jar}->extract_cookies($response) if $self->{cookie_jar};
+
+		if ( $response-> code =~ /^30[12378]$/) {
+			return $self-> finalize_response($req, $response)
+				if $self->{max_redirect} == 0;
+
 			$was_failed_auth = 0;
-			return 'too many redirects' 
+			return 'too many redirects'
 				if ++$was_redirected > $self-> {max_redirect};
 
 			my $location = $response-> header('Location');
 			return $response unless defined $location;
-			$req-> uri( URI-> new_abs( $location, $req-> uri));
+
+			my $uri = URI-> new_abs( $location, $req-> uri);
+			return $response if $uri->scheme !~ /^https?$/;
+
+			$req-> uri($uri);
 			$req-> headers-> header( Host => $req-> uri-> host);
+			$req-> remove_header('Cookie');
+			$req-> method('GET');
 
 			warn "redirect to " . $req-> uri . "\n" if $DEBUG;
 
-			this-> start; 
-		} elsif ( 
-			not($was_failed_auth) and 
+			this-> start;
+		} elsif (
+			not($was_failed_auth) and
 			$response-> code eq '401' and
 			defined($self-> {username}) and
 			defined($self-> {password})
@@ -237,16 +259,16 @@ sub socket
 	return $sock, ( $sock ? undef : "connect: $!");
 }
 
-# Connect to the remote, wait for protocol to finish, and
-# close the connection if needed. Returns HTTP::Response object on success
-sub handle_connection
+sub parse_proxy
 {
 	my ( $self, $req) = @_;
-	
 	my ( $host, $port);
-	if ( defined( $self-> {proxy})) {
-		if ( ref($self->{proxy})) {
-			return lambda { "'proxy' option must be a non-empty array" } if
+	if ( exists( $self-> {proxy})) {
+		if ( !defined $self->{proxy}) {
+			# nothing
+			( $host, $port) = ( $req-> uri-> host, $req-> uri-> port);
+		} elsif ( ref($self->{proxy})) {
+			Carp::confess("'proxy' option must be a non-empty array") if
 				ref($self->{proxy}) ne 'ARRAY' or
 				not @{$self->{proxy}};
 			($host, $port) = @{$self->{proxy}};
@@ -255,8 +277,32 @@ sub handle_connection
 		}
 		$port ||= $req-> uri-> port;
 	} else {
+		my $scheme = $req-> uri-> scheme;
 		( $host, $port) = ( $req-> uri-> host, $req-> uri-> port);
+		my %proxy;
+		for my $id ($scheme, qw(all no)) {
+			if ( exists $ENV{"${id}_proxy"}) {
+				$proxy{$id} = $ENV{"${id}_proxy"};
+			} elsif ( exists $ENV{uc "${id}_proxy"}) {
+				$proxy{$id} = $ENV{uc "${id}_proxy"};
+			}
+		}
+		my $proxy = $proxy{all} // $proxy{$scheme};
+		$proxy{no} //= '';
+		($host, $port) = ( $proxy =~ /^(.+?)\:(\d+)$/) ?  ($1, $2) : ($proxy, 80)
+			if defined($proxy) and $proxy{no} ne '*' and $proxy{no} !~ /\b\Q$host\E\b/;
 	}
+	return ( $host, $port);
+
+}
+
+# Connect to the remote, wait for protocol to finish, and
+# close the connection if needed. Returns HTTP::Response object on success
+sub handle_connection
+{
+	my ( $self, $req) = @_;
+
+	my ( $host, $port) = $self->parse_proxy($req);
 
 	# have a chance to load eventual modules early
 	my $err = $self-> prepare_transport( $req);
@@ -268,8 +314,8 @@ sub handle_connection
 			$self-> {async_dns} and
 			$host !~ /^(\d{1,3}\.){3}(\d{1,3})$/
 		) {
-			context $host, 
-				timeout => ($self-> {deadline} || $IO::Lambda::DNS::TIMEOUT); 
+			context $host,
+				timeout => ($self-> {deadline} || $IO::Lambda::DNS::TIMEOUT);
 			warn "resolving $host\n" if $DEBUG;
 			return IO::Lambda::DNS::dns( sub {
 				$host = shift;
@@ -280,9 +326,9 @@ sub handle_connection
 		}
 
 		delete $self-> {close_connection};
-		$self-> {close_connection}++ 
+		$self-> {close_connection}++
 			if ( $req-> header('Connection') || '') =~ /^close/i;
-		
+
 		# got cached socket?
 		my ( $sock, $cached);
 		my $cc = $self-> {conn_cache};
@@ -309,13 +355,13 @@ sub handle_connection
 
 		$self-> {socket} = $sock;
 		$self-> {reader} = readbuf ( $self-> {reader});
-		$self-> {writer} = $self-> {writer}-> ($cached) if $self-> {writer}; 
+		$self-> {writer} = $self-> {writer}-> ($cached, $host, $port) if $self-> {writer};
 		$self-> {writer} = writebuf( $self-> {writer});
 
 		context $self-> handle_request( $req);
 	autocatch tail {
 		my $response = shift;
-		
+
 		# put back the connection, if possible
 		if ( $cc and not $self-> {close_connection}) {
 			my $err = unpack('i', getsockopt( $sock, SOL_SOCKET, SO_ERROR));
@@ -323,11 +369,8 @@ sub handle_connection
 			$cc-> deposit( __PACKAGE__, "$host:$port", $sock)
 				unless $err;
 		}
-			
 		warn "connection:close\n" if $DEBUG and $self-> {close_connection};
-
 		delete @{$self}{qw(close_connection socket buf writer reader)};
-		
 		return $response;
 	}}}
 }
@@ -382,7 +425,7 @@ sub handle_request_in_buffer
 
 	lambda {
 		# send request
-		context 
+		context
 			$self-> {writer}, 
 			$self-> {socket}, \ $req_line, 
 			undef, 0, $self-> {deadline};
@@ -394,7 +437,7 @@ sub handle_request_in_buffer
 	readable {
 		# request sent, now wait for data
 		return undef, 'timeout' unless shift;
-		
+
 		# read first line
 		context $self-> http_read(qr/^.*?\n/);
 	state head => tail {
@@ -587,6 +630,12 @@ The requestor can optionally use a C<LWP::ConnCache> object to reuse
 connections on per-host per-port basis. Desired for HTTP/1.1. Required for the
 NTLM/Negotiate authentication.  See L<LWP::ConnCache> for details.
 
+=item cookie_jar $HTTP::Cookies = {}
+
+The requestor can optionally use a shared C<HTTP::Cookies> object to support cookies.
+If not set, a local cookie jar is created an used fo reventual redirects. To disable that,
+set C<cookie_jar> to 0. See L<HTTP::Cookies> for details.
+
 =item deadline SECONDS = undef
 
 Aborts a request and returns C<'timeout'> string as an error if the request is
@@ -633,6 +682,9 @@ request is reported as failed.
 =item proxy HOSTNAME | [ HOSTNAME, PORT ]
 
 If set, HOSTNAME (or HOSTNAME and PORT tuple) is used as HTTP proxy.
+If set to undef, proxy is not used.
+If unset, the proxy is set automatically after content of environment variables
+C<all_proxy>, C<http_proxy>, C<https_proxy>, C<no_proxy>.
 
 =item timeout SECONDS = undef
 

@@ -6,7 +6,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 use strict;
 use warnings;
@@ -58,16 +58,11 @@ sub _retrieve_attrs {
 
 1;
 
-#pod =head1 DESCRIPTION
-#pod
-#pod B<Net::FTP::Path::Iter::File> is a class representing a file entry. It is a subclass
-#pod of L<Net::FTP::Path::Iter::Entry>; see it for all available methods.
-#pod
-#pod
-
 __END__
 
 =pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
 
 =head1 NAME
 
@@ -75,17 +70,30 @@ Net::FTP::Path::Iter::File - Class representing a File
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 DESCRIPTION
 
 B<Net::FTP::Path::Iter::File> is a class representing a file entry. It is a subclass
 of L<Net::FTP::Path::Iter::Entry>; see it for all available methods.
 
-=head1 BUGS AND LIMITATIONS
+=head1 INTERNALS
 
-You can make new bug reports, and view existing ones, through the
-web interface at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Net-FTP-Path-Iter>.
+=head1 SUPPORT
+
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-net-ftp-path-iter@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-FTP-Path-Iter
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/net-ftp-path-iter
+
+and may be cloned from
+
+  https://gitlab.com/djerius/net-ftp-path-iter.git
 
 =head1 SEE ALSO
 

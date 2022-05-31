@@ -16,7 +16,7 @@ eval {
 	my $obj  = Net::DNS::Resolver-> new();
 	my $sock = $obj-> bgsend('www.google.com');
 	my $time = time + 5;
-	while ( not $obj-> bgisready( $sock )) { die if time > $time };
+	while ( $obj-> bgbusy( $sock )) { die if time > $time };
 	my $packet = $obj-> bgread( $sock);
 	die unless $packet;
 };

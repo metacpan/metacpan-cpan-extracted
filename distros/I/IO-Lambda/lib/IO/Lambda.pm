@@ -16,7 +16,7 @@ use vars qw(
 	$THIS @CONTEXT $METHOD $CALLBACK $AGAIN $SIGTHROW
 	$DEBUG_IO $DEBUG_LAMBDA $DEBUG_CALLER %DEBUG
 );
-$VERSION     = '1.30';
+$VERSION     = '1.31';
 @ISA         = qw(Exporter);
 @EXPORT_CONSTANTS = qw(
 	IO_READ IO_WRITE IO_EXCEPTION 
@@ -395,7 +395,7 @@ sub lambda_handler
 		if $nn == @$in or $self != $rec->[WATCH_OBJ];
 
 	my $lambda = $rec-> [WATCH_LAMBDA];
-	die _d($self, 
+	die _d($self,
 		'handler called but ', _obj($lambda),
 		' is not finished yet') unless $lambda-> {stopped};
 
@@ -404,14 +404,14 @@ sub lambda_handler
 	delete $EVENTS{"$lambda"} unless @$arr;
 
 	_d_in if $DEBUG_LAMBDA;
-				
+
 	local $self-> {cancel} = $rec-> [WATCH_CANCEL];
-	@{$self->{last}} = 
-		$rec-> [WATCH_CALLBACK] ? 
+	@{$self->{last}} =
+		$rec-> [WATCH_CALLBACK] ?
 			$rec-> [WATCH_CALLBACK]-> (
-				$self, 
+				$self,
 				@{$rec-> [WATCH_LAMBDA]-> {last}}
-			) : 
+			) :
 			@{$rec-> [WATCH_LAMBDA]-> {last}};
 
 	_d_out if $DEBUG_LAMBDA;
@@ -562,24 +562,34 @@ sub destroy
 
 # drives objects dependant on the other objects until all of them
 # are stopped
+my ($drive_reentrancy_refresh, $drive_reentrancy_depth) = (0,0);
 sub drive
 {
+	$drive_reentrancy_depth++;
+
 	my $changed = 1;
 	my $executed = 0;
 	warn "IO::Lambda::drive --------\n" if $DEBUG_LAMBDA;
-	while ( $changed) {
-		$changed = 0;
+	eval {
+		while ( $changed) {
+			$changed = 0;
 
-		# dispatch
-		for my $rec ( map { @$_ } values %EVENTS) {
-			next unless $rec->[WATCH_LAMBDA]-> {stopped};
-			$rec->[WATCH_OBJ]-> lambda_handler( $rec);
-			$changed = 1;
-			$executed++;
+			# dispatch
+			for my $rec ( map { @$_ } values %EVENTS) {
+				next unless $rec->[WATCH_LAMBDA]-> {stopped};
+				$changed = 1;
+				$executed++;
+				$rec->[WATCH_OBJ]-> lambda_handler( $rec);
+				$drive_reentrancy_refresh = 0, last if $drive_reentrancy_refresh;
+			}
+			warn "IO::Lambda::drive .........\n" if $DEBUG_LAMBDA and $changed;
 		}
-	warn "IO::Lambda::drive .........\n" if $DEBUG_LAMBDA and $changed;
-	}
+	};
+	die $@ if $@;
 	warn "IO::Lambda::drive +++++++++\n" if $DEBUG_LAMBDA;
+
+	$drive_reentrancy_depth--;
+	$drive_reentrancy_refresh++ if $executed && $drive_reentrancy_depth;
 
 	return $executed;
 }
@@ -654,7 +664,7 @@ sub wait_for_any
 	my @frame = get_frame();
 	while ( 1) {
 		my @n = grep { $_-> {stopped} } @objects;
-		return @n if @n;
+		set_frame(@frame), return @n if @n;
 		yield;
 	}
 	set_frame(@frame);
@@ -664,7 +674,7 @@ sub wait_for_any
 # run the event loop until no lambdas are left in the blocking state
 sub run {
 	my @frame = get_frame();
-	do {} while yield 
+	do {} while yield;
 	set_frame(@frame);
 }
 

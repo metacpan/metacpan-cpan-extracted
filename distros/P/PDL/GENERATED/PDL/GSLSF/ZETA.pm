@@ -49,7 +49,7 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-#line 1058 "../../../../blib/lib/PDL/PP.pm"
+#line 948 "../../../../blib/lib/PDL/PP.pm"
 
 
 
@@ -74,14 +74,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1060 "../../../../blib/lib/PDL/PP.pm"
+#line 950 "../../../../blib/lib/PDL/PP.pm"
 
 *gsl_sf_zeta = \&PDL::gsl_sf_zeta;
 #line 81 "ZETA.pm"
 
 
 
-#line 1058 "../../../../blib/lib/PDL/PP.pm"
+#line 948 "../../../../blib/lib/PDL/PP.pm"
 
 
 
@@ -106,14 +106,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1060 "../../../../blib/lib/PDL/PP.pm"
+#line 950 "../../../../blib/lib/PDL/PP.pm"
 
 *gsl_sf_hzeta = \&PDL::gsl_sf_hzeta;
 #line 113 "ZETA.pm"
 
 
 
-#line 1058 "../../../../blib/lib/PDL/PP.pm"
+#line 948 "../../../../blib/lib/PDL/PP.pm"
 
 
 
@@ -138,7 +138,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1060 "../../../../blib/lib/PDL/PP.pm"
+#line 950 "../../../../blib/lib/PDL/PP.pm"
 
 *gsl_sf_eta = \&PDL::gsl_sf_eta;
 #line 145 "ZETA.pm"

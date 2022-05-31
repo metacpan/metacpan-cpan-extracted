@@ -17,7 +17,7 @@ use strict;
 #use PDL::PP; ##-- do NOT do this!
 use Exporter;
 
-our $VERSION = '1.0.20'; ##-- v1.0.4: use perl-reversion from Perl::Version instead
+our $VERSION = '1.0.21'; ##-- v1.0.4: use perl-reversion from Perl::Version instead
 our @ISA = qw(Exporter);
 our @EXPORT_OK =
   (
@@ -525,9 +525,9 @@ sub vvpp_lb_code {
 =head2 Low-Level Functions
 
 Some additional low-level functions are provided in the
-PDL::Ngrams::ngutils
+PDL::Ngrams::Utils
 package.
-See L<PDL::Ngrams::ngutils> for details.
+See L<PDL::Ngrams::Utils> for details.
 
 =cut
 

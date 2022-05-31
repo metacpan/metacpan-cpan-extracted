@@ -62,7 +62,7 @@
       },
       "AsposeCellsCloud::CellsApi" : {
          "file" : "lib/AsposeCellsCloud/CellsApi.pm",
-         "version" : "22.4"
+         "version" : "22.5"
       },
       "AsposeCellsCloud::LiteCellsApi" : {
          "file" : "lib/AsposeCellsCloud/LiteCellsApi.pm"
@@ -106,6 +106,12 @@
       "AsposeCellsCloud::Object::Border" : {
          "file" : "lib/AsposeCellsCloud/Object/Border.pm"
       },
+      "AsposeCellsCloud::Object::BarcodeResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/BarcodeResponse.pm"
+      }, 
+      "AsposeCellsCloud::Object::BarcodeResponseList" : {
+         "file" : "lib/AsposeCellsCloud/Object/BarcodeResponseList.pm"
+      },       
       "AsposeCellsCloud::Object::BatchConvertRequest" : {
          "file" : "lib/AsposeCellsCloud/Object/BatchConvertRequest.pm"
       },      
@@ -843,6 +849,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "22.4",
+   "version" : "22.5",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

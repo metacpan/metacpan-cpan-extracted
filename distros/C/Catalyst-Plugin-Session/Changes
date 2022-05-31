@@ -1,5 +1,15 @@
 Revision history for Perl extension Catalyst::Plugin::Session
 
+0.42 - 2022-05-31
+      - revised packaging
+      - correctly specify test prerequisites as test prerequisites
+      - drop unused Test::Exception prereq
+      - drop Tie::RefHash prereq that was not used directly
+      - only run pod tests for authors
+      - ensure all optional tests are run by authors
+      - drop use of Test::WWW::Mechanize::PSGI and Test::WWW::Mechanize::Catalyst
+        in favor of a simpler user agent
+
 0.41 2018-12-05
       - Don't let an evil session ID supplier have an easy XSS vector (Michael McClimon++)
 

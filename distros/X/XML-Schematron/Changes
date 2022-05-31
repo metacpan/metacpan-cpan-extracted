@@ -1,4 +1,8 @@
 Revision history for Perl extension XML::Schematron.
+1.10  2022-05-29
+    - Add GitHub repo info.
+    - Minor POD fixes.
+
 1.09  We Nov 3 2010
     - Bugfix for modern Moose/Perl combos and native trait values. Thanks to Denise Mauldin for the catch.
 
@@ -6,7 +10,7 @@ Revision history for Perl extension XML::Schematron.
     - Migrated to Moose
 
 0.97  Mon Jan 21 2002
-	- bugfix for verify() in XPath.pm. Thanks to Michael Roberts <mroberts@cq.com>.
+	- Bugfix for verify() in XPath.pm. Thanks to Michael Roberts <mroberts@cq.com>.
 
 0.97  Mon Jan 21 2002
 	- verify() now takes strings too instead of just file names.
@@ -20,9 +24,9 @@ Revision history for Perl extension XML::Schematron.
 	- Changed the test harness.
 
 0.90  Tue May 08 2001
-        - Added support for LibXSLT
-        - Added new SchematronXSLTProcessor base class and moved the generic XSLT functions there.
-          Now, any new XSLT "drivers" need only implement the "verify" function.
+    - Added support for LibXSLT
+    - Added new SchematronXSLTProcessor base class and moved the generic XSLT functions there.
+      Now, any new XSLT "drivers" need only implement the "verify" function.
 
 0.53  Wed Dec 06 2000
 	- POD doc fixes.
@@ -37,9 +41,9 @@ Revision history for Perl extension XML::Schematron.
 
 0.51  Tue Oct 31 2000
 	- added array vs. string context for returning messages.
-        - removed dependency on Sablotron in base package
-          (Thanks to Matt Sergeant for the catch in both cases)
-        - Added Copyright notice
+    - removed dependency on Sablotron in base package
+      (Thanks to Matt Sergeant for the catch in both cases)
+    - Added Copyright notice
 
 0.50  Mon Oct 30 16:25:09 2000
 	- original version; created by h2xs 1.19

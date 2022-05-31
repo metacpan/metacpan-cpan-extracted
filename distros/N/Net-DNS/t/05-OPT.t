@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 05-OPT.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
+# $Id: 05-OPT.t 1864 2022-04-14 15:18:49Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -128,14 +128,12 @@ foreach my $method (qw(class ttl)) {
 	$edns->option( 4 => '' );
 	is( length( $edns->option(4) ), 0, "option 4 => ''" );
 
-	$edns->option( DAU => [5, 7, 8, 10] );
-	is( length( $edns->option(5) ), 4, "option DAU => [5, 7, 8, 10]" );
+	$edns->option( DAU => [8, 10, 13, 14, 15, 16] );
+	is( length( $edns->option(5) ), 6, "option DAU => [ ... ]" );
 
 	$edns->option( 10 => {'CLIENT-COOKIE' => 'rawbytes'} );
 	is( length( $edns->option(10) ), 8, "option 10 => {CLIENT-COOKIE => ... }" );
 
-
-	$edns->option( 5 => pack 'H*', '0507080A0D0E0F10' );
 
 	$edns->option( 6 => pack 'H*', '010204' );
 
@@ -157,13 +155,10 @@ foreach my $method (qw(class ttl)) {
 
 
 	foreach my $option ( sort { $a <=> $b } keys %Net::DNS::Parameters::ednsoptionbyval ) {
-		my $content = $edns->option($option);		# check option interpretation
-
-		my @interpretation = $edns->option($option);
+		my @interpretation = $edns->option($option);	# check option interpretation
 		$edns->option( $option => (@interpretation) );
-
-		my $uninterpreted = $edns->option($option);
-		is( $uninterpreted, $content, "compose/decompose option $option" );
+		my @reconstitution = $edns->option($option);
+		is( "@reconstitution", "@interpretation", "compose/decompose option $option" );
 	}
 
 

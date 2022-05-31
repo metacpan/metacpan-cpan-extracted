@@ -9,7 +9,7 @@ use version;
 use Carp qw/carp croak confess cluck/;
 use Try::Tiny;
 
-our $VERSION = qv("v4.0.1");
+our $VERSION = qv("v5.0.1");
 
 require Exporter;
 our @ISA       = ('Exporter');
@@ -42,7 +42,8 @@ __END__
 
 =head1 NAME
 
-Arthas::Defaults - Defaults for coding - Do not use if you're not Arthas
+Arthas::Defaults - Defaults for coding - Do not use if you're not Arthas. Also, this is only
+for backward compatibility. Please use B<Arthas::Defaults::536>.
 
 =head1 SYNOPSIS
 

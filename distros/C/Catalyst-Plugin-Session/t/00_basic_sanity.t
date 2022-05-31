@@ -1,13 +1,10 @@
-#!/usr/bin/perl
-
 use strict;
 use warnings;
 
-use Test::More tests => 4;
+use Test::More;
 
+use Catalyst::Plugin::Session;
 
-my $m; BEGIN { use_ok($m = "Catalyst::Plugin::Session") }
+can_ok('Catalyst::Plugin::Session', qw/sessionid session session_delete_reason/);
 
-can_ok($m, $_) for qw/sessionid session session_delete_reason/;
-
-
+done_testing;

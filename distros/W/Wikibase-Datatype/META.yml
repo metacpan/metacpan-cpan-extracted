@@ -30,7 +30,7 @@ requires:
   Error::Pure: 0.15
   Exporter: 0
   List::MoreUtils: 0
-  List::Util: 0
+  List::Util: 1.33
   Locale::Language: 0
   Mo: 0
   Mo::utils: 0.03
@@ -42,4 +42,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Wikibase-Datatype
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Wikibase-Datatype
-version: '0.11'
+version: '0.12'

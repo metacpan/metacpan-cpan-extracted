@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Rubric::CLI::Command::db;
+package Rubric::CLI::Command::db 0.157;
 # ABSTRACT: database management
-$Rubric::CLI::Command::db::VERSION = '0.156';
+
 use parent qw(Rubric::CLI::Command);
 
 use Rubric::DBI::Setup;
@@ -51,11 +51,20 @@ Rubric::CLI::Command::db - database management
 
 =head1 VERSION
 
-version 0.156
+version 0.157
+
+=head1 PERL VERSION
+
+This code is effectively abandonware.  Although releases will sometimes be made
+to update contact info or to fix packaging flaws, bug reports will mostly be
+ignored.  Feature requests are even more likely to be ignored.  (If someone
+takes up maintenance of this code, they will presumably remove this notice.)
+This means that whatever version of perl is currently required is unlikely to
+change -- but also that it might change at any new maintainer's whim.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

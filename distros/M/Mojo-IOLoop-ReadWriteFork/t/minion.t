@@ -26,11 +26,11 @@ plugin Minion => {SQLite => "sqlite:$file"};
 app->minion->add_task(
   rwf => sub {
     my $job       = shift;
-    my $fork      = Mojo::IOLoop::ReadWriteFork->new;
+    my $rwf       = Mojo::IOLoop::ReadWriteFork->new;
     my $exit_code = 0;
 
-    $fork->on(finish => sub { $exit_code = $_[1]; Mojo::IOLoop->stop; });
-    $fork->run(sub { print "I am $$.\n"; $! = 42; });
+    $rwf->on(finish => sub { $exit_code = $_[1]; Mojo::IOLoop->stop; });
+    $rwf->run(sub { print "I am $$.\n"; $! = 42; });
     Mojo::IOLoop->start;
     $job->finish($exit_code);
   }

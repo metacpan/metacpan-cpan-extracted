@@ -4,7 +4,7 @@ use warnings;
 package OPCUA::Open62541::Test::Client;
 use OPCUA::Open62541::Test::Logger;
 use OPCUA::Open62541 qw(STATUSCODE_GOOD STATUSCODE_BADCONNECTIONCLOSED
-    :CLIENTSTATE);
+    :CLIENTSTATE :SESSIONSTATE);
 use Carp 'croak';
 use Time::HiRes qw(sleep);
 
@@ -59,8 +59,14 @@ sub run {
     note("going to connect client to url $self->{url}");
     is($self->{client}->connect($self->{url}), STATUSCODE_GOOD,
 	"client: connect");
-    is($self->{client}->getState(), CLIENTSTATE_SESSION,
-	"client: state session");
+    if (defined &CLIENTSTATE_SESSION) {
+	is($self->{client}->getState(), CLIENTSTATE_SESSION,
+	    "client: state session");
+    } else {
+	my ($channel, $session, $connect) = $self->{client}->getState();
+	is($session, SESSIONSTATE_ACTIVATED,
+	    "client: state session activated");
+    }
     # check client did connect(2)
     ok($self->{log}->loggrep(
 	qr/TCP connection established|SessionState: Activated/, 5),
@@ -107,8 +113,14 @@ sub stop {
 
     note("going to disconnect client");
     is($self->{client}->disconnect(), STATUSCODE_GOOD, "client: disconnect");
-    is($self->{client}->getState, CLIENTSTATE_DISCONNECTED,
-	"client: state disconnected");
+    if (defined &CLIENTSTATE_DISCONNECTED) {
+	is($self->{client}->getState(), CLIENTSTATE_DISCONNECTED,
+	    "client: state disconnected");
+    } else {
+	my ($channel, $session, $connect) = $self->{client}->getState();
+	is($session, SESSIONSTATE_CLOSED,
+	    "client: state session closing");
+    }
 
     return $self;
 }
@@ -230,7 +242,7 @@ Alexander Bluhm E<lt>bluhm@genua.deE<gt>,
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2020 Alexander Bluhm
+Copyright (c) 2020-2022 Alexander Bluhm
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

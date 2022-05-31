@@ -15,7 +15,7 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(%DEFAULT_BEHAVIOR);
 
 our %DEFAULT_BEHAVIOR;
-our $VERSION = '0.16';
+our $VERSION = '1.00';
 
 my @snam = split ' ', $Config{sig_name};
 my @snum = split ' ', $Config{sig_num};
@@ -96,31 +96,36 @@ sub perform_default_behavior {
 	return;
     }
 
+    # remaining default behaviors should terminate the program
+    unimport Signals::XSIG;
+    %SIG = ();
+
     if ($behavior =~ /^ABORT/) {
-	untie %SIG;
-	%SIG = ();
-	$SIG{$signal} = $SIG{"ABRT"} = "DEFAULT";
-	killprog_with_signal("ABRT");
-	POSIX::abort();
-	croak "Abort\n";
+	end_prog_with_signal("ABRT");  # 1st try
+	POSIX::abort();                # 2nd try
+	croak "Abort\n";               # 3rd try
     }
     if ($behavior =~ /^SIGSEGV/) {
-	killprog_with_signal('SEGV');
-	croak "Abort\n";
+	end_prog_with_signal('SEGV');  # 1st try
+	croak "Abort\n";               # 2nd try
     }
-
     if ($behavior =~ /^EXIT (\d+)/) {
 	my $exit_code = $1;
+	if ($^O eq 'MSWin32') {
+	    close STDOUT;
+	    close STDERR;
+	}
 	exit($exit_code);
     }
-
     if ($behavior =~ /^TERMINATE/) {
 	my $number;
 	for (my $i=0; $i<@snum; $i++) {
 	    $number = $snum[$i] if $signal eq $snam[$i];
 	}
 
-	killprog_with_signal($signal, $number);
+	end_prog_with_signal($signal, $number);
+	end_prog_with_signal('TERM', $number);
+	end_prog_with_signal('KILL', $number);
 	croak "default behavior for SIG$signal should have killed script ",
             "but for some reason it didn't  :-(\n";
     }
@@ -129,11 +134,15 @@ sub perform_default_behavior {
         "for SIG$signal. Terminating this program.\n";
 }
 
-sub killprog_with_signal {
-    my ($sig,$sig_no) = @_;
-    untie %SIG;
-    %SIG = ();
-    $SIG{$sig} = 'DEFAULT';
+sub end_prog_with_signal {
+    my ($sig, $sig_no) = @_;
+    # $SIG{$sig} = 'DEFAULT';
+
+    if ($^O eq 'MSWin32') {
+	# to flush
+	close STDOUT;
+	close STDERR;
+    }
 
     unless ($sig_no) {
 	my @sig_name = split ' ', $Config{sig_name};
@@ -142,8 +151,9 @@ sub killprog_with_signal {
 
     kill $sig, $$;
     sleep 1 if $^O eq 'MSWin32';
+
+    # still here? Try setting POSIX signal handling functions
     eval {
-	use POSIX ();
 	if ($sig_no) {
 	    # this is needed for Linux
 	    POSIX::sigaction($sig_no, &POSIX::SIG_DFL);
@@ -154,13 +164,14 @@ sub killprog_with_signal {
     kill $sig, $$;
     sleep 1 if $^O eq 'MSWin32';
 
-    my $miniprog = q[$SIG{'__SIGNAL__'}='DEFAULT';sleep 4;
+    # still here? replacing process with simple perl script that terminates with signal
+    my $miniprog = q[$SIG{'__SIGNAL__'}='DEFAULT';sleep 2;
                      kill '__SIGNAL__',$$;sleep 1+"MSWin32"eq$^O;die];
     $miniprog =~ s/__SIGNAL__/$sig/g;
     exec($^X, "-e", $miniprog);
 }
 
-# in principle, SIGSTOP cannot be trapped.
+# SIGSTOP cannot be trapped.
 sub suspend {
     if ($^O eq 'MSWin32') {
 	# MSWin32 doesn't have signals as such.
@@ -273,21 +284,21 @@ __WARN__ [] => IGNORE
 [MSWin32]
 ABRT    [22] => EXIT 22
 ALRM    [14] => EXIT 14
-BREAK   [21] => TERMINATE 21
+BREAK   [21] => EXIT 21
 CHLD    [20] => EXIT 20
 CLD     [20] => EXIT 20
 CONT    [25] => EXIT 25
 FPE     [8] => EXIT 8
 HUP     [1] => EXIT 1
 ILL     [4] => EXIT 4
-INT     [2] => IGNORE
+INT     [2] => EXIT 2
 KILL    [9] => EXIT 9
 NUMxx   [] => EXIT xx
 PIPE    [13] => EXIT 13
-QUIT    [21] => IGNORE
+QUIT    [21] => EXIT 21
 SEGV    [11] => EXIT 11
 STOP    [23] => EXIT 23
-TERM    [15] => IGNORE
+TERM    [15] => EXIT 21
 ZERO    [] => IGNORE
 __DIE__ [] => IGNORE
 __WARN__ [] => IGNORE
@@ -345,18 +356,20 @@ URG	[]   => URG
 [cygwin]
 ABRT    [6] => TERMINATE 134
 ALRM    [14] => TERMINATE 14
-BUS     [10] => TERMINATE 10
+BUS     [10] => TERMINATE 138
 CHLD    [20] => IGNORE
 CLD     [20] => IGNORE
 CONT    [19] => IGNORE
 EMT     [7] => TERMINATE 7
-FPE     [8] => TERMINATE 8
+FPE     [8] => TERMINATE 136
 HUP     [1] => TERMINATE 1
-ILL     [4] => TERMINATE 4
+ILL     [4] => TERMINATE 132
 INT     [2] => TERMINATE 2
 IO      [23] => IGNORE
+IOT     [6] => TERMINATE 134
 KILL    [9] => TERMINATE 9
 LOST    [29] => TERMINATE 29
+NUMxx   [] => TERMINATE xx
 PIPE    [13] => TERMINATE 13
 POLL    [23] => IGNORE
 PROF    [27] => TERMINATE 27
@@ -364,11 +377,11 @@ PWR     [29] => TERMINATE 29
 QUIT    [3] => TERMINATE 131
 RTMAX   [32] => TERMINATE 32
 RTMIN   [32] => TERMINATE 32
-SEGV    [11] => TERMINATE 11
+SEGV    [11] => TERMINATE 139
 STOP    [17] => SUSPEND
-SYS     [12] => TERMINATE 12
+SYS     [12] => TERMINATE 140
 TERM    [15] => TERMINATE 15
-TRAP    [5] => TERMINATE 5
+TRAP    [5] => TERMINATE 133
 TSTP    [18] => SUSPEND
 TTIN    [21] => SUSPEND
 TTOU    [22] => SUSPEND
@@ -377,8 +390,8 @@ USR1    [30] => TERMINATE 30
 USR2    [31] => TERMINATE 31
 VTALRM  [26] => TERMINATE 26
 WINCH   [28] => IGNORE
-XCPU    [24] => TERMINATE 24
-XFSZ    [25] => TERMINATE 25
+XCPU    [24] => TERMINATE 152
+XFSZ    [25] => TERMINATE 153
 ZERO    [] => IGNORE
 __DIE__ [] => IGNORE
 __WARN__ [] => IGNORE

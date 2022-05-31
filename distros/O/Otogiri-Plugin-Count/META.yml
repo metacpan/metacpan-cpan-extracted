@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Minilla/v3.1.18, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   Otogiri::Plugin::Count:
     file: lib/Otogiri/Plugin/Count.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Otogiri: '0'
   Otogiri::Plugin: '0'
@@ -35,6 +35,8 @@ requires:
 resources:
   bugtracker: https://github.com/tsucchi/p5-Otogiri-Plugin-Count/issues
   homepage: https://github.com/tsucchi/p5-Otogiri-Plugin-Count
-  repository: git://github.com/tsucchi/p5-Otogiri-Plugin-Count.git
-version: '0.01'
+  repository: https://github.com/tsucchi/p5-Otogiri-Plugin-Count.git
+version: '0.02'
 x_authority: cpan:TSUCCHI
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

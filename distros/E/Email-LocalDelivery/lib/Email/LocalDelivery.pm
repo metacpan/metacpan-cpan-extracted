@@ -1,15 +1,34 @@
 use strict;
 use warnings;
-package Email::LocalDelivery;
-{
-  $Email::LocalDelivery::VERSION = '1.200';
-}
+package Email::LocalDelivery 1.201;
 # ABSTRACT: Deliver a piece of email - simply
 
 use File::Path::Expand 1.01 qw(expand_filename);
 use Email::FolderType 0.7 qw(folder_type);
 use Carp;
 
+#pod =head1 SYNOPSIS
+#pod
+#pod   use Email::LocalDelivery;
+#pod   my @delivered_to = Email::LocalDelivery->deliver($mail, @boxes);
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This module delivers an email to a list of mailboxes.
+#pod
+#pod B<Achtung!>  You might be better off looking at L<Email::Sender>, and at
+#pod L<Email::Sender::Transport::Maildir> and L<Email::Sender::Transport::Mbox>.
+#pod They are heavily used and more carefully monitored.
+#pod
+#pod =method deliver
+#pod
+#pod This takes an email, as a plain string, and a list of mailboxes to
+#pod deliver that mail to. It returns the list of boxes actually written to.
+#pod If no boxes are given, it assumes the standard Unix mailbox. (Either
+#pod C<$ENV{MAIL}>, F</var/spool/mail/you>, F</var/mail/you>, or
+#pod F<~you/Maildir/>)
+#pod
+#pod =cut
 
 sub deliver {
     my ($class, $mail, @boxes) = @_;
@@ -51,13 +70,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Email::LocalDelivery - Deliver a piece of email - simply
 
 =head1 VERSION
 
-version 1.200
+version 1.201
 
 =head1 SYNOPSIS
 
@@ -71,6 +92,15 @@ This module delivers an email to a list of mailboxes.
 B<Achtung!>  You might be better off looking at L<Email::Sender>, and at
 L<Email::Sender::Transport::Maildir> and L<Email::Sender::Transport::Mbox>.
 They are heavily used and more carefully monitored.
+
+=head1 PERL VERSION
+
+This code is effectively abandonware.  Although releases will sometimes be made
+to update contact info or to fix packaging flaws, bug reports will mostly be
+ignored.  Feature requests are even more likely to be ignored.  (If someone
+takes up maintenance of this code, they will presumably remove this notice.)
+This means that whatever version of perl is currently required is unlikely to
+change -- but also that it might change at any new maintainer's whim.
 
 =head1 METHODS
 
@@ -96,9 +126,15 @@ Casey West <casey@geeknest.com>
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =back
+
+=head1 CONTRIBUTOR
+
+=for stopwords William Yardley
+
+William Yardley <pep@veggiechinese.net>
 
 =head1 COPYRIGHT AND LICENSE
 

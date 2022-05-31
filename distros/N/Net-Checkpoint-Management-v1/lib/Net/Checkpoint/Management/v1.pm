@@ -1,5 +1,5 @@
 package Net::Checkpoint::Management::v1;
-$Net::Checkpoint::Management::v1::VERSION = '0.001009';
+$Net::Checkpoint::Management::v1::VERSION = '0.001010';
 # ABSTRACT: Checkpoint Management API version 1.x client library
 
 use 5.024;
@@ -437,7 +437,7 @@ Net::Checkpoint::Management::v1 - Checkpoint Management API version 1.x client l
 
 =head1 VERSION
 
-version 0.001009
+version 0.001010
 
 =head1 SYNOPSIS
 

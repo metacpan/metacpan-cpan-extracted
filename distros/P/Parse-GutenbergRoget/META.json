@@ -1,16 +1,16 @@
 {
    "abstract" : "parse Project Gutenberg's Roget's Thesaurus",
    "author" : [
-      "Ricardo Signes <rjbs@cpan.org>"
+      "Ricardo Signes <rjbs@semiotic.systems>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141520",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Parse-GutenbergRoget",
    "no_index" : {
@@ -39,9 +39,6 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Parse-GutenbergRoget"
-      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
@@ -49,5 +46,6 @@
          "url" : "https://github.com/rjbs/Parse-GutenbergRoget"
       }
    },
-   "version" : "0.022"
+   "version" : "0.023",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -3,7 +3,7 @@ package Net::DNS::RR;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: RR.pm 1856 2021-12-02 14:36:25Z willem $)[2];
+our $VERSION = (qw$Id: RR.pm 1864 2022-04-14 15:18:49Z willem $)[2];
 
 
 =head1 NAME
@@ -684,11 +684,12 @@ sub _subclass {
 			my $subclass = join '::', __PACKAGE__, $identifier;
 
 			unless ( eval "require $subclass" ) {	## no critic ProhibitStringyEval
-				push @INC, sub {
-					Net::DNS::Parameters::_typespec("$rrtype.RRTYPE");
-				};
-
+				my $perl = Net::DNS::Parameters::_typespec("$rrtype.RRTYPE");
 				$subclass = join '::', __PACKAGE__, "TYPE$rrtype";
+				push @INC, sub {		# see perldoc -f require
+					my @line = split /\n/, $perl;
+					return ( sub { defined( $_ = shift @line ) } );
+				};
 				eval "require $subclass";	## no critic ProhibitStringyEval
 			}
 

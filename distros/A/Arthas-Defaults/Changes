@@ -1,5 +1,14 @@
 Revision history for Perl extension Arthas::Defaults.
 
+5.0.1 - May 30th, 2022
+    - Fix package name
+
+5.0.0 - May 30th, 2022
+    - Added new 5.36 defaults, with some personal changes
+
+4.0.1 - Oct 13rd, 2014
+    - Added new 5.20 defaults
+
 3.0.0 - Feb 23rd, 2012
     - All warning are now fatal
 

@@ -2,7 +2,7 @@ use warnings;
 use strict;
 
 package Parse::GutenbergRoget;
-use base qw(Exporter);
+use parent qw(Exporter);
 
 use Carp ();
 use Text::CSV_XS;
@@ -15,13 +15,11 @@ Parse::GutenbergRoget - parse Project Gutenberg's Roget's Thesaurus
 
 =head1 VERSION
 
-version 0.022
-
-  $Id$
+version 0.023
 
 =cut
 
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 
 =head1 SYNOPSIS
 
@@ -424,14 +422,12 @@ I'll try to eliminate more UNKNOWN subsection types.
 
 =head1 AUTHOR
 
-Ricardo Signes, C<< <rjbs@cpan.org> >>
+Ricardo Signes, C<< <rjbs@semiotic.systems> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to
-C<bug-parse-gutenbergroget@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org>.  I will be notified, and then you'll automatically be
-notified of progress on your bug as I make changes.
+This software has been abandoned.  Any bugs, you're on your own.  Or look to
+take it over.
 
 =head1 COPYRIGHT
 

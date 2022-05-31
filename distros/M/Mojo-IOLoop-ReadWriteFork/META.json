@@ -1,7 +1,7 @@
 {
    "abstract" : "Fork a process and read/write from it",
    "author" : [
-      "Jan Henning Thorsen <jhthorsen@cpan.org>"
+      "Jan Henning Thorsen <jan.henning@thorsen.pm>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
@@ -52,7 +52,7 @@
          "web" : "https://github.com/jhthorsen/mojo-ioloop-readwritefork"
       }
    },
-   "version" : "2.00",
+   "version" : "2.01",
    "x_contributors" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],

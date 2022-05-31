@@ -6,6 +6,8 @@ use Test2::V0;
 use Git::Hooks::Test ':all';
 use Path::Tiny;
 
+use Test2::Require::Module 'Git::Mailmap';
+
 my ( $repo, $clone, $T );
 
 # Eliminate the effects of system wide and global configuration.

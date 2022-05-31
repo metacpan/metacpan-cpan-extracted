@@ -1,5 +1,5 @@
 package MIDI::Drummer::Tiny::Syncopate;
-$MIDI::Drummer::Tiny::Syncopate::VERSION = '0.2101';
+$MIDI::Drummer::Tiny::Syncopate::VERSION = '0.4001';
 our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Syncopation logic
@@ -70,7 +70,7 @@ sub combinatorial {
 
         for ( 1 .. $opts->{repeat} ) {
             for my $bit ( split //, $pattern ) {
-                $opts->{vary}{$bit}->();
+                $opts->{vary}{$bit}->($self);
                 $self->counter( $self->counter + $size ) if $opts->{count};
             }
         }
@@ -91,7 +91,7 @@ MIDI::Drummer::Tiny::Syncopate - Syncopation logic
 
 =head1 VERSION
 
-version 0.2101
+version 0.4001
 
 =head1 SYNOPSIS
 

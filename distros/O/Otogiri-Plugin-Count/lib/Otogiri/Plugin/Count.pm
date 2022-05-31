@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 use Otogiri;
 use Otogiri::Plugin;
@@ -13,7 +13,7 @@ our @EXPORT = qw(count);
 sub count {
     my ($self, $table, $column, $where, $opt) = @_;
 
-    if ( ref $column eq 'HASH' ) {
+    if ( ref $column eq 'HASH' || ref $column eq 'ARRAY' ) {
         $opt = $where;
         $where = $column;
         $column = '*';

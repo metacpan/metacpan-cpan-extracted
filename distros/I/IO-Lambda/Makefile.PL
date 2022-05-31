@@ -43,7 +43,7 @@ WriteMakefile(
 	VERSION_FROM  => 'lib/IO/Lambda.pm',
 	LICENSE       => 'perl',
 	PREREQ_PM     => {
-		'Net::DNS'          => 0,
+		'Net::DNS'          => 1.05,
 		'Storable'          => 0,
 		'LWP'               => 0,
 		'URI'               => 0,

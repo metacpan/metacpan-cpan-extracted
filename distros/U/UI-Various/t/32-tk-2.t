@@ -34,7 +34,7 @@ sleep 2;				# TODO: trying work-around for Xvfb
     eval { require Tk; };
 diag('Tk has been initialised');	# TODO: temporary diagnostics
     $@  and  plan skip_all => 'Perl/Tk not found';
-    plan tests => 8;
+    plan tests => 9;
 
     # define fixed environment for unit tests:
     delete $ENV{UI};
@@ -76,8 +76,12 @@ my @text8 = ('1st entry', '2nd entry', '3rd entry', '4th entry',
 	     '5th entry', '6th entry', '7th entry', '8th entry');
 my $listbox0 = UI::Various::Listbox->new(texts => \@text8, height => 3,
 					 selection => 0);
+my $counter = 0;
 my $listbox2 = UI::Various::Listbox->new(texts => \@text8, height => 3,
-					 selection => 2);
+					 selection => 2,
+					 on_select => sub {
+					     $counter++;
+					 });
 my @selection = ();
 my @counts = ();
 
@@ -118,3 +122,5 @@ is($ww2, 42, '$win2 had correct fixed width');
 is($counts[0], 9, 'listbox has correct 1st count');
 is($counts[1], 8, 'listbox has correct 2nd count');
 is_deeply(\@selection, [1, 2, 4], 'listbox had correct final selection');
+# We don't trigger the the event with selectionSet, so the counter is still 0:
+is($counter, 0, 'counter has correct value');

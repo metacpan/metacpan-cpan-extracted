@@ -2,7 +2,7 @@ package Net::DNS::RR::OPT;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: OPT.pm 1857 2021-12-07 13:38:02Z willem $)[2];
+our $VERSION = (qw$Id: OPT.pm 1864 2022-04-14 15:18:49Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -154,6 +154,8 @@ sub option {
 }
 
 
+########################################
+
 sub _format_option {
 	my ( $self, $number ) = @_;
 	my $option  = ednsoptionbyval($number);
@@ -216,8 +218,6 @@ sub _specified {
 }
 
 
-########################################
-
 ## no critic ProhibitMultiplePackages
 package Net::DNS::RR::OPT::DAU;					# RFC6975
 
@@ -250,7 +250,7 @@ sub _compose {
 	my ( $class, %argument ) = ( map( ( $_ => 0 ), @field8 ), @_ );
 	my $address = bless( {}, $family{$argument{FAMILY}} )->address( $argument{ADDRESS} );
 	my $bitmask = $argument{'SOURCE-PREFIX-LENGTH'};
-	pack "a* B$bitmask", pack( 'nC2', @argument{@field8} ), unpack 'B*', $address;
+	return pack "a* B$bitmask", pack( 'nC2', @argument{@field8} ), unpack 'B*', $address;
 }
 
 sub _decompose {
@@ -258,26 +258,28 @@ sub _decompose {
 	@hash{@field8} = unpack 'nC2a*', $_[1];
 	$hash{ADDRESS} = bless( {address => $hash{ADDRESS}}, $family{$hash{FAMILY}} )->address;
 	my @payload = map( ( $_ => $hash{$_} ), @field8 );
+	return @payload;
 }
 
 sub _image {
 	my %hash  = &_decompose;
 	my @image = map "$_ => $hash{$_}", @field8;
+	return @image;
 }
 
 
 package Net::DNS::RR::OPT::EXPIRE;				# RFC7314
 
 sub _compose {
-	my ( $class, %argument ) = @_;
-	pack 'N', values %argument;
+	return pack 'N', pop @_;
 }
 
 sub _decompose {
 	my @payload = ( 'EXPIRE-TIMER' => unpack 'N', $_[1] );
+	return @payload;
 }
 
-sub _image { join ' => ', &_decompose; }
+sub _image { return join ' => ', &_decompose; }
 
 
 package Net::DNS::RR::OPT::COOKIE;				# RFC7873
@@ -287,7 +289,7 @@ my @field10 = qw(VERSION RESERVED TIMESTAMP HASH);
 sub _compose {
 	my ( $class, %argument ) = ( VERSION => 1, RESERVED => '', @_ );
 	return pack 'a8', $argument{'CLIENT-COOKIE'} if $argument{'CLIENT-COOKIE'};
-	pack 'Ca3Na*', map $_, @argument{@field10};
+	return pack 'Ca3Na*', map $_, @argument{@field10};
 }
 
 sub _decompose {
@@ -296,6 +298,7 @@ sub _decompose {
 	my %hash;
 	@hash{@field10} = unpack 'Ca3Na*', $argument;
 	my @payload = map( ( $_ => $hash{$_} ), @field10 );
+	return @payload;
 }
 
 sub _image {
@@ -303,36 +306,37 @@ sub _image {
 	return unpack 'H*', $hash{'CLIENT-COOKIE'} if $hash{'CLIENT-COOKIE'};
 	for (qw(RESERVED HASH)) { $hash{$_} = unpack 'H*', $hash{$_} }
 	my @image = map "$_ => $hash{$_}", @field10;
+	return @image;
 }
 
 
 package Net::DNS::RR::OPT::TCP_KEEPALIVE;			# RFC7828
 
 sub _compose {
-	my ( $class, %argument ) = @_;
-	pack 'n', values %argument;
+	return pack 'n', pop @_;
 }
 
 sub _decompose {
 	my @payload = ( 'TIMEOUT' => unpack 'n', $_[1] );
+	return @payload;
 }
 
-sub _image { join ' => ', &_decompose; }
+sub _image { return join ' => ', &_decompose; }
 
 
 package Net::DNS::RR::OPT::PADDING;				# RFC7830
 
 sub _compose {
-	my ( $class, %argument ) = @_;
-	my ($size) = values %argument;
-	pack "x$size";
+	my $size = pop @_;
+	return pack "x$size";
 }
 
 sub _decompose {
 	my @payload = ( 'OPTION-LENGTH' => length( $_[1] ) );
+	return @payload;
 }
 
-sub _image { join ' => ', &_decompose; }
+sub _image { return join ' => ', &_decompose; }
 
 
 package Net::DNS::RR::OPT::CHAIN;				# RFC7901
@@ -340,30 +344,32 @@ package Net::DNS::RR::OPT::CHAIN;				# RFC7901
 sub _compose {
 	my ( $class, %argument ) = @_;
 	my ($trust_point) = values %argument;
-	Net::DNS::DomainName->new($trust_point)->encode;
+	return Net::DNS::DomainName->new($trust_point)->encode;
 }
 
 sub _decompose {
 	my ( $class, $payload ) = @_;
 	my $fqdn    = Net::DNS::DomainName->decode( \$payload )->string;
 	my @payload = ( 'CLOSEST-TRUST-POINT' => $fqdn );
+	return @payload;
 }
 
-sub _image { join ' => ', &_decompose; }
+sub _image { return join ' => ', &_decompose; }
 
 
 package Net::DNS::RR::OPT::KEY_TAG;				# RFC8145
 
 sub _compose {
 	shift;
-	pack 'n*', @_;
+	return pack 'n*', @_;
 }
 
 sub _decompose {
 	my @payload = unpack 'n*', $_[1];
+	return @payload;
 }
 
-sub _image { &_decompose; }
+sub _image { return &_decompose; }
 
 
 package Net::DNS::RR::OPT::EXTENDED_ERROR;			# RFC8914
@@ -373,7 +379,7 @@ my @field15 = qw(INFO-CODE EXTRA-TEXT);
 sub _compose {
 	my ( $class, %argument ) = ( 'INFO-CODE' => 0, 'EXTRA-TEXT' => '', @_ );
 	my ( $code,  $text )	 = @argument{@field15};
-	pack 'na*', $code, Net::DNS::Text->new($text)->raw;
+	return pack 'na*', $code, Net::DNS::Text->new($text)->raw;
 }
 
 sub _decompose {
@@ -382,6 +388,7 @@ sub _decompose {
 		'INFO-CODE'  => $code,
 		'EXTRA-TEXT' => Net::DNS::Text->decode( \$text, 0, length $text )->string
 		);
+	return @payload;
 }
 
 sub _image {
@@ -522,7 +529,7 @@ option value:
 
 Copyright (c)2001,2002 RIPE NCC.  Author Olaf M. Kolkman.
 
-Portions Copyright (c)2012,2017-2020 Dick Franks.
+Portions Copyright (c)2012,2017-2022 Dick Franks.
 
 All rights reserved.
 

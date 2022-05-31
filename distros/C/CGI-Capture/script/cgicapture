@@ -1,14 +1,13 @@
 #!/usr/bin/perl
+# PODNAME: cgicapture
+# ABSTRACT:Capture the CGI environment
 
 use 5.006;
 use strict;
 use warnings;
 use CGI::Capture ();
 
-use vars qw{$VERSION};
-BEGIN {
-	$VERSION = '1.14';
-}
+our $VERSION = '1.15';
 
 # Capture the CGI environment
 my $cgi = CGI::Capture->capture;
@@ -23,9 +22,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 cgicapture - Capture the CGI environment
+
+=head1 VERSION
+
+version 1.15
 
 =head1 SYNOPSIS
 
@@ -36,7 +41,7 @@ cgicapture - Capture the CGI environment
 L<CGI::Capture> is a module used to capture and replay a full CGI
 environment (primarily for debugging purposes).
 
-B<cgicapture> is a script you can copy into your cgi-bin directory
+B<cgicapture> is a script you can copy into your F<cgi-bin> directory
 that will capture the CGI environment and return it as a text/plain
 document containing the L<CGI::Capture> object, serialized as a YAML
 document.
@@ -48,6 +53,10 @@ F<cgi-bin> from a security perspective.
 You should only be using it for testing and debugging reasons, and never
 on production systems more than temporarily.
 
+=head1 NAME
+
+cgicapture - Capture the CGI environment
+
 =head1 SUPPORT
 
 All bugs should be filed via the bug tracker at
@@ -55,10 +64,6 @@ All bugs should be filed via the bug tracker at
 L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Capture>
 
 For other issues, or commercial enhancement or support, contact the author.
-
-=head1 AUTHORS
-
-Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 
 =head1 SEE ALSO
 
@@ -73,5 +78,21 @@ it and/or modify it under the same terms as Perl itself.
 
 The full text of the license can be found in the
 LICENSE file included with this module.
+
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Capture>
+(or L<bug-CGI-Capture@rt.cpan.org|mailto:bug-CGI-Capture@rt.cpan.org>).
+
+=head1 AUTHORS
+
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2004 by Adam Kennedy.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

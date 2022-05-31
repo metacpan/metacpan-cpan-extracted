@@ -70,4 +70,3 @@ foreach my $badtest (@chkbad) {
 
 print "\n";
 # end of t/05_vcos.t
-

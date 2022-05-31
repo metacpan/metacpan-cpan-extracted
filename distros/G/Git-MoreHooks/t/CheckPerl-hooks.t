@@ -1,15 +1,13 @@
 #!perl
-### no critic (ValuesAndExpressions::ProhibitMagicNumbers)
 use strict;
 use warnings;
 use Test2::V0;
 
+use Test2::Require::Module 'Perl::Critic';
 use Log::Any::Adapter ( 'Stderr', log_level => 'trace' );
 use Git::Hooks::Test ':all';
 use Path::Tiny;
 use English qw( -no_match_vars );    # Avoids regex performance penalty in perl 5.16 and earlier
-
-use Log::Any::Adapter ( 'Stderr', log_level => 'trace' );
 
 my ( $repo, $clone, $T );
 

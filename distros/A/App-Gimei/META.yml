@@ -1,0 +1,47 @@
+---
+abstract: 'CLI for Data::Gimei'
+author:
+  - 'NAKAJIMA Yusaku <youpong@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.14, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Gimei
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::Gimei:
+    file: lib/App/Gimei.pm
+    version: v0.0.1
+  App::Gimei::Runner:
+    file: lib/App/Gimei/Runner.pm
+requires:
+  Class::Tiny: '1.008'
+  Data::Gimei: v0.1.0
+  Getopt::Long: '2.52'
+  perl: '5.022001'
+resources:
+  bugtracker: https://github.com/youpong/App-Gimei/issues
+  homepage: https://github.com/youpong/App-Gimei
+  repository: git://github.com/youpong/App-Gimei.git
+version: v0.0.1
+x_authority: cpan:YOUPONG
+x_contributors:
+  - 'NAKAJIMA Yusaku <yupong7@gmail.com>'
+  - 'youpong <43817652+youpong@users.noreply.github.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

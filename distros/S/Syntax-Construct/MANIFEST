@@ -12,6 +12,7 @@ t/06-alias.t
 xt/changes.t
 xt/completness.t
 xt/copyright.t
+xt/counts.t
 xt/manifest.t
 xt/latest-version.t
 xt/pod-coverage.t

@@ -2,12 +2,13 @@
 use strict;
 use warnings;
 use Data::Dumper;
-use Test::More tests => 5;
+use Test::More;
 use Test::Deep;
 
 use Conf::Libconfig;
 
 my $foo = Conf::Libconfig->new();
+plan skip_all => 'libconfig version is too higher!' if ($foo->getversion() >= 1.7);
 
 # test the generic add method
 

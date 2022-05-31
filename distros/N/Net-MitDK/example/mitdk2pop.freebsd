@@ -1,0 +1,17 @@
+#! /bin/sh
+# PROVIDE: mitdk2pop
+# REQUIRE: DAEMON
+# KEYWORD: shutdown
+# Add the following lines to /etc/rc.conf to enable mitdk2pop:
+# mitdk2pop_enable="YES"
+
+. /etc/rc.subr
+name=mitdk2pop
+rcvar=mitdk2pop_enable
+load_rc_config $name
+command=/usr/sbin/daemon
+pidfile=/var/run/mitdk2pop.pid
+procname=/usr/local/bin/mitdk2pop
+command_interpreter=perl
+command_args="-u nobody -p $pidfile $procname -p 8111"
+run_rc_command "$1"

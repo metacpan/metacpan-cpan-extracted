@@ -3,6 +3,7 @@ use warnings;
 
 use lib 'lib';
 
+BEGIN { $ENV{ALGORITHM_QUADTREE_BACKEND} = 'Algorithm::QuadTree::PP'; }
 use Algorithm::QuadTree;
 use Benchmark qw(cmpthese);
 

@@ -3,7 +3,7 @@ use utf8;
 use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   NAME           => 'Mojo::IOLoop::ReadWriteFork',
-  AUTHOR         => 'Jan Henning Thorsen <jhthorsen@cpan.org>',
+  AUTHOR         => 'Jan Henning Thorsen <jan.henning@thorsen.pm>',
   LICENSE        => 'artistic_2',
   ABSTRACT_FROM  => 'lib/Mojo/IOLoop/ReadWriteFork.pm',
   VERSION_FROM   => 'lib/Mojo/IOLoop/ReadWriteFork.pm',

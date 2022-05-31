@@ -1,5 +1,13 @@
 Revision history for MIDI-Util
 
+0.1101 2022-05-29 13:41:16
+    - Improve documentation.
+
+0.1100 2022-05-29 13:14:56
+    - Add the eg/dump program.
+    - Add the reverse_dump() function.
+    - Made dump() return actual hashrefs, not arrays of strings.
+
 0.1002 2022-04-23 12:07:38
     - Rename set_time_sig to set_time_signature.
 

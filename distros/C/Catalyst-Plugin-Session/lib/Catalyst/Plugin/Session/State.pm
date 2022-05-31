@@ -1,9 +1,10 @@
-#!/usr/bin/perl
-
 package Catalyst::Plugin::Session::State;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.42';
+$VERSION =~ tr/_//d;
 
 __PACKAGE__;
 
@@ -47,7 +48,7 @@ C<prepare_cookies> is probably the stablest approach.
 =item finalize
 
 Modify the response at to include the session ID if C<sessionid> is defined,
-using whatever scheme you use. For example, set a cookie, 
+using whatever scheme you use. For example, set a cookie.
 
 =back
 

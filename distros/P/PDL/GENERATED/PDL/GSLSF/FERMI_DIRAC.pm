@@ -59,7 +59,7 @@ Incomplete Fermi-Dirac Integrals:
 
 
 
-#line 1058 "../../../../blib/lib/PDL/PP.pm"
+#line 948 "../../../../blib/lib/PDL/PP.pm"
 
 
 
@@ -84,14 +84,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1060 "../../../../blib/lib/PDL/PP.pm"
+#line 950 "../../../../blib/lib/PDL/PP.pm"
 
 *gsl_sf_fermi_dirac_int = \&PDL::gsl_sf_fermi_dirac_int;
 #line 91 "FERMI_DIRAC.pm"
 
 
 
-#line 1058 "../../../../blib/lib/PDL/PP.pm"
+#line 948 "../../../../blib/lib/PDL/PP.pm"
 
 
 
@@ -116,14 +116,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1060 "../../../../blib/lib/PDL/PP.pm"
+#line 950 "../../../../blib/lib/PDL/PP.pm"
 
 *gsl_sf_fermi_dirac_mhalf = \&PDL::gsl_sf_fermi_dirac_mhalf;
 #line 123 "FERMI_DIRAC.pm"
 
 
 
-#line 1058 "../../../../blib/lib/PDL/PP.pm"
+#line 948 "../../../../blib/lib/PDL/PP.pm"
 
 
 
@@ -148,14 +148,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1060 "../../../../blib/lib/PDL/PP.pm"
+#line 950 "../../../../blib/lib/PDL/PP.pm"
 
 *gsl_sf_fermi_dirac_half = \&PDL::gsl_sf_fermi_dirac_half;
 #line 155 "FERMI_DIRAC.pm"
 
 
 
-#line 1058 "../../../../blib/lib/PDL/PP.pm"
+#line 948 "../../../../blib/lib/PDL/PP.pm"
 
 
 
@@ -180,14 +180,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1060 "../../../../blib/lib/PDL/PP.pm"
+#line 950 "../../../../blib/lib/PDL/PP.pm"
 
 *gsl_sf_fermi_dirac_3half = \&PDL::gsl_sf_fermi_dirac_3half;
 #line 187 "FERMI_DIRAC.pm"
 
 
 
-#line 1058 "../../../../blib/lib/PDL/PP.pm"
+#line 948 "../../../../blib/lib/PDL/PP.pm"
 
 
 
@@ -212,7 +212,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1060 "../../../../blib/lib/PDL/PP.pm"
+#line 950 "../../../../blib/lib/PDL/PP.pm"
 
 *gsl_sf_fermi_dirac_inc_0 = \&PDL::gsl_sf_fermi_dirac_inc_0;
 #line 219 "FERMI_DIRAC.pm"

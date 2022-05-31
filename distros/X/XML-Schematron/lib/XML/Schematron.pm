@@ -8,7 +8,7 @@ use XML::Schematron::Test;
 use Check::ISA;
 
 use vars qw/$VERSION/;
-$VERSION = '1.09';
+$VERSION = '1.10';
 
 
 has '+_trait_namespace' => ( default => 'XML::Schematron' );
@@ -65,7 +65,7 @@ XML::Schematron - Perl implementation of the Schematron.
 
 This is the superclass for the XML::Schematron::* modules.
 
-Please run perldoc XML::Schematron::XPath, or perldoc XML::Schematron::Sablotron for examples and complete documentation.
+Please run perldoc L<XML::Schematron::XPath>, or perldoc L<XML::Schematron::LibXSLT> for examples and complete documentation.
 
 =head1 AUTHOR
 
@@ -79,6 +79,6 @@ under the same terms as Perl itself.
 =head1 SEE ALSO
 
 For information about Schematron, sample schemas, and tutorials to help you write your own schmemas, please visit the
-Schematron homepage at: http://www.ascc.net/xml/resource/schematron/
+Schematron homepage at: L<https://www.schematron.com/>
 
 =cut

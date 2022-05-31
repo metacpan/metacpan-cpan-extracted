@@ -6,6 +6,7 @@ use warnings;
 use Class::Utils qw(set_params);
 use Digest::MD5 qw(md5_hex);
 use File::Basename;
+use List::MoreUtils qw(any);
 use Readonly;
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 use URI;
@@ -15,7 +16,7 @@ Readonly::Scalar our $COMMONS_URI => q{https://commons.wikimedia.org};
 Readonly::Array our @UPLOAD_SEGS => qw(wikipedia commons);
 Readonly::Array our @COMMONS_SEGS => qw(wiki);
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 sub new {
 	my ($class, @params) = @_;
@@ -85,7 +86,7 @@ sub thumb_link {
 
 	my $thumb_file = $file;
 	my ($name, undef, $suffix) = fileparse($file, qr/\.[^.]*/ms);
-	if ($suffix eq '.svg') {
+	if (any { $_ eq $suffix } qw(.svg .tif .pdf)) {
 		$suffix = '.png';
 		$thumb_file = $name.$suffix;
 	}
@@ -319,12 +320,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2021
+© Michal Josef Špaček 2021-2022
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

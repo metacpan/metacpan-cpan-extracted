@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::Of::Poem;
 
 # Test.
-is($Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::Of::Poem::VERSION, 0.01, 'Version.');
+is($Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::Of::Poem::VERSION, 0.12, 'Version.');

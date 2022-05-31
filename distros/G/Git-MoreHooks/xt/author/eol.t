@@ -20,8 +20,7 @@ my @files = (
     't/CheckPerl-functions.t',
     't/CheckPerl-hooks.t',
     't/GitRepoAdmin-functions.t',
-    't/GitRepoAdmin-load.t',
-    't/TriggerJenkins-functions.t'
+    't/GitRepoAdmin-load.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

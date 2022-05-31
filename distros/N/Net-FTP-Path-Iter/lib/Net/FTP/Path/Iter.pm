@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 use Net::FTP;
 use File::Spec::Functions qw[ splitpath ];
@@ -19,27 +19,27 @@ use Net::FTP::Path::Iter::Dir;
 
 use namespace::clean;
 
-#pod =method new
-#pod
-#pod   $ftp = Net::FTP::Path::Iter->new( [$host], %options );
-#pod
-#pod Open up a connection to an FTP host and log in.  The arguments
-#pod are the same as for L<Net::FTP/new>, with the addition of two
-#pod mandatory options,
-#pod
-#pod =over
-#pod
-#pod =item C<user>
-#pod
-#pod The user name
-#pod
-#pod =item C<password>
-#pod
-#pod The password
-#pod
-#pod =back
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 sub new {
@@ -148,7 +148,11 @@ sub _iter {
 #   The GNU General Public License, Version 3, June 2007
 #
 
+__END__
+
 =pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
 
 =head1 NAME
 
@@ -156,7 +160,7 @@ Net::FTP::Path::Iter - Iterative, recursive, FTP file finder
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -212,6 +216,8 @@ The password
 
 =back
 
+=head1 INTERNALS
+
 =head1 ATTRIBUTES
 
 B<Net::FTP::Path::Iter> subclasses L<Path::Iter::Rule>. It is a hash based object
@@ -225,10 +231,21 @@ The B<Net::FTP> object representing the connection to the FTP server.
 
 =back
 
-=head1 BUGS AND LIMITATIONS
+=head1 SUPPORT
 
-You can make new bug reports, and view existing ones, through the
-web interface at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Net-FTP-Path-Iter>.
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-net-ftp-path-iter@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-FTP-Path-Iter
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/net-ftp-path-iter
+
+and may be cloned from
+
+  https://gitlab.com/djerius/net-ftp-path-iter.git
 
 =head1 AUTHOR
 
@@ -243,54 +260,3 @@ This is free software, licensed under:
   The GNU General Public License, Version 3, June 2007
 
 =cut
-
-__END__
-
-#pod =head1 SYNOPSIS
-#pod
-#pod     use Net::FTP::Path::Iter;
-#pod
-#pod     # connect to the FTP site
-#pod     my $ftp = Net::FTP::Path::Iter->new( $ftp_site, $user, $password );
-#pod
-#pod     # define a visitor callback routine. It will recieve a
-#pod     # Net::FTP::Path::Iter::Entry object.
-#pod     sub visitor { my ($entry) = @_ }
-#pod
-#pod     # use the Path::Iterator::Rule all() method to traverse the
-#pod     # site;
-#pod     $ftp->all( '/', \&visitor );
-#pod
-#pod =head1 DESCRIPTION
-#pod
-#pod B<Net::FTP::Path::Iter> is a subclass of L<Path::Iterator::Rule> which
-#pod iterates over an FTP site rather than a local filesystem.
-#pod
-#pod See the documentation L<Path::Iterator::Rule> for how to filter and
-#pod traverse paths.  When B<Net::FTP::Path::Iter> passes a path to a callback or
-#pod returns one from an iterator, it will be in the form of a
-#pod L<Net::FTP::Path::Iter::Entry> object.
-#pod
-#pod B<Net::FTP::Path::Iter> uses L<Net::FTP> to connect to the FTP site.
-#pod
-#pod =head2 Symbolic Links
-#pod
-#pod At present, B<Net::FTP::Path::Iter> does not handle symbolic links. It will
-#pod output an error and skip them.
-#pod
-#pod
-#pod =head1 ATTRIBUTES
-#pod
-#pod B<Net::FTP::Path::Iter> subclasses L<Path::Iter::Rule>. It is a hash based object
-#pod and has the following additional attributes:
-#pod
-#pod =over
-#pod
-#pod =item C<server>
-#pod
-#pod The B<Net::FTP> object representing the connection to the FTP server.
-#pod
-#pod =back
-#pod
-#pod =head1 SEE ALSO
-#pod

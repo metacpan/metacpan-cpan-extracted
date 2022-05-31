@@ -20,7 +20,7 @@ provides:
     file: lib/AsposeCellsCloud/ApiFactory.pm
   AsposeCellsCloud::CellsApi:
     file: lib/AsposeCellsCloud/CellsApi.pm
-    version: 22.4
+    version: 22.5
   AsposeCellsCloud::LiteCellsApi:
     file: lib/AsposeCellsCloud/LiteCellsApi.pm
   AsposeCellsCloud::LightCellsApi:
@@ -49,6 +49,10 @@ provides:
     file: lib/AsposeCellsCloud/Object/AutoShapesResponse.pm
   AsposeCellsCloud::Object::Border:
     file: lib/AsposeCellsCloud/Object/Border.pm
+  AsposeCellsCloud::Object::BarcodeResponse:
+    file: lib/AsposeCellsCloud/Object/BarcodeResponse.pm    
+  AsposeCellsCloud::Object::BarcodeResponseList:
+    file: lib/AsposeCellsCloud/Object/BarcodeResponseList.pm    
   AsposeCellsCloud::Object::BatchConvertRequest:
     file: lib/AsposeCellsCloud/Object/BatchConvertRequest.pm    
   AsposeCellsCloud::Object::CalculationOptions:
@@ -564,5 +568,5 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: 22.4
+version: 22.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,4 +1,15 @@
+0.251.1 2022-05-28
+
+  Model update:
+    * update model from systemd 251 documentation
+
 0.250.1 2022-03-26
+
+  Model update:
+    * update model from systemd 250 documentation
+
+  Other Changes:
+    * dist.ini: update copyright year
 
 0.249.1 2021-11-12
 

@@ -16,6 +16,8 @@ UA_StatusCode				T_PACKED
 UA_Guid					T_PACKED
 enum UA_NodeIdType			T_ENUM
 UA_ClientState				T_ENUM
+UA_SecureChannelState			T_ENUM
+UA_SessionState				T_ENUM
 UA_TimestampsToReturn			T_ENUM
 # these are enums with a magic pack function to show the strings
 UA_LogLevel				T_PACKED

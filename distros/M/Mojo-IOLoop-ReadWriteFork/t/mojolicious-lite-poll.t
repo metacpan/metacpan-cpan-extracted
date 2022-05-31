@@ -15,20 +15,20 @@ sub IO::Pty::DESTROY { $expected_pty_objects-- }
 use Mojolicious::Lite;
 
 get '/' => sub {
-  my $c    = shift->render_later;
-  my $fork = Mojo::IOLoop::ReadWriteFork->new(conduit => {type => 'pty'});
+  my $c   = shift->render_later;
+  my $rwf = Mojo::IOLoop::ReadWriteFork->new(conduit => {type => 'pty'});
 
   my $output = '';
-  $fork->on(read => sub { $output .= $_[1] });
-  $fork->on(
+  $rwf->on(read => sub { $output .= $_[1] });
+  $rwf->on(
     finish => sub {
-      my ($fork, $exit_value, $signal) = @_;
-      push @pids, $fork->pid;
+      my ($rwf, $exit_value, $signal) = @_;
+      push @pids, $rwf->pid;
       $c->render(json => {output => $output, exit_value => $exit_value});
     }
   );
 
-  $fork->run('uptime');
+  $rwf->run('uptime');
 };
 
 my $t = Test::Mojo->new;

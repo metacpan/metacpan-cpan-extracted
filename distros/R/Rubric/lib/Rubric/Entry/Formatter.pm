@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Rubric::Entry::Formatter;
+package Rubric::Entry::Formatter 0.157;
 # ABSTRACT: a base class for entry body formatters
-$Rubric::Entry::Formatter::VERSION = '0.156';
+
 #pod =head1 DESCRIPTION
 #pod
 #pod This class serves as a single point of dispatch for attempts to format entry
@@ -114,12 +114,21 @@ Rubric::Entry::Formatter - a base class for entry body formatters
 
 =head1 VERSION
 
-version 0.156
+version 0.157
 
 =head1 DESCRIPTION
 
 This class serves as a single point of dispatch for attempts to format entry
 bodies from their native format into rendered output.
+
+=head1 PERL VERSION
+
+This code is effectively abandonware.  Although releases will sometimes be made
+to update contact info or to fix packaging flaws, bug reports will mostly be
+ignored.  Feature requests are even more likely to be ignored.  (If someone
+takes up maintenance of this code, they will presumably remove this notice.)
+This means that whatever version of perl is currently required is unlikely to
+change -- but also that it might change at any new maintainer's whim.
 
 =head1 METHODS
 
@@ -160,7 +169,7 @@ module can respond to C<can> to allow it to render into all the format it likes
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

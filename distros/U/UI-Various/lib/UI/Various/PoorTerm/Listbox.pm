@@ -33,7 +33,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 use UI::Various::core;
 use UI::Various::Listbox;
@@ -182,27 +182,35 @@ sub _process($)
 	    $self->{first} -= $h;
 	    $self->{first} >= 0  or  $self->{first} = 0;
 	}
-	elsif ($selection == 1)
-	{
-	    if ($_ > 0)
-	    {
-		foreach my $i (0..$#{$self->texts})
-		{
-		    $self->{_selected}[$i] =
-			$i != $self->{first} + $_ - 1 ? ' ' :
-			$self->{_selected}[$i] eq ' ' ? '*' : ' ';
-		}
-	    }
-	}
 	else
 	{
-	    foreach (split m/,\s*/, $_)
+	    my $changes = 0;
+	    if ($selection == 1)
 	    {
-		$_ > 0  or  last;
-		$i = $self->{first} + $_ - 1;
-		$self->{_selected}[$i] =
-		    $self->{_selected}[$i] eq ' ' ? '*' : ' ';
+		if ($_ > 0)
+		{
+		    foreach my $i (0..$#{$self->texts})
+		    {
+			$self->{_selected}[$i] =
+			    $i != $self->{first} + $_ - 1 ? ' ' :
+			    $self->{_selected}[$i] eq ' ' ? '*' : ' ';
+			$changes++;
+		    }
+		}
 	    }
+	    else
+	    {
+		foreach (split m/,\s*/, $_)
+		{
+		    $_ > 0  or  next;
+		    $i = $self->{first} + $_ - 1;
+		    $self->{_selected}[$i] =
+			$self->{_selected}[$i] eq ' ' ? '*' : ' ';
+		    $changes++;
+		}
+	    }
+	    defined $self->{on_select}  and  $changes > 0  and
+		&{$self->{on_select}};
 	}
     }
 }

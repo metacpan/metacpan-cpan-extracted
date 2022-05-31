@@ -3,7 +3,7 @@ package Net::DNS::Packet;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Packet.pm 1855 2021-11-26 11:33:48Z willem $)[2];
+our $VERSION = (qw$Id: Packet.pm 1865 2022-05-21 09:57:49Z willem $)[2];
 
 
 =head1 NAME
@@ -115,12 +115,12 @@ sub decode {
 	my $self;
 	eval {
 		local $SIG{__DIE__};
-		die 'corrupt wire-format data' if length($$data) < HEADER_LENGTH;
+		my $length = length $$data;
+		die 'corrupt wire-format data' if $length < HEADER_LENGTH;
 
 		# header section
 		my ( $id, $status, @count ) = unpack 'n6', $$data;
 		my ( $qd, $an, $ns, $ar ) = @count;
-		my $length = length $$data;
 
 		$self = bless {
 			id	   => $id,
@@ -398,12 +398,13 @@ sub string {
 	my $self = shift;
 
 	my $header = $self->header;
+	my $opcode = $header->opcode;
 	my $server = $self->{replyfrom};
 	my $length = $self->{replysize};
 	my $origin = $server ? ";; Response received from $server ($length octets)\n" : "";
 	my @record = ( "$origin;; HEADER SECTION", $header->string );
 
-	if ( $self->{dso} ) {
+	if ( $opcode eq 'DSO' ) {
 		CORE::push( @record, ";; DSO SECTION" );
 		foreach ( @{$self->{dso}} ) {
 			my ( $t, $v ) = @$_;
@@ -412,7 +413,7 @@ sub string {
 		return join "\n", @record, "\n";
 	}
 
-	my @section  = $header->opcode eq 'UPDATE' ? qw(ZONE PREREQUISITE UPDATE) : qw(QUESTION ANSWER AUTHORITY);
+	my @section  = $opcode eq 'UPDATE' ? qw(ZONE PREREQUISITE UPDATE) : qw(QUESTION ANSWER AUTHORITY);
 	my @question = $self->question;
 	my $qdcount  = scalar @question;
 	my $qds	     = $qdcount != 1 ? 's' : '';

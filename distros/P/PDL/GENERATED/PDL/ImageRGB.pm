@@ -268,7 +268,7 @@ the copyright notice should be included in the file.
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 *cquant_c = \&PDL::cquant_c;
 #line 275 "ImageRGB.pm"

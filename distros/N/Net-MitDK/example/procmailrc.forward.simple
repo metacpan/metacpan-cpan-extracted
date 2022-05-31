@@ -1,0 +1,9 @@
+:0
+* ^X-Net-MitDK:.*
+* To: My Name .*
+! me@email.com
+
+:0
+* ^X-Net-MitDK:.*
+* To: My Wife .*
+! my-wife@email.com

@@ -49,7 +49,7 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-#line 1058 "../../../../blib/lib/PDL/PP.pm"
+#line 948 "../../../../blib/lib/PDL/PP.pm"
 
 
 
@@ -74,14 +74,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1060 "../../../../blib/lib/PDL/PP.pm"
+#line 950 "../../../../blib/lib/PDL/PP.pm"
 
 *gsl_sf_debye_1 = \&PDL::gsl_sf_debye_1;
 #line 81 "DEBYE.pm"
 
 
 
-#line 1058 "../../../../blib/lib/PDL/PP.pm"
+#line 948 "../../../../blib/lib/PDL/PP.pm"
 
 
 
@@ -106,14 +106,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1060 "../../../../blib/lib/PDL/PP.pm"
+#line 950 "../../../../blib/lib/PDL/PP.pm"
 
 *gsl_sf_debye_2 = \&PDL::gsl_sf_debye_2;
 #line 113 "DEBYE.pm"
 
 
 
-#line 1058 "../../../../blib/lib/PDL/PP.pm"
+#line 948 "../../../../blib/lib/PDL/PP.pm"
 
 
 
@@ -138,14 +138,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1060 "../../../../blib/lib/PDL/PP.pm"
+#line 950 "../../../../blib/lib/PDL/PP.pm"
 
 *gsl_sf_debye_3 = \&PDL::gsl_sf_debye_3;
 #line 145 "DEBYE.pm"
 
 
 
-#line 1058 "../../../../blib/lib/PDL/PP.pm"
+#line 948 "../../../../blib/lib/PDL/PP.pm"
 
 
 
@@ -170,7 +170,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1060 "../../../../blib/lib/PDL/PP.pm"
+#line 950 "../../../../blib/lib/PDL/PP.pm"
 
 *gsl_sf_debye_4 = \&PDL::gsl_sf_debye_4;
 #line 177 "DEBYE.pm"

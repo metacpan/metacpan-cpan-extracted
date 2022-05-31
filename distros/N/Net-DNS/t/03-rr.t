@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 03-rr.t 1856 2021-12-02 14:36:25Z willem $	-*-perl-*-
+# $Id: 03-rr.t 1864 2022-04-14 15:18:49Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -7,7 +7,6 @@ use warnings;
 use Test::More tests => 108;
 
 use Net::DNS::RR;
-local $Net::DNS::Parameters::DNSEXTLANG;			# suppress Extlang type queries
 
 
 {					## check exception raised for unparsable argument

@@ -1,0 +1,29 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use lib $ENV{HOME} . '/sandbox/MIDI-Util/lib';
+use MIDI::Util qw(midi_dump reverse_dump);
+use Data::Dumper::Compact qw(ddc);
+
+my $name = shift || 'length';
+
+print ddc(midi_dump($name));
+
+print ddc(reverse_dump($name, 2));
+
+__END__
+volume
+length
+note
+note2number
+number2note
+patch2number
+number2patch
+notenum2percussion
+percussion2notenum
+all_events
+midi_events
+meta_events
+text_events
+nontext_meta_events

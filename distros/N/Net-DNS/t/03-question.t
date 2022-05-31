@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 03-question.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
+# $Id: 03-question.t 1864 2022-04-14 15:18:49Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -7,7 +7,6 @@ use warnings;
 
 use Net::DNS::Question;
 use Net::DNS::Parameters;
-local $Net::DNS::Parameters::DNSEXTLANG;			# suppress Extlang type queries
 
 use Test::More tests => 105;
 

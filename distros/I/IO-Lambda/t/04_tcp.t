@@ -10,7 +10,6 @@ use IO::Handle;
 use IO::Socket::INET;
 
 plan skip_all => "online tests disabled" unless -e 't/online.enabled';
-plan tests    => 6;
 
 alarm(10);
 
@@ -21,8 +20,10 @@ my $serv_sock = IO::Socket::INET-> new(
 	Proto     => 'tcp',
 	ReuseAddr => 1,
 );
-die "listen() error: $!\n" unless $serv_sock;
+plan skip_all => "listen error: $!" unless $serv_sock;
 my $last_session_response = '';
+
+plan tests    => 6;
 
 sub session
 { 

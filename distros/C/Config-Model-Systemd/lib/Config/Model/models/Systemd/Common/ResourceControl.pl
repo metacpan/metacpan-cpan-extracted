@@ -1140,23 +1140,24 @@ the disabled controller list.',
 L<systemd-oomd.service(8)>
 will act on this unit\'s cgroups. Defaults to C<auto>.
 
-When set to C<kill>, systemd-oomd will actively monitor this unit\'s
-cgroup metrics to decide whether it needs to act. If the cgroup passes the limits set by
-L<oomd.conf(5)> or its
-overrides, systemd-oomd will send a C<SIGKILL> to all of the processes
-under the chosen candidate cgroup. Note that only descendant cgroups can be eligible candidates for killing;
-the unit that set its property to C<kill> is not a candidate (unless one of its ancestors set
-their property to C<kill>). You can find more details on candidates and kill behavior at
+When set to C<kill>, the unit becomes a candidate for monitoring by
+systemd-oomd. If the cgroup passes the limits set by
+L<oomd.conf(5)> or
+the unit configuration, systemd-oomd will select a descendant cgroup and send
+C<SIGKILL> to all of the processes under it. You can find more details on
+candidates and kill behavior at
 L<systemd-oomd.service(8)>
-and L<oomd.conf(5)>. Setting
-either of these properties to C<kill> will also automatically acquire
+and
+L<oomd.conf(5)>.
+
+Setting either of these properties to C<kill> will also result in
 C<After> and C<Wants> dependencies on
 C<systemd-oomd.service> unless C<DefaultDependencies=no>.
 
-When set to C<auto>, systemd-oomd will not actively use this cgroup\'s
-data for monitoring and detection. However, if an ancestor cgroup has one of these properties set to
-C<kill>, a unit with C<auto> can still be an eligible candidate for
-systemd-oomd to act on.',
+When set to C<auto>, systemd-oomd will not actively use this
+cgroup\'s data for monitoring and detection. However, if an ancestor cgroup has one of these
+properties set to C<kill>, a unit with C<auto> can still be a candidate
+for systemd-oomd to terminate.',
         'type' => 'leaf',
         'value_type' => 'enum'
       },
@@ -1170,23 +1171,24 @@ systemd-oomd to act on.',
 L<systemd-oomd.service(8)>
 will act on this unit\'s cgroups. Defaults to C<auto>.
 
-When set to C<kill>, systemd-oomd will actively monitor this unit\'s
-cgroup metrics to decide whether it needs to act. If the cgroup passes the limits set by
-L<oomd.conf(5)> or its
-overrides, systemd-oomd will send a C<SIGKILL> to all of the processes
-under the chosen candidate cgroup. Note that only descendant cgroups can be eligible candidates for killing;
-the unit that set its property to C<kill> is not a candidate (unless one of its ancestors set
-their property to C<kill>). You can find more details on candidates and kill behavior at
+When set to C<kill>, the unit becomes a candidate for monitoring by
+systemd-oomd. If the cgroup passes the limits set by
+L<oomd.conf(5)> or
+the unit configuration, systemd-oomd will select a descendant cgroup and send
+C<SIGKILL> to all of the processes under it. You can find more details on
+candidates and kill behavior at
 L<systemd-oomd.service(8)>
-and L<oomd.conf(5)>. Setting
-either of these properties to C<kill> will also automatically acquire
+and
+L<oomd.conf(5)>.
+
+Setting either of these properties to C<kill> will also result in
 C<After> and C<Wants> dependencies on
 C<systemd-oomd.service> unless C<DefaultDependencies=no>.
 
-When set to C<auto>, systemd-oomd will not actively use this cgroup\'s
-data for monitoring and detection. However, if an ancestor cgroup has one of these properties set to
-C<kill>, a unit with C<auto> can still be an eligible candidate for
-systemd-oomd to act on.',
+When set to C<auto>, systemd-oomd will not actively use this
+cgroup\'s data for monitoring and detection. However, if an ancestor cgroup has one of these
+properties set to C<kill>, a unit with C<auto> can still be a candidate
+for systemd-oomd to terminate.',
         'type' => 'leaf',
         'value_type' => 'enum'
       },

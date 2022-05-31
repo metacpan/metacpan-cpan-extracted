@@ -3,10 +3,8 @@ use strict;
 use warnings;
 use Carp qw(croak);
 use Digest;
-use Digest::Bcrypt;
 use MIME::Base64 qw(decode_base64 encode_base64);
 use Data::Entropy::Algorithms qw(rand_bits rand_int);
-use version 0.77;
 
 # ABSTRACT: Passphrases and Passwords as objects for Dancer2
 
@@ -30,20 +28,6 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-# Digest::Bcrypt at v1.210 switched to Crypt::Bcrypt, and also switched
-# its min cost from 4 to 5, even though Crypt::Bcrypt accepts 4, so we
-# monkeypatch the cost check for backwards-compatibility.
-if ( version->parse($Digest::Bcrypt::VERSION) > version->parse(1.209) ) {
-    no warnings 'redefine';
-    *Digest::Bcrypt::_check_cost = sub {
-        my ($self, $cost) = @_;
-        $cost = defined $cost ? $cost : $self->cost;
-        if (!defined $cost || $cost !~ /^\d+$/ || ($cost < 4 || $cost > 31)) {
-            Carp::croak "Cost must be an integer between 4 and 31";
-        }
-    };
-}
 
 sub new {
     my $class = shift;

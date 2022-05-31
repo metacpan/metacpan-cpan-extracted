@@ -80,7 +80,7 @@ to the algorithms in the GSL library that do not use derivatives.
 
 
 
-#line 1058 "../../../blib/lib/PDL/PP.pm"
+#line 948 "../../../blib/lib/PDL/PP.pm"
 
 
 
@@ -107,7 +107,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1059 "../../../blib/lib/PDL/PP.pm"
+#line 949 "../../../blib/lib/PDL/PP.pm"
 
 sub gslmroot_fsolver {
 	my ($x, $f_vect) = @_;
@@ -123,7 +123,7 @@ sub gslmroot_fsolver {
 
 
 
-#line 1060 "../../../blib/lib/PDL/PP.pm"
+#line 950 "../../../blib/lib/PDL/PP.pm"
 
 *gslmroot_fsolver = \&PDL::GSL::MROOT::gslmroot_fsolver;
 #line 130 "MROOT.pm"

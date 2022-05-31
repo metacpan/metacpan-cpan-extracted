@@ -1,37 +1,26 @@
 package Tags::HTML::Page::End;
 
+use base qw(Tags::HTML);
 use strict;
 use warnings;
 
-use Class::Utils qw(set_params);
-use Error::Pure qw(err);
-
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
 	my ($class, @params) = @_;
 
-	# Create object.
-	my $self = bless {}, $class;
+	# No CSS support.
+	push @params, 'no_css', 1;
 
-	# 'Tags' object.
-	$self->{'tags'} = undef;
-
-	# Process params.
-	set_params($self, @params);
-
-	# Check to 'Tags' object.
-	if (! $self->{'tags'} || ! $self->{'tags'}->isa('Tags::Output')) {
-		err "Parameter 'tags' must be a 'Tags::Output::*' class.";
-	}
+	my $self = $class->SUPER::new(@params);
 
 	# Object.
 	return $self;
 }
 
 # Process 'Tags'.
-sub process {
+sub _process {
 	my $self = shift;
 
 	# End of page.
@@ -93,9 +82,14 @@ Returns undef.
 =head1 ERRORS
 
  new():
-         Parameter 'tags' must be a 'Tags::Output::*' class.
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
+         From Tags::HTML::new():
+                 Parameter 'tags' must be a 'Tags::Output::*' class.
+
+ process():
+         From Tags::HTML::process():
+                 Parameter 'tags' isn't defined.
 
 =head1 EXAMPLE
 
@@ -110,6 +104,7 @@ Returns undef.
  # Object.
  my $tags = Tags::Output::Indent->new(
          'preserved' => ['style'],
+         'xml' => 1,
  );
  my $css = CSS::Struct::Output::Indent->new;
  my $begin = Tags::HTML::Page::Begin->new(
@@ -121,7 +116,12 @@ Returns undef.
  );
 
  # Process page
- $begin->process_css;
+ $css->put(
+        ['s', 'div'],
+        ['d', 'color', 'red'],
+        ['d', 'background-color', 'black'],
+        ['e'],
+ );
  $begin->process;
  $tags->put(
         ['b', 'div'],
@@ -135,25 +135,18 @@ Returns undef.
 
  # Output:
  # <!DOCTYPE html>
- # <html>
+ # <html lang="en">
  #   <head>
- #     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
- #     </meta>
+ #     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+ #     <meta name="generator" content=
+ #       "Perl module: Tags::HTML::Page::Begin, Version: 0.13" />
  #     <title>
  #       Page title
  #     </title>
  #     <style type="text/css">
- # .okay {
- # 	background: #9f9;
- # }
- # .warning {
- # 	background: #ff9;
- # }
- # .alert {
- # 	background: #f99;
- # }
- # .offline {
- # 	color: #999;
+ # div {
+ #         color: red;
+ #         background-color: black;
  # }
  # </style>
  #   </head>
@@ -166,8 +159,7 @@ Returns undef.
 
 =head1 DEPENDENCIES
 
-L<Class::Utils>,
-L<Error::Pure>.
+L<Tags::HTML>.
 
 =head1 SEE ALSO
 
@@ -191,12 +183,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2020
+© Michal Josef Špaček 2020-2022
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

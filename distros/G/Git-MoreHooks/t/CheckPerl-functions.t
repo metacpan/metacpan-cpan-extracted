@@ -1,18 +1,19 @@
 #!perl
 ## no critic (Subroutines::ProtectPrivateSubs)
-### no critic (ValuesAndExpressions::ProhibitMagicNumbers)
 use strict;
 use warnings;
 use Test2::V0;
 use Path::Tiny;
 use File::Spec ();
 use File::Temp ();
-use Test::Git qw(test_repository);
 
-# use Log::Any::Adapter ( 'Stdout', log_level => 'debug' );
-use Log::Any::Adapter            ('Stdout');
-use Git::MoreHooks::CheckPerl    ();
-use Git::MoreHooks::GitRepoAdmin ();
+use Test2::Require::Module 'Perl::Critic';
+use Test::Requires::Git ();
+use Test::Git qw(test_repository);
+use Git::MoreHooks::CheckPerl ();
+
+# We need Git which supports the --initial-branch parameter in init command.
+Test::Requires::Git::test_requires_git '2.28.0';
 
 # Eliminate the effects of system wide and global configuration.
 # https://metacpan.org/dist/Git-Repository/view/lib/Git/Repository/Tutorial.pod#Ignore-the-system-and-global-configuration-files

@@ -52,11 +52,8 @@ lib/Config/Model/models/Systemd/Timer.pl
 lib/Config/Model/models/Systemd/Timer.pod
 lib/Config/Model/system.d/systemd
 lib/Config/Model/system.d/systemd-service
-lib/Config/Model/system.d/systemd-service~
 lib/Config/Model/system.d/systemd-socket
-lib/Config/Model/system.d/systemd-socket~
 lib/Config/Model/system.d/systemd-timer
-lib/Config/Model/system.d/systemd-timer~
 lib/Config/Model/user.d/systemd-user
 t/README.md
 t/cme-function.t
@@ -77,8 +74,6 @@ t/model_tests.d/systemd-service-file-examples/override-service/main-obex
 t/model_tests.d/systemd-service-file-examples/override-service/user-obex
 t/model_tests.d/systemd-service-file-test-conf.pl
 t/model_tests.d/systemd-service-test-conf.pl
-t/model_tests.d/systemd-service-test-conf.pl~
-t/model_tests.d/systemd-service-test.pl~
 t/model_tests.d/systemd-socket-file-examples/basic-socket/gmail-imap-tunnel.socket
 t/model_tests.d/systemd-socket-file-test-conf.pl
 t/model_tests.d/systemd-test-conf.pl
@@ -94,7 +89,4 @@ t/perl-critic.t
 t/perlcriticrc
 t/pod.t
 t/systemd-service.t
-t/systemd-service.t~
 weaver.ini
-wr_root/cme-function/test.service
-wr_root/systemd-service/lib/systemd/system/transmission-daemon.service

@@ -27,6 +27,10 @@ sub skippable {
 
 
 my %tests = (
+    '5.036' => [
+        [ 'unicode14.0',
+          '"\N{MELTING FACE}" eq "\N{U+1FAE0}"', 1 ]
+    ],
     '5.034' => [
         [ '{,n}',
           '"ac" =~ /ab{,1}c/', 1 ],

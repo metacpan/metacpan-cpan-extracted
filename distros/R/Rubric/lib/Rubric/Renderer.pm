@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Rubric::Renderer;
+package Rubric::Renderer 0.157;
 # ABSTRACT: the rendering interface for Rubric
-$Rubric::Renderer::VERSION = '0.156';
+
 #pod =head1 DESCRIPTION
 #pod
 #pod Rubric::Renderer provides a simple interface for rendering entries, entry sets,
@@ -113,12 +113,21 @@ Rubric::Renderer - the rendering interface for Rubric
 
 =head1 VERSION
 
-version 0.156
+version 0.157
 
 =head1 DESCRIPTION
 
 Rubric::Renderer provides a simple interface for rendering entries, entry sets,
 and other things collected by Rubric::WebApp.
+
+=head1 PERL VERSION
+
+This code is effectively abandonware.  Although releases will sometimes be made
+to update contact info or to fix packaging flaws, bug reports will mostly be
+ignored.  Feature requests are even more likely to be ignored.  (If someone
+takes up maintenance of this code, they will presumably remove this notice.)
+This means that whatever version of perl is currently required is unlikely to
+change -- but also that it might change at any new maintainer's whim.
 
 =head1 METHODS
 
@@ -144,7 +153,7 @@ two-element list.  In scalar context, it returns the output document.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

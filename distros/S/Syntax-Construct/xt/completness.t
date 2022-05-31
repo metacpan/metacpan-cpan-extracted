@@ -1,13 +1,17 @@
 #!/usr/bin/perl
 use warnings;
 use strict;
+use FindBin;
 
 my $plan;
 BEGIN {
-    my ($constructs, $removed, $alias, $old)
-        = (87,       6,        75,     3);
-    $plan = 5 * $constructs + 3 * $removed + 5 * $alias + $old + 1
-};
+    my %count = (constructs => 88,
+                 removed    => 6,
+                 aliases    => 75,
+                 old        => 3);
+    $plan = 5 * $count{constructs} + 3 * $count{removed}
+          + 5 * $count{aliases} + $count{old} + 1;
+}
 
 use FindBin;
 use Test::More tests => $plan;

@@ -109,6 +109,10 @@ sub handle_connection
 
 		my $resp;
 		eval { ($resp, $error) = $cb->($req, \%session); };
+		if ($@) {
+			$error = $@;
+			warn $@;
+		}
 		context UNIVERSAL::isa( $resp, 'IO::Lambda') ?
 			$resp : lambda { $resp, $error };
 	tail {

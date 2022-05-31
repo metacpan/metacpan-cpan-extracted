@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Number::Tolerant::Union;
+package Number::Tolerant::Union 1.709;
 # ABSTRACT: unions of tolerance ranges
-$Number::Tolerant::Union::VERSION = '1.708';
+
 #pod =head1 SYNOPSIS
 #pod
 #pod  use Number::Tolerant;
@@ -149,7 +149,7 @@ Number::Tolerant::Union - unions of tolerance ranges
 
 =head1 VERSION
 
-version 1.708
+version 1.709
 
 =head1 SYNOPSIS
 
@@ -173,6 +173,16 @@ version 1.708
 Number::Tolerant::Union is used by L<Number::Tolerant> to represent the union
 of multiple tolerances.  A subset of the same operators that function on a
 tolerance will function on a union of tolerances, as listed below.
+
+=head1 PERL VERSION
+
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -237,7 +247,7 @@ Who knows.  Collapsing overlapping options, probably.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

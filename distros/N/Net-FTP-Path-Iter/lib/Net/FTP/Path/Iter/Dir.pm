@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use experimental 'switch';
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 use Carp;
 use Fcntl qw[ :mode ];
@@ -149,18 +149,33 @@ __END__
 
 =pod
 
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
 =head1 NAME
 
 Net::FTP::Path::Iter::Dir - Class representing a Directory
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
-=head1 BUGS AND LIMITATIONS
+=head1 INTERNALS
 
-You can make new bug reports, and view existing ones, through the
-web interface at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Net-FTP-Path-Iter>.
+=head1 SUPPORT
+
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-net-ftp-path-iter@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-FTP-Path-Iter
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/net-ftp-path-iter
+
+and may be cloned from
+
+  https://gitlab.com/djerius/net-ftp-path-iter.git
 
 =head1 SEE ALSO
 

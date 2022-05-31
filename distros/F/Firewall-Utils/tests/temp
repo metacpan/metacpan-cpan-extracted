@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use 5.018;
+use Mojo::Util qw(dumper);
+use lib "/works/firewall/lib";
+
+use Firewall::Utils::Set;
+use Firewall::Utils::Ip;
+use JSON;
+=pod
+open my $h_abc ,'<',"abc.txt";
+my $set = new Firewall::Utils::Set;
+while (<$h_abc>){
+    /\s*ip\s+address\s+(10.+)\/(\d+)/x;
+   $set->mergeToSet(Firewall::Utils::Ip->new->getRangeFromIpMask($1,$2))
+}
+my $i;
+for ($i=0;$i<$set->length;$i++){
+    my $min = $set->mins->[$i];
+    my $max = $set->maxs->[$i];
+    my $ipStr = Firewall::Utils::Ip->new->getIpMaskFromRange($min,$max);
+    say $ipStr." ".$min." ".$max;
+
+}
+#say dumper $set;
+#my $set = Firewall::Utils::Ip->new->getRangeFromIpMask();
+=cut
+
+
+my $set = Firewall::Utils::Set->new(mins => [ 1, 9, 12 ], maxs => [ 2, 10, 15 ]);
+#$set->mergeToSet(Firewall::Utils::Ip->new->getRangeFromIpMask('10.33.0.0', 16));
+#$set->mergeToSet(Firewall::Utils::Ip->new->getRangeFromIpMask('10.30.0.0', 16));
+say dumper $set->dump;
+#say dumper $set->interRange([ 7, 16 ], [ 3, 9 ],);
+say dumper $set->interSet(Firewall::Utils::Set->new(mins => [ 3, 9 ], maxs => [ 7, 16 ]));
+say dumper $set;
+say dumper encode_json { mins => $set->mins, maxs => $set->maxs };
+
+my $string = '{"mins":["16888888","26888888"],"maxs":["16899999","26899999"]}';
+
+my $jsonHash = decode_json $string;
+
+my $newSet = Firewall::Utils::Set->new(%$jsonHash);
+say dumper $newSet;
+

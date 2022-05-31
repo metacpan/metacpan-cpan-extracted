@@ -3,19 +3,14 @@
 use strict;
 use warnings;
 
-use Test::Shared::Fixture::Wikibase::Datatype::Form::Wikidata::DogCzechSingular;
-use Unicode::UTF8 qw(encode_utf8);
-use Wikibase::Datatype::Print::Form;
+use Test::Shared::Fixture::Wikibase::Datatype::Value::Item::Wikidata::Human;
+use Wikibase::Datatype::Print::Value::Item;
 
 # Object.
-my $obj = Test::Shared::Fixture::Wikibase::Datatype::Form::Wikidata::DogCzechSingular->new;
+my $obj = Test::Shared::Fixture::Wikibase::Datatype::Value::Item::Wikidata::Human->new;
 
 # Print out.
-print encode_utf8(scalar Wikibase::Datatype::Print::Form::print($obj));
+print scalar Wikibase::Datatype::Print::Value::Item::print($obj);
 
 # Output:
-# Id: L469-F1
-# Representation: pes (cs)
-# Grammatical features: Q110786, Q131105
-# Statements:
-#   P898: pɛs (normal)
+# Q5

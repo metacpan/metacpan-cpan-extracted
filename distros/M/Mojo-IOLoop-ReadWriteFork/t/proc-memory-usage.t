@@ -9,10 +9,10 @@ plan skip_all => "open /proc/$$/statm: $!" unless do { sysopen my $PROC, "/proc/
 my @tracked, (get_mem_usage());
 
 for (1 .. $ENV{TEST_MEMORY}) {
-  my $fork   = Mojo::IOLoop::ReadWriteFork->new;
+  my $rwf    = Mojo::IOLoop::ReadWriteFork->new;
   my $output = '';
-  $fork->on(read => sub { $output .= $_[1] });
-  $fork->run_p('dd if=/dev/urandom bs=10M count=1')->wait;
+  $rwf->on(read => sub { $output .= $_[1] });
+  $rwf->run_p('dd if=/dev/urandom bs=10M count=1')->wait;
 
   ok length($output) > 1e6, 'got output';
   sleep 0.2;

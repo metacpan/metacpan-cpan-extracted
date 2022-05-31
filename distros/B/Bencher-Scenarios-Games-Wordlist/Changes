@@ -1,7 +1,17 @@
+0.051   2022-03-19  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+        - Edit Changes.
+
+
 0.050   2022-03-19  Released-By: PERLANCAR; Urgency: medium
 
         - Rename dist
           Bencher-{Scenario-GamesWordlistModules,Scenarios-Games-Wordlist}.
+
+        - [removed] Remove most participants because I have removed most of the
+          Games:Word::Wordlist modules from CPAN.
 
 
 0.04    2017-01-25  Released-By: PERLANCAR

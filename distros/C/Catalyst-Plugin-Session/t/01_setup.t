@@ -1,14 +1,11 @@
-#!/usr/bin/perl
-
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More;
 use Class::MOP;
 use Test::Deep;
 
-my $m;
-BEGIN { use_ok( $m = "Catalyst::Plugin::Session" ) }
+use Catalyst::Plugin::Session;
 
 my %config;
 my $log_meta = Class::MOP::Class->create_anon_class(superclasses => ['Moose::Object']);
@@ -22,7 +19,7 @@ $log_meta->add_method("fatal" => sub { $calls++; 1; });
 
     package MockCxt;
     use MRO::Compat;
-    use base $m;
+    use base qw(Catalyst::Plugin::Session);
     sub new { bless {}, $_[0] }
     sub config { \%config }
     sub log    { $log }
@@ -34,7 +31,7 @@ $log_meta->add_method("fatal" => sub { $calls++; 1; });
     }
 }
 
-can_ok( $m, "setup" );
+can_ok( 'Catalyst::Plugin::Session', "setup" );
 
 eval { MockCxt->new->setup };    # throws OK is not working with NEXT
 like(
@@ -74,3 +71,4 @@ MockCxt->new->setup;
 is( $config{session}{expires},
     1234, "user values are not overwritten in config" );
 
+done_testing;

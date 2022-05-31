@@ -41,34 +41,31 @@ aliasing.',
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => 'This option may be used more than once, or a
-space-separated list of unit names may be given. A symbolic
-link is created in the C<.wants/> or
-C<.requires/> directory of each of the
-listed units when this unit is installed by systemctl
-enable. This has the effect that a dependency of
-type C<Wants> or C<Requires>
-is added from the listed unit to the current unit. The primary
-result is that the current unit will be started when the
-listed unit is started. See the description of
-C<Wants> and C<Requires> in
-the [Unit] section for details.
+        'description' => 'This option may be used more than once, or a space-separated list of unit names may
+be given. A symbolic link is created in the C<.wants/> or
+C<.requires/> directory of each of the listed units when this unit is installed by
+systemctl enable. This has the effect of a dependency of type
+C<Wants> or C<Requires> being added from the listed unit to the
+current unit. The primary result is that the current unit will be started when the listed unit is
+started, see the description of C<Wants> and C<Requires> in the
+[Unit] section for details.
 
-WantedBy=foo.service in a service
-C<bar.service> is mostly equivalent to
-Alias=foo.service.wants/bar.service in the
-same file. In case of template units, systemctl
-enable must be called with an instance name, and
-this instance will be added to the
-C<.wants/> or
-C<.requires/> list of the listed unit. E.g.
-WantedBy=getty.target in a service
-C<getty@.service> will result in
-systemctl enable getty@tty2.service
-creating a
-C<getty.target.wants/getty@tty2.service>
-link to C<getty@.service>.
-',
+In case of template units listing non template units, the listing unit must have
+C<DefaultInstance> set, or systemctl enable must be called with
+an instance name. The instance (default or specified) will be added to the
+C<.wants/> or C<.requires/> list of the listed unit. For example,
+WantedBy=getty.target in a service C<getty@.service> will result
+in systemctl enable getty@tty2.service creating a
+C<getty.target.wants/getty@tty2.service> link to
+C<getty@.service>. This also applies to listing specific instances of templated
+units: this specific instance will gain the dependency. A template unit may also list a template
+unit, in which case a generic dependency will be added where each instance of the listing unit will
+have a dependency on an instance of the listed template with the same instance value. For example,
+WantedBy=container@.target in a service C<monitor@.service> will
+result in systemctl enable monitor@.service creating a
+C<container@.target.wants/monitor@.service> link to
+C<monitor@.service>, which applies to all instances of
+C<container@.target>.',
         'type' => 'list'
       },
       'RequiredBy',
@@ -77,34 +74,31 @@ link to C<getty@.service>.
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => 'This option may be used more than once, or a
-space-separated list of unit names may be given. A symbolic
-link is created in the C<.wants/> or
-C<.requires/> directory of each of the
-listed units when this unit is installed by systemctl
-enable. This has the effect that a dependency of
-type C<Wants> or C<Requires>
-is added from the listed unit to the current unit. The primary
-result is that the current unit will be started when the
-listed unit is started. See the description of
-C<Wants> and C<Requires> in
-the [Unit] section for details.
+        'description' => 'This option may be used more than once, or a space-separated list of unit names may
+be given. A symbolic link is created in the C<.wants/> or
+C<.requires/> directory of each of the listed units when this unit is installed by
+systemctl enable. This has the effect of a dependency of type
+C<Wants> or C<Requires> being added from the listed unit to the
+current unit. The primary result is that the current unit will be started when the listed unit is
+started, see the description of C<Wants> and C<Requires> in the
+[Unit] section for details.
 
-WantedBy=foo.service in a service
-C<bar.service> is mostly equivalent to
-Alias=foo.service.wants/bar.service in the
-same file. In case of template units, systemctl
-enable must be called with an instance name, and
-this instance will be added to the
-C<.wants/> or
-C<.requires/> list of the listed unit. E.g.
-WantedBy=getty.target in a service
-C<getty@.service> will result in
-systemctl enable getty@tty2.service
-creating a
-C<getty.target.wants/getty@tty2.service>
-link to C<getty@.service>.
-',
+In case of template units listing non template units, the listing unit must have
+C<DefaultInstance> set, or systemctl enable must be called with
+an instance name. The instance (default or specified) will be added to the
+C<.wants/> or C<.requires/> list of the listed unit. For example,
+WantedBy=getty.target in a service C<getty@.service> will result
+in systemctl enable getty@tty2.service creating a
+C<getty.target.wants/getty@tty2.service> link to
+C<getty@.service>. This also applies to listing specific instances of templated
+units: this specific instance will gain the dependency. A template unit may also list a template
+unit, in which case a generic dependency will be added where each instance of the listing unit will
+have a dependency on an instance of the listed template with the same instance value. For example,
+WantedBy=container@.target in a service C<monitor@.service> will
+result in systemctl enable monitor@.service creating a
+C<container@.target.wants/monitor@.service> link to
+C<monitor@.service>, which applies to all instances of
+C<container@.target>.',
         'type' => 'list'
       },
       'Also',

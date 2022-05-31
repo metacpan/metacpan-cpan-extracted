@@ -1,0 +1,25 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Drummer-Tiny);
+use MIDI::Drummer::Tiny;
+
+my $d = MIDI::Drummer::Tiny->new( file => "$0.mid" );
+
+$d->count_in(1);
+
+$d->sync_patterns(
+    $d->closed_hh => [ ('11111111') x $d->bars ],
+    $d->snare     => [ ('0101') x $d->bars ],
+    $d->kick      => [ ('1010') x $d->bars ],
+);
+
+# For finer-grain control:
+#$d->sync(
+#   sub { $d->pattern( instrument => $d->closed_hh, patterns => [ ('11111111') x $d->bars ] ) },
+#   sub { $d->pattern( instrument => $d->snare,     patterns => [ ('0101') x $d->bars ] ) },
+#   sub { $d->pattern( instrument => $d->kick,      patterns => [ ('1010') x $d->bars ] ) },
+#);
+
+$d->write;

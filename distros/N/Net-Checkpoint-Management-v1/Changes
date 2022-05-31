@@ -1,4 +1,8 @@
-Revision history for Net-Checkpoint-Management-v1: 0.001009
+Revision history for Net-Checkpoint-Management-v1: 0.001010
+
+0.001010  2022-05-30 15:34:46+02:00 Europe/Vienna
+    - fix api_versions successful test
+      for three digit API version numbers introduced by jumbo hotfixes
 
 0.001009  2021-03-22 11:59:27+01:00 Europe/Vienna
     - improve error handling of underlying exceptions

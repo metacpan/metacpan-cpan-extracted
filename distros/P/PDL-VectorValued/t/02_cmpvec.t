@@ -25,9 +25,9 @@ my $v1 = zeroes($vdim);
 my $v2 = pdl($v1);
 $v2->set(-1,1);
 
-isok("cmpvec:1d:<",  $v1->cmpvec($v2)<0);
-isok("cmpvec:1d:>",  $v2->cmpvec($v1)>0);
-isok("cmpvec:1d:==", $v1->cmpvec($v1)->sclr, 0);
+isok("cmpvec:1d:<",  $v1->vv_cmpvec($v2)<0);
+isok("cmpvec:1d:>",  $v2->vv_cmpvec($v1)>0);
+isok("cmpvec:1d:==", $v1->vv_cmpvec($v1)->sclr, 0);
 
 
 ##--------------------------------------------------------------
@@ -46,10 +46,9 @@ pdlok("vv_qsortveci", $p2d->dice_axis(1,$p2d->vv_qsortveci), $p2d->vv_qsortvec);
 my $which = pdl(long,[[0,0],[0,0],[0,1],[0,1],[1,0],[1,0],[1,1],[1,1]]);
 my $find  = $which->slice(",0:-1:2");
 
-pdlok("vsearchvec():match", $find->vsearchvec($which), pdl(long,[0,2,4,6]));
-isok("vsearchvev():<<",    all(pdl([-1,-1])->vsearchvec($which)==0));
-isok("vsearchvev():>>",    all(pdl([2,2])->vsearchvec($which)==$which->dim(1)-1));
+pdlok("vsearchvec():match", $find->vv_vsearchvec($which), pdl(long,[0,2,4,6]));
+isok("vsearchvev():<<",    all(pdl([-1,-1])->vv_vsearchvec($which)==0));
+isok("vsearchvev():>>",    all(pdl([2,2])->vv_vsearchvec($which)==$which->dim(1)-1));
 
 print "\n";
 # end of t/02_cmpvec.t
-

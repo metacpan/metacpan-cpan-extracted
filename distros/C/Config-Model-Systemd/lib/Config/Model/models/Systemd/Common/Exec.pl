@@ -452,6 +452,38 @@ C<PrivateDevices> below, as it may change the setting of
 C<DevicePolicy>.',
         'type' => 'list'
       },
+      'ExtensionDirectories',
+      {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
+        'description' => 'This setting is similar to C<BindReadOnlyPaths> in that it mounts a file
+system hierarchy from a directory, but instead of providing a destination path, an overlay will be set
+up. This option expects a whitespace separated list of source directories.
+
+A read-only OverlayFS will be set up on top of C</usr/> and
+C</opt/> hierarchies. The order in which the directories are listed will determine
+the order in which the overlay is laid down: directories specified first to last will result in overlayfs
+layers bottom to top.
+
+Each directory listed in C<ExtensionDirectories> may be prefixed with C<->,
+in which case it will be ignored when its source path does not exist. Any mounts created with this option are
+specific to the unit, and are not visible in the host\'s mount table.
+
+These settings may be used more than once, each usage appends to the unit\'s list of directories
+paths. If the empty string is assigned, the entire list of mount paths defined prior to this is
+reset.
+
+Each directory must contain a C</usr/lib/extension-release.d/extension-release.IMAGE>
+file, with the appropriate metadata which matches C<RootImage>/C<RootDirectory>
+or the host. See:
+L<os-release(5)>.
+
+Note that usage from user units requires overlayfs support in unprivileged user namespaces,
+which was first introduced in kernel v5.11.',
+        'type' => 'list'
+      },
       'User',
       {
         'description' => "Set the UNIX user or group that the processes are executed as, respectively. Takes a single
@@ -794,6 +826,12 @@ over these per-process limits, as they apply to services as a whole, may be alte
 runtime, and are generally more expressive. For example, C<MemoryMax> is a more
 powerful (and working) replacement for C<LimitRSS>.
 
+Note that C<LimitNPROC> will limit the number of processes from one (real) UID and
+not the number of processes started (forked) by the service. Therefore the limit is cumulative for all
+processes running under the same UID. Please also note that the C<LimitNPROC> will not be
+enforced if the service is running as root (and not dropping privileges). Due to these limitations,
+C<TasksMax> (see L<systemd.resource-control(5)>) is typically a better choice than C<LimitNPROC>.
+
 Resource limits not configured explicitly for a unit default to the value configured in the various
 C<DefaultLimitCPU>, C<DefaultLimitFSIZE>, \x{2026} options available in
 L<systemd-system.conf(5)>, and \x{2013}
@@ -844,6 +882,12 @@ L<systemd.resource-control(5)>
 over these per-process limits, as they apply to services as a whole, may be altered dynamically at
 runtime, and are generally more expressive. For example, C<MemoryMax> is a more
 powerful (and working) replacement for C<LimitRSS>.
+
+Note that C<LimitNPROC> will limit the number of processes from one (real) UID and
+not the number of processes started (forked) by the service. Therefore the limit is cumulative for all
+processes running under the same UID. Please also note that the C<LimitNPROC> will not be
+enforced if the service is running as root (and not dropping privileges). Due to these limitations,
+C<TasksMax> (see L<systemd.resource-control(5)>) is typically a better choice than C<LimitNPROC>.
 
 Resource limits not configured explicitly for a unit default to the value configured in the various
 C<DefaultLimitCPU>, C<DefaultLimitFSIZE>, \x{2026} options available in
@@ -896,6 +940,12 @@ over these per-process limits, as they apply to services as a whole, may be alte
 runtime, and are generally more expressive. For example, C<MemoryMax> is a more
 powerful (and working) replacement for C<LimitRSS>.
 
+Note that C<LimitNPROC> will limit the number of processes from one (real) UID and
+not the number of processes started (forked) by the service. Therefore the limit is cumulative for all
+processes running under the same UID. Please also note that the C<LimitNPROC> will not be
+enforced if the service is running as root (and not dropping privileges). Due to these limitations,
+C<TasksMax> (see L<systemd.resource-control(5)>) is typically a better choice than C<LimitNPROC>.
+
 Resource limits not configured explicitly for a unit default to the value configured in the various
 C<DefaultLimitCPU>, C<DefaultLimitFSIZE>, \x{2026} options available in
 L<systemd-system.conf(5)>, and \x{2013}
@@ -946,6 +996,12 @@ L<systemd.resource-control(5)>
 over these per-process limits, as they apply to services as a whole, may be altered dynamically at
 runtime, and are generally more expressive. For example, C<MemoryMax> is a more
 powerful (and working) replacement for C<LimitRSS>.
+
+Note that C<LimitNPROC> will limit the number of processes from one (real) UID and
+not the number of processes started (forked) by the service. Therefore the limit is cumulative for all
+processes running under the same UID. Please also note that the C<LimitNPROC> will not be
+enforced if the service is running as root (and not dropping privileges). Due to these limitations,
+C<TasksMax> (see L<systemd.resource-control(5)>) is typically a better choice than C<LimitNPROC>.
 
 Resource limits not configured explicitly for a unit default to the value configured in the various
 C<DefaultLimitCPU>, C<DefaultLimitFSIZE>, \x{2026} options available in
@@ -998,6 +1054,12 @@ over these per-process limits, as they apply to services as a whole, may be alte
 runtime, and are generally more expressive. For example, C<MemoryMax> is a more
 powerful (and working) replacement for C<LimitRSS>.
 
+Note that C<LimitNPROC> will limit the number of processes from one (real) UID and
+not the number of processes started (forked) by the service. Therefore the limit is cumulative for all
+processes running under the same UID. Please also note that the C<LimitNPROC> will not be
+enforced if the service is running as root (and not dropping privileges). Due to these limitations,
+C<TasksMax> (see L<systemd.resource-control(5)>) is typically a better choice than C<LimitNPROC>.
+
 Resource limits not configured explicitly for a unit default to the value configured in the various
 C<DefaultLimitCPU>, C<DefaultLimitFSIZE>, \x{2026} options available in
 L<systemd-system.conf(5)>, and \x{2013}
@@ -1048,6 +1110,12 @@ L<systemd.resource-control(5)>
 over these per-process limits, as they apply to services as a whole, may be altered dynamically at
 runtime, and are generally more expressive. For example, C<MemoryMax> is a more
 powerful (and working) replacement for C<LimitRSS>.
+
+Note that C<LimitNPROC> will limit the number of processes from one (real) UID and
+not the number of processes started (forked) by the service. Therefore the limit is cumulative for all
+processes running under the same UID. Please also note that the C<LimitNPROC> will not be
+enforced if the service is running as root (and not dropping privileges). Due to these limitations,
+C<TasksMax> (see L<systemd.resource-control(5)>) is typically a better choice than C<LimitNPROC>.
 
 Resource limits not configured explicitly for a unit default to the value configured in the various
 C<DefaultLimitCPU>, C<DefaultLimitFSIZE>, \x{2026} options available in
@@ -1100,6 +1168,12 @@ over these per-process limits, as they apply to services as a whole, may be alte
 runtime, and are generally more expressive. For example, C<MemoryMax> is a more
 powerful (and working) replacement for C<LimitRSS>.
 
+Note that C<LimitNPROC> will limit the number of processes from one (real) UID and
+not the number of processes started (forked) by the service. Therefore the limit is cumulative for all
+processes running under the same UID. Please also note that the C<LimitNPROC> will not be
+enforced if the service is running as root (and not dropping privileges). Due to these limitations,
+C<TasksMax> (see L<systemd.resource-control(5)>) is typically a better choice than C<LimitNPROC>.
+
 Resource limits not configured explicitly for a unit default to the value configured in the various
 C<DefaultLimitCPU>, C<DefaultLimitFSIZE>, \x{2026} options available in
 L<systemd-system.conf(5)>, and \x{2013}
@@ -1150,6 +1224,12 @@ L<systemd.resource-control(5)>
 over these per-process limits, as they apply to services as a whole, may be altered dynamically at
 runtime, and are generally more expressive. For example, C<MemoryMax> is a more
 powerful (and working) replacement for C<LimitRSS>.
+
+Note that C<LimitNPROC> will limit the number of processes from one (real) UID and
+not the number of processes started (forked) by the service. Therefore the limit is cumulative for all
+processes running under the same UID. Please also note that the C<LimitNPROC> will not be
+enforced if the service is running as root (and not dropping privileges). Due to these limitations,
+C<TasksMax> (see L<systemd.resource-control(5)>) is typically a better choice than C<LimitNPROC>.
 
 Resource limits not configured explicitly for a unit default to the value configured in the various
 C<DefaultLimitCPU>, C<DefaultLimitFSIZE>, \x{2026} options available in
@@ -1202,6 +1282,12 @@ over these per-process limits, as they apply to services as a whole, may be alte
 runtime, and are generally more expressive. For example, C<MemoryMax> is a more
 powerful (and working) replacement for C<LimitRSS>.
 
+Note that C<LimitNPROC> will limit the number of processes from one (real) UID and
+not the number of processes started (forked) by the service. Therefore the limit is cumulative for all
+processes running under the same UID. Please also note that the C<LimitNPROC> will not be
+enforced if the service is running as root (and not dropping privileges). Due to these limitations,
+C<TasksMax> (see L<systemd.resource-control(5)>) is typically a better choice than C<LimitNPROC>.
+
 Resource limits not configured explicitly for a unit default to the value configured in the various
 C<DefaultLimitCPU>, C<DefaultLimitFSIZE>, \x{2026} options available in
 L<systemd-system.conf(5)>, and \x{2013}
@@ -1252,6 +1338,12 @@ L<systemd.resource-control(5)>
 over these per-process limits, as they apply to services as a whole, may be altered dynamically at
 runtime, and are generally more expressive. For example, C<MemoryMax> is a more
 powerful (and working) replacement for C<LimitRSS>.
+
+Note that C<LimitNPROC> will limit the number of processes from one (real) UID and
+not the number of processes started (forked) by the service. Therefore the limit is cumulative for all
+processes running under the same UID. Please also note that the C<LimitNPROC> will not be
+enforced if the service is running as root (and not dropping privileges). Due to these limitations,
+C<TasksMax> (see L<systemd.resource-control(5)>) is typically a better choice than C<LimitNPROC>.
 
 Resource limits not configured explicitly for a unit default to the value configured in the various
 C<DefaultLimitCPU>, C<DefaultLimitFSIZE>, \x{2026} options available in
@@ -1304,6 +1396,12 @@ over these per-process limits, as they apply to services as a whole, may be alte
 runtime, and are generally more expressive. For example, C<MemoryMax> is a more
 powerful (and working) replacement for C<LimitRSS>.
 
+Note that C<LimitNPROC> will limit the number of processes from one (real) UID and
+not the number of processes started (forked) by the service. Therefore the limit is cumulative for all
+processes running under the same UID. Please also note that the C<LimitNPROC> will not be
+enforced if the service is running as root (and not dropping privileges). Due to these limitations,
+C<TasksMax> (see L<systemd.resource-control(5)>) is typically a better choice than C<LimitNPROC>.
+
 Resource limits not configured explicitly for a unit default to the value configured in the various
 C<DefaultLimitCPU>, C<DefaultLimitFSIZE>, \x{2026} options available in
 L<systemd-system.conf(5)>, and \x{2013}
@@ -1354,6 +1452,12 @@ L<systemd.resource-control(5)>
 over these per-process limits, as they apply to services as a whole, may be altered dynamically at
 runtime, and are generally more expressive. For example, C<MemoryMax> is a more
 powerful (and working) replacement for C<LimitRSS>.
+
+Note that C<LimitNPROC> will limit the number of processes from one (real) UID and
+not the number of processes started (forked) by the service. Therefore the limit is cumulative for all
+processes running under the same UID. Please also note that the C<LimitNPROC> will not be
+enforced if the service is running as root (and not dropping privileges). Due to these limitations,
+C<TasksMax> (see L<systemd.resource-control(5)>) is typically a better choice than C<LimitNPROC>.
 
 Resource limits not configured explicitly for a unit default to the value configured in the various
 C<DefaultLimitCPU>, C<DefaultLimitFSIZE>, \x{2026} options available in
@@ -1406,6 +1510,12 @@ over these per-process limits, as they apply to services as a whole, may be alte
 runtime, and are generally more expressive. For example, C<MemoryMax> is a more
 powerful (and working) replacement for C<LimitRSS>.
 
+Note that C<LimitNPROC> will limit the number of processes from one (real) UID and
+not the number of processes started (forked) by the service. Therefore the limit is cumulative for all
+processes running under the same UID. Please also note that the C<LimitNPROC> will not be
+enforced if the service is running as root (and not dropping privileges). Due to these limitations,
+C<TasksMax> (see L<systemd.resource-control(5)>) is typically a better choice than C<LimitNPROC>.
+
 Resource limits not configured explicitly for a unit default to the value configured in the various
 C<DefaultLimitCPU>, C<DefaultLimitFSIZE>, \x{2026} options available in
 L<systemd-system.conf(5)>, and \x{2013}
@@ -1456,6 +1566,12 @@ L<systemd.resource-control(5)>
 over these per-process limits, as they apply to services as a whole, may be altered dynamically at
 runtime, and are generally more expressive. For example, C<MemoryMax> is a more
 powerful (and working) replacement for C<LimitRSS>.
+
+Note that C<LimitNPROC> will limit the number of processes from one (real) UID and
+not the number of processes started (forked) by the service. Therefore the limit is cumulative for all
+processes running under the same UID. Please also note that the C<LimitNPROC> will not be
+enforced if the service is running as root (and not dropping privileges). Due to these limitations,
+C<TasksMax> (see L<systemd.resource-control(5)>) is typically a better choice than C<LimitNPROC>.
 
 Resource limits not configured explicitly for a unit default to the value configured in the various
 C<DefaultLimitCPU>, C<DefaultLimitFSIZE>, \x{2026} options available in
@@ -1508,6 +1624,12 @@ over these per-process limits, as they apply to services as a whole, may be alte
 runtime, and are generally more expressive. For example, C<MemoryMax> is a more
 powerful (and working) replacement for C<LimitRSS>.
 
+Note that C<LimitNPROC> will limit the number of processes from one (real) UID and
+not the number of processes started (forked) by the service. Therefore the limit is cumulative for all
+processes running under the same UID. Please also note that the C<LimitNPROC> will not be
+enforced if the service is running as root (and not dropping privileges). Due to these limitations,
+C<TasksMax> (see L<systemd.resource-control(5)>) is typically a better choice than C<LimitNPROC>.
+
 Resource limits not configured explicitly for a unit default to the value configured in the various
 C<DefaultLimitCPU>, C<DefaultLimitFSIZE>, \x{2026} options available in
 L<systemd-system.conf(5)>, and \x{2013}
@@ -1558,6 +1680,12 @@ L<systemd.resource-control(5)>
 over these per-process limits, as they apply to services as a whole, may be altered dynamically at
 runtime, and are generally more expressive. For example, C<MemoryMax> is a more
 powerful (and working) replacement for C<LimitRSS>.
+
+Note that C<LimitNPROC> will limit the number of processes from one (real) UID and
+not the number of processes started (forked) by the service. Therefore the limit is cumulative for all
+processes running under the same UID. Please also note that the C<LimitNPROC> will not be
+enforced if the service is running as root (and not dropping privileges). Due to these limitations,
+C<TasksMax> (see L<systemd.resource-control(5)>) is typically a better choice than C<LimitNPROC>.
 
 Resource limits not configured explicitly for a unit default to the value configured in the various
 C<DefaultLimitCPU>, C<DefaultLimitFSIZE>, \x{2026} options available in
@@ -1646,7 +1774,7 @@ not specified defaults to the OOM score adjustment level of the service manager 
 normally at 0.
 
 Use the C<OOMPolicy> setting of service units to configure how the service
-manager shall react to the kernel OOM killer terminating a process of the service.  See
+manager shall react to the kernel OOM killer or systemd-oomd terminating a process of the service.  See
 L<systemd.service(5)>
 for details.',
         'max' => '1000',
@@ -3491,18 +3619,33 @@ securely.",
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => 'Similar to C<Environment> but reads the environment variables from a text
-file. The text file should contain new-line-separated variable assignments.  Empty lines, lines without an
-C<=> separator, or lines starting with ; or # will be ignored, which may be used for
-commenting. A line ending with a backslash will be concatenated with the following one, allowing multiline
-variable definitions. The parser strips leading and trailing whitespace from the values of assignments, unless
-you use double quotes (").
+        'description' => 'Similar to C<Environment> but reads the environment variables from a text file.
+The text file should contain newline-separated variable assignments.  Empty lines, lines without an
+C<=> separator, or lines starting with C<;> or C<#> will be
+ignored, which may be used for commenting. The file must be UTF-8 encoded. Valid characters are L<unicode scalar values|https://www.unicode.org/glossary/#unicode_scalar_value> other than L<noncharacters|https://www.unicode.org/glossary/#noncharacter>, U+0000 NUL, and U+FEFF L<byte order mark|https://www.unicode.org/glossary/#byte_order_mark>. Control codes other than NUL
+are allowed.
 
-L<C escapes|https://en.wikipedia.org/wiki/Escape_sequences_in_C#Table_of_escape_sequences>
-are supported, but not
-L<most control characters|https://en.wikipedia.org/wiki/Control_character#In_ASCII>.
-C<\\t> and C<\\n> can be used to insert tabs and newlines within
-C<EnvironmentFile>.
+In the file, an unquoted value after the C<=> is parsed with the same backslash-escape
+rules as L<unquoted
+text|https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_02_01> in a POSIX shell, but unlike in a shell, interior whitespace is preserved and quotes after the
+first non-whitespace character are preserved. Leading and trailing whitespace (space, tab, carriage return) is
+discarded, but interior whitespace within the line is preserved verbatim. A line ending with a backslash will be
+continued to the following one, with the newline itself discarded. A backslash
+C<\\> followed by any character other than newline will preserve the following character, so that
+C<\\\\> will become the value C<\\>.
+
+In the file, a C<\'>-quoted value after the C<=> can span multiple lines
+and contain any character verbatim other than single quote, like L<single-quoted
+text|https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_02_02> in a POSIX shell. No backslash-escape sequences are recognized. Leading and trailing whitespace
+outside of the single quotes is discarded.
+
+In the file, a C<">-quoted value after the C<=> can span multiple lines,
+and the same escape sequences are recognized as in L<double-quoted
+text|https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_02_03> of a POSIX shell. Backslash (C<\\>) followed by any of C<"\\`$> will
+preserve that character. A backslash followed by newline is a line continuation, and the newline itself is
+discarded. A backslash followed by any other character is ignored; both the backslash and the following
+character are preserved verbatim. Leading and trailing whitespace outside of the double quotes is
+discarded.
 
 The argument passed should be an absolute filename or wildcard expression, optionally prefixed with
 C<->, which indicates that if the file does not exist, it will not be read and no error or
@@ -3537,12 +3680,6 @@ to the executed processes anyway, hence this option is without effect for the us
 
 Variables set for invoked processes due to this setting are subject to being overridden by those
 configured with C<Environment> or C<EnvironmentFile>.
-
-L<C escapes|https://en.wikipedia.org/wiki/Escape_sequences_in_C#Table_of_escape_sequences>
-are supported, but not
-L<most control characters|https://en.wikipedia.org/wiki/Control_character#In_ASCII>.
-C<\\t> and C<\\n> can be used to insert tabs and newlines within
-C<EnvironmentFile>.
 
 Example:
 
@@ -3661,7 +3798,7 @@ defaults to C<data>.",
           'kmsg+console',
           'socket'
         ],
-        'description' => 'Controls where file descriptor 1 (stdout) of the executed processes is connected
+        'description' => "Controls where file descriptor 1 (stdout) of the executed processes is connected
 to. Takes one of C<inherit>, C<null>, C<tty>,
 C<journal>, C<kmsg>, C<journal+console>,
 C<kmsg+console>, C<file:path>,
@@ -3695,10 +3832,10 @@ two options above but copy the output to the system console as well.
 The C<file:path> option may be used to connect a specific file
 system object to standard output. The semantics are similar to the same option of
 C<StandardInput>, see above. If path refers to a regular file
-on the filesystem, it is opened (created if it doesn\'t exist yet) for writing at the beginning of the file,
+on the filesystem, it is opened (created if it doesn't exist yet) for writing at the beginning of the file,
 but without truncating it.
-If standard input and output are directed to the same file path, it is opened only once, for reading as well
-as writing and duplicated. This is particularly useful when the specified path refers to an
+If standard input and output are directed to the same file path, it is opened only once \x{2014} for reading as well
+as writing \x{2014} and duplicated. This is particularly useful when the specified path refers to an
 C<AF_UNIX> socket in the file system, as in that case only a
 single stream connection is created for both input and output.
 
@@ -3723,30 +3860,31 @@ similar.
 C<socket> connects standard output to a socket acquired via socket activation. The
 semantics are similar to the same option of C<StandardInput>, see above.
 
-The C<fd:name> option connects standard output to a specific,
-named file descriptor provided by a socket unit.  A name may be specified as part of this option, following a
-C<:> character (e.g. C<fd:foobar>).  If no name is specified, the name
+The C<fd:name> option connects standard output to a
+specific, named file descriptor provided by a socket unit.  A name may be specified as part of this
+option, following a C<:> character
+(e.g. C<fd:foobar>). If no name is specified, the name
 C<stdout> is implied (i.e. C<fd> is equivalent to
-C<fd:stdout>).  At least one socket unit defining the specified name must be provided via the
-C<Sockets> option, and the file descriptor name may differ from the name of its containing
-socket unit.  If multiple matches are found, the first one will be used.  See
+C<fd:stdout>). At least one socket unit defining the specified name must be provided
+via the C<Sockets> option, and the file descriptor name may differ from the name of
+its containing socket unit. If multiple matches are found, the first one will be used. See
 C<FileDescriptorName> in
-L<systemd.socket(5)> for more
-details about named descriptors and their ordering.
+L<systemd.socket(5)>
+for more details about named descriptors and their ordering.
 
 If the standard output (or error output, see below) of a unit is connected to the journal or
 the kernel log buffer, the unit will implicitly gain a dependency of type C<After>
-on C<systemd-journald.socket> (also see the "Implicit Dependencies" section
+on C<systemd-journald.socket> (also see the \"Implicit Dependencies\" section
 above). Also note that in this case stdout (or stderr, see below) will be an
 C<AF_UNIX> stream socket, and not a pipe or FIFO that can be re-opened. This means
-when executing shell scripts the construct echo "hello" > /dev/stderr for
-writing text to stderr will not work. To mitigate this use the construct echo "hello"
+when executing shell scripts the construct echo \"hello\" > /dev/stderr for
+writing text to stderr will not work. To mitigate this use the construct echo \"hello\"
 >&2 instead, which is mostly equivalent and avoids this pitfall.
 
 This setting defaults to the value set with C<DefaultStandardOutput> in
 L<systemd-system.conf(5)>, which
 defaults to C<journal>. Note that setting this parameter might result in additional dependencies
-to be added to the unit (see above).',
+to be added to the unit (see above).",
         'type' => 'leaf',
         'value_type' => 'enum'
       },
@@ -4030,15 +4168,15 @@ buffer is cleared. Defaults to C<no>.',
       },
       'LoadCredential',
       {
-        'description' => 'Pass a credential to the unit. Credentials are limited-size binary or textual objects
+        'description' => "Pass a credential to the unit. Credentials are limited-size binary or textual objects
 that may be passed to unit processes. They are primarily used for passing cryptographic keys (both
 public and private) or certificates, user account information or identity information from host to
-services. The data is accessible from the unit\'s processes via the file system, at a read-only
+services. The data is accessible from the unit's processes via the file system, at a read-only
 location that (if possible and permitted) is backed by non-swappable memory. The data is only
 accessible to the user associated with the unit, via the
 C<User>/C<DynamicUser> settings (as well as the superuser). When
-available, the location of credentials is exported as the C<$CREDENTIALS_DIRECTORY>
-environment variable to the unit\'s processes.
+available, the location of credentials is exported as the C<\$CREDENTIALS_DIRECTORY>
+environment variable to the unit's processes.
 
 The C<LoadCredential> setting takes a textual ID to use as name for a
 credential plus a file system path, separated by a colon. The ID must be a short ASCII string
@@ -4046,43 +4184,70 @@ suitable as filename in the filesystem, and may be chosen freely by the user. If
 is absolute it is opened as regular file and the credential data is read from it. If the absolute
 path refers to an C<AF_UNIX> stream socket in the file system a connection is made
 to it (only once at unit start-up) and the credential data read from the connection, providing an
-easy IPC integration point for dynamically providing credentials from other services. If the
-specified path is not absolute and itself qualifies as valid credential identifier it is understood
-to refer to a credential that the service manager itself received via the
-C<$CREDENTIALS_DIRECTORY> environment variable, which may be used to propagate
-credentials from an invoking environment (e.g. a container manager that invoked the service manager)
-into a service. The contents of the file/socket may be arbitrary binary or textual data, including
-newline characters and C<NUL> bytes. If the file system path is omitted it is
-chosen identical to the credential name, i.e. this is a terse way do declare credentials to inherit
-from the service manager into a service. This option may be used multiple times, each time defining
-an additional credential to pass to the unit.
+easy IPC integration point for dynamically transferring credentials from other services.
+
+If the specified path is not absolute and itself qualifies as valid credential identifier it is
+attempted to find a credential that the service manager itself received under the specified name \x{2014}
+which may be used to propagate credentials from an invoking environment (e.g. a container manager
+that invoked the service manager) into a service. If no matching system credential is found, the
+directories C</etc/credstore/>, C</run/credstore/> and
+C</usr/lib/credstore/> are searched for files under the credential's name \x{2014} which
+hence are recommended locations for credential data on disk. If
+C<LoadCredentialEncrypted> is used C</run/credstore.encrypted/>,
+C</etc/credstore.encrypted/>, and
+C</usr/lib/credstore.encrypted/> are searched as well.
+
+If the file system path is omitted it is chosen identical to the credential name, i.e. this is
+a terse way to declare credentials to inherit from the service manager into a service. This option
+may be used multiple times, each time defining an additional credential to pass to the unit.
+
+If an absolute path referring to a directory is specified, every file in that directory
+(recursively) will be loaded as a separate credential. The ID for each credential will be the
+provided ID suffixed with C<_\$FILENAME> (e.g., C<Key_file1>). When
+loading from a directory, symlinks will be ignored.
+
+The contents of the file/socket may be arbitrary binary or textual data, including newline
+characters and C<NUL> bytes.
 
 The C<LoadCredentialEncrypted> setting is identical to
-C<LoadCredential>, except that the credential data is decrypted before being passed
-on to the executed processes. Specifically, the referenced path should refer to a file or socket with
-an encrypted credential, as implemented by
+C<LoadCredential>, except that the credential data is decrypted and authenticated
+before being passed on to the executed processes. Specifically, the referenced path should refer to a
+file or socket with an encrypted credential, as implemented by
 L<systemd-creds(1)>. This
-credential is loaded, decrypted and then passed to the application in decrypted plaintext form, in
-the same way a regular credential specified via C<LoadCredential> would be. A
-credential configured this way may encrypted with a secret key derived from the system\'s TPM2
-security chip, or with a secret key stored in
-C</var/lib/systemd/credentials.secret>, or with both. Using encrypted credentials
-improves security as credentials are not stored in plaintext and only decrypted into plaintext the
-moment a service requiring them is started. Moreover, credentials may be bound to the local hardware
-and installations, so that they cannot easily be analyzed offline.
+credential is loaded, decrypted, authenticated and then passed to the application in plaintext form,
+in the same way a regular credential specified via C<LoadCredential> would be. A
+credential configured this way may be symmetrically encrypted/authenticated with a secret key derived
+from the system's TPM2 security chip, or with a secret key stored in
+C</var/lib/systemd/credentials.secret>, or with both. Using encrypted and
+authenticated credentials improves security as credentials are not stored in plaintext and only
+authenticated and decrypted into plaintext the moment a service requiring them is started. Moreover,
+credentials may be bound to the local hardware and installations, so that they cannot easily be
+analyzed offline, or be generated externally.
 
-The credential files/IPC sockets must be accessible to the service manager, but don\'t have to
-be directly accessible to the unit\'s processes: the credential data is read and copied into separate,
+The credential files/IPC sockets must be accessible to the service manager, but don't have to
+be directly accessible to the unit's processes: the credential data is read and copied into separate,
 read-only copies for the unit that are accessible to appropriately privileged processes. This is
 particularly useful in combination with C<DynamicUser> as this way privileged data
 can be made available to processes running under a dynamic UID (i.e. not a previously known one)
 without having to open up access to all users.
 
 In order to reference the path a credential may be read from within a
-C<ExecStart> command line use C<${CREDENTIALS_DIRECTORY}/mycred>,
-e.g. C<ExecStart=cat ${CREDENTIALS_DIRECTORY}/mycred>.
+C<ExecStart> command line use C<\${CREDENTIALS_DIRECTORY}/mycred>,
+e.g. C<ExecStart=cat \${CREDENTIALS_DIRECTORY}/mycred>. In order to reference the path
+a credential may be read from within a C<Environment> line use
+C<%d/mycred>, e.g. C<Environment=MYCREDPATH=%d/mycred>.
 
 Currently, an accumulated credential size limit of 1 MB per unit is enforced.
+
+The service manager itself may receive system credentials that can be propagated to services
+from a hosting container manager or VM hypervisor. See the L<Container Interface|https://systemd.io/CONTAINER_INTERFACE> documentation for details
+about the former. For the latter, use the qemu C<fw_cfg> node
+C<opt/io.systemd.credentials/>. Example qemu switch: C<-fw_cfg
+name=opt/io.systemd.credentials/mycred,string=supersecret>. They may also be specified on
+the kernel command line using the C<systemd.set_credential=> switch (see
+L<systemd(1)>)
+and from the UEFI firmware environment via
+L<systemd-stub(7)>.
 
 If referencing an C<AF_UNIX> stream socket to connect to, the connection will
 originate from an abstract namespace socket, that includes information about the unit and the
@@ -4094,21 +4259,24 @@ unit name, followed by the literal character C</>, followed by the textual crede
 ID requested. Example: C<\\0adf9d86b6eda275e/unit/foobar.service/credx> in case the
 credential C<credx> is requested for a unit C<foobar.service>. This
 functionality is useful for using a single listening socket to serve credentials to multiple
-consumers.',
+consumers.
+
+For further information see L<System and Service
+Credentials|https://systemd.io/CREDENTIALS> documentation.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'LoadCredentialEncrypted',
       {
-        'description' => 'Pass a credential to the unit. Credentials are limited-size binary or textual objects
+        'description' => "Pass a credential to the unit. Credentials are limited-size binary or textual objects
 that may be passed to unit processes. They are primarily used for passing cryptographic keys (both
 public and private) or certificates, user account information or identity information from host to
-services. The data is accessible from the unit\'s processes via the file system, at a read-only
+services. The data is accessible from the unit's processes via the file system, at a read-only
 location that (if possible and permitted) is backed by non-swappable memory. The data is only
 accessible to the user associated with the unit, via the
 C<User>/C<DynamicUser> settings (as well as the superuser). When
-available, the location of credentials is exported as the C<$CREDENTIALS_DIRECTORY>
-environment variable to the unit\'s processes.
+available, the location of credentials is exported as the C<\$CREDENTIALS_DIRECTORY>
+environment variable to the unit's processes.
 
 The C<LoadCredential> setting takes a textual ID to use as name for a
 credential plus a file system path, separated by a colon. The ID must be a short ASCII string
@@ -4116,43 +4284,70 @@ suitable as filename in the filesystem, and may be chosen freely by the user. If
 is absolute it is opened as regular file and the credential data is read from it. If the absolute
 path refers to an C<AF_UNIX> stream socket in the file system a connection is made
 to it (only once at unit start-up) and the credential data read from the connection, providing an
-easy IPC integration point for dynamically providing credentials from other services. If the
-specified path is not absolute and itself qualifies as valid credential identifier it is understood
-to refer to a credential that the service manager itself received via the
-C<$CREDENTIALS_DIRECTORY> environment variable, which may be used to propagate
-credentials from an invoking environment (e.g. a container manager that invoked the service manager)
-into a service. The contents of the file/socket may be arbitrary binary or textual data, including
-newline characters and C<NUL> bytes. If the file system path is omitted it is
-chosen identical to the credential name, i.e. this is a terse way do declare credentials to inherit
-from the service manager into a service. This option may be used multiple times, each time defining
-an additional credential to pass to the unit.
+easy IPC integration point for dynamically transferring credentials from other services.
+
+If the specified path is not absolute and itself qualifies as valid credential identifier it is
+attempted to find a credential that the service manager itself received under the specified name \x{2014}
+which may be used to propagate credentials from an invoking environment (e.g. a container manager
+that invoked the service manager) into a service. If no matching system credential is found, the
+directories C</etc/credstore/>, C</run/credstore/> and
+C</usr/lib/credstore/> are searched for files under the credential's name \x{2014} which
+hence are recommended locations for credential data on disk. If
+C<LoadCredentialEncrypted> is used C</run/credstore.encrypted/>,
+C</etc/credstore.encrypted/>, and
+C</usr/lib/credstore.encrypted/> are searched as well.
+
+If the file system path is omitted it is chosen identical to the credential name, i.e. this is
+a terse way to declare credentials to inherit from the service manager into a service. This option
+may be used multiple times, each time defining an additional credential to pass to the unit.
+
+If an absolute path referring to a directory is specified, every file in that directory
+(recursively) will be loaded as a separate credential. The ID for each credential will be the
+provided ID suffixed with C<_\$FILENAME> (e.g., C<Key_file1>). When
+loading from a directory, symlinks will be ignored.
+
+The contents of the file/socket may be arbitrary binary or textual data, including newline
+characters and C<NUL> bytes.
 
 The C<LoadCredentialEncrypted> setting is identical to
-C<LoadCredential>, except that the credential data is decrypted before being passed
-on to the executed processes. Specifically, the referenced path should refer to a file or socket with
-an encrypted credential, as implemented by
+C<LoadCredential>, except that the credential data is decrypted and authenticated
+before being passed on to the executed processes. Specifically, the referenced path should refer to a
+file or socket with an encrypted credential, as implemented by
 L<systemd-creds(1)>. This
-credential is loaded, decrypted and then passed to the application in decrypted plaintext form, in
-the same way a regular credential specified via C<LoadCredential> would be. A
-credential configured this way may encrypted with a secret key derived from the system\'s TPM2
-security chip, or with a secret key stored in
-C</var/lib/systemd/credentials.secret>, or with both. Using encrypted credentials
-improves security as credentials are not stored in plaintext and only decrypted into plaintext the
-moment a service requiring them is started. Moreover, credentials may be bound to the local hardware
-and installations, so that they cannot easily be analyzed offline.
+credential is loaded, decrypted, authenticated and then passed to the application in plaintext form,
+in the same way a regular credential specified via C<LoadCredential> would be. A
+credential configured this way may be symmetrically encrypted/authenticated with a secret key derived
+from the system's TPM2 security chip, or with a secret key stored in
+C</var/lib/systemd/credentials.secret>, or with both. Using encrypted and
+authenticated credentials improves security as credentials are not stored in plaintext and only
+authenticated and decrypted into plaintext the moment a service requiring them is started. Moreover,
+credentials may be bound to the local hardware and installations, so that they cannot easily be
+analyzed offline, or be generated externally.
 
-The credential files/IPC sockets must be accessible to the service manager, but don\'t have to
-be directly accessible to the unit\'s processes: the credential data is read and copied into separate,
+The credential files/IPC sockets must be accessible to the service manager, but don't have to
+be directly accessible to the unit's processes: the credential data is read and copied into separate,
 read-only copies for the unit that are accessible to appropriately privileged processes. This is
 particularly useful in combination with C<DynamicUser> as this way privileged data
 can be made available to processes running under a dynamic UID (i.e. not a previously known one)
 without having to open up access to all users.
 
 In order to reference the path a credential may be read from within a
-C<ExecStart> command line use C<${CREDENTIALS_DIRECTORY}/mycred>,
-e.g. C<ExecStart=cat ${CREDENTIALS_DIRECTORY}/mycred>.
+C<ExecStart> command line use C<\${CREDENTIALS_DIRECTORY}/mycred>,
+e.g. C<ExecStart=cat \${CREDENTIALS_DIRECTORY}/mycred>. In order to reference the path
+a credential may be read from within a C<Environment> line use
+C<%d/mycred>, e.g. C<Environment=MYCREDPATH=%d/mycred>.
 
 Currently, an accumulated credential size limit of 1 MB per unit is enforced.
+
+The service manager itself may receive system credentials that can be propagated to services
+from a hosting container manager or VM hypervisor. See the L<Container Interface|https://systemd.io/CONTAINER_INTERFACE> documentation for details
+about the former. For the latter, use the qemu C<fw_cfg> node
+C<opt/io.systemd.credentials/>. Example qemu switch: C<-fw_cfg
+name=opt/io.systemd.credentials/mycred,string=supersecret>. They may also be specified on
+the kernel command line using the C<systemd.set_credential=> switch (see
+L<systemd(1)>)
+and from the UEFI firmware environment via
+L<systemd-stub(7)>.
 
 If referencing an C<AF_UNIX> stream socket to connect to, the connection will
 originate from an abstract namespace socket, that includes information about the unit and the
@@ -4164,7 +4359,10 @@ unit name, followed by the literal character C</>, followed by the textual crede
 ID requested. Example: C<\\0adf9d86b6eda275e/unit/foobar.service/credx> in case the
 credential C<credx> is requested for a unit C<foobar.service>. This
 functionality is useful for using a single listening socket to serve credentials to multiple
-consumers.',
+consumers.
+
+For further information see L<System and Service
+Credentials|https://systemd.io/CREDENTIALS> documentation.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },

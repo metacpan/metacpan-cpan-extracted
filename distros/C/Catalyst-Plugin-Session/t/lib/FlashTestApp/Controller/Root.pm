@@ -13,7 +13,7 @@ sub default : Private {
     my ($self, $c) = @_;
     $c->session;
 }
-    
+
 sub first : Global {
     my ( $self, $c ) = @_;
     if ( ! $c->flash->{is_set}) {

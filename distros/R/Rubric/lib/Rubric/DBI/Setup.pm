@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Rubric::DBI::Setup;
+package Rubric::DBI::Setup 0.157;
 # ABSTRACT: db initialization routines
-$Rubric::DBI::Setup::VERSION = '0.156';
+
 #pod =head1 SYNOPSIS
 #pod
 #pod  use strict;
@@ -595,7 +595,7 @@ Rubric::DBI::Setup - db initialization routines
 
 =head1 VERSION
 
-version 0.156
+version 0.157
 
 =head1 SYNOPSIS
 
@@ -606,6 +606,15 @@ version 0.156
  Rubric::DBI::Setup->setup_tables;
 
 =head1 DESCRIPTION
+
+=head1 PERL VERSION
+
+This code is effectively abandonware.  Although releases will sometimes be made
+to update contact info or to fix packaging flaws, bug reports will mostly be
+ignored.  Feature requests are even more likely to be ignored.  (If someone
+takes up maintenance of this code, they will presumably remove this notice.)
+This means that whatever version of perl is currently required is unlikely to
+change -- but also that it might change at any new maintainer's whim.
 
 =head1 METHODS
 
@@ -639,7 +648,7 @@ sort of ugly, but it works...
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

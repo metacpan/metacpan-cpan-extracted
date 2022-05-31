@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 package Catalyst::Plugin::Session;
 
 use Moose;
@@ -15,8 +13,8 @@ use List::Util qw/ max /;
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '0.41';
-$VERSION = eval $VERSION;
+our $VERSION = '0.42';
+$VERSION =~ tr/_//d;
 
 my @session_data_accessors; # used in delete_session
 

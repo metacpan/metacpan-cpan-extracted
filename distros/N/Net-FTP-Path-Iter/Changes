@@ -1,5 +1,21 @@
 Revision history for Net-FTP-Path-Iter
 
+0.06      2022-05-31 12:18:49-04:00 America/New_York
+
+  [BUILD]
+
+    * fix incorrect template input which caused bad generated output
+
+0.05      2022-05-31 12:07:55-04:00 America/New_York
+
+  [BUG FIX]
+
+    * don't use experimental 'switch' feature
+
+  [BUILD]
+
+    * switch to Module::Build::Tiny
+
 0.04      2017-05-09 12:08:30-04:00 America/New_York
 
   [BUILD]

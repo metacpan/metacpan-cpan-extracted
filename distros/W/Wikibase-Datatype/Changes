@@ -1,3 +1,10 @@
+0.12 2022-05-29T20:11:07+02:00
+ - Add Property datatype.
+ - Add test instance for Property.
+ - Fix minimal version of List::Util with none().
+ - Fix versions in test instances.
+ - Improve test instance for Human item.
+
 0.11 2022-05-28T15:13:50+02:00
  - Add test instances.
  - Fix check_language().

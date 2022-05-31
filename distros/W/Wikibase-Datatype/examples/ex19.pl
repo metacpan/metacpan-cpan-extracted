@@ -3,15 +3,18 @@
 use strict;
 use warnings;
 
-use Wikibase::Datatype::Utils qw(check_property);
+use Error::Pure;
+use Wikibase::Datatype::Utils qw(check_entity);
+
+$Error::Pure::TYPE = 'Error';
 
 my $self = {
-        'key' => 'P123',
+        'key' => 'bad_entity',
 };
-check_property($self, 'key');
+check_entity($self, 'key');
 
 # Print out.
 print "ok\n";
 
-# Output:
-# ok
+# Output like:
+# #Error [/../Wikibase/Datatype/Utils.pm:?] Parameter 'key' must begin with 'Q' and number after it.

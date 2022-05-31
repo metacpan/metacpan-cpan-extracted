@@ -2,7 +2,7 @@ package Net::DNS::Resolver::Base;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Base.pm 1855 2021-11-26 11:33:48Z willem $)[2];
+our $VERSION = (qw$Id: Base.pm 1864 2022-04-14 15:18:49Z willem $)[2];
 
 
 #
@@ -257,7 +257,7 @@ END
 
 
 sub print {
-	print &string;
+	print shift->string;
 	return;
 }
 

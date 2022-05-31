@@ -3,10 +3,14 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.2101';
+our $VERSION = '0.4001';
 
-use MIDI::Util qw(set_time_signature);
+use Data::Dumper::Compact qw(ddc);
+use List::Util qw(sum0);
+use Math::Bezier ();
+use MIDI::Util qw(dura_size reverse_dump set_chan_patch set_time_signature);
 use Music::Duration;
+use Music::RhythmSet::Util qw(upsize);
 
 use Moo;
 use strictures 2;
@@ -34,8 +38,9 @@ sub BUILD {
 }
 
 
+has verbose   => ( is => 'ro', default => sub { 0 } );
 has kit       => ( is => 'ro', default => sub { 0 } );
-has reverb    => ( is => 'ro', default => sub { 63 } );
+has reverb    => ( is => 'ro', default => sub { 15 } );
 has channel   => ( is => 'ro', default => sub { 9 } );
 has volume    => ( is => 'ro', default => sub { 100 } );
 has bpm       => ( is => 'ro', default => sub { 120 } );
@@ -376,6 +381,138 @@ sub crescendo_roll {
 }
 
 
+sub pattern {
+    my ( $self, %args ) = @_;
+
+    $args{instrument} ||= $self->snare;
+    $args{patterns}   ||= [];
+    $args{beats}      ||= $self->beats;
+    $args{negate}     ||= 0;
+    $args{count}      ||= 0;
+    $args{repeat}     ||= 1;
+
+    return unless @{ $args{patterns} };
+
+    # set size and duration
+    my $size;
+    if ( $args{duration} ) {
+        $size = dura_size( $args{duration} ) || 1;
+    }
+    else {
+        $size = 4 / length( $args{patterns}->[0] );
+        my $dump = reverse_dump('length');
+        $args{duration} = $dump->{$size} || $self->quarter;
+    }
+
+    # set the default beat-string variations
+    $args{vary} ||= {
+        0 => sub { $self->rest( $args{duration} ) },
+        1 => sub { $self->note( $args{duration}, $args{instrument} ) },
+    };
+
+    set_chan_patch( $self->score, $self->channel, $args{instrument} );
+
+    for my $pattern (@{ $args{patterns} }) {
+        next if $pattern =~ /^0+$/;
+
+        $pattern =~ tr/01/10/ if $args{negate};
+
+        for ( 1 .. $args{repeat} ) {
+            for my $bit ( split //, $pattern ) {
+                $args{vary}{$bit}->($self);
+                $self->counter( $self->counter + $size ) if $args{count};
+            }
+        }
+    }
+}
+
+
+sub sync_patterns {
+    my ($self, %patterns) = @_;
+
+    my @subs;
+    for my $instrument (keys %patterns) {
+        push @subs, sub {
+            $self->pattern(
+                instrument => $instrument,
+                patterns   => $patterns{$instrument},
+            );
+        },
+    }
+
+    $self->sync(@subs);
+}
+
+
+sub add_fill {
+    my ($self, $fill, %patterns) = @_;
+
+    $fill ||= sub {
+        return {
+            duration       => 8,
+            $self->open_hh => '000',
+            $self->snare   => '111',
+            $self->kick    => '000',
+        };
+    };
+    my $fill_patterns = $fill->($self);
+    print 'Fill: ', ddc($fill_patterns) if $self->verbose;
+    my $fill_duration = delete $fill_patterns->{duration} || 8;
+    my $fill_length   = length((values %$fill_patterns)[0]);
+
+    my %lengths;
+    for my $instrument (keys %patterns) {
+        $lengths{$instrument} = sum0 map { length $_ } @{ $patterns{$instrument} };
+    }
+
+    my $lcm = _multilcm($fill_duration, values %lengths);
+    print "LCM: $lcm\n" if $self->verbose;
+
+    my $fill_chop = $fill_duration == $lcm
+        ? $fill_length
+        : int $lcm / $fill_length + 1;
+    print "FC: $fill_chop\n" if $self->verbose;
+
+    my %fresh_patterns;
+    for my $instrument (keys %patterns) {
+        # get a single "flattened" pattern as an arrayref
+        my $pattern = [ map { split //, $_ } @{ $patterns{$instrument} } ];
+        # the fresh pattern is possibly upsized with the LCM
+        $fresh_patterns{$instrument} = @$pattern < $lcm
+            ? [ join '', @{ upsize($pattern, $lcm) } ]
+            : [ join '', @$pattern ];
+    }
+    print 'Patterns: ', ddc(\%fresh_patterns) if $self->verbose;
+
+    my %replacement;
+    for my $instrument (keys %$fill_patterns) {
+        # get a single "flattened" pattern as a zero-pre-padded arrayref
+        my $pattern = [ split //, sprintf '%0*s', $fill_duration, $fill_patterns->{$instrument} ];
+        # the fresh pattern string is possibly upsized with the LCM
+        my $fresh = @$pattern < $lcm
+            ? join '', @{ upsize($pattern, $lcm) }
+            : join '', @$pattern;
+        # the replacement string is the tail of the fresh pattern string
+        $replacement{$instrument} = substr $fresh, -$fill_chop;
+    }
+    print 'Replacements: ', ddc(\%replacement) if $self->verbose;
+
+    my %replaced;
+    for my $instrument (keys %fresh_patterns) {
+        # get the string to replace
+        my $string = join '', @{ $fresh_patterns{$instrument} };
+        # replace the tail of the string
+        my $pos = length $replacement{$instrument};
+        substr $string, -$pos, $pos, $replacement{$instrument};
+        print "$instrument: $string\n" if $self->verbose;
+        # prepare the replaced pattern for syncing
+        $replaced{$instrument} = [ $string ];
+    }
+
+    $self->sync_patterns(%replaced);
+}
+
+
 sub set_time_sig {
     my ($self, $signature, $set) = @_;
     $self->signature($signature) if $signature;
@@ -400,6 +537,21 @@ sub write {
     $self->score->write_score( $self->file );
 }
 
+# lifted from https://www.perlmonks.org/?node_id=56906
+sub _gcf {
+    my ($x, $y) = @_;
+    ($x, $y) = ($y, $x % $y) while $y;
+    return $x;
+}
+sub _lcm {
+    return($_[0] * $_[1] / _gcf($_[0], $_[1]));
+}
+sub _multilcm {
+    my $x = shift;
+    $x = _lcm($x, shift) while @_;
+    return $x;
+}
+
 1;
 
 __END__
@@ -414,7 +566,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.2101
+version 0.4001
 
 =head1 SYNOPSIS
 
@@ -451,6 +603,13 @@ version 0.2101
  $d->note($d->quarter, $d->open_hh, $_ % 2 ? $d->kick : $d->snare)
     for 1 .. $d->beats * $d->bars;
 
+ # Same but with beat-strings:
+ $d->sync_patterns(
+    $d->open_hh => [ ('1111') x $d->bars ],
+    $d->snare   => [ ('0101') x $d->bars ],
+    $d->kick    => [ ('1010') x $d->bars ],
+ );
+
  $d->write;
 
 =head1 DESCRIPTION
@@ -464,6 +623,10 @@ eighth or quarter note, for instance.
 =for Pod::Coverage BUILD
 
 =head1 ATTRIBUTES
+
+=head2 verbose
+
+Default: C<0>
 
 =head2 file
 
@@ -491,7 +654,7 @@ soundfont, you can change kits.
 
 =head2 reverb
 
-Default: C<63>
+Default: C<15>
 
 =head2 channel
 
@@ -744,6 +907,77 @@ rather than as a straight line.
      ---------------
            time
 
+=head2 pattern
+
+  $d->pattern( patterns => \@patterns );
+  $d->pattern( patterns => \@patterns, instrument => $d->kick );
+  $d->pattern( patterns => \@patterns, instrument => $d->kick, %options );
+
+Play a given set of beat B<patterns> with the given B<instrument>.
+
+The B<patterns> are an arrayref of "beat-strings".  By default these
+are made of contiguous ones and zeros, meaning "strike" or "rest".
+For example:
+
+  patterns => [qw( 0101 0101 0110 0110 )],
+
+This method accumulates the number of beats in the object's B<counter>
+attribute, if the B<count> option is set.
+
+The B<vary> option is a hashref of coderefs, keyed by single character
+tokens, like the digits 0-9.  Each coderef duration should add up to
+the given B<duration> option.  The single argument to the coderefs is
+the object itself and may be used as: C<my $self = shift;> in yours.
+
+Defaults:
+
+  instrument: snare
+  patterns: [] (i.e. empty!)
+  Options:
+    duration: quarter-note
+    beats: given by constructor
+    repeat: 1
+    count: 0 ( keep track of the beat count)
+    negate: 0 (flip the bit values)
+    vary:
+        0 => sub { $self->rest( $args{duration} ) },
+        1 => sub { $self->note( $args{duration}, $args{instrument} ) },
+
+=head2 sync_patterns
+
+  $d->sync_patterns( $instrument1 => $patterns1, $inst2 => $pats2, ... );
+  $d->sync_patterns(
+      $d->open_hh => [ ('11111111') x $d->bars ],
+      $d->snare   => [ ('0101') x $d->bars ],
+      $d->kick    => [ ('1010') x $d->bars ],
+      ...
+  );
+
+Execute the C<pattern> method for multiple voices.
+
+=head2 add_fill
+
+  $d->add_fill( $fill, $instrument1 => $patterns1, $inst2 => $pats2, ... );
+  $d->add_fill(
+      sub {
+          my $self = shift;
+          return {
+            duration       => 16, # sixteenth note fill
+            $self->open_hh => '00000000',
+            $self->snare   => '11111111',
+            $self->kick    => '00000000',
+          };
+      },
+      $d->open_hh => [ ('11111111') x $d->bars ],  # example phrase
+      $d->snare   => [ ('0101') x $d->bars ],      # "
+      $d->kick    => [ ('1010') x $d->bars ],      # "
+  );
+
+Add a fill to the beat pattern.  That is, replace the end of the given
+beat-string phrase with a fill.  The fill is given as the first
+argument and should be a coderef that returns a hashref.  The default
+is a three-note, eighth-note snare fill.
+
 =head2 set_time_sig
 
   $d->set_time_sig;
@@ -773,8 +1007,8 @@ the file name.
 
 =head1 SEE ALSO
 
-The F<eg/*> programs in this distribution. Also
-F<eg/drum-fills-advanced> in the L<Music::Duration::Partition>
+The F<t/*> test file and the F<eg/*> programs in this distribution.
+Also F<eg/drum-fills-advanced> in the L<Music::Duration::Partition>
 distribution.
 
 L<Math::Bezier>
@@ -784,6 +1018,8 @@ L<MIDI::Util>
 L<Moo>
 
 L<Music::Duration>
+
+L<Music::RhythmSet::Util>
 
 L<https://en.wikipedia.org/wiki/General_MIDI#Percussion>
 

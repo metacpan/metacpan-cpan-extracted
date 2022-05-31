@@ -10,16 +10,15 @@ examples/log4perl/My_Module.pm
 lib/Log/OK.pm
 lib/Log/OK.pod
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
 README
 README.md
 t/cmd.t
 t/cmd.t.p
-t/log-any.t
-t/log-dispatch.t
-t/log-ger.t
-t/log-log4perl.t
-t/Log-OK.t
+t/log-any.t.d
+t/log-dispatch.t.d
+t/log-ger.t.d
+t/log-log4perl.t.d
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

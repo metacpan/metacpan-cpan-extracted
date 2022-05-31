@@ -23,7 +23,7 @@ use Test::Output;
 BEGIN {
     eval { require Curses::UI; };
     $@  and  plan skip_all => 'Curses::UI not found';
-    plan tests => 39;
+    plan tests => 43;
 
     # define fixed environment for unit tests:
     delete $ENV{DISPLAY};
@@ -271,10 +271,12 @@ combined_like
 is(@{$main->{children}}, 0, 'main 3 no longer has children');
 
 ####################################
-# test standard behaviour with a listbox:
+# test standard behaviour with a multi-selection listbox:
 my @list = (1..4);
 my $next = 5;
-my $listbox = UI::Various::Listbox->new(texts => \@list, height => 5);
+my $counter = 0;
+my $listbox = UI::Various::Listbox->new(texts => \@list, height => 5,
+					on_select => sub { $counter++; });
 my @selected = ();
 $w =  $main->window($listbox,
 		    UI::Various::Button->new
@@ -304,6 +306,34 @@ combined_like
     'mainloop 4 produces correct output';
 is_deeply(\@selected, [0, 2, 3], 'listbox had correct final selection');
 is(@{$main->{children}}, 0, 'main 4 no longer has children');
+is($counter, 4, 'counter has correct value');
+
+####################################
+# test standard behaviour with a single-selection listbox:
+$listbox = UI::Various::Listbox->new(texts => [1..5], height => 5,
+				     selection => 1);
+my $selected = -1;
+$w =  $main->window($listbox,
+		    UI::Various::Button->new
+		    (text => 'Remove #5',
+		     code => sub{   $listbox->remove(4);   }),
+		    UI::Various::Button->new
+		    (text => 'Quit',
+		     code => sub{
+			 $selected = $listbox->selected();
+			 $w->destroy;
+		     }));
+
+@chars_to_read = ('j', ' ',		# go to #2 and select it
+		  'j', ' ',		# go to #3 and select it
+		  "\t", ' ',		# go to REMOVE #5 and do it
+		  "\t", ' ');		# quit
+combined_like
+{   $main->mainloop;   }
+    qr/^.*Quit\b.*$/s,
+    'mainloop 5 produces correct output';
+is($selected, 2, '2nd listbox had correct final selection');
+is(@{$main->{children}}, 0, 'main 5 no longer has children');
 
 ####################################
 # test standard behaviour of a dialogue:
@@ -336,9 +366,9 @@ combined_like
 {   $main->mainloop;   }
     # Note that we can apparently only match some parts of the window here:
     qr/^.*\bDialogue!.*\bWIN\b.*Dialogue\b.*Quit\b.*/s,
-    'mainloop 5 produces correct output';
+    'mainloop 6 produces correct output';
 is($run_dialog, 1, 'dialogue did run');
-is(@{$main->{children}}, 0, 'main 5 no longer has children');
+is(@{$main->{children}}, 0, 'main 6 no longer has children');
 
 ####################################
 # test unused behaviour (and get 100% coverage):

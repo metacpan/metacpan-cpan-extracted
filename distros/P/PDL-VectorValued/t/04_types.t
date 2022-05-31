@@ -30,4 +30,3 @@ if (defined(&PDL::indx)) {
 
 print "\n";
 # end of t/04_types.t
-

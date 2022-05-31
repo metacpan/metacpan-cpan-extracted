@@ -11,10 +11,13 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 Open62541-client-read-callback.xsh
 Open62541-client-read-write.xsh
+Open62541-clientstate.xsh
 Open62541-destroy.xsh
 Open62541-packed-type.xsh
 Open62541-packed.xsh
+Open62541-securechannelstate.xsh
 Open62541-server-read-write.xsh
+Open62541-sessionstate.xsh
 Open62541-statuscode.xsh
 Open62541-typedef.xsh
 Open62541-types.xsh

@@ -7,7 +7,7 @@ require Exporter;
 use parent 'Exporter';
 use OPCUA::Open62541::Constant;
 
-our $VERSION = '0.029';
+our $VERSION = '1.00';
 
 our @EXPORT_OK = @OPCUA::Open62541::Constant::EXPORT_OK;
 our %EXPORT_TAGS = %OPCUA::Open62541::Constant::EXPORT_TAGS;
@@ -786,9 +786,9 @@ This only works for Perl that is compiled on a 64 bit platform.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2020-2021 Alexander Bluhm
+Copyright (c) 2020-2022 Alexander Bluhm
 
-Copyright (c) 2020-2021 Anton Borowka
+Copyright (c) 2020-2022 Anton Borowka
 
 Copyright (c) 2020 Arne Becker
 

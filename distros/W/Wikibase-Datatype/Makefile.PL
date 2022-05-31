@@ -24,7 +24,7 @@ requires 'Exporter' => 0;
 requires 'Mo' => 0;
 requires 'Mo::utils' => 0.03;
 requires 'List::MoreUtils' => 0;
-requires 'List::Util' => 0;
+requires 'List::Util' => 1.33;
 requires 'Locale::Language' => 0;
 requires 'Readonly' => 0;
 requires 'Unicode::UTF8' => 0;
@@ -37,7 +37,7 @@ test_requires 'Test::MockObject' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.11';
+version '0.12';
 
 # Run.
 WriteAll();

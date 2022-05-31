@@ -6,35 +6,37 @@ use Signals::XSIG::Default;
 use Carp;
 use Config;
 use Exporter;
-use POSIX ();
-use Symbol qw(qualify);
-use Time::HiRes 'time';
+use Symbol;
 use warnings;
 use strict;
+require Signals::XSIG::Meta;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(%XSIG);
-our @EXPORT_OK = qw(untied %DEFAULT_BEHAVIOR);
+our @EXPORT_OK = qw(%DEFAULT_BEHAVIOR);
 
 our %DEFAULT_BEHAVIOR;
 *DEFAULT_BEHAVIOR = \%Signals::XSIG::Default::DEFAULT_BEHAVIOR;
 
-our $VERSION = '0.16';
-our (%XSIG, %_XSIG, %SIGTABLE, $_REFRESH, $_DISABLE_WARNINGS);
+our $VERSION = '1.00';
+our (%XSIG);
+our (%OSIG, %ZSIG, %SIGTABLE, %alias, $_REFRESH);
+my (%OOSIG, %YSIG, $_DISABLE_WARNINGS);
 our $_INITIALIZED = 0;
+
+# singleton tied hash classes
 our $SIGTIE = bless {}, 'Signals::XSIG::TieSIG';
 our $XSIGTIE = bless {}, 'Signals::XSIG::TieXSIG';
-our $TIEARRAY_CLASS = 'Signals::XSIG::TieArray';
-
-my %TIEDSCALARS = (); # map signal names to S::X::TiedScalar objs
-my %alias = ();
-
 
 ###
 # to be removed when we get a handle on intermittent t/02 failures
-our ($XDEBUG,$XN,@XLOG) = (0,1001);
-sub XLOG{no warnings"uninitialized";push @XLOG,($XN++)." @_";XLOG_DUMP() if $XDEBUG>1}
-sub XLOG_DUMP{my $r = join("\n",@XLOG); @XLOG=(); print "$r\n"}
+our ($XDEBUG,$XN,@XLOG) = ($ENV{XSIGDEBUG},1001);
+sub XLOG{
+    no warnings "uninitialized";
+    push @XLOG,($XN++)." @_";
+    XLOG_DUMP() if $XDEBUG>1
+}
+sub XLOG_DUMP{my $r=join("\n",@XLOG);@XLOG=();Test::More::diag($r)}
 ###
 
 
@@ -48,63 +50,55 @@ BEGIN {
     }
 }
 
-&_init;
+sub import {
+    Signals::XSIG->export_to_level(1, @_);
+    _init();
+}
+
+sub unimport {
+    untie %main::SIG;
+}
 
 sub _init {
     return if $_INITIALIZED;
     $_REFRESH = 0;
-    if ($Config{PERL_VERSION} <= 6) {
-	require Signals::XSIG::TieArray56;
-	$TIEARRAY_CLASS = 'Signals::XSIG::TieArray56';
+    if ($ENV{XSIG_56} || $Config{PERL_VERSION} <= 6) {
+        print STDERR "Using  Signals::XSIG::Meta56  to manage multi-handlers\n";
+	require Signals::XSIG::Meta56;
     }
 
     my @z = ();
     my @num = split ' ', $Config{sig_num};
     my @name = split ' ', $Config{sig_name};
     for (my $i=0; $i<@name; $i++) {
-	if (defined $z[$num[$i]]) {
-	    $alias{$name[$i]} = $z[$num[$i]];
-	    $alias{$z[$num[$i]]} = $name[$i];
-	    $alias{"pk:$z[$num[$i]]"} = 1;
-	}
-	$z[$num[$i]] = $name[$i];
-    }
-
-    foreach my $sig (@name, '__WARN__', '__DIE__') {
-	tie $_XSIG{$sig}, 'Signals::XSIG::TieScalar', $sig;
-#### this functionality all happens within S::X::TieScalar::TIESCALAR now
-#	$_XSIG{$sig} = [];
-#	tie @{$_XSIG{$sig}}, $TIEARRAY_CLASS, $sig;
-#	$_XSIG{$sig}[0] = $SIG{$sig};
-    }
-    tie %SIG, 'Signals::XSIG::TieSIG';
-    $_REFRESH = 1;
-    foreach my $sig (@name, '__WARN__', '__DIE__') {
-	next if $sig eq 'ZERO';
-	unless (eval { (tied @{$_XSIG{$sig}})->_refresh_SIG; 1 }) {
-	    Carp::confess "Error initializing \@{\$XSIG{$sig}}!: $@\n";
-	}
-    }
-    tie %XSIG, 'Signals::XSIG::TieXSIG';
-
-    my @signo = split ' ', $Config{sig_num};
-    my @signame = split ' ', $Config{sig_name};
-    for (my $i=0; $i<@signo; $i++) {
-	my $signo = $signo[$i];
-	my $signame = $signame[$i];
+	my $signo = $num[$i];
+	my $signame = $name[$i];
 	$SIGTABLE{$signo} ||= $signame;
 	$SIGTABLE{'SIG' . $signame} = $SIGTABLE{$signame} = $SIGTABLE{$signo};
+	if (defined $z[$signo]) {
+	    $alias{$signame} = $z[$signo];
+	    $alias{$z[$signo]} = $signame;
+	    $alias{"pk:$z[$signo]"} = 1;
+            $alias{"sub:$signame"} = 1;
+	}
+	$z[$signo] = $signame;
     }
     $SIGTABLE{'__WARN__'} = '__WARN__';
     $SIGTABLE{'__DIE__'} = '__DIE__';
-    return ++$_INITIALIZED;
-}
 
-sub __shadow__warn__handler {          ## no critic (Unpacking)
-    return &__shadow_signal_handler('__WARN__',@_) 
-}
-sub __shadow__die__handler  {          ## no critic (Unpacking)
-    return &__shadow_signal_handler('__DIE__',@_) 
+    *OSIG = \%main::SIG;
+    %OOSIG = %OSIG;
+
+    foreach my $sig ('__WARN__', '__DIE__', @name) {
+	next if $SIGTABLE{$sig} ne $sig;
+	$ZSIG{$sig} = Signals::XSIG->_new($sig, $OSIG{$sig});
+    }
+    *main::SIG = \%YSIG;
+    tie %SIG, 'Signals::XSIG::TieSIG';
+    tie %XSIG, 'Signals::XSIG::TieXSIG';
+    $_REFRESH = 1;
+    $_->_refresh foreach values %ZSIG;
+    return ++$_INITIALIZED;
 }
 
 END { &__END; }
@@ -114,56 +108,25 @@ sub __END {
     *__inGD = sub () { 1 };
 }
 
-sub __shadow_signal_handler {
+sub Signals::XSIG::_sigaction {  # function, not method
     my ($signal, @args) = @_;
-
-    # %XSIG might be partially or completely untied during global destruction
-    return if __inGD();
-    my $seen_default = 0;
-
-    my $h = tied @{$XSIG{$signal}};
-    my @handlers = $h->handlers;
-    my $start = $h->{start} - 1;
-    my $ignore_main_default = 0;
-
-    # @HANDLER_SEQUENCE: the handlers that have already processed this signal
-    # will using 'local' be sufficient to distinguish handler count when
-    # signal handling is interrupted by another signal?
-    local @Signals::XSIG::HANDLER_SEQUENCE = ();
-    while (@handlers) {
-	my $subhandler = shift @handlers;
-	$start++;
-	next if !defined($subhandler);
-	next if $subhandler eq '';
-	if ($start != 0) {
-	    $ignore_main_default = 1;
-	}
-	next if $subhandler eq 'IGNORE';
-	if ($subhandler eq 'DEFAULT') {
-	    if ($start == 0) {
-		if ($ignore_main_default) {
-		    next;
-		}
-		if (0 != grep { defined($_) && $_ ne '' } @handlers) {
-		    next;
-		}
-	    }
-	    next if $seen_default++;
-	    Signals::XSIG::Default::perform_default_behavior($signal, @args);
-	    push @Signals::XSIG::HANDLER_SEQUENCE, 'DEFAULT';
+    foreach my $handler (@{$ZSIG{$signal}->{xh}}) {
+	# print STDERR "_sigaction($signal) => $handler\n";
+	if ($handler eq 'DEFAULT') {
+	    Signals::XSIG::Default::perform_default_behavior(
+		$signal, @args);
+	} elsif ($signal ne '__WARN__' && $signal ne '__DIE__') {
+            no strict 'refs';
+	    $handler->($signal, @args);
 	} else {
-	    next if !defined &$subhandler;
-	    no strict 'refs';                    ## no critic (NoStrict)
-	    if ($signal =~ /__\w+__/) {
-		$subhandler->(@args);
-	    } else {
-		$subhandler->($signal, @args);
-	    }
-	    push @Signals::XSIG::HANDLER_SEQUENCE, $subhandler;
+            no warnings 'uninitialized';
+            no strict 'refs';
+            print STDERR "Calling $signal signal handler $handler \@args=@args\n";
+	    $handler->($signal, @args);
 	}
     }
-    return;
 }
+
 
 # convert a signal name to its canonical name. If not disabled,
 # warn if the input is not a valid signal name.
@@ -191,25 +154,12 @@ sub _resolve_signal {
     return;
 }
 
-# execute a block of code while %SIG is temporarily untied.
-
-sub untied (&) {                    ## no critic (SubroutinePrototypes)
-    my $BLOCK = shift;
-
-    untie %SIG;
-    my @r = wantarray ? $BLOCK->() : scalar $BLOCK->();
-    tie %SIG, 'Signals::XSIG::TieSIG';
-
-    return wantarray ? @r : $r[0];
-}
-
-
 
 # in %SIG and %XSIG assignments, string values are qualified to the
 # 'main' package, unqualified *glob values are qualified to the
 # calling package.
 sub _qualify_handler {
-    my $handler = shift;
+    my $handler = shift(@_);
 
     if (!defined($handler)
 	|| $handler eq ''
@@ -224,10 +174,9 @@ sub _qualify_handler {
 	while (defined($package) && $package =~ /^Signals::XSIG/) {
 	    $package = caller(++$n);
 	}
-
-	$handler = qualify($handler, $package || 'main');
+	$handler = Symbol::qualify($handler, $package || 'main');
     } else {
-	$handler = qualify($handler, 'main');
+	$handler = Symbol::qualify($handler, 'main');
     }
     return $handler;
 }
@@ -245,6 +194,7 @@ sub Signals::XSIG::TieSIG::TIEHASH {
     return $SIGTIE;
 }
 
+# called when we say  $x = $SIG{signal}
 sub Signals::XSIG::TieSIG::FETCH {
     my ($self,$key) = @_;
 
@@ -252,111 +202,106 @@ sub Signals::XSIG::TieSIG::FETCH {
     $XDEBUG && $key ne '__DIE__'
             && XLOG("FETCH key=$key caller=",caller);
     if (_resolve_signal($key)) {
-        $XDEBUG && $key ne '__DIE__' && XLOG("    result(1)=",$_XSIG{$key}[0]);
-	return $_XSIG{$key}[0];
+	my $old = $ZSIG{$key}->_fetch(0);
+        $XDEBUG && $key ne '__DIE__' && XLOG("    result(1)=",$old);
+	return $old;
     } else {
 	no warnings 'uninitialized';
-	my $r = untied { $SIG{$key} };
+	my $r = $OSIG{$key};
         $XDEBUG && $key ne '__DIE__' && XLOG("    result(2)=$r");
 	return $r;
     }
 }
 
+# called when we say  $SIG{signal} = handler
 sub Signals::XSIG::TieSIG::STORE {
     my ($self,$key,$value) = @_;
     no warnings 'uninitialized';
     $XDEBUG && $key ne '__DIE__'
         && XLOG("STORE($key,$value) caller=",caller);
     if (_resolve_signal($key)) {
-	my $old = $_XSIG{$key}[0];
-	$_XSIG{$key}[0] = $value;
-	return $old;
+	return $ZSIG{$key}->_store(0, $value);
     } else {
 	my $old;
         $XDEBUG && XLOG("    key $key not resolved");
-	untied {
-	    no warnings 'signal';          ## no critic (NoWarnings)
-	    $old = $SIG{$key};
-	    $SIG{$key} = $value;
-	};
+	no warnings 'signal';          ## no critic (NoWarnings)
+	$old = $OSIG{$key};
+	$OSIG{$key} = $value;
 	return $old;
     }
 }
 
+# called when we say   delete $SIG{signal}
 sub Signals::XSIG::TieSIG::DELETE {
     my ($self,$key) = @_;
     $XDEBUG && $key ne '__DIE__'
         && XLOG("DELETE key=$key caller=",caller);
     if (_resolve_signal($key)) {
-	my $old = $_XSIG{$key}[0];
+	my $old = $ZSIG{$key}->_store(0, undef);
         $XDEBUG && XLOG("    DELETE result(1)=$old");
-	$_XSIG{$key}[0] = undef;
 	return $old;
     } else {
 	my $old = $self->FETCH($key);
 	no warnings 'uninitialized';
         $XDEBUG && XLOG("    DELETE result(2)=$old");
-	untied {
-	    $SIG{$key} = undef;
-	    delete $SIG{$key};
-	};
+	$OSIG{$key} = undef;
+	delete $OSIG{$key};
 	return $old;
     }
 }
 
+# called when we say  %SIG = ();
 sub Signals::XSIG::TieSIG::CLEAR {
     my ($self) = @_;
-    $XDEBUG && do {
+    $XDEBUG && $^O ne "MSWin32" && do {
         XLOG("CLEAR caller=",caller);
-        XLOG("    CLEAR init USR1=",@{$_XSIG{USR1}});
-        XLOG("    CLEAR init USR2=",@{$_XSIG{USR2}});
+        XLOG("    CLEAR init USR1=",@{$ZSIG{USR1}{handlers}});
+        XLOG("    CLEAR init USR2=",@{$ZSIG{USR2}{handlers}});
     };
 
-    # this used to say
-    #     $_XSIG{$_}[0] = undef for keys %_XSIG
-    # but on some platforms, for a reason I don't yet understand,
-    # the signal handler for the first value in the for loop
-    # would not get cleared properly. For another reason I don't
-    # yet understand, this is apparently not an issue for the
-    # __WARN__ and __DIE__ handlers, so we'll manipulate the signal
-    # list to make sure those handlers go first.
-    
-    my @sigs = reverse sort keys %_XSIG;
+    my @sigs = reverse sort keys %ZSIG;
     $XDEBUG && XLOG("    \@sigs = qw(@sigs);");
     for (@sigs) {
-	$_XSIG{$_}[0] = undef;
+	$ZSIG{$_} = Signals::XSIG->_new($_);
     }
 
-    $XDEBUG && do {
-        XLOG("    CLEAR final USR1=",@{$_XSIG{USR1}});
-        XLOG("    CLEAR final USR2=",@{$_XSIG{USR2}});
+    $XDEBUG && $^O ne 'MSWin32' && do {
+        XLOG("    CLEAR final USR1=",@{$ZSIG{USR1}{handlers}});
+        XLOG("    CLEAR final USR2=",@{$ZSIG{USR2}{handlers}});
     };
     return;
 }
 
+# called when we say   exists $SIG{signal}
 sub Signals::XSIG::TieSIG::EXISTS {
     my ($self,$key) = @_;
     $XDEBUG && $key ne '__DIE__'
         && XLOG("EXISTS key=$key caller=",caller);
-    return untied { exists $SIG{$key} };
+    return exists $OSIG{$key};
 }
 
 sub Signals::XSIG::TieSIG::FIRSTKEY {
     my ($self) = @_;
     $XDEBUG && XLOG("FIRSTKEY caller=",caller);
-    my $a = keys %_XSIG;
+    my $a = keys %OSIG;
     $XDEBUG && XLOG("    FIRSTKEY result=$a");
-    return each %_XSIG;
+    return each %OSIG;
 }
 
 sub Signals::XSIG::TieSIG::NEXTKEY {
     my ($self, $lastkey) = @_;
     $XDEBUG && XLOG("NEXTKEY lastkey=$lastkey caller=",caller);
-    return each %_XSIG;
+    return each %OSIG;
 }
 
+# invoked with   untie %SIG
 sub Signals::XSIG::TieSIG::UNTIE {
+    no warnings 'uninitialized';
     $XDEBUG && !__inGD() && XLOG("UNTIE caller=",caller);
+    *main::SIG = \%Signals::XSIG::OSIG;
+    *OSIG = \%YSIG;
+    %main::SIG = %OOSIG;
+    $_INITIALIZED = 0;
     return;
 }
 
@@ -364,239 +309,115 @@ sub Signals::XSIG::TieSIG::UNTIE {
 #
 # Signals::XSIG::TieArray
 #
-# Applied to @{$XSIG{signal}}.
-# On update, refreshes the handler for the signal.
+# Creates association between @{$XSIG{signal}} / $XSIG{signal}[index]
+# and $ZSIG{signal}
 #
 
 sub Signals::XSIG::TieArray::TIEARRAY {
-    my ($class, @list) = @_;
-    my $obj = bless {}, 'Signals::XSIG::TieArray';
-    $obj->{key} = shift @list;
-    $obj->{start} = 0;  # {start} refers to slot for first element of {handlers}
-    $obj->{handlers} = [ map { _qualify_handler($_) } @list ];
-    return $obj;
+    my ($class, $signal) = @_;
+    return bless {key => $signal}, 'Signals::XSIG::TieArray';
 }
 
-# Wow. Those Perl guys thought of everything.
-$Signals::XSIG::TieArray::NEGATIVE_INDICES = 1;
+# Those Perl guys thought of everything.
+{
+    no warnings 'once';
+    $Signals::XSIG::TieArray::NEGATIVE_INDICES = 1;
+}
 
+# called with  $x = $XSIG{signal}[index]
 sub Signals::XSIG::TieArray::FETCH {
     my ($self, $index) = @_;
-    $index -= $self->{start};
-    return if $index < 0;
-    return $self->{handlers}[$index];
+    return $ZSIG{$self->{key}}->_fetch($index);
 }
 
+
+# called with  $XSIG{signal}[index] = handler
 sub Signals::XSIG::TieArray::STORE {
     my ($self, $index, $handler) = @_;
-    $index -= $self->{start};
-
-    while ($index < 0) {
-	unshift @{$self->{handlers}}, undef;
-	$index++;
-	$self->{start}--;
-    }
-
-    while ($index > $#{$self->{handlers}}) {
-	push @{$self->{handlers}}, undef;
-    }
-
-    my $old = $self->{handlers}[$index];
-
-    $handler = _qualify_handler($handler);
-    $self->{handlers}[$index] = $handler;
-    $XDEBUG
-	&& XLOG("TA::STORE key=$self->{key} index=$index val=",$handler,
-		" caller=",caller);
-    $self->_refresh_SIG();
-    return $old;
-}
-
-sub Signals::XSIG::TieArray::_refresh_SIG {
-    my $self = shift;
-    return if $_REFRESH == 0;
-
-    my $sig = $self->{key};
-    my @index_list = ();
-    my @handlers = @{$self->{handlers}};
-    my ($seen_default, $seen_ignore) = (0,0);
-    for (my $i=0; $i<@handlers; $i++) {
-	next if !defined $handlers[$i];
-	next if $handlers[$i] eq 'DEFAULT' && $seen_default++;
-	next if $handlers[$i] eq 'IGNORE' && $seen_ignore++;
-	push @index_list, $i + $self->{start};
-    }
-
-    my $handler_to_install;
-    if (@index_list == 0) {
-	$handler_to_install = undef;
-    }
-
-    # XXX - if there is a single handler, and that handler is 'DEFAULT',
-    #       do we want to install the shadow signal handler anyway?
-    #       The caller may have overridden the DEFAULT behavior of the signal,
-    #       so yeah, I think we do.
-
-    elsif (@index_list == 1 && 
-	   ($seen_default == 0 || ref($DEFAULT_BEHAVIOR{$sig}) eq '')) {
-	$handler_to_install = $handlers[$index_list[0]];
-    } else {
-	if ($sig eq '__WARN__') {
-	    $handler_to_install = \&Signals::XSIG::__shadow__warn__handler;
-	} elsif ($sig eq '__DIE__') {
-	    $handler_to_install = \&Signals::XSIG::__shadow__die__handler;
-	} else {
-	    $handler_to_install = \&Signals::XSIG::__shadow_signal_handler;
-	}
-    }
-    untied {
-	no warnings qw(uninitialized signal); ## no critic (NoWarnings)
-        $XDEBUG
-	    && XLOG("refresh_SIG key=$self->{key} handler=$handler_to_install");
-	$SIG{$sig} = $handler_to_install;
-    };
-    return;
+    return $ZSIG{$self->{key}}->_store($index, $handler);
 }
 
 sub Signals::XSIG::TieArray::handlers {
-    my $self = shift;
+    my $self = shift(@_);
     return @{$self->{handlers}};
 }
 
 sub Signals::XSIG::TieArray::FETCHSIZE {
     my ($self) = @_;
-    return scalar @{$self->{handlers}};  
+    return $ZSIG{$self->{key}}->_size;
 }
 
 sub Signals::XSIG::TieArray::STORESIZE { }
 
 sub Signals::XSIG::TieArray::EXTEND { }
 
+# called with  exists $XSIG{signal}[index]
 sub Signals::XSIG::TieArray::EXISTS {
     my ($self, $index) = @_;
-    return if $index < $self->{start};
-    return exists $self->{handlers}[$index - $self->{start}];
+    my $zsig = $ZSIG{$self->{key}};
+    return if $index < $zsig->{start};
+    return exists $zsig->{handlers}[$index - $zsig->{start}];
 }
 
+
+# called with   delete $XSIG{signal}[index]
 sub Signals::XSIG::TieArray::DELETE {
     my ($self, $index) = @_;
-    $index -= $self->{start};
-    return if $index < 0;
-    my $old = $self->{handlers}[$index];
-    $self->{handlers}[$index] = undef;
-    $self->_refresh_SIG;
-    return $old;
+    return $ZSIG{$self->{key}}->_store($index, undef);
 }
 
+# called with   $XSIG{signal} = []
+#               @{$XSIG{signal}} = ()
 sub Signals::XSIG::TieArray::CLEAR {
     my ($self) = @_;
-    $self->{handlers} = [];
-    $self->{start} = 0;
-    $self->_refresh_SIG;
+    $ZSIG{$self->{key}} = Signals::XSIG->_new($self->{key});
     return;
 }
 
+
+# called with  unshift @{$XSIG{signal}}, @list
 sub Signals::XSIG::TieArray::UNSHIFT {
     my ($self, @list) = @_;
-    unshift @{$self->{handlers}}, @list;
-    $self->{start} -= @list;
-    $self->_refresh_SIG;
-    return $self->FETCHSIZE;
+    return $ZSIG{$self->{key}}->_unshift(@list);
 }
 
+
+# called with  pop @{$XSIG{signal}}
 sub Signals::XSIG::TieArray::POP {
     my ($self) = @_;
-    if (@{$self->{handlers}} + $self->{start} <= 1) {
-	return;
-    }
-    my $val = pop @{$self->{handlers}};
-    $self->_refresh_SIG;
-    return $val;
+    return $ZSIG{$self->{key}}->_pop;
 }
 
+
+# called with  shift @{$XSIG{signal}}
 sub Signals::XSIG::TieArray::SHIFT {
-    my $self = shift;
-    if ($self->{start} >= 0) {
-	return;
-    }
-    my $val = shift @{$self->{handlers}};
-    $self->{start}++;
-    $self->_refresh_SIG;
-    return $val;
+    my $self = shift(@_);
+    return $ZSIG{$self->{key}}->_shift;
 }
 
+
+# called with  push @{$XSIG{signal}}, @list
 sub Signals::XSIG::TieArray::PUSH {
     my ($self, @list) = @_;
-    if (@{$self->{handlers}} + $self->{start} <= 0) {
-	unshift @list, undef;
-    }
-    my $val = push @{$self->{handlers}}, @list;
-    $self->_refresh_SIG;
-    return $val;
+    return $ZSIG{$self->{key}}->_push(@list);
 }
 
-sub Signals::XSIG::TieArray::SPLICE { }
-
-##################################################################
-#
-# Signals::XSIG::TieScalar
-#
-# For tie-ing $XSIG{signal}.
-# Handles expressions like  $XSIG{signal} = [ ... ]
-# and                       $XSIG{signal} = handler
-# Main purpose is to assert that $XSIG{$sig} is always set
-# to a reference to a  Signals::XSIG::TieArray  object.
-#
-
-sub Signals::XSIG::TieScalar::TIESCALAR {
-    my ($class, @list) = @_;
-    my $key = $list[0];
-    if (defined($alias{$key}) && !defined($alias{"pk:$key"})) {
-	return $TIEDSCALARS{$key} = $TIEDSCALARS{$alias{$key}};
-    }
-
-    my $self = bless { key => $key }, 'Signals::XSIG::TieScalar';
-    $self->{val} = [];
-    tie @{$self->{val}}, $TIEARRAY_CLASS, $key;
-    $self->{val}[0] = $SIG{$key};
-    $TIEDSCALARS{$key} = $self;
-    return $self;
-}
-
-sub Signals::XSIG::TieScalar::FETCH {
-    my $self = shift;
-    my $key = my $key2 = $self->{key};
-    Signals::XSIG::_resolve_signal($key);
-    if ($key ne $key2 && !$self->{copied}) {
-	$self->{val} = (tied $Signals::XSIG::_XSIG{$key})->FETCH;
-	$self->{copied} = $key;
-        push @{(tied $Signals::XSIG::_XSIG{$key})->{aliases}}, $key2;
-    } elsif ($self->{copied}) {
-        $self->{val} = $Signals::XSIG::_XSIG{ $self->{copied} };
-    }
-    return $self->{val};
-}
-
-# $XSIG{key} = [ LIST ]   ==>  store LIST, tie LIST as TieArray
-# $XSIG{key} = EXPR       ==>  treat as  $SIG{key}=EXPR,$XSIG{key}[0]=EXPR
-sub Signals::XSIG::TieScalar::STORE {
-    my ($self, $value) = @_;
-    my $old = $self->{val};
-
-    if (ref $value ne 'ARRAY') {
-	$value = [ $value ];
-    }
-
-    my $key = $self->{key};
-    $self->{val} = [];
-    tie @{$self->{val}}, $TIEARRAY_CLASS, $self->{key}, @$value;
-    (tied @{$self->{val}})->_refresh_SIG;
-    return $old;
-}
+sub Signals::XSIG::TieArray::SPLICE { }  # TODO
 
 ##################################################################
 #
 # Signals::XSIG::TieXSIG
+#
+# $XSIG{sig} must produce a tied array that can be used in these ways:
+#
+#     $aref = $XSIG{signal}
+#     $XSIG{signal} = $aref
+#     @{$XSIG{signal}} = @list
+#     $h = $XSIG{signal}[index]
+#     $XSIG{signal}[index] = $h
+#     push|unshift @{$XSIG{signal}}, @list
+#     $h = pop|shift @{$XSIG{signal}}
+#
 #
 # Only for tie-ing %XSIG.
 # adds behavior to %XSIG hash so we can make assignments to
@@ -608,48 +429,41 @@ sub Signals::XSIG::TieXSIG::TIEHASH {
     return $XSIGTIE;
 }
 
+# $aref = $XSIG{signal}
+
 sub Signals::XSIG::TieXSIG::FETCH {
     my ($self,$key) = @_;
     _resolve_signal($key,1);
-    return $_XSIG{$key};
+    return $ZSIG{$key} ? $ZSIG{$key}{ta} : [];
 }
 
+# called with  $XSIG{signal} = handler, $XSIG{signal} = [handlers]
 sub Signals::XSIG::TieXSIG::STORE {
     my ($self, $key, $value) = @_;
+    # print STDERR "\n\aTieXSIG::STORE($key)\n\n";
     _resolve_signal($key,1);
-    my $old = $_XSIG{$key};
-    # (tied $_XSIG{$key})->STORE($key,$value); #
-    $_XSIG{$key} = $value;
+    return unless $ZSIG{$key};
+    if (ref $value ne 'ARRAY') {
+	$value = [ $value ];
+    }
+    my $old = $ZSIG{$key}->{handlers};
+    $ZSIG{$key} = Signals::XSIG->_new($key, @$value);
     return $old;
 }
 
 sub Signals::XSIG::TieXSIG::DELETE {
     my ($self, $key) = @_;
     _resolve_signal($key,1);
-    my $old = $_XSIG{$key};
-    $XSIG{$key} = [];
+    my $old = $ZSIG{$key} && $ZSIG{$key}->{handlers};
+    $ZSIG{$key} &&= Signals::XSIG->_new($key);
     return $old;
 }
 
 sub Signals::XSIG::TieXSIG::CLEAR {
     my ($self) = @_;
-
-    my @aliases = ();
-    for my $xsig (keys %_XSIG) {
-	my $osig = $xsig;
-	if (_resolve_signal($xsig, 1)) {
-	    if ($osig ne $xsig) {
-		push @aliases, [$xsig, $osig];
-	    } else {
-		$XSIG{$xsig} = [];
-	    }
-	} else {
-	    delete $_XSIG{$xsig};
-	}
-    }
-    foreach my $pair (@aliases) {
-	my ($xsig, $alias) = @$pair;
-	$_XSIG{$alias} = $_XSIG{$xsig};
+    my @names = keys %ZSIG;
+    for my $key (@names) {
+	$ZSIG{$key} = Signals::XSIG->_new($key);
     }
     return;
 }
@@ -657,19 +471,33 @@ sub Signals::XSIG::TieXSIG::CLEAR {
 sub Signals::XSIG::TieXSIG::EXISTS {
     my ($self,$key) = @_;
     _resolve_signal($key,1);
-    return exists $_XSIG{$key};
+    return exists $ZSIG{$key};
 }
 
 sub Signals::XSIG::TieXSIG::FIRSTKEY {
     my ($self) = @_;
-    my $a = keys %_XSIG;
-    return each %_XSIG;
+    my $a = keys %ZSIG;
+    return each %ZSIG;
 }
 
 sub Signals::XSIG::TieXSIG::NEXTKEY {
     my ($self, $lastkey) = @_;
-    return each %_XSIG
+    return each %ZSIG
 }
+
+
+# Signals::XSIG object implementation, all with 'private' functions
+# Elements of %ZSIG are objects of this type
+
+sub _new {
+    my ($___pkg, $sig, @handlers) = @_;
+    if ($ENV{XSIG_56} || $Config{PERL_VERSION} <= 6) {
+        return Signals::XSIG::Meta56->_new($sig, @handlers);
+    } else {
+        return Signals::XSIG::Meta->_new($sig, @handlers);
+    }
+}
+
 
 1;
 
@@ -681,11 +509,11 @@ Signals::XSIG - install multiple signal handlers through %XSIG
 
 =head1 VERSION
 
-Version 0.16
+Version 1.00
 
 =head1 SYNOPSIS
 
-    use Signals::XSIG q{:all};
+    use Signals::XSIG;
 
     # drop-in replacement for regular signal handling through %SIG
     $SIG{TERM} = \&my_sigterm_handler;
@@ -696,8 +524,8 @@ Version 0.16
     $SIG{TERM} = \&handle_sigterm;  # same as  $XSIG{TERM}[0] = ...
     $XSIG{TERM}[3] = \&posthandle_sigterm;
     $XSIG{TERM}[-1] = \&prehandle_sigterm;
-    # SIGTERM calls prehandle_sigterm, handle_sigterm, posthandle_sigterm
-    # in that order.
+    # On SIGTERM, prehandle_sigterm, handle_sigterm, and posthandle_sigterm
+    # are called, in that order.
 
     # array operations allowed on @{$XSIG{signal}}
     push @{$XSIG{__WARN__}}, \&log_warnings;
@@ -705,12 +533,16 @@ Version 0.16
     warn "This warning invokes both handlers";
     shift @{$XSIG{__WARN__}};
     warn "This warning only invokes the 'log_warnings' handler";
-    
+
+    # turn off all %XSIG signal handling, restore %SIG to its state
+    #      before Signals::XSIG was imported
+    unimport Signals::XSIG;
+
 =head1 DESCRIPTION
 
 Perl provides the magic global hash variable C<%SIG> to make it
-easy to trap and set a custom signal handler (see L<perlvar/"%SIG"> and 
-L<perlipc|perlipc>) on most of the available signals.
+easy to trap and set a custom signal handler (see L<perlvar/"%SIG"> and
+L<perlipc|perlipc/"Signals">) on most of the available signals.
 The hash-of-lists variable C<%XSIG> provided by this module
 has a similar interface for setting an arbitrary number of
 handlers on any signal.
@@ -800,7 +632,7 @@ that contains one of the following:
 
 (the last two handler specifications cannot be used with Perl 5.8
 due to a limitation with assigning globs to tied hashes. See
-L<"BUGS AND LIMITATIONS">).
+L</"BUGS AND LIMITATIONS">).
 
 There are several ways to enable additional handlers on a signal.
 
@@ -961,7 +793,24 @@ the calling namespace by default.
 
 =head1 FUNCTIONS
 
-None
+=head2 unimport 
+
+To disable this module and restore C<%SIG> to its original state
+(before this module was imported), call
+
+    unimport Signals::XSIG;
+
+=head2 import
+
+To reactivate this module and enable C<%XSIG> signal handling after
+calling L<"unimport">, call
+
+    import Signals::XSIG
+
+Selectively disabling this module with local C<{ no Signals::XSIG; ... }>
+blocks is not yet supported.
+
+=cut
 
 =head1 OTHER NOTES
 
@@ -1003,54 +852,19 @@ Marty O'Brien, C<< <mob at cpan.org> >>
 Using this module may make it more difficult to use Perl
 in some other ways.
 
-=head2 Avoid C<local %SIG>
+=head2 C<local %SIG> not DWIM
 
-This module converts C<%SIG> into a tied hash. As documented in 
-L<the perltie "BUGS" section|perltie/"BUGS">,
-C<local>izing a tied hash will cause the old data
-not to be restored when the local version of the hash goes out of scope.
-Avoid doing this:
+Version of C<Signals::XSIG> prior to 1.00 did not work well when
+a caller would C<local>ize C<%SIG>, and those versions strongly
+recommended using C<Signals::XSIG> in any program than also used
+C<local %SIG>. It is safe to call C<local %SIG> with C<Signals::XSIG>
+now, though it probably will not do what you expect. In older perls,
+C<local %SIG> with C<Signals::XSIG> has no effect at all. In newer
+perls, setting a signal handler on a C<local %SIG> with C<Signals::XSIG> 
+will not be used to handle a signal.
 
-    {
-        local %SIG;
-        ...
-    }
-
-or using modules and functions which localize C<%SIG> 
-(fortunately, there are not that many examples of code that
-use this construction 
-[L<https://code.google.com/archive/search?q=local%20%25SIG>]).
-
-If a code block that localizes C<%SIG> can't be avoided, the
-workaround for Perl E<lt>v5.36 is to save C<%SIG> and restore
-at the end of the localizing scope:
-
-    use Signals::XSIG;
-    ...
-    my %temp = %SIG;
-    function_call_or_block_that_localizes_SIG();
-    %SIG = %temp;
-
-Since Perl v5.36, you must also unforunately untie and retie
-C<%SIG> around localization.
-
-    use Signals::XSIG;
-    ...
-    my %temp = %SIG;
-    untie %SIG if $] >= 5.035;
-    function_call_or_block_that_localizes_SIG();
-    tie %SIG, 'Signals::XSIG::TieSIG' if $] >= 5.035;
-    %SIG = %temp;
-
-
-In addition, the behavior of the tied C<%SIG> while it is C<local>'ized
-is different in different versions of Perl, and all of the features
-of C<Signals::XSIG> might or might not work while a local copy
-of C<%SIG> is in use.
-
-Just avoid C<local %SIG> whenever you can.
-
-Note that it is perfectly fine to C<local>ize an I<element> of C<%SIG>:
+Note that it is and has always been perfectly fine to C<local>ize an 
+I<element> of C<%SIG>:
 
     {
         local $SIG{TERM} = ...; # this is ok.
@@ -1101,14 +915,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Signals-XSIG>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Signals-XSIG>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Signals-XSIG>
-
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/Signals-XSIG>
@@ -1116,14 +922,17 @@ L<http://search.cpan.org/dist/Signals-XSIG>
 =back
 
 Please report any bugs or feature requests to 
-C<bug-signal-handler-super at rt.cpan.org>, or through the web interface at 
+C<bug-signals-xsig at rt.cpan.org>, or through the web interface at 
 L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Signals-XSIG>.  
 I will be notified, and then you'll automatically be notified of 
 progress on your bug as I make changes.
 
 =cut
 
-_head1 ACKNOWLEDGEMENTS
+=head1 ACKNOWLEDGEMENTS
+
+This module was greatly simplified thanks to a suggestion from
+L<Leon Timmermans|https://metacpan.org/author/LEONT>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -19,7 +19,9 @@ foreach (1..8)
 {
     push @list, 'entry #' . $next_id++;
 }
-my $listbox = UI::Various::Listbox->new(texts => \@list, height => 5);
+my $counter = 0;
+my $listbox = UI::Various::Listbox->new(texts => \@list, height => 5,
+					on_select => sub { $counter++; });
 
 # When the UI is Curses::UI, using print(f)/say/... between here and the
 # return of $main->mainloop will (usually) not be visible, but may
@@ -39,7 +41,7 @@ $window =
 		  (text => 'Quit',
 		   code => sub{
 		       local $_;
-		       print STDERR "Selection:\n";
+		       print STDERR "Selection (after $counter changes):\n";
 		       print STDERR "\t$_\t$list[$_]\n"
 			   foreach $listbox->selected;
 		       $window->destroy;

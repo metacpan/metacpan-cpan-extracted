@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Rubric::WebApp::Login::HTTP;
+package Rubric::WebApp::Login::HTTP 0.157;
 # ABSTRACT: process web login from HTTP authentication
-$Rubric::WebApp::Login::HTTP::VERSION = '0.156';
+
 use parent qw(Rubric::WebApp::Login);
 
 #pod =head1 DESCRIPTION
@@ -43,12 +43,21 @@ Rubric::WebApp::Login::HTTP - process web login from HTTP authentication
 
 =head1 VERSION
 
-version 0.156
+version 0.157
 
 =head1 DESCRIPTION
 
 This module checks for information needed to confirm that a user is logged into
 the Rubric.
+
+=head1 PERL VERSION
+
+This code is effectively abandonware.  Although releases will sometimes be made
+to update contact info or to fix packaging flaws, bug reports will mostly be
+ignored.  Feature requests are even more likely to be ignored.  (If someone
+takes up maintenance of this code, they will presumably remove this notice.)
+This means that whatever version of perl is currently required is unlikely to
+change -- but also that it might change at any new maintainer's whim.
 
 =head1 METHODS
 
@@ -63,7 +72,7 @@ server has already taken care of authentication.)
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

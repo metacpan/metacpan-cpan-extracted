@@ -5,19 +5,162 @@ use warnings;
 use utf8;
 use Regexp::Grammars;
 
-our $VERSION = '5.016';
+our $VERSION = '5.052';
 
 sub new {
     my ($class) = @_;
     return bless {}, $class;
 }
 
+my $groupTable = {};
+
 sub PT::Lang::X {
     my ($class) = @_;
 
     my $code = 'use strict;
         use warnings;
-        use utf8;';
+        use utf8;
+
+        package Lang::HL::Export;
+
+        use strict;
+        no warnings;
+        use utf8;
+        use feature qw(signatures);
+        no warnings "experimental::signatures";
+        no warnings "experimental::smartmatch";
+        use Hash::Merge;
+
+        require Exporter;
+
+        our @ISA = qw(Exporter);
+        our @EXPORT = qw(
+            arrayElement
+            arrayLength
+            arrayMerge
+            arraySort
+            arrayPop
+            arrayPush
+            arrayShift
+            arrayUnshift
+            arraySort
+            arrayJoin
+            arrayReverse
+            arrayDelete
+            hashKeys
+            hashElement
+            hashMerge
+            hashDelete
+            stringConcat
+            readFile
+            writeFile
+            not
+        );
+
+        sub not($boolOperand) {
+            my $not = ! $boolOperand;
+            return $not;
+        }
+
+        sub arrayElement($array, $element) {
+            if( $element ~~ @{$array} ) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+
+        sub arrayDelete($array, $element) {
+            delete($array->[$element]);
+        }
+
+        sub hashDelete($hash, $element) {
+            delete($hash->{$element});
+        }
+
+        sub arrayReverse($array) {
+            my @reversedArray = reverse(@{$array});
+            return \@reversedArray;
+        }
+
+        sub arrayJoin($separator, $array) {
+            my @array = @{$array};
+            return join($separator, $array);
+        }
+
+        sub arraySort($array) {
+            my @array = @{$array};
+            my @sortedArray = sort(@array);
+            return \@sortedArray;
+        }
+
+        sub arrayUnshift($array, $element) {
+            unshift(@{$array}, $element);
+        }
+
+        sub arrayShift($array) {
+            return shift(@{$array});
+        }
+
+        sub arrayPush($array, $element) {
+            push(@{$array}, $element);
+        }
+
+        sub arrayPop($array) {
+            return pop(@{$array});
+        }
+
+        sub stringConcat($textOne, $textTwo) {
+            return $textOne . $textTwo;
+        }
+
+        sub arrayLength($array) {
+            my @newArray = @{$array};
+            return $#newArray;
+        }
+
+        sub arrayMerge($arrayOne, $arrayTwo) {
+            my @newArray = ( @{$arrayOne}, @{$arrayTwo} );
+            return \@newArray;
+        }
+
+        sub hashElement($hash, $element) {
+            my %hashMap  = %{$hash};
+            if( exists $hashMap{$element} ) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+
+        sub hashKeys($hash) {
+            my @keys = keys(%{$hash});
+            return \@keys;
+        }
+
+        sub hashMerge($hashOne, $hashTwo) {
+            my $mergedHash = merge($hashOne, $hashTwo);
+            return $mergedHash;
+        }
+
+        sub readFile($fileName) {
+            my $fileContent;
+            open(my $fh, "<:encoding(UTF-8)", $fileName) or die "Cannot open the $fileName file";
+            {
+                local $/;
+                $fileContent = <$fh>;
+            }
+            close($fh);
+            return $fileContent;
+        }
+
+        sub writeFile($fileName, $fileContent) {
+            open(my $fh, ">:encoding(UTF-8)", $fileName) or die "Cannot open the $fileName file";
+            print $fh $fileContent;
+            close($fh);
+        }
+
+        1;';
 
     for my $element ( @{ $class->{Class}} ) {
         $code .= $element->X();
@@ -42,6 +185,7 @@ sub PT::Class::X {
         use feature qw(signatures);
         no warnings "experimental::signatures";
         use Data::Printer;
+        use Try::Tiny;
     ';
 
     $classCode .= $classBlock . "\n1;";
@@ -63,10 +207,27 @@ sub PT::ClassBlock::X {
             return bless $hashRef, $class;
         }
     ';
+
+    my $errorLBrace = $class->{ErrorLBrace}->X($className);
     my $classGroups = $class->{ClassGroups}->X($className);
+    my $errorRBrace = $class->{ErrorRBrace}->X($className);
 
     $classBlock .= $classGroups;
     return $classBlock;
+}
+
+sub PT::ErrorLBrace::X {
+    my ($class, $className) = @_;
+
+    return (       $class->{LBrace}
+                || $class->{LBraceError} )->X($className);
+}
+
+sub PT::ErrorRBrace::X {
+    my ($class, $className) = @_;
+
+    return (       $class->{RBrace}
+                || $class->{RBraceError} )->X($className);       
 }
 
 sub PT::ClassGroups::X {
@@ -87,9 +248,41 @@ sub PT::Group::X {
     return (       $class->{Comment}
                 || $class->{Parent}
                 || $class->{Packages}
+                || $class->{ImplementFunction}
                 || $class->{EmbedBlock}
                 || $class->{Function}
+                || $class->{GroupDeclaration}
                 || $class->{NonSyntaxClass} )->X($className);
+}
+
+sub PT::ImplementFunction::X {
+    my ($class, $className) = @_;
+
+    my $functionName = $class->{FunctionName}->X($className);
+    my $functionParamList = $class->{FunctionParamList}->X($className);
+
+    my $multiLineComment = "";
+    if(exists $class->{MultiLineComment}) {
+        my $multiLineComment = $class->{MultiLineComment}->X($className);
+    }
+
+    my $dieMessage = "function " . $functionName . " in class " . $className . " is not defined \n";
+    my $implementFunction = "sub " . $functionName . $functionParamList . "{\n" . $multiLineComment . "\n die(" . $dieMessage . ");}\n";
+
+    return $implementFunction;
+}
+
+sub PT::MultiLineComment::X {
+    my ($class, $className) = @_;
+
+    my $mlComment = $class->{MLComment}->X($className);
+    return $mlComment;
+}
+
+sub PT::MLComment::X {
+    my ($class, $className) = @_;
+    my $mlComment = $class->{''};
+    return $mlComment;
 }
 
 sub PT::NonSyntaxClass::X {
@@ -134,9 +327,9 @@ sub PT::Package::X {
 sub PT::PackageWithConstructor::X {
     my ($class, $className) = @_;
 
-    my $object = $class->{Object}->X();
-    my $packageName = $class->{PackageName}->X();
-    my $constructor = $class->{Constructor}->X();
+    my $object = $class->{Object}->X($className);
+    my $packageName = $class->{PackageName}->X($className);
+    my $constructor = $class->{Constructor}->X($className);
 
     if(exists $class->{ObjectParameters}) {
         my $objectParameters = $class->{ObjectParameters}->X($className);
@@ -164,7 +357,7 @@ sub PT::ObjectParameters::X {
     my ($class, $className) = @_;
 
     return (       $class->{PackageParams}
-                || $class->{Parameters} )->X();
+                || $class->{Parameters} )->X($className);
 }
 
 sub PT::PackageParams::X {
@@ -368,15 +561,71 @@ sub PT::Blocks::X {
 
 sub PT::Block::X {
     my ($class, $className, $functionName) = @_;
+
     my $block = (      $class->{IfElse}
                     || $class->{While}
                     || $class->{ForEach}
+                    || $class->{ArrayEach}
+                    || $class->{HashEach}
                     || $class->{For}
+                    || $class->{RegexMatch}
+                    || $class->{TryCatch}
                     || $class->{EmbedBlock}
                     || $class->{Comment}
                     || $class->{Statement}
+                    || $class->{Packages}
                     || $class->{NonSyntaxFunction} )->X($className, $functionName);
     return $block;
+}
+
+sub PT::RegexMatch::X {
+    my ($class, $className) = @_;
+
+    my $pattern = $class->{Pattern}->X($className);
+    my $matchString = $class->{MatchString}->X($className);
+    my $codeBlock = $class->{CodeBlock}->X($className);
+
+    my $regexMatch = "if(" . $matchString . " =~ " . $pattern . ")" . $codeBlock;
+    return $regexMatch;
+}
+
+sub PT::Pattern::X {
+    my ($class, $className) = @_;
+
+    my $pattern = $class->{VariableName}->X($className);
+    return $pattern;
+}
+
+sub PT::MatchString::X {
+    my ($class, $className) = @_;
+
+    my $matchString = $class->{VariableName}->X($className);
+    return $matchString;
+}
+
+sub PT::TryCatch::X {
+    my ($class, $className) = @_;
+
+    my $codeBlock = $class->{CodeBlock}->X($className);
+    if(exists $class->{CatchBlock}) {
+        my $catchBlock = $class->{CatchBlock}->X($className);
+        my $tryCatch = "try " . $codeBlock . $catchBlock . ";";
+        return $tryCatch;
+    } else {
+        my $tryCatch = "try {\n " . $codeBlock . "\n}";
+        return $tryCatch;
+    }
+}
+
+sub PT::CatchBlock::X {
+    my ($class, $className) = @_;
+
+    my $codeBlock = $class->{CodeBlock}->X($className);
+    my @codeBlock = split(" ", $codeBlock);
+    shift(@codeBlock);
+    my $catchBlock = " catch {\n my \$error = \$_;\n " . join(" ", @codeBlock);
+
+    return $catchBlock;
 }
 
 sub PT::NonSyntaxFunction::X {
@@ -431,12 +680,12 @@ sub PT::While::X {
 sub PT::ForEach::X {
     my ($class, $className) = @_;
 
-    my $forEachVariableName = $class->{ForEachVariableName}->X($className);
-    my $variableName = $class->{VariableName}->X($className);
+    my $forEachVariableName = $class->{VariableName}->X($className);
+    my @forRange = $class->{ForRange}->X($className);
     my $codeBlock = $class->{CodeBlock}->X($className);
 
-    my $forEach = "\n foreach my " . $forEachVariableName
-                  . " ( \@{" . $variableName . "} ) " . $codeBlock;
+    my $forEach = "\n foreach my " . $forEachVariableName . " ( " . $forRange[0]
+                  . " ... " . $forRange[1] . " ) " . $codeBlock;
 
     return $forEach;
 }
@@ -446,6 +695,52 @@ sub PT::ForEachVariableName::X {
 
     my $variableName = $class->{VariableName}->X($className);
     return $variableName;
+}
+
+sub PT::ArrayEach::X {
+    my ($class, $className) = @_;
+
+    my $variableName = $class->{VariableName}->X($className);
+    my $arrayEachVariableName = $class->{ArrayEachVariableName}->X($className);
+    my $codeBlock = $class->{CodeBlock}->X($className);
+
+    my $arrayEach = "\n foreach my " . $arrayEachVariableName . "( \@{" . $variableName . "})" . $codeBlock;
+    return $arrayEach;
+}
+
+sub PT::ArrayEachVariableName::X {
+    my ($class, $className) = @_;
+
+    my $variableName = $class->{VariableName}->X($className);
+    return $variableName;
+}
+
+sub PT::HashEach::X {
+    my ($class, $className) = @_;
+
+    my $variableName = $class->{VariableName}->X($className);
+    my $hashEachKey = $class->{HashEachKey}->X($className);
+    my $hashEachValue = $class->{HashEachValue}->X($className);
+    my $codeBlock = $class->{CodeBlock}->X($className);
+
+    my $hashEach = "\n keys %{" . $variableName . "};\n while(my (" . $hashEachKey 
+                   . ", " . $hashEachValue . ") = each %{ " . $variableName . " }) " . $codeBlock;
+
+    return $hashEach;
+}
+
+sub PT::HashEachKey::X {
+    my ($class, $className) = @_;
+
+    my $hashEachKey = $class->{VariableName}->X($className);
+    return $hashEachKey;
+}
+
+sub PT::HashEachValue::X {
+    my ($class, $className) = @_;
+
+    my $hashEachValue = $class->{VariableName}->X($className);
+    return $hashEachValue;
 }
 
 sub PT::For::X {
@@ -638,6 +933,7 @@ sub PT::BoolOperands::X {
                 || $class->{ClassAccessor}
                 || $class->{ClassFunctionReturn}
                 || $class->{FunctionReturn}
+                || $class->{GroupAccess}
                 || $class->{EmbedBlock} )->X($className);
 }
 
@@ -679,11 +975,75 @@ sub PT::Statement::X {
     return (       $class->{VariableDeclaration}
                 || $class->{FunctionCall}
                 || $class->{Assignment}
+                || $class->{Regex}
+                || $class->{MakeGroup}
                 || $class->{ClassFunctionCall}
+                || $class->{FunctionReferenceCall}
                 || $class->{Return}
                 || $class->{Last}
                 || $class->{Next}
                 || $class->{ObjectCall} )->X($className);
+}
+
+sub PT::FunctionReferenceCall::X {
+    my ($class, $className) = @_;
+
+    my $functionName = $class->{FunctionName}->X($className);
+
+    my $parametersList = "\$class";
+    if(exists $class->{Parameters}) {
+        my @parameters = @{$class->{Parameters}->X($className)};
+        $parametersList = join(",", @parameters);
+    }
+
+    my $functionReferenceCall = "\&\$" . $functionName . "(" . $parametersList . ");";
+    return $functionReferenceCall;
+}
+
+sub PT::Regex::X {
+    my ($class, $className) = @_;
+    
+    my $regexVariable = $class->{RegexVariable}->X($className);
+    my $regexp = $class->{Regexp}->X($className);
+    my $modifiers = $class->{Modifiers}->X($className);
+
+    my $regex = "my ". $regexVariable . " = qr{\n " . $regexp . "\n}" . $modifiers . ";";
+    return $regex;
+}
+
+sub PT::RegexVariable::X {
+    my ($class, $className) = @_;
+
+    my $regexVariable = $class->{VariableName}->X($className);
+    return $regexVariable;
+}
+
+sub PT::Regexp::X {
+    my ($class, $className) = @_;
+
+    my $regex = $class->{Pre}->X($className);
+    return $regex;
+}
+
+sub PT::Pre::X {
+    my ($class, $className) = @_;
+
+    my $regex = $class->{''};
+    return $regex;
+}
+
+sub PT::Modifiers::X {
+    my ($class, $className) = @_;
+
+    my $regexModifiers = $class->{RegexModifiers}->X($className);
+    return $regexModifiers;
+}
+
+sub PT::RegexModifiers::X {
+    my ($class, $className) = @_;
+
+    my $regexModifiers = $class->{''};
+    return $regexModifiers;
 }
 
 sub PT::ObjectCall::X {
@@ -701,6 +1061,136 @@ sub PT::VariableDeclaration::X {
     return (       $class->{ScalarDeclaration}
                 || $class->{ArrayDeclaration}
                 || $class->{HashDeclaration} )->X($className);
+}
+
+sub PT::GroupDeclaration::X {
+    my ($class, $className) = @_;
+
+    my $groupName = $class->{GroupName}->X($className);
+    my @groupElements = $class->{GroupBlock}->X($className);
+
+    $groupTable->{$groupName} = {};
+    for my $element (@groupElements) {
+        $groupTable->{$className}->{$groupName}->{$element} = "";
+    }
+
+    my $groupElementsList = "";
+    foreach my $groupElement (@groupElements) {
+        $groupElementsList .= $groupElement . " => '', ";
+    }
+
+    # my $groupElementsList = join(" => '', ", @groupElements);
+    my $groupDeclaration = "my " . $groupName . " = {" . $groupElementsList . "};\n";
+
+    return $groupDeclaration;
+}
+
+sub PT::GroupName::X {
+    my ($class, $className) = @_;
+
+    my $groupName = $class->{VariableName}->X($className);
+    return $groupName;
+}
+
+sub PT::GroupBlock::X {
+    my ($class, $className) = @_;
+
+    my @groupElements = $class->{GroupElements}->X($className);
+    return @groupElements;
+}
+
+sub PT::GroupElements::X {
+    my ($class, $className) = @_;
+
+    my @groupElements;
+    for my $element ( @{ $class->{GroupElement} } ) {
+        push @groupElements, $element->X($className);
+    }
+
+    return @groupElements;
+}
+
+sub PT::GroupElement::X {
+    my ($class, $className) = @_;
+
+    my $variableName = $class->{''};
+    return $variableName;
+}
+
+sub PT::MakeGroup::X {
+    my ($class, $className) = @_;
+
+    my $groupName = $class->{GroupName}->X($className);
+    my $groupNameObject = $class->{GroupNameObject}->X($className);
+    my @groupElements = keys %{ $groupTable->{$className}->{$groupName} };
+
+    # if(exists $groupTable->{groupNameObject}) {};
+
+    my $makeGroup = "my " . $groupNameObject . " = {};\n" ;
+    for my $groupElement (@groupElements) {
+        $makeGroup .=  $groupNameObject . "->{" . $groupElement . "} = '';\n";
+    }
+
+    return $makeGroup;
+}
+
+sub PT::GroupNameObject::X {
+    my ($class, $className) = @_;
+
+    my $groupNameObject = $class->{VariableName}->X($className);
+    return $groupNameObject;
+}
+
+sub PT::GroupReference::X {
+    my ($class, $className) = @_;
+
+    my $groupName = $class->{GroupName}->X($className);
+    my $groupReference = $groupTable->{$groupName};
+
+    return $groupReference;
+}
+
+sub PT::GroupAssignment::X {
+    my ($class, $className) = @_;
+
+    my $groupAccess = $class->{GroupAccess}->X($className);
+    my $rhs = $class->{RHS}->X($className);
+
+    my $groupAssignment = "if(exists(" . $groupAccess . ")){\n";
+    $groupAssignment .= $groupAccess . " = " . $rhs . ";\n";
+    $groupAssignment .= "\n}\n";
+
+    return $groupAssignment;
+}
+
+sub PT::GroupAccess::X {
+    my ($class, $className) = @_;
+
+    my $groupName = $class->{GroupName}->X($className);
+
+    my @groupAccessElements;
+    for my $groupElement ( @{ $class->{GroupAccessElement} }) {
+        push @groupAccessElements, $groupElement->X($className);
+    }
+
+    my $counter = 0;
+    my $groupAccess = $groupName;
+
+    #if(exists $groupTable->{$groupName}->{$groupAccessElements[0]}) {
+        while( $counter <= $#groupAccessElements ) {
+            $groupAccess .= "->{" . $groupAccessElements[$counter] . "}";
+            $counter = $counter + 1;
+        }
+    #}
+
+    return $groupAccess;
+}
+
+sub PT::GroupAccessElement::X {
+    my ($class, $className) = @_;
+
+    my $groupElement = $class->{GroupElement}->X($className);
+    return $groupElement;
 }
 
 sub PT::ScalarDeclaration::X {
@@ -895,15 +1385,29 @@ sub PT::Param::X {
                 || $class->{ArrayElement}
                 || $class->{HashElement}
                 || $class->{HashRef}
+                || $class->{GroupAccess}
                 || $class->{FunctionReturn}
                 || $class->{ClassFunctionReturn}
-                || $class->{EmbedBlock} )->X($className);
+                || $class->{EmbedBlock}
+                || $class->{FunctionReference}
+                || $class->{GroupAccess}
+                || $class->{ClassFunctionReturn}
+                || $class->{Calc}
+                || $class->{ParamChars}
+                || $class->{ObjectFunctionCall} )->X($className);
+}
+
+sub PT::ParamChars::X {
+    my ($class, $className) = @_;
+    my $paramChars = $class->{''};
+    return $paramChars;
 }
 
 sub PT::Assignment::X {
     my ($class, $className) = @_;
     return (       $class->{ScalarAssignment}
                 || $class->{ArrayAssignment}
+                || $class->{GroupAssignment}
                 || $class->{HashAssignment}
                 || $class->{AccessorAssignment} )->X($className);
 }
@@ -945,20 +1449,71 @@ sub PT::ScalarVariable::X {
 
 sub PT::RHS::X {
     my ($class, $className) = @_;
+
     return (       $class->{RealNumber}
                 || $class->{FunctionReturn}
                 || $class->{ArrayElement}
                 || $class->{HashElement}
                 || $class->{ScalarVariable}
                 || $class->{Calc}
+                || $class->{RegexMatchVariables}
                 || $class->{ArrayList}
                 || $class->{HashRef}
+                || $class->{GroupReference}
+                || $class->{GroupElement}
+                || $class->{GroupAccess}
+                || $class->{FunctionReference}
                 || $class->{ClassAccessor}
                 || $class->{ClassFunctionReturn}
                 || $class->{String}
                 || $class->{STDIN}
                 || $class->{ObjectFunctionCall}
                 || $class->{EmbedBlock} )->X($className);
+}
+
+sub PT::RegexMatchVariables::X {
+    my ($class, $className) = @_;
+
+    my $matchVariable = $class->{MatchVariable}->X($className);
+    my $regexMatchVariables = "";
+
+    if( $matchVariable =~ /\d+/ ) {
+        $regexMatchVariables = "\$" . $matchVariable;
+    }
+
+    if( $matchVariable eq "Match" ) {
+        $regexMatchVariables = "\$" . "\&";
+    }
+
+    if( $matchVariable eq "PREMATCH" ) {
+        $regexMatchVariables = "\$" . "\'";
+    }
+
+    if( $matchVariable eq "POSTMATCH" ) {
+        $regexMatchVariables = "\$" . "\`";
+    }
+
+    return $regexMatchVariables;
+}
+
+sub PT::MatchVariable::X {
+    my ($class, $className) = @_;
+
+    return (        $class->{Number}
+                 || $class->{MatchParts} )->X($className);
+}
+
+sub PT::MatchParts::X {
+    my ($class, $className) = @_;
+    return $class->{''};
+}
+
+sub PT::FunctionReference::X {
+    my ($class, $className) = @_;
+
+    my $functionName = $class->{FunctionName}->X($className);
+    my $functionReference = "\\&" . $functionName;
+    return $functionReference;
 }
 
 sub PT::STDIN::X {
@@ -968,21 +1523,21 @@ sub PT::STDIN::X {
 }
 
 sub PT::ObjectFunctionCall::X {
-        my ($class, $className) = @_;
+    my ($class, $className) = @_;
 
-        my $object = $class->{Object}->X($className);
-        my $functionName = $class->{FunctionName}->X($className);
+    my $object = $class->{Object}->X($className);
+    my $functionName = $class->{FunctionName}->X($className);
 
-        my $objectFunctionCall;
-        if(exists $class->{Parameters}) {
-            my @parameters = @{$class->{Parameters}->X($className)};
-            my $parameters = join(",", @parameters);
-            $objectFunctionCall = "\$" . $object . "->" . $functionName . "(" . $parameters . ")";
-        } else {
-            $objectFunctionCall = "\$" . $object . "->" . $functionName . "()";
-        }
+    my $objectFunctionCall;
+    if(exists $class->{Parameters}) {
+        my @parameters = @{$class->{Parameters}->X($className)};
+        my $parameters = join(",", @parameters);
+        $objectFunctionCall = "\$" . $object . "->" . $functionName . "(" . $parameters . ")";
+    } else {
+        $objectFunctionCall = "\$" . $object . "->" . $functionName . "()";
+    }
 
-        return $objectFunctionCall;
+    return $objectFunctionCall;
 }
 
 sub PT::ClassAccessor::X {
@@ -1323,6 +1878,66 @@ sub PT::LogicalOr::X {
     return $logicalOr;
 }
 
+sub PT::TokenImplement::X {
+    my ($class, $className) = @_;
+    my $tokenImplement = $class->{''};
+    return $tokenImplement;
+}
+
+sub PT::TokenTry::X {
+    my ($class, $className) = @_;
+    my $tokenTry = $class->{''};
+    return $tokenTry;
+}
+
+sub PT::TokenCatch::X {
+    my ($class, $className) = @_;
+    my $tokenCatch = $class->{''};
+    return $tokenCatch;
+}
+
+sub PT::TokenError::X {
+    my ($class, $className) = @_;
+    my $tokenError = $class->{''};
+    return $tokenError;
+}
+
+sub PT::EachSymbol::X {
+    my ($class, $className) = @_;
+    my $eachSymbol = $class->{''};
+    return $eachSymbol;
+}
+
+sub PT::LBrace::X {
+    my ($class, $className) = @_;
+    my $lBrace = $class->{''};
+    return $lBrace;
+}
+
+sub PT::LBraceError::X {
+    my ($class, $className) = @_;
+    my $lBraceError = $class->{''};
+
+    print "SyntaxError", "\n";
+    print "===========", "\n";
+    die "Missing { after className '", $className, "', instead found ", $lBraceError, "\n";
+}
+
+sub PT::RBrace::X {
+    my ($class, $className) = @_;
+    my $rBrace = $class->{''};
+    return $rBrace;
+}
+
+sub PT::RBraceError::X {
+    my ($class, $className) = @_;
+    my $rBraceError = $class->{''};
+
+    print "SyntaxError", "\n";
+    print "===========", "\n";
+    die "Missing } after class '", $className, "', instead found ", $rBraceError, "\n";
+}
+
 my $parser = qr {
     <nocontext:>
     # <debug: on>
@@ -1330,14 +1945,24 @@ my $parser = qr {
     <Lang>
     <objrule:  PT::Lang>                       <[Class]>+
 
-    <objrule:  PT::Class>                      <TokenClass> <ClassName> <ClassBlock>
+    <objrule:  PT::Class>                      <ws: (\s++)*> <TokenClass> <ClassName> <ClassBlock>
     <objrule:  PT::ClassName>                  [a-zA-Z]+?
-    <objrule:  PT::ClassBlock>                 <LBrace> <ClassGroups> <RBrace>
-    <objrule:  PT::ClassGroups>                <[Group]>+
 
-    <objrule:  PT::Group>                      <ws: (\s++)*> <Comment> | <Parent> | <Packages> | <EmbedBlock> | <Function> | <NonSyntaxClass>
+    <objrule:  PT::ClassBlock>                 <ErrorLBrace> <ClassGroups> <ErrorRBrace>
+    <objrule:  PT::ErrorLBrace>                <LBrace> | <LBraceError>
+    <objrule:  PT::ErrorRBrace>                <RBrace> | <RBraceError>
+
+    <objrule:  PT::ClassGroups>                <[Group]>+
+    <objrule:  PT::Group>                      <Comment> | <Parent> | <Packages> | <EmbedBlock> | <GroupDeclaration>
+                                               | <ImplementFunction> | <Function> | <NonSyntaxClass>
 
     <objtoken: PT::NonSyntaxClass>             \b.*\b
+
+    <objrule:  PT::ImplementFunction>          <TokenImplement> <TokenFunction> <FunctionName> <LParen> <FunctionParamList> <RParen> <LBrace> <MultiLineComment>? <RBrace>
+    <objrule:  PT::MultiLineComment>           <MLCommentBegin> <MLComment> <MLCommentEnd>
+    <objtoken: PT::MLCommentBegin>             \/\*
+    <objtoken: PT::MLCommentEnd>               \*\/
+    <objrule:  PT::MLComment>                  (?<=\/\*)\s*.*?\s*(?=\*\/)
 
     <objrule:  PT::Comment>                    [#] <LineComment> @
     <objtoken: PT::LineComment>                .*?
@@ -1370,9 +1995,13 @@ my $parser = qr {
     <objrule:  PT::CodeBlock>                  <LBrace> <Blocks> <RBrace>
     <objrule:  PT::Blocks>                     <[Block]>+
 
-    <objrule:  PT::Block>                      <IfElse> | <While> | <ForEach> | <For> | <EmbedBlock> | <Comment> | <Statement> | <NonSyntaxFunction>
+    <objrule:  PT::Block>                      <IfElse> | <While> | <ForEach> | <For> | <ArrayEach> | <HashEach> | <EmbedBlock>
+                                               | <Comment> | <Statement> | <TryCatch> | <RegexMatch> | <Packages> | <NonSyntaxFunction>
 
     <objtoken: PT::NonSyntaxFunction>          \b.*\b
+
+    <objrule:  PT::TryCatch>                   <TokenTry> <CodeBlock> <CatchBlock>?
+    <objrule:  PT::CatchBlock>                 <TokenCatch> <LParen> <TokenError> <RParen> <CodeBlock>
 
     <objrule:  PT::EmbedBlock>                 <TokenEmbedBlock> <EmbedCodeBlock>
     <objrule:  PT::EmbedCodeBlock>             <EmbedBegin> <EmbeddedCode> <EmbedEnd>
@@ -1381,8 +2010,15 @@ my $parser = qr {
     <objrule:  PT::EmbeddedCode>               (?<=\(\?)\s*.*?\s*(?=\?\))
 
     <objrule:  PT::While>                      <TokenWhile> <LParen> <BoolExpression> <RParen> <CodeBlock>
-    <objrule:  PT::ForEach>                    <TokenForeach> <Var> <ForEachVariableName> <LParen> <VariableName> <RParen> <CodeBlock>
-    <objrule:  PT::ForEachVariableName>        <VariableName>
+
+    <objrule:  PT::ForEach>                    <TokenForeach> <LParen> <ForRange> <RParen> <EachSymbol> <VariableName> <CodeBlock>
+
+    <objrule:  PT::ArrayEach>                  <TokenArrayEach> <LParen> <VariableName> <RParen> <EachSymbol> <ArrayEachVariableName> <CodeBlock>
+    <objrule:  PT::ArrayEachVariableName>      <VariableName>
+
+    <objrule:  PT::HashEach>                   <TokenHashEach> <LParen> <VariableName> <RParen> <EachSymbol> <LParen> <HashEachKey> <Comma> <HashEachValue> <RParen> <CodeBlock>
+    <objrule:  PT::HashEachKey>                <VariableName>
+    <objrule:  PT::HashEachValue>              <VariableName>
 
     <objrule:  PT::For>                        <TokenFor> <Var> <VariableName> <LParen> <ForRange> <RParen> <CodeBlock>
     <objrule:  PT::ForRange>                   <LowerRange> <Dot><Dot><Dot> <UpperRange>
@@ -1393,6 +2029,10 @@ my $parser = qr {
     <objrule:  PT::UpperRange>                 <Number> | <VariableName> | <ArrayElement> | <HashElement>
                                                 | <ClassAccessor> | <ClassFunctionReturn> | <FunctionReturn>
 
+    <objrule:  PT::RegexMatch>                 <TokenMatchRegex> <LParen> <Pattern> <RegexMatchSymbol> <MatchString> <RParen> <CodeBlock>
+    <objrule:  PT::Pattern>                    <VariableName>
+    <objrule:  PT::MatchString>                <VariableName>
+
     <objrule:  PT::IfElse>                     <If> <ElsIf>? <Else>?
     <objrule:  PT::If>                         <TokenIf> <LParen> <BoolExpression> <RParen> <CodeBlock>
 
@@ -1401,7 +2041,7 @@ my $parser = qr {
     <objrule:  PT::BoolOperatorExpression>     <BoolOperator> <BoolOperands>
 
     <objrule:  PT::BoolOperands>               <RealNumber> | <String> | <ScalarVariable> | <ArrayElement> | <HashElement>
-                                               | <ClassAccessor> | <ClassFunctionReturn> | <FunctionReturn> | <EmbedBlock>
+                                               | <ClassAccessor> | <ClassFunctionReturn> | <FunctionReturn> | <GroupAccess> | <EmbedBlock>
 
     <objrule:  PT::BoolOperator>               <GreaterThan> | <LessThan> | <Equals> | <GreaterThanEquals> | <LessThanEquals>
                                                | <StringEquals> | <StringNotEquals> | <NotEqulas> | <LogicalAnd> | <LogicalOr>
@@ -1411,14 +2051,36 @@ my $parser = qr {
     <objrule:  PT::ElsIfChain>                 <TokenElsIf> <LParen> <BoolExpression> <RParen> <CodeBlock>
     <objrule:  PT::Else>                       <TokenElse> <CodeBlock>
 
-    <objrule:  PT::Statement>                  <VariableDeclaration> | <FunctionCall> | <ClassFunctionCall>
-                                               | <ObjectCall> | <Assignment> | <Return> | <Last> | <Next>
+    <objrule:  PT::Statement>                  <FunctionReferenceCall> | <VariableDeclaration> | <Regex> | <MakeGroup> | <FunctionCall> 
+                                               | <ClassFunctionCall> | <ObjectCall> | <Assignment> | <Return> | <Last> | <Next>
+
+    <objrule:  PT::Regex>                      <TokenMakeRegex> <LParen> <RegexVariable> <Comma> <Regexp> <Comma> <Modifiers> <RParen> <SemiColon>
+    <objrule:  PT::RegexVariable>              <VariableName>
+    <objrule:  PT::Regexp>                     <BackSlash> <Pre> <BackSlash>
+    <objrule:  PT::Pre>                        (?<=\/)\s*.*?\s*(?=\/\,)
+    <objrule:  PT::Modifiers>                  <LParen> <RegexModifiers> <RParen>
+    <objtoken: PT::RegexModifiers>             [nmasdilxpu]+
+
     <objrule:  PT::ClassFunctionCall>          <TokenClass> <Dot> <FunctionName> <LParen> <Parameters>? <RParen> <SemiColon>
 
     <objrule:  PT::ObjectCall>                 <ObjectFunctionCall> <SemiColon>
     <objrule:  PT::VariableDeclaration>        <ArrayDeclaration> | <HashDeclaration> | <ScalarDeclaration>
-    <objrule:  PT::ScalarDeclaration>          <Var> <VariableName> <Equal> <Value> <SemiColon>
 
+    <objrule:  PT::GroupDeclaration>           <TokenGroup> <GroupName> <GroupBlock> <SemiColon>
+    <objtoken: PT::GroupName>                  <VariableName>
+    <objrule:  PT::GroupBlock>                 <LessThan> <GroupElements> <GreaterThan>
+    <objrule:  PT::GroupElements>              <[GroupElement]>+ % <Comma>
+    <objrule:  PT::GroupElement>               [A-Za-z]+
+
+    <objrule:  PT::MakeGroup>                  <TokenMakeGroup> <LParen> <GroupName> <Comma> <GroupNameObject> <RParen> <SemiColon>
+    <objrule:  PT::GroupNameObject>            <VariableName>
+    <objrule:  PT::GroupReference>             <TokenGroupReference> <GroupName>
+
+    <objrule:  PT::GroupAssignment>            <GroupAccess> <Equal> <RHS> <SemiColon>
+    <objrule:  PT::GroupAccess>                <GroupName> <[GroupAccessElement]>+
+    <objrule:  PT::GroupAccessElement>         <LessThan> <GroupElement> <GreaterThan>
+
+    <objrule:  PT::ScalarDeclaration>          <Var> <VariableName> <Equal> <Value> <SemiColon>
     <objtoken: PT::Var>                        var
     <objtoken: PT::VariableName>               [a-zA-Z_]+?
     <objrule:  PT::Value>                      <RHS>
@@ -1452,17 +2114,27 @@ my $parser = qr {
     <objrule:  PT::FunctionCall>               <FunctionName> <LParen> <Parameters>? <RParen> <SemiColon>
     <objrule:  PT::Parameters>                 <[Param]>+ % <Comma>
     <objrule:  PT::Param>                      <RealNumber> | <String> | <VariableName> | <ArrayElement> | <HashElement>
-                                               | <HashRef> | <FunctionReturn> | <ClassFunctionReturn> | <EmbedBlock>
+                                               | <HashRef> | <FunctionReturn> | <ClassFunctionReturn> | <GroupAccess> | <EmbedBlock>
+                                               | <FunctionReference> | <GroupAccess> | <ClassFunctionReturn> | <Calc> | <ParamChars> | <ObjectFunctionCall>
 
-    <objrule:  PT::Assignment>                 <ScalarAssignment> | <ArrayAssignment> | <HashAssignment> | <AccessorAssignment>
+    <objtoken: PT::ParamChars>                 [A-Za-z]+
+
+    <objrule:  PT::Assignment>                 <ScalarAssignment> | <ArrayAssignment> | <HashAssignment> | <AccessorAssignment> | <GroupAssignment>
 
     <objrule:  PT::ScalarAssignment>           <ScalarVariable> <Equal> <RHS> <SemiColon>
     <objtoken: PT::ScalarVariable>             [a-zA-Z]+
 
-    <objrule:  PT::RHS>                        <RealNumber> | <FunctionReturn> | <ArrayElement> | <HashElement>
+    <objrule:  PT::RHS>                        <RealNumber> | <FunctionReference> | <FunctionReturn> | <ArrayElement> | <HashElement>
                                                | <ScalarVariable> | <Calc> | <ArrayList> | <HashRef> | <ClassAccessor>
-                                               | <ClassFunctionReturn> | <String> | <STDIN> | <ObjectFunctionCall>
-                                               | <EmbedBlock>
+                                               | <GroupElement> | <GroupReference> | <MakeGroup> | <GroupAccess> | <ClassFunctionReturn>
+                                               | <String> | <STDIN> | <RegexMatchVariables> | <ObjectFunctionCall> | <EmbedBlock>
+
+    <objrule:  PT::RegexMatchVariables>        <RegexMatchSymbol> <MatchVariable>
+    <objrule:  PT::MatchVariable>              <Number> | <MatchParts>
+    <objtoken: PT::MatchParts>                 PREMATCH|MATCH|POSTMATCH
+
+    <objrule:  PT::FunctionReference>          <TokenReference> <TokenClass> <Dot> <FunctionName> <LParen> <RParen>
+    <objrule:  PT::FunctionReferenceCall>      <TokenReferenceCall> <FunctionName> <LParen> <Parameters>? <RParen> <SemiColon>
 
     <objrule:  PT::FunctionReturn>             <FunctionName> <LParen> <Parameters>? <RParen>
 
@@ -1478,7 +2150,7 @@ my $parser = qr {
     <objrule:  PT::HashKey>                    <String> | <Number> | <ScalarVariable> | <ArrayElement>
                                                | <HashElement> | <FunctionReturn> | <ClassFunctionReturn>
 
-    <objrule:  PT::STDIN>                      <LessThan>  <TokenSTDIN> <GreaterThan>
+    <objrule:  PT::STDIN>                      <LessThan> <TokenSTDIN> <GreaterThan>
 
     <objtoken: PT::HashKeyStringValue>         [a-zA-Z]+?
     <objrule:  PT::AccessorAssignment>         <TokenClass> <Dot> <HashKeyStringValue> <Equal> <RHS> <SemiColon>
@@ -1499,6 +2171,8 @@ my $parser = qr {
     <objrule:  PT::Last>                       <TokenLast> <SemiColon>
     <objrule:  PT::Next>                       <TokenNext> <SemiColon>
 
+    <objrule:  PT::ObjectFunctionCall>         [!] <Object> <Dot> <FunctionName> <LParen> <Parameters>? <RParen>
+
     <objtoken: PT::TokenReturn>                return
     <objtoken: PT::TokenNext>                  next
     <objtoken: PT::TokenLast>                  last
@@ -1506,17 +2180,33 @@ my $parser = qr {
     <objtoken: PT::TokenElsIf>                 elsif
     <objtoken: PT::TokenIf>                    if
     <objtoken: PT::TokenFor>                   for
-    <objtoken: PT::TokenForeach>               foreach
+    <objtoken: PT::TokenForeach>               forEach
     <objtoken: PT::TokenWhile>                 while
     <objtoken: PT::TokenFunction>              function
     <objtoken: PT::TokenParent>                parent
     <objtoken: PT::TokenClass>                 class
     <objtoken: PT::TokenEmbedBlock>            embed
-
     <objtoken: PT::TokenSTDIN>                 STDIN
+    <objtoken: PT::TokenNot>                   not
+    <objtoken: PT::TokenArrayEach>             arrayEach
+    <objtoken: PT::TokenHashEach>              hashEach
+    <objtoken: PT::TokenImplement>             implement
+    <objtoken: PT::TokenTry>                   try
+    <objtoken: PT::TokenCatch>                 catch
+    <objtoken: PT::TokenError>                 error
+    <objtoken: PT::TokenMakeRegex>             makeRegex
+    <objtoken: PT::TokenMatchRegex>            matchRegex
+    <objtoken: PT::TokenReference>             reference
+    <objtoken: PT::TokenReferenceCall>         referenceCall
+    <objtoken: PT::TokenGroup>                 group
+    <objtoken: PT::TokenMakeGroup>             makeGroup
+    <objtoken: PT::TokenGroupReference>        groupReference
 
-    <objrule:  PT::ObjectFunctionCall>         [!] <Object> <Dot> <FunctionName> <LParen> <Parameters>? <RParen>
-
+    <objtoken: PT::BackSlash>                  \/
+    <objtoken: PT::RegexMatchSymbol>           \@
+    <objtoken: PT::EachSymbol>                 =\>
+    <objtoken: PT::Ampersand>                  \&
+    <objtoken: PT::Asterisk>                   \*
     <objtoken: PT::Modulus>                    \%
     <objtoken: PT::Exponent>                   \*\*
     <objtoken: PT::LogicalAnd>                 \&\&
@@ -1542,7 +2232,9 @@ my $parser = qr {
     <objtoken: PT::LParen>                     \(
     <objtoken: PT::RParen>                     \)
     <objtoken: PT::LBrace>                     \{
+    <objtoken: PT::LBraceError>                \s.
     <objtoken: PT::RBrace>                     \}
+    <objtoken: PT::RBraceError>                \s*.
     <objtoken: PT::LBracket>                   \[
     <objtoken: PT::RBracket>                   \]
 }xms;
@@ -1561,6 +2253,7 @@ sub parse {
 1;
 
 __END__
+
 
 =head1 NAME
 

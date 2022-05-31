@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 32-NSEC3-typelist.t 1856 2021-12-02 14:36:25Z willem $	-*-perl-*-
+# $Id: 32-NSEC3-typelist.t 1865 2022-05-21 09:57:49Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -8,7 +8,6 @@ use Test::More;
 use Net::DNS;
 use Net::DNS::Text;
 use Net::DNS::Parameters qw(:type);
-local $Net::DNS::Parameters::DNSEXTLANG;			# suppress Extlang type queries
 
 my @prerequisite = qw(
 		Net::DNS::RR::NSEC3
@@ -20,7 +19,7 @@ foreach my $package (@prerequisite) {
 	exit;
 }
 
-plan tests => 78;
+plan tests => 77;
 
 
 my $rr = Net::DNS::RR->new(
@@ -29,7 +28,7 @@ my $rr = Net::DNS::RR->new(
 	);
 
 foreach my $rrtype ( 0, 256, 512, 768, 1024 ) {
-	my $type = typebyval($rrtype);
+	my $type = "TYPE$rrtype";
 	$rr->typelist($type);
 	my $rdata = $rr->rdata;
 	my ( $text, $offset ) = Net::DNS::Text->decode( \$rdata, 4 );
@@ -48,7 +47,7 @@ foreach my $rrtype ( 0, 7, 8, 15, 16, 23, 24, 31, 32, 39 ) {
 	is( $l, 1 + ( $rrtype >> 3 ), "expected map length for $type" );
 }
 
-foreach my $rrtype ( 1 .. 40, 42 .. 64 ) {
+foreach my $rrtype ( 1 .. 40, 42 .. 53, 55 .. 64 ) {
 	my $type = typebyval($rrtype);
 	$rr->typelist($type);
 	is( $rr->typemap($type), 1, "expected map bit for $type" );

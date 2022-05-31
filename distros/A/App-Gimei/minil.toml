@@ -1,0 +1,7 @@
+name = "App-Gimei"
+# badges = ["travis-ci.com"]
+authority="cpan:YOUPONG"
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+

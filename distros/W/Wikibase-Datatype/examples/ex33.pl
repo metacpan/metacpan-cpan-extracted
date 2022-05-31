@@ -3,29 +3,23 @@
 use strict;
 use warnings;
 
-use Wikibase::Datatype::Value::Quantity;
+use Wikibase::Datatype::Value::Property;
 
 # Object.
-my $obj = Wikibase::Datatype::Value::Quantity->new(
-        'value' => '10',
+my $obj = Wikibase::Datatype::Value::Property->new(
+        'value' => 'P123',
 );
-
-# Get type.
-my $type = $obj->type;
-
-# Get unit.
-my $unit = $obj->unit;
 
 # Get value.
 my $value = $obj->value;
 
+# Get type.
+my $type = $obj->type;
+
 # Print out.
 print "Type: $type\n";
-if (defined $unit) {
-        print "Unit: $unit\n";
-}
 print "Value: $value\n";
 
 # Output:
-# Type: quantity
-# Value: 10
+# Type: property
+# Value: P123

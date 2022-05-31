@@ -77,8 +77,8 @@ C<.requires/> directory accompanying the unit file.
 If this unit gets activated, the units listed will be activated as well. If one of
 the other units fails to activate, and an ordering dependency C<After> on the
 failing unit is set, this unit will not be started. Besides, with or without specifying
-C<After>, this unit will be stopped if one of the other units is explicitly
-stopped.
+C<After>, this unit will be stopped (or restarted) if one of the other units is
+explicitly stopped (or restarted).
 
 Often, it is a better choice to use C<Wants> instead of
 C<Requires> in order to achieve a system that is more robust when dealing with

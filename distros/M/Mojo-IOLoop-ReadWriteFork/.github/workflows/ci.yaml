@@ -19,6 +19,7 @@ jobs:
     - name: Install dependencies
       run: |
         cpanm -n EV~"!= 4.28"
+        cpanm -n https://github.com/mojolicious/mojo/archive/refs/tags/v8.14.tar.gz
         cpanm -n Test::Pod Test::Pod::Coverage Minion
         cpanm -n --installdeps .
     - name: Run perl tests

@@ -64,7 +64,7 @@
             "Pod::Select" : "0",
             "Scalar::Util" : "0",
             "Storable" : "1.03",
-            "Text::Balanced" : "1.89",
+            "Text::Balanced" : "2.05",
             "perl" : "5.010"
          },
          "suggests" : {
@@ -95,6 +95,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "2.079",
+   "version" : "2.080",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

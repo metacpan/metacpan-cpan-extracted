@@ -12,6 +12,7 @@ my $fh;
 unless(open $fh, "-|","$^X $dir/cmd.t.p --verbose info"){
         die "error opening process";
 }
+
 my @results=<$fh>;
 print @results;
 ok $results[0]==1;

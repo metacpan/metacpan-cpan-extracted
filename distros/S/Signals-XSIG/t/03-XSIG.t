@@ -1,19 +1,22 @@
 package PackageOne;
-use Signals::XSIG qw(untied %XSIG);
+use Signals::XSIG;
 use lib '.';
 use t::SignalHandlerTest;
-use Test::More tests => 58;
+use Test::More tests => 59;
 use Config;
 use strict;
 use warnings;
 
 # are signal handlers registered correctly when we 
 # set $XSIG{signal}[index] directly?
+#
+#     $XSIG{signal}[index] = handler
 
 my $sig = appropriate_signals();
 
 my $t = $XSIG{$sig};
-ok(tied @{$XSIG{$sig}});
+ok(tied @$t, '@{$XSIG{signal}} is tied');
+ok(! tied $t, '$XSIG{signal} is not tied');
 
 sub foo { 42 }
 
@@ -38,7 +41,7 @@ foreach my $func ('DEFAULT', 'IGNORE', '', undef, 'qualified::name',
 
 $XSIG{$sig}[-10] = 'unqualified_name';
 ok($XSIG{$sig}[-10] eq 'main::unqualified_name',
-   'unqualfied funcname assignment');
+   'unqualified funcname assignment');
 
 SKIP: {
   if ($Config{PERL_VERSION} == 8) {
@@ -49,9 +52,12 @@ SKIP: {
      'assignment from *glob');
 }
 
-untied {
-  ok($SIG{$sig} eq \&Signals::XSIG::__shadow_signal_handler,
-     'untied $SIG{sig} points to Signals::XSIG shadow signal handler');
+# real_sig_handler  and  xsig_sigaction  are from  t::SignalHandlerTest
+ok(real_sig_handler($sig) eq xsig_sigaction($sig),
+   'real signal handler set to $ZSIG{sig} signal handler')
+    or do {
+	diag real_sig_handler($sig);
+	diag xsig_sigaction($sig);
 };
 
 {
@@ -162,20 +168,20 @@ ok(tied @{$XSIG{$alias}}, '@{$XSIG{alias}} still tied');
 
 #################### bogus signal ###############
 
-no warnings 'signal';
+no warnings 'signal', 'uninitialized';
 $sig = 'xyz';
 
+ok(!@{$XSIG{$sig}}, '$XSIG{bogus} initially empty');
 ok(!tied $XSIG{$sig}, '$XSIG{bogus} not tied');
-ok(!defined($XSIG{$sig}), '$XSIG{bogus} not initially defined');
 ok(!defined $SIG{$sig}, '$SIG{bogus} not initially defined');
 
 $XSIG{$sig}[0] = 'IGNORE';
-ok($XSIG{$sig}[0] eq 'IGNORE', 'scalar assignment to bogus signal ok');
+ok($XSIG{$sig}[0] ne 'IGNORE', 'scalar assignment to bogus has no effect');
 ok(!defined $SIG{$sig}, "assign to \$XSIG{bogus} does not affect \%SIG");
 
 $XSIG{$sig}[11] = 'foo';
-ok($XSIG{$sig}[11] eq 'foo',
-   "unqualified assignment to bogus signal not qualified");
+ok($XSIG{$sig}[11] !~ /foo/,
+   "element assign to \$XSIG{bogus} has no effect");
 
 delete $XSIG{$sig}[11];
 ok(!defined $XSIG{$sig}[11], "\$SIG{$sig} not defined after delete");

@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Rubric::WebApp::Entries;
+package Rubric::WebApp::Entries 0.157;
 # ABSTRACT:  process the /entries run method
-$Rubric::WebApp::Entries::VERSION = '0.156';
+
 #pod =head1 DESCRIPTION
 #pod
 #pod Rubric::WebApp::Entries implements a URI parser that builds a query based
@@ -259,13 +259,22 @@ Rubric::WebApp::Entries - process the /entries run method
 
 =head1 VERSION
 
-version 0.156
+version 0.157
 
 =head1 DESCRIPTION
 
 Rubric::WebApp::Entries implements a URI parser that builds a query based
 on a query URI, passes it to Rubric::Entries, and returns the rendered report
 on the results.
+
+=head1 PERL VERSION
+
+This code is effectively abandonware.  Although releases will sometimes be made
+to update contact info or to fix packaging flaws, bug reports will mostly be
+ignored.  Feature requests are even more likely to be ignored.  (If someone
+takes up maintenance of this code, they will presumably remove this notice.)
+This means that whatever version of perl is currently required is unlikely to
+change -- but also that it might change at any new maintainer's whim.
 
 =head1 METHODS
 
@@ -332,7 +341,7 @@ They return the passed string unchanged.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

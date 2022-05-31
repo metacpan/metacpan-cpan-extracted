@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Rubric::WebApp;
+package Rubric::WebApp 0.157;
 # ABSTRACT: the web interface to Rubric
-$Rubric::WebApp::VERSION = '0.156';
+
 #pod =head1 SYNOPSIS
 #pod
 #pod  use strict;
@@ -1189,7 +1189,7 @@ Rubric::WebApp - the web interface to Rubric
 
 =head1 VERSION
 
-version 0.156
+version 0.157
 
 =head1 SYNOPSIS
 
@@ -1206,6 +1206,15 @@ Rubric::WebApp provides a CGI-based interface to Rubric data.  It's built on
 top of CGI::Application, which does most of the boring work.  This module's
 code sets up the dispatch tables and implements the responses to various
 queries.
+
+=head1 PERL VERSION
+
+This code is effectively abandonware.  Although releases will sometimes be made
+to update contact info or to fix packaging flaws, bug reports will mostly be
+ignored.  Feature requests are even more likely to be ignored.  (If someone
+takes up maintenance of this code, they will presumably remove this notice.)
+This means that whatever version of perl is currently required is unlikely to
+change -- but also that it might change at any new maintainer's whim.
 
 =head1 REQUESTS DISPATCH
 
@@ -1486,7 +1495,7 @@ This runmode sends the named stylesheet from the CSS path.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

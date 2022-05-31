@@ -7,7 +7,7 @@
 ##======================================================================
 
 package PDL::VectorValued::Version;
-our $VERSION = '1.0.20';
+our $VERSION = '1.0.21';
 #$PDL::VectorValued::VERSION = $VERSION;	##-- use perl-reversion from Perl::Version instead
 #$PDL::VectorValued::Dev::VERSION = $VERSION;	##-- use perl-reversion from Perl::Version instead
 

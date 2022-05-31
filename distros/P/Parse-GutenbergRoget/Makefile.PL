@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME                => 'Parse::GutenbergRoget',
-    AUTHOR              => 'Ricardo Signes <rjbs@cpan.org>',
+    AUTHOR              => 'Ricardo Signes <rjbs@semiotic.systems>',
     VERSION_FROM        => 'lib/Parse/GutenbergRoget.pm',
     ABSTRACT_FROM       => 'lib/Parse/GutenbergRoget.pm',
     LICENSE             => 'perl',
@@ -16,7 +16,6 @@ WriteMakefile(
     META_MERGE => {
       resources => {
         license     => 'http://dev.perl.org/licenses/',
-        bugtracker  => 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=Parse-GutenbergRoget',
         repository  => 'https://github.com/rjbs/Parse-GutenbergRoget',
       },
     },
