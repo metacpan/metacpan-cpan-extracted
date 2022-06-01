@@ -3,7 +3,7 @@ use warnings;
 use strict;
 
 use Acme::Array::MaxSize;
-use Test::More tests => 19;
+use Test::More tests => 20;
 
 tie my @arr, 'Acme::Array::MaxSize', 3;
 
@@ -36,6 +36,9 @@ splice @arr, 0, 2, 0, 1, 4;
 is "@arr", '1 4 3', 'splice 0 2';
 
 splice @arr, 3, 1, 2;
+is "@arr", '1 4 3', 'splice offset >';
+
+splice @arr, 4, 1, 2;
 is "@arr", '1 4 3', 'splice offset >';
 
 splice @arr, 2, 0, 2, 3;

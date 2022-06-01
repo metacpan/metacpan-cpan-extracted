@@ -8,13 +8,31 @@ use Test::More;
 
 my $app = t::CLI->new;
 
-{
+{    # default
     $app->run('name');
     is $app->exit_code, 0;
     like $app->stdout, qr/^\S+\s\S+$/;
     ok !$app->stderr;
     ok !$app->error_message;
+}
 
+{    # address->romaji
+    $app->run('address:romaji');
+    is $app->exit_code, 255;
+    ok !$app->stdout;
+    ok !$app->stderr;
+    is $app->error_message, "Error: unknown subtype or rendering: romaji\n";
+}
+
+{    # gender
+    $app->run('name:gender');
+    is $app->exit_code, 0;
+    like $app->stdout, qr/^\S+$/;
+    ok !$app->stderr;
+    ok !$app->error_message;
+}
+
+{
     $app->run('name:name');
     is $app->exit_code, 0;
     like $app->stdout, qr/^\S+\s\S+$/;
@@ -44,13 +62,9 @@ my $app = t::CLI->new;
     like $app->stdout, qr/^\S+$/;
     ok !$app->stderr;
     ok !$app->error_message;
+}
 
-    $app->run('address:romaji');
-    is $app->exit_code, 255;
-    ok !$app->stdout;
-    ok !$app->stderr;
-    is $app->error_message, "Error: unknown subtype or rendering: romaji\n";
-
+{    # unknown rendering
     $app->run('address:prefecture:romaji');
     is $app->exit_code, 255;
     ok !$app->stdout;

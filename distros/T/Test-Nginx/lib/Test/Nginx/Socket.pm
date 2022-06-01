@@ -6,7 +6,7 @@ use lib 'inc';
 use v5.10.1;
 use Test::Base -Base;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use POSIX qw( SIGQUIT SIGKILL SIGTERM SIGHUP );
 use Encode;
@@ -46,9 +46,10 @@ our $CheckLeakCount = $ENV{TEST_NGINX_CHECK_LEAK_COUNT} // 100;
 our $UseHttp2 = $Test::Nginx::Util::UseHttp2;
 our $TotalConnectingTimeouts = 0;
 our $PrevNginxPid;
+our $UseValgrind = $ENV{TEST_NGINX_USE_VALGRIND};
 
 sub send_request ($$$$@);
-sub send_http2_req ($$$);
+sub send_http_req_by_curl ($$$);
 
 sub run_filter_helper($$$);
 sub run_test_helper ($$);
@@ -1091,6 +1092,70 @@ sub check_access_log ($$$) {
             }
         }
     }
+
+    if (defined $block->no_access_log) {
+        #warn "HERE";
+        my $pats = $block->no_access_log;
+
+        if (!ref $pats) {
+            chomp $pats;
+            my @lines = split /\n+/, $pats;
+            $pats = \@lines;
+
+        } elsif (ref $pats eq 'Regexp') {
+            $pats = [$pats];
+
+        } else {
+            my @clone = @$pats;
+            $pats = \@clone;
+        }
+
+        my %found;
+        $lines ||= access_log_data();
+        my $i = 0;
+        for my $line (@$lines) {
+            for my $pat (@$pats) {
+                next if !defined $pat;
+                #warn "test $pat\n";
+                if ((ref $pat && $line =~ /$pat/) || $line =~ /\Q$pat\E/) {
+                    if ($found{$pat}) {
+                        my $tb = Test::More->builder;
+                        $tb->no_ending(1);
+
+                    } else {
+                        $found{$pat} = 1;
+                    }
+
+                    SKIP: {
+                        skip "$name - no_access_log - tests skipped due to $dry_run ($line)", 1 if $dry_run;
+                        my $ln = fmt_str($line);
+                        my $p = fmt_str($pat);
+                        my @more_lines;
+                        for (my $j = $i + 1; $j < min($i + 10, @$lines - 1); $j++) {
+                            push @more_lines, $lines->[$j];
+                        }
+
+                        fail("$name - pattern \"$p\" should not match any line in access.log but matches line \"$ln\" (req $repeated_req_idx)\n"
+                             . join "", @more_lines);
+                    }
+                }
+            }
+
+        } continue {
+            $i++;
+        }
+
+        for my $pat (@$pats) {
+            next if $found{$pat};
+            if (defined $pat) {
+                SKIP: {
+                    skip "$name - no_access_log - tests skipped due to $dry_run", 1 if $dry_run;
+                    my $p = fmt_str($pat);
+                    pass("$name - pattern \"$p\" does not match a line in access.log (req $repeated_req_idx)");
+                }
+            }
+        }
+    }
 }
 
 sub check_error_log ($$$$) {
@@ -1111,6 +1176,12 @@ sub check_error_log ($$$$) {
 
         } else {
             $grep_pat = $grep_pats;
+        }
+
+    } else {
+        my $grep_error_log_out = $block->grep_error_log_out;
+        if (defined $grep_error_log_out) {
+            bail_out("$name - No --- grep_error_log defined but --- grep_error_log_out is defined");
         }
     }
 
@@ -1663,6 +1734,8 @@ sub parse_response($$$) {
 
     my $enc = $res->header('Transfer-Encoding');
     my $len = $res->header('Content-Length');
+    my @trailers = $res->header('Trailer');
+    # warn "trailers: @trailers";
 
     if ($code && $code !~ /^\d+$/) {
        undef $code;
@@ -1683,7 +1756,37 @@ sub parse_response($$$) {
 
         my $decoded = '';
         while (1) {
-            if ( $raw =~ /\G 0 [\ \t]* \r\n \r\n /gcsx ) {
+            if (@trailers == 0 && $raw =~ /\G 0 [\ \t]* \r\n \r\n /gcsx ) {
+                if ( $raw =~ /\G (.+) /gcsx ) {
+                    $left = $1;
+                }
+
+                last;
+
+            } elsif (@trailers > 0 && $raw =~ /\G 0 [\ \t]* \r\n /gcsx) {
+                # skip HTTP Trailer
+                for my $trailer (@trailers) {
+                    if ( $raw !~ /\G($trailer:\ [^\n]*\r\n)/gcs ) {
+                        my $tb = Test::More->builder;
+                        $tb->no_ending(1);
+
+                        fail(
+                            "$name - invalid trailer data received (expected $trailer)."
+                        );
+                        return;
+                    }
+                }
+
+                if ($raw !~ /\G\r\n/gcs ) {
+                    my $tb = Test::More->builder;
+                    $tb->no_ending(1);
+
+                    fail(
+                        "$name - invalid chunked data received (expected CRLF)."
+                    );
+                    return;
+                }
+
                 if ( $raw =~ /\G (.+) /gcsx ) {
                     $left = $1;
                 }
@@ -1766,7 +1869,7 @@ sub parse_response($$$) {
     return ( $res, $raw_headers, $left );
 }
 
-sub send_http2_req ($$$) {
+sub send_http_req_by_curl ($$$) {
     my ($block, $req, $timeout) = @_;
 
     my $name = $block->name;
@@ -1777,8 +1880,37 @@ sub send_http2_req ($$$) {
         warn "running cmd @$cmd";
     }
 
+    if (use_http2($block)) {
+        my $total_tries = $TotalConnectingTimeouts ? 20 : 50;
+        while ($total_tries-- > 0) {
+            if (is_tcp_port_used($ServerPortForClient)) {
+                last;
+            }
+
+            warn "$name - waiting for nginx to listen on port "
+                . "$ServerPortForClient, Retry connecting after 1 sec\n";
+            sleep 1;
+        }
+    }
+
+    if (use_http3($block)) {
+        my $total_tries = $TotalConnectingTimeouts ? 20 : 50;
+        while ($total_tries-- > 0) {
+            if (is_udp_port_used($ServerPortForClient)) {
+                last;
+            }
+
+            warn "$name - waiting for nginx to listen on port "
+                . "$ServerPortForClient, Retry connecting after 1 sec\n";
+            sleep 1;
+        }
+    }
+
     my $ok = IPC::Run::run($cmd, \(my $in), \(my $out), \(my $err),
                            IPC::Run::timeout($timeout));
+
+    #my @cmd_copy = @$cmd;
+    #warn "running cmd ", quote_sh_args(\@cmd_copy);
 
     if (!defined $ok) {
         fail "failed to run curl: $?: " . ($err // '');
@@ -1787,6 +1919,19 @@ sub send_http2_req ($$$) {
 
     if (!$out) {
         if ($err) {
+            my $curl_err = $block->curl_error;
+            if (defined $curl_err) {
+                if (ref $curl_err && $err =~ /$curl_err/) {
+                    return;
+
+                } elsif ($err =~ /\Q$curl_err\E/) {
+                    return;
+                }
+
+                fail "$name - command \"@$cmd\" generates stderr output: $err";
+                return;
+            }
+
             fail "$name - command \"@$cmd\" generates stderr output: $err";
             return;
         }
@@ -1807,7 +1952,21 @@ sub send_request ($$$$@) {
 
     my $name = $block->name;
 
-    #warn "connecting...\n";
+    my @req_bits = ref $req ? @$req : ($req);
+
+    my $head_req = 0;
+    {
+        my $req = join '', map { $_->{value} } @req_bits;
+        #warn "Request: $req\n";
+        if ($req =~ /^\s*HEAD\s+/) {
+            #warn "Found HEAD request!\n";
+            $head_req = 1;
+        }
+    }
+
+    if (use_http2($block) || use_http3($block)) {
+        return send_http_req_by_curl($block, $req, $timeout), $head_req;
+    }
 
     my $server_addr = $block->server_addr_for_client;
 
@@ -1825,6 +1984,7 @@ sub send_request ($$$$@) {
         Timeout   => $timeout,
     );
 
+    #warn "connecting...\n";
     if (!defined $sock) {
         $tries ||= 1;
         my $total_tries = $TotalConnectingTimeouts ? 20 : 50;
@@ -1876,22 +2036,6 @@ sub send_request ($$$$@) {
     }
 
     #warn "connected";
-
-    my @req_bits = ref $req ? @$req : ($req);
-
-    my $head_req = 0;
-    {
-        my $req = join '', map { $_->{value} } @req_bits;
-        #warn "Request: $req\n";
-        if ($req =~ /^\s*HEAD\s+/) {
-            #warn "Found HEAD request!\n";
-            $head_req = 1;
-        }
-    }
-
-    if (use_http2($block)) {
-        return send_http2_req($block, $req, $timeout), $head_req;
-    }
 
     #my $flags = fcntl $sock, F_GETFL, 0
     #or die "Failed to get flags: $!\n";
@@ -2193,7 +2337,9 @@ sub gen_curl_cmd_from_req ($$) {
     if ($req =~ m{^\s*(\w+)\s+(\S+)\s+HTTP/(\S+)\r?\n}smig) {
         ($meth, $uri, $http_ver) = ($1, $2, $3);
 
-    } elsif ($req =~ m{^\s*(\w+)\s+(.*\S)\r?\n}smig) {
+    } elsif ($req =~ m{^\s*(\w+)\s+(.*\S)\s*\r?\n}smig) {
+        # NB: there can be trailing spaces in the HTTP 0.9,
+        # but it will be ignored by the server
         ($meth, $uri) = ($1, $2);
         $http_ver = '0.9';
 
@@ -2201,7 +2347,15 @@ sub gen_curl_cmd_from_req ($$) {
         bail_out "$name - cannot parse the status line in the request: $req";
     }
 
-    my @args = ('curl', '-i');
+    # remove 'user-agent' and 'accept' request headers from curl
+    # because test-nginx does not send these header by default
+    my @args = ('curl', '-i', '-H', 'User-Agent:', '-H', 'Accept:',
+        '-H', 'Host:');
+
+    my $curl_protocol = $block->curl_protocol;
+    if (!defined $curl_protocol) {
+        $curl_protocol = "http";
+    }
 
     if ($Test::Nginx::Util::Verbose) {
         push @args, "-vv";
@@ -2210,7 +2364,11 @@ sub gen_curl_cmd_from_req ($$) {
         push @args, '-sS';
     }
 
-    if (use_http2($block)) {
+    if (use_http3($block)) {
+        push @args, '--http3';
+        $curl_protocol = "https";
+
+    } elsif (use_http2($block)) {
         push @args, '--http2', '--http2-prior-knowledge';
     }
 
@@ -2218,7 +2376,9 @@ sub gen_curl_cmd_from_req ($$) {
         push @args, '-I';
 
     } else {
-        push @args, "-X", $meth;
+        if ($meth ne 'GET') {
+            push @args, "-X", $meth;
+        }
     }
 
     if ($http_ver ne '1.1') {
@@ -2233,8 +2393,6 @@ sub gen_curl_cmd_from_req ($$) {
             #warn "raw headers: $headers\n";
             @headers = grep {
                 !/^Connection\s*:/i
-                && !/^Host: \Q$ServerName\E$/i
-                && !/^Content-Length\s*:/i
             } split /\r\n/, $headers;
 
         } else {
@@ -2248,16 +2406,11 @@ sub gen_curl_cmd_from_req ($$) {
 
     for my $h (@headers) {
         #warn "h: $h\n";
-        if ($h =~ /^\s*User-Agent\s*:\s*(.*\S)/i) {
-            push @args, '-A', $1;
-
-        } else {
-            if ($h =~ /^\s*Content-Type\s*:/i) {
-                $found_content_type = 1;
-            }
-
-            push @args, '-H', $h;
+        if ($h =~ /^\s*Content-Type\s*:/i) {
+            $found_content_type = 1;
         }
+
+        push @args, '-H', $h;
     }
 
     if ($req =~ m{\G(.+)}gcsm) {
@@ -2265,7 +2418,12 @@ sub gen_curl_cmd_from_req ($$) {
         if (!$found_content_type) {
             push @args, "-H", 'Content-Type: ';
         }
-        push @args, '--data-binary', $1;
+        my $body = $1;
+        my $filename = html_dir() . "/curl.data.bin";
+        push @args, '--data-binary', '@' . $filename;
+        open my $fh, ">", $filename or die "Could not open file. $!";
+        print $fh $body;
+        close $fh;
     }
 
     my $timeout = $block->timeout;
@@ -2274,6 +2432,10 @@ sub gen_curl_cmd_from_req ($$) {
     }
 
     push @args, '--connect-timeout', $timeout;
+
+    # http3 use udp, the connect-timeout does not take effect
+    # so use the max-time instead.
+    push @args, '--max-time', $timeout;
 
     my $link;
 
@@ -2286,7 +2448,12 @@ sub gen_curl_cmd_from_req ($$) {
     {
         my $server = $server_addr;
         my $port = $ServerPortForClient;
-        $link = "http://$server:$port$uri";
+        $link = "$curl_protocol://$server:$port$uri";
+    }
+
+    my $curl_options = $block->curl_options;
+    if (defined $curl_options) {
+        push @args, $curl_options;
     }
 
     push @args, $link;
@@ -2315,7 +2482,9 @@ sub gen_ab_cmd_from_req ($$@) {
     if ($req =~ m{^\s*(\w+)\s+(\S+)\s+HTTP/(\S+)\r?\n}smig) {
         ($meth, $uri, $http_ver) = ($1, $2, $3);
 
-    } elsif ($req =~ m{^\s*(\w+)\s+(.*\S)\r?\n}smig) {
+    } elsif ($req =~ m{^\s*(\w+)\s+(.*\S)\s*\r?\n}smig) {
+        # NB: there can be trailing spaces in the HTTP 0.9,
+        # but it will be ignored by the server
         ($meth, $uri) = ($1, $2);
         $http_ver = '0.9';
 
@@ -2817,7 +2986,7 @@ For example,
 
 =head2 add_cleanup_handler
 
-Rigister custom cleanup handler for the current perl/prove process by specifying a Perl subroutine object as the argument.
+Register custom cleanup handler for the current perl/prove process by specifying a Perl subroutine object as the argument.
 
 For example,
 
@@ -2992,6 +3161,27 @@ specified. For example, this section cannot be used with C<--- pipelined_request
 C<--- raw_request>.
 
 See also the L<TEST_NGINX_USE_HTTP2> system environment for the "http2" test mode.
+
+=head2 curl_protocol
+
+Set protocol (such as http/https) when sending request using 'curl'.
+
+=head2 curl_options
+
+Add extra command line options when using 'curl' to send request.
+
+Below is an example for sending an insecure https request using 'curl':
+
+    --- http2
+    --- curl_options: -k
+    --- curl_protocol: https
+    --- request
+        GET /ping
+
+=head2 curl_error
+
+The expected curl error.
+    --- curl_error
 
 =head2 config
 
@@ -3558,6 +3748,27 @@ Below is an example:
     hello
     --- access_log
     GET /t
+
+=head2 no_access_log
+
+Similar to the L<no_error_log> section, but for asserting appearance of patterns in the nginx access log file.
+
+Below is an example:
+
+    === TEST 1: check access log
+    --- config
+        location /t {
+            content_by_lua_block {
+                ngx.say("hello")
+            }
+        }
+
+    --- request
+    GET /t
+    --- response_body
+    hello
+    --- no_access_log
+    GET /p
 
 =head2 abort
 
@@ -4165,6 +4376,50 @@ One can enable HTTP/2 mode for an individual test block by specifying the L<http
 
     --- http2
 
+One can disable HTTP/2 mode for an individual test block by specifying the L<no_http2> section, as in
+
+    --- no_http2
+
+=head2 TEST_NGINX_USE_HTTP3
+
+Enables the "http3" test mode by enforcing using the HTTP/3 protocol to send the
+test request.
+
+Under the hood, the test scaffold uses the `curl` command-line utility to do the wire communication
+with the NGINX server. The `curl` utility must be recent enough to support both the C<--http3>
+command-line options.
+
+B<WARNING:> not all the sections and features are supported in the "http3" test mode. For example, the L<pipelined_requests> and
+L<raw_request> will still use the HTTP/1 protocols even in the "http3" test mode. Similarly, test blocks explicitly require
+the HTTP 1.0 protocol will still use HTTP 1.0.
+
+One can enable HTTP/3 mode for an individual test block by specifying the L<http3> section, as in
+
+    --- http3
+
+One can disable HTTP/3 mode for an individual test block by specifying the L<no_http3> section, as in
+
+    --- no_http3
+
+=head2 TEST_NGINX_HTTP3_CRT
+
+When running in http3 mode, you need to specify the default certificate.
+
+=head2 TEST_NGINX_HTTP3_KEY
+
+When running in http3 mode, you need to specify the default key.
+
+=head2 TEST_NGINX_QUIC_IDLE_TIMEOUT
+
+HTTP3 connections are not closed when the requests finished. When reload nginx,
+the older nginx will not exit unitl the older connections idle timeout reach.
+The default idle timeout is 60 seconds which is too long for the test scaffold.
+
+Change the idle timeout value by environment var TEST_NGINX_QUIC_IDLE_TIMEOUT.
+Default idle timeout value is 0.6s if not set.
+
+    export TEST_NGINX_QUIC_IDLE_TIMEOUT=0.1
+
 =head2 TEST_NGINX_VERBOSE
 
 Controls whether to output verbose debugging messages in Test::Nginx. Default to empty.
@@ -4320,6 +4575,10 @@ inspect the Nginx server manually afterwards.
 Defaults to 0. If set to 1, Test::Nginx module will not manage
 (configure/start/stop) the C<nginx> process. Can be useful to run tests
 against an already configured (and running) nginx server.
+
+=head2 TEST_NGINX_FAST_SHUTDOWN
+
+Defaults to 0. If set to 1, Test::Nginx module will stop C<nginx> process with SIGTERM.
 
 =head2 TEST_NGINX_NO_SHUFFLE
 

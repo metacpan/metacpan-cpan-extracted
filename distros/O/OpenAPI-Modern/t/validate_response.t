@@ -659,6 +659,51 @@ YAML
   );
 };
 
+subtest 'custom error messages for false schemas' => sub {
+  my $openapi = OpenAPI::Modern->new(
+    openapi_uri => '/api',
+    evaluator => JSON::Schema::Modern->new,
+    openapi_schema => $yamlpp->load_string(<<YAML));
+$openapi_preamble
+paths:
+  /foo:
+    post:
+      responses:
+        '200':
+          description: blah
+          headers:
+            Foo:
+              schema: false
+          content:
+            '*/*':
+              schema: false
+YAML
+
+  cmp_deeply(
+    (my $result = $openapi->validate_response(
+      response(200, [ Foo => 1, 'Content-Type' => 'text/plain' ], 'hi'),
+      { path_template => '/foo', method => 'post' }))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/response/header/Foo',
+          keywordLocation => jsonp(qw(/paths /foo post responses 200 headers Foo schema)),
+          absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo post responses 200 headers Foo schema)))->to_string,
+          error => 'response header not permitted',
+        },
+        {
+          instanceLocation => '/response/body',
+          keywordLocation => jsonp(qw(/paths /foo post responses 200 content */* schema)),
+          absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo post responses 200 content */* schema)))->to_string,
+          error => 'response body not permitted',
+        },
+      ],
+    },
+    'custom error message when the entity is not permitted',
+  );
+};
+
 goto START if ++$type_index < @::TYPES;
 
 done_testing;

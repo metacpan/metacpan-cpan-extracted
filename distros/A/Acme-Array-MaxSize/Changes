@@ -1,5 +1,8 @@
 Revision history for Acme-Array-MaxSize
 
+0.04	2022/06/01
+        Fix various doc links.
+
 0.03    2016/01/14
         'parent' added to dependencies.
 

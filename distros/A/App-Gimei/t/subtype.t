@@ -33,6 +33,18 @@ my $app = t::CLI->new;
     ok !$app->stderr;
     ok !$app->error_message;
 
+    $app->run('name:gender');
+    is $app->exit_code, 0;
+    like $app->stdout, qr/^\S+$/;
+    ok !$app->stderr;
+    ok !$app->error_message;
+
+    $app->run('name:sex');
+    is $app->exit_code, 0;
+    like $app->stdout, qr/^\S+$/;
+    ok !$app->stderr;
+    ok !$app->error_message;
+
     $app->run('female:unknown');
     is $app->exit_code, 255;
     ok !$app->stdout;

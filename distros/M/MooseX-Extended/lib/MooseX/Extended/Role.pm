@@ -16,13 +16,14 @@ use MooseX::Extended::Core qw(
 use MooseX::Role::WarnOnConflict ();
 use Moose::Role;
 use Moose::Meta::Role;
+use Moose::Util 'throw_exception';
 use namespace::autoclean ();
 use Import::Into;
 use true;
 use feature _enabled_features();
 no warnings _disabled_warnings();
 
-our $VERSION = '0.07';
+our $VERSION = '0.10';
 
 my ( $import, undef, $init_meta ) = Moose::Exporter->setup_import_methods(
     with_meta => [ 'field', 'param' ],
@@ -68,7 +69,13 @@ Filename: $filename
 Line:     $line
 Details:  $error
 END
-        die;
+        throw_exception(
+            'InvalidImportList',
+            class_name           => $package,
+            moosex_extended_type => __PACKAGE__,
+            line_number          => $line,
+            messsage             => $error,
+        );
     };
 
     # remap the arrays to hashes for easy lookup
@@ -132,7 +139,7 @@ MooseX::Extended::Role - MooseX::Extended roles
 
 =head1 VERSION
 
-version 0.07
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -144,7 +151,7 @@ version 0.07
 
 Similar to L<MooseX::Extended>, providing almost everything that module provides.
 However, for obvious reasons, it does not include L<MooseX::StrictConstructor>
-or make your class immutable, or set the c3 mro.
+or make your class immutable, or set the C3 mro.
 
 Note that there is no need to add a C<1> at the end of the role.
 
@@ -158,7 +165,7 @@ You may pass an import list to L<MooseX::Extended::Role>.
 
 =head2 C<types>
 
-ALlows you to import any types provided by L<MooseX::Extended::Types>.
+Allows you to import any types provided by L<MooseX::Extended::Types>.
 
 This:
 

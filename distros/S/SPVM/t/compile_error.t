@@ -100,7 +100,7 @@ sub print_error_messages {
 
 # SPVM compile error
 {
-  my $command = "$^X -Mblib $FindBin::Bin/compile_error.pl 2>&1";
+  my $command = "$^X -Mblib $FindBin::Bin/compile_error_perl_program.pl 2>&1";
   my $output = `$command 2>&1`;
   like($output, qr/CompileError/);
 }
@@ -118,13 +118,6 @@ sub print_error_messages {
   compile_not_ok_file('TestCase::CompileError::Use::ImportMethodNotFound');
   compile_not_ok_file('TestCase::CompileError::Use::AliasStartsLowerCase');
   compile_not_ok_file('TestCase::CompileError::Use::AliasDuplication');
-}
-
-# Logical operator
-{
-  compile_not_ok_file('TestCase::CompileError::LogicalOperator::AndNotExpression');
-  compile_not_ok_file('TestCase::CompileError::LogicalOperator::OrNotExpression');
-  compile_not_ok_file('TestCase::CompileError::LogicalOperator::NotNotExpression');
 }
 
 # oarray
@@ -371,6 +364,10 @@ sub print_error_messages {
   # Syntax
   {
     compile_not_ok_file('TestCase::CompileError::Class::NotClosed');
+    {
+      my $source = 'class Tmp { static method main : void () {} } class Tmp2 { static method main : void () {} }';
+      compile_not_ok($source, qr/Unexpected token "class"/);
+    }
   }
   
   # Class name
@@ -613,12 +610,79 @@ sub print_error_messages {
     compile_not_ok_file('TestCase::CompileError::Literal::Character::InvalidCharacterLiteralEmpty', qr/A character literal can't be empty/);
     compile_not_ok_file('TestCase::CompileError::Literal::Character::InvalidCharacterLiteral', qr/\QInvalid charater literal escape character "\A"/);
     compile_not_ok_file('TestCase::CompileError::Literal::Character::NotEnd', qr/A character literal must ends with "'"/);
-    compile_not_ok_file('TestCase::CompileError::Literal::Character::InvalidHexAscii1', qr/\QAfter "\x" of the charater literal hexadecimal escape character, one or tow hexadecimal numbers must follow/);
+    compile_not_ok_file('TestCase::CompileError::Literal::Character::InvalidHexAscii1', qr/\QAfter "\x" of the hexadecimal escape character, one or tow hexadecimal numbers must follow/);
     compile_not_ok_file('TestCase::CompileError::Literal::Character::InvalidHexAscii2', qr/A character literal must ends with "'"/);
     {
-      # Invalid "_"
       my $source = q|class Tmp { static method main : void () { '\x{a' } }|;
-      compile_not_ok($source, qr/The charater literal hexadecimal escape character that has the opening "\{" must have the closing "\}"/);
+      compile_not_ok($source, qr/The hexadecimal escape character that has the opening "\{" must have the closing "\}"/);
+    }
+    {
+      my $source = q|class Tmp { static method main : void () { '\xaz' } }|;
+      compile_not_ok($source, qr/A character literal must ends with "'"/);
+    }
+  }
+
+  # String literal
+  {
+    {
+      my $source = q|class Tmp { static method main : void () { "Foo \xg Bar" } }|;
+      compile_not_ok($source, qr/\QAfter "\x" of the hexadecimal escape character, one or tow hexadecimal numbers must follow/);
+    }
+    {
+      my $source = q|class Tmp { static method main : void () { "Foo \x{a Bar" } }|;
+      compile_not_ok($source, qr/The hexadecimal escape character that has the opening "\{" must have the closing "\}"/);
+    }
+    {
+      my $source = q|class Tmp { static method main : void () { "\u" }|;
+      compile_not_ok($source, qr/Invalid string literal escape character "\\u"/);
+    }
+    
+    # Unicode escape character
+    {
+      {
+        my $source = q|class Tmp { static method main : void () { "\N{U+}" }|;
+        compile_not_ok($source, qr/After "\\N\{U\+" of the Unicode escape character, one or more than one hexadecimal numbers must follow/);
+      }
+      {
+        my $source = q|class Tmp { static method main : void () { "\N{U+FFFFFFFFA}" }|;
+        compile_not_ok($source, qr/Too big Unicode escape character/);
+      }
+      {
+        my $source = q|class Tmp { static method main : void () { "\N{U+DFFF}" }|;
+        compile_not_ok($source, qr/The code point of Unicode escape character must be a Unicode scalar value/);
+      }
+      {
+        my $source = q|class Tmp { static method main : void () { "\N{U+DFFF}" }|;
+        compile_not_ok($source, qr/The code point of Unicode escape character must be a Unicode scalar value/);
+      }
+      {
+        my $source = q|class Tmp { static method main : void () { "\N{U+D800}" }|;
+        compile_not_ok($source, qr/The code point of Unicode escape character must be a Unicode scalar value/);
+      }
+    }
+    {
+      my $source = q|class Tmp { static method main : void () { " } }|;
+      compile_not_ok($source, qr/A string literal must be end with '"'/);
+    }
+    {
+      my $source = q|class Tmp { static method main : void () { "$foo->{foo-" }|;
+      compile_not_ok($source, qr/Getting field in a string literal must be closed with "}"/);
+    }
+    {
+      my $source = q|class Tmp { static method main : void () { "$foo->[3-" }|;
+      compile_not_ok($source, qr/Getting array element in a string literal must be closed with "]"/);
+    }
+    {
+      my $source = q|class Tmp { static method main : void () { "$foo->bar" }|;
+      compile_not_ok($source, qr/\QThe character after "->" in a string literal must be "[" or "{"/);
+    }
+  }
+  
+  # Block
+  {
+    {
+      my $source = q|class Tmp { static method main : void () { {} }|;
+      compile_not_ok($source, qr/Unexpected token "}"/);
     }
   }
 }

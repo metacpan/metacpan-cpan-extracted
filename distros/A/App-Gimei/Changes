@@ -1,5 +1,10 @@
 Revision history for Perl extension App-Gimei
 
+v0.1.0 2022-06-01T04:00:43Z
+
+    - support 'name:sex'
+    - add 'Capture::Tiny' to cpanfile
+
 v0.0.1 2022-05-31T03:56:53Z
 
     - original version

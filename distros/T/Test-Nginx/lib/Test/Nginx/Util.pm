@@ -3,7 +3,7 @@ package Test::Nginx::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use base 'Exporter';
 
@@ -20,6 +20,7 @@ use Scalar::Util qw( looks_like_number );
 use IO::Socket::INET;
 use IO::Socket::UNIX;
 use Test::LongString;
+use POSIX ":sys_wait_h";
 use Carp qw( croak );
 
 our $ConfigVersion;
@@ -30,6 +31,8 @@ our $NoLongString = undef;
 our $FirstTime = 1;
 
 our $ReusePort = $ENV{TEST_NGINX_REUSE_PORT};
+
+our $UseHttp3 = $ENV{TEST_NGINX_USE_HTTP3};
 
 our $UseHttp2 = $ENV{TEST_NGINX_USE_HTTP2};
 
@@ -45,6 +48,7 @@ our $NoNginxManager = $ENV{TEST_NGINX_NO_NGINX_MANAGER} || 0;
 our $Profiling = 0;
 
 sub use_http2 ($);
+sub use_http3 ($);
 
 our $InSubprocess;
 our $RepeatEach = 1;
@@ -66,6 +70,8 @@ our $PostponeOutput = $ENV{TEST_NGINX_POSTPONE_OUTPUT};
 
 our $Timeout = $ENV{TEST_NGINX_TIMEOUT} || 3;
 
+our $QuicIdleTimeout = $ENV{TEST_NGINX_QUIC_IDLE_TIMEOUT} || 0.6;
+
 our $CheckLeak = $ENV{TEST_NGINX_CHECK_LEAK} || 0;
 
 our $Benchmark = $ENV{TEST_NGINX_BENCHMARK} || 0;
@@ -78,8 +84,31 @@ our $ServerAddr = '127.0.0.1';
 
 our $ServerName = 'localhost';
 
+our $Http3SSLCrt = $ENV{TEST_NGINX_HTTP3_CRT};
+our $Http3SSLCrtKey = $ENV{TEST_NGINX_HTTP3_KEY};;
+
+our $ValgrindExtraTimeout = 0.3;
+
+if ($UseHttp2 && $UseHttp3) {
+    die "Ambiguous: both TEST_NGINX_USE_HTTP3 and TEST_NGINX_USE_HTTP2 are set.\n";
+}
+
+sub bail_out (@);
+
+if ($UseHttp3 && (!defined $Http3SSLCrt || !defined $Http3SSLCrtKey)) {
+    warn <<_EOC_;
+Please generate the certificate/key pair using the following command,
+and set TEST_NGINX_HTTP3_CRT and TEST_NGINX_HTTP3_KEY enviroment variables:
+  openssl req -x509 -newkey rsa:4096 -keyout http3.key -out http3.crt -days \\
+  7000 -nodes -subj '/CN=localhost' 2> /dev/null
+_EOC_
+    die "certificate/key pair not found";
+}
+
+our $ServerConfigHttp3 = '';
+
 our $WorkerUser = $ENV{TEST_NGINX_WORKER_USER};
-if (defined $WorkerUser && $WorkerUser !~ /^\w+(?:\s+\w+)?$/) {
+if (defined $WorkerUser && $WorkerUser !~ /^\w[-\w]+(?:\s+\w[-\w]+)?$/) {
     die "Bad value in the env TEST_NGINX_WORKER_USER: $WorkerUser\n";
 }
 
@@ -183,7 +212,9 @@ sub gen_rand_port (;$$) {
     my $rand_port;
 
     for (my $i = 0; $i < $tries; $i++) {
-        my $port = int(rand 63550) + 1985;
+        # NB: reserved ports for stream_server_config* (1..3)
+        # 1984 + 3 + 1 = 1988
+        my $port = int(rand 63547) + 1988;
 
         next if $used_ports->{$port};
 
@@ -206,6 +237,44 @@ sub gen_rand_port (;$$) {
     }
 
     return $rand_port;
+}
+
+sub is_udp_port_used($) {
+    my $port = shift;
+    my $filename = "/proc/net/udp";
+
+    open my $fh, $filename or die "Could not open $filename. $!";
+    while (<$fh>) {
+        my $line = $_;
+        if ($line =~ /^ *\d+: [0-9A-F]+:([0-9A-F]+) /) {
+            if ($port == hex($1)) {
+                close $fh;
+                return 1;
+            }
+        }
+    }
+
+    close $fh;
+    return 0;
+}
+
+sub is_tcp_port_used($) {
+    my $port = shift;
+    my $filename = "/proc/net/tcp";
+
+    open my $fh, $filename or die "Could not open $filename. $!";
+    while (<$fh>) {
+        my $line = $_;
+        if ($line =~ /^ *\d+: [0-9A-F]+:([0-9A-F]+) /) {
+            if ($port == hex($1)) {
+                close $fh;
+                return 1;
+            }
+        }
+    }
+
+    close $fh;
+    return 0;
 }
 
 sub no_long_string () {
@@ -278,12 +347,10 @@ sub use_hup() {
 our @CleanupHandlers;
 our @BlockPreprocessors;
 
-sub bail_out (@);
-
 our $Randomize              = $ENV{TEST_NGINX_RANDOMIZE};
 our $NginxBinary            = $ENV{TEST_NGINX_BINARY} || 'nginx';
 our $Workers                = 1;
-our $WorkerConnections      = 64;
+our $WorkerConnections      = $ENV{TEST_NGINX_USE_HTTP3} ? 1024 : 64;
 our $LogLevel               = $ENV{TEST_NGINX_LOG_LEVEL} || 'debug';
 our $MasterProcessEnabled   = $ENV{TEST_NGINX_MASTER_PROCESS} || 'off';
 our $DaemonEnabled          = 'on';
@@ -418,6 +485,7 @@ sub master_process_enabled (@) {
 
 our @EXPORT = qw(
     use_http2
+    use_http3
     env_to_nginx
     is_str
     check_accum_error_log
@@ -480,6 +548,8 @@ our @EXPORT = qw(
     server_port_for_client
     no_nginx_manager
     use_hup
+    is_udp_port_used
+    is_tcp_port_used
 );
 
 
@@ -566,28 +636,43 @@ sub kill_process ($$$) {
     my ($pid, $wait, $name) = @_;
 
     if ($wait) {
-        eval {
-            if (defined $pid) {
+        if (defined $pid) {
+            if ($ENV{TEST_NGINX_FAST_SHUTDOWN}) {
+                if ($Verbose) {
+                    warn "sending TERM signal to $pid";
+                }
+
+                kill(SIGTERM, $pid);
+
+            } else {
                 if ($Verbose) {
                     warn "sending QUIT signal to $pid";
                 }
 
                 kill(SIGQUIT, $pid);
             }
+        }
 
-            if ($Verbose) {
-                warn "waitpid timeout: ", timeout();
-            }
+        if ($Verbose) {
+            warn "waitpid timeout: ", timeout();
+        }
 
-            local $SIG{ALRM} = sub { die "alarm\n" };
-            alarm timeout();
-            waitpid($pid, 0);
-            alarm 0;
-        };
+        my $timeout_val = timeout();
+        while ($timeout_val > 0 && is_running($pid)) {
+            waitpid($pid, WNOHANG);
+            sleep 0.05;
+            $timeout_val -= 0.05;
+        }
 
-        if ($@) {
-            if ($Verbose) {
-                warn "$name - WARNING: child process $pid timed out.\n";
+        if (is_running($pid)) {
+            warn "$name - timeout when waiting for the process $pid to exit";
+            if (getpgrp($pid) == $pid) {
+                kill(SIGKILL, -$pid);
+                sleep 0.05;
+
+            } else {
+                kill(SIGKILL, $pid);
+                waitpid($pid, 0);
             }
         }
     }
@@ -621,8 +706,15 @@ sub kill_process ($$$) {
     #system("ps aux|grep $pid > /dev/stderr");
     warn "$name - WARNING: killing the child process $pid with force...";
 
-    kill(SIGKILL, $pid);
-    waitpid($pid, 0);
+    if (getpgrp($pid) == $pid) {
+        kill(SIGKILL, -$pid);
+        sleep 0.05;
+
+    } else {
+        kill(SIGKILL, $pid);
+        waitpid($pid, 0);
+    }
+
 
     if (is_running($pid)) {
         local $SIG{ALRM} = sub { die "alarm\n" };
@@ -734,6 +826,7 @@ sub run_tests () {
             $hdl->($block);
         }
 
+        $block->set_value("name", $0 . " " . $block->name);
         run_test($block);
 
         $PrevBlock = $block;
@@ -982,12 +1075,40 @@ _EOC_
 
     my $listen_opts = '';
 
-    if (use_http2($block)) {
+    $ServerConfigHttp3 = '';
+    if (use_http3($block)) {
+        if ($UseHttp3 && !defined $block->http3) {
+            $ServerConfigHttp3 = "ssl_protocols TLSv1.3;";
+
+            if (defined $Http3SSLCrt) {
+                $ServerConfigHttp3 .= "ssl_certificate $Http3SSLCrt;";
+            }
+
+            if (defined $Http3SSLCrtKey) {
+                $ServerConfigHttp3 .= "ssl_certificate_key $Http3SSLCrtKey;";
+            }
+        }
+
+    } elsif (use_http2($block)) {
         $listen_opts .= " http2";
     }
 
     if ($ReusePort) {
         $listen_opts .= " reuseport";
+    }
+
+    my $keepalive_timeout = 68000;
+    if (use_http3($block)) {
+        my $keepalive_timeout_sec = $QuicIdleTimeout;
+        if ($block->quic_max_idle_timeout) {
+            $keepalive_timeout_sec = $block->quic_max_idle_timeout;
+        }
+
+        if ($UseValgrind) {
+            $keepalive_timeout_sec += $ValgrindExtraTimeout;
+        }
+
+        $keepalive_timeout = int($keepalive_timeout_sec * 1000);
     }
 
     print $out <<_EOC_;
@@ -1001,14 +1122,32 @@ http {
     #access_log off;
 
     default_type text/plain;
-    keepalive_timeout  68;
+    keepalive_timeout  ${keepalive_timeout}ms;
 
 $http_config
-
     server {
         listen          $ServerPort$listen_opts;
-        server_name     '$server_name';
+_EOC_
 
+    # when using http3, wo both listen on tcp for http and udp for http3
+    if (use_http3($block)) {
+        my $h3_listen_opts = $listen_opts;
+        if ($h3_listen_opts !~ /\breuseport\b/) {
+            $h3_listen_opts .= " reuseport";
+        }
+
+        print $out <<_EOC_;
+        listen          $ServerPort$h3_listen_opts http3;
+_EOC_
+    } else {
+        print $out <<_EOC_;
+        #placeholder
+_EOC_
+    }
+
+    print $out <<_EOC_;
+        server_name     '$server_name';
+        $ServerConfigHttp3
         client_max_body_size 30M;
         #client_body_buffer_size 4k;
 
@@ -1104,7 +1243,7 @@ sub get_nginx_version () {
         bail_out("Failed to get the version of the Nginx in PATH: $out");
     }
 
-    if ($out =~ m{built with OpenSSL (\d+)\.(\d+)\.(\d+)([a-z])}s) {
+    if ($out =~ m{built with OpenSSL (\d+)\.(\d+)\.(\d+)([a-z])?}s) {
         $OpenSSLVersion = get_canon_version_for_OpenSSL($1, $2, $3, $4);
     }
 
@@ -1161,12 +1300,15 @@ sub test_config_version ($$) {
     for (my $tries = 1; $tries <= $total; $tries++) {
 
         my $extra_curl_opts = '';
+        my $http_protocol = "http";
 
         if (use_http2($block)) {
             $extra_curl_opts .= ' --http2 --http2-prior-knowledge';
         }
 
-        my $cmd = "curl$extra_curl_opts -sS -H 'Host: Test-Nginx' --connect-timeout 2 'http://$ServerAddr:$ServerPort/ver'";
+        #server Test-Nginx only listen on http(tcp port) when http3 is enabled
+
+        my $cmd = "curl$extra_curl_opts -sS -H 'Host: Test-Nginx' --connect-timeout 2 '$http_protocol://$ServerAddr:$ServerPort/ver'";
         #warn $cmd;
         my $ver = `$cmd`;
         #chop $ver;
@@ -1692,6 +1834,34 @@ sub run_test ($) {
                         if (system("kill -HUP $pid") == 0) {
                             sleep $TestNginxSleep * 3;
 
+                            # wait for http3 connections to timeout
+                            # so older nginx can exit
+                            if (use_http3($block)) {
+                                my $idle_time = $QuicIdleTimeout;
+                                if ($block->quic_max_idle_timeout) {
+                                    $idle_time = $block->quic_max_idle_timeout;
+                                }
+
+                                if ($UseValgrind) {
+                                    $idle_time += $ValgrindExtraTimeout;
+                                }
+
+                                sleep (0.1 + $idle_time);
+                                my $remain = 1.0;
+                                while ($remain >= 0) {
+                                    my $shutting = `pgrep -P $pid | xargs -n1 ps --noheader -o cmd -p | grep shutting`;
+                                    if ($shutting eq "") {
+                                        last;
+                                    }
+
+                                    $remain -= 0.1;
+                                }
+
+                                if ($remain <= 0.0) {
+                                    warn "$name - nginx shutting down timeout.\n";
+                                }
+                            }
+
                             if ($Verbose) {
                                 warn "skip starting nginx from scratch\n";
                             }
@@ -1897,6 +2067,7 @@ start_nginx:
                     # child process
                     #my $rc = system($cmd);
 
+                    setpgrp;
                     my $tb = Test::More->builder;
                     $tb->no_ending(1);
 
@@ -2023,7 +2194,7 @@ request:
         #warn "Use hup: $UseHup, i: $i\n";
 
         if ($Verbose) {
-            warn "Run the test block...\n";
+            warn "Run the test block ", $block->name, " ...\n";
         }
 
         if (($CheckLeak || $Benchmark) && defined $block->tcp_listen) {
@@ -2043,6 +2214,8 @@ request:
         if (!($CheckLeak || $Benchmark) && defined $block->tcp_listen) {
 
             my $target = $block->tcp_listen;
+
+            $target = expand_env_in_text($target, $name, $rand_ports);
 
             my $reply = $block->tcp_reply;
             if (!defined $reply && !defined $block->tcp_shutdown) {
@@ -2555,7 +2728,8 @@ retry:
                         warn "sending KILL signal to $pid";
                     }
 
-                    kill(SIGKILL, $pid);
+                    # kill process group, including children
+                    kill(SIGKILL, -$pid);
                     waitpid($pid, 0);
 
                     if (!unlink($PidFile) && -f $PidFile) {
@@ -2564,6 +2738,19 @@ retry:
 
                 } else {
                     #warn "nginx killed";
+                    waitpid($pid, WNOHANG);
+                    my $timeout_val = 1.0;
+                    while ($timeout_val > 0 && is_running($pid)) {
+                        waitpid($pid, WNOHANG);
+                        sleep 0.05;
+                        $timeout_val -= 0.05;
+                    }
+
+                    if (is_running($pid)) {
+                        warn "$name - timeout when waiting for the process $pid to exit";
+                        kill(SIGKILL, $pid);
+                        sleep 0.05;
+                    }
                 }
 
             } else {
@@ -2638,6 +2825,10 @@ sub use_http2 ($) {
         return $cached;
     }
 
+    if (defined $block->no_http2) {
+        return undef;
+    }
+
     if (defined $block->http2) {
         if ($block->raw_request) {
             bail_out("cannot use --- http2 with --- raw_request");
@@ -2680,6 +2871,42 @@ sub use_http2 ($) {
             return undef;
         }
 
+        if (defined $block->http3) {
+            warn "WARNING: ", $block->name, " - explicitly requires HTTP/3, so will not use HTTP/2\n";
+            $block->set_value("test_nginx_enabled_http2", 0);
+            return undef;
+        }
+
+        my $pat = qr{(proxy_pass .*:\$(server_port|TEST_NGINX_SERVER_PORT)
+                    | ngx.req.raw_header
+                    | lua_check_client_abort
+                    | ngx.location.capture
+                    | ngx.req.socket
+                    | ngx.req.read_body)}x;
+        if (defined $block->config) {
+            if ($block->config =~ $pat) {
+                warn "WARNING: ", $block->name, " - $1 does not support in HTTP/2\n";
+                $block->set_value("test_nginx_enabled_http2", 0);
+                return undef;
+            }
+        }
+
+        if (defined $block->user_files) {
+            if ($block->user_files =~ $pat) {
+                warn "WARNING: ", $block->name, " - $1 does not support HTTP/2\n";
+                $block->set_value("test_nginx_enabled_http2", 0);
+                return undef;
+            }
+        }
+
+        if (defined $block->http_config) {
+            if ($block->http_config=~ $pat) {
+                warn "WARNING: ", $block->name, " - can not listen on HTTP and HTTP/2 at the same time, so will no use HTTP2\n";
+                $block->set_value("test_nginx_enabled_http2", 0);
+                return undef;
+            }
+        }
+
         $block->set_value("test_nginx_enabled_http2", 1);
 
         if (!$LoadedIPCRun) {
@@ -2691,6 +2918,85 @@ sub use_http2 ($) {
     }
 
     $block->set_value("test_nginx_enabled_http2", 0);
+    return undef;
+}
+
+
+sub use_http3 ($) {
+    my $block = shift;
+    my $cached = $block->test_nginx_enabled_http3;
+
+    if (defined $cached) {
+        return $cached;
+    }
+
+    if (defined $block->no_http3) {
+        return undef;
+    }
+
+    if (defined $block->http3) {
+        if ($block->raw_request) {
+            bail_out("cannot use --- http3 with --- raw_request");
+        }
+
+        if ($block->pipelined_requests) {
+            bail_out("cannot use --- http3 with --- pipelined_requests");
+        }
+
+        if (defined $block->http2) {
+            bail_out("cannot use --- http3 with --- http2");
+        }
+
+        $block->set_value("test_nginx_enabled_http3", 1);
+
+        if (!$LoadedIPCRun) {
+            require IPC::Run;
+            $LoadedIPCRun = 1;
+        }
+
+        return 1;
+    }
+
+    if ($UseHttp3) {
+        if ($block->raw_request) {
+            warn "WARNING: ", $block->name, " - using raw_request HTTP/2, will not use HTTP/3\n";
+            $block->set_value("test_nginx_enabled_http3", 0);
+            return undef;
+        }
+
+        if ($block->pipelined_requests) {
+            warn "WARNING: ", $block->name, " - using pipelined_requests, will not use HTTP/3\n";
+            $block->set_value("test_nginx_enabled_http3", 0);
+            return undef;
+        }
+
+        if (!defined $block->request) {
+            $block->set_value("test_nginx_enabled_http3", 0);
+            return undef;
+        }
+
+        if (!ref $block->request && $block->request =~ m{HTTP/1\.0}s) {
+            warn "WARNING: ", $block->name, " - explicitly requires HTTP 1.0, so will not use HTTP/3\n";
+            $block->set_value("test_nginx_enabled_http3", 0);
+            return undef;
+        }
+
+        if (defined $block->http2) {
+            warn "WARNING: ", $block->name, " - explicitly requires HTTP/2, so will not use HTTP/3\n";
+            $block->set_value("test_nginx_enabled_http3", 0);
+            return undef;
+        }
+
+        $block->set_value("test_nginx_enabled_http3", 1);
+
+        if (!$LoadedIPCRun) {
+            require IPC::Run;
+            $LoadedIPCRun = 1;
+        }
+        return 1;
+    }
+
+    $block->set_value("test_nginx_enabled_http3", 0);
     return undef;
 }
 

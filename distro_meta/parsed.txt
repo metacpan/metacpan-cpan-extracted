@@ -79180,3 +79180,17 @@ S/SK/SKIM/Tags-HTML-Page-End-0.05.tar.gz
 S/SK/SKIM/Wikibase-Datatype-0.12.tar.gz
 O/OA/OALDERS/WWW-Mechanize-2.08.tar.gz
 A/AS/ASB/XML-Schematron-1.10.tar.gz
+C/CH/CHOROBA/Acme-Array-MaxSize-0.04.tar.gz
+B/BR/BRTASTIC/Algorithm-QuadTree-XS-0.02.tar.gz
+Y/YO/YOUPONG/App-Gimei-v0.1.0.tar.gz
+P/PE/PERLANCAR/App-ThisDist-0.014.tar.gz
+B/BL/BLHOTSKY/CLI-Helpers-2.0.tar.gz
+C/CA/CARELINE/Firewall-Controller-0.001.tar.gz
+J/JH/JHTHORSEN/Getopt-App-0.06.tar.gz
+E/ET/ETHER/OpenAPI-Modern-0.031.tar.gz
+K/KF/KFLY/JSON-UnblessObject-0.01.tar.gz
+O/OV/OVID/MooseX-Extended-0.10.tar.gz
+B/BL/BLHOTSKY/POE-Component-ElasticSearch-Indexer-0.015.tar.gz
+K/KI/KIMOTO/SPVM-0.9601.tar.gz
+C/CH/CHOROBA/Template-Plugin-TallyMarks-0.01.tar.gz
+A/AG/AGENT/Test-Nginx-0.30.tar.gz

@@ -3,6 +3,7 @@ Makefile
 Makefile\.old
 Build
 Build\.bat
+README.pod
 META\.
 MYMETA\.
 \.build/

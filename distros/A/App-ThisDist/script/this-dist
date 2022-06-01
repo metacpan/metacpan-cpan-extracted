@@ -10,9 +10,9 @@ use Cwd;
 use Getopt::Long;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-12-02'; # DATE
+our $DATE = '2022-05-03'; # DATE
 our $DIST = 'App-ThisDist'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 my ($quiet, $extract_version);
 Getopt::Long::Configure("bundling", "no_ignore_case");
@@ -49,7 +49,7 @@ this-dist - Return name of Perl distribution associated with the current directo
 
 =head1 VERSION
 
-This document describes version 0.013 of this-dist (from Perl distribution App-ThisDist), released on 2021-12-02.
+This document describes version 0.014 of this-dist (from Perl distribution App-ThisDist), released on 2022-05-03.
 
 =head1 SYNOPSIS
 
@@ -144,7 +144,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

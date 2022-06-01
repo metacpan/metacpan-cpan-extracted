@@ -315,9 +315,9 @@ t/builder_config/zlib.def
 t/builder_config_exe.t
 t/builder_link_info.pl
 t/builder_object_file_info.t
-t/compile_error.pl
 t/compile_error.t
 t/compile_error_dist.pl
+t/compile_error_perl_program.pl
 t/copy_default_to_precompile.pl
 t/default/000_use_spvm.t
 t/default/001_use_empty_class.t
@@ -466,9 +466,6 @@ t/default/lib/SPVM/TestCase/CompileError/LocalVar/LocalVarNameContainsUnderScore
 t/default/lib/SPVM/TestCase/CompileError/LocalVar/LocalVarNameEndColon2.spvm
 t/default/lib/SPVM/TestCase/CompileError/LocalVar/LocalVarNameInvalidColon.spvm
 t/default/lib/SPVM/TestCase/CompileError/LocalVar/LocalVarNameStartDigit.spvm
-t/default/lib/SPVM/TestCase/CompileError/LogicalOperator/AndNotExpression.spvm
-t/default/lib/SPVM/TestCase/CompileError/LogicalOperator/NotNotExpression.spvm
-t/default/lib/SPVM/TestCase/CompileError/LogicalOperator/OrNotExpression.spvm
 t/default/lib/SPVM/TestCase/CompileError/Method/INIT.spvm
 t/default/lib/SPVM/TestCase/CompileError/Method/MethodNameContainsUnderScoreTwice.spvm
 t/default/lib/SPVM/TestCase/CompileError/Method/MethodNameStartDigit.spvm
@@ -722,7 +719,6 @@ t/exe/lib/SPVM/TestCase/NativeAPI2.native/src/noneed.txt
 t/exe/lib/SPVM/TestCase/NativeAPI2.spvm
 t/exe/myexe.config
 t/exe/myexe.debug.config
-t/exe/myexe.default.config
 t/exe/myexe.no_precompile.config
 t/exe/myexe.no_precompile_no_compiler_api.config
 t/exe/myexe.pl

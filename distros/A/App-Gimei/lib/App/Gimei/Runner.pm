@@ -21,15 +21,11 @@ sub parse_option {
     $opts_ref->{n}   = 1;
     $opts_ref->{sep} = ', ';
 
-    my $p = Getopt::Long::Parser->new(
-                config => ["no_ignore_case"], );
+    my $p = Getopt::Long::Parser->new( config => ["no_ignore_case"], );
 
     local $SIG{__WARN__} = sub { die "Error: $_[0]" };
-    my $err = $p->getoptionsfromarray( $args_ref, $opts_ref,
-                "help|h",
-                "version|v",
-                "n=i",
-                "sep=s", );
+    my $err = $p->getoptionsfromarray( $args_ref, $opts_ref, "help|h", "version|v", "n=i",
+        "sep=s", );
 
     if ( $opts_ref->{n} < 1 ) {
         die
@@ -92,11 +88,9 @@ sub execute_tokens {
 
     $token = shift @$tokens_ref;
     if ( $token eq 'name' || $token eq 'male' || $token eq 'female' ) {
-        $word_type = 'name';
-        $word      = subtype_name( $tokens_ref, $words_ref->{$token} );
+        ( $word, $word_type ) = subtype_name( $tokens_ref, $words_ref->{$token} );
     } elsif ( $token eq 'address' ) {
-        $word_type = 'address';
-        $word      = subtype_address( $tokens_ref, $words_ref->{$token} );
+        ( $word, $word_type ) = subtype_address( $tokens_ref, $words_ref->{$token} );
     } else {
         die "Error: unknown word_type: $token\n";
     }
@@ -106,23 +100,27 @@ sub execute_tokens {
 
 sub subtype_name {
     my ( $tokens_ref, $word ) = @_;
-    my ( $token, $subtype, $call, $method );
+    my ( $token, $subtype, $call, $word_type );
 
     my %map = (
-        'family' => 'family',
-        'last'   => 'family',
-        'given'  => 'given',
-        'first'  => 'given'
+        family => [ 'family', 'name' ],
+        last   => [ 'family', 'name' ],
+        given  => [ 'given',  'name' ],
+        first  => [ 'given',  ' name' ],
+        gender => [ 'gender', 'gender' ],
+        sex    => [ 'gender', 'gender' ],
     );
 
-    $token = @$tokens_ref[0] // '';
-    if ( $method = $map{$token} ) {
+    $word_type = 'name';
+    $token     = @$tokens_ref[0] // '';
+    if ( my $m = $map{$token} ) {
         shift @$tokens_ref;
-        $call = $word->can($method) or die "system err";
-        $word = $word->$call();
+        $call      = $word->can( $m->[0] ) or die "system err";
+        $word      = $word->$call();
+        $word_type = $m->[1];
     }
 
-    return $word;
+    return ( $word, $word_type );
 }
 
 sub subtype_address {
@@ -136,7 +134,7 @@ sub subtype_address {
         $word = $word->$call();
     }
 
-    return $word;
+    return ( $word, 'address' );
 }
 
 # romaji not supported in WORD_TYPE = 'address'
@@ -148,10 +146,12 @@ sub render {
         $token = "kanji";
     }
 
-    if (   $token eq 'romaji'
-        && $word_type eq 'address' )
-    {
+    if ( $word_type eq 'address' && $token eq 'romaji' ) {
         die "Error: unknown subtype or rendering: $token\n";
+    }
+
+    if ( $word_type eq 'gender' ) {
+        return $word;
     }
 
     my $call = $word->can($token);

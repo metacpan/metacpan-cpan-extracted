@@ -3,8 +3,8 @@ NAME
     with current directory
 
 VERSION
-    This document describes version 0.013 of App::ThisDist (from Perl
-    distribution App-ThisDist), released on 2021-12-02.
+    This document describes version 0.014 of App::ThisDist (from Perl
+    distribution App-ThisDist), released on 2022-05-03.
 
 DESCRIPTION
     See included scripts:
@@ -58,7 +58,7 @@ CONTRIBUTING
     me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020 by perlancar
+    This software is copyright (c) 2022, 2020 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

@@ -8,7 +8,7 @@ use Carp qw(croak);
 use Getopt::Long ();
 use List::Util qw(first);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 our ($OPT_COMMENT_RE, $OPTIONS, $SUBCOMMANDS, %APPS) = (qr{\s+\#\s+});
 
@@ -320,8 +320,6 @@ run.
 L<Getopt::App> also supports infinite nested L<subcommands|/getopt_subcommands>
 and a method for L<bundling|/bundle> this module with your script to prevent
 depending on a module from CPAN.
-
-This module is currently EXPERIMENTAL, but is unlikely to change much.
 
 =head1 APPLICATION METHODS
 

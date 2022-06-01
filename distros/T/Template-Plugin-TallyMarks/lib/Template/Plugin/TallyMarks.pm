@@ -1,54 +1,104 @@
-=head1 Acme-Array-MaxSize
+package Template::Plugin::TallyMarks;
 
-=for HTML
-<a href="https://travis-ci.org/choroba/Acme-Array-MaxSize"><img src="https://api.travis-ci.org/choroba/Acme-Array-MaxSize.png?branch=master"></a>
-<a href="https://metacpan.org/pod/Acme::Array::MaxSize"><img src="https://badge.fury.io/pl/Acme-Array-MaxSize.svg"></a>
+use 5.006;
+use strict;
+use warnings;
 
-Use this module if you need an array that can't be larger than a given
-size.
+use parent 'Template::Plugin::Filter';
 
-  tie my @short, 'Acme::Array::MaxSize', 3;
-  @short = ( 1 .. 10 );      # 1 .. 3
-  push @short, 'a' .. 'z';   # still 1 .. 3
+=head1 NAME
 
-=head2 INSTALLATION
+Template::Plugin::TallyMarks - Convert numbers to tally marks.
 
-Use your favourite CPAN client to install this module. If it doesn't
-work, run the following commands:
+=head1 VERSION
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+Version 0.01
 
-=head2 SUPPORT AND DOCUMENTATION
+=cut
 
-After installing, you can find documentation for this module with the
-perldoc command.
+our $VERSION = '0.01';
 
-    perldoc Acme::Array::MaxSize
+
+=head1 SYNOPSIS
+
+The module implements a filter that changes a number into tally marks.
+
+    use Template;
+    my $tt = 'Template'->new;
+    $tt->process( \ '[% USE TallyMarks %][% n | tally_marks %]',
+                  { n => 12 },
+                  \ my $result );
+    print $result;  # <s>||||</s>&nbsp;<s>||||</s>&nbsp;||
+
+=head1 Filters
+
+=head2 tally_marks
+
+Transforms the input parameter into tally marks.
+
+=cut
+
+sub init {
+    my $self = shift;
+    $self->install_filter('tally_marks');
+    return $self
+}
+
+
+sub filter {
+    my ($self, $n) = @_;
+    return join '&nbsp;',
+                ('<s>||||</s>') x int($n / 5),
+                ('|' x ($n % 5)) || ()
+}
+
+=head1 AUTHOR
+
+E. Choroba, C<< <choroba at matfyz.cz> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-template-plugin-tallymarks at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Template-Plugin-TallyMarks>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Template::Plugin::TallyMarks
+
 
 You can also look for information at:
 
-=head3 GitHub, the module's repository (report bugs here)
+=over 4
 
-L<https://github.com/choroba/Acme-Array-MaxSize>
+=item * MetaCPAN
 
-=head3 AnnoCPAN, Annotated CPAN documentation
+L<https://metacpan.org/Template::Plugin::TallyMarks>
 
-L<http://annocpan.org/dist/Acme-Array-MaxSize>
+=item * GitHub Repository
 
-=head3 CPAN Ratings
+L<https://github.com/choroba/template-plugin-tallymarks/>
 
-L<http://cpanratings.perl.org/d/Acme-Array-MaxSize>
+=item * RT: CPAN's request tracker (report bugs here)
 
-=head3 Search CPAN
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Template-Plugin-TallyMarks>
 
-L<http://search.cpan.org/dist/Acme-Array-MaxSize/>
+=item * Search CPAN
 
-=head2 LICENSE AND COPYRIGHT
+L<https://metacpan.org/dist/Template-Plugin-TallyMarks/>
 
-Copyright (C) 2016 E. Choroba
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to Mohammad S Anwar for contribution.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2016 E. Choroba.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -86,4 +136,7 @@ CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
 CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
 =cut
+
+__PACKAGE__

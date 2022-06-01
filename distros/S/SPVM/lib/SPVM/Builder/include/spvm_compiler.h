@@ -6,14 +6,6 @@
 #include "spvm_typedecl.h"
 #include "spvm_native.h"
 
-enum {
-  SPVM_TOKE_C_STATE_VAR_EXPANSION_DEFAULT,
-  SPVM_TOKE_C_STATE_VAR_EXPANSION_FIRST_CONCAT,
-  SPVM_TOKE_C_STATE_VAR_EXPANSION_VAR,
-  SPVM_TOKE_C_STATE_VAR_EXPANSION_SECOND_CONCAT,
-  SPVM_TOKE_C_STATE_VAR_EXPANSION_DOUBLE_QUOTE,
-};
-
 // Parser information
 struct spvm_compiler {
   // OPs
@@ -62,7 +54,7 @@ struct spvm_compiler {
   char* befbufptr;
 
   // Next double quote start position
-  char* next_double_quote_start_bufptr;
+  char* next_string_literal_bufptr;
 
   // Expect method name
   int8_t expect_method_name;
@@ -73,11 +65,11 @@ struct spvm_compiler {
   // Before token is arrow
   int8_t before_token_is_arrow;
   
-  // Pasing start
-  int8_t parse_start;
+  // Parsing is not started
+  int8_t parse_not_started;
 
-  // Expect variable expansion start
-  int8_t state_var_expansion;
+  // State of variable expansion
+  int8_t var_expansion_state;
   
   // Current enum value
   int32_t current_enum_value;

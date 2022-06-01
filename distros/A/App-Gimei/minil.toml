@@ -1,5 +1,5 @@
 name = "App-Gimei"
-# badges = ["travis-ci.com"]
+badges = ['github-actions/test']
 authority="cpan:YOUPONG"
 
 module_maker="ModuleBuildTiny"

@@ -1,4 +1,100 @@
 Revision history for SPVM
+0.9601  2022-06-01
+        [CHANGE]
+        * Regex class support "i" (ignore case) option.
+        * Logical operator can be used as operands.
+          
+          my $ret = !1;
+          my $ret = 1 && 1;
+          my $ret = 1 || 1;
+        
+        [NON BACKWORD COMPATIBLE CHANGES]
+        * Change ByteList->new method definition
+          [Before]
+          static method new : ByteList ($array : byte[])
+          [After]
+          static method new : ByteList ($array : byte[]...)
+        * Change DoubleList->new method definition
+          [Before]
+          static method new : DoubleList ($array : double[])
+          [After]
+          static method new : DoubleList ($array : double[]...)
+        * Change FloatList->new method definition
+          [Before]
+          static method new : FloatList ($array : float[])
+          [After]
+          static method new : FloatList ($array : float[]...)
+        * Change Hash->new method definition
+          [Before]
+          static method new : Hash ($key_values : object[])
+          [After]
+          static method new : Hash ($key_values : object[]...)
+        * Change IntList->new method definition
+          [Before]
+          static method new : IntList ($array : int[])
+          [After]
+          static method new : IntList ($array : int[]...)
+        * Change List->new method definition
+          [Before]
+          static method new : List ($array : object[])
+          [After]
+          static method new : List ($array : object[]...)
+        * Change LongList->new method definition
+          [Before]
+          static method new : LongList ($array : long[])
+          [After]
+          static method new : LongList ($array : long[]...)
+        * Change ShortList->new method definition
+          [Before]
+          static method new : ShortList ($array : short[])
+          [After]
+          static method new : ShortList ($array : short[]...)
+        * Change StringList->new method definition
+          [Before]
+          static method new : StringList ($array : string[])
+          [After]
+          static method new : StringList ($array : string[]...)
+        * Change Regex->new method definition
+          [Before]
+          static method new : Regex ($re_str : string)
+          [After]
+          static method new : Regex ($re_str_and_options : string[]...)
+        [BUG FIX]
+        * Fix the bug that the tests of FreeBSD 9.1 fail.
+
+0.96  2022-05-25
+        [CHANGE]
+        * This is major version up from 0.95xx. SPVM language becomes a little more stable in my opinion.
+        * Support die statement without the operand again. This was remove at 0.9504(2021-02-10).
+          die;
+        * Add Fn->match method
+        * Simplify the compilation error messages of the character literal
+        * Support brace in the hexadecimal escape character
+          
+          '\x{A}'
+          '\x{6A}'
+          "Foo \x{A} Bar"
+          
+        * Support single character in the hexadecimal escape character
+        
+          '\xA'
+          "Foo \xA Bar"
+        * Improve the compilation error message of the Unicode escape character.
+        * Add the "cap1", "cap2", "cap3", "cap4", "cap5", "cap6", "cap7", "cap8", "cap9", "cap10" methods
+          to Regex class. These are corresponding to Perl's $1, $2, $3 ... $10.
+        * Improve the compilation error messages of variable expansion.
+        [BUG FIX]
+        * Fix bug that Regex don't work well in the following case.
+          my $result = Fn->replace("xyzAAAxyzAAA", "A+", "BBB", "g");
+        * Fix the bug that variable expansion doesn' support the arrow between braces or brackets such as "$minimals->[1]->{x}".
+          
+        [SPECIFICATION FIX]
+        * Add string literal escape character \$
+        * Hexadecimal escape charcter represents any value of byte type
+
+        [NON BACKWORD COMPATIBLE CHANGES]
+        * The unicode copde point of Unicode escape character must be a Unicode scalar value.
+        
 0.9517  2022-05-19
         [CHANGE]
         * Numeric literal error messages.

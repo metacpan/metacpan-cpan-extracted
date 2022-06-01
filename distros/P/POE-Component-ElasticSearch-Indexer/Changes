@@ -1,10 +1,22 @@
 ==================================================
-Changes from 2019-12-18 00:00:00 +0000 to present.
+Changes from 2020-06-01 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.014 at 2021-12-17 23:22:43 +0000
+version 0.015 at 2022-06-01 02:54:59 +0000
 ------------------------------------------
+
+  Change: 6364d6748a4f5451a7724981f26171b74732b070
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2022-06-01 02:49:23 +0000
+
+    Update to Support TLS and Basic Auth
+
+    * Adds `Protocol` parameter to support HTTPS * Adds
+    `POE::Component::SSLify` as a dependency * Adds `AuthUsername` for HTTP
+    Basic Auth, defaults to `$ENV{USER}` * Adds `AuthPassword` which, if set,
+    enables HTTP Basic Authorization * Fix argspec in
+    `file-to-elasticsearch.pl` 
 
   Change: f9e75de3442037557df899c997ab6f2d68228716
   Author: Brad Lhotsky <brad@divisionbyzero.net>
@@ -16,25 +28,6 @@ version 0.014 at 2021-12-17 23:22:43 +0000
     version check to the start so we know whether or not to include the `_type`
     element. 
 
-------------------------------------------
-version 0.013 at 2020-03-02 21:26:51 +0000
-------------------------------------------
-
-  Change: 1f0a2f75ff089ae9a9db02e726f3b968d4011351
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2020-03-02 13:26:51 +0000
-
-    Ready for 0.013 
-
-  Change: 58e5ea761c0e0b6c20d38a6b26f5c212de38f0ee
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2020-03-02 13:24:10 +0000
-
-    Set the DefaultType to '_doc'
-
-    This allows indexing to ElasticSearch 7.x without modifying the
-    `DefaultType` attribute. 
-
 =================================================
-Plus 12 releases after 2019-12-18 00:00:00 +0000.
+Plus 13 releases after 2020-06-01 00:00:00 +0000.
 =================================================

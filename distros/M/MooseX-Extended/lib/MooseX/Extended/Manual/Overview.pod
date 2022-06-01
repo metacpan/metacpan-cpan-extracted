@@ -13,7 +13,7 @@ MooseX::Extended::Manual::Overview - Work-in-progress overview for MooseX::Exten
 
 =head1 VERSION
 
-version 0.07
+version 0.10
 
 =head1 CONVERTING FROM MOOSE
 
@@ -151,7 +151,7 @@ Here's another fun bug:
 
     # later in your code
 
-    if ( $gbject->serial ) {
+    if ( $object->serial ) {
         # unreachable code
     }
 

@@ -26,13 +26,13 @@ my %DEFAULT = (
 );
 
 my ($opt,$usage) = describe_options('%c %o',
-    ['config|c:s', "Config file, default: $DEFAULT{config}",
+    ['config|c=s', "Config file, default: $DEFAULT{config}",
         { default => $DEFAULT{config}, callbacks => { "must be a readable file" => sub { -r $_[0] } } }
     ],
-    ['log4perl-config|L:s', "Log4perl Configuration to use, defaults to STDERR",
+    ['log4perl-config|L=s', "Log4perl Configuration to use, defaults to STDERR",
         { callbacks => { "must be a readable file" => sub { -r $_[0] } } }
     ],
-    ['stats-interval|s:i', "Seconds between displaying statistics, default: $DEFAULT{stats_interval}",
+    ['stats-interval|s=i', "Seconds between displaying statistics, default: $DEFAULT{stats_interval}",
         { default => $DEFAULT{stats_interval} },
     ],
     ['debug',       "Enable most verbose output" ],
@@ -113,6 +113,7 @@ sub main_start {
     my $es = $config->{elasticsearch} || {};
     $heap->{elasticsearch} = POE::Component::ElasticSearch::Indexer->spawn(
         Alias         => 'es',
+        Protocol      => $es->{protocol} || 'http',
         Servers       => $es->{servers} || [qw( localhost:9200 )],
         Timeout       => $es->{timeout} || 5,
         FlushInterval => $es->{flush_interval} || 10,
@@ -372,7 +373,7 @@ file-to-elasticsearch.pl - A simple utility to tail a file and index each line a
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

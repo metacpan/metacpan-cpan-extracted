@@ -11,6 +11,7 @@ dist.ini
 ex/bench.pl
 lib/Algorithm/QuadTree/XS.pm
 ppport.h
+t/01-use.t
 t/02-zones.t
 t/03-delete.t
 t/04-circles.t

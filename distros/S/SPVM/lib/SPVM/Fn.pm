@@ -10,8 +10,6 @@ SPVM::Fn - SPVM Starndard Functions
 
 =head1 SYNOPSYS
 
-=head2 SPVM
-
   use Fn;
   
   my $int8_max = Fn->INT8_MAX();
@@ -197,15 +195,6 @@ SPVM::Fn - SPVM Starndard Functions
     
     return $minimal1->{x} <=> $minimal2->{x} || $minimal1->{y} <=> $minimal2->{y};
   };
-
-=head2 Perl
-
-  use SPVM 'Fn';
-  
-  my $int8_max = SPVM::Fn->INT8_MAX();
-  my $int16_max = SPVM::Fn->INT16_MAX();
-  my $int32_max = SPVM::Fn->INT32_MAX();
-  my $int64_max = SPVM::Fn->INT64_MAX();
 
 =head1 DESCRIPTION
 
@@ -879,6 +868,23 @@ Convert uppercase string to lowercase string.
 
 Convert first chracter of string from uppercase to lowercase.
 
+=head2 match
+
+  static method match : Regex ($string : string, $regex_string : string, $regex_options_opt : string[]...) {
+
+If the string matches the regex with/without options, return the L<Regex|SPVM::Regex> object. Otherwise C<undef>.
+
+See also L<Regex|SPVM::Regex>.
+
+B<Examples:>
+
+  my $match = Fn->match("Foo Bar Baz", "^Foo.+Baz$");
+
+  my $match = Fn->match("Foo Bar Baz", "^Foo.+Baz$", "s");
+
+  my $m = Fn->match("abc\ndef", "(.+)", "s");
+  my $capture_first = $m->cap1;
+
 =head2 memcpy
 
   static method memcpy : void ($dest : object, $dest_byte_offset : int, $source : object, $source_byte_offset : int, $byte_length : int);
@@ -1194,7 +1200,7 @@ B<Examples:>
 
   static method repeat : double ($string : string, $count : int)
 
-Gets the repeat string.
+Get the repeat string.
 
 If the string is not defined, an exception will be thrown.
 
@@ -1204,6 +1210,39 @@ B<Examples:>
   
   # "abcabcabc"
   my $repeat_string = Fn->repeat("abc", 3);
+
+=head2 replace
+
+  static method replace : string (
+    $string : string,
+    $regex_string : string,
+    $replace_string_or_replacer : object,
+    $regex_options_opt : string[]...
+  )
+
+Replaces the string using a regular expression with/without options.
+
+The first argument is a string that the regular expression is performed.
+
+The second argument is a string that is a regular expression.
+
+The third argument is a replacement string or a L<Replacer|SPVM::Replacer> object.
+
+The 4th argument is the options of regular expression. This is optional.
+
+B<Examples:>
+  
+  # "xyzBBBxyzAAA"
+  my $result = Fn->replace("xyzAAAxyzAAA", "A+", "BBB");
+
+  # "xyzBBBxyzBBB"
+  my $result = Fn->replace("xyzAAAxyzAAA", "A+", "BBB", "g");
+
+  # "xyzaaaxyzAAA"
+  my $result = Fn->replace("xyzAAAxyzAAA", "(A+)", method : string ($re : Regex) { return Fn->lc($re->captures->[0]); });
+
+  # "xyzaaaxyzaaa"
+  my $result = Fn->replace("xyzAAAxyzAAA", "(A+)", method : string ($re : Regex) { return Fn->lc($re->captures->[0]); }, "g");
 
 =head2 rindex
 

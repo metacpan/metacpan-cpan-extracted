@@ -7,12 +7,12 @@ class Regex : precompile {
   use Regex::Replacer;
   use Regex::Pattern;
   use Fn;
-  use Hash;
   has patterns : List;
   has string_start : byte;
   has string_end : byte;
   has single_line_mode : byte;
   has ascii_mode : byte;
+  has ignore_case : byte;
   
   has captures : ro string[];
   
@@ -29,11 +29,15 @@ class Regex : precompile {
     STATUS_CHAR_CLASS,
   }
   
-  static method new : Regex ($re_str : string) {
+  static method new : Regex ($re_str_and_options : string[]...) {
     
-    my $self = Regex->_new_without_compile();
+    my $re_str = $re_str_and_options->[0];
+    my $options = (string)undef;
+    if (@$re_str_and_options > 1) {
+      $options = $re_str_and_options->[1];
+    }
     
-    $self->compile($re_str);
+    my $self = Regex->new_with_options($re_str, $options);
     
     return $self;
   }
@@ -62,6 +66,14 @@ class Regex : precompile {
           }
           $self->{ascii_mode} = 1;
           $options_h->set_int("a" => 1);
+        }
+        elsif ($option_char == 'i') {
+          my $found = $options_h->get("i");
+          if ($found) {
+            die "a option must be used once";
+          }
+          $self->{ignore_case} = 1;
+          $options_h->set_int("i" => 1);
         }
       }
     }
@@ -102,7 +114,7 @@ class Regex : precompile {
     
     my $status = Regex->STATUS_START();
     
-    my $char_class_uchar_min_maxs_list : IntList;
+    my $char_class_code_point_range_list : IntList;
     my $char_class_negate = 0;
     
     my $before_is_char_class_range = 0;
@@ -110,19 +122,19 @@ class Regex : precompile {
     my $is_capture = 0;
     my $is_capture_start = 0;
     
-    while ((my $uchar = Unicode->uchar($re_str, \$pos)) >= 0) {
+    while ((my $code_point = Unicode->uchar($re_str, \$pos)) >= 0) {
       if ($self->{string_end}) {
         die "\$ must be last of regex";
       }
       
       my $cur_is_char = 0;
-      my $cur_uchar_min_maxs : int[];
+      my $cur_code_point_range : int[];
       my $cur_negate = 0;
       
-      switch ($uchar) {
+      switch ($code_point) {
         case '\\': {
           my $next_uchar = Unicode->uchar($re_str, \$pos);
-          if ($uchar < 0) {
+          if ($code_point < 0) {
             die "Invalid regex. Last is \\ ";
           }
           
@@ -130,7 +142,7 @@ class Regex : precompile {
             case 'd': {
               if ($self->{ascii_mode}) {
                 $cur_is_char = 1;
-                $cur_uchar_min_maxs = [(int)'0', '9'];
+                $cur_code_point_range = [(int)'0', '9'];
               }
               else {
                 die "\d must be used with ascii option";
@@ -140,7 +152,7 @@ class Regex : precompile {
             case 'D': {
               if ($self->{ascii_mode}) {
                 $cur_is_char = 1;
-                $cur_uchar_min_maxs = [(int)'0', '9'];
+                $cur_code_point_range = [(int)'0', '9'];
                 $cur_negate = 1;
               }
               else {
@@ -151,7 +163,7 @@ class Regex : precompile {
             case 'w': {
               if ($self->{ascii_mode}) {
                 $cur_is_char = 1;
-                $cur_uchar_min_maxs = [(int)'0', '9', 'a', 'z', 'A', 'Z', '_', '_'];
+                $cur_code_point_range = [(int)'0', '9', 'a', 'z', 'A', 'Z', '_', '_'];
               }
               else {
                 die "\w  must be used with ascii option";
@@ -161,7 +173,7 @@ class Regex : precompile {
             case 'W': {
               if ($self->{ascii_mode}) {
                 $cur_is_char = 1;
-                $cur_uchar_min_maxs = [(int)'0', '9', 'a', 'z', 'A', 'Z', '_', '_'];
+                $cur_code_point_range = [(int)'0', '9', 'a', 'z', 'A', 'Z', '_', '_'];
                 $cur_negate = 1;
               }
               else {
@@ -172,7 +184,7 @@ class Regex : precompile {
             case 's': {
               if ($self->{ascii_mode}) {
                 $cur_is_char = 1;
-                $cur_uchar_min_maxs = [(int)' ', ' ', '\t', '\t', '\f', '\f', '\r', '\r', '\n', '\n'];
+                $cur_code_point_range = [(int)' ', ' ', '\t', '\t', '\f', '\f', '\r', '\r', '\n', '\n'];
               }
               else {
                 die "\s must be used with ascii option";
@@ -182,7 +194,7 @@ class Regex : precompile {
             case 'S': {
               if ($self->{ascii_mode}) {
                 $cur_is_char = 1;
-                $cur_uchar_min_maxs = [(int)' ', ' ', '\t', '\t', '\f', '\f', '\r', '\r', '\n', '\n'];
+                $cur_code_point_range = [(int)' ', ' ', '\t', '\t', '\f', '\f', '\r', '\r', '\n', '\n'];
                 $cur_negate = 1;
               }
               else {
@@ -196,14 +208,14 @@ class Regex : precompile {
               }
               # \: \- etc
               else {
-                my $uchar_min_maxs = [(int)$next_uchar, $next_uchar];
+                my $code_point_range = [(int)$next_uchar, $next_uchar];
                 if ($status == Regex->STATUS_CHAR_CLASS()) {
-                  $char_class_uchar_min_maxs_list->push($uchar_min_maxs->[0]);
-                  $char_class_uchar_min_maxs_list->push($uchar_min_maxs->[1]);
+                  $char_class_code_point_range_list->push($code_point_range->[0]);
+                  $char_class_code_point_range_list->push($code_point_range->[1]);
                 }
                 else {
                   $cur_is_char = 1;
-                  $cur_uchar_min_maxs = $uchar_min_maxs;
+                  $cur_code_point_range = $code_point_range;
                 }
               }
             }
@@ -213,25 +225,25 @@ class Regex : precompile {
         }
         default: {
           if ($status == Regex->STATUS_CHAR_CLASS()) {
-            if ($uchar == ']') {
+            if ($code_point == ']') {
               $status = Regex->STATUS_CONTINUE();
-              $cur_uchar_min_maxs = $char_class_uchar_min_maxs_list->to_array;
-              if (@$cur_uchar_min_maxs == 0) {
+              $cur_code_point_range = $char_class_code_point_range_list->to_array;
+              if (@$cur_code_point_range == 0) {
                 die "Emtpy character class";
               }
-              for (my $i = 0; $i < @$cur_uchar_min_maxs; $i += 2) {
-                my $min = $cur_uchar_min_maxs->[$i];
-                my $max = $cur_uchar_min_maxs->[$i + 1];
+              for (my $i = 0; $i < @$cur_code_point_range; $i += 2) {
+                my $min = $cur_code_point_range->[$i];
+                my $max = $cur_code_point_range->[$i + 1];
                 if ($max < $min) {
                   die "Invalid range character class";
                 }
               }
               
-              $char_class_uchar_min_maxs_list = IntList->new_len(0);
+              $char_class_code_point_range_list = IntList->new_len(0);
               $cur_is_char = 1;
               $cur_negate = $char_class_negate;
             }
-            elsif ($uchar == '-') {
+            elsif ($code_point == '-') {
               if ($before_is_char_class_range) {
                 die "- must not be repeat";
               }
@@ -240,28 +252,28 @@ class Regex : precompile {
               }
             }
             else {
-              if ($uchar == '^' && $char_class_uchar_min_maxs_list->length == 0) {
+              if ($code_point == '^' && $char_class_code_point_range_list->length == 0) {
                 $char_class_negate = 1;
               }
               else {
                 if ($before_is_char_class_range) {
-                  if ($char_class_uchar_min_maxs_list->length == 0) {
+                  if ($char_class_code_point_range_list->length == 0) {
                     die "- start not found";
                   }
                   else {
-                    $char_class_uchar_min_maxs_list->set($char_class_uchar_min_maxs_list->length - 1, $uchar);
+                    $char_class_code_point_range_list->set($char_class_code_point_range_list->length - 1, $code_point);
                     $before_is_char_class_range = 0;
                   }
                 }
                 else {
-                  $char_class_uchar_min_maxs_list->push($uchar);
-                  $char_class_uchar_min_maxs_list->push($uchar);
+                  $char_class_code_point_range_list->push($code_point);
+                  $char_class_code_point_range_list->push($code_point);
                 }
               }
             }
           }
           else {
-            switch ($uchar) {
+            switch ($code_point) {
               case '^': {
                 if ($status == Regex->STATUS_CHAR_CLASS()) {
                   die "Unexpected";
@@ -277,10 +289,10 @@ class Regex : precompile {
               case '.': {
                 $cur_is_char = 1;
                 if ($self->{single_line_mode}) {
-                  $cur_uchar_min_maxs = new int[0];
+                  $cur_code_point_range = new int[0];
                 }
                 else {
-                  $cur_uchar_min_maxs = [(int)'\n', '\n'];
+                  $cur_code_point_range = [(int)'\n', '\n'];
                 }
                 $cur_negate = 1;
                 break;
@@ -316,7 +328,7 @@ class Regex : precompile {
               }
               case '[': {
                 $status = Regex->STATUS_CHAR_CLASS();
-                $char_class_uchar_min_maxs_list = IntList->new_len(0);
+                $char_class_code_point_range_list = IntList->new_len(0);
                 $before_is_char_class_range = 0;
                 break;
               }
@@ -377,10 +389,10 @@ class Regex : precompile {
               }
               default: {
                 if ($status == Regex->STATUS_QUANTIFIER_MIN()) {
-                  if (Fn->is_digit($uchar)) {
-                    $quantifier_min_str .= $uchar - '0';
+                  if (Fn->is_digit($code_point)) {
+                    $quantifier_min_str .= $code_point - '0';
                   }
-                  elsif ($uchar == ',') {
+                  elsif ($code_point == ',') {
                     my $quantifier_min = Fn->to_int_with_base($quantifier_min_str, 10);
                     my $last_pattern = (Regex::Pattern)$patterns->get($patterns->length - 1);
                     $last_pattern->{min_repeat} = $quantifier_min;
@@ -393,8 +405,8 @@ class Regex : precompile {
                   }
                 }
                 elsif ($status == Regex->STATUS_QUANTIFIER_MAX()) {
-                  if (Fn->is_digit($uchar)) {
-                    $quantifier_max_str .= $uchar - '0';
+                  if (Fn->is_digit($code_point)) {
+                    $quantifier_max_str .= $code_point - '0';
                   }
                   else {
                     die "Quantifier max must be non-fractional number";
@@ -402,7 +414,7 @@ class Regex : precompile {
                 }
                 else {
                   $cur_is_char = 1;
-                  $cur_uchar_min_maxs = [$uchar, $uchar];
+                  $cur_code_point_range = [$code_point, $code_point];
                 }
               }
             }
@@ -411,10 +423,34 @@ class Regex : precompile {
       }
 
       if ($cur_is_char) {
+        my $ignore_case = $self->{ignore_case};
+        
+        if ($ignore_case) {
+          for (my $i = 0; $i < @$cur_code_point_range; $i += 2) {
+            my $min = $cur_code_point_range->[$i];
+            my $max = $cur_code_point_range->[$i + 1];
+            
+            # a-z (0x61-0x7A)
+            {
+              my $lower_min_range = -1;
+              my $lower_max_range = -1;
+              
+              if ($min >= 0x61 && $min <= 0x7A) {
+                $lower_min_range = $min;
+              }
+              else {
+                
+              }
+              
+            }
+            # A-Z(0x41-0x5A)
+            
+          }
+        }
+        
         my $pattern = new Regex::Pattern;
-        $pattern->{type} = Regex::Pattern->PATTERN;
         $pattern->{negate} = (byte)$cur_negate;
-        $pattern->{uchar_min_maxs} = $cur_uchar_min_maxs;
+        $pattern->{code_point_range} = $cur_code_point_range;
         $pattern->{max_repeat} = 1;
         $pattern->{min_repeat} = 1;
 
@@ -484,6 +520,7 @@ class Regex : precompile {
     my $match_all = 0;
     my $target_index = 0;
     my $target_base_index_before : int;
+    my $ignore_case = $self->{ignore_case};
     while (1) {
       $target_base_index_before = $target_base_index;
       my $target_base_uchar = Unicode->uchar($target, \$target_base_index);
@@ -501,7 +538,7 @@ class Regex : precompile {
         my $pattern = (Regex::Pattern)$patterns->get($pattern_index);
         my $max_repeat = $pattern->{max_repeat};
         my $min_repeat = $pattern->{min_repeat};
-        my $uchar_min_maxs = $pattern->{uchar_min_maxs};
+        my $code_point_range = $pattern->{code_point_range};
         my $negate = $pattern->{negate};
         
         if ($pattern->{capture_start}) {
@@ -515,72 +552,74 @@ class Regex : precompile {
         }
         
         
-        my $type = $pattern->{type};
-        
-        my $match_uchar_repeat = 0;
+        my $match_repeat = 0;
         my $repeat_count = 0;
         my $repeat_before_target_index = $target_before_index;
         
-        if ($type == Regex::Pattern->PATTERN) {
-          # Match uchar repeat
-          for (my $repeat_index = 0; $repeat_index < $max_repeat; $repeat_index++) {
-            # Match uchar
-            my $match_uchar : int;
+        # Match uchar repeat
+        for (my $repeat_index = 0; $repeat_index < $max_repeat; $repeat_index++) {
+          # Match uchar
+          my $match_char = 0;
+          
+          # Match a character
+          for (my $min_max_index = 0; $min_max_index < @$code_point_range; $min_max_index += 2) {
+            my $code_point_min = $code_point_range->[$min_max_index];
+            my $code_point_max = $code_point_range->[$min_max_index + 1];
             
-            # Match in not range
-            if ($negate) {
-              my $match_uchar_count = 0;
-              for (my $min_max_index = 0; $min_max_index < @$uchar_min_maxs; $min_max_index += 2) {
-                my $uchar_min = $uchar_min_maxs->[$min_max_index];
-                my $uchar_max = $uchar_min_maxs->[$min_max_index + 1];
-                if ($target_uchar >= $uchar_min && $target_uchar <= $uchar_max) {
-                  $match_uchar_count++;
-                }
-              }
-              if ($match_uchar_count == 0) {
-                $match_uchar = 1;
-              }
+            if ($target_uchar >= $code_point_min && $target_uchar <= $code_point_max) {
+              $match_char = 1;
             }
-            # Match in range
             else {
-              $match_uchar = 0;
-              for (my $min_max_index = 0; $min_max_index < @$uchar_min_maxs; $min_max_index += 2) {
-                my $uchar_min = $uchar_min_maxs->[$min_max_index];
-                my $uchar_max = $uchar_min_maxs->[$min_max_index + 1];
-                
-                if ($target_uchar >= $uchar_min && $target_uchar <= $uchar_max) {
-                  $match_uchar = 1;
-                  last;
+              if ($ignore_case) {
+                my $target_uchar_reverse_case = -1;
+                # a-z
+                if ($target_uchar >= 0x61 && $target_uchar <= 0x7A) {
+                  $target_uchar_reverse_case = $target_uchar - 32;
+                }
+                # A-Z
+                elsif ($target_uchar >= 0x41 && $target_uchar <= 0x5A) {
+                  $target_uchar_reverse_case = $target_uchar + 32;
+                }
+                if ($target_uchar_reverse_case >= 0) {
+                  if ($target_uchar_reverse_case >= $code_point_min && $target_uchar_reverse_case <= $code_point_max) {
+                    $match_char = 1;
+                  }
                 }
               }
             }
             
-            # Increment repeat count
-            if ($match_uchar) {
-              $repeat_count++;
-              $repeat_before_target_index = $target_index;
-
-              if ($target_index == length $target) {
-                last;
-              }
-              
-              $target_uchar = Unicode->uchar($target, \$target_index);
-              
-              $target_before_index = $target_index;
-            }
-            else {
+            if ($match_char) {
               last;
             }
           }
-          if ($repeat_count >= $min_repeat) {
-            $match_uchar_repeat = 1;
+          
+          # Negate
+          if ($negate) {
+            $match_char = !$match_char;
+          }
+          
+          # Increment repeat count
+          if ($match_char) {
+            $repeat_count++;
+            $repeat_before_target_index = $target_index;
+
+            if ($target_index == length $target) {
+              last;
+            }
+            
+            $target_uchar = Unicode->uchar($target, \$target_index);
+            
+            $target_before_index = $target_index;
+          }
+          else {
+            last;
           }
         }
-        else {
-          die "Not implemented";
+        if ($repeat_count >= $min_repeat) {
+          $match_repeat = 1;
         }
         
-        if ($match_uchar_repeat) {
+        if ($match_repeat) {
           if ($pattern->{capture_end}) {
             $self->{captures}[$capture_count] = Fn->substr($target, $capture_start_index, $repeat_before_target_index - $capture_start_index);
             $capture_count++;
@@ -631,30 +670,24 @@ class Regex : precompile {
   }
   
   method replace  : string ($target : string, $target_offset : int, $replace : string) {
-    my $opt = Hash->new({});
-    $opt->set_int(replace_all => 0);
-    return $self->replace_opt($target, $target_offset, $replace, $opt);
+    return $self->replace_opt($target, $target_offset, $replace, {replace_all => 0});
   }
 
   method replace_cb  : string ($target : string, $target_offset : int, $replace_cb : Regex::Replacer) {
-    my $opt = Hash->new({});
-    $opt->set_int(replace_all => 0);
-    return $self->replace_opt($target, $target_offset, $replace_cb, $opt);
+    return $self->replace_opt($target, $target_offset, $replace_cb, {replace_all => 0});
   }
 
   method replace_all  : string ($target : string, $target_offset : int, $replace : string) {
-    my $opt = Hash->new({});
-    $opt->set_int(replace_all => 1);
-    return $self->replace_opt($target, $target_offset, $replace, $opt);
+    return $self->replace_opt($target, $target_offset, $replace, {replace_all => 1});
   }
 
   method replace_all_cb  : string ($target : string, $target_offset : int, $replace_cb : Regex::Replacer) {
-    my $opt = Hash->new({});
-    $opt->set_int(replace_all => 1);
-    return $self->replace_opt($target, $target_offset, $replace_cb, $opt);
+    return $self->replace_opt($target, $target_offset, $replace_cb, {replace_all => 1});
   }
   
-  private method replace_opt  : string ($target : string, $target_base_index : int, $replace_object : object, $opt : Hash) {
+  private method replace_opt  : string ($target : string, $target_base_index : int, $replace_object : object, $options : object[]) {
+    
+    my $opt = Hash->new($options);
     
     my $original_target_base_index = $target_base_index;
     
@@ -748,8 +781,11 @@ class Regex : precompile {
     else {
       my $match_end = $self->match_start + $self->match_length;
       my $rest_length = $tarlength - $match_end;
-      my $rest_string = Fn->substr($target, $match_end, $rest_length);
-      $result_buffer->push($rest_string);
+      
+      if ($rest_length > 0) {
+        my $rest_string = Fn->substr($target, $match_end, $rest_length);
+        $result_buffer->push($rest_string);
+      }
       
       $result = $result_buffer->to_string;
     }
@@ -760,8 +796,8 @@ class Regex : precompile {
   }
 
   private method duplicate : int ($pattern1 : Regex::Pattern, $pattern2 : Regex::Pattern) {
-    my $uchar_min_maxs1 = $pattern1->{uchar_min_maxs};
-    my $uchar_min_maxs2 = $pattern2->{uchar_min_maxs};
+    my $code_point_range1 = $pattern1->{code_point_range};
+    my $code_point_range2 = $pattern2->{code_point_range};
     
     my $duplicate : int;
     my $negate1 = (int)$pattern1->{negate};
@@ -771,17 +807,17 @@ class Regex : precompile {
     }
     elsif (!$negate1 && !$negate2) {
       $duplicate = 0;
-      for (my $min_max_index1 = 0; $min_max_index1 < @$uchar_min_maxs1; $min_max_index1 += 2) {
-        my $uchar_min1 = $uchar_min_maxs1->[$min_max_index1];
-        my $uchar_max1 = $uchar_min_maxs1->[$min_max_index1 + 1];
-        for (my $min_max_index2 = 0; $min_max_index2 < @$uchar_min_maxs2; $min_max_index2 += 2) {
-          my $uchar_min2 = $uchar_min_maxs2->[$min_max_index2];
-          my $uchar_max2 = $uchar_min_maxs2->[$min_max_index2 + 1];
-          if ($uchar_min2 >= $uchar_min1 && $uchar_min2 <= $uchar_max1) {
+      for (my $min_max_index1 = 0; $min_max_index1 < @$code_point_range1; $min_max_index1 += 2) {
+        my $code_point_min1 = $code_point_range1->[$min_max_index1];
+        my $code_point_max1 = $code_point_range1->[$min_max_index1 + 1];
+        for (my $min_max_index2 = 0; $min_max_index2 < @$code_point_range2; $min_max_index2 += 2) {
+          my $code_point_min2 = $code_point_range2->[$min_max_index2];
+          my $code_point_max2 = $code_point_range2->[$min_max_index2 + 1];
+          if ($code_point_min2 >= $code_point_min1 && $code_point_min2 <= $code_point_max1) {
             $duplicate = 1;
             last;
           }
-          elsif ($uchar_max2 >= $uchar_min1 && $uchar_max2 <= $uchar_max1) {
+          elsif ($code_point_max2 >= $code_point_min1 && $code_point_max2 <= $code_point_max1) {
             $duplicate = 1;
             last;
           }
@@ -790,14 +826,14 @@ class Regex : precompile {
     }
     elsif ($negate1 && !$negate2) {
       $duplicate = 0;
-      for (my $min_max_index2 = 0; $min_max_index2 < @$uchar_min_maxs2; $min_max_index2 += 2) {
-        my $uchar_min2 = $uchar_min_maxs2->[$min_max_index2];
-        my $uchar_max2 = $uchar_min_maxs2->[$min_max_index2 + 1];
+      for (my $min_max_index2 = 0; $min_max_index2 < @$code_point_range2; $min_max_index2 += 2) {
+        my $code_point_min2 = $code_point_range2->[$min_max_index2];
+        my $code_point_max2 = $code_point_range2->[$min_max_index2 + 1];
         my $one_no_duplicate = 0;
-        for (my $min_max_index1 = 0; $min_max_index1 < @$uchar_min_maxs1; $min_max_index1 += 2) {
-          my $uchar_min1 = $uchar_min_maxs1->[$min_max_index1];
-          my $uchar_max1 = $uchar_min_maxs1->[$min_max_index1 + 1];
-          if ($uchar_min2 >= $uchar_min1 && $uchar_max2 <= $uchar_max1) {
+        for (my $min_max_index1 = 0; $min_max_index1 < @$code_point_range1; $min_max_index1 += 2) {
+          my $code_point_min1 = $code_point_range1->[$min_max_index1];
+          my $code_point_max1 = $code_point_range1->[$min_max_index1 + 1];
+          if ($code_point_min2 >= $code_point_min1 && $code_point_max2 <= $code_point_max1) {
             $one_no_duplicate = 1;
             last;
           }
@@ -810,14 +846,14 @@ class Regex : precompile {
     }
     elsif (!$negate1 && $negate2) {
       $duplicate = 0;
-      for (my $min_max_index1 = 0; $min_max_index1 < @$uchar_min_maxs1; $min_max_index1 += 2) {
-        my $uchar_min1 = $uchar_min_maxs1->[$min_max_index1];
-        my $uchar_max1 = $uchar_min_maxs1->[$min_max_index1 + 1];
+      for (my $min_max_index1 = 0; $min_max_index1 < @$code_point_range1; $min_max_index1 += 2) {
+        my $code_point_min1 = $code_point_range1->[$min_max_index1];
+        my $code_point_max1 = $code_point_range1->[$min_max_index1 + 1];
         my $one_no_duplicate = 0;
-        for (my $min_max_index2 = 0; $min_max_index2 < @$uchar_min_maxs2; $min_max_index2 += 2) {
-          my $uchar_min2 = $uchar_min_maxs2->[$min_max_index2];
-          my $uchar_max2 = $uchar_min_maxs2->[$min_max_index2 + 1];
-          if ($uchar_min1 >= $uchar_min2 && $uchar_max1 <= $uchar_max2) {
+        for (my $min_max_index2 = 0; $min_max_index2 < @$code_point_range2; $min_max_index2 += 2) {
+          my $code_point_min2 = $code_point_range2->[$min_max_index2];
+          my $code_point_max2 = $code_point_range2->[$min_max_index2 + 1];
+          if ($code_point_min1 >= $code_point_min2 && $code_point_max1 <= $code_point_max2) {
             $one_no_duplicate = 1;
             last;
           }
@@ -831,4 +867,15 @@ class Regex : precompile {
     
     return $duplicate;
   }
+  
+  method cap1 : string () { return $self->captures->[0]; }
+  method cap2 : string () { return $self->captures->[1]; }
+  method cap3 : string () { return $self->captures->[2]; }
+  method cap4 : string () { return $self->captures->[3]; }
+  method cap5 : string () { return $self->captures->[4]; }
+  method cap6 : string () { return $self->captures->[5]; }
+  method cap7 : string () { return $self->captures->[6]; }
+  method cap8 : string () { return $self->captures->[7]; }
+  method cap9 : string () { return $self->captures->[8]; }
+  method cap10 : string () { return $self->captures->[9]; }
 }

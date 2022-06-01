@@ -3,7 +3,7 @@ package App::Gimei;
 use warnings;
 use v5.22;
 
-use version; our $VERSION = version->declare("v0.0.1");
+use version; our $VERSION = version->declare("v0.1.0");
 
 1;
 __END__
@@ -44,13 +44,15 @@ Omitting ARGS is equivalent to specifying name:kanji.
 
 =head2 ARGS
 
-    [WORD_TYPE] [: WORD_SUB_TYPE] [- RENDERING]
+    [WORD_TYPE] [: WORD_SUBTYPE] [- RENDERING]
 
     WORD_TYPE:     'name'   or 'address'
-    WORD_SUB_TYPE: 'family' or 'given'
+    WORD_SUBTYPE:  'last', 'first' or 'sex'
                  | 'prefecture', 'city' or 'town'
     RENDERING:     'kanji', 'hiragana', 'katakana' or 'romaji'
-    *warn* WORD_TYPE address does not support RENDERING romaji.
+
+- WORD_TYPE 'address' does not support RENDERING romaji.
+- WORD_SUBTYPE 'sex' ignore RENDERING.
 
 =head1 DESCRIPTION
 

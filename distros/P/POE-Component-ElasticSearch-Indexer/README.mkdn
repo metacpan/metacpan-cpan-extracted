@@ -4,7 +4,7 @@ POE::Component::ElasticSearch::Indexer - POE session to index data to ElasticSea
 
 # VERSION
 
-version 0.014
+version 0.015
 
 # SYNOPSIS
 
@@ -14,6 +14,7 @@ This POE Session is used to index data to an ElasticSearch cluster.
 
     my $es_session = POE::Component::ElasticSearch::Indexer->spawn(
         Alias            => 'es',                    # Default
+        Protocol         => 'http',                  # Default
         Servers          => [qw(localhost)],         # Default
         Timeout          => 5,                       # Default
         FlushInterval    => 30,                      # Default
@@ -25,6 +26,8 @@ This POE Session is used to index data to an ElasticSearch cluster.
         BatchDiskSpace   => undef,                   # Default
         StatsHandler     => undef,                   # Default
         StatsInterval    => 60,                      # Default
+        AuthUsername     => $ENV{USER},              # Default
+        AuthPassword     => undef,                   # Default
     );
 
     # Index the document using the queue for better performance
@@ -45,10 +48,22 @@ following parameters.
     The alias this session is available to other sessions as.  The default is
     **es**.
 
+- **Protocol**
+
+    Can be either `http` or `https`, defaults to **http**.
+
 - **Servers**
 
     A list of Elasticsearch hosts for connections.  Maybe in the form of
     `hostname` or `hostname:port`.
+
+- **AuthUsername**
+
+    Username for HTTP Basic Authorization, defaults to `$ENV{USER}`.
+
+- **AuthPassword**
+
+    Password for HTTP Basic Authorization, set to enable HTTP Basic Authorization.
 
 - **PoolConnections**
 

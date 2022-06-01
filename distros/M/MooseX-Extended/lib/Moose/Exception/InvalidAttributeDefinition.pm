@@ -4,14 +4,14 @@ package Moose::Exception::InvalidAttributeDefinition;
 
 use Moose;
 extends 'Moose::Exception';
-our $VERSION = '0.07';
+our $VERSION = '0.10';
 with 'Moose::Exception::Role::Class';
 
 has 'attribute_name' => (
     is            => 'ro',
     isa           => 'Str',
     required      => 1,
-    documentation => "The exception is thrown if an attribute name is invalid.",
+    documentation => "This exception is thrown if an attribute definition is invalid.",
 );
 
 __PACKAGE__->meta->make_immutable;
@@ -29,7 +29,7 @@ Moose::Exception::InvalidAttributeDefinition - MooseX::Extended exception for in
 
 =head1 VERSION
 
-version 0.07
+version 0.10
 
 =head1 WHY NOT MOOSEX?
 

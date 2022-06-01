@@ -2,7 +2,7 @@ NAME
     MooseX::Extended - Extend Moose with safe defaults and useful features
 
 VERSION
-    version 0.07
+    version 0.10
 
 SYNOPSIS
         package My::Names {
@@ -36,7 +36,7 @@ SYNOPSIS
 
 DESCRIPTION
     This module is BETA code. It's feature-complete for release and has no
-    known bugs, but more testing is warranted.
+    known bugs.
 
     This class attempts to create a safer version of Moose that defaults to
     read-only attributes and is easier to read and write.
@@ -100,7 +100,7 @@ DESCRIPTION
             $self->set_y($x);
         }
 
-    # MooseX::Extended will causet this to return true, even if we try to
+    # MooseX::Extended will cause this to return true, even if we try to
     return # false 0;
 
 CONFIGURATION
@@ -111,7 +111,7 @@ CONFIGURATION
           types    => [qw/compile PositiveInt HashRef/]; # I want these type tools
 
   "types"
-    ALlows you to import any types provided by MooseX::Extended::Types.
+    Allows you to import any types provided by MooseX::Extended::Types.
 
     This:
 

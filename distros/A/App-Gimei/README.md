@@ -1,3 +1,4 @@
+[![Actions Status](https://github.com/youpong/App-Gimei/workflows/test/badge.svg)](https://github.com/youpong/App-Gimei/actions)
 # NAME
 
 App::Gimei - CLI for Data::Gimei
@@ -32,13 +33,15 @@ Omitting ARGS is equivalent to specifying name:kanji.
 
 ## ARGS
 
-    [WORD_TYPE] [: WORD_SUB_TYPE] [- RENDERING]
+    [WORD_TYPE] [: WORD_SUBTYPE] [- RENDERING]
 
     WORD_TYPE:     'name'   or 'address'
-    WORD_SUB_TYPE: 'family' or 'given'
+    WORD_SUBTYPE:  'last', 'first' or 'sex'
                  | 'prefecture', 'city' or 'town'
     RENDERING:     'kanji', 'hiragana', 'katakana' or 'romaji'
-    *warn* WORD_TYPE address does not support RENDERING romaji.
+
+\- WORD\_TYPE 'address' does not support RENDERING romaji.
+\- WORD\_SUBTYPE 'sex' ignore RENDERING.
 
 # DESCRIPTION
 

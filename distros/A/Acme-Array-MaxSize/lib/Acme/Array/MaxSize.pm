@@ -77,11 +77,11 @@ Acme::Array::MaxSize - Limit the maximal size your arrays can get.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 
 =head1 SYNOPSIS
@@ -150,17 +150,9 @@ L<https://github.com/choroba/Acme-Array-MaxSize/>
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-Array-MaxSize>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Acme-Array-MaxSize>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Acme-Array-MaxSize>
-
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/Acme-Array-MaxSize/>
+L<https://metacpan.org/dist/Acme-Array-MaxSize/>
 
 =back
 
@@ -171,7 +163,7 @@ Dedicated to L<Discipulus|http://www.perlmonks.org/?node=Discipulus>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 E. Choroba.
+Copyright 2016-2022 E. Choroba.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

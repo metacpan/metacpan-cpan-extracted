@@ -36,13 +36,13 @@
 %type <opval> opt_statements statements statement if_statement else_statement 
 %type <opval> for_statement while_statement switch_statement case_statement default_statement
 %type <opval> block eval_block init_block switch_block if_require_statement
-%type <opval> unary_op binary_op comparison_op isa logical_op op
+%type <opval> unary_operator binary_operator comparison_operator isa
 %type <opval> call_spvm_method opt_vaarg
 %type <opval> array_access field_access weaken_field unweaken_field isweak_field convert array_length
 %type <opval> assign inc dec allow has_impl
 %type <opval> new array_init
 %type <opval> var_decl var interface
-%type <opval> value_op opt_value_ops value_ops opt_value_op case_statements
+%type <opval> operator opt_operators operators opt_operator case_statements logical_operator
 %type <opval> field_name method_name class_name class_alias_name is_read_only
 %type <opval> type qualified_type basic_type array_type
 %type <opval> array_type_with_length ref_type  return_type type_comment opt_type_comment
@@ -464,7 +464,7 @@ statement
   | default_statement
   | eval_block
   | if_require_statement
-  | value_op ';'
+  | operator ';'
     {
       $$ = SPVM_OP_build_value_op_statement(compiler, $1);
     }
@@ -475,19 +475,23 @@ statement
     {
       $$ = SPVM_OP_build_return(compiler, $1, NULL);
     }
-  | RETURN value_op ';'
+  | RETURN operator ';'
     {
       $$ = SPVM_OP_build_return(compiler, $1, $2);
     }
-  | DIE value_op ';'
+  | DIE operator ';'
     {
       $$ = SPVM_OP_build_die(compiler, $1, $2);
     }
-  | WARN value_op ';'
+  | DIE ';'
+    {
+      $$ = SPVM_OP_build_die(compiler, $1, NULL);
+    }
+  | WARN operator ';'
     {
       $$ = SPVM_OP_build_warn(compiler, $1, $2);
     }
-  | PRINT value_op ';'
+  | PRINT operator ';'
     {
       $$ = SPVM_OP_build_print(compiler, $1, $2);
     }
@@ -497,25 +501,25 @@ statement
     {
       $$ = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NULL, compiler->cur_file, compiler->cur_line);
     }
-  | MAKE_READ_ONLY value_op ';'
+  | MAKE_READ_ONLY operator ';'
     {
       $$ = SPVM_OP_build_make_read_only(compiler, $1, $2);
     }
 
 for_statement
-  : FOR '(' opt_value_op ';' op ';' opt_value_op ')' block
+  : FOR '(' opt_operator ';' operator ';' opt_operator ')' block
     {
       $$ = SPVM_OP_build_for_statement(compiler, $1, $3, $5, $7, $9);
     }
 
 while_statement
-  : WHILE '(' op ')' block
+  : WHILE '(' operator ')' block
     {
       $$ = SPVM_OP_build_while_statement(compiler, $1, $3, $5);
     }
 
 switch_statement
-  : SWITCH '(' value_op ')' switch_block
+  : SWITCH '(' operator ')' switch_block
     {
       $$ = SPVM_OP_build_switch_statement(compiler, $1, $3, $5);
     }
@@ -555,11 +559,11 @@ case_statements
     }
 
 case_statement
-  : CASE value_op ':' block
+  : CASE operator ':' block
     {
       $$ = SPVM_OP_build_case_statement(compiler, $1, $2, $4);
     }
-  | CASE value_op ':'
+  | CASE operator ':'
     {
       $$ = SPVM_OP_build_case_statement(compiler, $1, $2, NULL);
     }
@@ -588,7 +592,7 @@ if_require_statement
       $$ = SPVM_OP_build_if_require_statement(compiler, op_if_require, $3, $5, $7);
     }
 if_statement
-  : IF '(' op ')' block else_statement
+  : IF '(' operator ')' block else_statement
     {
       SPVM_OP* op_if = SPVM_OP_build_if_statement(compiler, $1, $3, $5, $6);
       
@@ -599,7 +603,7 @@ if_statement
       
       $$ = op_block;
     }
-  | UNLESS '(' op ')' block else_statement
+  | UNLESS '(' operator ')' block else_statement
     {
       SPVM_OP* op_if = SPVM_OP_build_if_statement(compiler, $1, $3, $5, $6);
       
@@ -620,7 +624,7 @@ else_statement
     {
       $$ = $2;
     }
-  | ELSIF '(' op ')' block else_statement
+  | ELSIF '(' operator ')' block else_statement
     {
       $$ = SPVM_OP_build_if_statement(compiler, $1, $3, $5, $6);
     }
@@ -639,12 +643,12 @@ eval_block
       $$ = SPVM_OP_build_eval(compiler, $1, $2);
     }
 
-opt_value_ops
+opt_operators
   : /* Empty */
     {
       $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
     }
-  | value_ops
+  | operators
     {
       if ($1->id == SPVM_OP_C_ID_LIST) {
         $$ = $1;
@@ -656,18 +660,14 @@ opt_value_ops
       }
     }
     
-opt_value_op
+opt_operator
   : /* Empty */
     {
       $$ = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NULL, compiler->cur_file, compiler->cur_line);
     }
-  | value_op
+  | operator
 
-op
-  : value_op
-  | logical_op
-
-value_op
+operator
   : var
   | EXCEPTION_VAR
   | CONSTANT
@@ -680,20 +680,20 @@ value_op
   | array_init
   | array_length
   | var_decl
-  | unary_op
-  | binary_op
+  | unary_operator
+  | binary_operator
   | assign
   | inc
   | dec
-  | '(' value_ops ')'
+  | '(' operators ')'
     {
       if ($2->id == SPVM_OP_C_ID_LIST) {
-        SPVM_OP* op_value_op = $2->first;
+        SPVM_OP* op_operator = $2->first;
         SPVM_OP* op_sequence = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_SEQUENCE, compiler->cur_file, compiler->cur_line);
-        while ((op_value_op = SPVM_OP_sibling(compiler, op_value_op))) {
-          SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_value_op);
-          SPVM_OP_insert_child(compiler, op_sequence, op_sequence->last, op_value_op);
-          op_value_op = op_stab;
+        while ((op_operator = SPVM_OP_sibling(compiler, op_operator))) {
+          SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_operator);
+          SPVM_OP_insert_child(compiler, op_sequence, op_sequence->last, op_operator);
+          op_operator = op_stab;
         }
         $$ = op_sequence;
       }
@@ -703,7 +703,7 @@ value_op
     }
   | CURRENT_CLASS_NAME
   | isweak_field
-  | comparison_op
+  | comparison_operator
   | isa
   | TRUE
     {
@@ -715,9 +715,10 @@ value_op
     }
   | is_read_only
   | has_impl
+  | logical_operator
 
-value_ops
-  : value_ops ',' value_op
+operators
+  : operators ',' operator
     {
       SPVM_OP* op_list;
       if ($1->id == SPVM_OP_C_ID_LIST) {
@@ -731,27 +732,27 @@ value_ops
       
       $$ = op_list;
     }
-  | value_ops ','
+  | operators ','
     {
       $$ = $1;
     }
-  | value_op
+  | operator
     {
       $$ = $1;
     }
 
-unary_op
-  : '+' value_op %prec PLUS
+unary_operator
+  : '+' operator %prec PLUS
     {
-      SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_PLUS, $1->file, $1->line);
-      $$ = SPVM_OP_build_unary_op(compiler, op, $2);
+      SPVM_OP* operator = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_PLUS, $1->file, $1->line);
+      $$ = SPVM_OP_build_unary_op(compiler, operator, $2);
     }
-  | '-' value_op %prec MINUS
+  | '-' operator %prec MINUS
     {
       SPVM_OP* op_negate = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_MINUS, $1->file, $1->line);
       $$ = SPVM_OP_build_unary_op(compiler, op_negate, $2);
     }
-  | BIT_NOT value_op
+  | BIT_NOT operator
     {
       $$ = SPVM_OP_build_unary_op(compiler, $1, $2);
     }
@@ -759,15 +760,15 @@ unary_op
     {
       $$ = SPVM_OP_build_unary_op(compiler, $1, $2);
     }
-  | REFOP value_op
+  | REFOP operator
     {
       $$ = SPVM_OP_build_unary_op(compiler, $1, $2);
     }
-  | STRING_LENGTH value_op
+  | STRING_LENGTH operator
     {
       $$ = SPVM_OP_build_unary_op(compiler, $1, $2);
     }
-  | DUMP value_op
+  | DUMP operator
     {
       $$ = SPVM_OP_build_unary_op(compiler, $1, $2);
     }
@@ -779,194 +780,190 @@ unary_op
     {
       $$ = SPVM_OP_build_unary_op(compiler, $1, $2);
     }
-  | NEW_STRING_LEN value_op
+  | NEW_STRING_LEN operator
     {
       $$ = SPVM_OP_build_unary_op(compiler, $1, $2);
     }
-  | COPY value_op
+  | COPY operator
     {
       $$ = SPVM_OP_build_unary_op(compiler, $1, $2);
     }
 
 is_read_only
-  : IS_READ_ONLY value_op
+  : IS_READ_ONLY operator
     {
       $$ = SPVM_OP_build_is_read_only(compiler, $1, $2);
     }
 
 inc
-  : INC value_op
+  : INC operator
     {
-      SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_PRE_INC, $1->file, $1->line);
-      $$ = SPVM_OP_build_inc(compiler, op, $2);
+      SPVM_OP* operator = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_PRE_INC, $1->file, $1->line);
+      $$ = SPVM_OP_build_inc(compiler, operator, $2);
     }
-  | value_op INC
+  | operator INC
     {
-      SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_POST_INC, $2->file, $2->line);
-      $$ = SPVM_OP_build_inc(compiler, op, $1);
+      SPVM_OP* operator = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_POST_INC, $2->file, $2->line);
+      $$ = SPVM_OP_build_inc(compiler, operator, $1);
     }
 
 dec
-  : DEC value_op
+  : DEC operator
     {
-      SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_PRE_DEC, $1->file, $1->line);
-      $$ = SPVM_OP_build_dec(compiler, op, $2);
+      SPVM_OP* operator = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_PRE_DEC, $1->file, $1->line);
+      $$ = SPVM_OP_build_dec(compiler, operator, $2);
     }
-  | value_op DEC
+  | operator DEC
     {
-      SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_POST_DEC, $2->file, $2->line);
-      $$ = SPVM_OP_build_dec(compiler, op, $1);
-    }
-
-binary_op
-  : value_op '+' value_op
-    {
-      SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ADD, $2->file, $2->line);
-      $$ = SPVM_OP_build_binary_op(compiler, op, $1, $3);
-    }
-  | value_op '-' value_op
-    {
-      SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_SUBTRACT, $2->file, $2->line);
-      $$ = SPVM_OP_build_binary_op(compiler, op, $1, $3);
-    }
-  | value_op '*' value_op
-    {
-      SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_MULTIPLY, $2->file, $2->line);
-      $$ = SPVM_OP_build_binary_op(compiler, op, $1, $3);
-    }
-  | value_op DIVIDE value_op
-    {
-      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
-    }
-  | value_op DIVIDE_UNSIGNED_INT value_op
-    {
-      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
-    }
-  | value_op DIVIDE_UNSIGNED_LONG value_op
-    {
-      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
-    }
-  | value_op REMAINDER value_op
-    {
-      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
-    }
-  | value_op REMAINDER_UNSIGNED_INT value_op
-    {
-      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
-    }
-  | value_op REMAINDER_UNSIGNED_LONG value_op
-    {
-      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
-    }
-  | value_op BIT_XOR value_op
-    {
-      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
-    }
-  | value_op BIT_AND value_op
-    {
-      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
-    }
-  | value_op BIT_OR value_op
-    {
-      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
-    }
-  | value_op SHIFT value_op
-    {
-      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
-    }
-  | value_op '.' value_op
-    {
-      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
+      SPVM_OP* operator = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_POST_DEC, $2->file, $2->line);
+      $$ = SPVM_OP_build_dec(compiler, operator, $1);
     }
 
-comparison_op
-  : value_op NUMEQ value_op
+binary_operator
+  : operator '+' operator
+    {
+      SPVM_OP* operator = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ADD, $2->file, $2->line);
+      $$ = SPVM_OP_build_binary_op(compiler, operator, $1, $3);
+    }
+  | operator '-' operator
+    {
+      SPVM_OP* operator = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_SUBTRACT, $2->file, $2->line);
+      $$ = SPVM_OP_build_binary_op(compiler, operator, $1, $3);
+    }
+  | operator '*' operator
+    {
+      SPVM_OP* operator = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_MULTIPLY, $2->file, $2->line);
+      $$ = SPVM_OP_build_binary_op(compiler, operator, $1, $3);
+    }
+  | operator DIVIDE operator
+    {
+      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
+    }
+  | operator DIVIDE_UNSIGNED_INT operator
+    {
+      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
+    }
+  | operator DIVIDE_UNSIGNED_LONG operator
+    {
+      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
+    }
+  | operator REMAINDER operator
+    {
+      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
+    }
+  | operator REMAINDER_UNSIGNED_INT operator
+    {
+      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
+    }
+  | operator REMAINDER_UNSIGNED_LONG operator
+    {
+      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
+    }
+  | operator BIT_XOR operator
+    {
+      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
+    }
+  | operator BIT_AND operator
+    {
+      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
+    }
+  | operator BIT_OR operator
+    {
+      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
+    }
+  | operator SHIFT operator
+    {
+      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
+    }
+  | operator '.' operator
+    {
+      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
+    }
+
+comparison_operator
+  : operator NUMEQ operator
     {
       $$ = SPVM_OP_build_comparison_op(compiler, $2, $1, $3);
     }
-  | value_op NUMNE value_op
+  | operator NUMNE operator
     {
       $$ = SPVM_OP_build_comparison_op(compiler, $2, $1, $3);
     }
-  | value_op NUMGT value_op
+  | operator NUMGT operator
     {
       $$ = SPVM_OP_build_comparison_op(compiler, $2, $1, $3);
     }
-  | value_op NUMGE value_op
+  | operator NUMGE operator
     {
       $$ = SPVM_OP_build_comparison_op(compiler, $2, $1, $3);
     }
-  | value_op NUMLT value_op
+  | operator NUMLT operator
     {
       $$ = SPVM_OP_build_comparison_op(compiler, $2, $1, $3);
     }
-  | value_op NUMLE value_op
+  | operator NUMLE operator
     {
       $$ = SPVM_OP_build_comparison_op(compiler, $2, $1, $3);
     }
-  | value_op NUMERIC_CMP value_op
+  | operator NUMERIC_CMP operator
     {
       $$ = SPVM_OP_build_comparison_op(compiler, $2, $1, $3);
     }
-  | value_op STREQ value_op
+  | operator STREQ operator
     {
       $$ = SPVM_OP_build_comparison_op(compiler, $2, $1, $3);
     }
-  | value_op STRNE value_op
+  | operator STRNE operator
     {
       $$ = SPVM_OP_build_comparison_op(compiler, $2, $1, $3);
     }
-  | value_op STRGT value_op
+  | operator STRGT operator
     {
       $$ = SPVM_OP_build_comparison_op(compiler, $2, $1, $3);
     }
-  | value_op STRGE value_op
+  | operator STRGE operator
     {
       $$ = SPVM_OP_build_comparison_op(compiler, $2, $1, $3);
     }
-  | value_op STRLT value_op
+  | operator STRLT operator
     {
       $$ = SPVM_OP_build_comparison_op(compiler, $2, $1, $3);
     }
-  | value_op STRLE value_op
+  | operator STRLE operator
     {
       $$ = SPVM_OP_build_comparison_op(compiler, $2, $1, $3);
     }
-  | value_op STRING_CMP value_op
+  | operator STRING_CMP operator
     {
       $$ = SPVM_OP_build_comparison_op(compiler, $2, $1, $3);
     }
 
 isa
-  : value_op ISA type
+  : operator ISA type
     {
       $$ = SPVM_OP_build_isa(compiler, $2, $1, $3);
     }
     
-logical_op
-  : op LOGICAL_OR op
+logical_operator
+  : operator LOGICAL_OR operator
     {
       $$ = SPVM_OP_build_or(compiler, $2, $1, $3);
     }
-  | op LOGICAL_AND op
+  | operator LOGICAL_AND operator
     {
       $$ = SPVM_OP_build_and(compiler, $2, $1, $3);
     }
-  | LOGICAL_NOT op
+  | LOGICAL_NOT operator
     {
       $$ = SPVM_OP_build_not(compiler, $1, $2);
     }
-  | '(' logical_op ')'
-    {
-      $$ = $2;
-    }
 
 assign
-  : value_op ASSIGN value_op
+  : operator ASSIGN operator
     {
       $$ = SPVM_OP_build_assign(compiler, $2, $1, $3);
     }
-  | value_op SPECIAL_ASSIGN value_op
+  | operator SPECIAL_ASSIGN operator
     {
       $$ = SPVM_OP_build_special_assign(compiler, $2, $1, $3);
     }
@@ -1006,13 +1003,13 @@ new
     }
 
 array_init
-  : '[' opt_value_ops ']'
+  : '[' opt_operators ']'
     {
       SPVM_OP* op_array_init = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_INIT, compiler->cur_file, compiler->cur_line);
       int32_t is_key_values = 0;
       $$ = SPVM_OP_build_array_init(compiler, op_array_init, $2, is_key_values);
     }
-  | '{' value_ops '}'
+  | '{' operators '}'
     {
       SPVM_OP* op_array_init = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_INIT, compiler->cur_file, compiler->cur_line);
       int32_t is_key_values = 1;
@@ -1027,33 +1024,33 @@ array_init
     }
 
 convert
-  : '(' qualified_type ')' value_op %prec CONVERT
+  : '(' qualified_type ')' operator %prec CONVERT
     {
       SPVM_OP* op_convert = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE_CAST, $2->file, $2->line);
       $$ = SPVM_OP_build_convert(compiler, op_convert, $2, $4, NULL);
     }
-  | value_op ARROW '(' qualified_type ')' %prec CONVERT
+  | operator ARROW '(' qualified_type ')' %prec CONVERT
     {
       SPVM_OP* op_convert = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE_CAST, $4->file, $4->line);
       $$ = SPVM_OP_build_convert(compiler, op_convert, $4, $1, NULL);
     }
 
 array_access
-  : value_op ARROW '[' value_op ']'
+  : operator ARROW '[' operator ']'
     {
       $$ = SPVM_OP_build_array_access(compiler, $1, $4);
     }
-  | array_access '[' value_op ']'
+  | array_access '[' operator ']'
     {
       $$ = SPVM_OP_build_array_access(compiler, $1, $3);
     }
-  | field_access '[' value_op ']'
+  | field_access '[' operator ']'
     {
       $$ = SPVM_OP_build_array_access(compiler, $1, $3);
     }
 
 call_spvm_method
-  : CURRENT_CLASS SYMBOL_NAME '(' opt_value_ops  ')'
+  : CURRENT_CLASS SYMBOL_NAME '(' opt_operators  ')'
     {
       SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->cur_file, compiler->cur_line);
       $$ = SPVM_OP_build_call_method(compiler, op_call_method, $1, $2, $4);
@@ -1061,10 +1058,10 @@ call_spvm_method
   | CURRENT_CLASS SYMBOL_NAME
     {
       SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->cur_file, compiler->cur_line);
-      SPVM_OP* op_value_ops = SPVM_OP_new_op_list(compiler, $1->file, $2->line);
-      $$ = SPVM_OP_build_call_method(compiler, op_call_method, $1, $2, op_value_ops);
+      SPVM_OP* op_operators = SPVM_OP_new_op_list(compiler, $1->file, $2->line);
+      $$ = SPVM_OP_build_call_method(compiler, op_call_method, $1, $2, op_operators);
     }
-  | class_name ARROW method_name '(' opt_value_ops  ')'
+  | class_name ARROW method_name '(' opt_operators  ')'
     {
       SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->cur_file, compiler->cur_line);
       $$ = SPVM_OP_build_call_method(compiler, op_call_method, $1, $3, $5);
@@ -1072,21 +1069,21 @@ call_spvm_method
   | class_name ARROW method_name
     {
       SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->cur_file, compiler->cur_line);
-      SPVM_OP* op_value_ops = SPVM_OP_new_op_list(compiler, $1->file, $2->line);
-      $$ = SPVM_OP_build_call_method(compiler, op_call_method, $1, $3, op_value_ops);
+      SPVM_OP* op_operators = SPVM_OP_new_op_list(compiler, $1->file, $2->line);
+      $$ = SPVM_OP_build_call_method(compiler, op_call_method, $1, $3, op_operators);
     }
-  | value_op ARROW method_name '(' opt_value_ops ')'
+  | operator ARROW method_name '(' opt_operators ')'
     {
       SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->cur_file, compiler->cur_line);
       $$ = SPVM_OP_build_call_method(compiler, op_call_method, $1, $3, $5);
     }
-  | value_op ARROW method_name
+  | operator ARROW method_name
     {
       SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->cur_file, compiler->cur_line);
-      SPVM_OP* op_value_ops = SPVM_OP_new_op_list(compiler, $1->file, $2->line);
-      $$ = SPVM_OP_build_call_method(compiler, op_call_method, $1, $3, op_value_ops);
+      SPVM_OP* op_operators = SPVM_OP_new_op_list(compiler, $1->file, $2->line);
+      $$ = SPVM_OP_build_call_method(compiler, op_call_method, $1, $3, op_operators);
     }
-  | value_op ARROW '(' opt_value_ops ')'
+  | operator ARROW '(' opt_operators ')'
     {
       SPVM_OP* op_call_method = SPVM_OP_new_op_call_method(compiler, compiler->cur_file, compiler->cur_line);
       SPVM_OP* op_method_name = SPVM_OP_new_op_name(compiler, "", $2->file, $2->line);
@@ -1094,7 +1091,7 @@ call_spvm_method
     }
 
 field_access
-  : value_op ARROW '{' field_name '}'
+  : operator ARROW '{' field_name '}'
     {
       SPVM_OP* op_field_access = SPVM_OP_new_op_field_access(compiler, compiler->cur_file, compiler->cur_line);
       $$ = SPVM_OP_build_field_access(compiler, op_field_access, $1, $4);
@@ -1145,22 +1142,22 @@ has_impl
     }
 
 array_length
-  : '@' value_op
+  : '@' operator
     {
       SPVM_OP* op_array_length = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_LENGTH, compiler->cur_file, compiler->cur_line);
       $$ = SPVM_OP_build_array_length(compiler, op_array_length, $2);
     }
-  | '@' '{' value_op '}'
+  | '@' '{' operator '}'
     {
       SPVM_OP* op_array_length = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_LENGTH, compiler->cur_file, compiler->cur_line);
       $$ = SPVM_OP_build_array_length(compiler, op_array_length, $3);
     }
-  | SCALAR '@' value_op
+  | SCALAR '@' operator
     {
       SPVM_OP* op_array_length = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_LENGTH, compiler->cur_file, compiler->cur_line);
       $$ = SPVM_OP_build_array_length(compiler, op_array_length, $3);
     }
-  | SCALAR '@' '{' value_op '}'
+  | SCALAR '@' '{' operator '}'
     {
       SPVM_OP* op_array_length = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_LENGTH, compiler->cur_file, compiler->cur_line);
       $$ = SPVM_OP_build_array_length(compiler, op_array_length, $4);
@@ -1263,11 +1260,11 @@ array_type
     }
 
 array_type_with_length
-  : basic_type '[' value_op ']'
+  : basic_type '[' operator ']'
     {
       $$ = SPVM_OP_build_array_type(compiler, $1, $3);
     }
-  | array_type '[' value_op ']'
+  | array_type '[' operator ']'
     {
       $$ = SPVM_OP_build_array_type(compiler, $1, $3);
     }

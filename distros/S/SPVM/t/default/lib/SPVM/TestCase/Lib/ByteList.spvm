@@ -28,10 +28,37 @@ class TestCase::Lib::ByteList {
     
     # new with undef
     {
-      my $list = ByteList->new(undef);
+      my $list = ByteList->new((byte[])undef);
       
       unless ($list->length == 0) {
         return 0;
+      }
+    }
+
+    # new without argument
+    {
+      my $list = ByteList->new;
+      
+      unless ($list->length == 0) {
+        return 0;
+      }
+    }
+
+    # extra
+    {
+      {
+        my $list = ByteList->new(3);
+        
+        unless ($list->get(0) == 3) {
+          return 0;
+        }
+      }
+      {
+        my $list = ByteList->new(3, 4);
+        
+        unless ($list->get(0) == 3 && $list->get(1) == 4) {
+          return 0;
+        }
       }
     }
     

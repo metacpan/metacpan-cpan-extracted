@@ -9,7 +9,10 @@ package My::Names {
 
     param _name => ( isa => NonEmptyStr, init_arg => 'name' );
     param title => ( isa => Str, required => 0, predicate => 1 );
+    param extra => ( is  => 'rw', isa => Str, required => 0 );
+
     field created => ( isa => PositiveInt, default => sub {time} );
+    field updated => ( is => 'rw', isa => PositiveInt, writer => 1, default => sub {time} );
 
     sub name ($self) {
         my $title = $self->title;
@@ -45,6 +48,14 @@ subtest 'no title' => sub {
     ok !$person->can('sum'), 'subroutines have been removed from the namespace';
     is $person->add( [qw/1 3 5 6/] ), 15, 'Our add() method should work';
     ok !$person->has_title, 'Our predicate shortcut should work';
+
+    ok !defined $person->extra, 'optional params start our as default';
+    $person->extra('foo');
+    is $person->extra, 'foo', 'We can declare is => "rw" for params';
+
+    my $updated = $person->updated;
+    $person->set_updated( $updated + 1 );
+    is $person->updated, $updated + 1, 'We should be able to update is => "rw" fields';
 };
 
 subtest 'has title' => sub {

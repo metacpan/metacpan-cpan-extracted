@@ -1,5 +1,11 @@
 Revision history for OpenAPI-Modern
 
+0.031     2022-06-01 03:59:14Z
+          - fix error when request or response body schema is empty (since
+            v0.028)
+          - use a custom error message with false schemas (to indicate the
+            entire entity is forbidden)
+
 0.030     2022-05-26 05:17:26Z
           - prohibit request bodies for HEAD and GET request unless
             requestBody explicitly specified, as this is a smuggling vector

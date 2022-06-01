@@ -12,6 +12,12 @@ use Moose::Util qw(
 use feature qw(signatures postderef);
 no warnings qw(experimental::signatures experimental::postderef);
 
+BEGIN {
+    if ( $^V && $^V ge v5.36.0 ) {
+        warnings->unimport('experimental::args_array_with_signatures');
+    }
+}
+
 use Storable 'dclone';
 use Ref::Util qw(
   is_plain_arrayref
@@ -19,7 +25,7 @@ use Ref::Util qw(
 );
 use Carp 'croak';
 
-our $VERSION = '0.07';
+our $VERSION = '0.10';
 
 our @EXPORT_OK = qw(
   field
@@ -54,7 +60,12 @@ sub field ( $meta, $name, %opt_for ) {
     foreach my $attr ( is_plain_arrayref($name) ? @$name : $name ) {
         my %options = %opt_for;    # copy each time to avoid overwriting
         if ( defined( my $init_arg = $options{init_arg} ) ) {
-            croak("The 'field.init_arg' must be absent or undef, not '$init_arg'");
+            throw_exception(
+                'InvalidAttributeDefinition',
+                attribute_name => $name,
+                class_name     => $meta->name,
+                messsage       => "The 'field.init_arg' must be absent or undef, not '$init_arg'",
+            );
         }
         $options{init_arg} = undef;
         $options{lazy} //= 1;
@@ -178,7 +189,7 @@ sub _maybe_add_cloning_method ( $meta, $name, %opt_for ) {
     #     my $object = Some::Classs->new( created => $date );
     #
     # Any subsequent code calling $object->created was getting a reference to
-    # $date, so any changes to date would be propagated.
+    # $date, so any changes to $date would be propagated to all instances
     $meta->add_before_method_modifier(
         BUILD => sub ( $self, @ ) {
             my $attr = $meta->get_attribute($name);
@@ -237,7 +248,7 @@ MooseX::Extended::Core - Internal module for MooseX::Extended
 
 =head1 VERSION
 
-version 0.07
+version 0.10
 
 =head1 DESCRIPTION
 

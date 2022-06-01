@@ -19,7 +19,7 @@ use Term::ReadKey;
 use Term::ReadLine;
 use YAML;
 
-our $VERSION = '1.9'; # VERSION
+our $VERSION = '2.0'; # VERSION
 
 # Capture ARGV at Load
 my @ORIG_ARGS;
@@ -592,7 +592,6 @@ sub _get_input {
                 local $|=1;
                 print $prompt;
                 ReadMode('noecho');
-                1 until ReadKey(-1);
                 $text = ReadLine();
                 ReadMode('restore');
                 print "\n";
@@ -628,7 +627,7 @@ CLI::Helpers - Subroutines for making simple command line scripts
 
 =head1 VERSION
 
-version 1.9
+version 2.0
 
 =head1 SYNOPSIS
 

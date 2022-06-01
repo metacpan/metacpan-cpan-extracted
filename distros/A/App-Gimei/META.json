@@ -51,6 +51,7 @@
       },
       "test" : {
          "requires" : {
+            "Capture::Tiny" : "0.48",
             "Test::More" : "0.98"
          }
       }
@@ -58,7 +59,7 @@
    "provides" : {
       "App::Gimei" : {
          "file" : "lib/App/Gimei.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.1.0"
       },
       "App::Gimei::Runner" : {
          "file" : "lib/App/Gimei/Runner.pm"
@@ -75,7 +76,7 @@
          "web" : "https://github.com/youpong/App-Gimei"
       }
    },
-   "version" : "v0.0.1",
+   "version" : "v0.1.0",
    "x_authority" : "cpan:YOUPONG",
    "x_contributors" : [
       "NAKAJIMA Yusaku <yupong7@gmail.com>",

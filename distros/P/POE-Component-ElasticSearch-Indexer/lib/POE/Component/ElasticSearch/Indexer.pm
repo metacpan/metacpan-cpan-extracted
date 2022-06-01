@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 use Const::Fast;
 use Digest::MD5 qw(md5_hex);
@@ -22,6 +22,7 @@ use Time::HiRes qw(time);
 use URI;
 
 use POE qw(
+    Component::SSLify
     Component::Client::HTTP
     Component::Client::Keepalive
 );
@@ -64,6 +65,7 @@ sub spawn {
         MaxPendingRequests => 5,
         MaxRecoveryBatches => 10,
         MaxFailedRatio     => 0.8,
+        AuthUsername       => $ENV{USER},
         %params,
     );
     if( $CONFIG{BatchDiskSpace} ) {
@@ -247,13 +249,17 @@ sub es_version {
     # Get Server/Port
     my ($server,$port) = split /\:/, $heap->{cfg}{Servers}[int rand scalar @{$heap->{cfg}{Servers}}];
     my $uri = URI->new();
-        $uri->scheme('http');
+        $uri->scheme($heap->{cfg}{Protocol});
         $uri->host($server);
         $uri->port($port || 9200);
         $uri->path('/');
 
     # Build the request
     my $req = HTTP::Request->new(GET => $uri->as_string);
+
+    # Use authentication if configured
+    $req->authorization_basic( @{ $heap->{cfg} }{qw(AuthUsername AuthPassword)} )
+        if length $heap->{cfg}{AuthPassword};
 
     # Make the request
     $kernel->post( $heap->{http_alias} => request => resp_version => $req );
@@ -458,7 +464,7 @@ sub es_batch {
     # Build the URI
     my ($server,$port) = split /\:/, $heap->{cfg}{Servers}[int rand scalar @{$heap->{cfg}{Servers}}];
     my $uri = URI->new();
-        $uri->scheme('http');
+        $uri->scheme($heap->{cfg}{Protocol});
         $uri->host($server);
         $uri->port($port || 9200);
         $uri->path('/_bulk');
@@ -467,6 +473,10 @@ sub es_batch {
     my $req = HTTP::Request->new(POST => $uri->as_string);
     $req->header('Content-Type', 'application/x-ndjson');
     $req->content($batch);
+
+    # Use authentication if configured
+    $req->authorization_basic( @{ $heap->{cfg} }{qw(AuthUsername AuthPassword)} )
+        if length $heap->{cfg}{AuthPassword};
 
     TRACE(sprintf "Bulk update of %d bytes being attempted to %s as %s.",
         length($batch),
@@ -721,7 +731,7 @@ POE::Component::ElasticSearch::Indexer - POE session to index data to ElasticSea
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 
@@ -731,6 +741,7 @@ This POE Session is used to index data to an ElasticSearch cluster.
 
     my $es_session = POE::Component::ElasticSearch::Indexer->spawn(
         Alias            => 'es',                    # Default
+        Protocol         => 'http',                  # Default
         Servers          => [qw(localhost)],         # Default
         Timeout          => 5,                       # Default
         FlushInterval    => 30,                      # Default
@@ -742,6 +753,8 @@ This POE Session is used to index data to an ElasticSearch cluster.
         BatchDiskSpace   => undef,                   # Default
         StatsHandler     => undef,                   # Default
         StatsInterval    => 60,                      # Default
+        AuthUsername     => $ENV{USER},              # Default
+        AuthPassword     => undef,                   # Default
     );
 
     # Index the document using the queue for better performance
@@ -764,10 +777,22 @@ following parameters.
 The alias this session is available to other sessions as.  The default is
 B<es>.
 
+=item B<Protocol>
+
+Can be either C<http> or C<https>, defaults to B<http>.
+
 =item B<Servers>
 
 A list of Elasticsearch hosts for connections.  Maybe in the form of
 C<hostname> or C<hostname:port>.
+
+=item B<AuthUsername>
+
+Username for HTTP Basic Authorization, defaults to C<$ENV{USER}>.
+
+=item B<AuthPassword>
+
+Password for HTTP Basic Authorization, set to enable HTTP Basic Authorization.
 
 =item B<PoolConnections>
 

@@ -43,7 +43,7 @@ requires:
 resources:
   homepage: https://github.com/reyjrar/CLI-Helpers
   repository: https://github.com/reyjrar/CLI-Helpers.git
-version: '1.9'
+version: '2.0'
 x_contributors:
   - 'Kang-min Liu <gugod@gugod.org>'
   - 'Kevin M. Goess <kgoess@craigslist.org>'
