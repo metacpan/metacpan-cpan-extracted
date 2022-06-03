@@ -48,7 +48,7 @@ MOJO_APP: {
   get '/api/sleep' => sub {
     my ( $c ) = @_;
     $c->oauth( 'sleep' )
-      || $c->render( status => 401, text => 'You cannot sleep' );
+      || return $c->render( status => 401, text => 'You cannot sleep' );
 
     $c->render( text => "bed" );
   };

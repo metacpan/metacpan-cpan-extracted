@@ -15,10 +15,22 @@ Also, the Changes document is automatically generated from the document:
 and that document should be considered the canonical source for all change
 related information.
 
+6.88  expected 2022-06-01
+  -  Time zone fixes
+         There were no new timezone fixes on 2022-03-01, so no release made
+         then.
+
+         Newest zoneinfo data (tzdata 2022a).
+
+6.87  expected 2022-03-01
+  -  Bug fixes
+         The package was being generated with an incorrect MANIFEST file.
+         This is now fixed. RT 140075
+
 6.86  2021-11-15
   -  Change warn to carp
          All warnings are now issued with the carp command rather than warn.
-         Requested in GitHup pull request #18, but that request was not used
+         Requested in GitHub pull request #18, but that request was not used
          because it only changed the uses in the Date::Manip::Date module.
 
   -  Bug fixes

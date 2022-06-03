@@ -10,12 +10,14 @@ my $build = Module::Build->new (
     abstract_from => 'lib/Test/Compile.pm',
     dist_author => 'Evan Giles <egiles@cpan.org>',
     license  => 'perl',
-    configure_requires => { 'Module::Build' => 0.38 },
+    configure_requires => {
+        'Module::Build' => 0.38,
+        'version'       => 0.77
+    },
     requires => {
-       'perl'               => '5.10.0',
-       'version'            => 0,
-       'parent'             => '0.225',
-       'Exporter'           => '5.68',
+        'perl'          => '5.10.0',
+        'parent'        => '0.225',
+        'Exporter'      => '5.68',
     },
     create_makefile_pl => 'traditional',
     meta_merge     => {

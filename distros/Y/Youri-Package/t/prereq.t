@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: prereq.t 1580 2007-03-22 13:38:55Z guillomovitch $
+# $Id$
 
 use strict;
 use warnings;

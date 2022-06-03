@@ -47,10 +47,11 @@ Metabolomics::Utils - Perl Utils extension metabolomics::fragment::annotation mo
 
 Version 0.2 - Adding POD
 Version 0.3 - Adding Scoring methods for gcms annotation analysis
+Version 0.4 - Adding RI computing
 
 =cut
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 
 =head1 SYNOPSIS
@@ -352,7 +353,35 @@ sub computeScoreMatchedLibrarySpectrumPeaksPercent {
 }
 ### END of SUB    
 
+=item METHOD computeAbsoluteIntensitiesInRelativeIntensity100
 
+	## Description : compute a whole liste of relative Intensity (100-based) 
+	## Input : $mz_res, $ints_res
+	## Output : $relative_ints
+	## Usage : my ( $relative_ints ) = computeAbsoluteIntensitiesInRelativeIntensity100 ( $mz_res, $ints_res ) ;
+
+=cut
+
+## START of SUB
+sub computeAbsoluteIntensitiesInRelativeIntensity100 {
+	## Retrieve Values
+    my $self = shift ;
+    my ( $mz_res, $ints_res ) = @_ ;
+    
+    my @ints_res = @{$ints_res} ;
+    my @mzs_res = @{$mz_res} ;
+    	
+    # Sort by value (max -> min)
+    for (my $i=0 ; $i<@ints_res ; $i++) {
+		my @sorted_indices = sort { $ints_res[$b] <=> $ints_res[$a] } 0..$#ints_res;
+		@$_ = @{$_}[@sorted_indices] for \(@mzs_res, @ints_res);
+	}
+		
+    my @relative_ints = map { ($_ * 100)/$ints_res[0] } @ints_res ;
+
+    return (\@relative_ints) ;
+}
+## END of SUB
 
 
 =item utilsAsConf

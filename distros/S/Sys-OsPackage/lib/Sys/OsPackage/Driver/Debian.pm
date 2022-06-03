@@ -14,7 +14,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package Sys::OsPackage::Driver::Debian;
-$Sys::OsPackage::Driver::Debian::VERSION = '0.1.4';
+$Sys::OsPackage::Driver::Debian::VERSION = '0.1.6';
 use base "Sys::OsPackage::Driver";
 
 # check if packager command found (deb)
@@ -102,7 +102,7 @@ Sys::OsPackage::Driver::Debian - Debian.Ubuntu DEB packaging handler for Sys::Os
 
 =head1 VERSION
 
-version 0.1.4
+version 0.1.6
 
 =head1 SYNOPSIS
 

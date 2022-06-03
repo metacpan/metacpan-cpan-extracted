@@ -1,13 +1,13 @@
 
-# Copyright (c) 2008-2021 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2022 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Mon Nov 15 11:19:56 EST 2021
-#    Data version: tzdata2021e
-#    Code version: tzcode2021e
+#    Generated on: Wed Jun  1 10:57:03 EDT 2022
+#    Data version: tzdata2022a
+#    Code version: tzcode2022a
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -1399,7 +1399,7 @@ L<Date::Manip::TZ> module.
      0      -04:49:00   America/Port-au-Prince
      0      -04:44:32   America/Grand_Turk
      0      -04:43:40   America/Punta_Arenas
-     0      -04:42:46   America/Santiago
+     0      -04:42:45   America/Santiago
                         America/Punta_Arenas
      0      -04:40:00   America/Santo_Domingo
      0      -04:39:36   America/Santo_Domingo
@@ -1817,9 +1817,9 @@ L<Date::Manip::TZ> module.
                         Asia/Riyadh
                         Asia/Qatar
                         Europe/Istanbul
-                        Africa/Juba
                         Etc/GMT+3
                         P
+                        Africa/Juba
                         Africa/Khartoum
                         Asia/Famagusta
                         Europe/Saratov

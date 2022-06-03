@@ -1,3 +1,8 @@
+Release 1.20
+
+    Fix issue with locale variable incorrectly set on AIX.
+    Allow passwords > 32 characters.
+
 Release 1.19
 
     Fix compilation issue when CS_BIG_TIME is not defined.

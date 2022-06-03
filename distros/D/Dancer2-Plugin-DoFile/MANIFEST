@@ -1,0 +1,21 @@
+ABOUT.pod
+lib/Dancer2/Plugin/DoFile.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/01-dofile.t
+t/config.yml
+t/dofiles/pages/client-redirect-catch.view
+t/dofiles/pages/client-redirect.do
+t/dofiles/pages/dancer-forward-catch.view
+t/dofiles/pages/dancer-forward.do
+t/dofiles/pages/index.view
+t/dofiles/pages/internal-redirect-catch.view
+t/dofiles/pages/internal-redirect.do
+t/dofiles/pages/path-POST.view
+t/dofiles/pages/path.do
+t/dofiles/pages/path/to.view
+t/dofiles/pages/path/to/file-POST.do
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

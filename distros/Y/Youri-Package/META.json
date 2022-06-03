@@ -70,6 +70,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.2.8",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/guillomovitch/Youri-Package.git",
+         "web" : "https://github.com/guillomovitch/Youri-Package"
+      }
+   },
+   "version" : "0.2.9",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

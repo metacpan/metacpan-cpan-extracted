@@ -1,4 +1,4 @@
-# $Id: URPM.pm 2471 2022-04-23 16:07:19Z guillomovitch $
+# $Id$
 package Youri::Package::RPM::URPM;
 
 =head1 NAME

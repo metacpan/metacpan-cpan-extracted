@@ -12,7 +12,7 @@ use Getopt::Long;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-05-03'; # DATE
 our $DIST = 'App-ThisDist'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 my ($quiet, $extract_version);
 Getopt::Long::Configure("bundling", "no_ignore_case");
@@ -49,7 +49,7 @@ this-dist - Return name of Perl distribution associated with the current directo
 
 =head1 VERSION
 
-This document describes version 0.014 of this-dist (from Perl distribution App-ThisDist), released on 2022-05-03.
+This document describes version 0.015 of this-dist (from Perl distribution App-ThisDist), released on 2022-05-03.
 
 =head1 SYNOPSIS
 
@@ -97,9 +97,9 @@ with current directory:
 
 =back
 
-To determine if a directory "looks like the top-level directory of a Perl
-distribution", it checks whether one of these files/directories are present:
-C<t>,
+If it cannot find an associated Perl
+distribution name, it will print an error message to stderr (unless being told
+to be quiet via C<--quiet>) and exit with non-zero status.
 
 =head1 OPTIONS
 

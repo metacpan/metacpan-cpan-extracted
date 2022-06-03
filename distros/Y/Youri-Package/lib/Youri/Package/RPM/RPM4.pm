@@ -1,4 +1,4 @@
-# $Id: RPM4.pm 2382 2013-01-03 20:22:33Z guillomovitch $
+# $Id$
 package Youri::Package::RPM::RPM4;
 
 =head1 NAME

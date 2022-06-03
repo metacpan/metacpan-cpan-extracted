@@ -20,7 +20,7 @@ use Metabolomics::Banks::Knapsack qw( :all ) ;
 use Metabolomics::Banks::PhytoHub qw( :all ) ;
 use Metabolomics::Banks::PeakForest qw( :all ) ;
 
-use Test::More tests => 34 ;
+use Test::More tests => 35 ;
 use Data::Dumper ;
 
 
@@ -1280,6 +1280,28 @@ BEGIN {
 		$modulePath.'/pfs007110__ANNOTATED__.TSV',
 		'Method \'fullCompare_ExpPeakList_And_AbInitioFragmentBank_FromDataAnalysis\' works on PeakForest Data with L-prolyl-L-glycine (TOXALIM)');
 
+
+
+	
+#########################	
+	print "\n** Test $current_test fullCompare_ExpComplexPeakListFromBruker_And_AbInitioFragmentBank_FromDataAnalysis_TEST **\n" ; $current_test++;
+	is_deeply( fullCompare_ExpComplexPeakListFromBruker_And_AbInitioFragmentBank_FromDataAnalysis_TEST(
+		# ($expFile, $mzCol, $intCol, $delta, $theoFile, $mzParent, $mode, $stateMolecule, $isotopicDetection, $template, $tabular) 	
+		$modulePath.'/Cmpd_16_RFDAIACWWDREDC-FRVQLJSFSA-N_Glycocholic_acid__RT__=11.72.csv',
+		2,	## mz
+		4,  ##  i
+		10, #ppm
+		$modulePath.'/MS_fragments-adducts-isotopes__V1.1.txt',
+		465.3090381,
+		'POSITIVE', #mode
+		'NEUTRAL', #stateMolecule
+		'FALSE',
+		$modulePath.'/_template_pforest_peaklist_lcms.tmpl',
+		$modulePath.'/Cmpd_16_RFDAIACWWDREDC-FRVQLJSFSA-N_Glycocholic_acid__RT__=11.72__ANNOTATED__.TSV'
+		),
+		$modulePath.'/_template_pforest_peaklist_lcms.tmpl',
+		'Method \'fullCompare_ExpComplexPeakListFromBruker_And_AbInitioFragmentBank_FromDataAnalysis_TEST\' works on Glycocholic acid example with SPECIFIC PEAKFOREST CSV input');
+
 ## #################################################################################################################################
 ##
 #########################	######################### Full Analysis FOR MaConDa db #########################  ###############
@@ -1596,13 +1618,11 @@ BEGIN {
 		}
 		
 		$oBank->parsingMsFragments($expFile, 'asheader', $col) ; # get mz in colunm 2
-#		print Dumper $oBank ;
-
+		
 		my $oAnalysis = Metabolomics::Fragment::Annotation->new($oBank) ;
 
 #		$oAnalysis->compareExpMzToTheoMzList('PPM', $delta) ;
 		$oAnalysis->compareExpMzToTheoMzListAllMatches('PPM', $delta) ;
-#		print Dumper $oAnalysis ;
 		
 		my $tabularFullfile = $oAnalysis->writeFullTabularWithPeakBankObject($expFile, $template, $tabular, 'FALSE') ;
 		
@@ -1611,6 +1631,44 @@ BEGIN {
 		my $HtmlOuput = $oAnalysis->writeHtmlWithPeakBankObject($templateHTML, $htmlFile ) ;
 		
 		return($tabularFullfile) ;	
+	}
+
+	## sub fullCompare_ExpComplexPeakListFromBruker_And_AbInitioFragmentBank_FromDataAnalysis_TEST
+	sub fullCompare_ExpComplexPeakListFromBruker_And_AbInitioFragmentBank_FromDataAnalysis_TEST {
+		# get values
+		my ($expFile, $mzCol, $intCol, $delta, $theoFile, $mzParent, $mode, $stateMolecule, $isotopicDetection, $template, $tabular) = @_ ;
+		
+		my $oBank = Metabolomics::Banks::AbInitioFragments->new(  { POLARITY => $mode, }  ) ;
+#		print Dumper $oBank ;
+		
+		$oBank->getFragmentsFromSource($theoFile) ;
+#		print Dumper $oBank ;
+		
+		my $nb = $oBank->buildTheoPeakBankFromFragments($mzParent, $mode, $stateMolecule, $isotopicDetection) ;
+#		print Dumper $oBank ;
+
+		$oBank->buildTheoDimerFromMz($mzParent, $mode) ;
+#		print Dumper $oBank ;
+
+		if ($isotopicDetection eq 'TRUE') {
+			$oBank->isotopicAdvancedCalculation($mode) ;
+		}
+		
+		$oBank->parsingFeaturesFragments($expFile, 'asheader', [$mzCol, $intCol]) ; # get mz in colunm 2 and I in column 4
+		
+		my $oAnalysis = Metabolomics::Fragment::Annotation->new($oBank) ;
+
+		$oAnalysis->compareExpMzToTheoMzListAllMatches('PPM', $delta) ;
+		
+		$oAnalysis->writePForestTabularWithPeakBankObject($template , $tabular.'.PFOREST', 'FALSE') ;
+		
+#		my $tabularFullfile = $oAnalysis->writeFullTabularWithPeakBankObject($expFile, $template, $tabular, 'FALSE') ;
+#		
+#		my $tabularfile = $oAnalysis->writeTabularWithPeakBankObject($template, $tabular.'.SIMPLE', 'FALSE') ;
+#		
+#		my $HtmlOuput = $oAnalysis->writeHtmlWithPeakBankObject($templateHTML, $htmlFile ) ;
+		
+		return($template) ;	
 	}
 ##
 #########################	######################### 	MACONDA TESTS SUB	 #########################  ####################

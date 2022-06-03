@@ -1,4 +1,4 @@
-# Copyright (c) 2009-2021 Sullivan Beck. All rights reserved.
+# Copyright (c) 2009-2022 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -28,12 +28,43 @@ every release, but occasionally, a change is made which is backward
 incompatible. These are marked with an exclamation mark (!).
 
 #=head1 VERSION 6.90 (expected 2022-12-01)
-#
+
 #=head1 VERSION 6.89 (expected 2022-09-01)
-#
-#=head1 VERSION 6.88 (expected 2022-06-01)
-#
-#=head1 VERSION 6.87 (expected 2022-03-01)
+
+=head1 VERSION 6.89 (2022-09-02)
+
+=over 5
+
+=item Packaging problem.
+
+I generated a broken MANIFEST file in the previous release.  Reported 
+in GitHub issue #39.
+
+=back
+
+=head1 VERSION 6.88 (2022-06-01)
+
+=over 5
+
+=item Time zone fixes
+
+There were no new timezone fixes on 2022-03-01, so no
+release made then.
+
+Newest zoneinfo data (tzdata 2022a).
+
+=back
+
+=head1 VERSION 6.87 (2022-03-01)
+
+=over 5
+
+=item Bug fixes
+
+The package was being generated with an incorrect MANIFEST file.  This is now
+fixed.  RT 140075
+
+=back
 
 =head1 VERSION 6.86 (2021-11-15)
 
@@ -42,7 +73,7 @@ incompatible. These are marked with an exclamation mark (!).
 =item Change warn to carp
 
 All warnings are now issued with the carp command rather than warn.  Requested
-in GitHup pull request #18, but that request was not used because it only
+in GitHub pull request #18, but that request was not used because it only
 changed the uses in the Date::Manip::Date module.
 
 =item Bug fixes

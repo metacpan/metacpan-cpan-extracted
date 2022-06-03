@@ -1,0 +1,5 @@
+charset: "UTF-8"
+plugins:
+  DoFile:
+    page_loc: "dofiles/pages"
+    default_file: "index"

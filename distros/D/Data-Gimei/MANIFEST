@@ -9,6 +9,7 @@ eg/sample.pl
 lib/Data/Gimei.pm
 lib/Data/Gimei/Address.pm
 lib/Data/Gimei/Name.pm
+lib/Data/Gimei/Random.pm
 lib/Data/Gimei/Word.pm
 minil.toml
 share/addresses.yml
@@ -16,9 +17,10 @@ share/names.yml
 t/00_compile.t
 t/address.t
 t/addresses.yml
+t/deterministic_rand.t
 t/name.t
 t/names.yml
-t/rand.t
+t/random.t
 t/word.t
 META.yml
 MANIFEST

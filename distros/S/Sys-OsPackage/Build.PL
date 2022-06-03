@@ -18,7 +18,7 @@ my %module_build_args = (
     "Ian Kluft <cpan-dev\@iankluft.com>"
   ],
   "dist_name" => "Sys-OsPackage",
-  "dist_version" => "0.1.4",
+  "dist_version" => "0.1.6",
   "license" => "artistic_2",
   "module_name" => "Sys::OsPackage",
   "recursive_test_files" => 1,

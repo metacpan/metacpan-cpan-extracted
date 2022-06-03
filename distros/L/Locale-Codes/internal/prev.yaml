@@ -46896,6 +46896,7 @@ script:
       Jurc: Jurchen
       Kali: Kayah Li
       Kana: Katakana
+      Kawi: Kawi
       Khar: Kharoshthi
       Khmr: Khmer
       Khoj: Khojki
@@ -46937,6 +46938,7 @@ script:
       Mtei: Meitei Mayek
       Mult: Multani
       Mymr: Myanmar
+      Nagm: Nag Mundari
       Nand: Nandinagari
       Narb: Old North Arabian
       Nbat: Nabataean
@@ -46989,6 +46991,7 @@ script:
       Sora: Sora Sompeng
       Soyo: Soyombo
       Sund: Sundanese
+      Sunu: Sunuwar
       Sylo: Syloti Nagri
       Syrc: Syriac
       Syre: Syriac (Estrangelo variant)
@@ -47253,6 +47256,9 @@ script:
       katakana: 
         - Kana
         - Katakana
+      kawi: 
+        - Kawi
+        - Kawi
       kayah li: 
         - Kali
         - Kayah Li
@@ -47394,6 +47400,9 @@ script:
       nabataean: 
         - Nbat
         - Nabataean
+      nag mundari: 
+        - Nagm
+        - Nag Mundari
       nandinagari: 
         - Nand
         - Nandinagari
@@ -47544,6 +47553,9 @@ script:
       sundanese: 
         - Sund
         - Sundanese
+      sunuwar: 
+        - Sunu
+        - Sunuwar
       syloti nagri: 
         - Sylo
         - Syloti Nagri
@@ -47734,6 +47746,7 @@ script:
       263: Pau Cin Hau
       264: Mro, Mru
       265: Medefaidrin (Oberi Okaime, Oberi Okaime)
+      274: Sunuwar
       275: Tangsa
       280: Visible Speech
       281: Shavian (Shaw)
@@ -47749,6 +47762,7 @@ script:
       292: Sarati
       293: Klingon (KLI pIqaD)
       294: Toto
+      295: Nag Mundari
       300: Brahmi
       302: Siddham, Siddham, Siddhamatrka
       303: Ranjana
@@ -47810,6 +47824,7 @@ script:
       365: Batak
       366: Makasar
       367: Buginese
+      368: Kawi
       370: Tagalog (Baybayin, Alibata)
       371: Hanunoo (Hanunoo)
       372: Buhid
@@ -48087,6 +48102,9 @@ script:
       katakana: 
         - 411
         - Katakana
+      kawi: 
+        - 368
+        - Kawi
       kayah li: 
         - 357
         - Kayah Li
@@ -48228,6 +48246,9 @@ script:
       nabataean: 
         - 159
         - Nabataean
+      nag mundari: 
+        - 295
+        - Nag Mundari
       nandinagari: 
         - 311
         - Nandinagari
@@ -48375,6 +48396,9 @@ script:
       sundanese: 
         - 362
         - Sundanese
+      sunuwar: 
+        - 274
+        - Sunuwar
       syloti nagri: 
         - 316
         - Syloti Nagri

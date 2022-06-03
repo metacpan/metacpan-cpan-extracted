@@ -9419,6 +9419,7 @@ currency:
       SEK: Swedish Krona
       SGD: Singapore Dollar
       SHP: Saint Helena Pound
+      SLE: Leone
       SLL: Leone
       SOS: Somali Shilling
       SRD: Surinam Dollar
@@ -9716,7 +9717,7 @@ currency:
         - HNL
         - Lempira
       leone: 
-        - SLL
+        - SLE
         - Leone
       liberian dollar: 
         - LRD
@@ -10127,6 +10128,7 @@ currency:
       882: Tala
       886: Yemeni Rial
       901: New Taiwan Dollar
+      925: Leone
       926: Bolivar Soberano
       927: Unidad Previsional
       928: Bolivar Soberano
@@ -10428,7 +10430,7 @@ currency:
         - 340
         - Lempira
       leone: 
-        - 694
+        - 925
         - Leone
       liberian dollar: 
         - 430
@@ -10732,6 +10734,7 @@ langext:
       afb: Gulf Arabic
       afg: Afghan Sign Language
       ajp: South Levantine Arabic
+      ajs: Algerian Jewish Sign Language
       apc: North Levantine Arabic
       apd: Sudanese Arabic
       arb: Standard Arabic
@@ -10784,6 +10787,7 @@ langext:
       doq: Dominican Sign Language
       dse: Dutch Sign Language
       dsl: Danish Sign Language
+      dsz: Mardin Sign Language
       dup: Duano
       ecs: Ecuadorian Sign Language
       ehs: Miyakubo Sign Language
@@ -10843,12 +10847,14 @@ langext:
       liw: Col
       lls: Lithuanian Sign Language
       lsb: Burundian Sign Language
+      lsc: Albarradas Sign Language
       lsl: Latvian Sign Language
       lsn: Tibetan Sign Language
       lso: Laos Sign Language
       lsp: Panamanian Sign Language
       lst: Trinidad and Tobago Sign Language
       lsv: Sivia Sign Language
+      lsw: Seychelles Sign Language
       lsy: Mauritian Sign Language
       ltg: Latgalian
       lvs: Standard Latvian
@@ -10888,7 +10894,7 @@ langext:
       pks: Pakistan Sign Language
       prl: Peruvian Sign Language
       prz: Providencia Sign Language
-      psc: Persian Sign Language
+      psc: Iranian Sign Language
       psd: Plains Indian Sign Language
       pse: Central Malay
       psg: Penang Sign Language
@@ -10897,9 +10903,12 @@ langext:
       psp: Philippine Sign Language
       psr: Portuguese Sign Language
       pys: Paraguayan Sign Language
+      rib: Bribri Sign Language
       rms: Romanian Sign Language
+      rnb: Brunca Sign Language
       rsl: Russian Sign Language
       rsm: Miriwoong Sign Language
+      rsn: Rwandan Sign Language
       sdl: Saudi Arabian Sign Language
       sfb: Langue des signes de Belgique Francophone
       sfs: South African Sign Language
@@ -10969,9 +10978,15 @@ langext:
       albanian sign language: 
         - sqk
         - Albanian Sign Language
+      albarradas sign language: 
+        - lsc
+        - Albarradas Sign Language
       algerian arabic: 
         - arq
         - Algerian Arabic
+      algerian jewish sign language: 
+        - ajs
+        - Algerian Jewish Sign Language
       algerian saharan arabic: 
         - aao
         - Algerian Saharan Arabic
@@ -11029,9 +11044,15 @@ langext:
       brazilian sign language: 
         - bzs
         - Brazilian Sign Language
+      bribri sign language: 
+        - rib
+        - Bribri Sign Language
       british sign language: 
         - bfi
         - British Sign Language
+      brunca sign language: 
+        - rnb
+        - Brunca Sign Language
       brunei: 
         - kxd
         - Brunei
@@ -11218,6 +11239,9 @@ langext:
       inuit sign language: 
         - iks
         - Inuit Sign Language
+      iranian sign language: 
+        - psc
+        - Iranian Sign Language
       irish sign language: 
         - isg
         - Irish Sign Language
@@ -11332,6 +11356,9 @@ langext:
       mandarin chinese: 
         - cmn
         - Mandarin Chinese
+      mardin sign language: 
+        - dsz
+        - Mardin Sign Language
       maritime sign language: 
         - nsr
         - Maritime Sign Language
@@ -11464,9 +11491,6 @@ langext:
       penang sign language: 
         - psg
         - Penang Sign Language
-      persian sign language: 
-        - psc
-        - Persian Sign Language
       peruvian sign language: 
         - prl
         - Peruvian Sign Language
@@ -11500,6 +11524,9 @@ langext:
       russian sign language: 
         - rsl
         - Russian Sign Language
+      rwandan sign language: 
+        - rsn
+        - Rwandan Sign Language
       sabah malay: 
         - msi
         - Sabah Malay
@@ -11518,6 +11545,9 @@ langext:
       selangor sign language: 
         - kgi
         - Selangor Sign Language
+      seychelles sign language: 
+        - lsw
+        - Seychelles Sign Language
       shihhi arabic: 
         - ssh
         - Shihhi Arabic
@@ -12616,7 +12646,7 @@ language:
       aji: Ajie
       ajn: Andajin
       ajp: South Levantine Arabic
-      ajt: Judeo-Tunisian Arabic
+      ajs: Algerian Jewish Sign Language
       aju: Judeo-Moroccan Arabic
       ajw: Ajawa
       ajz: Amri Karbi
@@ -13322,6 +13352,7 @@ language:
       boy: Bodo (Central African Republic)
       boz: Tieyaxo Bozo
       bpa: Daakaka
+      bpc: Mbuk
       bpd: Banda-Banda
       bpe: Bauni
       bpg: Bonggo
@@ -13370,7 +13401,7 @@ language:
       bqy: Bengkala Sign Language
       bqz: Bakaka
       bra: Braj
-      brb: Lave
+      brb: Brao
       brc: Berbice Creole Dutch
       brd: Baraamu
       bre: Breton
@@ -13783,6 +13814,7 @@ language:
       cnl: Lalana Chinantec
       cno: Con
       cnp: Northern Ping Chinese
+      cnq: Chung
       cnr: Montenegrin
       cns: Central Asmat
       cnt: Tepetotutla Chinantec
@@ -13898,7 +13930,6 @@ language:
       cua: Cua
       cub: Cubeo
       cuc: Usila Chinantec
-      cug: Chungmboko
       cuh: Chuka
       cui: Cuiba
       cuj: Mashco Piro
@@ -14163,6 +14194,7 @@ language:
       dsn: Dusner
       dso: Desiya
       dsq: Tadaksahak
+      dsz: Mardin Sign Language
       dta: Daur
       dtb: Labuk-Kinabatangan Kadazan
       dtd: Ditidaht
@@ -14243,6 +14275,7 @@ language:
       efi: Efik
       ega: Ega
       egl: Emilian
+      egm: Benamanga
       ego: Eggon
       egx: Egyptian languages
       egy: Egyptian (Ancient)
@@ -14301,7 +14334,7 @@ language:
       enq: Enga
       enr: Emumu
       enu: Enu
-      env: Enwan (Edu State)
+      env: Enwan (Edo State)
       enw: Enwan (Akwa Ibom State)
       enx: Enxet
       eot: Beti (Cote d'Ivoire)
@@ -14678,6 +14711,7 @@ language:
       gos: Gronings
       got: Gothic
       gou: Gavar
+      gov: Goo
       gow: Gorowa
       gox: Gobu
       goy: Goundo
@@ -15087,6 +15121,7 @@ language:
       imo: Imbongu
       imr: Imroing
       ims: Marsian
+      imt: Imotong
       imy: Milyan
       ina: Interlingua (International Auxiliary Language Association)
       inb: Inga
@@ -15966,7 +16001,6 @@ language:
       lah: Lahnda
       lai: Lambya
       laj: Lango (Uganda)
-      lak: Laka (Nigeria)
       lal: Lalia
       lam: Lamba
       lan: Laru
@@ -16064,6 +16098,7 @@ language:
       lgl: Wala
       lgm: Lega-Mwenga
       lgn: T'apo
+      lgo: Lango (South Sudan)
       lgq: Logba
       lgr: Lengo
       lgt: Pahi
@@ -16179,7 +16214,6 @@ language:
       lnl: South Central Banda
       lnm: Langam
       lnn: Lorediakarkar
-      lno: Lango (South Sudan)
       lns: Lamnso'
       lnu: Longuda
       lnw: Lanima
@@ -16214,6 +16248,7 @@ language:
       lpn: Long Phuri Naga
       lpo: Lipo
       lpx: Lopit
+      lqr: Logir
       lra: Rara Bakati'
       lrc: Northern Luri
       lre: Laurentian
@@ -16230,6 +16265,7 @@ language:
       lrz: Lemerig
       lsa: Lasgerdi
       lsb: Burundian Sign Language
+      lsc: Albarradas Sign Language
       lsd: Lishana Deni
       lse: Lusengo
       lsh: Lish
@@ -16243,6 +16279,7 @@ language:
       lss: Lasi
       lst: Trinidad and Tobago Sign Language
       lsv: Sivia Sign Language
+      lsw: Seychelles Sign Language
       lsy: Mauritian Sign Language
       ltc: Late Middle Chinese
       ltg: Latgalian
@@ -17385,6 +17422,7 @@ language:
       nwm: Nyamusa-Molo
       nwo: Nauo
       nwr: Nawaru
+      nww: Ndwewe
       nwx: Middle Newar
       nwy: Nottoway-Meherrin
       nxa: Nauete
@@ -17469,6 +17507,7 @@ language:
       oht: Old Hittite
       ohu: Old Hungarian
       oia: Oirata
+      oie: Okolie
       oin: Inebu One
       ojb: Northwestern Ojibwa
       ojc: Central Ojibwa
@@ -17716,6 +17755,7 @@ language:
       phg: Phuong
       phh: Phukha
       phi: Philippine languages
+      phj: Pahari
       phk: Phake
       phl: Phalura
       phm: Phimbi
@@ -17735,7 +17775,6 @@ language:
       pif: Pingelapese
       pig: Pisabo
       pih: Pitcairn-Norfolk
-      pii: Pini
       pij: Pijao
       pil: Yom
       pim: Powhatan
@@ -17893,7 +17932,7 @@ language:
       prx: Purik
       prz: Providencia Sign Language
       psa: Asue Awyu
-      psc: Persian Sign Language
+      psc: Iranian Sign Language
       psd: Plains Indian Sign Language
       pse: Central Malay
       psg: Penang Sign Language
@@ -17961,7 +18000,8 @@ language:
       pyu: Puyuma
       pyx: Pyu (Myanmar)
       pyy: Pyen
-      pzn: Para Naga
+      pzh: Pazeh
+      pzn: Jejara Naga
       qtz: Reserved for local use
       qua: Quapaw
       qub: Huallaga Huanuco Quechua
@@ -18076,6 +18116,7 @@ language:
       rhg: Rohingya
       rhp: Yahang
       ria: Riang (India)
+      rib: Bribri Sign Language
       rif: Tarifit
       ril: Riang Lang
       rim: Nyaturu
@@ -18117,6 +18158,7 @@ language:
       rmx: Romam
       rmy: Vlax Romani
       rmz: Marma
+      rnb: Brunca Sign Language
       rnd: Ruund
       rng: Ronga
       rnl: Ranglong
@@ -18145,8 +18187,10 @@ language:
       rro: Waima
       rrt: Arritinngithigh
       rsb: Romano-Serbian
+      rsk: Ruthenian
       rsl: Russian Sign Language
       rsm: Miriwoong Sign Language
+      rsn: Rwandan Sign Language
       rtc: Rungtu Chin
       rth: Ratahan
       rtm: Rotuman
@@ -18440,7 +18484,6 @@ language:
       sma: Southern Sami
       smb: Simbari
       smc: Som
-      smd: Sama
       sme: Northern Sami
       smf: Auwe
       smg: Simbali
@@ -18464,7 +18507,6 @@ language:
       smy: Semnani
       smz: Simeku
       sna: Shona
-      snb: Sebuyau
       snc: Sinaugoro
       snd: Sindhi
       sne: Bau Bidayuh
@@ -19014,6 +19056,7 @@ language:
       toh: Gitonga
       toi: Tonga (Zambia)
       toj: Tojolabal
+      tok: Toki Pona
       tol: Tolowa
       tom: Tombulu
       ton: Tonga (Tonga Islands)
@@ -19082,7 +19125,7 @@ language:
       trs: Chicahuaxtla Triqui
       trt: Tunggare
       tru: Turoyo
-      trv: Taroko
+      trv: Sediq
       trw: Torwali
       trx: Tringgus-Sembaan Bidayuh
       try: Turung
@@ -19262,6 +19305,7 @@ language:
       uga: Ugaritic
       ugb: Kuku-Ugbanh
       uge: Ughele
+      ugh: Kubachi
       ugn: Ugandan Sign Language
       ugo: Ugong
       ugy: Uruguayan Sign Language
@@ -19322,6 +19366,7 @@ language:
       unu: Unubahe
       unx: Munda
       unz: Unde Kaili
+      uon: Kulon
       upi: Umeda
       upv: Uripiv-Wala-Rano-Atchin
       ura: Urarina
@@ -19362,7 +19407,6 @@ language:
       utr: Etulo
       utu: Utu
       uum: Urum
-      uun: Kulon-Pazeh
       uur: Ura (Vanuatu)
       uuu: U
       uve: West Uvean
@@ -19515,6 +19559,7 @@ language:
       wdg: Wadaginam
       wdj: Wadjiginy
       wdk: Wadikali
+      wdt: Wendat
       wdu: Wadjigu
       wdy: Wadjabangayi
       wea: Wewaw
@@ -19637,7 +19682,6 @@ language:
       woy: Weyto
       wpc: Maco
       wrb: Waluwarra
-      wrd: Warduji
       wrg: Warungu
       wrh: Wiradjuri
       wri: Wariyangga
@@ -19689,10 +19733,10 @@ language:
       www: Wawa
       wxa: Waxianghua
       wxw: Wardandi
-      wya: Wyandot
       wyb: Wangaaybuwan-Ngiyambaa
       wyi: Woiwurrung
       wym: Wymysorys
+      wyn: Wyandot
       wyr: Wayoro
       wyy: Western Fijian
       xaa: Andalusian Arabic
@@ -19751,6 +19795,7 @@ language:
       xdk: Dharuk
       xdm: Edomite
       xdo: Kwandu
+      xdq: Kaitag
       xdy: Malayic Dayak
       xeb: Eblan
       xed: Hdi
@@ -19779,6 +19824,7 @@ language:
       xhc: Hunnic
       xhd: Hadrami
       xhe: Khetrani
+      xhm: Middle Khmer (1400 to 1850 CE)
       xho: Xhosa
       xhr: Hernican
       xht: Hattic
@@ -19803,7 +19849,7 @@ language:
       xkg: Kagoro
       xki: Kenyan Sign Language
       xkj: Kajali
-      xkk: Kaco'
+      xkk: Kachok
       xkl: Mainstream Kenyah
       xkn: Kayan River Kayan
       xko: Kiorr
@@ -19853,7 +19899,7 @@ language:
       xmu: Kamu
       xmv: Antankarana Malagasy
       xmw: Tsimihety Malagasy
-      xmx: Maden
+      xmx: Salawati
       xmy: Mayaguduna
       xmz: Mori Bawah
       xna: Ancient North Arabian
@@ -20281,6 +20327,7 @@ language:
       zbu: Bu (Bauchi State)
       zbw: West Berawan
       zca: Coatecas Altas Zapotec
+      zcd: Las Delicias Zapotec
       zch: Central Hongshuihe Zhuang
       zdj: Ngazidja Comorian
       zea: Zeeuws
@@ -20955,6 +21002,9 @@ language:
       albanian sign language: 
         - sqk
         - Albanian Sign Language
+      albarradas sign language: 
+        - lsc
+        - Albarradas Sign Language
       alcozauca mixtec: 
         - xta
         - Alcozauca Mixtec
@@ -20970,6 +21020,9 @@ language:
       algerian arabic: 
         - arq
         - Algerian Arabic
+      algerian jewish sign language: 
+        - ajs
+        - Algerian Jewish Sign Language
       algerian saharan arabic: 
         - aao
         - Algerian Saharan Arabic
@@ -22782,6 +22835,9 @@ language:
       benabena: 
         - bef
         - Benabena
+      benamanga: 
+        - egm
+        - Benamanga
       bench: 
         - bcq
         - Bench
@@ -23439,6 +23495,9 @@ language:
       braj: 
         - bra
         - Braj
+      brao: 
+        - brb
+        - Brao
       brazilian sign language: 
         - bzs
         - Brazilian Sign Language
@@ -23454,6 +23513,9 @@ language:
       bribri: 
         - bzd
         - Bribri
+      bribri sign language: 
+        - rib
+        - Bribri Sign Language
       brithenig: 
         - bzt
         - Brithenig
@@ -23475,6 +23537,9 @@ language:
       broome pearling lugger pidgin: 
         - bpl
         - Broome Pearling Lugger Pidgin
+      brunca sign language: 
+        - rnb
+        - Brunca Sign Language
       brunei: 
         - kxd
         - Brunei
@@ -24549,9 +24614,9 @@ language:
       chumburung: 
         - ncu
         - Chumburung
-      chungmboko: 
-        - cug
-        - Chungmboko
+      chung: 
+        - cnq
+        - Chung
       churahi: 
         - cdj
         - Churahi
@@ -26088,9 +26153,9 @@ language:
       enwan (akwa ibom state): 
         - enw
         - Enwan (Akwa Ibom State)
-      enwan (edu state): 
+      enwan (edo state): 
         - env
-        - Enwan (Edu State)
+        - Enwan (Edo State)
       enxet: 
         - enx
         - Enxet
@@ -27006,6 +27071,9 @@ language:
       gonja: 
         - gjn
         - Gonja
+      goo: 
+        - gov
+        - Goo
       gooniyandi: 
         - gni
         - Gooniyandi
@@ -28158,6 +28226,9 @@ language:
       imonda: 
         - imn
         - Imonda
+      imotong: 
+        - imt
+        - Imotong
       imroing: 
         - imr
         - Imroing
@@ -28293,6 +28364,9 @@ language:
       iranian persian: 
         - pes
         - Iranian Persian
+      iranian sign language: 
+        - psc
+        - Iranian Sign Language
       irantxe: 
         - irn
         - Irantxe
@@ -28626,6 +28700,9 @@ language:
       jehai: 
         - jhi
         - Jehai
+      jejara naga: 
+        - pzn
+        - Jejara Naga
       jejueo: 
         - jje
         - Jejueo
@@ -28773,9 +28850,6 @@ language:
       judeo-tripolitanian arabic: 
         - yud
         - Judeo-Tripolitanian Arabic
-      judeo-tunisian arabic: 
-        - ajt
-        - Judeo-Tunisian Arabic
       judeo-yemeni arabic: 
         - jye
         - Judeo-Yemeni Arabic
@@ -28899,12 +28973,12 @@ language:
       kachin: 
         - kac
         - Kachin
+      kachok: 
+        - xkk
+        - Kachok
       kacipo-bale suri: 
         - koe
         - Kacipo-Bale Suri
-      kaco': 
-        - xkk
-        - Kaco'
       kadai: 
         - kzd
         - Kadai
@@ -29007,6 +29081,9 @@ language:
       kais: 
         - kzm
         - Kais
+      kaitag: 
+        - xdq
+        - Kaitag
       kaivi: 
         - kce
         - Kaivi
@@ -30690,6 +30767,9 @@ language:
       kuanyama: 
         - kua
         - Kuanyama
+      kubachi: 
+        - ugh
+        - Kubachi
       kube: 
         - kgf
         - Kube
@@ -30792,9 +30872,9 @@ language:
       kullu pahari: 
         - kfx
         - Kullu Pahari
-      kulon-pazeh: 
-        - uun
-        - Kulon-Pazeh
+      kulon: 
+        - uon
+        - Kulon
       kulung (nepal): 
         - kle
         - Kulung (Nepal)
@@ -31281,9 +31361,6 @@ language:
       laka (chad): 
         - lap
         - Laka (Chad)
-      laka (nigeria): 
-        - lak
-        - Laka (Nigeria)
       lakalei: 
         - lka
         - Lakalei
@@ -31423,7 +31500,7 @@ language:
         - yln
         - Langnian Buyang
       lango (south sudan): 
-        - lno
+        - lgo
         - Lango (South Sudan)
       lango (uganda): 
         - laj
@@ -31488,6 +31565,9 @@ language:
       laru: 
         - lan
         - Laru
+      las delicias zapotec: 
+        - zcd
+        - Las Delicias Zapotec
       lasalimu: 
         - llm
         - Lasalimu
@@ -31545,9 +31625,6 @@ language:
       lavatbura-lamusong: 
         - lbv
         - Lavatbura-Lamusong
-      lave: 
-        - brb
-        - Lave
       laven: 
         - lbo
         - Laven
@@ -31926,6 +32003,9 @@ language:
       logba: 
         - lgq
         - Logba
+      logir: 
+        - lqr
+        - Logir
       logo: 
         - log
         - Logo
@@ -32364,9 +32444,6 @@ language:
       madak: 
         - mmx
         - Madak
-      maden: 
-        - xmx
-        - Maden
       madhi madhi: 
         - dmd
         - Madhi Madhi
@@ -33048,6 +33125,9 @@ language:
       marba: 
         - mpg
         - Marba
+      mardin sign language: 
+        - dsz
+        - Mardin Sign Language
       maremgi: 
         - mrx
         - Maremgi
@@ -33474,6 +33554,9 @@ language:
       mbugwe: 
         - mgz
         - Mbugwe
+      mbuk: 
+        - bpc
+        - Mbuk
       mbuko: 
         - mqb
         - Mbuko
@@ -33759,6 +33842,9 @@ language:
       middle irish (900-1200): 
         - mga
         - Middle Irish (900-1200)
+      middle khmer (1400 to 1850 ce): 
+        - xhm
+        - Middle Khmer (1400 to 1850 CE)
       middle korean (10th-16th cent.): 
         - okm
         - Middle Korean (10th-16th cent.)
@@ -35013,6 +35099,9 @@ language:
       ndut: 
         - ndv
         - Ndut
+      ndwewe: 
+        - nww
+        - Ndwewe
       ndyuka-trio pidgin: 
         - njt
         - Ndyuka-Trio Pidgin
@@ -36354,6 +36443,9 @@ language:
       okodia: 
         - okd
         - Okodia
+      okolie: 
+        - oie
+        - Okolie
       okolod: 
         - kqv
         - Okolod
@@ -36804,6 +36896,9 @@ language:
       pahanan agta: 
         - apf
         - Pahanan Agta
+      pahari: 
+        - phj
+        - Pahari
       pahari-potwari: 
         - phr
         - Pahari-Potwari
@@ -37041,9 +37136,6 @@ language:
       para gaviao: 
         - gvp
         - Para Gaviao
-      para naga: 
-        - pzn
-        - Para Naga
       parachi: 
         - prc
         - Parachi
@@ -37167,6 +37259,9 @@ language:
       paynamar: 
         - pmr
         - Paynamar
+      pazeh: 
+        - pzh
+        - Pazeh
       pe: 
         - pai
         - Pe
@@ -37245,9 +37340,6 @@ language:
       persian: 
         - per
         - Persian
-      persian sign language: 
-        - psc
-        - Persian Sign Language
       peruvian sign language: 
         - prl
         - Peruvian Sign Language
@@ -37407,9 +37499,6 @@ language:
       pingelapese: 
         - pif
         - Pingelapese
-      pini: 
-        - pii
-        - Pini
       pinigura: 
         - pnv
         - Pinigura
@@ -38265,6 +38354,9 @@ language:
       rusyn: 
         - rue
         - Rusyn
+      ruthenian: 
+        - rue
+        - Ruthenian
       rutul: 
         - rut
         - Rutul
@@ -38280,6 +38372,9 @@ language:
       rwa: 
         - rwk
         - Rwa
+      rwandan sign language: 
+        - rsn
+        - Rwandan Sign Language
       s'gaw karen: 
         - ksw
         - S'gaw Karen
@@ -38418,6 +38513,9 @@ language:
       salasaca highland quichua: 
         - qxl
         - Salasaca Highland Quichua
+      salawati: 
+        - xmx
+        - Salawati
       salchuq: 
         - slq
         - Salchuq
@@ -38451,9 +38549,6 @@ language:
       sam: 
         - snx
         - Sam
-      sama: 
-        - smd
-        - Sama
       samaritan: 
         - smp
         - Samaritan
@@ -38877,9 +38972,6 @@ language:
       sebop: 
         - sib
         - Sebop
-      sebuyau: 
-        - snb
-        - Sebuyau
       sechelt: 
         - sec
         - Sechelt
@@ -38889,6 +38981,9 @@ language:
       sedang: 
         - sed
         - Sedang
+      sediq: 
+        - trv
+        - Sediq
       sedoa: 
         - tvw
         - Sedoa
@@ -39111,6 +39206,9 @@ language:
       sewa bay: 
         - sew
         - Sewa Bay
+      seychelles sign language: 
+        - lsw
+        - Seychelles Sign Language
       seze: 
         - sze
         - Seze
@@ -40770,9 +40868,6 @@ language:
       tarok: 
         - yer
         - Tarok
-      taroko: 
-        - trv
-        - Taroko
       tarpia: 
         - tpf
         - Tarpia
@@ -41493,6 +41588,9 @@ language:
       tokharian b: 
         - txb
         - Tokharian B
+      toki pona: 
+        - tok
+        - Toki Pona
       toku-no-shima: 
         - tkn
         - Toku-No-Shima
@@ -42951,9 +43049,6 @@ language:
       wardandi: 
         - wxw
         - Wardandi
-      warduji: 
-        - wrd
-        - Warduji
       warembori: 
         - wsa
         - Warembori
@@ -43119,6 +43214,9 @@ language:
       weme gbe: 
         - wem
         - Weme Gbe
+      wendat: 
+        - wdt
+        - Wendat
       wergaia: 
         - weg
         - Wergaia
@@ -43555,7 +43653,7 @@ language:
         - udl
         - Wuzlam
       wyandot: 
-        - wya
+        - wyn
         - Wyandot
       wymysorys: 
         - wym

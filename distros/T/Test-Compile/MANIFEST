@@ -9,6 +9,8 @@ META.json
 META.yml
 README
 t/000-compile.t
+t/100-internal--find-files-ignores-cvs.t
+t/100-internal--find-files-ignores-svn.t
 t/100-internal--find-files.t
 t/100-internal--is-in-taint-mode.t
 t/100-internal--read-shebang.t
@@ -25,6 +27,7 @@ t/200-import-check.t
 t/200-all-files-ok.t
 t/200-all-pm-files-ok.t
 t/200-all-pl-files-ok.t
+t/200-all-pl-files.t
 t/200-px-file-ok.t
 t/200-taint.t
 t/999-has-version.t
@@ -34,7 +37,7 @@ t/999-pod.t
 t/999-portability.t
 t/999-synopsis.t
 t/999-version.t
-t/perlcriticrc
+t/scripts/.svn/Ignore.pm
 t/scripts/CVS/Ignore.pm
 t/scripts/CVS/taint2.pl
 t/scripts/datafile
@@ -44,6 +47,7 @@ t/scripts/lib.pl
 t/scripts/Module2.pm
 t/scripts/Module.pm
 t/scripts/perlscript
+t/scripts/perlscript.pSgi
 t/scripts/shellscript
 t/scripts/subdir/empty
 t/scripts/subdir/success.pl

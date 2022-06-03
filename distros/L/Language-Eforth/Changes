@@ -1,0 +1,19 @@
+Revision history for Language-Eforth
+
+0.02    2022-06-01
+        Second version. The world is perhaps less unsuspecting
+        now. Oh, the changes? Right. Let's see.
+          * add eg/shape example script
+          * add the ->drain, signed(), unsigned() utility calls
+          * better ensure that drain, pop, and push use unsigned
+            values due to embed_pop and embed_push using
+            uint16_t cells and function parameters
+          * skip build if embed sources are not present
+          * make the XS somewhat less bad?
+          * more documentation, tests
+          * push now accepts multiple values, with consequently
+            higher odds of some sort of stack error
+
+0.01    2022-05-31
+        First version, released on an unsuspecting world.
+

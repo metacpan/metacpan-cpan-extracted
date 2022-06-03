@@ -162,7 +162,8 @@ EXAMPLE2
      # </div>
 
 DEPENDENCIES
-    Class::Utils, Error::Pure, List::Utils, MIME::Base64, Readonly.
+    Class::Utils, Error::Pure, List::Utils, MIME::Base64, Readonly,
+    Tags::HTML.
 
 SEE ALSO
     Number::Stars
@@ -177,10 +178,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © Michal Josef Špaček 2020
+    © Michal Josef Špaček 2020-2022
 
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20220307120109;
+our $VERSION = 1.20220601185315;
 
 my $formatters = [
                 {
@@ -38,13 +38,13 @@ my $validators = {
             0(?:
               49|
               5[23]|
-              6[56]|
+              6[5-7]|
               9[016-9]
             )|
             4(?:
               4[569]|
               5[4-6]|
-              6[56]|
+              6[5-7]|
               7[0179]
             )|
             5(?:
@@ -59,13 +59,13 @@ my $validators = {
             0(?:
               49|
               5[23]|
-              6[56]|
+              6[5-7]|
               9[016-9]
             )|
             4(?:
               4[569]|
               5[4-6]|
-              6[56]|
+              6[5-7]|
               7[0179]
             )|
             5(?:
@@ -77,7 +77,7 @@ my $validators = {
         ',
                 'mobile' => '
           (?:
-            0[1267]|
+            0[125-7]|
             5[1-8]|
             [67]\\d
           )\\d{6}
@@ -89,30 +89,30 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"2262456", "Djibo",
-"226204", "Kaya",
-"2262540", "Pô\/Kombissiri\/Koubri",
-"2262099", "Béréba\/Fo\/Houndé",
-"2262455", "Ouahigouya",
+$areanames{en} = {"2262470", "Pouytenga\/Koupéla",
 "226253", "Ouagadougou",
-"2262053", "Boromo\/Djibasso\/Nouna",
-"2262052", "Dédougou",
-"2262091", "Banfora",
-"2262097", "Bobo\-Dioulasso",
-"2262098", "Bobo\-Dioulasso",
-"2262471", "Tenkodogo",
-"2262477", "Fada\/Diabo",
 "2262449", "Falagountou\/Dori",
-"2262479", "Kantchari",
-"2262541", "Léo\/Sapouy",
-"2262454", "Yako",
-"2262544", "Koudougou",
-"226254", "Ouagadougou",
-"2262445", "Kaya",
-"2262096", "Orodara",
-"2262470", "Pouytenga\/Koupéla",
+"2262090", "Gaoua",
+"2262091", "Banfora",
+"2262455", "Ouahigouya",
+"2262097", "Bobo\-Dioulasso",
 "2262446", "Falagountou\/Dori",
-"2262090", "Gaoua",};
+"2262471", "Tenkodogo",
+"2262098", "Bobo\-Dioulasso",
+"2262477", "Fada\/Diabo",
+"2262544", "Koudougou",
+"226204", "Kaya",
+"2262454", "Yako",
+"2262052", "Dédougou",
+"2262445", "Kaya",
+"2262053", "Boromo\/Djibasso\/Nouna",
+"226254", "Ouagadougou",
+"2262541", "Léo\/Sapouy",
+"2262456", "Djibo",
+"2262096", "Orodara",
+"2262540", "Pô\/Kombissiri\/Koubri",
+"2262479", "Kantchari",
+"2262099", "Béréba\/Fo\/Houndé",};
 
     sub new {
       my $class = shift;

@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# Copyright (c) 2008-2021 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2022 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -349,7 +349,7 @@ $def_off{0} = {
                '-04:39:28' => 'America/Eirunepe',
                '-04:39:36' => 'America/Santo_Domingo',
                '-04:40:00' => 'America/Santo_Domingo',
-               '-04:42:46' => 'America/Santiago',
+               '-04:42:45' => 'America/Santiago',
                '-04:43:40' => 'America/Punta_Arenas',
                '-04:44:32' => 'America/Grand_Turk',
                '-04:49:00' => 'America/Port-au-Prince',

@@ -38,8 +38,20 @@ my $client = OpenAPI::Client->new('data://main/test.json', app => app);
 my ($obj, $tx);
 
 is +ref($client), 'OpenAPI::Client::main_test_json', 'generated class';
+
 isa_ok($client, 'OpenAPI::Client');
 can_ok($client, 'addPet');
+
+subtest 'subclassing' => sub {
+  package OpenAPI::Child {
+    use Mojo::Base 'OpenAPI::Client';
+    sub frobnicate {}
+  }
+  my $old_client = OpenAPI::Client->new('data://main/test.json');
+  my $new_client = OpenAPI::Child->new('data://main/test.json');
+  can_ok($new_client, 'frobnicate');
+  ok(!$old_client->can('frobnicate'), 'does not bleed over');
+};
 
 note 'Sync testing';
 $tx = $client->listPetsByType;

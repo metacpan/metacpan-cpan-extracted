@@ -26,6 +26,7 @@ t/102_arch.t
 t/103_debian.t
 t/104_fedora.t
 t/105_opensuse.t
+t/106_kali.t
 t/author-critic.t
 t/author-pod-syntax.t
 t/container-workspace/container-tests.pl

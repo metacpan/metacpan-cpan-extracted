@@ -3,7 +3,6 @@ abstract: 'Leds aka Light Environment (emi) for Development System based on Mojo
 author:
   - 'Emiliano Bruni <info@ebruni.it>'
 build_requires:
-  Data::Printer: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   Test::More: '0'
@@ -32,29 +31,29 @@ no_index:
 provides:
   Mojo::Leds:
     file: lib/Mojo/Leds.pm
-    version: '1.12'
+    version: '1.13'
   Mojo::Leds::Page:
     file: lib/Mojo/Leds/Page.pm
-    version: '1.12'
+    version: '1.13'
   Mojo::Leds::Plugin::CommonRoutes:
     file: lib/Mojo/Leds/Plugin/CommonRoutes.pm
-    version: '1.12'
+    version: '1.13'
   Mojo::Leds::Rest:
     file: lib/Mojo/Leds/Rest.pm
-    version: '1.12'
+    version: '1.13'
   Mojo::Leds::Rest::DBIx:
     file: lib/Mojo/Leds/Rest/DBIx.pm
-    version: '1.12'
+    version: '1.13'
   Mojo::Leds::Rest::MongoDB:
     file: lib/Mojo/Leds/Rest/MongoDB.pm
-    version: '1.12'
+    version: '1.13'
   Mojolicious::Command::Author::generate::leds_app:
     file: lib/Mojolicious/Command/Author/generate/leds_app.pm
-    version: '1.12'
+    version: '1.13'
 requires:
   BSON::OID: '0'
   Mojolicious: '8.23'
-  Mojolicious::Plugin::AutoRoutePm: '0.21'
+  Mojolicious::Plugin::AutoRoutePm: '0.23'
   Mojolicious::Plugin::RenderFile: '0'
   Net::Domain: '0'
   Scalar::Util: '0'
@@ -65,7 +64,7 @@ requires:
 resources:
   homepage: https://github.com/EmilianoBruni/Mojo-Leds
   repository: https://github.com/EmilianoBruni/Mojo-Leds.git
-version: '1.12'
+version: '1.13'
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

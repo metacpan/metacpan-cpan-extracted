@@ -46,5 +46,5 @@ requires:
 resources:
   bugtracker: https://github.com/DrHyde/perl-modules-Number-Phone/issues
   repository: https://github.com/DrHyde/perl-modules-Number-Phone
-version: '3.8004'
+version: '3.8005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

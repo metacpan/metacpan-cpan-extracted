@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20220307120123;
+our $VERSION = 1.20220601185320;
 
 my $formatters = [
                 {
@@ -72,12 +72,7 @@ my $validators = {
             5[1-3]
           )\\d{6}
         ',
-                'mobile' => '
-          9(?:
-            22|
-            [3-689]\\d
-          )\\d{6}
-        ',
+                'mobile' => '9[1-689]\\d{7}',
                 'pager' => '',
                 'personal_number' => '',
                 'specialrate' => '',
@@ -85,25 +80,25 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"96315", "Dara",
+$areanames{en} = {"96322", "Al\-Rakkah",
+"96323", "Edleb",
+"96325", "Menbej",
+"96351", "Deir\ Ezzour",
+"96333", "Hamah",
+"96334", "Palmyra",
+"96321", "Aleppo",
+"96353", "Al\-Kameshli",
+"96352", "Alhasakah",
+"96331", "Homs",
+"96341", "Lattakia",
+"96311", "Damascus\ and\ rural\ areas",
+"96315", "Dara",
 "96344", "Hamah",
 "96343", "Tartous",
-"96325", "Menbej",
-"96341", "Lattakia",
-"96312", "Al\-Nebek",
-"96352", "Alhasakah",
-"96323", "Edleb",
-"96321", "Aleppo",
-"96334", "Palmyra",
 "96313", "Al\-Zabadani",
-"96311", "Damascus\ and\ rural\ areas",
-"96331", "Homs",
-"96316", "Al\-Swedaa",
-"96333", "Hamah",
-"96351", "Deir\ Ezzour",
 "96314", "Al\-Quneitra",
-"96353", "Al\-Kameshli",
-"96322", "Al\-Rakkah",};
+"96312", "Al\-Nebek",
+"96316", "Al\-Swedaa",};
 
     sub new {
       my $class = shift;

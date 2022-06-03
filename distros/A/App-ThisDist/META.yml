@@ -19,7 +19,7 @@ name: App-ThisDist
 provides:
   App::ThisDist:
     file: lib/App/ThisDist.pm
-    version: '0.014'
+    version: '0.015'
 requires:
   CPAN::Dist::FromRepoName: '0'
   CPAN::Dist::FromURL: '0'
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-ThisDist
   homepage: https://metacpan.org/release/App-ThisDist
   repository: git://github.com/perlancar/perl-App-ThisDist.git
-version: '0.014'
+version: '0.015'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

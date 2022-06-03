@@ -1,17 +1,16 @@
 package Data::Gimei::Word;
 
-use feature ':5.12';
+use warnings;
+use v5.22;
 
-use Moo;
-use namespace::clean;
+use Class::Tiny qw (
+  kanji
+  hiragana
+  katakana
+  romaji
+);
 
-has kanji    => ( is => 'ro' );
-has hiragana => ( is => 'ro' );
-has katakana => ( is => 'ro' );
-has romaji   => ( is => 'ro' );
-
-around BUILDARGS => sub {
-    my $orig  = shift;
+sub BUILDARGS {
     my $class = shift;
 
     my %args;
@@ -25,9 +24,9 @@ around BUILDARGS => sub {
     } else {
         %args = @_;
     }
-
     $args{'romaji'} = ucfirst( $args{'romaji'} ) if $args{'romaji'};
-    return $class->$orig(%args);
-};
+
+    return \%args;
+}
 
 1;

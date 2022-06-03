@@ -1,5 +1,5 @@
 package Mojo::Leds::Rest;
-$Mojo::Leds::Rest::VERSION = '1.12';
+$Mojo::Leds::Rest::VERSION = '1.13';
 use Mojo::Base 'Mojo::Leds::Page';
 use Mojo::Util qw(decamelize class_to_path);
 use Mojo::JSON qw(decode_json);
@@ -156,7 +156,7 @@ Mojo::Leds::Rest - Abstract class for RESTFul webservices interface
 
 =head1 VERSION
 
-version 1.12
+version 1.13
 
 =head1 RESTFul API
 
@@ -326,7 +326,7 @@ Emiliano Bruni <info@ebruni.it>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Emiliano Bruni.
+This software is copyright (c) 2022 by Emiliano Bruni.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

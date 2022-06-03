@@ -1,10 +1,13 @@
 package Firewall::Config::Parser::Netscreen;
 
+#------------------------------------------------------------------------------
+# 加载扩展模块
+#------------------------------------------------------------------------------
 use Moose;
 use namespace::autoclean;
 
 #------------------------------------------------------------------------------
-# 引用 Firewall::Config::Element::DynamicNat::Role 角色
+# Firewall::Config::Parser::Netscreen 通用属性
 #------------------------------------------------------------------------------
 use Firewall::Config::Element::StaticNat::Netscreen;
 use Firewall::Config::Element::NatPool::Netscreen;

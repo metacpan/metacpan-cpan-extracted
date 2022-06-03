@@ -1,14 +1,14 @@
 package #
 Date::Manip::TZ::eumona00;
-# Copyright (c) 2008-2021 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2022 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Mon Nov 15 11:13:47 EST 2021
-#    Data version: tzdata2021e
-#    Code version: tzcode2021e
+#    Generated on: Wed Jun  1 10:55:32 EDT 2022
+#    Data version: tzdata2022a
+#    Code version: tzcode2022a
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.86';
+$VERSION='6.88';
 END { undef $VERSION; }
 
 %Dates         = (
@@ -1357,6 +1357,15 @@ END { undef $VERSION; }
         [ [2091,10,28,1,0,0],[2091,10,28,2,0,0],'+01:00:00',[1,0,0],
           'CET',0,[2092,3,30,0,59,59],[2092,3,30,1,59,59],
           '2091102801:00:00','2091102802:00:00','2092033000:59:59','2092033001:59:59' ],
+     ],
+   2092 =>
+     [
+        [ [2092,3,30,1,0,0],[2092,3,30,3,0,0],'+02:00:00',[2,0,0],
+          'CEST',1,[2092,10,26,0,59,59],[2092,10,26,2,59,59],
+          '2092033001:00:00','2092033003:00:00','2092102600:59:59','2092102602:59:59' ],
+        [ [2092,10,26,1,0,0],[2092,10,26,2,0,0],'+01:00:00',[1,0,0],
+          'CET',0,[2093,3,29,0,59,59],[2093,3,29,1,59,59],
+          '2092102601:00:00','2092102602:00:00','2093032900:59:59','2093032901:59:59' ],
      ],
 );
 

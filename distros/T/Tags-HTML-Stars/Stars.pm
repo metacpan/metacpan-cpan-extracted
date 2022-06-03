@@ -33,7 +33,7 @@ Readonly::Scalar our $IMG_STAR_NOTHING => encode_base64(<<'END', '');
 </svg>
 END
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -312,7 +312,8 @@ L<Class::Utils>,
 L<Error::Pure>,
 L<List::Utils>,
 L<MIME::Base64>,
-L<Readonly>.
+L<Readonly>,
+L<Tags::HTML>.
 
 =head1 SEE ALSO
 
@@ -336,12 +337,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2020
+© Michal Josef Špaček 2020-2022
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

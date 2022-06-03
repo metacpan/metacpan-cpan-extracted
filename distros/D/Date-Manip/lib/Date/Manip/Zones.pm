@@ -1,13 +1,13 @@
 package Date::Manip::Zones;
-# Copyright (c) 2008-2021 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2022 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Mon Nov 15 11:19:56 EST 2021
-#    Data version: tzdata2021e
-#    Code version: tzcode2021e
+#    Generated on: Wed Jun  1 10:57:03 EDT 2022
+#    Data version: tzdata2022a
+#    Code version: tzcode2022a
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -18,7 +18,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.86';
+$VERSION='6.88';
 END { undef $VERSION; }
 
 our ($TzdataVersion,$TzcodeVersion,
@@ -37,11 +37,11 @@ END {
    undef %Offmod;
 }
 
-$TzdataVersion = 'tzdata2021e';
-$TzcodeVersion = 'tzcode2021e';
+$TzdataVersion = 'tzdata2022a';
+$TzcodeVersion = 'tzcode2022a';
 $FirstDate     = '0001010200:00:00';
 $LastDate      = '9999123100:00:00';
-$LastYear      = '2091';
+$LastYear      = '2092';
 
 
 %Module = (
@@ -2779,7 +2779,7 @@ $LastYear      = '2091';
   '-04:39:28'  => 'off326',
   '-04:39:36'  => 'off327',
   '-04:40:00'  => 'off328',
-  '-04:42:46'  => 'off329',
+  '-04:42:45'  => 'off329',
   '-04:43:40'  => 'off330',
   '-04:44:32'  => 'off331',
   '-04:49:00'  => 'off332',

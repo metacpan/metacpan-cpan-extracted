@@ -1,4 +1,4 @@
-# Copyright (c) 2015-2021 Sullivan Beck. All rights reserved.
+# Copyright (c) 2015-2022 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -192,6 +192,19 @@ beginning.  I'm proud to be in their company!  And congratulations to
 ILYAZ for having the oldest module in CPAN!
 
 If I have missed anyone, please let me know.
+
+2022 Update: 
+
+Three of the above packages have now been removed from the list.  Symdump
+has not been updated since 2017, though the author is still active, and
+the package is still available.
+
+Filter is no longer available on CPAN (though the author is still active).
+
+GD is still maintained but by a new author.
+
+So, it seems like we're down to 4 packages that are actively maintained by
+the original author that are older than Date::Manip.
 
 =head1 SEE ALSO
 

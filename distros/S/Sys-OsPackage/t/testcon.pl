@@ -12,13 +12,16 @@ use File::Copy::Recursive qw(rcopy_glob pathempty);
 
 # test configuration
 my $workspace = "t/container-workspace";
-my %distro_subst = ("opensuse" => "opensuse/leap");
-my @distros = qw(fedora rockylinux almalinux debian ubuntu alpine archlinux opensuse);
+my %distro_subst = (
+    "opensuse" => "opensuse/leap",
+    "kalilinux" => "kalilinux/kali-last-release"
+);
+my @distros = qw(fedora rockylinux almalinux debian ubuntu alpine archlinux opensuse kalilinux);
 my %special = (
     #"perl58" => {image => "perl", tag => "5.8.9-slim-buster"},
 );
 my @copyfiles = (
-    qw(lib bin),
+    qw(lib bin t/002_basic.t),
 );
 
 #

@@ -1,59 +1,59 @@
 package Data::Gimei::Name;
 
-use feature ':5.12';
-use File::Share ':all';
-use YAML::XS;
+use warnings;
+use v5.22;
 use Carp;
+use File::Share qw( dist_file );
+use YAML::XS;
 
-use Moo;
-use namespace::clean;
-
-has gender     => ( is => 'ro' );
-has first_name => ( is => 'ro' );
-has last_name  => ( is => 'ro' );
+use Class::Tiny qw(
+  gender
+  given
+  family
+);
 
 our $names;
 
-around BUILDARGS => sub {
-    my $orig  = shift;
+sub BUILDARGS {
     my $class = shift;
     my %args  = @_;
 
     $names //= load();
 
     $args{'gender'} //= Data::Gimei::sample( [ 'male', 'female' ] );
-    $args{'first_name'} = Data::Gimei::Word->new(
+    $args{'given'} = Data::Gimei::Word->new(
         Data::Gimei::sample( $names->{'first_name'}->{ $args{'gender'} } ) );
-    $args{'last_name'} =
+    $args{'family'} =
       Data::Gimei::Word->new( Data::Gimei::sample( $names->{'last_name'} ) );
-    return $class->$orig(%args);
-};
+
+    return \%args;
+}
 
 sub load {
     my $yaml_path = shift // dist_file( 'Data-Gimei', 'names.yml' );
-    -r $yaml_path or Carp::croak("failed to load name data: $yaml_path");
+    Carp::croak("failed to load name data: $yaml_path") unless (-r $yaml_path);
 
     $names = YAML::XS::LoadFile($yaml_path);
 }
 
 sub kanji {
     my $self = shift;
-    return $self->last_name->kanji . " " . $self->first_name->kanji;
+    return $self->family->kanji . " " . $self->given->kanji;
 }
 
 sub hiragana {
     my $self = shift;
-    return $self->last_name->hiragana . " " . $self->first_name->hiragana;
+    return $self->family->hiragana . " " . $self->given->hiragana;
 }
 
 sub katakana {
     my $self = shift;
-    return $self->last_name->katakana . " " . $self->first_name->katakana;
+    return $self->family->katakana . " " . $self->given->katakana;
 }
 
 sub romaji {
     my $self = shift;
-    return $self->first_name->romaji . " " . $self->last_name->romaji;
+    return $self->given->romaji . " " . $self->family->romaji;
 }
 
 1;

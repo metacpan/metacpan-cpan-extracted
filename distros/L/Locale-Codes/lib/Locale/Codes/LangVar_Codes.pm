@@ -3,7 +3,7 @@ Locale::Codes::LangVar_Codes;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'harvest_data' is run.
-#    Generated on: Wed Mar  2 15:14:58 EST 2022
+#    Generated on: Wed Jun  1 10:46:07 EDT 2022
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.70';
+$VERSION='3.71';
 
 $Locale::Codes::Data{'langvar'}{'id'} = '0106';
 

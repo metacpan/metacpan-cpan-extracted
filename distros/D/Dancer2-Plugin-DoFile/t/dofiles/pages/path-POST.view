@@ -1,0 +1,16 @@
+my $stash = $args->{stash};
+my $str = "";
+if (defined $stash->{first} && $stash->{first} == 1) {
+  $str .= "First ";
+}
+if (defined $stash->{second} && $stash->{second} == 2) {
+  $str .= "Second ";
+}
+if (defined $stash->{third} && $stash->{third} == 3) {
+  $str .= "Third ";
+}
+$str .= "Fourth";
+
+return {
+  content => $str
+};

@@ -1,5 +1,5 @@
 package Mojo::Leds::Plugin::CommonRoutes;
-$Mojo::Leds::Plugin::CommonRoutes::VERSION = '1.12';
+$Mojo::Leds::Plugin::CommonRoutes::VERSION = '1.13';
 # ABSTRACT: Add routes to get app informations (library version, routes,...)
 
 use Mojo::Base 'Mojolicious::Plugin';
@@ -121,7 +121,7 @@ Mojo::Leds::Plugin::CommonRoutes - Add routes to get app informations (library v
 
 =head1 VERSION
 
-version 1.12
+version 1.13
 
 =head1 AUTHOR
 
@@ -129,7 +129,7 @@ Emiliano Bruni <info@ebruni.it>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Emiliano Bruni.
+This software is copyright (c) 2022 by Emiliano Bruni.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

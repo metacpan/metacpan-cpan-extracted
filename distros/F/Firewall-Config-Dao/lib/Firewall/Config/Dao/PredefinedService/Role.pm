@@ -45,8 +45,8 @@ requires 'vendor';
 #------------------------------------------------------------------------------
 sub createService {
   my ( $self, $param ) = @_;
-  my ( $fwId, $srvName, $protocol, $srcPort, $dstPort )
-    = @{$param}{qw/fwId srvName protocol srcPort dstPort/};
+  my ( $fwId, $srvName, $protocol, $srcPort, $dstPort ) = @{$param}{qw/fwId srvName protocol srcPort dstPort/};
+
   # 实例化服务端口对象
   my $vendor       = $self->vendor;
   my $vendorPlugin = 'Firewall::Config::Element::Service::' . $vendor;
@@ -59,6 +59,7 @@ sub createService {
     srcPort  => $srcPort,
     dstPort  => $dstPort
   );
+
   # 防护计算结果
   return $service;
 }
@@ -79,8 +80,10 @@ sub load {
 
   # 遍历预定义服务端口查询结果
   for my $item ( @{$services} ) {
+
     # 构造$param数据结构
     my $param = {fwId => $fwId};
+
     # 抽取查询结果内的属性，赋值给$param
     @{$param}{qw/srvName protocol srcPort dstPort/} = @{$item}{qw/srv_name protocol src_port dst_port/};
 

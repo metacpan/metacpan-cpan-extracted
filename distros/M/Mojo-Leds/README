@@ -3,7 +3,7 @@ NAME
     based on Mojolicious
 
 VERSION
-    version 1.12
+    version 1.13
 
 SYNOPSIS
 DESCRIPTION
@@ -88,7 +88,7 @@ AUTHOR
     Emiliano Bruni <info@ebruni.it>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021 by Emiliano Bruni.
+    This software is copyright (c) 2022 by Emiliano Bruni.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

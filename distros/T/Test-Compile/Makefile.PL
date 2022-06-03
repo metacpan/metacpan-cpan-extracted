@@ -7,8 +7,7 @@ WriteMakefile
   'VERSION_FROM' => 'lib/Test/Compile.pm',
   'PREREQ_PM' => {
                    'Exporter' => '5.68',
-                   'parent' => '0.225',
-                   'version' => 0
+                   'parent' => '0.225'
                  },
   'INSTALLDIRS' => 'site',
   'EXE_FILES' => [],

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: pod-coverage.t 2393 2013-01-03 20:57:34Z guillomovitch $
+# $Id$
 
 use strict;
 use warnings;

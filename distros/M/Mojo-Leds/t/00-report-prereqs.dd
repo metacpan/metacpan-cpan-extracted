@@ -20,7 +20,7 @@ do { my $x = {
                       'requires' => {
                                       'BSON::OID' => '0',
                                       'Mojolicious' => '8.23',
-                                      'Mojolicious::Plugin::AutoRoutePm' => '0.21',
+                                      'Mojolicious::Plugin::AutoRoutePm' => '0.23',
                                       'Mojolicious::Plugin::RenderFile' => '0',
                                       'Net::Domain' => '0',
                                       'Scalar::Util' => '0',
@@ -35,7 +35,6 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
-                                   'Data::Printer' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'Test::More' => '0',

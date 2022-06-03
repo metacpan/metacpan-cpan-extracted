@@ -42,7 +42,7 @@ sub getPluginObj {
   # 加载防火墙配置解析插件 => package
   my $pluginClassName = __PACKAGE__ . '::' . ( split( /::/, ref $self->parser ) )[-1];
   eval "use $pluginClassName";
-  confess "ERROR: load plugin $pluginClassName failed: $@" if $@;
+  confess "ERROR: load plugin $pluginClassName failed: $@" if !!$@;
 
   # 实例化配置解析对象
   my $pluginObj = $pluginClassName->new(
@@ -62,6 +62,7 @@ sub save {
 
   # 检查对象是否继承 Firewall::Config::Parser::Role
   if ( @_ == 1 and $_[0]->does('Firewall::Config::Parser::Role') ) {
+
     # 绑定解析器、fwId
     $self->setParser( $_[0] );
     $self->setFwId( $_[0]->fwId );
@@ -83,14 +84,18 @@ sub saveSerializedParser {
 
   # 获取家目录，并初始化序列号文件夹
   my $home = $self->home;
-  my $data = 'Firewall/Config/Parser/data/';
+
+  # my $data = 'Firewall/Config/Parser/data/';
+  my $data = 'Caches/';
+  mkdir( $data, 0755 ) or confess("ERROR: mkdir( $data, 0755 ) failed: $!") if not -d $data;
 
   # 序列化存储解析结果
   # 增加防火墙名称
   $home = $ENV{firewall_manager_home} . "/lib/" if exists $ENV{firewall_manager_home};
   my $path = $home . $data . $self->fwId;
+
   # 数据缓存
-  Storable::store( $self->parser, "$path" );
+  Storable::store( $self->parser, $path );
 }
 
 #------------------------------------------------------------------------------
@@ -98,6 +103,7 @@ sub saveSerializedParser {
 #------------------------------------------------------------------------------
 sub loadParser {
   my ( $self, $fwId ) = @_;
+
   # 如果携带 fwId，则更新数据
   if ( defined $fwId ) {
     $self->setFwId($fwId);
@@ -105,10 +111,15 @@ sub loadParser {
 
   # 获取家目录，并初始化序列号文件夹
   my $home = $self->home;
-  my $data = 'Firewall/Config/Parser/data/';
+
+  # my $data = 'Firewall/Config/Parser/data/';
+  my $data = 'Caches';
+
+  # mkdir($data, 0755) or confess("ERROR: mkdir( $data, 0755 ) failed: $!") if not -d $data;
 
   # 反序列化解析结构 | 支持临时的环境变量
   $home = $ENV{firewall_manager_home} . "/lib/" if exists $ENV{firewall_manager_home};
+
   # 增加防火墙名称
   my $path            = $home . $data . $self->fwId;
   my $parser          = Storable::retrieve($path);
@@ -116,7 +127,7 @@ sub loadParser {
 
   # 加载解析模块，加载异常则跳出
   eval "use $parserClassName";
-  confess $@ if $@;
+  confess $@ if !!$@;
 
   # 返回计算结果
   return $parser;
@@ -132,49 +143,49 @@ sub _buildFwId {
 
 =head3 saveSerializedParser
 
-sub saveSerializedParser {
+  sub saveSerializedParser {
     my $self = shift;
     my $tableName = 'fw_conf';
     my $serializedParser = Storable::freeze($self->parser);
     $self->execute("update $tableName set serialized_parser = :serializedParser where fw_id = :fwId",
                     {serializedParser => $serializedParser, fwId => $self->fwId},
                     bind_type => [serializedParser => DBI::SQL_BLOB]); #注意这里 bind_type 是绑在变量名 serializedParser 上，而非字段名 serialized_parser 上
-}
-#DBI::SQL_BINARY,DBI::SQL_BLOB
-sub loadParser {
+  }
+  #DBI::SQL_BINARY,DBI::SQL_BLOB
+  sub loadParser {
     my ($self, $fwId) = @_;
     if ( defined $fwId ) {
         $self->setFwId( $fwId );
     }
     my $tableName = 'fw_conf';
 
-    my $result = $self->execute("select serialized_parser from $tableName where fw_id = :fwId", {fwId => $self->fwId})->one;
-    confess("ERROR: get serializedParser(fwId: $fwId) from fw_conf failed!,可能使用了checkpoint,ASA8.3以上版本等工具不支持防火墙的私网地址，或数据库有问题请联系管理员处理") if not defined $result;
-    my $serializedParser = $result->{SERIALIZED_PARSER};
-    confess("ERROR: there is none column named SERIALIZED_PARSER in table $tableName") if not defined $serializedParser;
-    my $parser = Storable::thaw( $serializedParser );
+  my $result = $self->execute("select serialized_parser from $tableName where fw_id = :fwId", {fwId => $self->fwId})->one;
+  confess("ERROR: get serializedParser(fwId: $fwId) from fw_conf failed!,可能使用了checkpoint,ASA8.3以上版本等工具不支持防火墙的私网地址，或数据库有问题请联系管理员处理") if not defined $result;
+  my $serializedParser = $result->{SERIALIZED_PARSER};
+  confess("ERROR: there is none column named SERIALIZED_PARSER in table $tableName") if not defined $serializedParser;
+  my $parser = Storable::thaw( $serializedParser );
 
-    my $parserClassName = ref($parser);
-    eval("use $parserClassName;");
-    confess("ERROR: import class $parserClassName failed: $@") if $@;
-    #加载外部路由
-    $parserClassName =~ /Firewall::Config::Parser::(?<fwtype>\S+)$/;
-    my $fwType = $+{fwtype};
-    my $routeExtras = $self->execute("select network,mask,zone from FW_NETWORK_Extra where fw_id = :fwId", {fwId => $self->fwId})->all;
-    if (@{$routeExtras}>0){
-        my $className = "Firewall::Config::Element::Route::$fwType";
-        eval ("use Firewall::Config::Element::Route::$fwType");
-        confess("ERROR: import class Firewall::Config::Element::Route::$fwType failed: $@") if $@;
-        for my $row (@{$routeExtras}){
-            my $route;
-            my $className = "Firewall::Config::Element::Route::$fwType";
-            eval( "\$route = new $className(fwId =>\$self->fwId,network =>'$row->{NETWORK}',mask =>$row->{MASK},zoneName=>'$row->{ZONE}',routeInstance=>'default');");
-            confess("ERROR: new Route failed: $@") if $@;
-            $parser->addElement($route);
-        }
+  my $parserClassName = ref($parser);
+  eval("use $parserClassName;");
+  confess("ERROR: import class $parserClassName failed: $@") if $@;
+  #加载外部路由
+  $parserClassName =~ /Firewall::Config::Parser::(?<fwtype>\S+)$/;
+  my $fwType = $+{fwtype};
+  my $routeExtras = $self->execute("select network,mask,zone from FW_NETWORK_Extra where fw_id = :fwId", {fwId => $self->fwId})->all;
+  if (@{$routeExtras}>0){
+    my $className = "Firewall::Config::Element::Route::$fwType";
+    eval ("use Firewall::Config::Element::Route::$fwType");
+    confess("ERROR: import class Firewall::Config::Element::Route::$fwType failed: $@") if $@;
+    for my $row (@{$routeExtras}){
+      my $route;
+      my $className = "Firewall::Config::Element::Route::$fwType";
+      eval( "\$route = new $className(fwId =>\$self->fwId,network =>'$row->{NETWORK}',mask =>$row->{MASK},zoneName=>'$row->{ZONE}',routeInstance=>'default');");
+      confess("ERROR: new Route failed: $@") if $@;
+      $parser->addElement($route);
     }
-    $self->setParser($parser);
-    return $parser;
+  }
+  $self->setParser($parser);
+  return $parser;
 }
 
 =cut
@@ -183,9 +194,11 @@ sub loadParser {
 # around 钩子函数，用于计算配置解析所需时常
 #------------------------------------------------------------------------------
 if ( $ENV{DEBUG} ) {
+
   # 遍历抓取各函数解析所需时常
   for my $func (qw(lock unLock saveSerializedParser loadParser)) {
     around $func => sub {
+
       # around 固定入参格式 (class, instance, params)
       my $orig = shift;
       my $self = shift;

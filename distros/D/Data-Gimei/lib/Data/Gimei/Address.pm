@@ -1,21 +1,20 @@
 package Data::Gimei::Address;
 
-use feature ':5.12';
-use File::Share ':all';
-use YAML::XS;
+use warnings;
+use v5.22;
 use Carp;
+use File::Share qw( dist_file );
+use YAML::XS;
 
-use Moo;
-use namespace::clean;
-
-has prefecture => ( is => 'ro' );
-has city       => ( is => 'ro' );
-has town       => ( is => 'ro' );
+use Class::Tiny qw(
+  prefecture
+  city
+  town
+);
 
 our $addresses;
 
-around BUILDARGS => sub {
-    my $orig  = shift;
+sub BUILDARGS {
     my $class = shift;
     my %args  = @_;
 
@@ -27,12 +26,13 @@ around BUILDARGS => sub {
         Data::Gimei::sample( $addresses->{'addresses'}->{'city'} ) );
     $args{'town'} = Data::Gimei::Word->new(
         Data::Gimei::sample( $addresses->{'addresses'}->{'town'} ) );
-    return $class->$orig(%args);
-};
+
+    return \%args;
+}
 
 sub load {
     my $yaml_path = shift // dist_file( 'Data-Gimei', 'addresses.yml' );
-    -r $yaml_path or Carp::croak("failed to load address data: $yaml_path");
+    Carp::croak("failed to load address data: $yaml_path") unless (-r $yaml_path);
 
     $addresses = YAML::XS::LoadFile($yaml_path);
 }

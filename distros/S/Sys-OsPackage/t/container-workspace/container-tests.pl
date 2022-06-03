@@ -22,26 +22,30 @@ my @modules = qw(CPAN Sys::OsPackage Test::More YAML);
 sub run_tests
 {
     # check if running as root
-    my $mode = ($> == 0) ? "root" : "non-root $>";
+    my $mode = ($> == 0) ? "root" : "uid=$>";
 
     # run module & package detection tests
     Sys::OsPackage->clear_instance();
     my $ospkg = Sys::OsPackage->instance(quiet => 1);
     my $platform = Sys::OsPackage->platform();
     foreach my $module (@modules) {
-        ok($ospkg->module_installed($module), "found $module in Perl path ($mode mode)");
+        ok($ospkg->module_installed($module), "found $module in Perl path ($mode)");
         my $pkgname = $ospkg->call_pkg_driver(op => "modpkg", module => $module);
         SKIP: {
             if ($pkgname) {
                 my $pkg_found = $ospkg->pkg_installed($pkgname);
-                ok($pkg_found, "$module installed as $platform package $pkgname ($mode mode)");
+                ok($pkg_found, "$module installed as $platform package $pkgname ($mode)");
             } else {
                 SKIP: {
-                    skip "$module not available as package on $platform ($mode mode)", 1;
+                    skip "$module not available as package on $platform ($mode)", 1;
                 }
             }
         }
     }
+
+    # run basic tests inside the container
+    Sys::OsPackage->clear_instance(); # reset instance for tests
+    basic_tests_run("$platform($mode)");
     return;
 }
 
@@ -50,8 +54,26 @@ if ($< != 0) {
     croak "test must be started as root, and should be in a container";
 }
 
+# verify 002_basic.t was copied into the container and then load it
+my $basic_tests_script = "./002_basic.t";
+if (not -f $basic_tests_script) {
+    croak "test script $basic_tests_script must be copied into the container";
+}
+{
+    local $ENV{BASIC_TESTS_CONTAINER}=1;
+    unless (my $do_status = do $basic_tests_script) {
+        if ($@) {
+            croak "couldn't parse $basic_tests_script: $@";
+        }
+        if (defined $do_status) {
+            croak "couldn't do $basic_tests_script: $!";
+        }
+        croak "couldn't load $basic_tests_script";
+    }
+}
+
 # compute test count and generate plan for TAP output
-plan tests => 4 * scalar @modules;
+plan tests => 4 * (scalar @modules) + 2 * basic_tests_count();
 
 # run module & package detection tests as container root
 run_tests();
@@ -84,6 +106,3 @@ $( = $user_id;
 $< = $user_id;
 $> = $user_id;
 run_tests();
-#my $su_bin = $ospkg->cmd_path("su");
-#exec $su_bin, "-c", $0, "-", $user_id
-# or croak "exec failed; $!";

@@ -1,10 +1,16 @@
 package Firewall::Config::Parser::Topsec;
 
+#------------------------------------------------------------------------------
+# 加载扩展模块
+#------------------------------------------------------------------------------
 use Carp;
 use Encode;
 use Moose;
 use namespace::autoclean;
 
+#------------------------------------------------------------------------------
+# 加载 Firewall::Config::Parser::Topsec 相关属性和方法
+#------------------------------------------------------------------------------
 use Firewall::Utils::Ip;
 use Firewall::Config::Element::Address::Topsec;
 use Firewall::Config::Element::AddressGroup::Topsec;
@@ -588,8 +594,9 @@ sub getNat {
 
 sub parseNat {
   my ( $self, $string ) = @_;
-  say dumper $string;
-  say dumper getInterface("eth14");
+
+  # say dumper $string;
+  # say dumper getInterface("eth14");
   if (
     $string =~ /ID\s+(?<id>\d+)\s+nat\s+policy\s+add\s+((?<srca>srcarea|srcvlan)\s+'(?<srcareas>.+?)'\s*)?
         ((?<dsta>dstarea|dstvlan)\s+'(?<dstareas>.+?)'\s*)?(orig-src\s+'(?<src>.+?)'\s*)?(orig-dst\s+'(?<dst>.+?)'\s*)?
@@ -652,7 +659,8 @@ sub parseNat {
       }
     }
     if ( defined $+{natsrc} ) {
-      say dumper $+{natsrc};
+
+      # say dumper $+{natsrc};
       if ( $+{natsrc} =~ /eth/ ) {
         my $interface = $self->getInterface( $+{natsrc} );
         my $addr      = $interface->{ipAddress};

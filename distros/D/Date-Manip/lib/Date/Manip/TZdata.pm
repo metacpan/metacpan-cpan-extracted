@@ -1,5 +1,5 @@
 package Date::Manip::TZdata;
-# Copyright (c) 2008-2021 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2022 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -14,7 +14,7 @@ use integer;
 use warnings;
 
 our $VERSION;
-$VERSION='6.86';
+$VERSION='6.88';
 END { undef $VERSION; }
 
 ###############################################################################

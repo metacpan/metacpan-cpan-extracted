@@ -1,5 +1,10 @@
 Revision history for Perl extension Test-Compile
 
+v3.1.0	  2022-06-02
+    - (Tom Hukins) Treat files with .psgi extensions as perl
+    - (Tom Hukins) Look for file in a case insensitive manner
+    - Update the example code so it doesn't import anything
+
 v3.0.1	  2021-08-22
     - (waterkip) Really remove UNIVERSAL::require (CPAN-RT 138934)
 

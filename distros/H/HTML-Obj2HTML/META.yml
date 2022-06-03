@@ -1,0 +1,34 @@
+---
+abstract: 'Create HTML from a arrays and hashes'
+author:
+  - 'Pero Moretti'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-Obj2HTML
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  HTML::Entities: '0'
+  List::MoreUtils: '0'
+  Locale::Currency::Format: '0'
+  Module::Pluggable: '0'
+  Text::Markdown: '0'
+  Text::Pluralize: '0'
+  perl: '5.008004'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/Pero-Moretti/Perl-Obj2HTML.git
+version: '0.1'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

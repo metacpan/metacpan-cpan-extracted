@@ -1,0 +1,68 @@
+{
+   "abstract" : "A file based MVC style plugin for Dancer2",
+   "author" : [
+      "Pero Moretti"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "freebsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dancer2-Plugin-DoFile",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer2" : "0",
+            "Hash::Merge" : "0",
+            "JSON" : "0",
+            "perl" : "5.008004",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "FindBin" : "0",
+            "HTTP::Request::Common" : "0",
+            "JSON::MaybeXS" : "0",
+            "Module::Load" : "0",
+            "Path::Tiny" : "0",
+            "Plack::Test" : "0",
+            "Test::Mock::LWP::Dispatch" : "0",
+            "Test::More" : "0",
+            "URI" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Pero-Moretti/Perl-Dancer2-Plugin-DoFile.git",
+         "web" : "https://github.com/Pero-Moretti/Perl-Dancer2-Plugin-DoFile"
+      }
+   },
+   "version" : "0.1",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

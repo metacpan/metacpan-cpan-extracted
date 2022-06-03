@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+eg/shape
+lib/Language/Eforth.pm
+lib/Language/Eforth.xs
+lib/Language/typemap
+ppport.h
+t/00-load.t
+t/10-eval.t
+t/pod-coverage.t
+t/pod.t

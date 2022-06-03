@@ -1,5 +1,18 @@
 Change log for Sys::OsRelease
 
+0.1.6 2022-06-02T18:27:13-07:00 America/Los_Angeles
+ [REVISION]
+ - back off testing requirement for all platforms to find a perlbase path;
+   skip related tests if not defined
+ - re-run 002_basic.t tests under pre-release container tests as root &
+   non-root users; +679 test cases
+ - add pre-release container tests for Kali Linux; +152 test cases
+
+0.1.5 2022-05-23T20:57:30-07:00 America/Los_Angeles
+ [BUG FIXES]
+ - fix Win32 failure when perlbase cannot be set: ignore it and let CPAN
+   handle it (from CPAN Testers feedback)
+
 0.1.4 2022-05-22T23:53:34-07:00 America/Los_Angeles
  [BUG FIXES]
  - remove residual code that tried to symlink non-root user's perl lib

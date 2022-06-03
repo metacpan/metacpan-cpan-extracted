@@ -5,8 +5,9 @@ Data::Gimei - a Perl port of Ruby's gimei generates fake data in Japanese.
 
 # SYNOPSIS
 
+    use warnings;
+    use v5.22;
     binmode STDOUT, ":utf8";
-    use feature ':5.12';
 
     use Data::Gimei;
     my $name = Data::Gimei::Name->new();
@@ -16,15 +17,15 @@ Data::Gimei - a Perl port of Ruby's gimei generates fake data in Japanese.
     say $name->katakana;             # "サイトウ ハルナ"
     say $name->romaji;               # "Haruna Saito"
 
-    say $name->last_name->kanji;     # "斎藤"
-    say $name->last_name->hiragana;  # "さいとう"
-    say $name->last_name->katakana;  # "サイトウ"
-    say $name->last_name->romaji;    # "Saito"
+    say $name->family->kanji;        # "斎藤"
+    say $name->family->hiragana;     # "さいとう"
+    say $name->family->katakana;     # "サイトウ"
+    say $name->family->romaji;       # "Saito"
 
-    say $name->first_name->kanji;    # "陽菜"
-    say $name->first_name->hiragana; # "はるな"
-    say $name->first_name->katakana; # "ハルナ"
-    say $name->first_name->romaji;   # "Haruna"
+    say $name->given->kanji;         # "陽菜"
+    say $name->given->hiragana;      # "はるな"
+    say $name->given->katakana;      # "ハルナ"
+    say $name->given->romaji;        # "Haruna"
 
     say $name->gender;               # "female"
 

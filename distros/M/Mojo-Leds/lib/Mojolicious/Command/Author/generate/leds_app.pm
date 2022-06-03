@@ -1,5 +1,5 @@
 package Mojolicious::Command::Author::generate::leds_app;
-$Mojolicious::Command::Author::generate::leds_app::VERSION = '1.12';
+$Mojolicious::Command::Author::generate::leds_app::VERSION = '1.13';
 use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::Util qw(class_to_file class_to_path decamelize);
@@ -61,7 +61,7 @@ Mojolicious::Command::Author::generate::leds_app - Mojo::Leds app generator comm
 
 =head1 VERSION
 
-version 1.12
+version 1.13
 
 =head1 SYNOPSIS
 
@@ -126,7 +126,7 @@ Emiliano Bruni <info@ebruni.it>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Emiliano Bruni.
+This software is copyright (c) 2022 by Emiliano Bruni.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

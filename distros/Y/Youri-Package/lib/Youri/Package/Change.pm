@@ -1,4 +1,4 @@
-# $Id: Change.pm 1484 2007-02-18 21:10:00Z guillomovitch $
+# $Id$
 package Youri::Package::Change;
 
 =head1 NAME

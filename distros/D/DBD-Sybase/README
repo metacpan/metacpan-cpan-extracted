@@ -1,7 +1,7 @@
 	
 	   DBD::Sybase  --  a Sybase DBI driver for Perl 5.
 
-   Copyright (c) 1996-2021  Michael Peppler
+   Copyright (c) 1996-2022  Michael Peppler
 
    You may distribute under the terms of either the GNU General Public
    License or the Artistic License, as specified in the Perl README file.
@@ -28,9 +28,6 @@ If you use FreeTDS please read the README.freetds file.
 DBD::Sybase is a reasonably complete implementation of the DBI spec, but 
 there are still some features that are missing. Please see the DBD::Sybase
 man page for details.
-
-The full write-ups of the bugs that are listed in the CHANGES file as "fixed" 
-can be seen at http://www.peppler.org/bugdb
 
 Getting Help
 ============
@@ -141,8 +138,6 @@ If the LANG or LC_ALL environment variable is set and points to an
 entry that does not exist in $SYBASE/locales/locales.dat (in the 
 [linux] section) then you may get a core dump. This is an
 OpenClient problem. 
-See http://www.peppler.org/FAQ/linux.html#q1.14 for
-additional details.
 
 FreeTDS:
 --------
@@ -161,9 +156,6 @@ NOTE: t/fail.t will *fail* on test #8 if you are connecting to
       that I can do anything about, unfortunately. It's a fairly
       obscure constraint violation condition - read the code if
       you are interested.
-
-I have a simple bug tracking database at http://www.peppler.org/bugdb
-You can use it to check for known problems, and to report new ones.
 
 See perldoc DBD::Sybase for details about the package.
 

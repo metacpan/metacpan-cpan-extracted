@@ -1,4 +1,4 @@
-# $Id: Relationship.pm 1462 2007-02-12 20:56:03Z guillomovitch $
+# $Id$
 package Youri::Package::Relationship;
 
 =head1 NAME

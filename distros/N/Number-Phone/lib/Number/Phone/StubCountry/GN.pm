@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20220307120118;
+our $VERSION = 1.20220601185318;
 
 my $formatters = [
                 {
@@ -74,27 +74,27 @@ my $validators = {
                 'voip' => '722\\d{6}'
               };
 my %areanames = ();
-$areanames{en} = {"2243046", "Boussoura",
-"2243043", "Conakry",
-"2243042", "Sangoya",
-"2243045", "Conakry",
+$areanames{en} = {"2243094", "Macenta",
+"2243046", "Boussoura",
 "2243051", "Labé",
-"2243031", "Boké",
-"224302", "Fria",
-"2243041", "Conakry",
-"2243047", "Conakry",
-"224307", "Kankan",
-"2243032", "Kamsar",
-"2243097", "Guéckédou",
-"2243091", "N\'Zérékoré",
-"2243053", "Pita",
-"2243094", "Macenta",
 "224308", "Faranah",
-"2243068", "Mamou",
+"224302", "Fria",
+"224307", "Kankan",
+"2243053", "Pita",
+"2243069", "Dalaba",
 "22430613", "Télimélé",
+"2243042", "Sangoya",
+"2243091", "N\'Zérékoré",
+"2243043", "Conakry",
+"2243097", "Guéckédou",
+"2243068", "Mamou",
+"2243031", "Boké",
+"2243032", "Kamsar",
+"2243045", "Conakry",
 "2243061", "Kindia",
+"2243041", "Conakry",
 "2243098", "Kissidougou",
-"2243069", "Dalaba",};
+"2243047", "Conakry",};
 
     sub new {
       my $class = shift;

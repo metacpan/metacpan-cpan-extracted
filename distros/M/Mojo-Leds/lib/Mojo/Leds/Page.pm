@@ -1,5 +1,5 @@
 package Mojo::Leds::Page;
-$Mojo::Leds::Page::VERSION = '1.12';
+$Mojo::Leds::Page::VERSION = '1.13';
 use 5.014;    # because s///r usage
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::Util qw(class_to_path);
@@ -41,7 +41,6 @@ sub render_html {
 
     # needed for recursive calls (html -> json as an example)
     my $query = $c->req->params->to_hash;
-    $c->session->{query} = $query;
     while ( my ( $k, $v ) = each %$query ) {
         $c->stash( $k => $v );
     }
@@ -84,7 +83,7 @@ Mojo::Leds::Page - Standard page controller for Mojo::Leds
 
 =head1 VERSION
 
-version 1.12
+version 1.13
 
 =head1 SYNOPSIS
 
@@ -98,7 +97,7 @@ Emiliano Bruni <info@ebruni.it>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Emiliano Bruni.
+This software is copyright (c) 2022 by Emiliano Bruni.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

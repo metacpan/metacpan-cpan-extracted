@@ -1,6 +1,5 @@
-use strict;
 use warnings;
-use feature ':5.12';
+use v5.22;
 use utf8;
 
 use Test::More;
@@ -12,6 +11,7 @@ my $addr = Data::Gimei::Address->new();
 is $addr->kanji,    '北海道札幌市中央区モエレ沼公園';
 is $addr->hiragana, 'ほっかいどうさっぽろしちゅうおうくもえれぬまこうえん';
 is $addr->katakana, 'ホッカイドウサッポロシチュウオウクモエレヌマコウエン';
+# $addr->romaji(): not defined.
 
 is $addr->prefecture->kanji,    '北海道';
 is $addr->prefecture->hiragana, 'ほっかいどう';

@@ -25,7 +25,6 @@ use Firewall::Config::Element::DynamicNat::Hillstone;
 # 加载 Firewall::Config::Parser::Role 觉得，直接使用其属性和方法
 #------------------------------------------------------------------------------
 with 'Firewall::Config::Parser::Role';
-with 'Firewall::Config::Parser::Role';
 
 sub parse {
   my $self = shift;

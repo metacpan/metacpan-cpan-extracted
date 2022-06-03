@@ -1,0 +1,59 @@
+#!/usr/bin/env perl
+#
+# this code was adapted from "Starting FORTH" by Leo Brodie. the Forth,
+# anyways, less so the Perl
+
+use strict;
+use warnings;
+use Language::Eforth;
+our $f = Language::Eforth->new;
+
+$f->eval(<<'AND_NOW_FOR_SOMETHING_COMPETELY_DIFFERENT');
+
+: it's . . . ;
+
+: CSI   27 emit 91 emit ;   \ Control Sequence Introductor
+: home  CSI 49 emit 59 emit 49 emit 72 emit ;
+: clear CSI 50 emit 74 emit ;
+: page  home clear ;
+: 2*    1 lshift ;          \ not a lot is defined in image.c
+
+\ drawing tools
+: dot   32 emit ;           \ this was 46 at some point
+: star  42 emit ;
+: row   ( c -- )            \ accept a character on the stack
+  7 for                     \ *eight* times ( yay fencepost! )
+    dup 128 and             \ dup "c", mask with 0b10000000 and then
+    if star else dot then   \ branch resolution: yea, or nay?
+    2*                      \ shift "c" bits left one
+  next drop ;               \ did you remember to cleanup the stack
+
+\ a storage class... object? thingy? word. let's go with word.
+: shape ( eight characters -- )
+  create 7 for c, next      \ store the *eight* characters
+  does> 7 + 7 for           \ from highest address, looping 8 times
+    dup c@ row cr           \ lookup char, draw it
+    1- next drop ;          \ next char addr down, stack cleanup
+
+AND_NOW_FOR_SOMETHING_COMPETELY_DIFFERENT
+
+sub shape ($;@) {
+    my $name = shift;
+    @_ == 8 or die "need eight numbers\n";
+    $f->push(@_);
+    $f->eval("shape $name\n");
+}
+
+# these might be easier to draw as 0b... inputs. or import from some
+# bitmap font or such tool. also this spares use from having to change
+# the BASE in Forth to HEX and then forgetting you left it as HEX and
+# then you write a little word that yells at you if BASE is ever not
+# DECIMAL, ask me how I know
+shape castle => 0xAA, 0xAA, 0xFE, 0xFE, 0x38, 0x38, 0x38, 0xFE;
+
+$f->eval("page cr castle cr\n");
+print " -- Rook to D4, check\n\n";
+
+# was there anything left on the stack? a handy debugging technique.
+# ( no really I'll use the debugger one of these years, I swear it )
+#use Data::Dumper::Concise::Aligned; warn DumperA S => [ $f->drain ];

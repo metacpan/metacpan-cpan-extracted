@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20220307120122;
+our $VERSION = 1.20220601185319;
 
 my $formatters = [
                 {
@@ -80,7 +80,7 @@ my $validators = {
           579[01]\\d{5}|
           5(?:
             [013-689]\\d|
-            7[0-36-8]
+            7[0-35-8]
           )\\d{6}
         ',
                 'pager' => '',
@@ -90,18 +90,18 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{ar} = {"96616", "حائل\/القصيم",
-"96614", "المدينة\ المنورة\/عرعر\/تبوك\/ينبع\ البحر",
-"96611", "الرياض\/الخرج",
-"96613", "الدمام\/الخبر\/الظهران",
+$areanames{ar} = {"96611", "الرياض\/الخرج",
+"96616", "حائل\/القصيم",
+"96612", "مكة\/جدة",
 "96617", "أبها\/نجران\/جازان",
-"96612", "مكة\/جدة",};
-$areanames{en} = {"96611", "Riyadh\/Kharj",
-"96613", "Dammam\/Khobar\/Dahran",
-"96616", "Hail\/Qasim",
-"96614", "Madenah\/Arar\/Tabuk\/Yanbu",
+"96613", "الدمام\/الخبر\/الظهران",
+"96614", "المدينة\ المنورة\/عرعر\/تبوك\/ينبع\ البحر",};
+$areanames{en} = {"96616", "Hail\/Qasim",
 "96612", "Makkah\/Jeddah",
-"96617", "Abha\/Najran\/Jezan",};
+"96617", "Abha\/Najran\/Jezan",
+"96614", "Madenah\/Arar\/Tabuk\/Yanbu",
+"96613", "Dammam\/Khobar\/Dahran",
+"96611", "Riyadh\/Kharj",};
 
     sub new {
       my $class = shift;

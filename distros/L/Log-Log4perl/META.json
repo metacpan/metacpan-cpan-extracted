@@ -43,8 +43,12 @@
          "requires" : {
             "File::Path" : "2.07",
             "File::Spec" : "0.82",
-            "Test::More" : "0.45",
             "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
          }
       }
    },
@@ -53,8 +57,12 @@
       "bugtracker" : {
          "web" : "https://github.com/mschilli/log4perl/issues"
       },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/github.com/mschilli/log4perl"
+      },
       "x_MailingList" : "mailto:log4perl-devel@lists.sourceforge.net"
    },
-   "version" : "1.54",
+   "version" : "1.55",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -3,7 +3,7 @@ package Test::Compile::Internal;
 use warnings;
 use strict;
 
-use version; our $VERSION = qv("v3.0.1");
+use version; our $VERSION = version->declare("v3.1.0");
 use File::Spec;
 use Test::Builder;
 use IPC::Open3 ();
@@ -169,7 +169,7 @@ sub all_pm_files {
 =item C<all_pl_files(@dirs)>
 
 Searches for and returns a list of perl script files - that is, any files that either
-have a F<.pl> extension, or have no extension but have a perl shebang line.
+have a case insensitive F<.pl>, F<.psgi> extension, or have no extension but have a perl shebang line.
 
 If you provide a list of C<@dirs>, it'll use that as a list of files to process, or
 directories to search for perl scripts.
@@ -192,8 +192,8 @@ sub all_pl_files {
 
     my @pl;
     for my $file ( $self->_find_files(@dirs) ) {
-        if ( $file =~ /\.pl$/ ) {
-            # Files with a .pl extension are perl scripts
+        if ( $file =~ /\.p(?:l|sgi)$/i ) {
+            # Files with .pl or .psgi extensions are perl scripts
             push @pl, $file;
         }
         elsif ( $file =~ /(?:^[^.]+$)/ ) {

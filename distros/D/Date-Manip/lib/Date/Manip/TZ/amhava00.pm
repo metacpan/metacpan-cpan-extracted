@@ -1,14 +1,14 @@
 package #
 Date::Manip::TZ::amhava00;
-# Copyright (c) 2008-2021 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2022 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Mon Nov 15 11:13:39 EST 2021
-#    Data version: tzdata2021e
-#    Code version: tzcode2021e
+#    Generated on: Wed Jun  1 10:55:28 EDT 2022
+#    Data version: tzdata2022a
+#    Code version: tzcode2022a
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.86';
+$VERSION='6.88';
 END { undef $VERSION; }
 
 %Dates         = (
@@ -1228,6 +1228,15 @@ END { undef $VERSION; }
         [ [2091,11,4,5,0,0],[2091,11,4,0,0,0],'-05:00:00',[-5,0,0],
           'CST',0,[2092,3,9,4,59,59],[2092,3,8,23,59,59],
           '2091110405:00:00','2091110400:00:00','2092030904:59:59','2092030823:59:59' ],
+     ],
+   2092 =>
+     [
+        [ [2092,3,9,5,0,0],[2092,3,9,1,0,0],'-04:00:00',[-4,0,0],
+          'CDT',1,[2092,11,2,4,59,59],[2092,11,2,0,59,59],
+          '2092030905:00:00','2092030901:00:00','2092110204:59:59','2092110200:59:59' ],
+        [ [2092,11,2,5,0,0],[2092,11,2,0,0,0],'-05:00:00',[-5,0,0],
+          'CST',0,[2093,3,8,4,59,59],[2093,3,7,23,59,59],
+          '2092110205:00:00','2092110200:00:00','2093030804:59:59','2093030723:59:59' ],
      ],
 );
 

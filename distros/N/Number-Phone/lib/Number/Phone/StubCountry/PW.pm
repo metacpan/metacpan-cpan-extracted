@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20220307120122;
+our $VERSION = 1.20220601185319;
 
 my $formatters = [
                 {
@@ -95,7 +95,10 @@ my $validators = {
         ',
                 'mobile' => '
           (?:
-            46[0-5]|
+            (?:
+              46|
+              83
+            )[0-5]|
             6[2-4689]0
           )\\d{4}|
           (?:
@@ -111,21 +114,21 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"680622", "Ngchesar\ State",
-"68065", "Melekeok\ State",
-"68025", "Sonsorol\ State\ and\ Hatohobei\ State",
-"68082", "Ngaraard\ State",
+$areanames{en} = {"68087", "Kayangel\ State",
+"680622", "Ngchesar\ State",
+"68067", "Ngiwal\ State",
+"68027", "Angaur\ State",
 "68058", "Airai\ State",
+"68082", "Ngaraard\ State",
+"68053", "Ngatpang\ State",
+"68054", "Aimeliik\ State",
+"6803", "Peleliu\ State",
+"68085", "Ngarchelong\ State",
 "68073", "Ngaremlengui\ State",
 "68074", "Ngardmau\ State",
-"68087", "Kayangel\ State",
-"6803", "Peleliu\ State",
-"68067", "Ngiwal\ State",
-"68053", "Ngatpang\ State",
-"68085", "Ngarchelong\ State",
+"68025", "Sonsorol\ State\ and\ Hatohobei\ State",
 "68048", "Koror\ State",
-"68027", "Angaur\ State",
-"68054", "Aimeliik\ State",};
+"68065", "Melekeok\ State",};
 
     sub new {
       my $class = shift;

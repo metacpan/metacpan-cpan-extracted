@@ -1,5 +1,5 @@
 This archive contains the distribution Sys-OsPackage,
-version 0.1.4:
+version 0.1.6:
 
   install OS packages and determine if CPAN modules are packaged for the OS 
 

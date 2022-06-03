@@ -1,5 +1,20 @@
 Revision history for Perl extension Data-Gimei
 
+v0.1.1 2022-06-02T03:04:17Z
+
+    - update cpanfile
+    - format by perltidy
+
+v0.1.0 2022-05-24T20:07:31Z
+
+    - change OO systems Moo -> Class::Tiny
+    - organize modules
+    - update cpanfile
+    - use VERSION instead of use feature.
+    - rename first_name -> given, last_name -> family
+    - introduce Data::Gimei::Random
+    - delete Data::Gimei::random()
+
 v0.0.7 2022-05-06T05:47:29Z
 
     - remove unused modules

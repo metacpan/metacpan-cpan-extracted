@@ -28,8 +28,10 @@ sub _buildPreDefinedServiceTableName {
 #------------------------------------------------------------------------------
 sub vendor {
   my $self = shift;
+
   # 切割 vendor 字段
   my $vendor = ( split( /::/, __PACKAGE__ ) )[-1];
+
   # 防护计算结果
   return $vendor;
 }

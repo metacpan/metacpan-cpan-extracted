@@ -1,5 +1,14 @@
 Revision history for Metabolomics-Fragment-Annotation
 
+0.6.6	2022-06-01
+	- fix cpan errors
+	- fix several templates and properties computation issues 
+
+0.6.5	2021-09-21
+	- Package architecture modification (PeakForest Part), 
+	- POD improvement
+	- Annotation results filtering based on scores
+
 0.6.4	2021-08-10
 	- POD Update
 	- multiAnnotation support in matching algo and writers

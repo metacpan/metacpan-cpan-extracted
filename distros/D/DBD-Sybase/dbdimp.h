@@ -56,6 +56,8 @@ struct imp_drh_st {
 #define MAX_SQL_SIZE 255
 #define VERSION_SIZE 20
 
+#define UID_PWD_SIZE 256
+
 /* Define dbh implementor data structure */
 struct imp_dbh_st {
 	dbih_dbc_t com; /* MUST be first element in structure	*/
@@ -76,8 +78,8 @@ struct imp_dbh_st {
 	int lasterr;
 	int lastsev;
 
-	char uid[32];
-	char pwd[32];
+	char uid[UID_PWD_SIZE];
+	char pwd[UID_PWD_SIZE];
 
 	char server[64];
 	char charset[64];

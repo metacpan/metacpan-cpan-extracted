@@ -156,12 +156,12 @@ static perl_mutex context_alloc_mutex[1];
 /*#define USE_CSLIB_CB 1 */
 
 static CS_CONTEXT *context;
-static CS_LOCALE *locale;
+static CS_LOCALE *glocale;
 static char scriptName[255];
 static char hostname[255];
 static char *ocVersion;
 
-#define LOCALE(s)	((s)->locale ? (s)->locale : locale)
+#define LOCALE(s)	((s)->locale ? (s)->locale : glocale)
 
 static SV *cslib_cb;
 
@@ -234,9 +234,9 @@ static CS_RETCODE CS_PUBLIC cslibmsg_cb(CS_CONTEXT *context, CS_CLIENTMSG *errms
   }
   PerlIO_printf(PerlIO_stderr(), "\nCS Library Message:\n");
   PerlIO_printf(PerlIO_stderr(),
-      "Message number: LAYER = (%ld) ORIGIN = (%ld) ",
+      "Message number: LAYER = (%d) ORIGIN = (%d) ",
       CS_LAYER(errmsg->msgnumber), CS_ORIGIN(errmsg->msgnumber));
-  PerlIO_printf(PerlIO_stderr(), "SEVERITY = (%ld) NUMBER = (%ld)\n",
+  PerlIO_printf(PerlIO_stderr(), "SEVERITY = (%d) NUMBER = (%d)\n",
       CS_SEVERITY(errmsg->msgnumber), CS_NUMBER(errmsg->msgnumber));
   PerlIO_printf(PerlIO_stderr(), "Message String: %s\n", errmsg->msgstring);
   if (errmsg->osstringlen > 0) {
@@ -327,10 +327,10 @@ clientmsg_cb(CS_CONTEXT *context, CS_CONNECTION *connection, CS_CLIENTMSG *errms
     } else {
       sv_setpv(DBIc_ERRSTR(imp_dbh), "OpenClient message: ");
     }
-    sprintf(buff, "LAYER = (%ld) ORIGIN = (%ld) ",
+    sprintf(buff, "LAYER = (%d) ORIGIN = (%d) ",
         CS_LAYER(errmsg->msgnumber), CS_ORIGIN(errmsg->msgnumber));
     sv_catpv(DBIc_ERRSTR(imp_dbh), buff);
-    sprintf(buff, "SEVERITY = (%ld) NUMBER = (%ld)\n",
+    sprintf(buff, "SEVERITY = (%d) NUMBER = (%d)\n",
         CS_SEVERITY(errmsg->msgnumber), CS_NUMBER(errmsg->msgnumber));
     sv_catpv(DBIc_ERRSTR(imp_dbh), buff);
     sprintf(buff, "Server %s, database %s\n",
@@ -383,9 +383,9 @@ clientmsg_cb(CS_CONTEXT *context, CS_CONNECTION *connection, CS_CLIENTMSG *errms
     }
   } else { /* !connection */
     PerlIO_printf(PerlIO_stderr(), "OpenClient message: ");
-    PerlIO_printf(PerlIO_stderr(), "LAYER = (%ld) ORIGIN = (%ld) ",
+    PerlIO_printf(PerlIO_stderr(), "LAYER = (%d) ORIGIN = (%d) ",
         CS_LAYER(errmsg->msgnumber), CS_ORIGIN(errmsg->msgnumber));
-    PerlIO_printf(PerlIO_stderr(), "SEVERITY = (%ld) NUMBER = (%ld)\n",
+    PerlIO_printf(PerlIO_stderr(), "SEVERITY = (%d) NUMBER = (%d)\n",
         CS_SEVERITY(errmsg->msgnumber), CS_NUMBER(errmsg->msgnumber));
     PerlIO_printf(PerlIO_stderr(), "Message String: %s\n", errmsg->msgstring);
     if (errmsg->osstringlen> 0) {
@@ -415,9 +415,9 @@ servermsg_cb(CS_CONTEXT *context, CS_CONNECTION *connection, CS_SERVERMSG *srvms
 
   if(imp_dbh && DBIc_DBISTATE(imp_dbh)->debug >= 4) {
     if(srvmsg->msgnumber) {
-      PerlIO_printf(DBIc_LOGPIO(imp_dbh),"    servermsg_cb -> number=%ld severity=%ld ",
+      PerlIO_printf(DBIc_LOGPIO(imp_dbh),"    servermsg_cb -> number=%d severity=%d ",
           srvmsg->msgnumber, srvmsg->severity);
-      PerlIO_printf(DBIc_LOGPIO(imp_dbh), "state=%ld line=%ld ",
+      PerlIO_printf(DBIc_LOGPIO(imp_dbh), "state=%d line=%d ",
           srvmsg->state, srvmsg->line);
       if (srvmsg->svrnlen> 0) {
         PerlIO_printf(DBIc_LOGPIO(imp_dbh), "server=%s ", srvmsg->svrname);
@@ -554,9 +554,9 @@ servermsg_cb(CS_CONTEXT *context, CS_CONNECTION *connection, CS_SERVERMSG *srvms
     } else {
       sv_setpv(DBIc_ERRSTR(imp_dbh), "Server message ");
     }
-    sprintf(buff, "number=%ld severity=%ld ", srvmsg->msgnumber, srvmsg->severity);
+    sprintf(buff, "number=%d severity=%d ", srvmsg->msgnumber, srvmsg->severity);
     sv_catpv(DBIc_ERRSTR(imp_dbh), buff);
-    sprintf(buff, "state=%ld line=%ld", srvmsg->state, srvmsg->line);
+    sprintf(buff, "state=%d line=%d", srvmsg->state, srvmsg->line);
     sv_catpv(DBIc_ERRSTR(imp_dbh), buff);
     if (srvmsg->svrnlen> 0) {
       sv_catpv(DBIc_ERRSTR(imp_dbh), " server=");
@@ -591,9 +591,9 @@ servermsg_cb(CS_CONTEXT *context, CS_CONNECTION *connection, CS_SERVERMSG *srvms
     return retcode;
   } else {
     if(srvmsg->msgnumber) {
-      PerlIO_printf(DBIc_LOGPIO(imp_dbh), "Server message: number=%ld severity=%ld ",
+      PerlIO_printf(DBIc_LOGPIO(imp_dbh), "Server message: number=%d severity=%d ",
           srvmsg->msgnumber, srvmsg->severity);
-      PerlIO_printf(DBIc_LOGPIO(imp_dbh), "state=%ld line=%ld ",
+      PerlIO_printf(DBIc_LOGPIO(imp_dbh), "state=%d line=%d ",
           srvmsg->state, srvmsg->line);
       if (srvmsg->svrnlen> 0) {
         PerlIO_printf(DBIc_LOGPIO(imp_dbh), "server=%s ", srvmsg->svrname);
@@ -980,11 +980,11 @@ void syb_init(dbistate_t *dbistate) {
         ocVersion);
   }
 
-  if ((retcode = cs_loc_alloc(context, &locale)) != CS_SUCCEED) {
+  if ((retcode = cs_loc_alloc(context, &glocale)) != CS_SUCCEED) {
     warn("cs_loc_alloc failed");
   }
   if (retcode == CS_SUCCEED) {
-    if ((retcode = cs_locale(context, CS_SET, locale, CS_LC_ALL,
+    if ((retcode = cs_locale(context, CS_SET, glocale, CS_LC_ALL,
         (CS_CHAR*) NULL, CS_UNUSED, (CS_INT*) NULL)) != CS_SUCCEED) {
       warn("cs_locale(CS_LC_ALL) failed");
     }
@@ -1002,7 +1002,7 @@ void syb_init(dbistate_t *dbistate) {
 
   if (retcode == CS_SUCCEED) {
     CS_INT type = CS_DATES_SHORT;
-    if ((retcode = cs_dt_info(context, CS_SET, locale, CS_DT_CONVFMT,
+    if ((retcode = cs_dt_info(context, CS_SET, glocale, CS_DT_CONVFMT,
         CS_UNUSED, (CS_VOID*) &type, CS_SIZEOF(CS_INT), NULL))
         != CS_SUCCEED) {
         warn("cs_dt_info() failed");
@@ -1010,7 +1010,7 @@ void syb_init(dbistate_t *dbistate) {
   }
 
   if (retcode == CS_SUCCEED) {
-    if ((retcode = cs_config(context, CS_SET, CS_LOC_PROP, locale,
+    if ((retcode = cs_config(context, CS_SET, CS_LOC_PROP, glocale,
         CS_UNUSED, NULL)) != CS_SUCCEED) {
           // Ignored for now.
       /* warn("cs_config(CS_LOC_PROP) failed"); */
@@ -1188,10 +1188,10 @@ int syb_db_login(SV *dbh, imp_dbh_t *imp_dbh, char *dsn, char *uid, char *pwd, S
     imp_dbh->server[63] = 0;
   }
 
-  strncpy(imp_dbh->uid, uid, 32);
-  imp_dbh->uid[31] = 0;
-  strncpy(imp_dbh->pwd, pwd, 32);
-  imp_dbh->pwd[31] = 0;
+  strncpy(imp_dbh->uid, uid, UID_PWD_SIZE);
+  imp_dbh->uid[UID_PWD_SIZE - 1] = 0;
+  strncpy(imp_dbh->pwd, pwd, UID_PWD_SIZE);
+  imp_dbh->pwd[UID_PWD_SIZE - 1] = 0;
 
   sv_setpv(DBIc_ERRSTR(imp_dbh), "");
 
@@ -1235,7 +1235,6 @@ static CS_CONNECTION *syb_db_connect(imp_dbh_t *imp_dbh) {
   dTHR;
   CS_RETCODE retcode;
   CS_CONNECTION *connection = NULL;
-  CS_LOCALE *locale = NULL;
   char ofile[255];
   int len;
 
@@ -1538,8 +1537,8 @@ static CS_CONNECTION *syb_db_connect(imp_dbh_t *imp_dbh) {
       
       // Try to connect - if this fails we do some cleanup...
       if ((retcode = ct_connect(connection, imp_dbh->server, len)) != CS_SUCCEED) {
-        if (locale != NULL) {
-          cs_loc_drop(context, locale);
+        if (glocale != NULL) {
+          cs_loc_drop(context, glocale);
         }
         ct_con_drop(connection);
         return 0;
@@ -1557,8 +1556,8 @@ static CS_CONNECTION *syb_db_connect(imp_dbh_t *imp_dbh) {
       if (imp_dbh->failedDbUseFatal && ret < 0) {
         /* cleanup, and return NULL */
         ct_close(connection, CS_FORCE_CLOSE);
-        if (locale != NULL) {
-          cs_loc_drop(context, locale);
+        if (glocale != NULL) {
+          cs_loc_drop(context, glocale);
         }
         ct_con_drop(connection);
 
@@ -1960,8 +1959,8 @@ static int syb_blk_done(imp_sth_t *imp_sth, CS_INT type) {
   ret = blk_done(imp_sth->bcp_desc, type, &imp_sth->numRows);
   if (DBIc_DBISTATE(imp_sth)->debug >= 4) {
     PerlIO_printf(DBIc_LOGPIO(imp_sth),
-        "    syb_blk_done -> blk_done(%d, %d, %d) = %d\n",
-        imp_sth->bcp_desc, type, imp_sth->numRows, ret);
+        "    syb_blk_done -> blk_done(%d, %d) = %d\n",
+        type, imp_sth->numRows, ret);
   }
 
   /* reset row counter if blk_done was successful */
@@ -2126,7 +2125,7 @@ static int syb_db_opentran(SV *dbh, imp_dbh_t *imp_dbh) {
   }
 
   cmd = syb_alloc_cmd(imp_dbh, imp_dbh->connection);
-  sprintf(imp_dbh->tranName, "DBI%x", imp_dbh);
+  sprintf(imp_dbh->tranName, "DBI%x", (void*)imp_dbh);
   sprintf(buff, "\nBEGIN TRAN %s\n", imp_dbh->tranName);
   retcode = ct_command(cmd, CS_LANG_CMD, buff, CS_NULLTERM, CS_UNUSED);
   if (DBIc_DBISTATE(imp_dbh)->debug >= 3) {
@@ -4062,7 +4061,7 @@ static int syb_blk_execute(imp_dbh_t *imp_dbh, imp_sth_t *imp_sth, SV *sth) {
     if (DBIc_DBISTATE(imp_dbh)->debug >= 5) {
       PerlIO_printf(DBIc_LOGPIO(imp_dbh),
           "blk_bind %d -> '%s' (ret = %d)\n", i + 1,
-          imp_sth->coldata[i].ptr, ret);
+          (char *)imp_sth->coldata[i].ptr, ret);
     }
     if (ret != CS_SUCCEED) {
       goto FAIL;
@@ -5422,7 +5421,6 @@ static int to_numeric(char *str, SV *sth, imp_sth_t *imp_sth, CS_DATAFMT *datafm
   CS_DATAFMT srcfmt;
   CS_INT reslen;
   char *p;
-  CS_LOCALE *locale = LOCALE(imp_dbh);
 
   memset(mn, 0, sizeof(*mn));
 
@@ -5433,7 +5431,7 @@ static int to_numeric(char *str, SV *sth, imp_sth_t *imp_sth, CS_DATAFMT *datafm
   memset(&srcfmt, 0, sizeof(srcfmt));
   srcfmt.datatype = CS_CHAR_TYPE;
   srcfmt.format = CS_FMT_NULLTERM;
-  srcfmt.locale = locale;
+  srcfmt.locale = LOCALE(imp_dbh);
 
   /* According to  https://github.com/mpeppler/DBD-Sybase/issues/31 we need to set the 
      datafmt.maxlength value to 35. This is not needed with Sybase client libs, but 
@@ -5725,9 +5723,9 @@ static int _dbd_rebind_ph(SV *sth, imp_sth_t *imp_sth, phs_t *phs, int maxlen) {
   if (DBIc_DBISTATE(imp_dbh)->debug >= 4) {
     PerlIO_printf(DBIc_LOGPIO(imp_dbh),
         "       bind %s <== '%.100s' (size %d, ok %d)\n", phs->name,
-        phs->sv_buf, (long) phs->maxlen, SvOK(phs->sv) ? 1 : 0);
+        phs->sv_buf, phs->maxlen, SvOK(phs->sv) ? 1 : 0);
     PerlIO_printf(DBIc_LOGPIO(imp_dbh),
-        "       datafmt: type=%d, name=%s, status=%d, len=%d\n",
+        "       datafmt: type=%d, name=%s, status=%d, len=%ld\n",
         phs->datafmt.datatype, phs->datafmt.name, phs->datafmt.status,
         value_len);
     PerlIO_printf(DBIc_LOGPIO(imp_dbh), "       saved type: %d\n", datatype);
@@ -5967,7 +5965,7 @@ static CS_RETCODE fetch_data(imp_dbh_t *imp_dbh, CS_COMMAND *cmd) {
      ** Check if we hit a recoverable error.
      */
     if (retcode == CS_ROW_FAIL) {
-      sprintf(buff, "Error on row %ld.\n", row_count);
+      sprintf(buff, "Error on row %d.\n", row_count);
       sv_catpv(DBIc_ERRSTR(imp_dbh), buff);
     }
 

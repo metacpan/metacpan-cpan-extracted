@@ -1,9 +1,8 @@
-use strict;
 use warnings;
+use v5.22;
 use utf8;
-use feature ':5.12';
 
-use Test::More tests => 8;
+use Test::More;
 
 use Data::Gimei;
 
@@ -33,3 +32,5 @@ is $word->kanji,    '鈴木';
 is $word->hiragana, 'すずき';
 is $word->katakana, 'スズキ';
 is $word->romaji,   'Suzuki';    # romaji capitalize initial char.
+
+done_testing;

@@ -1,7 +1,7 @@
 {
    "abstract" : "A client for talking to an Open API powered server",
    "author" : [
-      "Jan Henning Thorsen <jhthorsen@cpan.org>"
+      "Veesh Goldman <rabbiveesh@gmail.com>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
@@ -52,7 +52,7 @@
          "web" : "https://github.com/jhthorsen/openapi-client"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_contributors" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>",
       "Ed J <etj@cpan.org>"

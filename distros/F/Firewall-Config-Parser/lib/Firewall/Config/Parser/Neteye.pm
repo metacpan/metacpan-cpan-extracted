@@ -1,8 +1,14 @@
 package Firewall::Config::Parser::Neteye;
 
+#------------------------------------------------------------------------------
+# 加载扩展模块
+#------------------------------------------------------------------------------
 use Moose;
 use namespace::autoclean;
 
+#------------------------------------------------------------------------------
+# Firewall::Config::Parser::Neteye 通用属性
+#------------------------------------------------------------------------------
 use Firewall::Config::Element::Address::Neteye;
 use Firewall::Config::Element::AddressGroup::Neteye;
 use Firewall::Config::Element::Service::Neteye;

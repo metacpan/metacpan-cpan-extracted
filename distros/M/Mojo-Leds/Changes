@@ -1,5 +1,9 @@
 Changelog for Mojo-Leds
 
+1.13 2022-06-01T09:15:00
+ - *** BREAK COMPATIBILITY *** In previous versions we saved $c->req->params->to_hash in a "query" key in session. This is not good (think about user/pass credentials) so we removed this.
+ - Changed a test in t/70-common_routes.t to solve some failed tests under windows.
+
 1.12 2021-11-17T12:25:00
  - Optimized route algoritm. Removed .text extension response
  - Required AutoRoutePM >= 0.21

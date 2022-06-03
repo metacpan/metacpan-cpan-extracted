@@ -34,6 +34,7 @@ sub _buildFwId {
 #------------------------------------------------------------------------------
 sub save {
   my $self = shift;
+
   # 初始化变量
   my $fwConfTable          = 'fw_conf';
   my $fwConfigHistoryTable = 'fw_config_history';
@@ -42,6 +43,7 @@ sub save {
 
   # 配置状态改变逻辑判断
   if ( $isConfigChanged == 2 ) {
+
     # 新增配置，同时存储到历史配置、配置快照两张表
     $self->execute(
       "INSERT INTO $fwConfTable (fw_id, conf_sign, conf_content, check_time, modify_time) VALUES (:fwId, :confSign, :confContent,:checkTime,:modifyTime)",
@@ -52,6 +54,7 @@ sub save {
         modifyTime  => $self->conf->timestamp
       }
     );
+
     # 同时将配置改变写入 fw_config_history
     my $sql
       = "INSERT INTO $fwConfigHistoryTable (fw_id,config,update_date,compare_report) VALUES (:id,:config,now(),:report)";
@@ -63,19 +66,24 @@ sub save {
       }
     );
   }
+
   # 已有配置但发生变化，现在修改,先拿到diff情况
   elsif ( $isConfigChanged == 1 ) {
+
     # 老配置存储再数据库中
     my $sql = "SELECT conf_content FROM fw_conf WHERE fw_id = $fwId";
     my $old = $self->execute($sql)->one->{conf_content};
+
     # 切割新老配置为数组
     my $oldConfig = [ split( /\n/, defined $old ? $old : "" ) ];
     my $newConfig = [ split( /\n/, $self->conf->confContent ) ];
+
     # 比对新老配置结果
     my $compareReport = diff( $oldConfig, $newConfig, {STYLE => "Context"} );
 
     # 将配置变化写入 fw_config_history | 此处为差量配置
-    $sql = "INSERT INTO $fwConfigHistoryTable (fw_id,config,update_date,compare_report) VALUES (:id,:config,now(),:report)";
+    $sql
+      = "INSERT INTO $fwConfigHistoryTable (fw_id,config,update_date,compare_report) VALUES (:id,:config,now(),:report)";
     $self->execute(
       $sql,
       { id     => $self->fwId,
@@ -116,6 +124,7 @@ sub save {
       }
     );
   }
+
   # 返回配置变更比对结果
   return $isConfigChanged;
 }
@@ -125,6 +134,7 @@ sub save {
 #------------------------------------------------------------------------------
 sub isConfigChanged {
   my $self = shift;
+
   # 初始化变量
   my $tableName = 'fw_conf';
   my $raw       = $self->select(
@@ -137,10 +147,12 @@ sub isConfigChanged {
   if ( !defined $raw ) {
     return 2;
   }
+
   # 已有配置且发生变化
   elsif ( $raw->{conf_sign} ne $self->conf->confSign ) {
     return 1;
   }
+
   # 已有配置且未发生变化
   else {
     return 0;

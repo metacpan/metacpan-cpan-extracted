@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "BSON::OID" => 0,
     "Mojolicious" => "8.23",
-    "Mojolicious::Plugin::AutoRoutePm" => "0.21",
+    "Mojolicious::Plugin::AutoRoutePm" => "0.23",
     "Mojolicious::Plugin::RenderFile" => 0,
     "Net::Domain" => 0,
     "Scalar::Util" => 0,
@@ -28,7 +28,6 @@ my %WriteMakefileArgs = (
     "re" => 0
   },
   "TEST_REQUIRES" => {
-    "Data::Printer" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "Test::More" => 0,
@@ -36,7 +35,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.12",
+  "VERSION" => "1.13",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,11 +44,10 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "BSON::OID" => 0,
-  "Data::Printer" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Mojolicious" => "8.23",
-  "Mojolicious::Plugin::AutoRoutePm" => "0.21",
+  "Mojolicious::Plugin::AutoRoutePm" => "0.23",
   "Mojolicious::Plugin::RenderFile" => 0,
   "Net::Domain" => 0,
   "Scalar::Util" => 0,

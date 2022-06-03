@@ -16,7 +16,7 @@ use if $] >= 5.027007, 'deprecate';
 use Locale::Codes::Constants;
 
 our($VERSION);
-$VERSION='3.70';
+$VERSION='3.71';
 
 use Exporter qw(import);
 our(@EXPORT_OK,%EXPORT_TAGS);

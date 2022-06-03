@@ -1,9 +1,13 @@
 Revision history for perl distribution OpenAPI-Client
 
+1.04 2022-06-03T09:56:54+0900
+ - Allow inheritance and roles to be applied before new() #35 #37
+   Contributor: Veesh Goldman
+
 1.03 2021-10-02T09:27:11+0900
  - Fix documentation issues regarding "base_url" #33
- - Fix "mojo client ..." with 3.0.x spec
- - Changed -I to also be able to dump the whole spec (bundled)
+ - Fix "mojo openapi ..." with 3.0.x spec
+ - Changed "mojo openapi -I" to also be able to dump the whole spec (bundled)
 
 1.02 2021-08-28T16:49:50+0200
  - Add support for kebab case in path templating #32

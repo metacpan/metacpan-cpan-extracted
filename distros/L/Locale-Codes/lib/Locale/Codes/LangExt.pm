@@ -7,7 +7,7 @@ package Locale::Codes::LangExt;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'gen_mods' is run.
-#    Generated on: Wed Mar  2 15:15:11 EST 2022
+#    Generated on: Wed Jun  1 10:46:19 EDT 2022
 
 use strict;
 use warnings;
@@ -15,7 +15,7 @@ require 5.006;
 use Exporter qw(import);
 
 our($VERSION,@EXPORT);
-$VERSION   = '3.70';
+$VERSION   = '3.71';
 
 ################################################################################
 use if $] >= 5.027007, 'deprecate';

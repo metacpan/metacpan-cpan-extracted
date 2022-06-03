@@ -1,37 +1,29 @@
 package Data::Gimei;
 
-use version; our $VERSION = version->declare("v0.0.7");
+use warnings;
+use v5.22;
+
+use version; our $VERSION = version->declare("v0.1.1");
 
 use Data::Gimei::Name;
 use Data::Gimei::Address;
 use Data::Gimei::Word;
+use Data::Gimei::Random;
 
-use strict;
-use warnings;
-use feature ':5.12';
-
-my $seed = srand();
+my $r = Data::Gimei::Random->new;
 
 sub set_random_seed {
-    $seed = shift;
-}
-
-sub random {
-    my $size = shift;
-
-    srand($seed);
-    my $ret = int( rand($size) );
-    $seed = srand($seed);
-
-    return $ret;
+    my $seed = shift;
+    $r->set_seed($seed);
 }
 
 sub sample {
     my $array = shift;
-    my $len   = @$array;
-    return $array->[ random($len) ];
+    return $r->next_sample($array);
 }
 1;
+
+__END__
 
 =encoding utf-8
 
@@ -41,8 +33,9 @@ Data::Gimei - a Perl port of Ruby's gimei generates fake data in Japanese.
 
 =head1 SYNOPSIS
 
+  use warnings;
+  use v5.22;
   binmode STDOUT, ":utf8";
-  use feature ':5.12';
 
   use Data::Gimei;
   my $name = Data::Gimei::Name->new();
@@ -52,15 +45,15 @@ Data::Gimei - a Perl port of Ruby's gimei generates fake data in Japanese.
   say $name->katakana;             # "サイトウ ハルナ"
   say $name->romaji;               # "Haruna Saito"
 
-  say $name->last_name->kanji;     # "斎藤"
-  say $name->last_name->hiragana;  # "さいとう"
-  say $name->last_name->katakana;  # "サイトウ"
-  say $name->last_name->romaji;    # "Saito"
+  say $name->family->kanji;        # "斎藤"
+  say $name->family->hiragana;     # "さいとう"
+  say $name->family->katakana;     # "サイトウ"
+  say $name->family->romaji;       # "Saito"
 
-  say $name->first_name->kanji;    # "陽菜"
-  say $name->first_name->hiragana; # "はるな"
-  say $name->first_name->katakana; # "ハルナ"
-  say $name->first_name->romaji;   # "Haruna"
+  say $name->given->kanji;         # "陽菜"
+  say $name->given->hiragana;      # "はるな"
+  say $name->given->katakana;      # "ハルナ"
+  say $name->given->romaji;        # "Haruna"
 
   say $name->gender;               # "female"
 

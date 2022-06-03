@@ -1,15 +1,16 @@
 package Data::TableData::Lookup;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-11'; # DATE
-our $DIST = 'Data-TableData-Lookup'; # DIST
-our $VERSION = '0.002'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
 use Exporter 'import';
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-05-06'; # DATE
+our $DIST = 'Data-TableData-Lookup'; # DIST
+our $VERSION = '0.003'; # VERSION
+
 our @EXPORT_OK = qw(table_vlookup);
 
 our %SPEC;
@@ -52,7 +53,7 @@ Example:
 
 will result in:
 
-    0.30
+    0.304
 
 while if the lookup_value is 40_000, undef will be returned since it is not
 found in any row of the table.
@@ -83,6 +84,25 @@ _
         table => {
             schema => 'array*',
             req => 1,
+            description => <<'_',
+
+Either an aoaos (array of aos's a.k.a. array-of-scalars) or aohos (array of
+hos's a.k.a. hash of scalars), e.g.:
+
+    # aoaos
+    [ # col1, col2, col3
+      [1,2,3],
+      [4,5,6],
+      [7,8,9], ]
+
+or:
+
+    # aohos
+    [ {col1=>1, col2=>2, col3=>3},
+      {col1=>4, col2=>5, col3=>6},
+      {col1=>7, col2=>8, col3=>9}, ]
+
+_
         },
         lookup_value => {
             summary => 'The value that you want to look up in the lookup field',
@@ -99,7 +119,7 @@ _
             summary => 'Where to look up the lookup value in',
             description => <<'_',
 
-Either an integer array index (for aoa table) or a string hash key (for aoh
+Either an integer array index (for aoaos table) or a string hash key (for aohos
 table).
 
 Instead of `lookup_value` and `lookup_field`, you can also specify `lookup_code`
@@ -293,7 +313,7 @@ Data::TableData::Lookup - Lookup value in a table data structure
 
 =head1 VERSION
 
-This document describes version 0.002 of Data::TableData::Lookup (from Perl distribution Data-TableData-Lookup), released on 2021-04-11.
+This document describes version 0.003 of Data::TableData::Lookup (from Perl distribution Data-TableData-Lookup), released on 2022-05-06.
 
 =head1 SYNOPSIS
 
@@ -408,7 +428,7 @@ Example:
 
 will result in:
 
- 0.30
+ 0.304
 
 while if the lookup_value is 40_000, undef will be returned since it is not
 found in any row of the table.
@@ -477,7 +497,7 @@ With C<approx> set to true, lookup will succeed once 0 or 1 is returned.
 
 Where to look up the lookup value in.
 
-Either an integer array index (for aoa table) or a string hash key (for aoh
+Either an integer array index (for aoaos table) or a string hash key (for aohos
 table).
 
 Instead of C<lookup_value> and C<lookup_field>, you can also specify C<lookup_code>
@@ -499,6 +519,22 @@ table).
 
 =item * B<table>* => I<array>
 
+Either an aoaos (array of aos's a.k.a. array-of-scalars) or aohos (array of
+hos's a.k.a. hash of scalars), e.g.:
+
+ # aoaos
+ [ # col1, col2, col3
+   [1,2,3],
+   [4,5,6],
+   [7,8,9], ]
+
+or:
+
+ # aohos
+ [ {col1=>1, col2=>2, col3=>3},
+   {col1=>4, col2=>5, col3=>6},
+   {col1=>7, col2=>8, col3=>9}, ]
+
 
 =back
 
@@ -512,6 +548,36 @@ Please visit the project's homepage at L<https://metacpan.org/release/Data-Table
 
 Source repository is at L<https://github.com/perlancar/perl-TableData-Lookup>.
 
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-TableData-Lookup>
@@ -519,18 +585,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 SEE ALSO
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

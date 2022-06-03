@@ -140,7 +140,7 @@ sub getFragmentsFromSource {
 	    	}
     		
     	}
-    	elsif ($VERSION == 0.4) {
+    	elsif ($VERSION >= 0.4) {
     		## v1.0 file
     		$source = dist_file('Metabolomics-Fragment-Annotation', 'MS_fragments-adducts-isotopes__V1.1.txt');
     		

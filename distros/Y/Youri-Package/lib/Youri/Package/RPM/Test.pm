@@ -1,4 +1,4 @@
-# $Id: Test.pm 2419 2017-10-28 11:00:16Z guillomovitch $
+# $Id$
 package Youri::Package::RPM::Test;
 
 =head1 NAME

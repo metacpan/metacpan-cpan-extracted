@@ -1,3 +1,8 @@
+0.04 2022-06-01T12:31:02+02:00
+ - Fix DEPENDENCIES section in doc.
+ - Move bugtracker to github.
+ - Update copyright years.
+
 0.03 2022-05-09T22:54:45+02:00
  - Add test for star with explicit width.
  - Rewrite to use Tags::HTML. (Change in api, parameter 'tags' is

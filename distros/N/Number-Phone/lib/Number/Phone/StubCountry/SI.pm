@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20220307120123;
+our $VERSION = 1.20220601185319;
 
 my $formatters = [
                 {
@@ -101,7 +101,7 @@ my $validators = {
             8(?:
               1(?:
                 [67]\\d|
-                8[0-489]
+                8[0-589]
               )|
               2(?:
                 0\\d|
@@ -114,35 +114,35 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en} = {"38657", "Gorica\/Koper\/Postojna",
-"3861", "Ljubljana",
-"38637", "Celje\/Trbovlje",
-"38652", "Gorica\/Koper\/Postojna",
+$areanames{en} = {"38677", "Novo\ Mesto\/Krško",
+"38657", "Gorica\/Koper\/Postojna",
 "38645", "Kranj",
-"38632", "Celje\/Trbovlje",
-"38675", "Novo\ Mesto\/Krško",
-"38634", "Celje\/Trbovlje",
-"38656", "Gorica\/Koper\/Postojna",
-"38654", "Gorica\/Koper\/Postojna",
-"38636", "Celje\/Trbovlje",
-"38648", "Kranj",
-"3862", "Maribor\/Ravne\ na\ Koroškem\/Murska\ Sobota",
-"38633", "Celje\/Trbovlje",
-"38678", "Novo\ Mesto\/Krško",
-"38653", "Gorica\/Koper\/Postojna",
-"38647", "Kranj",
-"38677", "Novo\ Mesto\/Krško",
-"38655", "Gorica\/Koper\/Postojna",
 "38642", "Kranj",
-"38635", "Celje\/Trbovlje",
-"38672", "Novo\ Mesto\/Krško",
 "38646", "Kranj",
-"38674", "Novo\ Mesto\/Krško",
-"38676", "Novo\ Mesto\/Krško",
+"38638", "Celje\/Trbovlje",
 "38644", "Kranj",
-"38673", "Novo\ Mesto\/Krško",
+"38633", "Celje\/Trbovlje",
+"38634", "Celje\/Trbovlje",
+"38648", "Kranj",
+"38636", "Celje\/Trbovlje",
+"38632", "Celje\/Trbovlje",
+"38635", "Celje\/Trbovlje",
+"3862", "Maribor\/Ravne\ na\ Koroškem\/Murska\ Sobota",
+"38637", "Celje\/Trbovlje",
 "38658", "Gorica\/Koper\/Postojna",
-"38638", "Celje\/Trbovlje",};
+"3861", "Ljubljana",
+"38678", "Novo\ Mesto\/Krško",
+"38672", "Novo\ Mesto\/Krško",
+"38676", "Novo\ Mesto\/Krško",
+"38674", "Novo\ Mesto\/Krško",
+"38673", "Novo\ Mesto\/Krško",
+"38675", "Novo\ Mesto\/Krško",
+"38656", "Gorica\/Koper\/Postojna",
+"38652", "Gorica\/Koper\/Postojna",
+"38653", "Gorica\/Koper\/Postojna",
+"38654", "Gorica\/Koper\/Postojna",
+"38647", "Kranj",
+"38655", "Gorica\/Koper\/Postojna",};
 
     sub new {
       my $class = shift;

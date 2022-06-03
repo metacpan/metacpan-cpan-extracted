@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20220307120117;
+our $VERSION = 1.20220601185318;
 
 my $formatters = [
                 {
@@ -114,7 +114,7 @@ my $validators = {
                   000|
                   (?:
                     19|
-                    [24-7]\\d
+                    [2-7]\\d
                   )\\d
                 )|
                 (?:
@@ -123,7 +123,7 @@ my $validators = {
                     3[5-9]
                   )\\d|
                   7(?:
-                    [679]\\d|
+                    [3679]\\d|
                     8[13-9]
                   )|
                   8(?:
@@ -170,24 +170,24 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"37233", "Kohtla\-Järve",
-"37248", "Rapla",
+$areanames{en} = {"37277", "Jõgeva",
 "37278", "Võru",
-"37245", "Kuressaare",
-"37275", "Tartu",
-"3726", "Tallinn\/Harju\ County",
-"37232", "Rakvere",
-"37274", "Tartu",
-"37246", "Kärdla",
-"37244", "Pärnu",
-"37276", "Valga",
-"37273", "Tartu",
 "37238", "Paide",
+"37244", "Pärnu",
 "37243", "Viljandi",
-"37247", "Haapsalu",
-"37277", "Jõgeva",
+"37246", "Kärdla",
+"37245", "Kuressaare",
 "37279", "Põlva",
-"37235", "Narva\/Sillamäe",};
+"37275", "Tartu",
+"37235", "Narva\/Sillamäe",
+"37232", "Rakvere",
+"37233", "Kohtla\-Järve",
+"37248", "Rapla",
+"37274", "Tartu",
+"37273", "Tartu",
+"37276", "Valga",
+"3726", "Tallinn\/Harju\ County",
+"37247", "Haapsalu",};
 
     sub new {
       my $class = shift;

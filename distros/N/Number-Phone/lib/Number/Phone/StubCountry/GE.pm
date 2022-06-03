@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20220307120118;
+our $VERSION = 1.20220601185318;
 
 my $formatters = [
                 {
@@ -97,14 +97,6 @@ my $validators = {
             )
           )\\d{3}|
           5(?:
-            0070|
-            (?:
-              11|
-              33
-            )33|
-            [25]222
-          )[0-4]\\d{3}|
-          5(?:
             00(?:
               0\\d|
               50
@@ -112,7 +104,8 @@ my $validators = {
             11(?:
               00|
               1\\d|
-              2[0-4]
+              2[0-4]|
+              3[01]
             )|
             5200|
             75(?:
@@ -131,6 +124,15 @@ my $validators = {
               )
             )
           )\\d{4}|
+          5(?:
+            0070|
+            11(?:
+              33|
+              51
+            )|
+            [25]222|
+            3333
+          )[0-4]\\d{3}|
           (?:
             5(?:
               [14]4|
@@ -149,81 +151,81 @@ my $validators = {
                 'voip' => '70[67]\\d{6}'
               };
 my %areanames = ();
-$areanames{en} = {"995426", "Kobuleti",
-"995372", "Gardabani",
-"995410", "Mestia",
-"995365", "Akhaltsikhe",
-"995491", "Terdjola",
-"995427", "Xelvachauri",
-"995494", "lanchxuti",
-"995495", "Khoni",
-"995472", "Tsageri",
-"995361", "Ninotsminda",
-"995423", "Xulo",
-"995364", "Aspindza",
-"995369", "Kareli",
-"995370", "Gori",
-"995412", "Abasha",
-"995432", "Vani",
-"995496", "Ozurgeti",
+$areanames{en} = {"995352", "Kvareli",
+"995433", "Kharagauli",
 "995342", "Akhalgori",
-"995497", "Tkibuli",
-"995350", "Telavi",
-"995363", "Tsalka",
-"995424", "Shuaxevi",
-"995367", "Bordjomi",
-"995493", "Poti",
-"995425", "Qeda",
-"99532", "Tbilisi",
-"995352", "Kvareli",
-"995442", "Sukhumi",
-"995366", "Adigeni",
-"995368", "Khashuri",
-"995447", "Gali",
-"995356", "DedoplisTskaro",
-"995479", "Chiatura",
-"995358", "Bolnisi",
-"995434", "Bagdati",
-"995411", "Samtredia",
-"995431", "Kutaisi",
-"995414", "Xobi",
 "995362", "Akhalkalaki",
-"995439", "Ambrolauri",
-"995446", "Tkvarcheli",
-"995419", "Choxatauri",
-"995357", "Marneuli",
-"995448", "Gulripshi",
-"995353", "Gurdjaani",
-"995360", "Dmanisi",
-"995347", "Djava",
-"995492", "Zestafoni",
-"995415", "Zugdidi",
-"995435", "Sachkhere",
-"995371", "Kaspi",
-"995374", "Tigvi",
-"995348", "Tianeti",
-"995443", "Gagra",
-"995346", "Dusheti",
-"995444", "Gudauta",
-"995417", "Chkhorotskhu",
-"995359", "TetriTskaro",
-"995373", "Mtskheta",
-"995437", "Lentekhi",
-"995416", "Tsalendjikha",
-"995436", "Tskaltubo",
-"995418", "Martvili",
-"995354", "Lagodekhi",
-"995345", "Stefanstminda\/Kazbegi",
-"995351", "Sagaredjo",
-"995344", "Tskhinvali",
 "995341", "Rustavi",
 "995355", "Signagi",
+"995361", "Ninotsminda",
+"995426", "Kobuleti",
+"995446", "Tkvarcheli",
+"995345", "Stefanstminda\/Kazbegi",
+"995351", "Sagaredjo",
+"995365", "Akhaltsikhe",
+"995425", "Qeda",
+"995445", "Ochamchire",
+"995356", "DedoplisTskaro",
+"995346", "Dusheti",
+"995366", "Adigeni",
+"995437", "Lentekhi",
 "995422", "Batumi",
-"995473", "Oni",
-"995433", "Kharagauli",
+"995442", "Sukhumi",
+"995439", "Ambrolauri",
+"995416", "Tsalendjikha",
+"995492", "Zestafoni",
+"995495", "Khoni",
+"995472", "Tsageri",
+"995434", "Bagdati",
+"995491", "Terdjola",
+"995412", "Abasha",
+"995496", "Ozurgeti",
+"995372", "Gardabani",
+"995371", "Kaspi",
+"995415", "Zugdidi",
+"99532", "Tbilisi",
+"995411", "Samtredia",
+"995357", "Marneuli",
+"995414", "Xobi",
+"995423", "Xulo",
+"995370", "Gori",
+"995443", "Gagra",
+"995374", "Tigvi",
+"995367", "Bordjomi",
+"995410", "Mestia",
+"995347", "Djava",
+"995348", "Tianeti",
+"995368", "Khashuri",
+"995436", "Tskaltubo",
+"995419", "Choxatauri",
+"995358", "Bolnisi",
+"995479", "Chiatura",
+"995435", "Sachkhere",
+"995494", "lanchxuti",
+"995431", "Kutaisi",
+"995448", "Gulripshi",
+"995447", "Gali",
+"995427", "Xelvachauri",
+"995353", "Gurdjaani",
+"995432", "Vani",
+"995363", "Tsalka",
+"995497", "Tkibuli",
 "995413", "Senaki",
+"995424", "Shuaxevi",
+"995444", "Gudauta",
+"995373", "Mtskheta",
+"995417", "Chkhorotskhu",
+"995473", "Oni",
+"995360", "Dmanisi",
+"995354", "Lagodekhi",
+"995344", "Tskhinvali",
+"995364", "Aspindza",
+"995350", "Telavi",
+"995359", "TetriTskaro",
+"995493", "Poti",
+"995418", "Martvili",
 "995349", "Akhmeta",
-"995445", "Ochamchire",};
+"995369", "Kareli",};
 
     sub new {
       my $class = shift;

@@ -267,7 +267,8 @@ sub getAddress {
 #------------------------------------------------------------------------------
 sub parseAddress {
   my ( $self, $string ) = @_;
-  say dumper $string;
+
+  # say dumper $string;
 
   # 正则匹配
   if ( $string =~ /ip\saddress-set\s(?<name>.*?)\stype\sobject(?:\svpn-instance\s(?<vpn>.*))?/i ) {
@@ -364,7 +365,8 @@ sub getAddressGroup {
 #------------------------------------------------------------------------------
 sub parseAddressGroup {
   my ( $self, $string ) = @_;
-  say dumper $string;
+
+  # say dumper $string;
 
   # 正则匹配
   if ( $string =~ /ip\saddress-set\s(?<name>.*?)\stype\sgroup(?:\svpn-instance\s(?<vpn>.*))?/i ) {
@@ -426,7 +428,8 @@ sub parseAddressGroup {
       # 拼接地址组代码块
       $config .= "\n" . $string;
     } ## end while ( $string = $self->...)
-    say dumper $address;
+
+    # say dumper $address;
 
     # 返回计算结果，每个解析对象都集成角色的config属性
     $address->{"config"} = $config;

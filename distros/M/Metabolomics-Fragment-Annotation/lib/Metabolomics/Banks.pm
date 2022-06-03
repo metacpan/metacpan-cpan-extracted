@@ -49,10 +49,11 @@ Metabolomics::Banks - Perl extension to build metabolite banks for metabolomics
 
 Version 0.3 - Object integration for multi-annotation
 Version 0.4 - Completing object properties and add cluster support
+Version 0.5 - parsingFeaturesFragments method to manage complexe fragments (multiple features)
 
 =cut
 
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 
 
 =head1 SYNOPSIS
@@ -284,8 +285,7 @@ sub parsingMsFragments {
 }
 ### END of SUB
 
-
-=item parsingMsFragments
+=item parsingMsFragmentsByCluster
 
 	## Description : get a list of Ms fragment from a experimental mesureament.
 	## Input : $oBank, $Xfile, $is_header, $column
@@ -386,6 +386,101 @@ sub parsingMsFragmentsByCluster {
     
 }
 ### END of SUB
+
+=item parsingFeaturesFragments
+
+	## Description : get a list of fragments from a experimental mesureament with all their features.
+	## Input : $oBank, $Xfile, $is_header, $columns
+	## Output : $msFragBank
+	## Usage : $oBank->parsingFeaturesFragments ( $Xfile, $is_header, $columns ) ;
+
+=cut
+
+## START of SUB
+sub parsingFeaturesFragments {
+    ## Retrieve Values
+    my ( $oBank, $Xfile, $is_header, $columns ) = @_;
+    my @fragmentsList = () ;
+    my @headers = () ;
+
+    #### FOR TEST ONLY :
+    if ((!defined $Xfile) or (!defined $columns) or (!defined $is_header)) {
+    	@fragmentsList = ( { 'mz' => '173.09274', 'ri' => '100.0'}, { 'mz' => '174.09584', 'ri' => '4.975'}, { 'mz' => '175.09841', 'ri' => '0.273'}  ) ;
+    	@headers =( 'mz', 'ri' ) ;
+    }
+    
+    ## Check file extension (tsv, csv, tabular...) and adapt csv object constructor
+    my $csv = undef ;
+    
+    if ($Xfile =~/\.(csv|CSV)$/) {
+    	print "Parsing a CSV file...\n" ;
+    	$csv = Text::CSV->new ( { 'sep_char' => ",", binary => 1, auto_diag => 1, eol => "\n" } )  # should set binary attribute.
+    	or die "Cannot use CSV: ".Text::CSV->error_diag ();	
+    }
+    elsif ($Xfile =~/\.(tsv|TSV|TABULAR|tabular)$/) {
+    	print "Parsing a tabular file...\n" ;
+    	$csv = Text::CSV->new ( { 'sep_char' => "\t", binary => 1, auto_diag => 1, eol => "\n" } )  # should set binary attribute.
+    	or die "Cannot use CSV: ".Text::CSV->error_diag ();	
+    }
+    else { # By default considering tabular as default format
+    	$csv = Text::CSV->new ( { 'sep_char' => "\t", binary => 1, auto_diag => 1, eol => "\n" } )  # should set binary attribute.
+    	or die "Cannot use TSV: ".Text::CSV->error_diag ();	
+    }
+    
+    ## Adapte the number of the colunm : (nb of column to position in array)
+    
+    open my $fh, '<:crlf', $Xfile or die $! ;
+	
+	@headers =	$csv->header( $fh ) ;
+	
+	## Clean headers: (can contains space before or after value/key)
+	my @cleanHeaders = () ;
+	foreach my $header (@headers) {
+		my $headerToclean = $header ;
+		$headerToclean =~ s/^\s+//;
+		$headerToclean =~ s/\s+$//;
+		push (@cleanHeaders, $headerToclean) ;
+	}
+	
+	## Get data
+	while (my $row = $csv->getline_hr ($fh)) {
+		my $fragment = undef ;
+		
+		foreach my $col ( @{$columns} ) {
+			
+			my $fieldName = $cleanHeaders[$col -1] ;
+			$fieldName =~ s/^\s+//;
+			$fieldName =~ s/\s+$//;
+			
+			my $fieldValue = $row->{$headers[$col -1]} ;
+			$fieldValue =~ s/^\s+//;
+			$fieldValue =~ s/\s+$//;
+			
+        	$fragment->{ $fieldName } = $fieldValue ;
+        }
+        my $tmp = $fragment ;
+        push ( @fragmentsList, $tmp ) ;
+	}
+    
+    ## Create a PeakList (Mapping on )
+    foreach my $features (@fragmentsList) {
+    
+    	my $oPeak = Metabolomics::Banks->__refPeak__() ;
+    	## TODO... make it generic ! (NOT ONLY FOR BRUKER output format)
+    	my $currentMzHeader = $cleanHeaders[ $columns->[0] - 1 ] ;
+    	my $currentIntHeader = $cleanHeaders[ $columns->[0] - 1 ] ;
+
+	    $oPeak->_setPeak_MESURED_MONOISOTOPIC_MASS (  $features->{$currentMzHeader} );
+	    $oPeak->_setPeak_INTENSITY ( $features->{$currentIntHeader} );
+	    #$oPeak->_setPeak_RELATIVE_INTENSITY_100 ( ) ;
+	    #$oPeak->_setPeak_RELATIVE_INTENSITY_999 ( ) ;
+    	
+    	$oBank->_addPeakList('_EXP_PEAK_LIST_', $oPeak) ;
+    	
+    }
+}
+### END of SUB
+
 
 
 =back

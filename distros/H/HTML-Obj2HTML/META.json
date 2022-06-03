@@ -1,0 +1,58 @@
+{
+   "abstract" : "Create HTML from a arrays and hashes",
+   "author" : [
+      "Pero Moretti"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "freebsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "HTML-Obj2HTML",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "HTML::Entities" : "0",
+            "List::MoreUtils" : "0",
+            "Locale::Currency::Format" : "0",
+            "Module::Pluggable" : "0",
+            "Text::Markdown" : "0",
+            "Text::Pluralize" : "0",
+            "perl" : "5.008004",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Pero-Moretti/Perl-Obj2HTML.git",
+         "web" : "https://github.com/Pero-Moretti/Perl-Obj2HTML"
+      }
+   },
+   "version" : "0.1",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

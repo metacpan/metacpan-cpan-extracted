@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20220307120124;
+our $VERSION = 1.20220601185320;
 
 my $formatters = [
                 {
@@ -68,7 +68,7 @@ my $validators = {
           )\\d{3}|
           (?:
             20(?:
-              [0147]\\d|
+              [017]\\d|
               2[5-9]|
               32|
               5[0-4]|
@@ -93,7 +93,7 @@ my $validators = {
           )\\d{3}|
           (?:
             20(?:
-              [0147]\\d|
+              [017]\\d|
               2[5-9]|
               32|
               5[0-4]|
@@ -105,10 +105,11 @@ my $validators = {
                 'mobile' => '
           726[01]\\d{5}|
           7(?:
-            [0157-9]\\d|
+            [01578]\\d|
             20|
             36|
-            [46][0-4]
+            [46][0-4]|
+            9[89]
           )\\d{6}
         ',
                 'pager' => '',
@@ -118,19 +119,19 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"25641", "Kampala",
-"25643", "Jinja",
-"256483", "Fort\ Portal",
-"256485", "Mbarara",
-"25646", "Mityana",
-"256471", "Gulu",
-"256476", "Arua",
-"256464", "Mubende",
+$areanames{en} = {"256473", "Lira",
 "256465", "Masindi",
 "256486", "Kabale\/Rukungiri\/Kisoro",
-"256473", "Lira",
+"256476", "Arua",
+"256483", "Fort\ Portal",
 "25645", "Mbale",
-"256481", "Masaka",};
+"256471", "Gulu",
+"25643", "Jinja",
+"25646", "Mityana",
+"256464", "Mubende",
+"256481", "Masaka",
+"25641", "Kampala",
+"256485", "Mbarara",};
 
     sub new {
       my $class = shift;

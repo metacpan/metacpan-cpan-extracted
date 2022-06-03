@@ -38,18 +38,15 @@ WriteMakefile(
         'Test::Kwalitee'                 => 0,
         'Test::More'                     => 0,
         'Youri::Package::RPM::Generator' => 0,
+    },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        'resources' => {
+            repository => {
+                type => 'git',
+                url  => 'git://github.com/guillomovitch/Youri-Package.git',
+                web  => 'https://github.com/guillomovitch/Youri-Package'
+            },
+        }
     }
 );
-
-sub MY::postamble {
-   return <<'EOF';
-.PHONY: svntag
-SVNPATH = svn+ssh://youri.zarb.org/home/projects/youri/svn/soft/Package
-
-svntag:
-	svn copy -m 'new release $(VERSION)'\
-		$(SVNPATH)/trunk \
-		$(SVNPATH)/tags/release-$(VERSION)
-
-EOF
-}

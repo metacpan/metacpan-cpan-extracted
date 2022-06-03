@@ -22,6 +22,7 @@ has dbi => (
   is       => 'ro',
   does     => 'Firewall::DBI::Role',
   required => 1,
+
   # 代理 Firewall::DBI::Role SQL 方法
   handles => [qw(select execute update insert delete batchExecute batchInsert)],
 );
@@ -54,6 +55,7 @@ sub save {
   $self->saveRoute;
   $self->saveRule;
   $self->saveNat;
+
   # 暂不支持
   # $self->saveSchedule;
 }
@@ -63,6 +65,7 @@ sub save {
 #------------------------------------------------------------------------------
 sub saveZone {
   my $self = shift;
+
   # 定义表单
   my $tableName = 'fw_zone_state';
 
@@ -72,12 +75,14 @@ sub saveZone {
     new => {},
     old => {}
   };
+
   # 遍历快照中的网络区域,写入 newZones 和 zoneExistsStatus
   for my $zoneObj ( values $self->{parser}{elements}{zone}->%* ) {
     my $zoneName = $zoneObj->{name};
     $newZones->{$zoneName} = undef;
     $zoneExistsStatus->{new}{$zoneName} = undef;
   }
+
   # 查询已有网络区域数据,写入 oldZones
   $oldZones = $self->select(
     column => ['zone'],
@@ -87,6 +92,7 @@ sub saveZone {
 
   # 寻找差量数据
   for my $zoneName ( map { $_->{zone} } $oldZones->@* ) {
+
     # 新旧zones均存在,则不是新的数据
     if ( exists $newZones->{$zoneName} ) {
       delete( $zoneExistsStatus->{new}{$zoneName} );
@@ -99,19 +105,14 @@ sub saveZone {
   # 根据网络区域状态更新数据
   if ( keys $zoneExistsStatus->{new}->%* > 0 ) {
     my $sql    = "insert into $tableName (fw_id, zone) values (?, ?)";
-    my $params = [
-      map { [ $self->fwId, $_ ] }
-        keys $zoneExistsStatus->{new}->%*
-    ];
+    my $params = [ map { [ $self->fwId, $_ ] } keys $zoneExistsStatus->{new}->%* ];
     $self->batchExecute( $params, $sql );
   }
+
   # 设置 state 为 0 代表停用状态
   if ( keys $zoneExistsStatus->{old}->%* > 0 ) {
     my $sql    = "update $tableName set state = 1 where fw_id = ? and zone = ?";
-    my $params = [
-      map { [ $self->fwId, $_ ] }
-        keys $zoneExistsStatus->{old}->%*
-    ];
+    my $params = [ map { [ $self->fwId, $_ ] } keys $zoneExistsStatus->{old}->%* ];
     $self->batchExecute( $params, $sql );
   }
 }
@@ -126,16 +127,22 @@ sub saveInterface {
   my $sql
     = "insert into fw_interface (fw_id,interface_name,ipaddress,interface_range,zonename,config,type) values(?,?,?,?,?,?,?)
     ON CONFLICT(fw_id,interface_name) do update set config=EXCLUDED.config,interface_range = EXCLUDED.interface_range,ipaddress=EXCLUDED.ipaddress";
+
   # 初始化变量
   my $params;
+
   # 编辑快照解析到的接口对象
   for my $interface ( values $self->{parser}{elements}{interface}->%* ) {
+
     # 构造 SQL VALUES
     my @ints;
+
     # fw_id
     push @ints, $self->fwId;
+
     # interface_name
     push @ints, $interface->{name};
+
     # ipaddress
     if ( defined $interface->{ipAddress} ) {
       push @ints, $interface->{ipAddress} . "/" . $interface->{mask};
@@ -143,18 +150,23 @@ sub saveInterface {
     else {
       push @ints, "";
     }
+
     # interface_range
     push @ints,
       encode_json {
       mins => $interface->{range}{mins},
       maxs => $interface->{range}{maxs}
       };
+
     # zone_name
     push @ints, $interface->{zoneName};
+
     # config
     push @ints, $interface->{config};
+
     # type
     push @ints, $interface->{interfaceType};
+
     # 将数据压入 $params
     push $params->@*, \@ints;
   }
@@ -172,6 +184,7 @@ sub saveNat {
     where => {fw_id => $self->{parser}{fwId}},
     table => "fw_nat_table"
   );
+
   # 定义 sql 插入语句
   my $sql
     = "insert into fw_nat_table (fw_id,rule_id_name,src_range,dst_range,srv_range,nat_src_range,nat_dst_range,nat_srv_range,nat_interface,
@@ -179,55 +192,74 @@ sub saveNat {
 
   # 初始化变量
   my $params;
+
   # 查询防火墙快照中的静态地址转换
   for my $staticNat ( values $self->{parser}{elements}{staticNat}->%* ) {
+
     # 构造 SQL VALUES
     my @nat;
+
     # fw_id
     push @nat, $self->{parser}{fwId};
+
     # rule_id_name
     push @nat, $staticNat->{ruleName};
+
     # src_range 封装为 json 对象
     push @nat,
       encode_json {
       mins => $staticNat->{realIpRange}{mins},
       maxs => $staticNat->{realIpRange}{maxs}
       };
+
     # 静态地址转换的 dst_range srv_range 为空
     push @nat, undef;
     push @nat, undef;
+
     # nat_src_range
     push @nat,
       encode_json {
       mins => $staticNat->{natIpRange}{mins},
       maxs => $staticNat->{natIpRange}{maxs}
       };
+
     # 静态地址转换的 nat_dst_range srv_dst_range 为空
     push @nat, undef;
     push @nat, undef;
+
     # nat_interface
     push @nat, $staticNat->{natInterface};
+
     # from_zone
     push @nat, $staticNat->{realZone};
+
     # to_zone
     push @nat, $staticNat->{natZone};
+
     # natDirection
     push @nat, 'bidirection';
+
     # nat_type
     push @nat, 'static';
+
     # config
     push @nat, $staticNat->{config};
+
     # 将数据压入 params
     push $params->@*, \@nat;
   }
 
   for my $dyNat ( values $self->{parser}{elements}{dynamicNat}->%* ) {
+
     # 构造 SQL VALUES
     my @nat;
+
     # fw_id
     push @nat, $self->{parser}{fwId};
+
     # rule_id_name
     push @nat, $dyNat->{ruleName};
+
     # src_range | 动态地址转换包括源地址和目的地址两个方向，该值可能不存在
     push @nat,
       defined $dyNat->{srcIpRange}
@@ -236,6 +268,7 @@ sub saveNat {
       maxs => $dyNat->{srcIpRange}{maxs}
       }
       : undef;
+
     # dst_range | 动态地址转换包括源地址和目的地址两个方向，该值可能不存在
     push @nat,
       defined $dyNat->{dstIpRange}
@@ -244,6 +277,7 @@ sub saveNat {
       maxs => $dyNat->{dstIpRange}{maxs}
       }
       : undef;
+
     # srv_range | 动态地址转换包括源地址和目的地址两个方向，该值可能不存在
     push @nat,
       defined $dyNat->srvRange
@@ -252,6 +286,7 @@ sub saveNat {
       maxs => $dyNat->{srvRange}{maxs}
       }
       : undef;
+
     # nat_src_range | 动态地址转换包括源地址和目的地址两个方向，该值可能不存在
     push @nat,
       defined $dyNat->{natSrcIpRange}
@@ -260,6 +295,7 @@ sub saveNat {
       maxs => $dyNat->{natSrcIpRange}{maxs}
       }
       : undef;
+
     # nat_dst_range | 动态地址转换包括源地址和目的地址两个方向，该值可能不存在
     push @nat,
       defined $dyNat->{natDstIpRange}
@@ -268,6 +304,7 @@ sub saveNat {
       maxs => $dyNat->{natDstIpRange}{maxs}
       }
       : undef;
+
     # nat_srv_range | 动态地址转换包括源地址和目的地址两个方向，该值可能不存在
     push @nat,
       defined $dyNat->{natSrvRange}
@@ -276,18 +313,25 @@ sub saveNat {
       maxs => $dyNat->{natSrvRange}{maxs}
       }
       : undef;
+
     # nat_interface
     push @nat, $dyNat->{natInterface};
+
     # from_zone
     push @nat, $dyNat->{fromZone};
+
     # to_zone
     push @nat, $dyNat->{toZone};
+
     # natDirection
     push @nat, $dyNat->{natDirection};
+
     # nat_type
     push @nat, 'dynamic';
+
     # config
     push @nat, $dyNat->{config};
+
     # 将数据压入 params
     push $params->@*, \@nat;
   }
@@ -299,42 +343,57 @@ sub saveNat {
 #------------------------------------------------------------------------------
 sub saveRule {
   my $self = shift;
+
   # 插入数据之前删除历史数据
   $self->delete(
     where => {fw_id => $self->fwId},
     table => "fw_rule"
   );
+
   # 定义 SQL 语句
   my $sql
     = "insert into fw_rule (fw_id,rule_id_name,rule_num,from_zone,to_zone,source_addr,destination_addr,service,rule_action,rule_state,expire_date,src_set,dst_set,srv_set,config,other,rule_sign,src_range,dst_range,srv_range) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
   # 初始化变量
   my $params;
+
   # 遍历解析到的防火墙策略
   for my $rule ( values $self->{parser}{elements}{rule}->%* ) {
+
     # 构造 SQL VALUES
     my @rules;
+
     # fw_id
     push @rules, $self->fwId;
+
     # rule_id_name
     push @rules, $rule->{sign};
+
     # rule_num
     push @rules, $rule->{ruleNum};
+
     # from_zone
     push @rules, $rule->{fromZone};
+
     # to_zone
     push @rules, $rule->{toZone};
 
     my @src = keys $rule->srcAddressMembers->%*;
     my @dst = keys $rule->dstAddressMembers->%*;
     my @srv = keys $rule->serviceMembers->%*;
+
     # source_addr
     push @rules, encode_json \@src;
+
     # destination_addr
     push @rules, encode_json \@dst;
+
     # service
     push @rules, encode_json \@srv;
+
     # rule_action
     push @rules, $rule->{action};
+
     # rule_state
     if ( $rule->{isDisable} eq 'enable' ) {
       push @rules, 1;
@@ -342,35 +401,39 @@ sub saveRule {
     else {
       push @rules, 0;
     }
+
     # expire_date
-    if ( defined $rule->{schedule}
-      and $rule->{schedule}->schType eq 'onetime' )
-    {
+    if ( defined $rule->{schedule} and $rule->{schedule}->schType eq 'onetime' ) {
       push @rules, $rule->{schedule}->getEnddateStr;
     }
     else {
       push @rules, undef;
     }
+
     # src_set
     push @rules,
       encode_json {
       mins => $rule->srcAddressGroup->range->mins,
       maxs => $rule->srcAddressGroup->range->maxs
       };
+
     # dst_set
     push @rules,
       encode_json {
       mins => $rule->dstAddressGroup->range->mins,
       maxs => $rule->dstAddressGroup->range->maxs
       };
+
     # srv_set
     push @rules,
       encode_json {
       mins => $rule->serviceGroup->range->mins,
       maxs => $rule->serviceGroup->range->maxs
       };
+
     # config
     push @rules, $rule->{content};
+
     # other
     if ( defined $rule->{fromInterface} or defined $rule->{toInterface} ) {
       my %hash;
@@ -381,8 +444,10 @@ sub saveRule {
     else {
       push @rules, undef;
     }
+
     # rule_sign
     push @rules, $rule->{sign};
+
     # src_range
     my @src_range;
     for ( my $i = 0; $i < $rule->srcAddressGroup->range->mins->@*; $i++ ) {
@@ -390,6 +455,7 @@ sub saveRule {
         "[" . $rule->srcAddressGroup->range->mins->[$i] . "," . $rule->srcAddressGroup->range->maxs->[$i] . "]";
     }
     push @rules, \@src_range;
+
     # dst_range
     my @dst_range;
     for ( my $i = 0; $i < $rule->dstAddressGroup->range->mins->@*; $i++ ) {
@@ -397,12 +463,15 @@ sub saveRule {
         "[" . $rule->dstAddressGroup->range->mins->[$i] . "," . $rule->dstAddressGroup->range->maxs->[$i] . "]";
     }
     push @rules, \@dst_range;
+
     # srv_range
     my @srv_range;
     for ( my $i = 0; $i < $rule->serviceGroup->range->mins->@*; $i++ ) {
-      push @srv_range, "[" . $rule->serviceGroup->range->mins->[$i] . "," . $rule->serviceGroup->range->maxs->[$i] . "]";
+      push @srv_range,
+        "[" . $rule->serviceGroup->range->mins->[$i] . "," . $rule->serviceGroup->range->maxs->[$i] . "]";
     }
     push @rules, \@srv_range;
+
     # 将数据压入 params
     push $params->@*, \@rules;
   }
@@ -414,74 +483,88 @@ sub saveRule {
 #------------------------------------------------------------------------------
 sub saveRoute {
   my $self = shift;
+
   # 插入数据之前删除历史数据
   $self->delete(
     where => {fw_id => $self->fwId},
     table => "fw_route"
   );
+
   # 定义 SQL 语句
   my $sql
     = "insert into fw_route (fw_id,network,mask,nexthop,network_range,distance,priority,type,config,dstInterface,other,network_set) values(?,?,?,?,?,?,?,?,?,?,?,?)";
 
   # 初始化变量
   my $params;
+
   # 遍历解析到的路由条目
   for my $route ( values $self->{parser}{elements}{route}->%* ) {
+
     # 构造 SQL VALUES
     my @route;
+
     # fw_id
     push @route, $self->fwId;
+
     # network
     push @route, $route->{network};
+
     # mask
     push @route, $route->{mask};
+
     # nexthop
     push @route, $route->{nextHop};
+
     # network_range
     push @route,
       encode_json {
       maxs => $route->range->maxs,
       mins => $route->range->mins,
       };
+
     # distance
     push @route, $route->{distance};
+
     # priority
     push @route, $route->{priority};
+
     # type
     push @route, $route->{type};
+
     # config
     push @route, $route->{config};
+
     # dstInterface
     push @route, undef;
+
     # other
-    if ( defined $route->{srcInterface}
-      or defined $route->{srcRange}
-      or defined $route->{routeInstance} )
-    {
+    if ( defined $route->{srcInterface} or defined $route->{srcRange} or defined $route->{routeInstance} ) {
       my %hash;
+
       # 路由关联源接口
-      $hash{srcInterface} = $route->{srcInterface}
-        if defined $route->{srcInterface};
+      $hash{srcInterface} = $route->{srcInterface} if defined $route->{srcInterface};
+
       # 路由关联 srcRange
       $hash{srcRange} = {
         mins => $route->srcRange->mins,
         maxs => $route->srcRange->maxs
-        }
-        if defined $route->{srcRange};
+      } if defined $route->{srcRange};
+
       # 路由关联 routeInstance
-      $hash{routeInstance} = $route->{routeInstance}
-        if defined $route->{routeInstance};
+      $hash{routeInstance} = $route->{routeInstance} if defined $route->{routeInstance};
       push @route, encode_json \%hash;
     }
     else {
       push @route, undef;
     }
+
     # network_set
     my @network_set;
     for ( my $i = 0; $i < $route->range->mins->@*; $i++ ) {
       push @network_set, "[" . $route->range->mins->[$i] . "," . $route->range->maxs->[$i] . "]";
     }
     push @route, \@network_set;
+
     # 将数据压入 params
     push $params->@*, \@route;
   }
@@ -493,41 +576,52 @@ sub saveRoute {
 #------------------------------------------------------------------------------
 sub saveService {
   my $self = shift;
+
   # 插入数据之前删除历史数据
   $self->delete(
     where => {fw_id => $self->fwId},
     table => "fw_service"
   );
+
   # 定义 SQL 语句
   my $sql = "insert into fw_service (fw_id,service_name,ref_num,config,service_set,service_range) values(?,?,?,?,?,?)
     ON CONFLICT(fw_id,service_name) do update set config=EXCLUDED.config,service_set=EXCLUDED.service_set";
 
   # 初始化变量
   my $params;
+
   # 遍历解析到的服务端口对象
   for my $serv ( values $self->{parser}{elements}{service}->%* ) {
+
     # 构造 SQL VALUES
     my @serv;
+
     # fw_id
     push @serv, $self->fwId;
+
     # service_name
     push @serv, $serv->{srvName};
+
     # ref_num
     push @serv, $serv->{refnum};
+
     # config
     push @serv, $serv->{config};
+
     # service_set
     push @serv,
       encode_json {
       mins => $serv->range->mins,
       maxs => $serv->range->maxs
       };
+
     # service_range
     my @service_range;
     for ( my $i = 0; $i < $serv->range->mins->@*; $i++ ) {
       push @service_range, "[" . $serv->range->mins->[$i] . "," . $serv->range->maxs->[$i] . "]";
     }
     push @serv, \@service_range;
+
     # 将数据压入 $params
     push $params->@*, \@serv;
   }
@@ -539,72 +633,95 @@ sub saveService {
 #------------------------------------------------------------------------------
 sub saveAddress {
   my $self = shift;
+
   # 插入数据之前删除历史数据
   $self->delete(
     where => {fw_id => $self->fwId},
     table => "fw_address"
   );
+
   # 定义 SQL 语句
-  my $sql = "insert into fw_address (fw_id,addr_name,ref_num,config,address_set,address_range,other) values(?,?,?,?,?,?,?)
+  my $sql
+    = "insert into fw_address (fw_id,addr_name,ref_num,config,address_set,address_range,other) values(?,?,?,?,?,?,?)
     ON CONFLICT(fw_id,addr_name) do update set config=EXCLUDED.config,address_set=EXCLUDED.address_set,address_range=EXCLUDED.address_range,other=EXCLUDED.other";
 
   # 初始化变量
   my $params;
+
   # 遍历解析到的地址对象
   for my $addr ( values $self->{parser}{elements}{address}->%* ) {
+
     # 构造 SQL VALUES
     my @addr;
+
     # fw_id
     push @addr, $self->fwId;
+
     # addr_name
     push @addr, $addr->{addrName};
+
     # ref_num
     push @addr, $addr->{refnum};
+
     # config
     push @addr, $addr->{config};
+
     # address_set
     push @addr,
       encode_json {
       mins => $addr->range->mins,
       maxs => $addr->range->maxs
       };
+
     # address_range
     my @address_range;
     for ( my $i = 0; $i < $addr->range->mins->@*; $i++ ) {
       push @address_range, "[" . $addr->range->mins->[$i] . "," . $addr->range->maxs->[$i] . "]";
     }
     push @addr, \@address_range;
+
     # other
     push @addr, encode_json {zone => $addr->{zone}};
+
     # 压入数据到 $params
     push $params->@*, \@addr;
   }
+
   # 遍历地址组对象
   for my $addrG ( values $self->{parser}{elements}{addressGroup}->%* ) {
+
     # 构造 SQL VALUES
     my @addr;
+
     # fw_id
     push @addr, $self->fwId;
+
     # addr_name
     push @addr, $addrG->{addrGroupName};
+
     # ref_num
     push @addr, $addrG->{refnum};
+
     # config
     push @addr, $addrG->{config};
+
     # address_set
     push @addr,
       encode_json {
       mins => $addrG->range->mins,
       maxs => $addrG->range->maxs
       };
+
     # address_range
     my @address_range;
     for ( my $i = 0; $i < $addrG->range->mins->@*; $i++ ) {
       push @address_range, "[" . $addrG->range->mins->[$i] . "," . $addrG->range->maxs->[$i] . "]";
     }
     push @addr, \@address_range;
+
     # other
     push @addr, encode_json {zone => $addrG->{zone}};
+
     # 将数据压入 $params
     push $params->@*, \@addr;
   }
@@ -616,51 +733,68 @@ sub saveAddress {
 #------------------------------------------------------------------------------
 sub updateNetwork {
   my ( $self, $zones, @tables ) = @_;
+
   # 如果传入的非哈希引用则自动修正
   confess "网络区域必须是哈希引用"  if not ref $zones eq 'HASH' || not defined $zones;
   confess "必须提供至少一个表单数据" if scalar @tables == 0;
+
   # 遍历表单批量更新数据
   foreach my $table (@tables) {
+
     # 异常拦截
     confess "数据表不匹配，请整体填写" if $table !~ /fw_network_main|fw_network_private/i;
+
     # 定义 SQL 语句
     my $sql = "insert into $table (fw_id,zone,addr_range,addr_min,addr_max) values(?,?,?,?,?)";
 
     # 初始化变量
     my $params;
+
     # 插入数据之前删除历史数据
     $self->delete(
       where => {fw_id => $self->fwId},
       table => $table
     );
+
     # 遍历防火墙网络区域
     foreach my $zone ( keys $zones->%* ) {
+
       # 这里的变量基于 Set 顺序一致
       my $addrIprange = $zones->{$zone}->addrIpRange;
       my $mins        = $zones->{$zone}->mins;
       my $maxs        = $zones->{$zone}->maxs;
+
       # COPY 复刻副本
       my $copy_addrIprange = dclone $addrIprange;
       my $copy_mins        = dclone $mins;
       my $copy_maxs        = dclone $maxs;
+
       # 遍历 addrIprange 数组
       while ( $copy_addrIprange->@* ) {
+
         # 初始化变量 @zone
         my @zone;
+
         # fw_id
         push @zone, $self->fwId;
+
         # zone
         push @zone, $zone;
+
         # addr_range
         push @zone, pop $copy_addrIprange->@*;
+
         # addr_min
         push @zone, pop $copy_mins->@*;
+
         # addr_max
         push @zone, pop $copy_maxs->@*;
+
         # 将数据压入 params
         push $params->@*, \@zone;
       }
     }
+
     # 插入快照数据
     $self->batchExecute( $params, $sql );
   }
@@ -671,25 +805,31 @@ sub updateNetwork {
 #------------------------------------------------------------------------------
 sub updateStaticNatToNetwork {
   my $self = shift;
+
   # 初始化变量
   my $params;
   my $table = 'fw_network_main';
+
   # 定义 SQL 语句
   my $sql = "insert into $table (fw_id,zone,addr_range,addr_min,addr_max) values(?,?,?,?,?)";
 
   # 查询防火墙快照中的静态地址转换
   for my $staticNat ( values $self->{parser}{elements}{staticNat}->%* ) {
+
     # 这里的变量基于 Set 顺序一致
     my $mins = $staticNat->natIpRange->mins;
     my $maxs = $staticNat->natIpRange->maxs;
+
     # COPY 复刻副本 | 深度复刻、互不影响
     my $copy_mins = dclone $mins;
     my $copy_maxs = dclone $maxs;
 
     # 遍历 $mins 数组
     while ( $copy_mins->@* ) {
+
       # 初始化变量 @network
       my @network;
+
       # 转换为 ipSet 集合 | 数据准备
       my $min        = pop $copy_mins->@*;
       my $max        = pop $copy_maxs->@*;
@@ -699,14 +839,19 @@ sub updateStaticNatToNetwork {
 
       # fw_id | 数据填充阶段
       push @network, $self->fwId;
+
       # zone
       push @network, $staticNat->{realZone};
+
       # 填充 addr_range
       push @network, $addr_range;
+
       # addr_min
       push @network, $min;
+
       # addr_max
       push @network, $max;
+
       # 将数据压入 params
       push $params->@*, \@network;
     }
@@ -722,6 +867,7 @@ sub saveFwNetworkPrivate {
 
   # 获取防火墙标识
   my $fw_id = $self->fwId;
+
   # 定义 SQL 语句并及时查询
   my $select = "select is_nat,networkupdatemode from fw_info where fw_id = $fw_id";
   my $fwInfo = $self->dbi->execute($select)->one;
@@ -730,19 +876,24 @@ sub saveFwNetworkPrivate {
   if ( $fwInfo->{networkupdatemode} == 2 ) {
     return;
   }
+
   # 非 NAT 防火墙，只需要维护大网信息
   if ( $fwInfo->{is_nat} == 0 ) {
+
     # 调用批量更新的抽象接口
     eval {
       my $zones = $self->{parser}{elements}{zone};
       $self->updateNetwork( $zones, 'fw_network_main' );
     };
+
     # confess "批量更新防火墙大网、私网期间捕捉异常：$@" if defined $@;
   }
+
   # 防火墙支持 NAT
   if ( $fwInfo->{is_nat} > 0 ) {
     my $sql      = "select * from fw_zone_state where fw_id = $fw_id";
     my $zoneInfo = $self->dbi->execute($sql)->all;
+
     # 遍历防火墙相关网络区域
     my ( @protected, @unProtected, @unUse );
     for my $zone ( $zoneInfo->@* ) {
@@ -758,13 +909,16 @@ sub saveFwNetworkPrivate {
         push @unUse, $zone->{zone};
       }
     }
+
     # 没有定义包含和非保护的网络区域
     if ( @protected == 0 && @unProtected == 0 ) {
+
       # 向大网、私网表插入数据
       eval {
         my $zones = $self->{parser}{elements}{zone};
         $self->updateNetwork( $zones, 'fw_network_private', 'fw_network_main' );
       };
+
       # confess "批量更新防火墙大网、私网期间捕捉异常：$@" if defined $@;
     }
     else {
@@ -781,11 +935,13 @@ sub saveFwNetworkPrivate {
         fw_network_private => $protectedZone,
         fw_network_main    => $unprotectedZone
       );
+
       # 向大网、私网表插入数据
       foreach my $table ( keys %tables ) {
         $self->updateNetwork( $tables{$table}, $table );
       }
     }
+
     # 将静态地址转换的数据填充到大网表单 | 此处为补丁数据，不需要向前面删除数据
     $self->updateStaticNatToNetwork;
   }

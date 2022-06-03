@@ -110,6 +110,7 @@ fi
 ./container-tests.pl
 
 # clean up
+rm -f /work/002_basic.t
 for cleandir in $cleandirs bin lib build
 do
     if [ -d "$cleandir" ]

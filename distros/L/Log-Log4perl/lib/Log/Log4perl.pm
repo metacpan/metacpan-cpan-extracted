@@ -16,7 +16,7 @@ use Log::Log4perl::Level;
 use Log::Log4perl::Config;
 use Log::Log4perl::Appender;
 
-our $VERSION = '1.54';
+our $VERSION = '1.55';
 
    # set this to '1' if you're using a wrapper
    # around Log::Log4perl
@@ -2511,6 +2511,12 @@ in Perl, without using a configuration file at all:
                           "Log::Log4perl::Appender::Screen",
                           name      => "screenlog",
                           stderr    => 0);
+
+     # Define a mixed stderr/stdout appender
+  my $mixed_stdout_stderr_appender = Log::Log4perl::Appender->new(
+                          "Log::Log4perl::Appender::Screen",
+                          name      => "screenlog",
+                          stderr    => { ERROR => 1, FATAL => 1 });
 
      # Have both appenders use the same layout (could be different)
   $stdout_appender->layout($layout);

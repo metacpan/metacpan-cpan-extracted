@@ -48,5 +48,7 @@ requires:
   strict: '0'
   version: '0'
   warnings: '0'
-version: 0.2.8
+resources:
+  repository: git://github.com/guillomovitch/Youri-Package.git
+version: 0.2.9
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: test.t 2370 2013-01-03 19:26:49Z guillomovitch $
+# $Id$
 
 use strict;
 

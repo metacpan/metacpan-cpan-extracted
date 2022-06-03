@@ -10,7 +10,7 @@ use File::chdir;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-05-03'; # DATE
 our $DIST = 'App-ThisDist'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 our @EXPORT_OK = qw(this_dist this_mod);
 
@@ -211,7 +211,7 @@ App::ThisDist - Print Perl {distribution,module,author,...} associated with curr
 
 =head1 VERSION
 
-This document describes version 0.014 of App::ThisDist (from Perl distribution App-ThisDist), released on 2022-05-03.
+This document describes version 0.015 of App::ThisDist (from Perl distribution App-ThisDist), released on 2022-05-03.
 
 =head1 DESCRIPTION
 

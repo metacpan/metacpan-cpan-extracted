@@ -1,0 +1,40 @@
+Language::Eforth
+
+This module is a small wrapper for "embed" Forth:
+
+https://github.com/howerj/embed
+
+
+INSTALLATION
+
+To install this module, run the following commands. In particular, the
+files embed.c, embed.h, and image.c must first be copied from the embed
+repository into the src directory of this module:
+
+  cpanm --look Language::Eforth
+  git clone https://github.com/howerj/embed
+  mkdir src
+  cp embed/embed.c src
+  cp embed/embed.h src
+  cp embed/image.c src
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+  perldoc Language::Eforth
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2022 by Jeremy Mates.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License

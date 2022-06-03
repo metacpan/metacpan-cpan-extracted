@@ -64,10 +64,11 @@ Metabolomics::Fragment::Annotation - Perl extension for fragment annotation in m
 
 Version 0.6.4 - POD Update, multiAnnotation support in matching algo and writers, PeakForest REST API integration, supporting CSV and TSV as inputs (sniffer), HTML outputs
 Version 0.6.5 - Package architecture modification (PeakForest Part), POD improvement, Annotation results filtering based on scores
+Version 0.6.6 - Fix cpan bugs (#24) and fix several templates and properties issues (rel int, peakforest compliance, ...)
 
 =cut
 
-our $VERSION = '0.6.5';
+our $VERSION = '0.6.6';
 
 
 =head1 SYNOPSIS
@@ -544,9 +545,9 @@ sub compareExpMzToTheoMzListAllMatches {
     				$annotInchikey = $theoFrag->_getPeak_ANNOTATION_INCHIKEY() if $theoFrag->_getPeak_ANNOTATION_INCHIKEY()  ;
     				$annotIsAMetabolite = $theoFrag->_getPeak_ANNOTATION_IS_A_METABOLITE()  if ($theoFrag->_getPeak_ANNOTATION_IS_A_METABOLITE() and $theoFrag->_getPeak_ANNOTATION_IS_A_METABOLITE() != 0) ;
     				$annotIsAPrecursor = $theoFrag->_getPeak_ANNOTATION_IS_A_PRECURSOR()  if ($theoFrag->_getPeak_ANNOTATION_IS_A_PRECURSOR() and $theoFrag->_getPeak_ANNOTATION_IS_A_PRECURSOR() != 0) ;
-    				$annotInt = $theoFrag->_getPeak_INTENSITY() if $theoFrag->_getPeak_INTENSITY() ;
-    				$annotInt100 = $theoFrag->_getPeak_RELATIVE_INTENSITY_100() if $theoFrag->_getPeak_RELATIVE_INTENSITY_100()  ;
-    				$annotInt999 = $theoFrag->_getPeak_RELATIVE_INTENSITY_999() if $theoFrag->_getPeak_RELATIVE_INTENSITY_999()  ;
+    				$annotInt = $expFrag->_getPeak_INTENSITY() if $expFrag->_getPeak_INTENSITY() ;
+    				$annotInt100 = $expFrag->_getPeak_RELATIVE_INTENSITY_100() if $expFrag->_getPeak_RELATIVE_INTENSITY_100()  ;
+    				$annotInt999 = $expFrag->_getPeak_RELATIVE_INTENSITY_999() if $expFrag->_getPeak_RELATIVE_INTENSITY_999()  ;
     				$annotSpectralId = $theoFrag->_getPeak_ANNOTATION_SPECTRA_ID() if $theoFrag->_getPeak_ANNOTATION_SPECTRA_ID()  ;
     				# Get Cluster if exists in exp peak
     				$annotClusterId = $expFrag->_getPeak_CLUSTER_ID() if $expFrag->_getPeak_CLUSTER_ID()  ;
@@ -604,7 +605,10 @@ sub compareExpMzToTheoMzListAllMatches {
 	    		$oNoMatchedPeak->_setPeak_ANNOTATION_IS_A_METABOLITE( undef ) ;
 	    		$oNoMatchedPeak->_setPeak_ANNOTATION_IS_A_PRECURSOR( undef ) ;
 	    		$oNoMatchedPeak->_setPeak_ANNOTATIONS(undef) ;
-	    		$oNoMatchedPeak->_setPeak_CLUSTER_ID(undef) ;
+	    		$oNoMatchedPeak->_setPeak_INTENSITY( $expFrag->_getPeak_INTENSITY() ) if $expFrag->_getPeak_INTENSITY() ;
+	    		$oNoMatchedPeak->_setPeak_RELATIVE_INTENSITY_100($expFrag->_getPeak_RELATIVE_INTENSITY_100() ) if $expFrag->_getPeak_RELATIVE_INTENSITY_100() ;
+	    		$oNoMatchedPeak->_setPeak_RELATIVE_INTENSITY_999($expFrag->_getPeak_RELATIVE_INTENSITY_999() ) if $expFrag->_getPeak_RELATIVE_INTENSITY_999() ;
+	    		$oNoMatchedPeak->_setPeak_CLUSTER_ID( $expFrag->_getPeak_CLUSTER_ID() ) if $expFrag->_getPeak_CLUSTER_ID()  ;
 	    		
 	    		## TODO - No match intensities    
 	    		
@@ -673,7 +677,6 @@ sub compareExpMzToTheoMzListAllMatches {
 sub computeHrGcmsMatchingScores {
 	## Retrieve Values
     my $self = shift ;
-    my ( ) = @_ ;
     
     my $expPseudoSpectra = $self->_getPeaksToAnnotated('_EXP_PSEUDOSPECTRA_LIST_') ;
     my $spectraPeakList = $self->_getPeaksToAnnotated('_ANNOTATION_DB_SPECTRA_INDEX_') ;
@@ -1140,6 +1143,109 @@ sub writeFullTabularWithPeakBankObject {
     return ($tabular) ;
 }
 ### END of SUB
+
+=item writePForestTabularWithPeakBankObject
+
+	## Description : write PForest compatible Tabular output file From a Peak Bank Object
+	## Input : $templateTabular, $tabular, $bestHitOnly
+	## Output : $PForestSpectraPeakListInTabular
+	## Usage : my ( $PForestSpectraPeakListInTabular ) = writePForestTabularWithPeakBankObject ( $inputTabularFile ) ;
+
+=cut
+
+## START of SUB
+sub writePForestTabularWithPeakBankObject {
+    ## Retrieve Values
+    my $self = shift ;
+    my ( $templateTabular, $tabular, $bestHitOnly ) = @_;
+    
+    ## Manage best hit only or all annotations
+	my $peakList = undef ;
+	
+	if ( (!defined $bestHitOnly) or ( $bestHitOnly eq 'TRUE') ) {
+		$peakList = $self->_getPeaksToAnnotated('_EXP_PEAK_LIST_') ;
+	}
+	else {
+		$peakList = $self->_getPeaksToAnnotated('_EXP_PEAK_LIST_ALL_ANNOTATIONS_') ;
+	}
+    
+    ## Get template header
+    my ( @fields, $templateFields ) = ( (), undef ) ;
+    if (-e $templateTabular) {
+    	
+    	my $csv = Text::CSV->new ( { 'sep_char' => "\t", binary => 1, auto_diag => 1, eol => "\n" } )  # should set binary attribute.
+    		or die "Cannot use CSV: ".Text::CSV->error_diag ();
+    	
+    	open my $fh, "<", $templateTabular or die "$templateTabular: $!";
+    	
+		## Checking header of the source file   	
+    	@fields = $csv->header ($fh) ;
+    	$templateFields = \@fields ;
+    }
+    else {
+		croak "Tabular template file is not defined or is not existing.\n" ;
+	}
+    
+    ## Map PeakList feature names with internal output headers
+    my ( $peakListRows ) = ( undef ) ;
+
+    foreach my $peak (@{$peakList}) {
+    	my %tmp = () ;
+    	
+    	foreach my $field (@fields ) {
+    		
+    		if ($field eq 'm/z') {
+    			if (defined $peak->{_MESURED_MONOISOTOPIC_MASS_}) 	{	$tmp{'m/z'} = $peak->{_MESURED_MONOISOTOPIC_MASS_}  ; }
+    		}
+    		elsif  ($field eq 'theo_mass') {
+    			if (defined $peak->{_COMPUTED_MONOISOTOPIC_MASS_}) 	{	$tmp{'theo_mass'} = $peak->{_COMPUTED_MONOISOTOPIC_MASS_}  ; }
+    		}
+    		elsif  ($field eq 'delta_ppm') {
+    			if (defined $peak->{_PPM_ERROR_}) 	{	$tmp{'delta_ppm'} = $peak->{_PPM_ERROR_}  ; }
+    		}
+    		elsif  ($field eq 'absolute_intensity') {
+    			if (defined $peak->{_INTENSITY_}) 	{	$tmp{'absolute_intensity'} = $peak->{_INTENSITY_}  ; }
+    		}
+    		elsif  ($field eq 'relative_intensity') {
+    			if (defined $peak->{_RELATIVE_INTENSITY_100_}) 	{	$tmp{'relative_intensity'} = $peak->{_RELATIVE_INTENSITY_100_}  ; }
+    		}
+    		elsif  ($field eq 'attribution') {
+    			if (defined $peak->{_ANNOTATION_IN_NEG_MODE_}) 	{	$tmp{'attribution'} = $peak->{_ANNOTATION_IN_NEG_MODE_}  ; }
+    			elsif (defined $peak->{_ANNOTATION_IN_POS_MODE_}) 	{	$tmp{'attribution'} = $peak->{_ANNOTATION_IN_POS_MODE_}  ; }
+    		}
+    		
+    		else 							{	$tmp{$field} = 'NA'  ; }
+    	}
+    	push (@{$peakListRows}, \%tmp) ;
+    }
+    
+#    print Dumper $peakListRows ;
+	
+	my $oCsv = Text::CSV_XS->new ( {
+	    binary    =>  1,
+	    auto_diag =>  1,
+	    eol       => "\n",
+	    sep_char=> "\t"
+	    } );
+	
+	if (defined $tabular) {
+		open my $oh, ">", "$tabular";
+	
+		$oCsv->column_names($templateFields);
+		$oCsv->print($oh, $templateFields);
+		foreach my $peak (@{$peakListRows}) {
+			$oCsv->print_hr($oh, \%$peak);
+		}
+		
+		close($oh) ;
+	}
+	else {
+		croak "[ERROR] the tabular output file $tabular is not defined\n" ;
+	}
+}
+### END of SUB
+
+
 
 =back
 

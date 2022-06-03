@@ -1,0 +1,5 @@
+if ($args->{stash}->{second} != 2) { return {}; }
+
+return {
+  third => 3
+};
