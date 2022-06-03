@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::HoldAtLocationDetail;
-$Shipment::FedEx::WSDL::ShipTypes::HoldAtLocationDetail::VERSION = '3.07';
+$Shipment::FedEx::WSDL::ShipTypes::HoldAtLocationDetail::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,42 +20,38 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %PhoneNumber_of :ATTR(:get<PhoneNumber>);
-my %LocationContactAndAddress_of :ATTR(:get<LocationContactAndAddress>);
-my %LocationType_of :ATTR(:get<LocationType>);
+    my %PhoneNumber_of : ATTR(:get<PhoneNumber>);
+    my %LocationContactAndAddress_of : ATTR(:get<LocationContactAndAddress>);
+    my %LocationType_of : ATTR(:get<LocationType>);
 
-__PACKAGE__->_factory(
-    [ qw(        PhoneNumber
-        LocationContactAndAddress
-        LocationType
+    __PACKAGE__->_factory(
+        [   qw(        PhoneNumber
+              LocationContactAndAddress
+              LocationType
 
-    ) ],
-    {
-        'PhoneNumber' => \%PhoneNumber_of,
-        'LocationContactAndAddress' => \%LocationContactAndAddress_of,
-        'LocationType' => \%LocationType_of,
-    },
-    {
-        'PhoneNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'LocationContactAndAddress' => 'Shipment::FedEx::WSDL::ShipTypes::ContactAndAddress',
-        'LocationType' => 'Shipment::FedEx::WSDL::ShipTypes::FedExLocationType',
-    },
-    {
+            )
+        ],
+        {   'PhoneNumber'               => \%PhoneNumber_of,
+            'LocationContactAndAddress' => \%LocationContactAndAddress_of,
+            'LocationType'              => \%LocationType_of,
+        },
+        {   'PhoneNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'LocationContactAndAddress' =>
+              'Shipment::FedEx::WSDL::ShipTypes::ContactAndAddress',
+            'LocationType' =>
+              'Shipment::FedEx::WSDL::ShipTypes::FedExLocationType',
+        },
+        {
 
-        'PhoneNumber' => 'PhoneNumber',
-        'LocationContactAndAddress' => 'LocationContactAndAddress',
-        'LocationType' => 'LocationType',
-    }
-);
+            'PhoneNumber'               => 'PhoneNumber',
+            'LocationContactAndAddress' => 'LocationContactAndAddress',
+            'LocationType'              => 'LocationType',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -72,7 +68,7 @@ Shipment::FedEx::WSDL::ShipTypes::HoldAtLocationDetail
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

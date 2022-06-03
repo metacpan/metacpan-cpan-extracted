@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::Party;
-$Shipment::FedEx::WSDL::RateTypes::Party::VERSION = '3.07';
+$Shipment::FedEx::WSDL::RateTypes::Party::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
+sub get_xmlns {'http://fedex.com/ws/rate/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,47 +20,42 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %AccountNumber_of :ATTR(:get<AccountNumber>);
-my %Tins_of :ATTR(:get<Tins>);
-my %Contact_of :ATTR(:get<Contact>);
-my %Address_of :ATTR(:get<Address>);
+    my %AccountNumber_of : ATTR(:get<AccountNumber>);
+    my %Tins_of : ATTR(:get<Tins>);
+    my %Contact_of : ATTR(:get<Contact>);
+    my %Address_of : ATTR(:get<Address>);
 
-__PACKAGE__->_factory(
-    [ qw(        AccountNumber
-        Tins
-        Contact
-        Address
+    __PACKAGE__->_factory(
+        [   qw(        AccountNumber
+              Tins
+              Contact
+              Address
 
-    ) ],
-    {
-        'AccountNumber' => \%AccountNumber_of,
-        'Tins' => \%Tins_of,
-        'Contact' => \%Contact_of,
-        'Address' => \%Address_of,
-    },
-    {
-        'AccountNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Tins' => 'Shipment::FedEx::WSDL::RateTypes::TaxpayerIdentification',
-        'Contact' => 'Shipment::FedEx::WSDL::RateTypes::Contact',
-        'Address' => 'Shipment::FedEx::WSDL::RateTypes::Address',
-    },
-    {
+            )
+        ],
+        {   'AccountNumber' => \%AccountNumber_of,
+            'Tins'          => \%Tins_of,
+            'Contact'       => \%Contact_of,
+            'Address'       => \%Address_of,
+        },
+        {   'AccountNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Tins'          =>
+              'Shipment::FedEx::WSDL::RateTypes::TaxpayerIdentification',
+            'Contact' => 'Shipment::FedEx::WSDL::RateTypes::Contact',
+            'Address' => 'Shipment::FedEx::WSDL::RateTypes::Address',
+        },
+        {
 
-        'AccountNumber' => 'AccountNumber',
-        'Tins' => 'Tins',
-        'Contact' => 'Contact',
-        'Address' => 'Address',
-    }
-);
+            'AccountNumber' => 'AccountNumber',
+            'Tins'          => 'Tins',
+            'Contact'       => 'Contact',
+            'Address'       => 'Address',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -77,7 +72,7 @@ Shipment::FedEx::WSDL::RateTypes::Party
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

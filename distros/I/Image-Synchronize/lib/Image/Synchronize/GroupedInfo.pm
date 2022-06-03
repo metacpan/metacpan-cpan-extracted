@@ -184,6 +184,19 @@ sub tags {
   return sort keys %{$self};
 }
 
+=head2 tags_count
+
+  $count = $egi->tags_count;
+
+Returns the count of tags for which a value was specified.
+
+=cut
+
+sub tags_count {
+  my ($self) = @_;
+  return scalar(keys %{$self});
+}
+
 =head2 groups
 
   @groups = $egi->groups($tag);

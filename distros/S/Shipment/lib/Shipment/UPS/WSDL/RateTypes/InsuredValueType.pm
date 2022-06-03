@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::RateTypes::InsuredValueType;
-$Shipment::UPS::WSDL::RateTypes::InsuredValueType::VERSION = '3.07';
+$Shipment::UPS::WSDL::RateTypes::InsuredValueType::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,31 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %CurrencyCode_of :ATTR(:get<CurrencyCode>);
-my %MonetaryValue_of :ATTR(:get<MonetaryValue>);
+    my %CurrencyCode_of : ATTR(:get<CurrencyCode>);
+    my %MonetaryValue_of : ATTR(:get<MonetaryValue>);
 
-__PACKAGE__->_factory(
-    [ qw(        CurrencyCode
-        MonetaryValue
+    __PACKAGE__->_factory(
+        [   qw(        CurrencyCode
+              MonetaryValue
 
-    ) ],
-    {
-        'CurrencyCode' => \%CurrencyCode_of,
-        'MonetaryValue' => \%MonetaryValue_of,
-    },
-    {
-        'CurrencyCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'MonetaryValue' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'CurrencyCode'  => \%CurrencyCode_of,
+            'MonetaryValue' => \%MonetaryValue_of,
+        },
+        {   'CurrencyCode'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'MonetaryValue' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'CurrencyCode' => 'CurrencyCode',
-        'MonetaryValue' => 'MonetaryValue',
-    }
-);
+            'CurrencyCode'  => 'CurrencyCode',
+            'MonetaryValue' => 'MonetaryValue',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +61,7 @@ Shipment::UPS::WSDL::RateTypes::InsuredValueType
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

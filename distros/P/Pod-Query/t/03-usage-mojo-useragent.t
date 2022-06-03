@@ -2291,5 +2291,5 @@ use FindBin();
 use lib $FindBin::RealBin;
 
 Test::Mojo::UserAgent->with_roles( 'Role::Test::Module' )
-  ->run( module => "Mojo::UserAgent", );
+  ->run( module => "Mojo::UserAgent", tests => 69 );
 

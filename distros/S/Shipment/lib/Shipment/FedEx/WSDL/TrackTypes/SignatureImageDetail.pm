@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::SignatureImageDetail;
-$Shipment::FedEx::WSDL::TrackTypes::SignatureImageDetail::VERSION = '3.07';
+$Shipment::FedEx::WSDL::TrackTypes::SignatureImageDetail::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/track/v9' };
+sub get_xmlns {'http://fedex.com/ws/track/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,32 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Image_of :ATTR(:get<Image>);
-my %Notifications_of :ATTR(:get<Notifications>);
+    my %Image_of : ATTR(:get<Image>);
+    my %Notifications_of : ATTR(:get<Notifications>);
 
-__PACKAGE__->_factory(
-    [ qw(        Image
-        Notifications
+    __PACKAGE__->_factory(
+        [   qw(        Image
+              Notifications
 
-    ) ],
-    {
-        'Image' => \%Image_of,
-        'Notifications' => \%Notifications_of,
-    },
-    {
-        'Image' => 'SOAP::WSDL::XSD::Typelib::Builtin::base64Binary',
-        'Notifications' => 'Shipment::FedEx::WSDL::TrackTypes::Notification',
-    },
-    {
+            )
+        ],
+        {   'Image'         => \%Image_of,
+            'Notifications' => \%Notifications_of,
+        },
+        {   'Image' => 'SOAP::WSDL::XSD::Typelib::Builtin::base64Binary',
+            'Notifications' =>
+              'Shipment::FedEx::WSDL::TrackTypes::Notification',
+        },
+        {
 
-        'Image' => 'Image',
-        'Notifications' => 'Notifications',
-    }
-);
+            'Image'         => 'Image',
+            'Notifications' => 'Notifications',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +62,7 @@ Shipment::FedEx::WSDL::TrackTypes::SignatureImageDetail
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::ReceiverInformation;
-$Shipment::Purolator::WSDL::Types::ReceiverInformation::VERSION = '3.07';
+$Shipment::Purolator::WSDL::Types::ReceiverInformation::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
+sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,31 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Address_of :ATTR(:get<Address>);
-my %TaxNumber_of :ATTR(:get<TaxNumber>);
+    my %Address_of : ATTR(:get<Address>);
+    my %TaxNumber_of : ATTR(:get<TaxNumber>);
 
-__PACKAGE__->_factory(
-    [ qw(        Address
-        TaxNumber
+    __PACKAGE__->_factory(
+        [   qw(        Address
+              TaxNumber
 
-    ) ],
-    {
-        'Address' => \%Address_of,
-        'TaxNumber' => \%TaxNumber_of,
-    },
-    {
-        'Address' => 'Shipment::Purolator::WSDL::Types::Address',
-        'TaxNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'Address'   => \%Address_of,
+            'TaxNumber' => \%TaxNumber_of,
+        },
+        {   'Address'   => 'Shipment::Purolator::WSDL::Types::Address',
+            'TaxNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'Address' => 'Address',
-        'TaxNumber' => 'TaxNumber',
-    }
-);
+            'Address'   => 'Address',
+            'TaxNumber' => 'TaxNumber',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +61,7 @@ Shipment::Purolator::WSDL::Types::ReceiverInformation
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

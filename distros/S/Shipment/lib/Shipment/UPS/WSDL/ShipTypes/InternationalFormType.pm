@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::InternationalFormType;
-$Shipment::UPS::WSDL::ShipTypes::InternationalFormType::VERSION = '3.07';
+$Shipment::UPS::WSDL::ShipTypes::InternationalFormType::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/IF/v1.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/IF/v1.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,197 +20,205 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %FormType_of :ATTR(:get<FormType>);
-my %AdditionalDocumentIndicator_of :ATTR(:get<AdditionalDocumentIndicator>);
-my %FormGroupIdName_of :ATTR(:get<FormGroupIdName>);
-my %SEDFilingOption_of :ATTR(:get<SEDFilingOption>);
-my %Contacts_of :ATTR(:get<Contacts>);
-my %Product_of :ATTR(:get<Product>);
-my %InvoiceNumber_of :ATTR(:get<InvoiceNumber>);
-my %InvoiceDate_of :ATTR(:get<InvoiceDate>);
-my %PurchaseOrderNumber_of :ATTR(:get<PurchaseOrderNumber>);
-my %TermsOfShipment_of :ATTR(:get<TermsOfShipment>);
-my %ReasonForExport_of :ATTR(:get<ReasonForExport>);
-my %Comments_of :ATTR(:get<Comments>);
-my %DeclarationStatement_of :ATTR(:get<DeclarationStatement>);
-my %Discount_of :ATTR(:get<Discount>);
-my %FreightCharges_of :ATTR(:get<FreightCharges>);
-my %InsuranceCharges_of :ATTR(:get<InsuranceCharges>);
-my %OtherCharges_of :ATTR(:get<OtherCharges>);
-my %CurrencyCode_of :ATTR(:get<CurrencyCode>);
-my %BlanketPeriod_of :ATTR(:get<BlanketPeriod>);
-my %ExportDate_of :ATTR(:get<ExportDate>);
-my %ExportingCarrier_of :ATTR(:get<ExportingCarrier>);
-my %CarrierID_of :ATTR(:get<CarrierID>);
-my %InBondCode_of :ATTR(:get<InBondCode>);
-my %EntryNumber_of :ATTR(:get<EntryNumber>);
-my %PointOfOrigin_of :ATTR(:get<PointOfOrigin>);
-my %ModeOfTransport_of :ATTR(:get<ModeOfTransport>);
-my %PortOfExport_of :ATTR(:get<PortOfExport>);
-my %PortOfUnloading_of :ATTR(:get<PortOfUnloading>);
-my %LoadingPier_of :ATTR(:get<LoadingPier>);
-my %PartiesToTransaction_of :ATTR(:get<PartiesToTransaction>);
-my %RoutedExportTransactionIndicator_of :ATTR(:get<RoutedExportTransactionIndicator>);
-my %ContainerizedIndicator_of :ATTR(:get<ContainerizedIndicator>);
-my %License_of :ATTR(:get<License>);
-my %ECCNNumber_of :ATTR(:get<ECCNNumber>);
+    my %FormType_of : ATTR(:get<FormType>);
+    my %AdditionalDocumentIndicator_of :
+      ATTR(:get<AdditionalDocumentIndicator>);
+    my %FormGroupIdName_of : ATTR(:get<FormGroupIdName>);
+    my %SEDFilingOption_of : ATTR(:get<SEDFilingOption>);
+    my %Contacts_of : ATTR(:get<Contacts>);
+    my %Product_of : ATTR(:get<Product>);
+    my %InvoiceNumber_of : ATTR(:get<InvoiceNumber>);
+    my %InvoiceDate_of : ATTR(:get<InvoiceDate>);
+    my %PurchaseOrderNumber_of : ATTR(:get<PurchaseOrderNumber>);
+    my %TermsOfShipment_of : ATTR(:get<TermsOfShipment>);
+    my %ReasonForExport_of : ATTR(:get<ReasonForExport>);
+    my %Comments_of : ATTR(:get<Comments>);
+    my %DeclarationStatement_of : ATTR(:get<DeclarationStatement>);
+    my %Discount_of : ATTR(:get<Discount>);
+    my %FreightCharges_of : ATTR(:get<FreightCharges>);
+    my %InsuranceCharges_of : ATTR(:get<InsuranceCharges>);
+    my %OtherCharges_of : ATTR(:get<OtherCharges>);
+    my %CurrencyCode_of : ATTR(:get<CurrencyCode>);
+    my %BlanketPeriod_of : ATTR(:get<BlanketPeriod>);
+    my %ExportDate_of : ATTR(:get<ExportDate>);
+    my %ExportingCarrier_of : ATTR(:get<ExportingCarrier>);
+    my %CarrierID_of : ATTR(:get<CarrierID>);
+    my %InBondCode_of : ATTR(:get<InBondCode>);
+    my %EntryNumber_of : ATTR(:get<EntryNumber>);
+    my %PointOfOrigin_of : ATTR(:get<PointOfOrigin>);
+    my %ModeOfTransport_of : ATTR(:get<ModeOfTransport>);
+    my %PortOfExport_of : ATTR(:get<PortOfExport>);
+    my %PortOfUnloading_of : ATTR(:get<PortOfUnloading>);
+    my %LoadingPier_of : ATTR(:get<LoadingPier>);
+    my %PartiesToTransaction_of : ATTR(:get<PartiesToTransaction>);
+    my %RoutedExportTransactionIndicator_of :
+      ATTR(:get<RoutedExportTransactionIndicator>);
+    my %ContainerizedIndicator_of : ATTR(:get<ContainerizedIndicator>);
+    my %License_of : ATTR(:get<License>);
+    my %ECCNNumber_of : ATTR(:get<ECCNNumber>);
 
-__PACKAGE__->_factory(
-    [ qw(        FormType
-        AdditionalDocumentIndicator
-        FormGroupIdName
-        SEDFilingOption
-        Contacts
-        Product
-        InvoiceNumber
-        InvoiceDate
-        PurchaseOrderNumber
-        TermsOfShipment
-        ReasonForExport
-        Comments
-        DeclarationStatement
-        Discount
-        FreightCharges
-        InsuranceCharges
-        OtherCharges
-        CurrencyCode
-        BlanketPeriod
-        ExportDate
-        ExportingCarrier
-        CarrierID
-        InBondCode
-        EntryNumber
-        PointOfOrigin
-        ModeOfTransport
-        PortOfExport
-        PortOfUnloading
-        LoadingPier
-        PartiesToTransaction
-        RoutedExportTransactionIndicator
-        ContainerizedIndicator
-        License
-        ECCNNumber
+    __PACKAGE__->_factory(
+        [   qw(        FormType
+              AdditionalDocumentIndicator
+              FormGroupIdName
+              SEDFilingOption
+              Contacts
+              Product
+              InvoiceNumber
+              InvoiceDate
+              PurchaseOrderNumber
+              TermsOfShipment
+              ReasonForExport
+              Comments
+              DeclarationStatement
+              Discount
+              FreightCharges
+              InsuranceCharges
+              OtherCharges
+              CurrencyCode
+              BlanketPeriod
+              ExportDate
+              ExportingCarrier
+              CarrierID
+              InBondCode
+              EntryNumber
+              PointOfOrigin
+              ModeOfTransport
+              PortOfExport
+              PortOfUnloading
+              LoadingPier
+              PartiesToTransaction
+              RoutedExportTransactionIndicator
+              ContainerizedIndicator
+              License
+              ECCNNumber
 
-    ) ],
-    {
-        'FormType' => \%FormType_of,
-        'AdditionalDocumentIndicator' => \%AdditionalDocumentIndicator_of,
-        'FormGroupIdName' => \%FormGroupIdName_of,
-        'SEDFilingOption' => \%SEDFilingOption_of,
-        'Contacts' => \%Contacts_of,
-        'Product' => \%Product_of,
-        'InvoiceNumber' => \%InvoiceNumber_of,
-        'InvoiceDate' => \%InvoiceDate_of,
-        'PurchaseOrderNumber' => \%PurchaseOrderNumber_of,
-        'TermsOfShipment' => \%TermsOfShipment_of,
-        'ReasonForExport' => \%ReasonForExport_of,
-        'Comments' => \%Comments_of,
-        'DeclarationStatement' => \%DeclarationStatement_of,
-        'Discount' => \%Discount_of,
-        'FreightCharges' => \%FreightCharges_of,
-        'InsuranceCharges' => \%InsuranceCharges_of,
-        'OtherCharges' => \%OtherCharges_of,
-        'CurrencyCode' => \%CurrencyCode_of,
-        'BlanketPeriod' => \%BlanketPeriod_of,
-        'ExportDate' => \%ExportDate_of,
-        'ExportingCarrier' => \%ExportingCarrier_of,
-        'CarrierID' => \%CarrierID_of,
-        'InBondCode' => \%InBondCode_of,
-        'EntryNumber' => \%EntryNumber_of,
-        'PointOfOrigin' => \%PointOfOrigin_of,
-        'ModeOfTransport' => \%ModeOfTransport_of,
-        'PortOfExport' => \%PortOfExport_of,
-        'PortOfUnloading' => \%PortOfUnloading_of,
-        'LoadingPier' => \%LoadingPier_of,
-        'PartiesToTransaction' => \%PartiesToTransaction_of,
-        'RoutedExportTransactionIndicator' => \%RoutedExportTransactionIndicator_of,
-        'ContainerizedIndicator' => \%ContainerizedIndicator_of,
-        'License' => \%License_of,
-        'ECCNNumber' => \%ECCNNumber_of,
-    },
-    {
-        'FormType' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'AdditionalDocumentIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'FormGroupIdName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'SEDFilingOption' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Contacts' => 'Shipment::UPS::WSDL::ShipTypes::ContactType',
-        'Product' => 'Shipment::UPS::WSDL::ShipTypes::ProductType',
-        'InvoiceNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'InvoiceDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'PurchaseOrderNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'TermsOfShipment' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'ReasonForExport' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Comments' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'DeclarationStatement' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Discount' => 'Shipment::UPS::WSDL::ShipTypes::IFChargesType',
-        'FreightCharges' => 'Shipment::UPS::WSDL::ShipTypes::IFChargesType',
-        'InsuranceCharges' => 'Shipment::UPS::WSDL::ShipTypes::IFChargesType',
-        'OtherCharges' => 'Shipment::UPS::WSDL::ShipTypes::OtherChargesType',
-        'CurrencyCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'BlanketPeriod' => 'Shipment::UPS::WSDL::ShipTypes::BlanketPeriodType',
-        'ExportDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'ExportingCarrier' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'CarrierID' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'InBondCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'EntryNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'PointOfOrigin' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'ModeOfTransport' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'PortOfExport' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'PortOfUnloading' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'LoadingPier' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'PartiesToTransaction' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'RoutedExportTransactionIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'ContainerizedIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'License' => 'Shipment::UPS::WSDL::ShipTypes::LicenseType',
-        'ECCNNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'FormType'                    => \%FormType_of,
+            'AdditionalDocumentIndicator' => \%AdditionalDocumentIndicator_of,
+            'FormGroupIdName'             => \%FormGroupIdName_of,
+            'SEDFilingOption'             => \%SEDFilingOption_of,
+            'Contacts'                    => \%Contacts_of,
+            'Product'                     => \%Product_of,
+            'InvoiceNumber'               => \%InvoiceNumber_of,
+            'InvoiceDate'                 => \%InvoiceDate_of,
+            'PurchaseOrderNumber'         => \%PurchaseOrderNumber_of,
+            'TermsOfShipment'             => \%TermsOfShipment_of,
+            'ReasonForExport'             => \%ReasonForExport_of,
+            'Comments'                    => \%Comments_of,
+            'DeclarationStatement'        => \%DeclarationStatement_of,
+            'Discount'                    => \%Discount_of,
+            'FreightCharges'              => \%FreightCharges_of,
+            'InsuranceCharges'            => \%InsuranceCharges_of,
+            'OtherCharges'                => \%OtherCharges_of,
+            'CurrencyCode'                => \%CurrencyCode_of,
+            'BlanketPeriod'               => \%BlanketPeriod_of,
+            'ExportDate'                  => \%ExportDate_of,
+            'ExportingCarrier'            => \%ExportingCarrier_of,
+            'CarrierID'                   => \%CarrierID_of,
+            'InBondCode'                  => \%InBondCode_of,
+            'EntryNumber'                 => \%EntryNumber_of,
+            'PointOfOrigin'               => \%PointOfOrigin_of,
+            'ModeOfTransport'             => \%ModeOfTransport_of,
+            'PortOfExport'                => \%PortOfExport_of,
+            'PortOfUnloading'             => \%PortOfUnloading_of,
+            'LoadingPier'                 => \%LoadingPier_of,
+            'PartiesToTransaction'        => \%PartiesToTransaction_of,
+            'RoutedExportTransactionIndicator' =>
+              \%RoutedExportTransactionIndicator_of,
+            'ContainerizedIndicator' => \%ContainerizedIndicator_of,
+            'License'                => \%License_of,
+            'ECCNNumber'             => \%ECCNNumber_of,
+        },
+        {   'FormType' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'AdditionalDocumentIndicator' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'FormGroupIdName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'SEDFilingOption' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Contacts'        => 'Shipment::UPS::WSDL::ShipTypes::ContactType',
+            'Product'         => 'Shipment::UPS::WSDL::ShipTypes::ProductType',
+            'InvoiceNumber'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'InvoiceDate'     => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'PurchaseOrderNumber' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'TermsOfShipment' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'ReasonForExport' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Comments'        => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'DeclarationStatement' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Discount' => 'Shipment::UPS::WSDL::ShipTypes::IFChargesType',
+            'FreightCharges' =>
+              'Shipment::UPS::WSDL::ShipTypes::IFChargesType',
+            'InsuranceCharges' =>
+              'Shipment::UPS::WSDL::ShipTypes::IFChargesType',
+            'OtherCharges' =>
+              'Shipment::UPS::WSDL::ShipTypes::OtherChargesType',
+            'CurrencyCode'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'BlanketPeriod' =>
+              'Shipment::UPS::WSDL::ShipTypes::BlanketPeriodType',
+            'ExportDate'       => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'ExportingCarrier' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'CarrierID'        => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'InBondCode'       => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'EntryNumber'      => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'PointOfOrigin'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'ModeOfTransport'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'PortOfExport'     => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'PortOfUnloading'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'LoadingPier'      => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'PartiesToTransaction' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'RoutedExportTransactionIndicator' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'ContainerizedIndicator' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'License'    => 'Shipment::UPS::WSDL::ShipTypes::LicenseType',
+            'ECCNNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'FormType' => 'FormType',
-        'AdditionalDocumentIndicator' => 'AdditionalDocumentIndicator',
-        'FormGroupIdName' => 'FormGroupIdName',
-        'SEDFilingOption' => 'SEDFilingOption',
-        'Contacts' => 'Contacts',
-        'Product' => 'Product',
-        'InvoiceNumber' => 'InvoiceNumber',
-        'InvoiceDate' => 'InvoiceDate',
-        'PurchaseOrderNumber' => 'PurchaseOrderNumber',
-        'TermsOfShipment' => 'TermsOfShipment',
-        'ReasonForExport' => 'ReasonForExport',
-        'Comments' => 'Comments',
-        'DeclarationStatement' => 'DeclarationStatement',
-        'Discount' => 'Discount',
-        'FreightCharges' => 'FreightCharges',
-        'InsuranceCharges' => 'InsuranceCharges',
-        'OtherCharges' => 'OtherCharges',
-        'CurrencyCode' => 'CurrencyCode',
-        'BlanketPeriod' => 'BlanketPeriod',
-        'ExportDate' => 'ExportDate',
-        'ExportingCarrier' => 'ExportingCarrier',
-        'CarrierID' => 'CarrierID',
-        'InBondCode' => 'InBondCode',
-        'EntryNumber' => 'EntryNumber',
-        'PointOfOrigin' => 'PointOfOrigin',
-        'ModeOfTransport' => 'ModeOfTransport',
-        'PortOfExport' => 'PortOfExport',
-        'PortOfUnloading' => 'PortOfUnloading',
-        'LoadingPier' => 'LoadingPier',
-        'PartiesToTransaction' => 'PartiesToTransaction',
-        'RoutedExportTransactionIndicator' => 'RoutedExportTransactionIndicator',
-        'ContainerizedIndicator' => 'ContainerizedIndicator',
-        'License' => 'License',
-        'ECCNNumber' => 'ECCNNumber',
-    }
-);
+            'FormType'                    => 'FormType',
+            'AdditionalDocumentIndicator' => 'AdditionalDocumentIndicator',
+            'FormGroupIdName'             => 'FormGroupIdName',
+            'SEDFilingOption'             => 'SEDFilingOption',
+            'Contacts'                    => 'Contacts',
+            'Product'                     => 'Product',
+            'InvoiceNumber'               => 'InvoiceNumber',
+            'InvoiceDate'                 => 'InvoiceDate',
+            'PurchaseOrderNumber'         => 'PurchaseOrderNumber',
+            'TermsOfShipment'             => 'TermsOfShipment',
+            'ReasonForExport'             => 'ReasonForExport',
+            'Comments'                    => 'Comments',
+            'DeclarationStatement'        => 'DeclarationStatement',
+            'Discount'                    => 'Discount',
+            'FreightCharges'              => 'FreightCharges',
+            'InsuranceCharges'            => 'InsuranceCharges',
+            'OtherCharges'                => 'OtherCharges',
+            'CurrencyCode'                => 'CurrencyCode',
+            'BlanketPeriod'               => 'BlanketPeriod',
+            'ExportDate'                  => 'ExportDate',
+            'ExportingCarrier'            => 'ExportingCarrier',
+            'CarrierID'                   => 'CarrierID',
+            'InBondCode'                  => 'InBondCode',
+            'EntryNumber'                 => 'EntryNumber',
+            'PointOfOrigin'               => 'PointOfOrigin',
+            'ModeOfTransport'             => 'ModeOfTransport',
+            'PortOfExport'                => 'PortOfExport',
+            'PortOfUnloading'             => 'PortOfUnloading',
+            'LoadingPier'                 => 'LoadingPier',
+            'PartiesToTransaction'        => 'PartiesToTransaction',
+            'RoutedExportTransactionIndicator' =>
+              'RoutedExportTransactionIndicator',
+            'ContainerizedIndicator' => 'ContainerizedIndicator',
+            'License'                => 'License',
+            'ECCNNumber'             => 'ECCNNumber',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -227,7 +235,7 @@ Shipment::UPS::WSDL::ShipTypes::InternationalFormType
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

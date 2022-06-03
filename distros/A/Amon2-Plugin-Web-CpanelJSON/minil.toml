@@ -1,0 +1,10 @@
+name = "Amon2-Plugin-Web-CpanelJSON"
+badges = ["github-actions/test.yml","codecov","metacpan"]
+authority="cpan:KFLY"
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+markdown_maker = "Pod::Markdown::Github"
+
+[release]
+branch='main'

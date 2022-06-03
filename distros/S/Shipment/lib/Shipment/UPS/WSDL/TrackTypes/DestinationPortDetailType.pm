@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::TrackTypes::DestinationPortDetailType;
-$Shipment::UPS::WSDL::TrackTypes::DestinationPortDetailType::VERSION = '3.07';
+$Shipment::UPS::WSDL::TrackTypes::DestinationPortDetailType::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,32 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %DestinationPort_of :ATTR(:get<DestinationPort>);
-my %EstimatedArrival_of :ATTR(:get<EstimatedArrival>);
+    my %DestinationPort_of : ATTR(:get<DestinationPort>);
+    my %EstimatedArrival_of : ATTR(:get<EstimatedArrival>);
 
-__PACKAGE__->_factory(
-    [ qw(        DestinationPort
-        EstimatedArrival
+    __PACKAGE__->_factory(
+        [   qw(        DestinationPort
+              EstimatedArrival
 
-    ) ],
-    {
-        'DestinationPort' => \%DestinationPort_of,
-        'EstimatedArrival' => \%EstimatedArrival_of,
-    },
-    {
-        'DestinationPort' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'EstimatedArrival' => 'Shipment::UPS::WSDL::TrackTypes::DateTimeType',
-    },
-    {
+            )
+        ],
+        {   'DestinationPort'  => \%DestinationPort_of,
+            'EstimatedArrival' => \%EstimatedArrival_of,
+        },
+        {   'DestinationPort'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'EstimatedArrival' =>
+              'Shipment::UPS::WSDL::TrackTypes::DateTimeType',
+        },
+        {
 
-        'DestinationPort' => 'DestinationPort',
-        'EstimatedArrival' => 'EstimatedArrival',
-    }
-);
+            'DestinationPort'  => 'DestinationPort',
+            'EstimatedArrival' => 'EstimatedArrival',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +62,7 @@ Shipment::UPS::WSDL::TrackTypes::DestinationPortDetailType
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

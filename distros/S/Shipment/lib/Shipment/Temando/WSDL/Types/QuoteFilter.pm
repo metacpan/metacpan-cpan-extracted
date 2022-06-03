@@ -1,12 +1,16 @@
 package Shipment::Temando::WSDL::Types::QuoteFilter;
-$Shipment::Temando::WSDL::Types::QuoteFilter::VERSION = '3.07';
+$Shipment::Temando::WSDL::Types::QuoteFilter::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(0);
 
-sub get_xmlns { 'http://' . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url . '/schema/2009_06/common.xsd' };
+sub get_xmlns {
+    'http://'
+      . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url
+      . '/schema/2009_06/common.xsd';
+}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,140 +24,121 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %preference_of :ATTR(:get<preference>);
-my %carriers_of :ATTR(:get<carriers>);
-my %extras_of :ATTR(:get<extras>);
+    my %preference_of : ATTR(:get<preference>);
+    my %carriers_of : ATTR(:get<carriers>);
+    my %extras_of : ATTR(:get<extras>);
 
-__PACKAGE__->_factory(
-    [ qw(        preference
-        carriers
-        extras
+    __PACKAGE__->_factory(
+        [   qw(        preference
+              carriers
+              extras
 
-    ) ],
-    {
-        'preference' => \%preference_of,
-        'carriers' => \%carriers_of,
-        'extras' => \%extras_of,
-    },
-    {
-        'preference' => 'Shipment::Temando::WSDL::Types::QuotePreference',
+            )
+        ],
+        {   'preference' => \%preference_of,
+            'carriers'   => \%carriers_of,
+            'extras'     => \%extras_of,
+        },
+        {   'preference' => 'Shipment::Temando::WSDL::Types::QuotePreference',
 
-        'carriers' => 'Shipment::Temando::WSDL::Types::QuoteFilter::_carriers',
+            'carriers' =>
+              'Shipment::Temando::WSDL::Types::QuoteFilter::_carriers',
 
-        'extras' => 'Shipment::Temando::WSDL::Types::QuoteFilter::_extras',
-    },
-    {
+            'extras' => 'Shipment::Temando::WSDL::Types::QuoteFilter::_extras',
+        },
+        {
 
-        'preference' => 'preference',
-        'carriers' => 'carriers',
-        'extras' => 'extras',
-    }
-);
+            'preference' => 'preference',
+            'carriers'   => 'carriers',
+            'extras'     => 'extras',
+        }
+    );
 
-} # end BLOCK
-
-
+}    # end BLOCK
 
 
 package Shipment::Temando::WSDL::Types::QuoteFilter::_carriers;
-$Shipment::Temando::WSDL::Types::QuoteFilter::_carriers::VERSION = '3.07';
+$Shipment::Temando::WSDL::Types::QuoteFilter::_carriers::VERSION = '3.08';
 use strict;
 use warnings;
 {
-our $XML_ATTRIBUTE_CLASS;
-undef $XML_ATTRIBUTE_CLASS;
+    our $XML_ATTRIBUTE_CLASS;
+    undef $XML_ATTRIBUTE_CLASS;
 
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
-use Class::Std::Fast::Storable constructor => 'none';
-use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-Class::Std::initialize();
-
-{ # BLOCK to scope variables
-
-my %carrier_of :ATTR(:get<carrier>);
-
-__PACKAGE__->_factory(
-    [ qw(        carrier
-
-    ) ],
-    {
-        'carrier' => \%carrier_of,
-    },
-    {
-        'carrier' => 'Shipment::Temando::WSDL::Types::CarrierPreference',
-    },
-    {
-
-        'carrier' => 'carrier',
+    sub __get_attr_class {
+        return $XML_ATTRIBUTE_CLASS;
     }
-);
 
-} # end BLOCK
+    use Class::Std::Fast::Storable constructor => 'none';
+    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
+    Class::Std::initialize();
 
+    {    # BLOCK to scope variables
 
+        my %carrier_of : ATTR(:get<carrier>);
 
+        __PACKAGE__->_factory(
+            [   qw(        carrier
+
+                )
+            ],
+            {'carrier' => \%carrier_of,},
+            {   'carrier' =>
+                  'Shipment::Temando::WSDL::Types::CarrierPreference',
+            },
+            {
+
+                'carrier' => 'carrier',
+            }
+        );
+
+    }    # end BLOCK
 
 
 }
-
 
 
 package Shipment::Temando::WSDL::Types::QuoteFilter::_extras;
-$Shipment::Temando::WSDL::Types::QuoteFilter::_extras::VERSION = '3.07';
+$Shipment::Temando::WSDL::Types::QuoteFilter::_extras::VERSION = '3.08';
 use strict;
 use warnings;
 {
-our $XML_ATTRIBUTE_CLASS;
-undef $XML_ATTRIBUTE_CLASS;
+    our $XML_ATTRIBUTE_CLASS;
+    undef $XML_ATTRIBUTE_CLASS;
 
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
-use Class::Std::Fast::Storable constructor => 'none';
-use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-Class::Std::initialize();
-
-{ # BLOCK to scope variables
-
-my %summary_of :ATTR(:get<summary>);
-
-__PACKAGE__->_factory(
-    [ qw(        summary
-
-    ) ],
-    {
-        'summary' => \%summary_of,
-    },
-    {
-        'summary' => 'Shipment::Temando::WSDL::Types::ExtraSummary',
-    },
-    {
-
-        'summary' => 'summary',
+    sub __get_attr_class {
+        return $XML_ATTRIBUTE_CLASS;
     }
-);
 
-} # end BLOCK
+    use Class::Std::Fast::Storable constructor => 'none';
+    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
+    Class::Std::initialize();
 
+    {    # BLOCK to scope variables
 
+        my %summary_of : ATTR(:get<summary>);
 
+        __PACKAGE__->_factory(
+            [   qw(        summary
+
+                )
+            ],
+            {'summary' => \%summary_of,},
+            {'summary' => 'Shipment::Temando::WSDL::Types::ExtraSummary',},
+            {
+
+                'summary' => 'summary',
+            }
+        );
+
+    }    # end BLOCK
 
 
 }
-
-
-
-
 
 
 1;
@@ -170,7 +155,7 @@ Shipment::Temando::WSDL::Types::QuoteFilter
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

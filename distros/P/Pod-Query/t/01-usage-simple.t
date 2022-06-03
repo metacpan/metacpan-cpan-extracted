@@ -159,5 +159,5 @@ for my $case ( @cases ) {
    is( $query->find_title(), $case->{expected_find_title}, "find_title" );
 }
 
-done_testing();
+done_testing( 25 );
 

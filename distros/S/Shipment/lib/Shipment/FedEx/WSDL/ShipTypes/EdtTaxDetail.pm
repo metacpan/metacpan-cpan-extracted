@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::EdtTaxDetail;
-$Shipment::FedEx::WSDL::ShipTypes::EdtTaxDetail::VERSION = '3.07';
+$Shipment::FedEx::WSDL::ShipTypes::EdtTaxDetail::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,62 +20,56 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %TaxType_of :ATTR(:get<TaxType>);
-my %EffectiveDate_of :ATTR(:get<EffectiveDate>);
-my %Name_of :ATTR(:get<Name>);
-my %TaxableValue_of :ATTR(:get<TaxableValue>);
-my %Description_of :ATTR(:get<Description>);
-my %Formula_of :ATTR(:get<Formula>);
-my %Amount_of :ATTR(:get<Amount>);
+    my %TaxType_of : ATTR(:get<TaxType>);
+    my %EffectiveDate_of : ATTR(:get<EffectiveDate>);
+    my %Name_of : ATTR(:get<Name>);
+    my %TaxableValue_of : ATTR(:get<TaxableValue>);
+    my %Description_of : ATTR(:get<Description>);
+    my %Formula_of : ATTR(:get<Formula>);
+    my %Amount_of : ATTR(:get<Amount>);
 
-__PACKAGE__->_factory(
-    [ qw(        TaxType
-        EffectiveDate
-        Name
-        TaxableValue
-        Description
-        Formula
-        Amount
+    __PACKAGE__->_factory(
+        [   qw(        TaxType
+              EffectiveDate
+              Name
+              TaxableValue
+              Description
+              Formula
+              Amount
 
-    ) ],
-    {
-        'TaxType' => \%TaxType_of,
-        'EffectiveDate' => \%EffectiveDate_of,
-        'Name' => \%Name_of,
-        'TaxableValue' => \%TaxableValue_of,
-        'Description' => \%Description_of,
-        'Formula' => \%Formula_of,
-        'Amount' => \%Amount_of,
-    },
-    {
-        'TaxType' => 'Shipment::FedEx::WSDL::ShipTypes::EdtTaxType',
-        'EffectiveDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
-        'Name' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'TaxableValue' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
-        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Formula' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Amount' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
-    },
-    {
+            )
+        ],
+        {   'TaxType'       => \%TaxType_of,
+            'EffectiveDate' => \%EffectiveDate_of,
+            'Name'          => \%Name_of,
+            'TaxableValue'  => \%TaxableValue_of,
+            'Description'   => \%Description_of,
+            'Formula'       => \%Formula_of,
+            'Amount'        => \%Amount_of,
+        },
+        {   'TaxType'       => 'Shipment::FedEx::WSDL::ShipTypes::EdtTaxType',
+            'EffectiveDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
+            'Name'          => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'TaxableValue'  => 'Shipment::FedEx::WSDL::ShipTypes::Money',
+            'Description'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Formula'       => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Amount'        => 'Shipment::FedEx::WSDL::ShipTypes::Money',
+        },
+        {
 
-        'TaxType' => 'TaxType',
-        'EffectiveDate' => 'EffectiveDate',
-        'Name' => 'Name',
-        'TaxableValue' => 'TaxableValue',
-        'Description' => 'Description',
-        'Formula' => 'Formula',
-        'Amount' => 'Amount',
-    }
-);
+            'TaxType'       => 'TaxType',
+            'EffectiveDate' => 'EffectiveDate',
+            'Name'          => 'Name',
+            'TaxableValue'  => 'TaxableValue',
+            'Description'   => 'Description',
+            'Formula'       => 'Formula',
+            'Amount'        => 'Amount',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -92,7 +86,7 @@ Shipment::FedEx::WSDL::ShipTypes::EdtTaxDetail
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

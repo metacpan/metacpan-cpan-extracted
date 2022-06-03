@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::EMailNotificationDetail;
-$Shipment::FedEx::WSDL::RateTypes::EMailNotificationDetail::VERSION = '3.07';
+$Shipment::FedEx::WSDL::RateTypes::EMailNotificationDetail::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
+sub get_xmlns {'http://fedex.com/ws/rate/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,32 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %PersonalMessage_of :ATTR(:get<PersonalMessage>);
-my %Recipients_of :ATTR(:get<Recipients>);
+    my %PersonalMessage_of : ATTR(:get<PersonalMessage>);
+    my %Recipients_of : ATTR(:get<Recipients>);
 
-__PACKAGE__->_factory(
-    [ qw(        PersonalMessage
-        Recipients
+    __PACKAGE__->_factory(
+        [   qw(        PersonalMessage
+              Recipients
 
-    ) ],
-    {
-        'PersonalMessage' => \%PersonalMessage_of,
-        'Recipients' => \%Recipients_of,
-    },
-    {
-        'PersonalMessage' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Recipients' => 'Shipment::FedEx::WSDL::RateTypes::EMailNotificationRecipient',
-    },
-    {
+            )
+        ],
+        {   'PersonalMessage' => \%PersonalMessage_of,
+            'Recipients'      => \%Recipients_of,
+        },
+        {   'PersonalMessage' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Recipients'      =>
+              'Shipment::FedEx::WSDL::RateTypes::EMailNotificationRecipient',
+        },
+        {
 
-        'PersonalMessage' => 'PersonalMessage',
-        'Recipients' => 'Recipients',
-    }
-);
+            'PersonalMessage' => 'PersonalMessage',
+            'Recipients'      => 'Recipients',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +62,7 @@ Shipment::FedEx::WSDL::RateTypes::EMailNotificationDetail
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

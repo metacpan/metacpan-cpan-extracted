@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::RequestContext;
-$Shipment::Purolator::WSDL::Types::RequestContext::VERSION = '3.07';
+$Shipment::Purolator::WSDL::Types::RequestContext::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
+sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,47 +20,41 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Version_of :ATTR(:get<Version>);
-my %Language_of :ATTR(:get<Language>);
-my %GroupID_of :ATTR(:get<GroupID>);
-my %RequestReference_of :ATTR(:get<RequestReference>);
+    my %Version_of : ATTR(:get<Version>);
+    my %Language_of : ATTR(:get<Language>);
+    my %GroupID_of : ATTR(:get<GroupID>);
+    my %RequestReference_of : ATTR(:get<RequestReference>);
 
-__PACKAGE__->_factory(
-    [ qw(        Version
-        Language
-        GroupID
-        RequestReference
+    __PACKAGE__->_factory(
+        [   qw(        Version
+              Language
+              GroupID
+              RequestReference
 
-    ) ],
-    {
-        'Version' => \%Version_of,
-        'Language' => \%Language_of,
-        'GroupID' => \%GroupID_of,
-        'RequestReference' => \%RequestReference_of,
-    },
-    {
-        'Version' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Language' => 'Shipment::Purolator::WSDL::Types::Language',
-        'GroupID' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'RequestReference' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'Version'          => \%Version_of,
+            'Language'         => \%Language_of,
+            'GroupID'          => \%GroupID_of,
+            'RequestReference' => \%RequestReference_of,
+        },
+        {   'Version'          => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Language'         => 'Shipment::Purolator::WSDL::Types::Language',
+            'GroupID'          => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'RequestReference' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'Version' => 'Version',
-        'Language' => 'Language',
-        'GroupID' => 'GroupID',
-        'RequestReference' => 'RequestReference',
-    }
-);
+            'Version'          => 'Version',
+            'Language'         => 'Language',
+            'GroupID'          => 'GroupID',
+            'RequestReference' => 'RequestReference',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -77,7 +71,7 @@ Shipment::Purolator::WSDL::Types::RequestContext
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

@@ -1,22 +1,22 @@
 
 package Shipment::Purolator::WSDLV2::Elements::ArrayOfOptionPrice;
-$Shipment::Purolator::WSDLV2::Elements::ArrayOfOptionPrice::VERSION = '3.07';
+$Shipment::Purolator::WSDLV2::Elements::ArrayOfOptionPrice::VERSION = '3.08';
 use strict;
 use warnings;
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' }
+    sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
 
-__PACKAGE__->__set_name('ArrayOfOptionPrice');
-__PACKAGE__->__set_nillable(1);
-__PACKAGE__->__set_minOccurs();
-__PACKAGE__->__set_maxOccurs();
-__PACKAGE__->__set_ref();
-use base qw(
-    SOAP::WSDL::XSD::Typelib::Element
-    Shipment::Purolator::WSDLV2::Types::ArrayOfOptionPrice
-);
+    __PACKAGE__->__set_name('ArrayOfOptionPrice');
+    __PACKAGE__->__set_nillable(1);
+    __PACKAGE__->__set_minOccurs();
+    __PACKAGE__->__set_maxOccurs();
+    __PACKAGE__->__set_ref();
+    use base qw(
+      SOAP::WSDL::XSD::Typelib::Element
+      Shipment::Purolator::WSDLV2::Types::ArrayOfOptionPrice
+    );
 
 }
 
@@ -34,7 +34,7 @@ Shipment::Purolator::WSDLV2::Elements::ArrayOfOptionPrice
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

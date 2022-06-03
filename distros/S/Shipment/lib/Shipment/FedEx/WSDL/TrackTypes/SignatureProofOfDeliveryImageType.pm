@@ -1,14 +1,13 @@
 package Shipment::FedEx::WSDL::TrackTypes::SignatureProofOfDeliveryImageType;
-$Shipment::FedEx::WSDL::TrackTypes::SignatureProofOfDeliveryImageType::VERSION = '3.07';
+$Shipment::FedEx::WSDL::TrackTypes::SignatureProofOfDeliveryImageType::VERSION = '3.08';
 use strict;
 use warnings;
 
-sub get_xmlns { 'http://fedex.com/ws/track/v9'};
+sub get_xmlns {'http://fedex.com/ws/track/v9'}
 
 # derivation by restriction
 use base qw(
-    SOAP::WSDL::XSD::Typelib::Builtin::string);
-
+  SOAP::WSDL::XSD::Typelib::Builtin::string);
 
 
 1;
@@ -25,7 +24,7 @@ Shipment::FedEx::WSDL::TrackTypes::SignatureProofOfDeliveryImageType
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

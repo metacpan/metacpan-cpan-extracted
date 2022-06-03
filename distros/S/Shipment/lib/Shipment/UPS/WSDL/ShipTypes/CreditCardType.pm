@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::CreditCardType;
-$Shipment::UPS::WSDL::ShipTypes::CreditCardType::VERSION = '3.07';
+$Shipment::UPS::WSDL::ShipTypes::CreditCardType::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,52 +20,47 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Type_of :ATTR(:get<Type>);
-my %Number_of :ATTR(:get<Number>);
-my %ExpirationDate_of :ATTR(:get<ExpirationDate>);
-my %SecurityCode_of :ATTR(:get<SecurityCode>);
-my %Address_of :ATTR(:get<Address>);
+    my %Type_of : ATTR(:get<Type>);
+    my %Number_of : ATTR(:get<Number>);
+    my %ExpirationDate_of : ATTR(:get<ExpirationDate>);
+    my %SecurityCode_of : ATTR(:get<SecurityCode>);
+    my %Address_of : ATTR(:get<Address>);
 
-__PACKAGE__->_factory(
-    [ qw(        Type
-        Number
-        ExpirationDate
-        SecurityCode
-        Address
+    __PACKAGE__->_factory(
+        [   qw(        Type
+              Number
+              ExpirationDate
+              SecurityCode
+              Address
 
-    ) ],
-    {
-        'Type' => \%Type_of,
-        'Number' => \%Number_of,
-        'ExpirationDate' => \%ExpirationDate_of,
-        'SecurityCode' => \%SecurityCode_of,
-        'Address' => \%Address_of,
-    },
-    {
-        'Type' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Number' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'ExpirationDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'SecurityCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Address' => 'Shipment::UPS::WSDL::ShipTypes::CreditCardAddressType',
-    },
-    {
+            )
+        ],
+        {   'Type'           => \%Type_of,
+            'Number'         => \%Number_of,
+            'ExpirationDate' => \%ExpirationDate_of,
+            'SecurityCode'   => \%SecurityCode_of,
+            'Address'        => \%Address_of,
+        },
+        {   'Type'           => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Number'         => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'ExpirationDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'SecurityCode'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Address'        =>
+              'Shipment::UPS::WSDL::ShipTypes::CreditCardAddressType',
+        },
+        {
 
-        'Type' => 'Type',
-        'Number' => 'Number',
-        'ExpirationDate' => 'ExpirationDate',
-        'SecurityCode' => 'SecurityCode',
-        'Address' => 'Address',
-    }
-);
+            'Type'           => 'Type',
+            'Number'         => 'Number',
+            'ExpirationDate' => 'ExpirationDate',
+            'SecurityCode'   => 'SecurityCode',
+            'Address'        => 'Address',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -82,7 +77,7 @@ Shipment::UPS::WSDL::ShipTypes::CreditCardType
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

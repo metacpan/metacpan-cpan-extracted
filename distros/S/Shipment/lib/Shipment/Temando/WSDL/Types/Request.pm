@@ -1,14 +1,19 @@
 package Shipment::Temando::WSDL::Types::Request;
-$Shipment::Temando::WSDL::Types::Request::VERSION = '3.07';
+$Shipment::Temando::WSDL::Types::Request::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(0);
 
-sub get_xmlns { 'http://' . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url . '/schema/2009_06/common.xsd' };
+sub get_xmlns {
+    'http://'
+      . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url
+      . '/schema/2009_06/common.xsd';
+}
 
-our $XML_ATTRIBUTE_CLASS = 'Shipment::Temando::WSDL::Types::Request::_Request::XmlAttr';
+our $XML_ATTRIBUTE_CLASS =
+  'Shipment::Temando::WSDL::Types::Request::_Request::XmlAttr';
 
 sub __get_attr_class {
     return $XML_ATTRIBUTE_CLASS;
@@ -19,202 +24,182 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %status_of :ATTR(:get<status>);
-my %anythings_of :ATTR(:get<anythings>);
-my %anywhere_of :ATTR(:get<anywhere>);
-my %anytime_of :ATTR(:get<anytime>);
-my %general_of :ATTR(:get<general>);
-my %origin_of :ATTR(:get<origin>);
-my %destination_of :ATTR(:get<destination>);
-my %quotes_of :ATTR(:get<quotes>);
-my %instructions_of :ATTR(:get<instructions>);
-my %comments_of :ATTR(:get<comments>);
-my %reference_of :ATTR(:get<reference>);
+    my %status_of : ATTR(:get<status>);
+    my %anythings_of : ATTR(:get<anythings>);
+    my %anywhere_of : ATTR(:get<anywhere>);
+    my %anytime_of : ATTR(:get<anytime>);
+    my %general_of : ATTR(:get<general>);
+    my %origin_of : ATTR(:get<origin>);
+    my %destination_of : ATTR(:get<destination>);
+    my %quotes_of : ATTR(:get<quotes>);
+    my %instructions_of : ATTR(:get<instructions>);
+    my %comments_of : ATTR(:get<comments>);
+    my %reference_of : ATTR(:get<reference>);
 
-__PACKAGE__->_factory(
-    [ qw(        status
-        anythings
-        anywhere
-        anytime
-        general
-        origin
-        destination
-        quotes
-        instructions
-        comments
-        reference
+    __PACKAGE__->_factory(
+        [   qw(        status
+              anythings
+              anywhere
+              anytime
+              general
+              origin
+              destination
+              quotes
+              instructions
+              comments
+              reference
 
-    ) ],
-    {
-        'status' => \%status_of,
-        'anythings' => \%anythings_of,
-        'anywhere' => \%anywhere_of,
-        'anytime' => \%anytime_of,
-        'general' => \%general_of,
-        'origin' => \%origin_of,
-        'destination' => \%destination_of,
-        'quotes' => \%quotes_of,
-        'instructions' => \%instructions_of,
-        'comments' => \%comments_of,
-        'reference' => \%reference_of,
-    },
-    {
-        'status' => 'Shipment::Temando::WSDL::Types::RequestStatus',
+            )
+        ],
+        {   'status'       => \%status_of,
+            'anythings'    => \%anythings_of,
+            'anywhere'     => \%anywhere_of,
+            'anytime'      => \%anytime_of,
+            'general'      => \%general_of,
+            'origin'       => \%origin_of,
+            'destination'  => \%destination_of,
+            'quotes'       => \%quotes_of,
+            'instructions' => \%instructions_of,
+            'comments'     => \%comments_of,
+            'reference'    => \%reference_of,
+        },
+        {   'status' => 'Shipment::Temando::WSDL::Types::RequestStatus',
 
-        'anythings' => 'Shipment::Temando::WSDL::Types::Request::_anythings',
-        'anywhere' => 'Shipment::Temando::WSDL::Types::Anywhere',
-        'anytime' => 'Shipment::Temando::WSDL::Types::Anytime',
-        'general' => 'Shipment::Temando::WSDL::Types::General',
-        'origin' => 'Shipment::Temando::WSDL::Types::Location',
-        'destination' => 'Shipment::Temando::WSDL::Types::Location',
+            'anythings' =>
+              'Shipment::Temando::WSDL::Types::Request::_anythings',
+            'anywhere'    => 'Shipment::Temando::WSDL::Types::Anywhere',
+            'anytime'     => 'Shipment::Temando::WSDL::Types::Anytime',
+            'general'     => 'Shipment::Temando::WSDL::Types::General',
+            'origin'      => 'Shipment::Temando::WSDL::Types::Location',
+            'destination' => 'Shipment::Temando::WSDL::Types::Location',
 
-        'quotes' => 'Shipment::Temando::WSDL::Types::Request::_quotes',
-        'instructions' => 'Shipment::Temando::WSDL::Types::Instructions',
-        'comments' => 'Shipment::Temando::WSDL::Types::Comments',
-        'reference' => 'Shipment::Temando::WSDL::Types::ClientReference',
-    },
-    {
+            'quotes' => 'Shipment::Temando::WSDL::Types::Request::_quotes',
+            'instructions' => 'Shipment::Temando::WSDL::Types::Instructions',
+            'comments'     => 'Shipment::Temando::WSDL::Types::Comments',
+            'reference' => 'Shipment::Temando::WSDL::Types::ClientReference',
+        },
+        {
 
-        'status' => 'status',
-        'anythings' => 'anythings',
-        'anywhere' => 'anywhere',
-        'anytime' => 'anytime',
-        'general' => 'general',
-        'origin' => 'origin',
-        'destination' => 'destination',
-        'quotes' => 'quotes',
-        'instructions' => 'instructions',
-        'comments' => 'comments',
-        'reference' => 'reference',
-    }
-);
+            'status'       => 'status',
+            'anythings'    => 'anythings',
+            'anywhere'     => 'anywhere',
+            'anytime'      => 'anytime',
+            'general'      => 'general',
+            'origin'       => 'origin',
+            'destination'  => 'destination',
+            'quotes'       => 'quotes',
+            'instructions' => 'instructions',
+            'comments'     => 'comments',
+            'reference'    => 'reference',
+        }
+    );
 
-} # end BLOCK
-
-
+}    # end BLOCK
 
 
 package Shipment::Temando::WSDL::Types::Request::_anythings;
-$Shipment::Temando::WSDL::Types::Request::_anythings::VERSION = '3.07';
+$Shipment::Temando::WSDL::Types::Request::_anythings::VERSION = '3.08';
 use strict;
 use warnings;
 {
-our $XML_ATTRIBUTE_CLASS;
-undef $XML_ATTRIBUTE_CLASS;
+    our $XML_ATTRIBUTE_CLASS;
+    undef $XML_ATTRIBUTE_CLASS;
 
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
-use Class::Std::Fast::Storable constructor => 'none';
-use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-Class::Std::initialize();
-
-{ # BLOCK to scope variables
-
-my %anything_of :ATTR(:get<anything>);
-
-__PACKAGE__->_factory(
-    [ qw(        anything
-
-    ) ],
-    {
-        'anything' => \%anything_of,
-    },
-    {
-        'anything' => 'Shipment::Temando::WSDL::Types::Anything',
-    },
-    {
-
-        'anything' => 'anything',
+    sub __get_attr_class {
+        return $XML_ATTRIBUTE_CLASS;
     }
-);
 
-} # end BLOCK
+    use Class::Std::Fast::Storable constructor => 'none';
+    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
+    Class::Std::initialize();
 
+    {    # BLOCK to scope variables
 
+        my %anything_of : ATTR(:get<anything>);
 
+        __PACKAGE__->_factory(
+            [   qw(        anything
+
+                )
+            ],
+            {'anything' => \%anything_of,},
+            {'anything' => 'Shipment::Temando::WSDL::Types::Anything',},
+            {
+
+                'anything' => 'anything',
+            }
+        );
+
+    }    # end BLOCK
 
 
 }
-
 
 
 package Shipment::Temando::WSDL::Types::Request::_quotes;
-$Shipment::Temando::WSDL::Types::Request::_quotes::VERSION = '3.07';
+$Shipment::Temando::WSDL::Types::Request::_quotes::VERSION = '3.08';
 use strict;
 use warnings;
 {
-our $XML_ATTRIBUTE_CLASS;
-undef $XML_ATTRIBUTE_CLASS;
+    our $XML_ATTRIBUTE_CLASS;
+    undef $XML_ATTRIBUTE_CLASS;
 
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
-use Class::Std::Fast::Storable constructor => 'none';
-use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-Class::Std::initialize();
-
-{ # BLOCK to scope variables
-
-my %quote_of :ATTR(:get<quote>);
-
-__PACKAGE__->_factory(
-    [ qw(        quote
-
-    ) ],
-    {
-        'quote' => \%quote_of,
-    },
-    {
-        'quote' => 'Shipment::Temando::WSDL::Types::AvailableQuote',
-    },
-    {
-
-        'quote' => 'quote',
+    sub __get_attr_class {
+        return $XML_ATTRIBUTE_CLASS;
     }
-);
 
-} # end BLOCK
+    use Class::Std::Fast::Storable constructor => 'none';
+    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
+    Class::Std::initialize();
 
+    {    # BLOCK to scope variables
 
+        my %quote_of : ATTR(:get<quote>);
 
+        __PACKAGE__->_factory(
+            [   qw(        quote
+
+                )
+            ],
+            {'quote' => \%quote_of,},
+            {'quote' => 'Shipment::Temando::WSDL::Types::AvailableQuote',},
+            {
+
+                'quote' => 'quote',
+            }
+        );
+
+    }    # end BLOCK
 
 
 }
-
 
 
 package Shipment::Temando::WSDL::Types::Request::_Request::XmlAttr;
-$Shipment::Temando::WSDL::Types::Request::_Request::XmlAttr::VERSION = '3.07';
+$Shipment::Temando::WSDL::Types::Request::_Request::XmlAttr::VERSION = '3.08';
 use base qw(SOAP::WSDL::XSD::Typelib::AttributeSet);
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %id_of :ATTR(:get<id>);
+    my %id_of : ATTR(:get<id>);
 
-__PACKAGE__->_factory(
-    [ qw(
-        id
-    ) ],
-    {
+    __PACKAGE__->_factory(
+        [   qw(
+              id
+            )
+        ],
+        {
 
-        id => \%id_of,
-    },
-    {
-        id => 'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',
-    }
-);
+            id => \%id_of,
+        },
+        {id => 'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',}
+    );
 
-} # end BLOCK
-
+}    # end BLOCK
 
 
 1;
@@ -231,7 +216,7 @@ Shipment::Temando::WSDL::Types::Request
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

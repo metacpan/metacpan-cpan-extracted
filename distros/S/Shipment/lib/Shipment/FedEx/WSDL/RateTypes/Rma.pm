@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::Rma;
-$Shipment::FedEx::WSDL::RateTypes::Rma::VERSION = '3.07';
+$Shipment::FedEx::WSDL::RateTypes::Rma::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
+sub get_xmlns {'http://fedex.com/ws/rate/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,31 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Number_of :ATTR(:get<Number>);
-my %Reason_of :ATTR(:get<Reason>);
+    my %Number_of : ATTR(:get<Number>);
+    my %Reason_of : ATTR(:get<Reason>);
 
-__PACKAGE__->_factory(
-    [ qw(        Number
-        Reason
+    __PACKAGE__->_factory(
+        [   qw(        Number
+              Reason
 
-    ) ],
-    {
-        'Number' => \%Number_of,
-        'Reason' => \%Reason_of,
-    },
-    {
-        'Number' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Reason' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'Number' => \%Number_of,
+            'Reason' => \%Reason_of,
+        },
+        {   'Number' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Reason' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'Number' => 'Number',
-        'Reason' => 'Reason',
-    }
-);
+            'Number' => 'Number',
+            'Reason' => 'Reason',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +61,7 @@ Shipment::FedEx::WSDL::RateTypes::Rma
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

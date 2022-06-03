@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDLV2::Types::NotificationInformation;
-$Shipment::Purolator::WSDLV2::Types::NotificationInformation::VERSION = '3.07';
+$Shipment::Purolator::WSDLV2::Types::NotificationInformation::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' };
+sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,47 +20,54 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %ConfirmationEmailAddress_of :ATTR(:get<ConfirmationEmailAddress>);
-my %AdvancedShippingNotificationEmailAddress1_of :ATTR(:get<AdvancedShippingNotificationEmailAddress1>);
-my %AdvancedShippingNotificationEmailAddress2_of :ATTR(:get<AdvancedShippingNotificationEmailAddress2>);
-my %AdvancedShippingNotificationMessage_of :ATTR(:get<AdvancedShippingNotificationMessage>);
+    my %ConfirmationEmailAddress_of : ATTR(:get<ConfirmationEmailAddress>);
+    my %AdvancedShippingNotificationEmailAddress1_of :
+      ATTR(:get<AdvancedShippingNotificationEmailAddress1>);
+    my %AdvancedShippingNotificationEmailAddress2_of :
+      ATTR(:get<AdvancedShippingNotificationEmailAddress2>);
+    my %AdvancedShippingNotificationMessage_of :
+      ATTR(:get<AdvancedShippingNotificationMessage>);
 
-__PACKAGE__->_factory(
-    [ qw(        ConfirmationEmailAddress
-        AdvancedShippingNotificationEmailAddress1
-        AdvancedShippingNotificationEmailAddress2
-        AdvancedShippingNotificationMessage
+    __PACKAGE__->_factory(
+        [   qw(        ConfirmationEmailAddress
+              AdvancedShippingNotificationEmailAddress1
+              AdvancedShippingNotificationEmailAddress2
+              AdvancedShippingNotificationMessage
 
-    ) ],
-    {
-        'ConfirmationEmailAddress' => \%ConfirmationEmailAddress_of,
-        'AdvancedShippingNotificationEmailAddress1' => \%AdvancedShippingNotificationEmailAddress1_of,
-        'AdvancedShippingNotificationEmailAddress2' => \%AdvancedShippingNotificationEmailAddress2_of,
-        'AdvancedShippingNotificationMessage' => \%AdvancedShippingNotificationMessage_of,
-    },
-    {
-        'ConfirmationEmailAddress' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'AdvancedShippingNotificationEmailAddress1' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'AdvancedShippingNotificationEmailAddress2' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'AdvancedShippingNotificationMessage' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'ConfirmationEmailAddress' => \%ConfirmationEmailAddress_of,
+            'AdvancedShippingNotificationEmailAddress1' =>
+              \%AdvancedShippingNotificationEmailAddress1_of,
+            'AdvancedShippingNotificationEmailAddress2' =>
+              \%AdvancedShippingNotificationEmailAddress2_of,
+            'AdvancedShippingNotificationMessage' =>
+              \%AdvancedShippingNotificationMessage_of,
+        },
+        {   'ConfirmationEmailAddress' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'AdvancedShippingNotificationEmailAddress1' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'AdvancedShippingNotificationEmailAddress2' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'AdvancedShippingNotificationMessage' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'ConfirmationEmailAddress' => 'ConfirmationEmailAddress',
-        'AdvancedShippingNotificationEmailAddress1' => 'AdvancedShippingNotificationEmailAddress1',
-        'AdvancedShippingNotificationEmailAddress2' => 'AdvancedShippingNotificationEmailAddress2',
-        'AdvancedShippingNotificationMessage' => 'AdvancedShippingNotificationMessage',
-    }
-);
+            'ConfirmationEmailAddress' => 'ConfirmationEmailAddress',
+            'AdvancedShippingNotificationEmailAddress1' =>
+              'AdvancedShippingNotificationEmailAddress1',
+            'AdvancedShippingNotificationEmailAddress2' =>
+              'AdvancedShippingNotificationEmailAddress2',
+            'AdvancedShippingNotificationMessage' =>
+              'AdvancedShippingNotificationMessage',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -77,7 +84,7 @@ Shipment::Purolator::WSDLV2::Types::NotificationInformation
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

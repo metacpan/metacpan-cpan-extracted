@@ -2,8 +2,8 @@ use strict;
 use warnings;
 
 use Test::Needs {
-  'Catalyst::Plugin::Session::State::Cookie' => '0.03',
-  'Catalyst::Plugin::Authentication' => 0,
+  'Catalyst::Plugin::Authentication'          => '0',
+  'Catalyst::Plugin::Session::State::Cookie'  => '0.03',
 };
 
 use Test::More;

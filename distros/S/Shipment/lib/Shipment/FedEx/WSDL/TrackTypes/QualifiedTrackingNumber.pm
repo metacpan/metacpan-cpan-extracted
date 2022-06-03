@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::QualifiedTrackingNumber;
-$Shipment::FedEx::WSDL::TrackTypes::QualifiedTrackingNumber::VERSION = '3.07';
+$Shipment::FedEx::WSDL::TrackTypes::QualifiedTrackingNumber::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/track/v9' };
+sub get_xmlns {'http://fedex.com/ws/track/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,52 +20,46 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %TrackingNumber_of :ATTR(:get<TrackingNumber>);
-my %ShipDate_of :ATTR(:get<ShipDate>);
-my %AccountNumber_of :ATTR(:get<AccountNumber>);
-my %Carrier_of :ATTR(:get<Carrier>);
-my %Destination_of :ATTR(:get<Destination>);
+    my %TrackingNumber_of : ATTR(:get<TrackingNumber>);
+    my %ShipDate_of : ATTR(:get<ShipDate>);
+    my %AccountNumber_of : ATTR(:get<AccountNumber>);
+    my %Carrier_of : ATTR(:get<Carrier>);
+    my %Destination_of : ATTR(:get<Destination>);
 
-__PACKAGE__->_factory(
-    [ qw(        TrackingNumber
-        ShipDate
-        AccountNumber
-        Carrier
-        Destination
+    __PACKAGE__->_factory(
+        [   qw(        TrackingNumber
+              ShipDate
+              AccountNumber
+              Carrier
+              Destination
 
-    ) ],
-    {
-        'TrackingNumber' => \%TrackingNumber_of,
-        'ShipDate' => \%ShipDate_of,
-        'AccountNumber' => \%AccountNumber_of,
-        'Carrier' => \%Carrier_of,
-        'Destination' => \%Destination_of,
-    },
-    {
-        'TrackingNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'ShipDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
-        'AccountNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Carrier' => 'Shipment::FedEx::WSDL::TrackTypes::CarrierCodeType',
-        'Destination' => 'Shipment::FedEx::WSDL::TrackTypes::Address',
-    },
-    {
+            )
+        ],
+        {   'TrackingNumber' => \%TrackingNumber_of,
+            'ShipDate'       => \%ShipDate_of,
+            'AccountNumber'  => \%AccountNumber_of,
+            'Carrier'        => \%Carrier_of,
+            'Destination'    => \%Destination_of,
+        },
+        {   'TrackingNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'ShipDate'       => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
+            'AccountNumber'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Carrier' => 'Shipment::FedEx::WSDL::TrackTypes::CarrierCodeType',
+            'Destination' => 'Shipment::FedEx::WSDL::TrackTypes::Address',
+        },
+        {
 
-        'TrackingNumber' => 'TrackingNumber',
-        'ShipDate' => 'ShipDate',
-        'AccountNumber' => 'AccountNumber',
-        'Carrier' => 'Carrier',
-        'Destination' => 'Destination',
-    }
-);
+            'TrackingNumber' => 'TrackingNumber',
+            'ShipDate'       => 'ShipDate',
+            'AccountNumber'  => 'AccountNumber',
+            'Carrier'        => 'Carrier',
+            'Destination'    => 'Destination',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -82,7 +76,7 @@ Shipment::FedEx::WSDL::TrackTypes::QualifiedTrackingNumber
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

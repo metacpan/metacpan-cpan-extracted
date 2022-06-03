@@ -36,5 +36,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/Pero-Moretti/Perl-Dancer2-Plugin-DoFile.git
-version: '0.1'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

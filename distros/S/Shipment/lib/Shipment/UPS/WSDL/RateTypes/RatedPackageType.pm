@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::RateTypes::RatedPackageType;
-$Shipment::UPS::WSDL::RateTypes::RatedPackageType::VERSION = '3.07';
+$Shipment::UPS::WSDL::RateTypes::RatedPackageType::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,57 +20,55 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %TransportationCharges_of :ATTR(:get<TransportationCharges>);
-my %SurePostDasCharges_of :ATTR(:get<SurePostDasCharges>);
-my %ServiceOptionsCharges_of :ATTR(:get<ServiceOptionsCharges>);
-my %TotalCharges_of :ATTR(:get<TotalCharges>);
-my %Weight_of :ATTR(:get<Weight>);
-my %BillingWeight_of :ATTR(:get<BillingWeight>);
+    my %TransportationCharges_of : ATTR(:get<TransportationCharges>);
+    my %SurePostDasCharges_of : ATTR(:get<SurePostDasCharges>);
+    my %ServiceOptionsCharges_of : ATTR(:get<ServiceOptionsCharges>);
+    my %TotalCharges_of : ATTR(:get<TotalCharges>);
+    my %Weight_of : ATTR(:get<Weight>);
+    my %BillingWeight_of : ATTR(:get<BillingWeight>);
 
-__PACKAGE__->_factory(
-    [ qw(        TransportationCharges
-        SurePostDasCharges
-        ServiceOptionsCharges
-        TotalCharges
-        Weight
-        BillingWeight
+    __PACKAGE__->_factory(
+        [   qw(        TransportationCharges
+              SurePostDasCharges
+              ServiceOptionsCharges
+              TotalCharges
+              Weight
+              BillingWeight
 
-    ) ],
-    {
-        'TransportationCharges' => \%TransportationCharges_of,
-        'SurePostDasCharges' => \%SurePostDasCharges_of,
-        'ServiceOptionsCharges' => \%ServiceOptionsCharges_of,
-        'TotalCharges' => \%TotalCharges_of,
-        'Weight' => \%Weight_of,
-        'BillingWeight' => \%BillingWeight_of,
-    },
-    {
-        'TransportationCharges' => 'Shipment::UPS::WSDL::RateTypes::ChargesType',
-        'SurePostDasCharges' => 'Shipment::UPS::WSDL::RateTypes::ChargesType',
-        'ServiceOptionsCharges' => 'Shipment::UPS::WSDL::RateTypes::ChargesType',
-        'TotalCharges' => 'Shipment::UPS::WSDL::RateTypes::ChargesType',
-        'Weight' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'BillingWeight' => 'Shipment::UPS::WSDL::RateTypes::BillingWeightType',
-    },
-    {
+            )
+        ],
+        {   'TransportationCharges' => \%TransportationCharges_of,
+            'SurePostDasCharges'    => \%SurePostDasCharges_of,
+            'ServiceOptionsCharges' => \%ServiceOptionsCharges_of,
+            'TotalCharges'          => \%TotalCharges_of,
+            'Weight'                => \%Weight_of,
+            'BillingWeight'         => \%BillingWeight_of,
+        },
+        {   'TransportationCharges' =>
+              'Shipment::UPS::WSDL::RateTypes::ChargesType',
+            'SurePostDasCharges' =>
+              'Shipment::UPS::WSDL::RateTypes::ChargesType',
+            'ServiceOptionsCharges' =>
+              'Shipment::UPS::WSDL::RateTypes::ChargesType',
+            'TotalCharges'  => 'Shipment::UPS::WSDL::RateTypes::ChargesType',
+            'Weight'        => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'BillingWeight' =>
+              'Shipment::UPS::WSDL::RateTypes::BillingWeightType',
+        },
+        {
 
-        'TransportationCharges' => 'TransportationCharges',
-        'SurePostDasCharges' => 'SurePostDasCharges',
-        'ServiceOptionsCharges' => 'ServiceOptionsCharges',
-        'TotalCharges' => 'TotalCharges',
-        'Weight' => 'Weight',
-        'BillingWeight' => 'BillingWeight',
-    }
-);
+            'TransportationCharges' => 'TransportationCharges',
+            'SurePostDasCharges'    => 'SurePostDasCharges',
+            'ServiceOptionsCharges' => 'ServiceOptionsCharges',
+            'TotalCharges'          => 'TotalCharges',
+            'Weight'                => 'Weight',
+            'BillingWeight'         => 'BillingWeight',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -87,7 +85,7 @@ Shipment::UPS::WSDL::RateTypes::RatedPackageType
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

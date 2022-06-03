@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Interfaces::EstimatingService::EstimatingServiceEndpoint;
-$Shipment::Purolator::WSDLV2::Interfaces::EstimatingService::EstimatingServiceEndpoint::VERSION = '3.07';
+$Shipment::Purolator::WSDLV2::Interfaces::EstimatingService::EstimatingServiceEndpoint::VERSION = '3.08';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -9,157 +9,185 @@ use base qw(SOAP::WSDL::Client::Base);
 
 # only load if it hasn't been loaded before
 require Shipment::Purolator::WSDLV2::Typemaps::EstimatingService
-    if not Shipment::Purolator::WSDLV2::Typemaps::EstimatingService->can('get_class');
+  if not Shipment::Purolator::WSDLV2::Typemaps::EstimatingService->can(
+    'get_class');
 
 
 sub START {
 
     my $proxy_domain = $_[2]->{proxy_domain} || 'devwebservices.purolator.com';
 
-    $_[0]->set_proxy('https://' . $proxy_domain . '/EWS/V2/Estimating/EstimatingService.asmx') if not $_[2]->{proxy};
+    $_[0]->set_proxy('https://'
+          . $proxy_domain
+          . '/EWS/V2/Estimating/EstimatingService.asmx')
+      if not $_[2]->{proxy};
 
-    $_[0]->set_class_resolver('Shipment::Purolator::WSDLV2::Typemaps::EstimatingService')
-        if not $_[2]->{class_resolver};
+    $_[0]->set_class_resolver(
+        'Shipment::Purolator::WSDLV2::Typemaps::EstimatingService')
+      if not $_[2]->{class_resolver};
 
     $_[0]->set_prefix($_[2]->{use_prefix}) if exists $_[2]->{use_prefix};
 
     my $options = $_[2];
     ## provide credentials
-    eval {
-      use SOAP::Lite;
-    };
+    eval { use SOAP::Lite; };
     if ($@) {
-      warn "SOAP::Lite not installed, using builtin SOAP::WSDL Transport";
-      *SOAP::WSDL::Transport::HTTP::get_basic_credentials = sub { return ($options->{key}, $options->{password}); };
+        warn "SOAP::Lite not installed, using builtin SOAP::WSDL Transport";
+        *SOAP::WSDL::Transport::HTTP::get_basic_credentials =
+          sub { return ($options->{key}, $options->{password}); };
     }
     else {
-      *SOAP::Transport::HTTP::Client::get_basic_credentials = sub { return ($options->{key}, $options->{password}); };
+        *SOAP::Transport::HTTP::Client::get_basic_credentials =
+          sub { return ($options->{key}, $options->{password}); };
     }
 }
 
 sub GetQuickEstimate {
     my ($self, $body, $header) = @_;
-    die "GetQuickEstimate must be called as object method (\$self is <$self>)" if not blessed($self);
-    return $self->SUPER::call({
-        operation => 'GetQuickEstimate',
-        soap_action => 'http://purolator.com/pws/service/v2/GetQuickEstimate',
-        style => 'document',
-        body => {
-            
+    die "GetQuickEstimate must be called as object method (\$self is <$self>)"
+      if not blessed($self);
+    return $self->SUPER::call(
+        {   operation   => 'GetQuickEstimate',
+            soap_action =>
+              'http://purolator.com/pws/service/v2/GetQuickEstimate',
+            style => 'document',
+            body  => {
 
-           'use'            => 'literal',
-            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle   => '',
-            parts           =>  [qw( Shipment::Purolator::WSDLV2::Elements::GetQuickEstimateRequest )],
-        },
-        header => {
-            
-           'use' => 'literal',
-            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle => '',
-            parts => [qw( Shipment::Purolator::WSDLV2::Elements::RequestContext )],
 
-        },
-        headerfault => {
-            
-        },
-        response => {
+                'use'         => 'literal',
+                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                encodingStyle => '',
+                parts         => [
+                    qw( Shipment::Purolator::WSDLV2::Elements::GetQuickEstimateRequest )
+                ],
+            },
             header => {
-                
 
+                'use'         => 'literal',
+                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                encodingStyle => '',
+                parts         => [
+                    qw( Shipment::Purolator::WSDLV2::Elements::RequestContext )
+                ],
 
-           'use' => 'literal',
-            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle => '',
-            parts => [qw( Shipment::Purolator::WSDLV2::Elements::ResponseContext )],
             },
-            body => {
-                
+            headerfault => {
 
-           'use'            => 'literal',
-            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle   => '',
-            parts           =>  [qw( Shipment::Purolator::WSDLV2::Elements::GetQuickEstimateResponse )],
             },
-        }
-    }, $body, $header);
+            response => {
+                header => {
+
+
+                    'use'         => 'literal',
+                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                    encodingStyle => '',
+                    parts         => [
+                        qw( Shipment::Purolator::WSDLV2::Elements::ResponseContext )
+                    ],
+                },
+                body => {
+
+
+                    'use'         => 'literal',
+                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                    encodingStyle => '',
+                    parts         => [
+                        qw( Shipment::Purolator::WSDLV2::Elements::GetQuickEstimateResponse )
+                    ],
+                },
+            }
+        },
+        $body,
+        $header
+    );
 }
 
 
 sub GetFullEstimate {
     my ($self, $body, $header) = @_;
-    die "GetFullEstimate must be called as object method (\$self is <$self>)" if not blessed($self);
-    return $self->SUPER::call({
-        operation => 'GetFullEstimate',
-        soap_action => 'http://purolator.com/pws/service/v2/GetFullEstimate',
-        style => 'document',
-        body => {
-            
+    die "GetFullEstimate must be called as object method (\$self is <$self>)"
+      if not blessed($self);
+    return $self->SUPER::call(
+        {   operation   => 'GetFullEstimate',
+            soap_action =>
+              'http://purolator.com/pws/service/v2/GetFullEstimate',
+            style => 'document',
+            body  => {
 
-           'use'            => 'literal',
-            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle   => '',
-            parts           =>  [qw( Shipment::Purolator::WSDLV2::Elements::GetFullEstimateRequest )],
-        },
-        header => {
-            
-           'use' => 'literal',
-            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle => '',
-            parts => [qw( Shipment::Purolator::WSDLV2::Elements::RequestContext )],
 
-        },
-        headerfault => {
-            
-        },
-        response => {
+                'use'         => 'literal',
+                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                encodingStyle => '',
+                parts         => [
+                    qw( Shipment::Purolator::WSDLV2::Elements::GetFullEstimateRequest )
+                ],
+            },
             header => {
-                
 
+                'use'         => 'literal',
+                namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                encodingStyle => '',
+                parts         => [
+                    qw( Shipment::Purolator::WSDLV2::Elements::RequestContext )
+                ],
 
-           'use' => 'literal',
-            namespace => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle => '',
-            parts => [qw( Shipment::Purolator::WSDLV2::Elements::ResponseContext )],
             },
-            body => {
-                
+            headerfault => {
 
-           'use'            => 'literal',
-            namespace       => 'http://schemas.xmlsoap.org/wsdl/soap/',
-            encodingStyle   => '',
-            parts           =>  [qw( Shipment::Purolator::WSDLV2::Elements::GetFullEstimateResponse )],
             },
-        }
-    }, $body, $header);
+            response => {
+                header => {
+
+
+                    'use'         => 'literal',
+                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                    encodingStyle => '',
+                    parts         => [
+                        qw( Shipment::Purolator::WSDLV2::Elements::ResponseContext )
+                    ],
+                },
+                body => {
+
+
+                    'use'         => 'literal',
+                    namespace     => 'http://schemas.xmlsoap.org/wsdl/soap/',
+                    encodingStyle => '',
+                    parts         => [
+                        qw( Shipment::Purolator::WSDLV2::Elements::GetFullEstimateResponse )
+                    ],
+                },
+            }
+        },
+        $body,
+        $header
+    );
 }
-
-
-
 
 
 sub _get_name_resolver {
 
     my $prefix_1 = {
-              'attribute' => 'Shipment::Purolator::WSDLV2::Attributes',
-              'typemap' => 'Shipment::Purolator::WSDLV2::Typemaps',
-              'interface' => 'Shipment::Purolator::WSDLV2::Interfaces',
-              'type' => 'Shipment::Purolator::WSDLV2::Types',
-              'server' => 'Shipment::Purolator::WSDLV2::Server',
-              'element' => 'Shipment::Purolator::WSDLV2::Elements'
-            };
+        'attribute' => 'Shipment::Purolator::WSDLV2::Attributes',
+        'typemap'   => 'Shipment::Purolator::WSDLV2::Typemaps',
+        'interface' => 'Shipment::Purolator::WSDLV2::Interfaces',
+        'type'      => 'Shipment::Purolator::WSDLV2::Types',
+        'server'    => 'Shipment::Purolator::WSDLV2::Server',
+        'element'   => 'Shipment::Purolator::WSDLV2::Elements'
+    };
 
 
-    return SOAP::WSDL::Generator::Template::Plugin::XSD->new({
-        prefix_resolver => SOAP::WSDL::Generator::PrefixResolver->new({
-            namespace_prefix_map => {
-                'http://www.w3.org/2001/XMLSchema' => 'SOAP::WSDL::XSD::Typelib::Builtin',
-            },
-            namespace_map => {
-            },
-            prefix => $prefix_1,
-        })
-    });
+    return SOAP::WSDL::Generator::Template::Plugin::XSD->new(
+        {   prefix_resolver => SOAP::WSDL::Generator::PrefixResolver->new(
+                {   namespace_prefix_map => {
+                        'http://www.w3.org/2001/XMLSchema' =>
+                          'SOAP::WSDL::XSD::Typelib::Builtin',
+                    },
+                    namespace_map => {},
+                    prefix        => $prefix_1,
+                }
+            )
+        }
+    );
 }
 
 1;
@@ -176,7 +204,7 @@ Shipment::Purolator::WSDLV2::Interfaces::EstimatingService::EstimatingServiceEnd
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 SYNOPSIS
 

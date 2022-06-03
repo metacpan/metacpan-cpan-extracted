@@ -94,6 +94,7 @@ also if there was already an offset but it wasn't changed.
 
 sub set {
   my ( $self, $camera_id, $time, $offset, $file ) = @_;
+  croak "Need camera ID" unless defined $camera_id;
   if ( Image::Synchronize::Timestamp->istypeof($time) ) {
     # we prefer UTC but if the camera doesn't provide UTC then we
     # accept local time.
@@ -315,6 +316,7 @@ I<exactly> that C<$time>.
 
 sub get {
   my ( $self, $camera_id, $time ) = @_;
+  return unless defined($camera_id) and defined($time);
   if ( Image::Synchronize::Timestamp->istypeof($time) ) {
     $time = $time->time_local;
   }

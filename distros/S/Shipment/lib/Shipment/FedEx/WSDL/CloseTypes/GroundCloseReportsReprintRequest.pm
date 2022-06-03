@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::CloseTypes::GroundCloseReportsReprintRequest;
-$Shipment::FedEx::WSDL::CloseTypes::GroundCloseReportsReprintRequest::VERSION = '3.07';
+$Shipment::FedEx::WSDL::CloseTypes::GroundCloseReportsReprintRequest::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/close/v2' };
+sub get_xmlns {'http://fedex.com/ws/close/v2'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,62 +20,60 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %WebAuthenticationDetail_of :ATTR(:get<WebAuthenticationDetail>);
-my %ClientDetail_of :ATTR(:get<ClientDetail>);
-my %TransactionDetail_of :ATTR(:get<TransactionDetail>);
-my %Version_of :ATTR(:get<Version>);
-my %ReportDate_of :ATTR(:get<ReportDate>);
-my %TrackingNumber_of :ATTR(:get<TrackingNumber>);
-my %CloseReportType_of :ATTR(:get<CloseReportType>);
+    my %WebAuthenticationDetail_of : ATTR(:get<WebAuthenticationDetail>);
+    my %ClientDetail_of : ATTR(:get<ClientDetail>);
+    my %TransactionDetail_of : ATTR(:get<TransactionDetail>);
+    my %Version_of : ATTR(:get<Version>);
+    my %ReportDate_of : ATTR(:get<ReportDate>);
+    my %TrackingNumber_of : ATTR(:get<TrackingNumber>);
+    my %CloseReportType_of : ATTR(:get<CloseReportType>);
 
-__PACKAGE__->_factory(
-    [ qw(        WebAuthenticationDetail
-        ClientDetail
-        TransactionDetail
-        Version
-        ReportDate
-        TrackingNumber
-        CloseReportType
+    __PACKAGE__->_factory(
+        [   qw(        WebAuthenticationDetail
+              ClientDetail
+              TransactionDetail
+              Version
+              ReportDate
+              TrackingNumber
+              CloseReportType
 
-    ) ],
-    {
-        'WebAuthenticationDetail' => \%WebAuthenticationDetail_of,
-        'ClientDetail' => \%ClientDetail_of,
-        'TransactionDetail' => \%TransactionDetail_of,
-        'Version' => \%Version_of,
-        'ReportDate' => \%ReportDate_of,
-        'TrackingNumber' => \%TrackingNumber_of,
-        'CloseReportType' => \%CloseReportType_of,
-    },
-    {
-        'WebAuthenticationDetail' => 'Shipment::FedEx::WSDL::CloseTypes::WebAuthenticationDetail',
-        'ClientDetail' => 'Shipment::FedEx::WSDL::CloseTypes::ClientDetail',
-        'TransactionDetail' => 'Shipment::FedEx::WSDL::CloseTypes::TransactionDetail',
-        'Version' => 'Shipment::FedEx::WSDL::CloseTypes::VersionId',
-        'ReportDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
-        'TrackingNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'CloseReportType' => 'Shipment::FedEx::WSDL::CloseTypes::CloseReportType',
-    },
-    {
+            )
+        ],
+        {   'WebAuthenticationDetail' => \%WebAuthenticationDetail_of,
+            'ClientDetail'            => \%ClientDetail_of,
+            'TransactionDetail'       => \%TransactionDetail_of,
+            'Version'                 => \%Version_of,
+            'ReportDate'              => \%ReportDate_of,
+            'TrackingNumber'          => \%TrackingNumber_of,
+            'CloseReportType'         => \%CloseReportType_of,
+        },
+        {   'WebAuthenticationDetail' =>
+              'Shipment::FedEx::WSDL::CloseTypes::WebAuthenticationDetail',
+            'ClientDetail' =>
+              'Shipment::FedEx::WSDL::CloseTypes::ClientDetail',
+            'TransactionDetail' =>
+              'Shipment::FedEx::WSDL::CloseTypes::TransactionDetail',
+            'Version'        => 'Shipment::FedEx::WSDL::CloseTypes::VersionId',
+            'ReportDate'     => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
+            'TrackingNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'CloseReportType' =>
+              'Shipment::FedEx::WSDL::CloseTypes::CloseReportType',
+        },
+        {
 
-        'WebAuthenticationDetail' => 'WebAuthenticationDetail',
-        'ClientDetail' => 'ClientDetail',
-        'TransactionDetail' => 'TransactionDetail',
-        'Version' => 'Version',
-        'ReportDate' => 'ReportDate',
-        'TrackingNumber' => 'TrackingNumber',
-        'CloseReportType' => 'CloseReportType',
-    }
-);
+            'WebAuthenticationDetail' => 'WebAuthenticationDetail',
+            'ClientDetail'            => 'ClientDetail',
+            'TransactionDetail'       => 'TransactionDetail',
+            'Version'                 => 'Version',
+            'ReportDate'              => 'ReportDate',
+            'TrackingNumber'          => 'TrackingNumber',
+            'CloseReportType'         => 'CloseReportType',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -92,7 +90,7 @@ Shipment::FedEx::WSDL::CloseTypes::GroundCloseReportsReprintRequest
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

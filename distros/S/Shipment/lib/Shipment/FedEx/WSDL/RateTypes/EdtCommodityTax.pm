@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::EdtCommodityTax;
-$Shipment::FedEx::WSDL::RateTypes::EdtCommodityTax::VERSION = '3.07';
+$Shipment::FedEx::WSDL::RateTypes::EdtCommodityTax::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
+sub get_xmlns {'http://fedex.com/ws/rate/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,31 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %HarmonizedCode_of :ATTR(:get<HarmonizedCode>);
-my %Taxes_of :ATTR(:get<Taxes>);
+    my %HarmonizedCode_of : ATTR(:get<HarmonizedCode>);
+    my %Taxes_of : ATTR(:get<Taxes>);
 
-__PACKAGE__->_factory(
-    [ qw(        HarmonizedCode
-        Taxes
+    __PACKAGE__->_factory(
+        [   qw(        HarmonizedCode
+              Taxes
 
-    ) ],
-    {
-        'HarmonizedCode' => \%HarmonizedCode_of,
-        'Taxes' => \%Taxes_of,
-    },
-    {
-        'HarmonizedCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Taxes' => 'Shipment::FedEx::WSDL::RateTypes::EdtTaxDetail',
-    },
-    {
+            )
+        ],
+        {   'HarmonizedCode' => \%HarmonizedCode_of,
+            'Taxes'          => \%Taxes_of,
+        },
+        {   'HarmonizedCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Taxes' => 'Shipment::FedEx::WSDL::RateTypes::EdtTaxDetail',
+        },
+        {
 
-        'HarmonizedCode' => 'HarmonizedCode',
-        'Taxes' => 'Taxes',
-    }
-);
+            'HarmonizedCode' => 'HarmonizedCode',
+            'Taxes'          => 'Taxes',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +61,7 @@ Shipment::FedEx::WSDL::RateTypes::EdtCommodityTax
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::ShipmentSpecialServicesRequested;
-$Shipment::FedEx::WSDL::RateTypes::ShipmentSpecialServicesRequested::VERSION = '3.07';
+$Shipment::FedEx::WSDL::RateTypes::ShipmentSpecialServicesRequested::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
+sub get_xmlns {'http://fedex.com/ws/rate/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,87 +20,91 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %SpecialServiceTypes_of :ATTR(:get<SpecialServiceTypes>);
-my %CodDetail_of :ATTR(:get<CodDetail>);
-my %HoldAtLocationDetail_of :ATTR(:get<HoldAtLocationDetail>);
-my %EMailNotificationDetail_of :ATTR(:get<EMailNotificationDetail>);
-my %ReturnShipmentDetail_of :ATTR(:get<ReturnShipmentDetail>);
-my %PendingShipmentDetail_of :ATTR(:get<PendingShipmentDetail>);
-my %ShipmentDryIceDetail_of :ATTR(:get<ShipmentDryIceDetail>);
-my %HomeDeliveryPremiumDetail_of :ATTR(:get<HomeDeliveryPremiumDetail>);
-my %FlatbedTrailerDetail_of :ATTR(:get<FlatbedTrailerDetail>);
-my %FreightGuaranteeDetail_of :ATTR(:get<FreightGuaranteeDetail>);
-my %EtdDetail_of :ATTR(:get<EtdDetail>);
-my %CustomDeliveryWindowDetail_of :ATTR(:get<CustomDeliveryWindowDetail>);
+    my %SpecialServiceTypes_of : ATTR(:get<SpecialServiceTypes>);
+    my %CodDetail_of : ATTR(:get<CodDetail>);
+    my %HoldAtLocationDetail_of : ATTR(:get<HoldAtLocationDetail>);
+    my %EMailNotificationDetail_of : ATTR(:get<EMailNotificationDetail>);
+    my %ReturnShipmentDetail_of : ATTR(:get<ReturnShipmentDetail>);
+    my %PendingShipmentDetail_of : ATTR(:get<PendingShipmentDetail>);
+    my %ShipmentDryIceDetail_of : ATTR(:get<ShipmentDryIceDetail>);
+    my %HomeDeliveryPremiumDetail_of : ATTR(:get<HomeDeliveryPremiumDetail>);
+    my %FlatbedTrailerDetail_of : ATTR(:get<FlatbedTrailerDetail>);
+    my %FreightGuaranteeDetail_of : ATTR(:get<FreightGuaranteeDetail>);
+    my %EtdDetail_of : ATTR(:get<EtdDetail>);
+    my %CustomDeliveryWindowDetail_of : ATTR(:get<CustomDeliveryWindowDetail>);
 
-__PACKAGE__->_factory(
-    [ qw(        SpecialServiceTypes
-        CodDetail
-        HoldAtLocationDetail
-        EMailNotificationDetail
-        ReturnShipmentDetail
-        PendingShipmentDetail
-        ShipmentDryIceDetail
-        HomeDeliveryPremiumDetail
-        FlatbedTrailerDetail
-        FreightGuaranteeDetail
-        EtdDetail
-        CustomDeliveryWindowDetail
+    __PACKAGE__->_factory(
+        [   qw(        SpecialServiceTypes
+              CodDetail
+              HoldAtLocationDetail
+              EMailNotificationDetail
+              ReturnShipmentDetail
+              PendingShipmentDetail
+              ShipmentDryIceDetail
+              HomeDeliveryPremiumDetail
+              FlatbedTrailerDetail
+              FreightGuaranteeDetail
+              EtdDetail
+              CustomDeliveryWindowDetail
 
-    ) ],
-    {
-        'SpecialServiceTypes' => \%SpecialServiceTypes_of,
-        'CodDetail' => \%CodDetail_of,
-        'HoldAtLocationDetail' => \%HoldAtLocationDetail_of,
-        'EMailNotificationDetail' => \%EMailNotificationDetail_of,
-        'ReturnShipmentDetail' => \%ReturnShipmentDetail_of,
-        'PendingShipmentDetail' => \%PendingShipmentDetail_of,
-        'ShipmentDryIceDetail' => \%ShipmentDryIceDetail_of,
-        'HomeDeliveryPremiumDetail' => \%HomeDeliveryPremiumDetail_of,
-        'FlatbedTrailerDetail' => \%FlatbedTrailerDetail_of,
-        'FreightGuaranteeDetail' => \%FreightGuaranteeDetail_of,
-        'EtdDetail' => \%EtdDetail_of,
-        'CustomDeliveryWindowDetail' => \%CustomDeliveryWindowDetail_of,
-    },
-    {
-        'SpecialServiceTypes' => 'Shipment::FedEx::WSDL::RateTypes::ShipmentSpecialServiceType',
-        'CodDetail' => 'Shipment::FedEx::WSDL::RateTypes::CodDetail',
-        'HoldAtLocationDetail' => 'Shipment::FedEx::WSDL::RateTypes::HoldAtLocationDetail',
-        'EMailNotificationDetail' => 'Shipment::FedEx::WSDL::RateTypes::EMailNotificationDetail',
-        'ReturnShipmentDetail' => 'Shipment::FedEx::WSDL::RateTypes::ReturnShipmentDetail',
-        'PendingShipmentDetail' => 'Shipment::FedEx::WSDL::RateTypes::PendingShipmentDetail',
-        'ShipmentDryIceDetail' => 'Shipment::FedEx::WSDL::RateTypes::ShipmentDryIceDetail',
-        'HomeDeliveryPremiumDetail' => 'Shipment::FedEx::WSDL::RateTypes::HomeDeliveryPremiumDetail',
-        'FlatbedTrailerDetail' => 'Shipment::FedEx::WSDL::RateTypes::FlatbedTrailerDetail',
-        'FreightGuaranteeDetail' => 'Shipment::FedEx::WSDL::RateTypes::FreightGuaranteeDetail',
-        'EtdDetail' => 'Shipment::FedEx::WSDL::RateTypes::EtdDetail',
-        'CustomDeliveryWindowDetail' => 'Shipment::FedEx::WSDL::RateTypes::CustomDeliveryWindowDetail',
-    },
-    {
+            )
+        ],
+        {   'SpecialServiceTypes'        => \%SpecialServiceTypes_of,
+            'CodDetail'                  => \%CodDetail_of,
+            'HoldAtLocationDetail'       => \%HoldAtLocationDetail_of,
+            'EMailNotificationDetail'    => \%EMailNotificationDetail_of,
+            'ReturnShipmentDetail'       => \%ReturnShipmentDetail_of,
+            'PendingShipmentDetail'      => \%PendingShipmentDetail_of,
+            'ShipmentDryIceDetail'       => \%ShipmentDryIceDetail_of,
+            'HomeDeliveryPremiumDetail'  => \%HomeDeliveryPremiumDetail_of,
+            'FlatbedTrailerDetail'       => \%FlatbedTrailerDetail_of,
+            'FreightGuaranteeDetail'     => \%FreightGuaranteeDetail_of,
+            'EtdDetail'                  => \%EtdDetail_of,
+            'CustomDeliveryWindowDetail' => \%CustomDeliveryWindowDetail_of,
+        },
+        {   'SpecialServiceTypes' =>
+              'Shipment::FedEx::WSDL::RateTypes::ShipmentSpecialServiceType',
+            'CodDetail' => 'Shipment::FedEx::WSDL::RateTypes::CodDetail',
+            'HoldAtLocationDetail' =>
+              'Shipment::FedEx::WSDL::RateTypes::HoldAtLocationDetail',
+            'EMailNotificationDetail' =>
+              'Shipment::FedEx::WSDL::RateTypes::EMailNotificationDetail',
+            'ReturnShipmentDetail' =>
+              'Shipment::FedEx::WSDL::RateTypes::ReturnShipmentDetail',
+            'PendingShipmentDetail' =>
+              'Shipment::FedEx::WSDL::RateTypes::PendingShipmentDetail',
+            'ShipmentDryIceDetail' =>
+              'Shipment::FedEx::WSDL::RateTypes::ShipmentDryIceDetail',
+            'HomeDeliveryPremiumDetail' =>
+              'Shipment::FedEx::WSDL::RateTypes::HomeDeliveryPremiumDetail',
+            'FlatbedTrailerDetail' =>
+              'Shipment::FedEx::WSDL::RateTypes::FlatbedTrailerDetail',
+            'FreightGuaranteeDetail' =>
+              'Shipment::FedEx::WSDL::RateTypes::FreightGuaranteeDetail',
+            'EtdDetail' => 'Shipment::FedEx::WSDL::RateTypes::EtdDetail',
+            'CustomDeliveryWindowDetail' =>
+              'Shipment::FedEx::WSDL::RateTypes::CustomDeliveryWindowDetail',
+        },
+        {
 
-        'SpecialServiceTypes' => 'SpecialServiceTypes',
-        'CodDetail' => 'CodDetail',
-        'HoldAtLocationDetail' => 'HoldAtLocationDetail',
-        'EMailNotificationDetail' => 'EMailNotificationDetail',
-        'ReturnShipmentDetail' => 'ReturnShipmentDetail',
-        'PendingShipmentDetail' => 'PendingShipmentDetail',
-        'ShipmentDryIceDetail' => 'ShipmentDryIceDetail',
-        'HomeDeliveryPremiumDetail' => 'HomeDeliveryPremiumDetail',
-        'FlatbedTrailerDetail' => 'FlatbedTrailerDetail',
-        'FreightGuaranteeDetail' => 'FreightGuaranteeDetail',
-        'EtdDetail' => 'EtdDetail',
-        'CustomDeliveryWindowDetail' => 'CustomDeliveryWindowDetail',
-    }
-);
+            'SpecialServiceTypes'        => 'SpecialServiceTypes',
+            'CodDetail'                  => 'CodDetail',
+            'HoldAtLocationDetail'       => 'HoldAtLocationDetail',
+            'EMailNotificationDetail'    => 'EMailNotificationDetail',
+            'ReturnShipmentDetail'       => 'ReturnShipmentDetail',
+            'PendingShipmentDetail'      => 'PendingShipmentDetail',
+            'ShipmentDryIceDetail'       => 'ShipmentDryIceDetail',
+            'HomeDeliveryPremiumDetail'  => 'HomeDeliveryPremiumDetail',
+            'FlatbedTrailerDetail'       => 'FlatbedTrailerDetail',
+            'FreightGuaranteeDetail'     => 'FreightGuaranteeDetail',
+            'EtdDetail'                  => 'EtdDetail',
+            'CustomDeliveryWindowDetail' => 'CustomDeliveryWindowDetail',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -117,7 +121,7 @@ Shipment::FedEx::WSDL::RateTypes::ShipmentSpecialServicesRequested
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

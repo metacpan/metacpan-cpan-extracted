@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::CodeType;
-$Shipment::UPS::WSDL::ShipTypes::CodeType::VERSION = '3.07';
+$Shipment::UPS::WSDL::ShipTypes::CodeType::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Error/v1.1' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Error/v1.1'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,42 +20,36 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Code_of :ATTR(:get<Code>);
-my %Description_of :ATTR(:get<Description>);
-my %Digest_of :ATTR(:get<Digest>);
+    my %Code_of : ATTR(:get<Code>);
+    my %Description_of : ATTR(:get<Description>);
+    my %Digest_of : ATTR(:get<Digest>);
 
-__PACKAGE__->_factory(
-    [ qw(        Code
-        Description
-        Digest
+    __PACKAGE__->_factory(
+        [   qw(        Code
+              Description
+              Digest
 
-    ) ],
-    {
-        'Code' => \%Code_of,
-        'Description' => \%Description_of,
-        'Digest' => \%Digest_of,
-    },
-    {
-        'Code' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Digest' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'Code'        => \%Code_of,
+            'Description' => \%Description_of,
+            'Digest'      => \%Digest_of,
+        },
+        {   'Code'        => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Digest'      => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'Code' => 'Code',
-        'Description' => 'Description',
-        'Digest' => 'Digest',
-    }
-);
+            'Code'        => 'Code',
+            'Description' => 'Description',
+            'Digest'      => 'Digest',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -72,7 +66,7 @@ Shipment::UPS::WSDL::ShipTypes::CodeType
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

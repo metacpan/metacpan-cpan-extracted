@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackRequest;
-$Shipment::FedEx::WSDL::TrackTypes::TrackRequest::VERSION = '3.07';
+$Shipment::FedEx::WSDL::TrackTypes::TrackRequest::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/track/v9' };
+sub get_xmlns {'http://fedex.com/ws/track/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,62 +20,65 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %WebAuthenticationDetail_of :ATTR(:get<WebAuthenticationDetail>);
-my %ClientDetail_of :ATTR(:get<ClientDetail>);
-my %TransactionDetail_of :ATTR(:get<TransactionDetail>);
-my %Version_of :ATTR(:get<Version>);
-my %SelectionDetails_of :ATTR(:get<SelectionDetails>);
-my %TransactionTimeOutValueInMilliseconds_of :ATTR(:get<TransactionTimeOutValueInMilliseconds>);
-my %ProcessingOptions_of :ATTR(:get<ProcessingOptions>);
+    my %WebAuthenticationDetail_of : ATTR(:get<WebAuthenticationDetail>);
+    my %ClientDetail_of : ATTR(:get<ClientDetail>);
+    my %TransactionDetail_of : ATTR(:get<TransactionDetail>);
+    my %Version_of : ATTR(:get<Version>);
+    my %SelectionDetails_of : ATTR(:get<SelectionDetails>);
+    my %TransactionTimeOutValueInMilliseconds_of :
+      ATTR(:get<TransactionTimeOutValueInMilliseconds>);
+    my %ProcessingOptions_of : ATTR(:get<ProcessingOptions>);
 
-__PACKAGE__->_factory(
-    [ qw(        WebAuthenticationDetail
-        ClientDetail
-        TransactionDetail
-        Version
-        SelectionDetails
-        TransactionTimeOutValueInMilliseconds
-        ProcessingOptions
+    __PACKAGE__->_factory(
+        [   qw(        WebAuthenticationDetail
+              ClientDetail
+              TransactionDetail
+              Version
+              SelectionDetails
+              TransactionTimeOutValueInMilliseconds
+              ProcessingOptions
 
-    ) ],
-    {
-        'WebAuthenticationDetail' => \%WebAuthenticationDetail_of,
-        'ClientDetail' => \%ClientDetail_of,
-        'TransactionDetail' => \%TransactionDetail_of,
-        'Version' => \%Version_of,
-        'SelectionDetails' => \%SelectionDetails_of,
-        'TransactionTimeOutValueInMilliseconds' => \%TransactionTimeOutValueInMilliseconds_of,
-        'ProcessingOptions' => \%ProcessingOptions_of,
-    },
-    {
-        'WebAuthenticationDetail' => 'Shipment::FedEx::WSDL::TrackTypes::WebAuthenticationDetail',
-        'ClientDetail' => 'Shipment::FedEx::WSDL::TrackTypes::ClientDetail',
-        'TransactionDetail' => 'Shipment::FedEx::WSDL::TrackTypes::TransactionDetail',
-        'Version' => 'Shipment::FedEx::WSDL::TrackTypes::VersionId',
-        'SelectionDetails' => 'Shipment::FedEx::WSDL::TrackTypes::TrackSelectionDetail',
-        'TransactionTimeOutValueInMilliseconds' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-        'ProcessingOptions' => 'Shipment::FedEx::WSDL::TrackTypes::TrackRequestProcessingOptionType',
-    },
-    {
+            )
+        ],
+        {   'WebAuthenticationDetail' => \%WebAuthenticationDetail_of,
+            'ClientDetail'            => \%ClientDetail_of,
+            'TransactionDetail'       => \%TransactionDetail_of,
+            'Version'                 => \%Version_of,
+            'SelectionDetails'        => \%SelectionDetails_of,
+            'TransactionTimeOutValueInMilliseconds' =>
+              \%TransactionTimeOutValueInMilliseconds_of,
+            'ProcessingOptions' => \%ProcessingOptions_of,
+        },
+        {   'WebAuthenticationDetail' =>
+              'Shipment::FedEx::WSDL::TrackTypes::WebAuthenticationDetail',
+            'ClientDetail' =>
+              'Shipment::FedEx::WSDL::TrackTypes::ClientDetail',
+            'TransactionDetail' =>
+              'Shipment::FedEx::WSDL::TrackTypes::TransactionDetail',
+            'Version' => 'Shipment::FedEx::WSDL::TrackTypes::VersionId',
+            'SelectionDetails' =>
+              'Shipment::FedEx::WSDL::TrackTypes::TrackSelectionDetail',
+            'TransactionTimeOutValueInMilliseconds' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+            'ProcessingOptions' =>
+              'Shipment::FedEx::WSDL::TrackTypes::TrackRequestProcessingOptionType',
+        },
+        {
 
-        'WebAuthenticationDetail' => 'WebAuthenticationDetail',
-        'ClientDetail' => 'ClientDetail',
-        'TransactionDetail' => 'TransactionDetail',
-        'Version' => 'Version',
-        'SelectionDetails' => 'SelectionDetails',
-        'TransactionTimeOutValueInMilliseconds' => 'TransactionTimeOutValueInMilliseconds',
-        'ProcessingOptions' => 'ProcessingOptions',
-    }
-);
+            'WebAuthenticationDetail' => 'WebAuthenticationDetail',
+            'ClientDetail'            => 'ClientDetail',
+            'TransactionDetail'       => 'TransactionDetail',
+            'Version'                 => 'Version',
+            'SelectionDetails'        => 'SelectionDetails',
+            'TransactionTimeOutValueInMilliseconds' =>
+              'TransactionTimeOutValueInMilliseconds',
+            'ProcessingOptions' => 'ProcessingOptions',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -92,7 +95,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackRequest
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

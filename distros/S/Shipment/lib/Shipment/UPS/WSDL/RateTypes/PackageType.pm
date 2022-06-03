@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::RateTypes::PackageType;
-$Shipment::UPS::WSDL::RateTypes::PackageType::VERSION = '3.07';
+$Shipment::UPS::WSDL::RateTypes::PackageType::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,62 +20,62 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %PackagingType_of :ATTR(:get<PackagingType>);
-my %Dimensions_of :ATTR(:get<Dimensions>);
-my %PackageWeight_of :ATTR(:get<PackageWeight>);
-my %Commodity_of :ATTR(:get<Commodity>);
-my %LargePackageIndicator_of :ATTR(:get<LargePackageIndicator>);
-my %PackageServiceOptions_of :ATTR(:get<PackageServiceOptions>);
-my %AdditionalHandlingIndicator_of :ATTR(:get<AdditionalHandlingIndicator>);
+    my %PackagingType_of : ATTR(:get<PackagingType>);
+    my %Dimensions_of : ATTR(:get<Dimensions>);
+    my %PackageWeight_of : ATTR(:get<PackageWeight>);
+    my %Commodity_of : ATTR(:get<Commodity>);
+    my %LargePackageIndicator_of : ATTR(:get<LargePackageIndicator>);
+    my %PackageServiceOptions_of : ATTR(:get<PackageServiceOptions>);
+    my %AdditionalHandlingIndicator_of :
+      ATTR(:get<AdditionalHandlingIndicator>);
 
-__PACKAGE__->_factory(
-    [ qw(        PackagingType
-        Dimensions
-        PackageWeight
-        Commodity
-        LargePackageIndicator
-        PackageServiceOptions
-        AdditionalHandlingIndicator
+    __PACKAGE__->_factory(
+        [   qw(        PackagingType
+              Dimensions
+              PackageWeight
+              Commodity
+              LargePackageIndicator
+              PackageServiceOptions
+              AdditionalHandlingIndicator
 
-    ) ],
-    {
-        'PackagingType' => \%PackagingType_of,
-        'Dimensions' => \%Dimensions_of,
-        'PackageWeight' => \%PackageWeight_of,
-        'Commodity' => \%Commodity_of,
-        'LargePackageIndicator' => \%LargePackageIndicator_of,
-        'PackageServiceOptions' => \%PackageServiceOptions_of,
-        'AdditionalHandlingIndicator' => \%AdditionalHandlingIndicator_of,
-    },
-    {
-        'PackagingType' => 'Shipment::UPS::WSDL::RateTypes::CodeDescriptionType',
-        'Dimensions' => 'Shipment::UPS::WSDL::RateTypes::DimensionsType',
-        'PackageWeight' => 'Shipment::UPS::WSDL::RateTypes::PackageWeightType',
-        'Commodity' => 'Shipment::UPS::WSDL::RateTypes::CommodityType',
-        'LargePackageIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'PackageServiceOptions' => 'Shipment::UPS::WSDL::RateTypes::PackageServiceOptionsType',
-        'AdditionalHandlingIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'PackagingType'               => \%PackagingType_of,
+            'Dimensions'                  => \%Dimensions_of,
+            'PackageWeight'               => \%PackageWeight_of,
+            'Commodity'                   => \%Commodity_of,
+            'LargePackageIndicator'       => \%LargePackageIndicator_of,
+            'PackageServiceOptions'       => \%PackageServiceOptions_of,
+            'AdditionalHandlingIndicator' => \%AdditionalHandlingIndicator_of,
+        },
+        {   'PackagingType' =>
+              'Shipment::UPS::WSDL::RateTypes::CodeDescriptionType',
+            'Dimensions' => 'Shipment::UPS::WSDL::RateTypes::DimensionsType',
+            'PackageWeight' =>
+              'Shipment::UPS::WSDL::RateTypes::PackageWeightType',
+            'Commodity' => 'Shipment::UPS::WSDL::RateTypes::CommodityType',
+            'LargePackageIndicator' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'PackageServiceOptions' =>
+              'Shipment::UPS::WSDL::RateTypes::PackageServiceOptionsType',
+            'AdditionalHandlingIndicator' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'PackagingType' => 'PackagingType',
-        'Dimensions' => 'Dimensions',
-        'PackageWeight' => 'PackageWeight',
-        'Commodity' => 'Commodity',
-        'LargePackageIndicator' => 'LargePackageIndicator',
-        'PackageServiceOptions' => 'PackageServiceOptions',
-        'AdditionalHandlingIndicator' => 'AdditionalHandlingIndicator',
-    }
-);
+            'PackagingType'               => 'PackagingType',
+            'Dimensions'                  => 'Dimensions',
+            'PackageWeight'               => 'PackageWeight',
+            'Commodity'                   => 'Commodity',
+            'LargePackageIndicator'       => 'LargePackageIndicator',
+            'PackageServiceOptions'       => 'PackageServiceOptions',
+            'AdditionalHandlingIndicator' => 'AdditionalHandlingIndicator',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -92,7 +92,7 @@ Shipment::UPS::WSDL::RateTypes::PackageType
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

@@ -491,23 +491,12 @@ different syntax).
 
 Previous attempts to do this same sort of thing:
 
-`HTML::LoL (last updated 2002)`
-`HTML::FromArrayref (last updated 2013)`
-`XML::FromArrayref (last updated 2013)`
+- `HTML::LoL (last updated 2002)`
+=item \* `HTML::FromArrayref (last updated 2013)`
+=item \* `XML::FromArrayref (last updated 2013)`
 
-How this is used in Dancer:
-
-`Dancer2::Template::Obj2HTML`
+How this is used in Dancer: `Dancer2::Template::Obj2HTML`
 
 And a different way of routing based on the presence of files, which are
-processed as `HTML::Obj2HTML` objects if they return an arrayref.
-
+processed as `HTML::Obj2HTML` objects if they return an arrayref:
 `Dancer2::Plugin::DoFile`
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 527:
-
-    '=end' without a target?

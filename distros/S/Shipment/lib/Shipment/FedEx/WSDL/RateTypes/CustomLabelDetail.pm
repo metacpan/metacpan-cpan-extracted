@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::CustomLabelDetail;
-$Shipment::FedEx::WSDL::RateTypes::CustomLabelDetail::VERSION = '3.07';
+$Shipment::FedEx::WSDL::RateTypes::CustomLabelDetail::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
+sub get_xmlns {'http://fedex.com/ws/rate/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,52 +20,51 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %CoordinateUnits_of :ATTR(:get<CoordinateUnits>);
-my %TextEntries_of :ATTR(:get<TextEntries>);
-my %GraphicEntries_of :ATTR(:get<GraphicEntries>);
-my %BoxEntries_of :ATTR(:get<BoxEntries>);
-my %BarcodeEntries_of :ATTR(:get<BarcodeEntries>);
+    my %CoordinateUnits_of : ATTR(:get<CoordinateUnits>);
+    my %TextEntries_of : ATTR(:get<TextEntries>);
+    my %GraphicEntries_of : ATTR(:get<GraphicEntries>);
+    my %BoxEntries_of : ATTR(:get<BoxEntries>);
+    my %BarcodeEntries_of : ATTR(:get<BarcodeEntries>);
 
-__PACKAGE__->_factory(
-    [ qw(        CoordinateUnits
-        TextEntries
-        GraphicEntries
-        BoxEntries
-        BarcodeEntries
+    __PACKAGE__->_factory(
+        [   qw(        CoordinateUnits
+              TextEntries
+              GraphicEntries
+              BoxEntries
+              BarcodeEntries
 
-    ) ],
-    {
-        'CoordinateUnits' => \%CoordinateUnits_of,
-        'TextEntries' => \%TextEntries_of,
-        'GraphicEntries' => \%GraphicEntries_of,
-        'BoxEntries' => \%BoxEntries_of,
-        'BarcodeEntries' => \%BarcodeEntries_of,
-    },
-    {
-        'CoordinateUnits' => 'Shipment::FedEx::WSDL::RateTypes::CustomLabelCoordinateUnits',
-        'TextEntries' => 'Shipment::FedEx::WSDL::RateTypes::CustomLabelTextEntry',
-        'GraphicEntries' => 'Shipment::FedEx::WSDL::RateTypes::CustomLabelGraphicEntry',
-        'BoxEntries' => 'Shipment::FedEx::WSDL::RateTypes::CustomLabelBoxEntry',
-        'BarcodeEntries' => 'Shipment::FedEx::WSDL::RateTypes::CustomLabelBarcodeEntry',
-    },
-    {
+            )
+        ],
+        {   'CoordinateUnits' => \%CoordinateUnits_of,
+            'TextEntries'     => \%TextEntries_of,
+            'GraphicEntries'  => \%GraphicEntries_of,
+            'BoxEntries'      => \%BoxEntries_of,
+            'BarcodeEntries'  => \%BarcodeEntries_of,
+        },
+        {   'CoordinateUnits' =>
+              'Shipment::FedEx::WSDL::RateTypes::CustomLabelCoordinateUnits',
+            'TextEntries' =>
+              'Shipment::FedEx::WSDL::RateTypes::CustomLabelTextEntry',
+            'GraphicEntries' =>
+              'Shipment::FedEx::WSDL::RateTypes::CustomLabelGraphicEntry',
+            'BoxEntries' =>
+              'Shipment::FedEx::WSDL::RateTypes::CustomLabelBoxEntry',
+            'BarcodeEntries' =>
+              'Shipment::FedEx::WSDL::RateTypes::CustomLabelBarcodeEntry',
+        },
+        {
 
-        'CoordinateUnits' => 'CoordinateUnits',
-        'TextEntries' => 'TextEntries',
-        'GraphicEntries' => 'GraphicEntries',
-        'BoxEntries' => 'BoxEntries',
-        'BarcodeEntries' => 'BarcodeEntries',
-    }
-);
+            'CoordinateUnits' => 'CoordinateUnits',
+            'TextEntries'     => 'TextEntries',
+            'GraphicEntries'  => 'GraphicEntries',
+            'BoxEntries'      => 'BoxEntries',
+            'BarcodeEntries'  => 'BarcodeEntries',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -82,7 +81,7 @@ Shipment::FedEx::WSDL::RateTypes::CustomLabelDetail
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,6 @@
 package HTML::Obj2HTML;
 
-$HTML::Obj2HTML::VERSION = '0.1';
+$HTML::Obj2HTML::VERSION = '0.11';
 
 use strict;
 use warnings;
@@ -1358,17 +1358,16 @@ different syntax).
 
 Previous attempts to do this same sort of thing:
 
-C<HTML::LoL (last updated 2002)>
-C<HTML::FromArrayref (last updated 2013)>
-C<XML::FromArrayref (last updated 2013)>
+=over 4
 
-How this is used in Dancer:
+=item * C<HTML::LoL (last updated 2002)>
+=item * C<HTML::FromArrayref (last updated 2013)>
+=item * C<XML::FromArrayref (last updated 2013)>
 
-C<Dancer2::Template::Obj2HTML>
+=back
+
+How this is used in Dancer: C<Dancer2::Template::Obj2HTML>
 
 And a different way of routing based on the presence of files, which are
-processed as C<HTML::Obj2HTML> objects if they return an arrayref.
-
+processed as C<HTML::Obj2HTML> objects if they return an arrayref:
 C<Dancer2::Plugin::DoFile>
-
-=end

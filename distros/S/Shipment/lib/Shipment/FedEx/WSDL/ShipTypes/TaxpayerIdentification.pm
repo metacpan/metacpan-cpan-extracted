@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::TaxpayerIdentification;
-$Shipment::FedEx::WSDL::ShipTypes::TaxpayerIdentification::VERSION = '3.07';
+$Shipment::FedEx::WSDL::ShipTypes::TaxpayerIdentification::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,42 +20,36 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %TinType_of :ATTR(:get<TinType>);
-my %Number_of :ATTR(:get<Number>);
-my %Usage_of :ATTR(:get<Usage>);
+    my %TinType_of : ATTR(:get<TinType>);
+    my %Number_of : ATTR(:get<Number>);
+    my %Usage_of : ATTR(:get<Usage>);
 
-__PACKAGE__->_factory(
-    [ qw(        TinType
-        Number
-        Usage
+    __PACKAGE__->_factory(
+        [   qw(        TinType
+              Number
+              Usage
 
-    ) ],
-    {
-        'TinType' => \%TinType_of,
-        'Number' => \%Number_of,
-        'Usage' => \%Usage_of,
-    },
-    {
-        'TinType' => 'Shipment::FedEx::WSDL::ShipTypes::TinType',
-        'Number' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Usage' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'TinType' => \%TinType_of,
+            'Number'  => \%Number_of,
+            'Usage'   => \%Usage_of,
+        },
+        {   'TinType' => 'Shipment::FedEx::WSDL::ShipTypes::TinType',
+            'Number'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Usage'   => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'TinType' => 'TinType',
-        'Number' => 'Number',
-        'Usage' => 'Usage',
-    }
-);
+            'TinType' => 'TinType',
+            'Number'  => 'Number',
+            'Usage'   => 'Usage',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -72,7 +66,7 @@ Shipment::FedEx::WSDL::ShipTypes::TaxpayerIdentification
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

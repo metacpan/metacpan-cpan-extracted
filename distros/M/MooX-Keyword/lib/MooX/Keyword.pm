@@ -1,5 +1,5 @@
 package MooX::Keyword;
-use 5.006; use strict; use warnings; our $VERSION = '0.03'; 
+use 5.006; use strict; use warnings; our $VERSION = '0.04'; 
 use MooX::ReturnModifiers; use Anonymous::Object;
 
 sub import {
@@ -10,8 +10,11 @@ sub import {
 	}); # *\o/*
 	
 	if ($import{extends}) {
-		$moo->extends($import{extends});
-		%import = $import{extends}->keyword_meta;		
+		for my $extend ( ref $import{extends} ? @{ $import{extends} } : $import{extends} ) {
+			$extend =~ s/^\+/MooX::Keyword::/;
+			$moo->extends($import{extends});
+			%import = (%import, $import{extends}->keyword_meta);	
+		}
 		delete $import{extends};
 	}
 
@@ -45,7 +48,7 @@ MooX::Keyword - The great new MooX::Keyword!
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 

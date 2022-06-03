@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::LinearMeasure;
-$Shipment::FedEx::WSDL::RateTypes::LinearMeasure::VERSION = '3.07';
+$Shipment::FedEx::WSDL::RateTypes::LinearMeasure::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
+sub get_xmlns {'http://fedex.com/ws/rate/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,31 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Value_of :ATTR(:get<Value>);
-my %Units_of :ATTR(:get<Units>);
+    my %Value_of : ATTR(:get<Value>);
+    my %Units_of : ATTR(:get<Units>);
 
-__PACKAGE__->_factory(
-    [ qw(        Value
-        Units
+    __PACKAGE__->_factory(
+        [   qw(        Value
+              Units
 
-    ) ],
-    {
-        'Value' => \%Value_of,
-        'Units' => \%Units_of,
-    },
-    {
-        'Value' => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
-        'Units' => 'Shipment::FedEx::WSDL::RateTypes::LinearUnits',
-    },
-    {
+            )
+        ],
+        {   'Value' => \%Value_of,
+            'Units' => \%Units_of,
+        },
+        {   'Value' => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
+            'Units' => 'Shipment::FedEx::WSDL::RateTypes::LinearUnits',
+        },
+        {
 
-        'Value' => 'Value',
-        'Units' => 'Units',
-    }
-);
+            'Value' => 'Value',
+            'Units' => 'Units',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +61,7 @@ Shipment::FedEx::WSDL::RateTypes::LinearMeasure
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDLV2::Types::ValidateShipmentResponseContainer;
-$Shipment::Purolator::WSDLV2::Types::ValidateShipmentResponseContainer::VERSION = '3.07';
+$Shipment::Purolator::WSDLV2::Types::ValidateShipmentResponseContainer::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' };
+sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -17,43 +17,39 @@ sub __get_attr_class {
 
 
 use base qw(Shipment::Purolator::WSDLV2::Types::ResponseContainer);
+
 # Variety: sequence
 use Class::Std::Fast::Storable constructor => 'none';
 use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %ResponseInformation_of :ATTR(:get<ResponseInformation>);
-my %ValidShipment_of :ATTR(:get<ValidShipment>);
+    my %ResponseInformation_of : ATTR(:get<ResponseInformation>);
+    my %ValidShipment_of : ATTR(:get<ValidShipment>);
 
-__PACKAGE__->_factory(
-    [ qw(        ResponseInformation
-        ValidShipment
+    __PACKAGE__->_factory(
+        [   qw(        ResponseInformation
+              ValidShipment
 
-    ) ],
-    {
-        'ResponseInformation' => \%ResponseInformation_of,
-        'ValidShipment' => \%ValidShipment_of,
-    },
-    {
-        'ResponseInformation' => 'Shipment::Purolator::WSDLV2::Types::ResponseInformation',
-        'ValidShipment' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-    },
-    {
+            )
+        ],
+        {   'ResponseInformation' => \%ResponseInformation_of,
+            'ValidShipment'       => \%ValidShipment_of,
+        },
+        {   'ResponseInformation' =>
+              'Shipment::Purolator::WSDLV2::Types::ResponseInformation',
+            'ValidShipment' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+        },
+        {
 
-        'ResponseInformation' => 'ResponseInformation',
-        'ValidShipment' => 'ValidShipment',
-    }
-);
+            'ResponseInformation' => 'ResponseInformation',
+            'ValidShipment'       => 'ValidShipment',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -70,7 +66,7 @@ Shipment::Purolator::WSDLV2::Types::ValidateShipmentResponseContainer
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

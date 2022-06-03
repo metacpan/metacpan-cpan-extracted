@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::PickupDetail;
-$Shipment::FedEx::WSDL::ShipTypes::PickupDetail::VERSION = '3.07';
+$Shipment::FedEx::WSDL::ShipTypes::PickupDetail::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,52 +20,50 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %ReadyDateTime_of :ATTR(:get<ReadyDateTime>);
-my %LatestPickupDateTime_of :ATTR(:get<LatestPickupDateTime>);
-my %CourierInstructions_of :ATTR(:get<CourierInstructions>);
-my %RequestType_of :ATTR(:get<RequestType>);
-my %RequestSource_of :ATTR(:get<RequestSource>);
+    my %ReadyDateTime_of : ATTR(:get<ReadyDateTime>);
+    my %LatestPickupDateTime_of : ATTR(:get<LatestPickupDateTime>);
+    my %CourierInstructions_of : ATTR(:get<CourierInstructions>);
+    my %RequestType_of : ATTR(:get<RequestType>);
+    my %RequestSource_of : ATTR(:get<RequestSource>);
 
-__PACKAGE__->_factory(
-    [ qw(        ReadyDateTime
-        LatestPickupDateTime
-        CourierInstructions
-        RequestType
-        RequestSource
+    __PACKAGE__->_factory(
+        [   qw(        ReadyDateTime
+              LatestPickupDateTime
+              CourierInstructions
+              RequestType
+              RequestSource
 
-    ) ],
-    {
-        'ReadyDateTime' => \%ReadyDateTime_of,
-        'LatestPickupDateTime' => \%LatestPickupDateTime_of,
-        'CourierInstructions' => \%CourierInstructions_of,
-        'RequestType' => \%RequestType_of,
-        'RequestSource' => \%RequestSource_of,
-    },
-    {
-        'ReadyDateTime' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
-        'LatestPickupDateTime' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
-        'CourierInstructions' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'RequestType' => 'Shipment::FedEx::WSDL::ShipTypes::PickupRequestType',
-        'RequestSource' => 'Shipment::FedEx::WSDL::ShipTypes::PickupRequestSourceType',
-    },
-    {
+            )
+        ],
+        {   'ReadyDateTime'        => \%ReadyDateTime_of,
+            'LatestPickupDateTime' => \%LatestPickupDateTime_of,
+            'CourierInstructions'  => \%CourierInstructions_of,
+            'RequestType'          => \%RequestType_of,
+            'RequestSource'        => \%RequestSource_of,
+        },
+        {   'ReadyDateTime' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
+            'LatestPickupDateTime' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
+            'CourierInstructions' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'RequestType' =>
+              'Shipment::FedEx::WSDL::ShipTypes::PickupRequestType',
+            'RequestSource' =>
+              'Shipment::FedEx::WSDL::ShipTypes::PickupRequestSourceType',
+        },
+        {
 
-        'ReadyDateTime' => 'ReadyDateTime',
-        'LatestPickupDateTime' => 'LatestPickupDateTime',
-        'CourierInstructions' => 'CourierInstructions',
-        'RequestType' => 'RequestType',
-        'RequestSource' => 'RequestSource',
-    }
-);
+            'ReadyDateTime'        => 'ReadyDateTime',
+            'LatestPickupDateTime' => 'LatestPickupDateTime',
+            'CourierInstructions'  => 'CourierInstructions',
+            'RequestType'          => 'RequestType',
+            'RequestSource'        => 'RequestSource',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -82,7 +80,7 @@ Shipment::FedEx::WSDL::ShipTypes::PickupDetail
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

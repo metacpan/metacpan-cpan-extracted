@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::CloseTypes::WebAuthenticationDetail;
-$Shipment::FedEx::WSDL::CloseTypes::WebAuthenticationDetail::VERSION = '3.07';
+$Shipment::FedEx::WSDL::CloseTypes::WebAuthenticationDetail::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/close/v2' };
+sub get_xmlns {'http://fedex.com/ws/close/v2'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,26 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %UserCredential_of :ATTR(:get<UserCredential>);
+    my %UserCredential_of : ATTR(:get<UserCredential>);
 
-__PACKAGE__->_factory(
-    [ qw(        UserCredential
+    __PACKAGE__->_factory(
+        [   qw(        UserCredential
 
-    ) ],
-    {
-        'UserCredential' => \%UserCredential_of,
-    },
-    {
-        'UserCredential' => 'Shipment::FedEx::WSDL::CloseTypes::WebAuthenticationCredential',
-    },
-    {
+            )
+        ],
+        {'UserCredential' => \%UserCredential_of,},
+        {   'UserCredential' =>
+              'Shipment::FedEx::WSDL::CloseTypes::WebAuthenticationCredential',
+        },
+        {
 
-        'UserCredential' => 'UserCredential',
-    }
-);
+            'UserCredential' => 'UserCredential',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -62,7 +56,7 @@ Shipment::FedEx::WSDL::CloseTypes::WebAuthenticationDetail
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

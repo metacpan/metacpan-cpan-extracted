@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::ContactInfoType;
-$Shipment::UPS::WSDL::ShipTypes::ContactInfoType::VERSION = '3.07';
+$Shipment::UPS::WSDL::ShipTypes::ContactInfoType::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,31 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Name_of :ATTR(:get<Name>);
-my %Phone_of :ATTR(:get<Phone>);
+    my %Name_of : ATTR(:get<Name>);
+    my %Phone_of : ATTR(:get<Phone>);
 
-__PACKAGE__->_factory(
-    [ qw(        Name
-        Phone
+    __PACKAGE__->_factory(
+        [   qw(        Name
+              Phone
 
-    ) ],
-    {
-        'Name' => \%Name_of,
-        'Phone' => \%Phone_of,
-    },
-    {
-        'Name' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Phone' => 'Shipment::UPS::WSDL::ShipTypes::ShipPhoneType',
-    },
-    {
+            )
+        ],
+        {   'Name'  => \%Name_of,
+            'Phone' => \%Phone_of,
+        },
+        {   'Name'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Phone' => 'Shipment::UPS::WSDL::ShipTypes::ShipPhoneType',
+        },
+        {
 
-        'Name' => 'Name',
-        'Phone' => 'Phone',
-    }
-);
+            'Name'  => 'Name',
+            'Phone' => 'Phone',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +61,7 @@ Shipment::UPS::WSDL::ShipTypes::ContactInfoType
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

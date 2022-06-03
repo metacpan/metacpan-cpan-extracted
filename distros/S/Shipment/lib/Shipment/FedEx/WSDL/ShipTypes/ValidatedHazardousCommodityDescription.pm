@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::ValidatedHazardousCommodityDescription;
-$Shipment::FedEx::WSDL::ShipTypes::ValidatedHazardousCommodityDescription::VERSION = '3.07';
+$Shipment::FedEx::WSDL::ShipTypes::ValidatedHazardousCommodityDescription::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,72 +20,72 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Id_of :ATTR(:get<Id>);
-my %PackingGroup_of :ATTR(:get<PackingGroup>);
-my %ProperShippingName_of :ATTR(:get<ProperShippingName>);
-my %ProperShippingNameAndDescription_of :ATTR(:get<ProperShippingNameAndDescription>);
-my %TechnicalName_of :ATTR(:get<TechnicalName>);
-my %HazardClass_of :ATTR(:get<HazardClass>);
-my %SubsidiaryClasses_of :ATTR(:get<SubsidiaryClasses>);
-my %Symbols_of :ATTR(:get<Symbols>);
-my %LabelText_of :ATTR(:get<LabelText>);
+    my %Id_of : ATTR(:get<Id>);
+    my %PackingGroup_of : ATTR(:get<PackingGroup>);
+    my %ProperShippingName_of : ATTR(:get<ProperShippingName>);
+    my %ProperShippingNameAndDescription_of :
+      ATTR(:get<ProperShippingNameAndDescription>);
+    my %TechnicalName_of : ATTR(:get<TechnicalName>);
+    my %HazardClass_of : ATTR(:get<HazardClass>);
+    my %SubsidiaryClasses_of : ATTR(:get<SubsidiaryClasses>);
+    my %Symbols_of : ATTR(:get<Symbols>);
+    my %LabelText_of : ATTR(:get<LabelText>);
 
-__PACKAGE__->_factory(
-    [ qw(        Id
-        PackingGroup
-        ProperShippingName
-        ProperShippingNameAndDescription
-        TechnicalName
-        HazardClass
-        SubsidiaryClasses
-        Symbols
-        LabelText
+    __PACKAGE__->_factory(
+        [   qw(        Id
+              PackingGroup
+              ProperShippingName
+              ProperShippingNameAndDescription
+              TechnicalName
+              HazardClass
+              SubsidiaryClasses
+              Symbols
+              LabelText
 
-    ) ],
-    {
-        'Id' => \%Id_of,
-        'PackingGroup' => \%PackingGroup_of,
-        'ProperShippingName' => \%ProperShippingName_of,
-        'ProperShippingNameAndDescription' => \%ProperShippingNameAndDescription_of,
-        'TechnicalName' => \%TechnicalName_of,
-        'HazardClass' => \%HazardClass_of,
-        'SubsidiaryClasses' => \%SubsidiaryClasses_of,
-        'Symbols' => \%Symbols_of,
-        'LabelText' => \%LabelText_of,
-    },
-    {
-        'Id' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'PackingGroup' => 'Shipment::FedEx::WSDL::ShipTypes::HazardousCommodityPackingGroupType',
-        'ProperShippingName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'ProperShippingNameAndDescription' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'TechnicalName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'HazardClass' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'SubsidiaryClasses' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Symbols' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'LabelText' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'Id'                               => \%Id_of,
+            'PackingGroup'                     => \%PackingGroup_of,
+            'ProperShippingName'               => \%ProperShippingName_of,
+            'ProperShippingNameAndDescription' =>
+              \%ProperShippingNameAndDescription_of,
+            'TechnicalName'     => \%TechnicalName_of,
+            'HazardClass'       => \%HazardClass_of,
+            'SubsidiaryClasses' => \%SubsidiaryClasses_of,
+            'Symbols'           => \%Symbols_of,
+            'LabelText'         => \%LabelText_of,
+        },
+        {   'Id'           => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'PackingGroup' =>
+              'Shipment::FedEx::WSDL::ShipTypes::HazardousCommodityPackingGroupType',
+            'ProperShippingName' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'ProperShippingNameAndDescription' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'TechnicalName'     => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'HazardClass'       => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'SubsidiaryClasses' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Symbols'           => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'LabelText'         => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'Id' => 'Id',
-        'PackingGroup' => 'PackingGroup',
-        'ProperShippingName' => 'ProperShippingName',
-        'ProperShippingNameAndDescription' => 'ProperShippingNameAndDescription',
-        'TechnicalName' => 'TechnicalName',
-        'HazardClass' => 'HazardClass',
-        'SubsidiaryClasses' => 'SubsidiaryClasses',
-        'Symbols' => 'Symbols',
-        'LabelText' => 'LabelText',
-    }
-);
+            'Id'                               => 'Id',
+            'PackingGroup'                     => 'PackingGroup',
+            'ProperShippingName'               => 'ProperShippingName',
+            'ProperShippingNameAndDescription' =>
+              'ProperShippingNameAndDescription',
+            'TechnicalName'     => 'TechnicalName',
+            'HazardClass'       => 'HazardClass',
+            'SubsidiaryClasses' => 'SubsidiaryClasses',
+            'Symbols'           => 'Symbols',
+            'LabelText'         => 'LabelText',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -102,7 +102,7 @@ Shipment::FedEx::WSDL::ShipTypes::ValidatedHazardousCommodityDescription
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

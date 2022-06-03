@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::VariableHandlingChargeDetail;
-$Shipment::FedEx::WSDL::RateTypes::VariableHandlingChargeDetail::VERSION = '3.07';
+$Shipment::FedEx::WSDL::RateTypes::VariableHandlingChargeDetail::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
+sub get_xmlns {'http://fedex.com/ws/rate/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,42 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %VariableHandlingChargeType_of :ATTR(:get<VariableHandlingChargeType>);
-my %FixedValue_of :ATTR(:get<FixedValue>);
-my %PercentValue_of :ATTR(:get<PercentValue>);
+    my %VariableHandlingChargeType_of : ATTR(:get<VariableHandlingChargeType>);
+    my %FixedValue_of : ATTR(:get<FixedValue>);
+    my %PercentValue_of : ATTR(:get<PercentValue>);
 
-__PACKAGE__->_factory(
-    [ qw(        VariableHandlingChargeType
-        FixedValue
-        PercentValue
+    __PACKAGE__->_factory(
+        [   qw(        VariableHandlingChargeType
+              FixedValue
+              PercentValue
 
-    ) ],
-    {
-        'VariableHandlingChargeType' => \%VariableHandlingChargeType_of,
-        'FixedValue' => \%FixedValue_of,
-        'PercentValue' => \%PercentValue_of,
-    },
-    {
-        'VariableHandlingChargeType' => 'Shipment::FedEx::WSDL::RateTypes::VariableHandlingChargeType',
-        'FixedValue' => 'Shipment::FedEx::WSDL::RateTypes::Money',
-        'PercentValue' => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
-    },
-    {
+            )
+        ],
+        {   'VariableHandlingChargeType' => \%VariableHandlingChargeType_of,
+            'FixedValue'                 => \%FixedValue_of,
+            'PercentValue'               => \%PercentValue_of,
+        },
+        {   'VariableHandlingChargeType' =>
+              'Shipment::FedEx::WSDL::RateTypes::VariableHandlingChargeType',
+            'FixedValue'   => 'Shipment::FedEx::WSDL::RateTypes::Money',
+            'PercentValue' => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
+        },
+        {
 
-        'VariableHandlingChargeType' => 'VariableHandlingChargeType',
-        'FixedValue' => 'FixedValue',
-        'PercentValue' => 'PercentValue',
-    }
-);
+            'VariableHandlingChargeType' => 'VariableHandlingChargeType',
+            'FixedValue'                 => 'FixedValue',
+            'PercentValue'               => 'PercentValue',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -72,7 +67,7 @@ Shipment::FedEx::WSDL::RateTypes::VariableHandlingChargeDetail
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

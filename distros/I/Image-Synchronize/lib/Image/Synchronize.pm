@@ -29,7 +29,7 @@ Louis Strous, E<lt>imsync@quae.nl<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018-2020 by Louis Strous
+Copyright (C) 2018-2021 by Louis Strous
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.26.2 or,
@@ -73,6 +73,7 @@ use Scalar::Util qw(
   blessed
   looks_like_number
 );
+use Text::Glob qw(match_glob);
 use XML::Twig;
 use YAML::Any qw(
   Dump
@@ -83,9 +84,12 @@ use YAML::Any qw(
 # always use x.yyy version numbering, so that string comparison and
 # numeric comparison give the same ordering, to avoid trouble due to
 # different ways of interpreting version numbers.
-our $VERSION = '2.007';
+our $VERSION = '2.009';
 
 my $CASE_TOLERANT;
+my $PIRname; # for 'name' or 'iname' as appropriate for
+             # case-sensitiveness of the operating system
+my $PIRnotname;               # likewise for 'not_name' or 'not_iname'
 
 # capture and log warnings and errors, so they end up in the log file
 # as well as being printed to standard output
@@ -97,6 +101,8 @@ BEGIN {
     log_error( Carp::longmess( $_[0] ) ) unless $^S;
   };
   $CASE_TOLERANT = File::Spec->case_tolerant();
+  $PIRname = $CASE_TOLERANT? 'iname': 'name';
+  $PIRnotname = 'not_' . $PIRname;
 }
 
 my @gps_location_tags      = qw(GPSLatitude GPSLongitude GPSAltitude);
@@ -139,6 +145,8 @@ my @all_tags;
    );
   @all_tags = sort keys %tags;
 }
+
+my %all_tags = map { $_ => 1 } @all_tags;
 
 my %time_tags;
 
@@ -219,7 +227,7 @@ sub process {
   if ( not($done) or $self->option('removeourtags') ) {
     log_message("Seeking files.\n");
     @files = resolve_files( { recurse => $self->option('recurse') },
-      Path::Iterator::Rule->new->not_name('*_original')->file, @arguments );
+      Path::Iterator::Rule->new->$PIRnotname('*_original')->file, @arguments );
     log_message( 'Found ' . scalar(@files) . ' file(s).' . "\n" );
 
     $self->process_follow(@files)        # must happen before the first
@@ -375,7 +383,7 @@ sub base_camera_id {
   # Make|Model|SerialNumber|U.  However, camera IDs that the user
   # supplies through --cameraid can have any format, and perhaps we
   # appended the "|U" suffix.
-  return $1 if $camera_id =~ /^(.*?)\|U$/;
+  return $1 if defined($camera_id) and $camera_id =~ /^(.*?)\|U$/;
   return $camera_id;
 }
 
@@ -558,20 +566,7 @@ sub deduce_camera_offset {
   my $d = Image::Synchronize::Timestamp->new($target_time - $camera_time)
     ->adjust_nodate;
 
-  if ($camera_time->has_timezone_offset) {
-    # The camera time includes a timezone offset, so $d is the number
-    # of seconds between the two instants of time when converted to
-    # the same timezone.  We assign the timezone of the camera time.
-
-    $d->adjust_timezone_offset($camera_time->timezone_offset);
-  } else {
-    # The camera time does not include a timezone offset, so $d is the
-    # number of seconds between the two instants of time when the
-    # camera time is assumed to be in the same timezone as the target
-    # time.  We assign the timezone of the target time.
-
-    $d->adjust_timezone_offset($target_time->timezone_offset);
-  }
+  $d->adjust_timezone_offset($target_time->timezone_offset);
   return $d;
 }
 
@@ -582,7 +577,7 @@ sub deduce_camera_offset {
 sub delete_backups {
   my ( $self, @arguments ) = @_;
   my @files = resolve_files( { recurse => $self->option('recurse') },
-    Path::Iterator::Rule->new->name('*_original')->file, @arguments );
+    Path::Iterator::Rule->new->$PIRname('*_original')->file, @arguments );
 
   log_message( "Removing " . scalar(@files) . " backup file(s).\n" );
   my $progressbar;
@@ -633,7 +628,6 @@ sub determine_new_values_for_all_files {
   foreach my $file (@files) {
     my $info = $self->{original_info}->{$file};
 
-
     if ( $self->has_useful_timestamp($file, $info) ) {
 
       # remember which files with embedded timestamps have which image
@@ -648,7 +642,7 @@ sub determine_new_values_for_all_files {
       my $extra_info = $self->{extra_info}->{$file};
       if (defined($extra_info)) {
         my $f = $extra_info->get('min_force_for_change');
-        ++$count_needs_force{$f} if  $f;
+        ++$count_needs_force{$f} if $f;
       }
     }
     elsif ( defined $info->get('image_number') ) {
@@ -683,53 +677,42 @@ EOD
     if ( defined( $files_for_image_numbers{$number} ) ) {
       my $target;
       my @targets = @{ $files_for_image_numbers{$number} };
-      if ( @targets > 1 ) {
-
-        # multiple files with the same number.
-
-        # prefer targets of which the beginning of the path looks
-        # most like that of the current file
-
-        @targets = best_scorers
-          ( sub { $_ => length_of_common_prefix( $file, $_ ) }, @targets);
-      }
-      if ( @targets > 1 ) {
-
-        # still multiple files.
-
-        # prefer the one(s) with the same basename structure
-        my $this_pattern = basename_pattern($file);
-        my @matches;
-        foreach my $t (@targets) {
-          next if $t eq $file;
-          my $target_pattern = basename_pattern($t);
-          push @matches, $t
-            if $target_pattern =~ /$this_pattern/
-            or $this_pattern =~ /$target_pattern/;
-        }
-        if (@matches) {
-          @targets = @matches;
-        }
-      }
       if (@targets > 1) {
-        # prefer the one(s) with the beginning of the file name is
-        # most like that of the current file
-        my $b = file($file)->basename;
-        @targets = best_scorers
-          ( sub {
-              $_ => length_of_common_prefix( $b, file($_)->basename ) },
-            @targets);
-      }
-      if (@targets > 1) {
-        # apply lexicographic sort, so the results are predictable.
-        @targets = sort @targets;
+        # multiple files with the same number.  Arrange them in
+        # descending order of priority; metadata that is missing from
+        # the current file will be copied from the first target file
+        # that has it.
+
+        # descending priority order:
+        # 1. current file name with '.yaml' appended
+        # 2. greatest directory prefix in common with current file
+        # 3. metadata file
+        # 4. greatest basename pattern prefix in common with current file
+        # 5. lexicographic order
+        my $t1 = "${file}.yaml";
+        my $t3 = basename_pattern($file);
+        @targets = map { $_->[0] }
+          sort {
+                 $b->[1] <=> $a->[1] # with .yaml suffix
+              or $b->[2] <=> $a->[2] # common directory prefix
+              or $b->[3] <=> $a->[3] # metadata file
+              or $b->[4] <=> $a->[4] # common base name pattern
+              or $a->[0] cmp $b->[0] # fallback: lexicographic order
+            }
+          map { [
+                 $_,
+                 ($_ eq $t1)? 1: 0,
+                 length_of_common_directory_prefix($_, $file),
+                 ($self->{original_info}->{$_}->get('is_metadata') // 0),
+                 length_of_common_prefix(basename_pattern($_), $t3)
+               ] } @targets;
       }
       $count_modified +=
-        ($self->determine_new_values_for_file( $file, $targets[0] ) == 1);
+        ($self->determine_new_values_for_file( $file, \@targets ) == 1);
       my $extra_info = $self->{extra_info}->{$file};
       if (defined($extra_info)) {
         my $f = $extra_info->get('min_force_for_change');
-        ++$count_needs_force{$f} if  $f;
+        ++$count_needs_force{$f} if $f;
       }
     }
     else {
@@ -757,11 +740,274 @@ EOD
   return $self;
 }
 
+sub get_from_targets {
+  my ($self, $tag, $target_files) = @_;
+  foreach my $tf (@{$target_files}) {
+    my $v = $self->{new_info}->{$tf}->get($tag);
+    if (defined $v) {
+      return wantarray? ($v, $tf): $v;
+    }
+  }
+  return;
+}
+
+# Compares $info and $new_info (which must be of type
+# Image::Synchronize::GroupedInfo) to determine which tags need to be
+# changed.
+#
+# $messages, if defined, is a reference to an array to which relevant
+# progress messages are appended.
+#
+# $changes, if defined, is a reference to a hash to which key-value
+# pairs are added in which the keys are the tags for which a change is
+# needed and the values are the amount of force that is needed for the
+# change.
+#
+# Returns 0 if no changes are needed.  If changes are needed, then
+# returns 1 plus the minimum amount of force that is needed for any of
+# the changes.
+sub get_changes {
+  my ($self, $file, $info, $new_info, $extra_info, $messages, $changes) = @_;
+
+  $messages //= [];
+  $changes //= {};
+
+  my $can_change = is_image_or_movie($info);
+
+  # In general, the file needs modification if FileModifyDate has
+  # changed or if the GPS location and timestamp are newly added
+  # or if the GPS location or timestamp have changed and
+  # TimeSource was set but not equal to 'GPS'.
+  #
+  # If the user specified --force or --force 1, then the file also
+  # needs modification if CameraID, DateTimeOriginal, or
+  # TimeSource have changed or are newly added.
+  #
+  # If the user specified --force 2, then the file also needs
+  # modification if the GPS location or timestamp have changed and
+  # TimeSource was not set or was equal to 'GPS'.
+
+  my $gps_location_tags_count;
+  my $min_force_for_change = 99;
+  if ($can_change) {
+    # not a metadata file
+    foreach my $tag (
+                     qw(
+                         CameraID
+                         DateTimeOriginal
+                         ImsyncVersion
+                         FileModifyDate
+                         GPSAltitude
+                         GPSLatitude
+                         GPSLongitude
+                         TimeSource
+                     )
+                   ) {
+      my $new    = $new_info->get($tag);
+      my $old    = $info->get($tag);
+      my $change = 1;
+
+      if ( (defined($gps_location_tags{$tag}))
+           and (defined($old) or defined($new)) ) {
+        ++$gps_location_tags_count;
+        next;                   # handle these separately
+      }
+
+      if ( defined $old ) {
+        if ( defined $new ) {
+          if ( $new ne $old ) {
+            push @{$messages}, " $tag has changed.";
+          } else {
+            $change = 0;
+          }
+        } else {                # old but not new
+          push @{$messages}, " $tag has disappeared,";
+        }
+      } elsif ( defined $new ) { # new but not old
+        push @{$messages}, " $tag is new.";
+      } else {                  # neither new nor old
+        $change = 0;
+      }
+      if ($change) {
+        state $force_1_tags = {
+                               map { $_ => 1 }
+                               qw(
+                                   CameraID
+                                   DateTimeOriginal
+                                   ImsyncVersion
+                                   TimeSource
+                               )
+                             };
+        if ( $tag eq 'FileModifyDate' ) {
+          $min_force_for_change = 0
+            if $min_force_for_change > 0;
+          $changes->{$tag} = 0;
+        } elsif ( exists $force_1_tags->{$tag} ) {
+          $min_force_for_change = 1
+            if $min_force_for_change > 1;
+          $changes->{$tag} = 1;
+        }
+      }
+    }
+  } else {
+    # a non-image file; cannot change any embedded tags, only file
+    # modification timestamp
+    my $tag = 'FileModifyDate';
+    my $new = $new_info->get($tag);
+    my $old = $info->get($tag);
+    my $change = 1;
+
+    if ( defined $old ) {
+      if ( defined $new ) {
+        if ( $new ne $old ) {
+          push @{$messages}, " $tag has changed.";
+        } else {
+          $change = 0;
+        }
+      } else {                # old but not new
+        push @{$messages}, " $tag has disappeared,";
+      }
+    } elsif ( defined $new ) { # new but not old
+      push @{$messages}, " $tag is new.";
+    } else {                  # neither new nor old
+      $change = 0;
+    }
+    if ($change) {
+      $min_force_for_change = 0
+        if $min_force_for_change > 0;
+      $changes->{$tag} = 0;
+    }
+  }
+
+  if ($gps_location_tags_count) {
+    # Some cameras, for example the LG-H870, can record a GPS altitude
+    # by itself, without a GPS latitude and longitude, when the camera
+    # doesn't know its location.  We treat those cases as if the GPS
+    # altitude wasn't there, but if the file gets modified anyway and
+    # get no new GPS position then we remove the troublesome and
+    # to us useless GPS altitude.
+    my $change        = 1;
+    my $old_pos_count = 0;
+    my @old_pos       = map {
+      my $v = $info->get($_);
+      ++$old_pos_count
+        if defined $v
+        and $_ ne 'GPSAltitude';
+      $v
+    } @gps_location_tags;
+    my $new_pos_count = 0;
+    my @new_pos       = map {
+      my $v = $new_info->get($_);
+      ++$new_pos_count
+        if defined $v
+        and $_ ne 'GPSAltitude';
+      $v
+    } @gps_location_tags;
+    my $distance = geo_distance( \@old_pos, \@new_pos );
+    if ( defined $distance ) {  # the GPS location was complete in old
+                                # and new
+      if ( $distance ) {
+        my ( $value, $prefix ) = si_prefix($distance);
+        push @{$messages}, " GPS position has changed by $value ${prefix}m.";
+        $extra_info->set( 'position_change', $distance );
+        if ( $distance > ( $self->{max_gps_distance} // 0 ) ) {
+          $self->{max_gps_distance} = $distance;
+          $self->{max_gps_file}     = $file;
+        }
+      }
+      else {
+        $change = 0;
+      }
+    }
+    elsif ( $old_pos_count == 2 ) {
+      push @{$messages}, " GPS position has disappeared,";
+      $new_info->delete($_) foreach ( @gps_location_tags, 'GPSDateTime' );
+    }
+    elsif ( $new_pos_count ) {
+      push @{$messages}, " GPS position is new.";
+    } elsif ($old_pos_count == 0) {
+      # no old location and no new location and yet we got here.  Must
+      # be the case where the file contains a solitary GPS altitude.
+      push @{$messages}, ' Solitary GPS altitude.';
+      $new_info->delete('GPSAltitude');
+    } else {
+      push @{$messages}, ' GPS position is incomplete.';
+      $new_info->delete($_) foreach ( @gps_location_tags, 'GPSDateTime' );
+    }
+    if ($change) {
+
+      # if the GPS position already existed and the TimeSource is
+      # absent or equal to GPS, then we assume the GPS information was
+      # embedded by a GPS device and should only be modified if the
+      # --force level is at least 2.  Otherwise we assume that the old
+      # GPS position (if any) was added by us in an earlier run; then
+      # we can already modify it even if no --force is specified.
+      if ( ( $info->get('TimeSource') // 'GPS' ) eq 'GPS' )
+      {
+        $min_force_for_change = 2
+          if $min_force_for_change > 2;
+        foreach my $tag (@gps_location_tags, 'GPSDateTime') {
+          $changes->{$tag} = 2
+          if stringify($info->get($tag)) ne stringify($new_info->get($tag));
+        }
+      }
+      else {
+        $min_force_for_change = 0
+          if $min_force_for_change > 0;
+        foreach my $tag (@gps_location_tags, 'GPSDateTime') {
+          $changes->{$tag} = 0
+            if stringify($info->get($tag)) ne stringify($new_info->get($tag));
+        }
+      }
+    }
+  }
+
+  push @{$messages}, $new_info->stringify(' ');
+
+  if (scalar(keys %{$changes}) == 1
+      and exists $changes->{ImsyncVersion}
+      and defined $info->get('ImsyncVersion')) {
+    # The only thing that changed is the ImsyncVersion value: the file
+    # already has that tag but the current version of imsync is newer
+    # than the one that modified the file last.  This is not a good
+    # reason to change the file, so we suppress that change.
+    %{$changes} = ();
+    $min_force_for_change = 99;
+    $new_info->set('ImsyncVersion', $info->get('ImsyncVersion'));
+    push @{$messages}, ' Only ImsyncVersion has changed -- suppressing.';
+  }
+
+  $extra_info->set( 'min_force_for_change', $min_force_for_change );
+
+  my $result = 0;
+  if ( $min_force_for_change < 99 ) {    # some changes
+    if ( ( $extra_info->get('explicit_change') // 0 ) > 0
+      or $self->option( 'force', 0 ) >= $min_force_for_change )
+    {
+      $extra_info->set( 'needs_modification', 1 );
+      push @{$messages}, ' Modification of this file is indicated.';
+      $extra_info->set( 'changes', [ sort keys %{$changes} ] )
+        if keys %{$changes};
+      $result = 1;
+    }
+    else {
+      push @{$messages}, ' Modification of this file is suppressed, needs --force'
+        . ( $min_force_for_change > 1 ? ' --force' : '' ) . '.';
+      $result = $min_force_for_change + 1;
+    }
+  }
+  else {
+    push @{$messages}, ' No changes.';
+  }
+
+  return $result;
+}
+
 # returns 0 if the file needs no modification, 1 if the file needs
 # modification (for the current level of force), or 1 + minimum needed
 # force if the file needs more force if it is to be modified.
 sub determine_new_values_for_file {
-  my ( $self, $file, $target_file ) = @_;
+  my ( $self, $file, $donator_files ) = @_;
 
   # The user may have chosen to get progress messages printed only
   # when the file needs modification, but we can't tell yet if that is
@@ -799,291 +1045,335 @@ sub determine_new_values_for_file {
     $new_info->set( $tag, $v ) if defined $v;
   }
 
+  # TODO: only report donators when sufficiently verbose
+  if (defined($donator_files) and @{$donator_files})
+  {
+    push @messages, " Possible donators in order of descending priority:";
+    push @messages, "  $_" foreach @{$donator_files};
+  }
+
+  # for files that aren't image or movie files, we suppress changes of
+  # any tags except FileModifyDate.
+  my $can_change = is_image_or_movie($info);
+
   # determine final camera ID.
-  if ( is_image_or_movie($info) ) {
-    my $camera_id = $self->user_camera_id($file);
-    if ( defined $camera_id ) {
-      push @messages, ' Camera ID set by user (--cameraid).';
-      $extra_info->set( 'explicit_change', 1 );
-    }
-    else {
-      $camera_id = $info->get('camera_id');
 
-      if ( not( defined $camera_id ) ) {
-        if ( defined($target_file) )
-        {
-          # we're copying the target time from another file.  If the
-          # current file is an image file and has no inherent camera
-          # ID, then we copy that one from the other file, too.  Omit
-          # any suffix due to "supposedly_utc"
-          $camera_id = base_camera_id(
-            $self->{new_info}->{$target_file}->get('CameraID') );
-          push @messages, " Cameara ID copied from '$target_file'.";
-        }
-        else {
-          my $fallback_camera_id = $info->get('fallback_camera_id');
-          $camera_id = $self->camera_id_from_fallback($fallback_camera_id);
-          if ( defined $camera_id ) {
-            push @messages, ' Camera ID deduced from other images.';
-          }
-          else {
-            $camera_id = $info->get('fallback_camera_id');
-            push @messages, ' Using fall-back camera ID.';
-          }
+  # user-specified camera ID?
+  my $camera_id = $self->user_camera_id($file);
+  if ( defined $camera_id ) {
+    push @messages, ' Camera ID set by user (--cameraid).';
+    $extra_info->set( 'explicit_change', 1 ) if $can_change;
+  } else {
+    $camera_id = $info->get('CameraID');
+
+    if ( not( defined $camera_id ) ) {
+      ($camera_id, my $donator) =
+        $self->get_from_targets('CameraID', $donator_files);
+      if ( defined($camera_id) ) {
+        push @messages, " Camera ID copied from '$donator'.";
+      } else {
+        my $fallback_camera_id = $info->get('fallback_camera_id')
+          // fallback_camera_id($file);
+        $camera_id = $self->camera_id_from_fallback($fallback_camera_id);
+        if ( defined $camera_id ) {
+          push @messages, ' Using fallback camera ID.';
         }
       }
-
-      if ( $info->get('supposedly_utc') ) {
-
-        # Because QuickTime files may be in a different timezone than
-        # the other image files by the same camera, we treat them as
-        # if they were recorded by a different camera, by appending to
-        # the camera ID.
-        $camera_id .= '|U';
-      }
     }
-    $new_info->set( 'CameraID', $camera_id );
+  }
+  $new_info->set( 'CameraID', $camera_id );
+
+  # get creation timestamp if available
+
+  my $timesource;           # value for TimeSource tag
+  my $timesource_letter;    # letter to identify time source in report
+
+  my $create_time = $new_info->get('CreateDate');
+  if (not defined $create_time) {
+    ($create_time, my $donator) =
+      $self->get_from_targets('CreateDate', $donator_files);
+    if (defined $create_time) {
+      push @messages, " Creation timestamp copied from '$donator'.";
+      $timesource_letter = 'n';
+      $timesource = 'Other';
+    }
   }
 
   # determine the target time
-  my $target_file_time;     # file modification timestamp to assign to image
-  my $target_dto_time;      # DateTimeOriginal to assign to image
-  my $timesource;           # value for TimeSource tag
-  my $timesource_letter;    # letter to identify time source in report
-  my $camera_timezone_offset;   # target timezone and offset of camera
 
-  if ( defined $target_file ) {
+  my $target_time = $self->repository('user_times')->{$file};
+  if (defined $target_time) {
+    push @messages, " Target time is set by user.";
+    $extra_info->set( 'explicit_change', 1 ) if $can_change;
+    $timesource_letter //= 't';   # source is user's --time
+    $timesource        //= 'User';
+  } elsif (defined($camera_id) and defined($create_time)) {
+    # An image file may or may not have a timezone offset specified
+    # for its CreateDate.  How do we handle both kinds of timestamps
+    # when applying a camera offset?
+    #
+    # A CreateDate timestamp is schematically T+Z (e.g.,
+    # 2020-11-23T14:23+02:00) where T is the timestamp
+    # (2020-11-23T14:23) and Z is the timezone offset (+02:00), in
+    # such a way that T − Z = U aims for UTC (2020-11-23T12:23Z) -- if
+    # a timezone offset is known.  If no timezone offset is known,
+    # then the timestamp is just T.
+    #
+    # The camera offset is schematically t+z where t is the timestamp
+    # part and z is the timezone part, similar to T and Z.
+    #
+    # Camera offsets written by versions < 2.001 don't have a timezone
+    # part z.  They get treated as if the specified value were t + z
+    # where z is the timezone offset that the current system would
+    # have had on the indicated date in the current location.
+    #
+    # The target timestamp is schematically τ+ζ where τ is the
+    # timestamp part and ζ is the timezone part, similar to T and Z.
+    # The corresponding UTC time is τ − ζ = υ.
+    #
+    # If we don't know Z, then we want the target timestamp to be
+    # calculated as
+    #
+    #  τ = T + t
+    #  ζ =     z
+    #
+    # i.e., t is how much to add to T, and z is the timezone to assume
+    # for the result.
+    #
+    # If we do know Z, then we still want t to indicate how far off
+    # the CreateDate was, so
+    #
+    #  υ = U + t  ⇔  τ − ζ = T − Z + t  ⇔  τ = t + ζ + T − Z
+    #
+    # And we still want to end up in timezone z, so
+    #
+    #  ζ = z
+    #  τ = t + z + T − Z
+    #
+    # If we compare the with-Z result with the no-Z result then we see
+    # that they are equivalent if z = Z, i.e., equivalent to the
+    # assumption that the CreateDate timezone is equal to the camera
+    # offset timezone.
 
-    # copying target time from another file
-    my $target_file_info = $self->{new_info}->{$target_file};
-    $target_file_time  = $target_file_info->get('FileModifyDate');
-    $target_dto_time   = $target_file_info->get('DateTimeOriginal');
-    $timesource_letter = 'n';
-    $timesource        = 'Other';
-    push @messages, " Target time copied from '$target_file'.";
+    my $cto = $self->gps_offsets->get($camera_id, $create_time);
+    if ( defined $cto) {
+      push @messages, " Target time is based on camera timezone offsets.";
+      $timesource_letter //= 's'; # source is CreateDate plus other images
+      $timesource        //= 'Other';
+
+      unless ($cto->has_timezone_offset) {
+        # timezone offset for local system at given instant
+        my $tz = $cto->local_timezone_offset;
+        # $cto_before->time_local
+        # == $cto_after->time_local + $cto_after->timezone_offset
+        # and $cto_after->timezone_offset = $tz
+        # so $cto_after->time_local = $cto_before->time_local - $tz
+        $cto = ($cto - $tz)->set_timezone_offset($tz);
+      }
+
+      $target_time = apply_camera_offset( $create_time, $cto );
+    }
   }
-  else {
-    $target_dto_time = $self->repository('user_times')->{$file};
-    if ( defined $target_dto_time ) {
-      push @messages, " Target time is set by user.";
-      $extra_info->set( 'explicit_change', 1 );
-      $timesource_letter = 't';      # source is user's --time
-      $timesource        = 'User';
-      $target_file_time = $self->file_from_dto($target_dto_time);
-    }
-    elsif ( $info->get('createdate_was_embedded')
-            and defined $info->get('GPSDatetime')
-         )
-    {
-      $timesource = $self->get_effective_timesource( $info, $file );
-      if ( $timesource ne 'Other' ) {
-        state $time_sources = {
-          GPS   => 'g',
-          User  => 't',
-          Other => 'o',
-        };
-
-        push @messages, " Target time is $timesource time.\n";
-        $timesource_letter = $time_sources->{$timesource} // '?';
-        ( $camera_timezone_offset, my $adjustment ) =
-          $self->get_camera_offset($file);
-        if ($adjustment) {
-          push @messages, " Assuming GPS fix lag.";
-        }
-        $target_dto_time = apply_camera_offset( $new_info->get('CreateDate'),
-                                                $camera_timezone_offset );
-        $target_file_time = $self->file_from_dto($target_dto_time);
+  if (not defined $target_time) {
+    $target_time = $new_info->get('DateTimeOriginal');
+    if (defined $target_time) {
+      push @messages,
+        " Target time is embedded original time (DateTimeOriginal).";
+      $timesource_letter //= 'o'; # source is DateTimeOriginal
+    } else {
+      ($target_time, my $donator) =
+        $self->get_from_targets('DateTimeOriginal', $donator_files);
+      if (defined $target_time) {
+        push @messages, " Target timestamp copied from '$donator' (DateTimeOriginal).";
+        $timesource_letter //= 'n'; # source is other file
       }
     }
-    unless ($target_file_time) {
-      if ( $info->get('createdate_was_embedded') ) {
-
-        # Locate the "best" offset (GPS minus creation) for the image,
-        # based on GPS timestamps in nearby images by the same camera.
-        if ( defined $new_info->get('CreateDate') ) {
-          $camera_timezone_offset =
-            $self->gps_offsets->get( $new_info->get('CameraID'),
-            $new_info->get('CreateDate') );
-        }
-
-        if ( defined $camera_timezone_offset ) {
-          push @messages, " Target time is based on camera timezone offsets.";
-          $timesource_letter = 's';     # source is CreateDate plus other images
-          $timesource        = 'Other';
-          $target_dto_time = apply_camera_offset( $new_info->get('CreateDate'),
-                                                  $camera_timezone_offset );
-          $target_file_time = $self->file_from_dto($target_dto_time);
-        }
-      }
-    }
-    unless ($target_file_time) {
-      if ( defined $info->get('DateTimeOriginal') ) {
-
-        # No offset available based on GPS, but do have
-        # DateTimeOriginal; set the file modification timestamp equal
-        # to the DateTimeOriginal
-        push @messages,
-          " Target time is embedded original time (DateTimeOriginal).";
-        $timesource_letter = 'o';       # source is DateTimeOriginal
-        $timesource        = 'Other';
-        $target_dto_time = $new_info->get('DateTimeOriginal');
-        if (not $target_dto_time->has_timezone_offset) {
-          # we need the target time to have a timezone offset.  Assume
-          # that it is given relative to the timezone that would have
-          # been in effect on the local system at that time.
-          $target_dto_time->adjust_to_local_timezone;
-        }
-        $target_file_time = $self->file_from_dto($target_dto_time);
-      }
-      elsif ( $info->get('createdate_was_embedded') ) {
-
-        # no DateTimeOriginal either; ensure that the file
-        # modification timestamp is equal to CreateDate
+    if (not defined $target_time) {
+      $target_time = $new_info->get('CreateDate');
+      if (defined $target_time) {
         push @messages, " Target time is embedded creation time (CreateDate).";
-        $timesource_letter = 'c';       # source is CreateDate
-        $timesource        = 'Other';
-        $target_dto_time = $new_info->get('CreateDate');
-        $target_file_time = $self->file_from_dto($target_dto_time);
+        $timesource_letter //= 'c'; # source is CreateDate
       }
     }
   }
+  if (not defined $target_time) {
+    ($target_time, my $donator) =
+      $self->get_from_targets('FileModifyDate', $donator_files);
+    if (defined $target_time) {
+      push @messages, " Target timestamp copied from '$donator' (FileModifyDate).";
+      $timesource_letter //= 'n'; # source is other file
+    }
+  }
 
-  if ( defined($target_file_time) ) {
+  if (defined($target_time)) {
+    $timesource //= 'Other';
+
+    # the timezone part of the camera offset is the target timezone of
+    # the target time
+    my $cto = $self->gps_offsets->get($camera_id, $create_time // $target_time);
+
+    if (defined $cto) {
+      unless ($cto->has_timezone_offset) {
+        # timezone offset for local system at given instant
+        my $tz = $cto->local_timezone_offset;
+        # $cto_before->time_local
+        # == $cto_after->time_local + $cto_after->timezone_offset
+        # and $cto_after->timezone_offset = $tz
+        # so $cto_after->time_local = $cto_before->time_local - $tz
+        $cto = ($cto - $tz)->set_timezone_offset($tz);
+      }
+      $target_time->adjust_timezone_offset($cto->timezone_offset);
+    } else {
+      $target_time->adjust_to_local_timezone;
+    }
+
     if ( defined( my $j = $self->repository('jump')->{$file} ) ) {
-      $target_dto_time += $j * 3600;
-      $target_file_time = $self->file_from_dto($target_dto_time);
-      push @messages, " Clock time of camera jumps by $j hours.";
+      $target_time += $j * 3600;
+      push @messages, " Clock time of camera jumped by $j hours.";
     }
-    $extra_info->set( 'timesource_letter', $timesource_letter );
-    $new_info->set( 'TimeSource', $timesource )
-      if is_image_or_movie($info);
-
-    if ( $info->get('createdate_was_embedded') ) {
-      $new_info->set( 'DateTimeOriginal', $target_dto_time );
-
-      if ( $timesource_letter ne 'n' ) {
-        my $o = $camera_timezone_offset;
-        $camera_timezone_offset =
-          deduce_camera_offset( $new_info->get('CreateDate'),
-                                $target_dto_time );
-
-        push @messages, ' Timezone offset for camera is '
-          . $camera_timezone_offset->display_time . '.';
-
-        # record the offset so it can be used for later files
-        $self->gps_offsets->set(
-          $new_info->get('CameraID'),
-          $new_info->get('CreateDate'),
-          $camera_timezone_offset
-        );
-      }
-    }
-    $new_info->set( 'FileModifyDate', $target_file_time );
-
-    push @messages, " Target time is $target_file_time.";
-
-    if ( is_image_or_movie($info) ) {
-
-      my $position = $self->repository('user_locations')->{$file};
-      if ( defined $position ) {
-        $extra_info->set( 'explicit_change', 1 );
-      }
-      elsif (
-        not( $info->get('GPSDateTime') )    # none yet
-        or (
-          ( $info->get('TimeSource') // 'GPS' ) ne 'GPS'    # not original
-            or $self->option( 'force', 0 ) >= 2             # or force is at least 2
-        )
-        )
-      {
-        # presumably able to store a GPS position; deduce one if
-        # possible.
-        #
-        # If the file already had a GPS position, then should we
-        # update it?  If TimeSource was absent or equal to 'GPS', then
-        # the existing GPS position was embedded in the file when the
-        # file was created, presumably directly from an attached GPS
-        # device.
-        #
-        # In that case we should be very reluctant to update that
-        # position, only updating the GPS position if --force has at
-        # least a value of 2.  If --force is less than 2, then we
-        # should propose to update the TimeSource to 'GPS' if it was
-        # empty.
-        #
-        # If a GPS position and TimeSource were already present but
-        # TimeSource is not equal to 'GPS', then the GPS position is
-        # assumed to have been added by an earlier run of an
-        # application like this one, and then it is OK to update it.
-        my @gps_positions =
-          $self->gps_positions->position_for_time( $target_file_time,
-          scope => scope_for_file($file) );
-        if (@gps_positions) {
-          my $l = length( $gps_positions[0]->{scope} );
-
-          # ignore positions from other than the first (longest) scope
-          @gps_positions = grep { length( $_->{scope} ) == $l } @gps_positions;
-
-          if ( @gps_positions > 1 ) {
-
-            # sort by track ID
-            @gps_positions =
-              sort { $a->{track} cmp $b->{track} } @gps_positions;
-            @gps_positions = ( $gps_positions[0] );
-          }
-          $position = $gps_positions[0]->{position};
-        }
-      }
-      if ( defined $position ) {
-        if (@{$position}) {
-          foreach my $ix (0..$#gps_location_tags) {
-            my $v = $info->get($gps_location_tags[$ix]);
-            $new_info->set( $gps_location_tags[$ix],  $position->[$ix] )
-              if defined($position->[$ix]) and (not(defined $v) or $position->[$ix] != $v);
-          }
-          my $v = $info->get('GPSDateTime');
-          $new_info->set( 'GPSDateTime', $target_file_time )
-            if not(defined $v) or $target_file_time != $v;
-          croak "Expected new TimeSource to have been set already\n"
-            unless defined $new_info->get('TimeSource');
-        } else {                # remove position
-          foreach my $ix (0..$#gps_location_tags) {
-            $new_info->delete( $gps_location_tags[$ix] );
-          }
-          $new_info->delete( 'GPSDateTime' );
-        }
-      }
-    }
-
-    # If the current image is acquiring an embedded GPSDateTime,
-    # then it is vital that it also ends up with an embedded
-    # TimeSource, because imsync interprets a GPSDateTime without
-    # a TimeSource as having been embedded in the image by the
-    # original recording device (such as a smartphone), for which
-    # the GPS fix may differ a few seconds from the image recording
-    # time (with the difference not necessarily being the same from
-    # one image to the next), which may cause imsync to round the
-    # camera offset.
-    #
-    # However, if the new GPSDateTime is embedded by imsync
-    # (together with a location), then the camera offset is deemed
-    # to be exact and must not be rounded.  So, such a new
-    # GPSDateTime must be accompanied by a suitable TimeSource, to
-    # avoid it being interpreted later as an original GPSDateTime
-    # for which the camera offset may get rounded, thus differing
-    # from the previous camera offset and leading to the target time
-    # being modified again (and erroneously).
-    #
-    # A TimeSource may be deduced during the Inspect phase even if
-    # the image has no embedded TimeSource, so if the final
-    # TimeSource (deduced during this Determine phase) is equal to
-    # the TimeSource from the Inspect phase, then the above
-    # $register call for XMP:TimeSource won't have registered a new
-    # value for XMP:TimeSource, but if a GPSDateTime is being added
-    # then we must also have a TimeSource.
   }
 
-  if ( is_image_or_movie($info) ) {
+  if ($can_change) {
+    $new_info->set('DateTimeOriginal', $target_time);
+    $new_info->set( 'TimeSource', $timesource );
+  }
+  $extra_info->set( 'timesource_letter', $timesource_letter );
+
+  # the File Modification Time may be in a different timezone than the
+  # target time, because of --relativetime
+  # TODO: suppress if target time is donated FileModifyDate?
+  $new_info->set('FileModifyDate', $self->file_from_dto($target_time));
+
+  push @messages, " Target time is $target_time.";
+
+  # determine the camera offset
+
+  if ($can_change
+      and $timesource_letter ne 'n'
+      and defined($create_time)
+      and defined($target_time)
+      and defined ($camera_id)) {
+    my $camera_timezone_offset =
+      deduce_camera_offset( $create_time, $target_time );
+
+    push @messages, ' Timezone offset for camera is '
+      . $camera_timezone_offset->display_time . '.';
+
+    # record the offset so it can be used for later files
+    $self->gps_offsets->set($camera_id, $create_time, $camera_timezone_offset);
+  }
+
+  # determine position
+
+  if ( defined($target_time) and $can_change) {
+    my $position = $self->repository('user_locations')->{$file};
+    if ( defined $position ) {
+      $extra_info->set( 'explicit_change', 1 );
+    } elsif (
+             not( $info->get('GPSDateTime') ) # none yet
+             or (
+                 ( $info->get('TimeSource') // 'GPS' ) ne 'GPS' # not original
+                 or $self->option( 'force', 0 ) >= 2 # or force is at least 2
+               )
+           ) {
+      # presumably able to store a GPS position; deduce one if
+      # possible.
+      #
+      # Do we have a target file with GPS information?
+      (undef, my $donator) = $self->get_from_targets('GPSDateTime', $donator_files);
+      if (defined $donator) {
+        my $donator_info = $self->{new_info}->{$donator};
+        # TODO: store in $positions
+        # push @messages, " GPS information copied from '$donator'.";
+        # foreach my $tag (@gps_location_tags, 'GPSDateTime') {
+        #   $new_info->set($tag, $donator_info->get($tag));
+        # }
+      }
+      #
+      # If the file already had a GPS position, then should we
+      # update it?  If TimeSource was absent or equal to 'GPS', then
+      # the existing GPS position was embedded in the file when the
+      # file was created, presumably directly from an attached GPS
+      # device.
+      #
+      # In that case we should be very reluctant to update that
+      # position, only updating the GPS position if --force has at
+      # least a value of 2.  If --force is less than 2, then we
+      # should propose to update the TimeSource to 'GPS' if it was
+      # empty.
+      #
+      # If a GPS position and TimeSource were already present but
+      # TimeSource is not equal to 'GPS', then the GPS position is
+      # assumed to have been added by an earlier run of an
+      # application like this one, and then it is OK to update it.
+      my @gps_positions =
+        $self->gps_positions->position_for_time( $target_time,
+                                                 scope => scope_for_file($file) );
+      if (@gps_positions) {
+        my $l = length( $gps_positions[0]->{scope} );
+
+        # ignore positions from other than the first (longest) scope
+        @gps_positions = grep { length( $_->{scope} ) == $l } @gps_positions;
+
+        if ( @gps_positions > 1 ) {
+
+          # sort by track ID
+          @gps_positions =
+            sort { $a->{track} cmp $b->{track} } @gps_positions;
+          @gps_positions = ( $gps_positions[0] );
+        }
+        $position = $gps_positions[0]->{position};
+      }
+    }
+    if ( defined $position ) {
+      if (@{$position}) {
+        foreach my $ix (0..$#gps_location_tags) {
+          my $v = $info->get($gps_location_tags[$ix]);
+          $new_info->set( $gps_location_tags[$ix],  $position->[$ix] )
+            if defined($position->[$ix]) and (not(defined $v) or $position->[$ix] != $v);
+        }
+        my $v = $info->get('GPSDateTime');
+        $new_info->set( 'GPSDateTime', $target_time )
+          if not(defined $v) or $target_time != $v;
+        croak "Expected new TimeSource to have been set already\n"
+          unless defined $new_info->get('TimeSource');
+      } else {                  # remove position
+        foreach my $ix (0..$#gps_location_tags) {
+          $new_info->delete( $gps_location_tags[$ix] );
+        }
+        $new_info->delete( 'GPSDateTime' );
+      }
+    }
+  }
+
+  # If the current image is acquiring an embedded GPSDateTime,
+  # then it is vital that it also ends up with an embedded
+  # TimeSource, because imsync interprets a GPSDateTime without
+  # a TimeSource as having been embedded in the image by the
+  # original recording device (such as a smartphone), for which
+  # the GPS fix may differ a few seconds from the image recording
+  # time (with the difference not necessarily being the same from
+  # one image to the next), which may cause imsync to round the
+  # camera offset.
+  #
+  # However, if the new GPSDateTime is embedded by imsync
+  # (together with a location), then the camera offset is deemed
+  # to be exact and must not be rounded.  So, such a new
+  # GPSDateTime must be accompanied by a suitable TimeSource, to
+  # avoid it being interpreted later as an original GPSDateTime
+  # for which the camera offset may get rounded, thus differing
+  # from the previous camera offset and leading to the target time
+  # being modified again (and erroneously).
+  #
+  # A TimeSource may be deduced during the Inspect phase even if
+  # the image has no embedded TimeSource, so if the final
+  # TimeSource (deduced during this Determine phase) is equal to
+  # the TimeSource from the Inspect phase, then the above
+  # $register call for XMP:TimeSource won't have registered a new
+  # value for XMP:TimeSource, but if a GPSDateTime is being added
+  # then we must also have a TimeSource.
+
+  if ( $can_change ) {
     $new_info->set( 'DateTimeOriginal', $new_info->get('FileModifyDate') )
       unless defined $new_info->get('DateTimeOriginal');
     $new_info->set( 'ImsyncVersion',    $VERSION );
@@ -1114,211 +1404,14 @@ sub determine_new_values_for_file {
     }
   }
 
-  # In general, the file needs modification if FileModifyDate has
-  # changed or if the GPS location and timestamp are newly added
-  # or if the GPS location or timestamp have changed and
-  # TimeSource was set but not equal to 'GPS'.
-  #
-  # If the user specified --force or --force 1, then the file also
-  # needs modification if CameraID, DateTimeOriginal, or
-  # TimeSource have changed or are newly added.
-  #
-  # If the user specified --force 2, then the file also needs
-  # modification if the GPS location or timestamp have changed and
-  # TimeSource was not set or was equal to 'GPS'.
-
-  my $gps_location_tags_count;
-  my $min_force_for_change = 99;
   my %changes;
-  foreach my $tag (
-    qw(
-    CameraID
-    DateTimeOriginal
-    ImsyncVersion
-    FileModifyDate
-    GPSAltitude
-    GPSLatitude
-    GPSLongitude
-    TimeSource
-    )
-    )
-  {
-    my $new    = $new_info->get($tag);
-    my $old    = $info->get($tag);
-    my $change = 1;
 
-    if ( (defined($gps_location_tags{$tag}))
-         and (defined($old) or defined($new)) ) {
-      ++$gps_location_tags_count;
-      next;                     # handle these separately
-    }
-
-    if ( defined $old ) {
-      if ( defined $new ) {
-        if ( $new ne $old ) {
-          push @messages, " $tag has changed.";
-        }
-        else {
-          $change = 0;
-        }
-      }
-      else {       # old but not new
-        push @messages, " $tag has disappeared,";
-      }
-    }
-    elsif ( defined $new ) {    # new but not old
-      push @messages, " $tag is new.";
-    }
-    else {                      # neither new nor old
-      $change = 0;
-    }
-    if ($change) {
-      state $force_1_tags = {
-        map { $_ => 1 }
-          qw(
-          CameraID
-          DateTimeOriginal
-          ImsyncVersion
-          TimeSource
-          )
-      };
-      if ( $tag eq 'FileModifyDate' ) {
-        $min_force_for_change = 0
-          if $min_force_for_change > 0;
-        $changes{$tag} = 0;
-      }
-      elsif ( exists $force_1_tags->{$tag} ) {
-        $min_force_for_change = 1
-          if $min_force_for_change > 1;
-        $changes{$tag} = 1;
-      }
-    }
-  }
-
-  if ($gps_location_tags_count) {
-    # Some cameras, for example the LG-H870, can record a GPS altitude
-    # by itself, without a GPS latitude and longitude, when the camera
-    # doesn't know its location.  We treat those cases as if the GPS
-    # altitude wasn't there, but if the file gets modified anyway and
-    # get no new GPS position then we remove the troublesome and
-    # to us useless GPS altitude.
-    my $change        = 1;
-    my $old_pos_count = 0;
-    my @old_pos       = map {
-      my $v = $info->get($_);
-      ++$old_pos_count
-        if defined $v
-        and $_ ne 'GPSAltitude';
-      $v
-    } @gps_location_tags;
-    my $new_pos_count = 0;
-    my @new_pos       = map {
-      my $v = $new_info->get($_);
-      ++$new_pos_count
-        if defined $v
-        and $_ ne 'GPSAltitude';
-      $v
-    } @gps_location_tags;
-    my $distance = geo_distance( \@old_pos, \@new_pos );
-    if ( defined $distance ) {  # the GPS location was complete in old
-                                # and new
-      if ( $distance ) {
-        my ( $value, $prefix ) = si_prefix($distance);
-        push @messages, " GPS position has changed by $value ${prefix}m.";
-        $extra_info->set( 'position_change', $distance );
-        if ( $distance > ( $self->{max_gps_distance} // 0 ) ) {
-          $self->{max_gps_distance} = $distance;
-          $self->{max_gps_file}     = $file;
-        }
-      }
-      else {
-        $change = 0;
-      }
-    }
-    elsif ( $old_pos_count == 2 ) {
-      push @messages, " GPS position has disappeared,";
-      $new_info->delete($_) foreach ( @gps_location_tags, 'GPSDateTime' );
-    }
-    elsif ( $new_pos_count ) {
-      push @messages, " GPS position is new.";
-    } elsif ($old_pos_count == 0) {
-      # no old location and no new location and yet we got here.  Must
-      # be the case where the file contains a solitary GPS altitude.
-      push @messages, ' Solitary GPS altitude.';
-      $new_info->delete('GPSAltitude');
-    } else {
-      push @messages, ' GPS position is incomplete.';
-      $new_info->delete($_) foreach ( @gps_location_tags, 'GPSDateTime' );
-    }
-    if ($change) {
-
-      # if the GPS position already existed and the TimeSource is
-      # absent or equal to GPS, then we assume the GPS information was
-      # embedded by a GPS device and should only be modified if the
-      # --force level is at least 2.  Otherwise we assume that the old
-      # GPS position (if any) was added by us in an earlier run; then
-      # we can already modify it even if no --force is specified.
-      if ( ( $info->get('TimeSource') // 'GPS' ) eq 'GPS' )
-      {
-        $min_force_for_change = 2
-          if $min_force_for_change > 2;
-        foreach my $tag (@gps_location_tags, 'GPSDateTime') {
-          $changes{$tag} = 2
-          if stringify($info->get($tag)) ne stringify($new_info->get($tag));
-        }
-      }
-      else {
-        $min_force_for_change = 0
-          if $min_force_for_change > 0;
-        foreach my $tag (@gps_location_tags, 'GPSDateTime') {
-          $changes{$tag} = 0
-            if stringify($info->get($tag)) ne stringify($new_info->get($tag));
-        }
-      }
-    }
-  }
+  my $result = $self->get_changes($file, $info, $new_info, $extra_info,
+                                  \@messages, \%changes);
 
   {
     my $camera_id = $new_info->get('CameraID');
     $self->{camera_ids}->{$camera_id} = 1 if defined $camera_id;
-  }
-
-  push @messages, $new_info->stringify(' ');
-
-  if (scalar(keys %changes) == 1
-      and exists $changes{ImsyncVersion}
-      and defined $info->get('ImsyncVersion')) {
-    # The only thing that changed is the ImsyncVersion value: the file
-    # already has that tag but the current version of imsync is newer
-    # than the one that modified the file last.  This is not a good
-    # reason to change the file, so we suppress that change.
-    %changes = ();
-    $min_force_for_change = 99;
-    $new_info->set('ImsyncVersion', $info->get('ImsyncVersion'));
-    push @messages, ' Only ImsyncVersion has changed -- suppressing.';
-  }
-
-  $extra_info->set( 'min_force_for_change', $min_force_for_change );
-
-  my $result = 0;
-  if ( $min_force_for_change < 99 ) {    # some changes
-    if ( ( $extra_info->get('explicit_change') // 0 ) > 0
-      or $self->option( 'force', 0 ) >= $min_force_for_change )
-    {
-      $extra_info->set( 'needs_modification', 1 );
-      push @messages, ' Modification of this file is indicated.';
-      $extra_info->set( 'changes', [ sort keys %changes ] )
-        if keys %changes;
-      $result = 1;
-    }
-    else {
-      push @messages, ' Modification of this file is suppressed, needs --force'
-        . ( $min_force_for_change > 1 ? ' --force' : '' ) . '.';
-      $result = $min_force_for_change + 1;
-    }
-  }
-  else {
-    push @messages, ' No changes.';
   }
 
   # if verbose & 4 then only print if needs_modification
@@ -1821,15 +1914,6 @@ sub get_image_info {
         $info->get( 'QuickTime', 'CreationDate' ) );
       $info->delete( 'QuickTime', 'CreationDate' );
     }
-    elsif ( not defined $info->get( 'EXIF', 'CreateDate' ) ) {
-
-      # QuickTime:CreateDate but no EXIF:CreateDate.  The camera
-      # makers must have been sure that there was no need to also
-      # store the creation timestamp in the local timezone, so we
-      # assume that QuickTime:CreateDate is in UTC.
-
-      $info->get( 'QuickTime', 'CreateDate' )->adjust_to_utc;
-    }
 
     if ( defined $info->get('GPSLongitude')
       and not( defined $info->get('GPSDateTime') ) )
@@ -1846,6 +1930,14 @@ sub get_image_info {
     }
   }
 
+  if (not(defined $info->get('CreateDate'))) {
+    # can we get a CreateDate from another tag?
+    my $ct = $info->get('RIFF', 'DateTimeOriginal');
+    if (defined $ct) {
+      $info->set('CreateDate', $ct);
+    }
+  }
+
   # for synchronizing the times of non-image files with those of
   # related image files, we determine the "image number" of each file.
   {
@@ -1853,6 +1945,41 @@ sub get_image_info {
     $info->set( 'image_number', $number ) if defined $number;
   }
 
+  return $info;
+}
+
+# read image/movie metadata from a text file.  The metadata is assumed
+# to be in JSON or YAML format and to contain tags as produced by
+# "exiftool -n -j", optionally (and preferably) also with the "-G"
+# option.
+sub get_image_info_from_metadata_file {
+  my ($file) = @_;
+
+  my $info;
+
+  my $metadata = LoadFile($file);
+
+  if (ref($metadata) eq 'ARRAY' && scalar(@{$metadata}) == 1) {
+    # single-element array, uncover the single element
+    $metadata = $metadata->[0];
+  }
+  if (ref($metadata) eq 'HASH') {
+    $info = new Image::Synchronize::GroupedInfo;
+
+    foreach my $k (keys %{$metadata}) {
+      my ($group, $tag) = $k =~ /^(?:([^:]+):)?(.*)$/;
+      if (defined $tag) {
+        if (exists($all_tags{$k}) || exists($all_tags{$tag})) {
+          # a tag that interests us
+          $info->set($group, $tag, $metadata->{$k});
+        }
+      }
+    }
+    if ($info->tags_count > 0) {
+      # mark that this information is metadata about another file
+      $info->set('is_metadata', 1);
+    }
+  }
   return $info;
 }
 
@@ -1909,8 +2036,21 @@ sub has_useful_timestamp {
 # sensitive, except on case-insensitive operating systems.
 sub identify_files {
   my ( $pattern, @files ) = @_;
-  my $regex = end_glob_to_regex($pattern);
-  return grep /$regex/, @files;
+  if ($CASE_TOLERANT) {
+    # lowercase the file names and pattern if the operating system
+    # uses case insensitive path names so the match becomes case
+    # insensitive.  Remember the original path names so we can return
+    # those (the matching ones) instead of the lowercased versions.
+    $pattern = lc $pattern;
+    my %original;
+    my @lcfiles = map { lc } @files;
+    foreach my $i (0..$#files) {
+      $original{$lcfiles[$i]} = $files[$i];
+    }
+    return map { $original{$_} } match_glob($pattern, @lcfiles);
+  } else {
+    return match_glob($pattern, @files);
+  }
 }
 
 #  $ims->import_camera_offsets;
@@ -2063,12 +2203,6 @@ sub inspect_files {
       my $info =
         $self->get_image_info( $file );
 
-      # TODO: remove this when the author no longer needs it to
-      # transition from exiftime to imsync
-      if ( defined $info->get('ExiftimeVersion') ) {
-        log_warn("ExiftimeVersion found in $file.\n");
-      }
-
       # if we have the creation timestamp only from the file system
       # and not from an embedded tag, then we cannot deduce the target
       # timestamp from the creation timestamp (because the file
@@ -2079,25 +2213,31 @@ sub inspect_files {
         if defined($createdate)
         and $group ne 'File';
 
-      my $count_essential_gps_tags = 0;
-      foreach (qw(GPSDateTime GPSLongitude GPSLatitude)) {
-        ++$count_essential_gps_tags if defined $info->get($_);
-      }
-      if (  $count_essential_gps_tags
-        and $count_essential_gps_tags < 3 )
-      {
-        log_warn(<<EOD);
+      if (is_image_or_movie($info)) {
+        # TODO: remove this when the author no longer needs it to
+        # transition from exiftime to imsync
+        if ( defined $info->get('ExiftimeVersion') ) {
+          log_warn("ExiftimeVersion found in $file.\n");
+        }
+
+        my $count_essential_gps_tags = 0;
+        foreach (qw(GPSDateTime GPSLongitude GPSLatitude)) {
+          ++$count_essential_gps_tags if defined $info->get($_);
+        }
+        if (  $count_essential_gps_tags
+              and $count_essential_gps_tags < 3 )
+        {
+          log_warn(<<EOD);
 File '$file' has some but not all of GPSDateTime,
 GPSLongitude, GPSLatitude.  Ignoring its GPS information.
 EOD
-        $info->delete($_)
-          foreach qw(GPSLatitude GPSLongitude GPSAltitude GPSDateTime);
-      }
+          $info->delete($_)
+            foreach qw(GPSLatitude GPSLongitude GPSAltitude GPSDateTime);
+        }
 
-      $info->set( 'supposedly_utc', 1 ) if is_supposedly_utc($info);
+        $info->set( 'supposedly_utc', 1 ) if is_supposedly_utc($info);
 
-      # determine the camera ID
-      if (is_image_or_movie($info)) {
+        # determine the camera ID
         my $camera_id = $info->get('CameraID');    # embedded camera ID
         if ( defined $camera_id ) {
 
@@ -2127,9 +2267,41 @@ EOD
         $info->set( 'fallback_camera_id', $fallback_camera_id );
 
         ++$count_image_files;
+        ++$count_gps_times if defined $info->{GPSDateTime};
+      } else {
+        my $type;
+        if (($info->get('MIMEType') // '') =~ m'application/(json|yaml)') {
+          # the MIMEType is detected based on the file's contents,
+          # regardless of its file name extension
+          $type = uc($1);
+        } elsif ($file =~ /\.ya?ml$/i) {
+          # but at the time of writing this there is no YAML-specific
+          # MIMEType yet, so we can also detect YAML files based on
+          # the file name extension
+          $type = 'YAML';
+        }
+        if ($type) {
+          my $metainfo = get_image_info_from_metadata_file($file);
+          if (defined $metainfo) {
+            my @tags = $metainfo->tags;
+            if (@tags) {
+              log_message(2, { name => $file }, " Is a $type metadata file.\n" );
+              # $info->set('is_metadata', 1);
+              foreach my $tag ($metainfo->tags) {
+                my ($group, $value) = $metainfo->get_context($tag);
+                if (not defined($info->get($group, $tag))) {
+                  # this group/tag is not in $info yet
+                  if (exists $time_tags{$tag}) {
+                    $value = Image::Synchronize::Timestamp->new($value);
+                  }
+                  $info->set($group, $tag, $value);
+                }
+              }
+              ++$count_gps_times if defined $info->{GPSDateTime};
+            }
+          }
+        }
       }
-
-      ++$count_gps_times   if defined $info->{GPSDateTime};
 
       $self->{original_info}->{$file} = $info;
       log_message( 2, { name => $file }, $info->stringify(' Found ') . "\n" );
@@ -2139,6 +2311,7 @@ EOD
   }
   $self->cleanup_progressbar($progressbar);
 
+  log_message("\n");
   log_message("Found $count_gps_track_files GPS track file(s).\n")
     if $count_gps_track_files;
   log_message("Found $count_image_files image file(s).\n");
@@ -2165,6 +2338,7 @@ sub is_gpx_track {
     log_message( { name => $file },
       sub { "Cannot open file '$file' for reading: $^E\n" } );
   }
+  return 0;
 }
 
 #   $ok = is_image_or_movie($image_info);
@@ -2202,9 +2376,18 @@ sub length_of_common_prefix {
   my ( $a, $b ) = @_;
   my @a = split //, $a;
   my @b = split //, $b;
-  my $i = 0;
-  ++$i while $a[$i] eq $b[$i];
-  return $i;
+  splice @a, scalar(@b);
+  foreach my $i (0..$#a) {
+    return $i if $a[$i] ne $b[$i];
+  }
+  return scalar(@a);
+}
+
+sub length_of_common_directory_prefix {
+  my ($a, $b) = @_;
+  my $a2 = file($a)->parent->stringify;
+  my $b2 = file($b)->parent->stringify;
+  return length_of_common_prefix($a2, $b2);
 }
 
 my %convert_for_writing = (
@@ -2251,6 +2434,11 @@ my %convert_for_writing = (
   TimeSource    => \&convert_to_xmp,
 );
 
+sub set_file_modification_time {
+  my ($self, $file, $time_utc) = @_;
+  return $self->backend->SetFileTime($file, undef, $time_utc);
+}
+
 #   $et->modify_file($file);
 #
 # Modify the $file as indicated in the information gathered in
@@ -2261,6 +2449,8 @@ my %convert_for_writing = (
 # Returns 1 if the file was modified OK, 2 if the file was written but
 # no changes were made, 3 if the file was not modified because no
 # backup could be created for it, 4 if there was an error writing the
+# file but the metadata could be written to a separate file, 5 if
+# there were errors writing the file and writing the separate metadata
 # file, and 0 if there were no changes to make.
 sub modify_file {
   my ( $self, $file ) = @_;
@@ -2373,19 +2563,77 @@ sub modify_file {
         }
       }
       else {
-        my $error = $b->GetValue('Error');
-        log_warn(
-          join( ', ',
-            " Writing '$file' failed",
-            ( $error ? "ExifTool reports:\n $error" : () ) )
-            . "\n"
-        );
-        $status = 4;
+        # Writing via Image::ExifTool failed.  We write the tags to a
+        # corresponding metadata file instead.  If the writing failed
+        # because Image::ExifTool does not support the file type
+        # (yet), then we report that problem only for the first file
+        # of that type -- to avoid numerous otherwise unavoidable
+        # warnings.
 
-        # Probably the file is unchanged, but we don't know for sure.
-        foreach my $tag (@{$changes}) {
-          next if $tag eq 'FileModifyDate';
-          $new_info->delete($tag);
+        my @messages;
+        my $error = $b->GetValue('Error');
+        if ($error =~ /(Writing of (?:.*?) files is not yet supported)/) {
+          state %suppress;
+          if (not $suppress{$1}) {
+            push @messages,
+              " Writing '$file' failed, ExifTool reports:\n  $error\n",
+              " This message is suppressed for similar following files.\n";
+            # mark that we reported this problem already
+            $suppress{$1} = 1;
+          }
+        } else {
+          push @messages,
+            join( ', ',
+                  " Writing '$file' failed",
+                  ( $error ? "ExifTool reports:\n $error" : () ))
+            . "\n"
+            ;
+        }
+
+        # write the tags to a metadata file instead, if any of the
+        # tags have changed relative to what is in the metadata file
+        # already
+        my $metafile = "${file}.yaml";
+        my $old_metainfo;
+        if (-r $metafile) {
+          $old_metainfo = get_image_info_from_metadata_file($metafile);
+        } else {
+          $old_metainfo = new Image::Synchronize::GroupedInfo;
+        }
+        my %changes;
+        $changed = $self->get_changes($file, $old_metainfo, $new_info, $extra_info,
+                                      undef, \%changes);
+        if ($changed) {
+          if (exists $changes{FileModifyDate}
+              and scalar keys %changes == 1) {
+            # only FileModifyDate needs to be changed
+            $self->set_file_modification_time($metafile,
+                                              $new_info->get('FileModifyDate')->time_utc);
+            $status = 4;
+          } else {
+            # the contents of the metadata file needs changes
+            my %values_for_export;
+            foreach my $tag ($new_info->tags) {
+              foreach my $group ($new_info->groups($tag)) {
+                my $v = $new_info->get($group, $tag);
+                $values_for_export{$group? "$group:$tag": $tag} = "$v";
+              }
+            }
+            if (DumpFile($metafile, \%values_for_export)) {
+              push @messages, " Wrote metadata to '$metafile'.\n";
+              $self->set_file_modification_time($metafile,
+                                                $new_info->get('FileModifyDate')->time_utc);
+              $status = 4;
+            } else {
+              push @messages, " Writing metadata to '${file}.yaml' failed: $@\n";
+              $status = 5;
+            }
+          }
+        } else {
+          $changed = 0; # no changes (perhaps excluding FileModifyDate) after all
+        }
+        if (@messages) {
+          log_message(join("\n", @messages) . "\n");
         }
       }
     }
@@ -2407,7 +2655,7 @@ sub modify_file {
       # that sets the file modification time.
 
       my $fmt = $new_info->get('FileModifyDate');
-      my $success = $b->SetFileTime($file, undef, $fmt->time_utc);
+      my $success = $self->set_file_modification_time($file, $fmt->time_utc);
 
       if ($success) {
         log_message( 4, { name => $file },
@@ -2416,6 +2664,8 @@ sub modify_file {
       } else {
         log_warn( " Error setting FileModifyDate of '$file' to '$fmt'\n");
       }
+    } else {
+      # TODO: don't report any changes for this file, either
     }
     $b->RestoreNewValues();     # return to clean slate
   }
@@ -2730,7 +2980,7 @@ sub process_user_times {
     if ( looks_like_number($rhs) ) {    # offset in seconds
       my $createdate = $info->get('CreateDate');
       if ( defined $createdate ) {
-        $value = $createdate->clone_to_local_timezone + $rhs;
+        $value = $createdate->clone->adjust_to_local_timezone + $rhs;
       }
       else {
         # no CreateDate; cannot apply offset
@@ -2759,7 +3009,7 @@ sub process_user_times {
       $value = -$value if ( $+{sign} // '+' ) eq '-';
       my $createdate = $info->get('CreateDate');
       if ( defined $createdate ) {
-        $value = $createdate->clone_to_local_timezone + $value;
+        $value = $createdate->clone->adjust_to_local_timezone + $value;
       }
       else {
         # no CreateDate; cannot apply offset
@@ -3197,6 +3447,9 @@ EOD
     my $extra_info = $self->{extra_info}->{$file};
     my $short;
     ( $short = $file ) =~ s/^(\Q$common_prefix_path\E)//o;
+    $short =~ s{^\./}{};
+
+    my $is_metainfo_file = $info->get('is_metadata');
 
     # G
     log_message( report_letter( 'GPSDateTime', $info, $new_info ) );
@@ -3205,7 +3458,9 @@ EOD
     log_message( report_letter( 'DateTimeOriginal', $info, $new_info ) );
 
     # O
-    {
+    if ($is_metainfo_file) {
+      log_message('=');
+    } else {
       my @letters = map { report_letter( $_, $info, $new_info ) }
         ( 'XMP:DateTimeOriginal', map { "XMP:$_" } @own_xmp_tags );
       my $combined = $letters[0];
@@ -3264,7 +3519,7 @@ EOD
           " %2s %-25.25s %1s %8s %8s %s\n",
           ( $camera_id // '' ),
           $timestamp->display_iso,
-          $extra_info->get('timesource_letter'),
+          $extra_info->get('timesource_letter') // ' ',
           display_offset( $time_change, 8 ),
           (
             defined($create_date)
@@ -3498,7 +3753,7 @@ sub resolve_files {
       my @subdirs =
         Path::Iterator::Rule->new
           ->max_depth(1)
-          ->name( $f->basename )
+          ->$PIRname( $f->basename )
           ->directory
           ->all( $f->parent );
       @extra = $rule->all(@subdirs) if @subdirs;
@@ -3507,11 +3762,15 @@ sub resolve_files {
       push @extra,
         Path::Iterator::Rule->new
           ->max_depth(1)
-          ->name( $f->basename )
+          ->$PIRname( $f->basename )
           ->and( $rule )
           ->all( $f->parent );
 
       log_message("No matches for $item.\n") unless @extra;
+
+      # remove initial './' because it makes later pattern matching
+      # more difficult
+      @extra = map { s|^./||; $_ } @extra;
     }
     push @files, @extra;
   }
@@ -3528,7 +3787,7 @@ sub restore_original_files {
 
   # restore original files
   my @files = resolve_files( { recurse => $self->option('recurse') },
-    Path::Iterator::Rule->new->file->name('*_original'), @arguments );
+    Path::Iterator::Rule->new->file->$PIRname('*_original'), @arguments );
   my $progressbar = $self->setup_progressbar( scalar(@files), 'restore' );
   my $count       = 0;
   my $exit_status = 0;

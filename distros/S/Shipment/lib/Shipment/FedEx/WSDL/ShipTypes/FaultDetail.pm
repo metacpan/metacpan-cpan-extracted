@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::FaultDetail;
-$Shipment::FedEx::WSDL::ShipTypes::FaultDetail::VERSION = '3.07';
+$Shipment::FedEx::WSDL::ShipTypes::FaultDetail::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,33 +20,25 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %fault_of :ATTR(:get<fault>);
+    my %fault_of : ATTR(:get<fault>);
 
-__PACKAGE__->_factory(
-    [ qw(
-        fault
+    __PACKAGE__->_factory(
+        [   qw(
+              fault
 
-    ) ],
-    {
-        'fault' => \%fault_of,
-    },
-    {
-        'fault' => 'Shipment::FedEx::WSDL::ShipTypes::Fault',
-    },
-    {
+            )
+        ],
+        {'fault' => \%fault_of,},
+        {'fault' => 'Shipment::FedEx::WSDL::ShipTypes::Fault',},
+        {
 
-        'fault' => 'fault',
-    }
-);
+            'fault' => 'fault',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -63,7 +55,7 @@ Shipment::FedEx::WSDL::ShipTypes::FaultDetail
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
-use Test::Needs qw(
-  Catalyst::Plugin::Session::State::Cookie
-  Catalyst::Plugin::Authentication
-);
+use Test::Needs {
+  'Catalyst::Plugin::Authentication'          => '0',
+  'Catalyst::Plugin::Session::State::Cookie'  => '0.03',
+};
 
 use Test::More;
 

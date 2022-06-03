@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::CreatePendingShipmentRequest;
-$Shipment::FedEx::WSDL::ShipTypes::CreatePendingShipmentRequest::VERSION = '3.07';
+$Shipment::FedEx::WSDL::ShipTypes::CreatePendingShipmentRequest::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,52 +20,49 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %WebAuthenticationDetail_of :ATTR(:get<WebAuthenticationDetail>);
-my %ClientDetail_of :ATTR(:get<ClientDetail>);
-my %TransactionDetail_of :ATTR(:get<TransactionDetail>);
-my %Version_of :ATTR(:get<Version>);
-my %RequestedShipment_of :ATTR(:get<RequestedShipment>);
+    my %WebAuthenticationDetail_of : ATTR(:get<WebAuthenticationDetail>);
+    my %ClientDetail_of : ATTR(:get<ClientDetail>);
+    my %TransactionDetail_of : ATTR(:get<TransactionDetail>);
+    my %Version_of : ATTR(:get<Version>);
+    my %RequestedShipment_of : ATTR(:get<RequestedShipment>);
 
-__PACKAGE__->_factory(
-    [ qw(        WebAuthenticationDetail
-        ClientDetail
-        TransactionDetail
-        Version
-        RequestedShipment
+    __PACKAGE__->_factory(
+        [   qw(        WebAuthenticationDetail
+              ClientDetail
+              TransactionDetail
+              Version
+              RequestedShipment
 
-    ) ],
-    {
-        'WebAuthenticationDetail' => \%WebAuthenticationDetail_of,
-        'ClientDetail' => \%ClientDetail_of,
-        'TransactionDetail' => \%TransactionDetail_of,
-        'Version' => \%Version_of,
-        'RequestedShipment' => \%RequestedShipment_of,
-    },
-    {
-        'WebAuthenticationDetail' => 'Shipment::FedEx::WSDL::ShipTypes::WebAuthenticationDetail',
-        'ClientDetail' => 'Shipment::FedEx::WSDL::ShipTypes::ClientDetail',
-        'TransactionDetail' => 'Shipment::FedEx::WSDL::ShipTypes::TransactionDetail',
-        'Version' => 'Shipment::FedEx::WSDL::ShipTypes::VersionId',
-        'RequestedShipment' => 'Shipment::FedEx::WSDL::ShipTypes::RequestedShipment',
-    },
-    {
+            )
+        ],
+        {   'WebAuthenticationDetail' => \%WebAuthenticationDetail_of,
+            'ClientDetail'            => \%ClientDetail_of,
+            'TransactionDetail'       => \%TransactionDetail_of,
+            'Version'                 => \%Version_of,
+            'RequestedShipment'       => \%RequestedShipment_of,
+        },
+        {   'WebAuthenticationDetail' =>
+              'Shipment::FedEx::WSDL::ShipTypes::WebAuthenticationDetail',
+            'ClientDetail' => 'Shipment::FedEx::WSDL::ShipTypes::ClientDetail',
+            'TransactionDetail' =>
+              'Shipment::FedEx::WSDL::ShipTypes::TransactionDetail',
+            'Version' => 'Shipment::FedEx::WSDL::ShipTypes::VersionId',
+            'RequestedShipment' =>
+              'Shipment::FedEx::WSDL::ShipTypes::RequestedShipment',
+        },
+        {
 
-        'WebAuthenticationDetail' => 'WebAuthenticationDetail',
-        'ClientDetail' => 'ClientDetail',
-        'TransactionDetail' => 'TransactionDetail',
-        'Version' => 'Version',
-        'RequestedShipment' => 'RequestedShipment',
-    }
-);
+            'WebAuthenticationDetail' => 'WebAuthenticationDetail',
+            'ClientDetail'            => 'ClientDetail',
+            'TransactionDetail'       => 'TransactionDetail',
+            'Version'                 => 'Version',
+            'RequestedShipment'       => 'RequestedShipment',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -82,7 +79,7 @@ Shipment::FedEx::WSDL::ShipTypes::CreatePendingShipmentRequest
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::FreightShipmentLineItem;
-$Shipment::FedEx::WSDL::RateTypes::FreightShipmentLineItem::VERSION = '3.07';
+$Shipment::FedEx::WSDL::RateTypes::FreightShipmentLineItem::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
+sub get_xmlns {'http://fedex.com/ws/rate/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,57 +20,53 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %FreightClass_of :ATTR(:get<FreightClass>);
-my %Packaging_of :ATTR(:get<Packaging>);
-my %Description_of :ATTR(:get<Description>);
-my %Weight_of :ATTR(:get<Weight>);
-my %Dimensions_of :ATTR(:get<Dimensions>);
-my %Volume_of :ATTR(:get<Volume>);
+    my %FreightClass_of : ATTR(:get<FreightClass>);
+    my %Packaging_of : ATTR(:get<Packaging>);
+    my %Description_of : ATTR(:get<Description>);
+    my %Weight_of : ATTR(:get<Weight>);
+    my %Dimensions_of : ATTR(:get<Dimensions>);
+    my %Volume_of : ATTR(:get<Volume>);
 
-__PACKAGE__->_factory(
-    [ qw(        FreightClass
-        Packaging
-        Description
-        Weight
-        Dimensions
-        Volume
+    __PACKAGE__->_factory(
+        [   qw(        FreightClass
+              Packaging
+              Description
+              Weight
+              Dimensions
+              Volume
 
-    ) ],
-    {
-        'FreightClass' => \%FreightClass_of,
-        'Packaging' => \%Packaging_of,
-        'Description' => \%Description_of,
-        'Weight' => \%Weight_of,
-        'Dimensions' => \%Dimensions_of,
-        'Volume' => \%Volume_of,
-    },
-    {
-        'FreightClass' => 'Shipment::FedEx::WSDL::RateTypes::FreightClassType',
-        'Packaging' => 'Shipment::FedEx::WSDL::RateTypes::PhysicalPackagingType',
-        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Weight' => 'Shipment::FedEx::WSDL::RateTypes::Weight',
-        'Dimensions' => 'Shipment::FedEx::WSDL::RateTypes::Dimensions',
-        'Volume' => 'Shipment::FedEx::WSDL::RateTypes::Volume',
-    },
-    {
+            )
+        ],
+        {   'FreightClass' => \%FreightClass_of,
+            'Packaging'    => \%Packaging_of,
+            'Description'  => \%Description_of,
+            'Weight'       => \%Weight_of,
+            'Dimensions'   => \%Dimensions_of,
+            'Volume'       => \%Volume_of,
+        },
+        {   'FreightClass' =>
+              'Shipment::FedEx::WSDL::RateTypes::FreightClassType',
+            'Packaging' =>
+              'Shipment::FedEx::WSDL::RateTypes::PhysicalPackagingType',
+            'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Weight'      => 'Shipment::FedEx::WSDL::RateTypes::Weight',
+            'Dimensions'  => 'Shipment::FedEx::WSDL::RateTypes::Dimensions',
+            'Volume'      => 'Shipment::FedEx::WSDL::RateTypes::Volume',
+        },
+        {
 
-        'FreightClass' => 'FreightClass',
-        'Packaging' => 'Packaging',
-        'Description' => 'Description',
-        'Weight' => 'Weight',
-        'Dimensions' => 'Dimensions',
-        'Volume' => 'Volume',
-    }
-);
+            'FreightClass' => 'FreightClass',
+            'Packaging'    => 'Packaging',
+            'Description'  => 'Description',
+            'Weight'       => 'Weight',
+            'Dimensions'   => 'Dimensions',
+            'Volume'       => 'Volume',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -87,7 +83,7 @@ Shipment::FedEx::WSDL::RateTypes::FreightShipmentLineItem
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::RateTypes::ClientInformationType;
-$Shipment::UPS::WSDL::RateTypes::ClientInformationType::VERSION = '3.07';
+$Shipment::UPS::WSDL::RateTypes::ClientInformationType::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Common/v1.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Common/v1.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,77 +20,73 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Property_of :ATTR(:get<Property>);
+    my %Property_of : ATTR(:get<Property>);
 
-__PACKAGE__->_factory(
-    [ qw(        Property
+    __PACKAGE__->_factory(
+        [   qw(        Property
 
-    ) ],
-    {
-        'Property' => \%Property_of,
-    },
-    {
+            )
+        ],
+        {'Property' => \%Property_of,},
+        {
 
-        'Property' => 'Shipment::UPS::WSDL::RateTypes::ClientInformationType::_Property',
-    },
-    {
+            'Property' =>
+              'Shipment::UPS::WSDL::RateTypes::ClientInformationType::_Property',
+        },
+        {
 
-        'Property' => 'Property',
-    }
-);
+            'Property' => 'Property',
+        }
+    );
 
-} # end BLOCK
-
-
+}    # end BLOCK
 
 
 package Shipment::UPS::WSDL::RateTypes::ClientInformationType::_Property;
-$Shipment::UPS::WSDL::RateTypes::ClientInformationType::_Property::VERSION = '3.07';
+$Shipment::UPS::WSDL::RateTypes::ClientInformationType::_Property::VERSION =
+  '3.08';
 use strict;
 use warnings;
 {
-our $XML_ATTRIBUTE_CLASS = 'Shipment::UPS::WSDL::RateTypes::ClientInformationType::_Property::XmlAttr';
+    our $XML_ATTRIBUTE_CLASS =
+      'Shipment::UPS::WSDL::RateTypes::ClientInformationType::_Property::XmlAttr';
 
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
-use base qw(
-    SOAP::WSDL::XSD::Typelib::ComplexType
-    SOAP::WSDL::XSD::Typelib::Builtin::string
-);
-
-package Shipment::UPS::WSDL::RateTypes::ClientInformationType::_Property::XmlAttr;
-$Shipment::UPS::WSDL::RateTypes::ClientInformationType::_Property::XmlAttr::VERSION = '3.07';
-use base qw(SOAP::WSDL::XSD::Typelib::AttributeSet);
-
-{ # BLOCK to scope variables
-
-my %Key_of :ATTR(:get<Key>);
-
-__PACKAGE__->_factory(
-    [ qw(
-        Key
-    ) ],
-    {
-
-        Key => \%Key_of,
-    },
-    {
-        Key => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+    sub __get_attr_class {
+        return $XML_ATTRIBUTE_CLASS;
     }
-);
 
-} # end BLOCK
+    use base qw(
+      SOAP::WSDL::XSD::Typelib::ComplexType
+      SOAP::WSDL::XSD::Typelib::Builtin::string
+    );
+
+    package Shipment::UPS::WSDL::RateTypes::ClientInformationType::_Property::XmlAttr;
+    $Shipment::UPS::WSDL::RateTypes::ClientInformationType::_Property::XmlAttr::VERSION
+      = '3.08';
+    use base qw(SOAP::WSDL::XSD::Typelib::AttributeSet);
+
+    {    # BLOCK to scope variables
+
+        my %Key_of : ATTR(:get<Key>);
+
+        __PACKAGE__->_factory(
+            [   qw(
+                  Key
+                )
+            ],
+            {
+
+                Key => \%Key_of,
+            },
+            {Key => 'SOAP::WSDL::XSD::Typelib::Builtin::string',}
+        );
+
+    }    # end BLOCK
 
 
 }
-
-
-
-
 
 
 1;
@@ -107,7 +103,7 @@ Shipment::UPS::WSDL::RateTypes::ClientInformationType
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackAdvanceNotificationDetail;
-$Shipment::FedEx::WSDL::TrackTypes::TrackAdvanceNotificationDetail::VERSION = '3.07';
+$Shipment::FedEx::WSDL::TrackTypes::TrackAdvanceNotificationDetail::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/track/v9' };
+sub get_xmlns {'http://fedex.com/ws/track/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,52 +20,48 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %EstimatedTimeOfArrival_of :ATTR(:get<EstimatedTimeOfArrival>);
-my %Reason_of :ATTR(:get<Reason>);
-my %Status_of :ATTR(:get<Status>);
-my %StatusDescription_of :ATTR(:get<StatusDescription>);
-my %StatusTime_of :ATTR(:get<StatusTime>);
+    my %EstimatedTimeOfArrival_of : ATTR(:get<EstimatedTimeOfArrival>);
+    my %Reason_of : ATTR(:get<Reason>);
+    my %Status_of : ATTR(:get<Status>);
+    my %StatusDescription_of : ATTR(:get<StatusDescription>);
+    my %StatusTime_of : ATTR(:get<StatusTime>);
 
-__PACKAGE__->_factory(
-    [ qw(        EstimatedTimeOfArrival
-        Reason
-        Status
-        StatusDescription
-        StatusTime
+    __PACKAGE__->_factory(
+        [   qw(        EstimatedTimeOfArrival
+              Reason
+              Status
+              StatusDescription
+              StatusTime
 
-    ) ],
-    {
-        'EstimatedTimeOfArrival' => \%EstimatedTimeOfArrival_of,
-        'Reason' => \%Reason_of,
-        'Status' => \%Status_of,
-        'StatusDescription' => \%StatusDescription_of,
-        'StatusTime' => \%StatusTime_of,
-    },
-    {
-        'EstimatedTimeOfArrival' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
-        'Reason' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Status' => 'Shipment::FedEx::WSDL::TrackTypes::TrackAdvanceNotificationStatusType',
-        'StatusDescription' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'StatusTime' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
-    },
-    {
+            )
+        ],
+        {   'EstimatedTimeOfArrival' => \%EstimatedTimeOfArrival_of,
+            'Reason'                 => \%Reason_of,
+            'Status'                 => \%Status_of,
+            'StatusDescription'      => \%StatusDescription_of,
+            'StatusTime'             => \%StatusTime_of,
+        },
+        {   'EstimatedTimeOfArrival' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
+            'Reason' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Status' =>
+              'Shipment::FedEx::WSDL::TrackTypes::TrackAdvanceNotificationStatusType',
+            'StatusDescription' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'StatusTime' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
+        },
+        {
 
-        'EstimatedTimeOfArrival' => 'EstimatedTimeOfArrival',
-        'Reason' => 'Reason',
-        'Status' => 'Status',
-        'StatusDescription' => 'StatusDescription',
-        'StatusTime' => 'StatusTime',
-    }
-);
+            'EstimatedTimeOfArrival' => 'EstimatedTimeOfArrival',
+            'Reason'                 => 'Reason',
+            'Status'                 => 'Status',
+            'StatusDescription'      => 'StatusDescription',
+            'StatusTime'             => 'StatusTime',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -82,7 +78,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackAdvanceNotificationDetail
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

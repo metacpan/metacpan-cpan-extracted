@@ -379,5 +379,5 @@ for my $case ( @cases ) {
      );
 }
 
-done_testing();
+done_testing( 28 );
 

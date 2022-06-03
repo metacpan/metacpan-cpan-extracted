@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::RateRequest;
-$Shipment::FedEx::WSDL::RateTypes::RateRequest::VERSION = '3.07';
+$Shipment::FedEx::WSDL::RateTypes::RateRequest::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
+sub get_xmlns {'http://fedex.com/ws/rate/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,67 +20,67 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %WebAuthenticationDetail_of :ATTR(:get<WebAuthenticationDetail>);
-my %ClientDetail_of :ATTR(:get<ClientDetail>);
-my %TransactionDetail_of :ATTR(:get<TransactionDetail>);
-my %Version_of :ATTR(:get<Version>);
-my %ReturnTransitAndCommit_of :ATTR(:get<ReturnTransitAndCommit>);
-my %CarrierCodes_of :ATTR(:get<CarrierCodes>);
-my %VariableOptions_of :ATTR(:get<VariableOptions>);
-my %RequestedShipment_of :ATTR(:get<RequestedShipment>);
+    my %WebAuthenticationDetail_of : ATTR(:get<WebAuthenticationDetail>);
+    my %ClientDetail_of : ATTR(:get<ClientDetail>);
+    my %TransactionDetail_of : ATTR(:get<TransactionDetail>);
+    my %Version_of : ATTR(:get<Version>);
+    my %ReturnTransitAndCommit_of : ATTR(:get<ReturnTransitAndCommit>);
+    my %CarrierCodes_of : ATTR(:get<CarrierCodes>);
+    my %VariableOptions_of : ATTR(:get<VariableOptions>);
+    my %RequestedShipment_of : ATTR(:get<RequestedShipment>);
 
-__PACKAGE__->_factory(
-    [ qw(        WebAuthenticationDetail
-        ClientDetail
-        TransactionDetail
-        Version
-        ReturnTransitAndCommit
-        CarrierCodes
-        VariableOptions
-        RequestedShipment
+    __PACKAGE__->_factory(
+        [   qw(        WebAuthenticationDetail
+              ClientDetail
+              TransactionDetail
+              Version
+              ReturnTransitAndCommit
+              CarrierCodes
+              VariableOptions
+              RequestedShipment
 
-    ) ],
-    {
-        'WebAuthenticationDetail' => \%WebAuthenticationDetail_of,
-        'ClientDetail' => \%ClientDetail_of,
-        'TransactionDetail' => \%TransactionDetail_of,
-        'Version' => \%Version_of,
-        'ReturnTransitAndCommit' => \%ReturnTransitAndCommit_of,
-        'CarrierCodes' => \%CarrierCodes_of,
-        'VariableOptions' => \%VariableOptions_of,
-        'RequestedShipment' => \%RequestedShipment_of,
-    },
-    {
-        'WebAuthenticationDetail' => 'Shipment::FedEx::WSDL::RateTypes::WebAuthenticationDetail',
-        'ClientDetail' => 'Shipment::FedEx::WSDL::RateTypes::ClientDetail',
-        'TransactionDetail' => 'Shipment::FedEx::WSDL::RateTypes::TransactionDetail',
-        'Version' => 'Shipment::FedEx::WSDL::RateTypes::VersionId',
-        'ReturnTransitAndCommit' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-        'CarrierCodes' => 'Shipment::FedEx::WSDL::RateTypes::CarrierCodeType',
-        'VariableOptions' => 'Shipment::FedEx::WSDL::RateTypes::ServiceOptionType',
-        'RequestedShipment' => 'Shipment::FedEx::WSDL::RateTypes::RequestedShipment',
-    },
-    {
+            )
+        ],
+        {   'WebAuthenticationDetail' => \%WebAuthenticationDetail_of,
+            'ClientDetail'            => \%ClientDetail_of,
+            'TransactionDetail'       => \%TransactionDetail_of,
+            'Version'                 => \%Version_of,
+            'ReturnTransitAndCommit'  => \%ReturnTransitAndCommit_of,
+            'CarrierCodes'            => \%CarrierCodes_of,
+            'VariableOptions'         => \%VariableOptions_of,
+            'RequestedShipment'       => \%RequestedShipment_of,
+        },
+        {   'WebAuthenticationDetail' =>
+              'Shipment::FedEx::WSDL::RateTypes::WebAuthenticationDetail',
+            'ClientDetail' => 'Shipment::FedEx::WSDL::RateTypes::ClientDetail',
+            'TransactionDetail' =>
+              'Shipment::FedEx::WSDL::RateTypes::TransactionDetail',
+            'Version' => 'Shipment::FedEx::WSDL::RateTypes::VersionId',
+            'ReturnTransitAndCommit' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+            'CarrierCodes' =>
+              'Shipment::FedEx::WSDL::RateTypes::CarrierCodeType',
+            'VariableOptions' =>
+              'Shipment::FedEx::WSDL::RateTypes::ServiceOptionType',
+            'RequestedShipment' =>
+              'Shipment::FedEx::WSDL::RateTypes::RequestedShipment',
+        },
+        {
 
-        'WebAuthenticationDetail' => 'WebAuthenticationDetail',
-        'ClientDetail' => 'ClientDetail',
-        'TransactionDetail' => 'TransactionDetail',
-        'Version' => 'Version',
-        'ReturnTransitAndCommit' => 'ReturnTransitAndCommit',
-        'CarrierCodes' => 'CarrierCodes',
-        'VariableOptions' => 'VariableOptions',
-        'RequestedShipment' => 'RequestedShipment',
-    }
-);
+            'WebAuthenticationDetail' => 'WebAuthenticationDetail',
+            'ClientDetail'            => 'ClientDetail',
+            'TransactionDetail'       => 'TransactionDetail',
+            'Version'                 => 'Version',
+            'ReturnTransitAndCommit'  => 'ReturnTransitAndCommit',
+            'CarrierCodes'            => 'CarrierCodes',
+            'VariableOptions'         => 'VariableOptions',
+            'RequestedShipment'       => 'RequestedShipment',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -97,7 +97,7 @@ Shipment::FedEx::WSDL::RateTypes::RateRequest
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::TrackTypes::DateTimeType;
-$Shipment::UPS::WSDL::TrackTypes::DateTimeType::VERSION = '3.07';
+$Shipment::UPS::WSDL::TrackTypes::DateTimeType::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,31 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Date_of :ATTR(:get<Date>);
-my %Time_of :ATTR(:get<Time>);
+    my %Date_of : ATTR(:get<Date>);
+    my %Time_of : ATTR(:get<Time>);
 
-__PACKAGE__->_factory(
-    [ qw(        Date
-        Time
+    __PACKAGE__->_factory(
+        [   qw(        Date
+              Time
 
-    ) ],
-    {
-        'Date' => \%Date_of,
-        'Time' => \%Time_of,
-    },
-    {
-        'Date' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Time' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'Date' => \%Date_of,
+            'Time' => \%Time_of,
+        },
+        {   'Date' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Time' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'Date' => 'Date',
-        'Time' => 'Time',
-    }
-);
+            'Date' => 'Date',
+            'Time' => 'Time',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +61,7 @@ Shipment::UPS::WSDL::TrackTypes::DateTimeType
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

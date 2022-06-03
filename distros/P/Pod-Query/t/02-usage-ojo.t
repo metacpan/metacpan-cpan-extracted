@@ -1295,5 +1295,6 @@ use Mojo::Base -strict;
 use FindBin();
 use lib $FindBin::RealBin;
 
-Test::ojo->with_roles( 'Role::Test::Module' )->run( module => "ojo", );
+Test::ojo->with_roles( 'Role::Test::Module' )
+  ->run( module => "ojo", tests => 95 );
 

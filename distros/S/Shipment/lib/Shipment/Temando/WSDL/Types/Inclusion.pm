@@ -1,12 +1,16 @@
 package Shipment::Temando::WSDL::Types::Inclusion;
-$Shipment::Temando::WSDL::Types::Inclusion::VERSION = '3.07';
+$Shipment::Temando::WSDL::Types::Inclusion::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(0);
 
-sub get_xmlns { 'http://' . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url . '/schema/2009_06/common.xsd' };
+sub get_xmlns {
+    'http://'
+      . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url
+      . '/schema/2009_06/common.xsd';
+}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +24,31 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %summary_of :ATTR(:get<summary>);
-my %details_of :ATTR(:get<details>);
+    my %summary_of : ATTR(:get<summary>);
+    my %details_of : ATTR(:get<details>);
 
-__PACKAGE__->_factory(
-    [ qw(        summary
-        details
+    __PACKAGE__->_factory(
+        [   qw(        summary
+              details
 
-    ) ],
-    {
-        'summary' => \%summary_of,
-        'details' => \%details_of,
-    },
-    {
-        'summary' => 'Shipment::Temando::WSDL::Types::InclusionSummary',
-        'details' => 'Shipment::Temando::WSDL::Types::InclusionDetails',
-    },
-    {
+            )
+        ],
+        {   'summary' => \%summary_of,
+            'details' => \%details_of,
+        },
+        {   'summary' => 'Shipment::Temando::WSDL::Types::InclusionSummary',
+            'details' => 'Shipment::Temando::WSDL::Types::InclusionDetails',
+        },
+        {
 
-        'summary' => 'summary',
-        'details' => 'details',
-    }
-);
+            'summary' => 'summary',
+            'details' => 'details',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +65,7 @@ Shipment::Temando::WSDL::Types::Inclusion
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

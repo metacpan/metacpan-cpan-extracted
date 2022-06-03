@@ -1,12 +1,16 @@
 package Shipment::Temando::WSDL::Types::Depot;
-$Shipment::Temando::WSDL::Types::Depot::VERSION = '3.07';
+$Shipment::Temando::WSDL::Types::Depot::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(0);
 
-sub get_xmlns { 'http://' . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url . '/schema/2009_06/common.xsd' };
+sub get_xmlns {
+    'http://'
+      . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url
+      . '/schema/2009_06/common.xsd';
+}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,82 +24,77 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %name_of :ATTR(:get<name>);
-my %street_of :ATTR(:get<street>);
-my %suburb_of :ATTR(:get<suburb>);
-my %city_of :ATTR(:get<city>);
-my %state_of :ATTR(:get<state>);
-my %code_of :ATTR(:get<code>);
-my %country_of :ATTR(:get<country>);
-my %phone1_of :ATTR(:get<phone1>);
-my %phone2_of :ATTR(:get<phone2>);
-my %fax_of :ATTR(:get<fax>);
-my %instructions_of :ATTR(:get<instructions>);
+    my %name_of : ATTR(:get<name>);
+    my %street_of : ATTR(:get<street>);
+    my %suburb_of : ATTR(:get<suburb>);
+    my %city_of : ATTR(:get<city>);
+    my %state_of : ATTR(:get<state>);
+    my %code_of : ATTR(:get<code>);
+    my %country_of : ATTR(:get<country>);
+    my %phone1_of : ATTR(:get<phone1>);
+    my %phone2_of : ATTR(:get<phone2>);
+    my %fax_of : ATTR(:get<fax>);
+    my %instructions_of : ATTR(:get<instructions>);
 
-__PACKAGE__->_factory(
-    [ qw(        name
-        street
-        suburb
-        city
-        state
-        code
-        country
-        phone1
-        phone2
-        fax
-        instructions
+    __PACKAGE__->_factory(
+        [   qw(        name
+              street
+              suburb
+              city
+              state
+              code
+              country
+              phone1
+              phone2
+              fax
+              instructions
 
-    ) ],
-    {
-        'name' => \%name_of,
-        'street' => \%street_of,
-        'suburb' => \%suburb_of,
-        'city' => \%city_of,
-        'state' => \%state_of,
-        'code' => \%code_of,
-        'country' => \%country_of,
-        'phone1' => \%phone1_of,
-        'phone2' => \%phone2_of,
-        'fax' => \%fax_of,
-        'instructions' => \%instructions_of,
-    },
-    {
-        'name' => 'Shipment::Temando::WSDL::Types::DepotName',
-        'street' => 'Shipment::Temando::WSDL::Types::Address',
-        'suburb' => 'Shipment::Temando::WSDL::Types::Suburb',
-        'city' => 'Shipment::Temando::WSDL::Types::City',
-        'state' => 'Shipment::Temando::WSDL::Types::State',
-        'code' => 'Shipment::Temando::WSDL::Types::PostalCode',
-        'country' => 'Shipment::Temando::WSDL::Types::CountryCode',
-        'phone1' => 'Shipment::Temando::WSDL::Types::Phone',
-        'phone2' => 'Shipment::Temando::WSDL::Types::Phone',
-        'fax' => 'Shipment::Temando::WSDL::Types::Fax',
-        'instructions' => 'Shipment::Temando::WSDL::Types::DepotInstructions',
-    },
-    {
+            )
+        ],
+        {   'name'         => \%name_of,
+            'street'       => \%street_of,
+            'suburb'       => \%suburb_of,
+            'city'         => \%city_of,
+            'state'        => \%state_of,
+            'code'         => \%code_of,
+            'country'      => \%country_of,
+            'phone1'       => \%phone1_of,
+            'phone2'       => \%phone2_of,
+            'fax'          => \%fax_of,
+            'instructions' => \%instructions_of,
+        },
+        {   'name'         => 'Shipment::Temando::WSDL::Types::DepotName',
+            'street'       => 'Shipment::Temando::WSDL::Types::Address',
+            'suburb'       => 'Shipment::Temando::WSDL::Types::Suburb',
+            'city'         => 'Shipment::Temando::WSDL::Types::City',
+            'state'        => 'Shipment::Temando::WSDL::Types::State',
+            'code'         => 'Shipment::Temando::WSDL::Types::PostalCode',
+            'country'      => 'Shipment::Temando::WSDL::Types::CountryCode',
+            'phone1'       => 'Shipment::Temando::WSDL::Types::Phone',
+            'phone2'       => 'Shipment::Temando::WSDL::Types::Phone',
+            'fax'          => 'Shipment::Temando::WSDL::Types::Fax',
+            'instructions' =>
+              'Shipment::Temando::WSDL::Types::DepotInstructions',
+        },
+        {
 
-        'name' => 'name',
-        'street' => 'street',
-        'suburb' => 'suburb',
-        'city' => 'city',
-        'state' => 'state',
-        'code' => 'code',
-        'country' => 'country',
-        'phone1' => 'phone1',
-        'phone2' => 'phone2',
-        'fax' => 'fax',
-        'instructions' => 'instructions',
-    }
-);
+            'name'         => 'name',
+            'street'       => 'street',
+            'suburb'       => 'suburb',
+            'city'         => 'city',
+            'state'        => 'state',
+            'code'         => 'code',
+            'country'      => 'country',
+            'phone1'       => 'phone1',
+            'phone2'       => 'phone2',
+            'fax'          => 'fax',
+            'instructions' => 'instructions',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -112,7 +111,7 @@ Shipment::Temando::WSDL::Types::Depot
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

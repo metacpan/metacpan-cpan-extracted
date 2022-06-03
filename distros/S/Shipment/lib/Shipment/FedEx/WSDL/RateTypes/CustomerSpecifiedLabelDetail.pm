@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::CustomerSpecifiedLabelDetail;
-$Shipment::FedEx::WSDL::RateTypes::CustomerSpecifiedLabelDetail::VERSION = '3.07';
+$Shipment::FedEx::WSDL::RateTypes::CustomerSpecifiedLabelDetail::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
+sub get_xmlns {'http://fedex.com/ws/rate/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,62 +20,68 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %DocTabContent_of :ATTR(:get<DocTabContent>);
-my %CustomContent_of :ATTR(:get<CustomContent>);
-my %ConfigurableReferenceEntries_of :ATTR(:get<ConfigurableReferenceEntries>);
-my %MaskedData_of :ATTR(:get<MaskedData>);
-my %TermsAndConditionsLocalization_of :ATTR(:get<TermsAndConditionsLocalization>);
-my %AdditionalLabels_of :ATTR(:get<AdditionalLabels>);
-my %AirWaybillSuppressionCount_of :ATTR(:get<AirWaybillSuppressionCount>);
+    my %DocTabContent_of : ATTR(:get<DocTabContent>);
+    my %CustomContent_of : ATTR(:get<CustomContent>);
+    my %ConfigurableReferenceEntries_of :
+      ATTR(:get<ConfigurableReferenceEntries>);
+    my %MaskedData_of : ATTR(:get<MaskedData>);
+    my %TermsAndConditionsLocalization_of :
+      ATTR(:get<TermsAndConditionsLocalization>);
+    my %AdditionalLabels_of : ATTR(:get<AdditionalLabels>);
+    my %AirWaybillSuppressionCount_of : ATTR(:get<AirWaybillSuppressionCount>);
 
-__PACKAGE__->_factory(
-    [ qw(        DocTabContent
-        CustomContent
-        ConfigurableReferenceEntries
-        MaskedData
-        TermsAndConditionsLocalization
-        AdditionalLabels
-        AirWaybillSuppressionCount
+    __PACKAGE__->_factory(
+        [   qw(        DocTabContent
+              CustomContent
+              ConfigurableReferenceEntries
+              MaskedData
+              TermsAndConditionsLocalization
+              AdditionalLabels
+              AirWaybillSuppressionCount
 
-    ) ],
-    {
-        'DocTabContent' => \%DocTabContent_of,
-        'CustomContent' => \%CustomContent_of,
-        'ConfigurableReferenceEntries' => \%ConfigurableReferenceEntries_of,
-        'MaskedData' => \%MaskedData_of,
-        'TermsAndConditionsLocalization' => \%TermsAndConditionsLocalization_of,
-        'AdditionalLabels' => \%AdditionalLabels_of,
-        'AirWaybillSuppressionCount' => \%AirWaybillSuppressionCount_of,
-    },
-    {
-        'DocTabContent' => 'Shipment::FedEx::WSDL::RateTypes::DocTabContent',
-        'CustomContent' => 'Shipment::FedEx::WSDL::RateTypes::CustomLabelDetail',
-        'ConfigurableReferenceEntries' => 'Shipment::FedEx::WSDL::RateTypes::ConfigurableLabelReferenceEntry',
-        'MaskedData' => 'Shipment::FedEx::WSDL::RateTypes::LabelMaskableDataType',
-        'TermsAndConditionsLocalization' => 'Shipment::FedEx::WSDL::RateTypes::Localization',
-        'AdditionalLabels' => 'Shipment::FedEx::WSDL::RateTypes::AdditionalLabelsDetail',
-        'AirWaybillSuppressionCount' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-    },
-    {
+            )
+        ],
+        {   'DocTabContent'                => \%DocTabContent_of,
+            'CustomContent'                => \%CustomContent_of,
+            'ConfigurableReferenceEntries' =>
+              \%ConfigurableReferenceEntries_of,
+            'MaskedData'                     => \%MaskedData_of,
+            'TermsAndConditionsLocalization' =>
+              \%TermsAndConditionsLocalization_of,
+            'AdditionalLabels'           => \%AdditionalLabels_of,
+            'AirWaybillSuppressionCount' => \%AirWaybillSuppressionCount_of,
+        },
+        {   'DocTabContent' =>
+              'Shipment::FedEx::WSDL::RateTypes::DocTabContent',
+            'CustomContent' =>
+              'Shipment::FedEx::WSDL::RateTypes::CustomLabelDetail',
+            'ConfigurableReferenceEntries' =>
+              'Shipment::FedEx::WSDL::RateTypes::ConfigurableLabelReferenceEntry',
+            'MaskedData' =>
+              'Shipment::FedEx::WSDL::RateTypes::LabelMaskableDataType',
+            'TermsAndConditionsLocalization' =>
+              'Shipment::FedEx::WSDL::RateTypes::Localization',
+            'AdditionalLabels' =>
+              'Shipment::FedEx::WSDL::RateTypes::AdditionalLabelsDetail',
+            'AirWaybillSuppressionCount' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+        },
+        {
 
-        'DocTabContent' => 'DocTabContent',
-        'CustomContent' => 'CustomContent',
-        'ConfigurableReferenceEntries' => 'ConfigurableReferenceEntries',
-        'MaskedData' => 'MaskedData',
-        'TermsAndConditionsLocalization' => 'TermsAndConditionsLocalization',
-        'AdditionalLabels' => 'AdditionalLabels',
-        'AirWaybillSuppressionCount' => 'AirWaybillSuppressionCount',
-    }
-);
+            'DocTabContent'                  => 'DocTabContent',
+            'CustomContent'                  => 'CustomContent',
+            'ConfigurableReferenceEntries'   => 'ConfigurableReferenceEntries',
+            'MaskedData'                     => 'MaskedData',
+            'TermsAndConditionsLocalization' =>
+              'TermsAndConditionsLocalization',
+            'AdditionalLabels'           => 'AdditionalLabels',
+            'AirWaybillSuppressionCount' => 'AirWaybillSuppressionCount',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -92,7 +98,7 @@ Shipment::FedEx::WSDL::RateTypes::CustomerSpecifiedLabelDetail
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

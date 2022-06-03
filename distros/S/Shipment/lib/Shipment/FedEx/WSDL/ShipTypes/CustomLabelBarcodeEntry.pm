@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::CustomLabelBarcodeEntry;
-$Shipment::FedEx::WSDL::ShipTypes::CustomLabelBarcodeEntry::VERSION = '3.07';
+$Shipment::FedEx::WSDL::ShipTypes::CustomLabelBarcodeEntry::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,57 +20,53 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Position_of :ATTR(:get<Position>);
-my %Format_of :ATTR(:get<Format>);
-my %DataFields_of :ATTR(:get<DataFields>);
-my %BarHeight_of :ATTR(:get<BarHeight>);
-my %ThinBarWidth_of :ATTR(:get<ThinBarWidth>);
-my %BarcodeSymbology_of :ATTR(:get<BarcodeSymbology>);
+    my %Position_of : ATTR(:get<Position>);
+    my %Format_of : ATTR(:get<Format>);
+    my %DataFields_of : ATTR(:get<DataFields>);
+    my %BarHeight_of : ATTR(:get<BarHeight>);
+    my %ThinBarWidth_of : ATTR(:get<ThinBarWidth>);
+    my %BarcodeSymbology_of : ATTR(:get<BarcodeSymbology>);
 
-__PACKAGE__->_factory(
-    [ qw(        Position
-        Format
-        DataFields
-        BarHeight
-        ThinBarWidth
-        BarcodeSymbology
+    __PACKAGE__->_factory(
+        [   qw(        Position
+              Format
+              DataFields
+              BarHeight
+              ThinBarWidth
+              BarcodeSymbology
 
-    ) ],
-    {
-        'Position' => \%Position_of,
-        'Format' => \%Format_of,
-        'DataFields' => \%DataFields_of,
-        'BarHeight' => \%BarHeight_of,
-        'ThinBarWidth' => \%ThinBarWidth_of,
-        'BarcodeSymbology' => \%BarcodeSymbology_of,
-    },
-    {
-        'Position' => 'Shipment::FedEx::WSDL::ShipTypes::CustomLabelPosition',
-        'Format' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'DataFields' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'BarHeight' => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
-        'ThinBarWidth' => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
-        'BarcodeSymbology' => 'Shipment::FedEx::WSDL::ShipTypes::BarcodeSymbologyType',
-    },
-    {
+            )
+        ],
+        {   'Position'         => \%Position_of,
+            'Format'           => \%Format_of,
+            'DataFields'       => \%DataFields_of,
+            'BarHeight'        => \%BarHeight_of,
+            'ThinBarWidth'     => \%ThinBarWidth_of,
+            'BarcodeSymbology' => \%BarcodeSymbology_of,
+        },
+        {   'Position' =>
+              'Shipment::FedEx::WSDL::ShipTypes::CustomLabelPosition',
+            'Format'           => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'DataFields'       => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'BarHeight'        => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
+            'ThinBarWidth'     => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
+            'BarcodeSymbology' =>
+              'Shipment::FedEx::WSDL::ShipTypes::BarcodeSymbologyType',
+        },
+        {
 
-        'Position' => 'Position',
-        'Format' => 'Format',
-        'DataFields' => 'DataFields',
-        'BarHeight' => 'BarHeight',
-        'ThinBarWidth' => 'ThinBarWidth',
-        'BarcodeSymbology' => 'BarcodeSymbology',
-    }
-);
+            'Position'         => 'Position',
+            'Format'           => 'Format',
+            'DataFields'       => 'DataFields',
+            'BarHeight'        => 'BarHeight',
+            'ThinBarWidth'     => 'ThinBarWidth',
+            'BarcodeSymbology' => 'BarcodeSymbology',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -87,7 +83,7 @@ Shipment::FedEx::WSDL::ShipTypes::CustomLabelBarcodeEntry
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

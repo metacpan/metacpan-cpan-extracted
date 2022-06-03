@@ -1,14 +1,13 @@
 package Shipment::Purolator::WSDL::Types::DimensionUnit;
-$Shipment::Purolator::WSDL::Types::DimensionUnit::VERSION = '3.07';
+$Shipment::Purolator::WSDL::Types::DimensionUnit::VERSION = '3.08';
 use strict;
 use warnings;
 
-sub get_xmlns { 'http://purolator.com/pws/datatypes/v1'};
+sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
 
 # derivation by restriction
 use base qw(
-    SOAP::WSDL::XSD::Typelib::Builtin::string);
-
+  SOAP::WSDL::XSD::Typelib::Builtin::string);
 
 
 1;
@@ -25,7 +24,7 @@ Shipment::Purolator::WSDL::Types::DimensionUnit
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

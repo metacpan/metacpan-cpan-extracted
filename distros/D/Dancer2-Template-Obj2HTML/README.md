@@ -1,1 +1,45 @@
+# NAME
 
+Dancer2::Template::Obj2HTML - Templating system based on HTML::Obj2HTML
+
+# SYNOPSYS
+
+In your config.yml
+
+    engines:
+      template:
+        Obj2HTML:
+          page_loc: "dofiles/pages"
+          component_loc: "dofiles/components"
+          template_loc: "dofiles/templates"
+          extension: ".view"
+
+In your router:
+
+    template \@content;
+    template path/to/file
+
+# DESCRIPTION
+
+Templating system for Dancer2 using HTML::Obj2HTML, primarily intended as the
+target templating system for Dancer2::Plugin::DoFile
+
+There is very little logic behind this templating system, aside processing
+the templates as Obj2HTML content (i.e. array and hash references that define
+the HTML in an easily manipulatable way).
+
+Note that the default location for files is in "dofiles/", not "layouts/", but
+a simple configuration change will fix that for you, if that's what you want to
+do. The reason WHY it's "dofiles/" is simply to keep together all the
+Plugin::DoFile and Template::Obj2HTML assets.
+
+# AUTHOR
+
+Pero Moretti
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022 by Pero Moretti.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

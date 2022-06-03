@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::ContactType;
-$Shipment::UPS::WSDL::ShipTypes::ContactType::VERSION = '3.07';
+$Shipment::UPS::WSDL::ShipTypes::ContactType::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/IF/v1.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/IF/v1.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,52 +20,49 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %ForwardAgent_of :ATTR(:get<ForwardAgent>);
-my %UltimateConsignee_of :ATTR(:get<UltimateConsignee>);
-my %IntermediateConsignee_of :ATTR(:get<IntermediateConsignee>);
-my %Producer_of :ATTR(:get<Producer>);
-my %SoldTo_of :ATTR(:get<SoldTo>);
+    my %ForwardAgent_of : ATTR(:get<ForwardAgent>);
+    my %UltimateConsignee_of : ATTR(:get<UltimateConsignee>);
+    my %IntermediateConsignee_of : ATTR(:get<IntermediateConsignee>);
+    my %Producer_of : ATTR(:get<Producer>);
+    my %SoldTo_of : ATTR(:get<SoldTo>);
 
-__PACKAGE__->_factory(
-    [ qw(        ForwardAgent
-        UltimateConsignee
-        IntermediateConsignee
-        Producer
-        SoldTo
+    __PACKAGE__->_factory(
+        [   qw(        ForwardAgent
+              UltimateConsignee
+              IntermediateConsignee
+              Producer
+              SoldTo
 
-    ) ],
-    {
-        'ForwardAgent' => \%ForwardAgent_of,
-        'UltimateConsignee' => \%UltimateConsignee_of,
-        'IntermediateConsignee' => \%IntermediateConsignee_of,
-        'Producer' => \%Producer_of,
-        'SoldTo' => \%SoldTo_of,
-    },
-    {
-        'ForwardAgent' => 'Shipment::UPS::WSDL::ShipTypes::ForwardAgentType',
-        'UltimateConsignee' => 'Shipment::UPS::WSDL::ShipTypes::UltimateConsigneeType',
-        'IntermediateConsignee' => 'Shipment::UPS::WSDL::ShipTypes::IntermediateConsigneeType',
-        'Producer' => 'Shipment::UPS::WSDL::ShipTypes::ProducerType',
-        'SoldTo' => 'Shipment::UPS::WSDL::ShipTypes::SoldToType',
-    },
-    {
+            )
+        ],
+        {   'ForwardAgent'          => \%ForwardAgent_of,
+            'UltimateConsignee'     => \%UltimateConsignee_of,
+            'IntermediateConsignee' => \%IntermediateConsignee_of,
+            'Producer'              => \%Producer_of,
+            'SoldTo'                => \%SoldTo_of,
+        },
+        {   'ForwardAgent' =>
+              'Shipment::UPS::WSDL::ShipTypes::ForwardAgentType',
+            'UltimateConsignee' =>
+              'Shipment::UPS::WSDL::ShipTypes::UltimateConsigneeType',
+            'IntermediateConsignee' =>
+              'Shipment::UPS::WSDL::ShipTypes::IntermediateConsigneeType',
+            'Producer' => 'Shipment::UPS::WSDL::ShipTypes::ProducerType',
+            'SoldTo'   => 'Shipment::UPS::WSDL::ShipTypes::SoldToType',
+        },
+        {
 
-        'ForwardAgent' => 'ForwardAgent',
-        'UltimateConsignee' => 'UltimateConsignee',
-        'IntermediateConsignee' => 'IntermediateConsignee',
-        'Producer' => 'Producer',
-        'SoldTo' => 'SoldTo',
-    }
-);
+            'ForwardAgent'          => 'ForwardAgent',
+            'UltimateConsignee'     => 'UltimateConsignee',
+            'IntermediateConsignee' => 'IntermediateConsignee',
+            'Producer'              => 'Producer',
+            'SoldTo'                => 'SoldTo',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -82,7 +79,7 @@ Shipment::UPS::WSDL::ShipTypes::ContactType
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

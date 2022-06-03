@@ -114,8 +114,11 @@ C<path/to/file-POST.do> and finally C<path/to.view>.
 
 =head2 Arguments to the executed files
 
-When a file is executed there will be a hashref called $args that contains a
-few important things:
+During execution of the file a hashref called $args is available that contains
+some important things.
+
+If the executed file returns a coderef, the coderef is executed with this same
+hashref as the only argument.
 
 =over 4
 
@@ -159,6 +162,19 @@ the plugin's internals.
 
 The result (returned value) of each file is checked; if something is returned
 DoFile will inspect the value to determine what to do next.
+
+=head3 Coderef (anonymous sub)
+
+You can return a coderef; this will be cached within the plugin and the file
+will not be checked again, but the coderef will be executed each time that
+"file" is requested. Generally whether the file should be checked or not is
+left up to the application (e.g. C<plackup -R ./ -r ...>).
+
+In the case a coderef is used, when the code is executed it is passed one
+argument, a hashref, which is the stash. This saves needing to import the stash
+from within the code of the file.
+
+The return of the coderef will be evaluated exactly as below.
 
 =head3 Internal Redirects
 
@@ -226,16 +242,11 @@ This could be used to set the status code for returning to the client
 DoFile may however return pretty much whatever you want to handle in your final
 router code.
 
-=head1 TO-DO
+=head1 EXAMPLES
 
-=head2 Cached, compiled, ready to go files
+As noted, what's returned from a DoFile can contain anything. That gives you
+the opportunity to do pretty much whatever you want with what's returned.
 
-An LRU evicted cache of compiled files to speed up commonly used pages.
-
-=head2 Discovery of js assets to load in
-
-Testing for the presence of static and generated javascript files that are
-automatically included in the response for the browser to load in.
 
 =head1 AUTHOR
 

@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::PackageRateDetail;
-$Shipment::FedEx::WSDL::ShipTypes::PackageRateDetail::VERSION = '3.07';
+$Shipment::FedEx::WSDL::ShipTypes::PackageRateDetail::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,122 +20,121 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %RateType_of :ATTR(:get<RateType>);
-my %RatedWeightMethod_of :ATTR(:get<RatedWeightMethod>);
-my %MinimumChargeType_of :ATTR(:get<MinimumChargeType>);
-my %BillingWeight_of :ATTR(:get<BillingWeight>);
-my %DimWeight_of :ATTR(:get<DimWeight>);
-my %OversizeWeight_of :ATTR(:get<OversizeWeight>);
-my %BaseCharge_of :ATTR(:get<BaseCharge>);
-my %TotalFreightDiscounts_of :ATTR(:get<TotalFreightDiscounts>);
-my %NetFreight_of :ATTR(:get<NetFreight>);
-my %TotalSurcharges_of :ATTR(:get<TotalSurcharges>);
-my %NetFedExCharge_of :ATTR(:get<NetFedExCharge>);
-my %TotalTaxes_of :ATTR(:get<TotalTaxes>);
-my %NetCharge_of :ATTR(:get<NetCharge>);
-my %TotalRebates_of :ATTR(:get<TotalRebates>);
-my %FreightDiscounts_of :ATTR(:get<FreightDiscounts>);
-my %Rebates_of :ATTR(:get<Rebates>);
-my %Surcharges_of :ATTR(:get<Surcharges>);
-my %Taxes_of :ATTR(:get<Taxes>);
-my %VariableHandlingCharges_of :ATTR(:get<VariableHandlingCharges>);
+    my %RateType_of : ATTR(:get<RateType>);
+    my %RatedWeightMethod_of : ATTR(:get<RatedWeightMethod>);
+    my %MinimumChargeType_of : ATTR(:get<MinimumChargeType>);
+    my %BillingWeight_of : ATTR(:get<BillingWeight>);
+    my %DimWeight_of : ATTR(:get<DimWeight>);
+    my %OversizeWeight_of : ATTR(:get<OversizeWeight>);
+    my %BaseCharge_of : ATTR(:get<BaseCharge>);
+    my %TotalFreightDiscounts_of : ATTR(:get<TotalFreightDiscounts>);
+    my %NetFreight_of : ATTR(:get<NetFreight>);
+    my %TotalSurcharges_of : ATTR(:get<TotalSurcharges>);
+    my %NetFedExCharge_of : ATTR(:get<NetFedExCharge>);
+    my %TotalTaxes_of : ATTR(:get<TotalTaxes>);
+    my %NetCharge_of : ATTR(:get<NetCharge>);
+    my %TotalRebates_of : ATTR(:get<TotalRebates>);
+    my %FreightDiscounts_of : ATTR(:get<FreightDiscounts>);
+    my %Rebates_of : ATTR(:get<Rebates>);
+    my %Surcharges_of : ATTR(:get<Surcharges>);
+    my %Taxes_of : ATTR(:get<Taxes>);
+    my %VariableHandlingCharges_of : ATTR(:get<VariableHandlingCharges>);
 
-__PACKAGE__->_factory(
-    [ qw(        RateType
-        RatedWeightMethod
-        MinimumChargeType
-        BillingWeight
-        DimWeight
-        OversizeWeight
-        BaseCharge
-        TotalFreightDiscounts
-        NetFreight
-        TotalSurcharges
-        NetFedExCharge
-        TotalTaxes
-        NetCharge
-        TotalRebates
-        FreightDiscounts
-        Rebates
-        Surcharges
-        Taxes
-        VariableHandlingCharges
+    __PACKAGE__->_factory(
+        [   qw(        RateType
+              RatedWeightMethod
+              MinimumChargeType
+              BillingWeight
+              DimWeight
+              OversizeWeight
+              BaseCharge
+              TotalFreightDiscounts
+              NetFreight
+              TotalSurcharges
+              NetFedExCharge
+              TotalTaxes
+              NetCharge
+              TotalRebates
+              FreightDiscounts
+              Rebates
+              Surcharges
+              Taxes
+              VariableHandlingCharges
 
-    ) ],
-    {
-        'RateType' => \%RateType_of,
-        'RatedWeightMethod' => \%RatedWeightMethod_of,
-        'MinimumChargeType' => \%MinimumChargeType_of,
-        'BillingWeight' => \%BillingWeight_of,
-        'DimWeight' => \%DimWeight_of,
-        'OversizeWeight' => \%OversizeWeight_of,
-        'BaseCharge' => \%BaseCharge_of,
-        'TotalFreightDiscounts' => \%TotalFreightDiscounts_of,
-        'NetFreight' => \%NetFreight_of,
-        'TotalSurcharges' => \%TotalSurcharges_of,
-        'NetFedExCharge' => \%NetFedExCharge_of,
-        'TotalTaxes' => \%TotalTaxes_of,
-        'NetCharge' => \%NetCharge_of,
-        'TotalRebates' => \%TotalRebates_of,
-        'FreightDiscounts' => \%FreightDiscounts_of,
-        'Rebates' => \%Rebates_of,
-        'Surcharges' => \%Surcharges_of,
-        'Taxes' => \%Taxes_of,
-        'VariableHandlingCharges' => \%VariableHandlingCharges_of,
-    },
-    {
-        'RateType' => 'Shipment::FedEx::WSDL::ShipTypes::ReturnedRateType',
-        'RatedWeightMethod' => 'Shipment::FedEx::WSDL::ShipTypes::RatedWeightMethod',
-        'MinimumChargeType' => 'Shipment::FedEx::WSDL::ShipTypes::MinimumChargeType',
-        'BillingWeight' => 'Shipment::FedEx::WSDL::ShipTypes::Weight',
-        'DimWeight' => 'Shipment::FedEx::WSDL::ShipTypes::Weight',
-        'OversizeWeight' => 'Shipment::FedEx::WSDL::ShipTypes::Weight',
-        'BaseCharge' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
-        'TotalFreightDiscounts' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
-        'NetFreight' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
-        'TotalSurcharges' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
-        'NetFedExCharge' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
-        'TotalTaxes' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
-        'NetCharge' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
-        'TotalRebates' => 'Shipment::FedEx::WSDL::ShipTypes::Money',
-        'FreightDiscounts' => 'Shipment::FedEx::WSDL::ShipTypes::RateDiscount',
-        'Rebates' => 'Shipment::FedEx::WSDL::ShipTypes::Rebate',
-        'Surcharges' => 'Shipment::FedEx::WSDL::ShipTypes::Surcharge',
-        'Taxes' => 'Shipment::FedEx::WSDL::ShipTypes::Tax',
-        'VariableHandlingCharges' => 'Shipment::FedEx::WSDL::ShipTypes::VariableHandlingCharges',
-    },
-    {
+            )
+        ],
+        {   'RateType'                => \%RateType_of,
+            'RatedWeightMethod'       => \%RatedWeightMethod_of,
+            'MinimumChargeType'       => \%MinimumChargeType_of,
+            'BillingWeight'           => \%BillingWeight_of,
+            'DimWeight'               => \%DimWeight_of,
+            'OversizeWeight'          => \%OversizeWeight_of,
+            'BaseCharge'              => \%BaseCharge_of,
+            'TotalFreightDiscounts'   => \%TotalFreightDiscounts_of,
+            'NetFreight'              => \%NetFreight_of,
+            'TotalSurcharges'         => \%TotalSurcharges_of,
+            'NetFedExCharge'          => \%NetFedExCharge_of,
+            'TotalTaxes'              => \%TotalTaxes_of,
+            'NetCharge'               => \%NetCharge_of,
+            'TotalRebates'            => \%TotalRebates_of,
+            'FreightDiscounts'        => \%FreightDiscounts_of,
+            'Rebates'                 => \%Rebates_of,
+            'Surcharges'              => \%Surcharges_of,
+            'Taxes'                   => \%Taxes_of,
+            'VariableHandlingCharges' => \%VariableHandlingCharges_of,
+        },
+        {   'RateType' => 'Shipment::FedEx::WSDL::ShipTypes::ReturnedRateType',
+            'RatedWeightMethod' =>
+              'Shipment::FedEx::WSDL::ShipTypes::RatedWeightMethod',
+            'MinimumChargeType' =>
+              'Shipment::FedEx::WSDL::ShipTypes::MinimumChargeType',
+            'BillingWeight'  => 'Shipment::FedEx::WSDL::ShipTypes::Weight',
+            'DimWeight'      => 'Shipment::FedEx::WSDL::ShipTypes::Weight',
+            'OversizeWeight' => 'Shipment::FedEx::WSDL::ShipTypes::Weight',
+            'BaseCharge'     => 'Shipment::FedEx::WSDL::ShipTypes::Money',
+            'TotalFreightDiscounts' =>
+              'Shipment::FedEx::WSDL::ShipTypes::Money',
+            'NetFreight'       => 'Shipment::FedEx::WSDL::ShipTypes::Money',
+            'TotalSurcharges'  => 'Shipment::FedEx::WSDL::ShipTypes::Money',
+            'NetFedExCharge'   => 'Shipment::FedEx::WSDL::ShipTypes::Money',
+            'TotalTaxes'       => 'Shipment::FedEx::WSDL::ShipTypes::Money',
+            'NetCharge'        => 'Shipment::FedEx::WSDL::ShipTypes::Money',
+            'TotalRebates'     => 'Shipment::FedEx::WSDL::ShipTypes::Money',
+            'FreightDiscounts' =>
+              'Shipment::FedEx::WSDL::ShipTypes::RateDiscount',
+            'Rebates'    => 'Shipment::FedEx::WSDL::ShipTypes::Rebate',
+            'Surcharges' => 'Shipment::FedEx::WSDL::ShipTypes::Surcharge',
+            'Taxes'      => 'Shipment::FedEx::WSDL::ShipTypes::Tax',
+            'VariableHandlingCharges' =>
+              'Shipment::FedEx::WSDL::ShipTypes::VariableHandlingCharges',
+        },
+        {
 
-        'RateType' => 'RateType',
-        'RatedWeightMethod' => 'RatedWeightMethod',
-        'MinimumChargeType' => 'MinimumChargeType',
-        'BillingWeight' => 'BillingWeight',
-        'DimWeight' => 'DimWeight',
-        'OversizeWeight' => 'OversizeWeight',
-        'BaseCharge' => 'BaseCharge',
-        'TotalFreightDiscounts' => 'TotalFreightDiscounts',
-        'NetFreight' => 'NetFreight',
-        'TotalSurcharges' => 'TotalSurcharges',
-        'NetFedExCharge' => 'NetFedExCharge',
-        'TotalTaxes' => 'TotalTaxes',
-        'NetCharge' => 'NetCharge',
-        'TotalRebates' => 'TotalRebates',
-        'FreightDiscounts' => 'FreightDiscounts',
-        'Rebates' => 'Rebates',
-        'Surcharges' => 'Surcharges',
-        'Taxes' => 'Taxes',
-        'VariableHandlingCharges' => 'VariableHandlingCharges',
-    }
-);
+            'RateType'                => 'RateType',
+            'RatedWeightMethod'       => 'RatedWeightMethod',
+            'MinimumChargeType'       => 'MinimumChargeType',
+            'BillingWeight'           => 'BillingWeight',
+            'DimWeight'               => 'DimWeight',
+            'OversizeWeight'          => 'OversizeWeight',
+            'BaseCharge'              => 'BaseCharge',
+            'TotalFreightDiscounts'   => 'TotalFreightDiscounts',
+            'NetFreight'              => 'NetFreight',
+            'TotalSurcharges'         => 'TotalSurcharges',
+            'NetFedExCharge'          => 'NetFedExCharge',
+            'TotalTaxes'              => 'TotalTaxes',
+            'NetCharge'               => 'NetCharge',
+            'TotalRebates'            => 'TotalRebates',
+            'FreightDiscounts'        => 'FreightDiscounts',
+            'Rebates'                 => 'Rebates',
+            'Surcharges'              => 'Surcharges',
+            'Taxes'                   => 'Taxes',
+            'VariableHandlingCharges' => 'VariableHandlingCharges',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -152,7 +151,7 @@ Shipment::FedEx::WSDL::ShipTypes::PackageRateDetail
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

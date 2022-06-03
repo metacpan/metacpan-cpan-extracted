@@ -1,86 +1,83 @@
 
 package Shipment::UPS::WSDL::TrackElements::TrackRequest;
-$Shipment::UPS::WSDL::TrackElements::TrackRequest::VERSION = '3.07';
+$Shipment::UPS::WSDL::TrackElements::TrackRequest::VERSION = '3.08';
 use strict;
 use warnings;
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0' }
+    sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0'}
 
-__PACKAGE__->__set_name('TrackRequest');
-__PACKAGE__->__set_nillable();
-__PACKAGE__->__set_minOccurs();
-__PACKAGE__->__set_maxOccurs();
-__PACKAGE__->__set_ref();
+    __PACKAGE__->__set_name('TrackRequest');
+    __PACKAGE__->__set_nillable();
+    __PACKAGE__->__set_minOccurs();
+    __PACKAGE__->__set_maxOccurs();
+    __PACKAGE__->__set_ref();
 
-use base qw(
-    SOAP::WSDL::XSD::Typelib::Element
-    SOAP::WSDL::XSD::Typelib::ComplexType
-);
+    use base qw(
+      SOAP::WSDL::XSD::Typelib::Element
+      SOAP::WSDL::XSD::Typelib::ComplexType
+    );
 
-our $XML_ATTRIBUTE_CLASS;
-undef $XML_ATTRIBUTE_CLASS;
+    our $XML_ATTRIBUTE_CLASS;
+    undef $XML_ATTRIBUTE_CLASS;
 
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
-use Class::Std::Fast::Storable constructor => 'none';
-use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-Class::Std::initialize();
-
-{ # BLOCK to scope variables
-
-my %Request_of :ATTR(:get<Request>);
-my %InquiryNumber_of :ATTR(:get<InquiryNumber>);
-my %TrackingOption_of :ATTR(:get<TrackingOption>);
-my %CandidateBookmark_of :ATTR(:get<CandidateBookmark>);
-my %ShipperAccountInfo_of :ATTR(:get<ShipperAccountInfo>);
-
-__PACKAGE__->_factory(
-    [ qw(        Request
-        InquiryNumber
-        TrackingOption
-        CandidateBookmark
-        ShipperAccountInfo
-
-    ) ],
-    {
-        'Request' => \%Request_of,
-        'InquiryNumber' => \%InquiryNumber_of,
-        'TrackingOption' => \%TrackingOption_of,
-        'CandidateBookmark' => \%CandidateBookmark_of,
-        'ShipperAccountInfo' => \%ShipperAccountInfo_of,
-    },
-    {
-        'Request' => 'Shipment::UPS::WSDL::TrackElements::Request',
-
-        'InquiryNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'TrackingOption' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'CandidateBookmark' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'ShipperAccountInfo' => 'Shipment::UPS::WSDL::TrackTypes::ShipperAccountInfoType',
-    },
-    {
-
-        'Request' => '',
-        'InquiryNumber' => 'InquiryNumber',
-        'TrackingOption' => 'TrackingOption',
-        'CandidateBookmark' => 'CandidateBookmark',
-        'ShipperAccountInfo' => 'ShipperAccountInfo',
+    sub __get_attr_class {
+        return $XML_ATTRIBUTE_CLASS;
     }
-);
 
-} # end BLOCK
+    use Class::Std::Fast::Storable constructor => 'none';
+    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+    Class::Std::initialize();
+
+    {    # BLOCK to scope variables
+
+        my %Request_of : ATTR(:get<Request>);
+        my %InquiryNumber_of : ATTR(:get<InquiryNumber>);
+        my %TrackingOption_of : ATTR(:get<TrackingOption>);
+        my %CandidateBookmark_of : ATTR(:get<CandidateBookmark>);
+        my %ShipperAccountInfo_of : ATTR(:get<ShipperAccountInfo>);
+
+        __PACKAGE__->_factory(
+            [   qw(        Request
+                  InquiryNumber
+                  TrackingOption
+                  CandidateBookmark
+                  ShipperAccountInfo
+
+                )
+            ],
+            {   'Request'            => \%Request_of,
+                'InquiryNumber'      => \%InquiryNumber_of,
+                'TrackingOption'     => \%TrackingOption_of,
+                'CandidateBookmark'  => \%CandidateBookmark_of,
+                'ShipperAccountInfo' => \%ShipperAccountInfo_of,
+            },
+            {   'Request' => 'Shipment::UPS::WSDL::TrackElements::Request',
+
+                'InquiryNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+                'TrackingOption' =>
+                  'SOAP::WSDL::XSD::Typelib::Builtin::string',
+                'CandidateBookmark' =>
+                  'SOAP::WSDL::XSD::Typelib::Builtin::string',
+                'ShipperAccountInfo' =>
+                  'Shipment::UPS::WSDL::TrackTypes::ShipperAccountInfoType',
+            },
+            {
+
+                'Request'            => '',
+                'InquiryNumber'      => 'InquiryNumber',
+                'TrackingOption'     => 'TrackingOption',
+                'CandidateBookmark'  => 'CandidateBookmark',
+                'ShipperAccountInfo' => 'ShipperAccountInfo',
+            }
+        );
+
+    }    # end BLOCK
 
 
-
-
-
-
-} # end of BLOCK
-
+}    # end of BLOCK
 
 
 1;
@@ -97,7 +94,7 @@ Shipment::UPS::WSDL::TrackElements::TrackRequest
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

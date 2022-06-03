@@ -144,7 +144,8 @@ sub run {
       };
    }
 
-   done_testing();
+   my $tests_count = $parms{tests} // 1;
+   done_testing( $tests_count );
 }
 
 1;

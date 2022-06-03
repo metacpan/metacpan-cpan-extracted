@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::TrackTypes::DocumentType;
-$Shipment::UPS::WSDL::TrackTypes::DocumentType::VERSION = '3.07';
+$Shipment::UPS::WSDL::TrackTypes::DocumentType::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,42 +20,38 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Type_of :ATTR(:get<Type>);
-my %Content_of :ATTR(:get<Content>);
-my %Format_of :ATTR(:get<Format>);
+    my %Type_of : ATTR(:get<Type>);
+    my %Content_of : ATTR(:get<Content>);
+    my %Format_of : ATTR(:get<Format>);
 
-__PACKAGE__->_factory(
-    [ qw(        Type
-        Content
-        Format
+    __PACKAGE__->_factory(
+        [   qw(        Type
+              Content
+              Format
 
-    ) ],
-    {
-        'Type' => \%Type_of,
-        'Content' => \%Content_of,
-        'Format' => \%Format_of,
-    },
-    {
-        'Type' => 'Shipment::UPS::WSDL::TrackTypes::CommonCodeDescriptionType',
-        'Content' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Format' => 'Shipment::UPS::WSDL::TrackTypes::CommonCodeDescriptionType',
-    },
-    {
+            )
+        ],
+        {   'Type'    => \%Type_of,
+            'Content' => \%Content_of,
+            'Format'  => \%Format_of,
+        },
+        {   'Type' =>
+              'Shipment::UPS::WSDL::TrackTypes::CommonCodeDescriptionType',
+            'Content' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Format'  =>
+              'Shipment::UPS::WSDL::TrackTypes::CommonCodeDescriptionType',
+        },
+        {
 
-        'Type' => 'Type',
-        'Content' => 'Content',
-        'Format' => 'Format',
-    }
-);
+            'Type'    => 'Type',
+            'Content' => 'Content',
+            'Format'  => 'Format',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -72,7 +68,7 @@ Shipment::UPS::WSDL::TrackTypes::DocumentType
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

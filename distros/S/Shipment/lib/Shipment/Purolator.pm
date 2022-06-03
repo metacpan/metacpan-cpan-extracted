@@ -1,5 +1,5 @@
 package Shipment::Purolator;
-$Shipment::Purolator::VERSION = '3.07';
+$Shipment::Purolator::VERSION = '3.08';
 use strict;
 use warnings;
 
@@ -14,538 +14,612 @@ extends 'Shipment::Base';
 
 
 has 'key' => (
-  is => 'rw',
-  isa => Str,
+    is  => 'rw',
+    isa => Str,
 );
 
 has 'password' => (
-  is => 'rw',
-  isa => Str,
+    is  => 'rw',
+    isa => Str,
 );
 
 
 has 'proxy_domain' => (
-  is => 'rw',
-  isa => Enum[ qw(
-    devwebservices.purolator.com
-    webservices.purolator.com
-  ) ],
-  default => 'devwebservices.purolator.com',
+    is  => 'rw',
+    isa => Enum [
+        qw(
+          devwebservices.purolator.com
+          webservices.purolator.com
+        )
+    ],
+    default => 'devwebservices.purolator.com',
 );
 
 
 my %bill_type_map = (
-  'sender'      => 'Sender',
-  'recipient'   => 'Receiver',
-  'third_party' => 'ThirdParty',
+    'sender'      => 'Sender',
+    'recipient'   => 'Receiver',
+    'third_party' => 'ThirdParty',
 );
 
 my %pickup_type_map = (
-  'pickup'      => 'PreScheduled',
-  'dropoff'     => 'DropOff',
+    'pickup'  => 'PreScheduled',
+    'dropoff' => 'DropOff',
 );
 
 my %package_type_map = (
-  'custom'      => 'CustomerPackaging',
-  'envelope'    => 'ExpressEnvelope',
-  'tube'        => '',
-  'box'         => 'ExpressBox',
-  'pack'        => 'ExpressPack',
+    'custom'   => 'CustomerPackaging',
+    'envelope' => 'ExpressEnvelope',
+    'tube'     => '',
+    'box'      => 'ExpressBox',
+    'pack'     => 'ExpressPack',
 );
 
 my %units_type_map = (
-  'lb'          => 'lb',
-  'kg'          => 'kg',
-  'in'          => 'in',
-  'cm'          => 'cm',
+    'lb' => 'lb',
+    'kg' => 'kg',
+    'in' => 'in',
+    'cm' => 'cm',
 );
 
 
 my %printer_type_map = (
-  'pdf'        => 'Regular',
-  'thermal'        => 'Thermal',
-  'image'      => '',
+    'pdf'     => 'Regular',
+    'thermal' => 'Thermal',
+    'image'   => '',
 );
 
 
-has '+currency' => (
-  default => 'CAD',
-);
+has '+currency' => (default => 'CAD',);
 
 
 sub _build_services {
-  my $self = shift;
+    my $self = shift;
 
-  if ($self->from_address && $self->to_address) {
+    if ($self->from_address && $self->to_address) {
 
-    use Shipment::Package;
-    use Shipment::Service;
-    use Shipment::Purolator::WSDLV2::Interfaces::ServiceAvailabilityService::ServiceAvailabilityServiceEndpoint;
+        use Shipment::Package;
+        use Shipment::Service;
+        use
+          Shipment::Purolator::WSDLV2::Interfaces::ServiceAvailabilityService::ServiceAvailabilityServiceEndpoint;
 
-    my $interface = Shipment::Purolator::WSDLV2::Interfaces::ServiceAvailabilityService::ServiceAvailabilityServiceEndpoint->new(
-      {
-        proxy_domain => $self->proxy_domain,
-        key => $self->key,
-        password => $self->password,
-      }
-    );
-    my $response;
-  
-    my %services;
+        my $interface =
+          Shipment::Purolator::WSDLV2::Interfaces::ServiceAvailabilityService::ServiceAvailabilityServiceEndpoint
+          ->new(
+            {   proxy_domain => $self->proxy_domain,
+                key          => $self->key,
+                password     => $self->password,
+            }
+          );
+        my $response;
 
-    $Shipment::SOAP::WSDL::Debug = 1 if $self->debug > 1;
-    $response = $interface->GetServicesOptions( {
-        BillingAccountNumber => $self->account,
-        SenderAddress => {
-          City       => $self->from_address()->city,
-          Province   => $self->from_address()->province_code,
-          Country    => $self->from_address()->country_code,
-          PostalCode => $self->from_address()->postal_code,
-        }, 
-        ReceiverAddress => {
-          City       => $self->to_address()->city,
-          Province   => $self->to_address()->province_code,
-          Country    => $self->to_address()->country_code,
-          PostalCode => $self->to_address()->postal_code,
-        },
-      },
-      {
-                  'Version'           =>  '2.0',
-                  'Language'          =>  'en',
-                  'GroupID'           =>  'xxx',
-                  'RequestReference'  =>  'Shipment::Purolator::_build_services'
-      },
-    );
-    $Shipment::SOAP::WSDL::Debug = 0;
-    warn "Response\n" . $response if $self->debug > 1;
+        my %services;
 
-    try {
-      foreach my $service (@{ $response->get_Services()->get_Service() }) {
-        if ($service->get_PackageType()->get_value eq $package_type_map{$self->package_type}) {
-          $services{$service->get_ID()->get_value} = Shipment::Service->new(
-              id => $service->get_ID()->get_value,
-              name => $service->get_Description()->get_value,
-            );
-          my %options;
-          foreach my $option (@{ $service->get_Options()->get_Option() }) {
-            $options{$option->get_ID()->get_value} = $option->get_ValueType()->get_value;
-          }
-          $services{$service->get_ID()->get_value}->options(\%options);
-          $services{ground} = $services{$service->get_ID()->get_value} if ($service->get_ID()->get_value =~ /PurolatorGround/);
-          $services{express} = $services{$service->get_ID()->get_value} if ($service->get_ID()->get_value =~ /PurolatorExpress/ && $service->get_ID()->get_value !~ /(9AM|10:30AM|12:00|Evening)$/);
-          $services{priority} = $services{$service->get_ID()->get_value} if ($service->get_ID()->get_value =~ /PurolatorExpress/ && $service->get_ID()->get_value =~ /(9AM|10:30AM|12:00|Evening)$/);
+        $Shipment::SOAP::WSDL::Debug = 1 if $self->debug > 1;
+        $response                    = $interface->GetServicesOptions(
+            {   BillingAccountNumber => $self->account,
+                SenderAddress        => {
+                    City       => $self->from_address()->city,
+                    Province   => $self->from_address()->province_code,
+                    Country    => $self->from_address()->country_code,
+                    PostalCode => $self->from_address()->postal_code,
+                },
+                ReceiverAddress => {
+                    City       => $self->to_address()->city,
+                    Province   => $self->to_address()->province_code,
+                    Country    => $self->to_address()->country_code,
+                    PostalCode => $self->to_address()->postal_code,
+                },
+            },
+            {   'Version'          => '2.0',
+                'Language'         => 'en',
+                'GroupID'          => 'xxx',
+                'RequestReference' => 'Shipment::Purolator::_build_services'
+            },
+        );
+        $Shipment::SOAP::WSDL::Debug = 0;
+        warn "Response\n" . $response if $self->debug > 1;
 
+        try {
+            foreach my $service (@{$response->get_Services()->get_Service()}) {
+                if ($service->get_PackageType()->get_value eq
+                    $package_type_map{$self->package_type})
+                {
+                    $services{$service->get_ID()->get_value} =
+                      Shipment::Service->new(
+                        id   => $service->get_ID()->get_value,
+                        name => $service->get_Description()->get_value,
+                      );
+                    my %options;
+                    foreach
+                      my $option (@{$service->get_Options()->get_Option()})
+                    {
+                        $options{$option->get_ID()->get_value} =
+                          $option->get_ValueType()->get_value;
+                    }
+                    $services{$service->get_ID()->get_value}
+                      ->options(\%options);
+                    $services{ground} =
+                      $services{$service->get_ID()->get_value}
+                      if ($service->get_ID()->get_value =~ /PurolatorGround/);
+                    $services{express} =
+                      $services{$service->get_ID()->get_value}
+                      if ( $service->get_ID()->get_value =~ /PurolatorExpress/
+                        && $service->get_ID()->get_value !~
+                        /(9AM|10:30AM|12:00|Evening)$/);
+                    $services{priority} =
+                      $services{$service->get_ID()->get_value}
+                      if ( $service->get_ID()->get_value =~ /PurolatorExpress/
+                        && $service->get_ID()->get_value
+                        =~ /(9AM|10:30AM|12:00|Evening)$/);
+
+                }
+            }
+            $services{ground} = $services{express}
+              if (!$services{ground} && $services{express});
         }
-      }
-      $services{ground} = $services{express} if (!$services{ground} && $services{express});
-    } catch {
-      warn $_ if $self->debug;
-      try {
-        warn $response->get_ResponseInformation()->get_Errors()->get_Error()->[0]->get_Description if $self->debug;
-        $self->error( $response->get_ResponseInformation()->get_Errors()->get_Error()->[0]->get_Description->get_value );
-      } catch {
-        warn $_ if $self->debug;
-        warn $response->get_faultstring if $self->debug;
-        $self->error( $response->get_faultstring->get_value );
-      };
-    };
-    \%services;
-  }
-  else {
-    warn 'services not fetched. both from and to address required.' if $self->debug;
-    $self->error( 'services not fetched. both from and to address required.' );
+        catch {
+            warn $_ if $self->debug;
+            try {
+                warn $response->get_ResponseInformation()->get_Errors()
+                  ->get_Error()->[0]->get_Description
+                  if $self->debug;
+                $self->error($response->get_ResponseInformation()->get_Errors()
+                      ->get_Error()->[0]->get_Description->get_value);
+            }
+            catch {
+                warn $_                         if $self->debug;
+                warn $response->get_faultstring if $self->debug;
+                $self->error($response->get_faultstring->get_value);
+            };
+        };
+        \%services;
+    }
+    else {
+        warn 'services not fetched. both from and to address required.'
+          if $self->debug;
+        $self->error(
+            'services not fetched. both from and to address required.');
 
-    {};
-  }
+        {};
+    }
 }
 
 
 sub rate {
-  my ( $self, $service_id ) = @_;
+    my ($self, $service_id) = @_;
 
-  try { 
-    $service_id = $self->services->{$service_id}->id;
-  } catch {
-    warn $_ if $self->debug;
-    warn "service ($service_id) not available" if $self->debug;
-    $self->error( "service ($service_id) not available" );
-    $service_id = '';
-  };
-  return unless $service_id;
+    try {
+        $service_id = $self->services->{$service_id}->id;
+    }
+    catch {
+        warn $_                                    if $self->debug;
+        warn "service ($service_id) not available" if $self->debug;
+        $self->error("service ($service_id) not available");
+        $service_id = '';
+    };
+    return unless $service_id;
 
     my $total_weight;
-    $total_weight += $_->weight for @{ $self->packages };
+    $total_weight += $_->weight for @{$self->packages};
 
     my @options;
     my $signature_option;
     if ($self->signature_type =~ /^(required|default|adult)$/) {
-      $signature_option = "ResidentialSignatureDomestic" if $self->services->{$service_id}->options->{ResidentialSignatureDomestic};
-      $signature_option = "ResidentialSignatureIntl" if $self->services->{$service_id}->options->{ResidentialSignatureIntl};
-    } elsif ($self->signature_type eq 'not_required') {
-      $signature_option = "OriginSignatureNotRequired";
+        $signature_option = "ResidentialSignatureDomestic"
+          if $self->services->{$service_id}
+          ->options->{ResidentialSignatureDomestic};
+        $signature_option = "ResidentialSignatureIntl"
+          if $self->services->{$service_id}
+          ->options->{ResidentialSignatureIntl};
+    }
+    elsif ($self->signature_type eq 'not_required') {
+        $signature_option = "OriginSignatureNotRequired";
     }
 
     if ($signature_option) {
-      push @options, 
-                {
-                  ID => $signature_option,
-                  Value => 'true',
-                };
+        push @options,
+          { ID    => $signature_option,
+            Value => 'true',
+          };
     }
 
     my @pieces;
-    foreach (@{ $self->packages }) {
-      if ($self->package_type eq 'custom') {
-        push @pieces,
-          {
-              Weight => {
-                Value => sprintf("%.0f", $_->weight) || 1,
-                WeightUnit => $self->weight_unit,
-              },
-              Length => {
-                Value => $_->length,
-                DimensionUnit => $self->dim_unit,
-              },
-              Width => {
-                Value => $_->width,
-                DimensionUnit => $self->dim_unit,
-              },
-              Height => {
-                Value => $_->height,
-                DimensionUnit => $self->dim_unit,
-              },
-          };
-      }
-      else {
-        push @pieces,
-          {
-              Weight => {
-                Value => sprintf("%.0f", $_->weight) || 1,
-                WeightUnit => $self->weight_unit,
-              },
-          };
-      }
+    foreach (@{$self->packages}) {
+        if ($self->package_type eq 'custom') {
+            push @pieces,
+              { Weight => {
+                    Value      => sprintf("%.0f", $_->weight) || 1,
+                    WeightUnit => $self->weight_unit,
+                },
+                Length => {
+                    Value         => $_->length,
+                    DimensionUnit => $self->dim_unit,
+                },
+                Width => {
+                    Value         => $_->width,
+                    DimensionUnit => $self->dim_unit,
+                },
+                Height => {
+                    Value         => $_->height,
+                    DimensionUnit => $self->dim_unit,
+                },
+              };
+        }
+        else {
+            push @pieces,
+              { Weight => {
+                    Value      => sprintf("%.0f", $_->weight) || 1,
+                    WeightUnit => $self->weight_unit,
+                },
+              };
+        }
     }
 
-    use Shipment::Purolator::WSDLV2::Interfaces::EstimatingService::EstimatingServiceEndpoint;
-    my $interface = Shipment::Purolator::WSDLV2::Interfaces::EstimatingService::EstimatingServiceEndpoint->new(
-      {
-        proxy_domain => $self->proxy_domain,
-        key => $self->key,
-        password => $self->password,
-      }
-    );
+    use
+      Shipment::Purolator::WSDLV2::Interfaces::EstimatingService::EstimatingServiceEndpoint;
+    my $interface =
+      Shipment::Purolator::WSDLV2::Interfaces::EstimatingService::EstimatingServiceEndpoint
+      ->new(
+        {   proxy_domain => $self->proxy_domain,
+            key          => $self->key,
+            password     => $self->password,
+        }
+      );
 
     $Shipment::SOAP::WSDL::Debug = 1 if $self->debug > 1;
     my $response = $interface->GetFullEstimate(
-      {
-        Shipment => {
-          SenderInformation => {
-            Address => {
-              Name            => $self->from_address->name,
-              Company         => $self->from_address->company,
-              StreetNumber    => $self->from_address->address_components->{number},
-              StreetName      => $self->from_address->address_components->{street} . ' ' . $self->from_address->address_components->{direction},
-              StreetAddress2  => $self->from_address->address2,
-              City            => $self->from_address->city,
-              Province        => $self->from_address->province_code,
-              Country         => $self->from_address->country_code,
-              PostalCode      => $self->from_address->postal_code,
-              PhoneNumber => {
-                CountryCode   => $self->from_address->phone_components->{country},
-                AreaCode      => $self->from_address->phone_components->{area},
-                Phone         => $self->from_address->phone_components->{phone},
-              },
+        {   Shipment => {
+                SenderInformation => {
+                    Address => {
+                        Name         => $self->from_address->name,
+                        Company      => $self->from_address->company,
+                        StreetNumber =>
+                          $self->from_address->address_components->{number},
+                        StreetName =>
+                          $self->from_address->address_components->{street}
+                          . ' '
+                          . $self->from_address->address_components
+                          ->{direction},
+                        StreetAddress2 => $self->from_address->address2,
+                        City           => $self->from_address->city,
+                        Province       => $self->from_address->province_code,
+                        Country        => $self->from_address->country_code,
+                        PostalCode     => $self->from_address->postal_code,
+                        PhoneNumber    => {
+                            CountryCode =>
+                              $self->from_address->phone_components->{country},
+                            AreaCode =>
+                              $self->from_address->phone_components->{area},
+                            Phone =>
+                              $self->from_address->phone_components->{phone},
+                        },
+                    },
+                },
+                ReceiverInformation => {
+                    Address => {
+                        Name         => $self->to_address->name,
+                        Company      => $self->to_address->company,
+                        StreetNumber =>
+                          $self->to_address->address_components->{number},
+                        StreetName =>
+                          $self->to_address->address_components->{street} . ' '
+                          . $self->to_address->address_components->{direction},
+                        StreetAddress2 => $self->to_address->address2,
+                        City           => $self->to_address->city,
+                        Province       => $self->to_address->province_code,
+                        Country        => $self->to_address->country_code,
+                        PostalCode     => $self->to_address->postal_code,
+                        PhoneNumber    => {
+                            CountryCode =>
+                              $self->to_address->phone_components->{country},
+                            AreaCode =>
+                              $self->to_address->phone_components->{area},
+                            Phone =>
+                              $self->to_address->phone_components->{phone},
+                        },
+                    },
+                },
+                PackageInformation => {
+                    ServiceID   => $service_id,
+                    TotalWeight => {
+                        Value      => sprintf("%.0f", $total_weight) || 1,
+                        WeightUnit => $self->weight_unit,
+                    },
+                    TotalPieces        => scalar @{$self->packages},
+                    PiecesInformation  => {Piece => \@pieces,},
+                    OptionsInformation =>
+                      {Options => {OptionIDValuePair => \@options,},},
+                },
+                PaymentInformation => {
+                    PaymentType             => 'Sender',
+                    RegisteredAccountNumber => $self->account,
+                    BillingAccountNumber    => $self->account,
+                },
+                PickupInformation => {
+                    PickupType => $pickup_type_map{$self->pickup_type}
+                      || $self->pickup_type,
+                },
+                TrackingReferenceInformation => {
+                    Reference1 => $self->get_reference(0),
+                    Reference2 => $self->get_reference(1),
+                    Reference3 => $self->get_reference(2),
+                    Reference4 => $self->get_reference(3),
+                },
             },
-          },
-          ReceiverInformation => {
-            Address => {
-              Name            => $self->to_address->name,
-              Company         => $self->to_address->company,
-              StreetNumber    => $self->to_address->address_components->{number},
-              StreetName      => $self->to_address->address_components->{street} . ' ' . $self->to_address->address_components->{direction},
-              StreetAddress2  => $self->to_address->address2,
-              City            => $self->to_address->city,
-              Province        => $self->to_address->province_code,
-              Country         => $self->to_address->country_code,
-              PostalCode      => $self->to_address->postal_code,
-              PhoneNumber => {
-                CountryCode   => $self->to_address->phone_components->{country},
-                AreaCode      => $self->to_address->phone_components->{area},
-                Phone         => $self->to_address->phone_components->{phone},
-              },
-            },
-          },
-          PackageInformation  => {
-            ServiceID => $service_id,
-            TotalWeight => {
-              Value => sprintf("%.0f", $total_weight) || 1,
-              WeightUnit => $self->weight_unit,
-            },
-            TotalPieces => scalar @{ $self->packages },
-            PiecesInformation => {
-                Piece =>  \@pieces,
-            },
-            OptionsInformation => {
-              Options => { 
-                OptionIDValuePair => \@options, 
-              },
-            },
-          },
-          PaymentInformation => {
-            PaymentType => 'Sender',
-            RegisteredAccountNumber => $self->account,
-            BillingAccountNumber => $self->account,
-          },
-          PickupInformation => {
-            PickupType => $pickup_type_map{$self->pickup_type} || $self->pickup_type,
-          },
-          TrackingReferenceInformation =>  {
-            Reference1 => $self->get_reference(0),
-            Reference2 => $self->get_reference(1),
-            Reference3 => $self->get_reference(2),
-            Reference4 => $self->get_reference(3),
-          },
+            ShowAlternativeServicesIndicator => "false",
         },
-        ShowAlternativeServicesIndicator => "false",
-      },
-      {
-                  'Version'           =>  '2.0',
-                  'Language'          =>  'en',
-                  'GroupID'           =>  'xxx',
-                  'RequestReference'  =>  'Shipment::Purolator::rate'
-      },
+        {   'Version'          => '2.0',
+            'Language'         => 'en',
+            'GroupID'          => 'xxx',
+            'RequestReference' => 'Shipment::Purolator::rate'
+        },
     );
     $Shipment::SOAP::WSDL::Debug = 0;
     warn "Response\n" . $response if $self->debug > 1;
 
     try {
-      use Data::Currency;
-      use Shipment::Service;
-      my ($y, $m, $d) = split('-', $response->get_ShipmentEstimates()->[0]->get_ShipmentEstimate()->get_ShipmentDate()->get_value);
-      my $ship_date = { year => $y, month => $m, day => $d };
-      ($y, $m, $d) = split('-', $response->get_ShipmentEstimates()->[0]->get_ShipmentEstimate()->get_ExpectedDeliveryDate()->get_value);
-      my $eta = { year => $y, month => $m, day => $d };
-      $self->service( 
-         Shipment::Service->new( 
-          id        => $service_id,
-          name      => $self->services->{$service_id}->name,
-          etd       => $response->get_ShipmentEstimates()->[0]->get_ShipmentEstimate()->get_EstimatedTransitDays()->get_value,
-          ship_date => $ship_date,
-          eta       => $eta,
-          cost      => Data::Currency->new($response->get_ShipmentEstimates()->[0]->get_ShipmentEstimate()->get_TotalPrice, 'CAD'),
-        )
-      );
-    } catch {
-      warn $_ if $self->debug;
-      try {
-        warn $response->get_ResponseInformation()->get_Errors()->get_Error()->[0]->get_Description if $self->debug;
-        $self->error( $response->get_ResponseInformation()->get_Errors()->get_Error()->[0]->get_Description->get_value );
-      } catch {
+        use Data::Currency;
+        use Shipment::Service;
+        my ($y, $m, $d) = split('-',
+            $response->get_ShipmentEstimates()->[0]->get_ShipmentEstimate()
+              ->get_ShipmentDate()->get_value);
+        my $ship_date = {year => $y, month => $m, day => $d};
+        ($y, $m, $d) = split('-',
+            $response->get_ShipmentEstimates()->[0]->get_ShipmentEstimate()
+              ->get_ExpectedDeliveryDate()->get_value);
+        my $eta = {year => $y, month => $m, day => $d};
+        $self->service(
+            Shipment::Service->new(
+                id   => $service_id,
+                name => $self->services->{$service_id}->name,
+                etd  => $response->get_ShipmentEstimates()->[0]
+                  ->get_ShipmentEstimate()->get_EstimatedTransitDays()
+                  ->get_value,
+                ship_date => $ship_date,
+                eta       => $eta,
+                cost      => Data::Currency->new(
+                    $response->get_ShipmentEstimates()->[0]
+                      ->get_ShipmentEstimate()->get_TotalPrice,
+                    'CAD'
+                ),
+            )
+        );
+    }
+    catch {
         warn $_ if $self->debug;
-        warn $response->get_faultstring if $self->debug;
-        $self->error( $response->get_faultstring->get_value );
-      };
+        try {
+            warn $response->get_ResponseInformation()->get_Errors()
+              ->get_Error()->[0]->get_Description
+              if $self->debug;
+            $self->error($response->get_ResponseInformation()->get_Errors()
+                  ->get_Error()->[0]->get_Description->get_value);
+        }
+        catch {
+            warn $_                         if $self->debug;
+            warn $response->get_faultstring if $self->debug;
+            $self->error($response->get_faultstring->get_value);
+        };
     };
 
 }
 
 
 sub ship {
-  my ( $self, $service_id ) = @_;
+    my ($self, $service_id) = @_;
 
-  try { 
-    $service_id = $self->services->{$service_id}->id;
-  } catch {
-    warn $_ if $self->debug;
-    warn "service ($service_id) not available" if $self->debug;
-    $self->error( "service ($service_id) not available" );
-    $service_id = '';
-  };
-  return unless $service_id;
+    try {
+        $service_id = $self->services->{$service_id}->id;
+    }
+    catch {
+        warn $_                                    if $self->debug;
+        warn "service ($service_id) not available" if $self->debug;
+        $self->error("service ($service_id) not available");
+        $service_id = '';
+    };
+    return unless $service_id;
 
-    $self->rate( $service_id );
+    $self->rate($service_id);
 
     my $total_weight;
-    $total_weight += $_->weight for @{ $self->packages };
+    $total_weight += $_->weight for @{$self->packages};
 
     my @options;
     my $signature_option;
     if ($self->signature_type =~ /^(required|default|adult)$/) {
-      $signature_option = "ResidentialSignatureDomestic" if $self->services->{$service_id}->options->{ResidentialSignatureDomestic};
-      $signature_option = "ResidentialSignatureIntl" if $self->services->{$service_id}->options->{ResidentialSignatureIntl};
-    } elsif ($self->signature_type eq 'not_required') {
-      $signature_option = "OriginSignatureNotRequired";
+        $signature_option = "ResidentialSignatureDomestic"
+          if $self->services->{$service_id}
+          ->options->{ResidentialSignatureDomestic};
+        $signature_option = "ResidentialSignatureIntl"
+          if $self->services->{$service_id}
+          ->options->{ResidentialSignatureIntl};
+    }
+    elsif ($self->signature_type eq 'not_required') {
+        $signature_option = "OriginSignatureNotRequired";
     }
 
     if ($signature_option) {
-      push @options, 
-                {
-                  ID => $signature_option,
-                  Value => 'true',
-                };
+        push @options,
+          { ID    => $signature_option,
+            Value => 'true',
+          };
     }
 
     my $notification_information;
     if ($self->to_address->email) {
-      $notification_information->{AdvancedShippingNotificationEmailAddress1} = $self->to_address->email;
+        $notification_information->{AdvancedShippingNotificationEmailAddress1}
+          = $self->to_address->email;
     }
 
     my @pieces;
-    foreach (@{ $self->packages }) {
-      if ($self->package_type eq 'custom') {
-        push @pieces,
-          {
-              Weight => {
-                Value => sprintf("%.0f", $_->weight) || 1,
-                WeightUnit => $self->weight_unit,
-              },
-              Length => {
-                Value => $_->length,
-                DimensionUnit => $self->dim_unit,
-              },
-              Width => {
-                Value => $_->width,
-                DimensionUnit => $self->dim_unit,
-              },
-              Height => {
-                Value => $_->height,
-                DimensionUnit => $self->dim_unit,
-              },
-          };
-      }
-      else {
-        push @pieces,
-          {
-              Weight => {
-                Value => sprintf("%.0f", $_->weight) || 1,
-                WeightUnit => $self->weight_unit,
-              },
-          };
-      }
+    foreach (@{$self->packages}) {
+        if ($self->package_type eq 'custom') {
+            push @pieces,
+              { Weight => {
+                    Value      => sprintf("%.0f", $_->weight) || 1,
+                    WeightUnit => $self->weight_unit,
+                },
+                Length => {
+                    Value         => $_->length,
+                    DimensionUnit => $self->dim_unit,
+                },
+                Width => {
+                    Value         => $_->width,
+                    DimensionUnit => $self->dim_unit,
+                },
+                Height => {
+                    Value         => $_->height,
+                    DimensionUnit => $self->dim_unit,
+                },
+              };
+        }
+        else {
+            push @pieces,
+              { Weight => {
+                    Value      => sprintf("%.0f", $_->weight) || 1,
+                    WeightUnit => $self->weight_unit,
+                },
+              };
+        }
     }
 
-    use Shipment::Purolator::WSDLV2::Interfaces::ShippingService::ShippingServiceEndpoint;
-    my $interface = Shipment::Purolator::WSDLV2::Interfaces::ShippingService::ShippingServiceEndpoint->new(
-      {
-        proxy_domain => $self->proxy_domain,
-        key => $self->key,
-        password => $self->password,
-      }
-    );
+    use
+      Shipment::Purolator::WSDLV2::Interfaces::ShippingService::ShippingServiceEndpoint;
+    my $interface =
+      Shipment::Purolator::WSDLV2::Interfaces::ShippingService::ShippingServiceEndpoint
+      ->new(
+        {   proxy_domain => $self->proxy_domain,
+            key          => $self->key,
+            password     => $self->password,
+        }
+      );
 
     $Shipment::SOAP::WSDL::Debug = 1 if $self->debug > 1;
     my $response = $interface->CreateShipment(
-      {
-        Shipment => {
-          SenderInformation => {
-            Address => {
-              Name            => $self->from_address->name,
-              Company         => $self->from_address->company,
-              StreetNumber    => $self->from_address->address_components->{number},
-              StreetName      => $self->from_address->address_components->{street} . ' ' . $self->from_address->address_components->{direction},
-              StreetAddress2  => $self->from_address->address2,
-              City            => $self->from_address->city,
-              Province        => $self->from_address->province_code,
-              Country         => $self->from_address->country_code,
-              PostalCode      => $self->from_address->postal_code,
-              PhoneNumber => {
-                CountryCode   => $self->from_address->phone_components->{country},
-                AreaCode      => $self->from_address->phone_components->{area},
-                Phone         => $self->from_address->phone_components->{phone},
-              },
+        {   Shipment => {
+                SenderInformation => {
+                    Address => {
+                        Name         => $self->from_address->name,
+                        Company      => $self->from_address->company,
+                        StreetNumber =>
+                          $self->from_address->address_components->{number},
+                        StreetName =>
+                          $self->from_address->address_components->{street}
+                          . ' '
+                          . $self->from_address->address_components
+                          ->{direction},
+                        StreetAddress2 => $self->from_address->address2,
+                        City           => $self->from_address->city,
+                        Province       => $self->from_address->province_code,
+                        Country        => $self->from_address->country_code,
+                        PostalCode     => $self->from_address->postal_code,
+                        PhoneNumber    => {
+                            CountryCode =>
+                              $self->from_address->phone_components->{country},
+                            AreaCode =>
+                              $self->from_address->phone_components->{area},
+                            Phone =>
+                              $self->from_address->phone_components->{phone},
+                        },
+                    },
+                },
+                ReceiverInformation => {
+                    Address => {
+                        Name         => $self->to_address->name,
+                        Company      => $self->to_address->company,
+                        StreetNumber =>
+                          $self->to_address->address_components->{number},
+                        StreetName =>
+                          $self->to_address->address_components->{street} . ' '
+                          . $self->to_address->address_components->{direction},
+                        StreetAddress2 => $self->to_address->address2,
+                        City           => $self->to_address->city,
+                        Province       => $self->to_address->province_code,
+                        Country        => $self->to_address->country_code,
+                        PostalCode     => $self->to_address->postal_code,
+                        PhoneNumber    => {
+                            CountryCode =>
+                              $self->to_address->phone_components->{country},
+                            AreaCode =>
+                              $self->to_address->phone_components->{area},
+                            Phone =>
+                              $self->to_address->phone_components->{phone},
+                        },
+                    },
+                },
+                PackageInformation => {
+                    ServiceID   => $service_id,
+                    TotalWeight => {
+                        Value      => sprintf("%.0f", $total_weight) || 1,
+                        WeightUnit => $self->weight_unit,
+                    },
+                    TotalPieces        => scalar @{$self->packages},
+                    PiecesInformation  => {Piece => \@pieces,},
+                    OptionsInformation =>
+                      {Options => {OptionIDValuePair => \@options,},},
+                },
+                PaymentInformation => {
+                    PaymentType => $bill_type_map{$self->bill_type}
+                      || $self->bill_type,
+                    RegisteredAccountNumber => $self->account,
+                    BillingAccountNumber    => $self->bill_account,
+                },
+                PickupInformation => {
+                    PickupType => $pickup_type_map{$self->pickup_type}
+                      || $self->pickup_type,
+                },
+                TrackingReferenceInformation => {
+                    Reference1 => $self->get_reference(0),
+                    Reference2 => $self->get_reference(1),
+                    Reference3 => $self->get_reference(2),
+                    Reference4 => $self->get_reference(3),
+                },
+                NotificationInformation => $notification_information,
+                OtherInformation        =>
+                  {SpecialInstructions => $self->special_instructions,},
             },
-          },
-          ReceiverInformation => {
-            Address => {
-              Name            => $self->to_address->name,
-              Company         => $self->to_address->company,
-              StreetNumber    => $self->to_address->address_components->{number},
-              StreetName      => $self->to_address->address_components->{street} . ' ' . $self->to_address->address_components->{direction},
-              StreetAddress2  => $self->to_address->address2,
-              City            => $self->to_address->city,
-              Province        => $self->to_address->province_code,
-              Country         => $self->to_address->country_code,
-              PostalCode      => $self->to_address->postal_code,
-              PhoneNumber => {
-                CountryCode   => $self->to_address->phone_components->{country},
-                AreaCode      => $self->to_address->phone_components->{area},
-                Phone         => $self->to_address->phone_components->{phone},
-              },
-            },
-          },
-          PackageInformation  => {
-            ServiceID => $service_id,
-            TotalWeight => {
-              Value => sprintf("%.0f", $total_weight) || 1,
-              WeightUnit => $self->weight_unit,
-            },
-            TotalPieces => scalar @{ $self->packages },
-            PiecesInformation => {
-                Piece =>  \@pieces,
-            },
-            OptionsInformation => {
-              Options => { 
-                OptionIDValuePair => \@options, 
-              },
-            },
-          },
-          PaymentInformation => {
-            PaymentType => $bill_type_map{$self->bill_type} || $self->bill_type,
-            RegisteredAccountNumber => $self->account,
-            BillingAccountNumber => $self->bill_account,
-          },
-          PickupInformation => {
-            PickupType => $pickup_type_map{$self->pickup_type} || $self->pickup_type,
-          },
-          TrackingReferenceInformation =>  {
-            Reference1 => $self->get_reference(0),
-            Reference2 => $self->get_reference(1),
-            Reference3 => $self->get_reference(2),
-            Reference4 => $self->get_reference(3),
-          },
-          NotificationInformation => $notification_information,
-          OtherInformation => {
-            SpecialInstructions => $self->special_instructions,
-          },
+            PrinterType => $printer_type_map{$self->printer_type}
+              || $self->printer_type,
         },
-        PrinterType => $printer_type_map{$self->printer_type} || $self->printer_type,
-      },
-      {
-                  'Version'           =>  '2.0',
-                  'Language'          =>  'en',
-                  'GroupID'           =>  'xxx',
-                  'RequestReference'  =>  'Shipment::Purolator::ship'
-      },
+        {   'Version'          => '2.0',
+            'Language'         => 'en',
+            'GroupID'          => 'xxx',
+            'RequestReference' => 'Shipment::Purolator::ship'
+        },
     );
     $Shipment::SOAP::WSDL::Debug = 0;
     warn "Response\n" . $response if $self->debug > 1;
 
     try {
-      $self->tracking_id( $response->get_ShipmentPIN()->get_Value()->get_value );
-      use Shipment::Label;
-      my $package_index = 0;
-      foreach (@{ $response->get_PiecePINs()->get_PIN() }) {
-        $self->get_package($package_index)->tracking_id($_->get_Value()->get_value);
-        $self->get_package($package_index)->label(
-          Shipment::Label->new(
-            {
-              tracking_id => $_->get_Value()->get_value,
-            },
-          )
-        );
-        $package_index++
-      }
-    } catch {
-      try {
-        warn $_ if $self->debug;
-        warn $response->get_ResponseInformation()->get_Errors()->get_Error()->[0]->get_Description if $self->debug;
-        $self->error( $response->get_ResponseInformation()->get_Errors()->get_Error()->[0]->get_Description->get_value );
-      } catch {
-        warn $_ if $self->debug;
-        warn $response->get_faultstring if $self->debug;
-        $self->error( $response->get_faultstring->get_value );
-      };
+        $self->tracking_id(
+            $response->get_ShipmentPIN()->get_Value()->get_value);
+        use Shipment::Label;
+        my $package_index = 0;
+        foreach (@{$response->get_PiecePINs()->get_PIN()}) {
+            $self->get_package($package_index)
+              ->tracking_id($_->get_Value()->get_value);
+            $self->get_package($package_index)->label(
+                Shipment::Label->new(
+                    {tracking_id => $_->get_Value()->get_value,},
+                )
+            );
+            $package_index++;
+        }
+    }
+    catch {
+        try {
+            warn $_ if $self->debug;
+            warn $response->get_ResponseInformation()->get_Errors()
+              ->get_Error()->[0]->get_Description
+              if $self->debug;
+            $self->error($response->get_ResponseInformation()->get_Errors()
+                  ->get_Error()->[0]->get_Description->get_value);
+        }
+        catch {
+            warn $_                         if $self->debug;
+            warn $response->get_faultstring if $self->debug;
+            $self->error($response->get_faultstring->get_value);
+        };
     };
 
     $self->fetch_documents();
@@ -558,203 +632,217 @@ sub fetch_documents {
 
     return unless $self->tracking_id;
 
-    use Shipment::Purolator::WSDL::Interfaces::ShippingDocumentsService::ShippingDocumentsServiceEndpoint;
-    my $interface = Shipment::Purolator::WSDL::Interfaces::ShippingDocumentsService::ShippingDocumentsServiceEndpoint->new(
-      {
-        proxy_domain => $self->proxy_domain,
-        key => $self->key,
-        password => $self->password,
-      }
-    );
+    use
+      Shipment::Purolator::WSDL::Interfaces::ShippingDocumentsService::ShippingDocumentsServiceEndpoint;
+    my $interface =
+      Shipment::Purolator::WSDL::Interfaces::ShippingDocumentsService::ShippingDocumentsServiceEndpoint
+      ->new(
+        {   proxy_domain => $self->proxy_domain,
+            key          => $self->key,
+            password     => $self->password,
+        }
+      );
 
     $Shipment::SOAP::WSDL::Debug = 1 if $self->debug > 1;
     my $response = $interface->GetDocuments(
-      {
-        DocumentCriterium => {
-          DocumentCriteria => {
-            PIN => {
-              Value => $self->tracking_id,
-            },
-          },
+        {   DocumentCriterium =>
+              {DocumentCriteria => {PIN => {Value => $self->tracking_id,},},},
         },
-      },
-      {
-                  'Version'           =>  '1.3',
-                  'Language'          =>  'en',
-                  'GroupID'           =>  'xxx',
-                  'RequestReference'  =>  'Shipment::Purolator::fetch_documents'
-      },
+        {   'Version'          => '1.3',
+            'Language'         => 'en',
+            'GroupID'          => 'xxx',
+            'RequestReference' => 'Shipment::Purolator::fetch_documents'
+        },
     );
     $Shipment::SOAP::WSDL::Debug = 0;
     warn "Response\n" . $response if $self->debug > 1;
 
     my $document_url;
     try {
-      $document_url = $response->get_Documents()->get_Document()->get_DocumentDetails()->[0]->get_DocumentDetail()->get_URL()->get_value;
-    } catch {
-      warn $_ if $self->debug;
-      try {
-        warn $response->get_ResponseInformation()->get_Errors()->get_Error()->[0]->get_Description if $self->debug;
-        $self->error( $response->get_ResponseInformation()->get_Errors()->get_Error()->[0]->get_Description->get_value );
-      } catch {
+        $document_url =
+          $response->get_Documents()->get_Document()->get_DocumentDetails()
+          ->[0]->get_DocumentDetail()->get_URL()->get_value;
+    }
+    catch {
         warn $_ if $self->debug;
-        warn $response->get_faultstring if $self->debug;
-        $self->error( $response->get_faultstring->get_value );
-      };
+        try {
+            warn $response->get_ResponseInformation()->get_Errors()
+              ->get_Error()->[0]->get_Description
+              if $self->debug;
+            $self->error($response->get_ResponseInformation()->get_Errors()
+                  ->get_Error()->[0]->get_Description->get_value);
+        }
+        catch {
+            warn $_                         if $self->debug;
+            warn $response->get_faultstring if $self->debug;
+            $self->error($response->get_faultstring->get_value);
+        };
     };
 
     use LWP::UserAgent;
     use Shipment::Label;
-    my $ua = LWP::UserAgent->new('Shipping::Purolator');
+    my $ua  = LWP::UserAgent->new('Shipping::Purolator');
     my $req = HTTP::Request->new(GET => $document_url);
 
     ## for multi-piece shipments, the labels are not always ready immediately after generating the shipment... try 10 times, sleeping for a second in between each try.
     my $label_success;
     my $res;
-    for (1..10) {
-      $res = $ua->request($req);
-      sleep 1 && next unless $res->is_success && $res->content;
+    for (1 .. 10) {
+        $res = $ua->request($req);
+        sleep 1 && next unless $res->is_success && $res->content;
 
-      $label_success = 1;
-      $self->documents(
-        Shipment::Label->new(
-          tracking_id   => $self->tracking_id,
-          content_type  => $res->header('Content-Type'),
-          data          => $res->content,
-          file_name     => $self->tracking_id . '-documents.pdf',
-        )
-      );
+        $label_success = 1;
+        $self->documents(
+            Shipment::Label->new(
+                tracking_id  => $self->tracking_id,
+                content_type => $res->header('Content-Type'),
+                data         => $res->content,
+                file_name    => $self->tracking_id . '-documents.pdf',
+            )
+        );
 
-      foreach ($self->all_packages) {
-        $_->label->content_type( $res->header('Content-Type') );
-        $_->label->data( $res->content );
-        $_->label->file_name( $_->tracking_id . '.pdf' );
-      }
+        foreach ($self->all_packages) {
+            $_->label->content_type($res->header('Content-Type'));
+            $_->label->data($res->content);
+            $_->label->file_name($_->tracking_id . '.pdf');
+        }
     }
 
     if (!$label_success) {
-      if (!$res->is_success) {
-        warn $res->status_line if $self->debug;
-        $self->error( "Failed to retrieve label(s) from " . $document_url . ": " . $res->status_line );
-      }
-      else {
-        warn "No content returned from label url: " . $document_url if $self->debug;
-        $self->error( "Failed to retrieve label(s) from " . $document_url );
-      }
-      $self->cancel;
+        if (!$res->is_success) {
+            warn $res->status_line if $self->debug;
+            $self->error("Failed to retrieve label(s) from "
+                  . $document_url . ": "
+                  . $res->status_line);
+        }
+        else {
+            warn "No content returned from label url: " . $document_url
+              if $self->debug;
+            $self->error("Failed to retrieve label(s) from " . $document_url);
+        }
+        $self->cancel;
     }
 }
 
 
 sub cancel {
-  my $self = shift;
+    my $self = shift;
 
-  if (!$self->tracking_id) {
-    $self->error('no tracking id provided');
-    return;
-  }
+    if (!$self->tracking_id) {
+        $self->error('no tracking id provided');
+        return;
+    }
 
-    use Shipment::Purolator::WSDLV2::Interfaces::ShippingService::ShippingServiceEndpoint;
-    my $interface = Shipment::Purolator::WSDLV2::Interfaces::ShippingService::ShippingServiceEndpoint->new(
-      {
-        proxy_domain => $self->proxy_domain,
-        key => $self->key,
-        password => $self->password,
-      }
-    );
+    use
+      Shipment::Purolator::WSDLV2::Interfaces::ShippingService::ShippingServiceEndpoint;
+    my $interface =
+      Shipment::Purolator::WSDLV2::Interfaces::ShippingService::ShippingServiceEndpoint
+      ->new(
+        {   proxy_domain => $self->proxy_domain,
+            key          => $self->key,
+            password     => $self->password,
+        }
+      );
 
     $Shipment::SOAP::WSDL::Debug = 1 if $self->debug > 1;
     my $response = $interface->VoidShipment(
-      {
-        PIN => {
-          Value => $self->tracking_id,
+        {PIN => {Value => $self->tracking_id,},},
+        {   'Version'          => '2.0',
+            'Language'         => 'en',
+            'GroupID'          => 'xxx',
+            'RequestReference' => 'Shipment::Purolator::cancel'
         },
-      },
-      {
-                  'Version'           =>  '2.0',
-                  'Language'          =>  'en',
-                  'GroupID'           =>  'xxx',
-                  'RequestReference'  =>  'Shipment::Purolator::cancel'
-      },
     );
     $Shipment::SOAP::WSDL::Debug = 0;
     warn "Response\n" . $response if $self->debug > 1;
 
     my $success;
     try {
-      $success = $response->get_ShipmentVoided->get_value;
-    } catch {
-      try {
-        warn $_ if $self->debug;
-        warn $response->get_ResponseInformation()->get_Errors()->get_Error()->[0]->get_Description if $self->debug;
-        $self->error( $response->get_ResponseInformation()->get_Errors()->get_Error()->[0]->get_Description->get_value );
-      } catch {
-        warn $_ if $self->debug;
-        warn $response->get_faultstring if $self->debug;
-        $self->error( $response->get_faultstring->get_value );
-      };
+        $success = $response->get_ShipmentVoided->get_value;
+    }
+    catch {
+        try {
+            warn $_ if $self->debug;
+            warn $response->get_ResponseInformation()->get_Errors()
+              ->get_Error()->[0]->get_Description
+              if $self->debug;
+            $self->error($response->get_ResponseInformation()->get_Errors()
+                  ->get_Error()->[0]->get_Description->get_value);
+        }
+        catch {
+            warn $_                         if $self->debug;
+            warn $response->get_faultstring if $self->debug;
+            $self->error($response->get_faultstring->get_value);
+        };
     };
-  
-  return $success;
+
+    return $success;
 }
 
 
 sub end_of_day {
-  my $self = shift;
+    my $self = shift;
 
     use DateTime;
-    use Shipment::Purolator::WSDL::Interfaces::ShippingDocumentsService::ShippingDocumentsServiceEndpoint;
-    my $interface = Shipment::Purolator::WSDL::Interfaces::ShippingDocumentsService::ShippingDocumentsServiceEndpoint->new(
-      {
-        proxy_domain => $self->proxy_domain,
-        key => $self->key,
-        password => $self->password,
-      }
-    );
+    use
+      Shipment::Purolator::WSDL::Interfaces::ShippingDocumentsService::ShippingDocumentsServiceEndpoint;
+    my $interface =
+      Shipment::Purolator::WSDL::Interfaces::ShippingDocumentsService::ShippingDocumentsServiceEndpoint
+      ->new(
+        {   proxy_domain => $self->proxy_domain,
+            key          => $self->key,
+            password     => $self->password,
+        }
+      );
 
     #TODO: call Consolidate before getting manifest document
 
     $Shipment::SOAP::WSDL::Debug = 1 if $self->debug > 1;
     my $response = $interface->GetShipmentManifestDocument(
-      {
-        ShipmentManifestDocumentCriterium => {
-          ShipmentManifestDocumentCriteria => {
-            ManifestDate => DateTime->now->ymd,
-          }
-        }
-      },
-      {
-                  'Version'           =>  '1.3',
-                  'Language'          =>  'en',
-                  'GroupID'           =>  'xxx',
-                  'RequestReference'  =>  'Shipment::Purolator::end_of_day'
-      },
+        {   ShipmentManifestDocumentCriterium => {
+                ShipmentManifestDocumentCriteria =>
+                  {ManifestDate => DateTime->now->ymd,}
+            }
+        },
+        {   'Version'          => '1.3',
+            'Language'         => 'en',
+            'GroupID'          => 'xxx',
+            'RequestReference' => 'Shipment::Purolator::end_of_day'
+        },
     );
     $Shipment::SOAP::WSDL::Debug = 0;
     warn "Response\n" . $response if $self->debug > 1;
 
     try {
-      use LWP::UserAgent;
-      my $ua = LWP::UserAgent->new('Shipping::Purolator');
-      my $req = HTTP::Request->new(GET => $response->get_ManifestBatches()->[0]->get_ManifestBatch()->get_ManifestBatchDetails->get_ManifestBatchDetail->get_URL()->get_value);
-      my $res = $ua->request($req);
-      $self->manifest(
-        Shipment::Label->new(
-          content_type => $res->header('Content-Type'),
-          data => $res->content,
-          file_name => 'manifest_' . DateTime->now->ymd('_') . '.pdf',
-        )
-      );
-    } catch {
-      warn $_ if $self->debug;
-      try {
-        warn $response->get_ResponseInformation()->get_Errors()->get_Error()->[0]->get_Description if $self->debug;
-        $self->error( $response->get_ResponseInformation()->get_Errors()->get_Error()->[0]->get_Description->get_value );
-      } catch {
+        use LWP::UserAgent;
+        my $ua  = LWP::UserAgent->new('Shipping::Purolator');
+        my $req = HTTP::Request->new(
+            GET => $response->get_ManifestBatches()->[0]->get_ManifestBatch()
+              ->get_ManifestBatchDetails->get_ManifestBatchDetail->get_URL()
+              ->get_value);
+        my $res = $ua->request($req);
+        $self->manifest(
+            Shipment::Label->new(
+                content_type => $res->header('Content-Type'),
+                data         => $res->content,
+                file_name    => 'manifest_' . DateTime->now->ymd('_') . '.pdf',
+            )
+        );
+    }
+    catch {
         warn $_ if $self->debug;
-        warn $response->get_faultstring if $self->debug;
-        $self->error( $response->get_faultstring->get_value );
-      };
+        try {
+            warn $response->get_ResponseInformation()->get_Errors()
+              ->get_Error()->[0]->get_Description
+              if $self->debug;
+            $self->error($response->get_ResponseInformation()->get_Errors()
+                  ->get_Error()->[0]->get_Description->get_value);
+        }
+        catch {
+            warn $_                         if $self->debug;
+            warn $response->get_faultstring if $self->debug;
+            $self->error($response->get_faultstring->get_value);
+        };
     };
 
 }
@@ -774,7 +862,7 @@ Shipment::Purolator
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 SYNOPSIS
 

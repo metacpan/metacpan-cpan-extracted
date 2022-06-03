@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::RateTypes::DeliveryConfirmationType;
-$Shipment::UPS::WSDL::RateTypes::DeliveryConfirmationType::VERSION = '3.07';
+$Shipment::UPS::WSDL::RateTypes::DeliveryConfirmationType::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Rate/v1.1'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,24 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %DCISType_of :ATTR(:get<DCISType>);
+    my %DCISType_of : ATTR(:get<DCISType>);
 
-__PACKAGE__->_factory(
-    [ qw(        DCISType
+    __PACKAGE__->_factory(
+        [   qw(        DCISType
 
-    ) ],
-    {
-        'DCISType' => \%DCISType_of,
-    },
-    {
-        'DCISType' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {'DCISType' => \%DCISType_of,},
+        {'DCISType' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',},
+        {
 
-        'DCISType' => 'DCISType',
-    }
-);
+            'DCISType' => 'DCISType',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -62,7 +54,7 @@ Shipment::UPS::WSDL::RateTypes::DeliveryConfirmationType
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

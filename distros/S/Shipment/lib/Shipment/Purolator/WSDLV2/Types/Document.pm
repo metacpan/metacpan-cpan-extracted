@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDLV2::Types::Document;
-$Shipment::Purolator::WSDLV2::Types::Document::VERSION = '3.07';
+$Shipment::Purolator::WSDLV2::Types::Document::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' };
+sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,32 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %PIN_of :ATTR(:get<PIN>);
-my %DocumentDetails_of :ATTR(:get<DocumentDetails>);
+    my %PIN_of : ATTR(:get<PIN>);
+    my %DocumentDetails_of : ATTR(:get<DocumentDetails>);
 
-__PACKAGE__->_factory(
-    [ qw(        PIN
-        DocumentDetails
+    __PACKAGE__->_factory(
+        [   qw(        PIN
+              DocumentDetails
 
-    ) ],
-    {
-        'PIN' => \%PIN_of,
-        'DocumentDetails' => \%DocumentDetails_of,
-    },
-    {
-        'PIN' => 'Shipment::Purolator::WSDLV2::Types::PIN',
-        'DocumentDetails' => 'Shipment::Purolator::WSDLV2::Types::ArrayOfDocumentDetail',
-    },
-    {
+            )
+        ],
+        {   'PIN'             => \%PIN_of,
+            'DocumentDetails' => \%DocumentDetails_of,
+        },
+        {   'PIN'             => 'Shipment::Purolator::WSDLV2::Types::PIN',
+            'DocumentDetails' =>
+              'Shipment::Purolator::WSDLV2::Types::ArrayOfDocumentDetail',
+        },
+        {
 
-        'PIN' => 'PIN',
-        'DocumentDetails' => 'DocumentDetails',
-    }
-);
+            'PIN'             => 'PIN',
+            'DocumentDetails' => 'DocumentDetails',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +62,7 @@ Shipment::Purolator::WSDLV2::Types::Document
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

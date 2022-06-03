@@ -1,22 +1,22 @@
 
 package Shipment::FedEx::WSDL::CloseElements::GroundCloseWithDocumentsRequest;
-$Shipment::FedEx::WSDL::CloseElements::GroundCloseWithDocumentsRequest::VERSION = '3.07';
+$Shipment::FedEx::WSDL::CloseElements::GroundCloseWithDocumentsRequest::VERSION = '3.08';
 use strict;
 use warnings;
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-sub get_xmlns { 'http://fedex.com/ws/close/v2' }
+    sub get_xmlns {'http://fedex.com/ws/close/v2'}
 
-__PACKAGE__->__set_name('GroundCloseWithDocumentsRequest');
-__PACKAGE__->__set_nillable();
-__PACKAGE__->__set_minOccurs();
-__PACKAGE__->__set_maxOccurs();
-__PACKAGE__->__set_ref();
-use base qw(
-    SOAP::WSDL::XSD::Typelib::Element
-    Shipment::FedEx::WSDL::CloseTypes::GroundCloseWithDocumentsRequest
-);
+    __PACKAGE__->__set_name('GroundCloseWithDocumentsRequest');
+    __PACKAGE__->__set_nillable();
+    __PACKAGE__->__set_minOccurs();
+    __PACKAGE__->__set_maxOccurs();
+    __PACKAGE__->__set_ref();
+    use base qw(
+      SOAP::WSDL::XSD::Typelib::Element
+      Shipment::FedEx::WSDL::CloseTypes::GroundCloseWithDocumentsRequest
+    );
 
 }
 
@@ -34,7 +34,7 @@ Shipment::FedEx::WSDL::CloseElements::GroundCloseWithDocumentsRequest
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

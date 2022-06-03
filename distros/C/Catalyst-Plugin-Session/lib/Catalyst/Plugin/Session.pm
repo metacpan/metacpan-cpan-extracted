@@ -13,7 +13,7 @@ use List::Util qw/ max /;
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 $VERSION =~ tr/_//d;
 
 my @session_data_accessors; # used in delete_session

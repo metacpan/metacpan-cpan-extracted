@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::BillReceiverAddressType;
-$Shipment::UPS::WSDL::ShipTypes::BillReceiverAddressType::VERSION = '3.07';
+$Shipment::UPS::WSDL::ShipTypes::BillReceiverAddressType::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,24 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %PostalCode_of :ATTR(:get<PostalCode>);
+    my %PostalCode_of : ATTR(:get<PostalCode>);
 
-__PACKAGE__->_factory(
-    [ qw(        PostalCode
+    __PACKAGE__->_factory(
+        [   qw(        PostalCode
 
-    ) ],
-    {
-        'PostalCode' => \%PostalCode_of,
-    },
-    {
-        'PostalCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {'PostalCode' => \%PostalCode_of,},
+        {'PostalCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',},
+        {
 
-        'PostalCode' => 'PostalCode',
-    }
-);
+            'PostalCode' => 'PostalCode',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -62,7 +54,7 @@ Shipment::UPS::WSDL::ShipTypes::BillReceiverAddressType
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

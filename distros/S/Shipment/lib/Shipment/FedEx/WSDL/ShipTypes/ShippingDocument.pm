@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::ShippingDocument;
-$Shipment::FedEx::WSDL::ShipTypes::ShippingDocument::VERSION = '3.07';
+$Shipment::FedEx::WSDL::ShipTypes::ShippingDocument::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,62 +20,63 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Type_of :ATTR(:get<Type>);
-my %Grouping_of :ATTR(:get<Grouping>);
-my %ShippingDocumentDisposition_of :ATTR(:get<ShippingDocumentDisposition>);
-my %AccessReference_of :ATTR(:get<AccessReference>);
-my %Resolution_of :ATTR(:get<Resolution>);
-my %CopiesToPrint_of :ATTR(:get<CopiesToPrint>);
-my %Parts_of :ATTR(:get<Parts>);
+    my %Type_of : ATTR(:get<Type>);
+    my %Grouping_of : ATTR(:get<Grouping>);
+    my %ShippingDocumentDisposition_of :
+      ATTR(:get<ShippingDocumentDisposition>);
+    my %AccessReference_of : ATTR(:get<AccessReference>);
+    my %Resolution_of : ATTR(:get<Resolution>);
+    my %CopiesToPrint_of : ATTR(:get<CopiesToPrint>);
+    my %Parts_of : ATTR(:get<Parts>);
 
-__PACKAGE__->_factory(
-    [ qw(        Type
-        Grouping
-        ShippingDocumentDisposition
-        AccessReference
-        Resolution
-        CopiesToPrint
-        Parts
+    __PACKAGE__->_factory(
+        [   qw(        Type
+              Grouping
+              ShippingDocumentDisposition
+              AccessReference
+              Resolution
+              CopiesToPrint
+              Parts
 
-    ) ],
-    {
-        'Type' => \%Type_of,
-        'Grouping' => \%Grouping_of,
-        'ShippingDocumentDisposition' => \%ShippingDocumentDisposition_of,
-        'AccessReference' => \%AccessReference_of,
-        'Resolution' => \%Resolution_of,
-        'CopiesToPrint' => \%CopiesToPrint_of,
-        'Parts' => \%Parts_of,
-    },
-    {
-        'Type' => 'Shipment::FedEx::WSDL::ShipTypes::ReturnedShippingDocumentType',
-        'Grouping' => 'Shipment::FedEx::WSDL::ShipTypes::ShippingDocumentGroupingType',
-        'ShippingDocumentDisposition' => 'Shipment::FedEx::WSDL::ShipTypes::ShippingDocumentDispositionType',
-        'AccessReference' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Resolution' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-        'CopiesToPrint' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-        'Parts' => 'Shipment::FedEx::WSDL::ShipTypes::ShippingDocumentPart',
-    },
-    {
+            )
+        ],
+        {   'Type'                        => \%Type_of,
+            'Grouping'                    => \%Grouping_of,
+            'ShippingDocumentDisposition' => \%ShippingDocumentDisposition_of,
+            'AccessReference'             => \%AccessReference_of,
+            'Resolution'                  => \%Resolution_of,
+            'CopiesToPrint'               => \%CopiesToPrint_of,
+            'Parts'                       => \%Parts_of,
+        },
+        {   'Type' =>
+              'Shipment::FedEx::WSDL::ShipTypes::ReturnedShippingDocumentType',
+            'Grouping' =>
+              'Shipment::FedEx::WSDL::ShipTypes::ShippingDocumentGroupingType',
+            'ShippingDocumentDisposition' =>
+              'Shipment::FedEx::WSDL::ShipTypes::ShippingDocumentDispositionType',
+            'AccessReference' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Resolution'      =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+            'CopiesToPrint' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+            'Parts' =>
+              'Shipment::FedEx::WSDL::ShipTypes::ShippingDocumentPart',
+        },
+        {
 
-        'Type' => 'Type',
-        'Grouping' => 'Grouping',
-        'ShippingDocumentDisposition' => 'ShippingDocumentDisposition',
-        'AccessReference' => 'AccessReference',
-        'Resolution' => 'Resolution',
-        'CopiesToPrint' => 'CopiesToPrint',
-        'Parts' => 'Parts',
-    }
-);
+            'Type'                        => 'Type',
+            'Grouping'                    => 'Grouping',
+            'ShippingDocumentDisposition' => 'ShippingDocumentDisposition',
+            'AccessReference'             => 'AccessReference',
+            'Resolution'                  => 'Resolution',
+            'CopiesToPrint'               => 'CopiesToPrint',
+            'Parts'                       => 'Parts',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -92,7 +93,7 @@ Shipment::FedEx::WSDL::ShipTypes::ShippingDocument
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

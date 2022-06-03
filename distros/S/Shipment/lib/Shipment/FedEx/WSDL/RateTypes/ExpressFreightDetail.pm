@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::ExpressFreightDetail;
-$Shipment::FedEx::WSDL::RateTypes::ExpressFreightDetail::VERSION = '3.07';
+$Shipment::FedEx::WSDL::RateTypes::ExpressFreightDetail::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
+sub get_xmlns {'http://fedex.com/ws/rate/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,57 +20,57 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %PackingListEnclosed_of :ATTR(:get<PackingListEnclosed>);
-my %ShippersLoadAndCount_of :ATTR(:get<ShippersLoadAndCount>);
-my %BookingConfirmationNumber_of :ATTR(:get<BookingConfirmationNumber>);
-my %ReferenceLabelRequested_of :ATTR(:get<ReferenceLabelRequested>);
-my %BeforeDeliveryContact_of :ATTR(:get<BeforeDeliveryContact>);
-my %UndeliverableContact_of :ATTR(:get<UndeliverableContact>);
+    my %PackingListEnclosed_of : ATTR(:get<PackingListEnclosed>);
+    my %ShippersLoadAndCount_of : ATTR(:get<ShippersLoadAndCount>);
+    my %BookingConfirmationNumber_of : ATTR(:get<BookingConfirmationNumber>);
+    my %ReferenceLabelRequested_of : ATTR(:get<ReferenceLabelRequested>);
+    my %BeforeDeliveryContact_of : ATTR(:get<BeforeDeliveryContact>);
+    my %UndeliverableContact_of : ATTR(:get<UndeliverableContact>);
 
-__PACKAGE__->_factory(
-    [ qw(        PackingListEnclosed
-        ShippersLoadAndCount
-        BookingConfirmationNumber
-        ReferenceLabelRequested
-        BeforeDeliveryContact
-        UndeliverableContact
+    __PACKAGE__->_factory(
+        [   qw(        PackingListEnclosed
+              ShippersLoadAndCount
+              BookingConfirmationNumber
+              ReferenceLabelRequested
+              BeforeDeliveryContact
+              UndeliverableContact
 
-    ) ],
-    {
-        'PackingListEnclosed' => \%PackingListEnclosed_of,
-        'ShippersLoadAndCount' => \%ShippersLoadAndCount_of,
-        'BookingConfirmationNumber' => \%BookingConfirmationNumber_of,
-        'ReferenceLabelRequested' => \%ReferenceLabelRequested_of,
-        'BeforeDeliveryContact' => \%BeforeDeliveryContact_of,
-        'UndeliverableContact' => \%UndeliverableContact_of,
-    },
-    {
-        'PackingListEnclosed' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-        'ShippersLoadAndCount' => 'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',
-        'BookingConfirmationNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'ReferenceLabelRequested' => 'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
-        'BeforeDeliveryContact' => 'Shipment::FedEx::WSDL::RateTypes::ExpressFreightDetailContact',
-        'UndeliverableContact' => 'Shipment::FedEx::WSDL::RateTypes::ExpressFreightDetailContact',
-    },
-    {
+            )
+        ],
+        {   'PackingListEnclosed'       => \%PackingListEnclosed_of,
+            'ShippersLoadAndCount'      => \%ShippersLoadAndCount_of,
+            'BookingConfirmationNumber' => \%BookingConfirmationNumber_of,
+            'ReferenceLabelRequested'   => \%ReferenceLabelRequested_of,
+            'BeforeDeliveryContact'     => \%BeforeDeliveryContact_of,
+            'UndeliverableContact'      => \%UndeliverableContact_of,
+        },
+        {   'PackingListEnclosed' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+            'ShippersLoadAndCount' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',
+            'BookingConfirmationNumber' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'ReferenceLabelRequested' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::boolean',
+            'BeforeDeliveryContact' =>
+              'Shipment::FedEx::WSDL::RateTypes::ExpressFreightDetailContact',
+            'UndeliverableContact' =>
+              'Shipment::FedEx::WSDL::RateTypes::ExpressFreightDetailContact',
+        },
+        {
 
-        'PackingListEnclosed' => 'PackingListEnclosed',
-        'ShippersLoadAndCount' => 'ShippersLoadAndCount',
-        'BookingConfirmationNumber' => 'BookingConfirmationNumber',
-        'ReferenceLabelRequested' => 'ReferenceLabelRequested',
-        'BeforeDeliveryContact' => 'BeforeDeliveryContact',
-        'UndeliverableContact' => 'UndeliverableContact',
-    }
-);
+            'PackingListEnclosed'       => 'PackingListEnclosed',
+            'ShippersLoadAndCount'      => 'ShippersLoadAndCount',
+            'BookingConfirmationNumber' => 'BookingConfirmationNumber',
+            'ReferenceLabelRequested'   => 'ReferenceLabelRequested',
+            'BeforeDeliveryContact'     => 'BeforeDeliveryContact',
+            'UndeliverableContact'      => 'UndeliverableContact',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -87,7 +87,7 @@ Shipment::FedEx::WSDL::RateTypes::ExpressFreightDetail
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

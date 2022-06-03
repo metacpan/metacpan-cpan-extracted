@@ -1,5 +1,5 @@
 package Dancer2::Template::Obj2HTML;
-$Dancer2::Template::Obj2HTML::VERSION = '0.1';
+$Dancer2::Template::Obj2HTML::VERSION = '0.11';
 
 use strict;
 use warnings;
@@ -80,7 +80,7 @@ __END__
 
 =head1 NAME
 
-Dancer2::Template::Obj2HTML - Temnplating system based on HTML::Obj2HTML
+Dancer2::Template::Obj2HTML - Templating system based on HTML::Obj2HTML
 
 =head1 SYNOPSYS
 
@@ -123,5 +123,3 @@ This software is copyright (c) 2022 by Pero Moretti.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
-
-=end

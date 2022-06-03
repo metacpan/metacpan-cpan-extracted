@@ -1,22 +1,22 @@
 
 package Shipment::Purolator::WSDL::Elements::CreditCardType;
-$Shipment::Purolator::WSDL::Elements::CreditCardType::VERSION = '3.07';
+$Shipment::Purolator::WSDL::Elements::CreditCardType::VERSION = '3.08';
 use strict;
 use warnings;
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' }
+    sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
 
-__PACKAGE__->__set_name('CreditCardType');
-__PACKAGE__->__set_nillable(1);
-__PACKAGE__->__set_minOccurs();
-__PACKAGE__->__set_maxOccurs();
-__PACKAGE__->__set_ref();
-use base qw(
-    SOAP::WSDL::XSD::Typelib::Element
-    Shipment::Purolator::WSDL::Types::CreditCardType
-);
+    __PACKAGE__->__set_name('CreditCardType');
+    __PACKAGE__->__set_nillable(1);
+    __PACKAGE__->__set_minOccurs();
+    __PACKAGE__->__set_maxOccurs();
+    __PACKAGE__->__set_ref();
+    use base qw(
+      SOAP::WSDL::XSD::Typelib::Element
+      Shipment::Purolator::WSDL::Types::CreditCardType
+    );
 
 }
 
@@ -34,7 +34,7 @@ Shipment::Purolator::WSDL::Elements::CreditCardType
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

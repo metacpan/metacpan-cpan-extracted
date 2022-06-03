@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::CommitDetail;
-$Shipment::FedEx::WSDL::RateTypes::CommitDetail::VERSION = '3.07';
+$Shipment::FedEx::WSDL::RateTypes::CommitDetail::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
+sub get_xmlns {'http://fedex.com/ws/rate/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,137 +20,144 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %CommodityName_of :ATTR(:get<CommodityName>);
-my %ServiceType_of :ATTR(:get<ServiceType>);
-my %AppliedOptions_of :ATTR(:get<AppliedOptions>);
-my %AppliedSubOptions_of :ATTR(:get<AppliedSubOptions>);
-my %CommitTimestamp_of :ATTR(:get<CommitTimestamp>);
-my %DayOfWeek_of :ATTR(:get<DayOfWeek>);
-my %TransitTime_of :ATTR(:get<TransitTime>);
-my %MaximumTransitTime_of :ATTR(:get<MaximumTransitTime>);
-my %DestinationServiceArea_of :ATTR(:get<DestinationServiceArea>);
-my %BrokerAddress_of :ATTR(:get<BrokerAddress>);
-my %BrokerLocationId_of :ATTR(:get<BrokerLocationId>);
-my %BrokerCommitTimestamp_of :ATTR(:get<BrokerCommitTimestamp>);
-my %BrokerCommitDayOfWeek_of :ATTR(:get<BrokerCommitDayOfWeek>);
-my %BrokerToDestinationDays_of :ATTR(:get<BrokerToDestinationDays>);
-my %ProofOfDeliveryDate_of :ATTR(:get<ProofOfDeliveryDate>);
-my %ProofOfDeliveryDayOfWeek_of :ATTR(:get<ProofOfDeliveryDayOfWeek>);
-my %CommitMessages_of :ATTR(:get<CommitMessages>);
-my %DeliveryMessages_of :ATTR(:get<DeliveryMessages>);
-my %DelayDetails_of :ATTR(:get<DelayDetails>);
-my %DocumentContent_of :ATTR(:get<DocumentContent>);
-my %RequiredDocuments_of :ATTR(:get<RequiredDocuments>);
-my %FreightCommitDetail_of :ATTR(:get<FreightCommitDetail>);
+    my %CommodityName_of : ATTR(:get<CommodityName>);
+    my %ServiceType_of : ATTR(:get<ServiceType>);
+    my %AppliedOptions_of : ATTR(:get<AppliedOptions>);
+    my %AppliedSubOptions_of : ATTR(:get<AppliedSubOptions>);
+    my %CommitTimestamp_of : ATTR(:get<CommitTimestamp>);
+    my %DayOfWeek_of : ATTR(:get<DayOfWeek>);
+    my %TransitTime_of : ATTR(:get<TransitTime>);
+    my %MaximumTransitTime_of : ATTR(:get<MaximumTransitTime>);
+    my %DestinationServiceArea_of : ATTR(:get<DestinationServiceArea>);
+    my %BrokerAddress_of : ATTR(:get<BrokerAddress>);
+    my %BrokerLocationId_of : ATTR(:get<BrokerLocationId>);
+    my %BrokerCommitTimestamp_of : ATTR(:get<BrokerCommitTimestamp>);
+    my %BrokerCommitDayOfWeek_of : ATTR(:get<BrokerCommitDayOfWeek>);
+    my %BrokerToDestinationDays_of : ATTR(:get<BrokerToDestinationDays>);
+    my %ProofOfDeliveryDate_of : ATTR(:get<ProofOfDeliveryDate>);
+    my %ProofOfDeliveryDayOfWeek_of : ATTR(:get<ProofOfDeliveryDayOfWeek>);
+    my %CommitMessages_of : ATTR(:get<CommitMessages>);
+    my %DeliveryMessages_of : ATTR(:get<DeliveryMessages>);
+    my %DelayDetails_of : ATTR(:get<DelayDetails>);
+    my %DocumentContent_of : ATTR(:get<DocumentContent>);
+    my %RequiredDocuments_of : ATTR(:get<RequiredDocuments>);
+    my %FreightCommitDetail_of : ATTR(:get<FreightCommitDetail>);
 
-__PACKAGE__->_factory(
-    [ qw(        CommodityName
-        ServiceType
-        AppliedOptions
-        AppliedSubOptions
-        CommitTimestamp
-        DayOfWeek
-        TransitTime
-        MaximumTransitTime
-        DestinationServiceArea
-        BrokerAddress
-        BrokerLocationId
-        BrokerCommitTimestamp
-        BrokerCommitDayOfWeek
-        BrokerToDestinationDays
-        ProofOfDeliveryDate
-        ProofOfDeliveryDayOfWeek
-        CommitMessages
-        DeliveryMessages
-        DelayDetails
-        DocumentContent
-        RequiredDocuments
-        FreightCommitDetail
+    __PACKAGE__->_factory(
+        [   qw(        CommodityName
+              ServiceType
+              AppliedOptions
+              AppliedSubOptions
+              CommitTimestamp
+              DayOfWeek
+              TransitTime
+              MaximumTransitTime
+              DestinationServiceArea
+              BrokerAddress
+              BrokerLocationId
+              BrokerCommitTimestamp
+              BrokerCommitDayOfWeek
+              BrokerToDestinationDays
+              ProofOfDeliveryDate
+              ProofOfDeliveryDayOfWeek
+              CommitMessages
+              DeliveryMessages
+              DelayDetails
+              DocumentContent
+              RequiredDocuments
+              FreightCommitDetail
 
-    ) ],
-    {
-        'CommodityName' => \%CommodityName_of,
-        'ServiceType' => \%ServiceType_of,
-        'AppliedOptions' => \%AppliedOptions_of,
-        'AppliedSubOptions' => \%AppliedSubOptions_of,
-        'CommitTimestamp' => \%CommitTimestamp_of,
-        'DayOfWeek' => \%DayOfWeek_of,
-        'TransitTime' => \%TransitTime_of,
-        'MaximumTransitTime' => \%MaximumTransitTime_of,
-        'DestinationServiceArea' => \%DestinationServiceArea_of,
-        'BrokerAddress' => \%BrokerAddress_of,
-        'BrokerLocationId' => \%BrokerLocationId_of,
-        'BrokerCommitTimestamp' => \%BrokerCommitTimestamp_of,
-        'BrokerCommitDayOfWeek' => \%BrokerCommitDayOfWeek_of,
-        'BrokerToDestinationDays' => \%BrokerToDestinationDays_of,
-        'ProofOfDeliveryDate' => \%ProofOfDeliveryDate_of,
-        'ProofOfDeliveryDayOfWeek' => \%ProofOfDeliveryDayOfWeek_of,
-        'CommitMessages' => \%CommitMessages_of,
-        'DeliveryMessages' => \%DeliveryMessages_of,
-        'DelayDetails' => \%DelayDetails_of,
-        'DocumentContent' => \%DocumentContent_of,
-        'RequiredDocuments' => \%RequiredDocuments_of,
-        'FreightCommitDetail' => \%FreightCommitDetail_of,
-    },
-    {
-        'CommodityName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'ServiceType' => 'Shipment::FedEx::WSDL::RateTypes::ServiceType',
-        'AppliedOptions' => 'Shipment::FedEx::WSDL::RateTypes::ServiceOptionType',
-        'AppliedSubOptions' => 'Shipment::FedEx::WSDL::RateTypes::ServiceSubOptionDetail',
-        'CommitTimestamp' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
-        'DayOfWeek' => 'Shipment::FedEx::WSDL::RateTypes::DayOfWeekType',
-        'TransitTime' => 'Shipment::FedEx::WSDL::RateTypes::TransitTimeType',
-        'MaximumTransitTime' => 'Shipment::FedEx::WSDL::RateTypes::TransitTimeType',
-        'DestinationServiceArea' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'BrokerAddress' => 'Shipment::FedEx::WSDL::RateTypes::Address',
-        'BrokerLocationId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'BrokerCommitTimestamp' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
-        'BrokerCommitDayOfWeek' => 'Shipment::FedEx::WSDL::RateTypes::DayOfWeekType',
-        'BrokerToDestinationDays' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-        'ProofOfDeliveryDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
-        'ProofOfDeliveryDayOfWeek' => 'Shipment::FedEx::WSDL::RateTypes::DayOfWeekType',
-        'CommitMessages' => 'Shipment::FedEx::WSDL::RateTypes::Notification',
-        'DeliveryMessages' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'DelayDetails' => 'Shipment::FedEx::WSDL::RateTypes::DelayDetail',
-        'DocumentContent' => 'Shipment::FedEx::WSDL::RateTypes::InternationalDocumentContentType',
-        'RequiredDocuments' => 'Shipment::FedEx::WSDL::RateTypes::RequiredShippingDocumentType',
-        'FreightCommitDetail' => 'Shipment::FedEx::WSDL::RateTypes::FreightCommitDetail',
-    },
-    {
+            )
+        ],
+        {   'CommodityName'            => \%CommodityName_of,
+            'ServiceType'              => \%ServiceType_of,
+            'AppliedOptions'           => \%AppliedOptions_of,
+            'AppliedSubOptions'        => \%AppliedSubOptions_of,
+            'CommitTimestamp'          => \%CommitTimestamp_of,
+            'DayOfWeek'                => \%DayOfWeek_of,
+            'TransitTime'              => \%TransitTime_of,
+            'MaximumTransitTime'       => \%MaximumTransitTime_of,
+            'DestinationServiceArea'   => \%DestinationServiceArea_of,
+            'BrokerAddress'            => \%BrokerAddress_of,
+            'BrokerLocationId'         => \%BrokerLocationId_of,
+            'BrokerCommitTimestamp'    => \%BrokerCommitTimestamp_of,
+            'BrokerCommitDayOfWeek'    => \%BrokerCommitDayOfWeek_of,
+            'BrokerToDestinationDays'  => \%BrokerToDestinationDays_of,
+            'ProofOfDeliveryDate'      => \%ProofOfDeliveryDate_of,
+            'ProofOfDeliveryDayOfWeek' => \%ProofOfDeliveryDayOfWeek_of,
+            'CommitMessages'           => \%CommitMessages_of,
+            'DeliveryMessages'         => \%DeliveryMessages_of,
+            'DelayDetails'             => \%DelayDetails_of,
+            'DocumentContent'          => \%DocumentContent_of,
+            'RequiredDocuments'        => \%RequiredDocuments_of,
+            'FreightCommitDetail'      => \%FreightCommitDetail_of,
+        },
+        {   'CommodityName' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'ServiceType'   => 'Shipment::FedEx::WSDL::RateTypes::ServiceType',
+            'AppliedOptions' =>
+              'Shipment::FedEx::WSDL::RateTypes::ServiceOptionType',
+            'AppliedSubOptions' =>
+              'Shipment::FedEx::WSDL::RateTypes::ServiceSubOptionDetail',
+            'CommitTimestamp' => 'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
+            'DayOfWeek'   => 'Shipment::FedEx::WSDL::RateTypes::DayOfWeekType',
+            'TransitTime' =>
+              'Shipment::FedEx::WSDL::RateTypes::TransitTimeType',
+            'MaximumTransitTime' =>
+              'Shipment::FedEx::WSDL::RateTypes::TransitTimeType',
+            'DestinationServiceArea' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'BrokerAddress'    => 'Shipment::FedEx::WSDL::RateTypes::Address',
+            'BrokerLocationId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'BrokerCommitTimestamp' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::dateTime',
+            'BrokerCommitDayOfWeek' =>
+              'Shipment::FedEx::WSDL::RateTypes::DayOfWeekType',
+            'BrokerToDestinationDays' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+            'ProofOfDeliveryDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
+            'ProofOfDeliveryDayOfWeek' =>
+              'Shipment::FedEx::WSDL::RateTypes::DayOfWeekType',
+            'CommitMessages' =>
+              'Shipment::FedEx::WSDL::RateTypes::Notification',
+            'DeliveryMessages' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'DelayDetails' => 'Shipment::FedEx::WSDL::RateTypes::DelayDetail',
+            'DocumentContent' =>
+              'Shipment::FedEx::WSDL::RateTypes::InternationalDocumentContentType',
+            'RequiredDocuments' =>
+              'Shipment::FedEx::WSDL::RateTypes::RequiredShippingDocumentType',
+            'FreightCommitDetail' =>
+              'Shipment::FedEx::WSDL::RateTypes::FreightCommitDetail',
+        },
+        {
 
-        'CommodityName' => 'CommodityName',
-        'ServiceType' => 'ServiceType',
-        'AppliedOptions' => 'AppliedOptions',
-        'AppliedSubOptions' => 'AppliedSubOptions',
-        'CommitTimestamp' => 'CommitTimestamp',
-        'DayOfWeek' => 'DayOfWeek',
-        'TransitTime' => 'TransitTime',
-        'MaximumTransitTime' => 'MaximumTransitTime',
-        'DestinationServiceArea' => 'DestinationServiceArea',
-        'BrokerAddress' => 'BrokerAddress',
-        'BrokerLocationId' => 'BrokerLocationId',
-        'BrokerCommitTimestamp' => 'BrokerCommitTimestamp',
-        'BrokerCommitDayOfWeek' => 'BrokerCommitDayOfWeek',
-        'BrokerToDestinationDays' => 'BrokerToDestinationDays',
-        'ProofOfDeliveryDate' => 'ProofOfDeliveryDate',
-        'ProofOfDeliveryDayOfWeek' => 'ProofOfDeliveryDayOfWeek',
-        'CommitMessages' => 'CommitMessages',
-        'DeliveryMessages' => 'DeliveryMessages',
-        'DelayDetails' => 'DelayDetails',
-        'DocumentContent' => 'DocumentContent',
-        'RequiredDocuments' => 'RequiredDocuments',
-        'FreightCommitDetail' => 'FreightCommitDetail',
-    }
-);
+            'CommodityName'            => 'CommodityName',
+            'ServiceType'              => 'ServiceType',
+            'AppliedOptions'           => 'AppliedOptions',
+            'AppliedSubOptions'        => 'AppliedSubOptions',
+            'CommitTimestamp'          => 'CommitTimestamp',
+            'DayOfWeek'                => 'DayOfWeek',
+            'TransitTime'              => 'TransitTime',
+            'MaximumTransitTime'       => 'MaximumTransitTime',
+            'DestinationServiceArea'   => 'DestinationServiceArea',
+            'BrokerAddress'            => 'BrokerAddress',
+            'BrokerLocationId'         => 'BrokerLocationId',
+            'BrokerCommitTimestamp'    => 'BrokerCommitTimestamp',
+            'BrokerCommitDayOfWeek'    => 'BrokerCommitDayOfWeek',
+            'BrokerToDestinationDays'  => 'BrokerToDestinationDays',
+            'ProofOfDeliveryDate'      => 'ProofOfDeliveryDate',
+            'ProofOfDeliveryDayOfWeek' => 'ProofOfDeliveryDayOfWeek',
+            'CommitMessages'           => 'CommitMessages',
+            'DeliveryMessages'         => 'DeliveryMessages',
+            'DelayDetails'             => 'DelayDetails',
+            'DocumentContent'          => 'DocumentContent',
+            'RequiredDocuments'        => 'RequiredDocuments',
+            'FreightCommitDetail'      => 'FreightCommitDetail',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -167,7 +174,7 @@ Shipment::FedEx::WSDL::RateTypes::CommitDetail
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

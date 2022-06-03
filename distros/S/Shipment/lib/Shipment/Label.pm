@@ -1,5 +1,5 @@
 package Shipment::Label;
-$Shipment::Label::VERSION = '3.07';
+$Shipment::Label::VERSION = '3.08';
 use strict;
 use warnings;
 
@@ -9,53 +9,53 @@ use MooX::Types::MooseLike::Base qw(:all);
 
 
 has 'tracking_id' => (
-  is => 'rw',
-  isa => Str,
+    is  => 'rw',
+    isa => Str,
 );
 
 
 has 'data' => (
-  is => 'rw',
-  isa => Str,
+    is  => 'rw',
+    isa => Str,
 );
 
 
 has 'content_type' => (
-  is => 'rw',
-  isa => Str,
+    is  => 'rw',
+    isa => Str,
 );
 
 
 has 'file_name' => (
-  is => 'rw',
-  isa => Str,
+    is  => 'rw',
+    isa => Str,
 );
 
 
 sub data_base64 {
-  my ($self) = @_;
+    my ($self) = @_;
 
-  use MIME::Base64;
+    use MIME::Base64;
 
-  return encode_base64($self->data) if $self->data;
+    return encode_base64($self->data) if $self->data;
 
-  return;
+    return;
 }
 
 
 sub save {
-  my ($self, $path) = @_;
+    my ($self, $path) = @_;
 
-  $path ||= './';
+    $path ||= './';
 
-  use File::Util;
+    use File::Util;
 
-  my $f = File::Util->new();
-  $f->write_file(
-    file => $path . $self->file_name,
-    bitmask => 0644,
-    content => $self->data,
-  );
+    my $f = File::Util->new();
+    $f->write_file(
+        file    => $path . $self->file_name,
+        bitmask => 0644,
+        content => $self->data,
+    );
 }
 
 
@@ -73,7 +73,7 @@ Shipment::Label
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 SYNOPSIS
 

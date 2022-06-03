@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::VersionId;
-$Shipment::FedEx::WSDL::RateTypes::VersionId::VERSION = '3.07';
+$Shipment::FedEx::WSDL::RateTypes::VersionId::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
+sub get_xmlns {'http://fedex.com/ws/rate/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,47 +20,41 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %ServiceId_of :ATTR(:get<ServiceId>);
-my %Major_of :ATTR(:get<Major>);
-my %Intermediate_of :ATTR(:get<Intermediate>);
-my %Minor_of :ATTR(:get<Minor>);
+    my %ServiceId_of : ATTR(:get<ServiceId>);
+    my %Major_of : ATTR(:get<Major>);
+    my %Intermediate_of : ATTR(:get<Intermediate>);
+    my %Minor_of : ATTR(:get<Minor>);
 
-__PACKAGE__->_factory(
-    [ qw(        ServiceId
-        Major
-        Intermediate
-        Minor
+    __PACKAGE__->_factory(
+        [   qw(        ServiceId
+              Major
+              Intermediate
+              Minor
 
-    ) ],
-    {
-        'ServiceId' => \%ServiceId_of,
-        'Major' => \%Major_of,
-        'Intermediate' => \%Intermediate_of,
-        'Minor' => \%Minor_of,
-    },
-    {
-        'ServiceId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Major' => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
-        'Intermediate' => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
-        'Minor' => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
-    },
-    {
+            )
+        ],
+        {   'ServiceId'    => \%ServiceId_of,
+            'Major'        => \%Major_of,
+            'Intermediate' => \%Intermediate_of,
+            'Minor'        => \%Minor_of,
+        },
+        {   'ServiceId'    => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Major'        => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
+            'Intermediate' => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
+            'Minor'        => 'SOAP::WSDL::XSD::Typelib::Builtin::int',
+        },
+        {
 
-        'ServiceId' => 'ServiceId',
-        'Major' => 'Major',
-        'Intermediate' => 'Intermediate',
-        'Minor' => 'Minor',
-    }
-);
+            'ServiceId'    => 'ServiceId',
+            'Major'        => 'Major',
+            'Intermediate' => 'Intermediate',
+            'Minor'        => 'Minor',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -77,7 +71,7 @@ Shipment::FedEx::WSDL::RateTypes::VersionId
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

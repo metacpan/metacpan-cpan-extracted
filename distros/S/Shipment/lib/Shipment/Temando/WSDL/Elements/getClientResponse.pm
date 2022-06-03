@@ -1,65 +1,61 @@
 
 package Shipment::Temando::WSDL::Elements::getClientResponse;
-$Shipment::Temando::WSDL::Elements::getClientResponse::VERSION = '3.07';
+$Shipment::Temando::WSDL::Elements::getClientResponse::VERSION = '3.08';
 use strict;
 use warnings;
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-sub get_xmlns { 'http://' . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url . '/schema/2009_06/server.xsd' }
-
-__PACKAGE__->__set_name('getClientResponse');
-__PACKAGE__->__set_nillable();
-__PACKAGE__->__set_minOccurs();
-__PACKAGE__->__set_maxOccurs();
-__PACKAGE__->__set_ref();
-
-use base qw(
-    SOAP::WSDL::XSD::Typelib::Element
-    SOAP::WSDL::XSD::Typelib::ComplexType
-);
-
-our $XML_ATTRIBUTE_CLASS;
-undef $XML_ATTRIBUTE_CLASS;
-
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
-use Class::Std::Fast::Storable constructor => 'none';
-use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-Class::Std::initialize();
-
-{ # BLOCK to scope variables
-
-my %client_of :ATTR(:get<client>);
-
-__PACKAGE__->_factory(
-    [ qw(        client
-
-    ) ],
-    {
-        'client' => \%client_of,
-    },
-    {
-        'client' => 'Shipment::Temando::WSDL::Types::Client',
-    },
-    {
-
-        'client' => 'client',
+    sub get_xmlns {
+        'http://'
+          . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url
+          . '/schema/2009_06/server.xsd';
     }
-);
 
-} # end BLOCK
+    __PACKAGE__->__set_name('getClientResponse');
+    __PACKAGE__->__set_nillable();
+    __PACKAGE__->__set_minOccurs();
+    __PACKAGE__->__set_maxOccurs();
+    __PACKAGE__->__set_ref();
+
+    use base qw(
+      SOAP::WSDL::XSD::Typelib::Element
+      SOAP::WSDL::XSD::Typelib::ComplexType
+    );
+
+    our $XML_ATTRIBUTE_CLASS;
+    undef $XML_ATTRIBUTE_CLASS;
+
+    sub __get_attr_class {
+        return $XML_ATTRIBUTE_CLASS;
+    }
+
+    use Class::Std::Fast::Storable constructor => 'none';
+    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+    Class::Std::initialize();
+
+    {    # BLOCK to scope variables
+
+        my %client_of : ATTR(:get<client>);
+
+        __PACKAGE__->_factory(
+            [   qw(        client
+
+                )
+            ],
+            {'client' => \%client_of,},
+            {'client' => 'Shipment::Temando::WSDL::Types::Client',},
+            {
+
+                'client' => 'client',
+            }
+        );
+
+    }    # end BLOCK
 
 
-
-
-
-
-} # end of BLOCK
-
+}    # end of BLOCK
 
 
 1;
@@ -76,7 +72,7 @@ Shipment::Temando::WSDL::Elements::getClientResponse
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

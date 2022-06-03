@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::CustomDocumentDetail;
-$Shipment::FedEx::WSDL::ShipTypes::CustomDocumentDetail::VERSION = '3.07';
+$Shipment::FedEx::WSDL::ShipTypes::CustomDocumentDetail::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,57 +20,56 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Format_of :ATTR(:get<Format>);
-my %LabelPrintingOrientation_of :ATTR(:get<LabelPrintingOrientation>);
-my %LabelRotation_of :ATTR(:get<LabelRotation>);
-my %SpecificationId_of :ATTR(:get<SpecificationId>);
-my %CustomDocumentIdentifier_of :ATTR(:get<CustomDocumentIdentifier>);
-my %DocTabContent_of :ATTR(:get<DocTabContent>);
+    my %Format_of : ATTR(:get<Format>);
+    my %LabelPrintingOrientation_of : ATTR(:get<LabelPrintingOrientation>);
+    my %LabelRotation_of : ATTR(:get<LabelRotation>);
+    my %SpecificationId_of : ATTR(:get<SpecificationId>);
+    my %CustomDocumentIdentifier_of : ATTR(:get<CustomDocumentIdentifier>);
+    my %DocTabContent_of : ATTR(:get<DocTabContent>);
 
-__PACKAGE__->_factory(
-    [ qw(        Format
-        LabelPrintingOrientation
-        LabelRotation
-        SpecificationId
-        CustomDocumentIdentifier
-        DocTabContent
+    __PACKAGE__->_factory(
+        [   qw(        Format
+              LabelPrintingOrientation
+              LabelRotation
+              SpecificationId
+              CustomDocumentIdentifier
+              DocTabContent
 
-    ) ],
-    {
-        'Format' => \%Format_of,
-        'LabelPrintingOrientation' => \%LabelPrintingOrientation_of,
-        'LabelRotation' => \%LabelRotation_of,
-        'SpecificationId' => \%SpecificationId_of,
-        'CustomDocumentIdentifier' => \%CustomDocumentIdentifier_of,
-        'DocTabContent' => \%DocTabContent_of,
-    },
-    {
-        'Format' => 'Shipment::FedEx::WSDL::ShipTypes::ShippingDocumentFormat',
-        'LabelPrintingOrientation' => 'Shipment::FedEx::WSDL::ShipTypes::LabelPrintingOrientationType',
-        'LabelRotation' => 'Shipment::FedEx::WSDL::ShipTypes::LabelRotationType',
-        'SpecificationId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'CustomDocumentIdentifier' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'DocTabContent' => 'Shipment::FedEx::WSDL::ShipTypes::DocTabContent',
-    },
-    {
+            )
+        ],
+        {   'Format'                   => \%Format_of,
+            'LabelPrintingOrientation' => \%LabelPrintingOrientation_of,
+            'LabelRotation'            => \%LabelRotation_of,
+            'SpecificationId'          => \%SpecificationId_of,
+            'CustomDocumentIdentifier' => \%CustomDocumentIdentifier_of,
+            'DocTabContent'            => \%DocTabContent_of,
+        },
+        {   'Format' =>
+              'Shipment::FedEx::WSDL::ShipTypes::ShippingDocumentFormat',
+            'LabelPrintingOrientation' =>
+              'Shipment::FedEx::WSDL::ShipTypes::LabelPrintingOrientationType',
+            'LabelRotation' =>
+              'Shipment::FedEx::WSDL::ShipTypes::LabelRotationType',
+            'SpecificationId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'CustomDocumentIdentifier' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'DocTabContent' =>
+              'Shipment::FedEx::WSDL::ShipTypes::DocTabContent',
+        },
+        {
 
-        'Format' => 'Format',
-        'LabelPrintingOrientation' => 'LabelPrintingOrientation',
-        'LabelRotation' => 'LabelRotation',
-        'SpecificationId' => 'SpecificationId',
-        'CustomDocumentIdentifier' => 'CustomDocumentIdentifier',
-        'DocTabContent' => 'DocTabContent',
-    }
-);
+            'Format'                   => 'Format',
+            'LabelPrintingOrientation' => 'LabelPrintingOrientation',
+            'LabelRotation'            => 'LabelRotation',
+            'SpecificationId'          => 'SpecificationId',
+            'CustomDocumentIdentifier' => 'CustomDocumentIdentifier',
+            'DocTabContent'            => 'DocTabContent',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -87,7 +86,7 @@ Shipment::FedEx::WSDL::ShipTypes::CustomDocumentDetail
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

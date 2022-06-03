@@ -1,0 +1,44 @@
+---
+abstract: 'Cpanel::JSON::XS plugin'
+author:
+  - 'kfly8 <kfly@cpan.org>'
+build_requires:
+  Module::Build::Tiny: '0.035'
+  Test::More: '0.98'
+  Test::Requires: '0.06'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.18, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Amon2-Plugin-Web-CpanelJSON
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Amon2::Plugin::Web::CpanelJSON:
+    file: lib/Amon2/Plugin/Web/CpanelJSON.pm
+    version: '0.01'
+requires:
+  Amon2: '0'
+  Cpanel::JSON::XS: '0'
+  HTTP::SecureHeaders: '0'
+  perl: '5.010000'
+resources:
+  bugtracker: https://github.com/kfly8/p5-Amon2-Plugin-Web-CpanelJSON/issues
+  homepage: https://github.com/kfly8/p5-Amon2-Plugin-Web-CpanelJSON
+  repository: https://github.com/kfly8/p5-Amon2-Plugin-Web-CpanelJSON.git
+version: '0.01'
+x_authority: cpan:KFLY
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

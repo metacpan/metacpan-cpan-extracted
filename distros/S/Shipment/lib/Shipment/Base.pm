@@ -1,5 +1,5 @@
 package Shipment::Base;
-$Shipment::Base::VERSION = '3.07';
+$Shipment::Base::VERSION = '3.08';
 use strict;
 use warnings;
 
@@ -18,28 +18,28 @@ use MooX::Types::MooseLike::DateTime qw( DateAndTime );
 use namespace::clean;
 
 
-has 'from_address' => ( 
-  is => 'rw',
-  isa => InstanceOf['Shipment::Address'],
+has 'from_address' => (
+    is  => 'rw',
+    isa => InstanceOf ['Shipment::Address'],
 );
 
 has 'to_address' => (
-  is => 'rw',
-  isa => InstanceOf['Shipment::Address'],
+    is  => 'rw',
+    isa => InstanceOf ['Shipment::Address'],
 );
 
 
 has 'account' => (
-  is => 'rw',
-  isa => Str,
+    is  => 'rw',
+    isa => Str,
 );
 
 
 has 'bill_account' => (
-  is => 'rw',
-  isa => Str, 
-  lazy => 1,
-  builder => 1,
+    is      => 'rw',
+    isa     => Str,
+    lazy    => 1,
+    builder => 1,
 );
 
 sub _build_bill_account {
@@ -48,332 +48,324 @@ sub _build_bill_account {
 
 
 has 'bill_address' => (
-  is => 'rw',
-  isa => InstanceOf['Shipment::Address'],
+    is  => 'rw',
+    isa => InstanceOf ['Shipment::Address'],
 );
 
 
 has 'bill_type' => (
-  is => 'rw',
-  isa => Enum[qw( sender recipient third_party )],
-  default => 'sender',
+    is      => 'rw',
+    isa     => Enum [qw( sender recipient third_party )],
+    default => 'sender',
 );
 
 
 has 'pickup_type' => (
-  is => 'rw',
-  isa => Enum[qw( pickup dropoff )],
-  default => 'pickup'
+    is      => 'rw',
+    isa     => Enum [qw( pickup dropoff )],
+    default => 'pickup'
 );
 
 
 has 'printer_type' => (
-  is => 'rw',
-  isa => Str,
-  default => 'pdf',
+    is      => 'rw',
+    isa     => Str,
+    default => 'pdf',
 );
 
 
 has 'signature_type' => (
-  is => 'rw',
-  isa => Enum[qw( default required not_required adult )],
-  default => 'default',
+    is      => 'rw',
+    isa     => Enum [qw( default required not_required adult )],
+    default => 'default',
 );
 
 
 has 'package_type' => (
-  is => 'rw',
-  isa => Enum[qw( custom envelope tube box pack )],
-  default => 'custom',
+    is      => 'rw',
+    isa     => Enum [qw( custom envelope tube box pack )],
+    default => 'custom',
 );
 
 
 has 'packages' => (
-  handles_via => 'Array',
-  is => 'rw',
-  isa => ArrayRef[InstanceOf['Shipment::Package']],
-  default => sub { [] },
-  handles => {
-    all_packages => 'elements',
-    get_package  => 'get',
-    add_package  => 'push',
-    count_packages => 'count',
-  },
+    handles_via => 'Array',
+    is          => 'rw',
+    isa         => ArrayRef [InstanceOf ['Shipment::Package']],
+    default     => sub { [] },
+    handles     => {
+        all_packages   => 'elements',
+        get_package    => 'get',
+        add_package    => 'push',
+        count_packages => 'count',
+    },
 );
 
 
 has 'weight_unit' => (
-  is => 'rw',
-  isa => Enum[ qw( lb kg oz ) ],
-  default => 'lb',
+    is      => 'rw',
+    isa     => Enum [qw( lb kg oz )],
+    default => 'lb',
 );
 
 has 'dim_unit' => (
-  is => 'rw',
-  isa => Enum[ qw( in cm ) ],
-  default => 'in',
+    is      => 'rw',
+    isa     => Enum [qw( in cm )],
+    default => 'in',
 );
 
 
 has 'currency' => (
-  is => 'rw',
-  isa => Str,
-  default => 'USD',
+    is      => 'rw',
+    isa     => Str,
+    default => 'USD',
 );
 
 
 has 'insured_value' => (
-  is => 'rw',
-  isa => InstanceOf['Data::Currency'],
-  lazy => 1,
-  default => sub {
-    my $self = shift;
-    my $insured_value = 0;
-    foreach (@{ $self->packages }) {
-      $insured_value += $_->insured_value->value;
-    }
-    Data::Currency->new($insured_value)
-  },
+    is      => 'rw',
+    isa     => InstanceOf ['Data::Currency'],
+    lazy    => 1,
+    default => sub {
+        my $self          = shift;
+        my $insured_value = 0;
+        foreach (@{$self->packages}) {
+            $insured_value += $_->insured_value->value;
+        }
+        Data::Currency->new($insured_value);
+    },
 );
 
 
 has 'goods_value' => (
-  is => 'rw',
-  isa => InstanceOf['Data::Currency'],
-  lazy => 1,
-  default => sub {
-    my $self = shift;
-    my $goods_value = 0;
-    foreach (@{ $self->packages }) {
-      $goods_value += $_->goods_value->value;
-    }
-    Data::Currency->new($goods_value)
-  },
+    is      => 'rw',
+    isa     => InstanceOf ['Data::Currency'],
+    lazy    => 1,
+    default => sub {
+        my $self        = shift;
+        my $goods_value = 0;
+        foreach (@{$self->packages}) {
+            $goods_value += $_->goods_value->value;
+        }
+        Data::Currency->new($goods_value);
+    },
 );
 
 
 has 'pickup_date' => (
-  is     => 'rw',
-  isa    => DateAndTime,
-  coerce => \&coerce_datetime,
-  default => sub { DateTime->now },
+    is      => 'rw',
+    isa     => DateAndTime,
+    coerce  => \&coerce_datetime,
+    default => sub { DateTime->now },
 );
 
 
 has 'services' => (
-  handles_via => 'Hash',
-  is => 'lazy',
-  isa => HashRef[InstanceOf['Shipment::Service']],
-  handles => {
-    all_services => 'values',
-  },
+    handles_via => 'Hash',
+    is          => 'lazy',
+    isa         => HashRef [InstanceOf ['Shipment::Service']],
+    handles     => {all_services => 'values',},
 );
 
 
 has 'service' => (
-  is => 'rw',
-  isa => InstanceOf['Shipment::Service'],
+    is  => 'rw',
+    isa => InstanceOf ['Shipment::Service'],
 );
 
 
 has 'tracking_id' => (
-  is => 'rw',
-  isa => Str,
+    is  => 'rw',
+    isa => Str,
 );
 
 
 has 'activities' => (
-  handles_via => 'Array',
-  is => 'rw',
-  isa => ArrayRef[InstanceOf['Shipment::Activity']],
-  default => sub { [] },
-  handles => {
-    all_activities => 'elements',
-    get_activity  => 'get',
-    add_activity  => 'push',
-    count_activities => 'count',
-  },
+    handles_via => 'Array',
+    is          => 'rw',
+    isa         => ArrayRef [InstanceOf ['Shipment::Activity']],
+    default     => sub { [] },
+    handles     => {
+        all_activities   => 'elements',
+        get_activity     => 'get',
+        add_activity     => 'push',
+        count_activities => 'count',
+    },
 );
 
 
 sub status {
-  shift->get_activity(0);
+    shift->get_activity(0);
 }
 
 has 'ship_date' => (
-  is     => 'rw',
-  isa    => DateAndTime,
-  coerce => \&coerce_datetime,
+    is     => 'rw',
+    isa    => DateAndTime,
+    coerce => \&coerce_datetime,
 );
 
 
 has 'documents' => (
-  is => 'rw',
-  isa => InstanceOf['Shipment::Label'],
+    is  => 'rw',
+    isa => InstanceOf ['Shipment::Label'],
 );
 
 
 has 'manifest' => (
-  is => 'rw',
-  isa => InstanceOf['Shipment::Label'],
+    is  => 'rw',
+    isa => InstanceOf ['Shipment::Label'],
 );
 
 
 has 'debug' => (
-  is => 'ro',
-  isa => Num,
-  default => sub {
-    return $ENV{SHIPMENT_DEBUG} || 0;
-  },
+    is      => 'ro',
+    isa     => Num,
+    default => sub {
+        return $ENV{SHIPMENT_DEBUG} || 0;
+    },
 );
 
 
 has 'error' => (
-  is => 'rw',
-  isa => Str,
+    is  => 'rw',
+    isa => Str,
 );
 
 
 has 'notice' => (
-  handles_via  => 'String',
-  is => 'rw',
-  isa => Str,
-  default => q{},
-  handles => {
-    add_notice  => 'append',
-  },
+    handles_via => 'String',
+    is          => 'rw',
+    isa         => Str,
+    default     => q{},
+    handles     => {add_notice => 'append',},
 );
 
 
 has 'references' => (
-  handles_via => 'Array',
-  is => 'rw',
-  isa => ArrayRef[],
-  default => sub { [] },
-  handles => {
-    all_references => 'elements',
-    get_reference  => 'get',
-    add_reference  => 'push',
-    count_references => 'count',
-  },
+    handles_via => 'Array',
+    is          => 'rw',
+    isa         => ArrayRef [],
+    default     => sub { [] },
+    handles     => {
+        all_references   => 'elements',
+        get_reference    => 'get',
+        add_reference    => 'push',
+        count_references => 'count',
+    },
 );
 
 
 has 'special_instructions' => (
-  is => 'rw',
-  isa => Str,
+    is  => 'rw',
+    isa => Str,
 );
 
 
 has 'carbon_offset' => (
-  is => 'rw',
-  isa => Bool,
-  default => 0,
+    is      => 'rw',
+    isa     => Bool,
+    default => 0,
 );
 
 
 sub _build_services {
-  my $self = shift;
+    my $self = shift;
 
-  warn "routine '_build_services' has not been implemented";
-  $self->error("routine '_build_services' has not been implemented");
-  { 
-    ground => 
-      Shipment::Service->new(
-        id => 'ground',
-        name => 'Example Ground Service',
-        etd => 4, ## Estimated Transit Days
-        cost => Data::Currency->new(1),
-      ),
-    express => 
-      Shipment::Service->new(
-        id => 'express',
-        name => 'Example Express Service',
-        etd => 2, ## Estimated Transit Days
-        cost => Data::Currency->new(10),
-      ),
-    priority => 
-      Shipment::Service->new(
-        id => 'priority',
-        name => 'Example Priority Service',
-        etd => 1, ## Estimated Transit Days
-        cost => Data::Currency->new(100),
-      ),
-  }
+    warn "routine '_build_services' has not been implemented";
+    $self->error("routine '_build_services' has not been implemented");
+    {   ground => Shipment::Service->new(
+            id   => 'ground',
+            name => 'Example Ground Service',
+            etd  => 4,                          ## Estimated Transit Days
+            cost => Data::Currency->new(1),
+        ),
+        express => Shipment::Service->new(
+            id   => 'express',
+            name => 'Example Express Service',
+            etd  => 2,                           ## Estimated Transit Days
+            cost => Data::Currency->new(10),
+        ),
+        priority => Shipment::Service->new(
+            id   => 'priority',
+            name => 'Example Priority Service',
+            etd  => 1,                            ## Estimated Transit Days
+            cost => Data::Currency->new(100),
+        ),
+    };
 }
 
 
 sub rate {
-  my ( $self, $service_id ) = @_;
+    my ($self, $service_id) = @_;
 
-  warn "routine 'rate' is not implemented for $self" if $self->debug;
-  $self->error("routine 'rate' is not implemented for $self");
+    warn "routine 'rate' is not implemented for $self" if $self->debug;
+    $self->error("routine 'rate' is not implemented for $self");
 
-  return;
+    return;
 }
 
 
 sub ship {
-  my ( $self, $service_id ) = @_;
+    my ($self, $service_id) = @_;
 
-  warn "routine 'ship' is not implemented for $self" if $self->debug;
-  $self->error("routine 'ship' is not implemented for $self");
+    warn "routine 'ship' is not implemented for $self" if $self->debug;
+    $self->error("routine 'ship' is not implemented for $self");
 
-  return;
+    return;
 }
 
 
 sub return {
-  my ( $self, $service_id ) = @_;
+    my ($self, $service_id) = @_;
 
-  warn "routine 'return' is not implemented for $self" if $self->debug;
-  $self->error("routine 'return' is not implemented for $self");
+    warn "routine 'return' is not implemented for $self" if $self->debug;
+    $self->error("routine 'return' is not implemented for $self");
 
-  return;
+    return;
 }
 
 
 sub cancel {
-  my ( $self, $service_id ) = @_;
+    my ($self, $service_id) = @_;
 
-  warn "routine 'cancel' is not implemented for $self" if $self->debug;
-  $self->error("routine 'cancel' is not implemented for $self");
+    warn "routine 'cancel' is not implemented for $self" if $self->debug;
+    $self->error("routine 'cancel' is not implemented for $self");
 
-  return;
+    return;
 }
 
 
 sub end_of_day {
-  my ( $self, $service_id ) = @_;
+    my ($self, $service_id) = @_;
 
-  warn "routine 'end_of_day' is not implemented for $self" if $self->debug;
-  $self->error("routine 'end_of_day' is not implemented for $self");
+    warn "routine 'end_of_day' is not implemented for $self" if $self->debug;
+    $self->error("routine 'end_of_day' is not implemented for $self");
 
-  return;
+    return;
 }
 
 
 sub track {
-  my $self = shift;
+    my $self = shift;
 
-  warn "routine 'track' is not implemented for $self" if $self->debug;
-  $self->error("routine 'track' is not implemented for $self");
+    warn "routine 'track' is not implemented for $self" if $self->debug;
+    $self->error("routine 'track' is not implemented for $self");
 
-  return;
+    return;
 }
 
 
 sub coerce_datetime {
-    if ( blessed( $_[0] ) and ( blessed( $_[0] ) eq 'DateTime' ) ) {
+    if (blessed($_[0]) and (blessed($_[0]) eq 'DateTime')) {
         return $_[0];
     }
-    elsif ( ref($_[0]) eq 'HASH' ) {
-        return DateTime->new( %{$_[0]} );
+    elsif (ref($_[0]) eq 'HASH') {
+        return DateTime->new(%{$_[0]});
     }
-    elsif ( ref($_[0]) eq '' && $_[0] =~ /^\d+/ ) {
-        return DateTime->from_epoch( epoch => $_[0] )
+    elsif (ref($_[0]) eq '' && $_[0] =~ /^\d+/) {
+        return DateTime->from_epoch(epoch => $_[0]);
     }
-    elsif ( ref($_[0]) eq '' && $_[0] eq 'now' ) {
+    elsif (ref($_[0]) eq '' && $_[0] eq 'now') {
         return DateTime->now;
     }
     else {
@@ -396,7 +388,7 @@ Shipment::Base
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 SYNOPSIS
 

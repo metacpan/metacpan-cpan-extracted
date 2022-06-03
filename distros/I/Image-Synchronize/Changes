@@ -1,5 +1,18 @@
 Revision history for Perl extension Image::Synchronize.
 
+2.009 2022-06-03
+
+      - Support character sets [qx3], character ranges [a-z], and
+        alteratives {foo,bar} in path name patterns.
+
+      - Make path name matching case insensitive in environments where
+        path names are case insensitive (in particular MS Windows).
+
+2.008 2021-02-28
+
+      - Support YAML metadata files if metadata cannot be written to
+        the image file directly.
+
 2.007 2020-12-13
 
       - --time <file>=<timestamp> produced an internal error.

@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::TrackTypes::SignatureImageType;
-$Shipment::UPS::WSDL::TrackTypes::SignatureImageType::VERSION = '3.07';
+$Shipment::UPS::WSDL::TrackTypes::SignatureImageType::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Track/v2.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,32 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %GraphicImage_of :ATTR(:get<GraphicImage>);
-my %ImageFormat_of :ATTR(:get<ImageFormat>);
+    my %GraphicImage_of : ATTR(:get<GraphicImage>);
+    my %ImageFormat_of : ATTR(:get<ImageFormat>);
 
-__PACKAGE__->_factory(
-    [ qw(        GraphicImage
-        ImageFormat
+    __PACKAGE__->_factory(
+        [   qw(        GraphicImage
+              ImageFormat
 
-    ) ],
-    {
-        'GraphicImage' => \%GraphicImage_of,
-        'ImageFormat' => \%ImageFormat_of,
-    },
-    {
-        'GraphicImage' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'ImageFormat' => 'Shipment::UPS::WSDL::TrackTypes::ImageFormatType',
-    },
-    {
+            )
+        ],
+        {   'GraphicImage' => \%GraphicImage_of,
+            'ImageFormat'  => \%ImageFormat_of,
+        },
+        {   'GraphicImage' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'ImageFormat'  =>
+              'Shipment::UPS::WSDL::TrackTypes::ImageFormatType',
+        },
+        {
 
-        'GraphicImage' => 'GraphicImage',
-        'ImageFormat' => 'ImageFormat',
-    }
-);
+            'GraphicImage' => 'GraphicImage',
+            'ImageFormat'  => 'ImageFormat',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +62,7 @@ Shipment::UPS::WSDL::TrackTypes::SignatureImageType
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

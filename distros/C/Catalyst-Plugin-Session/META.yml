@@ -37,7 +37,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Plugin-Session
   license: http://dev.perl.org/licenses/
   repository: https://github.com/perl-catalyst/Catalyst-Plugin-Session.git
-version: '0.42'
+version: '0.43'
 x_breaks:
   Catalyst::Plugin::Session::State::Cookie: '< 0.03'
   Catalyst::Plugin::Session::State::URI: '< 0.02'

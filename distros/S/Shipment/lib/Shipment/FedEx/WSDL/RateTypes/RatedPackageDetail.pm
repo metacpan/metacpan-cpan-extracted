@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::RatedPackageDetail;
-$Shipment::FedEx::WSDL::RateTypes::RatedPackageDetail::VERSION = '3.07';
+$Shipment::FedEx::WSDL::RateTypes::RatedPackageDetail::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
+sub get_xmlns {'http://fedex.com/ws/rate/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,57 +20,57 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %TrackingIds_of :ATTR(:get<TrackingIds>);
-my %GroupNumber_of :ATTR(:get<GroupNumber>);
-my %EffectiveNetDiscount_of :ATTR(:get<EffectiveNetDiscount>);
-my %AdjustedCodCollectionAmount_of :ATTR(:get<AdjustedCodCollectionAmount>);
-my %OversizeClass_of :ATTR(:get<OversizeClass>);
-my %PackageRateDetail_of :ATTR(:get<PackageRateDetail>);
+    my %TrackingIds_of : ATTR(:get<TrackingIds>);
+    my %GroupNumber_of : ATTR(:get<GroupNumber>);
+    my %EffectiveNetDiscount_of : ATTR(:get<EffectiveNetDiscount>);
+    my %AdjustedCodCollectionAmount_of :
+      ATTR(:get<AdjustedCodCollectionAmount>);
+    my %OversizeClass_of : ATTR(:get<OversizeClass>);
+    my %PackageRateDetail_of : ATTR(:get<PackageRateDetail>);
 
-__PACKAGE__->_factory(
-    [ qw(        TrackingIds
-        GroupNumber
-        EffectiveNetDiscount
-        AdjustedCodCollectionAmount
-        OversizeClass
-        PackageRateDetail
+    __PACKAGE__->_factory(
+        [   qw(        TrackingIds
+              GroupNumber
+              EffectiveNetDiscount
+              AdjustedCodCollectionAmount
+              OversizeClass
+              PackageRateDetail
 
-    ) ],
-    {
-        'TrackingIds' => \%TrackingIds_of,
-        'GroupNumber' => \%GroupNumber_of,
-        'EffectiveNetDiscount' => \%EffectiveNetDiscount_of,
-        'AdjustedCodCollectionAmount' => \%AdjustedCodCollectionAmount_of,
-        'OversizeClass' => \%OversizeClass_of,
-        'PackageRateDetail' => \%PackageRateDetail_of,
-    },
-    {
-        'TrackingIds' => 'Shipment::FedEx::WSDL::RateTypes::TrackingId',
-        'GroupNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-        'EffectiveNetDiscount' => 'Shipment::FedEx::WSDL::RateTypes::Money',
-        'AdjustedCodCollectionAmount' => 'Shipment::FedEx::WSDL::RateTypes::Money',
-        'OversizeClass' => 'Shipment::FedEx::WSDL::RateTypes::OversizeClassType',
-        'PackageRateDetail' => 'Shipment::FedEx::WSDL::RateTypes::PackageRateDetail',
-    },
-    {
+            )
+        ],
+        {   'TrackingIds'                 => \%TrackingIds_of,
+            'GroupNumber'                 => \%GroupNumber_of,
+            'EffectiveNetDiscount'        => \%EffectiveNetDiscount_of,
+            'AdjustedCodCollectionAmount' => \%AdjustedCodCollectionAmount_of,
+            'OversizeClass'               => \%OversizeClass_of,
+            'PackageRateDetail'           => \%PackageRateDetail_of,
+        },
+        {   'TrackingIds' => 'Shipment::FedEx::WSDL::RateTypes::TrackingId',
+            'GroupNumber' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+            'EffectiveNetDiscount' =>
+              'Shipment::FedEx::WSDL::RateTypes::Money',
+            'AdjustedCodCollectionAmount' =>
+              'Shipment::FedEx::WSDL::RateTypes::Money',
+            'OversizeClass' =>
+              'Shipment::FedEx::WSDL::RateTypes::OversizeClassType',
+            'PackageRateDetail' =>
+              'Shipment::FedEx::WSDL::RateTypes::PackageRateDetail',
+        },
+        {
 
-        'TrackingIds' => 'TrackingIds',
-        'GroupNumber' => 'GroupNumber',
-        'EffectiveNetDiscount' => 'EffectiveNetDiscount',
-        'AdjustedCodCollectionAmount' => 'AdjustedCodCollectionAmount',
-        'OversizeClass' => 'OversizeClass',
-        'PackageRateDetail' => 'PackageRateDetail',
-    }
-);
+            'TrackingIds'                 => 'TrackingIds',
+            'GroupNumber'                 => 'GroupNumber',
+            'EffectiveNetDiscount'        => 'EffectiveNetDiscount',
+            'AdjustedCodCollectionAmount' => 'AdjustedCodCollectionAmount',
+            'OversizeClass'               => 'OversizeClass',
+            'PackageRateDetail'           => 'PackageRateDetail',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -87,7 +87,7 @@ Shipment::FedEx::WSDL::RateTypes::RatedPackageDetail
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

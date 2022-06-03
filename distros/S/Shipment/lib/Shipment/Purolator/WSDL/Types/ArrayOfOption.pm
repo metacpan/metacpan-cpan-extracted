@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::ArrayOfOption;
-$Shipment::Purolator::WSDL::Types::ArrayOfOption::VERSION = '3.07';
+$Shipment::Purolator::WSDL::Types::ArrayOfOption::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
+sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,24 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Option_of :ATTR(:get<Option>);
+    my %Option_of : ATTR(:get<Option>);
 
-__PACKAGE__->_factory(
-    [ qw(        Option
+    __PACKAGE__->_factory(
+        [   qw(        Option
 
-    ) ],
-    {
-        'Option' => \%Option_of,
-    },
-    {
-        'Option' => 'Shipment::Purolator::WSDL::Types::Option',
-    },
-    {
+            )
+        ],
+        {'Option' => \%Option_of,},
+        {'Option' => 'Shipment::Purolator::WSDL::Types::Option',},
+        {
 
-        'Option' => 'Option',
-    }
-);
+            'Option' => 'Option',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -62,7 +54,7 @@ Shipment::Purolator::WSDL::Types::ArrayOfOption
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

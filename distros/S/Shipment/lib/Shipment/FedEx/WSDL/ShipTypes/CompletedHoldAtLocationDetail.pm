@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::CompletedHoldAtLocationDetail;
-$Shipment::FedEx::WSDL::ShipTypes::CompletedHoldAtLocationDetail::VERSION = '3.07';
+$Shipment::FedEx::WSDL::ShipTypes::CompletedHoldAtLocationDetail::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,33 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %HoldingLocation_of :ATTR(:get<HoldingLocation>);
-my %HoldingLocationType_of :ATTR(:get<HoldingLocationType>);
+    my %HoldingLocation_of : ATTR(:get<HoldingLocation>);
+    my %HoldingLocationType_of : ATTR(:get<HoldingLocationType>);
 
-__PACKAGE__->_factory(
-    [ qw(        HoldingLocation
-        HoldingLocationType
+    __PACKAGE__->_factory(
+        [   qw(        HoldingLocation
+              HoldingLocationType
 
-    ) ],
-    {
-        'HoldingLocation' => \%HoldingLocation_of,
-        'HoldingLocationType' => \%HoldingLocationType_of,
-    },
-    {
-        'HoldingLocation' => 'Shipment::FedEx::WSDL::ShipTypes::ContactAndAddress',
-        'HoldingLocationType' => 'Shipment::FedEx::WSDL::ShipTypes::FedExLocationType',
-    },
-    {
+            )
+        ],
+        {   'HoldingLocation'     => \%HoldingLocation_of,
+            'HoldingLocationType' => \%HoldingLocationType_of,
+        },
+        {   'HoldingLocation' =>
+              'Shipment::FedEx::WSDL::ShipTypes::ContactAndAddress',
+            'HoldingLocationType' =>
+              'Shipment::FedEx::WSDL::ShipTypes::FedExLocationType',
+        },
+        {
 
-        'HoldingLocation' => 'HoldingLocation',
-        'HoldingLocationType' => 'HoldingLocationType',
-    }
-);
+            'HoldingLocation'     => 'HoldingLocation',
+            'HoldingLocationType' => 'HoldingLocationType',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +63,7 @@ Shipment::FedEx::WSDL::ShipTypes::CompletedHoldAtLocationDetail
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

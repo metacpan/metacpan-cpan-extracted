@@ -1,5 +1,5 @@
 {
-   "abstract" : "Temnplating system based on HTML::Obj2HTML",
+   "abstract" : "Templating system based on HTML::Obj2HTML",
    "author" : [
       "Pero Moretti"
    ],
@@ -40,6 +40,20 @@
             "strict" : "0",
             "warnings" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "FindBin" : "0",
+            "HTTP::Request::Common" : "0",
+            "JSON::MaybeXS" : "0",
+            "Module::Load" : "0",
+            "Path::Tiny" : "0",
+            "Plack::Test" : "0",
+            "Test::Mock::LWP::Dispatch" : "0",
+            "Test::More" : "0",
+            "URI" : "0"
+         }
       }
    },
    "release_status" : "stable",
@@ -50,6 +64,6 @@
          "web" : "https://github.com/Pero-Moretti/Perl-Dancer2-Template-Obj2HTML"
       }
    },
-   "version" : "0.1",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

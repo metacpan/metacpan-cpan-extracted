@@ -101,10 +101,10 @@ __END__
 This application can synchronize filesystem modification times of
 images and movies created by one or more cameras, based on information
 embedded in the files and on adjustments provided by the user.  It can
-also synchronize times of related files based on information from the
-image files that they are related to and on information provided by
-the user.  Additionally, it can geotag images and movies, based on
-information extracted from GPX files.
+also synchronize times of related files based on information from
+image files or metadata files that they are related to and on
+information provided by the user.  Additionally, it can geotag images
+and movies, based on information extracted from GPX files.
 
 Start by calling it without any arguments in the directory holding the
 images of interest.  By default it reports what its inspection of the
@@ -176,9 +176,28 @@ C<--rep>, because no other option begins with that prefix.
 =head1 ARGUMENTS
 
 The arguments are zero or more path name patterns that identify files
-and directories to process.  Wildcard C<*> matches any number of
-characters, and wildcard C<?> matches a single character.  If no
-arguments are specified, then the current directory is processed.
+and directories to process.  Various wildcards are supported:
+
+=over
+
+=item C<*> matches any number of characters.
+
+=item C<?> matches a single character.
+
+=item C<[x7p]> matches a single character out of the specified
+collection, in this case a character that is equal to an C<x> or a
+C<7> or a C<p>.
+
+=item C<[a-z]> matches a single character out of the specified range,
+in this case a character between C<a> and C<z>, inclusive.
+
+=item C<{at,be,cm}> matches one of the comma-separated alternatives,
+in this case either C<at> or C<be> or C<cm>.
+
+=back
+
+If no arguments are specified, then the current directory is
+processed.
 
 =head1 OPTION DETAILS
 
@@ -642,16 +661,16 @@ Change the working directory to C<DIR> before starting processing.
 
 This application can synchronize filesystem modification times of
 images and movies created by one or more cameras, and times of related
-files, based on information provided by the user and on information
-embedded in other processed images by the same cameras.  Additionally,
-it can geotag images and movies, based on information extracted from
-GPX files.
+files, based on information provided by the user, on information
+embedded in other processed images by the same cameras, and on
+information in associated metadata files.  Additionally, it can geotag
+images and movies, based on information extracted from GPX files.
 
 Information embedded in image and movie files is extracted, modified,
-or added using L<Image::ExifTool>, so if that module cannot access
-tags embedded in some file, then neither can this application.  Names
-of embedded tags that are mentioned below are as recognized by that
-module.
+or added using L<Image::ExifTool>, so if that module cannot read or
+write tags embedded in some file, then neither can this application.
+Names of embedded tags that are mentioned below are as recognized by
+that module.
 
 Several passes are made over all relevant files:
 
@@ -1039,6 +1058,41 @@ their file system modification timestamp.
 If there is more than one file with the same file number and with a
 target timestamp, then the one "closest" to the current file in the
 file system is chosen to donate its target timestamp.
+
+=head2 Metadata Files
+
+If some useful tags aren't embedded in the image file, then they can
+be read from an associated I<metadata file> instead.  The metadata
+file must have the same L<file number|File Numbers> as the file to
+which the metadata applies and its contents must be arranged in JSON
+or YAML format.  A JSON file can be detected based on its contents,
+but a YAML file must have a (case insensitive) file extension equal to
+I<.yaml> or I<.yml> to be recognized as such.
+
+The JSON or YAML file must describe a map of key-value pairs, or an
+array that holds a single element that is equal to such a map.  Keys
+that are not equal to an ExifTool tag recognized by the current
+application are ignored, The keys should preferably have their
+ExifTool tag group prefixed.  The values should be those associated
+with the tag for the image.  For values that are numerical in nature,
+the value should be a single number, not a text value.  For example,
+the value associated with the C<EXIF:GPSLatitude> tag should be
+something like C<51.045711184>, not something like C<"51 deg 2'
+44.56\$"">.
+
+JSON with the correct tags is produced by C<exiftool -G -j -n FILE>
+where C<FILE> is the path name of a file containing the desired
+embedded tags.
+
+A JSON or YAML file that is schematically as follows should be
+acceptable:
+
+C<<
+[{
+  "group1:tag1": "text",
+  "group2:tag2": 42.3
+}]
+>>
 
 =head2 Locations
 

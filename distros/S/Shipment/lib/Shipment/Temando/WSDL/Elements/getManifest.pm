@@ -1,100 +1,101 @@
 
 package Shipment::Temando::WSDL::Elements::getManifest;
-$Shipment::Temando::WSDL::Elements::getManifest::VERSION = '3.07';
+$Shipment::Temando::WSDL::Elements::getManifest::VERSION = '3.08';
 use strict;
 use warnings;
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-sub get_xmlns { 'http://' . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url . '/schema/2009_06/server.xsd' }
-
-__PACKAGE__->__set_name('getManifest');
-__PACKAGE__->__set_nillable();
-__PACKAGE__->__set_minOccurs();
-__PACKAGE__->__set_maxOccurs();
-__PACKAGE__->__set_ref();
-
-use base qw(
-    SOAP::WSDL::XSD::Typelib::Element
-    SOAP::WSDL::XSD::Typelib::ComplexType
-);
-
-our $XML_ATTRIBUTE_CLASS;
-undef $XML_ATTRIBUTE_CLASS;
-
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
-use Class::Std::Fast::Storable constructor => 'none';
-use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-Class::Std::initialize();
-
-{ # BLOCK to scope variables
-
-my %type_of :ATTR(:get<type>);
-my %labelPrinterType_of :ATTR(:get<labelPrinterType>);
-my %carrierId_of :ATTR(:get<carrierId>);
-my %clientId_of :ATTR(:get<clientId>);
-my %location_of :ATTR(:get<location>);
-my %readyDate_of :ATTR(:get<readyDate>);
-my %lastConfirmed_of :ATTR(:get<lastConfirmed>);
-my %listRequests_of :ATTR(:get<listRequests>);
-
-__PACKAGE__->_factory(
-    [ qw(        type
-        labelPrinterType
-        carrierId
-        clientId
-        location
-        readyDate
-        lastConfirmed
-        listRequests
-
-    ) ],
-    {
-        'type' => \%type_of,
-        'labelPrinterType' => \%labelPrinterType_of,
-        'carrierId' => \%carrierId_of,
-        'clientId' => \%clientId_of,
-        'location' => \%location_of,
-        'readyDate' => \%readyDate_of,
-        'lastConfirmed' => \%lastConfirmed_of,
-        'listRequests' => \%listRequests_of,
-    },
-    {
-        'type' => 'Shipment::Temando::WSDL::Types::ManifestType',
-        'labelPrinterType' => 'Shipment::Temando::WSDL::Types::LabelPrinterType',
-        'carrierId' => 'Shipment::Temando::WSDL::Types::CarrierId',
-        'clientId' => 'Shipment::Temando::WSDL::Types::ClientId',
-        'location' => 'Shipment::Temando::WSDL::Types::LocationName',
-        'readyDate' => 'Shipment::Temando::WSDL::Types::Date',
-        'lastConfirmed' => 'Shipment::Temando::WSDL::Types::YesNoOption',
-        'listRequests' => 'Shipment::Temando::WSDL::Types::YesNoOption',
-    },
-    {
-
-        'type' => 'type',
-        'labelPrinterType' => 'labelPrinterType',
-        'carrierId' => 'carrierId',
-        'clientId' => 'clientId',
-        'location' => 'location',
-        'readyDate' => 'readyDate',
-        'lastConfirmed' => 'lastConfirmed',
-        'listRequests' => 'listRequests',
+    sub get_xmlns {
+        'http://'
+          . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url
+          . '/schema/2009_06/server.xsd';
     }
-);
 
-} # end BLOCK
+    __PACKAGE__->__set_name('getManifest');
+    __PACKAGE__->__set_nillable();
+    __PACKAGE__->__set_minOccurs();
+    __PACKAGE__->__set_maxOccurs();
+    __PACKAGE__->__set_ref();
+
+    use base qw(
+      SOAP::WSDL::XSD::Typelib::Element
+      SOAP::WSDL::XSD::Typelib::ComplexType
+    );
+
+    our $XML_ATTRIBUTE_CLASS;
+    undef $XML_ATTRIBUTE_CLASS;
+
+    sub __get_attr_class {
+        return $XML_ATTRIBUTE_CLASS;
+    }
+
+    use Class::Std::Fast::Storable constructor => 'none';
+    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+    Class::Std::initialize();
+
+    {    # BLOCK to scope variables
+
+        my %type_of : ATTR(:get<type>);
+        my %labelPrinterType_of : ATTR(:get<labelPrinterType>);
+        my %carrierId_of : ATTR(:get<carrierId>);
+        my %clientId_of : ATTR(:get<clientId>);
+        my %location_of : ATTR(:get<location>);
+        my %readyDate_of : ATTR(:get<readyDate>);
+        my %lastConfirmed_of : ATTR(:get<lastConfirmed>);
+        my %listRequests_of : ATTR(:get<listRequests>);
+
+        __PACKAGE__->_factory(
+            [   qw(        type
+                  labelPrinterType
+                  carrierId
+                  clientId
+                  location
+                  readyDate
+                  lastConfirmed
+                  listRequests
+
+                )
+            ],
+            {   'type'             => \%type_of,
+                'labelPrinterType' => \%labelPrinterType_of,
+                'carrierId'        => \%carrierId_of,
+                'clientId'         => \%clientId_of,
+                'location'         => \%location_of,
+                'readyDate'        => \%readyDate_of,
+                'lastConfirmed'    => \%lastConfirmed_of,
+                'listRequests'     => \%listRequests_of,
+            },
+            {   'type' => 'Shipment::Temando::WSDL::Types::ManifestType',
+                'labelPrinterType' =>
+                  'Shipment::Temando::WSDL::Types::LabelPrinterType',
+                'carrierId' => 'Shipment::Temando::WSDL::Types::CarrierId',
+                'clientId'  => 'Shipment::Temando::WSDL::Types::ClientId',
+                'location'  => 'Shipment::Temando::WSDL::Types::LocationName',
+                'readyDate' => 'Shipment::Temando::WSDL::Types::Date',
+                'lastConfirmed' =>
+                  'Shipment::Temando::WSDL::Types::YesNoOption',
+                'listRequests' =>
+                  'Shipment::Temando::WSDL::Types::YesNoOption',
+            },
+            {
+
+                'type'             => 'type',
+                'labelPrinterType' => 'labelPrinterType',
+                'carrierId'        => 'carrierId',
+                'clientId'         => 'clientId',
+                'location'         => 'location',
+                'readyDate'        => 'readyDate',
+                'lastConfirmed'    => 'lastConfirmed',
+                'listRequests'     => 'listRequests',
+            }
+        );
+
+    }    # end BLOCK
 
 
-
-
-
-
-} # end of BLOCK
-
+}    # end of BLOCK
 
 
 1;
@@ -111,7 +112,7 @@ Shipment::Temando::WSDL::Elements::getManifest
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

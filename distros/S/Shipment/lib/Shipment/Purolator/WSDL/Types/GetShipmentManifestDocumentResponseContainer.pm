@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::GetShipmentManifestDocumentResponseContainer;
-$Shipment::Purolator::WSDL::Types::GetShipmentManifestDocumentResponseContainer::VERSION = '3.07';
+$Shipment::Purolator::WSDL::Types::GetShipmentManifestDocumentResponseContainer::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
+sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -17,43 +17,40 @@ sub __get_attr_class {
 
 
 use base qw(Shipment::Purolator::WSDL::Types::ResponseContainer);
+
 # Variety: sequence
 use Class::Std::Fast::Storable constructor => 'none';
 use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %ResponseInformation_of :ATTR(:get<ResponseInformation>);
-my %ManifestBatches_of :ATTR(:get<ManifestBatches>);
+    my %ResponseInformation_of : ATTR(:get<ResponseInformation>);
+    my %ManifestBatches_of : ATTR(:get<ManifestBatches>);
 
-__PACKAGE__->_factory(
-    [ qw(        ResponseInformation
-        ManifestBatches
+    __PACKAGE__->_factory(
+        [   qw(        ResponseInformation
+              ManifestBatches
 
-    ) ],
-    {
-        'ResponseInformation' => \%ResponseInformation_of,
-        'ManifestBatches' => \%ManifestBatches_of,
-    },
-    {
-        'ResponseInformation' => 'Shipment::Purolator::WSDL::Types::ResponseInformation',
-        'ManifestBatches' => 'Shipment::Purolator::WSDL::Types::ArrayOfManifestBatch',
-    },
-    {
+            )
+        ],
+        {   'ResponseInformation' => \%ResponseInformation_of,
+            'ManifestBatches'     => \%ManifestBatches_of,
+        },
+        {   'ResponseInformation' =>
+              'Shipment::Purolator::WSDL::Types::ResponseInformation',
+            'ManifestBatches' =>
+              'Shipment::Purolator::WSDL::Types::ArrayOfManifestBatch',
+        },
+        {
 
-        'ResponseInformation' => 'ResponseInformation',
-        'ManifestBatches' => 'ManifestBatches',
-    }
-);
+            'ResponseInformation' => 'ResponseInformation',
+            'ManifestBatches'     => 'ManifestBatches',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -70,7 +67,7 @@ Shipment::Purolator::WSDL::Types::GetShipmentManifestDocumentResponseContainer
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

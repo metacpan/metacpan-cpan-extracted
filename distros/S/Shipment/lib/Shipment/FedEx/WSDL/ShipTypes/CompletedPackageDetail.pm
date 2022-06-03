@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::CompletedPackageDetail;
-$Shipment::FedEx::WSDL::ShipTypes::CompletedPackageDetail::VERSION = '3.07';
+$Shipment::FedEx::WSDL::ShipTypes::CompletedPackageDetail::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,97 +20,100 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %SequenceNumber_of :ATTR(:get<SequenceNumber>);
-my %TrackingIds_of :ATTR(:get<TrackingIds>);
-my %GroupNumber_of :ATTR(:get<GroupNumber>);
-my %OversizeClass_of :ATTR(:get<OversizeClass>);
-my %PackageRating_of :ATTR(:get<PackageRating>);
-my %GroundServiceCode_of :ATTR(:get<GroundServiceCode>);
-my %Barcodes_of :ATTR(:get<Barcodes>);
-my %AstraHandlingText_of :ATTR(:get<AstraHandlingText>);
-my %AstraLabelElements_of :ATTR(:get<AstraLabelElements>);
-my %Label_of :ATTR(:get<Label>);
-my %PackageDocuments_of :ATTR(:get<PackageDocuments>);
-my %CodReturnDetail_of :ATTR(:get<CodReturnDetail>);
-my %SignatureOption_of :ATTR(:get<SignatureOption>);
-my %HazardousCommodities_of :ATTR(:get<HazardousCommodities>);
+    my %SequenceNumber_of : ATTR(:get<SequenceNumber>);
+    my %TrackingIds_of : ATTR(:get<TrackingIds>);
+    my %GroupNumber_of : ATTR(:get<GroupNumber>);
+    my %OversizeClass_of : ATTR(:get<OversizeClass>);
+    my %PackageRating_of : ATTR(:get<PackageRating>);
+    my %GroundServiceCode_of : ATTR(:get<GroundServiceCode>);
+    my %Barcodes_of : ATTR(:get<Barcodes>);
+    my %AstraHandlingText_of : ATTR(:get<AstraHandlingText>);
+    my %AstraLabelElements_of : ATTR(:get<AstraLabelElements>);
+    my %Label_of : ATTR(:get<Label>);
+    my %PackageDocuments_of : ATTR(:get<PackageDocuments>);
+    my %CodReturnDetail_of : ATTR(:get<CodReturnDetail>);
+    my %SignatureOption_of : ATTR(:get<SignatureOption>);
+    my %HazardousCommodities_of : ATTR(:get<HazardousCommodities>);
 
-__PACKAGE__->_factory(
-    [ qw(        SequenceNumber
-        TrackingIds
-        GroupNumber
-        OversizeClass
-        PackageRating
-        GroundServiceCode
-        Barcodes
-        AstraHandlingText
-        AstraLabelElements
-        Label
-        PackageDocuments
-        CodReturnDetail
-        SignatureOption
-        HazardousCommodities
+    __PACKAGE__->_factory(
+        [   qw(        SequenceNumber
+              TrackingIds
+              GroupNumber
+              OversizeClass
+              PackageRating
+              GroundServiceCode
+              Barcodes
+              AstraHandlingText
+              AstraLabelElements
+              Label
+              PackageDocuments
+              CodReturnDetail
+              SignatureOption
+              HazardousCommodities
 
-    ) ],
-    {
-        'SequenceNumber' => \%SequenceNumber_of,
-        'TrackingIds' => \%TrackingIds_of,
-        'GroupNumber' => \%GroupNumber_of,
-        'OversizeClass' => \%OversizeClass_of,
-        'PackageRating' => \%PackageRating_of,
-        'GroundServiceCode' => \%GroundServiceCode_of,
-        'Barcodes' => \%Barcodes_of,
-        'AstraHandlingText' => \%AstraHandlingText_of,
-        'AstraLabelElements' => \%AstraLabelElements_of,
-        'Label' => \%Label_of,
-        'PackageDocuments' => \%PackageDocuments_of,
-        'CodReturnDetail' => \%CodReturnDetail_of,
-        'SignatureOption' => \%SignatureOption_of,
-        'HazardousCommodities' => \%HazardousCommodities_of,
-    },
-    {
-        'SequenceNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',
-        'TrackingIds' => 'Shipment::FedEx::WSDL::ShipTypes::TrackingId',
-        'GroupNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
-        'OversizeClass' => 'Shipment::FedEx::WSDL::ShipTypes::OversizeClassType',
-        'PackageRating' => 'Shipment::FedEx::WSDL::ShipTypes::PackageRating',
-        'GroundServiceCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Barcodes' => 'Shipment::FedEx::WSDL::ShipTypes::PackageBarcodes',
-        'AstraHandlingText' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'AstraLabelElements' => 'Shipment::FedEx::WSDL::ShipTypes::AstraLabelElement',
-        'Label' => 'Shipment::FedEx::WSDL::ShipTypes::ShippingDocument',
-        'PackageDocuments' => 'Shipment::FedEx::WSDL::ShipTypes::ShippingDocument',
-        'CodReturnDetail' => 'Shipment::FedEx::WSDL::ShipTypes::CodReturnPackageDetail',
-        'SignatureOption' => 'Shipment::FedEx::WSDL::ShipTypes::SignatureOptionType',
-        'HazardousCommodities' => 'Shipment::FedEx::WSDL::ShipTypes::ValidatedHazardousCommodityContent',
-    },
-    {
+            )
+        ],
+        {   'SequenceNumber'       => \%SequenceNumber_of,
+            'TrackingIds'          => \%TrackingIds_of,
+            'GroupNumber'          => \%GroupNumber_of,
+            'OversizeClass'        => \%OversizeClass_of,
+            'PackageRating'        => \%PackageRating_of,
+            'GroundServiceCode'    => \%GroundServiceCode_of,
+            'Barcodes'             => \%Barcodes_of,
+            'AstraHandlingText'    => \%AstraHandlingText_of,
+            'AstraLabelElements'   => \%AstraLabelElements_of,
+            'Label'                => \%Label_of,
+            'PackageDocuments'     => \%PackageDocuments_of,
+            'CodReturnDetail'      => \%CodReturnDetail_of,
+            'SignatureOption'      => \%SignatureOption_of,
+            'HazardousCommodities' => \%HazardousCommodities_of,
+        },
+        {   'SequenceNumber' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',
+            'TrackingIds' => 'Shipment::FedEx::WSDL::ShipTypes::TrackingId',
+            'GroupNumber' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::nonNegativeInteger',
+            'OversizeClass' =>
+              'Shipment::FedEx::WSDL::ShipTypes::OversizeClassType',
+            'PackageRating' =>
+              'Shipment::FedEx::WSDL::ShipTypes::PackageRating',
+            'GroundServiceCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Barcodes' => 'Shipment::FedEx::WSDL::ShipTypes::PackageBarcodes',
+            'AstraHandlingText' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'AstraLabelElements' =>
+              'Shipment::FedEx::WSDL::ShipTypes::AstraLabelElement',
+            'Label' => 'Shipment::FedEx::WSDL::ShipTypes::ShippingDocument',
+            'PackageDocuments' =>
+              'Shipment::FedEx::WSDL::ShipTypes::ShippingDocument',
+            'CodReturnDetail' =>
+              'Shipment::FedEx::WSDL::ShipTypes::CodReturnPackageDetail',
+            'SignatureOption' =>
+              'Shipment::FedEx::WSDL::ShipTypes::SignatureOptionType',
+            'HazardousCommodities' =>
+              'Shipment::FedEx::WSDL::ShipTypes::ValidatedHazardousCommodityContent',
+        },
+        {
 
-        'SequenceNumber' => 'SequenceNumber',
-        'TrackingIds' => 'TrackingIds',
-        'GroupNumber' => 'GroupNumber',
-        'OversizeClass' => 'OversizeClass',
-        'PackageRating' => 'PackageRating',
-        'GroundServiceCode' => 'GroundServiceCode',
-        'Barcodes' => 'Barcodes',
-        'AstraHandlingText' => 'AstraHandlingText',
-        'AstraLabelElements' => 'AstraLabelElements',
-        'Label' => 'Label',
-        'PackageDocuments' => 'PackageDocuments',
-        'CodReturnDetail' => 'CodReturnDetail',
-        'SignatureOption' => 'SignatureOption',
-        'HazardousCommodities' => 'HazardousCommodities',
-    }
-);
+            'SequenceNumber'       => 'SequenceNumber',
+            'TrackingIds'          => 'TrackingIds',
+            'GroupNumber'          => 'GroupNumber',
+            'OversizeClass'        => 'OversizeClass',
+            'PackageRating'        => 'PackageRating',
+            'GroundServiceCode'    => 'GroundServiceCode',
+            'Barcodes'             => 'Barcodes',
+            'AstraHandlingText'    => 'AstraHandlingText',
+            'AstraLabelElements'   => 'AstraLabelElements',
+            'Label'                => 'Label',
+            'PackageDocuments'     => 'PackageDocuments',
+            'CodReturnDetail'      => 'CodReturnDetail',
+            'SignatureOption'      => 'SignatureOption',
+            'HazardousCommodities' => 'HazardousCommodities',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -127,7 +130,7 @@ Shipment::FedEx::WSDL::ShipTypes::CompletedPackageDetail
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

@@ -1,85 +1,88 @@
 
 package Shipment::Temando::WSDL::Elements::updateTrackingDetails;
-$Shipment::Temando::WSDL::Elements::updateTrackingDetails::VERSION = '3.07';
+$Shipment::Temando::WSDL::Elements::updateTrackingDetails::VERSION = '3.08';
 use strict;
 use warnings;
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-sub get_xmlns { 'http://' . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url . '/schema/2009_06/server.xsd' }
-
-__PACKAGE__->__set_name('updateTrackingDetails');
-__PACKAGE__->__set_nillable();
-__PACKAGE__->__set_minOccurs();
-__PACKAGE__->__set_maxOccurs();
-__PACKAGE__->__set_ref();
-
-use base qw(
-    SOAP::WSDL::XSD::Typelib::Element
-    SOAP::WSDL::XSD::Typelib::ComplexType
-);
-
-our $XML_ATTRIBUTE_CLASS;
-undef $XML_ATTRIBUTE_CLASS;
-
-sub __get_attr_class {
-    return $XML_ATTRIBUTE_CLASS;
-}
-
-use Class::Std::Fast::Storable constructor => 'none';
-use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
-
-Class::Std::initialize();
-
-{ # BLOCK to scope variables
-
-my %requestId_of :ATTR(:get<requestId>);
-my %bookingNumber_of :ATTR(:get<bookingNumber>);
-my %trackingStatus_of :ATTR(:get<trackingStatus>);
-my %trackingStatusOccurred_of :ATTR(:get<trackingStatusOccurred>);
-my %trackingFurtherDetails_of :ATTR(:get<trackingFurtherDetails>);
-
-__PACKAGE__->_factory(
-    [ qw(        requestId
-        bookingNumber
-        trackingStatus
-        trackingStatusOccurred
-        trackingFurtherDetails
-
-    ) ],
-    {
-        'requestId' => \%requestId_of,
-        'bookingNumber' => \%bookingNumber_of,
-        'trackingStatus' => \%trackingStatus_of,
-        'trackingStatusOccurred' => \%trackingStatusOccurred_of,
-        'trackingFurtherDetails' => \%trackingFurtherDetails_of,
-    },
-    {
-        'requestId' => 'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',
-        'bookingNumber' => 'Shipment::Temando::WSDL::Types::BookingNumber',
-        'trackingStatus' => 'Shipment::Temando::WSDL::Types::TrackingStatus',
-        'trackingStatusOccurred' => 'Shipment::Temando::WSDL::Types::Datetime',
-        'trackingFurtherDetails' => 'Shipment::Temando::WSDL::Types::TrackingFurtherDetails',
-    },
-    {
-
-        'requestId' => 'requestId',
-        'bookingNumber' => 'bookingNumber',
-        'trackingStatus' => 'trackingStatus',
-        'trackingStatusOccurred' => 'trackingStatusOccurred',
-        'trackingFurtherDetails' => 'trackingFurtherDetails',
+    sub get_xmlns {
+        'http://'
+          . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url
+          . '/schema/2009_06/server.xsd';
     }
-);
 
-} # end BLOCK
+    __PACKAGE__->__set_name('updateTrackingDetails');
+    __PACKAGE__->__set_nillable();
+    __PACKAGE__->__set_minOccurs();
+    __PACKAGE__->__set_maxOccurs();
+    __PACKAGE__->__set_ref();
+
+    use base qw(
+      SOAP::WSDL::XSD::Typelib::Element
+      SOAP::WSDL::XSD::Typelib::ComplexType
+    );
+
+    our $XML_ATTRIBUTE_CLASS;
+    undef $XML_ATTRIBUTE_CLASS;
+
+    sub __get_attr_class {
+        return $XML_ATTRIBUTE_CLASS;
+    }
+
+    use Class::Std::Fast::Storable constructor => 'none';
+    use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
+
+    Class::Std::initialize();
+
+    {    # BLOCK to scope variables
+
+        my %requestId_of : ATTR(:get<requestId>);
+        my %bookingNumber_of : ATTR(:get<bookingNumber>);
+        my %trackingStatus_of : ATTR(:get<trackingStatus>);
+        my %trackingStatusOccurred_of : ATTR(:get<trackingStatusOccurred>);
+        my %trackingFurtherDetails_of : ATTR(:get<trackingFurtherDetails>);
+
+        __PACKAGE__->_factory(
+            [   qw(        requestId
+                  bookingNumber
+                  trackingStatus
+                  trackingStatusOccurred
+                  trackingFurtherDetails
+
+                )
+            ],
+            {   'requestId'              => \%requestId_of,
+                'bookingNumber'          => \%bookingNumber_of,
+                'trackingStatus'         => \%trackingStatus_of,
+                'trackingStatusOccurred' => \%trackingStatusOccurred_of,
+                'trackingFurtherDetails' => \%trackingFurtherDetails_of,
+            },
+            {   'requestId' =>
+                  'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',
+                'bookingNumber' =>
+                  'Shipment::Temando::WSDL::Types::BookingNumber',
+                'trackingStatus' =>
+                  'Shipment::Temando::WSDL::Types::TrackingStatus',
+                'trackingStatusOccurred' =>
+                  'Shipment::Temando::WSDL::Types::Datetime',
+                'trackingFurtherDetails' =>
+                  'Shipment::Temando::WSDL::Types::TrackingFurtherDetails',
+            },
+            {
+
+                'requestId'              => 'requestId',
+                'bookingNumber'          => 'bookingNumber',
+                'trackingStatus'         => 'trackingStatus',
+                'trackingStatusOccurred' => 'trackingStatusOccurred',
+                'trackingFurtherDetails' => 'trackingFurtherDetails',
+            }
+        );
+
+    }    # end BLOCK
 
 
-
-
-
-
-} # end of BLOCK
-
+}    # end of BLOCK
 
 
 1;
@@ -96,7 +99,7 @@ Shipment::Temando::WSDL::Elements::updateTrackingDetails
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

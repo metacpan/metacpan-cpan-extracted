@@ -20,11 +20,11 @@ Pod::Query - Query pod documents
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
-our $VERSION         = '0.10';
+our $VERSION         = '0.11';
 our $DEBUG_TREE      = 0;
 our $DEBUG_FIND      = 0;
 our $DEBUG_FIND_DUMP = 0;
@@ -498,10 +498,10 @@ Convert a pod query string into a structure based on these rules:
 
    4. Double and single quotes are removed from the ends (if matching).
 
-   5. Split each list of conditions by '='.
+   5. Split each list of conditions by "=".
       First word is the tag.
       Second word is the text (if any).
-      If  either starts with '~', then the word
+      If either starts with "~", then the word
          is treated like a pattern.
 
    Precedence:

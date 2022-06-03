@@ -1,12 +1,16 @@
 package Shipment::Temando::WSDL::Types::Anytime;
-$Shipment::Temando::WSDL::Types::Anytime::VERSION = '3.07';
+$Shipment::Temando::WSDL::Types::Anytime::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(0);
 
-sub get_xmlns { 'http://' . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url . '/schema/2009_06/common.xsd' };
+sub get_xmlns {
+    'http://'
+      . $Shipment::Temando::WSDL::Interfaces::quoting_Service::quoting_port::ns_url
+      . '/schema/2009_06/common.xsd';
+}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +24,31 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %readyDate_of :ATTR(:get<readyDate>);
-my %readyTime_of :ATTR(:get<readyTime>);
+    my %readyDate_of : ATTR(:get<readyDate>);
+    my %readyTime_of : ATTR(:get<readyTime>);
 
-__PACKAGE__->_factory(
-    [ qw(        readyDate
-        readyTime
+    __PACKAGE__->_factory(
+        [   qw(        readyDate
+              readyTime
 
-    ) ],
-    {
-        'readyDate' => \%readyDate_of,
-        'readyTime' => \%readyTime_of,
-    },
-    {
-        'readyDate' => 'Shipment::Temando::WSDL::Types::Date',
-        'readyTime' => 'Shipment::Temando::WSDL::Types::ReadyTime',
-    },
-    {
+            )
+        ],
+        {   'readyDate' => \%readyDate_of,
+            'readyTime' => \%readyTime_of,
+        },
+        {   'readyDate' => 'Shipment::Temando::WSDL::Types::Date',
+            'readyTime' => 'Shipment::Temando::WSDL::Types::ReadyTime',
+        },
+        {
 
-        'readyDate' => 'readyDate',
-        'readyTime' => 'readyTime',
-    }
-);
+            'readyDate' => 'readyDate',
+            'readyTime' => 'readyTime',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +65,7 @@ Shipment::Temando::WSDL::Types::Anytime
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

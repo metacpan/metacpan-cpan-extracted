@@ -1,6 +1,6 @@
 # ABSTRACT: Interface to Popular Shipping Services
 package Shipment;
-$Shipment::VERSION = '3.07';
+$Shipment::VERSION = '3.08';
 use Shipment::Address;
 use Shipment::Package;
 
@@ -11,46 +11,51 @@ use Shipment::UPS;
 use Shipment::Temando;
 
 
-
-
 sub generic {
-    shift; return Shipment::Generic->new(@_)
+    shift;
+    return Shipment::Generic->new(@_);
 }
 
 
 sub canadapost {
-    shift; return Shipment::CanadaPost->new(@_)
+    shift;
+    return Shipment::CanadaPost->new(@_);
 }
 
 
-
 sub fedex {
-    shift; return Shipment::FedEx->new(@_)
+    shift;
+    return Shipment::FedEx->new(@_);
 }
 
 
 sub purolator {
-    shift; return Shipment::Purolator->new(@_)
+    shift;
+    return Shipment::Purolator->new(@_);
 }
 
 
 sub ups {
-    shift; return Shipment::UPS->new(@_)
+    shift;
+    return Shipment::UPS->new(@_);
 }
 
 
 sub temando {
-    shift; return Shipment::Temando->new(@_)
+    shift;
+    return Shipment::Temando->new(@_);
 }
 
 
 sub address {
-    shift; return Shipment::Address->new(@_)
+    shift;
+    return Shipment::Address->new(@_);
 }
 
 
 sub package {
-    shift; return Shipment::Package->new(@_)
+    shift;
+    return Shipment::Package->new(@_);
 }
 
 
@@ -68,7 +73,7 @@ Shipment - Interface to Popular Shipping Services
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 SYNOPSIS
 

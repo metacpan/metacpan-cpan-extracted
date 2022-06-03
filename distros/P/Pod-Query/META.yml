@@ -16,12 +16,13 @@ name: Pod-Query
 provides:
   Pod::Query:
     file: lib/Pod/Query.pm
-    version: '0.10'
+    version: '0.11'
 requires:
   Mojolicious: '9.19'
   Pod::LOL: '0.06'
+  Role::Tiny: '2.000001'
   Term::ReadKey: '2.38'
 resources:
   license: http://www.perlfoundation.org/artistic_license_2_0
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

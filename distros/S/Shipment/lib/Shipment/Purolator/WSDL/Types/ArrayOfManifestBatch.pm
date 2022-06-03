@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDL::Types::ArrayOfManifestBatch;
-$Shipment::Purolator::WSDL::Types::ArrayOfManifestBatch::VERSION = '3.07';
+$Shipment::Purolator::WSDL::Types::ArrayOfManifestBatch::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://purolator.com/pws/datatypes/v1' };
+sub get_xmlns {'http://purolator.com/pws/datatypes/v1'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,26 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %ManifestBatch_of :ATTR(:get<ManifestBatch>);
+    my %ManifestBatch_of : ATTR(:get<ManifestBatch>);
 
-__PACKAGE__->_factory(
-    [ qw(        ManifestBatch
+    __PACKAGE__->_factory(
+        [   qw(        ManifestBatch
 
-    ) ],
-    {
-        'ManifestBatch' => \%ManifestBatch_of,
-    },
-    {
-        'ManifestBatch' => 'Shipment::Purolator::WSDL::Types::ManifestBatch',
-    },
-    {
+            )
+        ],
+        {'ManifestBatch' => \%ManifestBatch_of,},
+        {   'ManifestBatch' =>
+              'Shipment::Purolator::WSDL::Types::ManifestBatch',
+        },
+        {
 
-        'ManifestBatch' => 'ManifestBatch',
-    }
-);
+            'ManifestBatch' => 'ManifestBatch',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -62,7 +56,7 @@ Shipment::Purolator::WSDL::Types::ArrayOfManifestBatch
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

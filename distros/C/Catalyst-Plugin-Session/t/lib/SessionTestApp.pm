@@ -1,5 +1,3 @@
-#!/usr/bin/env perl
-
 package SessionTestApp;
 use Catalyst qw/Session Session::Store::Dummy Session::State::Cookie Authentication/;
 

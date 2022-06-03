@@ -20,6 +20,7 @@ my $builder = Module::Build->new(
         'Pod::LOL'      => '0.06',
         'Mojolicious'   => '9.19',
         'Term::ReadKey' => '2.38',
+        'Role::Tiny'    => '2.000001',
     },
     add_to_cleanup     => [ 'Pod-Query-*' ],
 );

@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::PackageServiceOptionsType;
-$Shipment::UPS::WSDL::ShipTypes::PackageServiceOptionsType::VERSION = '3.07';
+$Shipment::UPS::WSDL::ShipTypes::PackageServiceOptionsType::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/Ship/v1.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,62 +20,65 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %DeliveryConfirmation_of :ATTR(:get<DeliveryConfirmation>);
-my %DeclaredValue_of :ATTR(:get<DeclaredValue>);
-my %COD_of :ATTR(:get<COD>);
-my %VerbalConfirmation_of :ATTR(:get<VerbalConfirmation>);
-my %ShipperReleaseIndicator_of :ATTR(:get<ShipperReleaseIndicator>);
-my %Notification_of :ATTR(:get<Notification>);
-my %ReturnsFlexibleAccessIndicator_of :ATTR(:get<ReturnsFlexibleAccessIndicator>);
+    my %DeliveryConfirmation_of : ATTR(:get<DeliveryConfirmation>);
+    my %DeclaredValue_of : ATTR(:get<DeclaredValue>);
+    my %COD_of : ATTR(:get<COD>);
+    my %VerbalConfirmation_of : ATTR(:get<VerbalConfirmation>);
+    my %ShipperReleaseIndicator_of : ATTR(:get<ShipperReleaseIndicator>);
+    my %Notification_of : ATTR(:get<Notification>);
+    my %ReturnsFlexibleAccessIndicator_of :
+      ATTR(:get<ReturnsFlexibleAccessIndicator>);
 
-__PACKAGE__->_factory(
-    [ qw(        DeliveryConfirmation
-        DeclaredValue
-        COD
-        VerbalConfirmation
-        ShipperReleaseIndicator
-        Notification
-        ReturnsFlexibleAccessIndicator
+    __PACKAGE__->_factory(
+        [   qw(        DeliveryConfirmation
+              DeclaredValue
+              COD
+              VerbalConfirmation
+              ShipperReleaseIndicator
+              Notification
+              ReturnsFlexibleAccessIndicator
 
-    ) ],
-    {
-        'DeliveryConfirmation' => \%DeliveryConfirmation_of,
-        'DeclaredValue' => \%DeclaredValue_of,
-        'COD' => \%COD_of,
-        'VerbalConfirmation' => \%VerbalConfirmation_of,
-        'ShipperReleaseIndicator' => \%ShipperReleaseIndicator_of,
-        'Notification' => \%Notification_of,
-        'ReturnsFlexibleAccessIndicator' => \%ReturnsFlexibleAccessIndicator_of,
-    },
-    {
-        'DeliveryConfirmation' => 'Shipment::UPS::WSDL::ShipTypes::DeliveryConfirmationType',
-        'DeclaredValue' => 'Shipment::UPS::WSDL::ShipTypes::PackageDeclaredValueType',
-        'COD' => 'Shipment::UPS::WSDL::ShipTypes::PSOCODType',
-        'VerbalConfirmation' => 'Shipment::UPS::WSDL::ShipTypes::VerbalConfirmationType',
-        'ShipperReleaseIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Notification' => 'Shipment::UPS::WSDL::ShipTypes::PSONotificationType',
-        'ReturnsFlexibleAccessIndicator' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'DeliveryConfirmation'           => \%DeliveryConfirmation_of,
+            'DeclaredValue'                  => \%DeclaredValue_of,
+            'COD'                            => \%COD_of,
+            'VerbalConfirmation'             => \%VerbalConfirmation_of,
+            'ShipperReleaseIndicator'        => \%ShipperReleaseIndicator_of,
+            'Notification'                   => \%Notification_of,
+            'ReturnsFlexibleAccessIndicator' =>
+              \%ReturnsFlexibleAccessIndicator_of,
+        },
+        {   'DeliveryConfirmation' =>
+              'Shipment::UPS::WSDL::ShipTypes::DeliveryConfirmationType',
+            'DeclaredValue' =>
+              'Shipment::UPS::WSDL::ShipTypes::PackageDeclaredValueType',
+            'COD' => 'Shipment::UPS::WSDL::ShipTypes::PSOCODType',
+            'VerbalConfirmation' =>
+              'Shipment::UPS::WSDL::ShipTypes::VerbalConfirmationType',
+            'ShipperReleaseIndicator' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Notification' =>
+              'Shipment::UPS::WSDL::ShipTypes::PSONotificationType',
+            'ReturnsFlexibleAccessIndicator' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'DeliveryConfirmation' => 'DeliveryConfirmation',
-        'DeclaredValue' => 'DeclaredValue',
-        'COD' => 'COD',
-        'VerbalConfirmation' => 'VerbalConfirmation',
-        'ShipperReleaseIndicator' => 'ShipperReleaseIndicator',
-        'Notification' => 'Notification',
-        'ReturnsFlexibleAccessIndicator' => 'ReturnsFlexibleAccessIndicator',
-    }
-);
+            'DeliveryConfirmation'           => 'DeliveryConfirmation',
+            'DeclaredValue'                  => 'DeclaredValue',
+            'COD'                            => 'COD',
+            'VerbalConfirmation'             => 'VerbalConfirmation',
+            'ShipperReleaseIndicator'        => 'ShipperReleaseIndicator',
+            'Notification'                   => 'Notification',
+            'ReturnsFlexibleAccessIndicator' =>
+              'ReturnsFlexibleAccessIndicator',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -92,7 +95,7 @@ Shipment::UPS::WSDL::ShipTypes::PackageServiceOptionsType
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

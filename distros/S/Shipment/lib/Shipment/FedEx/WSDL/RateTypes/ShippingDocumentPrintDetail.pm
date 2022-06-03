@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::ShippingDocumentPrintDetail;
-$Shipment::FedEx::WSDL::RateTypes::ShippingDocumentPrintDetail::VERSION = '3.07';
+$Shipment::FedEx::WSDL::RateTypes::ShippingDocumentPrintDetail::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
+sub get_xmlns {'http://fedex.com/ws/rate/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,24 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %PrinterId_of :ATTR(:get<PrinterId>);
+    my %PrinterId_of : ATTR(:get<PrinterId>);
 
-__PACKAGE__->_factory(
-    [ qw(        PrinterId
+    __PACKAGE__->_factory(
+        [   qw(        PrinterId
 
-    ) ],
-    {
-        'PrinterId' => \%PrinterId_of,
-    },
-    {
-        'PrinterId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {'PrinterId' => \%PrinterId_of,},
+        {'PrinterId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',},
+        {
 
-        'PrinterId' => 'PrinterId',
-    }
-);
+            'PrinterId' => 'PrinterId',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -62,7 +54,7 @@ Shipment::FedEx::WSDL::RateTypes::ShippingDocumentPrintDetail
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

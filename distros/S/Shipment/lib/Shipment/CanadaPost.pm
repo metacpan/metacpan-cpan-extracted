@@ -1,5 +1,5 @@
 package Shipment::CanadaPost;
-$Shipment::CanadaPost::VERSION = '3.07';
+$Shipment::CanadaPost::VERSION = '3.08';
 use strict;
 use warnings;
 
@@ -18,678 +18,812 @@ extends 'Shipment::Base';
 
 
 has 'username' => (
-  is => 'rw',
-  isa => Str,
+    is  => 'rw',
+    isa => Str,
 );
 
 has 'password' => (
-  is => 'rw',
-  isa => Str,
+    is  => 'rw',
+    isa => Str,
 );
 
 
 has 'endpoint' => (
-  is => 'rw',
-  isa => Enum[ qw(
-    ct.soa-gw.canadapost.ca
-    soa-gw.canadapost.ca
-  ) ],
-  default => 'ct.soa-gw.canadapost.ca',
+    is  => 'rw',
+    isa => Enum [
+        qw(
+          ct.soa-gw.canadapost.ca
+          soa-gw.canadapost.ca
+        )
+    ],
+    default => 'ct.soa-gw.canadapost.ca',
 );
 
 
 has 'contract_id' => (
-  is => 'rw',
-  isa => Str,
+    is  => 'rw',
+    isa => Str,
 );
 
 
 has '+currency' => (
-  isa => Enum[ qw( CAD ) ],
-  default => 'CAD',
+    isa     => Enum [qw( CAD )],
+    default => 'CAD',
 );
 
 
 has 'customs_currency' => (
-  is => 'rw',
-  isa => Str,
-  default => 'CAD',
+    is      => 'rw',
+    isa     => Str,
+    default => 'CAD',
 );
 
 has 'customs_conversion' => (
-  is => 'rw',
-  isa => Num,
-  default => 1,
+    is      => 'rw',
+    isa     => Num,
+    default => 1,
 );
 
 has 'customs_reason' => (
-  is => 'rw',
-  isa => Enum[ qw( DOC SAM REP SOG ) ],
-  default => 'SOG',
+    is      => 'rw',
+    isa     => Enum [qw( DOC SAM REP SOG )],
+    default => 'SOG',
 );
 
 
 has 'non_delivery_handling' => (
-  is => 'rw',
-  isa => Enum[ qw( RASE RTS ABAN ) ],
+    is  => 'rw',
+    isa => Enum [qw( RASE RTS ABAN )],
 );
 
 
 has 'services_rates' => (
-  is => 'rw',
-  isa => Bool,
-  default => 0,
+    is      => 'rw',
+    isa     => Bool,
+    default => 0,
 );
 
 
 sub _messages {
-  my ($self, $xml) = @_;
+    my ($self, $xml) = @_;
 
-  my $schema = XML::Compile::Schema->new([
-    $Shipment::CanadaPost::XSD::messages,
-  ]);
+    my $schema =
+      XML::Compile::Schema->new([$Shipment::CanadaPost::XSD::messages,]);
 
-  my $reader = $schema->compile(READER => '{http://www.canadapost.ca/ws/messages}messages');
-  my $data = $reader->($xml);
+    my $reader = $schema->compile(
+        READER => '{http://www.canadapost.ca/ws/messages}messages');
+    my $data = $reader->($xml);
 
-  my $messages = '';
-  foreach my $message (@{ $data->{message} }) {
-    $messages .= $message->{code} . ': ' . $message->{description} . "\n";
-  }
-  warn $messages if $self->debug;
+    my $messages = '';
+    foreach my $message (@{$data->{message}}) {
+        $messages .= $message->{code} . ': ' . $message->{description} . "\n";
+    }
+    warn $messages if $self->debug;
 
-  $messages;
+    $messages;
 }
 
 
 sub _build_services {
-  my $self = shift;
+    my $self = shift;
 
-  my %services;
- 
-  my $ua = LWP::UserAgent->new();
-  $ua->credentials($self->endpoint . ':443','login', $self->username, $self->password);
+    my %services;
 
-  if (
-      $self->services_rates
-        &&
-      $self->from_address() && $self->from_address()->postal_code
-        &&
-      $self->to_address() && $self->to_address()->postal_code
-    ) {
-    
-    my $country_code = $self->to_address()->country_code || 'CA';
-    my $data = {
-      'parcel-characteristics' => {
-        'weight' => 1,
-      },
-      'origin-postal-code' => $self->from_address()->postal_code,
-    };
+    my $ua = LWP::UserAgent->new();
+    $ua->credentials($self->endpoint . ':443',
+        'login', $self->username, $self->password);
 
-    if ($self->account) {
-      $data->{'customer-number'} = $self->account;
-      $data->{'contract-id'} = $self->contract_id if $self->contract_id;
+    if (   $self->services_rates
+        && $self->from_address()
+        && $self->from_address()->postal_code
+        && $self->to_address()
+        && $self->to_address()->postal_code)
+    {
+
+        my $country_code = $self->to_address()->country_code || 'CA';
+        my $data         = {
+            'parcel-characteristics' => {'weight' => 1,},
+            'origin-postal-code'     => $self->from_address()->postal_code,
+        };
+
+        if ($self->account) {
+            $data->{'customer-number'} = $self->account;
+            $data->{'contract-id'} = $self->contract_id if $self->contract_id;
+        }
+        else {
+            $data->{'quote-type'} = 'counter';
+        }
+
+        if ($country_code eq 'CA') {
+            $data->{'destination'}->{'domestic'}->{'postal-code'} =
+              $self->to_address()->postal_code;
+        }
+        elsif ($country_code eq 'US') {
+            $data->{'destination'}->{'united-states'}->{'zip-code'} =
+              $self->to_address()->postal_code;
+        }
+        else {
+            $data->{'destination'}->{'international'}->{'country-code'} =
+              $country_code;
+            $data->{'destination'}->{'international'}->{'postal-code'} =
+              $self->to_address()->postal_code;
+        }
+
+        my $schema =
+          XML::Compile::Schema->new($Shipment::CanadaPost::XSD::rating
+              . $Shipment::CanadaPost::XSD::common);
+        my $xml_data =
+          $schema->compile('WRITER',
+            '{http://www.canadapost.ca/ws/ship/rate-v4}mailing-scenario')
+          ->(XML::LibXML::Document->new('1.0', 'UTF-8'), $data)->toString;
+        warn 'XML Request: ' . $xml_data if $self->debug;
+
+        my $url    = 'https://' . $self->endpoint . '/rs/ship/price';
+        my $header = [
+            'Content-Type' => 'application/vnd.cpc.ship.rate-v4+xml',
+            'Accept'       => 'application/vnd.cpc.ship.rate-v4+xml',
+        ];
+        my $request = HTTP::Request->new(POST => $url, $header, $xml_data);
+
+        my $response = $ua->request($request);
+        if (!$response->is_success) {
+            warn $response->status_line if $self->debug;
+            $self->error('services request failed with status: '
+                  . $response->status_line
+                  . ' and message: '
+                  . $self->_messages($response->content));
+            return \%services;
+        }
+
+        warn 'XML Response: ' . $response->content if $self->debug;
+
+        my $reader = $schema->compile(READER =>
+              '{http://www.canadapost.ca/ws/ship/rate-v4}price-quotes');
+        $data = $reader->($response->content);
+        foreach my $service (@{$data->{'price-quote'}}) {
+            my ($y, $m, $d) = split('-',
+                $service->{'service-standard'}->{'expected-delivery-date'});
+            my $eta;
+            if ($y && $m && $d) {
+                $eta = {year => $y, month => $m, day => $d};
+            }
+            $services{$service->{'service-code'}} = Shipment::Service->new(
+                id   => $service->{'service-code'},
+                name => $service->{'service-name'},
+                cost => Data::Currency->new(
+                    $service->{'price-details'}->{'due'}, 'CAD'
+                ),
+                etd =>
+                  $service->{'service-standard'}->{'expected-transit-time'},
+                eta => $eta,
+            );
+        }
+
     }
     else {
-      $data->{'quote-type'} = 'counter';
+
+        my $url =
+            'https://'
+          . $self->endpoint
+          . '/rs/ship/service?country='
+          . (($self->to_address() && $self->to_address()->country_code)
+            ? $self->to_address()->country_code
+            : 'CA');
+        $url .= '&contract=' . $self->contract_id if $self->contract_id;
+        $url .= '&origpc=' . $self->from_address()->postal_code
+          if $self->from_address() && $self->from_address()->postal_code;
+        $url .= '&destpc=' . $self->to_address()->postal_code
+          if $self->to_address() && $self->to_address()->postal_code;
+
+        my $response =
+          $ua->get($url, 'Accept' => 'application/vnd.cpc.ship.rate-v4+xml');
+
+        if (!$response->is_success) {
+            warn $response->status_line if $self->debug;
+            $self->error('services request failed with status: '
+                  . $response->status_line);
+            return \%services;
+        }
+
+        warn 'XML Response: ' . $response->content if $self->debug;
+
+        my $schema =
+          XML::Compile::Schema->new($Shipment::CanadaPost::XSD::discovery
+              . $Shipment::CanadaPost::XSD::common);
+        my $reader = $schema->compile(
+            READER => '{http://www.canadapost.ca/ws/ship/rate-v4}services');
+        my $data = $reader->($response->content);
+
+        foreach my $service (@{$data->{service}}) {
+            $services{$service->{'service-code'}} = Shipment::Service->new(
+                id   => $service->{'service-code'},
+                name => $service->{'service-name'},
+            );
+        }
+
     }
 
-    if ($country_code eq 'CA') {
-      $data->{'destination'}->{'domestic'}->{'postal-code'} = $self->to_address()->postal_code;
-    }
-    elsif ($country_code eq 'US') {
-      $data->{'destination'}->{'united-states'}->{'zip-code'} = $self->to_address()->postal_code;
-    }
-    else {
-      $data->{'destination'}->{'international'}->{'country-code'} = $country_code;
-      $data->{'destination'}->{'international'}->{'postal-code'} = $self->to_address()->postal_code;
-    }
-
-    my $schema = XML::Compile::Schema->new( $Shipment::CanadaPost::XSD::rating . $Shipment::CanadaPost::XSD::common );
-    my $xml_data = $schema->compile('WRITER', '{http://www.canadapost.ca/ws/ship/rate-v4}mailing-scenario')->(
-        XML::LibXML::Document->new('1.0', 'UTF-8'), $data
-      )->toString;
-    warn 'XML Request: ' . $xml_data if $self->debug;
-
-    my $url = 'https://' . $self->endpoint . '/rs/ship/price';
-    my $header = [
-        'Content-Type' => 'application/vnd.cpc.ship.rate-v4+xml',
-        'Accept' => 'application/vnd.cpc.ship.rate-v4+xml',
-      ];
-    my $request = HTTP::Request->new(POST => $url, $header, $xml_data);
-
-    my $response = $ua->request( $request );
-    if (!$response->is_success) {
-      warn $response->status_line if $self->debug;
-      $self->error( 'services request failed with status: ' . $response->status_line . ' and message: ' . $self->_messages($response->content) );
-      return \%services;
+    $services{ground} =
+         $services{'DOM.RP'}
+      || $services{'DOM.EP'}
+      || $services{'USA.TP'}
+      || $services{'USA.EP'}
+      || $services{'INT.TP'}
+      || $services{'INT.IP.AIR'}
+      || $services{'INT.IP.SURF'}
+      || $services{'INT.XP'}
+      || undef;
+    $services{express} =
+         $services{'DOM.XP'}
+      || $services{'USA.XP'}
+      || $services{'INT.XP'}
+      || undef;
+    $services{priority} =
+         $services{'DOM.PC'}
+      || $services{'USA.PW.PARCEL'}
+      || $services{'INT.PW.PARCEL'};
+    foreach (qw/ground express priority/) {
+        delete $services{$_} if !$services{$_};
     }
 
-    warn 'XML Response: ' . $response->content if $self->debug;
-
-    my $reader = $schema->compile(READER => '{http://www.canadapost.ca/ws/ship/rate-v4}price-quotes');
-    $data = $reader->($response->content);
-    foreach my $service (@{ $data->{'price-quote'} }) {
-      my ($y, $m, $d) = split('-', $service->{'service-standard'}->{'expected-delivery-date'});
-      my $eta;
-      if ($y && $m && $d) {
-        $eta = { year => $y, month => $m, day => $d };
-      }
-      $services{$service->{'service-code'}} = Shipment::Service->new(
-          id => $service->{'service-code'},
-          name => $service->{'service-name'},
-          cost => Data::Currency->new($service->{'price-details'}->{'due'}, 'CAD'),
-          etd => $service->{'service-standard'}->{'expected-transit-time'},
-          eta => $eta,
-        );
-    }
-
-  }
-  else {
-
-    my $url = 'https://' . $self->endpoint . '/rs/ship/service?country=' . (($self->to_address() && $self->to_address()->country_code) ? $self->to_address()->country_code : 'CA');
-    $url .= '&contract=' . $self->contract_id if $self->contract_id;
-    $url .= '&origpc=' . $self->from_address()->postal_code if $self->from_address() && $self->from_address()->postal_code;
-    $url .= '&destpc=' . $self->to_address()->postal_code if $self->to_address() && $self->to_address()->postal_code;
-
-    my $response = $ua->get( $url, 'Accept' => 'application/vnd.cpc.ship.rate-v4+xml');
-
-    if (!$response->is_success) {
-      warn $response->status_line if $self->debug;
-      $self->error( 'services request failed with status: ' . $response->status_line );
-      return \%services;
-    }
-
-    warn 'XML Response: ' . $response->content if $self->debug;
-
-    my $schema = XML::Compile::Schema->new( $Shipment::CanadaPost::XSD::discovery . $Shipment::CanadaPost::XSD::common );
-    my $reader = $schema->compile(READER => '{http://www.canadapost.ca/ws/ship/rate-v4}services');
-    my $data = $reader->($response->content);
-
-    foreach my $service (@{ $data->{service} }) {
-      $services{$service->{'service-code'}} = Shipment::Service->new(
-          id => $service->{'service-code'},
-          name => $service->{'service-name'},
-        );
-    }
-
-  }
-
-  $services{ground} = $services{'DOM.RP'} || $services{'DOM.EP'} || $services{'USA.TP'} || $services{'USA.EP'} || $services{'INT.TP'} || $services{'INT.IP.AIR'} || $services{'INT.IP.SURF'} || $services{'INT.XP'} || undef;
-  $services{express} = $services{'DOM.XP'} || $services{'USA.XP'} || $services{'INT.XP'} || undef;
-  $services{priority} = $services{'DOM.PC'} || $services{'USA.PW.PARCEL'} || $services{'INT.PW.PARCEL'};
-  foreach (qw/ground express priority/) {
-    delete $services{$_} if !$services{$_};
-  }
-
-  \%services;
+    \%services;
 }
 
 
 sub rate {
-  my ( $self, $service_id ) = @_;
+    my ($self, $service_id) = @_;
 
-  if ($service_id eq 'ground') {
-    foreach my $id (qw/DOM.RP DOM.EP USA.TP USA.EP INT.TP INT.IP.AIR INT.IP.SURF INT.XP/) {
-      if ($self->services->{$id}) {
-        $self->error('');
-        $self->rate($id);
-        if (!$self->error) {
-          return;
+    if ($service_id eq 'ground') {
+        foreach my $id (
+            qw/DOM.RP DOM.EP USA.TP USA.EP INT.TP INT.IP.AIR INT.IP.SURF INT.XP/
+          )
+        {
+            if ($self->services->{$id}) {
+                $self->error('');
+                $self->rate($id);
+                if (!$self->error) {
+                    return;
+                }
+            }
         }
-      }
-    }
-    return;
-  }
-
-  try { 
-    $service_id = $self->services->{$service_id}->id;
-  } catch {
-    warn $_ if $self->debug;
-    warn "service ($service_id) not available" if $self->debug;
-    $self->error( "service ($service_id) not available" );
-    $service_id = '';
-  };
-  return unless $service_id;
-
-  my $ua = LWP::UserAgent->new();
-  $ua->credentials($self->endpoint . ':443','login', $self->username, $self->password);
-
-  if (
-      $self->from_address() && $self->from_address()->postal_code
-        &&
-      $self->to_address() && $self->to_address()->postal_code
-    ) {
-    
-    my $country_code = $self->to_address()->country_code || 'CA';
-    my $data = {
-      'services' => { 'service-code' => [$service_id] },
-      'origin-postal-code' => $self->from_address()->postal_code,
-    };
-
-    if ($self->account) {
-      $data->{'customer-number'} = $self->account;
-      $data->{'contract-id'} = $self->contract_id if $self->contract_id;
-    }
-    else {
-      $data->{'quote-type'} = 'counter';
-    }
-
-    if ($country_code eq 'CA') {
-      $data->{'destination'}->{'domestic'}->{'postal-code'} = $self->to_address()->postal_code;
-    }
-    elsif ($country_code eq 'US') {
-      $data->{'destination'}->{'united-states'}->{'zip-code'} = $self->to_address()->postal_code;
-    }
-    else {
-      $data->{'destination'}->{'international'}->{'country-code'} = $country_code;
-      $data->{'destination'}->{'international'}->{'postal-code'} = $self->to_address()->postal_code;
-    }
-
-    my $schema = XML::Compile::Schema->new( $Shipment::CanadaPost::XSD::rating . $Shipment::CanadaPost::XSD::common );
-
-    my $cost = 0;
-    my $etd = 0;
-    my $eta;
-
-    foreach my $package (@{ $self->packages }) {
-
-      my $weight = $package->weight;
-      if ($self->weight_unit eq 'lb') {
-        $weight = sprintf('%.4f', $weight * 0.4535924);
-      }
-      elsif ($self->weight_unit eq 'oz') {
-        $weight = sprintf('%.4f', $weight * 0.02834952);
-      }
-      my ($l, $w, $h) = ($package->length, $package->width, $package->height);
-      if ($self->dim_unit eq 'in') {
-        $l = sprintf('%.4f', $l * 2.54);
-        $w = sprintf('%.4f', $w * 2.54);
-        $h = sprintf('%.4f', $h * 2.54);
-      }
-      $data->{'parcel-characteristics'} = {
-        weight => $weight,
-        dimensions => {
-          length => $l,
-          width => $w,
-          height => $h,
-        },
-      };
-
-      my $xml_data;
-      try {
-        $xml_data = $schema->compile('WRITER', '{http://www.canadapost.ca/ws/ship/rate-v4}mailing-scenario')->(
-            XML::LibXML::Document->new('1.0', 'UTF-8'), $data
-          )->toString;
-        warn 'XML Request: ' . $xml_data if $self->debug;
-      } catch {
-        warn $_ if $self->debug;
-        my $error = $_;
-        $error =~ s/\`//g;
-        $self->error( $error );
-      };
-      return unless $xml_data;
-
-      my $url = 'https://' . $self->endpoint . '/rs/ship/price';
-      my $header = [
-          'Content-Type' => 'application/vnd.cpc.ship.rate-v4+xml',
-          'Accept' => 'application/vnd.cpc.ship.rate-v4+xml',
-        ];
-      my $request = HTTP::Request->new(POST => $url, $header, $xml_data);
-
-      my $response = $ua->request( $request );
-      if (!$response->is_success) {
-        warn $response->status_line if $self->debug;
-        $self->error( $self->_messages($response->content) );
         return;
-      }
-
-      warn 'XML Response: ' . $response->content if $self->debug;
-
-      my $reader = $schema->compile(READER => '{http://www.canadapost.ca/ws/ship/rate-v4}price-quotes');
-      my $response_data = $reader->($response->content);
-      my $service = $response_data->{'price-quote'}->[0];
-      $cost += $service->{'price-details'}->{'due'};
-      $etd = $service->{'service-standard'}->{'expected-transit-time'};
-      my ($y, $m, $d) = split('-', $service->{'service-standard'}->{'expected-delivery-date'});
-      if ($y && $m && $d) {
-        $eta = { year => $y, month => $m, day => $d };
-      }
     }
 
-    $self->service( Shipment::Service->new(
-        id => $service_id,
-        name => $self->services->{$service_id}->name,
-        cost => Data::Currency->new($cost, 'CAD'),
-        etd => $etd,
-        eta => $eta,
-      )
-    );
-  }
-  else {
-    # from and to address required
-    $self->error( "Both from and to address are required for rating." );
-  }
+    try {
+        $service_id = $self->services->{$service_id}->id;
+    }
+    catch {
+        warn $_                                    if $self->debug;
+        warn "service ($service_id) not available" if $self->debug;
+        $self->error("service ($service_id) not available");
+        $service_id = '';
+    };
+    return unless $service_id;
 
-  return;
+    my $ua = LWP::UserAgent->new();
+    $ua->credentials($self->endpoint . ':443',
+        'login', $self->username, $self->password);
+
+    if (   $self->from_address()
+        && $self->from_address()->postal_code
+        && $self->to_address()
+        && $self->to_address()->postal_code)
+    {
+
+        my $country_code = $self->to_address()->country_code || 'CA';
+        my $data         = {
+            'services'           => {'service-code' => [$service_id]},
+            'origin-postal-code' => $self->from_address()->postal_code,
+        };
+
+        if ($self->account) {
+            $data->{'customer-number'} = $self->account;
+            $data->{'contract-id'} = $self->contract_id if $self->contract_id;
+        }
+        else {
+            $data->{'quote-type'} = 'counter';
+        }
+
+        if ($country_code eq 'CA') {
+            $data->{'destination'}->{'domestic'}->{'postal-code'} =
+              $self->to_address()->postal_code;
+        }
+        elsif ($country_code eq 'US') {
+            $data->{'destination'}->{'united-states'}->{'zip-code'} =
+              $self->to_address()->postal_code;
+        }
+        else {
+            $data->{'destination'}->{'international'}->{'country-code'} =
+              $country_code;
+            $data->{'destination'}->{'international'}->{'postal-code'} =
+              $self->to_address()->postal_code;
+        }
+
+        my $schema =
+          XML::Compile::Schema->new($Shipment::CanadaPost::XSD::rating
+              . $Shipment::CanadaPost::XSD::common);
+
+        my $cost = 0;
+        my $etd  = 0;
+        my $eta;
+
+        foreach my $package (@{$self->packages}) {
+
+            my $weight = $package->weight;
+            if ($self->weight_unit eq 'lb') {
+                $weight = sprintf('%.4f', $weight * 0.4535924);
+            }
+            elsif ($self->weight_unit eq 'oz') {
+                $weight = sprintf('%.4f', $weight * 0.02834952);
+            }
+            my ($l, $w, $h) =
+              ($package->length, $package->width, $package->height);
+            if ($self->dim_unit eq 'in') {
+                $l = sprintf('%.4f', $l * 2.54);
+                $w = sprintf('%.4f', $w * 2.54);
+                $h = sprintf('%.4f', $h * 2.54);
+            }
+            $data->{'parcel-characteristics'} = {
+                weight     => $weight,
+                dimensions => {
+                    length => $l,
+                    width  => $w,
+                    height => $h,
+                },
+            };
+
+            my $xml_data;
+            try {
+                $xml_data = $schema->compile('WRITER',
+                    '{http://www.canadapost.ca/ws/ship/rate-v4}mailing-scenario'
+                )->(XML::LibXML::Document->new('1.0', 'UTF-8'), $data)
+                  ->toString;
+                warn 'XML Request: ' . $xml_data if $self->debug;
+            }
+            catch {
+                warn $_ if $self->debug;
+                my $error = $_;
+                $error =~ s/\`//g;
+                $self->error($error);
+            };
+            return unless $xml_data;
+
+            my $url    = 'https://' . $self->endpoint . '/rs/ship/price';
+            my $header = [
+                'Content-Type' => 'application/vnd.cpc.ship.rate-v4+xml',
+                'Accept'       => 'application/vnd.cpc.ship.rate-v4+xml',
+            ];
+            my $request = HTTP::Request->new(POST => $url, $header, $xml_data);
+
+            my $response = $ua->request($request);
+            if (!$response->is_success) {
+                warn $response->status_line if $self->debug;
+                $self->error($self->_messages($response->content));
+                return;
+            }
+
+            warn 'XML Response: ' . $response->content if $self->debug;
+
+            my $reader = $schema->compile(READER =>
+                  '{http://www.canadapost.ca/ws/ship/rate-v4}price-quotes');
+            my $response_data = $reader->($response->content);
+            my $service       = $response_data->{'price-quote'}->[0];
+            $cost += $service->{'price-details'}->{'due'};
+            $etd = $service->{'service-standard'}->{'expected-transit-time'};
+            my ($y, $m, $d) = split('-',
+                $service->{'service-standard'}->{'expected-delivery-date'});
+
+            if ($y && $m && $d) {
+                $eta = {year => $y, month => $m, day => $d};
+            }
+        }
+
+        $self->service(
+            Shipment::Service->new(
+                id   => $service_id,
+                name => $self->services->{$service_id}->name,
+                cost => Data::Currency->new($cost, 'CAD'),
+                etd  => $etd,
+                eta  => $eta,
+            )
+        );
+    }
+    else {
+        # from and to address required
+        $self->error("Both from and to address are required for rating.");
+    }
+
+    return;
 }
 
 
 has 'tmp_file_dir' => (
-  is => 'rw',
-  isa => Str,
-  default => 'tmp',
+    is      => 'rw',
+    isa     => Str,
+    default => 'tmp',
 );
 
 sub ship {
-  my ( $self, $service_id ) = @_;
+    my ($self, $service_id) = @_;
 
-  try { 
-    $service_id = $self->services->{$service_id}->id;
-  } catch {
-    warn $_ if $self->debug;
-    warn "service ($service_id) not available" if $self->debug;
-    $self->error( "service ($service_id) not available" );
-    $service_id = '';
-  };
-  return unless $service_id;
-
-  my $ua = LWP::UserAgent->new();
-  $ua->credentials($self->endpoint . ':443','login', $self->username, $self->password);
-
-  if (
-      $self->from_address() && $self->from_address()->postal_code
-        &&
-      $self->to_address() && $self->to_address()->postal_code
-    ) {
-    
-    my $country_code = $self->to_address()->country_code || 'CA';
-    my $data = {
-      'transmit-shipment' => 'true',
-      'cpc-pickup-indicator' => 'true',
-      'requested-shipping-point' => $self->from_address()->postal_code,
-      'provide-pricing-info' => 'true',
-      'delivery-spec' => {
-        'service-code' => $service_id,
-        'sender' => {
-          'company' => $self->from_address->company,
-          'name' => $self->from_address->name,
-          'address-details' => {
-            'address-line-1'    => $self->from_address->address1,
-            'address-line-2'    => $self->from_address->address2,
-            'city'              => $self->from_address->city,
-            'prov-state'        => $self->from_address->province_code,
-            'postal-zip-code'   => $self->from_address->postal_code,
-            'country-code'      => $self->from_address->country_code,
-          },
-          'contact-phone' => $self->from_address()->phone || '0000000000',
-        },
-        'destination' => {
-          'company' => $self->to_address->name,
-          'name' => $self->to_address->company,
-          'address-details' => {
-            'address-line-1'    => $self->to_address->address1,
-            'address-line-2'    => $self->to_address->address2,
-            'city'              => $self->to_address->city,
-            'prov-state'        => $self->to_address->province_code,
-            'postal-zip-code'   => $self->to_address->postal_code,
-            'country-code'      => $self->to_address->country_code,
-          },
-          'client-voice-number' => $self->to_address()->phone || '',
-        },
-        'preferences' => {
-          'show-packing-instructions' => 'false',
-        },
-        'settlement-info' => {
-          'paid-by-customer' => $self->bill_account,
-          'contract-id' => $self->contract_id,
-          'intended-method-of-payment' => 'Account',
-        },
-      },
+    try {
+        $service_id = $self->services->{$service_id}->id;
+    }
+    catch {
+        warn $_                                    if $self->debug;
+        warn "service ($service_id) not available" if $self->debug;
+        $self->error("service ($service_id) not available");
+        $service_id = '';
     };
+    return unless $service_id;
 
-    if ($self->signature_type eq 'required') {
-      push @{ $data->{'delivery-spec'}->{'options'}->{option} }, { 'option-code' => 'SO' };
-    }
-    elsif ($self->signature_type eq 'adult') {
-      push @{ $data->{'delivery-spec'}->{'options'}->{option} }, { 'option-code' => 'PA18' };
-    }
+    my $ua = LWP::UserAgent->new();
+    $ua->credentials($self->endpoint . ':443',
+        'login', $self->username, $self->password);
 
-    if ($self->to_address->country_code ne 'CA') {
-      my $non_delivery_handling = $self->non_delivery_handling;
-      if (!$non_delivery_handling) {
-        if ($service_id eq 'USA.TP' || $service_id eq 'INT.TP') {
-          $non_delivery_handling = 'RTS';
+    if (   $self->from_address()
+        && $self->from_address()->postal_code
+        && $self->to_address()
+        && $self->to_address()->postal_code)
+    {
+
+        my $country_code = $self->to_address()->country_code || 'CA';
+        my $data         = {
+            'transmit-shipment'        => 'true',
+            'cpc-pickup-indicator'     => 'true',
+            'requested-shipping-point' => $self->from_address()->postal_code,
+            'provide-pricing-info'     => 'true',
+            'delivery-spec'            => {
+                'service-code' => $service_id,
+                'sender'       => {
+                    'company'         => $self->from_address->company,
+                    'name'            => $self->from_address->name,
+                    'address-details' => {
+                        'address-line-1' => $self->from_address->address1,
+                        'address-line-2' => $self->from_address->address2,
+                        'city'           => $self->from_address->city,
+                        'prov-state'     => $self->from_address->province_code,
+                        'postal-zip-code' => $self->from_address->postal_code,
+                        'country-code'    => $self->from_address->country_code,
+                    },
+                    'contact-phone' => $self->from_address()->phone
+                      || '0000000000',
+                },
+                'destination' => {
+                    'company'         => $self->to_address->name,
+                    'name'            => $self->to_address->company,
+                    'address-details' => {
+                        'address-line-1'  => $self->to_address->address1,
+                        'address-line-2'  => $self->to_address->address2,
+                        'city'            => $self->to_address->city,
+                        'prov-state'      => $self->to_address->province_code,
+                        'postal-zip-code' => $self->to_address->postal_code,
+                        'country-code'    => $self->to_address->country_code,
+                    },
+                    'client-voice-number' => $self->to_address()->phone || '',
+                },
+                'preferences'     => {'show-packing-instructions' => 'false',},
+                'settlement-info' => {
+                    'paid-by-customer'           => $self->bill_account,
+                    'contract-id'                => $self->contract_id,
+                    'intended-method-of-payment' => 'Account',
+                },
+            },
+        };
+
+        if ($self->signature_type eq 'required') {
+            push @{$data->{'delivery-spec'}->{'options'}->{option}},
+              {'option-code' => 'SO'};
+        }
+        elsif ($self->signature_type eq 'adult') {
+            push @{$data->{'delivery-spec'}->{'options'}->{option}},
+              {'option-code' => 'PA18'};
+        }
+
+        if ($self->to_address->country_code ne 'CA') {
+            my $non_delivery_handling = $self->non_delivery_handling;
+            if (!$non_delivery_handling) {
+                if ($service_id eq 'USA.TP' || $service_id eq 'INT.TP') {
+                    $non_delivery_handling = 'RTS';
+                }
+                else {
+                    $non_delivery_handling = 'RASE';
+                }
+            }
+            push @{$data->{'delivery-spec'}->{'options'}->{option}},
+              {'option-code' => $non_delivery_handling};
+        }
+
+        if ($self->to_address->email) {
+            $data->{'delivery-spec'}->{'notification'} = {
+                'email'        => $self->to_address->email,
+                'on-shipment'  => 'true',
+                'on-exception' => 'true',
+                'on-delivery'  => 'true',
+            };
+        }
+
+        if ($self->printer_type =~ /(thermal|zpl)/i) {
+            $data->{'delivery-spec'}->{'print-preferences'} = {
+                'output-format' => '4x6',
+                'encoding'      => 'ZPL',
+            };
         }
         else {
-          $non_delivery_handling = 'RASE';
+            $data->{'delivery-spec'}->{'print-preferences'} = {
+                'output-format' => '8.5x11',
+                'encoding'      => 'PDF',
+            };
         }
-      }
-      push @{ $data->{'delivery-spec'}->{'options'}->{option} }, { 'option-code' => $non_delivery_handling };
-    }
 
-    if ($self->to_address->email) {
-      $data->{'delivery-spec'}->{'notification'} = {
-        'email' => $self->to_address->email,
-        'on-shipment' => 'true',
-        'on-exception' => 'true',
-        'on-delivery' => 'true',
-      };
-    }
+        if ($self->get_reference(0)) {
+            $data->{'delivery-spec'}->{'references'}->{'customer-ref-1'} =
+              $self->get_reference(0);
+        }
+        if ($self->get_reference(1)) {
+            $data->{'delivery-spec'}->{'references'}->{'customer-ref-2'} =
+              $self->get_reference(1);
+        }
 
-    if ($self->printer_type =~ /(thermal|zpl)/i) {
-      $data->{'delivery-spec'}->{'print-preferences'} = {
-        'output-format' => '4x6',
-        'encoding' => 'ZPL',
-      };
-    }
-    else {
-      $data->{'delivery-spec'}->{'print-preferences'} = {
-        'output-format' => '8.5x11',
-        'encoding' => 'PDF',
-      };
-    }
+        my $schema =
+          XML::Compile::Schema->new($Shipment::CanadaPost::XSD::shipment
+              . $Shipment::CanadaPost::XSD::common);
 
-    if ($self->get_reference(0)) {
-      $data->{'delivery-spec'}->{'references'}->{'customer-ref-1'} = $self->get_reference(0);
-    }
-    if ($self->get_reference(1)) {
-      $data->{'delivery-spec'}->{'references'}->{'customer-ref-2'} = $self->get_reference(1);
-    }
+        my $shipment_id;
+        my $cost = 0;
+        my $etd  = 0;
+        my $eta;
+        my $package_index = 0;
+        foreach my $package (@{$self->packages}) {
 
-    my $schema = XML::Compile::Schema->new( $Shipment::CanadaPost::XSD::shipment . $Shipment::CanadaPost::XSD::common );
-
-    my $shipment_id;
-    my $cost = 0;
-    my $etd = 0;
-    my $eta;
-    my $package_index = 0;
-    foreach my $package (@{ $self->packages }) {
-
-      my $weight = $package->weight;
-      if ($self->weight_unit eq 'lb') {
-        $weight = sprintf('%.4f', $weight * 0.4535924);
-      }
-      elsif ($self->weight_unit eq 'oz') {
-        $weight = sprintf('%.4f', $weight * 0.02834952);
-      }
-      my ($l, $w, $h) = ($package->length, $package->width, $package->height);
-      if ($self->dim_unit eq 'in') {
-        $l = sprintf('%.4f', $l * 2.54);
-        $w = sprintf('%.4f', $w * 2.54);
-        $h = sprintf('%.4f', $h * 2.54);
-      }
-      $data->{'delivery-spec'}->{'parcel-characteristics'} = {
-        weight => $weight,
-        dimensions => {
-          length => $l,
-          width => $w,
-          height => $h,
-        },
-      };
-
-      if ($self->to_address->country_code ne 'CA') {
-        $data->{'delivery-spec'}->{'customs'} = {
-          'currency' => $self->customs_currency,
-          'conversion-from-cad' => $self->customs_conversion,
-          'reason-for-export' => $self->customs_reason,
-          'sku-list' => { 'item' => [] },
-        };
-        foreach my $item (@{$package->items}) {
-          my $origin_country;
-          if ($item->{origin_country}) {
-            my $origin_country = $item->{origin_country};
-            if ($origin_country =~ /korea/i) {
-              $origin_country = 'KR';
-            }
-            use Locale::SubCountry;
-            my $country = Locale::SubCountry->new($origin_country);
-            $origin_country = $country->country_code if $country && $country->country_code;
-          }
-          my $item_weight = $item->{weight};
-          if ($item_weight) {
+            my $weight = $package->weight;
             if ($self->weight_unit eq 'lb') {
-              $item_weight = sprintf('%.4f', $item_weight * 0.4535924);
+                $weight = sprintf('%.4f', $weight * 0.4535924);
             }
             elsif ($self->weight_unit eq 'oz') {
-              $item_weight = sprintf('%.4f', $item_weight * 0.02834952);
+                $weight = sprintf('%.4f', $weight * 0.02834952);
             }
-          }
-          push @{$data->{'delivery-spec'}->{'customs'}->{'sku-list'}->{'item'}}, {
-            'customs-number-of-units' => $item->{quantity} || 1,
-            'customs-description' => substr($item->{customs_description},0,44) || 'Misc',
-            'unit-weight' => $item_weight || $weight,
-            'customs-value-per-unit' => $item->{customs_value} || 1,
-            'country-of-origin' => $origin_country,
-          };
+            my ($l, $w, $h) =
+              ($package->length, $package->width, $package->height);
+            if ($self->dim_unit eq 'in') {
+                $l = sprintf('%.4f', $l * 2.54);
+                $w = sprintf('%.4f', $w * 2.54);
+                $h = sprintf('%.4f', $h * 2.54);
+            }
+            $data->{'delivery-spec'}->{'parcel-characteristics'} = {
+                weight     => $weight,
+                dimensions => {
+                    length => $l,
+                    width  => $w,
+                    height => $h,
+                },
+            };
+
+            if ($self->to_address->country_code ne 'CA') {
+                $data->{'delivery-spec'}->{'customs'} = {
+                    'currency'            => $self->customs_currency,
+                    'conversion-from-cad' => $self->customs_conversion,
+                    'reason-for-export'   => $self->customs_reason,
+                    'sku-list'            => {'item' => []},
+                };
+                foreach my $item (@{$package->items}) {
+                    my $origin_country;
+                    if ($item->{origin_country}) {
+                        my $origin_country = $item->{origin_country};
+                        if ($origin_country =~ /korea/i) {
+                            $origin_country = 'KR';
+                        }
+                        use Locale::SubCountry;
+                        my $country = Locale::SubCountry->new($origin_country);
+                        $origin_country = $country->country_code
+                          if $country && $country->country_code;
+                    }
+                    my $item_weight = $item->{weight};
+                    if ($item_weight) {
+                        if ($self->weight_unit eq 'lb') {
+                            $item_weight =
+                              sprintf('%.4f', $item_weight * 0.4535924);
+                        }
+                        elsif ($self->weight_unit eq 'oz') {
+                            $item_weight =
+                              sprintf('%.4f', $item_weight * 0.02834952);
+                        }
+                    }
+                    push @{$data->{'delivery-spec'}->{'customs'}->{'sku-list'}
+                          ->{'item'}},
+                      { 'customs-number-of-units' => $item->{quantity} || 1,
+                        'customs-description'     =>
+                          substr($item->{customs_description}, 0, 44)
+                          || 'Misc',
+                        'unit-weight'            => $item_weight || $weight,
+                        'customs-value-per-unit' => $item->{customs_value}
+                          || 1,
+                        'country-of-origin' => $origin_country,
+                      };
+                }
+                if (!scalar @{
+                        $data->{'delivery-spec'}->{'customs'}->{'sku-list'}
+                          ->{item}
+                    }
+                  )
+                {
+                    push @{$data->{'delivery-spec'}->{'customs'}->{'sku-list'}
+                          ->{'item'}},
+                      { 'customs-number-of-units' => 1,
+                        'customs-description'     => 'Misc',
+                        'unit-weight'             => $weight,
+                        'customs-value-per-unit'  => 1,
+                      };
+                }
+            }
+
+            my $xml_data =
+              $schema->compile('WRITER',
+                '{http://www.canadapost.ca/ws/shipment-v8}shipment')
+              ->(XML::LibXML::Document->new('1.0', 'UTF-8'), $data)->toString;
+            warn 'XML Request: ' . $xml_data if $self->debug;
+
+            my $url =
+                'https://'
+              . $self->endpoint . '/rs/'
+              . $self->account . '/'
+              . $self->bill_account
+              . '/shipment';
+
+            use File::Util;
+            my $f = File::Util->new();
+            my $tmp_file =
+              $self->tmp_file_dir . '/shipment_canada_post' . time();
+            $f->write_file(
+                file    => $tmp_file,
+                bitmask => 0644,
+                content => $xml_data
+            );
+            my $username = $self->username;
+            my $password = $self->password;
+            my $response =
+              `curl -s -w "%{http_code}" -H "Content-Type: application/vnd.cpc.shipment-v8+xml" -H "Accept: application/vnd.cpc.shipment-v8+xml" -u $username:$password -d \@$tmp_file $url`;
+            unlink $tmp_file;
+            $response =~ s/(\d\d\d)$//;
+            my $status = $1;
+            warn 'HTTP Status: ' . $status    if $self->debug;
+            warn 'XML Response: ' . $response if $self->debug;
+
+            if ($status ne '200') {
+                $self->error('shipment request failed with message: '
+                      . $self->_messages($response));
+                return;
+            }
+
+            my $reader = $schema->compile(READER =>
+                  '{http://www.canadapost.ca/ws/shipment-v8}shipment-info');
+            my $shipment = $reader->($response);
+
+            $shipment_id ||= $shipment->{'shipment-id'};
+            $cost += $shipment->{'shipment-price'}->{'due-amount'};
+            $etd
+              ||= $shipment->{'shipment-price'}->{'service-standard'}
+              ->{'expected-transmit-time'}
+              || $shipment->{'shipment-price'}->{'service-standard'}
+              ->{'expected-transit-time'};
+            my ($y, $m, $d) = split('-',
+                $shipment->{'shipment-price'}->{'service-standard'}
+                  ->{'expected-delivery-date'});
+            if ($y && $m && $d) {
+                $eta ||= {year => $y, month => $m, day => $d};
+            }
+
+            my $tracking_id = $shipment->{'tracking-pin'};
+            $self->get_package($package_index)->id($shipment->{'shipment-id'});
+            $self->get_package($package_index)->tracking_id($tracking_id);
+            $self->get_package($package_index)->cost(
+                Data::Currency->new(
+                    $shipment->{'shipment-price'}->{'due-amount'}, 'CAD'
+                )
+            );
+
+            my $label_url;
+            my $commercial_invoice_url;
+            my $label_data;
+            foreach my $link (@{$shipment->{'links'}->{'link'}}) {
+                if ($link->{'rel'} eq 'label') {
+                    $label_url = $link->{'href'};
+                }
+                if ($link->{'rel'} eq 'commercialInvoice') {
+                    $commercial_invoice_url = $link->{'href'};
+                }
+            }
+            if ($label_url) {
+                my $response = $ua->get(
+                    $label_url,
+                    'Accept' => (
+                        $self->printer_type =~ /(thermal|zpl)/i
+                        ? 'application/zpl'
+                        : 'application/pdf'
+                    )
+                );
+
+                if (!$response->is_success) {
+                    warn $response->status_line if $self->debug;
+                    $self->error('label request failed with status: '
+                          . $response->status_line);
+                }
+                else {
+
+                    warn 'LABEL Response: ' . $response->content
+                      if $self->debug;
+                    $label_data = $response->content;
+                }
+            }
+
+            if ($commercial_invoice_url) {
+                my $response = $ua->get(
+                    $commercial_invoice_url,
+                    'Accept' => (
+                        $self->printer_type =~ /(thermal|zpl)/i
+                        ? 'application/zpl'
+                        : 'application/pdf'
+                    )
+                );
+
+                if (!$response->is_success) {
+                    warn $response->status_line if $self->debug;
+                    $self->error(
+                        'commercial invoice request failed with status: '
+                          . $response->status_line);
+                }
+                else {
+
+                    warn 'COMMERCIAL INVOICE Response: ' . $response->content
+                      if $self->debug;
+                    $label_data .= "\n\n" . $response->content;
+                }
+            }
+
+            if ($label_data) {
+                $self->get_package($package_index)->label(
+                    Shipment::Label->new(
+                        {   tracking_id  => $tracking_id,
+                            content_type => (
+                                $self->printer_type =~ /(thermal|zpl)/i
+                                ? 'text/canadapost-zpl'
+                                : 'application/pdf'
+                            ),
+                            data      => $label_data,
+                            file_name => $shipment->{'tracking-pin'} . '.'
+                              . (
+                                $self->printer_type =~ /(thermal|zpl)/i
+                                ? 'zpl'
+                                : 'pdf'
+                              ),
+                        },
+                    )
+                );
+            }
+            $package_index++;
+
         }
-        if (!scalar @{$data->{'delivery-spec'}->{'customs'}->{'sku-list'}->{item}}) {
-          push @{$data->{'delivery-spec'}->{'customs'}->{'sku-list'}->{'item'}}, {
-            'customs-number-of-units' => 1,
-            'customs-description' => 'Misc',
-            'unit-weight' => $weight,
-            'customs-value-per-unit' => 1,
-          };
-        }
-      }
 
-      my $xml_data = $schema->compile('WRITER', '{http://www.canadapost.ca/ws/shipment-v8}shipment')->(
-          XML::LibXML::Document->new('1.0', 'UTF-8'), $data
-        )->toString;
-      warn 'XML Request: ' . $xml_data if $self->debug;
-
-      my $url = 'https://' . $self->endpoint . '/rs/' . $self->account . '/' . $self->bill_account . '/shipment';
-
-      use File::Util;
-      my $f = File::Util->new();
-      my $tmp_file = $self->tmp_file_dir . '/shipment_canada_post' . time();
-      $f->write_file( file => $tmp_file, bitmask => 0644, content => $xml_data );
-      my $username = $self->username;
-      my $password = $self->password;
-      my $response = `curl -s -w "%{http_code}" -H "Content-Type: application/vnd.cpc.shipment-v8+xml" -H "Accept: application/vnd.cpc.shipment-v8+xml" -u $username:$password -d \@$tmp_file $url`;
-      unlink $tmp_file;
-      $response =~ s/(\d\d\d)$//;
-      my $status = $1;
-      warn 'HTTP Status: ' . $status if $self->debug;
-      warn 'XML Response: ' . $response if $self->debug;
-
-      if ($status ne '200') {
-        $self->error( 'shipment request failed with message: ' . $self->_messages($response) );
-        return;
-      }
-
-      my $reader = $schema->compile(READER => '{http://www.canadapost.ca/ws/shipment-v8}shipment-info');
-      my $shipment = $reader->($response);
-
-      $shipment_id ||= $shipment->{'shipment-id'};
-      $cost += $shipment->{'shipment-price'}->{'due-amount'};
-      $etd ||= $shipment->{'shipment-price'}->{'service-standard'}->{'expected-transmit-time'} || $shipment->{'shipment-price'}->{'service-standard'}->{'expected-transit-time'};
-      my ($y, $m, $d) = split('-', $shipment->{'shipment-price'}->{'service-standard'}->{'expected-delivery-date'});
-      if ($y && $m && $d) {
-        $eta ||= { year => $y, month => $m, day => $d };
-      }
-
-      my $tracking_id = $shipment->{'tracking-pin'};
-      $self->get_package($package_index)->id( $shipment->{'shipment-id'} );
-      $self->get_package($package_index)->tracking_id( $tracking_id );
-      $self->get_package($package_index)->cost( Data::Currency->new($shipment->{'shipment-price'}->{'due-amount'}, 'CAD') );
-
-      my $label_url;
-      my $commercial_invoice_url;
-      my $label_data;
-      foreach my $link (@{$shipment->{'links'}->{'link'}}) {
-        if ($link->{'rel'} eq 'label') {
-          $label_url = $link->{'href'};
-        }
-        if ($link->{'rel'} eq 'commercialInvoice') {
-          $commercial_invoice_url = $link->{'href'};
-        }
-      }
-      if ($label_url) {
-        my $response = $ua->get( $label_url, 'Accept' => ($self->printer_type =~ /(thermal|zpl)/i ? 'application/zpl' : 'application/pdf'));
-
-        if (!$response->is_success) {
-          warn $response->status_line if $self->debug;
-          $self->error( 'label request failed with status: ' . $response->status_line );
-        }
-        else {
-
-          warn 'LABEL Response: ' . $response->content if $self->debug;
-          $label_data = $response->content;
-        }
-      }
-
-      if ($commercial_invoice_url) {
-        my $response = $ua->get( $commercial_invoice_url, 'Accept' => ($self->printer_type =~ /(thermal|zpl)/i ? 'application/zpl' : 'application/pdf'));
-
-        if (!$response->is_success) {
-          warn $response->status_line if $self->debug;
-          $self->error( 'commercial invoice request failed with status: ' . $response->status_line );
-        }
-        else {
-
-          warn 'COMMERCIAL INVOICE Response: ' . $response->content if $self->debug;
-          $label_data .= "\n\n" . $response->content;
-        }
-      }
-
-      if ($label_data) {
-        $self->get_package($package_index)->label(
-          Shipment::Label->new(
-            {
-              tracking_id => $tracking_id,
-              content_type => ($self->printer_type =~ /(thermal|zpl)/i ? 'text/canadapost-zpl' : 'application/pdf'),
-              data => $label_data,
-              file_name => $shipment->{'tracking-pin'} . '.' . ($self->printer_type =~ /(thermal|zpl)/i ? 'zpl' : 'pdf'),
-            },
-         )
+        $self->tracking_id($shipment_id);
+        $self->service(
+            Shipment::Service->new(
+                id   => $service_id,
+                name => $self->services->{$service_id}->name,
+                cost => Data::Currency->new($cost, 'CAD'),
+                etd  => $etd,
+                eta  => $eta,
+            )
         );
-      }
-      $package_index++;
-      
+
+    }
+    else {
+        # from and to address required
+        $self->error("Both from and to address are required for shipping.");
     }
 
-    $self->tracking_id( $shipment_id );
-    $self->service( 
-       Shipment::Service->new( 
-        id    => $service_id,
-        name  => $self->services->{$service_id}->name,
-        cost  => Data::Currency->new($cost, 'CAD'),
-        etd   => $etd,
-        eta   => $eta,
-      )
-    );
-
-  }
-  else {
-    # from and to address required
-    $self->error( "Both from and to address are required for shipping." );
-  }
-
-  return;
+    return;
 
 }
-
 
 
 1;
@@ -706,7 +840,7 @@ Shipment::CanadaPost
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 SYNOPSIS
 

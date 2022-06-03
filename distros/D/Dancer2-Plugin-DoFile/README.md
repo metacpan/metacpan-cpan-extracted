@@ -108,8 +108,11 @@ A POST to the URI `path/to/file` will execute `path.do`, then
 
 ## Arguments to the executed files
 
-When a file is executed there will be a hashref called $args that contains a
-few important things:
+During execution of the file a hashref called $args is available that contains
+some important things.
+
+If the executed file returns a coderef, the coderef is executed with this same
+hashref as the only argument.
 
 - path (arrayref)
 
@@ -150,6 +153,19 @@ few important things:
 The result (returned value) of each file is checked; if something is returned
 DoFile will inspect the value to determine what to do next.
 
+### Coderef (anonymous sub)
+
+You can return a coderef; this will be cached within the plugin and the file
+will not be checked again, but the coderef will be executed each time that
+"file" is requested. Generally whether the file should be checked or not is
+left up to the application (e.g. `plackup -R ./ -r ...`).
+
+In the case a coderef is used, when the code is executed it is passed one
+argument, a hashref, which is the stash. This saves needing to import the stash
+from within the code of the file.
+
+The return of the coderef will be evaluated exactly as below.
+
 ### Internal Redirects
 
 If a hashref is returned it's checked for a `url` element but NO `done`
@@ -161,7 +177,7 @@ This is a method for internally redirecting. For example, returning:
     }
 
 Will cause DoFile to start over with the new URI `account/login`, without
-processing any more files from the old URI
+processing any more files from the old URI. The stash is preserved.
 
 ### Content
 
@@ -212,16 +228,10 @@ is to return one of the following:
 DoFile may however return pretty much whatever you want to handle in your final
 router code.
 
-# TO-DO
+# EXAMPLES
 
-## Cached, compiled, ready to go files
-
-An LRU evicted cache of compiled files to speed up commonly used pages.
-
-## Discovery of js assets to load in
-
-Testing for the presence of static and generated javascript files that are
-automatically included in the response for the browser to load in.
+As noted, what's returned from a DoFile can contain anything. That gives you
+the opportunity to do pretty much whatever you want with what's returned.
 
 # AUTHOR
 

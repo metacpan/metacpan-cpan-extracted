@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::ShippingDocumentPart;
-$Shipment::FedEx::WSDL::ShipTypes::ShippingDocumentPart::VERSION = '3.07';
+$Shipment::FedEx::WSDL::ShipTypes::ShippingDocumentPart::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,32 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %DocumentPartSequenceNumber_of :ATTR(:get<DocumentPartSequenceNumber>);
-my %Image_of :ATTR(:get<Image>);
+    my %DocumentPartSequenceNumber_of : ATTR(:get<DocumentPartSequenceNumber>);
+    my %Image_of : ATTR(:get<Image>);
 
-__PACKAGE__->_factory(
-    [ qw(        DocumentPartSequenceNumber
-        Image
+    __PACKAGE__->_factory(
+        [   qw(        DocumentPartSequenceNumber
+              Image
 
-    ) ],
-    {
-        'DocumentPartSequenceNumber' => \%DocumentPartSequenceNumber_of,
-        'Image' => \%Image_of,
-    },
-    {
-        'DocumentPartSequenceNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',
-        'Image' => 'SOAP::WSDL::XSD::Typelib::Builtin::base64Binary',
-    },
-    {
+            )
+        ],
+        {   'DocumentPartSequenceNumber' => \%DocumentPartSequenceNumber_of,
+            'Image'                      => \%Image_of,
+        },
+        {   'DocumentPartSequenceNumber' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::positiveInteger',
+            'Image' => 'SOAP::WSDL::XSD::Typelib::Builtin::base64Binary',
+        },
+        {
 
-        'DocumentPartSequenceNumber' => 'DocumentPartSequenceNumber',
-        'Image' => 'Image',
-    }
-);
+            'DocumentPartSequenceNumber' => 'DocumentPartSequenceNumber',
+            'Image'                      => 'Image',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +62,7 @@ Shipment::FedEx::WSDL::ShipTypes::ShippingDocumentPart
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

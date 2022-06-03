@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::RateTypes::HazardousCommodityQuantityDetail;
-$Shipment::FedEx::WSDL::RateTypes::HazardousCommodityQuantityDetail::VERSION = '3.07';
+$Shipment::FedEx::WSDL::RateTypes::HazardousCommodityQuantityDetail::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/rate/v9' };
+sub get_xmlns {'http://fedex.com/ws/rate/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,37 +20,31 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Amount_of :ATTR(:get<Amount>);
-my %Units_of :ATTR(:get<Units>);
+    my %Amount_of : ATTR(:get<Amount>);
+    my %Units_of : ATTR(:get<Units>);
 
-__PACKAGE__->_factory(
-    [ qw(        Amount
-        Units
+    __PACKAGE__->_factory(
+        [   qw(        Amount
+              Units
 
-    ) ],
-    {
-        'Amount' => \%Amount_of,
-        'Units' => \%Units_of,
-    },
-    {
-        'Amount' => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
-        'Units' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'Amount' => \%Amount_of,
+            'Units'  => \%Units_of,
+        },
+        {   'Amount' => 'SOAP::WSDL::XSD::Typelib::Builtin::decimal',
+            'Units'  => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'Amount' => 'Amount',
-        'Units' => 'Units',
-    }
-);
+            'Amount' => 'Amount',
+            'Units'  => 'Units',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -67,7 +61,7 @@ Shipment::FedEx::WSDL::RateTypes::HazardousCommodityQuantityDetail
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

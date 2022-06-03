@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::ShipTypes::DeleteTagRequest;
-$Shipment::FedEx::WSDL::ShipTypes::DeleteTagRequest::VERSION = '3.07';
+$Shipment::FedEx::WSDL::ShipTypes::DeleteTagRequest::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/ship/v9' };
+sub get_xmlns {'http://fedex.com/ws/ship/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,67 +20,65 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %WebAuthenticationDetail_of :ATTR(:get<WebAuthenticationDetail>);
-my %ClientDetail_of :ATTR(:get<ClientDetail>);
-my %TransactionDetail_of :ATTR(:get<TransactionDetail>);
-my %Version_of :ATTR(:get<Version>);
-my %DispatchLocationId_of :ATTR(:get<DispatchLocationId>);
-my %DispatchDate_of :ATTR(:get<DispatchDate>);
-my %Payment_of :ATTR(:get<Payment>);
-my %ConfirmationNumber_of :ATTR(:get<ConfirmationNumber>);
+    my %WebAuthenticationDetail_of : ATTR(:get<WebAuthenticationDetail>);
+    my %ClientDetail_of : ATTR(:get<ClientDetail>);
+    my %TransactionDetail_of : ATTR(:get<TransactionDetail>);
+    my %Version_of : ATTR(:get<Version>);
+    my %DispatchLocationId_of : ATTR(:get<DispatchLocationId>);
+    my %DispatchDate_of : ATTR(:get<DispatchDate>);
+    my %Payment_of : ATTR(:get<Payment>);
+    my %ConfirmationNumber_of : ATTR(:get<ConfirmationNumber>);
 
-__PACKAGE__->_factory(
-    [ qw(        WebAuthenticationDetail
-        ClientDetail
-        TransactionDetail
-        Version
-        DispatchLocationId
-        DispatchDate
-        Payment
-        ConfirmationNumber
+    __PACKAGE__->_factory(
+        [   qw(        WebAuthenticationDetail
+              ClientDetail
+              TransactionDetail
+              Version
+              DispatchLocationId
+              DispatchDate
+              Payment
+              ConfirmationNumber
 
-    ) ],
-    {
-        'WebAuthenticationDetail' => \%WebAuthenticationDetail_of,
-        'ClientDetail' => \%ClientDetail_of,
-        'TransactionDetail' => \%TransactionDetail_of,
-        'Version' => \%Version_of,
-        'DispatchLocationId' => \%DispatchLocationId_of,
-        'DispatchDate' => \%DispatchDate_of,
-        'Payment' => \%Payment_of,
-        'ConfirmationNumber' => \%ConfirmationNumber_of,
-    },
-    {
-        'WebAuthenticationDetail' => 'Shipment::FedEx::WSDL::ShipTypes::WebAuthenticationDetail',
-        'ClientDetail' => 'Shipment::FedEx::WSDL::ShipTypes::ClientDetail',
-        'TransactionDetail' => 'Shipment::FedEx::WSDL::ShipTypes::TransactionDetail',
-        'Version' => 'Shipment::FedEx::WSDL::ShipTypes::VersionId',
-        'DispatchLocationId' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'DispatchDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
-        'Payment' => 'Shipment::FedEx::WSDL::ShipTypes::Payment',
-        'ConfirmationNumber' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'WebAuthenticationDetail' => \%WebAuthenticationDetail_of,
+            'ClientDetail'            => \%ClientDetail_of,
+            'TransactionDetail'       => \%TransactionDetail_of,
+            'Version'                 => \%Version_of,
+            'DispatchLocationId'      => \%DispatchLocationId_of,
+            'DispatchDate'            => \%DispatchDate_of,
+            'Payment'                 => \%Payment_of,
+            'ConfirmationNumber'      => \%ConfirmationNumber_of,
+        },
+        {   'WebAuthenticationDetail' =>
+              'Shipment::FedEx::WSDL::ShipTypes::WebAuthenticationDetail',
+            'ClientDetail' => 'Shipment::FedEx::WSDL::ShipTypes::ClientDetail',
+            'TransactionDetail' =>
+              'Shipment::FedEx::WSDL::ShipTypes::TransactionDetail',
+            'Version' => 'Shipment::FedEx::WSDL::ShipTypes::VersionId',
+            'DispatchLocationId' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'DispatchDate' => 'SOAP::WSDL::XSD::Typelib::Builtin::date',
+            'Payment'      => 'Shipment::FedEx::WSDL::ShipTypes::Payment',
+            'ConfirmationNumber' =>
+              'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'WebAuthenticationDetail' => 'WebAuthenticationDetail',
-        'ClientDetail' => 'ClientDetail',
-        'TransactionDetail' => 'TransactionDetail',
-        'Version' => 'Version',
-        'DispatchLocationId' => 'DispatchLocationId',
-        'DispatchDate' => 'DispatchDate',
-        'Payment' => 'Payment',
-        'ConfirmationNumber' => 'ConfirmationNumber',
-    }
-);
+            'WebAuthenticationDetail' => 'WebAuthenticationDetail',
+            'ClientDetail'            => 'ClientDetail',
+            'TransactionDetail'       => 'TransactionDetail',
+            'Version'                 => 'Version',
+            'DispatchLocationId'      => 'DispatchLocationId',
+            'DispatchDate'            => 'DispatchDate',
+            'Payment'                 => 'Payment',
+            'ConfirmationNumber'      => 'ConfirmationNumber',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -97,7 +95,7 @@ Shipment::FedEx::WSDL::ShipTypes::DeleteTagRequest
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

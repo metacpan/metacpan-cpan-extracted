@@ -1,12 +1,12 @@
 package Shipment::FedEx::WSDL::TrackTypes::AppointmentTimeDetail;
-$Shipment::FedEx::WSDL::TrackTypes::AppointmentTimeDetail::VERSION = '3.07';
+$Shipment::FedEx::WSDL::TrackTypes::AppointmentTimeDetail::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://fedex.com/ws/track/v9' };
+sub get_xmlns {'http://fedex.com/ws/track/v9'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,42 +20,37 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Type_of :ATTR(:get<Type>);
-my %Window_of :ATTR(:get<Window>);
-my %Description_of :ATTR(:get<Description>);
+    my %Type_of : ATTR(:get<Type>);
+    my %Window_of : ATTR(:get<Window>);
+    my %Description_of : ATTR(:get<Description>);
 
-__PACKAGE__->_factory(
-    [ qw(        Type
-        Window
-        Description
+    __PACKAGE__->_factory(
+        [   qw(        Type
+              Window
+              Description
 
-    ) ],
-    {
-        'Type' => \%Type_of,
-        'Window' => \%Window_of,
-        'Description' => \%Description_of,
-    },
-    {
-        'Type' => 'Shipment::FedEx::WSDL::TrackTypes::AppointmentWindowType',
-        'Window' => 'Shipment::FedEx::WSDL::TrackTypes::LocalTimeRange',
-        'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'Type'        => \%Type_of,
+            'Window'      => \%Window_of,
+            'Description' => \%Description_of,
+        },
+        {   'Type' =>
+              'Shipment::FedEx::WSDL::TrackTypes::AppointmentWindowType',
+            'Window' => 'Shipment::FedEx::WSDL::TrackTypes::LocalTimeRange',
+            'Description' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'Type' => 'Type',
-        'Window' => 'Window',
-        'Description' => 'Description',
-    }
-);
+            'Type'        => 'Type',
+            'Window'      => 'Window',
+            'Description' => 'Description',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -72,7 +67,7 @@ Shipment::FedEx::WSDL::TrackTypes::AppointmentTimeDetail
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

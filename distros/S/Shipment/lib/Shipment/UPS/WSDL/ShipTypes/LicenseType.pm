@@ -1,12 +1,12 @@
 package Shipment::UPS::WSDL::ShipTypes::LicenseType;
-$Shipment::UPS::WSDL::ShipTypes::LicenseType::VERSION = '3.07';
+$Shipment::UPS::WSDL::ShipTypes::LicenseType::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://www.ups.com/XMLSchema/XOLTWS/IF/v1.0' };
+sub get_xmlns {'http://www.ups.com/XMLSchema/XOLTWS/IF/v1.0'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,42 +20,36 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %Number_of :ATTR(:get<Number>);
-my %Date_of :ATTR(:get<Date>);
-my %ExceptionCode_of :ATTR(:get<ExceptionCode>);
+    my %Number_of : ATTR(:get<Number>);
+    my %Date_of : ATTR(:get<Date>);
+    my %ExceptionCode_of : ATTR(:get<ExceptionCode>);
 
-__PACKAGE__->_factory(
-    [ qw(        Number
-        Date
-        ExceptionCode
+    __PACKAGE__->_factory(
+        [   qw(        Number
+              Date
+              ExceptionCode
 
-    ) ],
-    {
-        'Number' => \%Number_of,
-        'Date' => \%Date_of,
-        'ExceptionCode' => \%ExceptionCode_of,
-    },
-    {
-        'Number' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'Date' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-        'ExceptionCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
-    },
-    {
+            )
+        ],
+        {   'Number'        => \%Number_of,
+            'Date'          => \%Date_of,
+            'ExceptionCode' => \%ExceptionCode_of,
+        },
+        {   'Number'        => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'Date'          => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+            'ExceptionCode' => 'SOAP::WSDL::XSD::Typelib::Builtin::string',
+        },
+        {
 
-        'Number' => 'Number',
-        'Date' => 'Date',
-        'ExceptionCode' => 'ExceptionCode',
-    }
-);
+            'Number'        => 'Number',
+            'Date'          => 'Date',
+            'ExceptionCode' => 'ExceptionCode',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -72,7 +66,7 @@ Shipment::UPS::WSDL::ShipTypes::LicenseType
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 

@@ -1,12 +1,12 @@
 package Shipment::Purolator::WSDLV2::Types::ArrayOfServiceRule;
-$Shipment::Purolator::WSDLV2::Types::ArrayOfServiceRule::VERSION = '3.07';
+$Shipment::Purolator::WSDLV2::Types::ArrayOfServiceRule::VERSION = '3.08';
 use strict;
 use warnings;
 
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'http://purolator.com/pws/datatypes/v2' };
+sub get_xmlns {'http://purolator.com/pws/datatypes/v2'}
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -20,32 +20,24 @@ use base qw(SOAP::WSDL::XSD::Typelib::ComplexType);
 
 Class::Std::initialize();
 
-{ # BLOCK to scope variables
+{    # BLOCK to scope variables
 
-my %ServiceRule_of :ATTR(:get<ServiceRule>);
+    my %ServiceRule_of : ATTR(:get<ServiceRule>);
 
-__PACKAGE__->_factory(
-    [ qw(        ServiceRule
+    __PACKAGE__->_factory(
+        [   qw(        ServiceRule
 
-    ) ],
-    {
-        'ServiceRule' => \%ServiceRule_of,
-    },
-    {
-        'ServiceRule' => 'Shipment::Purolator::WSDLV2::Types::ServiceRule',
-    },
-    {
+            )
+        ],
+        {'ServiceRule' => \%ServiceRule_of,},
+        {'ServiceRule' => 'Shipment::Purolator::WSDLV2::Types::ServiceRule',},
+        {
 
-        'ServiceRule' => 'ServiceRule',
-    }
-);
+            'ServiceRule' => 'ServiceRule',
+        }
+    );
 
-} # end BLOCK
-
-
-
-
-
+}    # end BLOCK
 
 
 1;
@@ -62,7 +54,7 @@ Shipment::Purolator::WSDLV2::Types::ArrayOfServiceRule
 
 =head1 VERSION
 
-version 3.07
+version 3.08
 
 =head1 DESCRIPTION
 
