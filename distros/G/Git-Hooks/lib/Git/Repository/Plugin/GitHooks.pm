@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Repository::Plugin::GitHooks;
 # ABSTRACT: A Git::Repository plugin with some goodies for hook developers
-$Git::Repository::Plugin::GitHooks::VERSION = '3.2.1';
+$Git::Repository::Plugin::GitHooks::VERSION = '3.2.2';
 use parent qw/Git::Repository::Plugin/;
 
 use v5.16.0;
@@ -1248,9 +1248,10 @@ sub repository_name {
         if (my $gerrit_args = $git->{_plugin_githooks}{gerrit_args}) {
             # Gerrit
              $git->{_plugin_githooks}{repository_name} = $gerrit_args->{'--project'};
-        } elsif (exists $ENV{STASH_REPO_NAME}) {
-            # Bitbucket
-            $git->{_plugin_githooks}{repository_name} = "$ENV{STASH_PROJECT_KEY}/$ENV{STASH_REPO_NAME}";
+        } elsif (exists $ENV{BB_REPO_SLUG}) {
+            # Bitbucket Server environment variables available for hooks:
+            # https://developer.atlassian.com/server/bitbucket/how-tos/write-hook-scripts/
+            $git->{_plugin_githooks}{repository_name} = "$ENV{BB_PROJECT_KEY}/$ENV{BB_REPO_SLUG}";
         } else {
             # As a last resort, return GIT_DIR's basename
             my $gitdir = path($git->git_dir());
@@ -1267,7 +1268,7 @@ sub repository_name {
 
 sub get_current_branch {
     my ($git) = @_;
-    my $branch = $git->run({fatal => [-129, -128]}, qw/symbolic-ref HEAD/);
+    my $branch = $git->run({fatal => [-129, -128], quiet => 1}, qw/symbolic-ref HEAD/);
 
     # Return undef if we're in detached head state
     return $? == 0 ? $branch : undef;
@@ -1282,7 +1283,7 @@ sub get_sha1 {
 sub get_head_or_empty_tree {
     my ($git) = @_;
 
-    my $head = $git->run({fatal => [-129, -128]}, qw/rev-parse --verify HEAD/);
+    my $head = $git->run({fatal => [-129, -128], quiet => 1}, qw/rev-parse --verify HEAD/);
 
     # Return the empty tree object if in the initial commit
     return $? == 0 ? $head : $git->empty_tree;
@@ -1558,7 +1559,7 @@ Git::Repository::Plugin::GitHooks - A Git::Repository plugin with some goodies f
 
 =head1 VERSION
 
-version 3.2.1
+version 3.2.2
 
 =head1 SYNOPSIS
 

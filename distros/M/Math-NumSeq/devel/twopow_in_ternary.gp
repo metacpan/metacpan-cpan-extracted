@@ -1,4 +1,4 @@
-\\ Copyright 2015, 2018 Kevin Ryde
+\\ Copyright 2015, 2018, 2020 Kevin Ryde
 \\
 \\ This file is part of Math-NumSeq.
 \\
@@ -15,6 +15,9 @@
 \\ You should have received a copy of the GNU General Public License along
 \\ with Math-NumSeq.  If not, see <http://www.gnu.org/licenses/>.
 
+
+default(recover,0);
+default(strictargs,1);
 
 \\ A260683 number of 2s in ternary of 2^n
 \\ A265157 number of 2s in ternary of 2^n-1

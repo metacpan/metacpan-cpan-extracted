@@ -1,4 +1,4 @@
-# Copyright (c) 2013-2019 by Martin Becker.  This package is free software,
+# Copyright (c) 2013-2022 by Martin Becker.  This package is free software,
 # licensed under The Artistic License 2.0 (GPL compatible).
 
 package Math::Polynomial::ModInt;
@@ -28,7 +28,7 @@ BEGIN {
     require Exporter;
     our @ISA       = qw(Math::Polynomial Exporter);
     our @EXPORT_OK = qw(modpoly);
-    our $VERSION   = '0.004';
+    our $VERSION   = '0.005';
     our @CARP_NOT  = qw(Math::ModInt::Event::Trap Math::Polynomial);
 }
 
@@ -49,13 +49,18 @@ $ipol->string_config($lifted_string_config);
 # ----- private subroutines -----
 
 # event catcher
-sub _bad_modulus {
+sub _nonprime_modulus {
     croak 'modulus not prime';
 }
 
 # event catcher
 sub _no_inverse {
     croak 'undefined inverse';
+}
+
+# constructor diagnostic
+sub _modulus_too_small {
+    croak 'modulus must be greater than one';
 }
 
 # wrapper for modular inverse to bail out early if not in a field
@@ -71,7 +76,7 @@ sub _inverse {
 # Supplied vectors may be modified.
 sub _linearly_dependent {
     my ($it) = @_;
-    my $trap = UndefinedResult->trap(\&_bad_modulus);
+    my $trap = UndefinedResult->trap(\&_nonprime_modulus);
     my @ech = ();
     while (defined(my $vec = $it->())) {
         my $ex = 0;
@@ -124,7 +129,10 @@ sub new {
         croak 'insufficient arguments';
     }
     if (grep {$_->is_undefined} @_) {
-        _bad_modulus();
+        _nonprime_modulus();
+    }
+    if (grep {$_->modulus <= 1} @_) {
+        _modulus_too_small();
     }
     return $this->SUPER::new(@_);
 }
@@ -183,6 +191,7 @@ sub from_index {
     my ($this, $index, $modulus) = @_;
     my $zero;
     if (defined $modulus) {
+        $modulus > 1 || _modulus_too_small();
         $zero = Math::ModInt::mod(0, $modulus);
     }
     elsif (ref $this) {
@@ -312,7 +321,7 @@ Math::Polynomial::ModInt - univariate polynomials over modular integers
 
 =head1 VERSION
 
-This documentation refers to version 0.004 of Math::Polynomial::ModInt.
+This documentation refers to version 0.005 of Math::Polynomial::ModInt.
 
 =head1 SYNOPSIS
 
@@ -504,8 +513,8 @@ only.  Note, however, that primality of the modulus is not explicitly
 checked, as this can be done beforehand once and would unnecessarily
 slow down operations on several polynomials with the same modulus.
 As currently implemented, the method may either return a meaningless
-result or throw a 'modulus is not prime' exception when called with such
-a modulus.
+result or throw a 'modulus is not prime' exception when called with a
+non-prime modulus.
 
 =back
 
@@ -565,6 +574,13 @@ A method only defined for prime moduli, like I<is_irreducible>, has been
 called inappropriately.  Note that this is not always detected and the
 result might be just wrong in such cases.
 
+=item C<modulus must be greater than one>
+
+A constructor was called with an inappropriate modulus of zero or one.
+Polynomials indexing uses the modulus as the base of a numeral system
+with coefficients acting as digits.  This is implemented and actually
+useful for bases greater than one only.
+
 =item C<undefined inverse>
 
 A method needing the multiplicative inverse of a coefficient, like
@@ -621,8 +637,8 @@ pure perl only.  An XS version may be added eventually, but not in the
 near future.
 
 Bug reports and more suggestions are always welcome
-E<8212> please submit them through the CPAN RT,
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Polynomial-ModInt>.
+E<8212> please submit them through the github issue tracker,
+L<https://github.com/mhasch/perl-Math-Polynomial-ModInt/issues>.
 
 =head1 SEE ALSO
 
@@ -642,7 +658,7 @@ L<Math::ModInt>
 
 =item *
 
-Math::GaloisField (soon to be published)
+Math::GaloisField (sooner or later to be published)
 
 =back
 
@@ -656,7 +672,7 @@ Contributions to this library are welcome (see the CONTRIBUTING file).
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2013-2019 by Martin Becker, Blaubeuren.
+Copyright (c) 2013-2022 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).

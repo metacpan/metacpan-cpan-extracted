@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012 Kevin Ryde
+# Copyright 2012, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -39,7 +39,7 @@ sub numeq_array {
   if (! ref $a1 || ! ref $a2) {
     return 0;
   }
-  my $i = 0; 
+  my $i = 0;
   while ($i < @$a1 && $i < @$a2) {
     if ($a1->[$i] ne $a2->[$i]) {
       return 0;

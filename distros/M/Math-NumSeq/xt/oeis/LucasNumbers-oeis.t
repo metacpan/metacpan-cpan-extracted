@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2014, 2019 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -20,7 +20,7 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 1;
+plan tests => 3;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -32,6 +32,34 @@ use Math::NumSeq::LucasNumbers;
 # uncomment this to run the ### lines
 #use Smart::Comments '###';
 
+
+#------------------------------------------------------------------------------
+# A005248 - Lucas(2n)
+
+MyOEIS::compare_values
+  (anum => 'A005248',
+   func => sub {
+     my ($count) = @_;
+     my $seq  = Math::NumSeq::LucasNumbers->new;
+     my @got;
+     for (my $i = 0; @got < $count; $i+=2) {
+       push @got, $seq->ith($i);
+     }
+     return \@got;
+   });
+
+# A002878 - Lucas(2n+1)
+MyOEIS::compare_values
+  (anum => 'A002878',
+   func => sub {
+     my ($count) = @_;
+     my $seq  = Math::NumSeq::LucasNumbers->new;
+     my @got;
+     for (my $i = 1; @got < $count; $i+=2) {
+       push @got, $seq->ith($i);
+     }
+     return \@got;
+   });
 
 #------------------------------------------------------------------------------
 # A061084 - Lucas numbers negative indices L[-n] starting L[1] then downwards

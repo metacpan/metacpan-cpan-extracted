@@ -22,13 +22,13 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 74;
+$VERSION = 75;
 use Math::NumSeq::OEIS::Catalogue::Plugin;
 @ISA = ('Math::NumSeq::OEIS::Catalogue::Plugin');
 
 ## no critic (CodeLayout::RequireTrailingCommaAtNewline)
 
-# total 930 A-numbers in 117 modules
+# total 947 A-numbers in 117 modules
 
 use constant info_arrayref =>
 [
@@ -3313,6 +3313,16 @@ use constant info_arrayref =>
     ]
   },
   {
+    'anum' => 'A033581',
+    'class' => 'Math::NumSeq::Polygonal',
+    'parameters' => [
+      'polygonal',
+      14,
+      'pairs',
+      'average'
+    ]
+  },
+  {
     'anum' => 'A277082',
     'class' => 'Math::NumSeq::Polygonal',
     'parameters' => [
@@ -3429,6 +3439,46 @@ use constant info_arrayref =>
     ]
   },
   {
+    'anum' => 'A255184',
+    'class' => 'Math::NumSeq::Polygonal',
+    'parameters' => [
+      'polygonal',
+      25
+    ]
+  },
+  {
+    'anum' => 'A255185',
+    'class' => 'Math::NumSeq::Polygonal',
+    'parameters' => [
+      'polygonal',
+      26
+    ]
+  },
+  {
+    'anum' => 'A255186',
+    'class' => 'Math::NumSeq::Polygonal',
+    'parameters' => [
+      'polygonal',
+      27
+    ]
+  },
+  {
+    'anum' => 'A255187',
+    'class' => 'Math::NumSeq::Polygonal',
+    'parameters' => [
+      'polygonal',
+      29
+    ]
+  },
+  {
+    'anum' => 'A254474',
+    'class' => 'Math::NumSeq::Polygonal',
+    'parameters' => [
+      'polygonal',
+      30
+    ]
+  },
+  {
     'anum' => 'A195028',
     'class' => 'Math::NumSeq::Polygonal',
     'parameters' => [
@@ -3439,11 +3489,11 @@ use constant info_arrayref =>
     ]
   },
   {
-    'anum' => 'A033581',
+    'anum' => 'A144555',
     'class' => 'Math::NumSeq::Polygonal',
     'parameters' => [
       'polygonal',
-      14,
+      30,
       'pairs',
       'average'
     ]
@@ -3519,16 +3569,6 @@ use constant info_arrayref =>
     ]
   },
   {
-    'anum' => 'A144555',
-    'class' => 'Math::NumSeq::Polygonal',
-    'parameters' => [
-      'polygonal',
-      30,
-      'pairs',
-      'average'
-    ]
-  },
-  {
     'anum' => 'A064761',
     'class' => 'Math::NumSeq::Polygonal',
     'parameters' => [
@@ -3539,6 +3579,22 @@ use constant info_arrayref =>
     ]
   },
   {
+    'anum' => 'A098923',
+    'class' => 'Math::NumSeq::Polygonal',
+    'parameters' => [
+      'polygonal',
+      33
+    ]
+  },
+  {
+    'anum' => 'A282854',
+    'class' => 'Math::NumSeq::Polygonal',
+    'parameters' => [
+      'polygonal',
+      34
+    ]
+  },
+  {
     'anum' => 'A016802',
     'class' => 'Math::NumSeq::Polygonal',
     'parameters' => [
@@ -3546,6 +3602,86 @@ use constant info_arrayref =>
       34,
       'pairs',
       'average'
+    ]
+  },
+  {
+    'anum' => 'A282851',
+    'class' => 'Math::NumSeq::Polygonal',
+    'parameters' => [
+      'polygonal',
+      35
+    ]
+  },
+  {
+    'anum' => 'A282853',
+    'class' => 'Math::NumSeq::Polygonal',
+    'parameters' => [
+      'polygonal',
+      36
+    ]
+  },
+  {
+    'anum' => 'A282852',
+    'class' => 'Math::NumSeq::Polygonal',
+    'parameters' => [
+      'polygonal',
+      37
+    ]
+  },
+  {
+    'anum' => 'A282850',
+    'class' => 'Math::NumSeq::Polygonal',
+    'parameters' => [
+      'polygonal',
+      38
+    ]
+  },
+  {
+    'anum' => 'A261191',
+    'class' => 'Math::NumSeq::Polygonal',
+    'parameters' => [
+      'polygonal',
+      40
+    ]
+  },
+  {
+    'anum' => 'A261343',
+    'class' => 'Math::NumSeq::Polygonal',
+    'parameters' => [
+      'polygonal',
+      50
+    ]
+  },
+  {
+    'anum' => 'A249911',
+    'class' => 'Math::NumSeq::Polygonal',
+    'parameters' => [
+      'polygonal',
+      60
+    ]
+  },
+  {
+    'anum' => 'A098140',
+    'class' => 'Math::NumSeq::Polygonal',
+    'parameters' => [
+      'polygonal',
+      63
+    ]
+  },
+  {
+    'anum' => 'A098230',
+    'class' => 'Math::NumSeq::Polygonal',
+    'parameters' => [
+      'polygonal',
+      75
+    ]
+  },
+  {
+    'anum' => 'A261276',
+    'class' => 'Math::NumSeq::Polygonal',
+    'parameters' => [
+      'polygonal',
+      100
     ]
   },
   {

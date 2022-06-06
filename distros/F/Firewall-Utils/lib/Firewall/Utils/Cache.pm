@@ -1,9 +1,11 @@
 package Firewall::Utils::Cache;
 
+#------------------------------------------------------------------------------
+# 加载扩展模块
+#------------------------------------------------------------------------------
 use Carp;
 use Moose;
 use namespace::autoclean;
-use Mojo::Util qw(dumper);
 
 has cache => (
   is      => 'ro',

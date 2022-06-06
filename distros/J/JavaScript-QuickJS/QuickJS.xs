@@ -822,7 +822,34 @@ eval (SV* self_sv, SV* js_code_sv)
 
         JSValue jsret = JS_Eval(ctx, js_code, js_code_len, "", eval_flags);
 
+        // In eval_module()’s case we want to croak if there was
+        // an exception. If not we’ll just discard the return value
         RETVAL = _return_jsvalue_or_croak(aTHX_ ctx, jsret);
+
+        if (ix) {
+
+            // The only thing a JS module should return is null.
+            // If that’s ever not the case, warn:
+            if ( UNLIKELY(RETVAL != &PL_sv_undef) ) {
+                warn("UNEXPECTED: Discarding non-null return from ES module: %" SVf, RETVAL);
+                SvREFCNT_dec(RETVAL);
+            }
+
+            RETVAL = SvREFCNT_inc(self_sv);
+        }
+
+    OUTPUT:
+        RETVAL
+
+SV*
+await (SV* self_sv)
+    CODE:
+        perl_qjs_s* pqjs = exs_structref_ptr(self_sv);
+        JSContext *ctx = pqjs->ctx;
+
+        js_std_loop(ctx);
+
+        RETVAL = SvREFCNT_inc(self_sv);
 
     OUTPUT:
         RETVAL

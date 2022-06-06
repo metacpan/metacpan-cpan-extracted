@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -44,38 +44,43 @@ use Math::NumSeq::LeastPrimitiveRoot;
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
+my @exclude_list =
+  (
+   # 'A137992',  # partial sums Catalans, mod 3, hit by PythagoreanTree
+   # 'A133879',  # n mod 9 repeated 9 times, hit by PythagoreanTree
+  );
 
 sub want_module {
   my ($module) = @_;
   # return 0 unless $module =~ /Collatz/;
   # return 0 unless $module =~ /DigitExtract/;
-  # return 0 unless $module =~ /PlanePathN/;
-   return 0 unless $module =~ /PlanePathTurn/;
+  return 0 unless $module =~ /PlanePath/;
+  # return 0 unless $module =~ /PlanePathTurn/;
   # return 0 unless $module =~ /HafermanCarpet/;
   # return 0 unless $module =~ /Aronson/;
+  # return 0 unless $module =~ /SevenSegments/;
 
   return 0 if (Module::Util::find_installed($module) // 'none') =~ /devel/;
   return 1;
 }
 sub want_planepath {
   my ($planepath) = @_;
-  # return 0 unless $planepath =~ /Knight/;
+  # return 0 unless $planepath =~ /Pythagorean/;
   # return 0 unless $planepath =~ /CCurve/;
   # return 0 unless $planepath =~ /Divis|DiagonalRationals|CoprimeCol/;
-  # return 0 unless $planepath =~ /LCornerTree/;
-  # return 0 unless $planepath =~ /LCorn|RationalsTree/;
   # return 0 unless $planepath =~ /FactorRationals/;
-  # return 0 unless $planepath =~ /SierpinskiCurve/;
   # return 0 unless $planepath =~ /TriangleSpiralSkewed/;
   # return 0 unless $planepath =~ /Pythagorean/;
   # return 0 unless $planepath =~ /UlamWarburtonQuarter/;
-  # return 0 unless $planepath =~ /HTree/;
-  # return 0 unless $planepath =~ /CoprimeColumns/;
+  # return 0 unless $planepath =~ /ToothpickSpiral/;
   # return 0 unless $planepath =~ /Gray/;
   # return 0 unless $planepath =~ /SierpinskiArrowhead/;
   # return 0 unless $planepath =~ /R5DragonCurve/;
   # return 0 unless $planepath =~ /AlternateTerdragon/;
-  return 0 unless $planepath =~ /Koch/;
+  # return 0 unless $planepath =~ /QuintetReplicate/;
+  # return 0 unless $planepath =~ /TriangleSpiralSk/;
+  # return 0 unless $planepath eq 'HilbertSides';
+  return 0 unless $planepath =~ /HexSpiralSkewed/;
 
   return 0 if $planepath =~ /SquaRecurve/; # exclude
   return 0 if $planepath =~ /Cellular/; # exclude
@@ -91,10 +96,10 @@ sub want_coordinate {
   # return 0 unless $type =~ /MinAbsTri|MaxAbsTri/;
   # return 0 unless $type =~ /NumSiblings/;
   # return 0 unless $type =~ /SubHeight|NumChildren|NumSibling/;
-  # return 0 unless $type =~ m{Turn};
   # return 0 unless $type =~ m{DiffXY/2};
   # return 0 if $type =~ /SubHeight|NumChildren|NumSibling/;
   # return 0 unless $type =~ /NotStraight/;
+  # return 0 unless $type =~ /[XY]/;
   return 1;
 }
 
@@ -353,8 +358,11 @@ sub special_values {
       my $name = "$module $params";
       Math::OEIS::Grep->search(array => $values_aref,
                                name => $name,
+                               verbose => 0,
                                values_min => $seq->values_min,
-                               values_max => $seq->values_max,);
+                               values_max => $seq->values_max,
+                               exclude_list => \@exclude_list,
+                              );
     }
   }
 }

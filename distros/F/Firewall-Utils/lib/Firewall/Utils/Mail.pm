@@ -1,5 +1,8 @@
 package Firewall::Utils::Mail;
 
+#------------------------------------------------------------------------------
+# 加载扩展模块
+#------------------------------------------------------------------------------
 use Carp;
 use Moose;
 use namespace::autoclean;
@@ -61,11 +64,13 @@ sub sendmail {
   confess "ERROR: 缺少目标地址" if not defined $param{to};
 
 =lala
-    #base64编码有长度限制，在一对解码标识符之间的字符串允许长度约为170，所以需要把标题分段插入解码标识。
-    #此分段依赖于base64编码的编码后每76个字符加一个回车的特性。
-    if ( defined $param{subject} ) {
-        $param{subject} =~s/(\s{1})/?=$1=?gb2312?b?/g;
-    }
+
+  #base64编码有长度限制，在一对解码标识符之间的字符串允许长度约为170，所以需要把标题分段插入解码标识。
+  #此分段依赖于base64编码的编码后每76个字符加一个回车的特性。
+  if ( defined $param{subject} ) {
+      $param{subject} =~s/(\s{1})/?=$1=?gb2312?b?/g;
+  }
+
 =cut
 
   #处理收件人中的重复项
@@ -74,15 +79,15 @@ sub sendmail {
   eval {
     my $sender = Mail::Sender->new;
     {
-      #smtp => 'mailgw2.paic.com.cn',
+      # smtp => 'mail.baidu.com',
       smtp => $param{smtp} // $self->smtp,
 
-      #from => 'easyagentmonitor@pingan.com.cn', #from => 'liyuan023@pingan.com.cn',
+      # from => 'monitor@baidu.com.cn', # from => 'monitor@baidu.com.cn',
       from => $param{from} // $self->from,
       to   => $param{to},
       cc   => $param{cc},
 
-      #bcc => 'dengkuangda745@pingan.com.cn',
+      # bcc => 'monitor@baidu.com.cn',
       on_errors => 'die',
     };
     $sender->Open( {
@@ -91,12 +96,12 @@ sub sendmail {
       encoding => $param{encoding} // "quoted-printable"
     } );
 
-    #for (@body) { $sender->SendEnc($_) };
+    # for (@body) { $sender->SendEnc($_) };
     $sender->SendEnc( $param{msg} );
     $sender->Close();
   };
 
-  if ($@) {
+  if (!!$@) {
     $@ =~ s/\s+$//;
     confess($@);
   }

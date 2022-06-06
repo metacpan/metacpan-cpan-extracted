@@ -1,11 +1,13 @@
 package Firewall::FireFlow::Config::Fortinet;
 
+#------------------------------------------------------------------------------
+# 加载扩展模块
+#------------------------------------------------------------------------------
 use Moose;
 use Carp;
 use Expect;
 use Try::Tiny;
 use namespace::autoclean;
-use Mojo::Util qw(dumper);
 
 has host => (
   is       => 'ro',

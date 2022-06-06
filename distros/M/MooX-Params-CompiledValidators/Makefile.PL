@@ -16,6 +16,7 @@ WriteMakefile(
         'Params::ValidationCompiler' => '0.27',
         'Sub::Util'                  => '1.50',
         'Types::Standard'            => '1.008',
+        'Regexp::Util'               => '0.005',
         'namespace::autoclean'       => '0.28',
     },
 
@@ -25,7 +26,7 @@ WriteMakefile(
 
     BUILD_REQUIRES => {
         'Test::Fatal'      => '0.01',
-        'Test::More'       => '0.88',    # done_testing()
+        'Test::Simple'     => '0.88',    # done_testing()
         'Test::Warnings'   => '0.028',
     },
 

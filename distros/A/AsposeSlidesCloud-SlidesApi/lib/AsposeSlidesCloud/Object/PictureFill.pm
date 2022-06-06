@@ -38,6 +38,7 @@ use Date::Parse;
 use DateTime;
 
 use AsposeSlidesCloud::Object::FillFormat;
+use AsposeSlidesCloud::Object::ImageTransformEffect;
 use AsposeSlidesCloud::Object::ResourceUri;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -248,6 +249,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'image_transform_list' => {
+    	datatype => 'ARRAY[ImageTransformEffect]',
+    	base_name => 'ImageTransformList',
+    	description => 'Image transform effects.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -260,7 +268,8 @@ __PACKAGE__->swagger_types( {
     'image' => 'ResourceUri',
     'base64_data' => 'string',
     'svg_data' => 'string',
-    'picture_fill_mode' => 'string'
+    'picture_fill_mode' => 'string',
+    'image_transform_list' => 'ARRAY[ImageTransformEffect]'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -273,7 +282,8 @@ __PACKAGE__->attribute_map( {
     'image' => 'Image',
     'base64_data' => 'Base64Data',
     'svg_data' => 'SvgData',
-    'picture_fill_mode' => 'PictureFillMode'
+    'picture_fill_mode' => 'PictureFillMode',
+    'image_transform_list' => 'ImageTransformList'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

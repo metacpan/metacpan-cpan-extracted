@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.016;
 
 use ExtUtils::MakeMaker;
 
@@ -14,16 +14,33 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Firewall-Utils",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.016",
   "NAME" => "Firewall::Utils",
-  "PREREQ_PM" => {},
-  "VERSION" => "0.004",
+  "PREREQ_PM" => {
+    "Carp" => 0,
+    "Mail::Sender" => 0,
+    "Moose" => 0,
+    "POSIX" => 0,
+    "experimental" => 0,
+    "namespace::autoclean" => 0,
+    "warnings" => 0
+  },
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => ""
   }
 );
 
 
-my %FallbackPrereqs = ();
+my %FallbackPrereqs = (
+  "Carp" => 0,
+  "Mail::Sender" => 0,
+  "Moose" => 0,
+  "POSIX" => 0,
+  "experimental" => 0,
+  "namespace::autoclean" => 0,
+  "warnings" => 0
+);
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

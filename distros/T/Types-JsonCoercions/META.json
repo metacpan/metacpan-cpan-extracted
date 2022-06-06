@@ -1,0 +1,80 @@
+{
+   "abstract" : "coercions to and from JSON",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Types-JsonCoercions",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "JSON::MaybeXS" : "0"
+         },
+         "requires" : {
+            "JSON::PP" : "0",
+            "Type::Library" : "1.004",
+            "Types::Standard" : "1.004",
+            "perl" : "5.008009"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "Types::JsonCoercions" : {
+         "file" : "lib/Types/JsonCoercions.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tobyink/p5-types-jsoncoercions/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Types-JsonCoercions",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-types-jsoncoercions.git",
+         "web" : "https://github.com/tobyink/p5-types-jsoncoercions"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Types-JsonCoercions/project"
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 4.06",
+   "x_static_install" : 1
+}

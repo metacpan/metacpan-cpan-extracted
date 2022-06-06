@@ -1,3 +1,22 @@
+0.105   2022-06-02  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        - [incompatible change] Change shortcut for --exclude-columns from -e to
+          -E.
+
+        - Add actions uniq & nauniq.
+
+        - Add option --include-columns (-I).
+
+
+0.104   2022-06-02  Released-By: PERLANCAR; Urgency: medium
+
+        [action shuf]
+
+        - [ux] Add 'pick' as alias name.
+
+        - Add --weight-column option.
+
+
 0.103   2021-05-29  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.
@@ -12,7 +31,7 @@
 
 0.101   2020-11-08  Released-By: PERLANCAR; Urgency: medium
 
-	- Add subcommand 'cat'.
+	- Add action 'cat'.
 
         - Switch from using Perinci::CmdLine::Inline to Perinci::CmdLine::Lite
 	  to enable format html+datatables.

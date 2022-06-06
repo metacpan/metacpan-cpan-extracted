@@ -33,13 +33,19 @@ Instantiates _CLASS_.
 Sets 1 or more globals in _OBJ_. See below for details on type conversions
 from Perl to JavaScript.
 
+Returns _OBJ_.
+
 ## $obj = _OBJ_->helpers()
 
 Defines QuickJS’s “helpers”, e.g., `console.log`.
 
+Returns _OBJ_.
+
 ## $obj = _OBJ_->std()
 
 Enables (but does _not_ import) QuickJS’s `std` module.
+
+Returns _OBJ_.
 
 ## $obj = _OBJ_->os()
 
@@ -54,19 +60,34 @@ Untrapped exceptions in JavaScript will be rethrown as Perl exceptions.
 
 $JS\_CODE is a _character_ string.
 
-## _OBJ_->eval\_module( $JS\_CODE )
+## $obj = _OBJ_->eval\_module( $JS\_CODE )
 
 Runs $JS\_CODE as a module, which enables ES6 module syntax.
 Note that no values can be returned directly in this mode of execution.
+
+Returns _OBJ_.
+
+## $obj = _OBJ_->await()
+
+Blocks until all of _OBJ_’s pending work (if any) is complete.
+
+For example, if you `eval()` some code that creates a promise, call
+this to wait for that promise to complete.
+
+Returns _OBJ_.
 
 ## $obj = _OBJ_->set\_module\_base( $PATH )
 
 Sets a base path (a byte string) for ES6 module imports.
 
+Returns _OBJ_.
+
 ## $obj = _OBJ_->unset\_module\_base()
 
 Restores QuickJS’s default directory for ES6 module imports
 (as of this writing, it’s the process’s current directory).
+
+Returns _OBJ_.
 
 # TYPE CONVERSION: JAVASCRIPT → PERL
 

@@ -1,5 +1,8 @@
 package Firewall::Config::Element::Zone::Role;
 
+#------------------------------------------------------------------------------
+# 加载扩展模块
+#------------------------------------------------------------------------------
 use Moose::Role;
 use Firewall::Config::Element::Interface::Role;
 use Firewall::Utils::Set;

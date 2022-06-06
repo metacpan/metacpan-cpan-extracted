@@ -1,0 +1,88 @@
+NAME
+    Types::JsonCoercions - coercions to and from JSON
+
+SYNOPSIS
+      package Person {
+        use Moo;
+        use Types::Standard -types,
+        use Types::JsonCoercions -types;
+    
+        has nicknames => (
+          is => 'ro',
+          isa => ArrayRefJ[Str],
+          coerce => 1,
+          required => 1,
+        );
+      }
+
+      my $alice => Person->new( nicknames => [ 'Ali' ] );
+      my $bob   => Person->new( nicknames => '["Bob","Rob"]' );
+
+DESCRIPTION
+    This module provides coercions to/from JSON for some of the types from
+    Types::Standard.
+
+  Coercions
+    You can export coercions using:
+
+      use Types::JsonCoercions -coercions;
+      # or
+      use Types::JsonCoercions qw( ToJSON FromJSON );
+
+    And they can be applied to existing type constraints like:
+
+      isa => ArrayRef->plus_coercions( FromJSON ),
+      coerce => 1,
+
+    This also works with parameterized types:
+
+      isa => ArrayRef->of( HashRef )->plus_coercions( FromJSON ),
+      coerce => 1,
+
+    The FromJSON coercion can be added to any arrayref-like or hashref-like
+    type constraints, and will coerce strings via a JSON decoder.
+
+    The ToJSON coercion can be added to string-like type constraints, and will
+    coerce references via a JSON encoder.
+
+  Types
+    You can export the types like:
+
+      use Types::JsonCoercions -types;
+      # or
+      use Types::JsonCoercions qw( StrJ RefJ ArrayRefJ HashRefJ );
+
+    The type constraint StrJ is provided as a shortcut for
+    `Str->plus_coercions( ToJSON )`.
+
+    The type constraints RefJ, ArrayRefJ, and HashRefJ are provided as
+    shortcuts for `Ref->plus_coercions( FromJSON )`, etc.
+
+    RefJ, ArrayRefJ, and HashRefJ are parameterizable as per the types in
+    Types::Standard, so ArrayRefJ[Int] should just work.
+
+  JSON Encoder/Decoder
+    This module will use JSON::MaybeXS if it is installed, and will otherwise
+    fall back to JSON::PP.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Types-JsonCoercions>.
+
+SEE ALSO
+    Types::Standard.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2022 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

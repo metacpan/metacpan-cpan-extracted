@@ -1,6 +1,6 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
-# Copyright (c) 2019 by Martin Becker, Blaubeuren.
+# Copyright (c) 2019-2022 by Martin Becker, Blaubeuren.
 # This package is free software; you can distribute it and/or modify it
 # under the terms of the Artistic License 2.0 (see LICENSE file).
 
@@ -13,8 +13,11 @@ use Math::ModInt qw(mod);
 use Math::Polynomial::ModInt qw(modpoly);
 use Math::Polynomial::ModInt::Order qw($BY_INDEX);
 
-my $p = 5;
-my $n = 3;
+my $p = @ARGV > 0? shift @ARGV: 5;
+my $n = @ARGV > 0? shift @ARGV: 3;
+if (@ARGV || grep { !/^[1-9][0-9]*\z/ } $p, $n) {
+    die "usage: $0 prime exponent\n";
+}
 
 my %CONFIG = (
     prefix        => q[],
@@ -32,7 +35,9 @@ $poly->string_config(\%CONFIG);
 while ($poly->is_monic && $poly->degree == $n) {
     if ($poly->is_irreducible) {
         ++$count;
-        print $poly->as_string, "\n";
+        print
+            "modpoly(", $poly->index, q[, ], $poly->modulus, q[) = ],
+            $poly->as_string, "\n";
     }
     $poly = $BY_INDEX->next_poly($poly);
 }

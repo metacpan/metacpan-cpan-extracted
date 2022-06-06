@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.016;
 
 use ExtUtils::MakeMaker;
 
@@ -14,16 +14,67 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Firewall-Config-Dao",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.016",
   "NAME" => "Firewall::Config::Dao",
-  "PREREQ_PM" => {},
-  "VERSION" => "0.002",
+  "PREREQ_PM" => {
+    "Carp" => 0,
+    "Encode" => 0,
+    "Firewall::Config::Element::Service::Asa" => 0,
+    "Firewall::Config::Element::Service::H3c" => 0,
+    "Firewall::Config::Element::Service::Hillstone" => 0,
+    "Firewall::Config::Element::Service::Huawei" => 0,
+    "Firewall::Config::Element::Service::Neteye" => 0,
+    "Firewall::Config::Element::Service::Netscreen" => 0,
+    "Firewall::Config::Element::Service::PaloAlto" => 0,
+    "Firewall::Config::Element::Service::Role" => 0,
+    "Firewall::Config::Element::Service::Srx" => 0,
+    "Firewall::Config::Element::Service::Topsec" => 0,
+    "Firewall::Utils::Date" => 0,
+    "Firewall::Utils::Ip" => 0,
+    "JSON" => 0,
+    "Mojo::Util" => 0,
+    "Moose" => 0,
+    "Moose::Role" => 0,
+    "Storable" => 0,
+    "Text::Diff" => 0,
+    "Time::HiRes" => 0,
+    "namespace::autoclean" => 0,
+    "strict" => 0,
+    "warnings" => 0
+  },
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => ""
   }
 );
 
 
-my %FallbackPrereqs = ();
+my %FallbackPrereqs = (
+  "Carp" => 0,
+  "Encode" => 0,
+  "Firewall::Config::Element::Service::Asa" => 0,
+  "Firewall::Config::Element::Service::H3c" => 0,
+  "Firewall::Config::Element::Service::Hillstone" => 0,
+  "Firewall::Config::Element::Service::Huawei" => 0,
+  "Firewall::Config::Element::Service::Neteye" => 0,
+  "Firewall::Config::Element::Service::Netscreen" => 0,
+  "Firewall::Config::Element::Service::PaloAlto" => 0,
+  "Firewall::Config::Element::Service::Role" => 0,
+  "Firewall::Config::Element::Service::Srx" => 0,
+  "Firewall::Config::Element::Service::Topsec" => 0,
+  "Firewall::Utils::Date" => 0,
+  "Firewall::Utils::Ip" => 0,
+  "JSON" => 0,
+  "Mojo::Util" => 0,
+  "Moose" => 0,
+  "Moose::Role" => 0,
+  "Storable" => 0,
+  "Text::Diff" => 0,
+  "Time::HiRes" => 0,
+  "namespace::autoclean" => 0,
+  "strict" => 0,
+  "warnings" => 0
+);
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

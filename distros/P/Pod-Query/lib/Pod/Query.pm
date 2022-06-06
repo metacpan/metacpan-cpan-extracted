@@ -6,8 +6,8 @@ use warnings;
 use FindBin qw/ $RealBin /;
 use Carp qw/ croak /;
 use List::Util qw/ first /;
-use Text::ParseWords qw/ parse_line shellwords /;
-use Mojo::Base qw/ -base -signatures /;
+use Text::ParseWords qw/ parse_line /;
+use Mojo::Base qw/ -base /;
 use Mojo::Util qw/ dumper class_to_path /;
 use Mojo::ByteStream qw/ b/;
 use Term::ReadKey qw/ GetTerminalSize /;
@@ -20,11 +20,11 @@ Pod::Query - Query pod documents
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
-our $VERSION         = '0.11';
+our $VERSION         = '0.12';
 our $DEBUG_TREE      = 0;
 our $DEBUG_FIND      = 0;
 our $DEBUG_FIND_DUMP = 0;
@@ -84,7 +84,9 @@ document without having to do much unnecessary work.
 
 =cut
 
-sub new ( $class, $pod_class, $path_only = 0 ) {
+sub new {
+   my ( $class, $pod_class, $path_only ) = @_;
+   $path_only //= 0;
    state %CACHE;
 
    my $cached;
@@ -116,7 +118,8 @@ Return value is cached (based on the class of the pod file).
 
 =cut
 
-sub _class_to_path ( $pod_class ) {
+sub _class_to_path {
+   my ( $pod_class ) = @_;
    state %CACHE;
    my $p;
 
@@ -174,7 +177,8 @@ tag was.
 
 =cut
 
-sub _flatten_for_tags ( $lol ) {
+sub _flatten_for_tags {
+   my ( $lol ) = @_;
    my @flat;
 
    for ( @$lol ) {
@@ -234,7 +238,8 @@ HeadN tags with the same or lower N will be grouped higher.
 
 =cut
 
-sub _lol_to_tree ( $lol ) {
+sub _lol_to_tree {
+   my ( $lol ) = @_;
    my ( $is_in, $is_out );
    my %heads_table = __PACKAGE__->_define_heads_regex_table();
    my $is_head     = qr/ ^ head (\d) $ /x;
@@ -301,7 +306,8 @@ Creates a new node (aka leaf).
 
 =cut
 
-sub _make_leaf ( $node ) {
+sub _make_leaf {
+   my ( $node ) = @_;
    return $node if ref $node eq ref {};
 
    my ( $tag, @text ) = @$node;
@@ -326,7 +332,8 @@ Restructures the text for an "over-text" element.
 
 =cut
 
-sub _structure_over ( $text_list ) {
+sub _structure_over {
+   my ( $text_list ) = @_;
    my @struct;
    my @q;
 
@@ -351,7 +358,8 @@ Extracts the title information.
 
 =cut
 
-sub find_title ( $s ) {
+sub find_title {
+   my ( $s ) = @_;
    scalar $s->find( 'head1=NAME[0]/Para[0]' );
 }
 
@@ -362,7 +370,8 @@ Extracts the complete method information.
 
 =cut
 
-sub find_method ( $s, $method ) {
+sub find_method {
+   my ( $s, $method ) = @_;
    $s->find( sprintf '~head=~^%s\b.*$[0]**',
       $s->_clean_method_name( $method ) );
 }
@@ -374,7 +383,8 @@ Extracts the method summary.
 
 =cut
 
-sub find_method_summary ( $s, $method ) {
+sub find_method_summary {
+   my ( $s, $method ) = @_;
    scalar $s->find( sprintf '~head=~^%s\b.*$[0]/~(Data|Para)[0]',
       $s->_clean_method_name( $method ) );
 }
@@ -386,7 +396,8 @@ Returns a method name without any possible parenthesis.
 
 =cut
 
-sub _clean_method_name ( $s, $name ) {
+sub _clean_method_name {
+   my ( $s, $name ) = @_;
    $name =~ s/[^a-zA-Z0-9_]+//gr;
 }
 
@@ -399,7 +410,8 @@ Returns a list of key value pairs.
 
 =cut
 
-sub find_events ( $s ) {
+sub find_events {
+   my ( $s ) = @_;
    $s->find( '~head=EVENTS[0]/~head*/(Para)[0]' );
 }
 
@@ -443,7 +455,8 @@ Results:
 
 =cut
 
-sub find ( $s, @raw_conditions ) {
+sub find {
+   my ( $s, @raw_conditions ) = @_;
 
    my $find_conditions;
 
@@ -501,7 +514,7 @@ Convert a pod query string into a structure based on these rules:
    5. Split each list of conditions by "=".
       First word is the tag.
       Second word is the text (if any).
-      If either starts with "~", then the word
+      If either starts with a tilde, then the word
          is treated like a pattern.
 
    Precedence:
@@ -511,7 +524,8 @@ Convert a pod query string into a structure based on these rules:
 
 =cut
 
-sub _query_string_to_struct ( $s, $query_string ) {
+sub _query_string_to_struct {
+   my ( $s, $query_string ) = @_;
    my $is_nth          = qr/ \[ (-?\d+) \] $ /x;
    my $is_nth_in_group = qr/ ^ \( (.+) \) $is_nth /x;
    my $is_keep         = qr/ \* $ /x;
@@ -573,7 +587,8 @@ Check if queries are valid.
 
 =cut
 
-sub _check_conditions ( $sections ) {
+sub _check_conditions {
+   my ( $sections ) = @_;
 
    my $error_message = <<~'ERROR';
 
@@ -627,7 +642,8 @@ Assigns default query options.
 
 =cut
 
-sub _set_condition_defaults ( $conditions ) {
+sub _set_condition_defaults {
+   my ( $conditions ) = @_;
    for my $condition ( @$conditions ) {
 
       # Text Options
@@ -684,7 +700,8 @@ TODO: Need to clean this up and possibly restructure.
 
 =cut
 
-sub _find ( $need, @groups ) {
+sub _find {
+   my ( $need, @groups ) = @_;
    if ( $DEBUG_FIND ) {
       say "\n_FIND()";
       say "need:   ", dumper $need;
@@ -796,7 +813,8 @@ the parent in its place.
 
 =cut
 
-sub _invert ( @groups ) {
+sub _invert {
+   my ( @groups ) = @_;
    if ( $DEBUG_INVERT ) {
       say "\n_INVERT()";
       say "groups: ", dumper \@groups;
@@ -851,14 +869,13 @@ Pod::Text formatter is used for C<Para> tags when C<keep_all> is set.
 
 =cut
 
-sub _render ( $kept_all, @tree ) {
+sub _render {
+   my ( $kept_all, @tree ) = @_;
    if ( $DEBUG_RENDER ) {
       say "\n_RENDER()";
       say "tree: ",     dumper \@tree;
       say "kept_all: ", dumper $kept_all;
    }
-
-   delete $ENV{COLUMNS};
 
    my $formatter = Pod::Text->new( width => get_term_width(), );
    $formatter->{MARGIN} = 2;
@@ -918,7 +935,8 @@ Specifically called for rendering "over" elements.
 
 =cut
 
-sub _render_over ( $list, $kept_all ) {
+sub _render_over {
+   my ( $list, $kept_all ) = @_;
    if ( $DEBUG_RENDER ) {
       say "\n_RENDER_OVER()";
       say "list=", dumper $list;

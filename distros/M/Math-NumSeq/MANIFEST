@@ -11,10 +11,12 @@ devel/abundant.pl
 devel/ascii-self.pl
 devel/balanced-binary.pl
 devel/baum-sweet.pl
+devel/bigprime-sieve.c
 devel/binary-undulant.pl
 devel/bits.pl
 devel/cbrt-continued.pl
 devel/cbrt.pl
+devel/Champernowne--test.gp
 devel/collatz.pl
 devel/concat.pl
 devel/digit-count.pl
@@ -22,6 +24,7 @@ devel/digit-length-cumulative.pl
 devel/engel.pl
 devel/erdos-selfridge.pl
 devel/euler.pl
+devel/even-0s-between-1s.gp
 devel/exe-cbrt.c
 devel/exe-flimsy.c
 devel/exe-gen-bits.c
@@ -31,7 +34,6 @@ devel/exe-sortadd.c
 devel/expression.pl
 devel/factorials.pl
 devel/fibbinary.pl
-devel/fibonacci-representations.pl
 devel/fibonacci-word.pl
 devel/fibonacci.pl
 devel/flimsy.pl
@@ -114,6 +116,7 @@ devel/math-factor.pl
 devel/maybe-decprime.pl
 devel/maybe-ln.pl
 devel/misc.pl
+devel/noties.pl
 devel/numaronson.pl
 devel/oeis-find.pl
 devel/oeis-grep.pl
@@ -379,6 +382,7 @@ xt/oeis/DigitCountLow-oeis.t
 xt/oeis/DigitProduct-oeis.t
 xt/oeis/DigitProductSteps-oeis.t
 xt/oeis/DigitSum-oeis.t
+xt/oeis/DigitSumModulo-oeis.t
 xt/oeis/DivisorCount-oeis.t
 xt/oeis/ErdosSelfridgeClass-oeis.t
 xt/oeis/Factorials-oeis.t
@@ -397,6 +401,7 @@ xt/oeis/LiouvilleFunction-oeis.t
 xt/oeis/LucasNumbers-oeis.t
 xt/oeis/LuckyNumbers-oeis.t
 xt/oeis/MephistoWaltz-oeis.t
+xt/oeis/misc-oeis.t
 xt/oeis/MobiusFunction-oeis.t
 xt/oeis/NumSeq-oeis.t
 xt/oeis/Palindromes-oeis.t

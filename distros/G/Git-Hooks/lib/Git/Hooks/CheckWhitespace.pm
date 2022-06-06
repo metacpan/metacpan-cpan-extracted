@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Hooks::CheckWhitespace;
 # ABSTRACT: Git::Hooks plugin for checking whitespace errors
-$Git::Hooks::CheckWhitespace::VERSION = '3.2.1';
+$Git::Hooks::CheckWhitespace::VERSION = '3.2.2';
 use v5.16.0;
 use utf8;
 use Log::Any '$log';
@@ -17,7 +17,7 @@ sub check_ref {
     my ($old_commit, $new_commit) = $git->get_affected_ref_range($ref);
 
     # If the reference is being deleted we have nothing to check
-    next if $new_commit eq $git->undef_commit;
+    return 0 if $new_commit eq $git->undef_commit;
 
     # If the reference is being created we have to calculate a proper
     # $old_commit to diff against.
@@ -27,7 +27,7 @@ sub check_ref {
         while (my $log = $log_iterator->next()) {
             $last_log = $log;
         }
-        next unless $last_log;
+        return 0 unless $last_log;
         my @parents = $last_log->parent;
         if (@parents == 0) {
             # We reached the repository root. Hence, let's consider
@@ -46,7 +46,7 @@ sub check_ref {
     }
 
     my $output = $git->run(
-        {fatal => [-129, -128]},
+        {fatal => [-129, -128], quiet => 1},
         qw/diff-tree -r --check/,
         $old_commit eq $git->undef_commit ? $git->empty_tree : $old_commit,
         $new_commit);
@@ -65,7 +65,7 @@ sub check_commit {
     my ($git) = @_;
 
     my $output = $git->run(
-        {fatal => [-129, -128]},
+        {fatal => [-129, -128], quiet => 1},
         qw/diff-index --check --cached/, $git->get_head_or_empty_tree());
     if ($? == 0) {
         return 1;
@@ -82,7 +82,7 @@ sub check_patchset {
     my ($git, $branch, $commit) = @_;
 
     my $output = $git->run(
-        {fatal => [-129, -128]},
+        {fatal => [-129, -128], quiet => 1},
         qw/diff-tree -r -m --check/, $commit->commit);
     if ($? == 0) {
         return 1;
@@ -114,7 +114,7 @@ Git::Hooks::CheckWhitespace - Git::Hooks plugin for checking whitespace errors
 
 =head1 VERSION
 
-version 3.2.1
+version 3.2.2
 
 =head1 SYNOPSIS
 

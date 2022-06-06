@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2019, 2020, 2022 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -21,7 +21,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 74;
+$VERSION = 75;
 
 use Math::NumSeq;
 use Math::NumSeq::Base::IterateIth;
@@ -180,11 +180,13 @@ sub ith {
 
   $i = $i + $self->{'i_offset'};
 
-  # if $i is inf or nan then $f0=$i*0 is nan and the while loop zero-trips
-  # and return is nan
-
-  my $f0 = ($i * 0) + 1;  # inherit bignum 1
-  my $f1 = $f0 + 1;       # inherit bignum 2
+  # if $i is inf or nan then $f0=$i*0 is nan and the do-while loop
+  # zero-trips and return is nan
+  
+  my $zero = ($i * 0);  # 0, or nan if i inf or nan
+  $i += $zero;          # nan if $i was inf
+  my $f0 = $zero + 1;   # inherit bignum 1
+  my $f1 = $f0 + 1;     # inherit bignum 2
   my $level = 0;
   ### start: "$f1,$f0  level=$level"
 
@@ -370,7 +372,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2016, 2019, 2020, 2022 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

@@ -1,0 +1,44 @@
+---
+abstract: 'coercions to and from JSON'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Types-JsonCoercions
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Types::JsonCoercions:
+    file: lib/Types/JsonCoercions.pm
+    version: '0.001'
+recommends:
+  JSON::MaybeXS: '0'
+requires:
+  JSON::PP: '0'
+  Type::Library: '1.004'
+  Types::Standard: '1.004'
+  perl: '5.008009'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/Types-JsonCoercions/project
+  bugtracker: https://github.com/tobyink/p5-types-jsoncoercions/issues
+  homepage: https://metacpan.org/release/Types-JsonCoercions
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-types-jsoncoercions.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

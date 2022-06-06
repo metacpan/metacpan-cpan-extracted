@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012 Kevin Ryde
+# Copyright 2012, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -33,51 +33,23 @@ use Math::NumSeq::PrimeIndexPrimes;
 #use Smart::Comments '###';
 
 
-sub numeq_array {
-  my ($a1, $a2) = @_;
-  if (! ref $a1 || ! ref $a2) {
-    return 0;
-  }
-  my $i = 0; 
-  while ($i < @$a1 && $i < @$a2) {
-    if ($a1->[$i] ne $a2->[$i]) {
-      return 0;
-    }
-    $i++;
-  }
-  return (@$a1 == @$a2);
-}
-
-
-
 #------------------------------------------------------------------------------
 # A175247 - primes at non-composite
 # meaning primes at prime index, but including Prime(1)
 
-{
-  my $anum = 'A175247';
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    MyTestHelpers::diag ("$anum has ",scalar(@$bvalues)," values");
+MyOEIS::compare_values
+  (anum => 'A175247',
+   func => sub {
+     my ($count) = @_;
+     my $seq  = Math::NumSeq::PrimeIndexPrimes->new;
+     my @got = (2);  # Prime(1)
+     while (@got < $count) {
+       my ($i, $prime) = $seq->next;
+       push @got, $prime;
+     }
+     return \@got;
+   });
 
-    my $seq  = Math::NumSeq::PrimeIndexPrimes->new;
-    push @got, 2; # Prime(1)
-    while (@got < @$bvalues) {
-      my ($i, $prime) = $seq->next;
-      push @got, $prime;
-    }
-    if (! numeq_array(\@got, $bvalues)) {
-      MyTestHelpers::diag ("bvalues: ",join(',',@{$bvalues}[0..20]));
-      MyTestHelpers::diag ("got:     ",join(',',@got[0..20]));
-    }
-  } else {
-    MyTestHelpers::diag ("$anum not available");
-  }
-  skip (! $bvalues,
-        numeq_array(\@got, $bvalues),
-        1, "$anum");
-}
 
 #------------------------------------------------------------------------------
 exit 0;

@@ -1,4 +1,4 @@
-# Copyright 2014, 2016, 2019 Kevin Ryde
+# Copyright 2014, 2016, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -44,7 +44,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 74;
+$VERSION = 75;
 
 use Math::NumSeq;
 use Math::NumSeq::Base::IterateIth;
@@ -298,7 +298,7 @@ This is the Fibonacci representations function R(i) which is the number of
 ways i can be represented as a sum of distinct Fibonacci numbers,
 
     1, 1, 1, 2, 1, 2, 2, 1, 3, 2, 2, 3, 1, 3, 3, 2, 4, 2, 3, 3, ...
-    starting i=0
+    starting i=0                                  (OEIS A000119)
 
 For example R(11)=3 because 11 is a sum of Fibonacci numbers in the
 following three different ways
@@ -420,21 +420,21 @@ bits processed so far and step r,rprev accordingly.
 modulo 2 since the test is just for odd or even run of zeros, not the full
 count.
 
-For a 1-bit the zeros count becomes 0 since there are now no 0-bits since
+For a 1-bit, the zeros count becomes 0 since there are now no 0-bits since
 the last 1-bit seen.  In the Zeckendorf form a 1-bit always has a 0-bit
 immediately below it.  That bit can be worked into the bit=1 case,
 
       if bit=1 then
         if zeros odd then rprev += r
                      else rprev = r
-        next lower bit of fibbinary(i+1) is 0-bit, skip it
+        next lower bit of fibbinary(i+1) is 0-bit, so skip it
         zeros = 1
 
 This is as if the bit=0 code is done immediately after the bit=1.  zeros=0
 is even after the bit=1 so there's no change to r,rprev by the bit=0 code,
 simply skip the 0-bit and record zeros=1.
 
-When calculating Fibonacci numbers for fibbinary(i+1) it's desirable to use
+When calculating Fibonacci numbers for fibbinary(i+1), it's desirable to use
 integers E<lt>=i only so as not to overflow a finite number type.  This can
 be done by finding the biggest Fibonacci f1E<lt>=i and subtracting it before
 doing the +1, giving i+1-f1 without overflow.  If the biggest Fibonacci
@@ -442,10 +442,10 @@ E<lt>=i+1 is in fact f2=f1+f0E<lt>=i+1 then will have i+1-f1 E<gt>= f0 and
 should subtract that too for i+1-(f1+f0).  The loop begins at the f1 bit in
 this case, or at the f0 bit if not.
 
-When the high 1-bit is handled like this to avoid overflow the second
+When the high 1-bit is handled like this to avoid overflow, the second
 highest bit is always a 0-bit the same as above.  So the loop can begin one
 lower, so f0 if f2 was subtracted or the Fibonacci below f0 if not.  Initial
-zero=1 to record the 0-bit skipped.
+zero=1 so as to record the 0-bit skipped.
 
 f1E<lt>=i and f1+f0E<lt>=i+1 only occurs when i+1=f1+f0 exactly, so it has
 all 0-bits.  This can be treated explicitly by floor(count/2) which is the
@@ -505,7 +505,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2014, 2016, 2019 Kevin Ryde
+Copyright 2014, 2016, 2019, 2020, 2021 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

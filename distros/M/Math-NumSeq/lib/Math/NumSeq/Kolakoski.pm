@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2016, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -23,7 +23,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 74;
+$VERSION = 75;
 
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
@@ -87,7 +87,7 @@ sub next {
   my $digit;
   for (;;) {
     if (++$pos > $#$counts) {
-      ### all zeros to pos: $pos
+      ### counts all zero to pos: $pos
       if ($pos == 1 && $digits->[0] == 1) {
         ### special case i=2,i=3 digit 2 ...
         $counts->[0] = 2;
@@ -107,7 +107,7 @@ sub next {
 
   while (--$pos >= 0) {
     $counts->[$pos] = $digit;
-    $digit = ($digits->[$pos] ^= 3);
+    $digit = ($digits->[$pos] ^= 3);     # flip 1 <-> 2
   }
   return ($self->{'i'}++, $digit);
 
@@ -149,13 +149,17 @@ Math::NumSeq::Kolakoski -- sequence of 1s and 2s its own run lengths
 
 =head1 DESCRIPTION
 
-A sequence 1,2,2,1,1,2,1,etc, each run length being given successively by
-the sequence itself.
+The Kolakoski sequence is
 
-Starting from 1,2, at i=2 the values is 2, so there should be a run of two
-2s.  Then at i=3 value 2 means two 1s.  Then at i=4 value 1 means a run of
-one 2.  The value alternates between 1 and 2 and the sequence values
-themselves determine the run length to give that value, either 1 or 2.
+    i     = 1  2  3  4  5  6  7  8  9
+    value = 1, 2, 2, 1, 1, 2, 1, 2, 2, ...          (OEIS A000002)
+
+where the values are 1 or 2 and the run lengths of 1s or 2s are given by the
+sequence values themselves.
+
+                |-| |--|  |--| |-||-| |--| 
+                 1, 2, 2, 1, 1, 2, 1, 2, 2, ...      values
+    run length   1    2     2   1  1   2    ...    lengths are values again
 
 =head1 FUNCTIONS
 
@@ -189,7 +193,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2016, 2019, 2020, 2021 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

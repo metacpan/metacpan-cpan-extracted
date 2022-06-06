@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:         IPC-Locker
-version:      1.500
+version:      1.502
 version_from: lib/IPC/Locker.pm
 abstract:     Distributed lock handler
 license:      perl

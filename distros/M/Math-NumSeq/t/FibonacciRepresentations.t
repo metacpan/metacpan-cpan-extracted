@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2014, 2016, 2019 Kevin Ryde
+# Copyright 2014, 2016, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -22,7 +22,7 @@ use strict;
 use List::Util 'max';
 
 use Test;
-plan tests => 104;
+plan tests => 106;
 
 use lib 't';
 use MyTestHelpers;
@@ -38,7 +38,7 @@ use Math::NumSeq::FibonacciRepresentations;
 # VERSION
 
 {
-  my $want_version = 74;
+  my $want_version = 75;
   ok ($Math::NumSeq::FibonacciRepresentations::VERSION, $want_version,
       'VERSION variable');
   ok (Math::NumSeq::FibonacciRepresentations->VERSION,  $want_version,
@@ -53,6 +53,34 @@ use Math::NumSeq::FibonacciRepresentations;
       "VERSION class check $check_version");
 }
 
+
+#------------------------------------------------------------------------------
+
+{
+  my %seen = ('100010000' => 1);
+  my $R = 0;
+  for (;;) {
+    foreach my $str (keys %seen) {
+      foreach my $pos (0 .. length($str)-3) {
+        if (substr($str,$pos,3) eq '100') {
+          my $new = $str;
+          substr($new,$pos,3, '011');
+          $seen{$new} = 1;
+        }
+      }
+    }
+    my $new_R = scalar(keys %seen);
+    ### $new_R
+    if ($R == $new_R) { last; }
+    $R = $new_R;
+  }
+  ok ($R, 8);
+  ok (join(',',sort keys %seen),
+      join(',',sort qw(100010000  100001100 100001011
+                       011010000  011001100 011001011 
+                                  010111100 010111011
+                     )));
+}
 
 #------------------------------------------------------------------------------
 # Stern diatomic = Fibonacci diatomic at Zeck even 1s positions

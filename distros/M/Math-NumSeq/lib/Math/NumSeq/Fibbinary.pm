@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2019 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2019, 2020, 2021, 2022 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -31,7 +31,7 @@ use strict;
 use Carp;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 74;
+$VERSION = 75;
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
 *_is_infinite = \&Math::NumSeq::_is_infinite;
@@ -57,10 +57,10 @@ sub values_min {
 }
 
 #------------------------------------------------------------------------------
-# cf A000119 - number of fibonacci sums forms
+# cf A000119 - number of Fibonacci sums forms
 #    A003622 - n with odd Zeckendorf,  cf golden seq
 #    A037011 - baum-sweet cubic, might be 1 iff i is in the fibbinary seq
-#    A014417 - n in fibonacci base, the fibbinaries written out in binary
+#    A014417 - n in Fibonacci base, the fibbinaries written out in binary
 #    A139764 - smallest Zeckendorf term
 #    A054204 - using only even Fibs
 #
@@ -384,7 +384,30 @@ __END__
 #   return ($self->{'i'}++, $ret);
 # }
 
+# GP-DEFINE  phi = quadgen(5);
+# bestappr(log(2)/log(phi), 6)
 
+# GP-DEFINE  fibbinary_first_k(n) = if(n,logint(n,2)*3\2+3);
+# GP-Test  vector(2^14,n,n--; my(k=fibbinary_first_k(n)); \
+# GP-Test                     fibonacci(k+1) >= n) == \
+# GP-Test  vector(2^14,n,n--; 1)
+
+# GP-DEFINE  m=Mod('x,'x^2-'x-1);
+# GP-Test  vector(20,k,k--; polcoeff(lift(m^k),1)) == \
+# GP-Test  vector(20,k,k--; fibonacci(k))
+# GP-Test  vector(20,k, Vec(lift(m^k))) == \
+# GP-Test  vector(20,k, [fibonacci(k),fibonacci(k-1)])
+#
+# GP-DEFINE  Fibbinary(n) = {
+# GP-DEFINE    my(k=(if(n,logint(n,2))+1)*3\2, v=vector(k));
+# GP-DEFINE    my(x,y);[x,y]=Vec(lift(m^(k+1)));
+# GP-DEFINE    for(i=1,#v, if((t=n-x)>=0, v[i]=1;n=t); [x,y]=[y,x-y]);
+# GP-DEFINE    fromdigits(v,2);
+# GP-DEFINE  }
+# GP-Test  my(v=select(n->bitand(n,n>>1)==0, [0..2^16])); \
+# GP-Test  vector(#v,n,n--; Fibbinary(n)) == v
+
+# \\ print(k" F="f" "t);
 
 
 =for stopwords Ryde Math-NumSeq fibbinary Zeckendorf k's Ith i'th OR-ing incrementing Fibonaccis BigInt bigint BigFloat BigRat eg ie
@@ -401,15 +424,14 @@ Math::NumSeq::Fibbinary -- without consecutive 1-bits
 
 =head1 DESCRIPTION
 
-This sequence is the fibbinary numbers
+This sequence is the Fibbinary numbers
 
      0, 1, 2, 4, 5, 8, 9, 10, 16, 17, 18, 20, 21, 32, 33, 34, ...
-     starting i=0
+     starting i=0       (A003714)
 
-being integers which have no adjacent 1-bits when written in binary, taken
-in ascending order.
+They have no adjacent 1-bits when written in binary,
 
-    i     fibbinary    fibbinary
+    i     Fibbinary    Fibbinary
           (decimal)    (binary)
    ---    ---------    --------
     0         0             0
@@ -423,7 +445,7 @@ in ascending order.
     8        16         10000
     9        17         10001
 
-For example at i=4 fibbinary is 5.  The next fibbinary is not 6 or 7 because
+For example at i=4 Fibbinary is 5.  The next Fibbinary is not 6 or 7 because
 they have adjacent 1-bits (110 and 111), the next without adjacent 1s is 8
 (100).
 
@@ -431,17 +453,17 @@ The two highest bits must be "10...", they cannot be "11...".  So there's
 effectively a block of 2^k values (not all used) followed by a gap of 2^k
 values, etc.
 
-The least significant bit of each fibbinary is the Fibonacci word sequence,
+The least significant bit of each Fibbinary is the Fibonacci word sequence,
 per L<Math::NumSeq::FibonacciWord>.
 
 All numbers without adjacent 1-bits can also be generated simply by taking
 the binary expansion and changing each "1" to "01", but that doesn't given
-them in ascending order the way the fibbinary here does.
+them in ascending order the way the Fibbinary here does.
 
 =head2 Zeckendorf Base
 
-The bits of the fibbinary values encode Fibonacci numbers used to represent
-i in Zeckendorf style Fibonacci base.  In the Zeckendorf base system an
+The bits of the Fibbinary values encode Fibonacci numbers used to represent
+i in Zeckendorf style Fibonacci base.  In the Zeckendorf base system, an
 integer i is a sum of Fibonacci numbers,
 
     i = F[k1] + F[k2] + ... F[kn]         k1 > k2 > ... > kn
@@ -449,7 +471,7 @@ integer i is a sum of Fibonacci numbers,
 Each k is chosen as the highest Fibonacci less than the remainder at that
 point.  For example, reckoning the Fibonaccis as F[0]=1, F[2]=2, etc
 
-    19 = 13+5+1 = F[5]+F[3]+F[0]
+    19 = 13+5+1 = F[5] + F[3] + F[0]
 
 =for GP-Test  fibonacci(2) == 1
 
@@ -460,13 +482,13 @@ point.  For example, reckoning the Fibonaccis as F[0]=1, F[2]=2, etc
 The k's are then assembled as 1-bits in binary to encode this sum in an
 integer,
 
-    fibbinary(19) = 2^5 + 2^3 + 2^0 = 41
+    Fibbinary(19) = 2^5 + 2^3 + 2^0 = 41
 
 =for GP-Test  2^5 + 2^3 + 2^0 == 41
 
-The gaps between Fibonacci numbers means that after subtracting F(k) the
-next cannot be F(k-1), it must be F(k-2) or less.  For that reason there's
-no adjacent 1-bits in the fibbinary numbers.
+The gaps between Fibonacci numbers mean that after subtracting F(k) from i,
+the next cannot be F(k-1), it must be F(k-2) or less.  For that reason
+there's no adjacent 1-bits in the Fibbinary numbers.
 
 The connection between no adjacent 1s and the Fibonacci sequence can be seen
 by considering values with high bit 2^k.  The further bits in it cannot have
@@ -507,11 +529,11 @@ next higher value which is.
 
 =item C<$value = $seq-E<gt>ith($i)>
 
-Return the C<$i>'th fibbinary number.
+Return the C<$i>'th Fibbinary number.
 
 =item C<$bool = $seq-E<gt>pred($value)>
 
-Return true if C<$value> is a fibbinary number, which means that in binary
+Return true if C<$value> is a Fibbinary number, which means that in binary
 it doesn't have any consecutive 1-bits.
 
 =item C<$i = $seq-E<gt>value_to_i($value)>
@@ -535,13 +557,13 @@ Return an estimate of the i corresponding to C<$value>.
 
 =head2 Next Value
 
-For a given fibbinary number, the next fibbinary is +1 if the lowest bit is
+For a given Fibbinary number, the next Fibbinary is +1 if the lowest bit is
 2^2=4 or more.  If however the low bit is 2^1=2 or 2^0=1 then the run of low
 alternating ...101 or ...1010 must be cleared and the bit above set.  For
 example 1001010 becomes 1010000.  All cases can be handled by some bit
 twiddling
 
-    # value=fibbinary
+    # value=Fibbinary
     filled = (value >> 1) | value
     mask = ((filled+1) ^ filled) >> 1
     next value = (value | mask) + 1
@@ -559,33 +581,33 @@ low ones).  +1 means the bit above the filled part is included so 11111, but
 a shift drops back to "mask" just 01111.  OR-ing and incrementing then
 clears those low bits and sets the next higher bit to make ...10000.
 
-This works for any fibbinary input, both odd "...10101" and even "...1010"
+This works for any Fibbinary input, both odd "...10101" and even "...1010"
 endings and also zeros "...0000".  In the zeros case the result is just a +1
 for "...0001", and that includes input value=0 giving next=1.
 
 =head2 Ith Value
 
-The i'th fibbinary number can be calculated as per L</Zeckendorf Base>
+The i'th Fibbinary number can be calculated as per L</Zeckendorf Base>
 above.  Reckoning the Fibonacci numbers as F(0)=1, F(1)=2, F(2)=3, F(3)=5,
 etc,
 
     find the biggest F(k) <= i
     subtract i -= F(k)
-    fibbinary result += 2^k
+    Fibbinary result += 2^k
     repeat until i=0
 
 To find each F(k)E<lt>=i either just work downwards through the Fibonacci
 numbers, or the Fibonaccis grow as (phi^k)/sqrt(5) with phi=(sqrt(5)+1)/2
 the golden ratio, so an F(k) could be found by a log base phi of i.  Or
 taking log2 of i (the bit length of i) might give 2 or 3 candidates for k.
-Calculating log base phi is unlikely to be faster, but log 2 high bit might
+Calculating log base phi is unlikely to be faster, but log 2 high bit should
 quickly go to a nearly-correct place in a table.
 
 =head2 Predicate
 
-Testing for a fibbinary value can be done by a shift and AND,
+Testing for a Fibbinary value can be done by a shift and AND,
 
-    is_fibbinary = ((value & (value >> 1)) == 0)
+    is_Fibbinary = ((value & (value >> 1)) == 0)
 
 Any adjacent 1-bits overlap in the shift+AND and come through as non-zero.
 
@@ -602,14 +624,14 @@ course.)
 
 =head2 Value to i Floor
 
-In a fibbinary value each bit becomes a Fibonacci F[i] to add to make i, as
+In a Fibbinary value each bit becomes a Fibonacci F[i] to add to make i, as
 per L</Zeckendorf Base> above.
 
-If a number is not a fibbinary then the next lower fibbinary can be had by
+If a number is not a Fibbinary then the next lower Fibbinary can be had by
 finding the highest 11 pair and changing it and all the bits below to
-101010...etc.  For example 10011001 is not a fibbinary and must change down
+101010...etc.  For example 10011001 is not a Fibbinary and must change down
 to 10010101, ie. the 11001 reduces to 10101, that being the biggest
-fibbinary no-adjacent-1s which is 10xxx.
+Fibbinary no-adjacent-1s which is 10xxx.
 
     bits 2^k from high to low
       if bit set
@@ -661,7 +683,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2019 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2019, 2020, 2021, 2022 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

@@ -4,12 +4,12 @@ author:
   - 'Abe Timmerman <abeltje@cpan.org>'
 build_requires:
   Test::Fatal: '0.01'
-  Test::More: '0.88'
+  Test::Simple: '0.88'
   Test::Warnings: '0.028'
 configure_requires:
   ExtUtils::MakeMaker: 6.55_02
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,6 +22,7 @@ no_index:
 requires:
   Moo: '2.003'
   Params::ValidationCompiler: '0.27'
+  Regexp::Util: '0.005'
   Sub::Util: '1.50'
   Types::Standard: '1.008'
   namespace::autoclean: '0.28'
@@ -29,4 +30,5 @@ requires:
 resources:
   homepage: https://github.com/abeltje/MooX-Params-CompiledValidators
   repository: https://github.com/abeltje/MooX-Params-CompiledValidators.git
-version: '0.04'
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

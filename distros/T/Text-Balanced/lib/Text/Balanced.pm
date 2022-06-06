@@ -18,7 +18,7 @@ use Exporter ();
 
 use vars qw { $VERSION @ISA %EXPORT_TAGS };
 BEGIN {
-    $VERSION     = '2.05';
+    $VERSION     = '2.06';
     @ISA         = 'Exporter';
     %EXPORT_TAGS = (
         ALL => [ qw{
@@ -41,6 +41,7 @@ Exporter::export_ok_tags('ALL');
 our $RE_PREREGEX_PAT = qr#(
     [!=]~
     | split|grep|map
+    | not|and|or|xor
 )#x;
 our $RE_EXPR_PAT = qr#(
     (?:\*\*|&&|\|\||<<|>>|//|[-+*x%^&|.])=?
@@ -493,7 +494,7 @@ sub _match_variable
         my $deref = $1;
 
         unless ($$textref =~ m/\G\s*(?:::|')?(?:[_a-z]\w*(?:::|'))*[_a-z]\w*/gci
-            or _match_codeblock($textref, qr/\G()/, '\{', qr/\G\s*(\})/, '\{', '\}', 0)
+            or _match_codeblock($textref, qr/\G()/, '\{', qr/\G\s*(\})/, '\{', '\}', 0, 1)
             or $deref eq '$#' or $deref eq '$$'
             or pos($$textref) == length $$textref )
         {
@@ -509,10 +510,10 @@ sub _match_variable
         next if _match_codeblock($textref,
                                  qr/\G\s*->\s*(?:[_a-zA-Z]\w+\s*)?/,
                                  qr/[({[]/, qr/\G\s*([)}\]])/,
-                                 qr/[({[]/, qr/[)}\]]/, 0);
+                                 qr/[({[]/, qr/[)}\]]/, 0, 1);
         next if _match_codeblock($textref,
                                  qr/\G\s*/, qr/[{[]/, qr/\G\s*([}\]])/,
-                                 qr/[{[]/, qr/[}\]]/, 0);
+                                 qr/[{[]/, qr/[}\]]/, 0, 1);
         next if _match_variable($textref,qr/\G\s*->\s*/);
         next if $$textref =~ m/\G\s*->\s*\w+(?![{([])/gc;
         last;
@@ -556,7 +557,7 @@ sub extract_codeblock (;$$$$$)
     my $rd         = $_[4];
     my @delims = _ec_delims($ldel_inner, $ldel_outer);
 
-    my @match = _match_codeblock($textref, $pre, @delims, $rd);
+    my @match = _match_codeblock($textref, $pre, @delims, $rd, 1);
     return _fail($wantarray, $textref) unless @match;
     return _succeed($wantarray, $textref,
                     @match[2..3,4..5,0..1]    # MATCH, REMAINDER, PREFIX
@@ -565,7 +566,8 @@ sub extract_codeblock (;$$$$$)
 
 sub _match_codeblock
 {
-    my ($textref, $pre, $ldel_outer, $rdel_outer, $ldel_inner, $rdel_inner, $rd) = @_;
+    my ($textref, $pre, $ldel_outer, $rdel_outer, $ldel_inner, $rdel_inner, $rd, $no_backcompat) = @_;
+    $rdel_outer = qr/\G\s*($rdel_outer)/ if !$no_backcompat; # Switch calls this func directly
     my $startpos = pos($$textref) = pos($$textref) || 0;
     unless ($$textref =~ m/$pre/gc)
     {
@@ -629,7 +631,7 @@ sub _match_codeblock
             next;
         }
 
-        if ( _match_codeblock($textref, qr/\G\s*/, $ldel_inner, qr/\G\s*($rdel_inner)/, $ldel_inner, $rdel_inner, $rd) )
+        if ( _match_codeblock($textref, qr/\G\s*/, $ldel_inner, qr/\G\s*($rdel_inner)/, $ldel_inner, $rdel_inner, $rd, 1) )
         {
             $ref2slashvalid{$textref} = $ref2qmarkvalid{$textref} = 1;
             next;
@@ -656,6 +658,7 @@ sub _match_codeblock
         return;
     }
 
+    $ref2slashvalid{$textref} = $ref2qmarkvalid{$textref} = undef;
     my $endpos = pos($$textref);
     return ( $startpos, $codepos-$startpos,
              $codepos, $endpos-$codepos,
@@ -890,7 +893,7 @@ sub _match_quotelike
 
     $$textref =~ m/\G($mods{$op})/gc;
     my $endpos = pos $$textref;
-    $ref2qmarkvalid{$textref} = $ref2slashvalid{$textref} = 0;
+    $ref2qmarkvalid{$textref} = $ref2slashvalid{$textref} = undef;
 
     return (
         $startpos,      $oppos-$startpos,       # PREFIX
@@ -2418,11 +2421,11 @@ License or the Artistic License, as specified in the F<LICENCE> file.
 
 =head1 VERSION
 
-Version 2.05
+Version 2.06
 
 =head1 DATE
 
-22 May 2022
+05 Jun 2022
 
 =head1 HISTORY
 

@@ -4,7 +4,7 @@
       "Martin Becker <becker-cpan-mp (at) cozap.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -40,6 +40,7 @@
             "Math::BigInt" : "0",
             "Math::ModInt" : "0.012",
             "Math::Polynomial" : "1.015",
+            "Readonly" : "2",
             "perl" : "5.006"
          }
       },
@@ -53,17 +54,26 @@
    "provides" : {
       "Math::Polynomial::ModInt" : {
          "file" : "lib/Math/Polynomial/ModInt.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Math::Polynomial::ModInt::Order" : {
          "file" : "lib/Math/Polynomial/ModInt/Order.pm",
-         "version" : "0.004"
+         "version" : "0.005"
+      },
+      "Math::Polynomial::ModInt::Order::ByIndex" : {
+         "file" : "lib/Math/Polynomial/ModInt/Order.pm"
+      },
+      "Math::Polynomial::ModInt::Order::Conway" : {
+         "file" : "lib/Math/Polynomial/ModInt/Order.pm"
+      },
+      "Math::Polynomial::ModInt::Order::Sparse" : {
+         "file" : "lib/Math/Polynomial/ModInt/Order.pm"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Math-Polynomial-ModInt"
+         "web" : "https://github.com/mhasch/perl-Math-Polynomial-ModInt/issues"
       },
       "license" : [
          "https://www.perlfoundation.org/artistic-license-20.html"
@@ -74,6 +84,6 @@
          "web" : "https://github.com/mhasch/perl-Math-Polynomial-ModInt"
       }
    },
-   "version" : "0.004",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.005",
+   "x_serialization_backend" : "JSON::PP version 4.09"
 }

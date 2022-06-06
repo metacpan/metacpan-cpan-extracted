@@ -84,7 +84,7 @@ use YAML::Any qw(
 # always use x.yyy version numbering, so that string comparison and
 # numeric comparison give the same ordering, to avoid trouble due to
 # different ways of interpreting version numbers.
-our $VERSION = '2.009';
+our $VERSION = '2.010';
 
 my $CASE_TOLERANT;
 my $PIRname; # for 'name' or 'iname' as appropriate for
@@ -2036,21 +2036,23 @@ sub has_useful_timestamp {
 # sensitive, except on case-insensitive operating systems.
 sub identify_files {
   my ( $pattern, @files ) = @_;
+  my %original;
+  my @tfiles;
   if ($CASE_TOLERANT) {
     # lowercase the file names and pattern if the operating system
     # uses case insensitive path names so the match becomes case
     # insensitive.  Remember the original path names so we can return
     # those (the matching ones) instead of the lowercased versions.
     $pattern = lc $pattern;
-    my %original;
-    my @lcfiles = map { lc } @files;
-    foreach my $i (0..$#files) {
-      $original{$lcfiles[$i]} = $files[$i];
-    }
-    return map { $original{$_} } match_glob($pattern, @lcfiles);
+    @tfiles = map { lc =~ s|^\./||r } @files;
   } else {
-    return match_glob($pattern, @files);
+    @tfiles = map { s|^\./||r } @files;
   }
+  foreach my $i (0..$#files) {
+    $original{$tfiles[$i]} = $files[$i];
+  }
+  $pattern = '*' . $pattern unless $pattern =~ /^\*/;
+  return map { $original{$_} } match_glob($pattern, @tfiles);
 }
 
 #  $ims->import_camera_offsets;

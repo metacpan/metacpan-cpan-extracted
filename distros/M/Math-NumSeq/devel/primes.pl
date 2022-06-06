@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -25,10 +25,36 @@ use Math::Prime::XS 0.23 'is_prime'; # version 0.23 fix for 1928099
 use Math::Factor::XS 0.39 'prime_factors'; # version 0.39 for prime_factors()
 use List::Util 'max','min';
 use Math::Trig 'pi';
+$|=1;
 
 use Smart::Comments;
 
 # use blib "$ENV{HOME}/perl/bit-vector/Bit-Vector-7.1/blib";
+
+{
+  # primes - k constant
+
+  require Math::NumSeq::Primes;
+  my $seq = Math::NumSeq::Primes->new;
+  foreach my $k (1 .. 30) {
+    print "k=$k\n";
+    $seq->rewind;
+    my @array;
+    while (@array < 40) {
+      my ($i, $value) = $seq->next;
+      $value -= $k;
+      if ($value >= 20) {
+        push @array, $value;
+      }
+    }
+    require Math::OEIS::Grep;
+    Math::OEIS::Grep->search (array => \@array,
+                              name => "prime - $k",
+                              verbose => 1,
+                             );
+  }
+  exit 0;
+}
 
 {
   # prime gaps
@@ -150,7 +176,7 @@ use Smart::Comments;
   exit 0;
 }
 {
-  use Math::Prime::Util;
+  require Math::Prime::Util;
   {
     my $ret = Math::Prime::Util::is_prime(2**256);
     ### $ret
@@ -331,7 +357,7 @@ use Smart::Comments;
 
 
 {
-  use Math::Prime::FastSieve;
+  require Math::Prime::FastSieve;
   my @ret = Math::Prime::FastSieve::primes(20);
   ### @ret;
 

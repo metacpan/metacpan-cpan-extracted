@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2016, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -20,7 +20,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 74;
+$VERSION = 75;
 
 use Math::NumSeq;
 use Math::NumSeq::Base::IterateIth;
@@ -140,7 +140,7 @@ i=1
 
     0, 1, 2, 2, 3, 2, 3, 3, 3, 3, 4, 3, 4, ...
 
-For example i=5 goes 5- E<gt> 4 -E<gt> 2 -E<gt> 1 so value=3 steps.
+For example i=5 goes 5 -E<gt> 4 -E<gt> 2 -E<gt> 1 so value=3 steps.
 
 =head1 FUNCTIONS
 
@@ -182,7 +182,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2016, 2019, 2020, 2021 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

@@ -7,7 +7,7 @@ use Test::More;
 plan tests => 1;
 
 BEGIN {
-    use_ok( 'App::Pod' ) || print "Bail out!\n";
+   use_ok( 'App::Pod' ) || print "Bail out!\n";
 }
 
 diag( "Testing App::Pod $App::Pod::VERSION, Perl $], $^X" );

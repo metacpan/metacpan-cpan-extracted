@@ -1,5 +1,10 @@
 Revision history for Perl extension JavaScript::QuickJS:
 
+0.12 Mon 6 Jan 2022
+- Add await() so Perl can wait until JS’s pending jobs finish.
+- Make eval_module() return the JS object so chaining is easier.
+- Explicitly document interfaces that return the JS object.
+
 0.11 Sun 15 May 2022
 - BREAKING CHANGE: JavaScript Functions converted to Perl now become
   instances of a new class, JavaScript::QuickJS::Function. That class

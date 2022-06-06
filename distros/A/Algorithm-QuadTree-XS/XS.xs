@@ -260,6 +260,28 @@ QuadTreeRootNode* get_root_from_perl(SV *self)
 	return (QuadTreeRootNode*) SvIV(get_hash_key(params, "ROOT"));
 }
 
+void clear_tree(QuadTreeRootNode *root)
+{
+		char *key;
+		I32 retlen;
+		SV *value;
+		int i;
+
+		hv_iterinit(root->backref);
+		while ((value = hv_iternextsv(root->backref, &key, &retlen)) != NULL) {
+			DynArr *list = (DynArr*) SvIV(value);
+			for (i = 0; i < list->count; ++i) {
+				QuadTreeNode *node = (QuadTreeNode*) list->ptr[i];
+				destroy_array_SV(node->values);
+				node->values = create_array();
+			}
+
+			destroy_array(list);
+		}
+
+		hv_clear(root->backref);
+}
+
 // proper XS Code starts here
 
 MODULE = Algorithm::QuadTree::XS		PACKAGE = Algorithm::QuadTree::XS
@@ -292,7 +314,7 @@ _AQT_deinit(self)
 	CODE:
 		QuadTreeRootNode *root = get_root_from_perl(self);
 
-		call_method("_AQT_clear", 0);
+		clear_tree(root);
 		destroy_node(root->node);
 		free(root->node);
 		SvREFCNT_dec((SV*) root->backref);
@@ -386,23 +408,5 @@ _AQT_clear(self)
 		SV* self
 	CODE:
 		QuadTreeRootNode *root = get_root_from_perl(self);
-
-		char *key;
-		I32 retlen;
-		SV *value;
-		int i;
-
-		hv_iterinit(root->backref);
-		while ((value = hv_iternextsv(root->backref, &key, &retlen)) != NULL) {
-			DynArr *list = (DynArr*) SvIV(value);
-			for (i = 0; i < list->count; ++i) {
-				QuadTreeNode *node = (QuadTreeNode*) list->ptr[i];
-				destroy_array_SV(node->values);
-				node->values = create_array();
-			}
-
-			destroy_array(list);
-		}
-
-		hv_clear(root->backref);
+		clear_tree(root);
 

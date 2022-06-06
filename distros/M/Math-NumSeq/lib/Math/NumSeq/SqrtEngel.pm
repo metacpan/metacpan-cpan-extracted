@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2016, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -20,7 +20,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 74;
+$VERSION = 75;
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
 
@@ -245,9 +245,9 @@ is
     1, 3, 5, 5, 16, etc
     starting i=1
 
-For a perfect square the expansion is a finite sequence of 1s adding up to
+For a perfect square, the expansion is a finite sequence of 1s summing to
 the root.  This is unlikely to be interesting, but works as a C<$seq>
-sequence..
+sequence.
 
     sqrt(perfect square) = 1/1 + 1/1 + ... + 1/1
 
@@ -280,7 +280,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2016, 2019, 2020 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

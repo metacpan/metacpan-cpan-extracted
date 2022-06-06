@@ -294,6 +294,48 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'show_connector_lines' => {
+    	datatype => 'boolean',
+    	base_name => 'ShowConnectorLines',
+    	description => 'True if inner points are shown. Applied to Waterfall series only.',
+    	format => '',
+    	read_only => '',
+    		},
+    'quartile_method' => {
+    	datatype => 'string',
+    	base_name => 'QuartileMethod',
+    	description => 'Quartile method. Applied to BoxAndWhisker series only.',
+    	format => '',
+    	read_only => '',
+    		},
+    'show_inner_points' => {
+    	datatype => 'boolean',
+    	base_name => 'ShowInnerPoints',
+    	description => 'True if inner points are shown. Applied to BoxAndWhisker series only.',
+    	format => '',
+    	read_only => '',
+    		},
+    'show_mean_line' => {
+    	datatype => 'boolean',
+    	base_name => 'ShowMeanLine',
+    	description => 'True if mean line is shown. Applied to BoxAndWhisker series only.',
+    	format => '',
+    	read_only => '',
+    		},
+    'show_mean_markers' => {
+    	datatype => 'boolean',
+    	base_name => 'ShowMeanMarkers',
+    	description => 'True if mean markers are shown. Applied to BoxAndWhisker series only.',
+    	format => '',
+    	read_only => '',
+    		},
+    'show_outlier_points' => {
+    	datatype => 'boolean',
+    	base_name => 'ShowOutlierPoints',
+    	description => 'True if outlier points are shown. Applied to BoxAndWhisker series only.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -312,7 +354,13 @@ __PACKAGE__->swagger_types( {
     'line_format' => 'LineFormat',
     'data_point_type' => 'string',
     'data_points' => 'ARRAY[OneValueChartDataPoint]',
-    'number_format_of_values' => 'string'
+    'number_format_of_values' => 'string',
+    'show_connector_lines' => 'boolean',
+    'quartile_method' => 'string',
+    'show_inner_points' => 'boolean',
+    'show_mean_line' => 'boolean',
+    'show_mean_markers' => 'boolean',
+    'show_outlier_points' => 'boolean'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -331,7 +379,13 @@ __PACKAGE__->attribute_map( {
     'line_format' => 'LineFormat',
     'data_point_type' => 'DataPointType',
     'data_points' => 'DataPoints',
-    'number_format_of_values' => 'NumberFormatOfValues'
+    'number_format_of_values' => 'NumberFormatOfValues',
+    'show_connector_lines' => 'ShowConnectorLines',
+    'quartile_method' => 'QuartileMethod',
+    'show_inner_points' => 'ShowInnerPoints',
+    'show_mean_line' => 'ShowMeanLine',
+    'show_mean_markers' => 'ShowMeanMarkers',
+    'show_outlier_points' => 'ShowOutlierPoints'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

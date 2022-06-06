@@ -1,5 +1,8 @@
 package Firewall::Config::Element::Address::Role;
 
+#------------------------------------------------------------------------------
+# 加载扩展模块
+#------------------------------------------------------------------------------
 use Moose::Role;
 use Firewall::Utils::Ip;
 use Firewall::Utils::Set;

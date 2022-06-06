@@ -45,6 +45,7 @@ use Smart::Comments;
   ### characteristic(smaller): $seq->characteristic('smaller')
   ### values_min: $seq->values_min
   ### values_max: $seq->values_max
+  ### i_start: $seq->i_start
   ### tell: $seq->tell_i
   exit 0;
 }

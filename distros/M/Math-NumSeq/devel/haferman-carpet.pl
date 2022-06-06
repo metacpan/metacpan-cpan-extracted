@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2013, 2014, 2019 Kevin Ryde
+# Copyright 2013, 2014, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -177,7 +177,6 @@ use Math::NumSeq::HafermanCarpet;
       }
       # shift @values;
       print join(',',@values),"\n";
-      require MyOEIS;
       Math::OEIS::Grep->search
         (name => "initial_value=$initial_value bit=$bit",
          array => \@values);
@@ -246,7 +245,6 @@ use Math::NumSeq::HafermanCarpet;
       }
     }
 
-    require MyOEIS;
     $#values = 70;
     Math::OEIS::Grep->search
       (name => "centre axis initial_value=$initial_value",
@@ -286,7 +284,6 @@ use Math::NumSeq::HafermanCarpet;
       @values = @new_values;
     }
 
-    require MyOEIS;
     $#values = 70;
     shift @values;
     Math::OEIS::Grep->search(name => "centre axis starting $initial",
@@ -318,7 +315,6 @@ use Math::NumSeq::HafermanCarpet;
   # XorY axis = A014578 count low 0-trits, mod 2
   # rule=20 line 1,2 maybe A182581 count low base-3 zeros taken mod 2
 
-  require MyOEIS;
   require Math::NumSeq::PlanePathCoord;
   my @choices = @{Math::NumSeq::PlanePathCoord->parameter_info_hash
       ->{'planepath'}->{'choices'}};
@@ -436,7 +432,6 @@ use Math::NumSeq::HafermanCarpet;
 
 {
   # not found
-  use lib 'xt'; require MyOEIS;
   require Math::NumSeq::HafermanZ;
   my $seq = Math::NumSeq::HafermanZ->new;
   my @values;

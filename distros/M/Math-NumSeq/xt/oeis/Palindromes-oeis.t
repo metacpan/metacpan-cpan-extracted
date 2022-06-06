@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2014, 2019 Kevin Ryde
+# Copyright 2012, 2014, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -20,7 +20,7 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 16;
+plan tests => 17;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -31,6 +31,23 @@ use Math::NumSeq::Palindromes;
 
 # uncomment this to run the ### lines
 #use Smart::Comments '###';
+
+
+#------------------------------------------------------------------------------
+# A057148 binary palindromes written in binary
+MyOEIS::compare_values
+  (anum => 'A057148',
+   func => sub {
+     my ($count) = @_;
+     require Math::BaseCnv;
+     my $seq = Math::NumSeq::Palindromes->new (radix => 2);
+     my @got;
+     while (@got < $count) {
+       my ($i, $value) = $seq->next;
+       push @got, Math::BaseCnv::cnv($value,10,2);
+     }
+     return \@got;
+   });
 
 
 #------------------------------------------------------------------------------

@@ -1854,7 +1854,7 @@ next(iter, count_sv= NULL)
 		Tree::RB::XS::Iter::next_values  = 2
 		Tree::RB::XS::Iter::next_kv      = 3
 	INIT:
-		size_t pos, n, i, tree_count= TreeRBXS_get_count(iter->tree);
+		size_t pos, n, nret, i, tree_count= TreeRBXS_get_count(iter->tree);
 		IV request;
 		rbtree_node_t *node;
 		rbtree_node_t *(*step)(rbtree_node_t *)= iter->reverse? &rbtree_node_prev : rbtree_node_next;
@@ -1890,20 +1890,21 @@ next(iter, count_sv= NULL)
 				n= iter->reverse? 1 + pos : tree_count - pos;
 				if (n > request) n= request;
 				node= &iter->item->rbnode;
-				EXTEND(SP, ix == 3? 2*n : n);
-				if (ix == 0) {
+				nret= ix == 3? 2*n : n;
+				EXTEND(SP, nret); // EXTEND macro declares a temp 'ix' internally - GitHub #2
+				if (ix == 0) { // Return N node references
 					for (i= 0; i < n && node; i++, node= step(node))
 						ST(i)= sv_2mortal(TreeRBXS_wrap_item(GET_TreeRBXS_item_FROM_rbnode(node)));
 				}
-				else if (ix == 1) {
+				else if (ix == 1) { // Return N keys
 					for (i= 0; i < n && node; i++, node= step(node))
 						ST(i)= sv_2mortal(TreeRBXS_item_wrap_key(GET_TreeRBXS_item_FROM_rbnode(node)));
 				}
-				else if (ix == 2) {
+				else if (ix == 2) { // Return N values
 					for (i= 0; i < n && node; i++, node= step(node))
 						ST(i)= GET_TreeRBXS_item_FROM_rbnode(node)->value;
 				}
-				else {
+				else { // return N (Key,Value) pairs
 					for (i= 0; i < n && node; i++, node= step(node)) {
 						ST(i*2)= sv_2mortal(TreeRBXS_item_wrap_key(GET_TreeRBXS_item_FROM_rbnode(node)));
 						ST(i*2+1)= GET_TreeRBXS_item_FROM_rbnode(node)->value;

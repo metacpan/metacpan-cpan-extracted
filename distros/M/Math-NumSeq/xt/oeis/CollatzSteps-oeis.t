@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2019 Kevin Ryde
+# Copyright 2012, 2013, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -20,8 +20,9 @@
 use 5.004;
 use strict;
 use Math::BigInt try => 'GMP';
+use List::Util 'sum';
 use Test;
-plan tests => 16;
+plan tests => 20;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -32,6 +33,107 @@ use Math::NumSeq::CollatzSteps;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
+
+
+#------------------------------------------------------------------------------
+
+# this code by Ruud H.G. van Tol in A075680
+sub a075680 {
+  my $v = 2 * shift - 1;
+  my $c = 0;
+  until (1 == $v) {
+    $v = 3 * $v + 1;
+    $v /= 2 until ($v & 1);
+    $c += 1;
+  }
+  return $c;
+}
+
+MyOEIS::compare_values
+  (anum => 'A075680',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     for (my $n = 1; @got < $count; $n++) {
+       push @got, a075680($n);
+     }
+     return \@got;
+   });
+
+
+#------------------------------------------------------------------------------
+# A088975 - breadth-first tree traversal, odd first
+# A088976 - breadth-first tree traversal, even first
+
+foreach my $elem (['A088975',1],
+                  ['A088976',0]) {
+  my ($anum,$rev) = @$elem;
+  MyOEIS::compare_values
+      (anum => $anum,
+       func => sub {
+         my ($count) = @_;
+         my @got;
+         my @pending = (1);
+         while (@got < $count) {
+           my $n = shift @pending;
+           push @got, $n;
+           my @new = (2*$n);
+           if ($n>4 && $n%6==4) { push @new, ($n-1)/3; }
+           push @pending, ($rev ? reverse @new : @new);
+         }
+         return \@got;
+       });
+}
+
+# breadth-first, sorted
+MyOEIS::compare_values
+  (anum => 'A127824',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     my @row = (1);
+     while (@got < $count) {
+       push @got, @row;
+       @row = sort {$a<=>$b} map { (2*$_, ($_>4 && $_%6==4 ? (($_-1)/3) : ())) } @row;
+     }
+     $#got = $count-1;
+     return \@got;
+   });
+
+# tree row widths
+MyOEIS::compare_values
+  (anum => 'A005186',
+   func => sub {
+     my ($count) = @_;
+     my @got;
+     my @row = (1);
+     while (@got < $count) {
+       push @got, scalar(@row);
+       @row = map { (2*$_, ($_>4 && $_%6==4 ? (($_-1)/3) : ())) } @row;
+     }
+     return \@got;
+   });
+
+# row totals
+# 1,2,4,8,16,37,74,172,344,786,1572,3538,7206,16252,33112,73762,149967,330107
+# going to be A337673
+#
+# cumulative
+# not in OEIS: 1,3,7,15,31,68,142,314,658,1444,3016,6554,13760,30012,63124,136886
+#
+# MyOEIS::compare_values
+#   (anum => 'A337673',
+#    func => sub {
+#      my ($count) = @_;
+#      my @got;
+#      my $total = 0;;
+#      my @row = (1);
+#      while (@got < $count) {
+#        push @got, ($total += sum(@row));
+#        @row = map { (2*$_, ($_>4 && $_%6==4 ? (($_-1)/3) : ())) } @row;
+#      }
+#      return \@got;
+#    });
 
 
 #------------------------------------------------------------------------------

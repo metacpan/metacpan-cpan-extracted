@@ -1,4 +1,4 @@
-# Copyright 2012, 2013, 2014, 2016, 2019 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2016, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -26,7 +26,7 @@ use strict;
 use List::Util 'reduce';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 74;
+$VERSION = 75;
 
 use Math::NumSeq;
 use Math::NumSeq::Base::IterateIth;
@@ -226,7 +226,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2012, 2013, 2014, 2016, 2019 Kevin Ryde
+Copyright 2012, 2013, 2014, 2016, 2019, 2020 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

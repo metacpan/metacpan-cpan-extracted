@@ -5,10 +5,10 @@ no if $] >= 5.018, warnings => "experimental::smartmatch";
 use Test::More;
 
 
-my @long = qw( pad empty undef ll default max_cols max_height max_width keep no_spacebar mark tabs_info tabs_prompt footer skip_items margin );
+my @long = qw( pad empty undef ll default max_cols max_height max_width keep no_spacebar mark footer skip_items margin );
 my @simple = qw( alignment layout order clear_screen mouse beep hide_cursor index color codepage_mapping search ); # prompt
 my @all = ( @long, @simple );
-my @skip = qw( info prompt include_highlighted meta_items busy_string page );
+my @skip = qw( info prompt include_highlighted meta_items busy_string page tabs_prompt tabs_info );
 
 
 plan tests => 2 + scalar @all;

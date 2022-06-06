@@ -1,43 +1,82 @@
-Changes on 2021-03-25 for repository at:
+Changes on 2022-06-06 for repository at:
   Fetch URL: git@github.com:abeltje/MooX-Params-CompiledValidators.git
   Push  URL: git@github.com:abeltje/MooX-Params-CompiledValidators.git
 
 Enjoy!
 
-0.04 2021-03-25T20:59:17+01:00 (1c0638e => Abe Timmerman)
- - (Abe Timmerman, 2 seconds ago) Autocommit for distribution
-   MooX::Params::CompiledValidators 0.04 (same)
+0.05 2022-06-06T13:20:53+02:00 (dad9d00 => Abe Timmerman)
+ - (Abe Timmerman, Mon, 6 Jun 2022 13:20:53 +0200) Autocommit for
+   distribution MooX::Params::CompiledValidators 0.05 (minor)
+
+0.04_04 2022-06-02T15:35:15+02:00 (55967ae => Abe Timmerman)
+ - (Abe Timmerman, Thu, 2 Jun 2022 15:35:15 +0200) Autocommit for
+   distribution MooX::Params::CompiledValidators 0.04_04 (test)
+
+0.04_03 2022-05-31T13:13:34+02:00 (9fa4454 => Abe Timmerman)
+ - (Abe Timmerman, Tue, 31 May 2022 13:13:34 +0200) Autocommit for
+   distribution MooX::Params::CompiledValidators 0.04_03 (test)
+
+ - (Abe Timmerman, Thu, 2 Jun 2022 15:32:37 +0200) Try to avoid warnings
+   from Types::Standard::StrMatch
+ -     It seems to help if you have Regexp::Util installed, so add it to
+   the
+ -     depencies.
+
+0.04_02 2022-05-31T12:32:25+02:00 (1345547 => Abe Timmerman)
+ - (Abe Timmerman, Tue, 31 May 2022 12:32:25 +0200) Autocommit for
+   distribution MooX::Params::CompiledValidators 0.04_02 (test)
+
+ - (Abe Timmerman, Tue, 31 May 2022 13:12:05 +0200) Try to avoid warnings
+   from Types::Standard::StrMatch
+
+0.04_01 2022-05-26T16:22:00+02:00 (84308db => Abe Timmerman)
+ - (Abe Timmerman, Thu, 26 May 2022 16:22:00 +0200) Autocommit for
+   distribution MooX::Params::CompiledValidators 0.04_01 (test)
+
+0.04 2021-03-25T20:59:17+01:00 (61b08e6 => Abe Timmerman)
+ - (Abe Timmerman, Thu, 25 Mar 2021 20:59:17 +0100) Autocommit for
+   distribution MooX::Params::CompiledValidators 0.04 (same)
+
+ - (Abe Timmerman, Thu, 26 May 2022 13:50:57 +0200) Update to
+   t::Test::abeltje 1.06
+
+ - (Abe Timmerman, Thu, 26 May 2022 14:04:03 +0200) Update documentation
+
+ - (Abe Timmerman, Thu, 26 May 2022 15:45:23 +0200) Better error messages.
 
 0.02 2021-03-19T05:08:02+01:00 (20fff4a => Abe Timmerman)
- - (Abe Timmerman, 7 days ago) Autocommit for distribution
-   MooX::Params::CompiledValidators 0.02 (same)
+ - (Abe Timmerman, Fri, 19 Mar 2021 05:08:02 +0100) Autocommit for
+   distribution MooX::Params::CompiledValidators 0.02 (same)
 
- - (Abe Timmerman, 6 minutes ago) FIX: Makefile.PL
+ - (Abe Timmerman, Thu, 25 Mar 2021 20:53:15 +0100) FIX: Makefile.PL
  -     Add dependency on 'namespace::autoclean'
  -     Fix some of the META_ADD information
 
- - (Abe Timmerman, 2 minutes ago) Autocommit for distribution
-   MooX::Params::CompiledValidators 0.03 (same)
+ - (Abe Timmerman, Thu, 25 Mar 2021 20:57:06 +0100) Autocommit for
+   distribution MooX::Params::CompiledValidators 0.03 (same)
 
 0.01 2021-03-19T04:43:32+01:00 (2b8c415 => Abe Timmerman)
- - (Abe Timmerman, 7 days ago) Autocommit for distribution
-   MooX::Params::CompiledValidators 0.01 (same)
+ - (Abe Timmerman, Fri, 19 Mar 2021 04:43:32 +0100) Autocommit for
+   distribution MooX::Params::CompiledValidators 0.01 (same)
 
- - (Abe Timmerman, 7 days ago) Clean up the MANIFEST* stuff
+ - (Abe Timmerman, Fri, 19 Mar 2021 05:00:52 +0100) Clean up the MANIFEST*
+   stuff
  -     We want Changes in the tarbal...
 
 0.00_00 2021-02-19T01:11:57+01:00 (58b6456 => Abe Timmerman)
- - (Abe Timmerman, 5 weeks ago) New repository
+ - (Abe Timmerman, Fri, 19 Feb 2021 01:11:57 +0100) New repository
    MooX::Params::CompiledValidations
 
- - (Abe Timmerman, 2 weeks ago) Setup the new repository
+ - (Abe Timmerman, Fri, 12 Mar 2021 05:08:34 +0100) Setup the new
+   repository
  -     Basic perl-distribution files
  -     t::Test::abeltje (update_abeltje_testing)
  -     The actual code
  -     basic tests
 
- - (Abe Timmerman, 2 weeks ago) VERSION doesn't work with whitespace in it
+ - (Abe Timmerman, Fri, 12 Mar 2021 05:16:05 +0100) VERSION doesn't work
+   with whitespace in it
 
- - (Abe Timmerman, 7 days ago) Small POD changes
+ - (Abe Timmerman, Fri, 19 Mar 2021 01:40:01 +0100) Small POD changes
 
- - (Abe Timmerman, 7 days ago) Add a README.md
+ - (Abe Timmerman, Fri, 19 Mar 2021 04:34:48 +0100) Add a README.md

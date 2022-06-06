@@ -8,6 +8,13 @@ lib/AsposeSlidesCloud/Object/AddLayoutSlide.pm
 lib/AsposeSlidesCloud/Object/AddMasterSlide.pm
 lib/AsposeSlidesCloud/Object/AddShape.pm
 lib/AsposeSlidesCloud/Object/AddSlide.pm
+lib/AsposeSlidesCloud/Object/AlphaBiLevelEffect.pm
+lib/AsposeSlidesCloud/Object/AlphaCeilingEffect.pm
+lib/AsposeSlidesCloud/Object/AlphaFloorEffect.pm
+lib/AsposeSlidesCloud/Object/AlphaInverseEffect.pm
+lib/AsposeSlidesCloud/Object/AlphaModulateEffect.pm
+lib/AsposeSlidesCloud/Object/AlphaModulateFixedEffect.pm
+lib/AsposeSlidesCloud/Object/AlphaReplaceEffect.pm
 lib/AsposeSlidesCloud/Object/ApiInfo.pm
 lib/AsposeSlidesCloud/Object/ArcToPathSegment.pm
 lib/AsposeSlidesCloud/Object/ArrayElement.pm
@@ -17,10 +24,11 @@ lib/AsposeSlidesCloud/Object/Axes.pm
 lib/AsposeSlidesCloud/Object/Axis.pm
 lib/AsposeSlidesCloud/Object/BarElement.pm
 lib/AsposeSlidesCloud/Object/Base64InputFile.pm
+lib/AsposeSlidesCloud/Object/BiLevelEffect.pm
 lib/AsposeSlidesCloud/Object/BlockElement.pm
 lib/AsposeSlidesCloud/Object/BlurEffect.pm
+lib/AsposeSlidesCloud/Object/BlurImageEffect.pm
 lib/AsposeSlidesCloud/Object/BorderBoxElement.pm
-lib/AsposeSlidesCloud/Object/BoxAndWhiskerSeries.pm
 lib/AsposeSlidesCloud/Object/BoxElement.pm
 lib/AsposeSlidesCloud/Object/BubbleChartDataPoint.pm
 lib/AsposeSlidesCloud/Object/BubbleSeries.pm
@@ -31,6 +39,8 @@ lib/AsposeSlidesCloud/Object/ChartLinesFormat.pm
 lib/AsposeSlidesCloud/Object/ChartTitle.pm
 lib/AsposeSlidesCloud/Object/ChartWall.pm
 lib/AsposeSlidesCloud/Object/ClosePathSegment.pm
+lib/AsposeSlidesCloud/Object/ColorChangeEffect.pm
+lib/AsposeSlidesCloud/Object/ColorReplaceEffect.pm
 lib/AsposeSlidesCloud/Object/ColorScheme.pm
 lib/AsposeSlidesCloud/Object/CommonSlideViewProperties.pm
 lib/AsposeSlidesCloud/Object/Connector.pm
@@ -43,6 +53,7 @@ lib/AsposeSlidesCloud/Object/Document.pm
 lib/AsposeSlidesCloud/Object/DocumentProperties.pm
 lib/AsposeSlidesCloud/Object/DocumentProperty.pm
 lib/AsposeSlidesCloud/Object/DocumentReplaceResult.pm
+lib/AsposeSlidesCloud/Object/DuotoneEffect.pm
 lib/AsposeSlidesCloud/Object/Effect.pm
 lib/AsposeSlidesCloud/Object/EffectFormat.pm
 lib/AsposeSlidesCloud/Object/EntityExists.pm
@@ -56,6 +67,7 @@ lib/AsposeSlidesCloud/Object/FileVersion.pm
 lib/AsposeSlidesCloud/Object/FileVersions.pm
 lib/AsposeSlidesCloud/Object/FillFormat.pm
 lib/AsposeSlidesCloud/Object/FillOverlayEffect.pm
+lib/AsposeSlidesCloud/Object/FillOverlayImageEffect.pm
 lib/AsposeSlidesCloud/Object/FontFallbackRule.pm
 lib/AsposeSlidesCloud/Object/FontScheme.pm
 lib/AsposeSlidesCloud/Object/FontSet.pm
@@ -70,9 +82,11 @@ lib/AsposeSlidesCloud/Object/GlowEffect.pm
 lib/AsposeSlidesCloud/Object/GradientFill.pm
 lib/AsposeSlidesCloud/Object/GradientFillStop.pm
 lib/AsposeSlidesCloud/Object/GraphicalObject.pm
+lib/AsposeSlidesCloud/Object/GrayScaleEffect.pm
 lib/AsposeSlidesCloud/Object/GroupingCharacterElement.pm
 lib/AsposeSlidesCloud/Object/GroupShape.pm
 lib/AsposeSlidesCloud/Object/HeaderFooter.pm
+lib/AsposeSlidesCloud/Object/HslEffect.pm
 lib/AsposeSlidesCloud/Object/Html5ExportOptions.pm
 lib/AsposeSlidesCloud/Object/HtmlExportOptions.pm
 lib/AsposeSlidesCloud/Object/Hyperlink.pm
@@ -81,6 +95,7 @@ lib/AsposeSlidesCloud/Object/ImageExportFormat.pm
 lib/AsposeSlidesCloud/Object/ImageExportOptions.pm
 lib/AsposeSlidesCloud/Object/ImageExportOptionsBase.pm
 lib/AsposeSlidesCloud/Object/Images.pm
+lib/AsposeSlidesCloud/Object/ImageTransformEffect.pm
 lib/AsposeSlidesCloud/Object/InnerShadowEffect.pm
 lib/AsposeSlidesCloud/Object/Input.pm
 lib/AsposeSlidesCloud/Object/InputFile.pm
@@ -94,6 +109,7 @@ lib/AsposeSlidesCloud/Object/LightRig.pm
 lib/AsposeSlidesCloud/Object/LimitElement.pm
 lib/AsposeSlidesCloud/Object/LineFormat.pm
 lib/AsposeSlidesCloud/Object/LineToPathSegment.pm
+lib/AsposeSlidesCloud/Object/LuminanceEffect.pm
 lib/AsposeSlidesCloud/Object/MasterSlide.pm
 lib/AsposeSlidesCloud/Object/MasterSlides.pm
 lib/AsposeSlidesCloud/Object/MathElement.pm
@@ -207,13 +223,12 @@ lib/AsposeSlidesCloud/Object/TextItems.pm
 lib/AsposeSlidesCloud/Object/Theme.pm
 lib/AsposeSlidesCloud/Object/ThreeDFormat.pm
 lib/AsposeSlidesCloud/Object/TiffExportOptions.pm
+lib/AsposeSlidesCloud/Object/TintEffect.pm
 lib/AsposeSlidesCloud/Object/UpdateBackground.pm
 lib/AsposeSlidesCloud/Object/UpdateShape.pm
 lib/AsposeSlidesCloud/Object/VideoExportOptions.pm
 lib/AsposeSlidesCloud/Object/VideoFrame.pm
 lib/AsposeSlidesCloud/Object/ViewProperties.pm
-lib/AsposeSlidesCloud/Object/WaterfallChartDataPoint.pm
-lib/AsposeSlidesCloud/Object/WaterfallSeries.pm
 lib/AsposeSlidesCloud/Object/XamlExportOptions.pm
 lib/AsposeSlidesCloud/Object/XpsExportOptions.pm
 lib/AsposeSlidesCloud/Object/XYSeries.pm

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012 Kevin Ryde
+# Copyright 2012, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -29,99 +29,48 @@ use MyOEIS;
 
 use Math::NumSeq::LemoineCount;
 
-# uncomment this to run the ### lines
-#use Smart::Comments '###';
-
-
-sub numeq_array {
-  my ($a1, $a2) = @_;
-  if (! ref $a1 || ! ref $a2) {
-    return 0;
-  }
-  my $i = 0;
-  while ($i < @$a1 && $i < @$a2) {
-    if ($a1->[$i] ne $a2->[$i]) {
-      return 0;
-    }
-    $i++;
-  }
-  return (@$a1 == @$a2);
-}
-
-
 
 #------------------------------------------------------------------------------
 # A194830 - odd record positions
 
-{
-  my $anum = 'A194830';
-
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    my $bvalues_count = scalar(@$bvalues);
-    my $limit = 60;
-    if ($#$bvalues > $limit) { $#$bvalues = $limit; }
-    MyTestHelpers::diag ("$anum has $bvalues_count values, shorten to ", scalar(@$bvalues));
-
-    my $seq = Math::NumSeq::LemoineCount->new;
-    my $record = 0;
-    while (@got < @$bvalues) {
-      my ($i, $value) = $seq->next;
-      if (($i&1) && $value > $record) {
-        $record = $value;
-        push @got, $i;
-      }
-    }
-    if (! numeq_array(\@got, $bvalues)) {
-      MyTestHelpers::diag ("bvalues: ",join(',',@{$bvalues}[0..10]));
-      MyTestHelpers::diag ("got:     ",join(',',@got[0..10]));
-    }
-  } else {
-    MyTestHelpers::diag ("$anum not available");
-  }
-  skip (! $bvalues,
-        numeq_array(\@got, $bvalues),
-        1, "$anum -- odd record positions");
-}
-
+MyOEIS::compare_values
+  (anum => 'A194830',
+   max_count => 60,
+   func => sub {
+     my ($count) = @_;
+     my $seq = Math::NumSeq::LemoineCount->new;
+     my @got;
+     my $record = 0;
+     while (@got < $count) {
+       my ($i, $value) = $seq->next;
+       if (($i&1) && $value > $record) {
+         $record = $value;
+         push @got, $i;
+       }
+     }
+     return \@got;
+   });
 
 #------------------------------------------------------------------------------
 # A194831 - odd record values
 
-{
-  my $anum = 'A194831';
-
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    my $bvalues_count = scalar(@$bvalues);
-    my $limit = 60;
-    if ($#$bvalues > $limit) { $#$bvalues = $limit; }
-    MyTestHelpers::diag ("$anum has $bvalues_count values, shorten to ", scalar(@$bvalues));
-
-    my $seq = Math::NumSeq::LemoineCount->new;
-    my $record = 0;
-    while (@got < @$bvalues) {
-      my ($i, $value) = $seq->next;
-      if (($i&1) && $value > $record) {
-        $record = $value;
-        push @got, $value;
-      }
-    }
-    if (! numeq_array(\@got, $bvalues)) {
-      MyTestHelpers::diag ("bvalues: ",join(',',@{$bvalues}[0..10]));
-      MyTestHelpers::diag ("got:     ",join(',',@got[0..10]));
-    }
-  } else {
-    MyTestHelpers::diag ("$anum not available");
-  }
-  skip (! $bvalues,
-        numeq_array(\@got, $bvalues),
-        1, "$anum -- odd record counts");
-}
-
-
+MyOEIS::compare_values
+  (anum => 'A194831',
+   max_count => 60,
+   func => sub {
+     my ($count) = @_;
+     my $seq = Math::NumSeq::LemoineCount->new;
+     my @got;
+     my $record = 0;
+     while (@got < $count) {
+       my ($i, $value) = $seq->next;
+       if (($i&1) && $value > $record) {
+         $record = $value;
+         push @got, $value;
+       }
+     }
+     return \@got;
+   });
 
 #------------------------------------------------------------------------------
 exit 0;

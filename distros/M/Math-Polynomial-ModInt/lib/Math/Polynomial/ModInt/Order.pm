@@ -2,13 +2,14 @@ package Math::Polynomial::ModInt::Order;
 
 use strict;
 use warnings;
+use Readonly ();
 
 BEGIN {
     require Exporter;
     our @ISA = qw(Exporter);
     our @EXPORT_OK = qw($BY_INDEX $SPARSE $CONWAY);
     our %EXPORT_TAGS = ( all => \@EXPORT_OK );
-    our $VERSION = '0.004';
+    our $VERSION = '0.005';
 }
 
 sub cmp { $_[0]->(@_[1, 2])      }
@@ -22,7 +23,8 @@ sub ge  { $_[0]->(@_[1, 2]) >= 0 }
 package Math::Polynomial::ModInt::Order::ByIndex;
 
 our @ISA = (Math::Polynomial::ModInt::Order::);
-$Math::Polynomial::ModInt::Order::BY_INDEX = bless \&_compare;
+Readonly::Scalar
+    $Math::Polynomial::ModInt::Order::BY_INDEX => bless \&_compare;
 
 sub _compare ($$) {
     my ($a, $b) = @_;
@@ -38,10 +40,10 @@ sub _compare ($$) {
 }
 
 sub next_poly {
-    my ($class, $poly) = @_;
+    my ($class, $poly, $i0) = @_;
     my @coeff  = $poly->coeff;
     my $one    = $poly->coeff_one;
-    my $i = 0;
+    my $i = $i0 || 0;
     {
         if ($i < @coeff) {
             $coeff[$i++] += $one or redo;
@@ -56,7 +58,8 @@ sub next_poly {
 package Math::Polynomial::ModInt::Order::Sparse;
 
 our @ISA = (Math::Polynomial::ModInt::Order::);
-$Math::Polynomial::ModInt::Order::SPARSE = bless \&_compare;
+Readonly::Scalar
+    $Math::Polynomial::ModInt::Order::SPARSE => bless \&_compare;
 
 sub _compare ($$) {
     my ($a, $b) = @_;
@@ -109,7 +112,8 @@ sub next_poly {
 package Math::Polynomial::ModInt::Order::Conway;
 
 our @ISA = (Math::Polynomial::ModInt::Order::);
-$Math::Polynomial::ModInt::Order::CONWAY = bless \&_compare;
+Readonly::Scalar
+    $Math::Polynomial::ModInt::Order::CONWAY => bless \&_compare;
 
 sub _compare ($$) {
     my ($a, $b) = @_;
@@ -130,11 +134,11 @@ sub _compare ($$) {
 }
 
 sub next_poly {
-    my ($class, $poly) = @_;
+    my ($class, $poly, $i0) = @_;
     my @coeff  = $poly->coeff;
     my $one    = $poly->coeff_one;
-    my $delta  = 1 & @coeff? $one: -$one;
-    my $i = 0;
+    my $i      = $i0 || 0;
+    my $delta  = 1 & (@coeff ^ $i)? $one: -$one;
     {
         if ($i < @coeff) {
             $coeff[$i++] += $delta or $delta = -$delta, redo;
@@ -158,7 +162,7 @@ Math::Polynomial::ModInt::Order - order relations on ModInt polynomials
 
 =head1 VERSION
 
-This documentation refers to version 0.004 of
+This documentation refers to version 0.005 of
 Math::Polynomial::ModInt::Order.
 
 =head1 SYNOPSIS
@@ -293,6 +297,11 @@ and more space and time efficient than calculating an index, incrementing
 that, and mapping the index back to a polynomial, even with the simplest
 order C<$BY_INDEX>.
 
+For orders C<$BY_INDEX> and C<$CONWAY>, an optional second argument C<$i0>
+can be used to increment by I<i0>th powers of the modulus rather than
+single steps.  Example: C<$BY_INDEX-E<gt>next_poly(modpoly(11, 3), 1)>
+yields C<modpoly(14, 3)>, since C<11 + 3 ** 1 == 14>.
+
 =back
 
 =head1 DIAGNOSTICS
@@ -306,11 +315,7 @@ but it operates on Math::Polynomial::ModInt objects.
 
 =head1 BUGS AND LIMITATIONS
 
-The singleton variables this module provides must be treated as read-only.
-Some future release will enforce this if we find a portable way to do that.
-Meanwhile, just don't mess with them.
-
-Other bug reports and suggestions are always welcome E<8212>
+Bug reports and suggestions are always welcome E<8212>
 please submit them as lined out in the distribution's main module,
 L<Math::Polynomial::ModInt>.
 
@@ -338,7 +343,7 @@ Contributions to this library are welcome (see the CONTRIBUTING file).
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2013-2019 by Martin Becker, Blaubeuren.
+Copyright (c) 2013-2022 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).

@@ -1,6 +1,6 @@
-# Copyright (c) 2008-2017 Martin Becker.  All rights reserved.
-# This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
+# Copyright (c) 2008-2021 Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
 
 # Utility functions for tests:
 # * conditionally skip tests if required modules are not available
@@ -16,7 +16,7 @@ use warnings;
 use Config;
 use base 'Exporter';
 
-our $VERSION   = '0.009';
+our $VERSION   = '0.012';
 our @EXPORT    = qw(use_or_bail maintainer_only);
 our @EXPORT_OK = qw(
     slurp_or_bail this_perl report_version

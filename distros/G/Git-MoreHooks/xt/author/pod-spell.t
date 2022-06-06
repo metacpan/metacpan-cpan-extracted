@@ -67,7 +67,7 @@ licensable
 lv
 mailmap
 messager
-mikko
+mikkoi
 msg
 multi
 params

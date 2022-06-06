@@ -40,6 +40,17 @@ WriteMakefile(
   OBJECT => q/$(O_FILES)/,
   DEFINE => $DEFINE,
   AUTHOR => 'Reini Urban <rurban@cpan.org>',
+  ($ExtUtils::MakeMaker::VERSION gt '6.46'
+   ? ('META_MERGE' =>
+     {
+         resources =>
+         {
+             bugtracker => 'https://github.com/rurban/YAML-Safe/issues',
+             repository => 'https://github.com/rurban/YAML-Safe',
+         },
+     })
+     : ()
+  )
 );
 
 package MY;

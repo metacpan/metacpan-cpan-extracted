@@ -32,14 +32,14 @@ use File::Spec;
 use Symbol 'gensym';
 
 use vars '$VERSION','@ISA';
-$VERSION = 74;
+$VERSION = 75;
 
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
 *_to_bigint = \&Math::NumSeq::_to_bigint;
 
 use vars '$VERSION';
-$VERSION = 74;
+$VERSION = 75;
 
 eval q{use Scalar::Util 'weaken'; 1}
   || eval q{sub weaken { $_[0] = undef }; 1 }
@@ -558,7 +558,7 @@ sub _read_internal_txt {
 
     # eg. "%O A007318 0,5" is OFFSET=0
     my $offset;
-    if ($contents =~ /^%O\s+\Q$anum\E\s+(\d+)/m) {
+    if ($contents =~ /^%O\s+\Q$anum\E\s+(-?\d+)/m) {
       $offset = $1;
       ### %O line: $offset
     } else {

@@ -15,12 +15,17 @@ subtest 'with summary' => sub {
             holder => 'X. Ample'
         });
 
+        my $text = $license->summary_or_text;
         if ($license->distribution eq 'debian') {
-            like($license->summary_or_text, qr/common-licenses/i, "$short summary found");
+            like($text, qr/common-licenses/i, "$short summary found");
         }
         else {
-            unlike($license->summary_or_text, qr/common-licenses/i, "$short summary not found");
+            unlike($text, qr/common-licenses/i, "$short summary not found");
         }
+        like($text, qr/X. Ample/, "found copyright notice");
+
+        my $license2 = $class->new_from_short_name({short_name => $short});
+        unlike($license2->summary_or_text, qr/^This software is Copyright \(c\)/, "no copyright notice");
     }
 };
 
@@ -36,7 +41,12 @@ subtest 'without summary' => sub {
             holder => 'X. Ample'
         });
 
-        like($license->summary_or_text, $no_summary{$short}, "$short license text found");
+        my $text = $license->summary_or_text;
+        like($text, $no_summary{$short}, "$short license text found");
+        like($text, qr/X. Ample/, "found copyright notice");
+
+        my $license2 = $class->new_from_short_name({short_name => $short});
+        unlike($license2->summary_or_text, qr/^This software is Copyright \(c\)/, "no copyright notice");
     }
 };
 

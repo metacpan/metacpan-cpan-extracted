@@ -2,6 +2,11 @@ Revision history for Perl extension IPC::Locker
 
 The contributors that suggested a given feature are shown in [].
 
+* IPC::Locker 1.502 2022-06-04
+
+****  Test cleanup for Nagios (#13).  [andk]
+
+
 * IPC::Locker 1.500 2019-10-26
 
 ****  Documentation cleanups for github release.
@@ -253,7 +258,7 @@ DESCRIPTION: Documentation on change history for this package
 
 This uses outline mode in Emacs.  See C-h m [M-x describe-mode].
 
-Copyright 1999-2019 by Wilson Snyder.  This program is free software;
+Copyright 1999-2022 by Wilson Snyder.  This program is free software;
 you can redistribute it and/or modify it under the terms of either the GNU
 Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
 

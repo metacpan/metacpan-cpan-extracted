@@ -1,5 +1,8 @@
 package Firewall::Config::Element::Rule::H3c;
 
+#------------------------------------------------------------------------------
+# 加载扩展模块
+#------------------------------------------------------------------------------
 use Moose;
 use namespace::autoclean;
 use Firewall::Config::Element::AddressGroup::H3c;

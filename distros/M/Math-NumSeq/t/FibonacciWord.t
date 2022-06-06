@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2016, 2019, 2020, 2022 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -20,7 +20,7 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 13;
+plan tests => 14;
 
 use lib 't';
 use MyTestHelpers;
@@ -29,13 +29,13 @@ MyTestHelpers::nowarnings();
 use Math::NumSeq::FibonacciWord;
 
 # uncomment this to run the ### lines
-#use Smart::Comments;
+# use Smart::Comments;
 
 #------------------------------------------------------------------------------
 # VERSION
 
 {
-  my $want_version = 74;
+  my $want_version = 75;
   ok ($Math::NumSeq::FibonacciWord::VERSION, $want_version,
       'VERSION variable');
   ok (Math::NumSeq::FibonacciWord->VERSION,  $want_version,
@@ -135,25 +135,29 @@ if (! Math::BigFloat->can('bnan')) {
 }
 
 {
-  my @nans;
-  unless ($skip_bigfloat) {
-    my $seq = Math::NumSeq::FibonacciWord->new;
+  foreach my $fibonacci_word_type ('plain','dense') {
+    my @nans;
+    unless ($skip_bigfloat) {
+      my $seq = Math::NumSeq::FibonacciWord->new
+        (fibonacci_word_type => $fibonacci_word_type);
 
-    my $nan = Math::BigFloat->bnan;
-    my $inf = Math::BigFloat->bnan;
-    my $neginf = Math::BigFloat->bnan('-');
+      my $nan = Math::BigFloat->bnan;
+      my $inf = Math::BigFloat->binf;
+      my $neginf = Math::BigFloat->binf('-');
 
-    foreach my $f ($nan, $inf, $neginf) {
-      my $value = $seq->ith($f);
-      my $value_is_nan = (ref $value && $value->is_nan ? 1 : 0);
-      push @nans, $value_is_nan;
+      foreach my $f ($nan, $inf, $neginf) {
+        my $value = $seq->ith($f);
+        my $value_is_nan = (ref $value && $value->is_nan ? 1 : 0);
+        push @nans, $value_is_nan;
+        ### value: ref($value) . " $value"
+      }
     }
-  }
 
-  skip ($skip_bigfloat,
-        join(',',@nans),
-        '1,1,1',
-        'ith() on BigFloat nan,inf,neginf should return big nan');
+    skip ($skip_bigfloat,
+          join(',',@nans),
+          '1,1,1',
+          "ith() type=$fibonacci_word_type on BigFloat nan,inf,neginf should return big nan");
+  }
 }
 
 exit 0;

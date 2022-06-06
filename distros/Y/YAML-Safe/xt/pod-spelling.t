@@ -39,3 +39,7 @@ le
 testsuite
 unicode
 yaml
+utf16be
+utf16le
+utf8
+v5

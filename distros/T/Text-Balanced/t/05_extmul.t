@@ -368,4 +368,12 @@ expect [ extract_multiple($slashmatch, [
   " : 0;\n"
   ];
 
+$slashmatch = <<'EOF'; # wrong in 2.05
+$_ = 1 unless defined $_ and /\d\b/;
+EOF
+expect [ extract_multiple($slashmatch, [
+  \&extract_variable, \&extract_quotelike,
+]) ],
+  [ '$_', ' = 1 unless defined ', '$_', ' and ', '/\\d\\b/', ";\n" ];
+
 done_testing;

@@ -1,4 +1,4 @@
-# Copyright 2001-2019, Paul Johnson (paul@pjcj.net)
+# Copyright 2001-2022, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -12,7 +12,7 @@ use warnings;
 
 our $VERSION;
 BEGIN {
-our $VERSION = '1.36'; # VERSION
+our $VERSION = '1.38'; # VERSION
 }
 
 use DynaLoader ();
@@ -348,7 +348,8 @@ sub import {
 
     $DB = File::Spec->rel2abs($DB, $Dir);
     unless (mkdir $DB) {
-        die "Can't mkdir $DB: $!" unless -d $DB;
+        my $err = $!;
+        die "Can't mkdir $DB as EUID $>: $err" unless -d $DB;
     }
     chmod 0777, $DB if $Loose_perms;
     $DB = $1 if abs_path($DB) =~ /(.*)/;
@@ -675,6 +676,8 @@ sub check_files {
             $line = $Line;
             # print STDERR "$name - $File:$Line\n";
         }
+        $line = 0  unless defined $line;
+        $name = '' unless defined $name;
         ($line, $name)
     };
 
@@ -970,9 +973,20 @@ sub add_condition_cover {
 
 my %Original;
 BEGIN {
-    $Original{deparse}     = \&B::Deparse::deparse;
-    $Original{logop}       = \&B::Deparse::logop;
-    $Original{logassignop} = \&B::Deparse::logassignop;
+    $Original{deparse}      = \&B::Deparse::deparse;
+    $Original{logop}        = \&B::Deparse::logop;
+    $Original{logassignop}  = \&B::Deparse::logassignop;
+    $Original{const_dumper} = \&B::Deparse::const_dumper;
+}
+
+sub const_dumper {
+    no warnings "redefine";
+    local *B::Deparse::deparse      = $Original{deparse};
+    local *B::Deparse::logop        = $Original{logop};
+    local *B::Deparse::logassignop  = $Original{logassignop};
+    local *B::Deparse::const_dumper = $Original{const_dumper};
+
+    $Original{const_dumper}->(@_);
 }
 
 sub deparse {
@@ -998,9 +1012,8 @@ sub deparse {
             local ($File, $Line) = ($File, $Line);
             # print STDERR "Collecting $$op under $File:$Line\n";
             no warnings "redefine";
-            my $use_dumper = $class eq 'SVOP' && $name eq 'const';
-            local *B::Deparse::const = \&B::Deparse::const_dumper
-              if $use_dumper;
+            my $use_dumper = $class eq "SVOP" && $name eq "const";
+            local $self->{use_dumper} = 1 if $use_dumper;
             require Data::Dumper if $use_dumper;
             $deparse = eval { local $^W; $Original{deparse}->($self, @_) };
             $deparse =~ s/^\010+//mg if defined $deparse;
@@ -1237,9 +1250,10 @@ sub get_cover {
     # print STDERR "<$dd>\n";
 
     no warnings "redefine";
-    local *B::Deparse::deparse     = \&deparse;
-    local *B::Deparse::logop       = \&logop;
-    local *B::Deparse::logassignop = \&logassignop;
+    local *B::Deparse::deparse      = \&deparse;
+    local *B::Deparse::logop        = \&logop;
+    local *B::Deparse::logassignop  = \&logassignop;
+    local *B::Deparse::const_dumper = \&const_dumper;
 
     my $de = @_ && ref $_[0]
                  ? $deparse->deparse($_[0], 0)
@@ -1289,7 +1303,7 @@ Devel::Cover - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.36
+version 1.38
 
 =head1 SYNOPSIS
 
@@ -1329,15 +1343,14 @@ discover areas of code not exercised by your tests and determine which tests
 to create to increase coverage.  Code coverage can be considered an indirect
 measure of quality.
 
-Although it is still being developed, Devel::Cover is now quite stable and
-provides many of the features to be expected in a useful coverage tool.
+Devel::Cover is now quite stable and provides many of the features to be
+expected in a useful coverage tool.
 
 Statement, branch, condition, subroutine, and pod coverage information is
 reported.  Statement and subroutine coverage data should be accurate.  Branch
 and condition coverage data should be mostly accurate too, although not always
-what one might initially expect.  Pod coverage comes from L<Pod::Coverage>.
-If L<Pod::Coverage::CountParents> is available it will be used instead.
-Coverage data for other criteria are not yet collected.
+what one might initially expect.  Pod coverage comes from L<Pod::Coverage>. If
+L<Pod::Coverage::CountParents> is available it will be used instead.
 
 The F<cover> program can be used to generate coverage reports.  Devel::Cover
 ships with a number of reports including various types of HTML output, textual
@@ -1808,7 +1821,7 @@ Please report new bugs on Github.
 
 =head1 LICENCE
 
-Copyright 2001-2019, Paul Johnson (paul@pjcj.net)
+Copyright 2001-2022, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

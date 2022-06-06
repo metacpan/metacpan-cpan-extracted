@@ -175,6 +175,9 @@ Load (...)
                   ret = DumpFile(self, yaml_arg, yaml_ix);
                 }
                 break;
+        default:
+          croak ("Internal Error: Unhandled YAML::Safe::Load alias");
+          return;
         }
         /* restore old safemode */
         if (old_safe) self->flags |=  F_SAFEMODE;

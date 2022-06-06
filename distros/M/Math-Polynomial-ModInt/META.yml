@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,10 +23,16 @@ no_index:
 provides:
   Math::Polynomial::ModInt:
     file: lib/Math/Polynomial/ModInt.pm
-    version: '0.004'
+    version: '0.005'
   Math::Polynomial::ModInt::Order:
     file: lib/Math/Polynomial/ModInt/Order.pm
-    version: '0.004'
+    version: '0.005'
+  Math::Polynomial::ModInt::Order::ByIndex:
+    file: lib/Math/Polynomial/ModInt/Order.pm
+  Math::Polynomial::ModInt::Order::Conway:
+    file: lib/Math/Polynomial/ModInt/Order.pm
+  Math::Polynomial::ModInt::Order::Sparse:
+    file: lib/Math/Polynomial/ModInt/Order.pm
 recommends:
   Math::BigInt::GMP: '0'
 requires:
@@ -34,10 +40,11 @@ requires:
   Math::BigInt: '0'
   Math::ModInt: '0.012'
   Math::Polynomial: '1.015'
+  Readonly: '2'
   perl: '5.006'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Math-Polynomial-ModInt
+  bugtracker: https://github.com/mhasch/perl-Math-Polynomial-ModInt/issues
   license: https://www.perlfoundation.org/artistic-license-20.html
   repository: git://github.com/mhasch/perl-Math-Polynomial-ModInt.git
-version: '0.004'
+version: '0.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

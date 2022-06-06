@@ -12,7 +12,23 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Firewall-Config-Connector
-version: '0.004'
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Expect: '0'
+  Firewall::Config::Content::Static: '0'
+  Firewall::Config::Dao::Config: '0'
+  Firewall::Config::Dao::Lock: '0'
+  Firewall::Config::Dao::Parser: '0'
+  Firewall::Utils::Date: '0'
+  Moose: '0'
+  POSIX: '0'
+  Time::HiRes: '0'
+  Try::Tiny: '0'
+  namespace::autoclean: '0'
+  perl: '5.018'
+  warnings: '0'
+version: '0.005'
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

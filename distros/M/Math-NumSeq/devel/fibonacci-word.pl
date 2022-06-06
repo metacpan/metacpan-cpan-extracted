@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012 Kevin Ryde
+# Copyright 2011, 2012, 2022 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -19,6 +19,7 @@
 
 require 5;
 use strict;
+use Math::NumSeq::FibonacciWord;
 
 # uncomment this to run the ### lines
 #use Devel::Comments;
@@ -27,6 +28,17 @@ use constant PHI => (1 + sqrt(5)) / 2;
 
 # 0,1,0,0,1,0,1,0,0,1,0,0,1,0,1,0,0,1,0,1,0,
 
+{
+  require Math::BigFloat;
+  my $seq = Math::NumSeq::FibonacciWord->new;
+  my $got = $seq->ith(- Math::BigFloat->binf);
+  print "$got\n";
+  $seq = Math::NumSeq::FibonacciWord->new
+    (fibonacci_word_type => 'dense');
+  $got = $seq->ith(Math::BigFloat->binf);
+  print "$got\n";
+  exit 0;
+}
 {
   # a(n) = floor((n+2)*r)-floor((n+1)*r) where r=phi/(1+2*phi)
 

@@ -1,7 +1,7 @@
 {
    "abstract" : "More plugins (Git hooks) for package Git::Hooks.",
    "author" : [
-      "'Mikko Koivunalho <mikko.koivunalho@iki.fi>'"
+      "'Mikko Koivunalho <mikkoi@cpan.org>'"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
@@ -55,14 +55,11 @@
             "File::Spec" : "0",
             "File::Temp" : "0",
             "Git::Hooks" : "3.000000",
-            "Git::Mailmap" : "0",
-            "Jenkins::API" : "0",
             "List::MoreUtils" : "0",
             "Log::Any" : "0",
             "Module::Load" : "0",
             "Params::Validate" : "0",
             "Path::Tiny" : "0",
-            "Template" : "0",
             "Text::Glob" : "0",
             "feature" : "0",
             "perl" : "5.016",
@@ -87,31 +84,31 @@
    "provides" : {
       "Git::MoreHooks" : {
          "file" : "lib/Git/MoreHooks.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Git::MoreHooks::CheckCommitAuthorFromMailmap" : {
          "file" : "lib/Git/MoreHooks/CheckCommitAuthorFromMailmap.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Git::MoreHooks::CheckCommitBase" : {
          "file" : "lib/Git/MoreHooks/CheckCommitBase.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Git::MoreHooks::CheckIndent" : {
          "file" : "lib/Git/MoreHooks/CheckIndent.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Git::MoreHooks::CheckPerl" : {
          "file" : "lib/Git/MoreHooks/CheckPerl.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Git::MoreHooks::GitRepoAdmin" : {
          "file" : "lib/Git/MoreHooks/GitRepoAdmin.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       },
       "Git::MoreHooks::TriggerJenkins" : {
          "file" : "lib/Git/MoreHooks/TriggerJenkins.pm",
-         "version" : "0.016"
+         "version" : "0.017"
       }
    },
    "release_status" : "stable",
@@ -126,7 +123,7 @@
          "web" : "https://github.com/mikkoi/git-morehooks.git"
       }
    },
-   "version" : "0.016",
+   "version" : "0.017",
    "x_contributors" : [
       "Gustavo L. de M. Chaves <gnustavo@cpan.org>"
    ],

@@ -42,6 +42,7 @@ use AsposeSlidesCloud::Object::FillFormat;
 use AsposeSlidesCloud::Object::GeometryShape;
 use AsposeSlidesCloud::Object::Hyperlink;
 use AsposeSlidesCloud::Object::LineFormat;
+use AsposeSlidesCloud::Object::PictureFill;
 use AsposeSlidesCloud::Object::ResourceUri;
 use AsposeSlidesCloud::Object::ThreeDFormat;
 
@@ -365,6 +366,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'picture_fill_format' => {
+    	datatype => 'PictureFill',
+    	base_name => 'PictureFillFormat',
+    	description => 'Picture fill format.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -393,7 +401,8 @@ __PACKAGE__->swagger_types( {
     'play_mode' => 'string',
     'rewind_video' => 'boolean',
     'volume' => 'string',
-    'base64_data' => 'string'
+    'base64_data' => 'string',
+    'picture_fill_format' => 'PictureFill'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -422,7 +431,8 @@ __PACKAGE__->attribute_map( {
     'play_mode' => 'PlayMode',
     'rewind_video' => 'RewindVideo',
     'volume' => 'Volume',
-    'base64_data' => 'Base64Data'
+    'base64_data' => 'Base64Data',
+    'picture_fill_format' => 'PictureFillFormat'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

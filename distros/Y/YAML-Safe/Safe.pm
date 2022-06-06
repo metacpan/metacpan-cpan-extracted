@@ -1,7 +1,7 @@
 use strict; use warnings;
 
 package YAML::Safe;
-our $VERSION = '0.80';
+our $VERSION = '0.81';
 our $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 
@@ -142,7 +142,7 @@ YAML::Safe - Safe Perl YAML Serialization using XS and libyaml
 
 =head1 Description
 
-This module is a refactoring of L<YAML::XS>, the old Perl XS binding
+This module is a re-factoring of L<YAML::XS>, the old Perl XS binding
 to C<libyaml> which offers Perl somewhat acceptable YAML support to
 date.  YAML::XS never produced code which could be read from YAML, and
 thus was unsuitable to be used as YAML replacement for core and CPAN.
@@ -347,8 +347,9 @@ formatting are preserved.
 =item C<get_noindentmap>
 
 If enabled fallback to the old C<YAML::Safe> behavior to omit the
-indentation of map keys, which arguably violates the YAML spec, is
-different to all other YAML libraries and causes C<YAML.pm> to fail.
+indentation of map keys, which arguably violates the first YAML spec
+(L<https://yaml.org/spec/1.0/#id2566128>), is different to most other
+YAML libraries and causes older C<YAML.pm> to fail.
 
 Disabled
 

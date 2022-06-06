@@ -1,4 +1,4 @@
-# Copyright 2012, 2013, 2014, 2016, 2018, 2019 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2016, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -26,7 +26,7 @@ use strict;
 use List::Util 'max';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 74;
+$VERSION = 75;
 
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
@@ -192,7 +192,7 @@ sub ith {
   $i -= 1;
   ### initial i remainder: $i
 
-  my $zero = ($i*0);
+  my $zero = ($i*0);     # inherit BigInt
 
   my @num;
   $num[0][0] = 0;
@@ -771,14 +771,18 @@ this sequence include
     A071152     binary, digits 0,2
     A085185     base 4
     A080116     predicate
-    A072643     width
+    A072643     width (bitlength/2)
     A085192     differences
     A080237     number of low 0 bits
     A085223     i where single low 0 bit
-    A002054     number of 01 bit pairs in length 2n
     A057520     value/2, so sans low 0 bit
     A085183     value sans high 1 and low 0 bits
     A085184        in base 4
+
+    A127284     number of 01 bit pairs (Tamari lattice successors)
+    A057514     number of 10 bit pairs
+    A126306     number of 11 bit pairs
+    A002054     total 01 bit pairs in all of length 2n
 
 =head1 SEE ALSO
 
@@ -792,7 +796,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2012, 2013, 2014, 2016, 2018, 2019 Kevin Ryde
+Copyright 2012, 2013, 2014, 2016, 2018, 2019, 2020 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

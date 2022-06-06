@@ -71,10 +71,13 @@ _test_module('after unset_module_base()');
 sub _test_module {
     my ($label) = @_;
 
-    $js->eval_module(<<END);
+    my $ret = $js->eval_module(<<END);
         import * as IMPORTED from 'my/module.js';
         _return(IMPORTED.life);
+        42;
 END
+
+    is($ret, $js, 'eval_module() returns JS object');
 
     is( $retval, 42, "$label: module imported and used" );
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2014, 2019 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2019, 2021 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU General Public License along
 # with Math-NumSeq.  If not, see <http://www.gnu.org/licenses/>.
 
-# A046815, A083853.
 
 use 5.004;
 use strict;
@@ -34,6 +33,41 @@ use Math::NumSeq::FibonacciRepresentations;
 
 # uncomment this to run the ### lines
 # use Smart::Comments '###';
+
+
+#------------------------------------------------------------------------------
+# A303903 - R increments
+
+MyOEIS::compare_values
+  (anum => 'A303903',
+   func => sub {
+     my ($count) = @_;
+     my $seq = Math::NumSeq::FibonacciRepresentations->new;
+     my @got = (1);
+     for (my $n = 0; @got < $count; $n++) {
+       push @got, $seq->ith($n+1) - $seq->ith($n);
+     }
+     return \@got;
+   });
+
+#------------------------------------------------------------------------------
+# A000121 - R cumulative
+
+MyOEIS::compare_values
+  (anum => 'A000119',
+   func => sub {
+     my ($count) = @_;
+     my $seq = Math::NumSeq::FibonacciRepresentations->new;
+     my @got;
+     my $total = -1;
+     while (@got < $count) {
+       my ($i, $value) = $seq->next;
+       $total += $value;
+       push @got, $total;
+     }
+     return \@got;
+   });
+
 
 
 #------------------------------------------------------------------------------

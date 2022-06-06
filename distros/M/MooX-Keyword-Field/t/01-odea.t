@@ -4,7 +4,6 @@ use Test::More;
 	package One;
 	use Moo;
 	use Data::Dumper;
-	use Factory::Sub qw/Str HashRef/;
 	our %FIELDS;
 
 	use MooX::Keyword extends => '+Field', param => {

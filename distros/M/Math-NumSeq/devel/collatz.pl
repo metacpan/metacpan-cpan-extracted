@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2013 Kevin Ryde
+# Copyright 2013, 2021 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -21,7 +21,32 @@ use 5.004;
 use strict;
 use List::Util 'max';
 use Math::Factor::XS 0.39 'prime_factors'; # version 0.39 for prime_factors()
+$|=1;
 
+# uncomment this to run the ### lines
+# use Smart::Comments;
+
+
+{
+  # grep for trajectories
+  require Math::OEIS::Grep;
+
+  foreach my $n (1..200) {
+    my $t = $n;
+    my @array = ($t, map { $t=step($t) } 1..50);
+    ### @array
+    Math::OEIS::Grep->search(array => \@array,
+                             name => "starting n=$n",
+                             verbose => 0,
+                            );
+  }
+  exit 0;
+
+  sub step {
+    my ($n) = @_;
+    return ($n & 1 ? 3*$n+1 : $n>>1);
+  }
+}
 
 # to_peak
 # 1
@@ -30,7 +55,6 @@ use Math::Factor::XS 0.39 'prime_factors'; # version 0.39 for prime_factors()
 # 4, 2, 1               0
 # 5, *16, 8, 4, 2, 1    1
 # 6, 3, 10, 5, 16       4
-
 
 {
   # n=138367  peak=2798323360    is 2*32

@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Hooks;
 # ABSTRACT: Framework for implementing Git (and Gerrit) hooks
-$Git::Hooks::VERSION = '3.2.1';
+$Git::Hooks::VERSION = '3.2.2';
 use v5.16.0;
 use utf8;
 use Carp;
@@ -298,7 +298,7 @@ Git::Hooks - Framework for implementing Git (and Gerrit) hooks
 
 =head1 VERSION
 
-version 3.2.1
+version 3.2.2
 
 =head1 SYNOPSIS
 
@@ -1683,10 +1683,10 @@ getting maintenance updates.
   +-------------+-----------------------+------+--------+
   | End of Life | Distro                | Perl |   Git  |
   +-------------+-----------------------+------+--------+
-  |   2021-04   | Ubuntu 16.04 (xenial) | 5.22 |  2.7.4 |
   |   2023-04   | Ubuntu 18.04 (bionic) | 5.26 | 2.15.1 |
   |   2024-07   | CentOS 7              | 5.16 |  1.8.3 |
   |   2025-04   | Ubuntu 20.04 (focal ) | 5.30 | 2.25.1 |
+  |   2027-04   | Ubuntu 22.04 (jammy)  | 5.34 | 2.34.1 |
   |   2029-05   | CentOS 8              | 5.26 | 2.18.4 |
   +-------------+-----------------------+------+--------+
 

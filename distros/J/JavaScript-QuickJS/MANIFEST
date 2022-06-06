@@ -81,6 +81,7 @@ quickjs/tests/test_worker_module.js
 quickjs/unicode_download.sh
 quickjs/unicode_gen.c
 quickjs/unicode_gen_def.h
+t/await.t
 t/basic.t
 t/callback_err.t
 t/callback_invalid_sv.t

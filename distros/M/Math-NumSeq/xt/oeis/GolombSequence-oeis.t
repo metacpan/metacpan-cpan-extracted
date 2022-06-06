@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012 Kevin Ryde
+# Copyright 2012, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -33,167 +33,93 @@ use Math::NumSeq::GolombSequence;
 #use Smart::Comments '###';
 
 
-sub numeq_array {
-  my ($a1, $a2) = @_;
-  if (! ref $a1 || ! ref $a2) {
-    return 0;
-  }
-  my $i = 0;
-  while ($i < @$a1 && $i < @$a2) {
-    if ($a1->[$i] ne $a2->[$i]) {
-      return 0;
-    }
-    $i++;
-  }
-  return (@$a1 == @$a2);
-}
-
-
 #------------------------------------------------------------------------------
 # A104236 n*golomb(n)
 
-{
-  my $anum = 'A104236';
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    MyTestHelpers::diag ("$anum has ",scalar(@$bvalues)," values");
-
-    my $seq  = Math::NumSeq::GolombSequence->new;
-    while (@got < @$bvalues) {
-      my ($i, $value) = $seq->next;
-      push @got, $i * $value;
-    }
-    if (! numeq_array(\@got, $bvalues)) {
-      MyTestHelpers::diag ("bvalues: ",join(',',@{$bvalues}[0..10]));
-      MyTestHelpers::diag ("got:     ",join(',',@got[0..10]));
-    }
-  } else {
-    MyTestHelpers::diag ("$anum not available");
-  }
-  skip (! $bvalues,
-        numeq_array(\@got, $bvalues),
-        1, "$anum -- n*golomb(n)");
-}
+MyOEIS::compare_values
+  (anum => 'A104236',
+   func => sub {
+     my ($count) = @_;
+     my $seq  = Math::NumSeq::GolombSequence->new;
+     my @got;
+     while (@got < $count) {
+       my ($i, $value) = $seq->next;
+       push @got, $i * $value;
+     }
+     return \@got;
+   });
 
 #------------------------------------------------------------------------------
 # A143125 n*golomb(n) cumulative
 
-{
-  my $anum = 'A143125';
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    MyTestHelpers::diag ("$anum has ",scalar(@$bvalues)," values");
-
-    my $seq  = Math::NumSeq::GolombSequence->new;
-    my $cumulative = 0;
-    while (@got < @$bvalues) {
-      my ($i, $value) = $seq->next;
-      $cumulative += $i * $value;
-      push @got, $cumulative;
-    }
-    if (! numeq_array(\@got, $bvalues)) {
-      MyTestHelpers::diag ("bvalues: ",join(',',@{$bvalues}[0..10]));
-      MyTestHelpers::diag ("got:     ",join(',',@got[0..10]));
-    }
-  } else {
-    MyTestHelpers::diag ("$anum not available");
-  }
-  skip (! $bvalues,
-        numeq_array(\@got, $bvalues),
-        1, "$anum -- n*golomb(n) cumulative");
-}
+MyOEIS::compare_values
+  (anum => 'A143125',
+   func => sub {
+     my ($count) = @_;
+     my $seq  = Math::NumSeq::GolombSequence->new;
+     my $cumulative = 0;
+     my @got;
+     while (@got < $count) {
+       my ($i, $value) = $seq->next;
+       $cumulative += $i * $value;
+       push @got, $cumulative;
+     }
+     return \@got;
+   });
 
 #------------------------------------------------------------------------------
-# A088517 first differences
+# A088517 increments
 
-{
-  my $anum = 'A088517';
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    MyTestHelpers::diag ("$anum has ",scalar(@$bvalues)," values");
-
-    my $seq  = Math::NumSeq::GolombSequence->new;
-    my (undef, $prev) = $seq->next;
-    while (@got < @$bvalues) {
-      my ($i, $value) = $seq->next;
-      push @got, $value - $prev;
-      $prev = $value;
-    }
-    if (! numeq_array(\@got, $bvalues)) {
-      MyTestHelpers::diag ("bvalues: ",join(',',@{$bvalues}[0..10]));
-      MyTestHelpers::diag ("got:     ",join(',',@got[0..10]));
-    }
-  } else {
-    MyTestHelpers::diag ("$anum not available");
-  }
-  skip (! $bvalues,
-        numeq_array(\@got, $bvalues),
-        1, "$anum -- differences");
-}
+MyOEIS::compare_values
+  (anum => 'A088517',
+   func => sub {
+     my ($count) = @_;
+     my $seq  = Math::NumSeq::GolombSequence->new;
+     my ($i, $prev) = $seq->next;
+     my @got;
+     while (@got < $count) {
+       my ($i, $value) = $seq->next;
+       push @got, $value - $prev;
+       $prev = $value;
+     }
+     return \@got;
+   });
 
 #------------------------------------------------------------------------------
 # A001463 partial sums
 
-{
-  my $anum = 'A001463';
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    MyTestHelpers::diag ("$anum has ",scalar(@$bvalues)," values");
-
-    my $seq  = Math::NumSeq::GolombSequence->new;
-    my $cumulative = 0;
-    while (@got < @$bvalues) {
-      my ($i, $value) = $seq->next;
-      $cumulative += $value;
-      push @got, $cumulative;
-    }
-    if (! numeq_array(\@got, $bvalues)) {
-      MyTestHelpers::diag ("bvalues: ",join(',',@{$bvalues}[0..10]));
-      MyTestHelpers::diag ("got:     ",join(',',@got[0..10]));
-    }
-  } else {
-    MyTestHelpers::diag ("$anum not available");
-  }
-  skip (! $bvalues,
-        numeq_array(\@got, $bvalues),
-        1, "$anum -- cumulative");
-}
+MyOEIS::compare_values
+  (anum => 'A001463',
+   func => sub {
+     my ($count) = @_;
+     my $seq  = Math::NumSeq::GolombSequence->new;
+     my @got;
+     my $cumulative = 0;
+     while (@got < $count) {
+       my ($i, $value) = $seq->next;
+       $cumulative += $value;
+       push @got, $cumulative;
+     }
+     return \@got;
+   });
 
 #------------------------------------------------------------------------------
 # A095114 partial sums + 1
 
-{
-  my $anum = 'A095114';
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    MyTestHelpers::diag ("$anum has ",scalar(@$bvalues)," values");
-
-    push @got, 1;
-    my $seq  = Math::NumSeq::GolombSequence->new;
-    my $cumulative = 0;
-    while (@got < @$bvalues) {
-      my ($i, $value) = $seq->next;
-      $cumulative += $value;
-      push @got, $cumulative + 1;
-    }
-    if (! numeq_array(\@got, $bvalues)) {
-      MyTestHelpers::diag ("bvalues: ",join(',',@{$bvalues}[0..10]));
-      MyTestHelpers::diag ("got:     ",join(',',@got[0..10]));
-    }
-  } else {
-    MyTestHelpers::diag ("$anum not available");
-  }
-  skip (! $bvalues,
-        numeq_array(\@got, $bvalues),
-        1, "$anum -- cumulative");
-}
-
-
+MyOEIS::compare_values
+  (anum => 'A095114',
+   func => sub {
+     my ($count) = @_;
+     my $seq  = Math::NumSeq::GolombSequence->new;
+     my @got = (1);
+     my $cumulative = 0;
+     while (@got < $count) {
+       my ($i, $value) = $seq->next;
+       $cumulative += $value;
+       push @got, $cumulative + 1;
+     }
+     return \@got;
+   });
 
 #------------------------------------------------------------------------------
 exit 0;

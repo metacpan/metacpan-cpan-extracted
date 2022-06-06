@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2001-2019, Paul Johnson (paul@pjcj.net)
+# Copyright 2001-2022, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -19,8 +19,8 @@ require Data::Dumper;
 
 $| = 1;
 
-my $Version  = "1.36";
-my $Latest_t = "5.031011";
+my $Version  = "1.38";
+my $Latest_t = "5.036";
 my $Author   = 'paul@pjcj.net';
 my @perlbug  = ("perlbug", "-a", $Author,
                            "-s", "Installation of Devel::Cover $Version");
@@ -35,7 +35,7 @@ chomp (my $inc_string = $dumper->Dump);
 open I, ">lib/Devel/Cover/Inc.pm"
     or die "Cannot open lib/Devel/Cover/Inc.pm: $!";
 print I <<"EOI";
-# Copyright 2001-2019, Paul Johnson (paul\@pjcj.net)
+# Copyright 2001-2022, Paul Johnson (paul\@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -105,7 +105,7 @@ for my $t (readdir D) {
     print T <<EOT;
 #!$^X
 
-# Copyright 2002-2019, Paul Johnson (paul\@pjcj.net)
+# Copyright 2002-2022, Paul Johnson (paul\@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -345,14 +345,6 @@ sub MY::postamble {
     qq[
 tags : pure_all
 \t ctags --recurse --exclude=blib --exclude=Devel-Cover-* .
-
-README : lib/Devel/Cover.pm
-\t TERMCAP= COLUMNS=80 pod2text -s lib/Devel/Cover.pm | \\
-    \$(PERL) -n \\
-    -e 'print if (/NAME/         ... /^[A-Z ]+\$\$/) =~ /^\\d+\$\$/;' \\
-    -e 'print if (/SYNOPSIS/     ... /^[A-Z ]+\$\$/) =~ /^\\d+\$\$/;' \\
-    -e 'print if (/DESCRIPTION/  ... /^[A-Z ]+\$\$/) =~ /^\\d+\$\$/;' \\
-    > README
 
 show_version :
 \t \@echo \$(VERSION)

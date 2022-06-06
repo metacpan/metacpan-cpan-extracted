@@ -1,5 +1,11 @@
 Revision history for Git-MoreHooks
 
+0.017     2022-06-06 01:22:58+02:00 Europe/Stockholm
+            * Use Module::Load to load Git::Mailmap. Report error if cannot load, not just crash.
+            * Use Module::Load to load Perl::Critic. Report error if cannot load, not just crash.
+            * Use Module::Load to load Jenkins::API. Report error if cannot load, not just crash.
+            * Change author to mikkoi@cpan.org
+
 0.016     2022-05-29 19:19:41+02:00 Europe/Stockholm
             * Fix cpanfile and isolate additional dependencies
                 to features.

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2013, 2014, 2016, 2019 Kevin Ryde
+# Copyright 2013, 2014, 2016, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -38,7 +38,7 @@ use vars '%Keysyms';
 use X11::Keysyms '%Keysyms', qw(MISCELLANY LATIN1);
 
 use vars '$VERSION';
-$VERSION = 74;
+$VERSION = 75;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -872,7 +872,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Math-NumSeq is Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
+Math-NumSeq is Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2019, 2020 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

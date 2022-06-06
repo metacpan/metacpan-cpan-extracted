@@ -1,4 +1,4 @@
-# Copyright (c) 2019 by Martin Becker, Blaubeuren.
+# Copyright (c) 2019-2022 by Martin Becker, Blaubeuren.
 # This package is free software; you can distribute it and/or modify it
 # under the terms of the Artistic License 2.0 (see LICENSE file).
 
@@ -11,7 +11,7 @@ use Math::BigInt try => 'GMP';
 use Math::ModInt qw(mod);
 use Math::Polynomial::ModInt qw(modpoly);
 
-use Test::More tests => 48;
+use Test::More tests => 52;
 
 sub display {
     my ($tag, $list) = @_;
@@ -111,3 +111,12 @@ ok(!modpoly(2, 2)->is_equal(modpoly(3, 2)));
 ok(modpoly(2, 2)->is_unequal(modpoly(3, 2)));
 ok(!modpoly(5, 2)->is_equal(modpoly(6, 2)));
 ok(modpoly(5, 2)->is_unequal(modpoly(6, 2)));
+
+$p7 = eval { Math::Polynomial::ModInt->new(mod(0, 1)) };
+ok(!defined $p7);
+like($@, qr/modulus must be greater than one/);
+
+$p7 = eval { Math::Polynomial::ModInt->from_index(1, 1) };
+ok(!defined $p7);
+like($@, qr/modulus must be greater than one/);
+

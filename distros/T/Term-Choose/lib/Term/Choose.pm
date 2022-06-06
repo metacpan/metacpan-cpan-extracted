@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '1.753';
+our $VERSION = '1.754';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -260,7 +260,13 @@ sub __modify_options {
         $self->{prompt} = defined $self->{wantarray} ? 'Your choice:' : 'Close with ENTER';
     }
     if ( defined $self->{margin} ) {
-        ( $self->{t_margin}, $self->{r_margin}, $self->{b_margin}, $self->{l_margin} ) = @{$self->{margin}};
+        ( $self->{margin_top}, $self->{margin_right}, $self->{margin_bottom}, $self->{margin_left} ) = @{$self->{margin}};
+        if ( ! defined $self->{tabs_prompt} ) {
+            $self->{tabs_prompt} = [ $self->{margin_left}, $self->{margin_left}, $self->{margin_right} ];
+        }
+        if ( ! defined $self->{tabs_info} ) {
+            $self->{tabs_info} = [ $self->{margin_left}, $self->{margin_left}, $self->{margin_right} ];
+        }
     }
 }
 
@@ -722,48 +728,38 @@ sub __prepare_info_and_prompt_lines {
     if ( $self->{max_width} && $info_w > $self->{max_width} ) { ##
         $info_w = $self->{max_width};
     }
-    my $prompt = '';
-    if ( $self->{t_margin} ) {
-        $prompt .= "\n" x $self->{t_margin};
+    my @tmp_prompt;
+    if ( $self->{margin_top} ) {
+        push @tmp_prompt, ( '' ) x $self->{margin_top};
     }
     if ( length $self->{info} ) {
-        my $init     = $self->{tabs_info}[0] ? $self->{tabs_info}[0] : 0;
-        my $subseq   = $self->{tabs_info}[1] ? $self->{tabs_info}[1] : 0;
-        my $r_margin = $self->{tabs_info}[2] ? $self->{tabs_info}[2] : 0;
-        $prompt .= line_fold(
+        my $init     = $self->{tabs_info}[0] // 0;
+        my $subseq   = $self->{tabs_info}[1] // 0;
+        my $r_margin = $self->{tabs_info}[2] // 0;
+        push @tmp_prompt, line_fold(
             $self->{info}, $info_w - $r_margin,
-            { init_tab => ' ' x $init, subseq_tab => ' ' x $subseq, color => $self->{color}, join => 1 }
+            { init_tab => ' ' x $init, subseq_tab => ' ' x $subseq, color => $self->{color}, join => 0 }
         );
     }
     if ( length $self->{prompt} ) {
-        if ( length $prompt ) {
-            $prompt .= "\n";
-        }
-        my $init     = $self->{tabs_prompt}[0] ? $self->{tabs_prompt}[0] : 0;
-        my $subseq   = $self->{tabs_prompt}[1] ? $self->{tabs_prompt}[1] : 0;
-        my $r_margin = $self->{tabs_prompt}[2] ? $self->{tabs_prompt}[2] : 0;
-        $prompt .= line_fold(
+        my $init     = $self->{tabs_prompt}[0] // 0;
+        my $subseq   = $self->{tabs_prompt}[1] // 0;
+        my $r_margin = $self->{tabs_prompt}[2] // 0;
+        push @tmp_prompt, line_fold(
             $self->{prompt}, $info_w - $r_margin,
-            { init_tab => ' ' x $init, subseq_tab => ' ' x $subseq, color => $self->{color}, join => 1 }
+            { init_tab => ' ' x $init, subseq_tab => ' ' x $subseq, color => $self->{color}, join => 0 }
         );
     }
     if ( length $self->{search_info} ) {
-        $prompt .= "\n";
-        if ( $self->{l_margin} ) {
-            $prompt .= ' ' x $self->{l_margin};
-        }
-        $prompt .= $self->{search_info};
+        push @tmp_prompt, ( $self->{margin_left} ? ' ' x $self->{margin_left} : '' ) . $self->{search_info};
     }
-    if ( $prompt eq '' ) {
+    $self->{count_prompt_lines} = @tmp_prompt;
+    if ( ! $self->{count_prompt_lines} ) {
         $self->{prompt_copy} = '';
-        $self->{count_prompt_lines} = 0;
         return;
     }
-    $self->{prompt_copy} = $prompt;
-    $self->{prompt_copy} .= "\n\r";
-    # s/\n/\n\r/g; -> stty 'raw' mode and Term::Readkey 'ultra-raw' mode
-    #                 don't translate newline to carriage_return/newline
-    $self->{count_prompt_lines} = $self->{prompt_copy} =~ s/\n/\n\r/g;
+    $self->{prompt_copy} = join( "\n\r", @tmp_prompt ) . "\n\r"; #
+    # \n\r -> stty 'raw' mode and Term::Readkey 'ultra-raw' mode don't translate newline to carriage_return/newline
 }
 
 
@@ -855,23 +851,24 @@ sub __wr_screen {
     print "\r" . clear_to_end_of_screen();
     if ( defined $self->{footer_fmt} ) {
         my $pp_line = sprintf $self->{footer_fmt}, int( $self->{first_page_row} / $self->{avail_height} ) + 1;
-        if ( $self->{l_margin} ) {
-            print right( $self->{l_margin} );
+        if ( $self->{margin_left} ) {
+            print right( $self->{margin_left} );
         }
         print "\n" x ( $self->{avail_height} );
         print $pp_line . "\r";
-        if ( $self->{b_margin} ) {
-            print "\n" x $self->{b_margin};
-            print up( $self->{b_margin} );
+        if ( $self->{margin_bottom} ) {
+            print "\n" x $self->{margin_bottom};
+            print up( $self->{margin_bottom} );
         }
         print up( $self->{avail_height} );
     }
-    elsif ( $self->{b_margin} ) {
-        print "\n" x ( $self->{avail_height} + $self->{b_margin} );
-        print up( $self->{avail_height} + $self->{b_margin} );
+    elsif ( $self->{margin_bottom} ) {
+        my $count = ( $self->{last_page_row} - $self->{first_page_row} ) + $self->{margin_bottom};
+        print "\n" x $count;
+        print up( $count );
     }
-    if ( $self->{l_margin} ) {
-        print right( $self->{l_margin} ); # left margin after each "\r"
+    if ( $self->{margin_left} ) {
+        print right( $self->{margin_left} ); # left margin after each "\r"
     }
     my $pad_str = ' ' x $self->{pad};
     for my $row ( $self->{first_page_row} .. $self->{last_page_row} ) {
@@ -882,8 +879,8 @@ sub __wr_screen {
             }
         }
         print $line . "\n\r";
-        if ( $self->{l_margin} ) {
-            print right( $self->{l_margin} );
+        if ( $self->{margin_left} ) {
+            print right( $self->{margin_left} );
         }
     }
     print up( $self->{last_page_row} - $self->{first_page_row} + 1 );
@@ -1043,13 +1040,13 @@ sub __goto {
 sub __avail_screen_size {
     my ( $self ) = @_;
     ( $self->{avail_width}, $self->{avail_height} ) = ( $self->{term_width}, $self->{term_height} );
-    if ( $self->{l_margin} ) {
-        $self->{avail_width} -= $self->{l_margin};
+    if ( $self->{margin_left} ) {
+        $self->{avail_width} -= $self->{margin_left};
     }
-    if ( $self->{r_margin} ) {
-        $self->{avail_width} -= $self->{r_margin};
+    if ( $self->{margin_right} ) {
+        $self->{avail_width} -= $self->{margin_right};
     }
-    if ( $self->{r_margin} || ( $self->{col_width} > $self->{avail_width} && $^O ne 'MSWin32' && $^O ne 'cygwin' ) ) {
+    if ( $self->{margin_right} || ( $self->{col_width} > $self->{avail_width} && $^O ne 'MSWin32' && $^O ne 'cygwin' ) ) {
         $self->{avail_width} += WIDTH_CURSOR;
         # + WIDTH_CURSOR: use also the last terminal column if there is only one item-column;
         #                 with only one item-column the output doesn't get messed up if an item
@@ -1071,8 +1068,8 @@ sub __avail_screen_size {
     if ( $self->{page} ) {
         $self->{avail_height}--;
     }
-    if ( $self->{b_margin} ) {
-        $self->{avail_height} -= $self->{b_margin};
+    if ( $self->{margin_bottom} ) {
+        $self->{avail_height} -= $self->{margin_bottom};
     }
     if ( $self->{avail_height} < $self->{keep} ) {
         $self->{avail_height} = $self->{term_height} >= $self->{keep} ? $self->{keep} : $self->{term_height};
@@ -1270,7 +1267,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.753
+Version 1.754
 
 =cut
 
@@ -1754,9 +1751,9 @@ option L<clear_screen>.
 
 =head3 prompt
 
-If I<prompt> is undefined a default prompt-string will be shown.
+If I<prompt> is undefined, a default prompt-string will be shown.
 
-If the I<prompt> value is an empty string ("") no prompt-line will be shown.
+If the I<prompt> value is an empty string (""), no prompt-line will be shown.
 
 default in list and scalar context: C<Your choice:>
 
@@ -1784,10 +1781,9 @@ Expected value: a regex quoted with the C<qr> operator.
 
 =head3 tabs_info
 
-If I<info> lines are folded, the option I<tabs_info> allows one to insert spaces at beginning of the folded lines. It is
-also possible, to set a right margin.
+The option I<tabs_info> allows one to insert spaces at the beginning and the end of I<info> lines.
 
-The option I<tabs_info> expects a reference to an array with one to three elements:
+I<tabs_info> expects a reference to an array with one to three elements:
 
 - the first element (initial tab) sets the number of spaces inserted at beginning of paragraphs
 
@@ -1798,14 +1794,14 @@ the beginning of paragraphs
 
 Allowed values: 0 or greater. Elements beyond the third are ignored.
 
-(default: undefined)
+default: If I<margin> is defined, the initial tab and the subsequent tab are set to left-I<margin> and the right margin
+is set to right-I<margin>. If I<margin> is not defined, the default is undefined.
 
 =head3 tabs_prompt
 
-If I<prompt> lines are folded, the option I<tabs_prompt> allows one to insert spaces at beginning of the folded lines.
-It is also possible, to set a right margin.
+The option I<tabs_prompt> allows one to insert spaces at the beginning and the end of I<prompt> lines.
 
-The option I<tabs_prompt> expects a reference to an array with one to three elements:
+I<tabs_prompt> expects a reference to an array with one to three elements:
 
 - the first element (initial tab) sets the number of spaces inserted at beginning of paragraphs
 
@@ -1816,7 +1812,8 @@ the beginning of paragraphs
 
 Allowed values: 0 or greater. Elements beyond the third are ignored.
 
-(default: undefined)
+default: If I<margin> is defined, the initial tab and the subsequent tab are set to left-I<margin> and the right margin
+is set to right-I<margin>. If I<margin> is not defined, the default is undefined.
 
 =head3 undef
 

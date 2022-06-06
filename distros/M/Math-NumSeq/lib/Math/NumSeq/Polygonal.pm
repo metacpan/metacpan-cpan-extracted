@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2018, 2019 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -20,7 +20,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 74;
+$VERSION = 75;
 
 use Math::NumSeq;
 use Math::NumSeq::Base::IterateIth;
@@ -178,10 +178,12 @@ $oeis_anum{'both'}->[13]   = 'A195313'; # 13-gonal generalized
 # OEIS-Catalogue: A211013 polygonal=13 pairs=second
 # OEIS-Catalogue: A195313 polygonal=13 pairs=both
 
-$oeis_anum{'second'}->[14] = 'A211014'; # 14-gonal second
-$oeis_anum{'both'}->[14]   = 'A195818'; # 14-gonal generalized
+$oeis_anum{'second'}->[14]  = 'A211014'; # 14-gonal second
+$oeis_anum{'both'}->[14]    = 'A195818'; # 14-gonal generalized
+$oeis_anum{'average'}->[14] = 'A033581'; # (k-2)/2==6 is 6*squares
 # OEIS-Catalogue: A211014 polygonal=14 pairs=second
 # OEIS-Catalogue: A195818 polygonal=14 pairs=both
+# OEIS-Catalogue: A033581 polygonal=14 pairs=average
 
 $oeis_anum{'both'}->[15]   = 'A277082'; # 15-gonal generalized
 # OEIS-Catalogue: A277082 polygonal=15 pairs=both
@@ -216,14 +218,23 @@ $oeis_anum{'first'}->[24]  =  'A051876'; # 24
 # OEIS-Catalogue: A051875 polygonal=23
 # OEIS-Catalogue: A051876 polygonal=24
 
-# A161935 (n+1)*(13*n+1) gives the 28-gonals starting from i=1, ie. the n
-# has an extra +1
+$oeis_anum{'first'}->[25]  =  'A255184'; # 25
+$oeis_anum{'first'}->[26]  =  'A255185'; # 26
+$oeis_anum{'first'}->[27]  =  'A255186'; # 27
+$oeis_anum{'first'}->[29]  =  'A255187'; # 29
+# OEIS-Catalogue: A255184 polygonal=25
+# OEIS-Catalogue: A255185 polygonal=26
+# OEIS-Catalogue: A255186 polygonal=27
+# OEIS-Catalogue: A255187 polygonal=29
 
-$oeis_anum{'second'}->[30] = 'A195028';
-# OEIS-Catalogue: A195028 polygonal=30 pairs=second   # 30 second
+# A161935 (n+1)*(13*n+1) is 28-gonals but OFFSET=1
 
-$oeis_anum{'average'}->[14] = 'A033581'; # (k-2)/2==6 is 6*squares
-# OEIS-Catalogue: A033581 polygonal=14 pairs=average
+$oeis_anum{'first'}->[30]   = 'A254474';
+$oeis_anum{'second'}->[30]  = 'A195028';
+$oeis_anum{'average'}->[30] = 'A144555'; # (k-2)/2==14 is 14*squares
+# OEIS-Catalogue: A254474 polygonal=30
+# OEIS-Catalogue: A195028 polygonal=30 pairs=second
+# OEIS-Catalogue: A144555 polygonal=30 pairs=average
 
 $oeis_anum{'second'}->[18] = 'A139278';
 $oeis_anum{'average'}->[18] = 'A139098'; # (k-2)/2==8 is 8*squares
@@ -245,14 +256,48 @@ $oeis_anum{'average'}->[26] = 'A135453'; # (k-2)/2==12 is 12*squares
 $oeis_anum{'average'}->[28] = 'A152742'; # (k-2)/2==13 is 13*squares
 # OEIS-Catalogue: A152742 polygonal=28 pairs=average
 
-$oeis_anum{'average'}->[30] = 'A144555'; # (k-2)/2==14 is 14*squares
-# OEIS-Catalogue: A144555 polygonal=30 pairs=average
-
 $oeis_anum{'average'}->[32] = 'A064761'; # (k-2)/2==15 is 15*squares
 # OEIS-Catalogue: A064761 polygonal=32 pairs=average
 
+$oeis_anum{'first'}->[33]  =  'A098923'; # 33
+# OEIS-Catalogue: A098923 polygonal=33
+
+$oeis_anum{'first'}->[34]  =  'A282854'; # 34
 $oeis_anum{'average'}->[34] = 'A016802'; # (k-2)/2==16 is 16*squares
+# OEIS-Catalogue: A282854 polygonal=34
 # OEIS-Catalogue: A016802 polygonal=34 pairs=average
+
+$oeis_anum{'first'}->[35]  =  'A282851'; # 35
+# OEIS-Catalogue: A282851 polygonal=35
+
+$oeis_anum{'first'}->[36]  =  'A282853'; # 36
+$oeis_anum{'first'}->[37]  =  'A282852'; # 37
+$oeis_anum{'first'}->[38]  =  'A282850'; # 38
+$oeis_anum{'first'}->[40]  =  'A261191'; # 40
+# OEIS-Catalogue: A282853 polygonal=36
+# OEIS-Catalogue: A282852 polygonal=37
+# OEIS-Catalogue: A282850 polygonal=38
+# OEIS-Catalogue: A261191 polygonal=40
+
+# ENHANCE-ME: let i_start=1 get the right oeis_anum()
+# $oeis_anum{'first'}->[45]  =  'A098924'; # 45
+# NOT Catalogue: A098924 polygonal=45 i_start=1
+# $oeis_anum{'first'}->[47]  =  'A095311'; # 47
+# NOT Catalogue: A095311 polygonal=47 i_start=1
+
+$oeis_anum{'first'}->[50]  =  'A261343'; # 50
+# OEIS-Catalogue: A261343 polygonal=50
+
+$oeis_anum{'first'}->[60]  =  'A249911'; # 60
+$oeis_anum{'first'}->[63]  =  'A098140'; # 63
+# OEIS-Catalogue: A249911 polygonal=60
+# OEIS-Catalogue: A098140 polygonal=63
+
+$oeis_anum{'first'}->[75]  =  'A098230'; # 75
+# OEIS-Catalogue: A098230 polygonal=75
+
+$oeis_anum{'first'}->[100]  =  'A261276'; # 100
+# OEIS-Catalogue: A261276 polygonal=100
 
 $oeis_anum{'average'}->[290] = 'A017522'; # (k-2)/2==290 is 144*squares (12n)^2
 # OEIS-Catalogue: A017522 polygonal=290 pairs=average
@@ -544,7 +589,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2018, 2019 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2018, 2019, 2020, 2021 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

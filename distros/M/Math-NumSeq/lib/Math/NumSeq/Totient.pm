@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2016, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -23,7 +23,7 @@ use Math::Prime::XS 0.23 'is_prime'; # version 0.23 fix for 1928099
 use Math::Factor::XS 'factors';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 74;
+$VERSION = 75;
 
 use Math::NumSeq;
 use Math::NumSeq::Base::IterateIth;
@@ -223,7 +223,7 @@ Math::NumSeq::Totient -- Euler's totient function, count of coprimes
 
 Euler's totient function, being the count of integers coprime to i,
 
-    1, 1, 2, 2, 4, 2, 6, 4, etc
+    1, 1, 2, 2, 4, 2, 6, 4, etc          (A000010)
     starting i=1
 
 For example i=6 has no common factor with 1 or 5, so the totient is 2.
@@ -318,7 +318,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2016, 2019, 2020, 2021 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

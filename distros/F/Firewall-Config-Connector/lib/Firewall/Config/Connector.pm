@@ -5,9 +5,11 @@ use Carp;
 use POSIX;
 use Moose;
 use namespace::autoclean;
-use Firewall::Config::Content::Static;
 use Time::HiRes;
+use Data::Dumper;
+
 use Firewall::Config::Dao::Parser;
+use Firewall::Config::Content::Static;
 use Firewall::Utils::Date;
 
 $Data::dumper::Sortkeys = 1;
@@ -27,8 +29,10 @@ sub update {
   else {
     $fwIds = [ keys %{$fwInfo} ];
   }
-  $numOfProcesses
-    = ( defined $param{numOfProcessesInput} and $param{numOfProcessesInput} > 0 ) ? $param{numOfProcessesInput} : 10;
+  $numOfProcesses =
+    ( defined $param{numOfProcessesInput} and $param{numOfProcessesInput} > 0 )
+      ? $param{numOfProcessesInput}
+      : 10;
   $numOfProcesses = ( @{$fwIds} > $numOfProcesses ) ? $numOfProcesses : scalar(@{$fwIds});
 
   my $i = 0;
@@ -45,21 +49,23 @@ sub update {
   }
   my $logPath = $home . '/log/' . POSIX::strftime("%Y%m%d", localtime());
   mkdir($logPath, 0755) or confess("ERROR: mkdir( $logPath, 0755 ) failed: $!") if not -d $logPath;
-  for (my $i = 0; $i < $numOfProcesses; $i++) {
+  for (my $j = 0; $j < $numOfProcesses; $j++) {
     if (my $pid = fork) {
       $childPids{$pid} = undef;
-      $processForFw{$pid} = $process[$i];
+      $processForFw{$pid} = $process[$j];
     }
     else {
-      foreach my $fwId (@{$process[$i]}) {
+      foreach my $fwId (@{$process[$j]}) {
         my $logName = sprintf('%04d', $fwId) . '_' . $fwInfo->{$fwId}{fwName};
         if (open(STDERR, q{>>}, "$logPath/$logName")) {
           print STDERR '<'
                        . Firewall::Utils::Date->new->getFormatedDate
                        . "> $fwId:$fwInfo->{$fwId}{fwName} start in proc $$\n";
+
           $fwType = $fwInfo->{$fwId}->{fwType};
           eval {$conf = $self->getConfById($fwInfo->{$fwId})};
-          if ($@) {
+
+          if (!!$@) {
             open(my $failedList, q{>>}, "$logPath/failedList")
             or confess("ERROR: open file $logPath/failedList failed: $!");
             print $failedList $fwId . ",";
@@ -67,7 +73,7 @@ sub update {
           }
           else {
             eval {$self->saveconfig({ fwId => $fwId, type => $fwType, conf => $conf })};
-            print STDERR $@ if $@;
+            print STDERR $@ if !!$@;
             print STDERR '<' . Firewall::Utils::Date->new->getFormatedDate . "> $fwId:$fwInfo->{$fwId}{fwName} end\n";
           }
         }
@@ -78,9 +84,10 @@ sub update {
       exit;
     } ## end else [ if ( my $pid = fork ) ]
   }   ## end for ( my $i = 0; $i < $numOfProcesses...)
-  open(my $parentlog, q{>>}, "$logPath/parentlog") or confess("ERROR: open file $logPath/parentlog failed: $!");
-  print $parentlog dumper(\%processForFw);
-  close $parentlog;
+  open(my $parentLog, q{>>}, "$logPath/parentLog") or confess("ERROR: open file $logPath/parentLog failed: $!");
+  print $parentLog dumper(\%processForFw);
+  close $parentLog;
+
   my $exitPid;
   while (keys(%childPids)) {
     while (( $exitPid = waitpid(-1, WNOHANG) ) > 0) {
@@ -97,7 +104,8 @@ sub saveconfig() {
   my $predefinedService;
   eval
   "use Firewall::Config::Dao::PredefinedService::$type; \$predefinedService = Firewall::Config::Dao::PredefinedService::$type->new( dbi => \$sonDbi )";
-  confess $@ if $@;
+  confess $@ if !!$@;
+
   $predefinedService = $predefinedService->load($fwId);
   use Firewall::Config::Dao::Config;
   my $daoConf = Firewall::Config::Dao::Config->new(
@@ -116,7 +124,7 @@ sub saveconfig() {
   my $parser;
   eval
   "use Firewall::Config::Parser::$type; \$parser = Firewall::Config::Parser::$type->new(config => \$conf, preDefinedService => \$predefinedService);";
-  confess $@ if $@;
+  confess $@ if !!$@;
   $parser->parse();
   my $dao = Firewall::Config::Dao::Parser->new(
     dbi    => $sonDbi,
@@ -159,8 +167,9 @@ sub getFwInfo {
         (select b.basekey_name from fw_basekey b where b.basekey_id = i.connection_type) as connection_type,
         (select b.basekey_name from fw_basekey b where b.basekey_id = i.fw_type) as fw_type,
         i.username,i.passwd,i.state,i.manage_ip,i.device_idfrom FW_INFO iwhere i.state = 1"
-  )                 ->all;
+  )->all;
   $self->dbi->disconnect;
+
   my %fwInfoIdAsKey;
   foreach (@{$fwInfo}) {
     @{$fwInfoIdAsKey{$_->{'fw_id'}}}{qw/fwId fwName connectionType fwType username passwd state manageIp/}

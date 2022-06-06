@@ -56,17 +56,17 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Exporter" => 0,
+    "Scalar::Util" => 0,
     "XSLoader" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Scalar::Util" => 0,
     "Test2::Suite" => "0.000139",
     "Test2::V0" => 0,
     "Time::HiRes" => 0
   },
-  "VERSION" => "0.06",
+  "VERSION" => "0.07",
   "test" => {
     "TESTS" => "t/*.t"
   }

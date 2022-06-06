@@ -405,24 +405,24 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 0
       base 0
       perl 5.006
-  Git-Hooks-3.2.1
-    pathname: G/GN/GNUSTAVO/Git-Hooks-3.2.1.tar.gz
+  Git-Hooks-3.2.2
+    pathname: G/GN/GNUSTAVO/Git-Hooks-3.2.2.tar.gz
     provides:
-      Git::Hooks v3.2.1
-      Git::Hooks::CheckCommit v3.2.1
-      Git::Hooks::CheckDiff v3.2.1
-      Git::Hooks::CheckFile v3.2.1
-      Git::Hooks::CheckJira v3.2.1
-      Git::Hooks::CheckLog v3.2.1
-      Git::Hooks::CheckReference v3.2.1
-      Git::Hooks::CheckRewrite v3.2.1
-      Git::Hooks::CheckWhitespace v3.2.1
-      Git::Hooks::GerritChangeId v3.2.1
-      Git::Hooks::Notify v3.2.1
-      Git::Hooks::PrepareLog v3.2.1
-      Git::Hooks::Test v3.2.1
-      Git::Message v3.2.1
-      Git::Repository::Plugin::GitHooks v3.2.1
+      Git::Hooks v3.2.2
+      Git::Hooks::CheckCommit v3.2.2
+      Git::Hooks::CheckDiff v3.2.2
+      Git::Hooks::CheckFile v3.2.2
+      Git::Hooks::CheckJira v3.2.2
+      Git::Hooks::CheckLog v3.2.2
+      Git::Hooks::CheckReference v3.2.2
+      Git::Hooks::CheckRewrite v3.2.2
+      Git::Hooks::CheckWhitespace v3.2.2
+      Git::Hooks::GerritChangeId v3.2.2
+      Git::Hooks::Notify v3.2.2
+      Git::Hooks::PrepareLog v3.2.2
+      Git::Hooks::Test v3.2.2
+      Git::Message v3.2.2
+      Git::Repository::Plugin::GitHooks v3.2.2
     requirements:
       Carp 0
       Email::Sender::Simple 0

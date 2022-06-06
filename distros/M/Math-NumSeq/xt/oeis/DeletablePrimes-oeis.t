@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2018 Kevin Ryde
+# Copyright 2012, 2018, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -33,22 +33,6 @@ use Math::NumSeq::DeletablePrimes;
 #use Smart::Comments '###';
 
 
-sub numeq_array {
-  my ($a1, $a2) = @_;
-  if (! ref $a1 || ! ref $a2) {
-    return 0;
-  }
-  my $i = 0;
-  while ($i < @$a1 && $i < @$a2) {
-    if ($a1->[$i] ne $a2->[$i]) {
-      return 0;
-    }
-    $i++;
-  }
-  return (@$a1 == @$a2);
-}
-
-
 #------------------------------------------------------------------------------
 # A096235 to A096245
 # number of deletable primes of n digits
@@ -56,46 +40,35 @@ sub numeq_array {
 foreach my $num (96235 .. 96245) {
   my $anum = sprintf 'A%06d', $num;
   my $radix = $num - 96235 + 2; # A096235 binary
-
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    my $bvalues_length_full = scalar(@$bvalues);
-
-    {
-      my $trunc = 1;
-      my $pow = $radix;
-      while ($pow < 100000) {
-        $pow *= $radix;
-        $trunc++;
-      }
-      $#$bvalues = $trunc;
-    }
-    my $bvalues_length = scalar(@$bvalues);
-    MyTestHelpers::diag ("$anum has $bvalues_length_full values, shorten to $bvalues_length");
-
-    my $seq  = Math::NumSeq::DeletablePrimes->new (radix => $radix);
+  my $trunc = 1;
+  {
     my $pow = $radix;
-    my $count = 0;
-    while (@got < @$bvalues) {
-      my ($i, $value) = $seq->next;
-      if ($value >= $pow) {
-        push @got, $count;
-        $count = 0;
-        $pow *= $radix;
-      }
-      $count++;
+    while ($pow < 100000) {
+      $pow *= $radix;
+      $trunc++;
     }
-    if (! numeq_array(\@got, $bvalues)) {
-      MyTestHelpers::diag ("bvalues: ",join(',',@{$bvalues}[0..10]));
-      MyTestHelpers::diag ("got:     ",join(',',@got[0..10]));
-    }
-  } else {
-    MyTestHelpers::diag ("$anum not available");
   }
-  skip (! $bvalues,
-        numeq_array(\@got, $bvalues),
-        1, "$anum -- num n-digit deletable primes");
+
+  MyOEIS::compare_values
+      (anum => $anum,
+       max_count => $trunc,
+       func => sub {
+         my ($count) = @_;
+         my $seq  = Math::NumSeq::DeletablePrimes->new (radix => $radix);
+         my @got;
+         my $pow = $radix;
+         my $deletables = 0;
+         while (@got < $count) {
+           my ($i, $value) = $seq->next;
+           if ($value >= $pow) {
+             push @got, $deletables;
+             $deletables = 0;
+             $pow *= $radix;
+           }
+           $deletables++;
+         }
+         return \@got;
+       });
 }
 
 #------------------------------------------------------------------------------

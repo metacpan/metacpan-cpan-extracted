@@ -105,7 +105,7 @@ https://www.nagios.org for information on installing plugins.
 
 =head1 LICENSE
 
-This package is Copyright 1999-2019 by Wilson Snyder <wsnyder@wsnyder.org>.
+This package is Copyright 1999-2022 by Wilson Snyder <wsnyder@wsnyder.org>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either the GNU Lesser General Public License Version 3

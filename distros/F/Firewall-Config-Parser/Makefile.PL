@@ -15,15 +15,47 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Firewall-Config-Parser",
   "LICENSE" => "perl",
   "NAME" => "Firewall::Config::Parser",
-  "PREREQ_PM" => {},
-  "VERSION" => "0.002",
+  "PREREQ_PM" => {
+    "Carp" => 0,
+    "Encode" => 0,
+    "Firewall::DBI::Oracle" => 0,
+    "Firewall::DBI::Pg" => 0,
+    "Firewall::Policy::Element::Destination" => 0,
+    "Firewall::Policy::Element::Service" => 0,
+    "Firewall::Policy::Element::Source" => 0,
+    "Firewall::Utils::Ip" => 0,
+    "Mojo::Util" => 0,
+    "Moose" => 0,
+    "Moose::Role" => 0,
+    "experimental" => 0,
+    "namespace::autoclean" => 0,
+    "strict" => 0,
+    "warnings" => 0
+  },
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => ""
   }
 );
 
 
-my %FallbackPrereqs = ();
+my %FallbackPrereqs = (
+  "Carp" => 0,
+  "Encode" => 0,
+  "Firewall::DBI::Oracle" => 0,
+  "Firewall::DBI::Pg" => 0,
+  "Firewall::Policy::Element::Destination" => 0,
+  "Firewall::Policy::Element::Service" => 0,
+  "Firewall::Policy::Element::Source" => 0,
+  "Firewall::Utils::Ip" => 0,
+  "Mojo::Util" => 0,
+  "Moose" => 0,
+  "Moose::Role" => 0,
+  "experimental" => 0,
+  "namespace::autoclean" => 0,
+  "strict" => 0,
+  "warnings" => 0
+);
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

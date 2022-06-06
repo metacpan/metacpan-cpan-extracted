@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Software::LicenseMoreUtils;
-$Software::LicenseMoreUtils::VERSION = '1.008';
+$Software::LicenseMoreUtils::VERSION = '1.009';
 use strict;
 use warnings;
 use 5.10.1;
@@ -80,7 +80,8 @@ sub _create_license {
         Carp::croak "Unknow license with short name $short ($_)";
     } ;
     delete $arg->{short_name};
-    $lic_obj = $lic_class->new( { %$arg } );
+    # the holder default value fits well with BSD license text
+    $lic_obj = $lic_class->new( { holder => 'the copyright holder', %$arg } );
 
     return $lic_obj;
 }
@@ -103,7 +104,8 @@ sub new_from_short_name {
 
     my $xlic = Software::LicenseMoreUtils::LicenseWithSummary->new({
         license => $lic,
-        or_later => $or_later
+        or_later => $or_later,
+        holder => $arg->{holder},
     });
     return $xlic;
 }
@@ -122,7 +124,7 @@ Software::LicenseMoreUtils - More utilities and a summary for Software::License
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head1 SYNOPSIS
 
@@ -130,10 +132,11 @@ version 1.008
 
  my $lic = Software::LicenseMoreUtils->new_from_short_name({
     short_name => 'Apache-2.0', # or GPL-2+, Artistic-2 ...
-    holder => 'X. Ample'
+    holder => 'X. Ample' # unlike Software::License, holder is optional
  });
 
  # On Debian, return a license summary, returns license text elsewhere
+ # with ot without copyright notice, depending if holder is set.
  my $text = $lic->summary_or_text;
 
  # returns license full text
@@ -182,7 +185,7 @@ directory. Then the license text of a package need only to provide a
 summary of the license that refer to the location of the common
 license.
 
-All summaries are provided for Debian (so for Ubuntu). Other
+All summaries are provided for Debian (so, for Ubuntu). Other
 distributions are welcome to send pull request for their license
 summaries.
 
@@ -191,9 +194,14 @@ summaries.
 =head2 new_from_short_name
 
  my $license_object = Software::LicenseMoreUtils->new_from_short_name({
-      short_name => 'GPL-1',
-      holder => 'X. Ample'
+      short_name => 'GPL-1', # mandatory
+      holder => 'X. Ample' # optional
  }) ;
+
+Unlike L<Software::License>, the C<Holder> parameter is optional. When
+set, L<Software::LicenseMoreUtils::LicenseWithSummary/summary_or_text>
+returns a copyright notice with the text of the summary of the
+license.
 
 Returns a new L<Software::LicenseMoreUtils::LicenseWithSummary> object
 which is a L<Software::License> wrapped with a summary. This is a

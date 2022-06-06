@@ -29,7 +29,7 @@ Synopsis
         $array = $yaml->SafeDumpFile("META.yml");
 
 Description
-    This module is a refactoring of YAML::XS, the old Perl XS binding to
+    This module is a re-factoring of YAML::XS, the old Perl XS binding to
     "libyaml" which offers Perl somewhat acceptable YAML support to date.
     YAML::XS never produced code which could be read from YAML, and thus was
     unsuitable to be used as YAML replacement for core and CPAN. It also
@@ -181,8 +181,9 @@ Configuration
 
     "noindentmap" =item "get_noindentmap"
         If enabled fallback to the old "YAML::Safe" behavior to omit the
-        indentation of map keys, which arguably violates the YAML spec, is
-        different to all other YAML libraries and causes "YAML.pm" to fail.
+        indentation of map keys, which arguably violates the first YAML spec
+        (<https://yaml.org/spec/1.0/#id2566128>), is different to most other
+        YAML libraries and causes older "YAML.pm" to fail.
 
         Disabled
 

@@ -15,7 +15,7 @@ use English qw/ -no_match_vars /;
 use YAML;
 use base qw/App::TemplateCMD::Command/;
 
-our $VERSION     = version->new('0.6.11');
+our $VERSION     = version->new('0.6.12');
 our @EXPORT_OK   = qw//;
 our %EXPORT_TAGS = ();
 
@@ -57,7 +57,7 @@ App::TemplateCMD::Command::Conf - Command to show the configuration used for tem
 
 =head1 VERSION
 
-This documentation refers to App::TemplateCMD::Command::Conf version 0.6.11.
+This documentation refers to App::TemplateCMD::Command::Conf version 0.6.12.
 
 =head1 SYNOPSIS
 

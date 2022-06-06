@@ -1,5 +1,11 @@
 Revision history for App-TemplateCMD
 
+0.6.12   2022-06-05
+        Updating for release of version 0.6.12
+        Updated (Ivan Wills)
+        Fixed using package as a variable name (Ivan Wills)
+        New module version of node file (Ivan Wills)
+
 0.6.11   2021-04-18
         Updating for release of version 0.6.11
         Adding missing files to manifest (Ivan Wills)

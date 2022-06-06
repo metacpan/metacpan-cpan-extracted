@@ -40,6 +40,24 @@ while (defined($str = <DATA>))
     ($neg ? \&unlike : \&like)->( $str, qr/\A;/, "$orig_str matched scalar");
 }
 
+my $grammar = <<'EOF';
+given 2 { when __ < 1 { ok(0) } else { ok(1) } }
+EOF
+pos $grammar = 8;
+my ($out) = Text::Balanced::_match_codeblock(\$grammar,qr/\s*/,qr/\{/,qr/\}/,qr/\{/,qr/\}/,undef);
+ok $out, 'Switch error from calling _match_codeblock';
+
+$grammar = <<'EOF';
+comment:  m/a/
+enum_list: (/b/)
+EOF
+pos $grammar = 10;
+($out) = Text::Balanced::extract_quotelike($grammar);
+is $out, 'm/a/', 'PRD error (setup for real error)';
+pos $grammar = 26;
+($out) = extract_codeblock($grammar,'{([',undef,'(',1);
+is $out, '(/b/)', 'PRD error';
+
 done_testing;
 
 __DATA__

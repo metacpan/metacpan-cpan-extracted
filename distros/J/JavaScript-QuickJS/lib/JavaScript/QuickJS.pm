@@ -35,7 +35,7 @@ your system.
 
 use XSLoader;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 XSLoader::load( __PACKAGE__, $VERSION );
 
@@ -52,13 +52,19 @@ Instantiates I<CLASS>.
 Sets 1 or more globals in I<OBJ>. See below for details on type conversions
 from Perl to JavaScript.
 
+Returns I<OBJ>.
+
 =head2 $obj = I<OBJ>->helpers()
 
 Defines QuickJS’s “helpers”, e.g., C<console.log>.
 
+Returns I<OBJ>.
+
 =head2 $obj = I<OBJ>->std()
 
 Enables (but does I<not> import) QuickJS’s C<std> module.
+
+Returns I<OBJ>.
 
 =head2 $obj = I<OBJ>->os()
 
@@ -73,19 +79,34 @@ Untrapped exceptions in JavaScript will be rethrown as Perl exceptions.
 
 $JS_CODE is a I<character> string.
 
-=head2 I<OBJ>->eval_module( $JS_CODE )
+=head2 $obj = I<OBJ>->eval_module( $JS_CODE )
 
 Runs $JS_CODE as a module, which enables ES6 module syntax.
 Note that no values can be returned directly in this mode of execution.
+
+Returns I<OBJ>.
+
+=head2 $obj = I<OBJ>->await()
+
+Blocks until all of I<OBJ>’s pending work (if any) is complete.
+
+For example, if you C<eval()> some code that creates a promise, call
+this to wait for that promise to complete.
+
+Returns I<OBJ>.
 
 =head2 $obj = I<OBJ>->set_module_base( $PATH )
 
 Sets a base path (a byte string) for ES6 module imports.
 
+Returns I<OBJ>.
+
 =head2 $obj = I<OBJ>->unset_module_base()
 
 Restores QuickJS’s default directory for ES6 module imports
 (as of this writing, it’s the process’s current directory).
+
+Returns I<OBJ>.
 
 =cut
 

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.135';
+our $VERSION = '0.136';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf );
@@ -62,7 +62,7 @@ sub __restore_defaults {
 
 
 sub __prepare_opt {
-    my ( $self, $opt ) = @_;
+    my ( $self, $opt, $subseq_tab ) = @_;
     if ( ! defined $opt ) {
         $opt = {};
     }
@@ -81,8 +81,22 @@ sub __prepare_opt {
             }
         }
     }
-    if ( defined $self->{margin} && ! defined $self->{tabs_prompt} ) {
-        $self->{tabs_prompt} = [ $self->{margin}[3] // 0, $self->{margin}[3] // 0, $self->{margin}[1] // 0 ];
+    if ( ! defined $self->{tabs_info} ) {
+        if ( defined $self->{margin} ) {
+            $self->{tabs_info} = [ $self->{margin}[3] // 0, $self->{margin}[3] // 0, $self->{margin}[1] // 0 ];
+        }
+    }
+    if ( ! defined $self->{tabs_prompt} ) {
+        if ( defined $self->{margin} ) {
+            $self->{tabs_prompt} = [
+                $self->{margin}[3] // 0,
+              ( $self->{margin}[3] // 0 ) + ( $subseq_tab // 0 ),
+                $self->{margin}[1] // 0
+            ];
+        }
+        elsif ( $subseq_tab ) {
+            $self->{tabs_prompt} = [ 0, $subseq_tab, 0 ];
+        }
     }
 }
 
@@ -140,41 +154,41 @@ sub _defaults {
     return {
         alignment           => 0,
         all_by_default      => 0,
+        back                => 'BACK',
         #busy_string        => undef,
         clear_screen        => 0,
         color               => 0,
+        confirm             => 'CONFIRM',
+        cs_begin            => '',
+        cs_end              => '',
+        #cs_label           => undef,
+        cs_separator        => ', ',
         decoded             => 1,
         #default_number     => undef,
+        #filter             => undef,
+        #footer             => undef,
         hide_cursor         => 1,
         index               => 0,
         #info               => undef,
         #init_dir           => undef,
-        #filter             => undef,
-        #footer             => undef,
-        #keep               => undef,
         keep_chosen         => 0,
+        #keep               => undef,
         layout              => 1,
-        #tabs_info          => undef,
-        #tabs_prompt        => undef,
-        back                => 'BACK',
-        confirm             => 'CONFIRM',
         #margin             => undef,
         #mark               => undef,
         mouse               => 0,
         order               => 1,
         #page               => undef,
+        parent_dir          => '..',
         prefix              => '',
         prompt              => 'Your choice: ',
         show_hidden         => 1,
         small_first         => 0,
-        cs_begin            => '',
-        cs_end              => '',
-        #cs_label           => undef,
-        cs_separator        => ', ',
+        #tabs_info          => undef,
+        #tabs_prompt        => undef,
         thousands_separator => ',',
 
         ## intern:
-        parent_dir => '..',
         reset      => 'reset',
     };
 };
@@ -182,25 +196,25 @@ sub _defaults {
 
 sub _routine_options {
     my ( $caller ) = @_;
-    my @every = ( qw( back clear_screen color confirm footer hide_cursor info keep margin mouse page prompt tabs_info tabs_prompt ) );
+    my @every = ( qw( back clear_screen color confirm cs_label footer hide_cursor info keep margin mouse page prompt tabs_info tabs_prompt ) );
     my $options;
     if ( $caller eq 'choose_directories' ) {
         $options = [ @every, qw( init_dir layout order alignment show_hidden decoded ) ];
     }
     elsif ( $caller eq 'choose_a_directory' ) {
-        $options = [ @every, qw( init_dir layout order alignment show_hidden decoded cs_label ) ];
+        $options = [ @every, qw( init_dir layout order alignment show_hidden decoded ) ];
     }
     elsif ( $caller eq 'choose_a_file' ) {
         $options = [ @every, qw( init_dir layout order alignment show_hidden decoded filter ) ];
     }
     elsif ( $caller eq 'choose_a_number' ) {
-        $options = [ @every, qw( small_first reset thousands_separator default_number cs_label ) ];
+        $options = [ @every, qw( small_first reset thousands_separator default_number ) ];
     }
     elsif ( $caller eq 'choose_a_subset' ) {
-        $options = [ @every, qw( layout order alignment keep_chosen index prefix all_by_default cs_label cs_begin cs_end cs_separator mark busy_string ) ];
+        $options = [ @every, qw( layout order alignment keep_chosen index prefix all_by_default cs_begin cs_end cs_separator mark busy_string ) ];
     }
     elsif ( $caller eq 'settings_menu' ) {
-        $options = [ @every, qw( cs_label cs_begin cs_end cs_separator ) ];
+        $options = [ @every, qw( cs_begin cs_end cs_separator ) ];
     }
     return $options;
 }
@@ -273,22 +287,19 @@ sub choose_directories {
         return $ob->choose_directories( @_ );
     }
     my ( $self, $opt ) = @_;
-    $self->__prepare_opt( $opt );
+    my $subseq_tab = 2;
+    $self->__prepare_opt( $opt, $subseq_tab );
     my $dir = $self->__prepare_path();
     my $chosen_dirs = [];
     my ( $confirm, $change_path, $add_dirs ) = ( '  ' . $self->{confirm}, '- Change Location', '- Add Directories' );
     my @bu;
 
     CHOOSE_MODE: while ( 1 ) {
-        my $term_w = get_term_width();
-        my @tmp_prompt;
-        my $key_dirs = 'Chosen Dirs: ';
+        my $key_dirs = $self->{cs_label} // 'Chosen Dirs: ';
         my $dirs_chosen = $key_dirs . ( @$chosen_dirs ? join( ', ', @$chosen_dirs ) : '---' );
-        push @tmp_prompt, line_fold( $dirs_chosen, $term_w, { subseq_tab => ' ' x length( $key_dirs ), join => 0 } );
         my $key_path = 'Location: ';
         my $path = $key_path . $dir;
-        push @tmp_prompt, line_fold( $path, $term_w, { subseq_tab => ' ' x length( $key_path ), join => 0 } );
-        my $prompt = join( "\n", @tmp_prompt );
+        my $prompt = $dirs_chosen . "\n" . $path;
         # Choose
         my $choice = choose(
             [ undef, $confirm, $change_path, $add_dirs ],
@@ -330,18 +341,15 @@ sub choose_directories {
             for my $o ( @$options ) {
                 $bu_opt{$o} = $self->{$o};
             }
-            my @tmp_cs_label = (
-                line_fold( $dirs_chosen, $term_w, { subseq_tab => ' ' x length( $key_dirs ), join => 0 } )
-            );
-            push @tmp_cs_label, $path;
-            push @tmp_cs_label, 'Dirs to add: ';
-            my $cs_label = join "\n", @tmp_cs_label;
+            my $cs_label = $dirs_chosen . "\n" . $path . "\n" . 'Dirs to add: ';
             # choose_a_subset
             my $idxs = $self->choose_a_subset(
                 [ sort @$avail_dirs ],
-                { info => $self->{info}, prompt => $self->{prompt}, back => '<<', confirm => 'OK', cs_begin => undef,
-                  cs_label => $cs_label, page => $self->{page}, footer => $self->{footer}, keep => $self->{keep},
-                  index => 1, margin => $self->{margin} }
+                { cs_label => $cs_label, back => '<<', confirm => 'OK', cs_begin => undef,index => 1,
+                  #info => $self->{info}, prompt => $self->{prompt}, page => $self->{page}, footer => $self->{footer},
+                  #keep => $self->{keep}, margin => $self->{margin}, tabs_info => $self->{tabs_info},
+                  #tabs_prompt => $self->{tabs_prompt}
+                }
             );
             for my $o ( keys %bu_opt ) {
                 $self->{$o} = $bu_opt{$o};
@@ -394,12 +402,9 @@ sub choose_a_directory {
         return $ob->choose_a_directory( @_ );
     }
     my ( $self, $opt ) = @_;
-    if ( ! defined $opt->{cs_label} ) {
-        $opt->{cs_label} = 'Directory: ';
-    }
     $self->__prepare_opt( $opt );
     my $init_dir = $self->__prepare_path();
-    my $prompt_fmt = $opt->{cs_label} . "%s";
+    my $prompt_fmt = ( $opt->{cs_label} // 'Directory: ' ) . "%s";
     if ( length $self->{prompt} ) {
         $prompt_fmt .= "\n" . $self->{prompt};
     }
@@ -508,7 +513,7 @@ sub __a_file {
         }
         my @tmp_prompt;
         push @tmp_prompt, 'File-Directory: ' . $dir;
-        push @tmp_prompt, 'File: ' . ( length $prev_dir ? $prev_dir : '' );
+        push @tmp_prompt, ( $self->{cs_label} // 'File: ' ) . ( length $prev_dir ? $prev_dir : '' );
         if ( length $self->{prompt} ) {
             push @tmp_prompt, $self->{prompt};
         }
@@ -703,7 +708,9 @@ sub choose_a_subset {
         return $ob->choose_a_subset( @_ );
     }
     my ( $self, $available, $opt ) = @_;
-    $self->__prepare_opt( $opt );
+    #my $subseq_tab = length( $opt->{cs_label} // '.' ) ? 2 : 0; # width a default cs_label set
+    my $subseq_tab = length $opt->{cs_label} ? 2 : 0;
+    $self->__prepare_opt( $opt, $subseq_tab );
     my $new_idx = [];
     my $curr_avail = [ @$available ];
     my $bu = [];
@@ -966,7 +973,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.135
+Version 0.136
 
 =cut
 
@@ -1039,6 +1046,17 @@ confirm
 Customize the string of the menu entry "I<confirm>".
 
 Default: C<CONFIRM>.
+
+=item
+
+cs_label
+
+The value of I<cs-label> (current selection label) is a string which is placed in front of the current selection.
+
+Defaults: C<choose_directories>: 'Chosen Dirs: ', C<choose_a_directory>: 'Directory: ', C<choose_a_file>: 'File: '. For
+C<choose_a_number>, C<choose_a_subset> and C<settings_menu> the default is undefined.
+
+The current-selection output is placed between the info string and the prompt string.
 
 =item
 
@@ -1116,6 +1134,9 @@ Allowed values: 0 or greater. Elements beyond the third are ignored.
 
 Default: undef
 
+default: If I<margin> is defined, the initial tab and the subsequent tab are set to left-I<margin> and the right margin
+is et to right-I<margin>. If I<margin> is not defined the default is undefined.
+
 =item
 
 tabs_prompt
@@ -1133,8 +1154,9 @@ the beginning of paragraphs
 
 Allowed values: 0 or greater. Elements beyond the third are ignored.
 
-default: If I<margin> is defined, C<initial tab> and C<subsequent tab> are set to C<left-margin> and the right margin is
-set to C<right-margin>. If I<margin> is not defined the default of I<tabs_prompt> is undefined.
+default: If I<margin> is defined, the initial tab and the subsequent tab are set to left-I<margin> and the right margin
+is set to right-I<margin>. C<choose-directories> and C<choose-a-subset>: +2 for the subsequent tab. Else the default is
+undefined.
 
 =back
 
@@ -1177,17 +1199,6 @@ Values: [0],1,2.
 
 =item
 
-cs_label
-
-The value of I<cs_label> (current selection label) is a string which is placed in front of the current selection.
-
-Defaults: C<choose_directories>: 'Dirs: ', C<choose_a_directory>: 'Dir: ', C<choose_a_file>: 'File: '. For
-C<choose_a_number>, C<choose_a_subset> and C<settings_menu> the default is undefined.
-
-The current selection output is placed between the I<info> string and the I<prompt> string.
-
-=item
-
 decoded
 
 If enabled, the directory name is returned decoded with C<locale_fs> form L<Encode::Locale>.
@@ -1219,6 +1230,14 @@ If set to C<1>, the items are ordered vertically else they are ordered horizonta
 This option has no meaning if I<layout> is set to C<2>.
 
 Values: 0,[1].
+
+=item
+
+parent_dir
+
+Customize the string of the menu entry "parent_dir".
+
+Default: C<..>
 
 =item
 
@@ -1378,16 +1397,6 @@ With the optional second argument (hash-reference), these options can be passed:
 
 =item
 
-cs_label
-
-The value of I<cs_label> (current selection label) is a string which is placed in front of the current selection.
-
-Defaults: undef
-
-The current selection output is placed between the I<info> string and the I<prompt> string.
-
-=item
-
 default_number
 
 Set a default number (unsigned integer in the range of the available numbers).
@@ -1459,16 +1468,6 @@ cs_end
 Current selection: as soon as elements have been chosen the I<cs_end> string is placed at the end of the chosen elements.
 
 Default: empty string
-
-=item
-
-cs_label
-
-The value of I<cs_label> (current selection label) is a string which is placed in front of the current selection.
-
-Default: undef
-
-The current selection output is placed between the I<info> string and the I<prompt> string.
 
 =item
 
@@ -1605,16 +1604,6 @@ cs_end
 Current selection: as soon as elements have been chosen the I<cs_end> string is placed at the end of the chosen elements.
 
 Default: empty string
-
-=item
-
-cs_label
-
-The value of I<cs_label> (current selection label) is a string which is placed in front of the current selection.
-
-Default: undef
-
-The current selection output is placed between the I<info> string and the I<prompt> string.
 
 =item
 

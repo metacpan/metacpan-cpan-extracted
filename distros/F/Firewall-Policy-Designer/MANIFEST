@@ -18,7 +18,6 @@ lib/Firewall/Policy/Designer/Fortinet.pm
 lib/Firewall/Policy/Designer/H3c.pm
 lib/Firewall/Policy/Designer/Hillstone.pm
 lib/Firewall/Policy/Designer/Huawei.pm
-lib/Firewall/Policy/Designer/Huawei.pm.bak
 lib/Firewall/Policy/Designer/Neteye.pm
 lib/Firewall/Policy/Designer/Netscreen.pm
 lib/Firewall/Policy/Designer/Srx.pm
@@ -26,4 +25,3 @@ lib/Firewall/Policy/Designer/Topsec.pm
 lib/Firewall/Policy/Designer/tests/Asa.t
 lib/Firewall/Policy/Designer/tests/Netscreen.t
 lib/Firewall/Policy/Designer/tests/Srx.t
-lib/Firewall/Policy/p.pl

@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Hooks::CheckJira;
 # ABSTRACT: Git::Hooks plugin which requires citation of JIRA issues in commit messages
-$Git::Hooks::CheckJira::VERSION = '3.2.1';
+$Git::Hooks::CheckJira::VERSION = '3.2.2';
 use v5.16.0;
 use utf8;
 use Log::Any '$log';
@@ -532,7 +532,7 @@ Git::Hooks::CheckJira - Git::Hooks plugin which requires citation of JIRA issues
 
 =head1 VERSION
 
-version 3.2.1
+version 3.2.2
 
 =head1 SYNOPSIS
 

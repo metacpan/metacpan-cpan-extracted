@@ -105,8 +105,9 @@ SKIP: {
 
 print "check_pidstat:\n";
 SKIP: {
-    if (!-d "/usr/lib/nagios/plugins") {
-	skip("nagios not installed (harmless)",1);
+    if (1 || !-d "/usr/lib/nagios/plugins") {
+	# Nagios is still included, but no longer being actively maintained
+	skip("nagios not tested (harmless)", 1);
     }
     # Note we may not be running as root, so need to check $$, not init.
     my $cmd = "$PERL nagios/check_pidstatd --port $SLArgs{port} --pid $$";

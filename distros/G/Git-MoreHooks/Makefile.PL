@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "More plugins (Git hooks) for package Git::Hooks.",
-  "AUTHOR" => "'Mikko Koivunalho <mikko.koivunalho\@iki.fi>'",
+  "AUTHOR" => "'Mikko Koivunalho <mikkoi\@cpan.org>'",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -25,14 +25,11 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "File::Temp" => 0,
     "Git::Hooks" => "3.000000",
-    "Git::Mailmap" => 0,
-    "Jenkins::API" => 0,
     "List::MoreUtils" => 0,
     "Log::Any" => 0,
     "Module::Load" => 0,
     "Params::Validate" => 0,
     "Path::Tiny" => 0,
-    "Template" => 0,
     "Text::Glob" => 0,
     "feature" => 0,
     "strict" => 0,
@@ -48,7 +45,7 @@ my %WriteMakefileArgs = (
     "Test::Git" => 0,
     "Test::Requires::Git" => 0
   },
-  "VERSION" => "0.016",
+  "VERSION" => "0.017",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -65,16 +62,13 @@ my %FallbackPrereqs = (
   "File::Temp" => 0,
   "Git::Hooks" => "3.000000",
   "Git::Hooks::Test" => 0,
-  "Git::Mailmap" => 0,
   "Git::Repository" => 0,
-  "Jenkins::API" => 0,
   "List::MoreUtils" => 0,
   "Log::Any" => 0,
   "Log::Any::Adapter" => 0,
   "Module::Load" => 0,
   "Params::Validate" => 0,
   "Path::Tiny" => 0,
-  "Template" => 0,
   "Test2::Require::Module" => 0,
   "Test2::V0" => 0,
   "Test::Git" => 0,

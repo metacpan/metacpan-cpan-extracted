@@ -1,4 +1,4 @@
-# Copyright 2001-2019, Paul Johnson (paul@pjcj.net)
+# Copyright 2001-2022, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -10,7 +10,7 @@ package Devel::Cover::DB;
 use strict;
 use warnings;
 
-our $VERSION = '1.36'; # VERSION
+our $VERSION = '1.38'; # VERSION
 
 use Devel::Cover::Criterion;
 use Devel::Cover::DB::File;
@@ -684,14 +684,19 @@ sub uncoverable_comments {
                     }
                 }
             }
-            $count = $1 if $info =~ /count:(\d+)/;
+            # e.g.: count:1 | count:2,5 | count:1,4..7
+            my $c = qr/\d+(?:\.\.\d+)?/;
+            $count = $1 if $info =~ /count:($c(?:,$c)*)/;
+            my @counts = map { m/^(\d+)\.\.(\d+)$/ ? ($1 .. $2) : $_ }
+                split m/,/, $count;
             $class = $1 if $info =~ /class:(\w+)/;
             $note  = $1 if $info =~ /note:(.+)/;
 
-            # no warnings "uninitialized";
-            # warn "pushing $criterion, $count, $type, $class, $note";
-
-            push @waiting, [$criterion, $count - 1, $type, $class, $note];
+            for my $c (@counts) {
+                # no warnings "uninitialized";
+                # warn "pushing $criterion, $c - 1, $type, $class, $note";
+                push @waiting, [$criterion, $c - 1, $type, $class, $note];
+            }
 
             next unless $code =~ /\S/;
         }
@@ -928,7 +933,7 @@ Devel::Cover::DB - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.36
+version 1.38
 
 =head1 SYNOPSIS
 
@@ -1014,7 +1019,7 @@ Huh?
 
 =head1 LICENCE
 
-Copyright 2001-2019, Paul Johnson (paul@pjcj.net)
+Copyright 2001-2022, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

@@ -24,7 +24,7 @@ our @_Local_Responses;
 # Other configurable settings.
 $Debug = 0;
 
-$VERSION = '1.500';
+$VERSION = '1.502';
 
 # True if pid existance can be detected by looking at /proc filesystem
 $Stat_Of_Pid_Supported = -e "/proc/1";
@@ -323,7 +323,7 @@ looked up via /etc/services, else 1752.
 
 The latest version is available from CPAN and from L<https://www.veripool.org/ipc-locker>.
 
-Copyright 2002-2019 by Wilson Snyder.  This package is free software; you
+Copyright 2002-2022 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU
 Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
 

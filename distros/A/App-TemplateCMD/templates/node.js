@@ -4,7 +4,7 @@
 
 'use strict';
 const fs = require('fs');
-const package = require(`${process.cwd()}/package.json`);
+const pkg = require(`${process.cwd()}/package.json`);
 const ngl = require('node-getopt-long');
 
 const options = ngl.options([
@@ -21,7 +21,7 @@ const options = ngl.options([
   }]
 ], {
   name: '[% file %]',
-  command: package.version,
+  command: pkg.version,
   helpPrefix: `
     before text
   `,

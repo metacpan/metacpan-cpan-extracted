@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011 Kevin Ryde
+# Copyright 2010, 2011, 2022 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -19,9 +19,19 @@
 
 use 5.004;
 use strict;
-use Math::BigInt try => 'GMP';
+# use Math::BigInt try => 'GMP';
+$|=1;
 
 # use Math::BigInt try => 'Calc';
+
+{
+  require Math::BigInt;
+  require Math::BigFloat;
+  print "Math::BigFloat version ",Math::BigFloat->VERSION,"\n";
+  my $nan = Math::BigFloat->bnan('-');
+  print $nan,"\n";
+  exit 0;
+}
 
 {
   require Math::NumSeq;

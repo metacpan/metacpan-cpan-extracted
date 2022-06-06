@@ -1,3 +1,8 @@
+Version 0.07 - 2022-06-04
+
+  - Actual fix for iter->next_kv, only affects debug perls - GitHub #2
+  - Explicitly require Scalar::Util
+
 Version 0.06 - 2022-05-22
 
   - Possible fix for bug in iter->next_kv

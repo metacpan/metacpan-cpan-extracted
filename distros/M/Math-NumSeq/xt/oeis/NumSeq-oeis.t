@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -61,7 +61,7 @@ sub want_anum {
 }
 sub want_module {
   my ($module) = @_;
-  # return 0 unless $module =~ /Almost/;
+   return 0 unless $module =~ /Polygonal/;
   # return 0 unless $module =~ /Lucas|Fibonacci/;
   # return 0 unless $module =~ /Collatz/;
   # return 0 unless $module =~ /Aronson/;

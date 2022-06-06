@@ -1,5 +1,5 @@
 package Algorithm::QuadTree::XS;
-$Algorithm::QuadTree::XS::VERSION = '0.02';
+$Algorithm::QuadTree::XS::VERSION = '0.03';
 use strict;
 use warnings;
 use Exporter qw(import);

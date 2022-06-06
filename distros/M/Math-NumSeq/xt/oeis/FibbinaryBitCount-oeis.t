@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2019 Kevin Ryde
+# Copyright 2012, 2013, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -21,7 +21,7 @@ use 5.004;
 use strict;
 use Math::BigInt try => 'GMP';
 use Test;
-plan tests => 40;
+plan tests => 42;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -29,6 +29,62 @@ MyTestHelpers::nowarnings();
 use MyOEIS;
 
 use Math::NumSeq::FibbinaryBitCount;
+
+
+#------------------------------------------------------------------------------
+# A095096 numbers with even num Zeck 1-bits
+
+MyOEIS::compare_values
+  (anum => 'A095096',
+   func => sub {
+     my ($count) = @_;
+     my $seq  = Math::NumSeq::FibbinaryBitCount->new;
+     my @got;
+     while (@got < $count) {
+       my ($i, $value) = $seq->next;
+       if ($value % 2 == 0) {
+         push @got, $i;
+       }
+     }
+     return \@got;
+   });
+
+# A337287 numbers n where both n and n+1 with even num Zeck 1-bits
+MyOEIS::compare_values
+  (anum => 'A337287',
+   func => sub {
+     my ($count) = @_;
+     my $seq  = Math::NumSeq::FibbinaryBitCount->new;
+     my @got;
+     my ($prev_i,$prev_value) = $seq->next;
+     while (@got < $count) {
+       my ($i, $value) = $seq->next;
+       if ($prev_value%2==0 && $value%2 == 0) {
+         push @got, $prev_i;
+       }
+       ($prev_i,$prev_value) = ($i,$value);
+     }
+     return \@got;
+   });
+
+
+#------------------------------------------------------------------------------
+# A179180 - fibbinary bit count cumulative
+
+MyOEIS::compare_values
+  (anum => 'A179180',
+   func => sub {
+     my ($count) = @_;
+     my $seq  = Math::NumSeq::FibbinaryBitCount->new;
+     my @got;
+     my $total = 0;
+     while (@got < $count) {
+       my ($i, $value) = $seq->next;
+       $total += $value;
+       push @got, $total;
+     }
+     return \@got;
+   });
 
 
 #------------------------------------------------------------------------------
@@ -82,24 +138,6 @@ MyOEIS::compare_values
      while (@got < $count) {
        my ($i, $value) = $seq->next;
        if ($value > 2) {
-         push @got, $i;
-       }
-     }
-     return \@got;
-   });
-
-#------------------------------------------------------------------------------
-# A095096 numbers with even num Zeck 1-bits
-
-MyOEIS::compare_values
-  (anum => 'A095096',
-   func => sub {
-     my ($count) = @_;
-     my $seq  = Math::NumSeq::FibbinaryBitCount->new;
-     my @got;
-     while (@got < $count) {
-       my ($i, $value) = $seq->next;
-       if ($value % 2 == 0) {
          push @got, $i;
        }
      }
@@ -189,8 +227,7 @@ foreach my $elem ([ 2, 'A182569'],
            }
          }
          return \@got;
-       }
-      );
+       });
 }
 
 #------------------------------------------------------------------------------

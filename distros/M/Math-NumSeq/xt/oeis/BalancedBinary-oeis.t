@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2018, 2019 Kevin Ryde
+# Copyright 2012, 2013, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -50,7 +50,64 @@ use Math::NumSeq::RadixConversion;
 
 
 #------------------------------------------------------------------------------
-# A085192 first diffs
+# A127284 count 01 bit pairs = number of Tamari lattice successors
+
+MyOEIS::compare_values
+  (anum => 'A127284',
+   func => sub {
+     my ($count) = @_;
+     my $seq = Math::NumSeq::BalancedBinary->new;
+     my @got = (0);  # A127284 includes 0
+     while (@got < $count) {
+       my ($i, $balanced) = $seq->next;
+       my $got = 0;
+       for ( ; $balanced >= 2; $balanced >>= 1) {
+         if (($balanced & 3) == 1) { $got++; }
+       }
+       push @got, $got;
+     }
+     return \@got;
+   });
+
+# A057514 count 10 bit pairs
+MyOEIS::compare_values
+  (anum => 'A057514',
+   func => sub {
+     my ($count) = @_;
+     my $seq = Math::NumSeq::BalancedBinary->new;
+     my @got = (0);  # A057514 includes 0
+     while (@got < $count) {
+       my ($i, $balanced) = $seq->next;
+       my $got = 0;
+       for ( ; $balanced; $balanced >>= 1) {
+         if (($balanced & 3) == 2) { $got++; }
+       }
+       push @got, $got;
+     }
+     return \@got;
+   });
+
+# A126306 count 11 bit pairs
+MyOEIS::compare_values
+  (anum => 'A126306',
+   func => sub {
+     my ($count) = @_;
+     my $seq = Math::NumSeq::BalancedBinary->new;
+     my @got = (0);  # A1263064 includes 0
+     while (@got < $count) {
+       my ($i, $balanced) = $seq->next;
+       my $got = 0;
+       for ( ; $balanced; $balanced >>= 1) {
+         if (($balanced & 3) == 3) { $got++; }
+       }
+       push @got, $got;
+     }
+     return \@got;
+   });
+
+
+#------------------------------------------------------------------------------
+# A085192 increments
 
 # differences xor
 # not in OEIS: 2,8,6,38,6,30,6,12,146,6,30,6,12,114,6,30
@@ -70,6 +127,7 @@ MyOEIS::compare_values
      }
      return \@got;
    });
+
 
 #------------------------------------------------------------------------------
 # A014138 - cumulative Catalan
@@ -418,7 +476,7 @@ sub breadthfirst_tree_to_bits {
     } else {
       push @ret, 0;
     }
-  };
+  }
   if (@pending) {
     die "Oops, more pending";
   }
@@ -508,6 +566,7 @@ sub bits_is_oneonly {
   return $good;
 }
 
+
 #------------------------------------------------------------------------------
 # A071152 - Lukasiewicz, binary with 0,2, including value=0
 
@@ -527,8 +586,9 @@ MyOEIS::compare_values
      return \@got;
    });
 
+
 #------------------------------------------------------------------------------
-# A072643 balanced binary width, including value=0
+# A072643 balanced binary width
 
 MyOEIS::compare_values
   (anum => 'A072643',
@@ -538,14 +598,14 @@ MyOEIS::compare_values
      my $dlen = Math::NumSeq::DigitLength->new (radix => 2);
 
      my $seq = Math::NumSeq::BalancedBinary->new;
-     my @got = (0);
-
+     my @got = (0);  # including 0
      for (my $value = 0; @got < $count; $value++) {
        my ($i,$value) = $seq->next;
        push @got, $dlen->ith($value)/2;
      }
      return \@got;
    });
+
 
 #------------------------------------------------------------------------------
 # A071671 - permuted by A071651/A071652
@@ -573,7 +633,7 @@ MyOEIS::compare_values
 # }
 
 #------------------------------------------------------------------------------
-# A085223 - positions of single trailing zero
+# A085223 - indexes where a single trailing zero
 
 MyOEIS::compare_values
   (anum => 'A085223',

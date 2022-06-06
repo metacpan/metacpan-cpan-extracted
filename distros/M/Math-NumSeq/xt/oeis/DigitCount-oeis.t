@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2019 Kevin Ryde
+# Copyright 2012, 2013, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -36,7 +36,7 @@ sub numeq_array {
   if (! ref $a1 || ! ref $a2) {
     return 0;
   }
-  my $i = 0; 
+  my $i = 0;
   while ($i < @$a1 && $i < @$a2) {
     if ($a1->[$i] ne $a2->[$i]) {
       return 0;
@@ -312,7 +312,7 @@ sub numeq_array {
   if ($bvalues) {
     my $seq  = Math::NumSeq::DigitCount->new (radix => 2, digit => 1);
     for (my $i = 0; @got < @$bvalues; $i++) {
-      push @got, $seq->ith($i*$i);;
+      push @got, $seq->ith($i*$i);
     }
     if (! numeq_array(\@got, $bvalues)) {
       MyTestHelpers::diag ("bvalues: ",join(',',@{$bvalues}[0..20]));

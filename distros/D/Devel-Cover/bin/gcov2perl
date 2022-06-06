@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2001-2019, Paul Johnson (paul@pjcj.net)
+# Copyright 2001-2022, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -12,7 +12,7 @@ require 5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = '1.36'; # VERSION
+our $VERSION = '1.38'; # VERSION
 
 use Devel::Cover::DB;
 
@@ -84,6 +84,11 @@ sub add_cover {
             next if $count eq "-";
             $count = 0 if $count eq "#####";
 
+            # Remove asterisk after execution count. Gcov outputs an asterisk
+            # symbol for certain lines as noted at
+            # <https://gcc.gnu.org/onlinedocs/gcc/Invoking-Gcov.html>.
+            $count =~ s/\*$//;
+
             # print "$f:$line - $count\n";
             push @{$run{count}{$f}{statement}}, $count;
             $structure->add_statement($f, $line);
@@ -145,7 +150,7 @@ gcov2perl - convert gcov files to Devel::Cover databases
 
 =head1 VERSION
 
-version 1.36
+version 1.38
 
 =head1 SYNOPSIS
 
@@ -213,7 +218,7 @@ Huh?
 
 =head1 LICENCE
 
-Copyright 2001-2019, Paul Johnson (paul@pjcj.net)
+Copyright 2001-2022, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

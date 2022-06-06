@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2014, 2016, 2019 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2016, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -35,7 +35,7 @@ plan tests => $test_count;
 # VERSION
 
 {
-  my $want_version = 74;
+  my $want_version = 75;
   ok ($Math::NumSeq::Triangular::VERSION, $want_version,
       'VERSION variable');
   ok (Math::NumSeq::Triangular->VERSION,  $want_version,

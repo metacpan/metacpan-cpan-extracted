@@ -1595,7 +1595,8 @@ yaml_perlio_write_handler(void *data, unsigned char *buffer, size_t size)
 /* XXX Make -Wall not complain about 'local_patches' not being used. */
 #if !defined(PERL_PATCHLEVEL_H_IMPLICIT)
 void xxx_local_patches() {
-    printf("%s", local_patches[0]);
+    if (local_patches[0])
+        printf("%s", local_patches[0]);
 }
 #endif
 

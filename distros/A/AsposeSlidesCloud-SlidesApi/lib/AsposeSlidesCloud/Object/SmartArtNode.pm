@@ -212,6 +212,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'paragraphs' => {
+    	datatype => 'ResourceUri',
+    	base_name => 'Paragraphs',
+    	description => 'Get or sets list to paragraphs list',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -219,7 +226,8 @@ __PACKAGE__->swagger_types( {
     'shapes' => 'ResourceUri',
     'is_assistant' => 'boolean',
     'text' => 'string',
-    'org_chart_layout' => 'string'
+    'org_chart_layout' => 'string',
+    'paragraphs' => 'ResourceUri'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -227,7 +235,8 @@ __PACKAGE__->attribute_map( {
     'shapes' => 'Shapes',
     'is_assistant' => 'IsAssistant',
     'text' => 'Text',
-    'org_chart_layout' => 'OrgChartLayout'
+    'org_chart_layout' => 'OrgChartLayout',
+    'paragraphs' => 'Paragraphs'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,5 +22,5 @@ requires:
   perl: '5.008004'
 resources:
   repository: https://github.com/vkeselj/App-Utils.git
-version: 22.04
+version: 22.05
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

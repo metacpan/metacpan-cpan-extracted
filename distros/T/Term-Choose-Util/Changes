@@ -1,6 +1,10 @@
 Revision history for Term::Choose::Util
 
 
+0.136   2022-06-04
+        - Update option 'cs_label'.
+        - Update subseq-tab.
+
 0.135   2022-05-26
         - Update and bugfix option 'prompt'.
 

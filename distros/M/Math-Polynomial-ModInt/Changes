@@ -1,5 +1,12 @@
 Revision history for Math-Polynomial-ModInt
 
+0.005   2022-06-04
+        - made $order singletons readonly
+        - added optional argument to $order->next_poly
+        - added modulus > 1 sanity checks
+        - extended examples
+        - moved bug tracker to github
+
 0.004   2019-12-10
         - added lambda_reduce, first_root, and is_irreducible
 

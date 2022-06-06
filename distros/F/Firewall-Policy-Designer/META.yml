@@ -12,7 +12,21 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Firewall-Policy-Designer
-version: '0.001'
+requires:
+  Carp: '0'
+  Firewall::Policy::Designer::Role: '0'
+  Firewall::Policy::Searcher::Report::FwInfo: '0'
+  Firewall::Policy::Searcher::Topsec: '0'
+  Firewall::Utils::Date: '0'
+  Firewall::Utils::Ip: '0'
+  Firewall::Utils::Set: '0'
+  List::Util: '0'
+  Mojo::Util: '0'
+  Moose: '0'
+  namespace::autoclean: '0'
+  strict: '0'
+  warnings: '0'
+version: '0.002'
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

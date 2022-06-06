@@ -1,4 +1,4 @@
-# Copyright 2012, 2013 Kevin Ryde
+# Copyright 2012, 2013, 2021 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -16,7 +16,20 @@
 # with Math-NumSeq.  If not, see <http://www.gnu.org/licenses/>.
 
 
-CFLAGS = -Wall -std=gnu99 -O3 -g -mtune=athlon -march=athlon
+# This file named GNUmakefile to hide it from ExtUtils::MakeMaker.
+
+#  -mtune=athlon -march=athlon
+CFLAGS = -Wall -std=gnu99 -O2 -g
 
 # exe-flimsy: exe-flimsy.o flimsy-subr.o
 
+test:
+	$(HOME)/p/shared/my-check-gp.pl *test*.gp
+	#  gp-2.11.4 gp-2.9.5 gp-2.7.6
+	for GP in gp; do \
+	  echo $$GP; \
+	  $$GP --quiet -f <a000119-Fibonacci-R--test.gp || exit 1; \
+	done
+
+spell:
+	ispell-batch-gp.pl a000119-Fibonacci-R.gp

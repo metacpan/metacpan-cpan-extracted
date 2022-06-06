@@ -1,17 +1,15 @@
 package App::td;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-29'; # DATE
-our $DIST = 'App-td'; # DIST
-our $VERSION = '0.103'; # VERSION
-
 use 5.010001;
-#IFUNBUILT
-# use strict;
-# use warnings;
-#END IFUNBUILT
+use strict;
+use warnings;
 
 use PerlX::Maybe;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-06-02'; # DATE
+our $DIST = 'App-td'; # DIST
+our $VERSION = '0.105'; # VERSION
 
 our %SPEC;
 
@@ -29,6 +27,8 @@ our %actions = (
     'colnames-row' => {summary=>'Append a row containing column names'},
     'head' => {summary=>'Only return the first N rows'},
     'info' => {summary=>'Check if input is table data and show information about the table'},
+    'nauniq' => {summary=>'Remove non-adjacent duplicates'},
+    'pick' => {summary=>'Pick one or more random rows, alias for `shuf`', tags=>['alias']},
     'rowcount-row' => {summary=>'Count number of rows (equivalent to "wc -l" in Unix)'},
     'rowcount' => {summary=>'Append a row containing rowcount'},
     'rownum-col' => {summary=>'Add a column containing row number'},
@@ -39,6 +39,7 @@ our %actions = (
     'sum' => {summary=>'Return a row containing sum of all numeric columns'},
     'tail' => {summary=>'Only return the last N rows'},
     'transpose' => {summary=>'Transpose table'},
+    'uniq' => {summary=>'Remove adjacent duplicates'},
     'wc-row' => {summary=>'Alias for rowcount-row', tags=>['alias']},
     'wc' => {summary=>'Alias for rowcount', tags=>['alias']},
 
@@ -56,7 +57,7 @@ sub _get_table_spec_from_envres {
     my $tfa = $envres->[3]{'table.field_aligns'};
     my $tff = $envres->[3]{'table.field_formats'};
     my $tfu = $envres->[3]{'table.field_units'};
-    return undef unless $tf;
+    return undef unless $tf; ## no critic: BuiltinFunctions::ProhibitStringyEval
     my $spec = {fields=>{}};
     my $i = 0;
     for (@$tf) {
@@ -136,11 +137,15 @@ $SPEC{td} = {
     summary => 'Manipulate table data',
     description => <<'_',
 
+**What is td?**
+
 *td* receives table data from standard input and performs an action on it. It
 has functionality similar to some Unix commands like *head*, *tail*, *wc*,
 *cut*, *sort* except that it operates on table rows/columns instead of
 lines/characters. This is convenient to use with CLI scripts that output table
 data.
+
+**What is table data?**
 
 A _table data_ is JSON-encoded data in the form of either: `hos` (hash of
 scalars, which is viewed as a two-column table where the columns are `key` and
@@ -152,6 +157,14 @@ The input can also be an _enveloped_ table data, where the envelope is an array:
 `[status, message, content, meta]` and `content` is the actual table data. This
 kind of data is produced by `Perinci::CmdLine`-based scripts and can contain
 more detailed table specification in the `meta` hash, which `td` can parse.
+
+If you have a CSV, you can easily convert it to table data using the *csv2td*
+utility:
+
+    % csv2td YOUR.csv | td ...
+    % program-that-outputs-csv | csv2td - | td ...
+
+**Using td**
 
 First you might want to use the `info` action to see if the input is a table
 data:
@@ -310,7 +323,7 @@ _
         lines => {
             schema => ['str*', match=>qr/\A[+-]?[0-9]+\z/],
             cmdline_aliases => {n=>{}},
-            tags => ['category:head-action', 'category:tail-action'],
+            tags => ['category:head-action', 'category:tail-action', 'category:pick-action'],
         },
 
         detail => {
@@ -323,15 +336,28 @@ _
             summary => 'Allow duplicates',
             schema => 'bool*',
             cmdline_aliases => {r=>{}},
-            tags => ['category:shuf-action'],
+            tags => ['category:shuf-action', 'category:pick-action'],
+        },
+
+        weight_column => {
+            summary => 'Select a column that contains weight',
+            schema => 'str*',
+            tags => ['category:shuf-action', 'category:pick-action'],
         },
 
         exclude_columns => {
             'x.name.is_plural' => 1,
             'x.name.singular' => 'exclude_column',
             schema => ['array*', of=>'str*'],
-            cmdline_aliases => {e=>{}},
-            tags => ['category:select-action'],
+            cmdline_aliases => {E=>{}},
+            tags => ['category:select-action', 'category:uniq-action', 'category:nauniq-action'],
+        },
+        include_columns => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'include_column',
+            schema => ['array*', of=>'str*'],
+            cmdline_aliases => {I=>{}},
+            tags => ['category:select-action', 'category:uniq-action', 'category:nauniq-action'],
         },
 
         no_header_column => {
@@ -564,20 +590,72 @@ sub td {
             last;
         }
 
-        if ($action eq 'shuf') {
+        if ($action eq 'shuf' || $action eq 'pick') {
             my $cols = $input_obj->cols_by_idx;
             my $input_rows = $input_obj->rows;
+            my $weight_column_idx = defined $args{weight_column} ?
+                $input_obj->col_idx($args{weight_column}) : undef;
             my @output_rows;
             if ($args{repeat}) {
-                for my $i (1 .. ($args{lines} // scalar(@$input_rows))) {
-                    $output_rows[$i-1] = $input_rows->[rand() * @$input_rows];
+                if (defined $weight_column_idx) {
+                    require Array::Sample::WeightedRandom;
+                    my @ary = map { [$input_rows->[$_], $input_rows->[$_][$weight_column_idx]] } 0 .. scalar(@$input_rows);
+                    @output_rows = Array::Sample::WeightedRandom::sample_weighted_random_with_replacement(\@ary, ($args{lines} // scalar(@$input_rows)));
+                } else {
+                    for my $i (1 .. ($args{lines} // scalar(@$input_rows))) {
+                        $output_rows[$i-1] = $input_rows->[rand() * @$input_rows];
+                    }
                 }
             } else {
-                require List::MoreUtils;
-                @output_rows = List::MoreUtils::samples(
-                    $args{lines} // scalar(@$input_rows),
-                    @$input_rows);
+                if (defined $weight_column_idx) {
+                    require Array::Sample::WeightedRandom;
+                    my @ary = map { [$input_rows->[$_], $input_rows->[$_][$weight_column_idx]] } 0 .. scalar(@$input_rows);
+                    @output_rows = Array::Sample::WeightedRandom::sample_weighted_random_no_replacement(\@ary, ($args{lines} // scalar(@$input_rows)));
+                } else {
+                    require List::MoreUtils;
+                    @output_rows = List::MoreUtils::samples(
+                        $args{lines} // scalar(@$input_rows),
+                        @$input_rows);
+                }
             }
+            $output = [200, "OK", \@output_rows, {'table.fields' => $cols}];
+            last;
+        }
+
+        if ($action eq 'uniq' || $action eq 'nauniq') {
+            my $cols = $input_obj->cols_by_idx;
+            my $input_rows = $input_obj->rows;
+            my @indexes =
+                defined($args{include_columns}) ? (map { $input_obj->col_idx($_) } @{$args{include_columns}}) :
+                defined($args{exclude_columns}) ? do {
+                    my @exclude_idxs = map map { $input_obj->col_idx($_) } @{$args{exclude_columns}};
+                    my @indexes;
+                    for my $col (0 .. $#{$cols}) {
+                        push @indexes, $col unless grep { $col == $_ } @exclude_idxs;
+                    }
+                    @indexes;
+                } : (0 .. $#{$cols});
+
+            my @output_rows;
+            if ($action eq 'uniq') {
+                my $prev_row_as_str;
+                for my $rownum (0 .. $#{$input_rows}) {
+                    my $row_as_str = join "\0", @{ $input_rows->[$rownum] }[@indexes];
+                    if (!defined($prev_row_as_str) || $prev_row_as_str ne $row_as_str) {
+                        push @output_rows, $input_rows->[$rownum];
+                    }
+                    $prev_row_as_str = $row_as_str;
+                }
+            } else { # nauniq
+                my %seen;
+                for my $rownum (0 .. $#{$input_rows}) {
+                    my $row_as_str = join "\0", @{ $input_rows->[$rownum] }[@indexes];
+                    if (!$seen{$row_as_str}++) {
+                        push @output_rows, $input_rows->[$rownum];
+                    }
+                }
+            }
+
             $output = [200, "OK", \@output_rows, {'table.fields' => $cols}];
             last;
         }
@@ -637,7 +715,7 @@ sub td {
             } else {
                 $code_str = "package main; no strict; no warnings; sub { $argv->[0] }";
             }
-            my $code = eval $code_str; die if $@;
+            my $code = eval $code_str; die if $@; ## no critic: BuiltinFunctions::ProhibitStringyEval
 
             my $input_rows     = $input_obj->rows;
             my $input_rows_aos = $input_obj->rows_as_aoaos;
@@ -676,7 +754,7 @@ sub td {
         if ($action =~ /\A(grep-col)\z/) {
             return [400, "Usage: td $action <perl-code>"] unless @$argv == 1;
             my $code_str = "package main; no strict; no warnings; sub { $argv->[0] }";
-            my $code = eval $code_str; die if $@;
+            my $code = eval $code_str; die if $@; ## no critic: BuiltinFunctions::ProhibitStringyEval
 
             my $input_cols = $input_obj->cols_by_idx;
             my $output_cols = [];
@@ -767,7 +845,7 @@ App::td - Manipulate table data
 
 =head1 VERSION
 
-This document describes version 0.103 of App::td (from Perl distribution App-td), released on 2021-05-29.
+This document describes version 0.105 of App::td (from Perl distribution App-td), released on 2022-06-02.
 
 =head1 FUNCTIONS
 
@@ -780,11 +858,15 @@ Usage:
 
 Manipulate table data.
 
+B<What is td?>
+
 I<td> receives table data from standard input and performs an action on it. It
 has functionality similar to some Unix commands like I<head>, I<tail>, I<wc>,
 I<cut>, I<sort> except that it operates on table rows/columns instead of
 lines/characters. This is convenient to use with CLI scripts that output table
 data.
+
+B<What is table data?>
 
 A I<table data> is JSON-encoded data in the form of either: C<hos> (hash of
 scalars, which is viewed as a two-column table where the columns are C<key> and
@@ -796,6 +878,14 @@ The input can also be an I<enveloped> table data, where the envelope is an array
 C<[status, message, content, meta]> and C<content> is the actual table data. This
 kind of data is produced by C<Perinci::CmdLine>-based scripts and can contain
 more detailed table specification in the C<meta> hash, which C<td> can parse.
+
+If you have a CSV, you can easily convert it to table data using the I<csv2td>
+utility:
+
+ % csv2td YOUR.csv | td ...
+ % program-that-outputs-csv | csv2td - | td ...
+
+B<Using td>
 
 First you might want to use the C<info> action to see if the input is a table
 data:
@@ -950,6 +1040,8 @@ Arguments.
 
 =item * B<exclude_columns> => I<array[str]>
 
+=item * B<include_columns> => I<array[str]>
+
 =item * B<lines> => I<str>
 
 =item * B<no_header_column> => I<true>
@@ -960,17 +1052,21 @@ Don't make the first column as column names of the transposed table; instead cre
 
 Allow duplicates.
 
+=item * B<weight_column> => I<str>
+
+Select a column that contains weight.
+
 
 =back
 
 Returns an enveloped result (an array).
 
-First element ($status_code) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-($reason) is a string containing error message, or "OK" if status is
-200. Third element ($payload) is optional, the actual result. Fourth
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
 element (%result_meta) is called result metadata and is optional, a hash
-that contains extra information.
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -981,14 +1077,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-td>.
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-App-td>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-td>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -1006,11 +1094,42 @@ L<Perinci::CmdLine>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-td>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

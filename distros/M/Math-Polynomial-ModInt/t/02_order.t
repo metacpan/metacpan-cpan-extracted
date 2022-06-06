@@ -1,4 +1,4 @@
-# Copyright (c) 2019 by Martin Becker, Blaubeuren.
+# Copyright (c) 2019-2022 by Martin Becker, Blaubeuren.
 # This package is free software; you can distribute it and/or modify it
 # under the terms of the Artistic License 2.0 (see LICENSE file).
 
@@ -10,7 +10,7 @@ use warnings;
 use Math::Polynomial::ModInt        qw(modpoly);
 use Math::Polynomial::ModInt::Order qw($BY_INDEX $CONWAY $SPARSE);
 
-use Test::More tests => 37;
+use Test::More tests => 45;
 
 sub display {
     my ($tag, $list) = @_;
@@ -145,3 +145,19 @@ my ($p1, $p2, $p3) =
 is_deeply($BY_INDEX->next_poly($p1), $p2);
 is_deeply($CONWAY->next_poly($p1), $p3);
 is_deeply($SPARSE->next_poly($p2), $p3);
+is_deeply($BY_INDEX->next_poly($p2, 1), $p3);
+is_deeply($CONWAY->next_poly($p3, 1), $p2);
+
+my $uncaught;
+$uncaught = eval { $BY_INDEX = sub {} };
+ok(!$uncaught, q[$BY_INDEX is readonly]);
+like($@, qr/read-only/);
+
+$uncaught = eval { $CONWAY = sub {} };
+ok(!$uncaught, q[$CONWAY is readonly]);
+like($@, qr/read-only/);
+
+$uncaught = eval { $SPARSE = sub {} };
+ok(!$uncaught, q[$SPARSE is readonly]);
+like($@, qr/read-only/);
+

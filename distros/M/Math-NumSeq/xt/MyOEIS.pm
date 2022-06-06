@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2020 Kevin Ryde
 
 # MyOEIS.pm is shared by several distributions.
 #
@@ -41,6 +41,7 @@ sub import {
 sub read_values {
   my ($anum, %option) = @_;
   ### read_values() ...
+  ### %option
 
   if ($without) {
     return;
@@ -50,8 +51,9 @@ sub read_values {
   my $filename;
   my $next;
   if (my $seq = eval { require Math::NumSeq::OEIS::File;
-                       Math::NumSeq::OEIS::File->new (anum => $anum) }) {
-    ### from seq ...
+                       Math::NumSeq::OEIS::File->new (anum => $anum,
+                                                      _b_filename => $option{'bfilename'}) }) {
+    ### $seq
     $next = sub {
       my ($i, $value) = $seq->next;
       return $value;
@@ -114,7 +116,8 @@ sub compare_values {
   my ($bvalues, $lo, $filename) = MyOEIS::read_values
     ($anum,
      max_count => $option{'max_count'},
-     max_value => $option{'max_value'});
+     max_value => $option{'max_value'},
+     bfilename => $option{'bfilename'});
   my $diff;
   if ($bvalues) {
     if (my $fixup = $option{'fixup'}) {

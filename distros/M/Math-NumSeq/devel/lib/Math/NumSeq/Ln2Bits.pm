@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -23,7 +23,7 @@ use Math::NumSeq;
 use base 'Math::NumSeq::PiBits';
 
 use vars '$VERSION';
-$VERSION = 74;
+$VERSION = 75;
 
 use constant name => Math::NumSeq::__('Log(2) Bits');
 use constant description => Math::NumSeq::__('Natural log(2), being 0.693147..., written out in binary.');

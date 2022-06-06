@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -20,7 +20,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 74;
+$VERSION = 75;
 use Math::NumSeq::Base::Sparse;
 @ISA = ('Math::NumSeq::Base::Sparse');
 *_is_infinite = \&Math::NumSeq::_is_infinite;
@@ -142,7 +142,7 @@ Math::NumSeq::Perrin -- Perrin sequence
 
 The Perrin sequence,
 
-    3, 0, 2, 3, 2, 5, 5, 7, 10, 12, 17, 22, 29, 39, 51, etc
+    3, 0, 2, 3, 2, 5, 5, 7, 10, 12, 17, 22, 29, 39, 51, ...  (A001608)
 
 which is the recurrence
 
@@ -193,7 +193,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2019, 2020, 2021 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

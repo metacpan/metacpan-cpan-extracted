@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2013, 2014 Kevin Ryde
+# Copyright 2013, 2014, 2020, 2021, 2022 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -20,10 +20,93 @@
 use 5.006;
 use strict;
 use warnings;
+use FindBin;
+use Math::BaseCnv 'cnv';
 use List::Util 'max','min';
 
-use Smart::Comments;
+use lib::abs "$FindBin::Bin/../xt";
+use lib::abs "$FindBin::Bin/../t";
+use MyOEIS;
+use MyTestHelpers;
+$|=1;
 
+{
+  # A064827 all digits of k in k^2 in any order
+
+  # A046827 Numbers n such that n^2 contains all the digits of n with the same or higher multiplicity.
+  # A064827 Numbers n such that each digit of n occurs among the digits of n^2.
+
+  foreach my $k (1 .. 1000) {
+    # if (is_A064827($k)) { print "$k,"; }
+    if (is_A064827($k) != is_A064827_distinct($k)) {
+      print "$k,";
+    }
+  }
+  exit 0;
+  sub is_A064827_distinct {
+    my ($k) = @_;
+    my $s = $k*$k;
+    foreach my $d (split //,$k) {
+      index($s,$d)>=0 or return 0;
+    }
+    return 1;
+  }
+  sub is_A064827 {
+    my ($k) = @_;
+    my @digs;
+    foreach my $d (split //,$k*$k) { $digs[$d]++; }
+    foreach my $d (split //,$k) {
+      if (--$digs[$d] < 0) {
+        return 0;
+      }
+    }
+    return 1;
+  }
+}
+{
+  # A018834 Numbers k such that decimal expansion of k^2 contains k as a substring.
+  # cf A064827 all digits any order
+  my $k = 1;
+  while ($k < 10000) {
+    my $s = $k*$k;
+    if (index($s,$k) >=0) {
+      print "$k,";
+    }
+    $k++;
+  }
+  exit 0;
+}
+{
+  # A032740 Numbers k such that k is a substring of 2^k.
+  # 2^k digits contain k
+  my $t = Math::BigInt->new(2);
+  my $k = 1;
+  while ($k < 100) {
+    if (index($t,$k) >=0) {
+      print "$k,";
+    }
+    $k++; $t<<=1;
+  }
+  exit 0;
+}
+{
+  # A048715 Narayana bits
+  my @want = (0, 1, 2, 4, 8, 9, 16, 17, 18, 32, 33, 34, 36, 64, 65, 66, 68, 72, 73);
+  my @got = grep {cnv($_,10,2) =~ /^(100(0)*)*(0|1|10)?$/} 0 .. 73;
+  print join(',',@want),"\n";
+  print join(',',@got),"\n";
+  print join(',',@want) eq join(',',@got),"\n";
+  print( ('100' =~ /^(100(0)*)*(0|1|10)?$/), "\n");
+  # (string-match "\\`\\(100\\(0\\)*\\)*\\(0|1|10\\)?\\'" "100")
+  exit 0;
+}
+  
+
+{
+  # digits dup
+  # sub Axx { my($n)=@_; $n =~ s/./$&$&/g; $n }
+  exit 0;
+}
 
 {
   require Math::NumSeq::SternDiatomic;

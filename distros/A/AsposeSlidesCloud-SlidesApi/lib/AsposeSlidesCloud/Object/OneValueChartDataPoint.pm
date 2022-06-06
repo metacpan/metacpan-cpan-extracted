@@ -183,14 +183,23 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'set_as_total' => {
+    	datatype => 'boolean',
+    	base_name => 'SetAsTotal',
+    	description => 'SetAsTotal. Applied to Waterfall data points only.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
-    'value' => 'double'
+    'value' => 'double',
+    'set_as_total' => 'boolean'
 } );
 
 __PACKAGE__->attribute_map( {
-    'value' => 'Value'
+    'value' => 'Value',
+    'set_as_total' => 'SetAsTotal'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

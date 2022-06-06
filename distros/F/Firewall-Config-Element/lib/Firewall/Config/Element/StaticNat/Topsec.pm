@@ -1,5 +1,8 @@
 package Firewall::Config::Element::StaticNat::Topsec;
 
+#------------------------------------------------------------------------------
+# 加载扩展模块
+#------------------------------------------------------------------------------
 use Moose;
 use namespace::autoclean;
 use Firewall::Utils::Set;

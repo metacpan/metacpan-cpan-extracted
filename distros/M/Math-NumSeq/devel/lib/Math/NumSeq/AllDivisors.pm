@@ -1,4 +1,4 @@
-# Copyright 2012, 2013, 2014, 2016, 2018, 2019 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2016, 2018, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -28,7 +28,7 @@ use Math::Prime::XS 0.23 'is_prime'; # version 0.23 fix for 1928099
 use Math::Factor::XS 0.39 'factors';
 
 use vars '$VERSION', '@ISA';
-$VERSION = 74;
+$VERSION = 75;
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
 
@@ -257,7 +257,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2012, 2013, 2014, 2016, 2018, 2019 Kevin Ryde
+Copyright 2012, 2013, 2014, 2016, 2018, 2019, 2020 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012 Kevin Ryde
+# Copyright 2012, 2021 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -20,14 +20,36 @@
 use 5.010;
 use strict;
 use warnings;
+use Math::NumSeq::Polygonal;
+$|=1;
 
-#use Smart::Comments;
+{
+  # search for polygonal numbers not catalogued
+  require Math::OEIS::Grep;
 
+  for my $polygonal (3..500) {
+    my $seq = Math::NumSeq::Polygonal->new (polygonal => $polygonal);
+    if (my $anum = $seq->oeis_anum) {
+      print "got $polygonal $anum\n";
+      next;
+    }
+    $seq->next;
+    $seq->next;
+    $seq->next;
+    my @values;
+    foreach (1..30) {
+      my ($i,$value) = $seq->next;
+      push @values, $value;
+    }
+    Math::OEIS::Grep->search (array => \@values,
+                              name => "polygonal $polygonal");
+  }
+  exit 0;
+}
 
 {
   # value_to_i_estimate() by polygonal
 
-  require Math::NumSeq::Polygonal;
   for my $polygonal (3,4,5,6,7,8,9,10,
                      11,12,
                      20,30,40,

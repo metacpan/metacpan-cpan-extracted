@@ -1,6 +1,6 @@
 package MooX::Keyword::Field;
 
-use 5.006; use strict; use warnings; our $VERSION = '0.01';
+use 5.006; use strict; use warnings; our $VERSION = '0.02';
 use Moo;
 
 our %FIELDS;
@@ -35,7 +35,7 @@ MooX::Keyword::Field - field attributes that cannot be set via the constructor
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 

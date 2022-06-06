@@ -24,8 +24,7 @@ sub my_summary_test {
 
     # test short_name retrieved by Software::LicenseUtils
     my $lic = $class->new_from_short_name({
-        short_name => $short_name,
-        holder => 'X. Ample'
+        short_name => $short_name
     });
     isa_ok($lic,'Software::LicenseMoreUtils::LicenseWithSummary',"license class");
 

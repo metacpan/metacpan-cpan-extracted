@@ -1,7 +1,7 @@
 package MooX::Params::CompiledValidators;
 use Moo::Role;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Hash::Util 'lock_hash';
 use Params::ValidationCompiler 'validation_for';
@@ -60,9 +60,9 @@ MooX::Params::CompiledValidators - A L<Moo::Role> for using L<Params::Validation
         my $self = shift;
         my $arguments = $self->validate_parameters(
             {
-                $self->parameter(customer => $self->Required),
+                $self->parameter(customer_id => $self->Required),
             },
-            $_[0]
+            { @_ }
         );
         ...
     }
@@ -70,7 +70,7 @@ MooX::Params::CompiledValidators - A L<Moo::Role> for using L<Params::Validation
     # Implement a local version of the ValidationTemplates
     sub ValidationTemplates {
         return {
-            customer => { type => Str },
+            customer_id => { type => Str },
         };
     }
 
@@ -80,70 +80,63 @@ This role uses L<Params::ValidationCompiler> to create parameter validators on a
 per method basis that can be used in the methods of your L<Moo> or L<Moose>
 projects.
 
-The objective is to create a single set of validation criteria -
-ideally in a seperate role that can be used along side of this role - that can be used
-to consistently validate parameters throughout your application.
+The objective is to create a single set of validation criteria - ideally in a
+seperate role that can be used along side of this role - that can be used to
+consistently validate parameters throughout your application.
 
 The validators created by L<Params::ValidationCompiler> are cached after they
-are created first time, so they will only be created once.
+are created the first time, so they will only be created once.
 
 =head2 Validation-Templates
 
-The validation templates are roughly based on the templates described for
-L<Params::ValidationCompiler::validation_for()>.
-
-=head3 Taken from L<Params::ValidationCompiler>
-
-=over
-
-=item I<type> => $type
-
-This argument is passed -as is- to C<validation_for()>.
-
-It can be overridden from the C<extra> parameter in the C<parameter()> method.
-
-=item I<default> => $default
-
-This argument is passed -as is- to C<validation_for()>.
-
-It can be overridden from the C<extra> parameter in the C<parameter()> method.
-
-=back
-
-=head3 Extra feature added
-
-There is support for an extra key (that will not be passed to C<validation_for()>):
+A validation-template is a structure (HashRef) that
+C<Params::ValidationCompiler::validation_for()> uses to validate the parameter
+and basically contains three keys:
 
 =over
 
-=item I<store> => $ref_to_scalar
+=item B<type>
 
-    my $args = $self->validate_parameters(
-        {
-            $self->parameter( customer_id => $sef->Required, {store => \my $customer_id} ),
-        },
-        {@_}
-    );
-    # $customer_id is a usable value and $args->{customer_id} has the same value
+C<Params::ValidationCompiler> supports a number of type systems, see their documentation.
 
-The value should be a reference to a scalar, so we can store the value in that
-scalar.
+=item B<default>
 
-One could argue that using (lexical) variables -instead of addressing keys of a
-locked hash- triggers the error caused by a typo at I<compile-time> rather than
-at I<run-time>.
+Define a default value for this parameter, either a simple scalar or a code-ref
+that returns a more complex value.
 
-B<NOTE>: In order to keep the scope of the variable, where the value is stored,
-limited, the C<store> attribute should only be used from the per method override
-option C<extra> for C<< $self->parameter() >>.
+=item B<optional>
+
+By default false, required parameters are preferred by C<Params::ValidationCompiler>
 
 =back
 
-=head2 $instance->Required
+=head2 The I<required> C<ValidationTemplates()> method
+
+The objective of this module (Role) is to standardise parameter validation by
+defining a single set of Validation Templates for all the parameters in a project.
+This is why the C<MooX::Params::CompiledValidators> role B<< C<requires> >> a
+C<ValidationTemplates> method in its consuming class. The C<ValidationTemplates>
+method is needed for the C<parameter()> method that is also supplied by this
+role.
+
+This could be as simple as:
+
+    package MyTemplates;
+    use Moo::Role;
+
+    use Types::Standard qw(Str);
+    sub ValidationTemplates {
+        return {
+            customer_id => { type => Str },
+            username    => { type => Str },
+        };
+    }
+
+=head2 The C<Required()> method
 
 C<validation_for()> uses the attribute C<optional> so this returns C<0>
 
-=head2 $instance->Optional
+=head2 The C<Optional> method
 
 C<validation_for()> uses the attribute C<optional> so this returns C<1>
 
@@ -152,21 +145,36 @@ C<validation_for()> uses the attribute C<optional> so this returns C<1>
 sub Required { 0 }
 sub Optional { 1 }
 
-=head2 $instance->validate_parameters(@parameters)
+=head2 The C<validate_parameters()> method
 
 Returns a (locked) hashref with validated parameters or C<die()>s trying...
 
-    my $self = shift;
-    my $args = $self->validate_parameters(
-        {
-            customer_id => { type => Int, optional => 0 },
-        },
-        { @_ }
-    );
-    # we can now use $args->{customer_id}
+Given:
 
-B<NOTE>: C<validate_parameters()> supports the C<store> attribute for
-te validation template.
+    use Moo;
+    with 'MooX::Params::CompiledValidators';
+
+    sub show_user_info {
+        my $self = shift;
+        my $args = $self->validate_parameters(
+            {
+                customer_id => { type => Str, optional => 0 },
+                username    => { type => Str, optional => 0 },
+            },
+            { @_ }
+        );
+        return {
+            customer => $args->{customer_id},
+            username => $args->{username},
+        };
+    }
+
+One would call this as:
+
+    my $user_info = $instance->show_user_info(
+        customer_id => 'Blah42',
+        username    => 'blah42',
+    );
 
 =head3 Parameters
 
@@ -174,12 +182,12 @@ Positional:
 
 =over
 
-=item 1. $validation_templates
+=item 1. C<$validation_templates>
 
-A hashref with the parameter-names as keys and the L<validation templates> as values.
+A hashref with the parameter-names as keys and the L</Validation-Templates> as values.
 
 
-=item 2. $values
+=item 2. C<$values>
 
 A hashref with the actual parameter-name/value pairs that need to be validated.
 
@@ -231,7 +239,7 @@ sub validate_parameters {
 
     my %validated = eval { $validator->(%$values) };
     if (my $error = $@) {
-        die "Parameter validation error: $error";
+        _sniff_it($error);
     }
 
     # store values in the their (scoped) variables
@@ -242,10 +250,10 @@ sub validate_parameters {
     return wantarray ? (%validated) : lock_hash(%validated);
 }
 
-=head2 $instance->validate_positional_parameters(@parameters)
+=head2 The C<validate_positional_parameters()> method
 
 Like C<< $instance->validate_parameters() >>, but now the pairs of I<name>,
-I<validation_template> are passed in an arrayref, that is split into lists of
+I<validation-template> are passed in an arrayref, that is split into lists of
 the names and templates. The parameters passed -as an array- will be validated
 against the templates-list, and the validated results are combined back into
 a hash with name/value pairs. This makes the programming interface almost the
@@ -253,17 +261,29 @@ same for both named-parameters and positional-parameters.
 
 Returns a (locked) hashref with validated parameters or C<die()>s trying...
 
-    my $self = shift;
-    my $args = $self->validate_positional_parameters(
-        [
-            customer_id => { type => Int, optional => 0 },
-        ],
-        [ @_ ]
-    );
-    # we can now use $args->{customer_id}
+Given:
 
-B<NOTE>: C<validate_positional_parameters()> supports the C<store> attribute for
-te validation template.
+    use Moo;
+    with 'MooX::Params::CompiledValidators';
+
+    sub show_user_info {
+        my $self = shift;
+        my $args = $self->validate_positional_parameters(
+            [
+                customer_id => { type => Str, optional => 0 },
+                username    => { type => Str, optional => 0 },
+            ],
+            \@_
+        );
+        return {
+            customer => $args->{customer_id},
+            username => $args->{username},
+        };
+    }
+
+One would call this as:
+
+    my $user_info = $instance->show_user_info('Blah42', 'blah42');
 
 =head3 Parameters
 
@@ -271,12 +291,12 @@ Positional:
 
 =over
 
-=item 1. $validation_templates
+=item 1. C<$validation_templates>
 
 A arrayref with pairs of parameter-names and L<validation templates>.
 
 
-=item 2. $values
+=item 2. C<$values>
 
 A arrayref with the actual values that need to be validated.
 
@@ -341,7 +361,7 @@ sub validate_positional_parameters {
 
     my @validated_values = eval { $validator->(@$data) };
     if (my $error = $@) {
-        die "Parameter validation error: $error";
+        _sniff_it($error);
     }
 
     my %validated;
@@ -355,7 +375,7 @@ sub validate_positional_parameters {
     return wantarray ? (%validated) : lock_hash(%validated);
 }
 
-=head2 $instance->parameter($name, $required, $extra)
+=head2 The C<parameter()> method
 
 Returns a C<parameter_name>, C<validation_template> pair that can be used in the
 C<parameters> argument hashref for
@@ -367,16 +387,16 @@ Positional:
 
 =over
 
-=item 1. $name (Required)
+=item 1. C<$name> (I<Required>)
 
 The name of this parameter (it must be a kind of identifier: C<< m{^\w+$} >>)
 
-=item 2. $required (Optional)
+=item 2. C<$required> (I<Optional>)
 
 One of C<< $class->Required >> or C<< $class->Optional >> but will default to
 C<< $class->Required >>.
 
-=item 3. $extra (Optional)
+=item 3. C<$extra> (I<Optional>)
 
 This optional HashRef can contain the fields supported by the C<params>
 parameter of C<validation_for()>, even overriding the ones set by the C<<
@@ -384,12 +404,7 @@ $class->ValidationTemplates() >> for this C<$name> - although C<optional> is set
 by the previous parameter in this sub.
 
 This parameter is mostly used for the extra feature to pass a lexically scoped
-variable to store the value in:
-
-    $self->param(
-        this_param => $self->Required,
-        { store => \my $this_param },
-    )
+variable via L<store|/"the extra store attribute">.
 
 =back
 
@@ -401,9 +416,43 @@ variable to store the value in:
 
 A list of C<$parameter_name> and C<$validation_template>.
 
-    (this_parm => { optional => 0, store => \my $this_param })
+
+    (this_parm => { optional => 0, type => Str, store => \my $this_param })
+
 
 =back
+
+=head3 NOTE on "Unknown" parameters
+
+Whenever C<< $self->parameter() >> is called with a parameter-name that doesn't
+resolve to a template in the C<ValidationTemplates()> hash, a default "empty"
+template is produced. This will mean that there will be no validation on that
+value, although one could pass one as the third parameter:
+
+    use Moo;
+    use Types::Standard qw( StrMatch );
+    with qw(
+        MyTemplates
+        MooX::Params::CompiledValidators
+    );
+
+    sub show_user_info {
+        my $self = shift;
+        my $args = $self->validate_parameters(
+            {
+                $self->parameter(customer_id => $self->Required),
+                $self->parameter(
+                    email => $self->Required,
+                    { type => StrMatch[ qr{^ [-.\w]+ @ [-.\w]+ $}x ] },
+                ),
+            },
+            { @_ }
+        );
+        return {
+            customer => $args->{customer_id},
+            email    => $args->{email},
+        };
+    }
 
 =cut
 
@@ -424,30 +473,87 @@ sub parameter {
     return ($name => $final_template);
 }
 
+=begin private
+
+=head2 _sniff_it($message)
+
+Tailor made exception handler.
+
+=end private
+
+=cut
+
+sub _sniff_it {
+    my ($message) = @_;
+    my ($filename, $line) = (caller(1))[1, 2];
+    my $subroutine = (caller(2))[3];
+
+    die sprintf('Error in %s (%s:%u): %s', $subroutine, $filename, $line, $message);
+}
+
 use namespace::autoclean;
 1;
+
+=head2 The extra C<store> attribute
+
+Both C<validate_parameters()> and C<validate_positional_parameters> support the
+extra C<store> attribute in a validation template that should be a
+scalar-reference where we store the value after successful validation.
+
+One can pick and mix with validation templates:
+
+    use Moo;
+    use Types::Standard qw( StrMatch );
+    with qw(
+        MyTemplates
+        MooX::Params::CompiledValidators
+    );
+
+    sub show_user_info {
+        my $self = shift;
+        $self->validate_parameters(
+            {
+                $self->parameter(customer_id => $self->Required, {store => \my $customer_id),
+                email => {
+                    type     => StrMatch[ qr{^ [-.\w]+ @ [-.\w]+ $}x ],
+                    optional => 0,
+                    store    => \my $email
+                },
+            },
+            { @_ }
+        );
+        return {
+            customer => $customer_id,
+            email    => $email,
+        };
+    }
+
+One would call this as:
+
+    my $user_info = $instance->show_user_info(
+        customer_id => 'Blah42',
+        email       => 'blah42@some.tld',
+    );
+
+One could argue that using (lexical) variables -instead of addressing keys of a
+locked hash- triggers the error caused by a typo at I<compile-time> rather than
+at I<run-time>.
+
+B<NOTE>: In order to keep the scope of the variable, where the value is stored,
+limited, the C<store> attribute should only be used from the per method override
+option C<extra> for C<< $self->parameter() >>.
+
+=head1 AUTHOR
+
+E<copy> MMXXI - Abe Timmerman <abeltje@cpan.org>
 
 =head1 LICENSE
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-See:
-
-=over 4
-
-=item * L<http://www.perl.com/perl/misc/Artistic.html>
-
-=item * L<http://www.gnu.org/copyleft/gpl.html>
-
-=back
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
-=head1 AUTHOR
-
-(c) MMXXI - Abe Timmerman <abeltje@cpan.org>
 
 =cut

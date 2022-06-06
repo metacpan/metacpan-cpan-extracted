@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.018;
 
 use ExtUtils::MakeMaker;
 
@@ -14,16 +14,47 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Firewall-Config-Connector",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.018",
   "NAME" => "Firewall::Config::Connector",
-  "PREREQ_PM" => {},
-  "VERSION" => "0.004",
+  "PREREQ_PM" => {
+    "Carp" => 0,
+    "Data::Dumper" => 0,
+    "Expect" => 0,
+    "Firewall::Config::Content::Static" => 0,
+    "Firewall::Config::Dao::Config" => 0,
+    "Firewall::Config::Dao::Lock" => 0,
+    "Firewall::Config::Dao::Parser" => 0,
+    "Firewall::Utils::Date" => 0,
+    "Moose" => 0,
+    "POSIX" => 0,
+    "Time::HiRes" => 0,
+    "Try::Tiny" => 0,
+    "namespace::autoclean" => 0,
+    "warnings" => 0
+  },
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => ""
   }
 );
 
 
-my %FallbackPrereqs = ();
+my %FallbackPrereqs = (
+  "Carp" => 0,
+  "Data::Dumper" => 0,
+  "Expect" => 0,
+  "Firewall::Config::Content::Static" => 0,
+  "Firewall::Config::Dao::Config" => 0,
+  "Firewall::Config::Dao::Lock" => 0,
+  "Firewall::Config::Dao::Parser" => 0,
+  "Firewall::Utils::Date" => 0,
+  "Moose" => 0,
+  "POSIX" => 0,
+  "Time::HiRes" => 0,
+  "Try::Tiny" => 0,
+  "namespace::autoclean" => 0,
+  "warnings" => 0
+);
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

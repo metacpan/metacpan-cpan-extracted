@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2016, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -27,7 +27,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 74;
+$VERSION = 75;
 use Math::NumSeq;
 @ISA = ('Math::NumSeq');
 *_is_infinite = \&Math::NumSeq::_is_infinite;
@@ -130,14 +130,14 @@ Math::NumSeq::MephistoWaltz -- Mephisto waltz sequence
 This sequence is the Mephisto waltz, being the count mod 2 of ternary digit
 2s in i.
 
-    0,0,1, 0,0,1, 1,1,0, ...
+    0,0,1, 0,0,1, 1,1,0, ...            (A064990)
     starting i=0
 
 i=0 has no 2s so value=0, and likewise i=1 value=0.  Then i=2 has one 2 so
 value=1.
 
-The sequence can also be expressed as starting with 0 and repeatedly
-expanding
+The sequence can also be expressed as a morphism starting from single term 0
+and repeatedly expanding
 
     0 -> 0,0,1
     1 -> 1,1,0
@@ -149,11 +149,11 @@ So
     0,0,1, 0,0,1, 1,1,0,
     0,0,1, 0,0,1, 1,1,0, 0,0,1, 0,0,1, 1,1,0, 1,1,0, 1,1,0, 0,0,1
 
-    |   original      |  |     copy        |  |     inverse     |
+    |   original      |  |     copy        |  |  0<->1 flipped  |
     +-----------------+  +-----------------+  +-----------------+
 
 The effect of the expansion is keep the first third the same, append a copy
-of it, and append an inverse of it 0E<lt>-E<gt>1.
+of it, and append an 0E<lt>-E<gt>1 flipped copy of it .
 
 =head1 FUNCTIONS
 
@@ -184,10 +184,10 @@ Return true if C<$value> occurs in the sequence, which simply means 0 or 1.
 
 =head1 FORMULAS
 
-The calculation can be made in a power-of-3 base like 9, 27, 81, etc instead
-of just 3.  For example in base 9 digits 2, 5, 6, 7 have a one (mod 2)
-ternary 2.  These base 9 digits correspond to the 1s in the initial sequence
-0,0,1, 0,0,1, 1,1,0 shown above.
+The calculation can also be made in a power-of-3 base like 9, 27, 81, etc
+instead of just 3.  For example in base 9 digits 2, 5, 6, 7 have a one (mod
+2) ternary 2.  These base 9 digits correspond to the 1s in the initial
+sequence 0,0,1, 0,0,1, 1,1,0 shown above.
 
 =head1 SEE ALSO
 
@@ -200,7 +200,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2016, 2019, 2020 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

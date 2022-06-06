@@ -1,4 +1,4 @@
-# Copyright 2004-2019, Paul Johnson (paul@pjcj.net)
+# Copyright 2004-2022, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -10,7 +10,7 @@ package Devel::Cover::Subroutine;
 use strict;
 use warnings;
 
-our $VERSION = '1.36'; # VERSION
+our $VERSION = '1.38'; # VERSION
 
 use base "Devel::Cover::Criterion";
 
@@ -28,15 +28,15 @@ __END__
 
 =head1 NAME
 
-Devel::Cover::Statement - Code coverage metrics for Perl
+Devel::Cover::Subroutine - Code coverage metrics for Perl subroutines
 
 =head1 VERSION
 
-version 1.36
+version 1.38
 
 =head1 SYNOPSIS
 
- use Devel::Cover::Statement;
+ use Devel::Cover::Subroutine;
 
 =head1 DESCRIPTION
 
@@ -54,7 +54,7 @@ Huh?
 
 =head1 LICENCE
 
-Copyright 2004-2019, Paul Johnson (paul@pjcj.net)
+Copyright 2004-2022, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

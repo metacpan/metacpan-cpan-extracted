@@ -1,11 +1,12 @@
 package Tree::RB::XS;
-$Tree::RB::XS::VERSION = '0.06';
+$Tree::RB::XS::VERSION = '0.07';
 # VERSION
 # ABSTRACT: Red/Black Tree implemented in C, with similar API to Tree::RB
 
 use strict;
 use warnings;
 use Carp;
+use Scalar::Util ();
 require XSLoader;
 XSLoader::load('Tree::RB::XS', $Tree::RB::XS::VERSION);
 use Exporter 'import';
@@ -223,7 +224,7 @@ independent from a tree.
 
 =item *
 
-Many functions have official names changed, but aliases are provided for compatibility.
+Many methods have official names changed, but aliases are provided for compatibility.
 
 =back
 
@@ -869,7 +870,7 @@ However, it runs significantly slower than Tree::RB.
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 AUTHOR
 

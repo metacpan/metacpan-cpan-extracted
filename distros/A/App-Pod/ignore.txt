@@ -16,3 +16,4 @@ pod2htm*.tmp
 pm_to_blib
 App-Pod-*
 App-Pod-*.tar.gz
+*.swp

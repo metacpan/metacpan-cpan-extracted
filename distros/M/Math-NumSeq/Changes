@@ -1,4 +1,4 @@
-Copyright 2011, 2012, 2013, 2014, 2016, 2018, 2019, 2020 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2016, 2018, 2019, 2020, 2021, 2022 Kevin Ryde
 
 This file is part of Math-NumSeq.
 
@@ -16,6 +16,12 @@ You should have received a copy of the GNU General Public License along
 with Math-NumSeq.  If not, see <http://www.gnu.org/licenses/>.
 
 
+
+Version 75, May 2022
+    - tests Fibonacci and FibonacciWord fix binf()
+
+Version 75, June 2021
+    - OEIS another fix for offset %O
 
 Version 74, February 2020
     - OEIS fix for offset %O parse

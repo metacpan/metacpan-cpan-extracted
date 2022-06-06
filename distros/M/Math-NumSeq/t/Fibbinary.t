@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2016, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -20,7 +20,7 @@
 use 5.004;
 use strict;
 use Test;
-plan tests => 38;
+plan tests => 56;
 
 use lib 't';
 use MyTestHelpers;
@@ -29,14 +29,14 @@ MyTestHelpers::nowarnings();
 use Math::NumSeq::Fibbinary;
 
 # uncomment this to run the ### lines
-#use Smart::Comments;
+# use Smart::Comments;
 
 
 #------------------------------------------------------------------------------
 # VERSION
 
 {
-  my $want_version = 74;
+  my $want_version = 75;
   ok ($Math::NumSeq::Fibbinary::VERSION, $want_version,
       'VERSION variable');
   ok (Math::NumSeq::Fibbinary->VERSION,  $want_version,
@@ -49,6 +49,37 @@ use Math::NumSeq::Fibbinary;
   ok (! eval { Math::NumSeq::Fibbinary->VERSION($check_version); 1 },
       1,
       "VERSION class check $check_version");
+}
+
+
+#------------------------------------------------------------------------------
+# ith()
+
+{
+  # table in Knuth "Fibonacci Multiplication", includes two low 0s each
+  my @want = (0,
+              0b100,      # 1
+              0b1000,
+              0b10000,
+              0b10100,
+              0b100000,
+              0b100100,
+              0b101000,
+              0b1000000,  # 8
+              #
+              0b1000100,  # 9
+              0b1001000,
+              0b1010000,
+              0b1010100,
+              0b10000000,
+              0b10000100,
+              0b10001000,
+              0b10010000); # 16
+  my $seq = Math::NumSeq::Fibbinary->new;
+  ok ($seq->characteristic('integer'), 1, 'characteristic(integer)');
+  foreach my $i (0 .. $#want) {
+    ok ($seq->ith($i) <<2, $want[$i]);
+  }
 }
 
 

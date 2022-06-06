@@ -5,6 +5,7 @@ MANIFEST
 Makefile.PL
 README
 examples/irred_poly.pl
+examples/modpoly.pl
 lib/Math/Polynomial/ModInt.pm
 lib/Math/Polynomial/ModInt/Order.pm
 t/01_basics.t

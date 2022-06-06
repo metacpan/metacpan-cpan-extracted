@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Hooks::CheckCommit;
 # ABSTRACT: Git::Hooks plugin to enforce commit policies
-$Git::Hooks::CheckCommit::VERSION = '3.2.1';
+$Git::Hooks::CheckCommit::VERSION = '3.2.2';
 use v5.16.0;
 use utf8;
 use Carp;
@@ -395,15 +395,13 @@ sub check_post_commit {
 
     return 1 unless $git->is_reference_enabled($current_branch);
 
-    my $commit = $git->get_sha1('HEAD');
-
-    return signature_errors($git, $commit);
+    return signature_errors($git, $git->get_commit('HEAD'));
 }
 
 sub check_patchset {
     my ($git, $branch, $commit) = @_;
 
-    return commit_errors($git, $commit, $branch);
+    return commit_errors($git, $commit, $git->get_commit($branch));
 }
 
 # Install hooks
@@ -430,7 +428,7 @@ Git::Hooks::CheckCommit - Git::Hooks plugin to enforce commit policies
 
 =head1 VERSION
 
-version 3.2.1
+version 3.2.2
 
 =head1 SYNOPSIS
 
@@ -469,6 +467,10 @@ may configure it in a Git configuration file like this:
     # avoid careless pushes.
     push-limit = 2
 
+    # Reject commits unless they are signed with a GPG key
+    # and the signature is good (does not need to be trusted).
+    signature = good
+
 =head1 DESCRIPTION
 
 This L<Git::Hooks> plugin hooks itself to the hooks below to enforce commit
@@ -484,7 +486,7 @@ committer identities.
 =item * B<post-commit>, B<post-applypatch>
 
 This hook is invoked after a commit is made to check its signature. Note
-that the commit is checked after is has been made and any errors must be
+that the commit is checked after it has been made and any errors must be
 fixed with a C<git-commit --amend> command afterwards.
 
 =item * B<update>

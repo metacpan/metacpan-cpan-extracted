@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2019, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -20,7 +20,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION','@ISA';
-$VERSION = 74;
+$VERSION = 75;
 use Math::NumSeq::Base::Sparse;  # FIXME: implement pred() directly ...
 @ISA = ('Math::NumSeq::Base::Sparse');
 
@@ -45,7 +45,7 @@ use constant characteristic_integer => 1;
 #    A020695 - Pisot 2,3,5,8,etc starting OFFSET=0
 #    A212804 - starting 1,0 OFFSET=0
 
-use constant oeis_anum => 'A000045'; # fibonacci starting at i=0 0,1,1,2,3
+use constant oeis_anum => 'A000045'; # Fibonacci starting at i=0 0,1,1,2,3
 
 #------------------------------------------------------------------------------
 
@@ -499,7 +499,7 @@ L<http://user42.tuxfamily.org/math-numseq/index.html>
 
 =head1 LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
+Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2019, 2020 Kevin Ryde
 
 Math-NumSeq is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

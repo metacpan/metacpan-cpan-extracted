@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013 Kevin Ryde
+# Copyright 2012, 2013, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -39,7 +39,7 @@ use Math::NumSeq::GolayRudinShapiroCumulative;
 
 MyOEIS::compare_values
   (anum => 'A212591',
-   max_count => 1000,
+   max_count => 200,
    func => sub {
      my ($count) = @_;
      my $seq = Math::NumSeq::GolayRudinShapiroCumulative->new;
@@ -60,7 +60,7 @@ MyOEIS::compare_values
 
 MyOEIS::compare_values
   (anum => 'A020991',
-   max_count => 1000,
+   max_count => 200,
    func => sub {
      my ($count) = @_;
      my $seq = Math::NumSeq::GolayRudinShapiroCumulative->new;
@@ -133,14 +133,13 @@ MyOEIS::compare_values
      my @triangle;
      for (my $n = 1; @got < $count; ) {
        my ($i, $value) = $seq->next;
-
        my $aref = ($triangle[$value] ||= []);
        push @$aref, $i;
        if ($value == $n && scalar(@$aref) == $n) {
          while (@$aref && @got < $count) {
            push @got, shift @$aref;
          }
-         delete $triangle[$value];
+         undef $triangle[$value];
          $n++;
        }
      }

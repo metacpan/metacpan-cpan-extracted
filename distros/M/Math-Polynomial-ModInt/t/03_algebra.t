@@ -1,4 +1,4 @@
-# Copyright (c) 2019 by Martin Becker, Blaubeuren.
+# Copyright (c) 2019-2022 by Martin Becker, Blaubeuren.
 # This package is free software; you can distribute it and/or modify it
 # under the terms of the Artistic License 2.0 (see LICENSE file).
 

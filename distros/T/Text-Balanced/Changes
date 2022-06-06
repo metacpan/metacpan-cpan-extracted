@@ -1,5 +1,19 @@
 Revision history for Perl distribution Text-Balanced.
 
+2.06 2022-06-05
+
+    - Released with no further code changes.
+
+2.05_01 2022-05-29
+
+    - Fix direct use of _match_codeblock by e.g. Switch.  [mohawk2, CPAN
+      RT#142923]
+
+    - Fix resetting of whether "/" or "?" allowed to open regex.  [mohawk2, CPAN
+      RT#142922]
+
+    - Fix false negative on /.../ regex after "and".  [mohawk2, GH#7]
+
 2.05 2022-05-22
 
     - Released with no further code changes.

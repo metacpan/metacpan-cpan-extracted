@@ -203,20 +203,38 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'slide_index' => {
+    	datatype => 'int',
+    	base_name => 'SlideIndex',
+    	description => 'Resource slide index.',
+    	format => '',
+    	read_only => '',
+    		},
+    'shape_index' => {
+    	datatype => 'int',
+    	base_name => 'ShapeIndex',
+    	description => 'Resource shape index.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
     'href' => 'string',
     'relation' => 'string',
     'link_type' => 'string',
-    'title' => 'string'
+    'title' => 'string',
+    'slide_index' => 'int',
+    'shape_index' => 'int'
 } );
 
 __PACKAGE__->attribute_map( {
     'href' => 'Href',
     'relation' => 'Relation',
     'link_type' => 'LinkType',
-    'title' => 'Title'
+    'title' => 'Title',
+    'slide_index' => 'SlideIndex',
+    'shape_index' => 'ShapeIndex'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

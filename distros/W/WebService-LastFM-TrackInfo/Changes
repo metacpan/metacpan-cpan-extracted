@@ -1,0 +1,13 @@
+Revision history for WebService-LastFM-TrackInfo
+
+0.0201 2022-06-05 11:00:06
+    - Fix response handling logic.
+
+0.0200 2022-06-05 10:53:16
+    - Handle XML response.
+
+0.0101 2022-06-03 20:03:15
+    - Improve tests a bit.
+
+0.0100 2022-06-03 18:38:01
+    - Copied and tweaked from WebService::AcousticBrainz

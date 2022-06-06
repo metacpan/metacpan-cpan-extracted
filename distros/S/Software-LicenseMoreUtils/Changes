@@ -1,3 +1,9 @@
+1.009 2022-06-04
+
+  * new_from_short_name(): holder parameter is now optional.
+  * summary_or_text(): does not include copyright notice when
+    holder parameter was not set when calling new_from_short_name()
+
 1.008 2022-04-16
 
   * fix: handle SPDX short name like LGPL-3.0-only

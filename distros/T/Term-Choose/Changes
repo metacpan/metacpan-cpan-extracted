@@ -1,6 +1,11 @@
 Revision history for Term::Choose
 
 
+1.754   2022-06-04
+    - Update documentation.
+    - Update defaults 'tabs_prompt' and 'tabs_info'.
+    - Bugfix margin.
+
 1.753   2022-05-19
     - Bugfix in info and prompt lines.
 

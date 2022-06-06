@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013, 2014, 2016, 2019 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2016, 2019, 2020, 2022 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -35,7 +35,7 @@ use Math::NumSeq::Fibonacci;
 # VERSION
 
 {
-  my $want_version = 74;
+  my $want_version = 75;
   ok ($Math::NumSeq::Fibonacci::VERSION, $want_version,
       'VERSION variable');
   ok (Math::NumSeq::Fibonacci->VERSION,  $want_version,
@@ -163,8 +163,8 @@ if (! Math::BigFloat->can('bnan')) {
     my $seq = Math::NumSeq::Fibonacci->new;
 
     my $nan = Math::BigFloat->bnan;
-    my $inf = Math::BigFloat->bnan;
-    my $neginf = Math::BigFloat->bnan('-');
+    my $inf = Math::BigFloat->binf;
+    my $neginf = Math::BigFloat->binf('-');
 
     foreach my $f ($nan, $inf, $neginf) {
       my $value = $seq->ith($f);

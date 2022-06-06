@@ -4,7 +4,7 @@
       "Reini Urban <rurban@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -42,6 +42,14 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.80",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rurban/YAML-Safe/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/rurban/YAML-Safe"
+      }
+   },
+   "version" : "0.81",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

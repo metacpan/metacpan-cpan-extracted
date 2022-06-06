@@ -15,15 +15,43 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Firewall-Policy-Designer",
   "LICENSE" => "perl",
   "NAME" => "Firewall::Policy::Designer",
-  "PREREQ_PM" => {},
-  "VERSION" => "0.001",
+  "PREREQ_PM" => {
+    "Carp" => 0,
+    "Firewall::Policy::Designer::Role" => 0,
+    "Firewall::Policy::Searcher::Report::FwInfo" => 0,
+    "Firewall::Policy::Searcher::Topsec" => 0,
+    "Firewall::Utils::Date" => 0,
+    "Firewall::Utils::Ip" => 0,
+    "Firewall::Utils::Set" => 0,
+    "List::Util" => 0,
+    "Mojo::Util" => 0,
+    "Moose" => 0,
+    "namespace::autoclean" => 0,
+    "strict" => 0,
+    "warnings" => 0
+  },
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => ""
   }
 );
 
 
-my %FallbackPrereqs = ();
+my %FallbackPrereqs = (
+  "Carp" => 0,
+  "Firewall::Policy::Designer::Role" => 0,
+  "Firewall::Policy::Searcher::Report::FwInfo" => 0,
+  "Firewall::Policy::Searcher::Topsec" => 0,
+  "Firewall::Utils::Date" => 0,
+  "Firewall::Utils::Ip" => 0,
+  "Firewall::Utils::Set" => 0,
+  "List::Util" => 0,
+  "Mojo::Util" => 0,
+  "Moose" => 0,
+  "namespace::autoclean" => 0,
+  "strict" => 0,
+  "warnings" => 0
+);
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

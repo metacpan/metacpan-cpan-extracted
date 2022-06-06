@@ -28,7 +28,7 @@ has preDefinedService => (
   writer  => 'setPreDefinedService',
 );
 
-has 'preDefinedServiceTableName' => (
+has preDefinedServiceTableName => (
   is      => 'ro',
   isa     => 'Str',
   builder => '_buildPreDefinedServiceTableName',
@@ -60,7 +60,7 @@ sub createService {
     dstPort  => $dstPort
   );
 
-  # 防护计算结果
+  # 返回计算结果
   return $service;
 }
 

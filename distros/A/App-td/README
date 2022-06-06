@@ -2,8 +2,8 @@ NAME
     App::td - Manipulate table data
 
 VERSION
-    This document describes version 0.103 of App::td (from Perl distribution
-    App-td), released on 2021-05-29.
+    This document describes version 0.105 of App::td (from Perl distribution
+    App-td), released on 2022-06-02.
 
 FUNCTIONS
   td
@@ -13,11 +13,15 @@ FUNCTIONS
 
     Manipulate table data.
 
+    What is td?
+
     *td* receives table data from standard input and performs an action on
     it. It has functionality similar to some Unix commands like *head*,
     *tail*, *wc*, *cut*, *sort* except that it operates on table
     rows/columns instead of lines/characters. This is convenient to use with
     CLI scripts that output table data.
+
+    What is table data?
 
     A *table data* is JSON-encoded data in the form of either: "hos" (hash
     of scalars, which is viewed as a two-column table where the columns are
@@ -30,6 +34,14 @@ FUNCTIONS
     table data. This kind of data is produced by "Perinci::CmdLine"-based
     scripts and can contain more detailed table specification in the "meta"
     hash, which "td" can parse.
+
+    If you have a CSV, you can easily convert it to table data using the
+    *csv2td* utility:
+
+     % csv2td YOUR.csv | td ...
+     % program-that-outputs-csv | csv2td - | td ...
+
+    Using td
 
     First you might want to use the "info" action to see if the input is a
     table data:
@@ -182,6 +194,8 @@ FUNCTIONS
 
     *   exclude_columns => *array[str]*
 
+    *   include_columns => *array[str]*
+
     *   lines => *str*
 
     *   no_header_column => *true*
@@ -193,14 +207,21 @@ FUNCTIONS
 
         Allow duplicates.
 
+    *   weight_column => *str*
+
+        Select a column that contains weight.
+
     Returns an enveloped result (an array).
 
-    First element ($status_code) is an integer containing HTTP status code
-    (200 means OK, 4xx caller error, 5xx function error). Second element
-    ($reason) is a string containing error message, or "OK" if status is
-    200. Third element ($payload) is optional, the actual result. Fourth
-    element (%result_meta) is called result metadata and is optional, a hash
-    that contains extra information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -210,13 +231,6 @@ HOMEPAGE
 
 SOURCE
     Source repository is at <https://github.com/perlancar/perl-App-td>.
-
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-td>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
     Rinci::function for a more detailed explanation on enveloped result.
@@ -232,10 +246,36 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2022, 2021, 2020, 2019, 2017, 2016, 2015
+    by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-td>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2019 by Martin Becker, Blaubeuren.
+# Copyright (c) 2019-2022 by Martin Becker, Blaubeuren.
 # This package is free software; you can distribute it and/or modify it
 # under the terms of the Artistic License 2.0 (see LICENSE file).
 
@@ -21,6 +21,12 @@ my %versions = map {
     Math::Polynomial::ModInt
     Math::Polynomial::ModInt::Order
 );
+my $OM = 'Math::Polynomial::ModInt::Order';
+my $OF = $versions{$OM}->{'file'};
+foreach my $subclass (qw(ByIndex Conway Sparse)) {
+    my $module = join q[::], $OM, $subclass;
+    $versions{$module} = { file => $OF };
+}
 
 WriteMakefile(
     NAME             => 'Math::Polynomial::ModInt',
@@ -42,6 +48,7 @@ WriteMakefile(
         'Math::BigInt'      => '0',
         'Math::ModInt'      => '0.012',
         'Math::Polynomial'  => '1.015',
+        'Readonly'          => '2',
     },
     SIGN => 1,
     META_MERGE => {
@@ -50,7 +57,7 @@ WriteMakefile(
         dynamic_config      => 0,
         resources           => {
             bugtracker  => {
-                web => "https://rt.cpan.org/Public/Dist/Display.html?Name=$DN",
+                web => "https://github.com/mhasch/perl-$DN/issues",
             },
             license     => [
                 'https://www.perlfoundation.org/artistic-license-20.html'

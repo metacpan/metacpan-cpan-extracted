@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013 Kevin Ryde
+# Copyright 2012, 2013, 2020, 2021, 2022 Kevin Ryde
 
 # This file is part of Math-NumSeq.
 #
@@ -21,7 +21,7 @@ use 5.004;
 use strict;
 use POSIX 'ceil';
 use Test;
-plan tests => 15;
+plan tests => 17;
 
 use lib 't','xt';
 use MyTestHelpers;
@@ -39,7 +39,7 @@ sub numeq_array {
   if (! ref $a1 || ! ref $a2) {
     return 0;
   }
-  my $i = 0; 
+  my $i = 0;
   while ($i < @$a1 && $i < @$a2) {
     if ($a1->[$i] ne $a2->[$i]) {
       return 0;
@@ -75,6 +75,48 @@ sub diff_nums {
   return undef;
 }
 
+#------------------------------------------------------------------------------
+# A004676 - primes in binary
+
+MyOEIS::compare_values
+  (anum => 'A004676',
+   func => sub {
+     my ($count) = @_;
+     require Math::NumSeq::Primes;
+     my $primes = Math::NumSeq::Primes->new;
+     my @got;
+     while (@got < $count) {
+       my ($i, $prime) = $primes->next;
+       push @got, sprintf '%b', $prime;
+     }
+     return \@got;
+   });
+
+
+#------------------------------------------------------------------------------
+# A090423 - primes binary concat of others
+
+MyOEIS::compare_values
+  (anum => 'A090423',
+   func => sub {
+     my ($count) = @_;
+     require Math::NumSeq::Primes;
+     my $primes = Math::NumSeq::Primes->new;
+     my @strings;
+     my @got;
+     while (@got < $count) {
+       my ($i, $prime) = $primes->next;
+       my $prime2 = sprintf '%b', $prime;
+       if (@strings) {
+         my $re = '^('.join('|',@strings).')*$';
+         if ($prime2 =~ $re) {
+           push @got, $prime;
+         }
+       }
+       push @strings, $prime2;
+     }
+     return \@got;
+   });
 
 
 #------------------------------------------------------------------------------
@@ -337,7 +379,7 @@ sub diff_nums {
       my ($i, $prime) = $seq->next;
       while ($upto < $prime) {
         push @got, $upto++;
-        last OUTER unless @got < @$bvalues
+        last OUTER unless @got < @$bvalues;
       }
       $upto++; # skip $prime
     }
@@ -365,7 +407,7 @@ sub diff_nums {
       my ($i, $prime) = $seq->next;
       while ($upto < $prime) {
         push @got, $upto++;
-        last OUTER unless @got < @$bvalues
+        last OUTER unless @got < @$bvalues;
       }
       $upto++; # skip $prime
     }

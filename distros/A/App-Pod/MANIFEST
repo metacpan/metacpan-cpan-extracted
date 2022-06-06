@@ -9,13 +9,10 @@ LICENSE
 MANIFEST			This list of files
 META.json
 META.yml
-nytprof.out
-old/dir.pl
 README
-README.pod
 t/00-load.t
+t/01-usage-simple.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
-TODO
 xt/boilerplate.t
