@@ -4,7 +4,7 @@
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -44,11 +44,13 @@
       "bugtracker" : {
          "x_url" : "https://github.com/briandfoy/mac-osversion/issues"
       },
+      "homepage" : "https://github.com/briandfoy/mac-osversion",
       "repository" : {
          "type" : "git",
+         "url" : "https://github.com/briandfoy/mac-osversion.git",
          "web" : "https://github.com/briandfoy/mac-osversion"
       }
    },
-   "version" : "1.007",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "1.008",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

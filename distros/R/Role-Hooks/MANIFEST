@@ -20,4 +20,5 @@ t/05mouserole.t
 t/06rolebasic.t
 t/10moorole_in_moose.t
 t/11mooserole_in_moo.t
+t/20packagevariant.t
 t/rt-133595.t

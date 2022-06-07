@@ -165,7 +165,7 @@ package Term::CLI::Argument::Country {
 
     sub complete {
         my ( $self, $text, $state ) = @_;
-        my $continent = $state->{processed}->[-1];
+        my $continent = $state->{processed}->[-1]->{value};
         my $values = $self->country_data->{continents}{$continent}{countries};
         return ( sort @{$values} ) if !length $text;
         return ( sort grep { substr( $_, 0, length $text ) eq $text }
@@ -210,7 +210,7 @@ package Term::CLI::Argument::City {
 
     sub complete {
         my ( $self, $text, $state ) = @_;
-        my $country = $state->{processed}->[-1];
+        my $country = $state->{processed}->[-1]->{value};
         my $values  = $self->country_data->{countries}{$country}{cities};
         return ( sort @{$values} ) if !length $text;
         return ( sort grep { substr( $_, 0, length $text ) eq $text }

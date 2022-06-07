@@ -10,8 +10,11 @@ use MooseX::Extended::Core qw(
   field
   param
   _debug
+  _assert_import_list_is_valid
   _enabled_features
   _disabled_warnings
+  _our_import
+  _our_init_meta
 );
 use MooseX::Role::WarnOnConflict ();
 use Moose::Role;
@@ -23,11 +26,7 @@ use true;
 use feature _enabled_features();
 no warnings _disabled_warnings();
 
-our $VERSION = '0.10';
-
-my ( $import, undef, $init_meta ) = Moose::Exporter->setup_import_methods(
-    with_meta => [ 'field', 'param' ],
-);
+our $VERSION = '0.20';
 
 # Should this be in the metaclass? It feels like it should, but
 # the MOP really doesn't support these edge cases.
@@ -35,97 +34,46 @@ my %CONFIG_FOR;
 
 sub import {
     my ( $class, %args ) = @_;
-    my ( $package, $filename, $line ) = caller;
-    state $check = compile_named(
-        debug    => Optional [Bool],
-        types    => Optional [ ArrayRef [NonEmptyStr] ],
-        excludes => Optional [
-            ArrayRef [
-                Enum [
-                    qw/
-                      WarnOnConflict
-                      autoclean
-                      carp
-                      true
-                      /
-                ]
-            ]
-        ],
+    $args{_import_type} = 'role';
+    my $target_class = _assert_import_list_is_valid( $class, \%args );
+    my @with_meta    = grep { not $args{excludes}{$_} } qw(field param);
+    if (@with_meta) {
+        @with_meta = ( with_meta => [@with_meta] );
+    }
+    my ( $import, undef, undef ) = Moose::Exporter->setup_import_methods(
+        @with_meta,
     );
-    eval {
-        $check->(%args);
-        1;
-    } or do {
-
-        # Not sure what's happening, but if we don't use the eval to trap the
-        # error, it gets swallowed and we simply get:
-        #
-        # BEGIN failed--compilation aborted at ...
-        my $error = $@;
-        Carp::carp(<<"END");
-Error:    Invalid import list to MooseX::Extended::Role.
-Package:  $package
-Filename: $filename
-Line:     $line
-Details:  $error
-END
-        throw_exception(
-            'InvalidImportList',
-            class_name           => $package,
-            moosex_extended_type => __PACKAGE__,
-            line_number          => $line,
-            messsage             => $error,
-        );
-    };
-
-    # remap the arrays to hashes for easy lookup
-    $args{excludes} = { map { $_ => 1 } $args{excludes}->@* };
-
-    $CONFIG_FOR{$package} = \%args;
-    @_ = $class;                       # anything else and $import blows up
-    goto $import;
+    _our_import( $class, $import, $target_class );
 }
 
 sub init_meta ( $class, %params ) {
     my $for_class = $params{for_class};
+    _our_init_meta( $class, \&_apply_default_features, %params );
+    return $for_class->meta;
+}
 
-    my $config = $CONFIG_FOR{$for_class};
-
-    if ( $config->{debug} ) {
-        $MooseX::Extended::Debug = $config->{debug};
-    }
-    if ( exists $config->{excludes} ) {
-        foreach my $category ( sort keys $config->{excludes}->%* ) {
-            _debug("$for_class exclude '$category'");
-        }
-    }
+sub _apply_default_features ( $config, $for_class, $params ) {
 
     if ( my $types = $config->{types} ) {
         _debug("$for_class: importing types '@$types'");
         MooseX::Extended::Types->import::into( $for_class, @$types );
     }
 
-    Carp->import::into($for_class)
-      unless $config->{excludes}{carp};
-
-    namespace::autoclean->import::into($for_class)
-      unless $config->{excludes}{autoclean};
-
-    true->import    # no need for `1` at the end of the module
-      unless $config->{excludes}{true};
-
-    MooseX::Role::WarnOnConflict->import::into($for_class)
-      unless $config->{excludes}{WarnOnConflict};
+    Carp->import::into($for_class)                         unless $config->{excludes}{carp};
+    namespace::autoclean->import::into($for_class)         unless $config->{excludes}{autoclean};
+    true->import                                           unless $config->{excludes}{true};
+    MooseX::Role::WarnOnConflict->import::into($for_class) unless $config->{excludes}{WarnOnConflict};
 
     feature->import( _enabled_features() );
     warnings->unimport(_disabled_warnings);
 
     Moose::Role->init_meta(    ##
-        %params,               ##
+        %$params,              ##
         metaclass => 'Moose::Meta::Role'
     );
-    return $for_class->meta;
 }
+
+1;
 
 __END__
 
@@ -139,7 +87,7 @@ MooseX::Extended::Role - MooseX::Extended roles
 
 =head1 VERSION
 
-version 0.10
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -204,9 +152,69 @@ Excluding this will no longer import C<Carp::croak> and C<Carp::carp>.
 
 =item * C<true>
 
-    use MooseX::Extended::Role excludes => ['carp'];
+    use MooseX::Extended::Role excludes => ['true'];
 
 Excluding this will require your module to end in a true value.
+
+=item * C<param>
+
+    use MooseX::Extended::Role excludes => ['param'];
+
+Excluding this will make the C<param> function unavailable.
+
+=item * C<field>
+
+    use MooseX::Extended::Role excludes => ['field'];
+
+Excluding this will make the C<field> function unavailable.
+
+=back
+
+=head2 C<includes>
+
+Some experimental features are useful, but might not be quite what you want.
+
+=over 4
+
+=item * C<multi>
+
+    use MooseX::Extended::Role includes => [qw/multi/];
+
+    multi sub foo ($self, $x)      { ... }
+    multi sub foo ($self, $x, $y ) { ... }
+
+Allows you to redeclare a method (or subroutine) and the dispatch will use the number
+of arguments to determine which subroutine to use. Note that "slurpy" arguments such as
+arrays or hashes will take precedence over scalars:
+
+    multi sub foo ($self, @x) { ... }
+    multi sub foo ($self, $x) { ... } # will never be called
+
+Only available on Perl v5.26.0 or higher. Requires L<Syntax::Keyword::MultiSub>.
+
+=item * C<async>
+
+    package My::Thing {
+        use MooseX::Extended
+        types    => [qw/Str/],
+        includes => ['async'];
+        use IO::Async::Loop;
+
+        field output => ( is => 'rw', isa => Str, default => '' );
+
+        async sub doit ( $self, @list ) {
+            my $loop = IO::Async::Loop->new;
+            $self->output('> ');
+            foreach my $item (@list) {
+                await $loop->delay_future( after => 0.01 );
+                $self->output( $self->output . "$item " );
+            }
+        }
+    }
+
+Allows you to write asynchronous code with C<async> and C<await>.
+
+Only available on Perl v5.26.0 or higher. Requires L<Future::AsyncAwait>.
 
 =back
 
@@ -244,6 +252,24 @@ To silence the warning, just be explicit about your intent:
         with 'My::Role' => { -excludes => ['name'] };
         sub name {'Bob'}
     }
+
+Alternately, you can exclude this feature. We don't recommend this, but it
+might be useful if you're refactoring a legacy Moose system.
+
+    use MooseX::Extended::Role excludes => [qw/WarnOnConflict/];
+
+=head1 REDUCING BOILERPLATE
+
+Let's say you've settled on the following feature set:
+
+    use MooseX::Extended::Role
+        excludes => [qw/WarnOnConflict carp/],
+        includes => [qw/multi/];
+
+And you keep typing that over and over. We've removed a lot of boilerplate,
+but we've added different boilerplate. Instead, just create
+C<My::Custom::Moose::Role> and C<use My::Custom::Moose::Role;>. See
+L<MooseX::Extended::Role::Custom> for details.
 
 =head1 AUTHOR
 

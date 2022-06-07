@@ -73,12 +73,13 @@ my %WriteMakefile = (
 		resources => {
 			repository => {
 				type => 'git',
-				url  => 'git@github.com:briandfoy/mac-osversion.git',
-				web  => 'https://github.com/briandfoy/mac-osversion',
+				url  => "$github.git",
+				web  => $github,
 				},
 			bugtracker => {
 				url => 'https://github.com/briandfoy/mac-osversion/issues',
 				},
+			homepage => $github,
 			},
 		},
 

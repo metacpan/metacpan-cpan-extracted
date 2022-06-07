@@ -1,10 +1,9 @@
 #!/usr/bin/env perl
 
-use lib 'lib';
-use Test::Most;
+use lib 't/lib';
+use MooseX::Extended::Tests;
 use MooseX::Extended::Core qw(param field);
 use MooseX::Extended::Role ();
-use Capture::Tiny 'capture_stderr';
 
 package Mock::Meta {
     use MooseX::Extended;

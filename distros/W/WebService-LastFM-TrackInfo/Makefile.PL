@@ -7,7 +7,7 @@ use 5.006;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Access to the track.getInfo slice of the LastFM API",
+  "ABSTRACT" => "Access to *.getInfo slices of the last.fm API",
   "AUTHOR" => "Gene Boggs <gene\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0201",
+  "VERSION" => "0.0205",
   "test" => {
     "TESTS" => "t/*.t"
   }

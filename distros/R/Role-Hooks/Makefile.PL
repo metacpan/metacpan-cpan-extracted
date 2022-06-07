@@ -33,7 +33,7 @@ my $meta = {
                                        },
                         },
   "provides"         => {
-                          "Role::Hooks" => { file => "lib/Role/Hooks.pm", version => 0.003 },
+                          "Role::Hooks" => { file => "lib/Role/Hooks.pm", version => 0.004 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -47,7 +47,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Role-Hooks/project",
                         },
-  "version"          => 0.003,
+  "version"          => 0.004,
   "x_static_install" => 1,
 };
 

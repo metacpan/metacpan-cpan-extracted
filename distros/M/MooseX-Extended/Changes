@@ -1,7 +1,18 @@
 Revision history for MooseX-Extended
 
+0.20      2022-06-07 18:40:47 CEST
+
+          - You can now exclude the "field" and "param" functions
+          - Add MooseX::Extended::Role::Custom (create your own Moose::Role)
+          - Add MooseX::Extended::Custom (create your own Moose)
+          - Add optional async/await support
+          - Linux CI now includes v.5.36.0
+          - Add optional multimethod support
+          - We no longer use @_ inside signatured subs
+
 0.10      2022-05-31 22:26:34 CEST
 
+          - Added .gitignore and cleaned up dist.ini (thanks, haarg!)
           - Skip Perl::Tidy tests unless Test::PerlTidy is installed
           - Add some test dependencies for Perl::Critic to dist.ini
           - Add a few more tests to cover edge cases.

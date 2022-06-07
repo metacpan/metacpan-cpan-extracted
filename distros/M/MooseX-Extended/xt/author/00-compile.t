@@ -6,14 +6,16 @@ use warnings;
 
 use Test::More;
 
-plan tests => 7;
+plan tests => 9;
 
 my @module_files = (
     'Moose/Exception/InvalidAttributeDefinition.pm',
     'Moose/Exception/InvalidImportList.pm',
     'MooseX/Extended.pm',
     'MooseX/Extended/Core.pm',
+    'MooseX/Extended/Custom.pm',
     'MooseX/Extended/Role.pm',
+    'MooseX/Extended/Role/Custom.pm',
     'MooseX/Extended/Types.pm'
 );
 

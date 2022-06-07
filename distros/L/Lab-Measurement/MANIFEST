@@ -136,6 +136,7 @@ lib/Lab/Moose/Connection/VISA/USB.pm
 lib/Lab/Moose/Connection/VISA/VXI11.pm
 lib/Lab/Moose/Connection/VISA_GPIB.pm
 lib/Lab/Moose/Connection/VXI11.pm
+lib/Lab/Moose/Connection/WWW.pm
 lib/Lab/Moose/Connection/Zhinst.pm
 lib/Lab/Moose/Countdown.pm
 lib/Lab/Moose/DataFile.pm
@@ -152,6 +153,7 @@ lib/Lab/Moose/Instrument/Agilent34410A.pm
 lib/Lab/Moose/Instrument/Agilent34460A.pm
 lib/Lab/Moose/Instrument/Cache.pm
 lib/Lab/Moose/Instrument/Common.pm
+lib/Lab/Moose/Instrument/Cryomagnetics_4G.pm
 lib/Lab/Moose/Instrument/DisplayXY.pm
 lib/Lab/Moose/Instrument/DummySource.pm
 lib/Lab/Moose/Instrument/HP34410A.pm
@@ -168,10 +170,11 @@ lib/Lab/Moose/Instrument/KeysightDSOS604A.pm
 lib/Lab/Moose/Instrument/KeysightE3633E.pm
 lib/Lab/Moose/Instrument/Lakeshore340.pm
 lib/Lab/Moose/Instrument/Lakeshore340/Helium3.pm
+lib/Lab/Moose/Instrument/Lakeshore350.pm
 lib/Lab/Moose/Instrument/Lakeshore372.pm
 lib/Lab/Moose/Instrument/LinearStepSweep.pm
 lib/Lab/Moose/Instrument/Log.pm
-lib/Lab/Moose/Instrument/MCL1_540.pm
+lib/Lab/Moose/Instrument/NanonisTremea.pm
 lib/Lab/Moose/Instrument/OI_Common.pm
 lib/Lab/Moose/Instrument/OI_ILM210.pm
 lib/Lab/Moose/Instrument/OI_IPS.pm
@@ -212,6 +215,7 @@ lib/Lab/Moose/Instrument/SCPIBlock.pm
 lib/Lab/Moose/Instrument/SR830.pm
 lib/Lab/Moose/Instrument/SignalRecovery7265.pm
 lib/Lab/Moose/Instrument/SpectrumAnalyzer.pm
+lib/Lab/Moose/Instrument/Synctek_MCL1_540.pm
 lib/Lab/Moose/Instrument/TBS1000C.pm
 lib/Lab/Moose/Instrument/VNASweep.pm
 lib/Lab/Moose/Instrument/Yokogawa7651.pm

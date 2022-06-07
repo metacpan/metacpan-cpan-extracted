@@ -2,7 +2,7 @@ NAME
     MooseX::Extended - Extend Moose with safe defaults and useful features
 
 VERSION
-    version 0.10
+    version 0.20
 
 SYNOPSIS
         package My::Names {
@@ -100,8 +100,9 @@ DESCRIPTION
             $self->set_y($x);
         }
 
-    # MooseX::Extended will cause this to return true, even if we try to
-    return # false 0;
+        # MooseX::Extended will cause this to return true, even if we try to return
+        # false
+        0;
 
 CONFIGURATION
     You may pass an import list to MooseX::Extended.
@@ -124,7 +125,7 @@ CONFIGURATION
 
   "excludes"
     You may find some features to be annoying, or even cause potential bugs
-    (e.g., if you have a `croak` method, our importing of "Carp::croak" will
+    (e.g., if you have a "croak" method, our importing of "Carp::croak" will
     be a problem. You can exclude the following:
 
     *   "StrictConstructor"
@@ -159,9 +160,80 @@ CONFIGURATION
 
     *   "true"
 
-            use MooseX::Extended::Role excludes => ['carp'];
+            use MooseX::Extended::Role excludes => ['true'];
 
         Excluding this will require your module to end in a true value.
+
+    *   "param"
+
+            use MooseX::Extended::Role excludes => ['param'];
+
+        Excluding this will make the "param" function unavailable.
+
+    *   "field"
+
+            use MooseX::Extended::Role excludes => ['field'];
+
+        Excluding this will make the "field" function unavailable.
+
+  "includes"
+    Some experimental features are useful, but might not be quite what you
+    want.
+
+    *   "multi"
+
+            use MooseX::Extended includes => [qw/multi/];
+
+            multi sub foo ($self, $x)      { ... }
+            multi sub foo ($self, $x, $y ) { ... }
+
+        Allows you to redeclare a method (or subroutine) and the dispatch
+        will use the number of arguments to determine which subroutine to
+        use. Note that "slurpy" arguments such as arrays or hashes will take
+        precedence over scalars:
+
+            multi sub foo ($self, @x) { ... }
+            multi sub foo ($self, $x) { ... } # will never be called
+
+        Only available on Perl v5.26.0 or higher. Requires
+        Syntax::Keyword::MultiSub.
+
+    *   "async"
+
+            package My::Thing {
+                use MooseX::Extended
+                types    => [qw/Str/],
+                includes => ['async'];
+                use IO::Async::Loop;
+
+                field output => ( is => 'rw', isa => Str, default => '' );
+
+                async sub doit ( $self, @list ) {
+                    my $loop = IO::Async::Loop->new;
+                    $self->output('> ');
+                    foreach my $item (@list) {
+                        await $loop->delay_future( after => 0.01 );
+                        $self->output( $self->output . "$item " );
+                    }
+                }
+            }
+
+        Allows you to write asynchronous code with "async" and "await".
+
+        Only available on Perl v5.26.0 or higher. Requires
+        Future::AsyncAwait.
+
+REDUCING BOILERPLATE
+    Let's say you've settled on the following feature set:
+
+        use MooseX::Extended
+            excludes => [qw/StrictConstructor carp/],
+            includes => [qw/multi/];
+
+    And you keep typing that over and over. We've removed a lot of
+    boilerplate, but we've added different boilerplate. Instead, just create
+    "My::Custom::Moose" and "use My::Custom::Moose;". See
+    MooseX::Extended::Custom for details.
 
 IMMUTABILITY
   Making Your Class Immutable
@@ -171,7 +243,7 @@ IMMUTABILITY
 
     That prevents further changes to the class and provides some
     optimizations to make the code run much faster. However, it's somewhat
-    annoying to type. We do this for you, via "B::Hooks::AtRuntime". You no
+    annoying to type. We do this for you, via B::Hooks::AtRuntime. You no
     longer need to do this yourself.
 
   Making Your Instance Immutable
@@ -237,7 +309,7 @@ ATTRIBUTE SHORTCUTS
 
     See MooseX::Extended::Manual::Shortcuts for a full explanation.
 
-INVALID ATTRIBUTE NAMES
+INVALID ATTRIBUTE DEFINITIONS
     The following Moose code will print "WhoAmI". However, the second
     attribute name is clearly invalid.
 
@@ -252,11 +324,51 @@ INVALID ATTRIBUTE NAMES
         say $object->name;
 
     "MooseX::Extended" will throw a
-    "Moose::Exception::InvalidAttributeDefinition" exception if it
-    encounters an illegal method name for an attribute.
+    Moose::Exception::InvalidAttributeDefinition exception if it encounters
+    an illegal method name for an attribute.
 
     This also applies to various attributes which allow method names, such
     as "clone", "builder", "clearer", "writer", "reader", and "predicate".
+
+    Trying to pass a defined "init_arg" to "field" will also this exception.
+
+OPTIONAL FEATURES
+    By default, MooseX::Extended tries to be relatively conservative.
+    However, you might want to turn it up to 11. There are optional features
+    you can use for this. They're turned by the "includes" flag:
+
+  "multi"
+        package My::Multi::Role {
+            use MooseX::Extended::Role includes => [qw/multi/];
+
+            multi sub point ( $self, $x, $y ) {
+                return My::Point->new( x => $x, y => $y );
+            }
+            multi sub point ( $self, $x, $y, $z ) {
+                return My::Point::3D->new( x => $x, y => $y, z => $z );
+            }
+        }
+
+    "multi" allows you to provide multiple method (or subroutine) bodies
+    with the same name. We use Syntax::Keyword::MultiSub to implement this,
+    so see that module for caveats.
+
+    It's quite possible to define multi subs that are ambiguous:
+
+        package Foo {
+            use MooseX::Extended includes => [qw/multi/];
+
+            multi sub foo ($self, @bar) { return '@bar' }
+            multi sub foo ($self, $bar) { return '$bar' }
+        }
+
+        say +Foo->new->foo(1);
+        say +Foo->new->foo(1,2,3);
+
+    Both of the above will print the string @bar. The second definition of
+    "foo" is effectively lost.
+
+    "multi" is available for Perl versions 5.26 or higher.
 
 DEBUGGER SUPPORT
     When running MooseX::Extended under the debugger, there are some
@@ -305,9 +417,6 @@ TODO
     Some of this may just be wishful thinking. Some of this would be
     interesting if others would like to collaborate.
 
-  Tests
-    Tests! Many more tests! Volunteers welcome :)
-
   Configurable Types
     We provide "MooseX::Extended::Types" for convenience, along with the
     "declare" function. We should write up (and test) examples of extending
@@ -343,9 +452,21 @@ NOTES
     repository is <https://github.com/Ovid/moosex-extreme/>.
 
 SEE ALSO
+    *   Corinna <https://github.com/Ovid/Cor>
+
+        The RFC of the new version of OOP planned for the Perl core.
+
     *   MooseX::Modern <https://metacpan.org/pod/MooseX::Modern>
 
-    *   Corinna <https://github.com/Ovid/Cor>
+        MooseX::Modern - Precision classes for Modern Perl
+
+    *   Zydeco <https://metacpan.org/pod/Zydeco>
+
+        Zydeco - Jazz up your Perl
+
+    *   Dios <https://metacpan.org/pod/Dios>
+
+        Dios - Declarative Inside-Out Syntax
 
 AUTHOR
     Curtis "Ovid" Poe <curtis.poe@gmail.com>

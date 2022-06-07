@@ -20,7 +20,6 @@ use Test::Exception;
             ro3 => 'Int',
             ro4 => 'Int',
         },
-        new => 1,
     );
 
     sub _build_rw1 { 'rw1' }

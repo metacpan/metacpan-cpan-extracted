@@ -18,14 +18,13 @@
 #
 #=============================================================================
 
-package Term::CLI::Command::Help 0.055002;
+package Term::CLI::Command::Help 0.057001;
 
 use 5.014;
 use warnings;
 use version;
 
 use List::Util 1.23 qw( first min );
-use File::Which 1.09;
 use Types::Standard 1.000005 qw( ArrayRef Str );
 use Term::CLI::Util qw( is_prefix_str get_options_from_array );
 use Term::CLI::L10N qw( loc );
@@ -37,34 +36,10 @@ my $POD_PARSER_CLASS = $Pod::Text::Termcap::VERSION >= 4.11
     ? 'Pod::Text::Termcap'
     : 'Pod::Text::Overstrike';
 
-my @PAGERS = (
-    [   qw(
-            less --no-lessopen --no-init
-            --dumb --quit-at-eof
-            --quit-if-one-screen
-            --RAW-CONTROL-CHARS
-        )
-    ],
-    ['more'],
-    ['pg'],
-);
-
-my @PAGER;
-
-if ( my $pager = first { defined which( $_->[0] ) } @PAGERS ) {
-    @PAGER = @$pager;
-}
-
 use Moo 1.000001;
 use namespace::clean 0.25;
 
 extends 'Term::CLI::Command';
-
-has 'pager' => (
-    is      => 'rw',
-    isa     => ArrayRef [Str],
-    default => sub { [@PAGER] },
-);
 
 has '+name' => ( default => sub {'help'} );
 
@@ -82,7 +57,7 @@ has '+options' => ( default => sub { [ 'pod|p', 'all|a' ] }, );
 has '+description' => (
     default => sub {
         loc(      qq{Show help for any given command sequence (or a command\n}
-                . qq{overview if no argument is given.\n\n}
+                . qq{overview if no argument is given).\n\n}
                 . qq{The C<--pod> (C<-p>) option will cause raw POD\n}
                 . qq{to be shown.\n\n}
                 . qq{The C<--all> (C<-a>) option will list help text for all commands.}
@@ -344,7 +319,10 @@ sub complete {
 
         return () if !$new_cmd_ref;
 
-        push @{$processed}, shift @{$unprocessed};
+        push @{$processed}, {
+            element => $new_cmd_ref,
+            value   => shift @{$unprocessed},
+        };
         $cur_cmd_ref = $new_cmd_ref;
     }
 
@@ -372,38 +350,16 @@ sub _execute_help {
         return %args;
     }
 
-    my $pager_cmd = $self->pager;
-
-    if (@$pager_cmd) {
-        no warnings 'exec';    ## no critic (ProhibitNoWarnings)
-        local ( $SIG{PIPE} ) = 'IGNORE';    # Temporarily avoid accidents.
-
-        my $pager_fh;
-        if (! open $pager_fh, '|-', @{$pager_cmd}) {
-            $args{status} = -1;
-            $args{error} =
-                loc( "cannot run '[_1]': [_2]", $$pager_cmd[0], $! );
-            return %args;
-        }
-
-        print $pager_fh $args{text};
-        $pager_fh->close;
-
-        $args{status} = $?;
-        $args{error}  = $! if $args{status} != 0;
+    my $cli = $self->root_node;
+    if ( $cli->can('write_pager') ) {
+        return $cli->write_pager(%args);
     }
-    else {
-        my $pager_fh;
-        if (! open $pager_fh, '>&', \*STDOUT) {
-            $args{status} = -1;
-            $args{error}  = "cannot dup STDOUT: $!";
-            return %args;
-        }
-        print $pager_fh $args{text};
-        if ( !$pager_fh->close ) {
-            $args{status} = -1;
-            $args{error}  = $!;
-        }
+
+    my $ok = print $args{text}, $args{text} =~ /\n$/xms ? '' : "\n";
+
+    if (!$ok) {
+        $args{status} = -1;
+        $args{error}  = $!;
     }
     return %args;
 }
@@ -420,7 +376,7 @@ Term::CLI::Command::Help - A generic 'help' command for Term::CLI
 
 =head1 VERSION
 
-version 0.055002
+version 0.057001
 
 =head1 SYNOPSIS
 
@@ -486,19 +442,6 @@ Override the default description for the C<help> command.
 
 Override the name for the help command. Default is C<help>.
 
-=item B<pager> =E<gt> I<ArrayRef>[I<Str>]
-
-Override the default pager for help display. See
-L<OUTPUT PAGING|/OUTPUT PAGING>. The value should
-be a command line split on words, e.g.:
-
-    OBJ->pager( [ 'cat', '-n', '-e' ] );
-
-If an empty list is provided, no external pager will
-be used, and output is printed to F<STDOUT> directly.
-
-See also the L<pager|/pager> method.
-
 =item B<summary> =E<gt>
 
 Override the default summary for the C<help> command.
@@ -511,24 +454,6 @@ Override the automatic usage string for the C<help> command.
 
 =back
 
-=head1 METHODS
-
-=over
-
-=item B<pager> ( [ I<ArrayRef>[I<Str>]> ] )
-X<pager>
-
-Get or set the pager command.
-If an empty list is provided, no external pager will
-be used, and output is printed to F<STDOUT> directly.
-
-Example:
-
-    $help_cmd->pager([]); # Print directly to STDOUT.
-    $help_cmd->pager([ 'cat', '-n' ]); # Number output lines.
-
-=back
-
 =head1 OUTPUT FORMATTING
 
 Help text is assumed to be in L<POD|perlpod> format, and will be formatted
@@ -536,14 +461,9 @@ for the terminal using L<Pod::Text::Termcap>(3p).
 
 =head1 OUTPUT PAGING
 
-The C<help> command will try to pipe the formatted output through a suitable
-pager.
-
-At startup, the pager is selected from the following list, in order of
-preference: L<less>, L<more>, L<pg>, F<STDOUT>.
-
-This can be overridden by supplying a value to the object's L<pager|/pager>
-attribute.
+The C<help> command will use the parent L<Term::CLI|Term::CLI>(3p)'s
+L<write_pager()|Term::CLI/write_pager> method to pipe the formatted output
+through a suitable pager.
 
 =head1 EXAMPLE
 

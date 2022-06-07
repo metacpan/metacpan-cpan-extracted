@@ -14,115 +14,57 @@ use namespace::autoclean      ();
 use Moose::Util 'throw_exception';
 use Module::Load 'load';
 use MooseX::Extended::Core qw(
+  _assert_import_list_is_valid
+  _debug
+  _disabled_warnings
+  _enabled_features
+  _our_import
+  _our_init_meta
   field
   param
-  _debug
-  _enabled_features
-  _disabled_warnings
 );
 use feature _enabled_features();
+no warnings _disabled_warnings();
 use B::Hooks::AtRuntime 'after_runtime';
 use Import::Into;
 
-no warnings _disabled_warnings();
-
-our $VERSION = '0.10';
-
-my ( $import, undef, $init_meta ) = Moose::Exporter->setup_import_methods(
-    with_meta => [ 'field', 'param' ],
-    install   => [qw/unimport/],
-    also      => ['Moose'],
-);
-
-# Should this be in the metaclass? It feels like it should, but
-# the MOP really doesn't support these edge cases.
-my %CONFIG_FOR;
+our $VERSION = '0.20';
 
 sub import {
     my ( $class, %args ) = @_;
-    my ( $package, $filename, $line ) = caller;
-    state $check = compile_named(
-        debug    => Optional [Bool],
-        types    => Optional [ ArrayRef [NonEmptyStr] ],
-        excludes => Optional [
-            ArrayRef [
-                Enum [
-                    qw/
-                      StrictConstructor
-                      autoclean
-                      c3
-                      carp
-                      immutable
-                      true
-                      /
-                ]
-            ]
-        ],
+    $args{_import_type} = 'class';
+    my $target_class = _assert_import_list_is_valid( $class, \%args );
+    my @with_meta    = grep { not $args{excludes}{$_} } qw(field param);
+    if (@with_meta) {
+        @with_meta = ( with_meta => [@with_meta] );
+    }
+    my ( $import, undef, undef ) = Moose::Exporter->setup_import_methods(
+        @with_meta,
+        install => [qw/unimport/],
+        also    => ['Moose'],
     );
-    eval {
-        $check->(%args);
-        1;
-    } or do {
-
-        # Not sure what's happening, but if we don't use the eval to trap the
-        # error, it gets swallowed and we simply get:
-        #
-        # BEGIN failed--compilation aborted at ...
-        my $error = $@;
-        Carp::carp(<<"END");
-Error:    Invalid import list to MooseX::Extended.
-Package:  $package
-Filename: $filename
-Line:     $line
-Details:  $error
-END
-        throw_exception(
-            'InvalidImportList',
-            class_name           => $package,
-            moosex_extended_type => __PACKAGE__,
-            line_number          => $line,
-            messsage             => $error,
-        );
-    };
-
-    # remap the arrays to hashes for easy lookup
-    $args{excludes} = { map { $_ => 1 } $args{excludes}->@* };
-
-    $CONFIG_FOR{$package} = \%args;
-    @_ = $class;                       # anything else and $import blows up
-    goto $import;
+    _our_import( $class, $import, $target_class );
 }
 
 # Internal method setting up exports. No public
 # documentation by design
 sub init_meta ( $class, %params ) {
-    my $for_class = $params{for_class};
     Moose->init_meta(%params);
+    _our_init_meta( $class, \&_apply_default_features, %params );
+}
 
-    my $config = $CONFIG_FOR{$for_class};
-
-    if ( $config->{debug} ) {
-        $MooseX::Extended::Debug = $config->{debug};
-    }
-    if ( exists $config->{excludes} ) {
-        foreach my $category ( sort keys $config->{excludes}->%* ) {
-            _debug("$for_class exclude '$category'");
-        }
-    }
-
+# XXX we don't actually use the $params here, even though we need it for
+# MooseX::Extended::Role. But we need to declare it in the signature to make
+# this code work
+sub _apply_default_features ( $config, $for_class, $params = undef ) {
     if ( my $types = $config->{types} ) {
         _debug("$for_class: importing types '@$types'");
         MooseX::Extended::Types->import::into( $for_class, @$types );
     }
 
-    MooseX::StrictConstructor->import( { into => $for_class } )
-      unless $config->{excludes}{StrictConstructor};
-
-    Carp->import::into($for_class)
-      unless $config->{excludes}{carp};
-
-    namespace::autoclean->import::into($for_class)
-      unless $config->{excludes}{autoclean};
+    MooseX::StrictConstructor->import( { into => $for_class } ) unless $config->{excludes}{StrictConstructor};
+    Carp->import::into($for_class)                              unless $config->{excludes}{carp};
+    namespace::autoclean->import::into($for_class)              unless $config->{excludes}{autoclean};
 
     # see perldoc -v '$^P'
     if ($^P) {
@@ -154,7 +96,7 @@ sub init_meta ( $class, %params ) {
     unless ( $config->{excludes}{true} ) {
         eval {
             load true;
-            true->import;    # no need for `1` at the end of the module
+            true->import::into($for_class);    # no need for `1` at the end of the module
             1;
         } or do {
             my $error = $@;
@@ -170,7 +112,6 @@ sub init_meta ( $class, %params ) {
     feature->import( _enabled_features() );
     warnings->unimport(_disabled_warnings);
 }
-
 1;
 
 __END__
@@ -185,7 +126,7 @@ MooseX::Extended - Extend Moose with safe defaults and useful features
 
 =head1 VERSION
 
-version 0.10
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -284,9 +225,9 @@ can even safely inline multiple packages in the same file:
         $self->set_y($x);
     }
 
-# MooseX::Extended will cause this to return true, even if we try to return
-# false
-0;
+    # MooseX::Extended will cause this to return true, even if we try to return
+    # false
+    0;
 
 =head1 CONFIGURATION
 
@@ -312,7 +253,7 @@ Is identical to this:
 =head2 C<excludes>
 
 You may find some features to be annoying, or even cause potential bugs (e.g.,
-if you have a `croak` method, our importing of C<Carp::croak> will be a
+if you have a C<croak> method, our importing of C<Carp::croak> will be a
 problem. You can exclude the following:
 
 =over 4
@@ -349,11 +290,84 @@ Excluding this will no longer make your class immutable.
 
 =item * C<true>
 
-    use MooseX::Extended::Role excludes => ['carp'];
+    use MooseX::Extended::Role excludes => ['true'];
 
 Excluding this will require your module to end in a true value.
 
+=item * C<param>
+
+    use MooseX::Extended::Role excludes => ['param'];
+
+Excluding this will make the C<param> function unavailable.
+
+=item * C<field>
+
+    use MooseX::Extended::Role excludes => ['field'];
+
+Excluding this will make the C<field> function unavailable.
+
 =back
+
+=head2 C<includes>
+
+Some experimental features are useful, but might not be quite what you want.
+
+=over 4
+
+=item * C<multi>
+
+    use MooseX::Extended includes => [qw/multi/];
+
+    multi sub foo ($self, $x)      { ... }
+    multi sub foo ($self, $x, $y ) { ... }
+
+Allows you to redeclare a method (or subroutine) and the dispatch will use the number
+of arguments to determine which subroutine to use. Note that "slurpy" arguments such as
+arrays or hashes will take precedence over scalars:
+
+    multi sub foo ($self, @x) { ... }
+    multi sub foo ($self, $x) { ... } # will never be called
+
+Only available on Perl v5.26.0 or higher. Requires L<Syntax::Keyword::MultiSub>.
+
+=item * C<async>
+
+    package My::Thing {
+        use MooseX::Extended
+        types    => [qw/Str/],
+        includes => ['async'];
+        use IO::Async::Loop;
+
+        field output => ( is => 'rw', isa => Str, default => '' );
+
+        async sub doit ( $self, @list ) {
+            my $loop = IO::Async::Loop->new;
+            $self->output('> ');
+            foreach my $item (@list) {
+                await $loop->delay_future( after => 0.01 );
+                $self->output( $self->output . "$item " );
+            }
+        }
+    }
+
+Allows you to write asynchronous code with C<async> and C<await>.
+
+Only available on Perl v5.26.0 or higher. Requires L<Future::AsyncAwait>.
+
+=back
+
+=head1 REDUCING BOILERPLATE
+
+Let's say you've settled on the following feature set:
+
+    use MooseX::Extended
+        excludes => [qw/StrictConstructor carp/],
+        includes => [qw/multi/];
+
+And you keep typing that over and over. We've removed a lot of boilerplate,
+but we've added different boilerplate. Instead, just create
+C<My::Custom::Moose> and C<use My::Custom::Moose;>. See
+L<MooseX::Extended::Custom> for details.
 
 =head1 IMMUTABILITY
 
@@ -365,7 +379,7 @@ You no longer need to end your Moose classes with:
 
 That prevents further changes to the class and provides some optimizations to
 make the code run much faster. However, it's somewhat annoying to type. We do
-this for you, via C<B::Hooks::AtRuntime>. You no longer need to do this yourself.
+this for you, via L<B::Hooks::AtRuntime>. You no longer need to do this yourself.
 
 =head2 Making Your Instance Immutable
 
@@ -431,7 +445,7 @@ When using C<field> or C<param>, we have some attribute shortcuts:
 
 See L<MooseX::Extended::Manual::Shortcuts> for a full explanation.
 
-=head1 INVALID ATTRIBUTE NAMES
+=head1 INVALID ATTRIBUTE DEFINITIONS
 
 The following L<Moose> code will print C<WhoAmI>. However, the second attribute
 name is clearly invalid.
@@ -446,11 +460,53 @@ name is clearly invalid.
     my $object = Some::Class->new( name => 'WhoAmI' );
     say $object->name;
 
-C<MooseX::Extended> will throw a C<Moose::Exception::InvalidAttributeDefinition> exception
+C<MooseX::Extended> will throw a L<Moose::Exception::InvalidAttributeDefinition> exception
 if it encounters an illegal method name for an attribute.
 
 This also applies to various attributes which allow method names, such as
 C<clone>, C<builder>, C<clearer>, C<writer>, C<reader>, and C<predicate>.
+
+Trying to pass a defined C<init_arg> to C<field> will also this exception.
+
+=head1 OPTIONAL FEATURES
+
+By default, L<MooseX::Extended> tries to be relatively conservative. However,
+you might want to turn it up to 11. There are optional features you can use
+for this. They're turned by the C<includes> flag:
+
+=head2 C<multi>
+
+    package My::Multi::Role {
+        use MooseX::Extended::Role includes => [qw/multi/];
+
+        multi sub point ( $self, $x, $y ) {
+            return My::Point->new( x => $x, y => $y );
+        }
+        multi sub point ( $self, $x, $y, $z ) {
+            return My::Point::3D->new( x => $x, y => $y, z => $z );
+        }
+    }
+
+C<multi> allows you to provide multiple method (or subroutine) bodies with the
+same name. We use L<Syntax::Keyword::MultiSub> to implement this, so see that module
+for caveats.
+
+It's quite possible to define multi subs that are ambiguous:
+
+    package Foo {
+        use MooseX::Extended includes => [qw/multi/];
+
+        multi sub foo ($self, @bar) { return '@bar' }
+        multi sub foo ($self, $bar) { return '$bar' }
+    }
+
+    say +Foo->new->foo(1);
+    say +Foo->new->foo(1,2,3);
+
+Both of the above will print the string C<@bar>. The second definition of
+C<foo> is effectively lost.
+
+C<multi> is available for Perl versions 5.26 or higher.
 
 =head1 DEBUGGER SUPPORT
 
@@ -512,10 +568,6 @@ C<MooseX::Extended>, but for roles.
 Some of this may just be wishful thinking. Some of this would be interesting if
 others would like to collaborate.
 
-=head2 Tests
-
-Tests! Many more tests! Volunteers welcome :)
-
 =head2 Configurable Types
 
 We provide C<MooseX::Extended::Types> for convenience, along with the C<declare> 
@@ -556,9 +608,21 @@ repository is L<https://github.com/Ovid/moosex-extreme/>.
 
 =over 4
 
+=item * L<Corinna|https://github.com/Ovid/Cor>
+
+The RFC of the new version of OOP planned for the Perl core.
+
 =item * L<MooseX::Modern|https://metacpan.org/pod/MooseX::Modern>
 
-=item * L<Corinna|https://github.com/Ovid/Cor>
+MooseX::Modern - Precision classes for Modern Perl
+
+=item * L<Zydeco|https://metacpan.org/pod/Zydeco>
+
+Zydeco - Jazz up your Perl
+
+=item * L<Dios|https://metacpan.org/pod/Dios>
+
+Dios - Declarative Inside-Out Syntax
 
 =back
 

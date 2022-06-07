@@ -38,7 +38,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use UI::Various::core;
 use UI::Various::container;
@@ -49,7 +49,7 @@ our @EXPORT_OK = qw();
 
 #########################################################################
 
-=item height [rw]
+=item height [rw, fixed]
 
 preferred (maximum) height of an application window / dialogue in
 (approximately) characters, should not exceed L<max_height of main "Window
@@ -92,7 +92,7 @@ sub max_width($;$)
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-=item width [rw]
+=item width [rw, fixed]
 
 preferred (maximum) width of an application window / dialogue in
 (approximately) characters, may not exceed L<max_width of main "Window

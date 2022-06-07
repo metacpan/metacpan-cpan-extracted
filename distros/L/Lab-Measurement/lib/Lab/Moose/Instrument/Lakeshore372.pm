@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Lakeshore372;
-$Lab::Moose::Instrument::Lakeshore372::VERSION = '3.810';
+$Lab::Moose::Instrument::Lakeshore372::VERSION = '3.820';
 #ABSTRACT: Lakeshore Model 372 Temperature Controller
 
 #
@@ -15,11 +15,8 @@ use Moose::Util::TypeConstraints qw/enum/;
 use MooseX::Params::Validate;
 use Lab::Moose::Instrument qw/
     validated_getter validated_setter setter_params /;
-use Lab::Moose::Instrument::Cache;
 use Carp;
 use namespace::autoclean;
-
-#use POSIX qw/log10 ceil floor/;
 
 extends 'Lab::Moose::Instrument';
 
@@ -141,6 +138,45 @@ sub get_heater_range {
     );
     my $output = delete $args{output};
     return $self->query( command => "RANGE? $output", %args );
+}
+
+
+sub set_heater_setup {
+    my ( $self, %args ) = validated_getter(
+        \@_,
+        %loop_arg,
+        resistance       => { isa => 'Lab::Moose::PosNum' },
+        max_current      => { isa => enum( [ 0, 1, 2 ] ) },
+        max_user_current => { isa => 'Lab::Moose::PosNum' },
+        display => { isa => enum( [ 0, 1 ] ) },
+    );
+    my $loop = delete $args{loop} // $self->default_loop;
+    my ( $resistance, $max_current, $max_user_current, $display )
+        = delete @args{qw/resistance max_current max_user_current display/};
+    $self->write(
+        command =>
+            "HTRSET $loop, $resistance, $max_current, $max_user_current, $display",
+        %args
+    );
+}
+
+sub get_heater_setup {
+    my ( $self, %args ) = validated_getter(
+        \@_,
+        %loop_arg,
+    );
+    my $loop = delete $args{loop} // $self->default_loop;
+    my $rv = $self->query( command => "HTRSET? $loop", %args );
+    my %htr;
+    @htr{qw/resistance max_current max_user_current display/} = split ',',
+        $rv;
+    return %htr;
+}
+
+
+sub get_sample_heater_output {
+    my ( $self, %args ) = validated_getter( \@_ );
+    return $self->query( command => "HTR?", %args );
 }
 
 
@@ -569,39 +605,6 @@ sub get_ramp {
 }
 
 
-sub set_heater_setup {
-    my ( $self, %args ) = validated_getter(
-        \@_,
-        %loop_arg,
-        resistance       => { isa => 'Lab::Moose::PosNum' },
-        max_current      => { isa => enum( [ 0, 1, 2 ] ) },
-        max_user_current => { isa => 'Lab::Moose::PosNum' },
-        display => { isa => enum( [ 0, 1 ] ) },
-    );
-    my $loop = delete $args{loop} // $self->default_loop;
-    my ( $resistance, $max_current, $max_user_current, $display )
-        = delete @args{qw/resistance max_current max_user_current display/};
-    $self->write(
-        command =>
-            "HTRSET $loop, $resistance, $max_current, $max_user_current, $display",
-        %args
-    );
-}
-
-sub get_heater_setup {
-    my ( $self, %args ) = validated_getter(
-        \@_,
-        %loop_arg,
-    );
-    my $loop = delete $args{loop} // $self->default_loop;
-    my $rv = $self->query( command => "HTRSET? $loop", %args );
-    my %htr;
-    @htr{qw/resistance max_current max_user_current display/} = split ',',
-        $rv;
-    return %htr;
-}
-
-
 sub set_scanner {
     my ( $self, %args ) = validated_getter(
         \@_,
@@ -686,7 +689,7 @@ Lab::Moose::Instrument::Lakeshore372 - Lakeshore Model 372 Temperature Controlle
 
 =head1 VERSION
 
-version 3.810
+version 3.820
 
 =head1 SYNOPSIS
 
@@ -790,6 +793,24 @@ alias for C<set_setpoint>
 
 For output 0 (sample heater), value is one of 0 (off), 1, ..., 8.
 For outputs 1 and 2, value is one of 0 and 1.
+
+=head2 set_heater_setup/get_heater_setup
+
+ $lakeshore->set_heater_setup(
+    loop => 0,
+    resistance => 1500, # Ohms
+    max_current => 0, # warm-up heater
+    max_user_current => 0.1, # Amps
+    display => 2, # Display power 
+ );
+
+ my %setup = $lakeshore->get_heater_setup(loop => 0);
+
+=head2 get_sample_heater_output
+
+ my $power = $lakeshore->get_sample_heater_output();
+
+Depending on setting, return either percentage of current range or power.
 
 =head2 set_outmode/get_outmode
 
@@ -945,18 +966,6 @@ Allowed values: 0 and 1.
  );
 
  my %rate = $lakeshore->get_ramp(loop => 0);
-
-=head2 set_heater_setup/get_heater_setup
-
- $lakeshore->set_heater_setup(
-    loop => 0,
-    resistance => 1500, # Ohms
-    max_current => 0, # warm-up heater
-    max_user_current => 0.1, # Amps
-    display => 2, # Display power 
- );
-
- my %setup = $lakeshore->get_heater_setup(loop => 0);
 
 =head2 set_scanner/get_scanner
 

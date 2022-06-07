@@ -8,6 +8,8 @@ use YAML::LibYAML::API;
 use Getopt::Long::Descriptive;
 use Encode;
 
+our $VERSION = '0.006'; # VERSION
+
 my ($opt, $usage) = describe_options(
     'yamltidy %o file(s)',
     [ 'config-file|c=s' => 'Config file' ],

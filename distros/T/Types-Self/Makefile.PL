@@ -25,7 +25,7 @@ my $meta = {
                           test      => { requires => { "Role::Tiny" => 0, "Test::More" => 0.96 } },
                         },
   "provides"         => {
-                          "Types::Self" => { file => "lib/Types/Self.pm", version => 0.001 },
+                          "Types::Self" => { file => "lib/Types/Self.pm", version => 0.002 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -39,7 +39,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Types-Self/project",
                         },
-  "version"          => 0.001,
+  "version"          => 0.002,
   "x_static_install" => 1,
 };
 

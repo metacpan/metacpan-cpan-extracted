@@ -19,7 +19,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "HTML-Widgets-NavMenu",
-  "dist_version" => "1.0902",
+  "dist_version" => "1.1000",
   "license" => "mit",
   "module_name" => "HTML::Widgets::NavMenu",
   "recursive_test_files" => 1,
@@ -27,7 +27,6 @@ my %module_build_args = (
     "Class::XSAccessor" => 0,
     "Exporter" => 0,
     "parent" => 0,
-    "perl" => "5.012",
     "strict" => 0,
     "vars" => 0,
     "warnings" => 0
@@ -38,7 +37,8 @@ my %module_build_args = (
     "IO::Scalar" => 0,
     "IPC::Open3" => 0,
     "Test::More" => "0.88",
-    "lib" => 0
+    "lib" => 0,
+    "perl" => "5.006"
   }
 );
 
@@ -50,7 +50,8 @@ my %fallback_build_requires = (
   "IPC::Open3" => 0,
   "Module::Build" => "0.28",
   "Test::More" => "0.88",
-  "lib" => 0
+  "lib" => 0,
+  "perl" => "5.006"
 );
 
 

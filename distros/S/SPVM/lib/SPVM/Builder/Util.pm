@@ -11,6 +11,7 @@ use List::Util 'min';
 use File::Basename 'dirname';
 use File::Spec;
 use SPVM::Builder::Config;
+use Encode 'decode';
 
 # SPVM::Builder::Util is used from Makefile.PL
 # so this module must be wrote as pure perl script, not contain XS functions.
@@ -116,6 +117,29 @@ sub slurp_binary {
   my $content = do { local $/; <$fh> };
   
   return $content;
+}
+
+sub slurp_utf8 {
+  my ($file) = @_;
+  
+  my $content = &slurp_binary($file);
+  
+  $content = decode('UTF-8', $content);
+  
+  return $content;
+}
+
+sub file_contains {
+  my ($file, $string) = @_;
+  
+  my $content = &slurp_utf8($file);
+  
+  my $contains;
+  if (index($content, $string) >= 0) {
+    $contains = 1;
+  }
+  
+  return $contains;
 }
 
 sub spurt_binary {
@@ -339,17 +363,16 @@ sub create_make_rule {
 
 sub get_spvm_builder_module_file_names {
   my @spvm_builder_module_file_names = qw(
-    SPVM/Builder/Exe.pm
     SPVM/Builder/API.pm
-    SPVM/Builder/Util/API.pm
-    SPVM/Builder/Config/Exe.pm
-    SPVM/Builder/LinkInfo.pm
-    SPVM/Builder/Generator/Lib.pm
-    SPVM/Builder/Config.pm
     SPVM/Builder/CC.pm
+    SPVM/Builder/Config/Exe.pm
+    SPVM/Builder/Config.pm
+    SPVM/Builder/Exe.pm
+    SPVM/Builder/LinkInfo.pm
     SPVM/Builder/ObjectFileInfo.pm
-    SPVM/Builder/Util.pm
     SPVM/Builder.pm
+    SPVM/Builder/Util/API.pm
+    SPVM/Builder/Util.pm
   );
   
   return \@spvm_builder_module_file_names;

@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::Role::CommandSet 0.055002;
+package Term::CLI::Role::CommandSet 0.057001;
 
 use 5.014;
 use warnings;
@@ -42,7 +42,9 @@ use namespace::clean 0.25;
 
 my $ERROR_STATUS  = -1;
 
-has parent => (
+requires qw( parent root_node );
+
+has '+parent' => (
     is       => 'rwp',
     weak_ref => 1,
     isa      => Maybe[ ConsumerOf ['Term::CLI::Role::CommandSet'] ],
@@ -186,15 +188,6 @@ sub find_matches {
     return find_obj_name_matches($text, $self->_get_command_list);
 }
 
-sub root_node {
-    my ($self) = my ($curr_node) = @_;
-
-    while ( my $parent = $curr_node->parent ) {
-        $curr_node = $parent;
-    }
-    return $curr_node // $self;
-}
-
 sub find_command {
     my ( $self, $text ) = @_;
 
@@ -281,9 +274,13 @@ sub complete_line {
         @list = map { $_->name } $self->find_matches( $text );
     }
     elsif ( my $cmd = $self->find_command( $words[0] ) ) {
+        shift @words;
         @list = $cmd->complete(
             $text => {
-                processed   => [shift @words],
+                processed   => [{
+                    element => $cmd,
+                    value   => $cmd->name,
+                }],
                 unprocessed => \@words,
                 options => {},
             }
@@ -338,10 +335,13 @@ sub execute_line {
         error        => q{},
         command_line => $cmd,
         command_path => [$self],
-        unparsed     => \@cmd,
+        unprocessed  => \@cmd,
+        processed    => [],
         options      => {},
         arguments    => [],
     );
+
+    $args{unparsed} = $args{unprocessed};
 
     return $self->try_callback( %args, status => $ERROR_STATUS,
         error => $error )
@@ -352,8 +352,11 @@ sub execute_line {
         $args{status} = $ERROR_STATUS;
     }
     elsif ( my $cmd_ref = $self->find_command( $cmd[0] ) ) {
+        my $cmd = shift @{$args{unprocessed}};
         %args = $cmd_ref->execute_command(
-            %args, unparsed => [ @cmd[ 1 .. $#cmd ] ] );
+            %args, 
+            processed => [ { element => $cmd_ref, value => $cmd } ],
+        );
     }
     else {
         $args{error}  = $self->error;
@@ -376,7 +379,7 @@ Term::CLI::Role::CommandSet - Role for (sub-)commands in Term::CLI
 
 =head1 VERSION
 
-version 0.055002
+version 0.057001
 
 =head1 SYNOPSIS
 
@@ -544,7 +547,9 @@ its corresponding L<Term::CLI::Argument>'s
 L<validate|Term::CLI::Argument/validate> method (e.g. C<3e-1> may have
 been converted to C<0.3>).
 
-=item C<unparsed>
+=item C<unparsed> (DEPRECATED)
+
+=item C<unprocessed>
 
 Reference to an array containing all the words on the command line that
 have not been parsed as arguments or sub-commands yet. In case of parse
@@ -558,7 +563,8 @@ L<Term::CLI::execute|Term::CLI/execute> method.
 =item C<command_path>
 
 Reference to an array containing the "parse tree", i.e. a list
-of object references:
+of object references that represent the commands and sub-commands
+that led up to this point:
 
     [
         InstanceOf['Term::CLI'],
@@ -571,6 +577,28 @@ L<Term::CLI> object.
 
 The I<OBJ_REF> will be somewhere in that list; it will be the last
 one if it is the "leaf" command.
+
+=item C<processed>
+
+More elaborate "parse tree": a list of hashes that represent all the
+elements on the command line that led up to this point, minus the
+L<Term::CLI> object itself.
+
+    [
+        {
+            element => InstanceOf['Term::CLI::Command'],
+            value   => String
+        },
+        {
+            element => InstanceOf['Term::CLI::Argument'],
+            value   => String
+        },
+        {
+            element => InstanceOf['Term::CLI::Argument'],
+            value   => String
+        },
+        ...
+    ]
 
 =back
 
@@ -586,14 +614,6 @@ X<commands>
 
 Return the list of subordinate C<Term::CLI::Command> objects
 (i.e. "sub-commands") sorted on C<name>.
-
-=item B<parent>
-X<parent>
-
-Return a reference to the object that "owns" this object.
-This is typically another object class that consumes this
-C<Term::CLI::Role::CommandSet> role, such as
-C<Term::CLI>(3p) or C<Term::CLI::Command>(3p), or C<undef>.
 
 =back
 
@@ -787,13 +807,6 @@ Examples:
     $line = $cli->readline( skip => qr{^\s*(?:#.*)?$} );
     exit if !defined $line;
 
-=item B<root_node>
-X<root_node>
-
-Walks L<parent|/parent> chain until it can go no further. Returns a
-reference to the object at the top. In a functional setup, this
-is expected to be a L<Term::CLI>(3p) object.
-
 =item B<try_callback> ( I<ARGS> )
 X<try_callback>
 
@@ -836,6 +849,8 @@ The simplest trick is to add a hidden section with an item list containing
 these methods.
 
 =over
+
+=item parent
 
 =item BUILD
 

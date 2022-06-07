@@ -13,16 +13,20 @@
 #  define dTHXfield(var)
 #endif
 
-typedef struct {
-  MMDB_s *mmdb;
+typedef struct IP__Geolocation__MMDB {
+  MMDB_s mmdb;
   SV *selfrv;
   dTHXfield(perl)
 } *IP__Geolocation__MMDB;
 
-#define NEW_IP__Geolocation__MMDB(var, type) \
-  Newxc(var, sizeof(*var) + sizeof(type), char, void); \
-  Zero(var, sizeof(*var) + sizeof(type), char); \
-  var->mmdb = (type *)((char *)var + sizeof(*var));
+static IP__Geolocation__MMDB
+new_IP__Geolocation__MMDB(void)
+{
+  IP__Geolocation__MMDB self;
+
+  Newxz(self, 1, struct IP__Geolocation__MMDB);
+  return self;
+}
 
 typedef struct {
   IP__Geolocation__MMDB self;
@@ -31,29 +35,14 @@ typedef struct {
   int max_depth;
 } iterate_data;
 
-#define INIT_iterate_data(DATA, SELF, DATA_CALLBACK, NODE_CALLBACK) { \
-  (DATA)->self = SELF; \
-  (DATA)->data_callback = DATA_CALLBACK; \
-  (DATA)->node_callback = NODE_CALLBACK; \
-  (DATA)->max_depth = (6 == (SELF)->mmdb->metadata.ip_version) ? 128 : 32; \
-}
-
-typedef struct {
-  char bytes[16];
-} numeric_ip;
-
-#define INIT_numeric_ip(IPNUM) \
-  Zero(&(IPNUM), sizeof(IPNUM), char)
-
-#define numeric_ip_to_bigint(SELF, IPNUM) \
-  to_bigint(SELF, (IPNUM).bytes, sizeof((IPNUM).bytes))
-
-#define numeric_ip_set_bit(IPNUM, BIT) { \
-  int num = (BIT); \
-  int denom = 8 * sizeof(char); \
-  int quot = num / denom; \
-  int rem = num % denom; \
-  (IPNUM).bytes[15 - quot] |= (128 >> (7 - rem)); \
+static void
+init_iterate_data(iterate_data *data, IP__Geolocation__MMDB self,
+                  SV *data_callback, SV *node_callback)
+{
+  data->self = self;
+  data->data_callback = data_callback;
+  data->node_callback = node_callback;
+  data->max_depth = (6 == self->mmdb.metadata.ip_version) ? 128 : 32;
 }
 
 static SV *
@@ -95,6 +84,30 @@ to_bigint(IP__Geolocation__MMDB self, const char *bytes, size_t size)
   LEAVE;
 
   return retval;
+}
+
+typedef struct {
+  char bytes[16];
+} numeric_ip;
+
+static void
+init_numeric_ip(numeric_ip *ipnum)
+{
+  Zero(ipnum, sizeof(*ipnum), char);
+}
+
+static void
+numeric_ip_set_bit(numeric_ip *ipnum, int bit)
+{
+  int quot = bit / (8 * sizeof(char));
+  int rem = bit % (8 * sizeof(char));
+  ipnum->bytes[15 - quot] |= (128 >> (7 - rem));
+}
+
+static SV *
+numeric_ip_to_bigint(IP__Geolocation__MMDB self, const numeric_ip *ipnum)
+{
+  return to_bigint(self, ipnum->bytes, sizeof(ipnum->bytes));
 }
 
 #if MMDB_UINT128_IS_BYTE_ARRAY
@@ -319,7 +332,7 @@ call_data_callback(iterate_data *data, numeric_ip ipnum, int depth,
           (unsigned int) record_entry->offset, error);
   }
 
-  SV *ip = numeric_ip_to_bigint(self, ipnum);
+  SV *ip = numeric_ip_to_bigint(self, &ipnum);
 
   dSP;
 
@@ -370,7 +383,7 @@ iterate_search_nodes(iterate_data *data, uint32_t node_num, numeric_ip ipnum,
                      int depth)
 {
   MMDB_search_node_s node;
-  int mmdb_error = MMDB_read_node(data->self->mmdb, node_num, &node);
+  int mmdb_error = MMDB_read_node(&data->self->mmdb, node_num, &node);
   if (MMDB_SUCCESS != mmdb_error) {
     const char *error = MMDB_strerror(mmdb_error);
     croak("Error reading node %u: %s", (unsigned int) node_num, error);
@@ -385,7 +398,7 @@ iterate_search_nodes(iterate_data *data, uint32_t node_num, numeric_ip ipnum,
   iterate_record_entry(data, ipnum, depth, node.left_record,
                        node.left_record_type, &node.left_record_entry);
 
-  numeric_ip_set_bit(ipnum, data->max_depth - depth);
+  numeric_ip_set_bit(&ipnum, data->max_depth - depth);
 
   iterate_record_entry(data, ipnum, depth, node.right_record,
                        node.right_record_type, &node.right_record_entry);
@@ -404,9 +417,9 @@ _new(class, file, flags)
     int mmdb_error;
     const char *error;
   CODE:
-    NEW_IP__Geolocation__MMDB(self, MMDB_s);
+    self = new_IP__Geolocation__MMDB();
 
-    mmdb_error = MMDB_open(file, flags, self->mmdb);
+    mmdb_error = MMDB_open(file, flags, &self->mmdb);
     if (MMDB_SUCCESS != mmdb_error) {
       Safefree(self);
       error = MMDB_strerror(mmdb_error);
@@ -425,7 +438,7 @@ void
 DESTROY(self)
   IP::Geolocation::MMDB self
   CODE:
-    MMDB_close(self->mmdb);
+    MMDB_close(&self->mmdb);
     Safefree(self);
 
 SV *
@@ -442,11 +455,11 @@ record_for_address(self, ...)
     if (items > 1) {
       ip_address = SvPVbyte_nolen(ST(1));
     }
-    if (NULL == ip_address|| '\0' == *ip_address) {
+    if (NULL == ip_address || '\0' == *ip_address) {
       croak("%s", "You must provide an IP address to look up");
     }
     result =
-      MMDB_lookup_string(self->mmdb, ip_address, &gai_error, &mmdb_error);
+      MMDB_lookup_string(&self->mmdb, ip_address, &gai_error, &mmdb_error);
     if (0 != gai_error) {
       croak("The IP address you provided (%s) is not a valid IPv4 or IPv6 address",
             ip_address);
@@ -490,8 +503,8 @@ iterate_search_tree(self, ...)
         node_callback = ST(2);
       }
     }
-    INIT_iterate_data(&data, self, data_callback, node_callback);
-    INIT_numeric_ip(ipnum);
+    init_iterate_data(&data, self, data_callback, node_callback);
+    init_numeric_ip(&ipnum);
     iterate_search_nodes(&data, 0, ipnum, 1);
 
 SV *
@@ -505,7 +518,7 @@ _metadata(self)
     RETVAL = &PL_sv_undef;
     entry_data_list = NULL;
     mmdb_error =
-      MMDB_get_metadata_as_entry_data_list(self->mmdb, &entry_data_list);
+      MMDB_get_metadata_as_entry_data_list(&self->mmdb, &entry_data_list);
     if (MMDB_SUCCESS == mmdb_error) {
       (void) decode_entry_data_list(self, entry_data_list,
                                     &RETVAL, &mmdb_error);

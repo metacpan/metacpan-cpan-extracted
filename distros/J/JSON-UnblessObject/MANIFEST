@@ -9,5 +9,10 @@ minil.toml
 t/00_compile.t
 t/01_synopsis.t
 t/10_unit/unbless_with_json_spec.t
+t/20-integration/Aniki/basic.t
+t/20-integration/DBIx-Class/basic.t
+t/20-integration/DBIx-Class/lib/My/Schema.pm
+t/20-integration/DBIx-Class/lib/My/Schema/Result/Foo.pm
+t/20-integration/Teng/basic.t
 META.yml
 MANIFEST

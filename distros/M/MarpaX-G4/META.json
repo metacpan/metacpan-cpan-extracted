@@ -1,0 +1,55 @@
+{
+   "abstract" : "Release 0.9 of MarpaX::G4",
+   "author" : [
+      "Axel Zuber"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "lgpl_3_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MarpaX-G4",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Marpa::R2" : "v8.0.0",
+            "Module::Build" : "v0.4.2",
+            "perl" : "v5.24.0"
+         }
+      }
+   },
+   "provides" : {
+      "MarpaX::G4" : {
+         "file" : "lib/MarpaX/G4.pm"
+      },
+      "MarpaX::G4::Actions" : {
+         "file" : "lib/MarpaX/G4/Parser.pm"
+      },
+      "MarpaX::G4::MarpaGen" : {
+         "file" : "lib/MarpaX/G4/MarpaGen.pm"
+      },
+      "MarpaX::G4::Parser" : {
+         "file" : "lib/MarpaX/G4/Parser.pm"
+      },
+      "MarpaX::G4::Symboltable" : {
+         "file" : "lib/MarpaX/G4/Symboltable.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/lgpl-3.0.txt"
+      ]
+   },
+   "version" : 0,
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

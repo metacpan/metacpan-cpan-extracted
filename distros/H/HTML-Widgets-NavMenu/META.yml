@@ -10,6 +10,7 @@ build_requires:
   Module::Build: '0.28'
   Test::More: '0.88'
   lib: '0'
+  perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Build: '0.28'
@@ -53,84 +54,83 @@ name: HTML-Widgets-NavMenu
 provides:
   HTML::Widgets::NavMenu:
     file: lib/HTML/Widgets/NavMenu.pm
-    version: '1.0902'
+    version: '1.1000'
   HTML::Widgets::NavMenu::Error:
-    file: lib/HTML/Widgets/NavMenu.pm
-    version: '1.0902'
+    file: lib/HTML/Widgets/NavMenu/Error.pm
+    version: '1.1000'
   HTML::Widgets::NavMenu::Error::Redirect:
-    file: lib/HTML/Widgets/NavMenu.pm
-    version: '1.0902'
+    file: lib/HTML/Widgets/NavMenu/Error/Redirect.pm
+    version: '1.1000'
   HTML::Widgets::NavMenu::EscapeHtml:
     file: lib/HTML/Widgets/NavMenu/EscapeHtml.pm
-    version: '1.0902'
+    version: '1.1000'
   HTML::Widgets::NavMenu::ExpandVal:
     file: lib/HTML/Widgets/NavMenu/ExpandVal.pm
-    version: '1.0902'
+    version: '1.1000'
   HTML::Widgets::NavMenu::HeaderRole:
     file: lib/HTML/Widgets/NavMenu/HeaderRole.pm
-    version: '1.0902'
+    version: '1.1000'
   HTML::Widgets::NavMenu::Iterator::Base:
     file: lib/HTML/Widgets/NavMenu/Iterator/Base.pm
-    version: '1.0902'
+    version: '1.1000'
   HTML::Widgets::NavMenu::Iterator::GetCurrentlyActive:
-    file: lib/HTML/Widgets/NavMenu.pm
-    version: '1.0902'
+    file: lib/HTML/Widgets/NavMenu/Iterator/GetCurrentlyActive.pm
+    version: '1.1000'
   HTML::Widgets::NavMenu::Iterator::Html:
     file: lib/HTML/Widgets/NavMenu/Iterator/Html.pm
-    version: '1.0902'
+    version: '1.1000'
   HTML::Widgets::NavMenu::Iterator::Html::Item:
     file: lib/HTML/Widgets/NavMenu/Iterator/Html/Item.pm
-    version: '1.0902'
+    version: '1.1000'
   HTML::Widgets::NavMenu::Iterator::JQTreeView:
     file: lib/HTML/Widgets/NavMenu/Iterator/JQTreeView.pm
-    version: '1.0902'
+    version: '1.1000'
   HTML::Widgets::NavMenu::Iterator::NavMenu:
     file: lib/HTML/Widgets/NavMenu/Iterator/NavMenu.pm
-    version: '1.0902'
+    version: '1.1000'
   HTML::Widgets::NavMenu::Iterator::NavMenu::HeaderRole:
     file: lib/HTML/Widgets/NavMenu/Iterator/NavMenu/HeaderRole.pm
-    version: '1.0902'
+    version: '1.1000'
   HTML::Widgets::NavMenu::Iterator::SiteMap:
     file: lib/HTML/Widgets/NavMenu/Iterator/SiteMap.pm
-    version: '1.0902'
+    version: '1.1000'
   HTML::Widgets::NavMenu::JQueryTreeView:
     file: lib/HTML/Widgets/NavMenu/JQueryTreeView.pm
-    version: '1.0902'
+    version: '1.1000'
   HTML::Widgets::NavMenu::LeadingPath::Component:
-    file: lib/HTML/Widgets/NavMenu.pm
-    version: '1.0902'
+    file: lib/HTML/Widgets/NavMenu/LeadingPath/Component.pm
+    version: '1.1000'
   HTML::Widgets::NavMenu::NodeDescription:
-    file: lib/HTML/Widgets/NavMenu.pm
-    version: '1.0902'
+    file: lib/HTML/Widgets/NavMenu/NodeDescription.pm
+    version: '1.1000'
   HTML::Widgets::NavMenu::Object:
     file: lib/HTML/Widgets/NavMenu/Object.pm
-    version: '1.0902'
+    version: '1.1000'
   HTML::Widgets::NavMenu::Predicate:
     file: lib/HTML/Widgets/NavMenu/Predicate.pm
-    version: '1.0902'
+    version: '1.1000'
   HTML::Widgets::NavMenu::TagGen:
     file: lib/HTML/Widgets/NavMenu/TagGen.pm
-    version: '1.0902'
+    version: '1.1000'
   HTML::Widgets::NavMenu::Tree::Iterator:
     file: lib/HTML/Widgets/NavMenu/Tree/Iterator.pm
-    version: '1.0902'
+    version: '1.1000'
   HTML::Widgets::NavMenu::Tree::Iterator::Item:
     file: lib/HTML/Widgets/NavMenu/Tree/Iterator/Item.pm
-    version: '1.0902'
+    version: '1.1000'
   HTML::Widgets::NavMenu::Tree::Iterator::Stack:
     file: lib/HTML/Widgets/NavMenu/Tree/Iterator/Stack.pm
-    version: '1.0902'
+    version: '1.1000'
   HTML::Widgets::NavMenu::Tree::Node:
     file: lib/HTML/Widgets/NavMenu/Tree/Node.pm
-    version: '1.0902'
+    version: '1.1000'
   HTML::Widgets::NavMenu::Url:
     file: lib/HTML/Widgets/NavMenu/Url.pm
-    version: '1.0902'
+    version: '1.1000'
 requires:
   Class::XSAccessor: '0'
   Exporter: '0'
   parent: '0'
-  perl: '5.012'
   strict: '0'
   vars: '0'
   warnings: '0'
@@ -138,7 +138,7 @@ resources:
   bugtracker: https://github.com/shlomif/perl-HTML-Widgets-NavMenu/issues
   homepage: http://web-cpan.shlomifish.org/modules/HTML-Widgets-NavMenu/
   repository: git://github.com/shlomif/perl-HTML-Widgets-NavMenu.git
-version: '1.0902'
+version: '1.1000'
 x_Dist_Zilla:
   perl:
     version: '5.034001'

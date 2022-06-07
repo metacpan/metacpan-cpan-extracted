@@ -48,6 +48,7 @@ html/TagNames/Apple.html
 html/TagNames/Audible.html
 html/TagNames/BMP.html
 html/TagNames/BPG.html
+html/TagNames/CBOR.html
 html/TagNames/Canon.html
 html/TagNames/CanonCustom.html
 html/TagNames/CanonRaw.html
@@ -193,6 +194,7 @@ html/idiosyncracies.html
 html/index.html
 html/install.html
 html/metafiles.html
+html/mistakes.html
 html/overview.png
 html/standards.html
 html/struct.html
@@ -217,6 +219,7 @@ lib/Image/ExifTool/BPG.pm
 lib/Image/ExifTool/BZZ.pm
 lib/Image/ExifTool/BigTIFF.pm
 lib/Image/ExifTool/BuildTagLookup.pm
+lib/Image/ExifTool/CBOR.pm
 lib/Image/ExifTool/Canon.pm
 lib/Image/ExifTool/CanonCustom.pm
 lib/Image/ExifTool/CanonRaw.pm
@@ -737,6 +740,7 @@ t/PNG_3.out
 t/PNG_4.out
 t/PNG_5.out
 t/PNG_6.out
+t/PNG_7.out
 t/PPM.t
 t/PPM_2.out
 t/PPM_3.out

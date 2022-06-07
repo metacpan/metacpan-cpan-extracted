@@ -1,5 +1,9 @@
 Revision history for Perl extension Sub-Meta
 
+0.15 2022-06-07T00:49:58Z
+    [IMPROVEMENTS]
+    - support perl 5.36
+
 0.14 2021-09-18T11:46:38Z
     [IMPROVEMENTS]
     - feat: type constraints for subroutines and Sub::Meta #42

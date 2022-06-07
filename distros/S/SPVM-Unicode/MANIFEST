@@ -1,0 +1,19 @@
+.gitignore
+Changes
+lib/SPVM/Unicode.c
+lib/SPVM/Unicode.config
+lib/SPVM/Unicode.native/include/.gitkeep
+lib/SPVM/Unicode.native/include/spvm_utf8proc.h
+lib/SPVM/Unicode.native/include/spvm_utf8proc_data.c
+lib/SPVM/Unicode.native/src/.gitkeep
+lib/SPVM/Unicode.native/src/spvm_utf8proc.c
+lib/SPVM/Unicode.pm
+lib/SPVM/Unicode.spvm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/basic.t
+t/lib/SPVM/TestCase/Unicode.spvm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

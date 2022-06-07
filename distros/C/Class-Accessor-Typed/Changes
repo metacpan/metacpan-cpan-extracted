@@ -1,5 +1,9 @@
 Revision history for Perl extension Class-Accessor-Typed
 
+0.03 2022-06-07T12:58:07Z
+
+    - support optional
+
 0.02 2019-10-17T14:14:18Z
 
     - support rw_lazy and ro_lazy

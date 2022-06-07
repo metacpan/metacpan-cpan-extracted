@@ -4,21 +4,14 @@ use warnings;
 
 use parent qw(Exporter);
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 our @EXPORT_OK = qw(
     unbless_object
 );
 
-use Scalar::Util qw(
-    blessed
-    reftype
-);
-
-use List::Util qw(
-    any
-);
-
+use Scalar::Util qw(blessed);
+use List::Util qw(any);
 use overload ();
 
 
@@ -212,6 +205,63 @@ For example, an blessed object can be encoded using JSON spec:
     encode_json($entity, { a => JSON_TYPE_INT, b => JSON_TYPE_STRING }),
     # => {"a":123,"b":"HELLO"}
 
+=head2 RESOLVERS
+
+The unbless_object function performs a resolver for a given object type.
+
+=over 4
+
+=item resolve_arrayref($object, $spec)
+
+When C<$spec> is C<ARRAYREF>, executes this function.
+C<$object> must either have C<@{}> overload or be an iterator with C<next> method.
+If C<$spec> is C<[JSON_TYPE_STRING, JSON_TYPE_STRING]>, then resolve like this C<list($object)-E<gt>[0], list($object)-E<gt>[1]>. C<list> function is an internal utility function that converts C<$object> to arrayref.
+
+=item resolve_hashref($object, $spec)
+
+When C<$spec> is C<HASHREF>, executes this function.
+If C<$spec> is C<{ foo =E<gt> JSON_TYPE_STRING, bar =E<gt> JSON_TYPE_STRING }>, then resolve like this C<{ foo =E<gt> $object-E<gt>foo, bar =E<gt> $object-E<gt>bar }>.
+
+=item resolve_json_type_arrayof($object, $spec)
+
+When C<$spec> is C<Cpanel::JSON::XS::Type::ArrayOf>, executes this function.
+C<$object> must either have C<@{}> overload or be an iterator with C<next> method.
+
+=item resolve_json_type_hashof($object, $spec)
+
+When C<$spec> is C<Cpanel::JSON::XS::Type::HashOf>, executes this function.
+C<$object> requires C<JSON_KEYS> function. C<JSON_KEYS> method is a whitelist of C<$object>
+that are allowed to be published as JSON.
+
+    package SomeEntity {
+        sub new {
+            my ($class, %args) = @_;
+            return bless \%args, $class
+        }
+
+        sub secret { shift->{secret} }
+
+        sub a { shift->{a} }
+        sub b { shift->{b} }
+
+        # Do not include keys that cannot be published like `secret`
+        sub JSON_KEYS { qw/a b/ }
+    }
+
+    my $entity = SomeEntity->new(a => 1, b => 2, secret => 'XXX');
+    unbless_object($entity, json_type_hashof(JSON_TYPE_STRING))
+    # => { a => 1, b => 2 }
+
+=item resolve_json_type_anyof($object, $spec)
+
+When C<$spec> is C<Cpanel::JSON::XS::Type::AnyOf>, executes this function.
+If C<$object> is available as array, it is resolved as array; if it is available as hash, it is resolved as hash; otherwise, it is resolved as scalar.
+
+=back
+
+=head1 SEE ALSO
+
+L<Cpanel::JSON::XS::Type>
 
 =head1 LICENSE
 

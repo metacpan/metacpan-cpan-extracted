@@ -1,7 +1,7 @@
 package UNIVERSAL::dump;
 
 # version info
-$VERSION= '0.08';
+$VERSION= '0.09';
 
 # be as strict and verbose as possible
 use strict;
@@ -197,11 +197,13 @@ You could try to convince me with a good patch.
 
 Elizabeth Mattijsen, <liz@dijkmat.nl>.
 
-Please report bugs to <perlbugs@dijkmat.nl>.
+Maintained by LNATION
+
+Please report bugs to <email@lnation.org>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, 2005, 2006, 2012 Elizabeth Mattijsen (liz@dijkmat.nl).
+Copyright (c) 2004, 2005, 2006, 2012 Elizabeth Mattijsen (liz@dijkmat.nl). 2022 LNATION (email@lnation.org).
 All rights reserved.  This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
 

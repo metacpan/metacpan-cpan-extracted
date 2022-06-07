@@ -15,13 +15,13 @@ MooseX::Extended::Manual::Cloning - An overview of MooseX::Extended optional att
 
 =head1 VERSION
 
-version 0.10
+version 0.20
 
 =head1 CLONING SUPPORT
 
 C<MooseX::Extended> offers optional, B<EXPERIMENTAL> support for attribute
 cloning, but differently from how we see it typically done. You can just pass
-the C<< clone => 1 >> argument to your attribute and it will be clone with
+the C<< clone => 1 >> argument to your attribute and it will be cloned with
 L<Storable>'s C<dclone> function every time you read or write that attribute,
 it will be cloned if it's a reference, ensuring that your object is
 effectively immutable.

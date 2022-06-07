@@ -1,0 +1,42 @@
+Source: libterm-cli-perl
+Section: perl
+Priority: optional
+Maintainer: Steven Bakker <steven.bakker@ams-ix.net>
+Build-Depends: debhelper (>= 9)
+Build-Depends-Indep: libcapture-tiny-perl (>= 0.25),
+ libfile-which-perl (>= 1.09),
+ liblocale-maketext-lexicon-perl (>= 1.00),
+ libmoo-perl (>= 1.000001),
+ libnamespace-clean-perl (>= 0.25),
+ libterm-readkey-perl (>= 2.32),
+ libterm-readline-gnu-perl (>= 1.24),
+ libtest-class-perl,
+ libtest-compile-perl (>= 1.2.0),
+ libtest-exception-perl (>= 0.35),
+ libtest-mockmodule-perl (>= 0.05),
+ libtest-output-perl (>= 1.03),
+ libtype-tiny-perl (>= 1.000005),
+ perl (>= 5.19.6)
+Standards-Version: 3.9.6
+Homepage: https://metacpan.org/release/Term-CLI
+
+Package: libterm-cli-perl
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends},
+ libfile-which-perl (>= 1.09),
+ liblocale-maketext-lexicon-perl (>= 1.00),
+ libmoo-perl (>= 1.000001),
+ libnamespace-clean-perl (>= 0.25),
+ libterm-readkey-perl (>= 2.32),
+ libterm-readline-gnu-perl (>= 1.24),
+ libtype-tiny-perl (>= 1.000005),
+ perl (>= 5.14.1)
+Description: CLI interpreter based on Term::ReadLine
+ Implement an easy-to-use command line interpreter based on
+ Term::ReadLine(3p). Although primarily aimed at use with the
+ Term::ReadLine::Gnu(3p) implementation, it also supports
+ Term::ReadLine::Perl(3p).
+ .
+ First-time users may want to read Term::CLI::Tutorial(3p) and
+ Term::CLI::Intro(3p) first, and peruse the example scripts in the source
+ distribution's examples and tutorial directories.

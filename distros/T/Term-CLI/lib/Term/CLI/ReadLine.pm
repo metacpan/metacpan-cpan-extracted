@@ -18,14 +18,14 @@
 #
 #=============================================================================
 
-package Term::CLI::ReadLine 0.055002;
+package Term::CLI::ReadLine 0.057001;
 
 use 5.014;
 use warnings;
 
 use parent 0.225 qw( Term::ReadLine );
 
-use Term::ReadKey 2.34 ();
+use Term::ReadKey 2.32 ();
 
 use namespace::clean 0.25;
 
@@ -225,9 +225,8 @@ sub _prepare_prompt {
 sub readline {    ## no critic (ProhibitBuiltinHomonyms)
     my ( $self, $prompt ) = @_;
 
-    local (%SIG) = %SIG;
-
-    $self->_set_signal_handlers;
+    # local(%SIG) logic does not work... :-(
+    my %old_SIG = $self->_set_signal_handlers;
 
     $prompt = $self->_prepare_prompt($prompt);
     $self->_set_ignore_keyboard_signals();
@@ -239,7 +238,20 @@ sub readline {    ## no critic (ProhibitBuiltinHomonyms)
             $self->AddHistory($input);
         }
     }
+    $self->_restore_signal_handlers( %old_SIG );
     return $input;
+}
+
+# CLI->_restore_signal_handlers( $HASH_REF );
+#
+# Re-set signal handlers that we overrode earlier.
+#
+sub _restore_signal_handlers {
+    my ($self, %old_SIG) = @_;
+    # Cannot assign slices to %SIG... :-(
+    while ( my ($sig, $handler) = each %old_SIG ) {
+        $SIG{$sig} = $handler;
+    }
 }
 
 # %old_sig = CLI->_set_signal_handlers();
@@ -247,11 +259,16 @@ sub readline {    ## no critic (ProhibitBuiltinHomonyms)
 # Set signal handlers to ensure proper terminal/CLI handling in the
 # face of various signals (^C ^\ ^Z).
 #
+# Return a hash with the overridden signal handlers.
+#
 sub _set_signal_handlers {
     ## no critic (RequireLocalizedPunctuationVars)
     my ($self) = @_;
 
-    my %old_SIG = %SIG;
+    my %old_SIG;
+
+    @old_SIG{qw( HUP INT QUIT ALRM TERM CONT )}
+        = @SIG{qw( HUP INT QUIT ALRM TERM CONT )};
 
     my $most_recent_signal = q{};
 
@@ -294,7 +311,9 @@ sub _set_signal_handlers {
 
     if ( $self->ReadLine =~ /::Gnu$/x ) {
         for my $sig (qw( HUP QUIT ALRM TERM )) {
-            $SIG{$sig} = $generic_handler if ref $old_SIG{$sig};
+            if ( ref $old_SIG{$sig} ) {
+                $SIG{$sig} = $generic_handler;
+            }
         }
     }
     else {
@@ -492,7 +511,7 @@ Term::CLI::ReadLine - Term::ReadLine compatibility layer for Term::CLI
 
 =head1 VERSION
 
-version 0.055002
+version 0.057001
 
 =head1 SYNOPSIS
 

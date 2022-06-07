@@ -53,7 +53,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use UI::Various::core;
 use UI::Various::toplevel;
@@ -65,7 +65,7 @@ our @EXPORT_OK = qw();
 
 #########################################################################
 
-=item border [rw, optional]
+=item border [rw, fixed, optional]
 
 a flag to indicate if the borders around the box and between its elements
 are visible or not
@@ -85,7 +85,7 @@ sub border($;$)
 		  @_);
 }
 
-=item columns [rw, recommended]
+=item columns [rw, fixed, recommended]
 
 the number of columns the box contains (numbering starts with 0)
 
@@ -105,7 +105,7 @@ sub columns($;$)
 		  @_);
 }
 
-=item rows [rw, recommended]
+=item rows [rw, fixed, recommended]
 
 the number of rows the box contains (numbering starts with 0)
 

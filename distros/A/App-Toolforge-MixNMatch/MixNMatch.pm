@@ -19,7 +19,7 @@ use Unicode::UTF8 qw(encode_utf8);
 Readonly::Scalar our $URI_BASE => 'https://mix-n-match.toolforge.org/';
 Readonly::Scalar our $URI_CATALOG_DETAIL => $URI_BASE.'api.php?query=catalog_details&catalog=%s';
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -123,7 +123,6 @@ sub _process_print_options {
 	if (! defined $print_options) {
 		return;
 	}
-
 
 	my $opts_hr = {};
 	foreach my $print_option (split m/,/, $print_options) {
@@ -250,7 +249,17 @@ App::Toolforge::MixNMatch - Perl class for mix-n-match application.
 
 =head1 DEPENDENCIES
 
-L<Getopt::Std>.
+L<Error::Pure>,
+L<Getopt::Std>,
+L<IO::Barf>,
+L<JSON::XS>,
+L<LWP::Simple>,
+L<Perl6::Slurp>,
+L<Readonly>,
+L<Toolforge::MixNMatch::Diff>,
+L<Toolforge::MixNMatch::Print::Catalog>,
+L<Toolforge::MixNMatch::Struct::Catalog>,
+L<Unicode::UTF8>.
 
 =head1 REPOSITORY
 
@@ -264,12 +273,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020 Michal Josef Špaček
+© 2020-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

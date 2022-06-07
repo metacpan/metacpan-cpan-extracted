@@ -126,7 +126,7 @@ DESCRIPTION
 
     The currently-supported websites are: podcasts.apple.com
     (StreamFinder::Apple), bitchute.com (StreamFinder::Bitchute),
-    blogger.com (StreamFinder::Blogger), brandnewtube.com
+    blogger.com (StreamFinder::Blogger), brandnewtube.com and ugetube.com
     (StreamFinder::BrandNewTube), brighteon.com (StreamFinder::Brighteon),
     castbox.fm (StreamFinder::Castbox), podcasts.google.com
     (StreamFinder::Google), iheartradio.com (StreamFinder::IHeartRadio),

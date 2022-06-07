@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Tiny::_HalfOp::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Tiny::_HalfOp::VERSION   = '1.012004';
+	$Type::Tiny::_HalfOp::VERSION   = '1.012005';
 }
 
 $Type::Tiny::_HalfOp::VERSION =~ tr/_//d;
@@ -25,7 +25,7 @@ sub complete {
 	my ( $self, $type ) = @_;
 	my $complete_type = $type->parameterize( @{ $self->{param} } );
 	my $method        = overload::Method( $complete_type, $self->{op} );
-	$complete_type->$method( $self->{type} );
+	$complete_type->$method( $self->{type}, undef );
 }
 
 1;

@@ -6,4 +6,12 @@ Home page:    <https://metacpan.org/release/Types-Self>
 Bug tracker:  <https://github.com/tobyink/p5-types-self/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.002	2022-06-07
+
+ [ Documentation ]
+ - Expanded documentation.
+
+ [ Other ]
+ - Added: Added a `coercions_for_Self` function.
+
 0.001	2022-04-21	Initial release

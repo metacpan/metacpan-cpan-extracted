@@ -22,7 +22,7 @@ Term::CLI::Tutorial - tips, tricks, and examples for Term::CLI
 
 =head1 VERSION
 
-version 0.055002
+version 0.057001
 
 =head1 SYNOPSIS
 
@@ -558,28 +558,28 @@ arguments:
 =item *
 
 The C<echo> command takes zero or more arbitrary string arguments
-(L<M6::CLI::Argument::String>).
+(L<Term::CLI::Argument::String>).
 
 =item *
 
 The C<make> command takes two string arguments, each from a set
 of pre-defined values.
-(L<M6::CLI::Argument::Enum>).
+(L<Term::CLI::Argument::Enum>).
 
 =item *
 
 The C<ls> command demonstrates the use of file name arguments
-(L<M6::CLI::Argument::Filename>).
+(L<Term::CLI::Argument::Filename>).
 
 =item *
 
 The C<cp> command demonstrates how to set up a variable number
-of arguments (L<M6::CLI::Argument::Filename>).
+of arguments (L<Term::CLI::Argument::Filename>).
 
 =item *
 
 The C<sleep> command demonstrates a numerical argument
-(L<M6::CLI::Argument::Int>).
+(L<Term::CLI::Argument::Int>).
 
 =back
 
@@ -1565,22 +1565,22 @@ when the list of possible values has to be expanded.
 
 So, let's rewrite the C<interface> command definition. Instead of:
 
-	arguments => [
-		Term::CLI::Argument::String->new( name => 'iface' )
-	],
+    arguments => [
+        Term::CLI::Argument::String->new( name => 'iface' )
+    ],
 
 We specify:
 
-	arguments => [
-		Term::CLI::Argument::Enum->new(
-			name => 'iface',
-			value_list => sub {
-				my $if_t = readpipe('ip link show 2>/dev/null') // '';
-				my @if_l = $if_t =~ /^ \d+ : \s (\S+): \s/gxms;
-				return \@if_l;
-			}
-		),
-	],
+    arguments => [
+        Term::CLI::Argument::Enum->new(
+            name => 'iface',
+            value_list => sub {
+                my $if_t = readpipe('ip link show 2>/dev/null') // '';
+                my @if_l = $if_t =~ /^ \d+ : \s (\S+): \s/gxms;
+                return \@if_l;
+            }
+        ),
+    ],
 
 This results in F<example_18_dynamic_enum.pl>:
 
@@ -1588,12 +1588,12 @@ This results in F<example_18_dynamic_enum.pl>:
 
     [Welcome to BSSH]
     bssh> interface <TAB><TAB>
-	lo        virbr0    virbr1    wlp113s0
+    lo        virbr0    virbr1    wlp113s0
 
 Now, when I plug in my USB-C dongle with an Ethernet adapter, I get:
 
     bssh> interface <TAB><TAB>
-	enp0s13f0u3u1  lo   virbr0    virbr1   wlp113s0
+    enp0s13f0u3u1  lo   virbr0    virbr1   wlp113s0
 
 Neat, huh?
 

@@ -29,7 +29,8 @@ allows configuration via import lists:
         types    => [qw/HashRef ArrayRef/],
         excludes => [qw/StrictConstructor/];
 
-We may add a new `includes` feature if a change:
+If you wish to extend `MooseX::Extended`, please use the C<includes> flag if
+the code:
 
 * Does not backport to `v5.20.0`
 * Breaks existing `MooseX::Extended` code
@@ -37,7 +38,4 @@ We may add a new `includes` feature if a change:
 
 For example:
 
-    use MooseX::Extended includes => [qw/some_new_feature/];
-
-This is not yet implemented. The key idea here is that we want to be safe and
-not break existing code.
+    use MooseX::Extended includes => [qw/multi/];

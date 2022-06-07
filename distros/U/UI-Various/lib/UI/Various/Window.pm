@@ -40,7 +40,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use UI::Various::core;
 use UI::Various::toplevel;
@@ -52,7 +52,7 @@ our @EXPORT_OK = qw();
 
 #########################################################################
 
-=item title [rw, optional]
+=item title [rw, fixed, optional]
 
 an optional title string for the window as string or variable reference
 

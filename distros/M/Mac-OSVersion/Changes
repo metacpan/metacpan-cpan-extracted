@@ -1,5 +1,8 @@
 Revision history for Perl module Ma::OSVersion
 
+1.008 2022-06-07T01:05:22Z
+	* Update macOS 13 to "Ventura"
+
 1.007 2022-01-09T03:15:09Z
 
 	* Added macOS 13 Mammoth. Maybe that's the name, maybe it's not. I'll

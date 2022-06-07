@@ -3,6 +3,9 @@
 
 #include "spvm_typedecl.h"
 
+
+
+
 enum {
   SPVM_DESCRIPTOR_C_ID_MULNUM_T,
   SPVM_DESCRIPTOR_C_ID_POINTER_T,
@@ -23,6 +26,7 @@ struct spvm_descriptor {
   int32_t id;
 };
 
+const char* SPVM_DESCRIPTOR_get_name(SPVM_COMPILER* compiler, int32_t id);
 SPVM_DESCRIPTOR* SPVM_DESCRIPTOR_new(SPVM_COMPILER* compiler);
 const char* const* SPVM_DESCRIPTOR_C_ID_NAMES(void);
 

@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Types::Common::Numeric::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Common::Numeric::VERSION   = '1.012004';
+	$Types::Common::Numeric::VERSION   = '1.012005';
 }
 
 $Types::Common::Numeric::VERSION =~ tr/_//d;
@@ -200,9 +200,9 @@ for my $base ( qw/Num Int/ ) {
 				);
 			}
 			push @whines, sprintf(
-				"length(%s) is %d",
+				"%s is %s",
 				$varname,
-				length( $value ),
+				$value,
 			);
 			return \@whines;
 		},

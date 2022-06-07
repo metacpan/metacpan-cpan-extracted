@@ -56,7 +56,7 @@ EXAMPLE1
      #                 json_file or catalog_id - Catalog ID or JSON file
      #                 [print_options] - Print options (type, count, year_months, users)
 
-  EXAMPLE2
+EXAMPLE2
      mix-n-match print 3869
 
      # Output like (20201219 - https://mix-n-match.toolforge.org/#/catalog/3869):
@@ -77,7 +77,7 @@ EXAMPLE1
      #         Epìdosis (54694): 1
      #         Auxiliary data matcher (4): 1
 
-   EXAMPLE3
+EXAMPLE3
      mix-n-match download 3869
 
      # Output:
@@ -102,17 +102,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2020 Michal Josef Špaček
+    © 2020-2022 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.04
-
-POD ERRORS
-    Hey! The above document had some coding errors, which are explained
-    below:
-
-    Around line 144:
-        You forgot a '=back' before '=head1'
+    0.05
 

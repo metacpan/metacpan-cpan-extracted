@@ -3,6 +3,7 @@ Changes
 LICENSE
 META.json
 README.md
+benchmark/bench.pl
 cpanfile
 lib/Class/Accessor/Typed.pm
 minil.toml

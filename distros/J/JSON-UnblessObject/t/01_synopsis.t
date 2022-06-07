@@ -1,5 +1,5 @@
 use Test2::V0;
-use Test2::Require::Module 'Cpanel::JSON::XS';
+use Test2::Require::Module 'Cpanel::JSON::XS' => '4.00';
 
 use JSON::UnblessObject qw(unbless_object);
 

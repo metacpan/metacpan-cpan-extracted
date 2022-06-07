@@ -6,11 +6,12 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4;
+plan tests => 5;
 
 my @module_files = (
     'Authen/Pluggable.pm',
     'Authen/Pluggable/AD.pm',
+    'Authen/Pluggable/JSON.pm',
     'Authen/Pluggable/Passwd.pm'
 );
 

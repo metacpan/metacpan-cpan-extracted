@@ -1,0 +1,968 @@
+# Copyright 2022 Axel Zuber
+# This file is part of MarpaX::G4.  MarpaX::G4 is free software: you can
+# redistribute it and/or modify it under the terms of the GNU Lesser
+# General Public License as published by the Free Software Foundation,
+# either version 3 of the License, or (at your option) any later version.
+#
+# MarpaX::G4 is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser
+# General Public License along with MarpaX::G4.  If not, see
+# http://www.gnu.org/licenses/.
+
+=head1 NAME
+
+MarpaX::G4 - Convert Antlr4 grammars to Marpa::R2 syntax.
+
+=head1 Rationale
+
+I observed that Marpa::R2 is quite a bit faster than Parse::RecDescent. The lack of
+anonymous quantified subrules however makes non-trivial grammars quite verbose since
+complex rules have to be manually split into the required subrules.
+For my use case (detailed in section 'Real life example : Translating a PL/SQL grammar') that was not feasible.
+
+I decided to bootstrap an Oracle Marpa grammar from an Antlr4 grammar available on github by using
+Marpa to translate the Antlr4 grammar to Marpa::R2 syntax.
+
+(I was working in an airgapped environment that provided Perl but not the option
+to install the antlr4 package in Python)
+
+=head1 Synopsis
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+normalize-whitespace: 1
+
+    use File::Basename;
+    use Getopt::Std;
+    use MarpaX::G4;
+
+    use vars qw($scriptName);
+
+    BEGIN { $scriptName = basename($0); }
+
+    my $options = {};
+
+    die 'Invalid option(s) given'            if !getopts( $MarpaX::G4::optstr, $options );
+    MarpaX::G4::printHelpScreen($scriptName) if exists $options->{h};
+
+    my $grammartext =<<'INPUT';
+    grammar Exp;
+
+    eval        :    additionExp
+                ;
+    additionExp :    multiplyExp ( '+' multiplyExp | '-' multiplyExp )*
+                ;
+    multiplyExp :    atomExp ( '*' atomExp | '/' atomExp )*
+                ;
+    atomExp     :    Number
+                |    '(' additionExp ')'
+                ;
+    Number      :    ('0'..'9')+ ('.' ('0'..'9')+)?
+                ;
+    /* We're going to ignore all white space characters */
+    WS          :   (' ' | '\t' | '\r'| '\n')+ ->HIDDEN
+                ;
+    INPUT
+
+    my $translator = MarpaX::G4->new();
+    $translator->translatestring( $grammartext, $options );
+
+    exit 0
+
+=for MarpaX::G4::Display::End
+
+with the option '-c' for stripping comments generates the output
+
+=for MarpaX::G4::Display
+name: Landing page output
+normalize-whitespace: 1
+
+    lexeme default = latm => 1
+
+    :start          ::= eval
+
+    # ---
+    # Discard rule from redirect options :
+    :discard        ~   <discarded redirects>
+    <discarded redirects> ~   WS
+    # ---
+    eval            ::= additionExp
+    additionExp     ::= multiplyExp additionExp_002
+    additionExp_001 ::= '+' multiplyExp
+                    |   '-' multiplyExp
+    additionExp_002 ::= additionExp_001*
+
+    multiplyExp     ::= atomExp multiplyExp_002
+    multiplyExp_001 ::= '*' atomExp
+                    |   '/' atomExp
+    multiplyExp_002 ::= multiplyExp_001*
+
+    atomExp         ::= Number
+                    |   '(' additionExp ')'
+    Number          ::= Number_002 opt_Number_006
+    Number_001      ~   [0-9]
+    Number_002      ::= Number_001+
+    Number_003      ~   [0-9]
+    Number_004      ::= Number_003+
+    Number_005      ::= '.' Number_004
+    opt_Number_006  ::=
+    opt_Number_006  ::= Number_005
+
+    WS              ::= WS_002
+    WS_001          ~   ' '
+                    |   '\t'
+                    |   '\r'
+                    |   '\n'
+    WS_002          ::= WS_001+
+
+=for MarpaX::G4::Display::End
+
+=head1 Description
+
+=head2 Overview
+
+MarpaX::G4 translates an Antlr4 grammar
+(possibly spread over multiple files)
+to Marpa::R2 and writes it to a single output file.
+
+This document provides a short tutorial on the usage of MarpaX::G4
+and the potential pitfalls while using it.
+
+=head1 Implementation
+
+C<MarpaX::G4> is split into 3 packages :
+
+=over 4
+
+=item * C<Parser> creates a C<Marpa::R2> parse tree from the antlr4 grammar file(s)
+
+=item * C<Symboltable> manages the rules from the parse tree
+
+=item * C<MarpaGen> generates a C<Marpa::R2> grammar from the rules
+
+=back
+
+=head1 Usage
+
+Calling MarpaX::G4::printHelpScreen with the script name returns the help screen :
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    parseg4.pl - Antlr4 to Marpa::R2 converter
+
+    Usage: parseg4.pl [-cdefghikprtuv] [-s <startsymbol>] [-o <outputfile>] <file1>[ <file2> ...]
+
+    -c                  strip all comments and actions (except inline actions)
+    -d                  dump the parse tree
+    -e                  embed the g4 inline actions into the marpa grammar
+                        (default : prefix as comments ahead of the rule)
+    -f                  convert fragments to classes where applicable
+    -g                  convert lazy to greedy quantifiers
+                        (CAVEAT: this might change the grammar semantics)
+    -h                  print this help and exit
+    -i                  ignore redirects (don't discard redirected rules)
+    -k                  build case-insensitive keywords from single-letter fragments
+    -o <outputfile>     specify the output file. default is stdout
+    -p                  strip inline comments and actions
+    -r                  verify the consistency of the symbol table
+    -s <startsymbol>    specify the start rule of the grammar
+                        (default: 1st rule of the 1st input file)
+    -t                  trace the grammar generation
+    -u                  make literals and classes case-insensitive
+    -v                  dump the symbol table
+
+=for MarpaX::G4::Display::End
+
+=head2 Detailed Description of options
+
+=head3 C<-c> strip all comments and actions (except inline actions)
+
+This input with standalone and embedded comments
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    /* This is a sample grammar */
+
+    A  : B C;
+    B  : 'Hello' # Symbol C contributes 'world!'
+       ;
+    C  : 'World !'
+       ;
+
+=for MarpaX::G4::Display::End
+
+gives this result :
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    lexeme default = latm => 1
+
+    :start ::= A
+
+    A ::= B C
+    B ~   'Hello'
+    C ~   'World !'
+
+=for MarpaX::G4::Display::End
+
+=head3 C<-d> dumps the parse tree created by the parser to stdout.
+
+MarpaX::G4 dumps the parse tree returned by the parser to stdout.
+
+=head3 C<-e> embed the g4 inline actions into the marpa grammar
+
+If you are using MarpaX::G4 to translate a pseudo-antlr4 grammar where
+you already want to embed actions from a Marpa::R2 action package,
+you can use option C<-e> to copy over the actions from source to destination.
+This example
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    A  : B C;
+    
+    B  : 'Hello'    { do_action_b }
+       ;
+    C  : 'World !'  { do_action_c }
+       ;
+
+=for MarpaX::G4::Display::End
+
+gives this result :
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    lexeme default = latm => 1
+
+    :start ::= A
+
+    A ::= B C
+    B ~   'Hello'                            action =>  do_action_b
+    C ~   'World !'                          action =>  do_action_c
+
+=for MarpaX::G4::Display::End
+
+The actions have to be defined in a package that is added to the grammar
+with an 'action_object => '<action package' clause, where <action package>
+is the name of the package with the action sub's.
+
+
+=head3 C<-f> convert fragments to classes where applicable
+
+Option C<-f> can simplify certain grammars.
+
+This example
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    A   : THIRTYTWOBITADDRESS+;
+
+    THIRTYTWOBITADDRESS     : HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT;
+    fragment HEX_DIGIT      : HEX_LETTER | DECIMAL_DIGIT;
+    fragment HEX_LETTER     : 'A' | 'B' | 'C' | 'E' | 'F';
+    fragment DECIMAL_DIGIT  : ('0'..'9');
+
+=for MarpaX::G4::Display::End
+
+gives this result :
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    lexeme default = latm => 1
+
+    :start              ::= A
+
+    A                   ::= A_001
+    A_001               ::= THIRTYTWOBITADDRESS+
+
+    THIRTYTWOBITADDRESS ::= HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
+    HEX_DIGIT           ~   HEX_DIGIT_001
+    HEX_DIGIT_001       ~   HEX_LETTER
+                        |   DECIMAL_DIGIT
+
+    HEX_LETTER          ~   HEX_LETTER_001
+    HEX_LETTER_001      ~   'A'
+                        |   'B'
+                        |   'C'
+                        |   'E'
+                        |   'F'
+
+    DECIMAL_DIGIT       ~   DECIMAL_DIGIT_001
+    DECIMAL_DIGIT_001   ~   [0-9]
+
+=for MarpaX::G4::Display::End
+
+With option C<-f> this is simplified to
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    lexeme default = latm => 1
+
+    :start            ::= A
+
+    A                 ::= A_001
+    A_001             ::= SIXTEENBITADDRESS+
+
+    SIXTEENBITADDRESS ::= HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
+    HEX_DIGIT         ~   HEX_DIGIT_001
+    HEX_DIGIT_001     ~   HEX_LETTER
+                      |   DECIMAL_DIGIT
+
+    HEX_LETTER        ~   [ABCEF]
+
+    DECIMAL_DIGIT     ~   [0-9]
+
+=for MarpaX::G4::Display::End
+
+Yes, i'm aware that the 2 trailing classes can be merged into a single class, but i wanted to retain the original rules
+so i did not consider optimizations that would remove one of them.
+
+=head3 C<-g> convert lazy to greedy quantifiers
+
+This input with a lazy quantifier in rule 'C'
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    A     : C;
+
+    B     : 'Hello'
+          ;
+    C     : (B C)+?
+          ;
+    D     : 'World !'
+          ;
+
+=for MarpaX::G4::Display::End
+
+gives this result :
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    lexeme default = latm => 1
+    
+    :start ::= A
+    
+    A     ::= C
+    B     ~   'Hello'
+    C     ::= C_002
+    C_001 ::= B D
+    C_002 ::= C_001+
+    
+    D     ~   'World !'
+
+=for MarpaX::G4::Display::End
+
+Without option L<-g> the input would be rejected with the error message
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    lazy quantifier +? in rule C not supported by Marpa at MarpaX/G4/MarpaGen.pm line 86.
+
+=for MarpaX::G4::Display::End
+
+B<CAVEAT:> transforming lazy into greedy quantifiers can make the generated Marpa::R2 grammar
+incompatible with the original Antlr4 grammar. If you run into problems, you'll have to manually
+tweak either the original or the generated grammar.
+
+=head3 C<-h> print the help screen and exit
+
+=head3 C<-i> ignore redirects (don't discard redirected rules)
+
+This input with different redirects
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    A       : B C;
+
+    B       : 'Hello'   -> channel(DIRECTIVE)
+            ;
+    C       : 'World !'
+            ;
+
+    WS      : [\s]+      -> hidden
+            ;
+    COMMENT : '#' [^\n]* -> skip
+            ;
+
+=for MarpaX::G4::Display::End
+
+gives this result :
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    lexeme default = latm => 1
+
+    :start      ::= A
+
+    # ---
+    # Discard rule from redirect options :
+    :discard    ~   <discarded redirects>
+    <discarded redirects> ~   COMMENT
+                |   WS
+    # ---
+    A           ::= B C
+    B           ~   'Hello'
+    C           ~   'World !'
+    WS          ::= [\s]+
+    COMMENT     ::= '#' COMMENT_001
+    COMMENT_001 ~   [^\n]*
+
+
+=for MarpaX::G4::Display::End
+
+Redirects to 'skip' and 'hidden' are mapped to the ':discard' directive. With option L<-i> other redirects
+are ignored (i.e. the rules tagged with the redirects are added to the generated grammar).
+Without option L<-i> they are also mapped to the ':discard' directive.
+
+B<CAVEAT:> Depending on the input grammar, MarpaX::G4 might map the redirected rules to G1 instead of L0
+rules. You'll have to manually replace the '::=' operator with '~'. If you miss this, the grammar will not work
+as expected.
+
+=head3 C<-k> build case-insensitive keywords from single-letter fragments
+
+In some grammars keywords are made case-insensitive by splitting them into terminals consisting of lower/upper case
+versions of a letter. The Marpa::R2 version of such a grammar could use the Marpa::R2 C<:i> literal suffix.
+This example grammar
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    A       : B C;
+
+    B       : H E L L O
+            ;
+    C       : W O R L D '!'
+            ;
+
+    fragment D : ('d'|'D');
+    fragment E : ('e'|'E');
+    fragment H : ('h'|'H');
+    fragment L : ('l'|'L');
+    fragment O : ('o'|'O');
+    fragment R : ('r'|'R');
+    fragment W : ('w'|'W');
+
+=for MarpaX::G4::Display::End
+
+gives this result :
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    lexeme default = latm => 1
+
+    :start ::= A
+
+    A     ::= B C
+    B     ::= 'hello':i
+    C     ::= 'world!':i
+
+=for MarpaX::G4::Display::End
+
+=head3 C<-p> strip inline comments and actions
+
+If you want to discard the original antlr4 actions
+(and potentially add actions to the generated grammar)
+use option C<-p> to discard the antlr4 actions.
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    A  : B C;
+
+    B  : 'Hello'    { do_action_b }
+       ;
+    C  : 'World !'  { do_action_c }
+       ;
+
+=for MarpaX::G4::Display::End
+
+gives this result :
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    lexeme default = latm => 1
+
+    :start ::= A
+
+    A ::= B C
+    B ~   'Hello'
+    C ~   'World !'
+
+=for MarpaX::G4::Display::End
+
+B<CAVEAT:> The MarpaX::G4 rule for embedded actions is quite simplistic.
+If an embedded action uses features like curly braces embedded in literals or nested blocks,
+this rule will fail. In that case you have 2 options :
+
+=over 4
+
+=item * Preprocess the input grammar and remove the offending action
+
+=item * Tweak the MarpaX::G4::Parser '<Inline Action>' rule to successfully recognize this action.
+
+=back
+
+=head3 C<-r> verify the consistency of the symbol table
+
+Option C<-r> generates a report at the end of processing that lists the grammar rules in 2 sections :
+composite and basic rules.
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    A  : B C;
+
+    B  : 'Hello'    { do_action_b }
+       ;
+    C  : 'World !'  { do_action_c }
+       ;
+
+=for MarpaX::G4::Display::End
+
+gives this result :
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    ===
+    === Composite Rules
+    ===
+    
+        +-------------------------------------------------------- rule name
+     +--!-------------------------------------------------------- Fragment (F) or regular rule
+     !  !                                              +--------- redirected (->) or contributing rule
+     !  !                                              !   +----- number of rule references
+     !  !                                              !   !   +- list of rule references
+     !  !                                              !   !   !
+     V  V                                              V   V   V
+    [ ][A                                            ][  ][ 2] B                C
+    
+    ===
+    === Basic Rules
+    ===
+    
+        +-------------------------------------------------------- rule name
+     +--!-------------------------------------------------------- Fragment (F) or regular rule
+     !  !                                              +--------- redirected (->) or contributing rule
+     !  !                                              !   +----- n/a
+     !  !                                              !   !
+     V  V                                              V   V
+    [ ][B                                            ][  ][  ]
+    [ ][C                                            ][  ][  ]
+    
+    lexeme default = latm => 1
+    
+    :start ::= A
+    
+    A ::= B C
+    #  do_action_b
+    B ~   'Hello'
+    #  do_action_c
+    C ~   'World !'
+
+=for MarpaX::G4::Display::End
+
+=head3 C<-s [startsymbol]> specify the start rule of the grammar
+
+MarpaX::G4::MarpaGen creates the output grammar by computing the convex hull of the start symbol. It does that by
+collecting the referenced rules of the start symbol, then collecting the referenced rules of these and so on until
+we only have basic rules left and the process terminates.
+
+By default, the start symbol is the first symbol from the first input file. Option C<-s> overrides this default.
+You may want to do that for 2 reasons :
+
+=over 4
+
+=item * The start symbol of the grammar is NOT the first symbol in the first input file.
+
+=item * You are interested in a subset of the original grammar
+(e.g. you are interested in a grammar for CREATE TABLE but not all statements supported by Oracle)
+
+=back
+
+Processing the grammar below with option S<-s B>
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    A  : B C;
+
+    B  : 'Hello'
+       ;
+    C  : 'World !'
+       ;
+
+=for MarpaX::G4::Display::End
+
+gives this result :
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    WARNING: the rules listed below are orphaned. They can't be reached from the start rule:
+    =======:
+
+           +----------------------------- rule name
+        +--!----------------------------- Lexical (L) or parser rule
+     +--!--!----------------------------- Fragment (F) or regular rule
+     !  !  !
+     V  V  V
+    [ ][ ] A
+    [ ][ ] C
+
+
+    lexeme default = latm => 1
+
+    :start ::= B
+
+    #  do_action_b
+    B ~   'Hello'
+
+=for MarpaX::G4::Display::End
+
+=head3 C<-t> trace the grammar generation
+
+Option C<-t> enables a trace mode for the actions embedded in the grammar in MarpaX::G4::Parser.
+This is quite useful in debugging scenarios. In regular operations you can ignore this option.
+
+=head3 C<-u> make literals and classes case-insensitive
+
+C<-u> is useful for generating grammars where lexemes should be recognized irrespective of case.
+Processing the grammar below
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    A   : BINDVAR+;
+
+    BINDVAR
+        : ':Prefix:' SIMPLE_LETTER  (SIMPLE_LETTER | SINGLE_DIGIT | '_')*
+        ;
+
+    fragment SIMPLE_LETTER  : [A-Z];
+    fragment SINGLE_DIGIT   : ('0'..'9');
+
+=for MarpaX::G4::Display::End
+
+gives this result :
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    lexeme default = latm => 1
+
+    :start           ::= A
+
+    A                ::= A_001
+    A_001            ::= BINDVAR+
+
+    BINDVAR          ::= ':prefix:':i SIMPLE_LETTER BINDVAR_002
+    BINDVAR_001      ::= SIMPLE_LETTER
+                     |   SINGLE_DIGIT
+                     |   '_'
+    BINDVAR_002      ::= BINDVAR_001*
+
+    SIMPLE_LETTER    ~   [A-Z]:ic
+    SINGLE_DIGIT     ~   SINGLE_DIGIT_001
+    SINGLE_DIGIT_001 ~   [0-9]
+
+=for MarpaX::G4::Display::End
+
+=head3 C<-v> dump the symbol table
+
+Option C<-v> dumps the symbol table created by the rules imported from the parse trees of the input files.
+This is useful for debugging, not much else.
+
+=head1 Real life example : Translating a PL/SQL grammar
+
+I wanted to use PlSqlLexer.g4 and PlSqlParser.g4 from
+L<https://github.com/antlr/grammars-v4/tree/master/sql/plsql>.
+
+Executing the translator with a number of command line options returned
+the Marpa grammar in the output file plsql.mx.
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    parseg4_from_file.pl -u -p -s sql_script -o plsql.mx ./grammars-v4-master/sql/plsql/PlSqlParser.g4 ./grammars-v4-master/sql/plsql/PlSqlLexer.g4
+
+=for MarpaX::G4::Display::End
+
+Applying this grammar to an Oracle package definition
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    testmarpagrammar_from_file.pl -g ./plsql.mx ./data/package_definition.sql
+
+=for MarpaX::G4::Display::End
+
+returned annoying errors when Marpa refused to accept the rules
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    UNSIGNED_INTEGER
+    DELIMITED_ID
+
+=for MarpaX::G4::Display::End
+
+In order to overcome these errors, i had to manually tweak the generated grammar
+as per the 'diff' output below :
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    10616c10616,10620
+    < UNSIGNED_INTEGER               ~   [0-9]+
+    ---
+    >
+    > UNSIGNED_INTEGER               ~   MULTIPLE_DIGITS
+    > MULTIPLE_DIGITS                ~   SINGLE_DIGIT+
+    > SINGLE_DIGIT                   ~   [0-9]
+    >
+    10695,10696c10699,10700
+    <                                |   ':' DELIMITED_ID
+    <                                |   ':' UNSIGNED_INTEGER
+    ---
+    >                                |   ':"' DELIMITED_ID_003 '"'
+    >                                |   ':' MULTIPLE_DIGITS
+    10699c10703
+    <                                |   [0-9]
+    ---
+    >                                |   SINGLE_DIGIT
+    10711c10715
+    < SINGLE_LINE_COMMENT            ~   '--' SINGLE_LINE_COMMENT_002 NEWLINE_EOF
+    ---
+    > SINGLE_LINE_COMMENT            ~   '--' SINGLE_LINE_COMMENT_002
+    10717c10721
+    < REMARK_COMMENT                 ~   'rem':i opt_REMARK_COMMENT_001 opt_REMARK_COMMENT_005 NEWLINE_EOF
+    ---
+    > REMARK_COMMENT                 ~   'rem':i opt_REMARK_COMMENT_001 opt_REMARK_COMMENT_005
+    10725c10729
+    < PROMPT_MESSAGE                 ~   'pro':i opt_PROMPT_MESSAGE_001 opt_PROMPT_MESSAGE_005 NEWLINE_EOF
+    ---
+    > PROMPT_MESSAGE                 ~   'pro':i opt_PROMPT_MESSAGE_001 opt_PROMPT_MESSAGE_005
+    10733c10737
+    < START_CMD                      ~   '@' opt_START_CMD_001 START_CMD_003 NEWLINE_EOF
+    ---
+    > START_CMD                      ~   '@' opt_START_CMD_001 START_CMD_003
+    10743c10747
+    <                                |   [0-9]
+    ---
+    >                                |   SINGLE_DIGIT
+    10747c10751
+    < NEWLINE_EOF                    ~   NEWLINE
+    ---
+    >
+    10751c10755
+    < FLOAT_FRAGMENT_001             ~   UNSIGNED_INTEGER*
+    ---
+    > FLOAT_FRAGMENT_001             ~   SINGLE_DIGIT*
+    10754c10758
+    < FLOAT_FRAGMENT_003             ~   UNSIGNED_INTEGER+
+    ---
+    > FLOAT_FRAGMENT_003             ~   MULTIPLE_DIGITS
+
+=for MarpaX::G4::Display::End
+
+The changes to the comment definitions are apparently due to the newline characters being processed by the C<:discard>
+rule, so the C<NEWLINE_EOF> parts are redundant. The changes to C<FLOAT_FRAGMENT> are bug fixes to the original grammar
+since adding quantifiers on top of the original C<UNSIGNED_INTEGER> makes no sense.
+
+Why Marpa would refuse to accept the C<UNSIGNED_INTEGER> and C<DELIMITED_ID> symbols in the original grammar
+is completely unclear to me.
+The changes i applied made Marpa accept the grammar but they are not intuitive.
+
+The scripts
+
+=over 4
+
+=item * parseg4_from_file.pl
+
+=item * testmarpagrammar_from_file.pl
+
+=back
+
+are driver scripts for MarpaX::G4.
+
+The versions
+
+=over 4
+
+=item * parseg4.pl
+
+=item * testmarpagrammar.pl
+
+=back
+
+take their input from HERE documents, so they are easier to use in a setting where you want to debug smaller samples
+with an IDE.
+
+Executing testmarpagrammar.pl for this input
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    2*((5+2)*3)
+
+=for MarpaX::G4::Display::End
+
+gives the output below
+(after replacing the WS :discard rule with WS ~ [\s]+)
+
+=for MarpaX::G4::Display
+name: Landing page synopsis
+partial: 1
+normalize-whitespace: 1
+
+    [
+      [
+        [2, []],
+        [
+          "*",
+          [
+            "(",
+            [
+              [
+                ["(", [[[5, []], []], ["+", [[2, []], []]]], ")"],
+                ["*", [3, []]],
+              ],
+              [],
+            ],
+            ")",
+          ],
+        ],
+      ],
+      [],
+    ]
+
+=for MarpaX::G4::Display::End
+
+Another version of the answer to the ultimate question from THGTTG.
+
+=head1 Known Bugs + Features
+
+=over 4
+
+=item  * ANTLR4 supports generic regex expressions in its lexemes. If you try to translate a grammar that
+uses such expressions, translation will fail.
+
+=item  * Mapping lazy to greedy quantifiers might break your grammar.
+
+=item * Antlr4 supplies an internal C<EOF> symbol that does not have to be declared in the grammar. MarpaX::G4 creates
+an C<EOF> lexeme L<EOF ~ [\z]> when it encounters a reference to EOF. This might or might not work for you.
+
+=item * Redirected rules that go into the :discard section must be lexical rules. You might have to tweak the
+generated grammar post-translation to enforce this.
+
+=back
+
+=head1 Author
+
+Axel Zuber
+
+=head1 Support
+
+L<MarpaX::G4> comes without warranty.
+Support is provided
+on a volunteer basis
+through the standard mechanisms for CPAN modules.
+
+=head1 Copyright and License
+
+=for MarpaX::G4::Display
+ignore: 1
+
+  Copyright 2022 Axel Zuber
+  This file is part of MarpaX::G4. MarpaX::G4 is free software: you can
+  redistribute it and/or modify it under the terms of the GNU Lesser
+  General Public License as published by the Free Software Foundation,
+  either version 3 of the License, or (at your option) any later version.
+
+  MarpaX::G4 is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser
+  General Public License along with MarpaX::G4.  If not, see
+  http://www.gnu.org/licenses/.
+
+=for MarpaX::G4::Display::End
+
+=cut

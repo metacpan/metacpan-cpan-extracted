@@ -9,7 +9,7 @@ use List::Util qw(uniq any first);
 use Moose::Util::TypeConstraints qw(enum subtype where);
 use namespace::autoclean;
 
-our $VERSION = '2.9';
+our $VERSION = '3.0';
 
 with
     'Dist::Zilla::Role::PluginBundle::Easy',
@@ -243,7 +243,7 @@ sub configure {
         ['Git::Contributors' => { order_by => 'commits' }],
         ['ContributorsFile'  => { filename => 'CONTRIBUTORS' }],
 
-        ['AutoPrereqs'         => { skip       => [qw(^perl$ utf8 warnings strict overload)] }],
+        ['AutoPrereqs'         => { skip       => [qw(^perl$ utf8 warnings strict overload feature autodie base)] }],
         ['Prereqs::AuthorDeps' => { ':version' => '0.006' }],
         [
             'MinimumPerl' => {
@@ -263,6 +263,7 @@ sub configure {
                 match    => '\.pdf$',
                 match    => '\.odt$',
                 match    => '\.msg$',
+                match    => '\.gz$',
             ]
         ],
 
@@ -361,7 +362,7 @@ Dist::Zilla::PluginBundle::Author::WATERKIP - An plugin bundle for all distribut
 
 =head1 VERSION
 
-version 2.9
+version 3.0
 
 =head1 SYNOPSIS
 

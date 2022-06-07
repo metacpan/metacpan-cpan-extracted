@@ -1,13 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.51;
+use Object::Pad 0.57;
 
-package Tangence::Registry 0.28;
-class Tangence::Registry isa Tangence::Object;
+package Tangence::Registry 0.29;
+class Tangence::Registry :isa(Tangence::Object);
 
 use Carp;
 
@@ -189,7 +189,7 @@ method load_tanfile ( $tanfile )
    Tangence::Registry::Parser->new->from_file( $tanfile );
 }
 
-class Tangence::Registry::Parser isa Tangence::Compiler::Parser
+class Tangence::Registry::Parser :isa(Tangence::Compiler::Parser)
 {
    method make_class
    {

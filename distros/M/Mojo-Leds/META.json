@@ -27,7 +27,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.014"
+            "perl" : "5.001600"
          }
       },
       "develop" : {
@@ -73,31 +73,31 @@
    "provides" : {
       "Mojo::Leds" : {
          "file" : "lib/Mojo/Leds.pm",
-         "version" : "1.13"
+         "version" : "1.14"
       },
       "Mojo::Leds::Page" : {
          "file" : "lib/Mojo/Leds/Page.pm",
-         "version" : "1.13"
+         "version" : "1.14"
       },
       "Mojo::Leds::Plugin::CommonRoutes" : {
          "file" : "lib/Mojo/Leds/Plugin/CommonRoutes.pm",
-         "version" : "1.13"
+         "version" : "1.14"
       },
       "Mojo::Leds::Rest" : {
          "file" : "lib/Mojo/Leds/Rest.pm",
-         "version" : "1.13"
+         "version" : "1.14"
       },
       "Mojo::Leds::Rest::DBIx" : {
          "file" : "lib/Mojo/Leds/Rest/DBIx.pm",
-         "version" : "1.13"
+         "version" : "1.14"
       },
       "Mojo::Leds::Rest::MongoDB" : {
          "file" : "lib/Mojo/Leds/Rest/MongoDB.pm",
-         "version" : "1.13"
+         "version" : "1.14"
       },
       "Mojolicious::Command::Author::generate::leds_app" : {
          "file" : "lib/Mojolicious/Command/Author/generate/leds_app.pm",
-         "version" : "1.13"
+         "version" : "1.14"
       }
    },
    "release_status" : "stable",
@@ -109,7 +109,7 @@
          "web" : "https://github.com/EmilianoBruni/Mojo-Leds"
       }
    },
-   "version" : "1.13",
+   "version" : "1.14",
    "x_generated_by_perl" : "v5.32.1",
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

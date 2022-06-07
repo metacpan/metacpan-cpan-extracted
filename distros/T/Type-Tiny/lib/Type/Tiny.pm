@@ -11,7 +11,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Tiny::AUTHORITY  = 'cpan:TOBYINK';
-	$Type::Tiny::VERSION    = '1.012004';
+	$Type::Tiny::VERSION    = '1.012005';
 	$Type::Tiny::XS_VERSION = '0.016';
 }
 
@@ -814,6 +814,7 @@ sub _perlcode {
 		if $self->can_be_inlined;
 		
 	$b ||= do {
+		local $@;
 		require B::Deparse;
 		my $tmp = "B::Deparse"->new;
 		$tmp->ambient_pragmas( strict => "all", warnings => "all" )

@@ -2,7 +2,7 @@ do { my $x = {
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0',
-                                        'perl' => '5.014'
+                                        'perl' => '5.001600'
                                       }
                       },
        'develop' => {

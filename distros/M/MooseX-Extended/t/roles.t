@@ -1,11 +1,10 @@
 #!/usr/bin/env perl
 
-use lib 'lib', 't/lib';
-use Test::Most;
+use lib 't/lib';
+use MooseX::Extended::Tests;
 
-pass 'this';
 use Not::Corinna;
-pass 'that';
+
 subtest 'miscellaneous features' => sub {
     SKIP: {
         skip "Classes cannot be immutable while running under the debugger", 1 if $^P;

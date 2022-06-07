@@ -17,7 +17,7 @@ use lib ".";
 use t::Colourable;
 
 use Scalar::Util ();
-use constant HAVE_ISBOOL => defined &builtin::isbool;
+use constant HAVE_IS_BOOL => defined &builtin::is_bool;
 
 my $VERSION_MINOR = Tangence::Constants->VERSION_MINOR;
 
@@ -499,7 +499,7 @@ test_typed "any (undef)",
 test_typed "any (bool)",
    sig    => "any",
    data   => !!0,
-   stream => "\x00" if HAVE_ISBOOL;
+   stream => "\x00" if HAVE_IS_BOOL;
 
 test_typed "any (int)",
    sig    => "any",

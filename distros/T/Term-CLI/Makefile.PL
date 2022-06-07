@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "Pod::Text::Overstrike" => "2.04",
     "Pod::Text::Termcap" => "2.06",
     "Scalar::Util" => "1.23",
-    "Term::ReadKey" => "2.34",
+    "Term::ReadKey" => "2.32",
     "Term::ReadLine" => "1.07",
     "Term::ReadLine::Gnu" => "1.24",
     "Text::ParseWords" => "3.27",
@@ -44,19 +44,19 @@ my %WriteMakefileArgs = (
     "warnings" => "1.00"
   },
   "TEST_REQUIRES" => {
-    "Capture::Tiny" => "0.48",
+    "Capture::Tiny" => "0.25",
     "File::Temp" => "0.22",
     "Test::Class" => 0,
     "Test::Compile" => "1.2.0",
     "Test::Exception" => "0.35",
-    "Test::MockModule" => "0.16",
+    "Test::MockModule" => "0.05",
     "Test::More" => "1.001002",
     "Test::Output" => "1.03",
     "charnames" => 0,
     "strict" => "1.00",
     "warnings" => "1.00"
   },
-  "VERSION" => "0.055002",
+  "VERSION" => "0.057001",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -64,7 +64,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Capture::Tiny" => "0.48",
+  "Capture::Tiny" => "0.25",
   "Carp" => "1.20",
   "Exporter" => "5.64",
   "Fcntl" => 0,
@@ -81,13 +81,13 @@ my %FallbackPrereqs = (
   "Pod::Text::Overstrike" => "2.04",
   "Pod::Text::Termcap" => "2.06",
   "Scalar::Util" => "1.23",
-  "Term::ReadKey" => "2.34",
+  "Term::ReadKey" => "2.32",
   "Term::ReadLine" => "1.07",
   "Term::ReadLine::Gnu" => "1.24",
   "Test::Class" => 0,
   "Test::Compile" => "1.2.0",
   "Test::Exception" => "0.35",
-  "Test::MockModule" => "0.16",
+  "Test::MockModule" => "0.05",
   "Test::More" => "1.001002",
   "Test::Output" => "1.03",
   "Text::ParseWords" => "3.27",

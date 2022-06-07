@@ -32,7 +32,7 @@ use Test::More 1.001002;
 use Test::Output 1.03;
 use Test::Exception 0.35;
 use FindBin 1.50;
-use Capture::Tiny 0.48 qw( capture );
+use Capture::Tiny 0.25 qw( capture );
 use Term::CLI;
 use Term::CLI::L10N;
 
@@ -72,17 +72,14 @@ sub startup : Test(startup => 1) {
         ],
     );
 
-    my $help = Term::CLI::Command::Help->new(
-        pager => [], # Prevent SIGPIPE by dumping to STDOUT directly.
-    );
-
-    push @commands, $help;
+    push @commands, Term::CLI::Command::Help->new();
 
     my $cli = Term::CLI->new(
         prompt      => 'test> ',
         callback    => undef,
         commands    => \@commands,
         filehandles => [],
+        pager       => [], # Prevent SIGPIPE by dumping to STDOUT directly.
     );
     isa_ok( $cli, 'Term::CLI', 'Term::CLI->new' );
 
@@ -102,14 +99,14 @@ sub check_pager : Test(3) {
         $pager = "$FindBin::Bin/scripts/does_not_exist_".$n++;
     }
 
-    $cli->find_command('help')->pager([ $pager ]);
+    $cli->pager([ $pager ]);
     my %args = $cli->execute('help');
     ok($args{status} < 0, '"help" with non-existent pager results in an error');
     like($args{error}, qr/cannot run '.*':/,
         'error on non-existent pager is set correctly');
 
     $pager = "$FindBin::Bin/scripts/pager.pl";
-    $cli->find_command('help')->pager([ $^X, $pager, '1' ]);
+    $cli->pager([ $^X, $pager, '1' ]);
 
     %args = $cli->execute('help');
     is($args{status}, 1<<8, 'pager exit status propagates to status')
@@ -121,7 +118,7 @@ sub check_help_formatted : Test(2) {
     my ($self) = @_;
     my $cli = $self->{cli};
 
-    $cli->find_command('help')->pager( [] );
+    $cli->pager( [] );
 
     # We cannot use "stdout_like" for formatted help text, because
     # bold/italic text can be rendered with termcap escape sequences
@@ -150,7 +147,7 @@ sub check_help_pod : Test(6) {
     my ($self) = @_;
     my $cli = $self->{cli};
 
-    $cli->find_command('help')->pager( [] );
+    $cli->pager( [] );
 
     stdout_like(
         sub { $cli->execute('help --pod') },
@@ -216,7 +213,7 @@ sub check_help_error : Test(6) {
     my ($self) = @_;
     my $cli = $self->{cli};
 
-    $cli->find_command('help')->pager( [] );
+    $cli->pager( [] );
 
     my %args = $cli->execute('help xp');
     ok($args{status} < 0, '"help xp" results in an error');

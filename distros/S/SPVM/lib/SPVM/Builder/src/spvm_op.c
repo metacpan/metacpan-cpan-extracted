@@ -1847,7 +1847,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           break;
         }
         default: {
-          SPVM_COMPILER_error(compiler, "Invalid class descriptor %s at %s line %d", (SPVM_DESCRIPTOR_C_ID_NAMES())[descriptor->id], op_class->file, op_class->line);
+          SPVM_COMPILER_error(compiler, "Invalid class descriptor %s at %s line %d", SPVM_DESCRIPTOR_get_name(compiler, descriptor->id), op_class->file, op_class->line);
         }
       }
     }
@@ -2163,7 +2163,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
       SPVM_CLASS_VAR* found_class_var = SPVM_HASH_get(class->class_var_symtable, class_var_name, strlen(class_var_name));
       
       if (found_class_var) {
-        SPVM_COMPILER_error(compiler, "Redeclaration of class variable \"$%s::%s\" at %s line %d", class_name, class_var_name + 1, class_var->op_class_var->file, class_var->op_class_var->line);
+        SPVM_COMPILER_error(compiler, "Redeclaration of the class variable \"$%s\" in the class \"%s\" at %s line %d", class_var_name + 1, class_name, class_var->op_class_var->file, class_var->op_class_var->line);
       }
       else {
         SPVM_HASH_set(class->class_var_symtable, class_var_name, strlen(class_var_name), class_var);
@@ -2407,14 +2407,14 @@ SPVM_OP* SPVM_OP_build_our(SPVM_COMPILER* compiler, SPVM_OP* op_class_var, SPVM_
           break;
         }
         default: {
-          SPVM_COMPILER_error(compiler, "Invalid class variable descriptor in class variable declaration %s at %s line %d", (SPVM_DESCRIPTOR_C_ID_NAMES())[descriptor->id], op_descriptors->file, op_descriptors->line);
+          SPVM_COMPILER_error(compiler, "Invalid class variable descriptor \"%s\" at %s line %d", SPVM_DESCRIPTOR_get_name(compiler, descriptor->id), op_descriptors->file, op_descriptors->line);
         }
       }
       if (accessor_descriptors_count > 1) {
-        SPVM_COMPILER_error(compiler, "rw, ro, wo can be specifed only one in class variable  declaration at %s line %d", op_class_var->file, op_class_var->line);
+        SPVM_COMPILER_error(compiler, "Only one of \"rw\", \"ro\", \"wo\" class variable descriptors can be specifed at %s line %d", op_class_var->file, op_class_var->line);
       }
       if (access_control_descriptors_count > 1) {
-        SPVM_COMPILER_error(compiler, "private, public can be specifed only one in class variable declaration at %s line %d", op_class_var->file, op_class_var->line);
+        SPVM_COMPILER_error(compiler, "Only one of \"private\", \"public\" class variable descriptors can be specifed at %s line %d", op_class_var->file, op_class_var->line);
       }
     }
   }
@@ -2477,7 +2477,7 @@ SPVM_OP* SPVM_OP_build_has(SPVM_COMPILER* compiler, SPVM_OP* op_field, SPVM_OP* 
           break;
         }
         default: {
-          SPVM_COMPILER_error(compiler, "Invalid field descriptor %s at %s line %d", (SPVM_DESCRIPTOR_C_ID_NAMES())[descriptor->id], op_descriptors->file, op_descriptors->line);
+          SPVM_COMPILER_error(compiler, "Invalid field descriptor %s at %s line %d", SPVM_DESCRIPTOR_get_name(compiler, descriptor->id), op_descriptors->file, op_descriptors->line);
         }
       }
       
@@ -2567,16 +2567,16 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
           break;
         }
         default: {
-          SPVM_COMPILER_error(compiler, "Invalid method descriptor \"%s\" at %s line %d", (SPVM_DESCRIPTOR_C_ID_NAMES())[descriptor->id], op_descriptors->file, op_descriptors->line);
+          SPVM_COMPILER_error(compiler, "Invalid method descriptor \"%s\" at %s line %d", SPVM_DESCRIPTOR_get_name(compiler, descriptor->id), op_descriptors->file, op_descriptors->line);
         }
       }
     }
     
     if (method->is_native && method->is_precompile) {
-      SPVM_COMPILER_error(compiler, "native and precompile descriptors can't be used together in method dinition at %s line %d", op_descriptors->file, op_descriptors->line);
+      SPVM_COMPILER_error(compiler, "Only one of \"native\" and \"precompile\" method descriptors can be specified at %s line %d", op_descriptors->file, op_descriptors->line);
     }
     if (access_control_descriptors_count > 1) {
-      SPVM_COMPILER_error(compiler, "public and private descriptors can't be used together in method difinition at %s line %d", op_method->file, op_method->line);
+      SPVM_COMPILER_error(compiler, "Only one of \"public\" and \"private\" method descriptors can be specified in method difinition at %s line %d", op_method->file, op_method->line);
     }
   }
 
@@ -2783,12 +2783,12 @@ SPVM_OP* SPVM_OP_build_enumeration(SPVM_COMPILER* compiler, SPVM_OP* op_enumerat
             break;
           }
           default: {
-            SPVM_COMPILER_error(compiler, "Invalid method descriptor \"%s\" at %s line %d", (SPVM_DESCRIPTOR_C_ID_NAMES())[descriptor->id], op_descriptors->file, op_descriptors->line);
+            SPVM_COMPILER_error(compiler, "Invalid enumeration descriptor \"%s\" at %s line %d", SPVM_DESCRIPTOR_get_name(compiler, descriptor->id), op_descriptors->file, op_descriptors->line);
           }
         }
       }
       if (access_control_descriptors_count > 1) {
-        SPVM_COMPILER_error(compiler, "public and private descriptors can't be used together in method difinition at %s line %d", op_method->file, op_method->line);
+        SPVM_COMPILER_error(compiler, "Only one of \"public\" and \"private\" enumeration descriptors can be specified at %s line %d", op_method->file, op_method->line);
       }
     }
   }

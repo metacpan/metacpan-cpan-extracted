@@ -24,12 +24,17 @@ attributes (inherited from C<UI::Various::widget>):
 
 =head2 Attributes
 
-(sorted alphabetically)
+(Usually attributes are sorted alphabetically.)
 
 B<rw> attributes can be read and modified.  The later may have some
 restrictions.  (See documentation of specific attribute).
 
 B<ro> attributes can only be read and not modified.
+
+B<fixed> attributes may only be modified before using the widget.  (Note
+that this is mostly not enforced.)
+
+B<wo> attributes can only be initialised and not modified or read later.
 
 B<optional> attributes may be empty or C<undef>.
 
@@ -54,7 +59,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use UI::Various::core;
 
@@ -64,7 +69,7 @@ our @EXPORT_OK = qw();
 
 #########################################################################
 
-=item height [rw, inherited]
+=item height [rw, fixed, inherited]
 
 preferred (maximum) height of a UI element in (approximately) characters,
 should not exceed L<max_height of main "Window Manager"
@@ -110,7 +115,7 @@ sub parent($;$)
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-=item width [rw, inherited]
+=item width [rw, fixed, inherited]
 
 preferred (maximum) width of a UI element in (approximately) characters,
 should not exceed L<max_width of main "Window Manager"

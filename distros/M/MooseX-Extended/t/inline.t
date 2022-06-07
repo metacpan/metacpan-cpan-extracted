@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 
-use lib 'lib', 't/lib';
+use lib 't/lib';
 use InlinePackages;    # provides My::Point and My::Point::Mutable
-use Test::Most;
+use MooseX::Extended::Tests;
 
 explain <<'END';
 This test verifies that we can inline several packages into one, and that we don't need the 

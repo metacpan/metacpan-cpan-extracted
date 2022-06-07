@@ -26,7 +26,7 @@ optional_features: {}
 provides:
   Types::Self:
     file: lib/Types/Self.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Role::Hooks: '0'
   Types::Standard: '1.012'
@@ -37,6 +37,6 @@ resources:
   homepage: https://metacpan.org/release/Types-Self
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-types-self.git
-version: '0.001'
+version: '0.002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

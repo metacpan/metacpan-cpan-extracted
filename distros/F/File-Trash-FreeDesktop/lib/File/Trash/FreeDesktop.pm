@@ -1,8 +1,5 @@
 package File::Trash::FreeDesktop;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.19'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -10,6 +7,11 @@ use Log::ger;
 
 use Fcntl;
 use File::MoreUtil qw(file_exists l_abs_path);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-05-06'; # DATE
+our $DIST = 'File-Trash-FreeDesktop'; # DIST
+our $VERSION = '0.200'; # VERSION
 
 sub new {
     require File::HomeDir::FreeDesktop;
@@ -64,8 +66,16 @@ sub _select_trash {
     my $afile2 = $afile; $afile2 =~ s!/[^/]+\z!! if (-l $file0);
     my $file_mp = Sys::Filesystem::MountPoint::path_to_mount_point($afile2);
 
+    if ($ENV{PERL_FILE_TRASH_FREEDESKTOP_DEBUG}) {
+        log_trace "File's mountpoint for file $file0 is $file_mp";
+    }
+
     $self->{_home_mp} //= Sys::Filesystem::MountPoint::path_to_mount_point(
         $self->{_home});
+
+    if ($ENV{PERL_FILE_TRASH_FREEDESKTOP_DEBUG}) {
+        log_trace "Home mountpoint for file $file0 is $self->{_home_mp}";
+    }
 
     # try home trash
     if ($self->{_home_mp} eq $file_mp) {
@@ -76,9 +86,16 @@ sub _select_trash {
     }
 
     # try file's mountpoint or mountpoint + "/tmp" (try "/tmp" first if /)
+    my $suggestion = '';
     for my $dir ($file_mp eq '/' ?
                      ("/tmp", "/") : ($file_mp, "$file_mp/tmp")) {
-        next unless -w $dir;
+        unless (-w $dir) {
+            if ($ENV{PERL_FILE_TRASH_FREEDESKTOP_DEBUG}) {
+                log_trace "Directory $dir is not writable, skipped";
+            }
+            $suggestion = ", try making directory $dir writable?";
+            next;
+        }
         if ($dir ne $file_mp) {
             my $mp = Sys::Filesystem::MountPoint::path_to_mount_point($dir);
             next unless $mp eq $file_mp;
@@ -89,11 +106,11 @@ sub _select_trash {
         return $trash_dir;
     }
 
-    die "Can't find suitable trash dir";
+    die "Can't find suitable trash dir$suggestion";
 }
 
 sub list_trashes {
-    require List::MoreUtils;
+    require List::Util;
     require Sys::Filesystem;
 
     my ($self) = @_;
@@ -112,7 +129,7 @@ sub list_trashes {
                 ) } @mp)
         );
 
-    List::MoreUtils::uniq(@res);
+    List::Util::uniq(@res);
 }
 
 sub _parse_trashinfo {
@@ -154,7 +171,8 @@ sub list_contents {
             next unless $e =~ /\.trashinfo$/;
             local $/;
             my $ifile = "$trash_dir/info/$e";
-            open my($fh), $ifile or die "Can't open trash info file $e: $!";
+            open my($fh), "<", $ifile
+                or die "Can't open trash info file $e: $!";
             my $content = <$fh>;
             close $fh;
             my $pres = $self->_parse_trashinfo($content);
@@ -198,7 +216,7 @@ sub trash {
 
     unless (file_exists $file0) {
         if ($opts->{on_not_found} eq 'ignore') {
-            return undef;
+            return undef; ## no critic: Subroutines::ProhibitExplicitReturnUndef
         } else {
             die "File does not exist: $file0";
         }
@@ -332,7 +350,7 @@ File::Trash::FreeDesktop - Trash files
 
 =head1 VERSION
 
-This document describes version 0.19 of File::Trash::FreeDesktop (from Perl distribution File-Trash-FreeDesktop), released on 2017-07-10.
+This document describes version 0.200 of File::Trash::FreeDesktop (from Perl distribution File-Trash-FreeDesktop), released on 2022-05-06.
 
 =head1 SYNOPSIS
 
@@ -531,6 +549,13 @@ die on errors.
 
 Return list of files erased.
 
+=head1 ENVIRONMENT
+
+=head2 PERL_FILE_TRASH_FREEDESKTOP_DEBUG
+
+Bool, if set to true will produce additional logging statements using
+L<Log::ger> at the C<trace> level.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/File-Trash-FreeDesktop>.
@@ -538,14 +563,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/File-Trash
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-File-Trash-FreeDesktop>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=File-Trash-FreeDesktop>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -577,11 +594,42 @@ undeletion function is provided at the time of this writing.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015, 2014, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2017, 2015, 2014, 2012 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=File-Trash-FreeDesktop>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

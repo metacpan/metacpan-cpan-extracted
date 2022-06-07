@@ -1,13 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.41;
+use Object::Pad 0.57;
 
-package Tangence::Struct 0.28;
-class Tangence::Struct isa Tangence::Meta::Struct;
+package Tangence::Struct 0.29;
+class Tangence::Struct :isa(Tangence::Meta::Struct);
 
 use Carp;
 

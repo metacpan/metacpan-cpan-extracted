@@ -9,14 +9,17 @@ use Moose::Util qw(
   add_method_modifier
   throw_exception
 );
+use MooseX::Extended::Types qw(
+  compile_named
+  ArrayRef
+  Bool
+  Enum
+  NonEmptyStr
+  Optional
+);
+use Module::Load 'load';
 use feature qw(signatures postderef);
 no warnings qw(experimental::signatures experimental::postderef);
-
-BEGIN {
-    if ( $^V && $^V ge v5.36.0 ) {
-        warnings->unimport('experimental::args_array_with_signatures');
-    }
-}
 
 use Storable 'dclone';
 use Ref::Util qw(
@@ -25,18 +28,209 @@ use Ref::Util qw(
 );
 use Carp 'croak';
 
-our $VERSION = '0.10';
+our $VERSION = '0.20';
 
 our @EXPORT_OK = qw(
+  _assert_import_list_is_valid
+  _debug
+  _disabled_warnings
+  _enabled_features
+  _our_import
+  _our_init_meta
   field
   param
-  _debug
-  _enabled_features
-  _disabled_warnings
 );
 
 sub _enabled_features  {qw/signatures postderef postderef_qq :5.20/}             # internal use only
 sub _disabled_warnings {qw/experimental::signatures experimental::postderef/}    # internal use only
+
+# Should this be in the metaclass? It feels like it should, but
+# the MOP really doesn't support these edge cases.
+my %CONFIG_FOR;
+
+sub _config_for ($package) {
+    return $CONFIG_FOR{$package};
+}
+
+sub _our_import {
+
+    # don't use signatures for this import because we need @_ later. @_ is
+    # intended to be removed for subs with signature
+    my ( $class, $import, $target_class ) = @_;
+
+    # Moose::Exporter uses Sub::Exporter to handle exporting, so it accepts an
+    # { into =>> $target_class } to say where we're exporting this to. This is
+    # used by our ::Custom modules to let people define their own versions
+    @_ = ( $class, { into => $target_class } );    # anything else and $import blows up
+    goto $import;
+}
+
+# asserts the import list is valid, rewrites the excludes and includes from
+# arrays to hashes (if ( $args{excludes}{$feature} ) ...) and returns the
+# target package that this code will be applied to. Yeah, it does too much.
+sub _assert_import_list_is_valid {
+    my ( $class, $args ) = @_;
+
+    $args->{call_level} //= 0;
+    my ( $package, $filename, $line ) = caller( $args->{call_level} + 1 );
+    my $target_class = $args->{for_class} // $package;
+
+    state $check = {
+        class => compile_named( _default_import_list(), _class_excludes() ),
+        role  => compile_named( _default_import_list(), _role_excludes() )
+    };
+    eval {
+        $check->{ $args->{_import_type} }->( $args->%* );
+        1;
+    } or do {
+
+        # Not sure what's happening, but if we don't use the eval to trap the
+        # error, it gets swallowed and we simply get:
+        #
+        # BEGIN failed--compilation aborted at ...
+        #
+        # Also, don't use $target_class here because if it's different from
+        # $package, the filename and line number won't match
+        my $error = $@;
+        Carp::carp(<<"END");
+Error:    Invalid import list to $class.
+Package:  $package
+Filename: $filename
+Line:     $line
+Details:  $error
+END
+        throw_exception(
+            'InvalidImportList',
+            class_name           => $package,
+            moosex_extended_type => __PACKAGE__,
+            line_number          => $line,
+            messsage             => $error,
+        );
+    };
+
+    # remap the arrays to hashes for easy lookup
+    foreach my $features (qw/includes excludes/) {
+        $args->{$features} = { map { $_ => 1 } $args->{$features}->@* };
+    }
+
+    $CONFIG_FOR{$target_class} = $args;
+    return $target_class;
+}
+
+sub _our_init_meta ( $class, $apply_default_features, %params ) {
+    my $for_class = $params{for_class};
+    my $config    = $CONFIG_FOR{$for_class};
+
+    if ( $config->{debug} ) {
+        $MooseX::Extended::Debug = $config->{debug};
+    }
+
+    foreach my $feature (qw/includes excludes/) {
+        if ( exists $config->{$feature} ) {
+            foreach my $category ( sort keys $config->{$feature}->%* ) {
+                _debug("$for_class $feature '$category'");
+            }
+        }
+    }
+
+    $apply_default_features->( $config, $for_class, \%params );
+    _apply_optional_features( $config, $for_class );
+}
+
+sub _class_setup_import_methods () {
+    return (
+        with_meta => [ 'field', 'param' ],
+        install   => [qw/unimport/],
+        also      => ['Moose'],
+    );
+}
+
+sub _role_setup_import_methods () {
+    return (
+        with_meta => [ 'field', 'param' ],
+    );
+}
+
+sub _role_excludes () {
+    return (
+        excludes => Optional [
+            ArrayRef [
+                Enum [
+                    qw/
+                      WarnOnConflict
+                      autoclean
+                      carp
+                      true
+                      field
+                      param
+                      /
+                ]
+            ]
+        ]
+    );
+}
+
+sub _class_excludes () {
+    return (
+        excludes => Optional [
+            ArrayRef [
+                Enum [
+                    qw/
+                      StrictConstructor
+                      autoclean
+                      c3
+                      carp
+                      immutable
+                      true
+                      field
+                      param
+                      /
+                ]
+            ]
+        ]
+    );
+}
+
+sub _default_import_list () {
+    return (
+        call_level   => Optional [ Enum [ 1, 0 ] ],
+        debug        => Optional [Bool],
+        for_class    => Optional [NonEmptyStr],
+        types        => Optional [ ArrayRef [NonEmptyStr] ],
+        _import_type => Enum [qw/class role/],
+        includes     => Optional [
+            ArrayRef [
+                Enum [
+                    qw/
+                      multi
+                      async
+                      /
+                ]
+            ]
+        ]
+    );
+}
+
+sub _apply_optional_features ( $config, $for_class ) {
+    if ( $config->{includes}{multi} ) {
+        if ( $^V && $^V lt v5.26.0 ) {
+            croak("multi subs not supported in Perl version less than v5.26.0. You have $^V");
+        }
+
+        # don't trap the error. Let it bubble up.
+        load Syntax::Keyword::MultiSub;
+        Syntax::Keyword::MultiSub->import::into($for_class);
+    }
+    if ( $config->{includes}{async} ) {
+        if ( $^V && $^V lt v5.26.0 ) {
+            croak("async subs not supported in Perl version less than v5.26.0. You have $^V");
+        }
+
+        # don't trap the error. Let it bubble up.
+        load Future::AsyncAwait;
+        Future::AsyncAwait->import::into($for_class);
+    }
+}
 
 sub param ( $meta, $name, %opt_for ) {
     $opt_for{is}       //= 'ro';
@@ -212,23 +406,23 @@ sub _maybe_add_cloning_method ( $meta, $name, %opt_for ) {
     else {
         _debug("Adding overloaded reader/writer for $name");
         $meta->add_method(
-            $reader => sub ( $self, $value = undef ) {
-                _debug( "Args for overloaded reader/writer for $name", \@_ );
-                return @_ == 1
+            $reader => sub ( $self, @value ) {
+                _debug( "Args for overloaded reader/writer for $name", [ $self, @value ] );
+                return @value == 0
                   ? $self->$reader_method
-                  : $self->$writer_method($value);
+                  : $self->$writer_method(@value);
             }
         );
     }
     return %opt_for;
 }
 
-sub _debug ( $message, $data = undef ) {
+sub _debug ( $message, @data ) {
     $MooseX::Extended::Debug //= $ENV{MOOSEX_EXTENDED_DEBUG};    # suppress "once" warnings
     return unless $MooseX::Extended::Debug;
-    if ( 2 == @_ ) {                                             # yup, still want multidispatch
+    if (@data) {                                                 # yup, still want multidispatch
         require Data::Printer;
-        $data    = Data::Printer::np($data);
+        my $data = Data::Printer::np(@data);
         $message = "$message: $data";
     }
     say STDERR $message;
@@ -248,7 +442,7 @@ MooseX::Extended::Core - Internal module for MooseX::Extended
 
 =head1 VERSION
 
-version 0.10
+version 0.20
 
 =head1 DESCRIPTION
 

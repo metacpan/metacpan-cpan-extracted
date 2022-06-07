@@ -1,5 +1,5 @@
 package HTML::Widgets::NavMenu::Predicate;
-$HTML::Widgets::NavMenu::Predicate::VERSION = '1.0902';
+$HTML::Widgets::NavMenu::Predicate::VERSION = '1.1000';
 use strict;
 use warnings;
 
@@ -167,7 +167,7 @@ HTML::Widgets::NavMenu
 
 =head1 VERSION
 
-version 1.0902
+version 1.1000
 
 =head1 SYNOPSIS
 

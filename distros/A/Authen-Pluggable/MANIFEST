@@ -8,6 +8,7 @@ Makefile.PL
 README
 lib/Authen/Pluggable.pm
 lib/Authen/Pluggable/AD.pm
+lib/Authen/Pluggable/JSON.pm
 lib/Authen/Pluggable/Passwd.pm
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
@@ -16,6 +17,7 @@ t/20-ad.t
 t/30-multiprov.t
 t/40-multiprov_hashcfg.t
 t/50-alias.t
+t/60-json.t
 t/users1
 t/users2
 xt/author/00-compile.t

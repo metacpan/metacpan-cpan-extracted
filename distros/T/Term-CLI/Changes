@@ -1,3 +1,72 @@
+0.057001 -- 2022-04-20
+
+    Acknowledgements to djerius for various fixes, enhancements, and
+    suggestions (see git log for full details).
+
+    [Enhancements]
+
+    Term::CLI::Argument::Enum [djerius]
+      - Minor optimizations to Term::CLI::Argument::Enum cache.
+
+    Term::CLI, Term::CLI::Command::Help
+      - Move pager logic from `Help` command to `CLI` object (add
+        `write_pager` method).
+
+    CLI::Base
+      - Move `parent` and `root_node` to CLI::Base.
+
+    [Bug fixes]
+
+    Term::CLI::ReadLine
+      - Fix signal restoration (`local(%SIG) = %SIG` does not work).
+
+    Term::CLI::Command::Help
+      - Fix missing ')' in help text.
+
+    [Documentation fixes]
+
+    - Change references in documentation from M6::CLI
+      to Term::CLI [djerius]
+
+    - Miscellaneous POD fixes.
+
+    [Miscellaneous]
+
+    - Lower dependencies for Test::MockModule and Capture::Tiny.
+    - Lower dependency on Term::ReadKey for older system Perls.
+
+0.056001 -- 2022-04-12
+
+    [Enhancements]
+
+    Term::CLI::Command, Term::CLI::Command::Help,
+    Term::CLI::Element, Term::CLI::Role::CommandSet
+
+    - Consistent state between `processed` and `validate`/`execute`
+        The state passed to `complete` and `execute_command` (and, by extension
+        the argument's `validate` methods) differs in subtle ways. Try to make
+        them more consistent by:
+        
+          * For `complete`: the `processed` key in the state information
+            now points to a list of hashes instead of strings.
+            The hashes have an `element` key (ref. to relevant command or
+            argument object) and a `value` key (the literal value provided
+            in the inpug).
+        
+          * For `execute_command` and `validate`: the state given to these
+            methods now also contains a `processed` key.
+            Semantics are the same as for `complete`, except that the
+            `value` keys of the elements contain the *validated* values, i.e.
+            they can be converted, expanded, or otherwise normalised.
+
+    [Bug fixes]
+
+    - Term::CLI::Command
+        POD fix: reference to "execute" -> "execute_line".
+
+    - Term::CLI::Tutorial
+        Convert TABs to spaces.
+
 0.055002 -- 2022-02-14
 
     [Bug fixes]

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.012;
+use 5.006;
 
 use ExtUtils::MakeMaker;
 
@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "HTML-Widgets-NavMenu",
   "LICENSE" => "mit",
-  "MIN_PERL_VERSION" => "5.012",
+  "MIN_PERL_VERSION" => "5.006",
   "NAME" => "HTML::Widgets::NavMenu",
   "PREREQ_PM" => {
     "Class::XSAccessor" => 0,
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.88",
     "lib" => 0
   },
-  "VERSION" => "1.0902",
+  "VERSION" => "1.1000",
   "test" => {
     "TESTS" => "t/*.t"
   }

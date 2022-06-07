@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
-use lib 'lib';
-use Test::Most;
+use lib 't/lib';
+use MooseX::Extended::Tests;
 use Scalar::Util 'refaddr';
 use DateTime;
 
@@ -10,14 +10,18 @@ use DateTime;
 my $clone_end_date_called = 0;
 
 package My::Class {
-    use MooseX::Extended types => [qw(NonEmptyStr HashRef InstanceOf)];
+    use MooseX::Extended types => [qw(NonEmptyStr HashRef InstanceOf ArrayRef Int)];
 
     param name => ( isa => NonEmptyStr );
+
+    # payload uses dclone, read-write, but using set_payload for the writer
     param payload => (
         isa    => HashRef,
         clone  => 1,
         writer => 1,
     );
+
+    # start_date uses cloning sub, read only
     param start_date => (
         isa   => InstanceOf ['DateTime'],
         clone => sub ( $self, $name, $value ) {
@@ -25,6 +29,8 @@ package My::Class {
               return $value->clone;
         },
     );
+
+    # end_date using clone builder, read only
     param end_date => (
         isa   => InstanceOf ['DateTime'],
         clone => '_clone_end_date',
@@ -34,6 +40,9 @@ package My::Class {
         $clone_end_date_called = 1;
         return $value->clone;
     }
+
+    # clone, read-write, but with rw_aref being overloaded
+    field rw_aref => ( is => 'rw', isa => ArrayRef [Int], clone => 1, default => sub { [ 1, 2, 3 ] } );
 
     sub BUILD ( $self, @ ) {
         if ( $self->end_date < $self->start_date ) {
@@ -98,6 +107,17 @@ $clone_end_date_called = 0;
 my $cloned_end_date2 = $object->end_date;
 ok $clone_end_date_called, 'We should be able to fetch our end date';
 cmp_ok refaddr($cloned_end_date2), '!=', refaddr($cloned_end_date), '... and it should again be a clone';
+
+eq_or_diff my $rw_aref = $object->rw_aref, [ 1, 2, 3 ], 'We should be able to read cloned fields';
+cmp_ok refaddr($rw_aref), '!=', refaddr( $object->rw_aref ), '... just like we do with params';
+my $new_val = [ 4, 3, 2 ];
+ok $object->rw_aref($new_val), '... and set them if they are read-write';
+cmp_ok refaddr( $object->rw_aref ), '!=', refaddr($new_val), '... and yup, still cloned';
+eq_or_diff $object->rw_aref, [ 4, 3, 2 ], '... with the correct data';
+
+throws_ok { $object->rw_aref( 1, 2 ) }
+qr/Too many arguments/,
+  "Perl's signatures allow us to feel confident we cannot pass too many arguments";
 
 throws_ok {
     My::Class->new(

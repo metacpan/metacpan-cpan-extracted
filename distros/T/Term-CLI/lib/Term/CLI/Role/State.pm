@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::Role::State 0.055002;
+package Term::CLI::Role::State 0.057001;
 
 use 5.014;
 use warnings;
@@ -53,7 +53,7 @@ Term::CLI::Role::State - Keep a "state" hash in Term::CLI objects
 
 =head1 VERSION
 
-version 0.055002
+version 0.057001
 
 =head1 SYNOPSIS
 

@@ -1,9 +1,9 @@
 package WebService::LastFM::TrackInfo;
 our $AUTHORITY = 'cpan:GENE';
 
-# ABSTRACT: Access to the track.getInfo slice of the LastFM API
+# ABSTRACT: Access to *.getInfo slices of the last.fm API
 
-our $VERSION = '0.0201';
+our $VERSION = '0.0205';
 
 use Moo;
 use strictures 2;
@@ -24,7 +24,7 @@ has api_key => (
 
 has method => (
     is      => 'ro',
-    default => sub { 'track.getInfo' },
+    default => sub { 'track' },
 );
 
 
@@ -56,14 +56,15 @@ sub fetch {
     my ( $self, %args ) = @_;
 
     croak 'No artist provided' unless $args{artist};
-    croak 'No track provided' unless $args{track};
+    croak 'No track provided' if $self->method eq 'track' && !$args{track};
+    croak 'No album provided' if $self->method eq 'album' && !$args{album};
 
     my $url = Mojo::URL->new($self->base)
         ->path($self->version)
         ->query(
             %args,
             api_key => $self->api_key,
-            method  => $self->method,
+            method  => $self->method . '.getInfo',
             format  => $self->format,
         );
 
@@ -113,28 +114,36 @@ __END__
 
 =head1 NAME
 
-WebService::LastFM::TrackInfo - Access to the track.getInfo slice of the LastFM API
+WebService::LastFM::TrackInfo - Access to *.getInfo slices of the last.fm API
 
 =head1 VERSION
 
-version 0.0201
+version 0.0205
 
 =head1 SYNOPSIS
 
   use WebService::LastFM::TrackInfo;
 
   my $w = WebService::LastFM::TrackInfo->new(api_key => 'abcdef123456');
-
   my $r = $w->fetch(
     artist => 'Led Zeppelin',
     track  => 'Kashmir',
   );
   print Dumper $r; # Do something cool with the result!
 
+  $w = WebService::LastFM::TrackInfo->new(
+    api_key => 'abcdef123456',
+    method  => 'album',
+  );
+  $r = $w->fetch(
+    artist => 'Led Zeppelin',
+    album  => 'Presence',
+  );
+
 =head1 DESCRIPTION
 
-C<WebService::LastFM::TrackInfo> provides access to the
-L<https://www.last.fm/api/show/track.getInfo> API slice.
+C<WebService::LastFM::TrackInfo> provides access to a couple *.getInfo
+API slices: track, artist and album.
 
 =head1 ATTRIBUTES
 
@@ -146,9 +155,9 @@ Default: C<undef>
 
 =head2 method
 
-The required, last.fm API method string.
+The required method string ("track", "artist", or "album").
 
-Default: C<track.getInfo>
+Default: C<track>
 
 =head2 format
 
@@ -178,7 +187,11 @@ Default: C<Mojo::UserAgent-E<gt>new>
 
 =head2 new
 
-  $w = WebService::LastFM::TrackInfo->new(api_key => $api_key);
+  $w = WebService::LastFM::TrackInfo->new(
+      api_key => $api_key,
+      method  => $method,
+      format  => $format,
+  );
 
 Create a new C<WebService::LastFM::TrackInfo> object with your
 required B<api_key> argument.
@@ -186,14 +199,16 @@ required B<api_key> argument.
 =head2 fetch
 
   $r = $w->fetch(artist => $artist, track => $track);
+  $r = $w->fetch(artist => $artist, album => $album); # for method => album
+  $r = $w->fetch(artist => $artist); # for method => artist
 
-Fetch the results given the required B<artist> and B<track> arguments.
+Fetch the results given the B<artist>, B<album> or B<track>.
 
 =head1 SEE ALSO
 
 The F<t/*> tests
 
-The F<eg/*> program(s)
+The F<eg/*> programs
 
 L<https://www.last.fm/api/show/track.getInfo>
 

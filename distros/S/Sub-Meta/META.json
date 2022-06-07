@@ -4,7 +4,7 @@
       "kfly8 <kfly@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.12",
+   "generated_by" : "Minilla/v3.1.18",
    "license" : [
       "perl_5"
    ],
@@ -84,11 +84,11 @@
    "provides" : {
       "Sub::Meta" : {
          "file" : "lib/Sub/Meta.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       },
       "Sub::Meta::Creator" : {
          "file" : "lib/Sub/Meta/Creator.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       },
       "Sub::Meta::CreatorFunction" : {
          "file" : "lib/Sub/Meta/CreatorFunction.pm"
@@ -104,19 +104,19 @@
       },
       "Sub::Meta::Library" : {
          "file" : "lib/Sub/Meta/Library.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       },
       "Sub::Meta::Param" : {
          "file" : "lib/Sub/Meta/Param.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       },
       "Sub::Meta::Parameters" : {
          "file" : "lib/Sub/Meta/Parameters.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       },
       "Sub::Meta::Returns" : {
          "file" : "lib/Sub/Meta/Returns.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       },
       "Sub::Meta::Test" : {
          "file" : "lib/Sub/Meta/Test.pm"
@@ -129,7 +129,7 @@
       },
       "Types::Sub" : {
          "file" : "lib/Types/Sub.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       }
    },
    "release_status" : "stable",
@@ -139,15 +139,16 @@
       },
       "homepage" : "https://github.com/kfly8/p5-Sub-Meta",
       "repository" : {
-         "url" : "git://github.com/kfly8/p5-Sub-Meta.git",
+         "type" : "git",
+         "url" : "https://github.com/kfly8/p5-Sub-Meta.git",
          "web" : "https://github.com/kfly8/p5-Sub-Meta"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_authority" : "cpan:KFLY",
    "x_contributors" : [
       "Kenta Kobayashi <kentafly88@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 1
 }

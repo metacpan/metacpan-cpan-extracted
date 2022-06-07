@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
-use lib 'lib';
-use Test::Most;
+use lib 't/lib';
+use MooseX::Extended::Tests;
 
 #$MooseX::Extended::Debug = 1;
 

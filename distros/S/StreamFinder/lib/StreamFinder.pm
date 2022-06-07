@@ -129,7 +129,7 @@ site URL as the argument.  You can then edit it to tailor it to your needs.
 
 The currently-supported websites are:  podcasts.apple.com (L<StreamFinder::Apple>), 
 bitchute.com (L<StreamFinder::Bitchute>), blogger.com (L<StreamFinder::Blogger>), 
-brandnewtube.com (L<StreamFinder::BrandNewTube>), brighteon.com 
+brandnewtube.com and ugetube.com (L<StreamFinder::BrandNewTube>), brighteon.com 
 (L<StreamFinder::Brighteon>), castbox.fm (L<StreamFinder::Castbox>), 
 podcasts.google.com (L<StreamFinder::Google>), 
 iheartradio.com (L<StreamFinder::IHeartRadio>), 
@@ -487,7 +487,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.86';
+our $VERSION = '1.87';
 our $DEBUG = 0;
 
 require Exporter;
@@ -518,7 +518,7 @@ sub new
 	while (@_) {
 		$arg = shift(@_);
 		if ($arg =~ /^\-?omit$/o) {   #ALLOW USER TO OMIT SPECIFIC INSTALLED SUBMODULE(S):
-			my @omitModules = split(/\,\s*/o, shift(@_));
+			my @omitModules = split(/\,\s*/, shift(@_));
 			foreach my $omit (@omitModules)
 			{
 				$useit{$omit} = 0;
@@ -539,7 +539,7 @@ sub new
 	} elsif ($url =~ m#\bpodcastaddict\.# && $useit{'PodcastAddict'}) {
 		eval { require 'StreamFinder/PodcastAddict.pm'; $haveit = 1; };
 		return new StreamFinder::PodcastAddict($url, @args)  if ($haveit);
-	} elsif ($url =~ m#\bbrandnewtube\.# && $useit{'BrandNewTube'}) {
+	} elsif ($url =~ m#\b(?:brandnew|uge)tube\.# && $useit{'BrandNewTube'}) { #HANDLES brandnewtube & ugetube!
 		eval { require 'StreamFinder/BrandNewTube.pm'; $haveit = 1; };
 		return new StreamFinder::BrandNewTube($url, @args)  if ($haveit);
 	} elsif ($url =~ m#\bbitchute\.# && $useit{'Bitchute'}) {

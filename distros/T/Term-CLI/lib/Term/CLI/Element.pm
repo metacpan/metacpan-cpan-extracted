@@ -18,17 +18,15 @@
 #
 #=============================================================================
 
-package Term::CLI::Element 0.055002;
+package Term::CLI::Element 0.057001;
 
 use 5.014;
 use warnings;
 
 use Term::CLI::ReadLine;
 
-use Types::Standard 1.000005 qw( Str );
-
-use Moo 1.000001;
-use namespace::clean 0.25;
+use Moo;
+use namespace::clean;
 
 extends 'Term::CLI::Base';
 
@@ -46,7 +44,7 @@ Term::CLI::Element - generic parent class for elements in Term::CLI
 
 =head1 VERSION
 
-version 0.055002
+version 0.057001
 
 =head1 SYNOPSIS
 
@@ -88,8 +86,8 @@ The B<name> attribute is required.
 
 =head1 METHODS
 
-The C<Term::CLI::Element> inherits from accessors
-and methods from L<Term::CLI::Base>(3p).
+The C<Term::CLI::Element> class inherits accessors
+and methods from L<Term::CLI::Base|Term::CLI::Base>(3p).
 
 In addition, it defines:
 
@@ -108,8 +106,27 @@ I<STATE> is a C<HashRef> that contains the following elements:
 
 =item B<processed> =E<gt> I<ArrayRef>
 
-Refers to a list of words that have already been processed by parent
+More elaborate "parse tree": a list of hashes that represent all the
+elements on the command line that have already been processed by parent
 (C<Term::CLI::Command>) objects.
+
+Example:
+
+    [
+        {
+            element => InstanceOf['Term::CLI::Command'],
+            value   => 'show'
+        },
+        {
+            element => InstanceOf['Term::CLI::Command'],
+            value   => 'info'
+        },
+        {
+            element => InstanceOf['Term::CLI::Argument'],
+            value   => 'foo'
+        },
+        ...
+    ]
 
 =item B<unprocessed> =E<gt> I<ArrayRef>
 
@@ -137,11 +154,11 @@ sensitive completion, however.
 
 =head1 SEE ALSO
 
-L<Term::CLI>(3p),
-L<Term::CLI::Argument>(3p),
-L<Term::CLI::Base>(3p),
-L<Term::CLI::Command>(3p),
-L<Term::CLI::ReadLine>(3p).
+L<Term::CLI::Argument|Term::CLI::Argument>(3p),
+L<Term::CLI::Base|Term::CLI::Base>(3p),
+L<Term::CLI::Command|Term::CLI::Command>(3p),
+L<Term::CLI::ReadLine|Term::CLI::ReadLine>(3p),
+L<Term::CLI|Term::CLI>(3p).
 
 =head1 AUTHOR
 

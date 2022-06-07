@@ -7,7 +7,7 @@ package Role::Hooks;
 use Class::Method::Modifiers qw( install_modifier );
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.003';
+our $VERSION   = '0.004';
 
 our %CALLBACKS_BEFORE_APPLY;
 our %CALLBACKS_AFTER_APPLY;
@@ -45,10 +45,11 @@ sub is_role {
 		return 'Role::Tiny';
 	}
 	
+	# really old versions of Role::Tiny
 	if ($INC{'Role/Tiny.pm'}
 	and !'Role::Tiny'->can('is_role')
 	and $Role::Tiny::INFO{$target}) {
-		return 'Role::Tiny';
+		return 'Role::Tiny'; # uncoverable statement
 	}
 	
 	if ($INC{'Moose/Meta/Role.pm'}
@@ -363,6 +364,9 @@ like "-excludes" and "-alias") can be passed when consuming a role. Although
 I discourage people from using these in general, if you need access to
 these arguments in the callback, you can check C<< %Role::Hooks::ARGS >>.
 
+Roles generated via L<Package::Variant> should work; see
+F<t/20packagevariant.t> for a demonstration.
+
 =head2 Methods
 
 =over
@@ -383,7 +387,7 @@ defined in!
     use Role::Hooks;
     Role::Hooks->before_apply(__PACKAGE__, sub {
       my ($role, $target) = @_;
-      "$role has been applied to $target.\n";
+      print "$role has been applied to $target.\n";
     });
   }
   
@@ -407,7 +411,7 @@ If you only care about direct applications of roles (i.e. the first one):
   Role::Hooks->before_apply(__PACKAGE__, sub {
     my ($role, $target) = @_;
     return if $role ne __PACKAGE__;
-    "$role has been applied to $target.\n";
+    print "$role has been applied to $target.\n";
   });
 
 If you only care about roles being applied to classes (i.e. the second one):
@@ -415,7 +419,7 @@ If you only care about roles being applied to classes (i.e. the second one):
   Role::Hooks->before_apply(__PACKAGE__, sub {
     my ($role, $target) = @_;
     return if Role::Hooks->is_role($target);
-    "$role has been applied to $target.\n";
+    print "$role has been applied to $target.\n";
   });
 
 =item C<< after_apply >>
@@ -464,7 +468,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2020 by Toby Inkster.
+This software is copyright (c) 2020-2022 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

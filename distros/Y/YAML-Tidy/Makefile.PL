@@ -46,7 +46,7 @@ my %WriteMakefileArgs = (
     "Test::Warnings" => "0.029",
     "YAML::LibYAML::API" => "0.013"
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }

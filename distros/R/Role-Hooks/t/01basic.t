@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Test that Role::Hooks compiles.
+Demonstration that Role::Hooks compiles.
 
 =head1 AUTHOR
 
@@ -16,7 +16,6 @@ This software is copyright (c) 2020 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
-
 
 =cut
 

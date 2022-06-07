@@ -1,5 +1,5 @@
 package Authen::Pluggable::Passwd;
-$Authen::Pluggable::Passwd::VERSION = '0.01';
+$Authen::Pluggable::Passwd::VERSION = '0.02';
 use Mojo::Base -base, -signatures;
 
 use Authen::Simple::Passwd;
@@ -32,11 +32,11 @@ sub cfg ($s, %cfg) {
 
 =head1 NAME
 
-Authen::Pluggable::Passwd - descrizione del modulo
+Authen::Pluggable::Passwd - Authentication via a passwd file
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 AUTHOR
 
@@ -53,4 +53,4 @@ the same terms as the Perl 5 programming language system itself.
 
 __END__
 
-# ABSTRACT: descrizione del modulo
+# ABSTRACT: Authentication via a passwd file

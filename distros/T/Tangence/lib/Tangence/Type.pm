@@ -4,10 +4,10 @@
 #  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.41;
+use Object::Pad 0.57;
 
-package Tangence::Type 0.28;
-class Tangence::Type isa Tangence::Meta::Type;
+package Tangence::Type 0.29;
+class Tangence::Type :isa(Tangence::Meta::Type);
 
 =head1 NAME
 
@@ -88,7 +88,7 @@ Removes a value of this type from the start of a L<Tangence::Message>.
 
 =cut
 
-class Tangence::Type::List isa Tangence::Type
+class Tangence::Type::List :isa(Tangence::Type)
 {
    use Carp;
    use Tangence::Constants;
@@ -120,7 +120,7 @@ class Tangence::Type::List isa Tangence::Type
    }
 }
 
-class Tangence::Type::Dict isa Tangence::Type
+class Tangence::Type::Dict :isa(Tangence::Type)
 {
    use Carp;
    use Tangence::Constants;
@@ -156,7 +156,7 @@ class Tangence::Type::Dict isa Tangence::Type
    }
 }
 
-class Tangence::Type::Primitive::bool isa Tangence::Type
+class Tangence::Type::Primitive::bool :isa(Tangence::Type)
 {
    use Carp;
    use Tangence::Constants;
@@ -179,7 +179,7 @@ class Tangence::Type::Primitive::bool isa Tangence::Type
    }
 }
 
-class Tangence::Type::Primitive::_integral isa Tangence::Type
+class Tangence::Type::Primitive::_integral :isa(Tangence::Type)
 {
    use Carp;
    use Tangence::Constants;
@@ -244,52 +244,52 @@ class Tangence::Type::Primitive::_integral isa Tangence::Type
    }
 }
 
-class Tangence::Type::Primitive::u8 isa Tangence::Type::Primitive::_integral
+class Tangence::Type::Primitive::u8 :isa(Tangence::Type::Primitive::_integral)
 {
    use constant SUBTYPE => Tangence::Constants::DATANUM_UINT8;
 }
 
-class Tangence::Type::Primitive::s8 isa Tangence::Type::Primitive::_integral
+class Tangence::Type::Primitive::s8 :isa(Tangence::Type::Primitive::_integral)
 {
    use constant SUBTYPE => Tangence::Constants::DATANUM_SINT8;
 }
 
-class Tangence::Type::Primitive::u16 isa Tangence::Type::Primitive::_integral
+class Tangence::Type::Primitive::u16 :isa(Tangence::Type::Primitive::_integral)
 {
    use constant SUBTYPE => Tangence::Constants::DATANUM_UINT16;
 }
 
-class Tangence::Type::Primitive::s16 isa Tangence::Type::Primitive::_integral
+class Tangence::Type::Primitive::s16 :isa(Tangence::Type::Primitive::_integral)
 {
    use constant SUBTYPE => Tangence::Constants::DATANUM_SINT16;
 }
 
-class Tangence::Type::Primitive::u32 isa Tangence::Type::Primitive::_integral
+class Tangence::Type::Primitive::u32 :isa(Tangence::Type::Primitive::_integral)
 {
    use constant SUBTYPE => Tangence::Constants::DATANUM_UINT32;
 }
 
-class Tangence::Type::Primitive::s32 isa Tangence::Type::Primitive::_integral
+class Tangence::Type::Primitive::s32 :isa(Tangence::Type::Primitive::_integral)
 {
    use constant SUBTYPE => Tangence::Constants::DATANUM_SINT32;
 }
 
-class Tangence::Type::Primitive::u64 isa Tangence::Type::Primitive::_integral
+class Tangence::Type::Primitive::u64 :isa(Tangence::Type::Primitive::_integral)
 {
    use constant SUBTYPE => Tangence::Constants::DATANUM_UINT64;
 }
 
-class Tangence::Type::Primitive::s64 isa Tangence::Type::Primitive::_integral
+class Tangence::Type::Primitive::s64 :isa(Tangence::Type::Primitive::_integral)
 {
    use constant SUBTYPE => Tangence::Constants::DATANUM_SINT64;
 }
 
-class Tangence::Type::Primitive::int isa Tangence::Type::Primitive::_integral
+class Tangence::Type::Primitive::int :isa(Tangence::Type::Primitive::_integral)
 {
    # empty
 }
 
-class Tangence::Type::Primitive::float isa Tangence::Type
+class Tangence::Type::Primitive::float :isa(Tangence::Type)
 {
    use Carp;
    use Tangence::Constants;
@@ -372,7 +372,7 @@ class Tangence::Type::Primitive::float isa Tangence::Type
    }
 }
 
-class Tangence::Type::Primitive::float16 isa Tangence::Type::Primitive::float
+class Tangence::Type::Primitive::float16 :isa(Tangence::Type::Primitive::float)
 {
    use Carp;
    use Tangence::Constants;
@@ -463,21 +463,21 @@ class Tangence::Type::Primitive::float16 isa Tangence::Type::Primitive::float
    }
 }
 
-class Tangence::Type::Primitive::float32 isa Tangence::Type::Primitive::float
+class Tangence::Type::Primitive::float32 :isa(Tangence::Type::Primitive::float)
 {
    use Tangence::Constants;
 
    use constant SUBTYPE => DATANUM_FLOAT32;
 }
 
-class Tangence::Type::Primitive::float64 isa Tangence::Type::Primitive::float
+class Tangence::Type::Primitive::float64 :isa(Tangence::Type::Primitive::float)
 {
    use Tangence::Constants;
 
    use constant SUBTYPE => DATANUM_FLOAT64;
 }
 
-class Tangence::Type::Primitive::str isa Tangence::Type
+class Tangence::Type::Primitive::str :isa(Tangence::Type)
 {
    use Carp;
    use Encode qw( encode_utf8 decode_utf8 );
@@ -504,7 +504,7 @@ class Tangence::Type::Primitive::str isa Tangence::Type
    }
 }
 
-class Tangence::Type::Primitive::obj isa Tangence::Type
+class Tangence::Type::Primitive::obj :isa(Tangence::Type)
 {
    use Carp;
    use Scalar::Util qw( blessed );
@@ -557,7 +557,7 @@ class Tangence::Type::Primitive::obj isa Tangence::Type
    }
 }
 
-class Tangence::Type::Primitive::any isa Tangence::Type
+class Tangence::Type::Primitive::any :isa(Tangence::Type)
 {
    use Carp;
    use Scalar::Util qw( blessed );
@@ -566,7 +566,7 @@ class Tangence::Type::Primitive::any isa Tangence::Type
    use Syntax::Keyword::Match;
 
    no if $] >= 5.035008, warnings => "experimental::builtin";
-   use constant HAVE_ISBOOL => defined &builtin::isbool;
+   use constant HAVE_IS_BOOL => defined &builtin::is_bool;
 
    my $TYPE_BOOL  = Tangence::Type->make( 'bool' );
    my $TYPE_INT   = Tangence::Type->make( 'int' );
@@ -597,7 +597,7 @@ class Tangence::Type::Primitive::any isa Tangence::Type
             $tmp =~ m/^[[:ascii:]]+$/ and ( $value ^ $value ) eq "0"
          };
 
-         if( HAVE_ISBOOL && builtin::isbool($value) ) {
+         if( HAVE_IS_BOOL && builtin::is_bool($value) ) {
             $TYPE_BOOL->pack_value( $message, $value );
          }
          # test for integers, but exclude NaN

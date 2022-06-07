@@ -1,0 +1,4 @@
+This is MarpaX::G4, a translator for converting
+Antlr4 grammars to Marpa::R2 syntax.
+Installation is discussed in the INSTALL document.
+Licensing is discussed in the LICENSE document.

@@ -41,7 +41,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use UI::Various::core;
 use UI::Various::widget;
@@ -53,7 +53,7 @@ our @EXPORT_OK = qw();
 
 #########################################################################
 
-=item text [rw, recommended]
+=item text [rw, fixed, recommended]
 
 the text as string or variable reference
 

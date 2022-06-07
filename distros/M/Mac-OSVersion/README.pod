@@ -8,6 +8,8 @@
 
 =for HTML <a href="https://metacpan.org/pod/Mac::OSVersion"><img src="https://img.shields.io/cpan/v/Mac-OSVersion.svg" /></A>
 
+=for HTML <a href="https://zenodo.org/badge/latestdoi/6171186"><img src="https://zenodo.org/badge/6171186.svg" alt="DOI"></a>
+
 =head1 The Mac::OSVersion module
 
 This is the I<README> for the L<Mac::OSVersion> Perl module. You're probably

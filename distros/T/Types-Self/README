@@ -37,11 +37,19 @@ SYNOPSIS
       );
 
 DESCRIPTION
+  `Self`
     This module exports a `Self` type constraint which consrtains values to be
     blessed objects in the same class as the package it was imported into, or
     blessed objects which consume the role it was imported into. It should do
     the right thing with inheritance.
 
+    Using `Self` in a class means the same as `InstanceOf[__PACKAGE__]`. (See
+    InstanceOf in Types::Standard.)
+
+    Using `Self` in a role means the same as `ConsumerOf[__PACKAGE__]`. (See
+    ConsumerOf in Types::Standard.)
+
+  `is_Self`
     This module also exports `is_Self`, which returns a boolean.
 
       package Marriage;
@@ -62,6 +70,9 @@ DESCRIPTION
         return $me;
       }
 
+    `is_Self( $var )` can also be written as `Self->check( $var )`.
+
+  `assert_Self`
     The module also exports `assert_Self` which acts like `is_Self` but
     instead of returning a boolean, either lives or dies. This can be useful
     is you need to check that the first argument to a function is a blessed
@@ -74,10 +85,52 @@ DESCRIPTION
         return $self;
       }
 
+    `assert_Self( $var )` can also be written as `Self->( $var )`.
+
+  `to_Self`
     The module also exports `to_Self` which will attempt to coerce other types
     to the Self type.
 
+    `to_Self( $var )` can also be written as `Self->coerce( $var )`.
+
+  `coercions_for_Self`
+    An easy way of adding coercions to your Self type for the benefit of
+    `to_Self`. Other classes which use `InstanceOf[$YourClass]` will also get
+    these coercions.
+
+    Accepts a list of type+code pairs. The code can be a scalarref naming a
+    method to call to coerce a value, a coderef to call to coerce the value
+    (operating on $_), or a string of Perl code to call to coerce the value
+    (operating on $_).
+
+      package MyClass;
+      use Moo;
+      use Types::Self -all;
+      use Types::Standard qw( HashRef ArrayRef ScalarRef );
+
+      coercions_for_Self(
+        HashRef,   \'new',
+        ArrayRef,  \'from_array',
+        ScalarRef, sub { ... },
+      );
+
+      sub from_array {
+        my ( $class, $arrayref ) = ( shift, @_ );
+        ...;
+      }
+
+  Exporting
     Only `Self` is exported by default.
+
+    Other functions need to be requested:
+
+      use Types::Self -all;
+
+    Functions can be renamed:
+
+      use Types::Self
+        'Self'    => { -as => 'ThisClass' },
+        'is_Self' => { -as => 'is_ThisClass' };
 
 BUGS
     Please report any bugs to

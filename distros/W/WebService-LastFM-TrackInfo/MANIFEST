@@ -8,7 +8,9 @@ Makefile.PL
 README
 README.md
 dist.ini
-eg/analyze
+eg/album-info
+eg/artist-info
+eg/track-info
 lib/WebService/LastFM/TrackInfo.pm
 t/00-compile.t
 t/01-methods.t

@@ -1,12 +1,13 @@
 # ABSTRACT: Tidy YAML files
 use strict;
+use warnings;
 use warnings FATAL => qw/ substr /;
 
 use v5.20;
 use experimental qw/ signatures /;
 package YAML::Tidy;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use YAML::Tidy::Node;
 use YAML::Tidy::Config;
@@ -313,7 +314,7 @@ sub _replace_quoting($self, $node) {
     # TODO nodes with tags or anchors
     my $default_style = $self->cfg->default_scalar_style;
     # single line flow scalars
-    if ($node->{style} != $default_style) {
+    if (defined $default_style and $node->{style} != $default_style) {
         my ($changed, $new_string) = $self->_change_style($node, $default_style);
         if ($changed) {
             my $lines = $self->{lines};
@@ -336,7 +337,7 @@ sub _replace_quoting($self, $node) {
 
 sub _change_style($self, $node, $style) {
     my $value = $node->{value};
-    if (grep { $_ eq $value } @all or $value =~ m/($re)/ and $node->{style} == YAML_PLAIN_SCALAR_STYLE) {
+    if (grep { $_ eq $value } @all or $value =~ m/($re)/) {
         # leave me alone
         return (0);
     }

@@ -55,6 +55,62 @@ encode_json($entity, { a => JSON_TYPE_INT, b => JSON_TYPE_STRING }),
 # => {"a":123,"b":"HELLO"}
 ```
 
+## RESOLVERS
+
+The unbless\_object function performs a resolver for a given object type.
+
+- resolve\_arrayref($object, $spec)
+
+    When `$spec` is `ARRAYREF`, executes this function.
+    `$object` must either have `@{}` overload or be an iterator with `next` method.
+    If `$spec` is `[JSON_TYPE_STRING, JSON_TYPE_STRING]`, then resolve like this `list($object)->[0], list($object)->[1]`. `list` function is an internal utility function that converts `$object` to arrayref.
+
+- resolve\_hashref($object, $spec)
+
+    When `$spec` is `HASHREF`, executes this function.
+    If `$spec` is `{ foo => JSON_TYPE_STRING, bar => JSON_TYPE_STRING }`, then resolve like this `{ foo => $object->foo, bar => $object->bar }`.
+
+- resolve\_json\_type\_arrayof($object, $spec)
+
+    When `$spec` is `Cpanel::JSON::XS::Type::ArrayOf`, executes this function.
+    `$object` must either have `@{}` overload or be an iterator with `next` method.
+
+- resolve\_json\_type\_hashof($object, $spec)
+
+    When `$spec` is `Cpanel::JSON::XS::Type::HashOf`, executes this function.
+    `$object` requires `JSON_KEYS` function. `JSON_KEYS` method is a whitelist of `$object`
+    that are allowed to be published as JSON.
+
+    ```perl
+    package SomeEntity {
+        sub new {
+            my ($class, %args) = @_;
+            return bless \%args, $class
+        }
+
+        sub secret { shift->{secret} }
+
+        sub a { shift->{a} }
+        sub b { shift->{b} }
+
+        # Do not include keys that cannot be published like `secret`
+        sub JSON_KEYS { qw/a b/ }
+    }
+
+    my $entity = SomeEntity->new(a => 1, b => 2, secret => 'XXX');
+    unbless_object($entity, json_type_hashof(JSON_TYPE_STRING))
+    # => { a => 1, b => 2 }
+    ```
+
+- resolve\_json\_type\_anyof($object, $spec)
+
+    When `$spec` is `Cpanel::JSON::XS::Type::AnyOf`, executes this function.
+    If `$object` is available as array, it is resolved as array; if it is available as hash, it is resolved as hash; otherwise, it is resolved as scalar.
+
+# SEE ALSO
+
+[Cpanel::JSON::XS::Type](https://metacpan.org/pod/Cpanel%3A%3AJSON%3A%3AXS%3A%3AType)
+
 # LICENSE
 
 Copyright (C) kfly8.

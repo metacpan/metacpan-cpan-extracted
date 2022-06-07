@@ -29,7 +29,7 @@ use parent 0.225 qw( Test::Class );
 use Test::More 1.001002;
 use Test::Exception 0.35;
 use Test::Output 1.02;
-use Test::MockModule 0.16 qw( strict );
+use Test::MockModule 0.05;
 
 use FindBin 1.50;
 use Term::CLI;
@@ -397,7 +397,7 @@ sub check_readline: Test(3) {
     my ($expected, $got, @lines);
 
     my $rl_mock = Test::MockModule->new('Term::ReadLine');
-    $rl_mock->redefine('readline' => sub { return shift @lines });
+    $rl_mock->mock('readline' => sub { return shift @lines });
 
     @lines = @test_lines;
     $expected = $lines[0];
@@ -465,7 +465,7 @@ sub check_complete_line: Test(12) {
         # so temporarily mock it.
         my $quote_char = '"';
         my $rl_mock = Test::MockModule->new('Term::CLI::ReadLine');
-        $rl_mock->redefine('completion_quote_character' => $quote_char);
+        $rl_mock->mock('completion_quote_character' => $quote_char);
 
         $line = "show $quote_char";
         $text = 'd';

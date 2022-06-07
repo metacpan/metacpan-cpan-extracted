@@ -1,5 +1,5 @@
 package HTML::Widgets::NavMenu::Iterator::Base;
-$HTML::Widgets::NavMenu::Iterator::Base::VERSION = '1.0902';
+$HTML::Widgets::NavMenu::Iterator::Base::VERSION = '1.1000';
 use strict;
 use warnings;
 
@@ -128,7 +128,7 @@ HTML::Widgets::NavMenu::Iterator::Base - base class for the iterator.
 
 =head1 VERSION
 
-version 1.0902
+version 1.1000
 
 =head1 SYNOPSIS
 

@@ -5,15 +5,15 @@ use warnings;
 package Types::Self;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001';
+our $VERSION   = '0.002';
 
 use Exporter::Tiny qw();
 our @ISA        = qw( Exporter::Tiny );
 our @EXPORT     = qw( Self );
-our @EXPORT_OK  = qw( is_Self assert_Self to_Self );
+our @EXPORT_OK  = qw( is_Self assert_Self to_Self coercions_for_Self );
 
 use Role::Hooks qw();
-use Types::Standard qw( InstanceOf ConsumerOf );
+use Types::Standard qw( InstanceOf ConsumerOf is_ScalarRef );
 
 sub _generate_Self {
 	my ( $me, $name, $args, $globals ) = ( shift, @_ );
@@ -51,6 +51,34 @@ sub _generate_to_Self {
 		my ( $value ) = @_;
 		$me->_make_type_constraint( $globals ) unless defined $globals->{type};
 		return $globals->{type}->coerce( $value );
+	};
+}
+
+sub _generate_coercions_for_Self {
+	my ( $me, $name, $args, $globals ) = ( shift, @_ );
+
+	return sub {
+		my ( @args ) = @_;
+		$me->_make_type_constraint( $globals ) unless defined $globals->{type};
+		my $type = $globals->{type};
+		my $caller = $globals->{into};
+
+		# expand scalarref args
+		for my $i ( 0 .. $#args ) {
+			my $arg = $args[$i];
+			if ( is_ScalarRef $arg ) {
+				my $method = $$arg;
+				$args[$i] = sub {
+					my $method_ref = $caller->can( $method );
+					unshift @_, $caller;
+					goto $method_ref;
+				};
+			}
+		}
+
+		$type->coercion->i_really_want_to_unfreeze;
+		$type->coercion->add_type_coercions( @args );
+		$type->coercion->freeze;
 	};
 }
 
@@ -112,10 +140,20 @@ Types::Self - provides a "Self" type constraint, referring to the caller class o
 
 =head1 DESCRIPTION
 
+=head2 C<< Self >>
+
 This module exports a C<Self> type constraint which consrtains values to be
 blessed objects in the same class as the package it was imported into, or
 blessed objects which consume the role it was imported into. It should do
 the right thing with inheritance.
+
+Using C<Self> in a class means the same as C<< InstanceOf[__PACKAGE__] >>.
+(See B<InstanceOf> in L<Types::Standard>.)
+
+Using C<Self> in a role means the same as C<< ConsumerOf[__PACKAGE__] >>.
+(See B<ConsumerOf> in L<Types::Standard>.)
+
+=head2 C<< is_Self >>
 
 This module also exports C<is_Self>, which returns a boolean.
 
@@ -137,6 +175,10 @@ This module also exports C<is_Self>, which returns a boolean.
     return $me;
   }
 
+C<< is_Self( $var ) >> can also be written as C<< Self->check( $var ) >>.
+
+=head2 C<< assert_Self >>
+
 The module also exports C<assert_Self> which acts like C<is_Self> but instead
 of returning a boolean, either lives or dies. This can be useful is you need
 to check that the first argument to a function is a blessed object.
@@ -148,10 +190,55 @@ to check that the first argument to a function is a blessed object.
     return $self;
   }
 
+C<< assert_Self( $var ) >> can also be written as C<< Self->( $var ) >>.
+
+=head2 C<< to_Self >>
+
 The module also exports C<to_Self> which will attempt to coerce other types
 to the B<Self> type.
 
+C<< to_Self( $var ) >> can also be written as C<< Self->coerce( $var ) >>.
+
+=head2 C<< coercions_for_Self >>
+
+An easy way of adding coercions to your B<Self> type for the benefit of
+C<< to_Self >>. Other classes which use C<< InstanceOf[$YourClass] >>
+will also get these coercions.
+
+Accepts a list of type+code pairs. The code can be a scalarref naming a
+method to call to coerce a value, a coderef to call to coerce the value
+(operating on C<< $_ >>), or a string of Perl code to call to coerce the
+value (operating on C<< $_ >>).
+
+  package MyClass;
+  use Moo;
+  use Types::Self -all;
+  use Types::Standard qw( HashRef ArrayRef ScalarRef );
+
+  coercions_for_Self(
+    HashRef,   \'new',
+    ArrayRef,  \'from_array',
+    ScalarRef, sub { ... },
+  );
+
+  sub from_array {
+    my ( $class, $arrayref ) = ( shift, @_ );
+    ...;
+  }
+
+=head2 Exporting
+
 Only C<Self> is exported by default.
+
+Other functions need to be requested:
+
+  use Types::Self -all;
+
+Functions can be renamed:
+
+  use Types::Self
+    'Self'    => { -as => 'ThisClass' },
+    'is_Self' => { -as => 'is_ThisClass' };
 
 =head1 BUGS
 

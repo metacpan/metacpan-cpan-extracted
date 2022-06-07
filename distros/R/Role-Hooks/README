@@ -44,6 +44,9 @@ DESCRIPTION
     access to these arguments in the callback, you can check
     %Role::Hooks::ARGS.
 
+    Roles generated via Package::Variant should work; see t/20packagevariant.t
+    for a demonstration.
+
   Methods
     `before_apply`
           Role::Hooks->before_apply($rolename, $callback);
@@ -60,7 +63,7 @@ DESCRIPTION
             use Role::Hooks;
             Role::Hooks->before_apply(__PACKAGE__, sub {
               my ($role, $target) = @_;
-              "$role has been applied to $target.\n";
+              print "$role has been applied to $target.\n";
             });
           }
   
@@ -85,7 +88,7 @@ DESCRIPTION
           Role::Hooks->before_apply(__PACKAGE__, sub {
             my ($role, $target) = @_;
             return if $role ne __PACKAGE__;
-            "$role has been applied to $target.\n";
+            print "$role has been applied to $target.\n";
           });
 
         If you only care about roles being applied to classes (i.e. the second
@@ -94,7 +97,7 @@ DESCRIPTION
           Role::Hooks->before_apply(__PACKAGE__, sub {
             my ($role, $target) = @_;
             return if Role::Hooks->is_role($target);
-            "$role has been applied to $target.\n";
+            print "$role has been applied to $target.\n";
           });
 
     `after_apply`
@@ -137,7 +140,7 @@ AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2020 by Toby Inkster.
+    This software is copyright (c) 2020-2022 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

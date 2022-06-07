@@ -2,8 +2,8 @@ NAME
     File::Trash::FreeDesktop - Trash files
 
 VERSION
-    This document describes version 0.19 of File::Trash::FreeDesktop (from
-    Perl distribution File-Trash-FreeDesktop), released on 2017-07-10.
+    This document describes version 0.200 of File::Trash::FreeDesktop (from
+    Perl distribution File-Trash-FreeDesktop), released on 2022-05-06.
 
 SYNOPSIS
      use File::Trash::FreeDesktop;
@@ -183,6 +183,11 @@ METHODS
 
     Return list of files erased.
 
+ENVIRONMENT
+  PERL_FILE_TRASH_FREEDESKTOP_DEBUG
+    Bool, if set to true will produce additional logging statements using
+    Log::ger at the "trace" level.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/File-Trash-FreeDesktop>.
@@ -190,14 +195,6 @@ HOMEPAGE
 SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-File-Trash-FreeDesktop>.
-
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=File-Trash-FreeDeskto
-    p>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
     [1] http://freedesktop.org/wiki/Specifications/trash-spec
@@ -224,10 +221,37 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2015, 2014, 2012 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2022, 2017, 2015, 2014, 2012 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=File-Trash-FreeDeskto
+    p>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

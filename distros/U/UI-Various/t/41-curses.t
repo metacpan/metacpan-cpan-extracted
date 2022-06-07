@@ -23,7 +23,7 @@ use Test::Output;
 BEGIN {
     eval { require Curses::UI; };
     $@  and  plan skip_all => 'Curses::UI not found';
-    plan tests => 43;
+    plan tests => 51;
 
     # define fixed environment for unit tests:
     delete $ENV{DISPLAY};
@@ -128,6 +128,13 @@ my $rvar2 = undef;
 my $radio2 = UI::Various::Radio->new(buttons => [1 => 1, 2 => 2, 3 => 3],
 				     var => \$rvar2);
 my $listbox0 = UI::Various::Listbox->new(texts => [], height => 5);
+my @options = ([a => 1], [b => 2], [c => 3], 42);
+my $optionmenu = UI::Various::Optionmenu->new(init => 2, options => \@options);
+my $option2 = 0;
+my $optionmenu2 = UI::Various::Optionmenu->new(options => \@options,
+					       on_select => sub {
+						   $option2 = $_[0];
+					       });
 
 stderr_like
 {   $text1->_prepare(0, 0);   }
@@ -152,7 +159,11 @@ stderr_like
 stderr_like
 {   $listbox0->_prepare(0, 0);   }
     qr/^UI::.*Curses::Listbox element must be accompanied by parent$re_msg_tail/,
-    'orphaned Radio causes error';
+    'orphaned Listbox causes error';
+stderr_like
+{   $optionmenu->_prepare(0, 0);   }
+    qr/^.*Curses::Optionmenu element must be accompanied by parent$re_msg_tail/,
+    'orphaned Optionmenu causes error';
 
 # additional fields with same SCALAR reference as $input1:
 my $text2  = UI::Various::Text ->new(text    => \$ivar);
@@ -359,9 +370,9 @@ my $button3 = UI::Various::Button->new(text => 'Quit',
 				       code => sub {   $w->destroy;   });
 $w = $main->window({title => 'WIN', width => 20}, $text1, $button2, $button3);
 
-@chars_to_read = (' ',		# select button 2 in WIN
-		  ' ',		# select button in DIA
-		  "\t", ' ');	# select button 3 in WIN
+@chars_to_read = (' ',			# select button 2 in WIN
+		  ' ',			# select button in DIA
+		  "\t", ' ');		# select button 3 in WIN
 combined_like
 {   $main->mainloop;   }
     # Note that we can apparently only match some parts of the window here:
@@ -369,6 +380,49 @@ combined_like
     'mainloop 6 produces correct output';
 is($run_dialog, 1, 'dialogue did run');
 is(@{$main->{children}}, 0, 'main 6 no longer has children');
+
+####################################
+# test standard behaviour with the 1st optionmenu:
+my $option = -1;
+$w =  $main->window($optionmenu,
+		    UI::Various::Button->new
+		    (text => 'Quit',
+		     code => sub{
+			 $option = $optionmenu->selected();
+			 $w->destroy;
+		     }));
+
+@chars_to_read = (' ',			# select Optionmenu
+		  'j', 'j', ' ',	# go from #2 (init) to #4 and select it
+		  "\t", ' ');		# quit
+combined_like
+{   $main->mainloop;   }
+    qr/^.*Quit\b.*$/s,
+    'mainloop 7 produces correct output';
+is($option, 42, '1st optionmenu had correct final selection');
+is(@{$main->{children}}, 0, 'main 7 no longer has children');
+
+####################################
+# test standard behaviour with the 2nd optionmenu:
+$option = -1;
+$w =  $main->window($optionmenu2,
+		    UI::Various::Button->new
+		    (text => 'Quit',
+		     code => sub{
+			 $option = $optionmenu2->selected();
+			 $w->destroy;
+		     }));
+
+@chars_to_read = (' ',			# select Optionmenu
+		  'j', 'j', ' ',	# go to #3 and select it
+		  "\t", ' ');		# quit
+combined_like
+{   $main->mainloop;   }
+    qr/^.*Quit\b.*$/s,
+    'mainloop 8 produces correct output';
+is($option, 3, '2nd optionmenu had correct final selection');
+is($option2, 3, '2nd optionmenu run its on_select');
+is(@{$main->{children}}, 0, 'main 8 no longer has children');
 
 ####################################
 # test unused behaviour (and get 100% coverage):

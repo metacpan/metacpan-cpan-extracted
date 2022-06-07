@@ -10,7 +10,7 @@ UI::Various::Listbox - general listbox widget of L<UI::Various>
 
     use UI::Various;
     my $main = UI::Various::main();
-    my $variable = 0;
+    my @variable = ('1st', '2nd', '3rd');
     $main->window(...
                   UI::Various::Listbox->new(height => 5,
                                             selection => 2,
@@ -42,7 +42,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use UI::Various::core;
 use UI::Various::widget;
@@ -68,7 +68,7 @@ sub first($)
     return get('first', $_[0]);
 }
 
-=item height [rw]
+=item height [rw, fixed]
 
 the height of the listbox is the maximum number of elements shown
 
@@ -118,7 +118,7 @@ sub on_select($;$)
 		  @_);
 }
 
-=item selection [rw, recommended]
+=item selection [rw, fixed, recommended]
 
 the selection type of the listbox, a number between 0 and 2, defaults to 2:
 
@@ -131,6 +131,9 @@ the selection type of the listbox, a number between 0 and 2, defaults to 2:
 =item 2 - multiple selection is possible
 
 =back
+
+Note that changing the value after displaying the listbox will not work
+without recreating its container.
 
 =cut
 
@@ -148,7 +151,7 @@ sub selection($;$)
 		  @_);
 }
 
-=item texts [ro, recommended]
+=item texts [rw, fixed, recommended]
 
 the texts of the elements of the listbox as strings
 

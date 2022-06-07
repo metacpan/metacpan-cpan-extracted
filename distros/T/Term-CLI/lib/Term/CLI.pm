@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI 0.055002;
+package Term::CLI 0.057001;
 
 use 5.014;
 use warnings;
@@ -26,8 +26,11 @@ use warnings;
 use Text::ParseWords 3.27 qw( parse_line );
 use Term::CLI::ReadLine;
 use FindBin 1.50;
+use File::Which 1.09;
 
 use Term::CLI::L10N qw( loc );
+
+use List::Util qw( first );
 
 # Load all Term::CLI classes so the user doesn't have to.
 
@@ -52,6 +55,18 @@ use Types::Standard 1.000005 qw(
     Int
 );
 
+my @PAGERS = (
+    [   qw(
+            less --no-lessopen --no-init
+            --dumb --quit-at-eof
+            --quit-if-one-screen
+            --RAW-CONTROL-CHARS
+        )
+    ],
+    ['more'],
+    ['pg'],
+);
+
 use Moo 1.000001;
 use namespace::clean 0.25;
 
@@ -66,6 +81,14 @@ my $DFL_HIST_SIZE = 1000;
 
 # Provide a default for 'name'.
 has '+name' => ( default => sub {$FindBin::Script} );
+
+has 'pager' => (
+    is      => 'rw',
+    isa     => ArrayRef [Str],
+    default => sub {
+        first { defined which( $_->[0] ) } @PAGERS;
+    },
+);
 
 has cleanup => (
     is        => 'rw',
@@ -242,6 +265,50 @@ sub write_history {
     return 1;
 }
 
+sub write_pager {
+    my ($self, %args) = @_;
+
+    my $pager_cmd = $self->pager // [];
+
+    my $text =
+        ref $args{text} eq 'ARRAY' 
+            ? join( q{}, @{ $args{text} } )
+            : $args{text};
+
+    if (@$pager_cmd) {
+        no warnings 'exec';    ## no critic (ProhibitNoWarnings)
+        local ( $SIG{PIPE} ) = 'IGNORE';    # Temporarily avoid accidents.
+
+        my $pager_fh;
+        if (! open $pager_fh, '|-', @{$pager_cmd}) {
+            $args{status} = -1;
+            $args{error} =
+                loc( "cannot run '[_1]': [_2]", $$pager_cmd[0], $! );
+            return %args;
+        }
+
+        print $pager_fh $text;
+        $pager_fh->close;
+
+        $args{status} = $?;
+        $args{error}  = $! if $args{status} != 0;
+        return %args;
+    }
+
+    my $pager_fh;
+    if (! open $pager_fh, '>&', \*STDOUT) {
+        $args{status} = -1;
+        $args{error}  = "cannot dup STDOUT: $!";
+        return %args;
+    }
+    print $pager_fh $text;
+    if ( !$pager_fh->close ) {
+        $args{status} = -1;
+        $args{error}  = $!;
+    }
+    return %args;
+}
+
 1;
 
 __END__
@@ -254,7 +321,7 @@ Term::CLI - CLI interpreter based on Term::ReadLine
 
 =head1 VERSION
 
-version 0.055002
+version 0.057001
 
 =head1 SYNOPSIS
 
@@ -408,6 +475,19 @@ and default command prompt.
 
 If not given, defaults to C<$FindBin::Script> (see L<FindBin>(3p)).
 
+=item B<pager> =E<gt> I<ArrayRef>[I<Str>]
+
+The C<pager> attribute is used by L<write_pager()|/write_pager>.
+
+The value should be a command line split on words, e.g.:
+
+    OBJ->pager( [ 'cat', '-n', '-e' ] );
+
+If an empty list is provided, no external pager will
+be used, and output is printed to F<STDOUT> directly.
+
+See also the L<pager|/pager> method.
+
 =item B<prompt> =E<gt> I<Str>
 
 Prompt to display when L<readline|/readline> is called. Defaults
@@ -527,6 +607,19 @@ The application name.
 See
 L<name in Term::CLI::Base|Term::CLI::Base/name>.
 
+=item B<pager> ( [ I<ArrayRef>[I<Str>] ] )
+X<pager>
+
+Get or set the pager to use for L<write_pager()|/write_pager>.
+
+If an empty list is provided, no external pager will
+be used, and output is printed to F<STDOUT> directly.
+
+Example:
+
+    $help_cmd->pager([]); # Print directly to STDOUT.
+    $help_cmd->pager([ 'cat', '-n' ]); # Number output lines.
+
 =item B<prompt> ( [ I<Str> ] )
 X<prompt>
 
@@ -580,6 +673,36 @@ Default is C< \t\n>, that is I<space>, I<tab>, and I<newline>.
 
 The first character in the string is also the character that is
 appended to a completed word at the command line prompt.
+
+=back
+
+=head2 Output Control
+
+
+=over
+
+=item B<write_pager>
+X<write_pager>
+
+    %status = $CLI->write_pager( text => TEXT, ... );
+
+Output the I<TEXT> through the L<pager|/pager> command, or
+F<STDOUT> if the C<pager> attribute is not set.
+
+Returns the arguments it was given with the following fields set if
+there was an error:
+
+=over
+
+=item C<status> =E<gt> I<Int>
+
+Non-zero value indicates an error.
+
+=item C<error> =E<gt> I<Str>
+
+Erorr diagnostic.
+
+=back
 
 =back
 

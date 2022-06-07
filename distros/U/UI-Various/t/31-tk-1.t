@@ -32,13 +32,14 @@ BEGIN {
     $ENV{DISPLAY}  or  plan skip_all => 'DISPLAY not found';
     eval { require Tk; };
     $@  and  plan skip_all => 'Perl/Tk not found';
-    plan tests => 31;
+    plan tests => 35;
 
     # define fixed environment for unit tests:
     delete $ENV{UI};
 }
 
 use UI::Various({use => ['Tk']});
+diag('UI::Various::Tk has been initialised');	# TODO: temporary diagnostics
 
 #########################################################################
 # specific check for problematic configuration, is sub-test as the
@@ -55,6 +56,32 @@ if ($_)
     diag('Your ', $^O,
 	 ' apparently has a strange font configuration (no default font?).',
 	 '  This will hurt!');
+}
+# TODO: temporary check for specific CPAN smoker:
+if ($ENV{DISPLAY} =~ m/:121$/)
+{
+    diag 'extended check for DISPLAY == ', $ENV{DISPLAY};
+    diag 'TK has version ', $Tk::VERSION;
+    my ($countdown, $pid) = (10, 0);
+    while (--$countdown > 0)
+    {
+	sleep 7  if $countdown < 10;
+	open my $ps, '-|', 'ps', 'auxww'  or  die "can't PS: $!\n";
+	my $found = 0;
+	while (<$ps>)
+	{
+	    next unless m/[X][a-z].* :121\b/;
+	    m/^[^ ]+\s+(\d+).*/  and  $pid = $1;
+	    $found++;
+	}
+	close $ps;
+	last if $found > 0;
+	diag 'X server not yet running - ', $countdown;
+    }
+    if ($countdown > 0)
+    {   diag 'X server seems to be running with PID ', $pid;   }
+    else
+    {   diag 'no X server - we will fail';   }
 }
 
 #########################################################################
@@ -106,6 +133,15 @@ my @text8 = ('1st entry', '2nd entry', '3rd entry', '4th entry',
 	     '5th entry', '6th entry', '7th entry', '8th entry');
 my $listbox = UI::Various::Listbox->new(texts => \@text8, height => 3,
 					selection => 1);
+my @options = ([a => 1], [b => 2], [c => 3], 42);
+my $optionmenu = UI::Various::Optionmenu->new(init => 1,
+					      options => \@options);
+my $option = 0;
+my $optionmenu2 = UI::Various::Optionmenu->new(init => 2,
+					       options => \@options,
+					       on_select => sub {
+						   $option = $_[0];
+					       });
 
 stderr_like
 {   $text1->_prepare(0, 0);   }
@@ -135,14 +171,18 @@ stderr_like
 {   $listbox->_prepare(0, 0);   }
     qr/^UI::.*::Tk::Listbox element must be accompanied by parent$re_msg_tail/,
     'orphaned Listbox causes error';
+stderr_like
+{   $optionmenu->_prepare(0, 0);   }
+    qr/^UI.*::Tk::Optionmenu element must be accompanied by parent$re_msg_tail/,
+    'orphaned Optionmenu causes error';
 
 $box1->add(0, 1, $input, $check, $text2, $radio);
 
 my $button2 = UI::Various::Button->new(text => 'Quit');
 my $box2 = UI::Various::Box->new(columns => 2);
 $box2->add($button1, $button2);
-my $w = $main->window({title => 'Hello', height => 12, width => 42},
-		      $text1, $box1, $listbox, $box2);
+my $w = $main->window({title => 'Hello', height => 16, width => 42},
+		      $text1, $box1, $listbox, $optionmenu, $optionmenu2, $box2);
 is(ref($w), 'UI::Various::Tk::Window',
    'type UI::Various::Tk::Window is correct');
 $button2->code(sub { $w->destroy(); });
@@ -164,6 +204,10 @@ combined_like
     $listbox->_tk()->selectionSet(2);
     $listbox->_tk()->selectionSet(1);
     $selection2 = $listbox->selected();
+    # some pseudo invocations:
+    &{$optionmenu ->_tk()->cget('-command')->[0]}(1);
+    &{$optionmenu2->_tk()->cget('-command')->[0]}(2);
+    # ... and quit:
     $button2->_tk()->invoke;
     $main->_mainloop_run;
 }
@@ -184,3 +228,6 @@ is($cvar, 1, 'checkbox variable has correct new value of 1');
 is($rvar, 'b', 'radio button variable has correct new value of "b"(lue)');
 is($selection1, undef, 'listbox has correct initial selection');
 is($selection2, 1, 'listbox has correct (invalid) final selection');
+is($optionmenu->selected(), 1, 'optionmenu 1 has correct selection');
+is($optionmenu2->selected(), 2, 'optionmenu 2 has correct selection');
+is($option, 2, 'option has been modified in menu 2');

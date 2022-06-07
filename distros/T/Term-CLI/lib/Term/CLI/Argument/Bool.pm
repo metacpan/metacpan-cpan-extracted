@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::Argument::Bool 0.055002;
+package Term::CLI::Argument::Bool 0.057001;
 
 use 5.014;
 use warnings;
@@ -128,7 +128,7 @@ Term::CLI::Argument::Bool - class for "boolean" arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.055002
+version 0.057001
 
 =head1 SYNOPSIS
 

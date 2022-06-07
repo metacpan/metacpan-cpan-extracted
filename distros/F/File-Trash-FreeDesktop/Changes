@@ -1,4 +1,12 @@
-0.19    2017-07-10 (PERLANCAR)
+0.200   2022-05-06  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Add more logging statement and a more useful error message,
+	  observe PERL_FILE_TRASH_FREEDESKTOP_DEBUG.
+
+	- [internal] Replace List::MoreUtils with List::Util.
+
+
+0.19    2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -7,14 +15,14 @@
 	- Replace Log::Any with Log::ger.
 
 
-0.18    2015-08-17 (PERLANCAR)
+0.18    2015-08-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Switch from Log::Any to Log::Any::IfLOG.
 
 
-0.17    2014-12-05 (PERLANCAR)
+0.17    2014-12-05  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -22,7 +30,7 @@
 	  File::MoreUtil.
 
 
-0.16    2014-11-18 (PERLANCAR)
+0.16    2014-11-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -30,27 +38,27 @@
 	  [CT].
 
 
-0.15    2014-11-13 (PERLANCAR)
+0.15    2014-11-13  Released-By: PERLANCAR
 
         - Instead of dying, warn+skip trashdir which does not have info/
           [RT#100281].
 
 
-0.14    2014-05-17 (SHARYANTO)
+0.14    2014-05-17  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Replace File::Slurp with File::Slurp::Tiny.
 
 
-0.13    2014-05-01 (SHARYANTO)
+0.13    2014-05-01  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Remove debugging print (steven--).
 
 
-0.12    2014-05-01 (SHARYANTO)
+0.12    2014-05-01  Released-By: SHARYANTO
 
         - Also try file's mountpoint + /tmp for trash dir (providing it's still
           under the same mountpoint as the file). This avoids failure when
@@ -58,7 +66,7 @@
           module tried to create /.Trash-1000).
 
 
-0.11    2012-09-06 (SHARYANTO)
+0.11    2012-09-06  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -67,7 +75,7 @@
         - Delay loading Sys::Filesystem::MountPoint.
 
 
-0.10    2012-09-05 (SHARYANTO)
+0.10    2012-09-05  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
@@ -75,7 +83,7 @@
           time to time to trash in /tmp, causing test failures).
 
 
-0.09    2012-08-30 (SHARYANTO)
+0.09    2012-08-30  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
@@ -86,7 +94,7 @@
         - Fix symlink handling when determining mountpoint.
 
 
-0.08    2012-08-29 (SHARYANTO)
+0.08    2012-08-29  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
@@ -94,7 +102,7 @@
           (or, to be exact, not recommended since now).
 
 
-0.07    2012-08-24 (SHARYANTO)
+0.07    2012-08-24  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
@@ -102,7 +110,7 @@
           allows us to trash symlink (instead of trashing the symlink's target).
 
 
-0.06    2012-08-24 (SHARYANTO)
+0.06    2012-08-24  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
@@ -113,14 +121,14 @@
         - Path was not recorded in absolute in .trashinfo
 
 
-0.05    2012-07-27 (SHARYANTO)
+0.05    2012-07-27  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
         - recover(): Add option 'on_target_exists'.
 
 
-0.04    2012-07-27 (SHARYANTO)
+0.04    2012-07-27  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
@@ -131,21 +139,21 @@
         - trash(): Add option 'on_not_found'.
 
 
-0.03    2012-07-26 (SHARYANTO)
+0.03    2012-07-26  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
-        - By default sort list_contents() result by deletion_date (older first)
+        - By default sort list_contents() result by deletion_date  Released-By: older first
           and file name.
 
 
-0.02    2012-07-26 (SHARYANTO)
+0.02    2012-07-26  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
         - trash() returns location of file in trash.
 
 
-0.01    2012-07-12 (SHARYANTO)
+0.01    2012-07-12  Released-By: SHARYANTO
 
         - First version.

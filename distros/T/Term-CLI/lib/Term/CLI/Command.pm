@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::Command 0.055002;
+package Term::CLI::Command 0.057001;
 
 use 5.014;
 use warnings;
@@ -97,7 +97,10 @@ sub complete {
         my @args = $self->arguments;
         my $arg_repeat = 0;
         while ( @{$unprocessed} && @args ) {
-            push @{$processed}, shift @{$unprocessed};
+            push @{$processed}, {
+                element => $args[0],
+                value   => shift @{$unprocessed},
+            };
             $arg_repeat++;
             if ( $args[0]->max_occur > 0 and $arg_repeat >= $args[0]->max_occur ) {
                 shift @args;
@@ -115,7 +118,11 @@ sub complete {
             return grep { is_prefix_str( $text, $_ ) } $self->command_names;
         }
         if ( my $cmd = $self->find_command( $unprocessed->[0] ) ) {
-            push @{$processed}, shift @{$unprocessed};
+            push @{$processed}, {
+                element => $cmd,
+                value => $cmd->name,
+            };
+            shift @{$unprocessed};
             return $cmd->complete( $text, $state );
         }
     }
@@ -132,7 +139,9 @@ sub execute_command {
     # Dereference and copy arguments/unparsed/options to prevent
     # unwanted side-effects.
     $args{arguments}    = [ @{ $args{arguments} } ];
-    $args{unparsed}     = [ @{ $args{unparsed} } ];
+    $args{unprocessed}  = [ @{ $args{unprocessed} } ];
+    $args{unparsed}     = $args{unprocessed};
+    $args{processed}    = [ @{ $args{processed} } ];
     $args{options}      = { %{ $args{options} } };
     $args{command_path} = [ @{ $args{command_path} } ];
 
@@ -140,7 +149,7 @@ sub execute_command {
 
     if ( $self->has_options ) {
         my %opt_result = get_options_from_array(
-            args         => $args{unparsed},
+            args         => $args{unprocessed},
             spec         => $self->options,
             result       => $args{options},
             pass_through => 0,
@@ -160,7 +169,7 @@ sub execute_command {
 
     return $self->try_callback(%args) if !$self->has_commands;
 
-    if ( $self->require_sub_command || @{ $args{unparsed} } > 0 ) {
+    if ( $self->require_sub_command || @{ $args{unprocessed} } > 0 ) {
         %args = $self->_execute_sub_command(%args);
     }
     return $self->try_callback(%args);
@@ -191,11 +200,12 @@ sub _too_few_args_error {
 sub _check_arguments {
     my ( $self, %args ) = @_;
 
-    my $unparsed = $args{unparsed};
+    my $unprocessed = $args{unprocessed};
+    my $processed   = $args{processed};
 
     my @arg_spec = $self->arguments;
 
-    if ( @arg_spec == 0 and @{$unparsed} > 0 ) {
+    if ( @arg_spec == 0 and @{$unprocessed} > 0 ) {
         return (
             %args,
             status => -1,
@@ -205,7 +215,7 @@ sub _check_arguments {
 
     my $argno = 0;
     for my $arg_spec (@arg_spec) {
-        if ( @{$unparsed} < $arg_spec->min_occur ) {
+        if ( @{$unprocessed} < $arg_spec->min_occur ) {
             return (
                 %args,
                 status => -1,
@@ -215,11 +225,11 @@ sub _check_arguments {
 
         my $args_to_check =
             $arg_spec->max_occur > 0
-            ? min( $arg_spec->max_occur, scalar @{$unparsed} )
-            : scalar @{$unparsed};
+            ? min( $arg_spec->max_occur, scalar @{$unprocessed} )
+            : scalar @{$unprocessed};
 
         for my $i ( 1 .. $args_to_check ) {
-            my $arg = $unparsed->[0];
+            my $arg = $unprocessed->[0];
             $argno++;
             my $arg_value = $arg_spec->validate($arg, \%args);
             if ( !defined $arg_value ) {
@@ -231,7 +241,8 @@ sub _check_arguments {
                 );
             }
             push @{ $args{arguments} }, $arg_value;
-            shift @{$unparsed};
+            push @{ $processed }, { element => $arg_spec, value => $arg_value };
+            shift @{ $unprocessed };
         }
     }
 
@@ -240,7 +251,7 @@ sub _check_arguments {
     # a max_occur that is exceeded. If the command has no sub-commands that
     # is surely an error. If it does have sub-commands, we'll leave it to
     # be parsed further.
-    if ( @{$unparsed} > 0 && !$self->has_commands ) {
+    if ( @{$unprocessed} > 0 && !$self->has_commands ) {
         my $last_spec = $arg_spec[-1];
         return (
             %args,
@@ -257,9 +268,10 @@ sub _check_arguments {
 sub _execute_sub_command {
     my ( $self, %args ) = @_;
 
-    my $unparsed = $args{unparsed};
+    my $unprocessed = $args{unprocessed};
+    my $processed   = $args{processed};
 
-    if ( @{$unparsed} == 0 ) {
+    if ( @{$unprocessed} == 0 ) {
         if ( scalar $self->commands == 1 ) {
             my ($cmd) = $self->commands;
             return (
@@ -271,7 +283,7 @@ sub _execute_sub_command {
         return ( %args, status => -1, error => loc("missing sub-command") );
     }
 
-    my $cmd_name = $unparsed->[0];
+    my $cmd_name = $unprocessed->[0];
 
     my $cmd = $self->find_command($cmd_name);
 
@@ -294,7 +306,8 @@ sub _execute_sub_command {
         );
     }
 
-    shift @{$unparsed};
+    shift @{ $unprocessed };
+    push @{ $processed }, { element => $cmd, value => $cmd->name };
     return $cmd->execute_command(%args);
 }
 
@@ -310,7 +323,7 @@ Term::CLI::Command - Class for (sub-)commands in Term::CLI
 
 =head1 VERSION
 
-version 0.055002
+version 0.057001
 
 =head1 SYNOPSIS
 
@@ -578,7 +591,7 @@ Example:
 =item B<execute_command> ( I<KEY> =E<gt> I<VAL>, ... )
 
 This method is called by C<Term::CLI::Role::CommandSet>'s
-L<execute|Term::CLI::Role::CommandSet/execute> method.
+L<execute_line|Term::CLI::Role::CommandSet/execute_line> method.
 It should not be called directly.
 
 It accepts the same list of parameters as the

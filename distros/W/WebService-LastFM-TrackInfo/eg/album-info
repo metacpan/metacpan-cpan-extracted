@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Data::Dumper::Compact qw(ddc);
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(WebService-LastFM-TrackInfo);
+use WebService::LastFM::TrackInfo;
+
+my $api_key = shift || die qq/Usage: perl $0 your_api_key "Artist Name" "Album Name"\n/;
+my $artist  = shift || 'Led Zeppelin';
+my $album   = shift || 'Presence';
+
+my $w = WebService::LastFM::TrackInfo->new(
+    api_key => $api_key,
+    method  => 'album',
+);
+
+my $r = $w->fetch(
+    artist => $artist,
+    album  => $album,
+);
+
+print ddc($r, {max_width=>128});

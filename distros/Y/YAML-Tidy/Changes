@@ -1,5 +1,9 @@
 Revision history for Perl module YAML::Tidy
 
+0.006 2022-06-07 15:12:11+02:00
+
+    - Fix scalar style
+
 0.005 2022-04-16 21:59:58+02:00
 
     - Fix tarball (remove accidentally included etc/docker/perl5 directory)

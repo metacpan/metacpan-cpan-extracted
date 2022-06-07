@@ -1,5 +1,5 @@
 package Mojo::Leds::Page;
-$Mojo::Leds::Page::VERSION = '1.13';
+$Mojo::Leds::Page::VERSION = '1.14';
 use 5.014;    # because s///r usage
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::Util qw(class_to_path);
@@ -33,7 +33,7 @@ sub render_pm {
 
     # if undef we suppose that &render_html do the render job by itself
     return unless $render_html;
-    $s->render_maybe( %{ $s->render_html } ) or $s->reply->not_found;
+    $s->render_maybe(%$render_html) or $s->reply->not_found;
 }
 
 sub render_html {
@@ -59,11 +59,12 @@ sub render_static_file {
     my $dRoot = $c->app->config->{docs_root} || '';
 
     # indipendently from url, it consider the requested file local to the ctl
-    my $ctl_path = $c->app->home->rel_file( $dRoot . '/' . class_to_path($c) );
+    my $ctl_path
+        = $c->app->home->rel_file( $dRoot . '/' . class_to_path($c) );
 
     my $fn = $c->tx->req->url->path->parts->[-1];    # the requested file name
     my $filepath = $ctl_path->dirname()->child($fn);    # filesystem file path
-    return $c->reply->not_found unless ( -e $filepath );    # file doen't exists
+    return $c->reply->not_found unless ( -e $filepath );  # file doen't exists
 
     my %opt = (
         content_disposition => 'inline',
@@ -83,7 +84,7 @@ Mojo::Leds::Page - Standard page controller for Mojo::Leds
 
 =head1 VERSION
 
-version 1.13
+version 1.14
 
 =head1 SYNOPSIS
 

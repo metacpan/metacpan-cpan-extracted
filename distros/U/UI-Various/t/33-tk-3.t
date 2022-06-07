@@ -39,6 +39,7 @@ BEGIN {
 }
 
 use UI::Various({use => ['Tk']});
+diag('UI::Various::Tk has been initialised');	# TODO: temporary diagnostics
 
 #########################################################################
 # specific check for problematic configuration, is sub-test as the
@@ -55,6 +56,32 @@ if ($_)
     diag('Your ', $^O,
 	 ' apparently has a strange font configuration (no default font?).',
 	 '  This will hurt!');
+}
+# TODO: temporary check for specific CPAN smoker:
+if ($ENV{DISPLAY} =~ m/:121$/)
+{
+    diag 'extended check for DISPLAY == ', $ENV{DISPLAY};
+    diag 'TK has version ', $Tk::VERSION;
+    my ($countdown, $pid) = (10, 0);
+    while (--$countdown > 0)
+    {
+	sleep 7  if $countdown < 10;
+	open my $ps, '-|', 'ps', 'auxww'  or  die "can't PS: $!\n";
+	my $found = 0;
+	while (<$ps>)
+	{
+	    next unless m/[X][a-z].* :121\b/;
+	    m/^[^ ]+\s+(\d+).*/  and  $pid = $1;
+	    $found++;
+	}
+	close $ps;
+	last if $found > 0;
+	diag 'X server not yet running - ', $countdown;
+    }
+    if ($countdown > 0)
+    {   diag 'X server seems to be running with PID ', $pid;   }
+    else
+    {   diag 'no X server - we will fail';   }
 }
 
 ####################################

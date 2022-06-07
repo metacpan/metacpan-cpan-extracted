@@ -3,6 +3,12 @@ Revision history for Dist::Zilla::PluginBundle::Author::WATERKIP
 TODO:
 * Get dual license to work with dzil
 
+3.0       2022-06-07 03:34:26Z
+
+    * Add gz to encoder
+    * Remove feature from prereqs
+    * Add some defaults to skip, eg base, feature, autodie
+
 2.9       2020-12-10 14:05:42Z
 
     * Update Dockerfile with new registry

@@ -3,7 +3,7 @@ NAME
     modules
 
 VERSION
-    version 0.01
+    version 0.02
 
 SYNOPSIS
       use Authen::Pluggable;
@@ -61,10 +61,23 @@ METHODS
       ),
 
     loads "Authen::Pluggable::plugin1" two times, one with provider name
-    "alias1" and one with "alias2". See "50-alias.t" in test folder for an
-    example with two different password files
+    "alias1" and one with "alias2". See "50-alias.t" in t in test folder for
+    an example with two different password files
 
     It always return the object itself.
+
+  authen($username, $password)
+    Call all configured providers and return the first with a valid
+    authentication.
+
+    The structure returned is usually something like this
+
+      { provider => $provider, user => $user, cn => $cn, gid => $gid };
+
+    where $provider is the alias of the provider which return the valid
+    authentication and $cn is the common name of the user.
+
+    If no plugins return a valid authentication, this method returns undef.
 
 EXAMPLE FOR CONFIGURING PROVIDERS
     There are various methods to select the providers where autenticate and

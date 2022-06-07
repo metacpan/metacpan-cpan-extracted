@@ -1,5 +1,5 @@
 package Authen::Pluggable;
-$Authen::Pluggable::VERSION = '0.01';
+$Authen::Pluggable::VERSION = '0.02';
 use Mojo::Base -base, -signatures;
 use Mojo::Loader qw/load_class/;
 
@@ -71,7 +71,7 @@ Authen::Pluggable - A Perl module to authenticate users via pluggable modules
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -140,10 +140,23 @@ loads C<Authen::Pluggable::plugin1> and C<Authen::Pluggable::plugin2>
   ),
 
 loads C<Authen::Pluggable::plugin1> two times, one with provider name C<alias1> and
-one with C<alias2>. See C<50-alias.t> in test folder for an example with two
+one with C<alias2>. See L<t/50-alias.t> in test folder for an example with two
 different password files
 
 It always return the object itself.
+
+=head2 authen($username, $password)
+
+Call all configured providers and return the first with a valid authentication.
+
+The structure returned is usually something like this
+
+  { provider => $provider, user => $user, cn => $cn, gid => $gid };
+
+where C<$provider> is the alias of the provider which return the valid
+authentication and C<$cn> is the common name of the user.
+
+If no plugins return a valid authentication, this method returns undef.
 
 =head1 EXAMPLE FOR CONFIGURING PROVIDERS
 

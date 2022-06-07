@@ -48,7 +48,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use UI::Various::core;
 use UI::Various::container;
@@ -103,9 +103,9 @@ defining the defaults for all others that do not set them.
 
 =over
 
-=item L<height|UI::Various::widget/height rw, inherited> [rw, optional]
+=item L<height|UI::Various::widget/height rw, fixed, inherited> [rw, fixed, optional]
 
-=item L<width|UI::Various::widget/width rw, inherited> [rw, optional]
+=item L<width|UI::Various::widget/width rw, fixed, inherited> [rw, fixed, optional]
 
 =back
 

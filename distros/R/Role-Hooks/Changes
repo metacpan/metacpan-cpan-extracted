@@ -6,6 +6,17 @@ Home page:    <https://metacpan.org/release/Role-Hooks>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Role-Hooks>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.004	2022-06-07
+
+ [ Bug Fixes ]
+ - Add missing `print` to print statements in examples.
+   Fixes RT#135361.
+   Alexander Hartmaier++
+   <https://rt.cpan.org/Ticket/Display.html?id=135361>
+
+ [ Documentation ]
+ - Test and document interaction with Package::Variant.
+
 0.003	2020-10-26
 
  [ Bug Fixes ]

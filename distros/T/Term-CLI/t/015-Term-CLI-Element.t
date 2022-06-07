@@ -59,11 +59,11 @@ sub check_term: Test(3) {
 
     my $t = Term::CLI::ReadLine->new('elt_tester');
     isa_ok( $t, 'Term::CLI::ReadLine',
-        'M6::CLI::ReadLine->new returns object' );
+        'Term::CLI::ReadLine->new returns object' );
     is ($elt->term, $t, "term() returns consistently");
 
     #is( $t->ReadLine, 'Term::ReadLine::Gnu',
-    #    'M6::CLI::ReadLine selects GNU ReadLine' );
+    #    'Term::CLI::ReadLine selects GNU ReadLine' );
     return;
 }
 

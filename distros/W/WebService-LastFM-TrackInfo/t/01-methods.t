@@ -18,6 +18,14 @@ subtest 'throws' => sub {
 
     throws_ok { $ws->fetch(artist => 'foo') }
         qr/No track provided/, 'fetch with no track';
+
+    $ws = new_ok 'WebService::LastFM::TrackInfo' => [
+        api_key => 'abc123',
+        method  => 'album',
+    ];
+
+    throws_ok { $ws->fetch(artist => 'foo') }
+        qr/No album provided/, 'fetch with no album';
 };
 
 subtest 'mock' => sub {

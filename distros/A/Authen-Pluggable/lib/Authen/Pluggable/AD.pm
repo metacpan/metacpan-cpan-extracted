@@ -1,5 +1,5 @@
 package Authen::Pluggable::AD;
-$Authen::Pluggable::AD::VERSION = '0.01';
+$Authen::Pluggable::AD::VERSION = '0.02';
 use Mojo::Base -base, -signatures;
 use Net::LDAP;
 
@@ -84,11 +84,11 @@ sub log ( $s, $type, $msg ) {
 
 =head1 NAME
 
-Authen::Pluggable::AD - descrizione del modulo
+Authen::Pluggable::AD - Authentication via Active Directory
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 AUTHOR
 
@@ -105,4 +105,4 @@ the same terms as the Perl 5 programming language system itself.
 
 __END__
 
-# ABSTRACT: descrizione del modulo
+# ABSTRACT: Authentication via Active Directory

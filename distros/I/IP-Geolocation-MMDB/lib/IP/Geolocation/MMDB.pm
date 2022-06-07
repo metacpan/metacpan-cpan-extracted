@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = 1.007;
+our $VERSION = 1.008;
 
 use IP::Geolocation::MMDB::Metadata;
 use Math::BigInt 1.999806;
@@ -21,6 +21,7 @@ sub new {
   my $flags = 0;
 
   my $self = $class->_new($file, $flags);
+  bless $self, $class;
 
   return $self;
 }
@@ -68,7 +69,7 @@ IP::Geolocation::MMDB - Read MaxMind DB files
 
 =head1 VERSION
 
-version 1.007
+version 1.008
 
 =head1 SYNOPSIS
 
@@ -227,6 +228,16 @@ None.
 =head1 AUTHOR
 
 Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
+
+=head1 CONTRIBUTORS
+
+=over
+
+=item *
+
+Yujuan Jiang
+
+=back
 
 =head1 BUGS AND LIMITATIONS
 

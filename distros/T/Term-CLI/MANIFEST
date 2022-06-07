@@ -56,6 +56,16 @@ lib/Term/CLI/Role/HelpText.pm
 lib/Term/CLI/Role/State.pm
 lib/Term/CLI/Tutorial.pod
 lib/Term/CLI/Util.pm
+pkg/debian/changelog
+pkg/debian/compat
+pkg/debian/control
+pkg/debian/copyright
+pkg/debian/libterm-cli-perl.docs
+pkg/debian/libterm-cli-perl.examples
+pkg/debian/rules
+pkg/debian/source/format
+pkg/debian/upstream/metadata
+pkg/debian/watch
 pkg/fedora/perl-Term-CLI.spec
 t/000-compile.t
 t/010-Term-CLI-Util.t

@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.43;
 
-package Tangence::Meta::Class 0.28;
+package Tangence::Meta::Class 0.29;
 class Tangence::Meta::Class :strict(params);
 
 use Carp;

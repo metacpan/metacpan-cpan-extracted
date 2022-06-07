@@ -55,15 +55,16 @@ subtest 'Testing other functions' => sub {
 	use Types::Self -all;
 	my $object = bless {};
 
-	use Types::Standard qw( Int );
-	if ( ! Self->has_coercion ) {
-		Self->coercion->i_really_want_to_unfreeze;
-		Self->coercion->add_type_coercions( Int, sub {
-			my $value = shift;
-			bless { value => $value };
-		} );
-		Self->coercion->freeze;
+	sub from_int {
+		my ( $class, $value ) = ( shift, @_ );
+		bless { value => $value }, $class;
 	}
+
+	use Types::Standard qw( Int ArrayRef );
+	coercions_for_Self(
+		Int,       \'from_int',
+		ArrayRef,  sub { __PACKAGE__->from_int( shift->[0] ) },
+	);
 
 	package main;
 
@@ -83,6 +84,12 @@ subtest 'Testing other functions' => sub {
 	ok(
 		ref($coerced) && $coerced->{value} == 42,
 		'to_Self seems to work',
+	);
+
+	$coerced = Local::MyClass2::to_Self( [ 666 ] );
+	ok(
+		ref($coerced) && $coerced->{value} == 666,
+		'to_Self seems to work again',
 	);
 };
 

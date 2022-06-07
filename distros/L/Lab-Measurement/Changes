@@ -4,6 +4,15 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.820 2022-06-06
+  * New driver: Lakeshore 350 temperature controller
+  * New WWW connection for REST-like interfaces
+  * Improve Synctek MCL1-540 code
+  * Lakeshore 372: Add function for sample heater output query
+  * Add OI Mercury level plotter example script
+  * New driver (work in progress): Cryomagnetics 4G magnet power supply
+  * New driver (work in progress): Nanonis Tramea (1d sweep)
+
 3.810 2022-02-14
   * New driver: Synctek MCL1-540 Lock-in Amplifier
   * New driver: Andeen-Hagerling AH2700A ultra-precision capacitance bridge

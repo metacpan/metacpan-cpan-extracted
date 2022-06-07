@@ -1,7 +1,7 @@
 This archive contains the distribution WebService-LastFM-TrackInfo,
-version 0.0201:
+version 0.0205:
 
-  Access to the track.getInfo slice of the LastFM API
+  Access to *.getInfo slices of the last.fm API
 
 This software is copyright (c) 2022 by Gene Boggs.
 

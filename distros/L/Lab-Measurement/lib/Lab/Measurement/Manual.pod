@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation manual for Lab::Measurement
 
 =head1 VERSION
 
-version 3.810
+version 3.820
 
 =head1 OVERVIEW
 
@@ -188,7 +188,7 @@ alias: L<Lab::Moose::Instrument::Agilent34410A>
 
 =item * L<Lab::Moose::Instrument::SignalRecovery7265>
 
-=item * L<Lab::Moose::Instrument::MCL1_540>
+=item * L<Lab::Moose::Instrument::Synctek_MCL1_540>
 
 =item * L<Lab::Moose::Instrument::ZI_MFIA>
 
@@ -240,6 +240,8 @@ contains support for temperature sensor and He/N2 level meters.
 
 =item * L<Lab::Moose::Instrument::OI_IPS>
 
+=item * L<Lab::Moose::Instrument::Cryomagnetics_4G> (work in progress)
+
 =back
 
 =head3 Helium and nitrogen liquid level meters
@@ -259,6 +261,8 @@ contains support for temperature sensor and He/N2 level meters.
 =item * L<Lab::Moose::Instrument::Lakeshore340>
 
 =item * L<Lab::Moose::Instrument::Lakeshore340::Helium3>
+
+=item * L<Lab::Moose::Instrument::Lakeshore350>
 
 =item * L<Lab::Moose::Instrument::Lakeshore372>
 
@@ -283,6 +287,14 @@ contains support for temperature sensor and He/N2 level meters.
 =over
 
 =item * L<Lab::Moose::Instrument::Rigol_DG5000>
+
+=back
+
+=head3 Special
+
+=over
+
+=item * L<Lab::Moose::Instrument::NanonisTremea> (work in progress)
 
 =back
 
@@ -384,6 +396,8 @@ contains support for temperature sensor and He/N2 level meters.
 
 alias: C<Lab::Moose::Connection::VISA_GPIB>
 
+=item * L<Lab::Moose::Connection::WWW>
+
 =back
 
 =head3 USB Test & Measurement
@@ -455,7 +469,7 @@ This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
             2019       Simon Reinhardt
             2020       Andreas K. Huettel, Sam Bingner, Simon Reinhardt
             2021       Andreas K. Huettel, Fabian Weinelt, Simon Reinhardt
-            2022       Simon Reinhardt
+            2022       Mia Schambeck, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

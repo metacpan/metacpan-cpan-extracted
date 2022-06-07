@@ -37,7 +37,7 @@ use warnings 'once';
 use Carp;
 use Storable ();
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use UI::Various::language::en;
 
@@ -69,7 +69,7 @@ our @EXPORT = qw(language logging stderr using
 use constant _ROOT_PACKAGE_ => substr(__PACKAGE__, 0, rindex(__PACKAGE__, "::"));
 
 use constant UI_ELEMENTS =>
-    qw(Box Button Check Dialog Input Listbox Main Radio Text Window);
+    qw(Box Button Check Dialog Input Listbox Main Optionmenu Radio Text Window);
 
 our @CARP_NOT =
     (	_ROOT_PACKAGE_,

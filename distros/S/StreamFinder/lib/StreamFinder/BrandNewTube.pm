@@ -1,6 +1,6 @@
 =head1 NAME
 
-StreamFinder::BrandNewTube - Fetch actual raw streamable URLs from BrandNewTube.com.
+StreamFinder::BrandNewTube - Fetch actual raw streamable URLs from BrandNewTube.com & UGetube.com.
 
 =head1 AUTHOR
 
@@ -90,18 +90,18 @@ file.
 
 =head1 DESCRIPTION
 
-StreamFinder::BrandNewTube accepts a valid full BrandNewTube video ID or page URL 
-(either one of their ".html" or "embed" URL) on brandnewtube.com and returns 
-the actual stream URL, title, and cover art icon for that video.  
-The purpose is that one needs this URL in order to have the option to 
+StreamFinder::BrandNewTube accepts a valid brandnewtube.com video ID or 
+page URL -OR- a ugetube.com page URL (either one of their ".html" or "embed" 
+URL) and returns the actual stream URL, title, and cover art icon for that 
+video.  The purpose is that one needs this URL in order to have the option to 
 stream the video in one's own choice of media player software rather than 
 using their web browser and accepting any / all flash, ads, javascript, 
 cookies, trackers, web-bugs, and other crapware that can come with that 
 method of play.  The author uses his own custom all-purpose media player 
 called "fauxdacious" (his custom hacked version of the open-source 
 "audacious" audio player).  "fauxdacious" incorporates this module to 
-decode and play brandnewtube.com videos.  This is a submodule of the general 
-StreamFinder module.
+decode and play brandnewtube.com and ugetube.com videos.  This is a submodule 
+of the general StreamFinder module.
 
 Depends:  
 
@@ -114,15 +114,20 @@ L<URI::Escape>, L<HTML::Entities>, and L<LWP::UserAgent>.
 =item B<new>(I<ID>|I<url> [, I<-secure> [ => 0|1 ]] 
 [, I<-debug> [ => 0|1|2 ]])
 
-Accepts a brandnewtube.com video ID or URL and creates and returns a new video 
-object, or I<undef> if the URL is not a valid BrandNewTube video or no streams 
-are found.  The URL can be the full URL, 
-ie. https://brandnewtube.com/B<video-id>.html, 
+Accepts a brandnewtube.com video ID or URL -OR ugetube.com URL and creates and 
+returns a new video object, or I<undef> if the URL is not a valid BrandNewTube 
+video or no streams are found.  For brandnewtube.com The URL can be the full 
+URL, ie. https://brandnewtube.com/B<video-id>.html, 
 https://brandnewtube.com/B<@channel-id>, 
 https://brandnewtube.com/embed/B<video-id> or just B<video-id> or 
 I<@channel-id>.  If a channel URL is given, then the first (latest) video of 
 that channel will be returned.  Note:  Channel-ids are distinguished by the 
-"@"-sign. 
+"@"-sign.  
+
+NOTE:  For ugetube.com, a full URL must be given (not just an ID), as there's 
+no way to distinguish them from brandnewtube.com IDs and we decided to use 
+this code to handle both sites, as they are both very similar (originally 
+written for brandnewtube.com)!
 
 The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  
 If 1 then only secure ("https://") streams will be returned.
@@ -371,7 +376,7 @@ sub new
 	my $response;
 	$self->{'genre'} = 'Video';
 
-	unless ($url =~ m#https?\:#) {
+	unless ($url =~ m#https?\:#) {  #NOTE: ASSUME brandnewtube ID!:
 		if ($url =~ /^\@/) {
 			$url = 'https://brandnewtube.com/@' . $url;
 		} else {
@@ -385,7 +390,7 @@ sub new
 
 	if ($url =~ /\@/) {
 		my $html = '';
-		print STDERR "-FETCHING CHANNEL URL=$url= ID=".$self->{'id'}."=\n"  if ($DEBUG);
+		print STDERR "-FETCHING CHANNEL URL=$url=\n"  if ($DEBUG);
 		$response = $ua->get($url);
 		if ($response->is_success) {
 			$html = $response->decoded_content;
@@ -428,11 +433,11 @@ sub new
 				$self->{'albumartist'} = $1  if ($publisherHtml =~ m#\<a\s+href\=\"([^\"]+)#s);
 				if ($publisherHtml =~ m#\<span\s+title="Published on\s+([^\"]+)#s) {
 					$self->{'created'} = $1;
-					$self->{'year'} = $1  if ($self->{'created'} =~ /\d\d\d\d$/);
+					$self->{'year'} = $1  if ($self->{'created'} =~ /(\d\d\d\d)$/);
 				}
 				$self->{'year'} ||= $1  if ($publisherHtml =~ m#(\d+)\<\/span#s);
 			}
-			if ($html =~ m#<div class="publisher-avatar(.+?)\/div\>#s) {
+			if ($html =~ m#<div class="publisher-avatar(.+?)\<\/div\>#s) {
 				my $publisherHtml = $1;
 				$self->{'articonurl'} = $1  if ($publisherHtml =~ m#\<img\s+src\=\"([^\"]+)#s);
 				$self->{'albumartist'} ||= $1  if ($publisherHtml =~ m#\<a\s+href\=\"([^\"]+)#s);
@@ -440,6 +445,17 @@ sub new
 			if ($html =~ m#<div class="video-published(.+?)\/div\>#s) {
 				my $publisherHtml = $1;
 				$self->{'genre'} = HTML::Entities::decode_entities($1)  if ($publisherHtml =~ m#\>([^\<]+)\<\/a#s);
+				#ugetube-specific year & genre:
+				if ($publisherHtml =~ m#Published on\s+(.+)#s) {
+					$self->{'created'} ||= $1;
+					$self->{'created'} =~ s/\s+$//;
+					if ($self->{'created'} =~ s#\s*\/\s+In\s+(.+)$##s) {
+						my $genredata = $1;
+						$genredata =~ s#\<[^\>]+\>##gs;
+						$self->{'genre'} ||= $genredata;
+					}
+					$self->{'year'} ||= $1  if ($self->{'created'} =~ /(\d\d\d\d)/);
+				}
 			}
 
 			$self->{'description'} = $1  if ($html =~ m# itemprop\=\"description\"\>(.+?)\<\/p\>#s);

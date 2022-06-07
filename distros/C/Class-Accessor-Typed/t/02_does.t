@@ -24,7 +24,6 @@ use Test::Exception;
         rw => {
             hoge => 'Foo',
         },
-        new => 1,
     );
 }
 

@@ -445,3 +445,6 @@ Revision history for StreamFinder
         https://<channel>.podbean.com/...).  This appears due to Podbean 
         possibly expanding the types of valid URLs at some point.
         - Update default user-agent to Firefox 99.
+1.87    2022/06/07
+        - StreamFinder::BrandNewTube - Add support for Ugetube.com videos.
+        Note:  User must specify full ugetube.com URLs.

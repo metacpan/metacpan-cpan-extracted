@@ -1,5 +1,9 @@
 Changelog for Mojo-Leds
 
+1.14 2022-06-07T13:26:00
+ - Optimized render_pm call
+ - Set 5.16 as minimum perl version
+
 1.13 2022-06-01T09:15:00
  - *** BREAK COMPATIBILITY *** In previous versions we saved $c->req->params->to_hash in a "query" key in session. This is not good (think about user/pass credentials) so we removed this.
  - Changed a test in t/70-common_routes.t to solve some failed tests under windows.

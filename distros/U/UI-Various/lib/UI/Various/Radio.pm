@@ -48,7 +48,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use UI::Various::core;
 use UI::Various::widget;
@@ -60,7 +60,7 @@ our @EXPORT_OK = qw();
 
 #########################################################################
 
-=item buttons [rw]
+=item buttons [rw, fixed]
 
 an ARRAY with pairs of key values and corresponding displayed texts of the
 radio buttons, e.g.:
@@ -117,8 +117,8 @@ sub buttons($;$)
 
 a variable reference for the radio buttons
 
-The variable will be set to one of the key values of C<L<buttons|/buttons rw>>
-when it is selected.  Note that if it's initial value is defined to
+The variable will be set to one of the key values of C<L<buttons|/buttons rw
+fixed>> when it is selected.  Note that if it's initial value is defined to
 something not being an existing key value of that ARRAY, it will be set to
 C<undef>.
 

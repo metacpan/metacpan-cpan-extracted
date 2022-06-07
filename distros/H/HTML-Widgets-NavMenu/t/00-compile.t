@@ -6,14 +6,17 @@ use warnings;
 
 use Test::More;
 
-plan tests => 20 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 25 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'HTML/Widgets/NavMenu.pm',
+    'HTML/Widgets/NavMenu/Error.pm',
+    'HTML/Widgets/NavMenu/Error/Redirect.pm',
     'HTML/Widgets/NavMenu/EscapeHtml.pm',
     'HTML/Widgets/NavMenu/ExpandVal.pm',
     'HTML/Widgets/NavMenu/HeaderRole.pm',
     'HTML/Widgets/NavMenu/Iterator/Base.pm',
+    'HTML/Widgets/NavMenu/Iterator/GetCurrentlyActive.pm',
     'HTML/Widgets/NavMenu/Iterator/Html.pm',
     'HTML/Widgets/NavMenu/Iterator/Html/Item.pm',
     'HTML/Widgets/NavMenu/Iterator/JQTreeView.pm',
@@ -21,6 +24,8 @@ my @module_files = (
     'HTML/Widgets/NavMenu/Iterator/NavMenu/HeaderRole.pm',
     'HTML/Widgets/NavMenu/Iterator/SiteMap.pm',
     'HTML/Widgets/NavMenu/JQueryTreeView.pm',
+    'HTML/Widgets/NavMenu/LeadingPath/Component.pm',
+    'HTML/Widgets/NavMenu/NodeDescription.pm',
     'HTML/Widgets/NavMenu/Object.pm',
     'HTML/Widgets/NavMenu/Predicate.pm',
     'HTML/Widgets/NavMenu/TagGen.pm',

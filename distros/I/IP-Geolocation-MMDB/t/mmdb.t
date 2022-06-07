@@ -32,7 +32,10 @@ ok !eval { IP::Geolocation::MMDB->new(file => 'nonexistent') },
 
 my $file = catfile(qw(t data Test-City.mmdb));
 
-my $mmdb = new_ok 'IP::Geolocation::MMDB' => [file => $file];
+# Ensure that the module is subclassable by using an empty subclass.
+@IP::Geolocation::MMDB::Subclass::ISA = qw(IP::Geolocation::MMDB);
+
+my $mmdb = new_ok 'IP::Geolocation::MMDB::Subclass' => [file => $file];
 
 can_ok $mmdb, qw(getcc record_for_address iterate_search_tree metadata);
 

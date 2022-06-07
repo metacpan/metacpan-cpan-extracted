@@ -24,7 +24,6 @@ Class::Accessor::Typed - Class::Accessor::Lite with Type
         ro_lazy => {
             bar_lazy => { isa => 'Int', builder => 'bar_lazy_builder' },
         }
-        new => 1,
     );
 
     sub _build_foo_lazy  { 'string' }
@@ -48,7 +47,8 @@ Setting of property is defined by hash reference that specifies property name as
 
 - new => $true\_of\_false
 
-    If value evaluates to true, the default constructor is created.
+    If value evaluates to false, the default constructor is not created.
+    The other cases, Class::Accessor::Typed provides the default constructor automatically.
 
 - rw => \\%name\_and\_option\_of\_the\_properties
 
@@ -72,14 +72,14 @@ Setting of property is defined by hash reference that specifies property name as
 
 ## PROPERTY RULE
 
-Property rule can receive string of type name (e.g. `Int`) or hash reference (with `isa`/`does`, `default` and `builder`).
+Property rule can receive string of type name (e.g. `Int`) or hash reference (with `isa`/`does`, `default`, `optional` and `builder`).
 `default` can only use on `rw`, `ro` and `wo`, and `builder` can only use on `rw_lazy` and `ro_lazy`.
 
 # SEE ALSO
 
-[Class::Accessor::Lite](https://metacpan.org/pod/Class::Accessor::Lite)
+[Class::Accessor::Lite](https://metacpan.org/pod/Class%3A%3AAccessor%3A%3ALite)
 
-[Smart::Args](https://metacpan.org/pod/Smart::Args)
+[Smart::Args](https://metacpan.org/pod/Smart%3A%3AArgs)
 
 # LICENSE
 

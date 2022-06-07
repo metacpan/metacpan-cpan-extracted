@@ -126,11 +126,6 @@ sub print_error_messages {
   compile_not_ok_file('TestCase::CompileError::OArray::AssignNumericArray');
 }
 
-# Enum
-{
-  compile_not_ok_file('TestCase::CompileError::Enum::PrivateAccess');
-}
-
 # Call sub
 {
   {
@@ -332,29 +327,6 @@ sub print_error_messages {
     {
       my $source = 'class Tmp { static method main : void () { my $Foo::name : int; } }';
       compile_not_ok($source, qr/The local variable "\$Foo::name" can't contain "::"/);
-    }
-  }
-}
-
-# Class variable
-{
-  # Access control
-  compile_not_ok_file('TestCase::CompileError::ClassVar::Private');
-  
-  # Class variable name
-  {
-    compile_not_ok_file('TestCase::CompileError::ClassVar::OurClassVarNameStartDigit', qr/The symbol name part of the variable name "\$3foo" can't begin with a number/);
-    compile_not_ok_file('TestCase::CompileError::ClassVar::OurClassVarNameInvalidColon', qr/Unexpected token ":"/);
-    compile_not_ok_file('TestCase::CompileError::ClassVar::OurClassVarNameEndColon2', qr/The variable name "\$FOO::" can't end with "::"/);
-    compile_not_ok_file('TestCase::CompileError::ClassVar::OurClassVarNameContainsUnderScoreTwice', qr/The variable name "\$Foo__Bar" can't contain "__"/);
-    compile_not_ok_file('TestCase::CompileError::ClassVar::OurClassVarNameColon2Twice', qr/The variable name "\$FOO::::BAR" can't contain "::::"/);
-    {
-      my $source = 'class Tmp { our $NAME : int; static method main : void () { ${NAME = 1; } }';
-      compile_not_ok($source, qr/Need a closing brace "}" at the end of the variable name/);
-    }
-    {
-      my $source = 'class Tmp { our $Tmp::NAME : int; static method main : void () {  } }';
-      compile_not_ok($source, qr/The class varaible name "\$Tmp::NAME" in the class variable definition can't contain "::"/);
     }
   }
 }
@@ -687,5 +659,52 @@ sub print_error_messages {
   }
 }
 
+# Enumeration
+{
+  compile_not_ok_file('TestCase::CompileError::Enum::PrivateAccess', qr/Can't call the private method "TestCase::Enum->PRIVATE_VALUE"/);
+  {
+    my $source = q|class Tmp { interface_t enum { ONE } }|;
+    compile_not_ok($source, qr/Invalid enumeration descriptor "interface_t"/);
+  }
+  {
+    my $source = q|class Tmp { public private enum { ONE } }|;
+    compile_not_ok($source, qr/Only one of "public" and "private" enumeration descriptors can be specified/);
+  }
+}
+
+# Class variable
+{
+  # Access control
+  compile_not_ok_file('TestCase::CompileError::ClassVar::Private');
+  
+  # Class variable name
+  {
+    compile_not_ok_file('TestCase::CompileError::ClassVar::OurClassVarNameStartDigit', qr/The symbol name part of the variable name "\$3foo" can't begin with a number/);
+    compile_not_ok_file('TestCase::CompileError::ClassVar::OurClassVarNameInvalidColon', qr/Unexpected token ":"/);
+    compile_not_ok_file('TestCase::CompileError::ClassVar::OurClassVarNameEndColon2', qr/The variable name "\$FOO::" can't end with "::"/);
+    compile_not_ok_file('TestCase::CompileError::ClassVar::OurClassVarNameContainsUnderScoreTwice', qr/The variable name "\$Foo__Bar" can't contain "__"/);
+    compile_not_ok_file('TestCase::CompileError::ClassVar::OurClassVarNameColon2Twice', qr/The variable name "\$FOO::::BAR" can't contain "::::"/);
+    {
+      my $source = 'class Tmp { our $NAME : int; static method main : void () { ${NAME = 1; } }';
+      compile_not_ok($source, qr/Need a closing brace "}" at the end of the variable name/);
+    }
+    {
+      my $source = 'class Tmp { our $Tmp::NAME : int; static method main : void () {  } }';
+      compile_not_ok($source, qr/The class varaible name "\$Tmp::NAME" in the class variable definition can't contain "::"/);
+    }
+    {
+      my $source = 'class Tmp { our $FOO : required int; }';
+      compile_not_ok($source, qr/Invalid class variable descriptor "required"/);
+    }
+    {
+      my $source = 'class Tmp { our $FOO : public private int; }';
+      compile_not_ok($source, qr/Only one of "private", "public" class variable descriptors can be specifed/);
+    }
+    {
+      my $source = 'class Tmp { our $FOO : int; our $FOO : int; }';
+      compile_not_ok($source, qr/Redeclaration of the class variable "\$FOO" in the class "Tmp"/);
+    }
+  }
+}
 
 done_testing;

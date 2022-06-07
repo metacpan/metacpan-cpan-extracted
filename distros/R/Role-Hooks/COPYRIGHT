@@ -3,12 +3,8 @@ Upstream-Name: Role-Hooks
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Role-Hooks
 
-Files: Changes
- META.json
- META.yml
- Makefile.PL
+Files: Makefile.PL
  dist.ini
- doap.ttl
  t/02roletiny.t
  t/03moorole.t
  t/04mooserole.t
@@ -19,36 +15,50 @@ Files: Changes
 Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: Changes
+ META.json
+ META.yml
+ doap.ttl
+Copyright: Copyright 2022 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: COPYRIGHT
  CREDITS
  SIGNATURE
 Copyright: None
 License: public-domain
 
-Files: README
- lib/Role/Hooks.pm
- t/01basic.t
-Copyright: This software is copyright (c) 2020 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: INSTALL
  LICENSE
 Copyright: Unknown
 License: Unknown
 
+Files: README
+ lib/Role/Hooks.pm
+Copyright: This software is copyright (c) 2020-2022 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/01basic.t
+Copyright: This software is copyright (c) 2020 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: t/rt-133595.t
 Copyright: This software is copyright (c) 2020 by Gianni Ceccarelli.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: t/20packagevariant.t
+Copyright: This software is copyright (c) 2022 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 License: Artistic-1.0
- This software is Copyright (c) 2020 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2020 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  

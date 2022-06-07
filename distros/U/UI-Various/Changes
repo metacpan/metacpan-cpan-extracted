@@ -1,6 +1,13 @@
 Revision history for Perl extension UI-Various
 
-0.23 2022-05-30T11:25:18Z
+0.24 2022-06-07T11:21:30Z
+
+0.24 2022-06-07T11:20:48Z
+
+    - added Optionmenu widget
+    - fixed synopsis in Listbox
+    - added temporary check for specific CPAN test servers
+    - clarified handling of fixed parameters
 
 0.23 2022-05-30T11:24:22Z
 

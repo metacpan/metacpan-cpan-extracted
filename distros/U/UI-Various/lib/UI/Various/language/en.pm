@@ -74,7 +74,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 #########################################################################
 
@@ -133,6 +133,8 @@ our %T =
      => 'invalid object (%s) in call to %s',
      invalid_object__1_in_call_to__2__3
      => 'invalid object (%s) in call to %s::%s',
+     invalid_pair_in__1_attribute
+     => "invalid pair in '%s' attribute",
      invalid_parameter__1_in_call_to__2
      => "invalid parameter '%s' in call to %s",
      invalid_parameter__1_in_call_to__2__3

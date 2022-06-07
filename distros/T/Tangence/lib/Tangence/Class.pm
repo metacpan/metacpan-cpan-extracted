@@ -1,13 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.41;
+use Object::Pad 0.57;
 
-package Tangence::Class 0.28;
-class Tangence::Class isa Tangence::Meta::Class;
+package Tangence::Class 0.29;
+class Tangence::Class :isa(Tangence::Meta::Class);
 
 use Tangence::Constants;
 

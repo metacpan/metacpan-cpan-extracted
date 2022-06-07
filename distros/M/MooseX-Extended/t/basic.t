@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
-use lib 'lib';
-use Test::Most;
+use lib 't/lib';
+use MooseX::Extended::Tests;
 
 package My::Names {
     use MooseX::Extended types => [qw(compile Num NonEmptyStr Str PositiveInt ArrayRef)];

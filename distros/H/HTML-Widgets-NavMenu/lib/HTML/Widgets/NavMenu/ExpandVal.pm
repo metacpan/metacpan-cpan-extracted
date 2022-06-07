@@ -1,5 +1,5 @@
 package HTML::Widgets::NavMenu::ExpandVal;
-$HTML::Widgets::NavMenu::ExpandVal::VERSION = '1.0902';
+$HTML::Widgets::NavMenu::ExpandVal::VERSION = '1.1000';
 use strict;
 use warnings;
 
@@ -41,7 +41,7 @@ For internal use only.
 
 =head1 VERSION
 
-version 1.0902
+version 1.1000
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 ---
-abstract: 'Access to the track.getInfo slice of the LastFM API'
+abstract: 'Access to *.getInfo slices of the last.fm API'
 author:
   - 'Gene Boggs <gene@cpan.org>'
 build_requires:
@@ -37,7 +37,7 @@ requires:
 resources:
   homepage: https://github.com/ology/WebService-LastFM-TrackInfo
   repository: https://github.com/ology/WebService-LastFM-TrackInfo.git
-version: '0.0201'
+version: '0.0205'
 x_Dist_Zilla:
   perl:
     version: '5.032001'

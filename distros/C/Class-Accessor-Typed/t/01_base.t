@@ -19,7 +19,28 @@ use Test::Exception;
         wo => {
             wo => 'Int',
         },
-        new => 1,
+    );
+}
+{
+    package
+        M;
+
+    use Class::Accessor::Typed (
+        rw => {
+            rw => 'Str',
+        },
+        new => 0,
+    );
+}
+{
+    package
+        N;
+
+    use Class::Accessor::Typed (
+        rw => {
+            rw1 => 'Str',
+            rw2 => { isa => 'Int', optional => 1 },
+        },
     );
 }
 
@@ -67,6 +88,24 @@ subtest 'new' => sub {
         is $obj->rw1, 'default value';
     };
 
+    subtest 'optional option' => sub {
+        my $obj1 = N->new(rw1 => 'RW1', rw2 => 123);
+        is $obj1->rw1, 'RW1';
+        is $obj1->rw2, 123;
+
+        my $obj2 = N->new(rw1 => 'RW1');
+        is $obj2->rw1, 'RW1';
+        is $obj2->rw2, undef;
+
+        $obj2->rw2(234);
+        is $obj2->rw1, 'RW1';
+        is $obj2->rw2, 234;
+
+        throws_ok {
+            $obj2->rw2('RW2');
+        } qr/'rw2': Validation failed for 'Int' with value RW2/;
+    };
+
     subtest 'unknown arguments' => sub {
         my $warn = '';
         local $SIG{__WARN__} = sub {
@@ -82,9 +121,15 @@ subtest 'new' => sub {
             unknown => 'unknown',
         );
 
-        like $warn, qr/unknown arguments: unknown/;
+        like $warn,  qr/unknown arguments: unknown/;
         isa_ok $obj, 'L';
-        ok ! exists $obj->{unknown};
+        ok !exists $obj->{unknown};
+    };
+
+    subtest 'disable new option' => sub {
+        throws_ok {
+            M->new(rw => 'RW');
+        } qr/Can't locate object method "new" via package "M"/;
     };
 };
 

@@ -8,10 +8,13 @@ use Test::NoTabs;
 
 my @files = (
     'lib/HTML/Widgets/NavMenu.pm',
+    'lib/HTML/Widgets/NavMenu/Error.pm',
+    'lib/HTML/Widgets/NavMenu/Error/Redirect.pm',
     'lib/HTML/Widgets/NavMenu/EscapeHtml.pm',
     'lib/HTML/Widgets/NavMenu/ExpandVal.pm',
     'lib/HTML/Widgets/NavMenu/HeaderRole.pm',
     'lib/HTML/Widgets/NavMenu/Iterator/Base.pm',
+    'lib/HTML/Widgets/NavMenu/Iterator/GetCurrentlyActive.pm',
     'lib/HTML/Widgets/NavMenu/Iterator/Html.pm',
     'lib/HTML/Widgets/NavMenu/Iterator/Html/Item.pm',
     'lib/HTML/Widgets/NavMenu/Iterator/JQTreeView.pm',
@@ -19,6 +22,8 @@ my @files = (
     'lib/HTML/Widgets/NavMenu/Iterator/NavMenu/HeaderRole.pm',
     'lib/HTML/Widgets/NavMenu/Iterator/SiteMap.pm',
     'lib/HTML/Widgets/NavMenu/JQueryTreeView.pm',
+    'lib/HTML/Widgets/NavMenu/LeadingPath/Component.pm',
+    'lib/HTML/Widgets/NavMenu/NodeDescription.pm',
     'lib/HTML/Widgets/NavMenu/Object.pm',
     'lib/HTML/Widgets/NavMenu/Predicate.pm',
     'lib/HTML/Widgets/NavMenu/TagGen.pm',

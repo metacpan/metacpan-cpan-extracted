@@ -30,6 +30,7 @@ lib/UI/Various/Curses/Dialog.pm
 lib/UI/Various/Curses/Input.pm
 lib/UI/Various/Curses/Listbox.pm
 lib/UI/Various/Curses/Main.pm
+lib/UI/Various/Curses/Optionmenu.pm
 lib/UI/Various/Curses/Radio.pm
 lib/UI/Various/Curses/Text.pm
 lib/UI/Various/Curses/Window.pm
@@ -38,6 +39,7 @@ lib/UI/Various/Dialog.pm
 lib/UI/Various/Input.pm
 lib/UI/Various/Listbox.pm
 lib/UI/Various/Main.pm
+lib/UI/Various/Optionmenu.pm
 lib/UI/Various/PoorTerm/Box.pm
 lib/UI/Various/PoorTerm/Button.pm
 lib/UI/Various/PoorTerm/Check.pm
@@ -45,6 +47,7 @@ lib/UI/Various/PoorTerm/Dialog.pm
 lib/UI/Various/PoorTerm/Input.pm
 lib/UI/Various/PoorTerm/Listbox.pm
 lib/UI/Various/PoorTerm/Main.pm
+lib/UI/Various/PoorTerm/Optionmenu.pm
 lib/UI/Various/PoorTerm/Radio.pm
 lib/UI/Various/PoorTerm/Text.pm
 lib/UI/Various/PoorTerm/Window.pm
@@ -58,6 +61,7 @@ lib/UI/Various/RichTerm/Dialog.pm
 lib/UI/Various/RichTerm/Input.pm
 lib/UI/Various/RichTerm/Listbox.pm
 lib/UI/Various/RichTerm/Main.pm
+lib/UI/Various/RichTerm/Optionmenu.pm
 lib/UI/Various/RichTerm/Radio.pm
 lib/UI/Various/RichTerm/Text.pm
 lib/UI/Various/RichTerm/Window.pm
@@ -71,6 +75,7 @@ lib/UI/Various/Tk/Dialog.pm
 lib/UI/Various/Tk/Input.pm
 lib/UI/Various/Tk/Listbox.pm
 lib/UI/Various/Tk/Main.pm
+lib/UI/Various/Tk/Optionmenu.pm
 lib/UI/Various/Tk/Radio.pm
 lib/UI/Various/Tk/Text.pm
 lib/UI/Various/Tk/Window.pm
@@ -100,6 +105,7 @@ t/17-radio.t
 t/18-box.t
 t/19-listbox.t
 t/20-dialog.t
+t/21-optionmenu.t
 t/31-tk-1.t
 t/32-tk-2.t
 t/33-tk-3.t
@@ -108,6 +114,7 @@ t/51-rich-term.t
 t/52-rich-term-box.t
 t/53-rich-term-listbox.t
 t/54-rich-term-dialog.t
+t/55-rich-term-optionmenu.t
 t/functions/call_with_stdin.pl
 t/functions/run_in_fork.pl
 t/functions/sub_perl.pl

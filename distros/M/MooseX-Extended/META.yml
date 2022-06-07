@@ -7,15 +7,18 @@ build_requires:
   DateTime: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  IO::Async::Loop: '0'
   List::Util: '0'
   Scalar::Util: '0'
+  Test::Builder: '0'
   Test::More: '0'
   Test::Most: '0'
+  base: '0'
   lib: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,22 +35,28 @@ no_index:
 provides:
   Moose::Exception::InvalidAttributeDefinition:
     file: lib/Moose/Exception/InvalidAttributeDefinition.pm
-    version: '0.10'
+    version: '0.20'
   Moose::Exception::InvalidImportList:
     file: lib/Moose/Exception/InvalidImportList.pm
-    version: '0.10'
+    version: '0.20'
   MooseX::Extended:
     file: lib/MooseX/Extended.pm
-    version: '0.10'
+    version: '0.20'
   MooseX::Extended::Core:
     file: lib/MooseX/Extended/Core.pm
-    version: '0.10'
+    version: '0.20'
+  MooseX::Extended::Custom:
+    file: lib/MooseX/Extended/Custom.pm
+    version: '0.20'
   MooseX::Extended::Role:
     file: lib/MooseX/Extended/Role.pm
-    version: '0.10'
+    version: '0.20'
+  MooseX::Extended::Role::Custom:
+    file: lib/MooseX/Extended/Role/Custom.pm
+    version: '0.20'
   MooseX::Extended::Types:
     file: lib/MooseX/Extended/Types.pm
-    version: '0.10'
+    version: '0.20'
 requires:
   B::Hooks::AtRuntime: '3'
   Carp: '0'
@@ -87,10 +96,11 @@ resources:
   bugtracker: https://github.com/Ovid/moosex-extreme/issues
   homepage: https://github.com/Ovid/moosex-extreme
   repository: https://github.com/Ovid/moosex-extreme.git
-version: '0.10'
+version: '0.20'
 x_contributors:
+  - 'Graham Knop <haarg@haarg.org>'
   - 'Marco Fontani <MFONTANI@cpan.org>'
   - 'Ovid <ovid@cpan.org>'
-x_generated_by_perl: v5.36.0
+x_generated_by_perl: v5.28.3
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

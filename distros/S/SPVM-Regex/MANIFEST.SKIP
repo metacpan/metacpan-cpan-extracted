@@ -1,0 +1,15 @@
+^blib/
+^Makefile$
+^Makefile.old$
+^MYMETA.yml$
+^MYMETA.json$
+^pm_to_blib$
+^.spvm_build/
+^t/.spvm_build/
+^SPVM-
+^core.
+^core$
+.bak$
+.tmp$
+.BAK$
+^.git/
