@@ -23,7 +23,7 @@ my @colors     = map {
 my @patterns = ();
 foreach ( 1 .. @data - 1 )
 {
-    open( PNG, '<' . File::Spec->catfile( File::Spec->curdir, 'patterns', "PATTERN$_.PNG" ) ) || die "Can't load pattern $_";
+    open( PNG, '<' . File::Spec->catfile( File::Spec->curdir, 't', 'patterns', "PATTERN$_.PNG" ) ) || die "Can't load pattern $_";
     push( @patterns, GD::Image->newFromPng( \*PNG ) );
     close(PNG);
 }

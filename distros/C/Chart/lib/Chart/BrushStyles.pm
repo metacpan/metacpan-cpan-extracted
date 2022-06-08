@@ -4,8 +4,7 @@
 use v5.12;
 
 package Chart::BrushStyles;
-our $VERSION = 2.400.5;
-
+our $VERSION = 'v2.402.0';
 
 use Carp;
 use GD;

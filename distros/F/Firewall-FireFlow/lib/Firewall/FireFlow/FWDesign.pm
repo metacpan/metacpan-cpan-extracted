@@ -6,7 +6,6 @@ package Firewall::FireFlow::FWDesign;
 use Moose;
 use namespace::autoclean;
 use JSON;
-use Carp;
 use experimental "smartmatch";
 
 #------------------------------------------------------------------------------

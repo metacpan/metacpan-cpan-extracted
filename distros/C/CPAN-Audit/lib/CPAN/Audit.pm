@@ -1,5 +1,5 @@
 package CPAN::Audit;
-use 5.008001;
+use v5.10.1;
 use strict;
 use warnings;
 use version;
@@ -10,21 +10,15 @@ use CPAN::Audit::Query;
 use CPAN::Audit::DB;
 use Module::CoreList;
 
-our $VERSION = "0.15";
+our $VERSION = "20220608";
 
 sub new {
-    my $class = shift;
-    my (%params) = @_;
+    my( $class, %params ) = @_;
 
-    my $self = {};
-    bless $self, $class;
+	my @allowed_keys = qw(ascii db include_perl interactive no_corelist no_color quiet verbose version);
 
-    $self->{ascii}       = $params{ascii};
-    $self->{verbose}     = $params{verbose};
-    $self->{quiet}       = $params{quiet};
-    $self->{no_color}    = $params{no_color};
-    $self->{no_corelist} = $params{no_corelist};
-    $self->{interactive} = $params{interactive};
+    my %args = map { $_, $params{$_} } @allowed_keys;
+    my $self = bless \%args, $class;
 
     if ( !$self->{interactive} ) {
         $self->{ascii}    = 1;
@@ -32,6 +26,7 @@ sub new {
     }
 
     $self->{db}       = CPAN::Audit::DB->db;
+
     $self->{query}    = CPAN::Audit::Query->new( db => $self->{db} );
     $self->{discover} = CPAN::Audit::Discover->new( db => $self->{db} );
 
@@ -39,8 +34,7 @@ sub new {
 }
 
 sub command {
-    my $self = shift;
-    my ( $command, @args ) = @_;
+    my( $self, $command, @args ) = @_;
 
     my %dists;
 
@@ -125,18 +119,16 @@ sub command {
     elsif ( $command eq 'installed' ) {
         $self->message_info('Collecting all installed modules. This can take a while...');
 
-        my @deps = CPAN::Audit::Installed->new(
-            db => $self->{db},
-            $self->{verbose}
-            ? (
-                cb => sub {
-                    my ($info) = @_;
+		my $verbose_callback = sub {
+			my ($info) = @_;
+            $self->message( '%s: %s-%s', $info->{path}, $info->{distname}, $info->{version} );
+		};
 
-                    $self->message( '%s: %s-%s', $info->{path}, $info->{distname}, $info->{version} );
-                }
-              )
-            : ()
-        )->find(@ARGV);
+        my @deps = CPAN::Audit::Installed->new(
+            db           => $self->{db},
+            include_perl => $self->{include_perl},
+            ( $self->{verbose} ? ( cb => $verbose_callback ) : () ),
+        )->find(@args);
 
         foreach my $dep (@deps) {
             my $dist = $dep->{dist}
@@ -155,16 +147,18 @@ sub command {
     if (%dists) {
         my $query = $self->{query};
 
+		my $note = $command eq 'installed' ? 'have' : 'requires';
+
         foreach my $distname ( sort keys %dists ) {
             my $version_range = $dists{$distname};
-
             my @advisories = $query->advisories_for( $distname, $version_range );
 
             $version_range = 'Any'
               if $version_range eq '' || $version_range eq '0';
 
             if (@advisories) {
-                $self->message( '__RED__%s (requires %s) has %d advisories__RESET__',
+            	my $inflect = scalar(@advisories) == 1 ? 'y' : 'ies';
+                $self->message( "__RED__%s ($note %s) has %d advisor${inflect}__RESET__",
                     $distname, $version_range, scalar(@advisories) );
 
                 foreach my $advisory (@advisories) {
@@ -183,7 +177,6 @@ sub command {
     }
     else {
         $self->message_info('__GREEN__No advisories found__RESET__');
-
         return 0;
     }
 }
@@ -281,8 +274,8 @@ CPAN::Audit - Audit CPAN distributions for known vulnerabilities
 
 =head1 DESCRIPTION
 
-CPAN::Audit is a module and a database at the same time. It is used by L<cpan-audit> command line application to query
-for vulnerabilities.
+CPAN::Audit is a module and a database at the same time. It is used by
+L<cpan-audit> command line application to query for vulnerabilities.
 
 =head1 LICENSE
 

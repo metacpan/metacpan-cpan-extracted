@@ -1,5 +1,10 @@
 Revision history for Perl extension Graphics::TIFF.
 
+19  Thu, 9 Jun 2022 00:00 +0000
+        - Adapt tests to tiff-4.4.0.
+          Closes RT #143153 (t/92_tiffinfo.t fails with tiff-4.4.0)
+          Thanks to Petr Pisar for the patch.
+
 18  Tue, 1 Nov 2021 00:00 +0000
         - Remove unnecessary cast from (unsigned char *) to (void * ) in buffers
 

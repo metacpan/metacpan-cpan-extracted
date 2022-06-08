@@ -26,7 +26,7 @@ use true;
 use feature _enabled_features();
 no warnings _disabled_warnings();
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 # Should this be in the metaclass? It feels like it should, but
 # the MOP really doesn't support these edge cases.
@@ -87,7 +87,7 @@ MooseX::Extended::Role - MooseX::Extended roles
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 

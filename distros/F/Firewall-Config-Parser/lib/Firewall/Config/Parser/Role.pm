@@ -1,6 +1,8 @@
 package Firewall::Config::Parser::Role;
 
-use Carp;
+#------------------------------------------------------------------------------
+# 加载扩展模块
+#------------------------------------------------------------------------------
 use Moose::Role;
 
 #------------------------------------------------------------------------------
@@ -20,7 +22,7 @@ use Firewall::Config::Parser::Report;
 #------------------------------------------------------------------------------
 # Firewall::Config::Parser::Role 通用属性
 #------------------------------------------------------------------------------
-has "fwId" => (
+has fwId => (
   is      => 'ro',
   isa     => 'Int',
   builder => '_buildFwId',
@@ -31,7 +33,7 @@ has "fwId" => (
 # does 要求该属性包含 Firewall::Config::Content::Role
 # https://metacpan.org/pod/distribution/Moose/lib/Moose/Manual/Attributes.pod
 #------------------------------------------------------------------------------
-has "config" => (
+has config => (
   is       => 'ro',
   does     => 'Firewall::Config::Content::Role',
   required => 1,
@@ -46,13 +48,13 @@ has "config" => (
   },
 );
 
-has "preDefinedService" => (
+has preDefinedService => (
   is       => 'ro',
   does     => 'HashRef[Firewall::Config::Element::Service::Role]',
   required => 1,
 );
 
-has "elements" => (
+has elements => (
   is      => 'ro',
   isa     => 'Firewall::Config::Parser::Elements',
   default => sub { Firewall::Config::Parser::Elements->new },
@@ -61,20 +63,20 @@ has "elements" => (
   },
 );
 
-has "report" => (
+has report => (
   is      => 'ro',
   isa     => 'Firewall::Config::Parser::Report',
   default => sub { Firewall::Config::Parser::Report->new },
 );
 
-has "elementType" => (
+has elementType => (
   is      => 'ro',
   isa     => 'Str|Undef',
   default => undef,
   writer  => 'setElementType',
 );
 
-has "ruleIndex" => (
+has ruleIndex => (
   is      => 'ro',
   isa     => 'HashRef',
   default => sub { {} },

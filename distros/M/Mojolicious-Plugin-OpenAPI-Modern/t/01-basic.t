@@ -1,6 +1,5 @@
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
-use strict;
-use warnings;
+use strictures 2;
 use 5.020;
 use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';

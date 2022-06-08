@@ -1,6 +1,28 @@
+use v5.12;
 
 package Chart;
-our $VERSION = 2.401.1;
+our $VERSION = 'v2.402.0';
+
+use Chart::Points;
+use Chart::Lines;
+use Chart::LinesPoints;
+use Chart::Mountain;
+
+use Chart::Bars;
+use Chart::HorizontalBars;
+use Chart::StackedBars;
+use Chart::ErrorBars;
+use Chart::Pie;
+
+use Chart::Direction;
+use Chart::Split;
+use Chart::Composite;
+use Chart::Pareto;
+
+
+sub new {
+    
+}
 
 1;
 
@@ -73,6 +95,9 @@ For example,
   use Chart::Lines;
 
 would invoke the lines module.
+Alternatively write to load all chart types at ones with 
+
+  use Chart;
 
 =head2 Getting an object
 
@@ -753,18 +778,31 @@ and ask him.  Third, please remember that the 0th dataset will be empty,
 since that's the place in the @data array for the data point labels.
 
 
+=head1 PLAN
+
+This module is under currently under a complete rewrite. Version will 
+bump to 3 when rewrite is completed, without breaking any compatibility.
+The old API stays as it is, the new will be through a new central API.
+
 =head1 TO DO
 
 =over 4
 
+=item *
+
+Include True Type Fonts
+
+=item *
+
+Violine and Box plots
 
 =item *
 
 Add some 3-D graphs.
-Include True Type Fonts
-Violine and Box plots
 
 =back
+
+For more please check the TODO file.
 
 =head1 BUGS
 
@@ -824,6 +862,8 @@ Petr Pisar (ppisar@redhat.com)
 
 Copyright(c) 1997-1998 by David Bonner, 1999 by Peter Clark,
 2001 by the Chart group at BKG-Wettzell.
+2022 by Herbert Breunung and Chart group
+
 All rights reserved.  This program is free software; you can
 redistribute it and/or modify it under the same terms as Perl 
 itself.

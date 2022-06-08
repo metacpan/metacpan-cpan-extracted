@@ -16,8 +16,6 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Firewall::FireFlow",
   "PREREQ_PM" => {
-    "Carp" => 0,
-    "Firewall::Config::Initialize" => 0,
     "Firewall::DBI::Pg" => 0,
     "Firewall::Policy::Designer" => 0,
     "Firewall::Policy::Searcher" => 0,
@@ -31,7 +29,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => ""
   }
@@ -39,8 +37,6 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Carp" => 0,
-  "Firewall::Config::Initialize" => 0,
   "Firewall::DBI::Pg" => 0,
   "Firewall::Policy::Designer" => 0,
   "Firewall::Policy::Searcher" => 0,

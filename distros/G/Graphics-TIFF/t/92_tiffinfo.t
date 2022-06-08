@@ -72,6 +72,8 @@ my $expected = `tiffinfo -? $file 2>&1`;
 $expected =~ s/'\?'/?/xsm;
 # strip a description line added in libtiff 4.3.0
 $expected =~ s/^Display information about TIFF files\R\R//sm;
+# strip unsupported -M option added in libtiff 4.4.0
+$expected =~ s/^ -M size\tset the memory allocation limit in MiB\. 0 to disable limit\R//sm;
 is( `$cmd -? $file 2>&1`, $expected, '-?' );
 
 #########################

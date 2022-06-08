@@ -1,4 +1,3 @@
-.travis.yml
 bin/cpantorpm
 bin/cpantorpm-depreq
 bin/cpantorpm.pod

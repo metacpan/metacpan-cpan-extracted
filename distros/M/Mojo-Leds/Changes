@@ -1,5 +1,8 @@
 Changelog for Mojo-Leds
 
+1.15 2022-06-08T08:55:00
+ - Bug in route. In previous versions, every page calls produced a call to render_json also if page was not in json.
+
 1.14 2022-06-07T13:26:00
  - Optimized render_pm call
  - Set 5.16 as minimum perl version

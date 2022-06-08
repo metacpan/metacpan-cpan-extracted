@@ -405,6 +405,7 @@ SPVM-*
 *.bak
 *.BAK
 *.tmp
+MANIFEST
 EOS
   
   # Generate file
@@ -423,8 +424,8 @@ sub generate_manifest_skip_file {
 ^MYMETA.yml\$
 ^MYMETA.json\$
 ^pm_to_blib\$
-^\.spvm_build\$
-^t/\.spvm_build\$
+^\.spvm_build/
+^t/\.spvm_build/
 ^SPVM-
 ^core\.
 ^core\$
@@ -482,10 +483,10 @@ sub generate_makefile_pl_file {
   my $class_name = $self->class_name;
 
   # Native make rule
-  my $make_rule_native = $self->native ? "SPVM::Builder::Util::API::create_make_rule_native('$class_name');" : '';
+  my $make_rule_native = $self->native ? "\$make_rule .= SPVM::Builder::Util::API::create_make_rule_native('$class_name');" : '';
   
   # Precompile make rule
-  my $make_rule_precompile = $self->precompile ? "SPVM::Builder::Util::API::create_make_rule_precompile('$class_name');" : '';
+  my $make_rule_precompile = $self->precompile ? "\$make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('$class_name');" : '';
 
   my $perl_module_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name, 'pm');
   $perl_module_rel_file =  $self->create_lib_rel_file($perl_module_rel_file);
@@ -551,13 +552,16 @@ sub generate_basic_test_file {
   
   # Content
   my $basic_test_content = <<"EOS";
-use strict;
-use warnings;
 use Test::More;
 
-use SPVM '$class_name';
+use strict;
+use warnings;
+use FindBin;
+use lib "\$FindBin::Bin/lib";
 
-ok(1);
+use SPVM 'TestCase::$class_name';
+
+ok(SPVM::TestCase::$class_name->test);
 
 done_testing;
 EOS
@@ -565,6 +569,28 @@ EOS
   # Generate file
   my $basic_test_rel_file = 't/basic.t';
   $self->generate_file($basic_test_rel_file, $basic_test_content);
+}
+
+sub generate_basic_test_spvm_module_file {
+  my ($self) = @_;
+  
+  # Class name
+  my $class_name = $self->class_name;
+  
+  # Content
+  my $basic_test_spvm_module_content = <<"EOS";
+class TestCase::$class_name {
+  static method test : int () {
+    
+    return 1;
+  }
+}
+EOS
+  
+  # Generate file
+  my $basic_test_spvm_module_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file("TestCase::$class_name", 'spvm');
+  $basic_test_spvm_module_rel_file = "t/lib/$basic_test_spvm_module_rel_file";
+  $self->generate_file($basic_test_spvm_module_rel_file, $basic_test_spvm_module_content);
 }
 
 sub generate_dist {
@@ -623,6 +649,9 @@ sub generate_dist {
     
     # Generate t/basic.t file
     $self->generate_basic_test_file;
+
+    # Generate basic test SPVM module file
+    $self->generate_basic_test_spvm_module_file;
   }
 }
 

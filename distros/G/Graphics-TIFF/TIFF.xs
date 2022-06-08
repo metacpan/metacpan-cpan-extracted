@@ -643,6 +643,14 @@ tiff_ReadTile (tif, x, y, z, s)
                 }
 		_TIFFfree(buf);
 
+uint16_t
+tiff_CurrentDirectory (tif)
+                TIFF            *tif
+        CODE:
+                RETVAL = TIFFCurrentDirectory(tif);
+        OUTPUT:
+                RETVAL
+
 void
 tiff_PrintDirectory (tif, file, flags)
                 TIFF            *tif

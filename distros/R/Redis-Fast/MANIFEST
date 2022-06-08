@@ -22,6 +22,7 @@ t/04-pipeline.t
 t/05-nonblock.t
 t/06-on-connect.t
 t/07-reconnect-on-error.t
+t/07-reconnect-without-auto-connect.t
 t/07-reconnect.t
 t/08-unix-socket.t
 t/09-env-redis-server.t
@@ -50,6 +51,7 @@ tools/benchmarks/readline_vs_sysread_vs_recv/client-sysread.pl
 tools/benchmarks/readline_vs_sysread_vs_recv/run.pl
 tools/benchmarks/readline_vs_sysread_vs_recv/server-generator.pl
 typemap
+xt/11-timeout.t
 xt/release/kwalitee.t
 deps/hiredis/CHANGELOG.md
 deps/hiredis/CMakeLists.txt

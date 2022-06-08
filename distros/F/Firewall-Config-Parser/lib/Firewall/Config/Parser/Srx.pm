@@ -21,8 +21,7 @@ use Firewall::Config::Element::Interface::Srx;
 use Firewall::Config::Element::Zone::Srx;
 use Firewall::Config::Element::NatPool::Srx;
 use Firewall::Config::Element::DynamicNat::Srx;
-use Mojo::Util qw(dumper);
-use Firewall::DBI::Oracle;
+use Firewall::DBI::Pg;
 with 'Firewall::Config::Parser::Role';
 
 sub parse {

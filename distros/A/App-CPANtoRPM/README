@@ -162,6 +162,16 @@ OPTIONS
 
         In addition, if either of these are given, --no-tests is implied.
 
+    --no-compat
+        By default, the SPEC file includes a line of the form:
+
+           Requires: perl(:MODULE_COMPAT_ ...
+
+        This is recommended in the fedora packaging guidelines, so is
+        included by default. Some linux distros may not have a version of
+        perl that provides a MODULE_COMPAT, so in these cases, you may need
+        to omit this from the spec. Use this option to do so.
+
     --prefix PREFIX
     --no-prefix
         By default, a prefix of 'perl-' is added to the name of the package

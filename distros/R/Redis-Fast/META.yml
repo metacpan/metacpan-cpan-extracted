@@ -18,7 +18,7 @@ configure_requires:
   Module::Build: '0.4005'
   Module::Build::XSUtil: '0.02'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.18, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -38,7 +38,7 @@ no_index:
 provides:
   Redis::Fast:
     file: lib/Redis/Fast.pm
-    version: '0.33'
+    version: '0.34'
   Redis::Fast::Hash:
     file: lib/Redis/Fast/Hash.pm
   Redis::Fast::List:
@@ -52,8 +52,8 @@ requires:
 resources:
   bugtracker: https://github.com/shogo82148/Redis-Fast/issues
   homepage: https://github.com/shogo82148/Redis-Fast
-  repository: git://github.com/shogo82148/Redis-Fast.git
-version: '0.33'
+  repository: https://github.com/shogo82148/Redis-Fast.git
+version: '0.34'
 x_contributors:
   - 'Aaron Crane <arc@aaroncrane.co.uk>'
   - 'Aaron Crane <arc@cpan.org>'
@@ -90,6 +90,7 @@ x_contributors:
   - 'Zugschlus <mh+github201409@zugschlus.de>'
   - 'bj5004 <bartosz.jakubski@hurra.com>'
   - 'dams <dams@zarb.org>'
+  - 'dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>'
   - 'hisaichi5518 <hisada.kazuki@gmail.com>'
   - 'nise_nabe <nise.nabe@gmail.com>'
   - 'perlpong <calyx238@gmail.com>'

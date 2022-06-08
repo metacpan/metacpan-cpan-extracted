@@ -155,7 +155,7 @@ sub join
   my ( $self, $url, $hook ) = @_;
   my $status = API::Eulerian::EDW::Status->new();
   my $socket = $self->_socket();
-  my $bufsize = 252000;
+  my $bufsize = 4 * 1024 * 1024;
   my $offset = 0;
   my $buf = '';
   my $read;
@@ -163,7 +163,10 @@ sub join
   my $peer;
 
   # Create a Websocket
-  $peer = Protocol::WebSocket::Client->new( url => $url );
+  $peer = Protocol::WebSocket::Client->new(
+    url => $url,
+    max_payload_size => $bufsize
+  );
 
   # Setup Websocket hooks
   $peer->on( write   => \&API::Eulerian::EDW::WebSocket::_on_write );
@@ -184,7 +187,6 @@ sub join
       $read = $socket->sysread( $buf, $bufsize, $offset );
       if( $read > 0 ) {
         $peer->read( $buf );
-        undef $buf;
       } else {
         close( $socket );
         undef( $socket );

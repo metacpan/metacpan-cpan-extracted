@@ -13,7 +13,7 @@ use MooseX::Extended::Core qw(
 use MooseX::Extended::Role ();
 use namespace::autoclean;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 sub import {
     my $custom_moose = caller;    # this is our custom Moose definition
@@ -49,7 +49,7 @@ MooseX::Extended::Role::Custom - Build a custom Moose::Role, just for you.
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,57 @@
+{
+   "abstract" : "Generates Excel Document with Continuous Distribution Function Chart",
+   "author" : [
+      "Michael R. Davis <mdavis@localdomain>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Excel-Writer-XLSX-CDF",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "Excel::Writer::XLSX" : "0",
+            "File::Temp" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "Math::Round::SignificantFigures" : "0",
+            "Package::New" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mrdvt92/perl-Excel-Writer-XLSX-CDF/issues"
+      },
+      "homepage" : "https://github.com/mrdvt92/perl-Excel-Writer-XLSX-CDF",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mrdvt92/perl-Excel-Writer-XLSX-CDF.git"
+      }
+   },
+   "version" : "0.02"
+}

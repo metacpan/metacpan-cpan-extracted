@@ -2,7 +2,7 @@ use v5.12;
 
 package Chart::Pareto;
 our @ISA     = qw(Chart::Base);
-our $VERSION = 2.400.5;
+our $VERSION = 'v2.402.0';
 
 use Chart::Base;
 use GD;

@@ -1,5 +1,5 @@
 package Mojo::Leds::Page;
-$Mojo::Leds::Page::VERSION = '1.14';
+$Mojo::Leds::Page::VERSION = '1.15';
 use 5.014;    # because s///r usage
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::Util qw(class_to_path);
@@ -18,10 +18,10 @@ sub route {
     $s->stash( 'format', $format );
 
     $s->respond_to(
-        html => sub { shift->render_pm },
-        json => { json => $s->render_json },
-        css  => sub { shift->render_static_file },
-        js   => sub { shift->render_static_file },
+        html => sub { $s->render_pm },
+        json => sub { $s->render( json => $s->render_json ) },
+        css  => sub { $s->render_static_file },
+        js   => sub { $s->render_static_file },
         any  => { text => '', status => 204 }
     );
 
@@ -84,7 +84,7 @@ Mojo::Leds::Page - Standard page controller for Mojo::Leds
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 SYNOPSIS
 

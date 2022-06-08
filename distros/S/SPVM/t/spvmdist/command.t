@@ -65,8 +65,13 @@ my $include_blib = "-I$blib_arch -I$blib_lib";
   
   my $basic_test_file = "$tmp_dir/SPVM-Foo/t/basic.t";
   ok(-f $basic_test_file);
-  ok(SPVM::Builder::Util::file_contains($basic_test_file, "use SPVM 'Foo';"));
+  ok(SPVM::Builder::Util::file_contains($basic_test_file, "use SPVM 'TestCase::Foo';"));
 
+  my $basic_test_spvm_module_file = "$tmp_dir/SPVM-Foo/t/lib/SPVM/TestCase/Foo.spvm";
+  ok(-f $basic_test_spvm_module_file);
+  ok(SPVM::Builder::Util::file_contains($basic_test_spvm_module_file, "class TestCase::Foo {"));
+  ok(SPVM::Builder::Util::file_contains($basic_test_spvm_module_file, "static method test : int () {"));
+  
   chdir($save_cur_dir) or die;
 }
 
@@ -118,8 +123,9 @@ my $include_blib = "-I$blib_arch -I$blib_lib";
   
   my $basic_test_file = "$tmp_dir/SPVM-Foo/t/basic.t";
   ok(-f $basic_test_file);
-  ok(SPVM::Builder::Util::file_contains($basic_test_file, "use SPVM 'Foo';"));
-  ok(SPVM::Builder::Util::file_contains($basic_test_file, "ok(1)"));
+  ok(SPVM::Builder::Util::file_contains($basic_test_file, 'use lib "$FindBin::Bin/lib";'));
+  ok(SPVM::Builder::Util::file_contains($basic_test_file, "use SPVM 'TestCase::Foo';"));
+  ok(SPVM::Builder::Util::file_contains($basic_test_file, "ok(SPVM::TestCase::Foo->test);"));
 
   chdir($save_cur_dir) or die;
 }
@@ -144,6 +150,15 @@ my $include_blib = "-I$blib_arch -I$blib_lib";
   ok(-f $spvm_module_file);
   ok(SPVM::Builder::Util::file_contains($spvm_module_file, "class Foo::Bar::Baz {"));
   
+  my $basic_test_file = "$tmp_dir/SPVM-Foo-Bar-Baz/t/basic.t";
+  ok(-f $basic_test_file);
+  ok(SPVM::Builder::Util::file_contains($basic_test_file, "use SPVM 'TestCase::Foo::Bar::Baz';"));
+
+  my $basic_test_spvm_module_file = "$tmp_dir/SPVM-Foo-Bar-Baz/t/lib/SPVM/TestCase/Foo/Bar/Baz.spvm";
+  ok(-f $basic_test_spvm_module_file);
+  ok(SPVM::Builder::Util::file_contains($basic_test_spvm_module_file, "class TestCase::Foo::Bar::Baz {"));
+  ok(SPVM::Builder::Util::file_contains($basic_test_spvm_module_file, "static method test : int () {"));
+
   chdir($save_cur_dir) or die;
 }
 
@@ -180,7 +195,7 @@ my $include_blib = "-I$blib_arch -I$blib_lib";
 
   my $makefile_pl_file = "$tmp_dir/SPVM-Foo/Makefile.PL";
   ok(-f $makefile_pl_file);
-  ok(SPVM::Builder::Util::file_contains($makefile_pl_file, "SPVM::Builder::Util::API::create_make_rule_native('Foo')"));
+  ok(SPVM::Builder::Util::file_contains($makefile_pl_file, "\$make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Foo')"));
 
   my $native_config_file = "$tmp_dir/SPVM-Foo/lib/SPVM/Foo.config";
   ok(-f $native_config_file);
@@ -215,7 +230,7 @@ my $include_blib = "-I$blib_arch -I$blib_lib";
 
   my $makefile_pl_file = "$tmp_dir/SPVM-Foo/Makefile.PL";
   ok(-f $makefile_pl_file);
-  ok(SPVM::Builder::Util::file_contains($makefile_pl_file, "SPVM::Builder::Util::API::create_make_rule_native('Foo')"));
+  ok(SPVM::Builder::Util::file_contains($makefile_pl_file, "\$make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Foo')"));
 
   my $native_config_file = "$tmp_dir/SPVM-Foo/lib/SPVM/Foo.config";
   ok(-f $native_config_file);
@@ -245,7 +260,7 @@ my $include_blib = "-I$blib_arch -I$blib_lib";
 
   my $makefile_pl_file = "$tmp_dir/SPVM-Foo/Makefile.PL";
   ok(-f $makefile_pl_file);
-  ok(SPVM::Builder::Util::file_contains($makefile_pl_file, "SPVM::Builder::Util::API::create_make_rule_precompile('Foo')"));
+  ok(SPVM::Builder::Util::file_contains($makefile_pl_file, "\$make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('Foo')"));
 
   my $native_config_file = "$tmp_dir/SPVM-Foo/lib/SPVM/Foo.config";
   ok(!-f $native_config_file);
@@ -377,6 +392,37 @@ my $include_blib = "-I$blib_arch -I$blib_lib";
 
   ok(-f $spvm_module_file);
   ok(SPVM::Builder::Util::file_contains($spvm_module_file, "class Foo {"));
+  
+  chdir($save_cur_dir) or die;
+}
+
+# perl Makefile.PL && make && make test
+{
+  my $tmp_dir = File::Temp->newdir;
+  my $spvmdist_cmd = qq($^X $include_blib $spvmdist_path Foo);
+  my $save_cur_dir = getcwd();
+  chdir($tmp_dir) or die;
+  system($spvmdist_cmd) == 0
+    or die "Can't execute spvmdist command $spvmdist_cmd:$!";
+  
+  chdir($save_cur_dir) or die;
+}
+
+# perl Makefile.PL && make && make test
+{
+  my $tmp_dir = File::Temp->newdir;
+  my $spvmdist_cmd = qq($^X $include_blib $spvmdist_path --native c --precompile Foo);
+  my $save_cur_dir = getcwd();
+  chdir($tmp_dir) or die;
+  system($spvmdist_cmd) == 0
+    or die "Can't execute spvmdist command $spvmdist_cmd:$!";
+  
+  chdir('SPVM-Foo')
+    or die "Can't chdir";
+  
+  my $make = $Config{make};
+  my $ret = system("$^X Makefile.PL && $make && $make test");
+  ok($ret == 0);
   
   chdir($save_cur_dir) or die;
 }

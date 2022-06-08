@@ -1,3 +1,9 @@
+0.012   2022-06-07  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add command-line aliases --boy, --girl, --male, --female,
+          -m, -f for --gender.
+
+
 0.011   2021-03-15  Released-By: PERLANCAR; Urgency: high
 
         - Merge releases 0.009 and 0.009.2.

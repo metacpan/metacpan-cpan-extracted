@@ -42,7 +42,7 @@ do { my $x = {
                                       'JSON::Schema::Modern::Document::OpenAPI' => '0.024',
                                       'Mojo::Base' => '0',
                                       'Mojo::JSON' => '0',
-                                      'OpenAPI::Modern' => '0.022',
+                                      'OpenAPI::Modern' => '0.031',
                                       'Path::Tiny' => '0',
                                       'Safe::Isa' => '0',
                                       'YAML::PP' => '0',
@@ -68,7 +68,8 @@ do { my $x = {
                                    'experimental' => '0',
                                    'lib' => '0',
                                    'open' => '0',
-                                   'perl' => '5.020'
+                                   'perl' => '5.020',
+                                   'strictures' => '2'
                                  }
                  },
        'x_Dist_Zilla' => {

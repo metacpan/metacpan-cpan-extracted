@@ -1,5 +1,8 @@
 Revision history for Mojolicious-Plugin-OpenAPI-Modern
 
+0.003     2022-06-08 02:25:56Z
+          - test fixes for error messages that changed
+
 0.002     2022-03-25 23:47:55Z
           - new helper methods validate_request and validate_response
 

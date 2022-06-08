@@ -16,7 +16,7 @@ use Firewall::Policy::Searcher::Report::FwInfo;
 #------------------------------------------------------------------------------
 # 继承 Firewall::Policy::Designer::Role 通用属性
 #------------------------------------------------------------------------------
-with 'Firewall::Policy::Designer::Role';
+# with 'Firewall::Policy::Designer::Role';
 
 #------------------------------------------------------------------------------
 # Firewall::Policy::Designer::Huawei 通用属性

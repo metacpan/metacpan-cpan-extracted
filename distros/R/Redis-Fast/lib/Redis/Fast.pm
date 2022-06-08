@@ -2,7 +2,7 @@ package Redis::Fast;
 
 BEGIN {
     use XSLoader;
-    our $VERSION = '0.33';
+    our $VERSION = '0.34';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -211,7 +211,7 @@ sub new {
                           );
 
                   $data->{sentinels} = [
-                      ( sort { $h{$a} <=> $h{$b} } keys %h ), # sorted existing sentinels,
+                      ( sort { $h{$a} <=> $h{$b} } CORE::keys(%h) ), # sorted existing sentinels,
                       grep { ! $h{$_}; }                      # list of unknown
                       map {
                           my $s = +{ @$_ };

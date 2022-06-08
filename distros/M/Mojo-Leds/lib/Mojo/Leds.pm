@@ -1,5 +1,5 @@
 package Mojo::Leds;
-$Mojo::Leds::VERSION = '1.14';
+$Mojo::Leds::VERSION = '1.15';
 use Mojo::Base 'Mojolicious';
 use Mojo::Log;
 use Mojo::File 'path';
@@ -72,7 +72,7 @@ Mojo::Leds - Leds aka Light Environment (emi) for Development System based on Mo
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 SYNOPSIS
 

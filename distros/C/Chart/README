@@ -58,7 +58,10 @@ DESCRIPTION
 
       use Chart::Lines;
 
-    would invoke the lines module.
+    would invoke the lines module. Alternatively write to load all chart
+    types at ones with
+
+      use Chart;
 
   Getting an object
     The new method can either be called without arguments, in which case it
@@ -647,8 +650,19 @@ DESCRIPTION
     will be empty, since that's the place in the @data array for the data
     point labels.
 
+PLAN
+    This module is under currently under a complete rewrite. Version will
+    bump to 3 when rewrite is completed, without breaking any compatibility.
+    The old API stays as it is, the new will be through a new central API.
+
 TO DO
-    *   Add some 3-D graphs. Include True Type Fonts Violine and Box plots
+    *   Include True Type Fonts
+
+    *   Violine and Box plots
+
+    *   Add some 3-D graphs.
+
+    For more please check the TODO file.
 
 BUGS
     Probably quite a few, since it's been completely rewritten. As usual,
@@ -676,7 +690,8 @@ CONTRIBUTORS
 
 COPYRIGHT
     Copyright(c) 1997-1998 by David Bonner, 1999 by Peter Clark, 2001 by the
-    Chart group at BKG-Wettzell. All rights reserved. This program is free
-    software; you can redistribute it and/or modify it under the same terms
-    as Perl itself.
+    Chart group at BKG-Wettzell. 2022 by Herbert Breunung and Chart group
+
+    All rights reserved. This program is free software; you can redistribute
+    it and/or modify it under the same terms as Perl itself.
 

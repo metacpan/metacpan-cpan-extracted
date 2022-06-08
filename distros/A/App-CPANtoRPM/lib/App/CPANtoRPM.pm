@@ -12,7 +12,7 @@ use POSIX qw(locale_h);
 use IO::File;
 
 our($VERSION);
-$VERSION="1.11";
+$VERSION="1.13";
 
 $| = 1;
 
@@ -151,6 +151,8 @@ sub _args {
 #   incl_tests => 0/1                    1 if we'll be adding tests to SPEC
 #   incl_deps  => 0/1                    1 if we'll be included requires
 #                                        in the SPEC
+#   incl_compat=> 0/1                    1 if we'll be including the MODULE_COMPAT
+#                                        line in the SPEC
 #
 #   # Init step:
 #   # ------------------------------     --------------------------------
@@ -358,6 +360,14 @@ sub _usage {
                          given, they will not be checked.  If the second
                          option is given, they will not be added to the
                          SPEC file.
+      --no-compat      : By default, the SPEC file includes a line of the form:
+                           Requires: perl(:MODULE_COMPAT_ ...
+                         This is recommended in the fedora packaging
+                         guidelines, so is included by default.  Some
+                         linux distros may not have a version of perl
+                         that provides a MODULE_COMPAT, so in these
+                         cases, you may need to omit this from the
+                         spec.  Use this option to do so.
       --prefix PREFIX  : By default, a prefix of 'perl-' will be applied
       --no-prefix        to the RPM.  To specify an alternate prefix, use
                          the --prefix option.  To specify that no prefix
@@ -486,6 +496,7 @@ sub _parse_args {
       $$self{'no_deps'} = 1,                   next  if ($_ eq '-d'  ||
                                                          $_ eq '--no-deps');
       $$self{'no_deps'} = 2,                   next  if ($_ eq '--NO-DEPS');
+      $$self{'incl_compat'} = 0,               next  if ($_ eq '--no-compat');
       $$self{'cpan'} = 'cpan',                 next  if ($_ eq '-c'  ||
                                                          $_ eq '--cpan');
       $$self{'description'} = shift(@a),       next  if ($_ eq '--description');
@@ -611,6 +622,11 @@ sub _parse_args {
    if ($$self{'no_deps'}) {
       $$self{'no_tests'} = 1  if (! $$self{'no_tests'});
    }
+
+   if (! exists $$self{'incl_compat'}) {
+      $$self{'incl_compat'} = 1;
+   }
+   $package{'incl_compat'}= $$self{'incl_compat'};
 
    $package{'incl_tests'} = ($$self{'no_tests'} == 2 ? 0 : 1);
    $package{'incl_deps'}  = ($$self{'no_deps'} == 2 ? 0 : 1);
@@ -4418,7 +4434,9 @@ Requires:       <hash:true:runtime_req> >= <val>
 Requires:       <hash:false:runtime_req>
 BuildRequires:  <hash:true:build_req> >= <val>
 BuildRequires:  <hash:false:build_req>
+<if:incl_compat>
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+<endif:incl_compat>
 <endif:incl_deps>
 
 %description

@@ -417,6 +417,12 @@ subtest 'aggressive_timeouts_on' => sub {
     $storage->aggressive_timeouts(0);
 };
 
+# Small test for this old method
+subtest 'is_dbi_error_retryable' => sub {
+    ok  $storage->is_dbi_error_retryable('DBI Exception: DBD::mysql::db do failed: MySQL server has gone away'), "Transient error";
+    ok !$storage->is_dbi_error_retryable('DBI Exception: DBD::mysql::db do failed: Your foos are barred!'),      "Not a transient error";
+};
+
 ############################################################
 
 done_testing;

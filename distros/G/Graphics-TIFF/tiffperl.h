@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017--2021 by Jeffrey Ratcliffe <jffry@posteo.net>
+ * Copyright (c) 2017--2022 by Jeffrey Ratcliffe <jffry@posteo.net>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the same terms as Perl itself, either Perl version 5.8.5 or,

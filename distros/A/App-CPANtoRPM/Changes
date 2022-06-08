@@ -2,6 +2,13 @@ Written by:
    Sullivan Beck (sbeck@cpan.org)
 Any suggestions, bug reports, or donations :-) should be sent to me.
 
+1.13  2022-06-08
+  - Fix for the --no-compat option.  Suggested by Stefan Kirchberg
+
+1.12  2022-06-07
+  - Changed default URL to be metacpan.org.  Suggested by Bogdan.
+  - Added the --no-compat option.
+
 1.11  2021-11-01
   - Optimized some regexps.  Patch by Bogdan.
   - Forced strace to run in English so messages can be parsed.  Patch by Bogdan.

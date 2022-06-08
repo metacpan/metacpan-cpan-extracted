@@ -1,6 +1,12 @@
 Changelog for DBIx-Class-Storage-DBI-mysql-Retryable
 
-v1.0.0 2021-05-19T20:33:03
+v1.0.1 2022-06-07T21:55:29
+ - Pull request #3: SM-3561 (Brendan Byrd)
+ - Update README (Brendan Byrd)
+ - Fix minor typo in comment (Jonathan Rubin)
+ - Re-add is_dbi_error_retryable method in storage engine (Brendan Byrd)
+
+v1.0.0 2021-05-19T20:31:41
  - Add basic files (Brendan Byrd)
  - Remove pedantic stringification protection for $error (Brendan Byrd)
  - Protect $@ from modification by parse_error_class (Andrew Hewus Fresh)

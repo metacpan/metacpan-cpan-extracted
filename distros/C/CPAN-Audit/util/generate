@@ -3,20 +3,22 @@
 use strict;
 use warnings;
 
-use JSON ();
-use File::Basename qw(basename);
-use YAML::Tiny;
-use HTTP::Tiny;
-use Data::Dumper;
 use CPAN::DistnameInfo;
+use Data::Dumper;
+use File::Basename qw(basename);
+use HTTP::Tiny;
+use JSON ();
+use PerlIO::gzip;
+use YAML::Tiny;
 
 local $Data::Dumper::Sortkeys = 1;
 
-my @files = @ARGV;
+my @files = my @args = ($^O eq 'MSWin32') ? map { glob } @ARGV : @ARGV;
 die "Usage: <files>\n" unless @files;
 
 my %db;
 foreach my $file (@files) {
+	print STDERR "Processing $file...\n";
     my $yaml = YAML::Tiny->read($file)->[0];
 
     my $dist = basename $file;
@@ -33,15 +35,30 @@ foreach my $dist ( keys %{ $db{dists} } ) {
     $db{dists}->{$dist}->{main_module} = release($dist)->{main_module};
 }
 
+# XXX: need to investigate why this shows up as utf8
+$db{dists}->{'perl'}->{main_module} = 'perl';
+
 my $dump = Dumper( \%db );
 $dump =~ s{^\$VAR1\s*=\s*}{};
 $dump =~ s{}{};
 
+my $submodule_dir = 'cpan-security-advisory';
+
+my( $commit ) = split /\s+/, join '', grep { /\Q$submodule_dir/ } `git submodule status`;
+
+my( $year, $month, $day ) = (localtime)[5,4,3];
+my( $version ) = sprintf '%4d%02d%02d', $year + 1900, $month + 1, $day;
+
 print <<"EOF";
+# created by $0 at @{[ scalar localtime]}
+# $submodule_dir $commit
+#
 package CPAN::Audit::DB;
 
 use strict;
 use warnings;
+
+our \$VERSION = '$version';
 
 sub db {
     $dump
@@ -56,8 +73,11 @@ sub provides {
     my $ua = HTTP::Tiny->new;
 
     my $details_file = '/tmp/02packages.details.txt.gz';
-    $ua->mirror( 'http://www.cpan.org//modules/02packages.details.txt.gz',
+	print STDERR "Downloading 02packages.details.txt.gz (this may take awhile)\n";
+    $ua->mirror( 'http://www.cpan.org/modules/02packages.details.txt.gz',
         $details_file );
+	print STDERR "Downloaded 02packages.details.txt.gz\n";
+	print STDERR "Digesting 02packages.details.txt.gz (this may take awhile)\n";
 
     open my $fh, '<:gzip', $details_file
       or die "Can't open '$details_file': $!";

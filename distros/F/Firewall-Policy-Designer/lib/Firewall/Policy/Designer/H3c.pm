@@ -1,12 +1,16 @@
 package Firewall::Policy::Designer::H3c;
 
-use Carp;
+#------------------------------------------------------------------------------
+# 加载系统模块
+#------------------------------------------------------------------------------
 use Moose;
 use namespace::autoclean;
 
+#------------------------------------------------------------------------------
+# 加载项目模块
+#------------------------------------------------------------------------------
 use Firewall::Utils::Ip;
 use Firewall::Policy::Searcher::Report::FwInfo;
-use Mojo::Util qw(dumper);
 
 has dbi => (
   is       => 'ro',
@@ -96,6 +100,7 @@ sub createRule {
     . ( shift @{$nameMap->{dst}} )
     . " service "
     . ( shift @{$nameMap->{srv}} );
+
   $cmdStr .= " time-range $scheduleName" if defined $scheduleName;
   push @commands, $cmdStr;
   for my $type ( keys %{$nameMap} ) {

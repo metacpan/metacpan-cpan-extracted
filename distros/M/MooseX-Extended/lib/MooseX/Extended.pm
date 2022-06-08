@@ -28,7 +28,7 @@ no warnings _disabled_warnings();
 use B::Hooks::AtRuntime 'after_runtime';
 use Import::Into;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 sub import {
     my ( $class, %args ) = @_;
@@ -126,7 +126,7 @@ MooseX::Extended - Extend Moose with safe defaults and useful features
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 
@@ -312,6 +312,10 @@ Excluding this will make the C<field> function unavailable.
 
 Some experimental features are useful, but might not be quite what you want.
 
+By default, L<MooseX::Extended> tries to be relatively conservative. However,
+you might want to turn it up to 11. There are optional, B<EXPERIMENTAL>
+features you can use for this. They're turned by the C<includes> flag.
+
 =over 4
 
 =item * C<multi>
@@ -327,6 +331,21 @@ arrays or hashes will take precedence over scalars:
 
     multi sub foo ($self, @x) { ... }
     multi sub foo ($self, $x) { ... } # will never be called
+
+It's quite possible to define multi subs that are ambiguous:
+
+    package Foo {
+        use MooseX::Extended includes => [qw/multi/];
+
+        multi sub foo ($self, @bar) { return '@bar' }
+        multi sub foo ($self, $bar) { return '$bar' }
+    }
+
+    say +Foo->new->foo(1);
+    say +Foo->new->foo(1,2,3);
+
+Both of the above will print the string C<@bar>. The second definition of
+C<foo> is effectively lost.
 
 Only available on Perl v5.26.0 or higher. Requires L<Syntax::Keyword::MultiSub>.
 
@@ -467,46 +486,6 @@ This also applies to various attributes which allow method names, such as
 C<clone>, C<builder>, C<clearer>, C<writer>, C<reader>, and C<predicate>.
 
 Trying to pass a defined C<init_arg> to C<field> will also this exception.
-
-=head1 OPTIONAL FEATURES
-
-By default, L<MooseX::Extended> tries to be relatively conservative. However,
-you might want to turn it up to 11. There are optional features you can use
-for this. They're turned by the C<includes> flag:
-
-=head2 C<multi>
-
-    package My::Multi::Role {
-        use MooseX::Extended::Role includes => [qw/multi/];
-
-        multi sub point ( $self, $x, $y ) {
-            return My::Point->new( x => $x, y => $y );
-        }
-        multi sub point ( $self, $x, $y, $z ) {
-            return My::Point::3D->new( x => $x, y => $y, z => $z );
-        }
-    }
-
-C<multi> allows you to provide multiple method (or subroutine) bodies with the
-same name. We use L<Syntax::Keyword::MultiSub> to implement this, so see that module
-for caveats.
-
-It's quite possible to define multi subs that are ambiguous:
-
-    package Foo {
-        use MooseX::Extended includes => [qw/multi/];
-
-        multi sub foo ($self, @bar) { return '@bar' }
-        multi sub foo ($self, $bar) { return '$bar' }
-    }
-
-    say +Foo->new->foo(1);
-    say +Foo->new->foo(1,2,3);
-
-Both of the above will print the string C<@bar>. The second definition of
-C<foo> is effectively lost.
-
-C<multi> is available for Perl versions 5.26 or higher.
 
 =head1 DEBUGGER SUPPORT
 

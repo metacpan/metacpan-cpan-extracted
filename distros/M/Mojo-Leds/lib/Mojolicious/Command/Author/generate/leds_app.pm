@@ -1,5 +1,5 @@
 package Mojolicious::Command::Author::generate::leds_app;
-$Mojolicious::Command::Author::generate::leds_app::VERSION = '1.14';
+$Mojolicious::Command::Author::generate::leds_app::VERSION = '1.15';
 use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::Util qw(class_to_file class_to_path decamelize);
@@ -61,7 +61,7 @@ Mojolicious::Command::Author::generate::leds_app - Mojo::Leds app generator comm
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 SYNOPSIS
 

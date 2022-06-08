@@ -2,7 +2,7 @@ use v5.12;
 
 package Chart::StackedBars;
 our @ISA     = qw(Chart::Base);
-our $VERSION = 2.400.5;
+our $VERSION = 'v2.402.0';
 
 use Chart::Base;
 use GD;
@@ -247,7 +247,7 @@ sub _find_y_range
 #   if ($self->{'integer_ticks_only'} =~ /^true$/i && ! $self->{'y_tick_labels'}) {
 #     unless (($range % $y_ticks) == 0) {
 #       while (($range % $y_ticks) != 0) {
-# 	$y_ticks++;
+#   $y_ticks++;
 #       }
 #       $self->{'y_ticks'} = $y_ticks + 1;
 #     }

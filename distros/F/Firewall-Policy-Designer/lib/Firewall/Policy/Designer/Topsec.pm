@@ -1,11 +1,13 @@
 package Firewall::Policy::Designer::Topsec;
 
-use Carp;
+#------------------------------------------------------------------------------
+# 加载项目模块
+#------------------------------------------------------------------------------
 use Moose;
+use namespace::autoclean;
 no warnings 'uninitialized';
 use List::Util qw( uniq );
 use Mojo::Util qw(dumper);
-use namespace::autoclean;
 
 #------------------------------------------------------------------------------
 # getAnalyzerReport 获取防火墙策略源目地址、服务端口分析报告
@@ -17,19 +19,19 @@ use Firewall::Policy::Searcher::Report::FwInfo;
 #------------------------------------------------------------------------------
 # Firewall::Policy::Designer::Topsec 通用属性
 #------------------------------------------------------------------------------
-has "dbi" => (
+has dbi => (
   is       => 'ro',
   does     => 'Firewall::DBI::Role',
   required => 1,
 );
 
-has "searcherReportFwInfo" => (
+has searcherReportFwInfo => (
   is       => 'ro',
   isa      => 'Firewall::Policy::Searcher::Report::FwInfo',
   required => 1,
 );
 
-has "commandText" => (
+has commandText => (
   is      => 'ro',
   isa     => 'ArrayRef[Str]',
   default => sub { [] },

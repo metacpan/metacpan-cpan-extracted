@@ -505,6 +505,7 @@ sub request
   $bench->start();
   while( ! $status->error() && $self->running( $status ) ) {
     $status = $self->status( $status );
+    sleep( 2 );
   }
   $bench->stage( 'running' );
 

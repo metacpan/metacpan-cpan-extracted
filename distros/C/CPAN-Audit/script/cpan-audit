@@ -1,44 +1,82 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use FindBin;
-use Pod::Usage;
-use Getopt::Long;
+
+use IO::Interactive qw(is_interactive);
+
 use CPAN::Audit;
 
-my $opt_no_color;
-my $opt_no_corelist;
-my $opt_ascii;
-my $opt_verbose;
-my $opt_quiet;
-my $opt_help;
-GetOptions(
-    'no-color'    => \$opt_no_color,
-    'no-corelist' => \$opt_no_corelist,
-    'ascii'       => \$opt_ascii,
-    'verbose|v'   => \$opt_verbose,
-    'quiet|q'     => \$opt_quiet,
-    'help|h'      => \$opt_help,
-) or die("Error in command line arguments\n");
+our $VERSION = "1.001";
 
-pod2usage( -input => $FindBin::Bin . "/" . $FindBin::Script ) if $opt_help;
+__PACKAGE__->run( @ARGV ) unless caller;
 
-my ($command) = shift @ARGV;
+use constant EXIT_NORMAL =>  0;
+use constant EXIT_USAGE  =>  2;
+use constant EXIT_BASE   => 64;
 
-if ( !$command ) {
-    pod2usage( -input => $FindBin::Bin . "/" . $FindBin::Script );
-}
+sub run {
+	my( $class, @args ) = @_;
 
-my $audit = CPAN::Audit->new(
-    no_color    => $opt_no_color,
-    no_corelist => $opt_no_corelist,
-    ascii       => $opt_ascii,
-    verbose     => $opt_verbose,
-    quiet       => $opt_quiet,
-    interactive => ( -t STDIN && -t STDOUT ),
-);
+	my( $opts ) = $class->process_options( \@args );
 
-exit $audit->command( $command, @ARGV );
+	$class->usage(EXIT_NORMAL) if $opts->{help};
+
+	if( $opts->{version} ) {
+		print "$0 version $VERSION using:\n\tCPAN::Audit     @{[ CPAN::Audit->VERSION ]}\n\tCPAN::Audit::DB @{[ CPAN::Audit::DB->VERSION ]}\n";
+		exit(EXIT_NORMAL);
+		}
+
+	my $command = shift @args;
+	$class->usage(EXIT_USAGE) unless defined $command;
+
+	my %extra = (
+		interactive => is_interactive(),
+		);
+
+	my $audit = CPAN::Audit->new( %$opts, %extra );
+
+	my $advisory_count = $audit->command( $command, @args );
+
+	my $exit_code = do {
+		   if( $advisory_count == 0 ) { EXIT_NORMAL }
+		elsif( $advisory_count > 0  ) { EXIT_BASE + $advisory_count }
+		};
+
+	exit( $exit_code );
+	}
+
+sub process_options {
+	my( $class, $args ) = @_;
+	require Getopt::Long;
+
+	my $options = {};
+
+	my %params;
+	my $params = {
+		'ascii'       => \$params{ascii},
+		'help|h'      => \$params{help},
+		'no-color'    => \$params{no_color},
+		'no-corelist' => \$params{no_corelist},
+		'perl'        => \$params{include_perl},
+		'quiet|q'     => \$params{quiet},
+		'verbose|v'   => \$params{verbose},
+		'version'     => \$params{version},
+		};
+
+	my $ret = Getopt::Long::GetOptionsFromArray( $args, $options, %$params ) or $class->usage(EXIT_USAGE);
+
+	\%params;
+	}
+
+sub usage {
+	require Pod::Usage;
+	require FindBin;
+
+	my( $exit_code ) = @_;
+	no warnings qw(once);
+	Pod::Usage::pod2usage( -input => $FindBin::Bin . "/" . $FindBin::Script );
+	exit( $exit_code );
+	}
 
 __END__
 
@@ -48,7 +86,7 @@ cpan-audit - Audit CPAN modules
 
 =head1 SYNOPSIS
 
-cpan-audit [command] [options...]
+cpan-audit [options] [command]
 
 Commands:
 
@@ -60,12 +98,14 @@ Commands:
 
 Options:
 
+    --ascii       use ascii output
+    --help|h      show the help message and exit
     --no-color    switch off colors
     --no-corelist ignore modules bundled with perl version
-    --ascii       use ascii output
+    --perl        include perl advisories
     --quiet       be quiet
     --verbose     be verbose
-    --help|h      help message
+	--version     show the version and exit
 
 Examples:
 
@@ -85,14 +125,17 @@ Examples:
 
 =head1 DESCRIPTION
 
-C<cpan-audit> is a command line application that checks the modules or distributions for known vulnerabilities. It is using
-its internal database that is automatically generated from a hand-picked database
-L<https://github.com/vti/cpan-security-advisory>.
+C<cpan-audit> is a command line application that checks the modules or
+distributions for known vulnerabilities. It is using its internal
+database that is automatically generated from a hand-picked database
+L<https://github.com/briandfoy/cpan-security-advisory>.
 
-C<cpan-audit> does not connect to anything, that is why it is important to keep it up to date. Every update of the internal
-database is released as a new version.
+C<cpan-audit> does not connect to anything, that is why it is
+important to keep it up to date. Every update of the internal database
+is released as a new version.
 
-C<cpan-audit> can automatically detect dependencies from the following sources:
+C<cpan-audit> can automatically detect dependencies from the following
+sources:
 
 =over
 
@@ -106,8 +149,25 @@ Parses C<cpanfile> taking into account the required versions.
 
 =back
 
-It is assumed that if the required version of the module is less than a version of a release with a known vulnerability
-fix, then the module is considered affected.
+It is assumed that if the required version of the module is less than
+a version of a release with a known vulnerability fix, then the module
+is considered affected.
+
+=head2 Exit values
+
+In prior versions, C<cpan-audit> exited with the number of advisories
+it found. Starting with 1.001, if there are advisories found, C<cpan-audit>
+exits with 64 added to that number.
+
+=over 4
+
+=item * 0 - normal operation
+
+=item * 2 - problem with program invocation, such as bad switches or values
+
+=item * 64+n - advisories found. Subtract 64 to get the advisory count
+
+=back
 
 =head1 LICENSE
 

@@ -5,7 +5,7 @@ use v5.12;
 
 package Chart::Pie;
 our @ISA     = qw(Chart::Base);
-our $VERSION = '2.400.5';
+our $VERSION = 'v2.402.0';
 
 use Carp;
 use GD;
@@ -866,6 +866,7 @@ sub _draw_bottom_legend
     my $l2 = 0;
     my ( $dataset_sum, $j );
     my $label;
+    my $text_color = $self->_color_role_to_index( 'text' );
 
     # make sure we're using a real font
     unless ( ( ref($font) ) eq 'GD::Font' )
@@ -969,7 +970,7 @@ sub _draw_bottom_legend
     $x2 -= $self->{'legend_space'};
     $y1 += $self->{'legend_space'} + $self->{'text_space'};
     $y2 -= $self->{'legend_space'} + $self->{'text_space'};
-
+    
     # draw in the actual legend
     for $r ( 0 .. $rows - 1 )
     {
@@ -1004,7 +1005,7 @@ sub _draw_bottom_legend
                 # now draw the label
                 if ( $self->{'legend_label_values'} =~ /^value$/i )
                 {
-                    $self->{'gd_obj'}->string( $font, $x, $y, $labels[$index] . ' ' . $data->[1][$index], $color );
+                    $self->{'gd_obj'}->string( $font, $x, $y, $labels[$index] . ' ' . $data->[1][$index], $text_color );
 
          #$self->{'gd_obj'}->stringTTF($color, FONT, 10, 0, $x, $y+10, $labels[$index].' '.$data->[1][$index]);     ############
                 }
@@ -1029,13 +1030,13 @@ sub _draw_bottom_legend
                             $data->[1][$index] / ( $dataset_sum || 1 ) * 100,
                             $data->[1][$index] );
                     }
-                    $self->{'gd_obj'}->string( $font, $x, $y, $label, $color );    ###
+                    $self->{'gd_obj'}->string( $font, $x, $y, $label, $text_color );    ###
                             # $self->{'gd_obj'}->stringTTF($color, FONT, 10, 0, $x, $y, $label);
 
                 }
                 else
                 {
-                    $self->{'gd_obj'}->string( $font, $x, $y, $labels[$index], $color );
+                    $self->{'gd_obj'}->string( $font, $x, $y, $labels[$index], $text_color );
                 }
             }
         }

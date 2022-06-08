@@ -3,10 +3,9 @@ package Firewall::Config::Dao::Parser;
 #------------------------------------------------------------------------------
 # 加载扩展模块
 #------------------------------------------------------------------------------
-use Carp;
-use Encode;
 use Moose;
 use namespace::autoclean;
+use Encode;
 use Time::HiRes;
 use Storable;
 

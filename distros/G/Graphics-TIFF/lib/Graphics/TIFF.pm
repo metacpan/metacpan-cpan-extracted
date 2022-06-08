@@ -208,7 +208,7 @@ our %EXPORT_TAGS = (
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
-our $VERSION = 18;
+our $VERSION = 19;
 
 require XSLoader;
 XSLoader::load( 'Graphics::TIFF', $VERSION );
@@ -246,7 +246,7 @@ Graphics::TIFF - Perl extension for the libtiff library
 
 =head1 VERSION
 
-18
+19
 
 =head1 SYNOPSIS
 
@@ -653,6 +653,10 @@ reversal is done if the FillOrder tag is opposite to the native machine bit
 order. 16- and 32-bit samples are automatically byte-swapped if the file was
 written with a byte order opposite to the native machine byte order.
 
+=head2 $tif->CurrentDirectory()
+
+Return an index number of the current directory in the specified TIFF file.
+
 =head2 $tif->PrintDirectory(file, flags)
 
 Prints a description of the current directory in the specified TIFF file to the
@@ -712,7 +716,7 @@ Jeffrey Ratcliffe, E<lt>jffry@posteo.netE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017--2021 by Jeffrey Ratcliffe
+Copyright (C) 2017--2022 by Jeffrey Ratcliffe
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.5 or,

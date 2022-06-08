@@ -4,7 +4,7 @@
       "Ichinose Shogo <shogo82148@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.12",
+   "generated_by" : "Minilla/v3.1.18",
    "license" : [
       "perl_5"
    ],
@@ -70,7 +70,7 @@
    "provides" : {
       "Redis::Fast" : {
          "file" : "lib/Redis/Fast.pm",
-         "version" : "0.33"
+         "version" : "0.34"
       },
       "Redis::Fast::Hash" : {
          "file" : "lib/Redis/Fast/Hash.pm"
@@ -89,11 +89,12 @@
       },
       "homepage" : "https://github.com/shogo82148/Redis-Fast",
       "repository" : {
-         "url" : "git://github.com/shogo82148/Redis-Fast.git",
+         "type" : "git",
+         "url" : "https://github.com/shogo82148/Redis-Fast.git",
          "web" : "https://github.com/shogo82148/Redis-Fast"
       }
    },
-   "version" : "0.33",
+   "version" : "0.34",
    "x_contributors" : [
       "Aaron Crane <arc@aaroncrane.co.uk>",
       "Aaron Crane <arc@cpan.org>",
@@ -130,6 +131,7 @@
       "Zugschlus <mh+github201409@zugschlus.de>",
       "bj5004 <bartosz.jakubski@hurra.com>",
       "dams <dams@zarb.org>",
+      "dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
       "hisaichi5518 <hisada.kazuki@gmail.com>",
       "nise_nabe <nise.nabe@gmail.com>",
       "perlpong <calyx238@gmail.com>",
@@ -140,6 +142,6 @@
       "zhihong zhang <zzh_621@yahoo.com>",
       "Ævar Arnfjörð Bjarmason <avarab@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.06",
+   "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 0
 }

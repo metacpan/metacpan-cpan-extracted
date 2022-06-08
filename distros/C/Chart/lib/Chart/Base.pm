@@ -5,19 +5,20 @@
 use v5.12;
 
 package Chart::Base;
-our $VERSION = '2.400.5';
+our $VERSION = 'v2.402.0';
 
 use FileHandle;
 use Carp;
 use GD;
 use GD::Image;
 use Chart::Constants;
+use Chart::Color;
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>#
 #  public methods          #
 #<<<<<<<<<<<<<<<<<<<<<<<<<<#
 
-sub new            # Standard normal constructor
+sub new            # Standard constructor
 {
     my $proto = shift;
     my $class = ref($proto) || $proto;
@@ -88,14 +89,7 @@ sub set {
     return 1;
 }
 
-## @method hash getopts()
-# @return hash of all set options so far
-#
-# @brief
-# get all options
-#
-# @details
-# @return set options as a hash
+# hash of all set options so far
 sub getopts
 {
     my $self = shift;
@@ -1036,67 +1030,20 @@ sub _init
         grey_background => 'grey',
         (
             map { 'dataset' . $d++ => $_ }
-              qw (red green blue purple peach orange mauve olive pink light_purple light_blue plum yellow turquoise light_green brown
-              HotPink PaleGreen1 DarkBlue BlueViolet orange2 chocolate1 LightGreen pink light_purple light_blue plum yellow turquoise light_green brown
-              pink PaleGreen2 MediumPurple PeachPuff1 orange3 chocolate2 olive pink light_purple light_blue plum yellow turquoise light_green brown
-              DarkOrange PaleGreen3 SlateBlue BlueViolet PeachPuff2 orange4 chocolate3 LightGreen pink light_purple light_blue plum yellow turquoise light_green brown
+              qw (flamescarlet forestgreen navy olive lightseagreen purple
+              orangepeel gold2 chartreuse3 cornflowerblue mediumpurple2 deeppink2 
+              galaxyblue hazelnut pottersclay BlueViolet 
+              
+              PaleGreen1 DarkBlue  orange2 chocolate1 LightGreen
+              pink light_purple light_blue plum yellow turquoise light_green brown
+              pink PaleGreen2 MediumPurple PeachPuff1 orange3 chocolate2
+              olive pink light_purple light_blue plum yellow turquoise light_green brown
+              DarkOrange PaleGreen3 SlateBlue BlueViolet PeachPuff2 orange4
+              chocolate3 LightGreen pink light_purple light_blue plum yellow turquoise light_green brown
               snow1 honeydew3 SkyBlue1 cyan3 DarkOliveGreen1 IndianRed3
               orange1 LightPink3 MediumPurple1 snow3 LavenderBlush1 SkyBlue3
               DarkSlateGray1 DarkOliveGreen3 sienna1 orange3 PaleVioletRed1
-              MediumPurple3 seashell1 LavenderBlush3 LightSkyBlue1
-              DarkSlateGray3 khaki1 sienna3 DarkOrange1 PaleVioletRed3
-              thistle1 seashell3 MistyRose1 LightSkyBlue3 aquamarine1 khaki3
-              burlywood1 DarkOrange3 maroon1 thistle3 AntiqueWhite1
-              MistyRose3 SlateGray1 aquamarine3 LightGoldenrod1 burlywood3
-              coral1 maroon3 AntiqueWhite3 azure1 SlateGray3 DarkSeaGreen1
-              LightGoldenrod3 wheat1 coral3 VioletRed1 bisque1 azure3
-              LightSteelBlue1 DarkSeaGreen3 LightYellow1 wheat3 tomato1
-              VioletRed3 bisque3 SlateBlue1 LightSteelBlue3 SeaGreen1
-              LightYellow3 tan1 tomato3 magenta1 PeachPuff1 SlateBlue3
-              LightBlue1 SeaGreen3 yellow1 tan3 OrangeRed1 magenta3
-              PeachPuff3 RoyalBlue1 LightBlue3 PaleGreen1 yellow3 chocolate1
-              OrangeRed3 orchid1 NavajoWhite1 RoyalBlue3 LightCyan1
-              PaleGreen3 gold1 chocolate3 red1 orchid3 NavajoWhite3 blue1
-              LightCyan3 SpringGreen1 gold3 firebrick1 red3 plum1
-              LemonChiffon1 blue3 PaleTurquoise1 SpringGreen3 goldenrod1
-              firebrick3 DeepPink1 plum3 LemonChiffon3 DodgerBlue1
-              PaleTurquoise3 green1 goldenrod3 brown1 DeepPink3
-              MediumOrchid1 cornsilk1 DodgerBlue3 CadetBlue1 green3
-              DarkGoldenrod1 brown3 HotPink1 MediumOrchid3 cornsilk3
-              SteelBlue1 CadetBlue3 chartreuse1 DarkGoldenrod3 salmon1
-              HotPink3 DarkOrchid1 ivory1 SteelBlue3 turquoise1 chartreuse3
-              RosyBrown1 salmon3 pink1 DarkOrchid3 ivory3 DeepSkyBlue1
-              turquoise3 OliveDrab1 RosyBrown3 LightSalmon1 pink3 purple1
-              honeydew1 DeepSkyBlue3 cyan1 OliveDrab3 IndianRed1
-              LightSalmon3 LightPink1 purple3 honeydew2 DeepSkyBlue4 cyan2
-              OliveDrab4 IndianRed2 LightSalmon4 LightPink2 purple4 snow2
-              honeydew4 SkyBlue2 cyan4 DarkOliveGreen2 IndianRed4 orange2
-              LightPink4 MediumPurple2 snow4 LavenderBlush2 SkyBlue4
-              DarkSlateGray2 DarkOliveGreen4 sienna2 orange4 PaleVioletRed2
-              MediumPurple4 seashell2 LavenderBlush4 LightSkyBlue2
-              DarkSlateGray4 khaki2 sienna4 DarkOrange2 PaleVioletRed4
-              thistle2 seashell4 MistyRose2 LightSkyBlue4 aquamarine2 khaki4
-              burlywood2 DarkOrange4 maroon2 thistle4 AntiqueWhite2
-              MistyRose4 SlateGray2 aquamarine4 LightGoldenrod2 burlywood4
-              coral2 maroon4 AntiqueWhite4 azure2 SlateGray4 DarkSeaGreen2
-              LightGoldenrod4 wheat2 coral4 VioletRed2 bisque2 azure4
-              LightSteelBlue2 DarkSeaGreen4 LightYellow2 wheat4 tomato2
-              VioletRed4 bisque4 SlateBlue2 LightSteelBlue4 SeaGreen2
-              LightYellow4 tan2 tomato4 magenta2 PeachPuff2 SlateBlue4
-              LightBlue2 SeaGreen4 yellow2 tan4 OrangeRed2 magenta4
-              PeachPuff4 RoyalBlue2 LightBlue4 PaleGreen2 yellow4 chocolate2
-              OrangeRed4 orchid2 NavajoWhite2 RoyalBlue4 LightCyan2
-              PaleGreen4 gold2 chocolate4 red2 orchid4 NavajoWhite4 blue2
-              LightCyan4 SpringGreen2 gold4 firebrick2 red4 plum2
-              LemonChiffon2 blue4 PaleTurquoise2 SpringGreen4 goldenrod2
-              firebrick4 DeepPink2 plum4 LemonChiffon4 DodgerBlue2
-              PaleTurquoise4 green2 goldenrod4 brown2 DeepPink4
-              MediumOrchid2 cornsilk2 DodgerBlue4 CadetBlue2 green4
-              DarkGoldenrod2 brown4 HotPink2 MediumOrchid4 cornsilk4
-              SteelBlue2 CadetBlue4 chartreuse2 DarkGoldenrod4 salmon2
-              HotPink4 DarkOrchid2 ivory2 SteelBlue4 turquoise2 chartreuse4
-              RosyBrown2 salmon4 pink2 DarkOrchid4 ivory4 DeepSkyBlue2
-              turquoise4 OliveDrab2 RosyBrown4 LightSalmon2 pink4 purple2)
+              MediumPurple3 seashell1 LavenderBlush3 LightSkyBlue1)
         ),
     };
 
@@ -1269,425 +1216,6 @@ sub _draw
     return 1;
 }
 
-## @var     Hash named_colors RGB values of named colors
-#
-# see URL http://en.wikipedia.org/wiki/Web_colors#X11_color_names
-our %named_colors = (
-    'white'           => [ 255, 255, 255 ],
-    'black'           => [ 0,   0,   0 ],
-    'red'             => [ 200, 0,   0 ],
-    'green'           => [ 0,   175, 0 ],
-    'blue'            => [ 0,   0,   200 ],
-    'orange'          => [ 250, 125, 0 ],
-    'orange2'         => [ 238, 154, 0 ],
-    'orange3'         => [ 205, 133, 0 ],
-    'orange4'         => [ 139, 90,  0 ],
-    'yellow'          => [ 225, 225, 0 ],
-    'purple'          => [ 200, 0,   200 ],
-    'light_blue'      => [ 0,   125, 250 ],
-    'light_green'     => [ 125, 250, 0 ],
-    'light_purple'    => [ 145, 0,   250 ],
-    'pink'            => [ 250, 0,   125 ],
-    'peach'           => [ 250, 125, 125 ],
-    'olive'           => [ 125, 125, 0 ],
-    'plum'            => [ 125, 0,   125 ],
-    'turquoise'       => [ 0,   125, 125 ],
-    'mauve'           => [ 200, 125, 125 ],
-    'brown'           => [ 160, 80,  0 ],
-    'grey'            => [ 225, 225, 225 ],
-    'HotPink'         => [ 255, 105, 180 ],
-    'PaleGreen1'      => [ 154, 255, 154 ],
-    'PaleGreen2'      => [ 144, 238, 144 ],
-    'PaleGreen3'      => [ 124, 205, 124 ],
-    'PaleGreen4'      => [ 84,  138, 84 ],
-    'DarkBlue'        => [ 0,   0,   139 ],
-    'BlueViolet'      => [ 138, 43,  226 ],
-    'PeachPuff'       => [ 255, 218, 185 ],
-    'PeachPuff1'      => [ 255, 218, 185 ],
-    'PeachPuff2'      => [ 238, 203, 173 ],
-    'PeachPuff3'      => [ 205, 175, 149 ],
-    'PeachPuff4'      => [ 139, 119, 101 ],
-    'chocolate1'      => [ 255, 127, 36 ],
-    'chocolate2'      => [ 238, 118, 33 ],
-    'chocolate3'      => [ 205, 102, 29 ],
-    'chocolate4'      => [ 139, 69,  19 ],
-    'LightGreen'      => [ 144, 238, 144 ],
-    'lavender'        => [ 230, 230, 250 ],
-    'MediumPurple'    => [ 147, 112, 219 ],
-    'DarkOrange'      => [ 255, 127, 0 ],
-    'DarkOrange2'     => [ 238, 118, 0 ],
-    'DarkOrange3'     => [ 205, 102, 0 ],
-    'DarkOrange4'     => [ 139, 69,  0 ],
-    'SlateBlue'       => [ 106, 90,  205 ],
-    'BlueViolet'      => [ 138, 43,  226 ],
-    'RoyalBlue'       => [ 65,  105, 225 ],
-    'AntiqueWhite'    => [ 250, 235, 215 ],
-    'AntiqueWhite1'   => [ 255, 239, 219 ],
-    'AntiqueWhite2'   => [ 238, 223, 204 ],
-    'AntiqueWhite3'   => [ 205, 192, 176 ],
-    'AntiqueWhite4'   => [ 139, 131, 120 ],
-    'CadetBlue'       => [ 95,  158, 160 ],
-    'CadetBlue1'      => [ 152, 245, 255 ],
-    'CadetBlue2'      => [ 142, 229, 238 ],
-    'CadetBlue3'      => [ 122, 197, 205 ],
-    'CadetBlue4'      => [ 83,  134, 139 ],
-    'DarkGoldenrod'   => [ 184, 134, 11 ],
-    'DarkGoldenrod1'  => [ 255, 185, 15 ],
-    'DarkGoldenrod2'  => [ 238, 173, 14 ],
-    'DarkGoldenrod3'  => [ 205, 149, 12 ],
-    'DarkGoldenrod4'  => [ 139, 101, 8 ],
-    'DarkOliveGreen'  => [ 85,  107, 47 ],
-    'DarkOliveGreen1' => [ 202, 255, 112 ],
-    'DarkOliveGreen2' => [ 188, 238, 104 ],
-    'DarkOliveGreen3' => [ 162, 205, 90 ],
-    'DarkOliveGreen4' => [ 110, 139, 61 ],
-    'DarkOrange1'     => [ 255, 127, 0 ],
-    'DarkOrchid'      => [ 153, 50,  204 ],
-    'DarkOrchid1'     => [ 191, 62,  255 ],
-    'DarkOrchid2'     => [ 178, 58,  238 ],
-    'DarkOrchid3'     => [ 154, 50,  205 ],
-    'DarkOrchid4'     => [ 104, 34,  139 ],
-    'DarkSeaGreen'    => [ 143, 188, 143 ],
-    'DarkSeaGreen1'   => [ 193, 255, 193 ],
-    'DarkSeaGreen2'   => [ 180, 238, 180 ],
-    'DarkSeaGreen3'   => [ 155, 205, 155 ],
-    'DarkSeaGreen4'   => [ 105, 139, 105 ],
-    'DarkSlateGray'   => [ 47,  79,  79 ],
-    'DarkSlateGray1'  => [ 151, 255, 255 ],
-    'DarkSlateGray2'  => [ 141, 238, 238 ],
-    'DarkSlateGray3'  => [ 121, 205, 205 ],
-    'DarkSlateGray4'  => [ 82,  139, 139 ],
-    'DeepPink'        => [ 255, 20,  147 ],
-    'DeepPink1'       => [ 255, 20,  147 ],
-    'DeepPink2'       => [ 238, 18,  137 ],
-    'DeepPink3'       => [ 205, 16,  118 ],
-    'DeepPink4'       => [ 139, 10,  80 ],
-    'DeepSkyBlue'     => [ 0,   191, 255 ],
-    'DeepSkyBlue1'    => [ 0,   191, 255 ],
-    'DeepSkyBlue2'    => [ 0,   178, 238 ],
-    'DeepSkyBlue3'    => [ 0,   154, 205 ],
-    'DeepSkyBlue4'    => [ 0,   104, 139 ],
-    'DodgerBlue'      => [ 30,  144, 255 ],
-    'DodgerBlue1'     => [ 30,  144, 255 ],
-    'DodgerBlue2'     => [ 28,  134, 238 ],
-    'DodgerBlue3'     => [ 24,  116, 205 ],
-    'DodgerBlue4'     => [ 16,  78,  139 ],
-    'HotPink1'        => [ 255, 110, 180 ],
-    'HotPink2'        => [ 238, 106, 167 ],
-    'HotPink3'        => [ 205, 96,  144 ],
-    'HotPink4'        => [ 139, 58,  98 ],
-    'IndianRed'       => [ 205, 92,  92 ],
-    'IndianRed1'      => [ 255, 106, 106 ],
-    'IndianRed2'      => [ 238, 99,  99 ],
-    'IndianRed3'      => [ 205, 85,  85 ],
-    'IndianRed4'      => [ 139, 58,  58 ],
-    'LavenderBlush'   => [ 255, 240, 245 ],
-    'LavenderBlush1'  => [ 255, 240, 245 ],
-    'LavenderBlush2'  => [ 238, 224, 229 ],
-    'LavenderBlush3'  => [ 205, 193, 197 ],
-    'LavenderBlush4'  => [ 139, 131, 134 ],
-    'LemonChiffon'    => [ 255, 250, 205 ],
-    'LemonChiffon1'   => [ 255, 250, 205 ],
-    'LemonChiffon2'   => [ 238, 233, 191 ],
-    'LemonChiffon3'   => [ 205, 201, 165 ],
-    'LemonChiffon4'   => [ 139, 137, 112 ],
-    'LightBlue'       => [ 173, 216, 230 ],
-    'LightBlue1'      => [ 191, 239, 255 ],
-    'LightBlue2'      => [ 178, 223, 238 ],
-    'LightBlue3'      => [ 154, 192, 205 ],
-    'LightBlue4'      => [ 104, 131, 139 ],
-    'LightCyan'       => [ 224, 255, 255 ],
-    'LightCyan1'      => [ 224, 255, 255 ],
-    'LightCyan2'      => [ 209, 238, 238 ],
-    'LightCyan3'      => [ 180, 205, 205 ],
-    'LightCyan4'      => [ 122, 139, 139 ],
-    'LightGoldenrod'  => [ 238, 221, 130 ],
-    'LightGoldenrod1' => [ 255, 236, 139 ],
-    'LightGoldenrod2' => [ 238, 220, 130 ],
-    'LightGoldenrod3' => [ 205, 190, 112 ],
-    'LightGoldenrod4' => [ 139, 129, 76 ],
-    'LightPink'       => [ 255, 182, 193 ],
-    'LightPink1'      => [ 255, 174, 185 ],
-    'LightPink2'      => [ 238, 162, 173 ],
-    'LightPink3'      => [ 205, 140, 149 ],
-    'LightPink4'      => [ 139, 95,  101 ],
-    'LightSalmon'     => [ 255, 160, 122 ],
-    'LightSalmon1'    => [ 255, 160, 122 ],
-    'LightSalmon2'    => [ 238, 149, 114 ],
-    'LightSalmon3'    => [ 205, 129, 98 ],
-    'LightSalmon4'    => [ 139, 87,  66 ],
-    'LightSkyBlue'    => [ 135, 206, 250 ],
-    'LightSkyBlue1'   => [ 176, 226, 255 ],
-    'LightSkyBlue2'   => [ 164, 211, 238 ],
-    'LightSkyBlue3'   => [ 141, 182, 205 ],
-    'LightSkyBlue4'   => [ 96,  123, 139 ],
-    'LightSteelBlue'  => [ 176, 196, 222 ],
-    'LightSteelBlue1' => [ 202, 225, 255 ],
-    'LightSteelBlue2' => [ 188, 210, 238 ],
-    'LightSteelBlue3' => [ 162, 181, 205 ],
-    'LightSteelBlue4' => [ 110, 123, 139 ],
-    'LightYellow'     => [ 255, 255, 224 ],
-    'LightYellow1'    => [ 255, 255, 224 ],
-    'LightYellow2'    => [ 238, 238, 209 ],
-    'LightYellow3'    => [ 205, 205, 180 ],
-    'LightYellow4'    => [ 139, 139, 122 ],
-    'MediumOrchid'    => [ 186, 85,  211 ],
-    'MediumOrchid1'   => [ 224, 102, 255 ],
-    'MediumOrchid2'   => [ 209, 95,  238 ],
-    'MediumOrchid3'   => [ 180, 82,  205 ],
-    'MediumOrchid4'   => [ 122, 55,  139 ],
-    'MediumPurple1'   => [ 171, 130, 255 ],
-    'MediumPurple2'   => [ 159, 121, 238 ],
-    'MediumPurple3'   => [ 137, 104, 205 ],
-    'MediumPurple4'   => [ 93,  71,  139 ],
-    'MistyRose'       => [ 255, 228, 225 ],
-    'MistyRose1'      => [ 255, 228, 225 ],
-    'MistyRose2'      => [ 238, 213, 210 ],
-    'MistyRose3'      => [ 205, 183, 181 ],
-    'MistyRose4'      => [ 139, 125, 123 ],
-    'NavajoWhite'     => [ 255, 222, 173 ],
-    'NavajoWhite1'    => [ 255, 222, 173 ],
-    'NavajoWhite2'    => [ 238, 207, 161 ],
-    'NavajoWhite3'    => [ 205, 179, 139 ],
-    'NavajoWhite4'    => [ 139, 121, 94 ],
-    'OliveDrab'       => [ 107, 142, 35 ],
-    'OliveDrab1'      => [ 192, 255, 62 ],
-    'OliveDrab2'      => [ 179, 238, 58 ],
-    'OliveDrab3'      => [ 154, 205, 50 ],
-    'OliveDrab4'      => [ 105, 139, 34 ],
-    'OrangeRed'       => [ 255, 69,  0 ],
-    'OrangeRed1'      => [ 255, 69,  0 ],
-    'OrangeRed2'      => [ 238, 64,  0 ],
-    'OrangeRed3'      => [ 205, 55,  0 ],
-    'OrangeRed4'      => [ 139, 37,  0 ],
-    'PaleGreen'       => [ 152, 251, 152 ],
-    'PaleTurquoise'   => [ 175, 238, 238 ],
-    'PaleTurquoise1'  => [ 187, 255, 255 ],
-    'PaleTurquoise2'  => [ 174, 238, 238 ],
-    'PaleTurquoise3'  => [ 150, 205, 205 ],
-    'PaleTurquoise4'  => [ 102, 139, 139 ],
-    'PaleVioletRed'   => [ 219, 112, 147 ],
-    'PaleVioletRed1'  => [ 255, 130, 171 ],
-    'PaleVioletRed2'  => [ 238, 121, 159 ],
-    'PaleVioletRed3'  => [ 205, 104, 137 ],
-    'PaleVioletRed4'  => [ 139, 71,  93 ],
-    'RosyBrown'       => [ 188, 143, 143 ],
-    'RosyBrown1'      => [ 255, 193, 193 ],
-    'RosyBrown2'      => [ 238, 180, 180 ],
-    'RosyBrown3'      => [ 205, 155, 155 ],
-    'RosyBrown4'      => [ 139, 105, 105 ],
-    'RoyalBlue1'      => [ 72,  118, 255 ],
-    'RoyalBlue2'      => [ 67,  110, 238 ],
-    'RoyalBlue3'      => [ 58,  95,  205 ],
-    'RoyalBlue4'      => [ 39,  64,  139 ],
-    'SeaGreen'        => [ 46,  139, 87 ],
-    'SeaGreen1'       => [ 84,  255, 159 ],
-    'SeaGreen2'       => [ 78,  238, 148 ],
-    'SeaGreen3'       => [ 67,  205, 128 ],
-    'SeaGreen4'       => [ 46,  139, 87 ],
-    'SkyBlue'         => [ 135, 206, 235 ],
-    'SkyBlue1'        => [ 135, 206, 255 ],
-    'SkyBlue2'        => [ 126, 192, 238 ],
-    'SkyBlue3'        => [ 108, 166, 205 ],
-    'SkyBlue4'        => [ 74,  112, 139 ],
-    'SlateBlue1'      => [ 131, 111, 255 ],
-    'SlateBlue2'      => [ 122, 103, 238 ],
-    'SlateBlue3'      => [ 105, 89,  205 ],
-    'SlateBlue4'      => [ 71,  60,  139 ],
-    'SlateGray'       => [ 112, 128, 144 ],
-    'SlateGray1'      => [ 198, 226, 255 ],
-    'SlateGray2'      => [ 185, 211, 238 ],
-    'SlateGray3'      => [ 159, 182, 205 ],
-    'SlateGray4'      => [ 108, 123, 139 ],
-    'SpringGreen'     => [ 0,   255, 127 ],
-    'SpringGreen1'    => [ 0,   255, 127 ],
-    'SpringGreen2'    => [ 0,   238, 118 ],
-    'SpringGreen3'    => [ 0,   205, 102 ],
-    'SpringGreen4'    => [ 0,   139, 69 ],
-    'SteelBlue'       => [ 70,  130, 180 ],
-    'SteelBlue1'      => [ 99,  184, 255 ],
-    'SteelBlue2'      => [ 92,  172, 238 ],
-    'SteelBlue3'      => [ 79,  148, 205 ],
-    'SteelBlue4'      => [ 54,  100, 139 ],
-    'VioletRed'       => [ 208, 32,  144 ],
-    'VioletRed1'      => [ 255, 62,  150 ],
-    'VioletRed2'      => [ 238, 58,  140 ],
-    'VioletRed3'      => [ 205, 50,  120 ],
-    'VioletRed4'      => [ 139, 34,  82 ],
-    'aquamarine'      => [ 127, 255, 212 ],
-    'aquamarine1'     => [ 127, 255, 212 ],
-    'aquamarine2'     => [ 118, 238, 198 ],
-    'aquamarine3'     => [ 102, 205, 170 ],
-    'aquamarine4'     => [ 69,  139, 116 ],
-    'azure'           => [ 240, 255, 255 ],
-    'azure1'          => [ 240, 255, 255 ],
-    'azure2'          => [ 224, 238, 238 ],
-    'azure3'          => [ 193, 205, 205 ],
-    'azure4'          => [ 131, 139, 139 ],
-    'bisque'          => [ 255, 228, 196 ],
-    'bisque1'         => [ 255, 228, 196 ],
-    'bisque2'         => [ 238, 213, 183 ],
-    'bisque3'         => [ 205, 183, 158 ],
-    'bisque4'         => [ 139, 125, 107 ],
-    'blue1'           => [ 0,   0,   255 ],
-    'blue2'           => [ 0,   0,   238 ],
-    'blue3'           => [ 0,   0,   205 ],
-    'blue4'           => [ 0,   0,   139 ],
-    'brown1'          => [ 255, 64,  64 ],
-    'brown2'          => [ 238, 59,  59 ],
-    'brown3'          => [ 205, 51,  51 ],
-    'brown4'          => [ 139, 35,  35 ],
-    'burlywood'       => [ 222, 184, 135 ],
-    'burlywood1'      => [ 255, 211, 155 ],
-    'burlywood2'      => [ 238, 197, 145 ],
-    'burlywood3'      => [ 205, 170, 125 ],
-    'burlywood4'      => [ 139, 115, 85 ],
-    'chartreuse'      => [ 127, 255, 0 ],
-    'chartreuse1'     => [ 127, 255, 0 ],
-    'chartreuse2'     => [ 118, 238, 0 ],
-    'chartreuse3'     => [ 102, 205, 0 ],
-    'chartreuse4'     => [ 69,  139, 0 ],
-    'chocolate'       => [ 210, 105, 30 ],
-    'coral'           => [ 255, 127, 80 ],
-    'coral1'          => [ 255, 114, 86 ],
-    'coral2'          => [ 238, 106, 80 ],
-    'coral3'          => [ 205, 91,  69 ],
-    'coral4'          => [ 139, 62,  47 ],
-    'cornsilk'        => [ 255, 248, 220 ],
-    'cornsilk1'       => [ 255, 248, 220 ],
-    'cornsilk2'       => [ 238, 232, 205 ],
-    'cornsilk3'       => [ 205, 200, 177 ],
-    'cornsilk4'       => [ 139, 136, 120 ],
-    'cyan'            => [ 0,   255, 255 ],
-    'cyan1'           => [ 0,   255, 255 ],
-    'cyan2'           => [ 0,   238, 238 ],
-    'cyan3'           => [ 0,   205, 205 ],
-    'cyan4'           => [ 0,   139, 139 ],
-    'firebrick'       => [ 178, 34,  34 ],
-    'firebrick1'      => [ 255, 48,  48 ],
-    'firebrick2'      => [ 238, 44,  44 ],
-    'firebrick3'      => [ 205, 38,  38 ],
-    'firebrick4'      => [ 139, 26,  26 ],
-    'gold'            => [ 255, 215, 0 ],
-    'gold1'           => [ 255, 215, 0 ],
-    'gold2'           => [ 238, 201, 0 ],
-    'gold3'           => [ 205, 173, 0 ],
-    'gold4'           => [ 139, 117, 0 ],
-    'goldenrod'       => [ 218, 165, 32 ],
-    'goldenrod1'      => [ 255, 193, 37 ],
-    'goldenrod2'      => [ 238, 180, 34 ],
-    'goldenrod3'      => [ 205, 155, 29 ],
-    'goldenrod4'      => [ 139, 105, 20 ],
-    'gray'            => [ 190, 190, 190 ],
-    'gray1'           => [ 3,   3,   3 ],
-    'gray2'           => [ 5,   5,   5 ],
-    'gray3'           => [ 8,   8,   8 ],
-    'gray4'           => [ 10,  10,  10 ],
-    'green1'          => [ 0,   255, 0 ],
-    'green2'          => [ 0,   238, 0 ],
-    'green3'          => [ 0,   205, 0 ],
-    'green4'          => [ 0,   139, 0 ],
-    'grey1'           => [ 3,   3,   3 ],
-    'grey2'           => [ 5,   5,   5 ],
-    'grey3'           => [ 8,   8,   8 ],
-    'grey4'           => [ 10,  10,  10 ],
-    'honeydew'        => [ 240, 255, 240 ],
-    'honeydew1'       => [ 240, 255, 240 ],
-    'honeydew2'       => [ 224, 238, 224 ],
-    'honeydew3'       => [ 193, 205, 193 ],
-    'honeydew4'       => [ 131, 139, 131 ],
-    'ivory'           => [ 255, 255, 240 ],
-    'ivory1'          => [ 255, 255, 240 ],
-    'ivory2'          => [ 238, 238, 224 ],
-    'ivory3'          => [ 205, 205, 193 ],
-    'ivory4'          => [ 139, 139, 131 ],
-    'khaki'           => [ 240, 230, 140 ],
-    'khaki1'          => [ 255, 246, 143 ],
-    'khaki2'          => [ 238, 230, 133 ],
-    'khaki3'          => [ 205, 198, 115 ],
-    'khaki4'          => [ 139, 134, 78 ],
-    'magenta'         => [ 255, 0,   255 ],
-    'magenta1'        => [ 255, 0,   255 ],
-    'magenta2'        => [ 238, 0,   238 ],
-    'magenta3'        => [ 205, 0,   205 ],
-    'magenta4'        => [ 139, 0,   139 ],
-    'maroon'          => [ 176, 48,  96 ],
-    'maroon1'         => [ 255, 52,  179 ],
-    'maroon2'         => [ 238, 48,  167 ],
-    'maroon3'         => [ 205, 41,  144 ],
-    'maroon4'         => [ 139, 28,  98 ],
-    'orange1'         => [ 255, 165, 0 ],
-    'orchid'          => [ 218, 112, 214 ],
-    'orchid1'         => [ 255, 131, 250 ],
-    'orchid2'         => [ 238, 122, 233 ],
-    'orchid3'         => [ 205, 105, 201 ],
-    'orchid4'         => [ 139, 71,  137 ],
-    'pink1'           => [ 255, 181, 197 ],
-    'pink2'           => [ 238, 169, 184 ],
-    'pink3'           => [ 205, 145, 158 ],
-    'pink4'           => [ 139, 99,  108 ],
-    'plum1'           => [ 255, 187, 255 ],
-    'plum2'           => [ 238, 174, 238 ],
-    'plum3'           => [ 205, 150, 205 ],
-    'plum4'           => [ 139, 102, 139 ],
-    'purple1'         => [ 155, 48,  255 ],
-    'purple2'         => [ 145, 44,  238 ],
-    'purple3'         => [ 125, 38,  205 ],
-    'purple4'         => [ 85,  26,  139 ],
-    'red1'            => [ 255, 0,   0 ],
-    'red2'            => [ 238, 0,   0 ],
-    'red3'            => [ 205, 0,   0 ],
-    'red4'            => [ 139, 0,   0 ],
-    'salmon'          => [ 250, 128, 114 ],
-    'salmon1'         => [ 255, 140, 105 ],
-    'salmon2'         => [ 238, 130, 98 ],
-    'salmon3'         => [ 205, 112, 84 ],
-    'salmon4'         => [ 139, 76,  57 ],
-    'seashell'        => [ 255, 245, 238 ],
-    'seashell1'       => [ 255, 245, 238 ],
-    'seashell2'       => [ 238, 229, 222 ],
-    'seashell3'       => [ 205, 197, 191 ],
-    'seashell4'       => [ 139, 134, 130 ],
-    'sienna'          => [ 160, 82,  45 ],
-    'sienna1'         => [ 255, 130, 71 ],
-    'sienna2'         => [ 238, 121, 66 ],
-    'sienna3'         => [ 205, 104, 57 ],
-    'sienna4'         => [ 139, 71,  38 ],
-    'snow'            => [ 255, 250, 250 ],
-    'snow1'           => [ 255, 250, 250 ],
-    'snow2'           => [ 238, 233, 233 ],
-    'snow3'           => [ 205, 201, 201 ],
-    'snow4'           => [ 139, 137, 137 ],
-    'tan'             => [ 210, 180, 140 ],
-    'tan1'            => [ 255, 165, 79 ],
-    'tan2'            => [ 238, 154, 73 ],
-    'tan3'            => [ 205, 133, 63 ],
-    'tan4'            => [ 139, 90,  43 ],
-    'thistle'         => [ 216, 191, 216 ],
-    'thistle1'        => [ 255, 225, 255 ],
-    'thistle2'        => [ 238, 210, 238 ],
-    'thistle3'        => [ 205, 181, 205 ],
-    'thistle4'        => [ 139, 123, 139 ],
-    'tomato'          => [ 255, 99,  71 ],
-    'tomato1'         => [ 255, 99,  71 ],
-    'tomato2'         => [ 238, 92,  66 ],
-    'tomato3'         => [ 205, 79,  57 ],
-    'tomato4'         => [ 139, 54,  38 ],
-    'turquoise1'      => [ 0,   245, 255 ],
-    'turquoise2'      => [ 0,   229, 238 ],
-    'turquoise3'      => [ 0,   197, 205 ],
-    'turquoise4'      => [ 0,   134, 139 ],
-    'wheat'           => [ 245, 222, 179 ],
-    'wheat1'          => [ 255, 231, 186 ],
-    'wheat2'          => [ 238, 216, 174 ],
-    'wheat3'          => [ 205, 186, 150 ],
-    'wheat4'          => [ 139, 126, 102 ],
-    'yellow1'         => [ 255, 255, 0 ],
-    'yellow2'         => [ 238, 238, 0 ],
-    'yellow3'         => [ 205, 205, 0 ],
-    'yellow4'         => [ 139, 139, 0 ],
-);
-
 ## @fn private int _set_colors
 #  specify my colors
 # @return status
@@ -1720,9 +1248,7 @@ sub _set_colors
 # @li undef: If your subroutine has been called in void context
 #
 # @return a (list of) color index(es) corresponding to the (list of) role(s) in \\\@_.
-#
-sub _color_role_to_index
-{
+sub _color_role_to_index {
     my $self = shift;
 
     # Return a (list of) color index(es) corresponding to the (list of) role(s) in @_.
@@ -1740,7 +1266,6 @@ sub _color_role_to_index
               || $self->{'colors_default_spec'}->{ $self->{'colors_default_role'}->{$role} };
 
             my @rgb = $self->_color_spec_to_rgb( $role, $spec );
-
             #print STDERR "spec = $spec\n";
 
             my $string = sprintf " RGB(%d,%d,%d)", map { $_ + 0 } @rgb;
@@ -1761,37 +1286,11 @@ sub _color_role_to_index
     ( wantarray && @_ > 1 ? @result : $result[0] );
 }
 
-## @fn private array _color_spec_to_rgb($role,$spec)
-# Return an array (list of) rgb values for spec
-# @param[in] role name of a role
-# @param[in] spec [r,g,b] or name
-# @return array of rgb values as a list (i.e., \\\@rgb)
-#
-sub _color_spec_to_rgb
-{
-    my $self = shift;
-    my $role = shift;    # for error messages
-    my $spec = shift;    # [r,g,b] or name
-
-    my @rgb;             # result
-    if ( ref($spec) eq 'ARRAY' )
-    {
-        @rgb = @{$spec};
-        croak "Invalid color RGB array (" . join( ',', @rgb ) . ") for $role\n"
-
-          unless @rgb == 3 && grep( !m/^\d+$/ || $_ > 255, @rgb ) == 0;
-    }
-    elsif ( !ref($spec) )
-    {
-        croak "Unknown named color ($spec) for $role\n"
-          unless $named_colors{$spec};
-        @rgb = @{ $named_colors{$spec} };
-    }
-    else
-    {
-        croak "Unrecognized color for $role\n";
-    }
-    @rgb;
+sub _color_spec_to_rgb {
+    my ($self, $role, $spec) = @_; # color role name (from set) for error msg
+    my $color = Chart::Color->new( $spec );
+    return croak "Unrecognized color for $role\n" unless ref $color;
+    $color->rgb;
 }
 
 ## @fn private int _brushStyles_of_roles
@@ -2789,7 +2288,6 @@ sub _draw_legend
 {
     my $self = shift;
     my $length;
-
     # check to see if legend type is none..
     if ( $self->{'legend'} =~ /^none$/ || length( $self->{'legend'} ) == 0 )
     {
@@ -2840,6 +2338,7 @@ sub _draw_legend
     elsif ( $self->{'legend'} eq 'top' )
     {
         $self->_draw_top_legend;
+
     }
     elsif ( $self->{'legend'} eq 'none' || length( $self->{'legend'} ) == 0 )
     {
@@ -2857,8 +2356,8 @@ sub _draw_legend
 ## @fn private int _draw_bottom_legend()
 # put the legend on the bottom of the chart
 # @return status
-sub _draw_bottom_legend
-{
+sub _draw_bottom_legend {
+
     my $self = shift;
 
     my @labels = @{ $self->{'legend_labels'} };
@@ -2936,6 +2435,8 @@ sub _draw_bottom_legend
     $y1 += $self->{'legend_space'} + $self->{'text_space'};
     $y2 -= $self->{'legend_space'} + $self->{'text_space'};
 
+    my $text_color = $self->_color_role_to_index( 'text' );
+
     # draw in the actual legend
     for $r ( 0 .. $rows - 1 )
     {
@@ -2968,11 +2469,10 @@ sub _draw_bottom_legend
                 $y = $y1 + ( $row_height * $r );
 
                 # now draw the label
-                $self->{'gd_obj'}->string( $font, $x, $y, $labels[$index], $color );
+                $self->{'gd_obj'}->string( $font, $x, $y, $labels[$index], $text_color );
             }
         }
     }
-
     # mark off the space used
     $self->{'curr_y_max'} -= $rows * $row_height + 2 * $self->{'text_space'} + 2 * $self->{'legend_space'};
 
@@ -4611,6 +4111,4 @@ sub _yPixelInReal
     return $yRealWidth / $width_y;
 }
 
-
 1; # be a good module and return positive
-

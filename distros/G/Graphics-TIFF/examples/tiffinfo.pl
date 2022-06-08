@@ -7,6 +7,7 @@ no if $] >= 5.018, warnings => 'experimental::smartmatch';
 use English qw( -no_match_vars );
 use Readonly;
 Readonly my $EXIT_ERROR => -1;
+Readonly my $TIFF_4_4_0 => 4.004000;
 
 our $VERSION;
 
@@ -287,6 +288,9 @@ sub readrawdata {
 
 sub tiffinfo {
     my ( $tif, $order, $flags, $is_image ) = @_;
+    if ( Graphics::TIFF->get_version_scalar >= $TIFF_4_4_0 ) {
+        printf "=== TIFF directory %d ===\n", $tif->CurrentDirectory;
+    }
     $tif->PrintDirectory( *STDOUT, $flags );
     if ( not $readdata or not $is_image ) { return }
     if ($rawdata) {

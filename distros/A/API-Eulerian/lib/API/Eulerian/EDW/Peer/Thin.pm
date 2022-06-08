@@ -26,7 +26,7 @@ use strict; use warnings;
 #
 # Inherited interface from API::Eulerian::EDW::Peer
 #
-use parent 'API::Eulerian::EDW::Peer';
+use API::Eulerian::EDW::Peer;
 #
 # Import API::Eulerian::EDW::WebSocket
 #
@@ -44,6 +44,18 @@ use Switch;
 #
 use JSON;
 #
+#
+#
+use API::Eulerian::EDW::Authority();
+#
+#
+#
+use Encode;
+#
+#
+#
+our @ISA = qw/ API::Eulerian::EDW::Peer /;
+#
 # @brief Allocate and initialize a new Eulerian Data Warehouse Thin Peer.
 #
 # @param $class - Eulerian Data Warehouse Thin Peer class.
@@ -53,11 +65,10 @@ use JSON;
 #
 sub new
 {
-  my ( $class, $setup ) = @_;
-  my $self;
-
-  # Call base instance constructor
-  $self = $class->SUPER::create( 'API::Eulerian::EDW::Peer::Thin' );
+  my $proto = shift;
+  my $class = ref( $proto ) || $proto;
+  my $setup = shift() || {};
+  my $self = $class->SUPER::new();
 
   # Setup Default host value
   $self->host( 'edwaro' );
@@ -68,7 +79,7 @@ sub new
   # Setup Rest Peer Attributes
   $self->setup( $setup );
 
-  return $self;
+  return bless( $self, $class );
 }
 #
 # @brief Setup Eulerian Data Warehouse Peer.
@@ -167,6 +178,7 @@ sub create
 sub dispatcher
 {
   my ( $ws, $buf ) = @_;
+  $buf = encode( 'utf-8', $buf );
   my $json = decode_json( $buf );
   my $type = $json->{ message };
   my $uuid = $json->{ uuid };

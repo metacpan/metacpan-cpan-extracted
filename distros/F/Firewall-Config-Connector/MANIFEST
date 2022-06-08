@@ -16,9 +16,6 @@ lib/Firewall/Config/Connector/Device/Neteye.pm
 lib/Firewall/Config/Connector/Device/Netscreen.pm
 lib/Firewall/Config/Connector/Device/Srx.pm
 lib/Firewall/Config/Connector/Device/Topsec.pm
-lib/Firewall/Config/Connector/Device/tests/Fortinet.t
-lib/Firewall/Config/Connector/Device/tests/Hillstone.t
-lib/Firewall/Config/Connector/Device/tests/Netscreen.t
 lib/Firewall/Config/Connector/Fortinet.pm
 lib/Firewall/Config/Connector/Hillstone.pm
 lib/Firewall/Config/Connector/Neteye.pm

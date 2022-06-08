@@ -1,15 +1,16 @@
 package WHO::GrowthReference::Table;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-12'; # DATE
-our $DIST = 'WHO-GrowthReference-Table'; # DIST
-our $VERSION = '0.011'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
-use Exporter;
+use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-06-07'; # DATE
+our $DIST = 'WHO-GrowthReference-Table'; # DIST
+our $VERSION = '0.012'; # VERSION
+
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
                        get_who_growth_reference
@@ -1212,6 +1213,14 @@ _
             schema => ['str*', in=>['M', 'F']],
             req => 1,
             pos => 0,
+            cmdline_aliases => {
+                boy    => {is_flag=>1, summary=>'Shortcut for --gender=M', code=>sub { $_[0]{gender} = 'M' }},
+                girl   => {is_flag=>1, summary=>'Shortcut for --gender=F', code=>sub { $_[0]{gender} = 'F' }},
+                male   => {is_flag=>1, summary=>'Shortcut for --gender=M', code=>sub { $_[0]{gender} = 'M' }},
+                female => {is_flag=>1, summary=>'Shortcut for --gender=F', code=>sub { $_[0]{gender} = 'F' }},
+                m      => {is_flag=>1, summary=>'Shortcut for --gender=M', code=>sub { $_[0]{gender} = 'M' }},
+                f      => {is_flag=>1, summary=>'Shortcut for --gender=F', code=>sub { $_[0]{gender} = 'F' }},
+            },
         },
         now => {
             summary => 'Assume now is this date, instead of current date',
@@ -1255,7 +1264,7 @@ _
     ],
 };
 sub get_who_growth_reference {
-    no strict 'refs';
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
     require Data::TableData::Lookup;
 
     my %args = @_;
@@ -1537,7 +1546,7 @@ WHO::GrowthReference::Table - Lookup height/weight in the WHO growth chart (a.k.
 
 =head1 VERSION
 
-This document describes version 0.011 of WHO::GrowthReference::Table (from Perl distribution WHO-GrowthReference-Table), released on 2021-04-12.
+This document describes version 0.012 of WHO::GrowthReference::Table (from Perl distribution WHO-GrowthReference-Table), released on 2022-06-07.
 
 =head1 SYNOPSIS
 
@@ -1586,7 +1595,7 @@ This document describes version 0.011 of WHO::GrowthReference::Table (from Perl 
 
 Usage:
 
- get_who_growth_reference(%args) -> [status, msg, payload, meta]
+ get_who_growth_reference(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Lookup heightE<sol>weight in the WHO growth chart (a.k.a. growth reference, growth standards).
 
@@ -1604,97 +1613,105 @@ Result:
    200,
    "OK",
    {
-     age           => "47.0 month(s)",
-     bmi_mean      => 15.3,
-     bmi_P1        => 12.8,
-     bmi_P15       => 14.1,
-     bmi_P25       => 14.5,
-     bmi_P3        => 13.2,
-     bmi_P5        => 13.5,
-     bmi_P50       => 15.3,
-     bmi_P75       => 16.2,
+     age           => "61.0 month(s)",
+     bmi_mean      => 15.264,
+     bmi_P01       => 12.041,
+     bmi_P1        => 12.72,
+     bmi_P10       => 13.764,
+     bmi_P15       => 14.03,
+     bmi_P25       => 14.441,
+     bmi_P3        => 13.148,
+     bmi_P5        => 13.384,
+     bmi_P50       => 15.264,
+     bmi_P75       => 16.172,
      bmi_P85       => 16.7,
-     bmi_P95       => 17.6,
-     bmi_P97       => "18.0",
-     bmi_P99       => 18.7,
-     bmi_SD0       => 15.3,
-     bmi_SD1       => 16.7,
-     bmi_SD1neg    => 14.2,
-     bmi_SD2       => 18.2,
-     bmi_SD2neg    => 13.1,
-     bmi_SD3       => 19.9,
-     bmi_SD3neg    => 12.1,
+     bmi_P90       => 17.074,
+     bmi_P95       => 17.656,
+     bmi_P97       => 18.052,
+     bmi_P99       => 18.845,
+     bmi_P999      => 20.355,
+     bmi_SD0       => 15.264,
+     bmi_SD1       => 16.645,
+     bmi_SD1neg    => 14.071,
+     bmi_SD2       => 18.259,
+     bmi_SD2neg    => 13.031,
+     bmi_SD3       => 20.166,
+     bmi_SD3neg    => 12.118,
+     bmi_SD4       => 22.072,
+     bmi_SD4neg    => 11.204,
      gender        => "M",
-     height_mean   => 102.92,
-     height_P01    => 90.042,
-     height_P1     => 93.225,
-     height_P10    => 97.579,
-     height_P15    => 98.6,
-     height_P25    => 100.109,
-     height_P3     => 95.082,
-     height_P5     => 96.065,
-     height_P50    => 102.92,
-     height_P75    => 105.73,
-     height_P85    => 107.239,
-     height_P90    => 108.26,
-     height_P95    => 109.774,
-     height_P97    => 110.757,
-     height_P99    => 112.614,
-     height_P999   => 115.797,
-     height_SD0    => "102.920",
-     height_SD1    => 107.087,
-     height_SD1neg => 98.752,
-     height_SD2    => 111.254,
-     height_SD2neg => 94.585,
-     height_SD3    => 115.421,
-     height_SD3neg => 90.418,
-     height_SD4    => 119.588,
-     height_SD4neg => 86.251,
-     weight_mean   => 16.2,
-     weight_P01    => 11,
-     weight_P1     => 12.1,
-     weight_P10    => 13.8,
-     weight_P15    => 14.2,
-     weight_P25    => 14.9,
-     weight_P3     => 12.8,
-     weight_P5     => 13.2,
-     weight_P50    => 16.2,
-     weight_P75    => 17.6,
-     weight_P85    => 18.5,
-     weight_P90    => 19.1,
-     weight_P95    => 20,
-     weight_P97    => 20.6,
-     weight_P99    => 21.9,
-     weight_P999   => 24.2,
-     weight_SD0    => 16.2,
-     weight_SD1    => 18.4,
-     weight_SD1neg => 14.3,
-     weight_SD2    => 20.9,
-     weight_SD2neg => 12.6,
-     weight_SD3    => 23.9,
-     weight_SD3neg => 11.1,
+     height_mean   => 110.265,
+     height_P01    => 96.076,
+     height_P1     => 99.583,
+     height_P10    => 104.381,
+     height_P15    => 105.506,
+     height_P25    => 107.168,
+     height_P3     => 101.629,
+     height_P5     => 102.712,
+     height_P50    => 110.265,
+     height_P75    => 113.362,
+     height_P85    => 115.023,
+     height_P90    => 116.149,
+     height_P95    => 117.817,
+     height_P97    => 118.9,
+     height_P99    => 120.946,
+     height_P999   => 124.453,
+     height_SD0    => 110.265,
+     height_SD1    => 114.856,
+     height_SD1neg => 105.673,
+     height_SD2    => 119.448,
+     height_SD2neg => 101.082,
+     height_SD3    => 124.039,
+     height_SD3neg => 96.49,
+     height_SD4    => 128.63,
+     height_SD4neg => 91.899,
+     weight_mean   => 18.506,
+     weight_P01    => 12.581,
+     weight_P1     => 13.802,
+     weight_P10    => 15.711,
+     weight_P15    => 16.204,
+     weight_P25    => 16.967,
+     weight_P3     => 14.58,
+     weight_P5     => 15.013,
+     weight_P50    => 18.506,
+     weight_P75    => 20.216,
+     weight_P85    => 21.212,
+     weight_P90    => 21.92,
+     weight_P95    => 23.023,
+     weight_P97    => 23.774,
+     weight_P99    => 25.276,
+     weight_P999   => 28.126,
+     weight_SD0    => 18.506,
+     weight_SD1    => 21.109,
+     weight_SD1neg => 16.279,
+     weight_SD2    => 24.165,
+     weight_SD2neg => 14.367,
+     weight_SD3    => 27.77,
+     weight_SD3neg => 12.718,
+     weight_SD4    => 31.375,
+     weight_SD4neg => 11.07,
    },
    {
      "func.raw_weight" => [
-       47,
-       -0.1097,
-       16.1827,
-       0.127,
-       11,
-       12.1,
-       12.8,
-       13.2,
-       13.8,
-       14.2,
-       14.9,
-       16.2,
-       17.6,
-       18.5,
-       19.1,
-       20,
-       20.6,
-       21.9,
-       24.2,
+       61,
+       -0.2026,
+       18.5057,
+       0.12988,
+       12.581,
+       13.802,
+       14.58,
+       15.013,
+       15.711,
+       16.204,
+       16.967,
+       18.506,
+       20.216,
+       21.212,
+       21.92,
+       23.023,
+       23.774,
+       25.276,
+       28.126,
      ],
    },
  ]
@@ -1970,12 +1987,12 @@ Specify weight to calculate percentile.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1986,14 +2003,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/WHO-Growth
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-WHO-GrowthReference-Table>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-WHO-GrowthReference-Table/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -2009,12 +2018,37 @@ L<CDC::GrowthReference::Table> too someday.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=WHO-GrowthReference-Table>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut
 

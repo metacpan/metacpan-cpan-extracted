@@ -1,6 +1,5 @@
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
-use strict;
-use warnings;
+use strictures 2;
 use 5.020;
 use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
@@ -109,7 +108,7 @@ YAML
         errors => [
           {
             instanceLocation => '/request/uri/path',
-            keywordLocation => jsonp(qw(/paths)),
+            keywordLocation => '/paths',
             absoluteKeywordLocation => $t->$abs_uri->fragment('/paths')->to_string,
             error => 'no match found for URI path "/foo/hi/there"',
           },
@@ -249,7 +248,7 @@ YAML
           instanceLocation => '/response/body',
           keywordLocation => jsonp(qw(/paths /foo/{foo_id} post responses 500 content application/json schema)),
           absoluteKeywordLocation => $t->$abs_uri->fragment(jsonp(qw(/paths /foo/{foo_id} post responses 500 content application/json schema)))->to_string,
-          error => 'subschema is false',
+          error => 'response body not permitted',
         },
       ],
     },
@@ -264,10 +263,10 @@ YAML
   cmp_deeply(
     $BasicApp::LAST_VALIDATE_RESPONSE_STASH,
     {
-        method => 'get',
-        operation_id => 'operation_skip_validate_request',
-        path_template => '/skip_validate_request',
-        path_captures => {},
+      method => 'get',
+      operation_id => 'operation_skip_validate_request',
+      path_template => '/skip_validate_request',
+      path_captures => {},
     },
     'stash is set in validate_response, even though validate_request never ran',
   );
@@ -281,7 +280,7 @@ YAML
           instanceLocation => '/response/body',
           keywordLocation => jsonp(qw(/paths /skip_validate_request get responses 200 content text/plain schema)),
           absoluteKeywordLocation => $t->$abs_uri->fragment(jsonp(qw(/paths /skip_validate_request get responses 200 content text/plain schema)))->to_string,
-          error => 'subschema is false',
+          error => 'response body not permitted',
         },
       ],
     },

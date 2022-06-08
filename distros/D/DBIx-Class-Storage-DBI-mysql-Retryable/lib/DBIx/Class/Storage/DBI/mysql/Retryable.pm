@@ -17,7 +17,7 @@ use namespace::clean;
 
 # ABSTRACT: MySQL-specific DBIC storage engine with retry support
 use version;
-our $VERSION = 'v1.0.0'; # VERSION
+our $VERSION = 'v1.0.1'; # VERSION
 
 #pod =head1 SYNOPSIS
 #pod
@@ -503,6 +503,13 @@ sub txn_do {
     $self->_blockrunner_do( txn_do => @_ );
 }
 
+### XXX: This is a now deprecated method that only existed in the non-public version, but
+### it's a public method that should still exist for anybody previously using it.
+sub is_dbi_error_retryable {
+    my ($self, $error) = @_;
+    return $self->parse_error_class->new($error)->is_transient;
+}
+
 #pod =head2 throw_exception
 #pod
 #pod     $storage->throw_exception('It failed');
@@ -655,7 +662,7 @@ DBIx::Class::Storage::DBI::mysql::Retryable - MySQL-specific DBIC storage engine
 
 =head1 VERSION
 
-version v1.0.0
+version v1.0.1
 
 =head1 SYNOPSIS
 
@@ -892,7 +899,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Grant Street Group.
+This software is Copyright (c) 2021 - 2022 by Grant Street Group.
 
 This is free software, licensed under:
 

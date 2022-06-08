@@ -1,13 +1,18 @@
 package Firewall::Config::Connector;
 # ABSTRACT: turns baubles into trinkets
 
-use Carp;
-use POSIX;
+#------------------------------------------------------------------------------
+# 加载系统模块
+#------------------------------------------------------------------------------
 use Moose;
 use namespace::autoclean;
+use POSIX;
 use Time::HiRes;
 use Data::Dumper;
 
+#------------------------------------------------------------------------------
+# 加载项目模块
+#------------------------------------------------------------------------------
 use Firewall::Config::Dao::Parser;
 use Firewall::Config::Content::Static;
 use Firewall::Utils::Date;
@@ -97,7 +102,7 @@ sub update {
   }
 } ## end sub update
 
-sub saveconfig() {
+sub saveconfig {
   my ( $self, $param ) = @_;
   my ( $fwId, $type, $conf ) = @{$param}{qw/fwId type conf/};
   my $sonDbi = $self->dbi->clone;
