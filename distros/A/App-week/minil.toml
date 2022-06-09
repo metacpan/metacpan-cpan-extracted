@@ -1,9 +1,9 @@
 name = "App-week"
 readme_from = "script/week"
-badges = ['github-actions/test', 'metacpan']
-authority="cpan:UTASHIRO"
+badges = [ 'github-actions/test', 'metacpan' ]
+authority = "cpan:UTASHIRO"
 
-module_maker="ModuleBuildTiny"
+module_maker = "ModuleBuildTiny"
 
 [unsupported]
 os = [
@@ -11,4 +11,4 @@ os = [
 ]
 
 [FileGatherer]
-exclude_match=['^docs/.*']
+exclude_match = ['^docs/.*']

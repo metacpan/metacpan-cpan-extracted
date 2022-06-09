@@ -15,55 +15,21 @@ with 'Firewall::Config::Element::StaticNat::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::StaticNat::Fortinet 通用属性
 #------------------------------------------------------------------------------
-has name => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has name => ( is => 'ro', isa => 'Str', required => 1, );
 
-has realIp => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has realIp => ( is => 'ro', isa => 'Str', required => 1, );
 
-has realIpRange => (
-  is      => 'ro',
-  isa     => 'Firewall::Utils::Set',
-  lazy    => 1,
-  builder => '_buildRealIpRange',
-);
+has realIpRange => ( is => 'ro', isa => 'Firewall::Utils::Set', lazy => 1, builder => '_buildRealIpRange', );
 
-has natIp => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has natIp => ( is => 'ro', isa => 'Str', required => 1, );
 
-has natIpRange => (
-  is      => 'ro',
-  isa     => 'Firewall::Utils::Set',
-  lazy    => 1,
-  builder => '_buildNatIpRange',
-);
+has natIpRange => ( is => 'ro', isa => 'Firewall::Utils::Set', lazy => 1, builder => '_buildNatIpRange', );
 
-has natInterface => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has natInterface => ( is => 'ro', isa => 'Str', required => 1, );
 
-has natZone => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has natZone => ( is => 'ro', isa => 'Str', required => 0, );
 
-has realZone => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has realZone => ( is => 'ro', isa => 'Str', required => 0, );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildRange 方法

@@ -1,11 +1,11 @@
 package Crypt::SRP;
 
-# Copyright (c) 2012+ DCIT, a.s. [http://www.dcit.cz] - Miko
+# Copyright (c) 2012+ DCIT, a.s. [https://www.dcit.cz] - Miko
 
 use strict;
 use warnings;
 
-our $VERSION = '0.018';
+our $VERSION = '0.019';
 
 use Math::BigInt lib => 'LTM'; # Math::BigInt::LTM is part of CryptX-0.029+
 use Crypt::Mac::HMAC qw(hmac);
@@ -939,4 +939,4 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 COPYRIGHT
 
-Copyright (c) 2012+ DCIT, a.s. L<http://www.dcit.cz> / Karel Miko
+Copyright (c) 2012+ DCIT, a.s. L<https://www.dcit.cz> / Karel Miko

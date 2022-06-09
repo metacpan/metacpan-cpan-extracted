@@ -1,5 +1,5 @@
 package Authen::Pluggable;
-$Authen::Pluggable::VERSION = '0.02';
+$Authen::Pluggable::VERSION = '0.03';
 use Mojo::Base -base, -signatures;
 use Mojo::Loader qw/load_class/;
 
@@ -41,8 +41,8 @@ sub _load_provider ( $s, $provider, %cfg ) {
     }
 }
 
-sub authen ( $s, $user, $pass ) {
-    foreach my $provider ( keys %{ $s->_providers } ) {
+sub authen ( $s, $user, $pass, $providers = [keys %{ $s->_providers }] ) {
+    foreach my $provider ( @$providers ) {
         my $uinfo = $s->_providers->{$provider}->authen( $user, $pass );
         $uinfo && do {
             $uinfo->{provider} = $provider;
@@ -71,7 +71,7 @@ Authen::Pluggable - A Perl module to authenticate users via pluggable modules
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -145,9 +145,10 @@ different password files
 
 It always return the object itself.
 
-=head2 authen($username, $password)
+=head2 authen($username, $password, [opt] $providers)
 
-Call all configured providers and return the first with a valid authentication.
+Call all configured providers, or only $providers if configured, and return 
+the first with a valid authentication.
 
 The structure returned is usually something like this
 

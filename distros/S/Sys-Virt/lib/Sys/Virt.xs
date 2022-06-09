@@ -2377,25 +2377,79 @@ PREINIT:
 
 
 void
-restore_domain(con, from, dxmlsv=&PL_sv_undef, flags=0)
+restore_domain(con, fromsv=&PL_sv_undef, dxmlsv=&PL_sv_undef, params_sv=&PL_sv_undef, flags=0)
       virConnectPtr con;
-      const char *from;
+      SV *fromsv;
       SV *dxmlsv;
+      SV *params_sv;
       unsigned int flags;
  PREINIT:
+      const char *from = NULL;
       const char *dxml = NULL;
+      HV *params_hv = NULL;
+      virTypedParameterPtr params;
+      int nparams;
   PPCODE:
+      if (!from && !SvOK(params_sv))
+          croak("Either $from or $params parameter must be supplied");
+
       if (SvOK(dxmlsv))
 	  dxml = SvPV_nolen(dxmlsv);
 
-      if (dxml || flags) {
-          if (virDomainRestoreFlags(con, from, dxml, flags) < 0)
-              _croak_error();
-      } else {
-          if (virDomainRestore(con, from) < 0)
-              _croak_error();
+      if (SvOK(fromsv))
+          from = SvPV_nolen(fromsv);
+
+      if (SvOK(params_sv)) {
+          params_hv = (HV*)SvRV(params_sv);
       }
 
+      if (params_hv) {
+          nparams = 2;
+
+          /* If parameters were supplied using the old way, we'll convert them
+           * to the new style libvirt API, i.e.
+           * dom->restore(filename, dxml, {FOO => bar}, flags) becomes
+           * dom->restore({SAVE_PARAM_FILE => file,
+           *               SAVE_PARAM_DXML => dxml,
+           *               FOO => bar}, flags)
+           */
+          if (from)
+              hv_store(params_hv,
+                       VIR_DOMAIN_SAVE_PARAM_FILE,
+                       strlen(VIR_DOMAIN_SAVE_PARAM_FILE),
+                       fromsv, 0);
+          if (dxml)
+              hv_store(params_hv,
+                       VIR_DOMAIN_SAVE_PARAM_DXML,
+                       strlen(VIR_DOMAIN_SAVE_PARAM_DXML),
+                       dxmlsv, 0);
+
+          Newx(params, nparams, virTypedParameter);
+          strncpy(params[0].field, VIR_DOMAIN_SAVE_PARAM_FILE,
+                  VIR_TYPED_PARAM_FIELD_LENGTH);
+          params[0].type = VIR_TYPED_PARAM_STRING;
+
+          strncpy(params[1].field, VIR_DOMAIN_SAVE_PARAM_DXML,
+                  VIR_TYPED_PARAM_FIELD_LENGTH);
+          params[1].type = VIR_TYPED_PARAM_STRING;
+
+          nparams = vir_typed_param_from_hv(params_hv, params, nparams);
+
+          if ((virDomainRestoreParams(con, params, nparams, flags)) < 0) {
+              vir_typed_param_safe_free(params, nparams);
+              _croak_error();
+          }
+          vir_typed_param_safe_free(params, nparams);
+      }
+      else {
+          if (dxml || flags) {
+              if (virDomainRestoreFlags(con, from, dxml, flags) < 0)
+                  _croak_error();
+          } else {
+              if (virDomainRestore(con, from) < 0)
+                  _croak_error();
+          }
+      }
 
 SV *
 get_save_image_xml_description(con, file, flags=0)
@@ -4485,23 +4539,79 @@ pm_wakeup(dom, flags=0)
 
 
 void
-save(dom, to, dxmlsv=&PL_sv_undef, flags=0)
+save(dom, tosv=&PL_sv_undef, dxmlsv=&PL_sv_undef, params_sv=&PL_sv_undef, flags=0)
+
       virDomainPtr dom;
-      const char *to;
+      SV *tosv;
       SV *dxmlsv;
+      SV *params_sv;
       unsigned int flags;
 PREINIT:
+      const char *to = NULL;
       const char *dxml = NULL;
+      HV *params_hv = NULL;
+      virTypedParameterPtr params;
+      int nparams;
   PPCODE:
+      if (!to && !SvOK(params_sv))
+          croak("Either $to or $params parameter must be supplied");
+
       if (SvOK(dxmlsv))
 	  dxml = SvPV_nolen(dxmlsv);
 
-      if (dxml || flags) {
-          if ((virDomainSaveFlags(dom, to, dxml, flags)) < 0)
+      if (SvOK(tosv))
+          to = SvPV_nolen(tosv);
+
+      if (SvOK(params_sv)) {
+          params_hv = (HV*)SvRV(params_sv);
+      }
+
+      if (params_hv) {
+          nparams = 2;
+
+          /* If parameters were supplied using the old way, we'll convert them
+           * to the new style libvirt API, i.e.
+           * dom->save(filename, dxml, {FOO => bar}, flags) becomes
+           * dom->save({SAVE_PARAM_FILE => file,
+           *            SAVE_PARAM_DXML => dxml,
+           *            FOO => bar}, flags)
+           */
+          if (to)
+              hv_store(params_hv,
+                       VIR_DOMAIN_SAVE_PARAM_FILE,
+                       strlen(VIR_DOMAIN_SAVE_PARAM_FILE),
+                       tosv, 0);
+          if (dxml)
+              hv_store(params_hv,
+                       VIR_DOMAIN_SAVE_PARAM_DXML,
+                       strlen(VIR_DOMAIN_SAVE_PARAM_DXML),
+                       dxmlsv, 0);
+
+          Newx(params, nparams, virTypedParameter);
+          strncpy(params[0].field, VIR_DOMAIN_SAVE_PARAM_FILE,
+                  VIR_TYPED_PARAM_FIELD_LENGTH);
+          params[0].type = VIR_TYPED_PARAM_STRING;
+
+          strncpy(params[1].field, VIR_DOMAIN_SAVE_PARAM_DXML,
+                  VIR_TYPED_PARAM_FIELD_LENGTH);
+          params[1].type = VIR_TYPED_PARAM_STRING;
+
+          nparams = vir_typed_param_from_hv(params_hv, params, nparams);
+
+          if ((virDomainSaveParams(dom, params, nparams, flags)) < 0) {
+              vir_typed_param_safe_free(params, nparams);
               _croak_error();
-      } else {
-          if ((virDomainSave(dom, to)) < 0)
-              _croak_error();
+          }
+          vir_typed_param_safe_free(params, nparams);
+      }
+      else {
+          if (dxml || flags) {
+              if ((virDomainSaveFlags(dom, to, dxml, flags)) < 0)
+                  _croak_error();
+          } else {
+              if ((virDomainSave(dom, to)) < 0)
+                  _croak_error();
+          }
       }
 
 
@@ -9520,6 +9630,7 @@ BOOT:
       REGISTER_CONSTANT_STR(VIR_NODE_SEV_REDUCED_PHYS_BITS, SEV_REDUCED_PHYS_BITS);
       REGISTER_CONSTANT_STR(VIR_NODE_SEV_MAX_GUESTS, SEV_MAX_GUESTS);
       REGISTER_CONSTANT_STR(VIR_NODE_SEV_MAX_ES_GUESTS, SEV_MAX_ES_GUESTS);
+      REGISTER_CONSTANT_STR(VIR_NODE_SEV_CPU0_ID, SEV_CPU0_ID);
 
       stash = gv_stashpv( "Sys::Virt::Event", TRUE );
 
@@ -10341,6 +10452,8 @@ BOOT:
       REGISTER_CONSTANT(VIR_DOMAIN_DIRTYRATE_MODE_PAGE_SAMPLING, DIRTYRATE_MODE_PAGE_SAMPLING);
       REGISTER_CONSTANT(VIR_DOMAIN_DIRTYRATE_MODE_DIRTY_BITMAP, DIRTYRATE_MODE_DIRTY_BITMAP);
       REGISTER_CONSTANT(VIR_DOMAIN_DIRTYRATE_MODE_DIRTY_RING, DIRTYRATE_MODE_DIRTY_RING);
+      REGISTER_CONSTANT_STR(VIR_DOMAIN_SAVE_PARAM_FILE, SAVE_PARAM_FILE);
+      REGISTER_CONSTANT_STR(VIR_DOMAIN_SAVE_PARAM_DXML, SAVE_PARAM_DXML);
 
       stash = gv_stashpv( "Sys::Virt::DomainSnapshot", TRUE );
       REGISTER_CONSTANT(VIR_DOMAIN_SNAPSHOT_DELETE_CHILDREN, DELETE_CHILDREN);

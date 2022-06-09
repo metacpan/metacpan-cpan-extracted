@@ -12,23 +12,11 @@ use namespace::autoclean;
 use Firewall::Utils::Ip;
 use Firewall::Policy::Searcher::Report::FwInfo;
 
-has dbi => (
-  is       => 'ro',
-  does     => 'Firewall::DBI::Role',
-  required => 1,
-);
+has dbi => ( is => 'ro', does => 'Firewall::DBI::Role', required => 1, );
 
-has searcherReportFwInfo => (
-  is       => 'ro',
-  isa      => 'Firewall::Policy::Searcher::Report::FwInfo',
-  required => 1,
-);
+has searcherReportFwInfo => ( is => 'ro', isa => 'Firewall::Policy::Searcher::Report::FwInfo', required => 1, );
 
-has commandText => (
-  is      => 'ro',
-  isa     => 'ArrayRef[Str]',
-  default => sub { [] },
-);
+has commandText => ( is => 'ro', isa => 'ArrayRef[Str]', default => sub { [] }, );
 
 sub addToCommandText {
   my ( $self, @commands ) = @_;
@@ -240,11 +228,7 @@ sub createDyNat {
         $poolName     = ( split( '/', ( keys %{$natIps} )[0] ) )[0];
         push @ips, $natInfo->{natIp};
       }
-      push @natStrs,
-        {
-        natStr => "$natDirection $poolName",
-        ips    => \@ips
-        };
+      push @natStrs, {natStr => "$natDirection $poolName", ips => \@ips};
     } ## end for my $natIps ( values...)
   } ## end for my $type ( keys %{$param...})
   return \@natStrs;

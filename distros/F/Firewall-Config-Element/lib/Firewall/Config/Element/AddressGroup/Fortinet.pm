@@ -15,11 +15,7 @@ with 'Firewall::Config::Element::AddressGroup::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::AddressGroup::Fortinet 通用属性
 #------------------------------------------------------------------------------
-has zone => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has zone => ( is => 'ro', isa => 'Str', required => 0, );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildSign 方法，

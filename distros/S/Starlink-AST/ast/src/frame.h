@@ -706,7 +706,7 @@ typedef struct AstFrameVtab {
    int (* GetPermute)( AstFrame *, int * );
    int (* GetPreserveAxes)( AstFrame *, int * );
    int (* IsUnitFrame)( AstFrame *, int * );
-   int (* LineCrossing)( AstFrame *, AstLineDef *, AstLineDef *, double[5], int * );
+   int (* LineCrossing)( AstFrame *, AstLineDef *, AstLineDef *, double[5], double *, int * );
    int (* LineContains)( AstFrame *, AstLineDef *, int, double *, int * );
    int (* Match)( AstFrame *, AstFrame *, int, int **, int **, AstMapping **, AstFrame **, int * );
    int (* SubFrame)( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame **, int * );
@@ -776,6 +776,8 @@ typedef struct AstFrameVtab {
    AstPointSet *(* FrameGrid)( AstFrame *, int, const double *, const double *, int * );
    struct AstFrameSet *(* GetFrameVariants)( AstFrame *, int * );
    void (* SetFrameVariants)( AstFrame *, struct AstFrameSet *, int * );
+   void (* NormPoints)( AstFrame *, AstDim, int, AstDim, const double *, int, int, AstDim, double *, int * );
+   AstPointSet *(* NormalPoints)( AstFrame *, AstPointSet *, int, AstPointSet *, int * );
 
    double (* GetTop)( AstFrame *, int, int * );
    int (* TestTop)( AstFrame *, int, int * );
@@ -921,8 +923,10 @@ void astResolve_( AstFrame *, const double [], const double [], const double [],
 void astSetActiveUnit_( AstFrame *, int, int * );
 AstFrameSet *astGetFrameVariants_( AstFrame *, int * );
 void astSetFrameVariants_( AstFrame *, AstFrameSet *, int * );
+void astNormPoints8_( AstFrame *, AstDim, int, AstDim, const double *, int, int, AstDim, double *, int * );
 
 #if defined(astCLASS)            /* Protected */
+AstPointSet *astNormalPoints_( AstFrame *, AstPointSet *, int, AstPointSet *, int * );
 void astNormBox_( AstFrame *, double *, double *, AstMapping *, int * );
 AstFrame *astPickAxes_( AstFrame *, int, const int[], AstMapping **, int * );
 const char *astFormat_( AstFrame *, int, double, int * );
@@ -964,7 +968,7 @@ int astGetNaxes_( AstFrame *, int * );
 int astGetPermute_( AstFrame *, int * );
 int astGetPreserveAxes_( AstFrame *, int * );
 int astIsUnitFrame_( AstFrame *, int * );
-int astLineCrossing_( AstFrame *, AstLineDef *, AstLineDef *, double[5], int * );
+int astLineCrossing_( AstFrame *, AstLineDef *, AstLineDef *, double[5], double *, int * );
 int astLineContains_( AstFrame *, AstLineDef *, int, double *, int * );
 int astMatch_( AstFrame *, AstFrame *, int, int **, int **, AstMapping **, AstFrame **, int * );
 int astSubFrame_( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame **, int * );
@@ -1134,6 +1138,11 @@ astINVOKE(O,astFindFrame_(astCheckFrame(target),astCheckFrame(template),domainli
 astINVOKE(V,astMatchAxes_(astCheckFrame(frm1),astCheckFrame(frm2),axes,STATUS_PTR))
 #define astNorm(this,value) \
 astINVOKE(V,astNorm_(astCheckFrame(this),value,STATUS_PTR))
+#define astNormPoints(this,npoint,ncoord_in,indim,in,contig,ncoord_out,outdim,out) \
+astINVOKE(V,astNormPoints8_(astCheckFrame(this),npoint,ncoord_in,indim,in,contig,ncoord_out,outdim,out,STATUS_PTR))
+#define astNormPoints8(this,npoint,ncoord_in,indim,in,contig,ncoord_out,outdim,out) \
+astINVOKE(V,astNormPoints8_(astCheckFrame(this),npoint,ncoord_in,indim,in,contig,ncoord_out,outdim,out,STATUS_PTR))
+
 #define astAxDistance(this,axis,v1,v2) \
 astINVOKE(V,astAxDistance_(astCheckFrame(this),axis,v1,v2,STATUS_PTR))
 #define astAxNorm(this,axis,oper,nval,values) \
@@ -1198,8 +1207,8 @@ astINVOKE(V,astLineDef_(astCheckFrame(this),p1,p2,STATUS_PTR))
 astINVOKE(V,astLineOffset_(astCheckFrame(this),line,par,prp,point,STATUS_PTR))
 #define astFrameGrid(this,size,lbnd,ubnd) \
 astINVOKE(O,astFrameGrid_(astCheckFrame(this),size,lbnd,ubnd,STATUS_PTR))
-#define astLineCrossing(this,l1,l2,cross) \
-astINVOKE(V,astLineCrossing_(astCheckFrame(this),l1,l2,cross,STATUS_PTR))
+#define astLineCrossing(this,l1,l2,cross,dist) \
+astINVOKE(V,astLineCrossing_(astCheckFrame(this),l1,l2,cross,dist,STATUS_PTR))
 #define astLineContains(this,l,def,point) \
 astINVOKE(V,astLineContains_(astCheckFrame(this),l,def,point,STATUS_PTR))
 #define astClearDigits(this) \
@@ -1449,6 +1458,8 @@ astINVOKE(V,astTestActiveUnit_(astCheckFrame(this),STATUS_PTR))
 astINVOKE(V,astSetFrameFlags_(astCheckFrame(this),flags,STATUS_PTR))
 #define astGetFrameFlags(this) \
 astINVOKE(V,astGetFrameFlags_(astCheckFrame(this),STATUS_PTR))
+#define astNormalPoints(this,in,contig,out) \
+astINVOKE(O,astNormalPoints_(astCheckFrame(this),astCheckPointSet(in),contig,(out)?astCheckPointSet(out):NULL,STATUS_PTR))
 
 #endif
 #endif

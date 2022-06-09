@@ -21,10 +21,7 @@ use Firewall::Config::Dao::Parser;
 #------------------------------------------------------------------------------
 # 加载系统模块
 #------------------------------------------------------------------------------
-has dbi => (
-  is   => 'ro',
-  does => 'Firewall::DBI::Role',
-);
+has dbi => ( is => 'ro', does => 'Firewall::DBI::Role', );
 
 #------------------------------------------------------------------------------
 # 策略合规审计
@@ -43,12 +40,8 @@ sub auditPolicy {
       $srvset->mergeToSet( Firewall::Utils::Ip->new->getRangeFromService($srv) );
     }
   }
-  my $audiPolicy = {
-    srcset => $srcset,
-    dstset => $dstset,
-    srvset => $srvset
-  };
-  my $result = $self->_audit( $audiPolicy, $audiRule );
+  my $audiPolicy = {srcset => $srcset, dstset => $dstset, srvset => $srvset};
+  my $result     = $self->_audit( $audiPolicy, $audiRule );
   return $result;
 }
 
@@ -89,11 +82,7 @@ sub auditFw {
     my $srcset = $rule->{srcAddressGroup}->range;
     my $dstset = $rule->{dstAddressGroup}->range;
     my $srvset = $rule->{serviceGroup}->range;
-    my $policy = {
-      srcset => $srcset,
-      dstset => $dstset,
-      srvset => $srvset
-    };
+    my $policy = {srcset => $srcset, dstset => $dstset, srvset => $srvset};
     my $result = $self->_audit( $policy, $audiRule );
     $ruleAudit{$rule->{sign}} = $result if @{$result} > 0;
   }
@@ -106,10 +95,7 @@ sub auditFw {
     push @rule,      encode_json $ruleAudit{$rule};
     push @{$params}, \@rule;
   }
-  $dbi->delete(
-    where => {fw_id => $parser->fwId},
-    table => "fw_rule_risk_report"
-  );
+  $dbi->delete( where => {fw_id => $parser->fwId}, table => "fw_rule_risk_report" );
   my $sql = "insert into fw_rule_risk_report (fw_id,rule_id_name,risk_id) values (?,?,?)";
   $dbi->batchExecute( $params, $sql );
   return {success => 1};
@@ -128,13 +114,8 @@ sub _audit {
     $type{src}  = 'srcset';
     $type{dst}  = 'dstset';
     $type{port} = 'srvset';
-    my %action = (
-      'eq'       => 'isEqual',
-      'neq'      => 'notEqual',
-      'scontain' => 'isBelong',
-      'contain'  => 'isContain',
-      'cross'    => 'interSet'
-    );
+    my %action
+      = ( eq => 'isEqual', neq => 'notEqual', scontain => 'isBelong', contain => 'isContain', cross => 'interSet' );
     if ( $audiRelation eq 'and' ) {
       for my $rule ( @{$audiRuleInfo->{contentSet}{content}} ) {
         my $func = $action{$rule->{relation}};

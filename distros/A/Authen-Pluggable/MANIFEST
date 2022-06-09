@@ -18,6 +18,7 @@ t/30-multiprov.t
 t/40-multiprov_hashcfg.t
 t/50-alias.t
 t/60-json.t
+t/70-subset_providers.t
 t/users1
 t/users2
 xt/author/00-compile.t

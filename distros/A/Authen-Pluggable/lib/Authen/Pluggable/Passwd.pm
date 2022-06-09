@@ -1,5 +1,5 @@
 package Authen::Pluggable::Passwd;
-$Authen::Pluggable::Passwd::VERSION = '0.02';
+$Authen::Pluggable::Passwd::VERSION = '0.03';
 use Mojo::Base -base, -signatures;
 
 use Authen::Simple::Passwd;
@@ -36,7 +36,7 @@ Authen::Pluggable::Passwd - Authentication via a passwd file
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 AUTHOR
 

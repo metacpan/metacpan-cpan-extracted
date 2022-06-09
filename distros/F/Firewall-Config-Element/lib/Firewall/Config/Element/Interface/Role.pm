@@ -14,51 +14,22 @@ with 'Firewall::Config::Element::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Route::Role 通用属性
 #------------------------------------------------------------------------------
-has name => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has name => ( is => 'ro', isa => 'Str', required => 1, );
 
-has ipAddress => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has ipAddress => ( is => 'ro', isa => 'Str', required => 0, );
 
-has mask => (
-  is       => 'ro',
-  isa      => 'Int',
-  required => 0,
-);
+has mask => ( is => 'ro', isa => 'Int', required => 0, );
 
 # 接口类型是二层还是三层
-has interfaceType => (
-  is      => 'ro',
-  isa     => 'Str',
-  default => 'layer2',
-);
+has interfaceType => ( is => 'ro', isa => 'Str', default => 'layer2', );
 
-has range => (
-  is      => 'ro',
-  isa     => 'Firewall::Utils::Set',
-  default => sub { Firewall::Utils::Set->new() }
-);
+has range => ( is => 'ro', isa => 'Firewall::Utils::Set', default => sub { Firewall::Utils::Set->new() } );
 
 # 接口路由
-has routes => (
-  is      => 'ro',
-  isa     => 'HashRef',
-  lazy    => 1,
-  default => sub { {} },
-);
+has routes => ( is => 'ro', isa => 'HashRef', lazy => 1, default => sub { {} }, );
 
 # 接口安全区
-has zoneName => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has zoneName => ( is => 'ro', isa => 'Str', required => 0, );
 
 #------------------------------------------------------------------------------
 # Moose BUILD 用于对象创建后，进行属性检查逻辑

@@ -5,7 +5,7 @@
 use v5.12;
 
 package Chart::Color;
-our $VERSION = 'v2.402.0';
+our $VERSION = 'v2.402.1';
 
 use Carp;
 use Chart::Color::Constant;

@@ -14,17 +14,9 @@ with 'Firewall::Config::Element::Interface::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Interface::Topsec 通用属性
 #------------------------------------------------------------------------------
-has accessMode => (
-  is      => 'rw',
-  isa     => 'Str',
-  default => 'access',
-);
+has accessMode => ( is => 'rw', isa => 'Str', default => 'access', );
 
-has accessVlan => (
-  is      => 'rw',
-  isa     => 'ArrayRef',
-  default => sub { [] },
-);
+has accessVlan => ( is => 'rw', isa => 'ArrayRef', default => sub { [] }, );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildRange 方法

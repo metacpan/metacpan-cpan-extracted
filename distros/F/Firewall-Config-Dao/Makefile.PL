@@ -16,7 +16,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Firewall::Config::Dao",
   "PREREQ_PM" => {},
-  "VERSION" => "0.005",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => ""
   }

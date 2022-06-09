@@ -14,25 +14,13 @@ with 'Firewall::Config::Element::Address::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Address::Hillstone 通用属性
 #------------------------------------------------------------------------------
-has '+ip' => (
-  required => 0,
-);
+has '+ip' => ( required => 0, );
 
-has '+mask' => (
-  required => 0,
-);
+has '+mask' => ( required => 0, );
 
-has members => (
-  is      => 'rw',
-  isa     => 'ArrayRef',
-  default => sub { [] },
-);
+has members => ( is => 'rw', isa => 'ArrayRef', default => sub { [] }, );
 
-has zone => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has zone => ( is => 'ro', isa => 'Str', required => 0, );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildSign 方法，

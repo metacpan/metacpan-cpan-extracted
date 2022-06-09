@@ -11,48 +11,20 @@ use Firewall::Utils::Set;
 #------------------------------------------------------------------------------
 with 'Firewall::Config::Element::Role';
 
-has srvName => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has srvName => ( is => 'ro', isa => 'Str', required => 1, );
 
-has protocol => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has protocol => ( is => 'ro', isa => 'Str', required => 1, );
 
-has srcPort => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has srcPort => ( is => 'ro', isa => 'Str', required => 0, );
 
-has dstPort => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has dstPort => ( is => 'ro', isa => 'Str', required => 0, );
 
-has srcPortRange => (
-  is      => 'ro',
-  isa     => 'Firewall::Utils::Set',
-  default => sub { Firewall::Utils::Set->new( 0, 65535 ) }
-);
+has srcPortRange =>
+  ( is => 'ro', isa => 'Firewall::Utils::Set', default => sub { Firewall::Utils::Set->new( 0, 65535 ) } );
 
-has dstPortRange => (
-  is      => 'ro',
-  isa     => 'Firewall::Utils::Set',
-  lazy    => 1,
-  builder => '_buildDstPortRange',
-);
+has dstPortRange => ( is => 'ro', isa => 'Firewall::Utils::Set', lazy => 1, builder => '_buildDstPortRange', );
 
-has range => (
-  is      => 'ro',
-  isa     => 'Firewall::Utils::Set',
-  builder => '_buildRange',
-);
+has range => ( is => 'ro', isa => 'Firewall::Utils::Set', builder => '_buildRange', );
 
 #------------------------------------------------------------------------------
 # Moose BUILDARGS 在实例创建之前生效，可以接收哈希和哈希的引用

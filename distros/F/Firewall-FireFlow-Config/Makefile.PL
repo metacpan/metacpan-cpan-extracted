@@ -18,13 +18,14 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Expect" => 0,
+    "Firewall::DBI::Pg" => 0,
+    "Firewall::Policy::Designer" => 0,
+    "Firewall::Policy::Searcher" => 0,
     "Moose" => 0,
     "Try::Tiny" => 0,
-    "namespace::autoclean" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "namespace::autoclean" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => ""
   }
@@ -34,11 +35,12 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Expect" => 0,
+  "Firewall::DBI::Pg" => 0,
+  "Firewall::Policy::Designer" => 0,
+  "Firewall::Policy::Searcher" => 0,
   "Moose" => 0,
   "Try::Tiny" => 0,
-  "namespace::autoclean" => 0,
-  "strict" => 0,
-  "warnings" => 0
+  "namespace::autoclean" => 0
 );
 
 

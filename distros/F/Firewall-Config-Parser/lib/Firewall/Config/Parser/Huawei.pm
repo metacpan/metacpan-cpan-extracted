@@ -207,10 +207,7 @@ sub parseZone {
     # 检查是否之前已解析过 zone, 接口元素必须拥有接口名
     my $zone = $self->getZone($name);
     if ( !$zone ) {
-      $zone = Firewall::Config::Element::Zone::Huawei->new(
-        "name" => $name,
-        "fwId" => $self->fwId
-      );
+      $zone = Firewall::Config::Element::Zone::Huawei->new( "name" => $name, "fwId" => $self->fwId );
       $self->addElement($zone);
     }
 

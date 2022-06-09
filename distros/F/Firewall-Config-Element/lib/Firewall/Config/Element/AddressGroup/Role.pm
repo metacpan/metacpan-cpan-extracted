@@ -14,11 +14,7 @@ with 'Firewall::Config::Element::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::AddressGroup::Role 通用属性
 #------------------------------------------------------------------------------
-has addrGroupName => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has addrGroupName => ( is => 'ro', isa => 'Str', required => 1, );
 
 has addrGroupMembers => (
   is   => 'ro',
@@ -26,17 +22,9 @@ has addrGroupMembers => (
   default => sub { {} },
 );
 
-has range => (
-  is      => 'ro',
-  isa     => 'Firewall::Utils::Set',
-  default => sub { Firewall::Utils::Set->new },
-);
+has range => ( is => 'ro', isa => 'Firewall::Utils::Set', default => sub { Firewall::Utils::Set->new }, );
 
-has refnum => (
-  is      => 'ro',
-  isa     => 'Int',
-  default => 0
-);
+has refnum => ( is => 'ro', isa => 'Int', default => 0 );
 
 #------------------------------------------------------------------------------
 # 新增地址组成员方法

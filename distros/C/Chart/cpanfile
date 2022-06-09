@@ -3,6 +3,7 @@
 
 requires "Carp" => "1.35";
 requires "GD" => "2";
+requires "POSIX" => "1";
 requires "perl" => "v5.12.0";
 suggests "Graphics::ColorNames" => "0";
 

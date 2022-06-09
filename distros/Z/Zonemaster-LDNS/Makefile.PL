@@ -14,17 +14,69 @@ all_from 'lib/Zonemaster/LDNS.pm';
 repository 'https://github.com/zonemaster/zonemaster-ldns';
 bugtracker 'https://github.com/zonemaster/zonemaster-ldns/issues';
 
+=head1 Optional features
+
+=over
+
+=item --[no-]ed25519
+
+Enable (or disable) support for Ed25519 in both openssl and ldns.
+Enabled by default.
+
+=item --[no-]idn
+
+Enable (or disable) support for converting IDN labels in U-label format (with
+non-ASCII Unicode characters) to the same IDN labels in A-label format (encoded
+in ASCII).
+Enabled by default.
+
+=item --[no-]internal-ldns
+
+When enabled, an included version of ldns is statically linked into
+Zonemaster::LDNS.
+When disabled, libldns is dynamically linked just like other dependencies.
+Enabled by default.
+
+=item --[no-]randomize
+
+Experimental.
+Randomizes the capitalization of returned domain names.
+Disabled by default.
+
+=item --prefix-openssl=PATH
+
+Search for OpenSSL headers and libraries in PATH.
+The LDNS script will look for an "include" and a "lib" folder.
+
+=item --openssl-inc=PATH
+
+Search for OpenSSL include in PATH.
+The PATH is passed to the LDNS compiler via the CFLAGS variable.
+
+=item --openssl-lib=PATH
+
+Search for OpenSSL library in PATH.
+The PATH is passed to the LDNS compiler via the LDFLAGS variable.
+
+=back
+
+=cut
+
 my $opt_ed25519        = 1;
 my $opt_idn            = 1;
 my $opt_internal_ldns  = 1;
 my $opt_randomize      = 0;
 my $opt_prefix_openssl = "";
+my $opt_openssl_inc    = "";
+my $opt_openssl_lib    = "";
 GetOptions(
     'ed25519!'         => \$opt_ed25519,
     'idn!'             => \$opt_idn,
     'internal-ldns!'   => \$opt_internal_ldns,
     'randomize!'       => \$opt_randomize,
     'prefix-openssl=s' => \$opt_prefix_openssl,
+    'openssl-inc=s'    => \$opt_openssl_inc,
+    'openssl-lib=s'    => \$opt_openssl_lib,
 );
 
 configure_requires 'Devel::CheckLib';
@@ -42,12 +94,31 @@ cc_src_paths 'src';
 # OpenSSL
 
 my %assert_lib_args_openssl;
-if ( $opt_prefix_openssl ) {
-    print "Custom prefix for OpenSSL: $opt_prefix_openssl\n";
-    cc_include_paths "$opt_prefix_openssl/include";
-    cc_libs "-L$opt_prefix_openssl/lib", "crypto";
-    $assert_lib_args_openssl{incpath} = "$opt_prefix_openssl/include";
-    $assert_lib_args_openssl{libpath} = "$opt_prefix_openssl/lib";
+my $custom_openssl = ( $opt_prefix_openssl or $opt_openssl_inc or $opt_openssl_lib );
+if ( $custom_openssl ) {
+    my $openssl_incpath = "";
+    my $openssl_libpath = "";
+
+    if ( $opt_prefix_openssl ) {
+        print "Custom prefix for OpenSSL: $opt_prefix_openssl\n";
+        $openssl_incpath = "$opt_prefix_openssl/include";
+        $openssl_libpath = "$opt_prefix_openssl/lib";
+    }
+
+    if ( $opt_openssl_inc ) {
+        print "Custom include directory for OpenSSL: $opt_openssl_inc\n";
+        $openssl_incpath = "$opt_openssl_inc";
+    }
+
+    if ( $opt_openssl_lib ) {
+        print "Custom library directory for OpenSSL: $opt_openssl_lib\n";
+        $openssl_libpath = "$opt_openssl_lib";
+    }
+
+    cc_include_paths "$openssl_incpath";
+    cc_libs "-L$openssl_libpath", "crypto";
+    $assert_lib_args_openssl{incpath} = "$openssl_incpath";
+    $assert_lib_args_openssl{libpath} = "$openssl_libpath";
 }
 else {
     cc_libs 'crypto';
@@ -99,12 +170,11 @@ else {
 if ( $opt_idn ) {
     print "Feature idn enabled\n";
     check_lib_or_exit(
-        lib    => 'idn',
-        header => 'idna.h',
+        lib    => 'idn2',
+        header => 'idn2.h',
         function =>
-          'if(strcmp(IDNA_ACE_PREFIX,"xn--")==0) return 0; else return 1;'
-    );
-    cc_libs 'idn';
+          'return IDN2_OK;');
+    cc_libs 'idn2';
     cc_define '-DWE_CAN_HAZ_IDN';
 }
 else {
@@ -156,11 +226,18 @@ CONFIGURE_FLAGS += --disable-ldns-config --disable-dane
 
 END_CONFIGURE_FLAGS
 
-    my $openssl_make = <<END_ED25519;
+    my $openssl_make = <<END_OPENSSL_MAKE;
 
 CONFIGURE_FLAGS += --with-ssl=$opt_prefix_openssl
 
-END_ED25519
+END_OPENSSL_MAKE
+
+    my $openssl_flags = <<END_OPENSSL_FLAGS;
+
+CFLAGS += -I$opt_openssl_inc
+LDFLAGS += -L$opt_openssl_lib
+
+END_OPENSSL_FLAGS
 
     my $ed25519_make = <<'END_ED25519';
 
@@ -176,13 +253,14 @@ END_NO_ED25519
 
     my $internal_ldns_make = <<'END_INTERNAL_LDNS';
 
+CFLAGS += -fPIC
 LDFROM += ldns/.libs/libldns.a
 
 config :: ldns/.libs/libldns.a
 
 ldns/.libs/libldns.a: ldns/configure
 	cd ldns ;\
-	./configure CFLAGS=-fPIC $(CONFIGURE_FLAGS) ;\
+	./configure CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" $(CONFIGURE_FLAGS) ;\
 	make lib
 
 ldns/configure:
@@ -203,6 +281,7 @@ END_INTERNAL_LDNS
         $postamble .= $openssl_make if $opt_prefix_openssl;
         $postamble .= $ed25519_make if $opt_ed25519;
         $postamble .= $no_ed25519_make if !$opt_ed25519;
+        $postamble .= $openssl_flags if ( $opt_openssl_inc or $opt_openssl_lib );
         $postamble .= $internal_ldns_make;
     }
 

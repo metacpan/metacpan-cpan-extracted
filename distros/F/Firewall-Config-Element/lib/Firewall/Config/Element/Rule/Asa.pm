@@ -17,23 +17,11 @@ with 'Firewall::Config::Element::Rule::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Rule::Asa 通用属性
 #------------------------------------------------------------------------------
-has zone => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has zone => ( is => 'ro', isa => 'Str', required => 1, );
 
-has aclName => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has aclName => ( is => 'ro', isa => 'Str', required => 1, );
 
-has aclLineNumber => (
-  is       => 'ro',
-  isa      => 'Int',
-  required => 1,
-);
+has aclLineNumber => ( is => 'ro', isa => 'Int', required => 1, );
 
 has protocolGroup => (
   is      => 'ro',
@@ -73,10 +61,7 @@ sub _buildSign {
 #------------------------------------------------------------------------------
 sub _buildSrcAddressGroup {
   my $self = shift;
-  return Firewall::Config::Element::AddressGroup::Asa->new(
-    fwId          => $self->fwId,
-    addrGroupName => '^'
-  );
+  return Firewall::Config::Element::AddressGroup::Asa->new( fwId => $self->fwId, addrGroupName => '^' );
 }
 
 #------------------------------------------------------------------------------
@@ -84,10 +69,7 @@ sub _buildSrcAddressGroup {
 #------------------------------------------------------------------------------
 sub _buildDstAddressGroup {
   my $self = shift;
-  return Firewall::Config::Element::AddressGroup::Asa->new(
-    fwId          => $self->fwId,
-    addrGroupName => '^'
-  );
+  return Firewall::Config::Element::AddressGroup::Asa->new( fwId => $self->fwId, addrGroupName => '^' );
 }
 
 #------------------------------------------------------------------------------
@@ -95,10 +77,7 @@ sub _buildDstAddressGroup {
 #------------------------------------------------------------------------------
 sub _buildServiceGroup {
   my $self = shift;
-  return Firewall::Config::Element::ServiceGroup::Asa->new(
-    fwId         => $self->fwId,
-    srvGroupName => '^'
-  );
+  return Firewall::Config::Element::ServiceGroup::Asa->new( fwId => $self->fwId, srvGroupName => '^' );
 }
 
 #------------------------------------------------------------------------------
@@ -106,10 +85,7 @@ sub _buildServiceGroup {
 #------------------------------------------------------------------------------
 sub _buildProtocolGroup {
   my $self = shift;
-  return Firewall::Config::Element::ProtocolGroup::Asa->new(
-    fwId         => $self->fwId,
-    proGroupName => '^'
-  );
+  return Firewall::Config::Element::ProtocolGroup::Asa->new( fwId => $self->fwId, proGroupName => '^' );
 }
 
 #------------------------------------------------------------------------------

@@ -112,20 +112,12 @@ sub parseZonePair {
     while ( defined( my $string = $self->nextUnParsedLine ) ) {
       last if $string =~ /^\s*#/;
       if ( $string =~ /object-policy\s+apply\s+ip\s+(?<policyName>\S+)/ ) {
-        $self->{zonePair}{obj}{$+{policyName}} = {
-          name     => $+{policyName},
-          fromZone => $fromZone,
-          toZone   => $toZone
-        };
+        $self->{zonePair}{obj}{$+{policyName}} = {name => $+{policyName}, fromZone => $fromZone, toZone => $toZone};
       }
       elsif ( $string =~ /packet-filter\s+((?<id>\d+)|name\s+(?<name>\S+))/ ) {
         my $aclName = $+{id};
         $aclName = $+{name} if defined $+{name};
-        $self->{zonePair}{acl}{$aclName} = {
-          name     => $aclName,
-          fromZone => $fromZone,
-          toZone   => $toZone
-        };
+        $self->{zonePair}{acl}{$aclName} = {name => $aclName, fromZone => $fromZone, toZone => $toZone};
       }
       else {
         say "can't parser $string";
@@ -204,10 +196,7 @@ sub parseAcl {
           $self->addToRuleSrcAddressGroup( $rule, "$ip/$mask", 'ip' );
           $self->addToRuleDstAddressGroup( $rule, 'any', 'addr' );
         }
-        my $obj = Firewall::Config::Element::Service::H3c->new(
-          srvName  => 'any',
-          protocol => 'any'
-        );
+        my $obj = Firewall::Config::Element::Service::H3c->new( srvName => 'any', protocol => 'any' );
         $rule->addServiceMembers( 'any', $obj );
 
       } ## end if ( $string =~ ...)
@@ -286,11 +275,8 @@ sub parseAcl {
           if ( $opt eq 'eq' ) {
             $port = $self->getPortName($port) if $port !~ /\d+/;
             my $name = $protocol . "/" . $port;
-            my $obj  = Firewall::Config::Element::Service::H3c->new(
-              srvName  => $name,
-              protocol => $protocol,
-              dstPort  => $port
-            );
+            my $obj  = Firewall::Config::Element::Service::H3c->new( srvName => $name, protocol => $protocol,
+              dstPort => $port );
             $rule->addServiceMembers( $name, $obj );
           }
           elsif ( $opt eq 'range' ) {
@@ -336,39 +322,23 @@ sub parseAcl {
             for my $portrange ( @{$portObj} ) {
               if ( $portrange =~ /eq\s+(?<port>\d+)/ ) {
                 my $name = $protocol . "/" . $+{port};
-                $obj->addMeta(
-                  srvName  => $name,
-                  protocol => $protocol,
-                  dstPort  => $+{port}
-                );
+                $obj->addMeta( srvName => $name, protocol => $protocol, dstPort => $+{port} );
 
               }
               elsif ( $portrange =~ /range\s+(?<minport>\d+)\s+(?<maxport>\d+)/ ) {
                 my $dstPort = $+{minport} . "-" . $+{maxport};
                 my $name    = $protocol . "/" . $dstPort;
-                $obj->addMeta(
-                  srvName  => $name,
-                  protocol => $protocol,
-                  dstPort  => $dstPort
-                );
+                $obj->addMeta( srvName => $name, protocol => $protocol, dstPort => $dstPort );
               }
               elsif ( $portrange =~ /gt\s+(?<port>\d+)/ ) {
                 my $dstPort = $+{port} . "-65535";
                 my $name    = $protocol . "/" . $dstPort;
-                $obj->addMeta(
-                  srvName  => $name,
-                  protocol => $protocol,
-                  dstPort  => $dstPort
-                );
+                $obj->addMeta( srvName => $name, protocol => $protocol, dstPort => $dstPort );
               }
               elsif ( $portrange =~ /lt\s+(?<port>\d+)/ ) {
                 my $dstPort = "0-" . $+{port};
                 my $name    = $protocol . "/" . $dstPort;
-                $obj->addMeta(
-                  srvName  => $name,
-                  protocol => $protocol,
-                  dstPort  => $dstPort
-                );
+                $obj->addMeta( srvName => $name, protocol => $protocol, dstPort => $dstPort );
               }
             } ## end for my $portrange ( @{$portObj...})
             $rule->addServiceMembers( $port, $obj );
@@ -376,10 +346,7 @@ sub parseAcl {
 
         }
         else {
-          my $obj = Firewall::Config::Element::Service::H3c->new(
-            srvName  => 'any',
-            protocol => 'any'
-          );
+          my $obj = Firewall::Config::Element::Service::H3c->new( srvName => 'any', protocol => 'any' );
           $rule->addServiceMembers( 'any', $obj );
         }
 
@@ -554,10 +521,7 @@ sub parseInterface {
 
     #my $isNat =0;
     my $interface;
-    $interface = Firewall::Config::Element::Interface::H3c->new(
-      name   => $name,
-      config => $string
-    );
+    $interface = Firewall::Config::Element::Interface::H3c->new( name => $name, config => $string );
     $self->addElement($interface);
     while ( defined( $string = $self->nextUnParsedLine ) ) {
       if ( $string =~ /^\s*#/ ) {
@@ -612,11 +576,7 @@ sub parseZone {
   if ( $string =~ /security-zone\s+name\s+(?<name>\S+)/i ) {
     my $name = $+{name};
     my $zone;
-    $zone = Firewall::Config::Element::Zone::H3c->new(
-      name   => $name,
-      fwId   => $self->fwId,
-      config => $string
-    );
+    $zone = Firewall::Config::Element::Zone::H3c->new( name => $name, fwId => $self->fwId, config => $string );
     $self->addElement($zone);
     while ( defined( $string = $self->nextUnParsedLine ) ) {
       if ( $string =~ /^\s*#/ ) {
@@ -689,10 +649,7 @@ sub parseAddress {
   my ( $self, $string ) = @_;
   if ( $string =~ /object-group\s+ip\s+address\s+((?<name>\S+)|"(?<name>.+?)")/i ) {
     my $name    = $+{name};
-    my $address = Firewall::Config::Element::Address::H3c->new(
-      addrName => $name,
-      config   => $string
-    );
+    my $address = Firewall::Config::Element::Address::H3c->new( addrName => $name, config => $string );
     $self->addElement($address);
     while ( defined( $string = $self->nextUnParsedLine ) ) {
       if ( $string =~ /^\s*#/ ) {
@@ -1284,10 +1241,7 @@ sub addToRuleServiceGroup {
   my ( $self, $rule, $srvName ) = @_;
   my $obj;
   if ( $srvName =~ /^\s*any\s*$/i ) {
-    $obj = Firewall::Config::Element::Service::H3c->new(
-      srvName  => 'any',
-      protocol => 'any'
-    );
+    $obj = Firewall::Config::Element::Service::H3c->new( srvName => 'any', protocol => 'any' );
     $rule->addServiceMembers( $srvName, $obj );
   }
   else {

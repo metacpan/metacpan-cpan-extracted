@@ -42,6 +42,7 @@
       },
       "test" : {
          "requires" : {
+            "Dancer2" : "0",
             "File::Basename" : "0",
             "FindBin" : "0",
             "HTTP::Request::Common" : "0",
@@ -63,6 +64,6 @@
          "web" : "https://github.com/Pero-Moretti/Perl-Dancer2-Plugin-DoFile"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

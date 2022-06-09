@@ -14,11 +14,7 @@ with 'Firewall::Config::Element::Zone::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Zone::Srx 通用属性
 #------------------------------------------------------------------------------
-has routeInstance => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has routeInstance => ( is => 'ro', isa => 'Str', required => 1, );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildRange 方法

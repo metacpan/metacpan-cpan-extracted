@@ -27,25 +27,12 @@ sub parse {
   $self->{ruleNum} = 0;
   while ( defined( my $string = $self->nextUnParsedLine ) ) {
     if    ( $self->isZone($string) ) { $self->parseZone($string) }
-    elsif ( $self->isInterface($string) ) {
-      $self->parseInterface($string);
-    }
-    elsif ( $self->isAddress($string) ) {
-      $self->parseAddress($string);
-    }
-    elsif ( $self->isAddressGroup($string) ) {
-      $self->parseAddressGroup($string);
-    }
-    elsif ( $self->isService($string) ) {
-      $self->parseService($string);
-    }
-    elsif ( $self->isServiceGroup($string) ) {
-      $self->parseServiceGroup($string);
-    }
-    elsif ( $self->isRoute($string) ) {
-      $self->parseRoute($string);
-    }
-
+    elsif ( $self->isInterface($string) ) {$self->parseInterface($string)}
+    elsif ( $self->isAddress($string) ) {$self->parseAddress($string)}
+    elsif ( $self->isAddressGroup($string) ) {$self->parseAddressGroup($string)}
+    elsif ( $self->isService($string) ) {$self->parseService($string)}
+    elsif ( $self->isServiceGroup($string) ) {$self->parseServiceGroup($string)}
+    elsif ( $self->isRoute($string) ) {$self->parseRoute($string)}
     #elsif ( $self->isActive($string)       ) { $self->setActive($string)         }
     else { $self->ignoreLine }
   } ## end while ( defined( my $string...))
@@ -54,15 +41,9 @@ sub parse {
   $self->goToHeadLine;
   while ( defined( my $string = $self->nextUnParsedLine ) ) {
     if    ( $self->isStaticNat($string) ) { $self->parseStaticNat($string) }
-    elsif ( $self->isDynamicNat($string) ) {
-      $self->parseDynamicNat($string);
-    }
-    elsif ( $self->isRule($string) ) {
-      $self->parseRule($string);
-    }
-    else {
-      $self->ignoreLine;
-    }
+    elsif ( $self->isDynamicNat($string) ) {$self->parseDynamicNat($string)}
+    elsif ( $self->isRule($string) ) {$self->parseRule($string)}
+    else {$self->ignoreLine}
   }
 
   $self->{config} = "";
@@ -149,10 +130,7 @@ sub parseZone {
     my $name = $+{name};
     my $zone;
     if ( !( $zone = $self->getZone($name) ) ) {
-      $zone = Firewall::Config::Element::Zone::Neteye->new(
-        name => $name,
-        fwId => $self->fwId
-      );
+      $zone = Firewall::Config::Element::Zone::Neteye->new( name => $name, fwId => $self->fwId );
       $self->addElement($zone);
     }
     $zone->{config} = $string;
@@ -571,11 +549,8 @@ sub parseStaticNat {
             my $port = $sport;
             $port = $sport . "-" . $eport if defined $eport;
             my $name = $proto . "/" . $port;
-            my $obj  = Firewall::Config::Element::Service::Neteye->new(
-              srvName  => $name,
-              protocol => $proto,
-              dstPort  => $port
-            );
+            my $obj  = Firewall::Config::Element::Service::Neteye->new( srvName => $name, protocol => $proto,
+              dstPort => $port );
             $rule->addServiceMembers( $name, $obj );
 
           }
@@ -592,11 +567,8 @@ sub parseStaticNat {
             elsif ( $other =~ /other\s+(?<proto>\d+)/ ) {
               my $proto = $+{proto};
               my $name  = "other" . $proto;
-              my $obj   = Firewall::Config::Element::Service::Neteye->new(
-                srvName  => $name,
-                protocol => $proto,
-                dstPort  => '0'
-              );
+              my $obj   = Firewall::Config::Element::Service::Neteye->new( srvName => $name, protocol => $proto,
+                dstPort => '0' );
               $rule->addServiceMembers( $name, $obj );
             }
           } ## end if ( defined $other )
@@ -783,11 +755,8 @@ sub parseDynamicNat {
             my $port = $sport;
             $port = $port . "-" . $eport if defined $eport;
             my $name = $proto . "/" . $port;
-            my $obj  = Firewall::Config::Element::Service::Neteye->new(
-              srvName  => $name,
-              protocol => $proto,
-              dstPort  => $port
-            );
+            my $obj  = Firewall::Config::Element::Service::Neteye->new( srvName => $name, protocol => $proto,
+              dstPort => $port );
             $rule->addServiceMembers( $name, $obj );
 
           }
@@ -804,11 +773,8 @@ sub parseDynamicNat {
             elsif ( $other =~ /other\s+(?<proto>\d+)/ ) {
               my $proto = $+{proto};
               my $name  = "other" . $proto;
-              my $obj   = Firewall::Config::Element::Service::Neteye->new(
-                srvName  => $name,
-                protocol => $proto,
-                dstPort  => '0'
-              );
+              my $obj   = Firewall::Config::Element::Service::Neteye->new( srvName => $name, protocol => $proto,
+                dstPort => '0' );
               $rule->addServiceMembers( $name, $obj );
             }
           } ## end if ( defined $other )
@@ -1160,10 +1126,7 @@ sub addToRuleServiceGroup {
   my $obj;
   if ( defined $type and $type eq 'obj' ) {
     if ( $srvName =~ /^any$/i ) {
-      $obj = Firewall::Config::Element::Service::Neteye->new(
-        srvName  => 'any',
-        protocol => 'any'
-      );
+      $obj = Firewall::Config::Element::Service::Neteye->new( srvName => 'any', protocol => 'any' );
       $rule->addServiceMembers( $srvName, $obj );
     }
     elsif ( $obj = $self->getServiceOrServiceGroupFromSrvGroupMemberName($srvName) ) {
@@ -1176,11 +1139,7 @@ sub addToRuleServiceGroup {
   }
   else {
     my ( $proto, $port ) = split( '/', $srvName );
-    $obj = Firewall::Config::Element::Service::Neteye->new(
-      srvName  => $srvName,
-      protocol => $proto,
-      dstPort  => $port
-    );
+    $obj = Firewall::Config::Element::Service::Neteye->new( srvName => $srvName, protocol => $proto, dstPort => $port );
     $rule->addServiceMembers( $srvName, $obj );
 
   }

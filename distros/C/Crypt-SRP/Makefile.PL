@@ -10,7 +10,7 @@ WriteMakefile(
     ABSTRACT     => 'Secure Remote Protocol',
     LICENSE      => 'perl_5',
     PREREQ_PM    => {
-      'CryptX'       => '0.029',   # we need: Crypt::Misc + Math::BigInt::LTM (v0.029 = Apr 13, 2016)
+      'CryptX'       => '0.074',   # we need: Crypt::Misc + Math::BigInt::LTM (v0.074 = 2021-11-06)
       'Math::BigInt' => '1.88',    # many things fail with Math::BigInt older than 1.88
     },
     MIN_PERL_VERSION => '5.006',

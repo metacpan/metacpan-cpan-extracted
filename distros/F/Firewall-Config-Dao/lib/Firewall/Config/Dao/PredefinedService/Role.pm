@@ -28,11 +28,7 @@ has preDefinedService => (
   writer  => 'setPreDefinedService',
 );
 
-has preDefinedServiceTableName => (
-  is      => 'ro',
-  isa     => 'Str',
-  builder => '_buildPreDefinedServiceTableName',
-);
+has preDefinedServiceTableName => ( is => 'ro', isa => 'Str', builder => '_buildPreDefinedServiceTableName', );
 
 #------------------------------------------------------------------------------
 # 明确继承 Dao::PredefinedService::Role 对象需要实现的方法

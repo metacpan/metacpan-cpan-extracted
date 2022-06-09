@@ -123,6 +123,11 @@ f     - AST_OUTLINE<X>: Create a Polygon outlining values in a pixel array
 *        distances (compared to the width of the polygon), as 10 times the length
 *        of a side (the previous length of the probing line) may not reach all
 *        the way across the polygon.
+*     9-JUN-2021 (DSB):
+*        - Function PolyWidth now works correctly for Regions that represent a "hole 
+*        in the sky" (i.e. have widths larger than 180 degrees). 
+*        - Fix bug in GetBounded (Regions on SkyFrames are all bounded), that could 
+*        cause Polygons on the sky to be incorrectly negated.
 *class--
 */
 
@@ -677,7 +682,8 @@ static void Cache( AstPolygon *this, int *status ){
    infinite extent outside the polygonal hole. In this case any point
    outside the hole will do, so we use the current contents of the
    "polcen" array. Set a flag indicating if the vertices are stored in
-   anti-clockwise order. */
+   anti-clockwise order (note, this flag is not used if the polygon is
+   defined within a SkyFrame). */
          if( maxwid < 0.0 ) {
             (this->in)[ 0 ] = polcen[ 0 ];
             (this->in)[ 1 ] = polcen[ 1 ];
@@ -2747,6 +2753,7 @@ static int GetBounded( AstRegion *this, int *status ) {
 */
 
 /* Local Variables: */
+   AstFrame *bfrm;           /* Pointer to Region's base Frame */
    int neg;                  /* Has the Polygon been negated? */
    int result;               /* Returned result */
 
@@ -2756,22 +2763,34 @@ static int GetBounded( AstRegion *this, int *status ) {
 /* Check the global error status. */
    if ( !astOK ) return result;
 
+/* Regions defined within SkyFrames (i.e. on a sphere) are always bounded,
+   since a finite region has a finite negation. */
+   bfrm = astGetFrame( this->frameset, AST__BASE );
+   if( astIsASkyFrame( bfrm ) ) {
+      result = 1;
+
+/* Now deal with other types of Frame. */
+   } else {
+
 /* Ensure cached information is available. */
-   Cache( (AstPolygon *) this, status );
+      Cache( (AstPolygon *) this, status );
 
 /* See if the Polygon has been negated. */
-   neg = astGetNegated( this );
+      neg = astGetNegated( this );
 
 /* If the polygon vertices are stored in anti-clockwise order, then the
    polygon is bounded if it has not been negated. */
-   if( ( (AstPolygon *) this)->acw ) {
-      result = (! neg );
+      if( ( (AstPolygon *) this)->acw ) {
+         result = (! neg );
 
 /* If the polygon vertices are stored in clockwise order, then the
    polygon is bounded if it has been negated. */
-   } else {
-      result = neg;
+      } else {
+         result = neg;
+      }
    }
+
+   bfrm = astAnnul( bfrm );
 
 /* Return the result. */
    return result;
@@ -4093,13 +4112,11 @@ static double Polywidth( AstFrame *frm, AstLineDef **edges, int i, int nv,
 
 /* Find the position at which the line created above crosses the current
    edge. Skip to the next edge if the line does not intersect the edge
-   within the length of the edge. */
-         if( astLineCrossing( frm, line, edges[ j ], cross ) ) {
+   within the length of the edge. This also returns the distance from the
+   line start to the crossing point. */
+         if( astLineCrossing( frm, line, edges[ j ], cross, &d ) ) {
 
-/* Find the distance between the crossing point and the line start. */
-            d = astDistance( frm, start, cross );
-
-/* If this is less than the smallest found so far, record it. */
+/* If the distance is less than the smallest found so far, record it. */
             if( d != AST__BAD && ( d < result || result == AST__BAD ) ) {
                result = d;
             }
@@ -6258,7 +6275,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 
 /* Otherwise, see if the two lines cross within their extent. If so,
    increment the number of crossings. */
-               } else if( astLineCrossing( frm, b, a, NULL ) ) {
+               } else if( astLineCrossing( frm, b, a, NULL, NULL ) ) {
                   ncross++;
                }
             }

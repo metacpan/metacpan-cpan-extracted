@@ -21,10 +21,7 @@ use Firewall::Config::Content::Static;
 #------------------------------------------------------------------------------
 # 数据库联结插件
 #------------------------------------------------------------------------------
-has dbi => (
-  is   => 'ro',
-  does => 'Firewall::DBI::Role',
-);
+has dbi => ( is => 'ro', does => 'Firewall::DBI::Role', );
 
 #------------------------------------------------------------------------------
 # 初始化防火墙
@@ -46,10 +43,7 @@ sub initFirewall {
       my $err = $+{error};
       my $sql = "update fw_info set fw_state=3,fw_error='$err' where fw_id = $fwId";
       $self->dbi->execute($sql);
-      return {
-        success => 0,
-        reason  => $err
-      };
+      return {success => 0, reason => $err};
     }
   }
   elsif ( $param->{initType} eq 'import' ) {
@@ -69,14 +63,11 @@ sub initFirewall {
     else {
       my $sql = "update fw_info set fw_state=3,fw_error='open file $param->{file} fail' where fw_id = $fwId";
       $self->dbi->execute($sql);
-      return {
-        success => 0,
-        reason  => "open file $param->{file} fail"
-      };
+      return {success => 0, reason => "open file $param->{file} fail"};
     }
   }
 
-  eval { $self->saveAndParseConfig( {fwId => $fwId, type => $fwType, conf => $conf, vdom => $vdom} ) };
+  eval { $self->saveAndParseConfig( {fwId => $fwId, type => $fwType, conf => $conf, vdom => $vdom} ); };
   if ( !!$@ ) {
 
     # confess $@;
@@ -84,10 +75,7 @@ sub initFirewall {
     my $err = $+{error};
     my $sql = "update fw_info set fw_state=3,fw_error='$err' where fw_id = $fwId";
     $self->dbi->execute($sql);
-    return {
-      success => 0,
-      reason  => $err
-    };
+    return {success => 0, reason => $err};
   }
   my $sql = "update fw_info set fw_state=2 where fw_id = $fwId";
   $self->dbi->execute($sql);
@@ -115,20 +103,12 @@ sub updateNetwork {
         ( $min, $max ) = Firewall::Utils::Ip->new->getRangeFromIpRange( $minIp, $maxIp );
       }
       else {
-        return {
-          success => 0,
-          reason  => "ipaddr format is wrong!"
-        };
+        return {success => 0, reason => "ipaddr format is wrong!"};
       }
       my $sql
         = "update $table set addr_min=$min,addr_max=$max where fw_id = :fwId and zone= :zone and addr_range= :range";
-      $self->dbi->execute(
-        $sql,
-        { fwId  => $network->{fw_id},
-          zone  => $network->{zone},
-          range => $network->{addr_range}
-        }
-      );
+      $self->dbi->execute( $sql,
+        {fwId => $network->{fw_id}, zone => $network->{zone}, range => $network->{addr_range}} );
     }
   }
   $self->dbi->disconnect;
@@ -151,10 +131,7 @@ sub saveAndParseConfig {
   $predefinedService = $predefinedService->load($fwId);
 
   use Firewall::Config::Dao::Config;
-  my $daoConf = Firewall::Config::Dao::Config->new(
-    dbi  => $sonDbi,
-    conf => $conf
-  );
+  my $daoConf         = Firewall::Config::Dao::Config->new( dbi => $sonDbi, conf => $conf );
   my $isConfigChanged = $daoConf->save;
 
   #return unless $isConfigChanged;
@@ -169,10 +146,7 @@ sub saveAndParseConfig {
     $parser->{vdom} = $param->{vdom} // 'root';
   }
   $parser->parse();
-  my $dao = Firewall::Config::Dao::Parser->new(
-    dbi    => $sonDbi,
-    parser => $parser
-  );
+  my $dao = Firewall::Config::Dao::Parser->new( dbi => $sonDbi, parser => $parser );
 
   #say dumper $parser->elements->zone;
   $dao->save;
@@ -195,12 +169,8 @@ sub getConfById {
   confess $@ if !!$@;
 
   $config = [ split( /\n/, $configStr ) ];
-  my $conf = Firewall::Config::Content::Static->new(
-    fwId   => $fwId,
-    fwName => $fwName,
-    config => $config,
-    fwType => $fwType
-  );
+  my $conf
+    = Firewall::Config::Content::Static->new( fwId => $fwId, fwName => $fwName, config => $config, fwType => $fwType );
   return $conf;
 }
 

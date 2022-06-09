@@ -15,11 +15,7 @@ with 'Firewall::Config::Element::Service::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Service::Asa 通用属性
 #------------------------------------------------------------------------------
-has dstPort => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has dstPort => ( is => 'ro', isa => 'Str', required => 1, );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildRange 方法

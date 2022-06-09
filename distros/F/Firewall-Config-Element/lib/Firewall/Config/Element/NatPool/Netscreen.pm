@@ -15,11 +15,7 @@ with 'Firewall::Config::Element::NatPool::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::NatPool::Netscreen 通用属性
 #------------------------------------------------------------------------------
-has interfaceName => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has interfaceName => ( is => 'ro', isa => 'Str', required => 0, );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildSign 方法，

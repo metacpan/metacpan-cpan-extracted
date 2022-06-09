@@ -1,1 +1,4 @@
+badges = ['github-actions/test.yml']
 module_maker = "ExtUtilsMakeMaker"
+authority = "cpan:SATOH"
+

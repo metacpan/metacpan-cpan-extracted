@@ -14,56 +14,22 @@ with 'Firewall::Config::Element::Route::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Route::H3c 通用属性
 #------------------------------------------------------------------------------
-has '+network' => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has '+network' => ( is => 'ro', isa => 'Str', required => 0, );
 
 # 改写 mask 属性
-has '+mask' => (
-  is       => 'ro',
-  isa      => 'Int',
-  required => 0,
-);
+has '+mask' => ( is => 'ro', isa => 'Int', required => 0, );
 
-has type => (
-  is      => 'ro',
-  isa     => 'Str',
-  default => 'static',
-);
+has type => ( is => 'ro', isa => 'Str', default => 'static', );
 
-has srcInterface => (
-  is       => 'ro',
-  isa      => 'Str|Undef',
-  required => 0,
-);
+has srcInterface => ( is => 'ro', isa => 'Str|Undef', required => 0, );
 
-has srcIpmask => (
-  is       => 'ro',
-  isa      => 'Str|Undef',
-  required => 0,
-);
+has srcIpmask => ( is => 'ro', isa => 'Str|Undef', required => 0, );
 
-has srcRange => (
-  is       => 'ro',
-  required => 0,
-  isa      => 'Firewall::Utils::Set',
-  lazy     => 1,
-  builder  => '_buildSrcRange',
-);
+has srcRange => ( is => 'ro', required => 0, isa => 'Firewall::Utils::Set', lazy => 1, builder => '_buildSrcRange', );
 
-has dstInterface => (
-  is       => 'ro',
-  isa      => 'Str|Undef',
-  required => 0,
-);
+has dstInterface => ( is => 'ro', isa => 'Str|Undef', required => 0, );
 
-has vpn => (
-  is       => 'ro',
-  isa      => 'Str|Undef',
-  required => 0,
-);
+has vpn => ( is => 'ro', isa => 'Str|Undef', required => 0, );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildRange 方法

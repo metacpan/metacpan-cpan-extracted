@@ -19,13 +19,7 @@ has dbi => (
 #------------------------------------------------------------------------------
 # 防火墙 fwId 查询主键
 #------------------------------------------------------------------------------
-has fwId => (
-  is      => 'ro',
-  isa     => 'Int',
-  lazy    => 1,
-  builder => '_buildFwId',
-  writer  => 'setFwId',
-);
+has fwId => ( is => 'ro', isa => 'Int', lazy => 1, builder => '_buildFwId', writer => 'setFwId', );
 
 #------------------------------------------------------------------------------
 # 继承 Dao::Role 的角色，必须实现的方法
@@ -38,11 +32,7 @@ requires '_buildFwId';
 sub getFwName {
   my $self      = shift;
   my $tableName = 'fw_info';
-  my $raw       = $self->select(
-    column => ['FW_NAME'],
-    table  => $tableName,
-    where  => {fw_id => $self->fwId}
-  )->one;
+  my $raw       = $self->select( column => ['FW_NAME'], table => $tableName, where => {fw_id => $self->fwId} )->one;
 
   # 判断是否成功返回查询结果
   if ( not defined $raw ) {
@@ -63,11 +53,7 @@ sub lock {
   my $self      = shift;
   my $fwName    = $self->getFwName;
   my $tableName = 'fw_conf';
-  my $isLocking = $self->select(
-    column => ['is_parsing'],
-    table  => $tableName,
-    where  => {fw_id => $self->fwId}
-  )->one;
+  my $isLocking = $self->select( column => ['is_parsing'], table => $tableName, where => {fw_id => $self->fwId} )->one;
 
   # 判断是否成功返回查询结果
   if ( not defined $isLocking ) {
@@ -76,9 +62,7 @@ sub lock {
   elsif ( $isLocking->{is_parsing} == 0 ) {
     $self->execute(
       "UPDATE $tableName SET is_parsing = 1, parse_start_time = :parse_start_time WHERE fw_id = :fw_id",
-      { parse_start_time => Firewall::Utils::Date->new->getLocalDate(),
-        fw_id            => $self->fwId
-      }
+      {parse_start_time => Firewall::Utils::Date->new->getLocalDate(), fw_id => $self->fwId}
     );
   }
   else {
@@ -86,11 +70,7 @@ sub lock {
   }
 
   # 再次查询
-  my $result = $self->select(
-    column => ['is_parsing'],
-    table  => $tableName,
-    where  => {fw_id => $self->fwId}
-  )->one;
+  my $result = $self->select( column => ['is_parsing'], table => $tableName, where => {fw_id => $self->fwId} )->one;
   if ( not defined $result ) {
     confess "ERROR: 表 $tableName 中 没有 fw_id 为 " . $self->fwId . " 的行，加锁失败";
   }
@@ -107,9 +87,7 @@ sub unLock {
   my $tableName = 'fw_conf';
   $self->execute(
     "UPDATE $tableName SET is_parsing = 0, parse_end_time = :parse_end_time WHERE fw_id = :fw_id",
-    { parse_end_time => Firewall::Utils::Date->new->getLocalDate(),
-      fw_id          => $self->fwId
-    }
+    {parse_end_time => Firewall::Utils::Date->new->getLocalDate(), fw_id => $self->fwId}
   );
 }
 

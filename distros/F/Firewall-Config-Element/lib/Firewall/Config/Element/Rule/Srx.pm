@@ -16,36 +16,17 @@ with 'Firewall::Config::Element::Rule::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Rule::Netscreen 通用属性
 #------------------------------------------------------------------------------
-has ruleName => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has ruleName => ( is => 'ro', isa => 'Str', required => 1, );
 
-has fromZone => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has fromZone => ( is => 'ro', isa => 'Str', required => 1, );
 
-has toZone => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has toZone => ( is => 'ro', isa => 'Str', required => 1, );
 
-has '+action' => (
-  required => 0,
-  writer   => 'setAction',
-);
+has '+action' => ( required => 0, writer => 'setAction', );
 
-has '+schName' => (
-  writer => 'setSchName',
-);
+has '+schName' => ( writer => 'setSchName', );
 
-has '+hasLog' => (
-  writer => 'setHasLog',
-);
+has '+hasLog' => ( writer => 'setHasLog', );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildRange 方法
@@ -60,11 +41,7 @@ sub _buildSign {
 #------------------------------------------------------------------------------
 sub _buildSrcAddressGroup {
   my $self = shift;
-  return Firewall::Config::Element::AddressGroup::Srx->new(
-    fwId          => $self->fwId,
-    addrGroupName => '^',
-    zone          => '^'
-  );
+  return Firewall::Config::Element::AddressGroup::Srx->new( fwId => $self->fwId, addrGroupName => '^', zone => '^' );
 }
 
 #------------------------------------------------------------------------------
@@ -72,11 +49,7 @@ sub _buildSrcAddressGroup {
 #------------------------------------------------------------------------------
 sub _buildDstAddressGroup {
   my $self = shift;
-  return Firewall::Config::Element::AddressGroup::Srx->new(
-    fwId          => $self->fwId,
-    addrGroupName => '^',
-    zone          => '^'
-  );
+  return Firewall::Config::Element::AddressGroup::Srx->new( fwId => $self->fwId, addrGroupName => '^', zone => '^' );
 }
 
 #------------------------------------------------------------------------------
@@ -84,10 +57,7 @@ sub _buildDstAddressGroup {
 #------------------------------------------------------------------------------
 sub _buildServiceGroup {
   my $self = shift;
-  return Firewall::Config::Element::ServiceGroup::Srx->new(
-    fwId         => $self->fwId,
-    srvGroupName => '^'
-  );
+  return Firewall::Config::Element::ServiceGroup::Srx->new( fwId => $self->fwId, srvGroupName => '^' );
 }
 
 #------------------------------------------------------------------------------

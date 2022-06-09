@@ -4,32 +4,18 @@ package Firewall::Config::Element::Role;
 # 加载扩展模块
 #------------------------------------------------------------------------------
 use Moose::Role;
-use Carp;
 
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Role 通用属性
 #------------------------------------------------------------------------------
 # 防火墙ID
-has fwId => (
-  is       => 'ro',
-  isa      => 'Int',
-  required => 0,
-);
+has fwId => ( is => 'ro', isa => 'Int', required => 0, );
 
 # 在同一个设备中描述一个对象的唯一性特征
-has sign => (
-  is      => 'ro',
-  isa     => 'Str',
-  lazy    => 1,
-  builder => '_buildSign',
-);
+has sign => ( is => 'ro', isa => 'Str', lazy => 1, builder => '_buildSign', );
 
 # 设备的配置内容
-has config => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has config => ( is => 'ro', isa => 'Str', required => 0, );
 
 #------------------------------------------------------------------------------
 # 应用该模块需要具体实现 _buildSign

@@ -11,45 +11,19 @@ use Expect;
 #------------------------------------------------------------------------------
 # 定义设备 Connector 通用属性
 #------------------------------------------------------------------------------
-has host => (
-  is       => 'ro',
-  required => 1,
-);
+has host => ( is => 'ro', required => 1, );
 
-has username => (
-  is       => 'ro',
-  required => 0,
-  default  => 'read',
-);
+has username => ( is => 'ro', required => 0, default => 'read', );
 
-has password => (
-  is       => 'ro',
-  required => 1,
-  default  => '',
-);
+has password => ( is => 'ro', required => 1, default => '', );
 
-has enpassword => (
-  is       => 'ro',
-  required => 0,
-);
+has enpassword => ( is => 'ro', required => 0, );
 
-has proto => (
-  is       => 'ro',
-  required => 0,
-  default  => 'ssh',
-);
+has proto => ( is => 'ro', required => 0, default => 'ssh', );
 
-has _login_ => (
-  is       => 'ro',
-  required => 0,
-  default  => 0,
-);
+has _login_ => ( is => 'ro', required => 0, default => 0, );
 
-has _enable_ => (
-  is       => 'ro',
-  required => 0,
-  default  => 0,
-);
+has _enable_ => ( is => 'ro', required => 0, default => 0, );
 
 #------------------------------------------------------------------------------
 # Cisco 设备登陆函数入口
@@ -68,10 +42,7 @@ sub login {
     if (/RSA modulus too small/mi) {
       try { $self->connect('-v -1 -c des ') }
       catch {
-        return {
-          success => 0,
-          reason  => $_
-        };
+        return {success => 0, reason => $_};
       }
     }
     elsif (/Selected cipher type <unknown> not supported/mi) {
@@ -79,10 +50,7 @@ sub login {
         $self->connect('-c des ');
       }
       catch {
-        return {
-          success => 0,
-          reason  => $_
-        };
+        return {success => 0, reason => $_};
       }
     }
     elsif (/Connection refused/mi) {
@@ -91,10 +59,7 @@ sub login {
         $self->connect();
       }
       catch {
-        return {
-          success => 0,
-          reason  => $_
-        };
+        return {success => 0, reason => $_};
       }
     }
     elsif (/IDENTIFICATION HAS CHANGED/mi) {
@@ -103,17 +68,11 @@ sub login {
         $self->connect();
       }
       catch {
-        return {
-          success => 0,
-          reason  => $_
-        };
+        return {success => 0, reason => $_};
       }
     }
     else {
-      return {
-        success => 0,
-        reason  => $_
-      };
+      return {success => 0, reason => $_};
     }
   };
 
@@ -193,7 +152,7 @@ sub connect {
 #------------------------------------------------------------------------------
 # Cisco 设备抓取运行配置函数入口
 #------------------------------------------------------------------------------
-sub getconfig {
+sub  {
   my $self = shift;
 
   # 抓取设备命令脚本，输入不分页命令加速输出
@@ -213,10 +172,7 @@ sub getconfig {
   }
 
   # 返回计算结果
-  return {
-    success => 1,
-    config  => $lines
-  };
+  return {success => 1, config => $lines};
 }
 
 #------------------------------------------------------------------------------
@@ -309,11 +265,7 @@ sub execCommands {
 
     # 异常回显信号捕捉
     if ( $buff =~ /(Invalid input detected|Incomplete command)/i ) {
-      return {
-        success     => 0,
-        failCommand => $cmd,
-        reason      => $result . $buff
-      };
+      return {success => 0, failCommand => $cmd, reason => $result . $buff};
     }
     else {
       $result .= $buff;
@@ -321,10 +273,7 @@ sub execCommands {
   }
 
   # 输出计算结果
-  return {
-    success => 1,
-    result  => $result
-  };
+  return {success => 1, result => $result};
 }
 
 #------------------------------------------------------------------------------

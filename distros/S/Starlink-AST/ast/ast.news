@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V9.2.4) of the Starlink AST (astrometry) library is
+   A new release (V9.2.8) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -16,6 +16,76 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
+
+- The Fortran interface has been changed to fix a bug caused by a change
+in the way that gfortran passes character arguments. As of gfortran V8 the
+length of each character argument passed to a subroutine is stored in a
+size_t value rather than an int value. AST now tests the version of
+gfortran at configure-time, and uses int or size_t within the Fortran
+API as appropriate. Prior to this change int was always used, which could
+cause undefined behaviour and segmentation faults when calling AST
+routines under gfortran v8 and later.
+
+- A bug has been fixed in astRebinSeq that could cause NaN values to
+appear in the output array in cases where the overlap between two
+input arrays is very small.  The fix corrects the way in which the mean
+weight per input pixel is calculated. It may cause some general minor
+changes to the decision about which output pixels pass the "wlim"
+criterion.
+
+Main Changes in V9.2.7
+----------------------
+
+- The FitsChan class has a new attribute called FitsRounding, which
+controls rounding applied when floating point values are formatted as
+FITS keyword values. Note, this changes the default rounding behaviour.
+Previously, sequences of four or more 9's or 0's were always rounded.
+Now, such sequences are only rounded if they extend beyond the tenth
+significant digit (the default value for FitsRounding being 10). To
+restore the original behaviour, set FitsRounding to 1.
+
+
+Main Changes in V9.2.6
+----------------------
+
+- A bug has been fixed in the FitsChan class that caused an error to be
+reported when reading a legal FITS WCS header that uses the "NCP"
+projection code. The error message related to a missing alternate axis
+description keyword.
+
+
+Main Changes in V9.2.5
+----------------------
+
+- A new method called astNormPoints has been added to the Frame
+class. This is similar to the existing astNorm method in that it can be
+used to normalise axis values, but can be used on a vector of points rather
+than just a single point. In addition, it has an option to choose a
+normalisation that avoids discontinuities in the Frame's coordinate
+system. The most common usage will be to modify vectors of sky position
+in such a way as to avoid sudden jumps of 360 degrees in longitude within
+groups of points that span the longitude origin.
+
+- The mesh of points returned by astGetRegionMesh and astShowMesh are now
+normalised to avoid discontinuities in celestial longitude. This uses the
+new astNormPoints methid described in the previous item.
+
+- A bug has been fixed in the KeyMap class that caused astMapGet1<X>
+functions to return a vector length of 1 for KeyMap entries with an
+undefined value. A vector length of zero is now returned in such cases.
+
+- The way in which the astRebinSeq<X> functions use the "wlim" argument
+has been modified in order to improve the performance when the input
+variances include aberrant ultra-low values. The change should result in
+fewer output pixels being set bad in such cases. This change only affects
+cases where the AST__GENVAR flag is not set.
+
+- An option "--with-external-cminpack" had been added to the configure script.
+It omits the internal cminpack routines from the built library, and instead
+links with an external cminpack library.
+
+Main Changes in V9.2.4
+----------------------
 
 - A bug has been fixed that could prevent the astWrite method of the
 FitsChan class producing FITS-WCS headers describing alternate axes for

@@ -19,23 +19,11 @@ use Firewall::Policy::Searcher::Report::FwInfo;
 #------------------------------------------------------------------------------
 # Firewall::Policy::Designer::Topsec 通用属性
 #------------------------------------------------------------------------------
-has dbi => (
-  is       => 'ro',
-  does     => 'Firewall::DBI::Role',
-  required => 1,
-);
+has dbi => ( is => 'ro', does => 'Firewall::DBI::Role', required => 1, );
 
-has searcherReportFwInfo => (
-  is       => 'ro',
-  isa      => 'Firewall::Policy::Searcher::Report::FwInfo',
-  required => 1,
-);
+has searcherReportFwInfo => ( is => 'ro', isa => 'Firewall::Policy::Searcher::Report::FwInfo', required => 1, );
 
-has commandText => (
-  is      => 'ro',
-  isa     => 'ArrayRef[Str]',
-  default => sub { [] },
-);
+has commandText => ( is => 'ro', isa => 'ArrayRef[Str]', default => sub { [] }, );
 
 #------------------------------------------------------------------------------
 # addToCommandText 设置 commandText 属性，入参为标量

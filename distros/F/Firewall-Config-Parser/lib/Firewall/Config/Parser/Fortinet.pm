@@ -27,10 +27,7 @@ use Firewall::Config::Element::DynamicNat::Fortinet;
 #------------------------------------------------------------------------------
 with 'Firewall::Config::Parser::Role';
 
-has vdom => (
-  is      => 'ro',
-  default => 'root'
-);
+has vdom => ( is => 'ro', default => 'root' );
 
 sub parse {
   my $self = shift;
@@ -52,24 +49,14 @@ sub parse {
     elsif ( $self->isNat($string) )     { $self->parseNat($string) }
     elsif ( $self->isVdom($string) )    { $self->parseVdom($string) }
     elsif ( $self->isAddress($string) ) { $self->parseAddress($string) }
-    elsif ( $self->isAddressGroup($string) ) {
-      $self->parseAddressGroup($string);
-    }
-    elsif ( $self->isServiceGroup($string) ) {
-      $self->parseServiceGroup($string);
-    }
-    elsif ( $self->isSchedule($string) ) {
-      $self->parseSchedule($string);
-    }
-    elsif ( $self->isRule($string) ) {
-      $self->parseRule($string);
-    }
-    else {
-      $self->ignoreLine;
-    }
+    elsif ( $self->isAddressGroup($string) ) {$self->parseAddressGroup($string)}
+    elsif ( $self->isServiceGroup($string) ) {$self->parseServiceGroup($string)}
+    elsif ( $self->isSchedule($string) ) {$self->parseSchedule($string)}
+    elsif ( $self->isRule($string) ) {$self->parseRule($string)}
+    else {$self->ignoreLine}
   }
   $self->{config} = "";
-} ## end sub parse
+}
 
 sub isVdom {
   my ( $self, $string ) = @_;
@@ -312,11 +299,8 @@ sub parseZone {
     }
     if ( $string =~ /edit\s+"(?<name>.+)"/ ) {
       my $name = $+{name};
-      my $zone = Firewall::Config::Element::Zone::Fortinet->new(
-        fwId   => $self->fwId,
-        name   => $name,
-        config => $string
-      );
+      my $zone
+        = Firewall::Config::Element::Zone::Fortinet->new( fwId => $self->fwId, name => $name, config => $string );
       while ( ( $string = $self->nextUnParsedLine ) !~ /next/ ) {
         $zone->{config} .= "\n" . $string;
         if ( $string =~ /set\s+interface\s+(?<ints>.+)/ ) {
@@ -403,11 +387,8 @@ sub parseAddress {
         );
       }
       else {
-        $address = Firewall::Config::Element::Address::Fortinet->new(
-          addrName => $name,
-          type     => $type,
-          config   => $config
-        );
+        $address
+          = Firewall::Config::Element::Address::Fortinet->new( addrName => $name, type => $type, config => $config );
       }
       $address->{zone} = $zone if defined $zone;
       $self->addElement($address);
@@ -983,11 +964,7 @@ sub addToRuleSrcAddressGroup {
   my $obj;
   if ( $srcAddrName =~ /^(?:Any|all)/io ) {
     unless ( $obj = $self->getAddress($srcAddrName) ) {
-      $obj = Firewall::Config::Element::Address::Fortinet->new(
-        addrName => $srcAddrName,
-        ip       => '0.0.0.0',
-        mask     => 0
-      );
+      $obj = Firewall::Config::Element::Address::Fortinet->new( addrName => $srcAddrName, ip => '0.0.0.0', mask => 0 );
       $self->addElement($obj);
     }
   }
@@ -1005,11 +982,7 @@ sub addToRuleDstAddressGroup {
   my $obj;
   if ( $dstAddrName =~ /^(?:Any|all)/io ) {
     unless ( $obj = $self->getAddress($dstAddrName) ) {
-      $obj = Firewall::Config::Element::Address::Fortinet->new(
-        addrName => $dstAddrName,
-        ip       => '0.0.0.0',
-        mask     => 0
-      );
+      $obj = Firewall::Config::Element::Address::Fortinet->new( addrName => $dstAddrName, ip => '0.0.0.0', mask => 0 );
       $self->addElement($obj);
     }
   }

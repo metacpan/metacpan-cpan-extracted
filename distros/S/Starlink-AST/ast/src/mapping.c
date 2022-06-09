@@ -418,7 +418,16 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     28-SEP-2020 (DSB):
 *        Fix bug in astMapMerge handling of AllowSimplify flag that could
 *        result in unnecessary UnitMaps being left in a simplified Mapping chain.
-*
+*     28-MAY-2021 (DSB):
+*        In astRebinSeq<X> calculate the mean weight per input point using
+*        sigma-clipping. This prevents the value being heavily dominated
+*        by pixels that have very low variance. This affects the interpretation
+*        of the supplied "wlim" value and thus the flagging of bad output
+*        pixels (but only in cases where the AST__GENVAR flag has not been set).
+*     7-FEB-2022 (DSB):
+*        RebinSeq<X>: change calculation of mean weight per input pixel so that
+*        it excludes pixels with zero weight. This will only affect the
+*        decision about which output pixels to set bad due to low weight.
 *class--
 */
 
@@ -6671,10 +6680,10 @@ f     .FALSE.
 /* On the assumption that the transformation applied above is
    approximately linear, loop to determine the matrix of gradients and
    the zero points which describe it. */
-      ii = 0;
       for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
          bad_output = 0;
          z = 0.0;
+         ii = ndim_in*coord_out;
          for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
 
 /* Find the indices of opposite faces in each input dimension. */
@@ -10433,6 +10442,7 @@ static int RebinAdaptively( AstMapping *this, int ndim_in,
    int result;                   /* Returned value */
    int toobig;                   /* Section too big (must sub-divide)? */
    int toosmall;                 /* Section too small to sub-divide? */
+   size_t nfitpar;               /* Number of paranmeters in linear fit */
 
 /* Initialise */
    result = 0;
@@ -10520,8 +10530,8 @@ static int RebinAdaptively( AstMapping *this, int ndim_in,
 /* Allocate memory for floating point bounds and for the coefficient array */
       flbnd = astMalloc( sizeof( double )*(size_t) ndim_in );
       fubnd = astMalloc( sizeof( double )*(size_t) ndim_in );
-      linear_fit = astMalloc( sizeof( double )*
-                              (size_t) ( ndim_out*( ndim_in + 1 ) ) );
+      nfitpar = ndim_out*( ndim_in + 1 );
+      linear_fit = astMalloc( sizeof( double )*nfitpar );
       if( astOK ) {
 
 /* Copy the bounds into these arrays, and change them so that they refer
@@ -10535,6 +10545,16 @@ static int RebinAdaptively( AstMapping *this, int ndim_in,
 
 /* Get the linear approximation to the forward transformation. */
          isLinear = astLinearApprox( this, flbnd, fubnd, tol, linear_fit );
+
+/* If a fit was returned, check there are no bad values in it. */
+         if( isLinear ){
+            for( i = 0; i < nfitpar; i++ ){
+               if( linear_fit[ i ] == AST__BAD ) {
+                  isLinear = 0;
+                  break;
+               }
+            }
+         }
 
 /* Free the coeff array if the inverse transformation is not linear. */
          if( !isLinear ) linear_fit = astFree( linear_fit );
@@ -12202,11 +12222,19 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
    double *w;                    /* Pointer to next weight value */ \
    double mwpip;                 /* Mean weight per input pixel */ \
    double neff;                  /* Effective number of contributing input pixels */ \
+   double newval;                /* New value for mwpip */ \
+   double std;                   /* Standard deviation of weights */ \
+   double sw2;                   /* Sum of squared weights at output pixel */ \
    double sw;                    /* Sum of weights at output pixel */ \
    double wgt;                   /* Output pixel weight */ \
+   double whi;                   /* Upper limit for acceptable weights */ \
+   double wlo;                   /* Lower limit for acceptable weights */ \
    int idim;                     /* Loop counter for coordinate dimensions */ \
+   int more;                     /* Do another sigma-clipping iteration? */ \
    int nin;                      /* Number of Mapping input coordinates */ \
    int nout;                     /* Number of Mapping output coordinates */ \
+   int64_t nw;                   /* Number of values summed */ \
+   int64_t nwlim;                /* Minimum allowed number of values summed */ \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
@@ -12529,16 +12557,47 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
 /* Ensure "wlim" is not zero. */ \
       if( wlim < 1.0E-10 ) wlim = 1.0E-10; \
 \
-/* If it will be needed, find the average weight per input pixel. */ \
-      if( !( flags & AST__GENVAR ) && *nused > 0 ) { \
-         sw = 0.0; \
-         for( i = 0; i < npix_out; i++ ) { \
-            sw += weights[ i ]; \
+/* If it will be needed, find the sigma-clipped mean weight per input \
+   pixel. Ensure no more than 50% of the usable points (i.e. points with \
+   non-zero weight) are rejected. Weights are always positive. */ \
+      mwpip = AST__BAD; \
+      if( !( flags & AST__GENVAR ) && *nused > 0 && npix_out > 0 ) { \
+         wlo = 0.0; \
+         whi = DBL_MAX; \
+         nwlim = -1; \
+         more = 1; \
+         while( more ) { \
+            sw = 0.0; \
+            sw2 = 0.0; \
+            nw = 0; \
+            w = weights; \
+            for( i = 0; i < npix_out; i++,w++ ) { \
+               if( *w > wlo && *w <= whi ){ \
+                  sw += *w; \
+                  sw2 += (*w)*(*w); \
+                  nw++; \
+               } \
+            } \
+            if( nwlim == -1 ) nwlim = nw/2; \
+            if( nw > nwlim ) { \
+               newval = sw/nw; \
+               if( mwpip != AST__BAD ){ \
+                  more = ( fabs( newval - mwpip ) > 0.05*mwpip ); \
+               } \
+               mwpip = newval; \
+               std = sw2/nw - mwpip*mwpip; \
+               std = (std>0.0)?sqrt( std ):0.0; \
+               wlo = mwpip - 3*std; \
+               if( wlo < 0.0 ) wlo = 0.0; \
+               whi = mwpip + 3*std; \
+            } else { \
+               more = 0; \
+            } \
          } \
-         mwpip = sw/( *nused ); \
-       } else { \
-         mwpip = AST__BAD; \
-       } \
+\
+/* Convert mean weight per output point to mean weight per input point */ \
+         mwpip *= ((double) 2*nwlim)/( *nused ); \
+      } \
 \
 /* Normalise each output pixel. */ \
       for( i = 0; i < npix_out; i++ ) { \
@@ -14598,6 +14657,7 @@ static AstDim ResampleAdaptively( AstMapping *this, int ndim_in,
    int result;                   /* Result value to return */
    int toobig;                   /* Section too big (must sub-divide)? */
    int toosmall;                 /* Section too small to sub-divide? */
+   size_t nfitpar;               /* Number of paranmeters in linear fit */
 
 /* Initialise. */
    result = 0;
@@ -14676,8 +14736,8 @@ static AstDim ResampleAdaptively( AstMapping *this, int ndim_in,
 /* Allocate memory for floating point bounds and for the coefficient array */
       flbnd = astMalloc( sizeof( double )*(size_t) ndim_out );
       fubnd = astMalloc( sizeof( double )*(size_t) ndim_out );
-      linear_fit = astMalloc( sizeof( double )*
-                              (size_t) ( ndim_in*( ndim_out + 1 ) ) );
+      nfitpar = ndim_in*( ndim_out + 1 );
+      linear_fit = astMalloc( sizeof( double )*nfitpar );
       if( astOK ) {
 
 /* Copy the bounds into these arrays, and change them so that they refer
@@ -14695,6 +14755,16 @@ static AstDim ResampleAdaptively( AstMapping *this, int ndim_in,
          astInvert( this );
          isLinear = astLinearApprox( this, flbnd, fubnd, tol, linear_fit );
          astInvert( this );
+
+/* If a fit was returned, check there are no bad values in it. */
+         if( isLinear ){
+            for( i = 0; i < nfitpar; i++ ){
+               if( linear_fit[ i ] == AST__BAD ) {
+                  isLinear = 0;
+                  break;
+               }
+            }
+         }
 
 /* Free the coeff array if the inverse transformation is not linear. */
          if( !isLinear ) linear_fit = astFree( linear_fit );
@@ -20856,6 +20926,7 @@ static void TranGridAdaptively( AstMapping *this, int ncoord_in,
    int nvertex;                  /* Number of vertices of output section */
    int toobig;                   /* Section too big (must sub-divide)? */
    int toosmall;                 /* Section too small to sub-divide? */
+   size_t nfitpar;               /* Number of paranmeters in linear fit */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -20929,8 +21000,8 @@ static void TranGridAdaptively( AstMapping *this, int ncoord_in,
 /* Allocate memory for floating point bounds and for the coefficient array */
       flbnd = astMalloc( sizeof( double )*(size_t) ncoord_in );
       fubnd = astMalloc( sizeof( double )*(size_t) ncoord_in );
-      linear_fit = astMalloc( sizeof( double )*
-                              (size_t) ( ncoord_out*( ncoord_in + 1 ) ) );
+      nfitpar = ncoord_out*( ncoord_in + 1 );
+      linear_fit = astMalloc( sizeof( double )*nfitpar );
       if( astOK ) {
 
 /* Copy the bounds into these arrays, and change them so that they refer
@@ -20944,6 +21015,16 @@ static void TranGridAdaptively( AstMapping *this, int ncoord_in,
 
 /* Get the linear approximation to the forward transformation. */
          isLinear = astLinearApprox( this, flbnd, fubnd, tol, linear_fit );
+
+/* If a fit was returned, check there are no bad values in it. */
+         if( isLinear ){
+            for( i = 0; i < nfitpar; i++ ){
+               if( linear_fit[ i ] == AST__BAD ) {
+                  isLinear = 0;
+                  break;
+               }
+            }
+         }
 
 /* Free the coeff array if the inverse transformation is not linear. */
          if( !isLinear ) linear_fit = astFree( linear_fit );

@@ -18,8 +18,8 @@ to_idn(...)
 
             if (SvPOK(ST(i)))
             {
-               status = idna_to_ascii_8z(SvPVutf8_nolen(obj), &out, IDNA_ALLOW_UNASSIGNED);
-               if (status == IDNA_SUCCESS)
+               status = idn2_to_ascii_8z(SvPVutf8_nolen(obj), &out, IDN2_ALLOW_UNASSIGNED);
+               if (status == IDN2_OK)
                {
                   SV *new = newSVpv(out,0);
                   SvUTF8_on(new); /* We know the string is plain ASCII, so let Perl know too */
@@ -28,12 +28,12 @@ to_idn(...)
                }
                else
                {
-                  croak("Error: %s\n", idna_strerror(status));
+                  croak("Error: %s\n", idn2_strerror(status));
                }
             }
         }
 #else
-        croak("libidn not installed");
+        croak("libidn2 not installed");
 #endif
     }
 

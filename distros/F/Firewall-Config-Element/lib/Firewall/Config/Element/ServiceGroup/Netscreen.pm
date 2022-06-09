@@ -15,11 +15,7 @@ with 'Firewall::Config::Element::ServiceGroup::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::ServiceGroup::Netscreen 通用属性
 #------------------------------------------------------------------------------
-has description => (
-  is      => 'ro',
-  isa     => 'Undef|Str',
-  default => undef,
-);
+has description => ( is => 'ro', isa => 'Undef|Str', default => undef, );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildRange 方法

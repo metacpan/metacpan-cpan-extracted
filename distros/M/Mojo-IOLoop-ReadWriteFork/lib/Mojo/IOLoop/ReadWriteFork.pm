@@ -15,7 +15,7 @@ use Scalar::Util qw(blessed);
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 131072;
 use constant DEBUG      => $ENV{MOJO_READWRITEFORK_DEBUG} && 1;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 our @SAFE_SIG
   = grep { !m!^(NUM\d+|__[A-Z0-9]+__|ALL|CATCHALL|DEFER|HOLD|IGNORE|MAX|PAUSE|RTMAX|RTMIN|SEGV|SETS)$! } keys %SIG;
@@ -28,10 +28,20 @@ has ioloop => sub { Mojo::IOLoop->singleton }, weak => 1;
 
 sub close {
   my $self = shift;
-  my $what = $_[0] eq 'stdout' ? 'stdout_read' : 'stdin_write';    # stdout_read is EXPERIMENTAL
-  my $fh   = delete $self->{$what} or return $self;
-  $fh->close or $self->emit(error => $!);
-  $self;
+  my $fh   = delete $self->{stdin_write} or return $self;
+
+  if (blessed $fh and $fh->isa('IO::Pty')) {
+    for my $name (qw(pty stdout)) {
+      my $stream = $self->{stream}{$name} && $self->ioloop->stream($self->{stream}{$name});
+      $stream->close if $stream and $stream->handle eq $fh;
+    }
+  }
+
+  if (!$fh->close) {
+    $self->emit(error => $!);
+  }
+
+  return $self;
 }
 
 sub run {
@@ -41,12 +51,13 @@ sub run {
 }
 
 sub run_and_capture_p {
-  my $self    = shift;
-  my $asset   = Mojo::Asset::Memory->new(auto_upgrade => 1);
-  my $read_cb = $self->on(read => sub { $asset->add_chunk($_[1]) });
+  my $self       = shift;
+  my $asset      = Mojo::Asset::Memory->new(auto_upgrade => 1);
+  my $read_event = $self->conduit->{stdout} ? 'stdout' : 'read';
+  my $read_cb    = $self->on($read_event => sub { $asset->add_chunk($_[1]) });
   $asset->once(upgrade => sub { $asset = $_[1]; $self->emit(asset => $asset) });
   return $self->emit(asset => $asset)->run_p(@_)->then(sub {$asset})
-    ->finally(sub { $self->unsubscribe(read => $read_cb) });
+    ->finally(sub { $self->unsubscribe($read_event => $read_cb) });
 }
 
 sub run_p {
@@ -116,9 +127,9 @@ sub _start_child {
 
   my $stdout_no = ($args->{stdout} // 1) && fileno($fh->{stdout_write});
   my $stderr_no = ($args->{stderr} // 1) && fileno($fh->{stderr_write} || $fh->{stdout_write});
-  open STDIN,  '<&' . fileno($fh->{stdin_read}) or exit $!;
-  open STDOUT, '>&' . $stdout_no or exit $! if $stdout_no;
-  open STDERR, '>&' . $stderr_no or exit $! if $stderr_no;
+  open STDIN,  '<&' . fileno($fh->{stdin_read}) or die $!;
+  open STDOUT, '>&' . $stdout_no or die $! if $stdout_no;
+  open STDERR, '>&' . $stderr_no or die $! if $stderr_no;
   $stdout_no ? STDOUT->autoflush(1) : STDOUT->close;
   $stderr_no ? STDERR->autoflush(1) : STDERR->close;
 
@@ -141,7 +152,7 @@ sub _start_child {
   }
 
   eval { POSIX::_exit($errno // $!); };
-  exit($errno // $!);
+  die($errno // $!);
 }
 
 sub _start_parent {
@@ -151,10 +162,10 @@ sub _start_parent {
   @$self{qw(stdin_write stdout_read stderr_read)} = @$fh{qw(stdin_write stdout_read stderr_read)};
   @$self{qw(wait_eof wait_sigchld)}               = (1, 1);
 
-  $fh->{stdout_read}->close_slave if blessed $fh->{stdout_read} and $fh->{stdout_read}->isa('IO::Pty');
-  $self->_stream(pty    => $fh->{stdin_write}) if $args->{conduit} eq 'pty3';
-  $self->_stream(stderr => $fh->{stderr_read}) if $fh->{stderr_read};
-  $self->_stream(stdout => $fh->{stdout_read}) if !$fh->{stderr_read} or $args->{stdout};
+  $fh->{stdin_write}->close_slave if blessed $fh->{stdin_write} and $fh->{stdin_write}->isa('IO::Pty');
+  $self->{stream}{pty}    = $self->_stream(pty    => $fh->{stdin_write}) if $args->{conduit} eq 'pty3';
+  $self->{stream}{stderr} = $self->_stream(stderr => $fh->{stderr_read}) if $fh->{stderr_read};
+  $self->{stream}{stdout} = $self->_stream(stdout => $fh->{stdout_read}) if !$fh->{stderr_read} or $args->{stdout};
 
   $SIGCHLD->waitpid($self->{pid} => sub { $self->_sigchld(@_) });
   $self->emit('fork');    # LEGACY
@@ -193,6 +204,7 @@ sub _maybe_terminate {
 
   delete $self->{stdin_write};
   delete $self->{stdout_read};
+  delete $self->{stderr_read};
 
   my @errors;
   for my $cb (@{$self->subscribers('close')}, @{$self->subscribers('finish')}) {
@@ -230,7 +242,8 @@ sub _stream {
   $stream->on(error => sub { $! != EIO && $self->emit(error => "Read error: $_[1]") });
   $stream->on(close => sub { $self->_maybe_terminate('wait_eof') });
   $stream->on(read  => $read_cb);
-  $self->ioloop->stream($stream);
+
+  return $self->ioloop->stream($stream);
 }
 
 sub _write {
@@ -265,7 +278,7 @@ Mojo::IOLoop::ReadWriteFork - Fork a process and read/write from it
 
 =head1 VERSION
 
-2.01
+2.02
 
 =head1 SYNOPSIS
 

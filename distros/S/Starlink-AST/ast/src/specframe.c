@@ -6124,9 +6124,9 @@ astMAKE_GET(SpecFrame,SourceVRF,AstStdOfRestType,AST__BADSOR,(
 /* When clearing SourceVRF, convert the SourceVel value to heliocentric
   (but only if set)*/
 astMAKE_CLEAR(SpecFrame,SourceVRF,sourcevrf,((astTestSourceVel( this )?
-             (void*)(astSetSourceVel( this, ConvertSourceVel( this, AST__HLSOR,
+             (void)(astSetSourceVel( this, ConvertSourceVel( this, AST__HLSOR,
                     astGetSourceSys( this ), status ) ),NULL):
-             NULL),AST__BADSOR))
+             (void)NULL),AST__BADSOR))
 
 /* Validate the SourceVRF value being set and report an error if necessary.
    If OK, convert the stored SourceVel value into the new rest frame (but
@@ -6134,8 +6134,8 @@ only if set)*/
 astMAKE_SET(SpecFrame,SourceVRF,AstStdOfRestType,sourcevrf,(
             ( ( value >= FIRST_SOR ) && ( value <= LAST_SOR ) && value != AST__SCSOR ) ?
                  (astTestSourceVel( this )?
-                 (void*)(astSetSourceVel( this,ConvertSourceVel(this,value,astGetSourceSys( this ), status )),NULL):
-                 NULL), value:( astError( AST__ATTIN, "%s(%s): Bad value (%d) "
+                 (void)(astSetSourceVel( this,ConvertSourceVel(this,value,astGetSourceSys( this ), status )),NULL):
+                 (void)NULL), value:( astError( AST__ATTIN, "%s(%s): Bad value (%d) "
                              "given for SourceVRF attribute.", status,
                              "astSetSourceVRF", astGetClass( this ), (int) value ),
 
@@ -6192,8 +6192,8 @@ astMAKE_GET(SpecFrame,SourceSys,AstSystemType,AST__BADSYSTEM,(
 /* When clearing SourceSys, convert the SourceVel value to relativistic
    velocity (but only if set) */
 astMAKE_CLEAR(SpecFrame,SourceSys,sourcesys,((astTestSourceVel( this )?
-(void*)(astSetSourceVel( this, ConvertSourceVel( this, astGetSourceVRF( this ),
-                                         AST__VREL, status ) ),NULL):NULL),AST__BADSYSTEM))
+(void)(astSetSourceVel( this, ConvertSourceVel( this, astGetSourceVRF( this ),
+                                         AST__VREL, status ) ),NULL):(void)NULL),AST__BADSYSTEM))
 
 /* Validate the SourceSys value being set and report an error if necessary.
    If OK, convert the stored SourceVel value into the new rest frame (but
@@ -6203,8 +6203,8 @@ astMAKE_SET(SpecFrame,SourceSys,AstSystemType,sourcesys,(
               ( value == AST__VRADIO ) || ( value == AST__REDSHIFT ) ||
               ( value == AST__VOPTICAL ) ) ?
               (astTestSourceVel( this )?
-               (void*)(astSetSourceVel( this, ConvertSourceVel( this, astGetSourceVRF( this ),
-                                                        value, status )),NULL):NULL),
+               (void)(astSetSourceVel( this, ConvertSourceVel( this, astGetSourceVRF( this ),
+                                                        value, status)),NULL):(void)NULL),
                                                         value:
                  ( astError( AST__ATTIN, "%s(%s): Bad value (%d) "
                              "given for SourceSys attribute.", status,

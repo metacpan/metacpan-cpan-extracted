@@ -29,83 +29,35 @@ use Firewall::Config::Element::Zone::Role;
 #------------------------------------------------------------------------------
 # Firewall::Config::Parser::Elements 通用属性
 #------------------------------------------------------------------------------
-has natPool => (
-  is      => 'ro',
-  does    => 'HashRef[Firewall::Config::Element::NatPool::Role]',
-  default => sub { {} },
-);
+has natPool => ( is => 'ro', does => 'HashRef[Firewall::Config::Element::NatPool::Role]', default => sub { {} }, );
 
-has zone => (
-  is      => 'ro',
-  does    => 'HashRef[Firewall::Config::Element::Zone::Role]',
-  default => sub { {} },
-);
+has zone => ( is => 'ro', does => 'HashRef[Firewall::Config::Element::Zone::Role]', default => sub { {} }, );
 
-has interface => (
-  is      => 'ro',
-  does    => 'HashRef[Firewall::Config::Element::Interface::Role]',
-  default => sub { {} },
-);
+has interface => ( is => 'ro', does => 'HashRef[Firewall::Config::Element::Interface::Role]', default => sub { {} }, );
 
-has route => (
-  is      => 'ro',
-  does    => 'HashRef[Firewall::Config::Element::Route::Role]',
-  default => sub { {} },
-);
+has route => ( is => 'ro', does => 'HashRef[Firewall::Config::Element::Route::Role]', default => sub { {} }, );
 
-has staticNat => (
-  is      => 'ro',
-  does    => 'HashRef[Firewall::Config::Element::StaticNat::Role]',
-  default => sub { {} },
-);
+has staticNat => ( is => 'ro', does => 'HashRef[Firewall::Config::Element::StaticNat::Role]', default => sub { {} }, );
 
-has dynamicNat => (
-  is      => 'ro',
-  does    => 'HashRef[Firewall::Config::Element::DynamicNat::Role]',
-  default => sub { {} },
-);
+has dynamicNat =>
+  ( is => 'ro', does => 'HashRef[Firewall::Config::Element::DynamicNat::Role]', default => sub { {} }, );
 
-has address => (
-  is      => 'ro',
-  does    => 'HashRef[Firewall::Config::Element::Address::Role]',
-  default => sub { {} },
-);
+has address => ( is => 'ro', does => 'HashRef[Firewall::Config::Element::Address::Role]', default => sub { {} }, );
 
-has addressGroup => (
-  is      => 'ro',
-  does    => 'HashRef[Firewall::Config::Element::AddressGroup::Role]',
-  default => sub { {} },
-);
+has addressGroup =>
+  ( is => 'ro', does => 'HashRef[Firewall::Config::Element::AddressGroup::Role]', default => sub { {} }, );
 
-has protocolGroup => (
-  is      => 'ro',
-  does    => 'HashRef[Firewall::Config::Element::ProtocolGroup::Role]',
-  default => sub { {} },
-);
+has protocolGroup =>
+  ( is => 'ro', does => 'HashRef[Firewall::Config::Element::ProtocolGroup::Role]', default => sub { {} }, );
 
-has schedule => (
-  is      => 'ro',
-  does    => 'HashRef[Firewall::Config::Element::Schedule::Role]',
-  default => sub { {} },
-);
+has schedule => ( is => 'ro', does => 'HashRef[Firewall::Config::Element::Schedule::Role]', default => sub { {} }, );
 
-has service => (
-  is      => 'ro',
-  does    => 'HashRef[Firewall::Config::Element::Service::Role]',
-  default => sub { {} },
-);
+has service => ( is => 'ro', does => 'HashRef[Firewall::Config::Element::Service::Role]', default => sub { {} }, );
 
-has serviceGroup => (
-  is      => 'ro',
-  does    => 'HashRef[Firewall::Config::Element::ServiceGroup::Role]',
-  default => sub { {} },
-);
+has serviceGroup =>
+  ( is => 'ro', does => 'HashRef[Firewall::Config::Element::ServiceGroup::Role]', default => sub { {} }, );
 
-has rule => (
-  is      => 'ro',
-  does    => 'HashRef[Firewall::Config::Element::Rule::Role]',
-  default => sub { {} },
-);
+has rule => ( is => 'ro', does => 'HashRef[Firewall::Config::Element::Rule::Role]', default => sub { {} }, );
 
 #------------------------------------------------------------------------------
 # addElement 新增解析对象元素类型

@@ -16,21 +16,11 @@ with 'Firewall::Config::Element::Schedule::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Schedule::Srx 通用属性
 #------------------------------------------------------------------------------
-has startDate => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has startDate => ( is => 'ro', isa => 'Str', required => 1, );
 
-has endDate => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has endDate => ( is => 'ro', isa => 'Str', required => 1, );
 
-has '+schType' => (
-  required => 0,
-);
+has '+schType' => ( required => 0, );
 
 =example
 set schedulers scheduler S_20130924 start-date 2013-09-24.00:00 stop-date 2013-10-23.23:59

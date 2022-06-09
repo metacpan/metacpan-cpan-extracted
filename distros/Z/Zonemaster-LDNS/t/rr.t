@@ -103,8 +103,8 @@ subtest 'DNSKEY' => sub {
             isa_ok( $rr, 'Zonemaster::LDNS::RR::DNSKEY' );
             ok( $rr->flags == 256 or $rr->flags == 257 );
             is( $rr->protocol,  3 );
-            # Alg 8 will replace 5. Now (December 2017) both are used.
-            ok( $rr->algorithm == 5 or $rr->algorithm == 8 );
+            # Alg 8 has replaced 5. Now (February 2022) only alg 8 is used.
+            ok( $rr->algorithm == 8 );
         }
     }
 };
@@ -122,9 +122,9 @@ subtest 'RRSIG' => sub {
             is( $rr->signer, 'se.' );
             is( $rr->labels, 1 );
             if ( $rr->typecovered eq 'DNSKEY' ) {
-                # .SE KSK should not change very often. 59407 will replace 59747.
-                # Now (December 2017) both are used.
-                ok( $rr->keytag == 59747 or $rr->keytag == 59407 );
+                # .SE KSK should not change very often. 59407 has replaced 59747.
+                # Now (February 2022) only 59407 is used.
+                ok( $rr->keytag == 59407 );
             }
         }
     }
@@ -172,19 +172,17 @@ subtest 'DS' => sub {
         my $pd      = $se->query( 'nic.se', 'DS' );
         plan skip_all => 'No response, cannot test' if not $pd;
 
+        # As of February 2022, new KSK with keytag 22643 and algo 13 is used
         my $nic_key = Zonemaster::LDNS::RR->new(
-    'nic.se IN DNSKEY 257 3 5 AwEAAdhJAx197qFpGGXuQn8XH0tQpQSfjvLKMcreRvJyO+f3F3weIHR3 6E8DObolHFp+m1YkxsgnHYjUFN4E9sKa38ZXU0oHTSsB3adExJkINA/t INDlKrzUDn4cIbyUCqHNGe0et+lHmjmfZdj62GJlHgVmxizYkoBd7Rg0 wxzEOo7CA3ZadaHuqmVJ2HvqRCoe+5NDsYpnDia7WggvLTe0vorV6kDc u6d5N9AUPwBsR7YUkbetfXMtUebux71kHCGUJdmzp84MeDi9wXYIssjR oTC5wUF2H3I2Mnj5GqdyBwQCdj5otFbRAx3jiMD+ROxXJxOFdFq7fWi1 yPqUf1jpJ+8='
+    'nic.se IN DNSKEY 257 3 13 lkpZSlU70pd1LHrXqZttOAYKmX046YqYQg1aQJsv1y0xKr+qJS+3Ue1tM5VCYPU3lKuzq93nz0Lm/AV9jeoumQ=='
         );
         my $made = Zonemaster::LDNS::RR->new_from_string( 'nic.se IN NS a.ns.se' );
         foreach my $rr ( $pd->answer ) {
             isa_ok( $rr, 'Zonemaster::LDNS::RR::DS' );
-            is( $rr->keytag,    16696 );
-            is( $rr->algorithm, 5 );
+            is( $rr->keytag,    22643 );
+            is( $rr->algorithm, 13 );
             ok( $rr->digtype == 1 or $rr->digtype == 2 );
-            ok(
-                     $rr->hexdigest eq '40079ddf8d09e7f10bb248a69b6630478a28ef969dde399f95bc3b39f8cbacd7'
-                  or $rr->hexdigest eq 'ef5d421412a5eaf1230071affd4f585e3b2b1a60'
-            );
+            ok( $rr->hexdigest eq 'aa0b38f6755c2777992a74935d50a2a3480effef1a60bf8643d12c307465c9da' );
             ok( $rr->verify( $nic_key ), 'derived from expected DNSKEY' );
             ok( !$rr->verify( $made ),   'does not match a non-DS non-DNSKEY record' );
         }

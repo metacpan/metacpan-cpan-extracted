@@ -3,7 +3,7 @@ NAME
     modules
 
 VERSION
-    version 0.02
+    version 0.03
 
 SYNOPSIS
       use Authen::Pluggable;
@@ -66,9 +66,9 @@ METHODS
 
     It always return the object itself.
 
-  authen($username, $password)
-    Call all configured providers and return the first with a valid
-    authentication.
+  authen($username, $password, [opt] $providers)
+    Call all configured providers, or only $providers if configured, and
+    return the first with a valid authentication.
 
     The structure returned is usually something like this
 

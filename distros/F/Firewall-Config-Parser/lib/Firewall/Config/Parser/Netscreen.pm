@@ -31,13 +31,8 @@ sub parse {
   $self->{ruleNum} = 0;
   while ( defined( my $string = $self->nextUnParsedLine ) ) {
     if    ( $self->isRoute($string) ) { $self->parseRoute($string) }
-    elsif ( $self->isInterfaceZone($string) ) {
-      $self->parseInterfaceZone($string);
-    }
-    elsif ( $self->isNatPool($string) ) {
-      $self->parseNatPool($string);
-    }
-
+    elsif ( $self->isInterfaceZone($string) ) {$self->parseInterfaceZone($string)}
+    elsif ( $self->isNatPool($string) ) {$self->parseNatPool($string)}
     #when ( $self->isActive($string)       ) { $self->setActive($string)         }
     else { $self->ignoreLine }
   }
@@ -47,30 +42,14 @@ sub parse {
   $self->goToHeadLine;
   while ( defined( my $string = $self->nextUnParsedLine ) ) {
     if    ( $self->isStaticNat($string) ) { $self->parseStaticNat($string) }
-    elsif ( $self->isDynamicNat($string) ) {
-      $self->parseDynamicNat($string);
-    }
-    elsif ( $self->isAddress($string) ) {
-      $self->parseAddress($string);
-    }
-    elsif ( $self->isAddressGroup($string) ) {
-      $self->parseAddressGroup($string);
-    }
-    elsif ( $self->isService($string) ) {
-      $self->parseService($string);
-    }
-    elsif ( $self->isServiceGroup($string) ) {
-      $self->parseServiceGroup($string);
-    }
-    elsif ( $self->isSchedule($string) ) {
-      $self->parseSchedule($string);
-    }
-    elsif ( $self->isRule($string) ) {
-      $self->parseRule($string);
-    }
-    else {
-      $self->ignoreLine;
-    }
+    elsif ( $self->isDynamicNat($string) ) {$self->parseDynamicNat($string)}
+    elsif ( $self->isAddress($string) ) {$self->parseAddress($string)}
+    elsif ( $self->isAddressGroup($string) ) {$self->parseAddressGroup($string)}
+    elsif ( $self->isService($string) ) {$self->parseService($string)}
+    elsif ( $self->isServiceGroup($string) ) {$self->parseServiceGroup($string)}
+    elsif ( $self->isSchedule($string) ) {$self->parseSchedule($string)}
+    elsif ( $self->isRule($string) ) {$self->parseRule($string)}
+    else {$self->ignoreLine}
   } ## end while ( defined( my $string...))
   $self->{config} = "";
 } ## end sub parse
@@ -325,11 +304,8 @@ set interface ethernet0/0 ip 172.20.255.81/29
 
     my $zone;
     if ( not defined( $zone = $self->getZone( $+{zoneName} ) ) ) {
-      $zone = Firewall::Config::Element::Zone::Netscreen->new(
-        fwId   => $self->fwId,
-        name   => $+{zoneName},
-        config => $string
-      );
+      $zone = Firewall::Config::Element::Zone::Netscreen->new( fwId => $self->fwId, name => $+{zoneName},
+        config => $string );
       $self->addElement($zone);
     }
     $zone->addInterface($interface);

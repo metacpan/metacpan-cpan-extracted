@@ -26,7 +26,7 @@ no_index:
 provides:
   App::week:
     file: lib/App/week.pm
-    version: '1.0203'
+    version: '1.0204'
   App::week::CalYear:
     file: lib/App/week/CalYear.pm
   App::week::colors:
@@ -52,10 +52,10 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/App-week/issues
   homepage: https://github.com/kaz-utashiro/App-week
   repository: git://github.com/kaz-utashiro/App-week.git
-version: '1.0203'
+version: '1.0204'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
   - 'Shlomi Fish <shlomif@shlomifish.org>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

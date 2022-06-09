@@ -16,10 +16,7 @@ use Firewall::Config::Initialize;
 #------------------------------------------------------------------------------
 # 加载系统模块
 #------------------------------------------------------------------------------
-has dbi => (
-  is   => 'ro',
-  does => 'Firewall::DBI::Role',
-);
+has dbi => ( is => 'ro', does => 'Firewall::DBI::Role', );
 
 #------------------------------------------------------------------------------
 # 脚本下发函数入口
@@ -53,27 +50,12 @@ sub deploy {
   if ( !!$@ ) {
     $@ =~ /^(?<error>.+?)(\s+at\s+)?/;
     my $error = $+{error};
-    $self->dbi->execute(
-      $sql,
-      { deployState  => 0,
-        deployResult => $error,
-        taskid       => $taskId
-      }
-    );
-    return {
-      success => 0,
-      reason  => $@
-    };
+    $self->dbi->execute( $sql, {deployState => 0, deployResult => $error, taskid => $taskId} );
+    return {success => 0, reason => $@};
   }
   my $execResult = $fwc->execCommands(@commands);
   if ( $execResult->{success} == 1 ) {
-    $self->dbi->execute(
-      $sql,
-      { deployState  => 1,
-        deployResult => $execResult->{result},
-        taskid       => $taskId
-      }
-    );
+    $self->dbi->execute( $sql, {deployState => 1, deployResult => $execResult->{result}, taskid => $taskId} );
 
     # 执行完毕重新初始化防火墙
     my $InitFW = Firewall::Config::Initialize->new( dbi => $self->dbi );
@@ -84,16 +66,10 @@ sub deploy {
     return {success => 1};
   }
   else {
-    $self->dbi->execute(
-      $sql,
-      { deployState  => 0,
-        deployResult => $execResult->{result},
-        taskid       => $taskId
-      }
-    );
+    $self->dbi->execute( $sql, {deployState => 0, deployResult => $execResult->{result}, taskid => $taskId} );
     return $execResult;
   }
-} ## end sub deploy
+}
 
 __PACKAGE__->meta->make_immutable;
 1;

@@ -25,3 +25,4 @@ lib/Firewall/Policy/Designer/Topsec.pm
 lib/Firewall/Policy/Designer/tests/Asa.t
 lib/Firewall/Policy/Designer/tests/Netscreen.t
 lib/Firewall/Policy/Designer/tests/Srx.t
+pl.pl

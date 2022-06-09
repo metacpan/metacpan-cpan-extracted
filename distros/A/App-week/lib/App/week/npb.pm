@@ -1,5 +1,11 @@
 package App::week::npb;
+
+use strict;
+use warnings;
+use utf8;
+
 1;
+
 __DATA__
 
 define 赤 400

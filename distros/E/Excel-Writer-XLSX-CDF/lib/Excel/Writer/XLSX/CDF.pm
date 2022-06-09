@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use List::MoreUtils qw{first_index};
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -38,7 +38,7 @@ Generates Excel Document with Continuous Distribution Function Chart from the su
 
   my $writer    = Excel::Writer::XLSX::CDF->new(
                                            chart_title      => "Continuous Distribution Function (CDF)",
-                                           chart_y_label    => "Distribution",
+                                           chart_y_label    => "Probability",
                                            chart_x_label    => "",
                                            group_names_sort => 0,  #default 0 is in order of appearance in data
                                           );
@@ -74,14 +74,14 @@ sub chart_title {
 
 Set and returns the Y axis label of the Excel chart
 
-Default: Distribution
+Default: Probability
 
 =cut
 
 sub chart_y_label {
   my $self           = shift;
   $self->{'chart_y_label'} = shift if @_;
-  $self->{'chart_y_label'} = 'Distribution' unless defined $self->{'chart_y_label'};
+  $self->{'chart_y_label'} = 'Probability' unless defined $self->{'chart_y_label'};
   return $self->{'chart_y_label'};
 }
 
@@ -117,7 +117,7 @@ sub chart_legend_display {
 
 =head2 chart_colors
 
-Set and Returns an array reference of Excel color codes to use for each CDF in group order.  The default color once all colors are used is black.
+Set and returns an array reference of Excel color codes to use for each CDF in group order.  The default color once all colors are used is black.
 
 Default: ['#FF0000', '#800000', '#FFFF00', '#808000', '#00FF00', '#008000', '#00FFFF', '#008080', '#0000FF', '#000080', '#FF00FF', '#800080']
 
@@ -287,7 +287,7 @@ sub generate_file {
 
   my $self            = shift;
   my $ymd             = DateTime->now->ymd;
-  my ($fh, $filename) = File::Temp::tempfile("excel-cdf-$ymd-XXXXXX", SUFFIX => ".xlsx", DIR => File::Temp::tempdir());
+  my ($fh, $filename) = File::Temp::tempfile("excel-cdf-$ymd-XXXXXX", SUFFIX => '.xlsx', DIR => File::Temp::tempdir());
   binmode($fh);
   my $blob            = $self->generate(@_);
   print $fh $blob;

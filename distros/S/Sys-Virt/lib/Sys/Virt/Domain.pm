@@ -207,12 +207,16 @@ C<$duration> specifies when the guest should automatically
 wakeup. The C<$flags> parameter is optional and defaults to
 zero.
 
-=item $dom->save($filename)
+=item $dom->save($filename, $dxml=undef, $params=undef, $flags=0)
 
 Take a snapshot of the domain's state and save the information to
 the file named in the C<$filename> parameter. The domain can later
 be restored from this file with the C<restore_domain> method on
-the L<Sys::Virt> object.
+the L<Sys::Virt> object. The optional C<$dxml> parameter can be used to alter
+portions of the domain XML that will be used when performing restore.  The
+C<$params> parameter is a hash reference whose keys is a subset of the SAVE /
+RESTORE PARAMETER CONSTANTS. The C<$flags> parameter accepts one of the SAVE /
+RESTORE FLAG CONSTANTS described later and defaults to zero.
 
 =item $dom->managed_save($flags=0)
 
@@ -4112,7 +4116,7 @@ Keep backing chain referenced using relative names
 
 =back
 
-=head2 DOMAIN SAVE / RESTORE CONSTANTS
+=head2 DOMAIN SAVE / RESTORE FLAG CONSTANTS
 
 The following constants can be used when saving or restoring
 virtual machines
@@ -4136,6 +4140,21 @@ to start upon restore.
 =item Sys::Virt::Domain::SAVE_RESET_NVRAM
 
 Reset the firmware NVRAM state from its original template
+
+=back
+
+=head2 SAVE / RESTORE PARAMETER CONSTANTS
+
+=over 4
+
+=item Sys::Virt::Domain::SAVE_PARAM_FILE
+
+Specify the save state file to save to or restore from.
+
+=item Sys::Virt::Domain::SAVE_PARAM_DXML
+
+Used to adjust guest xml on restore, e.g. to alter a device while domain is
+stopped.
 
 =back
 

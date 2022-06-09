@@ -1,5 +1,11 @@
 Revision history for perl module Sys::Virt
 
+8.4.0 2022-06-09
+
+ - Add VIR_NODE_SEV_CPU0_ID constant
+ - Add support for virDomainSaveParams/virDomainRestoreParams and related
+   VIR_DOMAIN_SAVE_PARAM_FILE and VIR_DOMAIN_SAVE_PARAM_DXML constants
+
 8.3.0 2022-05-03
 
  - Add VIR_DOMAIN_DESTROY_REMOVE_LOGS constant

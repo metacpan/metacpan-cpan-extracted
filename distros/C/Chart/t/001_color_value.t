@@ -82,9 +82,9 @@ is( $hsl[2],  50,     'converted color grey has computed right lightness');
 
 @rgb = Chart::Color::Value::rgb_from_hsl(0, 0, 50);
 is( int @rgb,  3,     'converted back color grey has rgb values');
-is( $rgb[0], 127,     'converted back color grey has right red value');
-is( $rgb[1], 127,     'converted back color grey has right green value');
-is( $rgb[2], 127,     'converted back color grey has right blue value');
+is( $rgb[0], 128,     'converted back color grey has right red value');
+is( $rgb[1], 128,     'converted back color grey has right green value');
+is( $rgb[2], 128,     'converted back color grey has right blue value');
 
 warning_like {$d_rgb->()}                         {carped => qr/two triplets/},"can't get distance without rgb values";
 warning_like {$d_rgb->( [1,1,1],[1,1,1],[1,1,1])} {carped => qr/two triplets/},'too many array arg';

@@ -13,17 +13,9 @@ with 'Firewall::Config::Element::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Schedule::Role 通用属性
 #------------------------------------------------------------------------------
-has schName => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has schName => ( is => 'ro', isa => 'Str', required => 1, );
 
-has schType => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has schType => ( is => 'ro', isa => 'Str', required => 1, );
 
 #------------------------------------------------------------------------------
 # 引用该模块的子类必须实现的方法

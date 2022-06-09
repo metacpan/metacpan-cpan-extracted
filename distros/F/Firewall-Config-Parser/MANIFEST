@@ -18,7 +18,7 @@ lib/Firewall/Config/Parser/Report.pm
 lib/Firewall/Config/Parser/Role.pm
 lib/Firewall/Config/Parser/Srx.pm
 lib/Firewall/Config/Parser/Topsec.pm
-p.pl
+pl.pl
 tests/Asa.t
 tests/Fortinet.t
 tests/H3c.t

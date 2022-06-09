@@ -14,11 +14,7 @@ with 'Firewall::Config::Element::Interface::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Interface::Fortinet 通用方法
 #------------------------------------------------------------------------------
-has vdom => (
-  is      => 'ro',
-  isa     => 'Str',
-  default => 'root',
-);
+has vdom => ( is => 'ro', isa => 'Str', default => 'root', );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildRange 方法

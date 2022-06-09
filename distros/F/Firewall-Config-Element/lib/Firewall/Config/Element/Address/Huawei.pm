@@ -16,26 +16,14 @@ with 'Firewall::Config::Element::Address::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Address::Huawei 通用属性
 #------------------------------------------------------------------------------
-has '+ip' => (
-  required => 0,
-);
+has '+ip' => ( required => 0, );
 
-has '+mask' => (
-  required => 0,
-);
+has '+mask' => ( required => 0, );
 
-has members => (
-  is      => 'rw',
-  isa     => 'ArrayRef',
-  default => sub { [] },
-);
+has members => ( is => 'rw', isa => 'ArrayRef', default => sub { [] }, );
 
 # 是否为 vpn-instance 实例
-has vpn => (
-  is      => 'ro',
-  isa     => 'Str',
-  default => 'default',
-);
+has vpn => ( is => 'ro', isa => 'Str', default => 'default', );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildSign 方法，

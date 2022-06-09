@@ -15,15 +15,41 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Firewall-Config",
   "LICENSE" => "perl",
   "NAME" => "Firewall::Config",
-  "PREREQ_PM" => {},
-  "VERSION" => "0.003",
+  "PREREQ_PM" => {
+    "Carp" => 0,
+    "Firewall::DBI::Pg" => 0,
+    "Firewall::Utils::Date" => 0,
+    "Firewall::Utils::Ip" => 0,
+    "Firewall::Utils::Set" => 0,
+    "JSON" => 0,
+    "Moose" => 0,
+    "POSIX" => 0,
+    "Time::HiRes" => 0,
+    "namespace::autoclean" => 0,
+    "strict" => 0,
+    "warnings" => 0
+  },
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => ""
   }
 );
 
 
-my %FallbackPrereqs = ();
+my %FallbackPrereqs = (
+  "Carp" => 0,
+  "Firewall::DBI::Pg" => 0,
+  "Firewall::Utils::Date" => 0,
+  "Firewall::Utils::Ip" => 0,
+  "Firewall::Utils::Set" => 0,
+  "JSON" => 0,
+  "Moose" => 0,
+  "POSIX" => 0,
+  "Time::HiRes" => 0,
+  "namespace::autoclean" => 0,
+  "strict" => 0,
+  "warnings" => 0
+);
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

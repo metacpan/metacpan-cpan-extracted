@@ -2,8 +2,8 @@ NAME
     App::RegexpPatternUtils - CLI utilities related to Regexp::Pattern
 
 VERSION
-    This document describes version 0.007 of App::RegexpPatternUtils (from
-    Perl distribution App-RegexpPatternUtils), released on 2021-07-02.
+    This document describes version 0.008 of App::RegexpPatternUtils (from
+    Perl distribution App-RegexpPatternUtils), released on 2022-05-08.
 
 SYNOPSIS
 DESCRIPTION
@@ -189,6 +189,37 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-App-RegexpPatternUtils>.
 
+SEE ALSO
+    Other CLI's included in other distributions:
+
+    *   test-regexp-pattern (from Test::Regexp::Pattern)
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022, 2020, 2018, 2016 by perlancar
+    <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
 BUGS
     Please report any bugs or feature requests on the bugtracker website
     <https://rt.cpan.org/Public/Dist/Display.html?Name=App-RegexpPatternUtil
@@ -196,14 +227,4 @@ BUGS
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
-
-AUTHOR
-    perlancar <perlancar@cpan.org>
-
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2018, 2016 by
-    perlancar@cpan.org.
-
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
 

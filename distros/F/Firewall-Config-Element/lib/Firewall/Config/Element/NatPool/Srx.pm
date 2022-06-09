@@ -15,29 +15,13 @@ with 'Firewall::Config::Element::NatPool::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::NatPool::Rool::Srx 通用属性
 #------------------------------------------------------------------------------
-has natDirection => (
-  is      => 'ro',
-  isa     => 'Str',
-  default => 'source',
-);
+has natDirection => ( is => 'ro', isa => 'Str', default => 'source', );
 
-has poolPort => (
-  is       => 'ro',
-  isa      => 'Int',
-  required => 0,
-);
+has poolPort => ( is => 'ro', isa => 'Int', required => 0, );
 
-has poolPortRange => (
-  is       => 'ro',
-  isa      => 'Firewall::Utils::Set',
-  required => 0,
-);
+has poolPortRange => ( is => 'ro', isa => 'Firewall::Utils::Set', required => 0, );
 
-has zone => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has zone => ( is => 'ro', isa => 'Str', required => 0, );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildSign 方法，

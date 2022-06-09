@@ -15,65 +15,25 @@ with 'Firewall::Config::Element::DynamicNat::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::DynamicNat::Asa 通用属性
 #------------------------------------------------------------------------------
-has fromZone => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has fromZone => ( is => 'ro', isa => 'Str', required => 1, );
 
-has toZone => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has toZone => ( is => 'ro', isa => 'Str', required => 0, );
 
-has srcIpRange => (
-  is      => 'ro',
-  isa     => 'Firewall::Utils::Set',
-  default => sub { Firewall::Utils::Set->new },
-);
+has srcIpRange => ( is => 'ro', isa => 'Firewall::Utils::Set', default => sub { Firewall::Utils::Set->new }, );
 
-has dstIpRange => (
-  is      => 'ro',
-  isa     => 'Firewall::Utils::Set',
-  default => sub { Firewall::Utils::Set->new },
-);
+has dstIpRange => ( is => 'ro', isa => 'Firewall::Utils::Set', default => sub { Firewall::Utils::Set->new }, );
 
-has natSrcPool => (
-  is       => 'ro',
-  isa      => 'Firewall::Config::Element::NatPool::Asa | Undef',
-  required => 0,
-);
+has natSrcPool => ( is => 'ro', isa => 'Firewall::Config::Element::NatPool::Asa | Undef', required => 0, );
 
-has natSrcRange => (
-  is       => 'ro',
-  isa      => 'Firewall::Utils::Set | Undef',
-  required => 0,
-);
+has natSrcRange => ( is => 'ro', isa => 'Firewall::Utils::Set | Undef', required => 0, );
 
-has natDstPool => (
-  is       => 'ro',
-  isa      => 'Firewall::Config::Element::NatPool::Asa | Undef',
-  required => 0,
-);
+has natDstPool => ( is => 'ro', isa => 'Firewall::Config::Element::NatPool::Asa | Undef', required => 0, );
 
-has natDstRange => (
-  is       => 'ro',
-  isa      => 'Firewall::Utils::Set | Undef',
-  required => 0,
-);
+has natDstRange => ( is => 'ro', isa => 'Firewall::Utils::Set | Undef', required => 0, );
 
-has ruleName => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has ruleName => ( is => 'ro', isa => 'Str', required => 1, );
 
-has aclName => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has aclName => ( is => 'ro', isa => 'Str', required => 0, );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildRange 方法

@@ -1,5 +1,14 @@
 Release history for Zonemaster component Zonemaster-LDNS
 
+2.2.2 2022-06-09
+
+ [Features]
+ - Gives more freedom when configuring (#134, #129, #96)
+ - Replaces libidn with libidn2 (#133, #131)
+
+ [Fixes]
+ - Clarifies README on --ed25519 (#142)
+
 
 2.2.1 2021-12-03
  [Features]

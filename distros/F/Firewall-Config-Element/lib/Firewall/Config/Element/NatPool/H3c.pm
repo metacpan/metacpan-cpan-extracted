@@ -15,17 +15,9 @@ with 'Firewall::Config::Element::NatPool::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::NatPool::H3c 通用属性
 #------------------------------------------------------------------------------
-has '+poolIp' => (
-  is       => 'ro',
-  isa      => 'ArrayRef',
-  required => 1,
-);
+has '+poolIp' => ( is => 'ro', isa => 'ArrayRef', required => 1, );
 
-has name => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has name => ( is => 'ro', isa => 'Str', required => 0, );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildSign 方法，

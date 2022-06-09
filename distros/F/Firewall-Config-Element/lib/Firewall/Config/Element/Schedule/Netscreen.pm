@@ -15,53 +15,21 @@ with 'Firewall::Config::Element::Schedule::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Schedule::Netscreen 通用属性
 #------------------------------------------------------------------------------
-has startDate => (
-  is      => 'ro',
-  isa     => 'Undef|Str',
-  default => undef,
-);
+has startDate => ( is => 'ro', isa => 'Undef|Str', default => undef, );
 
-has endDate => (
-  is      => 'ro',
-  isa     => 'Undef|Str',
-  default => undef,
-);
+has endDate => ( is => 'ro', isa => 'Undef|Str', default => undef, );
 
-has weekday => (
-  is      => 'ro',
-  isa     => 'Undef|Str',
-  default => undef,
-);
+has weekday => ( is => 'ro', isa => 'Undef|Str', default => undef, );
 
-has startTime1 => (
-  is      => 'ro',
-  isa     => 'Undef|Str',
-  default => undef,
-);
+has startTime1 => ( is => 'ro', isa => 'Undef|Str', default => undef, );
 
-has endTime1 => (
-  is      => 'ro',
-  isa     => 'Undef|Str',
-  default => undef,
-);
+has endTime1 => ( is => 'ro', isa => 'Undef|Str', default => undef, );
 
-has startTime2 => (
-  is      => 'ro',
-  isa     => 'Undef|Str',
-  default => undef,
-);
+has startTime2 => ( is => 'ro', isa => 'Undef|Str', default => undef, );
 
-has endTime2 => (
-  is      => 'ro',
-  isa     => 'Undef|Str',
-  default => undef,
-);
+has endTime2 => ( is => 'ro', isa => 'Undef|Str', default => undef, );
 
-has description => (
-  is      => 'ro',
-  isa     => 'Undef|Str',
-  default => undef,
-);
+has description => ( is => 'ro', isa => 'Undef|Str', default => undef, );
 
 =example
 set scheduler "S_20120331" once start 10/10/2011 0:0 stop 3/31/2012 23:59
@@ -145,21 +113,13 @@ sub createTimeRange {
     if ( defined $self->weekday and defined $self->startTime1 and defined $self->endTime1 ) {
       my @times = ( {min => $self->startTime1, max => $self->endTime1} );
       if ( defined $self->startTime2 and defined $self->endTime2 ) {
-        push @times,
-          {
-          min => $self->startTime2,
-          max => $self->endTime2
-          };
+        push @times, {min => $self->startTime2, max => $self->endTime2};
       }
       for (@times) {
         my ( $min, $max ) = ( $_->{min}, $_->{max} );
         $min =~ s/://;
         $max =~ s/://;
-        push @{$self->{timeRange}{$self->weekday}},
-          {
-          min => $min + 0,
-          max => $max + 0
-          };
+        push @{$self->{timeRange}{$self->weekday}}, {min => $min + 0, max => $max + 0};
       }
     } ## end if ( defined $self->weekday...)
   } ## end elsif ( $self->schType eq...)

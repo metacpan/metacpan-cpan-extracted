@@ -17,6 +17,7 @@ WriteMakefile(
     'Hash::Merge' => 0
   },
   TEST_REQUIRES => {
+    'Dancer2' => 0,
     'File::Basename' => 0,
     'Path::Tiny' => 0,
     'FindBin' => 0,

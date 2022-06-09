@@ -15,12 +15,13 @@ name: Firewall-FireFlow-Config
 requires:
   Carp: '0'
   Expect: '0'
+  Firewall::DBI::Pg: '0'
+  Firewall::Policy::Designer: '0'
+  Firewall::Policy::Searcher: '0'
   Moose: '0'
   Try::Tiny: '0'
   namespace::autoclean: '0'
-  strict: '0'
-  warnings: '0'
-version: '0.002'
+version: '0.005'
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

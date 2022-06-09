@@ -14,11 +14,7 @@ with 'Firewall::Config::Element::Zone::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Zone::Asa 通用属性
 #------------------------------------------------------------------------------
-has aclName => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has aclName => ( is => 'ro', isa => 'Str', required => 0, );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildRange 方法

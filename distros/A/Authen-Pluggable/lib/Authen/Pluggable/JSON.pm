@@ -1,5 +1,5 @@
 package Authen::Pluggable::JSON;
-$Authen::Pluggable::JSON::VERSION = '0.02';
+$Authen::Pluggable::JSON::VERSION = '0.03';
 use Mojo::Base -base, -signatures;
 use Mojo::UserAgent;
 use Mojo::URL;
@@ -63,7 +63,7 @@ Authen::Pluggable::JSON - Authentication via external json
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

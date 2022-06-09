@@ -15,59 +15,24 @@ with 'Firewall::Config::Element::StaticNat::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::StaticNat::Netscreen 通用属性
 #------------------------------------------------------------------------------
-has mask => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has mask => ( is => 'ro', isa => 'Str', required => 1, );
 
-has natZone => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has natZone => ( is => 'ro', isa => 'Str', required => 1, );
 
-has realZone => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has realZone => ( is => 'ro', isa => 'Str', required => 1, );
 
-has realIp => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has realIp => ( is => 'ro', isa => 'Str', required => 1, );
 
-has realIpRange => (
-  is       => 'ro',
-  isa      => 'Firewall::Utils::Set',
-  required => 1,
-);
+has realIpRange => ( is => 'ro', isa => 'Firewall::Utils::Set', required => 1, );
 
-has natIpRange => (
-  is       => 'ro',
-  isa      => 'Firewall::Utils::Set',
-  required => 1,
-);
+has natIpRange => ( is => 'ro', isa => 'Firewall::Utils::Set', required => 1, );
 
-has natIp => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has natIp => ( is => 'ro', isa => 'Str', required => 1, );
 
-has dstIpRange => (
-  is      => 'ro',
-  isa     => 'Firewall::Utils::Set',
-  default => sub { Firewall::Utils::Set->new( 0, 4294967295 ) },
-);
+has dstIpRange =>
+  ( is => 'ro', isa => 'Firewall::Utils::Set', default => sub { Firewall::Utils::Set->new( 0, 4294967295 ) }, );
 
-has natInterface => (
-  is       => 'ro',
-  isa      => 'Str|Undef',
-  required => 0,
-);
+has natInterface => ( is => 'ro', isa => 'Str|Undef', required => 0, );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildRange 方法

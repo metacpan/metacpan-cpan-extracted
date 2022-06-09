@@ -16,6 +16,7 @@ script/week
 t/00_compile.t
 t/01_run.t
 t/02_misc.t
+t/03_modules.t
 t/Util.pm
 META.yml
 MANIFEST

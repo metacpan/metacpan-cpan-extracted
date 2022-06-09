@@ -1,5 +1,12 @@
 Revision history for Perl-Metrics-Halstead
 
+0.0616 2022-06-08 18:10:20
+    - Improve the test script.
+
+0.0615 2022-06-08 17:47:13
+    - Make eg/git-halstead visualize git revisions.
+    - Improve test file.
+
 0.0614 2022-01-26 10:52:04
     - Update link to write-up.
 

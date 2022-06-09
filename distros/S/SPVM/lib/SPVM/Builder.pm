@@ -149,12 +149,12 @@ sub create_build_object_path {
   my ($self, $rel_file) = @_;
   
   my $build_dir = $self->build_dir;
-  my $build_object_path = "$build_dir/work/object";
+  my $build_output_path = "$build_dir/work/object";
   if (defined $rel_file) {
-    $build_object_path .= "/$rel_file";
+    $build_output_path .= "/$rel_file";
   }
   
-  return $build_object_path;
+  return $build_output_path;
 }
 
 sub create_build_lib_path {

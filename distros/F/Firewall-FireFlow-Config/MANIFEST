@@ -15,6 +15,7 @@ lib/Firewall/FireFlow/Config/Neteye.pm
 lib/Firewall/FireFlow/Config/Netscreen.pm
 lib/Firewall/FireFlow/Config/Srx.pm
 lib/Firewall/FireFlow/Config/Topsec.pm
+pl.pl
 tests/Asa.t
 tests/Netscreen.t
 tests/Srx.t

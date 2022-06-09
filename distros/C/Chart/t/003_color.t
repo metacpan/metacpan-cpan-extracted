@@ -44,7 +44,6 @@ is(($red->hsl)[0],         0, 'named red has correct hsl hue component value');
 is(($red->hsl)[1],       100, 'named red has correct hsl saturation component value');
 is(($red->hsl)[2],        50, 'named red has correct hsl lightness component value');
 
-
 $red = Chart::Color->new('#FF0000');
 is( ref $red,     $module, 'could create object by hex value');
 is( $red->red,           255, 'hex red has correct red component value');
@@ -277,7 +276,7 @@ is( $white->add( $white, -0.5 )->name,                'gray',   "white - 0.5 whi
 is( Chart::Color->new(1,2,3)->add( 2,1,0)->name,     'gray1',   "adding positional args"); # = 3, 3, 3
 is( $red->add( {Saturation => -10} )->red,               242,   "paling red 10%, red value");
 is( $red->add( {Saturation => -10} )->blue,               13,   "paling red 10%, blue value");
-is( $white->add( {Lightness => -10} )->name,        'gray90',   "dimming white 10%");
+is( $white->add( {Lightness => -12} )->name,        'gray88',   "dimming white 12%");
 is( $black->add( {Red => 255} )->name,                 'red',   "creating pure red from black");
 is( $black->add( {Green => 255} )->name,              'lime',   "creating pure green from black");
 is( $black->add( {  b => 255} )->name,                'blue',   "creating pure blue from black with short name");
@@ -292,7 +291,7 @@ warning_like {$red->blend_with([1,1,1,1])}           {carped => qr/need exactly 
 warning_like {$red->blend_with({r=>1,g=>1,t=>1})}    {carped => qr/argument keys/},   "don't mix named args, in hash ref color def";
 warning_like {$red->blend_with({r=>1,g=>1,l=>1})}    {carped => qr/argument keys/},   "don't invent named args, in hash ref color def";
 
-is( $black->blend_with( $white )->name,                'gray50',   "blend black + white = gray");
+is( $black->blend_with( $white )->name,                  'gray',   "blend black + white = gray");
 is( $black->blend_with( $white, 0 )->name,              'black',   "blend nothing, keep color");
 is( $black->blend_with( $white, 1 )->name,              'white',   "blend nothing, take c2");
 is( $black->blend_with( $white, 2 )->name,              'white',   "RGB limits kept");
@@ -301,7 +300,6 @@ is( $red->blend_with( '#0000ff')->name,               'fuchsia',   "blending wit
 is( $red->blend_with( [0,0,255])->name,               'fuchsia',   "blending with array ref color def");
 is( $red->blend_with({R=> 0, G=> 0, B=>255})->name,   'fuchsia',   "blending with RGB hash ref color def");
 is( $red->blend_with({H=> 240, S=> 100, L=>50})->name,'fuchsia',   "blending with HSL hash ref color def");
-
 
 is( $black->gradient_to( $white, 1 )->name,             'black',   'shortest gradient is $self');
 my @g = $black->gradient_to( $white, 2 );

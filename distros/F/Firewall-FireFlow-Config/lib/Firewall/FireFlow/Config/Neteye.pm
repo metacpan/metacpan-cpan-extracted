@@ -4,44 +4,21 @@ package Firewall::FireFlow::Config::Neteye;
 # 加载扩展模块
 #------------------------------------------------------------------------------
 use Moose;
-use Carp;
 use Expect;
 use Try::Tiny;
 use namespace::autoclean;
 
-has host => (
-  is       => 'ro',
-  required => 0,
-);
+has host => ( is => 'ro', required => 0, );
 
-has username => (
-  is       => 'ro',
-  required => 0,
-  default  => 'read'
-);
+has username => ( is => 'ro', required => 0, default => 'read' );
 
-has password => (
-  is       => 'ro',
-  required => 0,
-  default  => '',
-);
+has password => ( is => 'ro', required => 0, default => '', );
 
-has enpassword => (
-  is       => 'ro',
-  required => 0,
-);
+has enpassword => ( is => 'ro', required => 0, );
 
-has proto => (
-  is       => 'ro',
-  required => 0,
-  default  => 'ssh',
-);
+has proto => ( is => 'ro', required => 0, default => 'ssh', );
 
-has _login_ => (
-  is       => 'ro',
-  required => 0,
-  default  => 0,
-);
+has _login_ => ( is => 'ro', required => 0, default => 0, );
 
 sub login {
   my $self = shift;
@@ -53,10 +30,7 @@ sub login {
     if (/RSA modulus too small/mi) {
       try { $self->connect('-v -1 -c des ') }
       catch {
-        return {
-          success => 0,
-          reason  => $_
-        };
+        return {success => 0, reason => $_};
       }
     }
     elsif (/Selected cipher type <unknown> not supported/mi) {
@@ -64,10 +38,7 @@ sub login {
         $self->connect('-c des ');
       }
       catch {
-        return {
-          success => 0,
-          reason  => $_
-        };
+        return {success => 0, reason => $_};
       }
     }
     elsif (/Connection refused/mi) {
@@ -76,10 +47,7 @@ sub login {
         $self->connect();
       }
       catch {
-        return {
-          success => 0,
-          reason  => $_
-        };
+        return {success => 0, reason => $_};
       }
     }
     elsif (/IDENTIFICATION HAS CHANGED/mi) {
@@ -88,17 +56,11 @@ sub login {
         $self->connect();
       }
       catch {
-        return {
-          success => 0,
-          reason  => $_
-        };
+        return {success => 0, reason => $_};
       }
     }
     else {
-      return {
-        success => 0,
-        reason  => $_
-      };
+      return {success => 0, reason => $_};
     }
   };
   return {success => 1};
@@ -168,10 +130,7 @@ sub getconfig {
   else {
     return $config;
   }
-  return {
-    success => 1,
-    config  => $lines
-  };
+  return {success => 1, config => $lines};
 }
 
 sub send {
@@ -229,20 +188,13 @@ sub execCommands {
     $self->send( $cmd . "\n" );
     my $buff = $self->waitfor();
     if ( $buff =~ /Invalid input detected\s+.+\^/mi ) {
-      return {
-        success     => 0,
-        failCommand => $cmd,
-        reason      => $result . $buff
-      };
+      return {success => 0, failCommand => $cmd, reason => $result . $buff};
     }
     else {
       $result .= $buff;
     }
   }
-  return {
-    success => 1,
-    result  => $result
-  };
+  return {success => 1, result => $result};
 } ## end sub execCommands
 
 sub enable {

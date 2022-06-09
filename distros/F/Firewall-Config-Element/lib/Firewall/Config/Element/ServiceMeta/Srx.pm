@@ -14,23 +14,11 @@ with 'Firewall::Config::Element::ServiceMeta::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::ServiceMeta::Srx 通用属性
 #------------------------------------------------------------------------------
-has term => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has term => ( is => 'ro', isa => 'Str', required => 1, );
 
-has timeout => (
-  is      => 'ro',
-  isa     => 'Undef|Str',
-  default => undef,
-);
+has timeout => ( is => 'ro', isa => 'Undef|Str', default => undef, );
 
-has uuid => (
-  is      => 'ro',
-  isa     => 'Undef|Str',
-  default => undef,
-);
+has uuid => ( is => 'ro', isa => 'Undef|Str', default => undef, );
 
 #------------------------------------------------------------------------------
 # Moose BUILDARGS 在实例创建之前生效，可以接收哈希和哈希的引用

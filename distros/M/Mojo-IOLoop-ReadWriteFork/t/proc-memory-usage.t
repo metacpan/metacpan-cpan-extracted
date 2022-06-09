@@ -3,6 +3,7 @@ use Mojo::IOLoop::ReadWriteFork;
 use Test::More;
 use Time::HiRes qw(time);
 
+plan skip_all => "Perl $^V"                unless version->parse($^V) > 5.026;
 plan skip_all => 'TEST_MEMORY=10'          unless $ENV{TEST_MEMORY};
 plan skip_all => "open /proc/$$/statm: $!" unless do { sysopen my $PROC, "/proc/$$/statm", 0 };
 

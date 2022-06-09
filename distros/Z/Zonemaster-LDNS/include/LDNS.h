@@ -13,7 +13,7 @@
 #include <ldns/ldns.h>
 
 #ifdef WE_CAN_HAZ_IDN
-#include <idna.h>
+#include <idn2.h>
 #endif
 
 /* ldns 1.6.17 does not have this in its header files, but it is in the published documentation and we need it */

@@ -15,11 +15,7 @@ with 'Firewall::Config::Element::AddressGroup::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::AddressGroup::Netscreen 通用属性
 #------------------------------------------------------------------------------
-has zone => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has zone => ( is => 'ro', isa => 'Str', required => 1, );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildSign 方法，

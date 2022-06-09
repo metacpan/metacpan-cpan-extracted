@@ -17,71 +17,27 @@ with 'Firewall::Config::Element::Rule::Role';
 # Firewall::Config::Element::Rule::H3c 通用属性
 #------------------------------------------------------------------------------
 #rule type ACL or object-policy(obj)
-has ruleType => (
-  is      => 'ro',
-  isa     => 'Str',
-  default => 'obj'
-);
+has ruleType => ( is => 'ro', isa => 'Str', default => 'obj' );
 
-has objName => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has objName => ( is => 'ro', isa => 'Str', required => 0, );
 
-has aclName => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has aclName => ( is => 'ro', isa => 'Str', required => 0, );
 
-has aclRuleNum => (
-  is       => 'ro',
-  isa      => 'Int',
-  required => 0,
-);
+has aclRuleNum => ( is => 'ro', isa => 'Int', required => 0, );
 
-has aclType => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has aclType => ( is => 'ro', isa => 'Str', required => 0, );
 
-has policyId => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has policyId => ( is => 'ro', isa => 'Str', required => 0, );
 
-has fromZone => (
-  is       => 'ro',
-  isa      => 'Str|Undef',
-  required => 0,
-);
+has fromZone => ( is => 'ro', isa => 'Str|Undef', required => 0, );
 
-has toZone => (
-  is       => 'ro',
-  isa      => 'Str|Undef',
-  required => 0,
-);
+has toZone => ( is => 'ro', isa => 'Str|Undef', required => 0, );
 
-has fromInterface => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has fromInterface => ( is => 'ro', isa => 'Str', required => 0, );
 
-has toInterface => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has toInterface => ( is => 'ro', isa => 'Str', required => 0, );
 
-has '+action' => (
-  is      => 'ro',
-  isa     => 'Str',
-  default => 'permit',
-);
+has '+action' => ( is => 'ro', isa => 'Str', default => 'permit', );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildRange 方法

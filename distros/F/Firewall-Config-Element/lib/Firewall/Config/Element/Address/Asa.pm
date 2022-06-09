@@ -15,16 +15,10 @@ with 'Firewall::Config::Element::Address::Role';
 # Firewall::Config::Element::Address::Asa 通用属性
 #------------------------------------------------------------------------------
 # 改写 addrName 属性
-has '+addrName' => (
-  required => 0,
-);
+has '+addrName' => ( required => 0, );
 
 # 新增 iprange 属性
-has iprange => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has iprange => ( is => 'ro', isa => 'Str', required => 0, );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildSign 方法，

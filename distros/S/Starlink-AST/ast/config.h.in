@@ -1,5 +1,8 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* use external CMINPACK libraries */
+#undef EXTERNAL_CMINPACK
+
 /* use external PAL and ERFA libraries */
 #undef EXTERNAL_PAL
 

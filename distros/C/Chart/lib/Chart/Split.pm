@@ -18,7 +18,7 @@ use v5.12;
 
 package Chart::Split;
 our @ISA     = qw(Chart::Base);
-our $VERSION = 'v2.402.0';
+our $VERSION = 'v2.402.1';
 
 use Chart::Base;
 use GD;

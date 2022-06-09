@@ -1,3 +1,4 @@
+[![Actions Status](https://github.com/cho45/Test-Time/actions/workflows/test.yml/badge.svg)](https://github.com/cho45/Test-Time/actions)
 # NAME
 
 Test::Time - Overrides the time() and sleep() core functions for testing
@@ -17,7 +18,7 @@ Test::Time - Overrides the time() and sleep() core functions for testing
 
 # DESCRIPTION
 
-Test::Time can be used to test modules that deal with time. Once you `use` this 
+Test::Time can be used to test modules that deal with time. Once you `use` this
 module, all references to `time`, `localtime` and `sleep` will be internalized.
 You can set custom time by passing time => number after the `use` statement:
 

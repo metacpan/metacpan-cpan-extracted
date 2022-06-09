@@ -1,0 +1,4 @@
+name = "CGI-Carp-WarningsToBrowser"
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+

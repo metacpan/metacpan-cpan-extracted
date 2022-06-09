@@ -14,12 +14,7 @@ with 'Firewall::Config::Element::ServiceMeta::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::ServiceMeta::Netscreen 通用属性
 #------------------------------------------------------------------------------
-has timeout => (
-  is      => 'ro',
-  isa     => 'Undef|Str',
-  default => undef,
-  writer  => 'setTimeout',
-);
+has timeout => ( is => 'ro', isa => 'Undef|Str', default => undef, writer => 'setTimeout', );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildRange 方法

@@ -16,24 +16,11 @@ with 'Firewall::Config::Element::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Zone::Role 通用属性
 #------------------------------------------------------------------------------
-has name => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has name => ( is => 'ro', isa => 'Str', required => 1, );
 
-has interfaces => (
-  is      => 'ro',
-  does    => 'HashRef[Firewall::Config::Element::Interface::Role]',
-  default => sub { {} },
-);
+has interfaces => ( is => 'ro', does => 'HashRef[Firewall::Config::Element::Interface::Role]', default => sub { {} }, );
 
-has range => (
-  is      => 'ro',
-  isa     => 'Firewall::Utils::Set',
-  lazy    => 1,
-  default => sub { Firewall::Utils::Set->new() }
-);
+has range => ( is => 'ro', isa => 'Firewall::Utils::Set', lazy => 1, default => sub { Firewall::Utils::Set->new() } );
 
 #------------------------------------------------------------------------------
 # 安全区添加接口

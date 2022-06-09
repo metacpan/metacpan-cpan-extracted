@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 37;
+use Test::More tests => 39;
 BEGIN { use_ok('Excel::Writer::XLSX::CDF') };
 
 {
@@ -14,11 +14,12 @@ BEGIN { use_ok('Excel::Writer::XLSX::CDF') };
   can_ok($e, 'chart_y_label');
   can_ok($e, 'group_names_sort');
   can_ok($e, 'generate');
+  can_ok($e, 'generate_file');
 
   is($e->chart_title, 'Continuous Distribution Function (CDF)', 'chart_title');
   isa_ok($e->chart_colors, 'ARRAY', 'chart_colors');
   is($e->chart_x_label, '', 'chart_x_label');
-  is($e->chart_y_label, 'Distribution', 'chart_y_label');
+  is($e->chart_y_label, 'Probability', 'chart_y_label');
   ok(!$e->group_names_sort, 'group_names_sort');
 
   is($e->chart_title('My Title'), 'My Title', 'chart_title');
@@ -37,6 +38,7 @@ BEGIN { use_ok('Excel::Writer::XLSX::CDF') };
   can_ok($e, 'chart_y_label');
   can_ok($e, 'group_names_sort');
   can_ok($e, 'generate');
+  can_ok($e, 'generate_file');
 
   is($e->chart_title, 'chart_title', 'chart_title');
   isa_ok($e->chart_colors, 'ARRAY', 'chart_colors');

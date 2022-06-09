@@ -1,5 +1,5 @@
 package Authen::Pluggable::AD;
-$Authen::Pluggable::AD::VERSION = '0.02';
+$Authen::Pluggable::AD::VERSION = '0.03';
 use Mojo::Base -base, -signatures;
 use Net::LDAP;
 
@@ -88,7 +88,7 @@ Authen::Pluggable::AD - Authentication via Active Directory
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 AUTHOR
 

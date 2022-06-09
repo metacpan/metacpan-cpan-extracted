@@ -3,15 +3,10 @@ package Firewall::Utils::Cache;
 #------------------------------------------------------------------------------
 # 加载扩展模块
 #------------------------------------------------------------------------------
-use Carp;
 use Moose;
 use namespace::autoclean;
 
-has cache => (
-  is      => 'ro',
-  isa     => 'HashRef[Ref]',
-  default => sub { {} },
-);
+has cache => ( is => 'ro', isa => 'HashRef[Ref]', default => sub { {} }, );
 
 sub get {
   my $self = shift;
@@ -37,7 +32,7 @@ sub set {
     }
   }
   $ref->{$lastKey} = $value;
-} ## end sub set
+}
 
 sub clear {
   my $self = shift;

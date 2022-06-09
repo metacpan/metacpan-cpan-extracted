@@ -3,34 +3,17 @@ package Firewall::Utils::Mail;
 #------------------------------------------------------------------------------
 # 加载扩展模块
 #------------------------------------------------------------------------------
-use Carp;
 use Moose;
 use namespace::autoclean;
 use Mail::Sender;
 
-has smtp => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has smtp => ( is => 'ro', isa => 'Str', required => 1, );
 
-has from => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has from => ( is => 'ro', isa => 'Str', required => 1, );
 
-has charset => (
-  is      => 'ro',
-  isa     => 'Str',
-  builder => '_buildCharset',
-);
+has charset => ( is => 'ro', isa => 'Str', builder => '_buildCharset', );
 
-has displayFormat => (
-  is      => 'ro',
-  isa     => 'Str',
-  default => 'text/html',
-);
+has displayFormat => ( is => 'ro', isa => 'Str', default => 'text/html', );
 
 sub _buildCharset {
   my $self = shift;
@@ -101,11 +84,11 @@ sub sendmail {
     $sender->Close();
   };
 
-  if (!!$@) {
+  if ( !!$@ ) {
     $@ =~ s/\s+$//;
     confess($@);
   }
-} ## end sub sendmail
+}
 
 __PACKAGE__->meta->make_immutable;
 1;

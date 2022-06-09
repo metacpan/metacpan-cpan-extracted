@@ -3,8 +3,9 @@ use v5.12;
 # check, convert and measure color values
 
 package Chart::Color::Value;
-our $VERSION = 'v2.402.0';
+our $VERSION = 'v2.402.1';
 use Carp;
+use POSIX ();
 
 sub check_rgb { # carp returns 1
     my (@rgb) = @_;
@@ -33,7 +34,7 @@ sub trim_rgb { # cut values into the domain of definition of 0 .. 255
         $rgb[$_] =   0 if $rgb[$_] <   0;
         $rgb[$_] = 255 if $rgb[$_] > 255;
     }
-    $rgb[$_] = int $rgb[$_] + 0.5 for 0..2;
+    $rgb[$_] = round($rgb[$_]) for 0..2;
     @rgb;
 }
 
@@ -46,7 +47,7 @@ sub trim_hsl { # cut values into 0 ..359, 0 .. 100, 0 .. 100
         $hsl[$_] =   0 if $hsl[$_] <   0;
         $hsl[$_] = 100 if $hsl[$_] > 100; 
     }
-    $hsl[$_] = int $hsl[$_] + 0.5 for 0..2;
+    $hsl[$_] = round($hsl[$_]) for 0..2;
     @hsl;
 }
 
@@ -93,7 +94,7 @@ sub hsl_from_rgb { # convert color value triplet (int --> int), (real --> real) 
     check_rgb( @rgb ) and return unless $real;
     my @hsl = _hsl_from_rgb( @rgb );
     return @hsl if $real;
-    ( int( $hsl[0] + 0.5 ), int( $hsl[1] + 0.5), int( $hsl[2] + 0.5) );
+    ( round( $hsl[0] ), round( $hsl[1] ), round( $hsl[2] ) );
 }
 
 sub rgb_from_hsl { # convert color value triplet (int > int), (real > real) if $real
@@ -106,7 +107,7 @@ sub rgb_from_hsl { # convert color value triplet (int > int), (real > real) if $
     check_hsl( @hsl ) and return unless $real;
     my @rgb = _rgb_from_hsl( @hsl );
     return @rgb if $real;
-    ( int( $rgb[0] + 0.5 ), int( $rgb[1] + 0.5), int( $rgb[2] + 0.5) );
+    ( round( $rgb[0] ), round( $rgb[1] ), round( $rgb[2] ) );
 }
 
 sub hex_from_rgb {  return unless @_ == 3;  sprintf "#%02x%02x%02x", @_ }
@@ -146,6 +147,14 @@ sub _rgb_from_hsl { # float conversion
          : ($hsl[0] < 5) ? ($X + $m,      $m, $C + $m)
          :                 ($C + $m,      $m, $X + $m);
 }
+
+my $half = 0.50000000000008;
+
+sub round {
+  $_[0] >= 0 ? POSIX::floor($_[0] + $half)
+             : POSIX::ceil($_[0] - $half)
+}
+
 
 1;
 

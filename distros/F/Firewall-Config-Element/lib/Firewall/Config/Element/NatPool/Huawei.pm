@@ -16,30 +16,14 @@ with 'Firewall::Config::Element::NatPool::Role';
 # Firewall::Config::Element::NatPool::Huawei 通用属性
 #------------------------------------------------------------------------------
 
-has '+poolIp' => (
-  is       => 'ro',
-  isa      => 'ArrayRef',
-  required => 0,
-);
+has '+poolIp' => ( is => 'ro', isa => 'ArrayRef', required => 0, );
 
-has mode => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has mode => ( is => 'ro', isa => 'Str', required => 0, );
 
 #source destination bidirect
-has natDirection => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has natDirection => ( is => 'ro', isa => 'Str', required => 0, );
 
-has id => (
-  is       => 'ro',
-  isa      => 'Int',
-  required => 0,
-);
+has id => ( is => 'ro', isa => 'Int', required => 0, );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildSign 方法，

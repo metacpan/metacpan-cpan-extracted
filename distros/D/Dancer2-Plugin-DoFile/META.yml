@@ -3,6 +3,7 @@ abstract: 'A file based MVC style plugin for Dancer2'
 author:
   - 'Pero Moretti'
 build_requires:
+  Dancer2: '0'
   ExtUtils::MakeMaker: '0'
   File::Basename: '0'
   FindBin: '0'
@@ -36,5 +37,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/Pero-Moretti/Perl-Dancer2-Plugin-DoFile.git
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

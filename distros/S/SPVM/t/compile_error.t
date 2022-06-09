@@ -126,16 +126,6 @@ sub print_error_messages {
   compile_not_ok_file('TestCase::CompileError::OArray::AssignNumericArray');
 }
 
-# Call sub
-{
-  {
-    
-    compile_not_ok_file('TestCase::CompileError::Switch::NoLastBreak');
-    
-    
-  }
-}
-
 # Multi-numeric
 {
   compile_not_ok_file('TestCase::CompileError::MultiNumeric::FieldsZero');
@@ -705,6 +695,20 @@ sub print_error_messages {
       compile_not_ok($source, qr/Redeclaration of the class variable "\$FOO" in the class "Tmp"/);
     }
   }
+}
+
+# switch statement
+{
+  {
+    my $source = 'class Tmp { use Fn; static method main : void () { switch (1) { case Fn->INT32_MAX: {} } }}';
+    compile_not_ok($source, qr/The operand of the case statement must be a constant value/);
+  }
+  {
+    my $source = 'class Tmp { use Fn; static method main : void () { switch (1) { case 1: {} case 1: {} } }}';
+    compile_not_ok($source, qr/The values of the case statements can't be duplicated/);
+  }
+  
+  
 }
 
 done_testing;

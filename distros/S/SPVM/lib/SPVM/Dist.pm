@@ -67,6 +67,17 @@ sub precompile {
   }
 }
 
+sub resource {
+  my $self = shift;
+  if (@_) {
+    $self->{resource} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{resource};
+  }
+}
+
 sub only_lib_files {
   my $self = shift;
   if (@_) {
@@ -188,7 +199,12 @@ sub new {
   if (defined $native && !($native eq 'c' || $native eq 'c++')) {
     confess "Can't support native \"$native\"";
   }
-
+  
+  my $resource = $self->resource;
+  if ($resource && !defined $native) {
+    $self->native('c');
+  }
+  
   return $self;
 }
 
@@ -481,12 +497,15 @@ sub generate_makefile_pl_file {
   
   # Class name
   my $class_name = $self->class_name;
-
+  
+  # Resource
+  my $resource = $self->resource;
+  
   # Native make rule
-  my $make_rule_native = $self->native ? "\$make_rule .= SPVM::Builder::Util::API::create_make_rule_native('$class_name');" : '';
+  my $make_rule_native = $self->native && !$resource ? "\$make_rule .= SPVM::Builder::Util::API::create_make_rule_native('$class_name');" : '';
   
   # Precompile make rule
-  my $make_rule_precompile = $self->precompile ? "\$make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('$class_name');" : '';
+  my $make_rule_precompile = $self->precompile && !$resource ? "\$make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('$class_name');" : '';
 
   my $perl_module_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name, 'pm');
   $perl_module_rel_file =  $self->create_lib_rel_file($perl_module_rel_file);
@@ -558,6 +577,7 @@ use strict;
 use warnings;
 use FindBin;
 use lib "\$FindBin::Bin/lib";
+BEGIN { \$ENV{SPVM_BUILD_DIR} = "\$FindBin::Bin/.spvm_build"; }
 
 use SPVM 'TestCase::$class_name';
 
@@ -577,8 +597,21 @@ sub generate_basic_test_spvm_module_file {
   # Class name
   my $class_name = $self->class_name;
   
+  # Resource
+  my $resource = $self->resource;
+  
   # Content
-  my $basic_test_spvm_module_content = <<"EOS";
+  my $basic_test_spvm_module_content;
+  
+  if ($resource) {
+    $basic_test_spvm_module_content = <<"EOS";
+class TestCase::$class_name {
+  native static method test : int ();
+}
+EOS
+  }
+  else {
+    $basic_test_spvm_module_content = <<"EOS";
 class TestCase::$class_name {
   static method test : int () {
     
@@ -586,11 +619,106 @@ class TestCase::$class_name {
   }
 }
 EOS
+  }
   
   # Generate file
   my $basic_test_spvm_module_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file("TestCase::$class_name", 'spvm');
   $basic_test_spvm_module_rel_file = "t/lib/$basic_test_spvm_module_rel_file";
   $self->generate_file($basic_test_spvm_module_rel_file, $basic_test_spvm_module_content);
+}
+
+sub generate_basic_test_native_config_file {
+  my ($self) = @_;
+  
+  # Class name
+  my $class_name = $self->class_name;
+  
+  # Resource
+  my $resource = $self->resource;
+
+  # C or C++
+  my $native = $self->native;
+  my $new_method;
+  if ($native eq 'c') {
+    $new_method = 'new_gnu99';
+  }
+  elsif ($native eq 'c++') {
+    $new_method = 'new_cpp';
+  }
+  
+  # Content
+  my $basic_test_native_config_content = <<"EOS";
+use strict;
+use warnings;
+
+my \$config = SPVM::Builder::Config->$new_method;
+
+\$config->use_resource('$class_name');
+
+\$config;
+EOS
+  
+  # Generate file
+  my $basic_test_native_config_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file("TestCase::$class_name", 'config');
+  $basic_test_native_config_rel_file = "t/lib/$basic_test_native_config_rel_file";
+  $self->generate_file($basic_test_native_config_rel_file, $basic_test_native_config_content);
+}
+
+sub generate_basic_test_native_module_file {
+  my ($self) = @_;
+  
+  # Class name
+  my $class_name = $self->class_name;
+  
+  # Resource
+  my $resource = $self->resource;
+
+  # extern C for C++
+  my $native = $self->native;
+  my $extern_c_start;
+  my $extern_c_end;
+  if ($native eq 'c++') {
+    $extern_c_start = qq(extern "C" {);
+    $extern_c_end = "}";
+  }
+  else {
+    $extern_c_start = '';
+    $extern_c_end = '';
+  }
+  
+  # Content
+  my $native_class_name = $class_name;
+  $native_class_name =~ s/::/__/g;
+  my $basic_test_native_module_content = <<"EOS";
+#include "spvm_native.h"
+
+$extern_c_start
+
+int32_t SPVM__TestCase__${native_class_name}__test(SPVM_ENV* env, SPVM_VALUE* stack) {
+  (void)env;
+  (void)stack;
+  
+  stack[0].ival = 1;
+  
+  return 0;
+}
+
+$extern_c_end
+EOS
+  
+  # Generate file
+  my $native_module_ext;
+  if (defined $native) {
+    if ($native eq 'c') {
+      $native_module_ext = 'c';
+    }
+    elsif ($native eq 'c++') {
+      $native_module_ext = 'cpp';
+    }
+  }
+  my $basic_test_native_module_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file("TestCase::$class_name", $native_module_ext);
+  $basic_test_native_module_rel_file = "t/lib/$basic_test_native_module_rel_file";
+  $self->generate_file($basic_test_native_module_rel_file, $basic_test_native_module_content);
 }
 
 sub generate_dist {
@@ -599,6 +727,7 @@ sub generate_dist {
   my $class_name = $self->class_name;
   
   my $native = $self->native;
+  my $resource = $self->resource;
   
   my $class_name_rel_file = $class_name;
   $class_name_rel_file =~ s|::|/|g;
@@ -608,8 +737,10 @@ sub generate_dist {
   $self->generate_dir($output_dir);
   
   # Generate SPVM module file
-  $self->generate_spvm_module_file;
-
+  unless ($resource) {
+    $self->generate_spvm_module_file;
+  }
+  
   # Generate Perl module file
   my $no_pm_file = $self->no_pm_file;
   unless ($no_pm_file) {
@@ -621,7 +752,9 @@ sub generate_dist {
     $self->generate_native_config_file;
     
     # Generate native module file
-    $self->generate_native_module_file;
+    unless ($resource) {
+      $self->generate_native_module_file;
+    }
     
     # Generate ".gitkeep" file for native module include directory
     $self->generate_gitkeep_file_for_native_module_include_dir;
@@ -652,6 +785,14 @@ sub generate_dist {
 
     # Generate basic test SPVM module file
     $self->generate_basic_test_spvm_module_file;
+
+    if ($resource) {
+      # Generate basic test native module file
+      $self->generate_basic_test_native_module_file;
+
+      # Generate basic test native config file
+      $self->generate_basic_test_native_config_file;
+    }
   }
 }
 

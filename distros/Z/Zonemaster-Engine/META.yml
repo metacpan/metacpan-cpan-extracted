@@ -27,7 +27,6 @@ no_index:
     - t
 recommends:
   Net::IP::XS: 0
-  Readonly::XS: 0
 requires:
   Class::Accessor: 0
   Clone: 0
@@ -35,7 +34,6 @@ requires:
   File::ShareDir: 1
   File::Slurp: 0
   IO::Socket::INET6: 2.69
-  JSON::PP: 0
   List::MoreUtils: 0
   Locale::TextDomain: 1.2
   Module::Find: 0.1
@@ -44,10 +42,10 @@ requires:
   Net::IP: 1.26
   Readonly: 0
   Text::CSV: 0
-  Zonemaster::LDNS: 2.002
+  Zonemaster::LDNS: 2.002002
   perl: 5.14.2
 resources:
   bugtracker: https://github.com/zonemaster/zonemaster-engine/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/zonemaster/zonemaster-engine
-version: '4.004000'
+version: '4.005000'

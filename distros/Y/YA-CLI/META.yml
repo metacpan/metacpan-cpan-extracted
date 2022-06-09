@@ -1,0 +1,61 @@
+---
+abstract: 'Do CLI things'
+author:
+  - 'Wesley Schwengle <waterkip@cpan.org>'
+build_requires:
+  Cwd: '0'
+  File::Spec: '0'
+  File::Spec::Functions: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Import::Into: '1.002003'
+  Sub::Override: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::Lib: '0'
+  Test::More: '0.96'
+  Test::Most: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: YA-CLI
+provides:
+  YA::CLI:
+    file: lib/YA/CLI.pm
+    version: '0.001'
+  YA::CLI::ActionRole:
+    file: lib/YA/CLI/ActionRole.pm
+    version: '0.001'
+  YA::CLI::ErrorHandler:
+    file: lib/YA/CLI/ErrorHandler.pm
+    version: '0.001'
+  YA::CLI::Usage:
+    file: lib/YA/CLI/Usage.pm
+    version: '0.001'
+requires:
+  Carp: '0'
+  Getopt::Long: '0'
+  List::Util: '0'
+  Module::Pluggable::Object: '0'
+  Module::Runtime: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  Pod::Find: '0'
+  Pod::Usage: '0'
+  namespace::autoclean: '0'
+  perl: '5.010'
+resources:
+  repository: git://gitlab.com/waterkip/yet-another-cli-module.git
+version: '0.001'
+x_contributors:
+  - 'Wesley Schwengle <wesley@opperschaap.net>'
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: BSD

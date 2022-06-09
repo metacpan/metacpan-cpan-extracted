@@ -22,11 +22,11 @@ sub telnet {
     proto    => 'telnet'
   );
   my $config = $conn->getconfig();
-  if ( $config->{"success"} ) {
-    return $config->{"config"};
+  if ( $config->{success} ) {
+    return $config->{config};
   }
   else {
-    confess $config->{"reason"};
+    confess $config->{reason};
   }
 }
 
@@ -43,11 +43,11 @@ sub ssh {
     proto    => 'ssh'
   );
   my $config = $conn->getconfig();
-  if ( $config->{"success"} ) {
-    return $config->{"config"};
+  if ( $config->{success} ) {
+    return $config->{config};
   }
   else {
-    confess $config->{"reason"};
+    confess $config->{reason};
   }
 }
 

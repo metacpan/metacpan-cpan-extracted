@@ -1,6 +1,8 @@
 package Firewall::Config::Content::Static;
 
-use 5.018;
+#------------------------------------------------------------------------------
+# 加载扩展模块
+#------------------------------------------------------------------------------
 use Moose;
 use Encode;
 use Digest::MD5;
@@ -10,24 +12,11 @@ use namespace::autoclean;
 #------------------------------------------------------------------------------
 # 定义 Content::Static 通用属性
 #------------------------------------------------------------------------------
-has config => (
-  is       => 'ro',
-  isa      => 'ArrayRef[Str]',
-  required => 1,
-);
+has config => ( is => 'ro', isa => 'ArrayRef[Str]', required => 1, );
 
-has confContent => (
-  is      => 'ro',
-  isa     => 'Str',
-  lazy    => 1,
-  builder => '_buildConfContent',
-);
+has confContent => ( is => 'ro', isa => 'Str', lazy => 1, builder => '_buildConfContent', );
 
-has cursor => (
-  is      => 'ro',
-  isa     => 'Int',
-  default => 0,
-);
+has cursor => ( is => 'ro', isa => 'Int', default => 0, );
 
 #------------------------------------------------------------------------------
 # 引用 Firewall::Config::Content::Role 角色属性和方法约束
@@ -37,17 +26,9 @@ with 'Firewall::Config::Content::Role';
 #------------------------------------------------------------------------------
 # 改写 confSign 属性并设置懒加载，提供构建方法
 #------------------------------------------------------------------------------
-has '+confSign' => (
-  required => 0,
-  lazy     => 1,
-  builder  => '_buildConfSign',
-);
+has '+confSign' => ( required => 0, lazy => 1, builder => '_buildConfSign', );
 
-has '+timestamp' => (
-  required => 0,
-  lazy     => 1,
-  builder  => '_buildTimestamp',
-);
+has '+timestamp' => ( required => 0, lazy => 1, builder => '_buildTimestamp', );
 
 #------------------------------------------------------------------------------
 # 配置文件哈希方法
@@ -158,7 +139,7 @@ sub nextUnParsedLine {
     # 设置解析状态标志位，并自增游标号
     $self->setParseFlag;
     $self->{cursor}++;
-  } ## end if ( $self->cursor < scalar...)
+  }
 
   # 取出首尾空白字符串
   chomp $result if ( defined $result );

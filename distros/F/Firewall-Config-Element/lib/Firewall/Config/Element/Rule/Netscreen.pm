@@ -16,42 +16,17 @@ with 'Firewall::Config::Element::Rule::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Rule::Netscreen 通用属性
 #------------------------------------------------------------------------------
-has policyId => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has policyId => ( is => 'ro', isa => 'Str', required => 1, );
 
-has fromZone => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has fromZone => ( is => 'ro', isa => 'Str', required => 1, );
 
-has toZone => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has toZone => ( is => 'ro', isa => 'Str', required => 1, );
 
-has hasApplicationCheck => (
-  is      => 'ro',
-  isa     => 'Undef|Str',
-  default => undef,
-  writer  => 'setHasApplicationCheck',
-);
+has hasApplicationCheck => ( is => 'ro', isa => 'Undef|Str', default => undef, writer => 'setHasApplicationCheck', );
 
-has alias => (
-  is      => 'ro',
-  isa     => 'Undef|Str',
-  default => undef,
-);
+has alias => ( is => 'ro', isa => 'Undef|Str', default => undef, );
 
-has priority => (
-  is       => 'ro',
-  isa      => 'Int',
-  required => 1,
-);
+has priority => ( is => 'ro', isa => 'Int', required => 1, );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildRange 方法
@@ -66,11 +41,8 @@ sub _buildSign {
 #------------------------------------------------------------------------------
 sub _buildSrcAddressGroup {
   my $self = shift;
-  return Firewall::Config::Element::AddressGroup::Netscreen->new(
-    fwId          => $self->fwId,
-    addrGroupName => '^',
-    zone          => '^'
-  );
+  return Firewall::Config::Element::AddressGroup::Netscreen->new( fwId => $self->fwId, addrGroupName => '^',
+    zone => '^' );
 }
 
 #------------------------------------------------------------------------------
@@ -78,11 +50,8 @@ sub _buildSrcAddressGroup {
 #------------------------------------------------------------------------------
 sub _buildDstAddressGroup {
   my $self = shift;
-  return Firewall::Config::Element::AddressGroup::Netscreen->new(
-    fwId          => $self->fwId,
-    addrGroupName => '^',
-    zone          => '^'
-  );
+  return Firewall::Config::Element::AddressGroup::Netscreen->new( fwId => $self->fwId, addrGroupName => '^',
+    zone => '^' );
 }
 
 #------------------------------------------------------------------------------
@@ -90,10 +59,7 @@ sub _buildDstAddressGroup {
 #------------------------------------------------------------------------------
 sub _buildServiceGroup {
   my $self = shift;
-  return Firewall::Config::Element::ServiceGroup::Netscreen->new(
-    fwId         => $self->fwId,
-    srvGroupName => '^'
-  );
+  return Firewall::Config::Element::ServiceGroup::Netscreen->new( fwId => $self->fwId, srvGroupName => '^' );
 }
 
 #------------------------------------------------------------------------------

@@ -13,11 +13,7 @@ with 'Firewall::Config::Element::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::ProtocolGroup::Role 通用属性
 #------------------------------------------------------------------------------
-has proGroupName => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has proGroupName => ( is => 'ro', isa => 'Str', required => 1, );
 
 has proGroupMembers => (
   is   => 'ro',
@@ -26,11 +22,7 @@ has proGroupMembers => (
   default => sub { {} },
 );
 
-has protocols => (
-  is      => 'ro',
-  does    => 'HashRef[Firewall::Config::Element::Protocol::Role]',
-  default => sub { {} },
-);
+has protocols => ( is => 'ro', does => 'HashRef[Firewall::Config::Element::Protocol::Role]', default => sub { {} }, );
 
 #------------------------------------------------------------------------------
 # 新增协议对象成员方法

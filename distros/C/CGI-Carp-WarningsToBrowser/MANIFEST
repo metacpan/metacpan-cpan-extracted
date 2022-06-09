@@ -1,0 +1,13 @@
+Build.PL
+Changes
+INSTALL
+LICENSE
+META.json
+README.md
+cpanfile
+lib/CGI/Carp/WarningsToBrowser.pm
+minil.toml
+t/00_compile.t
+t/CGI_output.t
+META.yml
+MANIFEST

@@ -157,3 +157,4 @@ lib/Firewall/Config/Element/Zone/Role.pm
 lib/Firewall/Config/Element/Zone/Srx.pm
 lib/Firewall/Config/Element/Zone/Srx.t
 lib/Firewall/Config/Element/Zone/Topsec.pm
+pl.pl

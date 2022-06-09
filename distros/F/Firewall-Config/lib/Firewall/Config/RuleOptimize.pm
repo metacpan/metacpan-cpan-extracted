@@ -19,10 +19,7 @@ use Firewall::Config::Dao::Parser;
 #------------------------------------------------------------------------------
 # 数据库联结插件
 #------------------------------------------------------------------------------
-has dbi => (
-  is   => 'ro',
-  does => 'Firewall::DBI::Role',
-);
+has dbi => ( is => 'ro', does => 'Firewall::DBI::Role', );
 
 #------------------------------------------------------------------------------
 # 加载系统模块
@@ -32,7 +29,7 @@ sub optimizeRule {
   my $dao    = Firewall::Config::Dao::Parser->new( dbi => $self->dbi );
   my $parser = $dao->loadParser($fwId);
   my $class  = ref($parser);
-  eval {"use $class;"};
+  eval("use $class");
   confess $@ if !!$@;
 
   my @rules  = values %{$parser->{elements}->{rule}};
@@ -52,12 +49,7 @@ sub optimizeRule {
       my $srvSet1 = $self->getSrvSet( $rules[$i]->serviceGroup->dstPortRangeMap );
       my $srvSet2 = $self->getSrvSet( $rules[$j]->serviceGroup->dstPortRangeMap );
       my $srv     = $srvSet1->compare($srvSet2);
-      my $states  = {
-        equal              => [],
-        containButNotEqual => [],
-        belongButNotEqual  => [],
-        other              => []
-      };
+      my $states  = {equal => [], containButNotEqual => [], belongButNotEqual => [], other => []};
       push @{$states->{$src}}, 'src';
       push @{$states->{$dst}}, 'dst';
       push @{$states->{$srv}}, 'srv';
@@ -71,8 +63,8 @@ sub optimizeRule {
       elsif ( @{$states->{equal}} == 2 ) {
         push @{$result{$rules[$i]->{sign}}{combine}}, $rules[$j]->{sign};
       }
-    } ## end for ( my $j = $i + 1; $j...)
-  } ## end for ( my $i = 0; $i < $length...)
+    }
+  }
 
   my $params;
   for my $rule ( keys %result ) {
@@ -86,16 +78,13 @@ sub optimizeRule {
       push @{$params}, \@subRule;
     }
   }
-  $self->dbi->delete(
-    where => {fw_id => $parser->fwId},
-    table => "fw_rule_optimize"
-  );
+  $self->dbi->delete( where => {fw_id => $parser->fwId}, table => "fw_rule_optimize" );
   my $sql = "INSERT INTO fw_rule_optimize (fw_id,rule_id_name,optimize,other_rule) VALUES (?,?,?,?)";
   $self->dbi->batchExecute( $params, $sql );
   $sql = "UPDATE fw_info SET optistatus=0 WHERE fw_id = $fwId";
   $self->dbi->execute($sql);
   return {success => 1};
-} ## end sub optirule
+}
 
 #------------------------------------------------------------------------------
 # 加载系统模块
@@ -134,7 +123,7 @@ sub getSrvSet {
     }
   }
   return $retSet;
-} ## end sub getSrvset
+}
 
 __PACKAGE__->meta->make_immutable;
 1;

@@ -3,23 +3,14 @@ package Firewall::Utils::Set;
 #------------------------------------------------------------------------------
 # 加载扩展模块
 #------------------------------------------------------------------------------
-use Carp;
 use Moose;
 use namespace::autoclean;
 use POSIX;
 use experimental 'smartmatch';
 
-has mins => (
-  is      => 'rw',
-  isa     => 'ArrayRef[Int]',
-  default => sub { [] },
-);
+has mins => ( is => 'rw', isa => 'ArrayRef[Int]', default => sub { [] }, );
 
-has maxs => (
-  is      => 'rw',
-  isa     => 'ArrayRef[Int]',
-  default => sub { [] },
-);
+has maxs => ( is => 'rw', isa => 'ArrayRef[Int]', default => sub { [] }, );
 
 around BUILDARGS => sub {
   my $orig  = shift;
@@ -29,17 +20,11 @@ around BUILDARGS => sub {
   }
   elsif ( @_ == 1 and ref( $_[0] ) eq __PACKAGE__ ) {
     my $setObj = $_[0];
-    return $class->$orig(
-      mins => [ @{$setObj->mins} ],
-      maxs => [ @{$setObj->maxs} ]
-    );
+    return $class->$orig( mins => [ @{$setObj->mins} ], maxs => [ @{$setObj->maxs} ] );
   }
   elsif ( @_ == 2 and defined $_[0] and defined $_[1] and $_[0] =~ /^\d+$/o and $_[1] =~ /^\d+$/o ) {
     my ( $MIN, $MAX ) = $_[0] < $_[1] ? ( $_[0], $_[1] ) : ( $_[1], $_[0] );
-    return $class->$orig(
-      mins => [$MIN],
-      maxs => [$MAX]
-    );
+    return $class->$orig( mins => [$MIN], maxs => [$MAX] );
   }
   else {
     return $class->$orig(@_);
@@ -92,9 +77,8 @@ sub dump {
   }
 }
 
+# 不需要检查重复，需要检查排序，所以用这个的时候要特别慎重，只有在确定输入与set不重复的情况下才可使用，否则会有问题
 sub addToSet {
-
-  # 不需要检查重复，需要检查排序，所以用这个的时候要特别慎重，只有在确定输入与set不重复的情况下才可使用，否则会有问题
   my ( $self, $MIN, $MAX ) = @_;
   ( $MIN, $MAX ) = $MIN > $MAX ? ( $MAX, $MIN ) : ( $MIN, $MAX );
   my $length = $self->length;
@@ -124,7 +108,7 @@ sub addToSet {
   push @max, @{$maxArray}[ $index .. $length - 1 ];
   $self->mins( \@min );
   $self->maxs( \@max );
-} ## end sub addToSet
+}
 
 sub mergeToSet {
   my $self = shift;
@@ -140,9 +124,8 @@ sub mergeToSet {
   }
 }
 
+# 需要检查重复，也需要检查排序
 sub _mergeToSet {
-
-  # 需要检查重复，也需要检查排序
   my ( $self, $MIN, $MAX ) = @_;
   ( $MIN, $MAX ) = $MIN > $MAX ? ( $MAX, $MIN ) : ( $MIN, $MAX );
   my $length = $self->length;
@@ -202,7 +185,7 @@ MAX: {
   push @max, @{$maxArray}[ $maxIndexInt + 1 .. $length - 1 ];
   $self->mins( \@min );
   $self->maxs( \@max );
-} ## end sub _mergeToSet
+}
 
 sub compare {
   my ( $self, $setObj ) = @_;
@@ -312,7 +295,7 @@ sub interSet {
     }
   }
   return $result;
-} ## end sub interSet
+}
 
 sub interRange {
   my ( $self, $rangeSet1, $rangeSet2 ) = @_;

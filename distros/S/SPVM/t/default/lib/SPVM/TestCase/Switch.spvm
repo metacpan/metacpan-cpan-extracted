@@ -1,4 +1,10 @@
 class TestCase::Switch {
+  
+  enum {
+    VALUE0,
+    VALUE1,
+    VALUE2,
+  }
 
   static method switch : int () {
     
@@ -158,6 +164,155 @@ class TestCase::Switch {
         unless ($success) {
           return 0;
         }
+      }
+      
+      # Only default
+      {
+        my $success : int;
+        switch (1) {
+          default: {
+            $success = 1;
+          }
+        }
+        unless ($success) {
+          return 0;
+        }
+      }
+
+      # No cases and default
+      {
+        my $success = 0;
+        switch (1) {}
+        $success = 1;
+        unless ($success) {
+          return 0;
+        }
+      }
+
+      # No cases and default
+      {
+        my $success = 0;
+        switch ((byte)1) {
+          case 1: {
+            $success = 1;
+            break;
+          }
+        }
+        unless ($success) {
+          return 0;
+        }
+      }
+
+      # break is added to the end of the block if it doesn't exist
+      {
+        my $success = 0;
+        switch (1) {
+          case 1: {
+            $success = 1;
+          }
+          case 2: {
+            $success = 2;
+          }
+        }
+        unless ($success == 1) {
+          return 0;
+        }
+      }
+      {
+        my $success = 0;
+        switch (1) {
+          case 1: {}
+          case 2: {
+            $success = 2;
+          }
+        }
+        unless ($success == 0) {
+          return 0;
+        }
+      }
+
+      # break in default
+      {
+        my $success = 0;
+        switch (1) {
+          default: {
+            $success = 1;
+            break;
+            $success = 2;
+          }
+        }
+        unless ($success == 1) {
+          return 0;
+        }
+      }
+    }
+    
+    # Minus value
+    {
+      my $success : int;
+      switch (-1) {
+        case -1: {
+          $success = 1;
+          break;
+        }
+        case 3: {
+          $success = 0;
+          break;
+        }
+        case 10000: {
+          $success = 0;
+          break;
+        }
+        default:
+      }
+      unless ($success) {
+        return 0;
+      }
+    }
+
+    # int max
+    {
+      my $success : int;
+      switch (2147483647) {
+        case 2147483647: {
+          $success = 1;
+          break;
+        }
+        case 3: {
+          $success = 0;
+          break;
+        }
+        case 10000: {
+          $success = 0;
+          break;
+        }
+        default:
+      }
+      unless ($success) {
+        return 0;
+      }
+    }
+
+    # int min
+    {
+      my $success : int;
+      switch (-2147483648) {
+        case -2147483648: {
+          $success = 1;
+          break;
+        }
+        case 3: {
+          $success = 0;
+          break;
+        }
+        case 10000: {
+          $success = 0;
+          break;
+        }
+        default:
+      }
+      unless ($success) {
+        return 0;
       }
     }
     
@@ -372,6 +527,71 @@ class TestCase::Switch {
       }
     }
     
+    # Enumeration
+    {
+      my $success : int;
+      switch (1) {
+        case &VALUE0: {
+          $success = 0;
+          break;
+        }
+        case &VALUE1: {
+          $success = 1;
+          break;
+        }
+        case &VALUE2: {
+          $success = 0;
+          break;
+        }
+        default:
+      }
+      unless ($success) {
+        return 0;
+      }
+    }
+
+    # Character literal
+    {
+      my $success : int;
+      switch ('b') {
+        case 'a': {
+          $success = 0;
+          break;
+        }
+        case 'b': {
+          $success = 1;
+          break;
+        }
+        case 'c': {
+          $success = 0;
+          break;
+        }
+        default: {
+          warn "DDDDDD";
+        }
+      }
+      unless ($success) {
+        return 0;
+      }
+    }
+
+    # Multiple case values at once
+    {
+      my $total = 0;
+      for (my $i = 0; $i < 2; $i++) {
+        switch ($i) {
+          case 0 :
+          case 1 :
+          {
+            $total++;
+          }
+        }
+      }
+      unless ($total == 2) {
+        return 0;
+      }
+    }
+    
     return 1;
   }
   static method switch_extra : int () {
@@ -392,6 +612,7 @@ class TestCase::Switch {
           return 0;
         }
       }
+      
       # Add default in above case
       {
         my $num = 1;
@@ -408,6 +629,61 @@ class TestCase::Switch {
           return 0;
         }
       }
+      
+      # break in while satement
+      {
+        my $num = 0;
+        my $result = 0;
+        switch ($num) {
+          case 0: {
+            while (1) {
+              $result = 1;
+              break;
+            }
+            $result = 2;
+          }
+        }
+        unless ($result == 1) {
+          return 0;
+        }
+      }
+
+      # break in for satement
+      {
+        my $num = 0;
+        my $result = 0;
+        switch ($num) {
+          case 0: {
+            for (my $i = 0; $i < 5; $i++) {
+              $result = 1;
+              break;
+            }
+            $result = 2;
+          }
+        }
+        unless ($result == 1) {
+          return 0;
+        }
+      }
+
+      # break in if satement
+      {
+        my $num = 0;
+        my $result = 0;
+        switch ($num) {
+          case 0: {
+            if (1) {
+              $result = 1;
+              break;
+            }
+            $result = 2;
+          }
+        }
+        unless ($result == 1) {
+          return 0;
+        }
+      }
+      
     }
     
     return 1;

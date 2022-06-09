@@ -31,7 +31,9 @@
       "runtime" : {
          "requires" : {
             "IO::Pty" : "1.16",
-            "Mojolicious" : "8.41"
+            "IO::Socket::IP" : "0.37",
+            "Mojolicious" : "8.25",
+            "Sub::Util" : "1.41"
          }
       },
       "test" : {
@@ -52,7 +54,7 @@
          "web" : "https://github.com/jhthorsen/mojo-ioloop-readwritefork"
       }
    },
-   "version" : "2.01",
+   "version" : "2.02",
    "x_contributors" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],

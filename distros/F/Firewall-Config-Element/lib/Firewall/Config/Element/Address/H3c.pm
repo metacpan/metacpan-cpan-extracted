@@ -14,19 +14,11 @@ with 'Firewall::Config::Element::Address::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Address::H3c 通用属性
 #------------------------------------------------------------------------------
-has '+ip' => (
-  required => 0,
-);
+has '+ip' => ( required => 0, );
 
-has '+mask' => (
-  required => 0,
-);
+has '+mask' => ( required => 0, );
 
-has members => (
-  is      => 'rw',
-  isa     => 'ArrayRef',
-  default => sub { [] },
-);
+has members => ( is => 'rw', isa => 'ArrayRef', default => sub { [] }, );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildSign 方法，

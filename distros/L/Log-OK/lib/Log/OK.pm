@@ -2,9 +2,9 @@ package Log::OK;
 
 use strict;
 use warnings;
-use version; our $VERSION=version->declare("v0.1.2");
+use version; our $VERSION=version->declare("v0.1.4");
 
-use Carp qw<croak>;
+use Carp qw<croak carp>;
 use constant::more ();
 
 use constant DEBUG_=>0;		#Heh...
@@ -59,11 +59,12 @@ sub auto_detect {
 	DEBUG_ and say "log ger :. ".%Log::ger::Output::;
 	(%Log::Any::Adapter:: )and return \&log_any;
 	(%Log::ger::Output::) and return \&log_ger;
-	%Log::Dispatch:: and return \&log_dispatch;
-	%Log::Log4perl:: and return \&log_log4perl;
+	(%Log::Dispatch::) and return \&log_dispatch;
+	(%Log::Log4perl::) and return \&log_log4perl;
 
 	#otherwise fallback to log any
-	\&log_any;
+	#\&log_dispatch;
+	\&no_logger;
 }
 
 sub log_any {
@@ -98,7 +99,7 @@ sub log_any {
 		else{
 		
 			$level=$lookup->{$_};	
-			croak "Log::OK: unknown level \"$value\" for Log::Any. Valid options: ".join ', ', keys %$lookup unless defined $level;
+			carp "Log::OK: unknown level \"$value\" for Log::Any. Valid options: ".join ', ', keys %$lookup unless defined $level;
 		}
 	}
 
@@ -149,7 +150,7 @@ sub log_ger {
 		}
 		else{
 			$level=$lookup->{$_};	
-			croak "Log::OK: unknown level \"$value\" for Log::ger. Valid options: ".join ', ', keys %$lookup unless defined $level;
+			carp "Log::OK: unknown level \"$value\" for Log::ger. Valid options: ".join ', ', keys %$lookup unless defined $level;
 		}
 	}
 
@@ -202,7 +203,7 @@ sub log_dispatch {
 		else{
 		
 			$level=$lookup->{$_};	
-			croak "Log::OK: unknown level \"$value\" for Log::Dispatch. Valid options: ".join ', ', keys %$lookup unless defined $level;
+			carp "Log::OK: unknown level \"$value\" for Log::Dispatch. Valid options: ".join ', ', keys %$lookup unless defined $level;
 		}
 	}
 
@@ -266,13 +267,13 @@ sub log_log4perl {
 			$index=0 if $index< 0;
 			$index=@$levels-1 if $index > @$levels-1;
 			$level=$levels->[$index];
-			croak "Log::OK: unknown level \"$value\" for Log::Log4perl" unless grep $level==$_, @$levels;
+			carp "Log::OK: unknown level \"$value\" for Log::Log4perl" unless grep $level==$_, @$levels;
 
 		}
 		else{
 			$level=$lookup->{$_};	
 
-			croak "Log::OK: unknown level \"$value\" for Log::Log4perl. Valid options: ".join ', ', keys %$lookup unless defined $level;
+			carp "Log::OK: unknown level \"$value\" for Log::Log4perl. Valid options: ".join ', ', keys %$lookup unless defined $level;
 			($index)=grep $levels->[$_]==$level, 0..@$levels-1;
 		}
 	}
@@ -295,6 +296,39 @@ sub log_log4perl {
 
 		"Log::OK::LEVEL"=> $level
 	)
+}
+
+#Define all supported constants as false.
+sub no_logger {
+	DEBUG_ and say "NO LOGGER DETECTED";
+	(
+		"Log::OK::OFF"=>0,
+		"Log::OK::FATAL"=>0,
+		"Log::OK::ERROR"=>0,
+		"Log::OK::INFO"=>0,
+		"Log::OK::DEBUG"=>0,
+		"Log::OK::TRACE"=>0,
+		"Log::OK::ALL"=>0,
+
+
+		"Log::OK::EMERGENCY"=>0,
+		"Log::OK::EMERG"=>0,
+		"Log::OK::ALERT"=>0,
+		"Log::OK::CRITICAL"=>0,
+		"Log::OK::CRIT"=>0,
+		"Log::OK::ERR"=>0,
+		"Log::OK::WARNING"=>0,
+		"Log::OK::NOTICE"=>0,
+
+		"Log::OK::FATAL"=>0,
+
+                "Log::OK::INFORM"=>0,
+
+		"Log::OK::WARN"=>0,
+
+		"Log::OK::LEVEL"=> 0
+	)
+
 }
 
 1;

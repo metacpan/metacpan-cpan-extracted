@@ -45,7 +45,7 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     5-MAY-2021 (makeh):
+*     8-JUN-2022 (makeh):
 *        Original version, generated automatically from the internal header
 *        files by the "makeh" script.
 *     {enter_changes_here}
@@ -556,11 +556,11 @@ void astFandl_( const char *, size_t, size_t, size_t *, size_t *, int * );
 /* ===== */
 #define AST__VMAJOR 9
 #define AST__VMINOR 2
-#define AST__RELEASE 4
+#define AST__RELEASE 9
 
 #define AST_MAJOR_VERS 9
 #define AST_MINOR_VERS 2
-#define AST_RELEASE 4
+#define AST_RELEASE 9
 
 #include <stdarg.h>
 #include <float.h>
@@ -1673,6 +1673,7 @@ typedef struct AstFitsChan {
    int clean;
    int altaxes;
    int fitsdigits;
+   int fitsrounding;
    char *fitsaxisorder;
    char *warnings;
    void *card;
@@ -2332,6 +2333,7 @@ void astResolve_( AstFrame *, const double [], const double [], const double [],
 void astSetActiveUnit_( AstFrame *, int, int * );
 AstFrameSet *astGetFrameVariants_( AstFrame *, int * );
 void astSetFrameVariants_( AstFrame *, AstFrameSet *, int * );
+void astNormPoints8_( AstFrame *, AstDim, int, AstDim, const double *, int, int, AstDim, double *, int * );
 AstFrame *astPickAxesId_( AstFrame *, int, const int[], AstMapping **, int * );
 const char *astFormatId_( AstFrame *, int, double, int * );
 int astUnformatId_( AstFrame *, int, const char *, double *, int * );
@@ -2348,6 +2350,9 @@ void astPermAxesId_( AstFrame *, const int[], int * );
 #define astFindFrame(target,template,domainlist) astINVOKE(O,astFindFrame_(astCheckFrame(target),astCheckFrame(template),domainlist,STATUS_PTR))
 #define astMatchAxes(frm1,frm2,axes) astINVOKE(V,astMatchAxes_(astCheckFrame(frm1),astCheckFrame(frm2),axes,STATUS_PTR))
 #define astNorm(this,value) astINVOKE(V,astNorm_(astCheckFrame(this),value,STATUS_PTR))
+#define astNormPoints(this,npoint,ncoord_in,indim,in,contig,ncoord_out,outdim,out) astINVOKE(V,astNormPoints8_(astCheckFrame(this),npoint,ncoord_in,indim,in,contig,ncoord_out,outdim,out,STATUS_PTR))
+#define astNormPoints8(this,npoint,ncoord_in,indim,in,contig,ncoord_out,outdim,out) astINVOKE(V,astNormPoints8_(astCheckFrame(this),npoint,ncoord_in,indim,in,contig,ncoord_out,outdim,out,STATUS_PTR))
+
 #define astAxDistance(this,axis,v1,v2) astINVOKE(V,astAxDistance_(astCheckFrame(this),axis,v1,v2,STATUS_PTR))
 #define astAxNorm(this,axis,oper,nval,values) astINVOKE(V,astAxNorm_(astCheckFrame(this),axis,oper,nval,values,STATUS_PTR))
 #define astAxOffset(this,axis,v1,dist) astINVOKE(V,astAxOffset_(astCheckFrame(this),axis,v1,dist,STATUS_PTR))

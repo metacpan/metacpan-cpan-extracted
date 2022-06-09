@@ -32,7 +32,7 @@ Generates Excel Document with Continuous Distribution Function Chart from the su
     my $writer    = Excel::Writer::XLSX::CDF->new(
                                              chart_title      => "Continuous Distribution Function (CDF)",
                                              chart_y_label    => "Distribution",
-                                             chart_x_label    => "", 
+                                             chart_x_label    => "",
                                              group_names_sort => 0,  #default 0 is in order of appearance in data
                                             );
 
@@ -60,11 +60,11 @@ Default: ""
 
 Set and returns the legend display property for the Excel chart
 
-Default: ""
+Default: 1
 
 ## chart\_colors
 
-Set and Returns an array reference of Excel color codes to use for each CDF in group order.
+Set and Returns an array reference of Excel color codes to use for each CDF in group order.  The default color once all colors are used is black.
 
 Default: \['#FF0000', '#800000', '#FFFF00', '#808000', '#00FF00', '#008000', '#00FFFF', '#008080', '#0000FF', '#000080', '#FF00FF', '#800080'\]
 
@@ -72,7 +72,7 @@ Default: \['#FF0000', '#800000', '#FFFF00', '#808000', '#00FF00', '#008000', '#0
 
 Set and returns the alphabetical sort option for the group names.  A true value Perl-wise will sort the group names before generating the Excel Workbook and a false value will use the order in which the groups were discovered in the data to generate the group names order.
 
-Default: ""
+Default: 0
 
 # METHODS
 

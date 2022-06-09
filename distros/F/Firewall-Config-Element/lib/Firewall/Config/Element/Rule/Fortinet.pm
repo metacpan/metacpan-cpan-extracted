@@ -16,41 +16,17 @@ with 'Firewall::Config::Element::Rule::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Rule::Fortinet 通用属性
 #------------------------------------------------------------------------------
-has policyId => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has policyId => ( is => 'ro', isa => 'Str', required => 1, );
 
-has fromZone => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has fromZone => ( is => 'ro', isa => 'Str', required => 0, );
 
-has toZone => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has toZone => ( is => 'ro', isa => 'Str', required => 0, );
 
-has fromInterface => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has fromInterface => ( is => 'ro', isa => 'Str', required => 0, );
 
-has toInterface => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has toInterface => ( is => 'ro', isa => 'Str', required => 0, );
 
-has '+action' => (
-  is      => 'ro',
-  isa     => 'Str',
-  default => 'permit',
-);
+has '+action' => ( is => 'ro', isa => 'Str', default => 'permit', );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildRange 方法

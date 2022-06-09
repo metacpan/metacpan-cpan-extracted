@@ -3,7 +3,6 @@ package Firewall::Utils::Ip;
 #------------------------------------------------------------------------------
 # 加载扩展模块
 #------------------------------------------------------------------------------
-use Carp;
 use Moose;
 use namespace::autoclean;
 use Firewall::Utils::Set;
@@ -30,7 +29,7 @@ sub getRangeFromIpMask {
   my $min        = $ip & oct( "0b" . $maskString );
   my $max        = $min + oct( "0b" . ( '1' x ( 32 - $mask ) ) );
   return ( wantarray ? ( $min, $max ) : Firewall::Utils::Set->new( $min, $max ) );
-} ## end sub getRangeFromIpMask
+}
 
 sub getNetIpFromIpMask {
   my ( $self, $ip, $mask ) = @_;
@@ -103,7 +102,7 @@ sub changeMaskToNumForm {
     confess "ERROR: 网络掩码 [$mask] 未命中掩码正常区间值, 调用函数changeMaskToNumForm失败！";
   }
   return $mask;
-} ## end sub changeMaskToNumForm
+}
 
 sub changeWildcardToMaskForm {
 
@@ -144,7 +143,7 @@ sub changeMaskToIpForm {
     confess "ERROR: 网络掩码 [$mask] 格式有误, 调用函数changeMaskToIpForm失败！";
   }
   return $ip;
-} ## end sub changeMaskToIpForm
+}
 
 sub getIpMaskFromRange {
   my ( $self, $min, $max ) = @_;
@@ -199,7 +198,7 @@ sub getRangeFromService {
     wantarray
     ? ( $protoValue + $portMin, $protoValue + $portMax )
     : Firewall::Utils::Set->new( $protoValue + $portMin, $protoValue + $portMax ) );
-} ## end sub getRangeFromService
+}
 
 __PACKAGE__->meta->make_immutable;
 1;

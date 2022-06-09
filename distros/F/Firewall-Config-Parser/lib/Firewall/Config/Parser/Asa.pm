@@ -31,11 +31,7 @@ use Firewall::Utils::Ip;
 #------------------------------------------------------------------------------
 # Firewall::Config::Parser::Asa 通用属性
 #------------------------------------------------------------------------------
-has aclLineNumbers => (
-  is      => 'ro',
-  isa     => 'HashRef[Int]',
-  default => sub { {} },
-);
+has aclLineNumbers => ( is => 'ro', isa => 'HashRef[Int]', default => sub { {} }, );
 
 #------------------------------------------------------------------------------
 # 定义 Firewall::Config::Parser::Asa 配置解析入口函数
@@ -45,42 +41,22 @@ sub parse {
   my $self = shift;
   while ( my $string = $self->nextUnParsedLine ) {
     if    ( $self->isRoute($string) ) { $self->parseRoute($string) }
-    elsif ( $self->isInterfaceZone($string) ) {
-      $self->parseInterfaceZone($string);
-    }
-    elsif ( $self->isAclGroup($string) ) {
-      $self->parseAclGroup($string);
-    }
-    elsif ( $self->isAddressGroup($string) ) {
-      $self->parseAddressGroup($string);
-    }
-    elsif ( $self->isServiceGroup($string) ) {
-      $self->parseServiceGroup($string);
-    }
-    elsif ( $self->isProtocolGroup($string) ) {
-      $self->parseProtocolGroup($string);
-    }
-    elsif ( $self->isSchedule($string) ) {
-      $self->parseSchedule($string);
-    }
-    else {
-      $self->ignoreLine;
-    }
-  } ## end while ( my $string = $self...)
+    elsif ( $self->isInterfaceZone($string) ) {$self->parseInterfaceZone($string)}
+    elsif ( $self->isAclGroup($string) ) {$self->parseAclGroup($string)}
+    elsif ( $self->isAddressGroup($string) ) {$self->parseAddressGroup($string)}
+    elsif ( $self->isServiceGroup($string) ) {$self->parseServiceGroup($string)}
+    elsif ( $self->isProtocolGroup($string) ) {$self->parseProtocolGroup($string)}
+    elsif ( $self->isSchedule($string) ) {$self->parseSchedule($string)}
+    else {$self->ignoreLine}
+  }
   $self->goToHeadLine;
   while ( my $string = $self->nextUnParsedLine ) {
     if    ( $self->isStaticNat($string) ) { $self->parseStaticNat($string) }
     elsif ( $self->isRule($string) )      { $self->parseRule($string) }
     elsif ( $self->isNatPool($string) )   { $self->parseNatPool($string) }
-    elsif ( $self->isDynamicNat($string) ) {
-      $self->parseDynamicNat($string);
-    }
-    elsif ( $self->isNewNat($string) ) {
-      $self->parseNewNat($string);
-    }
-    else {
-      $self->ignoreLine;
-    }
+    elsif ( $self->isDynamicNat($string) ) {$self->parseDynamicNat($string)}
+    elsif ( $self->isNewNat($string) ) {$self->parseNewNat($string)}
+    else {$self->ignoreLine}
   }
 } ## end sub parse
 
@@ -468,11 +444,8 @@ sub parseInterfaceZone {
             zoneName => $zoneName,
             config   => $config
           );
-          my $zone = Firewall::Config::Element::Zone::Asa->new(
-            fwId   => $self->fwId,
-            name   => $zoneName,
-            config => $config
-          );
+          my $zone
+            = Firewall::Config::Element::Zone::Asa->new( fwId => $self->fwId, name => $zoneName, config => $config );
           $self->addElement($zone);
           if ( defined $ipAddress ) {
             $interface->{interfaceType} = 'layer3';
@@ -970,11 +943,9 @@ sub parseProtocolGroup {
 =cut
 
   if ( $string =~ /^object-group\s+protocol\s+(?<proGroupName>\S+)\s*$/ox ) {
-    my $proGroupName  = $+{proGroupName};
-    my $protocolGroup = Firewall::Config::Element::ProtocolGroup::Asa->new(
-      fwId         => $self->fwId,
-      proGroupName => $proGroupName
-    );
+    my $proGroupName = $+{proGroupName};
+    my $protocolGroup
+      = Firewall::Config::Element::ProtocolGroup::Asa->new( fwId => $self->fwId, proGroupName => $proGroupName );
     $self->addElement($protocolGroup);
     while ( my $string = $self->nextUnParsedLine ) {
       if ( $string =~ /^\s*(?<protocolObjType>protocol-object|group-object )\s+(?<proGroupMemberName>\S+)\s*$/ox ) {
@@ -1000,10 +971,7 @@ sub getProtocolOrProtocolGroupFromProGroupMemberName {
   my ( $self, $proGroupMemberName, $protocolObjType ) = @_;
   my $obj;
   if ( $protocolObjType eq 'protocol' ) {
-    $obj = Firewall::Config::Element::Protocol::Asa->new(
-      fwId     => $self->fwId,
-      protocol => $proGroupMemberName
-    );
+    $obj = Firewall::Config::Element::Protocol::Asa->new( fwId => $self->fwId, protocol => $proGroupMemberName );
   }
   else {
     $obj = $self->getProtocolGroup($proGroupMemberName);

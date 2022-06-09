@@ -14,17 +14,9 @@ with 'Firewall::Policy::Element::Role';
 #------------------------------------------------------------------------------
 # 定义 Firewall::Policy::Element::Service 方法属性
 #------------------------------------------------------------------------------
-has protocol => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has protocol => ( is => 'ro', isa => 'Str', required => 1, );
 
-has dstPort => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has dstPort => ( is => 'ro', isa => 'Str', required => 0, );
 
 __PACKAGE__->meta->make_immutable;
 1;

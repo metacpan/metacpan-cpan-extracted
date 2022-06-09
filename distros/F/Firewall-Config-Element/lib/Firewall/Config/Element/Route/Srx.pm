@@ -14,18 +14,9 @@ with 'Firewall::Config::Element::Route::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Route::Srx 通用属性
 #------------------------------------------------------------------------------
-has routeInstance => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-  default  => 'default'
-);
+has routeInstance => ( is => 'ro', isa => 'Str', required => 1, default => 'default' );
 
-has type => (
-  is      => 'ro',
-  isa     => 'Str',
-  default => 'static',
-);
+has type => ( is => 'ro', isa => 'Str', default => 'static', );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildRange 方法

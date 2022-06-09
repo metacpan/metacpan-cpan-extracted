@@ -1,6 +1,11 @@
 package App::week::default;
+
+use strict;
+use warnings;
 use utf8;
+
 1;
+
 __DATA__
 
 autoload -Mcolors --mono --green --lavender --pastel

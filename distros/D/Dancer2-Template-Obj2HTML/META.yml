@@ -28,7 +28,7 @@ no_index:
     - t
     - inc
 requires:
-  Dancer: '0'
+  Dancer2: '0'
   HTML::Obj2HTML: '0'
   JSON: '0'
   Moo: '0'
@@ -37,5 +37,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/Pero-Moretti/Perl-Dancer2-Template-Obj2HTML.git
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -11,45 +11,19 @@ use Try::Tiny;
 #------------------------------------------------------------------------------
 # 定义设备 Connector 通用属性
 #------------------------------------------------------------------------------
-has host => (
-  is       => 'ro',
-  required => 0,
-);
+has host => ( is => 'ro', required => 0, );
 
-has username => (
-  is       => 'ro',
-  required => 0,
-  default  => 'read'
-);
+has username => ( is => 'ro', required => 0, default => 'read' );
 
-has password => (
-  is       => 'ro',
-  required => 0,
-  default  => '',
-);
+has password => ( is => 'ro', required => 0, default => '', );
 
-has enpassword => (
-  is       => 'ro',
-  required => 0,
-);
+has enpassword => ( is => 'ro', required => 0, );
 
-has proto => (
-  is       => 'ro',
-  required => 0,
-  default  => 'ssh',
-);
+has proto => ( is => 'ro', required => 0, default => 'ssh', );
 
-has _login_ => (
-  is       => 'ro',
-  required => 0,
-  default  => 0,
-);
+has _login_ => ( is => 'ro', required => 0, default => 0, );
 
-has _enable_ => (
-  is       => 'ro',
-  required => 0,
-  default  => 0,
-);
+has _enable_ => ( is => 'ro', required => 0, default => 0, );
 
 #------------------------------------------------------------------------------
 # H3c 设备登陆函数入口
@@ -68,10 +42,7 @@ sub login {
     if (/RSA modulus too small/mi) {
       try { $self->connect('-v -1 -c des ') }
       catch {
-        return {
-          success => 0,
-          reason  => $_
-        };
+        return {success => 0, reason => $_};
       }
     }
     elsif (/Selected cipher type <unknown> not supported/mi) {
@@ -79,10 +50,7 @@ sub login {
         $self->connect('-c des ');
       }
       catch {
-        return {
-          success => 0,
-          reason  => $_
-        };
+        return {success => 0, reason => $_};
       }
     }
     elsif (/Connection refused/mi) {
@@ -91,10 +59,7 @@ sub login {
         $self->connect();
       }
       catch {
-        return {
-          success => 0,
-          reason  => $_
-        };
+        return {success => 0, reason => $_};
       }
     }
     elsif (/IDENTIFICATION HAS CHANGED/mi) {
@@ -103,17 +68,11 @@ sub login {
         $self->connect();
       }
       catch {
-        return {
-          success => 0,
-          reason  => $_
-        };
+        return {success => 0, reason => $_};
       }
     }
     else {
-      return {
-        success => 0,
-        reason  => $_
-      };
+      return {success => 0, reason => $_};
     }
   };
 
@@ -212,10 +171,7 @@ sub getconfig {
   }
 
   # 输出计算结果
-  return {
-    success => 1,
-    config  => $lines
-  };
+  return {success => 1, config => $lines};
 } ## end sub getconfig
 
 #------------------------------------------------------------------------------
@@ -318,11 +274,7 @@ sub execCommands {
 
     # 异常回显信号捕捉
     if ( $buff =~ /(^\s*\^|error:)/m ) {
-      return {
-        success     => 0,
-        failCommand => $cmd,
-        reason      => $result . $buff
-      };
+      return {success => 0, failCommand => $cmd, reason => $result . $buff};
     }
     else {
       $result .= $buff;
@@ -330,10 +282,7 @@ sub execCommands {
   } ## end for my $cmd (@commands)
 
   # 输出计算结果
-  return {
-    success => 1,
-    result  => $result
-  };
+  return {success => 1, result => $result};
 } ## end sub execCommands
 
 #------------------------------------------------------------------------------

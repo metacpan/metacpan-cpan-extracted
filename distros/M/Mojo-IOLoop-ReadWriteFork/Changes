@@ -1,5 +1,11 @@
 Revision history for perl distribution Mojo-IOLoop-ReadWriteFork
 
+2.02 2022-06-09T12:47:08+0900
+ - Fix cleaning up stderr_read
+ - Fix closing the IO::Pty slave
+ - Fix also closing pty or stdout if stdin share the same handle
+ - Changed run_and_capture_p() to only capture STDOUT if STDERR and STDOUT is split
+
 2.01 2022-05-30T08:20:46+0900
  - Add support for conduit = pty3
  - Internal cleanup regarding filehandle passing

@@ -15,42 +15,17 @@ with 'Firewall::Config::Element::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Address::Role 通用属性
 #------------------------------------------------------------------------------
-has addrName => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has addrName => ( is => 'ro', isa => 'Str', required => 1, );
 
-has ip => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has ip => ( is => 'ro', isa => 'Str', required => 0, );
 
-has mask => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has mask => ( is => 'ro', isa => 'Str', required => 0, );
 
-has range => (
-  is      => 'ro',
-  isa     => 'Firewall::Utils::Set',
-  lazy    => 1,
-  builder => '_buildRange',
-);
+has range => ( is => 'ro', isa => 'Firewall::Utils::Set', lazy => 1, builder => '_buildRange', );
 
-has type => (
-  is      => 'ro',
-  isa     => 'Str',
-  default => 'subnet'
-);
+has type => ( is => 'ro', isa => 'Str', default => 'subnet' );
 
-has refnum => (
-  is      => 'ro',
-  isa     => 'Int',
-  default => 0
-);
+has refnum => ( is => 'ro', isa => 'Int', default => 0 );
 
 #------------------------------------------------------------------------------
 # builder => _buildRange 将 ip 转换为 range 格式

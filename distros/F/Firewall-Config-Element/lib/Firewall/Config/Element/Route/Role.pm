@@ -13,48 +13,19 @@ with 'Firewall::Config::Element::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Route::Role 通用属性
 #-------------------------------------------------------------------------------
-has network => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has network => ( is => 'ro', isa => 'Str', required => 1, );
 
-has mask => (
-  is       => 'ro',
-  isa      => 'Int',
-  required => 1,
-);
+has mask => ( is => 'ro', isa => 'Int', required => 1, );
 
-has nextHop => (
-  is       => 'ro',
-  isa      => 'Str|Undef',
-  required => 0,
-);
+has nextHop => ( is => 'ro', isa => 'Str|Undef', required => 0, );
 
-has range => (
-  is      => 'ro',
-  isa     => 'Firewall::Utils::Set',
-  lazy    => 1,
-  builder => '_buildRange',
-);
+has range => ( is => 'ro', isa => 'Firewall::Utils::Set', lazy => 1, builder => '_buildRange', );
 
-has zoneName => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has zoneName => ( is => 'ro', isa => 'Str', required => 0, );
 
-has distance => (
-  is      => 'ro',
-  isa     => 'Int',
-  default => 10,
-);
+has distance => ( is => 'ro', isa => 'Int', default => 10, );
 
-has priority => (
-  is      => 'ro',
-  isa     => 'Int',
-  default => 0,
-);
+has priority => ( is => 'ro', isa => 'Int', default => 0, );
 
 #------------------------------------------------------------------------------
 # Moose BUILDARGS 在实例创建之前生效，可以接收哈希和哈希的引用

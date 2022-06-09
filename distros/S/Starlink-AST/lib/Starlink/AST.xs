@@ -590,7 +590,7 @@ new( class, naxes, options )
   char * options
  CODE:
   ASTCALL(
-   RETVAL = astFrame( naxes, options );
+   RETVAL = astFrame( naxes, "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -626,7 +626,7 @@ new( class, frame, options )
   char * options
  CODE:
   ASTCALL(
-   RETVAL = astFrameSet( frame, options );
+   RETVAL = astFrameSet( frame, "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -652,7 +652,7 @@ new( class, frame1, frame2, options )
   char * options
  CODE:
   ASTCALL(
-   RETVAL = astCmpFrame( frame1, frame2, options );
+   RETVAL = astCmpFrame( frame1, frame2, "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -668,7 +668,7 @@ new( class, specval, specfrm, options )
   char * options
  CODE:
   ASTCALL(
-   RETVAL = astFluxFrame( specval, specfrm, options );
+   RETVAL = astFluxFrame( specval, specfrm, "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -684,7 +684,7 @@ new( class, frame1, frame2, options )
   char * options
  CODE:
   ASTCALL(
-   RETVAL = astSpecFluxFrame( frame1, frame2, options );
+   RETVAL = astSpecFluxFrame( frame1, frame2, "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -701,7 +701,7 @@ new( class, map1, map2, series, options )
   char * options
  CODE:
   ASTCALL(
-   RETVAL = astCmpMap( map1, map2, series, options );
+   RETVAL = astCmpMap( map1, map2, series, "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -842,7 +842,7 @@ new( class, options )
   char * options
  CODE:
   ASTCALL(
-   RETVAL = astGrismMap( options );
+   RETVAL = astGrismMap( "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -859,7 +859,7 @@ new( class, name, nin, nout, options )
   char * options
  CODE:
   ASTCALL(
-   RETVAL = astIntraMap( name, nin, nout, options );
+   RETVAL = astIntraMap( name, nin, nout, "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -881,7 +881,7 @@ new( class, lut, start, inc, options )
   nlut = av_len( lut ) + 1;
   clut = pack1D( newRV_noinc((SV*)lut), 'd' );
   ASTCALL(
-   RETVAL = astLutMap( nlut, clut, start, inc, options );
+   RETVAL = astLutMap( nlut, clut, start, inc, "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -910,7 +910,7 @@ new( class, nin, nout, fwd, inv, options )
   cfwd = pack1Dchar( fwd );
   cinv = pack1Dchar( inv );
   RETVAL = astMathMap( nin, nout, nfwd, (const char **)cfwd,
-                       ninv, (const char**)cinv, options );
+                       ninv, (const char**)cinv, "%s", options );
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
@@ -944,7 +944,7 @@ new( class, nin, nout, matrix, options )
   }
   cmatrix = pack1D(newRV_noinc((SV*)matrix), 'd');
   ASTCALL(
-   RETVAL = astMatrixMap( nin, nout, form, cmatrix, options );
+   RETVAL = astMatrixMap( nin, nout, form, cmatrix, "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -960,7 +960,7 @@ new( class, frame, options )
   char * options
  CODE:
   ASTCALL(
-   RETVAL = astNormMap( frame, options );
+   RETVAL = astNormMap( frame, "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -988,7 +988,7 @@ _new( class, frame, graphbox, basebox, options )
   cbasebox = pack1D( newRV_noinc((SV*)basebox), 'd');
   cgraphbox = pack1D( newRV_noinc((SV*)graphbox), 'f');
   ASTCALL(
-    RETVAL = astPlot( frame, cgraphbox, cbasebox, options );
+    RETVAL = astPlot( frame, cgraphbox, cbasebox, "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -1015,7 +1015,7 @@ _new( class, frame, graphbox, basebox, options )
   cbasebox = pack1D( newRV_noinc((SV*)basebox), 'd');
   cgraphbox = pack1D( newRV_noinc((SV*)graphbox), 'f');
   ASTCALL(
-    RETVAL = astPlot3D( frame, cgraphbox, cbasebox, options );
+    RETVAL = astPlot3D( frame, cgraphbox, cbasebox, "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -1039,7 +1039,7 @@ new( class, disco, pcdcen, options )
   }
   cpcdcen = pack1D(newRV_noinc((SV*)pcdcen), 'd');
   ASTCALL(
-   RETVAL = astPcdMap( disco, cpcdcen, options );
+   RETVAL = astPcdMap( disco, cpcdcen, "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -1084,7 +1084,7 @@ new( class, inperm, outperm, constant, options )
     cconstant = pack1D(newRV_noinc((SV*)constant), 'd' );
   }
   ASTCALL(
-   RETVAL = astPermMap(nin, cinperm, nout, coutperm, cconstant, options );
+   RETVAL = astPermMap(nin, cinperm, nout, coutperm, cconstant, "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -1131,7 +1131,7 @@ new( class, nin, nout, coeff_f, coeff_i, options )
   }
 
   ASTCALL(
-    RETVAL = astPolyMap( nin, nout, ncoeff_f, ccoeff_f, ncoeff_i, ccoeff_i, options );
+    RETVAL = astPolyMap( nin, nout, ncoeff_f, ccoeff_f, ncoeff_i, ccoeff_i, "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -1276,7 +1276,7 @@ new( class, nin, nout, coeff_f, coeff_i, lbnd_f, ubnd_f, lbnd_i, ubnd_i, options
 
   ASTCALL(
     RETVAL = astChebyMap( nin, nout, ncoeff_f, ccoeff_f, ncoeff_i, ccoeff_i,
-                          clbnd_f, cubnd_f, clbnd_i, cubnd_i, options );
+                          clbnd_f, cubnd_f, clbnd_i, cubnd_i, "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -1321,7 +1321,7 @@ new( class, regs, badval, options )
   nreg = av_len( regs ) + 1;
   cregs = pack1DAstObj( regs );
   ASTCALL(
-    RETVAL = astSelectorMap( nreg, (void**) cregs, badval, options );
+    RETVAL = astSelectorMap( nreg, (void**) cregs, badval, "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -1342,7 +1342,7 @@ new( class, shift, options )
   ncoord = av_len( shift ) + 1;
   cshift = pack1D(newRV_noinc((SV*)shift), 'd');
   ASTCALL(
-   RETVAL = astShiftMap( ncoord, cshift, options);
+   RETVAL = astShiftMap( ncoord, cshift, "%s", options);
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -1365,7 +1365,7 @@ new( class, fsmap, ismap, routemaps, options )
   nroute = av_len( routemaps ) + 1;
   croutemaps = pack1DAstObj( routemaps );
   ASTCALL(
-    RETVAL = astSwitchMap( fsmap, ismap, nroute, (void**) croutemaps, options );
+    RETVAL = astSwitchMap( fsmap, ismap, nroute, (void**) croutemaps, "%s", options );
   )
  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -1386,7 +1386,7 @@ new( class, centre, options )
   ncoord = av_len( centre ) + 1;
   ccentre = pack1D(newRV_noinc((SV*)centre), 'd');
   ASTCALL(
-    RETVAL = astUnitNormMap( ncoord, ccentre, options );
+    RETVAL = astUnitNormMap( ncoord, ccentre, "%s", options );
   )
  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -1401,7 +1401,7 @@ new( class, options )
   char * options
  CODE:
   ASTCALL(
-   RETVAL = astSkyFrame( options );
+   RETVAL = astSkyFrame( "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -1427,7 +1427,7 @@ new( class, options )
   char * options
  CODE:
   ASTCALL(
-   RETVAL = astSpecFrame( options );
+   RETVAL = astSpecFrame( "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -1441,7 +1441,7 @@ new( class, options )
   char * options
  CODE:
   ASTCALL(
-   RETVAL = astDSBSpecFrame( options );
+   RETVAL = astDSBSpecFrame( "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -1455,7 +1455,7 @@ new( class, options )
   char * options
  CODE:
   ASTCALL(
-   RETVAL = astTimeFrame( options );
+   RETVAL = astTimeFrame( "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -1480,7 +1480,7 @@ new( class, flags, options )
   char * options
  CODE:
   ASTCALL(
-   RETVAL = astSlaMap( flags, options );
+   RETVAL = astSlaMap( flags, "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -1494,7 +1494,7 @@ new( class, options )
   char * options
  CODE:
   ASTCALL(
-   RETVAL = astSphMap( options );
+   RETVAL = astSphMap( "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -1510,7 +1510,7 @@ new( class, nin, flags, options )
   char * options
  CODE:
   ASTCALL(
-   RETVAL = astSpecMap( nin, flags, options );
+   RETVAL = astSpecMap( nin, flags, "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -1524,7 +1524,7 @@ new( flags, options )
   char * options
  CODE:
   ASTCALL(
-   RETVAL = astTimeMap( flags, options );
+   RETVAL = astTimeMap( flags, "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -1555,7 +1555,7 @@ new( class, map1, map2, options )
   char * options
  CODE:
   ASTCALL(
-   RETVAL = astTranMap( map1, map2, options );
+   RETVAL = astTranMap( map1, map2, "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -1570,7 +1570,7 @@ new( class, ncoord, options )
   char * options
  CODE:
   ASTCALL(
-   RETVAL = astUnitMap( ncoord, options );
+   RETVAL = astUnitMap( ncoord, "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -1588,7 +1588,7 @@ new( class, ncoord, type, lonax, latax, options )
   char * options
  CODE:
   ASTCALL(
-   RETVAL = astWcsMap( ncoord, type, lonax, latax,options );
+   RETVAL = astWcsMap( ncoord, type, lonax, latax, "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -1611,7 +1611,8 @@ new( class, ina, inb, outa, outb, options )
   RETVAL = astWinMap( av_len(ina)+1, pack1D(newRV_noinc((SV*)ina),'d'),
                       pack1D(newRV_noinc((SV*)inb),'d'),
                       pack1D(newRV_noinc((SV*)outa),'d'),
-                      pack1D(newRV_noinc((SV*)outb),'d'),options );
+                      pack1D(newRV_noinc((SV*)outb),'d'),
+                      "%s", options );
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
@@ -1626,7 +1627,7 @@ new( class, ncoord, zoom, options )
   char * options
  CODE:
   ASTCALL(
-   RETVAL = astZoomMap( ncoord, zoom, options );
+   RETVAL = astZoomMap( ncoord, zoom, "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -1809,7 +1810,7 @@ ast_Set(this, settings )
   char * settings
  CODE:
   ASTCALL(
-   astSet(this, settings );
+   astSet(this, "%s", settings );
   )
 
 void
@@ -2079,7 +2080,7 @@ new( class, options )
   char * options
  CODE:
   ASTCALL(
-   RETVAL = astKeyMap( options );
+   RETVAL = astKeyMap( "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -2612,7 +2613,7 @@ new( class, options )
   char * options
  CODE:
   ASTCALL(
-   RETVAL = astTable( options );
+   RETVAL = astTable( "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -2763,7 +2764,7 @@ new( class, header, options )
   char * options
  CODE:
   ASTCALL(
-    RETVAL = astFitsTable( header, options );
+    RETVAL = astFitsTable( header, "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -3823,7 +3824,7 @@ new( class, map, ax1, ax2, options )
   char * options
  CODE:
   ASTCALL(
-    RETVAL = astRateMap( map, ax1, ax2, options );
+    RETVAL = astRateMap( map, ax1, ax2, "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -4143,7 +4144,7 @@ new( class, frame, form, centre, point1, point2, unc, options)
   cpoint1 = pack1D(newRV_noinc((SV*)point1), 'd');
   cpoint2 = pack1D(newRV_noinc((SV*)point2), 'd');
   ASTCALL(
-     RETVAL = astEllipse( frame, form, ccentre, cpoint1, cpoint2, unc, options);
+     RETVAL = astEllipse( frame, form, ccentre, cpoint1, cpoint2, unc, "%s", options);
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -4215,7 +4216,7 @@ new( class, frame, form, point1, point2, unc, options )
   cpoint1 = pack1D(newRV_noinc((SV*)point1), 'd');
   cpoint2 = pack1D(newRV_noinc((SV*)point2), 'd');
    ASTCALL(
-     RETVAL = astBox( frame, form, cpoint1, cpoint2, unc, options);
+     RETVAL = astBox( frame, form, cpoint1, cpoint2, unc, "%s", options);
    )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -4245,7 +4246,7 @@ new( class, frame, lbnd, ubnd, unc, options )
   clbnd = pack1D(newRV_noinc((SV*)lbnd), 'd');
   cubnd = pack1D(newRV_noinc((SV*)ubnd), 'd');
    ASTCALL(
-     RETVAL = astInterval( frame, clbnd, cubnd, unc, options);
+     RETVAL = astInterval( frame, clbnd, cubnd, unc, "%s", options);
    )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -4293,7 +4294,7 @@ new( class, frame, xpoints, ypoints, unc, options )
    }
 
    ASTCALL(
-     RETVAL = astPolygon(frame, xlen, xlen, points, unc, options );
+     RETVAL = astPolygon(frame, xlen, xlen, points, unc, "%s", options );
    )
    if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -4321,7 +4322,7 @@ new( class, frame, unc, options )
   char * options
  CODE:
    ASTCALL(
-     RETVAL = astNullRegion( frame, unc, options);
+     RETVAL = astNullRegion( frame, unc, "%s", options);
    )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -4340,7 +4341,7 @@ astCmpRegion( region1, region2, oper, options )
   char * options
  CODE:
    ASTCALL(
-     RETVAL = astCmpRegion( region1, region2, oper, options);
+     RETVAL = astCmpRegion( region1, region2, oper, "%s", options);
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -4412,7 +4413,7 @@ new( class, frame, form, centre, point, unc, options )
   ccentre = pack1D(newRV_noinc((SV*)centre), 'd');
   cpoint = pack1D(newRV_noinc((SV*)point), 'd');
   ASTCALL(
-     RETVAL = astCircle( frame, form, ccentre, cpoint, unc, options);
+     RETVAL = astCircle( frame, form, ccentre, cpoint, unc, "%s", options);
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -4456,7 +4457,7 @@ new( class, options )
   char * options
  CODE:
   ASTCALL(
-     RETVAL = astMoc( options );
+     RETVAL = astMoc( "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -4631,7 +4632,7 @@ new( class, region1, region2, options )
   char * options
  CODE:
   ASTCALL(
-    RETVAL = astPrism( region1, region2, options );
+    RETVAL = astPrism( region1, region2, "%s", options );
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
@@ -4659,7 +4660,7 @@ new( class, frame, points, unc, options )
   npnt = len / ncoord;
   cpoints = pack1D(newRV_noinc((SV*)points), 'd');
   ASTCALL(
-     RETVAL = astPointList( frame, npnt, ncoord, npnt, cpoints, unc, options);
+     RETVAL = astPointList( frame, npnt, ncoord, npnt, cpoints, unc, "%s", options);
   )
   if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:

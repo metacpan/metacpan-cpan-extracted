@@ -1,5 +1,5 @@
 package Dancer2::Plugin::DoFile;
-$Dancer2::Plugin::DoFile::VERSION = '0.11';
+$Dancer2::Plugin::DoFile::VERSION = '0.12';
 # ABSTRACT: File-based MVC plugin for Dancer2
 
 use strict;

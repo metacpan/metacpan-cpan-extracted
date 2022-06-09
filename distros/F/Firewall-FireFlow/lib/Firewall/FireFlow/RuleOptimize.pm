@@ -83,12 +83,7 @@ sub optimize {
   }
   for ( keys %{$targetRules} ) {
     my $ruleCMP = $targetRules->{$_};
-    my $CMP     = {
-      equal              => [],
-      containButNotEqual => [],
-      belongButNotEqual  => [],
-      other              => []
-    };
+    my $CMP     = {equal => [], containButNotEqual => [], belongButNotEqual => [], other => []};
 
     # 比较运算，并封装数据到CMP哈希表中
     my $srcCMP = $rule->{srcSet}->compare( $ruleCMP->{srcSet} );

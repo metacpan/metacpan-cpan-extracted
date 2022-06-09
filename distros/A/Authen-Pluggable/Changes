@@ -1,5 +1,8 @@
 Changelog for Authen::Pluggable
 
+0.03 2022-06-09T07:53:00
+  - Added optional providers parameter in authen to select which providers to use in authentication among those configured
+
 0.02 2022-06-07T09:50:00
   - Add JSON plugin to authenticate users via external JSON
 

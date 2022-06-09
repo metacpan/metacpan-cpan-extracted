@@ -13,11 +13,7 @@ with 'Firewall::Config::Element::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::ServiceGroup::Role 通用属性
 #------------------------------------------------------------------------------
-has srvGroupName => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has srvGroupName => ( is => 'ro', isa => 'Str', required => 1, );
 
 has srvGroupMembers => (
   is   => 'ro',
@@ -25,24 +21,11 @@ has srvGroupMembers => (
   default => sub { {} },
 );
 
-has dstPortRangeMap => (
-  is      => 'ro',
-  isa     => 'HashRef[Firewall::Utils::Set]',
-  default => sub { {} },
-);
+has dstPortRangeMap => ( is => 'ro', isa => 'HashRef[Firewall::Utils::Set]', default => sub { {} }, );
 
-has refnum => (
-  is      => 'ro',
-  isa     => 'Int',
-  default => 0
-);
+has refnum => ( is => 'ro', isa => 'Int', default => 0 );
 
-has range => (
-  is      => 'ro',
-  isa     => 'Firewall::Utils::Set',
-  lazy    => 1,
-  builder => '_buildRange',
-);
+has range => ( is => 'ro', isa => 'Firewall::Utils::Set', lazy => 1, builder => '_buildRange', );
 
 #------------------------------------------------------------------------------
 # addSrvGroupMember 添加服务端口组成员

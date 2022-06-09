@@ -5,7 +5,7 @@ use v5.12;
 
 package Chart::Pie;
 our @ISA     = qw(Chart::Base);
-our $VERSION = 'v2.402.0';
+our $VERSION = 'v2.402.1';
 
 use Carp;
 use GD;

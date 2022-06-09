@@ -15,35 +15,15 @@ with 'Firewall::Config::Element::Schedule::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Schedule::H3c 通用属性
 #------------------------------------------------------------------------------
-has startDate => (
-  is      => 'ro',
-  isa     => 'Undef|Str',
-  default => undef,
-);
+has startDate => ( is => 'ro', isa => 'Undef|Str', default => undef, );
 
-has endDate => (
-  is      => 'ro',
-  isa     => 'Undef|Str',
-  default => undef,
-);
+has endDate => ( is => 'ro', isa => 'Undef|Str', default => undef, );
 
-has day => (
-  is      => 'ro',
-  isa     => 'Undef|Str',
-  default => undef,
-);
+has day => ( is => 'ro', isa => 'Undef|Str', default => undef, );
 
-has startTime => (
-  is      => 'ro',
-  isa     => 'Undef|Str',
-  default => undef,
-);
+has startTime => ( is => 'ro', isa => 'Undef|Str', default => undef, );
 
-has endTime => (
-  is      => 'ro',
-  isa     => 'Undef|Str',
-  default => undef,
-);
+has endTime => ( is => 'ro', isa => 'Undef|Str', default => undef, );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildRange 方法
@@ -119,11 +99,8 @@ sub createTimeRange {
       my ( $min, $max ) = ( $self->startTime, $self->endTime );
       $min =~ s/://;
       $max =~ s/://;
-      my $range = {
-        min => $min + 0,
-        max => $max + 0
-      };
-      my @days = split( /\s/, $self->day );
+      my $range = {min => $min + 0, max => $max + 0};
+      my @days  = split( /\s/, $self->day );
       my @weekDays;
       for my $day (@days) {
         if ( $day eq 'daily' ) {

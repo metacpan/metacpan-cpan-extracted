@@ -31,24 +31,12 @@ sub parse {
   $self->{ruleNum} = 0;
   while ( defined( my $string = $self->nextUnParsedLine ) ) {
     if    ( $self->isZone($string) ) { $self->parseZone($string) }
-    elsif ( $self->isInterface($string) ) {
-      $self->parseInterface($string);
-    }
-    elsif ( $self->isAddress($string) ) {
-      $self->parseAddress($string);
-    }
-    elsif ( $self->isService($string) ) {
-      $self->parseService($string);
-    }
-    elsif ( $self->isServiceGroup($string) ) {
-      $self->parseServiceGroup($string);
-    }
-    elsif ( $self->isSchedule($string) ) {
-      $self->parseSchedule($string);
-    }
-    elsif ( $self->isRoute($string) ) {
-      $self->parseRoute($string);
-    }
+    elsif ( $self->isInterface($string) ) {$self->parseInterface($string)}
+    elsif ( $self->isAddress($string) ) {$self->parseAddress($string)}
+    elsif ( $self->isService($string) ) {$self->parseService($string)}
+    elsif ( $self->isServiceGroup($string) ) {$self->parseServiceGroup($string)}
+    elsif ( $self->isSchedule($string) ) {$self->parseSchedule($string)}
+    elsif ( $self->isRoute($string) ) {$self->parseRoute($string)}
 
     #elsif ( $self->isActive($string)       ) { $self->setActive($string)         }
     else { $self->ignoreLine }
@@ -148,10 +136,7 @@ sub parseZone {
     my $zone;
     my $name = $+{name};
     if ( !( $zone = $self->getZone($name) ) ) {
-      $zone = Firewall::Config::Element::Zone::Hillstone->new(
-        name => $name,
-        fwId => $self->fwId
-      );
+      $zone = Firewall::Config::Element::Zone::Hillstone->new( name => $name, fwId => $self->fwId );
       $self->addElement($zone);
     }
     while ( $string = $self->nextUnParsedLine ) {

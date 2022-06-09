@@ -1,7 +1,7 @@
 [![Actions Status](https://github.com/kaz-utashiro/App-week/workflows/test/badge.svg)](https://github.com/kaz-utashiro/App-week/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-week.svg)](https://metacpan.org/release/App-week)
 # NAME
 
-week - colorful calendar command for terminal
+week - colorful calendar command for the ANSI terminal
 
 # SYNOPSIS
 
@@ -9,7 +9,7 @@ week - colorful calendar command for terminal
 
 Options:
 
-    -#,-m#  # months surronding today (default 3)
+    -#,-m#  # months surrounding today (default 3)
     -A #    after current month
     -B #    before current month
     -C[#]   before and after current month (default 4)
@@ -42,7 +42,7 @@ Color modules:
 
 # VERSION
 
-Version 1.0203
+Version 1.0204
 
 # DESCRIPTION
 
@@ -77,19 +77,18 @@ And also in Japanese format and era:
     $ week 平31
     $ week H31
 
-Greater number is handled as year.  Next command displays the calendar of
-the year 1752.
+Greater number is handled as a year.  Next command displays the
+calendar of the year 1752.
 
     $ week 1752
 
-Use option **-y** to show one year calendar.  The number of years can be
-specified by the **-Y** option, which will implicitly set the **-y** option.
+Use option **-y** to show one year calendar.  The number of years can
+be specified by the **-Y** option (must <= 100), which will implicitly
+set the **-y** option.
 
     $ week -y          # display this year's calendar
 
     $ week -Y2c6       # display 2 years calendar in 6 column
-
-    $ week -Y 1752     # display 1752 years of calendar (takes long)
 
 # INTERNATIONAL SUPPORT
 
@@ -101,7 +100,7 @@ environment.
 This command come with **-Mi18n** module which provides easy way to
 specify language by command option.  Option **-l** displays option list
 provided by **-Mi18n** module and option **--i18n** and **--i18n-v**
-enables them.  See [Getopt::EX::i18n](https://metacpan.org/pod/Getopt::EX::i18n).
+enables them.  See [Getopt::EX::i18n](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3Ai18n).
 
     $ week --i18n-v --et
 
@@ -149,7 +148,7 @@ labels by default.
     DOW_SA
 
 Three digit means 216 RGB values from 000 to 555, and Lxx means 24
-gray scales.  Colormap is handled by [Getopt::EX::Colormap](https://metacpan.org/pod/Getopt::EX::Colormap) module;
+gray scales.  Colormap is handled by [Getopt::EX::Colormap](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AColormap) module;
 use \`perldoc Getopt::EX::Colormap\` for detail.
 
 You can add special effect afterward.  For example, put next line in
@@ -168,10 +167,10 @@ all following arguments here, so that insert this option at the end.
 
 # MODULES
 
-Currently two modules are included in the distribution.  These options
-can be used without any special action, because they are defined to
-load appropriate module automatically in default start up module
-([App::week::default](https://metacpan.org/pod/App::week::default)).
+Some modules are included in the distribution.  These options can be
+used without any special action, because they are defined to load
+appropriate module automatically in default start up module
+([App::week::default](https://metacpan.org/pod/App%3A%3Aweek%3A%3Adefault)).
 
 - **-Mcolors**
 
@@ -219,21 +218,19 @@ site.
 ## CPANMINUS
 
     $ cpanm App::week
-    or
-    $ curl -sL http://cpanmin.us | perl - App::week
 
 # SEE ALSO
 
-[App::week](https://metacpan.org/pod/App::week),
+[App::week](https://metacpan.org/pod/App%3A%3Aweek),
 [https://github.com/kaz-utashiro/App-week](https://github.com/kaz-utashiro/App-week)
 
-[Getopt::EX::termcolor](https://metacpan.org/pod/Getopt::EX::termcolor),
+[Getopt::EX::termcolor](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3Atermcolor),
 [https://github.com/kaz-utashiro/Getopt-EX-termcolor](https://github.com/kaz-utashiro/Getopt-EX-termcolor)
 
-[Getopt::EX::i18n](https://metacpan.org/pod/Getopt::EX::i18n),
+[Getopt::EX::i18n](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3Ai18n),
 [https://github.com/kaz-utashiro/Getopt-EX-i18n](https://github.com/kaz-utashiro/Getopt-EX-i18n)
 
-[Getopt::EX::Colormap](https://metacpan.org/pod/Getopt::EX::Colormap)
+[Getopt::EX::Colormap](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AColormap)
 
 [https://qiita.com/kaz-utashiro/items/603f4bca39e397afc91c](https://qiita.com/kaz-utashiro/items/603f4bca39e397afc91c)
 
@@ -256,4 +253,4 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2018-2021 Kazumasa Utashiro
+Copyright 2018-2022 Kazumasa Utashiro

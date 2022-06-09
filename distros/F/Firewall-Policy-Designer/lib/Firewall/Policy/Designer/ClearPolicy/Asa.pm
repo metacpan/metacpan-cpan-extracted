@@ -12,11 +12,7 @@ use namespace::autoclean;
 use Firewall::Utils::Date;
 use Firewall::Utils::Ip;
 
-has commandText => (
-  is      => 'ro',
-  isa     => 'ArrayRef[Str]',
-  default => sub { [] },
-);
+has commandText => ( is => 'ro', isa => 'ArrayRef[Str]', default => sub { [] }, );
 
 sub addToCommandText {
   my ( $self, @commands ) = @_;

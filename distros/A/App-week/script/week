@@ -12,7 +12,7 @@ __END__
 
 =head1 NAME
 
-week - colorful calendar command for terminal
+week - colorful calendar command for the ANSI terminal
 
 =head1 SYNOPSIS
 
@@ -20,7 +20,7 @@ B<week> [ -MI<module> ] [ option ] [ date ]
 
 Options:
 
-    -#,-m#  # months surronding today (default 3)
+    -#,-m#  # months surrounding today (default 3)
     -A #    after current month
     -B #    before current month
     -C[#]   before and after current month (default 4)
@@ -53,7 +53,7 @@ Color modules:
 
 =head1 VERSION
 
-Version 1.0203
+Version 1.0204
 
 =head1 DESCRIPTION
 
@@ -88,19 +88,18 @@ And also in Japanese format and era:
     $ week 平31
     $ week H31
 
-Greater number is handled as year.  Next command displays the calendar of
-the year 1752.
+Greater number is handled as a year.  Next command displays the
+calendar of the year 1752.
 
     $ week 1752
 
-Use option B<-y> to show one year calendar.  The number of years can be
-specified by the B<-Y> option, which will implicitly set the B<-y> option.
+Use option B<-y> to show one year calendar.  The number of years can
+be specified by the B<-Y> option (must <= 100), which will implicitly
+set the B<-y> option.
 
     $ week -y          # display this year's calendar
 
     $ week -Y2c6       # display 2 years calendar in 6 column
-
-    $ week -Y 1752     # display 1752 years of calendar (takes long)
 
 =head1 INTERNATIONAL SUPPORT
 
@@ -184,9 +183,9 @@ will be shown if used B<--i18n-v>.
 
 =head1 MODULES
 
-Currently two modules are included in the distribution.  These options
-can be used without any special action, because they are defined to
-load appropriate module automatically in default start up module
+Some modules are included in the distribution.  These options can be
+used without any special action, because they are defined to load
+appropriate module automatically in default start up module
 (L<App::week::default>).
 
 =over 4
@@ -243,8 +242,6 @@ Start up file.  Use like this:
 =head2 CPANMINUS
 
     $ cpanm App::week
-    or
-    $ curl -sL http://cpanmin.us | perl - App::week
 
 =head1 SEE ALSO
 
@@ -280,6 +277,9 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2018-2021 Kazumasa Utashiro
+Copyright 2018-2022 Kazumasa Utashiro
 
 =cut
+
+#  LocalWords:  colormap rgb RGB cal LANG wareki perldoc weekrc tokyo
+#  LocalWords:  rev github CPANMINUS cpanm perl Kazumasa Utashiro

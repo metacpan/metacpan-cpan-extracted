@@ -14,37 +14,15 @@ with 'Firewall::Config::Element::Route::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Route::Netscreen 通用属性
 #------------------------------------------------------------------------------
-has type => (
-  is      => 'ro',
-  isa     => 'Str',
-  default => 'static',
-);
+has type => ( is => 'ro', isa => 'Str', default => 'static', );
 
-has srcInterface => (
-  is       => 'ro',
-  isa      => 'Str|Undef',
-  required => 0,
-);
+has srcInterface => ( is => 'ro', isa => 'Str|Undef', required => 0, );
 
-has srcIpmask => (
-  is       => 'ro',
-  isa      => 'Str|Undef',
-  required => 0,
-);
+has srcIpmask => ( is => 'ro', isa => 'Str|Undef', required => 0, );
 
-has srcRange => (
-  is       => 'ro',
-  required => 0,
-  isa      => 'Firewall::Utils::Set',
-  lazy     => 1,
-  builder  => '_buildSrcRange',
-);
+has srcRange => ( is => 'ro', required => 0, isa => 'Firewall::Utils::Set', lazy => 1, builder => '_buildSrcRange', );
 
-has dstInterface => (
-  is       => 'ro',
-  isa      => 'Str|Undef',
-  required => 0,
-);
+has dstInterface => ( is => 'ro', isa => 'Str|Undef', required => 0, );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildRange 方法

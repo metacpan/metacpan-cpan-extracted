@@ -39,7 +39,7 @@ Initially this module was named Net::LDNS.
 
 Run-time dependencies:
  * `openssl` (openssl >= 1.1.1 unless [Ed25519] is disabled)
- * `libidn` (if [IDN] is enabled)
+ * `libidn2` (if [IDN] is enabled)
  * `libldns` (if [Internal ldns] is disabled; libldns >= 1.7.0, or
    libldns >= 1.7.1 if [Ed25519] is enabled)
 
@@ -127,11 +127,12 @@ commands.
 Enabled by default.
 Disabled with `--no-ed25519`
 
-Requires support for Ed25519 in both openssl and ldns.
+Requires support for algorithms Ed25519 and Ed448 in both openssl and ldns.
 
 >
 > *Note:* Zonemaster Engine relies on this feature for its analysis when Ed25519
-> (algorithm 15) is being used in DNS records.
+> (DNSKEY algorithm 15) or Ed448 (DNSKEY algorithm 16) is being used in DNSSEC
+> signatures.
 >
 
 ### IDN
@@ -139,7 +140,7 @@ Requires support for Ed25519 in both openssl and ldns.
 Enabled by default.
 Disable with `--no-idn`.
 
-If the IDN feature is enabled, the GNU `libidn` library will be used to
+If the IDN feature is enabled, the GNU `libidn2` library will be used to
 add a simple function that converts strings from Perl's internal encoding
 to IDNA domain name format.
 In order to convert strings from whatever encoding you have to Perl's
@@ -173,7 +174,8 @@ Randomizes the capitalization of returned domain names.
 ### Custom OpenSSL
 
 Disabled by default.
-Enabled with `--prefix-openssl=/path/to/openssl`.
+Enabled with `--prefix-openssl=/path/to/openssl` or
+`--openssl-inc=/path/to/openssl_inc` or `--openssl-lib=/path/to/openssl_lib`
 
 Enabling this makes the build tools look for OpenSSL in a non-standard place.
 
@@ -184,6 +186,10 @@ Technically this does two things:
 
 > **Note:** The `lib` directory under the given path must be known to the
 > dynamic linker or feature checks will fail.
+
+If both headers and libraries directories (`include` and `lib`) are not in the
+same parent directory, use `--openssl-inc` and `--openssl-lib` options to
+specify both paths.
 
 
 [DNS::LDNS]:                                         http://search.cpan.org/~erikoest/DNS-LDNS/

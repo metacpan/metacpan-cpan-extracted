@@ -245,4 +245,4 @@ This program is free software; you can redistribute it and/or modify it under th
 
 # COPYRIGHT
 
-Copyright (c) 2012+ DCIT, a.s. [http://www.dcit.cz](http://www.dcit.cz) / Karel Miko
+Copyright (c) 2012+ DCIT, a.s. [https://www.dcit.cz](https://www.dcit.cz) / Karel Miko

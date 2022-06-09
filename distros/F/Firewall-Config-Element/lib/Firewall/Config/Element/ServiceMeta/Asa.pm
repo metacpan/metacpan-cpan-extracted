@@ -14,13 +14,9 @@ with 'Firewall::Config::Element::ServiceMeta::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::ServiceMeta::Asa 常用属性
 #------------------------------------------------------------------------------
-has '+srvName' => (
-  required => 0,
-);
+has '+srvName' => ( required => 0, );
 
-has '+srcPort' => (
-  required => 0,
-);
+has '+srcPort' => ( required => 0, );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildRange 方法

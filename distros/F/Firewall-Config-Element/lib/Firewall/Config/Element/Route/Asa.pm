@@ -14,11 +14,7 @@ with 'Firewall::Config::Element::Route::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Route::Asa 通用属性
 #------------------------------------------------------------------------------
-has type => (
-  is      => 'ro',
-  isa     => 'Str',
-  default => 'static',
-);
+has type => ( is => 'ro', isa => 'Str', default => 'static', );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildRange 方法

@@ -15,11 +15,7 @@ with 'Firewall::Config::Dao::Role';
 #------------------------------------------------------------------------------
 # 定义 'Firewall::Config::Content::Role' 方法属性
 #------------------------------------------------------------------------------
-has conf => (
-  is       => 'ro',
-  does     => 'Firewall::Config::Content::Role',
-  required => 1,
-);
+has conf => ( is => 'ro', does => 'Firewall::Config::Content::Role', required => 1, );
 
 #------------------------------------------------------------------------------
 # 具体实现 _buildFwId 方法 | 生成 fwId
@@ -58,13 +54,7 @@ sub save {
     # 同时将配置改变写入 fw_config_history
     my $sql
       = "INSERT INTO $fwConfigHistoryTable (fw_id,config,update_date,compare_report) VALUES (:id,:config,now(),:report)";
-    $self->execute(
-      $sql,
-      { id     => $self->fwId,
-        config => $self->conf->confContent,
-        report => 'new config'
-      }
-    );
+    $self->execute( $sql, {id => $self->fwId, config => $self->conf->confContent, report => 'new config'} );
   }
 
   # 已有配置但发生变化，现在修改,先拿到diff情况
@@ -84,13 +74,7 @@ sub save {
     # 将配置变化写入 fw_config_history | 此处为差量配置
     $sql
       = "INSERT INTO $fwConfigHistoryTable (fw_id,config,update_date,compare_report) VALUES (:id,:config,now(),:report)";
-    $self->execute(
-      $sql,
-      { id     => $self->fwId,
-        config => $self->conf->confContent,
-        report => $compareReport
-      }
-    );
+    $self->execute( $sql, {id => $self->fwId, config => $self->conf->confContent, report => $compareReport} );
 
     # 更新配置到 fw_conf
     $self->execute(
@@ -106,23 +90,13 @@ sub save {
 
   # 已有配置且未发生变化，只修改访问时间
   else {
-    $self->execute(
-      "UPDATE $fwConfTable SET check_time = :checkTime WHERE fw_id = :fwId",
-      { fwId      => $fwId,
-        checkTime => $self->conf->timestamp
-      }
-    );
+    $self->execute( "UPDATE $fwConfTable SET check_time = :checkTime WHERE fw_id = :fwId",
+      {fwId => $fwId, checkTime => $self->conf->timestamp} );
 
     # 更新历史配置信息
     my $sql
       = "INSERT INTO $fwConfigHistoryTable (fw_id,config,update_date,compare_report) VALUES (:id,:config,now(),:report)";
-    $self->execute(
-      $sql,
-      { id     => $self->fwId,
-        config => $self->conf->confContent,
-        report => "no change"
-      }
-    );
+    $self->execute( $sql, {id => $self->fwId, config => $self->conf->confContent, report => "no change"} );
   }
 
   # 返回配置变更比对结果
@@ -137,11 +111,7 @@ sub isConfigChanged {
 
   # 初始化变量
   my $tableName = 'fw_conf';
-  my $raw       = $self->select(
-    column => ['conf_sign'],
-    table  => $tableName,
-    where  => {fw_id => $self->fwId}
-  )->one;
+  my $raw       = $self->select( column => ['conf_sign'], table => $tableName, where => {fw_id => $self->fwId} )->one;
 
   # 查表无配置即代表为新增配置
   if ( !defined $raw ) {

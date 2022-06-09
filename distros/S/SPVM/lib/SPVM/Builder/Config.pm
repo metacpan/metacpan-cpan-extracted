@@ -7,6 +7,17 @@ use Carp 'confess';
 use File::Basename 'dirname';
 
 # Fields
+sub file {
+  my $self = shift;
+  if (@_) {
+    $self->{file} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{file};
+  }
+}
+
 sub ext {
   my $self = shift;
   if (@_) {
@@ -205,6 +216,17 @@ sub before_link {
   }
 }
 
+sub dependent_files {
+  my $self = shift;
+  if (@_) {
+    $self->{dependent_files} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{dependent_files};
+  }
+}
+
 sub is_exe { 0 }
 
 # Methods
@@ -315,6 +337,10 @@ sub new {
   # ld_optimize
   unless (defined $self->{ld_optimize}) {
     $self->ld_optimize('-O2');
+  }
+
+  unless (defined $self->{dependent_files}) {
+    $self->{dependent_files} = [];
   }
   
   return $self;
@@ -444,6 +470,91 @@ sub add_resources {
 }
 
 sub use { shift->add_resources(@_) }
+
+sub use_resource {
+  my ($self, @args) = @_;
+  
+  my %resource_args;
+  if (@args == 1) {
+    $resource_args{class_name} = $args[0];
+  }
+  else {
+    %resource_args = @args;
+  }
+  
+  my $resource = SPVM::Builder::Resource->new(%resource_args);
+  
+  my $resource_class_name = $resource->class_name;
+  my $resource_mode = $resource->mode;
+  my $resource_args = $resource->args;
+  
+  my $ext = defined $resource_mode ? "$resource_mode.config" : 'config';
+  my $config_file_base = SPVM::Builder::Util::convert_class_name_to_rel_file($resource_class_name, $ext);
+  
+  my $config_file;
+  for my $inc (@INC) {
+    my $config_file_tmp = "$inc/$config_file_base";
+    if (-f $config_file_tmp) {
+      $config_file = $config_file_tmp;
+      last;
+    }
+  }
+  unless (defined $config_file) {
+    confess "Can't find resource config file $config_file_base in @INC";
+  }
+  
+  my $config = $self->load_config($config_file, @$resource_args);
+  
+  $resource->config($config);
+  
+  $self->add_resources($resource);
+  
+  return $resource;
+}
+
+sub load_config {
+  my ($self, $config_file, @argv) = @_;
+  
+  my $config = SPVM::Builder::Util::load_config($config_file, @argv);
+  
+  push @{$config->dependent_files}, $config_file;
+  
+  return $config;
+}
+
+sub load_mode_config {
+  my ($self, $config_file, $mode, @argv) = @_;
+  
+  my $mode_config_file = $config_file;
+  
+  $mode_config_file =~ s/(\.[a-zA-Z0-9_]+)?\.config$//;
+  $mode_config_file .= ".$mode.config";
+  
+  unless (-f $mode_config_file) {
+    confess "Can't find the mode config file \"$mode_config_file\"";
+  }
+  
+  my $config = $self->load_config($mode_config_file, @argv);
+  
+  return $config;
+}
+
+sub load_base_config {
+  my ($self, $config_file, @argv) = @_;
+  
+  my $base_config_file = $config_file;
+  
+  $base_config_file =~ s/(\.[a-zA-Z0-9_]+)?\.config$//;
+  $base_config_file .= ".config";
+  
+  unless (-f $base_config_file) {
+    confess "Can't find the base config file \"$base_config_file\"";
+  }
+  
+  my $config = $self->load_config($base_config_file, @argv);
+  
+  return $config;
+}
 
 sub add_static_libs {
   my ($self, @static_libs) = @_;

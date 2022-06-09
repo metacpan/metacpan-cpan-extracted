@@ -15,16 +15,9 @@ with 'Firewall::Config::Element::ServiceGroup::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::ServiceGroup::Asa 通用属性
 #------------------------------------------------------------------------------
-has protocol => (
-  is       => 'ro',
-  isa      => 'Undef|Str',
-  required => 0,
-  default  => undef,
-);
+has protocol => ( is => 'ro', isa => 'Undef|Str', required => 0, default => undef, );
 
-has '+dstPortRangeMap' => (
-  writer => 'setDstPortRangeMap',
-);
+has '+dstPortRangeMap' => ( writer => 'setDstPortRangeMap', );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildRange 方法

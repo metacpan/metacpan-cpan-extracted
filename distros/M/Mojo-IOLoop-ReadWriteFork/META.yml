@@ -19,12 +19,14 @@ no_index:
     - inc
 requires:
   IO::Pty: '1.16'
-  Mojolicious: '8.41'
+  IO::Socket::IP: '0.37'
+  Mojolicious: '8.25'
+  Sub::Util: '1.41'
 resources:
   bugtracker: https://github.com/jhthorsen/mojo-ioloop-readwritefork/issues
   homepage: https://github.com/jhthorsen/mojo-ioloop-readwritefork
   repository: https://github.com/jhthorsen/mojo-ioloop-readwritefork.git
-version: '2.01'
+version: '2.02'
 x_contributors:
   - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

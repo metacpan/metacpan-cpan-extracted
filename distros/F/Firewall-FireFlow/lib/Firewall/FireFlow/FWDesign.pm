@@ -21,10 +21,7 @@ use Firewall::FireFlow::RuleOptimize;
 #------------------------------------------------------------------------------
 # 加载系统模块
 #------------------------------------------------------------------------------
-has dbi => (
-  is   => 'ro',
-  does => 'Firewall::DBI::Role',
-);
+has dbi => ( is => 'ro', does => 'Firewall::DBI::Role', );
 
 #------------------------------------------------------------------------------
 # 根据工单生成脚本
@@ -90,13 +87,7 @@ sub designAndSave {
   if ( defined $hadCommands ) {
     for my $fwName ( keys %{$hadCommands} ) {
       my $sql = "INSERT INTO firewall_havepolicy (requestid,fw_name,config) VALUES (:reqid,:fwName,:config)";
-      $self->dbi->execute(
-        $sql,
-        { reqid  => $requestId,
-          fwName => $fwName,
-          config => $hadCommands->{$fwName}
-        }
-      );
+      $self->dbi->execute( $sql, {reqid => $requestId, fwName => $fwName, config => $hadCommands->{$fwName}} );
     }
   }
   my $designed = 0;
@@ -131,22 +122,12 @@ sub designAndSave {
       if ( $designed == 1 ) {
         my $sql
           = "UPDATE firewall_req SET designstate = 1,nw_state=3,remark = :rmk,designdate = now() WHERE requestid = :reqid";
-        $self->dbi->execute(
-          $sql,
-          { reqid => $requestId,
-            rmk   => $failCommand
-          }
-        );
+        $self->dbi->execute( $sql, {reqid => $requestId, rmk => $failCommand} );
       }
       else {
         my $sql
           = "UPDATE firewall_req SET designstate = 1,nw_state=7,remark = :rmk,designdate = now() WHERE requestid = :reqid";
-        $self->dbi->execute(
-          $sql,
-          { reqid => $requestId,
-            rmk   => $failCommand
-          }
-        );
+        $self->dbi->execute( $sql, {reqid => $requestId, rmk => $failCommand} );
       }
       return {success => 1};
     }
@@ -154,26 +135,13 @@ sub designAndSave {
       if ( $designed == 1 ) {
         my $sql
           = "UPDATE firewall_req SET designstate = 1,nw_state=3,remark = :rmk,designdate = now() WHERE requestid = :reqid";
-        $self->dbi->execute(
-          $sql,
-          { reqid => $requestId,
-            rmk   => $failCommand
-          }
-        );
+        $self->dbi->execute( $sql, {reqid => $requestId, rmk => $failCommand} );
       }
       else {
         my $sql
           = "UPDATE firewall_req SET designstate = 0,nw_state=2,remark = :rmk,designdate = now() WHERE requestid = :reqid";
-        $self->dbi->execute(
-          $sql,
-          { reqid => $requestId,
-            rmk   => $failCommand
-          }
-        );
-        return {
-          success => 0,
-          reason  => $failCommand
-        };
+        $self->dbi->execute( $sql, {reqid => $requestId, rmk => $failCommand} );
+        return {success => 0, reason => $failCommand};
       }
     } ## end else [ if ( $failCommand =~ /error4/)]
   } ## end else [ if ( not defined $failCommand)]
@@ -191,52 +159,28 @@ sub _design {
   else {
     my $exception = $commands->{reason};
     if ( $exception =~ /error0/ ) {
-      return {
-        success => 0,
-        reason  => "需要联系管理员处理,$exception"
-      };
+      return {success => 0, reason => "需要联系管理员处理,$exception"};
     }
     elsif ( $exception =~ /error1/ ) {
-      return {
-        success => 0,
-        reason  => "请确认ip是否正确,$exception"
-      };
+      return {success => 0, reason => "请确认ip是否正确,$exception"};
     }
     elsif ( $exception =~ /error2/ ) {
-      return {
-        success => 0,
-        reason  => $exception
-      };
+      return {success => 0, reason => $exception};
     }
     elsif ( $exception =~ /error4/ ) {
-      return {
-        success => 0,
-        reason  => "$exception"
-      };
+      return {success => 0, reason => "$exception"};
     }
     elsif ( $exception =~ /error5/ ) {
-      return {
-        success => 0,
-        reason  => $exception
-      };
+      return {success => 0, reason => $exception};
     }
     elsif ( $exception =~ /error6/ ) {
-      return {
-        success => 0,
-        reason  => $exception
-      };
+      return {success => 0, reason => $exception};
     }
     elsif ( $exception =~ /error9/ ) {
-      return {
-        success => 0,
-        reason  => $exception
-      };
+      return {success => 0, reason => $exception};
     }
     else {
-      return {
-        success => 0,
-        reason  => $exception
-      };
+      return {success => 0, reason => $exception};
     }
   } ## end else [ if ( $commands->{success...})]
 } ## end sub _design
@@ -259,18 +203,12 @@ sub getCommands {
   if ( $searcherReport->state == 0 ) {
     my $comment = $searcherReport->comment;
     $comment =~ s/(.+?)\s+at\s+.+/$1/s;
-    return {
-      success => 0,
-      reason  => $comment
-    };
+    return {success => 0, reason => $comment};
   }
 
   # say dumper $searcherReport;
   # 实例化策略设计对象
-  my $designer = Firewall::Policy::Designer->new(
-    searcherReport => $searcherReport,
-    dbi            => $dbi
-  );
+  my $designer    = Firewall::Policy::Designer->new( searcherReport => $searcherReport, dbi => $dbi );
   my $designInfos = $designer->design;
 
   my %havePolicy;
@@ -319,11 +257,7 @@ sub getCommands {
     $fwCommand{commands} = \@commands;
     push @fwCommands, \%fwCommand;
   } ## end for my $designInfo ( @{...})
-  return {
-    success   => 1,
-    commands  => \@fwCommands,
-    hadPolicy => \%havePolicy
-  };
+  return {success => 1, commands => \@fwCommands, hadPolicy => \%havePolicy};
 } ## end sub getCommands
 
 #------------------------------------------------------------------------------
@@ -363,4 +297,3 @@ sub design {
 
 __PACKAGE__->meta->make_immutable;
 1;
-

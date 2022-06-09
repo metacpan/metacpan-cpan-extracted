@@ -14,11 +14,7 @@ with 'Firewall::Config::Element::Interface::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Interface::Neteye 通用属性
 #------------------------------------------------------------------------------
-has accessVlan => (
-  is      => 'rw',
-  isa     => 'ArrayRef',
-  default => sub { [] },
-);
+has accessVlan => ( is => 'rw', isa => 'ArrayRef', default => sub { [] }, );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildRange 方法

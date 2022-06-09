@@ -29,10 +29,7 @@ sub parse {
   $self->{ruleNum} = 1;
   while ( my $string = $self->nextUnParsedLine ) {
     if    ( $self->isRoute($string) ) { $self->parseRoute($string) }
-    elsif ( $self->isInterface($string) ) {
-      $self->parseInterface($string);
-    }
-
+    elsif ( $self->isInterface($string) ) {$self->parseInterface($string) }
     #elsif ($self->isActive($string)        ) { $self->setActive($string)           }
     else { $self->ignoreLine }
   }
@@ -49,30 +46,14 @@ sub parse {
   $self->goToHeadLine;
   while ( my $string = $self->nextUnParsedLine ) {
     if    ( $self->isNatPool($string) ) { $self->parseNatPool($string) }
-    elsif ( $self->isDynamicNat($string) ) {
-      $self->parseDynamicNat($string);
-    }
-    elsif ( $self->isStaticNat($string) ) {
-      $self->parseStaticNat($string);
-    }
-    elsif ( $self->isAddress($string) ) {
-      $self->parseAddress($string);
-    }
-    elsif ( $self->isAddressGroup($string) ) {
-      $self->parseAddressGroup($string);
-    }
-    elsif ( $self->isService($string) ) {
-      $self->parseService($string);
-    }
-    elsif ( $self->isServiceGroup($string) ) {
-      $self->parseServiceGroup($string);
-    }
-    elsif ( $self->isSchedule($string) ) {
-      $self->parseSchedule($string);
-    }
-    else {
-      $self->ignoreLine;
-    }
+    elsif ( $self->isDynamicNat($string) ) {$self->parseDynamicNat($string)}
+    elsif ( $self->isStaticNat($string) ) {$self->parseStaticNat($string)}
+    elsif ( $self->isAddress($string) ) {$self->parseAddress($string)}
+    elsif ( $self->isAddressGroup($string) ) {$self->parseAddressGroup($string)}
+    elsif ( $self->isService($string) ) {$self->parseService($string)}
+    elsif ( $self->isServiceGroup($string) ) {$self->parseServiceGroup($string)}
+    elsif ( $self->isSchedule($string) ) {$self->parseSchedule($string)}
+    else {$self->ignoreLine}
   } ## end while ( my $string = $self...)
 
   $self->goToHeadLine;
@@ -507,21 +488,15 @@ sub parseInterface {
 
       }
       else {
-        $interface = Firewall::Config::Element::Interface::Srx->new(
-          fwId   => $self->fwId,
-          name   => $name,
-          config => $string
-        );
+        $interface
+          = Firewall::Config::Element::Interface::Srx->new( fwId => $self->fwId, name => $name, config => $string );
         $self->addElement($interface);
       }
     }
     elsif ( $family eq 'bridge' or $family eq 'ethernet-switching' ) {
       unless ( $interface = $self->getInterface($name) ) {
-        $interface = Firewall::Config::Element::Interface::Srx->new(
-          fwId   => $self->fwId,
-          name   => $name,
-          config => $string
-        );
+        $interface
+          = Firewall::Config::Element::Interface::Srx->new( fwId => $self->fwId, name => $name, config => $string );
         $self->addElement($interface);
       }
       else {
@@ -541,11 +516,8 @@ sub parseInterface {
     my $name          = $+{name};
     my $routeInstance = $+{routeInstance};
     unless ( $interface = $self->getInterface($name) ) {
-      $interface = Firewall::Config::Element::Interface::Srx->new(
-        fwId   => $self->fwId,
-        name   => $name,
-        config => $string
-      );
+      $interface
+        = Firewall::Config::Element::Interface::Srx->new( fwId => $self->fwId, name => $name, config => $string );
       $self->addElement($interface);
     }
     else {
@@ -1121,12 +1093,7 @@ sub parseService {
       } ## end if ( keys %params > 0 ...)
 
       if ( keys %params == 0 ) {
-        %params = (
-          fwId    => $self->fwId,
-          srvName => $srvName,
-          term    => $term,
-          config  => $string
-        );
+        %params = ( fwId => $self->fwId, srvName => $srvName, term => $term, config => $string );
       }
       else {
         $params{config} .= "\n" . $string;

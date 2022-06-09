@@ -1,5 +1,5 @@
 package Gherkin::TokenFormatterBuilder;
-$Gherkin::TokenFormatterBuilder::VERSION = '23.0.1';
+$Gherkin::TokenFormatterBuilder::VERSION = '24.0.0';
 use strict;
 use warnings;
 use base 'Gherkin::AstBuilder';
@@ -34,8 +34,9 @@ sub format_token {
         "(%s:%s)%s:%s/%s/%s",
         $token->location->{'line'},
         $token->location->{'column'},
-        $token->matched_type,
-        $token->matched_keyword || '',
+        $token->matched_type || '',
+        ( $token->matched_keyword ?
+          sprintf('(%s)%s',$token->matched_keyword_type || '',$token->matched_keyword || '') : ''),
         $token->matched_text    || '',
         join( ',',
             map { $_->{'column'} . ':' . $_->{'text'} }

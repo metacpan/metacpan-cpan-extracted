@@ -1,5 +1,9 @@
 Revision history for Starlink::AST
 
+3.02 2022-06-08
+    - Update to AST version 9.2.9
+    - Adjusted option passing to allow building with -Werror=format-security
+
 3.01 2021-05-05
     - Update to AST version 9.2.4
     - Add support for YamlChan, astMapCopyEntry and astPointInRegion

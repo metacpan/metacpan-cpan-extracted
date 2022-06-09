@@ -1,3 +1,10 @@
+0.008   2022-05-08  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention test-regexp-pattern.
+
+
 0.007   2021-07-02  Released-By: PERLANCAR; Urgency: medium
 
 	- Remove rpgrep, which has been split into its own dist App-rpgrep.

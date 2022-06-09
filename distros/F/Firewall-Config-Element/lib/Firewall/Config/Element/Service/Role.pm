@@ -16,36 +16,15 @@ with 'Firewall::Config::Element::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Service::Role 通用属性
 #------------------------------------------------------------------------------
-has srvName => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has srvName => ( is => 'ro', isa => 'Str', required => 1, );
 
-has metas => (
-  is      => 'ro',
-  does    => 'HashRef[Firewall::Config::Element::ServiceMeta::Role]',
-  default => sub { {} },
-);
+has metas => ( is => 'ro', does => 'HashRef[Firewall::Config::Element::ServiceMeta::Role]', default => sub { {} }, );
 
-has dstPortRangeMap => (
-  is      => 'ro',
-  isa     => 'HashRef[Firewall::Utils::Set]',
-  default => sub { {} },
-);
+has dstPortRangeMap => ( is => 'ro', isa => 'HashRef[Firewall::Utils::Set]', default => sub { {} }, );
 
-has refnum => (
-  is      => 'ro',
-  isa     => 'Int',
-  default => 0
-);
+has refnum => ( is => 'ro', isa => 'Int', default => 0 );
 
-has range => (
-  is      => 'ro',
-  isa     => 'Firewall::Utils::Set',
-  lazy    => 1,
-  builder => '_buildRange',
-);
+has range => ( is => 'ro', isa => 'Firewall::Utils::Set', lazy => 1, builder => '_buildRange', );
 
 #------------------------------------------------------------------------------
 # getServiceClassName 获取服务端口名

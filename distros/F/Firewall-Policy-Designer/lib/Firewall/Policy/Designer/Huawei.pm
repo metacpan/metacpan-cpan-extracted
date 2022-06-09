@@ -21,23 +21,11 @@ use Firewall::Policy::Searcher::Report::FwInfo;
 #------------------------------------------------------------------------------
 # Firewall::Policy::Designer::Huawei 通用属性
 #------------------------------------------------------------------------------
-has dbi => (
-  is       => 'ro',
-  does     => 'Firewall::DBI::Role',
-  required => 1,
-);
+has dbi => ( is => 'ro', does => 'Firewall::DBI::Role', required => 1, );
 
-has searcherReportFwInfo => (
-  is       => 'ro',
-  isa      => 'Firewall::Policy::Searcher::Report::FwInfo',
-  required => 1,
-);
+has searcherReportFwInfo => ( is => 'ro', isa => 'Firewall::Policy::Searcher::Report::FwInfo', required => 1, );
 
-has commandText => (
-  is      => 'ro',
-  isa     => 'ArrayRef[Str]',
-  default => sub { [] },
-);
+has commandText => ( is => 'ro', isa => 'ArrayRef[Str]', default => sub { [] }, );
 
 #------------------------------------------------------------------------------
 # addToCommandText 向 commandText 属性推送命令行
@@ -56,7 +44,6 @@ sub design {
   # 初始化防火墙策略报告下 type action 属性
   my $type   = $self->{searcherReportFwInfo}{type}   if exists $self->{searcherReportFwInfo}{type};
   my $action = $self->{searcherReportFwInfo}{action} if exists $self->{searcherReportFwInfo}{action};
-
 
   # 情况1：当类型为 new，则新建策略
   if ( $type eq "new" ) {

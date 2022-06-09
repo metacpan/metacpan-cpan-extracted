@@ -15,31 +15,15 @@ with 'Firewall::Config::Element::Address::Role';
 # Firewall::Config::Element::Address::Fortinet 通用属性
 #------------------------------------------------------------------------------
 # 改写 ip mask 属性 => 非必须
-has '+ip' => (
-  required => 0,
-);
+has '+ip' => ( required => 0, );
 
-has '+mask' => (
-  required => 0,
-);
+has '+mask' => ( required => 0, );
 
-has zone => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has zone => ( is => 'ro', isa => 'Str', required => 0, );
 
-has startIp => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has startIp => ( is => 'ro', isa => 'Str', required => 0, );
 
-has endIp => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 0,
-);
+has endIp => ( is => 'ro', isa => 'Str', required => 0, );
 
 #------------------------------------------------------------------------------
 # 重写 Firewall::Config::Element::Role => _buildSign 方法，

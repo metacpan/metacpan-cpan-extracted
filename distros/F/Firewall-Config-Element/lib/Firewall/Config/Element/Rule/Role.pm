@@ -13,37 +13,15 @@ with 'Firewall::Config::Element::Role';
 #------------------------------------------------------------------------------
 # Firewall::Config::Element::Rule::Role 通用属性
 #------------------------------------------------------------------------------
-has action => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-);
+has action => ( is => 'ro', isa => 'Str', required => 1, );
 
-has isDisable => (
-  is      => 'ro',
-  isa     => 'Str',
-  default => 'enable',
-  writer  => 'setIsDisable',
-);
+has isDisable => ( is => 'ro', isa => 'Str', default => 'enable', writer => 'setIsDisable', );
 
-has hasLog => (
-  is      => 'ro',
-  isa     => 'Undef|Str',
-  default => undef,
-);
+has hasLog => ( is => 'ro', isa => 'Undef|Str', default => undef, );
 
-has schName => (
-  is      => 'ro',
-  isa     => 'Undef|Str',
-  default => undef,
-);
+has schName => ( is => 'ro', isa => 'Undef|Str', default => undef, );
 
-has content => (
-  is       => 'ro',
-  isa      => 'Str',
-  required => 1,
-  writer   => 'setContent',
-);
+has content => ( is => 'ro', isa => 'Str', required => 1, writer => 'setContent', );
 
 has srcAddressGroup => (
   is      => 'ro',
@@ -73,11 +51,7 @@ has schedule => (
   writer    => 'setSchedule',
 );
 
-has ruleNum => (
-  is       => 'ro',
-  isa      => 'Int',
-  required => 0,
-);
+has ruleNum => ( is => 'ro', isa => 'Int', required => 0, );
 
 #------------------------------------------------------------------------------
 # does 对象 requires 需要实现的方法

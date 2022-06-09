@@ -3,10 +3,9 @@ package Firewall::Config::Parser::Topsec;
 #------------------------------------------------------------------------------
 # 加载扩展模块
 #------------------------------------------------------------------------------
-use Carp;
-use Encode;
 use Moose;
 use namespace::autoclean;
+use Encode;
 
 #------------------------------------------------------------------------------
 # 加载 Firewall::Config::Parser::Topsec 相关属性和方法
@@ -24,7 +23,6 @@ use Firewall::Config::Element::Interface::Topsec;
 use Firewall::Config::Element::Zone::Topsec;
 use Firewall::Config::Element::DynamicNat::Topsec;
 use experimental 'smartmatch';
-use Mojo::Util qw(dumper);
 
 with 'Firewall::Config::Parser::Role';
 
@@ -42,18 +40,10 @@ sub parse {
     if    ( $self->isRoute($string) )   { $self->parseRoute($string) }
     elsif ( $self->isZone($string) )    { $self->parseZone($string) }
     elsif ( $self->isAddress($string) ) { $self->parseAddress($string) }
-    elsif ( $self->isAddressGroup($string) ) {
-      $self->parseAddressGroup($string);
-    }
-    elsif ( $self->isService($string) ) {
-      $self->parseService($string);
-    }
-    elsif ( $self->isServiceGroup($string) ) {
-      $self->parseServiceGroup($string);
-    }
-    elsif ( $self->isSchedule($string) ) {
-      $self->parseSchedule($string);
-    }
+    elsif ( $self->isAddressGroup($string) ) {$self->parseAddressGroup($string)}
+    elsif ( $self->isService($string) ) {$self->parseService($string)}
+    elsif ( $self->isServiceGroup($string) ) {$self->parseServiceGroup($string)}
+    elsif ( $self->isSchedule($string) ) {$self->parseSchedule($string)}
 
     #elsif ( $self->isActive($string)       ) { $self->setActive($string)         }
     else { $self->ignoreLine }
@@ -101,10 +91,7 @@ sub parseInterface {
       my $other = $+{other};
       my $interface;
       unless ( $interface = $self->getInterface($name) ) {
-        $interface = Firewall::Config::Element::Interface::Topsec->new(
-          name   => $name,
-          config => $string
-        );
+        $interface = Firewall::Config::Element::Interface::Topsec->new( name => $name, config => $string );
         $self->addElement($interface);
       }
       else {
@@ -244,11 +231,8 @@ sub parseZone {
     }
     elsif ( $string =~ /^ID\s+(\d+)\s+define\s+area\s+add\s+name\s+(?<name>\S+)\s+attribute\s+'(?<ints>.+)'\s+/i ) {
       my @ints = split( '\s+', $+{ints} );
-      my $zone = Firewall::Config::Element::Zone::Topsec->new(
-        fwId   => $self->fwId,
-        name   => $+{name},
-        config => $string
-      );
+      my $zone
+        = Firewall::Config::Element::Zone::Topsec->new( fwId => $self->fwId, name => $+{name}, config => $string );
       $self->addElement($zone);
       for my $intName (@ints) {
         my $interface = $self->getInterface($intName);
@@ -332,10 +316,7 @@ sub parseAddress {
     my $name = $+{name};
     $address = $self->getAddress($name);
     unless ( defined $address ) {
-      $address = Firewall::Config::Element::Address::Topsec->new(
-        addrName => $name,
-        config   => $string
-      );
+      $address = Firewall::Config::Element::Address::Topsec->new( addrName => $name, config => $string );
       $self->addElement($address);
     }
     else {
@@ -391,10 +372,7 @@ sub parseAddressGroup {
     my $name = $+{name};
     $addGroup = $self->getAddressGroup($name);
     unless ( defined $addGroup ) {
-      $addGroup = Firewall::Config::Element::AddressGroup::Topsec->new(
-        addrGroupName => $name,
-        config        => $string
-      );
+      $addGroup = Firewall::Config::Element::AddressGroup::Topsec->new( addrGroupName => $name, config => $string );
       $self->addElement($addGroup);
     }
     else {
@@ -494,10 +472,7 @@ sub parseServiceGroup {
     my @sers     = split( '\s+', $+{sers} );
     my $serGroup = $self->getServiceGroup($name);
     unless ( defined $serGroup ) {
-      $serGroup = Firewall::Config::Element::ServiceGroup::Topsec->new(
-        srvGroupName => $name,
-        config       => $string
-      );
+      $serGroup = Firewall::Config::Element::ServiceGroup::Topsec->new( srvGroupName => $name, config => $string );
       $self->addElement($serGroup);
     }
     for my $service (@sers) {
@@ -881,22 +856,14 @@ sub addToRuleSrcAddressGroup {
   if ( defined $type and $type eq 'vlan' ) {
     my $intVlan = $self->getInterface($srcAddrName);
     my ( $ip, $mask ) = ( $intVlan->{ipAddress}, $intVlan->{mask} );
-    $obj = Firewall::Config::Element::Address::Topsec->new(
-      addrName => $srcAddrName,
-      ip       => $ip,
-      mask     => $mask
-    );
+    $obj = Firewall::Config::Element::Address::Topsec->new( addrName => $srcAddrName, ip => $ip, mask => $mask );
     $obj->addMember( {'ipmask' => $ip . "/$mask"} );
     $rule->addSrcAddressMembers( $srcAddrName, $obj );
     return;
   }
   if ( $srcAddrName =~ /^(?:Any)$/io ) {
     unless ( $obj = $self->getAddress($srcAddrName) ) {
-      $obj = Firewall::Config::Element::Address::Topsec->new(
-        addrName => $srcAddrName,
-        ip       => '0.0.0.0',
-        mask     => 0
-      );
+      $obj = Firewall::Config::Element::Address::Topsec->new( addrName => $srcAddrName, ip => '0.0.0.0', mask => 0 );
       $obj->addMember( {'ipmask' => "0.0.0.0/0"} );
       $self->addElement($obj);
     }
@@ -916,22 +883,14 @@ sub addToRuleDstAddressGroup {
   if ( defined $type and $type eq 'vlan' ) {
     my $intVlan = $self->getInterface($dstAddrName);
     my ( $ip, $mask ) = ( $intVlan->{ipAddress}, $intVlan->{mask} );
-    $obj = Firewall::Config::Element::Address::Topsec->new(
-      addrName => $dstAddrName,
-      ip       => $ip,
-      mask     => $mask
-    );
+    $obj = Firewall::Config::Element::Address::Topsec->new( addrName => $dstAddrName, ip => $ip, mask => $mask );
     $obj->addMember( {'ipmask' => $ip . "/$mask"} );
     $rule->addDstAddressMembers( $dstAddrName, $obj );
     return;
   }
   if ( $dstAddrName =~ /^(?:Any)$/io ) {
     unless ( $obj = $self->getAddress($dstAddrName) ) {
-      $obj = Firewall::Config::Element::Address::Topsec->new(
-        addrName => $dstAddrName,
-        ip       => '0.0.0.0',
-        mask     => 0
-      );
+      $obj = Firewall::Config::Element::Address::Topsec->new( addrName => $dstAddrName, ip => '0.0.0.0', mask => 0 );
       $obj->addMember( {'ipmask' => "0.0.0.0/0"} );
       $self->addElement($obj);
     }

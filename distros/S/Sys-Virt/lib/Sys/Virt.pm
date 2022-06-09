@@ -81,7 +81,7 @@ use Sys::Virt::DomainSnapshot;
 use Sys::Virt::DomainCheckpoint;
 use Sys::Virt::Stream;
 
-our $VERSION = '8.3.0';
+our $VERSION = '8.4.0';
 require XSLoader;
 XSLoader::load('Sys::Virt', $VERSION);
 
@@ -1320,9 +1320,13 @@ network interfaces
 Abort a transaction for changing the configuration of one or more
 network interfaces
 
-=item $conn->restore_domain($savefile)
+=item $conn->restore_domain($savefile, $dxml=undef, $params=undef, $flags=0)
 
-Recreate a domain from the saved state file given in the C<$savefile> parameter.
+Recreate a domain from the saved state file given in the C<$savefile>
+parameter. The optional C<$dxml> parameter can be used to alter portions of the
+domain XML. The C<$params> parameter is a hash reference whose keys is a subset
+of the SAVE / RESTORE PARAMETER CONSTANTS. The C<$flags> parameter accepts one
+of the SAVE / RESTORE FLAG CONSTANTS described later and defaults to zero.
 
 =item $conn->get_max_vcpus($domtype)
 
@@ -1619,6 +1623,10 @@ Maximum number of SEV guests that can be launched
 =item Sys::Virt::SEV_MAX_ES_GUESTS
 
 Maximum number of SEV-ES guests that can be launched
+
+=item Sys::Virt::SEV_CPU0_ID
+
+The SEV firmware ID for CPU 0
 
 =back
 

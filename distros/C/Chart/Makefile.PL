@@ -18,14 +18,15 @@ my %WriteMakefileArgs = (
   "NAME" => "Chart",
   "PREREQ_PM" => {
     "Carp" => "1.35",
-    "GD" => 2
+    "GD" => 2,
+    "POSIX" => 1
   },
   "TEST_REQUIRES" => {
     "File::Temp" => "0.19",
     "Test::More" => "1.3",
     "Test::Warn" => "0.30"
   },
-  "VERSION" => "v2.402.0",
+  "VERSION" => "v2.402.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,6 +37,7 @@ my %FallbackPrereqs = (
   "Carp" => "1.35",
   "File::Temp" => "0.19",
   "GD" => 2,
+  "POSIX" => 1,
   "Test::More" => "1.3",
   "Test::Warn" => "0.30"
 );

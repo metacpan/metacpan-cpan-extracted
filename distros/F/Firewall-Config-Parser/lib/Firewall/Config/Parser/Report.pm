@@ -1,17 +1,16 @@
 package Firewall::Config::Parser::Report;
 
+#------------------------------------------------------------------------------
+# 加载扩展模块
+#------------------------------------------------------------------------------
 use Moose;
 use namespace::autoclean;
 
 #------------------------------------------------------------------------------
 # Firewall::Config::Parser::Report 通用属性
 #------------------------------------------------------------------------------
-has source => (
-  is      => 'ro',
-  isa     => 'HashRef[Firewall::Policy::Element::Source]',
-  default => sub { {} },
-  writer  => 'setSource',
-);
+has source =>
+  ( is => 'ro', isa => 'HashRef[Firewall::Policy::Element::Source]', default => sub { {} }, writer => 'setSource', );
 
 has destination => (
   is      => 'ro',

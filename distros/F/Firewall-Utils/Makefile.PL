@@ -17,7 +17,6 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.016",
   "NAME" => "Firewall::Utils",
   "PREREQ_PM" => {
-    "Carp" => 0,
     "Mail::Sender" => 0,
     "Moose" => 0,
     "POSIX" => 0,
@@ -25,7 +24,7 @@ my %WriteMakefileArgs = (
     "namespace::autoclean" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => ""
   }
@@ -33,7 +32,6 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Carp" => 0,
   "Mail::Sender" => 0,
   "Moose" => 0,
   "POSIX" => 0,

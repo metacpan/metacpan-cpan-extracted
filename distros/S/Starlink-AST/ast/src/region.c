@@ -262,6 +262,14 @@ f     - AST_SHOWMESH: Display a mesh of points on the surface of a Region
 *        Added 8-byte interface for astMask<X>.
 *     23-JAN-2020 (DSB):
 *        Added astPointInRegion.
+*     8-JUN-2021 (DSB):
+*        When creating a deep copy of a Region, ensure the RegionFS attribute
+*        is cleared in the copy. This means that if a component Region within
+*        a CmpRegion is copied, a dump of the resulting copy will include the
+*        FrameSet.
+*     28-OCT-2021 (DSB):
+*        Modified astGetRegionMesh so that meshes for SkyFrame regions that cross
+*        zero longitude do not include jumps of 2.PI in logitude.
 *class--
 
 *  Implementation Notes:
@@ -968,7 +976,7 @@ static size_t GetObjSize( AstObject *, int * );
 static int GetUseDefs( AstObject *, int * );
 static int IsUnitFrame( AstFrame *, int * );
 static int LineContains( AstFrame *, AstLineDef *, int, double *, int * );
-static int LineCrossing( AstFrame *, AstLineDef *, AstLineDef *, double[5], int * );
+static int LineCrossing( AstFrame *, AstLineDef *, AstLineDef *, double[5], double *, int * );
 static int Match( AstFrame *, AstFrame *, int, int **, int **, AstMapping **, AstFrame **, int * );
 static int Overlap( AstRegion *, AstRegion *, int * );
 static int OverlapX( AstRegion *, AstRegion *, int * );
@@ -979,6 +987,7 @@ static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstM
 static int RegTrace( AstRegion *, int, double *, double **, int * );
 static int Unformat( AstFrame *, int, const char *, double *, int * );
 static int ValidateAxis( AstFrame *, int, int, const char *, int * );
+static AstPointSet *NormalPoints( AstFrame *, AstPointSet *, int, AstPointSet *, int * );
 static void AxNorm( AstFrame *, int, int, int, double *, int * );
 static void CheckPerm( AstFrame *, const int *, const char *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
@@ -4733,6 +4742,7 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name, int *status ) {
    frame->IsUnitFrame = IsUnitFrame;
    frame->Match = Match;
    frame->Norm = Norm;
+   frame->NormalPoints = NormalPoints;
    frame->NormBox = NormBox;
    frame->Offset = Offset;
    frame->Offset2 = Offset2;
@@ -5047,7 +5057,7 @@ static int LineContains( AstFrame *this_frame, AstLineDef *l, int def, double *p
 }
 
 static int LineCrossing( AstFrame *this_frame, AstLineDef *l1, AstLineDef *l2,
-                         double cross[5], int *status ) {
+                         double cross[5], double *dist, int *status ) {
 /*
 *  Name:
 *     LineCrossing
@@ -5061,7 +5071,7 @@ static int LineCrossing( AstFrame *this_frame, AstLineDef *l1, AstLineDef *l2,
 *  Synopsis:
 *     #include "region.h"
 *     int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
-*                       double cross[5], int *status )
+*                       double cross[5], double *dist, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the protected astLineCrossing
@@ -5091,6 +5101,10 @@ static int LineCrossing( AstFrame *this_frame, AstLineDef *l1, AstLineDef *l2,
 *        account of the current axis permutation array if appropriate. Note,
 *        sub-classes such as SkyFrame may append extra values to the end
 *        of the basic frame axis values.
+*     dist
+*        Pointer to a double in which to return the distance from the
+*        start of line "l1" to the crossing point. May be NULL if not
+*        required. Returned equal to zero if an error occurs.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -5117,11 +5131,12 @@ static int LineCrossing( AstFrame *this_frame, AstLineDef *l1, AstLineDef *l2,
 
 /* Initialise */
    result =0;
+   if( dist ) *dist = 0.0;
 
 /* Obtain a pointer to the Region's current Frame and then invoke the
    method. Annul the Frame pointer afterwards. */
    fr = astGetFrame( ((AstRegion *) this_frame)->frameset, AST__CURRENT );
-   result = astLineCrossing( fr, l1, l2, cross );
+   result = astLineCrossing( fr, l1, l2, cross, dist );
    fr = astAnnul( fr );
 
 /* Return the result. */
@@ -6557,6 +6572,93 @@ static void Norm( AstFrame *this_frame, double value[], int *status ) {
    fr = astGetFrame( this->frameset, AST__CURRENT );
    astNorm( fr, value );
    fr = astAnnul( fr );
+}
+
+static AstPointSet *NormalPoints( AstFrame *this_frame, AstPointSet *in, int contig,
+                                  AstPointSet *out, int *status ) {
+/*
+*  Name:
+*     NormalPoints
+
+*  Purpose:
+*     Normalise a collection of points.
+
+*  Type:
+*     Region member function (over-rides the astNormalPoints method inherited
+*     from the Frame class).
+
+*  Synopsis:
+*     #include "frame.h"
+*     AstPointSet *NormalPoints( AstFrame *this, AstPointSet *in,
+*                                int contig, AstPointSet *out )
+
+*  Description:
+*     This function normalises the axis values representing a collection
+*     of points within a Frame. The normalisation can be done in two ways
+*     - 1) to put the axis values into the range expected for display to
+*     human readers or 2) to put the axis values into which ever range
+*     avoids discontinuities within the collection of positions. Using
+*     method 1) is the same as using function astNorm on each point in the
+*     collection. Using method 2) is useful when handling collections of
+*     points that may span some discontinuity in the coordinate system.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame. The nature of the axis normalisation
+*        will depend on the class of Frame supplied.
+*     in
+*        Pointer to the PointSet holding the input coordinate data.
+*     contig
+*        Indicates the way in which the normalised axis values are to be
+*        calculated. A non-zero value causes the values to be normalised
+*        in such a way as to reduce the effects of any discontinuities in
+*        the coordinate system. For instance, points in a SkyFrame that
+*        span longitude zero will be normalized into a longitude range of
+*        -pi to +pi (otherwise they will be normalized into a range of
+*        zero to 2.pi). A zero value causes each point to be normalised
+*        independently using astNorm.
+*     out
+*        Pointer to a PointSet which will hold the normalised
+*        (output) coordinate values. A NULL value may also be given,
+*        in which case a new PointSet will be created by this
+*        function.
+
+*  Returned Value:
+*     Pointer to the output (possibly new) PointSet.
+
+*  Notes:
+*     - The number of coordinate values per point in the input and output
+*     PointSet must each match the number of axes for the Frame being
+*     used.
+*     - If an output PointSet is supplied, it must have space for
+*     sufficient number of points and coordinate values per point to
+*     accommodate the result. Any excess space will be ignored.
+*     - A null pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*-
+*/
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to the current Frame */
+   AstRegion *this;              /* Pointer to the Region structure */
+   AstPointSet *result;          /* Pointer to returned PointSet */
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Obtain a pointer to the Region structure. */
+   this = (AstRegion *) this_frame;
+
+/* Obtain a pointer to the Region's current Frame and invoke this
+   Frame's astNormalPoints method to obtain the new values. Annul
+   the Frame pointer afterwards. */
+   fr = astGetFrame( this->frameset, AST__CURRENT );
+   result = astNormalPoints( fr, in, contig, out );
+   fr = astAnnul( fr );
+
+/* Return a pointer to the output PointSet. */
+   return result;
 }
 
 static void NormBox( AstFrame *this_frame, double lbnd[], double ubnd[],
@@ -9218,12 +9320,17 @@ f        The global status.
 *     original to new coordinate system is non-linear, the shape within
 *     the new coordinate system may be distorted, and so may not match
 *     that implied by the name of the Region subclass (Circle, Box, etc).
+*     - If the Region defines an area within a SkyFrame that traverses
+*     zero longitude, the returned positions will be normalised to avoid
+*     jumps of 2.PI radians in longitude (i.e. it will include longitude
+*     values less than zero or greater than 2.PI).
 
 *--
 */
 
 /* Local Variables: */
    AstPointSet *pset;       /* PointSet holding mesh/grid axis values */
+   AstPointSet *temp;       /* PointSet holding normalised mesh/grid axis values */
    double **ptr;            /* Pointer to mesh/grid axes values */
    double *p;               /* Pointer to next input axis value */
    double *q;               /* Pointer to next output axis value */
@@ -9252,12 +9359,18 @@ f        The global status.
          } else {
             pset = astRegBaseGrid( this );
          }
+
       } else {
          if( surface ) {
             pset = astRegMesh( this );
          } else {
             pset = astRegGrid( this );
          }
+
+/* Normalise the points to avoid discontinuities (e.g. at zero longitude). */
+         temp = astNormalPoints( this, pset, 1, NULL );
+         pset = astAnnul( pset );
+         pset = temp;
       }
 
 /* Return the number of points in the mesh or grid. */
@@ -10848,6 +10961,7 @@ f        The global status.
 
 /* Local Variables: */
    AstPointSet *ps;           /* PointSet holding mesh */
+   AstPointSet *temp;         /* PointSet holding normalised mesh */
    char *buffer = NULL;       /* Buffer for line output text */
    char buf[ 40 ];            /* Buffer for floating poitn value */
    double **ptr;              /* Pointers to the mesh data */
@@ -10863,6 +10977,11 @@ f        The global status.
 /* Get a PointSet holding the mesh */
    ps = astRegMesh( this );
    if( ps ) {
+
+/* Normalise it to avoid discontinuities in longitude etc */
+      temp = astNormalPoints( this, ps, 1, NULL );
+      ps = astAnnul( ps );
+      ps = temp;
 
 /* Get the number of axis values per position, and the number of positions. */
       nax = astGetNcoord( ps );
@@ -12811,6 +12930,11 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    if( in->unc ) out->unc = astCopy( in->unc );
    if( in->negation ) out->negation = astCopy( in->negation );
    if( in->defunc ) out->defunc = astCopy( in->defunc );
+
+/* Ensure the RegionFS attribute is cleared in the copy. This means that
+   if a component Region within a CmpRegion is copied, a dump of the
+   resulting copy will include the FrameSet. */
+   astClearRegionFS( out );
 }
 
 

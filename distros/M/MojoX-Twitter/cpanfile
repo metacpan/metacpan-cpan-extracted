@@ -1,4 +1,4 @@
-requires 'Mojolicious';
+requires 'Mojolicious' => '9.21';
 requires 'Digest::SHA';
 requires 'URI::Escape';
 

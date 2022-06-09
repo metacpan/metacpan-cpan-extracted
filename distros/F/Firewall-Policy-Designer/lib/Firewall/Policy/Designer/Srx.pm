@@ -12,23 +12,11 @@ use namespace::autoclean;
 use Firewall::Utils::Date;
 use Firewall::Policy::Searcher::Report::FwInfo;
 
-has dbi => (
-  is       => 'ro',
-  does     => 'Firewall::DBI::Role',
-  required => 1,
-);
+has dbi => ( is => 'ro', does => 'Firewall::DBI::Role', required => 1, );
 
-has searcherReportFwInfo => (
-  is       => 'ro',
-  isa      => 'Firewall::Policy::Searcher::Report::FwInfo',
-  required => 1,
-);
+has searcherReportFwInfo => ( is => 'ro', isa => 'Firewall::Policy::Searcher::Report::FwInfo', required => 1, );
 
-has commandText => (
-  is      => 'ro',
-  isa     => 'ArrayRef[Str]',
-  default => sub { [] },
-);
+has commandText => ( is => 'ro', isa => 'ArrayRef[Str]', default => sub { [] }, );
 
 sub addToCommandText {
   my ( $self, @commands ) = @_;

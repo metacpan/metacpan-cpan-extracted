@@ -12,18 +12,7 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Firewall-Config-Parser
-requires:
-  Carp: '0'
-  Encode: '0'
-  Firewall::Utils::Ip: '0'
-  Mojo::Util: '0'
-  Moose: '0'
-  Moose::Role: '0'
-  experimental: '0'
-  namespace::autoclean: '0'
-  strict: '0'
-  warnings: '0'
-version: '0.005'
+version: '0.006'
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -17,20 +17,12 @@ with 'Firewall::Config::Dao::Role';
 #------------------------------------------------------------------------------
 # 定义 Firewall::Config::Dao::Parser 方法属性
 #------------------------------------------------------------------------------
-has parser => (
-  is     => 'ro',
-  does   => 'Firewall::Config::Parser::Role',
-  writer => 'setParser',
-);
+has parser => ( is => 'ro', does => 'Firewall::Config::Parser::Role', writer => 'setParser', );
 
 #------------------------------------------------------------------------------
 # 设置文件工作路径，缺省为 '/works/firewall/lib/' | 数据缓存 data
 #------------------------------------------------------------------------------
-has home => (
-  is      => 'ro',
-  isa     => 'Str',
-  default => '/works/firewall/lib/'
-);
+has home => ( is => 'ro', isa => 'Str', default => '/works/firewall/lib/' );
 
 #------------------------------------------------------------------------------
 # getPluginObj 加载防火墙配置解析插件
@@ -44,10 +36,7 @@ sub getPluginObj {
   confess "ERROR: load plugin $pluginClassName failed: $@" if !!$@;
 
   # 实例化配置解析对象
-  my $pluginObj = $pluginClassName->new(
-    dbi    => $self->dbi,
-    parser => $self->parser
-  );
+  my $pluginObj = $pluginClassName->new( dbi => $self->dbi, parser => $self->parser );
 
   # 返回计算结果
   return $pluginObj;
@@ -113,6 +102,7 @@ sub loadParser {
 
   # my $data = 'Firewall/Config/Parser/data/';
   my $data = 'Caches/';
+  mkdir( $data, 0755 ) or confess("ERROR: mkdir( $data, 0755 ) failed: $!") if not -d $data;
 
   # mkdir($data, 0755) or confess("ERROR: mkdir( $data, 0755 ) failed: $!") if not -d $data;
 

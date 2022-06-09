@@ -7,61 +7,60 @@ Log::OK -  Disable inactive logging statements from the command line
 =head2	Application
 
 Setup your adaptor/dispatchers/output like usual using
-your logging framework (Log::Any and Log::Log4perl shown). (1)
+your logging framework (L<Log::ger> shown). (1)
 
 Then C<use Log::OK>  to setup a default logging level and/or specify a command
 line option (or environment variable) to set logging level. (2)
 
-Optionally synchronise the logging level of your logger to that configured by
+Synchronise the logging level of your logger to that configured by
 C<Log::OK>:
 
 
 	use strict;
 	use warnings;
 
-	use Log::Any::Adaptor;			#(1)
-	Log::Any::Adaptor->set("Log4perl");
+	use Log::ger;			#(1)
+	use Log::ger::Output "Screen";  #
+	use Log::ger::Util;		#
 
-	use Log::OK {				#(2)
-		lvl=>"info",
-		opt=>"verbose"
+	use Log::OK {			#(2)
+		lvl=>"info",		#
+		opt=>"verbose"		#
 	};
 
-	#Logging level stored in Log::OK::LEVEL #(3)
+	Log::ger::Util::set_level Log::OK::LEVEL; #(3}
 
 	My_Module::do_module_stuff();
 
 =head2 Module
 
-In your module, bring in your logging framework (Log::Any and Log::Log4perl
-shown). (1)
+In your module, bring in your logging framework (L<Log::ger> shown). (1)
 
 Then bring in C<Log::OK>, and optionally configure it with a default level.
 This will be used if the  top level script didn't define one (2)
 
 Constant names will be logging levels supported in your logging module, but
-converted to upper case. Use a constant together with a logical "and" and your
+converted to upper case.
+
+Use a constant together with a logical "and" and your
 logging statement for perl to optimise away inactive levels. (3)
 
 	package My_Module;
 	use strict;
 	use warnings;
 
-	use Log::Any qw($log);	#(1)
-
-	use Log::OK;		#(2)
+	use Log::ger;	#(1)
+	use Log::OK;	#(2)
 
 	sub do_module_stuff {
 				#(3)
 
-		Log::OK::EMERGENCY and $log->emergency("Emergency");
-		Log::OK::ALERT and $log->alert("Alert");
-		Log::OK::CRITICAL and $log->emergency("Critical");
-		Log::OK::ERROR and $log->emergency("Error");
-		Log::OK::WARN and $log->emergency("Warning");
-		Log::OK::NOTICE and $log->emergency("Notice");
-		Log::OK::INFO and $log->emergency("Info");
-		Log::OK::TRACE and $log->emergency("Trace");
+		Log::OK::FATAL and log_fatal("Fatal");
+		Log::OK::ERROR and log_error("Error");
+		Log::OK::WARN and log_warn("Warning");
+		Log::OK::INFO and log_info("Information");
+		Log::OK::DEBUG and log_debug("Debug");
+		Log::OK::TRACE and log_trace("Trace");
 	}
 
 	1;
@@ -76,14 +75,13 @@ line using the L<GetOpt::Long> options specification used:
 
 The output of the above would be
 	
-	Emergency
-	Alert
-	Critical
+	Fatal
 	Error
-	Warn
+	Warning
+	Information
 
 
-Notice, Info and Trace will not be executed at runtime
+Notice, Debug and Trace loggin  will not be executed at runtime
 
 =head1 DESCRIPTION
 
@@ -111,8 +109,7 @@ logging statements to reduce runtime overhead.
 By using the generated constants/flags in the following fashion, perl will
 optimise away this entire statement when C<Log::OK::DEBUG> is false for example:
 
-		Log::OK::FATAL and log_fatal("Fatal");
-
+		Log::OK::DEBUG and log_DEBUG("This message is optimised away");
 
 
 =head2 Supported Logging Modules 
@@ -124,12 +121,13 @@ modules logging levels.
 
 These modules are B<NOT> dependencies of C<Log::OK>.
 
-
 =head1 USAGE
 
 The constants generated are determined by the logging system selected/detected
-at the point of the C<use Log::OK> pragma.
-
+at the point of the C<use Log::OK> pragma. That means you need to bring in your
+logging framework before you bring in C<Log::OK>:
+	
+	use My::Fancy::Logger; #<-- do this first
 	use Log::OK {
 		opt=>$get_opt_long_spec,
 		env=>$env_var_name,
@@ -141,7 +139,6 @@ at the point of the C<use Log::OK> pragma.
 =head2 Hash keys
 
 All keys to the hash are optional and are detailed below:
-
 
 =head3 lvl
 
@@ -231,7 +228,7 @@ need to appear before any modules that also use it:
 
 	use My::Fancy::Module; #module that uses Log::OK
 
-=head2 Extraciting Log Level
+=head2 Extracting Log Level
 
 The log level used to create the constants is accessible via C<Log::OK::LEVEL>.
 It is a string representation of the log level in the detected logging
@@ -256,8 +253,24 @@ system detected, croak is called with a list of supported level names
 Constants are treated as constants so, once they are defined, the value remains
 the same for the program duration.
 
+Using multiple logging frameworks in the same project (sub modules choosing
+a different one that you for example) should work as long as:
+
+=over
+
+=item *
+
+You don't need to rely on C<Log::OK::LEVEL> to synchronise the logging level.
+This value is framework specific.
+
+=item *
+
+Command line processing is only done by one module.
+
+=back
+
 Also the incremental changing of the logging level from the command line only
-increases the logging level
+increases the logging level.
 
 Synchronising the logging level of your logging framework is easy in some and
 not so easy in others. If you are missing log messages the logger might be

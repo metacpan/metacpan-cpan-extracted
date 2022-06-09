@@ -18,7 +18,7 @@ $rwf->once(read => sub { shift->write("line two\n")->close('stdin'); });
 $rwf->run_and_capture_p(sub { print while <> })->then(sub { push @assets, shift })->wait;
 
 my $path = $assets[-1]->path;
-like $assets[-1]->slurp, qr/line one\nline two\n/, 'finish';
+like $assets[-1]->slurp, qr/line one\nline two\n/, 'asset content';
 isa_ok $_, 'Mojo::Asset' for @assets;
 is @assets, 3, 'got three assets';
 ok $path, 'got file asset';

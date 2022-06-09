@@ -22,12 +22,7 @@ use Firewall::Config::Parser::Report;
 #------------------------------------------------------------------------------
 # Firewall::Config::Parser::Role 通用属性
 #------------------------------------------------------------------------------
-has fwId => (
-  is      => 'ro',
-  isa     => 'Int',
-  builder => '_buildFwId',
-  writer  => 'setFwId',
-);
+has fwId => ( is => 'ro', isa => 'Int', builder => '_buildFwId', writer => 'setFwId', );
 
 #------------------------------------------------------------------------------
 # does 要求该属性包含 Firewall::Config::Content::Role
@@ -48,19 +43,13 @@ has config => (
   },
 );
 
-has preDefinedService => (
-  is       => 'ro',
-  does     => 'HashRef[Firewall::Config::Element::Service::Role]',
-  required => 1,
-);
+has preDefinedService => ( is => 'ro', does => 'HashRef[Firewall::Config::Element::Service::Role]', required => 1, );
 
 has elements => (
   is      => 'ro',
   isa     => 'Firewall::Config::Parser::Elements',
   default => sub { Firewall::Config::Parser::Elements->new },
-  handles => {
-    addElement => 'addElement',
-  },
+  handles => {addElement => 'addElement',},
 );
 
 has report => (
@@ -69,18 +58,9 @@ has report => (
   default => sub { Firewall::Config::Parser::Report->new },
 );
 
-has elementType => (
-  is      => 'ro',
-  isa     => 'Str|Undef',
-  default => undef,
-  writer  => 'setElementType',
-);
+has elementType => ( is => 'ro', isa => 'Str|Undef', default => undef, writer => 'setElementType', );
 
-has ruleIndex => (
-  is      => 'ro',
-  isa     => 'HashRef',
-  default => sub { {} },
-);
+has ruleIndex => ( is => 'ro', isa => 'HashRef', default => sub { {} }, );
 
 #------------------------------------------------------------------------------
 # Firewall::Config::Parser::Role 通用属性
@@ -149,21 +129,21 @@ sub createReport {
       ranges   => $rule->srcAddressGroup->range
     );
     $self->report->destination->{$rule->sign} = Firewall::Policy::Element::Destination->new(
-      "fwId"     => $self->fwId,
-      "ruleSign" => $rule->sign,
-      "ranges"   => $rule->dstAddressGroup->range
+      fwId     => $self->fwId,
+      ruleSign => $rule->sign,
+      ranges   => $rule->dstAddressGroup->range
     );
 
     # 解析防火墙策略服务端口对象
     for my $protocol ( keys %{$rule->serviceGroup->dstPortRangeMap} ) {
       $self->report->service->{$rule->sign}{$protocol} = Firewall::Policy::Element::Service->new(
-        "fwId"     => $self->fwId,
-        "ruleSign" => $rule->sign,
-        "protocol" => $protocol,
-        "ranges"   => $rule->serviceGroup->dstPortRangeMap->{$protocol}
+        fwId     => $self->fwId,
+        ruleSign => $rule->sign,
+        protocol => $protocol,
+        ranges   => $rule->serviceGroup->dstPortRangeMap->{$protocol}
       );
     }
-  } ## end for my $rule ( values %...)
-} ## end sub createReport
+  }
+}
 
 1;
