@@ -22,11 +22,13 @@ HTML::Obj2HTML::register_extension("help", {
   },
   before => sub {
     my $o = shift;
-    if ($o->{html}) {
-      $o->{"data-html"} = $o->{html}; delete($o->{html});
-    }
-    if ($o->{text}) {
-      $o->{"data-content"} = $o->{text}; delete($o->{text});
+    if (ref $o eq "HASH") {
+      if ($o->{html}) {
+        $o->{"data-html"} = $o->{html}; delete($o->{html});
+      }
+      if ($o->{text}) {
+        $o->{"data-content"} = $o->{text}; delete($o->{text});
+      }
     }
     return "";
   }
@@ -65,6 +67,7 @@ HTML::Obj2HTML::register_extension("dropdownmenu", {
   before => sub {
     my $obj = shift;
 
+    if (ref $obj ne "HASH") { return ""; }
     my $label = $obj->{label};
     delete($obj->{label});
 

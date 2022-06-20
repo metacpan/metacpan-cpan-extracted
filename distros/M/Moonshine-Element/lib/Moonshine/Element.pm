@@ -7,7 +7,7 @@ use UNIVERSAL::Object;
 use Data::GUID;
 use Autoload::AUTOCAN;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use feature qw/switch/;
 no if $] >= 5.017011, warnings => 'experimental::smartmatch';
@@ -142,6 +142,12 @@ sub add_child {
     my $child = $_[0]->build_element( $_[1] );
     $_[0]->$action($child);
     return $child;
+}
+
+sub insert_child {
+    my $element = $_[0]->build_element( $_[2] );
+    splice @{ $_[0]->{children} }, $_[1], 0, $element;
+    return $element;
 }
 
 sub add_before_element {
@@ -307,7 +313,7 @@ Moonshine::Element - Build some more html.
 
 =head1 VERSION
 
-Version 0.11 
+Version 0.12 
 
 =head1 DESCRIPTION
 
@@ -320,11 +326,12 @@ Version 0.11
     my $child = $base->add_child({ tag => 'p' });
     $child->add_before_element({ tag => 'span' });
     $child->add_after_element({ tag => 'span' });
-
+    $child->insert_child(0, { tag => "b" });
+ 
     $base->render
     .......
 
-OUTPUT: <div><span></span><p></p><span></span></div>
+OUTPUT: <div><span></span><p><b></b></p><span></span></div>
 
 =head1 ATTRIBUTES
 

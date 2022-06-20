@@ -14,6 +14,13 @@ use Class::Tiny qw(
 
 our $names;
 
+sub load {
+    my $yaml_path = shift // dist_file( 'Data-Gimei', 'names.yml' );
+    Carp::croak("failed to load name data: $yaml_path") unless -r $yaml_path;
+
+    $names = YAML::XS::LoadFile($yaml_path);
+}
+
 sub BUILDARGS {
     my $class = shift;
     my %args  = @_;
@@ -29,31 +36,31 @@ sub BUILDARGS {
     return \%args;
 }
 
-sub load {
-    my $yaml_path = shift // dist_file( 'Data-Gimei', 'names.yml' );
-    Carp::croak("failed to load name data: $yaml_path") unless (-r $yaml_path);
+sub to_s {
+    my $self = shift;
 
-    $names = YAML::XS::LoadFile($yaml_path);
+    return sprintf( "%s, %s, %s, %s, %s",
+        $self->gender, $self->kanji, $self->hiragana, $self->katakana, $self->romaji );
 }
 
 sub kanji {
-    my $self = shift;
-    return $self->family->kanji . " " . $self->given->kanji;
+    my ( $self, $s ) = @_;
+    return join $s // ' ', map { $_->kanji } ( $self->family, $self->given );
 }
 
 sub hiragana {
-    my $self = shift;
-    return $self->family->hiragana . " " . $self->given->hiragana;
+    my ( $self, $s ) = @_;
+    return join $s // ' ', map { $_->hiragana } ( $self->family, $self->given );
 }
 
 sub katakana {
-    my $self = shift;
-    return $self->family->katakana . " " . $self->given->katakana;
+    my ( $self, $s ) = @_;
+    return join $s // ' ', map { $_->katakana } ( $self->family, $self->given );
 }
 
 sub romaji {
-    my $self = shift;
-    return $self->given->romaji . " " . $self->family->romaji;
+    my ( $self, $s ) = @_;
+    return join $s // ' ', map { $_->romaji } ( $self->given, $self->family );
 }
 
 1;

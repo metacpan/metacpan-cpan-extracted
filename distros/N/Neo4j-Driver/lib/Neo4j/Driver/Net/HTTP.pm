@@ -4,8 +4,8 @@ use warnings;
 use utf8;
 
 package Neo4j::Driver::Net::HTTP;
-# ABSTRACT: Networking delegate for Neo4j HTTP
-$Neo4j::Driver::Net::HTTP::VERSION = '0.30';
+# ABSTRACT: Network controller for Neo4j HTTP
+$Neo4j::Driver::Net::HTTP::VERSION = '0.31';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -36,13 +36,17 @@ sub new {
 	# uncoverable pod
 	my ($class, $driver) = @_;
 	
-	my $net_module = $driver->{net_module} || 'Neo4j::Driver::Net::HTTP::LWP';
+	$driver->{plugins}->{default_handlers}->{http_adapter_factory} //= sub {
+		my $net_module = $driver->{net_module} || 'Neo4j::Driver::Net::HTTP::LWP';
+		return $net_module->new($driver);
+	};
+	my $http_adapter = $driver->{plugins}->trigger_event('http_adapter_factory', $driver);
 	
 	my $self = bless {
 		die_on_error => $driver->{die_on_error},
 		cypher_types => $driver->{cypher_types},
 		server_info => $driver->{server_info},
-		http_agent => $net_module->new($driver),
+		http_agent => $http_adapter,
 		want_jolt => $driver->{jolt},
 		want_concurrent => $driver->{concurrent_tx} // 1,
 		active_tx => {},
@@ -128,7 +132,8 @@ sub _accept_for {
 	my ($self, $method) = @_;
 	
 	# GET requests may fail if Neo4j sees clients that support Jolt, see neo4j #12644
-	my @modules = ( $self->{http_agent}->result_handlers, @RESULT_MODULES );
+	my @modules = @RESULT_MODULES;
+	unshift @modules, $self->{http_agent}->result_handlers if $self->{http_agent}->can('result_handlers');
 	my @accept = map { $_->_accept_header( $self->{want_jolt}, $method ) } @modules;
 	return $self->{accept_for}->{$method} = join ', ', @accept;
 }
@@ -139,7 +144,8 @@ sub _accept_for {
 sub _result_module_for {
 	my ($self, $content_type) = @_;
 	
-	my @modules = ( $self->{http_agent}->result_handlers, @RESULT_MODULES );
+	my @modules = @RESULT_MODULES;
+	unshift @modules, $self->{http_agent}->result_handlers if $self->{http_agent}->can('result_handlers');
 	foreach my $module (@modules) {
 		if ($module->_acceptable($content_type)) {
 			return $self->{result_module_for}->{$content_type} = $module;

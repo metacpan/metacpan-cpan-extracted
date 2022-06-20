@@ -11,7 +11,6 @@ use Moose                     ();
 use MooseX::StrictConstructor ();
 use mro                       ();
 use namespace::autoclean      ();
-use Moose::Util 'throw_exception';
 use Module::Load 'load';
 use MooseX::Extended::Core qw(
   _assert_import_list_is_valid
@@ -28,11 +27,13 @@ no warnings _disabled_warnings();
 use B::Hooks::AtRuntime 'after_runtime';
 use Import::Into;
 
-our $VERSION = '0.21';
+our $VERSION = '0.25';
 
 sub import {
     my ( $class, %args ) = @_;
+    my @caller = caller(0);
     $args{_import_type} = 'class';
+    $args{_caller_eval} = ( $caller[1] =~ /^\(eval/ );    # https://github.com/Ovid/moosex-extreme/pull/34
     my $target_class = _assert_import_list_is_valid( $class, \%args );
     my @with_meta    = grep { not $args{excludes}{$_} } qw(field param);
     if (@with_meta) {
@@ -71,7 +72,7 @@ sub _apply_default_features ( $config, $for_class, $params = undef ) {
         say STDERR "We are running under the debugger or using code that uses debugger code (e.g., Devel::Cover). $for_class is not immutable";
     }
     else {
-        unless ( $config->{excludes}{immutable} ) {
+        unless ( $config->{excludes}{immutable} or $config->{_caller_eval} ) {    # https://github.com/Ovid/moosex-extreme/pull/34
 
             # after_runtime is loaded too late under the debugger
             eval {
@@ -93,10 +94,10 @@ sub _apply_default_features ( $config, $for_class, $params = undef ) {
             };
         }
     }
-    unless ( $config->{excludes}{true} ) {
+    unless ( $config->{excludes}{true} or $config->{_caller_eval} ) {    # https://github.com/Ovid/moosex-extreme/pull/34
         eval {
             load true;
-            true->import::into($for_class);    # no need for `1` at the end of the module
+            true->import::into($for_class);                              # no need for `1` at the end of the module
             1;
         } or do {
             my $error = $@;
@@ -126,7 +127,7 @@ MooseX::Extended - Extend Moose with safe defaults and useful features
 
 =head1 VERSION
 
-version 0.21
+version 0.25
 
 =head1 SYNOPSIS
 
@@ -162,7 +163,10 @@ version 0.21
 =head1 DESCRIPTION
 
 This module is B<BETA> code. It's feature-complete for release and has no
-known bugs.
+known bugs. We believe it's ready for production, but make no promises.
+
+This is a quick overview. See L<MooseX::Extended::Manual::Tutorial> for more
+information.
 
 This class attempts to create a safer version of Moose that defaults to
 read-only attributes and is easier to read and write.
@@ -201,7 +205,7 @@ It also exports two functions which are similar to Moose C<has>: C<param> and
 C<field>.
 
 A C<param> is a required parameter (defaults may be used). A C<field> is not
-allowed to be passed to the constructor.
+intended to be passed to the constructor.
 
 Note that the C<has> function is still available, even if it's not needed.
 
@@ -260,49 +264,49 @@ problem. You can exclude the following:
 
 =item * C<StrictConstructor>
 
-    use MooseX::Extended::Role excludes => ['StrictConstructor'];
+    use MooseX::Extended excludes => ['StrictConstructor'];
 
 Excluding this will no longer import C<MooseX::StrictConstructor>.
 
 =item * C<autoclean>
 
-    use MooseX::Extended::Role excludes => ['autoclean'];
+    use MooseX::Extended excludes => ['autoclean'];
 
 Excluding this will no longer import C<namespace::autoclean>.
 
 =item * C<c3>
 
-    use MooseX::Extended::Role excludes => ['c3'];
+    use MooseX::Extended excludes => ['c3'];
 
 Excluding this will no longer apply the C3 mro.
 
 =item * C<carp>
 
-    use MooseX::Extended::Role excludes => ['carp'];
+    use MooseX::Extended excludes => ['carp'];
 
 Excluding this will no longer import C<Carp::croak> and C<Carp::carp>.
 
 =item * C<immutable>
 
-    use MooseX::Extended::Role excludes => ['immutable'];
+    use MooseX::Extended excludes => ['immutable'];
 
 Excluding this will no longer make your class immutable.
 
 =item * C<true>
 
-    use MooseX::Extended::Role excludes => ['true'];
+    use MooseX::Extended excludes => ['true'];
 
 Excluding this will require your module to end in a true value.
 
 =item * C<param>
 
-    use MooseX::Extended::Role excludes => ['param'];
+    use MooseX::Extended excludes => ['param'];
 
 Excluding this will make the C<param> function unavailable.
 
 =item * C<field>
 
-    use MooseX::Extended::Role excludes => ['field'];
+    use MooseX::Extended excludes => ['field'];
 
 Excluding this will make the C<field> function unavailable.
 
@@ -412,14 +416,17 @@ See the L<MooseX::Extended::Manual::Cloning> documentation.
 
 =head1 OBJECT CONSTRUCTION
 
-Objection construction for L<MooseX::Extended> is like Moose, so no
-changes are needed.  However, in addition to C<has>, we also provide C<param>
-and C<field> attributes, both of which are C<< is => 'ro' >> by default.
+Object construction for L<MooseX::Extended> is identical to Moose because
+MooseX::Extended I<is> Moose, so no changes are needed.  However, in addition
+to C<has>, we also provide C<param> and C<field> attributes, both of which are
+C<< is => 'ro' >> by default.
 
 The C<param> is I<required>, whether by passing it to the constructor, or using
 C<default> or C<builder>.
 
-The C<field> is I<forbidden> in the constructor and lazy by default.
+The C<field> is I<forbidden> in the constructor and is lazy if it has a
+builder, because that builder is often dependent on attributes set in the
+constructor (and why call it if it's not used?).
 
 Here's a short example:
 
@@ -462,6 +469,16 @@ When using C<field> or C<param>, we have some attribute shortcuts:
         ...
     }
 
+You can also do this:
+
+    param name ( isa => NonEmptyStr, builder => sub {...} );
+
+That's the same as:
+
+    param name ( isa => NonEmptyStr, builder => '_build_name' );
+
+    sub _build_name {...}
+
 See L<MooseX::Extended::Manual::Shortcuts> for a full explanation.
 
 =head1 INVALID ATTRIBUTE DEFINITIONS
@@ -485,7 +502,9 @@ if it encounters an illegal method name for an attribute.
 This also applies to various attributes which allow method names, such as
 C<clone>, C<builder>, C<clearer>, C<writer>, C<reader>, and C<predicate>.
 
-Trying to pass a defined C<init_arg> to C<field> will also this exception.
+Trying to pass a defined C<init_arg> to C<field> will also throw this
+exception, unless the init_arg begins with an underscore. (It is sometimes
+useful to be able to define an C<init_arg> for unit testing.)
 
 =head1 DEBUGGER SUPPORT
 
@@ -501,6 +520,8 @@ relies on L<B::Hooks::AtRuntime>'s C<after_runtime> function. However, that
 runs too late under the debugger and dies. Thus, we disable this feature under
 the debugger. Your classes may run a bit slower, but hey, it's the debugger!
 
+There is L<a PR against B::Hooks::AtRuntime which will fix this issue|https://github.com/mauzo/B-Hooks-AtRuntime/pull/1>.
+
 =item * C<namespace::autoclean> will frustrate you
 
 It's very frustrating when running under the debugger and doing this:
@@ -514,9 +535,19 @@ backed that out: L<https://github.com/Ovid/moosex-extreme/issues/11>.
 
 =back
 
+=head1 BUGS AND LIMITATIONS
+
+If the MooseX::Extended classes are loaded via I<stringy> eval, C<true> is not
+loaded, nor is your class made immutable. This is because there were
+intermittant errors (maybe 1 out of 5 times) being thrown. Removing these
+features under stringy eval solves this. See L<this github ticket for more
+infomration|https://github.com/Ovid/moosex-extreme/pull/34>.
+
 =head1 MANUAL
 
 =over 4
+
+=item * L<MooseX::Extended::Manual::Tutorial>
 
 =item * L<MooseX::Extended::Manual::Overview>
 

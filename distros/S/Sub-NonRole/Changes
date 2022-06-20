@@ -3,8 +3,18 @@ Sub-NonRole
 
 Created:      2013-01-03
 Home page:    <https://metacpan.org/release/Sub-NonRole>
-Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Sub-NonRole>
+Bug tracker:  <https://github.com/tobyink/p5-sub-nonrole/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.006	2022-06-17
+
+ [ Packaging ]
+ - Remove dependency on Sub::Identity which has not been needed for a
+   while.
+
+0.005	2022-06-17
+
+ - Updated: Use Role::Hooks instead of MooX::CaptainHook.
 
 0.004	2014-09-10
 

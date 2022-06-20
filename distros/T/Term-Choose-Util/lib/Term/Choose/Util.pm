@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.136';
+our $VERSION = '0.137';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf );
@@ -20,7 +20,7 @@ use Encode::Locale qw();
 use File::HomeDir  qw();
 
 use Term::Choose                  qw( choose );
-use Term::Choose::LineFold        qw( line_fold cut_to_printwidth print_columns );
+use Term::Choose::LineFold        qw( cut_to_printwidth print_columns );
 use Term::Choose::ValidateOptions qw( validate_options );
 
 
@@ -128,11 +128,13 @@ sub _valid_options {
         info                => 'Str',
         init_dir            => 'Str',
         back                => 'Str',
+        file_type           => 'Str',           # undocumented
         filter              => 'Str',
-        footer              => 'Str',             # undocumented
+        footer              => 'Str',           # undocumented
         confirm             => 'Str',
         prefix              => 'Str',
         prompt              => 'Str',
+        prompt_file_dir     => 'Str',           # undocumented
         cs_begin            => 'Str',
         cs_end              => 'Str',
         cs_label            => 'Str',
@@ -165,6 +167,7 @@ sub _defaults {
         cs_separator        => ', ',
         decoded             => 1,
         #default_number     => undef,
+        file_type           => 'File',
         #filter             => undef,
         #footer             => undef,
         hide_cursor         => 1,
@@ -182,6 +185,7 @@ sub _defaults {
         parent_dir          => '..',
         prefix              => '',
         prompt              => 'Your choice: ',
+        prompt_file_dir     => 'Choose the file directory:',
         show_hidden         => 1,
         small_first         => 0,
         #tabs_info          => undef,
@@ -205,7 +209,7 @@ sub _routine_options {
         $options = [ @every, qw( init_dir layout order alignment show_hidden decoded ) ];
     }
     elsif ( $caller eq 'choose_a_file' ) {
-        $options = [ @every, qw( init_dir layout order alignment show_hidden decoded filter ) ];
+        $options = [ @every, qw( init_dir layout order alignment show_hidden decoded filter prompt_file_dir file_type ) ];
     }
     elsif ( $caller eq 'choose_a_number' ) {
         $options = [ @every, qw( small_first reset thousands_separator default_number ) ];
@@ -373,12 +377,13 @@ sub choose_a_file {
     $self->__prepare_opt( $opt );
     my $init_dir = $self->__prepare_path();
     my $curr_dir = $init_dir;
+    my $prompt_fmt = "$self->{file_type}-Directory: %s";
+    $prompt_fmt =~ s/^-//;
+    if ( length $self->{prompt_file_dir} ) {
+        $prompt_fmt .= "\n" . $self->{prompt_file_dir};
+    }
 
     CHOOSE_DIR: while ( 1 ) {
-        my $prompt_fmt = "File-Directory: %s";
-        if ( length $self->{prompt} ) {
-            $prompt_fmt .= "\n" . $self->{prompt};
-        }
         my $chosen_dir = $self->__choose_a_path( $init_dir, $prompt_fmt, '<<', 'OK' );
         if ( ! defined $chosen_dir ) {
             $self->__restore_defaults(); #
@@ -511,9 +516,11 @@ sub __a_file {
             next if -d catdir $dir_fs, $file_fs;
             push @files, decode( 'locale_fs', $file_fs );
         }
+        my $chosen_dir = "$self->{file_type}-Directory: $dir";
+        $chosen_dir =~ s/^-//;
         my @tmp_prompt;
-        push @tmp_prompt, 'File-Directory: ' . $dir;
-        push @tmp_prompt, ( $self->{cs_label} // 'File: ' ) . ( length $prev_dir ? $prev_dir : '' );
+        push @tmp_prompt, $chosen_dir;
+        push @tmp_prompt, ( $self->{cs_label} // $self->{file_type} . ': ' // 'File: ' ) . ( length $prev_dir ? $prev_dir : '' );
         if ( length $self->{prompt} ) {
             push @tmp_prompt, $self->{prompt};
         }
@@ -973,7 +980,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.136
+Version 0.137
 
 =cut
 

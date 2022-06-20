@@ -1,11 +1,9 @@
-bashrc_pod
+bin/bashrc_pod
 bin/pod
 Build.PL
 Changes
 cpanfile
-ignore.txt
 lib/App/Pod.pm
-LICENSE
 MANIFEST			This list of files
 META.json
 META.yml

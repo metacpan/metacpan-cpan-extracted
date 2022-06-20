@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/MineralUtils.pm','script/convert-magnesium-unit'];
+my $filenames = ['lib/App/MineralUtils.pm','script/convert-magnesium-unit','script/convert-potassium-unit','script/convert-sodium-unit'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

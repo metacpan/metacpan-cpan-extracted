@@ -1,14 +1,14 @@
 package App::PerlReleaseUtils;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-27'; # DATE
-our $DIST = 'App-PerlReleaseUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-06-12'; # DATE
+our $DIST = 'App-PerlReleaseUtils'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 our %SPEC;
 
@@ -27,6 +27,16 @@ our %SPEC;
 
 $SPEC{grep_perl_release} = {
     v => 1.1,
+    summary => 'Grep Perl module release tarball name from text',
+    description => <<'_',
+
+The utility displays lines from input which resemble Perl module release tarball
+name (e.g. Bar-Qux-2.34.tar.gz, but not Bar-Qux-2.34 or Bar-Qux or Bar::Qux).
+
+    % echo -e "First line\nSecond line has Foo-Bar\nThird line has Foo-Bar-1.23\nBaz-Qux-2.34.tar.gz" | grep-perl-release
+    Baz-Qux-2.34.tar.gz
+
+_
     args => {
         include_latest_versions => {
             summary => "Only include latest N version(s) of each dist",
@@ -147,7 +157,7 @@ App::PerlReleaseUtils - Collection of utilities related to Perl distribution rel
 
 =head1 VERSION
 
-This document describes version 0.001 of App::PerlReleaseUtils (from Perl distribution App-PerlReleaseUtils), released on 2021-07-27.
+This document describes version 0.002 of App::PerlReleaseUtils (from Perl distribution App-PerlReleaseUtils), released on 2022-06-12.
 
 =head1 SYNOPSIS
 
@@ -220,14 +230,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-PerlRe
 
 Source repository is at L<https://github.com/perlancar/perl-App-PerlReleaseUtils>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-PerlReleaseUtils>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 Below is the list of distributions that provide CLI utilities for various
@@ -257,11 +259,36 @@ L<App::WeaverUtils>, utilities related to L<Pod::Weaver>.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar@cpan.org.
+This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-PerlReleaseUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

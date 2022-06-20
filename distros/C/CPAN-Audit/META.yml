@@ -5,7 +5,6 @@ author:
 build_requires:
   Capture::Tiny: '0'
   HTTP::Tiny: '0'
-  IO::Interactive: '0'
   JSON: '0'
   Test::More: '0.98'
   YAML::Tiny: '0'
@@ -25,6 +24,7 @@ no_index:
     - inc
 requires:
   CPAN::DistnameInfo: '0'
+  IO::Interactive: '0'
   Module::CPANfile: '0'
   Module::CoreList: '5.20181020'
   Module::Extract::VERSION: '0'
@@ -35,5 +35,5 @@ resources:
   bugtracker: https://github.com/briandfoy/cpan-audit/issues
   homepage: https://github.com/briandfoy/cpan-audit
   repository: https://github.com/briandfoy/cpan-audit.git
-version: '20220608'
+version: '20220613.001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

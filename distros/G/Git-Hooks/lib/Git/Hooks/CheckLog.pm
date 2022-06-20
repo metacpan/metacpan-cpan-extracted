@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Hooks::CheckLog;
 # ABSTRACT: Git::Hooks plugin to enforce commit log policies
-$Git::Hooks::CheckLog::VERSION = '3.2.2';
+$Git::Hooks::CheckLog::VERSION = '3.3.0';
 use v5.16.0;
 use utf8;
 use Log::Any '$log';
@@ -66,7 +66,7 @@ EOS
 
         my $checker = Text::SpellChecker->new(text => 'a', %extra_options);
 
-        unless (defined eval { $checker->next_word(); }) {
+        if (! defined eval { $checker->next_word(); } && $@) {
             $git->fault(<<'EOS', {option => 'spelling', details => $@});
 There was an error while I tried to spell check your commits using the
 Text::SpellChecker module. If you cannot fix it consider disabling this
@@ -351,7 +351,7 @@ Git::Hooks::CheckLog - Git::Hooks plugin to enforce commit log policies
 
 =head1 VERSION
 
-version 3.2.2
+version 3.3.0
 
 =head1 SYNOPSIS
 

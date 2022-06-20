@@ -188,7 +188,7 @@ subtest(
 note "Testing class $class";
 
         my $obj = $class->new;
-#        with_immutable {
+        with_immutable {
             is(
                 exception { $obj->accessor( 0, undef ) },
                 undef,
@@ -199,8 +199,8 @@ note "Testing class $class";
                 undef,
                 'can use curried accessor to set value to undef'
             );
-#        }
-#        $class;
+        }
+        $class;
     }
 );
 

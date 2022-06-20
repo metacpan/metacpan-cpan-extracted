@@ -1,4 +1,3 @@
-Build.PL
 Makefile.PL
 Changes
 lib/Test/XPath.pm

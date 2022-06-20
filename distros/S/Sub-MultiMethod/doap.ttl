@@ -13,13 +13,13 @@
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
-	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008"^^doap-deps:CpanId ], [
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008001"^^doap-deps:CpanId ], [
 		doap-deps:on "Types::Standard 1.008003"^^doap-deps:CpanId;
 	], [
 		doap-deps:on "Type::Params 1.008003"^^doap-deps:CpanId;
 	], [ doap-deps:on "Exporter::Shiny"^^doap-deps:CpanId ], [ doap-deps:on "Role::Hooks"^^doap-deps:CpanId ];
 	doap-deps:test-requirement [ doap-deps:on "parent"^^doap-deps:CpanId ], [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Class::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "Role::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ], [ doap-deps:on "Test::Requires"^^doap-deps:CpanId ];
-	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Sub-MultiMethod>;
+	doap:bug-database    <https://github.com/tobyink/p5-sub-multimethod/issues>;
 	doap:created         "2020-01-27"^^xsd:date;
 	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:download-page   <https://metacpan.org/release/Sub-MultiMethod>;
@@ -28,7 +28,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Sub-MultiMethod";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-900>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-901>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-902>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-900>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-901>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-902>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-903>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-904>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-905>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-sub-multimethod>;
@@ -216,6 +216,51 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-MultiMethod-0.902.tar.gz>;
 	doap:revision        "0.902"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-903>
+	a                    doap:Version;
+	dc:identifier        "Sub-MultiMethod-0.903"^^xsd:string;
+	dc:issued            "2022-06-19"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Sub::MultiMethod now supports references to coderefs as method names.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Drop support for Perl 5.8.0 (Jul 2002); minimum Perl version is now 5.8.1 (Sep 2003).";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-MultiMethod-0.903.tar.gz>;
+	doap:revision        "0.903"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-904>
+	a                    doap:Version;
+	dc:identifier        "Sub-MultiMethod-0.904"^^xsd:string;
+	dc:issued            "2022-06-19"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "When calling a method which was a coderef, it shouldn't be necessary to look in parent classes.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-MultiMethod-0.904.tar.gz>;
+	doap:revision        "0.904"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-905>
+	a                    doap:Version;
+	dc:identifier        "Sub-MultiMethod-0.905"^^xsd:string;
+	dc:issued            "2022-06-19"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Avoid using a particular optimization if Type::Param's head or tail options are being used.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-MultiMethod-0.905.tar.gz>;
+	doap:revision        "0.905"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

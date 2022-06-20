@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/Mom>
 Bug tracker:  <https://github.com/tobyink/p5-mom/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.006	2022-06-11
+
+ - Added: Support `!` and `:req` as aliases for `:required`.
+ - Added: Support `:handles(1)` and `:handles(2)` for enum attributes.
+
 0.005	2021-04-14
 
  [ Bug Fixes ]

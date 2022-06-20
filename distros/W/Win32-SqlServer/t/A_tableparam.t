@@ -1,10 +1,16 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/A_tableparam.t 15    21-06-30 23:11 Sommar $
+# $Header: /Perl/OlleDB/t/A_tableparam.t 16    22-04-24 22:46 Sommar $
 #
 # This test script tests table parameters with sql_sp and sql in with
 # all data types.
 #
 # $History: A_tableparam.t $
+# 
+# *****************  Version 16  *****************
+# User: Sommar       Date: 22-04-24   Time: 22:46
+# Updated in $/Perl/OlleDB/t
+# Reworked the spatial tests, so we don't need a new identical data file
+# for each new version of SQL Server.
 # 
 # *****************  Version 15  *****************
 # User: Sommar       Date: 21-06-30   Time: 23:11
@@ -1949,7 +1955,9 @@ SQLEND
 clear_test_data;
 create_clr_builtin;
 
-open(F, "../helpers/spatial.data.$sqlver") or warn "Could not read file 'spatial data': $!\n";
+my $spatialver = ($sqlver == 10 ? 10 : 11);
+open(F, "../helpers/spatial.data.$spatialver") or 
+      warn "Could not read file 'spatial data.$spatialver': $!\n";
 my @file = <F>;
 close F;
 my ($geometry, $geometrycol, $geometrypar,

@@ -1,7 +1,11 @@
 Revision history for Perl extension Net::DNS::Resolver::Unbound.
 
 
-**** 1.12  [unreleased]
+**** 1.13  Jun 11, 2022
+	Add test for undefined ub_result->answer_packet.
+
+
+**** 1.12  Apr 16, 2022
 	Documentation nit-picking.
 
 

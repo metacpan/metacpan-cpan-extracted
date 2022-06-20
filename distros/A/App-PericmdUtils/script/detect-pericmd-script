@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-02'; # DATE
+our $DATE = '2022-05-14'; # DATE
 our $DIST = 'App-PericmdUtils'; # DIST
-our $VERSION = '0.052'; # VERSION
+our $VERSION = '0.053'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Perinci/CmdLine/Util/detect_pericmd_script",
@@ -36,11 +36,9 @@ detect-pericmd-script - Detect whether a file is a Perinci::CmdLine-based CLI sc
 
 =head1 VERSION
 
-This document describes version 0.052 of detect-pericmd-script (from Perl distribution App-PericmdUtils), released on 2022-05-02.
+This document describes version 0.053 of detect-pericmd-script (from Perl distribution App-PericmdUtils), released on 2022-05-14.
 
 =head1 SYNOPSIS
-
-Usage:
 
 % B<detect-pericmd-script> [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--format>=I<name>|B<--json>] [B<--include-noexec>|B<--exclude-noexec>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--string-base64>=I<buf>] [B<--string>=I<buf>] -- [I<filename>]
 

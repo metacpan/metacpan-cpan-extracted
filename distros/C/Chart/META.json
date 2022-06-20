@@ -1,5 +1,5 @@
 {
-   "abstract" : "a series of charting modules ",
+   "abstract" : "a series of charting modules",
    "author" : [
       "Chart-Group <chartgrp@web.de>"
    ],
@@ -23,7 +23,6 @@
       "package" : [
          "Chart::Base",
          "Chart::BrushStyles",
-         "Chart::Color",
          "Chart::Constants"
       ]
    },
@@ -55,59 +54,67 @@
    "provides" : {
       "Chart" : {
          "file" : "lib/Chart.pm",
-         "version" : "v2.402.1"
+         "version" : "v2.402.3"
       },
       "Chart::Bars" : {
          "file" : "lib/Chart/Bars.pm",
-         "version" : "v2.402.1"
+         "version" : "v2.402.3"
+      },
+      "Chart::Color" : {
+         "file" : "lib/Chart/Color.pm",
+         "version" : "v2.402.3"
       },
       "Chart::Composite" : {
          "file" : "lib/Chart/Composite.pm",
-         "version" : "v2.402.1"
+         "version" : "v2.402.3"
       },
       "Chart::Direction" : {
          "file" : "lib/Chart/Direction.pm",
-         "version" : "v2.402.1"
+         "version" : "v2.402.3"
       },
       "Chart::ErrorBars" : {
          "file" : "lib/Chart/ErrorBars.pm",
-         "version" : "v2.402.1"
+         "version" : "v2.402.3"
+      },
+      "Chart::Font" : {
+         "file" : "lib/Chart/Font.pm",
+         "version" : "v2.402.3"
       },
       "Chart::HorizontalBars" : {
          "file" : "lib/Chart/HorizontalBars.pm",
-         "version" : "v2.402.1"
+         "version" : "v2.402.3"
       },
       "Chart::Lines" : {
          "file" : "lib/Chart/Lines.pm",
-         "version" : "v2.402.1"
+         "version" : "v2.402.3"
       },
       "Chart::LinesPoints" : {
          "file" : "lib/Chart/LinesPoints.pm",
-         "version" : "v2.402.1"
+         "version" : "v2.402.3"
       },
       "Chart::Mountain" : {
          "file" : "lib/Chart/Mountain.pm",
-         "version" : "v2.402.1"
+         "version" : "v2.402.3"
       },
       "Chart::Pareto" : {
          "file" : "lib/Chart/Pareto.pm",
-         "version" : "v2.402.1"
+         "version" : "v2.402.3"
       },
       "Chart::Pie" : {
          "file" : "lib/Chart/Pie.pm",
-         "version" : "v2.402.1"
+         "version" : "v2.402.3"
       },
       "Chart::Points" : {
          "file" : "lib/Chart/Points.pm",
-         "version" : "v2.402.1"
+         "version" : "v2.402.3"
       },
       "Chart::Split" : {
          "file" : "lib/Chart/Split.pm",
-         "version" : "v2.402.1"
+         "version" : "v2.402.3"
       },
       "Chart::StackedBars" : {
          "file" : "lib/Chart/StackedBars.pm",
-         "version" : "v2.402.1"
+         "version" : "v2.402.3"
       }
    },
    "release_status" : "stable",
@@ -118,7 +125,7 @@
          "web" : "https://github.com/lichtkind/Chart"
       }
    },
-   "version" : "v2.402.1",
+   "version" : "v2.402.3",
    "x_generated_by_perl" : "v5.30.0",
    "x_maintainers" : [
       "Herbert Breunung <lichtkind@cpan.org>"

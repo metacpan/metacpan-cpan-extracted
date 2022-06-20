@@ -1,0 +1,63 @@
+{
+   "abstract" : "Run a subprocess and read/write to it",
+   "author" : [
+      "Jan Henning Thorsen <jan.henning@thorsen.pm>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojo-Run3",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Pty" : "1.16",
+            "IO::Socket::IP" : "0.37",
+            "Mojo::IOLoop::ReadWriteFork" : "1.00",
+            "Mojolicious" : "8.25",
+            "Sub::Util" : "1.41"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jhthorsen/mojo-run3/issues"
+      },
+      "homepage" : "https://github.com/jhthorsen/mojo-run3",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jhthorsen/mojo-run3.git",
+         "web" : "https://github.com/jhthorsen/mojo-run3"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "Jan Henning Thorsen"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

@@ -14,6 +14,7 @@ our @EXPORT = qw(
    cgi_bin
    dot_files
    fake_extensions
+   header_injection
    ip_address_referer
    misc_extensions
    non_printable_chars
@@ -27,7 +28,7 @@ our @EXPORT = qw(
    wordpress
 );
 
-our $VERSION = 'v0.6.1';
+our $VERSION = 'v0.7.0';
 
 
 
@@ -63,6 +64,15 @@ sub fake_extensions {
         PATH_INFO    => $re,
     )
 }
+
+
+sub header_injection {
+    my $re = qr{(\%20HTTP/[0-9]|%0d%0a)}i;
+    return (
+        PATH_INFO    => $re,
+    );
+}
+
 
 
 sub ip_address_referer {
@@ -168,7 +178,7 @@ Plack::Middleware::Security::Common - A simple security filter for Plack with co
 
 =head1 VERSION
 
-version v0.6.1
+version v0.7.0
 
 =head1 SYNOPSIS
 
@@ -251,6 +261,16 @@ This blocks requests with fake extensions, usually done with image extensions, e
 F</some/path;.jpg>.
 
 Added in v0.5.1.
+
+=head2 header_injection
+
+This blocks requests that attept to inject a header in the response. e.g.
+C<GET /%20HTTP/1.1%0d%0aX-Auth:%20accepted%0d%0a>.
+
+Any path with an HTTP protocol suffix or newline plus carriage return
+will be rejected.
+
+Added in v0.7.0.
 
 =head2 ip_address_referer
 

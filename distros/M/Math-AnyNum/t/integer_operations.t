@@ -88,7 +88,7 @@ use Math::AnyNum;
 
     {
         my $z = $n->ipow('-3.95');    # gets truncated to '-3'
-        is($z, '0');
+        is($z, '-1');
     }
 
     {
@@ -158,7 +158,7 @@ use Math::AnyNum;
 
     {
         my $z = $n->idiv('2');
-        is($z, '-6');
+        is($z, '-7');
     }
 
     {
@@ -168,7 +168,7 @@ use Math::AnyNum;
 
     {
         my $z = $n->idiv($y);
-        is($z, '-1');
+        is($z, '-2');
     }
 
     {
@@ -178,7 +178,7 @@ use Math::AnyNum;
 
     {
         my $z = $n->idiv($f);
-        is($z, '-2');
+        is($z, '-3');
     }
 
     {

@@ -89,7 +89,7 @@ my %WriteMakefileArgs = (
     "Test::Needs" => 0,
     "Test::RequiresInternet" => 0
   },
-  "VERSION" => "6.66",
+  "VERSION" => "6.67",
   "test" => {
     "TESTS" => "t/*.t t/base/*.t t/base/protocols/*.t t/leak/*.t t/local/*.t t/robot/*.t"
   }
@@ -142,7 +142,7 @@ my %FallbackPrereqs = (
   "warnings" => 0
 );
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.039
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.040
 requires('HTTP::Status', '6.18') if has_module('HTTP::Status', '6.17');
 
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {
@@ -156,7 +156,7 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
 
 WriteMakefile(%WriteMakefileArgs);
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.039
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.040
 sub _add_prereq {
   my ($mm_key, $module, $version_or_range) = @_;
   $version_or_range ||= 0;

@@ -1,0 +1,128 @@
+Sun Jun 19 08:19:19 2022  Rob Lauer  <rlauer@usgn.net>
+
+	[0.52 - specify version of List::Util required]
+	* cpan/requires: List::Util
+	* cpan/Makefile.am: option of --no-core
+
+Sat Jun 18 07:05:14 2022  Rob Lauer  <rlauer@usgn.net>
+
+	[0.51 - unit tests]:
+	* src/main/perl/t/02-logger.t: remove Log::Log4perl from test
+
+Fri Jun 17 09:48:16 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.50 - version requirements]:
+	* cpan/Makefile.am: --no-core
+	* configure.ac: remove version requirements
+	* cpan/test-requires: add without core modules
+	* cpan/requires: remove core modules
+
+Fri Jun 17 07:21:22 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.49]:
+	* Makefile.am
+	- make rpm
+	- use abs_builddir
+	- src, not dist now
+	* configure.ac
+	- get version from VERSION
+	- don't treat warnings as errors
+	- output package version
+	- check for rpmbuild, pod2markdown, scandeps-static.pl
+	- update dependencies
+	* src/main/perl/lib/Amazon/S3.pm.in
+	- new logging option
+	- mv'd from dist/lib/Amazon/S3.pm
+	- documenation updates
+	- refactoring, perlcritic cleanups
+	- use Amazon::S3::Constants
+	- allow passing credentials class
+	(_make_request): check dns_bucket_names option
+	(dns_bucket_names): new
+	(get_logger): new
+	(level): new
+	(get_credentials): new
+	(new)
+	- secure defaults to true
+	(region): new
+	(list_bucket_v2): new
+	(list_bucket_all_v2): new
+	(last_response): new
+	* src/main/perl/lib/Amazon/S3/Bucket.pm.in
+	- mv'd from dist/lib/Amazon/S3/Bucket.pm
+	- revert using XML::Simple
+	- use Amazon::S3::Constants
+	- perlcritic cleanup
+	- perltidy
+	(_uri): support DNS bucket names
+	(list_v2): new
+	(list_all_v2): new
+	* src/main/perl/lib/Makefile.am: new
+	* src/main/perl/Makefile.am: new
+	* src/main/Makefile.am: new
+	* src/Makefile.am: new
+	* cpan/Makfile.am: new
+	* cpan/requires: new
+	* cpan/test-requires: new
+	* src/main/perl/t/01-api.t
+	- env vars for controlling tests1
+	- mv'd from dist/t/01api.t
+	- refactored test
+	- support AWS mocking services
+	- enable/disable regional testing
+	- added list_vs test
+	- create tempfile instead of using t/README
+	* src/main/perl/t/02-logging.t: new
+	* src/main/perl/t/03-region.t: new
+	* src/main/perl/t/04-list-bucket.t: new
+	* .gitignore: *.pm
+	* ChangeLog: mv'd from dist/CHANGES
+	* README-TESTING.md: new
+	* README-BUILD.md: new
+	* VERSION: new
+	* bootstrap: new
+	* autotools/ads_PERL_INCLUDES.m4: new
+	* autotools/ads_PERL_LIBDIR.m4: new
+	* autotools/ads_PERL_MODULE.m4: new
+	* autotools/ads_PROG_PERL.m4: new
+	* autotools/am_rpm_build_mode.m4: new
+	* autotools/ax_am_conditional_example.m4: new
+	* autotools/ax_deps_check.m4: new
+	* autotools/ax_distcheck_hack.m4: new
+	* autotools/ax_rpmbuild_check.m4: new
+
+Revision history for Perl module Amazon::S3:
+0.48    Sep 17 2021
+    - remove leading '/' from bucket name
+    - modify tests for not s3.amazonaws.com hosts (e.g. minio)
+0.47    Feb 4 2019
+    - update dependencies (XML::LibXML)
+0.46    Jan 19 2019
+    - use temporary credentials
+    - error string
+    -
+0.45    Aug 14 2009
+    - Applied patch to support any S3 end points (Tokuhiro Matsuno)
+    - Applied patches to not die when 0 or 1 buckets are return also (Tokuhiro Matsuno)
+0.441   Jun 16 2008
+    - Added handling to get_key_filename where the key is used as the file
+      name if one is not provided.
+0.44    Jun 08 2008
+    - Applied patch for fixing non-xml error parsing (Harold Sinclair)
+    - Ported changes from Net::Amazon::S3 0.42-0.44. These include:
+      - Fix bug with storing files consisting of "0" (Martin Atkins)
+      - Use of IO::File and binmode() to support Windows (Gabriel Weinberg)
+      - Add exponential backoff upon temporary errors with the new
+        retry option. (Leon Brocard)
+0.41.2  Jan 20 2008
+    - Added documentation fixes that where causing
+      99-pod-coverage.t to fail.
+0.411   Jan 19 2008
+    - initial release into CPAN
+    - Fork of Net::Amazon::S3 0.41
+    - Renamed packages
+    - Replaced XML::LibXML and XML::LibXML::XPathContext
+      with XML::Simple
+    - Ran perltidy over code
+    - Removed deprecated methods from Amazon::S3
+    - Revised documentation and README

@@ -24,7 +24,7 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Mojolicious' => '0',
-                                      'Text::Minify::XS' => 'v0.4.8',
+                                      'Text::Minify::XS' => 'v0.6.2',
                                       'perl' => 'v5.16.0'
                                     }
                     },

@@ -1,12 +1,24 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/internaldata.cpp 15    21-07-12 21:41 Sommar $
+ $Header: /Perl/OlleDB/internaldata.cpp 17    22-05-27 19:04 Sommar $
 
   This file holds routines setting up the internaldata struct, and
   also release memory allocated in it.
 
-  Copyright (c) 2004-2021   Erland Sommarskog
+  Copyright (c) 2004-2022   Erland Sommarskog
 
   $History: internaldata.cpp $
+ * 
+ * *****************  Version 17  *****************
+ * User: Sommar       Date: 22-05-27   Time: 19:04
+ * Updated in $/Perl/OlleDB
+ * Added propset as a parameter to dump_properties to avoid surprises when
+ * properties in different set have the same value.
+ * 
+ * *****************  Version 16  *****************
+ * User: Sommar       Date: 22-05-08   Time: 23:14
+ * Updated in $/Perl/OlleDB
+ * Rewrote dump_prooperties to show numeric index, and it was broken
+ * anyway.
  * 
  * *****************  Version 15  *****************
  * User: Sommar       Date: 21-07-12   Time: 21:41
@@ -108,74 +120,84 @@
 #include "internaldata.h"
 
 // Dumps the contents of a property array in case of an error
-void dump_properties(DBPROP init_properties[MAX_INIT_PROPERTIES],
-                     BOOL   props_debug)
+void dump_properties(DBPROP *props, init_propsets propset, int cProps)
 {
-  for (int i = 0; gbl_init_props[i].propset_enum != not_in_use; i++) {
-       if (! props_debug &&
-             (init_properties[i].dwStatus == DBPROPSTATUS_OK ||
-              init_properties[i].dwStatus == -1))   // -1 are optional ones never set.
-           continue;
+  for (int i = 0; i < cProps; i++) {
+     char *propname = NULL;
+     char *ststxt;
+     int  j = 0;
 
-       char * ststxt;
-       switch (init_properties[i].dwStatus) {
-          case DBPROPSTATUS_OK :
-               ststxt = "DBPROPSTATUS_OK"; break;
-          case DBPROPSTATUS_BADCOLUMN :
-               ststxt = "DBPROPSTATUS_BADCOLUMN"; break;
-          case DBPROPSTATUS_BADOPTION :
-               ststxt = "DBPROPSTATUS_BADOPTION"; break;
-          case DBPROPSTATUS_BADVALUE :
-               ststxt = "DBPROPSTATUS_BADVALUE"; break;
-          case DBPROPSTATUS_CONFLICTING :
-               ststxt = "DBPROPSTATUS_CONFLICTING"; break;
-          case DBPROPSTATUS_NOTALLSETTABLE :
-               ststxt = "DBPROPSTATUS_NOTALLSETTABLE"; break;
-          case DBPROPSTATUS_NOTAVAILABLE :
-               ststxt = "DBPROPSTATUS_NOTAVAILABLE"; break;
-          case DBPROPSTATUS_NOTSET :
-               ststxt = "DBPROPSTATUS_NOTSET"; break;
-          case DBPROPSTATUS_NOTSETTABLE :
-               ststxt = "DBPROPSTATUS_NOTSETTABLE"; break;
-          case DBPROPSTATUS_NOTSUPPORTED :
-               ststxt = "DBPROPSTATUS_NOTSUPPORTED"; break;
-       }
-       PerlIO_printf(PerlIO_stderr(), "Property '%s', Status: %s, Value: ",
-                      gbl_init_props[i].name, ststxt);
-       if (init_properties[i].vValue.vt == VT_EMPTY) {
-           PerlIO_printf(PerlIO_stderr(), "VT_EMPTY");
-       }
-       else {
-          switch (gbl_init_props[i].datatype) {
-             case VT_BOOL :
-                PerlIO_printf(PerlIO_stderr(), "%d",
-                              init_properties[i].vValue.boolVal);
-                break;
+     while (gbl_init_props[j].propset_enum != propset ||
+            gbl_init_props[j].property_id != props[i].dwPropertyID) { 
+        j++;
+     }
 
-             case VT_I2 :
-                PerlIO_printf(PerlIO_stderr(), "%d",
-                              init_properties[i].vValue.iVal);
-                break;
+     if (gbl_init_props[j].propset_enum != not_in_use) {
+        propname = gbl_init_props[j].name;
+     }
 
-             case VT_I4 :
-                PerlIO_printf(PerlIO_stderr(), "%d",
-                              init_properties[i].vValue.lVal);
-                break;
+     switch (props[i].dwStatus) {
+        case DBPROPSTATUS_OK :
+             ststxt = "DBPROPSTATUS_OK"; break;
+        case DBPROPSTATUS_BADCOLUMN :
+             ststxt = "DBPROPSTATUS_BADCOLUMN"; break;
+        case DBPROPSTATUS_BADOPTION :
+             ststxt = "DBPROPSTATUS_BADOPTION"; break;
+        case DBPROPSTATUS_BADVALUE :
+             ststxt = "DBPROPSTATUS_BADVALUE"; break;
+        case DBPROPSTATUS_CONFLICTING :
+             ststxt = "DBPROPSTATUS_CONFLICTING"; break;
+        case DBPROPSTATUS_NOTALLSETTABLE :
+             ststxt = "DBPROPSTATUS_NOTALLSETTABLE"; break;
+        case DBPROPSTATUS_NOTAVAILABLE :
+             ststxt = "DBPROPSTATUS_NOTAVAILABLE"; break;
+        case DBPROPSTATUS_NOTSET :
+             ststxt = "DBPROPSTATUS_NOTSET"; break;
+        case DBPROPSTATUS_NOTSETTABLE :
+             ststxt = "DBPROPSTATUS_NOTSETTABLE"; break;
+        case DBPROPSTATUS_NOTSUPPORTED :
+             ststxt = "DBPROPSTATUS_NOTSUPPORTED"; break;
+        default :
+             New(902, ststxt, 50, char);
+             sprintf_s(ststxt, 50, "%d", props[i].dwStatus);
+             Safefree(ststxt);
+     }
+     PerlIO_printf(PerlIO_stderr(), "Ix: %d, Property '%s', Status: %s, Value: ",
+                    i, (propname != NULL ? propname : "Unknown"), ststxt);
+     if (props[i].vValue.vt == VT_EMPTY) {
+         PerlIO_printf(PerlIO_stderr(), "VT_EMPTY");
+     }
+     else {
+        switch (props[i].vValue.vt) {
+           case VT_BOOL :
+              PerlIO_printf(PerlIO_stderr(), "%d",
+                            props[i].vValue.boolVal);
+              break;
 
-             case VT_BSTR : {
-                char * str = BSTR_to_char(init_properties[i].vValue.bstrVal);
-                PerlIO_printf(PerlIO_stderr(), "'%s'", str);
-                Safefree(str);
-                break;
-            }
+           case VT_I2 :
+              PerlIO_printf(PerlIO_stderr(), "%d",
+                            props[i].vValue.iVal);
+              break;
 
-            default :
-                PerlIO_printf(PerlIO_stderr(), "UNKNOWN DATATYPE");
-                break;
-           }
-       }
+           case VT_I4 :
+              PerlIO_printf(PerlIO_stderr(), "%d",
+                            props[i].vValue.lVal);
+              break;
 
-       PerlIO_printf(PerlIO_stderr(), ".\n");
+           case VT_BSTR : {
+              char * str = BSTR_to_char(props[i].vValue.bstrVal);
+              PerlIO_printf(PerlIO_stderr(), "'%s'", str);
+              Safefree(str);
+              break;
+          }
+
+          default :
+              PerlIO_printf(PerlIO_stderr(), "UNKNOWN DATATYPE");
+              break;
+         }
+     }
+
+     PerlIO_printf(PerlIO_stderr(), ".\n");
    }
 }
 
@@ -183,7 +205,10 @@ void dump_properties(DBPROP init_properties[MAX_INIT_PROPERTIES],
 // leaks, but is normally not called from anywhere.
 void dump_internaldata(internaldata * mydata)
 {
-   dump_properties(mydata->init_properties, TRUE);
+   dump_properties(mydata->init_properties, oleinit_props, MAX_INIT_PROPERTIES);
+   dump_properties(mydata->init_properties, ssinit_props, MAX_INIT_PROPERTIES);
+   dump_properties(mydata->init_properties, datasrc_props, MAX_INIT_PROPERTIES);
+
 
    warn("init_ptr = %x.\n", mydata->init_ptr);
    warn("datasrc_ptr = %x.\n", mydata->datasrc_ptr);

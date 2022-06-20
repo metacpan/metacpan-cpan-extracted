@@ -51,15 +51,14 @@ subtest 'partial' => sub {
 subtest 'default database' => sub {
 	plan tests => 3 + 3 + 10;
 	my ($d, $s, $si, $db);
-	my $config = { uri => 'http:', net_module => 'Neo4j_Test::MockHTTP' };
 	
-	lives_ok { $d = 0; $d = Neo4j::Driver->new($config) } 'driver 1';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('http:')->plugin('Neo4j_Test::MockHTTP') } 'driver 1';
 	lives_ok { $si = 0; $si = $d->session(database => 'dummy')->server } 'ServerInfo 1';
 	throws_ok { $si->_default_database($d) } qr/\bdefault database\b/i, 'default database failed';
 	
 	$Neo4j_Test::MockHTTP::res[0]->{json}{neo4j_version} = '3.5.0';
 	$Neo4j_Test::MockHTTP::res[0]->{content} = undef;
-	lives_ok { $d = 0; $d = Neo4j::Driver->new($config) } 'driver 2';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('http:')->plugin('Neo4j_Test::MockHTTP') } 'driver 2';
 	lives_ok { $si = 0; $si = $d->session->server } 'ServerInfo 2';
 	lives_and { is $si->_default_database($d), undef } 'no default database';
 	$Neo4j_Test::MockHTTP::res[0]->{json}{neo4j_version} = '4.2.5';
@@ -71,7 +70,7 @@ subtest 'default database' => sub {
 		{ summary => {} },
 		{ info => {} },
 	]};
-	lives_ok { $d = 0; $d = Neo4j::Driver->new($config) } 'driver 3';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new('http:')->plugin('Neo4j_Test::MockHTTP') } 'driver 3';
 	lives_ok { $si = 0; $si = $d->session(database => 'dummy')->server } 'ServerInfo 3';
 	isa_ok $si, 'Neo4j::Driver::ServerInfo', 'ServerInfo type';
 	is $si->{default_database}, undef, 'default database not cached';

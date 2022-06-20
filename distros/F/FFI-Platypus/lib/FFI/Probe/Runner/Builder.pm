@@ -9,7 +9,7 @@ use Text::ParseWords ();
 use FFI::Build::Platform;
 
 # ABSTRACT: Probe runner builder for FFI
-our $VERSION = '1.56'; # VERSION
+our $VERSION = '1.58'; # VERSION
 
 
 sub new
@@ -251,7 +251,7 @@ FFI::Probe::Runner::Builder - Probe runner builder for FFI
 
 =head1 VERSION
 
-version 1.56
+version 1.58
 
 =head1 SYNOPSIS
 
@@ -421,7 +421,7 @@ Pete Houston (openstrike, HOUSTON)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015,2016,2017,2018,2019,2020 by Graham Ollis.
+This software is copyright (c) 2015-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

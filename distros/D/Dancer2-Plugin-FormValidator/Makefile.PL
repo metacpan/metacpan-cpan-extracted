@@ -20,7 +20,6 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "Dancer2::Core::Hook" => 0,
     "Dancer2::Plugin" => 0,
-    "Dancer2::Plugin::Deferred" => 0,
     "Email::Valid" => 0,
     "Hash::MultiValue" => 0,
     "Hash::Util" => 0,
@@ -49,7 +48,7 @@ my %WriteMakefileArgs = (
     "URI::Escape" => 0,
     "utf8::all" => 0
   },
-  "VERSION" => "1.01",
+  "VERSION" => "1.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -61,7 +60,6 @@ my %FallbackPrereqs = (
   "Dancer2" => 0,
   "Dancer2::Core::Hook" => 0,
   "Dancer2::Plugin" => 0,
-  "Dancer2::Plugin::Deferred" => 0,
   "Email::Valid" => 0,
   "FindBin" => 0,
   "HTTP::Request::Common" => 0,

@@ -1,10 +1,15 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/makefile.pl 31    21-07-10 22:22 Sommar $
+# $Header: /Perl/OlleDB/makefile.pl 32    22-05-08 23:11 Sommar $
 #
 # Makefile.pl for MSSQL::OlleDB. Note that you may need to specify where
 # you ave the include files for OLE DB.
 #
 # $History: makefile.pl $
+# 
+# *****************  Version 32  *****************
+# User: Sommar       Date: 22-05-08   Time: 23:11
+# Updated in $/Perl/OlleDB
+# New OLE DB provider, MSOLEDBSQL19.
 # 
 # *****************  Version 31  *****************
 # User: Sommar       Date: 21-07-10   Time: 22:22
@@ -189,7 +194,7 @@ elsif ($clversion < 13) {
    exit 0
 }
 
-my $SQLDIR  = '\Program Files\Microsoft SQL Server\Client SDK\OLEDB\186\SDK';
+my $SQLDIR  = '\Program Files\Microsoft SQL Server\Client SDK\OLEDB\190\SDK';
 my $oleheader = "$SQLDIR\\INCLUDE\\msoledbsql.h";
 foreach my $device ('A'..'Z') {
    if (-r "$device:$oleheader") {
@@ -205,7 +210,7 @@ if ($SQLDIR !~ /^[C-Z]:/) {
 }
 
 my $archlibdir = ($ENV{PROCESSOR_ARCHITECTURE} eq 'AMD64' ? 'x64' : $ENV{PROCESSOR_ARCHITECTURE});
-my $libfile = qq!"$SQLDIR\\LIB\\$archlibdir\\msoledbsql.lib"!;
+my $libfile = qq!"$SQLDIR\\LIB\\$archlibdir\\msoledbsql19.lib"!;
 
 # Set specific flags we want for compilation.
 my $ccflags = $Config{'ccflags'};

@@ -225,6 +225,7 @@ The list of keywords:
   case
   cmp
   class
+  class_id
   copy
   default
   die
@@ -1141,7 +1142,7 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
   %token <opval> IF UNLESS ELSIF ELSE FOR WHILE LAST NEXT SWITCH CASE DEFAULT BREAK EVAL
   %token <opval> SYMBOL_NAME VAR_NAME CONSTANT EXCEPTION_VAR
   %token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT TRUE FALSE END_OF_FILE
-  %token <opval> DOT3 FATCAMMA RW RO WO INIT NEW OF
+  %token <opval> DOT3 FATCAMMA RW RO WO INIT NEW OF CLASS_ID
   %token <opval> RETURN WEAKEN DIE WARN PRINT CURRENT_CLASS_NAME UNWEAKEN '[' '{' '('
   %type <opval> grammar
   %type <opval> opt_classes classes class class_block
@@ -1411,6 +1412,7 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
     | is_read_only
     | has_impl
     | logical_operator
+    | CLASS_ID class_name
 
   operators
     : operators ',' operator
@@ -1646,6 +1648,9 @@ The list of syntax parsing tokens:
   </tr>
   <tr>
     <td>CLASS</td><td>class</td>
+  </tr>
+  <tr>
+    <td>CLASS_ID</td><td>class_id</td>
   </tr>
   <tr>
     <td>VAR_NAME</td><td>A variable name</td>
@@ -2929,7 +2934,7 @@ B<Examples:>
 
 =head2 Native Method
 
-Native methods are the L<methods|/"Method"> that is written by native languages such as C, C++.
+A native method is the L<method|/"Method"> that is written by native languages such as C<C language>, C<C++>.
 
 A native method is defined by the C<native> L<method descriptor|/"Method Descriptors">.
 
@@ -2937,7 +2942,7 @@ A native method is defined by the C<native> L<method descriptor|/"Method Descrip
 
 A native method doesn't have its L<method block|/"Method Block">.
 
-See also the L<SPVM Native API|SPVM::Document::NativeAPI> to interface native methods.
+About the way to write native methods, please see L<SPVM Native Module|SPVM::Document::NativeModule> and L<SPVM Native API|SPVM::Document::NativeAPI>.
 
 =head2 Precompiled Method
 
@@ -5852,63 +5857,27 @@ Boxing Type Conversion is the operation to convert the value of Numeric Type to 
 
 Unboxing Type Conversion is an operation to convert the value of Numeric Object Type to the corresponding value of Numeric Type.
 
-=head2 Bool Type Conversion
+=head2 Conditional Type Conversion
 
-The bool type conversion is a L<type conversion|/"Type Conversion"> that is performed in operands of conditional branches.
+The conditional type conversion is a L<type conversion|/"Type Conversion"> that is performed to the L<conditional operand|/"Conditional Operand">.
 
-The operand of the L<if statement|/"if Statement">:
+The type of the operand of the conditional type conversion must be one of a L<numeric type|/"Numeric Type">, an L<object type|/"Object Type"> or the L<undef type|/"Undefined Type">. Otherwise a compilation error will occur.
 
-  if (CONDITION) {
-  
-  }
+The conditional type conversion returns the following value corresponding to the type of the condional operand.
 
-The operand of the L<unless statement|/"unless Statement">:
+If the type is the L<int type|/"int Type">, return the value.
 
-  unless (CONDITION) {
-  
-  }
+If the type is the L<undef|/"Undefined Type">, return C<0>.
 
-The second operand of the L<for statement|/"for Statement">:
+If the type is the value returned by the L<TRUE method of Bool|SPVM::Bool|/"TRUE">, return C<1>.
 
-  for (INITIALIZEATION;CONDITION;NEXT_VALUE;) {
-  
-  }
+If the type is the value returned by the L<FALSE method of Bool|SPVM::Bool|/"FALSE">, return C<0>.
 
-The operand of the L<while statement|/"while Statement">:
+If the type is a L<numeric type|/"Numeric Type"> except for L<int type|/"int Type">, the L<numeric widening type conversion|/"Numeric Widening Type Conversion"> is performed.
 
-  while (CONDITION) {
-  
-  }
-
-The left and right operand of the L<logical AND operator|/"Logical AND Operator">:
-
-  CONDITION && CONDITION
-
-The left and right operand of the L<logical OR operator|/"Logical OR Operator">:
-
-  CONDITION || CONDITION
-
-The operand of the L<logical NOT operator|/"Logical NOT Operator">:
-
-  !CONDITION
-
-The type of the operand of the bool type conversion must be a L<numeric type|/"Numeric Type"> or an L<object type|/"Object Type"> or the L<undef type|/"Undefined Type">, otherwise a compilation error will occur.
-
-The return type of the bool type conversion is the L<int type|/"int Type">.
-
-If the operand is the L<undef|/"Undefined Value"> value, C<0> is returned.
-
-If the operand is L<true|/"true">(the C<TRUE> method of L<Bool|SPVM::Bool>), C<1> is returned.
-
-If the operand is L<false|/"false">(the C<FALSE> method of L<Bool|SPVM::Bool>), C<0> is returned.
-
-If the type of the operand is a L<numeric type|/"Numeric Type">, the L<numeric widening type conversion|/"Numeric Widening Type Conversion"> is performed.
-
-And the following operation is performed.
+And the following operation in C<C language> is performed to the operand .
 
   !!OPERAND
-
-If the type of the operand is an L<object type|/"Object Type"> except for the L<Bool|SPVM::Bool> type, and if the object is not L<undef|/"Undefined Value"> value, C<1> is returned. If the object is L<undef|/"Undefined Value"> value, C<0> is returned.
 
 B<Examples:>
 
@@ -5959,6 +5928,46 @@ B<Examples:>
     # not ok
   }
 
+=head2 Conditional Operand
+
+B<List of conditional operands:>
+
+The operand of the L<if statement|/"if Statement">:
+
+  if (CONDITION) {
+  
+  }
+
+The operand of the L<unless statement|/"unless Statement">:
+
+  unless (CONDITION) {
+  
+  }
+
+The second operand of the L<for statement|/"for Statement">:
+
+  for (INITIALIZEATION;CONDITION;NEXT_VALUE;) {
+  
+  }
+
+The operand of the L<while statement|/"while Statement">:
+
+  while (CONDITION) {
+  
+  }
+
+The left and right operand of the L<logical AND operator|/"Logical AND Operator">:
+
+  CONDITION && CONDITION
+
+The left and right operand of the L<logical OR operator|/"Logical OR Operator">:
+
+  CONDITION || CONDITION
+
+The operand of the L<logical NOT operator|/"Logical NOT Operator">:
+
+  !CONDITION
+
 =head1 Runtime Type Checking
 
 The runtime type cheking is the type cheking that is performed at runtime.
@@ -5971,7 +5980,7 @@ The runtime type assignability is the type assignalibility at runtime.
 
 The runtime assignability is false, an exception will be thrown.
 
-If the type of the distribution is an L<object type|/"Object Type"> and the type of the source is L<undef|\"Undefined Type">, the runtime type assignability is true.
+If the type of the distribution is an L<object type|/"Object Type"> and the type of the source is L<undef|/"Undefined Type">, the runtime type assignability is true.
 
 If the type of the distribution is the same as the type of the source, the runtime type assignability is true.
 
@@ -6050,9 +6059,9 @@ The C<if> statement is a L<statement|/"Statement"> for conditional branch.
   
   }
 
-The condition the L<bool type conversion|/"Bool Type Conversion"> is executed and Block is executed if the value is non-zero.
+The condition the L<conditional type conversion|/"Conditional Type Conversion"> is executed and Block is executed if the value is non-zero.
 
-If you want to write more than one condition, you can continue with "elsif Statement". The condition determination is performed from above, and each Expression is the L<bool type conversion|/"Bool Type Conversion"> is executed, and a corresponding Block is executed if the value is non-zero.
+If you want to write more than one condition, you can continue with "elsif Statement". The condition determination is performed from above, and each Expression is the L<conditional type conversion|/"Conditional Type Conversion"> is executed, and a corresponding Block is executed if the value is non-zero.
 
   if (CONDITION) {
   
@@ -6313,7 +6322,7 @@ The C<while> statement is a L<statement|/"Statement"> for repeating.
   
   }
 
-L</"Expressions"> can be described in the condition Expression. The L<bool type conversion|/"Bool Type Conversion"> is executed for condition Expression, and if the value is not 0, Block is executed. Exit the otherwise Block.
+L</"Expressions"> can be described in the condition Expression. The L<conditional type conversion|/"Conditional Type Conversion"> is executed for condition Expression, and if the value is not 0, Block is executed. Exit the otherwise Block.
 
 B<Examples:>
 
@@ -6373,7 +6382,7 @@ The C<for> Statement is a L<statement|/"Statement"> for repeating.
 
 L</"Expressions"> can be described in the initialization Expression. Generally, write Expression such as initialization of loop variable. Initialization Expression can be omitted.
 
-Condition Expression, L</"Expressions"> can be described. The L<bool type conversion|/"Bool Type Conversion"> is executed for condition Expression, and if the value is not 0, Block is executed. Exit the otherwise block.
+Condition Expression, L</"Expressions"> can be described. The L<conditional type conversion|/"Conditional Type Conversion"> is executed for condition Expression, and if the value is not 0, Block is executed. Exit the otherwise block.
 
 L</"Expressions"> can be described in INCREMENT_STATEMENT. Generally, Expression of Increment of loop variable is described. INCREMENT_STATEMENT can be omitted.
 
@@ -7327,26 +7336,6 @@ The logical operators are the L<operators|/"Operator"> to perform logical operat
 
 The logical operators are the L<logical AND operator|/"Logical AND Operator">, the L<logical OR operator|/"Logical OR Operator">, and the L<logical NOT operator|/"Logical NOT Operator">.
 
-The logical operators can be the operands of only the following statements or operators.
-
-=over 2
-
-=item * the operand of the L<if or eslif statement|/"if Statement">
-
-=item * the operand of the L<unless statement|/"unless Statement">
-
-=item * the second operand of the L<for statement|/"for Statement">
-
-=item * the operand of the L<while statement|/"while Statement">
-
-=item * the left operand and the right operand of the L<logical AND operator|/"Logical AND Operator">
-
-=item * the left operand and the right operand of the L<logical OR operator|/"Logical OR Operator">
-
-=item * the operand of the L<logical NOT operator|/"Logical NOT Operator">
-
-=back
-
 =head3 Logical AND Operator
 
 The logical AND operator C<&&> is a L<logical operator|/"Logical Operator"> to perform a logical AND operation.
@@ -7355,12 +7344,11 @@ The logical AND operator C<&&> is a L<logical operator|/"Logical Operator"> to p
   
 The left operand and the right operand must be an L<operator|/"Operator">.
 
-The return type of logical AND operator is the L<int type|/"int Type">.
+The return type of the logical AND operator is the L<int type|/"int Type">.
 
-Thg logical AND operator performs the L<bool type conversion|/"Bool Type Conversion"> to the left operand. If the evaluated value is C<0>, the logical AND operator returns C<0>.
-If the value is C<1>, the right operand is evaluated.
+Thg logical AND operator performs the L<conditional type conversion|/"Conditional Type Conversion"> to the left operand. If the evaluated value is C<0>, return C<0>. Otherwise proceed to the evaluation of the right operand.
 
-And thg logical AND operator performs the L<bool type conversion|/"Bool Type Conversion"> to the right operand. If the evaluated value is C<0>, the logical AND operator returns C<0>. Otherwise returns C<1>.
+It performs the L<conditional type conversion|/"Conditional Type Conversion"> to the right operand. If the evaluated value is C<0>, return C<0>. Otherwise return the evaluated value.
 
 =head3 Logical OR Operator
 
@@ -7368,13 +7356,11 @@ The logical OR operator C<||> is a L<logical operator|/"Logical Operator"> to pe
 
   LEFT_OPERAND || RIGHT_OPERAND
 
-The left operand and the right operand must be an L<operator|/"Operator">.
+The return type of the logical OR operator is the L<int type|/"int Type">.
 
-The return type of logical OR operator is the L<int type|/"int Type">.
+Thg logical OR operator performs the L<conditional type conversion|/"Conditional Type Conversion"> to the left operand. If the evaluated value is not C<0>, return the evaluated value. Otherwise proceed to the evaluation of the right operand.
 
-Thg logical OR operator performs the L<bool type conversion|/"Bool Type Conversion"> to the left operand. If the evaluated value is C<1>, the logical OR operator returns C<1>. Otherwise the right operand is evaluated.
-
-And the L<bool type conversion|/"Bool Type Conversion"> is performed to the right operand. If the evaluated value is C<1>, the logical OR operator returns C<1>. Otherwise returns C<0>.
+It performs the L<conditional type conversion|/"Conditional Type Conversion"> to the right operand. If the evaluated value is not C<0>, return the evaluated value. Otherwise return C<0>.
 
 =head3 Logical NOT Operator
 
@@ -7382,11 +7368,9 @@ The logical NOT operator C<!> is a L<logical operator|/"Logical Operator"> to pe
 
   !OPERAND
 
-The operand must be a an L<operator|/"Operator">.
+The return type of the logical NOT operator is the L<int type|/"int Type">.
 
-The return type of logical NOT operator is the L<int type|/"int Type">.
-
-Thg logical NOT operator performs the L<bool type conversion|/"Bool Type Conversion"> to the operand. If the evaluated value is C<1>, the logical NOT operator returns C<0>. Otherwise returns C<1>.
+Thg logical NOT operator performs the L<conditional type conversion|/"Conditional Type Conversion"> to the operand. If the evaluated value is C<0>, returns C<1>. Otherwise return C<0>.
 
 =head2 String Concatenation Operator
 
@@ -8405,6 +8389,18 @@ The above example is the same as the following codes.
       print "$self->{bar}\n";
     }
   }
+
+=head2 class_id Operator
+
+The C<class_id> operator to an L<operator|/"Operator"> to get the class id from a class name.
+
+  class_id CLASS_NAME
+
+The class name must be an existing class. Otherwise a compilation error occur.
+
+The return value is the class id.
+
+The return type is the L<int type|/"int Type">.
 
 =head1 Exception
 

@@ -53,6 +53,6 @@
          "web" : "https://github.com/Pero-Moretti/Perl-Obj2HTML"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

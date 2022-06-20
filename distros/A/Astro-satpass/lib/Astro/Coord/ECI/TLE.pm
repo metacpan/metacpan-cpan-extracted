@@ -229,7 +229,7 @@ package Astro::Coord::ECI::TLE;
 use strict;
 use warnings;
 
-our $VERSION = '0.124';
+our $VERSION = '0.125';
 
 use base qw{ Astro::Coord::ECI Exporter };
 
@@ -8274,7 +8274,7 @@ use constant _MCCANTS_QUICKSAT => undef;
   '25977' =>   5.7, # HELIOS 1B
   '25994' =>   2.7, # TERRA
   '26070' =>   2.7, # SL-16 R/B
-  '26102' =>   5.7, # MTI
+# '26102' => undef, # MTI has no recorded magnitude
   '26474' =>   2.7, # TITAN 4B R/B
   '26905' =>   3.7, # USA 160
   '26907' =>   3.7, # USA 160 DEB

@@ -28,7 +28,7 @@ use Ref::Util qw(
 );
 use Carp 'croak';
 
-our $VERSION = '0.21';
+our $VERSION = '0.25';
 
 our @EXPORT_OK = qw(
   _assert_import_list_is_valid
@@ -198,6 +198,7 @@ sub _default_import_list () {
         for_class    => Optional [NonEmptyStr],
         types        => Optional [ ArrayRef [NonEmptyStr] ],
         _import_type => Enum [qw/class role/],
+        _caller_eval => Bool,                                  # https://github.com/Ovid/moosex-extreme/pull/34
         includes     => Optional [
             ArrayRef [
                 Enum [
@@ -254,15 +255,18 @@ sub field ( $meta, $name, %opt_for ) {
     foreach my $attr ( is_plain_arrayref($name) ? @$name : $name ) {
         my %options = %opt_for;    # copy each time to avoid overwriting
         if ( defined( my $init_arg = $options{init_arg} ) ) {
-            throw_exception(
+            $init_arg =~ /\A_/ or throw_exception(
                 'InvalidAttributeDefinition',
                 attribute_name => $name,
                 class_name     => $meta->name,
-                messsage       => "The 'field.init_arg' must be absent or undef, not '$init_arg'",
+                messsage       => "A defined 'field.init_arg' must begin with an underscore: '$init_arg'",
             );
         }
-        $options{init_arg} = undef;
-        $options{lazy} //= 1;
+
+        $options{init_arg} //= undef;
+        if ( $options{builder} || $options{default} ) {
+            $options{lazy} //= 1;
+        }
 
         _add_attribute( 'field', $meta, $attr, %options );
     }
@@ -287,6 +291,15 @@ sub _add_attribute ( $attr_type, $meta, $name, %opt_for ) {
         writer    => sub ($value) {"set_$value"},
         reader    => sub ($value) {"get_$value"},
     };
+
+    if ( is_coderef( $opt_for{builder} ) ) {
+        my $builder_code = $opt_for{builder};
+        my $builder_name = $shortcut_for->{builder}->($name);
+        if ( _is_valid_method_name($builder_name) ) {
+            $meta->add_method( $builder_name => $builder_code );
+            $opt_for{builder} = $builder_name;
+        }
+    }
 
     OPTION: foreach my $option ( keys $shortcut_for->%* ) {
         next unless exists $opt_for{$option};
@@ -442,7 +455,7 @@ MooseX::Extended::Core - Internal module for MooseX::Extended
 
 =head1 VERSION
 
-version 0.21
+version 0.25
 
 =head1 DESCRIPTION
 

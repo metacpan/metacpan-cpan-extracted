@@ -12,7 +12,7 @@ use lib 't/lib';
 #use NoInlineAttribute;
 use Test::More;
 use Test::Fatal;
-#use Test::Moose;
+use Test::Moose;
 
 {
     my %handles = (
@@ -187,7 +187,7 @@ subtest(
 note "Testing class $class";
 
         my $obj = $class->new;
-#        with_immutable {
+        with_immutable {
             is(
                 exception { $obj->accessor( 0, undef ) },
                 undef,
@@ -198,8 +198,8 @@ note "Testing class $class";
                 undef,
                 'can use curried accessor to set value to undef'
             );
-#        }
-#        $class;
+        }
+        $class;
     }
 );
 
@@ -208,7 +208,7 @@ sub run_tests {
 
     can_ok( $class, $_ ) for sort keys %{$handles};
 
-#    with_immutable {
+    with_immutable {
         my $obj = $class->new( _values => [ 10, 12, 42 ] );
 
         is_deeply(
@@ -800,8 +800,8 @@ sub run_tests {
                 'unshift works with lazy init'
             );
         }
-#    }
-#    $class;
+    }
+    $class;
 }
 
 done_testing;

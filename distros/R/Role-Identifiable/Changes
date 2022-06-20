@@ -1,11 +1,16 @@
 Revision history for Role-Identifiable
 
+0.008     2022-06-12 15:25:28-04:00 America/New_York
+        - tweak some packaging information (author, etc)
+        - add Role::Identifiable just to make life simpler
+          ( https://github.com/rjbs/Role-Identifiable/issues/3 )
+
 0.007     2013-10-15 22:18:31 America/New_York
-          update bugtracker and repo metadata
+        - update bugtracker and repo metadata
 
 0.006     2013-08-30 15:41:27 America/New_York
           [NOT QUITE BACKWARD COMPATIBLE]
-          idents now have to be non-empty and can't start or end with spaces
+        - idents now have to be non-empty and can't start or end with spaces
 
 0.005     2010-10-28 15:25:50 America/New_York
-          first release, spun off of Throwable-X 0.004
+        - first release, spun off of Throwable-X 0.004

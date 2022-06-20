@@ -12,9 +12,9 @@ use String::ShellQuote;
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-08'; # DATE
+our $DATE = '2022-05-14'; # DATE
 our $DIST = 'Perinci-CmdLine-POD'; # DIST
-our $VERSION = '0.026'; # VERSION
+our $VERSION = '0.027'; # VERSION
 
 our @EXPORT_OK = qw(gen_pod_for_pericmd_script);
 
@@ -515,7 +515,6 @@ sub gen_pod_for_pericmd_script {
     # section: SYNOPSIS
     {
         my @sectpod;
-        push @sectpod, "Usage:\n\n";
         if ($cli->{subcommands}) {
             if ($gen_scs) {
                 for my $sc_name (sort keys %clidocdata) {
@@ -1026,7 +1025,7 @@ Perinci::CmdLine::POD - Generate POD for Perinci::CmdLine-based CLI script
 
 =head1 VERSION
 
-This document describes version 0.026 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2022-05-08.
+This document describes version 0.027 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2022-05-14.
 
 =head1 SYNOPSIS
 

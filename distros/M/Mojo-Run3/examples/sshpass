@@ -1,0 +1,86 @@
+#!/usr/bin/env perl
+use Mojo::Base -strict;
+
+use if -e 'lib/Mojo/Run3.pm', qw(lib lib);
+use IO::Handle;
+use Mojo::IOLoop::Stream;
+use Mojo::Run3;
+use Mojo::Util qw(getopt);
+use Term::ReadKey qw(ReadMode);
+
+my %state;
+getopt('f=s' => \&read_password_from_file, 'e' => \&read_password_from_env);
+abort(q(Can't start without valid -e or -f <file>)) unless $state{password};
+main();
+
+sub abort { warn "sshpass: $_[0]\n"; exit($! || 1) }
+
+sub main {
+  my $run3 = Mojo::Run3->new(driver => 'pty');
+  setup_stdin($run3);
+  $run3->once(stdout => \&start_parent);
+  $run3->on(error  => sub { abort($_[1]) });
+  $run3->on(pty    => \&maybe_write_ssh_password);
+  $run3->on(stderr => sub { STDERR->binmode; STDERR->syswrite($_[1]) });
+  $run3->on(stdout => sub { STDOUT->binmode; STDOUT->syswrite($_[1]) });
+  $run3->run_p(\&start_child)->catch(sub { abort(shift) })->wait;
+  exit $run3->exit_status;
+}
+
+sub maybe_write_ssh_password {
+  my ($run3, $chunk) = @_;
+  $state{password_tid} ||= Mojo::IOLoop->timer(
+    5 => sub {
+      $run3->kill(9);
+      abort('Timeout waiting for password prompt.');
+    }
+  );
+
+  return unless $chunk =~ m![Pp]assword:!;
+
+  state $seen_password = 0;
+  abort("Can't retry same password") if $seen_password++;
+  $run3->write("$state{password}\n");
+}
+
+sub read_password_from_env {
+  return if $state{password} = $ENV{SSHPASS};
+  abort('-e option given but SSHPASS environment variable not set');
+}
+
+sub read_password_from_file {
+  my ($name, $file) = @_;
+  abort("Can't read $file: $!") unless open my $PW, '<', $file;
+  $state{password} = readline $PW;
+  chomp $state{password};
+  abort("Can't read password from $file") unless $state{password};
+}
+
+sub setup_stdin {
+  my $run3  = shift;
+  my $STDIN = \*STDIN;
+  my $stdin = Mojo::IOLoop::Stream->new($STDIN);
+  $stdin->timeout(0);
+  $stdin->on(error => sub { abort($_[1]) });
+  $stdin->on(read  => sub { $run3->write($_[1]) });
+  $run3->ioloop->stream($stdin);
+
+  my @winsize = Term::ReadKey::GetTerminalSize($STDIN);
+  @winsize = map { $winsize[$_] } (1, 0, 2, 3);           # row, col, xpixel, ypixel
+  $state{winsize} = \@winsize;
+
+  $STDIN->binmode;
+}
+
+sub start_child {
+  my ($run3) = @_;
+  $run3->handle('stdin')->set_winsize(@{$state{winsize}});
+  exec @ARGV;
+}
+
+sub start_parent {
+  Mojo::IOLoop->remove($state{password_tid}) if $state{password_tid};
+  ReadMode 4;
+}
+
+END { ReadMode 0 }

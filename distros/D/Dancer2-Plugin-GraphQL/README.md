@@ -63,8 +63,8 @@ define a route handler implementing a GraphQL endpoint.
 Parameters, after the route pattern.
 The first three can be replaced with a single array-ref. If so,
 the first element is a classname-part, which will be prepended with
-"[GraphQL::Plugin::Convert](https://metacpan.org/pod/GraphQL::Plugin::Convert)::". The other values will be passed to
-that class's ["to\_graphql" in GraphQL::Plugin::Convert](https://metacpan.org/pod/GraphQL::Plugin::Convert#to_graphql) method. The returned
+"[GraphQL::Plugin::Convert](https://metacpan.org/pod/GraphQL%3A%3APlugin%3A%3AConvert)::". The other values will be passed to
+that class's ["to\_graphql" in GraphQL::Plugin::Convert](https://metacpan.org/pod/GraphQL%3A%3APlugin%3A%3AConvert#to_graphql) method. The returned
 hash-ref will be used to set options.
 
 E.g.
@@ -73,7 +73,7 @@ E.g.
 
 - $schema
 
-    A [GraphQL::Schema](https://metacpan.org/pod/GraphQL::Schema) object.
+    A [GraphQL::Schema](https://metacpan.org/pod/GraphQL%3A%3ASchema) object.
 
 - $root\_value
 
@@ -120,7 +120,7 @@ Here is example to use GraphiQL:
 
 Ed J
 
-Based heavily on [Dancer2::Plugin::Ajax](https://metacpan.org/pod/Dancer2::Plugin::Ajax) by "Dancer Core Developers".
+Based heavily on [Dancer2::Plugin::Ajax](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3AAjax) by "Dancer Core Developers".
 
 # COPYRIGHT AND LICENSE
 

@@ -1,6 +1,6 @@
 package Task::BeLike::GEEKRUTH;
 use Modern::Perl;
-our $VERSION = '1.0000'; # VERSION
+our $VERSION = '1.0100'; # VERSION
 our $AUTHORITY = 'cpan:GEEKRUTH'; # AUTHORITY
 # ABSTRACT: TIMTOWTDI, but this works for GeekRuthie
 
@@ -18,7 +18,7 @@ Task::BeLike::GEEKRUTH - TIMTOWTDI, but this works for GeekRuthie
 
 =head1 VERSION
 
-version 1.0000
+version 1.0100
 
 =head1 NAME
 
@@ -26,7 +26,7 @@ Task::BeLike::GEEKRUTH - TIMTOWTDI, but this works for GeekRuthie
 
 =head1 VERSION
 
-version 1.0000
+version 1.0100
 
 =head1 TASK CONTENTS
 
@@ -70,8 +70,6 @@ version 1.0000
 
 =head3 L<Perl::Tidy>
 
-=head3 L<PLS>
-
 =head3 L<Pod::Coverage::TrustPod>
 
 =head2 Database Wrangling
@@ -82,9 +80,13 @@ version 1.0000
 
 =head3 L<DBIx::Class::Helpers>
 
+=head3 L<DBIx::Class::TemporalRelations>
+
 =head2 Building Cool Stuff
 
 =head3 L<autodie>
+
+=head3 L<Carp>
 
 =head3 L<Cpanel::JSON::XS>
 
@@ -94,13 +96,9 @@ version 1.0000
 
 =head3 L<Dancer2::Plugin::Auth::Extensible>
 
-=head3 L<Dancer2::Plugin::Auth::Extensible::Provider::DBIC>
-
-=head3 L<Dancer2::Plugin::Auth::Extensible::Provider::DBIx::Class>
+=head3 L<Dancer2::Plugin::Auth::Extensible::Provider::DBIxClass>
 
 =head3 L<Dancer2::Plugin::Cache::CHI>
-
-=head3 L<Dancer2::Plugin::DBIC>
 
 =head3 L<Dancer2::Plugin::DBIx::Class>
 

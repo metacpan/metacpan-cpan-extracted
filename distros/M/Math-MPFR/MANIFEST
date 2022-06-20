@@ -100,6 +100,7 @@ t/Rmpfr_rootn_ui.t
 t/Rmpfr_sinu.t
 t/rndna.t
 t/rndna2.t
+t/ryu_checks.t
 t/set_IV.t
 t/set_NV.t
 t/set_str.t

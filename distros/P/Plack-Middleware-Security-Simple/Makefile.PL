@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "Plack::Test" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "v0.6.1",
+  "VERSION" => "v0.7.0",
   "test" => {
     "TESTS" => "t/*.t"
   }

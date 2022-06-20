@@ -149,11 +149,16 @@ sub MY::postamble {
   
   # Compile native and precompile codes of standard modules
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Fn');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Array');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Hash');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Format');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Time');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Time::Info');
   
   # Precompile make rule
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('Fn');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('Array');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('Format');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('List');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('ByteList');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('ShortList');
@@ -164,6 +169,7 @@ sub MY::postamble {
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('StringList');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('StringBuffer');
   $make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('Hash');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('Sort');
   
   # Create precompile tests
   {

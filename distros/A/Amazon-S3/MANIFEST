@@ -1,10 +1,15 @@
-CHANGES
+ChangeLog
 lib/Amazon/S3.pm
 lib/Amazon/S3/Bucket.pm
+lib/Amazon/S3/Constants.pm
+lib/Amazon/S3/Logger.pm
 Makefile.PL
 MANIFEST			This list of files
-README
-t/01api.t
-t/99-pod-coverage.t
-t/99-pod.t
-META.yml                                 Module meta-data (added by MakeMaker)
+README-TESTING.md
+README.md
+t/01-api.t
+t/02-logger.t
+t/03-region.t
+t/04-list-buckets.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -5,11 +5,12 @@ use utf8;
 
 package Neo4j::Driver;
 # ABSTRACT: Neo4j community graph database driver for Bolt and HTTP
-$Neo4j::Driver::VERSION = '0.30';
+$Neo4j::Driver::VERSION = '0.31';
 
 use Carp qw(croak);
 
 use URI 1.25;
+use Neo4j::Driver::PluginManager;
 use Neo4j::Driver::Session;
 
 use Neo4j::Driver::Type::Node;
@@ -58,6 +59,7 @@ sub new {
 	my ($class, $config, @extra) = @_;
 	
 	my $self = bless { %DEFAULTS }, $class;
+	$self->{plugins} = Neo4j::Driver::PluginManager->new;
 	
 	croak __PACKAGE__ . "->new() with multiple arguments unsupported" if @extra;
 	$config = { uri => $config } if ref $config ne 'HASH';
@@ -170,6 +172,7 @@ sub _parse_options {
 		$options{cypher_params} = v2;
 	}
 	warnings::warnif deprecated => "Config option jolt is deprecated: Jolt is now enabled by default" if defined $options{jolt};
+	warnings::warnif deprecated => "Config option net_module is deprecated; use plug-in interface" if defined $options{net_module};
 	
 	my @unsupported = ();
 	foreach my $key (keys %options) {
@@ -178,6 +181,16 @@ sub _parse_options {
 	croak "Unsupported $context option: " . join ", ", sort @unsupported if @unsupported;
 	
 	return %options;
+}
+
+
+sub plugin {
+	# uncoverable pod (experimental feature)
+	my ($self, $package, @extra) = @_;
+	
+	croak "plugin() with more than one argument is unsupported" if @extra;
+	$self->{plugins}->_register_plugin($package);
+	return $self;
 }
 
 
@@ -212,7 +225,7 @@ Neo4j::Driver - Neo4j community graph database driver for Bolt and HTTP
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 SYNOPSIS
 
@@ -288,15 +301,9 @@ See L</"uri"> for details.
 
 B<This driver's development is not yet considered finalised.>
 
-As of version 0.30, the major open items are:
+As of version 0.31, the major open items are:
 
 =over
-
-=item *
-
-Finalising the API for custom networking modules.
-(This is expected to require moving closer to a plugin API,
-in addition to formal specification of the result handler API.)
 
 =item *
 
@@ -392,33 +399,23 @@ These are subject to unannounced modification or removal in future
 versions. Expect your code to break if you depend upon these
 features.
 
-=head2 Custom networking modules
+=head2 Plug-in modules
 
- use Local::MyNetworkAgent;
- $driver->config(net_module => 'Local::MyNetworkAgent');
+ $driver->plugin( 'Local::MyPlugin' );
+ $driver->plugin(  Local::MyPlugin->new );
 
-The module to be used for network communication may be specified
-using the C<net_module> config option. The specified module must
-implement the API described in L<Neo4j::Driver::Net/"EXTENSIONS">.
-Your code must C<use> or C<require> the module it specifies here.
+The driver offers a simple plug-in interface. Plug-ins are modules
+providing handlers for events that may be triggered by the driver.
+Plug-ins are loaded by calling the C<plugin()> method with the
+module name as parameter. Your code must C<use> or C<require> the
+module it specifies here. Alternatively, the blessed instance of
+a plug-in may be given.
 
-By default, the driver will try to auto-detect a suitable module.
-This will currently always result in the driver's built-in modules
-being used. Alternatively, you may specify the empty string to ask
-for the built-in modules explicitly, which will disable
-auto-detection.
+Details on the implementation of plug-ins including descriptions of
+individual events are provided in L<Neo4j::Driver::Plugin>.
 
- $driver->config(net_module => undef);  # auto-detect (the default)
- $driver->config(net_module => '');     # use the built-in modules
-
-This config option is experimental because the API for custom
-networking modules is still evolving. See L<Neo4j::Driver::Net>
-for details.
-
-It is likely that this option will soon be replaced with a new
-option that allows specifying multiple plugins instead of just a
-single module. Existing networking modules will work as plugins
-with only minimal changes.
+This feature is experimental because some parts of the plug-in
+API are still evolving.
 
 =head2 Concurrent transactions in HTTP sessions
 
@@ -457,26 +454,6 @@ in time.
 This config option is experimental because its name and semantics
 are still evolving.
 
-=head2 Parameter syntax conversion
-
- $driver->config( cypher_params => v2 );
- $bar = $driver->session->run('RETURN {foo}', foo => 'bar');
-
-When this option is set, the driver automatically uses a regular
-expression to convert the old Cypher parameter syntax C<{param}>
-supported by Neo4j S<version 2> to the modern syntax C<$param>
-supported by Neo4j S<version 3> and newer.
-
-The only allowed value for this config option is the unquoted
-literal L<v-string|perldata/"Version Strings"> C<v2>.
-
-Cypher's modern C<$> parameter syntax unfortunately may cause string
-interpolations in Perl, which decreases database performance because
-Neo4j can re-use query plans less often. It is also a potential
-security risk (Cypher injection attacks). Using this config option
-enables your code to use the C<{}> parameter syntax instead. This
-option is currently experimental because the API is still evolving.
-
 =head1 CONFIGURATION OPTIONS
 
 L<Neo4j::Driver> implements the following configuration options.
@@ -491,7 +468,7 @@ L<Neo4j::Driver> implements the following configuration options.
 
 Specifies the authentication details for the Neo4j server.
 The authentication details are provided as a Perl reference
-that is made available to the networking module. Typically,
+that is made available to the network adapter. Typically,
 this is an unblessed hash reference with the authentication
 scheme declared in the hash entry C<scheme>.
 
@@ -504,6 +481,23 @@ specified as userinfo in the URI.
 
 The C<auth> config option defaults to the value C<undef>,
 which disables authentication.
+
+=head2 cypher_params
+
+ $driver->config( cypher_params => v2 );
+ $foo = $driver->session->run('RETURN {bar}', bar => 'foo');
+
+Enables conversion of the old Cypher parameter syntax C<{param}>
+supported by Neo4j S<version 2> to the modern syntax C<$param>
+supported by Neo4j S<version 3> and newer. The only allowed value
+for this config option is the unquoted literal
+L<v-string|perldata/"Version Strings"> C<v2>.
+
+Cypher's modern C<$> parameter syntax unfortunately may cause string
+interpolations in Perl, which decreases database performance because
+Neo4j can re-use query plans less often. It is also a potential
+security risk (Cypher injection attacks). Using this config option
+enables your code to use the safer C<{}> parameter syntax instead.
 
 =head2 encrypted
 
@@ -589,6 +583,10 @@ if no port is specified, the protocol's default port will be used.
 The C<neo4j> URI scheme is not yet implemented. Once it is added
 to a future version of this driver, the default URI scheme will
 likely change to C<neo4j>.
+
+Note that some network environments may have issues with dual-stack
+hostnames such as C<localhost>. The connection may appear to "hang".
+Literal IP addresses like C<127.0.0.1> are not affected.
 
 =head1 ENVIRONMENT
 

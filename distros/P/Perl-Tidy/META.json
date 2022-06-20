@@ -29,6 +29,11 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008"
+         }
       }
    },
    "release_status" : "stable",
@@ -39,6 +44,6 @@
          "web" : "https://github.com/perltidy/perltidy"
       }
    },
-   "version" : "20220217",
+   "version" : "20220613",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

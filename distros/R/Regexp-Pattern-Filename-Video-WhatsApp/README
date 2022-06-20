@@ -3,7 +3,7 @@ NAME
     WhatsApp
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.003 of
     Regexp::Pattern::Filename::Video::WhatsApp (from Perl distribution
     Regexp-Pattern-Filename-Video-WhatsApp), released on 2022-05-08.
 
@@ -23,6 +23,8 @@ SYNOPSIS
 DESCRIPTION
 REGEXP PATTERNS
     *   filename_video_whatsapp
+
+        Tags: anchored
 
         Video filename saved by WhatsApp.
 

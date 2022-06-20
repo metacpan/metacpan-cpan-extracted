@@ -13,7 +13,7 @@ use HTTP::Date;
 use LWP::UserAgent;
 use Pod::Usage;
 
-our $VERSION = '0.124';
+our $VERSION = '0.125';
 
 my %opt;
 

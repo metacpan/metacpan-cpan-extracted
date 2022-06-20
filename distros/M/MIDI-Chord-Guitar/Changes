@@ -1,5 +1,28 @@
 Revision history for MIDI-Chord-Guitar
 
+0.0704 2022-06-16 20:29:50
+    - Improve documentation.
+    - Use Carp.
+    - Use Music::PitchNum.
+    - Improve tests.
+
+0.0703 2022-06-13 21:46:32
+    - Add another Cm voicing.
+
+0.0702 2022-06-13 21:35:29
+    - Oops. Fix the Cm the MIDI-nums too.
+
+0.0701 2022-06-13 21:15:16
+    - Fix Cm voicing.
+
+0.0700 2022-06-12 14:47:05
+    - Improve documentation.
+    - Attempt to correct the convoluted, questionable logic in the fingering() method.
+
+0.0609 2022-06-12 12:22:49
+    - Do not show fingerings with negative positions.
+    - Improve test program.
+
 0.0608 2021-05-15 22:35:24
     - Fix 7b9 again. :\
 

@@ -174,7 +174,7 @@ lib/Lab/Moose/Instrument/Lakeshore350.pm
 lib/Lab/Moose/Instrument/Lakeshore372.pm
 lib/Lab/Moose/Instrument/LinearStepSweep.pm
 lib/Lab/Moose/Instrument/Log.pm
-lib/Lab/Moose/Instrument/NanonisTremea.pm
+lib/Lab/Moose/Instrument/NanonisTramea.pm
 lib/Lab/Moose/Instrument/OI_Common.pm
 lib/Lab/Moose/Instrument/OI_ILM210.pm
 lib/Lab/Moose/Instrument/OI_IPS.pm

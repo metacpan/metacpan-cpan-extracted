@@ -14,7 +14,7 @@ MarpaX::ESLIF::Introduction - MarpaX::ESLIF's Introduction
 
 =head1 VERSION
 
-version 6.0.22
+version 6.0.24
 
 =head1 DESCRIPTION
 
@@ -45,7 +45,7 @@ The L<MarpaX::ESLIF::BNF> is inspired by L<Marpa::R2's DSL|https://metacpan.org/
 
 =over
 
-=item Native regular expression support, including regex callbacks into user-space
+=item Native regular expression support, including regex callbacks into user-space and substitution
 
 =item Syntactic exception
 
@@ -466,129 +466,7 @@ is setting an internal PCRE2 match limit to 15. The dump does not show that as a
 
 =back
 
-It is highly recommended to read the L<pcre2pattern|http://www.pcre.org/current/doc/html/pcre2pattern.html> documentation to know all the possible settings that can be I<embedded> into the regular expression. Explicit modifiers are insipired by the L<jpcre2|https://github.com/jpcre2/jpcre2> and L<Perl language|www.perl.org> (most of the descriptions below are copy/pasted from jpcre2):
-
-=over
-
-=item e
-
-Set the C<PCRE2_MATCH_UNSET_BACKREF> flag.
-
-Unset back-references in the pattern will match to empty strings.
-
-=item i
-
-Set the C<PCRE2_CASELESS> flag.
-
-Case-insensitive.
-
-=item j
-
-Set the C<PCRE2_ALT_BSUX|PCRE2_MATCH_UNSET_BACKREF> flags.
-
-C<\u>, C<\U> and C<\x> and unset back-references will act as JavaScript standard:
-
-=over
-
-=item C<\U>
-
-Matches an upper case "U" character (by default it causes a compile error if this option is not set).
-
-=item C<\u>
-
-Matches a lower case "u" character unless it is followed by four hexadecimal digits, in which case the hexadecimal number defines the code point to match (by default it causes a compile error if this option is not set).
-
-=item C<\x>
-
-Matches a lower case "x" character unless it is followed by two hexadecimal digits, in which case the hexadecimal number defines the code point to match (By default, as in Perl, a hexadecimal number is always expected after C<\x>, but it may have zero, one, or two digits (so, for example, C<\xz> matches a binary zero character followed by z) ).
-
-=back
-
-Unset back-references in the pattern will match to empty strings.
-
-=item m
-
-Set the C<PCRE2_MULTILINE> flag.
-
-Multi-line regex.
-
-=item n
-
-Set the C<PCRE2_UCP> flag.
-
-Enable Unicode properties and extend meaning of meta-characters.
-
-=item s
-
-Set the C<PCRE2_DOTALL> flag.
-
-If this modifier is set, a dot meta-character in the pattern matches all characters, including newlines.
-
-=item x
-
-Set the C<PCRE2_EXTENDED> flag.
-
-Whitespace data characters in the pattern are totally ignored except when escaped or inside a character class, enables commentary in pattern.
-
-For parsing reasons, it can be the parsing of our grammar fail if your are using the / character into embedded regular expression comments, though -;
-
-=item D
-
-Set the C<PCRE2_DOLLAR_ENDONLY> flag.
-
-A dollar meta-character in the pattern matches only at the end of the subject string. Without this modifier, a dollar also matches immediately before the final character if it is a newline (but not before any other newlines). This modifier is ignored if m modifier is set.
-
-=item J
-
-Set the C<PCRE2_DUPNAMES> flag.
-
-Allow duplicate names for sub-patterns.
-
-=item U
-
-Set the C<PCRE2_UNGREEDY> flag.
-
-This modifier inverts the "greediness" of the quantifiers so that they are not greedy by default, but become greedy if followed by ?.
-
-=item a
-
-Unset the C<PCRE2_UTF> flag.
-
-Only byte matching will work.
-
-=item N
-
-Unset the C<PCRE2_UCP> flag.
-
-Meta-characters will be limited to their ASCII equivalent.
-
-=item u
-
-Set the C<PCRE2_UTF> flag.
-
-Forces support of large codepoints.
-
-=item b
-
-Unset the C<PCRE2_UTF> flag, then set the C<PCRE2_NEVER_UTF> flag.
-
-Could mean "forced binary" mode.
-
-=item c
-
-Unset the C<PCRE2_NEVER_UTF> flag, then set the C<PCRE2_UTF> flag.
-
-Could mean "forced unicode character" mode.
-
-=item A
-
-Unset the C<PCRE2_ANCHORED> flag.
-
-Dangerous option, in case you want to do look-behind. Since the user has no control on how MarpaX::ESLIF manages its stream buffers, in theory it is safe to use this option only if the whole data is sent to MarpaX::ESLIF a single buffer.
-
-=back
-
-Modifiers are always executed I<in order>, and I<before> the regular expression is compiled: if a regular expression compilation fail, corresponding message sent by PCRE2 will be echoed to your logger, with the C<GENERICLOGGER_LOGLEVEL_ERROR> level. You will notice that all modifiers in common to jpcre2 have the same meaning, I<except for the n> modifier: I<n> in jpcre2 is I<nu> for us.
+It is highly recommended to read the L<pcre2pattern|http://www.pcre.org/current/doc/html/pcre2pattern.html> documentation to know all the possible settings that can be I<embedded> into the regular expression. Explicit modifiers are insipired by the L<jpcre2|https://github.com/jpcre2/jpcre2> and L<Perl language|www.perl.org> (most of the descriptions below are copy/pasted from jpcre2). Please refer to L<MarpaX::ESLIF::BNF> for the exhaustive list of modifiers.
 
 =back
 
@@ -659,6 +537,10 @@ You must use a L<CMake|http://cmake.org> version 3 at least. Recommended pattern
   cmake -Wno-dev -DCMAKE_BUILD_TYPE=RelWithDebInfo -DTCONV_USE_ICU=NO .
   make
   make check
+
+If you use valgrind, the recommended C<cmake> arguments are:
+
+  cmake -Wno-dev -DCMAKE_BUILD_TYPE=RelWithDebInfo -DTCONV_USE_ICU=NO -DPCRE2_SUPPORT_VALGRIND=1 .
 
 =head1 SEE ALSO
 

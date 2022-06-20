@@ -152,6 +152,7 @@
 #define G1_RULE_TERMINAL_5                       "G1_rule_terminal_5"
 #define G1_RULE_TERMINAL_6                       "G1_rule_terminal_6"
 #define G1_RULE_TERMINAL_7                       "G1_rule_terminal_7"
+#define G1_RULE_TERMINAL_8                       "G1_rule_terminal_8"
 #define G1_RULE_SYMBOL                           "G1_rule_symbol"
 #define G1_RULE_SYMBOL_NAME_1                    "G1_rule_symbol_name_1"
 #define G1_RULE_SYMBOL_NAME_2                    "G1_rule_symbol_name_2"
@@ -381,6 +382,7 @@
 #define G1_ACTION_TERMINAL_5                       "047_G1_action_terminal_5"                       /* done */
 #define G1_ACTION_TERMINAL_6                       "048_G1_action_terminal_6"                       /* done */
 #define G1_ACTION_TERMINAL_7                       "116_G1_action_terminal_7"                       /* done */
+#define G1_ACTION_TERMINAL_8                       "117_G1_action_terminal_8"                       /* done */
 #define G1_ACTION_SYMBOL                           "049_G1_action_symbol" /* symbol ::= <symbol name> */
 #define G1_ACTION_SYMBOL_NAME_1                    "020_G1_action_symbol_name_1" /* <symbol name> ::= <bare name> */
 #define G1_ACTION_SYMBOL_NAME_2                    "021_G1_action_symbol_name_2" /* <symbol name> ::= <bracketed name> */ /* done */

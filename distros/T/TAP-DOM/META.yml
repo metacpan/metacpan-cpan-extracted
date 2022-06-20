@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -38,7 +38,7 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=TAP-DOM
   homepage: http://metacpan.org/release/TAP-DOM
   repository: git://github.com/renormalist/tap-dom.git
-version: '0.93'
+version: '0.97'
 x_Dist_Zilla:
   perl:
     version: '5.022000'
@@ -55,78 +55,78 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@SCHWIGON/@Basic/GatherDir'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@SCHWIGON/@Basic/PruneCruft'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@SCHWIGON/@Basic/ManifestSkip'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@SCHWIGON/@Basic/MetaYAML'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::License
       name: '@SCHWIGON/@Basic/License'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@SCHWIGON/@Basic/Readme'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@SCHWIGON/@Basic/ExtraTests'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@SCHWIGON/@Basic/ExecDir'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@SCHWIGON/@Basic/ShareDir'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@SCHWIGON/@Basic/MakeMaker'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@SCHWIGON/@Basic/Manifest'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@SCHWIGON/@Basic/TestRelease'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@SCHWIGON/@Basic/ConfirmRelease'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@SCHWIGON/@Basic/UploadToCPAN'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@SCHWIGON/MetaConfig'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@SCHWIGON/MetaJSON'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@SCHWIGON/PkgVersion'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@SCHWIGON/PodSyntaxTests'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
@@ -162,7 +162,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@SCHWIGON/MetaResources'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Authority
       name: '@SCHWIGON/Authority'
@@ -262,7 +262,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@SCHWIGON/AutoPrereqs'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Git::Describe
       name: '@SCHWIGON/Git::Describe'
@@ -274,7 +274,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@SCHWIGON/NextRelease'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
@@ -333,7 +333,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.93
+          tag: v0.97
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -356,7 +356,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: ManifestSkip
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -364,56 +364,56 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Encoding
       name: Encoding
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.015'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.015'
+      version: '6.024'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.015'
+    version: '6.024'
 x_authority: cpan:SCHWIGON
 x_generated_by_perl: v5.22.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

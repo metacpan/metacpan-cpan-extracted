@@ -5,7 +5,7 @@
 use v5.12;
 
 package Chart::Base;
-our $VERSION = 'v2.402.1';
+our $VERSION = 'v2.402.3';
 
 use FileHandle;
 use Carp;
@@ -13,6 +13,7 @@ use GD;
 use GD::Image;
 use Chart::Constants;
 use Chart::Color;
+use Chart::Font;
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>#
 #  public methods          #
@@ -44,21 +45,17 @@ sub set {
     }
 
     # set the options
-    for ( keys %opts )
-    {
+    for ( keys %opts ) {
         $self->{$_} = $opts{$_};
         $self->{saveopts}->{$_} = $opts{$_};
 
         # if someone wants to change the grid_lines color, we should set all
         # the colors of the grid_lines
-        if ( $_ =~ /^colors$/ )
-        {
+        if ( $_ =~ /^colors$/ ) {
             my %hash = %{ $opts{$_} };
-            foreach my $key ( sort keys %hash )
-            {
-                if ( $key =~ /^grid_lines$/ )
-                {
+            foreach my $key ( sort keys %hash ) {
 
+                if ( $key =~ /^grid_lines$/ ) {
                     # ORIG:
                     #$self->{'colors'}{'y_grid_lines'}    = $hash{'grid_lines'},
                     #  $self->{'colors'}{'x_grid_lines'}  = $hash{'grid_lines'},
@@ -79,27 +76,12 @@ sub set {
                         $self->{'colors'}{'x_grid_lines'}  = $sLocal;
                         $self->{'colors'}{'y2_grid_lines'} = $sLocal;
                     }
-                    else {
-                        carp "colors{'grid_lines'} is not SCALAR and not ARRAY\n";
-                    }
+                    else { carp "colors{'grid_lines'} is not SCALAR and not ARRAY\n" }
                 }
             }
         }
     }
     return 1;
-}
-
-# hash of all set options so far
-sub getopts
-{
-    my $self = shift;
-    my %opts = ();
-
-    foreach ( keys %{ $self->{saveopts} } )
-    {
-        $opts{$_} = $self->{saveopts};
-    }
-    return %opts;
 }
 
 ## @method int add_pt(@data)
@@ -318,8 +300,7 @@ sub get_data
 # @param[in] file Name of file to write graph to
 # @param[in] dataref Reference to external data space
 # @return Status of the plot
-sub png
-{
+sub png {
     my $self    = shift;
     my $file    = shift;
     my $dataref = shift;
@@ -389,8 +370,7 @@ sub png
 # draw the chart and plot the data
 # @param[in] dataref Reference to external data space
 # @return Status of the plot
-sub cgi_png
-{
+sub cgi_png {
     my $self    = shift;
     my $dataref = shift;
 
@@ -4061,8 +4041,7 @@ sub _prepare_brush
 # if the user does not provide another function
 #
 # @return status
-sub _default_f_tick
-{
+sub _default_f_tick {
     my $label = shift;
 
     return $label;
@@ -4072,8 +4051,7 @@ sub _default_f_tick
 # Get ratio width_x/width_y
 #
 # @return ratio width_x and width_y
-sub _xyRatio
-{
+sub _xyRatio {
     my $self = shift;
     my $width_x = $self->{'curr_x_max'} - $self->{'curr_x_min'} + 1;
     my $width_y = $self->{'curr_y_max'} - $self->{'curr_y_min'} + 1;
@@ -4086,8 +4064,7 @@ sub _xyRatio
 #
 # @return width(interval) of reality in x direction
 #
-sub _xPixelInReal
-{
+sub _xPixelInReal {
     my $self = shift;
     my $width_x = $self->{'curr_x_max'} - $self->{'curr_x_min'} + 1;
     my ( $min, $max ) = $self->_find_x_range();
@@ -4101,8 +4078,7 @@ sub _xPixelInReal
 #
 # @return width(interval) of reality in y direction
 #
-sub _yPixelInReal
-{
+sub _yPixelInReal {
     my $self = shift;
     my $width_y = $self->{'curr_y_max'} - $self->{'curr_y_min'} + 1;
     my ( $min, $max, $flag_all_integers ) = $self->_find_y_range();

@@ -5,7 +5,7 @@ use warnings;
 package Mom;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.005';
+our $VERSION   = '0.006';
 
 use parent qw( MooX::Press );
 use Carp qw();
@@ -15,7 +15,8 @@ use Regexp::Common;
 my $token_re = qr{(?:
 	(?: [^0-9\W]\w* )
 	| \: (?: isa|enum|does|type|handles|with|extends|default|requires|builder|trigger|clearer ) $RE{balanced}
-	| \: (?: role|ro|rwp|rw|bare|private|lazy|required|clearer|builder|trigger|std|common|path )
+	| \: (?: role|ro|rwp|rw|bare|private|lazy|required|clearer|builder|trigger|std|common|path|req )
+	| \!
 )}x;
 
 sub import {
@@ -50,17 +51,26 @@ sub import {
 		elsif ( $token =~ /^:(lazy)$/ ) {
 			$opts{has}{$attr}{$1} = 1;
 		}
-		elsif ( $token =~ /^:(required|clearer|trigger|builder)$/ ) {
+		elsif ( $token =~ /^:(required|req|clearer|trigger|builder)$/ ) {
+			my $o = $1;
+			$o = 'required' if $o eq 'req';
 			$opts{has}{$attr}{$1} = 1;
 		}
 		elsif ( $token =~ /^:(enum|handles).(.+).$/ ) {
-			push @{ $opts{has}{$attr}{$1} ||= [] }, split /\s*,\s*/, $2;
+			my ( $o, $v ) = ( $1, $2 );
+			push @{ $opts{has}{$attr}{$o} ||= [] }, split /\s*,\s*/, $v;
+			if ( $o eq 'handles' and $v =~ /^[12]$/ ) {
+				$opts{has}{$attr}{$o} = $v;
+			}
 		}
 		elsif ( $token =~ /^:(isa|does|type|default|builder|trigger|clearer).(.+).$/ ) {
 			$opts{has}{$attr}{$1} = $2;
 		}
 		elsif ( $token =~ /^:(requires).(.+).$/ ) {
 			push @{ $opts{requires} ||= [] }, split /\s*,\s*/, $2;
+		}
+		elsif ( $token eq '!' ) {
+			$opts{has}{$attr}{required} = 1;
 		}
 		else {
 			$opts{has}{$attr = $token} = {};
@@ -132,11 +142,7 @@ Is (roughly) a shortcut for:
 
 But Mom takes care of a lot more. This:
 
-  use Mom q{
-    foo
-    bar   :rw :type(Int)
-    baz   :required
-  };
+  use Mom q{ foo bar:rw:type(Int) baz! };
 
 Is (roughly) a shortcut for:
 
@@ -181,19 +187,7 @@ You can now write this:
 
 I thought I could go even shorter.
 
-  use Mom q{
-    hro   :required
-    hlazy :lazy     :default(2)
-    hrwp  :required :rwp
-    hrw   :required :rw
-  };
-
-Is it a lot shorter? No, but that's mostly because MooX::ShortHas makes it
-very concise to write required attributes, and uses that in the demonstration
-but less concise for optional attributes. If we make the attributes optional,
-it becomes shorter.
-
-  use Mom q{ hro hlazy :lazy :default(2) hrwp :rwp hrw :rw };
+  use Mom q{ hro! hlazy:lazy:default(2) hrwp!:rwp hrw!:rw };
 
 =head1 IMPORT
 
@@ -223,7 +217,7 @@ Like C<< is => "bare" >> in Moo
 
 Like C<< lazy => 1 >> in Moo.
 
-=item C<< :required >>
+=item C<< :required >> or C<< :req >> or C<< ! >>
 
 Like C<< required => 1 >> in Moo.
 
@@ -278,6 +272,10 @@ For simple (string/numeric) defaults. Doesn't accept coderefs.
 Like C<< handles => ["list","of","methods"] >> in Moo.
 
 Currently no support for a hashref of delegations.
+
+=item C<< :handles(1) >> or C<< :handles(2) >>
+
+Like L<MooX::Enumeration>.
 
 =back
 
@@ -336,7 +334,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2020 by Toby Inkster.
+This software is copyright (c) 2020, 2022 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

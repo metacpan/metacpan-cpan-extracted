@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-02'; # DATE
+our $DATE = '2022-05-14'; # DATE
 our $DIST = 'App-PericmdUtils'; # DIST
-our $VERSION = '0.052'; # VERSION
+our $VERSION = '0.053'; # VERSION
 
 our %SPEC;
 
@@ -88,7 +88,7 @@ App::PericmdUtils - Some utilities related to Perinci::CmdLine
 
 =head1 VERSION
 
-This document describes version 0.052 of App::PericmdUtils (from Perl distribution App-PericmdUtils), released on 2022-05-02.
+This document describes version 0.053 of App::PericmdUtils (from Perl distribution App-PericmdUtils), released on 2022-05-14.
 
 =head1 DESCRIPTION
 
@@ -155,6 +155,8 @@ Source repository is at L<https://github.com/perlancar/perl-App-PericmdUtils>.
 L<Perinci>
 
 L<App::PerinciUtils>
+
+L<peri-doc> (from L<Perinci::To::Doc>)
 
 =head1 AUTHOR
 

@@ -1,5 +1,8 @@
 Revision history for Music-MelodicDevice-Inversion
 
+0.0502 2022-06-16 20:58:15
+    - Use Music::PitchNum instead of Music::Note.
+
 0.0501 2022-01-31 20:16:04
     - Improve documentation.
 

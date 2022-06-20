@@ -1,0 +1,33 @@
+---
+abstract: 'Run a subprocess and read/write to it'
+author:
+  - 'Jan Henning Thorsen <jan.henning@thorsen.pm>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-Run3
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  IO::Pty: '1.16'
+  IO::Socket::IP: '0.37'
+  Mojo::IOLoop::ReadWriteFork: '1.00'
+  Mojolicious: '8.25'
+  Sub::Util: '1.41'
+resources:
+  bugtracker: https://github.com/jhthorsen/mojo-run3/issues
+  homepage: https://github.com/jhthorsen/mojo-run3
+  repository: https://github.com/jhthorsen/mojo-run3.git
+version: '0.05'
+x_contributors:
+  - 'Jan Henning Thorsen'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

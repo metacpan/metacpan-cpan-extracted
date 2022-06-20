@@ -1,0 +1,81 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+# Show major and relative minor over two octaves of a fretboard.
+
+# For author testing only:
+#use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Chord-Guitar Music-FretboardDiagram);
+
+use Data::Dumper::Compact qw(ddc);
+use MIDI::Chord::Guitar;
+use Music::FretboardDiagram;
+
+use constant MINOR => 'm';
+
+my $note  = shift || 'C'; # a note name with no octave
+my $frets = shift || 16;  # number of frets to display
+
+# Sure, this could be computed...
+my %relative_minor = ( # and starting octave
+    C  => { rel => 'A',  oct => 3 },
+    Db => { rel => 'Bb', oct => 3 },
+    D  => { rel => 'B',  oct => 3 },
+    Eb => { rel => 'C',  oct => 3 },
+    E  => { rel => 'Db', oct => 2 },
+    F  => { rel => 'D',  oct => 2 },
+    Gb => { rel => 'Eb', oct => 2 },
+    G  => { rel => 'E',  oct => 2 },
+    Ab => { rel => 'F',  oct => 2 },
+    A  => { rel => 'Gb', oct => 2 },
+    Bb => { rel => 'G',  oct => 2 },
+    B  => { rel => 'Ab', oct => 2 },
+);
+
+my $octave   = $relative_minor{$note}{oct};
+my $relative = $relative_minor{$note}{rel};
+my $r_octave = $relative_minor{$relative}{oct};
+
+my $mcg = MIDI::Chord::Guitar->new(
+    # For author testing only:
+    #voicing_file => '/home/gene/sandbox/MIDI-Chord-Guitar/share/midi-guitar-chord-voicings.csv'
+);
+
+my @specs = ();
+my $dia;
+
+for my $spec ([$note, $octave, ''], [$relative, $r_octave, MINOR]) {
+    my ($n, $o, $f) = @$spec; # note, octave, flavor
+
+    my $fingerings = $mcg->fingering($n . $o, $f);
+    push @specs, map { _get_spec($_) } @$fingerings;
+
+    $fingerings = $mcg->fingering($n . ($o + 1), $f);
+    push @specs, map { _get_spec($_) } @$fingerings;
+}
+
+@specs = sort { $a->[0] <=> $b->[0] } @specs;
+warn ddc(\@specs);
+
+$dia = Music::FretboardDiagram->new(
+    frets    => $frets,
+    chord    => \@specs,
+    absolute => 1,
+    outfile  => $0,
+    horiz    => 1,
+    size     => 50,
+    showname => "$note + $relative" . MINOR,
+#    verbose  => 1,
+);
+
+$dia->draw;
+
+sub _get_spec {
+    my ($fingering) = @_;
+
+    my ($chord, $posn) = split /-/, $fingering;
+
+    $chord =~ s/[oO0xX]/-/g; # don't show open or muted strings
+
+    return [ $posn, $chord ];
+}

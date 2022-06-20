@@ -24,6 +24,10 @@ do { my $x = {
                                     }
                     },
        'runtime' => {
+                      'recommends' => {
+                                        'IO::Compress::Brotli' => '0.004001',
+                                        'IO::Uncompress::Brotli' => '0.004001'
+                                      },
                       'requires' => {
                                       'Carp' => '0',
                                       'Compress::Raw::Zlib' => '0',
@@ -55,7 +59,9 @@ do { my $x = {
                     },
        'test' => {
                    'recommends' => {
-                                     'CPAN::Meta' => '2.120900'
+                                     'CPAN::Meta' => '2.120900',
+                                     'IO::Compress::Brotli' => '0.004001',
+                                     'IO::Uncompress::Brotli' => '0.004001'
                                    },
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
@@ -63,6 +69,7 @@ do { my $x = {
                                    'File::Temp' => '0',
                                    'PerlIO::encoding' => '0',
                                    'Test::More' => '0.88',
+                                   'Test::Needs' => '0',
                                    'Time::Local' => '0',
                                    'Try::Tiny' => '0',
                                    'URI::URL' => '0',

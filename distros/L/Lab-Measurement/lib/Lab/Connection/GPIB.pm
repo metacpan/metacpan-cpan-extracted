@@ -1,6 +1,6 @@
 package Lab::Connection::GPIB;
 #ABSTRACT: GPIB Connection base class
-$Lab::Connection::GPIB::VERSION = '3.820';
+$Lab::Connection::GPIB::VERSION = '3.821';
 use v5.20;
 
 #
@@ -119,7 +119,7 @@ Lab::Connection::GPIB - GPIB Connection base class
 
 =head1 VERSION
 
-version 3.820
+version 3.821
 
 =head1 SYNOPSIS
 

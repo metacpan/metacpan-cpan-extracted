@@ -3,15 +3,16 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Apply melodic inversion to a series of notes
 
-our $VERSION = '0.0501';
+our $VERSION = '0.0502';
 
 use Data::Dumper::Compact qw(ddc);
 use List::SomeUtils qw(first_index);
-use Music::Note;
 use Music::Scales qw(get_scale_MIDI is_scale);
 use Moo;
 use strictures 2;
 use namespace::clean;
+
+with('Music::PitchNum');
 
 use constant OCTAVES => 10;
 
@@ -91,9 +92,7 @@ sub invert {
         (my $i, $note) = $self->_find_pitch($note);
         my $pitch = $self->_scale->[ $i - $interval ];
 
-        $note = $named
-            ? Music::Note->new($pitch, 'midinum')->format('ISO')
-            : $pitch;
+        $note = $named ? $self->pitchname($pitch) : $pitch;
 
         push @inverted, $note;
     }
@@ -106,7 +105,7 @@ sub invert {
 sub _find_pitch {
     my ($self, $pitch) = @_;
 
-    $pitch = Music::Note->new($pitch, 'ISO')->format('midinum')
+    $pitch = $self->pitchnum($pitch)
         if $pitch =~ /[A-G]/;
 
     my $i = first_index { $_ eq $pitch } @{ $self->_scale };
@@ -128,7 +127,7 @@ Music::MelodicDevice::Inversion - Apply melodic inversion to a series of notes
 
 =head1 VERSION
 
-version 0.0501
+version 0.0502
 
 =head1 SYNOPSIS
 
@@ -173,6 +172,8 @@ B<scale_note>.
 
 Please see L<Music::Scales/SCALES> for a list of valid scale names.
 
+=for Pod::Coverage OCTAVES
+
 =head2 verbose
 
 Default: C<0>
@@ -214,8 +215,6 @@ L<Data::Dumper::Compact>
 L<List::SomeUtils>
 
 L<Moo>
-
-L<Music::Note>
 
 L<Music::Scales>
 

@@ -10442,23 +10442,29 @@ static inline void marpaESLIFLua_symbolContextFreev(marpaESLIFLuaSymbolContext_t
 static int marpaESLIFLua_marpaESLIFSymbol_newi(lua_State *L)
 /****************************************************************************/
 {
-  static const char             *funcs = "marpaESLIFLua_marpaESLIFSymbol_newi";
+  static const char             *funcs                 = "marpaESLIFLua_marpaESLIFSymbol_newi";
+  char                          *encodings             = NULL;
+  size_t                         encodingl             = 0;
+  char                          *modifiers             = NULL;
+  size_t                         modifierl             = 0;
+  char                          *substitutionModifiers = NULL;
+  size_t                         substitutionModifierl = 0;
+  short                          substitutionb         = 0;
   marpaESLIFLuaContext_t        *marpaESLIFLuaContextp;
   marpaESLIFLuaSymbolContext_t  *marpaESLIFLuaSymbolContextp;
-  char                          *encodings = NULL;
-  size_t                         encodingl = 0;
-  char                          *modifiers = NULL;
-  size_t                         modifierl = 0;
   char                          *types;
   size_t                         typel;
   char                          *patterns;
   size_t                         patternl;
+  char                          *substitutionPatterns;
+  size_t                         substitutionPatternl;
   char                          *symbols;
   size_t                         symboll;
   int                            typei;
   int                            topi;
   marpaESLIF_t                  *marpaESLIFp;
   marpaESLIFString_t             marpaESLIFString;
+  marpaESLIFString_t             marpaESLIFSubstitutionString;
   marpaESLIFSymbolOption_t       marpaESLIFSymbolOption;
   marpaESLIFLuaGrammarContext_t *marpaESLIFLuaGrammarContextp;
   marpaESLIFGrammar_t           *marpaESLIFGrammarp;
@@ -10479,7 +10485,44 @@ static int marpaESLIFLua_marpaESLIFSymbol_newi(lua_State *L)
   if (! marpaESLIFLua_lua_touserdata((void **) &marpaESLIFLuaContextp, L, -1)) goto err;
   if (! marpaESLIFLua_lua_pop(L, 1)) goto err;
 
-  if ((strcmp(types, "regex") == 0) || (strcmp(types, "string") == 0)) {
+  if (strcmp(types, "regex") == 0) {
+    /* We suppose that encoding is the same for pattern and substitutionPattern */
+    /* marpaESLIFSymbol_new(marpaESLIFp, types, pattern[, modifiers[, substitutionPattern[, substitutionModifiers[, encoding]]]]) */
+    if (topi > 7) {
+      marpaESLIFLua_luaL_errorf(L, "Usage: marpaESLIFSymbol_new(marpaESLIFp, '%s', pattern[, modifiers[, encoding]])", types);
+      goto err;
+    }
+    switch (topi) {
+    case 7:
+      if (! marpaESLIFLua_lua_type(&typei, L, 7)) goto err;
+      if (typei != LUA_TNIL) {
+        if (! marpaESLIFLua_luaL_checklstring((const char **) &encodings, L, 7, &encodingl)) goto err;
+      }
+      /* Intentionaly no break */
+    case 6:
+      if (! marpaESLIFLua_lua_type(&typei, L, 6)) goto err;
+      if (typei != LUA_TNIL) {
+        if (! marpaESLIFLua_luaL_checklstring((const char **) &substitutionModifiers, L, 6, &substitutionModifierl)) goto err;
+      }
+      /* Intentionaly no break */
+    case 5:
+      if (! marpaESLIFLua_luaL_checklstring((const char **) &substitutionPatterns, L, 3, &substitutionPatternl)) goto err;
+      substitutionb = 1;
+      /* Intentionaly no break */
+    case 4:
+      if (! marpaESLIFLua_lua_type(&typei, L, 4)) goto err;
+      if (typei != LUA_TNIL) {
+        if (! marpaESLIFLua_luaL_checklstring((const char **) &modifiers, L, 4, &modifierl)) goto err;
+      }
+      /* Intentionaly no break */
+    case 3:
+      if (! marpaESLIFLua_luaL_checklstring((const char **) &patterns, L, 3, &patternl)) goto err;
+      break;
+    default:
+      /* 1 and 2 already checked */
+      break;
+    }
+  } else if (strcmp(types, "string") == 0) {
     /* Same formalism for both: */
     /* marpaESLIFSymbol_new(marpaESLIFp, types, pattern[, modifiers[, encoding]]) */
     if (topi > 5) {
@@ -10551,7 +10594,15 @@ static int marpaESLIFLua_marpaESLIFSymbol_newi(lua_State *L)
     marpaESLIFString.bytel          = patternl;
     marpaESLIFString.encodingasciis = encodings;
     marpaESLIFString.asciis         = NULL;
-    marpaESLIFLuaSymbolContextp->marpaESLIFSymbolp = marpaESLIFSymbol_regex_newp(marpaESLIFp, &marpaESLIFString, modifiers, &marpaESLIFSymbolOption);
+    if (substitutionb) {
+      marpaESLIFSubstitutionString.bytep          = substitutionPatterns;
+      marpaESLIFSubstitutionString.bytel          = substitutionPatternl;
+      marpaESLIFSubstitutionString.encodingasciis = encodings;
+      marpaESLIFSubstitutionString.asciis         = NULL;
+      marpaESLIFLuaSymbolContextp->marpaESLIFSymbolp = marpaESLIFSymbol_regex_newp(marpaESLIFp, &marpaESLIFString, modifiers, &marpaESLIFSubstitutionString, substitutionModifiers, &marpaESLIFSymbolOption);
+    } else {
+      marpaESLIFLuaSymbolContextp->marpaESLIFSymbolp = marpaESLIFSymbol_regex_newp(marpaESLIFp, &marpaESLIFString, modifiers, NULL /* marpaESLIFSubstitutionStringp */, NULL /* substitutionModifiers */, &marpaESLIFSymbolOption);
+    }
   } else if (strcmp(types, "string") == 0) {
     marpaESLIFString.bytep          = patterns;
     marpaESLIFString.bytel          = patternl;

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION = '1.12';
+$VERSION = '1.13';
 
 use Carp;
 use Net::DNS;
@@ -407,7 +407,7 @@ sub _decode_result {
 		$self->errorstring('INSECURE') unless $result->secure;
 		$self->errorstring( $result->why_bogus ) if $result->bogus;
 
-		my $buffer = $result->answer_packet;
+		my $buffer = $result->answer_packet || return;
 		$packet = Net::DNS::Packet->decode( \$buffer, $self->debug );
 		$self->errorstring($@);
 	}

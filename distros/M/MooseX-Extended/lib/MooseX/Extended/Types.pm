@@ -11,7 +11,7 @@ use Types::Standard qw(
   slurpy
 );
 
-our $VERSION = '0.21';
+our $VERSION = '0.25';
 our @EXPORT_OK;
 
 BEGIN {
@@ -42,7 +42,7 @@ MooseX::Extended::Types - Keep our type tools organized
 
 =head1 VERSION
 
-version 0.21
+version 0.25
 
 =head1 SYNOPSIS
 
@@ -78,10 +78,10 @@ L<Type::Tiny>. Using these is preferred to using using strings due to runtime
 versus compile-time failures. For example:
 
     # fails at runtime, if ->name is set
-    param name => ( isa => 'StR' );
+    param name => ( isa => 'str' );
 
     # fails at compile-time
-    param name => ( isa => StR );
+    param name => ( isa => str );
 
 =head1 TYPE LIBRARIES
 

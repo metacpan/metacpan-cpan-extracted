@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::HP3458A;
-$Lab::Moose::Instrument::HP3458A::VERSION = '3.820';
+$Lab::Moose::Instrument::HP3458A::VERSION = '3.821';
 #ABSTRACT: HP 3458A digital multimeter
 
 use v5.20;
@@ -21,7 +21,9 @@ with qw(
 
 sub BUILD {
     my $self = shift;
-    $self->clear();    # FIXME: does this change any settings?!
+    $self->clear();
+
+    # Set EOI after each answer.
     $self->set_end( value => 'ALWAYS' );
 }
 
@@ -35,11 +37,9 @@ sub get_value {
 }
 
 
-cache nplc => ( getter => 'get_nplc' );
-
 sub get_nplc {
     my ( $self, %args ) = validated_getter( \@_ );
-    return $self->cached_nplc( $self->query( command => "NPLC?", %args ) );
+    return $self->query( command => "NPLC?", %args );
 }
 
 sub set_nplc {
@@ -48,59 +48,30 @@ sub set_nplc {
         value => { isa => 'Num' }
     );
     $self->write( command => "NPLC $value", %args );
-    $self->cached_nplc($value);
 }
-
-cache nrdgs        => ( getter => 'get_nrdgs' );
-cache sample_event => ( getter => 'get_sample_event' );
 
 
 sub get_nrdgs {
     my ( $self, %args ) = validated_getter( \@_ );
     my $result = $self->query( command => "NRDGS?", %args );
-    my ( $points, $event ) = split( /,/, $result );
-    $self->cached_nrdgs($points);
-    $self->cached_sample_event($event);
-    return $points;
+    return split( /,/, $result );
 }
 
 sub set_nrdgs {
-    my ( $self, $value, %args ) = validated_setter(
+    my ( $self, %args ) = validated_getter(
         \@_,
-        value => { isa => 'Int' },
+        readings => { isa => 'Int' },
+        sample_event =>
+            { isa => enum( [qw/AUTO EXT HOLD LEVEL LINE SGL SYN TIMER/] ) },
     );
-    my $sample_event = $self->cached_sample_event();
-    $self->write( command => "NRDGS $value,$sample_event", %args );
-    $self->cached_nrdgs($value);
+    my $readings     = delete $args{readings};
+    my $sample_event = delete $args{sample_event};
+    $self->write( command => "NRDGS $readings, $sample_event", %args );
 }
-
-
-sub get_sample_event {
-    my ( $self, %args ) = validated_getter( \@_ );
-    my $result = $self->query( command => "NRDGS?", %args );
-    my ( $points, $event ) = split( /,/, $result );
-    $self->cached_nrdgs($points);
-    $self->cached_sample_event($event);
-    return $event;
-}
-
-sub set_sample_event {
-    my ( $self, $value, %args ) = validated_setter(
-        \@_,
-        value => { isa => enum( [qw/AUTO EXTSYN SYN TIMER LEVEL LINE/] ) },
-    );
-    my $points = $self->cached_nrdgs();
-    $self->write( command => "NRDGS $points,$value", %args );
-    $self->cached_sample_event($value);
-}
-
-
-cache tarm_event => ( getter => 'get_tarm_event' );
 
 sub get_tarm_event {
     my ( $self, %args ) = validated_getter( \@_ );
-    return $self->cached_tarm_event(
-        $self->query( command => "TARM?", %args ) );
+    return $self->query( command => "TARM?", %args );
 }
 
 sub set_tarm_event {
@@ -109,16 +80,12 @@ sub set_tarm_event {
         value => { isa => enum( [qw/AUTO EXT SGL HOLD SYN/] ) },
     );
     $self->write( command => "TARM $value", %args );
-    $self->cached_tarm_event($value);
 }
 
 
-cache trig_event => ( getter => 'get_trig_event' );
-
 sub get_trig_event {
     my ( $self, %args ) = validated_getter( \@_ );
-    return $self->cached_trig_event(
-        $self->query( command => "TRIG?", %args ) );
+    return $self->query( command => "TRIG?", %args );
 }
 
 sub set_trig_event {
@@ -127,15 +94,12 @@ sub set_trig_event {
         value => { isa => enum( [qw/AUTO EXT SGL HOLD SYN LEVEL LINE/] ) },
     );
     $self->write( command => "TRIG $value", %args );
-    $self->cached_trig_event($value);
 }
 
 
-cache end => ( getter => 'get_end' );
-
 sub get_end {
     my ( $self, %args ) = validated_getter( \@_ );
-    return $self->cached_end( $self->query( command => "END?", %args ) );
+    return $self->query( command => "END?", %args );
 }
 
 sub set_end {
@@ -144,15 +108,12 @@ sub set_end {
         value => { isa => enum( [qw/OFF ON ALWAYS/] ) }
     );
     $self->write( command => "END $value" );
-    $self->cached_trig_event($value);
 }
 
 
-cache range => ( getter => 'get_range' );
-
 sub get_range {
     my ( $self, %args ) = validated_getter( \@_ );
-    return $self->cached_end( $self->query( command => "RANGE?", %args ) );
+    return $self->query( command => "RANGE?", %args );
 }
 
 sub set_range {
@@ -161,15 +122,12 @@ sub set_range {
         value => { isa => 'Lab::Moose::PosNum' }
     );
     $self->write( command => "RANGE $value" );
-    $self->cached_range($value);
 }
 
 
-cache auto_range => ( getter => 'get_auto_range' );
-
 sub get_auto_range {
     my ( $self, %args ) = validated_getter( \@_ );
-    return $self->cached_end( $self->query( command => "ARANGE?", %args ) );
+    return $self->query( command => "ARANGE?", %args );
 }
 
 sub set_auto_range {
@@ -177,8 +135,111 @@ sub set_auto_range {
         \@_,
         value => { isa => enum( [qw/ON OFF ONCE/] ) }
     );
-    $self->write( command => "ARANGE $value" );
-    $self->cached_auto_range($value);
+    $self->write( command => "ARANGE $value", %args );
+}
+
+sub get_output_format {
+    my ( $self, %args ) = validated_getter( \@_ );
+    return $self->query( command => 'OFORMAT?', %args );
+}
+
+sub set_output_format {
+    my ( $self, $value, %args ) = validated_setter(
+        \@_,
+        value => { isa => enum( [qw/ASCII SINT DINT SREAL DREAL/] ) },
+    );
+    $self->write( command => "OFORMAT $value", %args );
+}
+
+sub get_memory_format {
+    my ( $self, %args ) = validated_getter( \@_ );
+    return $self->query( command => 'MFORMAT?', %args );
+}
+
+sub set_memory_format {
+    my ( $self, $value, %args ) = validated_setter(
+        \@_,
+        value => { isa => enum( [qw/ASCII SINT DINT SREAL DREAL/] ) },
+    );
+    $self->write( command => "MFORMAT $value", %args );
+}
+
+sub get_memory {
+    my ( $self, %args ) = validated_getter( \@_ );
+    return $self->query( command => 'MEM?', %args );
+}
+
+sub set_memory {
+    my ( $self, $value, %args ) = validated_setter(
+        \@_,
+        value => { isa => enum( [qw/OFF LIFO FIFO CONT/] ) },
+    );
+    $self->write( command => "MEM $value", %args );
+}
+
+cache iscale => ( getter => 'get_iscale' );
+
+sub get_iscale {
+    my ( $self, %args ) = validated_getter( \@_ );
+    return $self->query( command => 'ISCALE?', %args );
+}
+
+sub get_auto_zero {
+    my ( $self, %args ) = validated_getter( \@_ );
+    return $self->query( command => 'AZERO?', %args );
+}
+
+sub set_auto_zero {
+    my ( $self, $value, %args ) = validated_setter(
+        \@_,
+        value => { isa => enum( [qw/ON OFF ONCE/] ) },
+    );
+    $self->write( command => "AZERO $value", %args );
+}
+
+sub get_disp {
+    my ( $self, %args ) = validated_getter( \@_ );
+    return $self->query( command => 'DISP?', %args );
+}
+
+sub set_disp {
+    my ( $self, $value, %args ) = validated_setter(
+        \@_,
+        value => { isa => enum( [qw/OFF ON MSG CLR/] ) },
+    );
+    $self->write( command => "DISP $value", %args );
+}
+
+sub set_math_off {
+    my ( $self, %args ) = validated_getter( \@_ );
+    $self->write( command => 'MATH OFF', %args );
+}
+
+
+sub get_mem_size {
+    my ( $self, %args ) = validated_getter( \@_ );
+    my $rv = $self->query( command => 'MSIZE?', %args );
+    return split( /,/, $rv );
+}
+
+
+sub set_high_speed_mode {
+    my ( $self, %args ) = validated_getter(
+        \@_,
+        format => { isa => enum( [qw/SINT DINT/] ) },
+    );
+    my $format = delete $args{format};
+
+    $self->set_output_format( value => $format );
+    $self->set_memory_format( value => $format );
+
+    $self->set_auto_zero( value => 'OFF' );
+    $self->set_disp( value => 'OFF' );
+    $self->set_math_off();
+
+    if ( $self->get_auto_range() ) {
+        croak("Autorange mode is on, cannot set high-speed mode");
+    }
 }
 
 
@@ -198,7 +259,7 @@ Lab::Moose::Instrument::HP3458A - HP 3458A digital multimeter
 
 =head1 VERSION
 
-version 3.820
+version 3.821
 
 =head1 SYNOPSIS
 
@@ -231,28 +292,23 @@ Read multimeter output value.
  $dmm->set_nplc(value => 10);
  $nplc = $dmm->get_nplc();
 
-Get/Set integration time in Number of Power Line Cycles.
+Get/Set integration time in Number of Power Line Cycles. This also affects the resolution (bits/digits) of the readings:
+
+- 0.0001 NPLC: 4.5 digits, 16 bits, 83300 readings/s  (OFORMAT SINT)
+- 0.0006 NPLC: 5.5 digits, 18 bits, 41650 readings/s
+- 0.01   NPLC: 6.5 digits, 21 bits, 4414  readings/s
+- 0.1    NPLC: 6.5 digits, 21 bits, 493   readings/s
+- 1      NPLC: 7.5 digits, 25 bits, 50    readings/s
+- 10     NPLC: 8.5 digits, 28 bits, 5     readings/s
+
+All values for auto-zero disabled.
 
 =head2 get_nrdgs/set_nrdgs
 
- $dmm->set_nrdgs(value => 2);
- $nrdgs = $dmm->get_nrdgs();
+ $dmm->set_nrdgs(readings => 2, sample_event => 'AUTO');
+ ($readings, $sample_event) = $dmm->get_nrdgs();
 
-Get/Set number of readings taken per trigger/sample event.
-
-=head2 get_sample_event/set_sample_event
-
- $dmm->set_sample_event(value => 'SYN');
- $sample_event = $dmm->get_sample_event();
-
-Get/Set sample event.
-
-=head2 get_tarm_event/set_tarm_event
-
- $dmm->set_tarm_event(value => 'EXT');
- $tarm_event = $dmm->get_tarm_event();
-
-Get/Set trigger arm event.
+Get/Set number of readings taken per trigger event and the sample event.
 
 =head2 get_trig_event/set_trig_event
 
@@ -284,6 +340,18 @@ Get/Set measurement range.
 Get/Set the status of the autorange function.
 Possible values: C<OFF, ON, ONCE>.
 
+=head2 get_mem_size
+
+ my ($msize, $unused) = $dmm->get_mem_size();
+
+=head2 set_high_speed_mode
+
+ $dmm->set_high_speed_mode(format => 'DINT');
+
+C<format> can be 'SINT' or 'DINT'.
+
+Croak if autorange is enabled.
+
 =head2 Consumed Roles
 
 This driver consumes the following roles:
@@ -301,6 +369,7 @@ This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
   Copyright 2017       Simon Reinhardt
             2020       Andreas K. Huettel
             2021       Simon Reinhardt
+            2022       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

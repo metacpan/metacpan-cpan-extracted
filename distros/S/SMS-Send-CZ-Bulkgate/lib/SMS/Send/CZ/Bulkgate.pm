@@ -8,18 +8,16 @@ use warnings;
 use strict;
 use Carp;
 
-our $VERSION = "1.001";
+our $VERSION = "2.004";
 $VERSION = eval $VERSION;
 
 use LWP::UserAgent;
-use IO::Socket::SSL;
-use URI::Escape;
+use LWP::Protocol::https;
 use DateTime qw();
 use base 'SMS::Send::Driver';
-use Digest::MD5 qw(md5 md5_hex);
 use Log::LogLite;
-use Data::Dumper;
 use Text::Unidecode;
+use JSON;
 
 sub new {
 	my $class  = shift;
@@ -57,17 +55,25 @@ sub log {
 
 sub send_sms {
 	my ($self, %args) = @_;
-    my $url = 'https://api.bulkgate.com/http';
+    my $url = 'https://portal.bulkgate.com/api/1.0/simple/transactional';
  	
  	$args{'text'} = unidecode($args{'text'});
 	$self->log("TEXT: " . $args{'text'} . ", TO: " . $args{'to'}, 4);
 
+    # example: 1111:gOwn:420111222333 
+    my @id = split(':', $self->{'login'});  
+    my $app_id = $id[0]; 
+    my $sender_id = defined $id[1] ? $id[1] : 'gSystem';
+    my $sender_id_value = defined $id[2] ? $id[2] : undef;
+
 	my %params = (
-	    'number'	=> $args{'to'} || '', 
-	    'data'  	=> $args{'text'}  || '', 
-	    'username'	=> $self->{'login'},
-	    'password'	=> $self->{'password'},
-	    'action'	=> 'sendsmsall'
+	    'application_id'       => $id[0],
+	    'application_token'    => $self->{'password'},
+	    'number'	           => $args{'to'} || '', 
+	    'text'  	           => $args{'text'}  || '', 
+	    'unicode'	           => 0,
+	    'sender_id'            => $sender_id,
+	    'sender_id_value'      => $sender_id_value
 	);
 
 	# cleanup
@@ -78,45 +84,26 @@ sub send_sms {
 	}
 	
 	# send away
-    my $uri = join( '&', map { $_ . '=' . uri_escape_utf8( $params{ $_ } ) } keys %params );
- 
-	IO::Socket::SSL::set_ctx_defaults(
-	     SSL_verifycn_scheme => 'www',
-	     SSL_verify_mode => 0,
-	);
-
-	my $ua = LWP::UserAgent->new(ssl_opts => { verify_hostname => 0 });
+    my $ua = LWP::UserAgent->new(ssl_opts => { verify_hostname => 0 });
     $ua->protocols_allowed( ['https'] );
-
-    my $res = $ua->get($url . "?" . $uri);
+    my $res = $ua->post($url, \%params );
 
     if( $res->{'_rc'} == 200 ) {
-    	$params{'password'} = "------";	# hide password in logs
-	    my $successLog = $url . "?" . join( '&', map { $_ . '=' . uri_escape_utf8( $params{ $_ } ) } keys %params );
-		$self->log("HTTP SUCCESS: " . $successLog, 4);
-
-		if ($res->{'_content'} =~ /<stat>(\d+)<\/stat><info>([^<]+)<\/info>/) {
-			my $stat = $1;
-			my $info = $2;
-			my $logMsg;
-			my $result = 0;
-			
-			SWITCH: {
-				if ($stat == 1) { $logMsg = "SMS #" . $info . " sent"; $result = 1; last SWITCH; }
-				if ($stat == 11) { $logMsg = "SMS #" . $info . " deferred, re-sending in 1 minute"; $result = 1; last SWITCH; } 
-				$logMsg = "SMS processing error #" . $stat . ": " . $info;
-			}
-			
-			$self->log($logMsg, 4);
-			
-			return $result;
-		}
-	}
-	else {
-        $self->log("Error " . $res->{'_rc'}, 4);
-        $self->log($res->{'_content'}, 4);
-		return 0;
-	}
+    	my $json = decode_json($res->{'_content'});
+    	if (defined $json->{data}->{status} && $json->{data}->{status} eq 'accepted') {
+            $self->log("SMS sent to : " . $args{'to'} . ", text: " . $args{'text'}, 4);
+            return 1;
+    	}
+    	else {
+            $self->log("Unexpected response from SMS provider: " . $res->{'_content'}, 4);
+            return 0;
+    	}
+    }
+    else {
+        my $json = eval { decode_json($res->{'_content'}) };
+        $self->log("Error " . $res->{'_rc'} . ": " . (defined $json ? $json->{error} : 'unexpected error'), 4);
+        return 0;
+    }
 }
 
 __END__
@@ -131,14 +118,15 @@ SMS::Send::CZ::Bulkgate - SMS::Send driver for Bulkgate - Czech Republic
 
 =head1 VERSION
 
-version 1.001
+version 2.004
 
 =head1 SYNOPSIS
 
 use SMS::Send;
 
+  # see https://help.bulkgate.com/docs/cs/http-simple-transactional.html
   my $sender = SMS::Send->new('CZ::Bulkgate',
-  	_login    => 'who',
+  	_login    => '1111:gOwn:420111222333',
   	_password => 'secret',
   	);
   
@@ -162,8 +150,8 @@ Logs message to /var/log/bulkgate.log if this file is accessible and writable
 
 =head2 send_sms
 
-Sends the message using prividers API at https://api.bulkgate.com/http and takes additional arguments:
-'text' containgin the message itself and 'to' with recipient's number.
+Sends the message using BulkGate Simple API at https://portal.bulkgate.com/api/1.0/simple/transactional and takes additional arguments:
+'text' containing the message itself and 'to' providing recipient's number.
 
 Processing information is automatically logged to /var/log/bulkgate.log to allow tracking of possible problems.   
 
@@ -179,7 +167,7 @@ Radek Šiman <rbit@rbit.cz>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by R-Bit Technology, s.r.o.
+This software is copyright (c) 2022 by R-Bit Technology, s.r.o.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

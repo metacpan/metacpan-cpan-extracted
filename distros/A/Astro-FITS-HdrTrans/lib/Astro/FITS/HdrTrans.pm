@@ -36,7 +36,7 @@ use vars qw/ $VERSION $DEBUG @ISA /;
 use Exporter 'import';
 our @EXPORT_OK = qw( translate_from_FITS translate_to_FITS );
 
-$VERSION = '1.64';
+$VERSION = '1.65';
 $DEBUG   = 0;
 
 # The reference list of classes we can try This list should be
@@ -147,6 +147,7 @@ my @generic_headers = qw(
                           OBSERVATION_MODE
                           OBSERVATION_NUMBER
                           OBSERVATION_TYPE
+                          OBSERVED_SIDEBAND
                           POLARIMETER
                           POLARIMETRY
                           PROJECT
@@ -165,6 +166,7 @@ my @generic_headers = qw(
                           SCAN_PATTERN
                           SEEING
                           SHIFT_TYPE
+                          SIDEBAND_MODE
                           SLIT_ANGLE
                           SLIT_NAME
                           SLIT_WIDTH
@@ -180,6 +182,7 @@ my @generic_headers = qw(
                           TAU
                           TELESCOPE
                           TILE_NUMBER
+                          TRACKING_SIDEBAND
                           TRANSITION
                           USER_AZIMUTH_CORRECTION
                           USER_ELEVATION_CORRECTION

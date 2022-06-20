@@ -14,4 +14,6 @@ doap.ttl
 lib/Mom.pm
 t/01basic.t
 t/02usage.t
+t/03enum_w_handles1.t
+t/04enum_w_handles2.t
 t/90rt134617.t

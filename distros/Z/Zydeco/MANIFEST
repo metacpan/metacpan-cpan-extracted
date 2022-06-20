@@ -45,6 +45,7 @@ t/20moosex.t
 t/21coderef.t
 t/22overload.t
 t/24mm.t
+t/24mm_coderef.t
 t/25abstract.t
 t/26accumulate.t
 t/27rolehooks.t

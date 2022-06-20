@@ -15,7 +15,8 @@ use Test::More 0.96;
     use Moo;
 
     ::is(
-        ::exception { has size => (
+        ::exception {
+            has size => (
                 is  => 'ro',
                 isa => t('Int'),
             );

@@ -4,7 +4,7 @@ my $void = <<'SKIP';
 /*
 ----------------------------------------------------------------------
 
-    ppport.h -- Perl/Pollution/Portability Version 3.66
+    ppport.h -- Perl/Pollution/Portability Version 3.68
 
     Automatically created by Devel::PPPort running under perl 5.034000.
 
@@ -21,7 +21,7 @@ SKIP
 
 =head1 NAME
 
-ppport.h - Perl/Pollution/Portability version 3.66
+ppport.h - Perl/Pollution/Portability version 3.68
 
 =head1 SYNOPSIS
 
@@ -588,7 +588,7 @@ BEGIN { require warnings if "$]" > '5.006' }
 # Disable broken TRIE-optimization
 BEGIN { eval '${^RE_TRIE_MAXBUF} = -1' if "$]" >= "5.009004" && "$]" <= "5.009005"}
 
-my $VERSION = 3.66;
+my $VERSION = 3.68;
 
 my %opt = (
   quiet     => 0,
@@ -715,6 +715,8 @@ AHOCORASICK_t8_pb|5.033003||Viu
 AHOCORASICK_tb|5.035004||Viu
 AHOCORASICK_tb_p8|5.033003||Viu
 AHOCORASICK_tb_pb|5.033003||Viu
+ALIGNED_TYPE_NAME|||Viu
+ALIGNED_TYPE|||Viu
 alloccopstash|5.017001|5.017001|x
 alloc_LOGOP|5.025004||xViu
 allocmy|5.008001||Viu
@@ -963,6 +965,8 @@ assert|5.003007||Viu
 __ASSERT_|5.019007|5.008008|p
 ASSERT_CURPAD_ACTIVE|5.008001||Viu
 ASSERT_CURPAD_LEGAL|5.008001||Viu
+ASSERT_IS_LITERAL|||Viu
+ASSERT_IS_PTR|||Viu
 assert_not_glob|5.009004||Viu
 ASSERT_NOT_PTR|5.035004||Viu
 assert_not_ROK|5.008001||Viu
@@ -1673,6 +1677,7 @@ CopSTASH_set|5.006000|5.003007|p
 cop_store_label|5.031004|5.031004|x
 Copy|5.003007|5.003007|
 CopyD|5.009002|5.003007|p
+copy_length|||Viu
 core_prototype|5.015002||Vi
 coresub_op|5.015003||Viu
 CowREFCNT|5.017007||Viu
@@ -2239,6 +2244,7 @@ DEFINEP_tb_p8|5.033003||Viu
 DEFINEP_tb_pb|5.033003||Viu
 DEFSV|5.004005|5.003007|p
 DEFSV_set|5.010001|5.003007|p
+del_body_by_type|||Viu
 delete_eval_scope|5.009004||xViu
 delimcpy|5.004000|5.004000|n
 delimcpy_no_escape|5.025005||cVni
@@ -2832,6 +2838,9 @@ find_span_end_mask|5.027009||Vniu
 find_uninit_var|5.009002||xVi
 FIRST_NON_ASCII_DECIMAL_DIGIT|5.027007||Viu
 first_symbol|5.009003||Vniu
+FIT_ARENA0|||Viu
+FIT_ARENAn|||Viu
+FIT_ARENA|||Viu
 FITS_IN_8_BITS|5.013005||Viu
 fixup_errno_string|5.019007||Viu
 FLAGS|5.013006||Viu
@@ -3313,6 +3322,7 @@ G_WARN_OFF|5.006000||Viu
 G_WARN_ON|5.006000||Viu
 G_WARN_ONCE|5.006000||Viu
 G_WRITING_TO_STDERR|5.013009||Viu
+HADNV|||Viu
 handle_named_backref|5.023008||Viu
 handle_names_wildcard|5.031011||Viu
 handle_possible_posix|5.023008||Viu
@@ -3322,6 +3332,7 @@ HAS_ACCEPT4|5.027008|5.027008|Vn
 HAS_ACCESS|5.006000|5.006000|Vn
 HAS_ACOSH|5.021004|5.021004|Vn
 HAS_ALARM|5.003007|5.003007|Vn
+HASARENA|||Viu
 HAS_ASCTIME_R|5.010000|5.010000|Vn
 HAS_ASINH|5.021006|5.021006|Vn
 HAS_ATANH|5.021006|5.021006|Vn
@@ -5263,8 +5274,10 @@ memLE|5.025005||Viu
 MEM_LOG_ALLOC|5.009003||Viu
 mem_log_alloc|5.024000||Vniu
 mem_log_common|5.010001||Vniu
+MEM_LOG_DEL_SV|||Viu
 MEM_LOG_FREE|5.009003||Viu
 mem_log_free|5.024000||Vniu
+MEM_LOG_NEW_SV|||Viu
 MEM_LOG_REALLOC|5.009003||Viu
 mem_log_realloc|5.024000||Vniu
 memLT|5.025005||Viu
@@ -5356,8 +5369,8 @@ MON_6|5.027010||Viu
 MON_7|5.027010||Viu
 MON_8|5.027010||Viu
 MON_9|5.027010||Viu
-more_bodies|||iu
-more_sv|5.009004||Viu
+more_bodies|||cu
+more_sv|5.009004||cVu
 moreswitches|5.003007||cVu
 mortal_getenv|5.031011||cVnu
 Move|5.003007|5.003007|
@@ -5555,6 +5568,8 @@ newAV_alloc_x|5.035001|5.035001|
 newAV_alloc_xz|5.035001|5.035001|
 newAVREF|5.003007|5.003007|u
 newBINOP|5.003007|5.003007|
+new_body_allocated|||Viu
+new_body_from_arena|||Viu
 Newc|5.003007||Viu
 new_collate|5.006000||Viu
 newCONDOP|5.003007|5.003007|
@@ -5591,6 +5606,8 @@ newMETHOP_internal|5.021005||Viu
 newMETHOP_named|5.021005|5.021005|
 new_msg_hv|5.027009||Viu
 newMYSUB|5.017004|5.017004|u
+new_NOARENA|||Viu
+new_NOARENAZ|||Viu
 newNULLLIST|5.003007|5.003007|
 new_numeric|5.006000||Viu
 newOP|5.003007|5.003007|
@@ -5636,7 +5653,9 @@ newSVsv|5.003007|5.003007|
 newSVsv_flags|5.029009|5.003007|p
 newSVsv_nomg|5.029009|5.003007|p
 newSV_type|5.009005|5.003007|p
+newSV_type_mortal|||
 newSVuv|5.006000|5.003007|p
+new_SV|||Viu
 newTRYCATCHOP|5.033007|5.033007|x
 newUNOP|5.003007|5.003007|
 newUNOP_AUX|5.021007|5.021007|
@@ -5647,6 +5666,9 @@ newWHENOP|5.027008|5.027008|
 newWHILEOP|5.013007|5.013007|
 Newx|5.009003|5.003007|p
 Newxc|5.009003|5.003007|p
+new_XNV|||Viu
+new_XPVMG|||Viu
+new_XPVNV|||Viu
 newXS|5.006000|5.006000|
 newXS_deffile|5.021006||cViu
 newXS_flags|5.009004|5.009004|xu
@@ -5663,6 +5685,7 @@ next_symbol|5.007003||Viu
 ninstr|5.003007|5.003007|n
 NL_LANGINFO_LOCK|5.033005||Viu
 NL_LANGINFO_UNLOCK|5.033005||Viu
+NOARENA|||Viu
 no_bareword_allowed|5.005004||Viu
 no_bareword_filehandle|5.033006||Viu
 NOCAPTURE_PAT_MOD|5.021008||Viu
@@ -5680,6 +5703,7 @@ NO_LOCALE|5.007000||Viu
 NONDESTRUCT_PAT_MOD|5.013002||Viu
 NONDESTRUCT_PAT_MODS|5.013002||Viu
 NON_OTHER_COUNT|5.033005||Viu
+NONV|||Viu
 no_op|5.003007||Viu
 NOOP|5.005000|5.003007|p
 noperl_die|5.021006||vVniu
@@ -6856,6 +6880,7 @@ perl_pthread_mutex_lock|5.023006||Viu
 perl_pthread_mutex_unlock|5.023006||Viu
 PERL_PV_ESCAPE_ALL|5.009004|5.003007|p
 PERL_PV_ESCAPE_DWIM|5.019008||Viu
+PERL_PV_ESCAPE_DWIM_ALL_HEX|||Viu
 PERL_PV_ESCAPE_FIRSTCHAR|5.009004|5.003007|p
 PERL_PV_ESCAPE_NOBACKSLASH|5.009004|5.003007|p
 PERL_PV_ESCAPE_NOCLEAR|5.009004|5.003007|p
@@ -7633,6 +7658,7 @@ Poison|5.008000|5.003007|p
 PoisonFree|5.009004|5.003007|p
 PoisonNew|5.009004|5.003007|p
 PoisonPADLIST|5.021006||Viu
+POISON_SV_HEAD|||Viu
 PoisonWith|5.009004|5.003007|p
 popen|5.003007||Viu
 POPi|5.003007|5.003007|
@@ -9012,6 +9038,8 @@ SvAMAGIC|5.003007||Viu
 SvAMAGIC_off|5.003007|5.003007|nu
 SvAMAGIC_on|5.003007|5.003007|nu
 SvANY|5.003007||Viu
+SvARENA_CHAIN_SET|||Viu
+SvARENA_CHAIN|||Viu
 sv_backoff|5.003007|5.003007|n
 sv_bless|5.003007|5.003007|
 sv_buf_to_ro|5.019008||Viu
@@ -10048,6 +10076,7 @@ unwind_handler_stack|5.009003||Viu
 update_debugger_info|5.009005||Viu
 upg_version|5.009005|5.009005|
 UPG_VERSION|5.019008||Viu
+uproot_SV|||Viu
 Uquad_t|5.006000|5.006000|Vn
 U_S|5.003007||Viu
 usage|5.005000||Viu
@@ -11538,7 +11567,7 @@ __DATA__
 #define DPPP_CAT2(x,y) CAT2(x,y)
 #define DPPP_(name) DPPP_CAT2(DPPP_NAMESPACE, name)
 
-#define D_PPP_RELEASE_DATE 1646179200 /* 2022-03-02 */
+#define D_PPP_RELEASE_DATE 1647561600 /* 2022-03-18 */
 
 #if ! defined(PERL_REVISION) && ! defined(PERL_VERSION_MAJOR)
 #  if   !   defined(__PATCHLEVEL_H_INCLUDED__)                                  \
@@ -12703,8 +12732,12 @@ DPPP_(my_newCONSTSUB)(HV *stash, const char *name, SV *sv)
 #  define NOOP                           /*EMPTY*/(void)0
 #endif
 
+#if (PERL_BCDVERSION < 0x5006001) && (PERL_BCDVERSION < 0x5027007)
+#undef dNOOP
 #ifndef dNOOP
-#  define dNOOP                          extern int /*@unused@*/ Perl___notused PERL_UNUSED_DECL
+#  define dNOOP                          struct Perl___notused_struct
+#endif
+
 #endif
 
 #ifndef NVTYPE
@@ -15860,12 +15893,12 @@ DPPP_(my_load_module)(U32 flags, SV *name, SV *ver, ...)
      PERL_STATIC_INLINE SV* D_PPP_newSVpvn_flags(const char *const s, const STRLEN len, const U32 flags)
      {
         dTHX;
-        SV * sv = newSVpvn(s, len));
+        SV * sv = newSVpvn(s, len);
         SvFLAGS(sv) |= (flags & SVf_UTF8);
         if (flags & SVs_TEMP) return sv_2mortal(sv);
         return sv;
      }
-#    define newSVpvn_flags(s, len, flags) D_PPP_newSVpvn_flags((s), (len), (flags));
+#    define newSVpvn_flags(s, len, flags) D_PPP_newSVpvn_flags((s), (len), (flags))
 #  endif
 #endif
 #ifndef SV_NOSTEAL
@@ -15964,17 +15997,17 @@ DPPP_(my_load_module)(U32 flags, SV *name, SV *ver, ...)
 #  if defined(PERL_USE_GCC_BRACE_GROUPS)
 #    define  newSVsv_flags(sv, flags)                       \
         ({                                                  \
-            SV *new = newSV(0);                             \
-            sv_setsv_flags(new, (sv), (flags));             \
-            new;                                            \
+            SV *n= newSV(0);                             \
+            sv_setsv_flags(n, (sv), (flags));             \
+            n;                                            \
         })
 #  else
     PERL_STATIC_INLINE SV* D_PPP_newSVsv_flags(SV *const old, I32 flags)
         {
             dTHX;
-            SV *new = newSV(0);
-            sv_setsv_flags(new, old, flags);
-            return new;
+            SV *n= newSV(0);
+            sv_setsv_flags(n, old, flags);
+            return n;
         }
 #    define  newSVsv_flags(sv, flags) D_PPP_newSVsv_flags(sv, flags)
 #  endif
@@ -17706,10 +17739,10 @@ DPPP_(my_my_strlcpy)(char *dst, const char *src, Size_t size)
 #  error Unknown character set
 #endif
 
-#if (PERL_BCDVERSION < 0x5031004)
-        /* Versions prior to this accepted things that are now considered
-         * malformations, and didn't return -1 on error with warnings enabled
-         * */
+#if (PERL_BCDVERSION < 0x5035010)
+        /* Versions prior to 5.31.4 accepted things that are now considered
+         * malformations, and didn't return -1 on error with warnings enabled.
+         * Versions before 5.35.10 dereferenced empty input without checking */
 #  undef utf8_to_uvchr_buf
 #endif
 
@@ -17766,6 +17799,34 @@ extern UV DPPP_(my_utf8_to_uvchr_buf)(pTHX_ const U8 * s, const U8 * send, STRLE
 UV
 DPPP_(my_utf8_to_uvchr_buf)(pTHX_ const U8 *s, const U8 *send, STRLEN *retlen)
 {
+#    if (PERL_BCDVERSION >= 0x5031004)   /* But from above, must be < 5.35.10 */
+#      if (PERL_BCDVERSION != 0x5035009)
+
+    /* Versions less than 5.35.9 could dereference s on zero length, so
+     * pass it something where no harm comes from that. */
+    if (send <= s) s = send = (U8 *) "?";
+    return Perl_utf8_to_uvchr_buf_helper(aTHX_ s, send, retlen);
+
+#      else /* Below is 5.35.9, which also works on non-empty input, but
+               for empty input, can wrongly dereference, and additionally is
+               also just plain broken */
+    if (send > s) return Perl_utf8_to_uvchr_buf_helper(aTHX_ s, send, retlen);
+    if (! ckWARN_d(WARN_UTF8)) {
+        if (retlen) *retlen = 0;
+        return UNICODE_REPLACEMENT;
+    }
+    else {
+        s = send = (U8 *) "?";
+
+        /* Call just for its warning */
+        (void) Perl__utf8n_to_uvchr_msgs_helper(s, 0, NULL, 0, NULL, NULL);
+        if (retlen) *retlen = (STRLEN) -1;
+        return 0;
+    }
+
+#      endif
+#    else
+
     UV ret;
     STRLEN curlen;
     bool overflows = 0;
@@ -17787,7 +17848,7 @@ DPPP_(my_utf8_to_uvchr_buf)(pTHX_ const U8 *s, const U8 *send, STRLEN *retlen)
         }
     }
 
-#    if (PERL_BCDVERSION < 0x5026000) && ! defined(EBCDIC)
+#      if (PERL_BCDVERSION < 0x5026000) && ! defined(EBCDIC)
 
     /* Perl did not properly detect overflow for much of its history on
      * non-EBCDIC platforms, often returning an overlong value which may or may
@@ -17842,7 +17903,7 @@ DPPP_(my_utf8_to_uvchr_buf)(pTHX_ const U8 *s, const U8 *send, STRLEN *retlen)
     }
     else
 
-#    endif  /* < 5.26 */
+#      endif  /* < 5.26 */
 
         /* Here, we are either in a release that properly detects overflow, or
          * we have checked for overflow and the next statement is executing as
@@ -17855,7 +17916,7 @@ DPPP_(my_utf8_to_uvchr_buf)(pTHX_ const U8 *s, const U8 *send, STRLEN *retlen)
                     s, curlen, retlen,   (UTF8_ALLOW_ANYUV
                                       & ~(UTF8_ALLOW_LONG|UTF8_ALLOW_EMPTY)));
 
-#    if (PERL_BCDVERSION >= 0x5026000) && (PERL_BCDVERSION < 0x5028000)
+#      if (PERL_BCDVERSION >= 0x5026000) && (PERL_BCDVERSION < 0x5028000)
 
     /* But actually, more modern versions restrict the UV to being no more than
      * what an IV can hold, so it could still have gotten it wrong about
@@ -17864,7 +17925,7 @@ DPPP_(my_utf8_to_uvchr_buf)(pTHX_ const U8 *s, const U8 *send, STRLEN *retlen)
         overflows = 1;
     }
 
-#    endif
+#      endif
 
     if (UNLIKELY(overflows)) {
         if (! do_warnings) {
@@ -17910,7 +17971,7 @@ DPPP_(my_utf8_to_uvchr_buf)(pTHX_ const U8 *s, const U8 *send, STRLEN *retlen)
              * modern version of this function returns */
             ret = UNICODE_REPLACEMENT;
 
-#    if (PERL_BCDVERSION < 0x5016000)
+#      if (PERL_BCDVERSION < 0x5016000)
 
             /* Versions earlier than this don't necessarily return the proper
              * length.  It should not extend past the end of string, nor past
@@ -17922,11 +17983,11 @@ DPPP_(my_utf8_to_uvchr_buf)(pTHX_ const U8 *s, const U8 *send, STRLEN *retlen)
                 *retlen = D_PPP_MIN(*retlen, curlen);
                 *retlen = D_PPP_MIN(*retlen, UTF8SKIP(s));
                 do {
-#      ifdef UTF8_IS_CONTINUATION
+#        ifdef UTF8_IS_CONTINUATION
                     if (! UTF8_IS_CONTINUATION(s[i]))
-#      else       /* Versions without the above don't support EBCDIC anyway */
+#        else       /* Versions without the above don't support EBCDIC anyway */
                     if (s[i] < 0x80 || s[i] > 0xBF)
-#      endif
+#        endif
                     {
                         *retlen = i;
                         break;
@@ -17934,12 +17995,15 @@ DPPP_(my_utf8_to_uvchr_buf)(pTHX_ const U8 *s, const U8 *send, STRLEN *retlen)
                 } while (++i < *retlen);
             }
 
-#    endif
+#      endif  /* end of < 5.16.0 */
 
         }
     }
 
     return ret;
+
+#    endif    /* end of < 5.31.4 */
+
 }
 
 #  endif

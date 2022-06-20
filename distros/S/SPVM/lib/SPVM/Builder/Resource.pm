@@ -69,3 +69,92 @@ sub to_string {
 }
 
 1;
+
+=head1 NAME
+
+SPVM::Builder::Resource - Resourceurations of Compile and Link of Native Sources
+
+=head1 SYNOPSYS
+
+  my $resource = SPVM::Builder::Resource->new(
+    class_name => 'Resource::Zlib::V1_0_0',
+    mode => 'prod',
+    args => ['foo', 'bar'],
+  );
+
+=head1 DESCRIPTION
+
+C<SPVM::Builder::Resource> is a resource that contains a set of C<C>/C<C++> source files and the headers.
+
+=head1 FIELDS
+
+Fields.
+
+=head2 class_name
+
+  my $class_name = $resource->class_name;
+  $resource->class_name($class_name);
+
+Get and set the class name of the resource.
+
+=head2 mode
+
+  my $mode = $resource->mode;
+  $resource->mode($mode);
+
+Get and set the mode of the config file of the resource.
+
+=head2 args
+
+  my $args = $resource->args;
+  $resource->args($args);
+
+Get and set the arguments of the config file of the resource.
+
+=head2 config
+
+  my $config = $resource->config;
+  $resource->config($config);
+
+Get and set the config of the resource. The config is a L<SPVM::Builder::Config> object.
+
+=head1 CLASS METHODS
+
+=head2 new
+
+  my $resource = SPVM::Builder::Resource->new;
+  my $resource = SPVM::Builder::Resource->new(%fields);
+  
+Create a L<SPVM::Builder::Resource> object.
+
+B<Examples:>
+
+  my $resource = SPVM::Builder::Resource->new(
+    class_name => 'Resource::Zlib::V1_0_0',
+    mode => 'prod',
+    args => ['foo', 'bar'],
+  );
+
+=head1 INSTANCE METHODS
+
+=head2 to_string
+
+  my $string = $resource->to_string;
+
+Get the string representation. This is the same as the value of C</"class_name">.
+
+=head1 OPERATORS
+
+C<SPVM::Builder::Resource> overloads the following operators.
+
+=head2 bool
+
+  my $bool = !!$object_file_info;
+  
+Always true.
+
+=head2 stringify
+
+  my $object_file_name = "$object_file_info";
+  
+Alias for L</"to_string">.

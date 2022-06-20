@@ -2,13 +2,17 @@ NAME
     App::MineralUtils - Utilities related to mineral supplements
 
 VERSION
-    This document describes version 0.007 of App::MineralUtils (from Perl
-    distribution App-MineralUtils), released on 2021-12-11.
+    This document describes version 0.008 of App::MineralUtils (from Perl
+    distribution App-MineralUtils), released on 2022-06-17.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
 
     *   convert-magnesium-unit
+
+    *   convert-potassium-unit
+
+    *   convert-sodium-unit
 
 FUNCTIONS
   convert_magnesium_unit
@@ -93,12 +97,12 @@ FUNCTIONS
            ],
            {
              "table.fields"        => ["amount", "unit", "summary"],
+             "table.field_aligns"  => ["number", "left", "left"],
              "table.field_formats" => [
-                                        ["number", { precision => 3, thousands_sep => "" }],
+                                        ["number", { thousands_sep => "", precision => 3 }],
                                         undef,
                                         undef,
                                       ],
-             "table.field_aligns"  => ["number", "left", "left"],
            },
          ]
 
@@ -162,6 +166,173 @@ FUNCTIONS
 
     Return value: (any)
 
+  convert_potassium_unit
+    Usage:
+
+     convert_potassium_unit(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Convert a potassium quantity from one unit to another.
+
+    Examples:
+
+    *   Show all possible conversions:
+
+         convert_potassium_unit();
+
+        Result:
+
+         [
+           200,
+           "OK",
+           [
+             {
+               amount  => 1,
+               unit    => "mg-k-elem",
+               summary => "Elemental potassium, in milligrams",
+             },
+             {
+               amount  => 1.90839694656489,
+               unit    => "mg-k-chloride",
+               summary => "Potassium chloride (KCl), in milligrams",
+             },
+             {
+               amount  => 1.90839694656489,
+               unit    => "mg-k-cl",
+               summary => "Potassium chloride (KCl), in milligrams",
+             },
+             {
+               amount  => 7.8125,
+               unit    => "mg-k-citrate",
+               summary => "Potassium citrate (K3C6H5O7), in milligrams",
+             },
+           ],
+           {
+             "table.field_aligns"  => ["number", "left", "left"],
+             "table.field_formats" => [
+                                        ["number", { thousands_sep => "", precision => 3 }],
+                                        undef,
+                                        undef,
+                                      ],
+             "table.fields"        => ["amount", "unit", "summary"],
+           },
+         ]
+
+    *   How much of potassium chloride provides 1000 mg of elemental
+        potassium?:
+
+         convert_potassium_unit(quantity => "1000 mg-k-elem", to_unit => "mg-k-cl");
+
+        Result:
+
+         [200, "OK", 1908.39694656489, {}]
+
+    If target unit is not specified, will show all known conversions.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   quantity => *str* (default: "1 mg")
+
+    *   to_unit => *str*
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  convert_sodium_unit
+    Usage:
+
+     convert_sodium_unit(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Convert a sodium quantity from one unit to another.
+
+    Examples:
+
+    *   Show all possible conversions:
+
+         convert_sodium_unit();
+
+        Result:
+
+         [
+           200,
+           "OK",
+           [
+             {
+               amount  => 1,
+               unit    => "mg-na-elem",
+               summary => "Elemental sodium, in milligrams",
+             },
+             {
+               amount  => 2.54452926208651,
+               unit    => "mg-na-chloride",
+               summary => "Sodium chloride (NaCl), in milligrams",
+             },
+             {
+               amount  => 2.54452926208651,
+               unit    => "mg-na-cl",
+               summary => "Sodium chloride (NaCl), in milligrams",
+             },
+             {
+               amount  => 11.2359550561798,
+               unit    => "mg-na-citrate",
+               summary => "Sodium citrate (Na3C6H5O7), in milligrams",
+             },
+           ],
+           {
+             "table.field_formats" => [
+                                        ["number", { thousands_sep => "", precision => 3 }],
+                                        undef,
+                                        undef,
+                                      ],
+             "table.field_aligns"  => ["number", "left", "left"],
+             "table.fields"        => ["amount", "unit", "summary"],
+           },
+         ]
+
+    *   How much of sodium chloride provides 1000 mg of elemental sodium?:
+
+         convert_sodium_unit(quantity => "1000 mg-na-elem", to_unit => "mg-na-cl");
+
+        Result:
+
+         [200, "OK", 2544.52926208651, {}]
+
+    If target unit is not specified, will show all known conversions.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   quantity => *str* (default: "1 mg")
+
+    *   to_unit => *str*
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/App-MineralUtils>.
@@ -195,7 +366,8 @@ CONTRIBUTING
     me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2022, 2021 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

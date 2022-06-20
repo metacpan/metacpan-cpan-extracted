@@ -3,7 +3,7 @@ package Specio::Subs;
 use strict;
 use warnings;
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 use Carp qw( croak );
 use Eval::Closure qw( eval_closure );
@@ -186,7 +186,7 @@ Specio::Subs - Make validation and coercion subs from Specio types
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNOPSIS
 
@@ -249,14 +249,14 @@ but it can be called by its fully qualified name. It accepts a single argument,
 a package name. It returns a list of subs that it generated and installed in
 the given package, if any.
 
-This exists to make it easy to write a type library that combines other library
-and generates helper subs for export all at once.
+This exists to make it easy to write a type library that combines other
+libraries and generates helper subs for export all at once.
+
+See the L<Specio::Exporter> docs for more details.
 
 =head1 SUPPORT
 
 Bugs may be submitted at L<https://github.com/houseabsolute/Specio/issues>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 
@@ -268,7 +268,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2021 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2022 by Dave Rolsky.
 
 This is free software, licensed under:
 

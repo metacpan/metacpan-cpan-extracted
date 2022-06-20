@@ -1,0 +1,11 @@
+runtime:
+  requires:
+    perl: '5.006001'
+    Cwd: 0
+    File::Spec: 0
+    File::Basename: 0
+    lib: 0
+test:
+  requires:
+    Test::More: '0.88'
+    File::Temp: '0.19'

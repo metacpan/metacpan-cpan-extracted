@@ -1,5 +1,11 @@
 Revision history for Neo4j::Driver
 
+0.31  2022-06-13
+
+ - Replace experimental net_module config option with plug-in interface
+ - The cypher_params config option is no longer experimental
+ - Announce plan to switch from JSON::PP::Boolean to Perl distinguished booleans
+
 0.30  2022-05-20
 
  - Add experimental config option concurrent_tx to explicitly enable support

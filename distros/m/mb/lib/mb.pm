@@ -3,7 +3,7 @@ package mb;
 # You are welcome! MOJIBAKE-san, you are our friend forever!!
 ######################################################################
 #
-# mb - Scripting in Big5, Big5-HKSCS, GBK, Sjis, UHC, UTF-8, ...
+# mb - Can easy script in Big5, Big5-HKSCS, GBK, Sjis, UHC, UTF-8, ...
 #
 # https://metacpan.org/release/mb
 #
@@ -13,7 +13,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.43';
+$VERSION = '0.44';
 $VERSION = $VERSION;
 
 # internal use
@@ -5269,7 +5269,7 @@ __END__
 
 =head1 NAME
 
-mb - Scripting in Big5, Big5-HKSCS, GBK, Sjis, UHC, UTF-8, ...
+mb - Can easy script in Big5, Big5-HKSCS, GBK, Sjis, UHC, UTF-8, ...
 
 =head1 SYNOPSIS
 
@@ -5414,6 +5414,24 @@ This software does ...
 =back
 
 Let's enjoy MBSC scripting in Perl!!
+
+=head1 Larry Wall san's Style
+
+If you're using the utf8 pragma and you have a big headache, probably, you're on the wrong way.
+You should back to the Larry Street where is a sign that says ver.5.00503, once.
+
+There is another path there. Follow that path.
+Soon, your headache will be improve.
+
+The "length()" described in the script universally functions as "bytes::length()", and the "substr()" in the script universally functions as "bytes::substr()".
+If you want to know the number of code points of multibyte characters contained in a scalar value, you have to write "mb::length()".
+If you want to execute "substr()" in code point context, you have to write "mb::substr()".
+
+Once, Larry Wall san said like this;
+
+"Easy jobs must be easy."
+
+Welcome to world of Larry Wall san's Style!!
 
 =head1 TERMINOLOGY
 
@@ -5698,9 +5716,9 @@ index brothers
   mb::rindex_byte         codepoint       octet           useful, JPerl like
   ------------------------------------------------------------------------------------------
 
-Sometimes "compatibility" means "compromise." In that case, "best compatibility" means
-"most useful compromise." That's what mb::index_byte() and mb::rindex_byte() are.
-But sorry for the long name.
+The most useful of the above are mb::index_byte() and mb::rindex_byte(), but it's
+more convenient to use regular expressions than those.
+So you can forget about these subroutines.
 
 =head1 MBCS special variables provided by this software
 
@@ -5736,32 +5754,16 @@ Running an US-ASCII script using mb.pm allows you to treat multibyte code points
 =head2 On other hand, if you want to write octet-oriented scripts from now on, or port existing octet-oriented scripts to mb.pm
 
 There are only a few places that need to be rewritten.
+If you want to execute "lc()", "lcfirst()", "uc()", and "ucfirst()" on octet-oriented data, you have to write "CORE::lc()", "CORE::lcfirst()", "CORE::uc()", and "CORE::ucfirst()" in your script.
 
   -----------------------------------------------------------------
   original script in        script with
   Perl4, Perl5              mb.pm modulino
   -----------------------------------------------------------------
-  chop                      chop
-  chr                       chr
-  do 'file'                 do 'file'
-  eval 'string'             eval 'string'
-  getc                      getc
-  index                     index
   lc                        CORE::lc
   lcfirst                   CORE::lcfirst
-  length                    length
-  no Module                 no Module
-  no Module qw(ARGUMENTS)   no Module qw(ARGUMENTS)
-  ord                       ord
-  require 'file'            require 'file'
-  reverse                   reverse
-  rindex                    rindex
-  substr                    substr
   uc                        CORE::uc
   ucfirst                   CORE::ucfirst
-  use Module                use Module
-  use Module qw(ARGUMENTS)  use Module qw(ARGUMENTS)
-  use Module ()             use Module ()
   qq{\Lfoo\E}               qq{@{[CORE::lc("foo")]}}
   qq{\lfoo\E}               qq{@{[CORE::lcfirst("foo")]}}
   qq{\Ufoo\E}               qq{@{[CORE::uc("foo")]}}
@@ -5770,13 +5772,11 @@ There are only a few places that need to be rewritten.
 
 =head1 Porting from script in JPerl4, and JPerl5
 
-=head2 If you want to write MBCS scripts from now on
-
-If you want to make it multibyte, rewrite the Perl built-in function to the subroutine of the same name in the mb :: * package.
-
 =head2 If you want to port existing JPerl scripts to mb.pm
 
 There are only a few places that need to be rewritten.
+If you write the functionality of "index()" and "rindex()" in regular expressions, the only difference left is "chop()".
+As "chop()" in JPerl script, you need to write "mb::chop()" when mb.pm modulino environment.
 
   -----------------------------------------------------------------
   original script in        script with
@@ -5786,23 +5786,33 @@ There are only a few places that need to be rewritten.
   do 'file'                 mb::do 'file'
   eval 'string'             mb::eval 'string'
   index                     mb::index_byte
-  lc                        mb::lc (also lc)
-  lcfirst                   mb::lcfirst (also lcfirst)
   no Module                 mb::no Module
   no Module qw(ARGUMENTS)   mb::no Module qw(ARGUMENTS)
   require 'file'            mb::require 'file'
   rindex                    mb::rindex_byte
-  uc                        mb::uc (also uc)
-  ucfirst                   mb::ucfirst (also ucfirst)
   use Module                mb::use Module
   use Module qw(ARGUMENTS)  mb::use Module qw(ARGUMENTS)
   use Module ()             mb::use Module ()
   -----------------------------------------------------------------
 
+However substantially ...
+
+  -----------------------------------------------------------------
+  original script in        script with
+  JPerl4, JPerl5            mb.pm modulino
+  -----------------------------------------------------------------
+  chop                      95% to chomp, 4% to mb::chop, 1% to chop
+  index                     (already written in regular expression)
+  rindex                    (already written in regular expression)
+  -----------------------------------------------------------------
+
+Substantially put, JPerl users can write programs the same way they used to.
+
 =head1 Porting from script with utf8 pragma
 
 If you want to port existing scripts that has utf8 pragma to mb.pm
 Like traditional style, Perl's built-in functions without package names provide octet-oriented functionality.
+Thus, "length()" and "substr()" work on an octet basis, universally.
 When you need multibyte functionally, you need to use subroutines in the "mb" package, on every time.
 
   -----------------------------------------------------------------
@@ -6062,12 +6072,13 @@ in perl's memory,
 
 =head1 MBCS character casing
 
-lc("A") makes halfwidth-"a", however lc("乙") makes "乙" not "兀", moreover lc("Ａ")
-makes "Ａ" not fullwidth-"ａ".
+lc("A") makes halfwidth-"a", however lc("乙") makes "乙" not "兀", moreover lc("Ａ") makes "Ａ" not fullwidth-"ａ".
+Like JPerl, for easy to use, "lc()" and "uc()" do not work for MBCS encoding that is not US-ASCII.
 
     ----------------------------------------------------------------------------------------------
-    encoding    script                         bare Perl4, bare Perl5     mb.pm modulino
-                                               makes MOJIBAKE             makes no MOJIBAKE
+                                               bare Perl4, bare Perl5     mb.pm modulino
+    encoding    your script                    makes MOJIBAKE             makes no MOJIBAKE
+                                               (works as CORE::lc)        (works as mb::lc)
     ----------------------------------------------------------------------------------------------
     big5        lc("A乙Ａ") [41][A441][A2CF]   "a兀Ａ" [61][A461][A2CF]   "a乙Ａ" [61][A441][A2CF]
     big5hkscs   lc("A淾Ａ") [41][8C41][A2CF]   "a蘏Ａ" [61][8C61][A2CF]   "a淾Ａ" [61][8C41][A2CF]
@@ -6075,6 +6086,12 @@ makes "Ａ" not fullwidth-"ａ".
     gbk         lc("A華Ａ") [41][C841][A3C1]   "a萢Ａ" [61][C861][A3C1]   "a華Ａ" [61][C841][A3C1]
     sjis        lc("AアＡ") [41][8341][8261]   "aヂＡ" [61][8361][8261]   "aアＡ" [61][8341][8261]
     uhc         lc("A갂Ａ") [41][8141][A3C1]   "a갵Ａ" [61][8161][A3C1]   "a갂Ａ" [61][8141][A3C1]
+    ----------------------------------------------------------------------------------------------
+    
+    ----------------------------------------------------------------------------------------------
+                                               bare Perl4, bare Perl5     mb.pm modulino
+    encoding    your script                    makes MOJIBAKE             makes no MOJIBAKE
+                                               (works as CORE::uc)        (works as mb::uc)
     ----------------------------------------------------------------------------------------------
     big5        uc("a兀ａ") [61][A461][A2E9]   "A乙ａ" [41][A441][A2E9]   "A兀ａ" [41][A461][A2E9]
     big5hkscs   uc("a蘏ａ") [61][8C61][A2E9]   "A淾ａ" [41][8C41][A2E9]   "A蘏ａ" [41][8C61][A2E9]
@@ -6649,41 +6666,6 @@ wildcard arguments supplied onto command line. But this software helps it.
       }
       @ARGV = @argv;
   }
-
-=head1 Yet Another Future of Multibyte Perl
-
-JPerl is very useful software. This "JPerl" means "Japanized Perl" or
-"Japanese Perl". The last version of JPerl is 5.005_04 and is not maintained
-now. Japanization maintainer WATANABE Hirofumi-san said this ...
-
-  "Because WATANABE am tired I give over maintaing JPerl."
-
-at Slide #15: "The future of JPerl" in "jperlconf.ppt" on The Perl Confernce
-Japan 1998. And he taught us on [Tokyo.pm] jus Benkyoukai at 1999-09-09,
-
-  http://mail.pm.org/pipermail/tokyo-pm/1999-September/001854.html
-  save as: SJIS.pm
-  
-  package SJIS;
-  use Filter::Util::Call;
-  sub multibyte_filter {
-      my $status;
-      if (($status = filter_read()) > 0 ) {
-          s/([\x81-\x9f\xe0-\xef])([\x40-\x7e\x80-\xfc])/
-              sprintf("\\x%02x\\x%02x",ord($1),ord($2))
-          /eg;
-      }
-      $status;
-  }
-  sub import {
-      filter_add(\&multibyte_filter);
-  }
-  1;
-
-(Unfortunately, Filter::Util::Call module requires Perl 5.6, so I couldn't
-use it on Perl 5.00503 that's my home.)
-
-I am excited about this software and Perl's future --- I hope you are too.
 
 =head1 DEPENDENCIES
 

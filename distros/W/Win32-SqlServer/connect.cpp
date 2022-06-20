@@ -1,11 +1,40 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/connect.cpp 13    21-07-12 21:42 Sommar $
+ $Header: /Perl/OlleDB/connect.cpp 17    22-05-27 23:59 Sommar $
 
   Implements the connection routines on Win32::SqlServer.
 
-  Copyright (c) 2004-2021   Erland Sommarskog
+  Copyright (c) 2004-2022   Erland Sommarskog
 
   $History: connect.cpp $
+ * 
+ * *****************  Version 17  *****************
+ * User: Sommar       Date: 22-05-27   Time: 23:59
+ * Updated in $/Perl/OlleDB
+ * Also except the settings for Trust Server Certificate and Host Name in
+ * Certificate when setting the provider string.
+ * 
+ * *****************  Version 16  *****************
+ * User: Sommar       Date: 22-05-27   Time: 21:59
+ * Updated in $/Perl/OlleDB
+ * The correction of the one-off error was in the wrong place. When
+ * setting provider string, don't clear the Encrypt setting, because for
+ * some reason it does not have any effect when you list it in the
+ * provider string. When comparing property IDs, also include the propset
+ * as some properties have the same ids.
+ * 
+ * *****************  Version 15  *****************
+ * User: Sommar       Date: 22-05-18   Time: 22:23
+ * Updated in $/Perl/OlleDB
+ * Added validation of the values of the Authentication propery. If
+ * AccessToken is given, clear IntegratedSecurity.
+ * 
+ * *****************  Version 14  *****************
+ * User: Sommar       Date: 22-05-08   Time: 23:16
+ * Updated in $/Perl/OlleDB
+ * New OLE DB provider MSOLEDBSQL19. Need special handling of the login
+ * property Encrypt, since the data type changed with tne new provider.
+ * Fix bug in set_one_property which resulted in the last property in a
+ * property set to be ignored.
  * 
  * *****************  Version 13  *****************
  * User: Sommar       Date: 21-07-12   Time: 21:42
@@ -188,7 +217,7 @@ void set_one_property_set (SV            * olle_ptr,
    // Then copy the *defined* properties to the DBPROP array.
    for (UINT i = init_propset_info[init_propset].start;
         i < mydata->init_propsets[init_propset].cProperties +
-           init_propset_info[init_propset].start; i++) {
+             init_propset_info[init_propset].start; i++) {
       if (mydata->init_properties[i].dwStatus == DBPROPSTATUS_OK) {
          DBPROP  &prop = properties[prop_ix++];
          prop.dwPropertyID = mydata->init_properties[i].dwPropertyID;
@@ -196,16 +225,31 @@ void set_one_property_set (SV            * olle_ptr,
          prop.colid        = DB_NULLID;
          prop.dwStatus     = DBPROPSTATUS_OK;
          VariantInit(&prop.vValue);
-         VariantCopy(&prop.vValue, &mydata->init_properties[i].vValue);
+         if (prop.dwPropertyID == SSPROP_INIT_ENCRYPT &&
+             mydata->provider < provider_msoledbsql19) {
+             // The special case. This property changed type in MSOLEDBSQL19, so 
+             // for earlier versions, we need to use the older type.
+             prop.vValue.vt = VT_BOOL;
+             if (_wcsicmp(mydata->init_properties[i].vValue.bstrVal, 
+                          L"Optional") == 0) {
+                 prop.vValue.boolVal = FALSE;
+             }
+             else {
+                 prop.vValue.boolVal = 0xFFFF;
+             }
+         }
+         else {
+            VariantCopy(&prop.vValue, &mydata->init_properties[i].vValue);
+         }
       }
    }
 
    // If any properties were copied, we can set them now.
    if (prop_ix > 0) {
-      propset.cProperties = prop_ix - 1;
+      propset.cProperties = prop_ix;
       HRESULT ret = property_ptr->SetProperties(1, &propset);
       if (FAILED(ret)) {
-         dump_properties(properties, OptPropsDebug(olle_ptr));
+         dump_properties(properties, init_propset, propset.cProperties);
          croak("Internal error: property_ptr->SetProperties for initialization propset %d failed with hresult %x", init_propset, ret);
       }
    }
@@ -226,6 +270,11 @@ BOOL do_connect (SV    * olle_ptr,
 
     switch (mydata->provider) {
        // At this point provider_default should never appear.
+       case provider_msoledbsql19 :
+         clsid = &clsid_msoledbsql19;
+         provider_name = "MSOLEDBSQL19";
+         break;
+
        case provider_msoledbsql :
          clsid = &clsid_msoledbsql;
          provider_name = "MSOLEDBSQL";
@@ -346,7 +395,8 @@ void setloginproperty(SV   * olle_ptr,
    // Some properties affects others.
    if (gbl_init_props[ix].propset_enum == oleinit_props &&
          gbl_init_props[ix].property_id == DBPROP_AUTH_USERID ||
-         gbl_init_props[ix].property_id == SSPROP_AUTH_MODE) {
+         gbl_init_props[ix].property_id == SSPROP_AUTH_MODE   ||
+         gbl_init_props[ix].property_id == SSPROP_AUTH_ACCESS_TOKEN) {
       // If userid is set, we clear Integrated security.
       setloginproperty(olle_ptr, "IntegratedSecurity", &PL_sv_undef);
    }
@@ -354,8 +404,14 @@ void setloginproperty(SV   * olle_ptr,
             gbl_init_props[ix].property_id == DBPROP_INIT_PROVIDERSTRING) {
       // In this case, all other properties should be ignored, except for
       // AUTOTRANSLATE, since we over rule its default.
+      // We also except the Encrypt option, since for some reason it does not seem to work
+      // in the provider string, so we want the setting through SetDefaultForEncryption to prevail.
       for (int j = 0; gbl_init_props[j].propset_enum != datasrc_props; j++) {
-         if (mydata->init_properties[j].dwPropertyID != SSPROP_INIT_AUTOTRANSLATE) {
+         if (! (gbl_init_props[j].propset_enum == ssinit_props &&
+                   (mydata->init_properties[j].dwPropertyID == SSPROP_INIT_AUTOTRANSLATE ||
+                    mydata->init_properties[j].dwPropertyID == SSPROP_INIT_ENCRYPT ||
+                    mydata->init_properties[j].dwPropertyID == SSPROP_INIT_TRUST_SERVER_CERTIFICATE ||
+                    mydata->init_properties[j].dwPropertyID == SSPROP_INIT_HOST_NAME_CERTIFICATE))) {
             VariantClear(&mydata->init_properties[j].vValue);
          }
       }
@@ -387,6 +443,21 @@ void setloginproperty(SV   * olle_ptr,
                     appintent, prop_name);
        }
    }
+    
+   // So does the Authentication property.
+   if (gbl_init_props[ix].propset_enum == ssinit_props &&
+       gbl_init_props[ix].property_id == SSPROP_AUTH_MODE) {
+       char * authmode = SvPV_nolen(prop_value);
+       if (_stricmp(authmode, "SqlPassword") != 0                     &&
+           _stricmp(authmode, "ActiveDirectoryIntegrated") != 0       &&
+           _stricmp(authmode, "ActiveDirectoryPassword") != 0         &&
+           _stricmp(authmode, "ActiveDirectoryInteractive") != 0      &&
+           _stricmp(authmode, "ActiveDirectoryServicePrincipal") != 0 &&
+           _stricmp(authmode, "ActiveDirectoryMSI") != 0) {
+              croak("Illegal value '%s' passed for the '%s' property",
+                    authmode, prop_name);
+       }
+   }
         
 
    // First mark that the property has been set explicitly.
@@ -399,7 +470,7 @@ void setloginproperty(SV   * olle_ptr,
    if (my_sv_is_defined(prop_value)) {
       mydata->init_properties[ix].vValue.vt = gbl_init_props[ix].datatype;
 
-      // First handle any specials. Currently there are two.
+      // First handle any specials. Currently there are three.
       if (gbl_init_props[ix].propset_enum == oleinit_props &&
           gbl_init_props[ix].property_id == DBPROP_INIT_OLEDBSERVICES) {
          // For OLE DB Services, we are only using connection pooling.
@@ -420,6 +491,36 @@ void setloginproperty(SV   * olle_ptr,
          }
          else {
             mydata->init_properties[ix].vValue.bstrVal = SV_to_BSTR(prop_value);
+         }
+      }
+      else if (gbl_init_props[ix].propset_enum == ssinit_props &&
+               gbl_init_props[ix].property_id == SSPROP_INIT_ENCRYPT) {
+         if (SvIOK(prop_value)) {
+             mydata->init_properties[ix].vValue.bstrVal = 
+                 SysAllocString(SvTRUE(prop_value) ? L"Mandatory" : L"Optional");
+         }
+         else {
+            char * encryptopt = SvPV_nolen(prop_value);
+            if (_stricmp(encryptopt, "no") == 0 ||
+                _stricmp(encryptopt, "false") == 0 ||
+                _stricmp(encryptopt, "optional") == 0) {
+               mydata->init_properties[ix].vValue.bstrVal = 
+                     SysAllocString(L"Optional");
+            }
+            else if (_stricmp(encryptopt, "yes") == 0 ||
+                     _stricmp(encryptopt, "true") == 0 ||
+                     _stricmp(encryptopt, "mandatory") == 0) {
+               mydata->init_properties[ix].vValue.bstrVal = 
+                     SysAllocString(L"Mandatory");
+            }
+            else if (_stricmp(encryptopt, "strict") == 0) {
+               mydata->init_properties[ix].vValue.bstrVal = 
+                     SysAllocString(L"Strict");
+            }
+            else {
+               croak("Illegal value '%s' passed for the '%s' property",
+                     encryptopt, prop_name);
+            }
          }
       }
       else {

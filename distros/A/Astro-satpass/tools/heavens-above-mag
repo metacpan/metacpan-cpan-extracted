@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+package heavens_above_mag;
+
 use 5.010;
 
 use strict;
@@ -10,69 +12,44 @@ use HTML::TreeBuilder;
 use LWP::UserAgent;
 use Pod::Usage;
 
-our $VERSION = '0.124';
+our $VERSION = '0.125';
+
+use constant REF_CODE	=> sub {};
 
 my %opt;
 
-GetOptions( \%opt,
-    qw{ celestrak! open! },
-    help => sub { pod2usage( { -verbose => 2 } ) },
-) or pod2usage( { -verbose => 0 } );
+unless ( caller ) {	# We're a modulino.
+    GetOptions( \%opt,
+	qw{ celestrak! open! },
+	help => sub { pod2usage( { -verbose => 2 } ) },
+    ) or pod2usage( { -verbose => 0 } );
 
-if ( $opt{celestrak} ) {
-    @ARGV and pod2usage( {
-	    -message	=> 'Arguments forbidden with --celestrak',
-	    -verbose	=> 0,
-	} );
-    process_celestrak();
-} else {
-    @ARGV or pod2usage( {
-	    -message	=> 'Arguments required unless --celestrak specified',
-	    -verbose	=> 0,
-	} );
-
-    if ( $opt{open} ) {
-	process_open( @ARGV );
+    if ( $opt{celestrak} ) {
+	@ARGV and pod2usage( {
+		-message	=> 'Arguments forbidden with --celestrak',
+		-verbose	=> 0,
+	    } );
+	process_celestrak();
     } else {
-	process_parse( @ARGV );
+	@ARGV or pod2usage( {
+		-message	=> 'Arguments required unless --celestrak specified',
+		-verbose	=> 0,
+	    } );
+
+	if ( $opt{open} ) {
+	    process_open( @ARGV );
+	} else {
+	    process_perl( @ARGV );
+	}
     }
 }
 
 # This mess exists because Heavens-Above enclosed multiple table rows in
 # a <span>..</span>. This is a standards violation which (e.g.) Firefox
 # tolerates, but HTML::TreeBuilder's parse emits such spans as empty
-# tags before the table containing them. Unless this is fixed, we will
-# have to step forward to the relevant table and then find the datum on
-# its own merits.
-sub find_intrinsic_magnitude {
-    my ( $tree ) = @_;
-
-    my $mag_ele = $tree->look_down( id => 'ctl00_cph1_lblBrightness' );
-    if ( my @mag_content = $mag_ele->content_list() ) {
-	die 'Bug - Not expecting content in span ctl00_cph1_lblBrightness';
-    }
-
-    my $right = $mag_ele;
-    while ( my $right = $right->right() ) {
-
-	warn 'Debug - right ele ', $right->tag();
-
-	'span' eq $right->tag()
-	    and next;
-
-	$mag_ele = $right->look_down( _tag => 'td', sub {
-		( local $_ ) = $_[0]->content_list();
-		return m/ \b at \s+ 1000 \s* km \s+ distance /smxi;
-	    } );
-	my ( $mag ) = $mag_ele->content_list();
-	$mag =~ s/ \A \s+ //smx;
-	$mag =~ s/ \s+ .* //smx;
-	return $mag;
-    }
-
-    die 'Bug - span ctl00_cph1_lblBrightness has no right ele';
-}
-
+# tags at some indeterminate point in the parse. Unless this is fixed,
+# we will have to just hope they continue to honor the Accept-Language
+# request header, or that the default language remains English.
 sub find_td_by_content {
     my ( $tree, $re ) = @_;
 
@@ -113,7 +90,11 @@ sub get_file {
 sub get_html {
     my ( $oid ) = @_;
     my $url = heavens_above_url( $oid );
-    state $ua = LWP::UserAgent->new();
+    state $ua = LWP::UserAgent->new(
+	default_headers	=> HTTP::Headers->new(
+	    'Accept-Language'	=> 'en',
+	),
+    );
     my $resp = $ua->get( $url );
     $resp->is_success()
 	or die "Failed to fetch $url: ", $resp->status_line(), "\n";
@@ -125,6 +106,17 @@ sub heavens_above_url {
     $oid =~ m/ \A [0-9]+ \z /smx
 	or die "OID '$oid' not numeric\n";
     return sprintf 'https://www.heavens-above.com/SatInfo.aspx?satid=%05d', $oid;
+}
+
+sub print_perl {
+    my ( $oid, $name, $mag ) = @_;
+    if ( defined $mag ) {
+	# die "Debug - $oid ($name) '$mag'";
+	printf "  '%05d' => %5.1f, # %s\n", $oid, $mag, $name;
+    } else {
+	printf "# '%05d' => undef, # %s has no recorded magnitude\n", $oid, $name;
+    }
+    return;
 }
 
 sub process_celestrak {
@@ -158,9 +150,22 @@ EOD
 	push @arg, unpack 'A5';
     }
     close $fh;
-    process_parse( @arg );
+    process_perl( @arg );
     say ');';
     return;
+}
+
+sub process_get {
+    my ( $spec ) = @_;
+    my @rslt;
+    process_parse(
+	sub {
+	    push @rslt, [ @_ ];
+	    return;
+	},
+	$spec,
+    );
+    return @rslt;
 }
 
 sub process_open {
@@ -175,7 +180,7 @@ sub process_open {
 }
 
 sub process_parse {
-    my @arg = @_;
+    my ( $handler, @arg ) = @_;
     foreach my $spec ( @arg ) {
 	my $get = $spec =~ m/ \A [0-9]+ \z /smx ? \&get_html : \&get_file;
 	my $tree = HTML::TreeBuilder->new_from_content( $get->( $spec ) );
@@ -184,24 +189,25 @@ sub process_parse {
 	my $oid = find_span( $tree, 'ctl00_cph1_lblSatID' );
 	# Should return a <span>..</span> containing the name
 	my $name = find_span( $tree, 'ctl00_cph1_lblOIGName' );
-	# See the subroutine below for why it is needed.
-	# my $mag = find_intrinsic_magnitude( $tree );
 	# We would like to look for id ctl00_cph1_lblBrightness here, but it
 	# contains table rows (which it should not), so HTML::TreeBuilder
 	# spits it out any old where. Sometimes before the table, sometimes
 	# in the middle of it (but still empty). So we just have to hope the
 	# default display is English.
-	if ( defined( my $mag = find_td_by_content(
-		    $tree, qr< \b at \s+ 1000 \s* km \s+ distance \b >smxi ) )
-	) {
-	    # die "Debug - $oid ($name) '$mag'";
-	    printf "  '%05d' => %5.1f, # %s\n", $oid, $mag, $name;
-	} else {
-	    printf "# '%05d' => undef, # %s has no recorded magnitude\n", $oid, $name;
-	}
+	my $mag = find_td_by_content(
+	    $tree, qr< \b at \s+ 1000 \s* km \s+ distance \b >smxi );
+	$handler->( $oid, $name, $mag );
     }
     return;
 }
+
+sub process_perl {
+    my ( @arg ) = @_;
+    process_parse( \&print_perl, @arg );
+    return;
+}
+
+1;
 
 __END__
 

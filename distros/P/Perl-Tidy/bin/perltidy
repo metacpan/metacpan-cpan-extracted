@@ -36,6 +36,11 @@ perltidy - a perl script indenter and reformatter
 =head1 DESCRIPTION
 
 Perltidy reads a perl script and writes an indented, reformatted script.
+This document describes the parameters available for controlling this formatting.
+
+Perltidy is a commandline frontend to the module Perl::Tidy.  For documentation
+describing how to call the Perl::Tidy module from other applications see the
+separate documentation for Perl::Tidy.  It is the file Perl::Tidy.pod in the source distribution.
 
 Many users will find enough information in L<"EXAMPLES"> to get
 started.  New users may benefit from the short tutorial
@@ -50,8 +55,7 @@ Perltidy can produce output on either of two modes, depending on the
 existence of an B<-html> flag.  Without this flag, the output is passed
 through a formatter.  The default formatting tries to follow the
 recommendations in perlstyle(1), but it can be controlled in detail with
-numerous input parameters, which are described in L<"FORMATTING
-OPTIONS">.
+numerous input parameters, which are described in L<"FORMATTING OPTIONS">.
 
 When the B<-html> flag is given, the output is passed through an HTML
 formatter which is described in L<"HTML OPTIONS">.
@@ -209,7 +213,7 @@ desired with B<-nse> on the command line.
 
 Change the extension of the output file to be F<ext> instead of the
 default F<tdy> (or F<html> in case the -B<-html> option is used).
-See L<Specifying File Extensions>.
+See L<"Specifying File Extensions">.
 
 =item	B<-opath>=path,    B<--output-path>=path
 
@@ -254,7 +258,7 @@ file to be something other than the default F<.bak>, and (2) to indicate
 that no backup file should be saved.
 
 To change the default extension to something other than F<.bak> see
-L<Specifying File Extensions>.
+L<"Specifying File Extensions">.
 
 A backup file of the source is always written, but you can request that it
 be deleted at the end of processing if there were no errors.  This is risky
@@ -385,14 +389,14 @@ For example,
 
         perltidy -sal='method fun _sub M4'
 
-will cause the perltidy to treate the words 'method', 'fun', '_sub' and 'M4' to be treated the same as if they were 'sub'.  Note that if the alias words are separated by spaces then the string of words should be placed in quotes.
+will cause the perltidy to treat the words 'method', 'fun', '_sub' and 'M4' the same as if they were 'sub'.  Note that if the alias words are separated by spaces then the string of words should be placed in quotes.
 
-Note that several other parameters accept a list of keywords, including 'sub' (see L<Specifying Block Types>).
+Note that several other parameters accept a list of keywords, including 'sub' (see L<"Specifying Block Types">).
 You do not need to include any sub aliases in these lists. Just include keyword 'sub' if you wish, and all aliases are automatically included.
 
 =item B<-gal=s>,   B<--grep-alias-list=s>
 
-This flag allows a code block following an external 'list operator' function to be formatted as if it followed one of the builtin keywords B<grep>,  B<map> or B<sort>.  The string B<s> contains the names of one or more such list operators, separated by spaces or commas.
+This flag allows a code block following an external 'list operator' function to be formatted as if it followed one of the built-in keywords B<grep>,  B<map> or B<sort>.  The string B<s> contains the names of one or more such list operators, separated by spaces or commas.
 
 By 'list operator' is meant a function which is invoked in the form
 
@@ -430,7 +434,7 @@ This flag disables all formatting and causes the input to be copied unchanged
 to the output except for possible changes in line ending characters and any
 pre- and post-filters.  This can be useful in conjunction with a hierarchical
 set of F<.perltidyrc> files to avoid unwanted code tidying.  See also
-L<Skipping Selected Sections of Code> for a way to avoid tidying specific
+L<"Skipping Selected Sections of Code"> for a way to avoid tidying specific
 sections of code.
 
 =item B<-i=n>,  B<--indent-columns=n>
@@ -511,11 +515,15 @@ here-documents, they will remain.
 
 =item B<-et=n>,   B<--entab-leading-whitespace>
 
-This flag causes each B<n> initial space characters to be replaced by
-one tab character.
+This flag causes each B<n> leading space characters produced by the
+formatting process to be replaced by one tab character.  The
+formatting process itself works with space characters. The B<-et=n> parameter is applied
+as a last step, after formatting is complete, to convert leading spaces into tabs.
+Before starting to use tabs, it is essential to first get the indentation
+controls set as desired without tabs, particularly the two parameters B<--indent-columns=n> (or B<-i=n>) and B<--continuation-indentation=n> (or B<-ci=n>).
 
 The value of the integer B<n> can be any value but can be coordinated with the
-number of spaces used for intentation. For example, B<-et=4 -ci=4 -i=4> will
+number of spaces used for indentation. For example, B<-et=4 -ci=4 -i=4> will
 produce one tab for each indentation level and and one for each continuation
 indentation level.  You may want to coordinate the value of B<n> with what your
 display software assumes for the spacing of a tab.
@@ -527,7 +535,8 @@ of indentation.  Certain other features are incompatible with this
 option, and if these options are also given, then a warning message will
 be issued and this flag will be unset.  One example is the B<-lp>
 option. This flag is retained for backwards compatibility, but
-if you use tabs, the B<-et=n> flag is recommended.
+if you use tabs, the B<-et=n> flag is recommended.  If both B<-t> and
+B<-et=n> are set, the B<-et=n> is used.
 
 =item B<-dt=n>,   B<--default-tabsize=n>
 
@@ -565,7 +574,7 @@ This flag is enabled by default but it can be deactivated with B<-nxs>.
 Probably the only reason to deactivate this flag is to generate more diagnostic
 messages when debugging a script.
 
-For another method of handling extended syntax see the section L<Skipping Selected Sections of Code>.
+For another method of handling extended syntax see the section L<"Skipping Selected Sections of Code">.
 
 =item B<-io>,   B<--indent-only>
 
@@ -599,7 +608,7 @@ this flag is in effect.
 =item B<-enc=s>,  B<--character-encoding=s>
 
 This flag indicates if the input data stream use a character encoding.
-Perltidy does not look for the encoding directives in the soure stream, such
+Perltidy does not look for the encoding directives in the source stream, such
 as B<use utf8>, and instead relies on this flag to determine the encoding.
 (Note that perltidy often works on snippets of code rather than complete files
 so it cannot rely on B<use utf8> directives).
@@ -647,21 +656,34 @@ post-processing to handle decoding and encoding.
 
 =item B<-eos=s>,   B<--encode-output-strings=s>
 
-This flag has been added to resolve an issue involving the interface between
+This flag was added to resolve an issue involving the interface between
 Perl::Tidy and calling programs, and in particular B<Code::TidyAll (tidyall)>.
-By default Perl::Tidy returns unencoded strings to the calling
-program, but some programs expect encoded strings. Setting this flag causes
-Perl::Tidy to return encoded output strings which it decoded.  For some
-background information see
-L<https://github.com/perltidy/perltidy/issues/83> and
-L<https://github.com/houseabsolute/perl-code-tidyall/issues/84>.
 
-If you only run the B<perltidy> binary this flag has no effect.
+If you only run the B<perltidy> binary this flag has no effect.  If you run a
+program which calls the Perl::Tidy module and receives a string in return, then
+the meaning of the flag is as follows:
 
-If you use B<tidyall> with encoded files and encounter irregularities such as
-B<wide character> messages you should set this flag.
+=over 4
 
-Additional information can be found in the man pages for the B<Perl::Tidy> module.
+=item *
+
+The setting B<-eos> means Perl::Tidy should encode any string which it decodes.
+This is the default because it makes perltidy behave well as a filter,
+and is the correct setting for most programs.
+
+=item *
+
+The setting B<-neos> means that a string should remain decoded if it was
+decoded by Perl::Tidy.  This is only appropriate if the calling program will
+handle any needed encoding before outputting the string.
+
+=back
+
+The default was changed from B<-neos> to B<-eos> in versions after 20220217.
+If this change causes a program to start running incorrectly on encoded files,
+an emergency fix might be to set B<-neos>.  Additional information can be found
+in the man pages for the B<Perl::Tidy> module and also in
+L<https://github.com/perltidy/perltidy/blob/master/docs/eos_flag.md>.
 
 =item B<-gcs>,  B<--use-unicode-gcstring>
 
@@ -816,7 +838,7 @@ To guess the starting indentation level perltidy simply assumes that
 indentation scheme used to create the code snippet is the same as is being used
 for the current perltidy process.  This is the only sensible guess that can be
 made.  It should be correct if this is true, but otherwise it probably won't.
-For example, if the input script was written with -i=2 and the current peltidy
+For example, if the input script was written with -i=2 and the current perltidy
 flags have -i=4, the wrong initial indentation will be guessed for a code
 snippet which has non-zero initial indentation. Likewise, if an entabbing
 scheme is used in the input script and not in the current process then the
@@ -863,7 +885,7 @@ closing paren, see the next section.
 These flags have no effect on code BLOCKS, such as if/then/else blocks,
 which always use whatever is specified with B<-i=n>.
 
-Some limitiations on these flags are:
+Some limitations on these flags are:
 
 =over 4
 
@@ -953,7 +975,7 @@ result, but the B<-lpil=s> flag is much easier to describe and use and is
 recommended.  The B<-lpxl=s> flag was the original implementation and is
 only retained for backwards compatibility.
 
-This list B<s> for these parametes is a string with space-separated items.
+This list B<s> for these parameters is a string with space-separated items.
 Each item consists of up to three pieces of information in this order: (1) an
 optional letter code (2) a required container type, and (3) an optional numeric
 code.
@@ -963,7 +985,7 @@ The only required piece of information is a container type, which is one of
 
   -lpil='('
 
-means use -lp formatting only on lists within parentheses, not lists in square-bracets or braces.
+means use -lp formatting only on lists within parentheses, not lists in square-brackets or braces.
 The same thing could alternatively be specified with
 
   -lpxl = '[ {'
@@ -975,7 +997,7 @@ letter which is used to limit the selection further depending on the type of
 token immediately before the paren.  The possible letters are currently 'k',
 'K', 'f', 'F', 'w', and 'W', with these meanings for matching whatever precedes an opening paren:
 
- 'k' matches if the previous nonblank token is a perl builtin keyword (such as 'if', 'while'),
+ 'k' matches if the previous nonblank token is a perl built-in keyword (such as 'if', 'while'),
  'K' matches if 'k' does not, meaning that the previous token is not a keyword.
  'f' matches if the previous token is a function other than a keyword.
  'F' matches if 'f' does not.
@@ -1153,7 +1175,7 @@ has been set to), if possible.  This is the default.  For example:
             fixit($i);
         }
 
-Use B<-nola> to not outdent labels.  To control line breaks after labels see L<bal=n, --break-after-labels=n>.
+Use B<-nola> to not outdent labels.  To control line breaks after labels see L<"bal=n, --break-after-labels=n">.
 
 =item B<Outdenting Keywords>
 
@@ -1439,7 +1461,7 @@ But the following will give a syntax error:
   for my $severity ( reverse $SEVERITY_LOWEST +1 .. $SEVERITY_HIGHEST ) { ... }
 
 To avoid subtle parsing problems like this, it is best to avoid spacing a
-binary operator asymetrically with a space on the left but not on the right.
+binary operator asymmetrically with a space on the left but not on the right.
 
 =item B<Space between specific keywords and opening paren>
 
@@ -1823,7 +1845,7 @@ where C<string> is a list of block types to be tagged with closing side
 comments.  By default, all code block types preceded by a keyword or
 label (such as C<if>, C<sub>, and so on) will be tagged.  The B<-cscl>
 command changes the default list to be any selected block types; see
-L<Specifying Block Types>.
+L<"Specifying Block Types">.
 For example, the following command
 requests that only C<sub>'s, labels, C<BEGIN>, and C<END> blocks be
 affected by any B<-csc> or B<-dcsc> operation:
@@ -2146,7 +2168,7 @@ but they can be helpful for working around occasional problems.
 Note that it may be possible to avoid the use of B<--format-skipping> for the
 specific case of a comma-separated list of values, as in the above example, by
 simply inserting a blank or comment somewhere between the opening and closing
-parens.  See the section L<Controlling List Formatting>.
+parens.  See the section L<"Controlling List Formatting">.
 
 The following sections describe the available controls for these options.  They
 should not normally be needed.
@@ -2227,8 +2249,7 @@ The default is equivalent to -cse='#>>V'.
 
 The parameters in this section control breaks after
 non-blank lines of code.  Blank lines are controlled
-separately by parameters in the section L<Blank Line
-Control>.
+separately by parameters in the section L<"Blank Line Control">.
 
 =over 4
 
@@ -2238,13 +2259,13 @@ If you do not want any changes to the line breaks within
 lines of code in your script, set
 B<-fnl>, and they will remain fixed, and the rest of the commands in
 this section and sections
-L<Controlling List Formatting>,
-L<Retaining or Ignoring Existing Line Breaks>.
+L<"Controlling List Formatting">,
+L<"Retaining or Ignoring Existing Line Breaks">.
 You may want to use B<-noll> with this.
 
 Note: If you also want to keep your blank lines exactly
 as they are, you can use the B<-fbl> flag which is described
-in the section L<Blank Line Control>.
+in the section L<"Blank Line Control">.
 
 =item B<-ce>,   B<--cuddled-else>
 
@@ -2395,14 +2416,14 @@ parameters B<--brace-left-list> and B<-brace-left-exclusion-list> described in t
 =item B<-bll=s>, B<--brace-left-list=s>
 
 Use this parameter to change the types of block braces for which the
-B<-bl> flag applies; see L<Specifying Block Types>.  For example,
+B<-bl> flag applies; see L<"Specifying Block Types">.  For example,
 B<-bll='if elsif else sub'> would apply it to only C<if/elsif/else>
 and named sub blocks.  The default is all blocks, B<-bll='*'>.
 
 =item B<-blxl=s>, B<--brace-left-exclusion-list=s>
 
 Use this parameter to exclude types of block braces for which the
-B<-bl> flag applies; see L<Specifying Block Types>.  For example,
+B<-bl> flag applies; see L<"Specifying Block Types">.  For example,
 the default settings B<-bll='*'> and B<-blxl='sort map grep eval asub'>
 mean all blocks except B<sort map grep eval> and anonymous sub blocks.
 
@@ -2482,14 +2503,14 @@ a certain block type, the B<-bli> style has priority.
 =item B<-blil=s>,    B<--brace-left-and-indent-list=s>
 
 Use this parameter to change the types of block braces for which the
-B<-bli> flag applies; see L<Specifying Block Types>.
+B<-bli> flag applies; see L<"Specifying Block Types">.
 
 The default is B<-blil='if else elsif unless while for foreach do : sub'>.
 
 =item B<-blixl=s>, B<--brace-left-and-indent-exclusion-list=s>
 
 Use this parameter to exclude types of block braces for which the B<-bli> flag
-applies; see L<Specifying Block Types>.
+applies; see L<"Specifying Block Types">.
 
 This might be useful in conjunction with selecting all blocks B<-blil='*'>.
 The default setting is B<-blixl=' '>, which does not exclude any blocks.
@@ -2848,7 +2869,7 @@ token immediately before the container.  If given, it goes just before the
 container symbol.  The possible letters are currently 'k', 'K', 'f', 'F',
 'w', and 'W', with these meanings:
 
- 'k' matches if the previous nonblank token is a perl builtin keyword (such as 'if', 'while'),
+ 'k' matches if the previous nonblank token is a perl built-in keyword (such as 'if', 'while'),
  'K' matches if 'k' does not, meaning that the previous token is not a keyword.
  'f' matches if the previous token is a function other than a keyword.
  'F' matches if 'f' does not.
@@ -3075,7 +3096,7 @@ B<until>, and also with a preceding label.  This can be changed with
 the parameter B<-bbvtl=string>, or
 B<--block-brace-vertical-tightness-list=string>, where B<string> is a
 space-separated list of block types.  For more information on the
-possible values of this string, see L<Specifying Block Types>
+possible values of this string, see L<"Specifying Block Types">
 
 For example, if we want to just apply this style to C<if>,
 C<elsif>, and C<else> blocks, we could use
@@ -3278,9 +3299,9 @@ single perl operator except B<=> on a -wbb flag.
 =item B<bal=n, --break-after-labels=n>
 
 This flag controls whether or not a line break occurs after a label. There
-are three possible valuse for B<n>:
+are three possible values for B<n>:
 
-  -bal=0  break if there is a break in the input [DEFAULt]
+  -bal=0  break if there is a break in the input [DEFAULT]
   -bal=1  always break after a label
   -bal=2  never break after a label
 
@@ -3340,7 +3361,7 @@ anywhere between the opening and closing parens.  Vertical alignment
 of the list items will still occur if possible.
 
 For another possibility see
-the -fs flag in L<Skipping Selected Sections of Code>.
+the -fs flag in L<"Skipping Selected Sections of Code">.
 
 =over 4
 
@@ -3616,7 +3637,7 @@ these meanings (these are the same as used in the
 B<--weld-nested-exclusion-list> and B<--line-up-parentheses-exclusion-list>
 parameters):
 
- 'k' matches if the previous nonblank token is a perl builtin keyword (such as 'if', 'while'),
+ 'k' matches if the previous nonblank token is a perl built-in keyword (such as 'if', 'while'),
  'K' matches if 'k' does not, meaning that the previous token is not a keyword.
  'f' matches if the previous token is a function other than a keyword.
  'F' matches if 'f' does not.
@@ -3628,12 +3649,10 @@ parens:
 
    perltidy -kba='f('
 
-B<NOTE>: To match all opening curly braces, and no other opening tokens, please
-prefix the brace it with an asterisk, like this: '*{'.  Otherwise a warning
-message will occur. This is necessary to avoid problems while the input scheme
-is being updated and generalized.  A single bare curly brace previously matched
-all container tokens, and tentatively still does. Likewise, to match all
-closing curly braces, and no other closing tokens, use '*}'.
+B<NOTE>: A request to break before an opening container, such as B<-kbb='('>,
+will be silently ignored because it can lead to formatting instability.
+Likewise, a request to break after a closing container, such as B<-kba>=')',
+will also be silently ignored.
 
 =item B<-iob>,  B<--ignore-old-breakpoints>
 
@@ -4009,7 +4028,7 @@ B<use> and B<my> statements.
 B<-kgbd> or B<--keyword-group-blanks-delete> controls the deletion of any
 blank lines that exist in the the group when it is first scanned.  When
 statements are initially scanned, any existing blank lines are included in the
-collection.  Any such orignial blank lines will be deleted before any other
+collection.  Any such original blank lines will be deleted before any other
 insertions are made when the parameter B<-kgbd> is set.  The default is not to
 do this, B<-nkgbd>.
 
@@ -4306,7 +4325,7 @@ For example,
 
 =item B<Completely turning off vertical alignment with -novalign>
 
-The default is to use vertical alignment, but bertical alignment can be
+The default is to use vertical alignment, but vertical alignment can be
 completely turned of with the B<-novalign> flag.
 
 A lower level of control of vertical alignment is possible with three parameters
@@ -4326,7 +4345,7 @@ below.
 =item B<Controlling side comment alignment with --valign-side-comments or -vsc>
 
 The B<-vsc> flag enables alignment of side comments and is enabled by default.  If side
-comment aligment is disabled with B<-nvsc> they will appear at a fixed space from the
+comment alignment is disabled with B<-nvsc> they will appear at a fixed space from the
 preceding code token.  The default is B<-vsc>
 
 =item B<Controlling block comment alignment with --valign-block-comments or -vbc>
@@ -4344,17 +4363,21 @@ parameters.  Most of the vertical alignments in typical programs occur at one
 of the tokens ',', '=', and '=>', but many other alignments are possible and are given in the following list:
 
   = **= += *= &= <<= &&= -= /= |= >>= ||= //= .= %= ^= x=
-  { ( ? : , ; => && || ~~ !~~ =~ !~ // <=> ->
+  { ( ? : , ; => && || ~~ !~~ =~ !~ // <=> -> q
   if unless and or err for foreach while until
 
-These alignments are all enabled by default, but they can be selectively disabled by including one or more of these tokens in the space-separated list B<valign-exclusion-list=s>.
+These alignment types correspond to perl symbols, operators and keywords except
+for 'q', which refers to the special case of alignment in a 'use' statement of
+qw quotes and empty parens. 
+
+They are all enabled by default, but they can be selectively disabled by including one or more of these tokens in the space-separated list B<valign-exclusion-list=s>.
 For example, the following would prevent alignment at B<=> and B<if>:
 
   --valign-exclusion-list='= if'
 
 If it is simpler to specify only the token types which are to be aligned, then
 include the types which are to be aligned in the list of B<--valign-inclusion-list>.
-You may leave the B<valign-exclusion-list> undefined, or use the special symbol B<*> for the exclusion list.
+In that case you may leave the B<valign-exclusion-list> undefined, or use the special symbol B<*> for the exclusion list.
 For example, the following parameters enable alignment only at commas and 'fat commas':
 
   --valign-inclusion-list=', =>'
@@ -4419,6 +4442,10 @@ Two commands which remove comments (but not pod) are: B<-dbc> or
 B<--delete-block-comments> and B<-dsc> or  B<--delete-side-comments>.
 (Hanging side comments will be deleted with side comments here.)
 
+When side comments are deleted, any special control side comments for
+non-indenting braces will be retained unless they are deactivated with
+a B<-nnib> flag.
+
 The negatives of these commands also work, and are the defaults.  When
 block comments are deleted, any leading 'hash-bang' will be retained.
 Also, if the B<-x> flag is used, any system commands before a leading
@@ -4459,7 +4486,7 @@ F</etc/perltidyrc>.  Note that these last two system-wide files do not
 have a leading dot.  Further system-dependent information will be found
 in the INSTALL file distributed with perltidy.
 
-Under Windows, perltidy will also search for a configuration file named perltidy.ini since Windows does not allow files with a leading period (.).
+Under Windows, perltidy will also search for a configuration file named F<perltidy.ini> since Windows does not allow files with a leading period (.).
 Use C<perltidy -dpro> to see the possible locations for your system.
 An example might be F<C:\Documents and Settings\All Users\perltidy.ini>.
 
@@ -4830,13 +4857,13 @@ ignored.
 
 Use this flag to specify the extra file extension of the table of contents file
 when html frames are used.  The default is "toc".
-See L<Specifying File Extensions>.
+See L<"Specifying File Extensions">.
 
 =item  The B<-sext=s>, or B<--html-src-extension> flag
 
 Use this flag to specify the extra file extension of the content file when html
 frames are used.  The default is "src".
-See L<Specifying File Extensions>.
+See L<"Specifying File Extensions">.
 
 =item  The B<-hent>, or B<--html-entities> flag
 
@@ -5139,15 +5166,13 @@ The perltidy binary uses the Perl::Tidy module and is installed when that module
 
 =head1 VERSION
 
-This man page documents perltidy version 20220217
+This man page documents perltidy version 20220613
 
 =head1 BUG REPORTS
 
-A list of current bugs and issues can be found at the CPAN site L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Tidy>
-
-To report a new bug or problem, use the link on this page.
-
 The source code repository is at L<https://github.com/perltidy/perltidy>.
+
+To report a new bug or problem, use the "issues" link on this page.
 
 =head1 COPYRIGHT
 

@@ -12,7 +12,7 @@ use feature ();
 package Zydeco;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.613';
+our $VERSION   = '0.614';
 
 use Keyword::Simple ();
 use PPR;
@@ -94,6 +94,7 @@ BEGIN {
 			
 			if ($gather{$me}{$caller}{debug}) {
 				require Data::Dumper;
+				local $Data::Dumper::Deparse = 1;
 				warn Data::Dumper::Dumper($gather{$me}{$caller});
 			}
 			
@@ -614,7 +615,7 @@ our $GRAMMAR = qr{
 			(?&PerlOWS)
 			(?: method | factory )                        # CAPTURE:kind
 			(?&PerlOWS)
-			(?: (?&MxpSimpleIdentifier) )                 # CAPTURE:name
+			(?: \$? (?&MxpSimpleIdentifier) )             # CAPTURE:name
 			(?&PerlOWS)
 			(?: ( (?&MxpAttribute) (?&PerlOWS) )+ )?      # CAPTURE:attributes
 			(?&PerlOWS)
@@ -1207,6 +1208,10 @@ sub _handle_method_keyword {
 sub _handle_multi_keyword {
 	my $me = shift;
 	my ($kind, $name, $code, $has_sig, $sig, $attrs) = @_;
+	
+	if ( $name =~ /^\$/ ) {
+		$name = "{ \\$name }";
+	}
 	
 	my ($signature_is_named, $signature_var_list, $type_params_stuff, $extra) = $has_sig ? $me->_handle_signature_list($sig) : ();
 	
@@ -2426,7 +2431,7 @@ sub _include {
 #{
 #	package Zydeco::Anonymous::Package;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.613';
+#	our $VERSION   = '0.614';
 #	use overload q[""] => sub { ${$_[0]} }, fallback => 1;
 #	sub DESTROY {}
 #	sub AUTOLOAD {
@@ -2437,7 +2442,7 @@ sub _include {
 #	
 #	package Zydeco::Anonymous::Class;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.613';
+#	our $VERSION   = '0.614';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub new {
 #		my $me = shift;
@@ -2450,12 +2455,12 @@ sub _include {
 #	
 #	package Zydeco::Anonymous::Role;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.613';
+#	our $VERSION   = '0.614';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	
 #	package Zydeco::Anonymous::ParameterizableClass;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.613';
+#	our $VERSION   = '0.614';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -2469,7 +2474,7 @@ sub _include {
 #
 #	package Zydeco::Anonymous::ParameterizableRole;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.613';
+#	our $VERSION   = '0.614';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -2908,6 +2913,12 @@ class will not be able to see functions exported into the class.
   multi method myfunc ( HashRef *collection, Int *index ) {
     ...;
   }
+  
+  # lexical multimethod - make sure you declare the variable first
+  #
+  my $otherfunc;
+  multi method $otherfunc ( CodeRef $x ) { ... }
+  multi method $otherfunc ( HashRef $x ) { ... }
 
 =head2 C<< requires >>
 

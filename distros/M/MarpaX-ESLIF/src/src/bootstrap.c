@@ -22,6 +22,7 @@ static inline void _marpaESLIF_bootstrap_lua_function_freev(marpaESLIF_bootstrap
 static inline void _marpaESLIF_bootstrap_rhs_alternative_freev(marpaESLIF_bootstrap_rhs_alternative_t *rhsAlternativep);
 static inline void _marpaESLIF_bootstrap_symbol_and_reference_freev(marpaESLIF_bootstrap_symbol_and_reference_t *symbolAndReferencep);
 static inline void _marpaESLIF_bootstrap_utf_string_freev(marpaESLIF_bootstrap_utf_string_t *stringp, short onStackb);
+static inline marpaESLIF_bootstrap_utf_string_t *_marpaESLIF_bootstrap_utf_string_newp(marpaESLIF_t *marpaESLIFp);
 static inline void _marpaESLIF_bootstrap_rhs_freev(genericStack_t *rhsAlternativeStackp);
 static inline void _marpaESLIF_bootstrap_adverb_list_item_freev(marpaESLIF_bootstrap_adverb_list_item_t *adverbListItemp);
 static inline void _marpaESLIF_bootstrap_adverb_list_items_freev(genericStack_t *adverbListItemStackp);
@@ -138,6 +139,7 @@ static        short _marpaESLIF_bootstrap_G1_action_terminal_4b(void *userDatavp
 static        short _marpaESLIF_bootstrap_G1_action_terminal_5b(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, int arg0i, int argni, int resulti, short nullableb);
 static        short _marpaESLIF_bootstrap_G1_action_terminal_6b(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, int arg0i, int argni, int resulti, short nullableb);
 static        short _marpaESLIF_bootstrap_G1_action_terminal_7b(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, int arg0i, int argni, int resulti, short nullableb);
+static        short _marpaESLIF_bootstrap_G1_action_terminal_8b(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, int arg0i, int argni, int resulti, short nullableb);
 static        short _marpaESLIF_bootstrap_G1_action_symbolb(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, int arg0i, int argni, int resulti, short nullableb);
 static        short _marpaESLIF_bootstrap_G1_action_grammar_reference_1b(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, int arg0i, int argni, int resulti, short nullableb);
 static        short _marpaESLIF_bootstrap_G1_action_grammar_reference_2b(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, int arg0i, int argni, int resulti, short nullableb);
@@ -209,6 +211,8 @@ static        short _marpaESLIF_bootstrap_G1_action_start_symbol_1b(void *userDa
 static        short _marpaESLIF_bootstrap_G1_action_start_symbol_2b(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, int arg0i, int argni, int resulti, short nullableb);
 static inline marpaESLIF_rule_t *_marpaESLIF_bootstrap_check_rulep(marpaESLIFValue_t *marpaESLIFValuep, marpaESLIFGrammar_bootstrap_t *marpaESLIFGrammarBootstrapp, marpaESLIF_grammar_bootstrap_t *grammarBootstrapp, char *descEncodings, char *descs, size_t descl, int lhsi, size_t nrhsl, int *rhsip, int exceptioni, int ranki, short nullRanksHighb, short sequenceb, int minimumi, int separatori, short properb, marpaESLIF_action_t *actionp, short hideseparatorb, short *skipbp, marpaESLIF_lua_functiondecl_t *declp, marpaESLIF_lua_functioncall_t **callpp, marpaESLIF_lua_functioncall_t *separatorcallp);
 static short marpaESLIFValueImport(marpaESLIFValue_t *marpaESLIFValuep, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb);
+static inline marpaESLIF_bootstrap_terminal_t *_marpaESLIF_bootstrap_quotedstring_to_terminalp(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, void *bytep, size_t bytel, marpaESLIF_terminal_t *modifiersp);
+static inline marpaESLIF_bootstrap_terminal_t *_marpaESLIF_bootstrap_regex_to_terminalp(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, void *bytep, size_t bytel);
 
 /* Helpers */
 #define MARPAESLIF_BOOTSTRAP_GET_ARRAY(marpaESLIFValuep, indicei, _p, _l) do { \
@@ -644,6 +648,12 @@ static inline void  _marpaESLIF_bootstrap_utf_string_freev(marpaESLIF_bootstrap_
 /*****************************************************************************/
 {
   if (stringp != NULL) {
+    if (stringp->substitutionBytep != NULL) {
+      free(stringp->substitutionBytep);
+    }
+    if (stringp->substitutionModifiers != NULL) {
+      free(stringp->substitutionModifiers);
+    }
     if (stringp->bytep != NULL) {
       free(stringp->bytep);
     }
@@ -1005,14 +1015,16 @@ static inline marpaESLIF_symbol_t *_marpaESLIF_bootstrap_check_meta_by_namep(mar
 static inline short _marpaESLIF_bootstrap_search_terminal_by_descriptionb(marpaESLIFValue_t *marpaESLIFValuep, marpaESLIF_grammar_bootstrap_t *grammarBootstrapp, marpaESLIF_terminal_type_t terminalType, marpaESLIF_bootstrap_utf_string_t *stringp, marpaESLIF_symbol_t **symbolpp)
 /*****************************************************************************/
 {
-  genericStack_t        *symbolStackp = grammarBootstrapp->symbolStackp;
-  marpaESLIF_symbol_t   *symbolp      = NULL;
+  genericStack_t        *symbolStackp          = grammarBootstrapp->symbolStackp;
+  marpaESLIF_symbol_t   *symbolp               = NULL;
+  marpaESLIF_terminal_t *terminalp             = NULL;
+  marpaESLIF_terminal_t *substitutionTerminalp = NULL;
   marpaESLIF_symbol_t   *symbol_i_p;
   int                    i;
-  marpaESLIF_terminal_t *terminalp;
   short                  rcb;
 
   /* Create a fake terminal (it has existence only in memory) - the description is the content itself */
+  /* If there is a substitution then the terminal must be a regex. */
   terminalp = _marpaESLIF_terminal_newp(marpaESLIFValuep->marpaESLIFp,
                                         NULL, /* marpaWrapperGrammarStartp: this is what make the terminal only in memory */
                                         MARPAWRAPPERGRAMMAR_EVENTTYPE_NONE,
@@ -1026,9 +1038,34 @@ static inline short _marpaESLIF_bootstrap_search_terminal_by_descriptionb(marpaE
                                         NULL, /* testFullMatchs */
                                         NULL, /* testPartialMatchs */
                                         0, /* pseudob */
-                                        0 /* characterClassb */);
+                                        0, /* characterClassb */
+                                        (stringp->substitutionBytep != NULL) ? MARPAESLIF_TERMINAL_TYPE_REGEX : MARPAESLIF_TERMINAL_TYPE_NA, /* wantType */
+                                        0 /* substitutionb */);
   if (MARPAESLIF_UNLIKELY(terminalp == NULL)) {
     goto err;
+  }
+
+  /* Idem if there is a substition - can happen only with regular expressions */
+  if (stringp->substitutionBytep != NULL) {
+    substitutionTerminalp = _marpaESLIF_terminal_newp(marpaESLIFValuep->marpaESLIFp,
+                                                      NULL, /* marpaWrapperGrammarStartp: this is what make the terminal only in memory */
+                                                      MARPAWRAPPERGRAMMAR_EVENTTYPE_NONE,
+                                                      (char *) _marpaESLIF_bootstrap_descEncodingInternals,
+                                                      (char *) _marpaESLIF_bootstrap_descInternals,
+                                                      _marpaESLIF_bootstrap_descInternall,
+                                                      MARPAESLIF_TERMINAL_TYPE_STRING, /* terminalType */
+                                                      stringp->substitutionModifiers,
+                                                      stringp->substitutionBytep,
+                                                      stringp->substitutionBytel,
+                                                      NULL, /* testFullMatchs */
+                                                      NULL, /* testPartialMatchs */
+                                                      0, /* pseudob */
+                                                      0, /* characterClassb */
+                                                      MARPAESLIF_TERMINAL_TYPE_NA, /* wantType */
+                                                      1 /* substitutionb */);
+    if (MARPAESLIF_UNLIKELY(substitutionTerminalp == NULL)) {
+      goto err;
+    }
   }
 
   for (i = 0; i < GENERICSTACK_USED(symbolStackp); i++) {
@@ -1047,6 +1084,21 @@ static inline short _marpaESLIF_bootstrap_search_terminal_by_descriptionb(marpaE
     if (memcmp(symbol_i_p->u.terminalp->patterns, terminalp->patterns, terminalp->patternl) != 0) {
       continue;
     }
+
+    if (stringp->substitutionBytep != NULL) {
+      /* Substitution pattern options */
+      if (symbol_i_p->u.terminalp->substitutionPatterni != substitutionTerminalp->patterni) {
+        continue;
+      }
+      /* Substitution pattern content */
+      if (symbol_i_p->u.terminalp->substitutionPatternl != substitutionTerminalp->patternl) {
+        continue;
+      }
+      if (memcmp(symbol_i_p->u.terminalp->substitutionPatterns, substitutionTerminalp->patterns, substitutionTerminalp->patternl) != 0) {
+        continue;
+      }
+    }
+
     /* Got it */
     symbolp = symbol_i_p;
     break;
@@ -1064,6 +1116,7 @@ static inline short _marpaESLIF_bootstrap_search_terminal_by_descriptionb(marpaE
 
  done:
   _marpaESLIF_terminal_freev(terminalp);
+  _marpaESLIF_terminal_freev(substitutionTerminalp);
   return rcb;
 }
 
@@ -1150,9 +1203,11 @@ done:
 static inline marpaESLIF_symbol_t  *_marpaESLIF_bootstrap_check_terminal_by_typep(marpaESLIFValue_t *marpaESLIFValuep, marpaESLIFGrammar_bootstrap_t *marpaESLIFGrammarBootstrapp, marpaESLIF_grammar_bootstrap_t *grammarBootstrapp, marpaESLIF_terminal_type_t terminalType, marpaESLIF_bootstrap_utf_string_t *stringp, short createb, short pseudob, short forcecreateb, char *descEncodings, char *descs, size_t descl, short characterClassb)
 /*****************************************************************************/
 {
-  static const char     *funcs     = "_marpaESLIF_bootstrap_check_terminal_by_typep";
-  marpaESLIF_symbol_t   *symbolp   = NULL;
-  marpaESLIF_terminal_t *terminalp = NULL;
+  static const char     *funcs                 = "_marpaESLIF_bootstrap_check_terminal_by_typep";
+  marpaESLIF_symbol_t   *symbolp               = NULL;
+  marpaESLIF_terminal_t *terminalp             = NULL;
+  marpaESLIF_terminal_t *substitutionTerminalp = NULL;
+  marpaESLIF_string_t   *descp                 = NULL;
 
   if (pseudob) {
     if (MARPAESLIF_UNLIKELY(! _marpaESLIF_bootstrap_search_terminal_pseudob(marpaESLIFValuep, grammarBootstrapp, terminalType, &symbolp))) {
@@ -1178,11 +1233,37 @@ static inline marpaESLIF_symbol_t  *_marpaESLIF_bootstrap_check_terminal_by_type
                                           NULL, /* testFullMatchs */
                                           NULL, /* testPartialMatchs */
                                           pseudob,
-                                          characterClassb);
+                                          characterClassb,
+                                          ((! pseudob) && (stringp->substitutionBytep != NULL)) ? MARPAESLIF_TERMINAL_TYPE_REGEX : MARPAESLIF_TERMINAL_TYPE_NA, /* wantType */
+                                          0 /* substitutionb */);
     if (MARPAESLIF_UNLIKELY(terminalp == NULL)) {
       goto err;
     }
     MARPAESLIF_TRACEF(marpaESLIFValuep->marpaESLIFp, funcs, "Creating terminal symbol %s in grammar level %d", terminalp->descp->asciis, grammarBootstrapp->leveli);
+    
+    if ((! pseudob) && (stringp->substitutionBytep != NULL)) {
+      substitutionTerminalp = _marpaESLIF_terminal_newp(marpaESLIFValuep->marpaESLIFp,
+                                                        grammarBootstrapp->marpaWrapperGrammarStartp,
+                                                        MARPAWRAPPERGRAMMAR_EVENTTYPE_NONE,
+                                                        NULL, /* descEncodings */
+                                                        NULL, /* descs */
+                                                        0, /* descl */
+                                                        MARPAESLIF_TERMINAL_TYPE_STRING,
+                                                        stringp->substitutionModifiers,
+                                                        stringp->substitutionBytep,
+                                                        stringp->substitutionBytel,
+                                                        NULL, /* testFullMatchs */
+                                                        NULL, /* testPartialMatchs */
+                                                        0, /* pseudob */
+                                                        0, /* characterClassb */
+                                                        MARPAESLIF_TERMINAL_TYPE_NA, /* wantType */
+                                                        1 /* substitutionb */);
+      if (MARPAESLIF_UNLIKELY(substitutionTerminalp == NULL)) {
+        goto err;
+      }
+      MARPAESLIF_TRACEF(marpaESLIFValuep->marpaESLIFp, funcs, "Creating substitution terminal symbol %s in grammar level %d", substitutionTerminalp->descp->asciis, grammarBootstrapp->leveli);
+    }
+
     symbolp = _marpaESLIF_symbol_newp(marpaESLIFValuep->marpaESLIFp, NULL /* marpaESLIFSymbolOptionp */);
     if (MARPAESLIF_UNLIKELY(symbolp == NULL)) {
       goto err;
@@ -1192,7 +1273,19 @@ static inline marpaESLIF_symbol_t  *_marpaESLIF_bootstrap_check_terminal_by_type
     symbolp->idi         = terminalp->idi;
     symbolp->descp       = terminalp->descp;
     terminalp = NULL; /* terminalp is now in symbolp */
-      
+
+    if ((! pseudob) && (stringp->substitutionBytep != NULL)) {
+      descp = _marpaESLIF_terminal_add_substitution_desc_to_terminal_descp(marpaESLIFValuep->marpaESLIFp, symbolp->u.terminalp, substitutionTerminalp);
+      if (descp == NULL) {
+	goto err;
+      }
+
+      /* Replace description */
+      _marpaESLIF_string_freev(symbolp->u.terminalp->descp, 0 /* onStackb */);
+      symbolp->descp = symbolp->u.terminalp->descp = descp;
+      descp = NULL; /* descp is now in symbolp->u.terminalp */
+    }
+
     GENERICSTACK_SET_PTR(grammarBootstrapp->symbolStackp, symbolp, symbolp->idi);
     if (MARPAESLIF_UNLIKELY(GENERICSTACK_ERROR(grammarBootstrapp->symbolStackp))) {
       MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "symbolStackp push failure, %s", strerror(errno));
@@ -1204,7 +1297,9 @@ static inline marpaESLIF_symbol_t  *_marpaESLIF_bootstrap_check_terminal_by_type
   
  err:
   _marpaESLIF_terminal_freev(terminalp);
+  _marpaESLIF_terminal_freev(substitutionTerminalp);
   _marpaESLIF_symbol_freev(symbolp);
+  _marpaESLIF_string_freev(descp, 0 /* onStackb */);
   symbolp = NULL;
 
  done:
@@ -2247,14 +2342,13 @@ static inline marpaESLIF_bootstrap_utf_string_t *_marpaESLIF_bootstrap_unquote_s
     goto err;
   }
   
-  rcp = (marpaESLIF_bootstrap_utf_string_t *) malloc(sizeof(marpaESLIF_bootstrap_utf_string_t));
+  rcp = _marpaESLIF_bootstrap_utf_string_newp(marpaESLIFValuep->marpaESLIFp);
   if (MARPAESLIF_UNLIKELY(rcp == NULL)) {
-    MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "malloc failure, %s", strerror(errno));
     goto err;
   }
-  rcp->modifiers = NULL;
-  rcp->bytel = rc.bytel;
-  rcp->bytep = (char *) malloc(rc.bytel + 1); /* NUL byte */
+
+  rcp->bytel               = rc.bytel;
+  rcp->bytep               = (char *) malloc(rc.bytel + 1); /* NUL byte */
   if (MARPAESLIF_UNLIKELY(rcp->bytep == NULL)) {
     MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "malloc failure, %s", strerror(errno));
     goto err;
@@ -2395,6 +2489,7 @@ static marpaESLIFValueRuleCallback_t _marpaESLIF_bootstrap_ruleActionResolver(vo
   case 114: return _marpaESLIF_bootstrap_G1_action_start_symbol_1b;
   case 115: return _marpaESLIF_bootstrap_G1_action_start_symbol_2b;
   case 116: return _marpaESLIF_bootstrap_G1_action_terminal_7b;
+  case 117: return _marpaESLIF_bootstrap_G1_action_terminal_8b;
   default:
     MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "Unsupported action \"%s\"", actions);
     return NULL;
@@ -3732,7 +3827,7 @@ static short _marpaESLIF_bootstrap_G1_action_rhs_primary_no_parameter_2b(void *u
   MARPAESLIF_BOOTSTRAP_GETANDFORGET_PTR(marpaESLIFValuep, arg0i+2, grammarReferencep);
   /* It is a non-sense to not have valid information */
   if (MARPAESLIF_UNLIKELY(grammarReferencep == NULL)) {
-    MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "_marpaESLIFValue_stack_getAndForgetb at indice %d returned NULL", arg0i+2);
+    MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "_marpaESLIFValue_stack_getb at indice %d returned NULL", arg0i+2);
     goto err;
   }
 
@@ -3792,7 +3887,7 @@ static short _marpaESLIF_bootstrap_G1_action_rhs_primary_no_parameter_3b(void *u
   MARPAESLIF_BOOTSTRAP_GET_ARRAY(marpaESLIFValuep, argni, bytep, bytel);
   /* It is a non-sense to have a null information */
   if (MARPAESLIF_UNLIKELY((bytep == NULL) || (bytel <= 0))) {
-    MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "_marpaESLIFValue_stack_getAndForgetb at indice %d returned {p,%ld}", argni, bytep, (unsigned long) bytel);
+    MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "_marpaESLIFValue_stack_getb at indice %d returned {p,%ld}", argni, bytep, (unsigned long) bytel);
     goto err;
   }
 
@@ -3803,11 +3898,14 @@ static short _marpaESLIF_bootstrap_G1_action_rhs_primary_no_parameter_3b(void *u
     goto err;
   }
 
-  rhsPrimaryp->callp            = NULL;
-  rhsPrimaryp->type             = MARPAESLIF_BOOTSTRAP_RHS_PRIMARY_TYPE_NA;
-  rhsPrimaryp->u.name.bytep     = NULL;
-  rhsPrimaryp->u.name.bytel     = 0;
-  rhsPrimaryp->u.name.modifiers = NULL;
+  rhsPrimaryp->callp                        = NULL;
+  rhsPrimaryp->type                         = MARPAESLIF_BOOTSTRAP_RHS_PRIMARY_TYPE_NA;
+  rhsPrimaryp->u.name.substitutionBytep     = NULL;
+  rhsPrimaryp->u.name.substitutionBytel     = 0;
+  rhsPrimaryp->u.name.substitutionModifiers = NULL;
+  rhsPrimaryp->u.name.bytep                 = NULL;
+  rhsPrimaryp->u.name.bytel                 = 0;
+  rhsPrimaryp->u.name.modifiers             = NULL;
 
   rhsPrimaryp->u.name.bytep = (char *) malloc(bytel + 1);
   if (rhsPrimaryp->u.name.bytep == NULL) {
@@ -5043,17 +5141,10 @@ static short _marpaESLIF_bootstrap_G1_action_terminal_2b(void *userDatavp, marpa
 
   MARPAESLIF_BOOTSTRAP_GET_ARRAY(marpaESLIFValuep, arg0i, bytep, bytel);
 
-  terminalp = (marpaESLIF_bootstrap_terminal_t *) malloc(sizeof(marpaESLIF_bootstrap_terminal_t));
+  terminalp = _marpaESLIF_bootstrap_regex_to_terminalp(userDatavp, marpaESLIFValuep, bytep, bytel);
   if (MARPAESLIF_UNLIKELY(terminalp == NULL)) {
-    MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "malloc failure, %s", strerror(errno));
     goto err;
   }
-  terminalp->type                 = MARPAESLIF_BOOTSTRAP_TERMINAL_TYPE_NA;
-  terminalp->u.regularExpressionp = _marpaESLIF_bootstrap_regex_to_stringb(marpaESLIFValuep->marpaESLIFp, bytep, bytel);
-  if (MARPAESLIF_UNLIKELY(terminalp->u.characterClassp == NULL)) {
-    goto err;
-  }
-  terminalp->type                 = MARPAESLIF_BOOTSTRAP_TERMINAL_TYPE_REGULAR_EXPRESSION;
 
   MARPAESLIF_BOOTSTRAP_SET_PTR(marpaESLIFValuep, resulti, MARPAESLIF_BOOTSTRAP_STACK_TYPE_TERMINAL, terminalp);
 
@@ -5073,17 +5164,10 @@ static short _marpaESLIF_bootstrap_G1_action_terminal_3b(void *userDatavp, marpa
 /*****************************************************************************/
 {
   /* <terminal> ::= <quoted string> */
-  marpaESLIF_bootstrap_terminal_t  *terminalp             = NULL;
-  marpaESLIFRecognizer_t           *marpaESLIFRecognizerp = NULL; /* Fake recognizer to use the internal regex */
-  char                             *modifiers             = NULL;
-  void                             *bytep;
-  size_t                            bytel;
-  char                             *tmps;
-  marpaESLIFValueResult_t           marpaESLIFValueResult;
-  size_t                            sizel;
-  marpaESLIF_matcher_value_t        rci;
-  short                             rcb;
-  size_t                            matchedLengthl;
+  marpaESLIF_bootstrap_terminal_t *terminalp = NULL;
+  void                            *bytep;
+  size_t                           bytel;
+  short                            rcb;
 
   /* Cannot be nullable */
   if (MARPAESLIF_UNLIKELY(nullableb)) {
@@ -5095,98 +5179,13 @@ static short _marpaESLIF_bootstrap_G1_action_terminal_3b(void *userDatavp, marpa
   MARPAESLIF_BOOTSTRAP_GET_ARRAY(marpaESLIFValuep, arg0i, bytep, bytel);
   /* It is a non-sense to not have valid information */
   if (MARPAESLIF_UNLIKELY((bytep == NULL) || (bytel <= 0))) {
-    MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "_marpaESLIFValue_stack_getAndForgetb at indice %d returned {%p,%ld}", arg0i, bytep, (unsigned long) bytel);
+    MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "_marpaESLIFValue_stack_getb at indice %d returned {%p,%ld}", arg0i, bytep, (unsigned long) bytel);
     goto err;
   }
 
-  /* Duplicate bytep */
-  tmps = (char *) malloc(bytel + 1);
-  if (MARPAESLIF_UNLIKELY(tmps == NULL)) {
-    MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "malloc failure, %s", strerror(errno));
-    goto err;
-  }
-  memcpy(tmps, bytep, bytel);
-  tmps[bytel] = '\0';
-  bytep = tmps;
-
-  /* Fake a recognizer. EOF flag will be set automatically in fake mode */
-  marpaESLIFRecognizerp = __marpaESLIFRecognizer_newp(marpaESLIFValuep->marpaESLIFp,
-                                                      NULL, /* grammarp */
-                                                      NULL, /* marpaESLIFRecognizerOptionp */
-                                                      0, /* discardb - no effect anway because we are in fake mode */
-                                                      1, /* noEventb - no effect anway because we are in fake mode */
-                                                      0, /* silentb */
-                                                      NULL, /* marpaESLIFRecognizerParentp */
-                                                      1, /* fakeb */
-                                                      0, /* wantedStartCompletionsi */
-                                                      1, /* A grammar is always transformed to valid UTF-8 before being parsed */
-                                                      0 /* isLexemeb */);
-  if (MARPAESLIF_UNLIKELY(marpaESLIFRecognizerp == NULL)) {
-    goto err;
-  }
-  if (MARPAESLIF_UNLIKELY(! _marpaESLIFRecognizer_terminal_matcherb(marpaESLIFRecognizerp,
-                                                                    marpaESLIFRecognizerp->marpaESLIF_streamp,
-                                                                    marpaESLIFValuep->marpaESLIFp->stringModifiersp,
-                                                                    bytep,
-                                                                    bytel,
-                                                                    1, /* eofb */
-                                                                    &rci,
-                                                                    &marpaESLIFValueResult,
-                                                                    &matchedLengthl))) {
-    goto err;
-  }
-  if (rci == MARPAESLIF_MATCH_OK) {
-    /* Got modifiers. Per def this is an sequence of ASCII characters. */
-    /* For a character class it is something like ":xxxxx" */
-#ifndef MARPAESLIF_NTRACE
-    /* Paranoid test */
-    if (MARPAESLIF_UNLIKELY(marpaESLIFValueResult.u.a.sizel <= 0)) {
-      MARPAESLIF_ERROR(marpaESLIFValuep->marpaESLIFp, "Match of character class modifiers returned empty size");
-      goto err;
-    }
-#endif
-    /* We want to maintain marpaESLIFValueResult lifetime, so need to unshallow the result of the INTERNAL method _marpaESLIFRecognizer_terminal_matcherb() if necessary */
-    if (marpaESLIFValueResult.u.a.shallowb) {
-      modifiers = (char *) malloc(marpaESLIFValueResult.u.a.sizel + 1);
-      if (MARPAESLIF_UNLIKELY(modifiers == NULL)) {
-        MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "malloc failure, %s", strerror(errno));
-        goto err;
-      }
-      memcpy(modifiers, marpaESLIFValueResult.u.a.p, marpaESLIFValueResult.u.a.sizel);
-      modifiers[marpaESLIFValueResult.u.a.sizel] = '\0';
-    } else {
-      modifiers = (char *) marpaESLIFValueResult.u.a.p;
-    }
-    sizel = marpaESLIFValueResult.u.a.sizel;
-  } else {
-    /* Because we use this value just below */
-    sizel = 0;
-  }
-
-  /* We leave the quotes because terminal_newp(), in case of a STRING, removes the surrounding characters. */
-  /* Remember that a quoted string is a regexp with enforced unicode mode. Therefore the match is guaranteed to */
-  /* have been done on a buffer always pre-converted to UTF-8, regardless of the original encoding of the input. */
-
-  /* Make that a single symbol structure */
-  terminalp = (marpaESLIF_bootstrap_terminal_t *) malloc(sizeof(marpaESLIF_bootstrap_terminal_t));
+  terminalp = _marpaESLIF_bootstrap_quotedstring_to_terminalp(userDatavp, marpaESLIFValuep, bytep, bytel, marpaESLIFValuep->marpaESLIFp->stringModifiersp);
   if (MARPAESLIF_UNLIKELY(terminalp == NULL)) {
-    MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "malloc failure, %s", strerror(errno));
     goto err;
-  }
-  terminalp->type = MARPAESLIF_BOOTSTRAP_TERMINAL_TYPE_NA;
-  terminalp->u.stringp = (marpaESLIF_bootstrap_utf_string_t *) malloc(sizeof(marpaESLIF_bootstrap_utf_string_t));
-  if (MARPAESLIF_UNLIKELY(terminalp->u.stringp == NULL)) {
-    MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "malloc failure, %s", strerror(errno));
-    goto err;
-  }
-  terminalp->type                 = MARPAESLIF_BOOTSTRAP_TERMINAL_TYPE_QUOTED_STRING;
-  terminalp->u.stringp->modifiers = modifiers;
-  terminalp->u.stringp->bytep     = bytep;
-  terminalp->u.stringp->bytel     = bytel;
-  modifiers = NULL; /* modifiers is in singleSymbolp */
-  bytep = NULL; /* bytep is in singleSymbolp */
-  if (sizel > 0) {
-    terminalp->u.stringp->bytel -= (sizel + 1);  /* ":xxxx" */
   }
 
   MARPAESLIF_BOOTSTRAP_SET_PTR(marpaESLIFValuep, resulti, MARPAESLIF_BOOTSTRAP_STACK_TYPE_TERMINAL, terminalp);
@@ -5199,10 +5198,6 @@ static short _marpaESLIF_bootstrap_G1_action_terminal_3b(void *userDatavp, marpa
   rcb = 0;
 
  done:
-  if (modifiers != NULL) {
-    free(modifiers);
-  }
-  marpaESLIFRecognizer_freev(marpaESLIFRecognizerp);
   return rcb;
 }
 
@@ -5232,6 +5227,62 @@ static short _marpaESLIF_bootstrap_G1_action_terminal_7b(void *userDatavp, marpa
 /*****************************************************************************/
 {
   return _marpaESLIF_bootstrap_G1_action_terminal_pseudob(userDatavp, marpaESLIFValuep, MARPAESLIF_BOOTSTRAP_TERMINAL_TYPE__EMPTY, resulti);
+}
+
+/*****************************************************************************/
+static short _marpaESLIF_bootstrap_G1_action_terminal_8b(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, int arg0i, int argni, int resulti, short nullableb)
+/*****************************************************************************/
+{
+  /* <terminal> ::= <regular expression> '->' <regular substitution> */
+  /* <regular expression> and <regular substitution> are lexemes. */
+  marpaESLIF_bootstrap_terminal_t *regexTerminalp        = NULL;
+  marpaESLIF_bootstrap_terminal_t *substitutionTerminalp = NULL;
+  void                            *bytep[2];
+  size_t                           bytel[2];
+  short                            rcb;
+
+  /* Cannot be nullable */
+  if (MARPAESLIF_UNLIKELY(nullableb)) {
+    MARPAESLIF_ERROR(marpaESLIFValuep->marpaESLIFp, "Nullable mode is not supported");
+    goto err;
+  }
+
+  MARPAESLIF_BOOTSTRAP_GET_ARRAY(marpaESLIFValuep, arg0i,     bytep[0], bytel[0]);
+  MARPAESLIF_BOOTSTRAP_GET_ARRAY(marpaESLIFValuep, arg0i + 2, bytep[1], bytel[1]);
+
+  regexTerminalp = _marpaESLIF_bootstrap_regex_to_terminalp(userDatavp, marpaESLIFValuep, bytep[0], bytel[0]);
+  if (MARPAESLIF_UNLIKELY(regexTerminalp == NULL)) {
+    goto err;
+  }
+
+  substitutionTerminalp = _marpaESLIF_bootstrap_quotedstring_to_terminalp(userDatavp, marpaESLIFValuep, bytep[1], bytel[1], marpaESLIFValuep->marpaESLIFp->substitutionModifiersp);
+  if (MARPAESLIF_UNLIKELY(substitutionTerminalp == NULL)) {
+    goto err;
+  }
+
+  /* We move substitution terminal into regex bootstrap terminal */
+  regexTerminalp->u.regularExpressionp->substitutionBytep     = substitutionTerminalp->u.stringp->bytep;
+  regexTerminalp->u.regularExpressionp->substitutionBytel     = substitutionTerminalp->u.stringp->bytel;
+  regexTerminalp->u.regularExpressionp->substitutionModifiers = substitutionTerminalp->u.stringp->modifiers;
+
+  substitutionTerminalp->u.stringp->bytep     = NULL;
+  substitutionTerminalp->u.stringp->bytel     = 0;
+  substitutionTerminalp->u.stringp->modifiers = NULL;
+  _marpaESLIF_bootstrap_terminal_freev(substitutionTerminalp);
+  substitutionTerminalp = NULL;
+
+  MARPAESLIF_BOOTSTRAP_SET_PTR(marpaESLIFValuep, resulti, MARPAESLIF_BOOTSTRAP_STACK_TYPE_TERMINAL, regexTerminalp);
+
+  rcb = 1;
+  goto done;
+
+ err:
+  _marpaESLIF_bootstrap_terminal_freev(regexTerminalp);
+  _marpaESLIF_bootstrap_terminal_freev(substitutionTerminalp);
+  rcb = 0;
+
+ done:
+ return rcb;
 }
 
 /*****************************************************************************/
@@ -7501,20 +7552,17 @@ static short _marpaESLIF_bootstrap_G1_action_namingb(void *userDatavp, marpaESLI
   MARPAESLIF_BOOTSTRAP_GET_ARRAY(marpaESLIFValuep, argni, bytep, bytel);
   /* It is a non-sense to have a null information */
   if (MARPAESLIF_UNLIKELY((bytep == NULL) || (bytel <= 0))) {
-    MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "_marpaESLIFValue_stack_getAndForgetb at indice %d returned {p,%ld}", argni, bytep, (unsigned long) bytel);
+    MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "_marpaESLIFValue_stack_getb at indice %d returned {p,%ld}", argni, bytep, (unsigned long) bytel);
     goto err;
   }
 
-  namingp = (marpaESLIF_bootstrap_utf_string_t *) malloc(sizeof(marpaESLIF_bootstrap_utf_string_t));
+  namingp = _marpaESLIF_bootstrap_utf_string_newp(marpaESLIFValuep->marpaESLIFp);
   if (MARPAESLIF_UNLIKELY(namingp == NULL)) {
-    MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "malloc failure, %s", strerror(errno));
     goto err;
   }
-  namingp->bytep     = NULL;
-  namingp->bytel     = bytel;
-  namingp->modifiers = NULL;
 
   /* Duplicate bytep */
+  namingp->bytel               = bytel;
   namingp->bytep     = malloc(bytel + 1);
   if (MARPAESLIF_UNLIKELY(namingp->bytep == NULL)) {
     MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "malloc failure, %s", strerror(errno));
@@ -7771,11 +7819,11 @@ static inline marpaESLIF_bootstrap_utf_string_t *_marpaESLIF_bootstrap_regex_to_
     sizel = 0;
   }
 
-  stringp = (marpaESLIF_bootstrap_utf_string_t *) malloc(sizeof(marpaESLIF_bootstrap_utf_string_t));
+  stringp = _marpaESLIF_bootstrap_utf_string_newp(marpaESLIFp);
   if (MARPAESLIF_UNLIKELY(stringp == NULL)) {
-    MARPAESLIF_ERRORF(marpaESLIFp, "malloc failure, %s", strerror(errno));
     goto err;
   }
+
   /* By definition a regular expression is a lexeme in this form: /xxxx/modifiers */
   /* we have already catched the modifiers. But we have to shift the UTF-8 buffer: */
   /* - We know per def that it is starting with the "/" ASCII character (one byte) */
@@ -7916,11 +7964,11 @@ static inline marpaESLIF_bootstrap_utf_string_t *_marpaESLIF_bootstrap_character
     sizel = 0;
   }
 
-  stringp = (marpaESLIF_bootstrap_utf_string_t *) malloc(sizeof(marpaESLIF_bootstrap_utf_string_t));
+  stringp = _marpaESLIF_bootstrap_utf_string_newp(marpaESLIFp);
   if (MARPAESLIF_UNLIKELY(stringp == NULL)) {
-    MARPAESLIF_ERRORF(marpaESLIFp, "malloc failure, %s", strerror(errno));
     goto err;
   }
+
   stringp->modifiers = modifiers;
   stringp->bytep     = dupp;
   stringp->bytel     = dupl;
@@ -8318,7 +8366,7 @@ static short _marpaESLIF_bootstrap_G1_action_luascript_statementb(void *userData
     MARPAESLIF_BOOTSTRAP_GET_ARRAY(marpaESLIFValuep, arg0i+2, luabytep, luabytel);
     /* It is a non-sense to not have valid information */
     if (MARPAESLIF_UNLIKELY((luabytep == NULL) || (luabytel <= 0))) {
-      MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "_marpaESLIFValue_stack_getAndForgetb at indice %d returned {%p,%ld}", arg0i+2, luabytep, (unsigned long) luabytel);
+      MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "_marpaESLIFValue_stack_getb at indice %d returned {%p,%ld}", arg0i+2, luabytep, (unsigned long) luabytel);
       goto err;
     }
 
@@ -9192,4 +9240,171 @@ static short marpaESLIFValueImport(marpaESLIFValue_t *marpaESLIFValuep, void *us
 
  done:
   return rcb;
+}
+
+/*****************************************************************************/
+static inline marpaESLIF_bootstrap_terminal_t *_marpaESLIF_bootstrap_quotedstring_to_terminalp(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, void *bytep, size_t bytel, marpaESLIF_terminal_t *modifiersp)
+/*****************************************************************************/
+{
+  marpaESLIF_bootstrap_terminal_t  *rcp                   = NULL;
+  marpaESLIFRecognizer_t           *marpaESLIFRecognizerp = NULL; /* Fake recognizer to use the internal regex */
+  char                             *modifiers             = NULL;
+  char                             *tmps;
+  char                             *stringdups;
+  marpaESLIFValueResult_t           marpaESLIFValueResult;
+  size_t                            modifiersl;
+  marpaESLIF_matcher_value_t        rci;
+  size_t                            matchedLengthl;
+
+  /* Duplicate bytep */
+  tmps = (char *) malloc(bytel + 1);
+  if (MARPAESLIF_UNLIKELY(tmps == NULL)) {
+    MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "malloc failure, %s", strerror(errno));
+    goto err;
+  }
+  memcpy(tmps, bytep, bytel);
+  tmps[bytel] = '\0';
+  stringdups = tmps;
+
+  /* Fake a recognizer. EOF flag will be set automatically in fake mode */
+  marpaESLIFRecognizerp = __marpaESLIFRecognizer_newp(marpaESLIFValuep->marpaESLIFp,
+                                                      NULL, /* grammarp */
+                                                      NULL, /* marpaESLIFRecognizerOptionp */
+                                                      0, /* discardb - no effect anway because we are in fake mode */
+                                                      1, /* noEventb - no effect anway because we are in fake mode */
+                                                      0, /* silentb */
+                                                      NULL, /* marpaESLIFRecognizerParentp */
+                                                      1, /* fakeb */
+                                                      0, /* wantedStartCompletionsi */
+                                                      1, /* A grammar is always transformed to valid UTF-8 before being parsed */
+                                                      0 /* isLexemeb */);
+  if (MARPAESLIF_UNLIKELY(marpaESLIFRecognizerp == NULL)) {
+    goto err;
+  }
+  if (MARPAESLIF_UNLIKELY(! _marpaESLIFRecognizer_terminal_matcherb(marpaESLIFRecognizerp,
+                                                                    marpaESLIFRecognizerp->marpaESLIF_streamp,
+                                                                    modifiersp,
+                                                                    stringdups,
+                                                                    bytel,
+                                                                    1, /* eofb */
+                                                                    &rci,
+                                                                    &marpaESLIFValueResult,
+                                                                    &matchedLengthl))) {
+    goto err;
+  }
+  if (rci == MARPAESLIF_MATCH_OK) {
+    /* Got modifiers. Per def this is an sequence of ASCII characters. */
+    /* For a character class it is something like ":xxxxx" */
+#ifndef MARPAESLIF_NTRACE
+    /* Paranoid test */
+    if (MARPAESLIF_UNLIKELY(marpaESLIFValueResult.u.a.sizel <= 0)) {
+      MARPAESLIF_ERROR(marpaESLIFValuep->marpaESLIFp, "Match of character class modifiers returned empty size");
+      goto err;
+    }
+#endif
+    /* We want to maintain marpaESLIFValueResult lifetime, so need to unshallow the result of the INTERNAL method _marpaESLIFRecognizer_terminal_matcherb() if necessary */
+    if (marpaESLIFValueResult.u.a.shallowb) {
+      modifiers = (char *) malloc(marpaESLIFValueResult.u.a.sizel + 1);
+      if (MARPAESLIF_UNLIKELY(modifiers == NULL)) {
+        MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "malloc failure, %s", strerror(errno));
+        goto err;
+      }
+      memcpy(modifiers, marpaESLIFValueResult.u.a.p, marpaESLIFValueResult.u.a.sizel);
+      modifiers[marpaESLIFValueResult.u.a.sizel] = '\0';
+    } else {
+      modifiers = (char *) marpaESLIFValueResult.u.a.p;
+    }
+    modifiersl = marpaESLIFValueResult.u.a.sizel;
+  } else {
+    /* Because we use this value just below */
+    modifiersl = 0;
+  }
+
+  /* We leave the quotes because terminal_newp(), in case of a STRING, removes the surrounding characters. */
+  /* Remember that a quoted string is a regexp with enforced unicode mode. Therefore the match is guaranteed to */
+  /* have been done on a buffer always pre-converted to UTF-8, regardless of the original encoding of the input. */
+
+  /* Make that a single symbol structure */
+  rcp = (marpaESLIF_bootstrap_terminal_t *) malloc(sizeof(marpaESLIF_bootstrap_terminal_t));
+  if (MARPAESLIF_UNLIKELY(rcp == NULL)) {
+    MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "malloc failure, %s", strerror(errno));
+    goto err;
+  }
+  rcp->type = MARPAESLIF_BOOTSTRAP_TERMINAL_TYPE_NA;
+  rcp->u.stringp = _marpaESLIF_bootstrap_utf_string_newp(marpaESLIFValuep->marpaESLIFp);
+  if (MARPAESLIF_UNLIKELY(rcp->u.stringp == NULL)) {
+    goto err;
+  }
+
+  rcp->type                 = MARPAESLIF_BOOTSTRAP_TERMINAL_TYPE_QUOTED_STRING;
+  rcp->u.stringp->modifiers = modifiers;
+  rcp->u.stringp->bytep     = stringdups;
+  rcp->u.stringp->bytel     = bytel;
+  modifiers = NULL; /* modifiers is in singleSymbolp */
+  stringdups = NULL; /* strings is in singleSymbolp */
+  if (modifiersl > 0) {
+    rcp->u.stringp->bytel -= (modifiersl + 1);  /* ":xxxx" */
+  }
+
+  goto done;
+
+ err:
+  _marpaESLIF_bootstrap_terminal_freev(rcp);
+  rcp = NULL;
+
+ done:
+  if (modifiers != NULL) {
+    free(modifiers);
+  }
+  marpaESLIFRecognizer_freev(marpaESLIFRecognizerp);
+  return rcp;
+}
+
+/*****************************************************************************/
+static inline marpaESLIF_bootstrap_terminal_t *_marpaESLIF_bootstrap_regex_to_terminalp(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, void *bytep, size_t bytel)
+/*****************************************************************************/
+{
+  marpaESLIF_bootstrap_terminal_t *rcp;
+
+  rcp = (marpaESLIF_bootstrap_terminal_t *) malloc(sizeof(marpaESLIF_bootstrap_terminal_t));
+  if (MARPAESLIF_UNLIKELY(rcp == NULL)) {
+    MARPAESLIF_ERRORF(marpaESLIFValuep->marpaESLIFp, "malloc failure, %s", strerror(errno));
+    goto err;
+  }
+  rcp->type                 = MARPAESLIF_BOOTSTRAP_TERMINAL_TYPE_NA;
+  rcp->u.regularExpressionp = _marpaESLIF_bootstrap_regex_to_stringb(marpaESLIFValuep->marpaESLIFp, bytep, bytel);
+  if (MARPAESLIF_UNLIKELY(rcp->u.regularExpressionp == NULL)) {
+    goto err;
+  }
+  rcp->type                 = MARPAESLIF_BOOTSTRAP_TERMINAL_TYPE_REGULAR_EXPRESSION;
+
+  goto done;
+
+ err:
+  _marpaESLIF_bootstrap_terminal_freev(rcp);
+  rcp = NULL;
+
+ done:
+ return rcp;
+}
+
+/*****************************************************************************/
+static inline marpaESLIF_bootstrap_utf_string_t *_marpaESLIF_bootstrap_utf_string_newp(marpaESLIF_t *marpaESLIFp)
+/*****************************************************************************/
+{
+  marpaESLIF_bootstrap_utf_string_t *rcp;
+
+  rcp = (marpaESLIF_bootstrap_utf_string_t *) malloc(sizeof(marpaESLIF_bootstrap_utf_string_t));
+  if (MARPAESLIF_UNLIKELY(rcp == NULL)) {
+    MARPAESLIF_ERRORF(marpaESLIFp, "malloc failure, %s", strerror(errno));
+  } else {
+    rcp->substitutionBytep     = NULL;
+    rcp->substitutionBytel     = 0;
+    rcp->substitutionModifiers = NULL;
+    rcp->modifiers             = NULL;
+    rcp->bytel                 = 0;
+    rcp->bytep                 = NULL;
+  }
+
+  return rcp;
 }

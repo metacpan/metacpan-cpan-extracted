@@ -101,8 +101,7 @@ subtest 'config illegal args' => sub {
 
 subtest 'config/session sequence' => sub {
 	plan tests => 8;
-	my $config = {net_module => 'Neo4j_Test::MockHTTP'};
-	lives_ok { $d = 0; $d = Neo4j::Driver->new($config) } 'new mock driver';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new->plugin('Neo4j_Test::MockHTTP') } 'new mock driver';
 	lives_ok { $d->basic_auth(user => 'pw') } 'basic_auth before session';
 	lives_ok { $d->config(auth => undef) } 'config before session';
 	lives_ok { $d->session(database => 'dummy') } 'first session';
@@ -322,16 +321,16 @@ subtest 'cypher params' => sub {
 	lives_ok { $r = 0; $r = $t->_prepare(@q); } 'prepare unfiltered';
 	is $r->{statement}, 'RETURN {a}', 'unfiltered';
 	# verify that filter flag is automatically cleared for Neo4j 2
-	my $config = {cypher_params => v2, net_module => 'Neo4j_Test::MockHTTP'};
+	my $config = {cypher_params => v2};
 	my $d;
-	lives_ok { $d = Neo4j::Driver->new($config) } 'Neo4j 4: set filter mock';
+	lives_ok { $d = Neo4j::Driver->new($config)->plugin('Neo4j_Test::MockHTTP') } 'Neo4j 4: set filter mock';
 	lives_and { ok !! $d->session(database => 'dummy')->{cypher_params_v2} } 'Neo4j 4: filter';
-	lives_ok { $d = Neo4j::Driver->new($config) } 'Neo4j 2: set filter mock';
+	lives_ok { $d = Neo4j::Driver->new($config)->plugin('Neo4j_Test::MockHTTP') } 'Neo4j 2: set filter mock';
 	$Neo4j_Test::MockHTTP::res[0]->{json}{neo4j_version} = '2.3.12';
 	$Neo4j_Test::MockHTTP::res[0]->{content} = undef;
 	lives_and { ok !  $d->session(database => 'dummy')->{cypher_params_v2} } 'Neo4j 2: no filter';
 	$d = Neo4j::Driver->new('http:');
-	lives_ok { $d = Neo4j::Driver->new($config) } 'Sim: set filter mock';
+	lives_ok { $d = Neo4j::Driver->new($config)->plugin('Neo4j_Test::MockHTTP') } 'Sim: set filter mock';
 	$Neo4j_Test::MockHTTP::res[0]->{json}{neo4j_version} = '0.0.0';
 	$Neo4j_Test::MockHTTP::res[0]->{content} = undef;
 	lives_and { ok !! $d->session(database => 'dummy')->{cypher_params_v2} } 'Sim (0.0.0): filter';
@@ -343,7 +342,7 @@ subtest 'cypher params' => sub {
 subtest 'session config' => sub {
 	plan tests => 6;
 	my $d = Neo4j::Driver->new('http:');
-	lives_ok { $d->config(net_module => 'Neo4j_Test::MockHTTP') } 'set mock';
+	lives_ok { $d->plugin('Neo4j_Test::MockHTTP') } 'set mock';
 	my %db = (database => 'foobar');
 	lives_and { like $d->session( %db)->{net}{endpoints}{new_commit}, qr/\bfoobar\b/ } 'session hash';
 	lives_and { like $d->session(\%db)->{net}{endpoints}{new_commit}, qr/\bfoobar\b/ } 'session hash ref';

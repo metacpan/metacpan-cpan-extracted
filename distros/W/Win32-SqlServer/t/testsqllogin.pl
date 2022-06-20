@@ -1,5 +1,5 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/testsqllogin.pl 14    19-07-15 23:05 Sommar $
+# $Header: /Perl/OlleDB/t/testsqllogin.pl 15    22-05-27 22:09 Sommar $
 #
 # This file is C<required> by all test scripts. It defines a sub that
 # connects to SQL Server, and changes current directory to the test
@@ -7,6 +7,11 @@
 # are written there.
 #
 # $History: testsqllogin.pl $
+# 
+# *****************  Version 15  *****************
+# User: Sommar       Date: 22-05-27   Time: 22:09
+# Updated in $/Perl/OlleDB/t
+# Default running with encryption off.
 # 
 # *****************  Version 14  *****************
 # User: Sommar       Date: 19-07-15   Time: 23:05
@@ -87,6 +92,9 @@
 sub testsqllogin
 {
    my ($use_sql_init, $autoconnect) = @_;
+
+   # Attempt to turn off encryption, to avoicd problems with MSOLEDBSQL19.
+   Win32::SqlServer::SetDefaultForEncryption('Optional');
 
    if (not defined $use_sql_init) {
       $use_sql_init = 1;

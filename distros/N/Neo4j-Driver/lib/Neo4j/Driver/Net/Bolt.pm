@@ -4,8 +4,8 @@ use warnings;
 use utf8;
 
 package Neo4j::Driver::Net::Bolt;
-# ABSTRACT: Networking delegate for Neo4j Bolt
-$Neo4j::Driver::Net::Bolt::VERSION = '0.30';
+# ABSTRACT: Network controller for Neo4j Bolt
+$Neo4j::Driver::Net::Bolt::VERSION = '0.31';
 
 # This package is not part of the public Neo4j::Driver API.
 

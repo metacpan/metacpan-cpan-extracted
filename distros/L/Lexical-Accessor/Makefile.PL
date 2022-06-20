@@ -22,7 +22,7 @@ my $meta = {
                         runtime   => {
                                        recommends => {
                                                        "Hash::FieldHash" => 0,
-                                                       "Sub::HandlesVia" => 0,
+                                                       "Sub::HandlesVia" => 0.025,
                                                        "Sub::Name"       => 0,
                                                        "Type::Utils"     => 0.026,
                                                      },
@@ -44,14 +44,16 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "Lexical::Accessor"    => { file => "lib/Lexical/Accessor.pm", version => 0.013 },
-                        "Sub::Accessor::Small" => { file => "lib/Sub/Accessor/Small.pm", version => 0.013 },
+                        "Lexical::Accessor" => { file => "lib/Lexical/Accessor.pm", version => 0.014 },
+                        "Sub::Accessor::Small" => { file => "lib/Sub/Accessor/Small.pm", version => 0.014 },
+                        "Sub::HandlesVia::Toolkit::SubAccessorSmall" => {
+                          file => "lib/Sub/HandlesVia/Toolkit/SubAccessorSmall.pm",
+                          version => 0.014,
+                        },
                       },
   "release_status" => "stable",
   "resources"      => {
-                        bugtracker   => {
-                                          web => "http://rt.cpan.org/Dist/Display.html?Queue=Lexical-Accessor",
-                                        },
+                        bugtracker   => { web => "https://github.com/tobyink/p5-lexical-accessor/issues" },
                         homepage     => "https://metacpan.org/release/Lexical-Accessor",
                         license      => ["http://dev.perl.org/licenses/"],
                         repository   => {
@@ -61,7 +63,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Lexical-Accessor/project",
                       },
-  "version"        => 0.013,
+  "version"        => 0.014,
   "x_contributors" => ["Lukas Atkinson (AMON) <amon\@cpan.org>"],
 };
 
@@ -69,6 +71,10 @@ my %dynamic_config;
 do {
 if ($] < 5.010000) {
 	$meta->{prereqs}{runtime}{requires}{'Hash::Util::FieldHash::Compat'} = 0;
+}
+
+if (eval { require Sub::HandlesVia; 1 }) {
+	$meta->{prereqs}{runtime}{requires}{'Sub::HandlesVia'} = '0.025';
 }
 
 };
@@ -142,28 +148,8 @@ else
 	}
 }
 
-sub FixMakefile
-{
-	return unless -d 'inc';
-	my $file = shift;
-	
-	local *MAKEFILE;
-	open MAKEFILE, "< $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	my $makefile = do { local $/; <MAKEFILE> };
-	close MAKEFILE or die $!;
-	
-	$makefile =~ s/\b(test_harness\(\$\(TEST_VERBOSE\), )/$1'inc', /;
-	$makefile =~ s/( -I\$\(INST_ARCHLIB\))/ -Iinc$1/g;
-	$makefile =~ s/( "-I\$\(INST_LIB\)")/ "-Iinc"$1/g;
-	$makefile =~ s/^(FULLPERL = .*)/$1 "-Iinc"/m;
-	$makefile =~ s/^(PERL = .*)/$1 "-Iinc"/m;
-	
-	open  MAKEFILE, "> $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	print MAKEFILE $makefile or die $!;
-	close MAKEFILE or die $!;
-}
 
 my $mm = WriteMakefile(%WriteMakefileArgs);
-FixMakefile($mm->{FIRST_MAKEFILE} || 'Makefile');
+
 exit(0);
 

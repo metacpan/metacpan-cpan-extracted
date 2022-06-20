@@ -4,7 +4,7 @@
       "hexonet <middleware@hexonet.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -59,6 +59,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v2.10.3",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "v2.10.4",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

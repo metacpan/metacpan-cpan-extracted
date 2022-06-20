@@ -1,0 +1,615 @@
+=head1 NAME
+
+Sub::HandlesVia::HandlerLibrary::Array - library of array-related methods
+
+=head1 SYNOPSIS
+
+  package My::Class {
+    use Moo;
+    use Sub::HandlesVia;
+    use Types::Standard 'ArrayRef';
+    has attr => (
+      is => 'rwp',
+      isa => ArrayRef,
+      handles_via => 'Array',
+      handles => {
+        'my_accessor' => 'accessor',
+        'my_all' => 'all',
+        'my_all_true' => 'all_true',
+        'my_any' => 'any',
+        'my_apply' => 'apply',
+        'my_clear' => 'clear',
+        'my_count' => 'count',
+        'my_delete' => 'delete',
+        'my_elements' => 'elements',
+        'my_first' => 'first',
+        'my_first_index' => 'first_index',
+        'my_flatten' => 'flatten',
+        'my_flatten_deep' => 'flatten_deep',
+        'my_for_each' => 'for_each',
+        'my_for_each_pair' => 'for_each_pair',
+        'my_get' => 'get',
+        'my_grep' => 'grep',
+        'my_head' => 'head',
+        'my_insert' => 'insert',
+        'my_is_empty' => 'is_empty',
+        'my_join' => 'join',
+        'my_map' => 'map',
+        'my_max' => 'max',
+        'my_maxstr' => 'maxstr',
+        'my_min' => 'min',
+        'my_minstr' => 'minstr',
+        'my_natatime' => 'natatime',
+        'my_not_all_true' => 'not_all_true',
+        'my_pairfirst' => 'pairfirst',
+        'my_pairgrep' => 'pairgrep',
+        'my_pairkeys' => 'pairkeys',
+        'my_pairmap' => 'pairmap',
+        'my_pairs' => 'pairs',
+        'my_pairvalues' => 'pairvalues',
+        'my_pick_random' => 'pick_random',
+        'my_pop' => 'pop',
+        'my_print' => 'print',
+        'my_product' => 'product',
+        'my_push' => 'push',
+        'my_reduce' => 'reduce',
+        'my_reductions' => 'reductions',
+        'my_reset' => 'reset',
+        'my_reverse' => 'reverse',
+        'my_sample' => 'sample',
+        'my_set' => 'set',
+        'my_shallow_clone' => 'shallow_clone',
+        'my_shift' => 'shift',
+        'my_shuffle' => 'shuffle',
+        'my_shuffle_in_place' => 'shuffle_in_place',
+        'my_sort' => 'sort',
+        'my_sort_in_place' => 'sort_in_place',
+        'my_splice' => 'splice',
+        'my_sum' => 'sum',
+        'my_tail' => 'tail',
+        'my_uniq' => 'uniq',
+        'my_uniq_in_place' => 'uniq_in_place',
+        'my_uniqnum' => 'uniqnum',
+        'my_uniqnum_in_place' => 'uniqnum_in_place',
+        'my_uniqstr' => 'uniqstr',
+        'my_uniqstr_in_place' => 'uniqstr_in_place',
+        'my_unshift' => 'unshift',
+      },
+    );
+  }
+
+=head1 DESCRIPTION
+
+This is a library of methods for L<Sub::HandlesVia>.
+
+=head1 DELEGATABLE METHODS
+
+=head2 C<< accessor( $index, $value? ) >>
+
+Arguments: B<< Int >>, B<< Optional[Any] >>.
+
+Acts like C<get> if given one argument, or C<set> if given two arguments.
+
+  my $object = My::Class->new( attr => [ 'foo', 'bar', 'baz' ] );
+  $object->my_accessor( 1, 'quux' );
+  say Dumper( $object->attr ); ## ==> [ 'foo', 'quux', 'baz' ]
+  say $object->my_accessor( 2 ); ## ==> 'baz'
+
+=head2 C<< all() >>
+
+All elements in the array, in list context.
+
+  my $object = My::Class->new( attr => [ 'foo', 'bar' ] );
+  my @list = $object->my_all;
+
+=head2 C<< all_true( $coderef ) >>
+
+Arguments: B<< CodeRef >>.
+
+Like C<< List::Util::all() >>.
+
+=head2 C<< any( $coderef ) >>
+
+Arguments: B<< CodeRef >>.
+
+Like C<< List::Util::any() >>.
+
+=head2 C<< apply( $coderef ) >>
+
+Arguments: B<< CodeRef >>.
+
+Executes the coderef (which should modify C<< $_ >>) against each element of the array; returns the resulting array in list context.
+
+=head2 C<< clear() >>
+
+Empties the array.
+
+  my $object = My::Class->new( attr => [ 'foo' ] );
+  $object->my_clear;
+  say Dumper( $object->attr ); ## ==> []
+
+=head2 C<< count() >>
+
+The number of elements in the referenced array.
+
+  my $object = My::Class->new( attr => [ 'foo', 'bar' ] );
+  say $object->my_count; ## ==> 2
+
+=head2 C<< delete( $index ) >>
+
+Arguments: B<< Int >>.
+
+Removes the indexed element from the array and returns it. Elements after it will be "moved up".
+
+=head2 C<< elements() >>
+
+All elements in the array, in list context.
+
+  my $object = My::Class->new( attr => [ 'foo', 'bar' ] );
+  my @list = $object->my_elements;
+
+=head2 C<< first( $coderef ) >>
+
+Arguments: B<< CodeRef >>.
+
+Like C<< List::Util::first() >>.
+
+=head2 C<< first_index( $coderef ) >>
+
+Arguments: B<< CodeRef >>.
+
+Like C<< List::MoreUtils::first_index() >>.
+
+=head2 C<< flatten() >>
+
+All elements in the array, in list context.
+
+=head2 C<< flatten_deep( $depth? ) >>
+
+Arguments: B<< Optional[Int] >>.
+
+Flattens the arrayref into a list, including any nested arrayrefs.
+
+=head2 C<< for_each( $coderef ) >>
+
+Arguments: B<< CodeRef >>.
+
+Chainable method which executes the coderef on each element of the array. The coderef will be passed two values: the element and its index.
+
+  my $object = My::Class->new( attr => [ 'foo', 'bar', 'baz' ] );
+  $object->my_for_each( sub { say "Item $_[1] is $_[0]." } );
+
+=head2 C<< for_each_pair( $coderef ) >>
+
+Arguments: B<< CodeRef >>.
+
+Chainable method which executes the coderef on each pair of elements in the array. The coderef will be passed the two elements.
+
+=head2 C<< get( $index ) >>
+
+Arguments: B<< Int >>.
+
+Returns a single element from the array by index.
+
+  my $object = My::Class->new( attr => [ 'foo', 'bar', 'baz' ] );
+  say $object->my_get(  0 ); ## ==> 'foo'
+  say $object->my_get(  1 ); ## ==> 'bar'
+  say $object->my_get( -1 ); ## ==> 'baz'
+
+=head2 C<< grep( $coderef ) >>
+
+Arguments: B<< CodeRef >>.
+
+Like C<grep> from L<perlfunc>.
+
+=head2 C<< head( $count ) >>
+
+Arguments: B<< Int >>.
+
+Returns the first C<< $count >> elements of the array in list context.
+
+=head2 C<< insert( $index, $value ) >>
+
+Arguments: B<< Int >>, B<< Any >>.
+
+Inserts a value into the array with the given index. Elements after it will be "moved down".
+
+  my $object = My::Class->new( attr => [ 'foo', 'bar', 'baz' ] );
+  $object->my_insert( 1, 'quux' );
+  say Dumper( $object->attr ); ## ==> [ 'foo', 'quux', 'bar', 'baz' ]
+
+=head2 C<< is_empty() >>
+
+Boolean indicating if the referenced array is empty.
+
+  my $object = My::Class->new( attr => [ 'foo', 'bar' ] );
+  say $object->my_is_empty; ## ==> false
+  $object->_set_attr( [] );
+  say $object->my_is_empty; ## ==> true
+
+=head2 C<< join( $with? ) >>
+
+Arguments: B<< Optional[Str] >>.
+
+Returns a string joining all the elements in the array; if C<< $with >> is omitted, defaults to a comma.
+
+  my $object = My::Class->new( attr => [ 'foo', 'bar', 'baz' ] );
+  say $object->my_join;        ## ==> 'foo,bar,baz'
+  say $object->my_join( '|' ); ## ==> 'foo|bar|baz'
+
+=head2 C<< map( $coderef ) >>
+
+Arguments: B<< CodeRef >>.
+
+Like C<map> from L<perlfunc>.
+
+=head2 C<< max() >>
+
+Like C<< List::Util::max() >>.
+
+=head2 C<< maxstr() >>
+
+Like C<< List::Util::maxstr() >>.
+
+=head2 C<< min() >>
+
+Like C<< List::Util::min() >>.
+
+=head2 C<< minstr() >>
+
+Like C<< List::Util::minstr() >>.
+
+=head2 C<< natatime( $n, $callback? ) >>
+
+Arguments: B<< Int >>, B<< Optional[CodeRef] >>.
+
+Given just a number, returns an iterator which reads that many elements from the array at a time. If also given a callback, calls the callback repeatedly with those values.
+
+=head2 C<< not_all_true( $coderef ) >>
+
+Arguments: B<< CodeRef >>.
+
+Like C<< List::Util::notall() >>.
+
+=head2 C<< pairfirst( $coderef ) >>
+
+Arguments: B<< CodeRef >>.
+
+Like C<< List::Util::pairfirst() >>.
+
+=head2 C<< pairgrep( $coderef ) >>
+
+Arguments: B<< CodeRef >>.
+
+Like C<< List::Util::pairgrep() >>.
+
+=head2 C<< pairkeys() >>
+
+Like C<< List::Util::pairkeys() >>.
+
+=head2 C<< pairmap( $coderef ) >>
+
+Arguments: B<< CodeRef >>.
+
+Like C<< List::Util::pairmap() >>.
+
+=head2 C<< pairs() >>
+
+Like C<< List::Util::pairs() >>.
+
+=head2 C<< pairvalues() >>
+
+Like C<< List::Util::pairvalues() >>.
+
+=head2 C<< pick_random( $count ) >>
+
+Arguments: B<< Optional[Int] >>.
+
+If no C<< $count >> is given, returns one element of the array at random. If C<< $count >> is given, creates a new array with that many random elements from the original array (or fewer if the original array is not long enough) and returns that as an arrayref or list depending on context
+
+=head2 C<< pop() >>
+
+Removes the last element from the array and returns it.
+
+  my $object = My::Class->new( attr => [ 'foo', 'bar', 'baz' ] );
+  say $object->my_pop; ## ==> 'baz'
+  say $object->my_pop; ## ==> 'bar'
+  say Dumper( $object->attr ); ## ==> [ 'foo' ]
+
+=head2 C<< print( $fh?, $with? ) >>
+
+Arguments: B<< Optional[FileHandle] >>, B<< Optional[Str] >>.
+
+Prints a string joining all the elements in the array; if C<< $fh >> is omitted, defaults to STDOUT; if C<< $with >> is omitted, defaults to a comma.
+
+=head2 C<< product() >>
+
+Like C<< List::Util::product() >>.
+
+=head2 C<< push( @values ) >>
+
+Adds elements to the end of the array.
+
+  my $object = My::Class->new( attr => [ 'foo' ] );
+  $object->my_push( 'bar', 'baz' );
+  say Dumper( $object->attr ); ## ==> [ 'foo', 'bar', 'baz' ]
+
+=head2 C<< reduce( $coderef ) >>
+
+Arguments: B<< CodeRef >>.
+
+Like C<< List::Util::reduce() >>.
+
+=head2 C<< reductions( $coderef ) >>
+
+Arguments: B<< CodeRef >>.
+
+Like C<< List::Util::reductions() >>.
+
+=head2 C<< reset() >>
+
+Resets the attribute to its default value, or an empty arrayref if it has no default.
+
+  my $object = My::Class->new( attr => [ 'foo', 'bar', 'baz' ] );
+  $object->my_reset;
+  say Dumper( $object->attr ); ## ==> []
+
+=head2 C<< reverse() >>
+
+Returns the reversed array in list context.
+
+=head2 C<< sample( $count ) >>
+
+Arguments: B<< Int >>.
+
+Like C<< List::Util::sample() >>.
+
+=head2 C<< set( $index, $value ) >>
+
+Arguments: B<< Int >>, B<< Any >>.
+
+Sets the element with the given index to the supplied value.
+
+  my $object = My::Class->new( attr => [ 'foo', 'bar', 'baz' ] );
+  $object->my_set( 1, 'quux' );
+  say Dumper( $object->attr ); ## ==> [ 'foo', 'quux', 'baz' ]
+
+=head2 C<< shallow_clone() >>
+
+Creates a new arrayref with the same elements as the original.
+
+=head2 C<< shift() >>
+
+Removes an element from the start of the array and returns it.
+
+  my $object = My::Class->new( attr => [ 'foo', 'bar', 'baz' ] );
+  say $object->my_shift; ## ==> 'foo'
+  say $object->my_shift; ## ==> 'bar'
+  say Dumper( $object->attr ); ## ==> [ 'baz' ]
+
+=head2 C<< shuffle() >>
+
+Returns the array in a random order; can be called in list context or scalar context and will return an arrayref in the latter case.
+
+=head2 C<< shuffle_in_place() >>
+
+Rearranges the array in a random order, and changes the attribute to point to the new order.
+
+=head2 C<< sort( $coderef? ) >>
+
+Arguments: B<< Optional[CodeRef] >>.
+
+Like C<sort> from L<perlfunc>.
+
+=head2 C<< sort_in_place( $coderef? ) >>
+
+Arguments: B<< Optional[CodeRef] >>.
+
+Like C<sort> from L<perlfunc>, but changes the attribute to point to the newly sorted array.
+
+=head2 C<< splice( $index, $length, @values ) >>
+
+Like C<splice> from L<perlfunc>.
+
+=head2 C<< sum() >>
+
+Like C<< List::Util::sum0() >>.
+
+=head2 C<< tail( $count ) >>
+
+Arguments: B<< Int >>.
+
+Returns the last C<< $count >> elements of the array in list context.
+
+=head2 C<< uniq() >>
+
+Returns the array filtered to remove duplicates; can be called in list context or scalar context and will return an arrayref in the latter case.
+
+=head2 C<< uniq_in_place() >>
+
+Filters the array to remove duplicates, and changes the attribute to point to the filtered array.
+
+=head2 C<< uniqnum() >>
+
+Returns the array filtered to remove duplicates numerically; can be called in list context or scalar context and will return an arrayref in the latter case.
+
+=head2 C<< uniqnum_in_place() >>
+
+Filters the array to remove duplicates numerically, and changes the attribute to point to the filtered array.
+
+=head2 C<< uniqstr() >>
+
+Returns the array filtered to remove duplicates stringwise; can be called in list context or scalar context and will return an arrayref in the latter case.
+
+=head2 C<< uniqstr_in_place() >>
+
+Filters the array to remove duplicates stringwise, and changes the attribute to point to the filtered array.
+
+=head2 C<< unshift( @values ) >>
+
+Adds an element to the start of the array.
+
+  my $object = My::Class->new( attr => [ 'foo' ] );
+  $object->my_unshift( 'bar', 'baz' );
+  say Dumper( $object->attr ); ## ==> [ 'bar', 'baz', 'foo' ]
+
+=head1 EXTENDED EXAMPLES
+
+=head2 Using for_each
+
+  use strict;
+  use warnings;
+  
+  package My::Plugin {
+    use Moo::Role;
+    sub initialize {}
+    sub finalize {}
+  }
+  
+  package My::Processor {
+    use Moo;
+    use Sub::HandlesVia;
+    use Types::Standard qw( ArrayRef ConsumerOf );
+    
+    has plugins => (
+      is => 'ro',
+      isa => ArrayRef[ ConsumerOf['My::Plugin'] ],
+      handles_via => 'Array',
+      handles => {
+        add_plugin => 'push',
+        plugin_do => 'for_each',
+      },
+      default => sub { [] },
+    );
+    
+    sub _do_stuff {
+      return;
+    }
+    
+    sub run_process {
+      my ( $self, @args ) = @_;
+      $self->plugin_do( sub {
+        my $plugin = shift;
+        $plugin->initialize( $self, @args );
+      } );
+      $self->_do_stuff( @args );
+      $self->plugin_do( sub {
+        my $plugin = shift;
+        $plugin->finalize( $self, @args );
+      } );
+    }
+  }
+  
+  my $p = My::Processor->new();
+  
+  package My::Plugin::Noisy {
+    use Moo; with 'My::Plugin';
+    sub initialize {
+      my ( $self, $processor, @args ) = @_;
+      say "initialize @args"; ## ==> 'initialize 1 2 3'
+    }
+    sub finalize {
+      my ( $self, $processor, @args ) = @_;
+      say "finalize @args"; ## ==> 'finalize 1 2 3'
+    }
+  }
+  
+  $p->add_plugin( My::Plugin::Noisy->new );
+  
+  $p->run_process( 1, 2, 3 );
+
+=head2 Job queue using push and shift
+
+  use strict;
+  use warnings;
+  use Try::Tiny;
+  
+  package My::JobQueue {
+    use Moo;
+    use Sub::HandlesVia;
+    use Types::Standard qw( Bool ArrayRef CodeRef HasMethods is_Object );
+    use Try::Tiny;
+    
+    has auto_requeue => (
+      is => 'ro',
+      isa => Bool,
+      default => 0,
+    );
+    
+    has jobs => (
+      is => 'ro',
+      isa => ArrayRef[ CodeRef | HasMethods['run'] ],
+      handles_via => 'Array',
+      handles => {
+        add_job => 'push',
+        _get_job => 'shift',
+        is_empty => 'is_empty',
+      },
+      default => sub { [] },
+    );
+    
+    sub _handle_failed_job {
+      my ( $self, $job ) = @_;
+      $self->add_job( $job ) if $self->auto_requeue;
+    }
+    
+    sub run_jobs {
+      my $self = shift;
+      while ( not $self->is_empty ) {
+        my $job = $self->_get_job;
+        try {
+          is_Object($job) ? $job->run() : $job->();
+        }
+        catch {
+          $self->_handle_failed_job( $job );
+        };
+      }
+    }
+  }
+  
+  my $q = My::JobQueue->new();
+  
+  my $str = '';
+  $q->add_job( sub { $str .= 'A' } );
+  $q->add_job( sub { $str .= 'B' } );
+  $q->add_job( sub { $str .= 'C' } );
+  
+  $q->run_jobs;
+  
+  say $str; ## ==> 'ABC'
+  
+  # Attempt to push invalid value on the queue
+  #
+  try {
+    $q->add_job( "jobs cannot be strings" );
+  }
+  catch {
+    say $q->is_empty;  ## ==> true
+  };
+
+=head1 BUGS
+
+Please report any bugs to
+L<https://github.com/tobyink/p5-sub-handlesvia/issues>.
+
+=head1 SEE ALSO
+
+L<Sub::HandlesVia>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2020, 2022 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -226,6 +226,7 @@ sub _dircopy {
         # Copy only the version of pcre2 we use
         #
         next if $_ eq 'pcre2-10.23';
+        next if $_ eq 'pcre2-10.33';
         #
         # Do not copy known garbage
         #

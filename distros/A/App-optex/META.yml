@@ -29,7 +29,7 @@ no_index:
 provides:
   App::optex:
     file: lib/App/optex.pm
-    version: v0.5.2
+    version: v0.5.3
   App::optex::Tmpfile:
     file: lib/App/optex/Tmpfile.pm
   App::optex::debug:
@@ -56,9 +56,9 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/optex/issues
   homepage: https://github.com/kaz-utashiro/optex
   repository: git://github.com/kaz-utashiro/optex.git
-version: v0.5.2
+version: v0.5.3
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

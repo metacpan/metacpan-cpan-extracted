@@ -292,6 +292,7 @@ lib/Chart/Composite.pm
 lib/Chart/Constants.pm
 lib/Chart/Direction.pm
 lib/Chart/ErrorBars.pm
+lib/Chart/Font.pm
 lib/Chart/HorizontalBars.pm
 lib/Chart/Lines.pm
 lib/Chart/LinesPoints.pm

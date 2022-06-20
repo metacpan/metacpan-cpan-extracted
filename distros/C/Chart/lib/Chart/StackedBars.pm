@@ -2,7 +2,7 @@ use v5.12;
 
 package Chart::StackedBars;
 our @ISA     = qw(Chart::Base);
-our $VERSION = 'v2.402.1';
+our $VERSION = 'v2.402.3';
 
 use Chart::Base;
 use GD;

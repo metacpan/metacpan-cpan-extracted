@@ -52,4 +52,8 @@ $bleh = Local::Bleh->new;
 is_deeply($bleh->nums, [3..5], 'delegated method with chaining worked');
 is_deeply(\@r, [$bleh], '... and returned correct value');
 
+#use B::Deparse;
+#my $bdp = B::Deparse->new;
+#diag explain( $bdp->coderef2text( \&Local::Bleh::splice_nums_tap ) );
+
 done_testing;

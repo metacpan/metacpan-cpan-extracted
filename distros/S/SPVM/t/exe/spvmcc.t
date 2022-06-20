@@ -26,6 +26,14 @@ rmtree "$build_dir/work";
 {
   mkpath $exe_dir;
 
+  # --print-dependent-resources, -p
+  for my $option ('--print-dependent-resources', '-p'){
+    my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc -I t/exe/lib/SPVM -I t/default/lib/SPVM $option MyExe);
+    my @lines = `$spvmcc_cmd`;
+    is($lines[0], '{class_name:"TestCase::NativeAPI2",resource_class_name:"TestCase::Resource::Mylib1::V1_0_0",resource_mode:"mode1",resource_args:["args1","args2"]}' . "\n");
+    is($lines[1], '{class_name:"TestCase::NativeAPI2",resource_class_name:"TestCase::Resource::Mylib2::V1_0_0",resource_mode:undefined,resource_args:[]}' . "\n");
+  }
+  
   # Basic
   {
     my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc -B $build_dir -I t/exe/lib/SPVM -o $exe_dir/myexe -c t/exe/myexe.config MyExe);
@@ -81,11 +89,11 @@ rmtree "$build_dir/work";
 
   # no_precompile
   {
-    my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc -f -B $build_dir -I t/exe/lib/SPVM -o $exe_dir/myexe_precompile -c t/exe/myexe.no_precompile.config MyExe);
+    my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc -f -B $build_dir -I t/exe/lib/SPVM -o $exe_dir/myexe_no_precompile -c t/exe/myexe.no_precompile.config MyExe);
     system($spvmcc_cmd) == 0
       or die "Can't execute spvmcc command $spvmcc_cmd:$!";
 
-    my $execute_cmd = File::Spec->catfile(@build_dir_parts, qw/work exe myexe_precompile/);
+    my $execute_cmd = File::Spec->catfile(@build_dir_parts, qw/work exe myexe_no_precompile/);
     my $execute_cmd_with_args = "$execute_cmd args1 args2";
     system($execute_cmd_with_args) == 0
       or die "Can't execute command:$execute_cmd_with_args:$!";
@@ -103,11 +111,11 @@ rmtree "$build_dir/work";
 
   # no_precompile, no_compiler_api
   {
-    my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc -f -B $build_dir -I t/exe/lib/SPVM -o $exe_dir/myexe_no_compiler_api -c t/exe/myexe.no_precompile_no_compiler_api.config MyExe);
+    my $spvmcc_cmd = qq($^X -Mblib blib/script/spvmcc -f -B $build_dir -I t/exe/lib/SPVM -o $exe_dir/myexe_no_precompile_no_compiler_api -c t/exe/myexe.no_precompile_no_compiler_api.config MyExe);
     system($spvmcc_cmd) == 0
       or die "Can't execute spvmcc command $spvmcc_cmd:$!";
 
-    my $execute_cmd = File::Spec->catfile(@build_dir_parts, qw/work exe myexe_no_compiler_api/);
+    my $execute_cmd = File::Spec->catfile(@build_dir_parts, qw/work exe myexe_no_precompile_no_compiler_api/);
     my $execute_cmd_with_args = "$execute_cmd args1 args2";
     system($execute_cmd_with_args) == 0
       or die "Can't execute command:$execute_cmd_with_args:$!";
@@ -122,6 +130,7 @@ rmtree "$build_dir/work";
     my $myexe_bootstarp_source_content = SPVM::Builder::Util::slurp_binary($myexe_bootstarp_source_file);
     unlike($myexe_bootstarp_source_content, qr/SPVMPRECOMPILE/);
   }
+
 }
 
 # SPVM script
@@ -129,7 +138,7 @@ rmtree "$build_dir/work";
   $ENV{SPVM_BUILD_DIR} = $build_dir;
   
   my $spvm_script = File::Spec->catfile(qw/t exe myexe.pl/);
-  my $execute_cmd = qq($^X -Mblib -I t/exe/lib $spvm_script);
+  my $execute_cmd = qq($^X -Mblib -I t/exe/lib -I t/default/lib $spvm_script);
   my $execute_cmd_with_args = "$execute_cmd args1 args2";
   system($execute_cmd_with_args) == 0
     or die "Can't execute SPVM script: $execute_cmd_with_args:$!";

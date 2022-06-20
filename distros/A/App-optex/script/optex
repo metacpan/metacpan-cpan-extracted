@@ -68,6 +68,11 @@ my $bin_dir = $ENV{$env_BINDIR} || "$config_dir/bin";
 my $config_file = $ENV{$env_CONFIG} || "$config_dir/config.toml";
 
 ##
+## decode @ARGV
+##
+@ARGV = map { utf8::is_utf8($_) ? $_ : decode('utf8', $_) } @ARGV;
+
+##
 ## load config file
 ##
 my $config = sub {
@@ -444,10 +449,10 @@ sub show_modules {
 
 =head1 DESCRIPTION
 
-B<optex> is a general purpose option handling wrapper utilizing Perl
-module L<Getopt::EX>.  It enables user to define their own option
-aliases for any commands on the system, and provide module style
-extendible capability.
+B<optex> is a general purpose command option handling wrapper
+utilizing Perl module L<Getopt::EX>.  It enables user to define their
+own option aliases for any commands on the system, and provide module
+style extensibility.
 
 Target command is given as an argument:
 
@@ -865,6 +870,9 @@ Override default symbolic link directory F<OPTEX_ROOT/bin>.
 
 L<Getopt::EX>, L<Getopt::EX::Loader>, L<Getopt::EX::Module>
 
+L<App::optex::textconv>
+
+L<App::optex::xform>
 
 =head1 AUTHOR
 
@@ -883,7 +891,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2017-2021 Kazumasa Utashiro
+Copyright 2017-2022 Kazumasa Utashiro
 
 
 =cut

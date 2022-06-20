@@ -3,7 +3,7 @@ use v5.12;
 # check, convert and measure color values
 
 package Chart::Color::Value;
-our $VERSION = 'v2.402.1';
+our $VERSION = 'v2.402.3';
 use Carp;
 use POSIX ();
 
@@ -81,6 +81,7 @@ sub distance_rgb { # \@rgb, \@rgb --> $d
 sub distance_hsl { # \@hsl, \@hsl --> $d
     return carp  "need two triplets of hsl values in 2 arrays to compute hsl distance " if @_ != 2;
     my @delta_hsl = difference_hsl( $_[0], $_[1] );
+    return unless @delta_hsl == 3;
     sqrt($delta_hsl[0] ** 2 + $delta_hsl[1] ** 2 + $delta_hsl[2] ** 2); 
 }
 

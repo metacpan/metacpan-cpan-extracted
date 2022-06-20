@@ -1,4 +1,5 @@
 Build.PL
+CONTRIBUTING.md
 Changes
 LICENSE
 MANIFEST
@@ -13,4 +14,5 @@ t/2017.t
 t/2018.t
 t/2021.t
 t/2022.t
+t/2023.t
 t/simple.t

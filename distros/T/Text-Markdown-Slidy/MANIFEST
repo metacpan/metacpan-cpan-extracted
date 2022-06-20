@@ -5,6 +5,7 @@ META.json
 README.md
 cpanfile
 lib/Text/Markdown/Slidy.pm
+minil.toml
 t/00_compile.t
 t/01_basic.t
 META.yml

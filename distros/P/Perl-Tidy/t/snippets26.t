@@ -4,6 +4,11 @@
 #1 bal.bal2
 #2 bal.def
 #3 lpxl.lpxl6
+#4 c133.c133
+#5 c133.def
+#6 git93.def
+#7 git93.git93
+#8 c139.def
 
 # To locate test #13 you can search for its name or the string '#13'
 
@@ -22,7 +27,11 @@ BEGIN {
     ###########################################
     $rparams = {
         'bal2'  => "-bal=2",
+        'c133'  => "-boc",
         'def'   => "",
+        'git93' => <<'----------',
+-vxl='q'
+----------
         'lpxl6' => <<'----------',
 # equivalent to -lpxl='{ [ F(2'
 -lp -lpil='f(2'
@@ -40,6 +49,76 @@ BEGIN {
   L2:
   L3: return;
 };
+----------
+
+        'c133' => <<'----------',
+# this will make 1 line unless -boc is used
+return (
+    $x * cos($a) - $y * sin($a),
+    $x * sin($a) + $y * cos($a)
+);
+
+# broken list - issue c133
+return (
+    $x * cos($a) - $y * sin($a),
+    $x * sin($a) + $y * cos($a)
+
+);
+
+# no parens
+return
+  $x * cos($a) - $y * sin($a),
+  $x * sin($a) + $y * cos($a);
+----------
+
+        'c139' => <<'----------',
+# The '&' has trailing spaces
+@l = &    
+_  
+( -49, -71 );
+
+# This '$' has trailing spaces
+my $    
+b = 40;
+
+# this arrow has trailing spaces
+$r = $c->         
+sql_set_env_attr( $evh, $SQL_ATTR_ODBC_VERSION, $SQL_OV_ODBC2, 0 );
+
+# spaces and blank line
+@l = &    
+
+_  
+( -49, -71 );
+
+# spaces and blank line
+$r = $c->         
+
+sql_set_env_attr( $evh, $SQL_ATTR_ODBC_VERSION, $SQL_OV_ODBC2, 0 );
+----------
+
+        'git93' => <<'----------',
+use Cwd qw[cwd];
+use Carp qw(carp);
+use IPC::Cmd qw{can_run run QUOTE};
+use File::Path qw/mkpath/;
+use File::Temp qw[tempdir];
+use Params::Check qw<check>;
+use Module::Load::Conditional qw#can_load#;
+use Locale::Maketext::Simple Style => 'gettext';    # does not align
+
+# do not align on these 'q' token types - not use statements...
+my $gene_color_sets = [
+    [ qw( blue blue blue blue ) => 'blue' ],
+    [ qw( brown blue blue blue ) => 'brown' ],
+    [ qw( brown brown green green ) => 'brown' ],
+];
+
+sub quux : PluginKeyword { 'quux' }
+sub qaax : PluginKeyword(qiix) { die "unimplemented" }
+
+use vars qw($curdir);
+no strict qw(vars);
 ----------
 
         'lpxl' => <<'----------',
@@ -199,6 +278,132 @@ $behaviour = {
     mouse => { nibble => "kibble" },
 };
 #3...........
+        },
+
+        'c133.c133' => {
+            source => "c133",
+            params => "c133",
+            expect => <<'#4...........',
+# this will make 1 line unless -boc is used
+return (
+    $x * cos($a) - $y * sin($a),
+    $x * sin($a) + $y * cos($a)
+);
+
+# broken list - issue c133
+return (
+    $x * cos($a) - $y * sin($a),
+    $x * sin($a) + $y * cos($a)
+
+);
+
+# no parens
+return
+  $x * cos($a) - $y * sin($a),
+  $x * sin($a) + $y * cos($a);
+#4...........
+        },
+
+        'c133.def' => {
+            source => "c133",
+            params => "def",
+            expect => <<'#5...........',
+# this will make 1 line unless -boc is used
+return ( $x * cos($a) - $y * sin($a), $x * sin($a) + $y * cos($a) );
+
+# broken list - issue c133
+return (
+    $x * cos($a) - $y * sin($a),
+    $x * sin($a) + $y * cos($a)
+
+);
+
+# no parens
+return
+  $x * cos($a) - $y * sin($a),
+  $x * sin($a) + $y * cos($a);
+#5...........
+        },
+
+        'git93.def' => {
+            source => "git93",
+            params => "def",
+            expect => <<'#6...........',
+use Cwd                       qw[cwd];
+use Carp                      qw(carp);
+use IPC::Cmd                  qw{can_run run QUOTE};
+use File::Path                qw/mkpath/;
+use File::Temp                qw[tempdir];
+use Params::Check             qw<check>;
+use Module::Load::Conditional qw#can_load#;
+use Locale::Maketext::Simple Style => 'gettext';    # does not align
+
+# do not align on these 'q' token types - not use statements...
+my $gene_color_sets = [
+    [ qw( blue blue blue blue )     => 'blue' ],
+    [ qw( brown blue blue blue )    => 'brown' ],
+    [ qw( brown brown green green ) => 'brown' ],
+];
+
+sub quux : PluginKeyword       { 'quux' }
+sub qaax : PluginKeyword(qiix) { die "unimplemented" }
+
+use vars qw($curdir);
+no strict qw(vars);
+#6...........
+        },
+
+        'git93.git93' => {
+            source => "git93",
+            params => "git93",
+            expect => <<'#7...........',
+use Cwd qw[cwd];
+use Carp qw(carp);
+use IPC::Cmd qw{can_run run QUOTE};
+use File::Path qw/mkpath/;
+use File::Temp qw[tempdir];
+use Params::Check qw<check>;
+use Module::Load::Conditional qw#can_load#;
+use Locale::Maketext::Simple Style => 'gettext';    # does not align
+
+# do not align on these 'q' token types - not use statements...
+my $gene_color_sets = [
+    [ qw( blue blue blue blue )     => 'blue' ],
+    [ qw( brown blue blue blue )    => 'brown' ],
+    [ qw( brown brown green green ) => 'brown' ],
+];
+
+sub quux : PluginKeyword       { 'quux' }
+sub qaax : PluginKeyword(qiix) { die "unimplemented" }
+
+use vars qw($curdir);
+no strict qw(vars);
+#7...........
+        },
+
+        'c139.def' => {
+            source => "c139",
+            params => "def",
+            expect => <<'#8...........',
+# The '&' has trailing spaces
+@l = &_( -49, -71 );
+
+# This '$' has trailing spaces
+my $b = 40;
+
+# this arrow has trailing spaces
+$r = $c->sql_set_env_attr( $evh, $SQL_ATTR_ODBC_VERSION, $SQL_OV_ODBC2, 0 );
+
+# spaces and blank line
+@l = &
+
+  _( -49, -71 );
+
+# spaces and blank line
+$r = $c->
+
+  sql_set_env_attr( $evh, $SQL_ATTR_ODBC_VERSION, $SQL_OV_ODBC2, 0 );
+#8...........
         },
     };
 

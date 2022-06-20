@@ -59,6 +59,7 @@ my @files = (
     't/is-ignored.t',
     't/lib/TestHelper.pm',
     't/lookalike-words.t',
+    't/memoize.t',
     't/meta.t',
     't/method.t',
     't/missing-semicolon-in-import.t',

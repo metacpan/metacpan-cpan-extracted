@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.0.10] - 2022-06-14
+
+### Fixed
+
+- Fixed to the way that we interact with the underlying
+  SVG object (thanks choroba)
+
 ## [0.0.9] - 2020-12-22
 
 ### Fixed

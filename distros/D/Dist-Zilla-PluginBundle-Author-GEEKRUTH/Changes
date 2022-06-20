@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-PluginBundle-GEEKRUTH
 
+1.0201 2022-06-16T08:48:22-04:00 America/New_York
+ [STATISTICS]
+ - code churn: 1 file changed, 7 insertions(+), 1 deletion(-)
+
 1.0200 2022-01-23T20:58:14-05:00 America/New_York
  [ENHANCEMENTS]
  - Add Role PluginRemover.

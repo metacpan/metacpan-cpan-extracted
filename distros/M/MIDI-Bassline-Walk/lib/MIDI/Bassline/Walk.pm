@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate walking basslines
 
-our $VERSION = '0.0311';
+our $VERSION = '0.0312';
 
 use Data::Dumper::Compact qw(ddc);
 use Carp qw(croak);
@@ -17,31 +17,33 @@ use Set::Array;
 use strictures 2;
 use namespace::clean;
 
+with('Music::PitchNum');
+
 
 has guitar => (
-    is  => 'ro',
-    isa => sub { croak 'not a boolean' unless $_[0] =~ /^[01]$/ },
+    is      => 'ro',
+    isa     => sub { croak 'not a boolean' unless $_[0] =~ /^[01]$/ },
     default => sub { 0 },
 );
 
 
 has intervals => (
-    is  => 'ro',
-    isa => sub { croak 'not an array reference' unless ref $_[0] eq 'ARRAY' },
+    is      => 'ro',
+    isa     => sub { croak 'not an array reference' unless ref $_[0] eq 'ARRAY' },
     default => sub { [qw(-3 -2 -1 1 2 3)] },
 );
 
 
 has octave => (
-    is  => 'ro',
-    isa => sub { croak 'not a positive integer' unless $_[0] =~ /^\d+$/ },
+    is      => 'ro',
+    isa     => sub { croak 'not a positive integer' unless $_[0] =~ /^\d+$/ },
     default => sub { 2 },
 );
 
 
 has scale => (
-    is  => 'ro',
-    isa => sub { croak 'not a code reference' unless ref $_[0] eq 'CODE' },
+    is      => 'ro',
+    isa     => sub { croak 'not a code reference' unless ref $_[0] eq 'CODE' },
     default => sub { sub { $_[0] =~ /^[A-G][#b]?m/ ? 'minor' : 'major' } },
 );
 
@@ -54,8 +56,8 @@ has tonic => (
 
 
 has verbose => (
-    is  => 'ro',
-    isa => sub { croak 'not a boolean' unless $_[0] =~ /^[01]$/ },
+    is      => 'ro',
+    isa     => sub { croak 'not a boolean' unless $_[0] =~ /^[01]$/ },
     default => sub { 0 },
 );
 
@@ -64,7 +66,7 @@ sub generate {
     my ($self, $chord, $num, $next_chord) = @_;
 
     $chord ||= 'C';
-    $num ||= 4;
+    $num   ||= 4;
 
     print "CHORD: $chord\n" if $self->verbose;
     print "NEXT: $next_chord\n" if $self->verbose && $next_chord;
@@ -88,7 +90,7 @@ sub generate {
 
     my $cn = Music::Chord::Note->new;
 
-    my @notes = map { Music::Note->new($_, 'ISO')->format('midinum') }
+    my @notes = map { $self->pitchnum($_) }
         $cn->chord_with_octave($chord, $self->octave);
 
     my @pitches = $scale ? get_scale_MIDI($chord_note, $self->octave, $scale) : ();
@@ -99,7 +101,7 @@ sub generate {
         if (not any { $_ == $n } @pitches) {
             push @pitches, $n;
             if ($self->verbose) {
-                my $x = Music::Note->new($n, 'midinum')->format('ISO');
+                my $x = $self->pitchname($n);
                 print "\tADD: $x\n";
             }
         }
@@ -113,6 +115,7 @@ sub generate {
     for my $p (@pitches) {
         my $n = Music::Note->new($p, 'midinum');
         my $x = $n->format('isobase');
+        # TODO Why?
         if ($x =~ /#/) {
             $n->en_eq('flat');
         }
@@ -148,7 +151,7 @@ sub generate {
     # Make sure there are no duplicate pitches
     @fixed = uniq @fixed;
 
-    _verbose_notes('NOTES', @fixed) if $self->verbose;
+    $self->_verbose_notes('NOTES', @fixed) if $self->verbose;
 
     my $voice = Music::VoiceGen->new(
         pitches   => \@fixed,
@@ -175,7 +178,7 @@ sub generate {
         my $A1 = Set::Array->new(@fixed);
         my $A2 = Set::Array->new(@next_pitches);
         my @intersect = @{ $A1->intersection($A2) };
-        _verbose_notes('INTERSECT', @intersect) if $self->verbose;
+        $self->_verbose_notes('INTERSECT', @intersect) if $self->verbose;
         # Anticipate the next chord
         if (@intersect) {
             if (my $closest = _closest($chosen[-2], \@intersect)) {
@@ -185,15 +188,15 @@ sub generate {
     }
 
     # Show them what they've won, Bob!
-    _verbose_notes('CHOSEN', @chosen) if $self->verbose;
+    $self->_verbose_notes('CHOSEN', @chosen) if $self->verbose;
 
     return \@chosen;
 }
 
 # Show a phrase of midinums as ISO notes
 sub _verbose_notes {
-    my ($title, @notes) = @_;
-    @notes = map { Music::Note->new($_, 'midinum')->format('ISO') } @notes;
+    my ($self, $title, @notes) = @_;
+    @notes = map { $self->pitchname($_) } @notes;
     print "\t$title: ", ddc(\@notes);
 }
 
@@ -230,7 +233,7 @@ MIDI::Bassline::Walk - Generate walking basslines
 
 =head1 VERSION
 
-version 0.0311
+version 0.0312
 
 =head1 SYNOPSIS
 
@@ -247,14 +250,13 @@ version 0.0311
 
 C<MIDI::Bassline::Walk> generates randomized, walking basslines.
 
-The "formula" implemented by this module is basically, "play any notes
-of the chord, or chord-root scale, plus the notes of the chord that
-may differ, minus the notes those replaced."
+The logic and music theory implemented here, can generate some
+possibly sour notes.  This is an approximate composition tool, and not
+a drop-in bass player.  Import rendered MIDI into a DAW and alter
+notes until they sound suitable.
 
-The logic (and music theory) implemented here, can generate some sour
-notes.  This is an approximate composition tool, and not a drop-in
-bass player.  Import rendered MIDI into a DAW and alter notes until
-they sound suitable.
+The "formula" implemented by this module is basically: "Play any notes
+of the chord, or chord-root scale."
 
 The chords recognized by this module, are those known to
 L<Music::Chord::Note>.  Please see the source of that module for the

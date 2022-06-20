@@ -1,5 +1,8 @@
 Change history for libwww-perl
 
+6.67      2022-06-14 20:20:12Z
+    - Remove undocumented LWP::Version sub (GH#416) (James Raspass)
+
 6.66      2022-05-18 16:44:44Z
     - Revert automatic follow of meta refresh tags which was added in 6.63
       (GH#415) (Olaf Alders)

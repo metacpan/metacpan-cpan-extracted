@@ -27,8 +27,9 @@ my $meta = {
                                                          "Eval::TypeTiny"           => 0,
                                                          "Exporter::Shiny"          => 0,
                                                          "List::Util"               => 1.54,
-                                                         "perl"                     => 5.008,
+                                                         "perl"                     => 5.008001,
                                                          "Role::Tiny"               => 0,
+                                                         "Scope::Guard"             => 0,
                                                          "Type::Params"             => "1.004000",
                                                          "Types::Standard"          => 0,
                                                        },
@@ -38,65 +39,70 @@ my $meta = {
                                                          "Class::Tiny" => 0,
                                                          "Moo" => 0,
                                                          "Moose" => 0,
+                                                         "MooseX::Extended" => 0.22,
                                                          "MooX::TypeTiny" => 0,
                                                          "Mouse" => 0,
                                                        },
-                                         requires   => { "Test::Fatal" => 0, "Test::More" => 0.96, "Test::Requires" => 0 },
+                                         requires   => {
+                                                         "Test::Fatal"    => 0,
+                                                         "Test::More"     => 0.96,
+                                                         "Test::Requires" => 0,
+                                                         "Try::Tiny"      => 0,
+                                                       },
                                        },
                         },
   "provides"         => {
-                          "Sub::HandlesVia"                               => { file => "lib/Sub/HandlesVia.pm", version => 0.016 },
-                          "Sub::HandlesVia::Handler"                      => { file => "lib/Sub/HandlesVia/Handler.pm", version => 0.016 },
-                          "Sub::HandlesVia::Handler::CodeRef"             => { file => "lib/Sub/HandlesVia/Handler.pm", version => 0.016 },
-                          "Sub::HandlesVia::Handler::Traditional"         => { file => "lib/Sub/HandlesVia/Handler.pm", version => 0.016 },
-                          "Sub::HandlesVia::HandlerLibrary"               => { file => "lib/Sub/HandlesVia/HandlerLibrary.pm", version => 0.016 },
+                          "Sub::HandlesVia"                               => { file => "lib/Sub/HandlesVia.pm", version => 0.025 },
+                          "Sub::HandlesVia::CodeGenerator"                => { file => "lib/Sub/HandlesVia/CodeGenerator.pm", version => 0.025 },
+                          "Sub::HandlesVia::Handler"                      => { file => "lib/Sub/HandlesVia/Handler.pm", version => 0.025 },
+                          "Sub::HandlesVia::Handler::CodeRef"             => { file => "lib/Sub/HandlesVia/Handler.pm", version => 0.025 },
+                          "Sub::HandlesVia::Handler::Traditional"         => { file => "lib/Sub/HandlesVia/Handler.pm", version => 0.025 },
+                          "Sub::HandlesVia::HandlerLibrary"               => { file => "lib/Sub/HandlesVia/HandlerLibrary.pm", version => 0.025 },
                           "Sub::HandlesVia::HandlerLibrary::Array"        => {
                                                                                file => "lib/Sub/HandlesVia/HandlerLibrary/Array.pm",
-                                                                               version => 0.016,
+                                                                               version => 0.025,
                                                                              },
                           "Sub::HandlesVia::HandlerLibrary::Bool"         => {
                                                                                file => "lib/Sub/HandlesVia/HandlerLibrary/Bool.pm",
-                                                                               version => 0.016,
+                                                                               version => 0.025,
                                                                              },
                           "Sub::HandlesVia::HandlerLibrary::Code"         => {
                                                                                file => "lib/Sub/HandlesVia/HandlerLibrary/Code.pm",
-                                                                               version => 0.016,
+                                                                               version => 0.025,
                                                                              },
                           "Sub::HandlesVia::HandlerLibrary::Counter"      => {
                                                                                file => "lib/Sub/HandlesVia/HandlerLibrary/Counter.pm",
-                                                                               version => 0.016,
+                                                                               version => 0.025,
                                                                              },
                           "Sub::HandlesVia::HandlerLibrary::Hash"         => {
                                                                                file => "lib/Sub/HandlesVia/HandlerLibrary/Hash.pm",
-                                                                               version => 0.016,
+                                                                               version => 0.025,
                                                                              },
                           "Sub::HandlesVia::HandlerLibrary::Number"       => {
                                                                                file => "lib/Sub/HandlesVia/HandlerLibrary/Number.pm",
-                                                                               version => 0.016,
+                                                                               version => 0.025,
                                                                              },
                           "Sub::HandlesVia::HandlerLibrary::Scalar"       => {
                                                                                file => "lib/Sub/HandlesVia/HandlerLibrary/Scalar.pm",
-                                                                               version => 0.016,
+                                                                               version => 0.025,
                                                                              },
                           "Sub::HandlesVia::HandlerLibrary::String"       => {
                                                                                file => "lib/Sub/HandlesVia/HandlerLibrary/String.pm",
-                                                                               version => 0.016,
+                                                                               version => 0.025,
                                                                              },
-                          "Sub::HandlesVia::Toolkit"                      => { file => "lib/Sub/HandlesVia/Toolkit.pm", version => 0.016 },
-                          "Sub::HandlesVia::Toolkit::Moo"                 => { file => "lib/Sub/HandlesVia/Toolkit/Moo.pm", version => 0.016 },
-                          "Sub::HandlesVia::Toolkit::Moose"               => { file => "lib/Sub/HandlesVia/Toolkit/Moose.pm", version => 0.016 },
-                          "Sub::HandlesVia::Toolkit::Moose::PackageTrait" => { file => "lib/Sub/HandlesVia/Toolkit/Moose.pm", version => 0.016 },
-                          "Sub::HandlesVia::Toolkit::Moose::RoleTrait"    => { file => "lib/Sub/HandlesVia/Toolkit/Moose.pm", version => 0.016 },
-                          "Sub::HandlesVia::Toolkit::Mouse"               => { file => "lib/Sub/HandlesVia/Toolkit/Mouse.pm", version => 0.016 },
-                          "Sub::HandlesVia::Toolkit::Mouse::PackageTrait" => { file => "lib/Sub/HandlesVia/Toolkit/Mouse.pm", version => 0.016 },
-                          "Sub::HandlesVia::Toolkit::Mouse::RoleTrait"    => { file => "lib/Sub/HandlesVia/Toolkit/Mouse.pm", version => 0.016 },
-                          "Sub::HandlesVia::Toolkit::Plain"               => { file => "lib/Sub/HandlesVia/Toolkit/Plain.pm", version => 0.016 },
+                          "Sub::HandlesVia::Toolkit"                      => { file => "lib/Sub/HandlesVia/Toolkit.pm", version => 0.025 },
+                          "Sub::HandlesVia::Toolkit::Moo"                 => { file => "lib/Sub/HandlesVia/Toolkit/Moo.pm", version => 0.025 },
+                          "Sub::HandlesVia::Toolkit::Moose"               => { file => "lib/Sub/HandlesVia/Toolkit/Moose.pm", version => 0.025 },
+                          "Sub::HandlesVia::Toolkit::Moose::PackageTrait" => { file => "lib/Sub/HandlesVia/Toolkit/Moose.pm", version => 0.025 },
+                          "Sub::HandlesVia::Toolkit::Moose::RoleTrait"    => { file => "lib/Sub/HandlesVia/Toolkit/Moose.pm", version => 0.025 },
+                          "Sub::HandlesVia::Toolkit::Mouse"               => { file => "lib/Sub/HandlesVia/Toolkit/Mouse.pm", version => 0.025 },
+                          "Sub::HandlesVia::Toolkit::Mouse::PackageTrait" => { file => "lib/Sub/HandlesVia/Toolkit/Mouse.pm", version => 0.025 },
+                          "Sub::HandlesVia::Toolkit::Mouse::RoleTrait"    => { file => "lib/Sub/HandlesVia/Toolkit/Mouse.pm", version => 0.025 },
+                          "Sub::HandlesVia::Toolkit::Plain"               => { file => "lib/Sub/HandlesVia/Toolkit/Plain.pm", version => 0.025 },
                         },
   "release_status"   => "stable",
   "resources"        => {
-                          bugtracker   => {
-                                            web => "http://rt.cpan.org/Dist/Display.html?Queue=Sub-HandlesVia",
-                                          },
+                          bugtracker   => { web => "https://github.com/tobyink/p5-sub-handlesvia/issues" },
                           homepage     => "https://metacpan.org/release/Sub-HandlesVia",
                           license      => ["http://dev.perl.org/licenses/"],
                           repository   => {
@@ -106,7 +112,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/project",
                         },
-  "version"          => 0.016,
+  "version"          => 0.025,
   "x_static_install" => 1,
 };
 
@@ -119,7 +125,7 @@ my %WriteMakefileArgs = (
 	VERSION    => $meta->{version},
 	EXE_FILES  => [ map $_->{file}, values %{ $meta->{x_provides_scripts} || {} } ],
 	NAME       => do { my $n = $meta->{name}; $n =~ s/-/::/g; $n },
-	test       => { TESTS => "t/*.t t/02moo/*.t t/03moo_mxtt/*.t t/04moose/*.t t/05moose_nativetypes/*.t t/06mouse/*.t t/07mouse_nativetypes/*.t" },
+	test       => { TESTS => "t/*.t t/02moo/*.t t/03moo_mxtt/*.t t/04moose/*.t t/05moose_nativetypes/*.t t/06mouse/*.t t/07mouse_nativetypes/*.t t/30egpod/*.t" },
 	%dynamic_config,
 );
 
@@ -181,28 +187,8 @@ else
 	}
 }
 
-sub FixMakefile
-{
-	return unless -d 'inc';
-	my $file = shift;
-	
-	local *MAKEFILE;
-	open MAKEFILE, "< $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	my $makefile = do { local $/; <MAKEFILE> };
-	close MAKEFILE or die $!;
-	
-	$makefile =~ s/\b(test_harness\(\$\(TEST_VERBOSE\), )/$1'inc', /;
-	$makefile =~ s/( -I\$\(INST_ARCHLIB\))/ -Iinc$1/g;
-	$makefile =~ s/( "-I\$\(INST_LIB\)")/ "-Iinc"$1/g;
-	$makefile =~ s/^(FULLPERL = .*)/$1 "-Iinc"/m;
-	$makefile =~ s/^(PERL = .*)/$1 "-Iinc"/m;
-	
-	open  MAKEFILE, "> $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	print MAKEFILE $makefile or die $!;
-	close MAKEFILE or die $!;
-}
 
 my $mm = WriteMakefile(%WriteMakefileArgs);
-FixMakefile($mm->{FIRST_MAKEFILE} || 'Makefile');
+
 exit(0);
 

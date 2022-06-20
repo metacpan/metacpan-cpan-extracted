@@ -2,13 +2,12 @@ package Imager;
 use 5.006;
 
 use strict;
-use IO::File;
 use Scalar::Util;
 use Imager::Color;
 use Imager::Color::Float;
 use Imager::Font;
 use Imager::TrimColorList;
-use Config;
+use if $] >= 5.014, "warnings::register" => qw(tagcodes channelmask);
 
 our $ERRSTR;
 
@@ -150,7 +149,7 @@ BEGIN {
   if ($ex_version < 5.57) {
     our @ISA = qw(Exporter);
   }
-  $VERSION = '1.015';
+  $VERSION = '1.018';
   require XSLoader;
   XSLoader::load(Imager => $VERSION);
 }
@@ -1422,6 +1421,8 @@ sub addtag {
     }
   }
   elsif ($opts{code}) {
+    warnings::warnif("Imager::tagcodes", "addtag: code parameter is deprecated")
+        if $] >= 5.014;
     if (defined $opts{value}) {
       if ($opts{value} =~ /^\d+$/) {
         # add as a number
@@ -1459,6 +1460,8 @@ sub deltag {
     return i_tags_delbyname($self->{IMG}, $opts{name});
   }
   elsif (defined $opts{code}) {
+    warnings::warnif("Imager::tagcodes", "deltag: code parameter is deprecated")
+        if $] >= 5.014;
     return i_tags_delbycode($self->{IMG}, $opts{code});
   }
   else {
@@ -1478,8 +1481,26 @@ sub settag {
     return $self->addtag(name=>$opts{name}, value=>$opts{value});
   }
   elsif (defined $opts{code}) {
-    $self->deltag(code=>$opts{code});
-    return $self->addtag(code=>$opts{code}, value=>$opts{value});
+    warnings::warnif("Imager::tagcodes", "settag: code parameter is deprecated")
+        if $] >= 5.014;
+    i_tags_delbycode($self->{IMG}, $opts{code});
+    if (defined $opts{value}) {
+      if ($opts{value} =~ /^\d+$/) {
+        # add as a number
+        return i_tags_addn($self->{IMG}, $opts{code}, 0, $opts{value});
+      }
+      else {
+        return i_tags_add($self->{IMG}, $opts{code}, 0, $opts{value}, 0);
+      }
+    }
+    elsif (defined $opts{data}) {
+      # force addition as a string
+      return i_tags_add($self->{IMG}, $opts{code}, 0, $opts{data}, 0);
+    }
+    else {
+      $self->{ERRSTR} = "No value supplied";
+      return undef;
+    }
   }
   else {
     return undef;
@@ -1504,8 +1525,8 @@ sub _get_reader_io {
     return Imager::IO->new_fh($input->{fh});
   }
   elsif ($input->{file}) {
-    my $file = IO::File->new($input->{file}, "r");
-    unless ($file) {
+    my $file;
+    unless (open $file, "<", $input->{file}) {
       $self->_set_error("Could not open $input->{file}: $!");
       return;
     }
@@ -1558,8 +1579,8 @@ sub _get_writer_io {
     $io = Imager::IO->new_fh($input->{fh});
   }
   elsif ($input->{file}) {
-    my $fh = new IO::File($input->{file},"w+");
-    unless ($fh) { 
+    my $fh;
+    unless (open $fh, "+>", $input->{file}) { 
       $self->_set_error("Could not open file $input->{file}: $!");
       return;
     }
@@ -4135,6 +4156,9 @@ sub setmask {
   my $self = shift;
   my %opts = @_;
 
+  warnings::warnif("Imager::channelmask", "setmask: image channel masks are deprecated")
+      if $] >= 5.014;
+
   $self->_valid_image("setmask")
     or return;
 
@@ -4394,6 +4418,8 @@ my %ext_types =
    fit => "fits",
    fits => "fits",
    rle => "utah",
+   avifs => "avif", # AVIF image sequence
+   avif => "avif",
   );
 
 sub def_guess_type {
@@ -4402,8 +4428,15 @@ sub def_guess_type {
   my ($ext) = $name =~ /\.([^.]+)$/
     or return;
 
-  my $type = $ext_types{$ext}
-    or return;
+  my $type = $ext_types{$ext};
+  unless ($type) {
+    $type = $ext_types{lc $ext};
+  }
+
+  if (!defined $type && $ext =~ /\A[a-zA-Z0-9_]{2,}\z/) {
+    # maybe a reasonable assumption
+    $type = lc $ext;
+  }
 
   return $type;
 }

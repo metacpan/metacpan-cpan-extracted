@@ -19,7 +19,7 @@ name: Pod-Weaver-Plugin-Regexp-Pattern
 provides:
   Pod::Weaver::Plugin::Regexp::Pattern:
     file: lib/Pod/Weaver/Plugin/Regexp/Pattern.pm
-    version: '0.010'
+    version: '0.011'
 requires:
   Data::Dmp: '0.241'
   Markdown::To::POD: '0'
@@ -33,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Regexp-Pattern
   homepage: https://metacpan.org/release/Pod-Weaver-Plugin-Regexp-Pattern
   repository: git://github.com/perlancar/perl-Pod-Weaver-Plugin-Regexp-Pattern.git
-version: '0.010'
+version: '0.011'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

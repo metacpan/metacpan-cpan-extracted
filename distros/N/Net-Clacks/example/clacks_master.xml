@@ -5,7 +5,7 @@
     <pingtimeout>600</pingtimeout>
     <interclackspingtimeout>60</interclackspingtimeout>
     <persistancefile>clackspersistance.dat</persistancefile>
-        <!--<stalecachetime>30</stalecachetime>-->
+        <!--<deletecachetime>30</deletecachetime>-->
     <ssl>
         <cert>exampleserver.crt</cert>
         <key>exampleserver.key</key>

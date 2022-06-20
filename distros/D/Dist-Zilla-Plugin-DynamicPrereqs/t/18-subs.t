@@ -19,14 +19,11 @@ use lib path('t/lib')->absolute->stringify;
 my $sub_prereqs = closed_over(\&Dist::Zilla::Plugin::DynamicPrereqs::register_prereqs)->{'%sub_prereqs'};
 my %loaded_subs;
 
-sub load_sub
-{
-    foreach my $sub (Dist::Zilla::Plugin::DynamicPrereqs->_all_required_subs_for(@_))
-    {
+sub load_sub {
+    foreach my $sub (Dist::Zilla::Plugin::DynamicPrereqs->_all_required_subs_for(@_)) {
         next if exists $loaded_subs{$sub};
 
-        foreach my $prereq (keys %{$sub_prereqs->{$sub}})
-        {
+        foreach my $prereq (keys %{$sub_prereqs->{$sub}}) {
             note "loading $prereq $sub_prereqs->{$sub}{$prereq}";
             use_module($prereq, $sub_prereqs->{$sub}{$prereq});
         }

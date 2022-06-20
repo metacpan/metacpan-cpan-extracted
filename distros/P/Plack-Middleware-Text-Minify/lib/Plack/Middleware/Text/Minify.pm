@@ -12,11 +12,11 @@ use parent qw/ Plack::Middleware /;
 use Plack::Util;
 use Plack::Util::Accessor qw/ path type /;
 use Ref::Util qw/ is_arrayref is_coderef /;
-use Text::Minify::XS v0.4.8 ();
+use Text::Minify::XS v0.6.2 ();
 
 # RECOMMEND PREREQ:  Ref::Util::XS
 
-our $VERSION = 'v0.3.1';
+our $VERSION = 'v0.3.2';
 
 sub call {
     my ($self, $env) = @_;
@@ -97,7 +97,7 @@ Plack::Middleware::Text::Minify - remove HTML indentation on the fly
 
 =head1 VERSION
 
-version v0.3.1
+version v0.3.2
 
 =head1 SYNOPSIS
 
@@ -196,7 +196,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020-2021 by Robert Rothenberg.
+This software is Copyright (c) 2020-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

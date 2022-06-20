@@ -3,7 +3,7 @@ package Test::Deep::URI;
 use strict;
 use warnings;
 use 5.008_005;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 # ABSTRACT: Easier testing of URIs for Test::Deep
 
@@ -214,6 +214,8 @@ it under the same terms as Perl itself.
 =item L<Test::Deep::JSON>
 
 =item L<Test::Deep::Filter>
+
+=item L<Test2::Tools::URL>
 
 =back
 

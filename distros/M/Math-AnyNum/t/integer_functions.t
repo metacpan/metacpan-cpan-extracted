@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 637;
+plan tests => 1522;
 
 use Math::AnyNum qw(:ntheory prod);
 use Math::GMPz::V qw();
@@ -165,6 +165,35 @@ is(lucasmod(42, 0), 'NaN');
     is(chebyshevU(4, -$x), (-1)**4 * chebyshevU(4, $x));
     is(chebyshevU(5, -$x), (-1)**5 * chebyshevU(5, $x));
 
+    is(chebyshevT(12, 4123),                        '49418538023342634823295833322486184432838430401');
+    is(chebyshevT(12, Math::AnyNum->new(4123) / 5), '49418328710898260515349871648781812832583114833/244140625');
+
+    is(chebyshevU(12, 4123),                        '98837077500246219848336438815625860458790495021');
+    is(chebyshevU(12, Math::AnyNum->new(4123) / 5), '98836693760704840441814811004491987763689350941/244140625');
+
+    is(chebyshevTmod(12, 4123,                        99), '73');
+    is(chebyshevTmod(12, Math::AnyNum->new(4123) / 5, 99), '64');
+
+    is(chebyshevUmod(12, 4123,                        99), '4');
+    is(chebyshevUmod(12, Math::AnyNum->new(4123) / 5, 99), '52');
+
+    is(chebyshevUmod(43, 100, 97),                        chebyshevU(43, 100) % 97);
+    is(chebyshevUmod(43, Math::AnyNum::rat('15/13'), 97), chebyshevU(43, Math::AnyNum::rat('15/13')) % 97);
+    is(chebyshevTmod(43, 100, 97),                        chebyshevT(43, 100) % 97);
+    is(chebyshevTmod(43, Math::AnyNum::rat('15/13'), 97), chebyshevT(43, Math::AnyNum::rat('15/13')) % 97);
+
+    is(join(' ', quadratic_powmod(3, 4, 5, 6,  97)), '14 8');
+    is(join(' ', quadratic_powmod(3, 4, 5, -6, 97)), '39 47');
+
+    is(join(' ', quadratic_powmod(3, 4, 5, 43,  97)), '27 73');
+    is(join(' ', quadratic_powmod(3, 4, 5, -43, 97)), '84 10');
+
+    is(join(' ', quadratic_powmod(3, 4, -5, 6,  97)), '31 19');
+    is(join(' ', quadratic_powmod(3, 4, -5, -6, 97)), '53 52');
+
+    is(join(' ', quadratic_powmod(3, 4, -5, 43,  97)), '41 75');
+    is(join(' ', quadratic_powmod(3, 4, -5, -43, 97)), '59 8');
+
     $x = Math::AnyNum->new('-7/11');
 
     is(chebyshevT(Math::AnyNum->new(10), $x), '-21191511863/25937424601');
@@ -245,6 +274,13 @@ is(binomial($o->new(124), $o->new(-2)), '0');
 is(divmod($o->new(1234), 100),           34);
 is(divmod(12345,         1000),          345);
 is(divmod(12345,         $o->new(1000)), 345);
+
+is(divmod(23, 17, 97), 47);
+is(divmod(24, 2,  8),  4);
+
+is(addmod(24, 8, 29),   3);
+is(submod(127, 88, 29), 10);
+is(mulmod(127, 88, 29), 11);
 
 is(binomial(42, 39),  11480);
 is(binomial(-4, -42), 10660);
@@ -360,15 +396,14 @@ is(lucas($o->new(15)),     1364);
 is(ipow(2,  10), 1024);
 is(ipow(-2, 10), 1024);
 is(ipow(-2, 11), -2048);
-is(ipow(-2, -1), 0);
+is(ipow(-2, -1), -1);
 is(ipow(-2, -2), 0);
 is(ipow(-1, -1), -1);
 is(ipow(-1, 0),  1);
 
-is(ipow(2,   10.5), 1024);
-is(ipow(2.5, 10.5), 1024);
-is(ipow(2.5, 10),   1024);
-
+is(ipow(2,          10.5),        1024);
+is(ipow(2.5,        10.5),        1024);
+is(ipow(2.5,        10),          1024);
 is(ipow(2,          $o->new(10)), 1024);
 is(ipow($o->new(2), 10),          1024);
 is(ipow($o->new(2), $o->new(10)), 1024);
@@ -518,12 +553,33 @@ is(imul($o->new(13), $o->new(-2)), -26);
 is(imul(13,          $o->new(-2)), -26);
 
 is(idiv(1234,           10),           123);
-is(idiv(1234,           -10),          -123);
-is(idiv(-1234,          10),           -123);
-is(idiv($o->new(1234),  -10),          -123);
-is(idiv($o->new(-1234), 10),           -123);
-is(idiv($o->new(-1234), $o->new(10)),  -123);
-is(idiv(1234,           $o->new(-10)), -123);
+is(idiv(1234,           -10),          -124);
+is(idiv(-1234,          10),           -124);
+is(idiv($o->new(1234),  -10),          -124);
+is(idiv($o->new(-1234), 10),           -124);
+is(idiv($o->new(-1234), $o->new(10)),  -124);
+is(idiv(1234,           $o->new(-10)), -124);
+
+foreach my $x (-5 .. 5) {
+    foreach my $y (-5 .. 5) {
+
+        next if ($y == 0);
+
+        if (!($o->new($x) / $y + $o->new(1) / 2)->is_int) {
+            is($o->new($x)->div($y)->round, idiv_round($x, $y));
+            is($o->new($x)->div($y)->round, idiv_round($x, $o->new($y)));
+        }
+
+        is($o->new($x)->div($y)->floor, idiv($x, $y));
+        is($o->new($x)->div($y)->floor, idiv($x, $o->new($y)));
+
+        is($o->new($x)->div($y)->ceil, idiv_ceil($x, $y));
+        is($o->new($x)->div($y)->ceil, idiv_ceil($x, $o->new($y)));
+
+        is($o->new($x)->div($y)->int, idiv_trunc($x, $y));
+        is($o->new($x)->div($y)->int, idiv_trunc($x, $o->new($y)));
+    }
+}
 
 is(imod(1234,           10),           4);
 is(imod(1234,           -10),          -6);
@@ -808,6 +864,21 @@ ok(is_power(-1),  'is_power(-1)');
 ok(!is_power(-2), 'is_power(-2)');
 ok(is_power(0),   'is_power(0)');
 
+ok(is_power(ipow(197,  77), 77));
+ok(!is_power(ipow(197, 77), 197));
+
+ok(is_power_of(64,             2));
+ok(is_power_of(27,             3));
+ok(is_power_of(ipow(197, 77),  197));
+ok(!is_power_of(ipow(197, 77), 77));
+
+ok(!is_power_of(28,                3));
+ok(!is_power_of(26,                3));
+ok(!is_power_of(63,                2));
+ok(!is_power_of(65,                2));
+ok(!is_power_of(ipow(197, 77) - 1, 197));
+ok(!is_power_of(ipow(197, 77) + 1, 197));
+
 ok(is_square(100), 'is_square(100)');
 ok(!is_square(99), 'is_square(99)');
 ok(!is_square(-1), 'is_square(-1)');
@@ -959,7 +1030,7 @@ is(subfactorial(Math::AnyNum->new(7), 5),                    21);
 is(subfactorial(7,                    Math::AnyNum->new(5)), 21);
 
 is(subfactorial(-20, -20), 'NaN');
-is(subfactorial(12, 20),   'NaN');
+is(subfactorial(12, 20),   0);
 is(subfactorial(-12),      'NaN');
 is(subfactorial(0, 0),     1);
 is(subfactorial(0, -1),    0);

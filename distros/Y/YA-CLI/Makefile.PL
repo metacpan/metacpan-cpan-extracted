@@ -7,7 +7,7 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Do CLI things",
+  "ABSTRACT" => "Yet another CLI framework",
   "AUTHOR" => "Wesley Schwengle <waterkip\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -18,8 +18,8 @@ my %WriteMakefileArgs = (
   "NAME" => "YA::CLI",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "Getopt::Long" => 0,
-    "List::Util" => 0,
+    "Getopt::Long" => "2.39",
+    "List::Util" => "1.33",
     "Module::Pluggable::Object" => 0,
     "Module::Runtime" => 0,
     "Moo" => 0,
@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "Test::Most" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,11 +54,11 @@ my %FallbackPrereqs = (
   "Cwd" => 0,
   "File::Spec" => 0,
   "File::Spec::Functions" => 0,
-  "Getopt::Long" => 0,
+  "Getopt::Long" => "2.39",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Import::Into" => "1.002003",
-  "List::Util" => 0,
+  "List::Util" => "1.33",
   "Module::Pluggable::Object" => 0,
   "Module::Runtime" => 0,
   "Moo" => 0,

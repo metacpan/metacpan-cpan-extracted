@@ -41,7 +41,19 @@
               # as for string arg of '0.1'.
 
   Generally, providing a string argument will DWYW, whereas providing a
-  floating-point (NV) argument won't.
+  floating-point (NV) argument won't. (Of course, exceptions exist and
+  you should familiarise yourself with the difference if it is not
+  already clear to you.)
+
+  printx($obj); # Same as for print() execept that values are in hex.
+  print sprintx($obj);  # Same as 'printx($obj)'.
+  print dd_repro($obj); # $obj in scientific notation (in decimal).
+
+  # Verify that the string returned by dd_repro($obj) is correct:
+  print "ok" if dd_repro_test(dd_repro($obj), $obj) == 7;
+
+  print dd_dec($obj); # Exact representation of the value held by $obj,
+                      # in scientific notation .
 
   NOTES: In the following documentation:
 
@@ -67,6 +79,9 @@
 
 =head1 ARITHMETIC FUNCTIONS
 
+  Use either the functions, or the overloaded
+  operations (that use these functions).
+
   $obj = dd_add($arg1, $arg2);
   $obj = dd_sub($arg1, $arg2);
   $obj = dd_mul($arg1, $arg2);
@@ -75,10 +90,10 @@
    Returns a Math::FakeDD object with the value of $arg1
    (respectively) plus, minus, multiplied by or divided by $arg2.
 
-  dd_add($obj, $arg);
-  dd_sub($obj, $arg);
-  dd_mul($obj, $arg);
-  dd_div($obj, $arg);
+  dd_add_eq($obj, $arg);
+  dd_sub_eq($obj, $arg);
+  dd_mul_eq($obj, $arg);
+  dd_div_eq($obj, $arg);
 
    The value in $obj is (respectively) incremented, decremented,
    multiplied or divided by $arg.
@@ -86,6 +101,7 @@
   $obj = dd_pow($arg1, $arg2);
 
    Return a Math::FakeDD object that contains $arg1 ** $arg2.
+
 
   dd_pow_eq($obj, $arg);
 
@@ -124,27 +140,38 @@
 
 =head1 COMPARISON FUNCTIONS
 
-  $integer = dd_cmp($arg1, $arg2);
-  $integer = dd_spaceship($arg1, $arg2);
+  $iv = dd_cmp($arg1, $arg2);
+  $iv = dd_spaceship($arg1, $arg2);
 
-   $integer < 0  if $arg1 <  $arg2.
-   $integer > 0  if $arg1 >  $arg2.
-   $integer == 0 if $arg1 == $arg2.
+   Return undef if at least one of $arg1
+   and $arg2 is NaN
+   $iv < 0  if $arg1 <  $arg2.
+   $iv > 0  if $arg1 >  $arg2.
+   $iv == 0 if $arg1 == $arg2.
 
-   dd_spaceship() returns undef if at least one of $arg1
-   and $arg2 is NaN.
-
-  $integer = dd_eq ($arg1, $arg2);
-  $integer = dd_neq($arg1, $arg2);
-  $integer = dd_gt($arg1, $arg2);
-  $integer = dd_gte($arg1, $arg2);
-  $integer = dd_lt($arg1, $arg2);
-  $integer = dd_lte($arg1, $arg2);
+  $iv = dd_eq ($arg1, $arg2);
+  $iv = dd_neq($arg1, $arg2);
+  $iv = dd_gt($arg1, $arg2);
+  $iv = dd_gte($arg1, $arg2);
+  $iv = dd_lt($arg1, $arg2);
+  $iv = dd_lte($arg1, $arg2);
 
    If (respectively) $arg1 == $arg2, $arg1 != $arg2,
    $arg1 > $arg2, $arg1 >= $arg2, $arg1 < $arg2, $arg1 <= $arg2,
    then $integer is set to 1.
    Else $integer is set to 0.
+
+  $iv = dd_streq($obj, $arg);
+   We need this function only because Test::More can pull
+   in code that assumes 'eq' is overloaded. (And this is the
+   function that overloaded 'eq' calls.)
+   Return 1 if "$obj" eq "$arg".
+   Else return 0;
+
+  $iv = dd_strne($obj, $arg);
+   We provide this function only because dd_stre() is provided.
+   Return 1 if "$obj" ne "$arg".
+   Else return 0;
 
 =head1 OUTPUT FUNCTIONS
 
@@ -167,14 +194,57 @@
 
   $str = dd_repro($obj); # "repro" short for "reproducible"
 
+   #### NOTE: This function has turned into a much uglier hack
+              than I had envisaged. See the "TODO" section below
+              for elaboration.
+
    Represent the value of $obj in decimal scientific notation,
    using as few decimal mantissa digits as possible, such that if
    this $str is assigned to a new Math::FakeDD object, then the
    new Math::FakeDD object will be identical to (ie a reproduction
    of) the Math::FakeDD object from which $str was derived.
+   Also set $Math::FakeDD::RETRO_PREC to the bit-precision value
+   that was used in determining $str.
+   If $Math::FakeDD::REPRO_PREC begins with ">", then the value that
+   dd_repro() returned was altered slightly (away from zero) from
+   the value that was calculated using the specified precision.
+   If $Math::FakeDD::REPRO_PREC begins with "<", then the value that
+   dd_repro() returned was altered slightly (toward zero) from the
+   value that was calculated using the specified precision.
+   Other possible $Math::FakeDD::REPRO_PREC values, all of which
+   indicate that no calcuation of precision has been made, are:
+    -1: the initial value, and dd_repro() has not been called at all;
+    0 : dd_repro returned an Inf, NaN or Zero;
+    undef: perl's nvtype is DoubleDouble, so dd_repro() simply used
+           Math::MPFR::nvtoa().
 
-   NOTE: This representation, unlike that provided by dd_dec()
-         and dd_hex(), might not represent the value *exactly*.
+  $iv = dd_repro_test(dd_repro($obj), $obj, $debug); # 3rd arg is optional
+
+   Check that the representation of dd_repro($obj) returned by
+   dd_repro() is accurate, and that it uses the fewest significant
+   decimal mantissa digits possible.
+   Some debugging output is provided if the third (optional) arg
+   is true.
+   The function assigns its first arg, dd_repro($obj), to a
+   string - let's call it $str.
+
+   3 tests are conducted:
+
+   1) that Math::FakeDD->new($str) == $obj.
+      $iv & 1 will be true if and only if this first test passes.
+
+   2) that if we were to round $str *down* to 1 less significant decimal
+      digit then Math::FakeDD->new($str) < $obj.
+      $iv & 2 will be true if and only if this second test passes.
+
+   3) that if we were round $str *up* to 1 less significant decimal
+      digit then Math::FakeDD->new($str) > $obj.
+      $iv & 4 will be true if and only if this second test passes.
+
+   If all three tests pass (in which case the returned $iv == 7) then
+   we know that dd_repro($obj) has functioned correctly and as intended.
+   Else, dd_repro() has not functioned correctly and we can determine
+   which test(s) failed by examining the 3 lowest bits of $iv.
 
   $str = dd_stringify($obj);
 
@@ -184,6 +254,11 @@
    less significant double. Both doubles  will be shown in as few
    digits as possible, while not losing any information.
    The overloading of interpolation uses this function.
+
+  $nv = dd_numify($obj); # Mainly for '0+' overloading.
+
+   Converts $obj to an NV, as accurately as the precision of the NV
+   allows.
 
   printx($obj);
 
@@ -205,10 +280,11 @@
 =head1 OPERATOR OVERLOADING
 
   The following operations are currently overloaded:
-   "", ==, !=, *, *=, **, **=, +, +=, -, -=, /, /=, <, <=, <=>, >, >=,
+   "", 0+, ==, !=, *, *=, **, **=, +, +=, -, -=, /, /=, <, <=, <=>, >, >=,
    abs, int, exp, log, sqrt,
    bool, !,
    atan2, cos, sin
+   eq, ne
 
   Run
     my %oloads = Math::FakeDD::oload();
@@ -294,6 +370,16 @@
   bits (depending upon value).
 
   All rounding is done to nearest, with ties to even.
+
+=head1 TODO
+
+  Re-factor dd_repro(), which is currently just an awful hack.
+  Also, it's possible that dd_repro() doesn't work correctly for all
+  possible DoubleDouble values. It's recommended that, if this
+  matters, then dd_repro_test() should be run to check on the
+  correctness of the values that dd_repro() returns.
+  Please report any such errors, as that will be helpful with the
+  intended re-factoring.
 
 =head1 LICENSE
 

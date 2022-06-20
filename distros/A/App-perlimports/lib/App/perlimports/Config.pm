@@ -3,10 +3,10 @@ package App::perlimports::Config;
 use Moo;
 use MooX::StrictConstructor;
 
-our $VERSION = '0.000044';
+our $VERSION = '0.000045';
 
-use List::Util qw( uniq );
-use Path::Tiny qw( path );
+use List::Util      qw( uniq );
+use Path::Tiny      qw( path );
 use Types::Standard qw( ArrayRef Bool InstanceOf Str );
 
 has cache => (
@@ -201,7 +201,7 @@ App::perlimports::Config - Generic configuration options for C<perlimports>
 
 =head1 VERSION
 
-version 0.000044
+version 0.000045
 
 =head1 DESCRIPTION
 

@@ -281,5 +281,13 @@ subtest set_col_val => sub {
     is_deeply($td->{data}[1], {column0=>4,column1=>10,column2=>6});
 };
 
+subtest iter => sub {
+    my $td = table([{a=>1},{b=>2}]);
+    my $it = $td->iter;
+    is_deeply($it->(), {a=>1});
+    is_deeply($it->(), {b=>2});
+    is_deeply($it->(), undef);
+};
+
 DONE_TESTING:
 done_testing;

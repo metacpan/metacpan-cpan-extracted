@@ -4,7 +4,7 @@
       "Wesley Schwengle <waterkip@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
@@ -26,6 +26,7 @@
          },
          "requires" : {
             "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
             "Dist::Zilla::PluginBundle::Author::WATERKIP" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Software::License::BSD" : "0",
@@ -54,8 +55,8 @@
             "Getopt::Long" : "0",
             "List::Util" : "0",
             "Module::Pluggable" : "0",
-            "Moose" : "0",
-            "Moose::Role" : "0",
+            "Moose" : "2.2013",
+            "Moose::Role" : "2.2013",
             "Pod::Usage" : "0",
             "Text::Table" : "0",
             "namespace::autoclean" : "0",
@@ -76,23 +77,23 @@
    "provides" : {
       "Finance::Tax::Aruba" : {
          "file" : "lib/Finance/Tax/Aruba.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Finance::Tax::Aruba::Income" : {
          "file" : "lib/Finance/Tax/Aruba/Income.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Finance::Tax::Aruba::Income::2020" : {
          "file" : "lib/Finance/Tax/Aruba/Income/2020.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Finance::Tax::Aruba::Income::2021" : {
          "file" : "lib/Finance/Tax/Aruba/Income/2021.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Finance::Tax::Aruba::Role::Income::TaxYear" : {
          "file" : "lib/Finance/Tax/Aruba/Role/Income/TaxYear.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -103,13 +104,13 @@
          "web" : "https://gitlab.com/opndev/finance-tax-aruba"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_contributors" : [
       "Wesley Schwengle <wesley@opndev.io>",
       "Shlomi Fish <shlomif@shlomifish.org>"
    ],
-   "x_generated_by_perl" : "v5.32.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.29",
    "x_spdx_expression" : "BSD"
 }
 

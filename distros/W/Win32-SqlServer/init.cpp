@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/init.cpp 14    21-07-12 21:37 Sommar $
+ $Header: /Perl/OlleDB/init.cpp 18    22-05-27 19:03 Sommar $
 
   This file holds code that is run when the module initialiases, and
   when a new OlleDB object is created. This file also declares global
@@ -7,9 +7,35 @@
   constants that are set up once and then never changed.
 
 
-  Copyright (c) 2004-2021   Erland Sommarskog
+  Copyright (c) 2004-2022   Erland Sommarskog
 
   $History: init.cpp $
+ * 
+ * *****************  Version 18  *****************
+ * User: Sommar       Date: 22-05-27   Time: 19:03
+ * Updated in $/Perl/OlleDB
+ * When looking for encryption option, also filter for the property set,
+ * since properties in different set can have the same value.
+ * 
+ * *****************  Version 17  *****************
+ * User: Sommar       Date: 22-05-18   Time: 22:22
+ * Updated in $/Perl/OlleDB
+ * Added module routine SetDefaultForEncryption to permit changing the
+ * default for the lgoin properties Encrypt, TrustServerCertificate and
+ * HostNameInCertificate.
+ * 
+ * *****************  Version 16  *****************
+ * User: Sommar       Date: 22-05-08   Time: 23:37
+ * Updated in $/Perl/OlleDB
+ * For Encrypt option, set is_optional as TRUE, so that provider default
+ * can apply.
+ * 
+ * *****************  Version 15  *****************
+ * User: Sommar       Date: 22-05-08   Time: 23:14
+ * Updated in $/Perl/OlleDB
+ * New OLE DB provider MSOLEDBSQl19. Changed data type for the Encrypt
+ * loginu property. New login property HostNameInCertificate, only
+ * available with MSOLEDBSQL19.
  * 
  * *****************  Version 14  *****************
  * User: Sommar       Date: 21-07-12   Time: 21:37
@@ -116,22 +142,24 @@ FILE *dbgfile = NULL;
 
 
 // Global variables for class ids for the possible providers.
-CLSID  clsid_sqloledb   = CLSID_NULL;
-CLSID  clsid_sqlncli    = CLSID_NULL;
-CLSID  clsid_sqlncli10  = CLSID_NULL;
-CLSID  clsid_sqlncli11  = CLSID_NULL;
-CLSID  clsid_msoledbsql = CLSID_NULL;
+CLSID  clsid_sqloledb     = CLSID_NULL;
+CLSID  clsid_sqlncli      = CLSID_NULL;
+CLSID  clsid_sqlncli10    = CLSID_NULL;
+CLSID  clsid_sqlncli11    = CLSID_NULL;
+CLSID  clsid_msoledbsql   = CLSID_NULL;
+CLSID  clsid_msoledbsql19 = CLSID_NULL;
 
 // This global array holds definition of all initialisation properties
 // for OLE DB.
 init_property gbl_init_props[MAX_INIT_PROPERTIES];
 
 // Number of properties per provider:
-int no_of_ssprops_sqloledb   = -1;
-int no_of_ssprops_sqlncli    = -1;
-int no_of_ssprops_sqlncli10  = -1;
-int no_of_ssprops_sqlncli11  = -1;
-int no_of_ssprops_msoledbsql = -1;
+int no_of_ssprops_sqloledb     = -1;
+int no_of_ssprops_sqlncli      = -1;
+int no_of_ssprops_sqlncli10    = -1;
+int no_of_ssprops_sqlncli11    = -1;
+int no_of_ssprops_msoledbsql   = -1;
+int no_of_ssprops_msoledbsql19 = -1;
 
 // This array holds where each property set starts in gbl_init_props;
 propset_info_struct init_propset_info[NO_OF_INIT_PROPSETS];
@@ -194,10 +222,12 @@ static BSTR get_hostname() {
 }
 
 // Add a property to the global array.
+// isoptoinal: properties that were added in a .X version of a provider, or
+// options where we want the provider default to apply.
 static void add_init_property (const char *  name,
                                init_propsets propset_enum,
                                DBPROPID      propid,
-                               BOOL          isoptional,
+                               BOOL          isoptional, 
                                VARTYPE       datatype,
                                BOOL          default_empty,
                                const WCHAR * default_str,
@@ -242,7 +272,7 @@ static void add_init_property (const char *  name,
             break;
 
          case VT_BSTR :
-            gbl_init_props[ix].default_value.bstrVal = SysAllocString(default_str);
+               gbl_init_props[ix].default_value.bstrVal = SysAllocString(default_str);
             break;
 
          default :
@@ -318,7 +348,7 @@ static void setup_init_properties ()
    add_init_property("Hostname", ssinit_props, SSPROP_INIT_WSID,
                      FALSE, VT_BSTR, FALSE, hostname, NULL, ix);
    add_init_property("Encrypt", ssinit_props, SSPROP_INIT_ENCRYPT,
-                     FALSE, VT_BOOL, TRUE, NULL, NULL, ix);
+                     TRUE, VT_BSTR, TRUE, NULL, NULL, ix);  // Set as is_optional, to permit for different provider defaults.
    // The above properties are those that are in SQLOLEDB.
    no_of_ssprops_sqloledb = init_propset_info[ssinit_props].no_of_props;
 
@@ -357,6 +387,12 @@ static void setup_init_properties ()
    add_init_property("TransparentNetworkIPResolution", ssinit_props, SSPROP_INIT_TNIR,
                      TRUE, VT_BOOL, FALSE, NULL, FALSE, ix);
    no_of_ssprops_msoledbsql = init_propset_info[ssinit_props].no_of_props;
+
+   // Properties new in MSOLEDBSQL19.
+   add_init_property("HostNameInCertificate", ssinit_props, SSPROP_INIT_HOST_NAME_CERTIFICATE,
+                     FALSE, VT_BSTR, TRUE, NULL, FALSE, ix);
+   no_of_ssprops_msoledbsql19 = init_propset_info[ssinit_props].no_of_props;   
+
    
    // DBPROPSET_DATASOURCE, data-source properties.
    init_propset_info[datasrc_props].start = ix;
@@ -367,6 +403,84 @@ static void setup_init_properties ()
 
    SysFreeString(scriptname);
    SysFreeString(hostname);
+}
+
+// Above we leave the Encrypt option without a default, to let the provider to decide. But this
+// routine permits the user to override.
+void SetDefaultForEncryption(SV * sv_Encrypt,
+                             SV * sv_Trust,
+                             SV * sv_HostName) {
+   int    encrypt_ix = -1;
+   int    trust_cert_ix = -1;
+   int    host_name_ix  = -1;
+
+   // Loop over gbl_init_props to find the indexes for the Encrypt and TrustServerCert options
+   for (int ix = 0; 
+            ix < MAX_INIT_PROPERTIES && 
+                 (encrypt_ix < 0 || trust_cert_ix < 0 || host_name_ix < 0); ix++) {
+      if (gbl_init_props[ix].propset_enum == ssinit_props) {
+         if (gbl_init_props[ix].property_id == SSPROP_INIT_ENCRYPT) {
+            encrypt_ix = ix;
+         }
+         else if (gbl_init_props[ix].property_id == SSPROP_INIT_TRUST_SERVER_CERTIFICATE) {
+            trust_cert_ix = ix;
+         }
+         else if (gbl_init_props[ix].property_id == SSPROP_INIT_HOST_NAME_CERTIFICATE) {
+            host_name_ix = ix;
+         }
+      }
+   }
+
+   // Sanity check.
+   if (encrypt_ix == -1 || trust_cert_ix == -1 || host_name_ix == -1) {
+      croak("Internal error! Was not able to set encrypt_ix(%d), trust_cert_ix(%d) or host_name_ix(%d)!\n", 
+            encrypt_ix, trust_cert_ix, host_name_ix);
+   }
+   
+   // Handle Encrypt option
+   if (sv_Encrypt && SvOK(sv_Encrypt)) {
+      char * setting = SvPV_nolen(sv_Encrypt);
+
+      if (strcmp("Optional", setting) == 0 || 
+          strcmp("Mandatory", setting) == 0 || 
+          strcmp("Strict", setting) == 0) {
+
+         gbl_init_props[encrypt_ix].isoptional = FALSE;
+         gbl_init_props[encrypt_ix].default_value.vt = VT_BSTR;
+         gbl_init_props[encrypt_ix].default_value.bstrVal = SV_to_BSTR(sv_Encrypt);
+      }
+      else {
+         warn("SetDefaultForEncrypt: Illegal value for encrypt option: '%s'.\n", setting);
+         croak("Permitted values are undef, 'Optional', 'Mandatory', and 'Strict'.\n");
+      }
+   }
+   else {
+      gbl_init_props[encrypt_ix].isoptional = TRUE;
+      VariantClear(&gbl_init_props[encrypt_ix].default_value);
+   }
+
+   // Handle default for TrustServerCertificate.
+   if (sv_Trust && SvOK(sv_Trust)) {
+      gbl_init_props[trust_cert_ix].isoptional = FALSE;
+      gbl_init_props[trust_cert_ix].default_value.vt = VT_BOOL;
+      gbl_init_props[trust_cert_ix].default_value.boolVal = 
+           (SvTRUE(sv_Trust) ? -1 : FALSE);
+   }
+   else {
+      gbl_init_props[trust_cert_ix].isoptional = TRUE;
+      VariantClear(&gbl_init_props[trust_cert_ix].default_value);
+   }
+
+   // And host name in certificate.
+   if (sv_HostName && SvOK(sv_HostName)) {
+      gbl_init_props[host_name_ix].isoptional = FALSE;
+      gbl_init_props[host_name_ix].default_value.vt = VT_BSTR;
+      gbl_init_props[host_name_ix].default_value.bstrVal = SV_to_BSTR(sv_HostName);
+   }
+   else {
+      gbl_init_props[host_name_ix].isoptional = TRUE;
+      VariantClear(&gbl_init_props[host_name_ix].default_value);
+   }
 }
 
 
@@ -413,11 +527,12 @@ void initialize ()
    EnterCriticalSection(&CS);
 
    // Get classIDs for the possible providers.
-   if (IsEqualCLSID(clsid_sqloledb,   CLSID_NULL) &&
-       IsEqualCLSID(clsid_sqlncli,    CLSID_NULL) &&
-       IsEqualCLSID(clsid_sqlncli10,  CLSID_NULL) && 
-       IsEqualCLSID(clsid_sqlncli11,  CLSID_NULL) &&
-       IsEqualCLSID(clsid_msoledbsql, CLSID_NULL)) {
+   if (IsEqualCLSID(clsid_sqloledb,     CLSID_NULL) &&
+       IsEqualCLSID(clsid_sqlncli,      CLSID_NULL) &&
+       IsEqualCLSID(clsid_sqlncli10,    CLSID_NULL) && 
+       IsEqualCLSID(clsid_sqlncli11,    CLSID_NULL) &&
+       IsEqualCLSID(clsid_msoledbsql,   CLSID_NULL) &&
+       IsEqualCLSID(clsid_msoledbsql19, CLSID_NULL)) {
 
       ret = CLSIDFromProgID(L"SQLOLEDB", &clsid_sqloledb);
       if (FAILED(ret)) {
@@ -442,6 +557,11 @@ void initialize ()
       ret = CLSIDFromProgID(L"MSOLEDBSQL", &clsid_msoledbsql);
       if (FAILED(ret)) {
          clsid_msoledbsql = CLSID_NULL;
+      }
+
+      ret = CLSIDFromProgID(L"MSOLEDBSQL19", &clsid_msoledbsql19);
+      if (FAILED(ret)) {
+         clsid_msoledbsql19 = CLSID_NULL;
       }
    }
 
@@ -513,11 +633,12 @@ void initialize ()
 // given provider.
 int no_of_ssprops(provider_enum provider) {
    switch (provider) {
-      case provider_sqloledb   : return no_of_ssprops_sqloledb;
-      case provider_sqlncli    : return no_of_ssprops_sqlncli;
-      case provider_sqlncli10  : return no_of_ssprops_sqlncli10;
-      case provider_sqlncli11  : return no_of_ssprops_sqlncli11;
-      case provider_msoledbsql : return no_of_ssprops_msoledbsql;
+      case provider_sqloledb     : return no_of_ssprops_sqloledb;
+      case provider_sqlncli      : return no_of_ssprops_sqlncli;
+      case provider_sqlncli10    : return no_of_ssprops_sqlncli10;
+      case provider_sqlncli11    : return no_of_ssprops_sqlncli11;
+      case provider_msoledbsql   : return no_of_ssprops_msoledbsql;
+      case provider_msoledbsql19 : return no_of_ssprops_msoledbsql19;
       default :
          croak("Internal error: Unexpected value %d passed to no_of_ssprops");
          return 0;
@@ -527,7 +648,9 @@ int no_of_ssprops(provider_enum provider) {
 // This routine returns the default provider, which is highest version of
 // SQL Native Client/SQLOLEDB that is installed.
 provider_enum default_provider(void) {
-  if (! IsEqualCLSID(clsid_msoledbsql, CLSID_NULL))
+  if (! IsEqualCLSID(clsid_msoledbsql19, CLSID_NULL))
+      return provider_msoledbsql19;
+  else if (! IsEqualCLSID(clsid_msoledbsql, CLSID_NULL))
       return provider_msoledbsql;
   else if (! IsEqualCLSID(clsid_sqlncli11, CLSID_NULL))
       return provider_sqlncli11;

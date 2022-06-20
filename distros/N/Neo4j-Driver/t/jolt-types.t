@@ -7,11 +7,7 @@ use Test::More 0.88;
 use Test::Exception;
 use Test::Warnings;
 
-{
-
-package Neo4j_Test::JoltTypes;
-use parent 'Neo4j_Test::MockHTTP';
-sub response_for { &Neo4j_Test::MockHTTP::response_for }
+use Neo4j_Test::MockHTTP qw(response_for);
 
 sub single_column {[
 	{ header => { fields => [0] } },
@@ -75,8 +71,6 @@ response_for 'sigil error' => { jolt => single_column(
 	{ '' => '' },
 )};
 
-}
-
 
 # Confirm that the deep_bless Jolt parser correctly
 # converts Neo4j values to Perl values.
@@ -89,7 +83,7 @@ plan tests => 1 + 6 + 1;
 
 
 lives_and { ok $s = Neo4j::Driver->new('http:')
-                    ->config(net_module => 'Neo4j_Test::JoltTypes')
+                    ->plugin('Neo4j_Test::MockHTTP')
                     ->session(database => 'dummy') } 'session';
 
 

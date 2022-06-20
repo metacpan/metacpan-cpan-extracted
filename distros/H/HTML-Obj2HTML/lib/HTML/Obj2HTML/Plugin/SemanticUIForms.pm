@@ -13,6 +13,7 @@ HTML::Obj2HTML::register_extension("checkbox", {
   tag => "",
   before => sub {
     my $obj = shift;
+    if (ref $obj ne "HASH") { return ""; }
     my $readonly = HTML::Obj2HTML::get_opt("readonly") || $obj->{readonly};
     delete($obj->{readonly});
     if ($readonly) {
@@ -38,6 +39,7 @@ HTML::Obj2HTML::register_extension("radio", {
   tag => "",
   before => sub {
     my $obj = shift;
+    if (ref $obj ne "HASH") { return ""; }
     my $readonly = HTML::Obj2HTML::get_opt("readonly") || $obj->{readonly};
     delete($obj->{readonly});
     if ($readonly) {
@@ -63,7 +65,7 @@ HTML::Obj2HTML::register_extension("labeledinput", {
   tag => "",
   before => sub {
     my $obj = shift;
-
+    if (ref $obj ne "HASH") { return ""; }
     my $readonly = HTML::Obj2HTML::get_opt("readonly") || $obj->{readonly};
     delete($obj->{readonly});
     if ($readonly) {
@@ -102,6 +104,7 @@ HTML::Obj2HTML::register_extension("fields", {
   tag => "div",
   before => sub {
     my $o = shift;
+    if (ref $o ne "HASH") { return ""; }
     $o->{class} = "ui ".$semanticnumbers[$o->{num}]." fields";
     delete($o->{num});
     return "";
@@ -111,6 +114,7 @@ HTML::Obj2HTML::register_extension("checkboxfield", {
   tag => "",
   before => sub {
     my $obj = shift;
+    if (ref $obj ne "HASH") { return ""; }
     return HTML::Obj2HTML::gen(commonfield($obj, [ checkbox => $obj ]));
   }
 });
@@ -118,6 +122,7 @@ HTML::Obj2HTML::register_extension("radiofield", {
   tag => "",
   before => sub {
     my $obj = shift;
+    if (ref $obj ne "HASH") { return ""; }
     return HTML::Obj2HTML::gen(commonfield($obj, [ radio => $obj ]));
   }
 });
@@ -126,6 +131,7 @@ HTML::Obj2HTML::register_extension("inputfield", {
   tag => "",
   before => sub {
     my $obj = shift;
+    if (ref $obj ne "HASH") { return ""; }
     my $readonly = HTML::Obj2HTML::get_opt("readonly") || $obj->{readonly};
     delete($obj->{readonly});
     if ($readonly) {
@@ -140,7 +146,7 @@ HTML::Obj2HTML::register_extension("textareafield", {
   tag => "",
   before => sub {
     my $obj = shift;
-
+    if (ref $obj ne "HASH") { return ""; }
     if (defined $obj->{value}) {
       my $val = $obj->{value};
       delete($obj->{value});
@@ -169,6 +175,7 @@ HTML::Obj2HTML::register_extension("htmlfield", {
   tag => "",
   before => sub {
     my $obj = shift;
+    if (ref $obj ne "HASH") { return ""; }
     if ($obj->{class} !~ /editor/) {
       if ($obj->{class}) { $obj->{class} .= " "; }
       $obj->{class} .= "editor";
@@ -181,6 +188,7 @@ HTML::Obj2HTML::register_extension("selectfield", {
   tag => "",
   before => sub {
     my $obj = shift;
+    if (ref $obj ne "HASH") { return ""; }
 
     my $readonly = HTML::Obj2HTML::get_opt("readonly") || $obj->{readonly};
     delete($obj->{readonly});
@@ -296,6 +304,7 @@ HTML::Obj2HTML::register_extension("datefield", {
   tag => "",
   before => sub {
     my $obj = shift;
+    if (ref $obj ne "HASH") { return ""; }
 
     my $readonly = HTML::Obj2HTML::get_opt("readonly") || $obj->{readonly};
     delete($obj->{readonly});
@@ -321,6 +330,7 @@ HTML::Obj2HTML::register_extension("submit", {
   tag => "",
   before => sub {
     my $obj = shift;
+    if (ref $obj ne "HASH") { $obj = { _ => $obj }; }
     my $readonly = HTML::Obj2HTML::get_opt("readonly") || $obj->{readonly};
     delete($obj->{readonly});
     if ($readonly) {
@@ -337,6 +347,7 @@ HTML::Obj2HTML::register_extension("cancel", {
   tag => "",
   before => sub {
     my $obj = shift;
+    if (ref $obj ne "HASH") { $obj = { _ => $obj }; }
     my $readonly = HTML::Obj2HTML::get_opt("readonly") || $obj->{readonly};
     delete($obj->{readonly});
     if ($readonly) {
@@ -353,6 +364,7 @@ HTML::Obj2HTML::register_extension("helplabel", {
   tag => "label",
   before => sub {
     my $o = shift;
+    if (ref $o ne "HASH") { $o = { helptext => $o }; }
     $o->{_} = [ _ => $o->{label} ];
     if ($o->{helptext}) {
       push(@{$o->{_}}, help => { text => $o->{helptext} });
@@ -369,6 +381,7 @@ HTML::Obj2HTML::register_extension("helplabel", {
 
 sub genhelplabel {
   my $obj = shift;
+  if (ref $obj ne "HASH") { $obj = { _ => $obj }; }
   if ($obj->{label}) {
     my $label = $obj->{label};
     if ($obj->{helptext}) {
@@ -388,6 +401,7 @@ sub commonfield {
   my $obj = shift;
   my $field = shift;
 
+  if (ref $obj ne "HASH") { return ""; }
   my $class = "field";
   if ($obj->{required}) {
     $class .= " required";

@@ -9,14 +9,14 @@ use File::Basename 'dirname';
 use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
 # Fields
-sub object_file {
+sub file {
   my $self = shift;
   if (@_) {
-    $self->{object_file} = $_[0];
+    $self->{file} = $_[0];
     return $self;
   }
   else {
-    return $self->{object_file};
+    return $self->{file};
   }
 }
 
@@ -64,25 +64,14 @@ sub class_name {
   }
 }
 
-sub is_resource {
+sub lib_type {
   my $self = shift;
   if (@_) {
-    $self->{is_resource} = $_[0];
+    $self->{lib_type} = $_[0];
     return $self;
   }
   else {
-    return $self->{is_resource};
-  }
-}
-
-sub is_lib_file {
-  my $self = shift;
-  if (@_) {
-    $self->{is_lib_file} = $_[0];
-    return $self;
-  }
-  else {
-    return $self->{is_lib_file};
+    return $self->{lib_type};
   }
 }
 
@@ -97,14 +86,14 @@ sub source_type {
   }
 }
 
-sub is_exe_config {
+sub config {
   my $self = shift;
   if (@_) {
-    $self->{is_exe_config} = $_[0];
+    $self->{config} = $_[0];
     return $self;
   }
   else {
-    return $self->{is_exe_config};
+    return $self->{config};
   }
 }
 
@@ -112,7 +101,7 @@ sub is_exe_config {
 sub to_string {
   my ($self) = @_;
   
-  return $self->object_file;
+  return $self->file;
 }
 
 # Methods
@@ -144,19 +133,19 @@ B<SPVM::Builder::ObjectFileInfo> is a object file information. This infromation 
 
 Fields of B<SPVM::Builder::ObjectFileInfo>.
 
-=head2 object_file
+=head2 file
 
-  my $object_file = $object_file_info->object_file;
-  $object_file_info->object_file($object_file);
+  my $file = $object_file_info->file;
+  $object_file_info->file($file);
 
-Get and set the object file that is compiled.
+Get and set the path of the object file.
 
 =head2 source_file
 
   my $source_file = $object_file_info->source_file;
   $object_file_info->source_file($source_file);
 
-Get and set the source file that is the source of the compiled object file.
+Get and set the path of source file.
 
 =head2 cc
 
@@ -179,19 +168,14 @@ Get and set the compiler flags that compiled the object file. The default value 
 
 Get and set the class name belonged to when the object file was compiled.
 
-=head2 is_resource
+=head2 lib_type
 
-  my $is_resource = $object_file_info->is_resource;
-  $object_file_info->is_resource($is_resource);
+  my $lib_type = $object_file_info->lib_type;
+  $object_file_info->lib_type($lib_type);
 
-Get and set if the object file(this is static library(.a)) is a resource.
+Get and set the library type if the object is a static library or a dynamic library.
 
-=head2 is_lib_file
-
-  my $is_lib_file = $object_file_info->is_lib_file;
-  $object_file_info->is_lib_file($is_lib_file);
-
-Get and set if the object file is a library file.
+The values are C<static>, or C<dynamic>.
 
 =head2 source_type
 
@@ -200,12 +184,12 @@ Get and set if the object file is a library file.
 
 Get and set source type. C<native_module> or C<resource>.
 
-=head2 is_exe_config
+=head2 config
 
-  my $is_exe_config = $object_file_info->is_exe_config;
-  $object_file_info->is_exe_config($is_exe_config);
+  my $config = $object_file_info->config;
+  $object_file_info->config($config);
 
-Get and set if the object file is compiled using L<SPVM::Builder::Config::Exe>.
+Get and set the L<config|SPVM::Builder::Config> that is used to compile the source file.
 
 =head1 METHODS
 

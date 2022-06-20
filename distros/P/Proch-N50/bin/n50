@@ -21,7 +21,7 @@ our %program = (
     'NAME'    => 'FASTX N50',
     'AUTHOR'  => 'Andrea Telatin',
     'MAIL'    => 'andrea@telatin.com',
-    'VERSION' => '4.0.1',
+    'VERSION' => '4.0.4',
 );
 my $hasJSON = undef;
 my $t;
@@ -583,7 +583,7 @@ n50 - A script to calculate N50 from one or multiple FASTA/FASTQ files.
 
 =head1 VERSION
 
-version 1.4.2
+version 1.4.4
 
 =head1 SYNOPSIS
 
@@ -597,6 +597,14 @@ It will print the result in different formats, by default only the N50 is printe
 for a single file and all metrics in TSV format for multiple files.
 
 I<*>: See L<https://lh3.github.io/2020/04/08/a-new-metric-on-assembly-contiguity>
+
+=head1 NAME
+
+n50 - A script to calculate N50 from one or multiple FASTA/FASTQ files.
+
+=head1 VERSION
+
+version 1.4.2
 
 =head1 NAME
 
@@ -835,6 +843,18 @@ Andrea Telatin <andrea@telatin.com>
 =head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2018-2020 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=head1 AUTHOR
+
+Andrea Telatin <andrea@telatin.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018-2022 by Andrea Telatin.
 
 This is free software, licensed under:
 

@@ -6,14 +6,17 @@ HTML::Obj2HTML::register_extension("repeat", {
   before => sub {
     my $o = shift;
     my $ret = [];
-    if (!defined $o->{num}) { $o->{num} = 1; }
-    for (my $i=0; $i<$o->{num}; $i++) {
-      push(@{$ret}, @{$o->{_}});
+    if (ref $o ne "HASH") {
+      return $o;
+    } else {
+      if (!defined $o->{num}) { $o->{num} = 1; }
+      for (my $i=0; $i<$o->{num}; $i++) {
+        push(@{$ret}, @{$o->{_}});
+      }
     }
     return $ret;
   }
 });
-
 HTML::Obj2HTML::register_extension("editable", {
   tag => "",
   before => sub {

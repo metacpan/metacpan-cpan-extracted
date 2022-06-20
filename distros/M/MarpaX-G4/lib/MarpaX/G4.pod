@@ -75,7 +75,7 @@ normalize-whitespace: 1
 
 =for MarpaX::G4::Display::End
 
-with the option '-c' for stripping comments generates the output
+with the option B<-c>, B<-f> and B<-k>
 
 =for MarpaX::G4::Display
 name: Landing page output
@@ -91,6 +91,7 @@ normalize-whitespace: 1
     <discarded redirects> ~   WS
     # ---
     eval            ::= additionExp
+
     additionExp     ::= multiplyExp additionExp_002
     additionExp_001 ::= '+' multiplyExp
                     |   '-' multiplyExp
@@ -103,6 +104,7 @@ normalize-whitespace: 1
 
     atomExp         ::= Number
                     |   '(' additionExp ')'
+
     Number          ::= Number_002 opt_Number_006
     Number_001      ~   [0-9]
     Number_002      ::= Number_001+
@@ -113,10 +115,7 @@ normalize-whitespace: 1
     opt_Number_006  ::= Number_005
 
     WS              ::= WS_002
-    WS_001          ~   ' '
-                    |   '\t'
-                    |   '\r'
-                    |   '\n'
+    WS_001          ~   [ \t\r\n]
     WS_002          ::= WS_001+
 
 =for MarpaX::G4::Display::End
@@ -846,6 +845,9 @@ Why Marpa would refuse to accept the C<UNSIGNED_INTEGER> and C<DELIMITED_ID> sym
 is completely unclear to me.
 The changes i applied made Marpa accept the grammar but they are not intuitive.
 
+
+=head1 Driver scripts for MarpaX::G4
+
 The scripts
 
 =over 4
@@ -856,7 +858,9 @@ The scripts
 
 =back
 
-are driver scripts for MarpaX::G4.
+are driver scripts for MarpaX::G4. B<parseg4_from_file.pl> reads an antlr4 grammar from an (or multiple) input file(s)
+and writes a Marpa::R2 grammar to output. B<testmarpagrammar_from_file.pl> reads a Marpa::R2 grammar from an input file,
+applies it to test data from a 2nd input file and writes the parse tree to output.
 
 The versions
 
@@ -892,18 +896,12 @@ normalize-whitespace: 1
 
     [
       [
-        [2, []],
+        2,
         [
           "*",
           [
             "(",
-            [
-              [
-                ["(", [[[5, []], []], ["+", [[2, []], []]]], ")"],
-                ["*", [3, []]],
-              ],
-              [],
-            ],
+            [[["(", [[5, []], ["+", [2, []]]], ")"], ["*", 3]], []],
             ")",
           ],
         ],

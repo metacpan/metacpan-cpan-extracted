@@ -10,5 +10,5 @@ my $rc = eval { $class->$method(
 	username => 'fakename',
 	url      => 'http://www.example.com',
 	) };
-	
+
 done_testing();

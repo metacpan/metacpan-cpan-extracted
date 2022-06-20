@@ -11,9 +11,9 @@ use XSLoader;
 
 our @EXPORT_OK = qw(minify minify_utf8 minify_ascii);
 
-our $VERSION = 'v0.6.1';
+our $VERSION = 'v0.6.3';
 
-XSLoader::load( "Text::Minify::XS", $VERSION );
+XSLoader::load( __PACKAGE__, $VERSION );
 
 {
     no strict 'refs';
@@ -34,7 +34,7 @@ Text::Minify::XS - remove indentation and trailing whitespace
 
 =head1 VERSION
 
-version v0.6.1
+version v0.6.3
 
 =head1 SYNOPSIS
 
@@ -72,7 +72,7 @@ removes trailing whitespace,
 
 =item *
 
-removes multiple newlines,
+collapses multiple newlines,
 
 =item *
 
@@ -112,61 +112,8 @@ encoded as UTF-8.
 
 =head1 SEE ALSO
 
-There are many string trimming and specialised
-whitespace/comment-removal modules on CPAN.  Some of them are:
-
-=head2 CSS
-
-=over
-
-=item L<CSS::Minifier>
-
-=item L<CSS::Minifier::XS>
-
-=item L<CSS::Packer>
-
-=back
-
-=head2 HTML
-
-=over
-
-=item L<HTML::Packer>
-
-=back
-
-=head2 JavaScript
-
-=over
-
-=item L<JavaScript::Minifier>
-
-=item L<JavaScript::Minifier::XS>
-
-=item L<JavaScript::Packer>
-
-=back
-
-=head2 Plain Text
-
-=over
-
-=item L<String::Strip>
-
-=item L<String::Trim>
-
-=item String::Trim::Regex
-
-=item L<String::Trim::NonRegex>
-
-=item L<String::Util>
-
-=item L<Text::Trim>
-
-=back
-
-This list does not include specialised template filters or plugins to
-web frameworks.
+There are many string trimming and specialised whitespace/comment-removal modules on CPAN.
+It is not practical to include such a list.
 
 =head1 SOURCE
 

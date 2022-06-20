@@ -8,9 +8,21 @@ use Carp;
 use Mojo::UserAgent;
 use Scalar::Util qw/blessed/;
 
-use vars qw($DEBUG $CACHE);
+=encoding utf8
 
-our $VERSION = '1.13';
+=head1 NAME
+
+Geo::GeoNames - Perform geographical queries using GeoNames Web Services
+
+=head1 VERSION
+
+Version 1.14
+
+=cut
+
+our $VERSION = '1.14';
+
+use vars qw($DEBUG $CACHE);
 
 our %searches = (
 	cities                              => 'cities?',
@@ -237,13 +249,28 @@ sub username {
 	$self->{username};
 	}
 
+=head2 ua
+
+Accessor method to get and set UserAgent object used internally. You
+can call I<env_proxy> for example, to get the proxy information from
+environment variables:
+
+    $geo_coder->ua()->env_proxy(1);
+
+You can also set your own User-Agent object:
+
+    use LWP::UserAgent::Throttled;
+    $geo_coder->ua(LWP::UserAgent::Throttled->new());
+
+=cut
+
 sub ua {
-	my( $self, $ua ) = @_;
-
-	$self->{ua} = $ua if @_ == 2;
-
-	$self->{ua};
+	my $self = shift;
+	if (@_) {
+		$self->{ua} = shift;
 	}
+	$self->{ua};
+}
 
 sub default_ua {
 	my $ua = Mojo::UserAgent->new;
@@ -298,7 +325,7 @@ sub _build_request_url {
 		$request_url .= join('', map { "$key=$_&" } sort @vals );
 		}
 
-	chop($request_url); # loose the trailing &
+	chop($request_url); # lose the trailing &
 	return $request_url;
 	}
 
@@ -422,12 +449,6 @@ sub DESTROY { 1 }
 
 __END__
 
-=encoding utf8
-
-=head1 NAME
-
-Geo::GeoNames - Perform geographical queries using GeoNames Web Services
-
 =head1 SYNOPSIS
 
 	use Geo::GeoNames;
@@ -468,7 +489,7 @@ L<http://www.geonames.org/enablefreewebservice>
 Provides a perl interface to the webservices found at
 L<http://api.geonames.org>. That is, given a given placename or
 postalcode, the module will look it up and return more information
-(longitude, lattitude, etc) for the given placename or postalcode.
+(longitude, latitude, etc) for the given placename or postalcode.
 Wikipedia lookups are also supported. If more than one match is found,
 a list of locations will be returned.
 
@@ -892,7 +913,13 @@ encoded. So make sure that strings are encoded/decoded based on the
 correct encoding.
 
 Please report any bugs found or feature requests through GitHub issues
-L<https://github.com/briandfoy/geo-geonames/issues>
+L<https://github.com/nigelhorne/Geo-GeoNames/issues>.
+or
+C<bug-geo-geonamnes at rt.cpan.org>,
+or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Geo-GeoNames>.
+I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
 
 =head1 SEE ALSO
 
@@ -907,18 +934,21 @@ L<https://github.com/briandfoy/geo-geonames/issues>
 =head1 SOURCE AVAILABILITY
 
 The source code for this module is available from Github
-at L<https://github.com/briandfoy/geo-geonames>
+at L<https://github.com/nigelhorne/Geo-GeoNames>.
 
 =head1 AUTHOR
 
 Per Henrik Johansen, C<< <per.henrik.johansen@gmail.com> >>.
 
-Currently maintained by brian d foy, C<< <brian.d.foy@gmail.com> >>
+Previously maintained by brian d foy, C<< <brian.d.foy@gmail.com> >>
 and Nicolas Mendoza, C<< <mendoza@pvv.ntnu.no> >>
+
+Maintained by Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2007-2008 by Per Henrik Johansen
+Copyright © 2007-2021 by Per Henrik Johansen
+Copyright © 2022 by Nigel Horne
 
 This library is available under the Artistic License 2.0.
 

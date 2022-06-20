@@ -1,7 +1,7 @@
 use v5.12;
 
 package Chart;
-our $VERSION = 'v2.402.1';
+our $VERSION = 'v2.402.3';
 
 use Chart::Points;
 use Chart::Lines;
@@ -20,9 +20,7 @@ use Chart::Composite;
 use Chart::Pareto;
 
 
-sub new {
-    
-}
+
 
 1;
 
@@ -30,7 +28,7 @@ sub new {
 
 =head1 NAME
 
-Chart - a series of charting modules 
+Chart - a series of charting modules
 
 =head1 SYNOPSIS 
 
@@ -349,6 +347,7 @@ this hash are
 NB. For composite charts, there is a limit of 8 datasets per component.
 The colors for 'dataset8' through 'dataset15' become the colors
 for 'dataset0' through 'dataset7' for the second component chart.
+More options how to define colors are described under L<Chart::Color>.
 
 =item 'title_font'
 
@@ -450,11 +449,12 @@ chart.  Default is undef.
 
 =item 'y_ticks1', 'y_ticks2'
 
-The number of y ticks to use on the first and second y-axis on a composite
-chart.  Please note that if you just set the 'y_ticks' option, both axes 
-will use that number of y ticks.  Both default to undef.
+Only for composite charts, the number of y ticks to use on the first and
+second y-axis on a composite chart.  Please note that if you just set the
+'y_ticks' option, both axes will use that number of y ticks.
+Both default to undef.
 
-=item 'f_y_ticks1', 'f_y_ticks2'
+=item 'f_y_tick1', 'f_y_tick2'
 
 Only for composite charts, needs a reference to a function 
 which has one argument and has to return
@@ -569,6 +569,12 @@ Sets the maximum number of circles when generating a scale for direction.
 Default is 100. This limit is used to avoid plotting  an unreasonable 
 large number of ticks if non-round values are used for the min_val and
 max_val.
+
+=item 'ring'
+
+Only for pie charts: sets the "thickness" of the pie, the percentage of
+the radius, which is visible. Defaults to 1 (normal pie chart).
+Good values are between 0.2 and 0.4.
 
 =back
 

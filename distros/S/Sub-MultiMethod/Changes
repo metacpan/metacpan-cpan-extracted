@@ -3,8 +3,28 @@ Sub-MultiMethod
 
 Created:      2020-01-27
 Home page:    <https://metacpan.org/release/Sub-MultiMethod>
-Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Sub-MultiMethod>
+Bug tracker:  <https://github.com/tobyink/p5-sub-multimethod/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.905	2022-06-19
+
+ - Avoid using a particular optimization if Type::Param's head or tail
+   options are being used.
+
+0.904	2022-06-19
+
+ - When calling a method which was a coderef, it shouldn't be necessary to
+   look in parent classes.
+
+0.903	2022-06-19
+
+ [ Packaging ]
+ - Drop support for Perl 5.8.0 (Jul 2002); minimum Perl version is now
+   5.8.1 (Sep 2003).
+
+ [ Other ]
+ - Added: Sub::MultiMethod now supports references to coderefs as method
+   names.
 
 0.902	2020-11-15
 

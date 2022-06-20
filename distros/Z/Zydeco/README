@@ -333,6 +333,12 @@ KEYWORDS
       multi method myfunc ( HashRef *collection, Int *index ) {
         ...;
       }
+  
+      # lexical multimethod - make sure you declare the variable first
+      #
+      my $otherfunc;
+      multi method $otherfunc ( CodeRef $x ) { ... }
+      multi method $otherfunc ( HashRef $x ) { ... }
 
   `requires`
       role MyRole {

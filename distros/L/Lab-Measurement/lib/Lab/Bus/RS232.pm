@@ -1,6 +1,6 @@
 package Lab::Bus::RS232;
 #ABSTRACT: RS232 or Virtual Comm port bus
-$Lab::Bus::RS232::VERSION = '3.820';
+$Lab::Bus::RS232::VERSION = '3.821';
 use v5.20;
 
 use strict;
@@ -307,7 +307,7 @@ Lab::Bus::RS232 - RS232 or Virtual Comm port bus
 
 =head1 VERSION
 
-version 3.820
+version 3.821
 
 =head1 SYNOPSIS
 

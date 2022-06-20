@@ -147,7 +147,7 @@ shell$ myapp commands whatever
 It is possible to disable the generation of part of all of these
 automatic children `help` and `commands`:
 
-- setting option `auto-children` (at the highest `configuration level)
+- setting option `auto-children` (at the highest `configuration` level)
   to a false value (it is set to a true value by default). This option
   is actually more than a purely boolean one, though: it is also
   possible to set it to a list of sub-commands (inside an array

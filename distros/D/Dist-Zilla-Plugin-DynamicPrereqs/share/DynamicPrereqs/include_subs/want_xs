@@ -1,0 +1,10 @@
+{
+  my $want_xs;
+  sub want_xs {
+    return $want_xs if defined $want_xs;
+    my $want_pp = want_pp();
+    $want_xs = defined $want_pp ? !$want_pp : can_xs();
+    return $want_xs;
+  }
+}
+

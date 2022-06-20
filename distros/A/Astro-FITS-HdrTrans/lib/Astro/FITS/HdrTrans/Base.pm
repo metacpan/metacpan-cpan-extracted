@@ -31,7 +31,7 @@ use Math::Trig qw/ deg2rad /;
 use vars qw/ $VERSION /;
 use Astro::FITS::HdrTrans ();   # for the generic header list
 
-$VERSION = "1.64";
+$VERSION = "1.65";
 
 =head1 PUBLIC METHODS
 

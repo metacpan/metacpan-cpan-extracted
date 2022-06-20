@@ -18,6 +18,7 @@ lib/MooseX/Extended/Manual/Cloning.pod
 lib/MooseX/Extended/Manual/Construction.pod
 lib/MooseX/Extended/Manual/Overview.pod
 lib/MooseX/Extended/Manual/Shortcuts.pod
+lib/MooseX/Extended/Manual/Tutorial.pod
 lib/MooseX/Extended/Role.pm
 lib/MooseX/Extended/Role/Custom.pm
 lib/MooseX/Extended/Types.pm
@@ -31,6 +32,7 @@ t/configuration.t
 t/custom.t
 t/exceptions.t
 t/excludes_field_param.t
+t/field_init_arg.t
 t/inline.t
 t/lib/InlinePackages.pm
 t/lib/MooseX/Extended/Tests.pm
@@ -41,6 +43,7 @@ t/lib/Not/Corinna/Role/Created.pm
 t/moose_compatibility.t
 t/multimethods.t
 t/roles.t
+t/stringy-eval.t
 xt/author/00-compile.t
 xt/author/perlcritic.t
 xt/author/perltidy.t

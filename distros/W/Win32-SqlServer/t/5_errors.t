@@ -1,9 +1,14 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/5_errors.t 32    18-04-11 21:08 Sommar $
+# $Header: /Perl/OlleDB/t/5_errors.t 33    22-05-08 23:27 Sommar $
 #
 # Tests sql_message_handler and errors raised by OlleDB itself.
 #
 # $History: 5_errors.t $
+# 
+# *****************  Version 33  *****************
+# User: Sommar       Date: 22-05-08   Time: 23:27
+# Updated in $/Perl/OlleDB/t
+# New OLE DB provider MSOLEDBSQL19.
 # 
 # *****************  Version 32  *****************
 # User: Sommar       Date: 18-04-11   Time: 21:08
@@ -215,8 +220,11 @@ elsif ($X->{Provider} == Win32::SqlServer::PROVIDER_SQLNCLI10) {
 elsif ($X->{Provider} == Win32::SqlServer::PROVIDER_SQLNCLI11) {
    $PROVIDERNAME = 'Microsoft SQL Server Native Client 11.0';
 }
-else {
+elsif ($X->{Provider} == Win32::SqlServer::PROVIDER_MSOLEDBSQL) {
    $PROVIDERNAME = 'Microsoft OLE DB Driver for SQL Server'
+}
+else {
+   $PROVIDERNAME = 'Microsoft OLE DB Driver 19 for SQL Server'
 }
 
 

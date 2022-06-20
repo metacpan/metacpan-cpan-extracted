@@ -1,3 +1,25 @@
+1.04 2022-06-15 22:19:11 Europe/Moscow
+    [CHANGES]
+    * Config session.namespace no more required
+    * Change session driver from Dancer2::Plugin::Deferred to native
+
+     [DOCS]
+     * Configuration
+
+1.03 2022-05-24 19:32:31 Europe/Moscow
+    [BUGS]
+    * Validator LengthMin number bug
+    * Validator LengthMax number bug
+
+1.02 2022-05-24 15:08:03 Europe/Moscow
+    [FEATURES]
+    * Default input depending on request method
+    * Validator Boolean
+
+    [DOCS]
+    * Typos
+    * Validator Boolean
+
 1.01 2022-05-16 22:22:22 Europe/Moscow
     [BUGS]
     * Fix access to input field, that not exists

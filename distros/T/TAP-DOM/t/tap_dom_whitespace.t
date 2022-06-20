@@ -12,6 +12,7 @@ my $tap;
 {
         local $/;
         open (TAP, "< t/some_tap_whitespace.tap") or die "Cannot read t/some_tap_whitespace.tap";
+        binmode TAP;
         $tap = <TAP>;
         close TAP;
 }

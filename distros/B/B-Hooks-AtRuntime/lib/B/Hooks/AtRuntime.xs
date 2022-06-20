@@ -18,6 +18,20 @@ call_after (pTHX_ void *p)
     SvREFCNT_dec(cv);
 }
 
+void show_cx (pTHX_ const char *name, const PERL_CONTEXT *cx)
+{
+    int is_sub = CxTYPE(cx) == CXt_SUB;
+    CV *cxcv = is_sub ? cx->blk_sub.cv : NULL;
+    int is_special = is_sub ? CvSPECIAL(cxcv) : 0;
+    const char *cvname = is_sub ? GvNAME(CvGV(cxcv)) : "<none>";
+
+    Perl_warn(aTHX_ "%s: sub %s, special %s, name %s\n",
+        name,
+        (is_sub ? "yes" : "no"),
+        (is_special ? "yes" : "no"),
+        cvname);
+}
+
 MODULE = B::Hooks::AtRuntime  PACKAGE = B::Hooks::AtRuntime
 
 #ifdef lex_stuff_sv
@@ -37,17 +51,30 @@ count_BEGINs ()
     PREINIT:
         I32 c = 0;
         const PERL_CONTEXT *cx;
+        const PERL_CONTEXT *dbcx;
         const CV *cxcv;
     CODE:
         RETVAL = 0;
-        while ((cx = caller_cx(c++, NULL))) {
-            if (CxTYPE(cx) == CXt_SUB   &&
-                (cxcv = cx->blk_sub.cv) &&
+
+        while ((cx = caller_cx(c++, &dbcx))) {
+
+            /*
+            show_cx(aTHX_ "cx", cx);
+            show_cx(aTHX_ "dbcx", dbcx);
+            */
+
+            if (CxTYPE(dbcx) == CXt_SUB   &&
+                (cxcv = dbcx->blk_sub.cv) &&
                 CvSPECIAL(cxcv)         &&
                 strEQ(GvNAME(CvGV(cxcv)), "BEGIN")
             )
                 RETVAL++;
         }
+
+        /*
+        Perl_warn(aTHX_ "count_BEGINS: frames %i, BEGINs %lu\n",
+            c, RETVAL);
+        */
     OUTPUT:
         RETVAL
 
@@ -56,17 +83,18 @@ compiling_string_eval ()
     PREINIT:
         I32 c = 0;
         const PERL_CONTEXT *cx;
+        const PERL_CONTEXT *dbcx;
         const CV *cxcv;
     CODE:
         RETVAL = 0;
-        while ((cx = caller_cx(c++, NULL))) {
-            if (CxTYPE(cx) == CXt_SUB   &&
-                (cxcv = cx->blk_sub.cv) &&
+        while ((cx = caller_cx(c++, &dbcx))) {
+            if (CxTYPE(dbcx) == CXt_SUB   &&
+                (cxcv = dbcx->blk_sub.cv) &&
                 CvSPECIAL(cxcv)         &&
                 strEQ(GvNAME(CvGV(cxcv)), "BEGIN")
             ) {
-                cx = caller_cx(c + 1, NULL);
-                if (cx && CxREALEVAL(cx))
+                cx = caller_cx(c + 1, &dbcx);
+                if (cx && CxREALEVAL(dbcx))
                     RETVAL = 1;
                 break;
             }
@@ -100,7 +128,12 @@ run (...)
         SV      *sv;
         I32     i = 0;
     CODE:
-        LEAVE; /* hmm hmm hmm */
+        /* This is the magic step... This leaves the scope that
+         * surrounds the call to run(), putting us back in the outer
+         * scope we were called from. This is what makes after_runtime
+         * subs run at the end of the inserted-into scope, rather than
+         * when run() finishes. */
+        LEAVE;
 
         while (i++ < items) {
             sv = *(MARK + i);
@@ -109,11 +142,13 @@ run (...)
                 Perl_croak(aTHX_ "Not a reference");
             sv = SvRV(sv);
 
+            /* We have a ref to a ref; this is after_runtime. */
             if (SvROK(sv)) {
                 sv = SvRV(sv);
                 SvREFCNT_inc(sv);
                 SAVEDESTRUCTOR_X(call_after, sv);
             }
+            /* This is at_runtime. */
             else {
                 PUSHMARK(SP); PUTBACK;
                 call_sv(sv, G_VOID|G_DISCARD);
@@ -122,4 +157,6 @@ run (...)
             }
         }
 
+        /* Re-enter the scope level we were supposed to be in, or perl
+         * will get confused. */
         ENTER;

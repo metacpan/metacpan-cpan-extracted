@@ -50,12 +50,12 @@ my %WriteMakefileArgs = (
         resources => {
         #    homepage    => undef,
             repository  => {
-                url         => 'git@git.deguest.jp:jack/Cookie.git',
-                web         => 'https://git.deguest.jp/jack/Cookie',
+                url         => 'git@gitlab.com:jackdeguest/Cookie.git',
+                web         => 'https://gitlab.com/jackdeguest/Cookie',
                 type        => 'git',
             },
             bugtracker => {
-                web         => 'https://git.deguest.jp/jack/Cookie/issues',
+                web         => 'https://gitlab.com/jackdeguest/Cookie/issues',
             },
         },
     }) : ()),
@@ -83,13 +83,51 @@ if( !$@ && !$ENV{NO_MOD_PERL} )
     $ref->{_HAS_APACHE_TEST} = 1;
     
     my $config = Apache::TestConfig->thaw->httpd_config;
-    my( $has_ssl, $has_perl_ssl ) = ( 0, '' );
+    my( $has_ssl, $has_perl_ssl, $has_error ) = ( 0, '', 0 );
     $ref->{_HAS_SSL} = 0;
     # require Data::Dump;
     # print( STDERR "Apache::TestConfig->thaw->httpd_config yields: ", Data::Dump::dump( $config ), "\n" ) if( $MY_DEBUG );
     if( ref( $config ) eq 'Apache::TestConfig' )
     {
         $has_ssl = $config->{modules}->{ $config->{vars}->{ssl_module} } ? 1 : 0;
+        my $apache_bin = $config->{vars}->{httpd};
+        if( !$apache_bin )
+        {
+            eval
+            {
+                require File::Which;
+            };
+            if( !$@ )
+            {
+                for( qw( apache2 httpd ) )
+                {
+                    if( $apache_bin = File::Which::which( $_ ) )
+                    {
+                        print( STDERR "Found Apache binary at $apache_bin" ) if( $MY_DEBUG );
+                        last;
+                    }
+                }
+            }
+        }
+        
+        my $cmd = '';
+        if( $apache_bin )
+        {
+            $cmd .= ". $config->{vars}->{conf_dir}/envvars; " if( $config->{vars}->{conf_dir} && -e( "$config->{vars}->{conf_dir}/envvars" ) );
+            $cmd .= $apache_bin;
+            open( my $io, "${cmd} -M 2>&1|" );
+            while( <$io> )
+            {
+                $has_ssl++, last if( /ssl/i );
+                if( /Syntax[[:blank:]]+error[[:blank:]]+(?:on|at)[[:blank:]]+line[[:blank:]]+(\d+)/i )
+                {
+                    $has_error = $1;
+                }
+            }
+            close( $io );
+        }
+        warn( "[warning] You have syntax error in your Apache configuration file at line $has_error. You might want to do an apache2ctl configtest or (${cmd} -t)\n" ) if( $has_error );
+        
         # IO::Socket::SSL or Net::SSL
         eval( 'require IO::Socket::SSL' );
         if( $@ )
@@ -125,6 +163,7 @@ if( !$@ && !$ENV{NO_MOD_PERL} )
         }
     }
     
+    print( STDERR "Found apxs? ", ( $ref->{apxs} ? "yes at $ref->{apxs}" : 'no' ), "\n" ) if( $MY_DEBUG );
     if( !$ref->{apxs} )
     {
         my $apxs;
@@ -140,6 +179,7 @@ if( !$@ && !$ENV{NO_MOD_PERL} )
             my $build = Apache2::BuildConfig->new;
             $apxs = File::Spec->catfile( $build->{APXS_BINDIR}, 'apxs' ) if( $build->{APXS_BINDIR} );
             undef( $apxs ) unless( -e( $apxs ) );
+            print( STDERR "Found apxs at $apxs\n" ) if( $MY_DEBUG );
         }
         
         if( !$apxs )
@@ -151,6 +191,7 @@ if( !$@ && !$ENV{NO_MOD_PERL} )
             if( !$@ && ( $apxs = File::Which::which( 'apxs' ) ) )
             {
                 $ref->{apxs} = $apxs;
+                print( STDERR "Found apxs at $apxs" ) if( $MY_DEBUG );
             }
         }
         
@@ -250,9 +291,9 @@ if( !$@ && !$ENV{NO_MOD_PERL} )
                             # egrep -Ev '#' /etc/apache2/apache2.conf|egrep -Ev '^[[:blank:]]*$'
                             if( defined( $fh = IO::File->new( ">$new" ) ) )
                             {
-                                $fh->print( $conf );
+                                print( $fh $conf );
+                                close( $fh );
                             }
-                            $fh->close;
                             if( -s( $new ) > 0 )
                             {
                                 $ref->{httpd_conf} = $new;

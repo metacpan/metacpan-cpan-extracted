@@ -21,7 +21,7 @@ Readonly our $ISPAPI_CONNECTION_URL_OTE   => 'https://api-ote.ispapi.net/api/cal
 Readonly our $ISPAPI_CONNECTION_URL_LIVE  => 'https://api.ispapi.net/api/call.cgi';        # LIVE Connection Setup URL
 Readonly our $ISPAPI_CONNECTION_URL_PROXY => 'http://127.0.0.1/api/call.cgi';              # High Speed Connection Setup URL
 
-our $VERSION = 'v2.10.3';
+our $VERSION = 'v2.10.4';
 
 my $rtm = WebService::Hexonet::Connector::ResponseTemplateManager->getInstance();
 

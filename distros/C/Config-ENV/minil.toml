@@ -1,0 +1,5 @@
+name = "Config-ENV"
+badges = ["github-actions/test.yml"]
+authority="cpan:SATOH"
+
+module_maker="ModuleBuildTiny"

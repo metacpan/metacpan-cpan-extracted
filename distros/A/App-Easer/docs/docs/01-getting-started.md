@@ -34,11 +34,15 @@ Done! We're ready to move on.
 Basic templates to start with can be found in [templates][];
 
 
-## Introductory tutorial
+## Introductory tutorials
 
-In [Tutorial: a to-do application][] is possible to find a step-by-step
-tutorial to build a simple application, showing most of the common
-facilities provided by [App::Easer][].
+[Tutorial: a to-do application][] provides a step-by-step guide to build
+a simple application, showing most of the common facilities provided by
+[App::Easer][].
+
+[Tutorial: splitting onto multiple modules][tut-splitting] grows over
+the previous one to show how it is possible to easily split the
+application into several modules, to allow for future expansions.
 
 
 [App::Easer]: https://metacpan.org/pod/App::Easer
@@ -49,3 +53,4 @@ facilities provided by [App::Easer][].
 [download]: templates/getting-started.pl
 [Tutorial: a to-do application]: {{ '/docs/10-tutorial-base.html' | relative_url }}
 [templates]: {{ '/templates' | relative_url }}
+[tut-splitting]: {{ '/docs/15-tutorial-splitting.html' | relative_url }}

@@ -1,3 +1,10 @@
+0.053   2022-05-14  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention peri-doc.
+
+
 0.052   2022-05-02  Released-By: PERLANCAR; Urgency: medium
 
         - [cli list-pericmd-plugins] On --detail (-l), show more

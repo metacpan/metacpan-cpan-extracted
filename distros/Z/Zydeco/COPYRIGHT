@@ -17,7 +17,6 @@ Files: dist.ini
  t/20moosex.t
  t/21coderef.t
  t/22overload.t
- t/24mm.t
  t/25abstract.t
  t/26accumulate.t
  t/27rolehooks.t
@@ -26,7 +25,6 @@ Files: dist.ini
  t/41ps.t
  t/42mf.t
  t/50complextypes.t
- t/51mixedsigs.t
  t/52lists.t
  t/53outsiders.t
  t/80lines.t
@@ -74,7 +72,10 @@ Files: Changes
  META.yml
  doap.ttl
  lib/MooX/Pression.pm
-Copyright: Copyright 2021 Toby Inkster.
+ t/24mm.t
+ t/24mm_coderef.t
+ t/51mixedsigs.t
+Copyright: Copyright 2022 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
@@ -88,14 +89,14 @@ Copyright: This software is copyright (c) 2013, 2020 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2021 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2021 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  

@@ -7,7 +7,7 @@ use 5.012000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "a series of charting modules ",
+  "ABSTRACT" => "a series of charting modules",
   "AUTHOR" => "Chart-Group <chartgrp\@web.de>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "1.3",
     "Test::Warn" => "0.30"
   },
-  "VERSION" => "v2.402.1",
+  "VERSION" => "v2.402.3",
   "test" => {
     "TESTS" => "t/*.t"
   }

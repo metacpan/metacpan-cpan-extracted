@@ -33,12 +33,12 @@ subtest ebadf => sub {
 
 	close $s;
 
-	my $err = exception { select $rin, undef, undef, 0 };
+	my $err = exception { select $rin, undef, undef, 1 };
 	like($err, error_for('select', EBADF), 'void context' );
 
 	#----------------------------------------------------------------------
 
-	$err = exception { () = select $rin, undef, undef, 0 };
+	$err = exception { () = select $rin, undef, undef, 1 };
 	like($err, error_for('select', EBADF), 'list context');
 };
 
@@ -51,13 +51,13 @@ subtest success => sub {
 
 	is(exception { 
 		vec( my $rin = '', $fd, 1) = 1;
-		my $got = select $rin, undef, undef, 0;
+		my $got = select $rin, undef, undef, 1;
 		is $got, 1, 'scalar context return 1';
 	}, undef, 'scalar context lives');
 
 	is(exception {
 		vec( my $rin = '', $fd, 1) = 1;
-		my ($got) = select $rin, undef, undef, 0;
+		my ($got) = select $rin, undef, undef, 1;
 		is $got, 1, 'list context returns 1';
 	}, undef, 'list context lives');
 };

@@ -4,7 +4,7 @@ Plack::Middleware::Text::Minify - remove HTML indentation on the fly
 
 # VERSION
 
-version v0.3.1
+version v0.3.2
 
 # SYNOPSIS
 
@@ -107,7 +107,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020-2021 by Robert Rothenberg.
+This software is Copyright (c) 2020-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

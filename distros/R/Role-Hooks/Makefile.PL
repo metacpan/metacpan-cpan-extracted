@@ -33,11 +33,11 @@ my $meta = {
                                        },
                         },
   "provides"         => {
-                          "Role::Hooks" => { file => "lib/Role/Hooks.pm", version => 0.004 },
+                          "Role::Hooks" => { file => "lib/Role/Hooks.pm", version => 0.005 },
                         },
   "release_status"   => "stable",
   "resources"        => {
-                          bugtracker   => { web => "http://rt.cpan.org/Dist/Display.html?Queue=Role-Hooks" },
+                          bugtracker   => { web => "https://github.com/tobyink/p5-role-hooks/issues" },
                           homepage     => "https://metacpan.org/release/Role-Hooks",
                           license      => ["http://dev.perl.org/licenses/"],
                           repository   => {
@@ -47,7 +47,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Role-Hooks/project",
                         },
-  "version"          => 0.004,
+  "version"          => 0.005,
   "x_static_install" => 1,
 };
 

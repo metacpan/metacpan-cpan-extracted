@@ -12,7 +12,7 @@ use lib 't/lib';
 #use NoInlineAttribute;
 use Test::More;
 use Test::Fatal;
-#use Test::Moose;
+use Test::Moose;
 
 {
     my %handles = (
@@ -73,7 +73,7 @@ note "Testing class $class";
 
     can_ok( $class, $_ ) for sort keys %{$handles};
 
-#    with_immutable {
+    with_immutable {
         my $obj = $class->new;
 
         ok( $obj->illuminate, 'set returns true' );
@@ -98,8 +98,8 @@ note "Testing class $class";
         ok( !$obj->is_lit,
             'toggle is_lit back to 0 again using ->flip_switch' );
         ok( $obj->is_dark, 'check if is_dark does the right thing' );
-#    }
-#    $class;
+    }
+    $class;
 }
 
 done_testing;

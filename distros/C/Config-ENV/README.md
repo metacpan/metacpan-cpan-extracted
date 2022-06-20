@@ -1,3 +1,4 @@
+[![Actions Status](https://github.com/cho45/Config-ENV/actions/workflows/test.yml/badge.svg)](https://github.com/cho45/Config-ENV/actions)
 # NAME
 
 Config::ENV - Various config determined by %ENV

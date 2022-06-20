@@ -8,7 +8,6 @@ META.yml
 Makefile.PL
 README
 README.md
-README.template
 bin/n50
 data/big.fa
 data/encodings/test-cr.fa.fa
@@ -42,6 +41,7 @@ t/release-06-fastx-reader.t
 t/release-20_stdin.t
 t/release-21_bin.t
 t/release-22_csv.t
+xt/LICENSE
 xt/N50.pm.old
 xt/n50.old
 xt/n50_loc_lib.sh

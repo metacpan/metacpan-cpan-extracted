@@ -8,13 +8,14 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-05-08'; # DATE
 our $DIST = 'Regexp-Pattern-Filename-Video-WhatsApp'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our %RE;
 
 $RE{filename_video_whatsapp} = {
     summary => 'Video filename saved by WhatsApp',
     pat => qr/\AVID-[0-9]{8}-WA[0-9]{4,}\.(?:MP4|mp4)\z/,
+    tags => ['anchored'],
     examples => [
         {str=>'foo.mp4', matches=>0, summary=>'No pattern'},
         {str=>'IMG-20210922-WA0001.jpg', matches=>0, summary=>'Image, not video'},
@@ -38,7 +39,7 @@ Regexp::Pattern::Filename::Video::WhatsApp - Video filename saved by WhatsApp
 
 =head1 VERSION
 
-This document describes version 0.002 of Regexp::Pattern::Filename::Video::WhatsApp (from Perl distribution Regexp-Pattern-Filename-Video-WhatsApp), released on 2022-05-08.
+This document describes version 0.003 of Regexp::Pattern::Filename::Video::WhatsApp (from Perl distribution Regexp-Pattern-Filename-Video-WhatsApp), released on 2022-05-08.
 
 =head1 SYNOPSIS
 
@@ -61,6 +62,8 @@ Using the pattern(s) directly:
 =over
 
 =item * filename_video_whatsapp
+
+Tags: anchored
 
 Video filename saved by WhatsApp.
 

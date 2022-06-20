@@ -1,5 +1,9 @@
 Revision history for HTTP-Message
 
+6.37      2022-06-14 14:08:55Z
+    - Support for Brotli "br" encoding (GH#163) (trizen and Julien Fiegehenn)
+    - Don't test Perl > 5.32 on Windows in GH Actions (GH#174) (Olaf Alders)
+
 6.36      2022-01-05 14:39:42Z
     - Fix examples in HTTP::Request::Common synopsis: HTTP::Request::Common
       does not put headers in an arrayref, unlike HTTP::Request (GH#170) (Karen

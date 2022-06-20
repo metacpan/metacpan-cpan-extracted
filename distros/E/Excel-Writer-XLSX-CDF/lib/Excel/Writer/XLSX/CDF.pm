@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use List::MoreUtils qw{first_index};
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 NAME
 
@@ -40,7 +40,9 @@ Generates Excel Document with Continuous Distribution Function Chart from the su
                                            chart_title      => "Continuous Distribution Function (CDF)",
                                            chart_y_label    => "Probability",
                                            chart_x_label    => "",
-                                           group_names_sort => 0,  #default 0 is in order of appearance in data
+                                           chart_x_min      => "auto", #defalut: undef => calculated by this package
+                                           chart_x_max      => "auto", #default: undef => calculated by this package
+                                           group_names_sort => 0,      #default: 0     => order of appearance in data
                                           );
 
 =cut
@@ -87,7 +89,7 @@ sub chart_y_label {
 
 =head2 chart_x_label
 
-Set and returns the X axis label of the Excel chart
+Set and returns the X axis max value of the Excel chart
 
 Default: ""
 
@@ -98,6 +100,42 @@ sub chart_x_label {
   $self->{'chart_x_label'} = shift if @_;
   $self->{'chart_x_label'} = '' unless defined $self->{'chart_x_label'};
   return $self->{'chart_x_label'};
+}
+
+=head2 chart_x_max
+
+Set and returns the X axis min value of the Excel chart
+
+Default: undef = calculate (currently max of all 90% or first 50% crossing)
+
+  "auto" - set to auto in Excel
+  number - set set_x_axis max to number
+
+=cut
+
+sub chart_x_max {
+  my $self           = shift;
+  $self->{'chart_x_max'} = shift if @_;
+  $self->{'chart_x_max'} = undef unless exists $self->{'chart_x_max'};
+  return $self->{'chart_x_max'};
+}
+
+=head2 chart_x_min
+
+Set and returns the X axis label of the Excel chart
+
+Default: undef = calculate (currently using auto)
+
+  "auto" - set to auto in Excel
+  number - set set_x_axis max to number
+
+=cut
+
+sub chart_x_min {
+  my $self           = shift;
+  $self->{'chart_x_min'} = shift if @_;
+  $self->{'chart_x_min'} = undef unless exists $self->{'chart_x_min'};
+  return $self->{'chart_x_min'};
 }
 
 =head2 chart_legend_display
@@ -246,22 +284,33 @@ sub generate {
 
   } #foreach group
 
-  my $maxset;
-  if (@stats_groups) {
-    require List::Util;
-    require Math::Round::SignificantFigures;
+  my $maxset = $self->chart_x_max;
+  if (!defined($maxset)) {
+    if (@stats_groups) {
+      require List::Util;
+      require Math::Round::SignificantFigures;
 
-    my $max      = List::Util::max(map {$_->{'max'}} @stats_groups);
-    my $p50      = Math::Round::SignificantFigures::ceilsigfigs(List::Util::max(map {$_->{'p50'}} @stats_groups) * 1.5, 2);
-    my $p90      = Math::Round::SignificantFigures::ceilsigfigs(List::Util::min(map {$_->{'p90'}} @stats_groups) * 1.5, 2);
-    $maxset   = List::Util::max($p50, $p90);
-    $maxset      = undef if $maxset > $max;
+      my $max      = List::Util::max(map {$_->{'max'}} @stats_groups);
+      my $p50      = Math::Round::SignificantFigures::ceilsigfigs(List::Util::max(map {$_->{'p50'}} @stats_groups) * 1.5, 2);
+      my $p90      = Math::Round::SignificantFigures::ceilsigfigs(List::Util::min(map {$_->{'p90'}} @stats_groups) * 1.5, 2);
+      $maxset      = List::Util::max($p50, $p90);
+      $maxset      = undef if $maxset > $max;
+    }
+  } elsif (defined($maxset) and $maxset =~ m/\Aauto\Z/i) {
+    $maxset = undef;
+  }
+
+  my $minset = $self->chart_x_min;
+  if (!defined($minset)) {
+    $minset = undef; #allow for calculation in the future
+  } elsif (defined($minset) and $minset =~ m/\Aauto\Z/i) {
+    $minset = undef;
   }
 
   #Configure chart
-  $chart->set_title( name => $self->chart_title                               );
-  $chart->set_y_axis(name => $self->chart_y_label, min => 0   , max => 1      );
-  $chart->set_x_axis(name => $self->chart_x_label,              max => $maxset);
+  $chart->set_title( name => $self->chart_title                                  );
+  $chart->set_y_axis(name => $self->chart_y_label, min => 0      , max => 1      );
+  $chart->set_x_axis(name => $self->chart_x_label, min => $minset, max => $maxset);
   $chart->set_legend(none => 1) unless $self->chart_legend_display;
 
   #Write Excel output to filehandle

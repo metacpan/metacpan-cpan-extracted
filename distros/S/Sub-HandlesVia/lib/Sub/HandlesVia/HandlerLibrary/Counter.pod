@@ -1,0 +1,99 @@
+=head1 NAME
+
+Sub::HandlesVia::HandlerLibrary::Counter - library of counter-related methods
+
+=head1 SYNOPSIS
+
+  package My::Class {
+    use Moo;
+    use Sub::HandlesVia;
+    use Types::Standard 'Int';
+    has attr => (
+      is => 'rwp',
+      isa => Int,
+      handles_via => 'Counter',
+      handles => {
+        'my_dec' => 'dec',
+        'my_inc' => 'inc',
+        'my_reset' => 'reset',
+        'my_set' => 'set',
+      },
+    );
+  }
+
+=head1 DESCRIPTION
+
+This is a library of methods for L<Sub::HandlesVia>.
+
+=head1 DELEGATABLE METHODS
+
+=head2 C<< dec( $amount? ) >>
+
+Arguments: B<< Optional[Int] >>.
+
+Decrements the counter by C<< $amount >>, or by 1 if no value is given.
+
+  my $object = My::Class->new( attr => 10 );
+  $object->my_dec;
+  $object->my_dec;
+  say $object->attr; ## ==> 8
+  $object->my_dec( 5 );
+  say $object->attr; ## ==> 3
+
+=head2 C<< inc( $amount? ) >>
+
+Arguments: B<< Optional[Int] >>.
+
+Increments the counter by C<< $amount >>, or by 1 if no value is given.
+
+  my $object = My::Class->new( attr => 0 );
+  $object->my_inc;
+  $object->my_inc;
+  say $object->attr; ## ==> 2
+  $object->my_inc( 3 );
+  say $object->attr; ## ==> 5
+
+=head2 C<< reset() >>
+
+Sets the counter to its default value, or 0 if it has no default.
+
+  my $object = My::Class->new( attr => 10 );
+  $object->my_reset;
+  say $object->attr; ## ==> 0
+
+=head2 C<< set( $value ) >>
+
+Arguments: B<< Int >>.
+
+Sets the counter to the given value.
+
+  my $object = My::Class->new( attr => 0 );
+  $object->my_set( 5 );
+  say $object->attr; ## ==> 5
+
+=head1 BUGS
+
+Please report any bugs to
+L<https://github.com/tobyink/p5-sub-handlesvia/issues>.
+
+=head1 SEE ALSO
+
+L<Sub::HandlesVia>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2020, 2022 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

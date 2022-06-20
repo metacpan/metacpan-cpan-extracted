@@ -4,6 +4,10 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.821 2022-06-19
+  * HP3458A: More functions for high-speed mode
+  * Nanonis Tramea: Complete set of raw access functions
+
 3.820 2022-06-06
   * New driver: Lakeshore 350 temperature controller
   * New WWW connection for REST-like interfaces

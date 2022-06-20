@@ -62,6 +62,7 @@ my @files = (
     't/does-type.t',
     't/exception.t',
     't/import-twice.t',
+    't/inheritance.t',
     't/inline-environment.t',
     't/inline.t',
     't/intersection.t',

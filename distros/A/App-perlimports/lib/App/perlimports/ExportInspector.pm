@@ -4,14 +4,14 @@ use Moo;
 
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
-our $VERSION = '0.000044';
+our $VERSION = '0.000045';
 
 use App::perlimports::Sandbox ();
 use Class::Inspector          ();
-use List::Util qw( any );
-use Module::Runtime qw( require_module );
+use List::Util                qw( any );
+use Module::Runtime           qw( require_module );
 use Sub::HandlesVia;
-use Try::Tiny qw( catch try );
+use Try::Tiny       qw( catch try );
 use Types::Standard qw(ArrayRef Bool HashRef Int InstanceOf Str);
 
 with 'App::perlimports::Role::Logger';
@@ -306,7 +306,7 @@ sub _list_to_hash {
     }
 
     # Specifically for File::chdir, which exports a typeglob, but doesn't
-    # implement eery possibility.
+    # implement every possibility.
     for my $key ( keys %hash ) {
         if ( substr( $key, 0, 1 ) eq '*' ) {
             my $thing = substr( $key, 1 );
@@ -522,7 +522,7 @@ App::perlimports::ExportInspector - Inspect code for exportable symbols
 
 =head1 VERSION
 
-version 0.000044
+version 0.000045
 
 =head1 SYNOPSIS
 

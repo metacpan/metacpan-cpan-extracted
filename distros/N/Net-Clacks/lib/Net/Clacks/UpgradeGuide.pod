@@ -280,6 +280,28 @@ allow slimming down the argument checking in future releases.
 WARNING: While this change should work with Perl 5.20 and up, the author of this module only tests against stable Perl versions that are still considered "in maintenance". As of this module release,
 these are 5.32.x and 5.34.x. Since <Net::Clacks> contains network code, the author of this module recommends to always keep your Perl installation as well as Net::Clacks up-to-date for security reasons.
 
+=head2 VERSION 24
+
+WARNING: BREAKING CHANGES! It is REQUIRED to update all servers and clients at the same time. 
+
+This is a bugfix and stability enhancement release.
+
+Version 24 fixes interclacks KEYSYNC problems. Some keys failed to sync after the clacks servers were running for some time (affects versions 22 and 23, possibly earlier versions as well).
+This was caused by a badly designed cache cleaning algorithm that wrongly removed the "cache time" while keeping the actual data, which in turn lead to sending out invalid
+KEYSYNC commands to the interclacks partner.
+
+I rewrote the way clacks cache entries are stored internally. This also changes the persistance file format, which will be upgraded in-place automatically (in nearly all cases).
+
+The caching algorithm should now be much more stable and easier to maintain (fingers crossed).
+
+The automatic cache cleaning interval can now be set by the "cachecleaninterval" config, which defaults to 60 seconds. "deletedcachetime" sets how long deleted cache entries are kept for
+interclacks sync (default 1 hour), and "stalecachetime" sets how long to keep cache entries that have not been accessed (default 1 day).
+
+This release also has a lot of code refactoring and other internal changes.
+
+This release is dedicated to the dog Sheila, faithful companion of my friend @NightStorm_KPC. Rest in peace, Sheila.
+
+
 =head1 AUTHOR
 
 Rene Schickbauer, E<lt>cavac@cpan.orgE<gt>

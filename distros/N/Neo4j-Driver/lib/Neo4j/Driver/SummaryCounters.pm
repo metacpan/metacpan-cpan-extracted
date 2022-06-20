@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::SummaryCounters;
 # ABSTRACT: Statement statistics
-$Neo4j::Driver::SummaryCounters::VERSION = '0.30';
+$Neo4j::Driver::SummaryCounters::VERSION = '0.31';
 
 sub new {
 	my ($class, $stats) = @_;
@@ -65,7 +65,7 @@ Neo4j::Driver::SummaryCounters - Statement statistics
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 SYNOPSIS
 

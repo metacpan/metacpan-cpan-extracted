@@ -48,8 +48,8 @@ SCOPE:
     );
 
     my $moveto1 = File::Remove::_moveto(
-        File::Spec->catdir( $base, 't' ),        # remove
-        File::Spec->catdir( $base, 't' ),        # cwd
+        File::Spec->catdir( $base, 't' ),    # remove
+        File::Spec->catdir( $base, 't' ),    # cwd
     );
     $moveto1 =~ s/\\/\//g;
 

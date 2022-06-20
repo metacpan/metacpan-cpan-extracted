@@ -29,4 +29,4 @@ resources:
   bugtracker: https://github.com/mrdvt92/perl-Excel-Writer-XLSX-CDF/issues
   homepage: https://github.com/mrdvt92/perl-Excel-Writer-XLSX-CDF
   repository: https://github.com/mrdvt92/perl-Excel-Writer-XLSX-CDF.git
-version: '0.03'
+version: '0.04'

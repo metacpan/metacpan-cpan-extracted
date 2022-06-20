@@ -5,7 +5,7 @@ use 5.6.2;
 use XML::LibXML '1.69';
 use Test::Builder;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 sub new {
     my ($class, %p) = @_;

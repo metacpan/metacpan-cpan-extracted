@@ -17,6 +17,7 @@ use Test::NoTabs;
 my @files = (
     'lib/Tapper/TAP/Harness.pm',
     't/00-load.t',
+    't/archive-with-empty.t',
     't/archive.t',
     't/author-eol.t',
     't/author-no-tabs.t',

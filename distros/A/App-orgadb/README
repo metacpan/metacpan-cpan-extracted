@@ -1,0 +1,103 @@
+NAME
+    App::orgadb - An opinionated Org addressbook tool
+
+VERSION
+    This document describes version 0.001 of App::orgadb (from Perl
+    distribution App-orgadb), released on 2022-06-12.
+
+SYNOPSIS
+FUNCTIONS
+  select_addressbook_entries
+    Usage:
+
+     select_addressbook_entries(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Select Org document elements using CSel (CSS-selector-like) syntax.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   category => *str_or_re*
+
+    *   color => *str* (default: "auto")
+
+        Whether to use color.
+
+    *   color_theme => *perl::colortheme::modname_with_optional_args*
+
+    *   detail => *bool*
+
+    *   entry => *str_or_re*
+
+        Find entry by string or regex search against its title.
+
+    *   field => *str_or_re*
+
+        Find field by string or regex search.
+
+    *   files => *array[filename]*
+
+        Path to addressbook files.
+
+    *   hide_category => *true*
+
+        Do not show category.
+
+    *   hide_entry => *true*
+
+        Do not entry headline.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-orgadb>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-orgadb>.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-orgadb>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

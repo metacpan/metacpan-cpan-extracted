@@ -62,6 +62,7 @@ use warnings;
 use strict;
 use Exporter;
 use Carp;
+use English     qw( -no_match_vars );
 use Digest::MD5 qw(md5_hex);
 use Perl::Tidy::Debugger;
 use Perl::Tidy::DevNull;
@@ -77,10 +78,12 @@ use Perl::Tidy::LineSource;
 use Perl::Tidy::Logger;
 use Perl::Tidy::Tokenizer;
 use Perl::Tidy::VerticalAligner;
-local $| = 1;
+local $OUTPUT_AUTOFLUSH = 1;
 
-# this can be turned on for extra checking during development
-use constant DEVEL_MODE => 0;
+# DEVEL_MODE can be turned on for extra checking during development
+use constant DEVEL_MODE   => 0;
+use constant EMPTY_STRING => q{};
+use constant SPACE        => q{ };
 
 use vars qw{
   $VERSION
@@ -110,7 +113,7 @@ BEGIN {
     # Release version must be bumped, and it is probably past time for a
     # release anyway.
 
-    $VERSION = '20220217';
+    $VERSION = '20220613';
 }
 
 sub DESTROY {
@@ -135,7 +138,7 @@ This error is probably due to a recent programming change
 ======================================================================
 EOM
     exit 1;
-}
+} ## end sub AUTOLOAD
 
 sub streamhandle {
 
@@ -196,7 +199,7 @@ sub streamhandle {
                     $New = sub { undef };
                     confess <<EOM;
 ------------------------------------------------------------------------
-No 'getline' method is defined for object of class $ref
+No 'getline' method is defined for object of class '$ref'
 Please check your call to Perl::Tidy::perltidy.  Trace follows.
 ------------------------------------------------------------------------
 EOM
@@ -216,7 +219,7 @@ EOM
                     $New = sub { undef };
                     confess <<EOM;
 ------------------------------------------------------------------------
-No 'print' method is defined for object of class $ref
+No 'print' method is defined for object of class '$ref'
 Please check your call to Perl::Tidy::perltidy. Trace follows.
 ------------------------------------------------------------------------
 EOM
@@ -237,7 +240,7 @@ EOM
     $fh = $New->( $filename, $mode );
     if ( !$fh ) {
 
-        Warn("Couldn't open file:$filename in mode:$mode : $!\n");
+        Warn("Couldn't open file:$filename in mode:$mode : $ERRNO\n");
 
     }
     else {
@@ -252,17 +255,21 @@ EOM
             elsif ( $filename eq '-' ) {
                 binmode STDOUT, ":raw:encoding(UTF-8)";
             }
+            else {
+                # shouldn't happen
+            }
         }
 
         # Case 2: handle unencoded data
         else {
             if    ( ref($fh) eq 'IO::File' ) { binmode $fh }
             elsif ( $filename eq '-' )       { binmode STDOUT }
+            else                             { }    # shouldn't happen
         }
     }
 
     return $fh, ( $ref or $filename );
-}
+} ## end sub streamhandle
 
 sub find_input_line_ending {
 
@@ -282,7 +289,7 @@ sub find_input_line_ending {
     binmode $fh;
     my $buf;
     read( $fh, $buf, 1024 );
-    close $fh;
+    close $fh || return $ending;
     if ( $buf && $buf =~ /([\012\015]+)/ ) {
         my $test = $1;
 
@@ -303,7 +310,7 @@ sub find_input_line_ending {
     else { }
 
     return $ending;
-}
+} ## end sub find_input_line_ending
 
 {    ## begin closure for sub catfile
 
@@ -311,7 +318,7 @@ sub find_input_line_ending {
 
     BEGIN {
         eval { require File::Spec };
-        $missing_file_spec = $@;
+        $missing_file_spec = $EVAL_ERROR;
     }
 
     sub catfile {
@@ -334,14 +341,14 @@ sub find_input_line_ending {
         my $test_file = $path . $name;
         my ( $test_name, $test_path ) = fileparse($test_file);
         return $test_file if ( $test_name eq $name );
-        return            if ( $^O eq 'VMS' );
+        return            if ( $OSNAME eq 'VMS' );
 
         # this should work at least for Windows and Unix:
         $test_file = $path . '/' . $name;
         ( $test_name, $test_path ) = fileparse($test_file);
         return $test_file if ( $test_name eq $name );
         return;
-    }
+    } ## end sub catfile
 } ## end closure for sub catfile
 
 # Here is a map of the flow of data from the input source to the output
@@ -394,6 +401,25 @@ sub Warn_msg { my $msg = shift; $fh_stderr->print($msg); return }
 # Output Warn message and bump Warn count
 sub Warn { my $msg = shift; $fh_stderr->print($msg); $Warn_count++; return }
 
+sub is_char_mode {
+
+    my ($string) = @_;
+
+    # Returns:
+    #   true  if $string is in Perl's internal character mode
+    #         (also called the 'upgraded form', or UTF8=1)
+    #   false if $string is in Perl's internal byte mode
+
+    # This function isolates the call to Perl's internal function
+    # utf8::is_utf8() which is true for strings represented in an 'upgraded
+    # form'. It is available after Perl version 5.8.
+    # See https://perldoc.perl.org/Encode.
+    # See also comments in Carp.pm and other modules using this function
+
+    return 1 if ( utf8::is_utf8($string) );
+    return;
+} ## end sub is_char_mode
+
 sub perltidy {
 
     my %input_hash = @_;
@@ -419,6 +445,67 @@ sub perltidy {
         postfilter            => undef,
     );
 
+    # Status information which can be returned for diagnostic purposes.
+    # This is intended for testing and subject to change.
+
+    # List of "key => value" hash entries:
+
+    # Some relevant user input parameters for convenience:
+    # opt_format         => value of --format: 'tidy', 'html', or 'user'
+    # opt_encoding       => value of -enc flag: 'utf8', 'none', or 'guess'
+    # opt_encode_output  => value of -eos flag: 'eos' or 'neos'
+    # opt_max_iterations => value of --iterations=n
+
+    # file_count         => number of files processed in this call
+
+    # If multiple files are processed, then the following values will be for
+    # the last file only:
+
+    # input_name         => name of the input stream
+    # output_name        => name of the output stream
+
+    # The following two variables refer to Perl's two internal string modes,
+    # and have the values 0 for 'byte' mode and 1 for 'char' mode:
+    # char_mode_source   => true if source is in 'char' mode. Will be false
+    #      unless we received a source string ref with utf8::is_utf8() set.
+    # char_mode_used     => true if text processed by perltidy in 'char' mode.
+    #      Normally true for text identified as utf8, otherwise false.
+
+    # This tells if Unicode::GCString was used
+    # gcs_used           => true if -gcs and Unicode::GCString found & used
+
+    # These variables tell what utf8 decoding/encoding was done:
+    # input_decoded_as   => non-blank if perltidy decoded the source text
+    # output_encoded_as  => non-blank if perltidy encoded before return
+
+    # These variables are related to iterations and convergence testing:
+    # iteration_count    => number of iterations done
+    #                       ( can be from 1 to opt_max_iterations )
+    # converged          => true if stopped on convergence
+    #                       ( can only happen if opt_max_iterations > 1 )
+    # blinking           => true if stopped on blinking states
+    #                       ( i.e., unstable formatting, should not happen )
+
+    my $rstatus = {
+
+        file_count         => 0,
+        opt_format         => EMPTY_STRING,
+        opt_encoding       => EMPTY_STRING,
+        opt_encode_output  => EMPTY_STRING,
+        opt_max_iterations => EMPTY_STRING,
+
+        input_name        => EMPTY_STRING,
+        output_name       => EMPTY_STRING,
+        char_mode_source  => 0,
+        char_mode_used    => 0,
+        input_decoded_as  => EMPTY_STRING,
+        output_encoded_as => EMPTY_STRING,
+        gcs_used          => 0,
+        iteration_count   => 0,
+        converged         => 0,
+        blinking          => 0,
+    };
+
     # Fix for issue git #57
     $Warn_count = 0;
 
@@ -427,7 +514,7 @@ sub perltidy {
     local *STDERR = *STDERR;
 
     if ( my @bad_keys = grep { !exists $defaults{$_} } keys %input_hash ) {
-        local $" = ')(';
+        local $LIST_SEPARATOR = ')(';
         my @good_keys = sort keys %defaults;
         @bad_keys = sort @bad_keys;
         confess <<EOM;
@@ -534,7 +621,9 @@ EOM
         unless ( defined($dump_options_type) ) {
             $dump_options_type = 'perltidyrc';
         }
-        unless ( $dump_options_type =~ /^(perltidyrc|full)$/ ) {
+        if (   $dump_options_type ne 'perltidyrc'
+            && $dump_options_type ne 'full' )
+        {
             croak <<EOM;
 ------------------------------------------------------------------------
 Please check value of -dump_options_type in call to perltidy;
@@ -546,7 +635,7 @@ EOM
         }
     }
     else {
-        $dump_options_type = "";
+        $dump_options_type = EMPTY_STRING;
     }
 
     if ($user_formatter) {
@@ -579,21 +668,21 @@ EOM
 
         # string
         else {
-            my ( $rargv, $msg ) = parse_args($argv);
+            my ( $rargv_str, $msg ) = parse_args($argv);
             if ($msg) {
                 Die(<<EOM);
 Error parsing this string passed to to perltidy with 'argv': 
 $msg
 EOM
             }
-            @ARGV = @{$rargv};
+            @ARGV = @{$rargv_str};
         }
     }
 
     my $rpending_complaint;
-    ${$rpending_complaint} = "";
+    ${$rpending_complaint} = EMPTY_STRING;
     my $rpending_logfile_message;
-    ${$rpending_logfile_message} = "";
+    ${$rpending_logfile_message} = EMPTY_STRING;
 
     my ( $is_Windows, $Windows_type ) = look_for_Windows($rpending_complaint);
 
@@ -601,7 +690,7 @@ EOM
     # instead of .tdy, etc. (but see also sub check_vms_filename)
     my $dot;
     my $dot_pattern;
-    if ( $^O eq 'VMS' ) {
+    if ( $OSNAME eq 'VMS' ) {
         $dot         = '_';
         $dot_pattern = '_';
     }
@@ -620,9 +709,8 @@ EOM
         $rpending_complaint, $dump_options_type,
       );
 
-    my $saw_extrude = ( grep { m/^-extrude$/ } @{$rraw_options} ) ? 1 : 0;
     my $saw_pbp =
-      ( grep { m/^-(pbp|perl-best-practices)$/ } @{$rraw_options} ) ? 1 : 0;
+      grep { $_ eq '-pbp' || $_ eq '-perl-best-practices' } @{$rraw_options};
 
     #---------------------------------------------------------------
     # Handle requests to dump information
@@ -636,7 +724,7 @@ EOM
         $quit_now = 1;
         foreach my $op ( @{$roption_string} ) {
             my $opt  = $op;
-            my $flag = "";
+            my $flag = EMPTY_STRING;
 
             # Examples:
             #  some-option=s
@@ -696,12 +784,17 @@ EOM
     my %default_file_extension = (
         tidy => 'tdy',
         html => 'html',
-        user => '',
+        user => EMPTY_STRING,
     );
+
+    $rstatus->{'opt_format'}         = $rOpts->{'format'};
+    $rstatus->{'opt_max_iterations'} = $rOpts->{'iterations'};
+    $rstatus->{'opt_encode_output'} =
+      $rOpts->{'encode-output-strings'} ? 'eos' : 'neos';
 
     # be sure we have a valid output format
     unless ( exists $default_file_extension{ $rOpts->{'format'} } ) {
-        my $formats = join ' ',
+        my $formats = join SPACE,
           sort map { "'" . $_ . "'" } keys %default_file_extension;
         my $fmt = $rOpts->{'format'};
         Die("-format='$fmt' but must be one of: $formats\n");
@@ -905,7 +998,8 @@ EOM
                     my $dh;
                     if ( opendir( $dh, './' ) ) {
                         my @files =
-                          grep { /$pattern/ && !-d $_ } readdir($dh);
+                          grep { /$pattern/ && !-d } readdir($dh);
+                        ##grep { /$pattern/ && !-d $_ } readdir($dh);
                         closedir($dh);
                         if (@files) {
                             unshift @ARGV, @files;
@@ -954,7 +1048,7 @@ EOM
             $fileroot        = $input_file;
             @input_file_stat = stat($input_file);
 
-            if ( $^O eq 'VMS' ) {
+            if ( $OSNAME eq 'VMS' ) {
                 ( $fileroot, $dot ) = check_vms_filename($fileroot);
             }
 
@@ -965,7 +1059,7 @@ EOM
                 my $new_path = $rOpts->{'output-path'};
                 unless ( -d $new_path ) {
                     unless ( mkdir $new_path, 0777 ) {
-                        Die("unable to create directory $new_path: $!\n");
+                        Die("unable to create directory $new_path: $ERRNO\n");
                     }
                 }
                 my $path = $new_path;
@@ -1008,7 +1102,7 @@ EOM
         my %saw_md5;
         my $digest_input = 0;
 
-        my $buf = '';
+        my $buf = EMPTY_STRING;
         while ( my $line = $source_object->get_line() ) {
             $buf .= $line;
         }
@@ -1016,16 +1110,22 @@ EOM
         my $remove_terminal_newline =
           !$rOpts->{'add-terminal-newline'} && substr( $buf, -1, 1 ) !~ /\n/;
 
-        # Decode the input stream if necessary requested
-        my $encoding_in              = "";
+        # Decode the input stream if necessary or requested
+        my $encoding_in              = EMPTY_STRING;
         my $rOpts_character_encoding = $rOpts->{'character-encoding'};
         my $encoding_log_message;
-        my $decoded_input_as = "";
+        my $decoded_input_as = EMPTY_STRING;
+        $rstatus->{'char_mode_source'} = 0;
 
-        # Case 1. See if we already have an encoded string. In that
-        # case, we have to ignore any encoding flag.
-        if ( utf8::is_utf8($buf) ) {
+        # Case 1: If Perl is already in a character-oriented mode for this
+        # string rather than a byte-oriented mode.  Normally, this happens if
+        # the caller has decoded a utf8 string before calling perltidy.  But it
+        # could also happen if the user has done some unusual manipulations of
+        # the source.  In any case, we will not attempt to decode it because
+        # that could result in an output string in a different mode.
+        if ( is_char_mode($buf) ) {
             $encoding_in = "utf8";
+            $rstatus->{'char_mode_source'} = 1;
         }
 
         # Case 2. No input stream encoding requested.  This is appropriate
@@ -1038,7 +1138,7 @@ EOM
         }
 
         # Case 3. guess input stream encoding if requested
-        elsif ( $rOpts_character_encoding =~ /^guess$/i ) {
+        elsif ( lc($rOpts_character_encoding) eq 'guess' ) {
 
             # The guessing strategy is simple: use Encode::Guess to guess
             # an encoding.  If and only if the guess is utf8, try decoding and
@@ -1055,8 +1155,8 @@ EOM
             my $decoder = guess_encoding( $buf_in, 'utf8' );
             if ( ref($decoder) ) {
                 $encoding_in = $decoder->name;
-                if ( $encoding_in !~ /^(UTF-8|utf8)$/ ) {
-                    $encoding_in = "";
+                if ( $encoding_in ne 'UTF-8' && $encoding_in ne 'utf8' ) {
+                    $encoding_in = EMPTY_STRING;
                     $buf         = $buf_in;
                     $encoding_log_message .= <<EOM;
 Guessed encoding '$encoding_in' is not utf8; no encoding will be used
@@ -1065,7 +1165,7 @@ EOM
                 else {
 
                     eval { $buf = $decoder->decode($buf_in); };
-                    if ($@) {
+                    if ($EVAL_ERROR) {
 
                         $encoding_log_message .= <<EOM;
 Guessed encoding '$encoding_in' but decoding was unsuccessful; no encoding is used
@@ -1076,7 +1176,7 @@ EOM
                         Warn(
 "file: $input_file: bad guess to decode source as $encoding_in\n"
                         );
-                        $encoding_in = "";
+                        $encoding_in = EMPTY_STRING;
                         $buf         = $buf_in;
                     }
                     else {
@@ -1087,9 +1187,11 @@ EOM
                     }
                 }
             }
-            $encoding_log_message .= <<EOM;
-Unable to guess a character encoding
+            else {
+                $encoding_log_message .= <<EOM;
+Does not look like utf8 encoded text so processing as raw bytes
 EOM
+            }
         }
 
         # Case 4. Decode with a specific encoding
@@ -1099,7 +1201,7 @@ EOM
                 $buf = Encode::decode( $encoding_in, $buf,
                     Encode::FB_CROAK | Encode::LEAVE_SRC );
             };
-            if ($@) {
+            if ($EVAL_ERROR) {
 
                 # Quit if we cannot decode by the requested encoding;
                 # Something is not right.
@@ -1121,9 +1223,15 @@ EOM
         # read and write it as encoded data, and we will normalize these
         # operations with utf8.  If we have not decoded the data, then
         # we must not treat it as encoded data.
-        my $is_encoded_data = $encoding_in ? 'utf8' : "";
+        my $is_encoded_data = $encoding_in ? 'utf8' : EMPTY_STRING;
 
-       # Define the function to determine the display width of character strings
+        $rstatus->{'input_name'}       = $display_name;
+        $rstatus->{'opt_encoding'}     = $rOpts_character_encoding;
+        $rstatus->{'char_mode_used'}   = $encoding_in ? 1 : 0;
+        $rstatus->{'input_decoded_as'} = $decoded_input_as;
+
+        # Define the function to determine the display width of character
+        # strings
         my $length_function = sub { return length( $_[0] ) };
         if ($is_encoded_data) {
 
@@ -1134,11 +1242,11 @@ EOM
             # requested, when the first encoded file is encountered
             if ( !defined($loaded_unicode_gcstring) ) {
                 eval { require Unicode::GCString };
-                $loaded_unicode_gcstring = !$@;
-                if ( $@ && $rOpts->{'use-unicode-gcstring'} ) {
+                $loaded_unicode_gcstring = !$EVAL_ERROR;
+                if ( $EVAL_ERROR && $rOpts->{'use-unicode-gcstring'} ) {
                     Warn(<<EOM);
 ----------------------
-Unable to load Unicode::GCString: $@
+Unable to load Unicode::GCString: $EVAL_ERROR
 Processing continues but some vertical alignment may be poor
 To prevent this warning message, you can either:
 - install module Unicode::GCString, or
@@ -1151,6 +1259,10 @@ EOM
                 $length_function = sub {
                     return Unicode::GCString->new( $_[0] )->columns;
                 };
+                $encoding_log_message .= <<EOM;
+Using 'Unicode::GCString' to measure horizontal character widths
+EOM
+                $rstatus->{'gcs_used'} = 1;
             }
         }
 
@@ -1187,6 +1299,7 @@ EOM
         # prepare the output stream
         #---------------------------------------------------------------
         my $output_file = undef;
+        my $output_name = EMPTY_STRING;
         my $actual_output_extension;
 
         if ( $rOpts->{'outfile'} ) {
@@ -1210,6 +1323,7 @@ EOM
                     Die("You may not specify -o and -oext together\n");
                 }
                 $output_file = $rOpts->{outfile};
+                $output_name = $output_file;
 
                 # make sure user gives a file name after -o
                 if ( $output_file =~ /^-/ ) {
@@ -1233,6 +1347,7 @@ EOM
                 Die("$msg\n");
             }
             $output_file = '-';
+            $output_name = "<stdout>";
 
             if ( $number_of_files <= 1 ) {
             }
@@ -1243,23 +1358,33 @@ EOM
         elsif ($destination_stream) {
 
             $output_file = $destination_stream;
+            $output_name = "<destination_stream>";
         }
         elsif ($source_stream) {    # source but no destination goes to stdout
             $output_file = '-';
+            $output_name = "<stdout>";
         }
         elsif ( $input_file eq '-' ) {
             $output_file = '-';
+            $output_name = "<stdout>";
         }
         else {
             if ($in_place_modify) {
                 $output_file = IO::File->new_tmpfile()
-                  or Die("cannot open temp file for -b option: $!\n");
+                  or Die("cannot open temp file for -b option: $ERRNO\n");
+                $output_name = $display_name;
             }
             else {
                 $actual_output_extension = $output_extension;
                 $output_file             = $fileroot . $output_extension;
+                $output_name             = $output_file;
             }
         }
+
+        $rstatus->{'file_count'} += 1;
+        $rstatus->{'output_name'}     = $output_name;
+        $rstatus->{'iteration_count'} = 0;
+        $rstatus->{'converged'}       = 0;
 
         my $fh_tee;
         my $tee_file = $fileroot . $dot . "TEE";
@@ -1271,7 +1396,7 @@ EOM
             ( $fh_tee, my $tee_filename ) =
               Perl::Tidy::streamhandle( $tee_file, 'w', $is_encoded_data );
             if ( !$fh_tee ) {
-                Warn("couldn't open TEE file $tee_file: $!\n");
+                Warn("couldn't open TEE file $tee_file: $ERRNO\n");
             }
         }
 
@@ -1294,14 +1419,32 @@ EOM
         # possible encoding at the end of processing.
         my $destination_buffer;
         my $use_destination_buffer;
-        if (
-            ref($destination_stream)
-            && (   ref($destination_stream) eq 'SCALAR'
-                || ref($destination_stream) eq 'ARRAY' )
-          )
-        {
+        my $encode_destination_buffer;
+        my $ref_destination_stream = ref($destination_stream);
+        if ( $ref_destination_stream && !$user_formatter ) {
             $use_destination_buffer = 1;
             $output_file            = \$destination_buffer;
+
+            # Strings and arrays use special encoding rules
+            if (   $ref_destination_stream eq 'SCALAR'
+                || $ref_destination_stream eq 'ARRAY' )
+            {
+                $encode_destination_buffer =
+                  $rOpts->{'encode-output-strings'} && $decoded_input_as;
+            }
+
+            # An object with a print method will use file encoding rules
+            elsif ( $ref_destination_stream->can('print') ) {
+                $encode_destination_buffer = $is_encoded_data;
+            }
+            else {
+                confess <<EOM;
+------------------------------------------------------------------------
+No 'print' method is defined for object of class '$ref_destination_stream'
+Please check your call to Perl::Tidy::perltidy. Trace follows.
+------------------------------------------------------------------------
+EOM
+            }
         }
 
         $sink_object = Perl::Tidy::LineSink->new(
@@ -1325,7 +1468,6 @@ EOM
             log_file        => $log_file,
             warning_file    => $warning_file,
             fh_stderr       => $fh_stderr,
-            saw_extruce     => $saw_extrude,
             display_name    => $display_name,
             is_encoded_data => $is_encoded_data,
         );
@@ -1366,6 +1508,8 @@ EOM
         my $iteration_of_formatter_convergence;
 
         foreach my $iter ( 1 .. $max_iterations ) {
+
+            $rstatus->{'iteration_count'} += 1;
 
             # send output stream to temp buffers until last iteration
             my $sink_buffer;
@@ -1477,6 +1621,7 @@ EOM
             {
                 if ( $formatter->get_convergence_check() ) {
                     $iteration_of_formatter_convergence = $iter;
+                    $rstatus->{'converged'} = 1;
                 }
             }
 
@@ -1522,6 +1667,7 @@ EOM
                             # with extreme parameter values, such as very short
                             # maximum line lengths.  We want to catch and fix
                             # them when they happen.
+                            $rstatus->{'blinking'} = 1;
                             $convergence_log_message = <<EOM;
 BLINKER. Output for iteration $iter same as for $saw_md5{$digest}. 
 EOM
@@ -1544,6 +1690,7 @@ EOM
                             $diagnostics_object->write_diagnostics(
                                 $convergence_log_message)
                               if $diagnostics_object && $iterm > 2;
+                            $rstatus->{'converged'} = 1;
                         }
                     }
                 } ## end if ($do_convergence_test)
@@ -1604,17 +1751,17 @@ EOM
                 is_encoded_data          => $is_encoded_data,
             );
 
-            my $buf =
+            my $buf_post =
                 $postfilter
               ? $postfilter->($postfilter_buffer)
               : $postfilter_buffer;
 
             # Check if file changed if requested, but only after any postfilter
             if ( $rOpts->{'assert-tidy'} ) {
-                my $digest_output = $md5_hex->($buf);
+                my $digest_output = $md5_hex->($buf_post);
                 if ( $digest_output ne $digest_input ) {
                     my $diff_msg =
-                      compare_string_buffers( $saved_input_buf, $buf,
+                      compare_string_buffers( $saved_input_buf, $buf_post,
                         $is_encoded_data );
                     $logger_object->warning(<<EOM);
 assertion failure: '--assert-tidy' is set but output differs from input
@@ -1626,7 +1773,7 @@ EOM
                 }
             }
             if ( $rOpts->{'assert-untidy'} ) {
-                my $digest_output = $md5_hex->($buf);
+                my $digest_output = $md5_hex->($buf_post);
                 if ( $digest_output eq $digest_input ) {
                     $logger_object->warning(
 "assertion failure: '--assert-untidy' is set but output equals input\n"
@@ -1636,7 +1783,7 @@ EOM
             }
 
             $source_object = Perl::Tidy::LineSource->new(
-                input_file               => \$buf,
+                input_file               => \$buf_post,
                 rOpts                    => $rOpts,
                 rpending_logfile_message => $rpending_logfile_message,
             );
@@ -1683,15 +1830,16 @@ EOM
 
             # -eos flag set: If perltidy decodes a string, regardless of
             # source, it encodes before returning.
+            $rstatus->{'output_encoded_as'} = EMPTY_STRING;
 
-            if ( $rOpts->{'encode-output-strings'} && $decoded_input_as ) {
+            if ($encode_destination_buffer) {
                 my $encoded_buffer;
                 eval {
                     $encoded_buffer =
                       Encode::encode( "UTF-8", $destination_buffer,
                         Encode::FB_CROAK | Encode::LEAVE_SRC );
                 };
-                if ($@) {
+                if ($EVAL_ERROR) {
 
                     Warn(
 "Error attempting to encode output string ref; encoding not done\n"
@@ -1699,16 +1847,41 @@ EOM
                 }
                 else {
                     $destination_buffer = $encoded_buffer;
+                    $rstatus->{'output_encoded_as'} = 'UTF-8';
                 }
             }
 
-            # Final string storage
+            # Send data for SCALAR, ARRAY & OBJ refs to its final destination
             if ( ref($destination_stream) eq 'SCALAR' ) {
                 ${$destination_stream} = $destination_buffer;
             }
-            else {
+            elsif ($destination_buffer) {
                 my @lines = split /^/, $destination_buffer;
-                @{$destination_stream} = @lines;
+                if ( ref($destination_stream) eq 'ARRAY' ) {
+                    @{$destination_stream} = @lines;
+                }
+
+                # destination stream must be an object with print method
+                else {
+                    foreach my $line (@lines) {
+                        $destination_stream->print($line);
+                    }
+                    if ( $ref_destination_stream->can('close') ) {
+                        $destination_stream->close();
+                    }
+                }
+            }
+            else {
+
+                # Empty destination buffer not going to a string ... could
+                # happen for example if user deleted all pod or comments
+            }
+        }
+        else {
+
+            # output went to a file ...
+            if ($is_encoded_data) {
+                $rstatus->{'output_encoded_as'} = 'UTF-8';
             }
         }
 
@@ -1732,7 +1905,7 @@ EOM
             if ( -f $backup_name ) {
                 unlink($backup_name)
                   or Die(
-"unable to remove previous '$backup_name' for -b option; check permissions: $!\n"
+"unable to remove previous '$backup_name' for -b option; check permissions: $ERRNO\n"
                   );
             }
 
@@ -1740,12 +1913,12 @@ EOM
             # we use copy for symlinks, move for regular files
             if ( -l $input_file ) {
                 File::Copy::copy( $input_file, $backup_name )
-                  or Die("File::Copy failed trying to backup source: $!");
+                  or Die("File::Copy failed trying to backup source: $ERRNO");
             }
             else {
                 rename( $input_file, $backup_name )
                   or Die(
-"problem renaming $input_file to $backup_name for -b option: $!\n"
+"problem renaming $input_file to $backup_name for -b option: $ERRNO\n"
                   );
             }
             $ifname = $backup_name;
@@ -1756,13 +1929,14 @@ EOM
             # handle of an open nameless temporary file so we would lose
             # everything if we closed it.
             seek( $output_file, 0, 0 )
-              or Die("unable to rewind a temporary file for -b option: $!\n");
+              or
+              Die("unable to rewind a temporary file for -b option: $ERRNO\n");
 
             my ( $fout, $iname ) =
               Perl::Tidy::streamhandle( $input_file, 'w', $is_encoded_data );
             if ( !$fout ) {
                 Die(
-"problem re-opening $input_file for write for -b option; check file and directory permissions: $!\n"
+"problem re-opening $input_file for write for -b option; check file and directory permissions: $ERRNO\n"
                 );
             }
 
@@ -1876,7 +2050,7 @@ EOM
             else {
                 unlink($ifname)
                   or Die(
-"unable to remove previous '$ifname' for -b option; check permissions: $!\n"
+"unable to remove previous '$ifname' for -b option; check permissions: $ERRNO\n"
                   );
             }
         }
@@ -1902,11 +2076,12 @@ EOM
 
   NORMAL_EXIT:
     my $ret = $Warn_count ? 2 : 0;
-    return $ret;
+    return wantarray ? ( $ret, $rstatus ) : $ret;
 
   ERROR_EXIT:
-    return 1;
-} ## end of main program perltidy
+    return wantarray ? ( 1, $rstatus ) : 1;
+
+} ## end sub perltidy
 } ## end of closure for sub perltidy
 
 sub line_diff {
@@ -1919,7 +2094,7 @@ sub line_diff {
     # have same common characters so non-null characters indicate character
     # differences.
     my ( $s1, $s2 ) = @_;
-    my $diff_marker = "";
+    my $diff_marker = EMPTY_STRING;
     my $pos         = -1;
     my $pos1        = $pos;
     if ( defined($s1) && defined($s2) ) {
@@ -1929,16 +2104,16 @@ sub line_diff {
         while ( $mask =~ /[^\0]/g ) {
             $count++;
             my $pos_last = $pos;
-            $pos = $-[0];
+            $pos = $LAST_MATCH_START[0];
             if ( $count == 1 ) { $pos1 = $pos; }
-            $diff_marker .= ' ' x ( $pos - $pos_last - 1 ) . '^';
+            $diff_marker .= SPACE x ( $pos - $pos_last - 1 ) . '^';
 
             # we could continue to mark all differences, but there is no point
             last;
         }
     }
     return wantarray ? ( $diff_marker, $pos1 ) : $diff_marker;
-}
+} ## end sub line_diff
 
 sub compare_string_buffers {
 
@@ -1955,9 +2130,9 @@ sub compare_string_buffers {
     my ( $fhi, $fnamei ) = streamhandle( \$bufi, 'r', $is_encoded_data );
     my ( $fho, $fnameo ) = streamhandle( \$bufo, 'r', $is_encoded_data );
     return $msg unless ( $fho && $fhi );    # for safety, shouldn't happen
-    my ( $linei,              $lineo );
-    my ( $counti,             $counto )              = ( 0,  0 );
-    my ( $last_nonblank_line, $last_nonblank_count ) = ( "", 0 );
+    my ( $linei,  $lineo );
+    my ( $counti, $counto )                          = ( 0, 0 );
+    my ( $last_nonblank_line, $last_nonblank_count ) = ( EMPTY_STRING, 0 );
     my $truncate = sub {
         my ( $str, $lenmax ) = @_;
         if ( length($str) > $lenmax ) {
@@ -1986,7 +2161,7 @@ sub compare_string_buffers {
         my ( $line_diff, $pos1 ) = line_diff( $linei, $lineo );
         my $reason = "Files first differ at character $pos1 of line $counti";
 
-        my ( $leading_ws_i, $leading_ws_o ) = ( "", "" );
+        my ( $leading_ws_i, $leading_ws_o ) = ( EMPTY_STRING, EMPTY_STRING );
         if ( $linei =~ /^(\s+)/ ) { $leading_ws_i = $1; }
         if ( $lineo =~ /^(\s+)/ ) { $leading_ws_o = $1; }
         if ( $leading_ws_i ne $leading_ws_o ) {
@@ -1996,7 +2171,8 @@ sub compare_string_buffers {
             }
         }
         else {
-            my ( $trailing_ws_i, $trailing_ws_o ) = ( "", "" );
+            my ( $trailing_ws_i, $trailing_ws_o ) =
+              ( EMPTY_STRING, EMPTY_STRING );
             if ( $linei =~ /(\s+)$/ ) { $trailing_ws_i = $1; }
             if ( $lineo =~ /(\s+)$/ ) { $trailing_ws_o = $1; }
             if ( $trailing_ws_i ne $trailing_ws_o ) {
@@ -2008,9 +2184,9 @@ sub compare_string_buffers {
         # limit string display length
         if ( $pos1 > 60 ) {
             my $drop = $pos1 - 40;
-            $linei     = "..." . substr( $linei,     $drop );
-            $lineo     = "..." . substr( $lineo,     $drop );
-            $line_diff = "   " . substr( $line_diff, $drop );
+            $linei     = "..." . substr( $linei, $drop );
+            $lineo     = "..." . substr( $lineo, $drop );
+            $line_diff = SPACE x 3 . substr( $line_diff, $drop );
         }
         $linei              = $truncate->( $linei,              72 );
         $lineo              = $truncate->( $lineo,              72 );
@@ -2022,7 +2198,7 @@ sub compare_string_buffers {
  $last_nonblank_count:$last_nonblank_line
 EOM
         }
-        $line_diff = ' ' x ( 2 + length($counto) ) . $line_diff;
+        $line_diff = SPACE x ( 2 + length($counto) ) . $line_diff;
         $msg .= <<EOM;
 <$counti:$linei
 >$counto:$lineo
@@ -2048,7 +2224,7 @@ Text in lines of file match but checksums differ. Perhaps line endings differ.
 EOM
     }
     return $msg;
-}
+} ## end sub compare_string_buffers
 
 sub get_stream_as_named_file {
 
@@ -2088,7 +2264,7 @@ sub get_stream_as_named_file {
         }
     }
     return ( $fname, $is_tmpfile );
-}
+} ## end sub get_stream_as_named_file
 
 sub fileglob_to_re {
 
@@ -2115,20 +2291,23 @@ sub make_extension {
         $extension = $dot . $extension;
     }
     return $extension;
-}
+} ## end sub make_extension
 
 sub write_logfile_header {
     my (
         $rOpts,        $logger_object, $config_file,
         $rraw_options, $Windows_type,  $readable_options
     ) = @_;
+
+    # Note: the punctuation variable '$]' is not in older versions of
+    # English.pm so leave it as is to avoid failing installation tests.
     $logger_object->write_logfile_entry(
-"perltidy version $VERSION log file on a $^O system, OLD_PERL_VERSION=$]\n"
+"perltidy version $VERSION log file on a $OSNAME system, OLD_PERL_VERSION=$]\n"
     );
     if ($Windows_type) {
         $logger_object->write_logfile_entry("Windows type is $Windows_type\n");
     }
-    my $options_string = join( ' ', @{$rraw_options} );
+    my $options_string = join( SPACE, @{$rraw_options} );
 
     if ($config_file) {
         $logger_object->write_logfile_entry(
@@ -2153,7 +2332,7 @@ sub write_logfile_header {
     $logger_object->write_logfile_entry(
         "To find error messages search for 'WARNING' with your editor\n");
     return;
-}
+} ## end sub write_logfile_header
 
 sub generate_options {
 
@@ -2470,10 +2649,11 @@ sub generate_options {
     $add_option->( 'brace-left-exclusion-list',               'blxl',  '=s' );
     $add_option->( 'break-after-labels',                      'bal',   '=i' );
 
-    ## This was an experiment mentioned in git #78. It works, but it does not
-    ## look very useful.  Instead, I expanded the functionality of the
-    ## --keep-old-breakpoint-xxx flags.
-    ##$add_option->( 'break-open-paren-list',                   'bopl',  '=s' );
+    # This was an experiment mentioned in git #78, originally named -bopl. I
+    # expanded it to also open logical blocks, based on git discussion #100,
+    # and renamed it -bocp. It works, but will remain commented out due to
+    # apparent lack of interest.
+    # $add_option->( 'break-open-compact-parens', 'bocp', '=s' );
 
     ########################################
     $category = 6;    # Controlling list formatting
@@ -2549,11 +2729,11 @@ sub generate_options {
     $add_option->( 'dump-want-left-space',    'dwls', '!' );
     $add_option->( 'dump-want-right-space',   'dwrs', '!' );
     $add_option->( 'fuzzy-line-length',       'fll',  '!' );
-    $add_option->( 'help',                    'h',    '' );
+    $add_option->( 'help',                    'h',    EMPTY_STRING );
     $add_option->( 'short-concatenation-item-length', 'scl',   '=i' );
     $add_option->( 'show-options',                    'opt',   '!' );
     $add_option->( 'timestamp',                       'ts',    '!' );
-    $add_option->( 'version',                         'v',     '' );
+    $add_option->( 'version',                         'v',     EMPTY_STRING );
     $add_option->( 'memoize',                         'mem',   '!' );
     $add_option->( 'file-size-order',                 'fso',   '!' );
     $add_option->( 'maximum-file-size-mb',            'maxfs', '=i' );
@@ -2690,6 +2870,7 @@ sub generate_options {
       delete-old-newlines
       delete-semicolons
       extended-syntax
+      encode-output-strings
       function-paren-vertical-alignment
       fuzzy-line-length
       hanging-side-comments
@@ -2985,7 +3166,7 @@ q(wbb=% + - * / x != == >= <= =~ !~ < > | & = **= += *= &= <<= &&= -= /= |= >>= 
         \%option_category, \%option_range
     );
 
-} ## end of generate_options
+} ## end sub generate_options
 
 # Memoize process_command_line. Given same @ARGV passed in, return same
 # values and same @ARGV back.
@@ -3020,7 +3201,7 @@ sub process_command_line {
     else {
         return _process_command_line(@q);
     }
-}
+} ## end sub process_command_line
 
 # (note the underscore here)
 sub _process_command_line {
@@ -3038,7 +3219,7 @@ sub _process_command_line {
     # Previous configuration is reset at the exit of this routine.
     my $glc;
     eval { $glc = Getopt::Long::Configure() };
-    unless ($@) {
+    unless ($EVAL_ERROR) {
         eval { Getopt::Long::ConfigDefaults() };
     }
     else { $glc = undef }
@@ -3068,7 +3249,7 @@ sub _process_command_line {
 
     my $word;
     my @raw_options        = ();
-    my $config_file        = "";
+    my $config_file        = EMPTY_STRING;
     my $saw_ignore_profile = 0;
     my $saw_dump_profile   = 0;
 
@@ -3111,8 +3292,8 @@ sub _process_command_line {
                 }
             }
             unless ( -e $config_file ) {
-                Warn("cannot find file given with -pro=$config_file: $!\n");
-                $config_file = "";
+                Warn("cannot find file given with -pro=$config_file: $ERRNO\n");
+                $config_file = EMPTY_STRING;
             }
         }
         elsif ( $i =~ /^-(pro|profile)=?$/ ) {
@@ -3173,7 +3354,7 @@ EOM
 
         # look for a config file if we don't have one yet
         my $rconfig_file_chatter;
-        ${$rconfig_file_chatter} = "";
+        ${$rconfig_file_chatter} = EMPTY_STRING;
         $config_file =
           find_config_file( $is_Windows, $Windows_type, $rconfig_file_chatter,
             $rpending_complaint )
@@ -3284,14 +3465,14 @@ EOM
 
     return ( \%Opts, $config_file, \@raw_options, $roption_string,
         $rexpansion, $roption_category, $roption_range );
-} ## end of _process_command_line
+} ## end sub _process_command_line
 
 sub make_grep_alias_string {
     my ($rOpts) = @_;
 
     # Defaults: list operators in List::Util
     # Possible future additions:  pairfirst pairgrep pairmap
-    my $default_string = join ' ', qw(
+    my $default_string = join SPACE, qw(
       all
       any
       first
@@ -3313,11 +3494,11 @@ sub make_grep_alias_string {
     }
 
     # The special option -gaxl='*' removes all defaults
-    if ( $is_excluded_word{'*'} ) { $default_string = "" }
+    if ( $is_excluded_word{'*'} ) { $default_string = EMPTY_STRING }
 
     # combine the defaults and any input list
     my $input_string = $rOpts->{'grep-alias-list'};
-    if ($input_string) { $input_string .= " " . $default_string }
+    if ($input_string) { $input_string .= SPACE . $default_string }
     else               { $input_string = $default_string }
 
     # Now make the final list of unique grep alias words
@@ -3341,10 +3522,10 @@ sub make_grep_alias_string {
             }
         }
     }
-    my $joined_words = join ' ', @filtered_word_list;
+    my $joined_words = join SPACE, @filtered_word_list;
     $rOpts->{'grep-alias-list'} = $joined_words;
     return;
-}
+} ## end sub make_grep_alias_string
 
 sub check_options {
 
@@ -3483,7 +3664,14 @@ EOM
         }
 
         # entab leading whitespace has priority over the older 'tabs' option
-        if ( $rOpts->{'tabs'} ) { $rOpts->{'tabs'} = 0; }
+        if ( $rOpts->{'tabs'} ) {
+
+            # The following warning could be added but would annoy a lot of
+            # users who have a perltidyrc with both -t and -et=n.  So instead
+            # there is a note in the manual that -et overrides -t.
+            ##Warn("-tabs and -et=n conflict; ignoring -tabs\n");
+            $rOpts->{'tabs'} = 0;
+        }
     }
 
     # set a default tabsize to be used in guessing the starting indentation
@@ -3526,7 +3714,7 @@ EOM
                 }
             }
         }
-        $rOpts->{'sub-alias-list'} = join ' ', @filtered_word_list;
+        $rOpts->{'sub-alias-list'} = join SPACE, @filtered_word_list;
     }
 
     make_grep_alias_string($rOpts);
@@ -3562,7 +3750,7 @@ EOM
       : $rOpts->{'tabs'} ? $rOpts->{'indent-columns'}
       :                    $rOpts->{'default-tabsize'};
     return $tabsize;
-}
+} ## end sub check_options
 
 sub find_file_upwards {
     my ( $search_dir, $search_file ) = @_;
@@ -3586,7 +3774,7 @@ sub find_file_upwards {
     # This return is for Perl-Critic.
     # We shouldn't get out of the while loop without a return
     return;
-}
+} ## end sub find_file_upwards
 
 sub expand_command_abbreviations {
 
@@ -3598,7 +3786,6 @@ sub expand_command_abbreviations {
     # 10 should be plenty, but it may be increased to allow deeply
     # nested expansions.
     my $max_passes = 10;
-    my @new_argv   = ();
 
     # keep looping until all expansions have been converted into actual
     # dash parameters..
@@ -3627,7 +3814,7 @@ sub expand_command_abbreviations {
                 # to allow abbreviations with arguments such as '-vt=1'
                 if ( $rexpansion->{ $abr . $flags } ) {
                     $abr   = $abr . $flags;
-                    $flags = "";
+                    $flags = EMPTY_STRING;
                 }
 
                 # if we see this dash item in the expansion hash..
@@ -3660,7 +3847,7 @@ sub expand_command_abbreviations {
 
         # make sure we are not in an infinite loop
         if ( $pass_count == $max_passes ) {
-            local $" = ')(';
+            local $LIST_SEPARATOR = ')(';
             Warn(<<EOM);
 I'm tired. We seem to be in an infinite loop trying to expand aliases.
 Here are the raw options;
@@ -3694,7 +3881,7 @@ DIE
         } ## end of check for circular references
     } ## end of loop over all passes
     return;
-}
+} ## end sub expand_command_abbreviations
 
 # Debug routine -- this will dump the expansion hash
 sub dump_short_names {
@@ -3706,12 +3893,12 @@ New abbreviations may be defined in a .perltidyrc file.
 For a list of all long names, use perltidy --dump-long-names (-dln).
 --------------------------------------------------------------------------
 EOM
-    foreach my $abbrev ( sort keys %$rexpansion ) {
+    foreach my $abbrev ( sort keys %{$rexpansion} ) {
         my @list = @{ $rexpansion->{$abbrev} };
         print STDOUT "$abbrev --> @list\n";
     }
     return;
-}
+} ## end sub dump_short_names
 
 sub check_vms_filename {
 
@@ -3738,13 +3925,13 @@ sub check_vms_filename {
                 \.-?\d*$       # match . version number
               /$1/x;
 
-    # normalise filename, if there are no unescaped dots then append one
+    # normalize filename, if there are no unescaped dots then append one
     $base .= '.' unless $base =~ /(?:^|[^^])\./;
 
     # if we don't already have an extension then we just append the extension
-    my $separator = ( $base =~ /\.$/ ) ? "" : "_";
+    my $separator = ( $base =~ /\.$/ ) ? EMPTY_STRING : "_";
     return ( $path . $base, $separator );
-}
+} ## end sub check_vms_filename
 
 sub Win_OS_Type {
 
@@ -3758,8 +3945,8 @@ sub Win_OS_Type {
     # We need to know this to decide where to look for config files
 
     my $rpending_complaint = shift;
-    my $os                 = "";
-    return $os unless $^O =~ /win32|dos/i;    # is it a MS box?
+    my $os                 = EMPTY_STRING;
+    return $os unless $OSNAME =~ /win32|dos/i;    # is it a MS box?
 
     # Systems built from Perl source may not have Win32.pm
     # But probably have Win32::GetOSVersion() anyway so the
@@ -3796,7 +3983,7 @@ sub Win_OS_Type {
     # If $os is undefined, the above code is out of date.  Suggested updates
     # are welcome.
     unless ( defined $os ) {
-        $os = "";
+        $os = EMPTY_STRING;
 
         # Deactivated this message 20180322 because it was needlessly
         # causing some test scripts to fail.  Need help from someone
@@ -3810,14 +3997,14 @@ EOS
     # Unfortunately the logic used for the various versions isn't so clever..
     # so we have to handle an outside case.
     return ( $os eq "2000" && $major != 5 ) ? "NT4" : $os;
-}
+} ## end sub Win_OS_Type
 
 sub is_unix {
     return
-         ( $^O !~ /win32|dos/i )
-      && ( $^O ne 'VMS' )
-      && ( $^O ne 'OS2' )
-      && ( $^O ne 'MacOS' );
+         ( $OSNAME !~ /win32|dos/i )
+      && ( $OSNAME ne 'VMS' )
+      && ( $OSNAME ne 'OS2' )
+      && ( $OSNAME ne 'MacOS' );
 }
 
 sub look_for_Windows {
@@ -3825,11 +4012,11 @@ sub look_for_Windows {
     # determine Windows sub-type and location of
     # system-wide configuration files
     my $rpending_complaint = shift;
-    my $is_Windows         = ( $^O =~ /win32|dos/i );
+    my $is_Windows         = ( $OSNAME =~ /win32|dos/i );
     my $Windows_type;
     $Windows_type = Win_OS_Type($rpending_complaint) if $is_Windows;
     return ( $is_Windows, $Windows_type );
-}
+} ## end sub look_for_Windows
 
 sub find_config_file {
 
@@ -3844,7 +4031,7 @@ sub find_config_file {
         ${$rconfig_file_chatter} .= "Windows $Windows_type\n";
     }
     else {
-        ${$rconfig_file_chatter} .= " $^O\n";
+        ${$rconfig_file_chatter} .= " $OSNAME\n";
     }
 
     # sub to check file existence and record all tests
@@ -3894,7 +4081,7 @@ sub find_config_file {
 
     # Check the NT/2k/XP locations, first a local machine def, then a
     # network def
-    push @envs, qw(USERPROFILE HOMESHARE) if $^O =~ /win32/i;
+    push @envs, qw(USERPROFILE HOMESHARE) if $OSNAME =~ /win32/i;
 
     # Now go through the environment ...
     foreach my $var (@envs) {
@@ -3956,11 +4143,11 @@ sub find_config_file {
     }
 
     # Place to add customization code for other systems
-    elsif ( $^O eq 'OS2' ) {
+    elsif ( $OSNAME eq 'OS2' ) {
     }
-    elsif ( $^O eq 'MacOS' ) {
+    elsif ( $OSNAME eq 'MacOS' ) {
     }
-    elsif ( $^O eq 'VMS' ) {
+    elsif ( $OSNAME eq 'VMS' ) {
     }
 
     # Assume some kind of Unix
@@ -3975,7 +4162,7 @@ sub find_config_file {
 
     # Couldn't find a config file
     return;
-}
+} ## end sub find_config_file
 
 sub Win_Config_Locs {
 
@@ -3993,8 +4180,8 @@ sub Win_Config_Locs {
 
     return unless $os;
 
-    my $system   = "";
-    my $allusers = "";
+    my $system   = EMPTY_STRING;
+    my $allusers = EMPTY_STRING;
 
     if ( $os =~ /9[58]|Me/ ) {
         $system = "C:/Windows";
@@ -4015,7 +4202,7 @@ sub Win_Config_Locs {
         return;
     }
     return wantarray ? ( $os, $system, $allusers ) : $os;
-}
+} ## end sub Win_Config_Locs
 
 sub dump_config_file {
     my ( $fh, $config_file, $rconfig_file_chatter ) = @_;
@@ -4029,7 +4216,7 @@ sub dump_config_file {
         print STDOUT "# ...no config file found\n";
     }
     return;
-}
+} ## end sub dump_config_file
 
 sub read_config_file {
 
@@ -4037,7 +4224,7 @@ sub read_config_file {
     my @config_list = ();
 
     # file is bad if non-empty $death_message is returned
-    my $death_message = "";
+    my $death_message = EMPTY_STRING;
 
     my $name = undef;
     my $line_no;
@@ -4068,15 +4255,15 @@ sub read_config_file {
             $opening_brace_line = $line_no unless ( $body && $body =~ s/\}$// );
 
             # handle a new alias definition
-            if ( ${$rexpansion}{$name} ) {
-                local $" = ')(';
-                my @names = sort keys %$rexpansion;
+            if ( $rexpansion->{$name} ) {
+                local $LIST_SEPARATOR = ')(';
+                my @names = sort keys %{$rexpansion};
                 $death_message =
                     "Here is a list of all installed aliases\n(@names)\n"
-                  . "Attempting to redefine alias ($name) in config file $config_file line $.\n";
+                  . "Attempting to redefine alias ($name) in config file $config_file line $INPUT_LINE_NUMBER\n";
                 last;
             }
-            ${$rexpansion}{$name} = [];
+            $rexpansion->{$name} = [];
         }
 
         # leading opening braces not allowed
@@ -4117,7 +4304,7 @@ EOM
 
                 # remove leading dashes if this is an alias
                 foreach ( @{$rbody_parts} ) { s/^\-+//; }
-                push @{ ${$rexpansion}{$name} }, @{$rbody_parts};
+                push @{ $rexpansion->{$name} }, @{$rbody_parts};
             }
             else {
                 push( @config_list, @{$rbody_parts} );
@@ -4131,17 +4318,17 @@ EOM
     }
     eval { $fh->close() };
     return ( \@config_list, $death_message );
-}
+} ## end sub read_config_file
 
 sub strip_comment {
 
     # Strip any comment from a command line
     my ( $instr, $config_file, $line_no ) = @_;
-    my $msg = "";
+    my $msg = EMPTY_STRING;
 
     # check for full-line comment
     if ( $instr =~ /^\s*#/ ) {
-        return ( "", $msg );
+        return ( EMPTY_STRING, $msg );
     }
 
     # nothing to do if no comments
@@ -4162,14 +4349,14 @@ sub strip_comment {
     }
 
     # handle comments and quotes
-    my $outstr     = "";
-    my $quote_char = "";
+    my $outstr     = EMPTY_STRING;
+    my $quote_char = EMPTY_STRING;
     while (1) {
 
         # looking for ending quote character
         if ($quote_char) {
             if ( $instr =~ /\G($quote_char)/gc ) {
-                $quote_char = "";
+                $quote_char = EMPTY_STRING;
                 $outstr .= $1;
             }
             elsif ( $instr =~ /\G(.)/gc ) {
@@ -4209,7 +4396,7 @@ EOM
         }
     }
     return ( $outstr, $msg );
-}
+} ## end sub strip_comment
 
 sub parse_args {
 
@@ -4223,15 +4410,20 @@ sub parse_args {
 
     my ($body)     = @_;
     my @body_parts = ();
-    my $quote_char = "";
-    my $part       = "";
-    my $msg        = "";
+    my $quote_char = EMPTY_STRING;
+    my $part       = EMPTY_STRING;
+    my $msg        = EMPTY_STRING;
+
+    # Check for external call with undefined $body - added to fix
+    # github issue Perl-Tidy-Sweetened issue #23
+    if ( !defined($body) ) { $body = EMPTY_STRING }
+
     while (1) {
 
         # looking for ending quote character
         if ($quote_char) {
             if ( $body =~ /\G($quote_char)/gc ) {
-                $quote_char = "";
+                $quote_char = EMPTY_STRING;
             }
             elsif ( $body =~ /\G(.)/gc ) {
                 $part .= $1;
@@ -4255,7 +4447,7 @@ EOM
             }
             elsif ( $body =~ /\G(\s+)/gc ) {
                 if ( length($part) ) { push @body_parts, $part; }
-                $part = "";
+                $part = EMPTY_STRING;
             }
             elsif ( $body =~ /\G(.)/gc ) {
                 $part .= $1;
@@ -4267,7 +4459,7 @@ EOM
         }
     }
     return ( \@body_parts, $msg );
-}
+} ## end sub parse_args
 
 sub dump_long_names {
 
@@ -4290,7 +4482,7 @@ EOM
 
     foreach my $name ( sort @names ) { print STDOUT "$name\n" }
     return;
-}
+} ## end sub dump_long_names
 
 sub dump_defaults {
     my @defaults = @_;
@@ -4310,7 +4502,7 @@ sub readable_options {
     $readable_options .=
       "# See utility 'perltidyrc_dump.pl' for nicer formatting.\n";
     foreach my $opt ( @{$roption_string} ) {
-        my $flag = "";
+        my $flag = EMPTY_STRING;
         if ( $opt =~ /(.*)(!|=.*)$/ ) {
             $opt  = $1;
             $flag = $2;
@@ -4323,7 +4515,7 @@ sub readable_options {
         my $flag   = $rGetopt_flags->{$key};
         my $value  = $rOpts->{$key};
         my $prefix = '--';
-        my $suffix = "";
+        my $suffix = EMPTY_STRING;
         if ($flag) {
             if ( $flag =~ /^=/ ) {
                 if ( $value !~ /^\d+$/ ) { $value = '"' . $value . '"' }
@@ -4342,7 +4534,7 @@ sub readable_options {
         $readable_options .= $prefix . $key . $suffix . "\n";
     }
     return $readable_options;
-}
+} ## end sub readable_options
 
 sub show_version {
     print STDOUT <<"EOM";
@@ -4357,7 +4549,7 @@ Complete documentation for perltidy can be found using 'man perltidy'
 or on the internet at http://perltidy.sourceforge.net.
 EOM
     return;
-}
+} ## end sub show_version
 
 sub usage {
 
@@ -4558,7 +4750,7 @@ or go to the perltidy home page at http://perltidy.sourceforge.net
 EOF
 
     return;
-}
+} ## end sub usage
 
 sub process_this_file {
 
@@ -4575,5 +4767,5 @@ sub process_this_file {
       if $formatter->can('finish_formatting');
 
     return;
-}
+} ## end sub process_this_file
 1;

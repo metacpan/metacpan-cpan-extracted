@@ -135,6 +135,11 @@ typedef struct MarpaX_ESLIF_constants {
   SV *Encode__decode_svp;
   SV *MarpaX__ESLIF__Recognizer_svp;
   SV *MarpaX__ESLIF__Recognizer__SHALLOW_svp;
+  SV *MarpaX__ESLIF__Context__symbolName_svp;
+  SV *MarpaX__ESLIF__Context__symbolNumber_svp;
+  SV *MarpaX__ESLIF__Context__ruleName_svp;
+  SV *MarpaX__ESLIF__Context__ruleNumber_svp;
+  SV *MarpaX__ESLIF__Context__grammar_svp;
 } MarpaX_ESLIF_constants_t;
 
 typedef struct marpaESLIFPerl_stringGeneratorContext {
@@ -720,7 +725,7 @@ static inline SV *marpaESLIFPerl_call_actionp(pTHX_ SV *interfacep, const char *
     Perl_MarpaX_ESLIF_Grammarp = MarpaX_ESLIF_Valuep->Perl_MarpaX_ESLIF_Grammarp;
 
     symbols = MarpaX_ESLIF_Valuep->symbols;
-    svlocalp = get_sv("MarpaX::ESLIF::Context::symbolName", GV_ADD);
+    svlocalp = MarpaX_ESLIF_Valuep->constantsp->MarpaX__ESLIF__Context__symbolName_svp;
     save_item(svlocalp); /* We control this variable - no magic involved */
     if (symbols != NULL) {
       sv_setpvn(svlocalp, symbols, strlen(symbols));
@@ -732,7 +737,7 @@ static inline SV *marpaESLIFPerl_call_actionp(pTHX_ SV *interfacep, const char *
     }
 
     symboli = MarpaX_ESLIF_Valuep->symboli;
-    svlocalp = get_sv("MarpaX::ESLIF::Context::symbolNumber", GV_ADD);
+    svlocalp = MarpaX_ESLIF_Valuep->constantsp->MarpaX__ESLIF__Context__symbolNumber_svp;
     save_item(svlocalp); /* We control this variable - no magic involved */
     sv_setiv(svlocalp, symboli);
     if (MarpaX_ESLIF_Valuep->canSetSymbolNumberb) {
@@ -740,7 +745,7 @@ static inline SV *marpaESLIFPerl_call_actionp(pTHX_ SV *interfacep, const char *
     }
 
     rules = MarpaX_ESLIF_Valuep->rules;
-    svlocalp = get_sv("MarpaX::ESLIF::Context::ruleName", GV_ADD);
+    svlocalp = MarpaX_ESLIF_Valuep->constantsp->MarpaX__ESLIF__Context__ruleName_svp;
     save_item(svlocalp); /* We control this variable - no magic involved */
     if (rules != NULL) {
       sv_setpvn(svlocalp, rules, strlen(rules));
@@ -752,14 +757,14 @@ static inline SV *marpaESLIFPerl_call_actionp(pTHX_ SV *interfacep, const char *
     }
 
     rulei = MarpaX_ESLIF_Valuep->rulei;
-    svlocalp = get_sv("MarpaX::ESLIF::Context::ruleNumber", GV_ADD);
+    svlocalp = MarpaX_ESLIF_Valuep->constantsp->MarpaX__ESLIF__Context__ruleNumber_svp;
     save_item(svlocalp); /* We control this variable - no magic involved */
     sv_setiv(svlocalp, rulei);
     if (MarpaX_ESLIF_Valuep->canSetRuleNumberb) {
       marpaESLIFPerl_call_methodv(aTHX_ Perl_valueInterfacep, "setRuleNumber", svlocalp, MarpaX_ESLIF_Valuep->setRuleNumberSvp);
     }
 
-    svlocalp = get_sv("MarpaX::ESLIF::Context::grammar", GV_ADD);
+    svlocalp = MarpaX_ESLIF_Valuep->constantsp->MarpaX__ESLIF__Context__grammar_svp;
     save_item(svlocalp); /* We control this variable - no magic involved */
     sv_setsv(svlocalp, Perl_MarpaX_ESLIF_Grammarp);
     if (MarpaX_ESLIF_Valuep->canSetGrammarb) {
@@ -3182,6 +3187,26 @@ static inline void marpaESLIFPerl_constants_initv(pTHX_ MarpaX_ESLIF_constants_t
   if (! marpaESLIFPerl_canb(aTHX_ constantsp->MarpaX__ESLIF__Recognizer_svp, "SHALLOW", &(constantsp->MarpaX__ESLIF__Recognizer__SHALLOW_svp))) {
     MARPAESLIFPERL_CROAK("MarpaX::ESLIF::Recognizer must do \"SHALLOW\"");
   }
+  constantsp->MarpaX__ESLIF__Context__symbolName_svp = get_sv("MarpaX::ESLIF::Context::symbolName", GV_ADD);
+  if (constantsp->MarpaX__ESLIF__Context__symbolName_svp == NULL) {
+    MARPAESLIFPERL_CROAK("Failed to create MarpaX::ESLIF::Context::symbolName variable");
+  }
+  constantsp->MarpaX__ESLIF__Context__symbolNumber_svp = get_sv("MarpaX::ESLIF::Context::symbolNumber", GV_ADD);
+  if (constantsp->MarpaX__ESLIF__Context__symbolNumber_svp == NULL) {
+    MARPAESLIFPERL_CROAK("Failed to create MarpaX::ESLIF::Context::symbolNumber variable");
+  }
+  constantsp->MarpaX__ESLIF__Context__ruleName_svp = get_sv("MarpaX::ESLIF::Context::ruleName", GV_ADD);
+  if (constantsp->MarpaX__ESLIF__Context__ruleName_svp == NULL) {
+    MARPAESLIFPERL_CROAK("Failed to create MarpaX::ESLIF::Context::ruleName variable");
+  }
+  constantsp->MarpaX__ESLIF__Context__ruleNumber_svp = get_sv("MarpaX::ESLIF::Context::ruleNumber", GV_ADD);
+  if (constantsp->MarpaX__ESLIF__Context__ruleNumber_svp == NULL) {
+    MARPAESLIFPERL_CROAK("Failed to create MarpaX::ESLIF::Context::ruleNumber variable");
+  }
+  constantsp->MarpaX__ESLIF__Context__grammar_svp = get_sv("MarpaX::ESLIF::Context::grammar", GV_ADD);
+  if (constantsp->MarpaX__ESLIF__Context__grammar_svp == NULL) {
+    MARPAESLIFPERL_CROAK("Failed to create MarpaX::ESLIF::Context::grammar variable");
+  }
 }
 
 /*****************************************************************************/
@@ -4614,13 +4639,15 @@ OUTPUT:
 =cut
 
 void *
-regex_allocate(Perl_packagep, p, bytep, bytel, encodingasciisp, modifiersp)
+regex_allocate(Perl_packagep, p, bytep, bytel, encodingasciisp, modifiersp, Perl_substitutionp, substitutionModifiersp)
   SV     *Perl_packagep;
   SV     *p;
   char   *bytep;
   size_t  bytel;
   SV     *encodingasciisp;
   SV     *modifiersp;
+  SV     *Perl_substitutionp;
+  SV     *substitutionModifiersp;
 PREINIT:
   static const char *funcs = "MarpaX::ESLIF::Symbol::regex_allocate";
 CODE:
@@ -4628,11 +4655,15 @@ CODE:
   marpaESLIF_t               *marpaESLIFp   = MarpaX_ESLIFp->marpaESLIFp;
   marpaESLIFSymbol_t         *marpaESLIFSymbolp;
   marpaESLIFString_t          marpaESLIFString;
+  marpaESLIFString_t          marpaESLIFSubstitutionString;
   MarpaX_ESLIF_Symbol_t      *MarpaX_ESLIF_Symbolp;
   int                         typei;
   char                       *encodingasciis = NULL;
   char                       *modifiers = NULL;
   marpaESLIFSymbolOption_t    marpaESLIFSymbolOption;
+  char                       *substitutionPatterns = NULL;
+  STRLEN                      substitutionPatternl;
+  char                       *substitutionModifiers = NULL;
 
   typei = marpaESLIFPerl_getTypei(aTHX_ encodingasciisp);
   if ((typei & SCALAR) != SCALAR) {
@@ -4656,6 +4687,17 @@ CODE:
     modifiers = SvPV_nolen(modifiersp);
   }
 
+  typei = marpaESLIFPerl_getTypei(aTHX_ Perl_substitutionp);
+  if ((typei & SCALAR) != SCALAR) {
+    /* This is an error unless it is undef */
+    if ((typei & UNDEF) != UNDEF) {
+      MARPAESLIFPERL_CROAK("substitution must be a scalar or undef");
+    }
+  }
+  if (SvOK(Perl_substitutionp)) {
+    substitutionPatterns = SvPVbyte(Perl_substitutionp, substitutionPatternl);
+  }
+
   Newx(MarpaX_ESLIF_Symbolp, 1, MarpaX_ESLIF_Symbol_t);
   marpaESLIFPerl_symbolContextInitv(aTHX_ MarpaX_ESLIFp, p, MarpaX_ESLIF_Symbolp, &(MarpaX_ESLIFp->constants));
 
@@ -4664,10 +4706,15 @@ CODE:
   marpaESLIFString.encodingasciis = encodingasciis;
   marpaESLIFString.asciis         = NULL;
 
+  marpaESLIFSubstitutionString.bytep          = substitutionPatterns;
+  marpaESLIFSubstitutionString.bytel          = (size_t) substitutionPatternl;
+  marpaESLIFSubstitutionString.encodingasciis = encodingasciis;
+  marpaESLIFSubstitutionString.asciis         = NULL;
+
   marpaESLIFSymbolOption.userDatavp = (void *) MarpaX_ESLIF_Symbolp;
   marpaESLIFSymbolOption.importerp  = marpaESLIFPerl_symbolImportb;
 
-  marpaESLIFSymbolp = marpaESLIFSymbol_regex_newp(marpaESLIFp, &marpaESLIFString, modifiers, &marpaESLIFSymbolOption);
+  marpaESLIFSymbolp = marpaESLIFSymbol_regex_newp(marpaESLIFp, &marpaESLIFString, modifiers, (substitutionPatterns != NULL) ? &marpaESLIFSubstitutionString : NULL, (substitutionPatterns != NULL) ? substitutionModifiers : NULL, &marpaESLIFSymbolOption);
   if (MARPAESLIF_UNLIKELY(marpaESLIFSymbolp == NULL)) {
     marpaESLIFPerl_symbolContextFreev(aTHX_ MarpaX_ESLIF_Symbolp);
     MARPAESLIFPERL_CROAKF("marpaESLIFSymbol_regex_newp failure, %s", strerror(errno));

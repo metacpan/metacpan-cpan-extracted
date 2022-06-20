@@ -7,7 +7,7 @@ package Sub::HandlesVia;
 use Exporter::Shiny qw( delegations );
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.016';
+our $VERSION   = '0.025';
 
 sub _generate_delegations {
 	my ($me, $name, $args, $globals) = (shift, @_);
@@ -132,6 +132,10 @@ One ring to rule them all, so to speak.
 
 Also, unlike L<MooX::HandlesVia>, it honours type constraints, plus it
 doesn't have the limitation that it can't mutate non-reference values.
+
+Note: as Sub::HandlesVia needs to detect whether you're using Moo, Moose,
+or Mouse, and often needs to detect whether your package is a class or a
+role, it needs to be loaded I<after> Moo/Moose/Mouse.
 
 =head2 Using with Moo
 
@@ -418,24 +422,24 @@ native traits, and L<MouseX::NativeTraits>.
              uniqstr : SubHV                       
     uniqstr_in_place : SubHV                       
              unshift : SubHV  DataP  Moose  Mouse  
- 
+  
   Bool ============================================
                  not : SubHV  DataP  Moose  Mouse  
                reset : SubHV                       
                  set : SubHV  DataP  Moose  Mouse  
               toggle : SubHV  DataP  Moose  Mouse  
                unset : SubHV  DataP  Moose  Mouse  
- 
+  
   Code ============================================
              execute : SubHV  DataP  Moose  Mouse  
       execute_method : SubHV         Moose  Mouse  
- 
+  
   Counter =========================================
                  dec : SubHV  DataP  Moose  Mouse  
                  inc : SubHV  DataP  Moose  Mouse  
                reset : SubHV  DataP  Moose  Mouse  
                  set : SubHV         Moose  Mouse  
- 
+  
   Hash ============================================
             accessor : SubHV  DataP  Moose  Mouse  
                  all : SubHV  DataP                
@@ -459,32 +463,78 @@ native traits, and L<MouseX::NativeTraits>.
          sorted_keys : SubHV                Mouse  
                store :                      Mouse  (alias: set)
               values : SubHV  DataP  Moose  Mouse  
- 
+  
   Number ==========================================
                  abs : SubHV  DataP  Moose  Mouse  
                  add : SubHV  DataP  Moose  Mouse  
+                 cmp : SubHV                       
                  div : SubHV  DataP  Moose  Mouse  
+                  eq : SubHV                       
+                  ge : SubHV                       
                  get : SubHV                       
+                  gt : SubHV                       
+                  le : SubHV                       
+                  lt : SubHV                       
                  mod : SubHV  DataP  Moose  Mouse  
                  mul : SubHV  DataP  Moose  Mouse  
+                  ne : SubHV                       
                  set : SubHV         Moose         
                  sub : SubHV  DataP  Moose  Mouse  
- 
+  
+  Scalar ==========================================
+         make_getter : SubHV                       
+         make_setter : SubHV                       
+    scalar_reference : SubHV                       
+  
   String ==========================================
               append : SubHV  DataP  Moose  Mouse  
                chomp : SubHV  DataP  Moose  Mouse  
                 chop : SubHV  DataP  Moose  Mouse  
                clear : SubHV  DataP  Moose  Mouse  
+                 cmp : SubHV                       
+                cmpi : SubHV                       
+            contains : SubHV                       
+          contains_i : SubHV                       
+           ends_with : SubHV                       
+         ends_with_i : SubHV                       
+                  eq : SubHV                       
+                 eqi : SubHV                       
+                  fc : SubHV                       
+                  ge : SubHV                       
+                 gei : SubHV                       
                  get : SubHV                       
+                  gt : SubHV                       
+                 gti : SubHV                       
                  inc : SubHV  DataP  Moose  Mouse  
+                  lc : SubHV                       
+                  le : SubHV                       
+                 lei : SubHV                       
               length : SubHV  DataP  Moose  Mouse  
+                  lt : SubHV                       
+                 lti : SubHV                       
                match : SubHV  DataP  Moose  Mouse  
+             match_i : SubHV                       
+                  ne : SubHV                       
+                 nei : SubHV                       
              prepend : SubHV  DataP  Moose  Mouse  
              replace : SubHV  DataP  Moose  Mouse  
     replace_globally : SubHV                Mouse  
                reset : SubHV                       
                  set : SubHV                       
+         starts_with : SubHV                       
+       starts_with_i : SubHV                       
               substr : SubHV  DataP  Moose  Mouse  
+                  uc : SubHV                       
+
+For further details see:
+L<Array|Sub::HandlesVia::HandlerLibrary::Array>,
+L<Bool|Sub::HandlesVia::HandlerLibrary::Bool>,
+L<Code|Sub::HandlesVia::HandlerLibrary::Code>,
+L<Counter|Sub::HandlesVia::HandlerLibrary::Counter>,
+L<Hash|Sub::HandlesVia::HandlerLibrary::Hash>,
+L<Number|Sub::HandlesVia::HandlerLibrary::Number>,
+L<Scalar|Sub::HandlesVia::HandlerLibrary::Scalar>, and
+L<String|Sub::HandlesVia::HandlerLibrary::String>.
 
 =head2 Method Chaining
 
@@ -619,13 +669,25 @@ But you can be specific:
 =head1 BUGS
 
 Please report any bugs to
-L<http://rt.cpan.org/Dist/Display.html?Queue=Sub-HandlesVia>.
+L<https://github.com/tobyink/p5-sub-handlesvia/issues>.
 
 (There are known bugs for Moose native types that do coercion.)
 
 =head1 SEE ALSO
 
-L<Moose>, L<MouseX::NativeTraits>, L<Data::Perl>, L<MooX::HandlesVia>.
+Documentation for delegatable methods:
+L<Array|Sub::HandlesVia::HandlerLibrary::Array>,
+L<Bool|Sub::HandlesVia::HandlerLibrary::Bool>,
+L<Code|Sub::HandlesVia::HandlerLibrary::Code>,
+L<Counter|Sub::HandlesVia::HandlerLibrary::Counter>,
+L<Hash|Sub::HandlesVia::HandlerLibrary::Hash>,
+L<Number|Sub::HandlesVia::HandlerLibrary::Number>,
+L<Scalar|Sub::HandlesVia::HandlerLibrary::Scalar>, and
+L<String|Sub::HandlesVia::HandlerLibrary::String>.
+
+Other implementations of the same concept:
+L<Moose::Meta::Attribute::Native>, L<MouseX::NativeTraits>, and
+L<MooX::HandlesVia> with L<Data::Perl>.
 
 =head1 AUTHOR
 
@@ -633,7 +695,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2020 by Toby Inkster.
+This software is copyright (c) 2020, 2022 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -3,15 +3,16 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Apply chromatic and diatonic transposition to notes
 
-our $VERSION = '0.0501';
+our $VERSION = '0.0502';
 
 use Data::Dumper::Compact qw(ddc);
 use List::SomeUtils qw(first_index);
-use Music::Note;
 use Music::Scales qw(get_scale_MIDI is_scale);
 use Moo;
 use strictures 2;
 use namespace::clean;
+
+with('Music::PitchNum');
 
 use constant OCTAVES => 10;
 
@@ -65,7 +66,7 @@ sub transpose {
         }
         else {
             if ($named) {
-                push @transposed, Music::Note->new($self->_scale->[ $i + $offset ], 'midinum')->format('ISO');
+                push @transposed, $self->pitchname($self->_scale->[ $i + $offset ]);
             }
             else {
                 push @transposed, $self->_scale->[ $i + $offset ];
@@ -80,7 +81,7 @@ sub transpose {
 sub _find_pitch {
     my ($self, $pitch) = @_;
 
-    $pitch = Music::Note->new($pitch, 'ISO')->format('midinum')
+    $pitch = $self->pitchnum($pitch)
         if $pitch =~ /[A-G]/;
 
     my $i = first_index { $_ == $pitch } @{ $self->_scale };
@@ -102,7 +103,7 @@ Music::MelodicDevice::Transposition - Apply chromatic and diatonic transposition
 
 =head1 VERSION
 
-version 0.0501
+version 0.0502
 
 =head1 SYNOPSIS
 
@@ -123,7 +124,7 @@ version 0.0501
 =head1 DESCRIPTION
 
 C<Music::MelodicDevice::Transposition> applies transposition, both
-chromatic or diatonic, to a series of ISO  or "midinum" formatted
+chromatic or diatonic, to a series of ISO or "midinum" formatted
 notes.
 
 While there are modules on CPAN that do chromatic transposition,
@@ -145,6 +146,8 @@ scale with flats, a diatonic B<scale_name> must be used with a flat
 B<scale_note>.
 
 Please see L<Music::Scales/SCALES> for a list of valid scale names.
+
+=for Pod::Coverage OCTAVES
 
 =head2 verbose
 
@@ -178,8 +181,6 @@ L<Data::Dumper::Compact>
 L<List::SomeUtils>
 
 L<Moo>
-
-L<Music::Note>
 
 L<Music::Scales>
 

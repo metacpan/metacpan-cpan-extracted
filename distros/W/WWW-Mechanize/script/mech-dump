@@ -131,7 +131,7 @@ mech-dump - Dumps information about a web page
 
 =head1 VERSION
 
-version 2.08
+version 2.09
 
 =head1 SYNOPSIS
 
@@ -169,7 +169,7 @@ The order of the options specified is relevant.  Repeated options
 get repeated dumps.
 
 Proxy settings are specified through the environment (e.g. C<http_proxy=http://proxy.my.place/>).
-See LWP::UserAgent for details.
+See L<LWP::UserAgent> for details.
 
 =head1 SEE ALSO
 

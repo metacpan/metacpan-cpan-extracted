@@ -339,6 +339,7 @@ Net::DNS::Resolver::Unbound::Result
 mock_result(struct ub_ctx* ctx, SV* name, int secure, int bogus)
     CODE:
 	checkerr( ub_resolve(ctx, (const char*) SvPVX(name), 1, 1, &RETVAL) );
+	if (bogus) RETVAL->answer_packet = NULL;
 	RETVAL->secure = secure;
 	RETVAL->bogus  = bogus;
     OUTPUT:

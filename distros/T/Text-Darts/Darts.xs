@@ -24,6 +24,7 @@ static IV da_make(AV *av){
 
 static int da_free(IV dpi){
     delete INT2PTR(Darts::DoubleArray *, dpi);
+    return 0;
 }
 
 static IV da_open(char *filename){

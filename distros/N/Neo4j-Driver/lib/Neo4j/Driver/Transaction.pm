@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Transaction;
 # ABSTRACT: Logical container for an atomic unit of work
-$Neo4j::Driver::Transaction::VERSION = '0.30';
+$Neo4j::Driver::Transaction::VERSION = '0.31';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(
@@ -283,7 +283,7 @@ Neo4j::Driver::Transaction - Logical container for an atomic unit of work
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 SYNOPSIS
 
@@ -476,7 +476,7 @@ This feature might eventually be used to implement lazy statement
 execution for this driver. The private C<_run_multiple()> method
 which makes using this feature explicit is expected to remain
 available at least until that time. See also
-L<Neo4j::Driver::Net/"USE OF INTERNAL APIS">.
+L<Neo4j::Driver::Plugin/"USE OF INTERNAL APIS">.
 
 =head1 SEE ALSO
 

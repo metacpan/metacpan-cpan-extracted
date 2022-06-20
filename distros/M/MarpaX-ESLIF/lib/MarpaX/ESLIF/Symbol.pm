@@ -19,13 +19,15 @@ sub _ALLOCATE {
             my $pattern = $options{pattern} // croak 'pattern must be defined';
             my $encoding = $options{encoding};
             my $modifiers = $options{modifiers};
+            my $substitutionPattern = $options{substitutionPattern};
+            my $substitutionModifiers = $options{substitutionModifiers};
 
             return
                 ($type eq 'string')
                 ?
                 MarpaX::ESLIF::Symbol->string_allocate($eslif, $pattern, bytes::length($pattern), $encoding, $modifiers)
                 :
-                MarpaX::ESLIF::Symbol->regex_allocate($eslif, $pattern, bytes::length($pattern), $encoding, $modifiers)
+                MarpaX::ESLIF::Symbol->regex_allocate($eslif, $pattern, bytes::length($pattern), $encoding, $modifiers, $substitutionPattern, $substitutionModifiers)
         } elsif ($type eq 'meta') {
             my $grammar = $options{grammar} // croak 'grammar must be defined';
             my $symbol = $options{symbol} // croak 'symbol must be defined';
@@ -48,35 +50,48 @@ sub _EQ {
             my $pattern = $options{pattern} // croak 'pattern must be defined';
             my $encoding = $options{encoding};
             my $modifiers = $options{modifiers};
+            my $substitutionPattern = $options{substitutionPattern};
+            my $substitutionModifiers = $options{substitutionModifiers};
 
             my $definedEncoding = defined($encoding); # It is legal to create a symbol with no encoding
             my $definedModifiers = defined($modifiers); # It is legal to create a symbol with no modifier
+            my $definedSubstitutionPattern = defined($substitutionPattern); # It is legal to create a symbol with no substitution pattern
+            my $definedSubstitutionModifiers = defined($substitutionModifiers); # It is legal to create a symbol with no substitution modifier
 
-            my $_definedEncoding = defined($args_ref->[3]);
-            my $_definedModifiers = defined($args_ref->[4]);
+            my ($args_eslif, %args_options) = @{$args_ref};
+            my $_definedEncoding = defined($args_options{encoding});
+            my $_definedModifiers = defined($args_options{modifiers});
+            my $_definedSubstitutionPattern = defined($args_options{substitutionPattern});
+            my $_definedSubstitutionModifiers = defined($args_options{substitutionModifiers});
             return $_ if
-                $eslif == $args_ref->[0]
+                $eslif == $args_eslif
                 &&
-                $type eq $args_ref->[1]
+                $type eq $args_options{type}
                 &&
-                $pattern eq $args_ref->[2]
+                $pattern eq $args_options{pattern}
                 &&
-                ((! $definedEncoding && ! $_definedEncoding) || ($definedEncoding && $_definedEncoding && ($encoding eq $args_ref->[3])))
+                ((! $definedEncoding && ! $_definedEncoding) || ($definedEncoding && $_definedEncoding && ($encoding eq $args_options{encoding})))
                 &&
-                ((! $definedModifiers && ! $_definedModifiers) || ($definedModifiers && $_definedModifiers && ($modifiers eq $args_ref->[4])))
+                ((! $definedModifiers && ! $_definedModifiers) || ($definedModifiers && $_definedModifiers && ($modifiers eq $args_options{modifiers})))
+                &&
+                ((! $definedSubstitutionPattern && ! $_definedSubstitutionPattern) || ($definedSubstitutionPattern && $_definedSubstitutionPattern && ($substitutionPattern eq $args_options{substitutionPattern})))
+                &&
+                ((! $definedSubstitutionModifiers && ! $_definedSubstitutionModifiers) || ($definedSubstitutionModifiers && $_definedSubstitutionModifiers && ($substitutionModifiers eq $args_options{substitutionModifiers})))
 
         } elsif ($type eq 'meta') {
             my $grammar = $options{grammar} // croak 'grammar must be defined';
             my $symbol = $options{symbol} // croak 'symbol must be defined';
 
+            my ($args_eslif, %args_options) = @{$args_ref};
+
             return $_ if
-                $eslif == $args_ref->[0]
+                $eslif == $args_eslif
                 &&
-                $type eq $args_ref->[1]
+                $type eq $args_options{type}
                 &&
-                $grammar == $args_ref->[2]
+                $grammar == $args_options{grammar}
                 &&
-                $symbol eq $args_ref->[3]
+                $symbol eq $args_options{symbol}
         } else {
             croak "Type must be 'string', 'regex' or 'meta'"
         }
@@ -87,7 +102,7 @@ sub _EQ {
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '6.0.22'; # VERSION
+our $VERSION = '6.0.24'; # VERSION
 
 
 1;
@@ -104,7 +119,7 @@ MarpaX::ESLIF::Symbol - MarpaX::ESLIF's symbol
 
 =head1 VERSION
 
-version 6.0.22
+version 6.0.24
 
 =head1 SYNOPSIS
 
@@ -122,6 +137,10 @@ version 6.0.22
                                                                    $eslif,
                                                                    "<something> ::= <SOMETHING>\n<SOMETHING> ~ 'that'")
                                                       symbol => 'SOMETHING');
+  #
+  # For regex, a substitution pattern is supported
+  #
+  my $substitutionSymbol = MarpaX::ESLIF::Symbol->new($eslif, type => 'regex', pattern => 'Regex(.*)Pattern', modifiers => 'A', substitutionPattern => '$1', substitutionModifiers => 'g');
 
   if (defined(my $match = $stringSymbol->try('String Pattern here'))) {
       print "==> String match: $match\n";
@@ -132,6 +151,10 @@ version 6.0.22
   }
 
   if (defined(my $match = $metaSymbol->try('something'))) {
+      print "==> Meta match: $match\n";
+  }
+
+  if (defined(my $match = $substitutionSymbol->try('Should match Regex etc Pattern in there'))) {
       print "==> Meta match: $match\n";
   }
 
@@ -202,6 +225,26 @@ It must follow the specification of the I<Terminals> section of L<MarpaX::ESLIF:
   ----------------------------------------------------------------
 
 Note that a string pattern accepts only the C<i> and C<c> modifiers.
+
+=item C<substitutionPattern>
+
+Value is the substitution content, writen as if this was an ESLIF string. Optional and supported only for "regex" type. If set, it is assumed that it is in the same encoding as C<pattern>.
+
+=item C<substitutionModifiers>
+
+Value is a string containing substitution modifiers. Optional and supported only for "regex" type.
+
+It must follow the substitution specification of the I<Terminals> section of L<MarpaX::ESLIF::BNF>:
+
+  ----------------------------------------------------------------
+  Modifiers         PCRE2 flag unset   PCR2 flag set
+  ----------------------------------------------------------------
+  x                                    PCRE2_SUBSTITUTE_EXTENDED
+  g                                    PCRE2_SUBSTITUTE_GLOBAL
+  l                                    PCRE2_SUBSTITUTE_LITERAL
+  !                                    PCRE2_SUBSTITUTE_UNKNOWN_UNSET
+  f                                    PCRE2_SUBSTITUTE_UNSET_EMPTY
+  ----------------------------------------------------------------
 
 =back
 

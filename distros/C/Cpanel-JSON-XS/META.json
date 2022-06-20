@@ -100,7 +100,7 @@
          "url" : "https://github.com/rurban/Cpanel-JSON-XS"
       }
    },
-   "version" : "4.29",
+   "version" : "4.30",
    "x_contributors" : [
       "Ashley Willis <ashleyw@cpan.org>",
       "Chip Salzenberg <chip@pobox.com>",
@@ -127,5 +127,5 @@
       "Syohei Yoshida <syohex@gmail.com>",
       "tevfik1903 <tevfik1903@users.noreply.github.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

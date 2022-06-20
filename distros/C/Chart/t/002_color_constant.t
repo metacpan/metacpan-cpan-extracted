@@ -1,3 +1,5 @@
+#!/usr/bin/perl
+
 use v5.12;
 use warnings;
 use Test::More tests => 57;

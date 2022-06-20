@@ -22,14 +22,7 @@ sub validate {
     my ($self, $field, $input, $min) = @_;
 
     if ($self->_field_defined_and_non_empty($field, $input)) {
-        my $maybe_str = $input->{$field};
-
-        if (looks_like_number($maybe_str)) {
-            return 0;
-        }
-        else {
-            return length($maybe_str) >= $min;
-        }
+        return length($input->{$field}) >= $min;
     }
 
     return 1;

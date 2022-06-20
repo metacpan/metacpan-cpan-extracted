@@ -37,11 +37,17 @@ my $unicycle = Local::Unicycle->new;
 die if eval { $unicycle->wheel };
 die if eval { $unicycle->{wheel}->colour };
 
-#require B::Deparse;
-#for my $method (qw/ spin wheel_ref wheel_colour /) {
-#	diag("sub $method");
-#	diag(B::Deparse->new->coderef2text($unicycle->can($method)));
-#}
+require B::Deparse;
+for my $method (qw/ spin wheel_ref wheel_colour /) {
+	my $coderef = $unicycle->can($method);
+	if ($coderef) {
+		note("sub $method");
+		note(B::Deparse->new->coderef2text($coderef));
+	}
+	else {
+		note "NO METHOD $method";
+	}
+}
 
 is(
 	$unicycle->spin,

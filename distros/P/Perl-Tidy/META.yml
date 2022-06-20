@@ -17,7 +17,9 @@ no_index:
   directory:
     - t
     - inc
+requires:
+  perl: '5.008'
 resources:
   repository: https://github.com/perltidy/perltidy.git
-version: '20220217'
+version: '20220613'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

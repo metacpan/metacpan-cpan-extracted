@@ -1,7 +1,7 @@
 use 5.006;
 use ExtUtils::MakeMaker;
 
-$is_devel_host = defined $ENV{USER} && $ENV{USER} eq 'eserte' && $^O =~ /bsd/i && -f "../../perl.release.mk";
+$is_devel_host = defined $ENV{USER} && $ENV{USER} eq 'eserte' && ($^O =~ /bsd/i || $ENV{PERL_RELEASE_READY}) && -f "../../perl.release.mk";
 $eumm_recent_enough = $ExtUtils::MakeMaker::VERSION >= 6.54;
 
 if (!$eumm_recent_enough) {
@@ -17,6 +17,7 @@ EOF
 WriteMakefile(
     NAME                => 'XTerm::Conf',
     VERSION_FROM        => 'lib/XTerm/Conf.pm',
+    LICENSE             => 'perl_5',
     EXE_FILES           => ['xterm-conf'],
     PREREQ_PM		=> {
 	'Getopt::Long'  => 2.24,

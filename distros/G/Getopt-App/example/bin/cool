@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 package Test::Cool;
-use Getopt::App;
+use Getopt::App -complete;
 use File::Spec::Functions qw(catdir catfile rel2abs updir);
 use File::Basename qw(dirname);
 
@@ -17,11 +17,13 @@ sub getopt_subcommands {
 }
 
 run(
-  qw(h),
+  'h                 # Print help',
+  'completion-script # Print autocomplete script',
   sub {
-    my ($app) = @_;
-    return print extract_usage() if $app->{h};
-    print __FILE__;
+    my ($app, @args) = @_;
+    return print generate_completion_script() if $app->{'completion-script'};
+    return print extract_usage()              if $app->{h};
+    say __FILE__;
     return 10;
   }
 );

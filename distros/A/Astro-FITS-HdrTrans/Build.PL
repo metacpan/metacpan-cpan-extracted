@@ -33,7 +33,7 @@ my $build = Module::Build->new
                    'Brad Cavanagh <b.cavanagh@jach.hawaii.edu>',
                    'Malcolm J. Currie <mjc@star.rl.ac.uk>',
                   ],
-   dist_version => '1.64',
+   dist_version => '1.65',
    script_files => [ qw/
                          translatehdr
                        / ],

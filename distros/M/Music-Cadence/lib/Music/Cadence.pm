@@ -3,18 +3,20 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate musical cadence chords
 
-our $VERSION = '0.1504';
+our $VERSION = '0.1505';
 
 use List::Util 'any';
-use Moo;
 use Music::Chord::Note;
 use Music::Chord::Positions;
 use Music::Note;
 use Music::Scales;
 use Music::ToRoman;
 
+use Moo;
 use strictures 2;
 use namespace::clean;
+
+with('Music::PitchNum');
 
 
 has key => (
@@ -189,13 +191,13 @@ sub _invert_chord {
             if $octave;
 
         # Convert the chord into pitch-class representation
-        my $pitches = [ map { Music::Note->new( $_ . -1, 'ISO' )->format('midinum') } @$chord ];
+        my $pitches = [ map { $self->pitchnum( $_ . -1 ) } @$chord ];
 
         # Do the inversion!
         $pitches = $mcp->chord_inv( $pitches, inv_num => $inversion );
 
         # Convert the pitch-classes back to named notes
-        $chord = [ map { Music::Note->new( $_, 'midinum' )->format('ISO') } @$pitches ];
+        $chord = [ map { $self->pitchname($_) } @$pitches ];
 
         # Clean-up the chord
         for ( @$chord ) {
@@ -263,7 +265,7 @@ sub _generate_chord {
     }
     elsif ( $self->format eq 'midinum' ) {
         # Convert the notes to midinum format
-        @notes = map { Music::Note->new( $_ . $octave, 'ISO' )->format('midinum') } @notes;
+        @notes = map { $self->pitchnum( $_ . $octave ) } @notes;
     }
     elsif ( $self->format ne 'isobase' ) {
         die 'unknown format';
@@ -301,7 +303,7 @@ Music::Cadence - Generate musical cadence chords
 
 =head1 VERSION
 
-version 0.1504
+version 0.1505
 
 =head1 SYNOPSIS
 

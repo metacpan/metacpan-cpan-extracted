@@ -28,7 +28,7 @@ subtest bad_name => sub {
 		like( $string, qr/(GeoNames error: invalid username|does not exist)/, 'Fake username gives warning' );
 		}
 	};
-	
+
 subtest empty_name => sub {
 	my $geo = eval { $class->$method(
 		username => '',
@@ -44,7 +44,7 @@ subtest undef_name => sub {
 		username => undef,
 		) };
 	my $at = $@;
-	
+
 	is( $geo, undef, '$geo is undefined with undef username' );
 	like( $at, qr/You must specify/i, 'Error message says to specify username' );
 	};

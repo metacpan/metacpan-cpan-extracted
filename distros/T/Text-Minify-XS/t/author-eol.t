@@ -21,6 +21,7 @@ my @files = (
     't/01-minify.t',
     't/02-minify_utf8.t',
     't/03-minify_ascii.t',
+    't/04-undef.t',
     't/author-clean-namespaces.t',
     't/author-critic.t',
     't/author-eof.t',

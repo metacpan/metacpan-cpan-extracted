@@ -47,14 +47,12 @@ my $when = DateTime->new(
     time_zone => 'UTC',
 );
 
-my $campaign = [qw( campaign1 campaign2 )];
 my $tag      = [qw( tag1 tag2 tag3 )];
 
 my $transport = Email::Sender::Transport::Mailgun->new(
     api_key  => $api_key,
     domain   => $domain,
     base_uri => "$proto://$host",
-    campaign => $campaign,
     tag      => join(', ', @$tag),
     tracking_clicks => 'htmlonly',
     deliverytime => $when,
@@ -85,7 +83,6 @@ eq_or_diff($req->{form}, {
     },
     to                  => body($envelope{to}),
     'o:tag'             => body(@$tag),
-    'o:campaign'        => body(@$campaign),
     'o:deliverytime'    => body('Fri, 31 Dec 2066 23:59:59 +0000'),
     'o:tracking-clicks' => body('htmlonly'),
 }, 'Message format as expected');

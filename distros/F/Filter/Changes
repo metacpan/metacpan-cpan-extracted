@@ -1,3 +1,11 @@
+1.61 2022-06-13 rurban
+----
+  * perfilter.pod: minor improvements (PR #16 khw)
+  * Remove runtime recommends META (GH #14 kentfredric)
+  * use strict in all modules. Fixes Test::Kwalitee.
+  * Add github actions, and cirrus CI's
+  * Updated Copyright years.
+
 1.60 2020-08-05 rurban
 ----
   * Increase t/call.t verbosity on failures (PR #12 aatomic)

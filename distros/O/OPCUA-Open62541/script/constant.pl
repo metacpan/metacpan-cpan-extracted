@@ -7,10 +7,11 @@ use warnings;
 # get $VERSION without loading XS code or parsing generated Perl
 open(my $fh, '<', "Makefile")
     or die "Open 'Makefile' for reading failed\n";
-my $version;
+my ($inc, $version);
 local $_;
 while(<$fh>) {
-    ($version) = /^VERSION\s*=\s*(.*)/ and last;
+    ($inc) = /^INC\s*=\s*(.*)/ unless $inc;
+    ($version) = /^VERSION\s*=\s*(.*)/ unless $version;
 }
 close($fh);
 
@@ -322,7 +323,12 @@ EOPODFOOTER
 ########################################################################
 sub print_xsfunc {
     my ($xsf, $typedef, $prefix, $str, $ifdef) = @_;
-    print $xsf "#ifdef UA_${prefix}_${str}\n\n" if $ifdef;
+    if ($ifdef) {
+	$ifdef = "UA_${prefix}_${str}";
+    } elsif (grep { /\-DHAVE_UA_${prefix}_${str}=1/ } $inc) {
+	$ifdef = "HAVE_UA_${prefix}_${str}";
+    }
+    print $xsf "#ifdef ${ifdef}\n\n" if $ifdef;
     print $xsf <<"EOXSFUNC";
 ${typedef}
 ${prefix}_${str}()
@@ -332,5 +338,5 @@ ${prefix}_${str}()
 	RETVAL
 
 EOXSFUNC
-    print $xsf "#endif\n" if $ifdef;
+    print $xsf "#endif\n\n" if $ifdef;
 }

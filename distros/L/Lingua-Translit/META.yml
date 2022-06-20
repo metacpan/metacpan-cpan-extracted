@@ -1,21 +1,21 @@
---- #YAML:1.0
-name:               Lingua-Translit
-version:            0.28
-abstract:           transliterates text between writing systems
+---
+abstract: 'transliterates text between writing systems'
 author:
-    - Alex Linke <alinke@netzum-sorglos.de>
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Alex Linke <alinke@netzum-sorglos.de>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:  {}
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.57_05
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-Translit
+no_index:
+  directory:
+    - t
+    - inc
+version: '0.29'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

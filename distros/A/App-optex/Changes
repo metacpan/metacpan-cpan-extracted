@@ -1,5 +1,9 @@
 Revision history for `optex' command.
 
+v0.5.3 2022-06-19T07:06:43Z
+
+    - Decode @ARGV.
+
 v0.5.2 2021-11-01T08:36:05Z
 
     - Update util::filter::rev_char() to handle logical characters.

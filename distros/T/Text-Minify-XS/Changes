@@ -1,5 +1,26 @@
 Revision history for Text-Minify-XS:
 
+v0.6.3    2022-06-13 16:55:07+01:00 Europe/London
+  [Documentation]
+  - Removed the similar modules from SEE ALSO.
+
+  - Other minor changes to documentation.
+
+  [Toolchain]
+  - Simplify XSLoader call.
+
+v0.6.2    2022-06-10 15:03:20+01:00 Europe/London
+  [Bug Fixes]
+  - Fix segfault when passed undef values, GH#10.
+
+  [Other]
+  - Bump version of Devel::PPPort to 3.68.
+
+  [Documentation]
+  - Fix typo in Changes.
+
+  - Mention Perl v5.36 trim function.
+
 v0.6.1    2022-03-04 19:30:24+00:00 Europe/London
   [Documentation]
   - Fix encoding of links in README.
@@ -7,7 +28,7 @@ v0.6.1    2022-03-04 19:30:24+00:00 Europe/London
   [Other]
   - Use modern calling style for Exporter and XSLoader.
 
-  - Bump version of Devel::PPPort to 3.36.
+  - Bump version of Devel::PPPort to 3.66.
 
 v0.6.0    2022-02-15 14:23:40+00:00 Europe/London
   [Documentation]

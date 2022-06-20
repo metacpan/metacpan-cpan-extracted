@@ -266,16 +266,14 @@ visible representation.
 
 =item I<name>
 
-Name is C<tabstyle>, C<all>, or one of these: [ nul soh stx etx eot
-enq ack bel bs ht nl vt np cr so si dle dc1 dc2 dc3 dc4 nak syn etb
-can em sub esc fs gs rs us sp del ].
+Name is C<tabstyle>, C<all>, or one of these:
 
-     000 nul  001 soh  002 stx  003 etx  004 eot  005 enq  006 ack  007 bel
-     010 bs   011 ht   012 nl   013 vt   014 np   015 cr   016 so   017 si
-     020 dle  021 dc1  022 dc2  023 dc3  024 dc4  025 nak  026 syn  027 etb
-     030 can  031 em   032 sub  033 esc  034 fs   035 gs   036 rs   037 us
-     040 sp
-     240 nbsp
+    000 nul  001 soh  002 stx  003 etx  004 eot  005 enq  006 ack  007 bel
+    010 bs   011 ht   012 nl   013 vt   014 np   015 cr   016 so   017 si
+    020 dle  021 dc1  022 dc2  023 dc3  024 dc4  025 nak  026 syn  027 etb
+    030 can  031 em   032 sub  033 esc  034 fs   035 gs   036 rs   037 us
+    040 sp
+    240 nbsp
 
 If the name is C<all>, the value is set for all characters.
 Default is equivalent to:

@@ -1,25 +1,29 @@
 Revision history for Perl module Getopt::Class
 
-v0.102.6 2022-03-12T21:55:30+0900
+v0.102.7 2022-06-19T08:30:15Z +0900
+    - Added method postprocess()
+    - Added support for array and scalar objects
+
+v0.102.6 2022-03-12T21:55:30Z +0900
     - Added better support for array
     - Added argument types 'file' and 'file-array'
 
-0.102.5 2020-05-26T14:23:07+0900
+0.102.5 2020-05-26T14:23:07Z +0900
     - Corrected a mishandling of boolean object
 
-0.102.4 2020-05-21T11:51:32+0900
+0.102.4 2020-05-21T11:51:32Z +0900
     - Using the latest version of Module::Generic
 
-0.102.3 2020-05-21T08:00:55+0900
+0.102.3 2020-05-21T08:00:55Z +0900
     - Change from TryCatch to Nice::Try because TryCatch got broken with release of Devel::Declare version 0.006020
 
-0.102.2 2020-05-16T09:52:29+0900
+0.102.2 2020-05-16T09:52:29Z +0900
     - Bug fixes and design improvements
 
-0.102.1 2020-05-05T22:46:21+0900
+0.102.1 2020-05-05T22:46:21Z +0900
     - Corrected design bug for option key aliases not working properly.
 
-0.102.0 2020-05-03T17:42:22+0900
+0.102.0 2020-05-03T17:42:22Z +0900
     - Improvement in management of aliases so that when an alias value is modified, it also modifies the values for other aliases
     - Created an inline class so that the resulting options can be called as method, e.g.
     - my $cl = Getlong::Class->new({ dictionary => $dict });
@@ -30,14 +34,14 @@ v0.102.6 2022-03-12T21:55:30+0900
     - Corrected and improved aliases using Tie::Hash, because the perl feature https://metacpan.org/pod/perlref#Assigning-to-References refaliasing is still experimental and using Tie::Hash is more straightforward
     - Added the access of the option values as object method, each with their type being an object (string, boolean, date/datetime, number, hash or array reference)
 
-0.101.1 2020-05-01T22:57:41+0900
+0.101.1 2020-05-01T22:57:41Z +0900
     - Corrected a type in method class
 
-0.101.0 2020-04-27T14:47:58+0900
+0.101.0 2020-04-27T14:47:58Z +0900
     - Change of versioning, cpan forcing me to set version to higher than 0.100.0
 
-0.1.1 2020-04-27T02:22:51+0900
+0.1.1 2020-04-27T02:22:51Z +0900
     - Corrected 2 typos overlooked and updated slightly the documentation
 
-0.1.0 2020-04-27T00:12:44+0900
+0.1.0 2020-04-27T00:12:44Z +0900
     - Initial version 0.1

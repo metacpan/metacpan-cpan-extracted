@@ -1,0 +1,81 @@
+=head1 NAME
+
+Sub::HandlesVia::HandlerLibrary::Scalar - library of scalar-related methods
+
+=head1 SYNOPSIS
+
+  package My::Class {
+    use Moo;
+    use Sub::HandlesVia;
+    use Types::Standard 'Any';
+    has attr => (
+      is => 'rwp',
+      isa => Any,
+      handles_via => 'Scalar',
+      handles => {
+        'my_make_getter' => 'make_getter',
+        'my_make_setter' => 'make_setter',
+        'my_scalar_reference' => 'scalar_reference',
+      },
+    );
+  }
+
+=head1 DESCRIPTION
+
+This is a library of methods for L<Sub::HandlesVia>.
+
+=head1 DELEGATABLE METHODS
+
+=head2 C<< make_getter() >>
+
+Returns a getter coderef.
+
+  my $object = My::Class->new( attr => 10 );
+  my $getter = $object->my_make_getter;
+  $object->_set_attr( 11 );
+  say $getter->(); ## ==> 11
+
+=head2 C<< make_setter() >>
+
+Returns a setter coderef.
+
+  my $object = My::Class->new( attr => 10 );
+  my $setter = $object->my_make_setter;
+  $setter->( 11 );
+  say $object->attr; ## ==> 11
+
+=head2 C<< scalar_reference() >>
+
+Returns a scalar reference to the attribute value's slot within its object.
+
+  my $object = My::Class->new( attr => 10 );
+  my $ref = $object->my_scalar_reference;
+  $$ref++;
+  say $object->attr; ## ==> 11
+
+=head1 BUGS
+
+Please report any bugs to
+L<https://github.com/tobyink/p5-sub-handlesvia/issues>.
+
+=head1 SEE ALSO
+
+L<Sub::HandlesVia>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2020, 2022 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

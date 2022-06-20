@@ -1,5 +1,16 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+1.01 2022-06-17
+    - Adapt client iterate timeout to 32 bit for open62541 API 1.1.
+    - Use the SECURECHANNELSTATE constants from API 1.1 and 1.2.
+    - Use magic STATUSCODE in clientStateCallback().
+    - Avoid double free when destroying client config.
+    - Test server starts with API 1.3.
+    - Implement client async connect and disconnect with API 1.1.
+    - Test client works with API 1.1.
+    - Server config provides setCustomHostname() or setServerUrls().
+    - Allow float values Infinity and NaN.
+
 1.00 2022-05-30
     - Bump major version.  OPCUA::Open62541 compiles with open62541
       version 1.0.6, 1.1.6, 1.2.4, 1.3.  While this is enough to

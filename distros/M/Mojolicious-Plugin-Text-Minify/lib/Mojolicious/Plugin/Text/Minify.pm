@@ -6,9 +6,9 @@ use v5.16; # Mojolicious minimum version
 
 use Mojo::Base 'Mojolicious::Plugin';
 
-use Text::Minify::XS v0.4.8 ();
+use Text::Minify::XS v0.6.2 ();
 
-our $VERSION = 'v0.2.2';
+our $VERSION = 'v0.2.3';
 
 sub register {
     my ($self, $app, $conf) = @_;
@@ -38,7 +38,7 @@ Mojolicious::Plugin::Text::Minify - remove HTML indentation on the fly
 
 =head1 VERSION
 
-version v0.2.2
+version v0.2.3
 
 =head1 SYNOPSIS
 
@@ -90,7 +90,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Robert Rothenberg.
+This software is Copyright (c) 2021-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

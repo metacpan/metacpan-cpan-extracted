@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
 dynamic_config: 0
-generated_by: 'Moose::Meta::Class::__ANON__::SERIAL::9 version , CPAN::Meta::Converter version 2.140640'
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
 keywords: []
 license: perl
 meta-spec:
@@ -27,20 +27,22 @@ optional_features: {}
 provides:
   Sub::NonRole:
     file: lib/Sub/NonRole.pm
-    version: '0.004'
+    version: '0.006'
   Sub::NonRole::Trait::ParameterizableRole:
     file: lib/Sub/NonRole.pm
   Sub::NonRole::Trait::Role:
     file: lib/Sub/NonRole.pm
 requires:
   Hook::AfterRuntime: '0'
-  MooX::CaptainHook: '0.004'
-  Sub::Identify: '0'
+  Role::Hooks: '0.005'
   Sub::Talisman: '0'
+  perl: '5.008'
 resources:
-  X_identifier: http://purl.org/NET/cpan-uri/dist/Sub-NonRole/project
-  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Sub-NonRole
+  Identifier: http://purl.org/NET/cpan-uri/dist/Sub-NonRole/project
+  bugtracker: https://github.com/tobyink/p5-sub-nonrole/issues
   homepage: https://metacpan.org/release/Sub-NonRole
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-sub-nonrole.git
-version: '0.004'
+version: '0.006'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

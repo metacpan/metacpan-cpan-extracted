@@ -1,6 +1,6 @@
 package SPVM;
 
-our $VERSION = '0.9605';
+our $VERSION = '0.9609';
 
 use 5.008007;
 use strict;
@@ -78,10 +78,10 @@ sub import {
       next if $added_class_name =~ /::anon/;
       
       # Build Precompile classs - Compile C source codes and link them to SPVM precompile method
-      $BUILDER->build_and_bind_shared_lib($added_class_name, 'precompile');
+      $BUILDER->build_and_bind_dynamic_lib($added_class_name, 'precompile');
       
       # Build native classs - Compile C source codes and link them to SPVM native method
-      $BUILDER->build_and_bind_shared_lib($added_class_name, 'native');
+      $BUILDER->build_and_bind_dynamic_lib($added_class_name, 'native');
     }
   }
 }
@@ -421,13 +421,13 @@ SPVM Exchange APIs is functions to convert between Perl data structures and SPVM
 
 =back
 
-=head2 Native Method
+=head2 Native Module
 
-Native methods are the methods that implementations are writen by native language such as C<C language> or C<C++>.
+The native module is the module that is implemented by native language such as C<C language> or C<C++>.
 
 =over 2
 
-=item * L<Native Method|SPVM::Document::NativeMethod>
+=item * L<Native Method|SPVM::Document::NativeModule>
 
 =back
 
@@ -438,6 +438,16 @@ SPVM native APIs are public APIs that are used in native language sources such a
 =over 2
 
 =item * L<Native APIs|SPVM::Document::NativeAPI>
+
+=back
+
+=head2 Resource
+
+A resource is a L<native module|SPVM::Document::NativeModule> that contains a set of sources and headers of native language such as C<C language> or C<C++>.
+
+=over 2
+
+=item * L<Resource|SPVM::Document::Resource>
 
 =back
 

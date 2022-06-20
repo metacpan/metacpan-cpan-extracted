@@ -8,6 +8,7 @@ BEGIN
     use Test::More;
     use_ok( 'Cookie::Domain' );
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
+    require "t/env.pl";
 };
 
 my $dom = Cookie::Domain->new( debug => $DEBUG );

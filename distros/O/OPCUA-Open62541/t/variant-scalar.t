@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use OPCUA::Open62541 ':TYPES';
 
-use Test::More tests => 112;
+use Test::More tests => 115;
 use Test::Exception;
 use Test::LeakTrace;
 use Test::NoWarnings;
@@ -203,6 +203,13 @@ $variant->setScalar(1.17549435082229E-38, TYPES_FLOAT);
 is($variant->getScalar(), 1.17549435082229E-38, "scalar TYPES_FLOAT MIN");
 $variant->setScalar(3.4028230607371E+38, TYPES_FLOAT);
 is($variant->getScalar(), 3.4028230607371E+38, "scalar TYPES_FLOAT MAX");
+$variant->setScalar("Infinity", TYPES_FLOAT);
+is($variant->getScalar(), "Inf", "scalar TYPES_FLOAT Inf");
+$variant->setScalar("-Inf", TYPES_FLOAT);
+is($variant->getScalar(), "-Inf", "scalar TYPES_FLOAT -Inf");
+$variant->setScalar("NaN", TYPES_FLOAT);
+is($variant->getScalar(), "NaN", "scalar TYPES_FLOAT NaN");
+
 throws_ok { $variant->setScalar(-3.40282347E+38, TYPES_FLOAT) }
     (qr/Float value -3.402823e\+38 less than -3.402823e\+38 /,
     "TYPES_FLOAT min");

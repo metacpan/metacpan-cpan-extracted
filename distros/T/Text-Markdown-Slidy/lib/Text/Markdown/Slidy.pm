@@ -3,7 +3,9 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.02";
+use YAML::PP ();
+
+our $VERSION = "0.04";
 use parent 'Exporter';
 
 our @EXPORT = qw/markdown split_markdown/;
@@ -28,14 +30,46 @@ sub markdown {
             croak('Calling ' . $self . '->markdown (as a class method) is not supported.');
         }
     }
-    my @slides = $self->_sections($text);
-    join "\n", @slides;
+    my ($body, $meta) = _separate_frontmater($text);
+    my @slides = $self->_sections($body);
+    my $html = join "\n", @slides;
+    return wantarray ? ($html, $meta) : $html;
 }
 
 sub template {
     my $self = shift;
 
     $self->{template} ||= qq[<div class="slide">\n%s</div>\n];
+}
+
+sub _separate_frontmater {
+    my $text = shift;
+
+    my $delim = "---\n";
+    my $strict_frontmatter;
+    my ($raw_header, $body, $body2) = split /^$delim/ms, $text, 3;
+    if ($raw_header eq '') {
+        my $strict_frontmatter = 1;
+        ($raw_header, $body) = ($body, $body2);
+    } elsif ($body2) {
+        $body = $body . $delim . $body2;
+    }
+    my $meta;
+    if (!$body) {
+        $body = $raw_header;
+    } else {
+        eval {
+            $meta = YAML::PP::Load($raw_header);
+        };
+        if ($@ || !$meta || ref $meta ne 'HASH') {
+            if ($strict_frontmatter) {
+                die sprintf("invalid frontmatter\n%s", $raw_header);
+            }
+            undef $meta;
+            $body = $raw_header . $delim . $body;
+        }
+    }
+    return ($body, $meta);
 }
 
 sub md {
@@ -67,15 +101,22 @@ sub split_markdown {
 
     my @slides;
     my @slide_lines;
-    my $prev;
     for my $line (split /\r?\n/, $text) {
-        if ( $line =~ /^(?:(?:-+)|(?:=+))$/ && $prev) {
-            pop @slide_lines;
+        if ( my ($delim) = $line =~ /^([- ]+?|=+)\s*$/ and @slide_lines) {
+            if ($delim =~ / / || !$slide_lines[$#slide_lines]) {
+                # <hr />
+                # `- - -`
+                # "\n\n----\n"
+                push @slides, join("\n", (@slide_lines, $line));
+                @slide_lines = ();
+                next;
+            }
+            # h1 or h2
+            my $prev = pop @slide_lines;
             push @slides, join("\n", @slide_lines) if @slide_lines;
             @slide_lines = ($prev); # $prev is title;
         }
         push @slide_lines, $line;
-        $prev = $line;
     }
     push @slides, join("\n", @slide_lines) if @slide_lines;
 

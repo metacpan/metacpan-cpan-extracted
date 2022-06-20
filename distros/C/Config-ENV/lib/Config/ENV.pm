@@ -6,7 +6,7 @@ use warnings;
 use Carp;
 use File::Spec;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 sub import {
 	my $class   = shift;

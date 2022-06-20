@@ -1,5 +1,7 @@
 Revision history for SPVM::Math
 
+0.10  2022-06-13
+        * Catch up with latest SPVM.
 0.09  2021-02-23
         * SPVM::Math only supports FreeBSD 12+ because old FreeBSD doesn't support C99 math functions correctly, such as cpow.
 

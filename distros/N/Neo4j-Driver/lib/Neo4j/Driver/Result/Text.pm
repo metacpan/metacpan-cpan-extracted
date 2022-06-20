@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result::Text;
 # ABSTRACT: Fallback handler for result errors
-$Neo4j::Driver::Result::Text::VERSION = '0.30';
+$Neo4j::Driver::Result::Text::VERSION = '0.31';
 
 use parent 'Neo4j::Driver::Result';
 
@@ -73,7 +73,7 @@ Neo4j::Driver::Result::Text - Fallback handler for result errors
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 DESCRIPTION
 

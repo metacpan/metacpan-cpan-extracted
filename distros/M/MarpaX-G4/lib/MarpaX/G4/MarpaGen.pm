@@ -3,7 +3,6 @@
 #                                                                                                       #
 # translate the parsed antlr4 rules to Marpa::R2 syntax.                                                #
 #                                                                                                       #
-# V 1.0                                                                                                 #
 # ----------------------------------------------------------------------------------------------------- #
 
 package MarpaX::G4::MarpaGen;
@@ -31,7 +30,7 @@ sub new
     $self->{symboltable}        = undef;
     $self->{verbosity}          = 0;
     $self->{level}              = -1;
-    $self->{outputfilename}     = "-";
+    $self->{outputfilename}     = '-';
     $self->{outf}               = undef;
     $self->{rules}              = {};
     $self->{subrules}           = {};
@@ -40,17 +39,17 @@ sub new
     return $self;
 }
 
-sub setVerbosity     { my ($self, $verbosity) = @_; $self->{verbosity} = defined($verbosity) ? $verbosity : 0;   }
-sub symboltable      { my ($self) = @_; return $self->{symboltable};                                             }
-sub setoutputfile    { my ($self, $outputfilename) = @_; $self->{outputfilename} = $outputfilename;              }
+sub setVerbosity         { my ($self, $verbosity) = @_; $self->{verbosity} = defined($verbosity) ? $verbosity : 0; }
+sub symboltable          { my ($self) = @_; return $self->{symboltable};                                           }
+sub setoutputfile        { my ($self, $outputfilename) = @_; $self->{outputfilename} = $outputfilename;            }
 
-sub fragment2class   { my ($self) = @_; $self->{generationoptions}{fragment2class} = 'true';                     }
-sub embedactions     { my ($self) = @_; $self->{generationoptions}{embedactions} = 'true';                       }
-sub stripactions     { my ($self) = @_; $self->{generationoptions}{stripactions} = 'true';                       }
-sub stripallcomments { my ($self) = @_; $self->{generationoptions}{stripallcomments} = 'true';                   }
-sub splitliteral     { my ($self) = @_; $self->{generationoptions}{splitliteral} = 'true';                       }
-sub shiftlazytogreedy{ my ($self) = @_; $self->{generationoptions}{shiftlazytogreedy} = 'true';                  }
-sub buildkeywords    { my ($self) = @_; $self->{generationoptions}{buildkeywords} = 'true';                      }
+sub fragment2class       { my ($self) = @_; $self->{generationoptions}{fragment2class}       = 'true';             }
+sub embedactions         { my ($self) = @_; $self->{generationoptions}{embedactions}         = 'true';             }
+sub stripactions         { my ($self) = @_; $self->{generationoptions}{stripactions}         = 'true';             }
+sub stripallcomments     { my ($self) = @_; $self->{generationoptions}{stripallcomments}     = 'true';             }
+sub matchcaseinsensitive { my ($self) = @_; $self->{generationoptions}{matchcaseinsensitive} = 'true';             }
+sub shiftlazytogreedy    { my ($self) = @_; $self->{generationoptions}{shiftlazytogreedy}    = 'true';             }
+sub buildkeywords        { my ($self) = @_; $self->{generationoptions}{buildkeywords}        = 'true';             }
 
 sub testoption
 {
@@ -96,7 +95,7 @@ sub addMarpaRule
 }
 
 ##
-#   deleteMarpaRule : delete 'subrulename' if it is a subrule of 'rulename'
+#   deleteMarpaRule : delete '$rulename'
 ##
 sub deleteMarpaRule
 {
@@ -106,8 +105,26 @@ sub deleteMarpaRule
 
     mydie "INTERNAL: can't delete undefined rule $rulename" if !exists $rules->{$rulename};
 
-    $rules->{$rulename} = { deletedafterconversiontoclass => "true" };
     $self->deleteAllSubrules($rulename);
+    $rules->{$rulename} = { deletedafterconversiontoclass => 'true' };
+}
+
+##
+#   deleteAllSubrules : delete all subrules of '$rulename'
+##
+sub deleteAllSubrules
+{
+    my ($self, $rulename ) = @_;
+
+    my $subrules    = $self->{subrules};
+    my $rules       = $self->{rules};
+
+    return if !exists $subrules->{$rulename};
+
+    for my $subrulename (@{$subrules->{$rulename}})
+    {
+        $rules->{$subrulename} = { deletedafterconversiontoclass => 'true' };
+    }
 }
 
 ##
@@ -121,6 +138,9 @@ sub deleteSingleSubrule
 
     my $subrules = $self->{subrules}{$rulename};
 
+    ##
+    #   remove the subrule by creating a new list of subrules
+    ##
     my $status = 0;
     my @newrules;
 
@@ -140,7 +160,7 @@ sub deleteSingleSubrule
     {
         my $rules = $self->{rules};
         mydie "INTERNAL: can't delete undefined rule $subrulename" if !exists $rules->{$subrulename};
-        $rules->{$subrulename} = { deletedafterconversiontoclass => "true" }
+        $rules->{$subrulename} = { deletedafterconversiontoclass => 'true' }
     }
 }
 
@@ -176,7 +196,7 @@ sub tagMarpaRule
 
     my $rules = $self->{rules};
     mydie "INTERNAL: rule $rulename is undefined" if !exists $rules->{$rulename};
-    $rules->{$rulename}{status} = "done";
+    $rules->{$rulename}{status} = 'done';
 }
 
 sub isSubrule
@@ -218,30 +238,11 @@ sub exitLevel
     $context->{level} = $level;
 }
 
-sub generateSubruleName
-{
-    my ($self, $rulename, $cardinality, $context) = @_;
-
-    $context->{subruleindex}{$rulename}{index} = 0 if !exists $context->{subruleindex}{$rulename}{index};
-
-    my $subruleindex = ++$context->{subruleindex}{$rulename}{index};
-    my $subrulename  = sprintf "%s_%03d", $rulename, $subruleindex;
-
-    if ( defined $cardinality && $cardinality eq "?" )
-    {
-        $subrulename = "opt_" . $subrulename;
-    }
-
-    push @{$self->{subrules}{$rulename}}, $subrulename;
-
-    return $subrulename;
-}
-
 sub  retrieveModifier
 {
     my ($token, $tag) = @_;
 
-    return undef if ref $token ne "HASH";
+    return undef if ref $token ne 'HASH';
 
     my $modifier = undef;
     $modifier = $token->{$tag} if exists $token->{$tag};
@@ -258,7 +259,7 @@ sub negateElement
     #     printf "found!\n";
     # }
 
-    mydie "INTERNAL: negated element is not a hash in rule $rulename" if ref $mxtoken ne "HASH";
+    mydie "INTERNAL: negated element is not a hash in rule $rulename" if ref $mxtoken ne 'HASH';
 
     my $mxelement;
 
@@ -301,7 +302,7 @@ sub translateLiteralCase
 }
 
 ##
-#   generateSplitLiteral : make a literal (somewhat) case-insensitive by creating a subrule with 2 match alternatives :
+#   generatematchcaseinsensitive : make a literal (somewhat) case-insensitive by creating a subrule with 2 match alternatives :
 #
 #   - all uppercase
 #   - characterclass with the 1st character in upper/lower case, the rest all lowercase
@@ -313,7 +314,7 @@ sub translateLiteralCase
 ##  CAVEAT : introduction of the ':i' and ':ic' literal and class modifiers has made this function obsolete. ##
 ##           we retain it as a demo of generated subrules.                                                   ##
 ## --------------------------------------------------------------------------------------------------------- ##
-sub generateSplitLiteral
+sub generateMatchCaseInsensitive
 {
     my ($tokenvalue) = @_;
 
@@ -372,13 +373,16 @@ sub isKeywordLetter
 ##
 sub isKeywordFragment
 {
-    my ($string) = @_;
+    my ($self, $rulename, $rule ) = @_;
 
-    return 0 if !defined $string;
-    return 1 if $string =~ /([a-z])([a-z])/i && ( uc "$1" eq "$2" || lc "$1" eq "$2");
-    return 1 if $string !~ /[a-z]/i;
-    return 1 if $string =~ /[0-9]/i;
-    return 0;
+    return undef if !exists $rule->{class4list};
+    my $string = $rule->{class4list};
+
+    return lc substr($string, 0, 1) if $string =~ /([a-z])([a-z])/i && ( uc "$1" eq "$2" || lc "$1" eq "$2");
+    return substr($string, 0, 1) if $string !~ /[a-z]/i;
+    return substr($string, 0, 1) if $string =~ /[0-9]/i;
+
+    return undef;
 }
 
 sub convertLiteralToClass
@@ -402,7 +406,7 @@ sub convertRangeToClass
     $begr = $begr->{value};
     $endr = $endr->{value};
 
-    return { type => 'unsupported', msg => "can't convert range ${begr} .. ${endr} to class" } if !isSingleChar($begr) || !isSingleChar($endr);
+    return { type => 'unsupported', msg => "can't convert range (${begr} .. ${endr}) to class" } if !isSingleChar($begr) || !isSingleChar($endr);
 
     my $classtext = "${begr}-${endr}";
 
@@ -439,6 +443,25 @@ sub mergeKeywordFragment
     {
         $tracker->{value} .= $mxelement->{keywordfragment};
     }
+}
+
+sub generateSubruleName
+{
+    my ($self, $rulename, $cardinality, $context) = @_;
+
+    $context->{subruleindex}{$rulename}{index} = 0 if !exists $context->{subruleindex}{$rulename}{index};
+
+    my $subruleindex = ++$context->{subruleindex}{$rulename}{index};
+    my $subrulename  = sprintf "%s_%03d", $rulename, $subruleindex;
+
+    if ( defined $cardinality && $cardinality eq "?" )
+    {
+        $subrulename = "opt_" . $subrulename;
+    }
+
+    push @{$self->{subrules}{$rulename}}, $subrulename;
+
+    return $subrulename;
 }
 
 ##
@@ -485,21 +508,6 @@ sub createSubRule
     return $mxalias;
 }
 
-sub deleteAllSubrules
-{
-    my ($self, $rulename ) = @_;
-
-    my $subrules    = $self->{subrules};
-    my $rules       = $self->{rules};
-
-    return if !exists $subrules->{$rulename};
-
-    for my $subrulename (@{$subrules->{$rulename}})
-    {
-        $rules->{$subrulename} = { deletedafterconversiontoclass => "true" };
-    }
-}
-
 ## ------------------------------------------------------
 # 'walktoken' : process all token flavours
 ## ------------------------------------------------------
@@ -518,7 +526,7 @@ sub walktoken
     my $mxToken     = {};
     my $comments    = [];
 
-    if (ref $token eq "HASH" && exists $token->{comment} && !$self->testoption('stripallcomments'))
+    if (ref $token eq 'HASH' && exists $token->{comment} && !$self->testoption('stripallcomments'))
     {
         mydie "comment not a plain string in rule $rulename" if ref $token->{comment} ne "";
         my $cl = $self->renderComment($rulename, [$token->{comment}]);
@@ -536,14 +544,14 @@ sub walktoken
             $negation = undef;
             last SWITCH;
         };
-        (ref $token eq "HASH" && exists $token->{type} && $token->{type} eq "tokengroup") && do {
+        (ref $token eq 'HASH' && exists $token->{type} && $token->{type} eq 'tokengroup') && do {
             $mxToken = $self->walkgroup($rulename, $token, $context);
             $mxToken = $self->createSubRule( $rulename, $mxToken, $negation, $cardinality, $context );
             # reset 'negation' since it was processed by 'createSubRule'
             $negation = undef;
             last SWITCH;
         };
-        (ref $token eq "HASH" && exists $token->{type} && $token->{type} eq "rulegroup") && do {
+        (ref $token eq 'HASH' && exists $token->{type} && $token->{type} eq 'rulegroup') && do {
             $mxToken = $self->walkgroup($rulename, $token, $context);
             # strip lexeme status off rule groups
             delete $mxToken->{isLexeme};
@@ -552,49 +560,38 @@ sub walktoken
             $negation = undef;
             last SWITCH;
         };
-        (ref $token eq "HASH" && exists $token->{type} && $token->{type} eq "literal") && do {
+        (ref $token eq 'HASH' && exists $token->{type} && $token->{type} eq 'literal') && do {
             my $tokenvalue = $token->{value};
-            # if ( !$self->testoption('splitliteral') || !$self->isAlphaLiteral($tokenvalue) )
-            # {
-                $mxToken = { type => 'literal', value => $tokenvalue, isLexeme => 1 };
-                my $class4list = convertLiteralToClass($tokenvalue);
-                $mxToken->{class4list} = $class4list if defined $class4list;
-            # }
-            # else
-            # {
-            #     my $literaltoken = generateSplitLiteral($tokenvalue);
-            #     delete $self->{generationoptions}{splitliteral};
-            #     $mxToken = $self->walkgroup($rulename, $literaltoken, $context);
-            #     $mxToken = $self->createSubRule( $rulename, $mxToken, $negation, $cardinality, $context );
-            #     $self->{generationoptions}{splitliteral} = 'true';
-            # }
+            $mxToken = { type => 'literal', value => $tokenvalue, isLexeme => 1 };
+            my $class4list = convertLiteralToClass($tokenvalue);
+            $mxToken->{class4list} = $class4list if defined $class4list;
             last SWITCH;
         };
-        (ref $token eq "HASH" && exists $token->{type} && $token->{type} eq "class") && do {
+        (ref $token eq 'HASH' && exists $token->{type} && $token->{type} eq 'class') && do {
             $mxToken = { type => 'class', value => $token->{value}, isLexeme => 1, class4list => $token->{value} };
             last SWITCH;
         };
-        (ref $token eq "HASH" && exists $token->{type} && $token->{type} eq "regex") && do {
+        (ref $token eq 'HASH' && exists $token->{type} && $token->{type} eq 'regex') && do {
             $mxToken = { type => 'unsupported', msg => "can't convert arbitrary regex to Marpa in $rulename" };
             last SWITCH;
         };
-        (ref $token eq "HASH" && exists $token->{type} && $token->{type} eq "range") && do {
+        (ref $token eq 'HASH' && exists $token->{type} && $token->{type} eq 'range') && do {
             $mxToken = convertRangeToClass($token);
             last SWITCH;
         };
-        (ref $token eq "HASH" && exists $token->{type} && $token->{type} eq "value") && do {
+        (ref $token eq 'HASH' && exists $token->{type} && $token->{type} eq 'value') && do {
             $mxToken = { type => 'unsupported', msg => "can't convert 'value' to Marpa in $rulename" };
             last SWITCH;
         };
-        (ref $token eq "HASH" && exists $token->{token}) && do {
+        (ref $token eq 'HASH' && exists $token->{token}) && do {
             $mxToken = $self->walktoken($rulename, $token->{token}, $context);
             last SWITCH;
         };
-        (ref $token eq "HASH" && exists $token->{action}) && do {
+        (ref $token eq 'HASH' && exists $token->{action}) && do {
             $mxToken = { type => 'ignore', msg => "embedded action in $rulename" };
             last SWITCH;
         };
-        (ref $token eq "HASH" && exists $token->{comment}) && do {
+        (ref $token eq 'HASH' && exists $token->{comment}) && do {
             $mxToken = { type => 'ignore', msg => "comment in $rulename" };
             last SWITCH;
         };
@@ -637,7 +634,7 @@ sub walknonterminal
 {
     my ( $self, $rulename, $nonterminal, $context ) = @_;
 
-    mydie "nonterminal is not a hash for rule $rulename" if ref $nonterminal ne "HASH";
+    mydie "nonterminal is not a hash for rule $rulename" if ref $nonterminal ne 'HASH';
 
     my $mxToken = {};
 
@@ -659,8 +656,8 @@ sub walknonterminal
 
 ## -------------------------------------------------------------------------------
 # 'retagSimpleRule' : check if the cardinality can be added to 'mxtoken'.
-#  Rules  :
-#  - '?' is consumed by 'opt_' subrules, so we reject it here
+#  Conditions :
+#  - '?' is consumed by 'opt_' subrules, so we have to reject it here
 #  - 'mxtoken' must be a subrule of 'rule'
 #  - the parent rule must consist of a single element
 #    (responsibility of the caller to verify)
@@ -669,19 +666,21 @@ sub retagSimpleRule
 {
     my ( $self, $rulename, $mxtoken, $cardinality, $context, $options ) = @_;
 
-    mydie "token must be a hash in $rulename"   if ref $mxtoken ne "HASH";
+    mydie "retagSimpleRule : token must be a hash in $rulename" if ref $mxtoken ne 'HASH';
     return 0 if $cardinality eq "?";
 
     $cardinality =~ s/([+*])\?/$1/ if $cardinality =~ /[+*]\?/ && $self->testoption('shiftlazytogreedy');
-    mydie sprintf "lazy quantifier %s in rule %s not supported by Marpa", $cardinality, $rulename if $cardinality =~ /[+*]\?/;
+    mydie sprintf "lazy quantifier %s in rule %s not supported by Marpa. use option -g to map to greedy.", $cardinality, $rulename if $cardinality =~ /[+*]\?/;
 
-    my $abortatfirstlevel = defined $options && ref $options eq "HASH" && exists $options->{abortatfirstlevel};
+    $options = {} if !defined $options;
+
+    my $abortatfirstlevel = exists $options->{abortatfirstlevel};
 
     SWITCH: {
         (exists $mxtoken->{rhs}) && do {
             my $rhs = $mxtoken->{rhs};
 
-            mydie "'rhs' must be a hash in $rulename"   if ref $rhs ne "HASH";
+            mydie "'rhs' must be a hash in $rulename"   if ref $rhs ne 'HASH';
             mydie "'token' must be a scalar in 'rhs' in rule $rulename" if !exists $rhs->{token} || ref $rhs->{token} ne "";
 
             return 0 if !defined $self->checkMarpaRuleExists($rhs->{token});
@@ -729,7 +728,7 @@ sub retagSimpleRule
             my $ec = 0;
             for my $al (@{$mxtoken->{list}})
             {
-                mydie "alternative list is not an array in rule $rulename" if ref $al ne "HASH" || !exists $al->{list};
+                mydie "alternative list is not an array in rule $rulename" if ref $al ne 'HASH' || !exists $al->{list};
                 for my $le (@{$al->{list}})
                 {
                     mydie "alternative element is not simple in rule $rulename" if exists $le->{type} && $le->{type} !~ /literal|class/;
@@ -739,7 +738,7 @@ sub retagSimpleRule
             return $ec <= 1;
             last SWITCH;
         };
-        (exists $mxtoken->{type} && $mxtoken->{type} eq "literal") && do {
+        (exists $mxtoken->{type} && $mxtoken->{type} eq 'literal') && do {
             $mxtoken->{cardinality} = $cardinality;
             return 1;
             last SWITCH;
@@ -766,6 +765,69 @@ sub retagSimpleRule
 }
 
 ## ------------------------------------------------------
+#   removeCaseEquivalentBranches :
+#        go over the branches from the alternative lists.
+#        if 2 branches
+#           - consist of exactly 1 symbol
+#           - are case-equivalent
+#        then remove one of them.
+## ------------------------------------------------------
+sub removeCaseEquivalentBranches
+{
+    my ($self, $alternativelists) = @_;
+
+    return $alternativelists if scalar @$alternativelists < 2;
+
+    my $filteredlist    = [];
+    my $filtered        = 0;
+    my $literal;
+
+    for my $branch (@$alternativelists)
+    {
+        if ( !exists $branch->{list})
+        {
+            push @$filteredlist, $branch;
+        }
+        else
+        {
+            my $branchlist = $branch->{list};
+            if (scalar @$branchlist > 1)
+            {
+                push @$filteredlist, $branch;
+            }
+            else
+            {
+                my $rhs = $branchlist->[0];
+                my $matchfound = 0;
+
+                if ( exists $rhs->{type} && $rhs->{type} eq 'literal' )
+                {
+                    my $newliteral = $rhs->{value};
+
+                    if (defined $literal)
+                    {
+                        my $tmp1 = uc $literal;
+                        my $tmp2 = uc $newliteral;
+                        $matchfound = $tmp1 ne "" && $tmp1 eq $tmp2;
+                        $filtered = 1 if $matchfound;
+                    }
+                    else
+                    {
+                        $literal = $newliteral;
+                    }
+                }
+
+                push @$filteredlist, $branch if !$matchfound;
+            }
+        }
+    }
+
+    return $alternativelists if !$filtered;
+
+    return $filteredlist;
+}
+
+## ------------------------------------------------------
 # 'processRightSides' converts a single list of tokens some of which
 # are tagged as 'alternative' into (possibly) multiple lists
 # each of which is an alternative for a group or rule
@@ -774,24 +836,30 @@ sub processRightSides
 {
     my ( $self, $rulename, $rhslist, $context ) = @_;
 
+    # symbol lists of alternative branches
     my $alternativelists    = [];
+    # current alternative branch
     my $currentlist         = [];
+    # number of symbols in current alternative branch
+    my $alternativelength   = 0;
+
     my $metalist            = { comments => [], actions => [] };
 
+    # status tracking for conversion to keyword, lexeme or class
     my $class4list          = { status => 0, value => "" };
     my $class4group         = { status => 0, value => "" };
     my $groupisLexeme       = { status => 0 };
     my $keywordfragment     = { status => 0 };
 
-    # if ($rulename eq "COMPUTATIONAL_1")
+    # if ( $rulename eq "outer_join_sign")
     # {
     #     printf "found!\n";
     # }
 
     for my $e (@$rhslist)
     {
-        $e = $e->{rhs}          if ref $e eq "HASH" && exists $e->{rhs}  && !exists $e->{token};
-        $e = { token => $e }    if ref $e eq "HASH" && exists $e->{type} &&  exists $e->{definition};
+        $e = $e->{rhs}          if ref $e eq 'HASH' && exists $e->{rhs}  && !exists $e->{token};
+        $e = { token => $e }    if ref $e eq 'HASH' && exists $e->{type} &&  exists $e->{definition};
 
         my $negation    = retrieveModifier($e, 'negation');
         my $cardinality = retrieveModifier($e, 'cardinality');
@@ -816,7 +884,7 @@ sub processRightSides
             next;
         }
 
-        if (ref $e eq "HASH" && !exists $e->{token})
+        if (ref $e eq 'HASH' && !exists $e->{token})
         {
             $self->abortWithError( "generic regex rules not supported in rule $rulename", $e ) if exists $e->{type} && $e->{type} eq "regex";
             $self->abortWithError( "INTERNAL: 'e' must be a hash and contain 'token' in rule $rulename", $e );
@@ -836,12 +904,13 @@ sub processRightSides
                 ##
                 #   replace a keyword built from lower/upper case character classes by a literal
                 ##
-                if ($self->testoption("buildkeywords") && $keywordfragment->{status} == 0 && $keywordfragment->{value} =~ /^[a-z]/i)
+                my $keyword = $keywordfragment->{value};
+                if ($self->testoption("buildkeywords") && $keywordfragment->{status} == 0 && $keyword =~ /^[a-z]/i)
                 {
                     $currentlist = [
-                        { type => "literal", value => $keywordfragment->{value}, isLexeme => 1 }
+                        { type => 'literal', value => $keyword, isLexeme => 1 }
                     ];
-                    $newlist = { list => $currentlist };
+                    $newlist = { list => $currentlist, isLexeme => 1 };
                 }
                 else
                 {
@@ -858,28 +927,45 @@ sub processRightSides
                 $class4list         = { status => 0, value => "" };
                 $metalist           = { comments => [], actions => [] };
                 $keywordfragment    = { status => 0 };
+                $alternativelength  = 0;
+            }
+        }
+        else
+        {
+            ##
+            #   a sequence of literals can't be mapped to a class, so we reset class4list
+            ##
+            if ($alternativelength > 1)
+            {
+                $class4group->{status} = -1;
+                delete $class4group->{value};
             }
         }
 
         my $mxelement;
 
-        ##
-        #   translate a G4 subrule into a Marpa subrule
-        ##
         if (ref $e->{token} eq "")
         {
+            ##
+            #   translate a G4 subrule into a Marpa subrule
+            ##
             my $symbol = $e->{token};
             $mxelement = $self->processSubRule($symbol, $context);
         }
         else
         {
-            $self->abortWithError( "can't process group for rule $rulename", $rhslist ) if ref $e ne "HASH" || !exists $e->{token};
+            $self->abortWithError( "can't process group for rule $rulename", $rhslist ) if ref $e ne 'HASH' || !exists $e->{token};
             $mxelement = $self->walktoken($rulename, $e->{token}, $context);
             # ignore embedded comments/actions
             next if exists $mxelement->{type} && $mxelement->{type} eq "ignore";
-            $mxelement->{keywordfragment} = lc substr($mxelement->{class4list}, 0, 1) if exists $mxelement->{class4list} && isKeywordFragment($mxelement->{class4list});
+
+            my $keywordfragment = $self->isKeywordFragment($rulename, $mxelement);
+            $mxelement->{keywordfragment} = $keywordfragment if defined $keywordfragment;
         }
 
+        ##
+        #   collect embedded comments in the alternative branch state
+        ##
         if (exists $mxelement->{comments})
         {
             push (@{$metalist->{comments}}, @{$mxelement->{comments}});
@@ -918,11 +1004,12 @@ sub processRightSides
             if ( scalar @$rhslist <= 1 && $self->retagSimpleRule($rulename, $mxelement, $cardinality, $context) )
             {
                 ##
-                #   if the tagged element is part of an alternative branch, we have to make it into a subrule
+                #   if the tagged element is part of an alternative branch (i.e. a branch that has more than one element),
+                #   we have to make it into a subrule
                 ##
-                if (defined $alternative)
+                if (defined $alternative && scalar @$rhslist > 1)
                 {
-                    $mxelement = $self->createSubRule( $rulename, $mxelement, undef, undef, $context ) if scalar @$rhslist > 1;
+                    $mxelement = $self->createSubRule( $rulename, $mxelement, undef, undef, $context );
                 }
             }
             else
@@ -931,16 +1018,20 @@ sub processRightSides
                 #   create a subrule for cardinality-tagged element lists
                 ##
                 $mxelement = $self->createSubRule( $rulename, $mxelement, undef, $cardinality, $context );
+
                 ##
                 #   propagate the cardinality to the new subrule
                 #   ("?" is wrapped into an 'opt_' rule in 'createSubRule', so it was already consumed).
+                #
+                #   TODO : check if the '!defined $alternative' clause below should be reinstated
                 ##
-                if ( !defined $alternative && $cardinality ne "?" && !$self->retagSimpleRule($rulename, $mxelement, $cardinality, $context, {abortatfirstlevel => 'true'}) )
+                # if ( !defined $alternative && $cardinality ne "?" && !$self->retagSimpleRule($rulename, $mxelement, $cardinality, $context, {abortatfirstlevel => 'true'}) )
+                if ( $cardinality ne "?" && !$self->retagSimpleRule($rulename, $mxelement, $cardinality, $context, {abortatfirstlevel => 'true'}) )
                 {
                     mydie "INTERNAL: no destination for cardinality found in rule '$rulename'" if scalar @$rhslist > 1;
                     $mxelement->{cardinality} = $cardinality if $cardinality ne "?";
                 }
-           }
+            }
 
             # cardinality-annotated subrules loose lexeme status
             delete $mxelement->{class4list};
@@ -953,6 +1044,12 @@ sub processRightSides
         mergeKeywordFragment( \%$keywordfragment, $mxelement );
 
         push @$currentlist, $mxelement;
+        ++$alternativelength;
+
+        ##
+        #   a list of lexemes is not itself a lexeme (unless declared in the 'lexer' grammar).
+        ##
+        $groupisLexeme->{status} = -1 if $alternativelength > 1;
     }
 
     ##
@@ -962,15 +1059,27 @@ sub processRightSides
     if ($self->testoption("buildkeywords") && $keywordfragment->{status} == 0 && $keywordfragment->{value} =~ /^[a-z]/i)
     {
         $currentlist = [
-            { type => "literal", value => $keywordfragment->{value}, isLexeme => 1 }
+            { type => 'literal', value => $keywordfragment->{value}, isLexeme => 1 }
         ];
+        $groupisLexeme->{status} = 0;
     }
 
-    my $newlist = { list => $currentlist };
-    $newlist->{class4list}   = $class4list->{value}  if $class4list->{status} != -1;
-    $newlist->{isLexeme}     = 1                     if $groupisLexeme->{status} == 0;
-    $newlist->{metalist}     = $metalist             if exists $metalist->{state};
-    push @$alternativelists, $newlist;
+    ##
+    #   append the current list to the alternative list if it has entries.
+    ##
+    if ( scalar @$currentlist > 0)
+    {
+        my $newlist = { list => $currentlist };
+        $newlist->{class4list}   = $class4list->{value}  if $class4list->{status} != -1;
+        $newlist->{isLexeme}     = 1                     if $groupisLexeme->{status} == 0;
+        $newlist->{metalist}     = $metalist             if exists $metalist->{state};
+        push @$alternativelists, $newlist;
+    }
+
+    ##
+    #   remove branches that are case-equivalent
+    ##
+    $alternativelists = $self->removeCaseEquivalentBranches($alternativelists) if $self->testoption('matchcaseinsensitive');
 
     my $grouplist = { type => 'group', list => $alternativelists };
     # single lists of literals can be tagged as lexemes
@@ -989,7 +1098,7 @@ sub walkgroup
 {
     my ($self, $rulename, $tokengroup, $context) = @_;
 
-    $self->abortWithError( "INTERNAL: group is missing 'definition' in rule $rulename", $tokengroup ) if ref $tokengroup ne "HASH" || !exists $tokengroup->{definition};
+    $self->abortWithError( "INTERNAL: group is missing 'definition' in rule $rulename", $tokengroup ) if ref $tokengroup ne 'HASH' || !exists $tokengroup->{definition};
     my $definition  = $tokengroup->{definition};
     my $grouplist   = $self->processRightSides( $rulename, $definition, $context );
 
@@ -1003,7 +1112,7 @@ sub walkrule
 {
     my ($self, $rulename, $rule, $context) = @_;
 
-    # if ( $rulename eq "D")
+    # if ( $rulename eq "outer_join_sign")
     # {
     #     printf "found!\n";
     # }
@@ -1014,24 +1123,26 @@ sub walkrule
     # test if we traversed this node already
     if ( defined $rulestatus )
     {
-        if ($rulestatus eq "synthetic" && !$self->checkMarpaRuleExists($rulename))
-        {
-            my $mxrightside = $self->processRightSides( $rulename, $rule->{rightsides}, $context );
-            $self->addMarpaRule($rulename, $mxrightside);
-            $symboltable->tagrule($rulename, 'done');
-            $rulestatus  = $symboltable->rulestatus($rulename);
-        }
-
         my $mxrule;
 
         SWITCH: {
             ($rulestatus eq "inprogress") && do {$mxrule = $symboltable->rule( $rulename ); last SWITCH; };
             ($rulestatus eq "done")       && do {$mxrule = $self->getMarpaRule( undef, $rulename ); last SWITCH; };
+            ($rulestatus eq "synthetic" && !$self->checkMarpaRuleExists($rulename)) && do
+            {
+                my $mxrightside = $self->processRightSides( $rulename, $rule->{rightsides}, $context );
+                $self->addMarpaRule($rulename, $mxrightside);
+                $symboltable->tagrule($rulename, 'done');
+                $rulestatus     = $symboltable->rulestatus($rulename);
+                $mxrule         = {};
+                last SWITCH;
+            };
             do { mydie "unexpected rule status $rulestatus in rule $rulename" };
         }
 
         my $result              = { mxrule => $rulename, rhs => { token => $rulename } };
         $result->{class4list}   = $mxrule->{class4list} if exists $mxrule->{class4list};
+
         return $result;
     }
 
@@ -1041,10 +1152,10 @@ sub walkrule
     my $rightside   = $rule->{rightsides};
     if (defined $rightside)
     {
-        $self->abortWithError( "rhs is not an array ref in $rulename", $rightside ) if ref $rightside ne "ARRAY";
+        $self->abortWithError( "rhs is not an array ref in $rulename", $rightside ) if ref $rightside ne 'ARRAY';
 
-        $context->{subruleindex}{$rulename}{grammarstate}       = $rule->{grammarstate} if exists $rule->{grammarstate} && $rule->{grammarstate} eq "lexer";
-        $context->{subruleindex}{$rulename}{isFragmentOrChild}  = 'true'                if exists $rule->{type}         && $rule->{type}         eq "fragment";
+        $context->{subruleindex}{$rulename}{grammarstate}      = $rule->{grammarstate} if exists $rule->{grammarstate} && $rule->{grammarstate} eq "lexer";
+        $context->{subruleindex}{$rulename}{isFragmentOrChild} = 'true'                if exists $rule->{type}         && $rule->{type}         eq "fragment";
 
         ##
         #  prevent infinite recursion by tagging any symbol
@@ -1067,6 +1178,7 @@ sub walkrule
     }
 
     $self->addMarpaRule($rulename, $mxrightside);
+
     $self->exitLevel($rulename, $context);
 
     return $mxrightside;
@@ -1082,11 +1194,12 @@ sub processSubRule
     my $symboltable = $self->symboltable;
     my $rule        = $symboltable->rule($rulename);
 
-    my $mxrule = $self->walkrule( $rulename, $rule, $context );
+    my $mxrule      = $self->walkrule( $rulename, $rule, $context );
 
-    my $result = { rule => $rulename, rhs => { token => $rulename } };
+    my $result      = { rule => $rulename, rhs => { token => $rulename } };
 
-    $result->{keywordfragment} = lc substr($mxrule->{class4list}, 0, 1) if exists $mxrule->{class4list} && isKeywordFragment($mxrule->{class4list});
+    my $keywordfragment = $self->isKeywordFragment($rulename, $mxrule);
+    $result->{keywordfragment} = $keywordfragment if defined $keywordfragment;
 
     return $result;
 }
@@ -1238,7 +1351,7 @@ sub renderComment
 {
     my ($self, $rulename, $comments) = @_;
 
-    mydie "INTERNAL : 'comments' is not an array in rule $rulename" if ref $comments ne "ARRAY";
+    mydie "INTERNAL : 'comments' is not an array in rule $rulename" if ref $comments ne 'ARRAY';
 
     my $result      = [];
     for my $comment (@$comments)
@@ -1265,6 +1378,13 @@ sub processRedirected
 
     my $rule = $self->getMarpaRule(undef, $token);
 
+    if ($self->testoption('matchcaseinsensitive') && $self->isKeywordLetter($token, $rule))
+    {
+        my $value = $rule->{class4list};
+        $value = substr($value, 0, 1);
+        return { value => "'${value}':i" };
+    }
+
     return { discard => 'true' } if exists $rule->{redirected};
 
     return { value => $token };
@@ -1284,7 +1404,7 @@ sub fragmentEligible2Convert
     return length($class4list) > 1;
 }
 
-sub convertFragment2Class
+sub writeFragmentAsClass
 {
     my ($self, $rulename, $rule, $options ) = @_;
 
@@ -1296,7 +1416,43 @@ sub convertFragment2Class
     printf $outf "%s\n", $outputline;
 }
 
+#
+#   translateunicode :  translate unicodes embedded in literals or classes.
+#                       die if we are in codepages beyond 00
 ##
+sub translateunicode
+{
+    my ($self, $rulename, $string ) = @_;
+
+    while ( $string =~ /(\\u([0-9A-F]{4,4}))|(\\u\{([0-9A-F]+)\})/i )
+    {
+        my $fourmatch   = $2;
+        my $bracedmatch = $4;
+
+        SWITCH: {
+            (defined $fourmatch) && do {
+                mydie "translateunicode : class string $string not in codepage 00 in $rulename" if $fourmatch !~ /00([0-9A-Z][0-9A-Z])/i;
+                my $translatedcode = $1;
+                $string =~ s/\\u${fourmatch}/\\x${translatedcode}/i;
+                last SWITCH;
+            };
+            (defined $bracedmatch) && do {
+                mydie "translateunicode : class string $string not in codepage 00 in $rulename" if $bracedmatch !~ /0*([0-9A-Z]{2,2})/i;
+                my $translatedcode = $1;
+                $string =~ s/\\u\{${bracedmatch}\}/\\x${translatedcode}/i;
+                last SWITCH;
+            };
+            do {
+                mydie "translateunicode : unexpected match";
+                last SWITCH;
+            };
+        }
+    }
+
+    return $string;
+}
+
+#
 #   normalizeClassString :  remove class elements that are redundant when the class is made case-insensitive
 #                           return the modified class text as well as an indicator if the class contains letters
 ##
@@ -1315,14 +1471,14 @@ sub normalizeClassString
     while ( $classstring ne "" )
     {
         SWITCH: {
-        ($classstring =~ /(\\u[0-9a-f]+)-(\\u[0-9a-f]+)(.*)$/i) && do {
+        ($classstring =~ /(\\[ux][0-9a-f]+)-(\\[ux][0-9a-f]+)(.*)$/i) && do {
             my $beg = $1;
             my $end = $2;
             $result .= "${1}-${2}";
             $classstring = $3;
             last SWITCH;
         };
-        ($classstring =~ /(\\u[0-9a-f]{4,4})(.*)$/i) && do {
+        ($classstring =~ /(\\[ux][0-9a-f]{2,4})(.*)$/i) && do {
             my $c = $1;
             $result .= $c;
             $classstring = $2;
@@ -1403,31 +1559,33 @@ sub computeRhs
 {
     my ($self, $rulename, $rhs, $options ) = @_;
 
-    my $isLexeme = 1 if exists $rhs->{isLexeme};
-
-    # if ($rulename eq "SPECIAL_VAR")
+    # if ($rulename eq "HEXNUMBER_003")
     # {
     #     printf "found!\n";
     # }
 
-    SWITCH: {
-        (exists $rhs->{type} && $rhs->{type} eq "negatedclass") && do {
+    SWITCH:
+    {
+        (exists $rhs->{type} && $rhs->{type} eq 'negatedclass') && do {
             mydie "computeRhs : 'value' missing in negatedclass $rulename" if !exists $rhs->{value};
-            $rhs = { value => "[" . $rhs->{value} . "]" };
+            my $value = $rhs->{value};
+            $value = $self->translateunicode($rulename, $value);
+            $rhs = { value => "[${value}]" };
             last SWITCH;
         };
         (exists $rhs->{deletedafterconversiontoclass}) && do {
             $rhs = { discard => 'true' };
             last SWITCH;
         };
-        (exists $rhs->{type} && $rhs->{type} eq "unsupported") && do {
+        (exists $rhs->{type} && $rhs->{type} eq 'unsupported') && do {
             mydie $rhs->{msg};
             last SWITCH;
         };
-        (exists $rhs->{type} && $rhs->{type} eq "class") && do {
+        (exists $rhs->{type} && $rhs->{type} eq 'class') && do {
             my $value = $rhs->{value};
+            $value = $self->translateunicode($rulename, $value);
             my $modifier = "";
-            if ($self->testoption('splitliteral') && $self->isAlphaLiteral($value))
+            if ($self->testoption('matchcaseinsensitive') && $self->isAlphaLiteral($value))
             {
                 my $normclass = $self->normalizeClassString($value);
                 $value = $normclass->{classstring};
@@ -1436,10 +1594,11 @@ sub computeRhs
             $rhs = { value => "[${value}]${modifier}" };
             last SWITCH;
         };
-        (exists $rhs->{type} && $rhs->{type} eq "literal") && do {
+        (exists $rhs->{type} && $rhs->{type} eq 'literal') && do {
             my $literal = $rhs->{value};
+            $literal = $self->translateunicode($rulename, $literal);
             $literal =  ($literal eq "\\'") ? "[']" : "'${literal}'";
-            if ($self->testoption('splitliteral') && $self->isAlphaLiteral($literal))
+            if ($self->testoption('matchcaseinsensitive') && $self->isAlphaLiteral($literal))
             {
                 $literal = lc $literal;
                 $literal .= ':i';
@@ -1447,7 +1606,7 @@ sub computeRhs
             $rhs = { value => $literal };
             last SWITCH;
         };
-        (exists $rhs->{type} && $rhs->{type} eq "action") && do {
+        (exists $rhs->{type} && $rhs->{type} eq 'action') && do {
             push @{$options->{comments}}, " # Action: " . $rhs->{token}{action};
             $rhs = { discard => 'true' };
             last SWITCH;
@@ -1489,12 +1648,12 @@ sub printRhs
 
     mydie "printRhs: 'status' not defined for rule $rulename" if !exists $options->{status};
 
-    my $status  = $options->{status};
-    my $rhs     = $self->computeRhs($rulename, $rule, $options);
+    my $status          = $options->{status};
+    my $rhs             = $self->computeRhs($rulename, $rule, $options);
 
     return "" if exists $rhs->{discard};
 
-    mydie "'options' not well-defined" if ref $options ne "HASH" || !exists $options->{delimiter};
+    mydie "'options' not well-defined" if ref $options ne 'HASH' || !exists $options->{delimiter};
 
     my $delimiter       = $options->{delimiter};
 
@@ -1520,7 +1679,8 @@ sub printRhs
         $cardinality = "";
     }
 
-    SWITCH: {
+    SWITCH:
+    {
         ($status == 0) && do {
             $result .= sprintf "%s %-3s %s%s", $self->pad($rulename), $definitionop, $rhs->{value}, $cardinality;
             last SWITCH;
@@ -1548,7 +1708,7 @@ sub writeMarpaRuleList
 {
     my ( $self, $rulename, $rule, $options ) = @_;
 
-    # if ($rulename eq "sql_statement_shortcut")
+    # if ($rulename eq "SAFECODEPOINT")
     # {
     #     printf "found!\n";
     # }
@@ -1572,7 +1732,7 @@ sub writeMarpaRuleList
 
             for my $cl (@{$metalist->{comments}})
             {
-                $cl = $cl->[0] if ref $cl eq "ARRAY";
+                $cl = $cl->[0] if ref $cl eq 'ARRAY';
                 printf $outf "%s\n", $cl;
             }
             if (exists $metalist->{actions})
@@ -1581,7 +1741,7 @@ sub writeMarpaRuleList
                 {
                     for my $cl (@{$metalist->{actions}})
                     {
-                        $cl = $cl->[0] if ref $cl eq "ARRAY";
+                        $cl = $cl->[0] if ref $cl eq 'ARRAY';
                         printf $outf "%s\n", $cl;
                     }
                 }
@@ -1590,7 +1750,7 @@ sub writeMarpaRuleList
                     $actiontext = "";
                     for my $cl (@{$metalist->{actions}})
                     {
-                        $cl = $cl->[0] if ref $cl eq "ARRAY";
+                        $cl = $cl->[0] if ref $cl eq 'ARRAY';
                         $actiontext .= $cl;
                     }
                 }
@@ -1615,7 +1775,8 @@ sub writeMarpaRuleList
 
             my $nextclause;
 
-            SWITCH: {
+            SWITCH:
+            {
                 (exists $rhs->{type} && $rhs->{type} eq "group" && exists $rhs->{list}) && do {
                     if ( exists $rhs->{class4list})
                     {
@@ -1624,7 +1785,7 @@ sub writeMarpaRuleList
                     }
                     else
                     {
-                        mydie "unexpected embedded 'list'";
+                        mydie "writeMarpaRuleList : unexpected embedded 'list'";
                     }
                     last SWITCH;
                 };
@@ -1685,7 +1846,7 @@ sub writeMarpaRule
 
     $self->tagMarpaRule($rulename);
 
-    # if ($rulename eq "C")
+    # if ( $rulename eq "IDENTIFIER")
     # {
     #     printf "found!\n";
     # }
@@ -1701,28 +1862,47 @@ sub writeMarpaRule
     my $outputline          = "";
     my $outf                = $self->{outf};
 
+    my $printoutputcreated  = 1;
+
     SWITCH:
     {
+        ##
+        #   discard rules that implement a case-insensitive single-letter literal
+        #   if we are building case-insensitive keyword literals.
+        ##
         ($self->testoption('buildkeywords') && $self->isKeywordLetter($rulename, $rule)) && do {
             $self->deleteMarpaRule($rulename);
+            $printoutputcreated = 0;
             last SWITCH;
         };
         #(exists $rule->{isFragmentOrChild} && $self->testoption('fragment2class') && fragmentEligible2Convert($rule)) && do {
-        ($self->testoption('fragment2class') && fragmentEligible2Convert($rule)) && do {
-            $self->convertFragment2Class($rulename, $rule, $options );
+        ##
+        #   conditionally translate eligible fragments to classes if the fragment is not tagged with a '?' quantifier
+        ##
+        ($self->testoption('fragment2class') && $rulename !~ /^opt_/ && fragmentEligible2Convert($rule)) && do {
+            $self->writeFragmentAsClass($rulename, $rule, $options );
             last SWITCH;
         };
+        ##
+        #   print a rule with alternative branches
+        ##
         (exists $rule->{list}) && do {
             $self->writeMarpaRuleList($rulename, $rule, $options );
             last SWITCH;
         };
+        ##
+        #   print a simple rule
+        ##
         do {
-            $outputline .= $self->printRhs( $rulename, $rule, $options );
+            $outputline = $self->printRhs( $rulename, $rule, $options );
+            $printoutputcreated = 0 if !length($outputline);
             last SWITCH;
         };
     }
 
     printf $outf "%s\n", $outputline if length($outputline) > 0;
+
+    return $printoutputcreated;
 }
 
 sub dumpMarpaRule
@@ -1740,9 +1920,9 @@ sub computeIndentation
 {
     my ($self) = @_;
 
-    my $symboltable     = $self->{symboltable};
-    my $ruletable       = $symboltable->ruletable;
-    my $subrules        = $self->{subrules};
+    my $symboltable = $self->{symboltable};
+    my $ruletable   = $symboltable->ruletable;
+    my $subrules    = $self->{subrules};
 
     my $indent = -1;
     for my $rule (@$ruletable)
@@ -1785,7 +1965,7 @@ sub convertRedirectToDiscard
 {
     my ($self) = @_;
 
-    return if !exists $self->{discarded} || ref $self->{discarded} ne "ARRAY" || scalar @{$self->{discarded}} < 1;
+    return if !exists $self->{discarded} || ref $self->{discarded} ne 'ARRAY' || scalar @{$self->{discarded}} < 1;
 
     my $outf = $self->{outf};
 
@@ -1828,9 +2008,8 @@ sub writeMarpaGrammar
     $self->generateGenericOptions;
     $self->generateStartClause;
 
-    # create a ':discard' rule from the rules
-    # tagged 'redirect' at the top of the
-    # output file.
+    # create a ':discard' rule at the top of the output file
+    # from the rules tagged 'redirect'
     $self->convertRedirectToDiscard;
 
     my $outf = $self->{outf};
@@ -1839,12 +2018,15 @@ sub writeMarpaGrammar
     #   print rules in the order of the input file
     ##
     my $status = 0;
+    my $subrulestatus = 0;
+    my $rulegeneratedoutput = 1;
+
     for my $rule (@$ruletable)
     {
         if (exists $rule->{comment} && !$self->testoption('stripallcomments'))
         {
             my $comment = $rule->{comment};
-            $comment = [$comment] if ref $comment ne "ARRAY";
+            $comment = [$comment] if ref $comment ne 'ARRAY';
             my $cl = $self->renderComment("grammar", $comment);
             for my $s (@$cl)
             {
@@ -1858,25 +2040,32 @@ sub writeMarpaGrammar
 
         if ( !$status )
         {
-            if ( $rulename ne $startrulename )
-            {
-                printf "WARNING : first rule '%s' is not startrule '%s'\n", $rulename, $startrulename;
-            }
+            printf "WARNING : first rule '%s' is not startrule '%s'\n", $rulename, $startrulename if $rulename ne $startrulename;
             $status = 1;
         }
 
-        $self->writeMarpaRule($rulename);
+        ##
+        #   create a block of text for a rule with its subrules
+        ##
+        printf $outf "\n" if exists $subrules->{$rulename} && !$subrulestatus && $rulegeneratedoutput;
+        $subrulestatus = 0;
+
+        $rulegeneratedoutput = $self->writeMarpaRule($rulename);
 
         ##
         #   print the generated subrules immediately after the parent rule
         ##
         if (exists $subrules->{$rulename})
         {
+            my $subrulegeneratedoutput = 0;
+
             for my $subrulename (@{$subrules->{$rulename}})
             {
-                $self->writeMarpaRule($subrulename);
+                $subrulegeneratedoutput += $self->writeMarpaRule($subrulename);
             }
-            printf $outf "\n";
+
+            printf $outf "\n" if $subrulegeneratedoutput;
+            $subrulestatus = 1;
         }
     }
 
@@ -1942,7 +2131,7 @@ $generator->shiftlazytogreedy   if exists $options->{g};
 $generator->buildkeywords       if exists $options->{k};
 $generator->stripactions        if exists $options->{p};
 $generator->setVerbosity(2)     if exists $options->{t};
-$generator->splitliteral        if exists $options->{u} || exists $options->{k};
+$generator->matchcaseinsensitive        if exists $options->{u} || exists $options->{k};
 
 my $outputfile  = '-';
 $outputfile     = $options->{o} if exists $options->{o};

@@ -284,8 +284,8 @@ is(lc("$r"), 'inf');
 ##############################################################
 # special integer truncations
 
-is(Math::AnyNum->new(-3)->ipow(-5),                    0);
-is(Math::AnyNum->new(-3)->ipow(Math::AnyNum->new(-5)), 0);
+is(Math::AnyNum->new(-3)->ipow(-5),                    -1);
+is(Math::AnyNum->new(-3)->ipow(Math::AnyNum->new(-5)), -1);
 
 is(Math::AnyNum->new(-3)->ipow(-4),    0);
 is(Math::AnyNum->new(-3)->ipow($int2), 0);

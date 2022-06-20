@@ -1,5 +1,5 @@
 package YA::CLI::Usage;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use Moo;
 use namespace::autoclean;
 
@@ -68,7 +68,7 @@ YA::CLI::Usage - Class that handles usage and man page generation for action han
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

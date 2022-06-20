@@ -10,7 +10,6 @@ use SPVM::Builder;
 use SPVM::Builder::CC;
 use SPVM::Builder::Util;
 use SPVM::Builder::Config::Exe;
-use SPVM::Builder::LinkInfo;
 
 use File::Spec;
 use File::Find 'find';
@@ -176,12 +175,12 @@ sub new {
   my $config;
   if (defined $config_file) {
     $config = SPVM::Builder::Config::Exe->load_config($config_file);
-    unless ($config->is_exe) {
+    unless ($config->output_type eq 'exe') {
       confess "Config file \"$config_file\" is not the config to create the executable file";
     }
   }
   else {
-    $config = SPVM::Builder::Config::Exe->new_gnu99;
+    $config = SPVM::Builder::Config::Exe->new_gnu99(file_optional => 1);
   }
   $self->{config} = $config;
   
@@ -190,22 +189,116 @@ sub new {
   return bless $self, $class;
 }
 
-sub build_exe_file {
+sub get_dependent_resources {
   my ($self) = @_;
   
+  unless ($self->{finish_build_runtime}) {
+    $self->build_runtime;
+  }
+  
+  my $dependent_resources = [];
+  
+  my $builder = $self->builder;
+
+  my $build_dir = $self->builder->build_dir;
+
+  # Compiler for native module
+  my $builder_cc_native = SPVM::Builder::CC->new(
+    build_dir => $build_dir,
+    builder => $builder,
+    quiet => $self->quiet,
+    force => $self->force,
+  );
+  
+  my $class_names = $builder->get_class_names;
+  my $class_names_without_anon = [grep { $_ !~ /::anon::/ } @$class_names];
+  my $all_object_files = [];
+  for my $class_name (@$class_names_without_anon) {
+
+    my $perl_class_name = "SPVM::$class_name";
+    
+    my $native_method_names = $builder->get_method_names($class_name, 'native');
+    if (@$native_method_names) {
+      my $native_module_file = $builder->get_module_file($class_name);
+      my $native_dir = $native_module_file;
+      
+      $native_dir =~ s/\.spvm$//;
+      $native_dir .= 'native';
+      my $input_dir = SPVM::Builder::Util::remove_class_part_from_file($native_module_file, $perl_class_name);
+      my $build_object_dir = $self->builder->create_build_object_path;
+      mkpath $build_object_dir;
+
+      # Module file
+      my $module_file = $builder->get_module_file($class_name);
+      unless (defined $module_file) {
+        my $config_file = SPVM::Builder::Util::get_config_file_from_class_name($class_name);
+        if ($config_file) {
+          $module_file = $config_file;
+          $module_file =~ s/\.config$/\.spvm/;
+        }
+        else {
+          confess "\"$module_file\" module is not loaded";
+        }
+      }
+      my $config = $builder_cc_native->create_native_config_from_module_file($module_file);
+      
+      my $resource_names = $config->get_resource_names;
+      for my $resource_name (@$resource_names) {
+        my $resource = $config->get_resource($resource_name);
+        
+        my $resource_info = {
+          class_name => $class_name,
+          resource => $resource
+        };
+        
+        push @$dependent_resources, $resource_info;
+      }
+    }
+  }
+  
+  return $dependent_resources;
+}
+
+sub get_dependent_resource_lines {
+  my ($self) = @_;
+  
+  my $dependent_resources = $self->get_dependent_resources;
+  
+  my @lines;
+  for my $dependent_resource (@$dependent_resources) {
+    my $class_name = $dependent_resource->{class_name};
+    my $resource = $dependent_resource->{resource};
+    my $resource_class_name = $resource->class_name;
+    my $resource_mode = $resource->mode;
+    my $resource_args = $resource->args || [];
+    
+    my $line = qq({class_name:"$class_name",resource_class_name:"$resource_class_name",resource_mode:);
+    if (defined $resource_mode) {
+      $line .= qq("$resource_mode");
+    }
+    else {
+      $line .= 'undefined';
+    }
+    $line .= ",resource_args:[";
+    
+    $line .= join(",", map { qq("$_") } @$resource_args);
+    
+    $line .= "]}";
+    
+    push @lines, $line;
+  }
+  
+  return \@lines;
+}
+
+sub build_runtime {
+  my ($self) = @_;
+
+  # Builder
   my $builder = $self->builder;
   
-  my $config = $self->config;
-
-  # Target class name
+  # Class name
   my $class_name = $self->{class_name};
-  
-  # Excutable file name
-  my $output_file = $self->{output_file};
-  
-  # Build directory
-  my $build_dir = $self->builder->build_dir;
-  mkpath $build_dir;
   
   # Compile SPVM
   my $compile_success = $builder->compile_spvm($class_name, __FILE__, __LINE__);
@@ -217,15 +310,34 @@ sub build_exe_file {
   # Build runtime
   $builder->build_runtime;
   
+  $self->{finish_build_runtime} = 1;
+}
+
+sub build_exe_file {
+  my ($self) = @_;
+  
+  # Builder
+  my $builder = $self->builder;
+  
+  # Class name
+  my $class_name = $self->{class_name};
+  
+  # Build runtime
+  unless ($self->{finish_build_runtime}) {
+    $self->build_runtime;
+  }
+  
   # Config file
   my $module_file = $builder->get_module_file($class_name);
-  
+
   # Object files
   my $object_files = [];
 
   # Compile SPVM core source files
   my $spvm_core_objects = $self->compile_spvm_core_sources;
   push @$object_files, @$spvm_core_objects;
+  
+  my $config = $self->config;
   
   my $no_precompile = $config->no_precompile;
 
@@ -249,19 +361,34 @@ sub build_exe_file {
   my $bootstrap_object_file = $self->compile_bootstrap_source;
   push @$object_files, $bootstrap_object_file;
   
+  # Build directory
+  my $build_dir = $self->builder->build_dir;
+  mkpath $build_dir;
+
   # Link and generate executable file
-  $self->link($object_files);
+  my $cc_linker = SPVM::Builder::CC->new(
+    build_dir => $build_dir,
+    builder => $builder,
+    quiet => $self->quiet,
+    force => $self->force,
+  );
+  my $options = {
+    output_file => $self->{output_file},
+    config => $self->config,
+    category => 'native',
+  };
+  $cc_linker->link($class_name, $object_files, $options);
 }
 
 sub create_source_file {
-  my ($self, $opt) = @_;
+  my ($self, $options) = @_;
   
   # Config
   my $config = $self->config;
   
-  my $input_files = $opt->{input_files};
-  my $output_file = $opt->{output_file};
-  my $create_cb = $opt->{create_cb};
+  my $input_files = $options->{input_files};
+  my $output_file = $options->{output_file};
+  my $create_cb = $options->{create_cb};
   
   my $config_dependent_files = $config->dependent_files;
   my $need_generate_input_files = [@$input_files, @$config_dependent_files];
@@ -277,21 +404,21 @@ sub create_source_file {
 }
 
 sub compile_source_file {
-  my ($self, $opt) = @_;
+  my ($self, $options) = @_;
 
   # Config
   my $config = $self->config;
   
-  my $opt_ccflags = $opt->{ccflags};
-  $opt_ccflags = [] unless defined $opt_ccflags;
+  my $options_ccflags = $options->{ccflags};
+  $options_ccflags = [] unless defined $options_ccflags;
   
-  if (@$opt_ccflags) {
-    $config->add_ccflags(@$opt_ccflags);
+  if (@$options_ccflags) {
+    $config->add_ccflags(@$options_ccflags);
   }
 
-  my $source_file = $opt->{source_file};
-  my $output_file = $opt->{output_file};
-  my $depend_files = $opt->{depend_files};
+  my $source_file = $options->{source_file};
+  my $output_file = $options->{output_file};
+  my $depend_files = $options->{depend_files};
   unless ($depend_files) {
     $depend_files = [];
   }
@@ -321,11 +448,11 @@ sub compile_source_file {
   }
   
   my $object_file_info = SPVM::Builder::ObjectFileInfo->new(
-    object_file => $output_file,
+    file => $output_file,
     source_file => $source_file,
     cc => $compile_info_cc,
     ccflags => $compile_info_ccflags,
-    is_exe_config => $config->is_exe,
+    config => $config,
   );
   
   return $object_file_info;
@@ -748,19 +875,9 @@ sub compile_spvm_core_sources {
   # Config
   my $config = $self->config;
 
-  # SPVM::Builder::Config directory
-  my $spvm_builder_config_dir = $INC{"SPVM/Builder/Config.pm"};
-
-  # SPVM::Builder directory
-  my $spvm_builder_dir = $spvm_builder_config_dir;
-  $spvm_builder_dir =~ s/\/Config\.pm$//;
-
   # SPVM src directory
-  my $spvm_core_source_dir = "$spvm_builder_dir/src";
+  my $builder_src_dir = $config->builder_src_dir;
 
-  # SPVM header directory
-  my $spvm_core_header_dir = "$spvm_builder_dir/include";
-  
   # SPVM runtime source files
   my $no_compiler_api = $config->no_compiler_api;
   my $spvm_runtime_src_base_names;
@@ -770,7 +887,7 @@ sub compile_spvm_core_sources {
   else {
     $spvm_runtime_src_base_names = SPVM::Builder::Util::get_spvm_core_source_file_names();
   }
-  my @spvm_core_source_files = map { "$spvm_core_source_dir/$_" } @$spvm_runtime_src_base_names;
+  my @spvm_core_source_files = map { "$builder_src_dir/$_" } @$spvm_runtime_src_base_names;
 
   # Object dir
   my $output_dir = $self->builder->create_build_object_path;
@@ -811,9 +928,8 @@ sub create_precompile_sources {
   mkpath $build_dir;
 
   # Build precompile classes
-  my $builder_c_precompile = SPVM::Builder::CC->new(
+  my $builder_cc_precompile = SPVM::Builder::CC->new(
     build_dir => $build_dir,
-    category => 'precompile',
     builder => $builder,
     quiet => $self->quiet,
     force => $self->force,
@@ -827,7 +943,7 @@ sub create_precompile_sources {
       
       my $build_src_dir = $self->builder->create_build_src_path;
       mkpath $build_src_dir;
-      $builder_c_precompile->create_precompile_source_file(
+      $builder_cc_precompile->create_precompile_source_file(
         $class_name,
         {
           output_dir => $build_src_dir,
@@ -847,9 +963,8 @@ sub compile_precompile_sources {
   my $build_dir = $self->builder->build_dir;
   
   # Build precompile classes
-  my $builder_c_precompile = SPVM::Builder::CC->new(
+  my $builder_cc_precompile = SPVM::Builder::CC->new(
     build_dir => $build_dir,
-    category => 'precompile',
     builder => $builder,
     quiet => $self->quiet,
     force => $self->force,
@@ -867,11 +982,14 @@ sub compile_precompile_sources {
       my $build_object_dir = $self->builder->create_build_object_path;
       mkpath $build_object_dir;
       
-      my $precompile_object_files = $builder_c_precompile->compile(
+      my $config = SPVM::Builder::Config->new_gnu99(file_optional => 1);
+      my $precompile_object_files = $builder_cc_precompile->compile(
         $class_name,
         {
           input_dir => $build_src_dir,
           output_dir => $build_object_dir,
+          config => $config,
+          category => 'precompile',
         }
       );
       push @$object_files, @$precompile_object_files;
@@ -891,9 +1009,8 @@ sub compile_native_sources {
   mkpath $build_dir;
 
   # Compiler for native module
-  my $builder_c_native = SPVM::Builder::CC->new(
+  my $builder_cc_native = SPVM::Builder::CC->new(
     build_dir => $build_dir,
-    category => 'native',
     builder => $builder,
     quiet => $self->quiet,
     force => $self->force,
@@ -916,12 +1033,39 @@ sub compile_native_sources {
       my $input_dir = SPVM::Builder::Util::remove_class_part_from_file($native_module_file, $perl_class_name);
       my $build_object_dir = $self->builder->create_build_object_path;
       mkpath $build_object_dir;
+
+      # Module file
+      my $module_file = $builder->get_module_file($class_name);
+      unless (defined $module_file) {
+        my $config_file = SPVM::Builder::Util::get_config_file_from_class_name($class_name);
+        if ($config_file) {
+          $module_file = $config_file;
+          $module_file =~ s/\.config$/\.spvm/;
+        }
+        else {
+          confess "\"$module_file\" module is not loaded";
+        }
+      }
+      my $config = $builder_cc_native->create_native_config_from_module_file($module_file);
       
-      my $object_files = $builder_c_native->compile(
+      my $include_dirs = [];
+      my $exe_config = $self->config;
+      my $resource_names = $exe_config->get_resource_names;
+      for my $resource_name (@$resource_names) {
+        my $resource = $exe_config->get_resource($resource_name);
+        my $resource_include_dir = $resource->config->own_include_dir;
+        push @$include_dirs, $resource_include_dir;
+      }
+      
+      my $object_files = $builder_cc_native->compile(
         $class_name,
         {
           input_dir => $input_dir,
           output_dir => $build_object_dir,
+          config => $config,
+          category => 'native',
+          ignore_use_resource => 1,
+          include_dirs => $include_dirs,
         }
       );
       push @$all_object_files, @$object_files;
@@ -929,138 +1073,6 @@ sub compile_native_sources {
   }
   
   return $all_object_files;
-}
-
-sub link {
-  my ($self, $object_file_infos) = @_;
-
-  my $class_name = $self->class_name;
-  
-  my $config = $self->config;
-
-  # CBuilder configs
-  my $output_file = $self->{output_file};
-  
-  # Add output file extension
-  my $output_file_base = basename $output_file;
-  unless ($output_file_base =~ /\./) {
-    my $exe_ext = $Config{exe_ext};
-    $output_file .= $exe_ext;
-  }
-
-  # Linker
-  my $ld = $config->ld;
-  
-  # All linker flags
-  my @all_ldflags;
-  
-  # Linker flags
-  my $ldflags = $config->ldflags;
-  push @all_ldflags, @{$config->ldflags};
-  
-  # Linker optimize
-  my $ld_optimize = $config->ld_optimize;
-  push @all_ldflags, $ld_optimize;
-  
-  # Library directory
-  my $lib_dirs = $config->lib_dirs;
-  for my $lib_dir (@$lib_dirs) {
-    if (-d $lib_dir) {
-      push @all_ldflags, "-L$lib_dir";
-    }
-  }
-  
-  # Libraries
-  my $libs = $config->libs;
-  push @all_ldflags, map { "-l$_" } @$libs;
-  
-  # ExeUtils::CBuilder config
-  my $cbuilder_config = {
-    ld => $ld,
-    ldflags => '',
-    shrpenv => '',
-    perllibs => '',
-    libpth => '',
-  };
-  
-  my $config_dependent_files = $config->dependent_files;
-  my $need_generate_input_files = [@$object_file_infos, @$config_dependent_files];
-  my $need_generate = SPVM::Builder::Util::need_generate({
-    force => $self->force || $config->force,
-    output_file => $output_file,
-    input_files => $need_generate_input_files,
-  });
-
-  my $link_info = SPVM::Builder::LinkInfo->new(
-    class_name => $class_name,
-    object_file_infos => $object_file_infos,
-    ld => $ld,
-    ldflags => \@all_ldflags,
-    is_exe => 1,
-    output_file => $output_file,
-  );
-
-  my $before_link = $config->before_link;
-  if ($before_link) {
-    $before_link->($config, $link_info);
-  }
-  
-  if ($need_generate) {
-    my $link_info_ld = $link_info->ld;
-    my $link_info_ldflags = $link_info->ldflags;
-    my $link_info_class_name = $link_info->class_name;
-    my $link_info_output_file = $link_info->output_file;
-    my $link_info_object_file_infos = $link_info->object_file_infos;
-    my $link_info_object_files = [map { $_->to_string } @$link_info_object_file_infos];
-    my $link_info_ldflags_str = join(' ', @$link_info_ldflags);
-    
-    my $dynamic_lib = $config->dynamic_lib;
-    my $static_lib = $config->static_lib;
-    
-    # CBuilder
-    my $cbuilder = ExtUtils::CBuilder->new(quiet => $self->quiet, config => $cbuilder_config);
-
-    # Create a dynamic library
-    if ($dynamic_lib) {
-      my $link_info_output_dir = dirname $link_info_output_file;
-      my $link_info_output_file_base = basename $link_info_output_file;
-      my $lib_file = $link_info_output_file;
-      unless ($link_info_output_file_base =~ /\./) {
-        $lib_file .= ".$Config{dlext}";
-      }
-      
-      $cbuilder->link(
-        objects => $link_info_object_files,
-        module_name => $link_info_class_name,
-        lib_file => $lib_file,
-        extra_linker_flags => $link_info_ldflags_str,
-      );
-    }
-    # Create a static library
-    elsif ($static_lib) {
-      my $link_info_output_dir = dirname $link_info_output_file;
-      my $link_info_output_file_base = basename $link_info_output_file;
-      my $lib_file = $link_info_output_file;
-      unless ($link_info_output_file_base =~ /\./) {
-        $lib_file .= ".a";
-      }
-    
-      my @object_files = map { "$_" } @$link_info_object_files;
-      my @ar_cmd = ('ar', 'rc', $lib_file, @object_files);
-      $cbuilder->do_system(@ar_cmd);
-    }
-    # Create an executable file
-    else {
-      $cbuilder->link_executable(
-        objects => $link_info_object_files,
-        module_name => $link_info_class_name,
-        exe_file => $link_info_output_file,
-        extra_linker_flags => $link_info_ldflags_str,
-      );
-    }
-  }
-  
-  return $output_file;
 }
 
 1;

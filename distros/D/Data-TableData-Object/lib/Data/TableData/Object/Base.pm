@@ -7,9 +7,9 @@ use warnings;
 use Scalar::Util::Numeric qw(isint isfloat);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-11-17'; # DATE
+our $DATE = '2022-05-19'; # DATE
 our $DIST = 'Data-TableData-Object'; # DIST
-our $VERSION = '0.115'; # VERSION
+our $VERSION = '0.116'; # VERSION
 
 sub _array_is_numeric {
     my $self = shift;
@@ -227,6 +227,19 @@ sub rename_col { die "Must be implemented by subclass" }
 
 sub switch_cols { die "Must be implemented by subclass" }
 
+sub iter {
+    my $self = shift;
+    my $i = 0;
+    my $count = $self->row_count;
+    sub {
+        if ($i < $count) {
+            $self->row($i++);
+        } else {
+            undef;
+        }
+    };
+}
+
 1;
 # ABSTRACT: Base class for Data::TableData::Object::*
 
@@ -242,7 +255,7 @@ Data::TableData::Object::Base - Base class for Data::TableData::Object::*
 
 =head1 VERSION
 
-This document describes version 0.115 of Data::TableData::Object::Base (from Perl distribution Data-TableData-Object), released on 2021-11-17.
+This document describes version 0.116 of Data::TableData::Object::Base (from Perl distribution Data-TableData-Object), released on 2022-05-19.
 
 =head1 METHODS
 
@@ -454,6 +467,15 @@ given hash arguments containing these keys: C<table> (the
 Data::TableData::Object instance), C<row_idx> (row number, 0-based), C<col_name>
 (column name), C<col_idx> (column index, 0-based), C<value> (current value).
 
+=head2 $td->iter
+
+Generate a simple (coderef) iterator to iterate rows of the table. Will call
+row() repeatedly from the first row (index 0) to the last (determined by
+$td->row_count). After the rows are exhausted, the iterator will return
+C<undef>. Note that for an aos table, it is possible that a row has the value of
+C<undef> and thus the iterator can return C<undef> before the rows are
+exhausted.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Data-TableData-Object>.
@@ -485,7 +507,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

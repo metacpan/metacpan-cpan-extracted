@@ -20,13 +20,13 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.012",
   "NAME" => "Proch::N50",
   "PREREQ_PM" => {
-    "FASTX::Reader" => "0.7",
+    "FASTX::Reader" => "1.3.0",
     "Getopt::Long" => "2.39",
     "JSON::PP" => "2.27",
     "Pod::Usage" => "1.61",
     "Text::ASCIITable" => 0
   },
-  "VERSION" => "1.4.2",
+  "VERSION" => "1.4.4",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "FASTX::Reader" => "0.7",
+  "FASTX::Reader" => "1.3.0",
   "Getopt::Long" => "2.39",
   "JSON::PP" => "2.27",
   "Pod::Usage" => "1.61",

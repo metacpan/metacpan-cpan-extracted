@@ -20,7 +20,10 @@
 package Perl::Tidy::Diagnostics;
 use strict;
 use warnings;
-our $VERSION = '20220217';
+use English qw( -no_match_vars );
+our $VERSION = '20220613';
+
+use constant EMPTY_STRING => q{};
 
 sub AUTOLOAD {
 
@@ -53,8 +56,8 @@ sub new {
     my $class = shift;
     return bless {
         _write_diagnostics_count => 0,
-        _last_diagnostic_file    => "",
-        _input_file              => "",
+        _last_diagnostic_file    => EMPTY_STRING,
+        _input_file              => EMPTY_STRING,
         _fh                      => undef,
     }, $class;
 }
@@ -70,7 +73,7 @@ sub write_diagnostics {
 
     unless ( $self->{_write_diagnostics_count} ) {
         open( $self->{_fh}, ">", "DIAGNOSTICS" )
-          or Perl::Tidy::Die("couldn't open DIAGNOSTICS: $!\n");
+          or Perl::Tidy::Die("couldn't open DIAGNOSTICS: $ERRNO\n");
     }
 
     my $fh                   = $self->{_fh};

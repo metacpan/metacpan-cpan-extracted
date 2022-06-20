@@ -1,5 +1,12 @@
 Revision history for Perl extension Text-Markdown-Slidy
 
+0.04 2022-06-14T10:58:31Z
+    - fix frontmatter handling
+
+0.03 2022-06-14T10:33:36Z
+    - support Frontmatter
+    - support HR as slide delimiter
+
 0.02 2014-04-27T12:35:44Z
     - fix deps
 

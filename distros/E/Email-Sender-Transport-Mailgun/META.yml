@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.8, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.18, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +29,7 @@ no_index:
 provides:
   Email::Sender::Transport::Mailgun:
     file: lib/Email/Sender/Transport/Mailgun.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Email::Sender: '0'
   HTTP::Tiny: '0'
@@ -42,9 +42,10 @@ requires:
 resources:
   bugtracker: https://github.com/sdt/Email-Sender-Transport-Mailgun/issues
   homepage: https://github.com/sdt/Email-Sender-Transport-Mailgun
-  repository: git://github.com/sdt/Email-Sender-Transport-Mailgun.git
-version: '0.02'
+  repository: https://github.com/sdt/Email-Sender-Transport-Mailgun.git
+version: '0.03'
 x_contributors:
   - 'Florian Helmberger <fh@25th-floor.com>'
+  - 'Stephen Thirlwall <sdt@dr.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

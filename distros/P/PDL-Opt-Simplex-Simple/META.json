@@ -1,0 +1,60 @@
+{
+   "abstract" : "A simplex optimizer for the rest of us (who may not know PDL).",
+   "author" : [
+      "Eric Wheeler <ewheeler@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PDL-Opt-Simplex-Simple",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Math::Round" : "0",
+            "PDL" : "2.007",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/KJ7LNW/perl-PDL-Opt-Simplex-Simple/issues"
+      },
+      "homepage" : "https://github.com/KJ7LNW/perl-PDL-Opt-Simplex-Simple",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/KJ7LNW/perl-PDL-Opt-Simplex-Simple.git",
+         "web" : "https://github.com/KJ7LNW/perl-PDL-Opt-Simplex-Simple.git"
+      }
+   },
+   "version" : "1.4",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

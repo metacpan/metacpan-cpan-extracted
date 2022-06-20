@@ -4,6 +4,7 @@ use warnings;
 
 use URI;
 use Neo4j::Driver;
+use Neo4j_Test::NetModulePlugin;
 use Neo4j_Test::Sim;
 
 
@@ -32,15 +33,14 @@ sub driver_maybe {
 	$driver->config(cypher_params => v2);
 	
 	$bolt = $driver->{uri} && $driver->{uri}->scheme eq 'bolt';
-	if (! $ENV{TEST_NEO4J_PASSWORD} && ! $bolt) {
-		# without a password, we use the REST simulator instead
-		$driver->config(net_module => 'Neo4j_Test::Sim');
-		$sim = 1;
-	}
-	
 	if ($ENV{TEST_NEO4J_NETMODULE}) {
-		eval "require $ENV{TEST_NEO4J_NETMODULE}; 1";
-		$driver->config(net_module => $ENV{TEST_NEO4J_NETMODULE});
+		eval "require $ENV{TEST_NEO4J_NETMODULE} unless $ENV{TEST_NEO4J_NETMODULE}->can('new'); 1" or die;
+		$driver->plugin(Neo4j_Test::NetModulePlugin->new($ENV{TEST_NEO4J_NETMODULE}));
+	}
+	elsif (! $ENV{TEST_NEO4J_PASSWORD} && ! $bolt) {
+		# without a password, we use the REST simulator instead
+		$driver->plugin(Neo4j_Test::NetModulePlugin->new('Neo4j_Test::Sim'));
+		$sim = 1;
 	}
 	
 	return $driver;
@@ -77,8 +77,11 @@ sub driver_no_connect {
 # returns a driver that is expected to fail (unauthorized)
 sub driver_no_auth {
 	my $driver = driver_maybe;
+	if ($sim) {
+		delete $driver->{plugins}->{handlers}->{http_adapter_factory};
+		$driver->plugin(Neo4j_Test::NetModulePlugin->new( Neo4j_Test::Sim->new({auth => 0}) ));
+	}
 	$driver->{auth} = { scheme => 'basic', principal => "no\tuser", credentials => "no\tpass" };
-	$driver->config(net_module => Neo4j_Test::Sim->new({auth => 0})) if $sim;
 	return $driver;
 }
 

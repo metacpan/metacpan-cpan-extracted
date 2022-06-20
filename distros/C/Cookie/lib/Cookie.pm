@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Cookies API for Server & Client - ~/lib/Cookie.pm
-## Version v0.1.8
+## Version v0.1.9
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/10/08
-## Modified 2021/12/15
+## Modified 2022/06/19
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -28,7 +28,7 @@ BEGIN
         '=='     => \&same_as,
         fallback => 1,
     );
-    our $VERSION = 'v0.1.8';
+    our $VERSION = 'v0.1.9';
     our $SUBS;
     our $COOKIE_DEBUG = 0;
     use constant CRYPTX_VERSION => '0.074';
@@ -713,7 +713,7 @@ sub _header_datetime
         return( $self->error( "Object provided (", ref( $_[0] ), ") is not a DateTime object." ) ) if( !$_[0]->isa( 'DateTime' ) );
         $dt = shift( @_ );
     }
-    $dt = DateTime->now( time_zone => 'local' ) if( !defined( $dt ) );
+    $dt = DateTime->now if( !defined( $dt ) );
     $dt->set_time_zone( 'GMT' );
     my $fmt = DateTime::Format::Strptime->new(
         pattern => '%a, %d %b %Y %H:%M:%S GMT',
@@ -838,7 +838,7 @@ Cookie - Cookie Object with Encryption or Signature
 
 =head1 VERSION
 
-    v0.1.8
+    v0.1.9
 
 =head1 DESCRIPTION
 

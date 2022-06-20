@@ -18,7 +18,8 @@ use Test::More 0.96;
     use Moose;
 
     ::is(
-        ::exception { has size => (
+        ::exception {
+            has size => (
                 is  => 'ro',
                 isa => t('Int'),
             );
@@ -218,7 +219,8 @@ is(
     use Moose;
 
     ::is(
-        ::exception { has native => (
+        ::exception {
+            has native => (
                 traits  => ['Array'],
                 is      => 'ro',
                 isa     => t( 'ArrayRef', of => t('Int') ),
@@ -248,7 +250,8 @@ is(
     );
 
     ::is(
-        ::exception { has coerced => (
+        ::exception {
+            has coerced => (
                 traits  => ['Array'],
                 is      => 'ro',
                 isa     => t('AofStr'),
@@ -262,7 +265,8 @@ is(
     );
 
     ::like(
-        ::exception { has native2 => (
+        ::exception {
+            has native2 => (
                 traits => ['Array'],
                 is     => 'ro',
                 isa    => t('Str'),

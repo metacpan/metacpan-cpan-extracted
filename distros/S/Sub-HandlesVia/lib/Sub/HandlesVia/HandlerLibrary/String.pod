@@ -1,0 +1,434 @@
+=head1 NAME
+
+Sub::HandlesVia::HandlerLibrary::String - library of string-related methods
+
+=head1 SYNOPSIS
+
+  package My::Class {
+    use Moo;
+    use Sub::HandlesVia;
+    use Types::Standard 'Str';
+    has attr => (
+      is => 'rwp',
+      isa => Str,
+      handles_via => 'String',
+      handles => {
+        'my_append' => 'append',
+        'my_chomp' => 'chomp',
+        'my_chop' => 'chop',
+        'my_clear' => 'clear',
+        'my_cmp' => 'cmp',
+        'my_cmpi' => 'cmpi',
+        'my_contains' => 'contains',
+        'my_contains_i' => 'contains_i',
+        'my_ends_with' => 'ends_with',
+        'my_ends_with_i' => 'ends_with_i',
+        'my_eq' => 'eq',
+        'my_eqi' => 'eqi',
+        'my_fc' => 'fc',
+        'my_ge' => 'ge',
+        'my_gei' => 'gei',
+        'my_get' => 'get',
+        'my_gt' => 'gt',
+        'my_gti' => 'gti',
+        'my_inc' => 'inc',
+        'my_lc' => 'lc',
+        'my_le' => 'le',
+        'my_lei' => 'lei',
+        'my_length' => 'length',
+        'my_lt' => 'lt',
+        'my_lti' => 'lti',
+        'my_match' => 'match',
+        'my_match_i' => 'match_i',
+        'my_ne' => 'ne',
+        'my_nei' => 'nei',
+        'my_prepend' => 'prepend',
+        'my_replace' => 'replace',
+        'my_replace_globally' => 'replace_globally',
+        'my_reset' => 'reset',
+        'my_set' => 'set',
+        'my_starts_with' => 'starts_with',
+        'my_starts_with_i' => 'starts_with_i',
+        'my_substr' => 'substr',
+        'my_uc' => 'uc',
+      },
+    );
+  }
+
+=head1 DESCRIPTION
+
+This is a library of methods for L<Sub::HandlesVia>.
+
+=head1 DELEGATABLE METHODS
+
+=head2 C<< append( $tail ) >>
+
+Arguments: B<< Str >>.
+
+Appends another string to the end of the current string and updates the attribute.
+
+  my $object = My::Class->new( attr => 'foo' );
+  $object->my_append( 'bar' );
+  say $object->attr; ## ==> 'foobar'
+
+=head2 C<< chomp() >>
+
+Like C<chomp> from L<perlfunc>.
+
+=head2 C<< chop() >>
+
+Like C<chop> from L<perlfunc>.
+
+=head2 C<< clear() >>
+
+Sets the string to the empty string.
+
+  my $object = My::Class->new( attr => 'foo' );
+  $object->my_clear;
+  say $object->attr; ## nothing
+
+=head2 C<< cmp( $str ) >>
+
+Arguments: B<< Str >>.
+
+Returns C<< $object->attr cmp $str >>.
+
+=head2 C<< cmpi( $str ) >>
+
+Arguments: B<< Str >>.
+
+Returns C<< fc($object->attr) cmp fc($str) >>. Uses C<lc> instead of C<fc> in versions of Perl older than 5.16.
+
+=head2 C<< contains( $str ) >>
+
+Arguments: B<< Str >>.
+
+Returns true iff the string contains C<< $str >>.
+
+=head2 C<< contains_i( $tail ) >>
+
+Arguments: B<< Str >>.
+
+Returns true iff the string contains C<< $str >> case-insensitvely.
+
+=head2 C<< ends_with( $tail ) >>
+
+Arguments: B<< Str >>.
+
+Returns true iff the string ends with C<< $tail >>.
+
+=head2 C<< ends_with_i( $tail ) >>
+
+Arguments: B<< Str >>.
+
+Returns true iff the string ends with C<< $tail >> case-insensitvely.
+
+=head2 C<< eq( $str ) >>
+
+Arguments: B<< Str >>.
+
+Returns C<< $object->attr eq $str >>.
+
+=head2 C<< eqi( $str ) >>
+
+Arguments: B<< Str >>.
+
+Returns C<< fc($object->attr) eq fc($str) >>. Uses C<lc> instead of C<fc> in versions of Perl older than 5.16.
+
+=head2 C<< fc() >>
+
+Returns C<< fc($object->attr) >>.
+
+=head2 C<< ge( $str ) >>
+
+Arguments: B<< Str >>.
+
+Returns C<< $object->attr ge $str >>.
+
+=head2 C<< gei( $str ) >>
+
+Arguments: B<< Str >>.
+
+Returns C<< fc($object->attr) ge fc($str) >>. Uses C<lc> instead of C<fc> in versions of Perl older than 5.16.
+
+=head2 C<< get() >>
+
+Gets the current value of the string.
+
+  my $object = My::Class->new( attr => 'foo' );
+  say $object->my_get; ## ==> 'foo'
+
+=head2 C<< gt( $str ) >>
+
+Arguments: B<< Str >>.
+
+Returns C<< $object->attr gt $str >>.
+
+=head2 C<< gti( $str ) >>
+
+Arguments: B<< Str >>.
+
+Returns C<< fc($object->attr) gt fc($str) >>. Uses C<lc> instead of C<fc> in versions of Perl older than 5.16.
+
+=head2 C<< inc() >>
+
+Performs C<< ++ >> on the string.
+
+=head2 C<< lc() >>
+
+Returns C<< lc($object->attr) >>.
+
+=head2 C<< le( $str ) >>
+
+Arguments: B<< Str >>.
+
+Returns C<< $object->attr le $str >>.
+
+=head2 C<< lei( $str ) >>
+
+Arguments: B<< Str >>.
+
+Returns C<< fc($object->attr) le fc($str) >>. Uses C<lc> instead of C<fc> in versions of Perl older than 5.16.
+
+=head2 C<< length() >>
+
+Like C<length> from L<perlfunc>.
+
+  my $object = My::Class->new( attr => 'foo' );
+  say $object->my_length; ## ==> 3
+
+=head2 C<< lt( $str ) >>
+
+Arguments: B<< Str >>.
+
+Returns C<< $object->attr lt $str >>.
+
+=head2 C<< lti( $str ) >>
+
+Arguments: B<< Str >>.
+
+Returns C<< fc($object->attr) lt fc($str) >>. Uses C<lc> instead of C<fc> in versions of Perl older than 5.16.
+
+=head2 C<< match( $regexp ) >>
+
+Arguments: B<< Str|RegexpRef >>.
+
+Returns true iff the string matches the regexp.
+
+  my $object = My::Class->new( attr => 'foo' );
+  if ( $object->my_match( '^f..$' ) ) {
+    say 'matched!';
+  }
+
+=head2 C<< match_i( $regexp ) >>
+
+Arguments: B<< Str|RegexpRef >>.
+
+Returns true iff the string matches the regexp case-insensitively.
+
+  my $object = My::Class->new( attr => 'foo' );
+  if ( $object->my_match_i( '^F..$' ) ) {
+    say 'matched!';
+  }
+
+=head2 C<< ne( $str ) >>
+
+Arguments: B<< Str >>.
+
+Returns C<< $object->attr ne $str >>.
+
+=head2 C<< nei( $str ) >>
+
+Arguments: B<< Str >>.
+
+Returns C<< fc($object->attr) ne fc($str) >>. Uses C<lc> instead of C<fc> in versions of Perl older than 5.16.
+
+=head2 C<< prepend( $head ) >>
+
+Arguments: B<< Str >>.
+
+Prepends another string to the start of the current string and updates the attribute.
+
+  my $object = My::Class->new( attr => 'foo' );
+  $object->my_prepend( 'bar' );
+  say $object->attr; ## ==> 'barfoo'
+
+=head2 C<< replace( $regexp, $replacement ) >>
+
+Arguments: B<< Str|RegexpRef >>, B<< Str|CodeRef >>.
+
+Replaces the first regexp match within the string with the replacement string.
+
+  my $object = My::Class->new( attr => 'foo' );
+  $object->my_replace( 'o' => 'a' );
+  say $object->attr; ## ==> 'fao'
+
+  my $object2 = My::Class->new( attr => 'foo' );
+  $object2->my_replace( qr/O/i => sub { return 'e' } );
+  say $object2->attr; ## ==> 'feo'
+
+=head2 C<< replace_globally( $regexp, $replacement ) >>
+
+Arguments: B<< Str|RegexpRef >>, B<< Str|CodeRef >>.
+
+Replaces the all regexp matches within the string with the replacement string.
+
+  my $object = My::Class->new( attr => 'foo' );
+  $object->my_replace_globally( 'o' => 'a' );
+  say $object->attr; ## ==> 'faa'
+
+  my $object2 = My::Class->new( attr => 'foo' );
+  $object2->my_replace_globally( qr/O/i => sub { return 'e' } );
+  say $object2->attr; ## ==> 'fee'
+
+=head2 C<< reset() >>
+
+Resets the attribute to its default value, or an empty string if it has no default.
+
+=head2 C<< set( $value ) >>
+
+Arguments: B<< Str >>.
+
+Sets the string to a new value.
+
+  my $object = My::Class->new( attr => 'foo' );
+  $object->my_set( 'bar' );
+  say $object->attr; ## ==> 'bar'
+
+=head2 C<< starts_with( $head ) >>
+
+Arguments: B<< Str >>.
+
+Returns true iff the string starts with C<< $head >>.
+
+=head2 C<< starts_with_i( $head ) >>
+
+Arguments: B<< Str >>.
+
+Returns true iff the string starts with C<< $head >> case-insensitvely.
+
+=head2 C<< substr( $start, $length?, $replacement? ) >>
+
+Arguments: B<< Int >>, B<< Optional[Int] >>, B<< Optional[Str] >>.
+
+Like C<substr> from L<perlfunc>, but is not an lvalue.
+
+=head2 C<< uc() >>
+
+Returns C<< uc($object->attr) >>.
+
+=head1 EXTENDED EXAMPLES
+
+=head2 Using eq for Enum
+
+  use strict;
+  use warnings;
+  
+  package My::Person {
+    use Moo;
+    use Sub::HandlesVia;
+    use Types::Standard qw( Str Enum );
+    
+    has name => (
+      is => 'ro',
+      isa => Str,
+      required => 1,
+    );
+    
+    has status => (
+      is => 'rwp',
+      isa => Enum[ 'alive', 'dead' ],
+      handles_via => 'String',
+      handles => {
+        is_alive => [ eq  => 'alive' ],
+        is_dead  => [ eq  => 'dead' ],
+        kill     => [ set => 'dead' ],
+      },
+      default => 'alive',
+    );
+    
+    # Note: method modifiers work on delegated methods
+    #
+    before kill => sub {
+      my $self = shift;
+      warn "overkill" if $self->is_dead;
+    };
+  }
+  
+  my $bob = My::Person->new( name => 'Robert' );
+  say $bob->is_alive; ## ==> true
+  say $bob->is_dead;  ## ==> false
+  $bob->kill;
+  say $bob->is_alive; ## ==> false
+  say $bob->is_dead;  ## ==> true
+
+See also L<MooX::Enumeration> and L<MooseX::Enumeration>.
+
+=head2 Match with curried regexp
+
+  use strict;
+  use warnings;
+  
+  package My::Component {
+    use Moo;
+    use Sub::HandlesVia;
+    use Types::Standard qw( Str Int );
+    
+    has id => (
+      is => 'ro',
+      isa => Int,
+      required => 1,
+    );
+    
+    has name => (
+      is => 'ro',
+      isa => Str,
+      required => 1,
+      handles_via => 'String',
+      handles => {
+        name_is_safe_filename => [ match => qr/\A[A-Za-z0-9]+\z/ ],
+        _lc_name => 'lc',
+      },
+    );
+    
+    sub config_filename {
+      my $self = shift;
+      if ( $self->name_is_safe_filename ) {
+        return sprintf( '%s.ini', $self->_lc_name );
+      }
+      return sprintf( 'component-%d.ini', $self->id );
+    }
+  }
+  
+  my $foo = My::Component->new( id => 42, name => 'Foo' );
+  say $foo->config_filename; ## ==> 'foo.ini'
+  
+  my $bar4 = My::Component->new( id => 99, name => 'Bar #4' );
+  say $bar4->config_filename; ## ==> 'component-99.ini'
+
+=head1 BUGS
+
+Please report any bugs to
+L<https://github.com/tobyink/p5-sub-handlesvia/issues>.
+
+=head1 SEE ALSO
+
+L<Sub::HandlesVia>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2020, 2022 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

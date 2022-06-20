@@ -20,7 +20,7 @@
 	doap-deps:test-recommendation [ doap-deps:on "Role::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "Class::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "Moo::Role"^^doap-deps:CpanId ], [ doap-deps:on "Moose::Role"^^doap-deps:CpanId ];
 	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Requires"^^doap-deps:CpanId ];
 	doap-deps:test-suggestion [ doap-deps:on "Role::Basic"^^doap-deps:CpanId ], [ doap-deps:on "Mouse::Role"^^doap-deps:CpanId ];
-	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Role-Hooks>;
+	doap:bug-database    <https://github.com/tobyink/p5-role-hooks/issues>;
 	doap:created         "2020-02-18"^^xsd:date;
 	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:download-page   <https://metacpan.org/release/Role-Hooks>;
@@ -29,7 +29,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Role-Hooks";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Role-Hooks/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Role-Hooks/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Role-Hooks/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Role-Hooks/v_0-004>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Role-Hooks/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Role-Hooks/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Role-Hooks/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Role-Hooks/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Role-Hooks/v_0-005>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-role-hooks>;
@@ -96,6 +96,20 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Role-Hooks-0.004.tar.gz>;
 	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Role-Hooks/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "Role-Hooks-0.005"^^xsd:string;
+	dc:issued            "2022-06-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Add after_inflate hook.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Role-Hooks-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/abraxxa>
 	a                    foaf:Person;

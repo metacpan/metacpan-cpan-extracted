@@ -1,12 +1,19 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/SqlServer.xs 99    19-07-09 16:05 Sommar $
+ $Header: /Perl/OlleDB/SqlServer.xs 100   22-05-18 22:22 Sommar $
 
   The main flie for Win32::SqlServer. This file only includes the XS
   parts these days. All other code is in other files.
 
-  Copyright (c) 2004-2019   Erland Sommarskog
+  Copyright (c) 2004-2022   Erland Sommarskog
 
   $History: SqlServer.xs $
+ * 
+ * *****************  Version 100  *****************
+ * User: Sommar       Date: 22-05-18   Time: 22:22
+ * Updated in $/Perl/OlleDB
+ * Added module routine SetDefaultForEncryption to permit changing the
+ * default for the lgoin properties Encrypt, TrustServerCertificate and
+ * HostNameInCertificate.
  * 
  * *****************  Version 99  *****************
  * User: Sommar       Date: 19-07-09   Time: 16:05
@@ -201,6 +208,13 @@ PROTOTYPES: ENABLE
 
 BOOT:
 initialize();
+
+void
+SetDefaultForEncryption(sv_Encrypt, sv_Trust = NULL, sv_HostName = NULL)
+   SV * sv_Encrypt
+   SV * sv_Trust
+   SV * sv_HostName
+
 
 void
 olledb_message (olle_ptr, msgno, state, severity, msg)

@@ -6,7 +6,7 @@ package Lingua::Translit::Tables;
 #   Rona Linke <rlinke@lingua-systems.com>
 # Copyright (C) 2009-2016 Lingua-Systems Software GmbH
 # Copyright (C) 2016-2017 Netzum Sorglos, Lingua-Systems Software GmbH
-# Copyright (C) 2017 Netzum Sorglos Software GmbH
+# Copyright (C) 2017-2022 Netzum Sorglos Software GmbH
 #
 
 use strict;
@@ -312,7 +312,7 @@ Copyright (C) 2009-2016 Lingua-Systems Software GmbH
 
 Copyright (C) 2016-2017 Netzum Sorglos, Lingua-Systems Software GmbH
 
-Copyright (C) 2017 Netzum Sorglos Software GmbH
+Copyright (C) 2017-2022 Netzum Sorglos Software GmbH
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

@@ -1,5 +1,8 @@
 Revision history for Perl extension File-Remove
 
+1.61    2022-06-13 - Shlomi Fish
+    - Merged https://github.com/shlomif/File-Remove/pull/4
+
 1.60    2020-10-22 - Shlomi Fish
     - Add .tidyallrc + related changes
     - Fix mismatched $VERSION.

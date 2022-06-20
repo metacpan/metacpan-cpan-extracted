@@ -1,9 +1,21 @@
 #!/usr/bin/env perl
-# By CSV, I mean the dataset downloadable from here: https://data.gov.tw/dataset/26557
 
-use v5.18;
-use strict;
-use warnings;
+=head1 CSV ?
+
+
+The CSV can be downloaded from:
+
+     https://data.gov.tw/dataset/14718
+
+Download the one named: 111年中華民國政府行政機關辦公日曆表
+
+After converting that from Big5 to UTF-8, feed it to this program.
+
+    perl ./dev-bin/convert-from-csv.pl  <( piconf -f big5 -t utf8 ~/Downloads/111年 中華民國政府行政機關辦公日曆表.csv )
+
+=cut
+
+use v5.36;
 use utf8;
 
 use Text::CSV;
@@ -17,14 +29,16 @@ open my $fh, '<:utf8', $ARGV[0] or die $!;
 $_ = <$fh>; # throw away the header line with BOM.
 
 while ( my $row = $csv->getline($fh) ) {
-    # "date","name","isHoliday","holidayCategory","description"
-    my ($date, $name, $is_holiday, $holiday_category, $description) = @$row;
-    my ($year, $month, $day) = split /\//, $date;
+    # 西元日期,星期,是否放假,備註
+    my ($date, $weekday, $is_holiday,$description) = @$row;
+    my ($year, $month, $day) = $date =~ m{^(....)(..)(..)$};
 
-    $is_holiday = ($is_holiday eq "是") ? 1 : 0;
+    if ($is_holiday) {
+        my $mmdd = sprintf '%02d%02d', $month, $day;
 
-    my $mmdd = sprintf '%02d%02d', $month, $day;
-    $CAL{$year}{$mmdd} = $is_holiday ? ($name || $holiday_category) : '';
+        $description = "星期六、星期日" if !$description && $is_holiday && ($weekday eq "六" || $weekday eq "日");
+        $CAL{$year}{$mmdd} = $description;
+    }
 }
 close($fh);
 

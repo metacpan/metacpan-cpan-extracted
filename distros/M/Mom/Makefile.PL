@@ -33,7 +33,7 @@ my $meta = {
                                        },
                           test      => { requires => { "Test::Fatal" => 0, "Test::More" => 0.96 } },
                         },
-  "provides"         => { Mom => { file => "lib/Mom.pm", version => 0.005 } },
+  "provides"         => { Mom => { file => "lib/Mom.pm", version => 0.006 } },
   "release_status"   => "stable",
   "resources"        => {
                           bugtracker   => { web => "https://github.com/tobyink/p5-mom/issues" },
@@ -46,7 +46,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Mom/project",
                         },
-  "version"          => 0.005,
+  "version"          => 0.006,
   "x_contributors"   => ["Brian Greenfield (BRIANG) <briang\@cpan.org>"],
   "x_static_install" => 1,
 };

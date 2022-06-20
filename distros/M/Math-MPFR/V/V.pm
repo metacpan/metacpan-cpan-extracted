@@ -10,7 +10,7 @@ require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-our $VERSION = '4.23';
+our $VERSION = '4.24';
 #$VERSION = eval $VERSION;
 Math::MPFR::V->DynaLoader::bootstrap($VERSION);
 

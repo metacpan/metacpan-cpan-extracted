@@ -1,5 +1,12 @@
 Revision history for Task::BeLik::GEEKRUTH
 
+1.0100 2022-06-16T08:56:23-04:00 America/New_York
+ [ENHANCEMENTS]
+ - Added a few things, removed a few things
+
+ [STATISTICS]
+ - code churn: 2 files changed, 9 insertions(+), 20 deletions(-)
+
 1.0000 2022-01-23T20:07:28-05:00 America/New_York
  [STATISTICS]
  - code churn: 1 file changed, 22 insertions(+), 1 deletion(-)

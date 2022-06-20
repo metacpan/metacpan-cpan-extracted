@@ -3,7 +3,7 @@ package Specio::Constraint::Parameterized;
 use strict;
 use warnings;
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 use Role::Tiny::With;
 use Specio::OO;
@@ -80,7 +80,7 @@ Specio::Constraint::Parameterized - A class which represents parameterized const
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNOPSIS
 
@@ -132,8 +132,6 @@ Returns the type that was passed to the constructor.
 
 Bugs may be submitted at L<https://github.com/houseabsolute/Specio/issues>.
 
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
-
 =head1 SOURCE
 
 The source code repository for Specio can be found at L<https://github.com/houseabsolute/Specio>.
@@ -144,7 +142,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2021 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2022 by Dave Rolsky.
 
 This is free software, licensed under:
 

@@ -5,12 +5,11 @@ use warnings;
 package Sub::HandlesVia::Toolkit::Moo;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.016';
+our $VERSION   = '0.025';
 
 use Sub::HandlesVia::Toolkit;
 our @ISA = 'Sub::HandlesVia::Toolkit';
 
-use Data::Dumper;
 use Types::Standard qw( is_ArrayRef is_Str assert_HashRef is_CodeRef is_Undef );
 use Types::Standard qw( ArrayRef HashRef Str Num Int CodeRef Bool );
 
@@ -55,35 +54,7 @@ sub install_has_wrapper {
 	});
 }
 
-my %standard_callbacks = (
-	args => sub {
-		'@_[1..$#_]';
-	},
-	arg => sub {
-		@_==1 or die;
-		my $n = shift;
-		"\$_[$n]";
-	},
-	argc => sub {
-		'(@_-1)';
-	},
-	curry => sub {
-		@_==1 or die;
-		my $arr = shift;
-		"splice(\@_,1,0,$arr);";
-	},
-	usage_string => sub {
-		@_==2 or die;
-		my $method_name = shift;
-		my $guts = shift;
-		"\$instance->$method_name($guts)";
-	},
-	self => sub {
-		'$_[0]';
-	},
-);
-
-sub make_callbacks {
+sub code_generator_for_attribute {
 	my ($me, $target, $attrname) = (shift, @_);
 	
 	if (ref $attrname) {
@@ -94,7 +65,7 @@ sub make_callbacks {
 	my $ctor_maker = $INC{'Moo.pm'} && 'Moo'->_constructor_maker_for($target);
 	
 	if (!$ctor_maker) {
-		return $me->_make_callbacks_role($target, $attrname);
+		return $me->_code_generator_for_role_attribute($target, $attrname);
 	}
 	
 	my $spec = $ctor_maker->all_attribute_specs->{$attrname};
@@ -107,26 +78,53 @@ sub make_callbacks {
 		$coerce = 1;
 	}
 	
-	my ($slot) = $maker->generate_simple_get('$_[0]', $attrname, $spec);
+	my ($slot) = sub {
+		my $gen = shift;
+		my ($code) = $maker->generate_simple_get($gen->generate_self, $attrname, $spec);
+		$code;
+	};
 	
-	my ($is_simple_get, $get, $captures) = $maker->is_simple_get($attrname, $spec)
-		? (1, $maker->generate_simple_get('$_[0]', $attrname, $spec))
-		: (0, $maker->_generate_get($attrname, $spec), delete($maker->{captures})||{});
+	my $captures = {};
+	my ($is_simple_get, $get) = $maker->is_simple_get($attrname, $spec)
+		? (1, sub {
+			my $gen = shift;
+			my $selfvar = $gen ? $gen->generate_self : '$_[0]';
+			my ($return) = $maker->generate_simple_get($selfvar, $attrname, $spec);
+			%$captures = ( %$captures, %{ delete($maker->{captures}) or {} } );
+			$return;
+		})
+		: (0, sub {
+			my $gen = shift;
+			my $selfvar = $gen ? $gen->generate_self : '$_[0]';
+			my ($return) = $maker->_generate_use_default(
+				$selfvar,
+				$attrname,
+				$spec,
+				$maker->_generate_simple_has($selfvar, $attrname, $spec),
+			);
+			%$captures = ( %$captures, %{ delete($maker->{captures}) or {} } );
+			$return;
+		});
 	my ($is_simple_set, $set) = $maker->is_simple_set($attrname, $spec)
 		? (1, sub {
-			my ($var) = @_;
-			$maker->_generate_simple_set('$_[0]', $attrname, $spec, $var);
+			my ($gen, $var) = @_;
+			my $selfvar = $gen ? $gen->generate_self : '$_[0]';
+			my $code = $maker->_generate_simple_set($selfvar, $attrname, $spec, $var);
+			$captures = { %$captures, %{ delete($maker->{captures}) or {} } };  # merge environments
+			$code;
 		})
 		: (0, sub { # that allows us to avoid going down this yucky code path
-			my ($var) = @_;
+			my ($gen, $var) = @_;
+			my $selfvar = $gen ? $gen->generate_self : '$_[0]';
 			my $code = $maker->_generate_set($attrname, $spec);
 			$captures = { %$captures, %{ delete($maker->{captures}) or {} } };  # merge environments
-			$code = "do { local \@_ = (\$_[0], $var); $code }";
+			$code = "do { local \@_ = ($selfvar, $var); $code }";
 			$code;
 		});
 	
 	# force $captures to be updated
-	$set->('$dummy') if !$is_simple_set;
+	$get->(undef, '$dummy');
+	$set->(undef, '$dummy');
 	
 	my $default;
 	if (exists $spec->{default}) {
@@ -140,44 +138,52 @@ sub make_callbacks {
 		$captures->{'$shv_default_for_reset'} = \$default->[1];
 	}
 	
-	return {
-		%standard_callbacks,
-		is_method      => !!1,
-		slot           => sub { $slot },
-		get            => sub { $get },
-		get_is_lvalue  => $is_simple_get,
-		set            => $set,
-		set_checks_isa => !$is_simple_set,
-		isa            => $type,
-		coerce         => !!$coerce,
-		env            => $captures,
-		be_strict      => $spec->{weak_ref}||$spec->{trigger},
-		default_for_reset => sub {
-			my ($handler, $callbacks) = @_ or die;
-			if (!$default) {
+	require Sub::HandlesVia::CodeGenerator;
+	return 'Sub::HandlesVia::CodeGenerator'->new(
+		toolkit               => $me,
+		target                => $target,
+		attribute             => $attrname,
+		attribute_spec        => $spec,
+		env                   => $captures,
+		isa                   => $type,
+		coerce                => !!$coerce,
+		generator_for_slot    => $slot,
+		generator_for_get     => $get,
+		generator_for_set     => $set,
+		get_is_lvalue         => $is_simple_get,
+		set_checks_isa        => !$is_simple_set,
+		set_strictly          => $spec->{weak_ref} || $spec->{trigger},
+		generator_for_default => sub {
+			my ( $gen, $handler ) = @_ or die;
+			if ( !$default and $handler ) {
 				return $handler->default_for_reset->();
 			}
-			elsif ($default->[0] eq 'builder') {
-				return sprintf('(%s)->%s', $callbacks->{self}->(), $default->[1]);
+			elsif ( $default->[0] eq 'builder' ) {
+				return sprintf(
+					'(%s)->%s',
+					$gen->generate_self,
+					$default->[1],
+				);
 			}
-			elsif ($default->[0] eq 'default' and is_CodeRef $default->[1]) {
-				return sprintf('(%s)->$shv_default_for_reset', $callbacks->{self}->());
+			elsif ( $default->[0] eq 'default' and is_CodeRef $default->[1] ) {
+				return sprintf(
+					'(%s)->$shv_default_for_reset',
+					$gen->generate_self,
+				);
 			}
-			elsif ($default->[0] eq 'default' and is_Undef $default->[1]) {
+			elsif ( $default->[0] eq 'default' and is_Undef $default->[1] ) {
 				return 'undef';
 			}
-			elsif ($default->[0] eq 'default' and is_Str $default->[1]) {
+			elsif ( $default->[0] eq 'default' and is_Str $default->[1] ) {
 				require B;
-				return B::perlstring($default->[1]);
+				return B::perlstring( $default->[1] );
 			}
-			else {
-				die 'lolwut?';
-			}
+			return;
 		},
-	};
+	);
 }
 
-sub _make_callbacks_role {
+sub _code_generator_for_role_attribute {
 	my ($me, $target, $attrname) = (shift, @_);
 	
 	if (ref $attrname) {
@@ -226,8 +232,8 @@ sub _make_callbacks_role {
 	
 	if (defined $reader_name) {
 		$get = ($reader_name =~ /^[\W0-9]\w*$/s)
-			? sub { sprintf "\$_[0]->%s", $reader_name }
-			: sub { sprintf "\$_[0]->\${\\ %s }", B::perlstring($reader_name) };
+			? sub { my $gen = shift; sprintf "%s->%s", $gen->generate_self, $reader_name }
+			: sub { my $gen = shift; sprintf "%s->\${\\ %s }", $gen->generate_self, B::perlstring($reader_name) };
 	}
 	else {
 		my ($default, $default_literal) = (undef, 0);
@@ -255,14 +261,14 @@ sub _make_callbacks_role {
 			$instance->{$attrname};
 		};
 		$captures->{'$shv_reader'} = \$dammit_i_need_to_build_a_reader;
-		$get = sub { '$_[0]->$shv_reader()' };
+		$get = sub { my $gen = shift; $gen->generate_self . '->$shv_reader()' };
 	}
 	
 	
 	if (defined $writer_name) {
 		$set = $writer_name =~ /^[\W0-9]\w*$/s
-			? sub { my $val = shift; sprintf "\$_[0]->%s(%s)", $writer_name, $val }
-			: sub { my $val = shift; sprintf "\$_[0]->\${\\ %s }(%s)", B::perlstring($writer_name), $val };
+			? sub { my ($gen, $val) = @_; sprintf "%s->%s(%s)", $gen->generate_self, $writer_name, $val }
+			: sub { my ($gen, $val) = @_; sprintf "%s->\${\\ %s }(%s)", $gen->generate_self, B::perlstring($writer_name), $val };
 	}
 	else {
 		my $trigger;
@@ -287,7 +293,7 @@ sub _make_callbacks_role {
 			$instance->{$attrname};
 		};
 		$captures->{'$shv_writer'} = \$dammit_i_need_to_build_a_writer;
-		$set = sub { my $val = shift; "\$_[0]->\$shv_writer($val)" };
+		$set = sub { my ($gen, $val) = @_; $gen->generate_self . "->\$shv_writer($val)" };
 	}
 
 	my $default;
@@ -301,42 +307,50 @@ sub _make_callbacks_role {
 	if (is_CodeRef $default->[1]) {
 		$captures->{'$shv_default_for_reset'} = \$default->[1];
 	}
-
-	return {
-		%standard_callbacks,
-		is_method      => !!1,
-		slot           => sub { '$_[0]{'.B::perlstring($attrname).'}' }, # icky
-		get            => $get,
-		get_is_lvalue  => !!0,
-		set            => $set,
-		set_checks_isa => !!1,
-		isa            => $type,
-		coerce         => !!$coerce,
-		env            => $captures,
-		be_strict      => !!0,
-		default_for_reset => sub {
-			my ($handler, $callbacks) = @_ or die;
-			if (!$default) {
+	
+	require Sub::HandlesVia::CodeGenerator;
+	return 'Sub::HandlesVia::CodeGenerator'->new(
+		toolkit               => $me,
+		target                => $target,
+		attribute             => $attrname,
+		attribute_spec        => $spec,
+		env                   => $captures,
+		isa                   => $type,
+		coerce                => !!$coerce,
+		generator_for_slot    => sub { shift->generate_self.'->{'.B::perlstring($attrname).'}' }, # icky
+		generator_for_get     => $get,
+		generator_for_set     => $set,
+		get_is_lvalue         => !!0,
+		set_checks_isa        => !!1,
+		set_strictly          => !!0,
+		generator_for_default => sub {
+			my ( $gen, $handler ) = @_ or die;
+			if ( !$default and $handler ) {
 				return $handler->default_for_reset->();
 			}
-			elsif ($default->[0] eq 'builder') {
-				return sprintf('(%s)->%s', $callbacks->{self}->(), $default->[1]);
+			elsif ( $default->[0] eq 'builder' ) {
+				return sprintf(
+					'(%s)->%s',
+					$gen->generate_self,
+					$default->[1],
+				);
 			}
-			elsif ($default->[0] eq 'default' and is_CodeRef $default->[1]) {
-				return sprintf('(%s)->$shv_default_for_reset', $callbacks->{self}->());
+			elsif ( $default->[0] eq 'default' and is_CodeRef $default->[1] ) {
+				return sprintf(
+					'(%s)->$shv_default_for_reset',
+					$gen->generate_self,
+				);
 			}
-			elsif ($default->[0] eq 'default' and is_Undef $default->[1]) {
+			elsif ( $default->[0] eq 'default' and is_Undef $default->[1] ) {
 				return 'undef';
 			}
-			elsif ($default->[0] eq 'default' and is_Str $default->[1]) {
+			elsif ( $default->[0] eq 'default' and is_Str $default->[1] ) {
 				require B;
-				return B::perlstring($default->[1]);
+				return B::perlstring( $default->[1] );
 			}
-			else {
-				die 'lolwut?';
-			}
+			return;
 		},
-	};
+	);
 }
 
 1;

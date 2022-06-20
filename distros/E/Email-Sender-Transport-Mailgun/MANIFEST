@@ -7,6 +7,7 @@ cpanfile
 lib/Email/Sender/Transport/Mailgun.pm
 minil.toml
 t/00_compile.t
+t/apikey.t
 t/failure.t
 t/live.t
 t/region.t

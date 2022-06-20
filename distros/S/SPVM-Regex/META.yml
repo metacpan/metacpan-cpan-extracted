@@ -17,7 +17,8 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
+requires:
+  SPVM::Unicode: '0.01'
 resources: {}
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

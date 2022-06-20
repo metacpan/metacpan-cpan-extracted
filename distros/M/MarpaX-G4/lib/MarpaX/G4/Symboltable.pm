@@ -3,7 +3,6 @@
 #                                                                                                       #
 # manage a symbol table with rules parsed from an antlr4 grammar.                                       #
 #                                                                                                       #
-# V 1.0                                                                                                 #
 # ----------------------------------------------------------------------------------------------------- #
 
 package MarpaX::G4::Symboltable;
@@ -293,7 +292,7 @@ sub walksubrule
     {
         $Data::Dumper::Indent = 1;
         print Dumper($rule);
-        die "'rule' is not a hash";
+        die "rule '$rulename' is not a hash";
     }
 
     my $rhs = $rule->{rightsides};
@@ -304,7 +303,7 @@ sub walksubrule
     {
         $Data::Dumper::Indent = 1;
         print Dumper($rhs);
-        die "'rhs' is not an array ref";
+        die "'rhs' is not an array ref in '$rulename'";
     }
 
     my $namelist = [];
@@ -322,25 +321,30 @@ sub joinReferences
 {
     my ($sr) = @_;
 
-    my $temp = {};
+    my $temp    = {};
+    my $result  = "";
+    my $delim   = "";
 
-    my @result = map {
-        my $s = $_;
+    for my $s (@$sr)
+    {
         if (!exists $temp->{$s})
         {
             $temp->{$s} = 1;
-            my $len = 16 - length($_);
+            my $len = 16 - length($s);
+            my $ts = $s;
             if ($len < 0)
             {
                 $len = 0;
-                $s = substr($s, 0, 16);
+                $ts = substr($ts, 0, 16);
             }
-            $s .= ' ' x $len if $len > 0;
-            $s
+            my $pad = "";
+            $pad = ' ' x $len if $len > 0;
+            $result .= $delim . $ts . $pad;
+            $delim   = " ";
         }
-    } @$sr;
+    }
 
-    return join " ", @result;
+    return $result;
 }
 
 sub verifySymbolNames
@@ -367,7 +371,7 @@ sub validateSymbolTable
     printf "===\n=== Composite Rules\n===\n\n";
     printf  <<'END_OF_SOURCE';
     +-------------------------------------------------------- rule name
- +--!-------------------------------------------------------- Fragment (F) or regular rule
+ +--!-------------------------------------------------------- Fragment (F), Lexeme (L) or regular rule
  !  !                                              +--------- redirected (->) or contributing rule
  !  !                                              !   +----- number of rule references
  !  !                                              !   !   +- list of rule references
@@ -384,12 +388,17 @@ END_OF_SOURCE
             (exists $rule->{name}) && do
             {
                 my $name             = $rule->{name};
+                # if ($name eq "alter_table_properties")
+                # {
+                #     printf "found!\n";
+                # }
                 my $symbolreferences = walksubrule($name, $rule);
 
                 if (scalar @$symbolreferences > 0)
                 {
                     my $strReferences = joinReferences($symbolreferences);
                     my $type = "";
+                    $type = "L" if exists $rule->{isLexeme} || (exists $rule->{grammarstate} && $rule->{grammarstate} eq "lexer");
                     $type = "F" if exists $rule->{type} && $rule->{type} eq "fragment";
                     printf "[%-1s][%-45s][%-2s][%2d] %s\n", $type, $name, (exists $rule->{redirect}) ? "->" : "", scalar @$symbolreferences, $strReferences;
                     $self->verifySymbolNames( $name, $symbolreferences );
@@ -407,7 +416,7 @@ END_OF_SOURCE
     printf "\n===\n=== Basic Rules\n===\n\n";
     printf  <<'END_OF_SOURCE';
     +-------------------------------------------------------- rule name
- +--!-------------------------------------------------------- Fragment (F) or regular rule
+ +--!-------------------------------------------------------- Fragment (F), Lexeme (L) or regular rule
  !  !                                              +--------- redirected (->) or contributing rule
  !  !                                              !   +----- n/a
  !  !                                              !   !
@@ -425,9 +434,14 @@ END_OF_SOURCE
                 my $name                = $rule->{name};
                 my $symbolreferences    = walksubrule($name, $rule);
 
+                if ($name eq "TILDE_OPERATOR_PART")
+                {
+                    printf "found!\n";
+                }
                 if (scalar @$symbolreferences == 0)
                 {
                     my $type = "";
+                    $type = "L" if exists $rule->{isLexeme} || (exists $rule->{grammarstate} && $rule->{grammarstate} eq "lexer");
                     $type = "F" if exists $rule->{type} && $rule->{type} eq "fragment";
                     printf "[%-1s][%-45s][%-2s][%2s] %s\n", $type, $name, (exists $rule->{redirect}) ? "->" : "", "", "";
                 }

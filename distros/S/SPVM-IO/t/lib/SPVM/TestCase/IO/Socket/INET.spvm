@@ -1,6 +1,6 @@
 class TestCase::IO::Socket::INET {
   use IO::Socket::INET;
-  use IO::Socket;
+  use IO::Socketable;
 
   static method basic : int () {
 
@@ -38,7 +38,7 @@ class TestCase::IO::Socket::INET {
     # Socket
     my $host = "google.com";
     my $port = 80;
-    my $socket = (IO::Socket)IO::Socket::INET->new($host, $port);
+    my $socket = (IO::Socketable)IO::Socket::INET->new($host, $port);
     
     my $write_buffer = "GET / HTTP/1.0\r\n\r\n";
     $socket->write($write_buffer, length $write_buffer);

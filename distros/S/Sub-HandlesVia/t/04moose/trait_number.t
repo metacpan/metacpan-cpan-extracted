@@ -12,7 +12,7 @@ use lib 't/lib';
 #use NoInlineAttribute;
 use Test::More;
 use Test::Fatal;
-#use Test::Moose;
+use Test::Moose;
 
 {
     my %handles = (
@@ -81,7 +81,7 @@ note "Testing class $class";
 
     can_ok( $class, $_ ) for sort keys %{$handles};
 
-#    with_immutable {
+    with_immutable {
         my $obj = $class->new;
 
         is( $obj->integer, 5, 'Default to five' );
@@ -159,8 +159,8 @@ note "Testing class $class";
 
             is( $obj->integer, 1, 'mod with lazy default' );
         }
-#    }
-#    $class;
+    }
+    $class;
 }
 
 done_testing;

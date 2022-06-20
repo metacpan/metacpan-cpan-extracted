@@ -1,3 +1,10 @@
+0.002   2022-06-12  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [cli grep-perl-release] Add description.
+
+
 0.001   2021-07-27  Released-By: PERLANCAR
 
         - First release.

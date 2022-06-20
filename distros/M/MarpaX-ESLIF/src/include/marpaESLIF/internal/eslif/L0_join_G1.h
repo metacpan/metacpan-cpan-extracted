@@ -9,6 +9,7 @@
 #define L0_JOIN_G1_META_QUOTED_STRING                    "quoted string"
 #define L0_JOIN_G1_META_CHARACTER_CLASS                  "character class"
 #define L0_JOIN_G1_META_REGULAR_EXPRESSION               "regular expression"
+#define L0_JOIN_G1_META_REGULAR_SUBSTITUTION             "regular substitution"
 #define L0_JOIN_G1_META_BARE_NAME                        "bare name"
 #define L0_JOIN_G1_META_BRACKETED_NAME                   "bracketed name"
 #define L0_JOIN_G1_META_RESTRICTED_ASCII_GRAPH_NAME      "restricted ascii graph name" /* [[:graph:]] without the = */

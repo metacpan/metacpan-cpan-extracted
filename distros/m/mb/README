@@ -1,6 +1,6 @@
 NAME
 
-  mb - run Perl script in MBCS encoding (not only CJK ;-)
+  mb - Can easy script in Big5, Big5-HKSCS, GBK, Sjis, UHC, UTF-8, ...
 
 SYNOPSIS
 
@@ -79,9 +79,26 @@ DESCRIPTION
   This software escapes DAMEMOJI in your script, generate a new script and
   run it.
 
-SUPPORTED PERL VERSIONS
+Larry Wall san's Style
 
-  perl version 5.005_03 to newest perl
+  If you're using the utf8 pragma and you have a big headache, probably, you're
+  on the wrong way. You should back to the Larry Street where is a sign that
+  says ver.5.00503, once.
+
+  There is another path there. Follow that path. Soon, your headache will be
+  improve.
+
+  The "length()" described in the script universally functions as "bytes::length()",
+  and the "substr()" in the script universally functions as "bytes::substr()".
+  If you want to know the number of code points of multibyte characters contained
+  in a scalar value, you have to write "mb::length()". If you want to execute
+  "substr()" in code point context, you have to write "mb::substr()".
+
+  Once, Larry Wall san said like this;
+
+  "Easy jobs must be easy."
+
+  Welcome to world of Larry Wall san's Style!!
 
 SEE ALSO
 

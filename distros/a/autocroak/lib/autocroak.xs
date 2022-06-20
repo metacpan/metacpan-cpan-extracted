@@ -30,9 +30,13 @@ static U32 pragma_hash;
 #endif
 
 #ifndef sv_string_from_errnum
+#ifndef dSAVE_ERRNO
+#   define dSAVE_ERRNO    int saved_errno = errno
+#   define RESTORE_ERRNO  (errno = saved_errno)
+#endif
+
 SV* S_sv_string_from_errnum(pTHX_ int error, SV* value) {
-	dSAVEDERRNO;
-	SAVE_ERRNO;
+	dSAVE_ERRNO;
 	errno = error;
 	SV* result = newSVsv(get_sv("!", 0));
 	RESTORE_ERRNO;
@@ -58,7 +62,8 @@ bool S_errno_in_bitset(pTHX_ SV* arg, bool default_result) {
 
 #define dAXMARKI\
 	int ax = TOPMARK + 1;\
-	SV **mark = PL_stack_base + ax - 1;
+	SV **mark = PL_stack_base + ax - 1;\
+	dITEMS
 
 #define throw_sv(message) croak_sv(sv_2mortal(message))
 
@@ -88,7 +93,6 @@ static OP* croak_##TYPE(pTHX) {\
 #define UNDEFINED_FILE_WRAPPER(TYPE, FILENAME)\
 static OP* croak_##TYPE(pTHX) {\
 	dSP;\
-	dAXMARKI;\
 	SV* filename = FILENAME;\
 	OP* next = opcodes[OP_##TYPE](aTHX);\
 	if (autocroak_enabled()) {\
@@ -109,7 +113,6 @@ static OP* croak_##TYPE(pTHX) {\
 static OP* croak_##TYPE(pTHX) {\
 	dSP;\
 	dAXMARKI;\
-	dITEMS;\
 	size_t expected = items - OFFSET;\
 	SV* filename = expected == 1 ? ST(OFFSET) : NULL;\
 	OP* next = opcodes[OP_##TYPE](aTHX);\
@@ -163,7 +166,6 @@ static OP* croak_OPEN(pTHX) {
 	if (autocroak_enabled()) {
 		dSP;
 		dAXMARKI;
-		dITEMS;\
 		if (items == 3) {
 			SV* mode = ST(1);
 			SV* filename = ST(2);
@@ -199,7 +201,6 @@ static OP* croak_SYSTEM(pTHX) {
 	if (autocroak_enabled()) {
 		dSP;
 		dAXMARKI;
-		dITEMS;
 
 		SV* arguments = newSVpvs("");
 		int i;
@@ -259,11 +260,11 @@ static OP* croak_PRINT(pTHX) {
 
 static OP* croak_SSELECT(pTHX) {
 	dSP;
-	dAXMARKI;
 	OP* next = opcodes[OP_SSELECT](aTHX);
 	if (autocroak_enabled()) {
 		SPAGAIN;
-		if (SvIV(ST(0)) < 0 && !allowed_for(SSELECT, FALSE)) {
+		SV* result = SP[GIMME_V == G_LIST ? -1 : 0];
+		if (SvIV(result) < 0 && !allowed_for(SSELECT, FALSE)) {
 			SV* message = newSVpvs("Could not select: ");
 			sv_caterror(message, errno);
 			throw_sv(message);
@@ -275,7 +276,6 @@ static OP* croak_SSELECT(pTHX) {
 static OP* croak_KILL(pTHX) {
 	dSP;
 	dAXMARKI;
-	dITEMS;
 	size_t expected = items - 1;
 	IV signal = SvIOK(ST(0)) ? SvIV(ST(0)) : -1;
 	SV* procname = expected == 1 ? ST(1) : NULL;

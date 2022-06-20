@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::DynamicPrereqs; # git description: v0.038-3-g9c7e714
+package Dist::Zilla::Plugin::DynamicPrereqs; # git description: v0.039-7-g0ef9450
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Specify dynamic (user-side) prerequisites for your distribution
 # KEYWORDS: plugin distribution metadata MYMETA prerequisites Makefile.PL dynamic
 
-our $VERSION = '0.039';
+our $VERSION = '0.040';
 
 use Moose;
 with
@@ -34,8 +34,7 @@ has raw => (
         my $self = shift;
 
         my @lines;
-        if (my $filename = $self->raw_from_file)
-        {
+        if (my $filename = $self->raw_from_file) {
             my $file = first { $_->name eq $filename } @{ $self->zilla->files };
             $self->log_fatal([ 'no such file in build: %s' ], $filename) if not $file;
             $self->zilla->prune_file($file);
@@ -77,24 +76,21 @@ sub mvp_aliases { +{
     'body_from_file' => 'raw_from_file',
 } }
 
-around BUILDARGS => sub
-{
+around BUILDARGS => sub {
     my $orig = shift;
     my $class = shift;
 
     my $args = $class->$orig(@_);
 
     my $delimiter = delete $args->{delimiter};
-    if (defined $delimiter and length($delimiter))
-    {
+    if (defined $delimiter and length($delimiter)) {
         s/^\Q$delimiter\E// foreach @{$args->{raw}};
     }
 
     return $args;
 };
 
-sub BUILD
-{
+sub BUILD {
     my ($self, $args) = @_;
 
     $self->log_fatal('[MakeMaker::Awesome] must be at least version 0.19 to be used with [DynamicPrereqs]')
@@ -103,15 +99,13 @@ sub BUILD
 
     my %extra_args = %$args;
     delete @extra_args{ map $_->name, $self->meta->get_all_attributes };
-    if (my @keys = keys %extra_args)
-    {
+    if (my @keys = keys %extra_args) {
         $self->log('Warning: unrecognized argument' . (@keys > 1 ? 's' : '')
                 . ' (' . join(', ', @keys) . ') passed. Perhaps you need to upgrade?');
     }
 }
 
-around dump_config => sub
-{
+around dump_config => sub {
     my ($orig, $self) = @_;
     my $config = $self->$orig;
 
@@ -125,8 +119,7 @@ around dump_config => sub
 
 sub metadata { return +{ dynamic_config => 1 } }
 
-sub after_build
-{
+sub after_build {
     my $self = shift;
     $self->log_fatal('Build.PL detected - dynamic prereqs will not be added to it!')
         if first { $_->name eq 'Build.PL' } @{ $self->zilla->files };
@@ -135,8 +128,7 @@ sub after_build
 # track which subs have already been included by some other instance
 my %included_subs;
 
-sub munge_files
-{
+sub munge_files {
     my $self = shift;
 
     my $file = first { $_->name eq 'Makefile.PL' } @{$self->zilla->files};
@@ -158,8 +150,7 @@ sub munge_files
     my $pos = pos($content) - length($insertion_breadcrumb);
 
     my $code = join("\n", $self->raw);
-    if (my $conditions = join(' && ', $self->conditions))
-    {
+    if (my $conditions = join(' && ', $self->conditions)) {
         $code = "if ($conditions) {\n"
             . $code . "\n"
             . '}' . "\n";
@@ -193,8 +184,7 @@ has _sub_definitions => (
     lazy => 1, builder => '_build__sub_definitions',
 );
 
-sub _build__sub_definitions
-{
+sub _build__sub_definitions {
     my $self = shift;
 
     my @include_subs = grep +(not exists $included_subs{$_}), $self->_all_required_subs;
@@ -203,8 +193,7 @@ sub _build__sub_definitions
     my $content;
     $content .= "\n" . $self->_header if not keys %included_subs;
 
-    if (my @missing_subs = grep !-f path($self->_include_sub_root, $_), @include_subs)
-    {
+    if (my @missing_subs = grep !-f path($self->_include_sub_root, $_), @include_subs) {
         $self->log_fatal(
             @missing_subs > 1
                 ? [ 'no definitions available for subs %s!', join(', ', map "'".$_."'", @missing_subs) ]
@@ -219,8 +208,7 @@ sub _build__sub_definitions
     my @sub_definitions = map path($self->_include_sub_root, $_)->slurp_utf8, @include_subs;
     $content .= "\n"
         . $self->fill_in_string(
-            join("\n", @sub_definitions),
-            {
+            join("\n", @sub_definitions), {
                 dist => \($self->zilla),
                 plugin => \$self,
             },
@@ -262,20 +250,17 @@ my %sub_inc_dependencies = (
 sub gather_files {
     my $self = shift;
 
-    foreach my $required_sub ($self->_all_required_subs)
-    {
+    foreach my $required_sub ($self->_all_required_subs) {
         # FIXME: update %included_subs earlier to account for other coexisting
         # plugins, or running two instances of the plugin will try to do this twice.
         my $include_modules = $sub_inc_dependencies{$required_sub} || {};
-        foreach my $module (keys %$include_modules)
-        {
+        foreach my $module (keys %$include_modules) {
             (my $path = $module) =~ s{::}{/}g;
             $path = path('inc', $path . '.pm');
             my $cpath = $path->canonpath;
 
             my $file = first { $_->name eq $path or $_->name eq $cpath } @{ $self->zilla->files };
-            if (not $file)
-            {
+            if (not $file) {
                 $self->log([ 'inlining %s into inc/', $module ]);
                 my $installed_filename = Module::Metadata->find_module_by_name($module)
                     or $self->log_fatal([ 'Can\'t locate %s', $module ]);
@@ -286,8 +271,7 @@ sub gather_files {
             }
             $self->log_fatal([ 'failed to find %s in files', $module ]) if not $file;
 
-            if (defined $include_modules->{$module} and $include_modules->{$module} > 0)
-            {
+            if (defined $include_modules->{$module} and $include_modules->{$module} > 0) {
                 # check that the file we got actually satisfies our dependency
                 my $mmd = $self->module_metadata_for_file($file);
                 $self->log_fatal([ '%s version %s required--only found version %s',
@@ -299,11 +283,9 @@ sub gather_files {
     }
 }
 
-sub register_prereqs
-{
+sub register_prereqs {
     my $self = shift;
-    foreach my $required_sub ($self->_all_required_subs)
-    {
+    foreach my $required_sub ($self->_all_required_subs) {
         my $configure_prereqs = $sub_prereqs{$required_sub} || {};
         $self->zilla->register_prereqs(
             {
@@ -342,6 +324,7 @@ my %sub_dependencies = (
     build_requires => [ qw(_add_prereq) ],
     test_requires => [ qw(_add_prereq) ],
     want_pp => [ qw(parse_args) ],
+    want_xs => [ qw(want_pp can_xs) ],
 );
 
 has _all_required_subs => (
@@ -365,14 +348,12 @@ has _all_required_subs => (
 );
 
 my %required_subs;
-sub _all_required_subs_for
-{
+sub _all_required_subs_for {
     my ($self, @subs) = @_;
 
     @required_subs{@subs} = (() x @subs);
 
-    foreach my $sub (@subs)
-    {
+    foreach my $sub (@subs) {
         my @subs = @{ $sub_dependencies{$sub} || [] };
         $self->_all_required_subs_for(@subs)
             if notall { exists $required_subs{$_} } @subs;
@@ -387,8 +368,7 @@ my %warn_include_sub = (
     can_run => 1,
 );
 
-sub _warn_include_subs
-{
+sub _warn_include_subs {
     my ($self, @include_subs) = @_;
 
     $self->log(colored('Use ' . $_ . ' with great care! Please consult the documentation!', 'bright_yellow'))
@@ -409,7 +389,7 @@ Dist::Zilla::Plugin::DynamicPrereqs - Specify dynamic (user-side) prerequisites 
 
 =head1 VERSION
 
-version 0.039
+version 0.040
 
 =head1 SYNOPSIS
 
@@ -636,7 +616,11 @@ C<test_requires($module [, $version ])> - adds the module to test prereqs (as a 
 
 =item *
 
-C<want_pp> - true if the user or CPAN client explicitly specified PUREPERL_ONLY (indicating that no XS-requiring modules or code should be installed)
+C<want_pp()> - true if the user or CPAN client explicitly specified C<PUREPERL_ONLY> (indicating that no XS-requiring modules or code should be installed). false if the user has explicitly specified C<PUREPERL_ONLY> as 0. undef if no preference was specified.
+
+=item *
+
+C<want_xs()> - true if C<PUREPERL_ONLY> was specified as 0, or if it was not specified and compiling XS modules is possible (checked via can_xs).
 
 =back
 
@@ -731,17 +715,27 @@ L<http://dzil.org/#mailing-list>.
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.freenode.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
 =head1 AUTHOR
 
 Karen Etheridge <ether@cpan.org>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Graham Ollis
+=for stopwords Graham Knop Ollis
+
+=over 4
+
+=item *
+
+Graham Knop <haarg@haarg.org>
+
+=item *
 
 Graham Ollis <plicease@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENCE
 

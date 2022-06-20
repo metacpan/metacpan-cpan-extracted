@@ -1,31 +1,54 @@
---- #YAML:1.0
-name:               Amazon-S3
-version:            0.45
-abstract:           ~
+---
+abstract: 'Perl interface to AWS S3 API'
 author:
-    - Timothy Appnel <tima@cpan.org>
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Rob Lauer <rlauer6@comcat.net>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Class::Accessor::Fast:  0
-    Digest::HMAC_SHA1:    0
-    Digest::MD5::File:    0
-    HTTP::Date:           0
-    IO::File:             0
-    LWP::UserAgent::Determined:  0
-    MIME::Base64:         0
-    Test::More:           0.01
-    URI::Escape:          0
-    XML::Simple:          1.08
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.54
+  Digest::MD5::File: '0.08'
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0'
+  Test::More: '1.302190'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Amazon-S3
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Amazon::S3:
+    file: lib/Amazon/S3.pm
+    version: '0.52'
+  Amazon::S3::Bucket:
+    file: lib/Amazon/S3/Bucket.pm
+    version: '0.52'
+  Amazon::S3::Constants:
+    file: lib/Amazon/S3/Constants.pm
+    version: '0.52'
+  Amazon::S3::Logger:
+    file: lib/Amazon/S3/Logger.pm
+    version: '0.52'
+requires:
+  Class::Accessor::Fast: '0.51'
+  Digest::HMAC_SHA1: '1.04'
+  Digest::MD5::File: '0.08'
+  HTTP::Date: '6.02'
+  LWP::UserAgent::Determined: '1.07'
+  List::Util: '1.5'
+  Readonly: '2.05'
+  Test::Output: '1.033'
+  URI: '5.10'
+  URI::Escape: '5.10'
+  XML::Simple: '2.25'
+resources:
+  bugtracker: http://github.com/rlauer6/perl-amazon-s3/issues
+  homepage: http://github.com/rlauer6/perl-amazon-s3
+  repository: git://github.com/rlauer6/perl-amazon-s3.git
+version: '0.52'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

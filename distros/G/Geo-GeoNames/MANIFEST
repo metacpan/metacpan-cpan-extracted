@@ -6,10 +6,15 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
+README.md
 README.pod
+t/comment-spelling.t
+t/eof.t
+t/eol.t
 t/json.t
+t/pod-coverage.t
+t/pod-spelling.t
 t/pod.t
-t/pod_coverage.t
 t/url.t
 t/useragent.t
 t/username.t

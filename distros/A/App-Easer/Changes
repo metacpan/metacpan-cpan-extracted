@@ -1,3 +1,17 @@
+2.002  2022-06-18 18:07:12 CEST
+   - release after 194 PASSes on CPAN Testers (thanks!)
+
+2.001001  2022-06-13 21:06:03 CEST
+   - Try to (blindly) address an issue with tests in Strawberry Perl
+
+2.001  2022-06-12 21:39:55 CEST
+   - Split into legacy V1 version and new V2 version
+   - Huge refactoring
+   - Added tests
+
+0.011  2022-02-03 23:58:16 CET
+   - Add support for nested children
+
 0.010  2022-01-21 20:27:52 CET
    - Fix typo bugs
    - Small fix in example

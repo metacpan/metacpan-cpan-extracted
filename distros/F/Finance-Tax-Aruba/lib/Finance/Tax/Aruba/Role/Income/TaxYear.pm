@@ -1,5 +1,5 @@
 package Finance::Tax::Aruba::Role::Income::TaxYear;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use Moose::Role;
 
 # ABSTRACT: A role that implements income tax logic
@@ -437,7 +437,7 @@ Finance::Tax::Aruba::Role::Income::TaxYear - A role that implements income tax l
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

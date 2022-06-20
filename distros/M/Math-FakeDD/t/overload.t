@@ -9,7 +9,7 @@ use warnings;
 use Math::FakeDD qw(:all);
 use Test::More;
 
-cmp_ok($Math::FakeDD::VERSION, '==', 0.03, "Version number is correct");
+cmp_ok($Math::FakeDD::VERSION, '==', 0.04, "Version number is correct");
 
 my $obj = Math::FakeDD->new();
 
@@ -73,7 +73,8 @@ unless(NV_IS_DOUBLEDOUBLE) {
     cmp_ok(Math::FakeDD->new(3) ** 0.6  , '!=', 3 ** Math::FakeDD->new('0.6'), "4:'**' overloading ok");
   }
   else {
-    # These tests should pass if NV_IS_DOUBLE
+    # Because of the extra precision, these
+    # tests should pass if NV_IS_QUAD.
     cmp_ok(Math::FakeDD->new($s1), '==', Math::FakeDD->new($s2), "DD 3**0.6 == DD 3**'0.6'");
     cmp_ok(Math::FakeDD->new(3) ** 0.6  , '==', 3 ** Math::FakeDD->new('0.6'), "4:'**' overloading ok");
   }
@@ -97,7 +98,7 @@ cmp_ok($fudd1, '==', int($fudd2), "(2 ** 100) < int((2 ** 100) + (2 **-100))");
 
 my %oload = Math::FakeDD::oload();
 
-cmp_ok(scalar keys(%oload), '==', 28, "Math::FakeDD::oload relative sizes ok");
+cmp_ok(scalar keys(%oload), '==', 31, "Math::FakeDD::oload relative sizes ok");
 
 for(0.2, 0.3, 0.4, 0.50, 0.6, 0.8, 1, 2) {
 
@@ -136,7 +137,15 @@ cmp_ok(defined($nan <=> Math::FakeDD->new(1)), '==', 0, "1: NaN with spaceship o
 
 cmp_ok(defined(Math::FakeDD->new(1) <=> $nan), '==', 0, "2: NaN with spaceship op returns undef");
 
+cmp_ok(Math::FakeDD->new('1.3'), 'eq', '[1.3 -4.4408920985006264e-17]', "dd_streq() overloading ok");
+cmp_ok(Math::FakeDD->new('1.4'), 'ne', '[1.3 -4.4408920985006264e-17]', "dd_strne() overloading ok");
 
+# overloading of '0+' uses dd_numify().
+# I haven't found a way of invoking the '0+'
+# overloading, so test dd_numify() instead.
+
+my $dd = dd_numify(Math::FakeDD->new(2 ** 10) + Math::FakeDD->new(2 ** 70));
+cmp_ok( $dd, '==', (2 ** 10) + (2 ** 70), "'dd_numify' ok");
 
 done_testing();
 

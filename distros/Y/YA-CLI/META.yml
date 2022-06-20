@@ -1,5 +1,5 @@
 ---
-abstract: 'Do CLI things'
+abstract: 'Yet another CLI framework'
 author:
   - 'Wesley Schwengle <waterkip@cpan.org>'
 build_requires:
@@ -29,20 +29,20 @@ name: YA-CLI
 provides:
   YA::CLI:
     file: lib/YA/CLI.pm
-    version: '0.001'
+    version: '0.002'
   YA::CLI::ActionRole:
     file: lib/YA/CLI/ActionRole.pm
-    version: '0.001'
+    version: '0.002'
   YA::CLI::ErrorHandler:
     file: lib/YA/CLI/ErrorHandler.pm
-    version: '0.001'
+    version: '0.002'
   YA::CLI::Usage:
     file: lib/YA/CLI/Usage.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Carp: '0'
-  Getopt::Long: '0'
-  List::Util: '0'
+  Getopt::Long: '2.39'
+  List::Util: '1.33'
   Module::Pluggable::Object: '0'
   Module::Runtime: '0'
   Moo: '0'
@@ -53,7 +53,7 @@ requires:
   perl: '5.010'
 resources:
   repository: git://gitlab.com/waterkip/yet-another-cli-module.git
-version: '0.001'
+version: '0.002'
 x_contributors:
   - 'Wesley Schwengle <wesley@opperschaap.net>'
 x_generated_by_perl: v5.34.0

@@ -81,6 +81,7 @@ sub _validators {
         accepted        => 'Dancer2::Plugin::FormValidator::Validator::Accepted',
         alpha           => 'Dancer2::Plugin::FormValidator::Validator::Alpha',
         alpha_num       => 'Dancer2::Plugin::FormValidator::Validator::AlphaNum',
+        boolean         => 'Dancer2::Plugin::FormValidator::Validator::Boolean',
         enum            => 'Dancer2::Plugin::FormValidator::Validator::Enum',
         email           => 'Dancer2::Plugin::FormValidator::Validator::Email',
         email_dns       => 'Dancer2::Plugin::FormValidator::Validator::EmailDns',

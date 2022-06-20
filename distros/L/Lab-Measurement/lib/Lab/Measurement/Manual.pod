@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation manual for Lab::Measurement
 
 =head1 VERSION
 
-version 3.820
+version 3.821
 
 =head1 OVERVIEW
 
@@ -294,7 +294,7 @@ contains support for temperature sensor and He/N2 level meters.
 
 =over
 
-=item * L<Lab::Moose::Instrument::NanonisTremea> (work in progress)
+=item * L<Lab::Moose::Instrument::NanonisTramea> (work in progress)
 
 =back
 
@@ -469,7 +469,7 @@ This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
             2019       Simon Reinhardt
             2020       Andreas K. Huettel, Sam Bingner, Simon Reinhardt
             2021       Andreas K. Huettel, Fabian Weinelt, Simon Reinhardt
-            2022       Mia Schambeck, Simon Reinhardt
+            2022       Andreas K. Huettel, Mia Schambeck, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

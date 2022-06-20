@@ -7,7 +7,7 @@ use Test::More;
 plan tests => 1;
 
 BEGIN {
-   use_ok( 'Pod::Query' ) || print "Bail out!\n";
+    use_ok( 'Pod::Query' ) || print "Bail out!\n";
 }
 
 diag( "Testing Pod::Query $Pod::Query::VERSION, Perl $], $^X" );

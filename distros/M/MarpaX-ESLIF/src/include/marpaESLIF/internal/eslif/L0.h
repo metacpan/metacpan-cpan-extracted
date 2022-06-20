@@ -35,6 +35,7 @@ typedef enum bootstrap_grammar_L0_enum {
   L0_TERMINAL_REGULAR_EXPRESSION,
   L0_TERMINAL_CHARACTER_CLASS_REGEXP,
   L0_TERMINAL_REGULAR_EXPRESSION_MODIFIERS,
+  L0_TERMINAL_REGULAR_SUBSTITUTION_MODIFIERS,
   L0_TERMINAL_STRING_MODIFIERS,
   L0_TERMINAL_RESTRICTED_ASCII_GRAPH_CHARACTERS,
   L0_TERMINAL_LUA_ACTION_NAME,
@@ -61,6 +62,7 @@ typedef enum bootstrap_grammar_L0_enum {
   L0_META_QUOTED_STRING_LITERAL,
   L0_META_CHARACTER_CLASS,
   L0_META_REGULAR_EXPRESSION,
+  L0_META_REGULAR_SUBSTITUTION,
   L0_META_GRAPH_ASCII_NAME
 } bootstrap_grammar_L0_enum_t;
 
@@ -87,6 +89,7 @@ bootstrap_grammar_meta_t bootstrap_grammar_L0_metas[] = {
   { L0_META_QUOTED_STRING_LITERAL,        L0_JOIN_G1_META_QUOTED_STRING_LITERAL,       0,       0,           0,            0,    0,               -1,       0,        NULL,       NULL },
   { L0_META_CHARACTER_CLASS,              L0_JOIN_G1_META_CHARACTER_CLASS,             0,       0,           0,            0,    0,               -1,       0,        NULL,       NULL },
   { L0_META_REGULAR_EXPRESSION,           L0_JOIN_G1_META_REGULAR_EXPRESSION,          0,       0,           0,            0,    0,               -1,       0,        NULL,       NULL },
+  { L0_META_REGULAR_SUBSTITUTION,         L0_JOIN_G1_META_REGULAR_SUBSTITUTION,        0,       0,           0,            0,    0,               -1,       0,        NULL,       NULL },
   { L0_META_GRAPH_ASCII_NAME,             L0_JOIN_G1_META_GRAPH_ASCII_NAME,            0,       0,           0,            0,    0,               -1,       0,        NULL,       NULL }
 };
 
@@ -285,7 +288,7 @@ __DATA__
   /* And it appears that is ok because a regexp starting with C comment have no sense, as well */
   /* as an empty regexp starting with // */
   { L0_TERMINAL_REGULAR_EXPRESSION, MARPAESLIF_TERMINAL_TYPE_REGEX, 0, "su",
-    "/(?![*/])(?:[^\\\\/]*(?:\\\\.[^\\\\/]*)*)/", NULL, NULL,
+    "/(?![*\\/])(?:[^\\\\\\/]*(?:\\\\.[^\\\\\\/]*)*)/", NULL, NULL,
 #ifndef MARPAESLIF_NTRACE
     "/a(b)c/", "/a("
 #else
@@ -307,6 +310,11 @@ __DATA__
   /* --------------------------------------------------------------------------------------------------------------------------------- */
   { L0_TERMINAL_REGULAR_EXPRESSION_MODIFIERS, MARPAESLIF_TERMINAL_TYPE_REGEX, 0, NULL,
     "[eijmnsxDJUuaNbcA]+", NULL, NULL,
+    NULL, NULL
+  },
+  /* --------------------------------------------------------------------------------------------------------------------------------- */
+  { L0_TERMINAL_REGULAR_SUBSTITUTION_MODIFIERS, MARPAESLIF_TERMINAL_TYPE_REGEX, 0, NULL,
+    "[xgl!f]+", NULL, NULL,
     NULL, NULL
   },
   /* --------------------------------------------------------------------------------------------------------------------------------- */
@@ -385,6 +393,10 @@ bootstrap_grammar_rule_t bootstrap_grammar_L0_rules[] = {
   { L0_META_REGULAR_EXPRESSION,               "regular expression 1",                         MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { L0_TERMINAL_REGULAR_EXPRESSION               }, -1,                        -1,      -1,             0, NULL },
   { L0_META_REGULAR_EXPRESSION,               "regular expression 2",                         MARPAESLIF_RULE_TYPE_ALTERNATIVE, 2, { L0_TERMINAL_REGULAR_EXPRESSION,
                                                                                                                                      L0_TERMINAL_REGULAR_EXPRESSION_MODIFIERS     }, -1,                        -1,      -1,             0, NULL },
+  { L0_META_REGULAR_SUBSTITUTION,             "regular substitution 1",                       MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { L0_TERMINAL_QUOTED_STRING                    }, -1,                        -1,      -1,             0, NULL },
+  { L0_META_REGULAR_SUBSTITUTION,             "regular substitution 2",                       MARPAESLIF_RULE_TYPE_ALTERNATIVE, 3, { L0_TERMINAL_QUOTED_STRING,
+                                                                                                                                     L0_TERMINAL_SEMICOLON,
+                                                                                                                                     L0_TERMINAL_REGULAR_SUBSTITUTION_MODIFIERS   }, -1,                        -1,      -1,             0, NULL },
   { L0_META_GRAPH_ASCII_NAME,                 "graph ascii name",                             MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { L0_TERMINAL_GRAPH_ASCII_CHARACTERS           }, -1,                        -1,      -1,             0, NULL }
 };
 

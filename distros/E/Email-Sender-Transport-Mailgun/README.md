@@ -43,20 +43,16 @@ The attributes all correspond directly to Mailgun parameters.
 
 ## api\_key
 
-Mailgun API key. See [https://documentation.mailgun.com/api-intro.html#authentication](https://documentation.mailgun.com/api-intro.html#authentication)
+Mailgun API key. See [https://documentation.mailgun.com/en/latest/api-intro.html#authentication-1](https://documentation.mailgun.com/en/latest/api-intro.html#authentication-1)
 
 ## domain
 
-Mailgun domain. See [https://documentation.mailgun.com/api-intro.html#base-url](https://documentation.mailgun.com/api-intro.html#base-url)
+Mailgun domain. See [https://documentation.mailgun.com/en/latest/api-intro.html#base-url-1](https://documentation.mailgun.com/en/latest/api-intro.html#base-url-1)
 
 # OPTIONAL ATTRIBUTES
 
 These (except region) correspond to the `o:` options in the `messages.mime`
-section of [https://documentation.mailgun.com/api-sending.html#sending](https://documentation.mailgun.com/api-sending.html#sending)
-
-## campaign
-
-Id of the campaign. Comma-separated string list or arrayref of strings.
+section of [https://documentation.mailgun.com/en/latest/api-sending.html#sending](https://documentation.mailgun.com/en/latest/api-sending.html#sending)
 
 ## deliverytime
 
@@ -70,7 +66,7 @@ Enables/disables DKIM signatures. `'yes'` or `'no'`.
 
 Defines used Mailgun region. `'us'` (default) or `'eu'`.
 
-See [https://documentation.mailgun.com/en/latest/api-intro.html#mailgun-regions](https://documentation.mailgun.com/en/latest/api-intro.html#mailgun-regions).
+See [https://documentation.mailgun.com/en/latest/api-intro.html#mailgun-regions-1](https://documentation.mailgun.com/en/latest/api-intro.html#mailgun-regions-1)
 
 ## tag
 
@@ -95,7 +91,7 @@ Toggles open tracking. `'yes'` or `'no'`.
 # MIME HEADERS
 
 The `o:` options above can also be specified using the `X-Mailgun-` headers
-listed here [https://documentation.mailgun.com/user\_manual.html#sending-via-smtp](https://documentation.mailgun.com/user_manual.html#sending-via-smtp)
+listed here [https://documentation.mailgun.com/en/latest/user\_manual.html#sending-via-smtp](https://documentation.mailgun.com/en/latest/user_manual.html#sending-via-smtp)
 
 If a single-valued option is specified in both the options and the headers,
 experimentation shows the header takes precedence. This doesn't seem to be
@@ -116,7 +112,6 @@ To specify any of the attributes above, prepend the attribute name with
 
 - EMAIL\_SENDER\_TRANSPORT\_api\_key
 - EMAIL\_SENDER\_TRANSPORT\_domain
-- EMAIL\_SENDER\_TRANSPORT\_campaign
 - EMAIL\_SENDER\_TRANSPORT\_deliverytime
 - EMAIL\_SENDER\_TRANSPORT\_dkim
 - EMAIL\_SENDER\_TRANSPORT\_region

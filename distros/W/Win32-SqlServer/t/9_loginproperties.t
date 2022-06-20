@@ -1,9 +1,27 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/9_loginproperties.t 30    20-04-11 12:10 Sommar $
+# $Header: /Perl/OlleDB/t/9_loginproperties.t 33    22-06-09 23:02 Sommar $
 #
 # This test suite tests that setloginproperty, Autoclose and CommandTimeout.
 #
 # $History: 9_loginproperties.t $
+# 
+# *****************  Version 33  *****************
+# User: Sommar       Date: 22-06-09   Time: 23:02
+# Updated in $/Perl/OlleDB/t
+# Exempt localdb instances from the test of changing providers, since
+# SQLOLEDB cannot communicate with these.
+# 
+# *****************  Version 32  *****************
+# User: Sommar       Date: 22-06-07   Time: 22:36
+# Updated in $/Perl/OlleDB/t
+# Cannot test the various Authentication variations with MSOLEDBSQL,
+# since this provider requires a valid certificate to be in place.
+# 
+# *****************  Version 31  *****************
+# User: Sommar       Date: 22-05-27   Time: 22:09
+# Updated in $/Perl/OlleDB/t
+# Default running with encryption off. Added a few test for the login
+# properties added in 2.013.
 # 
 # *****************  Version 30  *****************
 # User: Sommar       Date: 20-04-11   Time: 12:10
@@ -163,6 +181,8 @@ use strict;
 use Win32::SqlServer qw(:DEFAULT :consts);
 use File::Basename qw(dirname);
 
+Win32::SqlServer::SetDefaultForEncryption('Optional');
+
 # This test script reads OLLEDBTEST directly, because it uses more fields
 # from it.
 my ($olledbtest) = $ENV{'OLLEDBTEST'};
@@ -186,12 +206,12 @@ sub setup_testc {
     if ($userpw and $mainpw) {
        $testc->setloginproperty('Password', $mainpw);
     }
-    $testc->{ErrInfo}{PrintMsg}    = 17;
-    $testc->{ErrInfo}{PrintLines}  = 17;
-    $testc->{ErrInfo}{PrintText}   = 17;
-    $testc->{ErrInfo}{MaxSeverity} = 17;
-    $testc->{ErrInfo}{CarpLevel}   = 17;
-    $testc->{ErrInfo}{SaveMessages} = 1;
+     $testc->{ErrInfo}{PrintMsg}    = 17;
+     $testc->{ErrInfo}{PrintLines}  = 17;
+     $testc->{ErrInfo}{PrintText}   = 17;
+     $testc->{ErrInfo}{MaxSeverity} = 17;
+     $testc->{ErrInfo}{CarpLevel}   = 17;
+     $testc->{ErrInfo}{SaveMessages} = 1;
     return $testc;
 }
 
@@ -201,7 +221,7 @@ $| = 1;
 
 chdir dirname($0);
 
-print "1..45\n";
+print "1..49\n";
 
 # Set up a monitor connection and get login configuration.
 my $monitor = sql_init($mainserver, $mainuser, $mainpw, undef, $provider);
@@ -836,7 +856,7 @@ else {
 # provider already is SQLOLEDB, because that's what we're changing to.
 # Also, we need to use DMVs in SQL 2005 and later.
 if ($monitor->{Provider} != PROVIDER_SQLOLEDB and
-    $monitorsqlver >= 9) {
+    $monitorsqlver >= 9 and $mainserver !~ /^\(localdb\)/) {
    $testc = setup_testc;
    $testc->setloginproperty('appname', 'Lantluft');
    $testc->setloginproperty('HOSTNAME', 'Nettocourtage');
@@ -897,4 +917,70 @@ else {
    print "ok 43 # skip\n";
    print "ok 44 # skip\n";
    print "ok 45 # skip\n";
+}
+
+# Test if the Authentication property. While they are available in 
+# MSOLEDBSQL, they are only testable MSOLEDBSQL19, as they require
+# a valid certificate to be in place with MSOLEDBSQL.
+if ($monitor->{Provider} >= PROVIDER_MSOLEDBSQL19) {
+   my $testc = setup_testc(0);
+
+   # Test that incorrect value gives error message.
+   my $wrong = 'AzureDirectoryPassword';
+   eval(q!$testc->setloginproperty('Authentication', $wrong)!);
+   if ($@ =~ /Illegal.*\'\Q$wrong\E\'/) { 
+      print "ok 46\n";
+   }
+   else {
+      print "not ok 46\n";
+   }
+
+   # Test correct values.
+   if ($mainuser) {
+      $testc->setloginproperty('Authentication', 'SqlPassword');
+      $testc->setloginproperty('Username', $mainuser);
+      $testc->setloginproperty('Password', $mainpw);
+   }
+   else {
+     $testc->setloginproperty('Authentication', 'ActiveDirectoryIntegrated');
+   }
+
+   $testc->connect();
+   my $appname = $testc->sql_one('SELECT app_name()', Win32::SqlServer::SCALAR);
+   if ($appname eq '9_loginproperties.t') {
+      print "ok 47\n";
+   }
+   else {
+      print "not ok 47\n";
+   }
+
+   # Test some Azure-specific stuff. They will cause login failures on-prem.
+   # but nothing should go wrong before that.
+   $testc = setup_testc(0);
+   $testc->setloginproperty('Authentication', 'ActiveDirectoryPassword');
+   $testc->setloginproperty('Username', 'nisse@bogus.com');
+   $testc->setloginproperty('Password', 'WeakPassword');
+   $testc->connect();
+   if ($testc->{ErrInfo}{Messages}[0]{Errno} == 18456) {
+      print "ok 48\n";
+   }
+   else {
+      print "not ok 48\n";
+   }
+
+   $testc = setup_testc(0);
+   $testc->setloginproperty('AccessToken', '/JKGkDÄÄGByhb&');
+   $testc->connect();
+   if ($testc->{ErrInfo}{Messages}[0]{Errno} == 18456) {
+      print "ok 49\n";
+   }
+   else {
+      print "not ok 49\n";
+   }
+}
+else {
+   print "ok 46 # skip\n";
+   print "ok 47 # skip\n";
+   print "ok 48 # skip\n";
+   print "ok 49 # skip\n";
 }

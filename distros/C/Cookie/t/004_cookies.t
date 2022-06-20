@@ -17,6 +17,7 @@ BEGIN
 {
     use_ok( 'Cookie' );
     use_ok( 'Cookie::Jar' );
+    require "t/env.pl";
 };
 
 subtest 'methods' => sub

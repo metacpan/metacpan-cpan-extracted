@@ -1,5 +1,11 @@
 Revision history for App-perlimports
 
+0.000045  2022-06-16 21:18:31Z
+    - Document config file creation and Vim + ALE configuration (GH#83) (Olaf
+      Alders)
+    - Flush memoize cache on object creation (GH#82) (Olaf Alders)
+    - Apply perltidy 20220613 (GH#81) (Olaf Alders)
+
 0.000044  2022-05-27 18:01:51Z
     - Add log_filename to default config file content (GH#79) (Olaf Alders)
     - Don't raise some expected Mojo eval problems to the warning level (GH#80)

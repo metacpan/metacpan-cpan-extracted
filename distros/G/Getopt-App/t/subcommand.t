@@ -46,7 +46,8 @@ Subcommands:
   unknown  Try unknown.pl
 
 Options:
-  -h  
+  -h                   Print help
+  --completion-script  Print autocomplete script
 
 HERE
 };

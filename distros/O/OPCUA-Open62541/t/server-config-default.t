@@ -25,10 +25,20 @@ throws_ok { OPCUA::Open62541::ServerConfig::setDefault(1) }
 no_leaks_ok { eval { OPCUA::Open62541::ServerConfig::setDefault(1) } }
     "config type leak";
 
-lives_ok { $config->setCustomHostname("foo\0bar") }
-    "custom hostname";
-no_leaks_ok { $config->setCustomHostname("foo\0bar") }
-    "custom hostname leak";
+if ($config->can("setCustomHostname")) {
+    lives_ok { $config->setCustomHostname("foo\0bar") }
+	"custom hostname";
+    no_leaks_ok { $config->setCustomHostname("foo\0bar") }
+	"custom hostname leak";
+}
+if ($config->can("setServerUrls")) {
+    lives_ok {
+	$config->setServerUrls("opc.tcp://foo/", "opc.tcp://bar:4840/");
+    } "custom hostname";
+    no_leaks_ok {
+	$config->setServerUrls("opc.tcp://foo/", "opc.tcp://bar:4840/");
+    } "custom hostname leak";
+}
 
 ok(my $buildinfo = $config->getBuildInfo(), "buildinfo get");
 no_leaks_ok { $config->getBuildInfo() } "buildinfo leak";

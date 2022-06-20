@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Hooks::CheckJira;
 # ABSTRACT: Git::Hooks plugin which requires citation of JIRA issues in commit messages
-$Git::Hooks::CheckJira::VERSION = '3.2.2';
+$Git::Hooks::CheckJira::VERSION = '3.3.0';
 use v5.16.0;
 use utf8;
 use Log::Any '$log';
@@ -366,6 +366,8 @@ EOS
         } else {
             ++$errors;
         }
+    } continue {
+        $git->check_timeout();
     }
 
     return $errors == 0;
@@ -532,7 +534,7 @@ Git::Hooks::CheckJira - Git::Hooks plugin which requires citation of JIRA issues
 
 =head1 VERSION
 
-version 3.2.2
+version 3.3.0
 
 =head1 SYNOPSIS
 
@@ -903,6 +905,9 @@ If the subroutine returns undef it's considered to have succeeded.
 
 If it raises an exception (e.g., by invoking B<die>) it's considered
 to have failed and a proper message is produced to the user.
+
+Since the code may take much time to run, the plugin checks if the
+C<githooks.timeout> option has been violated after each code runs.
 
 =head2 check-code-ref CODESPEC
 

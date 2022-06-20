@@ -1,5 +1,9 @@
 Revision history for Perl extension Config-ENV
 
+0.19 2022-06-11T02:09:43Z
+	- Fix: Make sure error isn't empty because $^E varies by OS/locale (by akiym #14)
+	- Remove Exporter::Lite from dependencies (#16)
+
 0.18 2019-06-11T08:20:01Z
 	- FIX: Improve error messages (by akiym)
 	- FIX: Test for mswin32 (by akiym)

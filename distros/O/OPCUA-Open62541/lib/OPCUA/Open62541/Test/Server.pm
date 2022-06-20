@@ -3,7 +3,8 @@ use warnings;
 
 package OPCUA::Open62541::Test::Server;
 use OPCUA::Open62541::Test::Logger;
-use OPCUA::Open62541 qw(:ACCESSLEVELMASK :NODEIDTYPE :STATUSCODE :TYPES :VALUERANK);
+use OPCUA::Open62541 qw(:ACCESSLEVELMASK :NODEIDTYPE :STATUSCODE :TYPES
+    :VALUERANK);
 use Carp 'croak';
 use Errno 'EINTR';
 use Net::EmptyPort qw(empty_port);
@@ -313,7 +314,8 @@ sub run {
     ok($self->{log}->pid($self->{pid}), "server: log set pid");
 
     # wait until server did bind(2) the port
-    ok($self->{log}->loggrep(qr/TCP network layer listening on /, 10),
+    ok($self->{log}->loggrep(qr/TCP network layer listening on /."|".
+	qr/TCP.* Listening on all interfaces/, 10),
 	"server: log grep listening");
     return $self;
 }

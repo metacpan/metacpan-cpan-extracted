@@ -280,6 +280,7 @@ SPVM_ENV* SPVM_API_new_env_raw() {
     SPVM_API_print_stderr,
     SPVM_API_init_env,
     SPVM_API_call_init_blocks,
+    SPVM_API_get_class_id,
   };
   
   SPVM_ENV* env = calloc(1, sizeof(env_init));
@@ -1509,27 +1510,27 @@ int32_t SPVM_API_call_spvm_method_vm(SPVM_ENV* env, int32_t method_id, SPVM_VALU
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_BOOL_INT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_CONDITINAL_INT: {
         int_vars[0] = int_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_BOOL_LONG: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_CONDITINAL_LONG: {
         int_vars[0] = !!long_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_BOOL_FLOAT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_CONDITINAL_FLOAT: {
         int_vars[0] = !!float_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_BOOL_DOUBLE: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_CONDITINAL_DOUBLE: {
         int_vars[0] = !!double_vars[opcode->operand1];
         break;
       }
-      case SPVM_OPCODE_C_ID_BOOL_BOOL_OBJECT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_CONDITINAL_BOOL_OBJECT: {
         int_vars[0] = !!env->get_bool_object_value(env, *(void**)&object_vars[opcode->operand1]);
         break;
       }
-      case SPVM_OPCODE_C_ID_BOOL_OBJECT: {
+      case SPVM_OPCODE_C_ID_TYPE_CONVERSION_CONDITINAL_OBJECT: {
         int_vars[0] = !!*(void**)&object_vars[opcode->operand1];
         break;
       }
@@ -3587,6 +3588,12 @@ int32_t SPVM_API_call_spvm_method_vm(SPVM_ENV* env, int32_t method_id, SPVM_VALU
           // Push object
           SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
         }
+        
+        break;
+      }
+      case SPVM_OPCODE_C_ID_GET_CLASS_ID: {
+        int32_t class_id = opcode->operand1;
+        int_vars[opcode->operand0] = class_id;
         
         break;
       }
@@ -6695,6 +6702,25 @@ int32_t SPVM_API_get_basic_type_id(SPVM_ENV* env, const char* basic_type_name) {
   if (basic_type) {
     int32_t basic_type_id = basic_type->id;
     return basic_type_id;
+  }
+  else {
+    return -1;
+  }
+}
+
+int32_t SPVM_API_get_class_id(SPVM_ENV* env, const char* class_name) {
+  (void)env;
+
+  SPVM_RUNTIME* runtime = env->runtime;
+
+  if (class_name == NULL) {
+    return -1;
+  }
+
+  SPVM_RUNTIME_CLASS* class = SPVM_API_RUNTIME_get_class_by_name(runtime, class_name);
+  if (class) {
+    int32_t class_id = class->id;
+    return class_id;
   }
   else {
     return -1;

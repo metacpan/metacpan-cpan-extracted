@@ -9,13 +9,7 @@ use warnings;
 
 use base qw/ Alien::Base /;
 
-
-use File::Spec::Functions qw/ catfile /;
-use List::Util qw/ first /;
-
-use namespace::autoclean;
-
-our $VERSION = 'v0.3.4';
+our $VERSION = 'v0.3.5';
 
 
 sub exe {
@@ -40,7 +34,7 @@ Alien::TidyHTML5 - Download and install HTML Tidy
 
 =head1 VERSION
 
-version v0.3.4
+version v0.3.5
 
 =head1 DESCRIPTION
 
@@ -115,7 +109,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2021 by Robert Rothenberg.
+This software is Copyright (c) 2018-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

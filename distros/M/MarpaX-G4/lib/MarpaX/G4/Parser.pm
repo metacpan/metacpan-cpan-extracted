@@ -1,9 +1,8 @@
 # ----------------------------------------------------------------------------------------------------- #
 # MarpaX::G4                                                                                            #
 #                                                                                                       #
-# a grammar for parsing antlr4 grammars and translating them to Marpa grammars.                         #
+# a grammar for parsing antlr4 grammars and translating them to Marpa::R2 grammars.                     #
 #                                                                                                       #
-# V 1.0                                                                                                 #
 # ----------------------------------------------------------------------------------------------------- #
 
 package MarpaX::G4::Parser;
@@ -45,10 +44,10 @@ grammarentry                        ::= symbolrule
 
 symbolrule                          ::= name opt_return opt_comment (COLON) right_side      action => do_single_rule
 
-right_side	                        ::= rhs opt_hashcomment opt_comment end_rhs             action => do_right_side
+right_side                          ::= rhs opt_hashcomment opt_comment end_rhs             action => do_right_side
                                     |   opt_redir (SEMICOLON)                               action => do_empty_rule
 
-end_rhs		                        ::= (BAR) right_side                                    action => do_endrhs
+end_rhs                             ::= (BAR) right_side                                    action => do_endrhs
                                     |   opt_redir (SEMICOLON)                               action => do_empty_rule
 
 rhs                                 ::= nonterminal+                                        action => do_rhs
@@ -67,13 +66,13 @@ fragmentrule                        ::= (fragmentkeywd) opt_comment name opt_com
                                         (COLON) fragment_right_side                         action => do_fragment
 fragmentkeywd                       ~   'fragment'
 
-fragment_right_side	                ::= fragment_rhs opt_hashcomment opt_comment
+fragment_right_side                 ::= fragment_rhs opt_hashcomment opt_comment
                                         fragment_end_rhs                                    action => do_right_side
                                     |   (SEMICOLON)
 
 fragment_rhs                        ::= tokenlist                                           action => do_rhs
 
-fragment_end_rhs		            ::= (BAR) fragment_right_side                           action => do_endrhs
+fragment_end_rhs                    ::= (BAR) fragment_right_side                           action => do_endrhs
                                     |   (SEMICOLON)                                         action => do_empty_rule
 
 token                               ::= opt_neg literal                                     action => do_token
@@ -118,6 +117,7 @@ in_string_char                      ~   [^'\\]
                                     |   '\\'
                                     |   '\' 'u' four_hex_digits
                                     |   '\' 'u' '{' hex_digits '}'
+                                    |   '\' 'x' hex_digits
 
 # a dash ('-') character immediately following or preceding the opening/closing bracket counts as a dash not a range
 characterclass                      ~   '[-' in_class  ']'
@@ -130,6 +130,7 @@ in_class_char                       ~   [^-\]\\]
                                     |   '\' [^u]
                                     |   '\' 'u' four_hex_digits
                                     |   '\' 'u' '{' hex_digits '}'
+                                    |   '\' 'x' hex_digits
 
 hex_digits                          ~   hex_digit+
 four_hex_digits                     ~   hex_digit hex_digit hex_digit hex_digit
@@ -175,7 +176,7 @@ opt_return                          ::=
 opt_return                          ::= 'returns' (LBRACKET) namelist (RBRACKET)            action => do_return_clause
 namelist                            ::= name+
 
-optionspec                          ::= <Options Prefix> <Inline Action>                    action => do_options_spec
+optionspec                          ::= <Options Prefix> <Inline Action>                    action => do_option_spec
 <Options Prefix>                    ~   'options'
                                     |   'channels'
                                     |   'tokens'
@@ -315,6 +316,7 @@ sub flattenArray
 sub default_action
 {
     my ($self, @items ) = @_;
+    $self->do_trace("default_action", \@items);
     my $result = \@items;
     $result = $items[0] if scalar @items == 1;
     return $result;
@@ -326,10 +328,10 @@ sub do_grammar
     return \@rules;
 }
 
-sub do_options_spec
+sub do_option_spec
 {
     my ($self, @items) = @_;
-    $self->do_trace("do_options_spec", \@items);
+    $self->do_trace("do_option_spec", \@items);
     my $value = $items[1]->{action};
     $value = join("\n", @$value) if ref($value) eq "ARRAY";
     my $result = { comment => sprintf("%s : <%s>", $items[0], $value) };
@@ -645,11 +647,8 @@ sub do_rhs
 {
     my ($self, @items) = @_;
     $self->do_trace("do_rhs", \@items);
-
     my $result = $items[0];
-
     $result = \@items if scalar @items > 1;
-
     return $result;
 }
 
@@ -674,7 +673,6 @@ sub do_nonterminal
                 $self->abortWithError( "'rulecomponent' must be a scalar or a hash", $rulecomponent );
             }
         }
-
         $rulecomponent->{cardinality}  = $self->flattenArray($opt_card);
     }
 
@@ -691,7 +689,6 @@ sub do_nonterminal
                 $self->abortWithError( "'rulecomponent' must be a scalar or a hash", $rulecomponent );
             }
         }
-
         $rulecomponent->{associativity} = $self->flattenArray($opt_assoc);
     }
 
@@ -713,10 +710,9 @@ sub do_group
     $self->do_trace("do_group", \@items);
     my ( $opt_colon, $rhs, $grouplist, $opt_bar ) = @items;
 
-    $rhs = $rhs->[1] if ref $rhs eq "ARRAY" && scalar @$rhs == 1;
-
     my $resultlist = [];
 
+    $rhs = $rhs->[1]                          if ref $rhs eq "ARRAY" && scalar @$rhs == 1;
     push @$resultlist, $rhs;
 
     push @$resultlist, $grouplist             if ref $grouplist eq "HASH";
@@ -812,6 +808,7 @@ sub do_token
 sub do_assignalias
 {
     my ($self, @items ) = @_;
+    $self->do_trace("do_assignalias", \@items);
     # alias op can be '=' or '+='
     my $result = { token => $items[2], alias => { name => $items[0], op => $items[1] } };
     return $result;

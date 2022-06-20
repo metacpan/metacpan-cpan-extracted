@@ -80,3 +80,4 @@ it under the same terms as Perl itself.
 - [Test::Deep](https://metacpan.org/pod/Test%3A%3ADeep)
 - [Test::Deep::JSON](https://metacpan.org/pod/Test%3A%3ADeep%3A%3AJSON)
 - [Test::Deep::Filter](https://metacpan.org/pod/Test%3A%3ADeep%3A%3AFilter)
+- [Test2::Tools::URL](https://metacpan.org/pod/Test2%3A%3ATools%3A%3AURL)

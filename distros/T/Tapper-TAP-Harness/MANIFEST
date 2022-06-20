@@ -44,6 +44,7 @@ inc/Devel/AssertOS/iOS.pm
 inc/Devel/CheckOS.pm
 lib/Tapper/TAP/Harness.pm
 t/00-load.t
+t/archive-with-empty.t
 t/archive.t
 t/author-eol.t
 t/author-no-tabs.t
@@ -111,6 +112,7 @@ t/strange_tap_slbench.t
 t/strange_tap_v13_and_yaml.t
 t/tap-archive-1.tgz
 t/tap-archive-2.tgz
+t/tap-archive-3-with-empty.tgz
 t/tap_archive_STM_explicit_section.tap
 t/tap_archive_STM_explicit_section_no_yaml.tap
 t/tap_archive_benchmark-s3.tap

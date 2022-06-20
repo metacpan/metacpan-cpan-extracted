@@ -15,7 +15,7 @@ MooseX::Extended::Manual::Shortcuts - Shortcuts to make your Moose easier to wri
 
 =head1 VERSION
 
-version 0.21
+version 0.25
 
 =head1 ATTRIBUTE SHORTCUTS
 
@@ -46,8 +46,8 @@ These can also be used when you pass an array reference to the function:
         );
     }
 
-Note that these are I<shortcuts> and they make attributes easier to write and more consistent.
-However, you can still use full names:
+Note that these are I<shortcuts> and they make attributes easier to write and
+more consistent.  However, you can still use full names:
 
     field authz_delegate => (
         builder => '_build_my_darned_authz_delegate',
@@ -170,6 +170,20 @@ Is the same as this:
 
 Obviously, a "private" attribute, such as C<_auth_token> would get a build named
 C<_build__auth_token> (note the two underscores between "build" and "auth_token").
+
+=head1 STEALING FROM MOO
+
+You may also pass a coderef to `builder`:
+
+    field created => (
+        isa     => PositiveInt,
+        lazy    => 0,
+        builder => sub {time},
+    );
+
+This is different from C<< default => sub {...} >> because it will install a
+C<_build_created> method for you. This is useful if you with to allow a
+subclass to override this method.
 
 =head1 AUTHOR
 

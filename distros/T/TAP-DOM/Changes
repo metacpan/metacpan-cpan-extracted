@@ -1,5 +1,24 @@
 Revision history for TAP-DOM
 
+0.97      2022-06-15
+        - fix replacement tap pragma line for 'noempty_tap' situation
+
+0.96      2022-06-15
+        - avoid accidental Perl 5.10+ idiom
+
+0.95      2022-06-14
+        - reuploads are my new hobby
+
+0.94      2022-06-14
+        - tweak handling of empty TAP(::Archive) documents, so far only
+          when option 'noempty_tap' is provided to not trigger surprises.
+
+0.93.2    2021-06-21
+        - re-upload(?)
+
+0.93.1    2021-06-14
+        - fix test to work on windows
+
 0.93      2021-06-05
         - provide mnemonics table for severity
         - evaluate TAP::DOM-specific pragma +tapdom_error

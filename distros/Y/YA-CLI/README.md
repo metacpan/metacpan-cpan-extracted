@@ -43,7 +43,7 @@ Override the default search path, defaults to your Your::App namespace.
 ## default\_handler
 
 Defaults to `main` for your default handler. If this handler cannot be found
-ultimatly falls back to [YA::CLI::MainHandler](https://metacpan.org/pod/YA%3A%3ACLI%3A%3AMainHandler) which deals with just `--help`
+ultimatly falls back to [YA::CLI::ErrorHandler](https://metacpan.org/pod/YA%3A%3ACLI%3A%3AErrorHandler) which deals with just `--help`
 and `--man` commands.
 
 ## cli\_options

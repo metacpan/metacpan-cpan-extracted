@@ -5,7 +5,7 @@ use v5.12;
 
 package Chart::Points;
 our @ISA     = qw(Chart::Base);
-our $VERSION = 'v2.402.1';
+our $VERSION = 'v2.402.3';
 
 use Carp;
 use GD;

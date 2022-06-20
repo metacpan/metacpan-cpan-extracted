@@ -31,7 +31,7 @@ use Astro::FITS::HdrTrans::FITS qw/ UTSTART UTEND /;
 
 use vars qw/ $VERSION /;
 
-$VERSION = "1.64";
+$VERSION = "1.65";
 
 # For a constant mapping, there is no FITS header, just a generic
 # header that is constant.

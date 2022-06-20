@@ -1,6 +1,6 @@
 package Text::Table::Tiny;
-$Text::Table::Tiny::VERSION = '1.02';
-use 5.010;
+$Text::Table::Tiny::VERSION = '1.03';
+use 5.008;
 use strict;
 use warnings;
 use utf8;
@@ -29,6 +29,7 @@ my %arguments = (
     style => "styling of table, one of classic, boxrule, or norule",
     indent => "indent every row of the table a certain number of spaces",
     compact => "narrow columns (no space either side of content)",
+    header => "array ref with header columns",
 );
 
 my %charsets = (
@@ -47,11 +48,23 @@ sub generate_table
 
     my $rows    = $param{rows} or croak "you must pass the 'rows' argument!";
     my @rows    = @$rows;
-    my @widths  = _calculate_widths($rows);
 
-    $param{style}  //= 'classic';
+    if (exists($param{header}) && exists($param{header_row})) {
+        croak "you can't pass both header and header_row arguments";
+    }
 
-    $param{indent} //= '';
+    if (exists $param{header}) {
+        if (not is_arrayref($param{header})) {
+            croak "the 'header' argument expects an arrayref\n"
+        }
+        unshift(@rows, $param{header});
+        $param{header_row} = 1;
+    }
+    my @widths  = _calculate_widths(\@rows);
+
+    $param{style} = 'classic' if not defined $param{style};
+
+    $param{indent} = '' if not defined $param{indent};
     $param{indent} = ' ' x $param{indent} if $param{indent} =~ /^[0-9]+$/;
 
     my $style   = $param{style};
@@ -151,7 +164,7 @@ sub _text_row
     my $text = $param->{indent}.$char->{VR};
 
     for (my $i = 0; $i < @$widths; $i++) {
-        $text .= _format_column($columns[$i] // '', $widths->[$i], $align->[$i] // 'l', $param, $char);
+        $text .= _format_column($columns[$i], $widths->[$i], $align->[$i], $param, $char);
         $text .= $char->{VR};
     }
     $text .= "\n";
@@ -162,6 +175,9 @@ sub _text_row
 sub _format_column
 {
     my ($text, $width, $align, $param, $char) = @_;
+    $text  = ''  if not defined $text;
+    $align = 'l' if not defined $align;
+
     my $pad = $param->{compact} ? '' : ' ';
 
     if ($align eq 'r' || $align eq 'right') {
@@ -287,6 +303,15 @@ header_row
 If given a true value, the first row in the data will be interpreted
 as a header row, and separated from the rest of the table with a ruled line.
 
+
+=item *
+
+header
+
+Takes an array reference which has the header row to use for the table.
+You can't use this option together with C<header_row>.
+
+Added in 1.03
 
 =item *
 

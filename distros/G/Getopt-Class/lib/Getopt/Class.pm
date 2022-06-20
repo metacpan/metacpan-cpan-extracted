@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Getopt::Long with Class - ~/lib/Getopt/Class.pm
-## Version v0.102.6
-## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Version v0.102.7
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/04/25
-## Modified 2022/03/12
+## Modified 2022/06/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -20,10 +20,12 @@ BEGIN
     use DateTime::Format::Strptime;
 	use Devel::Confess;
     use Getopt::Long;
+    use Module::Generic::Array;
     use Module::Generic::File qw( file );
+    use Module::Generic::Scalar;
     use Nice::Try;
     use Scalar::Util;
-    our $VERSION = 'v0.102.6';
+    our $VERSION = 'v0.102.7';
 };
 
 sub init
@@ -364,7 +366,7 @@ sub exec
     $self->message( 3, "Options data is: ", sub{ $self->dumper( $opts ) } );
     $self->message( 3, "Params are: ", sub{ $self->dumper( $params ) } );
     $self->message( 3, "Enabling aliasing." );
-    $tie->enable( 1 );
+    $tie->enable(1);
     $getopt->getoptions( $opts, @$params ) || do
     {
         my $usage = $self->usage;
@@ -393,7 +395,7 @@ sub exec
     }
     $self->missing( $missing );
     
-    ## Make sure we can access each of the options dictionary definition not just from the original key, but also from any of it aliases
+    # Make sure we can access each of the options dictionary definition not just from the original key, but also from any of it aliases
     my $aliases = $self->{aliases};
     foreach my $k ( keys( %$dict ) )
     {
@@ -407,6 +409,67 @@ sub exec
     $self->message( 3, "Enabling aliasing." );
     $tie->enable(1);
     
+    $self->postprocess;
+    
+    $self->message( 3, "Options data are now: ", sub{ $self->dumper( $opts ) } );
+    ## return( $opts );
+    ## e return a Getopt::Class::Values object, so we can call the option values hash key as method:
+    ## $object->metadata / $object->metadata( $some_hash );
+    ## instead of:
+    ## $object->{metadata}
+    ## return( $opts );
+    my $o = Getopt::Class::Values->new({
+        data => $opts,
+        dict => $dict,
+        aliases => $aliases,
+        debug => $self->{debug},
+    }) || return( $self->pass_error( Getopt::Class::Values->error ) );
+    return( $o );
+}
+
+sub get_class_values
+{
+    my $self  = shift( @_ );
+    my $class = shift( @_ ) || return( $self->error( "No class was provided to return its definition" ) );
+    return( $self->error( "Class provided '$class' is not a string." ) ) if( ref( $class ) );
+    my $this_dict = $self->class( $class ) || return;
+    my $opts = $self->options;
+    return( $self->error( "The data returned by options() is not an hash reference." ) ) if( !$self->_is_hash( $opts ) );
+    return( $self->error( "Somehow, the options hash is empty!" ) ) if( !scalar( keys( %$opts ) ) );
+    my $v = {};
+    $v = shift( @_ ) if( scalar( @_ ) && $self->_is_hash( $_[0] ) );
+    foreach my $f ( sort( keys( %$this_dict ) ) )
+    {
+        my $ref = lc( Scalar::Util::reftype( $opts->{ $f } ) );
+        if( $ref eq 'hash' )
+        {
+            $v->{ $f } = $opts->{ $f } if( scalar( keys( %{$opts->{ $f }} ) ) > 0 );
+        }
+        elsif( $ref eq 'array' )
+        {
+            $v->{ $f } = $opts->{ $f } if( scalar( @{$opts->{ $f }} ) > 0 );
+        }
+        elsif( !length( $ref ) )
+        {
+            $v->{ $f } = $opts->{ $f } if( length( $opts->{ $f } ) );
+        }
+    }
+    return( $v );
+}
+
+sub getopt { return( shift->_set_get_object( 'getopt', 'Getopt::Long::Parser', @_ ) ); }
+
+sub missing { return( shift->_set_get_array_as_object( 'missing', @_ ) ); }
+
+sub options { return( shift->_set_get_hash( 'options', @_ ) ); }
+
+sub parameters { return( shift->_set_get_array_as_object( 'parameters', @_ ) ); }
+
+sub postprocess
+{
+    my $self = shift( @_ );
+    my $dict = $self->dictionary;
+    my $opts = $self->options;
     $self->messagef( 3, "%d option keys found in dictionary.", scalar( keys( %$dict ) ) );
     foreach my $k ( sort( keys( %$dict ) ) )
     {
@@ -533,60 +596,8 @@ sub exec
             $opts->{ $k } = $arr;
         }
    }
-    
-    $self->message( 3, "Options data are now: ", sub{ $self->dumper( $opts ) } );
-    ## return( $opts );
-    ## e return a Getopt::Class::Values object, so we can call the option values hash key as method:
-    ## $object->metadata / $object->metadata( $some_hash );
-    ## instead of:
-    ## $object->{metadata}
-    ## return( $opts );
-    my $o = Getopt::Class::Values->new({
-        data => $opts,
-        dict => $dict,
-        aliases => $aliases,
-        debug => $self->{debug},
-    }) || return( $self->pass_error( Getopt::Class::Values->error ) );
-    return( $o );
+   return( $self );
 }
-
-sub get_class_values
-{
-    my $self  = shift( @_ );
-    my $class = shift( @_ ) || return( $self->error( "No class was provided to return its definition" ) );
-    return( $self->error( "Class provided '$class' is not a string." ) ) if( ref( $class ) );
-    my $this_dict = $self->class( $class ) || return;
-    my $opts = $self->options;
-    return( $self->error( "The data returned by options() is not an hash reference." ) ) if( !$self->_is_hash( $opts ) );
-    return( $self->error( "Somehow, the options hash is empty!" ) ) if( !scalar( keys( %$opts ) ) );
-    my $v = {};
-    $v = shift( @_ ) if( scalar( @_ ) && $self->_is_hash( $_[0] ) );
-    foreach my $f ( sort( keys( %$this_dict ) ) )
-    {
-        my $ref = lc( Scalar::Util::reftype( $opts->{ $f } ) );
-        if( $ref eq 'hash' )
-        {
-            $v->{ $f } = $opts->{ $f } if( scalar( keys( %{$opts->{ $f }} ) ) > 0 );
-        }
-        elsif( $ref eq 'array' )
-        {
-            $v->{ $f } = $opts->{ $f } if( scalar( @{$opts->{ $f }} ) > 0 );
-        }
-        elsif( !length( $ref ) )
-        {
-            $v->{ $f } = $opts->{ $f } if( length( $opts->{ $f } ) );
-        }
-    }
-    return( $v );
-}
-
-sub getopt { return( shift->_set_get_object( 'getopt', 'Getopt::Long::Parser', @_ ) ); }
-
-sub missing { return( shift->_set_get_array_as_object( 'missing', @_ ) ); }
-
-sub options { return( shift->_set_get_hash( 'options', @_ ) ); }
-
-sub parameters { return( shift->_set_get_array_as_object( 'parameters', @_ ) ); }
 
 sub required { return( shift->_set_get_array_as_object( 'required', @_ ) ); }
 
@@ -1080,7 +1091,7 @@ Getopt::Class - Extended dictionary version of Getopt::Long
 
 =head1 VERSION
 
-    v0.102.6
+    v0.102.7
 
 =head1 DESCRIPTION
 

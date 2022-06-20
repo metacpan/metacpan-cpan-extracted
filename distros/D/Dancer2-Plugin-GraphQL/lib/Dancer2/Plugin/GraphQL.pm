@@ -7,7 +7,7 @@ use Dancer2::Plugin;
 use GraphQL::Execution qw(execute);
 use Module::Runtime qw(require_module);
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 has graphiql => (
   is => 'ro',
@@ -266,6 +266,7 @@ __DATA__
 <!--
 Copied from https://github.com/graphql/express-graphql/blob/master/src/renderGraphiQL.js
 Converted to use the simple template to capture the CGI args
+Added the apollo-link-ws stuff, marked with "ADDED"
 -->
 <!--
 The request to this GraphQL server provided the header "Accept: text/html"
@@ -288,14 +289,51 @@ add "&raw" to the end of the URL within a browser.
       width: 100%;
     }
   </style>
-  <link href="//cdn.jsdelivr.net/npm/graphiql@<% graphiql_version %>/graphiql.css" rel="stylesheet" />
+  <link href="//cdn.jsdelivr.net/npm/graphiql@[% graphiql_version %]/graphiql.css" rel="stylesheet" />
   <script src="//cdn.jsdelivr.net/fetch/0.9.0/fetch.min.js"></script>
-  <script src="//cdn.jsdelivr.net/react/15.4.2/react.min.js"></script>
-  <script src="//cdn.jsdelivr.net/react/15.4.2/react-dom.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/graphiql@<% graphiql_version %>/graphiql.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/graphiql@[% graphiql_version %]/graphiql.min.js"></script>
 </head>
 <body>
-  <script>
+  <script type="module">
+    var defaultQuery = `
+# Welcome to GraphiQL
+#
+# GraphiQL is an in-browser tool for writing, validating, and
+# testing GraphQL queries.
+#
+# Type queries into this side of the screen, and you will see intelligent
+# typeaheads aware of the current GraphQL type schema and live syntax and
+# validation errors highlighted within the text.
+#
+# GraphQL queries typically start with a "{" character. Lines that start
+# with a # are ignored.
+#
+# An example GraphQL query might look like:
+#
+#     {
+#       field(arg: "value") {
+#         subField
+#       }
+#     }
+#
+# Calder notes:
+#
+#   Open the "Request Headers" panel located at the bottom of this page
+#   to specify Business-Unit and other headers as a JSON object.
+#
+# Keyboard shortcuts:
+#
+#  Prettify Query:  Shift-Ctrl-P (or press the prettify button above)
+#
+#     Merge Query:  Shift-Ctrl-M (or press the merge button above)
+#
+#       Run Query:  Ctrl-Enter (or press the play button above)
+#
+#   Auto Complete:  Ctrl-Space (or just start typing)
+#
+`;
     // Collect the URL parameters
     var parameters = {};
     window.location.search.substr(1).split('&').forEach(function (entry) {
@@ -318,7 +356,8 @@ add "&raw" to the end of the URL within a browser.
     var graphqlParamNames = {
       query: true,
       variables: true,
-      operationName: true
+      operationName: true,
+      headers: true
     };
     var otherParams = {};
     for (var k in parameters) {
@@ -329,12 +368,17 @@ add "&raw" to the end of the URL within a browser.
     var fetchURL = locationQuery(otherParams);
     // Defines a GraphQL fetcher using the fetch API.
     function graphQLFetcher(graphQLParams) {
+      var headers =  {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      };
+      var extra_headers = JSON.parse(
+        parameters.headers || localStorage.getItem('graphiql:headers') || '{ }'
+      );
+      Object.assign(headers, extra_headers);
       return fetch(fetchURL, {
         method: 'post',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
+        headers: headers,
         body: JSON.stringify(graphQLParams),
         credentials: 'include',
       }).then(function (response) {
@@ -361,20 +405,29 @@ add "&raw" to the end of the URL within a browser.
       parameters.operationName = newOperationName;
       updateURL();
     }
+    function onEditHeaders(newHeaders) {
+      parameters.headers = newHeaders;
+      updateURL();
+    }
     function updateURL() {
       history.replaceState(null, null, locationQuery(parameters));
     }
+    let myCustomFetcher = graphQLFetcher;
     // Render <GraphiQL /> into the body.
     ReactDOM.render(
       React.createElement(GraphiQL, {
-        fetcher: graphQLFetcher,
+        fetcher: myCustomFetcher, // ADDED changed from graphQLFetcher
         onEditQuery: onEditQuery,
         onEditVariables: onEditVariables,
         onEditOperationName: onEditOperationName,
-        query: <% queryString %>,
-        response: <% resultString %>,
-        variables: <% variablesString %>,
-        operationName: <% operationName %>,
+        onEditHeaders: onEditHeaders,
+        defaultSecondaryEditorOpen: true,
+        shouldPersistHeaders: true,
+        defaultQuery: defaultQuery,
+        query: [% queryString %],
+        response: [% resultString %],
+        variables: [% variablesString %],
+        operationName: [% operationName %],
       }),
       document.body
     );

@@ -4,8 +4,8 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{mb},
-    'VERSION'   => q{0.43},
-    'ABSTRACT'  => q{Scripting in Big5, Big5-HKSCS, GBK, Sjis, UHC, UTF-8, ...},
+    'VERSION'   => q{0.44},
+    'ABSTRACT'  => q{Can easy script in Big5, Big5-HKSCS, GBK, Sjis, UHC, UTF-8, ...},
     'PREREQ_PM' => {
         'Cwd' => '0',
         'ExtUtils::MakeMaker' => '5.4302',

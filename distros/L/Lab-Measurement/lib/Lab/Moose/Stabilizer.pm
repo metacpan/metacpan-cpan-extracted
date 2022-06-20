@@ -1,5 +1,5 @@
 package Lab::Moose::Stabilizer;
-$Lab::Moose::Stabilizer::VERSION = '3.820';
+$Lab::Moose::Stabilizer::VERSION = '3.821';
 #ABSTRACT: Sensor stabilizer subroutine
 
 use v5.20;
@@ -140,7 +140,7 @@ Lab::Moose::Stabilizer - Sensor stabilizer subroutine
 
 =head1 VERSION
 
-version 3.820
+version 3.821
 
 =head1 DESCRIPTION
 

@@ -27,7 +27,7 @@ BEGIN {
 };
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.013';
+our $VERSION   = '0.014';
 our @ISA       = qw/ Exporter::Tiny /;
 
 fieldhash( our %FIELDS );
@@ -98,40 +98,28 @@ sub install_accessors : method
 	}
 	
 	if (defined $me->{handles}) {
+		
 		my $shv_data;
 		if ($me->{traits} or $me->{handles_via}) {
-			my $orig_handles = $me->{handles};
-			require Sub::HandlesVia::Toolkit::Plain;
-			$shv_data = 'Sub::HandlesVia::Toolkit::Plain'->clean_spec(
+			
+			my @pairs = $me->expand_handles;
+			my %handles_map;
+			while ( @pairs ) {
+				my ( $name ) = splice( @pairs, 0, 2 );
+				$handles_map{"$name"} = $name;
+			}
+			
+			require Sub::HandlesVia::Toolkit::SubAccessorSmall;
+			my $SHV = 'Sub::HandlesVia::Toolkit::SubAccessorSmall'->new(
+				attr => $me,
+				handles_map => \%handles_map,
+			);
+			$shv_data = $SHV->clean_spec(
 				$me->{package},
 				$me->{slot},
 				+{%$me},
 			);
-			if ($shv_data) {
-				my @default =
-					ref($me->{default})    ? ( $me->{default} ) :
-					length($me->{builder}) ? ( $me->{builder} ) :
-					();
-				my $callbacks = 'Sub::HandlesVia::Toolkit::Plain'->make_callbacks(
-					$me->{package},
-					[ $me->reader, $me->writer, @default ],
-				);
-				require Sub::HandlesVia::Handler;
-				$me->{handles} = $orig_handles;
-				my @pairs = $me->expand_handles;
-				while (@pairs) {
-					my ($target, $method) = splice(@pairs, 0, 2);
-					my $handler = 'Sub::HandlesVia::Handler'->lookup($method, $shv_data->{handles_via});
-					$me->install_coderef(
-						$target,
-						$handler->coderef(
-							%$callbacks,
-							target        => $me->{package},
-							method_name   => ref($target) ? '__ANON__' : $target,
-						),
-					);
-				}
-			}
+			$shv_data and $SHV->install_delegations( $shv_data );
 		}
 		
 		if (!$shv_data) {

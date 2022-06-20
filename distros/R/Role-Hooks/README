@@ -116,6 +116,17 @@ DESCRIPTION
         inappropriate target, it is probably better to do that in
         `before_apply` if you can.
 
+    `after_inflate`
+          Role::Hooks->after_inflate($pkg_name, $callback);
+
+        Even though this is part of Role::Hooks, it works on classes too. But
+        it only works on classes and roles built using Moo. This runs your
+        callback if your Moo class or role gets "inflated" to a Moose class or
+        role.
+
+        If you set up a callback for a role, then the callback will also get
+        called if any packages that role was applied to get inflated.
+
     `is_role`
         Will return true if the given package seems to be a role, false
         otherwise.

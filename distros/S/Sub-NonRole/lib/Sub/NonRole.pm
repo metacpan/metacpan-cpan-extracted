@@ -2,15 +2,15 @@ package Sub::NonRole;
 
 use 5.008;
 use strict;
+use warnings;
 
 BEGIN {
 	$Sub::NonRole::AUTHORITY = 'cpan:TOBYINK';
-	$Sub::NonRole::VERSION   = '0.004';
+	$Sub::NonRole::VERSION   = '0.006';
 }
 
 use Hook::AfterRuntime;
-use MooX::CaptainHook -all;
-use Sub::Identify 'get_code_info';
+use Role::Hooks 0.005;
 
 use base 'Sub::Talisman';
 
@@ -39,23 +39,20 @@ sub _post_process
 	{
 		$Role::Tiny::INFO{$caller}{not_methods}{$_} = $caller->can($_) for @subs;
 		
-		on_application {
-			my ($role, $pkg) = @{ $_[0] };
-		} $caller;
-		
-		on_inflation {
-			if ($_->name eq $caller) {
+		'Role::Hooks'->after_inflate( $caller, sub {
+			my $this = shift;
+			if ($this eq $caller) {
 				require Moose::Util::MetaRole;
 				_mk_moose_trait();
-				$_[0][0] = Moose::Util::MetaRole::apply_metaroles(
+				my $meta = Moose::Util::MetaRole::apply_metaroles(
 					for => $caller,
 					role_metaroles => {
 						role => ['Sub::NonRole::Trait::Role'],
 					},
 				);
-				@{ $_[0][0]->non_role_methods } = @subs;
+				@{ $meta->non_role_methods } = @subs;
 			}
-		} $caller;
+		} );
 	}
 	
 	$INC{'Class/MOP.pm'} or return;
@@ -225,7 +222,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013 by Toby Inkster.
+This software is copyright (c) 2013-2022 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

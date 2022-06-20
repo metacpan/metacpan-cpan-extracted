@@ -3,11 +3,12 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: MIDI pitches for guitar chord voicings
 
-our $VERSION = '0.0608';
+our $VERSION = '0.0704';
 
 use strict;
 use warnings;
 
+use Carp qw(croak);
 use File::ShareDir qw(dist_dir);
 use List::Util qw(any zip);
 use Music::Note;
@@ -15,6 +16,8 @@ use Text::CSV_XS ();
 use Moo;
 use strictures 2;
 use namespace::clean;
+
+with('Music::PitchNum');
 
 
 has voicing_file => (
@@ -43,7 +46,7 @@ sub _build_chords {
     my $csv = Text::CSV_XS->new({ binary => 1 });
 
     open my $fh, '<', $file
-        or die "Can't read $file: $!";
+        or croak "Can't read $file: $!";
 
     while (my $row = $csv->getline($fh)) {
         my $chord = shift @$row;
@@ -65,7 +68,8 @@ sub _build_chords {
 sub transform {
     my ($self, $target, $chord_name, $variation) = @_;
 
-    $target = Music::Note->new($target, 'ISO')->format('midinum');
+    $target = $self->pitchnum($target);
+    croak 'Invalid note' unless $target;
 
     $chord_name //= '';
 
@@ -136,7 +140,7 @@ sub voicings {
 sub fingering {
     my ($self, $target, $chord_name, $variation) = @_;
 
-    $target = Music::Note->new($target, 'ISO')->format('midinum');
+    $target = $self->pitchnum($target);
 
     $chord_name //= '';
 
@@ -144,12 +148,36 @@ sub fingering {
 
     if (defined $variation) {
         my $fingering = $self->chords->{ 'C' . $chord_name }{fingering}[$variation];
-
         my $pitches = $self->chords->{ 'C' . $chord_name }{notes}[$variation];
-        my $diff = $target - _lowest_c($pitches);
 
-        my ($str, $pos) = split /-/, $fingering;
-        my $p = $pos + $diff;
+        my ($str, $p) = _find_fingering($target, $pitches, $fingering);
+
+        push @fingering, $str . '-' . $p if $p >= 0;
+    }
+    else {
+        for (zip $self->chords->{ 'C' . $chord_name }{notes}, $self->chords->{ 'C' . $chord_name }{fingering}) {
+            my ($pitches, $fingering) = @$_;
+
+            my ($str, $p) = _find_fingering($target, $pitches, $fingering);
+
+            push @fingering, $str . '-' . $p if $p >= 0;
+        }
+    }
+
+    return \@fingering;
+}
+
+# XXX This is overly complicated, questionable logic
+sub _find_fingering {
+    my ($target, $pitches, $fingering) = @_;
+
+    my $diff = $target - _lowest_c($pitches);
+
+    my ($str, $pos) = split /-/, $fingering;
+
+    my $p = $pos + $diff;
+
+    if ($pos != 1 && $str !~ /0/) {
         if ($p == 0 && $str !~ /0/) {
             $str = _decrement_fingering($str);
             $p++;
@@ -157,27 +185,15 @@ sub fingering {
         elsif ($p != 0 && $str =~ /0/) {
             $str = _increment_fingering($str);
         }
-        push @fingering, $str . '-' . $p;
     }
-    else {
-        for (zip $self->chords->{ 'C' . $chord_name }{notes}, $self->chords->{ 'C' . $chord_name }{fingering}) {
-            my ($pitches, $fingering) = @$_;
-            my $diff = $target - _lowest_c($pitches);
-            my ($str, $pos) = split /-/, $fingering;
-            my $p = $pos + $diff;
-            if ($p == 0 && $str !~ /0/) {
-                $str = _decrement_fingering($str);
-                $p++;
-            }
-            elsif ($p != 0 && $str =~ /0/) {
-                $str = _increment_fingering($str);
-            }
-            push @fingering, $str . '-' . $p;
-        }
+    elsif ($p > 1 && $str =~ /0/) {
+        $str = _increment_fingering($str);
+        $p--;
     }
 
-    return \@fingering;
+    return $str, $p;
 }
+
 
 sub _increment_fingering {
     my ($fingering) = @_;
@@ -211,7 +227,7 @@ MIDI::Chord::Guitar - MIDI pitches for guitar chord voicings
 
 =head1 VERSION
 
-version 0.0608
+version 0.0704
 
 =head1 SYNOPSIS
 
@@ -242,9 +258,8 @@ voicings of an C<E A D G B E> tuned guitar.
 <img src="https://raw.githubusercontent.com/ology/MIDI-Chord-Guitar/main/guitar-position-midi-numbers.png">
 
 In order to craft a MIDI-Perl program with appropriate
-transformations, cross-reference the voicing CSV included in this
-distribution, with the diagrams above.  Check out the fingering
-column, and choose the best voicing to use.
+transformations, cross-reference the voicing CSV
+(B<voicing_file>) with the diagrams above.
 
 Alternatively, inspect the results of the C<fingering> method for each
 chord, and select those that are appropriate.
@@ -340,6 +355,8 @@ placement.
 
 The F<t/01-methods.t> and F<eg/*> files in this distribution
 
+The F<eg/fretboard> program in the L<Music::FretboardDiagram> distribution
+
 The CSV of chords used by this module (with the C<voicing_file> attribute)
 
 L<File::ShareDir>
@@ -362,7 +379,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -45,6 +45,10 @@ examples/spvmcc/basic/myapp
 examples/spvmcc/basic/README.txt
 examples/spvmcc/basic/SPVM/MyApp.spvm
 lib/SPVM.pm
+lib/SPVM/Array.c
+lib/SPVM/Array.config
+lib/SPVM/Array.pm
+lib/SPVM/Array.spvm
 lib/SPVM/BlessedObject.pm
 lib/SPVM/BlessedObject/Array.pm
 lib/SPVM/BlessedObject/Class.pm
@@ -199,7 +203,8 @@ lib/SPVM/Document/NativeAPI/Compiler.pm
 lib/SPVM/Document/NativeAPI/Precompile.pm
 lib/SPVM/Document/NativeAPI/Runtime.pm
 lib/SPVM/Document/NativeAPI/StringBuffer.pm
-lib/SPVM/Document/NativeMethod.pm
+lib/SPVM/Document/NativeModule.pm
+lib/SPVM/Document/Resource.pm
 lib/SPVM/Document/Tutorial.pm
 lib/SPVM/Document/Tutorial/Complex.pm
 lib/SPVM/Double.pm
@@ -217,6 +222,10 @@ lib/SPVM/Fn.c
 lib/SPVM/Fn.config
 lib/SPVM/Fn.pm
 lib/SPVM/Fn.spvm
+lib/SPVM/Format.c
+lib/SPVM/Format.config
+lib/SPVM/Format.pm
+lib/SPVM/Format.spvm
 lib/SPVM/Hash.c
 lib/SPVM/Hash.config
 lib/SPVM/Hash.pm
@@ -236,6 +245,8 @@ lib/SPVM/Point.spvm
 lib/SPVM/Short.pm
 lib/SPVM/ShortList.pm
 lib/SPVM/ShortList.spvm
+lib/SPVM/Sort.pm
+lib/SPVM/Sort.spvm
 lib/SPVM/Stringable.pm
 lib/SPVM/Stringable.spvm
 lib/SPVM/StringBuffer.pm
@@ -248,6 +259,8 @@ lib/SPVM/Time.c
 lib/SPVM/Time.config
 lib/SPVM/Time.pm
 lib/SPVM/Time.spvm
+lib/SPVM/Time/Info.c
+lib/SPVM/Time/Info.config
 lib/SPVM/Time/Info.pm
 lib/SPVM/Time/Info.spvm
 Makefile.PL
@@ -325,6 +338,7 @@ t/default/begin.t
 t/default/bit_not.t
 t/default/bit_operator.t
 t/default/callback.t
+t/default/class_id.t
 t/default/class_var.t
 t/default/comment.t
 t/default/comparison_operator.t
@@ -372,6 +386,7 @@ t/default/lib/SPVM/TestCase/Callback/Callback.spvm
 t/default/lib/SPVM/TestCase/Callback/ImplementCallback1.spvm
 t/default/lib/SPVM/TestCase/Callback/ImplementCallback2.spvm
 t/default/lib/SPVM/TestCase/CLASS.spvm
+t/default/lib/SPVM/TestCase/ClassId.spvm
 t/default/lib/SPVM/TestCase/ClassVar.spvm
 t/default/lib/SPVM/TestCase/Comment/CR.spvm
 t/default/lib/SPVM/TestCase/Comment/CRLF.spvm
@@ -518,6 +533,7 @@ t/default/lib/SPVM/TestCase/Inline.spvm
 t/default/lib/SPVM/TestCase/Interface.spvm
 t/default/lib/SPVM/TestCase/InterfaceType.spvm
 t/default/lib/SPVM/TestCase/Isa.spvm
+t/default/lib/SPVM/TestCase/Lib/Array.spvm
 t/default/lib/SPVM/TestCase/Lib/Bool.spvm
 t/default/lib/SPVM/TestCase/Lib/Byte.spvm
 t/default/lib/SPVM/TestCase/Lib/ByteList.spvm
@@ -528,6 +544,7 @@ t/default/lib/SPVM/TestCase/Lib/FloatList.spvm
 t/default/lib/SPVM/TestCase/Lib/Fn1.spvm
 t/default/lib/SPVM/TestCase/Lib/Fn2.spvm
 t/default/lib/SPVM/TestCase/Lib/Fn3.spvm
+t/default/lib/SPVM/TestCase/Lib/Format.spvm
 t/default/lib/SPVM/TestCase/Lib/Hash.spvm
 t/default/lib/SPVM/TestCase/Lib/Int.spvm
 t/default/lib/SPVM/TestCase/Lib/IntList.spvm
@@ -536,6 +553,7 @@ t/default/lib/SPVM/TestCase/Lib/Long.spvm
 t/default/lib/SPVM/TestCase/Lib/LongList.spvm
 t/default/lib/SPVM/TestCase/Lib/Short.spvm
 t/default/lib/SPVM/TestCase/Lib/ShortList.spvm
+t/default/lib/SPVM/TestCase/Lib/Sort.spvm
 t/default/lib/SPVM/TestCase/Lib/StringBuffer.spvm
 t/default/lib/SPVM/TestCase/Lib/StringList.spvm
 t/default/lib/SPVM/TestCase/Lib/Time.spvm
@@ -605,6 +623,16 @@ t/default/lib/SPVM/TestCase/Ref.spvm
 t/default/lib/SPVM/TestCase/Refcnt.spvm
 t/default/lib/SPVM/TestCase/Refop.spvm
 t/default/lib/SPVM/TestCase/Remainder.spvm
+t/default/lib/SPVM/TestCase/Resource/Mylib1/V1_0_0.config
+t/default/lib/SPVM/TestCase/Resource/Mylib1/V1_0_0.mode1.config
+t/default/lib/SPVM/TestCase/Resource/Mylib1/V1_0_0.native/include/mylib1_source1.h
+t/default/lib/SPVM/TestCase/Resource/Mylib1/V1_0_0.native/include/mylib1_source2.h
+t/default/lib/SPVM/TestCase/Resource/Mylib1/V1_0_0.native/src/extra.c
+t/default/lib/SPVM/TestCase/Resource/Mylib1/V1_0_0.native/src/mylib1_source1.c
+t/default/lib/SPVM/TestCase/Resource/Mylib1/V1_0_0.native/src/mylib1_source2.c
+t/default/lib/SPVM/TestCase/Resource/Mylib2/V1_0_0.config
+t/default/lib/SPVM/TestCase/Resource/Mylib2/V1_0_0.native/include/mylib2_source1.h
+t/default/lib/SPVM/TestCase/Resource/Mylib2/V1_0_0.native/src/mylib2_source1.c
 t/default/lib/SPVM/TestCase/Return.spvm
 t/default/lib/SPVM/TestCase/Seqop.spvm
 t/default/lib/SPVM/TestCase/Simple.spvm
@@ -620,6 +648,16 @@ t/default/lib/SPVM/TestCase/TypeConversion.spvm
 t/default/lib/SPVM/TestCase/UnaryMinus.spvm
 t/default/lib/SPVM/TestCase/UnaryPlus.spvm
 t/default/lib/SPVM/TestCase/Unless.spvm
+t/default/lib/SPVM/TestCase/UseResource.spvm
+t/default/lib/SPVM/TestCase/UseResource/Basic.c
+t/default/lib/SPVM/TestCase/UseResource/Basic.config
+t/default/lib/SPVM/TestCase/UseResource/Basic.spvm
+t/default/lib/SPVM/TestCase/UseResource/Mylib1.c
+t/default/lib/SPVM/TestCase/UseResource/Mylib1.config
+t/default/lib/SPVM/TestCase/UseResource/Mylib1.spvm
+t/default/lib/SPVM/TestCase/UseResource/Mylib2.c
+t/default/lib/SPVM/TestCase/UseResource/Mylib2.config
+t/default/lib/SPVM/TestCase/UseResource/Mylib2.spvm
 t/default/lib/SPVM/TestCase/Warn.spvm
 t/default/lib/SPVM/TestCase/Weaken.spvm
 t/default/lib/SPVM/TestCase/While.spvm
@@ -646,9 +684,11 @@ t/default/refcnt.t
 t/default/refop.t
 t/default/remainder.t
 t/default/require.t
+t/default/resource.t
 t/default/return.t
 t/default/seqop.t
 t/default/special_assign.t
+t/default/SPVM_Array.t
 t/default/SPVM_Bool.t
 t/default/SPVM_Byte.t
 t/default/SPVM_ByteList.t
@@ -657,6 +697,7 @@ t/default/SPVM_DoubleList.t
 t/default/SPVM_Float.t
 t/default/SPVM_FloatList.t
 t/default/SPVM_Fn.t
+t/default/SPVM_Format.t
 t/default/SPVM_Hash.t
 t/default/SPVM_Int.t
 t/default/SPVM_IntList.t
@@ -666,6 +707,7 @@ t/default/SPVM_LongList.t
 t/default/SPVM_Point.t
 t/default/SPVM_Short.t
 t/default/SPVM_ShortList.t
+t/default/SPVM_Sort.t
 t/default/SPVM_StringBuffer.t
 t/default/SPVM_StringList.t
 t/default/SPVM_Time.t
@@ -707,8 +749,6 @@ t/exe/myexe.pl
 t/exe/SPVM_Builder_Exe.t
 t/exe/spvmcc.t
 t/get_native_api_indexes.pl
-t/lib/TestAuto.pm
-t/lib/TestFile.pm
 t/sort_method_name_native.pl
 t/sort_method_name_pod.pl
 t/sort_method_name_spvm.pl
@@ -720,6 +760,8 @@ t/test_files/fread.txt
 t/test_files/fread_eof.txt
 t/test_files/long_line.txt
 t/test_files/SPVM/Foo.config
+t/testlib/TestAuto.pm
+t/testlib/TestFile.pm
 yacc/bison.sh
 yacc/spvm_yacc.y
 META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -31,7 +31,7 @@ Generates Excel Document with Continuous Distribution Function Chart from the su
 
     my $writer    = Excel::Writer::XLSX::CDF->new(
                                              chart_title      => "Continuous Distribution Function (CDF)",
-                                             chart_y_label    => "Distribution",
+                                             chart_y_label    => "Probability",
                                              chart_x_label    => "",
                                              group_names_sort => 0,  #default 0 is in order of appearance in data
                                             );
@@ -48,7 +48,7 @@ Default: Continuous Distribution Function (CDF)
 
 Set and returns the Y axis label of the Excel chart
 
-Default: Distribution
+Default: Probability
 
 ## chart\_x\_label
 
@@ -64,7 +64,7 @@ Default: 1
 
 ## chart\_colors
 
-Set and Returns an array reference of Excel color codes to use for each CDF in group order.  The default color once all colors are used is black.
+Set and returns an array reference of Excel color codes to use for each CDF in group order.  The default color once all colors are used is black.
 
 Default: \['#FF0000', '#800000', '#FFFF00', '#808000', '#00FF00', '#008000', '#00FFFF', '#008080', '#0000FF', '#000080', '#FF00FF', '#800080'\]
 

@@ -1,4 +1,8 @@
-0.01  YYYY-MM-DD
+0.02  2022-06-13
 
-  -
+  - Catch up with latest SPVM.
+  - Add SPVM::Unicode to Makefile.PL
   
+0.01  2022-06-07
+
+  - First development release

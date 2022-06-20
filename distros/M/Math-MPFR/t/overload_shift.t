@@ -30,7 +30,7 @@ cmp_ok(Rmpfr_inf_p($f), '!=', 0, "'>>' Inf results in Inf");
 
 Rmpfr_set_NV($f, 0.0, MPFR_RNDN);
 
-my $n = $f << 10;
+$n = $f << 10;
 cmp_ok(Rmpfr_zero_p($f), '!=', 0, "'<<' 0 results in 0");
 
 $n = $f >> 10;
@@ -58,10 +58,10 @@ cmp_ok($f, '==', 37, "4.625 >> -3 results in 37");
 $f <<= -3;
 cmp_ok($f, '==', 4.625, "37 << -3 results in 4.625");
 
-eval {$f >> '3'};
+eval {my $r = $f >> '3'};
 like ($@, qr/In overloading of '>>' operator,/, "'>>' doesn't accept a string");
 
-eval {$f << 3.1};
+eval {my $r= $f << 3.1};
 like ($@, qr/In overloading of '<<' operator,/, "'<<' doesn't accept an NV");
 
 eval {$f >>= 3.1};

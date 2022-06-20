@@ -12,7 +12,7 @@ use lib 't/lib';
 #use NoInlineAttribute;
 use Test::More;
 use Test::Fatal;
-#use Test::Moose;
+use Test::Moose;
 
 use Types::Standard ();
 
@@ -79,7 +79,7 @@ note "Testing class $class";
 
     can_ok( $class, $_ ) for sort keys %{$handles};
 
-#    with_immutable {
+    with_immutable {
         my $obj = $class->new();
 
         is( $obj->counter, 0, '... got the default value' );
@@ -134,8 +134,8 @@ note "Testing class $class";
             is( $obj->counter, -1, 'dec decrements - with lazy default' );
         }
     }
-#    $class;
-#}
+    $class;
+}
 
 {
     package WithBuilder;

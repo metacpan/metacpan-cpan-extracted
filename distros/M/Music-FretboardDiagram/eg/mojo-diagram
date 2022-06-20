@@ -25,6 +25,7 @@ get '/:chord/:position' => sub {
         horiz    => 1,
         image    => 1,
         font     => '/opt/X11/share/fonts/TTF/VeraMono.ttf',
+#        verbose  => 1,
     );
     my $i = $dia->draw;
 

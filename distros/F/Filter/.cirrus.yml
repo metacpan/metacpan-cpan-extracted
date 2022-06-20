@@ -1,0 +1,12 @@
+# Build configuration for https://cirrus-ci.com/github/rurban/Filter
+# See https://cirrus-ci.org/guide/FreeBSD/
+
+freebsd_instance:
+  image_family: freebsd-13-0
+  cpu: 4
+task:
+  #auto_cancellation: $CIRRUS_BRANCH != 'master' && $CIRRUS_BRANCH !=~ 'smoke/.*'
+  #only_if: $CIRRUS_BRANCH =~ 'smoke/.*' || $CIRRUS_BRANCH == 'master'
+  install_script: pkg install -y m4 git p5-Filter perl5 p5-Test-Pod p5-Test-Pod-Coverage
+  build_script: perl Makefile.PL && make -j4
+  test_script: make -j4 test

@@ -5,7 +5,7 @@ use warnings;
 package MooX::Press;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.083';
+our $VERSION   = '0.085';
 
 use Types::Standard 1.010000 -is, -types;
 use Types::TypeTiny qw(ArrayLike HashLike);
@@ -1977,7 +1977,7 @@ sub install_methods {
 				? sprintf('my @invocants = splice(@_, 0, %d);', $invocant_count)
 				: ''),
 			(($signature && !$optimized)
-				? sprintf('$check ||= %s->_build_method_signature_check(%s, %s, %s, $signature, \\@invocants);', map(B::perlstring($_), $builder, $class, "$class\::$name", $signature_style))
+				? sprintf('$check ||= do { my $tmp = %s->_build_method_signature_check(%s, %s, %s, $signature, \\@invocants); ref($tmp) eq q(HASH) ? $tmp->{closure} : $tmp };', map(B::perlstring($_), $builder, $class, "$class\::$name", $signature_style))
 				: ''),
 			($signature
 				? (@curry ? sprintf('@_ = (@invocants, @curry, %s);', $checkcode) : sprintf('@_ = (@invocants, %s);', $checkcode))
@@ -2145,7 +2145,7 @@ sub _build_method_signature_check {
 	my $next = $is_named ? \&Type::Params::compile_named_oo : \&Type::Params::compile;
 	@_ = ($global_opts, @params);
 	return [@_] if $gimme_list;
-	goto($next);
+	goto $next;
 }
 
 sub install_constants {
@@ -2189,7 +2189,7 @@ sub _prepare_method_modifier {
 		my \$check;
 		sub {
 			my \@invocants = splice(\@_, 0, $invocant_count);
-			\$check ||= q($builder)->_build_method_signature_check(q($class), q($class\::$name), \$signature_style, \$signature, \\\@invocants);
+			\$check ||= do{ my \$tmp = q($builder)->_build_method_signature_check(q($class), q($class\::$name), \$signature_style, \$signature, \\\@invocants); ref(\$tmp) eq q(HASH) ? \$tmp->{closure} : \$tmp };
 			\@_ = (\@invocants, \@curry, \&\$check);
 			goto \$coderef;
 		};

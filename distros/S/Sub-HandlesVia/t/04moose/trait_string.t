@@ -12,7 +12,7 @@ use lib 't/lib';
 #use NoInlineAttribute;
 use Test::More;
 use Test::Fatal;
-#use Test::Moose;
+use Test::Moose;
 
 {
     my %handles = (
@@ -91,7 +91,7 @@ note "Testing class $class";
 
     can_ok( $class, $_ ) for sort keys %{$handles};
 
-#    with_immutable {
+    with_immutable {
         my $obj = $class->new();
 
         is( $obj->length, 0, 'length returns zero' );
@@ -305,8 +305,8 @@ note "Testing class $class";
                 'append with lazy default'
             );
         }
-#    }
-#    $class;
+    }
+    $class;
 }
 
 done_testing;

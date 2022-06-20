@@ -1,5 +1,46 @@
 Revision history for Music-FretboardDiagram
 
+0.1308 2022-06-14 18:22:28
+    - Don't draw dots before the fretboard please.
+    - Add the eg/relatives program to show major/relative-minor.
+
+0.1307 2022-06-14 00:09:07
+    - Improve the eg/fretboard program a bit more.
+    - Improve the tests a bit.
+
+0.1306 2022-06-13 23:33:49
+    - Improve the eg/fretboard program.
+    - Fix the off-by-one number of frets rendered.
+
+0.1305 2022-06-13 22:10:04
+    - Improve documentation.
+    - Use croak not die.
+
+0.1304 2022-06-13 21:07:45
+    - Do not print fingering dots outside the fretboard for vertical drawing too!
+
+0.1303 2022-06-13 20:59:37
+    - Do not print fingering dots outside the fretboard (for horizontal drawing).
+
+0.1302 2022-06-13 20:43:01
+    - Make Boolean attributes have a check.
+
+0.1301 2022-06-13 20:20:27
+    - Add the eg/fretboard program.
+    - Add an absolute attribute to specify where to render a chord.
+    - Make verbose print statements into warn()s.
+
+0.1300 2022-06-12 11:09:05
+    - Fix the default font.
+    - Allow multiple chords to be rendered.
+
+0.1207 2022-06-10 11:25:00
+    - Restore the accidentally deleted eg/ukulele program.
+
+0.1206 2022-06-10 11:16:37
+    - Improve documentation.
+    - Improve test file.
+
 0.1205 2020-03-21 17:27:21
     - Do not document the ->BUILD method.
 

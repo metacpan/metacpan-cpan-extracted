@@ -12,7 +12,7 @@ use lib 't/lib';
 #use NoInlineAttribute;
 use Test::More;
 use Test::Fatal;
-#use Test::Moose;
+use Test::Moose;
 
 {
     my $name = 'Foo1';
@@ -109,7 +109,7 @@ note "Testing class $class";
         "Code trait didn't create reader method for $_"
     ) for qw(callback callback_method multiplier);
 
-#    with_immutable {
+    with_immutable {
         ${$iref} = 0;
         my $obj = $class->new(@args);
 
@@ -123,8 +123,8 @@ note "Testing class $class";
         );
 
         is( $obj->multiply(3), 6, 'multiple double value' );
-#    }
-#    $class;
+    }
+    $class;
 }
 
 done_testing;

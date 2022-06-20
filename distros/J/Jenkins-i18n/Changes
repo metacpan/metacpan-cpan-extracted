@@ -1,5 +1,12 @@
 Revision history for Perl extension Jenkins::i18n.
 
+0.05 Tue June 14 11:01 2002
+    - Microsoft Windows is now deprecated due issues with the native file
+      system.
+    - The --all option is now available
+    - Code refactoring, fixing wrong usage of format outside the CLI file
+    - Updated the CLI online documentation for the latest changes.
+
 0.04 Fri May 27 20:48 2022
     - Fixed bug in define_files regarding relative paths
     - Fixed bug in define_files regarding file extension

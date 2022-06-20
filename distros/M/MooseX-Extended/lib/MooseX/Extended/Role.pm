@@ -19,14 +19,13 @@ use MooseX::Extended::Core qw(
 use MooseX::Role::WarnOnConflict ();
 use Moose::Role;
 use Moose::Meta::Role;
-use Moose::Util 'throw_exception';
 use namespace::autoclean ();
 use Import::Into;
 use true;
 use feature _enabled_features();
 no warnings _disabled_warnings();
 
-our $VERSION = '0.21';
+our $VERSION = '0.25';
 
 # Should this be in the metaclass? It feels like it should, but
 # the MOP really doesn't support these edge cases.
@@ -34,7 +33,9 @@ my %CONFIG_FOR;
 
 sub import {
     my ( $class, %args ) = @_;
+    my @caller = caller(0);
     $args{_import_type} = 'role';
+    $args{_caller_eval} = ( $caller[1] =~ /^\(eval/ );
     my $target_class = _assert_import_list_is_valid( $class, \%args );
     my @with_meta    = grep { not $args{excludes}{$_} } qw(field param);
     if (@with_meta) {
@@ -59,16 +60,16 @@ sub _apply_default_features ( $config, $for_class, $params ) {
         MooseX::Extended::Types->import::into( $for_class, @$types );
     }
 
-    Carp->import::into($for_class)                         unless $config->{excludes}{carp};
-    namespace::autoclean->import::into($for_class)         unless $config->{excludes}{autoclean};
-    true->import                                           unless $config->{excludes}{true};
+    Carp->import::into($for_class)                 unless $config->{excludes}{carp};
+    namespace::autoclean->import::into($for_class) unless $config->{excludes}{autoclean};
+    true->import                                   unless $config->{excludes}{true} || $config->{_caller_eval}; # https://github.com/Ovid/moosex-extreme/pull/34
     MooseX::Role::WarnOnConflict->import::into($for_class) unless $config->{excludes}{WarnOnConflict};
 
     feature->import( _enabled_features() );
     warnings->unimport(_disabled_warnings);
 
-    Moose::Role->init_meta(    ##
-        %$params,              ##
+    Moose::Role->init_meta(                                                                                     ##
+        %$params,                                                                                               ##
         metaclass => 'Moose::Meta::Role'
     );
 }
@@ -87,7 +88,7 @@ MooseX::Extended::Role - MooseX::Extended roles
 
 =head1 VERSION
 
-version 0.21
+version 0.25
 
 =head1 SYNOPSIS
 
@@ -257,6 +258,19 @@ Alternately, you can exclude this feature. We don't recommend this, but it
 might be useful if you're refactoring a legacy Moose system.
 
     use MooseX::Extended::Role excludes => [qw/WarnOnConflict/];
+
+=head1 ATTRIBUTE SHORTCUTS
+
+C<param> and C<field> in roles allow the same L<attribute
+shortcuts|MooseX::Extended::Manual::Shortcuts> as L<MooseX::Extended>.
+
+=head1 BUGS AND LIMITATIONS
+
+If the MooseX::Extended::Role is loaded via I<stringy> eval, C<true> is not
+loaded, This is because there were intermittant errors (maybe 1 out of 5
+times) being thrown. Removing this feature under stringy eval solves this. See
+L<this github ticket for more
+infomration|https://github.com/Ovid/moosex-extreme/pull/34>.
 
 =head1 REDUCING BOILERPLATE
 

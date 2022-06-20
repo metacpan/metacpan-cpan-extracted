@@ -4,6 +4,8 @@ lib/Moonshine/Element.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
 README
 t/00-load.t
 t/01-basic.t
@@ -14,9 +16,8 @@ t/05-name.t
 t/06-add_after_element.t
 t/07-get_element_by_id.t
 t/08-get_elements.t
+t/09-insert_child.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
 xt/boilerplate.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

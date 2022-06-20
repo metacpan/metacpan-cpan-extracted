@@ -24,17 +24,17 @@ my $meta = {
                                        requires   => {
                                                        "Exporter::Tiny"       => "1.000000",
                                                        "Import::Into"         => 0,
-                                                       "Lexical::Accessor"    => 0.012,
+                                                       "Lexical::Accessor"    => 0.014,
                                                        "Module::Runtime"      => 0,
                                                        "Moo"                  => "2.000000",
                                                        "MooX::Enumeration"    => "0.010",
                                                        "namespace::autoclean" => 0,
                                                        "perl"                 => 5.008008,
                                                        "Role::Hooks"          => 0.001,
-                                                       "Sub::HandlesVia"      => 0.013,
+                                                       "Sub::HandlesVia"      => 0.025,
                                                        "Sub::MultiMethod"     => 0.008,
                                                        "Sub::SymMethod"       => 0.001,
-                                                       "Type::Tiny"           => "1.010000",
+                                                       "Type::Tiny"           => "1.012000",
                                                      },
                                        suggests   => { "Mouse" => 0, "MouseX::NonMoose" => 0 },
                                      },
@@ -45,13 +45,13 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "MooX::Press"           => { file => "lib/MooX/Press.pm", version => 0.083 },
-                        "MooX::Press::Keywords" => { file => "lib/MooX/Press/Keywords.pm", version => 0.083 },
-                        "Zydeco::Lite"          => { file => "lib/Zydeco/Lite.pm", version => 0.083 },
+                        "MooX::Press"           => { file => "lib/MooX/Press.pm", version => 0.085 },
+                        "MooX::Press::Keywords" => { file => "lib/MooX/Press/Keywords.pm", version => 0.085 },
+                        "Zydeco::Lite"          => { file => "lib/Zydeco/Lite.pm", version => 0.085 },
                       },
   "release_status" => "stable",
   "resources"      => {
-                        bugtracker   => { web => "http://rt.cpan.org/Dist/Display.html?Queue=MooX-Press" },
+                        bugtracker   => { web => "https://github.com/tobyink/p5-moox-press/issues" },
                         homepage     => "https://metacpan.org/release/MooX-Press",
                         license      => ["http://dev.perl.org/licenses/"],
                         repository   => {
@@ -61,7 +61,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/MooX-Press/project",
                       },
-  "version"        => 0.083,
+  "version"        => 0.085,
 };
 
 my %dynamic_config;

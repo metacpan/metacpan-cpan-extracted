@@ -5,8 +5,20 @@ use warnings;
 use Config;
 use Carp 'confess';
 use File::Basename 'dirname';
+use SPVM::Builder::Util;
 
 # Fields
+sub file_optional {
+  my $self = shift;
+  if (@_) {
+    $self->{file_optional} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{file_optional};
+  }
+}
+
 sub file {
   my $self = shift;
   if (@_) {
@@ -128,6 +140,50 @@ sub include_dirs {
   }
 }
 
+sub builder_include_dir {
+  my $self = shift;
+  if (@_) {
+    $self->{builder_include_dir} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{builder_include_dir};
+  }
+}
+
+sub builder_src_dir {
+  my $self = shift;
+  if (@_) {
+    $self->{builder_src_dir} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{builder_src_dir};
+  }
+}
+
+sub own_include_dir {
+  my $self = shift;
+  if (@_) {
+    $self->{own_include_dir} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{own_include_dir};
+  }
+}
+
+sub own_src_dir {
+  my $self = shift;
+  if (@_) {
+    $self->{own_src_dir} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{own_src_dir};
+  }
+}
+
 sub ld {
   my $self = shift;
   if (@_) {
@@ -147,6 +203,17 @@ sub ldflags {
   }
   else {
     return $self->{ldflags};
+  }
+}
+
+sub dynamic_lib_ldflags {
+  my $self = shift;
+  if (@_) {
+    $self->{dynamic_lib_ldflags} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{dynamic_lib_ldflags};
   }
 }
 
@@ -183,17 +250,6 @@ sub source_files {
   }
 }
 
-sub resources {
-  my $self = shift;
-  if (@_) {
-    $self->{resources} = $_[0];
-    return $self;
-  }
-  else {
-    return $self->{resources};
-  }
-}
-
 sub force {
   my $self = shift;
   if (@_) {
@@ -227,7 +283,27 @@ sub dependent_files {
   }
 }
 
-sub is_exe { 0 }
+sub output_type {
+  my $self = shift;
+  if (@_) {
+    $self->{output_type} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{output_type};
+  }
+}
+
+sub lib_link_abs {
+  my $self = shift;
+  if (@_) {
+    $self->{lib_link_abs} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{lib_link_abs};
+  }
+}
 
 # Methods
 sub new {
@@ -236,6 +312,13 @@ sub new {
   my $self = {@_};
 
   bless $self, ref $class || $class;
+  
+  my $file_optional = $self->file_optional;
+  
+  my $file = $self->file;
+  if (!$file_optional && !defined $file) {
+    confess "\"file\" option must be specified";
+  }
   
   # quiet
   unless (defined $self->{quiet}) {
@@ -257,21 +340,42 @@ sub new {
     $self->cc($Config{cc});
   }
 
+  my $builder_dir = SPVM::Builder::Util::get_builder_dir_from_config_module();
+  
+  # builder_include_dir
+  unless (defined $self->{builder_include_dir}) {
+    my $builder_include_dir = "$builder_dir/include";
+    $self->builder_include_dir($builder_include_dir);
+  }
+
+  # builder_src_dir
+  unless (defined $self->{builder_src_dir}) {
+    my $builder_src_dir = "$builder_dir/src";
+    $self->builder_src_dir($builder_src_dir);
+  }
+  
   # include_dirs
   unless (defined $self->{include_dirs}) {
     $self->include_dirs([]);
-    
-    my @default_include_dirs;
+  }
 
-    # Add "include" directory of SPVM::Builder. This directory contains spvm_native.h
-    my $spvm_builder_config_dir = $INC{"SPVM/Builder/Config.pm"};
-    my $spvm_builder_dir = $spvm_builder_config_dir;
-    $spvm_builder_dir =~ s/\/Config\.pm$//;
-    my $spvm_include_dir = $spvm_builder_dir;
-    $spvm_include_dir .= '/include';
-    push @default_include_dirs, $spvm_include_dir;
+  # Resource directory
+  if (defined $file) {
+    my $resource_dir = $self->remove_ext_from_config_file($file);
     
-    $self->add_include_dirs(@default_include_dirs);
+    $resource_dir .= '.native';
+    
+    # own_include_dir
+    unless (defined $self->{own_include_dir}) {
+      my $own_include_dir = "$resource_dir/include";
+      $self->own_include_dir($own_include_dir);
+    }
+
+    # own_src_dir
+    unless (defined $self->{own_src_dir}) {
+      my $own_src_dir = "$resource_dir/src";
+      $self->own_src_dir($own_src_dir);
+    }
   }
   
   # ccflags
@@ -305,7 +409,7 @@ sub new {
 
   # resources
   unless (defined $self->{resources}) {
-    $self->resources([]);
+    $self->{resources} = {};
   }
 
   # source_files
@@ -318,22 +422,6 @@ sub new {
     $self->libs([]);
   }
   
-  # ldflags
-  unless (defined $self->{ldflags}) {
-    $self->ldflags([]);
-    
-    my @default_ldflags;
-    
-    # Dynamic link options
-    if ($^O eq 'MSWin32') {
-      push @default_ldflags, '-mdll', '-s';
-    }
-    else {
-      push @default_ldflags, '-shared';
-    }
-    $self->add_ldflags(@default_ldflags);
-  }
-
   # ld_optimize
   unless (defined $self->{ld_optimize}) {
     $self->ld_optimize('-O2');
@@ -341,6 +429,40 @@ sub new {
 
   unless (defined $self->{dependent_files}) {
     $self->{dependent_files} = [];
+  }
+  
+  unless (defined $self->output_type) {
+    $self->output_type('dynamic_lib');
+  }
+
+  # dynamic_lib_ldflags
+  unless (defined $self->{dynamic_lib_ldflags}) {
+    $self->dynamic_lib_ldflags([]);
+    
+    if ($self->output_type eq 'dynamic_lib') {
+      my @dynamic_lib_ldflags;
+      
+      # Dynamic link options
+      if ($^O eq 'MSWin32') {
+        push @dynamic_lib_ldflags, '-mdll', '-s';
+      }
+      else {
+        push @dynamic_lib_ldflags, '-shared';
+      }
+      $self->dynamic_lib_ldflags(\@dynamic_lib_ldflags);
+    }
+  }
+
+  # ldflags
+  unless (defined $self->{ldflags}) {
+    $self->ldflags([]);
+  }
+  
+  # lib_link_abs
+  unless (defined $self->lib_link_abs) {
+    if ($self->output_type eq 'dynamic_lib') {
+      $self->lib_link_abs(1);
+    }
   }
   
   return $self;
@@ -463,75 +585,49 @@ sub add_source_files {
   push @{$self->{source_files}}, @source_files;
 }
 
-sub add_resources {
-  my ($self, @resources) = @_;
-  
-  push @{$self->{resources}}, @resources;
-}
-
-sub use { shift->add_resources(@_) }
-
-sub use_resource {
-  my ($self, @args) = @_;
-  
-  my %resource_args;
-  if (@args == 1) {
-    $resource_args{class_name} = $args[0];
-  }
-  else {
-    %resource_args = @args;
-  }
-  
-  my $resource = SPVM::Builder::Resource->new(%resource_args);
-  
-  my $resource_class_name = $resource->class_name;
-  my $resource_mode = $resource->mode;
-  my $resource_args = $resource->args;
-  
-  my $ext = defined $resource_mode ? "$resource_mode.config" : 'config';
-  my $config_file_base = SPVM::Builder::Util::convert_class_name_to_rel_file($resource_class_name, $ext);
-  
-  my $config_file;
-  for my $inc (@INC) {
-    my $config_file_tmp = "$inc/$config_file_base";
-    if (-f $config_file_tmp) {
-      $config_file = $config_file_tmp;
-      last;
-    }
-  }
-  unless (defined $config_file) {
-    confess "Can't find resource config file $config_file_base in @INC";
-  }
-  
-  my $config = $self->load_config($config_file, @$resource_args);
-  
-  $resource->config($config);
-  
-  $self->add_resources($resource);
-  
-  return $resource;
-}
-
 sub load_config {
-  my ($self, $config_file, @argv) = @_;
+  my ($self, $config_file, @args) = @_;
+
+  unless (-f $config_file) {
+    confess "Can't find config file \"$config_file\"";
+  }
+  local @ARGV = @args;
+  my $config = do File::Spec->rel2abs($config_file);
+  if ($@) {
+    confess "Can't parse config file \"$config_file\": $@";
+  }
   
-  my $config = SPVM::Builder::Util::load_config($config_file, @argv);
+  unless (defined $config && $config->isa('SPVM::Builder::Config')) {
+    confess "The config file must be a SPVM::Builder::Config object";
+  }
   
   push @{$config->dependent_files}, $config_file;
   
   return $config;
 }
 
+
+sub remove_ext_from_config_file {
+  my ($self, $config_file) = @_;
+  
+  my $config_file_without_ext = $config_file;
+  
+  $config_file_without_ext =~ s/(\.[a-zA-Z0-9_]+)?\.config$//;
+  
+  return $config_file_without_ext;
+}
+
 sub load_mode_config {
   my ($self, $config_file, $mode, @argv) = @_;
   
-  my $mode_config_file = $config_file;
-  
-  $mode_config_file =~ s/(\.[a-zA-Z0-9_]+)?\.config$//;
-  $mode_config_file .= ".$mode.config";
+  my $mode_config_file = $self->remove_ext_from_config_file($config_file);
+  if (defined $mode) {
+    $mode_config_file .= ".$mode";
+  }
+  $mode_config_file .= ".config";
   
   unless (-f $mode_config_file) {
-    confess "Can't find the mode config file \"$mode_config_file\"";
+    confess "Can't find the config file \"$mode_config_file\"";
   }
   
   my $config = $self->load_config($mode_config_file, @argv);
@@ -540,19 +636,10 @@ sub load_mode_config {
 }
 
 sub load_base_config {
-  my ($self, $config_file, @argv) = @_;
+  my ($self, $config_file, @args) = @_;
   
-  my $base_config_file = $config_file;
-  
-  $base_config_file =~ s/(\.[a-zA-Z0-9_]+)?\.config$//;
-  $base_config_file .= ".config";
-  
-  unless (-f $base_config_file) {
-    confess "Can't find the base config file \"$base_config_file\"";
-  }
-  
-  my $config = $self->load_config($base_config_file, @argv);
-  
+  my $config = $self->load_mode_config($config_file, undef, @args);
+
   return $config;
 }
 
@@ -572,83 +659,66 @@ sub add_dynamic_libs {
   $self->add_libs(@dynamic_lib_infos);
 }
 
-sub to_hash {
-  my ($self) = @_;
+sub use_resource {
+  my ($self, @args) = @_;
   
-  my $hash = {%$self};
-  
-  return $hash;
-}
-
-sub search_lib_dirs_from_cc_info {
-  my ($self) = @_;
-  
-  my $cc = $self->cc;
-  
-  my $cmd = "$cc -print-search-dirs";
-  
-  my $output = `$cmd`;
-  
-  my $lib_dirs_str;
-  if ($output =~ /^libraries:\s+=(.+)/m) {
-    $lib_dirs_str = $1;
+  my $first_arg;
+  unless (@args % 2 == 0) {
+    $first_arg = shift @args;
   }
   
-  my $sep = $Config{path_sep};
-  
-  my @lib_dirs;
-  if (defined $lib_dirs_str) {
-    @lib_dirs = split($sep, $lib_dirs_str);
+  my $resource;
+  if (ref $first_arg) {
+    $resource = $first_arg;
+  }
+  else {
+    my $class_name = $first_arg;
+    my %args = @args;
+    if (exists $args{class_name}) {
+      $class_name = delete $args{class_name};
+    }
+    $resource = SPVM::Builder::Resource->new(class_name => $class_name, %args);
   }
   
-  return \@lib_dirs;
+  my $resource_class_name = $resource->class_name;
+  my $resource_mode = $resource->mode;
+  my $resource_args = $resource->args;
+  
+  my $ext = defined $resource_mode ? "$resource_mode.config" : 'config';
+  my $config_file_base = SPVM::Builder::Util::convert_class_name_to_rel_file($resource_class_name, $ext);
+  
+  my $config_file = SPVM::Builder::Util::get_config_file_from_class_name($resource_class_name, $resource_mode);
+  
+  my $config = $self->load_config($config_file, @$resource_args);
+  $config->file($config_file);
+  
+  $resource->config($config);
+  
+  my $index = keys %{$self->{resources}};
+  
+  $self->{resources}->{$resource_class_name} = {resource => $resource, index => $index};
+  
+  return $resource;
 }
 
-sub search_lib_dirs_from_config_libpth {
+sub get_resource {
+  my ($self, $resource_class_name) = @_;
+  
+  unless (defined $self->{resources}{$resource_class_name}) {
+    return;
+  }
+  
+  my $resource = $self->{resources}{$resource_class_name}{resource};
+  
+  return $resource;
+}
+
+sub get_resource_names {
   my ($self) = @_;
   
-  my $libpth = $Config{libpth};
+  my @resource_names = sort { $self->{resources}{$a}{index} <=> $self->{resources}{$b}{index} } keys %{$self->{resources}};
   
-  my @lib_dirs = split(/ +/, $libpth);
-  
-  return \@lib_dirs;
-}
-
-sub search_include_dirs_from_config_incpth {
-  my ($self) = @_;
-  
-  my $incpth = $Config{incpth};
-  
-  my @include_dirs = split(/ +/, $incpth);
-  
-  return \@include_dirs;
-}
-
-sub get_include_dir {
-  my ($self, $file) = @_;
-  
-  my $include_dir = $file;
-  $include_dir =~ s|\.config$|.native/include|;
-  
-  return $include_dir;
-}
-
-sub get_src_dir {
-  my ($self, $file) = @_;
-  
-  my $src_dir = $file;
-  $src_dir =~ s|\.config$|.native/src|;
-  
-  return $src_dir;
-}
-
-sub get_lib_dir {
-  my ($self, $file) = @_;
-  
-  my $lib_dir = $file;
-  $lib_dir =~ s|\.config$|.native/lib|;
-  
-  return $lib_dir;
+  return \@resource_names;
 }
 
 1;
@@ -656,6 +726,41 @@ sub get_lib_dir {
 =head1 NAME
 
 SPVM::Builder::Config - Configurations of Compile and Link of Native Sources
+
+=head1 SYNOPSYS
+
+  use SPVM::Builder::Config;
+  
+  # Create a config
+  my $config = SPVM::Builder::Config->new(file => __FILE__);
+  
+  # Create a config with "GNU99" standard of "C" language
+  my $config = SPVM::Builder::Config->new_gnu99(file => __FILE__);
+
+  # Create a config with "C99" standard of "C" language
+  my $config = SPVM::Builder::Config->new_c99(file => __FILE__);
+
+  # Create a config as "C++"
+  my $config = SPVM::Builder::Config->new_cpp(file => __FILE__);
+
+  # Create a config with "C++11" standard of "C++"
+  my $config = SPVM::Builder::Config->new_cpp11(file => __FILE__);
+  
+  # Optimize
+  $config->optimize('-O2');
+  
+  # Optimize with debug mode
+  $config->optimize('-O0 -g');
+  
+  # Add source files
+  $config->add_source_files('foo.c', 'bar.c', 'baz/baz.c');
+  
+  # Use resource
+  $config->use_resource('TestCase::Resource::Zlib::V1_0_0');
+  $config->use_resource('TestCase::Resource::Foo1::V1_0_0', mode => 'mode1', args => ['args1', 'args2']);
+  
+  # Get resouce information
+  my $resource = $config->get_resource('TestCase::Resource::Zlib::V1_0_0');
 
 =head1 DESCRIPTION
 
@@ -758,9 +863,41 @@ B<Examples:>
 
 Get and set header including directories of the compiler. This is same as C<-I> option of C<gcc>. 
 
-The default value is "SPVM/Builder/include" of one up of directory that SPVM::Buidler::Config.pm is loaded.
+=head2 builder_include_dir
 
-At runtime, the "include" directory of the native module is added before C<include_dirs>.
+  my $builder_include_dir = $config->builder_include_dir;
+  $config->builder_include_dir($builder_include_dir);
+
+Get and set the header including directory of L<SPVM::Builder>.
+
+The default value is C<SPVM/Builder/include> of one up of directory that C<SPVM::Buidler::Config> is loaded.
+
+=head2 builder_src_dir
+
+  my $builder_src_dir = $config->builder_src_dir;
+  $config->builder_src_dir($builder_src_dir);
+
+Get and set the source directory of L<SPVM::Builder>.
+
+The default value is C<SPVM/Builder/src> of one up of the directory that C<SPVM::Buidler::Config> is loaded.
+
+=head2 own_include_dir
+
+  my $own_include_dir = $config->own_include_dir;
+  $config->own_include_dir($own_include_dir);
+
+Get and set the header including directory of this module.
+
+The default value is the name that removing C<[.mode].config> from the L<file|/"file"> and add C<.native/include>.
+
+=head2 own_src_dir
+
+  my $own_src_dir = $config->own_src_dir;
+  $config->own_src_dir($own_src_dir);
+
+Get and set the source directory of this module.
+
+The default value is the name that removing C<[.mode].config> from the L<file|/"file"> and add C<.native/src>.
 
 =head2 ccflags
 
@@ -911,7 +1048,7 @@ B<Examples:>
   my $source_files = $config->source_files;
   $config->source_files($source_files);
 
-Get and get source files. These sourceraries are linked by the compiler.
+Get and get source files. The file name is the relative pass from L</"own_src_dir">.
 
 B<Examples:>
 
@@ -962,25 +1099,19 @@ If you want to link only static link library, you can use the following hash ref
 
   {type => 'static', name => 'gsl'}
 
-=head2 resources
-
-  my $resources = $config->resources;
-  $config->resources($resources);
-
-Get and get resouce module names.
-
-At runtime, each modules' native "include" directory is added before C<include_dirs>, and "lib" directory is added before C<lib_dirs>.
-
-B<Examples:>
-
-  $config->resources(['SPVM::Resouce::Zlib::V1_15']);
-  
 =head2 ldflags
 
   my ldflags = $config->ldflags;
   $config->ldflags(ldflags);
 
-Get and set linker flags. The default is emtpy array reference.
+Get and set linker flags. The default value is an emtpy array reference.
+
+=head2 dynamic_lib_ldflags
+
+  my dynamic_lib_ldflags = $config->dynamic_lib_ldflags;
+  $config->dynamic_lib_ldflags(dynamic_lib_ldflags);
+
+Get and set linker flags for dynamic link.
 
 B<Default:>
 
@@ -1035,17 +1166,40 @@ Get and set the flag if the compiler and the linker output the results.
 
 The default is C<1>.
 
-=head1 Methods
+=head2 file
+
+  my $file = $config->file;
+  $config->file($file);
+
+Get and set the config file path.
+
+The default is C<1>.
+
+=head2 file_optional
+
+  my $file_optional = $config->file_optional;
+  $config->file_optional($file_optional);
+
+Get and set the value that indicates L<file|/"file"> field is needed for C<new|/"new"> method.
+
+The default is C<0>.
+
+=head2 output_type
+
+  my $output_type = $config->output_type;
+  $config->output_type($type);
+
+=head1 CLASS METHODS
 
 =head2 new
 
-  my $config = SPVM::Builder::Config->new;
+  my $config = SPVM::Builder::Config->new(file => __FILE__);
   
 Create L<SPVM::Builder::Config> object.
 
 =head2 new_c
   
-  my $config = SPVM::Builder::Config->new_c;
+  my $config = SPVM::Builder::Config->new_c(file => __FILE__);
 
 Create default build config with C settings. This is L<SPVM::Builder::Config> object.
 
@@ -1055,13 +1209,13 @@ If you want to use the specific C version, use C<set_std> method.
 
 =head2 new_c99
   
-  my $config = SPVM::Builder::Config->new_gnu99;
+  my $config = SPVM::Builder::Config->new_gnu99(file => __FILE__);
 
 Create default build config with C99 settings. This is L<SPVM::Builder::Config> object.
 
 =head2 new_cpp
   
-  my $config = SPVM::Builder::Config->new_cpp;
+  my $config = SPVM::Builder::Config->new_cpp(file => __FILE__);
 
 Create default build config with C++ settings. This is L<SPVM::Builder::Config> object.
 
@@ -1071,9 +1225,11 @@ If you want to use the specific C++ version, use C<set_std> method.
 
 =head2 new_cpp11
   
-  my $config = SPVM::Builder::Config->new_cpp11;
+  my $config = SPVM::Builder::Config->new_cpp11(file => __FILE__);
 
 Create default build config with C++11 settings. This is L<SPVM::Builder::Config> object.
+
+=head1 INSTANCE METHODS
 
 =head2 set_std
 
@@ -1149,70 +1305,38 @@ B<Examples:>
 
   $config->add_dynamic_libs('gsl');
 
-=head2 use
+=head2 use_resource
 
-  $config->use(@resources);
+  $config->use_resource($resource);
+  $config->use_resource('Resource::Zlib::V1_0_0');
+  $config->use_resource('Resource::Zlib::V1_0_0', mode => 'prod', args => ['foo', 'bar']);
 
-This method is the alias for L<"add_resources"> to improve user experiences.
+Use a resource. 
 
-B<Examples:>
+The first argument is a L<SPVM::Builder::Resource> object.
 
-  $config->use('SPVM::Resouce::Zlib::V1_15');
+If the first argument is a class name of the resource, a L<SPVM::Builder::Resource> object is created by L<SPVM::Builder::Resource|/"new"> method with C<class_name> option.
 
-=head2 add_resources
+  my $resource = SPVM::Builder::Resource->new(class_name => 'Resource::Zlib::V1_0_0');
+  $config->use_resource($resource);
 
-  $config->add_resources(@resources);
+If the rest arguments are used as the options of L<SPVM::Builder::Resource|/"new"> of L<SPVM::Builder::Resource>.
 
-Add the values after the last element of C<resources> field.
+  my $resource = SPVM::Builder::Resource->new(
+    class_name => 'Resource::Zlib::V1_0_0',
+    mode => 'prod',
+    args => ['foo', 'bar'],
+  );
+  $config->use_resource($resource);
 
-B<Examples:>
+=head2 get_resource
 
-  $config->add_resources('SPVM::Resouce::Zlib::V1_15');
+  my $resource = $config->get_resource('Resource::Zlib::V1_0_0');
 
-=head2 to_hash
+Get a resource. The resource is a L<SPVM::Builder::Resource> object.
 
-  my $config = $config->to_hash;
+=head2 get_resource_names
 
-Convert L<SPVM::Builder::Config> to a hash reference.
+  my $resource_names = $config->get_resource_names;
 
-=head2 search_lib_dirs_from_cc_info
-
-  my $lib_dirs = $config->search_lib_dirs_from_cc_info;
-
-Get the library searching directories parsing the infomation the compiler has.
-
-=head2 search_lib_dirs_from_config_libpth
-
-  my $lib_dirs = $config->search_lib_dirs_from_config_libpth;
-
-Get the library searching directories parsing C<libpth> of L<Config>.
-
-=head2 search_include_dirs_from_config_incpth
-
-  my $include_dirs = $config->search_include_dirs_from_config_incpth;
-
-Get the header searching directories parsing C<incpth> of L<Config>.
-
-=head2 sub get_include_dir
-
-  my $include_dir = $config->get_include_dir(__FILE__);
-
-Get the header include directory from the config file name.
-
-=head2 get_src_dir
-
-  my $src_dir = $config->get_src_dir(__FILE__);
-
-Get the source directory from the config file name.
-
-=head2 get_lib_dir
-
-  my $lib_dir = $config->get_lib_dir(__FILE__);
-
-Get the library directory from the config file name.
-
-=head2 is_exe
-
-  my $is_exe = $config->is_exe;
-
-Check this config is used for creating executalbe file. Always 0.
+Get resource names.

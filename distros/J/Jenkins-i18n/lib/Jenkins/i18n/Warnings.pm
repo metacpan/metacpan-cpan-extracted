@@ -7,7 +7,7 @@ use Hash::Util qw(lock_keys);
 use Carp qw(confess);
 use Cwd;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =pod
 
@@ -42,7 +42,7 @@ Expects no parameters, returns a new instance.
 =cut
 
 sub new {
-    my $class = shift;
+    my ( $class, $silent ) = @_;
 
     my $self = {
         types => {
@@ -52,7 +52,8 @@ sub new {
             non_jenkins  => 'Non Jenkins',
             search_found => 'Found match on given term',
             ignored      => 'Ignored due expected value'
-        }
+        },
+        silent => $silent
     };
 
     if ( $self->{is_add} ) {
@@ -180,7 +181,7 @@ sub summary {
     # required for predicable warnings order
     my @sorted_types = sort( keys( %{ $self->{types} } ) );
 
-    if ($has_any) {
+    if ( ($has_any) and ( not $self->{silent} ) ) {
         my $rel = $self->_relative_path($file);
         warn "Got warnings for $rel:\n";
 

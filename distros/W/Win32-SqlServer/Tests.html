@@ -65,7 +65,7 @@ server(s) the test scripts should access. <SMALL>OLLEDBTEST</SMALL> has this for
    with <SMALL>SQL</SMALL> authentication, you would say:</P>
 <PRE>   SET OLLEDBTEST=.;;;DEVSERVER;sa;notstrong</PRE>
 <P>The last option in the string is <B>Provider</B>. Use this if you want to force a
-certain provider. You will neeed to use this if you want to test against a version of SQL Server which is not supported by the default provider, which always is the most recently released proivder. The values for <B>Provider</B> are: 1&nbsp;&#8211;&nbsp;<SMALL>SQLOLEDB</SMALL>, 2&nbsp;&#8211;&nbsp;<SMALL>SQLNCLI</SMALL>, 3&nbsp;&#8211;&nbsp;<SMALL>SQLNCLI10</SMALL>, 4&nbsp;&#8211;<SMALL>&nbsp;SQLNCLI1</SMALL>, 5 &#8211; <SMALL>MSOLEDBSQL</SMALL>.</P>
+certain provider. You will neeed to use this if you want to test against a version of SQL Server which is not supported by the default provider, which always is the most recently released proivder. The values for <B>Provider</B> are: 1&nbsp;&#8211;&nbsp;<SMALL>SQLOLEDB</SMALL>, 2&nbsp;&#8211;&nbsp;<SMALL>SQLNCLI</SMALL>, 3&nbsp;&#8211;&nbsp;<SMALL>SQLNCLI10</SMALL>, 4&nbsp;&#8211;<SMALL>&nbsp;SQLNCLI1</SMALL>, 5 &#8211; <SMALL>MSOLEDBSQL</SMALL>, 6  &#8211; <SMALL>MSOLEDBSQL19</SMALL>.</P>
 <P>The simplest way to run the scripts is to run them with <KBD>MAKE test</KBD>. </P>
 <P>A poor man's test harness is avilable in the <B>t</B> directory. Do:</P>
 <PRE>   CD t
@@ -190,11 +190,11 @@ other connection routines. </P>
 <B>Notes</B>: to perform all tests, this script requires that you have defined a
 second test server with the <SMALL>OLLEDBTEST</SMALL> environment variable.</P>
 <P>
-<B>Number of tests</B>: 45, whereof three will be skipped if no second server
-is defined. Some tests are skipped depending on the <SMALL>SQL</SMALL> Server and the provider.
-Only with <SMALL>SQL</SMALL> 2005 or later and <SMALL>SQLNCLI</SMALL> or later and a second server all tests will be
+<B>Number of tests</B>: 49, whereof three will be skipped if no second server
+is defined. Some tests are skipped depending on the <SMALL>version of SQL</SMALL> Server and the provider.
+Only with <SMALL>SQL</SMALL> 2005 or later and <SMALL>MSOLEDBSQL19</SMALL> or later and a second server all tests will be
 performed. And even in that case, two tests will be skipped if <SMALL>SQL</SMALL>
-Server is configured for Windows authentication only.</P>
+Server is configured for Windows authentication only. Four tests are skipped if you are testing against an instancs of LocalDB.</P>
 <P>
 <B>Creates in <SMALL>SQL</SMALL> Server</B>: Creates a <FONT COLOR="#FF0000"><I>database</I></FONT> which it detaches and
 then reattaches with a different name. Both names start with &quot;OlleDB&quot;. On
@@ -204,7 +204,7 @@ with the name starting in &quot;Olle&quot; followed by random digits. The script
 login with <SMALL>CHECK_POLICY = OFF</SMALL>. As all other objects the test script creates, the
 login is dropped if the script terminates normally. No objects are created in
 the second server.</P>
-<P><B>Known issues</B>: I have seen the first two test fail when integrated security is not possible. Instead of the expected login error, the connection attempt sometimes out. There is a test where I attempt to force the SQLOLEDB provider. This can fail if the server requires TLS 1.2 (I guess that is the reason). I've seen this when attempting to connect to a VM that runs CentOS 8.</P>
+<P><B>Known issues</B>: I have seen the first two tests fail when integrated security is not possible. Instead of the expected login error, the connection attempt sometimes out. There is a test where I attempt to force the SQLOLEDB provider. This can fail if the server requires TLS 1.2 (I guess that is the reason). I've seen this when attempting to connect to a VM that runs CentOS 8.</P>
 <H3>
 A_tableparam.t</H3>
 <P>
@@ -241,7 +241,7 @@ according to <B>sys.configurations</B>.
   with filestream data in that database. The database is dropped at the end of the 
 script.</P>
 <P><B>Known issues</B>: Some or most tests fail when connected to SQL 2008. I also see failures when testing against SQL 2008 R2, put sometimes all tests pass. No such issues are seen on SQL 2012 or later, save for the issue below.</P>
-<P>On 32-bit Perl with USE_64_BIT_INT, the last test fails for reasons I have not been able to understand. The test intends to pre-allocate a 80 TB record which is expected to fail, but the call unexpectedly succeeds.</P>
+<P>On 32-bit Perl with USE_64_BIT_INT, the last test often fails for reasons I have not been able to understand. The test intends to pre-allocate a 80 TB record which is expected to fail, but the call unexpectedly succeeds.</P>
 <P><B>WARNING</B>! I have experienced Blue Screens with this test on one of my machines. Specifically it is the last test where I test to allocate too much that crashes Windows.  The Blue Screen occurs on the machine where SQL Server is running and the error code is BAD POOL CALLER. I have not nailed the exact conditions for the crash to occur, but it seems to be a combination of filter drivers. The machine in question has an installation of Storagecraft's Shadowprotect which sets up a filter driver. There is also the fileinfo filter driver, which I am told is only comes with client O/S like Windows 10, but not server O/Ss.</P>
 <H3>C_character.t</H3>
 <P><B>Tests</B> sending and retrieving char and varchar data with different collations.</P>
@@ -290,7 +290,7 @@ generate output files.
 </P>
 <HR />
 <I>
-Last updated <!--$$Modtime:--> 21-07-04 0:06 <!-- $-->
+Last updated <!--$$Modtime:--> 22-06-09 22:59 <!-- $-->
 </I>
 </P>
 </BODY>

@@ -1,6 +1,13 @@
+0.027   2022-05-14  Released-By: PERLANCAR; Urgency: medium
+
+        - Remove superfluous paragraph 'Usage:' in the generated SYNOPSIS
+          section because SYNOPSIS *is* for displaying usage. This will make CLI
+          scripts' generated doc follow Unix manpage convention more closely.
+
+
 0.026   2022-05-08  Released-By: PERLANCAR; Urgency: medium
 
-	- [ux] In generated Synopsis, helpfully refer to the EXAMPLES
+	- [ux] In generated Synopsis, helpfully refer to the generated EXAMPLES
 	  section if CLI has examples.
 
 

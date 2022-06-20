@@ -8,6 +8,7 @@ inc/Test/Fatal.pm
 inc/Test/More.pm
 inc/Test/Name/FromLine.pm
 lib/Config/ENV.pm
+minil.toml
 t/00_compile.t
 t/01_base.t
 t/02_default.t

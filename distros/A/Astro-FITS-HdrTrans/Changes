@@ -1,5 +1,10 @@
 Revision history for Astro::FITS::HdrTrans
 
+1.65 2022-06-17
+
+    - Add SB_MODE, OBS_SB and TRACK_SB for ACSIS.
+    - Avoid error in ACSIS EXPOSURE_TIME if end undefinded.
+
 1.64 2021-08-13
 
     - Provide default for undefined ACSIS RECIPE.

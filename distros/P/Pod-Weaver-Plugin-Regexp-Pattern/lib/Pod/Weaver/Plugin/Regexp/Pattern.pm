@@ -13,7 +13,7 @@ use Data::Dmp;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-05-08'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Regexp-Pattern'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 sub _md2pod {
     require Markdown::To::POD;
@@ -60,11 +60,13 @@ sub _process_module {
         push @pod, " # see Regexp::Pattern for more details on how to use with Regexp::Pattern\n";
         push @pod, " \n";
 
-        push @pod, "Using the pattern(s) directly:\n";
-        push @pod, " \n";
-        push @pod, " use $package;\n";
-        push @pod, " if ('some string' =~ \$$package\::RE{$patnames[0]}) { ... }\n";
-        push @pod, "\n";
+        if ($patnames[0]{pat} && !$patnames[0]{gen}) {
+            push @pod, "Using the pattern(s) directly:\n";
+            push @pod, " \n";
+            push @pod, " use $package;\n";
+            push @pod, " if ('some string' =~ \$$package\::RE{$patnames[0]}{pat}) { ... }\n";
+            push @pod, "\n";
+        }
 
         $self->add_text_to_section(
             $document, join("", @pod), 'SYNOPSIS',
@@ -232,7 +234,7 @@ Pod::Weaver::Plugin::Regexp::Pattern - Plugin to use when building Regexp::Patte
 
 =head1 VERSION
 
-This document describes version 0.010 of Pod::Weaver::Plugin::Regexp::Pattern (from Perl distribution Pod-Weaver-Plugin-Regexp-Pattern), released on 2022-05-08.
+This document describes version 0.011 of Pod::Weaver::Plugin::Regexp::Pattern (from Perl distribution Pod-Weaver-Plugin-Regexp-Pattern), released on 2022-05-08.
 
 =head1 SYNOPSIS
 

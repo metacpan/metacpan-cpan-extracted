@@ -3,6 +3,7 @@ class TestCase::JSON {
   use List;
   use Hash;
   use Fn;
+  use Sort;
 
   our $DEFAULT_JSON : JSON;
 
@@ -34,8 +35,8 @@ class TestCase::JSON {
         }
       }
       else {
-        Fn->sort_string($l_keys, 0, scalar @$l_keys, method : int ($a : string, $b : string) { $a cmp $b; });
-        Fn->sort_string($r_keys, 0, scalar @$r_keys, method : int ($a : string, $b : string) { $a cmp $b; });
+        Sort->sort_string($l_keys, 0, scalar @$l_keys, method : int ($a : string, $b : string) { $a cmp $b; });
+        Sort->sort_string($r_keys, 0, scalar @$r_keys, method : int ($a : string, $b : string) { $a cmp $b; });
 
         for (my $key_index = 0; $key_index < @$l_keys; ++$key_index) {
           my $key = $l_keys->[$key_index];

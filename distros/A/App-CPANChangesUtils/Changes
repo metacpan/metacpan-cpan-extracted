@@ -1,3 +1,17 @@
+0.076   2022-06-10  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [ux] Add an example.
+
+
+0.075   2022-06-10  Released-By: PERLANCAR; Urgency: medium
+
+        - [utility parse-cpan-changes] Add option parse_release_metadata
+          (defaults to true) to parse 'key: value' metadata in the release
+          note.
+
+
 0.073   2021-10-17  Released-By: PERLANCAR; Urgency: medium
 
 	- Rename module/dist App-ParseCPANChanges -> App-CPANChangesUtils.

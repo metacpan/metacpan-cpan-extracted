@@ -6,7 +6,7 @@ use warnings;
 use Carp qw(confess);
 use File::Find;
 use File::Spec;
-use Config;
+use Set::Tiny;
 
 use Jenkins::i18n::Properties;
 
@@ -31,10 +31,10 @@ This module implements some of the functions used by the CLI.
 use Exporter 'import';
 our @EXPORT_OK = (
     'remove_unused', 'find_files', 'print_license', 'load_properties',
-    'load_jelly'
+    'load_jelly',    'find_langs'
 );
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head2 EXPORT
 
@@ -142,29 +142,18 @@ my $target_regex  = qr/$target_path/;
 my $msgs_regex    = qr/Messages\.properties$/;
 my $jelly_regex   = qr/\.jelly$/;
 
-my $win_sep_regex;
-
-if ( $Config{osname} eq 'MSWin32' ) {
-    $win_sep_regex = qr#/#;
-}
-
 sub find_files {
     my $dir = shift;
     confess 'Must provide a string, invalid directory parameter'
         unless ($dir);
     confess 'Must provide a string as directory, not a reference'
         unless ( ref($dir) eq '' );
-    die "Directory $dir must exists" unless ( -d $dir );
+    confess "Directory $dir must exists" unless ( -d $dir );
     my @files;
-
-    # BUGFIX: File::Find::name is not returning with MS Windows separator
-    my $is_windows = 0;
-    $is_windows = 1 if ( $Config{osname} eq 'MSWin32' );
 
     find(
         sub {
             my $file = $File::Find::name;
-            $file =~ s#$win_sep_regex#\\# if ($is_windows);
 
             unless ( ( $file =~ $src_regex ) or ( $file =~ $target_regex ) ) {
                 push( @files, $file )
@@ -176,6 +165,42 @@ sub find_files {
     );
     my @sorted = sort(@files);
     return \@sorted;
+}
+
+my $regex = qr/_([a-z]{2})(_[A-Z]{2})?\.properties$/;
+
+sub find_langs {
+    my $dir = shift;
+    confess 'Must provide a string, invalid directory parameter'
+        unless ($dir);
+    confess 'Must provide a string as directory, not a reference'
+        unless ( ref($dir) eq '' );
+    confess "Directory $dir must exists" unless ( -d $dir );
+    my $langs = Set::Tiny->new;
+
+    find(
+        sub {
+            my $file = $File::Find::name;
+
+            unless ( ( $file =~ $src_regex ) or ( $file =~ $target_regex ) ) {
+                if ( $file =~ $regex ) {
+                    my $lang;
+
+                    if ($2) {
+                        $lang = $1 . $2;
+                    }
+                    else {
+                        $lang = $1;
+                    }
+
+                    $langs->insert($lang);
+                }
+            }
+        },
+        $dir
+    );
+
+    return $langs;
 }
 
 =head2 print_license

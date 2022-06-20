@@ -24,7 +24,6 @@
             "Carp" : "0",
             "Dancer2::Core::Hook" : "0",
             "Dancer2::Plugin" : "0",
-            "Dancer2::Plugin::Deferred" : "0",
             "Email::Valid" : "0",
             "Hash::MultiValue" : "0",
             "Hash::Util" : "0",
@@ -70,7 +69,7 @@
          "web" : "https://github.com/AlexP007/dancer2-plugin-formvalidator"
       }
    },
-   "version" : "1.01",
+   "version" : "1.04",
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

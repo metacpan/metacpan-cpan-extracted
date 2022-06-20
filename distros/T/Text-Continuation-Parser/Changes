@@ -1,6 +1,17 @@
 Revision history for Text::Continuation::Parser
 
+0.5       2022-06-09 23:55:31Z
+
+    * CPAN testers were ok with the previous trial, so let's make it
+      official
+
+0.4       2019-03-10 23:42:19Z (TRIAL RELEASE)
+
+    * Bump IO::Handle dependency to to 1.39
+
 0.3       2018-04-13 21:56:39Z
+
+    * Release TRIAL version as actual release
 
 0.3_1     2017-11-09 20:07:43Z (TRIAL RELEASE)
 

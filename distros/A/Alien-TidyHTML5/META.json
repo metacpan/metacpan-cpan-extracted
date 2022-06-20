@@ -4,7 +4,7 @@
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "tidy5",
       "HTML5"
@@ -52,10 +52,7 @@
          "requires" : {
             "Alien::Base" : "0",
             "Alien::cmake3" : "0",
-            "File::Spec::Functions" : "0",
-            "List::Util" : "0",
             "base" : "0",
-            "namespace::autoclean" : "0",
             "perl" : "v5.8.0",
             "strict" : "0",
             "warnings" : "0"
@@ -77,7 +74,7 @@
    "provides" : {
       "Alien::TidyHTML5" : {
          "file" : "lib/Alien/TidyHTML5.pm",
-         "version" : "v0.3.4"
+         "version" : "v0.3.5"
       }
    },
    "release_status" : "stable",
@@ -91,9 +88,9 @@
          "web" : "https://github.com/robrwo/Alien-TidyHTML5"
       }
    },
-   "version" : "v0.3.4",
+   "version" : "v0.3.5",
    "x_alienfile" : {
-      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.29",
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {
          "share" : {
             "Alien::cmake3" : "0.02",
@@ -117,8 +114,8 @@
       "Slaven Rezi\u0107 <slaven@rezic.de>",
       "Graham Ollis <plicease@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.28",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

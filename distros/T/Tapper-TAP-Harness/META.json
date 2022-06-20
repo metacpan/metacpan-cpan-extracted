@@ -44,6 +44,7 @@
             "IO::Scalar" : "0",
             "IO::String" : "0",
             "Moose" : "0",
+            "TAP::DOM" : "0.97",
             "TAP::Formatter::HTML" : "0",
             "TAP::Parser" : "3.22",
             "TAP::Parser::Aggregator" : "0",
@@ -57,7 +58,6 @@
          "requires" : {
             "Data::Dumper" : "0",
             "File::Slurp" : "0",
-            "TAP::DOM" : "0",
             "Test::Deep" : "0",
             "Test::More" : "0"
          }
@@ -76,7 +76,7 @@
          "web" : "http://github.com/tapper/Tapper-TAP-Harness"
       }
    },
-   "version" : "5.0.9",
+   "version" : "5.0.11",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.022000"
@@ -420,7 +420,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v5.0.9",
+                  "tag" : "v5.0.11",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

@@ -1,6 +1,10 @@
 class IO::Socket::INET {
+  
+  interface IO::Socketable;
+  interface IO::Handlable;
 
-  method is_io_socket : void () { }
+  method is_io_handlable : int () { return 1; }
+  method is_io_socketable : int () { return 1; }
 
   has handle : int;
   

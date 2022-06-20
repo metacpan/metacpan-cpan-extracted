@@ -1,9 +1,10 @@
+## no critic: TestingAndDebugging::RequireUseStrict
 package Log::ger::Format;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-31'; # DATE
+our $DATE = '2022-06-10'; # DATE
 our $DIST = 'Log-ger'; # DIST
-our $VERSION = '0.038'; # VERSION
+our $VERSION = '0.040'; # VERSION
 
 use parent qw(Log::ger::Plugin);
 
@@ -24,7 +25,7 @@ Log::ger::Format - Use a format plugin
 
 =head1 VERSION
 
-version 0.038
+version 0.040
 
 =head1 SYNOPSIS
 
@@ -65,7 +66,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2020, 2019, 2018, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

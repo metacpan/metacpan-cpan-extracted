@@ -15,7 +15,8 @@ my @files = (
     'lib/Finance/Tax/Aruba/Role/Income/TaxYear.pm',
     't/00-compile.t',
     't/01-2020.t',
-    't/02-2021.t'
+    't/02-2021.t',
+    't/03-2022.t'
 );
 
 notabs_ok($_) foreach @files;

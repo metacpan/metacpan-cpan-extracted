@@ -1,6 +1,5 @@
 Build.PL
 Changes
-ignore.txt
 lib/Pod/Query.pm
 MANIFEST			This list of files
 META.json
@@ -10,7 +9,9 @@ t/00-load.t
 t/01-usage-simple.t
 t/02-usage-ojo.t
 t/03-usage-mojo-useragent.t
-t/04-method-query_string_to_struct.t
+t/04-usage-module-build.t
+t/05-method-query_string_to_struct.t
+t/06-class_to_path.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

@@ -2,11 +2,11 @@
 
 SPVM::Document::Modules - SPVM Standard Modules
 
-=head1 DESCRIPTION
+=head1 Description
 
 The list of SPVM Standard Modules.
 
-=head1 STANDARD MODULES
+=head1 Standard Modules
 
 =over 2
 
@@ -70,6 +70,10 @@ The list of SPVM Standard Modules.
 
 =item * L<ShortList|SPVM::ShortList> - Dynamic short Array
 
+=item * L<Sort|SPVM::Sort> - Sorting Utilities
+
+=item * L<Format|SPVM::Format> - Format Utilities
+
 =item * L<StringBuffer|SPVM::StringBuffer> - String Buffer
 
 =item * L<Stringable|SPVM::Stringable> - Interface Type to Stringify a Object
@@ -84,7 +88,7 @@ The list of SPVM Standard Modules.
 
 =back
 
-=head1 CPAN MODULES
+=head1 CPAN Modules
 
 The list of some CPAN modules.
 
@@ -98,4 +102,10 @@ The list of some CPAN modules.
 
 =item * L<Unicode|SPVM::Unicode> - Unicode Utilities
 
+=item * L<Base64|SPVM::Base64> - Base 64
+
 =back
+
+=head2 Resource Modules
+
+See L<SPVM::Document::Resource|/"Resource Modules">.

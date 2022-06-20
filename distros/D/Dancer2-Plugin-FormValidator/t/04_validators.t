@@ -1,11 +1,12 @@
 use strict;
 use warnings;
 use utf8::all;
-use Test::More tests => 77;
+use Test::More tests => 83;
 
 use Dancer2::Plugin::FormValidator::Validator::Accepted;
 use Dancer2::Plugin::FormValidator::Validator::Alpha;
 use Dancer2::Plugin::FormValidator::Validator::AlphaNum;
+use Dancer2::Plugin::FormValidator::Validator::Boolean;
 use Dancer2::Plugin::FormValidator::Validator::Enum;
 use Dancer2::Plugin::FormValidator::Validator::Email;
 use Dancer2::Plugin::FormValidator::Validator::EmailDns;
@@ -425,6 +426,12 @@ is(
     'TEST 12: Dancer2::Plugin::FormValidator::Validator::LengthMin valid',
 );
 
+is(
+    $validator->validate('number', {number => '10045'}, '4'),
+    1,
+    'TEST 12: Dancer2::Plugin::FormValidator::Validator::LengthMin number valid',
+);
+
 # TEST 13.
 ## Check Dancer2::Plugin::FormValidator::Validators::LengthMax.
 
@@ -452,6 +459,12 @@ is(
     $validator->validate('name', {name => 'Вася'}, '4'),
     1,
     'TEST 13: Dancer2::Plugin::FormValidator::Validator::LengthMax valid',
+);
+
+is(
+    $validator->validate('number', {number => '123'}, '4'),
+    1,
+    'TEST 13: Dancer2::Plugin::FormValidator::Validator::LengthMax number string valid',
 );
 
 # TEST 14.
@@ -601,4 +614,34 @@ is(
     $validator->validate('email', {email => 'alex@cpan.org', 'name' => 'Alex'}, 'name'),
     1,
     'TEST 1: Dancer2::Plugin::FormValidator::Validator::RequiredWith valid',
+);
+
+
+# TEST 18.
+## Check Dancer2::Plugin::FormValidator::Validators::Boolean.
+
+$validator = Dancer2::Plugin::FormValidator::Validator::Boolean->new;
+
+is(
+    ref $validator->message,
+    'HASH',
+    'TEST 1: Dancer2::Plugin::FormValidator::Validator::Boolean messages hash'
+);
+
+is(
+    $validator->stop_on_fail,
+    0,
+    'TEST 1: Dancer2::Plugin::FormValidator::Validator::Boolean stop_on_fail',
+);
+
+isnt(
+    $validator->validate('include', {'include' => 'bla'}),
+    1,
+    'TEST 1: Dancer2::Plugin::FormValidator::Validator::Boolean not valid',
+);
+
+is(
+    $validator->validate('include', {'include' => '1'}),
+    1,
+    'TEST 1: Dancer2::Plugin::FormValidator::Validator::Boolean valid',
 );

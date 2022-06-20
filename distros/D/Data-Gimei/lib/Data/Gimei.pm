@@ -3,7 +3,7 @@ package Data::Gimei;
 use warnings;
 use v5.22;
 
-use version; our $VERSION = version->declare("v0.1.1");
+use version; our $VERSION = version->declare("v0.2.0");
 
 use Data::Gimei::Name;
 use Data::Gimei::Address;

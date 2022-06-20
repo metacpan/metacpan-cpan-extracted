@@ -10,3 +10,5 @@ s
 0\
 foo\
 ''
+
+last line

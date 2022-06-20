@@ -12,7 +12,7 @@ use Test::More;
 use File::Spec::Functions ':ALL';
 use File::Remove ();
 
-unless ( eval { symlink( "", "" ); 1 } )
+unless ( $^O ne 'msys' && eval { symlink( "", "" ); 1 } )
 {
     plan( "skip_all" => "No Unix-like symlinks" );
     exit(0);

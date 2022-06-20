@@ -26,4 +26,5 @@ plan skip_all => 'Test::Kwalitee fails with clang -faddress-sanitizer'
 use File::Copy 'cp';
 cp('MYMETA.yml','META.yml') if -e 'MYMETA.yml' and !-e 'META.yml';
 
-Test::Kwalitee->import( tests => [ qw( -use_strict -proper_libs ) ] );
+#Test::Kwalitee->import( tests => [ qw( -use_strict -proper_libs ) ] );
+Test::Kwalitee->import();

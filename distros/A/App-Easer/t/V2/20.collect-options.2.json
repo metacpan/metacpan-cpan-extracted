@@ -1,0 +1,12 @@
+{
+   "bar": "from_general_configuration_file",
+   "defaults": {
+      "foo": {
+         "baz": {
+            "foo": 0,
+            "bar": "from_substuff",
+            "last": 42
+         }
+      }
+   }
+}

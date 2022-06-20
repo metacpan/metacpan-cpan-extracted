@@ -38,6 +38,10 @@ DESCRIPTION
     Also, unlike MooX::HandlesVia, it honours type constraints, plus it
     doesn't have the limitation that it can't mutate non-reference values.
 
+    Note: as Sub::HandlesVia needs to detect whether you're using Moo, Moose,
+    or Mouse, and often needs to detect whether your package is a class or a
+    role, it needs to be loaded *after* Moo/Moose/Mouse.
+
   Using with Moo
     You should be able to use it as a drop-in replacement for
     MooX::HandlesVia.
@@ -316,24 +320,24 @@ DESCRIPTION
                  uniqstr : SubHV                       
         uniqstr_in_place : SubHV                       
                  unshift : SubHV  DataP  Moose  Mouse  
- 
+  
       Bool ============================================
                      not : SubHV  DataP  Moose  Mouse  
                    reset : SubHV                       
                      set : SubHV  DataP  Moose  Mouse  
                   toggle : SubHV  DataP  Moose  Mouse  
                    unset : SubHV  DataP  Moose  Mouse  
- 
+  
       Code ============================================
                  execute : SubHV  DataP  Moose  Mouse  
           execute_method : SubHV         Moose  Mouse  
- 
+  
       Counter =========================================
                      dec : SubHV  DataP  Moose  Mouse  
                      inc : SubHV  DataP  Moose  Mouse  
                    reset : SubHV  DataP  Moose  Mouse  
                      set : SubHV         Moose  Mouse  
- 
+  
       Hash ============================================
                 accessor : SubHV  DataP  Moose  Mouse  
                      all : SubHV  DataP                
@@ -357,32 +361,71 @@ DESCRIPTION
              sorted_keys : SubHV                Mouse  
                    store :                      Mouse  (alias: set)
                   values : SubHV  DataP  Moose  Mouse  
- 
+  
       Number ==========================================
                      abs : SubHV  DataP  Moose  Mouse  
                      add : SubHV  DataP  Moose  Mouse  
+                     cmp : SubHV                       
                      div : SubHV  DataP  Moose  Mouse  
+                      eq : SubHV                       
+                      ge : SubHV                       
                      get : SubHV                       
+                      gt : SubHV                       
+                      le : SubHV                       
+                      lt : SubHV                       
                      mod : SubHV  DataP  Moose  Mouse  
                      mul : SubHV  DataP  Moose  Mouse  
+                      ne : SubHV                       
                      set : SubHV         Moose         
                      sub : SubHV  DataP  Moose  Mouse  
- 
+  
+      Scalar ==========================================
+             make_getter : SubHV                       
+             make_setter : SubHV                       
+        scalar_reference : SubHV                       
+  
       String ==========================================
                   append : SubHV  DataP  Moose  Mouse  
                    chomp : SubHV  DataP  Moose  Mouse  
                     chop : SubHV  DataP  Moose  Mouse  
                    clear : SubHV  DataP  Moose  Mouse  
+                     cmp : SubHV                       
+                    cmpi : SubHV                       
+                contains : SubHV                       
+              contains_i : SubHV                       
+               ends_with : SubHV                       
+             ends_with_i : SubHV                       
+                      eq : SubHV                       
+                     eqi : SubHV                       
+                      fc : SubHV                       
+                      ge : SubHV                       
+                     gei : SubHV                       
                      get : SubHV                       
+                      gt : SubHV                       
+                     gti : SubHV                       
                      inc : SubHV  DataP  Moose  Mouse  
+                      lc : SubHV                       
+                      le : SubHV                       
+                     lei : SubHV                       
                   length : SubHV  DataP  Moose  Mouse  
+                      lt : SubHV                       
+                     lti : SubHV                       
                    match : SubHV  DataP  Moose  Mouse  
+                 match_i : SubHV                       
+                      ne : SubHV                       
+                     nei : SubHV                       
                  prepend : SubHV  DataP  Moose  Mouse  
                  replace : SubHV  DataP  Moose  Mouse  
         replace_globally : SubHV                Mouse  
                    reset : SubHV                       
                      set : SubHV                       
-                  substr : SubHV  DataP  Moose  Mouse
+             starts_with : SubHV                       
+           starts_with_i : SubHV                       
+                  substr : SubHV  DataP  Moose  Mouse  
+                      uc : SubHV
+
+    For further details see: Array, Bool, Code, Counter, Hash, Number, Scalar,
+    and String.
 
   Method Chaining
     Say you have the following
@@ -510,18 +553,22 @@ DESCRIPTION
 
 BUGS
     Please report any bugs to
-    <http://rt.cpan.org/Dist/Display.html?Queue=Sub-HandlesVia>.
+    <https://github.com/tobyink/p5-sub-handlesvia/issues>.
 
     (There are known bugs for Moose native types that do coercion.)
 
 SEE ALSO
-    Moose, MouseX::NativeTraits, Data::Perl, MooX::HandlesVia.
+    Documentation for delegatable methods: Array, Bool, Code, Counter, Hash,
+    Number, Scalar, and String.
+
+    Other implementations of the same concept: Moose::Meta::Attribute::Native,
+    MouseX::NativeTraits, and MooX::HandlesVia with Data::Perl.
 
 AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2020 by Toby Inkster.
+    This software is copyright (c) 2020, 2022 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

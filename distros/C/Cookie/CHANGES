@@ -1,32 +1,35 @@
 Revision history for Perl module Cookie
 
-v0.1.8 2021-12-15T07:01:04+0900
+v0.1.9 2022-06-19T08:38:19+0900
+    - Improvement of the Makefile.PL
+
+v0.1.8 2021-12-15T07:01:04Z +0900
     - Re-submision for Cookies
 
-v0.1.7 2021-12-14T10:50:36+0900
+v0.1.7 2021-12-14T10:50:36Z +0900
     - Added the Cookies class to serve as a cookies jar. See also Cookie::Jar
 
-v0.1.6 2021-12-07T17:49:09+0900
+v0.1.6 2021-12-07T17:49:09Z +0900
     - Corrected bug in handling and resetting cache in Cookie
 
-v0.1.5 2021-11-25T07:27:14+0900
+v0.1.5 2021-11-25T07:27:14Z +0900
     - Corrected test units version requirement for testing with CryptX
 
-v0.1.4 2021-11-22T11:10:49+0900
+v0.1.4 2021-11-22T11:10:49Z +0900
     - Minor correction in expires() in Cookie and related test units
 
-v0.1.3 2021-11-18T12:24:20+0900
+v0.1.3 2021-11-18T12:24:20Z +0900
     - Improvement on is_expired in Cookie
 
-v0.1.2 2021-11-18T11:34:17+0900
+v0.1.2 2021-11-18T11:34:17Z +0900
     - Documentation corrections
 
-v0.1.1 2021-11-17T17:00:54+0900
+v0.1.1 2021-11-17T17:00:54Z +0900
     - Change of distribution name from Cookies to Cookie
     - Improvements on handling of same cookie name for a given domain and path
     - Better compliance with rfc6265
 
-v0.1.0 2021-11-14T14:40:13+0900
+v0.1.0 2021-11-14T14:40:13Z +0900
     - Initial release
     - Added classes Cookies and Cookie
     - Added class Cookies::Domain

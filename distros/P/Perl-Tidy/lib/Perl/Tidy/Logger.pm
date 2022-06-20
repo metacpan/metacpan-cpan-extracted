@@ -7,7 +7,11 @@
 package Perl::Tidy::Logger;
 use strict;
 use warnings;
-our $VERSION = '20220217';
+our $VERSION = '20220613';
+use English qw( -no_match_vars );
+
+use constant EMPTY_STRING => q{};
+use constant SPACE        => q{ };
 
 sub AUTOLOAD {
 
@@ -35,6 +39,8 @@ sub DESTROY {
     # required to avoid call to AUTOLOAD in some versions of perl
 }
 
+use constant DEFAULT_LOGFILE_GAP => 50;
+
 sub new {
 
     my ( $class, @args ) = @_;
@@ -44,7 +50,6 @@ sub new {
         log_file        => undef,
         warning_file    => undef,
         fh_stderr       => undef,
-        saw_extruce     => undef,
         display_name    => undef,
         is_encoded_data => undef,
     );
@@ -55,7 +60,6 @@ sub new {
     my $log_file        = $args{log_file};
     my $warning_file    = $args{warning_file};
     my $fh_stderr       = $args{fh_stderr};
-    my $saw_extrude     = $args{saw_extrude};
     my $display_name    = $args{display_name};
     my $is_encoded_data = $args{is_encoded_data};
 
@@ -66,14 +70,14 @@ sub new {
         if ( -e $warning_file ) {
             unlink($warning_file)
               or Perl::Tidy::Die(
-                "couldn't unlink warning file $warning_file: $!\n");
+                "couldn't unlink warning file $warning_file: $ERRNO\n");
         }
     }
 
     my $logfile_gap =
       defined( $rOpts->{'logfile-gap'} )
       ? $rOpts->{'logfile-gap'}
-      : 50;
+      : DEFAULT_LOGFILE_GAP;
     if ( $logfile_gap == 0 ) { $logfile_gap = 1 }
 
     my $filename_stamp    = $display_name ? $display_name . ':' : "??";
@@ -97,7 +101,6 @@ sub new {
         _is_encoded_data               => $is_encoded_data,
         _saw_code_bug      => -1,                   # -1=no 0=maybe 1=for sure
         _saw_brace_error   => 0,
-        _saw_extrude       => $saw_extrude,
         _output_array      => [],
         _input_stream_name => $input_stream_name,
         _filename_stamp    => $filename_stamp,
@@ -156,6 +159,8 @@ sub we_are_at_the_last_line {
 }
 
 # record some stuff in case we go down in flames
+use constant MAX_PRINTED_CHARS => 35;
+
 sub black_box {
     my ( $self, $line_of_tokens, $output_line_number ) = @_;
     my $input_line        = $line_of_tokens->{_line_text};
@@ -184,10 +189,10 @@ sub black_box {
 
         $out_str = ( '.' x $structural_indentation_level ) . $out_str;
 
-        if ( length($out_str) > 35 ) {
-            $out_str = substr( $out_str, 0, 35 ) . " ....";
+        if ( length($out_str) > MAX_PRINTED_CHARS ) {
+            $out_str = substr( $out_str, 0, MAX_PRINTED_CHARS ) . " ....";
         }
-        $self->logfile_output( "", "$out_str\n" );
+        $self->logfile_output( EMPTY_STRING, "$out_str\n" );
     }
     return;
 }
@@ -226,7 +231,7 @@ sub make_line_information_string {
     my $self                    = shift;
     my $line_of_tokens          = $self->{_line_of_tokens};
     my $input_line_number       = $line_of_tokens->{_line_number};
-    my $line_information_string = "";
+    my $line_information_string = EMPTY_STRING;
     if ($input_line_number) {
 
         my $output_line_number   = $self->{_output_line_number};
@@ -242,15 +247,15 @@ sub make_line_information_string {
 
         # keep logfile columns aligned for scripts up to 999 lines;
         # for longer scripts it doesn't really matter
-        my $extra_space = "";
+        my $extra_space = EMPTY_STRING;
         $extra_space .=
-            ( $input_line_number < 10 )  ? "  "
-          : ( $input_line_number < 100 ) ? " "
-          :                                "";
+            ( $input_line_number < 10 )  ? SPACE x 2
+          : ( $input_line_number < 100 ) ? SPACE
+          :                                EMPTY_STRING;
         $extra_space .=
-            ( $output_line_number < 10 )  ? "  "
-          : ( $output_line_number < 100 ) ? " "
-          :                                 "";
+            ( $output_line_number < 10 )  ? SPACE x 2
+          : ( $output_line_number < 100 ) ? SPACE
+          :                                 EMPTY_STRING;
 
         # there are 2 possible nesting strings:
         # the original which looks like this:  (0 [1 {2
@@ -266,7 +271,7 @@ sub make_line_information_string {
 
         if ( length($nesting_string_new) <= 8 ) {
             $nesting_string =
-              $nesting_string_new . " " x ( 8 - length($nesting_string_new) );
+              $nesting_string_new . SPACE x ( 8 - length($nesting_string_new) );
         }
         $line_information_string =
 "L$input_line_number:$output_line_number$extra_space i$guessed_indentation_level:$structural_indentation_level $ci_level $bk $nesting_string";
@@ -310,17 +315,16 @@ sub increment_brace_error {
 sub brace_warning {
     my ( $self, $msg ) = @_;
 
-    #use constant BRACE_WARNING_LIMIT => 10;
-    my $BRACE_WARNING_LIMIT = 10;
-    my $saw_brace_error     = $self->{_saw_brace_error};
+    use constant BRACE_WARNING_LIMIT => 10;
+    my $saw_brace_error = $self->{_saw_brace_error};
 
-    if ( $saw_brace_error < $BRACE_WARNING_LIMIT ) {
+    if ( $saw_brace_error < BRACE_WARNING_LIMIT ) {
         $self->warning($msg);
     }
     $saw_brace_error++;
     $self->{_saw_brace_error} = $saw_brace_error;
 
-    if ( $saw_brace_error == $BRACE_WARNING_LIMIT ) {
+    if ( $saw_brace_error == BRACE_WARNING_LIMIT ) {
         $self->warning("No further warnings of this type will be given\n");
     }
     return;
@@ -350,8 +354,7 @@ sub warning {
     # report errors to .ERR file (or stdout)
     my ( $self, $msg ) = @_;
 
-    #use constant WARNING_LIMIT => 50;
-    my $WARNING_LIMIT = 50;
+    use constant WARNING_LIMIT => 50;
 
     # Always bump the warn count, even if no message goes out
     Perl::Tidy::Warn_count_bump();
@@ -366,7 +369,8 @@ sub warning {
             my $warning_file = $self->{_warning_file};
             ( $fh_warnings, my $filename ) =
               Perl::Tidy::streamhandle( $warning_file, 'w', $is_encoded_data );
-            $fh_warnings or Perl::Tidy::Die("couldn't open $filename $!\n");
+            $fh_warnings
+              or Perl::Tidy::Die("couldn't open $filename: $ERRNO\n");
             Perl::Tidy::Warn_msg("## Please see file $filename\n")
               unless ref($warning_file);
             $self->{_fh_warnings} = $fh_warnings;
@@ -375,7 +379,7 @@ sub warning {
 
         my $filename_stamp = $self->{_filename_stamp};
 
-        if ( $warning_count < $WARNING_LIMIT ) {
+        if ( $warning_count < WARNING_LIMIT ) {
 
             if ( !$warning_count ) {
 
@@ -390,7 +394,7 @@ sub warning {
                 # Turn off filename stamping unless error output is directed
                 # to the standard error output (with -se flag)
                 if ( !$rOpts->{'standard-error-output'} ) {
-                    $filename_stamp = "";
+                    $filename_stamp = EMPTY_STRING;
                     $self->{_filename_stamp} = $filename_stamp;
                 }
             }
@@ -415,7 +419,7 @@ sub warning {
 
                 # add prefix 'filename: ' to message lines
                 if ($filename_stamp) {
-                    my $pre_string = $filename_stamp . " ";
+                    my $pre_string = $filename_stamp . SPACE;
                     chomp $msg;
                     $msg =~ s/\n/\n$pre_string/g;
                     $msg = $pre_string . $msg . "\n";
@@ -427,7 +431,7 @@ sub warning {
         $warning_count++;
         $self->{_warning_count} = $warning_count;
 
-        if ( $warning_count == $WARNING_LIMIT ) {
+        if ( $warning_count == WARNING_LIMIT ) {
             $fh_warnings->print(
                 $filename_stamp . "No further warnings will be given\n" );
         }
@@ -485,13 +489,12 @@ sub finish {
     }
 
     if ($save_logfile) {
-        my $log_file        = $self->{_log_file};
         my $is_encoded_data = $self->{_is_encoded_data};
         my ( $fh, $filename ) =
           Perl::Tidy::streamhandle( $log_file, 'w', $is_encoded_data );
         if ($fh) {
             my $routput_array = $self->{_output_array};
-            foreach ( @{$routput_array} ) { $fh->print($_) }
+            foreach my $line ( @{$routput_array} ) { $fh->print($line) }
             if ( $log_file ne '-' && !ref $log_file ) {
                 eval { $fh->close() };
             }

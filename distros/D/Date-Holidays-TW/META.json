@@ -40,7 +40,7 @@
    "provides" : {
       "Date::Holidays::TW" : {
          "file" : "lib/Date/Holidays/TW.pm",
-         "version" : "v0.3.0"
+         "version" : "v0.4.0"
       }
    },
    "release_status" : "stable",
@@ -54,8 +54,8 @@
          "web" : "https://github.com/perltaiwan/Date-Holidays-TW"
       }
    },
-   "version" : "v0.3.0",
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "version" : "v0.4.0",
+   "x_serialization_backend" : "JSON::PP version 4.06",
    "x_spdx_expression" : "MIT",
    "x_static_install" : "1"
 }

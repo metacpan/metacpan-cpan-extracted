@@ -26,7 +26,7 @@ optional_features: {}
 provides:
   Mom:
     file: lib/Mom.pm
-    version: '0.005'
+    version: '0.006'
 recommends:
   Path::Tiny: '0'
   Types::Path::Tiny: '0'
@@ -44,7 +44,7 @@ resources:
   homepage: https://metacpan.org/release/Mom
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-mom.git
-version: '0.005'
+version: '0.006'
 x_contributors:
   - 'Brian Greenfield (BRIANG) <briang@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,19 +1,11 @@
-class Fn : precompile {
-  use Cloner;
-  use EqualityChecker;
-  use Comparator::Byte;
-  use Comparator::Short;
-  use Comparator::Int;
-  use Comparator::Long;
-  use Comparator::Float;
-  use Comparator::Double;
-  use Comparator::String;
-  use Comparator;
+class Fn {
+  use StringBuffer;
+  use StringList;
   use Stringer;
   use Cloner;
   use EqualityChecker;
-  use StringBuffer;
-  use StringList;
+  use Array;
+  use Format;
   
   # C-like max and minimal constants
   static method INT8_MAX : byte () { return 127; }
@@ -135,308 +127,83 @@ class Fn : precompile {
   }
   
   static method copy_array_byte : byte[] ($nums : byte[]) {
-    return copy $nums;
+    warn "Fn->copy_array_byte is deprecated. Use Array->copy_byte instead";
+    return Array->copy_byte($nums);
   }
 
   static method copy_array_double : double[] ($nums : double[]) {
-    return copy $nums;
+    warn "Fn->copy_array_double is deprecated. Use Array->copy_double instead";
+    return Array->copy_double($nums);
   }
 
   static method copy_array_float : float[] ($nums : float[]) {
-    return copy $nums;
+    warn "Fn->copy_array_float is deprecated. Use Array->copy_float instead";
+    return Array->copy_float($nums);
   }
 
   static method copy_array_int : int[] ($nums : int[]) {
-    return copy $nums;
+    warn "Fn->copy_array_int is deprecated. Use Array->copy_int instead";
+    return Array->copy_int($nums);
   }
 
   static method copy_array_long : long[] ($nums : long[]) {
-    return copy $nums;
+    warn "Fn->copy_array_long is deprecated. Use Array->copy_long instead";
+    return Array->copy_long($nums);
   }
 
   static method copy_array_object : object[] ($objects : object[], $cloner : Cloner) {
-    if ($objects == undef) {
-      return undef;
-    }
-    
-    my $length = @$objects;
-
-    my $new_objects = new object[$length];
-
-    for (my $i = 0; $i < $length; $i++) {
-      $new_objects->[$i] = $cloner->($objects->[$i]);
-    }
-
-    return $new_objects;
+    warn "Fn->copy_array_object is deprecated. Use Array->copy_object instead";
+    return Array->copy_object($objects, $cloner);
   }
 
   static method copy_array_range_byte : byte[] ($nums : byte[], $offset : int, $length : int) {
-
-    if ($nums == undef) {
-      die "The argument array must be defined";
-    }
-
-    my $array_length = @$nums;
-
-    if ($offset < 0 || $offset > $array_length - 1) {
-      die "Offset must be in the array range";
-    }
-
-    if ($length < 0) {
-      die "Length must be more than or equals to 0";
-    }
-
-    if ($offset + $length > $array_length) {
-      die "Offset + length must be in the array range";
-    }
-
-    my $range = new byte[$length];
-
-    my $pos = 0;
-    for (my $i = $offset; $i < $offset + $length; $i++) {
-      $range->[$pos] = $nums->[$i];
-      $pos++;
-    }
-
-    return $range;
+    warn "Fn->copy_array_range_byte is deprecated. Use Array->copy_range_byte instead";
+    return Array->copy_range_byte($nums, $offset, $length);
   }
 
   static method copy_array_range_double : double[] ($nums : double[], $offset : int, $length : int) {
-
-    if ($nums == undef) {
-      die "The argument array must be defined";
-    }
-
-    my $array_length = @$nums;
-
-    if ($offset < 0 || $offset > $array_length - 1) {
-      die "Offset must be in the array range";
-    }
-
-    if ($length < 0) {
-      die "Length must be more than or equals to 0";
-    }
-
-    if ($offset + $length > $array_length) {
-      die "Offset + length must not be in the array range";
-    }
-
-    my $range = new double[$length];
-
-    my $pos = 0;
-    for (my $i = $offset; $i < $offset + $length; $i++) {
-      $range->[$pos] = $nums->[$i];
-      $pos++;
-    }
-
-    return $range;
+    warn "Fn->copy_array_range_double is deprecated. Use Array->copy_range_double instead";
+    return Array->copy_range_double($nums, $offset, $length);
   }
 
   static method copy_array_range_float : float[] ($nums : float[], $offset : int, $length : int) {
-
-    if ($nums == undef) {
-      die "The argument array must be defined";
-    }
-
-    my $array_length = @$nums;
-
-    if ($offset < 0 || $offset > $array_length - 1) {
-      die "Offset must be in the array range";
-    }
-
-    if ($length < 0) {
-      die "Length must be more than or equals to 0";
-    }
-
-    if ($offset + $length > $array_length) {
-      die "Offset + length must not be in the array range";
-    }
-
-    my $range = new float[$length];
-
-    my $pos = 0;
-    for (my $i = $offset; $i < $offset + $length; $i++) {
-      $range->[$pos] = $nums->[$i];
-      $pos++;
-    }
-
-    return $range;
+    warn "Fn->copy_array_range_float is deprecated. Use Array->copy_range_float instead";
+    return Array->copy_range_float($nums, $offset, $length);
   }
 
   static method copy_array_range_int : int[] ($nums : int[], $offset : int, $length : int) {
-
-    if ($nums == undef) {
-      die "The argument array must be defined";
-    }
-
-    my $array_length = @$nums;
-
-    if ($offset < 0 || $offset > $array_length - 1) {
-      die "Offset must be in the array range";
-    }
-
-    if ($length < 0) {
-      die "Length must be more than or equals to 0";
-    }
-
-    if ($offset + $length > $array_length) {
-      die "Offset + length must be in the array range";
-    }
-
-    my $range = new int[$length];
-
-    my $pos = 0;
-    for (my $i = $offset; $i < $offset + $length; $i++) {
-      $range->[$pos] = $nums->[$i];
-      $pos++;
-    }
-
-    return $range;
+    warn "Fn->copy_array_range_int is deprecated. Use Array->copy_range_int instead";
+    return Array->copy_range_int($nums, $offset, $length);
   }
 
   static method copy_array_range_long : long[] ($nums : long[], $offset : int, $length : int) {
-
-    if ($nums == undef) {
-      die "The argument array must be defined";
-    }
-
-    my $array_length = @$nums;
-
-    if ($offset < 0 || $offset > $array_length - 1) {
-      die "Offset must be in the array range";
-    }
-
-    if ($length < 0) {
-      die "Length must be more than or equals to 0";
-    }
-
-    if ($offset + $length > $array_length) {
-      die "Offset + length must not be in the array range";
-    }
-
-    my $range = new long[$length];
-
-    my $pos = 0;
-    for (my $i = $offset; $i < $offset + $length; $i++) {
-      $range->[$pos] = $nums->[$i];
-      $pos++;
-    }
-
-    return $range;
+    warn "Fn->copy_array_range_long is deprecated. Use Array->copy_range_long instead";
+    return Array->copy_range_long($nums, $offset, $length);
   }
 
   static method copy_array_range_object : object[] ($objects : object[], $offset : int, $length : int) {
-
-    if ($objects == undef) {
-      die "The argument array must be defined";
-    }
-
-    my $array_length = @$objects;
-
-    if ($offset < 0 || $offset > $array_length - 1) {
-      die "Offset must be in the array range";
-    }
-
-    if ($length < 0) {
-      die "Length must be more than or equals to 0";
-    }
-
-    if ($offset + $length > $array_length) {
-      die "Offset + length must not be in the array range";
-    }
-
-    my $range = Fn->new_array_proto($objects, $length);
-
-    my $pos = 0;
-    for (my $i = $offset; $i < $offset + $length; $i++) {
-      $range->[$pos] = $objects->[$i];
-      $pos++;
-    }
-
-    return $range;
+    warn "Fn->copy_array_range_object is deprecated. Use Array->copy_range_object instead";
+    return Array->copy_range_object($objects, $offset, $length);
   }
 
   static method copy_array_range_short : short[] ($nums : short[], $offset : int, $length : int) {
-
-    if ($nums == undef) {
-      die "The argument array must be defined";
-    }
-
-    my $array_length = @$nums;
-
-    if ($offset < 0 || $offset > $array_length - 1) {
-      die "Offset must be in the array range";
-    }
-
-    if ($length < 0) {
-      die "Length must be more than or equals to 0";
-    }
-
-    if ($offset + $length > $array_length) {
-      die "Offset + length must be in the array range";
-    }
-
-    my $range = new short[$length];
-
-    my $pos = 0;
-    for (my $i = $offset; $i < $offset + $length; $i++) {
-      $range->[$pos] = $nums->[$i];
-      $pos++;
-    }
-
-    return $range;
+    warn "Fn->copy_array_range_short is deprecated. Use Array->copy_range_short instead";
+    return Array->copy_range_short($nums, $offset, $length);
   }
 
 
-  static method copy_array_range_string : string[] ($strings : string[], $offset : int, $length : int) {
-
-    if ($strings == undef) {
-      die "The argument array must be defined";
-    }
-
-    my $array_length = @$strings;
-
-    if ($offset < 0 || $offset > $array_length - 1) {
-      die "Offset must be in the array range";
-    }
-
-    if ($length < 0) {
-      die "Length must be more than or equals to 0";
-    }
-
-    if ($offset + $length > $array_length) {
-      die "Offset + length must not be in the array range";
-    }
-
-    my $range = new string[$length];
-
-    my $pos = 0;
-    for (my $i = $offset; $i < $offset + $length; $i++) {
-      $range->[$pos] = $strings->[$i];
-      $pos++;
-    }
-
-    return $range;
+  precompile static method copy_array_range_string : string[] ($strings : string[], $offset : int, $length : int) {
+    warn "Fn->copy_array_range_string is deprecated. Use Array->copy_range_string instead";
+    return Array->copy_range_string($strings, $offset, $length);
   }
 
   static method copy_array_short : short[] ($nums : short[]) {
     return copy $nums;
   }
 
-  static method copy_array_string : string[] ($strings : string[]) {
-    if ($strings == undef) {
-      return undef;
-    }
-    
-    my $length = @$strings;
-
-    my $new_strings = new string[$length];
-
-    for (my $i = 0; $i < $length; $i++) {
-      $new_strings->[$i] = copy $strings->[$i];
-    }
-
-    return $new_strings;
+  precompile static method copy_array_string : string[] ($strings : string[]) {
+    warn "Fn->copy_array_string is deprecated. Use Array->copy_tring instead";
+    return Array->copy_string($strings);
   }
   
   static method copy_string : string ($string : string) {
@@ -446,512 +213,107 @@ class Fn : precompile {
   native static method crand : int ($seed : int*);
 
   static method dump_array_byte : string ($nums : byte[]) {
-    
-    if ($nums == undef) {
-      return undef;
-    }
-    
-    my $dump = "[\n";
-
-    for (my $i = 0; $i < @$nums; $i++) {
-      my $string = (string)$nums->[$i];
-      $dump .= "  $string";
-      if ($i != @$nums - 1) {
-        $dump .= ",\n";
-      }
-      else {
-        $dump .= "\n";
-      }
-    }
-    
-    $dump .= "]";
-
-    return $dump;
+    warn "Fn->dump_array_byte is deprecated. Use Array->dump_byte instead";
+    return Array->dump_byte($nums);
   }
 
   static method dump_array_double : string ($nums : double[]) {
-    
-    if ($nums == undef) {
-      return undef;
-    }
-    
-    my $dump = "[\n";
-
-    for (my $i = 0; $i < @$nums; $i++) {
-      my $string = (string)$nums->[$i];
-      $dump .= "  $string";
-      if ($i != @$nums - 1) {
-        $dump .= ",\n";
-      }
-      else {
-        $dump .= "\n";
-      }
-    }
-    
-    $dump .= "]";
-
-    return $dump;
+    warn "Fn->dump_array_double is deprecated. Use Array->dump_double instead";
+    return Array->dump_double($nums);
   }
 
   static method dump_array_float : string ($nums : float[]) {
-    
-    if ($nums == undef) {
-      return undef;
-    }
-    
-    my $dump = "[\n";
-
-    for (my $i = 0; $i < @$nums; $i++) {
-      my $string = (string)$nums->[$i];
-      $dump .= "  $string";
-      if ($i != @$nums - 1) {
-        $dump .= ",\n";
-      }
-      else {
-        $dump .= "\n";
-      }
-    }
-    
-    $dump .= "]";
-
-    return $dump;
+    warn "Fn->dump_array_float is deprecated. Use Array->dump_float instead";
+    return Array->dump_float($nums);
   }
 
   static method dump_array_int : string ($nums : int[]) {
-    
-    if ($nums == undef) {
-      return undef;
-    }
-    
-    my $dump = "[\n";
-
-    for (my $i = 0; $i < @$nums; $i++) {
-      my $string = (string)$nums->[$i];
-      $dump .= "  $string";
-      if ($i != @$nums - 1) {
-        $dump .= ",\n";
-      }
-      else {
-        $dump .= "\n";
-      }
-    }
-    
-    $dump .= "]";
-
-    return $dump;
+    warn "Fn->dump_array_int is deprecated. Use Array->dump_int instead";
+    return Array->dump_int($nums);
   }
 
   static method dump_array_long : string ($nums : long[]) {
-    
-    if ($nums == undef) {
-      return undef;
-    }
-    
-    my $dump = "[\n";
-
-    for (my $i = 0; $i < @$nums; $i++) {
-      my $string = (string)$nums->[$i];
-      $dump .= "  $string";
-      if ($i != @$nums - 1) {
-        $dump .= ",\n";
-      }
-      else {
-        $dump .= "\n";
-      }
-    }
-    
-    $dump .= "]";
-
-    return $dump;
+    warn "Fn->dump_array_long is deprecated. Use Array->dump_long instead";
+    return Array->dump_long($nums);
   }
 
   static method dump_array_object : string ($objects : object[], $stringer : Stringer) {
-    
-    if ($objects == undef) {
-      return undef;
-    }
-    
-    my $dump = "[\n";
-
-    for (my $i = 0; $i < @$objects; $i++) {
-      my $string = $stringer->($objects->[$i]);
-      $dump .= "  $string";
-      if ($i != @$objects - 1) {
-        $dump .= ",\n";
-      }
-      else {
-        $dump .= "\n";
-      }
-    }
-    
-    $dump .= "]";
-
-    return $dump;
+    warn "Fn->dump_array_object is deprecated. Use Array->dump_object instead";
+    return Array->dump_object($objects, $stringer);
   }
 
   static method dump_array_short : string ($nums : short[]) {
-    
-    if ($nums == undef) {
-      return undef;
-    }
-    
-    my $dump = "[\n";
-
-    for (my $i = 0; $i < @$nums; $i++) {
-      my $string = (string)$nums->[$i];
-      $dump .= "  $string";
-      if ($i != @$nums - 1) {
-        $dump .= ",\n";
-      }
-      else {
-        $dump .= "\n";
-      }
-    }
-    
-    $dump .= "]";
-
-    return $dump;
+    warn "Fn->dump_array_short is deprecated. Use Array->dump_short instead";
+    return Array->dump_short($nums);
   }
 
   static method dump_array_string : string ($strings : string[]) {
-    
-    if ($strings == undef) {
-      return undef;
-    }
-    
-    my $dump = "[\n";
-
-    for (my $i = 0; $i < @$strings; $i++) {
-      my $string = $strings->[$i];
-      $dump .= "  $string";
-      if ($i != @$strings - 1) {
-        $dump .= ",\n";
-      }
-      else {
-        $dump .= "\n";
-      }
-    }
-    
-    $dump .= "]";
-
-    return $dump;
+    warn "Fn->dump_array_string is deprecated. Use Array->dump_string instead";
+    return Array->dump_string($strings);
   }
 
   static method dump_array_unsigned_byte : string ($nums : byte[]) {
-    
-    if ($nums == undef) {
-      return undef;
-    }
-    
-    my $dump = "[\n";
-
-    for (my $i = 0; $i < @$nums; $i++) {
-      my $string = Fn->sprintf("%u", (int)$nums->[$i] & 0xFF);
-      $dump .= "  $string";
-      if ($i != @$nums - 1) {
-        $dump .= ",\n";
-      }
-      else {
-        $dump .= "\n";
-      }
-    }
-    
-    $dump .= "]";
-
-    return $dump;
+    warn "Fn->dump_array_unsigned_byte is deprecated. Use Array->dump_unsigned_byte instead";
+    return Array->dump_unsigned_byte($nums);
   }
 
   static method dump_array_unsigned_int : string ($nums : int[]) {
-    
-    if ($nums == undef) {
-      return undef;
-    }
-    
-    my $dump = "[\n";
-
-    for (my $i = 0; $i < @$nums; $i++) {
-      my $string = Fn->sprintf("%u", $nums->[$i]);
-      $dump .= "  $string";
-      if ($i != @$nums - 1) {
-        $dump .= ",\n";
-      }
-      else {
-        $dump .= "\n";
-      }
-    }
-    
-    $dump .= "]";
-
-    return $dump;
+    warn "Fn->dump_array_unsigned_int is deprecated. Use Array->dump_unsigned_int instead";
+    return Array->dump_unsigned_int($nums);
   }
 
   static method dump_array_unsigned_long : string ($nums : long[]) {
-    
-    if ($nums == undef) {
-      return undef;
-    }
-    
-    my $dump = "[\n";
-
-    for (my $i = 0; $i < @$nums; $i++) {
-      my $string = Fn->sprintf("%lu", $nums->[$i]);
-      $dump .= "  $string";
-      if ($i != @$nums - 1) {
-        $dump .= ",\n";
-      }
-      else {
-        $dump .= "\n";
-      }
-    }
-    
-    $dump .= "]";
-
-    return $dump;
+    warn "Fn->dump_array_unsigned_long is deprecated. Use Array->dump_unsigned_long instead";
+    return Array->dump_unsigned_long($nums);
   }
 
   static method dump_array_unsigned_short : string ($nums : short[]) {
-    
-    if ($nums == undef) {
-      return undef;
-    }
-    
-    my $dump = "[\n";
-
-    for (my $i = 0; $i < @$nums; $i++) {
-      my $string = Fn->sprintf("%u", (int)$nums->[$i] & 0xFFFF);
-      $dump .= "  $string";
-      if ($i != @$nums - 1) {
-        $dump .= ",\n";
-      }
-      else {
-        $dump .= "\n";
-      }
-    }
-    
-    $dump .= "]";
-
-    return $dump;
+    warn "Fn->dump_array_unsigned_short is deprecated. Use Array->dump_unsigned_short instead";
+    return Array->dump_unsigned_short($nums);
   }
 
   native static method get_next_code_point : int ($str : string, $offset_ref : int*);
   
   static method equals_array_byte : int ($nums1 : byte[], $nums2 : byte[]) {
-    
-    if ($nums1 == undef && $nums2 == undef) {
-      return 1;
-    }
-    elsif ($nums1 != undef && $nums2 == undef) {
-      return 0;
-    }
-    elsif ($nums1 == undef && $nums2 != undef) {
-      return 0;
-    }
-    
-    my $is_equals = 1;
-    if (@$nums1 == @$nums2) {
-      for (my $i = 0; $i < @$nums1; $i++) {
-        if ($nums1->[$i] != $nums2->[$i]) {
-          $is_equals = 0;
-          last;
-        }
-      }
-    }
-    else {
-      $is_equals = 0;
-    }
-
-    return $is_equals;
+    warn "Fn->equals_array_byte is deprecated. Use Array->equals_byte instead";
+    return Array->equals_byte($nums1, $nums2);
   }
 
   static method equals_array_double : int ($nums1 : double[], $nums2 : double[]) {
-    if ($nums1 == undef && $nums2 == undef) {
-      return 1;
-    }
-    elsif ($nums1 != undef && $nums2 == undef) {
-      return 0;
-    }
-    elsif ($nums1 == undef && $nums2 != undef) {
-      return 0;
-    }
-    
-    my $is_equals = 1;
-    if (@$nums1 == @$nums2) {
-      for (my $i = 0; $i < @$nums1; $i++) {
-        if ($nums1->[$i] != $nums2->[$i]) {
-          $is_equals = 0;
-          last;
-        }
-      }
-    }
-    else {
-      $is_equals = 0;
-    }
-
-    return $is_equals;
+    warn "Fn->equals_array_double is deprecated. Use Array->equals_double instead";
+    return Array->equals_double($nums1, $nums2);
   }
 
   static method equals_array_float : int ($nums1 : float[], $nums2 : float[]) {
-    if ($nums1 == undef && $nums2 == undef) {
-      return 1;
-    }
-    elsif ($nums1 != undef && $nums2 == undef) {
-      return 0;
-    }
-    elsif ($nums1 == undef && $nums2 != undef) {
-      return 0;
-    }
-    
-    my $is_equals = 1;
-    if (@$nums1 == @$nums2) {
-      for (my $i = 0; $i < @$nums1; $i++) {
-        if ($nums1->[$i] != $nums2->[$i]) {
-          $is_equals = 0;
-          last;
-        }
-      }
-    }
-    else {
-      $is_equals = 0;
-    }
-
-    return $is_equals;
+    warn "Fn->equals_array_float is deprecated. Use Array->equals_float instead";
+    return Array->equals_float($nums1, $nums2);
   }
 
   static method equals_array_int : int ($nums1 : int[], $nums2 : int[]) {
-    if ($nums1 == undef && $nums2 == undef) {
-      return 1;
-    }
-    elsif ($nums1 != undef && $nums2 == undef) {
-      return 0;
-    }
-    elsif ($nums1 == undef && $nums2 != undef) {
-      return 0;
-    }
-    
-    my $is_equals = 1;
-    if (@$nums1 == @$nums2) {
-      for (my $i = 0; $i < @$nums1; $i++) {
-        if ($nums1->[$i] != $nums2->[$i]) {
-          $is_equals = 0;
-          last;
-        }
-      }
-    }
-    else {
-      $is_equals = 0;
-    }
-
-    return $is_equals;
+    warn "Fn->equals_array_int is deprecated. Use Array->equals_int instead";
+    return Array->equals_int($nums1, $nums2);
   }
   static method equals_array_long : int ($nums1 : long[], $nums2 : long[]) {
-    if ($nums1 == undef && $nums2 == undef) {
-      return 1;
-    }
-    elsif ($nums1 != undef && $nums2 == undef) {
-      return 0;
-    }
-    elsif ($nums1 == undef && $nums2 != undef) {
-      return 0;
-    }
-    
-    my $is_equals = 1;
-    if (@$nums1 == @$nums2) {
-      for (my $i = 0; $i < @$nums1; $i++) {
-        if ($nums1->[$i] != $nums2->[$i]) {
-          $is_equals = 0;
-          last;
-        }
-      }
-    }
-    else {
-      $is_equals = 0;
-    }
-
-    return $is_equals;
+    warn "Fn->equals_array_long is deprecated. Use Array->equals_long instead";
+    return Array->equals_long($nums1, $nums2);
   }
 
   static method equals_array_object : int ($objects1 : object[], $objects2 : object[], $equality_checker : EqualityChecker) {
-    if ($objects1 == undef && $objects2 == undef) {
-      return 1;
-    }
-    elsif ($objects1 != undef && $objects2 == undef) {
-      return 0;
-    }
-    elsif ($objects1 == undef && $objects2 != undef) {
-      return 0;
-    }
-    
-    my $is_equals = 1;
-    if (@$objects1 == @$objects2) {
-      for (my $i = 0; $i < @$objects1; $i++) {
-        if (!$equality_checker->($objects1->[$i], $objects2->[$i])) {
-          $is_equals = 0;
-          last;
-        }
-      }
-    }
-    else {
-      $is_equals = 0;
-    }
-
-    return $is_equals;
+    warn "Fn->equals_array_object is deprecated. Use Array->equals_object instead";
+    return Array->equals_object($objects1, $objects2, $equality_checker);
   }
 
   static method equals_array_short : int ($nums1 : short[], $nums2 : short[]) {
-    if ($nums1 == undef && $nums2 == undef) {
-      return 1;
-    }
-    elsif ($nums1 != undef && $nums2 == undef) {
-      return 0;
-    }
-    elsif ($nums1 == undef && $nums2 != undef) {
-      return 0;
-    }
-    
-    my $is_equals = 1;
-    if (@$nums1 == @$nums2) {
-      for (my $i = 0; $i < @$nums1; $i++) {
-        if ($nums1->[$i] != $nums2->[$i]) {
-          $is_equals = 0;
-          last;
-        }
-      }
-    }
-    else {
-      $is_equals = 0;
-    }
-
-    return $is_equals;
+    warn "Fn->equals_array_short is deprecated. Use Array->equals_short instead";
+    return Array->equals_short($nums1, $nums2);
   }
 
   static method equals_array_string : int ($strings1 : string[], $strings2 : string[]) {
-    if ($strings1 == undef && $strings2 == undef) {
-      return 1;
-    }
-    elsif ($strings1 != undef && $strings2 == undef) {
-      return 0;
-    }
-    elsif ($strings1 == undef && $strings2 != undef) {
-      return 0;
-    }
-    
-    my $is_equals = 1;
-    if (@$strings1 == @$strings2) {
-      for (my $i = 0; $i < @$strings1; $i++) {
-        if ($strings1->[$i] ne $strings2->[$i]) {
-          $is_equals = 0;
-          last;
-        }
-      }
-    }
-    else {
-      $is_equals = 0;
-    }
-
-    return $is_equals;
+    warn "Fn->equals_array_string is deprecated. Use Array->equals_string instead";
+    return Array->equals_string($strings1, $strings2);
   }
 
-  static method hex : int ($hex_string : string) {
+  precompile static method hex : int ($hex_string : string) {
     
     unless ($hex_string) {
       die "the hex string must be defined";
@@ -981,7 +343,7 @@ class Fn : precompile {
       elsif ($ascii_code >= 'A' && $ascii_code <= 'F') {
         $digit_value = $ascii_code - 55;
       }
-      $value += $digit_value * Fn->powi(16, $digit);
+      $value += $digit_value * &powi(16, $digit);
       
       $digit += 1;
     }
@@ -993,7 +355,7 @@ class Fn : precompile {
     return &index_len($string, $sub_string, $start_pos, length $string);
   }
 
-  static method index_len : int ($string : string, $sub_string : string, $start_pos : int, $max_string_length : int) {
+  precompile static method index_len : int ($string : string, $sub_string : string, $start_pos : int, $max_string_length : int) {
     my $sub_string_length = length $sub_string;
     
     if ($max_string_length > length $string) {
@@ -1211,7 +573,7 @@ class Fn : precompile {
     }
   }
 
-  static method join : string ($sep : string, $strings : string[]) {
+  precompile static method join : string ($sep : string, $strings : string[]) {
     my $join = "";
 
     for (my $i = 0; $i < @$strings; $i++) {
@@ -1237,7 +599,7 @@ class Fn : precompile {
     return $ret;
   }
 
-  static method lc : string ($string : string) {
+  precompile static method lc : string ($string : string) {
 
     unless ($string) { die "String must be defined"; }
 
@@ -1255,7 +617,7 @@ class Fn : precompile {
     return (string)$new_string;
   }
 
-  static method lcfirst : string ($string : string) {
+  precompile static method lcfirst : string ($string : string) {
 
     unless ($string) { die "String must be defined"; }
 
@@ -1282,25 +644,112 @@ class Fn : precompile {
     $$offset_ref = $save_offset;
     return $code_point;
   }
+
+  static method memset_byte : void ($dest : byte[], $dest_offset : int, $value : byte, $length : int) {
+    warn "Fn->memset_byte is deprecated. Use Array->memset_byte instead";
+    Array->memset_byte($dest, $dest_offset, $value, $length);
+  }
+  static method memset_double : void ($dest : double[], $dest_offset : int, $value : double, $length : int) {
+    warn "Fn->memset_double is deprecated. Use Array->memset_double instead";
+    Array->memset_double($dest, $dest_offset, $value, $length);
+  }
+  static method memset_float : void ($dest : float[], $dest_offset : int, $value : float, $length : int) {
+    warn "Fn->memset_float is deprecated. Use Array->memset_float instead";
+    Array->memset_float($dest, $dest_offset, $value, $length);
+  }
+  static method memset_int : void ($dest : int[], $dest_offset : int, $value : int, $length : int) {
+    warn "Fn->memset_int is deprecated. Use Array->memset_int instead";
+    Array->memset_int($dest, $dest_offset, $value, $length);
+  }
+  static method memset_long : void ($dest : long[], $dest_offset : int, $value : long, $length : int) {
+    warn "Fn->memset_long is deprecated. Use Array->memset_long instead";
+    Array->memset_long($dest, $dest_offset, $value, $length);
+  }
+  static method memset_short : void ($dest : short[], $dest_offset : int, $value : short, $length : int) {
+    warn "Fn->memset_short is deprecated. Use Array->memset_short instead";
+    Array->memset_short($dest, $dest_offset, $value, $length);
+  }
+  static method memset_object : void ($dest : object[], $dest_offset : int, $value : object, $length : int) {
+    warn "Fn->memset_object is deprecated. Use Array->memset_object instead";
+    Array->memset_object($dest, $dest_offset, $value, $length);
+  }
   
   native static method memcpy : void ($dest : object, $dest_byte_offset : int, $source : object, $source_byte_offset : int, $byte_length : int);
-  native static method memcpy_byte : void ($dest : byte[], $dest_offset : int, $source : byte[], $source_offset : int, $length : int);
-  native static method memcpy_double : void ($dest : double[], $dest_offset : int, $source : double[], $source_offset : int, $length : int);
-  native static method memcpy_float : void ($dest : float[], $dest_offset : int, $source : float[], $source_offset : int, $length : int);
-  native static method memcpy_int : void ($dest : int[], $dest_offset : int, $source : int[], $source_offset : int, $length : int);
-  native static method memcpy_long : void ($dest : long[], $dest_offset : int, $source : long[], $source_offset : int, $length : int);
-  native static method memcpy_short : void ($dest : short[], $dest_offset : int, $source : short[], $source_offset : int, $length : int);
+  
+  static method memcpy_byte : void ($dest : byte[], $dest_offset : int, $source : byte[], $source_offset : int, $length : int) {
+    warn "Fn->memcpy_byte is deprecated. Use Array->memcpy_byte instead";
+    Array->memcpy_byte($dest, $dest_offset, $source, $source_offset, $length);
+  }
+  static method memcpy_double : void ($dest : double[], $dest_offset : int, $source : double[], $source_offset : int, $length : int) {
+    warn "Fn->memcpy_double is deprecated. Use Array->memcpy_double instead";
+    Array->memcpy_double($dest, $dest_offset, $source, $source_offset, $length);
+  }
+  static method memcpy_float : void ($dest : float[], $dest_offset : int, $source : float[], $source_offset : int, $length : int) {
+    warn "Fn->memcpy_float is deprecated. Use Array->memcpy_float instead";
+    Array->memcpy_float($dest, $dest_offset, $source, $source_offset, $length);
+  }
+  static method memcpy_int : void ($dest : int[], $dest_offset : int, $source : int[], $source_offset : int, $length : int) {
+    warn "Fn->memcpy_int is deprecated. Use Array->memcpy_int instead";
+    Array->memcpy_int($dest, $dest_offset, $source, $source_offset, $length);
+  }
+  static method memcpy_long : void ($dest : long[], $dest_offset : int, $source : long[], $source_offset : int, $length : int) {
+    warn "Fn->memcpy_long is deprecated. Use Array->memcpy_long instead";
+    Array->memcpy_long($dest, $dest_offset, $source, $source_offset, $length);
+  }
+  static method memcpy_short : void ($dest : short[], $dest_offset : int, $source : short[], $source_offset : int, $length : int) {
+    warn "Fn->memcpy_short is deprecated. Use Array->memcpy_short instead";
+    Array->memcpy_short($dest, $dest_offset, $source, $source_offset, $length);
+  }
+  precompile static method memcpy_object : void ($dest : object[], $dest_offset : int, $source : object[], $source_offset : int, $length : int) {
+    for (my $i = 0; $i < $length; $i++) {
+      my $dist_index = $dest_offset + $i;
+      my $source_index = $source_offset + $i;
+      $dest->[$dist_index] = $source->[$source_index];
+    }
+  }
 
   native static method memmove : void ($dest : object, $dest_byte_offset : int, $source : object, $source_byte_offset : int, $byte_length : int);
-  native static method memmove_byte : void ($dest : byte[], $dest_offset : int, $source : byte[], $source_offset : int, $length : int);
-  native static method memmove_double : void ($dest : double[], $dest_offset : int, $source : double[], $source_offset : int, $length : int);
-  native static method memmove_float : void ($dest : float[], $dest_offset : int, $source : float[], $source_offset : int, $length : int);
-  native static method memmove_int : void ($dest : int[], $dest_offset : int, $source : int[], $source_offset : int, $length : int);
-  native static method memmove_long : void ($dest : long[], $dest_offset : int, $source : long[], $source_offset : int, $length : int);
-  native static method memmove_short : void ($dest : short[], $dest_offset : int, $source : short[], $source_offset : int, $length : int);
 
-  native static method new_array_proto : object[] ($proto_array : object[], $length : int);
+  static method memmove_byte : void ($dest : byte[], $dest_offset : int, $source : byte[], $source_offset : int, $length : int) {
+    warn "Fn->memmove_byte is deprecated. Use Array->memmove_byte instead";
+    Array->memmove_byte($dest, $dest_offset, $source, $source_offset, $length);
+  }
+  static method memmove_double : void ($dest : double[], $dest_offset : int, $source : double[], $source_offset : int, $length : int) {
+    warn "Fn->memmove_double is deprecated. Use Array->memmove_double instead";
+    Array->memmove_double($dest, $dest_offset, $source, $source_offset, $length);
+  }
+  static method memmove_float : void ($dest : float[], $dest_offset : int, $source : float[], $source_offset : int, $length : int) {
+    warn "Fn->memmove_float is deprecated. Use Array->memmove_float instead";
+    Array->memmove_float($dest, $dest_offset, $source, $source_offset, $length);
+  }
+  static method memmove_int : void ($dest : int[], $dest_offset : int, $source : int[], $source_offset : int, $length : int) {
+    warn "Fn->memmove_int is deprecated. Use Array->memmove_int instead";
+    Array->memmove_int($dest, $dest_offset, $source, $source_offset, $length);
+  }
+  static method memmove_long : void ($dest : long[], $dest_offset : int, $source : long[], $source_offset : int, $length : int) {
+    warn "Fn->memmove_long is deprecated. Use Array->memmove_long instead";
+    Array->memmove_long($dest, $dest_offset, $source, $source_offset, $length);
+  }
+  static method memmove_short : void ($dest : short[], $dest_offset : int, $source : short[], $source_offset : int, $length : int) {
+    warn "Fn->memmove_short is deprecated. Use Array->memmove_short instead";
+    Array->memmove_short($dest, $dest_offset, $source, $source_offset, $length);
+  }
+  static method memmove_object : void ($dest : object[], $dest_offset : int, $source : object[], $source_offset : int, $length : int) {
+    if ($dest == $source) {
+      my $source_length = @$source;
+      my $source_copy = new object[$source_length];
+      my $source_offset_plus_length = $source_offset + $length;
+      &memcpy_object($source_copy, $source_offset, $source, $source_offset, $length);
+      $source = $source_copy;
+    }
+    &memcpy_object($dest, $dest_offset, $source, $source_offset, $length);
+  }
 
+  static method new_array_proto : object[] ($proto_array : object[], $length : int) {
+    warn "Fn->new_array_proto is deprecated. Use Array->new_proto instead";
+    return Array->new_proto($proto_array, $length);
+  }
+  
   static method ord : int ($utf8_character : string) {
     unless ($utf8_character) {
       return -1;
@@ -1316,7 +765,7 @@ class Fn : precompile {
     return $unicode_code_point;
   }
 
-  static method powi : int ($x : int, $y : int) {
+  precompile static method powi : int ($x : int, $y : int) {
     my $p = 1;
     
     for (my $i = 0; $i < $y; $i++) {
@@ -1326,7 +775,7 @@ class Fn : precompile {
     return $p;
   }
 
-  static method powl : long ($x : long, $y : long) {
+  precompile static method powl : long ($x : long, $y : long) {
     my $p = 1L;
     
     for (my $i = 0; $i < $y; $i++) {
@@ -1339,12 +788,12 @@ class Fn : precompile {
   static method rand : double ($seed : int*) {
     
     # 0 <= random_number < 1
-    my $random_number = (double)Fn->crand($seed) / ((double)Fn->RAND_MAX() + 1);
+    my $random_number = (double)&crand($seed) / ((double)&RAND_MAX() + 1);
     
     return $random_number;
   }
 
-  static method repeat : string ($string : string, $count : int) {
+  precompile static method repeat : string ($string : string, $count : int) {
     
     unless ($string) {
       die "The string must be defined";
@@ -1367,7 +816,7 @@ class Fn : precompile {
     return &rindex_len($string, $sub_string, $start_pos, length $string);
   }
 
-  static method rindex_len : int ($string : string, $sub_string : string, $start_pos : int, $max_string_length : int) {
+  precompile static method rindex_len : int ($string : string, $sub_string : string, $start_pos : int, $max_string_length : int) {
     my $sub_string_length = length $sub_string;
 
     if ($max_string_length > length $string) {
@@ -1393,218 +842,9 @@ class Fn : precompile {
     return -1;
   }
 
-  static method sort_byte : void ($nums : byte[], $offset : int, $length : int, $comparator : Comparator::Byte) {
-    if ($nums == undef) {
-      die "Array must be not undef";
-    }
-    
-    my $nums_length = @$nums;
-    
-    if ($offset < 0) {
-      die "Offset must be more than or equals to 0";
-    }
-    
-    if ($length < 0) {
-      die "Length must be more than or equals to 0";
-    }
-    
-    if ($offset + $length > $nums_length) {
-      die "Offset + Length must be in the array range";
-    }
-    
-    if ($length == 0) {
-      return;
-    }
-    
-    my $b = new byte[$length];
-    Fn->_sort_byte_merge_sort($nums, $b, $offset, $offset + $length - 1, $length - 1, $comparator);
-  }
-
   native static method shorten : void ($string : mutable string, $length : int);
 
-  static method sort_double : void ($nums : double[], $offset : int, $length : int, $comparator : Comparator::Double) {
-    if ($nums == undef) {
-      die "Array must be not undef";
-    }
-    
-    my $nums_length = @$nums;
-    
-    if ($offset < 0) {
-      die "Offset must be more than or equals to 0";
-    }
-    
-    if ($length < 0) {
-      die "Length must be more than or equals to 0";
-    }
-    
-    if ($offset + $length > $nums_length) {
-      die "Offset + Length must be in the array range";
-    }
-    
-    if ($length == 0) {
-      return;
-    }
-    
-    my $b = new double[$length];
-    Fn->_sort_double_merge_sort($nums, $b, $offset, $offset + $length - 1, $length - 1, $comparator);
-  }
-
-  static method sort_float : void ($nums : float[], $offset : int, $length : int, $comparator : Comparator::Float) {
-    if ($nums == undef) {
-      die "Array must be not undef";
-    }
-    
-    my $nums_length = @$nums;
-    
-    if ($offset < 0) {
-      die "Offset must be more than or equals to 0";
-    }
-    
-    if ($length < 0) {
-      die "Length must be more than or equals to 0";
-    }
-    
-    if ($offset + $length > $nums_length) {
-      die "Offset + Length must be in the array range";
-    }
-    
-    if ($length == 0) {
-      return;
-    }
-    
-    my $b = new float[$length];
-    Fn->_sort_float_merge_sort($nums, $b, $offset, $offset + $length - 1, $length - 1, $comparator);
-  }
-  
-  static method sort_int : void ($nums : int[], $offset : int, $length : int, $comparator : Comparator::Int) {
-    if ($nums == undef) {
-      die "Array must be not undef";
-    }
-    
-    my $nums_length = @$nums;
-    
-    if ($offset < 0) {
-      die "Offset must be more than or equals to 0";
-    }
-    
-    if ($length < 0) {
-      die "Length must be more than or equals to 0";
-    }
-    
-    if ($offset + $length > $nums_length) {
-      die "Offset + Length must be in the array range";
-    }
-    
-    if ($length == 0) {
-      return;
-    }
-    
-    my $b = new int[$length];
-    Fn->_sort_int_merge_sort($nums, $b, $offset, $offset + $length - 1, $length - 1, $comparator);
-  }
-  
-  static method sort_long : void ($nums : long[], $offset : int, $length : int, $comparator : Comparator::Long) {
-    if ($nums == undef) {
-      die "Array must be not undef";
-    }
-    
-    my $nums_length = @$nums;
-    
-    if ($offset < 0) {
-      die "Offset must be more than or equals to 0";
-    }
-    
-    if ($length < 0) {
-      die "Length must be more than or equals to 0";
-    }
-    
-    if ($offset + $length > $nums_length) {
-      die "Offset + Length must be in the array range";
-    }
-    
-    if ($length == 0) {
-      return;
-    }
-    
-    my $b = new long[$length];
-    Fn->_sort_long_merge_sort($nums, $b, $offset, $offset + $length - 1, $length - 1, $comparator);
-  }
-  
-  static method sort_object : void ($objects : object[], $offset : int, $length : int, $comparator : Comparator) {
-    if ($objects == undef) {
-      die "Array must be not undef";
-    }
-    
-    my $objects_length = @$objects;
-    
-    if ($offset < 0) {
-      die "Offset must be more than or equals to 0";
-    }
-    
-    if ($length < 0) {
-      die "Length must be more than or equals to 0";
-    }
-    
-    if ($offset + $length > $objects_length) {
-      die "Offset + Length must be in the array range";
-    }
-    
-    my $b = Fn->new_array_proto($objects, $length);
-    
-    Fn->_sort_object_merge_sort($objects, $b, $offset, $offset + $length - 1, $length - 1, $comparator);
-  }
-
-  static method sort_short : void ($nums : short[], $offset : int, $length : int, $comparator : Comparator::Short) {
-    if ($nums == undef) {
-      die "Array must be not undef";
-    }
-    
-    my $nums_length = @$nums;
-    
-    if ($offset < 0) {
-      die "Offset must be more than or equals to 0";
-    }
-    
-    if ($length < 0) {
-      die "Length must be more than or equals to 0";
-    }
-    
-    if ($offset + $length > $nums_length) {
-      die "Offset + Length must be in the array range";
-    }
-    
-    if ($length == 0) {
-      return;
-    }
-    
-    my $b = new short[$length];
-    Fn->_sort_short_merge_sort($nums, $b, $offset, $offset + $length - 1, $length - 1, $comparator);
-  }
-
-  static method sort_string : void ($strings : string[], $offset : int, $length : int, $comparator : Comparator::String) {
-    if ($strings == undef) {
-      die "Array must be not undef";
-    }
-    
-    my $strings_length = @$strings;
-    
-    if ($offset < 0) {
-      die "Offset must be more than or equals to 0";
-    }
-    
-    if ($length < 0) {
-      die "Length must be more than or equals to 0";
-    }
-    
-    if ($offset + $length > $strings_length) {
-      die "Offset + Length must be in the array range";
-    }
-    
-    my $b = new string[$length];
-    Fn->_sort_string_merge_sort($strings, $b, $offset, $offset + $length - 1, $length - 1, $comparator);
-  }
-
-  static method split : string[] ($sep : string, $string : string) {
+  precompile static method split : string[] ($sep : string, $string : string) {
     my $string_length = length $string;
     my $sep_length = length $sep;
 
@@ -1637,7 +877,7 @@ class Fn : precompile {
           }
         }
         if ($match) {
-          my $separated_string = Fn->substr($string, $string_base, $string_index - $string_base);
+          my $separated_string = &substr($string, $string_base, $string_index - $string_base);
           $separated_strings_list->push($separated_string);
           $string_base = $string_index + $sep_length;
           $string_index += $sep_length - 1;
@@ -1648,7 +888,7 @@ class Fn : precompile {
       $separated_strings_list->push("");
     }
     else {
-      my $separated_string = Fn->substr($string, $string_base, $string_length - $string_base);
+      my $separated_string = &substr($string, $string_base, $string_length - $string_base);
       $separated_strings_list->push($separated_string);
     }
 
@@ -1658,295 +898,8 @@ class Fn : precompile {
   }
 
   static method sprintf : string ($format : string, $args : object[]...) {
-    my $format_length = length $format;
-    my $index = 0;
-
-    my $buffer = StringBuffer->new;
-    my $arg_count = 0;
-    my $constant_string_length = 0;
-
-    while ($index + $constant_string_length < $format_length) {
-
-      if ($format->[$index + $constant_string_length] != '%') {
-        # Read constant string
-        ++$constant_string_length;
-      }
-      elsif ($index + $constant_string_length + 1 < $format_length &&
-          $format->[$index + $constant_string_length + 1] == '%') {
-        # Read %%
-        ++$constant_string_length;
-
-        # Add constant string
-        if ($constant_string_length > 0) {
-          my $format_part = Fn->substr($format, $index, $constant_string_length);
-          
-          $buffer->push($format_part);
-          $index += $constant_string_length;
-          $constant_string_length = 0;
-        }
-
-        # Skip second %
-        ++$index;
-      }
-      elsif ($index + $constant_string_length + 1 >= $format_length) {
-        die "Invalid conversion in sprintf: end of string";
-      }
-      else {
-        # Add constant string
-        if ($constant_string_length > 0) {
-          my $format_part = Fn->substr($format, $index, $constant_string_length);
-          $buffer->push($format_part);
-          $index += $constant_string_length;
-          $constant_string_length = 0;
-        }
-
-        # Read format string
-
-        # Check the next element of @$args corresponding to the specifier
-        unless ($arg_count < @$args) {
-          die "Missing argument in sprintf";
-        }
-
-        # Read specifier %[flags][width][.precision][length]type
-
-        my $specifier_base_index = $index;
-        ++$index; # '%'
-
-        # Read `flags`
-        my $pad_char = ' ';
-        my $plus_sign = 0;
-        my $left_justified = 0;
-
-        while ($index < $format_length) {
-          my $flag = (int)($format->[$index]);
-          switch($flag) {
-            case '0': {
-              ++$index;
-              $pad_char = '0';
-              break;
-            }
-            case '+': {
-              ++$index;
-              $plus_sign = 1;
-              break;
-            }
-            case '-': {
-              ++$index;
-              $left_justified = 1;
-              break;
-            }
-            default: {
-              last;
-              break;
-            }
-          }
-        }
-        
-        if ($left_justified) {
-          $pad_char = ' ';
-        }
-
-        # Width
-        my $width = 0;
-        while ($index < $format_length) {
-          my $c = $format->[$index];
-          if ($c < '0' || '9' < $c) {
-            last;
-          }
-          $width = $width * 10 + $c - '0';
-          ++$index;
-        }
-
-        # Precision
-        my $precision = 0;
-        my $has_precision = 0;
-        if ($index < $format_length && $format->[$index] == '.') {
-          ++$index;
-          while ($index < $format_length) {
-            my $c = $format->[$index];
-            if ($c < '0' || '9' < $c) {
-              last;
-            }
-            $has_precision = 1;
-            $precision = $precision * 10 + $c - '0';
-            ++$index;
-          }
-        }
-        unless ($has_precision) {
-          $precision = -1;
-        }
-
-        unless ($index < $format_length) {
-          die "Invalid conversion in sprintf: \""
-              . Fn->substr($format, $specifier_base_index, $index - $specifier_base_index) . "\"";
-        }
-        
-        my $specifier_first_char = $format->[$index];
-        $index++;
-        
-        my $specifier = (string)"";
-        switch ((int) $specifier_first_char) {
-          case 'c' : {
-            $specifier = "c";
-            break;
-          }
-          case 's' : {
-            $specifier = "s";
-            break;
-          }
-          case 'd' : {
-            $specifier = "d";
-            break;
-          }
-          case 'u' : {
-            $specifier = "u";
-            break;
-          }
-          case 'l' : {
-            if ($index < length $format) {
-              if ($format->[$index] == 'd') {
-                $index++;
-                $specifier = "ld";
-              }
-              elsif ($format->[$index] == 'u') {
-                $index++;
-                $specifier = "lu";
-              }
-              elsif ($format->[$index] == 'x') {
-                $index++;
-                $specifier = "lx";
-              }
-              elsif ($format->[$index] == 'X') {
-                $index++;
-                $specifier = "lX";
-              }
-            }
-            break;
-          }
-          case 'f' : {
-            $specifier = "f";
-            break;
-          }
-          case 'g' : {
-            $specifier = "g";
-            break;
-          }
-          case 'U' : {
-            $specifier = "U";
-            break;
-          }
-          case 'x' : {
-            $specifier = "x";
-            break;
-          }
-          case 'X' : {
-            $specifier = "X";
-            break;
-          }
-          default: {
-
-          }
-        }
-        
-        if ($specifier eq "c") {
-          my $arg_value : int;
-          my $arg = $args->[$arg_count];
-          if ($arg isa Byte) {
-            $arg_value = $arg->(Byte)->value;
-          }
-          else {
-            $arg_value = $arg->(Int)->value;
-          }
-          my $formatted_value = Fn->chr($arg_value);
-          &_push_formatted_string_unsigned($buffer, $formatted_value, $width, $pad_char, $left_justified);
-        }
-        elsif ($specifier eq "s") {
-          my $arg = (string)$args->[$arg_count];
-          my $formatted_value = $arg;
-          &_push_formatted_string_unsigned($buffer, $formatted_value, $width, $pad_char, $left_justified);
-        }
-        elsif ($specifier eq "d") {
-          my $arg = (Int)$args->[$arg_count];
-          my $formatted_value = &_native_snprintf_d($arg);
-          &_push_formatted_string_signed($buffer, $formatted_value, $width, $pad_char, $left_justified, $plus_sign);
-        }
-        elsif ($specifier eq "u") {
-          my $arg = (Int)$args->[$arg_count];
-          my $formatted_value = &_native_snprintf_u($arg);
-          &_push_formatted_string_unsigned($buffer, $formatted_value, $width, $pad_char, $left_justified);
-        }
-        elsif ($specifier eq "ld") {
-          my $arg = (Long)$args->[$arg_count];
-          my $formatted_value = &_native_snprintf_ld($arg);
-          &_push_formatted_string_signed($buffer, $formatted_value, $width, $pad_char, $left_justified, $plus_sign);
-        }
-        elsif ($specifier eq "lu") {
-          my $arg = (Long)$args->[$arg_count];
-          my $formatted_value = &_native_snprintf_lu($arg);
-          &_push_formatted_string_unsigned($buffer, $formatted_value, $width, $pad_char, $left_justified);
-        }
-        elsif ($specifier eq "f") {
-          my $arg_value : double;
-          my $arg = $args->[$arg_count];
-          if ($arg isa Float) {
-            $arg_value = $arg->(Float)->value;
-          }
-          else {
-            $arg_value = $arg->(Double)->value;
-          }
-          my $formatted_value = &_native_snprintf_f($arg_value, $precision);
-          &_push_formatted_string_signed($buffer, $formatted_value, $width, $pad_char, $left_justified, $plus_sign);
-        }
-        elsif ($specifier eq "g") {
-          my $arg_value : double;
-          my $arg = $args->[$arg_count];
-          if ($arg isa Float) {
-            $arg_value = $arg->(Float)->value;
-          }
-          else {
-            $arg_value = $arg->(Double)->value;
-          }
-          my $formatted_value = &_native_snprintf_g($arg_value, $precision);
-          &_push_formatted_string_signed($buffer, $formatted_value, $width, $pad_char, $left_justified, $plus_sign);
-        }
-        elsif ($specifier eq "x" || $specifier eq "X") {
-          my $arg = (Int)$args->[$arg_count];
-          my $formatted_value = &_native_snprintf_x($arg);
-
-          if ($specifier eq "X") {
-            $formatted_value = Fn->uc($formatted_value);
-          }
-          
-          &_push_formatted_string_unsigned($buffer, $formatted_value, $width, $pad_char, $left_justified);
-        }
-        elsif ($specifier eq "lx" || $specifier eq "lX") {
-          my $arg = (Long)$args->[$arg_count];
-          my $formatted_value = &_native_snprintf_lx($arg);
-
-          if ($specifier eq "lX") {
-            $formatted_value = Fn->uc($formatted_value);
-          }
-          
-          &_push_formatted_string_unsigned($buffer, $formatted_value, $width, $pad_char, $left_justified);
-        }
-        else {
-          die "Invalid specifier \"%$specifier\"";
-        }
-
-        ++$arg_count;
-      }
-    }
-
-    # Add constant string
-    if ($constant_string_length > 0) {
-      my $format_part = Fn->substr($format, $index, $constant_string_length);
-      $buffer->push($format_part);
-      $index += $constant_string_length;
-      $constant_string_length = 0;
-    }
-
-    my $result = $buffer->to_string;
-    return $result;
+    warn "Fn->sprintf is deprecated. Use Format->sprintf instead";
+    return Format->sprintf($format, $args);
   }
   
   native static method _native_snprintf_d : string ($value : int);
@@ -1966,7 +919,7 @@ class Fn : precompile {
     &_push_formatted_string_signed($buffer, $formatted_value, $width, $pad_char, $left_justified, $plus_sign);
   }
 
-  static method _push_formatted_string_signed : void($buffer : StringBuffer, $formatted_value : string, $width : int, $pad_char : byte, $left_justified : int, $plus_sign : int) {
+  precompile static method _push_formatted_string_signed : void($buffer : StringBuffer, $formatted_value : string, $width : int, $pad_char : byte, $left_justified : int, $plus_sign : int) {
     my $is_minus = 0;
     if ($formatted_value->[0] == '-') {
        $is_minus = 1;
@@ -2005,7 +958,7 @@ class Fn : precompile {
     }
   }
   
-  static method substr : string ($string : string, $offset : int, $length : int) {
+  precompile static method substr : string ($string : string, $offset : int, $length : int) {
 
     if ($string == undef) {
       die "String must be defined";
@@ -2041,13 +994,13 @@ class Fn : precompile {
   native static method to_float : float ($string : string);
 
   static method to_int : int ($string : string) {
-    return Fn->to_int_with_base($string, 10);
+    return &to_int_with_base($string, 10);
   }
   
   native static method to_int_with_base : int ($string : string, $digit : int);
   
   static method to_long : long ($string : string) {
-    return Fn->to_long_with_base($string, 10);
+    return &to_long_with_base($string, 10);
   }
   native static method to_long_with_base : long ($string : string, $digit : int);
 
@@ -2067,7 +1020,7 @@ class Fn : precompile {
     return $code_point;
   }
 
-  static method trim_ascii_space : string ($string : string) {
+  precompile static method trim_ascii_space : string ($string : string) {
     
     unless ($string) {
       return undef;
@@ -2079,7 +1032,7 @@ class Fn : precompile {
     
     for (my $i = 0; $i < $length; $i++) {
       if ($start_string_index == -1) {
-        if (Fn->is_space($string->[$i])) {
+        if (&is_space($string->[$i])) {
           # Skip
         }
         else {
@@ -2091,7 +1044,7 @@ class Fn : precompile {
 
     for (my $i = $length - 1; $i >= 0; $i--) {
       if ($end_string_index == -1) {
-        if (Fn->is_space($string->[$i])) {
+        if (&is_space($string->[$i])) {
           # Skip
         }
         else {
@@ -2106,20 +1059,20 @@ class Fn : precompile {
       return "";
     }
     elsif ($end_string_index == -1) {
-      $trimed_string = Fn->substr($string, $start_string_index, $length - $start_string_index);
+      $trimed_string = &substr($string, $start_string_index, $length - $start_string_index);
     }
     elsif ($end_string_index == -1) {
-      $trimed_string = Fn->substr($string, 0, $end_string_index + 1);
+      $trimed_string = &substr($string, 0, $end_string_index + 1);
     }
     else {
-      $trimed_string = Fn->substr($string, $start_string_index, $end_string_index - $start_string_index + 1);
+      $trimed_string = &substr($string, $start_string_index, $end_string_index - $start_string_index + 1);
     }
     
     return $trimed_string;
   }
 
 
-  static method uc : string ($string : string) {
+  precompile static method uc : string ($string : string) {
 
     unless ($string) { die "String must be defined"; }
 
@@ -2137,7 +1090,7 @@ class Fn : precompile {
     return $new_string;
   }
 
-  static method ucfirst : string ($string : string) {
+  precompile static method ucfirst : string ($string : string) {
 
     unless ($string) { die "String must be defined"; }
 
@@ -2160,392 +1113,5 @@ class Fn : precompile {
 
 
   native static method _snsprintf_double : string ($format : string, $value : double);
-
-  private static method _sort_byte_merge : void($a : byte[], $b : byte[], $left : int, $mid : int, $right : int, $n : int, $comparator : Comparator::Byte) {
-    my $i = $left;
-    my $j = $mid + 1;
-    my $k = 0;
-    while ($i <= $mid && $j <= $right) {
-      $i = $left;
-      $j = $mid + 1;
-      $k = 0;
-      while ($i <= $mid && $j <= $right) {
-        if ($comparator->($a->[$i], $a->[$j]) <= 0) {
-          $b->[$k] = $a->[$i];
-          $i++;
-        } else {
-          $b->[$k] = $a->[$j];
-          $j++;
-        }
-        $k++;
-      }
-      if ($i == $mid + 1) {
-        while ($j <= $right) {
-          $b->[$k] = $a->[$j]; 
-          $j++;
-          $k++;
-        }
-      } else {
-        while($i <= $mid) {
-          $b->[$k] = $a->[$i];
-          $i++;
-          $k++;
-        }
-      }
-    }
-    for ($i = 0; $i < $k; $i++) {
-      $a->[$i + $left] = $b->[$i];
-    }
-  }
-  private static method _sort_byte_merge_sort : void($a : byte[], $b : byte[], $left : int, $right : int, $n : int, $comparator : Comparator::Byte){
-    if ($left >= $right) {
-      return;
-    }
-
-    my $mid = ($left + $right) / 2;
-
-    Fn->_sort_byte_merge_sort($a, $b, $left, $mid, $n, $comparator);
-    Fn->_sort_byte_merge_sort($a, $b, $mid + 1, $right, $n, $comparator);
-    Fn->_sort_byte_merge($a, $b, $left, $mid, $right, $n, $comparator);
-  }
-
-  private static method _sort_short_merge : void($a : short[], $b : short[], $left : int, $mid : int, $right : int, $n : int, $comparator : Comparator::Short) {
-    my $i = $left;
-    my $j = $mid + 1;
-    my $k = 0;
-    while ($i <= $mid && $j <= $right) {
-      $i = $left;
-      $j = $mid + 1;
-      $k = 0;
-      while ($i <= $mid && $j <= $right) {
-        if ($comparator->($a->[$i], $a->[$j]) <= 0) {
-          $b->[$k] = $a->[$i];
-          $i++;
-        } else {
-          $b->[$k] = $a->[$j];
-          $j++;
-        }
-        $k++;
-      }
-      if ($i == $mid + 1) {
-        while ($j <= $right) {
-          $b->[$k] = $a->[$j]; 
-          $j++;
-          $k++;
-        }
-      } else {
-        while($i <= $mid) {
-          $b->[$k] = $a->[$i];
-          $i++;
-          $k++;
-        }
-      }
-    }
-    for ($i = 0; $i < $k; $i++) {
-      $a->[$i + $left] = $b->[$i];
-    }
-  }
-  private static method _sort_short_merge_sort : void($a : short[], $b : short[], $left : int, $right : int, $n : int, $comparator : Comparator::Short){
-    if ($left >= $right) {
-      return;
-    }
-
-    my $mid = ($left + $right) / 2;
-
-    Fn->_sort_short_merge_sort($a, $b, $left, $mid, $n, $comparator);
-    Fn->_sort_short_merge_sort($a, $b, $mid + 1, $right, $n, $comparator);
-    Fn->_sort_short_merge($a, $b, $left, $mid, $right, $n, $comparator);
-  }
-
-
-  private static method _sort_int_merge : void($a : int[], $b : int[], $left : int, $mid : int, $right : int, $n : int, $comparator : Comparator::Int) {
-    my $i = $left;
-    my $j = $mid + 1;
-    my $k = 0;
-    while ($i <= $mid && $j <= $right) {
-      $i = $left;
-      $j = $mid + 1;
-      $k = 0;
-      while ($i <= $mid && $j <= $right) {
-        if ($comparator->($a->[$i], $a->[$j]) <= 0) {
-          $b->[$k] = $a->[$i];
-          $i++;
-        } else {
-          $b->[$k] = $a->[$j];
-          $j++;
-        }
-        $k++;
-      }
-      if ($i == $mid + 1) {
-        while ($j <= $right) {
-          $b->[$k] = $a->[$j]; 
-          $j++;
-          $k++;
-        }
-      } else {
-        while($i <= $mid) {
-          $b->[$k] = $a->[$i];
-          $i++;
-          $k++;
-        }
-      }
-    }
-    for ($i = 0; $i < $k; $i++) {
-      $a->[$i + $left] = $b->[$i];
-    }
-  }
-  private static method _sort_int_merge_sort : void($a : int[], $b : int[], $left : int, $right : int, $n : int, $comparator : Comparator::Int){
-    if ($left >= $right) {
-      return;
-    }
-
-    my $mid = ($left + $right) / 2;
-
-    Fn->_sort_int_merge_sort($a, $b, $left, $mid, $n, $comparator);
-    Fn->_sort_int_merge_sort($a, $b, $mid + 1, $right, $n, $comparator);
-    Fn->_sort_int_merge($a, $b, $left, $mid, $right, $n, $comparator);
-  }
-
-  private static method _sort_long_merge : void($a : long[], $b : long[], $left : int, $mid : int, $right : int, $n : int, $comparator : Comparator::Long) {
-    my $i = $left;
-    my $j = $mid + 1;
-    my $k = 0;
-    while ($i <= $mid && $j <= $right) {
-      $i = $left;
-      $j = $mid + 1;
-      $k = 0;
-      while ($i <= $mid && $j <= $right) {
-        if ($comparator->($a->[$i], $a->[$j]) <= 0) {
-          $b->[$k] = $a->[$i];
-          $i++;
-        } else {
-          $b->[$k] = $a->[$j];
-          $j++;
-        }
-        $k++;
-      }
-      if ($i == $mid + 1) {
-        while ($j <= $right) {
-          $b->[$k] = $a->[$j]; 
-          $j++;
-          $k++;
-        }
-      } else {
-        while($i <= $mid) {
-          $b->[$k] = $a->[$i];
-          $i++;
-          $k++;
-        }
-      }
-    }
-    for ($i = 0; $i < $k; $i++) {
-      $a->[$i + $left] = $b->[$i];
-    }
-  }
-  private static method _sort_long_merge_sort : void($a : long[], $b : long[], $left : int, $right : int, $n : int, $comparator : Comparator::Long){
-    if ($left >= $right) {
-      return;
-    }
-
-    my $mid = ($left + $right) / 2;
-
-    Fn->_sort_long_merge_sort($a, $b, $left, $mid, $n, $comparator);
-    Fn->_sort_long_merge_sort($a, $b, $mid + 1, $right, $n, $comparator);
-    Fn->_sort_long_merge($a, $b, $left, $mid, $right, $n, $comparator);
-  }
-
-  private static method _sort_float_merge : void($a : float[], $b : float[], $left : int, $mid : int, $right : int, $n : int, $comparator : Comparator::Float) {
-    my $i = $left;
-    my $j = $mid + 1;
-    my $k = 0;
-    while ($i <= $mid && $j <= $right) {
-      $i = $left;
-      $j = $mid + 1;
-      $k = 0;
-      while ($i <= $mid && $j <= $right) {
-        if ($comparator->($a->[$i], $a->[$j]) <= 0) {
-          $b->[$k] = $a->[$i];
-          $i++;
-        } else {
-          $b->[$k] = $a->[$j];
-          $j++;
-        }
-        $k++;
-      }
-      if ($i == $mid + 1) {
-        while ($j <= $right) {
-          $b->[$k] = $a->[$j]; 
-          $j++;
-          $k++;
-        }
-      } else {
-        while($i <= $mid) {
-          $b->[$k] = $a->[$i];
-          $i++;
-          $k++;
-        }
-      }
-    }
-    for ($i = 0; $i < $k; $i++) {
-      $a->[$i + $left] = $b->[$i];
-    }
-  }
-  private static method _sort_float_merge_sort : void($a : float[], $b : float[], $left : int, $right : int, $n : int, $comparator : Comparator::Float){
-    if ($left >= $right) {
-      return;
-    }
-
-    my $mid = ($left + $right) / 2;
-
-    Fn->_sort_float_merge_sort($a, $b, $left, $mid, $n, $comparator);
-    Fn->_sort_float_merge_sort($a, $b, $mid + 1, $right, $n, $comparator);
-    Fn->_sort_float_merge($a, $b, $left, $mid, $right, $n, $comparator);
-  }
-
-  private static method _sort_double_merge : void($a : double[], $b : double[], $left : int, $mid : int, $right : int, $n : int, $comparator : Comparator::Double) {
-    my $i = $left;
-    my $j = $mid + 1;
-    my $k = 0;
-    while ($i <= $mid && $j <= $right) {
-      $i = $left;
-      $j = $mid + 1;
-      $k = 0;
-      while ($i <= $mid && $j <= $right) {
-        if ($comparator->($a->[$i], $a->[$j]) <= 0) {
-          $b->[$k] = $a->[$i];
-          $i++;
-        } else {
-          $b->[$k] = $a->[$j];
-          $j++;
-        }
-        $k++;
-      }
-      if ($i == $mid + 1) {
-        while ($j <= $right) {
-          $b->[$k] = $a->[$j]; 
-          $j++;
-          $k++;
-        }
-      } else {
-        while($i <= $mid) {
-          $b->[$k] = $a->[$i];
-          $i++;
-          $k++;
-        }
-      }
-    }
-    for ($i = 0; $i < $k; $i++) {
-      $a->[$i + $left] = $b->[$i];
-    }
-  }
-  private static method _sort_double_merge_sort : void($a : double[], $b : double[], $left : int, $right : int, $n : int, $comparator : Comparator::Double){
-    if ($left >= $right) {
-      return;
-    }
-
-    my $mid = ($left + $right) / 2;
-
-    Fn->_sort_double_merge_sort($a, $b, $left, $mid, $n, $comparator);
-    Fn->_sort_double_merge_sort($a, $b, $mid + 1, $right, $n, $comparator);
-    Fn->_sort_double_merge($a, $b, $left, $mid, $right, $n, $comparator);
-  }
-
-  private static method _sort_string_merge : void($a : string[], $b : string[], $left : int, $mid : int, $right : int, $n : int, $comparator : Comparator::String) {
-    my $i = $left;
-    my $j = $mid + 1;
-    my $k = 0;
-    while ($i <= $mid && $j <= $right) {
-      $i = $left;
-      $j = $mid + 1;
-      $k = 0;
-      while ($i <= $mid && $j <= $right) {
-        if ($comparator->($a->[$i], $a->[$j]) <= 0) {
-          $b->[$k] = $a->[$i];
-          $i++;
-        } else {
-          $b->[$k] = $a->[$j];
-          $j++;
-        }
-        $k++;
-      }
-      if ($i == $mid + 1) {
-        while ($j <= $right) {
-          $b->[$k] = $a->[$j]; 
-          $j++;
-          $k++;
-        }
-      } else {
-        while($i <= $mid) {
-          $b->[$k] = $a->[$i];
-          $i++;
-          $k++;
-        }
-      }
-    }
-    for ($i = 0; $i < $k; $i++) {
-      $a->[$i + $left] = $b->[$i];
-    }
-  }
-
-  private static method _sort_string_merge_sort : void($a : string[], $b : string[], $left : int, $right : int, $n : int, $comparator : Comparator::String){
-    if ($left >= $right) {
-      return;
-    }
-
-    my $mid = ($left + $right) / 2;
-
-    Fn->_sort_string_merge_sort($a, $b, $left, $mid, $n, $comparator);
-    Fn->_sort_string_merge_sort($a, $b, $mid + 1, $right, $n, $comparator);
-    Fn->_sort_string_merge($a, $b, $left, $mid, $right, $n, $comparator);
-  }
-
-  private static method _sort_object_merge : void($a : object[], $b : object[], $left : int, $mid : int, $right : int, $n : int, $comparator : Comparator) {
-      my $i = $left;
-      my $j = $mid + 1;
-      my $k = 0;
-      while ($i <= $mid && $j <= $right) {
-        $i = $left;
-        $j = $mid + 1;
-        $k = 0;
-        while ($i <= $mid && $j <= $right) {
-          if ($comparator->($a->[$i], $a->[$j]) <= 0) {
-            $b->[$k] = $a->[$i];
-            $i++;
-          } else {
-            $b->[$k] = $a->[$j];
-            $j++;
-          }
-          $k++;
-        }
-        if ($i == $mid + 1) {
-          while ($j <= $right) {
-            $b->[$k] = $a->[$j]; 
-            $j++;
-            $k++;
-          }
-        } else {
-          while($i <= $mid) {
-            $b->[$k] = $a->[$i];
-            $i++;
-            $k++;
-          }
-        }
-      }
-      for ($i = 0; $i < $k; $i++) {
-        $a->[$i + $left] = $b->[$i];
-      }
-  }
-
-  private static method _sort_object_merge_sort : void($a : object[], $b : object[], $left : int, $right : int, $n : int, $comparator : Comparator){
-    if ($left >= $right) {
-      return;
-    }
-
-    my $mid = ($left + $right) / 2;
-
-    Fn->_sort_object_merge_sort($a, $b, $left, $mid, $n, $comparator);
-    Fn->_sort_object_merge_sort($a, $b, $mid + 1, $right, $n, $comparator);
-    Fn->_sort_object_merge($a, $b, $left, $mid, $right, $n, $comparator);
-  }
 }
 

@@ -25,4 +25,5 @@ no_leaks_ok {
     my $client = OPCUA::Open62541::Client->new();
     my $config = $client->getConfig();
     $config->setClientContext("foo");
+    $config->setClientContext("bar");
 } "context leak";

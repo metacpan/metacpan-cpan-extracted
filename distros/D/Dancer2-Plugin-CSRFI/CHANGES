@@ -1,0 +1,17 @@
+1.03 2022-06-16 13:45:10 Europe/Moscow
+    [CHANGES]
+    * Removed log debug message before entering hook
+
+1.02 2022-06-14 19:18:34 Europe/Moscow
+    [BUGS]
+    * Referer with query bug
+
+1.01 2022-06-14 18:34:45 Europe/Moscow
+    [BUGS]
+    * Fix multi-app uri bug
+
+    [DOCS]
+    * Configuration indent typo
+
+1.00 2022-06-12 11:11:23 Europe/Moscow
+    Initial

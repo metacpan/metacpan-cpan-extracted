@@ -4,7 +4,7 @@
       "Paul Marquess <pmqs@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 8.3508, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,17 +32,8 @@
       },
       "runtime" : {
          "recommends" : {
-            "Class::XSAccessor" : "0",
             "Filter::Simple" : "0.88",
-            "Filter::Simple::Compile" : "0.02",
-            "List::MoreUtils" : "0",
-            "Perl::MinimumVersion" : "0",
-            "Pod::Spell::CommonMistakes" : "0",
-            "Test::CPAN::Meta" : "0",
-            "Test::Kwalitee" : "0",
-            "Test::More" : "0.88",
-            "Test::Pod" : "1.00",
-            "Text::CSV_XS" : "0"
+            "Test::More" : "0.88"
          }
       }
    },
@@ -55,6 +46,6 @@
          "url" : "https://github.com/rurban/Filter"
       }
    },
-   "version" : "1.60",
-   "x_serialization_backend" : "JSON::PP version 4.04_01"
+   "version" : "1.61",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

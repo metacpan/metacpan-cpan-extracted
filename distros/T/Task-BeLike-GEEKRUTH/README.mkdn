@@ -4,7 +4,7 @@ Task::BeLike::GEEKRUTH - TIMTOWTDI, but this works for GeekRuthie
 
 # VERSION
 
-version 1.0000
+version 1.0100
 
 # NAME
 
@@ -12,7 +12,7 @@ Task::BeLike::GEEKRUTH - TIMTOWTDI, but this works for GeekRuthie
 
 # VERSION
 
-version 1.0000
+version 1.0100
 
 # TASK CONTENTS
 
@@ -56,8 +56,6 @@ version 1.0000
 
 ### [Perl::Tidy](https://metacpan.org/pod/Perl%3A%3ATidy)
 
-### [PLS](https://metacpan.org/pod/PLS)
-
 ### [Pod::Coverage::TrustPod](https://metacpan.org/pod/Pod%3A%3ACoverage%3A%3ATrustPod)
 
 ## Database Wrangling
@@ -68,9 +66,13 @@ version 1.0000
 
 ### [DBIx::Class::Helpers](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AHelpers)
 
+### [DBIx::Class::TemporalRelations](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ATemporalRelations)
+
 ## Building Cool Stuff
 
 ### [autodie](https://metacpan.org/pod/autodie)
+
+### [Carp](https://metacpan.org/pod/Carp)
 
 ### [Cpanel::JSON::XS](https://metacpan.org/pod/Cpanel%3A%3AJSON%3A%3AXS)
 
@@ -80,13 +82,9 @@ version 1.0000
 
 ### [Dancer2::Plugin::Auth::Extensible](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3AAuth%3A%3AExtensible)
 
-### [Dancer2::Plugin::Auth::Extensible::Provider::DBIC](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3AAuth%3A%3AExtensible%3A%3AProvider%3A%3ADBIC)
-
-### [Dancer2::Plugin::Auth::Extensible::Provider::DBIx::Class](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3AAuth%3A%3AExtensible%3A%3AProvider%3A%3ADBIx%3A%3AClass)
+### [Dancer2::Plugin::Auth::Extensible::Provider::DBIxClass](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3AAuth%3A%3AExtensible%3A%3AProvider%3A%3ADBIxClass)
 
 ### [Dancer2::Plugin::Cache::CHI](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3ACache%3A%3ACHI)
-
-### [Dancer2::Plugin::DBIC](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3ADBIC)
 
 ### [Dancer2::Plugin::DBIx::Class](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3ADBIx%3A%3AClass)
 
@@ -142,9 +140,13 @@ the same terms as the Perl 5 programming language system itself.
 
 Hey! **The above document had some coding errors, which are explained below:**
 
-- Around line 123:
+- Around line 121:
 
     Unknown directive: =pkggoup
+
+- Around line 123:
+
+    Unknown directive: =pkg
 
 - Around line 125:
 
@@ -163,9 +165,5 @@ Hey! **The above document had some coding errors, which are explained below:**
     Unknown directive: =pkg
 
 - Around line 133:
-
-    Unknown directive: =pkg
-
-- Around line 135:
 
     Unknown directive: =pkg

@@ -7,7 +7,11 @@
 package Perl::Tidy::Debugger;
 use strict;
 use warnings;
-our $VERSION = '20220217';
+use English qw( -no_match_vars );
+our $VERSION = '20220613';
+
+use constant EMPTY_STRING => q{};
+use constant SPACE        => q{ };
 
 sub new {
 
@@ -29,7 +33,7 @@ sub really_open_debug_file {
     my ( $fh, $filename ) =
       Perl::Tidy::streamhandle( $debug_file, 'w', $is_encoded_data );
     if ( !$fh ) {
-        Perl::Tidy::Warn("can't open $debug_file: $!\n");
+        Perl::Tidy::Warn("can't open $debug_file: $ERRNO\n");
     }
     $self->{_debug_file_opened} = 1;
     $self->{_fh}                = $fh;
@@ -63,7 +67,6 @@ sub write_debug_entry {
     my $rtoken_type = $line_of_tokens->{_rtoken_type};
     my $rtokens     = $line_of_tokens->{_rtokens};
     my $rlevels     = $line_of_tokens->{_rlevels};
-    my $rslevels    = $line_of_tokens->{_rslevels};
     my $rblock_type = $line_of_tokens->{_rblock_type};
 
     my $input_line_number = $line_of_tokens->{_line_number};
@@ -75,7 +78,7 @@ sub write_debug_entry {
     my $reconstructed_original = "$input_line_number: ";
     my $block_str              = "$input_line_number: ";
 
-    my $pattern   = "";
+    my $pattern   = EMPTY_STRING;
     my @next_char = ( '"', '"' );
     my $i_next    = 0;
     unless ( $self->{_debug_file_opened} ) { $self->really_open_debug_file() }
@@ -98,7 +101,7 @@ sub write_debug_entry {
         # be sure there are no blank tokens (shouldn't happen)
         # This can only happen if a programming error has been made
         # because all valid tokens are non-blank
-        if ( $type_str eq ' ' ) {
+        if ( $type_str eq SPACE ) {
             $fh->print("BLANK TOKEN on the next line\n");
             $type_str = $next_char[$i_next];
             $i_next   = 1 - $i_next;

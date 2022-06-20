@@ -1,8 +1,8 @@
 package YA::CLI;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use Moo;
 
-# ABSTRACT: Do CLI things
+# ABSTRACT: Yet another CLI framework
 
 use Carp qw(croak);
 use Getopt::Long;
@@ -107,11 +107,11 @@ __END__
 
 =head1 NAME
 
-YA::CLI - Do CLI things
+YA::CLI - Yet another CLI framework
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -160,7 +160,7 @@ Override the default search path, defaults to your Your::App namespace.
 =head2 default_handler
 
 Defaults to C<main> for your default handler. If this handler cannot be found
-ultimatly falls back to L<YA::CLI::MainHandler> which deals with just C<--help>
+ultimatly falls back to L<YA::CLI::ErrorHandler> which deals with just C<--help>
 and C<--man> commands.
 
 =head2 cli_options

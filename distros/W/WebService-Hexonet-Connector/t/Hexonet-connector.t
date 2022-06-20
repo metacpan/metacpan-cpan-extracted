@@ -7,7 +7,7 @@ use Test::More;
 use Test::Exception;
 use Test::RequiresInternet ( 'api.ispapi.net' => 443 );
 
-our $VERSION = 'v2.10.3';
+our $VERSION = 'v2.10.4';
 
 # T1-4: test import modules
 use_ok('Config');

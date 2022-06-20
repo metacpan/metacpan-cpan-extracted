@@ -1,8 +1,10 @@
 Revision history for Perl module Geo::GeoNames
 
-1.13 2019-07-23T19:36:01Z
-	* support the children? query (@alesn)
-	* a bit more info when the response has the wrong mime type (@nigelhorne)
+1.14	Fri Jun 10 05:08:22 EDT 2022
+	Start to use Test::Most
+
+1.13	Thu Jun  9 09:34:57 EDT 2022
+	Change ownership to NHORNE
 
 1.12 - 2017-04-16
 	* Update the docs for GitHub Issues:

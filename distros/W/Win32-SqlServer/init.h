@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/init.h 8     21-07-12 21:37 Sommar $
+ $Header: /Perl/OlleDB/init.h 10    22-05-18 22:22 Sommar $
 
   This file holds code associated with module and object initialitaion.
   This file also declares global variables that exist through the lifetime
@@ -8,9 +8,21 @@
   The header file also define some enums related to initialisation.
 
 
-  Copyright (c) 2004-2021   Erland Sommarskog
+  Copyright (c) 2004-2022   Erland Sommarskog
 
   $History: init.h $
+ * 
+ * *****************  Version 10  *****************
+ * User: Sommar       Date: 22-05-18   Time: 22:22
+ * Updated in $/Perl/OlleDB
+ * Added module routine SetDefaultForEncryption to permit changing the
+ * default for the lgoin properties Encrypt, TrustServerCertificate and
+ * HostNameInCertificate.
+ * 
+ * *****************  Version 9  *****************
+ * User: Sommar       Date: 22-05-08   Time: 23:12
+ * Updated in $/Perl/OlleDB
+ * Handle new OLE DB provider MSOLEDBSQL19.
  * 
  * *****************  Version 8  *****************
  * User: Sommar       Date: 21-07-12   Time: 21:37
@@ -66,7 +78,8 @@
 // Definitions of all possible providers as an enum.
 typedef enum provider_enum {
     provider_default, provider_sqloledb, provider_sqlncli, 
-    provider_sqlncli10, provider_sqlncli11, provider_msoledbsql
+    provider_sqlncli10, provider_sqlncli11, provider_msoledbsql,
+    provider_msoledbsql19
 } provider_enum;
 
 // And here is global variables for the classids for the possible providers.
@@ -75,6 +88,7 @@ extern CLSID  clsid_sqlncli;
 extern CLSID  clsid_sqlncli10;
 extern CLSID  clsid_sqlncli11;
 extern CLSID  clsid_msoledbsql;
+extern CLSID  clsid_msoledbsql19;
 
 
 // This is stuff for init properties. When the module starts up, we set up a
@@ -133,3 +147,6 @@ extern void initialize();
 extern provider_enum default_provider(void);
 
 
+// This routine permits the caller to change the default for the options Encrypt and
+// TrustServerCertificate.
+extern void SetDefaultForEncryption(SV *, SV*, SV *);

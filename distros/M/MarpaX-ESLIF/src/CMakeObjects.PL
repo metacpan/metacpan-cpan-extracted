@@ -258,7 +258,7 @@ my @additional_srcdir = ();
 # We provide ourself PCRE2
 # ------------------------
 {
-    my $PCRE2_VERSION = '10.33';
+    my $PCRE2_VERSION = '10.40';
     local $CWD = File::Spec->catdir('3rdparty', 'untar', "pcre2-${PCRE2_VERSION}");
     print "... Compiling pcre2 version ${PCRE2_VERSION}\n";
     my $fh;
@@ -266,18 +266,24 @@ my @additional_srcdir = ();
 
     print $fh <<AUTOCONF;
 [headers]
+strings.h = 1
+string.h = 1
 dirent.h = 1
+stdlib.h = 1
 stdint.h = 1
 inttypes.h = 1
 sys/stat.h = 1
 sys/types.h = 1
 unistd.h = 1
 windows.h = 1
+sys/mman.h = 1
 
 [funcs]
 bcopy = 1
 memmove = 1
 strerror = 1
+memfd_create = 1
+secure_getenv = 1
 
 [outputs]
 config.h = 1
@@ -360,7 +366,7 @@ AUTOCONF
 	);
   }
 }
-push(@additional_includes, File::Spec->catdir('3rdparty', 'untar', 'pcre2-10.33'));
+push(@additional_includes, File::Spec->catdir('3rdparty', 'untar', 'pcre2-10.40'));
 
 # -------------------------------------------
 # marpaESLIF embeds my unpanic version of lua

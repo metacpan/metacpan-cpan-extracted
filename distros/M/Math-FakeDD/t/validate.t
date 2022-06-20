@@ -19,6 +19,13 @@ use warnings;
 use Math::FakeDD qw(:all);
 use Test::More;
 
+if($ENV{SKIP_REPRO_TESTS}) {
+  is(1, 1);
+  warn "\n skipping all tests as \$ENV{SKIP_REPRO_TESTS} is set\n";
+  done_testing();
+  exit 0;
+}
+
 my $dbl_min = 2 ** -1022;
 
 for(my $i = -300; $i <= 300; $i++) {
@@ -36,6 +43,8 @@ for(my $i = -300; $i <= 300; $i++) {
     my $repro   = dd_repro($orig);
     my $decimal = dd_dec  ($orig);
     my $hex     = dd_hex  ($orig);
+
+    chop_inc_test(dd_repro($orig), $orig);
 
     if($orig < 1 && $orig > -1) {
       cmp_ok(int($orig), '==', 0, "int() expected to return a value of 0");
@@ -61,38 +70,6 @@ for(my $i = -300; $i <= 300; $i++) {
     my $t = int(Math::FakeDD->new($repro));
     cmp_ok(int($orig), '==', $t                 , "$str: int() ok");
 
-    my $check1 = Math::FakeDD->new($repro);
-    cmp_ok($check1, '==', $orig, "$str: round trip achieved");
-
-    # round down by removing the least significant mantissa digit
-    my @chop  = split /e/i, $repro;
-    chop($chop[0]);
-    next if $chop[0] =~ /\.$/;
-
-    if(!defined($chop[1])) {
-      $repro = $chop[0];
-    }
-    else {
-      $repro = $chop[0] . 'e' . $chop[1];
-    }
-
-    my $check2 = Math::FakeDD->new($repro);
-    cmp_ok($check2, '!=', $orig, "$str: chop() alters value");
-    cmp_ok(abs($check2), '<', abs($orig), "$str: test value < original");
-
-    next if $chop[0] =~ /9$/;
-
-    ++substr($chop[0], -1); # round up the last digit.
-
-    if(!defined($chop[1])) {
-      $repro = $chop[0];
-    }
-    else {
-      $repro = $chop[0] . 'e' . $chop[1];
-    }
-    my $check3 = Math::FakeDD->new($repro);
-    cmp_ok($check3, '!=', $orig, "$str: round-up alters value");
-    cmp_ok(abs($check3), '>', abs($orig), "$str: test value > original");
   }
 }
 
@@ -111,53 +88,76 @@ my $fudd4 = Math::FakeDD->new(dd_repro($fudd2));
 cmp_ok($fudd3, '==', $fudd1, "+: round trip ok");
 cmp_ok($fudd4, '==', $fudd2, "-: round trip ok");
 
+dd_assign($fudd1, 2 ** -1025);
+chop_inc_test(dd_repro($fudd1), $fudd1);
+
 dd_assign($fudd1, 2 ** -1075);
-cmp_ok(dd_repro($fudd1), 'eq', '0.0', "dd_repro returns '0.0' for 2 ** -1075");
+chop_inc_test(dd_repro($fudd1), $fudd1);
 
 dd_assign($fudd1, 2 ** -1074);
-cmp_ok(dd_repro($fudd1), 'eq', '5e-324', "dd_repro returns '5e-324' for 2 ** -1074");
+chop_inc_test(dd_repro($fudd1), $fudd1);
 
 dd_assign($fudd1, 2 ** -1073);
-cmp_ok(dd_repro($fudd1), 'eq', '1e-323', "dd_repro displays '1e-323' for 2 ** -1073");
+chop_inc_test(dd_repro($fudd1), $fudd1);
 
 $fudd1 += 2 ** -1068;
-cmp_ok(dd_repro($fudd1), 'eq', '3.26e-322', "dd_repro returns '3.26e-322' for (2 ** -1068)+(2 ** -1073)");
+chop_inc_test(dd_repro($fudd1), $fudd1);
 
 dd_assign($fudd1, 2 ** -1022);
-cmp_ok(dd_repro($fudd1), 'eq', '2.2250738585072014e-308', "dd_repro returns DBL_MIN as '2.2250738585072014e-308'");
+chop_inc_test(dd_repro($fudd1), $fudd1);
 
 dd_assign($fudd1, 2 ** -1021);
-cmp_ok(dd_repro($fudd1), 'eq', '4.450147717014403e-308', "dd_repro returns 2 ** -1021 as '4.450147717014403e-308'");
+chop_inc_test(dd_repro($fudd1), $fudd1);
 
 $fudd1 += 2 ** -1020;
-cmp_ok(dd_repro($fudd1), 'eq', '1.3350443151043208e-307', "dd_repro '1.3350443151043208e-307' for (2 ** -1020)+(2 ** -1021)");
+chop_inc_test(dd_repro($fudd1), $fudd1);;
 
-dd_assign($fudd1, (2 ** -1021) + (2 ** -1064)) ;
-cmp_ok(dd_repro($fudd1), 'eq', '4.450147717014909e-308', "dd_repro '4.450147717014909e-308' for (2 ** -1021)+(2 ** -1064)");
+dd_assign($fudd1, 2 ** -1021);
+$fudd1 += (2 ** -1064) ;
+chop_inc_test(dd_repro($fudd1), $fudd1);
 
 dd_assign($fudd1, '0.59374149305888224e17'); # mpfr_dump() exponent == 56
-cmp_ok(Math::FakeDD->new(dd_repro($fudd1)), '==', $fudd1, "round trip for '0.59374149305888224e17' ok");
+chop_inc_test(dd_repro($fudd1), $fudd1);
 
 dd_assign($fudd1, '0.0605815825720235e15');  # mpfr_dump() exponent == 46
-cmp_ok(Math::FakeDD->new(dd_repro($fudd1)), '==', $fudd1, "round trip for '0.0605815825720235e15' ok");
+chop_inc_test(dd_repro($fudd1), $fudd1);
 
 dd_assign($fudd1, '0.32264564579955e13');    # mpfr_dump() exponent == 42
-cmp_ok(Math::FakeDD->new(dd_repro($fudd1)), '==', $fudd1, "round trip for '0.32264564579955e13' ok");
+chop_inc_test(dd_repro($fudd1), $fudd1);
 
 dd_assign($fudd1, '0.217045016575725e14');   # mpfr_dump() exponent == 45
-cmp_ok(Math::FakeDD->new(dd_repro($fudd1)), '==', $fudd1, "round trip for '0.217045016575725e14' ok");
+chop_inc_test(dd_repro($fudd1), $fudd1);
 
 dd_assign($fudd1, '0.920640108967635e14');   # mpfr_dump() exponent == 47
-cmp_ok(Math::FakeDD->new(dd_repro($fudd1)), '==', $fudd1, "round trip for '0.920640108967635e14' ok");
+chop_inc_test(dd_repro($fudd1), $fudd1);
 
 dd_assign($fudd1, '0.26580405907862925e15'); # mpfr_dump() exponent == 48
-cmp_ok(Math::FakeDD->new(dd_repro($fudd1)), '==', $fudd1, "round trip for '0.26580405907862925e15' ok");
+chop_inc_test(dd_repro($fudd1), $fudd1);
 
 dd_assign($fudd1, '0.94562172840506875e15'); # mpfr_dump() exponent == 50
-cmp_ok(Math::FakeDD->new(dd_repro($fudd1)), '==', $fudd1, "round trip for '0.94562172840506875e15' ok");
+chop_inc_test(dd_repro($fudd1), $fudd1);
 
 dd_assign($fudd1, '0.59951823306102625e15'); # mpfr_dump() exponent == 50
-cmp_ok(Math::FakeDD->new(dd_repro($fudd1)), '==', $fudd1, "round trip for '0.59951823306102625e15' ok");
+chop_inc_test(dd_repro($fudd1), $fudd1);
 
 done_testing();
 
+sub chop_inc_test {
+   my $res;
+   my ($repro, $op) = (shift, shift);
+   if(defined($_[0])) {
+     $res = dd_repro_test($repro, $op, $_[0]);
+   }
+   else {
+     $res = dd_repro_test($repro, $op);
+   }
+   ok($res == 7) or dd_diag($res, $op);
+}
+
+sub dd_diag {
+  print STDERR "Failed round-trip for " . sprintx($_[1])     . "\n" unless $_[0] & 1;
+  print STDERR "Failed chop test for " . sprintx($_[1])      . "\n" unless $_[0] & 2;
+  print STDERR "Failed increment test for " . sprintx($_[1]) . "\n" unless $_[0] & 4;
+}
+
+__END__

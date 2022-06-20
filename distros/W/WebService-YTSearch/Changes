@@ -1,7 +1,10 @@
 Revision history for WebService-YTSearch
 
+0.0303 2022-06-09 21:12:12
+    - Improve documentation.
+
 0.0302 2021-11-18 07:52:41
-    - Improve the eg/harvest program lsightly.
+    - Improve the eg/harvest program sightly.
 
 0.0301 2021-11-17 17:10:14
     - Improve documentation.

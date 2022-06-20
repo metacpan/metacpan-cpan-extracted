@@ -3,8 +3,13 @@ Lexical-Accessor
 
 Created:      2013-10-21
 Home page:    <https://metacpan.org/release/Lexical-Accessor>
-Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Lexical-Accessor>
+Bug tracker:  <https://github.com/tobyink/p5-lexical-accessor/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.014	2022-06-16
+
+ - Updated: Cope with changes to Sub::HandlesVia API; try to stick more to
+   the public API.
 
 0.013	2020-09-12
 

@@ -2,7 +2,7 @@ package Text::Darts;
 use strict;
 use warnings;
 use Carp;
-our $VERSION = sprintf "%d.%02d", q$Revision: 0.9 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%02d", q$Revision: 0.10 $ =~ /(\d+)/g;
 our $DEBUG = 0;
 
 require XSLoader;

@@ -1,5 +1,109 @@
-@  changeset:   165:9df090eface9
+@  changeset:   178:604b2eac0d0f
 |  tag:         tip
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Mon Jun 13 14:05:49 2022 +0200
+|  files:       lib/Net/Clacks/UpgradeGuide.pod
+|  description:
+|  Update Upgradeguide in preparation for V24 release
+|
+|
+o  changeset:   177:9d7c0ae888de
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Mon Jun 13 13:02:06 2022 +0200
+|  files:       lib/Net/Clacks/Client.pm
+|  description:
+|  Remembering Sheila
+|
+|
+o  changeset:   176:834711d8a805
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Wed May 04 15:39:59 2022 +0200
+|  files:       lib/Net/Clacks/Server.pm
+|  description:
+|  Trying to fix endless loop on unclean client disconnect
+|
+|
+o  changeset:   175:672b61c11b79
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Mon Apr 25 16:29:41 2022 +0200
+|  files:       lib/Net/Clacks/Server.pm
+|  description:
+|  Re-factor state machine in run() into many smaller functions
+|
+|
+o  changeset:   174:0cdeefc95c59
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Mon Apr 25 14:46:20 2022 +0200
+|  files:       example/clacks_master.xml lib/Net/Clacks/Server.pm
+|  description:
+|  Refactor code to use $self for all variables in run(). This will enable further modularization.
+|
+|
+o  changeset:   173:22743173e6f6
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Mon Apr 25 13:58:47 2022 +0200
+|  files:       lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
+|  description:
+|  Make cache cleaning interval configureable
+|
+|
+o  changeset:   172:55757e55b0bc
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Mon Apr 25 13:53:32 2022 +0200
+|  files:       lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
+|  description:
+|  Update upgradeguide. Make sure we differentiate between deleted and non-deleted cache items in cleanup routine
+|
+|
+o  changeset:   171:7d57ea55c692
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Mon Apr 25 13:42:33 2022 +0200
+|  files:       example/clacks_master.xml lib/Net/Clacks/Server.pm
+|  description:
+|  Cleanup
+|
+|
+o  changeset:   170:74be4272c50d
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Mon Apr 25 13:29:03 2022 +0200
+|  files:       lib/Net/Clacks/Server.pm
+|  description:
+|  Upgrade internal cache handling and persistancefile format
+|
+|
+o  changeset:   169:ab53f94dbc0d
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Mon Apr 25 10:29:32 2022 +0200
+|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/Server.pm
+|  description:
+|  Bump version to 24
+|
+|
+o  changeset:   168:1f86d7d3b7e7
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Mon Apr 25 10:28:47 2022 +0200
+|  files:       Makefile.PL lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
+|  description:
+|  Better sanity checks. Fix cache cleaning algorithm
+|
+|
+o  changeset:   167:9e7348b72d85
+|  user:        Rene Schickbauer <cavac@dsky>
+|  date:        Sun Apr 24 21:33:43 2022 +0200
+|  files:       lib/Net/Clacks/Server.pm
+|  description:
+|  Sanity check that we have valid timestamps before sending KEYSYNC
+|
+|
+o  changeset:   166:c6e7ef9286a8
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Mon Apr 11 15:03:45 2022 +0200
+|  files:       Changes
+|  description:
+|  Update Changes file for release of V23
+|
+|
+o  changeset:   165:9df090eface9
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Mon Apr 11 13:22:32 2022 +0200
 |  files:       lib/Net/Clacks/Server.pm

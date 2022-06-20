@@ -40,7 +40,7 @@ use File::Spec::Functions qw(catfile);
 my $module    = __PACKAGE__;
 ( my $dist = $module ) =~ s/::/-/g;
 
-my $github    = 'https://github.com/briandfoy/geo-geonames';
+my $github    = 'https://github.com/nigelhorne/Geo-GeoNames';
 my $main_file = catfile( 'lib', split /::/, "$module.pm" );
 
 my %WriteMakefile = (
@@ -49,7 +49,8 @@ my %WriteMakefile = (
 	'NAME'             => $module,
 	'ABSTRACT_FROM'    => $main_file,
 	'VERSION_FROM'     => $main_file,
-	'AUTHOR'           => 'Per Henrik Johansen <per.henrik.johansen@gmail.com>',
+	# 'AUTHOR'           => 'Per Henrik Johansen <per.henrik.johansen@gmail.com>',
+	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
 	'LICENSE'          => 'perl',
 
 	'CONFIGURE_REQUIRES' => {
@@ -57,14 +58,10 @@ my %WriteMakefile = (
 		'File::Spec::Functions' => '0',
 		},
 
-	'BUILD_REQUIRES' => {
-		},
-
+	'BUILD_REQUIRES' => { },
 	'TEST_REQUIRES' => {
-		'Test::More' => '0.98',
-		},
-
-	'PREREQ_PM'      => {
+		'Test::Most' => 0,
+	}, 'PREREQ_PM'      => {
 		'XML::Simple'     => '2.13',
 		'Mojo::UserAgent' => '0',
 		'JSON'            => '1.14',
@@ -96,7 +93,7 @@ sub do_it {
 
 	unless( exists $ENV{GEONAMES_USER} ) {
 		print <<"HERE";
-	To test Geo::GeoNames, you need a a GeoNames account enabled at least
+	To test Geo::GeoNames, you need a GeoNames account enabled at least
 	for free access. Start at http://www.geonames.org/login to create a
 	new account. Set GEONAMES_USER to run the tests.
 HERE

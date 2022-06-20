@@ -119,11 +119,11 @@
    "provides" : {
       "Dist::Zilla::MintingProfile::Author::WATERKIP" : {
          "file" : "lib/Dist/Zilla/MintingProfile/Author/WATERKIP.pm",
-         "version" : "3.0"
+         "version" : "3.1"
       },
       "Dist::Zilla::PluginBundle::Author::WATERKIP" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/WATERKIP.pm",
-         "version" : "3.0"
+         "version" : "3.1"
       }
    },
    "release_status" : "stable",
@@ -134,7 +134,7 @@
          "web" : "https://gitlab.com/waterkip/dist-zilla-pluginbundle-author-waterkip"
       }
    },
-   "version" : "3.0",
+   "version" : "3.1",
    "x_contributors" : [
       "Wesley Schwengle <wesley@schwengle.net>"
    ],

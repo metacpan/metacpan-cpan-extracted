@@ -1,0 +1,22 @@
+Revision history for perl distribution Mojo-Run3
+
+0.05 2022-06-13T18:53:02+0900
+ - Will automatically clean up on destroy
+
+0.04 2022-06-13T10:46:18+0900
+ - Fix also closing the pty when stdin gets closed
+
+0.03 2022-06-12T11:21:31+0900
+ - Need to receive EOF on boh STDERR and STDOUT before emitting "finish"
+
+0.02 2022-06-11T11:17:26+0900
+ - Changed "read" event to "stdout", "stderr" and "pty"
+ - Add support for MOJO_RUN3_DEBUG=1
+ - Add support for IO::Pty
+ - Add handle()
+ - Add "sshpass" example
+
+0.01 2022-06-10T20:31:39+0900
+ - Add close(), kill(), start(), write()
+ - Add exit_status(), pid(), status()
+ - Add run_p()

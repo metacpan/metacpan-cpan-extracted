@@ -3,9 +3,10 @@
 # to make sure we get expected values
 
 use strict;
-use Test::More tests => 492;
+use Test::More;
 
 BEGIN { use_ok(Imager => qw(:handy :all)) }
+use warnings;
 
 use Imager::Test qw(image_bounds_checks is_color3 is_color4 is_fcolor4 color_cmp mask_tests is_fcolor3);
 
@@ -230,8 +231,11 @@ is($impal2->colorchannels, 3, "check colorchannels");
   is($im->errstr, "getchannels: empty input image", "check message");
   is($im->getmask, undef, "can't get mask of empty image");
   is($im->errstr, "getmask: empty input image", "check message");
-  is($im->setmask, undef, "can't set mask of empty image");
-  is($im->errstr, "setmask: empty input image", "check message");
+  {
+    no if $] >= 5.014, warnings => 'Imager::channelmask';
+    is($im->setmask, undef, "can't set mask of empty image");
+    is($im->errstr, "setmask: empty input image", "check message");
+  }
   is($im->colorchannels, undef, "can't get colorchannels of empty image");
   is($im->errstr, "colorchannels: empty input image", "check message");
   is($im->alphachannel, undef, "can't get alphachannel of empty image");
@@ -823,7 +827,6 @@ my $psamp_outside_error = "Image position outside of image";
 { # check the channel mask function
   
   my $im = Imager->new(xsize => 10, ysize=>10, bits=>8);
-
   mask_tests($im, 0.005);
 }
 
@@ -1132,6 +1135,52 @@ my $psamp_outside_error = "Image position outside of image";
      "check error message");
 }
 
+SKIP:
+{
+  skip "No detailed warning registration before 5.014", 1
+    if $] < 5.014;
+  # warnings should be enabled
+  my @warn;
+  local $SIG{__WARN__} = sub { push @warn, "@_"; };
+  my $im = Imager->new(xsize => 1, ysize => 1);
+  $im->settag(code => 10, value => 10);
+  is(scalar @warn, 1, "settag with code warns");
+  like($warn[0], qr/settag: code parameter is deprecated/,
+       "check message for settag");
+  @warn = ();
+  {
+    no if $] >= 5.014, warnings => 'Imager::tagcodes';
+    $im->settag(code => 10, value => 10);
+  }
+  is(scalar @warn, 0, "settag with code with warning disabled doesn't warn");
+
+  @warn = ();
+  $im->addtag(code => 11, value => 11);
+  is(scalar @warn, 1, "addtag with code warns");
+  like($warn[0], qr/addtag: code parameter is deprecated/,
+       "check message for addtag");
+
+  @warn = ();
+  {
+    no if $] >= 5.014, warnings => 'Imager::tagcodes';
+    $im->addtag(code => 12, value => 12);
+  }
+  is(scalar @warn, 0, "addtag with code with warning disabled doesn't warn");
+
+  # setmask
+  @warn = ();
+  $im->setmask(mask => 0xFF);
+  is(scalar @warn, 1, "warned on setmask");
+  like($warn[0], qr/setmask: image channel masks are deprecated/,
+       "check setmask warning message");
+  @warn = ();
+  {
+    no if $] >= 5.014, warnings => 'Imager::channelmask';
+    $im->setmask(mask => 0xFF);
+  }
+  is(scalar @warn, 0, "setmask with warning disabled doesn't warn");
+}
+
 {
   my @tests =
     (
@@ -1150,6 +1199,8 @@ my $psamp_outside_error = "Image position outside of image";
     is($im->colorchannels, $color_channels, "check colorchannels");
   }
 }
+
+done_testing();
 
 Imager->close_log();
 

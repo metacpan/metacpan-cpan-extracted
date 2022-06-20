@@ -1,3 +1,20 @@
+0.040   2022-06-10  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Edit Changes to add Backward-Incompatible metadata.
+
+
+0.039   2022-06-10  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Tweak Log::ger's Synopsis to make the code more explanatory.
+
+        - [internals] Replace 'use var' with 'our' as the former is discouraged
+          in 5.006+ (thanks James Raspass).
+
+
 0.038   2021-01-31  Released-By: PERLANCAR; Urgency: medium
 
 	- Rename Log::ger::Plugin::MultilevelLog to the more appropriate
@@ -6,7 +23,7 @@
 	  be removed in the future.
 
 
-0.037   2020-03-11  Released-By: PERLANCAR; Urgency: high
+0.037   2020-03-11  Released-By: PERLANCAR; Urgency: high; Backward-Incompatible: yes
 
         - [Incompatible change] Bump meta version to 2 to force all plugins
           to be upgraded to comply to Log::ger >0.032.
@@ -41,7 +58,7 @@
 	  by output plugins). The "is routine" was also a bad name.
 
 
-0.032   2020-03-06  Released-By: PERLANCAR; Urgency: medium
+0.032   2020-03-06  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
         - Introduce filters as a way to do custom filtering as well as to
           extract additional information from the original logger arguments,
@@ -219,7 +236,7 @@
 	  multilevel logger.
 
 
-0.011   2017-06-30  Released-By: PERLANCAR
+0.011   2017-06-30  Released-By: PERLANCAR; Backward-Incompatible: yes
 
         - [Incompatible change] In hook argument "routines", change $flags to
           $type to be more general. The value can be 'log_sub', 'log_method',
@@ -270,7 +287,7 @@
 	- [Bugfix] Use the correct package when initializing object.
 
 
-0.005   2017-06-23  Released-By: PERLANCAR
+0.005   2017-06-23  Released-By: PERLANCAR; Backward-Incompatible: yes
 
         - [Incompatible change] Another round of internal refactoring and
           interface changes. New: Log::ger::{Plugin,Format,Filter}. Every plugin
@@ -300,7 +317,7 @@
 	- [doc] Update module name Log::ger::LogAny -> Log::ger::Output::LogAny.
 
 
-0.002   2017-06-21  Released-By: PERLANCAR
+0.002   2017-06-21  Released-By: PERLANCAR; Backward-Incompatible: yes
 
         - [Incompatible change] Reorganize internals & fix a couple of doc
           typos.

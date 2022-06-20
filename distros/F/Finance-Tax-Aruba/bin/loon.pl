@@ -276,7 +276,7 @@ loon.pl - A salary cost calculator
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

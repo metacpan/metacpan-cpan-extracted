@@ -4,7 +4,7 @@ use warnings;
 use Math::FakeDD qw(:all);
 use Test::More;
 
-cmp_ok($Math::FakeDD::VERSION, '==', 0.03, "Version number is correct");
+cmp_ok($Math::FakeDD::VERSION, '==', 0.04, "Version number is correct");
 
 my $obj = Math::FakeDD->new();
 

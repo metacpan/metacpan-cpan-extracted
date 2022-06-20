@@ -1,16 +1,16 @@
 package App::podtohtml;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-26'; # DATE
-our $DIST = 'App-podtohtml'; # DIST
-our $VERSION = '0.009'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 use FindBin '$Bin';
 
 use File::chdir;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-05-14'; # DATE
+our $DIST = 'App-podtohtml'; # DIST
+our $VERSION = '0.010'; # VERSION
 
 our %SPEC;
 
@@ -58,7 +58,7 @@ sub _list_templates_or_get_template_tarball {
     if ($which eq 'list_templates') {
         return [sort keys %templates];
     } elsif ($which eq 'get_template_tarball') {
-        return undef;
+        return undef; ## no critic: Subroutines::ProhibitExplicitReturnUndef
     }
     undef;
 }
@@ -179,7 +179,7 @@ sub podtohtml {
     my $outfile = $args{outfile} // '-';
     my $browser = $args{browser};
 
-    unless (-f $infile) {
+    unless ($infile eq '-' or -f $infile) {
         return [404, "No such file '$infile'"];
     }
 
@@ -218,8 +218,10 @@ sub podtohtml {
 
             my $tmplvars;
             {
-                (my $module = $args{-orig_infile}) =~ s!/!::!g;
-                (my $dist = $module) =~ s!::!-!g;
+                my $module;
+                if (defined $args{-orig_infile}) { ($module = $args{-orig_infile}) =~ s!/!::!g }
+                my $dist;
+                if (defined $module) { ($dist = $module) =~ s!::!-!g }
                 my $author = "AUTHOR";
 
                 $tmplvars = {
@@ -240,9 +242,10 @@ sub podtohtml {
             $tmplcontent =~ s{<!--TEMPLATE:BEGIN_POD-->.+<!--TEMPLATE:END_POD-->}{$rpod}s
                 or die "podtohtml: Cannot insert rendered POD to template\n";
             $tmplcontent =~ s{\[\[(\w+)(:raw|)\]\]}{
-                exists($tmplvars->{$1}) ?
+                my $val = exists($tmplvars->{$1}) ?
                     ($2 eq ':raw' ? $tmplvars->{$1} : HTML::Entities::encode_entities($tmplvars->{$1})) :
-                    "[[UNKNOWN_VAR:$1]]"
+                    "[[UNKNOWN_VAR:$1]]";
+                defined $val ? $val : "";
             }eg;
             File::Slurper::write_text("$tmplname/$tmplname.html", $tmplcontent);
 
@@ -298,7 +301,7 @@ App::podtohtml - Convert POD to HTML
 
 =head1 VERSION
 
-This document describes version 0.009 of App::podtohtml (from Perl distribution App-podtohtml), released on 2021-02-26.
+This document describes version 0.010 of App::podtohtml (from Perl distribution App-podtohtml), released on 2022-05-14.
 
 =head1 FUNCTIONS
 
@@ -307,7 +310,7 @@ This document describes version 0.009 of App::podtohtml (from Perl distribution 
 
 Usage:
 
- podtohtml(%args) -> [status, msg, payload, meta]
+ podtohtml(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Convert POD to HTML.
 
@@ -317,19 +320,19 @@ Examples:
 
 =item * Convert POD file to HTML, print result to STDOUT:
 
- podtohtml( infile => "some.pod");
+ podtohtml(infile => "some.pod");
 
 =item * Convert POD file to HTML, show result in browser:
 
- podtohtml( infile => "some.pod", browser => 1);
+ podtohtml(infile => "some.pod", browser => 1);
 
 =item * Convert POD file to HTML, show result in browser using the MetaCPAN template to give an idea how it will look on MetaCPAN:
 
- podtohtml( infile => "some.pod", browser => 1, template => "metacpan-20180911");
+ podtohtml(infile => "some.pod", browser => 1, template => "metacpan-20180911");
 
 =item * Convert POD file to HTML, show result in browser using the sco template to give an idea how it will look on (now-dead) search.cpan.org:
 
- podtohtml( infile => "some.pod", browser => 1, template => "sco-20180123");
+ podtohtml(infile => "some.pod", browser => 1, template => "sco-20180123");
 
 =item * Convert POD file to HTML, show result in browser using the perldoc.perl.org template to give an idea how it will look on perldoc.perl.org:
 
@@ -341,7 +344,7 @@ Examples:
 
 =item * List which templates are available:
 
- podtohtml( list_templates => 1);
+ podtohtml(list_templates => 1);
 
 =back
 
@@ -383,12 +386,12 @@ Pick a template to use, only relevant with --browser.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -398,7 +401,7 @@ Return value:  (any)
 
 Usage:
 
- podtohtml_metacpan(%args) -> [status, msg, payload, meta]
+ podtohtml_metacpan(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Show POD documentation roughly like how MetaCPAN would display it.
 
@@ -424,12 +427,12 @@ If not found, will search in for .pod or .pm files in C<@INC>.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -441,14 +444,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-podtoh
 
 Source repository is at L<https://github.com/perlancar/perl-App-podtohtml>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-podtohtml/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<pod2html>, L<Pod::Html>
@@ -457,11 +452,36 @@ L<pod2html>, L<Pod::Html>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2019, 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021, 2019, 2018, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-podtohtml>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

@@ -13,7 +13,7 @@ MooseX::Extended::Manual::Construction - Objected construction for MooseX::Exten
 
 =head1 VERSION
 
-version 0.21
+version 0.25
 
 =head1 OBJECT CONSTRUCTION
 
@@ -101,12 +101,15 @@ B<WARNING>: if you pass C<field> an C<init_arg> with a defined value, The code
 will C<croak>. A C<field> is just for instance data the class uses. It's not
 to be passed to the constructor. If you want that, just use C<param>.
 
-Later, we'll add proper exceptions.
-
 =head3 Lazy Fields
 
-Every C<field> is lazy by default. This is because there's no guarantee the code will call
-them, but this makes it very easy for a C<field> to rely on a C<param> value being present.
+A C<field> is automatically lazy if it has a C<builder> or C<default>. This is
+because there's no guarantee the code will call them, but this makes it very
+easy for a C<field> to rely on a C<param> value being present. Note that is
+does mean if you need a C<field> to be initialized at construction time, you
+have to take care:
+
+    has created => ( isa => PositiveInt, lazy => 0, default => sub {time} );
 
 Every C<param> is not lazy by default, but you can add C<< lazy => 1 >> if you need to.
 

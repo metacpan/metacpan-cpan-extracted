@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Hooks::CheckDiff;
 # ABSTRACT: Git::Hooks plugin to enforce commit policies
-$Git::Hooks::CheckDiff::VERSION = '3.2.2';
+$Git::Hooks::CheckDiff::VERSION = '3.3.0';
 use v5.16.0;
 use utf8;
 use Carp;
@@ -102,6 +102,8 @@ sub _check_shell {
 
     foreach my $command (@commands) {
         $errors += _check_command($git, $ctx, $command, $diff_file);
+    } continue {
+        $git->check_timeout();
     }
 
     return $errors;
@@ -242,7 +244,7 @@ Git::Hooks::CheckDiff - Git::Hooks plugin to enforce commit policies
 
 =head1 VERSION
 
-version 3.2.2
+version 3.3.0
 
 =head1 SYNOPSIS
 
@@ -406,6 +408,9 @@ COMMAND (STDOUT or STDERR) will end up being shown to the user.
 The script F<find-secret-leakage-in-git-diff.pl>, which is part of the
 Git::Hooks module, is a good example of a script which can detect problems in a
 Git diff.
+
+Since the shell commands may take much time to run, the plugin checks if the
+C<githooks.timeout> option has been violated after each shell runs.
 
 =head1 AUTHOR
 

@@ -25,15 +25,17 @@ package MyApp {
 my $obj = MyApp->new_foo;
 my $coderef = $obj->can('new');
 
+#use B::Deparse;
+#note( B::Deparse->new->coderef2text(\&MyApp::Foo::bar1) );
+#note( B::Deparse->new->coderef2text(\&MyApp::Foo::bar2) );
+
 for my $method (qw/ bar1 bar2 /) {
 	is_deeply(
 		$obj->$method(1.1, ['c'], n1=>{foo=>42}, n2=>\42, $coderef),
 		[1, ['c'], {foo=>42}, \42, $coderef],
+		"is_deeply for $method",
 	);
 }
-
-#use B::Deparse;
-#note( B::Deparse->new->coderef2text(\&MyApp::Foo::bar2) );
 
 is_deeply( MyApp->new_foo->foo(1,2,3), [1,3] );
 

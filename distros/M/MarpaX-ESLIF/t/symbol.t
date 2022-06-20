@@ -30,7 +30,7 @@ sub setResult          { $_[0]->{result} = $_[1] }
 package main;
 use strict;
 use warnings FATAL => 'all';
-use Test::More tests => 13;
+use Test::More tests => 16;
 use Log::Log4perl qw/:easy/;
 use Log::Any::Adapter;
 use Log::Any qw/$log/;
@@ -66,6 +66,8 @@ my $regexSymbol  = MarpaX::ESLIF::Symbol->new($eslif, type => 'regex', pattern =
 isa_ok($regexSymbol, 'MarpaX::ESLIF::Symbol');
 my $metaSymbol  = MarpaX::ESLIF::Symbol->new($eslif, type => 'meta', grammar => MarpaX::ESLIF::Grammar->new($eslif, "<anything up to newline> ::= <ANYTHING UP TO NEWLINE>\n<ANYTHING UP TO NEWLINE> ~ /[^\\n]*/"), symbol => 'ANYTHING UP TO NEWLINE');
 isa_ok($regexSymbol, 'MarpaX::ESLIF::Symbol');
+my $substitutionSymbol  = MarpaX::ESLIF::Symbol->new($eslif, type => 'regex', pattern => "a(.*)\nsubject", modifiers => 'A', substitutionPattern => '"$1"');
+isa_ok($substitutionSymbol, 'MarpaX::ESLIF::Symbol');
 
 my $match;
 
@@ -75,6 +77,8 @@ $match = $regexSymbol->try($input) // '';
 ok($match eq "a string\nsubject", "Regex try");
 $match = $metaSymbol->try($input) // '';
 ok($match eq "This is a string", "Meta try");
+$match = $substitutionSymbol->try($input) // '';
+ok($match eq " string", "Substitution try");
 
 my $recognizerInterface = MyRecognizerInterface->new($input);
 my $eslifGrammar = MarpaX::ESLIF::Grammar->new($eslif, $dsl);
@@ -88,5 +92,7 @@ $match = $eslifRecognizer->symbolTry($regexSymbol) // '';
 ok($match eq "a string\nsubject", "Recognizer regex try");
 $match = $eslifRecognizer->symbolTry($metaSymbol) // '';
 ok($match eq "This is a string", "Recognizer meta try");
+$match = $eslifRecognizer->symbolTry($substitutionSymbol) // '';
+ok($match eq " string", "Recognizer substitution try");
 
 exit 0;

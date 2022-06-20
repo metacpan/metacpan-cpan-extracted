@@ -2,12 +2,29 @@ use strict;
 use warnings;
 package Neo4j_Test::MockHTTP;
 
+use parent 'Neo4j::Driver::Plugin';
+use parent 'Exporter';
+
+our @EXPORT_OK = qw(response_for);
+
 use JSON::MaybeXS;
 use Neo4j::Driver::Net::HTTP::LWP;
 
 sub new {
-	my ($class, $driver) = @_;
-	bless { base => $driver->{uri} }, $class;
+	my ($class) = @_;
+	bless {}, $class;
+}
+
+sub register {
+	my ($self, $manager) = @_;
+	
+	$manager->add_event_handler(
+		http_adapter_factory => sub {
+			my ($continue, $driver) = @_;
+			$self->{base} = $driver->{uri};
+			return $self;
+		},
+	);
 }
 
 my $coder = JSON::MaybeXS->new(utf8 => 1, allow_nonref => 1);

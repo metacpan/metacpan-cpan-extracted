@@ -1,5 +1,5 @@
 ---
-abstract: 'EVERY & EVERY::LAST pseudo-packages using mro. '
+abstract: 'EVERY & EVERY::LAST pseudo-packages using mro.'
 author:
   - 'Steven Lembark <lembark@wrkhors.com>'
 build_requires:
@@ -22,5 +22,5 @@ requires:
   List::Util: '1.45'
   Symbol: '0'
   mro: '0'
-version: v0.1.4
+version: v1.0.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

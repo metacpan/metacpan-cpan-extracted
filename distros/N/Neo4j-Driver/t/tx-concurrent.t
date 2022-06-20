@@ -16,7 +16,7 @@ use Test::Warnings qw(warning);
 # As of 0.30, this is an experimental feature (but expected to be mainlined).
 
 use Neo4j_Test;
-use Neo4j_Test::MockHTTP;
+use Neo4j_Test::MockHTTP qw(response_for);
 
 plan tests => 12 + 1;
 
@@ -25,7 +25,7 @@ my ($w, $d, $s, $t, $r);
 
 
 # minimal dummy responses for HTTP
-Neo4j_Test::MockHTTP::response_for 'foo' => {
+response_for 'foo' => {
 	jolt => [
 		'{"header":{"fields":[]}}',
 		'{"summary":{}}',
@@ -34,7 +34,7 @@ Neo4j_Test::MockHTTP::response_for 'foo' => {
 	status => 201,
 	location => 'http://localhost:7474/db/dummy/tx/5',
 };
-Neo4j_Test::MockHTTP::response_for 'bar' => {
+response_for 'bar' => {
 	jolt => [
 		'{"header":{"fields":[]}}',
 		'{"summary":{}}',
@@ -43,7 +43,7 @@ Neo4j_Test::MockHTTP::response_for 'bar' => {
 	status => 201,
 	location => 'http://localhost:7474/db/dummy/tx/6',
 };
-Neo4j_Test::MockHTTP::response_for '' => { jolt => [
+response_for '' => { jolt => [
 	'{"header":{"fields":[]}}',
 	'{"summary":{}}',
 	'{"info":{}}',
@@ -69,17 +69,20 @@ Neo4j_Test::MockHTTP::response_for '' => { jolt => [
 subtest 'config for bolt: uri' => sub {
 	plan tests => 6;
 	# config 1
-	$d = Neo4j::Driver->new({ net_module => 'Local::Bolt' });
+	$d = Neo4j::Driver->new;
+	$d->{net_module} = 'Local::Bolt';
 	lives_ok { $d->config( uri => 'bolt:', concurrent_tx => 1 ); } 'config on lives';
 	throws_ok {
 		$d->session(database => 'dummy');
 	} qr/\bConcurrent transactions\b.*\bunsupported\b.*\bBolt\b/i, 'bolt session on dies';
 	# config 0
-	$d = Neo4j::Driver->new({ net_module => 'Local::Bolt' });
+	$d = Neo4j::Driver->new;
+	$d->{net_module} = 'Local::Bolt';
 	lives_ok { $d->config( uri => 'bolt:', concurrent_tx => 0 ); } 'config off lives';
 	lives_ok { $d->session(database => 'dummy'); } 'bolt session off lives';
 	# config undef
-	$d = Neo4j::Driver->new({ net_module => 'Local::Bolt' });
+	$d = Neo4j::Driver->new;
+	$d->{net_module} = 'Local::Bolt';
 	lives_ok { $d->config( uri => 'bolt:' ); } 'config undef lives';
 	lives_ok { $d->session(database => 'dummy'); } 'bolt session undef lives';
 };
@@ -88,17 +91,17 @@ subtest 'config for bolt: uri' => sub {
 subtest 'config for http: uri' => sub {
 	plan tests => 9;
 	# config 1
-	$d = Neo4j::Driver->new({ net_module => 'Neo4j_Test::MockHTTP' });
+	$d = Neo4j::Driver->new->plugin('Neo4j_Test::MockHTTP');
 	lives_ok { $d->config( uri => 'http:', concurrent_tx => 1 ); } 'config on lives';
 	lives_ok { $s = 0; $s = $d->session(database => 'dummy'); } 'session on lives';
 	ok $s->{net}{want_concurrent}, 'concurrent tx on';
 	# config 0
-	$d = Neo4j::Driver->new({ net_module => 'Neo4j_Test::MockHTTP' });
+	$d = Neo4j::Driver->new->plugin('Neo4j_Test::MockHTTP');
 	lives_ok { $d->config( uri => 'http:', concurrent_tx => 0 ); } 'config off lives';
 	lives_ok { $s = 0; $s = $d->session(database => 'dummy'); } 'session off lives';
 	ok ! $s->{net}{want_concurrent}, 'concurrent tx off';
 	# config undef
-	$d = Neo4j::Driver->new({ net_module => 'Neo4j_Test::MockHTTP' });
+	$d = Neo4j::Driver->new->plugin('Neo4j_Test::MockHTTP');
 	lives_ok { $d->config( uri => 'http:', concurrent_tx => undef ); } 'config undef lives';
 	lives_ok { $s = 0; $s = $d->session(database => 'dummy'); } 'session undef lives';
 	ok $s->{net}{want_concurrent}, 'concurrent tx http default on';
@@ -108,17 +111,17 @@ subtest 'config for http: uri' => sub {
 subtest 'config for https: uri' => sub {
 	plan tests => 9;
 	# config 1
-	$d = Neo4j::Driver->new({ net_module => 'Neo4j_Test::MockHTTP' });
+	$d = Neo4j::Driver->new->plugin('Neo4j_Test::MockHTTP');
 	lives_ok { $d->config( uri => 'https:', concurrent_tx => 1 ); } 'config on lives';
 	lives_ok { $s = 0; $s = $d->session(database => 'dummy'); } 'session on lives';
 	ok $s->{net}{want_concurrent}, 'concurrent tx on';
 	# config 0
-	$d = Neo4j::Driver->new({ net_module => 'Neo4j_Test::MockHTTP' });
+	$d = Neo4j::Driver->new->plugin('Neo4j_Test::MockHTTP');
 	lives_ok { $d->config( uri => 'https:', concurrent_tx => 0 ); } 'config off lives';
 	lives_ok { $s = 0; $s = $d->session(database => 'dummy'); } 'session off lives';
 	ok ! $s->{net}{want_concurrent}, 'concurrent tx off';
 	# config undef
-	$d = Neo4j::Driver->new({ net_module => 'Neo4j_Test::MockHTTP' });
+	$d = Neo4j::Driver->new->plugin('Neo4j_Test::MockHTTP');
 	lives_ok { $d->config( uri => 'https:', concurrent_tx => undef ); } 'config undef lives';
 	lives_ok { $s = 0; $s = $d->session(database => 'dummy'); } 'session undef lives';
 	ok $s->{net}{want_concurrent}, 'concurrent tx https default on';
@@ -127,7 +130,8 @@ subtest 'config for https: uri' => sub {
 
 subtest 'bolt explicit' => sub {
 	plan tests => 5;
-	$d = Neo4j::Driver->new({ uri => 'bolt:', net_module => 'Local::Bolt' });
+	$d = Neo4j::Driver->new({ uri => 'bolt:' });
+	$d->{net_module} = 'Local::Bolt';
 	lives_ok { $s = 0; $s = $d->session(database => 'dummy'); } 'session';
 	lives_and { ok $t = $s->begin_transaction } 'begin 1';
 	throws_ok {
@@ -140,7 +144,8 @@ subtest 'bolt explicit' => sub {
 
 subtest 'bolt autocommit' => sub {
 	plan tests => 5;
-	$d = Neo4j::Driver->new({ uri => 'bolt:', net_module => 'Local::Bolt' });
+	$d = Neo4j::Driver->new({ uri => 'bolt:' });
+	$d->{net_module} = 'Local::Bolt';
 	lives_ok { $s = 0; $s = $d->session(database => 'dummy'); } 'session';
 	lives_and { ok $t = $s->begin_transaction } 'begin 1';
 	throws_ok {
@@ -153,7 +158,7 @@ subtest 'bolt autocommit' => sub {
 
 subtest 'http explicit, concurrent enabled' => sub {
 	plan tests => 8;
-	$d = Neo4j::Driver->new({ net_module => 'Neo4j_Test::MockHTTP' });
+	$d = Neo4j::Driver->new->plugin('Neo4j_Test::MockHTTP');
 	lives_ok { $d->config( uri => 'http:', concurrent_tx => 1 ); } 'config on lives';
 	lives_ok { $s = 0; $s = $d->session(database => 'dummy'); } 'session';
 	my ($t1, $t2);
@@ -168,7 +173,7 @@ subtest 'http explicit, concurrent enabled' => sub {
 
 subtest 'http autocommit, concurrent enabled' => sub {
 	plan tests => 6;
-	$d = Neo4j::Driver->new({ net_module => 'Neo4j_Test::MockHTTP' });
+	$d = Neo4j::Driver->new->plugin('Neo4j_Test::MockHTTP');
 	lives_ok { $d->config( uri => 'http:', concurrent_tx => 1 ); } 'config on lives';
 	lives_ok { $s = 0; $s = $d->session(database => 'dummy'); } 'session';
 	lives_and { ok $t = $s->begin_transaction } 'begin expl';
@@ -180,7 +185,7 @@ subtest 'http autocommit, concurrent enabled' => sub {
 
 subtest 'http explicit, concurrent disabled' => sub {
 	plan tests => 11;
-	$d = Neo4j::Driver->new({ net_module => 'Neo4j_Test::MockHTTP' });
+	$d = Neo4j::Driver->new->plugin('Neo4j_Test::MockHTTP');
 	lives_ok { $d->config( uri => 'http:', concurrent_tx => 0 ); } 'config on lives';
 	lives_ok { $s = 0; $s = $d->session(database => 'dummy'); } 'session';
 	my ($t1, $t2);
@@ -200,7 +205,7 @@ subtest 'http explicit, concurrent disabled' => sub {
 
 subtest 'http autocommit, concurrent disabled' => sub {
 	plan tests => 8;
-	$d = Neo4j::Driver->new({ net_module => 'Neo4j_Test::MockHTTP' });
+	$d = Neo4j::Driver->new->plugin('Neo4j_Test::MockHTTP');
 	lives_ok { $d->config( uri => 'http:', concurrent_tx => 0 ); } 'config on lives';
 	lives_ok { $s = 0; $s = $d->session(database => 'dummy'); } 'session';
 	lives_and { ok $t = $s->begin_transaction } 'begin expl';

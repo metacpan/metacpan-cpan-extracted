@@ -1,14 +1,25 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/internaldata.h 10    19-07-19 22:00 Sommar $
+ $Header: /Perl/OlleDB/internaldata.h 12    22-05-27 19:04 Sommar $
 
   This headerfile defines the internaldata struct and structs it uses.
   The internaldata is private to the C++/XS code and not exposed to Perl.
 
   There are also routines to set it up and tear it down.
 
-  Copyright (c) 2004-2019   Erland Sommarskog
+  Copyright (c) 2004-2022   Erland Sommarskog
 
   $History: internaldata.h $
+ * 
+ * *****************  Version 12  *****************
+ * User: Sommar       Date: 22-05-27   Time: 19:04
+ * Updated in $/Perl/OlleDB
+ * Added propset as a parameter to dump_properties to avoid surprises when
+ * properties in different set have the same value.
+ * 
+ * *****************  Version 11  *****************
+ * User: Sommar       Date: 22-05-08   Time: 23:11
+ * Updated in $/Perl/OlleDB
+ * Changed interface of dump_properties.
  * 
  * *****************  Version 10  *****************
  * User: Sommar       Date: 19-07-19   Time: 22:00
@@ -211,8 +222,7 @@ typedef struct {
 } internaldata;
 
 
-extern void dump_properties(DBPROP init_properties[MAX_INIT_PROPERTIES],
-                            BOOL   props_debug);
+extern void dump_properties(DBPROP *dbprops, init_propsets propset, int cProps);
 
 extern void * setupinternaldata();
 

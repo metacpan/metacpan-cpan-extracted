@@ -1,0 +1,21 @@
+Revision history for PDL-Opt-Simplex-Simple
+1.4     Sat Jun 18 18:37:08 2022 -0700
+	Updated documentation, usecase examples and links.
+	Fixed version regression, cpan saw 1.3.1 as 1.003001 but
+	previous versions were seen as 1.3 so 1.003 looked smaller. oops.
+
+1.3.1   Sat Jun 18 17:39:57 2022 -0700
+        Fixed srand handling, added git repo info
+
+1.3     Fri Jun 17 18:21:05 2022 -0700
+        Use die to cancel if simplex is not making progress.
+
+1.2     Tue Jun 14 17:33:09 2022 -0700
+        Flagged PDL srand issue
+
+1.1	Fri Jun 10 14:02:46 2022
+	First public release, released on an unsuspecting world.  This release
+	has lots of great documentation.
+
+1.0	Wed Nov 17 20:21:53 2021
+	Initial internal release 

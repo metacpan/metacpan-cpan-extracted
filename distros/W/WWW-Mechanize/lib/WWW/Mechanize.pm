@@ -6,7 +6,7 @@ package WWW::Mechanize;
 use strict;
 use warnings;
 
-our $VERSION = '2.08';
+our $VERSION = '2.09';
 
 use Tie::RefHash;
 use HTTP::Request 1.30;
@@ -1800,7 +1800,7 @@ WWW::Mechanize - Handy web browsing in a Perl object
 
 =head1 VERSION
 
-version 2.08
+version 2.09
 
 =head1 SYNOPSIS
 
@@ -1890,7 +1890,8 @@ traverse.
     $mech->back();
 
 If you want finer control over your page fetching, you can use
-these methods. C<follow_link> and C<submit_form> are just high
+these methods. C<L<< follow_link()|/"$mech->follow_link(...)" >>>
+and C<L<< submit_form()|/"$mech->submit_form( ... )" >>> are just high
 level wrappers around them.
 
     $mech->find_link( n => $number );
@@ -2027,7 +2028,7 @@ strict and verbose mode for form handling, which is done with L<HTML::Form>.
 Globally sets the HTML::Form strict flag which causes form submission to
 croak if any of the passed fields don't exist in the form, and/or a value
 doesn't exist in a select element. This can still be disabled in individual
-calls to C<L<< submit_form()|"$mech->submit_form( ... )" >>>.
+calls to C<L<< submit_form()|/"$mech->submit_form( ... )" >>>.
 
 Default is off.
 
@@ -2056,7 +2057,7 @@ L<LWP::UserAgent>.)
 =head2 $mech->agent_alias( $alias )
 
 Sets the user agent string to the expanded version from a table of actual user strings.
-I<$alias> can be one of the following:
+C<$alias> can be one of the following:
 
 =over 4
 
@@ -2082,7 +2083,9 @@ sets your User-Agent to
 
     Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)
 
-The list of valid aliases can be returned from C<known_agent_aliases()>.  The current list is:
+The list of valid aliases can be returned from
+C<L<< known_agent_aliases()|/"$mech->known_agent_aliases()" >>>.
+The current list is:
 
 =over
 
@@ -2100,16 +2103,21 @@ The list of valid aliases can be returned from C<known_agent_aliases()>.  The cu
 
 =back
 
-=head2 known_agent_aliases()
+=head2 $mech->known_agent_aliases()
 
 Returns a list of all the agent aliases that Mech knows about.
+This can also be called as a package or class method.
+
+    @aliases = WWW::Mechanize::known_agent_aliases();
+    @aliases = WWW::Mechanize->known_agent_aliases();
+    @aliases = $mech->known_agent_aliases();
 
 =head1 PAGE-FETCHING METHODS
 
 =head2 $mech->get( $uri )
 
 Given a URL/URI, fetches it.  Returns an L<HTTP::Response> object.
-I<$uri> can be a well-formed URL string, a L<URI> object, or a
+C<$uri> can be a well-formed URL string, a L<URI> object, or a
 L<WWW::Mechanize::Link> object.
 
 The results are stored internally in the agent object, but you don't
@@ -2149,14 +2157,14 @@ C< L<< dump_text(...)|/"$mech->dump_text( [$fh] )" >> >
 
 =head2 $mech->post( $uri, content => $content )
 
-POSTs I<$content> to I<$uri>.  Returns an L<HTTP::Response> object.
-I<$uri> can be a well-formed URI string, a L<URI> object, or a
+POSTs C<$content> to C<$uri>.  Returns an L<HTTP::Response> object.
+C<$uri> can be a well-formed URI string, a L<URI> object, or a
 L<WWW::Mechanize::Link> object.
 
 =head2 $mech->put( $uri, content => $content )
 
-PUTs I<$content> to I<$uri>.  Returns an L<HTTP::Response> object.
-I<$uri> can be a well-formed URI string, a L<URI> object, or a
+PUTs C<$content> to C<$uri>.  Returns an L<HTTP::Response> object.
+C<$uri> can be a well-formed URI string, a L<URI> object, or a
 L<WWW::Mechanize::Link> object.
 
     my $res = $mech->head( $uri );
@@ -2164,8 +2172,8 @@ L<WWW::Mechanize::Link> object.
 
 =head2 $mech->head ($uri )
 
-Performs a HEAD request to I<$uri>. Returns an L<HTTP::Response> object.
-I<$uri> can be a well-formed URI string, a L<URI> object, or a
+Performs a HEAD request to C<$uri>. Returns an L<HTTP::Response> object.
+C<$uri> can be a well-formed URI string, a L<URI> object, or a
 L<WWW::Mechanize::Link> object.
 
 =head2 $mech->reload()
@@ -2197,7 +2205,7 @@ include the most recently made request.
 
 This returns the I<n>th item in history.  The 0th item is the most recent
 request and response, which would be acted on by methods like
-C<L<< find_link()|"$mech->find_link( ... )" >>>.
+C<L<< find_link()|/"$mech->find_link( ... )" >>>.
 The 1st item is the state you'd return to if you called
 C<L<< back()|/$mech->back() >>>.
 
@@ -2226,7 +2234,7 @@ to the URI itself.
 
 Return the current response as an L<HTTP::Response> object.
 
-Synonym for C<< $mech->response() >>
+Synonym for C<< $mech->response() >>.
 
 =head2 $mech->status()
 
@@ -2284,17 +2292,17 @@ Note that you can also use L<< is_redirect|HTTP::Response/$r->is_redirect >> to 
 Returns the content that the mech uses internally for the last page
 fetched. Ordinarily this is the same as
 C<< $mech->response()->decoded_content() >>,
-but this may differ for HTML documents if L<< update_html|/$mech->update_html( $html ) >> is
+but this may differ for HTML documents if C<L<< update_html|/"$mech->update_html( $html )" >>> is
 overloaded (in which case the value passed to the base-class
 implementation of same will be returned), and/or extra named arguments
-are passed to I<content()>:
+are passed to C<content()>:
 
 =over 2
 
 =item I<< $mech->content( format => 'text' ) >>
 
 Returns a text-only version of the page, with all HTML markup
-stripped. This feature requires I<HTML::TreeBuilder> version 5 or higher
+stripped. This feature requires L<HTML::TreeBuilder> version 5 or higher
 to be installed, or a fatal error will be thrown. This works only if
 the contents are HTML.
 
@@ -2302,7 +2310,7 @@ the contents are HTML.
 
 Returns the HTML document, modified to contain a
 C<< <base href="$base_href"> >> mark-up in the header.
-I<$base_href> is C<< $mech->base() >> if not specified. This is
+C<$base_href> is C<< $mech->base() >> if not specified. This is
 handy to pass the HTML to e.g. L<HTML::Display>. This works only if
 the contents are HTML.
 
@@ -2350,7 +2358,7 @@ links.  In scalar context, returns an array reference of all links.
 =head2 $mech->follow_link(...)
 
 Follows a specified link on the page.  You specify the match to be
-found using the same params that C<L<< find_link()|"$mech->find_link( ... )" >>> uses.
+found using the same params that C<L<< find_link()|/"$mech->find_link( ... )" >>> uses.
 
 Here some examples:
 
@@ -2392,12 +2400,13 @@ C<undef>.  If C<autocheck> is enabled an exception will be thrown instead.
 
 Finds a link in the currently fetched page. It returns a
 L<WWW::Mechanize::Link> object which describes the link.  (You'll
-probably be most interested in the C<url()> property.)  If it fails
-to find a link it returns undef.
+probably be most interested in the
+C<L<< url()|"WWW::Mechanize::Link/$link->url()" >>> property.)
+If it fails to find a link it returns C<undef>.
 
 You can take the URL part and pass it to the C<get()> method.  If
-that's your plan, you might as well use the C<follow_link()> method
-directly, since it does the C<get()> for you automatically.
+that's your plan, you might as well use the C<L<< follow_link()|/"$mech->follow_link(...)" >>>
+method directly, since it does the C<get()> for you automatically.
 
 Note that C<< <FRAME SRC="..."> >> tags are parsed out of the HTML and
 treated as links so this method works with them.
@@ -2478,7 +2487,8 @@ text of "News" and with "cnn.com" in the URL, use:
     $mech->find_link( text => 'News', url_regex => qr/cnn\.com/ );
 
 The return value is a reference to an array containing a
-L<WWW::Mechanize::Link> object for every link in C<< $self->content >>.
+L<WWW::Mechanize::Link> object for every link in
+C<L<< $self->content|/"$mech->content(...)" >>>.
 
 The links come from the following:
 
@@ -2502,7 +2512,7 @@ The links come from the following:
 
 Returns all the links on the current page that match the criteria.  The
 method for specifying link criteria is the same as in
-C<L<< find_link()|"$mech->find_link( ... )" >>>.
+C<L<< find_link()|/"$mech->find_link( ... )" >>>.
 Each of the links returned is a L<WWW::Mechanize::Link> object.
 
 In list context, C<find_all_links()> returns a list of the links.
@@ -2513,7 +2523,7 @@ page.
 
 =head2 $mech->find_all_inputs( ... criteria ... )
 
-find_all_inputs() returns an array of all the input controls in the
+C<find_all_inputs()> returns an array of all the input controls in the
 current form whose properties match all of the regexes passed in.
 The controls returned are all descended from HTML::Form::Input.
 See L<HTML::Form/INPUTS> for details.
@@ -2540,7 +2550,8 @@ You may use a regex or a literal string:
 
 =head2 $mech->find_all_submits( ... criteria ... )
 
-C<find_all_submits()> does the same thing as C<find_all_inputs()>
+C<find_all_submits()> does the same thing as
+C<L<< find_all_inputs()|/"$mech->find_all_inputs( ... criteria ... )" >>>
 except that it only returns controls that are submit controls,
 ignoring other types of input controls like text and checkboxes.
 
@@ -2650,13 +2661,14 @@ ALT text of "News" and with "cnn.com" in the URL, use:
     $mech->find_image( image => 'News', url_regex => qr/cnn\.com/ );
 
 The return value is a reference to an array containing a
-L<WWW::Mechanize::Image> object for every image in C<< $self->content >>.
+L<WWW::Mechanize::Image> object for every image in
+C<L<< $mech->content|/"$mech->content(...)" >>>.
 
 =head2 $mech->find_all_images( ... )
 
 Returns all the images on the current page that match the criteria.  The
 method for specifying image criteria is the same as in
-C<L<< find_image()|"$mech->find_image()" >>>.
+C<L<< find_image()|/"$mech->find_image()" >>>.
 Each of the images returned is a L<WWW::Mechanize::Image> object.
 
 In list context, C<find_all_images()> returns a list of the images.
@@ -2679,14 +2691,14 @@ context, returns an array reference of all forms.
 =head2 $mech->form_number($number)
 
 Selects the I<number>th form on the page as the target for subsequent
-calls to C<L<< field()|"$mech->field( $name, $value, $number )" >>>
-and C<L<< click()|"$mech->click( $button [, $x, $y] )" >>>.
+calls to C<L<< field()|/"$mech->field( $name, $value, $number )" >>>
+and C<L<< click()|/"$mech->click( $button [, $x, $y] )" >>>.
 Also returns the form that was selected.
 
 If it is found, the form is returned as an L<HTML::Form> object and set internally
 for later use with Mech's form methods such as
-C<L<< field()|"$mech->field( $name, $value, $number )" >>> and
-C<L<< click()|"$mech->click( $button [, $x, $y] )" >>>.
+C<L<< field()|/"$mech->field( $name, $value, $number )" >>> and
+C<L<< click()|/"$mech->click( $button [, $x, $y] )" >>>.
 When called in a list context, the number of the found form is also returned as
 a second value.
 
@@ -2702,8 +2714,8 @@ generated.
 
 If it is found, the form is returned as an L<HTML::Form> object and
 set internally for later use with Mech's form methods such as
-C<L<< field()|"$mech->field( $name, $value, $number )" >>> and
-C<L<< click()|"$mech->click( $button [, $x, $y] )" >>>.
+C<L<< field()|/"$mech->field( $name, $value, $number )" >>> and
+C<L<< click()|/"$mech->click( $button [, $x, $y] )" >>>.
 
 Returns undef if no form is found.
 
@@ -2714,8 +2726,8 @@ with that ID, then the first one is used, and a warning is generated.
 
 If it is found, the form is returned as an L<HTML::Form> object and
 set internally for later use with Mech's form methods such as
-C<L<< field()|"$mech->field( $name, $value, $number )" >>> and
-C<L<< click()|"$mech->click( $button [, $x, $y] )" >>>.
+C<L<< field()|/"$mech->field( $name, $value, $number )" >>> and
+C<L<< click()|/"$mech->click( $button [, $x, $y] )" >>>.
 
 If no form is found it returns C<undef>.  This will also trigger a warning,
 unless C<quiet> is enabled.
@@ -2732,8 +2744,8 @@ and a warning is generated.
 
 If it is found, the form is returned as an L<HTML::Form> object and set internally
 for later used with Mech's form methods such as
-C<L<< field()|"$mech->field( $name, $value, $number )" >>> and
-C<L<< click()|"$mech->click( $button [, $x, $y] )" >>>.
+C<L<< field()|/"$mech->field( $name, $value, $number )" >>> and
+C<L<< click()|/"$mech->click( $button [, $x, $y] )" >>>.
 
 Returns undef and emits a warning if no form is found.
 
@@ -2761,8 +2773,8 @@ Using C<undef> as value means that the attribute in question must not be present
 
 If it is found, the form is returned as an L<HTML::Form> object and set internally
 for later used with Mech's form methods such as
-C<L<< field()|"$mech->field( $name, $value, $number )" >>> and
-C<L<< click()|"$mech->click( $button [, $x, $y] )" >>>.
+C<L<< field()|/"$mech->field( $name, $value, $number )" >>> and
+C<L<< click()|/"$mech->click( $button [, $x, $y] )" >>>.
 
 Returns undef if no form is found.
 
@@ -2776,11 +2788,11 @@ These methods allow you to set the values of fields in a given form.
 
 Given the name of a field, set its value to the value specified.
 This applies to the current form (as set by the
-C<L<< form_name()|"$mech->form_name( $name )" >>> or
-C<L<< form_number()|"$mech->form_number($number)" >>>
+C<L<< form_name()|/"$mech->form_name( $name )" >>> or
+C<L<< form_number()|/"$mech->form_number($number)" >>>
 method or defaulting to the first form on the page).
 
-The optional I<$number> parameter is used to distinguish between two fields
+The optional C<$number> parameter is used to distinguish between two fields
 with the same name.  The fields are numbered from 1.
 
 =head2 $mech->select($name, $value)
@@ -2873,7 +2885,7 @@ C<tick($name,$value,undef)>
 Given the name of a field, return its value. This applies to the current
 form.
 
-The optional I<$number> parameter is used to distinguish between two fields
+The optional C<$number> parameter is used to distinguish between two fields
 with the same name.  The fields are numbered from 1.
 
 If the field is of type file (file upload field), the value is always
@@ -2921,7 +2933,7 @@ Clicks the button with the value I<value> in the current form.
 
 =item * C<< input => $inputobject >>
 
-Clicks on the button referenced by $inputobject, an instance of
+Clicks on the button referenced by C<$inputobject>, an instance of
 L<HTML::Form::SubmitInput> obtained e.g. from
 
     $mech->current_form()->find_input( undef, 'submit' )
@@ -2967,8 +2979,8 @@ and data setting in one operation. It selects the first form that contains all
 fields mentioned in C<\%fields>.  This is nice because you don't need to know
 the name or number of the form to do this.
 
-(calls C<L<< form_with_fields()|"$mech->form_with_fields( @fields )" >>> and
-       C<L<< set_fields()|"$mech->set_fields( $name => $value ... )" >>>).
+(calls C<L<< form_with_fields()|/"$mech->form_with_fields( @fields )" >>> and
+       C<L<< set_fields()|/"$mech->set_fields( $name => $value ... )" >>>).
 
 If you choose C<with_fields>, the C<fields> option will be ignored. The
 C<form_number>, C<form_name> and C<form_id> options will still be used.  An
@@ -2978,26 +2990,26 @@ criteria.
 =item * C<< form_number => n >>
 
 Selects the I<n>th form (calls
-C<L<< form_number()|"$mech->form_number($number)" >>>.  If this param is not
+C<L<< form_number()|/"$mech->form_number($number)" >>>.  If this param is not
 specified, the currently-selected form is used.
 
 =item * C<< form_name => name >>
 
 Selects the form named I<name> (calls
-C<L<< form_name()|"$mech->form_name( $name )" >>>)
+C<L<< form_name()|/"$mech->form_name( $name )" >>>)
 
 =item * C<< form_id => ID >>
 
 Selects the form with ID I<ID> (calls
-C<L<< form_id()|"$mech->form_id( $name )" >>>)
+C<L<< form_id()|/"$mech->form_id( $id )" >>>)
 
 =item * C<< button => button >>
 
-Clicks on button I<button> (calls C<L<< click()|"$mech->click( $button [, $x, $y] )" >>>)
+Clicks on button I<button> (calls C<L<< click()|/"$mech->click( $button [, $x, $y] )" >>>)
 
 =item * C<< x => x, y => y >>
 
-Sets the x or y values for C<L<< click()|"$mech->click( $button [, $x, $y] )" >>>
+Sets the x or y values for C<L<< click()|/"$mech->click( $button [, $x, $y] )" >>>
 
 =item * C<< strict_forms => bool >>
 
@@ -3013,7 +3025,7 @@ by passing C<< strict_forms => 0 >> here.
 
 If no form is selected, the first form found is used.
 
-If I<button> is not passed, then the C<L<< submit()|"$mech->submit()" >>>
+If I<button> is not passed, then the C<L<< submit()|/"$mech->submit()" >>>
 method is used instead.
 
 If you want to submit a file and get its content from a scalar rather
@@ -3072,15 +3084,15 @@ Allows you to suppress warnings to the screen.
 Get or set the page stack depth. Use this if you're doing a lot of page
 scraping and running out of memory.
 
-A value of 0 means "no history at all."  By default, the max stack depth
+A value of C<0> means "no history at all."  By default, the max stack depth
 is humongously large, effectively keeping all history.
 
 =head2 $mech->save_content( $filename, %opts )
 
-Dumps the contents of C<< $mech->content >> into I<$filename>.
-I<$filename> will be overwritten.  Dies if there are any errors.
+Dumps the contents of C<L<< $mech->content|/"$mech->content(...)" >>> into C<$filename>.
+C<$filename> will be overwritten.  Dies if there are any errors.
 
-If the content type does not begin with "text/", then the content
+If the content type does not begin with C<"text/">, then the content
 is saved in binary mode (i.e. C<binmode()> is set on the output
 filehandle).
 
@@ -3100,7 +3112,7 @@ This I<should> be the safest way to save contents verbatim.
 
 =item I<< $mech->save_content( $filename, binmode => $binmode ) >>
 
-Filehandle is set to binary mode. If C<$binmode> begins with ':', it is
+Filehandle is set to binary mode. If C<$binmode> begins with C<':'>, it is
 passed as a parameter to C<binmode>:
 
     binmode $fh, $binmode;
@@ -3111,7 +3123,7 @@ otherwise the filehandle is set to binary mode if C<$binmode> is true:
 
 =item I<all other arguments>
 
-are passed as-is to C<< $mech->content(%opts) >>. In particular,
+are passed as-is to C<L<< $mech->content(%opts)|/"$mech->content(...)" >>>. In particular,
 C<decoded_by_headers> might come handy if you want to revert the effect
 of line compression performed by the web server but without further
 interpreting the contents (e.g. decoding it according to the charset).
@@ -3121,33 +3133,33 @@ interpreting the contents (e.g. decoding it according to the charset).
 =head2 $mech->dump_headers( [$fh] )
 
 Prints a dump of the HTTP response headers for the most recent
-response.  If I<$fh> is not specified or is undef, it dumps to
+response.  If C<$fh> is not specified or is C<undef>, it dumps to
 STDOUT.
 
-Unlike the rest of the dump_* methods, $fh can be a scalar. It
+Unlike the rest of the C<dump_*> methods, C<$fh> can be a scalar. It
 will be used as a file name.
 
 =head2 $mech->dump_links( [[$fh], $absolute] )
 
-Prints a dump of the links on the current page to I<$fh>.  If I<$fh>
-is not specified or is undef, it dumps to STDOUT.
+Prints a dump of the links on the current page to C<$fh>.  If C<$fh>
+is not specified or is C<undef>, it dumps to STDOUT.
 
-If I<$absolute> is true, links displayed are absolute, not relative.
+If C<$absolute> is true, links displayed are absolute, not relative.
 
 =head2 $mech->dump_images( [[$fh], $absolute] )
 
-Prints a dump of the images on the current page to I<$fh>.  If I<$fh>
-is not specified or is undef, it dumps to STDOUT.
+Prints a dump of the images on the current page to C<$fh>.  If C<$fh>
+is not specified or is C<undef>, it dumps to STDOUT.
 
-If I<$absolute> is true, links displayed are absolute, not relative.
+If C<$absolute> is true, links displayed are absolute, not relative.
 
 The output will include empty lines for images that have no C<src> attribute
-and therefore no C<<->url>>.
+and therefore no URL.
 
 =head2 $mech->dump_forms( [$fh] )
 
-Prints a dump of the forms on the current page to I<$fh>.  If I<$fh>
-is not specified or is undef, it dumps to STDOUT. Running the following:
+Prints a dump of the forms on the current page to C<$fh>.  If C<$fh>
+is not specified or is C<undef>, it dumps to STDOUT. Running the following:
 
     my $mech = WWW::Mechanize->new();
     $mech->get("https://www.google.com/");
@@ -3168,8 +3180,8 @@ will print:
 
 =head2 $mech->dump_text( [$fh] )
 
-Prints a dump of the text on the current page to I<$fh>.  If I<$fh>
-is not specified or is undef, it dumps to STDOUT.
+Prints a dump of the text on the current page to C<$fh>.  If C<$fh>
+is not specified or is C<undef>, it dumps to STDOUT.
 
 =head1 OVERRIDDEN LWP::UserAgent METHODS
 
@@ -3212,7 +3224,7 @@ update it so the links come out correctly:
 This method is also used internally by the mech itself to update its
 own HTML content when loading a page. This means that if you would
 like to I<systematically> perform the above HTML substitution, you
-would overload I<update_html> in a subclass thusly:
+would overload C<update_html> in a subclass thusly:
 
    package MyMech;
    use base 'WWW::Mechanize';
@@ -3225,11 +3237,12 @@ would overload I<update_html> in a subclass thusly:
 
 If you do this, then the mech will use the tidied-up HTML instead of
 the original both when parsing for its own needs, and for returning to
-you through C<L<< content()|"$mech->content(...)" >>>.
+you through C<L<< content()|/"$mech->content(...)" >>>.
 
 Overloading this method is also the recommended way of implementing
 extra validation steps (e.g. link checkers) for every HTML page
-received.  L</warn> and L</die> would then come in handy to signal
+received.  C<L<< warn|/"warn( @messages )" >>> and
+C<L<< warn|/"warn( @messages )" >>> would then come in handy to signal
 validation errors.
 
 =head2 $mech->credentials( $username, $password )
@@ -3289,10 +3302,10 @@ know about them.
 
 =head2 $mech->_update_page($request, $response)
 
-Updates all internal variables in $mech as if $request was just
+Updates all internal variables in C<$mech> as if C<$request> was just
 performed, and returns $response. The page stack is B<not> altered by
 this method, it is up to caller (e.g.
-C<L<< request|"$mech->request( $request [, $arg [, $size]])" >>>)
+C<L<< request|/"$mech->request( $request [, $arg [, $size]])" >>>)
 to do that.
 
 =head2 $mech->_modify_request( $req )
@@ -3505,7 +3518,7 @@ listings.
 Randal Schwartz's article on scraping Yahoo News for images.  It's
 already out of date: He manually walks the list of links hunting
 for matches, which wouldn't have been necessary if the
-C<L<< find_link()|"$mech->find_link( ... )" >>> method existed at press time.
+C<L<< find_link()|/"$mech->find_link( ... )" >>> method existed at press time.
 
 =item * L<http://www.perladvent.org/2002/16th/>
 

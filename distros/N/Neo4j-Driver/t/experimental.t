@@ -24,6 +24,8 @@ use Test::More 0.96 tests => 8 + 1;
 use Test::Exception;
 use Test::Warnings qw(warnings);
 
+use Neo4j_Test::MockHTTP qw(response_for);
+
 use Neo4j::Driver;
 
 
@@ -31,9 +33,6 @@ my ($q, $r, @a, $a);
 
 
 {
-package Neo4j_Test::Result::Keys;
-use parent 'Neo4j_Test::MockHTTP';
-sub response_for { &Neo4j_Test::MockHTTP::response_for }
 no warnings 'qw';
 response_for 'no keys' => { jolt => [qw(
 	{"header":{}} {"summary":{}} {"info":{}}
@@ -48,7 +47,7 @@ response_for 'three keys' => { jolt => [qw(
 subtest 'result keys() wantarray' => sub {
 	plan tests => 1 + 3*3;
 	my $d = Neo4j::Driver->new('http:');
-	$d->config(net_module => 'Neo4j_Test::Result::Keys');
+	$d->plugin('Neo4j_Test::MockHTTP');
 	my $sx;
 	lives_and { ok $sx = $d->session(database => 'dummy') } 'session';
 	lives_and { $r = 0; ok $r = $sx->run('no keys') } 'run 0';
@@ -64,9 +63,6 @@ subtest 'result keys() wantarray' => sub {
 
 
 {
-package Neo4j_Test::Summary::Notifications;
-use parent 'Neo4j_Test::MockHTTP';
-sub response_for { &Neo4j_Test::MockHTTP::response_for }
 no warnings 'qw';
 response_for 'zero notes' => { jolt => [qw(
 	{"header":{}} {"summary":{"stats":{}}} {"info":{}}
@@ -81,7 +77,7 @@ response_for 'two notes' => { jolt => [qw(
 subtest 'summary notifications() wantarray' => sub {
 	plan tests => 1 + 3*3;
 	my $d = Neo4j::Driver->new('http:');
-	$d->config(net_module => 'Neo4j_Test::Summary::Notifications');
+	$d->plugin('Neo4j_Test::MockHTTP');
 	my $sx;
 	lives_and { ok $sx = $d->session(database => 'dummy') } 'session';
 	lives_and { $r = 0; ok $r = $sx->run('zero notes')->summary } 'run 0';
@@ -96,10 +92,6 @@ subtest 'summary notifications() wantarray' => sub {
 };
 
 
-{
-package Neo4j_Test::Types::Context;
-use parent 'Neo4j_Test::MockHTTP';
-sub response_for { &Neo4j_Test::MockHTTP::response_for }
 sub single_column {[
 	{ header => { fields => [0] } },
 	(map {{ data => [$_] }} @_),
@@ -139,11 +131,10 @@ response_for 'path two' => { jolt => single_column( { '..' => [
 	{ '->' => [ 8, 7, 'TEST', 9, {} ] },
 	{ '()' => [ 9, [], {} ] },
 ]})};
-}
 subtest 'types node/path wantarray' => sub {
 	plan tests => 1 + 4*3 + 3*7;
 	my $d = Neo4j::Driver->new('http:');
-	$d->config(net_module => 'Neo4j_Test::Types::Context');
+	$d->plugin('Neo4j_Test::MockHTTP');
 	my $sx;
 	lives_and { ok $sx = $d->session(database => 'dummy') } 'session';
 	

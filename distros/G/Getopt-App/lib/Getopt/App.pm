@@ -8,9 +8,15 @@ use Carp qw(croak);
 use Getopt::Long ();
 use List::Util qw(first);
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 our ($OPT_COMMENT_RE, $OPTIONS, $SUBCOMMANDS, %APPS) = (qr{\s+\#\s+});
+
+our $call_maybe = sub {
+  my ($app, $m) = (shift, shift);
+  $m = $app->can($m) || __PACKAGE__->can("_$m");
+  return $m ? $app->$m(@_) : undef;
+};
 
 sub bundle {
   my ($class, $script, $OUT) = (@_, \*STDOUT);
@@ -114,6 +120,11 @@ sub import {
       *{"$caller\::capture"} = \&capture;
       $skip_default = 1;
     }
+    elsif ($flag eq '-complete') {
+      require Getopt::App::Complete;
+      *{"$caller\::generate_completion_script"}
+        = \&Getopt::App::Complete::generate_completion_script;
+    }
     elsif ($flag eq '-signatures') {
       require experimental;
       experimental->import(qw(signatures));
@@ -149,36 +160,35 @@ sub run {
   @rules = map {s!$OPT_COMMENT_RE.*$!!r} @rules;
 
   my $app = $class->new;
-  _call($app, getopt_pre_process_argv => $argv);
+  return $app->$call_maybe('getopt_complete_reply')
+    if defined $ENV{COMP_POINT} and defined $ENV{COMP_LINE};
 
-  local $SUBCOMMANDS = _call($app, 'getopt_subcommands');
-  my $exit_value = $SUBCOMMANDS ? _subcommand($app, $SUBCOMMANDS, $argv) : undef;
+  $app->$call_maybe(getopt_pre_process_argv => $argv);
+
+  local $SUBCOMMANDS = $app->$call_maybe('getopt_subcommands');
+  my $exit_value = $SUBCOMMANDS ? _subcommand_run_maybe($app, $SUBCOMMANDS, $argv) : undef;
   return $exit_value if defined $exit_value;
 
-  my @configure = _call($app, 'getopt_configure');
+  my @configure = $app->$call_maybe('getopt_configure');
   my $prev      = Getopt::Long::Configure(@configure);
   my $valid     = Getopt::Long::GetOptionsFromArray($argv, $app, @rules) ? 1 : 0;
   Getopt::Long::Configure($prev);
-  _call($app, getopt_post_process_argv => $argv, {valid => $valid});
+  $app->$call_maybe(getopt_post_process_argv => $argv, {valid => $valid});
 
   $exit_value = $valid ? $app->$cb(@$argv) : 1;
-  $exit_value = _call($app, getopt_post_process_exit_value => $exit_value) // $exit_value;
+  $exit_value = $app->$call_maybe(getopt_post_process_exit_value => $exit_value) // $exit_value;
   $exit_value = 0   unless $exit_value and $exit_value =~ m!^\d{1,3}$!;
   $exit_value = 255 unless $exit_value < 255;
   exit(int $exit_value) unless $Getopt::App::APP_CLASS;
   return $exit_value;
 }
 
-sub _call {
-  my ($app, $method) = (shift, shift);
-  my $cb = $app->can($method) || __PACKAGE__->can("_$method");
-  return $cb ? $app->$cb(@_) : undef;
-}
+sub _getopt_complete_reply { Getopt::App::Complete::complete_reply(@_) }
 
 sub _getopt_configure {qw(bundling no_auto_abbrev no_ignore_case pass_through require_order)}
 
 sub _getopt_load_subcommand {
-  my ($self, $subcommand, $argv) = @_;
+  my ($app, $subcommand, $argv) = @_;
   ($@, $!) = ('', 0);
   croak "Unable to load subcommand $subcommand->[0]: $@ ($!)" unless my $code = do $subcommand->[1];
   return $code;
@@ -193,25 +203,28 @@ sub _getopt_post_process_argv {
 }
 
 sub _getopt_unknown_subcommand {
-  my ($self, $argv) = @_;
+  my ($app, $argv) = @_;
   die "Unknown subcommand: $argv->[0]\n";
 }
 
-sub _subcommand {
-  my ($app, $subcommands, $argv) = @_;
-  return undef unless $argv->[0] and $argv->[0] =~ m!^\w!;
-
-  return _call($app, getopt_unknown_subcommand => $argv)
-    unless my $subcommand = first { $_->[0] eq $argv->[0] } @$subcommands;
-
+sub _subcommand_run {
+  my ($app, $subcommand, $argv) = @_;
   local $Getopt::App::APP_CLASS;
   local $0 = $subcommand->[1];
   unless ($APPS{$subcommand->[1]}) {
-    $APPS{$subcommand->[1]} = _call($app, getopt_load_subcommand => $subcommand, $argv);
+    $APPS{$subcommand->[1]} = $app->$call_maybe(getopt_load_subcommand => $subcommand, $argv);
     croak "$subcommand->[0] did not return a code ref" unless ref $APPS{$subcommand->[1]} eq 'CODE';
   }
 
   return $APPS{$subcommand->[1]}->([@$argv[1 .. $#$argv]]);
+}
+
+sub _subcommand_run_maybe {
+  my ($app, $subcommands, $argv) = @_;
+  return undef unless $argv->[0] and $argv->[0] =~ m!^\w!;
+  return $app->$call_maybe(getopt_unknown_subcommand => $argv)
+    unless my $subcommand = first { $_->[0] eq $argv->[0] } @$subcommands;
+  return _subcommand_run($app, $subcommand, $argv);
 }
 
 sub _usage_for_options {
@@ -262,7 +275,7 @@ Getopt::App - Write and test your script with ease
 
   #!/usr/bin/env perl
   package My::Script;
-  use Getopt::App -signatures;
+  use Getopt::App -complete, -signatures;
 
   # See "APPLICATION METHODS"
   sub getopt_post_process_argv ($app, $argv, $state) { ... }
@@ -272,15 +285,17 @@ Getopt::App - Write and test your script with ease
   run(
 
     # Specify your Getopt::Long options and optionally a help text
-    'h|help # Output help',
-    'v+     # Verbose output',
-    'name=s # Specify a name',
+    'h|help            # Output help',
+    'v+                # Verbose output',
+    'name=s            # Specify a name',
+    'completion-script # Print autocomplete script',
 
     # Here is the main sub that will run the script
     sub ($app, @extra) {
-      return print extract_usage() if $app->{h};
-      say $app->{name} // 'no name'; # access command line options
-      return 42; # Reture value is used as exit code
+      return print generate_completion_script() if $app->{'completion-script'};
+      return print extract_usage()              if $app->{h};
+      say $app->{name} // 'no name';            # Access command line options
+      return 42;                                # Reture value is used as exit code
     }
   );
 
@@ -325,6 +340,16 @@ depending on a module from CPAN.
 
 These methods are optional, but can be defined in your script to override the
 default behavior.
+
+=head2 getopt_complete_reply
+
+  $app->getopt_complete_reply;
+
+This method will be called instead of the L</run> callback when the
+C<COMP_LINE> and C<COMP_POINT> environment variables are set. The default
+implementation will call L<Getopt::App::Complete/complete_reply>.
+
+See also L</Complete>.
 
 =head2 getopt_configure
 
@@ -538,6 +563,13 @@ it will also import the following:
   use warnings;
   use utf8;
   use feature ':5.16';
+
+=item * Completion
+
+  use Getopt::App -complete;
+
+Same as L</Default>, but will also load L<Getopt::App::Complete> and import
+L<Getopt::App::Complete/generate_completion_script>.
 
 =item * Signatures
 

@@ -1,5 +1,12 @@
 Revision history for Perl module Math::FakeDD
 
+0.04
+ - More corrections to dd_repro().
+ - Add new test file t/sparse.t.
+ - Add dd_numify() - mainly for '0+' overloading.
+ - Add dd_repro_test().
+ - Add new test file t/dd_repro_basics.t.
+
 0.03
  - Allow for mpfr versions older than 4.0.0, as they set minimum allowed precision
    to 2 bits. (Beginning with 4.0.0, this minimum has been set to 1.)

@@ -17,7 +17,7 @@ use constant {
               LONG_MIN  => Math::GMPq::_long_min(),
              };
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 our ($ROUND, $PREC);
 
 BEGIN {
@@ -121,7 +121,7 @@ use overload
         atan2   => \&atan2,
         deg2rad => \&deg2rad,
         rad2deg => \&rad2deg,
-               );
+    );
 
     my %special = (
         beta => \&beta,
@@ -180,7 +180,7 @@ use overload
 
         polygonal_root  => \&polygonal_root,
         polygonal_root2 => \&polygonal_root2,
-                  );
+    );
 
     my %ntheory = (
         factorial    => \&factorial,
@@ -213,6 +213,9 @@ use overload
 
         chebyshevT => \&chebyshevT,
         chebyshevU => \&chebyshevU,
+
+        chebyshevTmod => \&chebyshevTmod,
+        chebyshevUmod => \&chebyshevUmod,
 
         laguerreL => \&laguerreL,
         legendreP => \&legendreP,
@@ -247,13 +250,21 @@ use overload
         kronecker => \&kronecker,
 
         remdiv => \&remdiv,
+
+        addmod => \&addmod,
+        submod => \&submod,
+        mulmod => \&mulmod,
         divmod => \&divmod,
 
         iadd => \&iadd,
         isub => \&isub,
         imul => \&imul,
-        idiv => \&idiv,
         imod => \&imod,
+
+        idiv       => \&idiv,
+        idiv_ceil  => \&idiv_ceil,
+        idiv_round => \&idiv_round,
+        idiv_trunc => \&idiv_trunc,
 
         ipow   => \&ipow,
         ipow2  => \&ipow2,
@@ -277,7 +288,10 @@ use overload
         powmod => \&powmod,
         invmod => \&invmod,
 
+        quadratic_powmod => \&quadratic_powmod,
+
         is_power      => \&is_power,
+        is_power_of   => \&is_power_of,
         is_square     => \&is_square,
         is_polygonal  => \&is_polygonal,
         is_polygonal2 => \&is_polygonal2,
@@ -294,7 +308,7 @@ use overload
         rough_part  => \&rough_part,
 
         make_coprime => \&make_coprime,
-                  );
+    );
 
     my %misc = (
         rand  => \&rand,
@@ -382,7 +396,7 @@ use overload
         is_even      => \&is_even,
         is_div       => \&is_div,
         is_congruent => \&is_congruent,
-               );
+    );
 
     sub import {
         shift;
@@ -1083,31 +1097,15 @@ sub _star2obj {
 #
 ## Binary splitting
 #
+
 sub _binsplit {
     my ($arr, $func) = @_;
 
-    my $sub = sub {
-        my ($s, $n, $m) = @_;
-
-        $n == $m
-          ? $s->[$n]
-          : $func->(__SUB__->($s, $n, ($n + $m) >> 1), __SUB__->($s, (($n + $m) >> 1) + 1, $m));
-    };
-
-    my $end = $#$arr;
-
-    if ($end <= 1e5) {
-        return $sub->($arr, 0, $end);
+    while ($#$arr > 0) {
+        push(@$arr, $func->(shift(@$arr), shift(@$arr)));
     }
 
-    my @partial;
-
-    while (@$arr) {
-        my @head = splice(@$arr, 0, 1e5);
-        push @partial, $sub->(\@head, 0, $#head);
-    }
-
-    __SUB__->(\@partial, $func);
+    $arr->[0];
 }
 
 # Cached primorial of k
@@ -3649,10 +3647,9 @@ sub idiv ($$) {
 
     $x = _star2mpz($x) // goto &nan;
 
-    if (!ref($y) and CORE::int($y) eq $y and CORE::int($y) and $y < ULONG_MAX and $y > LONG_MIN) {
+    if (!ref($y) and CORE::int($y) eq $y and CORE::int($y) > 0 and $y < ULONG_MAX) {
         my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_tdiv_q_ui($r, $x, $y < 0 ? -$y : $y);
-        Math::GMPz::Rmpz_neg($r, $r) if $y < 0;
+        Math::GMPz::Rmpz_div_ui($r, $x, $y);
         return bless \$r;
     }
 
@@ -3674,7 +3671,102 @@ sub idiv ($$) {
     };
 
     my $r = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_div($r, $x, $y);
+    bless \$r;
+}
+
+sub idiv_ceil ($$) {
+    my ($x, $y) = @_;
+
+    $x = _star2mpz($x) // (goto &nan);
+
+    if (!ref($y) and CORE::int($y) eq $y and CORE::int($y) > 0 and $y < ULONG_MAX) {
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_cdiv_q_ui($r, $x, $y);
+        return bless \$r;
+    }
+
+    $y = _star2mpz($y) // (goto &nan);
+
+    # Detect division by zero
+    Math::GMPz::Rmpz_sgn($y) || do {
+        my $sign = Math::GMPz::Rmpz_sgn($x);
+
+        if ($sign == 0) {    # 0/0
+            goto &nan;
+        }
+        elsif ($sign > 0) {    # x/0 where: x > 0
+            goto &inf;
+        }
+        else {                 # x/0 where: x < 0
+            goto &ninf;
+        }
+    };
+
+    my $r = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_cdiv_q($r, $x, $y);
+    bless \$r;
+}
+
+sub idiv_trunc ($$) {
+    my ($x, $y) = @_;
+
+    $x = _star2mpz($x) // (goto &nan);
+
+    if (!ref($y) and CORE::int($y) eq $y and CORE::int($y) > 0 and $y < ULONG_MAX) {
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_tdiv_q_ui($r, $x, $y);
+        return bless \$r;
+    }
+
+    $y = _star2mpz($y) // (goto &nan);
+
+    # Detect division by zero
+    Math::GMPz::Rmpz_sgn($y) || do {
+        my $sign = Math::GMPz::Rmpz_sgn($x);
+
+        if ($sign == 0) {    # 0/0
+            goto &nan;
+        }
+        elsif ($sign > 0) {    # x/0 where: x > 0
+            goto &inf;
+        }
+        else {                 # x/0 where: x < 0
+            goto &ninf;
+        }
+    };
+
+    my $r = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_tdiv_q($r, $x, $y);
+    bless \$r;
+}
+
+sub idiv_round ($$) {
+    my ($x, $y) = @_;
+
+    $x = _star2mpz($x) // (goto &nan);
+    $y = _star2mpz($y) // (goto &nan);
+
+    # Detect division by zero
+    Math::GMPz::Rmpz_sgn($y) || do {
+        my $sign = Math::GMPz::Rmpz_sgn($x);
+
+        if ($sign == 0) {    # 0/0
+            goto &nan;
+        }
+        elsif ($sign > 0) {    # x/0 where: x > 0
+            goto &inf;
+        }
+        else {                 # x/0 where: x < 0
+            goto &ninf;
+        }
+    };
+
+    my $r = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_set($r, $y);
+    Math::GMPz::Rmpz_addmul_ui($r, $x, 2);
+    Math::GMPz::Rmpz_div($r, $r, $y);
+    Math::GMPz::Rmpz_div_2exp($r, $r, 1);
     bless \$r;
 }
 
@@ -3914,7 +4006,7 @@ sub ipow ($$) {
     if ($y < 0) {
         Math::GMPz::Rmpz_sgn($r) || goto &inf;    # 0^(-y) = Inf
         state $ONE_Z = Math::GMPz::Rmpz_init_set_ui_nobless(1);
-        Math::GMPz::Rmpz_tdiv_q($r, $ONE_Z, $r);
+        Math::GMPz::Rmpz_div($r, $ONE_Z, $r);
     }
 
     bless \$r;
@@ -4268,7 +4360,24 @@ sub __mod__ {
 
   Math_GMPq__Math_GMPz: {
         Math::GMPz::Rmpz_sgn($y) || goto &_nan;
-        my $r = _modular_rational($x, $y) // goto &_nan;
+        my $r = _modular_rational($x, $y) // do {
+
+            my $quo = Math::GMPq::Rmpq_init();
+            Math::GMPq::Rmpq_div_z($quo, $x, $y);
+
+            # Floor
+            Math::GMPq::Rmpq_integer_p($quo) || do {
+                my $z = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_set_q($z, $quo);
+                Math::GMPz::Rmpz_sub_ui($z, $z, 1) if Math::GMPq::Rmpq_sgn($quo) < 0;
+                Math::GMPq::Rmpq_set_z($quo, $z);
+            };
+
+            Math::GMPq::Rmpq_mul_z($quo, $quo, $y);
+            Math::GMPq::Rmpq_sub($quo, $x, $quo);
+
+            return $quo;
+        };
         Math::GMPz::Rmpz_mod($r, $r, $y);
         return $r;
     }
@@ -4535,12 +4644,76 @@ sub polymod {
     map { bless \$_ } @r;
 }
 
+# Modular operations
+
+sub addmod ($$$) {
+    my ($x, $y, $m) = @_;
+
+    $x = _star2mpz($x) // goto &nan;
+    $y = _star2mpz($y) // goto &nan;
+    $m = _star2mpz($m) // goto &nan;
+
+    my $r = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_add($r, $x, $y);
+    Math::GMPz::Rmpz_mod($r, $r, $m);
+    bless \$r;
+}
+
+sub submod ($$$) {
+    my ($x, $y, $m) = @_;
+
+    $x = _star2mpz($x) // goto &nan;
+    $y = _star2mpz($y) // goto &nan;
+    $m = _star2mpz($m) // goto &nan;
+
+    my $r = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_sub($r, $x, $y);
+    Math::GMPz::Rmpz_mod($r, $r, $m);
+    bless \$r;
+}
+
+sub mulmod ($$$) {
+    my ($x, $y, $m) = @_;
+
+    $x = _star2mpz($x) // goto &nan;
+    $y = _star2mpz($y) // goto &nan;
+    $m = _star2mpz($m) // goto &nan;
+
+    my $r = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_mul($r, $x, $y);
+    Math::GMPz::Rmpz_mod($r, $r, $m);
+    bless \$r;
+}
+
 #
 ## DIVMOD
 #
 
-sub divmod ($$) {
-    my ($x, $y) = @_;
+sub divmod ($$;$) {
+    my ($x, $y, $m) = @_;
+
+    if (defined($m)) {    # modular division
+
+        $x = _star2mpz($x) // goto &nan;
+        $y = _star2mpz($y) // goto &nan;
+        $m = _star2mpz($m) // goto &nan;
+
+        my $r = Math::GMPz::Rmpz_init();
+
+        if (Math::GMPz::Rmpz_divisible_p($x, $y) and Math::GMPz::Rmpz_sgn($y)) {
+            Math::GMPz::Rmpz_divexact($r, $x, $y);
+            Math::GMPz::Rmpz_mod($r, $r, $m);
+        }
+        elsif (Math::GMPz::Rmpz_invert($r, $y, $m)) {
+            Math::GMPz::Rmpz_mul($r, $r, $x);
+            Math::GMPz::Rmpz_mod($r, $r, $m);
+        }
+        else {
+            goto &nan;
+        }
+
+        return bless \$r;
+    }
 
     $x = _star2mpz($x) // return (nan(), nan());
     $y = _star2mpz($y) // return (nan(), nan());
@@ -7192,6 +7365,115 @@ sub lucasmod ($$) {
 ## Chebyshev polynomials: T_n(x)
 #
 
+sub _quadratic_mul {
+    my ($xa, $xb, $ya, $yb, $w) = @_;
+    (__add__(__mul__($xa, $ya), __mul__(__mul__($xb, $yb), $w)), __add__(__mul__($xa, $yb), __mul__($xb, $ya)));
+}
+
+sub _quadratic_invmod {
+    my ($xa, $xb, $w, $m) = @_;
+
+    $xa = __mod__($xa, $m);
+    $xb = __mod__($xb, $m);
+
+    my $t = invmod(__sub__(__mul__($xa, $xa), __mul__(__mul__($xb, $xb), $w)), $m);
+    (__mod__(__mul__($xa, $$t), $m), __mod__(__neg__(__mul__($xb, $$t)), $m));
+}
+
+sub _quadratic_pow {
+    my ($x, $y, $w, $n) = @_;
+
+    my ($c1, $c2) = (Math::GMPz::Rmpz_init_set_ui(1), Math::GMPz::Rmpz_init_set_ui(0));
+
+    for (; $n > 0 ; $n >>= 1) {
+
+        if ($n & 1) {
+            ($c1, $c2) = _quadratic_mul($c1, $c2, $x, $y, $w);
+        }
+
+        ($x, $y) = _quadratic_mul($x, $y, $x, $y, $w);
+    }
+
+    ($c1, $c2);
+}
+
+sub _mpz_quadratic_powmod {
+    my ($x, $y, $a, $b, $w, $n, $m) = @_;
+
+    state $t = Math::GMPz::Rmpz_init_nobless();
+
+    for my $i (0 .. Math::GMPz::Rmpz_sizeinbase($n, 2) - 1) {
+
+        if (Math::GMPz::Rmpz_tstbit($n, $i)) {
+
+            # (x, y) = ((a*x + b*y*w) % m, (a*y + b*x) % m)
+            Math::GMPz::Rmpz_mul($t, $b, $w);
+            Math::GMPz::Rmpz_mul($t, $t, $y);
+            Math::GMPz::Rmpz_addmul($t, $a, $x);
+            Math::GMPz::Rmpz_mul($y, $y, $a);
+            Math::GMPz::Rmpz_addmul($y, $x, $b);
+            Math::GMPz::Rmpz_mod($x, $t, $m);
+            Math::GMPz::Rmpz_mod($y, $y, $m);
+        }
+
+        # (a, b) = ((a*a + b*b*w) % m, (2*a*b) % m)
+        Math::GMPz::Rmpz_mul($t, $a, $b);
+        Math::GMPz::Rmpz_mul_2exp($t, $t, 1);
+        Math::GMPz::Rmpz_powm_ui($a, $a, 2, $m);
+        Math::GMPz::Rmpz_powm_ui($b, $b, 2, $m);
+        Math::GMPz::Rmpz_addmul($a, $b, $w);
+        Math::GMPz::Rmpz_mod($b, $t, $m);
+    }
+}
+
+sub _quadratic_powmod {
+    my ($x, $y, $w, $n, $m) = @_;
+
+    my $negative_power = 0;
+
+    if (Math::GMPz::Rmpz_sgn($n) < 0) {
+        $n = Math::GMPz::Rmpz_init_set($n);    # copy
+        Math::GMPz::Rmpz_abs($n, $n);
+        $negative_power = 1;
+    }
+
+    my ($c1, $c2) = (Math::GMPz::Rmpz_init_set_ui(1), Math::GMPz::Rmpz_init_set_ui(0));
+
+    if (ref($x) eq 'Math::GMPz' and ref($y) eq 'Math::GMPz' and ref($w) eq 'Math::GMPz' and ref($m) eq 'Math::GMPz') {
+        _mpz_quadratic_powmod($c1, $c2, $x, $y, $w, $n, $m);
+    }
+    else {
+        for my $i (0 .. Math::GMPz::Rmpz_sizeinbase($n, 2) - 1) {
+
+            if (Math::GMPz::Rmpz_tstbit($n, $i)) {
+                ($c1, $c2) = map { __mod__($_, $m) } _quadratic_mul($c1, $c2, $x, $y, $w);
+            }
+
+            ($x, $y) = map { __mod__($_, $m) } _quadratic_mul($x, $y, $x, $y, $w);
+        }
+    }
+
+    if ($negative_power) {
+        ($c1, $c2) = _quadratic_invmod($c1, $c2, $w, $m);
+    }
+
+    ($c1, $c2);
+}
+
+sub quadratic_powmod ($$$$$) {
+    my ($x, $y, $w, $n, $m) = @_;
+
+    $x = _star2obj($x);
+    $y = _star2obj($y);
+    $w = _star2obj($w);
+    $n = _star2mpz($n) // return (nan(), nan());
+    $m = _star2obj($m);
+
+    my ($r1, $r2) = _quadratic_powmod($x, $y, $w, $n, $m);
+
+    ((bless \$r1), (bless \$r2));
+}
+
 sub chebyshevT ($$) {
     my ($n, $x) = @_;
 
@@ -7202,16 +7484,42 @@ sub chebyshevT ($$) {
     $n == 0 and goto &one;
     $n == 1 and return bless \$x;
 
-    state $ONE = ${one()};
-
-    my $t = __add__($x, $x);
-    my ($u, $v) = ($ONE, $x);
-
-    foreach my $i (2 .. $n) {
-        ($u, $v) = ($v, __sub__(__mul__($t, $v), $u));
+    if (ref($x) eq 'Math::GMPz' or (ref($x) eq 'Math::GMPq' and __is_int__($x))) {
+        return lucasV(2 * $x, 1, $n)->idiv(2);
     }
 
-    bless \$v;
+    # T_n(x) = 1/2 * ((x - sqrt(x^2 - 1))^n + (x + sqrt(x^2 - 1))^n)
+
+    my ($r1, $r2) = _quadratic_pow($x, Math::GMPz::Rmpz_init_set_si(-1), __dec__(__mul__($x, $x)), $n);
+    bless \$r1;
+}
+
+#
+## Modular Chebyshev polynomials: T_n(x) mod m
+#
+
+sub chebyshevTmod ($$$) {
+    my ($n, $x, $m) = @_;
+
+    $n = _star2mpz($n) // goto &nan;
+    $x = _star2obj($x);
+    $m = _star2mpz($m) // goto &nan;
+
+    if (Math::GMPz::Rmpz_sgn($n) < 0) {
+        $n = Math::GMPz::Rmpz_init_set($n);    # copy
+        Math::GMPz::Rmpz_abs($n, $n);
+    }
+
+    if (Math::GMPz::Rmpz_odd_p($m) and (ref($x) eq 'Math::GMPz' or (ref($x) eq 'Math::GMPq' and __is_int__($x)))) {
+        return lucasVmod(2 * $x, 1, $n, $m)->divmod(2, $m);
+    }
+
+    # T_n(x) = 1/2 * ((x - sqrt(x^2 - 1))^n + (x + sqrt(x^2 - 1))^n)
+
+    my ($r1, $r2) = _quadratic_powmod($x, Math::GMPz::Rmpz_init_set_si(-1), __dec__(__mul__($x, $x)), $n, $m);
+    my $r = bless \$r1;
+    $r = $r->mod($m);
+    $r;
 }
 
 #
@@ -7237,17 +7545,62 @@ sub chebyshevU ($$) {
 
     $x = _star2obj($x);
 
-    state $ONE = ${one()};
-
-    my $t = __add__($x, $x);
-    my ($u, $v) = ($ONE, $t);
-
-    foreach my $i (2 .. $n) {
-        ($u, $v) = ($v, __sub__(__mul__($t, $v), $u));
+    if (ref($x) eq 'Math::GMPz' or (ref($x) eq 'Math::GMPz' and __is_int__($x))) {
+        my $r = lucasU(2 * $x, 1, $n + 1);
+        $r = $r->neg if $negative;
+        return $r;
     }
 
-    $v = __neg__($v) if $negative;
-    bless \$v;
+    # U_n(x) = ((x + sqrt(x^2 - 1))^(n+1) - (x - sqrt(x^2 - 1))^(n+1)) / (2 * sqrt(x^2 - 1))
+
+    my ($r1, $r2) = _quadratic_pow($x, Math::GMPz::Rmpz_init_set_ui(1), __dec__(__mul__($x, $x)), $n + 1);
+
+    my $r = bless \$r2;
+    $r = $r->neg if $negative;
+    $r;
+}
+
+#
+## Modular Chebyshev polynomials: U_n(x) mod m
+#
+
+sub chebyshevUmod {
+    my ($n, $x, $m) = @_;
+
+    $n = _star2mpz($n) // goto &nan;
+    $x = _star2obj($x);
+    $m = _star2mpz($m) // goto &nan;
+
+    my $negative = 0;
+
+    if (Math::GMPz::Rmpz_sgn($n) < 0) {
+
+        if (Math::GMPz::Rmpz_cmp_si($n, -1) == 0) {
+            return (zero()->mod(bless \$m));
+        }
+
+        if (Math::GMPz::Rmpz_cmp_si($n, -2) == 0) {
+            return (mone()->mod(bless \$m));
+        }
+
+        $n        = -$n - 2;
+        $negative = 1;
+    }
+
+    if (ref($x) eq 'Math::GMPz' or (ref($x) eq 'Math::GMPq' and __is_int__($x))) {
+        my $r = lucasUmod(2 * $x, 1, $n + 1, $m);
+        $r = $r->neg->mod($m) if $negative;
+        return $r;
+    }
+
+    # U_n(x) = ((x + sqrt(x^2 - 1))^(n+1) - (x - sqrt(x^2 - 1))^(n+1)) / (2 * sqrt(x^2 - 1))
+
+    my ($r1, $r2) = _quadratic_pow($x, Math::GMPz::Rmpz_init_set_ui(1), __dec__(__mul__($x, $x)), $n + 1, $m);
+
+    my $r = bless \$r2;
+    $r = $r->neg if $negative;
+    $r = $r->mod($m);
+    $r;
 }
 
 #
@@ -7433,7 +7786,7 @@ sub sum {
 
     @terms || goto &zero;
 
-    my @left;
+    my @non_mpz;
     my $sum = Math::GMPz::Rmpz_init_set_ui(0);
 
     foreach my $n (@terms) {
@@ -7441,12 +7794,12 @@ sub sum {
             Math::GMPz::Rmpz_add($sum, $sum, $n);
         }
         else {
-            push @left, $n;
+            push @non_mpz, $n;
         }
     }
 
-    if (@left) {
-        $sum = __add__($sum, _binsplit(\@left, \&__add__));
+    if (@non_mpz) {
+        $sum = __add__($sum, _binsplit(\@non_mpz, \&__add__));
     }
 
     bless \$sum;
@@ -7850,7 +8203,7 @@ sub harmfrac ($) {
             }
             else {
                 Math::GMPz::Rmpz_add($temp, $num, $den);
-                Math::GMPz::Rmpz_tdiv_q_2exp($temp, $temp, 1);
+                Math::GMPz::Rmpz_div_2exp($temp, $temp, 1);
                 my $q = Math::GMPz::Rmpz_init_set($temp);
                 my $r = Math::GMPz::Rmpz_init_set($temp);
                 __SUB__->($num, $q);
@@ -8040,7 +8393,7 @@ sub subfactorial ($;$) {
 
     goto &zero if ($k < 0);
     goto &one  if ($n == 0);
-    goto &nan  if ($n < 0);
+    goto &zero if ($n < 0);
 
     my $tau  = 6.28318530717958647692528676655900576839433879875;
     my $prec = 4 + CORE::int(($n * CORE::log($n) + CORE::log($tau * $n) / 2 - $n) / CORE::log(2));
@@ -9164,6 +9517,33 @@ sub is_power ($;$) {
     __is_power__($n, $k);
 }
 
+sub is_power_of ($$) {
+    my ($n, $k) = @_;
+
+    $n = _star2obj($n);
+    $k = _star2obj($k);
+
+    if (ref($n) ne 'Math::GMPz') {
+        __is_int__($n) || return 0;
+        $n = _any2mpz($n) // return 0;
+    }
+
+    if (ref($k) ne 'Math::GMPz') {
+        $k = _any2mpz($k) // 0;
+    }
+
+    if (Math::GMPz::Rmpz_cmp_ui($k, 2) == 0) {
+        return (Math::GMPz::Rmpz_popcount($n) == 1);
+    }
+
+    my $e = __ilog__($n, $k) // return 0;
+
+    state $t = Math::GMPz::Rmpz_init_nobless();
+    Math::GMPz::Rmpz_pow_ui($t, $k, $e);
+
+    (Math::GMPz::Rmpz_cmp($t, $n) == 0);
+}
+
 #
 ## kronecker
 #
@@ -9487,7 +9867,7 @@ sub dirichlet_sum ($$$$$) {
     foreach my $k (1 .. Math::GMPz::Rmpz_get_ui($s)) {
 
         Math::GMPz::Rmpz_set_ui($$t, $k);
-        Math::GMPz::Rmpz_tdiv_q_ui($$u, $n, $k);
+        Math::GMPz::Rmpz_div_ui($$u, $n, $k);
 
         my $f_r = $f->($t);
         my $g_r = $g->($t);
@@ -10119,11 +10499,11 @@ sub digits ($;$) {
     # Subquadratic algorithm from "Modern Computer Arithmetic" by Richard P. Brent and Paul Zimmermann
     if (!ref($k) || Math::GMPz::Rmpz_fits_ulong_p($k)) {
 
-        # Find r such that B^(2r - 2) <= A < B^(2r)
-        my $r = (__ilog__($n, $k) >> 1) + 1;
-
         my $A = $n;
         my $B = ref($k) ? Math::GMPz::Rmpz_get_ui($k) : $k;
+
+        # Find r such that B^(2r - 2) <= A < B^(2r)
+        my $r = (__ilog__($A, $B) >> 1) + 1;
 
         state $Q = Math::GMPz::Rmpz_init_nobless();
         state $R = Math::GMPz::Rmpz_init_nobless();
@@ -10131,9 +10511,21 @@ sub digits ($;$) {
         return sub {
             my ($A, $r) = @_;
 
-            if (Math::GMPz::Rmpz_cmp_ui($A, $B) < 0) {
-                return Math::GMPz::Rmpz_get_ui($A);
+            # Cut the recursion early
+            if (Math::GMPz::Rmpz_fits_ulong_p($A)) {
+                my $v = Math::GMPz::Rmpz_init_set($A);
+                my $m = Math::GMPz::Rmpz_init();
+
+                my @digits;
+                while (Math::GMPz::Rmpz_sgn($v)) {
+                    push @digits, Math::GMPz::Rmpz_divmod_ui($v, $m, $v, $B);
+                }
+                return @digits;
             }
+
+            #~ if (Math::GMPz::Rmpz_cmp_ui($A, $B) < 0) {
+            #~ return Math::GMPz::Rmpz_get_ui($A);
+            #~ }
 
             my $t = Math::GMPz::Rmpz_init();
             Math::GMPz::Rmpz_ui_pow_ui($t, $B, 2 * ($r - 1));    # can this be optimized away?
@@ -10199,19 +10591,23 @@ sub sumdigits ($;$) {
 #<<<
     if (ref($k) ? (Math::GMPz::Rmpz_cmp_ui($k, 62) <= 0) : ($k <= 62)) {
         $k = Math::GMPz::Rmpz_get_ui($k) if ref($k);
+
         return bless \Math::GMPz::Rmpz_init_set_ui(Math::GMPz::Rmpz_popcount($n)) if $k == 2;
-        return bless \Math::GMPz::Rmpz_init_set_ui(List::Util::sum(map { $k <= 36 ? $DIGITS_36{$_} : $DIGITS_62{$_} } split(//, Math::GMPz::Rmpz_get_str($n, $k))));
+
+        if (Math::GMPz::Rmpz_sizeinbase($n, $k) <= 1e6) {
+            return bless \Math::GMPz::Rmpz_init_set_ui(List::Util::sum(map { $k <= 36 ? $DIGITS_36{$_} : $DIGITS_62{$_} } split(//, Math::GMPz::Rmpz_get_str($n, $k))));
+        }
     }
 #>>>
 
     # Subquadratic algorithm from "Modern Computer Arithmetic" by Richard P. Brent and Paul Zimmermann
     if (!ref($k) || Math::GMPz::Rmpz_fits_ulong_p($k)) {
 
-        # Find r such that B^(2r - 2) <= A < B^(2r)
-        my $r = (__ilog__($n, $k) >> 1) + 1;
-
         my $A = $n;
         my $B = ref($k) ? Math::GMPz::Rmpz_get_ui($k) : $k;
+
+        # Find r such that B^(2r - 2) <= A < B^(2r)
+        my $r = (__ilog__($A, $B) >> 1) + 1;
 
         state $Q = Math::GMPz::Rmpz_init_nobless();
         state $R = Math::GMPz::Rmpz_init_nobless();
@@ -10219,9 +10615,21 @@ sub sumdigits ($;$) {
         my $total = sub {
             my ($A, $r) = @_;
 
-            if (Math::GMPz::Rmpz_cmp_ui($A, $B) < 0) {
-                return Math::GMPz::Rmpz_get_ui($A);
+            # Cut the recursion early
+            if (Math::GMPz::Rmpz_fits_ulong_p($A)) {
+                my $v = Math::GMPz::Rmpz_init_set($A);
+                my $m = Math::GMPz::Rmpz_init();
+
+                my $sum = 0;
+                while (Math::GMPz::Rmpz_sgn($v)) {
+                    $sum += Math::GMPz::Rmpz_divmod_ui($v, $m, $v, $B);
+                }
+                return $sum;
             }
+
+            #~ if (Math::GMPz::Rmpz_cmp_ui($A, $B) < 0) {
+            #~ return Math::GMPz::Rmpz_get_ui($A);
+            #~ }
 
             my $w = ($r + 1) >> 1;
             my $t = Math::GMPz::Rmpz_init();

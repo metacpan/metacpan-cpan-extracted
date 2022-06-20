@@ -15,10 +15,12 @@ DynamicPrereqs
 Etheridge
 Graham
 Karen
+Knop
 Ollis
 Plugin
 Zilla
 ether
+haarg
 irc
 lib
 plicease

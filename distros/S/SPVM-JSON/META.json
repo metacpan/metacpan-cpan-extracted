@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "SPVM" : "0.9500"
+            "SPVM" : "0.9609"
          }
       }
    },
@@ -44,6 +44,6 @@
          "web" : "https://github.com/yuki-kimoto/Perl-SPVM-JSON"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

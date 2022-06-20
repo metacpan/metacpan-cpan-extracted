@@ -3,8 +3,8 @@
 use warnings;
 use v5.22;
 
-use Test::More;
 use Data::Gimei;
+use Test::More;
 
 my @expected;
 Data::Gimei::set_random_seed(42);
@@ -20,7 +20,7 @@ push @expected, Data::Gimei::Address->new();
     push @actual, Data::Gimei::Name->new();
     push @actual, Data::Gimei::Address->new();
 
-    is_deeply [map {$_->kanji} @expected],[map {$_->kanji} @actual];
+    is_deeply [ map { $_->kanji } @expected ], [ map { $_->kanji } @actual ];
 }
 
 # Different seed
@@ -47,7 +47,7 @@ push @expected, Data::Gimei::Address->new();
     rand;
     push @actual, Data::Gimei::Address->new();
 
-    is_deeply [map {$_->kanji} @expected],[map {$_->kanji} @actual];
+    is_deeply [ map { $_->kanji } @expected ], [ map { $_->kanji } @actual ];
 }
 
 done_testing();

@@ -19,10 +19,10 @@ or _command_ -> **optex** symlink, or
 
 # DESCRIPTION
 
-**optex** is a general purpose option handling wrapper utilizing Perl
-module [Getopt::EX](https://metacpan.org/pod/Getopt::EX).  It enables user to define their own option
-aliases for any commands on the system, and provide module style
-extendible capability.
+**optex** is a general purpose command option handling wrapper
+utilizing Perl module [Getopt::EX](https://metacpan.org/pod/Getopt%3A%3AEX).  It enables user to define their
+own option aliases for any commands on the system, and provide module
+style extensibility.
 
 Target command is given as an argument:
 
@@ -259,12 +259,12 @@ addressed with and without `App::optex` prefix.
 - -M**util::argv**
 
     Module to manipulate command argument.
-    See [App::optex::util::argv](https://metacpan.org/pod/App::optex::util::argv) for detail.
+    See [App::optex::util::argv](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Autil%3A%3Aargv) for detail.
 
 - -M**util::filter**
 
     Module to implement command input/output filters.
-    See [App::optex::util::filter](https://metacpan.org/pod/App::optex::util::filter) for detail.
+    See [App::optex::util::filter](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Autil%3A%3Afilter) for detail.
 
 # OPTIONS
 
@@ -394,7 +394,11 @@ format.
 
 # SEE ALSO
 
-[Getopt::EX](https://metacpan.org/pod/Getopt::EX), [Getopt::EX::Loader](https://metacpan.org/pod/Getopt::EX::Loader), [Getopt::EX::Module](https://metacpan.org/pod/Getopt::EX::Module)
+[Getopt::EX](https://metacpan.org/pod/Getopt%3A%3AEX), [Getopt::EX::Loader](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3ALoader), [Getopt::EX::Module](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AModule)
+
+[App::optex::textconv](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Atextconv)
+
+[App::optex::xform](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Axform)
 
 # AUTHOR
 
@@ -411,4 +415,4 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2017-2021 Kazumasa Utashiro
+Copyright 2017-2022 Kazumasa Utashiro

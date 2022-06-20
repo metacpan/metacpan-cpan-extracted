@@ -65,7 +65,7 @@
    "provides" : {
       "Mojolicious::Plugin::Authentication" : {
          "file" : "lib/Mojolicious/Plugin/Authentication.pm",
-         "version" : "1.38"
+         "version" : "1.39"
       }
    },
    "release_status" : "stable",
@@ -80,7 +80,7 @@
          "web" : "https://github.com/benvanstaveren/Mojolicious-Plugin-Authentication"
       }
    },
-   "version" : "1.38",
+   "version" : "1.39",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -324,7 +324,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "1.38",
+                  "tag" : "1.39",
                   "tag_format" : "%v",
                   "tag_message" : ""
                },

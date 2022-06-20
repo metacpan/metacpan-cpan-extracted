@@ -1,6 +1,7 @@
 use strict;
 use warnings;
-use OPCUA::Open62541 qw(STATUSCODE_GOOD :CLIENTSTATE);
+use OPCUA::Open62541 qw(STATUSCODE_GOOD :CLIENTSTATE
+    :SECURECHANNELSTATE :SESSIONSTATE);
 
 use OPCUA::Open62541::Test::Server;
 use OPCUA::Open62541::Test::Client;
@@ -32,11 +33,11 @@ no_leaks_ok {
     $config->setStateCallback(undef);
 } "state callback set unset";
 throws_ok { $config->setStateCallback("foo") }
-    qr/Context 'foo' is not a CODE reference /, "state callback array";
+    qr/Callback 'foo' is not a CODE reference /, "state callback code";
 no_leaks_ok { eval { $config->setStateCallback("foo") } }
-    "state callback array leak";
+    "state callback code leak";
 throws_ok { $config->setStateCallback([]) }
-    qr/Context 'ARRAY.*' is not a CODE reference /, "state callback array";
+    qr/Callback 'ARRAY.*' is not a CODE reference /, "state callback array";
 no_leaks_ok { eval { $config->setStateCallback([]) } }
     "state callback array leak";
 undef $config;
@@ -54,30 +55,40 @@ my @states;
 sub callback3 {
     my ($c, $channel, $session, $connect) = @_;
     is($c, $client->{client}, "callback client");
+    my $count = @states;
     my $state = shift @states;
-    is($channel, $state->[0], "callback channel");
-    is($session, $state->[1], "callback session");
-    is($connect, $state->[2], "callback connect");
+    is($channel, $state->[0], "callback channel $count");
+    is($session, $state->[1], "callback session $count");
+    is($connect, $state->[2], "callback connect $count");
 }
 # 1.0 API
 sub callback {
     my ($c, $state) = @_;
     is($c, $client->{client}, "callback client");
-    is($state, shift @states, "callback state");
+    my $count = @states;
+    is($state, shift @states, "callback state $count");
 }
 my $callback = @statearray == 3 ? \&callback3 : \&callback;
 lives_ok { $client->{config}->setStateCallback($callback); }
     "set state callback";
 
 @states = @statearray == 3 ? (
-    [ 1, 0, 0 ],
-    [ 4, 0, 0 ],
-    [ 5, 0, 0 ],
-    [ 6, 0, 0 ],
-    [ 6, 1, 0 ],
-    [ 6, 2, 0 ],
-    [ 6, 3, 0 ],
-    [ 6, 4, 0 ],
+    [ SECURECHANNELSTATE_HEL_SENT,	SESSIONSTATE_CLOSED,
+	STATUSCODE_GOOD ],
+    [ SECURECHANNELSTATE_ACK_RECEIVED,	SESSIONSTATE_CLOSED,
+	STATUSCODE_GOOD],
+    [ SECURECHANNELSTATE_OPN_SENT,	SESSIONSTATE_CLOSED,
+	STATUSCODE_GOOD],
+    [ SECURECHANNELSTATE_OPEN,		SESSIONSTATE_CLOSED,
+	STATUSCODE_GOOD],
+    [ SECURECHANNELSTATE_OPEN,		SESSIONSTATE_CREATE_REQUESTED,
+	STATUSCODE_GOOD],
+    [ SECURECHANNELSTATE_OPEN,		SESSIONSTATE_CREATED,
+	STATUSCODE_GOOD],
+    [ SECURECHANNELSTATE_OPEN,		SESSIONSTATE_ACTIVATE_REQUESTED,
+	STATUSCODE_GOOD],
+    [ SECURECHANNELSTATE_OPEN,		SESSIONSTATE_ACTIVATED,
+	STATUSCODE_GOOD],
 ) : (
     CLIENTSTATE_CONNECTED,
     CLIENTSTATE_SECURECHANNEL,
@@ -87,8 +98,10 @@ $client->run();
 is(scalar @states, 0, "states connected");
 
 @states = @statearray == 3 ? (
-    [ 6, 5, 0 ],
-    [ 0, 0, 0 ],
+    [ SECURECHANNELSTATE_OPEN,		SESSIONSTATE_CLOSING,
+	STATUSCODE_GOOD ],
+    [ SECURECHANNELSTATE_CLOSED,	SESSIONSTATE_CLOSED,
+	STATUSCODE_GOOD ],
 ) : (
     CLIENTSTATE_DISCONNECTED,
 );

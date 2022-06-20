@@ -7,20 +7,25 @@ use Getopt::App ();
 my $script = rel2abs(catfile qw(example bin bundle));
 plan skip_all => "$script" unless -x $script;
 
+my $first_line = join '.*', 'package Getopt::App', 'use feature', 'use strict', 'use warnings',
+  'use utf8', 'use Carp', 'use Getopt::Long', 'use List::Util', '\$OPT_COMMENT_RE', '\$OPTIONS',
+  '\$SUBCOMMANDS', '\%APPS', '\$call_maybe';
+
 my @expect_bundled = (
   qr/^\#!/,
-  qr/package Getopt::App;use feature/,
+  qr/$first_line/,
   qr/sub capture \{.*\}/,
   qr/sub extract_usage \{.*\}/,
   qr/sub import \{.*\}/,
   qr/sub new \{.*\}/,
   qr/sub run \{.*\}/,
-  qr/sub _call \{.*\}/,
+  qr/sub _getopt_complete_reply \{.*\}/,
   qr/sub _getopt_configure \{.*\}/,
   qr/sub _getopt_load_subcommand \{.*\}/,
   qr/sub _getopt_post_process_argv \{.*\}/,
   qr/sub _getopt_unknown_subcommand \{.*\}/,
-  qr/sub _subcommand \{.*\}/,
+  qr/sub _subcommand_run \{.*\}/,
+  qr/sub _subcommand_run_maybe \{.*\}/,
   qr/sub _usage_for_options \{.*\}/,
   qr/sub _usage_for_subcommands \{.*\}/,
   qr/BEGIN\{\$INC\{'Getopt\/App\.pm'\}='BUNDLED'\}/,

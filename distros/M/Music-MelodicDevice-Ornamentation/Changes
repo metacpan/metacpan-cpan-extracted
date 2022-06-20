@@ -1,5 +1,8 @@
 Revision history for Music-MelodicDevice-Ornamentation
 
+0.0701 2022-06-16 21:07:01
+    - Use Music::PitchNum instead of Music::Note.
+
 0.0700 2022-01-31 16:29:53
     - Make things handle numeric pitches! Duuh!
 

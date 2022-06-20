@@ -17,6 +17,7 @@ BEGIN
 BEGIN
 {
     use_ok( 'Cookie' );
+    require "t/env.pl";
 };
 
 subtest 'methods' => sub

@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-02'; # DATE
+our $DATE = '2022-05-14'; # DATE
 our $DIST = 'App-PericmdUtils'; # DIST
-our $VERSION = '0.052'; # VERSION
+our $VERSION = '0.053'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/PericmdUtils/list_pericmd_plugins",
@@ -36,11 +36,9 @@ list-pericmd-plugins - List Perinci::CmdLine plugins
 
 =head1 VERSION
 
-This document describes version 0.052 of list-pericmd-plugins (from Perl distribution App-PericmdUtils), released on 2022-05-02.
+This document describes version 0.053 of list-pericmd-plugins (from Perl distribution App-PericmdUtils), released on 2022-05-14.
 
 =head1 SYNOPSIS
-
-Usage:
 
 % B<list-pericmd-plugins> [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--detail>|B<-l>|B<--no-detail>|B<--nodetail>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]]
 

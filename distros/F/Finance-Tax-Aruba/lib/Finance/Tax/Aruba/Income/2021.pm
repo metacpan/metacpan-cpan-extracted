@@ -1,5 +1,5 @@
 package Finance::Tax::Aruba::Income::2021;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use Moose;
 use namespace::autoclean;
 
@@ -82,7 +82,9 @@ sub _build_tax_bracket {
 
 sub is_year {
     my $self = shift;
-    return 1 if shift == 2021;
+    my $year = shift;
+    return 1 if $year == 2021;
+    return 1 if $year == 2022; # same rules apply
     return 0;
 }
 
@@ -101,13 +103,13 @@ Finance::Tax::Aruba::Income::2021 - Income tax calculator for the year 2021
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-Calculate your taxes and other social premiums for the year 2020.
+Calculate your taxes and other social premiums for the year 2021 and 2022.
 
 =head1 METHODS
 

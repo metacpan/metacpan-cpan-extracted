@@ -1,6 +1,8 @@
+#!/usr/bin/perl
+#
 use v5.12;
 use warnings;
-use Test::More tests => 301;
+use Test::More tests => 303;
 use Test::Warn;
 
 BEGIN { unshift @INC, 'lib', '../lib'}
@@ -43,6 +45,9 @@ is(($red->rgb)[2],         0, 'named red has correct rgb blue component value');
 is(($red->hsl)[0],         0, 'named red has correct hsl hue component value');
 is(($red->hsl)[1],       100, 'named red has correct hsl saturation component value');
 is(($red->hsl)[2],        50, 'named red has correct hsl lightness component value');
+is( $red->string,      'red', 'named red does stringify correctly');
+is( Chart::Color->new(15,12,13)->string, '[ 15, 12, 13 ]', 'random color does stringify correctly');
+
 
 $red = Chart::Color->new('#FF0000');
 is( ref $red,     $module, 'could create object by hex value');

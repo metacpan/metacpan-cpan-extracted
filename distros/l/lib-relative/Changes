@@ -1,3 +1,6 @@
+1.001     2022-06-15 14:13:17 EDT
+  - Skip symlink tests on msys as symlinks are broken on this platform (#2, pauloscustodio)
+
 1.000     2019-03-18 17:45:50 EDT
   - Stable release
 

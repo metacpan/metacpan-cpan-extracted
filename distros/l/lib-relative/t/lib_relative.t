@@ -37,6 +37,7 @@ use lib::relative ();
 
 # Symlinked __FILE__
 SKIP: {
+  skip 4, 'symlinks broken in msys' if $^O eq 'msys';
   local @INC = @INC;
   my $dir = File::Temp->newdir;
   skip 4, 'tempdir in @INC' if grep { m!^\Q$dir\E! } @INC;

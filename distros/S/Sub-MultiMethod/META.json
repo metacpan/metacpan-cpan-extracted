@@ -11,7 +11,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Sub-MultiMethod",
    "no_index" : {
@@ -41,7 +41,7 @@
             "Role::Hooks" : "0",
             "Type::Params" : "1.008003",
             "Types::Standard" : "1.008003",
-            "perl" : "5.008"
+            "perl" : "5.008001"
          }
       },
       "test" : {
@@ -58,13 +58,13 @@
    "provides" : {
       "Sub::MultiMethod" : {
          "file" : "lib/Sub/MultiMethod.pm",
-         "version" : "0.902"
+         "version" : "0.905"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Sub-MultiMethod"
+         "web" : "https://github.com/tobyink/p5-sub-multimethod/issues"
       },
       "homepage" : "https://metacpan.org/release/Sub-MultiMethod",
       "license" : [
@@ -77,6 +77,6 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/project"
    },
-   "version" : "0.902",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.905",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

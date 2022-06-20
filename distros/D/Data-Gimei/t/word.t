@@ -2,35 +2,23 @@ use warnings;
 use v5.22;
 use utf8;
 
+use Data::Gimei;
 use Test::More;
 
-use Data::Gimei;
+{    # to_s
+    my $w = Data::Gimei::Word->new( [ '佐藤', 'さとう', 'サトウ', 'sato' ] );
+    is $w->to_s, '佐藤, さとう, サトウ, Sato';
+}
 
-#
-# call by using named args.
-#
+{    # like call by using positional args.
 
-my $word = Data::Gimei::Word->new(
-    kanji    => '田中',
-    hiragana => 'たなか',
-    katakana => 'タナカ',
-    romaji   => 'tanaka'    # args romaji can be lower case
-);
-is $word->kanji,    '田中';
-is $word->hiragana, 'たなか';
-is $word->katakana, 'タナカ';
-is $word->romaji,   'Tanaka';    # romaji capitalizes initial char.
+    # 4th args, romaji can be lower case
+    my $w = Data::Gimei::Word->new( [ '鈴木', 'すずき', 'スズキ', 'suzuki' ] );
 
-#
-# like call by using positional args.
-#
-
-# 4th args, romaji can be lower case
-$word = Data::Gimei::Word->new( [ '鈴木', 'すずき', 'スズキ', 'suzuki' ] );
-
-is $word->kanji,    '鈴木';
-is $word->hiragana, 'すずき';
-is $word->katakana, 'スズキ';
-is $word->romaji,   'Suzuki';    # romaji capitalize initial char.
+    is $w->kanji,    '鈴木';
+    is $w->hiragana, 'すずき';
+    is $w->katakana, 'スズキ';
+    is $w->romaji,   'Suzuki';    # romaji capitalize initial char.
+}
 
 done_testing;

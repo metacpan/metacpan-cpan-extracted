@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Search YouTube
 
-our $VERSION = '0.0302';
+our $VERSION = '0.0303';
 
 use Moo;
 use strictures 2;
@@ -89,7 +89,7 @@ WebService::YTSearch - Search YouTube
 
 =head1 VERSION
 
-version 0.0302
+version 0.0303
 
 =head1 SYNOPSIS
 
@@ -102,7 +102,7 @@ version 0.0302
 
 =head1 DESCRIPTION
 
-C<WebService::YTSearch> searches YouTube with your API key. YMMV.
+C<WebService::YTSearch> searches YouTube with your API key.
 
 =head1 ATTRIBUTES
 
@@ -114,11 +114,13 @@ Your authorized access key.
 
 The base URL.
 
-Default: https://www.googleapis.com
+Default: C<https://www.googleapis.com>
 
 =head2 ua
 
 The user agent.
+
+Default: C<Mojo::UserAgent-E<gt>new>
 
 =head1 METHODS
 
@@ -126,7 +128,7 @@ The user agent.
 
   $w = WebService::YTSearch->new(key => $key);
 
-Create a new C<WebService::YTSearch> object given an API B<key>.
+Create a new C<WebService::YTSearch> object given your API B<key>.
 
 =head2 search
 

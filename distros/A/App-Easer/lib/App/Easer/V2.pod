@@ -1,0 +1,1427 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+App::Easer::V2 - Simplify writing (hierarchical) CLI applications
+
+=head1 VERSION
+
+This document describes App::Easer::V2 version {{[ version ]}}.
+
+=head1 SYNOPSIS
+
+   #!/usr/bin/env perl
+   use v5.24;
+   use experimental 'signatures';
+   use App::Easer V2 => 'run';
+   my $app = {
+      aliases     => ['foo'],
+      help        => 'this is the main app',
+      description => 'Yes, this really is the main app',
+      options     => [
+         {
+            name        => 'foo',
+            help        => 'option foo!',
+            getopt      => 'foo|f=s',
+            environment => 'FOO',
+            default     => 'bar',
+         },
+      ],
+      execute => sub ($instance) {
+         my $foo = $instance->config('foo');
+         say "Hello, $foo!";
+         return 0;
+      },
+      default_child => '-self',    # run execute by default
+      children => [
+         {
+            aliases => ['bar'],
+            help => 'this is a sub-command',
+            description => 'Yes, this is a sub-command',
+            execute => sub { 'Peace!' },
+         },
+      ],
+   };
+   exit run($app, $0, @ARGV);
+
+Call examples:
+
+   $ ./example.pl 
+   Hello, bar!
+
+   $ ./example.pl --foo World
+   Hello, World!
+
+   $ ./example.pl commands
+   sub-commands for ./example.pl
+               bar: this is a sub-command
+            help: print a help command
+         commands: list sub-commands
+
+   $ ./example.pl help
+   this is the main app
+
+   Description:
+      Yes, this really is the main app
+
+   Can be called as: foo
+
+   Options:
+               foo: option foo!
+                  command-line: mandatory string option
+                                 --foo <value>
+                                 -f <value>
+                     environment: FOO
+                        default: bar
+
+   Sub-commands:
+               bar: this is a sub-command
+            help: print a help command
+         commands: list sub-commands
+
+   $ ./example.pl help help
+   print a help command
+
+   Description:
+      Print help for (sub)command
+
+   Can be called as: help
+
+   This command has no option
+   No sub-commands
+
+   $ ./example.pl help commands
+   list sub-commands
+
+   Description:
+      Print list of supported sub-commands
+
+   Can be called as: commands
+
+   This command has no option
+   No sub-commands
+
+   $ ./example.pl inexistent
+   cannot find sub-command 'inexistent'
+
+   $ ./example.pl help inexistent
+   cannot find sub-command 'inexistent'
+
+=head1 DESCRIPTION
+
+B<NOTE>: THIS DOCUMENT HAS TO BE REVIEWED TO MAKE IT EXPLICIT THAT IT
+REFERS TO VERSION 2 OF THE API.
+
+App::Easer::V2 provides the scaffolding for implementing hierarchical
+command-line applications in a very fast way. This is Version 2 of the
+provided API, which does everything described below.
+
+It makes it extremely simple to generate an application based on
+specific interfacing options, while still leaving ample capabilities for
+customising the shape of the application. As such, it aims at making
+simple things easy and complex things possible, in pure Perl spirit.
+
+There are multiple ways to define an application. The two extremes are:
+
+=over
+
+=item *
+
+a hash reference with all the needed elements inside (see L</SYNOPSIS>
+for an example)
+
+=item *
+
+a sub-class of C<App::Easer::V2::Command> with methods overriding the
+needed elements where the programmer sees fit.
+
+=back
+
+App::Easer::V2 allows also to leverage both aspects at the same time for
+the same command, e.g. setting some parts through a hash reference and
+other parts with overriding methods.
+
+=head2 Top-Level Functions
+
+The following functions are exported by C<App::Easer::V2>:
+
+=over
+
+=item * C<appeaser_api>
+
+   my $api_version = appeaser_api();
+
+Return string C<V2>.
+
+=item * C<d>
+
+   d($whatever);
+
+Sends C<$whatever> through C<dd> and then to C<warn>.
+
+=item * C<dd>
+
+   my $dumped = dd($whatever);
+
+Sends C<$whatever> through L<Data::Dumper> and returns it.
+
+=item * C<run>
+
+   my $exit_code = run($cmd_hashref, $0, @ARGV);
+
+Run a command with the provided parameters (first the name of the
+command, using C<$0>, then the command-line arguments).
+
+=back
+
+In addition to importing the functions above, the following keys are
+also supported when C<use>ing the module:
+
+=over
+
+=item * C<-command>
+
+The package from where C<App::Easer::V2> is C<use>d is a command and
+inherits from C<App::Easer::V2::Command>, as well as registering as a
+command. This is the combined effect of C<-inherit> and C<-register>
+below.
+
+=item * C<-inherit>
+
+The package from where C<App::Easer::V2> is C<use>d inherits from
+C<App::Easer::V2::Command>. Usually C<-command> is the right one though.
+
+=item * C<-register>
+
+Register this package as a valid (sub)command.
+
+=item * C<-spec>
+
+Provide a specification hash reference to set many attributes of the
+specific command. This hash reference is saved into the package's
+variable C<app_easer_spec>.
+
+=back
+
+The options above allow easily define a new class for a command like
+this:
+
+   use App::Easer::V2 -command => -spec => { ... };
+
+
+=head2 Anatomy of a run
+
+Running an application can be done in several ways, depending on how the
+application is represented:
+
+   # application defined as a hashref or arrayref
+   use App::Easer V2 => 'run';
+   exit run($app, $0, @ARGS);
+
+   # application defined in a class
+   use MyApp;
+   exit MyApp->new->run($0, @ARGS);
+
+When an application is run, the following high level algorithm is
+applied:
+
+=over
+
+=item *
+
+Options are gathered from different I<sources>, like e.g. the
+command-line, environment variables, parent commands (in lower levels of
+the command hierarchy), files, or defaults.
+
+=item *
+
+A I<commit> hook is called, if present, allowing an intermediate command
+to perform some actions before a sub-command is run. This hook has been
+anticipated I<before> validation in V2.
+
+=item *
+
+A I<validation> hook is called, if present, allowing check of the
+provided configuration, e.g. to spot incompatible options.
+
+=item *
+
+A sub-command is searched if possible and, if present, the process
+restarts from the first bullet above with this sub-command.
+
+=item *
+
+When the final sub-command is reached, the I<execute> hook is run.
+
+=back
+
+
+=head2 Application High Level View
+
+The following list provides all keys/method names that are recognized in
+the definition of an application with C<App::Easer::V2>. Items markes as
+C<Executable> can be provided as sub references or with overriding the
+corresponding method in the derived class.
+
+=over
+
+=item C<aliases>
+
+Array of strings.
+
+The array contains alias names for the command. The first alias is also
+considered the C<name> in case a C<name> is missing.
+
+=item C<allow_residual_options>
+
+Boolean, defaults to I<false>.
+
+Signal that the parsing of the command line must not fail if residual,
+unrecognized options are found. This allows e.g. building wrappers
+around external commands without the need to re-implement all of their
+options.
+
+=item C<auto_environment>
+
+Boolean, defaults to I<false>.
+
+Signal that all options without an C<environment> key should get one set
+to value 1, triggering auto-generation of the environment variable name.
+
+=item C<children>
+
+Array of items.
+
+Provides a list of children for the command. Children can be provided as
+hash references (whose structure is the same as anytyhing supported by
+C<hashy_class>), array references (whose first item is the name of a
+class and the rest is provided to its C<new> method), a string (which
+leads to a class name that can be instantiated without parameters), or a
+blessed object.
+
+Anything that does not eventually produce a C<App::Easer::V2::Command>
+should be considered a liability.
+
+=item C<children_prefixes>
+
+Array of strings. Defaults to C<[$pkg . '::Cmd']>.
+
+Each string in the array is used as a prefix to look for sub-commands in
+C<@INC>.
+
+Assuming the main command is implemented in class C<MyApp>, the default
+value looks for classes named C<MyApp::Cmd*>, e.g. C<MyApp::CmdFoo> and
+C<MyApp::CmdBar> and I<ignores> classed named C<MyApp::Common> or
+C<MyApp::Utils>.
+
+=item C<commit>
+
+Executable with signature:
+
+   sub commit_function ($app) { ... }
+
+where C<$app> is the blessed object for the application.
+
+Perform the I<commit> hook for the application, which is called
+immediately after the I<collection> of options for the command and
+before looking further down for sub-commands or calling the C<execute>
+method. Every weird action like fiddling with the command-line arguments
+etc. should be done here.
+
+=item C<default_child>
+
+String. Defaults to C<help>.
+
+The name of a sub-command to invoke if no non-option values are set on
+the command line for a non-leaf command.
+
+If set to C<-self>, lack of an explicit child name on the command line
+means that the C<execute> of the command itself should be run.
+
+See also C<fallback_to>.
+
+=item C<description>
+
+String.
+
+A verbose form of C<help>, usually providing details about how the
+command works. This is used when generating the whole help for the
+command.
+
+=item C<environment_prefix>
+
+String.
+
+A prefix that is applied to an options's name to derive an environment
+variable name. Used when C<auto_environment> is true and no
+C<environment> key is present in the option's specification, or when the
+C<environment> key points to value C<1>.
+
+=item C<execute>
+
+Executable.
+
+=item C<getopt_config>
+
+Array of strings. See below for defaults.
+
+A list of strings to use to configure C<Getopt::Long> for the specific
+command.
+
+By default it is set to C<gnu_getopt>. If a command is I<not> a leaf,
+C<require_order> and C<pass_through> are added too, although the latter
+only temporarily to allow for chaining (unrecognized options might still
+trigger an exception). If C<allow_residual_options> is true,
+C<pass_through> is added.
+
+
+=item C<help>
+
+A concise form of help, ideally a single line to explain what the
+(sub-)command does. It is used when generating the whole help for the
+command, as well as the list of sub-commands of the help for the parent
+command.
+
+=item C<options>
+
+Array of items.
+
+See L</OPTIONS>.
+
+=item C<fallback_to>
+
+String.
+
+The name of a sub-command to invoke if the first non-option command-line
+argument is not recognized as a children command for non-leaf commands.
+
+If set to C<-self>, lack of a valid child name on the command line means
+that the C<execute> of the command itself should be run.
+
+If set to C<-default>, the C<default_child> is used.
+
+If set to a non-negative integer I<n>, the I<n-th> child is used from
+the list of children.
+
+If set to a string, the corresponding child is used.
+
+Otherwise, an exception is raised.
+
+See also C<default_child>.
+
+=item C<force_auto_children>
+
+Boolean. Defaults to I<false>.
+
+Force the generation of the so-called I<auto>-children even for leaf
+commands (i.e. commands without sub-commands either in C<children> or
+from the class hierarchy).
+
+Auto-children are the C<help>, C<commands>, and C<tree> sub-commands.
+
+This can come handy when C<default_child>/C<fallback_to> are set to
+C<-self> and the three words C<help>, C<commands>, and C<tree> are not
+possible valid values as arguments for the leaf command itself (e.g.
+when it does not use non-option command line arguments).
+
+=item C<hashy_class>
+
+String. Defaults to C<App::Easer::V2::Command>.
+
+The class name to use for inflating applications defined as hash
+references into objects.
+
+Anything different from the default is a liability.
+
+=item C<help_channel>
+
+String. Defaults to C<-STDOUT:encoding(UTF-8)>.
+
+Set the output channel for automatic commands C<help>, C<commands>, and
+C<tree>.
+
+It can be set to:
+
+=over
+
+=item *
+
+a sub reference, which will be called with the following signature:
+
+   sub channel ($cmd_object, @stuff_to_print);
+
+=item *
+
+a filehandle, used to print out stuff
+
+=item *
+
+a reference to a scalar, where the output will be placed
+
+=item *
+
+a string of the form C<filename[:binmode]>, where C<filename> can B<NOT>
+contain the character C<:>. The file will be opened and if the
+C<binmode> part is provided, C<binmode()> will be called on the
+resulting filehandle with the provided value.
+
+If the C<filename> part is C<-> or C<-stdout> (case insensitive), then
+C<STDOUT> will be used. If C<filename> is C<-stderr> (case insensitive),
+then C<STDERR> will be used.
+
+=back
+
+=item C<name>
+
+String.
+
+Name of the command. If absent, the first item in the C<alias> array is
+used.
+
+=item C<params_validate>
+
+Hash reference or C<undef>.
+
+If passed as a hash reference, two keys are supported:
+
+=over
+
+=item C<args>
+
+call C<Params::Validate::validate_pos> on the C<residual_args> (see
+L</OPTIONS>).
+
+=item C<config>
+
+call C<Params::Validate::validate> on the collected I<merged>
+configuration (see L</OPTIONS>).
+
+=back
+
+=item C<sources>
+
+Array of items.
+
+See L</OPTIONS>.
+
+=back
+
+The following YAML representation gives an overview of the elements that
+define an application managed by C<App::Easer::V2>, highlighting the
+necessary or I<strongly suggested> ones at the beginning:
+
+  aliases: «array of strings»
+  execute: «executable»
+  help: «string»
+  options: «array of hashes»
+
+  allow_residual_options: «boolean»
+  auto_environment: «boolean»
+  children: «array of hashes»
+  children_prefixes: «array of strings»
+  commit: «executable»
+  default_child: «string»
+  description: «string»
+  environment_prefix: «string»
+  fallback_to: «string»
+  force_auto_children: «boolean»
+  hashy_class: «string»
+  help_channel: «string»
+  name: «string»
+  params_validate: «hash»
+  sources: «array of items»
+  validate: «executable»
+
+As anticipated, it's entirely up to the user to decide what style is
+best, i.e. define applications through metadata only, through
+object-oriented derivation, or through a mix of the two. The following
+examples are aimed at producing the same application:
+
+   # metadata (mostly)
+   my $app_as_metadata = {
+      aliases => [qw< this that >],
+      help => 'this is the application, but also that',
+      options => [ { getopt => 'foo|f=s', default => 'bar' } ],
+      execute => sub ($app) {
+         say 'foo is ', $app->config('foo');
+         return 0;
+      },
+   };
+
+   # class only
+   package ThisThatApp;
+   use App::Easer::V2 '-command';
+   sub aliases ($self) { return [qw< this that >] }
+   sub help ($self) { return 'this is the application, but also that' }
+   sub options ($self) { [ { getopt => 'foo|f=s', default => 'bar' } ] }
+   sub execute ($self) {
+      say 'foo is ', $self->config('foo');
+      return 0;
+   }
+
+   # mixed style
+   package ThisThatMixedApp;
+   use App::Easer::V2 -command => -spec => {
+      aliases => [qw< this that >],
+      help => 'this is the application, but also that',
+      options => [ { getopt => 'foo|f=s', default => 'bar' } ],
+   };
+   sub execute ($self) {
+      say 'foo is ', $self->config('foo');
+      return 0;
+   }
+
+The last style allows keeping data mostly as data, while leaving the
+freedom to implement the logic as proper methods, which can be
+beneficial for e.g. sharing common logic among several commands.
+
+=head1 App::Easer::V2::Command METHODS
+
+When a command is created, it is (usually) an instance of class
+C<App::Easer::V2::Command> or a descendant. As such, it has the
+methods explained in the following list, which at the moment appear as
+public ones although some might be hidden in the future (stable ones are
+expressely marked so).
+
+=over
+
+=item C<auto_children>
+
+   my @classes = $self->auto_children;
+   my @objects = $self->auto_children(1);
+
+Return a list of the automatic children (C<help>, C<commands>, and
+C<tree>) as inflatable children, i.e. as fully qualified class names. If
+an optional true value is passed, children are inflated into objects.
+
+=item C<auto_commands>
+
+   my $instance = $self->auto_commands;
+
+Returns an instance representing the C<commands> sub-command.
+
+=item C<auto_help>
+
+   my $instance = $self->auto_help;
+
+Returns an instance representing the C<help> sub-command.
+
+=item C<auto_tree>
+
+   my $instance = $self->auto_tree;
+
+Returns an instance representing the C<tree> sub-command.
+
+=item C<aliases>
+
+   my @aliases = $self->aliases;
+   my @modified = $self->aliases(\@new_aliases);
+
+Gets/sets the aliases. If not set, C<name> is used.
+
+See L</Application High Level View>.
+
+=item C<allow_residual_options>
+
+   my $boolean = $self->allow_residual_options;
+   $self->allow_residual_options(0); # disable
+   $self->allow_residual_options(1); # enable
+
+See L</Application High Level View>.
+
+=item C<auto_environment>
+
+   my $boolean = $self->auto_environment;
+   $self->auto_environment(0); # disable
+   $self->auto_environment(1); # enable
+
+See L</Application High Level View>.
+
+=item C<call_name>
+
+   my $string = $self->call_name;
+   $self->call_name('override, for no reason apparently...');
+
+Returns a string with the name used to call the sub command (useful to
+figure out which of the C<aliases> was used).
+
+The method can also be used to I<set> this name, if needed. This is not
+guaranteed to be future-proof.
+
+=item C<children>
+
+   my @direct_children = $self->children;
+   $self->children(\@new_direct_children);
+
+Get/set the list of I<direct> children. Other children might be
+collected automatically from the class hierarchy.
+
+Use of this method is discouraged and not future-proof.
+
+See L</Application High Level View>.
+
+=item C<children_prefixes>
+
+   my $aref = $self->children_prefixes;
+   $self->children_prefixes(\@new_prefixes);
+
+See L</Application High Level View>.
+
+=item C<collect>
+
+   $self->collect;
+
+Collect options values from the configured sources, see L</OPTIONS>.
+
+Not assumed to be used directly. Overloading is a liability.
+
+=item C<commit>
+
+   $self->commit;
+
+Commit the collected options.
+
+Not assumed to be used directly.
+
+It can be overloaded to provide a custom behaviour, which can e.g.
+modify C<residual_args> or C<config_hash> to drive following steps of
+looking for a sub-command.
+
+=item C<config>
+
+   my $value = $self->config($key);   # returns a scalar anyway
+   my @values = $self->config(@keys);
+
+Retrieve collected option values.
+
+=item C<config_hash>
+
+   my $merged_hash = $self->config_hash;
+   my $detailed    = $self->config_hash(1);
+
+Get the collected option values as a hash.
+
+In the basic case, a I<merged> hash is returned, with values taken from
+sources according to their priorities.
+
+In the advanced case where a I<true> value is passed as optional
+argument, a hash with two keys C<merged> and C<sequence> is returned.
+The explanation of the data format is beyond the scope of this manual
+page.
+
+=item C<default_child>
+
+   my $dc = $self->default_child;
+   $self->default_child($new_name);
+
+See L</Application High Level View>.
+
+=item C<description>
+
+   my $text = $self->description;
+   $self->description($updated_description);
+
+See L</Application High Level View>.
+
+=item C<environment_prefix>
+
+   my $prefix = $self->environment_prefix;
+   $self->environment_prefix($new_prefix);
+
+See L</Application High Level View>.
+
+=item C<environment_variable_name>
+
+   my $name = $self->environment_variable_name($opt_hash);
+
+Get the environment variable name set for the specific option described
+by C<$opt_hash>. If it contains an C<environment> key and it has a name,
+that is returned, otherwise if it is C<1> then an environment variable
+is generated from C<envoronment_prefix> and C<name>.
+
+=item C<execute>
+
+   $self->execute;
+
+Code that executes the main logic of the command.
+
+If a sub reference was provided with C<execute> in the application
+definition, that is called receiving the object as its only parameter.
+Otherwise, the intended use is to override this method in a derived
+class for a command.
+
+It is not meant to be called directly.
+
+=item C<execution_reason>
+
+   my $reason = $self->execution_reason;
+
+A string representing the reason why the specific C<execute>
+method/callback was selected, can be one of:
+
+=over
+
+=item * C<-default>
+
+The command was selected as the default child set for a command.
+
+=item * C<-fallback>
+
+The command was selected as a result of the C<fallback> method.
+
+=item * C<-leaf>
+
+The command is a leaf and has no sub-commands.
+
+=back
+
+=item C<fallback>
+
+   my $name = $self->fallback;
+
+Select a fallback child, or the invoking command itself (returning
+C<-self>) as the command that should be investigated next or executed.
+
+This method is called when there are unrecognized non-option
+command-line arguments that lead to no child of a non-leaf command. The
+selection is performed using C<fallback_to>.
+
+=item C<fallback_to>
+
+   my $name = $self->fallback_to;
+   $self->fallback_to($new_fallback);
+
+Get/set the fallback string for figuring out the fallback in case of
+need. Used by C<fallback>.
+
+See L</Application High Level View>.
+
+=item C<find_child>
+
+   my ($child_instance, @child_args) = $self->find_child;
+
+Look for a child to hand execution over. Returns an child instance or
+undef (which means that the C<$self> is in charge of executing
+something). This implements the most sensible default, deviations will
+have to be coded explicitly.
+
+This method is called by C<run> and is not expected to be called
+elsewhere. It use is discouraged and not future-proof.
+
+Returns a list with the selected children and the arguments to feed to
+its C<run> method:
+
+=over
+
+=item *
+
+   (undef, '-leaf')
+
+if no child exists. In this case, the caller command's C<execute> method
+should be used.
+
+=item *
+
+   ($instance, @args)
+
+if a child is found in C<$args[0]>.
+
+=item *
+
+   ($instance, '-default')
+
+if the default child is returned.
+
+=item *
+
+   (undef, '-fallback')
+
+in case $self is the fallback and should be used for calling the
+C<execute> method.
+
+=item *
+
+   ($instance, '-fallback', @args)
+
+in case the fallback is returned, with the residual unparsed arguments.
+
+=back
+
+=item C<find_matching_child>
+
+   my $instance = $self->find_matching_child($name);
+
+Find and instantiate a child matching C<$name>, either directly or as an
+alias.
+
+=item C<force_auto_children>
+
+   my $boolean = $self->force_auto_children;
+   $self->force_auto_children(0); # disable
+   $self->force_auto_children(1); # enable
+
+See L</Application High Level View>.
+
+=item C<full_help_text>
+
+   my $text = $self->full_help_text;
+
+Get the full auto-generated help text for the command, e.g. to print it.
+
+=item C<getopt_config>
+
+   my $aref = $self->getopt_config;
+   $self->getopt_config(\@custom_getopt_long_configuration);
+
+See L</Application High Level View>.
+
+=item C<hashy_class>
+
+   my $class = $self->hashy_class;
+   $self->hashy_class($new_class);
+
+Setting this to anything different from C<App::Easer::V2::Command> is a
+liability, although it might make sense to set to a derived class to
+provide a common set of methods useful for the specific application.
+
+See L</Application High Level View>.
+
+=item C<help>
+
+   my $text = $self->help;
+   $self->help($new_help_line);
+
+See L</Application High Level View>.
+
+=item C<help_channel>
+
+   my $ch = $self->help_channel;
+   $self->help_channel($new_channel);
+
+See L</Application High Level View>.
+
+=item C<inflate_children>
+
+   my @instances = $self->inflate_children(@hints);
+
+Turn a list of C<@hints> into corresponding instances.
+
+A blessed hint is always returned unmodified, assuming it's already a
+valid instance. No check on the class is performed.
+
+A hash reference is inflated using C<hashy_class>.
+
+An array reference assumes that the first element in the array is a
+valid C<hashy_class> and the rest of the items are passed to its C<new>
+method.
+
+Anything else is considered a string containing a class to instantiate.
+
+Actual instantiation is done using method C<instantiate>.
+
+Direct use of this method is a liability.
+
+=item C<inherit_options>
+
+   my @options = $self->inherit_options(@options_names);
+
+Look for matching names in a parent's options. This does technically
+I<not> put these options inside the command, but it is used internally
+to achieve this goal.
+
+This method is not meant to be called directly and is subject to become
+a private method, so its usage is discouraged and not future-proof.
+
+=item C<instantiate>
+
+   my $instance = $self_or_package->instantiate($class, @args);
+
+This method loads class C<$class> via C<load_module> and returns:
+
+   $class->new(@args);
+
+This is a class method.
+
+=item C<list_children>
+
+   my @children = $self->list_children;
+
+Return the I<full> list of children for a command, including ones
+gathered in the class tree and auto-generated ones (these are added only
+if there are other children or if C<force_auto_children> is set to a
+I<true> value).
+
+=item C<load_module>
+
+   my $module_name_copy = $self->load_module($module_name);
+
+Load C<$module_name> with C<require> and return the name itself. The
+module name can only be provided using C<::> as separators. No specific
+bug from the past of Perl is addressed.
+
+=item C<merge_hashes>
+
+   my $merged = $self->merge_hashes(@inputs);
+
+Takes a list of input hash references and generates a merged version of
+all of them. Hashes in C<@inputs> are supposed to be provided in
+priority order, where those coming first take precedence over those
+coming next.
+
+=item C<name>
+
+   my $name = $self->name;
+   $self->name($new_name);
+
+Get/set name of command. If not present, the first item of C<aliases> is
+used. If this is not set too, or empty, string C<** no name **> is used.
+
+See L</Application High Level View>.
+
+=item C<name_for_option>
+
+   my $opt_name = $self->name_for_option($opt_spec_hashref);
+
+Get the option's name, either from its C<name> key, or deriving it from
+C<getopt>, or from C<environment>. Returns C<~~~> if none of them works.
+
+=item C<new>
+
+   my $instance = $class->new(@spec);
+   my $other    = $class->new(\%spec);
+
+Instantiate a new object, using the provided values.
+
+In derived classes, additional specifications are also taken from the
+package variable C<$class . '::app_easer_spec'>, if set.
+
+=item C<options>
+
+   my @options_aoh = $self->options;
+   $self->options(\@new_options);
+
+See L</Application High Level View> and L</OPTIONS>. The returned list
+if passed through C<resolve_options> anyway, e.g. to inherit options.
+
+=item C<params_validate>
+
+   my $href_or_undef = $self->params_validate;
+   $self->params_validate($new_pv_conf);
+
+See L</Application High Level View>.
+
+=item C<parent>
+
+   my $parent_command = $self->parent;
+
+Get the parent command.
+
+=item C<ref_to_sub>
+
+   my $sub = $self->ref_to_sub($locator);
+
+Turn a I<locator> for a sub into a proper reference to a sub. The
+C<$locator> can be:
+
+=over
+
+=item *
+
+a sub reference, that is returned unmodified;
+
+=item *
+
+an array reference with two items inside, i.e. a class/module name
+followed by a method/function name
+
+=item *
+
+a string pointing to the function, either fully qualified as in
+C<My::Class::function> or as a plain name that will be looked for in the
+class of C<$self>.
+
+=back
+
+=item C<residual_args>
+
+   my @residual_args = $self->residual_args;
+   $self->residual_args(@new_args);
+
+Access the list of I<residual> (i.e. unparsed) arguments from the
+command line.
+
+=item C<resolve_options>
+
+   my @options = $self->resolve_options($single_specification);
+
+Expand a C<$single_specification> into one or more options. Basic
+optiosn specifications are hash references, but they might be strings
+like C<+parent> (for inheriting all that is I<transmitted> from a parent
+command) or regular expressions to bulk import options based on their
+names.
+
+=item C<run>
+
+   $self->run($command_name, @arguments);
+
+Run a command. The first parameter is the command name, it should
+probably be set to C<$0> when calling the topmost command.
+
+Running means parsing all options and potentially looking for
+sub-commands, until one is found.
+
+Returns whatever the C<execute> method of the selected sub-command
+returns.
+
+=item C<run_help>
+
+   $self->run_help;
+
+Run the C<auto_help> command, which should print out the help for the
+command itself. This is not usually needed, but comes handy to implement
+printing the help not via a sub-command but honoring a command-line
+option, like this:
+
+   sub execute ($self) {
+      return $self->run_help if $self->config('help');
+      ...
+   }
+
+=item C<set_config>
+
+   $self->set_config(foo => 'bar');
+
+Set a new value for a configuration, overriding what has been found out
+from the several input sources.
+
+=item C<slot>
+
+   my $hashref = $self->slot;
+   $self->slot($new_data);
+
+C<App::Easer::V2> uses a blessed hash reference to manage all data
+related to an object representing a command. To minimize overlapping
+with a user's object data, all data for C<App::Easer::V2> is kept in a
+sub-hash pointed by the C<slot> key, like this:
+
+   bless {
+      $class_name => {
+         ... all actual App::Easer::V2 stuff here ...
+      }
+   }, $hashy_class;
+
+This method gives access to this slot and can be overridden to keep this
+data elsewhere, e.g. in an array element or in an inside-out object,
+without the need to re-implement all accessors.
+
+=item C<slurp>
+
+   my $contents   = $self->slurp($filename);
+   my $contents_2 = $self->slurp($filename, '<:raw');
+
+Get the whole contents from a file, optionally specifying the mode for
+openining the file. By default, UTF-8 encoding is assumed and enforced.
+
+Use of this method is discouraged and not future-proof.
+
+=item C<sources>
+
+   my @sources = $self->sources;
+   $self->sources(\@new_sources_list);
+
+See L</Application High Level View> and L</OPTIONS>.
+
+=item C<validate>
+
+=back
+
+=head1 OPTIONS
+
+The main capability provided by C<App::Easer> is the flexibility to
+handle options, collecting them from several sources and merging them
+together according to priorities.
+
+Supported options are set in an array of hashes (or strings) pointed by
+the C<options> key. Each hash in the array sets the details regarding a
+single option.  When provided as string, the option is I<inherited> from
+a parent, allowing the sub-command to expose the same option as the
+parent. This gives freedom to put options and values either in the
+parent or in the descendant command, providing flexibility.
+
+This is a YAML overview of how to set one option as a hash:
+
+   name: «string»
+   help: «string»
+   transmit: «boolean»
+   transmit_exact: «boolean»
+   getopt: «string»
+   environment: «string» or 1
+   default: any value
+
+A few keys inside the hash regard the option itself, like:
+
+=over
+
+=item * C<name>
+
+name of the option. This is not mandatory if C<getopt> is present, which
+gets the name automatically from the first alias of the option itself;
+
+=item * C<help>
+
+some help about the option.
+
+=item * C<transmit>
+
+boolean to set whether an option can be easily "inherited" by a
+sub-command (without the need to put all attributes of the option once
+again).
+
+=item * C<transmit_exact>
+
+boolean to set whether the option must be spelled exactly to be
+inherited (no inheritance via a regular expression).
+
+=back
+
+=head2 Option Values Collection
+
+The collection is performed thanks to I<sources>, which can be set with
+the corresponding C<sources> key or method (depending on the style).
+C<App::Easer> comes with several sources for getting configurations from
+a variety of places, but still leaves the door open to add more
+customized ones.
+
+Sources are I<considered> with respect to two different ordering
+methods: their place in the array pointed by key C<sources> and their
+I<priority>. The former sets the order in which data from each source is
+collected, the latter sets the precedence while assembling conflicting
+data from several different sources (lower priorities means higher
+precedence).
+
+Each source can be set either as a C<$locator> (see ahead) or as an
+array reference with the following structure:
+
+   [ $locator, @args ]
+
+The C<$locator> can be a reference to a sub, which is used as the source
+itself, or a string that allows getting the source sub to handle the
+specific source. Strings starting with the C<+> character are reserved
+for sources provided by C<App::Easer::V2> natively.
+
+If C<$locator> is a plain string, it is possible to set the I<priority>
+directly inside it with C<=NN> (e.g. C<+Default=100>).  It's not
+necessary to set the priority; if missing, it will be assumed to be 10
+more than the previous one in the array (with the first item starting at
+10). This also means that, by default, the ordering of sources also
+doubles down as the ordering of precedence.
+
+The C<@args> part can provide additional arguments to the specific
+source; its applicability is dependent on the source itself. As the only
+exception, if the I<first> item of C<@args> is a hash reference, it will
+be removed from the array and used to gather additional I<meta-options>
+used directly by C<App::Easer>. At the moment, this is an alternative
+way to set the priority of the specific source using the key
+C<priority>. This means that the following examples are equivalent:
+
+   # priority in source name, like anywhere else
+   [ '+FromTrail=90', qw< defaults foo baz > ],
+
+   # priority in meta-options first-arguments hash reference
+   [ '+FromTrail', {priority => 90}, qw< defaults foo baz > ],
+
+It's not necessary to set the C<sources> explicitly, as by default the
+following configuration is assumed:
+
+   +CmdLine +Environment +Parent=70 +Default=100
+
+where the respective priorities are, in order, 10, 20, 70, and 100.
+
+Sources provided out of the box by C<App::Easer::V2> are:
+
+=over
+
+=item * C<+CmdLine>
+
+This source gathers options from the command line arguments. It is set
+using the C<getopt> key, according to the rules explained in
+C<GetOpt::Long>. The first alias of an option is also set as the
+option's name in case key C<name> is missing.
+
+=item * C<+Environment>
+
+This source gets values from environment variables. It is set using the
+C<environment> key, which can be set to either the name of the
+environment variable (this is case sensitive) or automatically from
+higher-level configuration C<environment_prefix> and the option's name
+in case it is set to value C<1> exactly.
+
+=item * C<+Parent>
+
+This source gets values from a parent command (it only applies to
+sub-commands).
+
+=item * C<+Default>
+
+Get a default value from the C<default> sub-key of the option.
+
+=item * C<+JsonFileFromConfig>
+
+Get keys/values from a JSON file, whose path is pointed by a key in the
+collected options. By default this key is C<config>. To set a different
+key, pass this source as an array reference with the source name and the
+key, like this:
+
+   [ JsonFileFromConfig => 'jcnf' ]
+
+=item * C<+JsonFiles>
+
+Get keys/values from a few JSON files (it's OK if they do not exist). To
+set the files to try, pass this source as an array reference:
+
+   [ JsonFiles => @paths ]
+
+=item * C<+FromTrail>
+
+Get keys/values from a sub-hash of the already collected options (e.g.
+after loading them from a configuration file). The I<trail> to the
+position of the sub-hash is provided like this:
+
+   [ FromTrail => qw< topcmd subcmd additional_values > ]
+
+=back
+
+It is possible to set a I<default> value for the option used by
+C<JsonFileFromConfig>, as long as the C<+Default> source is placed
+before C<JsonFileFromConfig>. In this case, it's usually necessary to
+assign a lower priority value to C<JsonFileFromConfig> to make sure
+values read from there take precedence over the defaults:
+
+   sources => [qw<
+      +CmdLine=10 +Environment=20 +Parent=30 +Default=100
+      +JsonFileFromConfig=40
+   >];
+
+This is the main reason why the I<priority> has been detached from order
+of appearance.
+
+=head2 Accessing Collected Option Values
+
+Assuming the application object is C<$self>, there are a few methods to
+get the configurations:
+
+=over
+
+=item * C<config>
+
+   my $value = $self->config('foo');
+   my @values = $self->config(@multiple_keys);
+
+get whatever value was computed after collecting values from all sources
+and taking the one with the best (i.e. lowest) priority.
+
+=item * C<config_hash>
+
+   my $merged_hash   = $self->config_hash;
+   my $complete_hash = $self->config_hash(1);
+
+The first form (or any where the only parameter is considered I<false>
+by Perl) gets the I<merged> form, i.e. where each key has one value
+associated, based on the priorities set for the sources.
+
+The second form returns a more I<complicated> data structure where the
+C<sequence> key points to an array reference containing all details
+about data gathering. Explanation of this data structure is beyond the
+scope of this manual page.
+
+The second form cam be used in case the provided mechanism of
+prioritization is not sufficient.
+
+=item * C<residual_args>
+
+   my @args = $self->residual_args;
+
+Get all arguments from the command line that were not parsed (and hence
+I<left> for a sub-command or just unparsed).
+
+=back
+
+
+=head1 MIXED STUFF
+
+=head2 Managing help as a command-line option
+
+To get C<help> about a command, App::Easer::V2 provides a C<help>
+sub-command out of the box I<most of the times>. The exception is for
+I<leaf> commands, which do not have sub-commands.
+
+This is not a big deal with hierarchical applications, because it's
+possible to invoke the C<help> sub-command of the parent command and
+pass the name of the sub-command we need help with:
+
+   # print help about `topcmd`
+   $ topcmd help
+
+   # print help about `subcmd` under `topcmd`
+   $ topcmd help subcmd
+
+On the other hand, for non-hierarchical applications, the only available
+command is also a leaf and this hinders getting a meaningful,
+auto-generated help text off the shelf.
+
+In this case, it's possible to include an option for getting help, like
+this:
+
+   my $app = {
+      options => [
+         {
+            getopt => 'help|h!',
+            help   => 'print help on the command',
+         },
+         ...
+
+Then, inside the C<execute> sub, it's possible to I<run> the C<help>
+sub-command explicitly:
+
+   sub execute ($self) {
+      return $self->run_help if $self->config('help');
+
+      # ... normal code for "execute"
+      # ...
+   }
+
+
+=head1 BUGS AND LIMITATIONS
+
+Minimum perl version 5.24.
+
+Report bugs through GitHub (patches welcome) at
+L<https://github.com/polettix/App-Easer>.
+
+=head1 AUTHOR
+
+Flavio Poletti <flavio@polettix.it>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2021 by Flavio Poletti <flavio@polettix.it>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+=cut

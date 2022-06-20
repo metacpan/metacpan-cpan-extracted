@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-02'; # DATE
+our $DATE = '2022-05-14'; # DATE
 our $DIST = 'App-PericmdUtils'; # DIST
-our $VERSION = '0.052'; # VERSION
+our $VERSION = '0.053'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Perinci/CmdLine/POD/gen_pod_for_pericmd_script",
@@ -36,11 +36,9 @@ gen-pod-for-pericmd-script - Generate POD for Perinci::CmdLine-based CLI script
 
 =head1 VERSION
 
-This document describes version 0.052 of gen-pod-for-pericmd-script (from Perl distribution App-PericmdUtils), released on 2022-05-02.
+This document describes version 0.053 of gen-pod-for-pericmd-script (from Perl distribution App-PericmdUtils), released on 2022-05-14.
 
 =head1 SYNOPSIS
-
-Usage:
 
 % B<gen-pod-for-pericmd-script> [B<--common-opts>=I<s>] [B<--completer-script>=I<str>] [(B<--config-dirs>=I<dirname>)+] [B<--config-filename>=I<any>] [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--default-subcommand>=I<str>] [B<--env-name>=I<str>] [B<--format>=I<name>|B<--json>] [B<--gen-subcommand>=I<str>] [B<--gen-subcommands>|B<--no-gen-subcommands>|B<--nogen-subcommands>] [(B<--libs>=I<dirname>)+] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--per-arg-json>] [B<--per-arg-yaml>] [B<--program-name>=I<str>] [B<--read-config>] [B<--read-env>] [B<--script>=I<filename>] [B<--subcommands>=I<s>] [B<--summary>=I<str>] [B<--url>=I<str>] [B<--common-opts-json>=I<json>] [B<--config-dirs-json>=I<json>] [B<--config-filename-json>=I<json>] [B<--libs-json>=I<json>] [B<--subcommands-json>=I<json>]
 

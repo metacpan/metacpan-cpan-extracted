@@ -5,7 +5,7 @@ use v5.12;
 
 package Chart::Pie;
 our @ISA     = qw(Chart::Base);
-our $VERSION = 'v2.402.1';
+our $VERSION = 'v2.402.3';
 
 use Carp;
 use GD;
@@ -167,7 +167,6 @@ sub _draw_data
     # into account the angles where the labels will be plotted
 
     my $labeldistance = 2 * $self->maximum( $fontW, $fontH );
-
     $start_degrees = 0;
     $end_degrees   = 0;
     my $max_radius = $self->minimum( $width, $height ) / 2;
@@ -354,7 +353,6 @@ sub _draw_data
 
     }
     $diameter = $radius * 2 - 2 * $labeldistance;
-
     $text_diameter = $diameter + $labeldistance;
     $self->{'gd_obj'}->arc( $centerX, $centerY, $diameter, $diameter, 0, 360, $misccolor );
 

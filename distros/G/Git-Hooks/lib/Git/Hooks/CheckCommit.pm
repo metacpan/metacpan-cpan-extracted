@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Hooks::CheckCommit;
 # ABSTRACT: Git::Hooks plugin to enforce commit policies
-$Git::Hooks::CheckCommit::VERSION = '3.2.2';
+$Git::Hooks::CheckCommit::VERSION = '3.3.0';
 use v5.16.0;
 use utf8;
 use Carp;
@@ -311,6 +311,8 @@ sub code_errors {
                         {commit => $commit, option => 'check-code', details => $@});
             ++$errors;
         }
+    } continue {
+        $git->check_timeout();
     }
 
     return $errors;
@@ -428,7 +430,7 @@ Git::Hooks::CheckCommit - Git::Hooks plugin to enforce commit policies
 
 =head1 VERSION
 
-version 3.2.2
+version 3.3.0
 
 =head1 SYNOPSIS
 
@@ -693,6 +695,9 @@ as the script filename, which is executed by a B<do> command. Otherwise, the
 option's value is executed directly by an eval. Either way, the code must
 end with the definition of a routine, which will be called once for each
 commit with the following arguments:
+
+Since the codes may take much time to run, the plugin checks if the
+C<githooks.timeout> option has been violated after each code runs.
 
 =over
 

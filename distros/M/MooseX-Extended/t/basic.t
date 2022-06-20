@@ -12,7 +12,7 @@ package My::Names {
     param extra => ( is  => 'rw', isa => Str, required => 0 );
 
     field created => ( isa => PositiveInt, default => sub {time} );
-    field updated => ( is => 'rw', isa => PositiveInt, writer => 1, default => sub {time} );
+    field updated => ( is => 'rw', isa => PositiveInt, writer => 1, builder => sub {time} );
 
     sub name ($self) {
         my $title = $self->title;
@@ -56,6 +56,7 @@ subtest 'no title' => sub {
     my $updated = $person->updated;
     $person->set_updated( $updated + 1 );
     is $person->updated, $updated + 1, 'We should be able to update is => "rw" fields';
+    ok $person->can('_build_updated'), 'Coderef builder was installed as method';
 };
 
 subtest 'has title' => sub {

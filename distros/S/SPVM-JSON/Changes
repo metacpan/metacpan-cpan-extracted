@@ -1,5 +1,9 @@
 Revision history for SPVM::JSON
 
+0.02  2022-06-20
+  [CHANGES]
+  * SPVM::JSON first development release.
+
 0.01  2022-02-01
   [CHANGES]
   * SPVM::JSON first development release.

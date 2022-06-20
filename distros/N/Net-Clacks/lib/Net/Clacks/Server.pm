@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 23;
+our $VERSION = 24;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -27,6 +27,7 @@ use YAML::Syck;
 use MIME::Base64;
 use File::Copy;
 use Data::Dumper;
+use Scalar::Util qw(looks_like_number);
 
 # For turning off SSL session cache
 use Readonly;
@@ -90,14 +91,337 @@ sub new($class, $isDebugging, $configfile) {
         print "****** RUNNING WITH A SIMULATED TIME OFFSET OF ", $self->{timeoffset}, " seconds ******\n";
     }
 
-    $self->{clackscache} = {};
-    $self->{clackscachetime} = {};
-    $self->{clackscacheaccesstime} = {};
+    $self->{cache} = {};
 
     return $self;
 }
 
 sub init($self) {
+    # Dummy function for backward compatibility
+    warn("Deprecated call to init(), you can remove that function from your code");
+    return;
+}
+
+
+sub run($self) { ## no critic (Subroutines::ProhibitExcessComplexity)
+    if(!defined($self->{initHasRun}) || !$self->{initHasRun}) {
+        $self->_init();
+    }
+
+    # Let STDOUT/STDERR settle down first
+    sleep(0.1);
+
+    # Need to ignore SIGPIPE, this can screw us over in certain circumstances
+    # while writing to the network. We can only detect certain types of disconnects
+    # after writing to the socket, but we will get a SIGPIPE if we try. So we just
+    # ignore the signal and carry on as usual...
+    $SIG{PIPE} = 'IGNORE';
+
+
+    $SIG{INT} = sub { $self->{keepRunning} = 0; };
+    $SIG{TERM} = sub { $self->{keepRunning} = 0; };
+
+    # Restore persistance file if required
+    if($self->{persistance}) {
+        $self->_restorePersistanceFile();
+    }
+
+    while($self->{keepRunning}) {
+        $self->{workCount} = 0;
+
+        # Check for shutdown time
+        if($self->{shutdowntime} && $self->{shutdowntime} < time) {
+            print STDERR "Shutdown time has arrived!\n";
+            $self->{keepRunning} = 0;
+        }
+
+        my $now = $self->_getTime();
+        if($self->{savecache} && $now > ($self->{lastsavecache} + $self->{persistanceinterval})) {
+            $self->{lastsavecache} = $now;
+            $self->_savePersistanceFile();
+            $self->{savecache} = 0;
+        }
+
+        # We are in client mode. We need to add an interclacks link
+        if(defined($self->{config}->{master}->{socket}) || defined($self->{config}->{master}->{ip})) {
+            $self->_addInterclacksLink();
+        }
+
+        $self->_addNewClients();
+
+        $self->_disconnectClients();
+
+        if(!(scalar keys %{$self->{clients}})) {
+            # No clients to handle, let's sleep and try again later
+            sleep(0.1);
+            next;
+        }
+
+        $self->_clientInput();
+
+
+        foreach my $cid (keys %{$self->{clients}}) {
+            while(@{$self->{clients}->{$cid}->{charbuffer}}) {
+                my $buf = shift @{$self->{clients}->{$cid}->{charbuffer}};
+
+                $self->{workCount}++;
+                if($buf eq "\r") {
+                    next;
+                } elsif($buf eq "\n") {
+                    next if($self->{clients}->{$cid}->{buffer} eq ''); # Empty lines
+
+                    my %inmsg = (
+                        message => $self->{clients}->{$cid}->{buffer},
+                        releasetime => $now + $self->{clients}->{$cid}->{inmessagedelay},
+                    );
+                    push @{$self->{clients}->{$cid}->{inmessages}}, \%inmsg;
+                    $self->{clients}->{$cid}->{buffer} = '';
+                } else {
+                    $self->{clients}->{$cid}->{buffer} .= $buf;
+                }
+            }
+
+            if($self->{interclackslock} && !$self->{clients}->{$cid}->{interclacksclient}) {
+                # We are locked into interclacks sync lock, but this is not the connection to master,
+                # so we don't handle the input buffer for this client at the moment.
+                next;
+            }
+
+
+            while(scalar @{$self->{clients}->{$cid}->{inmessages}}) {
+                last if($self->{clients}->{$cid}->{inmessages}->[0]->{releasetime} > $now);
+                my $inmsgtmp = shift @{$self->{clients}->{$cid}->{inmessages}};
+                my $inmsg = $inmsgtmp->{message};
+
+                # Handle CLACKS identification header
+                if($inmsg =~ /^CLACKS\ (.+)/) {
+                    $self->{clients}->{$cid}->{clientinfo} = $1;
+                    $self->{clients}->{$cid}->{clientinfo} =~ s/\;/\_/g;
+                    print "Client at ", $cid, " identified as ", $self->{clients}->{$cid}->{clientinfo}, "\n";
+                    next;
+                }
+
+                $self->{nodebug} = 0;
+                $self->{sendinterclacks} = 1;
+                $self->{discardafterlogging} = 0;
+                # Handle OVERHEAD messages before logging (for handling 'N' flag correctly)
+                $self->_handleMessageOverhead($cid, $inmsg);
+
+                # Ignore other command when not authenticated
+                if(!$self->{clients}->{$cid}->{authok}) {
+                    next;
+                }
+
+                if(!$self->{nodebug}) {
+                    # Add ALL incoming messages as debug-type messages to the outbox
+                    my %tmp = (
+                        sender => $cid,
+                        type => 'DEBUG',
+                        data => $inmsg,
+                    );
+
+                    push @{$self->{outbox}}, \%tmp;
+                }
+
+                if($self->{discardafterlogging}) {
+                    next;
+                }
+
+
+
+                if($inmsg =~ /^OVERHEAD\ /) { ## no critic (ControlStructures::ProhibitCascadingIfElse)
+                    # Already handled
+                    next;
+                } elsif($self->_handleMessageDirect($cid, $inmsg)) {
+                    # Fallthrough
+                } elsif($self->_handleMessageCaching($cid, $inmsg)) {
+                    # Fallthrough
+                } elsif($self->_handleMessageControl($cid, $inmsg)) {
+                    # Fallthrough
+                # local managment commands
+                } else {
+                    print STDERR "ERROR Unknown_command ", $inmsg, "\r\n";
+                    $self->{sendinterclacks} = 0;
+                    $self->{clients}->{$cid}->{outbuffer} .= "OVERHEAD E unknown_command " . $inmsg . "\r\n";
+                }
+
+                # forward interclacks messages
+                if($self->{sendinterclacks}) {
+                    foreach my $interclackscid (keys %{$self->{clients}}) {
+                        if($cid eq $interclackscid || !$self->{clients}->{$interclackscid}->{interclacks}) {
+                            next;
+                        }
+                        $self->{clients}->{$interclackscid}->{outbuffer} .= $inmsg . "\r\n";
+                    }
+                }
+
+            }
+
+        }
+
+        # Clean up algorithm, only run every so often
+        if($self->{nextcachecleanup} < $now) {
+            $self->_cacheCleanup();
+            $self->{nextcachecleanup} = $now + $self->{config}->{cachecleaninterval};
+
+        }
+
+        $self->_outboxToClientBuffer();
+        $self->_clientOutput();
+
+        if($self->{workCount}) {
+            $self->{usleep} = 0;
+        } elsif($self->{usleep} < $self->{config}->{throttle}->{maxsleep}) {
+            $self->{usleep} += $self->{config}->{throttle}->{step};
+        }
+        if($self->{usleep}) {
+            sleep($self->{usleep} / 1000);
+        }
+    }
+
+    print "Shutting down...\n";
+
+    # Make sure we save the latest version of the persistance file
+    $self->_savePersistanceFile();
+
+    sleep(0.5);
+    foreach my $cid (keys %{$self->{clients}}) {
+        print "Removing client $cid\n";
+        # Try to notify the client (may or may not work);
+        $self->_evalsyswrite($self->{clients}->{$cid}->{socket}, "\r\nQUIT\r\n");
+
+        delete $self->{clients}->{$cid};
+    }
+    print "All clients removed\n";
+
+
+    return;
+}
+sub _savePersistanceFile($self) {
+    if(!$self->{persistance}) {
+        return;
+    }
+
+    print "Saving persistance file\n";
+
+    my $tempfname = $self->{config}->{persistancefile} . '_';
+    my $backfname = $self->{config}->{persistancefile} . '_bck';
+    if($self->{savecache} == 1) {
+        # Normal savecache operation only
+        copy($self->{config}->{persistancefile}, $backfname);
+    }
+
+    my $persistancedata = chr(0) . 'CLACKSV3' . Dump($self->{cache}) . chr(0) . 'CLACKSV3';
+    $self->_writeBinFile($tempfname, $persistancedata);
+    move($tempfname, $self->{config}->{persistancefile});
+
+    if($self->{savecache} == 2) {
+        # Need to make sure we have a valid backup file, since we had a general problem while loading
+        copy($self->{config}->{persistancefile}, $backfname);
+    }
+
+    return;
+}
+
+sub _deref($self, $val) {
+    return if(!defined($val));
+
+    while(ref($val) eq "SCALAR" || ref($val) eq "REF") {
+        $val = ${$val};
+        last if(!defined($val));
+    }
+
+    return $val;
+}
+
+sub _evalsyswrite($self, $socket, $buffer) {
+    return 0 unless(length($buffer));
+
+    my $written = 0;
+    my $ok = 0;
+    eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
+        $written = syswrite($socket, $buffer);
+        $ok = 1;
+    };
+    if($EVAL_ERROR || !$ok) {
+        print STDERR "Write error: $EVAL_ERROR\n";
+        return -1;
+    }
+
+    return $written;
+}
+
+sub _getTime($self) {
+    my $now = time + $self->{timeoffset};
+
+    return $now;
+}
+
+sub _slurpBinFile($self, $fname) {
+    # Read in file in binary mode, slurping it into a single scalar.
+    # We have to make sure we use binmode *and* turn on the line termination variable completly
+    # to work around the multiple idiosynchrasies of Perl on Windows
+    open(my $fh, "<", $fname) or croak($ERRNO);
+    local $INPUT_RECORD_SEPARATOR = undef;
+    binmode($fh);
+    my $data = <$fh>;
+    close($fh);
+
+    return $data;
+}
+
+sub _writeBinFile($self, $fname, $data) {
+    # Write file in binmode
+    # We have to make sure we use binmode *and* turn on the line termination variable completly
+    # to work around the multiple idiosynchrasies of Perl on Windows
+    open(my $fh, ">", $fname) or croak($ERRNO);
+    local $INPUT_RECORD_SEPARATOR = undef;
+    binmode($fh);
+    print $fh $data;
+    close($fh);
+
+    return 1;
+}
+
+sub _restorePersistanceFile($self) {
+    my $previousfname = $self->{config}->{persistancefile} . '_bck';
+    my $tempfname = $self->{config}->{persistancefile} . '_';
+    my $loadok = 0;
+    if(-f $self->{config}->{persistancefile}) {
+        print "Trying to load persistance file ", $self->{config}->{persistancefile}, "\n";
+        $loadok = $self->_loadPersistanceFile($self->{config}->{persistancefile});
+    }
+
+    if(!$loadok && -f $previousfname) {
+        print "Trying to load backup (previous) persistance file ", $previousfname, "\n";
+        $loadok = $self->_loadPersistanceFile($previousfname);
+        if($loadok) {
+            $self->{savecache} = 2; # Force saving a new persistance file plus a new backup
+        }
+    }
+    if(!$loadok && -f $tempfname) {
+        print "Oh no. As a final, desperate solution, trying to load a 'temporary file while saving' persistance file ", $tempfname, "\n";
+        $loadok = $self->_loadPersistanceFile($tempfname);
+        if($loadok) {
+            $self->{savecache} = 2; # Force saving a new persistance file plus a new backup
+        }
+    }
+
+    if(!$loadok) {
+        print "Sorry, no valid persistance file found. Starting server 'blankety-blank'\n";
+        $self->{savecache} = 2;
+    } else {
+        print "Persistance file loaded\n";
+    }
+    
+    return;
+}
+
+sub _init($self) {
+    if(defined($self->{initHasRun}) && $self->{initHasRun}) {
+        # NOT ALLOWED!
+        croak("Multiple calls to _init() are not allowed!");
+    }
 
     my @paths;
     if(defined($ENV{'PC_CONFIG_PATHS'})) {
@@ -118,7 +442,7 @@ sub init($self) {
         next unless (-f $fullfname);
         print "   Loading config file $fullfname\n";
 
-        $filedata = slurpBinFile($fullfname);
+        $filedata = $self->_slurpBinFile($fullfname);
 
         foreach my $varname (keys %ENV) {
             next unless $varname =~ /^PC\_/;
@@ -204,6 +528,24 @@ sub init($self) {
         $self->{config}->{stalecachetime} = 60 * 60 * 24; # 1 day
     }
 
+    if(!defined($self->{config}->{cachecleaninterval})) {
+        $self->{config}->{cachecleaninterval} = 60; # 1 minute
+    }
+
+    # Init run() variables
+    $self->{savecache} = 0;
+    $self->{lastsavecache} = 0;
+    $self->{outbox} = [];
+    $self->{toremove} = [];
+    $self->{clients} = {};
+    $self->{shutdowntime} = 0;
+    $self->{selector} = IO::Select->new();
+    $self->{interclackslock} = 0;
+    $self->{nextinterclackscheck} = 0;
+    $self->{keepRunning} = 1;
+    $self->{nextcachecleanup} = 0;
+    $self->{initHasRun} = 1;
+
     my @tcpsockets;
 
     if(defined($config->{ip})) {
@@ -288,11 +630,77 @@ sub init($self) {
     return;
 }
 
-sub loadPersistanceFile($self, $fname) {
+sub _loadPersistanceFile($self, $fname) {
+    my $alreadyupgraded = 0;
+
+retry:
+    if(!-f $fname) {
+        # Does not exist
+        carp("$fname not found");
+        return 0;
+    }
+
+    my $data = $self->_slurpBinFile($fname);
+    if(length($data) < 11) {
+        carp("$fname too small");
+        # Invalid file
+        return 0;
+    }
+    if(substr($data, 0, 9) ne chr(0) . 'CLACKSV3') {
+        if($alreadyupgraded) {
+            carp("Upgrade resulted in invalog file (wrong prefix)");
+            # Something went wrong with inplace upgrade
+            return;
+        }
+        $alreadyupgraded = 1;
+        if(!$self->_inplaceUpgrade($fname)) {
+            carp("Inplace upgrade failed");
+            # Could not upgrade
+            return 0;
+        }
+        goto retry;
+    }
+
+    if(length($data) < 18) {
+        carp("Incomplete V3 persistance file " . $fname . " (too small)!");
+        return 0;
+    }
+
+    substr($data, 0, 9, ''); # Remove header
+
+    if(substr($data, -9, 9) ne chr(0) . 'CLACKSV3') {
+        # Missing end bytes
+        carp("Incomplete V3 persistance file " . $fname . " (missing end bytes)!");
+        return 0; # Fail
+    }
+    substr($data, -9, 9, ''); # Remove end bytes
+
+    $self->{cache} = {};
+    if(length($data)) {
+        my $loadok = 0;
+        eval {
+            $self->{cache} = Load($data);
+            $loadok = 1;
+        };
+        if(!$loadok) {
+            carp("Invalid V3 persistance file " . $fname . "!");
+            return 0; # Fail
+        }
+    }
+
+    return 1;
+}
+
+sub _inplaceUpgrade($self, $fname) {
     my %clackscache;
     my %clackscachetime;
     my %clackscacheaccesstime;
 
+    print "Inplace-upgrading persistance file $fname...\n";
+
+    my $now = $self->_getTime();
+
+    # Use old loader algorithm to load file
     if(open(my $ifh, '<', $fname)) {
         my $line = <$ifh>;
         my $timestampline = <$ifh>;
@@ -315,7 +723,7 @@ sub loadPersistanceFile($self, $fname) {
 
         if(!defined($line) || !defined($timestampline) || $endline ne 'ENDBYTES') {
             carp("Invalid persistance file " . $fname . "! File is incomplete!");
-            return; # Fail
+            return 0; # Fail
         }
 
         my $loadok = 0;
@@ -328,13 +736,12 @@ sub loadPersistanceFile($self, $fname) {
             };
             if(!$loadok) {
                 carp("Invalid persistance file " . $fname . "! Failed to decode data line!");
-                return; # Fail
+                return 0; # Fail
             }
         }
         %clackscache = %{$line};
 
         # Mark all data as current as a fallback
-        my $now = $self->getTime();
         foreach my $key (keys %clackscache) {
             $clackscachetime{$key} = $now;
         }
@@ -348,7 +755,7 @@ sub loadPersistanceFile($self, $fname) {
             };
             if(!$loadok) {
                 carp("Invalid persistance file " . $fname . "! Failed to decode timestamp line, using current time!");
-                return; # Fail
+                return 0; # Fail
             } else {
                 my %clackstemp = %{$timestampline};
                 foreach my $key (keys %clackstemp) {
@@ -371,1071 +778,951 @@ sub loadPersistanceFile($self, $fname) {
             };
             if(!$loadok) {
                 carp("Invalid persistance file " . $fname . "! Failed to decode timestamp line, using current time!");
-                return; # Fail
+                return 0; # Fail
             } else {
                 %clackscacheaccesstime = %{$accesstimeline};
             }
         }
     } else {
         # Fail
-        return;
+        return 0;
     }
 
-    return \%clackscache, \%clackscachetime, \%clackscacheaccesstime;
-}
-
-
-sub run($self) { ## no critic (Subroutines::ProhibitExcessComplexity)
-    my $savecache = 0;
-    my $lastsavecache = 0;
-
-    # Let STDOUT/STDERR settle down first
-    sleep(0.1);
-
-    # Need to ignore SIGPIPE, this can screw us over in certain circumstances
-    # while writing to the network. We can only detect certain types of disconnects
-    # after writing to the socket, but we will get a SIGPIPE if we try. So we just
-    # ignore the signal and carry on as usual...
-    $SIG{PIPE} = 'IGNORE';
-
-    my @toremove;
-    my @outbox;
-    my %clients;
-
-    my $shutdowntime;
-    my $selector = IO::Select->new();
-    my $interclackslock = 0;
-    my $nextinterclackscheck = 0;
-
-    my $keepRunning = 1;
-    $SIG{INT} = sub { $keepRunning = 0; };
-    $SIG{TERM} = sub { $keepRunning = 0; };
-
-    # Restore persistance file if required
-    if($self->{persistance}) {
-        my $previousfname = $self->{config}->{persistancefile} . '_bck';
-        my $tempfname = $self->{config}->{persistancefile} . '_';
-        my $loadok = 0;
-        if(-f $self->{config}->{persistancefile}) {
-            print "Trying to load persistance file ", $self->{config}->{persistancefile}, "\n";
-            my ($cc, $cct, $cca) = $self->loadPersistanceFile($self->{config}->{persistancefile});
-            if(defined($cc) && ref $cc eq 'HASH') {
-                $self->{clackscache} = $cc;
-                $self->{clackscachetime} = $cct;
-                $self->{clackscacheaccesstime} = $cca;
-                $savecache = 1; # Force saving a new persistance file
-                $loadok = 1;
-            }
+    # Turn into new format
+    my %cache;
+    # not-deleted sets
+    foreach my $key (keys %clackscache) {
+        my $cachetime = $now;
+        my $accesstime = $now;
+        if(defined($clackscachetime{$key})) {
+            $cachetime = $clackscachetime{$key};
         }
-
-        if(!$loadok && -f $previousfname) {
-            print "Trying to load backup (previous) persistance file ", $previousfname, "\n";
-            my ($cc, $cct, $cca) = $self->loadPersistanceFile($previousfname);
-            if(defined($cc) && ref $cc eq 'HASH') {
-                $self->{clackscache} = $cc;
-                $self->{clackscachetime} = $cct;
-                $self->{clackscacheaccesstime} = $cca;
-                $savecache = 2; # Force saving a new persistance file plus a new backup
-                $loadok = 1;
-            }
+        if(defined($clackscacheaccesstime{$key})) {
+            $accesstime = $clackscacheaccesstime{$key};
         }
-        if(!$loadok && -f $tempfname) {
-            print "Oh no. As a final, desperate solution, trying to load a 'temporary file while saving' persistance file ", $tempfname, "\n";
-            my ($cc, $cct, $cca) = $self->loadPersistanceFile($tempfname);
-            if(defined($cc) && ref $cc eq 'HASH') {
-                $self->{clackscache} = $cc;
-                $self->{clackscachetime} = $cct;
-                $self->{clackscacheaccesstime} = $cca;
-                $savecache = 2; # Force saving a new persistance file plus a new backup
-                $loadok = 1;
-            }
-        }
-
-        if(!$loadok) {
-            print "Sorry, no valid persistance file found. Starting server 'blankety-blank'\n";
-            $savecache = 2;
-        } else {
-            print "Persistance file loaded\n";
-        }
+        $cache{$key} = {
+            data => $clackscache{$key},
+            cachetime => $cachetime,
+            accesstime => $accesstime,
+            deleted => 0,
+        };
     }
 
-    while($keepRunning) {
-        my $workCount = 0;
-
-        # Check for shutdown time
-        if($shutdowntime && $shutdowntime < time) {
-            print STDERR "Shutdown time has arrived!\n";
-            $keepRunning = 0;
-        }
-
-        my $now = $self->getTime();
-        if($savecache && $now > ($lastsavecache + $self->{persistanceinterval})) {
-            $lastsavecache = $now;
-            $self->savePersistanceFile($savecache);
-            $savecache = 0;
-        }
-
-        # We are in client mode. We need to add an interclacks link
-        if(defined($self->{config}->{master}->{socket}) || defined($self->{config}->{master}->{ip})) {
-            my $mcid;
-            if(defined($self->{config}->{master}->{socket})) {
-                $mcid = 'unixdomainsocket:interclacksmaster';
-            } else {
-                $mcid = $self->{config}->{master}->{ip}->[0] . ':' . $self->{config}->{master}->{port};
-            }
-            if(!defined($clients{$mcid}) && $nextinterclackscheck < $now) {
-                $nextinterclackscheck = $now + $self->{config}->{interclacksreconnecttimeout} + int(rand(10));
-
-                print "Connect to master\n";
-                my $msocket;
-
-                if(defined($self->{config}->{master}->{socket})) {
-                    $msocket = IO::Socket::UNIX->new(
-                        Peer => $self->{config}->{master}->{socket}->[0],
-                        Type => SOCK_STREAM,
-                    );
-                } else {
-                    $msocket = IO::Socket::IP->new(
-                        PeerHost => $self->{config}->{master}->{ip}->[0],
-                        PeerPort => $self->{config}->{master}->{port},
-                        Type => SOCK_STREAM,
-                        Timeout => 5,
-                    );
-                }
-                if(!defined($msocket)) {
-                    print STDERR "Can't connect to MASTER via interclacks!\n";
-                } else {
-                    print "connected to master\n";
-
-                    if(ref $msocket ne 'IO::Socket::UNIX') {
-                        # ONLY USE SSL WHEN RUNNING OVER THE NETWORK
-                        # There is simply no point in running it over a local socket.
-                        my $encrypted = IO::Socket::SSL->start_SSL($msocket,
-                                                                   SSL_verify_mode => SSL_VERIFY_NONE,
-                        );
-                        if(!$encrypted) {
-                            print "startSSL failed: ", $SSL_ERROR, "\n";
-                            next;
-                        }
-                    }
-
-                    $msocket->blocking(0);
-                    #binmode($msocket, ':bytes');
-                    my %tmp = (
-                        buffer  => '',
-                        charbuffer => [],
-                        listening => {},
-                        socket => $msocket,
-                        lastping => $now,
-                        mirror => 0,
-                        outbuffer => "CLACKS PageCamel $VERSION in interclacks client mode\r\n" .  # Tell the server we are using PageCamel Interclacks...
-                                     "OVERHEAD A " . $self->{authtoken} . "\r\n" .              # ...send Auth token
-                                     "OVERHEAD I 1\r\n",                                        # ...and turn interclacks master mode ON on remote side
-                        clientinfo => 'Interclacks link',
-                        client_timeoffset => 0,
-                        interclacks => 1,
-                        interclacksclient => 1,
-                        lastinterclacksping => $now,
-                        lastmessage => $now,
-                        authtimeout => $now + $self->{config}->{authtimeout},
-                        authok => 0,
-                        failcount => 0,
-                        outmessages => [],
-                        inmessages => [],
-                        messagedelay => 0,
-                        inmessagedelay => 0,
-                        outmessagedelay => 0,
-                    );
-
-                    if(defined($self->{config}->{master}->{ip})) {
-                        $tmp{host} = $self->{config}->{master}->{ip}->[0];
-                        $tmp{port} = $self->{config}->{master}->{port};
-                    }
-                    $clients{$mcid} = \%tmp;
-                    $msocket->_setClientID($mcid);
-                    $selector->add($msocket);
-
-                    $workCount++;
-                }
-            }
-        }
-
-        foreach my $tcpsocket (@{$self->{tcpsockets}}) {
-            my $clientsocket = $tcpsocket->accept;
-            if(defined($clientsocket)) {
-                $clientsocket->blocking(0);
-                my ($cid, $chost, $cport);
-                if(ref $tcpsocket eq 'IO::Socket::UNIX') {
-                    $chost = 'unixdomainsocket';
-                    $cport = $now . ':' . int(rand(1_000_000));
-                } else {
-                    ($chost, $cport) = ($clientsocket->peerhost, $clientsocket->peerport);
-                }
-                print "Got a new client $chost:$cport!\n";
-                $cid = "$chost:$cport";
-                foreach my $debugcid (keys %clients) {
-                    if($clients{$debugcid}->{mirror}) {
-                        $clients{$debugcid}->{outbuffer} .= "DEBUG CONNECTED=" . $cid . "\r\n";
-                    }
-                }
-
-                if(ref $clientsocket ne 'IO::Socket::UNIX') {
-                    # ONLY USE SSL WHEN RUNNING OVER THE NETWORK
-                    # There is simply no point in running it over a local socket.
-                    my $encrypted = IO::Socket::SSL->start_SSL($clientsocket,
-                                                               SSL_server => 1,
-                                                               SSL_cert_file => $self->{config}->{ssl}->{cert},
-                                                               SSL_key_file => $self->{config}->{ssl}->{key},
-                                                               SSL_cipher_list => 'ALL:!ADH:!RC4:+HIGH:+MEDIUM:!LOW:!SSLv2:!SSLv3!EXPORT',
-                                                               SSL_create_ctx_callback => sub {
-                                                                    my $ctx = shift;
-
-                                                                    # Enable workarounds for broken clients
-                                                                    Net::SSLeay::CTX_set_options($ctx, &Net::SSLeay::OP_ALL); ## no critic (Subroutines::ProhibitAmpersandSigils)
-
-                                                                    # Disable session resumption completely
-                                                                    Net::SSLeay::CTX_set_session_cache_mode($ctx, $SSL_SESS_CACHE_OFF);
-
-                                                                    # Disable session tickets
-                                                                    Net::SSLeay::CTX_set_options($ctx, &Net::SSLeay::OP_NO_TICKET); ## no critic (Subroutines::ProhibitAmpersandSigils)
-                                                                },
-                    );
-                    if(!$encrypted) {
-                        print "startSSL failed: ", $SSL_ERROR, "\n";
-                        next;
-                    }
-                }
-
-                $clientsocket->blocking(0);
-                #binmode($clientsocket, ':bytes');
-                #$clientsocket->{clacks_cid} = $cid;
-                my %tmp = (
-                    buffer  => '',
-                    charbuffer => [],
-                    listening => {},
-                    socket => $clientsocket,
-                    lastping => $now,
-                    mirror => 0,
-                    outbuffer => "CLACKS PageCamel $VERSION\r\n" .
-                                 "OVERHEAD M Authentication required\r\n",  # Informal message
-                    clientinfo => 'UNKNOWN',
-                    client_timeoffset => 0,
-                    host => $chost,
-                    port => $cport,
-                    interclacks => 0,
-                    interclacksclient => 0,
-                    lastinterclacksping => 0,
-                    lastmessage => $now,
-                    authtimeout => $now + $self->{config}->{authtimeout},
-                    authok => 0,
-                    failcount => 0,
-                    outmessages => [],
-                    inmessages => [],
-                    inmessagedelay => 0,
-                    outmessagedelay => 0,
-                );
-                if(0 && $self->{isDebugging}) {
-                    $tmp{authok} = 1;
-                    $tmp{outbuffer} .= "OVERHEAD M debugmode_auth_not_really_required\r\n"
-                }
-                $clients{$cid} = \%tmp;
-                $clientsocket->_setClientID($cid);
-                $selector->add($clientsocket);
-                $workCount++;
-            }
-        }
-
-        # Check if there are any clients to disconnect...
-
-        my $pingtime = $now - $self->{config}->{pingtimeout};
-        my $interclackspingtime = $now - $self->{config}->{interclackspingtimeout};
-        my $interclackspinginterval = $now - int($self->{config}->{interclackspingtimeout} / 3);
-        foreach my $cid (keys %clients) {
-            if(!$clients{$cid}->{socket}->connected) {
-                push @toremove, $cid;
-                next;
-            }
-            if(!$clients{$cid}->{interclacks}) {
-                if($clients{$cid}->{lastping} > 0 && $clients{$cid}->{lastping} < $pingtime) {
-                    $self->evalsyswrite($clients{$cid}->{socket}, "\r\nTIMEOUT\r\n");
-                    push @toremove, $cid;
-                    next;
-                }
-            } else {
-                if($clients{$cid}->{lastping} < $interclackspingtime) {
-                    $self->evalsyswrite($clients{$cid}->{socket}, "\r\nTIMEOUT\r\n");
-                    push @toremove, $cid;
-                    next;
-                }
-            }
-
-            if($clients{$cid}->{interclacks} && $clients{$cid}->{lastinterclacksping} < $interclackspinginterval) {
-                $clients{$cid}->{lastinterclacksping} = $now;
-                $clients{$cid}->{outbuffer} .= "PING\r\n";
-            }
-
-            if(!$clients{$cid}->{authok} && $clients{$cid}->{authtimeout} < $now) {
-                # Authentication timeout!
-                push @toremove, $cid;
-            }
-        }
-
-        # ...and disconnect them
-        while((my $cid = shift @toremove)) {
-            # In some circumstances, there may be multiple @toremove entries for the same client. Ignore them...
-            if(defined($clients{$cid})) {
-                print "Removing client $cid\n";
-                foreach my $debugcid (keys %clients) {
-                    if($clients{$debugcid}->{mirror}) {
-                        $clients{$debugcid}->{outbuffer} .= "DEBUG DISCONNECTED=" . $cid . "\r\n";
-                    }
-                }
-
-                if($clients{$cid}->{interclacksclient} && $interclackslock) {
-                    print "...this one is interclacks master and has us locked - UNLOCKING mid-sync!\n";
-                    $interclackslock = 0;
-                }
-
-                $selector->remove($clients{$cid}->{socket});
-                delete $clients{$cid};
-            }
-
-            $workCount++;
-        }
-
-        if(!(scalar keys %clients)) {
-            # No clients to handle, let's sleep and try again later
-            sleep(0.1);
+    # deleted sets
+    foreach my $key (keys %clackscachetime) {
+        if(defined($cache{$key})) {
+            # not deleted
             next;
         }
 
-
-        my $hasoutbufferwork = 0;
-        foreach my $cid (keys %clients) {
-            if(length($clients{$cid}->{buffer}) > 0) {
-                # Found some work to do
-                $hasoutbufferwork = 1;
-                last;
-            }
+        my $cachetime = $clackscachetime{$key};
+        my $accesstime = $now;
+        if(defined($clackscacheaccesstime{$key})) {
+            $accesstime = $clackscacheaccesstime{$key};
         }
-        my $selecttimeout = 0.5; # Half a second
-        if($hasoutbufferwork) {
-            $selecttimeout = 0.05;
+        $cache{$key} = {
+            data => '',
+            cachetime => $cachetime,
+            accesstime => $accesstime,
+            deleted => 0,
+        };
+    }
+
+    my $converted = chr(0) . 'CLACKSV3' . Dump(\%cache) . chr(0) . 'CLACKSV3';
+    $self->_writeBinFile($fname, $converted);
+
+    print "...upgrade complete.\n";
+
+    return 1;
+}
+
+sub _addInterclacksLink($self) {
+    my $now = $self->_getTime();
+
+    my $mcid;
+    if(defined($self->{config}->{master}->{socket})) {
+        $mcid = 'unixdomainsocket:interclacksmaster';
+    } else {
+        $mcid = $self->{config}->{master}->{ip}->[0] . ':' . $self->{config}->{master}->{port};
+    }
+    if(!defined($self->{clients}->{$mcid}) && $self->{nextinterclackscheck} < $now) {
+        $self->{nextinterclackscheck} = $now + $self->{config}->{interclacksreconnecttimeout} + int(rand(10));
+
+        print "Connect to master\n";
+        my $msocket;
+
+        if(defined($self->{config}->{master}->{socket})) {
+            $msocket = IO::Socket::UNIX->new(
+                Peer => $self->{config}->{master}->{socket}->[0],
+                Type => SOCK_STREAM,
+            );
+        } else {
+            $msocket = IO::Socket::IP->new(
+                PeerHost => $self->{config}->{master}->{ip}->[0],
+                PeerPort => $self->{config}->{master}->{port},
+                Type => SOCK_STREAM,
+                Timeout => 5,
+            );
         }
+        if(!defined($msocket)) {
+            print STDERR "Can't connect to MASTER via interclacks!\n";
+        } else {
+            print "connected to master\n";
 
-        my @inclients = $selector->can_read($selecttimeout);
-        foreach my $clientsocket (@inclients) {
-            my $cid = $clientsocket->_getClientID();
-
-            my $totalread = 0;
-            my $readchunksleft = 3;
-            while(1) {
-                my $rawbuffer;
-                my $readok = 0;
-                eval {
-                    sysread($clients{$cid}->{socket}, $rawbuffer, 1_000_000); # Read at most 1 Meg at a time
-                    $readok = 1;
-                };
-                if(!$readok) {
-                    push @toremove, $cid;
-                    last;
-                }
-                if(defined($rawbuffer) && length($rawbuffer)) {
-                    $totalread += length($rawbuffer);
-                    push @{$clients{$cid}->{charbuffer}}, split//, $rawbuffer;
-                    $readchunksleft--;
-                    if(!$readchunksleft) {
-                        last;
-                    }
+            if(ref $msocket ne 'IO::Socket::UNIX') {
+                # ONLY USE SSL WHEN RUNNING OVER THE NETWORK
+                # There is simply no point in running it over a local socket.
+                my $encrypted = IO::Socket::SSL->start_SSL($msocket,
+                                                           SSL_verify_mode => SSL_VERIFY_NONE,
+                );
+                if(!$encrypted) {
+                    print "startSSL failed: ", $SSL_ERROR, "\n";
                     next;
                 }
-                last;
             }
-            
-            # Check if we could read data from a socket that was marked as readable.
-            # Thanks to SSL, this might ocxasionally fail. Don't bail out at the first
-            # error, only if multiple happen one after the other
-            if($totalread) {
-                $clients{$cid}->{failcount} = 0;
+
+            $msocket->blocking(0);
+            #binmode($msocket, ':bytes');
+            my %tmp = (
+                buffer  => '',
+                charbuffer => [],
+                listening => {},
+                socket => $msocket,
+                lastping => $now,
+                mirror => 0,
+                outbuffer => "CLACKS PageCamel $VERSION in interclacks client mode\r\n" .  # Tell the server we are using PageCamel Interclacks...
+                             "OVERHEAD A " . $self->{authtoken} . "\r\n" .              # ...send Auth token
+                             "OVERHEAD I 1\r\n",                                        # ...and turn interclacks master mode ON on remote side
+                clientinfo => 'Interclacks link',
+                client_timeoffset => 0,
+                interclacks => 1,
+                interclacksclient => 1,
+                lastinterclacksping => $now,
+                lastmessage => $now,
+                authtimeout => $now + $self->{config}->{authtimeout},
+                authok => 0,
+                failcount => 0,
+                outmessages => [],
+                inmessages => [],
+                messagedelay => 0,
+                inmessagedelay => 0,
+                outmessagedelay => 0,
+            );
+
+            if(defined($self->{config}->{master}->{ip})) {
+                $tmp{host} = $self->{config}->{master}->{ip}->[0];
+                $tmp{port} = $self->{config}->{master}->{port};
+            }
+            $self->{clients}->{$mcid} = \%tmp;
+            $msocket->_setClientID($mcid);
+            $self->{selector}->add($msocket);
+
+            $self->{workCount}++;
+        }
+    }
+    return;
+}
+
+sub _addNewClients($self) {
+    my $now = $self->_getTime();
+    foreach my $tcpsocket (@{$self->{tcpsockets}}) {
+        my $clientsocket = $tcpsocket->accept;
+        if(defined($clientsocket)) {
+            $clientsocket->blocking(0);
+            my ($cid, $chost, $cport);
+            if(ref $tcpsocket eq 'IO::Socket::UNIX') {
+                $chost = 'unixdomainsocket';
+                $cport = $now . ':' . int(rand(1_000_000));
             } else {
-                $clients{$cid}->{failcount}++;
-                
-                if($clients{$cid}->{failcount} > 5) {
-                    # Socket was active multiple times but delivered no data?
-                    # EOF, maybe, possible, perhaps?
-                    push @toremove, $cid;
+                ($chost, $cport) = ($clientsocket->peerhost, $clientsocket->peerport);
+            }
+            print "Got a new client $chost:$cport!\n";
+            $cid = "$chost:$cport";
+            foreach my $debugcid (keys %{$self->{clients}}) {
+                if($self->{clients}->{$debugcid}->{mirror}) {
+                    $self->{clients}->{$debugcid}->{outbuffer} .= "DEBUG CONNECTED=" . $cid . "\r\n";
                 }
             }
-        }
 
-        foreach my $cid (keys %clients) {
-            while(@{$clients{$cid}->{charbuffer}}) {
-                my $buf = shift @{$clients{$cid}->{charbuffer}};
+            if(ref $clientsocket ne 'IO::Socket::UNIX') {
+                # ONLY USE SSL WHEN RUNNING OVER THE NETWORK
+                # There is simply no point in running it over a local socket.
+                my $encrypted = IO::Socket::SSL->start_SSL($clientsocket,
+                                                           SSL_server => 1,
+                                                           SSL_cert_file => $self->{config}->{ssl}->{cert},
+                                                           SSL_key_file => $self->{config}->{ssl}->{key},
+                                                           SSL_cipher_list => 'ALL:!ADH:!RC4:+HIGH:+MEDIUM:!LOW:!SSLv2:!SSLv3!EXPORT',
+                                                           SSL_create_ctx_callback => sub {
+                                                                my $ctx = shift;
 
-                $workCount++;
-                if($buf eq "\r") {
+                                                                # Enable workarounds for broken clients
+                                                                Net::SSLeay::CTX_set_options($ctx, &Net::SSLeay::OP_ALL); ## no critic (Subroutines::ProhibitAmpersandSigils)
+
+                                                                # Disable session resumption completely
+                                                                Net::SSLeay::CTX_set_session_cache_mode($ctx, $SSL_SESS_CACHE_OFF);
+
+                                                                # Disable session tickets
+                                                                Net::SSLeay::CTX_set_options($ctx, &Net::SSLeay::OP_NO_TICKET); ## no critic (Subroutines::ProhibitAmpersandSigils)
+                                                            },
+                );
+                if(!$encrypted) {
+                    print "startSSL failed: ", $SSL_ERROR, "\n";
                     next;
-                } elsif($buf eq "\n") {
-                    next if($clients{$cid}->{buffer} eq ''); # Empty lines
-
-                    my %inmsg = (
-                        message => $clients{$cid}->{buffer},
-                        releasetime => $now + $clients{$cid}->{inmessagedelay},
-                    );
-                    push @{$clients{$cid}->{inmessages}}, \%inmsg;
-                    $clients{$cid}->{buffer} = '';
-                } else {
-                    $clients{$cid}->{buffer} .= $buf;
                 }
             }
 
-            if($interclackslock && !$clients{$cid}->{interclacksclient}) {
-                # We are locked into interclacks sync lock, but this is not the connection to master,
-                # so we don't handle the input buffer for this client at the moment.
+            $clientsocket->blocking(0);
+            #binmode($clientsocket, ':bytes');
+            #$clientsocket->{clacks_cid} = $cid;
+            my %tmp = (
+                buffer  => '',
+                charbuffer => [],
+                listening => {},
+                socket => $clientsocket,
+                lastping => $now,
+                mirror => 0,
+                outbuffer => "CLACKS PageCamel $VERSION\r\n" .
+                             "OVERHEAD M Authentication required\r\n",  # Informal message
+                clientinfo => 'UNKNOWN',
+                client_timeoffset => 0,
+                host => $chost,
+                port => $cport,
+                interclacks => 0,
+                interclacksclient => 0,
+                lastinterclacksping => 0,
+                lastmessage => $now,
+                authtimeout => $now + $self->{config}->{authtimeout},
+                authok => 0,
+                failcount => 0,
+                outmessages => [],
+                inmessages => [],
+                inmessagedelay => 0,
+                outmessagedelay => 0,
+            );
+            if(0 && $self->{isDebugging}) {
+                $tmp{authok} = 1;
+                $tmp{outbuffer} .= "OVERHEAD M debugmode_auth_not_really_required\r\n"
+            }
+            $self->{clients}->{$cid} = \%tmp;
+            $clientsocket->_setClientID($cid);
+            $self->{selector}->add($clientsocket);
+            $self->{workCount}++;
+        }
+    }
+    
+    return;
+}
+
+sub _disconnectClients($self) {
+    my $now = $self->_getTime();
+
+    # Check if there are any clients to disconnect...
+    my $pingtime = $now - $self->{config}->{pingtimeout};
+    my $interclackspingtime = $now - $self->{config}->{interclackspingtimeout};
+    my $interclackspinginterval = $now - int($self->{config}->{interclackspingtimeout} / 3);
+    foreach my $cid (keys %{$self->{clients}}) {
+        if(!$self->{clients}->{$cid}->{socket}->connected) {
+            push @{$self->{toremove}}, $cid;
+            next;
+        }
+        if(!$self->{clients}->{$cid}->{interclacks}) {
+            if($self->{clients}->{$cid}->{lastping} > 0 && $self->{clients}->{$cid}->{lastping} < $pingtime) {
+                $self->_evalsyswrite($self->{clients}->{$cid}->{socket}, "\r\nTIMEOUT\r\n");
+                push @{$self->{toremove}}, $cid;
                 next;
             }
-
-
-            # ******************************************************************************
-            # ******************************************************************************
-            # ******************************************************************************
-            # ******************************************************************************
-            # ******************************************************************************
-            # ******************************************************************************
-            # ******************************************************************************
-            while(scalar @{$clients{$cid}->{inmessages}}) {
-                last if($clients{$cid}->{inmessages}->[0]->{releasetime} > $now);
-                my $inmsgtmp = shift @{$clients{$cid}->{inmessages}};
-                my $inmsg = $inmsgtmp->{message};
-
-                # Handle CLACKS identification header
-                if($inmsg =~ /^CLACKS\ (.+)/) {
-                    $clients{$cid}->{clientinfo} = $1;
-                    $clients{$cid}->{clientinfo} =~ s/\;/\_/g;
-                    print "Client at ", $cid, " identified as ", $clients{$cid}->{clientinfo}, "\n";
-                    next;
-                }
-
-                my $nodebug = 0;
-                my $sendinterclacks = 1;
-                my $discardafterlogging = 0;
-                # Handle OVERHEAD messages before logging (for handling 'N' flag correctly)
-                if($inmsg =~ /^OVERHEAD\ (.+?)\ (.+)/) {
-                    my ($flags, $value) = ($1, $2);
-                    $sendinterclacks = 0;
-                    my @flagparts = split//, $flags;
-                    my %parsedflags;
-                    my %newflags;
-                    foreach my $key (sort keys %overheadflags) {
-                        if(contains($key, \@flagparts)) {
-                            $parsedflags{$overheadflags{$key}} = 1;
-                            $newflags{$overheadflags{$key}} = 1;
-                        } else {
-                            $parsedflags{$overheadflags{$key}} = 0;
-                            $newflags{$overheadflags{$key}} = 0;
-                        }
-                    }
-
-                    if($parsedflags{auth_token}) {
-                        if($value eq $self->{authtoken}) {
-                            $clients{$cid}->{authok} = 1;
-                            #$clients{$cid}->{outbuffer} .= "OVERHEAD O Welcome!\r\n";
-                            push @{$clients{$cid}->{outmessages}}, {releasetime => $now + $clients{$cid}->{outmessagedelay}, message => 'OVERHEAD O Welcome!'};
-                        } else {
-                            $clients{$cid}->{authok} = 0;
-                            #$clients{$cid}->{outbuffer} .= "OVERHEAD F Login failed!\r\n";
-                            push @{$clients{$cid}->{outmessages}}, {releasetime => $now + $clients{$cid}->{outmessagedelay}, message => 'OVERHEAD F Login failed!'};
-                            push @{$clients{$cid}->{outmessages}}, {releasetime => $now + $clients{$cid}->{outmessagedelay}, message => 'EXIT'};
-                            push @toremove, $cid; # Disconnect the client
-                            last;
-                        }
-                    }
-
-                    # Ignore other command when not authenticated
-                    if(!$clients{$cid}->{authok}) {
-                        next;
-                    }
-
-                    if($parsedflags{timestamp}) {
-                        $now = $self->getTime(); # Make sure we are at the "latest" $now. This is one of the very few critical sections
-                        $clients{$cid}->{client_timeoffset} = $now - $value;
-                        print "**** CLIENT TIME OFFSET: ", $clients{$cid}->{client_timeoffset}, "\n";
-                        next;
-                    }
-
-                    if($parsedflags{lock_for_sync} && $clients{$cid}->{interclacksclient}) {
-                        if($value) {
-                            print "Interclacks sync lock ON.\n";
-                            $interclackslock = 1;
-                        } else {
-                            print "Interclacks sync lock OFF.\n";
-                            $interclackslock = 0;
-
-                            # Send server our keys AFTER we got everything FROM the server (e.g. after unlock)
-                            $clients{$cid}->{outbuffer} .= "OVERHEAD T " . $self->getTime() . "\r\n"; # Send local time to server for offset calculation
-                            foreach my $ckey (sort keys %{$self->{clackscache}}) {
-                                $clients{$cid}->{outbuffer} .= "KEYSYNC " . $self->{clackscachetime}->{$ckey} . " " . $self->{clackscacheaccesstime}->{$ckey} . " U $ckey=" . $self->{clackscache}->{$ckey} . "\r\n";
-                            }
-                            foreach my $ckey (sort keys %{$self->{clackscachetime}}) {
-                                next if(defined($self->{clackscache}->{$ckey}));
-                                $clients{$cid}->{outbuffer} .= "KEYSYNC " . $self->{clackscachetime}->{$ckey} . " 0 D $ckey=REMOVED\r\n";
-                            }
-                        }
-                        $parsedflags{forward_message} = 0; # Don't forward
-                        $newflags{return_to_sender} = 0; # Don't return to sender
-                    }
-
-                    if($parsedflags{close_all_connections} && $value) {
-                        foreach my $closecid (keys %clients) {
-                            if($clients{$closecid}->{interclacks} && $parsedflags{forward_message}) {
-                                $self->evalsyswrite($clients{$closecid}->{socket}, "\r\nOVERHEAD GC 1\r\n");
-                            }
-                            $self->evalsyswrite($clients{$closecid}->{socket}, "\r\nQUIT\r\n");
-                            push @toremove, $closecid;
-                        }
-                        $parsedflags{forward_message} = 0; # Already forwarded where needed
-                    }
-
-                    if($parsedflags{shutdown_service}) {
-                        $value = 0 + $value;
-                        if($value > 0) {
-                            $shutdowntime = $value + $now;
-                            print STDERR "Shutting down in $value seconds\n";
-                        }
-                    }
-                    if($parsedflags{discard_message}) {
-                        $discardafterlogging = 1;
-                    }
-                    if($parsedflags{no_logging}) {
-                        $nodebug = 1;
-                    }
-
-                    if($parsedflags{error_message}) {
-                        print STDERR 'ERROR from ', $cid, ': ', $value, "\n";
-                    }
-
-                    if($parsedflags{set_interclacks_mode}) {
-                        $newflags{forward_message} = 0;
-                        $newflags{return_to_sender} = 0;
-
-                        if($value) {
-                            $clients{$cid}->{interclacks} = 1;
-                            $clients{$cid}->{lastping} = $now;
-
-
-                            $clients{$cid}->{outbuffer} .= "CLACKS PageCamel $VERSION in interclacks master mode\r\n" .  # Tell client we are in interclacks master mode
-                                                           "OVERHEAD M Authentication required\r\n" .                 # Informal message
-                                                           "OVERHEAD A " . $self->{authtoken} . "\r\n" .              # ...and send Auth token...
-                                                           "OVERHEAD L 1\r\n" .                                       # ...and lock client for sync
-                                                           "OVERHEAD T " . time . "\r\n";                             # ... and send local timestamp
-
-                            # Make sure our new interclacks client has an *exact* copy of our buffer
-                            #$clients{$cid}->{outbuffer} .= "CLEARCACHE\r\n";
-                            foreach my $ckey (sort keys %{$self->{clackscache}}) {
-                                $clients{$cid}->{outbuffer} .= "KEYSYNC " . $self->{clackscachetime}->{$ckey} . " " . $self->{clackscacheaccesstime}->{$ckey} . " U $ckey=" . $self->{clackscache}->{$ckey} . "\r\n";
-                            }
-                            foreach my $ckey (sort keys %{$self->{clackscachetime}}) {
-                                next if(defined($self->{clackscache}->{$ckey}));
-                                $clients{$cid}->{outbuffer} .= "KEYSYNC " . $self->{clackscachetime}->{$ckey} . " 0 D $ckey=REMOVED\r\n";
-                            }
-                            $clients{$cid}->{outbuffer} .= "OVERHEAD L 0\r\n"; # unlock client after sync
-                            $clients{$cid}->{outbuffer} .= "PING\r\n";
-                            $clients{$cid}->{lastinterclacksping} = $now;
-                        } else {
-                            $clients{$cid}->{interclacks} = 0;
-                            $clients{$cid}->{lastping} = $now;
-                        }
-                    }
-
-                    my $newflagstring = '';
-                    $newflags{return_to_sender} = 0;
-
-                    foreach my $key (sort keys %overheadflags) {
-                        next if($key eq 'Z');
-                        if($newflags{$overheadflags{$key}}) {
-                            $newflagstring .= $key;
-                        }
-                    }
-                    if($newflagstring eq '') {
-                        $newflagstring = 'Z';
-                    }
-
-                    if($parsedflags{forward_message}) {
-                        foreach my $overheadcid (keys %clients) {
-                            next if($cid eq $overheadcid && !$parsedflags{return_to_sender});
-
-                            $clients{$overheadcid}->{outbuffer} .= "OVERHEAD $newflagstring $value\r\n";
-                        }
-                    }
-                }
-
-                # Ignore other command when not authenticated
-                if(!$clients{$cid}->{authok}) {
-                    next;
-                }
-
-                if(!$nodebug) {
-                    # Add ALL incoming messages as debug-type messages to the outbox
-                    my %tmp = (
-                        sender => $cid,
-                        type => 'DEBUG',
-                        data => $inmsg,
-                    );
-
-                    push @outbox, \%tmp;
-                }
-
-                if($discardafterlogging) {
-                    next;
-                }
-
-
-                if($inmsg =~ /^OVERHEAD\ /) { ## no critic (ControlStructures::ProhibitCascadingIfElse)
-                    # Already handled
-                } elsif($inmsg =~ /^LISTEN\ (.*)/) {
-                    $clients{$cid}->{listening}->{$1} = 1;
-                    $sendinterclacks = 0;
-                } elsif($inmsg =~ /^UNLISTEN\ (.*)/) {
-                    delete $clients{$cid}->{listening}->{$1};
-                    $sendinterclacks = 0;
-                } elsif($inmsg =~ /^MONITOR/) {
-                    $clients{$cid}->{mirror} = 1;
-                    $sendinterclacks = 0;
-                } elsif($inmsg =~ /^UNMONITOR/) {
-                    $clients{$cid}->{mirror} = 0;
-                    $sendinterclacks = 0;
-                } elsif($inmsg =~ /^QUIT/) {
-                    print STDERR "Client disconnected cleanly!\n";
-                    push @toremove, $cid;
-                    $sendinterclacks = 0;
-                } elsif($inmsg =~ /^TIMEOUT/ && $clients{$cid}->{interclacks}) {
-                    print STDERR "Ooops, didn't send timely PINGS through interclacks link!\n";
-                    push @toremove, $cid;
-                    $sendinterclacks = 0;
-                } elsif($inmsg =~ /^PING/) {
-                    $clients{$cid}->{lastping} = $now;
-                    $sendinterclacks = 0;
-                } elsif($inmsg =~ /^NOPING/) {
-                    # Disable PING check until next PING recieved
-                    $clients{$cid}->{lastping} = 0;
-                    $sendinterclacks = 0;
-                } elsif($inmsg =~ /^NOTIFY\ (.*)/) {
-                    my %tmp = (
-                        sender => $cid,
-                        type => 'NOTIFY',
-                        name => $1,
-                    );
-                    push @outbox, \%tmp;
-                } elsif($inmsg =~ /^SET\ (.+?)\=(.*)/) {
-                    my %tmp = (
-                        sender => $cid,
-                        type => 'SET',
-                        name => $1,
-                        value => $2,
-                    );
-                    push @outbox, \%tmp;
-                } elsif($inmsg =~ /^KEYSYNC\ (.+?)\ (.+?)\ (.+?)\ (.+?)\=(.*)/) {
-                    #print "***** ", $inmsg, "\n";
-                    my ($ctimestamp, $atimestamp, $cmode, $ckey, $cval) = ($1, $2, $3, $4, $5);
-                    $clients{$cid}->{lastping} = $now; # KEYSYNC acts as a PING as well
-
-                    $ctimestamp += $clients{$cid}->{client_timeoffset}; # Take client time offset into account
-                    if($atimestamp) {
-                        $atimestamp += $clients{$cid}->{client_timeoffset}; # Take client time offset into account
-                    }
-
-                    if(!defined($self->{clackscachetime}->{$ckey})) {
-                        $self->{clackscachetime}->{$ckey} = 0;
-                    }
-                    if(!defined($self->{clackscachetime}->{$ckey}) || $ctimestamp > $self->{clackscachetime}->{$ckey}) {
-                        # If *we* have the older entry (or none at all), *only* then work on the keysync command
-                        if($cmode eq "U") { # "Update"
-                            $self->{clackscache}->{$ckey} = $cval;
-                            $self->{clackscachetime}->{$ckey} = $ctimestamp;
-                            $self->{clackscacheaccesstime}->{$ckey} = $atimestamp;
-                        } else { # REMOVE request from server
-                            $self->{clackscachetime}->{$ckey} = $ctimestamp;
-                            if(defined($self->{clackscache}->{$ckey})) {
-                                delete $self->{clackscache}->{$ckey};
-                            }
-                            if(defined($self->{clackscacheaccesstime}->{$ckey})) {
-                                delete $self->{clackscacheaccesstime}->{$ckey};
-                            }
-                        }
-                    }
-
-                    $savecache = 1;
-                    $sendinterclacks = 1;
-                } elsif($inmsg =~ /^STORE\ (.+?)\=(.*)/) {
-                    $self->{clackscache}->{$1} = $2;
-                    $self->{clackscachetime}->{$1} = $now;
-                    $self->{clackscacheaccesstime}->{$1} = $now;
-                    $savecache = 1;
-                } elsif($inmsg =~ /^SETANDSTORE\ (.+?)\=(.*)/) {
-                    my %tmp = (
-                        sender => $cid,
-                        type => 'SETANDSTORE',
-                        name => $1,
-                        value => $2,
-                    );
-                    push @outbox, \%tmp;
-                    $self->{clackscache}->{$tmp{name}} = $tmp{value};
-                    $self->{clackscachetime}->{$tmp{name}} = $now;
-                    $self->{clackscacheaccesstime}->{$tmp{name}} = $now;
-                    $savecache = 1;
-                } elsif($inmsg =~ /^RETRIEVE\ (.+)/) {
-                    #$clients{$cid}->{outbuffer} .= "SET ". $line->{name} . "=" . $line->{value} . "\r\n";
-                    my $ckey = $1;
-                    if(defined($self->{clackscache}->{$ckey})) {
-                        $clients{$cid}->{outbuffer} .= "RETRIEVED $ckey=" . $self->{clackscache}->{$ckey} . "\r\n";
-                        $self->{clackscacheaccesstime}->{$ckey} = $now;
-                        $savecache = 1;
-                    } else {
-                        $clients{$cid}->{outbuffer} .= "NOTRETRIEVED $ckey\r\n";
-                    }
-                    $sendinterclacks = 0;
-                } elsif($inmsg =~ /^REMOVE\ (.+)/) {
-                    my $ckey = $1;
-                    if(defined($self->{clackscache}->{$ckey})) {
-                        delete $self->{clackscache}->{$ckey};
-                        $self->{clackscachetime}->{$ckey} = $now;
-                    }
-                    if(defined($self->{clackscacheaccesstime}->{$ckey})) {
-                        delete $self->{clackscacheaccesstime}->{$ckey};
-                    }
-                    $savecache = 1;
-                } elsif($inmsg =~ /^INCREMENT\ (.+)/) {
-                    my $ckey = $1;
-                    my $cval = 1;
-                    if($ckey =~ /(.+)\=(.+)/) {
-                        ($ckey, $cval) = ($1, $2);
-                        $cval = 0 + $cval;
-                    }
-                    if(defined($self->{clackscache}->{$ckey})) {
-                        $self->{clackscache}->{$ckey} += $cval;
-                    } else {
-                        $self->{clackscache}->{$ckey} = $cval;
-                    }
-                    $self->{clackscachetime}->{$ckey} = $now;
-                    $self->{clackscacheaccesstime}->{$ckey} = $now;
-                    $savecache = 1;
-                } elsif($inmsg =~ /^DECREMENT\ (.+)/) {
-                    my $ckey = $1;
-                    my $cval = 1;
-                    if($ckey =~ /(.+)\=(.+)/) {
-                        ($ckey, $cval) = ($1, $2);
-                        $cval = 0 + $cval;
-                    }
-                    if(defined($self->{clackscache}->{$ckey})) {
-                        $self->{clackscache}->{$ckey} -= $cval;
-                    } else {
-                        $self->{clackscache}->{$ckey} = 0 - $cval;
-                    }
-                    $self->{clackscachetime}->{$ckey} = $now;
-                    $self->{clackscacheaccesstime}->{$ckey} = $now;
-                    $savecache = 1;
-                } elsif($inmsg =~ /^KEYLIST/) {
-                    $clients{$cid}->{outbuffer} .= "KEYLISTSTART\r\n";
-                    foreach my $ckey (sort keys %{$self->{clackscache}}) {
-                        $clients{$cid}->{outbuffer} .= "KEY $ckey\r\n";
-                    }
-                    $clients{$cid}->{outbuffer} .= "KEYLISTEND\r\n";
-                    $sendinterclacks = 0;
-                } elsif($inmsg =~ /^CLEARCACHE/) {
-                    %{$self->{clackscache}} = ();
-                    %{$self->{clackscachetime}} = ();
-                    %{$self->{clackscacheaccesstime}} = ();
-                    $savecache = 1;
-
-                # local managment commands
-                } elsif($inmsg =~ /^CLIENTLIST/) {
-                    $clients{$cid}->{outbuffer} .= "CLIENTLISTSTART\r\n";
-                    foreach my $lmccid (sort keys %clients) {
-                        $clients{$cid}->{outbuffer} .= "CLIENT CID=$lmccid;" .
-                                                            "HOST=" . $clients{$lmccid}->{host} . ";" .
-                                                            "PORT=" . $clients{$lmccid}->{port} . ";" .
-                                                            "CLIENTINFO=" . $clients{$lmccid}->{clientinfo} . ";" .
-                                                            "OUTBUFFER_LENGTH=" . length($clients{$lmccid}->{outbuffer}) . ";" .
-                                                            "INBUFFER_LENGTH=" . length($clients{$lmccid}->{buffer}) . ";" .
-                                                            "INTERCLACKS=" . $clients{$lmccid}->{interclacks} . ";" .
-                                                            "MONITOR=" . $clients{$lmccid}->{mirror} . ";" .
-                                                            "LASTPING=" . $clients{$lmccid}->{lastping} . ";" .
-                                                            "LASTINTERCLACKSPING=" . $clients{$lmccid}->{lastinterclacksping} . ";" .
-                                                            "\r\n";
-                    }
-                    $clients{$cid}->{outbuffer} .= "CLIENTLISTEND\r\n";
-                    $sendinterclacks = 0;
-                } elsif($inmsg =~ /^CLIENTDISCONNECT\ (.+)/) {
-                    my $lmccid = $1;
-                    if(defined($clients{$lmccid})) {
-                        # Try to notify the client (may or may not work);
-                        $self->evalsyswrite($clients{$lmccid}->{socket}, "\r\nQUIT\r\n");
-                        push @toremove, $lmccid;
-                    }
-                    $sendinterclacks = 0;
-                } elsif($inmsg =~ /^FLUSH\ (.+)/) {
-                    my $retid = $1;
-                    $clients{$cid}->{outbuffer} .= "FLUSHED $retid\r\n";
-                    $sendinterclacks = 0;
-                } else {
-                    print STDERR "ERROR Unknown_command ", $inmsg, "\r\n";
-                    $sendinterclacks = 0;
-                    $clients{$cid}->{outbuffer} .= "OVERHEAD E unknown_command " . $inmsg . "\r\n";
-                }
-
-                # forward interclacks messages
-                if($sendinterclacks) {
-                    foreach my $interclackscid (keys %clients) {
-                        if($cid eq $interclackscid || !$clients{$interclackscid}->{interclacks}) {
-                            next;
-                        }
-                        $clients{$interclackscid}->{outbuffer} .= $inmsg . "\r\n";
-                    }
-                }
-
+        } else {
+            if($self->{clients}->{$cid}->{lastping} < $interclackspingtime) {
+                $self->_evalsyswrite($self->{clients}->{$cid}->{socket}, "\r\nTIMEOUT\r\n");
+                push @{$self->{toremove}}, $cid;
+                next;
             }
-
         }
 
-        # clean up very old "deleted" entries
-        my $stillvalidtime = $now - $self->{config}->{deletedcachetime};
-        foreach my $key (keys %{$self->{clackscachetime}}) {
-            next if($self->{clackscachetime}->{$key} > $stillvalidtime);
-            if(defined($self->{clackscache}->{$key})) { # Still has data? Fix clackscachetime entry
-                $self->{clackscachetime}->{$key} = $now;
-            }
-            delete $self->{clackscachetime}->{$key};
-            $savecache = 1;
+        if($self->{clients}->{$cid}->{interclacks} && $self->{clients}->{$cid}->{lastinterclacksping} < $interclackspinginterval) {
+            $self->{clients}->{$cid}->{lastinterclacksping} = $now;
+            $self->{clients}->{$cid}->{outbuffer} .= "PING\r\n";
         }
 
-        # Clean up (forget) stale cached entries
-        $stillvalidtime = $now - $self->{config}->{stalecachetime};
-        foreach my $key (keys %{$self->{clackscacheaccesstime}}) {
-            next if($self->{clackscacheaccesstime}->{$key} > $stillvalidtime);
-            delete $self->{clackscacheaccesstime}->{$key};
-            if(defined($self->{clackscache})) {
-                delete $self->{clackscache}->{$key};
+        if(!$self->{clients}->{$cid}->{authok} && $self->{clients}->{$cid}->{authtimeout} < $now) {
+            # Authentication timeout!
+            push @{$self->{toremove}}, $cid;
+        }
+    }
+
+    # ...and disconnect them
+    if(scalar @{$self->{toremove}}) {
+        # Make sure we handle any last messages, or at least try to. This should allow us to at least try to adhere to the
+        # protocol in some cases (auth failure, etc)
+        $self->_outboxToClientBuffer();
+        for(1..5) {
+            my @flushed;
+            foreach my $cid (@{$self->{toremove}}) {
+                next if(contains($cid, \@flushed));
+                push @flushed, $cid;
+                next if(!length($self->{clients}->{$cid}->{outbuffer}));
+                print "Flushing $cid for removal...\n";
+                $self->_clientOutput($cid);
             }
-            if(defined($self->{clackscachetime})) {
-                delete $self->{clackscachetime}->{$key};
+            sleep(0.02);
+        }
+    }
+
+    while((my $cid = shift @{$self->{toremove}})) {
+        # In some circumstances, there may be multiple @{$self->{toremove}} entries for the same client. Ignore them...
+        if(defined($self->{clients}->{$cid})) {
+            print "Removing client $cid\n";
+            foreach my $debugcid (keys %{$self->{clients}}) {
+                if($self->{clients}->{$debugcid}->{mirror}) {
+                    $self->{clients}->{$debugcid}->{outbuffer} .= "DEBUG DISCONNECTED=" . $cid . " (" . length($self->{clients}->{$cid}->{outbuffer}) . " bytes discarded from outbuffer)\r\n";
+                    if($self->{clients}->{$cid}->{interclacksclient} && $self->{interclackslock}) {
+                        $self->{clients}->{$debugcid}->{outbuffer} .= "DEBUG DISCONNECTED=" . $cid . " (Unlocking interclacks mid-sync)\r\n";
+                    }
+                }
             }
+
+            if($self->{clients}->{$cid}->{interclacksclient} && $self->{interclackslock}) {
+                print "...this one is interclacks master and has us locked - UNLOCKING mid-sync!\n";
+                $self->{interclackslock} = 0;
+            }
+
+            $self->{selector}->remove($self->{clients}->{$cid}->{socket});
+            delete $self->{clients}->{$cid};
+        }
+
+        $self->{workCount}++;
+    }
+
+    return;
+}
+
+sub _clientInput($self) {
+    my $now = $self->_getTime();
+
+    # **** READ FROM CLIENTS ****
+    my $hasoutbufferwork = 0;
+    foreach my $cid (keys %{$self->{clients}}) {
+        if(length($self->{clients}->{$cid}->{buffer}) > 0) {
+            # Found some work to do
+            $hasoutbufferwork = 1;
+            last;
+        }
+    }
+    my $selecttimeout = 0.5; # Half a second
+    if($hasoutbufferwork) {
+        $selecttimeout = 0.05;
+    }
+
+    my @inclients = $self->{selector}->can_read($selecttimeout);
+    foreach my $clientsocket (@inclients) {
+        my $cid = $clientsocket->_getClientID();
+
+        my $totalread = 0;
+        my $readchunksleft = 3;
+        while(1) {
+            my $rawbuffer;
+            my $readok = 0;
+            eval {
+                sysread($self->{clients}->{$cid}->{socket}, $rawbuffer, 1_000_000); # Read at most 1 Meg at a time
+                $readok = 1;
+            };
+            if(!$readok) {
+                push @{$self->{toremove}}, $cid;
+                last;
+            }
+            if(defined($rawbuffer) && length($rawbuffer)) {
+                $totalread += length($rawbuffer);
+                push @{$self->{clients}->{$cid}->{charbuffer}}, split//, $rawbuffer;
+                $readchunksleft--;
+                if(!$readchunksleft) {
+                    last;
+                }
+                next;
+            }
+            last;
+        }
+        
+        # Check if we could read data from a socket that was marked as readable.
+        # Thanks to SSL, this might ocxasionally fail. Don't bail out at the first
+        # error, only if multiple happen one after the other
+        if($totalread) {
+            $self->{clients}->{$cid}->{failcount} = 0;
+        } else {
+            $self->{clients}->{$cid}->{failcount}++;
+            
+            if($self->{clients}->{$cid}->{failcount} > 5) {
+                # Socket was active multiple times but delivered no data?
+                # EOF, maybe, possible, perhaps?
+                push @{$self->{toremove}}, $cid;
+            }
+        }
+    }
+
+    return;
+}
+
+# $forceclientid let's us "force" working on a specific client only
+sub _clientOutput($self, $forceclientid = '') {
+    my $now = $self->_getTime();
+    
+    # **** WRITE TO CLIENTS ****
+    foreach my $cid (keys %{$self->{clients}}) {
+        if($forceclientid ne '' && $forceclientid ne $cid) {
+            next;
+        }
+        if($cid ne $forceclientid && contains($cid, $self->{toremove})) {
+            next;
+        }
+        if(length($self->{clients}->{$cid}->{outbuffer})) {
+            $self->{clients}->{$cid}->{lastmessage} = $now;
+        } elsif(($self->{clients}->{$cid}->{lastmessage} + 60) < $now) {
+            $self->{clients}->{$cid}->{lastmessage} = $now;
+            $self->{clients}->{$cid}->{outbuffer} .= "NOP\r\n"; # send "No OPerations" command, just to
+                                                      # check if socket is still open
+        }
+
+        next if(!length($self->{clients}->{$cid}->{outbuffer}));
+
+        # Output bandwidth-limited stuff, in as big chunks as possible
+        my $written;
+        $self->{workCount}++;
+        eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
+            $written = syswrite($self->{clients}->{$cid}->{socket}, $self->{clients}->{$cid}->{outbuffer});
+        };
+        if($EVAL_ERROR) {
+            print STDERR "Write error: $EVAL_ERROR\n";
+            push @{$self->{toremove}}, $cid;
+            next;
+        }
+        if(!$self->{clients}->{$cid}->{socket}->opened || $self->{clients}->{$cid}->{socket}->error || ($ERRNO ne '' && !$ERRNO{EWOULDBLOCK})) {
+            print STDERR "webPrint write failure: $ERRNO\n";
+            push @{$self->{toremove}}, $cid;
+            next;
+        }
+
+        if(defined($written) && $written) {
+            if(length($self->{clients}->{$cid}->{outbuffer}) == $written) {
+                $self->{clients}->{$cid}->{outbuffer} = '';
+            } else {
+                $self->{clients}->{$cid}->{outbuffer} = substr($self->{clients}->{$cid}->{outbuffer}, $written);
+            }   
+        }
+    }
+
+    return;
+}
+
+sub _cacheCleanup($self) {
+    my $now = $self->_getTime();
+
+    my $deletedtime = $now - $self->{config}->{deletedcachetime};
+    my $staletime = $now - $self->{config}->{stalecachetime};
+    foreach my $ckey (keys %{$self->{cache}}) {
+        # Clean deleted entries. Ignore any non-"DELETED" entries as these are run from a different timer
+        if($self->{cache}->{$ckey}->{deleted} && $self->{cache}->{$ckey}->{cachetime} < $deletedtime) {
+            delete $self->{cache}->{$ckey};
 
             my %tmp = (
                 sender => 'SERVERCACHE',
                 type => 'DEBUG',
-                data => 'FORGET=' . $key,
+                data => 'CLEANDELETED=' . $ckey,
             );
 
-            push @outbox, \%tmp;
+            push @{$self->{outbox}}, \%tmp;
+            $self->{savecache} = 1;
+            next;
         }
 
+        # Forget entries that have not been accesses in a long time (stale entries).
+        # Ignore any "DELETED" entries, as these are run from a different timer
+        if(!$self->{cache}->{$ckey}->{deleted} && $self->{cache}->{$ckey}->{accesstime} < $staletime) {
+            delete $self->{cache}->{$ckey};
 
-        # Outbox contains the messages that have to be forwarded to the clients when listening (or when the connection is in interclacks mode)
-        # We iterate over the outbox and put those messages into the output buffers of the corresponding client connection
-        while((my $line = shift @outbox)) {
-            $workCount++;
-            foreach my $cid (keys %clients) {
-                if($line->{type} eq 'DEBUG' && $clients{$cid}->{mirror}) {
-                    $clients{$cid}->{outbuffer} .= "DEBUG " . $line->{sender} . "=". $line->{data} . "\r\n";
-                }
+            my %tmp = (
+                sender => 'SERVERCACHE',
+                type => 'DEBUG',
+                data => 'CLEANSTALE=' . $ckey,
+            );
 
-                if($cid eq $line->{sender}) {
-                    next;
-                }
+            push @{$self->{outbox}}, \%tmp;
+            $self->{savecache} = 1;
+            next;
+        }
+    }
 
-                if($line->{type} ne 'DEBUG' && defined($clients{$cid}->{listening}->{$line->{name}})) {
-                    # Just buffer in the clients outbuffers
-                    if($line->{type} eq 'NOTIFY') {
-                        $clients{$cid}->{outbuffer} .= "NOTIFY ". $line->{name} . "\r\n";
-                    } elsif($line->{type} eq 'SET') {
-                        $clients{$cid}->{outbuffer} .= "SET ". $line->{name} . "=" . $line->{value} . "\r\n";
-                    } elsif($line->{type} eq 'SETANDSTORE') {
-                        # We forward SETANDSTORE as such only over interclacks connections. Basic clients don't have a cache,
-                        # so we only send a SET command
-                        if($clients{$cid}->{interclacks}) {
-                            $clients{$cid}->{outbuffer} .= "SETANDSTORE ". $line->{name} . "=" . $line->{value} . "\r\n";
-                        } else {
-                            $clients{$cid}->{outbuffer} .= "SET ". $line->{name} . "=" . $line->{value} . "\r\n";
-                        }
+    return;
+}
+
+sub _outboxToClientBuffer($self) {
+    my $now = $self->_getTime();
+
+    # Outbox contains the messages that have to be forwarded to the clients when listening (or when the connection is in interclacks mode)
+    # We iterate over the outbox and put those messages into the output buffers of the corresponding client connection
+    while((my $line = shift @{$self->{outbox}})) {
+        $self->{workCount}++;
+        foreach my $cid (keys %{$self->{clients}}) {
+            if($line->{type} eq 'DEBUG' && $self->{clients}->{$cid}->{mirror}) {
+                $self->{clients}->{$cid}->{outbuffer} .= "DEBUG " . $line->{sender} . "=". $line->{data} . "\r\n";
+            }
+
+            if($cid eq $line->{sender}) {
+                next;
+            }
+
+            if($line->{type} ne 'DEBUG' && defined($self->{clients}->{$cid}->{listening}->{$line->{name}})) {
+                # Just buffer in the clients outbuffers
+                if($line->{type} eq 'NOTIFY') {
+                    $self->{clients}->{$cid}->{outbuffer} .= "NOTIFY ". $line->{name} . "\r\n";
+                } elsif($line->{type} eq 'SET') {
+                    $self->{clients}->{$cid}->{outbuffer} .= "SET ". $line->{name} . "=" . $line->{value} . "\r\n";
+                } elsif($line->{type} eq 'SETANDSTORE') {
+                    # We forward SETANDSTORE as such only over interclacks connections. Basic clients don't have a cache,
+                    # so we only send a SET command
+                    if($self->{clients}->{$cid}->{interclacks}) {
+                        $self->{clients}->{$cid}->{outbuffer} .= "SETANDSTORE ". $line->{name} . "=" . $line->{value} . "\r\n";
+                    } else {
+                        $self->{clients}->{$cid}->{outbuffer} .= "SET ". $line->{name} . "=" . $line->{value} . "\r\n";
                     }
                 }
             }
         }
+    }
 
 
-        # Push all messages that can be released at this time into the corresponding char based output for each client
-        foreach my $cid (keys %clients) {
-            while(scalar @{$clients{$cid}->{outmessages}}) {
-                last if($clients{$cid}->{outmessages}->[0]->{releasetime} > $now);
+    # Push all messages that can be released at this time into the corresponding char based output for each client
+    foreach my $cid (keys %{$self->{clients}}) {
+        while(scalar @{$self->{clients}->{$cid}->{outmessages}}) {
+            last if($self->{clients}->{$cid}->{outmessages}->[0]->{releasetime} > $now);
 
-                my $outmsg = shift @{$clients{$cid}->{outmessages}};
-                if($outmsg->{message} eq 'EXIT') {
-                    push @toremove, $cid; # Disconnect the client
-                } else {
-                    $clients{$cid}->{outbuffer} .= $outmsg->{message} . "\r\n";
+            my $outmsg = shift @{$self->{clients}->{$cid}->{outmessages}};
+            if($outmsg->{message} eq 'EXIT') {
+                push @{$self->{toremove}}, $cid; # Disconnect the client
+            } else {
+                $self->{clients}->{$cid}->{outbuffer} .= $outmsg->{message} . "\r\n";
+            }
+        }
+    }
+
+    return;
+}
+
+sub _handleMessageOverhead($self, $cid, $inmsg) {
+    my $now = $self->_getTime();
+
+    if($inmsg =~ /^OVERHEAD\ (.+?)\ (.+)/) {
+        my ($flags, $value) = ($1, $2);
+        $self->{sendinterclacks} = 0;
+        my @flagparts = split//, $flags;
+        my %parsedflags;
+        my %newflags;
+        foreach my $key (sort keys %overheadflags) {
+            if(contains($key, \@flagparts)) {
+                $parsedflags{$overheadflags{$key}} = 1;
+                $newflags{$overheadflags{$key}} = 1;
+            } else {
+                $parsedflags{$overheadflags{$key}} = 0;
+                $newflags{$overheadflags{$key}} = 0;
+            }
+        }
+
+        if($parsedflags{auth_token}) {
+            if($value eq $self->{authtoken}) {
+                $self->{clients}->{$cid}->{authok} = 1;
+                #$self->{clients}->{$cid}->{outbuffer} .= "OVERHEAD O Welcome!\r\n";
+                push @{$self->{clients}->{$cid}->{outmessages}}, {releasetime => $now + $self->{clients}->{$cid}->{outmessagedelay}, message => 'OVERHEAD O Welcome!'};
+                return 1; # NO LOGGING OF CREDENTIALS
+            } else {
+                $self->{clients}->{$cid}->{authok} = 0;
+                #$self->{clients}->{$cid}->{outbuffer} .= "OVERHEAD F Login failed!\r\n";
+                push @{$self->{clients}->{$cid}->{outmessages}}, {releasetime => $now + $self->{clients}->{$cid}->{outmessagedelay}, message => 'OVERHEAD F Login failed!'};
+                push @{$self->{clients}->{$cid}->{outmessages}}, {releasetime => $now + $self->{clients}->{$cid}->{outmessagedelay}, message => 'EXIT'};
+                push @{$self->{toremove}}, $cid; # Disconnect the client
+                return 1; # NO LOGGING OF CREDENTIALS
+            }
+        }
+
+        # Ignore other command when not authenticated
+        if(!$self->{clients}->{$cid}->{authok}) {
+            return 1;
+        }
+
+        if($parsedflags{timestamp}) {
+            $now = $self->_getTime(); # Make sure we are at the "latest" $now. This is one of the very few critical sections
+            $self->{clients}->{$cid}->{client_timeoffset} = $now - $value;
+            print "**** CLIENT TIME OFFSET: ", $self->{clients}->{$cid}->{client_timeoffset}, "\n";
+            return 1;
+        }
+
+        if($parsedflags{lock_for_sync} && $self->{clients}->{$cid}->{interclacksclient}) {
+            if($value) {
+                print "Interclacks sync lock ON.\n";
+                $self->{interclackslock} = 1;
+            } else {
+                print "Interclacks sync lock OFF.\n";
+                $self->{interclackslock} = 0;
+
+                # Send server our keys AFTER we got everything FROM the server (e.g. after unlock)
+                $self->{clients}->{$cid}->{outbuffer} .= "OVERHEAD T " . $self->_getTime() . "\r\n"; # Send local time to server for offset calculation
+
+                $now = $self->_getTime();
+                foreach my $ckey (sort keys %{$self->{cache}}) {
+                    # Sanity checks 
+                    if(!defined($self->{cache}->{$ckey}->{cachetime}) || !looks_like_number($self->{cache}->{$ckey}->{cachetime})) {
+                        $self->{cache}->{$ckey}->{cachetime} = $now;
+                    }
+                    if(!defined($self->{cache}->{$ckey}->{accesstime}) || !looks_like_number($self->{cache}->{$ckey}->{accesstime})) {
+                        $self->{cache}->{$ckey}->{accesstime} = $now;
+                    }
+                    if(!defined($self->{cache}->{$ckey}->{deleted}) || !$self->{cache}->{$ckey}->{deleted}) {
+                        $self->{cache}->{$ckey}->{deleted} = 0;
+                    }
+                    if(!defined($self->{cache}->{$ckey}->{data})) {
+                        $self->{cache}->{$ckey}->{data} = '';
+                    }
+                    
+                    # Send KEYSYNC commands
+                    if(!$self->{cache}->{$ckey}->{deleted}) {
+                        $self->{clients}->{$cid}->{outbuffer} .= "KEYSYNC " . $self->{cache}->{$ckey}->{cachetime} . " " . $self->{cache}->{$ckey}->{accesstime} . " U $ckey=" . $self->{cache}->{$ckey}->{data} . "\r\n";
+                    } else {
+                        $self->{clients}->{$cid}->{outbuffer} .= "KEYSYNC " . $self->{cache}->{$ckey}->{cachetime} . " 0 D $ckey=REMOVED\r\n";
+                    }
                 }
             }
+            $parsedflags{forward_message} = 0; # Don't forward
+            $newflags{return_to_sender} = 0; # Don't return to sender
         }
 
-            # ******************************************************************************
-            # ******************************************************************************
-            # ******************************************************************************
-            # ******************************************************************************
-            # ******************************************************************************
-            # ******************************************************************************
-            # ******************************************************************************
-
-        # Send as much as possible
-        foreach my $cid (keys %clients) {
-            if(length($clients{$cid}->{outbuffer})) {
-                $clients{$cid}->{lastmessage} = $now;
-            } elsif(($clients{$cid}->{lastmessage} + 60) < $now) {
-                $clients{$cid}->{lastmessage} = $now;
-                $clients{$cid}->{outbuffer} .= "NOP\r\n"; # send "No OPerations" command, just to
-                                                          # check if socket is still open
+        if($parsedflags{close_all_connections} && $value) {
+            foreach my $closecid (keys %{$self->{clients}}) {
+                if($self->{clients}->{$closecid}->{interclacks} && $parsedflags{forward_message}) {
+                    $self->_evalsyswrite($self->{clients}->{$closecid}->{socket}, "\r\nOVERHEAD GC 1\r\n");
+                }
+                $self->_evalsyswrite($self->{clients}->{$closecid}->{socket}, "\r\nQUIT\r\n");
+                push @{$self->{toremove}}, $closecid;
             }
+            $parsedflags{forward_message} = 0; # Already forwarded where needed
+        }
 
-            next if(!length($clients{$cid}->{outbuffer}));
+        if($parsedflags{shutdown_service}) {
+            $value = 0 + $value;
+            if($value > 0) {
+                $self->{shutdowntime} = $value + $now;
+                print STDERR "Shutting down in $value seconds\n";
+            }
+        }
+        if($parsedflags{discard_message}) {
+            $self->{discardafterlogging} = 1;
+        }
+        if($parsedflags{no_logging}) {
+            $self->{nodebug} = 1;
+        }
 
-            # Output bandwidth-limited stuff, in as big chunks as possible
-            my $written;
-            $workCount++;
-            eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
-                $written = syswrite($clients{$cid}->{socket}, $clients{$cid}->{outbuffer});
+        if($parsedflags{error_message}) {
+            print STDERR 'ERROR from ', $cid, ': ', $value, "\n";
+        }
+
+        if($parsedflags{set_interclacks_mode}) {
+            $newflags{forward_message} = 0;
+            $newflags{return_to_sender} = 0;
+
+            if($value) {
+                $self->{clients}->{$cid}->{interclacks} = 1;
+                $self->{clients}->{$cid}->{lastping} = $now;
+
+
+                $self->{clients}->{$cid}->{outbuffer} .= "CLACKS PageCamel $VERSION in interclacks master mode\r\n" .  # Tell client we are in interclacks master mode
+                                               "OVERHEAD M Authentication required\r\n" .                 # Informal message
+                                               "OVERHEAD A " . $self->{authtoken} . "\r\n" .              # ...and send Auth token...
+                                               "OVERHEAD L 1\r\n" .                                       # ...and lock client for sync
+                                               "OVERHEAD T " . time . "\r\n";                             # ... and send local timestamp
+
+                # Make sure our new interclacks client has an *exact* copy of our buffer
+                #$self->{clients}->{$cid}->{outbuffer} .= "CLEARCACHE\r\n";
+                
+                $now = $self->_getTime();
+                foreach my $ckey (sort keys %{$self->{cache}}) {
+                    # Sanity checks 
+                    if(!defined($self->{cache}->{$ckey}->{cachetime}) || !looks_like_number($self->{cache}->{$ckey}->{cachetime})) {
+                        $self->{cache}->{$ckey}->{cachetime} = $now;
+                    }
+                    if(!defined($self->{cache}->{$ckey}->{accesstime}) || !looks_like_number($self->{cache}->{$ckey}->{accesstime})) {
+                        $self->{cache}->{$ckey}->{accesstime} = $now;
+                    }
+                    if(!defined($self->{cache}->{$ckey}->{deleted}) || !$self->{cache}->{$ckey}->{deleted}) {
+                        $self->{cache}->{$ckey}->{deleted} = 0;
+                    }
+                    if(!defined($self->{cache}->{$ckey}->{data})) {
+                        $self->{cache}->{$ckey}->{data} = '';
+                    }
+
+                    # Send KEYSYNC commands
+                    if(!$self->{cache}->{$ckey}->{deleted}) {
+                        $self->{clients}->{$cid}->{outbuffer} .= "KEYSYNC " . $self->{cache}->{$ckey}->{cachetime} . " " . $self->{cache}->{$ckey}->{accesstime} . " U $ckey=" . $self->{cache}->{$ckey}->{data} . "\r\n";
+                    } else {
+                        $self->{clients}->{$cid}->{outbuffer} .= "KEYSYNC " . $self->{cache}->{$ckey}->{cachetime} . " 0 D $ckey=REMOVED\r\n";
+                    }
+                }
+                $self->{clients}->{$cid}->{outbuffer} .= "OVERHEAD L 0\r\n"; # unlock client after sync
+                $self->{clients}->{$cid}->{outbuffer} .= "PING\r\n";
+                $self->{clients}->{$cid}->{lastinterclacksping} = $now;
+            } else {
+                $self->{clients}->{$cid}->{interclacks} = 0;
+                $self->{clients}->{$cid}->{lastping} = $now;
+            }
+        }
+
+        my $newflagstring = '';
+        $newflags{return_to_sender} = 0;
+
+        foreach my $key (sort keys %overheadflags) {
+            next if($key eq 'Z');
+            if($newflags{$overheadflags{$key}}) {
+                $newflagstring .= $key;
+            }
+        }
+        if($newflagstring eq '') {
+            $newflagstring = 'Z';
+        }
+
+        if($parsedflags{forward_message}) {
+            foreach my $overheadcid (keys %{$self->{clients}}) {
+                next if($cid eq $overheadcid && !$parsedflags{return_to_sender});
+
+                $self->{clients}->{$overheadcid}->{outbuffer} .= "OVERHEAD $newflagstring $value\r\n";
+            }
+        }
+
+        return 1;
+    }
+
+    return 0;
+}
+
+sub _handleMessageCaching($self, $cid, $inmsg) {
+    my $now = $self->_getTime();
+
+    if($inmsg =~ /^KEYSYNC\ (.+?)\ (.+?)\ (.+?)\ (.+?)\=(.*)/) {
+        #print "***** ", $inmsg, "\n";
+        my ($ctimestamp, $atimestamp, $cmode, $ckey, $cval) = ($1, $2, $3, $4, $5);
+        $self->{clients}->{$cid}->{lastping} = $now; # KEYSYNC acts as a PING as well
+
+        $ctimestamp += $self->{clients}->{$cid}->{client_timeoffset}; # Take client time offset into account
+        if($atimestamp) {
+            $atimestamp += $self->{clients}->{$cid}->{client_timeoffset}; # Take client time offset into account
+        }
+
+        if(!defined($self->{cache}->{$ckey}) || $ctimestamp > $self->{cache}->{$ckey}->{cachetime}) {
+            # If *we* have the older entry (or none at all), *only* then work on the keysync command
+            $self->{cache}->{$ckey} = {
+                data => $cval,
+                cachetime => $ctimestamp,
+                accesstime => $atimestamp,
+                deleted => 0,
             };
-            if($EVAL_ERROR) {
-                print STDERR "Write error: $EVAL_ERROR\n";
-                push @toremove, $cid;
-                next;
-            }
-            if(!$clients{$cid}->{socket}->opened || $clients{$cid}->{socket}->error || ($ERRNO ne '' && !$ERRNO{EWOULDBLOCK})) {
-                print STDERR "webPrint write failure: $ERRNO\n";
-                push @toremove, $cid;
-                next;
-            }
-
-            if(defined($written) && $written) {
-                if(length($clients{$cid}->{outbuffer}) == $written) {
-                    $clients{$cid}->{outbuffer} = '';
-                } else {
-                    $clients{$cid}->{outbuffer} = substr($clients{$cid}->{outbuffer}, $written);
-                }   
+            if($cmode eq 'D') {
+                $self->{cache}->{$ckey}->{data} = '';
+                $self->{cache}->{$ckey}->{deleted} = 1;
             }
         }
 
-        if($workCount) {
-            $self->{usleep} = 0;
-        } elsif($self->{usleep} < $self->{config}->{throttle}->{maxsleep}) {
-            $self->{usleep} += $self->{config}->{throttle}->{step};
+        $self->{savecache} = 1;
+        $self->{sendinterclacks} = 1;
+    } elsif($inmsg =~ /^STORE\ (.+?)\=(.*)/) {
+        my ($ckey, $cval) = ($1, $2);
+        $self->{cache}->{$ckey} = {
+            data => $cval,
+            cachetime => $now,
+            accesstime => $now,
+            deleted => 0,
+        };
+        $self->{savecache} = 1;
+    } elsif($inmsg =~ /^SETANDSTORE\ (.+?)\=(.*)/) {
+        my ($ckey, $cval) = ($1, $2);
+        my %tmp = (
+            sender => $cid,
+            type => 'SETANDSTORE',
+            name => $ckey,
+            value => $cval,
+        );
+        push @{$self->{outbox}}, \%tmp;
+        $self->{cache}->{$ckey} = {
+            data => $cval,
+            cachetime => $now,
+            accesstime => $now,
+            deleted => 0,
+        };
+        $self->{savecache} = 1;
+    } elsif($inmsg =~ /^RETRIEVE\ (.+)/) {
+        #$self->{clients}->{$cid}->{outbuffer} .= "SET ". $line->{name} . "=" . $line->{value} . "\r\n";
+        my $ckey = $1;
+        if(defined($self->{cache}->{$ckey}) && !$self->{cache}->{$ckey}->{deleted}) {
+            $self->{clients}->{$cid}->{outbuffer} .= "RETRIEVED $ckey=" . $self->{cache}->{$ckey}->{data} . "\r\n";
+            $self->{cache}->{$ckey}->{accesstime} = $now;
+            $self->{savecache} = 1;
+        } else {
+            $self->{clients}->{$cid}->{outbuffer} .= "NOTRETRIEVED $ckey\r\n";
         }
-        if($self->{usleep}) {
-            sleep($self->{usleep} / 1000);
+        $self->{sendinterclacks} = 0;
+    } elsif($inmsg =~ /^REMOVE\ (.+)/) {
+        my $ckey = $1;
+        $self->{cache}->{$ckey} = {
+            data => '',
+            cachetime => $now,
+            accesstime => $now,
+            deleted => 1,
+        };
+        $self->{savecache} = 1;
+    } elsif($inmsg =~ /^INCREMENT\ (.+)/) {
+        my $ckey = $1;
+        my $cval = 1;
+        if($ckey =~ /(.+)\=(.+)/) {
+            ($ckey, $cval) = ($1, $2);
+            $cval = 0 + $cval;
         }
+
+        my $oldval = 0;
+        if(defined($self->{cache}->{$ckey}) && !$self->{cache}->{$ckey}->{deleted} && looks_like_number($self->{cache}->{$ckey}->{data})) {
+            $oldval = $self->{cache}->{$ckey}->{data};
+        }
+
+        $self->{cache}->{$ckey} = {
+            data => $oldval + $cval,
+            cachetime => $now,
+            accesstime => $now,
+            deleted => 0,
+        };
+
+        $self->{savecache} = 1;
+    } elsif($inmsg =~ /^DECREMENT\ (.+)/) {
+        my $ckey = $1;
+        my $cval = 1;
+        if($ckey =~ /(.+)\=(.+)/) {
+            ($ckey, $cval) = ($1, $2);
+            $cval = 0 + $cval;
+        }
+
+        my $oldval = 0;
+        if(defined($self->{cache}->{$ckey}) && !$self->{cache}->{$ckey}->{deleted} && looks_like_number($self->{cache}->{$ckey}->{data})) {
+            $oldval = $self->{cache}->{$ckey}->{data};
+        }
+
+        $self->{cache}->{$ckey} = {
+            data => $oldval - $cval,
+            cachetime => $now,
+            accesstime => $now,
+            deleted => 0,
+        };
+
+        $self->{savecache} = 1;
+    } elsif($inmsg =~ /^KEYLIST/) {
+        $self->{clients}->{$cid}->{outbuffer} .= "KEYLISTSTART\r\n";
+        foreach my $ckey (sort keys %{$self->{cache}}) {
+            $self->{clients}->{$cid}->{outbuffer} .= "KEY $ckey\r\n";
+        }
+        $self->{clients}->{$cid}->{outbuffer} .= "KEYLISTEND\r\n";
+        $self->{sendinterclacks} = 0;
+    } elsif($inmsg =~ /^CLEARCACHE/) {
+        $self->{cache} = {};
+        $self->{savecache} = 1;
+    } else {
+        # "not handled in this sub"
+        return 0;
     }
 
-    print "Shutting down...\n";
-
-    # Make sure we save the latest version of the persistance file
-    $self->savePersistanceFile($savecache);
-
-    sleep(0.5);
-    foreach my $cid (keys %clients) {
-        print "Removing client $cid\n";
-        # Try to notify the client (may or may not work);
-        $self->evalsyswrite($clients{$cid}->{socket}, "\r\nQUIT\r\n");
-
-        delete $clients{$cid};
-    }
-    print "All clients removed\n";
-
-
-    return;
-}
-sub savePersistanceFile($self, $savecache) {
-    if(!$self->{persistance}) {
-        return;
-    }
-
-    print "Saving persistance file\n";
-    my $line = Dump($self->{clackscache});
-    $line = encode_base64($line, '');
-    my $timestampline = Dump($self->{clackscachetime});
-    $timestampline = encode_base64($timestampline, '');
-    my $accesstimeline = Dump($self->{clackscacheaccesstime});
-    $accesstimeline = encode_base64($accesstimeline, '');
-
-    my $tempfname = $self->{config}->{persistancefile} . '_';
-    my $backfname = $self->{config}->{persistancefile} . '_bck';
-    if($savecache == 1) {
-        # Normal savecache operation only
-        copy($self->{config}->{persistancefile}, $backfname);
-    }
-
-    if(open(my $ofh, '>', $tempfname)) {
-        print $ofh $line, "\n";
-        print $ofh $timestampline, "\n";
-        print $ofh $accesstimeline, "\n";
-        print $ofh "ENDBYTES\n";
-        close $ofh;
-    }
-    move($tempfname, $self->{config}->{persistancefile});
-
-    if($savecache == 2) {
-        # Need to make sure we have a valid backup file, since we had a general problem while loading
-        copy($self->{config}->{persistancefile}, $backfname);
-    }
-
-    return;
+    return 1;
 }
 
-sub deref($self, $val) {
-    return if(!defined($val));
+sub _handleMessageControl($self, $cid, $inmsg) {
+    my $now = $self->_getTime();
 
-    while(ref($val) eq "SCALAR" || ref($val) eq "REF") {
-        $val = ${$val};
-        last if(!defined($val));
+    if($inmsg =~ /^LISTEN\ (.*)/) {
+        $self->{clients}->{$cid}->{listening}->{$1} = 1;
+        $self->{sendinterclacks} = 0;
+    } elsif($inmsg =~ /^UNLISTEN\ (.*)/) {
+        delete $self->{clients}->{$cid}->{listening}->{$1};
+        $self->{sendinterclacks} = 0;
+    } elsif($inmsg =~ /^MONITOR/) {
+        $self->{clients}->{$cid}->{mirror} = 1;
+        $self->{sendinterclacks} = 0;
+    } elsif($inmsg =~ /^UNMONITOR/) {
+        $self->{clients}->{$cid}->{mirror} = 0;
+        $self->{sendinterclacks} = 0;
+    } elsif($inmsg =~ /^QUIT/) {
+        print STDERR "Client disconnected cleanly!\n";
+        push @{$self->{toremove}}, $cid;
+        $self->{sendinterclacks} = 0;
+    } elsif($inmsg =~ /^TIMEOUT/ && $self->{clients}->{$cid}->{interclacks}) {
+        print STDERR "Ooops, didn't send timely PINGS through interclacks link!\n";
+        push @{$self->{toremove}}, $cid;
+        $self->{sendinterclacks} = 0;
+    } elsif($inmsg =~ /^PING/) {
+        $self->{clients}->{$cid}->{lastping} = $now;
+        $self->{sendinterclacks} = 0;
+    } elsif($inmsg =~ /^NOPING/) {
+        # Disable PING check until next PING recieved
+        $self->{clients}->{$cid}->{lastping} = 0;
+        $self->{sendinterclacks} = 0;
+    } elsif($inmsg =~ /^CLIENTLIST/) {
+        $self->{clients}->{$cid}->{outbuffer} .= "CLIENTLISTSTART\r\n";
+        foreach my $lmccid (sort keys %{$self->{clients}}) {
+            $self->{clients}->{$cid}->{outbuffer} .= "CLIENT CID=$lmccid;" .
+                                                "HOST=" . $self->{clients}->{$lmccid}->{host} . ";" .
+                                                "PORT=" . $self->{clients}->{$lmccid}->{port} . ";" .
+                                                "CLIENTINFO=" . $self->{clients}->{$lmccid}->{clientinfo} . ";" .
+                                                "OUTBUFFER_LENGTH=" . length($self->{clients}->{$lmccid}->{outbuffer}) . ";" .
+                                                "INBUFFER_LENGTH=" . length($self->{clients}->{$lmccid}->{buffer}) . ";" .
+                                                "INTERCLACKS=" . $self->{clients}->{$lmccid}->{interclacks} . ";" .
+                                                "MONITOR=" . $self->{clients}->{$lmccid}->{mirror} . ";" .
+                                                "LASTPING=" . $self->{clients}->{$lmccid}->{lastping} . ";" .
+                                                "LASTINTERCLACKSPING=" . $self->{clients}->{$lmccid}->{lastinterclacksping} . ";" .
+                                                "\r\n";
+        }
+        $self->{clients}->{$cid}->{outbuffer} .= "CLIENTLISTEND\r\n";
+        $self->{sendinterclacks} = 0;
+    } elsif($inmsg =~ /^CLIENTDISCONNECT\ (.+)/) {
+        my $lmccid = $1;
+        if(defined($self->{clients}->{$lmccid})) {
+            # Try to notify the client (may or may not work);
+            $self->_evalsyswrite($self->{clients}->{$lmccid}->{socket}, "\r\nQUIT\r\n");
+            push @{$self->{toremove}}, $lmccid;
+        }
+        $self->{sendinterclacks} = 0;
+    } elsif($inmsg =~ /^FLUSH\ (.+)/) {
+        my $retid = $1;
+        $self->{clients}->{$cid}->{outbuffer} .= "FLUSHED $retid\r\n";
+        $self->{sendinterclacks} = 0;
+    } else {
+        # "not handled in this sub"
+        return 0;
     }
 
-    return $val;
+    return 1;
 }
 
-sub evalsyswrite($self, $socket, $buffer) {
-    return 0 unless(length($buffer));
 
-    my $written = 0;
-    my $ok = 0;
-    eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
-        $written = syswrite($socket, $buffer);
-        $ok = 1;
-    };
-    if($EVAL_ERROR || !$ok) {
-        print STDERR "Write error: $EVAL_ERROR\n";
-        return -1;
+sub _handleMessageDirect($self, $cid, $inmsg) {
+    if($inmsg =~ /^NOTIFY\ (.*)/) {
+        my %tmp = (
+            sender => $cid,
+            type => 'NOTIFY',
+            name => $1,
+        );
+        push @{$self->{outbox}}, \%tmp;
+    } elsif($inmsg =~ /^SET\ (.+?)\=(.*)/) {
+        my %tmp = (
+            sender => $cid,
+            type => 'SET',
+            name => $1,
+            value => $2,
+        );
+        push @{$self->{outbox}}, \%tmp;
+    } else {
+        # "not handled in this sub"
+        return 0;
     }
 
-    return $written;
+    return 1;
 }
-
-sub getTime($self) {
-    my $now = time + $self->{timeoffset};
-
-    return $now;
-}
-
-sub slurpBinFile($fname) {
-    # Read in file in binary mode, slurping it into a single scalar.
-    # We have to make sure we use binmode *and* turn on the line termination variable completly
-    # to work around the multiple idiosynchrasies of Perl on Windows
-    open(my $fh, "<", $fname) or croak($ERRNO);
-    local $INPUT_RECORD_SEPARATOR = undef;
-    binmode($fh);
-    my $data = <$fh>;
-    close($fh);
-
-    return $data;
-}
-
-
 
 1;
 __END__
@@ -1461,15 +1748,12 @@ Create a new instance.
 
 =head2 init
 
-Initialize server instance (required before running)
+DEPRECATED: Initialize server instance (required before running). This is now a dummy function that will show a deprecation warning and return.
+Initialization is now done automatically when calling run().
 
 =head2 run
 
 Run the server instance
-
-=head2 deref
-
-Internal function
 
 =head1 IMPORTANT NOTE
 

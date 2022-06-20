@@ -2,7 +2,7 @@ NAME
     MooseX::Extended - Extend Moose with safe defaults and useful features
 
 VERSION
-    version 0.21
+    version 0.25
 
 SYNOPSIS
         package My::Names {
@@ -36,7 +36,10 @@ SYNOPSIS
 
 DESCRIPTION
     This module is BETA code. It's feature-complete for release and has no
-    known bugs.
+    known bugs. We believe it's ready for production, but make no promises.
+
+    This is a quick overview. See MooseX::Extended::Manual::Tutorial for
+    more information.
 
     This class attempts to create a safer version of Moose that defaults to
     read-only attributes and is easier to read and write.
@@ -75,7 +78,7 @@ DESCRIPTION
     and "field".
 
     A "param" is a required parameter (defaults may be used). A "field" is
-    not allowed to be passed to the constructor.
+    not intended to be passed to the constructor.
 
     Note that the "has" function is still available, even if it's not
     needed.
@@ -130,49 +133,49 @@ CONFIGURATION
 
     *   "StrictConstructor"
 
-            use MooseX::Extended::Role excludes => ['StrictConstructor'];
+            use MooseX::Extended excludes => ['StrictConstructor'];
 
         Excluding this will no longer import "MooseX::StrictConstructor".
 
     *   "autoclean"
 
-            use MooseX::Extended::Role excludes => ['autoclean'];
+            use MooseX::Extended excludes => ['autoclean'];
 
         Excluding this will no longer import "namespace::autoclean".
 
     *   "c3"
 
-            use MooseX::Extended::Role excludes => ['c3'];
+            use MooseX::Extended excludes => ['c3'];
 
         Excluding this will no longer apply the C3 mro.
 
     *   "carp"
 
-            use MooseX::Extended::Role excludes => ['carp'];
+            use MooseX::Extended excludes => ['carp'];
 
         Excluding this will no longer import "Carp::croak" and "Carp::carp".
 
     *   "immutable"
 
-            use MooseX::Extended::Role excludes => ['immutable'];
+            use MooseX::Extended excludes => ['immutable'];
 
         Excluding this will no longer make your class immutable.
 
     *   "true"
 
-            use MooseX::Extended::Role excludes => ['true'];
+            use MooseX::Extended excludes => ['true'];
 
         Excluding this will require your module to end in a true value.
 
     *   "param"
 
-            use MooseX::Extended::Role excludes => ['param'];
+            use MooseX::Extended excludes => ['param'];
 
         Excluding this will make the "param" function unavailable.
 
     *   "field"
 
-            use MooseX::Extended::Role excludes => ['field'];
+            use MooseX::Extended excludes => ['field'];
 
         Excluding this will make the "field" function unavailable.
 
@@ -278,14 +281,17 @@ IMMUTABILITY
     See the MooseX::Extended::Manual::Cloning documentation.
 
 OBJECT CONSTRUCTION
-    Objection construction for MooseX::Extended is like Moose, so no changes
-    are needed. However, in addition to "has", we also provide "param" and
-    "field" attributes, both of which are "is => 'ro'" by default.
+    Object construction for MooseX::Extended is identical to Moose because
+    MooseX::Extended *is* Moose, so no changes are needed. However, in
+    addition to "has", we also provide "param" and "field" attributes, both
+    of which are "is => 'ro'" by default.
 
     The "param" is *required*, whether by passing it to the constructor, or
     using "default" or "builder".
 
-    The "field" is *forbidden* in the constructor and lazy by default.
+    The "field" is *forbidden* in the constructor and is lazy if it has a
+    builder, because that builder is often dependent on attributes set in
+    the constructor (and why call it if it's not used?).
 
     Here's a short example:
 
@@ -327,6 +333,16 @@ ATTRIBUTE SHORTCUTS
             ...
         }
 
+    You can also do this:
+
+        param name ( isa => NonEmptyStr, builder => sub {...} );
+
+    That's the same as:
+
+        param name ( isa => NonEmptyStr, builder => '_build_name' );
+
+        sub _build_name {...}
+
     See MooseX::Extended::Manual::Shortcuts for a full explanation.
 
 INVALID ATTRIBUTE DEFINITIONS
@@ -350,7 +366,9 @@ INVALID ATTRIBUTE DEFINITIONS
     This also applies to various attributes which allow method names, such
     as "clone", "builder", "clearer", "writer", "reader", and "predicate".
 
-    Trying to pass a defined "init_arg" to "field" will also this exception.
+    Trying to pass a defined "init_arg" to "field" will also throw this
+    exception, unless the init_arg begins with an underscore. (It is
+    sometimes useful to be able to define an "init_arg" for unit testing.)
 
 DEBUGGER SUPPORT
     When running MooseX::Extended under the debugger, there are some
@@ -363,6 +381,9 @@ DEBUGGER SUPPORT
         However, that runs too late under the debugger and dies. Thus, we
         disable this feature under the debugger. Your classes may run a bit
         slower, but hey, it's the debugger!
+
+        There is a PR against B::Hooks::AtRuntime which will fix this issue
+        <https://github.com/mauzo/B-Hooks-AtRuntime/pull/1>.
 
     *   "namespace::autoclean" will frustrate you
 
@@ -377,7 +398,16 @@ DEBUGGER SUPPORT
         debugger, but backed that out:
         <https://github.com/Ovid/moosex-extreme/issues/11>.
 
+BUGS AND LIMITATIONS
+    If the MooseX::Extended classes are loaded via *stringy* eval, "true" is
+    not loaded, nor is your class made immutable. This is because there were
+    intermittant errors (maybe 1 out of 5 times) being thrown. Removing
+    these features under stringy eval solves this. See this github ticket
+    for more infomration <https://github.com/Ovid/moosex-extreme/pull/34>.
+
 MANUAL
+    *   MooseX::Extended::Manual::Tutorial
+
     *   MooseX::Extended::Manual::Overview
 
     *   MooseX::Extended::Manual::Construction

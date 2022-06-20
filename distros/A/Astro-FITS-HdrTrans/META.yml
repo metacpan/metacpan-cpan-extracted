@@ -20,136 +20,136 @@ name: Astro-FITS-HdrTrans
 provides:
   Astro::FITS::HdrTrans:
     file: lib/Astro/FITS/HdrTrans.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::ACSIS:
     file: lib/Astro/FITS/HdrTrans/ACSIS.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::Base:
     file: lib/Astro/FITS/HdrTrans/Base.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::CGS4New:
     file: lib/Astro/FITS/HdrTrans/CGS4New.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::CGS4Old:
     file: lib/Astro/FITS/HdrTrans/CGS4Old.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::CURVE:
     file: lib/Astro/FITS/HdrTrans/CURVE.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::ClassicCam:
     file: lib/Astro/FITS/HdrTrans/ClassicCam.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::ESO:
     file: lib/Astro/FITS/HdrTrans/ESO.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::FITS:
     file: lib/Astro/FITS/HdrTrans/FITS.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::GEMINI:
     file: lib/Astro/FITS/HdrTrans/GEMINI.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::GMOS:
     file: lib/Astro/FITS/HdrTrans/GMOS.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::INGRID:
     file: lib/Astro/FITS/HdrTrans/INGRID.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::IRCAM:
     file: lib/Astro/FITS/HdrTrans/IRCAM.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::IRIS2:
     file: lib/Astro/FITS/HdrTrans/IRIS2.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::ISAAC:
     file: lib/Astro/FITS/HdrTrans/ISAAC.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::JAC:
     file: lib/Astro/FITS/HdrTrans/JAC.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::JCMT:
     file: lib/Astro/FITS/HdrTrans/JCMT.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::JCMT_GSD:
     file: lib/Astro/FITS/HdrTrans/JCMT_GSD.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::JCMT_GSD_DB:
     file: lib/Astro/FITS/HdrTrans/JCMT_GSD_DB.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::LCO:
     file: lib/Astro/FITS/HdrTrans/LCO.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::LCOFLI_1m0:
     file: lib/Astro/FITS/HdrTrans/LCOFLI_1m0.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::LCOFLOYDS:
     file: lib/Astro/FITS/HdrTrans/LCOFLOYDS.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::LCOMEROPE:
     file: lib/Astro/FITS/HdrTrans/LCOMEROPE.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::LCOSBIG_0m4:
     file: lib/Astro/FITS/HdrTrans/LCOSBIG_0m4.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::LCOSBIG_0m8:
     file: lib/Astro/FITS/HdrTrans/LCOSBIG_0m8.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::LCOSBIG_1m0:
     file: lib/Astro/FITS/HdrTrans/LCOSBIG_1m0.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::LCOSBIG_CC:
     file: lib/Astro/FITS/HdrTrans/LCOSBIG_CC.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::LCOSINISTRO_1m0:
     file: lib/Astro/FITS/HdrTrans/LCOSINISTRO_1m0.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::LCOSPECTRAL:
     file: lib/Astro/FITS/HdrTrans/LCOSPECTRAL.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::MICHELLE:
     file: lib/Astro/FITS/HdrTrans/MICHELLE.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::NACO:
     file: lib/Astro/FITS/HdrTrans/NACO.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::NIRI:
     file: lib/Astro/FITS/HdrTrans/NIRI.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::RxH3:
     file: lib/Astro/FITS/HdrTrans/RxH3.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::SCUBA:
     file: lib/Astro/FITS/HdrTrans/SCUBA.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::SCUBA2:
     file: lib/Astro/FITS/HdrTrans/SCUBA2.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::SOFI:
     file: lib/Astro/FITS/HdrTrans/SOFI.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::SPEX:
     file: lib/Astro/FITS/HdrTrans/SPEX.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::UFTI:
     file: lib/Astro/FITS/HdrTrans/UFTI.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::UIST:
     file: lib/Astro/FITS/HdrTrans/UIST.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::UKIRT:
     file: lib/Astro/FITS/HdrTrans/UKIRT.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::UKIRTDB:
     file: lib/Astro/FITS/HdrTrans/UKIRTDB.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::UKIRTNew:
     file: lib/Astro/FITS/HdrTrans/UKIRTNew.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::UKIRTOld:
     file: lib/Astro/FITS/HdrTrans/UKIRTOld.pm
-    version: '1.64'
+    version: '1.65'
   Astro::FITS::HdrTrans::WFCAM:
     file: lib/Astro/FITS/HdrTrans/WFCAM.pm
-    version: '1.64'
+    version: '1.65'
 recommends:
   Astro::PAL: '0'
   Starlink::AST: '1.02'
@@ -165,5 +165,5 @@ requires:
 resources:
   license: http://opensource.org/licenses/gpl-2.0.php
   repository: git://github.com/Starlink/perl-Astro-FITS-HdrTrans.git
-version: '1.64'
+version: '1.65'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

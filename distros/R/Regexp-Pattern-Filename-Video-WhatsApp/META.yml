@@ -19,7 +19,7 @@ name: Regexp-Pattern-Filename-Video-WhatsApp
 provides:
   Regexp::Pattern::Filename::Video::WhatsApp:
     file: lib/Regexp/Pattern/Filename/Video/WhatsApp.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   perl: '5.010001'
   strict: '0'
@@ -28,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Pattern-Filename-Video-WhatsApp
   homepage: https://metacpan.org/release/Regexp-Pattern-Filename-Video-WhatsApp
   repository: git://github.com/perlancar/perl-Regexp-Pattern-Filename-Video-WhatsApp.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

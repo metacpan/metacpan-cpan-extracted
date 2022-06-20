@@ -3,18 +3,19 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Chromatic and diatonic melodic ornamentation
 
-our $VERSION = '0.0700';
+our $VERSION = '0.0701';
 
 use Carp qw(croak);
 use Data::Dumper::Compact qw(ddc);
 use List::SomeUtils qw(first_index);
 use MIDI::Simple ();
 use Music::Duration;
-use Music::Note;
 use Music::Scales qw(get_scale_MIDI is_scale);
 use Moo;
 use strictures 2;
 use namespace::clean;
+
+with('Music::PitchNum');
 
 use constant TICKS => 96;
 use constant OCTAVES => 10;
@@ -67,8 +68,8 @@ sub grace_note {
     my $grace_note = $self->_scale->[ $i + $offset ];
 
     if ($named) {
-        $pitch = Music::Note->new($pitch, 'midinum')->format('ISO');
-        $grace_note = Music::Note->new($grace_note, 'midinum')->format('ISO');
+        $pitch = $self->pitchname($pitch);
+        $grace_note = $self->pitchname($grace_note);
     }
 
     # Compute the ornament durations
@@ -99,9 +100,9 @@ sub turn {
     my $below = $self->_scale->[ $i - $offset ];
 
     if ($named) {
-        $pitch = Music::Note->new($pitch, 'midinum')->format('ISO');
-        $above = Music::Note->new($above, 'midinum')->format('ISO');
-        $below = Music::Note->new($below, 'midinum')->format('ISO');
+        $pitch = $self->pitchname($pitch);
+        $above = $self->pitchname($above);
+        $below = $self->pitchname($below);
     }
 
     # Compute the ornament durations
@@ -129,8 +130,8 @@ sub trill {
     my $alt = $self->_scale->[ $i + $offset ];
 
     if ($named) {
-        $pitch = Music::Note->new($pitch, 'midinum')->format('ISO');
-        $alt = Music::Note->new($alt, 'midinum')->format('ISO');
+        $pitch = $self->pitchname($pitch);
+        $alt = $self->pitchname($alt);
     }
 
     # Compute the ornament durations
@@ -160,8 +161,8 @@ sub mordent {
     my $alt = $self->_scale->[ $i + $offset ];
 
     if ($named) {
-        $pitch = Music::Note->new($pitch, 'midinum')->format('ISO');
-        $alt = Music::Note->new($alt, 'midinum')->format('ISO');
+        $pitch = $self->pitchname($pitch);
+        $alt = $self->pitchname($alt);
     }
 
     # Compute the ornament durations
@@ -210,7 +211,7 @@ sub slide {
 
     my @slide;
     if ($named) {
-        @slide = map { [ $z, Music::Note->new($scale[$_], 'midinum')->format('ISO') ] } $start .. $end;
+        @slide = map { [ $z, $self->pitchname($scale[$_]) ] } $start .. $end;
     }
     else {
         @slide = map { [ $z, $scale[$_] ] } $start .. $end;
@@ -226,7 +227,7 @@ sub _find_pitch {
 
     $scale //= $self->_scale;
 
-    $pitch = Music::Note->new($pitch, 'ISO')->format('midinum')
+    $pitch = $self->pitchnum($pitch)
         if $pitch =~ /[A-G]/;
 
     my $i = first_index { $_ eq $pitch } @$scale;
@@ -249,7 +250,7 @@ Music::MelodicDevice::Ornamentation - Chromatic and diatonic melodic ornamentati
 
 =head1 VERSION
 
-version 0.0700
+version 0.0701
 
 =head1 SYNOPSIS
 
@@ -313,6 +314,8 @@ B<scale_note>.
 
 Please see L<Music::Scales/SCALES> for a list of valid scale names.
 
+=for Pod::Coverage OCTAVES
+
 =head2 verbose
 
 Default: C<0>
@@ -340,6 +343,8 @@ Default offset: C<1>
 NB: I believe that "appoggiatura" means emphasis on the grace note,
 and "acciaccatura" means emphasis on the principle note.  This module
 doesn't accent notes.  You'll have to do that bit.
+
+=for Pod::Coverage TICKS
 
 =head2 turn
 
@@ -407,8 +412,6 @@ L<MIDI::Simple>
 L<Moo>
 
 L<Music::Duration>
-
-L<Music::Note>
 
 L<Music::Scales>
 

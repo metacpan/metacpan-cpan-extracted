@@ -4,50 +4,52 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"       => "prevent some subs from appearing in a role's API",
-  "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
-  "dynamic_config" => 0,
-  "generated_by"   => "Moose::Meta::Class::__ANON__::SERIAL::9 version , CPAN::Meta::Converter version 2.140640",
-  "keywords"       => [],
-  "license"        => ["perl_5"],
-  "meta-spec"      => {
-                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                        version => 2,
-                      },
-  "name"           => "Sub-NonRole",
-  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"        => {
-                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                        runtime => {
-                          requires => {
-                            "Hook::AfterRuntime" => 0,
-                            "MooX::CaptainHook"  => 0.004,
-                            "Sub::Identify"      => 0,
-                            "Sub::Talisman"      => 0,
+  "abstract"         => "prevent some subs from appearing in a role's API",
+  "author"           => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
+  "dynamic_config"   => 0,
+  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+  "keywords"         => [],
+  "license"          => ["perl_5"],
+  "meta-spec"        => {
+                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                          version => 2,
+                        },
+  "name"             => "Sub-NonRole",
+  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"          => {
+                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                          runtime => {
+                            requires => {
+                              "Hook::AfterRuntime" => 0,
+                              "perl" => 5.008,
+                              "Role::Hooks" => 0.005,
+                              "Sub::Talisman" => 0,
+                            },
+                          },
+                          test => {
+                            recommends => { "Moose::Role" => 2, "MooseX::Role::Parameterized" => 0 },
+                            requires   => { "Moo" => "1.000000", "Moo::Role" => 0, "Test::Requires" => 0 },
                           },
                         },
-                        test => {
-                          requires => { "Moo" => "1.000000", "Moo::Role" => 0, "Test::Requires" => 0 },
+  "provides"         => {
+                          "Sub::NonRole" => { file => "lib/Sub/NonRole.pm", version => 0.006 },
+                          "Sub::NonRole::Trait::ParameterizableRole" => { file => "lib/Sub/NonRole.pm" },
+                          "Sub::NonRole::Trait::Role" => { file => "lib/Sub/NonRole.pm" },
                         },
-                      },
-  "provides"       => {
-                        "Sub::NonRole" => { file => "lib/Sub/NonRole.pm", version => 0.004 },
-                        "Sub::NonRole::Trait::ParameterizableRole" => { file => "lib/Sub/NonRole.pm" },
-                        "Sub::NonRole::Trait::Role" => { file => "lib/Sub/NonRole.pm" },
-                      },
-  "release_status" => "stable",
-  "resources"      => {
-                        bugtracker   => { web => "http://rt.cpan.org/Dist/Display.html?Queue=Sub-NonRole" },
-                        homepage     => "https://metacpan.org/release/Sub-NonRole",
-                        license      => ["http://dev.perl.org/licenses/"],
-                        repository   => {
-                                          type => "git",
-                                          url  => "git://github.com/tobyink/p5-sub-nonrole.git",
-                                          web  => "https://github.com/tobyink/p5-sub-nonrole",
-                                        },
-                        X_identifier => "http://purl.org/NET/cpan-uri/dist/Sub-NonRole/project",
-                      },
-  "version"        => 0.004,
+  "release_status"   => "stable",
+  "resources"        => {
+                          bugtracker   => { web => "https://github.com/tobyink/p5-sub-nonrole/issues" },
+                          homepage     => "https://metacpan.org/release/Sub-NonRole",
+                          license      => ["http://dev.perl.org/licenses/"],
+                          repository   => {
+                                            type => "git",
+                                            url  => "git://github.com/tobyink/p5-sub-nonrole.git",
+                                            web  => "https://github.com/tobyink/p5-sub-nonrole",
+                                          },
+                          x_identifier => "http://purl.org/NET/cpan-uri/dist/Sub-NonRole/project",
+                        },
+  "version"          => 0.006,
+  "x_static_install" => 1,
 };
 
 my %dynamic_config;
@@ -121,28 +123,8 @@ else
 	}
 }
 
-sub FixMakefile
-{
-	return unless -d 'inc';
-	my $file = shift;
-	
-	local *MAKEFILE;
-	open MAKEFILE, "< $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	my $makefile = do { local $/; <MAKEFILE> };
-	close MAKEFILE or die $!;
-	
-	$makefile =~ s/\b(test_harness\(\$\(TEST_VERBOSE\), )/$1'inc', /;
-	$makefile =~ s/( -I\$\(INST_ARCHLIB\))/ -Iinc$1/g;
-	$makefile =~ s/( "-I\$\(INST_LIB\)")/ "-Iinc"$1/g;
-	$makefile =~ s/^(FULLPERL = .*)/$1 "-Iinc"/m;
-	$makefile =~ s/^(PERL = .*)/$1 "-Iinc"/m;
-	
-	open  MAKEFILE, "> $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	print MAKEFILE $makefile or die $!;
-	close MAKEFILE or die $!;
-}
 
 my $mm = WriteMakefile(%WriteMakefileArgs);
-FixMakefile($mm->{FIRST_MAKEFILE} || 'Makefile');
+
 exit(0);
 

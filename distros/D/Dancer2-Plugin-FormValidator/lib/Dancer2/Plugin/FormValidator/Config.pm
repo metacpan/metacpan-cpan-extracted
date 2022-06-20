@@ -19,12 +19,18 @@ has session => (
     is       => 'ro',
     isa      => HashRef,
     required => 1,
+    builder  => sub {
+        return $_[0]->config->{session} // {};
+    }
 );
 
 has session_namespace => (
     is       => 'ro',
     isa      => NonEmptyStr,
     required => 1,
+    builder  => sub {
+        return $_[0]->session->{namespace} //  '_form_validator';
+    }
 );
 
 has messages => (
@@ -62,18 +68,5 @@ has language => (
         return $_[0]->messages->{language} // 'en';
     }
 );
-
-sub BUILDARGS {
-    my ($self, %args) = @_;
-
-    if (my $config = $args{config}) {
-        if (my $session = $config->{session}) {
-            $args{session}           = $session;
-            $args{session_namespace} = $session->{namespace};
-        }
-    }
-
-    return \%args;
-}
 
 1;

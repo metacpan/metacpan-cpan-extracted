@@ -1,0 +1,42 @@
+#!perl
+
+use alienfile;
+use version 0.77;
+
+use constant MINIMUM_VERSION => '1.0.9';
+
+plugin 'PkgConfig' => (
+    pkg_name        => [qw/ libbrotlicommon libbrotlienc libbrotlidec /],
+    minimum_version => MINIMUM_VERSION,
+);
+
+share {
+
+    start_url 'https://github.com/google/brotli/tags';
+
+    plugin 'Build::SearchDep';
+
+    plugin 'Download' => (
+        filter  => qr/(\d\.)+\d\.tar\.gz$/,
+        version => qr/([0-9\.]+)/,
+        prefer  => 1,
+    );
+
+    plugin 'Extract' => 'tar.gz';
+
+    plugin 'Build::CMake';
+    plugin 'Build::Autoconf';
+
+    build [
+        './bootstrap',
+        '%{configure}',
+        '%{make}',
+        '%{make} install',
+    ];
+
+    after 'gather' => sub {
+        my($build) = @_;
+        $build->runtime_prop->{command} = 'brotli';
+    };
+
+};

@@ -184,20 +184,25 @@ minify(inStr)
     char* outStr = NULL;
     RETVAL = &PL_sv_undef;
   CODE:
-    char*  src = SvPVX(inStr);
-    STRLEN len = SvCUR(inStr);
+    char*  src;
+    STRLEN len;
     STRLEN packed = 0;
-    U32 is_utf8 = SvUTF8(inStr);
-    outStr = _minify_utf8(aTHX_ src, len, &packed);
-    if (outStr != NULL) {
-      SV* result = newSVpvn(outStr, packed);
-      if (is_utf8)
-        SvUTF8_on(result);
-      RETVAL = result;
-      Safefree(outStr);
-    }
-    else {
-      croak("_minify_utf8 returned NULL");
+    U32 is_utf8;
+    if (SvOK(inStr)) {
+      src = SvPVX(inStr);
+      len = SvCUR(inStr);
+      outStr = _minify_utf8(aTHX_ src, len, &packed);
+      if (outStr != NULL) {
+        SV* result = newSVpvn(outStr, packed);
+        is_utf8 = SvUTF8(inStr);
+        if (is_utf8)
+          SvUTF8_on(result);
+        RETVAL = result;
+        Safefree(outStr);
+      }
+      else {
+        croak("_minify_utf8 returned NULL");
+      }
     }
   OUTPUT:
     RETVAL
@@ -209,17 +214,21 @@ minify_ascii(inStr)
     char* outStr = NULL;
     RETVAL = &PL_sv_undef;
   CODE:
-    char*  src = SvPVX(inStr);
-    STRLEN len = SvCUR(inStr);
+    char*  src;
+    STRLEN len;
     STRLEN packed = 0;
-    outStr = _minify_ascii(aTHX_ src, len, &packed);
-    if (outStr != NULL) {
-      SV* result = newSVpvn(outStr, packed);
-      RETVAL = result;
-      Safefree(outStr);
-    }
-    else {
-      croak("_minify_ascii returned NULL");
+    if (SvOK(inStr)) {
+      src = SvPVX(inStr);
+      len = SvCUR(inStr);
+      outStr = _minify_ascii(aTHX_ src, len, &packed);
+      if (outStr != NULL) {
+        SV* result = newSVpvn(outStr, packed);
+        RETVAL = result;
+        Safefree(outStr);
+      }
+      else {
+        croak("_minify_ascii returned NULL");
+      }
     }
   OUTPUT:
     RETVAL

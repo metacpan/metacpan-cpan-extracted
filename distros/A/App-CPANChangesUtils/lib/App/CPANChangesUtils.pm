@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-17'; # DATE
+our $DATE = '2022-06-10'; # DATE
 our $DIST = 'App-CPANChangesUtils'; # DIST
-our $VERSION = '0.074'; # VERSION
+our $VERSION = '0.076'; # VERSION
 
 our %SPEC;
 
@@ -23,6 +23,8 @@ our %argspecs_common = (
         default => 'CPAN::Changes',
     },
 );
+
+our $re_rel_metadata = qr/(?:([A-Za-z]+(?:-[A-Za-z]+)*):\s*([^;]*))/;
 
 $SPEC{parse_cpan_changes} = {
     v => 1.1,
@@ -45,13 +47,48 @@ serializing Perl objects, e.g. on the CLI using `--format=perl`.
 
 _
         },
+        parse_release_metadata => {
+            summary => 'Whether to parse release metadata in release note',
+            schema => 'bool*',
+            default => 1,
+            description => <<'_',
+
+If set to true (the default), the utility will attempt to parse release metadata
+in the release note. The release note is the text after the version and date in
+the first line of a release entry:
+
+    0.001 - 2022-06-10 THIS IS THE RELEASE NOTE AND CAN BE ANY TEXT
+
+One convention I use is for the release note to be semicolon-separated of
+metadata entries, where each metadata is in the form of HTTP-header-like "Name:
+Value" text where Name is dash-separated words and Value is any text that does
+not contain newline or semicolon. Example:
+
+    0.001 - 2022-06-10  Urgency: high; Backward-Incompatible: yes
+
+Note that Debian changelog also supports "key=value" in the release line.
+
+This option, when enabled, will first check if the release note is indeed in the
+form of semicolon-separated metadata. If yes, will create a key called
+C<metadata> in the release result structure containing a hash of metadata:
+
+    { "urgency" => "high", "backward-incompatible" => "yes" }
+
+Note that the metadata names are converted to lowercase.
+
+_
+        },
     },
+    examples => [
+        {args=>{}},
+    ],
 };
 sub parse_cpan_changes {
     require Data::Structure::Util;
 
     my %args = @_;
     my $unbless = $args{unbless} // 1;
+    my $parse_release_metadata = $args{parse_release_metadata} // 1;
     my $class = $args{class} // 'CPAN::Changes';
     (my $class_pm = "$class.pm") =~ s!::!/!g;
     require $class_pm;
@@ -67,6 +104,20 @@ sub parse_cpan_changes {
         unless $file;
 
     my $ch = $class->load($file);
+
+    if ($parse_release_metadata) {
+        for my $rel ($ch->releases) {
+            my $note = $rel->note;
+            if ($note =~ /\A$re_rel_metadata(?:;\s*$re_rel_metadata)*/) {
+                my $meta = {};
+                while ($note =~ /$re_rel_metadata/g) {
+                    $meta->{lc $1} = $2;
+                }
+                $rel->{metadata} = $meta;
+            }
+        }
+    }
+
     [200, "OK", $unbless ? Data::Structure::Util::unbless($ch) : $ch];
 }
 
@@ -107,7 +158,7 @@ App::CPANChangesUtils - Parse CPAN Changes file
 
 =head1 VERSION
 
-This document describes version 0.074 of App::CPANChangesUtils (from Perl distribution App-CPANChangesUtils), released on 2021-10-17.
+This document describes version 0.076 of App::CPANChangesUtils (from Perl distribution App-CPANChangesUtils), released on 2022-06-10.
 
 =head1 DESCRIPTION
 
@@ -164,6 +215,206 @@ Usage:
 
 Parse CPAN Changes file.
 
+Examples:
+
+=over
+
+=item * Example #1:
+
+ parse_cpan_changes();
+
+Result:
+
+ [
+   200,
+   "OK",
+   {
+     months   => {
+                   Apr => 4,
+                   Aug => 8,
+                   Dec => 12,
+                   Feb => 2,
+                   Jan => 1,
+                   Jul => 7,
+                   Jun => 6,
+                   Mar => 3,
+                   May => 5,
+                   Nov => 11,
+                   Oct => 10,
+                   Sep => 9,
+                 },
+     preamble => "",
+     releases => {
+                   "0.01"  => {
+                                _parsed_date => "2013-08-05",
+                                changes      => { "" => { changes => ["First version."], name => "" } },
+                                date         => "2013-08-05",
+                                metadata     => { "released-by" => "SHARYANTO" },
+                                note         => "Released-By: SHARYANTO",
+                                version      => 0.01,
+                              },
+                   "0.02"  => {
+                                _parsed_date => "2013-08-06",
+                                changes      => {
+                                                  "" => {
+                                                          changes => ["No functional changes. Add missing dep [CT]."],
+                                                          name => "",
+                                                        },
+                                                },
+                                date         => "2013-08-06",
+                                metadata     => { "released-by" => "SHARYANTO" },
+                                note         => "Released-By: SHARYANTO",
+                                version      => 0.02,
+                              },
+                   "0.03"  => {
+                                _parsed_date => "2013-11-01",
+                                changes      => {
+                                                  "" => {
+                                                          changes => [
+                                                            "No functional changes. Mention some other modules and the rationale for the script.",
+                                                          ],
+                                                          name => "",
+                                                        },
+                                                },
+                                date         => "2013-11-01",
+                                metadata     => { "released-by" => "SHARYANTO" },
+                                note         => "Released-By: SHARYANTO",
+                                version      => 0.03,
+                              },
+                   "0.04"  => {
+                                _parsed_date => "2014-07-22",
+                                changes      => {
+                                                  "" => {
+                                                          changes => [
+                                                            "No functional changes.",
+                                                            "Switch CLI scripts from using Perinci::CmdLine to Perinci::CmdLine::Any to reduce size of dependencies.",
+                                                          ],
+                                                          name => "",
+                                                        },
+                                                },
+                                date         => "2014-07-22",
+                                metadata     => { "released-by" => "SHARYANTO" },
+                                note         => "Released-By: SHARYANTO",
+                                version      => 0.04,
+                              },
+                   "0.05"  => {
+                                _parsed_date => "2015-09-03",
+                                changes      => {
+                                                  "" => {
+                                                          changes => [
+                                                            "No functional changes.",
+                                                            "[dist] Move spec prereqs from RuntimeRequires to DevelopRecommends to reduce deps but still allow indicating spec requirement.",
+                                                          ],
+                                                          name => "",
+                                                        },
+                                                },
+                                date         => "2015-09-03",
+                                metadata     => { "released-by" => "PERLANCAR" },
+                                note         => "Released-By: PERLANCAR",
+                                version      => 0.05,
+                              },
+                   "0.06"  => {
+                                _parsed_date => "2016-01-18",
+                                changes      => {
+                                                  "" => {
+                                                          changes => [
+                                                            "No functional changes.",
+                                                            "[build] Rebuild to fix POD section ordering.",
+                                                          ],
+                                                          name => "",
+                                                        },
+                                                },
+                                date         => "2016-01-18",
+                                metadata     => { "released-by" => "PERLANCAR" },
+                                note         => "Released-By: PERLANCAR",
+                                version      => 0.06,
+                              },
+                   "0.070" => {
+                                _parsed_date => "2019-07-03",
+                                changes      => {
+                                                  "" => {
+                                                          changes => ["Add option --class to customize parser class."],
+                                                          name => "",
+                                                        },
+                                                },
+                                date         => "2019-07-03",
+                                metadata     => { "released-by" => "PERLANCAR", "urgency" => "medium" },
+                                note         => "Released-By: PERLANCAR; Urgency: medium",
+                                version      => "0.070",
+                              },
+                   "0.071" => {
+                                _parsed_date => "2020-10-06",
+                                changes      => { "" => { changes => ["Add option --no-unbless."], name => "" } },
+                                date         => "2020-10-06",
+                                metadata     => { "released-by" => "PERLANCAR", "urgency" => "medium" },
+                                note         => "Released-By: PERLANCAR; Urgency: medium",
+                                version      => 0.071,
+                              },
+                   "0.072" => {
+                                _parsed_date => "2021-05-25",
+                                changes      => {
+                                                  "" => {
+                                                          changes => [
+                                                            "[build] Rebuild to update Sah coercion module names (old Sah coercion modules have been purged from CPAN).",
+                                                          ],
+                                                          name => "",
+                                                        },
+                                                },
+                                date         => "2021-05-25",
+                                metadata     => { "released-by" => "PERLANCAR", "urgency" => "high" },
+                                note         => "Released-By: PERLANCAR; Urgency: high",
+                                version      => 0.072,
+                              },
+                   "0.073" => {
+                                _parsed_date => "2021-10-17",
+                                changes      => {
+                                                  "" => {
+                                                          changes => [
+                                                            "Rename module/dist App-ParseCPANChanges -> App-CPANChangesUtils. - Add CLI format-cpan-changes.",
+                                                          ],
+                                                          name => "",
+                                                        },
+                                                },
+                                date         => "2021-10-17",
+                                metadata     => { "released-by" => "PERLANCAR", "urgency" => "medium" },
+                                note         => "Released-By: PERLANCAR; Urgency: medium",
+                                version      => 0.073,
+                              },
+                   "0.075" => {
+                                _parsed_date => "2022-06-10",
+                                changes      => {
+                                                  "" => {
+                                                          changes => [
+                                                            "[utility parse-cpan-changes] Add option parse_release_metadata (defaults to true) to parse 'key: value' metadata in the release note.",
+                                                          ],
+                                                          name => "",
+                                                        },
+                                                },
+                                date         => "2022-06-10",
+                                metadata     => { "released-by" => "PERLANCAR", "urgency" => "medium" },
+                                note         => "Released-By: PERLANCAR; Urgency: medium",
+                                version      => 0.075,
+                              },
+                   "0.076" => {
+                                _parsed_date => "2022-06-10",
+                                changes      => {
+                                                  "" => {
+                                                          changes => ["No functional changes.", "[ux] Add an example."],
+                                                          name => "",
+                                                        },
+                                                },
+                                date         => "2022-06-10",
+                                metadata     => { "released-by" => "PERLANCAR", "urgency" => "low" },
+                                note         => "Released-By: PERLANCAR; Urgency: low",
+                                version      => 0.076,
+                              },
+                 },
+   },
+   {},
+ ]
+
+=back
+
 This utility is a simple wrapper for L<CPAN::Changes>.
 
 This function is not exported.
@@ -177,6 +428,33 @@ Arguments ('*' denotes required arguments):
 =item * B<file> => I<filename>
 
 If not specified, will look for file called ChangesE<sol>ChangeLog in current directory.
+
+=item * B<parse_release_metadata> => I<bool> (default: 1)
+
+Whether to parse release metadata in release note.
+
+If set to true (the default), the utility will attempt to parse release metadata
+in the release note. The release note is the text after the version and date in
+the first line of a release entry:
+
+ 0.001 - 2022-06-10 THIS IS THE RELEASE NOTE AND CAN BE ANY TEXT
+
+One convention I use is for the release note to be semicolon-separated of
+metadata entries, where each metadata is in the form of HTTP-header-like "Name:
+Value" text where Name is dash-separated words and Value is any text that does
+not contain newline or semicolon. Example:
+
+ 0.001 - 2022-06-10  Urgency: high; Backward-Incompatible: yes
+
+Note that Debian changelog also supports "key=value" in the release line.
+
+This option, when enabled, will first check if the release note is indeed in the
+form of semicolon-separated metadata. If yes, will create a key called
+C<metadata> in the release result structure containing a hash of metadata:
+
+ { "urgency" => "high", "backward-incompatible" => "yes" }
+
+Note that the metadata names are converted to lowercase.
 
 =item * B<unbless> => I<bool> (default: 1)
 
@@ -243,7 +521,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

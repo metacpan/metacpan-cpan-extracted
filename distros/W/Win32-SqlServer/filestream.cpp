@@ -1,11 +1,16 @@
 ﻿/*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/filestream.cpp 3     18-04-09 22:48 Sommar $
+ $Header: /Perl/OlleDB/filestream.cpp 4     22-05-08 23:12 Sommar $
 
   This file includes the support for OpenSqlFileStream.
 
-  Copyright (c) 2004-2018   Erland Sommarskog
+  Copyright (c) 2004-2022   Erland Sommarskog
 
   $History: filestream.cpp $
+ * 
+ * *****************  Version 4  *****************
+ * User: Sommar       Date: 22-05-08   Time: 23:12
+ * Updated in $/Perl/OlleDB
+ * Handle new OLE DB provider MSOLEDBSQL19.
  * 
  * *****************  Version 3  *****************
  * User: Sommar       Date: 18-04-09   Time: 22:48
@@ -58,7 +63,10 @@ void * OpenSqlFilestream (SV         * olle_ptr,
    char            library_name[namelen];
 
    // Set the library name.
-   if (mydata->provider == provider_msoledbsql) {
+   if (mydata->provider == provider_msoledbsql19) {
+      sprintf_s(library_name, namelen, "msoledbsql19.dll");
+   }
+   else if (mydata->provider == provider_msoledbsql) {
       sprintf_s(library_name, namelen, "msoledbsql.dll");
    }
    else if (mydata->provider == provider_sqlncli11) {

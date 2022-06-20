@@ -31,7 +31,9 @@
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "SPVM::Unicode" : "0.01"
+         }
       }
    },
    "release_status" : "stable",
@@ -40,6 +42,6 @@
          "type" : "git"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

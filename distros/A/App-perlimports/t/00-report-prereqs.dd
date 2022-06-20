@@ -10,7 +10,6 @@ do { my $x = {
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
-                                      'App::FatPacker::Simple' => '0.09',
                                       'Code::TidyAll' => '0.71',
                                       'Code::TidyAll::Plugin::SortLines::Naturally' => '0.000003',
                                       'Code::TidyAll::Plugin::Test::Vars' => '0.04',
@@ -54,7 +53,7 @@ do { my $x = {
                                       'PPIx::Utils::Classification' => '0',
                                       'Path::Iterator::Rule' => '0',
                                       'Path::Tiny' => '0',
-                                      'Perl::Tidy' => '20220217',
+                                      'Perl::Tidy' => '20220613',
                                       'Pod::Usage' => '0',
                                       'Ref::Util' => '0',
                                       'Sereal::Decoder' => '0',

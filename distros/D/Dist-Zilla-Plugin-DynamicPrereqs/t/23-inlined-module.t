@@ -13,8 +13,7 @@ use Test::File::ShareDir ();
 # since we change directories during the build process, this must be absolute
 use lib path('t/lib')->absolute->stringify;
 
-sub tzil
-{
+sub tzil {
     my $tzil = Builder->from_config(
         { dist_root => 'does-not-exist' },
         {

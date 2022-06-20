@@ -13,8 +13,7 @@ use Config;
 # this by setting the -nologo option using MAKEFLAGS
 $ENV{MAKEFLAGS} = join(' ', 'nologo', ($ENV{MAKEFLAGS} // ())) if $Config{make} eq 'nmake';
 
-sub run_makemaker
-{
+sub run_makemaker {
     my $tzil = shift;
 
     my $exception;

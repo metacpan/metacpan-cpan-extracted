@@ -307,10 +307,13 @@ XS_unpack_UA_Float(SV *in)
 	dTHX;
 	NV out = SvNV(in);
 
+	if (Perl_isinfnan(out))
+		return out;
 	if (out < -FLT_MAX)
 		CROAK("Float value %le less than %le", out, -FLT_MAX);
 	if (out > FLT_MAX)
 		CROAK("Float value %le greater than %le", out, FLT_MAX);
+
 	return out;
 }
 
@@ -1513,7 +1516,7 @@ XS_unpack_OPCUA_Open62541_GlobalNodeLifecycle(SV *in)
 	svp = hv_fetchs(hv, "GlobalNodeLifecycle_constructor", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVCV)
-			CROAK("constructor '%s' is not a CODE reference",
+			CROAK("Constructor '%s' is not a CODE reference",
 			    SvPV_nolen(*svp));
 		out.gnl_constructor = *svp;
 	}
@@ -1521,7 +1524,7 @@ XS_unpack_OPCUA_Open62541_GlobalNodeLifecycle(SV *in)
 	svp = hv_fetchs(hv, "GlobalNodeLifecycle_destructor", 0);
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVCV)
-			CROAK("destructor '%s' is not a CODE reference",
+			CROAK("Destructor '%s' is not a CODE reference",
 			    SvPV_nolen(*svp));
 		out.gnl_destructor = *svp;
 	}
@@ -1530,7 +1533,7 @@ XS_unpack_OPCUA_Open62541_GlobalNodeLifecycle(SV *in)
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVCV)
 			CROAK(
-			    "createOptionalChild '%s' is not a CODE reference",
+			    "CreateOptionalChild '%s' is not a CODE reference",
 			    SvPV_nolen(*svp));
 		out.gnl_createOptionalChild = *svp;
 	}
@@ -1539,7 +1542,7 @@ XS_unpack_OPCUA_Open62541_GlobalNodeLifecycle(SV *in)
 	if (svp != NULL) {
 		if (!SvROK(*svp) || SvTYPE(SvRV(*svp)) != SVt_PVCV)
 			CROAK(
-			    "generateChildNodeId '%s' is not a CODE reference",
+			    "GenerateChildNodeId '%s' is not a CODE reference",
 			    SvPV_nolen(*svp));
 		out.gnl_generateChildNodeId = *svp;
 	}
@@ -1961,7 +1964,9 @@ clientStateCallback(UA_Client *ua_client,
 	mPUSHs(sv);
 	sv = newSViv(sessionState);
 	mPUSHs(sv);
-	sv = newSViv(connectStatus);
+	/* Use magic status code. */
+	sv = newSV(0);
+	XS_pack_UA_StatusCode(sv, connectStatus);
 	mPUSHs(sv);
 #else
 	EXTEND(SP, 2);
@@ -2703,11 +2708,7 @@ INCLUDE: Open62541-clientstate.xsh
 
 #else
 
-#ifdef HAVE_UA_SECURECHANNELSTATE_FRESH
-
 INCLUDE: Open62541-securechannelstate.xsh
-
-#endif
 
 INCLUDE: Open62541-sessionstate.xsh
 
@@ -3386,6 +3387,50 @@ UA_ServerConfig_setCustomHostname(config, customHostname)
 
 #endif
 
+#ifdef HAVE_UA_SERVERCONFIG_CUSTOMHOSTNAME
+
+void
+UA_ServerConfig_setCustomHostname(config, customHostname)
+	OPCUA_Open62541_ServerConfig	config
+	OPCUA_Open62541_String		customHostname
+    PREINIT:
+	UA_StatusCode		sc;
+    CODE:
+	UA_String_clear(&config->svc_serverconfig->customHostname);
+	sc = UA_String_copy(customHostname,
+	    &config->svc_serverconfig->customHostname);
+	if (sc != UA_STATUSCODE_GOOD)
+		CROAKS(sc, "UA_String_copy");
+
+#endif
+
+#ifdef HAVE_UA_SERVERCONFIG_SERVERURLS
+
+void
+UA_ServerConfig_setServerUrls(config, ...)
+	OPCUA_Open62541_ServerConfig	config
+    PREINIT:
+	int i;
+    CODE:
+	UA_Array_delete(config->svc_serverconfig->serverUrls,
+	    config->svc_serverconfig->serverUrlsSize,
+	    &UA_TYPES[UA_TYPES_STRING]);
+	config->svc_serverconfig->serverUrls = NULL;
+	config->svc_serverconfig->serverUrlsSize = 0;
+	if (items <= 1)
+		XSRETURN_EMPTY;
+	config->svc_serverconfig->serverUrls = UA_Array_new(items - 1,
+	    &UA_TYPES[UA_TYPES_STRING]);
+	if (config->svc_serverconfig->serverUrls == NULL)
+		CROAKE("UA_Array_new");
+	config->svc_serverconfig->serverUrlsSize = items - 1;
+	for (i = 1; i < items; i++) {
+		config->svc_serverconfig->serverUrls[i - 1] =
+		    XS_unpack_UA_String(ST(i));
+	}
+
+#endif
+
 #ifdef HAVE_UA_SERVER_SETADMINSESSIONCONTEXT
 
 void
@@ -3903,13 +3948,18 @@ void
 UA_Client_DESTROY(client)
 	OPCUA_Open62541_Client		client
     PREINIT:
+	OPCUA_Open62541_ClientConfig	config;
 	OPCUA_Open62541_Logger		logger;
     CODE:
-	logger = &client->cl_config.clc_logger;
-	DPRINTF("client %p, cl_client %p, cl_callbackdata %p, logger %p",
-	    client, client->cl_client, client->cl_callbackdata, logger);
+	config = &client->cl_config;
+	logger = &config->clc_logger;
+	DPRINTF("client %p, cl_client %p, cl_callbackdata %p, "
+	    "config %p, logger %p",
+	    client, client->cl_client, client->cl_callbackdata, config, logger);
 	UA_Client_delete(client->cl_client);
 	/* SvREFCNT_dec checks for NULL pointer. */
+	SvREFCNT_dec(config->clc_clientcontext);
+	SvREFCNT_dec(config->clc_statecallback);
 	SvREFCNT_dec(logger->lg_log);
 	SvREFCNT_dec(logger->lg_context);
 	SvREFCNT_dec(logger->lg_clear);
@@ -3947,7 +3997,14 @@ UA_Client_connect(client, endpointUrl)
 
 #ifdef HAVE_UA_CLIENT_CONNECTASYNC
 
-# XXX UA_Client_connectAsync not implemented
+UA_StatusCode
+UA_Client_connectAsync(client, endpointUrl)
+	OPCUA_Open62541_Client		client
+	char *				endpointUrl
+    CODE:
+	RETVAL = UA_Client_connectAsync(client->cl_client, endpointUrl);
+    OUTPUT:
+	RETVAL
 
 #else /* HAVE_UA_CLIENT_CONNECTASYNC */
 
@@ -3995,8 +4052,9 @@ UA_Client_connect_async(client, endpointUrl, callback, data)
 UA_StatusCode
 UA_Client_run_iterate(client, timeout)
 	OPCUA_Open62541_Client		client
-	UA_UInt16			timeout
+	UA_UInt32			timeout
     CODE:
+	/* open62541 1.0 had UA_UInt16 timeout, it is implicitly casted */
 	RETVAL = UA_Client_run_iterate(client->cl_client, timeout);
     OUTPUT:
 	RETVAL
@@ -4009,7 +4067,17 @@ UA_Client_disconnect(client)
     OUTPUT:
 	RETVAL
 
-#ifndef HAVE_UA_CLIENT_CONNECTASYNC
+#ifdef HAVE_UA_CLIENT_CONNECTASYNC
+
+UA_StatusCode
+UA_Client_disconnectAsync(client)
+	OPCUA_Open62541_Client		client
+    CODE:
+	RETVAL = UA_Client_disconnectAsync(client->cl_client);
+    OUTPUT:
+	RETVAL
+
+#else /* HAVE_UA_CLIENT_CONNECTASYNC */
 
 UA_StatusCode
 UA_Client_disconnect_async(client, outoptReqId)
@@ -4560,15 +4628,6 @@ UA_ClientConfig_DESTROY(config)
     CODE:
 	DPRINTF("config %p, clc_clientconfig %p, clc_storage %p",
 	    config, config->clc_clientconfig, config->clc_storage);
-	/*
-	 * XXX The client context and state callback should live longer than
-	 * the config.  They should live until the client dies, but reference
-	 * counting the client SV in the client object does not work.
-	 */
-	config->clc_clientconfig->clientContext = NULL;
-	config->clc_clientconfig->stateCallback = NULL;
-	SvREFCNT_dec(config->clc_clientcontext);
-	SvREFCNT_dec(config->clc_statecallback);
 	/* Delayed client destroy after client config destroy. */
 	SvREFCNT_dec(config->clc_storage);
 
@@ -4607,7 +4666,7 @@ UA_ClientConfig_setStateCallback(config, callback)
     INIT:
 	if (SvOK(callback) &&
 	    !(SvROK(callback) && SvTYPE(SvRV(callback)) == SVt_PVCV)) {
-		CROAK("Context '%s' is not a CODE reference",
+		CROAK("Callback '%s' is not a CODE reference",
 		    SvPV_nolen(callback));
 	}
     CODE:

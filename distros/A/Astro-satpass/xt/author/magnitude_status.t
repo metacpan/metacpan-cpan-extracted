@@ -25,26 +25,37 @@ is_last_modified(
     'Celestrak visual.txt',
 );
 
+do './tools/heavens-above-mag'
+    or die "Failed to execute ./tools/heavens-above-mag";
+
+my %canned = Astro::Coord::ECI::TLE->magnitude_table( 'show' );
+foreach my $oid ( sort keys %canned ) {
+    my $got = $canned{$oid};
+    my @rslt = heavens_above_mag::process_get( $oid );
+    my ( undef, $name, $want ) = @{ $rslt[0] };
+    is $got, $want, "Canned magnitude of $oid ($name)";
+}
+
+=begin comment
+
 is_last_modified( mccants => 'vsnames',
     Astro::Coord::ECI::TLE->_MCCANTS_VSNAMES(),
     'McCants vsnames.mag',
 );
-
-=begin comment
 
 is_last_modified( mccants => 'mcnames',
     'Thu, 25 May 2017 00:09:56 GMT',
     'McCants mcnames.mag',
 );
 
-=end comment
-
-=cut
-
 is_last_modified( mccants => 'quicksat',
     Astro::Coord::ECI::TLE->_MCCANTS_QUICKSAT(),
     'McCants qs.mag',
 );
+
+=end comment
+
+=cut
 
 done_testing;
 

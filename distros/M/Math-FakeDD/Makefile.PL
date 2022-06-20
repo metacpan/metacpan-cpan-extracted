@@ -8,7 +8,7 @@ my %options = %{
 {
   NAME => 'Math::FakeDD',
   VERSION_FROM => 'FakeDD.pm',
-  PREREQ_PM => {'Math::MPFR' => '4.22'},
+  PREREQ_PM => {'Math::MPFR' => '4.24'},
   LICENSE  => 'perl',
   META_MERGE => {
    'meta-spec' => { version => 2 },

@@ -3,8 +3,88 @@ Sub-HandlesVia
 
 Created:      2020-01-18
 Home page:    <https://metacpan.org/release/Sub-HandlesVia>
-Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Sub-HandlesVia>
+Bug tracker:  <https://github.com/tobyink/p5-sub-handlesvia/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.025	2022-06-16
+
+ - Internally shift off the method invocant sometimes as benchmarking shows
+   that to be faster.
+
+0.024	2022-06-15
+
+ [ Documentation ]
+ - Explicitly document that Sub::HandlesVia needs to be imported AFTER
+   Moo/Moose/Mouse so that it can detect the class/role builder being used.
+
+ [ Test Suite ]
+ - Test that Sub::HandlesVia works okay with MooseX::Extended.
+
+0.023	2022-06-14
+
+ [ Documentation ]
+ - Minor documentation improvements.
+
+ [ Packaging ]
+ - Changed minimum required Perl from 5.8.0 to 5.8.1.
+
+ [ Other ]
+ - Major Sub::HandlesVia::CodeGenerator cleanups.
+ - Move some code from Sub::HandlesVia::Toolkit::Plain to its base class.
+ - Removed: Sub::HandlesVia::CodeGenerator's simple_set concept has been
+   removed; this was vestigial and had no effect.
+
+0.022	2022-06-14
+
+ [ Documentation ]
+ - Additional Array example: push and shift.
+ - Document Sub::HandlesVia::Handler and Sub::HandlesVia::CodeGenerator.
+ - Other documentation improvements.
+
+ [ Other ]
+ - Cleaned up Sub::HandlesVia::Handler and moved a lot of code into a new
+   class Sub::HandlesVia::CodeGenerator, which replaces the big hash of
+   callbacks which was passed around everywhere.
+
+0.021	2022-06-12
+
+ [ Documentation ]
+ - Provide extended examples in HandlerLibrary pod.
+
+ [ Test Suite ]
+ - Additional tests based on extended examples.
+
+0.020	2022-06-11
+
+ [ Documentation ]
+ - Improve and document the Sub::HandlesVia::HandlerLibrary::Scalar module.
+
+ [ Test Suite ]
+ - Additional tests based on pod examples.
+
+0.019	2022-06-11
+
+ [ Documentation ]
+ - Include more examples in pod for HandlerLibrary modules.
+
+0.018	2022-06-11
+
+ [ Documentation ]
+ - Generated pod for the HandlerLibrary modules.
+
+ [ Other ]
+ - Added: Sub::HandlesVia::Handler objects now have a `documentation`
+   attribute.
+
+0.017	2022-06-11
+
+ - Added: Case-insensitive versions of string comparison methods.
+ - Added: Numeric comparison methods.
+ - Added: String comparison methods.
+ - Added: String match_i method.
+ - Added: String starts_with, ends_with, and contains methods, plus
+   case-insensitive versions of them.
+ - Added: String uc, lc, and fc methods.
 
 0.016	2020-09-20
 

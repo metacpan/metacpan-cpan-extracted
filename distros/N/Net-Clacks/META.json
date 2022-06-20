@@ -41,6 +41,7 @@
             "IO::Socket::IP" : "0",
             "IO::Socket::SSL" : "0",
             "Readonly" : "0",
+            "Scalar::Util" : "0",
             "Sys::Hostname" : "0",
             "Time::HiRes" : "0",
             "XML::Simple" : "0",
@@ -49,6 +50,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : 23,
+   "version" : 24,
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

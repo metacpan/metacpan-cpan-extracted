@@ -1,5 +1,5 @@
 {
-   "abstract" : "EVERY & EVERY::LAST pseudo-packages using mro. ",
+   "abstract" : "EVERY & EVERY::LAST pseudo-packages using mro.",
    "author" : [
       "Steven Lembark <lembark@wrkhors.com>"
    ],
@@ -40,6 +40,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.1.4",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "v1.0.0",
+   "x_serialization_backend" : "JSON::PP version 4.08"
 }

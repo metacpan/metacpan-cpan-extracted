@@ -1,11 +1,12 @@
 package SVG::Graph::Kit;
 our $AUTHORITY = 'cpan:GENE';
-# ABSTRACT: Data plotting with SVG
+
+# ABSTRACT: Simplified SVG data plotting
 
 use strict;
 use warnings;
 
-our $VERSION = '0.0402';
+our $VERSION = '0.0403';
 
 use parent qw(SVG::Graph);
 
@@ -60,7 +61,7 @@ sub _setup {
     }
 
     # Handle the axis unless it's set to 0.
-    if (not(exists $args{axis}) or exists $args{axis} and $args{axis}) {
+    if (!exists $args{axis} || (exists $args{axis} && $args{axis})) {
         my %axis = $self->_load_axis($args{data}, $args{axis});
         $frame->add_glyph('axis', %axis);
     }
@@ -70,16 +71,15 @@ sub _load_axis {
     my($self, $data, $axis) = @_;
 
     # Initialize an empty axis unless given a hashref.
-    $axis = {} if not ref $axis eq 'HASH';
+    $axis = {} unless ref $axis eq 'HASH';
 
     # Set the default properties and user override.
     my %axis = (
-        x_intercept => 0,
-        y_intercept => 0,
-        stroke => 'gray',
+        x_intercept    => 0,
+        y_intercept    => 0,
+        stroke         => 'gray',
         'stroke-width' => 2,
-        ticks => 30, # Max data per axis
-        log => 0,
+        ticks          => 30, # Max data per axis
         %$axis, # User override
     );
 
@@ -87,31 +87,27 @@ sub _load_axis {
     $axis{xticks} ||= $axis{ticks};
     $axis{yticks} ||= $axis{ticks};
 
-    # Set the logarithmic scaling factor.
-    $axis{xlog} ||= $axis{log};
-    $axis{ylog} ||= $axis{log};
-
     # Compute scale factors.
     my ($xscale, $yscale) = (1, 1);
-    if ($data and $self->{graph_data}->xmax - $self->{graph_data}->xmin > $axis{xticks}) {
+    if ($data && ($self->{graph_data}->xmax - $self->{graph_data}->xmin) > $axis{xticks}) {
         # Round to the integer, i.e. 0 decimal places.
         $xscale = sprintf '%.0f', $self->{graph_data}->xmax / $axis{xticks};
     }
-    if ($data and $self->{graph_data}->ymax - $self->{graph_data}->ymin > $axis{yticks}) {
+    if ($data && ($self->{graph_data}->ymax - $self->{graph_data}->ymin) > $axis{yticks}) {
         # Round to the integer, i.e. 0 decimal places.
         $yscale = sprintf '%.0f', $self->{graph_data}->ymax / $axis{yticks};
     }
 
     # Use absolute_ticks if no tick mark setting is provided.
-    unless (defined $axis{x_absolute_ticks} or defined $axis{x_fractional_ticks}) {
+    unless (defined $axis{x_absolute_ticks} || defined $axis{x_fractional_ticks}) {
         $axis{x_absolute_ticks} = $xscale;
     }
-    unless (defined $axis{y_absolute_ticks} or defined $axis{y_fractional_ticks}) {
+    unless (defined $axis{y_absolute_ticks} || defined $axis{y_fractional_ticks}) {
         $axis{y_absolute_ticks} = $yscale;
     }
 
     # Use increments of 1 to data-max for ticks if none are provided.
-    if ($data and !defined $axis{x_tick_labels} and !defined $axis{x_intertick_labels}) {
+    if ($data && !defined $axis{x_tick_labels} && !defined $axis{x_intertick_labels}) {
         if ($xscale > 1) {
             $axis{x_tick_labels} = [ $self->{graph_data}->xmin ];
             push @{ $axis{x_tick_labels} }, $_ * $xscale for 1 .. $axis{ticks};
@@ -119,8 +115,10 @@ sub _load_axis {
         else {
             $axis{x_tick_labels} = [ $self->{graph_data}->xmin .. $self->{graph_data}->xmax ];
         }
+        # XXX This is a lame hack
+        $axis{x_intertick_labels} = [ map { '' } $self->{graph_data}->ymin .. $self->{graph_data}->ymax ];
     }
-    if ($data and !defined $axis{y_tick_labels} and !defined $axis{y_intertick_labels}) {
+    if ($data && !defined $axis{y_tick_labels} && !defined $axis{y_intertick_labels}) {
         if ($yscale > 1) {
             $axis{y_tick_labels} = [ $self->{graph_data}->ymin ];
             push @{ $axis{y_tick_labels} }, $_ * $yscale for 1 .. $axis{ticks};
@@ -128,21 +126,21 @@ sub _load_axis {
         else {
             $axis{y_tick_labels} = [ $self->{graph_data}->ymin .. $self->{graph_data}->ymax ];
         }
+        # XXX This is also a lame hack
+        $axis{y_intertick_labels} = [ map { '' } $self->{graph_data}->ymin .. $self->{graph_data}->ymax ];
     }
 
     # Remove keys not used by parent module.
     delete $axis{ticks};
     delete $axis{xticks};
     delete $axis{yticks};
-    delete $axis{log};
-    delete $axis{xlog};
-    delete $axis{ylog};
 
     return %axis;
 }
 
 sub _load_data {
     my ($data, $frame, $polar) = @_;
+
     # Create individual data points.
     my @data = ();
     for my $datum (@$data) {
@@ -157,8 +155,10 @@ sub _load_data {
             z => $coord[2],
         );
     }
+
     # Instantiate a new SVG::Graph::Data object;
     my $obj = SVG::Graph::Data->new(data => \@data);
+
     # Populate our graph with data.
     $frame->add_data($obj);
     return $obj;
@@ -179,15 +179,6 @@ sub _to_polar {
     return $r, $t;
 }
 
-
-sub stat {
-    my ($self, $dimension, $name, @args) = @_;
-    my $method = $dimension . $name;
-    return $self->{graph_data}->$method(@args);
-}
-
-1;
-
 __END__
 
 =pod
@@ -196,35 +187,32 @@ __END__
 
 =head1 NAME
 
-SVG::Graph::Kit - Data plotting with SVG
+SVG::Graph::Kit - Simplified SVG data plotting
 
 =head1 VERSION
 
-version 0.0402
+version 0.0403
 
 =head1 SYNOPSIS
 
   use SVG::Graph::Kit;
+
   my $data = [ [ 1,  2, 0 ],
                [ 2,  3, 1 ],
                [ 3,  5, 1 ],
                [ 4,  7, 2 ],
                [ 5, 11, 3 ],
                [ 6, 13, 5 ], ];
+
   my $g = SVG::Graph::Kit->new(data => $data);
-  print $g->draw;
-  my $n;
-  for my $dim (qw(x y z)) {
-    for my $stat (qw(min max mean mode median range stdv percentile)) {
-      $n = $stat eq 'percentile' ? 90 : undef; # Inspect the 90th percentile.
-      printf "%s %s = %0.2f\n", $dim, $stat, $g->stat($dim, $stat, $n);
-    }
-  }
+
+  print $g->draw; # > plot.svg
 
 =head1 DESCRIPTION
 
 An C<SVG::Graph::Kit> object is an automated data plotter that is a
-subclass of C<SVG::Graph>.
+subclass of L<SVG::Graph> (which unfortunately rotates the x-axis
+tick labels 90 degrees).
 
 =head1 NAME
 
@@ -232,61 +220,41 @@ SVG::Graph::Kit - Data plotting with SVG
 
 =head1 METHODS
 
-=head2 new()
+=head2 new
 
-  $g = SVG::Graph::Kit->new();
-  $g = SVG::Graph::Kit->new(data => \@numeric);
-  $g = SVG::Graph::Kit->new(data => \@numeric, axis => 0);
-  # Custom:
+  $g = SVG::Graph::Kit->new(data => \@LoL);
+  $g = SVG::Graph::Kit->new(data => \@LoL, axis => 0);
   $g = SVG::Graph::Kit->new(
-    data => \@numeric,
+    data => \@LoL,
     axis => { xticks => 10, yticks => 20 },
   );
   $g = SVG::Graph::Kit->new(
-    width => 300, height => 300, margin => 20,
-    data => [[0,2], [1,3] ... ],
-    plot => {
+    width  => 300,
+    height => 300, margin => 20,
+    data   => \@LoL,
+    plot   => {
       type => 'line', # default: scatter
       'fill-opacity' => 0.5, # etc.
     },
     axis => {
       'stroke-width' => 2, # etc.
-      ticks => scalar @$data, # default: 30
-      log => 2, # Default factor 10
+      ticks => scalar @$LoL,
     },
   );
 
 Return a new C<SVG::Graph::Kit> instance.
 
-Optional arguments:
+Arguments:
 
   data => Numeric vectors (the datapoints)
   plot => Chart type and data rendering properties
   axis => Axis rendering properties or 0 for off
 
-Except for the C<plot type>, C<axis =E<gt> 0> and C<axis ticks>, the
-C<plot> and C<axis> arguments are ordinary CSS, 'a la C<SVG::Graph>.
-
-The C<plot type> is given in C<SVG::Graph>.  C<axis =E<gt> 0> turns
-off the rendering of the axis.  The C<axis ticks>, C<xticks> and
-C<yticks> values represent the number of labeled tick marks displayed
-on a scaled graph axis.
-
-=head2 stat()
-
-  $g->stat($dimension, $name);
-  $g->stat('x', 'mean');
-  $g->stat('y', 'stdv');
-  $g->stat('z', 'percentile');
-  # etc.
-
-This method is a direct call to the appropriate C<SVG::Graph::Data>
-"x-method" (i.e. min, max, mean, mode, median, range, stdv and
-percentile).
+C<axis =E<gt> 0> turns off the rendering of the axis.
 
 =head1 TO DO
 
-Allow log scaling.
+Log scaling.
 
 Position axis origin.
 
@@ -297,11 +265,11 @@ Highlight data points or areas.
 
 Draw grid lines.
 
-Add an C<SVG::Graph::polar> chart?
+Plot polar axes for polar plots.
 
 =head1 SEE ALSO
 
-The code in F<t/*>.
+The F<t/*> tests.
 
 L<SVG::Graph>
 
@@ -311,7 +279,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

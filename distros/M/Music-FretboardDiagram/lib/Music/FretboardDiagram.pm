@@ -3,15 +3,20 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Draw fretboard chord diagrams
 
-our $VERSION = '0.1205';
+our $VERSION = '0.1308';
 
 use Moo;
 use strictures 2;
 use namespace::clean;
 
-use Imager;
+use Carp 'croak';
+use Imager ();
 use List::SomeUtils 'first_index';
 use Music::Chord::Namer 'chordname';
+
+use constant WHITE => 'white';
+use constant BLACK => 'black';
+use constant TAN   => 'tan';
 
 
 has chord => (
@@ -23,6 +28,13 @@ has position => (
     is      => 'rw',
     isa     => \&_positive_int,
     default => sub { 1 },
+);
+
+
+has absolute => (
+    is      => 'ro',
+    isa     => \&_boolean,
+    default => sub { 0 },
 );
 
 
@@ -61,7 +73,7 @@ has type => (
 
 has font => (
     is      => 'ro',
-    default => sub { '/opt/X11/share/fonts/TTF/VeraMono.ttf' },
+    default => sub { '/usr/share/fonts/truetype/freefont/FreeMono.ttf' },
 );
 
 
@@ -73,12 +85,14 @@ has tuning => (
 
 has horiz => (
     is      => 'ro',
+    isa     => \&_boolean,
     default => sub { 0 },
 );
 
 
 has image => (
     is      => 'ro',
+    isa     => \&_boolean,
     default => sub { 0 },
 );
 
@@ -101,12 +115,6 @@ has dot_color => (
 );
 
 
-has fretboard => (
-    is       => 'ro',
-    init_arg => undef,
-);
-
-
 has showname => (
     is      => 'rw',
     default => sub { 1 },
@@ -115,15 +123,25 @@ has showname => (
 
 has verbose => (
     is      => 'ro',
+    isa     => \&_boolean,
     default => sub { 0 },
+);
+
+
+has fretboard => (
+    is       => 'ro',
+    init_arg => undef,
 );
 
 
 sub BUILD {
     my ( $self, $args ) = @_;
 
-    die 'chord length and string number differ'
-        if $args->{chord} && length($args->{chord}) != $self->{strings};
+    $self->chord( [ [ $self->position, $self->chord ] ] )
+        unless ref $self->chord;
+
+    croak 'chord length and string number differ'
+        if $self->chord && length( $self->chord->[0][1] ) != $self->strings;
 
     my @scale = qw/C Db D Eb E F Gb G Ab A Bb B/;
 
@@ -149,20 +167,17 @@ sub draw {
         return $self->_draw_horiz;
     }
 
-    my $WHITE = 'white';
-    my $BLACK = 'black';
-    my $TAN   = 'tan';
     my $SPACE = $self->size;
 
-    my @chord;
+    my $frets = $self->frets + 1;
     my $font;
 
     # Setup a new image
     my $i = Imager->new(
         xsize => $SPACE + $self->strings * $SPACE,
-        ysize => $SPACE + $self->frets * $SPACE,
+        ysize => $SPACE + $frets * $SPACE,
     );
-    $i->box( filled => 1, color => $WHITE );
+    $i->box( filled => 1, color => WHITE );
 
     if ( -e $self->font ) {
         $font = Imager::Font->new( file => $self->font );
@@ -172,7 +187,7 @@ sub draw {
     }
 
     # Draw the horizontal fret lines
-    for my $fret ( 0 .. $self->frets - 1 ) {
+    for my $fret ( 0 .. $frets - 1 ) {
         $i->line(
             color => $self->fret_color,
             x1    => $SPACE,
@@ -188,7 +203,7 @@ sub draw {
             $i->string(
                 font  => $font,
                 text  => $self->position,
-                color => $BLACK,
+                color => BLACK,
                 x     => $SPACE / 4,
                 y     => $SPACE * 2 + $SPACE / 4,
                 size  => $SPACE / 2,
@@ -198,11 +213,11 @@ sub draw {
 
         if ( $self->_fret_match($fret) ) {
             $i->circle(
-                color => $TAN,
+                color => TAN,
                 r     => $SPACE / 8,
                 x     => $SPACE * $self->strings / 2 + $SPACE / 2,
                 y     => $SPACE + $fret * $SPACE + $SPACE / 2,
-            ) if ( $SPACE + $fret * $SPACE + $SPACE / 2 ) < ( $SPACE * $self->frets );
+            ) if ( $SPACE + $fret * $SPACE + $SPACE / 2 ) < ( $SPACE * $frets );
         }
     }
 
@@ -213,76 +228,90 @@ sub draw {
             x1    => $SPACE + $string * $SPACE,
             y1    => $SPACE,
             x2    => $SPACE + $string * $SPACE,
-            y2    => $SPACE + ($self->frets - 1) * $SPACE,
+            y2    => $SPACE + ($frets - 1) * $SPACE,
             aa    => 1,
             endp  => 1
         );
     }
 
-    # Draw the note/mute markers
-    my $string = $self->strings;
+    for my $spec ( @{ $self->chord } ) {
+        my ( $posn, $chord ) = @$spec;
 
-    for my $note ( split //, $self->chord ) {
-        if ( $note =~ /[xX]/ ) {
-            print "X at 0,$string\n" if $self->verbose;
+        my @chord;
 
+        # Draw the note/mute markers
+        my $string = $self->strings;
+        for my $note ( split //, $chord ) {
+            if ( $note =~ /-/ ) {
+                $string--;
+                next;
+            }
+
+            if ( $note =~ /[xX]/ ) {
+                warn "X at 0,$string\n" if $self->verbose;
+
+                $i->string(
+                    font  => $font,
+                    text  => 'X',
+                    color => BLACK,
+                    x     => $SPACE + ($self->strings - $string) * $SPACE - $SPACE / 6,
+                    y     => $SPACE - 2,
+                    size  => $SPACE / 2,
+                    aa    => 1,
+                );
+            }
+            elsif ( $note =~ /[oO0]/ ) {
+                my $temp = $self->fretboard->{$string}[0];
+                push @chord, $temp;
+
+                warn "O at 0,$string = $temp\n" if $self->verbose;
+
+                $i->string(
+                    font  => $font,
+                    text  => 'O',
+                    color => BLACK,
+                    x     => $SPACE + ($self->strings - $string) * $SPACE - $SPACE / 6,
+                    y     => $SPACE - 2,
+                    size  => $SPACE / 2,
+                    aa    => 1,
+                );
+            }
+            else {
+                my $temp = $self->_note_at($string, $note);
+                push @chord, $temp;
+
+                warn "Dot at $note,$string = $temp\n" if $self->verbose;
+
+                my $y = $self->absolute
+                    ? $SPACE + $SPACE / 2 + ($posn - 1 + $note - 1) * $SPACE
+                    : $SPACE + $SPACE / 2 + ($note - 1) * $SPACE;
+
+                $i->circle(
+                    color => $self->dot_color,
+                    r     => $SPACE / 5,
+                    x     => $SPACE + ($self->strings - $string) * $SPACE,
+                    y     => $y,
+                ) if $y > $SPACE && $y < $SPACE * $frets;
+            }
+
+            # Decrement the current string number
+            $string--;
+        }
+
+        # Print the chord name if requested
+        if ( $self->showname ) {
+            my $chord_name = $self->showname eq '1' ? chordname(@chord) : $self->showname;
+            warn "Chord = $chord_name\n" if $self->verbose;
             $i->string(
                 font  => $font,
-                text  => 'X',
-                color => $BLACK,
-                x     => $SPACE + ($self->strings - $string) * $SPACE - $SPACE / 6,
-                y     => $SPACE - 2,
+                text  => $chord_name,
+                color => BLACK,
+                x     => $SPACE,
+                y     => ($frets + 1) * $SPACE - $SPACE / 3,
                 size  => $SPACE / 2,
                 aa    => 1,
             );
         }
-        elsif ( $note =~ /[oO0]/ ) {
-            my $temp = $self->fretboard->{$string}[0];
-            push @chord, $temp;
-
-            print "O at 0,$string = $temp\n" if $self->verbose;
-
-            $i->string(
-                font  => $font,
-                text  => 'O',
-                color => $BLACK,
-                x     => $SPACE + ($self->strings - $string) * $SPACE - $SPACE / 6,
-                y     => $SPACE - 2,
-                size  => $SPACE / 2,
-                aa    => 1,
-            );
-        }
-        else {
-            my $temp = $self->_note_at($string, $note);
-            push @chord, $temp;
-
-            print "Dot at $note,$string = $temp\n" if $self->verbose;
-
-            $i->circle(
-                color => $self->dot_color,
-                r     => $SPACE / 5,
-                x     => $SPACE + ($self->strings - $string) * $SPACE,
-                y     => $SPACE + $SPACE / 2 + ($note - 1) * $SPACE,
-            );
-        }
-
-        # Decrement the current string number
-        $string--;
-    }
-
-    # Print the chord name if requested
-    if ( $self->showname ) {
-        my $chord_name = $self->showname eq '1' ? chordname(@chord) : $self->showname;
-        print "Chord = $chord_name\n" if $self->verbose;
-        $i->string(
-            font  => $font,
-            text  => $chord_name,
-            color => $BLACK,
-            x     => $SPACE,
-            y     => ($self->frets + 1) * $SPACE - $SPACE / 3,
-            size  => $SPACE / 2,
-            aa    => 1,
-        );
     }
 
     if ( $self->image ) {
@@ -296,20 +325,17 @@ sub draw {
 sub _draw_horiz {
     my ($self) = @_;
 
-    my $WHITE = 'white';
-    my $BLACK = 'black';
-    my $TAN   = 'tan';
     my $SPACE = $self->size;
 
-    my @chord;
+    my $frets = $self->frets + 1;
     my $font;
 
     # Setup a new image
     my $i = Imager->new(
         ysize => $SPACE + $self->strings * $SPACE,
-        xsize => $SPACE + $self->frets * $SPACE,
+        xsize => $SPACE + $frets * $SPACE,
     );
-    $i->box( filled => 1, color => $WHITE );
+    $i->box( filled => 1, color => WHITE );
 
     if ( -e $self->font ) {
         $font = Imager::Font->new( file => $self->font );
@@ -319,7 +345,7 @@ sub _draw_horiz {
     }
 
     # Draw the vertical fret lines
-    for my $fret ( 0 .. $self->frets - 1 ) {
+    for my $fret ( 0 .. $frets - 1 ) {
         $i->line(
             color => $self->fret_color,
             y1    => $SPACE,
@@ -335,7 +361,7 @@ sub _draw_horiz {
             $i->string(
                 font  => $font,
                 text  => $self->position,
-                color => $BLACK,
+                color => BLACK,
                 y     => $SPACE / 2 + $SPACE / 5,
                 x     => $SPACE * 2 - $SPACE / 5,
                 size  => $SPACE / 2,
@@ -345,11 +371,11 @@ sub _draw_horiz {
 
         if ( $self->_fret_match($fret) ) {
             $i->circle(
-                color => $TAN,
+                color => TAN,
                 r     => $SPACE / 8,
                 y     => $SPACE * $self->strings / 2 + $SPACE / 2,
                 x     => $SPACE + $fret * $SPACE + $SPACE / 2,
-            ) if ( $SPACE + $fret * $SPACE + $SPACE / 2 ) < ( $SPACE * $self->frets );
+            ) if ( $SPACE + $fret * $SPACE + $SPACE / 2 ) < ( $SPACE * $frets );
         }
     }
 
@@ -360,76 +386,90 @@ sub _draw_horiz {
             y1    => $SPACE + $string * $SPACE,
             x1    => $SPACE,
             y2    => $SPACE + $string * $SPACE,
-            x2    => $SPACE + ($self->frets - 1) * $SPACE,
+            x2    => $SPACE + ($frets - 1) * $SPACE,
             aa    => 1,
             endp  => 1
         );
     }
 
-    # Draw the note/mute markers
-    my $string = 1;
+    for my $spec ( @{ $self->chord } ) {
+        my ( $posn, $chord ) = @$spec;
 
-    for my $note ( reverse split //, $self->chord ) {
-        if ( $note =~ /[xX]/ ) {
-            print "X at fret:0, string:$string\n" if $self->verbose;
+        my @chord;
 
+        # Draw the note/mute markers
+        my $string = 1;
+        for my $note ( reverse split //, $chord ) {
+            if ( $note =~ /-/ ) {
+                $string++;
+                next;
+            }
+
+            if ( $note =~ /[xX]/ ) {
+                warn "X at fret:0, string:$string\n" if $self->verbose;
+
+                $i->string(
+                    font  => $font,
+                    text  => 'X',
+                    color => BLACK,
+                    y     => $SPACE + ($string - 1) * $SPACE + $SPACE / 4,
+                    x     => $SPACE - $SPACE / 2,
+                    size  => $SPACE / 2,
+                    aa    => 1,
+                );
+            }
+            elsif ( $note =~ /[oO0]/ ) {
+                my $temp = $self->fretboard->{$string}[0];
+                unshift @chord, $temp;
+
+                warn "O at fret:0, string:$string = $temp\n" if $self->verbose;
+
+                $i->string(
+                    font  => $font,
+                    text  => 'O',
+                    color => BLACK,
+                    y     => $SPACE + ($string - 1) * $SPACE + $SPACE / 4,
+                    x     => $SPACE - $SPACE / 2,
+                    size  => $SPACE / 2,
+                    aa    => 1,
+                );
+            }
+            else {
+                my $temp = $self->_note_at($string, $note);
+                unshift @chord, $temp;
+
+                warn "Dot at fret:$note, string:$string = $temp\n" if $self->verbose;
+
+                my $x = $self->absolute
+                    ? $SPACE + $SPACE / 2 + ($posn - 1 + $note - 1) * $SPACE
+                    : $SPACE + $SPACE / 2 + ($note - 1) * $SPACE;
+
+                $i->circle(
+                    color => $self->dot_color,
+                    r     => $SPACE / 5,
+                    x     => $x,
+                    y     => $SPACE + ($string - 1) * $SPACE,
+                ) if $x > $SPACE && $x < $SPACE * $frets;
+            }
+
+            # Increment the current string number
+            $string++;
+        }
+
+        # Print the chord name if requested
+        if ( $self->showname ) {
+            my $chord_name = $self->showname eq '1' ? chordname(@chord) : $self->showname;
+            warn "Chord = $chord_name\n" if $self->verbose;
             $i->string(
                 font  => $font,
-                text  => 'X',
-                color => $BLACK,
-                y     => $SPACE + ($string - 1) * $SPACE + $SPACE / 4,
-                x     => $SPACE - $SPACE / 2,
+                text  => $chord_name,
+                color => BLACK,
+                x     => $SPACE,
+                y     => ($self->strings + 1) * $SPACE - $SPACE / 3,
                 size  => $SPACE / 2,
                 aa    => 1,
             );
         }
-        elsif ( $note =~ /[oO0]/ ) {
-            my $temp = $self->fretboard->{$string}[0];
-            unshift @chord, $temp;
-
-            print "O at fret:0, string:$string = $temp\n" if $self->verbose;
-
-            $i->string(
-                font  => $font,
-                text  => 'O',
-                color => $BLACK,
-                y     => $SPACE + ($string - 1) * $SPACE + $SPACE / 4,
-                x     => $SPACE - $SPACE / 2,
-                size  => $SPACE / 2,
-                aa    => 1,
-            );
-        }
-        else {
-            my $temp = $self->_note_at($string, $note);
-            unshift @chord, $temp;
-
-            print "Dot at fret:$note, string:$string = $temp\n" if $self->verbose;
-
-            $i->circle(
-                color => $self->dot_color,
-                r     => $SPACE / 5,
-                y     => $SPACE + ($string - 1) * $SPACE,
-                x     => $SPACE + $SPACE / 2 + ($note - 1) * $SPACE,
-            );
-        }
-
-        # Increment the current string number
-        $string++;
-    }
-
-    # Print the chord name if requested
-    if ( $self->showname ) {
-        my $chord_name = $self->showname eq '1' ? chordname(@chord) : $self->showname;
-        print "Chord = $chord_name\n" if $self->verbose;
-        $i->string(
-            font  => $font,
-            text  => $chord_name,
-            color => $BLACK,
-            x     => $SPACE,
-            y     => ($self->strings + 1) * $SPACE - $SPACE / 3,
-            size  => $SPACE / 2,
-            aa    => 1,
-        );
     }
 
     if ( $self->image ) {
@@ -463,12 +503,17 @@ sub _output_image {
     my ($self, $img) = @_;
     my $name = $self->outfile . '.' . $self->type;
     $img->write( type => $self->type, file => $name )
-        or die "Can't save $name: ", $img->errstr;
+        or croak "Can't save $name: ", $img->errstr;
 }
 
 sub _positive_int {
     my ($arg) = @_;
-    die "$arg is not a positive integer" unless $arg =~ /^[1-9]\d*$/;
+    croak "$arg is not a positive integer" unless $arg =~ /^[1-9]\d*$/;
+}
+
+sub _boolean {
+    my ($arg) = @_;
+    croak "$arg is not a Boolean value" unless $arg =~ /^[10]$/;
 }
 
 1;
@@ -485,49 +530,47 @@ Music::FretboardDiagram - Draw fretboard chord diagrams
 
 =head1 VERSION
 
-version 0.1205
+version 0.1308
 
 =head1 SYNOPSIS
 
   use Music::FretboardDiagram;
 
   my $dia = Music::FretboardDiagram->new(
-    chord => 'x02220',
-    font  => '/path/to/TTF/font.ttf',
+    chord    => 'xx0232',
+    frets    => 5,     # the default
+    position => 1,     # the default
+    outfile  => 'Dmajor',
+    type     => 'png', # the default
   );
-  $dia->draw;
-
-  $dia->chord('xx0232');
-  $dia->position(5);
-  $dia->outfile('mystery-chord');
-  $dia->showname('Xb dim'); # "X flat diminished"
-  $dia->draw;
 
   $dia = Music::FretboardDiagram->new(
-    chord    => '4442',
-    position => 3,
-    strings  => 4,
-    frets    => 6,
-    size     => 25,
-    outfile  => 'ukulele-chord',
-    type     => 'bmp',
-    font     => '/path/to/TTF/font.ttf',
-    tuning   => [qw/A E C G/],
+    chord    => [[1,'022000'], [2,'--1342'], [7,'-13321']], # Em chords
+    frets    => 13,
+    absolute => 1,
+    size     => 50, # relative units, not pixels
     horiz    => 1,
-    image    => 1,
+    showname => 'Em',
+    outfile  => 'fretboard',
+    font     => '/path/to/TTF/font.ttf',
     verbose  => 1,
-    string_color => 'black',
-    fret_color   => 'darkgray',
-    dot_color    => 'blue',
   );
-  my $image = $dia->draw;
+
+  $dia->chord('x02220');          # set a new chord
+  $dia->position(7);              # set a new position
+  $dia->outfile('mystery-chord'); # set a new filename
+  $dia->showname('Xb dim');       # "X flat diminished"
+
+  $dia->draw;
 
 =head1 DESCRIPTION
 
-A C<Music::FretboardDiagram> object draws fretboard chord diagrams including
-neck position and chord name annotations for guitar, ukulele, banjo, etc.
+A C<Music::FretboardDiagram> object draws fretboard chord diagrams
+including neck position and chord name annotations for guitar,
+ukulele, banjo, etc.
 
-=for html Here are examples of a vertical guitar diagram and a horizontal ukulele diagram:
+=for html Here are examples of a vertical guitar diagram and a horizontal
+ukulele diagram:
 <br>
 <img src="https://raw.githubusercontent.com/ology/Music-FretboardDiagram/master/chord-diagram.png">
 <img src="https://raw.githubusercontent.com/ology/Music-FretboardDiagram/master/ukulele.png">
@@ -538,13 +581,20 @@ neck position and chord name annotations for guitar, ukulele, banjo, etc.
 =head2 chord
 
   $dia->chord('xx0232');
+  $dia->chord([[1,'022000'], [2,'--1342'], [7,'-13321']]);
   $chord = $dia->chord;
 
-A chord given as a string, where non-zero digits represent frets, C<x> (or C<X>)
-indicates a muted string and C<0> (or C<o> or C<O>) indicates an open string.
-The default order of the strings is C<654321> from lowest to highest.
+A required chord given as a string or array reference of
+specifications.
 
-Examples:
+For a chord string, non-zero digits represent frets, C<x> (or C<X>)
+indicates a muted string, C<0> (or C<o> or C<O>) indicates an open
+string, and a dash (C<->) means skip to the next string.
+
+For an array-ref of chord specifications, the first element is the
+chord position, and the second is the chord string.
+
+Chord string examples at position 1:
 
   C: x32010
   D: xx0232
@@ -554,32 +604,41 @@ Examples:
   A: x02220
   B: x24442
 
-  Cm: xx5543
+  Cm: x3101x
   Dm: xx0231
   Em: 022000
-  Fm: xx3111
-  Gm: xx5333
   Am: x02210
-  Bm: x24432
 
   C7: x32310
   D7: xx0212
   E7: 020100
-  F7: xx1211
   G7: 320001
   A7: x02020
   B7: x21202
+
+  etc.
 
 =head2 position
 
   $dia->position(3);
   $position = $dia->position;
 
-The neck position of a chord to be diagrammed.  This number is rendered to the
-left of the first fret in vertical mode.  When drawing horizontally, the
-position is rendered above the first fret.
+The neck position of a chord to be diagrammed.  This number is
+rendered to the left of the first fret in vertical mode.  When drawing
+horizontally, the position is rendered above the first fret.
 
-Default: 1
+Default: C<1>
+
+=head2 absolute
+
+  $absolute = $dia->absolute;
+
+Use an absolute neck position for rendering a chord on a full length
+fretboard.
+
+If not set, the chord will be rendered relative to the first fret.
+
+Default: C<0>
 
 =head2 strings
 
@@ -587,7 +646,7 @@ Default: 1
 
 The number of strings.
 
-Default: 6
+Default: C<6>
 
 =head2 frets
 
@@ -595,15 +654,16 @@ Default: 6
 
 The number of frets.
 
-Default: 5
+Default: C<5>
 
 =head2 size
 
   $size = $dia->size;
 
-The relative size of the diagram.
+The relative size of the diagram.  The smallest visible diagram is
+B<size> = C<6>.  (This is B<not> a measure of pixels.)
 
-Default: 30
+Default: C<30>
 
 =head2 outfile
 
@@ -612,7 +672,7 @@ Default: 30
 
 The image file name minus the extension.
 
-Default: chord-diagram
+Default: C<chord-diagram>
 
 =head2 type
 
@@ -620,41 +680,44 @@ Default: chord-diagram
 
 The image file extension.
 
-Default: png
+Default: C<png>
 
 =head2 font
 
   $font = $dia->font;
 
-The TTF font to use when rendering the diagram.
+The (TTF) font.
 
-Default: /opt/X11/share/fonts/TTF/VeraMono.ttf
+Default: C</usr/share/fonts/truetype/freefont/FreeMono.ttf>
 
 =head2 tuning
 
   $tuning = $dia->tuning;
 
-An arrayref of the string tuning.  The order of the notes is from highest string
-(1st) to lowest (6th).  For accidental notes, use flat (C<b>), not sharp (C<#>).
+An arrayref of the string tuning.  The order of the notes is from
+highest string (1st) to lowest (6th).  For accidental notes, use flat
+(C<b>), not sharp (C<#>).
 
-Default: [ E B G D A E ]
+Default: C<[ E B G D A E ]>
 
 =head2 horiz
 
   $horiz = $dia->horiz;
 
-Draw the diagram horizontally.  That is, with the first string at the top and
-the 6th string at the bottom, and frets numbered from left to right.
+Draw the diagram horizontally.  That is, with the first string at the
+top and the 6th string at the bottom, and frets numbered from left to
+right.
 
-Default: 0
+Default: C<0>
 
 =head2 image
 
   $image = $dia->image;
 
-Return the image from the B<draw> method instead of writing to a file.
+Boolean to return the image from the B<draw> method instead of writing
+it to a file.
 
-Default: 0
+Default: C<0>
 
 =head2 string_color
 
@@ -662,7 +725,7 @@ Default: 0
 
 The diagram string color.
 
-Default: blue
+Default: C<blue>
 
 =head2 fret_color
 
@@ -670,7 +733,7 @@ Default: blue
 
 The diagram fret color.
 
-Default: darkgray
+Default: C<darkgray>
 
 =head2 dot_color
 
@@ -678,29 +741,22 @@ Default: darkgray
 
 The diagram finger position dot color.
 
-Default: black
-
-=head2 fretboard
-
-  $fretboard = $dia->fretboard;
-
-A hashref of the string notes.  This is a computed attribute based on the given
-B<tuning>.
+Default: C<black>
 
 =head2 showname
 
-  $dia->showname('Xb dim');
-  $dia->showname(1); # Reset to computed names
-  $dia->showname(0); # Do not show chord names
+  $dia->showname(0);        # Do not show chord names
+  $dia->showname(1);        # Show computed names
+  $dia->showname('Xb dim'); # Show a custom name
   $showname = $dia->showname;
 
 Show a chord name or not.
 
-Sometimes the computed chord name is not that accurate or desired.  In those
-cases either set the B<showname> to a string of your choosing before drawing, or
-to C<0> for no chord name.
+Sometimes the computed chord name is not accurate or desired.  In
+those cases, either set the B<showname> to a string of your choosing,
+or to C<0> for no chord name.
 
-Default: 1
+Default: C<1>
 
 =head2 verbose
 
@@ -708,13 +764,37 @@ Default: 1
 
 Monitor the progress of the diagram construction.
 
-Default: 0
+Default: C<0>
+
+=head2 fretboard
+
+  $fretboard = $dia->fretboard;
+
+A hashref of the string notes.  This is a computed attribute based on
+the given B<tuning>.
 
 =head1 METHODS
 
 =head2 new
 
-  $dia = Music::FretboardDiagram->new(%arguments);
+  $dia = Music::FretboardDiagram->new(
+    chord        => $chord,
+    position     => $position,
+    strings      => $strings,
+    frets        => $frets,
+    size         => $size,
+    tuning       => $tuning,
+    font         => $font,
+    showname     => $showname,
+    horiz        => $horiz,
+    image        => $image,
+    string_color => $string_color,
+    fret_color   => $fret_color,
+    dot_color    => $dot_color,
+    outfile      => $outfile,
+    type         => $type,
+    verbose      => $verbose,
+  );
 
 Create a new C<Music::FretboardDiagram> object.
 
@@ -723,8 +803,13 @@ Create a new C<Music::FretboardDiagram> object.
 =head2 draw
 
   $dia->draw;
+  $image = $dia->draw; # if the image attr is set
 
-Render the requested chord diagram as an image file of the given B<type>.
+Render the requested chord diagram as an image file of the given
+B<type>.
+
+If the B<image> attribute is set, return the image object instead of
+writing to a file.
 
 =head1 THANK YOU
 
@@ -758,7 +843,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

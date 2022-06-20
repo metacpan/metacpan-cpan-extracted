@@ -2,12 +2,11 @@
 # housekeeping
 ########################################################################
 
-package mro::EVERY v0.1.4;
+package mro::EVERY v1.0.0;
 use v5.24;
 use mro;
 
 use Carp            qw( croak           );
-use List::Util      qw( uniq            );
 use Scalar::Util    qw( blessed         );
 use Symbol          qw( qualify_to_ref  );
 
@@ -16,8 +15,7 @@ use Symbol          qw( qualify_to_ref  );
 ########################################################################
 
 our @CARP_NOT   = ( __PACKAGE__, qw( mro ) );
-my $find_subs   = '';
-my $with_auto   = '';
+my %class2dfs   = ();
 
 ########################################################################
 # utility subs
@@ -34,28 +32,23 @@ my $find_name
     $proto->can( $name )
     or croak "Botched EVERY: '$proto' cannot '$name'";
 
-    # if they handle this via AUTOLOAD then we have 
-    # problem at this point, see find_with_autoload.
-    #
-    # if the dispatching class has no ancestors then 
-    # treat it as its own ancestor.
-    
-    local $"    = ',';
-    my @isa     = $class->mro::get_linear_isa->@*;
+    # class at entry point gets to decide the mro type.
 
-    # uniq avoids case of multiple-dispatch of 
-    # hardwired inherited methods at multiple 
-    # places in the tree. 
+    my $mro     = $class2dfs{ $class } || $class->mro::get_mro;
+    my @isa     = $class->mro::get_linear_isa( $mro )->@*;
+
+    # @found preserves array context of map.
+    #
+    # this should never croak afer the can
+    # check unless they have an overloaded 
+    # can and forgot qw( autoload );
 
     my @found
-    = uniq
-    grep
-    {
-        $_
-    }
-    map
+    = map
     {
         *{ qualify_to_ref $name => $_ }{ CODE }
+        or
+        ()
     }
     @isa
     or
@@ -64,7 +57,7 @@ my $find_name
     @found
 };
 
-my $find_with_autoload
+my $find_auto
 = sub
 {
     my $proto   = shift;
@@ -73,23 +66,21 @@ my $find_with_autoload
 
     $proto->can( $name )
     or croak "Botched EVERY: '$proto' cannot '$name'";
- 
+
     local $"    = ',';
     my @isa     = $proto->mro::get_linear_isa->@*;
 
-    # uniq avoids multiple-dispatch in case where
-    # AUTOLOAD handling $name is inherited.
+    # @found preserves array context of map.
 
     my @found
-    = uniq
-    grep
+    = grep
     {
         $_
     }
     map
     {
         *{ qualify_to_ref $name => $_ }{ CODE }
-        or 
+        or
         do
         {
             my $isa = qualify_to_ref ISA        => $_;
@@ -97,7 +88,7 @@ my $find_with_autoload
 
             local *$isa = [];
 
-            # at this point can is isolated to the 
+            # at this point can is isolated to the
             # single pacakge.
 
             my $al
@@ -128,21 +119,45 @@ my $find_with_autoload
     @found
 };
 
+my $finder  = $find_name;
+
 sub import
 {
-    shift;  # discard this package
+$DB::single = 1;
+
+    shift;
+    my $caller  = caller;
 
     for( @_ )
     {
-        m{^   autoload $}x and $with_auto = 1;
-        m{^ noautoload $}x and $with_auto = '';
-    }
+        my ( $status, $arg ) = m{ (no)? (dfs|autoload) }x;
 
-    $find_subs
-    = $with_auto
-    ? $find_with_autoload
-    : $find_name
-    ;
+        if( $arg eq 'dfs' )
+        {
+            # delay the lookup of mro::get_mro until runtim
+            # to allow classes to fiddle with it at runtime.
+
+            if( $status  )
+            {
+                delete $class2dfs{ $caller }
+            }
+            else
+            {
+                $class2dfs{ $caller } = 'dfs'
+            }
+        }
+        elsif( $arg eq 'autoload' )
+        {
+            $finder
+            = $status
+            ? $find_name
+            : $find_auto
+        }
+        else
+        {
+            croak "Botched EVERY: unknown argument '$_'";
+        }
+    }
 
     return
 }
@@ -153,38 +168,44 @@ sub import
 
 package EVERY;
 use v5.22;
-use Carp    qw( croak );
+use Carp            qw( croak   );
+use List::Util      qw( uniq    );
 
 our @CARP_NOT   = ( __PACKAGE__, qw( mro ) );
 our $AUTOLOAD   = '';
 
 AUTOLOAD
 {
+$DB::single = 1;
+
     my $proto   = shift
     or croak "Bogus EVERY, called without an object.";
 
     # remaining arguments left on the stack.
 
     $proto->$_( @_ )
-    for $proto->$find_subs( $AUTOLOAD );
+    for uniq $proto->$finder( $AUTOLOAD );
 }
 
 package EVERY::LAST;
 use v5.22;
-use Carp    qw( croak );
+use Carp            qw( croak   );
+use List::Util      qw( uniq    );
 
 our @CARP_NOT   = ( __PACKAGE__, qw( mro ) );
 our $AUTOLOAD   = '';
 
 AUTOLOAD
 {
+$DB::single = 1;
+
     my $proto   = shift
     or croak "Bogus EVERY::LAST, called without an object.";
 
     # remaining arguments left on the stack.
 
     $proto->$_( @_ )
-    for reverse $proto->$find_subs( $AUTOLOAD );
+    for uniq reverse $proto->$finder( $AUTOLOAD );
 }
 
 # keep require happy
@@ -193,20 +214,19 @@ __END__
 
 =head1 NAME
 
-mro::EVERY - EVERY & EVERY::LAST pseudo-packages using mro. 
+mro::EVERY - EVERY & EVERY::LAST pseudo-packages using mro.
 
 =head1 SYNOPSIS
 
     # EVERY & EVERY::LAST redispatch the named method into
-    # all classes in the object/class hierarchy which 
-    # implement the method or have a suitable can() and 
-    # AUTOLOAD to handdle the method.
-
+    # all classes in the object/class hierarchy which
+    # define the method or have a suitable can() which 
+    # returns their AUTOLOAD to handdle the method.
 
     # one common use: initialization in construction.
     #
     # construct an object then dispatch the 'initialize'
-    # method into any derived classes  least-to-most derived 
+    # method into any derived classes  least-to-most derived
     # that declare their own 'initialize' method.
     #
     # derived classes don't have to re-dispatch the method,
@@ -218,13 +238,13 @@ mro::EVERY - EVERY & EVERY::LAST pseudo-packages using mro.
     # derived classes hande the method.
 
     package MyBase;
-    use mro qw( c3 );    
+    use mro qw( c3 );
     use mro::EVERY;
 
     sub construct
     {
         my $proto   = shift;
-        my $class   = 
+        my $class   =
 
         bless \( my $a = '' ), blessed $proto || $proto
     }
@@ -236,6 +256,10 @@ mro::EVERY - EVERY & EVERY::LAST pseudo-packages using mro.
         $object->EVERY::LAST::initialize( @_ );
         $object
     }
+
+    # notice the lack of a daisy-chain call in the 
+    # initialize. each initialize defined up the 
+    # stack is called once.
 
     sub initialize{};
 
@@ -255,25 +279,27 @@ mro::EVERY - EVERY & EVERY::LAST pseudo-packages using mro.
         $object->EVERY::cleanup;
     }
 
+    # again, notice the lack of a daisy-chain.
+
     sub cleanup {}
 
     # Dispatching to AUTOLOAD that can.
 
-    # the "autoload" switch turns on scanning for 
+    # the "autoload" switch turns on scanning for
     # $proto->can( $name ) and checking for AUTOLOAD
     # subs (vs. simply checking for a defined coderef
-    # in the package). 
-    # 
+    # in the package).
+    #
     # using this approach requires properly overloading
-    # can() in the package. 
-    # 
+    # can() in the package.
+    #
     # note that AUTOLOAD's can have all sorts of side
     # effects, this should be used with care and where
     # the handling classes really do have overloaded
     # "can" methods and really do handle the named
     # operation properly.
     #
-    # lacking an overloaded can() and appropriate 
+    # lacking an overloaded can() and appropriate
     # AUTOLOAD, this is a waste.
     #
     # nu, don't say I didn't warn you.
@@ -303,24 +329,22 @@ mro::EVERY - EVERY & EVERY::LAST pseudo-packages using mro.
     # example that works because there are no other
     # bases classes other than UNIVERSAL here.
 
-    my %can = 
+    my %can =
     (
-        oxydize     => \&AUTOLOAD
-      , AUTOLOAD    => \&AUTOLOAD
-      , bottle      => \&bottle
+        oxydize => \&AUTOLOAD
     );
 
     sub can
     {
-        %can{ $_[1] }
+        $_[0]->UNIVERSAL::can( $_[1] )
         or
-        UNIVERSAL->can( $_[1] )
+        %can{ $_[1] }
     }
 
     sub bottle
     {
-        # autoloaded or not, this has to be 
-        # handled by can(), above.
+        # not autoloaded, found via 
+        # UNIVERSAL::can.
 
         ...
     }
@@ -328,10 +352,10 @@ mro::EVERY - EVERY & EVERY::LAST pseudo-packages using mro.
     our $AUTOLOAD   = '';
     AUTOLOD
     {
-        # call ends up here becuase mro::EVERY can 
+        # call ends up here becuase mro::EVERY can
         # find that $pkg->can( 'oxydize' ) and
         # also that there is an AUTOLOAD defined
-        # in the package (not just inherited). 
+        # in the package (not just inherited).
 
         my $name    = ( split '::', $AUTOLOAD )[-1];
 
@@ -341,33 +365,52 @@ mro::EVERY - EVERY & EVERY::LAST pseudo-packages using mro.
         }
     }
 
+    # some very, very old code may depend on using depth
+    # first searches. This switch turns on dfs for calls
+    # to mro::EVERY & mro::EVERY::LAST from the Frobnicate 
+    # package only.
+    #
+    # Note that other packages using either pseudo-class
+    # will still get whatever mro they have declared and 
+    # will search Frobnicate using whatever mro they define.
+
+    package Frobnicte;
+    use mro::EVERY qw( dfs );
+
 =head1 DESCRIPTION
 
-The main use of both pseudo-classes is re-dispatching an arbitrary 
+The use of both pseudo-classes is re-dispatching an arbitrary
 method up or down the inheritence stack without each class in the
 hierarchy having to do its own re-dispatch to another. One common
 use of this is in initializers, which can use EVERY::LAST to walk
 the tree from least-to-most derived classes calling the method where
-it is declared in each class (vs. simply inherited). This works 
+it is declared in each class (vs. simply inherited). This works
 nicely for base class destructors also using EVERY to tear down the
-object from most-to-least derived layers. 
+object from most-to-least derived layers.
 
 An initial sanity check of '$object->can( $method )' to ensure that
-something in the hierarchy claims to handle the call. If not an 
+something in the hierarchy claims to handle the call. If not an
 exception is raised. Inherited methods are also skipped to avoid
-duplicate dispatches into the same method with the same object. 
-For installed methods a unique check for the returned coderefs 
-also helps avoid duplicate dispatches. 
+duplicate dispatches into the same method with the same object.
+For installed methods a unique check for the returned coderefs
+also helps avoid duplicate dispatches.
 
 Without autoloading this is quite simple: Walk down the list from
-mro::get_linear_isa looking for packages that define their own code
-for the method name. The resulting list of subrefs is dispatced in
+mro::get_linear_isa looking for packages the method name in their
+pacakge as CODE.  The unique list of subrefs is dispatced in
 order for EVERY and in reverse for EVERY::LAST. This is pretty much
 the same guts as NEXT, just using mro for the package names rather
-than iterating on @ISA. 
+than iterating on @ISA.
+
+One final step after finding the declared (vs. inherited) methods
+is applying uniq() to get a distinct list. This is important in
+not re-dispatching the same method mulitple times up or down the
+stack. In the case of EVERY this finds a unique list of most-
+derived methods avilable; EVERY::LAST finds the least-derived
+going up the stack from base to derived classes.
 
 Autoload requires a bit more work, and co-operation from the classes
-in overloading can() to return true for methods handled by the 
+in overloading can() to return true for methods handled by the
 AUTOLOAD. In some cases it's trivial: return true for anything.
 If the AUTOLOAD only handles some cases then can() needs to return
 the correct ones. The AUTOLOAD also has to exist in the classes
@@ -377,9 +420,9 @@ package space (vs. being inherited).
 
 =over 4
 
-=item mro 
+=item mro
 
-This describes the use of "dfs" & "c3" methologies for 
+This describes the use of "dfs" & "c3" methologies for
 resolving class inheritence order. This module is agnostic,
 relying on mro::get_linea_isa which handles them properly.
 
@@ -390,9 +433,9 @@ Further description EVERY & EVERY::LAST.
 The NEXT uses its own DFS inheritence search and is not compatible
 with mro. If you don't require 5.8 compatibility then this module
 and mro's next::method and maybe::next::method along with this one
-will be a reasonable substitute. 
+will be a reasonable substitute.
 
 If you are dealing with existing code that uses NEXT then this may
-provide different result for any classes using mro( c3 ). 
+provide different result for any classes using mro( c3 ).
 
 =back

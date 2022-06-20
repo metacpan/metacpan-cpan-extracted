@@ -1,5 +1,8 @@
 Revision history for Test-Deep-URI
 
+0.05  2022-06-17 10:10:44 PDT
+        - Add link to Test2::Tools::URL.
+
 0.04  2022-03-22 13:44:53 PDT
         - Add slightly more test coverage.
 

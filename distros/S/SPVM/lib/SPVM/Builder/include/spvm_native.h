@@ -280,6 +280,7 @@ struct spvm_env {
   void (*print_stderr)(SPVM_ENV* env, void* string);
   int32_t (*init_env)(SPVM_ENV* env);
   void (*call_init_blocks)(SPVM_ENV* env);
+  int32_t (*get_class_id)(SPVM_ENV* env, const char* class_name);
 };
 
 
@@ -415,7 +416,7 @@ enum {
   SPVM_NATIVE_C_BASIC_TYPE_ID_LONG_OBJECT,
   SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT_OBJECT,
   SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE_OBJECT,
-  SPVM_NATIVE_C_BASIC_TYPE_ID_BOOL_OBJECT,
+  SPVM_NATIVE_C_BASIC_TYPE_ID_TYPE_CONVERSION_CONDITINAL_OBJECT,
 };
 
 enum {

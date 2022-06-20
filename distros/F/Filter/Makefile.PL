@@ -70,36 +70,28 @@ WriteMakefile
      {recommends =>
       {
 	'Filter::Simple'          => '0.88',
-        'Filter::Simple::Compile' => '0.02',
         'Test::More'        => '0.88',
-        'Test::Kwalitee'    => 0,
-        'Class::XSAccessor' => 0,
-        'Text::CSV_XS'      => 0,
-        'List::MoreUtils'   => 0,
-        'Pod::Spell::CommonMistakes' => 0,
-        'Test::Pod'         => '1.00',
-        'Test::CPAN::Meta'   => 0,
-        'Perl::MinimumVersion' => 0,
       },
       resources =>
       {
 	license     => 'http://dev.perl.org/licenses/',
 	repository  => 'https://github.com/rurban/Filter',
       }}) : ()),
-   clean => { FILES =>
-		"t/FilterTry.pm *~ "
-		."META.yml MYMETA.yml MYMETA.json "
-		."decrypt/MYMETA.yml decrypt/MYMETA.json decrypt/Makefile.old decrypt/pm_to_blib decrypt/*.c decrypt/*.o "
-		."tee/MYMETA.yml tee/MYMETA.json tee/Makefile.old tee/pm_to_blib tee/*.c tee/*.o "
-		."Exec/MYMETA.yml Exec/MYMETA.json Exec/Makefile.old Exec/pm_to_blib Exec/*.c Exec/*.o "
-		."Call/MYMETA.yml Call/MYMETA.json Call/Makefile.old Call/pm_to_blib Call/*.c Call/*.o"
+   clean =>
+   { FILES =>
+       "t/FilterTry.pm *~ "
+       ."META.yml MYMETA.yml MYMETA.json "
+       ."decrypt/MYMETA.yml decrypt/MYMETA.json decrypt/Makefile.old decrypt/pm_to_blib decrypt/*.c decrypt/*.o "
+       ."tee/MYMETA.yml tee/MYMETA.json tee/Makefile.old tee/pm_to_blib tee/*.c tee/*.o "
+       ."Exec/MYMETA.yml Exec/MYMETA.json Exec/Makefile.old Exec/pm_to_blib Exec/*.c Exec/*.o "
+       ."Call/MYMETA.yml Call/MYMETA.json Call/Makefile.old Call/pm_to_blib Call/*.c Call/*.o"
    }
   );
 
 sub MY::libscan
 {
-    my $self = shift ;
-    my $path = shift ;
+    my $self = shift;
+    my $path = shift;
 
     return undef
         if $path =~ /(~|\.bak)$/ || 

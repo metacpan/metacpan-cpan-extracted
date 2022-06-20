@@ -3,7 +3,7 @@ use warnings;
 use 5.006; # warnings
 package Software::License;
 # ABSTRACT: packages that provide templated software licenses
-$Software::License::VERSION = '0.104001';
+$Software::License::VERSION = '0.104002';
 use Data::Section -setup => { header_re => qr/\A__([^_]+)__\Z/ };
 use Text::Template ();
 
@@ -268,7 +268,7 @@ Software::License - packages that provide templated software licenses
 
 =head1 VERSION
 
-version 0.104001
+version 0.104002
 
 =head1 SYNOPSIS
 
@@ -277,6 +277,15 @@ version 0.104001
   });
 
   print $output_fh $license->fulltext;
+
+=head1 PERL VERSION
+
+This module is part of CPAN toolchain, or is treated as such.  As such, it
+follows the agreement of the Perl Toolchain Gang to require no newer version of
+perl than v5.8.1.  This version may change by agreement of the Toolchain Gang,
+but for now is governed by the L<Lancaster
+Consensus|https://github.com/Perl-Toolchain-Gang/toolchain-site/blob/master/lancaster-consensus.md>
+of 2013.
 
 =head1 METHODS
 
@@ -541,7 +550,7 @@ Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alex Kapranoff Andrew Grangaard Axel Beckert Bernardo Rechea Bernhard Amann bowtie Brian Cassidy Phillips Craig Scrivner Curtis Brandt Dave Rolsky David E. Wheeler Golden Dominique Dumont Dylan William Hardison Flavio Poletti Florian Ragwitz Graham Knop Kang-min Liu Karen Etheridge Kenichi Ishigaki Kivanc Yazan Leon Timmermans magnolia mikegrb Neil Bowers Nicolas Rochelemagne Olivier Mengué Pablo Rodríguez González Shlomi Fish Syohei YOSHIDA Tomasz Konojacki Van de Bugger Wesley Schwengle
+=for stopwords Alex Kapranoff Andrew Grangaard Axel Beckert Bernardo Rechea Bernhard Amann bowtie Brian Cassidy Phillips Craig Scrivner Curtis Brandt Dave Rolsky David E. Wheeler Golden Dominique Dumont Dylan William Hardison Flavio Poletti Florian Ragwitz Graham Knop Justin Baker Kang-min Liu Karen Etheridge Kenichi Ishigaki Kivanc Yazan Leon Timmermans magnolia mikegrb Neil Bowers Nicolas Rochelemagne Olivier Mengué Pablo Rodríguez González Shlomi Fish srchulo Syohei YOSHIDA Tomasz Konojacki Van de Bugger Wesley Schwengle
 
 =over 4
 
@@ -619,6 +628,10 @@ Graham Knop <haarg@haarg.org>
 
 =item *
 
+Justin Baker <me@jbaker.dev>
+
+=item *
+
 Kang-min Liu <gugod@gugod.org>
 
 =item *
@@ -667,6 +680,10 @@ Shlomi Fish <shlomif@iglu.org.il>
 
 =item *
 
+srchulo <violapiratejunky@gmail.com>
+
+=item *
+
 Syohei YOSHIDA <syohex@gmail.com>
 
 =item *
@@ -685,7 +702,7 @@ Wesley Schwengle <wesley@schwengle.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo Signes.
+This software is copyright (c) 2022 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

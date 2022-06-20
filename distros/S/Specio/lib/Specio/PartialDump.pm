@@ -3,7 +3,7 @@ package Specio::PartialDump;
 use strict;
 use warnings;
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 use Scalar::Util qw( looks_like_number reftype blessed );
 
@@ -213,7 +213,7 @@ Specio::PartialDump - A partially rear-ended copy of Devel::PartialDump without 
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNOPSIS
 
@@ -240,8 +240,6 @@ stringified in a sane way.
 =head1 SUPPORT
 
 Bugs may be submitted at L<https://github.com/houseabsolute/Specio/issues>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 

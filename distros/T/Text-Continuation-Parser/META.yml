@@ -5,33 +5,35 @@ author:
 build_requires:
   File::Spec: '0'
   File::Spec::Functions: '0'
+  IO: '1.39'
   IO::All: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::Exception: '0'
   Test::More: '0.96'
-  autodie: '0'
-  if: '0'
   perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Text-Continuation-Parser
+provides:
+  Text::Continuation::Parser:
+    file: lib/Text/Continuation/Parser.pm
+    version: '0.5'
 requires:
   Carp: '0'
   Exporter: '0'
-  base: '0'
+  IO: '1.39'
   perl: '5.010'
-  strict: '0'
-  utf8: '0'
-  warnings: '0'
 resources:
   repository: git://gitlab.com/waterkip/text-continuation-parser.git
-version: '0.3'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '0.5'
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: BSD

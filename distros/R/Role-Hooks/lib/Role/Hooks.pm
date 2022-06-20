@@ -7,10 +7,11 @@ package Role::Hooks;
 use Class::Method::Modifiers qw( install_modifier );
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.004';
+our $VERSION   = '0.005';
 
 our %CALLBACKS_BEFORE_APPLY;
 our %CALLBACKS_AFTER_APPLY;
+our %CALLBACKS_AFTER_INFLATE;
 our %ARGS;
 
 BEGIN { *DEBUG = $ENV{'PERL_ROLE_HOOKS_DEBUG'} ? sub(){1} : sub(){0} };
@@ -90,12 +91,24 @@ sub after_apply {
 	return $me;
 }
 
+sub after_inflate {
+	no warnings 'uninitialized';
+	my ($me, $target, @callbacks) = @_;
+	return unless @callbacks;
+	$me->is_role($target) eq 'Role::Tiny'
+		or $target->isa('Moo::Object')
+		or $me->_croak('%s is not a Moo class or role', $target);
+	$me->_install_patches($target);
+	$me->_install_patches_inflation($target);
+	push @{ $CALLBACKS_AFTER_INFLATE{$target}||=[] }, @callbacks;
+	return $me;
+}
+
 {
 	# Internals for monkey-patching role implementations.
 	#
 	
 	my %patched;
-	
 	sub _install_patches {
 		my ($me, $target) = @_;
 		
@@ -113,6 +126,14 @@ sub after_apply {
 		}
 		if ($INC{'Role/Basic.pm'}) {
 			$patched{'Role::Basic'} ||= $me->_install_patches_rolebasic;
+		}
+	}
+	
+	my %patched_inflation;
+	sub _install_patches_inflation {
+		my ($me, $target) = @_;
+		if ($INC{'Moo/Role.pm'} or $INC{'Moo.pm'}) {
+			$patched_inflation{'Moo::Role'}  ||= $me->_install_patches_moorole_inflation;
 		}
 	}
 	
@@ -151,10 +172,13 @@ sub after_apply {
 			for my $cb (@callbacks) {
 				$cb->($role, $to);
 			}
-			if ($me->is_role($to)) {
+			if (my $is_role = $me->is_role($to)) {
 				$me->_debug("Copying role hooks for $role to $to") if DEBUG;
 				$me->before_apply($to, @{ $CALLBACKS_BEFORE_APPLY{$role} || [] });
 				$me->after_apply($to, @{ $CALLBACKS_AFTER_APPLY{$role} || [] });
+				if ($is_role eq 'Role::Tiny' or $to->isa('Moo::Object')) {
+					$me->after_inflate($to, @{ $CALLBACKS_AFTER_INFLATE{$role} || [] });
+				}
 			}
 			return;
 		};
@@ -183,6 +207,33 @@ sub after_apply {
 				__PACKAGE__ . '::_run_role_tiny_before_callbacks',
 				@steps,
 			);
+		};
+		
+		return 1;
+	}
+	
+	sub _install_patches_moorole_inflation {
+		my ($me) = @_;
+		return 1 if $patched_inflation{'Moo::Role'};
+		
+		$me->_debug("Installing inflation patches for Moo::Role") if DEBUG;
+		
+		require Moo::HandleMoose;
+		
+		install_modifier 'Moo::HandleMoose', after => 'inject_real_metaclass_for', sub {
+			my ( $name ) = @_;
+			$me->_run_moo_inhale_callbacks( $name );
+		};
+		
+		my %already;
+		*_run_moo_inhale_callbacks = sub {
+			my (undef, $name) = @_;
+			$me->_debug("Calling role hooks for $name after inflation") if DEBUG;
+			my @callbacks = @{ $CALLBACKS_AFTER_INFLATE{$name} || [] };
+			for my $cb (@callbacks) {
+				next if $already{"$name|$cb"}++;
+				$cb->($name);
+			}
 		};
 		
 		return 1;
@@ -438,6 +489,18 @@ If you want to throw an error when someone applies your role to an
 inappropriate target, it is probably better to do that in C<before_apply> if
 you can.
 
+=item C<< after_inflate >>
+
+  Role::Hooks->after_inflate($pkg_name, $callback);
+
+Even though this is part of Role::Hooks, it works on classes too.
+But it only works on classes and roles built using Moo. This runs
+your callback if your Moo class or role gets "inflated" to a Moose
+class or role.
+
+If you set up a callback for a role, then the callback will also
+get called if any packages that role was applied to get inflated.
+
 =item C<< is_role >>
 
 Will return true if the given package seems to be a role, false otherwise.
@@ -478,4 +541,3 @@ the same terms as the Perl 5 programming language system itself.
 THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-

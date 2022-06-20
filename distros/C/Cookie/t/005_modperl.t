@@ -23,6 +23,7 @@ BEGIN
     our $CRYPTX_REQUIRED_VERSION = '0.074';
     our $DEBUG = exists( $ENV{COOKIES_DEBUG} ) ? $ENV{COOKIES_DEBUG} : exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
     our( $hostport, $host, $port, $mp_host, $proto );
+    require "t/env.pl";
 };
 
 BEGIN

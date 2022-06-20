@@ -2,14 +2,14 @@ NAME
     App::podtohtml - Convert POD to HTML
 
 VERSION
-    This document describes version 0.009 of App::podtohtml (from Perl
-    distribution App-podtohtml), released on 2021-02-26.
+    This document describes version 0.010 of App::podtohtml (from Perl
+    distribution App-podtohtml), released on 2022-05-14.
 
 FUNCTIONS
   podtohtml
     Usage:
 
-     podtohtml(%args) -> [status, msg, payload, meta]
+     podtohtml(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Convert POD to HTML.
 
@@ -17,22 +17,22 @@ FUNCTIONS
 
     *   Convert POD file to HTML, print result to STDOUT:
 
-         podtohtml( infile => "some.pod");
+         podtohtml(infile => "some.pod");
 
     *   Convert POD file to HTML, show result in browser:
 
-         podtohtml( infile => "some.pod", browser => 1);
+         podtohtml(infile => "some.pod", browser => 1);
 
     *   Convert POD file to HTML, show result in browser using the MetaCPAN
         template to give an idea how it will look on MetaCPAN:
 
-         podtohtml( infile => "some.pod", browser => 1, template => "metacpan-20180911");
+         podtohtml(infile => "some.pod", browser => 1, template => "metacpan-20180911");
 
     *   Convert POD file to HTML, show result in browser using the sco
         template to give an idea how it will look on (now-dead)
         search.cpan.org:
 
-         podtohtml( infile => "some.pod", browser => 1, template => "sco-20180123");
+         podtohtml(infile => "some.pod", browser => 1, template => "sco-20180123");
 
     *   Convert POD file to HTML, show result in browser using the
         perldoc.perl.org template to give an idea how it will look on
@@ -46,7 +46,7 @@ FUNCTIONS
 
     *   List which templates are available:
 
-         podtohtml( list_templates => 1);
+         podtohtml(list_templates => 1);
 
     This is a thin wrapper for Pod::Html and an alternative CLI to pod2html
     to remove some annoyances that I experience with "pod2html", e.g. the
@@ -81,19 +81,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   podtohtml_metacpan
     Usage:
 
-     podtohtml_metacpan(%args) -> [status, msg, payload, meta]
+     podtohtml_metacpan(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Show POD documentation roughly like how MetaCPAN would display it.
 
@@ -114,12 +117,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -131,23 +137,39 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-App-podtohtml>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-App-podtohtml/issues>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     pod2html, Pod::Html
 
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2019, 2018, 2017 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2022, 2021, 2019, 2018, 2017 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-podtohtml>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

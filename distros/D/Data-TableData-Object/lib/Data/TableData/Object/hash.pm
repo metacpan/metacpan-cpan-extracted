@@ -7,9 +7,9 @@ use warnings;
 use parent 'Data::TableData::Object::Base';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-11-17'; # DATE
+our $DATE = '2022-05-19'; # DATE
 our $DIST = 'Data-TableData-Object'; # DIST
-our $VERSION = '0.115'; # VERSION
+our $VERSION = '0.116'; # VERSION
 
 sub new {
     my ($class, $data) = @_;
@@ -166,7 +166,7 @@ Data::TableData::Object::hash - Manipulate hash via table object
 
 =head1 VERSION
 
-This document describes version 0.115 of Data::TableData::Object::hash (from Perl distribution Data-TableData-Object), released on 2021-11-17.
+This document describes version 0.116 of Data::TableData::Object::hash (from Perl distribution Data-TableData-Object), released on 2022-05-19.
 
 =head1 SYNOPSIS
 
@@ -187,6 +187,10 @@ or:
 This class lets you manipulate a hash as a table object. The table will have two
 columns named C<key> (containing hash keys) and C<value> (containing hash
 values).
+
+Implementation notes: C<rows*()> methods sort the hash keys so you get the same
+order of rows every time. The C<row()> method is currently not efficient because
+it calls C<rows()> first to get a sorted list of rows, then pick from that.
 
 =for Pod::Coverage .+
 
@@ -225,7 +229,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

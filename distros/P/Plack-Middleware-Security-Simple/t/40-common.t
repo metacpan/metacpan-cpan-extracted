@@ -23,6 +23,7 @@ my $handler = builder {
             cgi_bin,
             dot_files,
             fake_extensions,
+            header_injection,
             ip_address_referer,
             non_printable_chars,
             null_or_escape,
@@ -219,6 +220,12 @@ test_psgi
         is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";
     };
 
+    subtest 'blocked header injection' => sub {
+        my $req = GET q[/%20HTTP/1.1%0d%0aHost:%20example.com%0d%0a%0d%0a ];
+        my $res = $cb->($req);
+        ok is_error( $res->code ), join( " ", $req->method, $req->uri );
+        is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";
+    };
 
  };
 

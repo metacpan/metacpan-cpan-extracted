@@ -32,7 +32,16 @@ WriteMakefile(
                 url  => 'https://github.com/manwar/Test-XPath.git',
                 web  => 'https://github.com/manwar/Test-XPath',
             },
-        }})
-     : ()
-    ),
+            bugtracker => {
+                web => 'http://github.com/manwar/test-xpath/issues',
+            },
+        },
+        prereqs => {
+            runtime => {
+                recommends => {
+                    'HTML::Selector::XPath' => '0.06',
+                },
+            },
+        },
+    }) : () ),
 );

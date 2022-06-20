@@ -1,3 +1,17 @@
+0.004   2022-05-20  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention List::AllUtils's sample(),
+          Array::Sample::SimpleRandom, Array::Sample::WeightedRandom.
+
+
+0.003   2022-05-20  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Return an empty list and not (undef) when picking 1
+          element from an empty array is requested.
+
+
 0.002   2020-05-18  Released-By: PERLANCAR; Urgency: medium
 
 	- Accept items from iterator as well as array.

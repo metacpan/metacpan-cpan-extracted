@@ -170,21 +170,6 @@ sub create_cfunc_name {
   return $cfunc_name;
 }
 
-sub load_config {
-  my ($config_file, @argv) = @_;
-  
-  unless (-f $config_file) {
-    confess "Can't find config file \"$config_file\"";
-  }
-  local @ARGV = @argv;
-  my $config = do File::Spec->rel2abs($config_file);
-  if ($@) {
-    confess "Can't parse config file \"$config_file\": $@";
-  }
-  
-  return $config;
-}
-
 sub unindent {
   my $str = shift;
   my $min = min map { m/^([ \t]*)/; length $1 || () } split "\n", $str;
@@ -211,25 +196,25 @@ sub getopt {
   Getopt::Long::Configure($save);
 }
 
-sub convert_module_file_to_shared_lib_file {
+sub convert_module_file_to_dynamic_lib_file {
   my ($module_file, $category) = @_;
   
   my $dlext = $Config{dlext};
   $module_file =~ s/\.[^.]+$//;
-  my $shared_lib_category_file = $module_file;
-  $shared_lib_category_file .= $category eq 'native' ? ".$dlext" : ".$category.$dlext";
+  my $dynamic_lib_category_file = $module_file;
+  $dynamic_lib_category_file .= $category eq 'native' ? ".$dlext" : ".$category.$dlext";
   
-  return $shared_lib_category_file;
+  return $dynamic_lib_category_file;
 }
 
-sub convert_class_name_to_shared_lib_rel_file {
+sub convert_class_name_to_dynamic_lib_rel_file {
   my ($class_name, $category) = @_;
   
   my $dlext = $Config{dlext};
-  my $shared_lib_category_rel_file = convert_class_name_to_rel_file($class_name);
-  $shared_lib_category_rel_file .= $category eq 'native' ? ".$dlext" : ".$category.$dlext";
+  my $dynamic_lib_category_rel_file = convert_class_name_to_rel_file($class_name);
+  $dynamic_lib_category_rel_file .= $category eq 'native' ? ".$dlext" : ".$category.$dlext";
   
-  return $shared_lib_category_rel_file;
+  return $dynamic_lib_category_rel_file;
 }
 
 sub convert_class_name_to_category_rel_file {
@@ -332,7 +317,7 @@ sub create_make_rule {
     my $config_file = $noext_file;
     $config_file .= '.config';
     $config_file = "$lib_dir/$config_file";
-    my $config = &load_config($config_file);
+    my $config = SPVM::Builder::Config->load_config($config_file);
     
     my $native_file = $noext_file;
     my $native_file_ext = $config->ext;
@@ -346,18 +331,18 @@ sub create_make_rule {
   }
 
   # Shared library file
-  my $shared_lib_rel_file = convert_class_name_to_shared_lib_rel_file($class_name, $category);
-  my $shared_lib_file = "blib/lib/$shared_lib_rel_file";
+  my $dynamic_lib_rel_file = convert_class_name_to_dynamic_lib_rel_file($class_name, $category);
+  my $dynamic_lib_file = "blib/lib/$dynamic_lib_rel_file";
   
   my $make_rule = '';
   
   # dynamic section
-  $make_rule .= "dynamic :: $shared_lib_file\n";
+  $make_rule .= "dynamic :: $dynamic_lib_file\n";
   $make_rule .= "\t\$(NOECHO) \$(NOOP)\n\n";
   
   # Get source files
-  $make_rule .= "$shared_lib_file :: @deps\n";
-  $make_rule .= "\t$^X -Mblib -MSPVM::Builder::API -e \"SPVM::Builder::API->new(build_dir => '.spvm_build')->build_shared_lib_dist_$category('$class_name')\"\n\n";
+  $make_rule .= "$dynamic_lib_file :: @deps\n";
+  $make_rule .= "\t$^X -Mblib -MSPVM::Builder::API -e \"SPVM::Builder::API->new(build_dir => '.spvm_build')->build_dynamic_lib_dist_$category('$class_name')\"\n\n";
   
   return $make_rule;
 }
@@ -515,6 +500,37 @@ sub get_spvm_core_header_file_names {
   );
   
   return \@spvm_core_header_file_names;
+}
+
+sub get_config_file_from_class_name {
+  my ($class_name, $mode) = @_;
+  
+  my $ext = 'config';
+  if (defined $mode) {
+    $ext = "$mode.$ext";
+  }
+  
+  my $config_file_base = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name, $ext);
+  my $config_file;
+  for my $inc (@INC) {
+    my $config_file_tmp = "$inc/$config_file_base";
+    if (-f $config_file_tmp) {
+      $config_file = $config_file_tmp;
+      last;
+    }
+  }
+  unless (defined $config_file) {
+    confess "Can't find the config file \"$config_file_base\" in (@INC)";
+  }
+  
+  return $config_file;
+}
+
+sub get_builder_dir_from_config_module {
+  my $builder_config_dir = $INC{"SPVM/Builder/Config.pm"};
+  my $builder_dir = $builder_config_dir;
+  $builder_dir =~ s/\/Config\.pm$//;
+  return $builder_dir;
 }
 
 1;

@@ -3,7 +3,7 @@ package Specio::Constraint::Parameterizable;
 use strict;
 use warnings;
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 use Carp qw( confess );
 use Role::Tiny::With;
@@ -116,7 +116,7 @@ Specio::Constraint::Parameterizable - A class which represents parameterizable c
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNOPSIS
 
@@ -185,8 +185,6 @@ This method returns a new L<Specio::Constraint::Parameterized> object.
 
 Bugs may be submitted at L<https://github.com/houseabsolute/Specio/issues>.
 
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
-
 =head1 SOURCE
 
 The source code repository for Specio can be found at L<https://github.com/houseabsolute/Specio>.
@@ -197,7 +195,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2021 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2022 by Dave Rolsky.
 
 This is free software, licensed under:
 

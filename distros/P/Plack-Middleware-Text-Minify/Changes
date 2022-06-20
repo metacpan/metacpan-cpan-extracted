@@ -1,5 +1,13 @@
 Revision history for Plack-Middleware-Text-Minify:
 
+v0.3.2    2022-06-10 16:26:00+01:00 Europe/London
+  [Bug Fixes]
+  - Upgrade minimum version of Text::Minify::XS to v0.6.2 to fix issue
+    with undef data.
+
+  [Documentation]
+  - Bump copyright year.
+
 v0.3.1    2022-03-19 10:56:57+00:00 Europe/London
   [Enhancements]
   - Improve the performance for non-IO::Handle bodies.

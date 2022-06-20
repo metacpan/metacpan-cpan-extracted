@@ -1,5 +1,9 @@
 Revision history for Software-License
 
+0.104002  2022-06-14 23:44:29+02:00 Europe/Amsterdam
+        - Add support for ISC license
+        - Add guesser for Apache license and no license
+
 0.104001  2021-08-02 09:33:25-04:00 America/New_York
         - add "program" and "Program" arguments; this allows text generation
           like "CoolClient is license..." instead of "This software is..."

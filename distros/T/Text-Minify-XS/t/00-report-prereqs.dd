@@ -6,7 +6,7 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
-                                      'Devel::PPPort' => '3.66',
+                                      'Devel::PPPort' => '3.68',
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Test::CleanNamespaces' => '0.15',
                                       'Test::EOF' => '0',

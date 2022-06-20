@@ -84,6 +84,8 @@ section <A HREF="#EXPORTTAGS">Exported Names and Export Tags</A>.</P>
 <LI><B><A HREF="#datatypes">Data-Type Representation</A></B></LI>
  <LI><B><A HREF="#Initroutines">Connection Routines</A></B>
 <UL STYLE="list-style-type: none;">
+ <LI></LI>
+ <LI><A HREF="#SetDefaultForEncryption"><SPAN CLASS="nowrap">SetDefaultForEncryption()</SPAN></A></LI>
  <LI><A HREF="#sql_init"><SPAN CLASS="nowrap">sql_init()</SPAN></A></LI>
  <LI><A HREF="#new">new</A></LI>
  <LI><A HREF="#setloginproperty"><SPAN CLASS="nowrap">setloginproperty()</SPAN></A></LI>
@@ -214,40 +216,42 @@ result set(s).</P>
    <DT>&nbsp;</DT>
    <DT><B>OLE DB Provider</B></DT>
    <DD>To connect to SQL Server you need a OLE DB Provider for SQL Server. There
-   are several of them, or at least there are several names (they can been seen as
-   different versions of the same provider). They are here listed in reverse order of release:</DD>
-   <DD>
+     are several of them, or at least there are several names (they can been seen as
+   different versions of the same provider). They are here listed in reverse order of release: 
      <UL>
-       <LI><SMALL>MSOLEDBSQL</SMALL> &#8211; <A HREF="http://www.microsoft.com/download/details.aspx?id=56730">Microsoft OLE DB Driver for SQL Server</A>. Originally released in March 2018, the first release of OLE DB for SQL Server after some years of deprecation. This is the recommended provider. Beware that there have been some updates since then. The current release os Win32::SqlServer was developed and tested against version 18.3, 18.5 and 18.6 of the OLE DB driver.</LI>
-       <LI><SMALL>SQLNCLI11</SMALL> &#8211; SQL Serer Native Client 11.0. The provider that ships with SQL 2012 and later versions.</LI>
+       <LI><SMALL>MSOLEDBSQL19</SMALL> &#8211; <A HREF="https://go.microsoft.com/fwlink/?linkid=2186934">Microsoft OLE DB Driver 19 for SQL Server</A>. The most recent provider, released in March 2022. As of this writing, there is only 19.0, but there will certainly be .point releases in the future. This provider has a breaking change in the default for settings for encryption for which Win32::SqlServer offers some mitigation with the routine <A HREF="#SetDefaultForEncryption"><SPAN CLASS="nowrap">SetDefaultForEncryption()</SPAN></A>. I recommend that you use this provider or <SMALL>MSOLEDBSQL</SMALL> (next in the list).</LI>
+       <LI><SMALL>MSOLEDBSQL</SMALL> &#8211; <A HREF="http://www.microsoft.com/download/details.aspx?id=56730">Microsoft OLE DB Driver for SQL Server</A>. Originally released in March 2018, the first release of OLE DB for SQL Server after some years of deprecation. There have been point releases of this provider. The current release of Win32::SqlServer was tested against version 18.6. Version 18.2 of this provider ships with SQL 2019.</LI>
+       <LI><SMALL>SQLNCLI11</SMALL> &#8211; SQL Server Native Client 11.0. The provider that ships with SQL 2012 and later versions.</LI>
        <LI><SMALL>SQLNCLI10</SMALL> &#8211; SQL Server Native Client 10.0. The provider that
-       shipped with SQL&nbsp;2008.</LI>
-       <LI><SMALL>SQLNCLI &#8211; SQL</SMALL> (Server) Native Client. The provider that shipped with SQL&nbsp;2005.</LI>
+         shipped with SQL&nbsp;2008.</LI>
+       <LI><SMALL>SQLNCLI</SMALL> &#8211; SQL (Server) Native Client. The provider that shipped with SQL&nbsp;2005.</LI>
        <LI><SMALL>SQLOLEDB</SMALL> &#8211; The original OLE DB provider that shipped with SQL 2000 and earlier versions and still ships with all operating systems. That is, if you install no OLE DB provider on the machine, <SMALL>SQLOLEDB</SMALL> will always be there for you, but you will not have support for features added in SQL 2005 or later.</LI>
      </UL>
    </DD>
-   <DT>&nbsp;</DT>
-   <DT><B>SQL Server</B></DT>
-   <DD>All versions from SQL Server 2000 and on
-   are supported. Azure SQL Database and Azure Managed Instance should work; however, I have conducted minimal or no testing against these platforms.</DD>
-   <DT>&nbsp;</DT>
-   <DT><B>Compiler</B></DT>
-   <DD>If you want to compile Win32::SqlServer on your own, you need Visual Studio 2017 or
-   later. You will also need the <SMALL>SDK</SMALL> file for Microsoft OLE DB Driver for SQL Server. (Note that the SDK is not installed by default when you install the provider.) If you use any other compiler than
-     Visual C++, feel free to try. I have not tested that, nor do I support it.
+</DL>
+<DL>
+  <DT>&nbsp;</DT>
+  <DT><B>SQL Server</B></DT>
+  <DD>All versions from SQL Server 2000 and on
+   are supported. Azure SQL Database and Azure SQL Managed Instance should work; however, I have conducted minimal or no testing against these platforms.</DD>
+  <DT>&nbsp;</DT>
+  <DT><B>Compiler</B></DT>
+  <DD>If you want to compile Win32::SqlServer on your own, you need Visual Studio 2017 or
+    later. You will also need the <SMALL>SDK</SMALL> file for Microsoft OLE DB Driver for SQL Server. (Note that the SDK is not installed by default when you install the provider.) If you use any other compiler than
+    Visual C++, feel free to try. I have not tested that, nor do I support it.
    If you have downloaded a binary, you do not need any compiler. </DD>
   <DT>&nbsp;</DT>   
-   <DT><B>Binary Support</B></DT>
-   <DD><UL>
-     <LI>The binary distribution includes 32-bit and 64-bit binaries for Perl 5.24, 5.26, 5.28, 5.30, 5.32 and 5.34. Generally, I commit myself to support five versions of Perl, but I may stretch it  if I find it appropriate. Thus, when Perl 5.36 comes out, I may drop support for both Perl 5.24 and 5.26.</LI> 
-   <LI>Note that 32-bit versiions were built with the flag  USE_64_BIT_INT set. and they will not run with a 32-bit Perl built without this flag set.</LI> 
-   <LI>I have tested all binaries with Strawberry Perl, save for the 5.34 binaries (because Strawberry Perl 5.34 was not available when I released the current version of Strawberry Perl).</LI>
-   </UL>
-   </DD>
+  <DT><B>Binary Support</B></DT>
+  <DD><UL>
+    <LI>The binary distribution includes 32-bit and 64-bit binaries for Perl 5.24, 5.26, 5.28, 5.30, 5.32, 5.34 and 5.36. Generally, I commit myself to support five versions of Perl, but I may stretch it  if I find it appropriate. Thus, when Perl 5.38 comes out, I may drop support from 5.28 and down.</LI> 
+    <LI>Note that 32-bit versiions were built with the flag  <SMALL>USE_64_BIT_INT</SMALL> set. and they will not run with a 32-bit Perl built without this flag set.</LI> 
+    <LI>I have tested all binaries with Strawberry Perl and/or ActivePer up to Perl 5.34, save for the 32-bit 5.34 binaries (because there is no free binary distribution of 5.34 32-bit.) I released the current version shortly after the release of Perl 5.36, and there was no binary distribution available at that time.</LI>
+    </UL>
+  </DD>
 </DL>
 <P>To run Win32::SqlServer on platforms not included above, you can use older versions as follows:</P>
 <UL>
-  <LI>For binary support for Perl 5.20 and 5.223 use <A HREF="http://www.sommarskog.se/mssqlperl/Win32-SqlServer-2.012.zip">version 2.012</A> of Win32::SqlServer</LI>
+  <LI>For binary support for Perl 5.20 and 5.22 use <A HREF="http://www.sommarskog.se/mssqlperl/Win32-SqlServer-2.012.zip">version 2.012</A> of Win32::SqlServer</LI>
   <LI>For binary support for Perl 5.18, use <A HREF="http://www.sommarskog.se/mssqlperl/Win32-SqlServer-2.011.zip">version 2.011</A> of Win32::SqlServer.</LI>
   <LI>To able to connect to SQL 7, use <A HREF="http://www.sommarskog.se/mssqlperl/Win32-SqlServer-2.011.zip">version 2.011</A> of Win32::SqlServer.</LI>
   <LI>For support for Perl 5.12, 5.14 or 5.16, use <A HREF="http://www.sommarskog.se/mssqlperl/Win32-SqlServer-2.010.zip">version 2.010</A> of Win32::SqlServer.</LI>
@@ -258,7 +262,7 @@ result set(s).</P>
 <P>Finally, a note about using UTF-8 as you ANSI code page. (This is a setting in Windows 10, which is still labeled as &quot;beta&quot;, although it has been there for a few years now). If you have setting enabled, you need to observe these prerequisites:</P>
 <UL>
   <LI>You can only connect to SQL 2019 or later.</LI>
-  <LI>You must be using at least version 18.5 of the MSOLEDBSQL provider.</LI>
+  <LI>You must be using at version 18.5 of the <SMALL>MSOLEDBSQL</SMALL> provider or later.</LI>
 </UL>
 <P>These limitations are not set by Win32::SqlServer itself, but are due to the capabilities of the OLE DB provider.</P>
 <H2><A NAME="functionsummary">Summary of Functions</A></H2>
@@ -271,7 +275,11 @@ result set(s).</P>
    for this.</P>
 <H3>Connection Routines</H3>
 <DL>
-<DT><B><CODE>$sqlsrv = Win32::SqlServer::sql_init($server, $user, $pw, $database,
+
+  <DT><B><CODE>Win32::SqlServer::SetDefaultForEncryption($EncryptOption, $TrustServerCert, $HostNameInCert);</CODE></B></DT>
+  <DD>Sets module-level defaults for encryption options.</DD>
+  <DT></DT>
+  <DT><B><CODE>$sqlsrv = Win32::SqlServer::sql_init($server, $user, $pw, $database,
 $provider);</CODE></B></DT>
 <DD>Creates a Win32::SqlServer object and connects to the specified server and database.</DD>
 <DT>&nbsp;</DT>
@@ -404,7 +412,7 @@ $alloclen]])</CODE></B></DT>
 <DD>Makes a <SMALL>FILESTREAM</SMALL> column available for access through <CODE>Win32::API</CODE>.</DD>
 </DL>
 <H3>Character-set Conversion Routines</H3>
-<P>Csveat: These routines are mainly intended for ANSI/OEM conversion if you really have data in the OEM code page. Be careful to read more closely about these functions before you start using them.</P>
+<P>Caveat: These routines are mainly intended for ANSI/OEM conversion if you really have data in the OEM code page. Be careful to read more closely about these functions before you start using them.</P>
 <DL>
 <DT><CODE><B>$sqlsrv-&gt;sql_set_conversion($client_cs, $server_cs, $direction);</B></CODE></DT>
 
@@ -451,9 +459,9 @@ Win32::SqlServer <CODE>croaks</CODE>.</P>
    <DD>How long Win32::SqlServer should wait before timing out on a command. The default
    is 0, which means wait forever.</DD>
    <DT><B>codepages</B></DT>
-   <DD>A cache with the code page for each database hitherto visited. Used when passing and receiving char and varchar data.</DD>
+   <DD>A cache with the code page for each database hitherto visited. Used when passing and receiving <B><CODE>char</CODE></B> and <B><CODE>varchar</CODE></B> data.</DD>
    <DT><B>CurrentDB</B></DT>
-   <DD>Holds the name of the current database (which may change if a batch issues a USE command). This is a read-only property.</DD>
+   <DD>Holds the name of the current database (which may change if a batch issues a <SMALL>USE</SMALL> command). This is a read-only property.</DD>
    <DT>&nbsp;</DT>
    <DT><B>DateFormat</B></DT>
    <DD>Controls how <CODE><B>datetime</B></CODE> values are formatted when <B><A HREF="#datetime">DatetimeOption</A></B> has the value
@@ -1018,7 +1026,7 @@ see below.</P>
    Win32::SqlServer converts the
    value returned by SQL Server. The property
 <B><A HREF="#datetime">TZOffset</A></B> can be used to shift the time-zone of a <B><CODE>datetimeoffset</CODE></B> value.</P>
-<P><B>Note</B>: if you any of the providers <SMALL>SQLOLEDB</SMALL> or <SMALL>SQLNCLI, SQL</SMALL> Server will
+<P><B>Note</B>: if you any of the providers <SMALL>SQLOLEDB</SMALL> or <SMALL>SQLNCLI</SMALL>, SQL Server will
 return values of the  data types introduced in SQL 2008 (<B><CODE>date</CODE></B>, <B><CODE>time</CODE></B>, <CODE><B>datetime2</B></CODE> and <B><CODE>datetimefoffset</CODE></B>) as strings in ISO format, and the properties <B><A HREF="#datetime">DatetimeOption</A></B> and <B><A HREF="#datetime">TZOffset</A></B> will never apply. They only apply
 to the new data types if you use
 <SMALL>SQLNCLI10</SMALL> or later. <B><A HREF="#datetime">DatetimeOption</A></B> always
@@ -1103,7 +1111,7 @@ applies to <B><CODE>datetime</CODE></B> and <B><CODE>smalldatetime</CODE></B> va
    <TR><TD><CODE><SPAN CLASS="nowrap">%d</SPAN></CODE></TD><TD>Day of month as decimal number (01 –
       31)</TD></TR>
    <TR><TD><CODE><SPAN CLASS="nowrap">%H</SPAN>, <SPAN CLASS="nowrap">%I</SPAN></CODE></TD><TD>Hour in 24/12-hour format (00 –
-      23)/(01 - 12)</TD></TR>
+      23)/(01 &#8211; 12)</TD></TR>
    <TR><TD><CODE><SPAN CLASS="nowrap">%m</SPAN></CODE></TD><TD>Month as decimal number (01 – 12)</TD></TR>
    <TR><TD><CODE><SPAN CLASS="nowrap">%M</SPAN></CODE></TD><TD>Minute as decimal number (00 – 59)</TD></TR>
    <TR><TD><CODE><SPAN CLASS="nowrap">%p</SPAN></CODE></TD><TD>Current locale&#39;s <SMALL>A.M./P.M</SMALL>. indicator
@@ -1243,7 +1251,7 @@ values. Only ISO strings will work. And even with ISO strings, you may get
 different results with a legacy provider than with <SMALL>SQLNCLI10</SMALL>, since
 Win32::SqlServer has somewhat different conversion rules than SQL Server. (Truncation
 instead of rounding, using <SPAN CLASS="nowrap">1899-12-30</SPAN> as the default date etc.)</P>
-<H2>nchar, nvarchar and ntext</A></H2>
+<H2><A NAME="nchar">nchar, nvarchar and ntext</A></H2>
 <P>For <B><CODE>nvarchar(MAX)</CODE></B> and <B><CODE>ntext</CODE></B>, see
    also <A HREF="#largetypes">large data types</A> below.</P>
 <H3>Output</H3>
@@ -1260,16 +1268,16 @@ instead of rounding, using <SPAN CLASS="nowrap">1899-12-30</SPAN> as the default
 <H3>Output</H3>
 <P>A value in a result set is handled just like <B><CODE>n(var)char</CODE></B> data. That is, even if your script that is running on an computer with an ANSI code page or Latin-1, the value <I>αβγ</I> from a <B><CODE>varchar</CODE></B> column with a Greek collation, will come back to you as <I>αβγ</I>. </P>
 <P>The same is almost true for output parameters. However they will always be coerced into the code page of the current database by SQL Server. Example: Your current database has the collation Greek_CI_AS (codepage 1253) and you call a stored procedure that returns the value <I>αβγ</I>; you will receive that value correctly. However, if you make a cross-database call to the same procedure from a database with the collation Latin1_General_CI_AS (codepage 1252), you will receive this value as <I>aß?</I>, because as the data passes through the Latin1 database, SQL Server will replace the Greek characters with fallback characters.</P>
-<P><B>Notes on UTF-8 collations</B>: SQL 2019 introduced UTF-8 collations. If you are connected with version 18.2.1 or later of the <SMALL>MSOLEDBSQL</SMALL> provider, SQL Server will return <B><CODE>(var)char</CODE></B> data as-is. For older providers without UTF-8 support, SQL Server will return the data as <B><CODE>n(var)char</CODE></B> as a fallback. This makes it largely transperant for Win32::SqlServer. However, I found that for output parameters, it is best to pass them as <B><CODE>n(var)char</CODE></B> to get everything to work smoothlessly and the <A HREF="#High-level">high-level routines</A> take care of this, with one caveat: I only do this if the provider is SQLNCLI11 or earlier, so if you are using the first release(s) of <SMALL>MSOLEDBSQL</SMALL> which I don't think has the UTF-8 support, you may experience some rough edges. (I have not tested with these older versions of that provider.) </P>
+<P><B>Notes on UTF-8 collations</B>: SQL 2019 introduced UTF-8 collations. If you are connected with version 18.2.1 or later of the <SMALL>MSOLEDBSQL</SMALL> provider, SQL Server will return <B><CODE>(var)char</CODE></B> data as-is. For older providers without UTF-8 support, SQL Server will return the data as <B><CODE>n(var)char</CODE></B> as a fallback. This makes it largely transperant for Win32::SqlServer. However, I found that for output parameters, it is best to pass them as <B><CODE>n(var)char</CODE></B> to get everything to work smoothlessly and the <A HREF="#High-level">high-level routines</A> take care of this, with one caveat: I only do this if the provider is <SMALL>SQLNCLI11</SMALL> or earlier, so if you are using the first release(s) of <SMALL>MSOLEDBSQL</SMALL> which I don't think has the UTF-8 support, you may experience some rough edges. (I have not tested with these older versions of that provider.) </P>
 <P>If you are calling <A HREF="#enterparameter" CLASS="nowrap">enterparameter()</A> yourself, you are adviced to specify <CODE><B>n(var)char</B></CODE> as the data type for if you are using a low-level provider and your database has a UTF-8 collations.</P>
-<P>If you are using SQLOLEDB, see <A HREF="#Issue7">Issue 7</A> in the list of known issues for a restriction with data from UTF-8 data.</P>
+<P>If you are using <SMALL>SQLOLEDB</SMALL>, see <A HREF="#Issue7">Issue 7</A> in the list of known issues for a restriction with data from UTF-8 data.</P>
 <H3>Input</H3>
 <P>When you pass data to <B><CODE>(var)char</CODE></B> parameters, Win32::SqlServer will convert the Perl data to the code page of the current database. This permits you to insert a value such as <I>αβγ</I> in a database with a Greek collation, even if you are running from a computer with an ANSI code page of Latin-1. However, observe the following:</P>
 <UL>
   <LI>If the target column is a <B><CODE>(var)char</CODE></B> column with a collation with a different code page than the database collation, you need to use an <B><CODE>n(var)char</CODE></B> parameter to avoid data loss with the conversion. (Because in SQL Server, parameters and variables of the types <CODE><B>(var)char</B></CODE> always have the collation of the database.)</LI>
   <LI>If you call a stored procedure in a database with a collation with a different code page, the result may not be correct, as the <CODE><B>(var)char</B></CODE> values are interpreted according to the code page of the current database. Switch to the other database with a <SMALL>USE</SMALL> statement first.</LI>
 </UL>
-<P>When you pass data to <CODE><B>varchar</B></CODE> columns in table-valued parameters, the situation is different. If you are defining the columns of the table parameter with <A HREF="#definetablecolumn">definetablecolumn()</A> directly, you are adviced to use <CODE><B>n(var)char</B></CODE> for <CODE><B>(var)char</B></CODE> columns that have a collation that is different from the code page of the database collation and/or the ANSI code page of the client. This is because while Win32::SqlServer turns off the AutoTranslate option in the OLE DB provider, the OLE DB does not respect this for data to table parameters. If you are using the the <A HREF="#High-level">high-level routines</A>, they take care of this for you, and net effect is that result is the same for input parameters <I>minus</I> the two observations above.</P>
+<P>When you pass data to <CODE><B>varchar</B></CODE> columns in table-valued parameters, the situation is different. If you are defining the columns of the table parameter with <A HREF="#definetablecolumn"><SPAN CLASS="nowrap">definetablecolumn()</SPAN></A> directly, you are adviced to use <CODE><B>n(var)char</B></CODE> for <CODE><B>(var)char</B></CODE> columns that have a collation that is different from the code page of the database collation and/or the ANSI code page of the client. This is because while Win32::SqlServer turns off the AutoTranslate option in the OLE DB provider, the OLE DB does not respect this for data to table parameters. If you are using the the <A HREF="#High-level">high-level routines</A>, they take care of this for you, and net effect is that result is the same for input parameters <I>minus</I> the two observations above.</P>
 <H2><A NAME="binary">binary, varbinary, image</A></H2>
 <P>For <B><CODE>varbinary(MAX)</CODE></B> and <B><CODE>image</CODE></B>, see
    also  <A HREF="#largetypes">large data types</A> below.</P>
@@ -1312,7 +1320,7 @@ instead of rounding, using <SPAN CLASS="nowrap">1899-12-30</SPAN> as the default
 <P>On output the <B><CODE>sql_variant</CODE></B> value is handled as the
    underlying base type. Thus for a datetime value, Win32::SqlServer
    will look at <B><A HREF="#datetime">DatetimeOption</A></B>, for a binary value at <B><A HREF="#binary">BinaryAsStr</A></B>
-   etc. Note that if the underlying data type is <B><CODE>char</CODE></B><CODE></CODE> or <CODE><B>varchar</B></CODE>, the interpretation of the string depends on which OLE DB provider you are using. With SQLNCLI11 and earlier, Win32::SqlServer will assume that the code page of the string is the same as of the database collation, since the OLE DB provider does not return information about collation or code page for the value. With the MSOLEDBSQL provider, the OLE DB provider will always coerce the string into the code page of the client. (More precisely, this is a change that was introduced in version 18.4 of the MSOLEDBSQL provider.)</P>
+   etc. Note that if the underlying data type is <B><CODE>char</CODE></B><CODE></CODE> or <CODE><B>varchar</B></CODE>, the interpretation of the string depends on which OLE DB provider you are using. With <SMALL>SQLNCLI11</SMALL> and earlier, Win32::SqlServer will assume that the code page of the string is the same as of the database collation, since the OLE DB provider does not return information about collation or code page for the value. With the <SMALL>MSOLEDBSQL</SMALL> provider, the OLE DB provider will always coerce the string into the code page of the client. (More precisely, this is a change that was introduced in version 18.4 of the <SMALL>MSOLEDBSQL</SMALL> provider.)</P>
 <H3>Input</H3>
 <P>On input, Win32::SqlServer only supports conversion to some possible base types for the
    SQL variant value, more precisely <B><CODE>int</CODE></B>,
@@ -1365,7 +1373,7 @@ instead of rounding, using <SPAN CLASS="nowrap">1899-12-30</SPAN> as the default
    this bit for string data it receives from SQL Server.)</LI>
    <LI>The database collation has a different code page from the ANSI code page of the client.</LI>
    </UL>
-   When none of the above applies</B>, Win32::SqlServer will pass the value as <B><CODE>varchar</CODE></B>.
+   When none of the above applies, Win32::SqlServer will pass the value as <B><CODE>varchar</CODE></B>.
    </DD>
 </DL>
 <H2><A NAME="xml">xml</A> and FOR XML</H2>
@@ -1467,7 +1475,7 @@ later; you cannot use table parameters with older providers.</P>
 <P>Win32::SqlServer has no particular support for these data types, but these are handled
    as just as any other types. This should be OK for values of moderate size.
    However, with values of several megabytes, the performance becomes
-   unacceptable, and it can take several seconds to retrieve a 10&nbsp;MB value. For LOB values of these size, you should consider using FILESTREAM and use the the <A HREF="#OpenSqlFilestream"><SPAN CLASS="nowrap">OpenSqlFilestream()</SPAN></A> interface which should give you a lot better performance at those sizes.</P>
+   unacceptable, and it can take several seconds to retrieve a 10&nbsp;MB value. For LOB values of these size, you should consider using <SMALL>FILESTREAM</SMALL> and use the the <A HREF="#OpenSqlFilestream"><SPAN CLASS="nowrap">OpenSqlFilestream()</SPAN></A> interface which should give you a lot better performance at those sizes.</P>
 <P><B>Note</B>: if you are using the <SMALL>SQLOLEDB</SMALL> provider, be aware of that output parameters of the <SMALL>MAX</SMALL> data types will be truncated at 8000 bytes by SQL Server. You cannot call user-defined functions with
 a return value of these data types from <SMALL>SQLOLEDB</SMALL>. </P>
 <H1><A NAME="Initroutines">Connection Routines</A></H1>
@@ -1480,7 +1488,24 @@ a return value of these data types from <SMALL>SQLOLEDB</SMALL>. </P>
    <A HREF="#connect">connect()</A> &#8211;</SPAN> or you set the property <B>
    <A HREF="#AutoConnect">AutoConnect</A></B> which means that Win32::SqlServer connects
    and disconnects for
-   each query.</P>
+   each query. Since the encryption options can be a little tricky, Win32::SqlServer offers a way to set a default for these.</P>
+<H2><A NAME="SetDefaultForEncryption"><SPAN><SPAN CLASS="nowrap">SetDefaultForEncryption()</SPAN></SPAN></A></H2>
+<P>With the introduction of the <SMALL>MSOLEDBSQL19</SMALL> provider, Microsoft changed the default for the <I>Encrypt</I> setting, that is, whether the data sent to/from SQL Server, should be encrypted. Win32::SqlServer respects these defaults. However, this can be problematic if you are moving your scripts between different environments with different providers installed, and you generally don't expect encryption to work. (Because typically there are no trusted certificates installed.) For this reason, Win32::SqlServer offers this module-level routine to set your encryption options once for all.</P>
+<PRE>Win32::SqlServer::SetDefaultForEncryption($EncryptOption [, $TrustServerCert [,$HostNameInCert]));</PRE>
+<P>Observe that this routine is not exported &#8211; you must include <CODE>Win32::SqlServer::</CODE> in the call.</P>
+<P>Note that the intended usage is like this:</P>
+<PRE>use Win32::SqlServer qw(:DEFAULT :consts);
+Win32::SqlServer::SetDefaultForEncryption('Optional');</PRE>
+<P>That is, you call it more or less call directly after <CODE>use</CODE>. There is nothing to stop you from calling it all over the place and changing the defaults as you move on, but this is nothing I have tested. And since it deals with global values (in the C++ code), the routine is definitely not thread-safe.</P>
+<DL>
+  <DT><CODE>$EncryptOption</CODE></DT>
+<DD>One of <CODE>undef</CODE>, <I>Optional</I>, <I>Mandatory</I> and <I>Strict</I>. <CODE>undef</CODE> means that you use the default of the provider. <I>Optional</I> means that you permit the conection to be unencrypted. <I>Mandatory</I> means that you require the connection to be encrypted. <I>Strict</I> means that also pre-login packets should be encrypted. The latter option is only functional with the <SMALL>MSOLEDBSQL19</SMALL> provider and later and only if you connect to an engine that supports TDS 8.0, for instance SQL 2022. For older providers, <I>Strict</I> and <I>Mandatory</I> are synonymous. Beware that if you specify <I>Strict</I> and the provider is <SMALL>MSOLEDBSQL19</SMALL> and you connect to SQL 2019 or earlier, connection will fail.</DD>
+<DT><CODE>$TrustServerCert</CODE></DT>
+<DD>This can be <CODE>undef</CODE> or a true or false value and sets the default for the setting <I>TrustServerCertificate</I>. <CODE>undef</CODE> means that you go with the provider default. </DD>
+<DT><CODE>$HostNameInCert</CODE></DT>
+<DD>When you have <I>Mandatory</I> or <I>Strict</I> for <CODE>$EncryptOption</CODE>, the name in the certificate must agree with the name you specified for the server with <A HREF="#sql_init"><SPAN CLASS="nowrap">sql_init()</SPAN></A> or <A HREF="#setloginproperty"><SPAN CLASS="nowrap">setloginproperty()</SPAN></A>. This can be unpractical if you need to connect by, for instance, IP-address for DNS reasons. This setting permits you to spefiy the server name you expect in the certificate. This setting was introduced in <SMALL>MSOLEDBSQL19</SMALL> and is ignonred by earlier versions.</DD>
+</DL>
+<P>Beware that there are also registry values that affect the encryption settings, and they may specify that <B><I>Mandatory</I></B> is the lowest permitted level. Please refer to the topic <I><A HREF="https://docs.microsoft.com/en-us/sql/connect/oledb/features/encryption-and-certificate-validation?view=sql-server-ver15">Encryption and Certificate Validation</A></I> in the OLE DB docs for details.</P>
 <H2><A NAME="sql_init"><SPAN CLASS="nowrap">sql_init()</SPAN></A></H2>
 <P>Creates a Win32::SqlServer object, connects to SQL Server and returns the object.</P>
 <PRE>$sqlsrv = [Win32::SqlServer::]sql_init([$server, [$username,[$password,
@@ -1578,10 +1603,10 @@ the provider fancies.</P>
    <CODE>undef</CODE></TD>
     <TH><SPAN CLASS="nowrap">OLE DB Property</SPAN></TH>
     <TD CLASS="extrapad">
-   <SMALL>SSPROP_AUTH_ACCESSTOKEN</SMALL></TD></TR>
+   <SMALL>SSPROP_AUTH_ACCESS_TOKEN</SMALL></TD></TR>
 </TABLE>
 </P>
-<P>Specifies an access token to authenticate to Azure Active Directory. This property requires MSOLEDBSQL 18.2 or later. See the OLE DB Docs topic <I><A HREF="https://docs.microsoft.com/en-us/sql/connect/oledb/features/using-azure-active-directory?view=sql-server-ver15">Using Azure Directory</A></I> in for details.</P>
+<P>Specifies an access token to authenticate to Azure Active Directory. This property requires <SMALL>MSOLEDBSQL</SMALL> 18.2 or later. See the OLE DB Docs topic <I><A HREF="https://docs.microsoft.com/en-us/sql/connect/oledb/features/using-azure-active-directory?view=sql-server-ver15">Using Azure Directory</A></I> in for details.</P>
 
 
 <H3><A NAME="ApplicationIntent">ApplicationIntent</A></H3>
@@ -1642,8 +1667,10 @@ available with the <SMALL>SQLNCLI11</SMALL> provider or later.</P>
     <TH>OLE DB Property</TH><TD CLASS="extrapad"><SMALL>SSPROP_INIT_AUTOTRANSLATE</SMALL></TD></TR>
 </TABLE>
 </P>
-<P>This setting is deprecated and will be removed from a future version of Win32::SqlServer. Any attempt to set it renders a warning through <A HREF="#MsgHandler">current
-message handler</A> and the value is ignored. The setting controls how data to <B><CODE>(var)char</CODE></B> columns is converted, and this is on by default with OLE DB. However, since Win32::SqlServer itself performs character conversion from Perl's internal UTF-8 representation to the code page of the database as discussed in the section on <I><A HREF="#char">char, varchar and text</A></I>, Win32::SqlServer forces this setting to <B>false</B>.</P>
+<P>This setting is deprecated and will be removed from a future version of Win32::SqlServer. Any attempt to set it renders a warning through the <A HREF="#MsgHandler">current
+message handler</A> and the value is ignored. The setting controls how data to <B><CODE>(var)char</CODE></B> columns is converted, and this is on by default with OLE DB. However, since Win32::SqlServer itself performs character conversion from Perl's internal UTF-8 representation to the code page of the database as discussed in the section on <I><A HREF="#char">
+<NOMEDDLE>char, varchar and text</NOMEDDLE>
+</A></I>, Win32::SqlServer forces this setting to <B>false</B>.</P>
 
 <H3><A NAME="ConnectionString">ConnectionString</A></H3>
 <P>
@@ -1653,22 +1680,23 @@ message handler</A> and the value is ignored. The setting controls how data to <
 </TABLE>
 </P>
 <P>Instead of setting all properties individually, you can set all in one bang
-with a connection string, just as they do in other interfaces. If you set this
-property, Win32::SqlServer flushes the settings for all other login properties, including
-its default values. So, for instance, if you set the <B>ConnectionString</B>
+with a connection string, just like they do in other interfaces. If you set this
+property, Win32::SqlServer flushes the settings  for all other login properties, with the exception of those listed below. So, for instance, if you set the <B>ConnectionString</B>
 property, but do not include <I>Initial Catalog</I> in the connection string,
 the user&#39;s default database will apply, not tempdb. If you then go on to set
-other login properties with <A HREF="#setloginproperty"><SPAN CLASS="nowrap">setloginproperty()</SPAN></A>, these take
+other login properties with <A HREF="#setloginproperty"><SPAN CLASS="nowrap">setloginproperty()</SPAN></A>, they take
 precedence over the connection string.</P>
+<P>There are four login properties for which Win32::SqlServer does not flush the settings of when you specify a connection string. The first is <B><A HREF="#Autotranslate">Autotranslate</A></B>, which Win32::SqlServer always forces to false. The other three are <A HREF="#Encrypt"><B>Encrypt</B></A>, <A HREF="#TrustServerCert"><B>TrustServerCert</B></A> and <A HREF="#HostNameInCertificate"><B>HostNameInCertificate</B></A>. This is to permit <A HREF="#SetDefaultForEncryption"><SPAN CLASS="nowrap">SetDefaultForEncryption()</SPAN></A> to have effect also when you are using a connection string. </P>
 <P>There are two keywords you should not include in the connection string:</P>
 <UL>
   <LI>The keyword <I>Provider</I>. To set which provider to use you must use the
     Win32::SqlServer property <B><A HREF="#Provider">Provider</A></B>.
   </LI>
-  <LI>The keyword <I>AutoTranslate</I> (or <I>Auto Translate</I>). Win32::SqlServer always sets the OLE DB property SSPROP_INIT_AUTOTRANSATE to <B>false</B>, and this takes precedence of what you may specify in the connection string.</LI>
+  <LI>The keyword <I>AutoTranslate</I> (or <I>Auto Translate</I>). Win32::SqlServer always sets the OLE DB property <SMALL>SSPROP_INIT_AUTOTRANSATE</SMALL> to <B>false</B>, and this takes precedence of what you may specify in the connection string.</LI>
 </UL>
 <P>For a full list of available keywords for the connection string, please see
-   this <A HREF="https://docs.microsoft.com/en-us/sql/connect/oledb/applications/using-connection-string-keywords-with-oledb-driver-for-sql-server">topic in the OLE DB Docs</A>. (Beware that this topic applies to the most recent provider MSOLEDBSQL, and not all keywords may be available with older providers.)</P>
+   this <A HREF="https://docs.microsoft.com/en-us/sql/connect/oledb/applications/using-connection-string-keywords-with-oledb-driver-for-sql-server">topic in the OLE DB Docs</A>. (Beware that this topic applies to the most recent provider <SMALL>MSOLEDBSQL19</SMALL>, and not all keywords may be available with older providers.)</P>
+<P>Note: when testing, I have found that not all available connection-string keywords to actually have any effect, but I have not been able to understand why. The important ones to specify authentication, server and database work, but for instance the <I>Encrypt</I> keyword appears to have no effect. </P>
 <H3><A NAME="ConnectRetryCount">ConnectRetryCount</A></H3>
 <P>
 <TABLE BORDER=1 CELLSPACING=0 CELLPADDING=0>
@@ -1680,7 +1708,7 @@ precedence over the connection string.</P>
 </TABLE>
 </P>
 <P>This property specifies how many times the OLE DB provider should retry to re-establish the connection, if an idle connection is broken. </P>
-<P>This property requires MSSQLOLEDB 18.6. The default value given, is the default value from the OLE DB provider. Win32::SqlServer only sets this property if you explicity set it. For details, see the topic <I><A HREF="https://docs.microsoft.com/en-us/sql/connect/oledb/features/idle-connection-resiliency?view=sql-server-ver15">Idle connection resiliency in the OLE DB Driver</A></I> in the OLE DB Docs .</P>
+<P>This property requires <SMALL>MSSQLOLEDB</SMALL> 18.6 or later. The default value given, is the default value of the OLE DB provider. Win32::SqlServer only sets this property if you explicity set it. For details, see the topic <I><A HREF="https://docs.microsoft.com/en-us/sql/connect/oledb/features/idle-connection-resiliency?view=sql-server-ver15">Idle connection resiliency in the OLE DB Driver</A></I> in the OLE DB Docs .</P>
 
 <H3><A NAME="ConnectRetryCount">ConnectRetryInterval</A></H3>
 <P>
@@ -1696,7 +1724,7 @@ precedence over the connection string.</P>
 </TABLE>
 </P>
 <P>This property specifies with which frequency the the OLE DB provider should retry to re-establish a broken idle connection. The property is ignored if <A HREF="#ConnectRetryCount"><B>ConnectRetryCount</B></A> is 0.</P>
-<P>This property requires MSSQLOLEDB 18.6. The default value given, is the default value from the OLE DB provider. Win32::SqlServer only sets this property if you explicity set it. For details, see the topic <I><A HREF="https://docs.microsoft.com/en-us/sql/connect/oledb/features/idle-connection-resiliency?view=sql-server-ver15">Idle connection resiliency in the OLE DB Driver</A></I> in the OLE DB Docs.</P>
+<P>This property requires <SMALL>MSSQLOLEDB</SMALL> 18.6 or later. The default value given, is the default value of the OLE DB provider. Win32::SqlServer only sets this property if you explicity set it. For details, see the topic <I><A HREF="https://docs.microsoft.com/en-us/sql/connect/oledb/features/idle-connection-resiliency?view=sql-server-ver15">Idle connection resiliency in the OLE DB Driver</A></I> in the OLE DB Docs.</P>
 <H3><A NAME="ConnectTimeout">ConnectTimeout</A></H3>
 <P>
 <TABLE BORDER=1 CELLSPACING=0 CELLPADDING=0>
@@ -1724,12 +1752,23 @@ giving up when trying to connect to SQL Server. (This is not the same as the com
 <H3><A NAME="Encrypt">Encrypt</A></H3>
 <P>
 <TABLE BORDER=1 CELLSPACING=0 CELLPADDING=0>
-<TR><TH>Data type</TH><TD CLASS="extrapad">boolean</TD><TH>Default</TH><TD CLASS="extrapad">false</TD>
+<TR><TH>Data type</TH>
+<TD CLASS="extrapad">string</TD><TH>Default</TH>
+<TD CLASS="extrapad"><CODE>undef</CODE></TD>
     <TH>OLE DB Property</TH><TD CLASS="extrapad"><SMALL>SSPROP_INIT_ENCRYPT</SMALL></TD></TR>
 </TABLE>
 </P>
-<P>Whether the connection is to be encrypted. Please refer to the OLE DB Docs for
-   further details. </P>
+<P>Whether the connection is to be encrypted. Originally, this was a boolean property, but it was changed to be a string value with introduction of the <SMALL>MSOLEDBSQL19</SMALL> provider. There are three possible settings, which for compatibility reasons can be expressed in alternate ways (all values are case-insensitive):</P>
+<DL>
+<DT>0 / <I>no</I> / <I>false</I> / <I>Optional</I></DT>
+<DD>You do not require encryption.</DD>
+<DT>1 / <I>yes</I> / <I>true</I> / <I>Mandatory</I></DT>
+<DD> You require that the connection is encrypted.</DD>
+<DT><I>Strict</I></DT>
+<DD>You require that also pre-login packets are to be encrypted. This option was introduced in the <SMALL>MSOLEDBSQL19</SMALL> provider, and Win32::SqlServer handles it as synonymous to <I>Mandatory</I> for older providers. Beware that this option only works with servers supporting TDS 8.0, for instance SQL 2022. If you specify this setting with <SMALL>MSOLEDBSQL19</SMALL> or later with an older server, connection will fail.</DD>
+</DL>
+<P>Win32::SqlServer only sets this option if you specify it through <A HREF="#setloginproperty"><SPAN CLASS="nowrap">setloginproperty()</SPAN></A> or <A HREF="#SetDefaultForEncryption"><SPAN CLASS="nowrap">SetDefaultForEncryption()</SPAN></A>, else the default of the provider will apply. Note that up to <SMALL>MSOLEDBSQL</SMALL>, the default was <I>false</I>, that is, encryption was not required, but starting with <SMALL>MSOLEDBSQL19</SMALL>, the default is <I>Mandatory</I>.</P>
+<P>Also beware that registry settings may mandate that <I>Mandatory </I>is the lowest permitted level, regardless to what you pass to <A HREF="#setloginproperty"><SPAN CLASS="nowrap">setloginproperty()</SPAN></A>. See the topic<I><A HREF="https://docs.microsoft.com/en-us/sql/connect/oledb/features/encryption-and-certificate-validation?view=sql-server-ver15"> Encryption and Certificate Validation</A></I> in the OLE DB docs for details.</P>
 
 <H3><A NAME="FailoverPartner">FailoverPartner</A></H3>
 <P>
@@ -1761,6 +1800,19 @@ property requires the <SMALL>SQLNCLI10</SMALL> provider or later.</P>
 </P>
 <P>A string that represents the machine you are connecting from and which
 resurfaces in the SQL function <SPAN CLASS="nowrap"><SMALL>HOST_NAME</SMALL>()</SPAN>. </P>
+
+<H3><A NAME="HostNameInCertificate">HostNameInCertificate</A></H3>
+<P>
+<TABLE BORDER=1 CELLSPACING=0 CELLPADDING=0>
+<TR><TH>Data type</TH><TD CLASS="extrapad">string</TD><TH>Default</TH>
+<TD CLASS="extrapad"><CODE>undef</CODE>
+</TD>
+<TH>OLE DB Property</TH><TD CLASS="extrapad"><SMALL>SSPROP_INIT_HOST_NAME_CERTIFICATE</SMALL></TD></TR>
+</TABLE>
+</P>
+<P>When you specify that the connection should encrypted (or this is the default set by the provider), the server's certificate must be trusted, which includes that name of the server must appear in the certificate. This can cause problems if you connect by an alternate name (IP address, FQDN etc). With older OLE DB providers, you could give the server carte blanche with the <B><A HREF="#TrustServerCert">TrustServerCert</A></B> login property. <SMALL>MSOLEDBSQL19</SMALL> removes this potential security risk with the option <B>HostNameInCertificate</B>, which permits you to specify the server name you expect in the certificate.</P>
+<P>You can also set this property once for all with <A HREF="#SetDefaultForEncryption"><SPAN CLASS="nowrap">SetDefaultForEncryption()</SPAN></A>.</P>
+
 
 <H3><A NAME="IntegratedSecurity">IntegratedSecurity</A></H3>
 <P>
@@ -1806,7 +1858,7 @@ value by calling the Windows function <I>GetUserDefault<SMALL>LCID</SMALL></I>.<
 <TD CLASS="extrapad">false</TD><TH>OLE DB Property</TH><TD CLASS="extrapad"><SMALL>SSPROP_INIT_MULTISUBNETFAILOVER</SMALL></TD></TR>
 </TABLE>
 </P>
-<P>Set this property to a true value when connecting to an availability group. This property is only available with the <SMALL>MSOLEDBSQL</SMALL> provider.</P>
+<P>Set this property to a true value when connecting to an availability group. This property is only available with the <SMALL>MSOLEDBSQL</SMALL> provider and later.</P>
 <H3><A NAME="Netlib">Netlib</A></H3>
 <P>
 <TABLE BORDER=1 CELLSPACING=0 CELLPADDING=0>
@@ -1886,7 +1938,7 @@ When this setting is false, the connection is physically disconnected when you c
 <P>Pooling permits you to connect and disconnect, for instance by having a local Win32::SqlServer object in each <CODE>sub</CODE> without any overhead.<CODE></CODE> However, if you
   have poor transaction handling, any outstanding transaction on the pooled
   connection is not rolled back until the connection is reused or physically
-  disconnected. This can lead to blocking scenarios. Furthermore, since Win32::SqlServer works a lot with cached procedure definitions, it is much better to have a Win32::SqlServer stays in scope.</P>
+  disconnected. This can lead to blocking scenarios. Furthermore, since Win32::SqlServer works a lot with cached procedure definitions, it is much better to have a Win32::SqlServer object that stays in scope.</P>
 <P> (Readers well versed <SMALL>in OLE DB</SMALL> may know that <SMALL>DBPROP_INIT_OLEDBSERVICES</SMALL> is in fact a bit mask that controls other OLE DB
     services as well. Currently Win32::SqlServer always turns off these other services.)
 </P>
@@ -1952,9 +2004,8 @@ details. This property is only available with the <SMALL>SQLNCLI10</SMALL> provi
   </TR>
 </TABLE>
 </P>
-<P>Please see the topic <I><A HREF="https://docs.microsoft.com/en-us/sql/connect/oledb/features/using-transparent-network-ip-resolution?view=sql-server-ver15">Using Transparent Network IP Resolution</A></I> in the OLE DB Docs for all details. This property requires MSOLEDBSQL 18.4.</P>
-<H3></H3>
-<H3>&nbsp;<A NAME="TrustServerCert">TrustServerCert</A></H3>
+<P>Please see the topic <I><A HREF="https://docs.microsoft.com/en-us/sql/connect/oledb/features/using-transparent-network-ip-resolution?view=sql-server-ver15">Using Transparent Network IP Resolution</A></I> in the OLE DB Docs for all details. This property requires <SMALL>MSOLEDBSQL</SMALL> 18.4 or later.</P>
+<H3><A NAME="TrustServerCert">TrustServerCert</A></H3>
 <P>
 <TABLE BORDER=1 CELLSPACING=0 CELLPADDING=0>
 <TR><TH>Data type</TH><TD CLASS="extrapad">boolean</TD><TH>Default</TH><TD CLASS="extrapad">false</TD>
@@ -1965,6 +2016,7 @@ details. This property is only available with the <SMALL>SQLNCLI10</SMALL> provi
 refer to the OLE DB Docs for further details. This property is unavailable with
    the <SMALL>SQLOLEDB</SMALL> provider and applies only to SQL&nbsp;2005
 and later.</P>
+<P>You can also set this property once for all with <A HREF="#SetDefaultForEncryption"><SPAN CLASS="nowrap">SetDefaultForEncryption()</SPAN></A>.</P>
 
 <H3><A NAME="LogPropUsername">Username</A></H3>
 <P>
@@ -3473,7 +3525,10 @@ For each parameter in the batch, define the parameter with
    <LI>
       Conversions you have set up with <A HREF="#sql_set_conversion"><SPAN CLASS="nowrap">sql_set_conversion()</SPAN></A>
       have no effect (except in <A HREF="#get_result_sets"><SPAN CLASS="nowrap">get_result_sets()</SPAN></A>).</LI>
-   <LI>As noted in the section on <I>char, varchar and text</I>, there are two situation where the high-level routines pass <B><CODE>(var)char</CODE></B> data as <B><CODE>n(var)char</CODE></B> to make things work more smoothly. With the mid-level routines, you must take care of this yourself.</LI>
+   <LI>As noted in the section <A HREF="#char"><I>
+     <NOMEDDLE>
+       char,    varchar   and text</NOMEDDLE>
+   </I></A>, there are two situation where the high-level routines pass <B><CODE>(var)char</CODE></B> data as <B><CODE>n(var)char</CODE></B> to make things work more smoothly. With the mid-level routines, you must take care of this yourself.</LI>
 </UL>   
 <P>I list further restrictions with the function or parameter they apply to.</P>
 
@@ -3501,7 +3556,7 @@ For each parameter in the batch, define the parameter with
    should not, please see the subsections <A HREF="#whyparameter"><I>Why
    Parameterising SQL Commands at All?</I></A> and <I><A HREF="#whennotparameter">When
    You Should Not Parameterise</A></I> in the <A HREF="#sql"><SPAN CLASS="nowrap">sql()</SPAN></A> topic.</P>
-<P>You must be connected to call <A HREF="#initbatch"><SPAN CLASS="nowrap">initbatch()</SPAN></A>, unless you have set <A HREF="#AutoConnect">AutoConnect</A> (in which case the call to initbatch will trigger a connection).</P>
+<P>You must be connected to call <A HREF="#initbatch"><SPAN CLASS="nowrap">initbatch()</SPAN></A>, unless you have set <A HREF="#AutoConnect">AutoConnect</A> (in which case the call to <A HREF="#initbatch"><SPAN CLASS="nowrap">initbatch()</SPAN></A> will trigger a connection).</P>
 <H3><A NAME="ODBCCall">Using ODBC Call Syntax</A></H3>
 <P>To initiate a call of a stored procedure through <SMALL>RPC</SMALL>, use the <SMALL>ODBC</SMALL> call
    syntax, for instance:
@@ -3575,8 +3630,7 @@ the data type or leave it <CODE>undef</CODE>.
 <DT>&nbsp;</DT>
 <DT><CODE>$paramname</CODE></DT>
 <DD>The name for the parameter. This works differently depending on the context
-where the parameter appears. This is something that is happening in the <SMALL>OLE
-DB</SMALL> provider, not in Win32::SqlServer. From my investigations, I&#39;ve identified four
+where the parameter appears. This is something that is happening in the OLE DB provider, not in Win32::SqlServer. From my investigations, I&#39;ve identified four
 different cases.
 <P><OL>
 <LI>Parameters in regular SQL batch.</LI>
@@ -4300,7 +4354,9 @@ into its own mould. To access the file, you would use the module
 <NOMEDDLE><CODE>Win32API::File</CODE></NOMEDDLE>.
 For a very brief introduction, there is an example at the end of this section.</P>
 <P>To use <SPAN CLASS="nowrap"><A HREF="#OpenSqlFilestream">OpenSqlFilestream()</A></SPAN>, the current provider must be <SMALL>SQLNCLI10</SMALL> or later. If you invoke <A HREF="#OpenSqlFilestream"><SPAN CLASS="nowrap">OpenSqlFilestream()</SPAN></A> with the Provider property set to an earlier provider, Win32::SqlServer <CODE>croaks</CODE>. <SPAN CLASS="remark">You may be aware of that <A HREF="#OpenSqlFilestream"><SPAN CLASS="nowrap">OpenSqlFilestream()</SPAN></A> is a static routine, in difference to everything else which is COM-based. However, this has no importance in the context of Win32::SqlServer which loads the API dynamically, to permit Win32::SqlServer to run on systems with older versions with only SQLOLEDB or SQLNCLI.</SPAN></P>
-<P>Note: my testing indicates that OpenSqlFilestream() in Win32::SqlServer is entirely broken for SQL 2008. More precisely the calls to the Win32API rountines ReadFile and WriteFile fail. With SQL 2008 R2, I see mixed results, but it is not wholly reliable. For connections to SQL 2012 and up, I see no issues. </P>
+<P>Note: my testing indicates that <A HREF="#OpenSqlFilestream"><SPAN CLASS="nowrap">OpenSqlFilestream()</SPAN></A> in Win32::SqlServer is entirely broken for SQL 2008. More precisely the calls to the Win32API rountines ReadFile and WriteFile fail. With 
+  <NOMEDDLE>SQL 2008 R2</NOMEDDLE>
+, I see mixed results, but it is not wholly reliable. For connections to SQL 2012 and up, I see no issues. </P>
 <P>For full details on the
   <SMALL>FILESTREAM</SMALL> feature and the <NOMEDDLE>OpenSqlFilestream</NOMEDDLE> API, please see <A HREF="https://docs.microsoft.com/en-us/sql/relational-databases/blob/access-filestream-data-with-opensqlfilestream">Books Online</A>. The
 description here is restricted to what you need to know when you use <A HREF="#OpenSqlFilestream"><SPAN CLASS="nowrap">OpenSqlFilestream()</SPAN></A> with Win32::SqlServer.</P>
@@ -4482,7 +4538,8 @@ instance, if you send the simple statement <CODE>SELECT &#39;Räksmörgås&#39;<
 have set up a conversion with CP437 as the client set (the most commonly OEM
 set in the <SMALL>US</SMALL>, I believe) and CP1252 (Latin-1) as a the server set, you will get
 back <I>RSksmörgss</I>.</P>
-<P><B>Warning</B>: these character-set conversions are performed by Win32::SqlServer before it performs any of the conversions described in the section <I>char, varchar and text</I>. They are not really deprecated, but I don't have any plans to improve them or make them work with say UTF-8.</P>
+<P><B>Warning</B>: these character-set conversions are performed by Win32::SqlServer before it performs any of the conversions described in the section <I><A HREF="#char">
+  <NOMEDDLE>char, varchar and text</NOMEDDLE></A></I>. They are not really deprecated, but I don't have any plans to improve them or make them work with say UTF-8.</P>
 <H2><A NAME="sql_unset_conversion"><SPAN CLASS="nowrap">sql_unset_conversion()</SPAN></A> </H2>
 <P>Removes any previous conversion.</P>
 <PRE>$sqlsrv-&gt;sql_unset_conversion([$direction]);</PRE>
@@ -4675,7 +4732,7 @@ later section in this manual.</P>
 <TD CLASS="extrapad">N/A</TD></TR>
 </TABLE>
 </P>
-<P>This is a read-only property that holds the name of the current database (which may change if your SQL code issues a USE statement).</P>
+<P>This is a read-only property that holds the name of the current database (which may change if your SQL code issues a <SMALL>USE</SMALL> statement).</P>
 <H2><A NAME="DateFormat">DateFormat</A></H2>
 <P>
 <TABLE BORDER=1 CELLSPACING=0 CELLPADDING=0>
@@ -4794,9 +4851,10 @@ an result
 <TR><TH>Data type</TH><TD CLASS="extrapad">enumeration</TD><TH>Default</TH><TD CLASS="extrapad">see below</TD></TR>
 </TABLE>
 </P>
-   <P>There are five generations of OLE DB providers that Win32::SqlServer supports for connecting to SQL Server. They are here listed in reverse order of release:</P>
+   <P>There are six generations of OLE DB providers that Win32::SqlServer supports for connecting to SQL Server. They are here listed in reverse order of release:</P>
 <UL>
-   <LI><SMALL>MSOLEDBSQL</SMALL> (<I>Microsoft OLE DB Driver for SQL Server) </I>which is released out-of-band with SQL Server versions. The first version was released in March SQL 2018. Officially, the lowest version it supports is SQL 2012, but it permits connections to SQL 2005 and SQL 2008 as well. This is the recommended version.</LI>
+   <LI><SMALL>MSOLEDBSQL19</SMALL> (<I>Microsoft OLE DB Driver 19 for SQL Server</I>) which is released out-of-band with SQL Server versions. The first version was released in March 2022. Officially, the lowest version it supports is SQL 2014, but it permits connections to older versions down to SQL 2005 as well. This is the recommended version together with the preceding <SMALL>MSOLEDBSQL</SMALL>.</LI>
+   <LI><SMALL>MSOLEDBSQL</SMALL> (<I>Microsoft OLE DB Driver for SQL Server) </I>also released out-of-band with SQL Server versions. Also ships with SQL 2019 and (as of this writing) SQL 2022. The first version was released in March  2018. Officially, the lowest version it supports is SQL 2012, but it permits connections to SQL 2005 and SQL 2008 as well. </LI>
    <LI><SMALL>SQLNCLI11</SMALL> (<I>SQL Server Native Client 11.0</I>) is the version of SQL Server Native Client that ships with SQL 2012 and later versions of SQL Server. </LI>
    <LI><SMALL>SQLNCLI10</SMALL> (<I>SQL Server Native Client 10.0</I>) is the version of SQL Server Native Client that shipped with SQL
    2008.</LI>
@@ -4807,35 +4865,33 @@ an result
     OLE DB Provider for SQL Server</I>), which comes
      with all versions of Windows, but only has support on the level of SQL 2000.</LI>
 </UL>
-<P>There are six different values for this property.</P>
+<P>There are seven different values for this property. When you do not specify the provider, as a default, Win32::SqlServer selects the newest provider it can find on the computer.</P>
 <DL>
+   <DT><B><A NAME="PROVIDER_MSOLEDBSQL">PROVIDER_MSOLEDBSQL19</A></B></DT>
+   <DD>Use <SMALL>Microsoft OLE DB Driver 19 for SQL Server </SMALL>as the OLE DB provider. </DD>
+   <DT></DT>
    <DT><B><A NAME="PROVIDER_MSOLEDBSQL">PROVIDER_MSOLEDBSQL</A></B></DT>
-   <DD>Use <SMALL>Microsoft OLE DB Driver for SQL Server </SMALL>as the OLE DB provider. This is the
-     default, if <SMALL>MSOLEDBSQL</SMALL><SMALL></SMALL> is installed.</DD>
+   <DD>Use <SMALL>Microsoft OLE DB Driver for SQL Server </SMALL>as the OLE DB provider.  is not avilable.</DD>
    <DT></DT>
    <DT>&nbsp;</DT>
    <DT><B><A NAME="PROVIDER_SQLNCLI11">PROVIDER_SQLNCLI11</A></B></DT>
-   <DD>Use SQL Server Native Client 11 as the OLE DB provider. This is the
-   default if <SMALL>SQLNCLI11</SMALL> is installed, but <SMALL>MSOLEDBSQL</SMALL> is not available.</DD>
+   <DD>Use SQL Server Native Client 11 as the OLE DB provider. </DD>
    <DT>&nbsp;</DT>
    <DT><B><A NAME="PROVIDER_SQLNCLI10">PROVIDER_SQLNCLI10</A></B></DT>
-   <DD>Use SQL Server Native Client 10 as the OLE DB provider. This is the
-   default if <SMALL>SQLNCLI10</SMALL> is installed, but <SMALL>SQLNCLI11</SMALL> and <SMALL>MSOLEDBSQL</SMALL> are not.</DD>
+   <DD>Use SQL Server Native Client 10 as the OLE DB provider. <SMALL>MSOLEDBSQL</SMALL> are not.</DD>
    <DT>&nbsp;</DT>
    <DT><B><A NAME="PROVIDER_SQLNCLI">PROVIDER_SQLNCLI</A></B></DT>
-   <DD>Use SQL Native Client as the OLE DB provider. This is the default if
-   <SMALL>SQLNCLI</SMALL> is installed, but <SMALL>SQLNCLI10</SMALL> or later is not available.</DD>
+   <DD>Use SQL Native Client as the OLE DB provider. </DD>
    <DT>&nbsp;</DT>
    <DT><B><A NAME="PROVIDER_SQLOLEDB">PROVIDER_SQLOLEDB</A></B></DT>
-   <DD>Use the <SMALL>SQLOLEDB</SMALL> provider. This is the default if
-   no later version is available. </DD>
+   <DD>Use the <SMALL>SQLOLEDB</SMALL> provider. </DD>
    <DT>&nbsp;</DT>
    <DT><B><A NAME="PROVIDER_DEFAULT">PROVIDER_DEFAULT</A></B></DT>
    <DD>Use this value when you want to set the provider to the default provider
    for the machine. When you set the property to this value, Win32::SqlServer will
-   automatically change it to one of the other five.</DD>
+   automatically change it to new most recently released provider of those available on the computer.</DD>
 </DL>
-<P>As long as you are connecting to SQL 2005 or later, you can use any of the providers above. (But note that officially, <SMALL>MSOLEDBSQL</SMALL> only supports SQL 2012 and later.) To connect to SQL 2000, the most recent provdier you can use is SQLNCLI10. </P>
+<P>As long as you are connecting to SQL 2005 or later, you can use any of the providers above. (But note that officially, <SMALL>MSOLEDBSQL19</SMALL> and <SMALL>MSOLEDBSQL</SMALL> have a lower cap in what they support.) To connect to SQL 2000, the most recent provdier you can use is <SMALL>SQLNCLI10</SMALL>. </P>
 <P>You cannot set this property when you are connected. You can check whether
    you are connected with the function <A HREF="#isconnected"><SPAN CLASS="nowrap">isconnected()</SPAN></A>.</P>
 <H2>QueryNotification</H2>
@@ -4860,8 +4916,7 @@ an result
 <P>Controls how many rows at a time <A HREF="#nextrow"><SPAN CLASS="nowrap">nextrow()</SPAN></A> requests from the OLE DB
       provider. The idea was that that if the OLE DB provider requests one row
    at a time from SQL Server, this could hurt performance. But I have not
-   noticed any difference when I&#39;ve set <B><A HREF="#RowsAtATime">RowsAtATime</A></B> to 1. So I suspect the <SMALL>OLE
-   DB</SMALL> providers buffer rows as well.</P>
+   noticed any difference when I&#39;ve set <B><A HREF="#RowsAtATime">RowsAtATime</A></B> to 1. So I suspect the OLE DB providers buffer rows as well.</P>
 <H2><A NAME="SQL_version">SQL_version</A></H2>
 <P>
 <TABLE BORDER=1 CELLSPACING=0 CELLPADDING=0>
@@ -5038,10 +5093,10 @@ as the source for the error message.</P>
    Server errors.) You can find a list
    of all SQLstates in the <SMALL>MSDN</SMALL> topic <A HREF="https://docs.microsoft.com/en-us/sql/odbc/reference/appendixes/appendix-a-odbc-error-codes"><I>Appendix <SMALL>A: ODBC</SMALL> Error Codes</I></A>.</P>
 <P>Not all provider errors have SQLstate. For these errors, Win32::SqlServer passes the
-   return code from the <SMALL>OLE DB API</SMALL> function that failed
+   return code from the OLE DB API function that failed
    as the &quot;SQLstate&quot;,
    formatted as an 8-character hex string. The main purpose of this hex string
-   to diagnose problems in Win32::SqlServer itself.</P>
+to diagnose problems in Win32::SqlServer itself.</P>
 <P>Win32::SqlServer errors never have an SQLstate.</P>
 <H2><A NAME="ErrInfo">ErrInfo</A></H2>
 <P><B><A HREF="#ErrInfo">ErrInfo</A></B> is a hash and some of the elements are hashes or arrays
@@ -5795,8 +5850,8 @@ the line number in the line above.
    <DD>The possible values for the <B><A HREF="#Provider">Provider</A></B>
    property: <NOMEDDLE><SMALL>PROVIDER_DEFAULT, PROVIDER_SQLOLEDB</SMALL>,
    <SMALL>PROVIDER_SQLNCLI</SMALL>,
-  <SMALL>PROVIDER_SQLNCLI10</SMALL>, <SMALL>PROVIDER_SQLNCLI11</SMALL></NOMEDDLE> 
-   and <SMALL>PROVIDER_MSOLEDBSQL</SMALL>. </DD>
+  <SMALL>PROVIDER_SQLNCLI10</SMALL>, <SMALL>PROVIDER_SQLNCLI11</SMALL>,
+   <SMALL>PROVIDER_MSOLEDBSQL</SMALL> and <SMALL>PROVIDER_MSOLEDBSQL19</SMALL></NOMEDDLE>. </DD>
 
    <DT>&nbsp;</DT>
    <DT><CODE>:resultstyles</CODE></DT>
@@ -5966,7 +6021,7 @@ SQLEND
 <P>When you retrieve <B><CODE>char</CODE></B><CODE></CODE> or <B><CODE>varchar</CODE></B> data with an embedded NUL character, the string may truncated at the position of the NUL character. That is, the string &quot;abcd\0efghij&quot; comes back as &quot;abcd&quot;. </P>
 <P>This does not exhibit if any of these two are true:</P>
 <UL>
-  <LI>You are using 18.5 or later of the MSOLEDBSQL provider. (That is, there was a bug in previous versions and previous providers).</LI>
+  <LI>You are using 18.5 of the <SMALL>MSOLEDBSQL</SMALL> provider or later. (That is, there was a bug in previous versions and previous providers).</LI>
   <LI>The collation of the column is a UTF-8 collation.</LI>
 </UL>
 <P>Because of this bug, there are five test cases in the test script <B>2_datatypes.t</B> that fails if you have an older provider,  unless the server collation is a UTF-8 collation.</P>
@@ -5997,7 +6052,7 @@ WAITFOR DELAY &#39;00:00:05&#39;</PRE>
  varchar(MAX)</CODE></B> value could take 5-10 depending on your hardware. <SMALL>A 50
    MB</SMALL> value could take ten times as long. A similar issue exists with passing large amount of data to table-valued parameters.</P>
 <P>The root cause is that Win32::SqlServer does not have any particular support for large
- types, and does not use streaming to retrieve them. A workaround may be to use the FILESTREAM feature.</P>
+ types, and does not use streaming to retrieve them. A workaround may be to use the <SMALL>FILESTREAM</SMALL> feature.</P>
 <H3>Issue 5</H3>
 <P>You cannot use the <CODE>share</CODE> operator from the <CODE>threads::shared</CODE>
    package. I don&#39;t know if this is a problem in my code, or a restriction with
@@ -6024,14 +6079,13 @@ WAITFOR DELAY &#39;00:00:05&#39;</PRE>
    SELECT @@version</PRE>
 <P>When you run this procedure and pass 1 for the <CODE><SPAN CLASS="nowrap">@nocount</SPAN></CODE> parameter, you will not get the result set for <CODE><SPAN CLASS="nowrap">getdate()</SPAN></CODE>, but you
   will get the result set for <CODE><SPAN CLASS="nowrap">@@version</SPAN></CODE>.</P>
-<P>This is due to some combination of bugs in SQL Server and the <SMALL>OLE
-  DB</SMALL> providers, which have been fixed with the release of SQL&nbsp;2005. But
+<P>This is due to some combination of bugs in SQL Server and the OLE DB providers, which have been fixed with the release of SQL&nbsp;2005. But
   if you connect to SQL&nbsp;2000 or earlier, or use the <SMALL>SQLOLEDB</SMALL> provider, you are
   exposed to this bug.</P>
 <H3 ID="Issue7">Issue 7</H3>
 <P>When you are using the <SMALL>SQLOLDEB</SMALL> provider, You cannot retrieve <B><CODE>(var)char</CODE></B> data from a UTF-8 column with a max length &gt; 4000. When debugging, I can see that the meta-data suggests a length of 32767. (The expected value is -1, because SQL Server returns the data as <B><CODE>nvarchar(MAX)</CODE></B>.) If left unguarded, this leads to that <SMALL>SQLOLEDB</SMALL> hangs without consuming any CPU. Win32::SqlServer mitigates the situation by <CODE>croak</CODE>ing when it sees the length 32767. However, while you may get the error message, your script may still be hanging and not terminate by itself. I have reported this as a bug in SQL Server to Microsoft but as of CU11 of SQL 2019, the bug still exhibits.</P>
 <H3>Issue 8</H3>
-<P><A HREF="#OpenSqlFilestream">OpenSqlFilestream</A> appears to be entirely broken for SQL 2008, and in my tests it sometimes work with SQL 2008 R2 and sometimes not. No such problems are seen with later versions of SQL Server.</P>
+<P><A HREF="#OpenSqlFilestream"><SPAN CLASS="nowrap">OpenSqlFilestream()</SPAN></A> appears to be entirely broken for SQL 2008, and in my tests it sometimes work with SQL 2008 R2 and sometimes not. No such problems are seen with later versions of SQL Server.</P>
 <H3>&nbsp;</H3>
 
 <H1><A NAME="ACKNOWLEDGEMENTS">Acknowledgements</A></H1>
@@ -6046,12 +6100,12 @@ WAITFOR DELAY &#39;00:00:05&#39;</PRE>
 <P>I also need to thank the people in the perl.xs and perl.unicode newsgroups for
  answering my questions, and particularly Jarkko Hietaniemi and Nick Ing-Simmons. </P>
 <H1><A NAME="AUTHOR">Author</A>, Copyright and Licence</H1>
-<P>&copy; 2005-2019 Erland Sommarskog &lt;<A HREF="mailto:esquel@sommarskog.se">esquel@sommarskog.se</A>&gt;.</P>
+<P>&copy; 2005-2022 Erland Sommarskog &lt;<A HREF="mailto:esquel@sommarskog.se">esquel@sommarskog.se</A>&gt;.</P>
 <P>This module is available under any license you
  want, as long as you don&#39;t claim that you wrote it yourself.</P>
 <HR />
 <I>
-This file was last updated <!--$$Modtime:--> 21-07-12 23:09 <!-- $-->
+This file was last updated <!--$$Modtime:--> 22-06-08 22:08 <!-- $-->
 </I>
 </BODY>
 </HTML>

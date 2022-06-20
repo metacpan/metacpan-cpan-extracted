@@ -1,0 +1,8 @@
+name = "Text-Markdown-Slidy"
+badges = ["github-actions", "coveralls"]
+authority="cpan:SONGMU"
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+[release]
+  branch = "main"

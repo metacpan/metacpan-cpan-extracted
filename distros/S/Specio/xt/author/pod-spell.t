@@ -43,6 +43,7 @@ Knop
 Kogman
 LaxVersionStr
 Library
+Lipatov
 MUTC
 Map
 ModuleName
@@ -93,6 +94,7 @@ Throwable
 Tuple
 TypeChecks
 Union
+Vitaly
 White
 Yuval
 autarch
@@ -109,6 +111,7 @@ haarg
 inlinable
 inline
 isa
+lav
 lib
 namespace
 numification

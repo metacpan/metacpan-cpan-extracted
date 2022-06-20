@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::Toolkit::Mouse;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.016';
+our $VERSION   = '0.025';
 
 use Sub::HandlesVia::Toolkit;
 our @ISA = 'Sub::HandlesVia::Toolkit';
@@ -28,35 +28,7 @@ sub role_trait {
 	__PACKAGE__ . "::RoleTrait";
 }
 
-my %standard_callbacks = (
-	args => sub {
-		'@_[1..$#_]';
-	},
-	arg => sub {
-		@_==1 or die;
-		my $n = shift;
-		"\$_[$n]";
-	},
-	argc => sub {
-		'(@_-1)';
-	},
-	curry => sub {
-		@_==1 or die;
-		my $arr = shift;
-		"splice(\@_,1,0,$arr);";
-	},
-	usage_string => sub {
-		@_==2 or die;
-		my $method_name = shift;
-		my $guts = shift;
-		"\$instance->$method_name($guts)";
-	},
-	self => sub {
-		'$_[0]';
-	},
-);
-
-sub make_callbacks {
+sub code_generator_for_attribute {
 	my ($me, $target, $attrname) = (shift, @_);
 
 	if (ref $attrname) {
@@ -83,27 +55,42 @@ sub make_callbacks {
 	if (!$spec->{lazy} and !$spec->{traits} and !$spec->{auto_deref}) {
 		require B;
 		my $slot = B::perlstring($attrname);
-		$get = sub { "\$_[0]{$slot}" };
+		$get = sub {
+			my $self = shift->generate_self;
+			"$self\->{$slot}";
+		};
 		++$get_is_lvalue;
 	}
 	elsif ($attr->has_read_method) {
 		my $read_method = $attr->reader || $attr->accessor;
-		$get = sub { "scalar(\$_[0]->$read_method)" };
+		$get = sub {
+			my $self = shift->generate_self;
+			"scalar($self\->$read_method)";
+		};
 	}
 	else {
 		my $read_method = $attr->get_read_method_ref;
 		$captures->{'$shv_read_method'} = \$read_method;
-		$get = sub { 'scalar($_[0]->$shv_read_method)' };
+		$get = sub {
+			my $self = shift->generate_self;
+			"scalar($self\->\$shv_read_method)";
+		};
 	}
 	if ($attr->has_write_method) {
 		my $write_method = $attr->writer || $attr->accessor;
-		$set = sub { my $val = shift; "\$_[0]->$write_method\($val)" };
+		$set = sub {
+			my ($gen, $val) = @_;
+			$gen->generate_self . "->$write_method\($val)"
+		};
 		++$set_checks_isa;
 	}
 	else {
 		my $write_method = $attr->get_write_method_ref;
 		$captures->{'$shv_write_method'} = \$write_method;
-		$set = sub { my $val = shift; '$_[0]->$shv_write_method('.$val.')' };
+		$set = sub {
+			my ($gen, $val) = @_;
+			$gen->generate_self . '->$shv_write_method('.$val.')';
+		};
 		++$set_checks_isa;
 	}
 
@@ -119,48 +106,56 @@ sub make_callbacks {
 		$captures->{'$shv_default_for_reset'} = \$default->[1];
 	}
 
-	return {
-		%standard_callbacks,
-		is_method      => !!1,
-		slot           => sub { '$_[0]{'.B::perlstring($attrname).'}' }, # icky
-		get            => $get,
-		get_is_lvalue  => $get_is_lvalue,
-		set            => $set,
-		set_checks_isa => $set_checks_isa,
-		isa            => Types::TypeTiny::to_TypeTiny($attr->type_constraint),
-		coerce         => !!$spec->{coerce},
-		env            => $captures,
-		be_strict      => !!0,
-		install_method => sub { $meta->add_method(@_) },
-		default_for_reset => sub {
-			my ($handler, $callbacks) = @_ or die;
-			if (!$default) {
+	require Sub::HandlesVia::CodeGenerator;
+	return 'Sub::HandlesVia::CodeGenerator'->new(
+		toolkit               => $me,
+		target                => $target,
+		attribute             => $attrname,
+		attribute_spec        => $spec,
+		env                   => $captures,
+		isa                   => Types::TypeTiny::to_TypeTiny($attr->type_constraint),
+		coerce                => !!$spec->{coerce},
+		generator_for_slot    => sub { shift->generate_self.'->{'.B::perlstring($attrname).'}' }, # icky
+		generator_for_get     => $get,
+		generator_for_set     => $set,
+		get_is_lvalue         => $get_is_lvalue,
+		set_checks_isa        => $set_checks_isa,
+		set_strictly          => !!0,
+		method_installer      => sub { $meta->add_method(@_) },
+		generator_for_default => sub {
+			my ( $gen, $handler ) = @_ or die;
+			if ( !$default and $handler ) {
 				return $handler->default_for_reset->();
 			}
-			elsif ($default->[0] eq 'builder') {
-				return sprintf('(%s)->%s', $callbacks->{self}->(), $default->[1]);
+			elsif ( $default->[0] eq 'builder' ) {
+				return sprintf(
+					'(%s)->%s',
+					$gen->generate_self,
+					$default->[1],
+				);
 			}
-			elsif ($default->[0] eq 'default' and ref $default->[1] eq 'CODE') {
-				return sprintf('(%s)->$shv_default_for_reset', $callbacks->{self}->());
+			elsif ( $default->[0] eq 'default' and ref $default->[1] eq 'CODE' ) {
+				return sprintf(
+					'(%s)->$shv_default_for_reset',
+					$gen->generate_self,
+				);
 			}
-			elsif ($default->[0] eq 'default' and !defined $default->[1]) {
+			elsif ( $default->[0] eq 'default' and !defined $default->[1] ) {
 				return 'undef';
 			}
-			elsif ($default->[0] eq 'default' and !ref $default->[1]) {
+			elsif ( $default->[0] eq 'default' and !ref $default->[1] ) {
 				require B;
-				return B::perlstring($default->[1]);
+				return B::perlstring( $default->[1] );
 			}
-			else {
-				die 'lolwut?';
-			}
+			return;
 		},
-	};
+	);
 }
 
 package Sub::HandlesVia::Toolkit::Mouse::PackageTrait;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.016';
+our $VERSION   = '0.025';
 
 use Role::Tiny;
 
@@ -198,7 +193,7 @@ around add_attribute => sub {
 package Sub::HandlesVia::Toolkit::Mouse::RoleTrait;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.016';
+our $VERSION   = '0.025';
 
 use Role::Tiny;
 

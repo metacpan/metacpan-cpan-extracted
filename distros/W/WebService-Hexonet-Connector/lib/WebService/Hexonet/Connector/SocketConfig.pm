@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 'v2.10.3';
+our $VERSION = 'v2.10.4';
 
 
 sub new {

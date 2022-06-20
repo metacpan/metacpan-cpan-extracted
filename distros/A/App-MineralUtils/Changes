@@ -1,3 +1,8 @@
+0.008   2022-06-17  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utilities: convert-potassium-unit, convert-sodium-unit.
+
+
 0.007   2021-12-11  Released-By: PERLANCAR; Urgency: high
 
 	- [bugfix] Fix molecular weight of Mg ascorbate & pidolate.

@@ -1,9 +1,9 @@
 package Tapper::TAP::Harness;
-# git description: v5.0.8-1-gcd69c25
+# git description: v5.0.10-2-g4e8ff93
 
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Tapper - Tapper specific TAP handling
-$Tapper::TAP::Harness::VERSION = '5.0.9';
+$Tapper::TAP::Harness::VERSION = '5.0.11';
 use 5.010;
 use strict;
 use warnings;
@@ -16,7 +16,7 @@ use YAML::Tiny;
 use Archive::Tar;
 use IO::Scalar;
 use IO::String;
-
+use TAP::DOM;
 
 
 our @SUITE_HEADER_KEYS_GENERAL = qw(suite-version
@@ -326,6 +326,10 @@ sub _collect_meta_from_sections {
 
                 my $tap       = $tap_file->{tap};
                 my $filename  = $tap_file->{filename};
+
+                # no empty tap
+                $tap = join "\n", grep { defined($_) } TAP::DOM->new(tap=>"", version=>13, noempty_tap=>1)->to_tap
+                  if !$tap;
 
                 my $parser = TAP::Parser->new ({ tap => $tap, version => 13 });
 

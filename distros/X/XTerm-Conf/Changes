@@ -1,5 +1,12 @@
 Revision history for XTerm-Conf
 
+0.12    2022-06-15
+	Stable release with the changes in 0.11_50.
+
+0.11_50 2022-05-29
+	No code changes, just skip some tests on debian/stretch
+	because of a possibly hanging rxvt.
+
 0.11	2017-04-06
 	Pod typos and test fixes (mainly timeout issues)
 

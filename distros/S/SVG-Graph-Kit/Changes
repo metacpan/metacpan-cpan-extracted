@@ -1,8 +1,10 @@
 Revision history for SVG-Graph-Kit
 
-0.0402 2015-10-20
+0.0403 2022-06-11 19:19:13
     - Use parent instead of base.
-    - Update ABSTRACT and NAME sections.
+    - Improve documentation.
+    - Add a temporary hack to quiet *_intertick_label warnings.
+    - Remove the non-plotting stat() method.
 
 0.0401 MAR 01, 2014
     - Added full compliment of dzil plugins.

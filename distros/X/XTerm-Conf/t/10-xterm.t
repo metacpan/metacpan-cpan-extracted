@@ -19,6 +19,11 @@ BEGIN {
     }
 }
 
+BEGIN {
+    eval 'use Time::HiRes qw(time)';
+    warn "Can't use hires time(): $@, continue with lores version" if $@;
+}
+
 my @xterm_likes = qw(xterm rxvt urxvt);
 
 my $tests = 5;
@@ -31,47 +36,19 @@ for my $xterm (@xterm_likes) {
 	skip("No $xterm and/or DISPLAY on this system available", $tests)
 	    if (!is_in_path("$xterm") || !$ENV{DISPLAY});
 
-	my $run_xterm_cmd = sub (\@$;$) {
-	    my($cmd, $testlabel, $run_tests) = @_;
-	    $run_tests = 1 if !defined $run_tests;
-
-	    my $pid = fork;
-	    if (!defined $pid) {
-		die "Can't fork: $!";
-	    }
-	    if ($pid == 0) {
-		exec @$cmd;
-		die $!;
-	    }
-	    local $SIG{ALRM} = sub { die "Timeout" };
-	    alarm(30);
-	    eval {
-		waitpid $pid, 0;
-	    };
-	    alarm(0);
-	    if ($run_tests) {
-		is $@, '', "No hangs if $xterm is running with $testlabel"
-		    or diag "Command was '@$cmd'";
-		is $?, 0, 'exit code is success'
-		    or diag "Command was '@$cmd'";
-	    }
-	    if ($@) {
-		kill 9 => $pid;
-	    }
-	};
-
-	$run_xterm_cmd->([$xterm, "-geometry", "+10+10", "-e", $^X, "-e", q{print STDERR "# $xterm can be started\n"}], undef, 0);
-	skip("Cannot start $xterm", $tests)
-	    if $? != 0;
-
 	if ($xterm eq 'rxvt' || $xterm eq 'urxvt') {
 	    my $rxvt_version;
 	    if ($xterm eq 'rxvt') {
 		my $help_output = `$xterm --help 2>&1`;
 		for my $l (split /\n/, $help_output) {
 		    next if $l eq '';
-		    last if $l =~ m{^rxvt.*options.*command};
+		    last if $l =~ m{^(Usage.*)?rxvt.*options.*command};
 		    $rxvt_version .= $l . "\n";
+		}
+		if (open my $fh, "/etc/os-release") {
+		    if (grep { /VERSION_CODENAME=stretch/ } <$fh>) {
+			skip("rxvt on debian/stretch may hang", $tests);
+		    }
 		}
 	    } elsif ($xterm eq 'urxvt') {
 		my $help_output = `$xterm --help 2>&1`;
@@ -87,6 +64,42 @@ for my $xterm (@xterm_likes) {
 	    $xterm_version = `$xterm -v`;
 	    diag("\n$xterm version $xterm_version");
 	}
+
+	my $run_xterm_cmd = sub (\@$;$) {
+	    my($cmd, $testlabel, $run_tests) = @_;
+	    $run_tests = 1 if !defined $run_tests;
+
+	    my $t0 = time;
+	    my $pid = fork;
+	    if (!defined $pid) {
+		die "Can't fork: $!";
+	    }
+	    if ($pid == 0) {
+		exec @$cmd;
+		die $!;
+	    }
+	    local $SIG{ALRM} = sub { die "Timeout" };
+	    alarm(30);
+	    eval {
+		waitpid $pid, 0;
+	    };
+	    alarm(0);
+	    my $t1 = time;
+	    if ($run_tests) {
+		is $@, '', "No hangs if $xterm is running with $testlabel"
+		    or diag "Command was '@$cmd'";
+		is $?, 0, 'exit code is success'
+		    or diag "Command was '@$cmd'";
+	    }
+	    if ($@) {
+		kill 9 => $pid;
+	    }
+	    diag sprintf "Subtest runtime for $xterm $testlabel was %.2f seconds", $t1-$t0;
+	};
+
+	$run_xterm_cmd->([$xterm, "-geometry", "+10+10", "-e", $^X, "-e", q{print STDERR "# $xterm can be started\n"}], 'no special options', 0);
+	skip("Cannot start $xterm", $tests)
+	    if $? != 0;
 
 	$run_xterm_cmd->([$xterm, "-xrm", "*allowWindowOps:true", "-T", "XTerm::Conf test suite", "-geometry", "+10+10", "-e", $^X, "$FindBin::RealBin/10-xterm.pl", $file], 'allowWindowOps:true');
 	

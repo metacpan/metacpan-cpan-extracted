@@ -1,3 +1,4 @@
+[![Actions Status](https://github.com/Songmu/p5-Text-Markdown-Slidy/workflows/test/badge.svg)](https://github.com/Songmu/p5-Text-Markdown-Slidy/actions) [![Coverage Status](https://img.shields.io/coveralls/Songmu/p5-Text-Markdown-Slidy/main.svg?style=flat)](https://coveralls.io/r/Songmu/p5-Text-Markdown-Slidy?branch=main)
 # NAME
 
 Text::Markdown::Slidy - Markdown converter for HTML slide tools

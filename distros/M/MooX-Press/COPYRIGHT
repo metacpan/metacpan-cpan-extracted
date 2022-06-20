@@ -3,11 +3,7 @@ Upstream-Name: MooX-Press
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/MooX-Press
 
-Files: Changes
- META.json
- META.yml
- doap.ttl
- t/14enum.t
+Files: t/14enum.t
  t/15requires.t
  t/16classgenerators-zylite.t
  t/16classgenerators.t
@@ -70,6 +66,13 @@ Files: lib/MooX/Press/Keywords.pm
 Copyright: This software is copyright (c) 2020 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: Changes
+ META.json
+ META.yml
+ doap.ttl
+Copyright: Copyright 2022 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: COPYRIGHT
  CREDITS
  SIGNATURE
@@ -86,14 +89,14 @@ Copyright: Copyright 2019 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2020 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2020 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  

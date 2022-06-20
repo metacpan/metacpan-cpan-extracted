@@ -9,7 +9,7 @@ package Astro::FITS::HdrTrans::RxH3;
 use warnings;
 use strict;
 
-our $VERSION = '1.64';
+our $VERSION = '1.65';
 
 use base qw/Astro::FITS::HdrTrans::JCMT/;
 

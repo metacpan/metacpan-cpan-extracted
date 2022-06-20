@@ -39,12 +39,12 @@ my %WriteMakefileArgs = (
         resources => {
         #    homepage    => undef,
             repository  => {
-                url         => 'git@git.deguest.jp:jack/Getopt-Class.git',
-                web         => 'https://git.deguest.jp/jack/Getopt-Class',
+                url         => 'git@gitlab.com:jackdeguest/Getopt-Class.git',
+                web         => 'https://gitlab.com/jackdeguest/Getopt-Class',
                 type        => 'git',
             },
             bugtracker => {
-                web         => 'https://git.deguest.jp/jack/Getopt-Class/issues',
+                web         => 'https://gitlab.com/jackdeguest/Getopt-Class/issues',
                 mailto      => 'cpan-bug@deguest.jp',
             },
         },

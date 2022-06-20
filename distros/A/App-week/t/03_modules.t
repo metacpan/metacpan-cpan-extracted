@@ -10,9 +10,14 @@ use t::Util;
 $Script::lib    = File::Spec->rel2abs('lib');
 $Script::script = File::Spec->rel2abs('script/week');
 
-{
+SKIP: {
     local %ENV = %ENV;
     $ENV{LANG} = $ENV{LC_ALL} = 'C';
+
+    local $_ = `cal`;
+    if ($? != 0) {
+	skip "cal command execution error.", 1;
+    }
 
     for my $opt (
 	'-Mnpb',

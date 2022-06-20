@@ -1,4 +1,162 @@
-Revision history for SPVM
+0.9609 2022-06-19
+  [CHANGE]
+  * Improve error messages of compilation.
+  * Improve Time::Info document.
+  * Improve Changes of spvmdist command.
+  * Improve Time doucment.
+  * Add Sort class.
+  * Improve exception messages of Sort class.
+  * Add the following method to Sort class
+    sort_byte_asc
+    sort_byte_desc
+    sort_double_asc
+    sort_double_desc
+    sort_float
+    sort_float_asc
+    sort_int_asc
+    sort_int_desc
+    sort_long_asc
+    sort_long_desc
+    sort_short_asc
+    sort_short_desc
+    sort_string_asc
+    sort_string_desc
+  * Time->timegm is implemented using timegm on UNIX/Linux or _mkgmtime on Windows.
+  * Add Array class.
+  * Add Format class.
+  [DEPRECATION]
+  * The following methods are depracated.
+    Fn->copy_array_byte is deprecated. Use Array->copy_byte instead
+    Fn->copy_array_double is deprecated. Use Array->copy_double instead
+    Fn->copy_array_float is deprecated. Use Array->copy_float instead
+    Fn->copy_array_int is deprecated. Use Array->copy_int instead
+    Fn->copy_array_long is deprecated. Use Array->copy_long instead
+    Fn->copy_array_object is deprecated. Use Array->copy_object instead
+    Fn->copy_array_range_byte is deprecated. Use Array->copy_range_byte instead
+    Fn->copy_array_range_double is deprecated. Use Array->copy_range_double instead
+    Fn->copy_array_range_float is deprecated. Use Array->copy_range_float instead
+    Fn->copy_array_range_int is deprecated. Use Array->copy_range_int instead
+    Fn->copy_array_range_long is deprecated. Use Array->copy_range_long instead
+    Fn->copy_array_range_object is deprecated. Use Array->copy_range_object instead
+    Fn->copy_array_range_short is deprecated. Use Array->copy_range_short instead
+    Fn->copy_array_range_string is deprecated. Use Array->copy_range_string instead
+    Fn->copy_array_string is deprecated. Use Array->copy_tring instead
+    Fn->dump_array_byte is deprecated. Use Array->dump_byte instead
+    Fn->dump_array_double is deprecated. Use Array->dump_double instead
+    Fn->dump_array_float is deprecated. Use Array->dump_float instead
+    Fn->dump_array_int is deprecated. Use Array->dump_int instead
+    Fn->dump_array_long is deprecated. Use Array->dump_long instead
+    Fn->dump_array_object is deprecated. Use Array->dump_object instead
+    Fn->dump_array_short is deprecated. Use Array->dump_short instead
+    Fn->dump_array_string is deprecated. Use Array->dump_string instead
+    Fn->dump_array_unsigned_byte is deprecated. Use Array->dump_unsigned_byte instead
+    Fn->dump_array_unsigned_int is deprecated. Use Array->dump_unsigned_int instead
+    Fn->dump_array_unsigned_long is deprecated. Use Array->dump_unsigned_long instead
+    Fn->dump_array_unsigned_short is deprecated. Use Array->dump_unsigned_short instead
+    Fn->equals_array_byte is deprecated. Use Array->equals_byte instead
+    Fn->equals_array_double is deprecated. Use Array->equals_double instead
+    Fn->equals_array_float is deprecated. Use Array->equals_float instead
+    Fn->equals_array_int is deprecated. Use Array->equals_int instead
+    Fn->equals_array_long is deprecated. Use Array->equals_long instead
+    Fn->equals_array_object is deprecated. Use Array->equals_object instead
+    Fn->equals_array_short is deprecated. Use Array->equals_short instead
+    Fn->equals_array_string is deprecated. Use Array->equals_string instead
+    Fn->memcpy_byte is deprecated. Use Array->memcpy_byte instead
+    Fn->memcpy_double is deprecated. Use Array->memcpy_double instead
+    Fn->memcpy_float is deprecated. Use Array->memcpy_float instead
+    Fn->memcpy_int is deprecated. Use Array->memcpy_int instead
+    Fn->memcpy_long is deprecated. Use Array->memcpy_long instead
+    Fn->memcpy_short is deprecated. Use Array->memcpy_short instead
+    Fn->memmove_byte is deprecated. Use Array->memmove_byte instead
+    Fn->memmove_double is deprecated. Use Array->memmove_double instead
+    Fn->memmove_float is deprecated. Use Array->memmove_float instead
+    Fn->memmove_int is deprecated. Use Array->memmove_int instead
+    Fn->memmove_long is deprecated. Use Array->memmove_long instead
+    Fn->memmove_short is deprecated. Use Array->memmove_short instead
+    Fn->memset_byte is deprecated. Use Array->memset_byte instead
+    Fn->memset_double is deprecated. Use Array->memset_double instead
+    Fn->memset_float is deprecated. Use Array->memset_float instead
+    Fn->memset_int is deprecated. Use Array->memset_int instead
+    Fn->memset_long is deprecated. Use Array->memset_long instead
+    Fn->memset_object is deprecated. Use Array->memset_object instead
+    Fn->memset_short is deprecated. Use Array->memset_short instead
+    Fn->new_array_proto is deprecated. Use Array->new_proto instead
+    Fn->sprintf is deprecated. Use Format->sprintf instead
+  [BUG FIX]
+  * Fix the bug that logical and operater and logical or operator don't return the evaluated value.
+  [SPECIFICATION BUG FIX]
+  * Fix the specification bug that logical and operater and logical or operator don't return the evaluated value.
+  
+  [NON BACKWORD COMPATIBLE CHANGES]
+  * The following methods are moved from Fn class to Sort class.
+    sort_byte
+    sort_double
+    sort_float
+    sort_int
+    sort_long
+    sort_object
+    sort_short
+    sort_string
+
+0.9608 2022-06-16
+  [CHANGE]
+  * Add "--genlib" option to "spvmdist" command.
+  * Add "--print-dependent-resources" and "-p" options to "spvmcc" command.
+  [BUG FIX]
+  * Fix the bug that spvmcc don't set @INC to the value of -I.
+  * Fix many bugs of the resource sysmtem of "spvmcc" command.
+  [NON BACKWORD COMPATIBLE CHANGES]
+  * remove "dynamic-lib" option form "spvmcc" command.
+  * remove "static-lib" option form "spvmcc" command.
+  
+0.9607 2022-06-15
+  [CHANGE]
+  * Add the following methods to Fn class
+    static method memset_byte : void ($dest : byte[], $dest_offset : int, $value : byte, $length : int)
+    static method memset_double : void ($dest : double[], $dest_offset : int, $value : double, $length : int)
+    static method memset_float : void ($dest : float[], $dest_offset : int, $value : float, $length : int)
+    static method memset_int : void ($dest : int[], $dest_offset : int, $value : int, $length : int)
+    static method memset_long : void ($dest : long[], $dest_offset : int, $value : long, $length : int)
+    static method memset_short : void ($dest : short[], $dest_offset : int, $value : short, $length : int)
+    static method memset_object : void ($dest : object[], $dest_offset : int, $value : object, $length : int)
+    static method memcpy_object : void ($dest : object[], $dest_offset : int, $source : object[], $source_offset : int, $length : int)
+    static method memmove_object : void ($dest : object[], $dest_offset : int, $source : object[], $source_offset : int, $length : int)
+  * Add class_id operator.
+  * Add "get_resource" method to "SPVM::Builder::Config" module.
+  * Add "get_resource_names" method to "SPVM::Builder::Config" module.
+  * Add "builder_include_dir" field to "SPVM::Builder::Config" module.
+  * Add "file_optional" field to "SPVM::Builder::Config" module.
+  * Add "own_include_dir" field to "SPVM::Builder::Config" module.
+  * Add "own_src_dir" field to "SPVM::Builder::Config" module.
+  * Add "lib_link_abs" field to "SPVM::Builder::Config" module.
+  [NON BACKWORD COMPATIBLE CHANGES]
+  * Remove "add_resources" and use from "SPVM::Builder::Config" module. Instead, use "use_resource" method.
+  * Remove "resources" method from "SPVM::Builder::Config" module. Intead, use "get_resource" method and "get_resource_names" methods.
+  * The default value of "include_dirs" of "SPVM::Builder::Config" module becomes an empty array reference.
+  * "new" method of "SPVM::Builder::Config" module must need "file" option.
+  * Remove "search_lib_dirs_from_config_libpth" from "SPVM::Builder::Config" module.
+  * Remove "get_include_dir", "get_lib_dir", "get_src_dir", "search_lib_dirs_from_cc_info"
+    "search_include_dirs_from_config_incpth", "to_hash" from "SPVM::Builder::Config" module.
+0.9606  2022-06-13
+        [CHANGE]
+        * Add build_dynamic_lib_dist_precompile method to SPVM::Builder::API.
+          This is same as build_shared_lib_dist_precompile method.
+          build_shared_lib_dist_precompile method is remained for backwards compatibility.
+        * Add build_dynamic_lib_dist_native method to SPVM::Builder::API.
+          This is same as build_shared_lib_dist_native method.
+          build_shared_lib_dist_native method is remained for backwards compatibility.
+        * Add config field to SPVM::Builder::ObjectFileInfo.
+        * Add config field to SPVM::Builder::LinkInfo.
+        * Add output_type field to SPVM::Builder::Config.
+        * Add lib_type field to SPVM::Builder::ObjectFileInfo.
+        [NON BACKWORD COMPATIBLE CHANGES]
+        * Remove is_exe method from SPVM::Builder::Config.
+        * Remove is_resource field from SPVM::Builder::ObjectFileInfo.
+        * Remove is_exe field from SPVM::Builder::ObjectFileInfo.
+        * Remove is_exe field from SPVM::Builder::LinkInfo.
+        * Remove is_lib_file field from SPVM::Builder::ObjectFileInfo.
+        * Rename SPVM::Builder::ObjectFileInfo's "object_file" field to "file".
+        
 0.9605  2022-06-10
         [CHANGE]
         * switch statement can have only default statement.

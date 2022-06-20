@@ -22,7 +22,7 @@ my $meta = {
                         runtime   => {
                                        requires => {
                                          "Exporter::Shiny" => 0,
-                                         "perl" => 5.008,
+                                         "perl" => 5.008001,
                                          "Role::Hooks" => 0,
                                          "Type::Params" => 1.008003,
                                          "Types::Standard" => 1.008003,
@@ -40,13 +40,11 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "Sub::MultiMethod" => { file => "lib/Sub/MultiMethod.pm", version => 0.902 },
+                        "Sub::MultiMethod" => { file => "lib/Sub/MultiMethod.pm", version => 0.905 },
                       },
   "release_status" => "stable",
   "resources"      => {
-                        bugtracker   => {
-                                          web => "http://rt.cpan.org/Dist/Display.html?Queue=Sub-MultiMethod",
-                                        },
+                        bugtracker   => { web => "https://github.com/tobyink/p5-sub-multimethod/issues" },
                         homepage     => "https://metacpan.org/release/Sub-MultiMethod",
                         license      => ["http://dev.perl.org/licenses/"],
                         repository   => {
@@ -56,7 +54,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/project",
                       },
-  "version"        => 0.902,
+  "version"        => 0.905,
 };
 
 my %dynamic_config;

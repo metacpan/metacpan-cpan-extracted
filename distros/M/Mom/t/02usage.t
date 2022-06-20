@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Test that Mom compiles.
+Test that Mom works.
 
 =head1 AUTHOR
 
@@ -26,12 +26,12 @@ use Test::Fatal;
 
 {
 	package Local::Role;
-	use Mom q( :role foo :required );
+	use Mom q(:role foo!);
 }
 
 {
 	package Local::Class;
-	use Mom q( :with(Local::Role) bar :required :type(Int) :std );
+	use Mom q(:with(Local::Role)bar!:type(Int):std);
 	
 	sub sum {
 		my $self = shift;

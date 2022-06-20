@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Cryomagnetics_4G;
-$Lab::Moose::Instrument::Cryomagnetics_4G::VERSION = '3.820';
+$Lab::Moose::Instrument::Cryomagnetics_4G::VERSION = '3.821';
 #ABSTRACT: Cryomagnetics 4G superconducting magnet power supply
 
 use v5.20;
@@ -319,7 +319,7 @@ Lab::Moose::Instrument::Cryomagnetics_4G - Cryomagnetics 4G superconducting magn
 
 =head1 VERSION
 
-version 3.820
+version 3.821
 
 =head1 SYNOPSIS
 

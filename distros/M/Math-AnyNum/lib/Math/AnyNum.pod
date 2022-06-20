@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.38
+Version 0.39
 
 =head1 SYNOPSIS
 
@@ -85,6 +85,8 @@ Additionally, each Math::AnyNum object is B<immutable>.
     hermiteHe(n,x)            Probabilists' Hermite polynomials: He_n(x)
     chebyshevT(n,x)           Chebyshev polynomials of the 1st kind: T_n(x)
     chebyshevU(n,x)           Chebyshev polynomials of the 2nd kind: U_n(x)
+    chebyshevTmod(n,x,m)      Modular Chebyshev polynomials of the 1st kind: T_n(x)
+    chebyshevUmod(n,x,m)      Modular Chebyshev polynomials of the 2nd kind: U_n(x)
     faulhaber_sum(n,k)        sum of powers: 1^k + 2^k + ... + n^k
     geometric_sum(n,r)        geometric sum: r^0 + r^1 + ... + r^n
     dirichlet_sum(n,f,g,F,G)  Dirichlet hyperbola method
@@ -95,7 +97,10 @@ Additionally, each Math::AnyNum object is B<immutable>.
     iadd(a,b)                 integer addition: a+b
     isub(a,b)                 integer subtraction: a-b
     imul(a,b)                 integer multiplication: a*b
-    idiv(a,b)                 integer division: int(a/b)
+    idiv(a,b)                 floor division: floor(a/b)
+    idiv_ceil(a,b)            ceil division: int(a/b)
+    idiv_round(a,b)           round division: int(a/b)
+    idiv_trunc(a,b)           truncated division: trunc(a/b)
     imod(a,b)                 integer remainder: a%b
     ipow(n,k)                 integer exponentiation: n^k
     ipow2(k)                  integer exponentiation: 2^k
@@ -106,6 +111,10 @@ Additionally, each Math::AnyNum object is B<immutable>.
     ilog(n,k)                 integer logarithm of n to base k
     ilog2(n)                  integer logarithm of n to base 2
     ilog10(n)                 integer logarithm of n to base 10
+    addmod(a,b,m)             modular integer addition: (a+b)%m
+    submod(a,b,m)             modular integer subtraction: (a-b)%m
+    mulmod(a,b,m)             modular integer multiplication: (a*b)%m
+    divmod(a,b,m)             modular integer division: (a/b)%m
     divmod(a,b)               quotient and remainder of a/b
     invmod(n,m)               multiplicative inverse of n modulo m
     powmod(a,b,m)             modular exponentiation: a ^ b mod m
@@ -1101,15 +1110,23 @@ Example:
 
 All operations in this section are done with integers.
 
-=head2 iadd | isub | imul | idiv | ipow
+=head2 iadd | isub | imul | ipow
 
     iadd(x, y)                                    #=> Int | NaN
     isub(x, y)                                    #=> Int | NaN
     imul(x, y)                                    #=> Int | NaN
-    idiv(x, y)                                    #=> Int | NaN
     ipow(x, y)                                    #=> Int | NaN
 
-Integer addition, subtraction, multiplication, division and exponentiation.
+Integer addition, subtraction, multiplication and exponentiation.
+
+=head2 idiv | idiv_ceil | idiv_round | idiv_trunc
+
+    idiv(x, y)                                    #=> Int | NaN
+    idiv_ceil(x, y)                               #=> Int | NaN
+    idiv_trunc(x, y)                              #=> Int | NaN
+    idiv_round(x, y)                              #=> Int | NaN
+
+Integer division: C<floor(a/b)>, C<ceil(a/b)>, C<trunc(a/b)>, C<round(a/b)>.
 
 =head2 ipow2
 
@@ -1131,12 +1148,40 @@ Returns C<0> when C<n> is negative.
 
 The integer modulus operation. Returns NaN when C<y> is zero.
 
+=head2 addmod
+
+    addmod(a, b, m)                               #=> Int | NaN
+
+Modular integer addition: C<(a+b) % m>.
+
+    say addmod(43, 97, 127)     # == (43+97)%127
+
+=head2 submod
+
+    submod(a,b,m)                                 #=> Int | NaN
+
+Modular integer subtraction: C<(a-b) % m>.
+
+    say submod(43, 97, 127)     #=> (43-97)%127
+
+=head2 mulmod
+
+    mulmod(a,b,m)                                 #=> Int | NaN
+
+Modular integer multiplication: C<(a*b) % m>.
+
+    say mulmod(43, 97, 127)     # == (43*97)%127
+
 =head2 divmod
 
-    divmod(x, y)                                  #=> (Int, Int) | (NaN, NaN)
+    divmod(a, b)                                  #=> (Int, Int) | (NaN, NaN)
+    divmod(a, b, m)                               #=> (Int, Int) | (NaN, NaN)
 
-Returns the quotient and the remainder from division of C<x> by C<y>,
-where both are integers. When C<y> is zero, it returns two NaN values.
+When only two arguments are provided, it returns C<(idiv(a,b), imod(a,b))>.
+
+When three arguments are given, it does integer modular division: C<(a/b) % m>.
+
+    say divmod(43, 97, 127)     # == (43 * invmod(97, 127))%127
 
 =head2 invmod
 
@@ -1153,6 +1198,14 @@ When no inverse exists (i.e.: C<gcd(x, y) != 1>), the NaN value is returned.
 Computes C<(x ** y) % z>, where all three values are integers.
 
 Returns NaN when the third argument is 0, or when C<y> is negative and C<gcd(x, z) != 1>.
+
+=head2 quadratic_powmod
+
+    quadratic_powmod(a, b, w, n, m)               #=> Int | NaN
+
+Computes C<(a + b*sqrt(w))**n % m>, returning C<(x,y)> satisfying:
+
+    x + y*sqrt(w) == (a + b*sqrt(w))**n (mod m)
 
 =head2 isqrt | icbrt
 
@@ -1452,6 +1505,18 @@ Defined as:
     U(1, x) = 2*x
     U(n, x) = 2*x*U(n-1, x) - U(n-2, x)
 
+=head2 chebyshevTmod
+
+    chebyshevTmod(n, x, m)                        #=> Int | NaN
+
+Compute the modular Chebyshev polynomials of the first kind: C<T_n(x) mod m>, where C<n> must be an integer.
+
+=head2 chebyshevUmod
+
+    chebyshevUmod(n, x, m)                        #=> Int | NaN
+
+Compute the modular Chebyshev polynomials of the second kind: C<U_n(x) mod m>, where C<n> must be an integer.
+
 =head2 laguerreL
 
     laguerreL(n, x)                               #=> Any
@@ -1710,9 +1775,16 @@ Example:
     rough_part(3*3*5*7,  5)    # 35  (= 5*7)
     rough_part(5*7*7*11, 6)    # 539 (= 7*7*11)
 
+=head2 is_square
+
+    is_square(n)                                  #=> Bool
+
+Returns true when C<n> is a perfect square.
+When C<n> is not an integer, a false value is returned.
+
 =head2 is_power
 
-    is_power(n)
+    is_power(n)                                   #=> Bool
     is_power(n, k)                                #=> Bool
 
 Returns true when C<n> is a perfect power of a given integer C<k>.
@@ -1730,12 +1802,16 @@ Example:
     is_power(125, 3)       # true: 125 is a cube   ( 5**3)
     is_power(279841)       # true: 279841 is 23**4
 
-=head2 is_square
+=head2 is_power_of
 
-    is_square(n)                                  #=> Bool
+    is_power_of(n, b)                             #=> Bool
 
-Returns true when C<n> is a perfect square.
-When C<n> is not an integer, a false value is returned.
+Return true if C<n> is a power of C<b>, such that C<n = b**k> for some k >= 0.
+
+Example:
+
+    64->is_power_of(2)     # true: 64 is a power of 2 (64 = 2**6)
+    27->is_power_of(3)     # true: 27 is a power of 3 (27 = 3**3)
 
 =head2 polygonal
 

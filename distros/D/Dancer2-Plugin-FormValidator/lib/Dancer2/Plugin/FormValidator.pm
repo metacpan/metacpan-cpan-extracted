@@ -13,7 +13,7 @@ use Dancer2::Plugin::FormValidator::Input;
 use Dancer2::Plugin::FormValidator::Processor;
 use Types::Standard qw(InstanceOf);
 
-our $VERSION = '1.01';
+our $VERSION = '1.04';
 
 plugin_keywords qw(validate validated errors);
 
@@ -44,15 +44,6 @@ has registry => (
     }
 );
 
-has plugin_deferred => (
-    is       => 'ro',
-    isa      => InstanceOf['Dancer2::Plugin::Deferred'],
-    lazy     => 1,
-    builder  => sub {
-        return $_[0]->app->with_plugin('Dancer2::Plugin::Deferred');
-    }
-);
-
 # Var for saving last success validation valid input.
 has valid => (
     is       => 'rwp',
@@ -67,13 +58,28 @@ sub BUILD {
 sub validate {
     my ($self, %args) = @_;
 
+    # We need to delete old data in session if it wasn't collected.
+    $self->_clear_session;
+
     # We need to unset value of this var (if there was something).
     $self->clear_valid;
 
     # Arguments.
+    # Arguments.
     my $profile = $args{profile};
-    my $input   = $args{input} // $self->dsl->body_parameters->as_hashref_mixed;
+    my $input   = $args{input};
     my $lang    = $args{lang};
+
+    if (not defined $input) {
+        my $request = $self->app->request;
+
+        if ($request->is_get) {
+            $input = $request->query_parameters->as_hashref_mixed;
+        }
+        elsif($request->is_post) {
+            $input = $request->body_parameters->as_hashref_mixed;
+        }
+    }
 
     if (defined $lang) {
         $self->_validator_language($lang);
@@ -89,13 +95,10 @@ sub validate {
     my $result = $processor->run;
 
     if ($result->success != 1) {
-        $self->plugin_deferred->deferred(
-            $self->validator_config->session_namespace,
-            {
-                messages => $result->messages,
-                old      => $input,
-            },
-        );
+        $self->_set_session({
+            messages => $result->messages,
+            old      => $input,
+        });
         return undef;
     }
     else {
@@ -110,7 +113,10 @@ sub validated {
 }
 
 sub errors {
-    return $_[0]->_get_deferred->{messages};
+    if (my $session = $_[0]->_get_session) {
+        return $session->{messages}
+    }
+    return undef;
 }
 
 # Register Dancer2 hook to add custom template tokens: errors, old.
@@ -126,9 +132,9 @@ sub _register_hooks {
                 my $errors   = {};
                 my $old      = {};
 
-                if (my $deferred = $tokens->{deferred}->{$self->validator_config->session_namespace}) {
-                    $errors = delete $deferred->{messages};
-                    $old    = delete $deferred->{old};
+                if (my $session = $self->_get_session) {
+                    $errors = $session->{messages};
+                    $old    = $session->{old};
                 }
 
                 $tokens->{errors} = $errors;
@@ -150,11 +156,37 @@ sub _validator_language {
     return;
 }
 
-# Returned deferred message from session storage.
-sub _get_deferred {
-    return $_[0]->plugin_deferred->deferred(
-        $_[0]->validator_config->session_namespace
+sub _set_session {
+    my ($self, $value) = @_;
+
+    $self->app->session->write(
+        $self->validator_config->session_namespace,
+        $value,
     );
+
+    return;
+}
+
+sub _get_session {
+    my ($self) = @_;
+
+    my $session = $self->app->session->read(
+        $self->validator_config->session_namespace,
+    );
+
+    $self->_clear_session;
+
+    return $session;
+}
+
+sub _clear_session {
+    my ($self) = @_;
+
+    $self->app->session->delete(
+        $self->validator_config->session_namespace,
+    );
+
+    return;
 }
 
 1;
@@ -172,7 +204,7 @@ Dancer2::Plugin::FormValidator - neat and easy to start form validation plugin f
 
 =head1 VERSION
 
-version 1.01
+version 1.04
 
 =head1 SYNOPSIS
 
@@ -325,7 +357,7 @@ Template app/register:
             </div>
             <div class="py-2">
                 <label class="block font-normal text-gray-400" for="email">
-                    Name
+                    Email
                 </label>
                 <input
                         type="text"
@@ -361,7 +393,7 @@ Template app/register:
     plugins:
         FormValidator:
             session:
-                namespace: '_form_validator'         # this is required
+                namespace: '_form_validator'         # this is default
             messages:
                 language: en                         # this is default
                 ucfirst: 1                           # this is default
@@ -405,7 +437,7 @@ Key => values, where key is extension short name and values is its configuration
 
 =head3 validate
 
-    validate(Hash $params): HashRef|undef
+    validate(Hash %args): HashRef|undef
 
 Accept arguments as hash:
 
@@ -499,6 +531,14 @@ To set encoding to unicode you need to pass 'u' argument:
     field => [ qw(alpha_num:u) ]
 
 Rule will be B</^\w+$/>.
+
+=head3 boolean
+
+    boolean(): Bool
+
+Validate that field is 0 or 1 scalar value.
+
+    field => [ qw(boolean) ]
 
 =head3 email
 

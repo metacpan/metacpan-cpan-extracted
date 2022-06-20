@@ -1,6 +1,9 @@
 Revision history for Term::Choose::Util
 
 
+0.137   2022-06-17
+        - New options 'prompt_file_dir' and 'file_type'.
+
 0.136   2022-06-04
         - Update option 'cs_label'.
         - Update subseq-tab.

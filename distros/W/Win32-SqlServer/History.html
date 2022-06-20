@@ -13,6 +13,32 @@
 <CENTER>
 <H1>History Win32::SqlServer</H1>
 </CENTER>
+<H3>2022-06-12 &#8211; 2.014</H3>
+<UL>
+  <LI><B>Platform support:</B>
+<UL>
+      <LI>Support added for the new OLE DB provider MSOLEDBSQL19, which incurs some breaking changes, see below.</LI>
+      <LI>This version includes binaries for these Perl versions: 5.24, 5.26, 5.28, 5.30, 5.32, 5.34 and 5.36. All versions up to Perl 5.32 have been tested with Strawberry Perl and/or ActivePerl. For 5.34, only the 64-bit binary have been tested, since there is no free binary distribution of 32-bit Perl for that version. This version of Win32:SqlServer was released very shortly after the release of Perl 5.36, and no binary distribution was available at the time.</LI>
+      <LI>I have tested Win32::SqlServer 2.014 against SQL 2022, CTP 2.0, which was the current pre-release version of SQL 2022 at the time of the release of 2.014.</LI>
+    </UL>
+  </LI>
+  <LI><B>Breaking changes</B>:
+<UL>
+      <LI>Beware that MSSQLOLEDB19 defaults to requiring that the connection to SQL Server is encrypted by a trusted certificate. </LI>
+    </UL>
+  </LI>
+  <LI><B>Feature enhancemets</B>:
+<UL>
+      <LI>New login property <B>HostNameInCertificate</B>, which requires the new provider MSOLEDBSQL19.</LI>
+      <LI>New module-level routine <A HREF="Win32-SqlServer.html#SetDefaultForEncryption">SetDefaultForEncryption()</A> which permits you to set the default for the login properties <B>Encrypt</B>, <B>TrustServerCertificate</B> and <B>HostNameInCertificate</B> directly after <CODE>use</CODE>. This is intended to mitigatge the change for encryption in MSOLEDBSQL19.</LI>
+    </UL>
+  </LI>
+  <LI><B>Bug fixes</B>:
+<UL>
+      <LI>It seems that 2.013 introduced a bug by which some login properties were ignored. The property <B>GeneralTimeout</B> was always ignored together with one more, exactly which dependend on which OLE DB provider you were using. This has been fixed.</LI>
+    </UL>
+  </LI>
+</UL>
 <H3>2021-07-16 &#8211; 2.013</H3>
 <UL>
   <LI><B>Platform support</B>:
@@ -338,7 +364,7 @@ source distribution for further details.
 
 <HR>
 <I>
-Last updated <!--$$Modtime:--> 21-07-16 23:16 <!-- $-->
+Last updated <!--$$Modtime:--> 22-06-08 21:56 <!-- $-->
 </I>
 </BODY>
 </HTML>

@@ -12,11 +12,11 @@ Pod::LOL - parse Pod into a list of lists (LOL)
 
 =head1 VERSION
 
-Version 0.06
+Version 0.08
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 our $DEBUG   = 0;
 
 
@@ -47,9 +47,9 @@ Returns:
 
 =head1 DESCRIPTION
 
-This class may be of interest for anyone writing a Pod parser.
+This class may be of interest to anyone writing a pod parser.
 
-This module takes Pod (as a file) and returns a list of lists (LOL) structure.
+This module takes pod (as a file) and returns a list of lists (LOL) structure.
 
 This is a subclass of L<Pod::Simple> and inherits all of its methods.
 
@@ -57,27 +57,26 @@ This is a subclass of L<Pod::Simple> and inherits all of its methods.
 
 =head2 new_root
 
-Convenience method to do this:
+Convenience method to do (mostly) this:
 
    Pod::LOL->new->parse_file( $file )->{root};
 
 =cut
 
 sub new_root {
-   my ( $class, $file ) = @_;
+    my ( $class, $file ) = @_;
+    if ( $DEBUG ) {
+        printf STDERR "class=$class, file=$file, ref=%s\n", ref $file;
+    }
 
-   my $parser = $class->new;
+    my $parser = $class->new;
 
-   # Normally =for and =begin would otherwise be skipped.
-   $parser->accept_targets( '*' );
+    # Normally =for and =begin would otherwise be skipped.
+    $parser->accept_targets( '*' );
 
-   my $s = $parser->parse_file( $file );
+    my $s = $parser->parse_file( $file );
 
-
-   # TODO: Add error check here.
-
-
-   $s->{root};
+    $s->{root};
 }
 
 =head2 _handle_element_start
@@ -91,22 +90,22 @@ Executed when a new pod element starts such as:
 =cut
 
 sub _handle_element_start {
-   my ( $s, $tag ) = @_;
-   $DEBUG and print STDERR "TAG_START: $tag";
+    my ( $s, $tag ) = @_;
+    print STDERR "TAG_START: $tag" if $DEBUG;
 
-   if ( $s->{_pos} ) {    # We already have a position.
-      my $x =
-        ( length( $tag ) == 1 ) ? [] : [$tag];   # Ignore single character tags.
-      push @{ $s->{_pos}[0] }, $x;               # Append to root.
-      unshift @{ $s->{_pos} }, $x;               # Set as current position.
-   }
-   else {
-      my $x = [];
-      $s->{root} = $x;                           # Set root.
-      $s->{_pos} = [$x];                         # Set current position.
-   }
+    if ( $s->{_pos} ) {    # We already have a position.
+        my $x =
+          ( length( $tag ) == 1 ) ? [] : [$tag]; # Ignore single character tags.
+        push @{ $s->{_pos}[0] }, $x;             # Append to root.
+        unshift @{ $s->{_pos} }, $x;             # Set as current position.
+    }
+    else {
+        my $x = [];
+        $s->{root} = $x;                         # Set root.
+        $s->{_pos} = [$x];                       # Set current position.
+    }
 
-   $DEBUG and print STDERR "{_pos}: " . Dumper $s->{_pos};
+    print STDERR "{_pos}: " . Dumper $s->{_pos} if $DEBUG;
 }
 
 =head2 _handle_text
@@ -120,12 +119,12 @@ Executed for each text element such as:
 =cut
 
 sub _handle_text {
-   my ( $s, $text ) = @_;
-   $DEBUG and print STDERR "TEXT: $text";
+    my ( $s, $text ) = @_;
+    print STDERR "TEXT: $text" if $DEBUG;
 
-   push @{ $s->{_pos}[0] }, $text;    # Add the new text.
+    push @{ $s->{_pos}[0] }, $text;    # Add the new text.
 
-   $DEBUG and print STDERR "{_pos}: " . Dumper $s->{_pos};
+    print STDERR "{_pos}: " . Dumper $s->{_pos} if $DEBUG;
 }
 
 =head2 _handle_element_end
@@ -140,25 +139,25 @@ Such as when these tags end:
 =cut
 
 sub _handle_element_end {
-   my ( $s, $tag ) = @_;
-   $DEBUG and print STDERR "TAG_END: $tag";
-   shift @{ $s->{_pos} };
+    my ( $s, $tag ) = @_;
+    print STDERR "TAG_END: $tag" if $DEBUG;
+    shift @{ $s->{_pos} };
 
-   if ( length $tag == 1 ) {
+    if ( length $tag == 1 ) {
 
-      # Single character tags (like L<>) should be on the same level as text.
-      $s->{_pos}[0][-1] = join "", @{ $s->{_pos}[0][-1] };
-      $DEBUG and print STDERR "TAG_END_TEXT: @{[ $s->{_pos}[0][-1] ]}";
-   }
-   elsif ( $tag eq "Para" ) {
+        # Single character tags (like L<>) should be on the same level as text.
+        $s->{_pos}[0][-1] = join "", @{ $s->{_pos}[0][-1] };
+        print STDERR "TAG_END_TEXT: @{[ $s->{_pos}[0][-1] ]}" if $DEBUG;
+    }
+    elsif ( $tag eq "Para" ) {
 
-      # Should only have 2 elements: tag, entire text
-      my ( $_tag, @text ) = @{ $s->{_pos}[0][-1] };
-      my $text = join "", @text;
-      @{ $s->{_pos}[0][-1] } = ( $_tag, $text );
-   }
+        # Should only have 2 elements: tag, entire text
+        my ( $_tag, @text ) = @{ $s->{_pos}[0][-1] };
+        my $text = join "", @text;
+        @{ $s->{_pos}[0][-1] } = ( $_tag, $text );
+    }
 
-   $DEBUG and print STDERR "{_pos}: " . Dumper $s->{_pos};
+    print STDERR "{_pos}: " . Dumper $s->{_pos} if $DEBUG;
 }
 
 

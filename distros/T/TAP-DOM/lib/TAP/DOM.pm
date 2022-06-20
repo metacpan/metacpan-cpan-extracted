@@ -1,9 +1,9 @@
 package TAP::DOM;
-# git description: v0.92-7-gfa0a487
+# git description: v0.96-1-g9b41662
 
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: TAP as Document Object Model.
-$TAP::DOM::VERSION = '0.93';
+$TAP::DOM::VERSION = '0.97';
 use 5.006;
 use strict;
 use warnings;
@@ -123,7 +123,7 @@ $severity->{test}     {0}        {0}            {0}        {1} = 6; # notok_skip
 
 our $obvious_tap_line = qr/(1\.\.|ok\s|not\s+ok\s|#|\s|tap\s+version|pragma|Bail out!)/i;
 
-our $noempty_tap = "+pragma tapdom_error\n# document was empty";
+our $noempty_tap = "pragma +tapdom_error\n# document was empty";
 
 use Class::XSAccessor
     chained     => 1,
@@ -198,7 +198,13 @@ sub preprocess_tap {
 sub noempty_tap {
     my %args = @_;
 
-    $args{tap} = $noempty_tap if defined($args{tap}) and $args{tap} eq '';
+    if (defined($args{tap}) and $args{tap} eq '') {
+      $args{tap} = $noempty_tap;
+    }
+    elsif (defined($args{source}) and -z $args{source}) {
+      $args{tap} = $noempty_tap;
+      delete $args{source};
+    }
 
     return %args
 }
@@ -231,6 +237,7 @@ sub new {
         my $LOWERCASE_FIELDNAMES = $args{lowercase_fieldnames};
         my $LOWERCASE_FIELDVALUES = $args{lowercase_fieldvalues};
         my $TRIM_FIELDVALUES = $args{trim_fieldvalues};
+        my $NOEMPTY_TAP = $args{noempty_tap};
         delete $args{ignore};
         delete $args{ignorelines};
         delete $args{dontignorelines};
@@ -438,6 +445,7 @@ sub new {
           lowercase_fieldnames                 => $LOWERCASE_FIELDNAMES,
           lowercase_fieldvalues                => $LOWERCASE_FIELDVALUES,
           trim_fieldvalues                     => $TRIM_FIELDVALUES,
+          noempty_tap                          => $NOEMPTY_TAP,
          );
 
         my $document_data = TAP::DOM::DocumentData->new(%document_data);
@@ -1032,7 +1040,7 @@ careful!
 When a document is empty (which can also happen after preprocessing)
 then this option set to 1 triggers to put in some replacement line.
 
- +pragma tapdom_error
+ pragma +tapdom_error
  # document was empty
 
 which in turn assigns it an error severity, so that these situations
@@ -1296,7 +1304,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Steffen Schwigon.
+This software is copyright (c) 2022 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,8 @@
 Revision history for Perl extension Excel::Writer::XLSX::CDF.
 
+0.04 2022-06-16
+  - Added chart_x_min and chart_x_max capability
+
 0.03 2022-06-09
   - Updates to cleanup CPAN distribution
 

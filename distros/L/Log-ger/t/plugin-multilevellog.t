@@ -6,7 +6,7 @@ use Test::More 0.98;
 
 use Log::ger::Util;
 
-use vars '$str';
+our $str;
 use Log::ger::Output 'String', string => \$str;
 
 package My::P1;

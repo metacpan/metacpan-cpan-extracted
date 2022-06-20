@@ -1,5 +1,8 @@
 Revision history for B::Hooks::AtRuntime.
 
+7       2020-06-19
+    - Fix use under the debugger (haarg++).
+
 6       2018-02-20
     - More test fixes for no-.-in-@INC.
 

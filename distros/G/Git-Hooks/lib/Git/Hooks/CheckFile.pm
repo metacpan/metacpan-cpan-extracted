@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Hooks::CheckFile;
 # ABSTRACT: Git::Hooks plugin for checking files
-$Git::Hooks::CheckFile::VERSION = '3.2.2';
+$Git::Hooks::CheckFile::VERSION = '3.3.0';
 use v5.16.0;
 use utf8;
 use Carp;
@@ -116,6 +116,8 @@ sub check_commands {
 
         foreach my $command (map {$_->[1]} grep {$basename =~ $_->[0]} @name_checks) {
             $errors += check_command($git, $ctx, $commit, $file, $command);
+        } continue {
+            $git->check_timeout();
         }
     }
 
@@ -538,7 +540,7 @@ Git::Hooks::CheckFile - Git::Hooks plugin for checking files
 
 =head1 VERSION
 
-version 3.2.2
+version 3.3.0
 
 =head1 SYNOPSIS
 
@@ -690,6 +692,9 @@ Some real examples:
 
 COMMAND may rely on the B<GIT_COMMIT> environment variable to identify the
 commit being checked according to the hook being used, as follows.
+
+Since the external commands may take much time to run, the plugin checks if the
+C<githooks.timeout> option has been violated after each command runs.
 
 =over
 

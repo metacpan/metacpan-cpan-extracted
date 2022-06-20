@@ -4,7 +4,7 @@
       "Ben Morrow <ben@morrow.me.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "bsd"
    ],
@@ -41,7 +41,7 @@
    "provides" : {
       "B::Hooks::AtRuntime" : {
          "file" : "lib/B/Hooks/AtRuntime.pm",
-         "version" : "6"
+         "version" : "7"
       }
    },
    "release_status" : "stable",
@@ -56,5 +56,5 @@
          "url" : "http://github.com/mauzo/B-Hooks-AtRuntime"
       }
    },
-   "version" : "6"
+   "version" : "7"
 }

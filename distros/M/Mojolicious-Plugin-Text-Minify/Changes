@@ -1,5 +1,18 @@
 Revision history for Mojolicious-Plugin-Text-Minify:
 
+v0.2.3    2022-06-10 16:31:49+01:00 Europe/London
+  [Bug Fixes]
+  - Upgrade minimum version of Text::Minify::XS to v0.6.2 to fix issue
+    with undef data.
+
+  [Documentation]
+  - Fix encoding of links in README.
+
+  - Bump copyright year.
+
+  [Other]
+  - Removed bad rule from MANIFEST.SKIP.
+
 v0.2.2    2021-09-29 17:36:07+01:00 Europe/London
   [Documentation]
   - Included an example of making the use of the plugin dependent on

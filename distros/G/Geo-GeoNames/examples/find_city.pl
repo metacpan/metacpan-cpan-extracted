@@ -1,9 +1,12 @@
+#!/usr/bin/env perl
+
+use strict;
 use Geo::GeoNames;
 use Data::Printer;
 
 my $geo = Geo::GeoNames->new(
-	username => 'briandfoy',
-	);
+	username => $ENV{GEONAMES_USER'} || 'nigelhorne',
+);
 
 my $results = $geo->find_nearby_placename(
 	lat => $ARGV[0],

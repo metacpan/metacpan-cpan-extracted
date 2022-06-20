@@ -24,7 +24,7 @@
 %token <opval> IF UNLESS ELSIF ELSE FOR WHILE LAST NEXT SWITCH CASE DEFAULT BREAK EVAL
 %token <opval> SYMBOL_NAME VAR_NAME CONSTANT EXCEPTION_VAR
 %token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT TRUE FALSE END_OF_FILE
-%token <opval> DOT3 FATCAMMA RW RO WO INIT NEW OF
+%token <opval> DOT3 FATCAMMA RW RO WO INIT NEW OF CLASS_ID
 %token <opval> RETURN WEAKEN DIE WARN PRINT CURRENT_CLASS_NAME UNWEAKEN '[' '{' '('
 
 %type <opval> grammar
@@ -734,6 +734,11 @@ operator
   | is_read_only
   | has_impl
   | logical_operator
+  | CLASS_ID class_name
+    {
+      $$ = SPVM_OP_build_class_id(compiler, $1, $2);
+    }
+
 
 operators
   : operators ',' operator
@@ -965,15 +970,15 @@ isa
 logical_operator
   : operator LOGICAL_OR operator
     {
-      $$ = SPVM_OP_build_or(compiler, $2, $1, $3);
+      $$ = SPVM_OP_build_logical_or(compiler, $2, $1, $3);
     }
   | operator LOGICAL_AND operator
     {
-      $$ = SPVM_OP_build_and(compiler, $2, $1, $3);
+      $$ = SPVM_OP_build_logical_and(compiler, $2, $1, $3);
     }
   | LOGICAL_NOT operator
     {
-      $$ = SPVM_OP_build_not(compiler, $1, $2);
+      $$ = SPVM_OP_build_logical_not(compiler, $1, $2);
     }
 
 assign

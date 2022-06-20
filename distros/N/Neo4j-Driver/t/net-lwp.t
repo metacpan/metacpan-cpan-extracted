@@ -39,7 +39,7 @@ lives_ok { $m = Neo4j::Driver::Net::HTTP::LWP->new($driver) } 'new';
 subtest 'static' => sub {
 	plan tests => 5;
 	lives_and { like $m->uri(), qr/\Q$uri\E/i } 'uri';
-	lives_and { is_deeply [$m->result_handlers], [] } 'result_handlers';
+	is_deeply [eval { $m->result_handlers }], [], 'result_handlers';
 	my $coder;
 	lives_ok { $coder = $m->json_coder } 'json_coder lives';
 	lives_and { ok $coder->can('decode') } 'json_coder';

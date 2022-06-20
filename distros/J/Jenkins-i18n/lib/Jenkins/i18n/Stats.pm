@@ -6,7 +6,7 @@ use warnings;
 use Hash::Util qw(lock_keys);
 use Carp qw(confess);
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =pod
 
@@ -112,57 +112,44 @@ Prints to C<STDOUT> a summary of all statistics in text format.
 
 =cut
 
+sub _done {
+    my $self = shift;
+    return (  $self->{keys}
+            - $self->{missing}
+            - $self->{unused}
+            - $self->{empty}
+            - $self->{same}
+            - $self->{no_jenkins} );
+}
+
+sub perc_done {
+    my $self = shift;
+    return ( ( $self->_done / $self->{keys} ) * 100 );
+}
+
 sub summary {
     my $self = shift;
 
-    my $done
-        = $self->{keys}
-        - $self->{missing}
-        - $self->{unused}
-        - $self->{empty}
-        - $self->{same}
-        - $self->{no_jenkins};
-
-    my ( $pdone, $pmissing, $punused, $pempty, $psame, $pnojenkins );
-
     unless ( $self->{keys} == 0 ) {
-        $pdone    = $done / $self->{keys} * 100;
-        $pmissing = $self->{missing} / $self->{keys} * 100;
-        $punused  = $self->{unused} / $self->{keys} * 100;
+        my %summary = ( done => $self->_done, pdone => $self->perc_done );
+        my @wanted  = qw(missing unused empty same no_jenkins);
 
-        $pempty     = $self->{empty} / $self->{keys} * 100;
-        $psame      = $self->{same} / $self->{keys} * 100;
-        $pnojenkins = $self->{no_jenkins} / $self->{keys} * 100;
-        format STDOUT_TOP =
+        foreach my $wanted (@wanted) {
+            $summary{$wanted} = $self->{$wanted};
+            $summary{"p$wanted"} = $self->{$wanted} / $self->{keys} * 100;
+        }
 
-         Translation Status
+        return \%summary;
 
-    Status         Total      %
-    -----------------------------
-.
-
-        format STDOUT =
-    @<<<<<<<<<<    @<<<<    @<<<<
-    'Done', $done, $pdone
-    @<<<<<<<<<<    @<<<<    @<<<<
-    'Missing', $self->{missing}, $pmissing
-    @<<<<<<<<<<    @<<<<    @<<<<
-    'Orphan', $self->{unused}, $punused
-    @<<<<<<<<<<    @<<<<    @<<<<
-    'Empty', $self->{empty}, $pempty
-    @<<<<<<<<<<    @<<<<    @<<<<
-    'Same', $self->{same}, $psame
-    @<<<<<<<<<<    @<<<<    @<<<<
-    'No Jenkins', $self->{no_jenkins}, $pnojenkins
-
-.
-
-        write;
-        print 'Total of files: ', $self->{files}, "\n";
     }
-    else {
-        warn "Not a single key was processed\n";
-    }
+
+    warn "Not a single key was processed\n";
+    return {};
+}
+
+sub files {
+    my $self = shift;
+    return $self->{files};
 }
 
 1;

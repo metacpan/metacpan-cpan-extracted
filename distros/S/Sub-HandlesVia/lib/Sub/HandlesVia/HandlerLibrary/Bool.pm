@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::HandlerLibrary::Bool;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.016';
+our $VERSION   = '0.025';
 
 use Sub::HandlesVia::HandlerLibrary;
 our @ISA = 'Sub::HandlesVia::HandlerLibrary';
@@ -18,6 +18,15 @@ sub set {
 		name      => 'Bool:set',
 		args      => 0,
 		template  => '« !!1 »',
+		documentation => 'Sets the value of the boolean to true.',
+		_examples => sub {
+			my ( $class, $attr, $method ) = @_;
+			return join "",
+				"  my \$object = $class\->new();\n",
+				"  \$object->$method\();\n",
+				"  say \$object->$attr; ## ==> true\n",
+				"\n";
+		},
 }
 
 sub unset {
@@ -25,6 +34,15 @@ sub unset {
 		name      => 'Bool:unset',
 		args      => 0,
 		template  => '« !!0 »',
+		documentation => 'Sets the value of the boolean to false.',
+		_examples => sub {
+			my ( $class, $attr, $method ) = @_;
+			return join "",
+				"  my \$object = $class\->new();\n",
+				"  \$object->$method\();\n",
+				"  say \$object->$attr; ## ==> false\n",
+				"\n";
+		},
 }
 
 sub toggle {
@@ -32,6 +50,17 @@ sub toggle {
 		name      => 'Bool:toggle',
 		args      => 0,
 		template  => '« !$GET »',
+		documentation => 'Toggles the truth value of the boolean.',
+		_examples => sub {
+			my ( $class, $attr, $method ) = @_;
+			return join "",
+				"  my \$object = $class\->new();\n",
+				"  \$object->$method\();\n",
+				"  say \$object->$attr; ## ==> true\n",
+				"  \$object->$method\();\n",
+				"  say \$object->$attr; ## ==> false\n",
+				"\n";
+		},
 }
 
 sub not {
@@ -39,6 +68,14 @@ sub not {
 		name      => 'Bool:not',
 		args      => 0,
 		template  => '!$GET',
+		documentation => 'Returns the opposite value of the boolean.',
+		_examples => sub {
+			my ( $class, $attr, $method ) = @_;
+			return join "",
+				"  my \$object = $class\->new( $attr => 1 );\n",
+				"  say \$object->$method\(); ## ==> false\n",
+				"\n";
+		},
 }
 
 sub reset {
@@ -47,7 +84,7 @@ sub reset {
 		args      => 0,
 		template  => '« $DEFAULT »',
 		default_for_reset => sub { 0 },
+		documentation => 'Sets the boolean to its default value, or false if it has no default.',
 }
-
 
 1;

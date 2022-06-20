@@ -1,6 +1,6 @@
 package HTML::Obj2HTML;
 
-$HTML::Obj2HTML::VERSION = '0.11';
+$HTML::Obj2HTML::VERSION = '0.12';
 
 use strict;
 use warnings;
@@ -33,6 +33,8 @@ my $snippets = {};
 # A dictionary of substitutions are stored here and can be referenced in _content_
 my %dictionary;
 
+my $file_ext = ".po";
+
 my %dofiles;
 
 # Whether or not to close empty tags with /
@@ -52,28 +54,12 @@ plugins();
 
 sub import {
   my @extra = ();
+  my $loadcomponents = 0;
+  my $ext;
   while (my $opt = shift) {
     if ($opt eq "components") {
       my $arg = shift;
-      foreach my $file (split("\n", `find $arg -name "*.po"`)) {
-        chomp($file);
-        my $l = $file;
-        $l =~ s/$arg\///;
-        $l =~ s/\.po$//;
-        $l =~ s/\//::/g;
-        #print STDERR "HTML::Obj2HTML registering component $l\n";
-        HTML::Obj2HTML::register_extension($l, {
-          tag => "",
-          before => sub {
-            my $o = shift;
-            if (ref $o eq "HASH") {
-              return HTML::Obj2HTML::fetch($file, $o);
-            } else {
-              return HTML::Obj2HTML::fetch($file, { _ => $o });
-            }
-          }
-        });
-      }
+      $loadcomponents = $arg;
     }
     elsif ($opt eq "default_currency") {
       $default_currency = shift;
@@ -87,8 +73,33 @@ sub import {
     elsif ($opt eq "html_fromarrayref_format") {
       $html_fromarrayref_format = shift;
     }
+    elsif ($opt eq "file_extension") {
+      $file_ext = shift;
+      $file_ext =~ s/[\/\n\r]//g;
+    }
     else {
       push(@extra, $opt);
+    }
+  }
+  if ($loadcomponents) {
+    foreach my $file (split("\n", `find $loadcomponents -name "*${file_ext}"`)) {
+      chomp($file);
+      my $l = $file;
+      $l =~ s/$loadcomponents\///;
+      $l =~ s/${file_ext}$//;
+      $l =~ s/\//::/g;
+      #print STDERR "HTML::Obj2HTML registering component $l\n";
+      HTML::Obj2HTML::register_extension($l, {
+        tag => "",
+        before => sub {
+          my $o = shift;
+          if (ref $o eq "HASH") {
+            return HTML::Obj2HTML::fetch($file, $o);
+          } else {
+            return HTML::Obj2HTML::fetch($file, { _ => $o });
+          }
+        }
+      });
     }
   }
 }
@@ -448,6 +459,7 @@ sub gen {
   my $o = shift;
   my $ret = "";
 
+  if (!defined $o) { return ""; }
   if (!ref $o) {
     $o = web_escape($o);
     return $o;
@@ -504,12 +516,14 @@ sub gen {
     }
     # Typically linking to another file will return an arrayref, but could equally return a hashref to also set the
     # attributes of the element calling it
-    if (!ref $attr && $attr =~ /staticfile:(.+)/) {
-      $attr = HTML::Obj2HTML::fetchraw($1);
-    } elsif (!ref $attr && $attr =~ /file:(.+)/) {
-      $attr = HTML::Obj2HTML::fetch($1);
-    } elsif (!ref $attr && $attr =~ /raw:(.+)/) {
-      $attr = HTML::Obj2HTML::fetchraw($1);
+    if ($attr && !ref $attr) {
+      if ($attr =~ /staticfile:(.+)/) {
+        $attr = HTML::Obj2HTML::fetchraw($1);
+      } elsif ($attr =~ /file:(.+)/) {
+        $attr = HTML::Obj2HTML::fetch($1);
+      } elsif ($attr =~ /raw:(.+)/) {
+        $attr = HTML::Obj2HTML::fetchraw($1);
+      }
     }
 
     # Run the current tag through extentions
@@ -632,7 +646,7 @@ sub gen {
       }
 
     } elsif ($tag eq "include") {
-      $ret .= HTML::Obj2HTML::gen(HTML::Obj2HTML::fetch($o->{src}.".po", $attr));
+      $ret .= HTML::Obj2HTML::gen(HTML::Obj2HTML::fetch($o->{src}.$file_ext, $attr));
 
     } elsif ($tag eq "javascript") {
       $ret .= "<script language='javascript' type='text/javascript' defer='1'><!--\n$attr\n//--></script>";
@@ -796,7 +810,9 @@ sub format_attr {
 }
 sub substitute_dictionary {
   my $val = shift;
-  $val =~ s/%([A-Za-z0-9]+)%/$dictionary{$1}/g;
+  if ($val) {
+    $val =~ s/%([A-Za-z0-9]+)%/$dictionary{$1}/g;
+  }
   return $val;
 }
 sub web_escape {
@@ -815,7 +831,7 @@ sub markdown {
   my $txt = shift;
   $txt = substitute_dictionary($txt);
   my $m = new Text::Markdown;
-  my $val = $m->markdown($txt);
+  my $val = $m->markdown(HTML::Entities::encode($txt));
   return $val;
 }
 
@@ -861,7 +877,11 @@ HTML::Obj2HTML - Create HTML from a arrays and hashes
 
 This is the relative path from the current working directory to components.
 Obj2HTML will find all *.po files and automatically register elements that when
-called within your object executes the file. (See C<fetch()>)
+called within your object executes the file. (See C<fetch()>);
+
+Note, you can change the extension searched for with an import argument:
+
+    use HTML::Obj2HTML file_extension => ".po"
 
 =item * C<default_currency>
 
@@ -1010,6 +1030,8 @@ You can also use [cond,true,false] syntax.
     [
        div => include("path/to/file")
     ]
+
+You should exclude the file extension. It will be added automatically. By default this is "*.po" but can be changed.
 
 =item Add some javascript
 

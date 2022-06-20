@@ -4,7 +4,7 @@ Mojolicious::Plugin::Text::Minify - remove HTML indentation on the fly
 
 # VERSION
 
-version v0.2.2
+version v0.2.3
 
 # SYNOPSIS
 
@@ -18,7 +18,7 @@ $app->plugin("Text::Minify");
 
 # DESCRIPTION
 
-This plugin uses [Text::Minify::XS](https://metacpan.org/pod/Text::Minify::XS) to remove indentation and
+This plugin uses [Text::Minify::XS](https://metacpan.org/pod/Text%3A%3AMinify%3A%3AXS) to remove indentation and
 trailing whitespace from HTML content.
 
 If the `mojox.no-minify` key in the stash is set to a true value,
@@ -36,9 +36,9 @@ meaningful, e.g. `pre` or `textarea`.
 
 # SEE ALSO
 
-[Text::Minify::XS](https://metacpan.org/pod/Text::Minify::XS)
+[Text::Minify::XS](https://metacpan.org/pod/Text%3A%3AMinify%3A%3AXS)
 
-[Plack::Middleware::Text::Minify](https://metacpan.org/pod/Plack::Middleware::Text::Minify)
+[Plack::Middleware::Text::Minify](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3AText%3A%3AMinify)
 
 # SOURCE
 
@@ -60,7 +60,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Robert Rothenberg.
+This software is Copyright (c) 2021-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

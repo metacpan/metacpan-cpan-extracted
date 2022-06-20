@@ -1,10 +1,15 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/SqlServer.pm 88    21-04-29 22:28 Sommar $
+# $Header: /Perl/OlleDB/SqlServer.pm 89    22-05-08 23:10 Sommar $
 #
-# Copyright (c) 2004-2021 Erland Sommarskog
+# Copyright (c) 2004-2022 Erland Sommarskog
 #
 #
 # $History: SqlServer.pm $
+# 
+# *****************  Version 89  *****************
+# User: Sommar       Date: 22-05-08   Time: 23:10
+# Updated in $/Perl/OlleDB
+# Stepping up to version 2.014 and added new OLE  DB provider MSOLEDBSQL.
 # 
 # *****************  Version 88  *****************
 # User: Sommar       Date: 21-04-29   Time: 22:28
@@ -306,7 +311,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS
             %NEWDATETIMETYPES %MAXTYPES %TYPEINFOTYPES $VERSION);
 
 
-$VERSION = '2.013';
+$VERSION = '2.014';
 
 @ISA = qw(Exporter DynaLoader Tie::StdHash);
 
@@ -326,6 +331,7 @@ bootstrap Win32::SqlServer;
                 RETURN_ABORT
                 PROVIDER_DEFAULT PROVIDER_SQLOLEDB PROVIDER_SQLNCLI
                 PROVIDER_SQLNCLI10 PROVIDER_SQLNCLI11 PROVIDER_MSOLEDBSQL
+                PROVIDER_MSOLEDBSQL19
                 DATETIME_HASH DATETIME_ISO DATETIME_REGIONAL DATETIME_FLOAT
                 DATETIME_STRFMT
                 CMDSTATE_INIT CMDSTATE_ENTEREXEC CMDSTATE_NEXTRES
@@ -353,7 +359,8 @@ bootstrap Win32::SqlServer;
                                     RETURN_ERROR RETURN_ABORT)],
                 providers    => [qw(PROVIDER_DEFAULT PROVIDER_SQLOLEDB
                                     PROVIDER_SQLNCLI PROVIDER_SQLNCLI10
-                                    PROVIDER_SQLNCLI11 PROVIDER_MSOLEDBSQL)],
+                                    PROVIDER_SQLNCLI11 PROVIDER_MSOLEDBSQL
+                                    PROVIDER_MSOLEDBSQL19)],
                 datetime     => [qw(DATETIME_HASH DATETIME_ISO DATETIME_REGIONAL
                                     DATETIME_FLOAT DATETIME_STRFMT)],
                 cmdstates    => [qw(CMDSTATE_INIT CMDSTATE_ENTEREXEC CMDSTATE_NEXTRES
@@ -417,15 +424,17 @@ use constant RETURN_ERROR      =>  0;
 use constant RETURN_ABORT      => -1;
 
 # Constants for option Provider
-use constant PROVIDER_DEFAULT    => 0;
-use constant PROVIDER_SQLOLEDB   => 1;
-use constant PROVIDER_SQLNCLI    => 2;
-use constant PROVIDER_SQLNCLI10  => 3;
-use constant PROVIDER_SQLNCLI11  => 4;
-use constant PROVIDER_MSOLEDBSQL => 5;
+use constant PROVIDER_DEFAULT      => 0;
+use constant PROVIDER_SQLOLEDB     => 1;
+use constant PROVIDER_SQLNCLI      => 2;
+use constant PROVIDER_SQLNCLI10    => 3;
+use constant PROVIDER_SQLNCLI11    => 4;
+use constant PROVIDER_MSOLEDBSQL   => 5;
+use constant PROVIDER_MSOLEDBSQL19 => 6;
 use constant PROVIDER_OPTIONS    => (PROVIDER_DEFAULT, PROVIDER_SQLOLEDB,
                                      PROVIDER_SQLNCLI, PROVIDER_SQLNCLI10,
-                                     PROVIDER_SQLNCLI11, PROVIDER_MSOLEDBSQL);
+                                     PROVIDER_SQLNCLI11, PROVIDER_MSOLEDBSQL,
+                                     PROVIDER_MSOLEDBSQL19);
 
 # Constants for datetime options
 use constant DATETIME_HASH     => 0;

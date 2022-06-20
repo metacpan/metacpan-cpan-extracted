@@ -341,6 +341,34 @@ DESCRIPTION
     All other things being equal, candidates defined in classes should beat
     candidates imported from roles.
 
+  CodeRef multimethods
+    The $name of a multimethod may be a scalarref, in which case `multimethod`
+    will install the multimethod as a coderef into the scalar referred to.
+    Example:
+
+      my ($coderef, $otherref);
+  
+      multimethod \$coderef => (
+        method => 0,
+        signature => [ ArrayRef ],
+        code => sub { say "It's an arrayref!" },
+      );
+  
+      multimethod \$coderef => (
+        method => 0,
+        alias => \$otherref,
+        signature => [ HashRef ],
+        code => sub { say "It's a hashref!" },
+      );
+  
+      $coderef->( [] );
+      $coderef->( {} );
+  
+      $otherref->( {} );
+
+    The $coderef and $otherref variables will actually end up as blessed
+    coderefs so that some tidy ups can take place in `DESTROY`.
+
   API
     Sub::MultiMethod avoids cute syntax hacks because those can be added by
     third party modules. It provides an API for these modules.

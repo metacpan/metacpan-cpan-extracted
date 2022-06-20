@@ -5,34 +5,41 @@
 
 use warnings;
 use strict;
+use utf8;
 use File::Basename;
 use File::Path;
 use Getopt::Long;
 use Set::Tiny 0.04;
+use Term::ANSIColor 5.01;
+use Term::ProgressBar 2.22;
+use FileHandle;
+
 use Cwd;
 use Pod::Usage qw(pod2usage);
+use feature 'say';
 
 use Jenkins::i18n (
     'remove_unused', 'find_files', 'print_license', 'load_properties',
-    'load_jelly'
+    'load_jelly',    'find_langs'
 );
 use Jenkins::i18n::Stats;
 use Jenkins::i18n::Warnings;
 use Jenkins::i18n::ProcOpts;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 my $DATA_START  = tell DATA;
 my $current_dir = getcwd;
 
 my (
     $lang, $dir,   $add, $remove, $counter, $target,
-    $help, $debug, $man, $search, $version
-) = ( undef, $current_dir, 0, 0, 0, $current_dir, 0, 0, 0, undef, 0 );
+    $help, $debug, $man, $search, $version, $all_langs
+) = ( undef, $current_dir, 0, 0, 0, $current_dir, 0, 0, 0, undef, 0, 0 );
 
 GetOptions(
     'help'     => \$help,
     'version'  => \$version,
+    'all'      => \$all_langs,
     'lang=s'   => \$lang,
     'dir=s'    => \$dir,
     'add'      => \$add,
@@ -52,11 +59,7 @@ if ($version) {
 pod2usage( -exitval => 0, -verbose => 0 ) if ($help);
 pod2usage( -exitval => 0, -verbose => 2 ) if ($man);
 
-# language parameter is mandatory and shouldn't be 'en'
-unless ( $lang and ( $lang ne 'en' ) ) {
-    pod2usage( -exitval => 1, -verbose => 1 );
-}
-
+# TODO: move this variables to a module
 my $empty_regex  = qr/empty/i;
 my $jelly_regex  = qr/.jelly$/;
 my $hudson_regex = qr/Hudson/;
@@ -71,11 +74,96 @@ my $ignore_same  = Set::Tiny->new(
         'https://www.jenkins.io/redirect/search-box'
     )
 );
+
+if ($all_langs) {
+    my ( $files_ref, $all_langs );
+    binmode( STDOUT, ':utf8' );
+
+    {
+        local $| = 1;
+        $ENV{ANSI_COLORS_DISABLED}++ unless -t STDOUT;
+
+        my $done = 'Done! ' . colored( '✓', 'green' );
+        print 'Hang on, this might take a while.', "\n",
+            'Searching for all translatable files... ';
+        $files_ref = find_files($dir);
+        say $done;
+        print 'Now searching for all available languages... ';
+        $all_langs = find_langs($dir);
+        say $done, "\n", 'Now verifying each language translated status...';
+    }
+
+    my $warnings = Jenkins::i18n::Warnings->new(1);
+    my %results;
+
+    my $max      = $all_langs->size;
+    my $progress = Term::ProgressBar->new(
+        { name => 'Languages', count => $max, remove => 1 } );
+    $progress->minor(0);
+    my $next_update = 0;
+    my $counter     = 0;
+
+    foreach my $lang ( $all_langs->members ) {
+        my $processor
+            = Jenkins::i18n::ProcOpts->new( $dir, $target, 0, 0, 0, $debug,
+            $lang, undef );
+        my $stats = Jenkins::i18n::Stats->new;
+
+        # process each file
+        foreach my $file ( @{$files_ref} ) {
+            $stats->inc('files');
+            process_file( $file, $stats, $warnings, $processor );
+            $warnings->reset;
+        }
+
+        $results{ $stats->perc_done } = $lang;
+        $counter++;
+        $next_update = $progress->update($counter)
+            if $counter >= $next_update;
+    }
+
+    $progress->update($max) if $max >= $next_update;
+    my @sorted = sort { $b <=> $a } keys(%results);
+    my ( $lang, $percent );
+
+    format LANGS_TOP =
+
+         Translation Status
+
+    Language code        %
+    ------------------------
+.
+
+    format LANGS =
+    @<<<<<             @<<<<
+    $lang, $percent
+.
+
+    select(STDOUT);
+    format_name STDOUT 'LANGS';
+    format_top_name STDOUT 'LANGS_TOP';
+
+    foreach my $val (@sorted) {
+        $lang    = $results{$val};
+        $percent = $val;
+        write;
+    }
+
+    print "\n\n";
+    exit(0);
+}
+
+# language parameter is mandatory and shouldn't be 'en'
+unless ( $lang and ( $lang ne 'en' ) ) {
+    pod2usage( -exitval => 1, -verbose => 1 );
+}
+
 print "Searching for files ...\n";
 
 # look for Message.properties and *.jelly files in the provided folder
 my $files_ref = find_files($dir);
 print 'Found ', scalar( @{$files_ref} ), ' files', "\n";
+
 my $stats    = Jenkins::i18n::Stats->new;
 my $warnings = Jenkins::i18n::Warnings->new;
 my $processor
@@ -89,7 +177,7 @@ foreach my $file ( @{$files_ref} ) {
     $warnings->reset;
 }
 
-$stats->summary;
+print_summary($stats);
 
 # This is the main method with is run for each file
 sub process_file {
@@ -166,9 +254,9 @@ sub process_file {
         if (   $lang_entries_ref->{$entry}
             && $lang_entries_ref->{$entry} =~ $hudson_regex )
         {
-            $warnings->add( 'nonjenkins',
+            $warnings->add( 'non_jenkins',
                 ( "$entry -> " . $lang_entries_ref->{$entry} ) );
-            $stats->inc('nojenkins');
+            $stats->inc('no_jenkins');
         }
     }
 
@@ -231,6 +319,39 @@ sub process_file {
 
 }
 
+sub print_summary {
+    my $stats       = shift;
+    my $summary_ref = $stats->summary;
+    my ( $item, $total, $percent );
+
+    format SUMMARY_TOP =
+
+         Translation Status
+
+    Status         Total      %
+    -----------------------------
+.
+
+    format SUMMARY =
+    @<<<<<<<<<<    @<<<<    @<<<<
+    $item, $total, $percent
+.
+
+    my @metrics = qw(done missing unused empty same no_jenkins);
+    select(STDOUT);
+    format_name STDOUT 'SUMMARY';
+    format_top_name STDOUT 'SUMMARY_TOP';
+
+    foreach my $metric (@metrics) {
+        $item    = ucfirst($metric);
+        $total   = $summary_ref->{$metric};
+        $percent = $summary_ref->{"p$metric"};
+        write;
+    }
+
+    say "\n", 'Total of files: ', $stats->files;
+}
+
 sub read_license {
     my $start = shift;
     seek DATA, $start, 0;
@@ -253,6 +374,8 @@ jtt - CLI to help internationalization for Jenkins
     --help             -> print this help message and exits
     --man              -> provides this CLI manpage and exits
     --version          -> prints the CLI version and exits
+    --all              -> prints all identified language codes and their respective
+                          percentage of translation
     --lang=xx          -> language code to use
     --add              -> optional, generate new files and add new keys to existing
                           files if present
@@ -269,10 +392,10 @@ jtt - CLI to help internationalization for Jenkins
 
 =head1 OPTIONS
 
-C<--lang> is mandatory and it has to be different to English. If it is the only
-option provided, all files in the provided language code will be analyzed and
-a report will be provided at the end of it, without modifying a single
-translation file.
+C<--lang> is mandatory (except for C<--all>) and it has to be different to
+English. If it is the only option provided, all files in the provided language
+code will be analyzed and a report will be provided at the end of it, without
+modifying a single translation file.
 
 C<--dir> and C<--target> are optional and the default values for each one is
 the current directory. This probably the best configuration if you're going
@@ -298,36 +421,72 @@ Remove all orphaned keys from German files which are in the current directory:
 
 =head1 DESCRIPTION
 
-CLI to generate missing translation keys and missing properties files and to
-remove unused keys.
+=head2 Reporting overall status
+
+The C<--all> option will run through all translation files to:
+
+=over
+
+=item 1.
+
+Load all the original English messages.
+
+=item 2.
+
+Identify all available translation, extracting the related language code.
+
+=item 3.
+
+For each language, prints it's code and the respective translation percentage.
+
+=back
+
+Any other command line options are ignored if used with C<--all>.
+
+=head2 Translation changing helpers
+
+To generate missing translation keys and missing properties files and to
+remove unused keys, the CLI uses this process:
 
 =over
 
 =item 1.
 
 It recursively looks for files in a folder, and analyzes them to extract the
-keys being used in the application.
+keys being used in the application. In order to do that, the option C<--lang>
+is required and the value must be different of C<english>.
 
 =item 2.
 
-If C<--add>, it generates the appropriate file for the desired language and
-adds these keys to it, adding the English text as a reference. If the
-properties file already exists the script update it with the new keys.
+If C<--add> is in use, it generates the appropriate file for the desired
+language and adds these keys to it, adding the English text as a reference.
+If the properties file already exists the CLI updates it with the new keys.
 
 =item 3.
 
-When C<--remove> and there are unused keys in our file, the script removes
-them.
+When C<--remove> is in use and there are unused keys in our file, the CLI
+removes them.
 
 =item 4.
 
-If an editor is passed as argument, the script edits each modified file
-after adding new keys.
+The C<--search> option can be used instead of the two describe above in order
+to just search for a particular value in all files and print to STDOUT their
+location. No changes are made to any file.
 
 =back
 
-Note, while the migration to Jenkins this file will report the keys which
-should point to Jenkins instead of the old name.
+The C<--counter> can be used with both options, as well C<--debug>.
+
+The C<--dir> and C<--target> options can also be used, but you probably just
+want to move inside to the path where the Jenkins Git repository is and run
+from there instead. These options are kept for compatibility with the original
+tool and might be removed in the future.
+
+=head1 REFERENCES
+
+Make sure to also check the proposed translation
+L<workflow|https://github.com/glasswalk3r/jenkins-translation-tool/blob/main/Workflow.md>
+documentation.
 
 =head1 AUTHOR
 

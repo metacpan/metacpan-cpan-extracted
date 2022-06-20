@@ -63,7 +63,7 @@
    "provides" : {
       "App::week" : {
          "file" : "lib/App/week.pm",
-         "version" : "1.0204"
+         "version" : "1.0205"
       },
       "App::week::CalYear" : {
          "file" : "lib/App/week/CalYear.pm"
@@ -92,7 +92,7 @@
          "web" : "https://github.com/kaz-utashiro/App-week"
       }
    },
-   "version" : "1.0204",
+   "version" : "1.0205",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>",

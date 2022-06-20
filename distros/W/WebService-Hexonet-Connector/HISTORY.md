@@ -1,3 +1,12 @@
+## [2.10.4](https://github.com/hexonet/perl-sdk/compare/v2.10.3...v2.10.4) (2022-06-10)
+
+
+### Bug Fixes
+
+* **ci:** remove "." from cpanm args (duplicated by install property) ([322f9a3](https://github.com/hexonet/perl-sdk/commit/322f9a3ac0cac9ee3b4a5a4e1951abbc455ea0a3))
+* **ci:** switch release step to ubuntu image with better nodejs compatibility ([c9c04a5](https://github.com/hexonet/perl-sdk/commit/c9c04a58bfe0f7bd32aa56fa620bf19dd2f9caaa))
+* **dep-bump:** upgrade npm engines, node dependencies and reviewed gh workflow ([da06958](https://github.com/hexonet/perl-sdk/commit/da069585d2370f6a15290f3dce6bf3bdd82bd54c))
+
 ## [2.10.3](https://github.com/hexonet/perl-sdk/compare/v2.10.2...v2.10.3) (2022-03-23)
 
 

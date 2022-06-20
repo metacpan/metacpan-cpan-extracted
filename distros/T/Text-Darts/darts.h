@@ -1,7 +1,7 @@
 /*
   Darts -- Double-ARray Trie System
 
-  $Id: darts.h,v 1.1 2009/04/06 10:25:41 dankogai Exp $;
+  $Id: darts.h,v 0.10 2022/06/14 02:05:42 dankogai Exp $;
 
   Copyright(C) 2001-2007 Taku Kudo <taku@chasen.org>
 */

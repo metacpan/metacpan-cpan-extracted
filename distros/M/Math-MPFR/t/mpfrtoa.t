@@ -28,12 +28,15 @@ else {
 }
 
 for(@in) {
-  my $nv = Rmpfr_get_NV(Math::MPFR->new($_), MPFR_RNDN);
+  my $rop = Math::MPFR->new($_);
+  my $nv = Rmpfr_get_NV($rop, MPFR_RNDN);
 
-  my $s1 = mpfrtoa(Math::MPFR->new($_));
+  my $s1 = mpfrtoa($rop);
   my $s2 = nvtoa(atonv($_));
 
   cmp_ok($s1, 'eq', $s2, "mpfrtoa() and nvtoa() agree for $_");
+  ok(nvtoa_test($s1, $rop) == 7, "$_");
+  ok(nvtoa_test($s2, $nv ) == 7, "$_");
 }
 
 ##############################################################################
@@ -69,6 +72,8 @@ for(1 .. 100) {
   my $s2 = nvtoa($nv);
 
   cmp_ok($s1, 'eq', $s2, "mpfrtoa() and nvtoa() agree for $s");
+  ok(nvtoa_test($s1, $f ) == 7, "$s");
+  ok(nvtoa_test($s2, $nv) == 7, "$s");
 }
 
 ###########################################################################
@@ -100,64 +105,7 @@ for my $prec( 20000, 2000, 200, 96, 21, 5 ) {
     my $f = Math::MPFR->new( $s );
     my $dec = mpfrtoa( $f );
 
-    # check that $dec is not zero, or inf, or nan.
-
-    cmp_ok( Rmpfr_regular_p( Math::MPFR->new($dec) ), '!=', 0,"First mpfrtoa() sanity check for $s" );
-
-    # check that, having removed any leading '-' sign, the
-    # length of the significand of $dec is greater than 0.
-
-    my @str = split /e/i, $dec;
-
-    if( $str[0] =~ /^\-/ ) {
-      cmp_ok(length($str[0]), '>', 1, "Second mpfrtoa() sanity check for $s");
-    }
-    else {
-      cmp_ok(length($str[0]), '>', 0, "Second mpfrtoa() sanity check for $s");
-    }
-
-    $str[1] = '0' unless defined $str[1];
-
-    my $check_str = $str[0] . 'e' . $str[1];
-
-    cmp_ok(Math::MPFR->new($s), '==', Math::MPFR->new($dec), "$dec equates to $s");
-
-    my $dec2f = Math::MPFR->new($dec);
-
-    cmp_ok($dec2f, '==', $f, "$dec == $f");
-
-    ###############################################################
-    # Next, check that reducing the number of significant decimal #
-    # digits of $str[0] makes a difference to the assigned value. #
-    ###############################################################
-
-    my $sig = $str[0];
-    my $exponent = $str[1];
-
-    unlike( $sig, qr/\.$/, 'significand does not terminate with "."' );
-
-    if( $sig =~ s/\.0$// ) { # if $sig ends in '.0' remove the '.0'
-      while( $sig =~ /0$/ ) {
-        # Here we remove all trailing zeroes as they are not siginificant digits.
-        # When we remove a trailing zero, the value of the significand is
-        # divided by 10 - for which we compensate by incrementing the exponent.
-        chop $sig;
-        $exponent++;
-      }
-      # Now we get to remove the least significant digit and increment the exponent.
-      chop $sig;
-      $exponent++
-    }
-    else {
-      chop $sig;
-      if( $sig =~ /\.$/ ) { $sig .= '0' }  # The chop() might have created the condition.
-      elsif( $sig !~ /\./) { $exponent++ } # decimal point was effectively moved one place to the left.
-    }
-
-    my $in = $sig . 'e' . $exponent;
-    if( $sign ) { cmp_ok(Math::MPFR->new($in), '>', $dec2f, "$in > $dec for $s ($str[0] $str[1] $prec)") }
-    else { cmp_ok(Math::MPFR->new($in), '<', $dec2f, "$in < $dec for $s ($str[0] $str[1] $prec)") }
-
+    ok(nvtoa_test($dec, $f) == 7, "$s");
   }
 }
 

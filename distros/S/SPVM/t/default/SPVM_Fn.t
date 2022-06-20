@@ -1,4 +1,4 @@
-use lib "t/lib";
+use lib "t/testlib";
 use TestAuto;
 
 use strict;
@@ -387,7 +387,7 @@ my $nan_re = qr/(nan|ind)/i;
   ok(SPVM::TestCase::Lib::Fn2->equals_array_object);
 }
 
-# memcpy_numeric
+# memcpy
 {
   ok(SPVM::TestCase::Lib::Fn2->memcpy_byte);
   ok(SPVM::TestCase::Lib::Fn2->memcpy_short);
@@ -395,6 +395,7 @@ my $nan_re = qr/(nan|ind)/i;
   ok(SPVM::TestCase::Lib::Fn2->memcpy_long);
   ok(SPVM::TestCase::Lib::Fn2->memcpy_float);
   ok(SPVM::TestCase::Lib::Fn2->memcpy_double);
+  ok(SPVM::TestCase::Lib::Fn2->memcpy_object);
 }
 
 # memmove_numeric
@@ -405,24 +406,24 @@ my $nan_re = qr/(nan|ind)/i;
   ok(SPVM::TestCase::Lib::Fn2->memmove_long);
   ok(SPVM::TestCase::Lib::Fn2->memmove_float);
   ok(SPVM::TestCase::Lib::Fn2->memmove_double);
+  ok(SPVM::TestCase::Lib::Fn2->memmove_object);
+}
+
+# memset 
+{
+  ok(SPVM::TestCase::Lib::Fn2->memset_byte);
+  ok(SPVM::TestCase::Lib::Fn2->memset_short);
+  ok(SPVM::TestCase::Lib::Fn2->memset_int);
+  ok(SPVM::TestCase::Lib::Fn2->memset_long);
+  ok(SPVM::TestCase::Lib::Fn2->memset_float);
+  ok(SPVM::TestCase::Lib::Fn2->memset_double);
+  ok(SPVM::TestCase::Lib::Fn2->memset_object);
 }
 
 # new_array_proto
 {
   # copy_array_range_byte
   ok(SPVM::TestCase::Lib::Fn2->new_array_proto);
-}
-
-# sort
-{
-  ok(SPVM::TestCase::Lib::Fn1->sort_byte);
-  ok(SPVM::TestCase::Lib::Fn1->sort_short);
-  ok(SPVM::TestCase::Lib::Fn1->sort_int);
-  ok(SPVM::TestCase::Lib::Fn1->sort_long);
-  ok(SPVM::TestCase::Lib::Fn1->sort_float);
-  ok(SPVM::TestCase::Lib::Fn1->sort_double);
-  ok(SPVM::TestCase::Lib::Fn1->sort_string);
-  ok(SPVM::TestCase::Lib::Fn1->sort_object);
 }
 
 # is_array

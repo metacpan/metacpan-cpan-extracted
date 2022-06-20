@@ -4,7 +4,7 @@ use Carp;
 
 package Software::LicenseUtils;
 # ABSTRACT: little useful bits of code for licensey things
-$Software::LicenseUtils::VERSION = '0.104001';
+$Software::LicenseUtils::VERSION = '0.104002';
 use File::Spec;
 use IO::Dir;
 use Module::Load;
@@ -52,6 +52,11 @@ my @phrases = (
   'has dedicated the work to the Commons' => 'CC0_1_0',
   'waiving all of his or her rights to the work worldwide under copyright law' => 'CC0_1_0',
   'has waived all copyright and related or neighboring rights to' => 'CC0_1_0',
+  'apache(?: |-)1.1' => "Apache_1_1",
+  "Apache Software License(\\s)+Version 1.1" => "Apache_1_1",
+  'apache(?: |-)2.0' => "Apache_2_0",
+  "Apache License(\\s)+Version 2.0" => "Apache_2_0",
+  'No license is granted to other entities' => 'None',
 );
 
 my %meta_keys  = ();
@@ -272,7 +277,16 @@ Software::LicenseUtils - little useful bits of code for licensey things
 
 =head1 VERSION
 
-version 0.104001
+version 0.104002
+
+=head1 PERL VERSION
+
+This module is part of CPAN toolchain, or is treated as such.  As such, it
+follows the agreement of the Perl Toolchain Gang to require no newer version of
+perl than v5.8.1.  This version may change by agreement of the Toolchain Gang,
+but for now is governed by the L<Lancaster
+Consensus|https://github.com/Perl-Toolchain-Gang/toolchain-site/blob/master/lancaster-consensus.md>
+of 2013.
 
 =head1 METHODS
 
@@ -334,7 +348,7 @@ Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo Signes.
+This software is copyright (c) 2022 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

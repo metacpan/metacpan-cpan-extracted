@@ -8,7 +8,9 @@ use SPVM::Builder::Util::API;
 WriteMakefile(
   NAME              => 'SPVM::Regex',
   VERSION_FROM      => 'lib/SPVM/Regex.pm',
-  PREREQ_PM         => {}, # e.g., Module::Name => 1.1
+  PREREQ_PM         => {
+    'SPVM::Unicode' => '0.01',
+  }, # e.g., Module::Name => 1.1
   LICENSE           => 'perl_5',
   ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
     (ABSTRACT_FROM  => 'lib/SPVM/Regex.pm',
@@ -35,8 +37,8 @@ sub MY::postamble {
 
   my $make_rule = '';
   
-  SPVM::Builder::Util::API::create_make_rule_native('Regex');
-  SPVM::Builder::Util::API::create_make_rule_precompile('Regex');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Regex');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('Regex');
   
   return $make_rule;
 }

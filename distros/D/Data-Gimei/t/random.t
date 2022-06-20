@@ -1,19 +1,19 @@
 use warnings;
 use v5.22;
 
-use Test::More;
-
 use Math::Random;
 use Data::Gimei::Random;
 
-{ # default seed
+use Test::More;
+
+{    # default seed
     my @results;
     my $r = Data::Gimei::Random->new;
 
     $r->next_int(42);    # must not throw error
 }
 
-{ # next_int
+{    # next_int
     my $expected;
     my $r = Data::Gimei::Random->new;
 
@@ -21,14 +21,14 @@ use Data::Gimei::Random;
     $expected = $r->next_int(1024);
 
     $r->set_seed(42);
-    is   $r->next_int(1024), $expected;
+    is $r->next_int(1024),   $expected;
     isnt $r->next_int(1024), $expected;
 
     $r->set_seed(43);
     isnt $r->next_int(1024), $expected;
 }
 
-{ # calling rand(), random_uniform_integer().
+{    # calling rand(), random_uniform_integer().
     my @array = qw(a b c);
     my $r     = Data::Gimei::Random->new;
 

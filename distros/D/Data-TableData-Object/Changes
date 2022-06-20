@@ -1,3 +1,10 @@
+0.116   2022-05-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Add iter() method.
+
+        - [doc] Add implementation note about Data::TableData::Object::hash.
+
+
 0.115   2021-11-17  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

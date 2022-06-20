@@ -108,35 +108,35 @@
    "provides" : {
       "Moose::Exception::InvalidAttributeDefinition" : {
          "file" : "lib/Moose/Exception/InvalidAttributeDefinition.pm",
-         "version" : "0.21"
+         "version" : "0.25"
       },
       "Moose::Exception::InvalidImportList" : {
          "file" : "lib/Moose/Exception/InvalidImportList.pm",
-         "version" : "0.21"
+         "version" : "0.25"
       },
       "MooseX::Extended" : {
          "file" : "lib/MooseX/Extended.pm",
-         "version" : "0.21"
+         "version" : "0.25"
       },
       "MooseX::Extended::Core" : {
          "file" : "lib/MooseX/Extended/Core.pm",
-         "version" : "0.21"
+         "version" : "0.25"
       },
       "MooseX::Extended::Custom" : {
          "file" : "lib/MooseX/Extended/Custom.pm",
-         "version" : "0.21"
+         "version" : "0.25"
       },
       "MooseX::Extended::Role" : {
          "file" : "lib/MooseX/Extended/Role.pm",
-         "version" : "0.21"
+         "version" : "0.25"
       },
       "MooseX::Extended::Role::Custom" : {
          "file" : "lib/MooseX/Extended/Role/Custom.pm",
-         "version" : "0.21"
+         "version" : "0.25"
       },
       "MooseX::Extended::Types" : {
          "file" : "lib/MooseX/Extended/Types.pm",
-         "version" : "0.21"
+         "version" : "0.25"
       }
    },
    "release_status" : "stable",
@@ -151,11 +151,12 @@
          "web" : "https://github.com/Ovid/moosex-extreme"
       }
    },
-   "version" : "0.21",
+   "version" : "0.25",
    "x_contributors" : [
       "Graham Knop <haarg@haarg.org>",
       "Marco Fontani <MFONTANI@cpan.org>",
-      "Ovid <ovid@cpan.org>"
+      "Ovid <ovid@cpan.org>",
+      "Toby Inkster <github@toby.ink>"
    ],
    "x_generated_by_perl" : "v5.28.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",

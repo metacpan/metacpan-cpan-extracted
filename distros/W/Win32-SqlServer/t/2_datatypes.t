@@ -1,10 +1,16 @@
 ﻿#---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/2_datatypes.t 40    21-06-30 23:12 Sommar $
+# $Header: /Perl/OlleDB/t/2_datatypes.t 41    22-04-24 22:46 Sommar $
 #
 # This test script tests using sql_sp and sql_insert in all possible
 # ways and with testing use of all datatypes.
 #
 # $History: 2_datatypes.t $
+# 
+# *****************  Version 41  *****************
+# User: Sommar       Date: 22-04-24   Time: 22:46
+# Updated in $/Perl/OlleDB/t
+# Reworked the spatial tests, so we don't need a new identical data file
+# for each new version of SQL Server.
 # 
 # *****************  Version 40  *****************
 # User: Sommar       Date: 21-06-30   Time: 23:12
@@ -4468,7 +4474,9 @@ goto done_spatial if $X->{Provider} == PROVIDER_SQLOLEDB;
 clear_test_data;
 create_spatial($X, $X->{Provider} >= PROVIDER_SQLNCLI10);
 
-{ open(F, "../helpers/spatial.data.$sqlver") or warn "Could not read file 'spatial data': $!\n";
+{ my $spatialver = ($sqlver == 10 ? 10 : 11); 
+  open(F, "../helpers/spatial.data.$spatialver") or 
+        warn "Could not read file 'spatial data.$spatialver': $!\n";
   my @file = <F>;
   close F;
   my ($geometry, $geometrycol, $geometrypar,

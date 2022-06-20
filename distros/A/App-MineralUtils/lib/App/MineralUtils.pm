@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-12-11'; # DATE
+our $DATE = '2022-06-17'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 our %SPEC;
 
@@ -121,6 +121,118 @@ our %argspecs_magnesium = (
     },
 );
 
+our @potassium_forms = (
+    {
+        name => 'mg-k-elem',
+        potassium_ratio => 1,
+        summary => 'Elemental potassium, in milligrams',
+    },
+    {
+        name => 'mg-k-chloride',
+        potassium_ratio => 39.0983/74.5513, # 52.45%
+        summary => 'Potassium chloride (KCl), in milligrams',
+    },
+    {
+        name => 'mg-k-cl',
+        potassium_ratio => 39.0983/74.5513, # 52.45%
+        summary => 'Potassium chloride (KCl), in milligrams',
+    },
+    {
+        name => 'mg-k-citrate',
+        potassium_ratio => 39.0983/306.395, # 12.76%
+        summary => 'Potassium citrate (K3C6H5O7), in milligrams',
+    },
+);
+
+our %argspecs_potassium = (
+    quantity => {
+        # schema => 'physical::mass*', # XXX Perinci::Sub::GetArgs::Argv is not smart enough to coerce from string
+        schema => 'str*',
+        default => '1 mg',
+        req => 0,
+        pos => 0,
+        completion => sub {
+            require Complete::Sequence;
+
+            my %args = @_;
+            Complete::Sequence::complete_sequence(
+                word => $args{word},
+                sequence => [
+                    # TEMP
+                    #sub {
+                    #    require Complete::Number;
+                    #    my $stash = shift;
+                    #    Complete::Number::complete_int(word => $stash->{cur_word});
+                    #},
+                    #' ',
+                    {alternative=>[map {$_->{name}} @potassium_forms]},
+                ],
+            );
+        },
+    },
+    to_unit => {
+        # schema => 'physical::unit', # IU hasn't been added
+        schema => ['str*', in=>['mg', map {$_->{name}} @potassium_forms]],
+        pos => 1,
+    },
+);
+
+our @sodium_forms = (
+    {
+        name => 'mg-na-elem',
+        sodium_ratio => 1,
+        summary => 'Elemental sodium, in milligrams',
+    },
+    {
+        name => 'mg-na-chloride',
+        sodium_ratio => 22.989769/58.44, # 39.34%
+        summary => 'Sodium chloride (NaCl), in milligrams',
+    },
+    {
+        name => 'mg-na-cl',
+        sodium_ratio => 22.989769/58.44, # 39.34%
+        summary => 'Sodium chloride (NaCl), in milligrams',
+    },
+    {
+        name => 'mg-na-citrate',
+        sodium_ratio => 22.989769/258.06, # 8.909%
+        summary => 'Sodium citrate (Na3C6H5O7), in milligrams',
+    },
+);
+
+our %argspecs_sodium = (
+    quantity => {
+        # schema => 'physical::mass*', # XXX Perinci::Sub::GetArgs::Argv is not smart enough to coerce from string
+        schema => 'str*',
+        default => '1 mg',
+        req => 0,
+        pos => 0,
+        completion => sub {
+            require Complete::Sequence;
+
+            my %args = @_;
+            Complete::Sequence::complete_sequence(
+                word => $args{word},
+                sequence => [
+                    # TEMP
+                    #sub {
+                    #    require Complete::Number;
+                    #    my $stash = shift;
+                    #    Complete::Number::complete_int(word => $stash->{cur_word});
+                    #},
+                    #' ',
+                    {alternative=>[map {$_->{name}} @sodium_forms]},
+                ],
+            );
+        },
+    },
+    to_unit => {
+        # schema => 'physical::unit', # IU hasn't been added
+        schema => ['str*', in=>['mg', map {$_->{name}} @sodium_forms]],
+        pos => 1,
+    },
+);
+
 $SPEC{convert_magnesium_unit} = {
     v => 1.1,
     summary => 'Convert a magnesium quantity from one unit to another',
@@ -185,6 +297,118 @@ sub convert_magnesium_unit {
     }
 }
 
+$SPEC{convert_potassium_unit} = {
+    v => 1.1,
+    summary => 'Convert a potassium quantity from one unit to another',
+    description => <<'_',
+
+If target unit is not specified, will show all known conversions.
+
+_
+    args => {
+        %argspecs_potassium,
+    },
+    examples => [
+        {
+            args=>{},
+            summary=>'Show all possible conversions',
+        },
+        {
+            args=>{quantity=>'1000 mg-k-elem', to_unit=>'mg-k-cl'},
+            summary=>'How much of potassium chloride provides 1000 mg of elemental potassium?',
+        },
+    ],
+};
+sub convert_potassium_unit {
+    require Physics::Unit;
+
+    Physics::Unit::InitUnit(
+        map {([$_->{name}], sprintf("%.3f mg", $_->{potassium_ratio}*($_->{purity}//1)))}
+        @potassium_forms,
+    );
+
+    my %args = @_;
+    my $quantity = Physics::Unit->new($args{quantity});
+    return [412, "Must be a Mass quantity"] unless $quantity->type eq 'Mass';
+
+    if ($args{to_unit}) {
+        my $new_amount = $quantity->convert($args{to_unit});
+        return [200, "OK", $new_amount];
+    } else {
+        my @rows;
+        for my $u (
+            @potassium_forms,
+        ) {
+            push @rows, {
+                amount => $quantity->convert($u->{name}),
+                unit => $u->{name},
+                summary => $u->{summary},
+            };
+        }
+        [200, "OK", \@rows, {
+            'table.fields' => [qw/amount unit summary/],
+            'table.field_formats'=>[[number=>{thousands_sep=>'', precision=>3}], undef, undef],
+            'table.field_aligns' => [qw/number left left/],
+        }];
+    }
+}
+
+$SPEC{convert_sodium_unit} = {
+    v => 1.1,
+    summary => 'Convert a sodium quantity from one unit to another',
+    description => <<'_',
+
+If target unit is not specified, will show all known conversions.
+
+_
+    args => {
+        %argspecs_sodium,
+    },
+    examples => [
+        {
+            args=>{},
+            summary=>'Show all possible conversions',
+        },
+        {
+            args=>{quantity=>'1000 mg-na-elem', to_unit=>'mg-na-cl'},
+            summary=>'How much of sodium chloride provides 1000 mg of elemental sodium?',
+        },
+    ],
+};
+sub convert_sodium_unit {
+    require Physics::Unit;
+
+    Physics::Unit::InitUnit(
+        map {([$_->{name}], sprintf("%.3f mg", $_->{sodium_ratio}*($_->{purity}//1)))}
+        @sodium_forms,
+    );
+
+    my %args = @_;
+    my $quantity = Physics::Unit->new($args{quantity});
+    return [412, "Must be a Mass quantity"] unless $quantity->type eq 'Mass';
+
+    if ($args{to_unit}) {
+        my $new_amount = $quantity->convert($args{to_unit});
+        return [200, "OK", $new_amount];
+    } else {
+        my @rows;
+        for my $u (
+            @sodium_forms,
+        ) {
+            push @rows, {
+                amount => $quantity->convert($u->{name}),
+                unit => $u->{name},
+                summary => $u->{summary},
+            };
+        }
+        [200, "OK", \@rows, {
+            'table.fields' => [qw/amount unit summary/],
+            'table.field_formats'=>[[number=>{thousands_sep=>'', precision=>3}], undef, undef],
+            'table.field_aligns' => [qw/number left left/],
+        }];
+    }
+}
+
 1;
 # ABSTRACT: Utilities related to mineral supplements
 
@@ -200,7 +424,7 @@ App::MineralUtils - Utilities related to mineral supplements
 
 =head1 VERSION
 
-This document describes version 0.007 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2021-12-11.
+This document describes version 0.008 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2022-06-17.
 
 =head1 DESCRIPTION
 
@@ -209,6 +433,10 @@ This distributions provides the following command-line utilities:
 =over
 
 =item * L<convert-magnesium-unit>
+
+=item * L<convert-potassium-unit>
+
+=item * L<convert-sodium-unit>
 
 =back
 
@@ -300,12 +528,12 @@ Result:
    ],
    {
      "table.fields"        => ["amount", "unit", "summary"],
+     "table.field_aligns"  => ["number", "left", "left"],
      "table.field_formats" => [
-                                ["number", { precision => 3, thousands_sep => "" }],
+                                ["number", { thousands_sep => "", precision => 3 }],
                                 undef,
                                 undef,
                               ],
-     "table.field_aligns"  => ["number", "left", "left"],
    },
  ]
 
@@ -338,6 +566,190 @@ Result:
 Result:
 
  [200, "OK", 250, {}]
+
+=back
+
+If target unit is not specified, will show all known conversions.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<quantity> => I<str> (default: "1 mg")
+
+=item * B<to_unit> => I<str>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 convert_potassium_unit
+
+Usage:
+
+ convert_potassium_unit(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Convert a potassium quantity from one unit to another.
+
+Examples:
+
+=over
+
+=item * Show all possible conversions:
+
+ convert_potassium_unit();
+
+Result:
+
+ [
+   200,
+   "OK",
+   [
+     {
+       amount  => 1,
+       unit    => "mg-k-elem",
+       summary => "Elemental potassium, in milligrams",
+     },
+     {
+       amount  => 1.90839694656489,
+       unit    => "mg-k-chloride",
+       summary => "Potassium chloride (KCl), in milligrams",
+     },
+     {
+       amount  => 1.90839694656489,
+       unit    => "mg-k-cl",
+       summary => "Potassium chloride (KCl), in milligrams",
+     },
+     {
+       amount  => 7.8125,
+       unit    => "mg-k-citrate",
+       summary => "Potassium citrate (K3C6H5O7), in milligrams",
+     },
+   ],
+   {
+     "table.field_aligns"  => ["number", "left", "left"],
+     "table.field_formats" => [
+                                ["number", { thousands_sep => "", precision => 3 }],
+                                undef,
+                                undef,
+                              ],
+     "table.fields"        => ["amount", "unit", "summary"],
+   },
+ ]
+
+=item * How much of potassium chloride provides 1000 mg of elemental potassium?:
+
+ convert_potassium_unit(quantity => "1000 mg-k-elem", to_unit => "mg-k-cl");
+
+Result:
+
+ [200, "OK", 1908.39694656489, {}]
+
+=back
+
+If target unit is not specified, will show all known conversions.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<quantity> => I<str> (default: "1 mg")
+
+=item * B<to_unit> => I<str>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 convert_sodium_unit
+
+Usage:
+
+ convert_sodium_unit(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Convert a sodium quantity from one unit to another.
+
+Examples:
+
+=over
+
+=item * Show all possible conversions:
+
+ convert_sodium_unit();
+
+Result:
+
+ [
+   200,
+   "OK",
+   [
+     {
+       amount  => 1,
+       unit    => "mg-na-elem",
+       summary => "Elemental sodium, in milligrams",
+     },
+     {
+       amount  => 2.54452926208651,
+       unit    => "mg-na-chloride",
+       summary => "Sodium chloride (NaCl), in milligrams",
+     },
+     {
+       amount  => 2.54452926208651,
+       unit    => "mg-na-cl",
+       summary => "Sodium chloride (NaCl), in milligrams",
+     },
+     {
+       amount  => 11.2359550561798,
+       unit    => "mg-na-citrate",
+       summary => "Sodium citrate (Na3C6H5O7), in milligrams",
+     },
+   ],
+   {
+     "table.field_formats" => [
+                                ["number", { thousands_sep => "", precision => 3 }],
+                                undef,
+                                undef,
+                              ],
+     "table.field_aligns"  => ["number", "left", "left"],
+     "table.fields"        => ["amount", "unit", "summary"],
+   },
+ ]
+
+=item * How much of sodium chloride provides 1000 mg of elemental sodium?:
+
+ convert_sodium_unit(quantity => "1000 mg-na-elem", to_unit => "mg-na-cl");
+
+Result:
+
+ [200, "OK", 2544.52926208651, {}]
 
 =back
 
@@ -404,7 +816,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

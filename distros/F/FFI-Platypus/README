@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.56
+    version 1.58
 
 SYNOPSIS
 
@@ -27,11 +27,11 @@ DESCRIPTION
     Platypus is a library for creating interfaces to machine code libraries
     written in languages like C, C++, Go, Fortran, Rust, Pascal.
     Essentially anything that gets compiled into machine code. This
-    implementation uses libffi to accomplish this task. libffi is battle
-    tested by a number of other scripting and virtual machine languages,
-    such as Python and Ruby to serve a similar role. There are a number of
-    reasons why you might want to write an extension with Platypus instead
-    of XS:
+    implementation uses libffi <https://sourceware.org/libffi/> to
+    accomplish this task. libffi is battle tested by a number of other
+    scripting and virtual machine languages, such as Python and Ruby to
+    serve a similar role. There are a number of reasons why you might want
+    to write an extension with Platypus instead of XS:
 
     FFI / Platypus does not require messing with the guts of Perl
 
@@ -1719,9 +1719,7 @@ CONTRIBUTING
 
 SEE ALSO
 
-    NativeCall
-
-      Promising interface to Platypus inspired by Raku.
+ Extending Platypus
 
     FFI::Platypus::Type
 
@@ -1746,13 +1744,11 @@ SEE ALSO
 
       Memory functions for FFI.
 
-    FFI::CheckLib
-
-      Find dynamic libraries in a portable way.
+ Languages
 
     FFI::TinyCC
 
-      JIT compiler for FFI.
+      JIT C compiler for FFI.
 
     FFI::Platypus::Lang::C
 
@@ -1795,6 +1791,12 @@ SEE ALSO
       call functions written in any language supported by WebAssembly.
       These modules are also implemented using Platypus.
 
+ Other Tools Related Tools Useful for FFI
+
+    FFI::CheckLib
+
+      Find dynamic libraries in a portable way.
+
     Convert::Binary::C
 
       A great interface for decoding C data structures, including structs,
@@ -1809,6 +1811,17 @@ SEE ALSO
       This module can extract constants and other useful objects from C
       header files that may be relevant to an FFI application. One downside
       is that its use may require development packages to be installed.
+
+ Other Foreign Function Interfaces
+
+    Dyn
+
+      A wrapper around dyncall <https://dyncall.org>, which is itself an
+      alternative to libffi <https://sourceware.org/libffi/>.
+
+    NativeCall
+
+      Promising interface to Platypus inspired by Raku.
 
     Win32::API
 
@@ -1835,15 +1848,17 @@ SEE ALSO
 
       Embed a tiny C compiler into your Perl scripts.
 
-    Alien::FFI
-
-      Provides libffi for Platypus during its configuration and build
-      stages.
-
     P5NCI
 
       Yet another FFI like interface that does not appear to be supported
       or under development anymore.
+
+ Other
+
+    Alien::FFI
+
+      Provides libffi for Platypus during its configuration and build
+      stages.
 
 ACKNOWLEDGMENTS
 
@@ -1905,8 +1920,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2015,2016,2017,2018,2019,2020 by Graham
-    Ollis.
+    This software is copyright (c) 2015-2022 by Graham Ollis.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

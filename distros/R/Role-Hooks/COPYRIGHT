@@ -19,6 +19,7 @@ Files: Changes
  META.json
  META.yml
  doap.ttl
+ t/30inflate.t
 Copyright: Copyright 2022 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
@@ -38,16 +39,16 @@ Files: README
 Copyright: This software is copyright (c) 2020-2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/01basic.t
-Copyright: This software is copyright (c) 2020 by Toby Inkster.
+Files: t/20packagevariant.t
+Copyright: This software is copyright (c) 2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/rt-133595.t
 Copyright: This software is copyright (c) 2020 by Gianni Ceccarelli.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/20packagevariant.t
-Copyright: This software is copyright (c) 2022 by Toby Inkster.
+Files: t/01basic.t
+Copyright: This software is copyright (c) 2020 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

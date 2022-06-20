@@ -23,7 +23,7 @@ package My::Thing {
       includes => ['async'];
     use IO::Async::Loop;
 
-    field output => ( is => 'rw', isa => Str, default => '' );
+    field output => ( is => 'rw', isa => Str );
 
     async sub doit ( $self, @list ) {
         my $loop = IO::Async::Loop->new;
@@ -41,7 +41,7 @@ package My::Async::Role {
       includes => ['async'];
     use IO::Async::Loop;
 
-    field output => ( is => 'rw', isa => Str, default => '' );
+    field output => ( is => 'rw', isa => Str );
 
     async sub doit ( $self, @list ) {
         my $loop = IO::Async::Loop->new;
@@ -66,7 +66,7 @@ my %cases = (
 while ( my ( $name, $class ) = each %cases ) {
     subtest "async in $name" => sub {
         ok my $async = $class->new, "We should be allowed to load $name with ascync";
-        is $async->output, '', 'Our output should start empty';
+        ok !defined $async->output, 'Our output should start empty';
 
         my $future1 = $async->doit(qw/one two three four/);
         is $async->output, '> ', 'Before we get compute our async result, the initial output should be set';

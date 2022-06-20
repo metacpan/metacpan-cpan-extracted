@@ -4,7 +4,7 @@ use v5.12;
 
 package Chart::Composite;
 our @ISA     = qw(Chart::Base);
-our $VERSION = 'v2.402.1';
+our $VERSION = 'v2.402.3';
 
 use Chart::Base;
 use GD;
@@ -202,63 +202,26 @@ sub _split_data
     $self->{'sub_0'} = ( "Chart::" . $types[0] )->new();
     $self->{'sub_1'} = ( "Chart::" . $types[1] )->new();
 
-    # set the options (set the min_val, max_val, brush_size, y_ticks,
-    #
-    # options intelligently so that the sub-objects don't get
-    # confused)
+    # forward  options to sub-objects (set the min_val, max_val, brush_size, y_ticks,
+    
     $self->{'sub_0'}->set( %{ $self->{'opts'} } );
     $self->{'sub_1'}->set( %{ $self->{'opts'} } );
-    if ( defined( $self->{'opts'}{'min_val1'} ) )
-    {
-        $self->{'sub_0'}->set( 'min_val' => $self->{'opts'}{'min_val1'} );
-    }
-    if ( defined( $self->{'opts'}{'max_val1'} ) )
-    {
-        $self->{'sub_0'}->set( 'max_val' => $self->{'opts'}{'max_val1'} );
-    }
-    if ( defined( $self->{'opts'}{'min_val2'} ) )
-    {
-        $self->{'sub_1'}->set( 'min_val' => $self->{'opts'}{'min_val2'} );
-    }
-    if ( defined( $self->{'opts'}{'max_val2'} ) )
-    {
-        $self->{'sub_1'}->set( 'max_val' => $self->{'opts'}{'max_val2'} );
-    }
-    if ( $self->{'opts'}{'y_ticks1'} )
-    {
-        $self->{'sub_0'}->set( 'y_ticks' => $self->{'opts'}{'y_ticks1'} );
-    }
-    if ( $self->{'opts'}{'y_ticks2'} )
-    {
-        $self->{'sub_1'}->set( 'y_ticks' => $self->{'opts'}{'y_ticks2'} );
-    }
-    if ( $self->{'opts'}{'brush_size1'} )
-    {
-        $self->{'sub_0'}->set( 'brush_size' => $self->{'opts'}{'brush_size1'} );
-    }
-    if ( $self->{'opts'}{'brush_size2'} )
-    {
-        $self->{'sub_1'}->set( 'brush_size' => $self->{'opts'}{'brush_size2'} );
-    }
-
-    if ( $self->{'opts'}{'brushStyle1'} )
-    {
-        $self->{'sub_0'}->set( 'brushStyle' => $self->{'opts'}{'brushStyle1'} );
-    }
-    if ( $self->{'opts'}{'brushStyle2'} )
-    {
-        $self->{'sub_1'}->set( 'brushStyle' => $self->{'opts'}{'brushStyle2'} );
-    }
-
+    
+    $self->{'sub_0'}->set( 'min_val' => $self->{'opts'}{'min_val1'} ) if defined $self->{'opts'}{'min_val1'};
+    $self->{'sub_0'}->set( 'max_val' => $self->{'opts'}{'max_val1'} ) if defined $self->{'opts'}{'max_val1'};
+    $self->{'sub_1'}->set( 'min_val' => $self->{'opts'}{'min_val2'} ) if defined $self->{'opts'}{'min_val2'};
+    $self->{'sub_1'}->set( 'max_val' => $self->{'opts'}{'max_val2'} ) if defined $self->{'opts'}{'max_val2'};
+    $self->{'sub_0'}->set( 'y_ticks' => $self->{'opts'}{'y_ticks1'} ) if $self->{'opts'}{'y_ticks1'};
+    $self->{'sub_1'}->set( 'y_ticks' => $self->{'opts'}{'y_ticks2'} ) if $self->{'opts'}{'y_ticks2'};
+    $self->{'sub_0'}->set( 'brush_size' => $self->{'opts'}{'brush_size1'} ) if $self->{'opts'}{'brush_size1'};
+    $self->{'sub_1'}->set( 'brush_size' => $self->{'opts'}{'brush_size2'} ) if $self->{'opts'}{'brush_size2'};
+    $self->{'sub_0'}->set( 'brushStyle' => $self->{'opts'}{'brushStyle1'} ) if $self->{'opts'}{'brushStyle1'};
+    $self->{'sub_0'}->set( 'brushStyle' => $self->{'opts'}{'brushStyle1'} ) if $self->{'opts'}{'brush_style1'};
+    $self->{'sub_1'}->set( 'brushStyle' => $self->{'opts'}{'brushStyle2'} ) if $self->{'opts'}{'brushStyle2'};
+    $self->{'sub_1'}->set( 'brushStyle' => $self->{'opts'}{'brushStyle2'} ) if $self->{'opts'}{'brush_style2'};
     #  f_y_tick for left and right axis
-    if ( defined( $self->{'opts'}{'f_y_tick1'} ) )
-    {
-        $self->{'sub_0'}->set( 'f_y_tick' => $self->{'opts'}{'f_y_tick1'} );
-    }
-    if ( defined( $self->{'opts'}{'f_y_tick2'} ) )
-    {
-        $self->{'sub_1'}->set( 'f_y_tick' => $self->{'opts'}{'f_y_tick2'} );
-    }
+    $self->{'sub_0'}->set( 'f_y_tick' => $self->{'opts'}{'f_y_tick1'} ) if defined $self->{'opts'}{'f_y_tick1'};
+    $self->{'sub_1'}->set( 'f_y_tick' => $self->{'opts'}{'f_y_tick2'} ) if defined $self->{'opts'}{'f_y_tick2'};
 
     # replace the gd_obj fields
     $self->{'sub_0'}->{'gd_obj'} = $self->{'gd_obj'};

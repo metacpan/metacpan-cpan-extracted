@@ -1,3 +1,10 @@
+0.879   2022-05-14  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention gen-pod-for-pericmd-script.
+
+
 0.878   2021-05-31  Released-By: PERLANCAR; Urgency: medium
 
 	- Remove leading indentation in single-line argument dump.

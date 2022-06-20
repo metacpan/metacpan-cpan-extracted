@@ -26,7 +26,7 @@ no_index:
 provides:
   Data::Gimei:
     file: lib/Data/Gimei.pm
-    version: v0.1.1
+    version: v0.2.0
   Data::Gimei::Address:
     file: lib/Data/Gimei/Address.pm
   Data::Gimei::Name:
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://github.com/youpong/pl-gimei/issues
   homepage: https://github.com/youpong/pl-gimei
   repository: git://github.com/youpong/pl-gimei.git
-version: v0.1.1
+version: v0.2.0
 x_authority: cpan:YOUPONG
 x_contributors:
   - 'NAKAJIMA Yusaku <yupong7@gmail.com>'

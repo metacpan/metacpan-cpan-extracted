@@ -15,11 +15,7 @@ SYNOPSIS
 
     But Mom takes care of a lot more. This:
 
-      use Mom q{
-        foo
-        bar   :rw :type(Int)
-        baz   :required
-      };
+      use Mom q{ foo bar:rw:type(Int) baz! };
 
     Is (roughly) a shortcut for:
 
@@ -62,19 +58,7 @@ DESCRIPTION
 
     I thought I could go even shorter.
 
-      use Mom q{
-        hro   :required
-        hlazy :lazy     :default(2)
-        hrwp  :required :rwp
-        hrw   :required :rw
-      };
-
-    Is it a lot shorter? No, but that's mostly because MooX::ShortHas makes it
-    very concise to write required attributes, and uses that in the
-    demonstration but less concise for optional attributes. If we make the
-    attributes optional, it becomes shorter.
-
-      use Mom q{ hro hlazy :lazy :default(2) hrwp :rwp hrw :rw };
+      use Mom q{ hro! hlazy:lazy:default(2) hrwp!:rwp hrw!:rw };
 
 IMPORT
     All of Mom's magic happens in the import statement.
@@ -95,7 +79,7 @@ IMPORT
     `:lazy`
         Like `lazy => 1` in Moo.
 
-    `:required`
+    `:required` or `:req` or `!`
         Like `required => 1` in Moo.
 
     `:clearer`
@@ -138,6 +122,9 @@ IMPORT
 
         Currently no support for a hashref of delegations.
 
+    :handles(1) or :handles(2)
+        Like MooX::Enumeration.
+
   Flags Affecting Package
     `:role`
         Creates a Moo::Role instead of a Moo class.
@@ -177,7 +164,7 @@ AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2020 by Toby Inkster.
+    This software is copyright (c) 2020, 2022 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

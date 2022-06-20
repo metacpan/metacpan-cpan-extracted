@@ -42,7 +42,7 @@ use App::Regather::Plugin;
 use constant SYNST => [ qw( LDAP_SYNC_PRESENT LDAP_SYNC_ADD LDAP_SYNC_MODIFY LDAP_SYNC_DELETE ) ];
 
 # my @DAEMONARGS = ($0, @ARGV);
-our $VERSION   = '0.82.00';
+our $VERSION   = '0.83.00';
 
 sub new {
   my $class = shift;
@@ -424,7 +424,7 @@ sub ldap_search_callback {
       #######################################################################
 
       ### LDAP_SYNC_DELETE arrives for both cases, object deletetion and attribute
-      ### deletion and in both cases Net::LDAP::Entry provided contains only DN,
+      ### deletion and in both cases Net::LDAP::Entry obj, provided contains only DN,
       ### so, we need to "re-construct" it for further processing
       if ( $st == LDAP_SYNC_DELETE ) {
 	$mesg = $self->o('ldap')->search( base     => $self->cf->get(qw(ldap srch log_base)),
@@ -442,9 +442,19 @@ sub ldap_search_callback {
 	  $self->l->cc_ldap_err( mesg => $mesg );
 	  # exit $mesg->code; # !!! NEED TO DECIDE WHAT TO DO
 	} else {
-	  $entry = pop @{[$mesg->sorted]};
+	  if ( $mesg->count == 0 ) {
+	    $self->l->cc( pr => 'err', nt => 1,
+			  fm => "%s:%s: LDAP accesslog search on %s, returned no result:\n% 13s%s\n% 13s%s\n% 13s%s\n\n",
+			  ls => [ __FILE__,__LINE__, SYNST->[$st],
+				  'base: ',   $self->cf->get(qw(ldap srch log_base)),
+				  'scope: ',  'sub',
+				  'filter: ', '(reqDN=' . $obj->dn . ')' ] );
+	    return;
+	  } else {
+	    $entry = pop @{[$mesg->sorted]};
+	  }
 
-	  if ( ! $entry->isa('Net::LDAP::Entry') ) {
+	  if ( defined $entry && ! $entry->isa('Net::LDAP::Entry') ) {
 	    $self->l->cc( pr => 'err', nt => 1,
 		      fm => "%s:%s: LDAP accesslog search on %s, returned no result:\n% 13s%s\n% 13s%s\n% 13s%s\n\n",
 		      ls => [ __FILE__,__LINE__, SYNST->[$st],
@@ -452,7 +462,7 @@ sub ldap_search_callback {
 			      'scope: ',  'sub',
 			      'filter: ', '(reqDN=' . $obj->dn . ')' ] );
 	    return;
-	  } elsif ( $entry->get_value('reqType') eq 'delete' ) {
+	  } elsif ( defined $entry && $entry->get_value('reqType') eq 'delete' ) {
 	    my $reqold = 'dn: ' . $obj->dn;
 	    foreach ( @{$entry->get_value('reqOld', asref => 1)} ) {
 	      s/^(.*;binary:) .*$/$1: c3R1Yg==/agis;
@@ -471,7 +481,7 @@ sub ldap_search_callback {
 	    }
 	    $obj = $entry;
 	    $ldif->done;
-	  } elsif ( $entry->get_value('reqType') eq 'modify' ) {
+	  } elsif ( defined $entry && $entry->get_value('reqType') eq 'modify' ) {
 	    ### here we re-assemble $obj to have all attributes before deletion and since
 	    ### after that it'll has ctrl_attr but reqType=delete, it'll go to $st == LDAP_SYNC_DELETE
 	    %reqmod = map  { substr($_, 0, -2) => 1 } grep { /^(.*):-$/g }
@@ -496,6 +506,14 @@ sub ldap_search_callback {
 	    }
 	    $self->l->cc( pr => 'debug', fm => "%s:%s: %s reqType=modify reqMod: %s",
 		      ls => [ __FILE__,__LINE__, SYNST->[$st], \%reqmod ] )	if $self->o('v') > 3;
+	  } else {
+	    $self->l->cc( pr => 'err', nt => 1,
+		      fm => "%s:%s: LDAP accesslog search on %s, returned an object but it's something wrong with it:\n% 13s%s\n% 13s%s\n% 13s%s\n\n",
+		      ls => [ __FILE__,__LINE__, SYNST->[$st],
+			      'base: ',   $self->cf->get(qw(ldap srch log_base)),
+			      'scope: ',  'sub',
+			      'filter: ', '(reqDN=' . $obj->dn . ')' ] );
+	    return;
 	  }
 	}
       } elsif ( $st == LDAP_SYNC_MODIFY ) {
@@ -591,7 +609,7 @@ sub ldap_search_callback {
 		    $obj->replace( $rdn => $entries[scalar(@entries) - 2]->get_value($rdn) );
 		  } else {
 		    $self->l->cc( pr => 'err', nt => 1,
-			      fm => "%s:%s: %s object (before ModRDN) to delete not found! accesslog reqType=add object nod found\n\nobject reqEntryUUID=%s should be processed manually",
+			      fm => "%s:%s: %s object (before ModRDN) to delete not found! accesslog reqType=add object not found, object reqEntryUUID=%s should be processed manually",
 			      ls => [ __FILE__,__LINE__, SYNST->[$st], $entry->get_value('reqEntryUUID') ] );
 		  }
 		}
@@ -640,18 +658,18 @@ sub ldap_search_callback {
 	# 				 params => [ 1, 2, 3]} )->run;
 	foreach my $svc ( @{$self->cf->get('service', $s, 'plugin')} ) {
 	  App::Regather::Plugin->new( $svc, {
-					cf           => $self->cf,
-					force        => $self->o('force'),
-					log          => $self->l,
-					obj          => $obj,
-					out_file_old => $out_file_old,
-					prog         => sprintf("%s v.%s", $self->progname, $VERSION),
-					rdn          => $rdn,
-					s            => $s,
-					st           => $st,
-					ts_fmt       => $self->o('ts_fmt'),
-					v            => $self->o('v'),
-				       } )->ldap_sync_add_modify;
+					     cf           => $self->cf,
+					     force        => $self->o('force'),
+					     log          => $self->l,
+					     obj          => $obj,
+					     out_file_old => $out_file_old,
+					     prog         => sprintf("%s v.%s", $self->progname, $VERSION),
+					     rdn          => $rdn,
+					     s            => $s,
+					     st           => $st,
+					     ts_fmt       => $self->o('ts_fmt'),
+					     v            => $self->o('v'),
+					    } )->ldap_sync_add_modify;
 	}
 
 	#######################################################################
@@ -661,18 +679,18 @@ sub ldap_search_callback {
 
 	foreach my $svc ( @{$self->cf->get('service', $s, 'plugin')} ) {
 	  App::Regather::Plugin->new( $svc, {
-					cf           => $self->cf,
-					force        => $self->o('force'),
-					log          => $self->l,
-					obj          => $obj,
-					out_file_old => $out_file_old,
-					prog         => sprintf("%s v.%s", $self->progname, $VERSION),
-					rdn          => $rdn,
-					s            => $s,
-					st           => $st,
-					ts_fmt       => $self->o('ts_fmt'),
-					v            => $self->o('v'),
-				       } )->ldap_sync_delete;
+					     cf           => $self->cf,
+					     force        => $self->o('force'),
+					     log          => $self->l,
+					     obj          => $obj,
+					     out_file_old => $out_file_old,
+					     prog         => sprintf("%s v.%s", $self->progname, $VERSION),
+					     rdn          => $rdn,
+					     s            => $s,
+					     st           => $st,
+					     ts_fmt       => $self->o('ts_fmt'),
+					     v            => $self->o('v'),
+					    } )->ldap_sync_delete;
 	}
 
       }

@@ -4,7 +4,7 @@
 use v5.12;
 
 package Chart::BrushStyles;
-our $VERSION = 'v2.402.1';
+our $VERSION = 'v2.402.3';
 
 use Carp;
 use GD;

@@ -1,5 +1,5 @@
 package Dist::Zilla::MintingProfile::Author::WATERKIP;
-our $VERSION = '3.0';
+our $VERSION = '3.1';
 use Moose;
 with 'Dist::Zilla::Role::MintingProfile::ShareDir';
 use namespace::clean;
@@ -20,7 +20,7 @@ Dist::Zilla::MintingProfile::Author::WATERKIP - A minting profile with WATERKIP 
 
 =head1 VERSION
 
-version 3.0
+version 3.1
 
 =head1 SYNOPSIS
 

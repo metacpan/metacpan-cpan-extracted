@@ -1,5 +1,9 @@
 Revision history for MIDI-Bassline-Walk
 
+0.0312 2022-06-16 20:10:09
+    - Improve documentation.
+    - Use Music::PitchNum instead of doing Music::Note gymnastics.
+
 0.0311 2022-01-26 21:50:58
     - Fix-up the "closest element" logic.
     - Improve documentation.

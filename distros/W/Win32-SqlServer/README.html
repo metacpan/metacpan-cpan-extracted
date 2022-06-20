@@ -16,11 +16,11 @@ small {font-size: 90%;}
 </STYLE>
 </HEAD>
 <BODY>
-<H1 ALIGN="center">Win32::SqlServer 2.013</H1>
+<H1 ALIGN="center">Win32::SqlServer 2.014</H1>
 <UL>
 <P>This is Win32::SqlServer, a module for calling Microsoft SQL Server from Perl
   through OLE DB. </P>
-<P> Copyright © 2004-2021 Erland Sommarskog.
+<P> Copyright © 2004-2022 Erland Sommarskog.
   All rights reserved.</P>
 <P> This program is free software; you can redistribute it and/or modify it under
   the same terms as Perl itself. </P>
@@ -39,7 +39,7 @@ verbose code. A special feature of Win32::SqlServer is that you get fine-grained
   <LI> Perl 5.12 or later. (That is what the <CODE>require</CODE> says. However, I don't aim to support older versions than Perl 5.24)</LI>
   <LI>Windows 7 SP1 or later (Client O/S), Windows Server 2008 R2 SP1 or later (Server O/S). Depending on which compiler you use to build the module, you may need to install  the update in <A HREF="https://support.microsoft.com/en-us/help/2999226/update-for-universal-c-runtime-in-windows">KB2999226</A> if you are on versions before Windows 10.</LI>
   <LI> SQL Server 2000 or later. The module should work with Azure SQL Database and Azure Managed Instance, but I have not tested against these platforms.</LI>
-  <LI> An OLE DB provider for SQL Server. SQLOLEDB comes with the OS, but it is very outdated. I recommend downloading and installing <A HREF="http://www.microsoft.com/download/details.aspx?id=56730">Microsoft OLE DB Driver for SQL Server</A>, originally released in March 2018. I recommend that you use version 18.2.1 or later.</LI>
+  <LI> An OLE DB provider for SQL Server. SQLOLEDB comes with the OS, but it is very outdated. I recommend that you download and install <A HREF="https://docs.microsoft.com/en-us/sql/connect/oledb/download-oledb-driver-for-sql-server">Microsoft OLE DB Driver for SQL Server</A>, originally released in March 2018. I recommend that you use version 18.2.1 or later.</LI>
 </UL>
 <P>For details, see the <A HREF="Win32-SqlServer.html#Prerequisites">Prerequisites</A> section in the Win32::SqlServer manual.</P>
 <P>Prerequisites for building, see below under <A HREF="#build_src">Building from
@@ -78,7 +78,7 @@ I usually try to respond within 24-48 hours, but if I am on holiday I am.</P>
 <A HREF="http://www.microsoft.com/downloads/details.aspx?FamilyId=F26B1AA4-741A-433A-9BE5-FA919850BDBF&amp;displaylang=en">Windows SDK for Windows Server 2008 and .NET Framework 3.5</A>.
 (The link is the current as of this writing. Microsoft often twitches things
 around, so you have to search for it.)</LI>
-<LI> The SDK (header files and link libraries) for <A HREF="http://www.microsoft.com/download/details.aspx?id=56730">Microsoft OLE DB Driver for SQL Server</A>. Note that the SDK files are not installed by default when you install the provider.</LI>
+<LI> The SDK (header files and link libraries) for <A HREF="https://docs.microsoft.com/en-us/sql/connect/oledb/download-oledb-driver-for-sql-server">Microsoft OLE DB Driver 19 for SQL Server</A>. Note that the SDK files are not installed by default when you install the provider.</LI>
 <LI>Perl 5.12 or later (but beware that I have not tested any earlier version than Perl 5.24.)</LI>
 <LI> A C++ compiler, preferably Visual C++ 14.0 or later. If you don&#39;t have
   Visual Studio, the Windows SDK (see above), comes with one. I have only tested with the C++ compiler from Visual Studio 2017.</LI>
@@ -114,7 +114,7 @@ prompt.</P>
 </OL>
 <HR />
 <I>
-Last updated <!--$$Modtime:--> 21-07-12 23:18 <!-- $-->
+Last updated <!--$$Modtime:--> 22-05-29 20:35 <!-- $-->
 </I>
 </BODY>
 </HTML>

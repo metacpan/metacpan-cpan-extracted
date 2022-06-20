@@ -1,0 +1,289 @@
+NAME
+    Bencher::Scenario::List::Util - Benchmark List::Util (XS) vs PP
+    implementation(s)
+
+VERSION
+    This document describes version 0.051 of Bencher::Scenario::List::Util
+    (from Perl distribution Bencher-Scenario-List-Util), released on
+    2022-05-07.
+
+SYNOPSIS
+    To run benchmark with default option:
+
+     % bencher -m List::Util
+
+    To run module startup overhead benchmark:
+
+     % bencher --module-startup -m List::Util
+
+    For more options (dump scenario, list/include/exclude/add participants,
+    list/include/exclude/add datasets, etc), see bencher or run "bencher
+    --help".
+
+DESCRIPTION
+    EARLY VERSION, ONLY A FEW FUNCTIONS HAVE BEEN BENCHMARKED.
+
+    For max*/min*, in general the XS version are about 3x faster than PP.
+
+    Packaging a benchmark script as a Bencher scenario makes it convenient
+    to include/exclude/add participants/datasets (either via CLI or Perl
+    code), send the result to a central repository, among others . See
+    Bencher and bencher (CLI) for more details.
+
+BENCHMARKED MODULES
+    Version numbers shown below are the versions used when running the
+    sample benchmark.
+
+    List::Util 1.56
+
+    PERLANCAR::List::Util::PP 0.04
+
+BENCHMARK PARTICIPANTS
+    *   List::Util::max (perl_code) [numeric]
+
+        Function call template:
+
+         List::Util::max(@{<list>})
+
+    *   PERLANCAR::List::Util::PP::max (perl_code) [numeric]
+
+        Function call template:
+
+         PERLANCAR::List::Util::PP::max(@{<list>})
+
+    *   List::Util::maxstr (perl_code) [stringy]
+
+        Function call template:
+
+         List::Util::maxstr(@{<list>})
+
+    *   PERLANCAR::List::Util::PP::maxstr (perl_code) [stringy]
+
+        Function call template:
+
+         PERLANCAR::List::Util::PP::maxstr(@{<list>})
+
+    *   List::Util::min (perl_code) [numeric]
+
+        Function call template:
+
+         List::Util::min(@{<list>})
+
+    *   PERLANCAR::List::Util::PP::min (perl_code) [numeric]
+
+        Function call template:
+
+         PERLANCAR::List::Util::PP::min(@{<list>})
+
+    *   List::Util::minstr (perl_code) [stringy]
+
+        Function call template:
+
+         List::Util::minstr(@{<list>})
+
+    *   PERLANCAR::List::Util::PP::minstr (perl_code) [stringy]
+
+        Function call template:
+
+         PERLANCAR::List::Util::PP::minstr(@{<list>})
+
+BENCHMARK DATASETS
+    *   num10
+
+    *   num100
+
+    *   num1000
+
+    *   str10
+
+    *   str100
+
+    *   str1000
+
+BENCHMARK SAMPLE RESULTS
+  Sample benchmark #1
+    Run on: perl: *v5.34.0*, CPU: *Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz
+    (4 cores)*, OS: *GNU/Linux LinuxMint version 19*, OS kernel: *Linux
+    version 5.3.0-68-generic*.
+
+    Benchmark command (default options):
+
+     % bencher -m List::Util
+
+    Result formatted as table:
+
+     #table1#
+     +-----------------------------------+---------+---------+------------+------------+-----------------------+-----------------------+---------+---------+
+     | participant                       | dataset | p_tags  | rate (/s)  | time (μs)  | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     +-----------------------------------+---------+---------+------------+------------+-----------------------+-----------------------+---------+---------+
+     | PERLANCAR::List::Util::PP::maxstr | num1000 | stringy |    6135.85 | 162.977    |                 0.00% |             55156.61% |   0     |      20 |
+     | PERLANCAR::List::Util::PP::minstr | num1000 | stringy |    6289.97 | 158.983    |                 2.51% |             53802.63% |   0     |      20 |
+     | PERLANCAR::List::Util::PP::maxstr | str1000 | stringy |    7710    | 130        |                25.70% |             43859.94% | 4.7e-08 |      26 |
+     | PERLANCAR::List::Util::PP::minstr | str1000 | stringy |    9283.05 | 107.723    |                51.29% |             36423.12% |   0     |      20 |
+     | List::Util::minstr                | num1000 | stringy |   10000    |  95        |                71.11% |             32193.44% | 1.1e-07 |      20 |
+     | List::Util::maxstr                | num1000 | stringy |   11000    |  93        |                75.33% |             31415.40% | 1.1e-07 |      20 |
+     | PERLANCAR::List::Util::PP::max    | num1000 | numeric |   11000    |  90        |                80.96% |             30435.28% | 1.1e-07 |      20 |
+     | PERLANCAR::List::Util::PP::min    | num1000 | numeric |   13429.3  |  74.4638   |               118.87% |             25146.66% |   0     |      20 |
+     | List::Util::minstr                | str1000 | stringy |   20700    |  48.2      |               237.92% |             16251.83% | 4.6e-08 |      27 |
+     | List::Util::maxstr                | str1000 | stringy |   20900    |  47.9      |               240.03% |             16150.30% | 1.1e-08 |      29 |
+     | List::Util::max                   | num1000 | numeric |   57543.4  |  17.3782   |               837.82% |              5792.00% |   0     |      21 |
+     | List::Util::min                   | num1000 | numeric |   57800    |  17.3      |               842.65% |              5761.81% | 5.6e-09 |      28 |
+     | PERLANCAR::List::Util::PP::maxstr | num100  | stringy |   65768.4  |  15.2049   |               971.87% |              5055.15% |   0     |      20 |
+     | PERLANCAR::List::Util::PP::minstr | num100  | stringy |   68589.6  |  14.5795   |              1017.85% |              4843.11% |   0     |      26 |
+     | PERLANCAR::List::Util::PP::maxstr | str100  | stringy |   76348.4  |  13.0979   |              1144.30% |              4340.78% |   0     |      20 |
+     | PERLANCAR::List::Util::PP::minstr | str100  | stringy |   91599.7  |  10.9171   |              1392.86% |              3601.39% |   0     |      20 |
+     | PERLANCAR::List::Util::PP::max    | num100  | numeric |  109301    |   9.14904  |              1681.35% |              3001.95% |   0     |      20 |
+     | List::Util::minstr                | num100  | stringy |  127000    |   7.87     |              1971.90% |              2566.96% | 3.3e-09 |      20 |
+     | List::Util::maxstr                | num100  | stringy |  128000    |   7.83     |              1982.55% |              2553.32% | 3.3e-09 |      20 |
+     | PERLANCAR::List::Util::PP::min    | num100  | numeric |  130770    |   7.64701  |              2031.25% |              2492.69% |   0     |      20 |
+     | List::Util::minstr                | str100  | stringy |  205000    |   4.89     |              3234.59% |              1557.07% | 1.6e-09 |      21 |
+     | List::Util::maxstr                | str100  | stringy |  210000    |   4.9      |              3253.86% |              1547.55% |   5e-09 |      20 |
+     | PERLANCAR::List::Util::PP::maxstr | num10   | stringy |  520000    |   1.92     |              8379.72% |               551.63% | 7.3e-10 |      26 |
+     | List::Util::max                   | num100  | numeric |  543000    |   1.84     |              8755.75% |               523.96% | 8.1e-10 |      21 |
+     | List::Util::min                   | num100  | numeric |  550379    |   1.81693  |              8869.89% |               516.02% |   0     |      20 |
+     | PERLANCAR::List::Util::PP::minstr | num10   | stringy |  616000    |   1.62     |              9935.11% |               450.63% | 7.3e-10 |      26 |
+     | PERLANCAR::List::Util::PP::maxstr | str10   | stringy |  664000    |   1.51     |             10713.89% |               410.98% | 3.6e-10 |      27 |
+     | PERLANCAR::List::Util::PP::minstr | str10   | stringy |  758910    |   1.3177   |             12268.50% |               346.75% | 5.5e-12 |      20 |
+     | PERLANCAR::List::Util::PP::max    | num10   | numeric |  891148    |   1.12215  |             14423.64% |               280.46% |   0     |      20 |
+     | PERLANCAR::List::Util::PP::min    | num10   | numeric | 1018900    |   0.981455 |             16505.63% |               232.76% |   0     |      20 |
+     | List::Util::maxstr                | num10   | stringy | 1100000    |   0.93     |             17388.70% |               215.96% | 1.7e-09 |      20 |
+     | List::Util::minstr                | num10   | stringy | 1075300    |   0.92996  |             17425.07% |               215.30% | 5.8e-12 |      20 |
+     | List::Util::maxstr                | str10   | stringy | 1670620    |   0.59858  |             27127.21% |               102.95% |   0     |      20 |
+     | List::Util::minstr                | str10   | stringy | 1692510    |   0.590839 |             27483.93% |               100.32% |   0     |      20 |
+     | List::Util::min                   | num10   | numeric | 3300000    |   0.3      |             54048.23% |                 2.05% | 4.2e-10 |      20 |
+     | List::Util::max                   | num10   | numeric | 3390000    |   0.295    |             55156.61% |                 0.00% |   1e-10 |      20 |
+     +-----------------------------------+---------+---------+------------+------------+-----------------------+-----------------------+---------+---------+
+
+    The above result formatted in Benchmark.pm style:
+
+                                   Rate  PLUP:m stringy num1000  PLUP:m stringy num1000  PLUP:m stringy str1000  PLUP:m stringy str1000  LU:m stringy num1000  LU:m stringy num1000  PLUP:m numeric num1000  PLUP:m numeric num1000  LU:m stringy str1000  LU:m stringy str1000  LU:m numeric num1000  LU:m numeric num1000  PLUP:m stringy num100  PLUP:m stringy num100  PLUP:m stringy str100  PLUP:m stringy str100  PLUP:m numeric num100  LU:m stringy num100  LU:m stringy num100  PLUP:m numeric num100  LU:m stringy str100  LU:m stringy str100  PLUP:m stringy num10  LU:m numeric num100  LU:m numeric num100  PLUP:m stringy num10  PLUP:m stringy str10  PLUP:m stringy str10  PLUP:m numeric num10  PLUP:m numeric num10  LU:m stringy num10  LU:m stringy num10  LU:m stringy str10  LU:m stringy str10  LU:m numeric num10  LU:m numeric num10 
+      PLUP:m stringy num1000  6135.85/s                      --                     -2%                    -20%                    -33%                  -41%                  -42%                    -44%                    -54%                  -70%                  -70%                  -89%                  -89%                   -90%                   -91%                   -91%                   -93%                   -94%                 -95%                 -95%                   -95%                 -96%                 -96%                  -98%                 -98%                 -98%                  -99%                  -99%                  -99%                  -99%                  -99%                -99%                -99%                -99%                -99%                -99%                -99% 
+      PLUP:m stringy num1000  6289.97/s                      2%                      --                    -18%                    -32%                  -40%                  -41%                    -43%                    -53%                  -69%                  -69%                  -89%                  -89%                   -90%                   -90%                   -91%                   -93%                   -94%                 -95%                 -95%                   -95%                 -96%                 -96%                  -98%                 -98%                 -98%                  -98%                  -99%                  -99%                  -99%                  -99%                -99%                -99%                -99%                -99%                -99%                -99% 
+      PLUP:m stringy str1000     7710/s                     25%                     22%                      --                    -17%                  -26%                  -28%                    -30%                    -42%                  -62%                  -63%                  -86%                  -86%                   -88%                   -88%                   -89%                   -91%                   -92%                 -93%                 -93%                   -94%                 -96%                 -96%                  -98%                 -98%                 -98%                  -98%                  -98%                  -98%                  -99%                  -99%                -99%                -99%                -99%                -99%                -99%                -99% 
+      PLUP:m stringy str1000  9283.05/s                     51%                     47%                     20%                      --                  -11%                  -13%                    -16%                    -30%                  -55%                  -55%                  -83%                  -83%                   -85%                   -86%                   -87%                   -89%                   -91%                 -92%                 -92%                   -92%                 -95%                 -95%                  -98%                 -98%                 -98%                  -98%                  -98%                  -98%                  -98%                  -99%                -99%                -99%                -99%                -99%                -99%                -99% 
+      LU:m stringy num1000      10000/s                     71%                     67%                     36%                     13%                    --                   -2%                     -5%                    -21%                  -49%                  -49%                  -81%                  -81%                   -83%                   -84%                   -86%                   -88%                   -90%                 -91%                 -91%                   -91%                 -94%                 -94%                  -97%                 -98%                 -98%                  -98%                  -98%                  -98%                  -98%                  -98%                -99%                -99%                -99%                -99%                -99%                -99% 
+      LU:m stringy num1000      11000/s                     75%                     70%                     39%                     15%                    2%                    --                     -3%                    -19%                  -48%                  -48%                  -81%                  -81%                   -83%                   -84%                   -85%                   -88%                   -90%                 -91%                 -91%                   -91%                 -94%                 -94%                  -97%                 -98%                 -98%                  -98%                  -98%                  -98%                  -98%                  -98%                -99%                -99%                -99%                -99%                -99%                -99% 
+      PLUP:m numeric num1000    11000/s                     81%                     76%                     44%                     19%                    5%                    3%                      --                    -17%                  -46%                  -46%                  -80%                  -80%                   -83%                   -83%                   -85%                   -87%                   -89%                 -91%                 -91%                   -91%                 -94%                 -94%                  -97%                 -97%                 -97%                  -98%                  -98%                  -98%                  -98%                  -98%                -98%                -98%                -99%                -99%                -99%                -99% 
+      PLUP:m numeric num1000  13429.3/s                    118%                    113%                     74%                     44%                   27%                   24%                     20%                      --                  -35%                  -35%                  -76%                  -76%                   -79%                   -80%                   -82%                   -85%                   -87%                 -89%                 -89%                   -89%                 -93%                 -93%                  -97%                 -97%                 -97%                  -97%                  -97%                  -98%                  -98%                  -98%                -98%                -98%                -99%                -99%                -99%                -99% 
+      LU:m stringy str1000      20700/s                    238%                    229%                    169%                    123%                   97%                   92%                     86%                     54%                    --                    0%                  -63%                  -64%                   -68%                   -69%                   -72%                   -77%                   -81%                 -83%                 -83%                   -84%                 -89%                 -89%                  -96%                 -96%                 -96%                  -96%                  -96%                  -97%                  -97%                  -97%                -98%                -98%                -98%                -98%                -99%                -99% 
+      LU:m stringy str1000      20900/s                    240%                    231%                    171%                    124%                   98%                   94%                     87%                     55%                    0%                    --                  -63%                  -63%                   -68%                   -69%                   -72%                   -77%                   -80%                 -83%                 -83%                   -84%                 -89%                 -89%                  -95%                 -96%                 -96%                  -96%                  -96%                  -97%                  -97%                  -97%                -98%                -98%                -98%                -98%                -99%                -99% 
+      LU:m numeric num1000    57543.4/s                    837%                    814%                    648%                    519%                  446%                  435%                    417%                    328%                  177%                  175%                    --                    0%                   -12%                   -16%                   -24%                   -37%                   -47%                 -54%                 -54%                   -55%                 -71%                 -71%                  -88%                 -89%                 -89%                  -90%                  -91%                  -92%                  -93%                  -94%                -94%                -94%                -96%                -96%                -98%                -98% 
+      LU:m numeric num1000      57800/s                    842%                    818%                    651%                    522%                  449%                  437%                    420%                    330%                  178%                  176%                    0%                    --                   -12%                   -15%                   -24%                   -36%                   -47%                 -54%                 -54%                   -55%                 -71%                 -71%                  -88%                 -89%                 -89%                  -90%                  -91%                  -92%                  -93%                  -94%                -94%                -94%                -96%                -96%                -98%                -98% 
+      PLUP:m stringy num100   65768.4/s                    971%                    945%                    754%                    608%                  524%                  511%                    491%                    389%                  217%                  215%                   14%                   13%                     --                    -4%                   -13%                   -28%                   -39%                 -48%                 -48%                   -49%                 -67%                 -67%                  -87%                 -87%                 -88%                  -89%                  -90%                  -91%                  -92%                  -93%                -93%                -93%                -96%                -96%                -98%                -98% 
+      PLUP:m stringy num100   68589.6/s                   1017%                    990%                    791%                    638%                  551%                  537%                    517%                    410%                  230%                  228%                   19%                   18%                     4%                     --                   -10%                   -25%                   -37%                 -46%                 -46%                   -47%                 -66%                 -66%                  -86%                 -87%                 -87%                  -88%                  -89%                  -90%                  -92%                  -93%                -93%                -93%                -95%                -95%                -97%                -97% 
+      PLUP:m stringy str100   76348.4/s                   1144%                   1113%                    892%                    722%                  625%                  610%                    587%                    468%                  267%                  265%                   32%                   32%                    16%                    11%                     --                   -16%                   -30%                 -39%                 -40%                   -41%                 -62%                 -62%                  -85%                 -85%                 -86%                  -87%                  -88%                  -89%                  -91%                  -92%                -92%                -92%                -95%                -95%                -97%                -97% 
+      PLUP:m stringy str100   91599.7/s                   1392%                   1356%                   1090%                    886%                  770%                  751%                    724%                    582%                  341%                  338%                   59%                   58%                    39%                    33%                    19%                     --                   -16%                 -27%                 -28%                   -29%                 -55%                 -55%                  -82%                 -83%                 -83%                  -85%                  -86%                  -87%                  -89%                  -91%                -91%                -91%                -94%                -94%                -97%                -97% 
+      PLUP:m numeric num100    109301/s                   1681%                   1637%                   1320%                   1077%                  938%                  916%                    883%                    713%                  426%                  423%                   89%                   89%                    66%                    59%                    43%                    19%                     --                 -13%                 -14%                   -16%                 -46%                 -46%                  -79%                 -79%                 -80%                  -82%                  -83%                  -85%                  -87%                  -89%                -89%                -89%                -93%                -93%                -96%                -96% 
+      LU:m stringy num100      127000/s                   1970%                   1920%                   1551%                   1268%                 1107%                 1081%                   1043%                    846%                  512%                  508%                  120%                  119%                    93%                    85%                    66%                    38%                    16%                   --                   0%                    -2%                 -37%                 -37%                  -75%                 -76%                 -76%                  -79%                  -80%                  -83%                  -85%                  -87%                -88%                -88%                -92%                -92%                -96%                -96% 
+      LU:m stringy num100      128000/s                   1981%                   1930%                   1560%                   1275%                 1113%                 1087%                   1049%                    851%                  515%                  511%                  121%                  120%                    94%                    86%                    67%                    39%                    16%                   0%                   --                    -2%                 -37%                 -37%                  -75%                 -76%                 -76%                  -79%                  -80%                  -83%                  -85%                  -87%                -88%                -88%                -92%                -92%                -96%                -96% 
+      PLUP:m numeric num100    130770/s                   2031%                   1979%                   1600%                   1308%                 1142%                 1116%                   1076%                    873%                  530%                  526%                  127%                  126%                    98%                    90%                    71%                    42%                    19%                   2%                   2%                     --                 -35%                 -36%                  -74%                 -75%                 -76%                  -78%                  -80%                  -82%                  -85%                  -87%                -87%                -87%                -92%                -92%                -96%                -96% 
+      LU:m stringy str100      210000/s                   3226%                   3144%                   2553%                   2098%                 1838%                 1797%                   1736%                   1419%                  883%                  877%                  254%                  253%                   210%                   197%                   167%                   122%                    86%                  60%                  59%                    56%                   --                   0%                  -60%                 -62%                 -62%                  -66%                  -69%                  -73%                  -77%                  -79%                -81%                -81%                -87%                -87%                -93%                -93% 
+      LU:m stringy str100      205000/s                   3232%                   3151%                   2558%                   2102%                 1842%                 1801%                   1740%                   1422%                  885%                  879%                  255%                  253%                   210%                   198%                   167%                   123%                    87%                  60%                  60%                    56%                   0%                   --                  -60%                 -62%                 -62%                  -66%                  -69%                  -73%                  -77%                  -79%                -80%                -80%                -87%                -87%                -93%                -93% 
+      PLUP:m stringy num10     520000/s                   8388%                   8180%                   6670%                   5510%                 4847%                 4743%                   4587%                   3778%                 2410%                 2394%                  805%                  801%                   691%                   659%                   582%                   468%                   376%                 309%                 307%                   298%                 155%                 154%                    --                  -4%                  -5%                  -15%                  -21%                  -31%                  -41%                  -48%                -51%                -51%                -68%                -69%                -84%                -84% 
+      LU:m numeric num100      543000/s                   8757%                   8540%                   6965%                   5754%                 5063%                 4954%                   4791%                   3946%                 2519%                 2503%                  844%                  840%                   726%                   692%                   611%                   493%                   397%                 327%                 325%                   315%                 166%                 165%                    4%                   --                  -1%                  -11%                  -17%                  -28%                  -39%                  -46%                -49%                -49%                -67%                -67%                -83%                -83% 
+      LU:m numeric num100      550379/s                   8869%                   8650%                   7054%                   5828%                 5128%                 5018%                   4853%                   3998%                 2552%                 2536%                  856%                  852%                   736%                   702%                   620%                   500%                   403%                 333%                 330%                   320%                 169%                 169%                    5%                   1%                   --                  -10%                  -16%                  -27%                  -38%                  -45%                -48%                -48%                -67%                -67%                -83%                -83% 
+      PLUP:m stringy num10     616000/s                   9960%                   9713%                   7924%                   6549%                 5764%                 5640%                   5455%                   4496%                 2875%                 2856%                  972%                  967%                   838%                   799%                   708%                   573%                   464%                 385%                 383%                   372%                 202%                 201%                   18%                  13%                  12%                    --                   -6%                  -18%                  -30%                  -39%                -42%                -42%                -63%                -63%                -81%                -81% 
+      PLUP:m stringy str10     664000/s                  10693%                  10428%                   8509%                   7033%                 6191%                 6058%                   5860%                   4831%                 3092%                 3072%                 1050%                 1045%                   906%                   865%                   767%                   622%                   505%                 421%                 418%                   406%                 224%                 223%                   27%                  21%                  20%                    7%                    --                  -12%                  -25%                  -35%                -38%                -38%                -60%                -60%                -80%                -80% 
+      PLUP:m stringy str10     758910/s                  12268%                  11965%                   9765%                   8075%                 7109%                 6957%                   6730%                   5551%                 3557%                 3535%                 1218%                 1212%                  1053%                  1006%                   893%                   728%                   594%                 497%                 494%                   480%                 271%                 271%                   45%                  39%                  37%                   22%                   14%                    --                  -14%                  -25%                -29%                -29%                -54%                -55%                -77%                -77% 
+      PLUP:m numeric num10     891148/s                  14423%                  14067%                  11484%                   9499%                 8365%                 8187%                   7920%                   6535%                 4195%                 4168%                 1448%                 1441%                  1254%                  1199%                  1067%                   872%                   715%                 601%                 597%                   581%                 336%                 335%                   71%                  63%                  61%                   44%                   34%                   17%                    --                  -12%                -17%                -17%                -46%                -47%                -73%                -73% 
+      PLUP:m numeric num10    1018900/s                  16505%                  16098%                  13145%                  10875%                 9579%                 9375%                   9070%                   7487%                 4811%                 4780%                 1670%                 1662%                  1449%                  1385%                  1234%                  1012%                   832%                 701%                 697%                   679%                 399%                 398%                   95%                  87%                  85%                   65%                   53%                   34%                   14%                    --                 -5%                 -5%                -39%                -39%                -69%                -69% 
+      LU:m stringy num10      1100000/s                  17424%                  16994%                  13878%                  11483%                10115%                 9900%                   9577%                   7906%                 5082%                 5050%                 1768%                 1760%                  1534%                  1467%                  1308%                  1073%                   883%                 746%                 741%                   722%                 426%                 425%                  106%                  97%                  95%                   74%                   62%                   41%                   20%                    5%                  --                  0%                -35%                -36%                -67%                -68% 
+      LU:m stringy num10      1075300/s                  17425%                  16995%                  13879%                  11483%                10115%                 9900%                   9577%                   7907%                 5083%                 5050%                 1768%                 1760%                  1535%                  1467%                  1308%                  1073%                   883%                 746%                 741%                   722%                 426%                 425%                  106%                  97%                  95%                   74%                   62%                   41%                   20%                    5%                  0%                  --                -35%                -36%                -67%                -68% 
+      LU:m stringy str10      1670620/s                  27127%                  26460%                  21618%                  17896%                15770%                15436%                  14935%                  12340%                 7952%                 7902%                 2803%                 2790%                  2440%                  2335%                  2088%                  1723%                  1428%                1214%                1208%                  1177%                 718%                 716%                  220%                 207%                 203%                  170%                  152%                  120%                   87%                   63%                 55%                 55%                  --                 -1%                -49%                -50% 
+      LU:m stringy str10      1692510/s                  27483%                  26808%                  21902%                  18132%                15978%                15640%                  15132%                  12503%                 8057%                 8007%                 2841%                 2828%                  2473%                  2367%                  2116%                  1747%                  1448%                1232%                1225%                  1194%                 729%                 727%                  224%                 211%                 207%                  174%                  155%                  123%                   89%                   66%                 57%                 57%                  1%                  --                -49%                -50% 
+      LU:m numeric num10      3300000/s                  54225%                  52894%                  43233%                  35807%                31566%                30900%                  29900%                  24721%                15966%                15866%                 5692%                 5666%                  4968%                  4759%                  4265%                  3539%                  2949%                2523%                2510%                  2449%                1533%                1530%                  540%                 513%                 505%                  440%                  403%                  339%                  274%                  227%                210%                209%                 99%                 96%                  --                 -1% 
+      LU:m numeric num10      3390000/s                  55146%                  53792%                  43967%                  36416%                32103%                31425%                  30408%                  25141%                16238%                16137%                 5790%                 5764%                  5054%                  4842%                  4339%                  3600%                  3001%                2567%                2554%                  2492%                1561%                1557%                  550%                 523%                 515%                  449%                  411%                  346%                  280%                  232%                215%                215%                102%                100%                  1%                  -- 
+ 
+     Legends:
+       LU:m numeric num10: dataset=num10 p_tags=numeric participant=List::Util::max
+       LU:m numeric num100: dataset=num100 p_tags=numeric participant=List::Util::min
+       LU:m numeric num1000: dataset=num1000 p_tags=numeric participant=List::Util::min
+       LU:m stringy num10: dataset=num10 p_tags=stringy participant=List::Util::minstr
+       LU:m stringy num100: dataset=num100 p_tags=stringy participant=List::Util::maxstr
+       LU:m stringy num1000: dataset=num1000 p_tags=stringy participant=List::Util::maxstr
+       LU:m stringy str10: dataset=str10 p_tags=stringy participant=List::Util::minstr
+       LU:m stringy str100: dataset=str100 p_tags=stringy participant=List::Util::minstr
+       LU:m stringy str1000: dataset=str1000 p_tags=stringy participant=List::Util::maxstr
+       PLUP:m numeric num10: dataset=num10 p_tags=numeric participant=PERLANCAR::List::Util::PP::min
+       PLUP:m numeric num100: dataset=num100 p_tags=numeric participant=PERLANCAR::List::Util::PP::min
+       PLUP:m numeric num1000: dataset=num1000 p_tags=numeric participant=PERLANCAR::List::Util::PP::min
+       PLUP:m stringy num10: dataset=num10 p_tags=stringy participant=PERLANCAR::List::Util::PP::minstr
+       PLUP:m stringy num100: dataset=num100 p_tags=stringy participant=PERLANCAR::List::Util::PP::minstr
+       PLUP:m stringy num1000: dataset=num1000 p_tags=stringy participant=PERLANCAR::List::Util::PP::minstr
+       PLUP:m stringy str10: dataset=str10 p_tags=stringy participant=PERLANCAR::List::Util::PP::minstr
+       PLUP:m stringy str100: dataset=str100 p_tags=stringy participant=PERLANCAR::List::Util::PP::minstr
+       PLUP:m stringy str1000: dataset=str1000 p_tags=stringy participant=PERLANCAR::List::Util::PP::minstr
+
+  Sample benchmark #2
+    Benchmark command (benchmarking module startup overhead):
+
+     % bencher -m List::Util --module-startup
+
+    Result formatted as table:
+
+     #table2#
+     +---------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
+     | participant               | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     +---------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
+     | List::Util                |         8 |                 4 |                 0.00% |                76.85% | 0.00011 |      20 |
+     | PERLANCAR::List::Util::PP |         8 |                 4 |                 1.33% |                74.52% | 0.00023 |      20 |
+     | perl -e1 (baseline)       |         4 |                 0 |                76.85% |                 0.00% | 0.00019 |      20 |
+     +---------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
+
+    The above result formatted in Benchmark.pm style:
+
+                              Rate   L:U  PLU:P  perl -e1 (baseline) 
+      L:U                  125.0/s    --     0%                 -50% 
+      PLU:P                125.0/s    0%     --                 -50% 
+      perl -e1 (baseline)  250.0/s  100%   100%                   -- 
+ 
+     Legends:
+       L:U: mod_overhead_time=4 participant=List::Util
+       PLU:P: mod_overhead_time=4 participant=PERLANCAR::List::Util::PP
+       perl -e1 (baseline): mod_overhead_time=0 participant=perl -e1 (baseline)
+
+    To display as an interactive HTML table on a browser, you can add option
+    "--format html+datatables".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenario-List-Util>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenario-List-Util>.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022, 2017, 2016, 2015 by perlancar
+    <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenario-List
+    -Util>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

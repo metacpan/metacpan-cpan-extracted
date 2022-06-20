@@ -1,9 +1,19 @@
-Revision history for SPVM::IO
+0.04  2022-06-14
+  [CHANGES]
+  * Fix tests
+  * Add IO::Handlable class.
+  * Rename IO::Socket to IO::Socketable
+  * IO::File has IO::Handlable interface.
+  * IO::Socket::INET has IO::Handlable interface.
 
+0.03  2022-06-13
+  [CHANGES]
+  * Catch up with latest SPVM.
+        
 0.02  2022-05-26
-        [CHANGES]
-        * Catch up with latest SPVM.
+  [CHANGES]
+  * Catch up with latest SPVM.
 
 0.01  2022-05-23
-        [CHANGES]
-        * First development release
+  [CHANGES]
+  * First development release

@@ -1,11 +1,10 @@
-#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
 use Test::Fatal;
 use lib 't/lib';
 
-use Test::Requires 'Package::Anon';
+use Test::Needs 'Package::Anon';
 
 use Package::Stash;
 use Symbol;

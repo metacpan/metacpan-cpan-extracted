@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Agilent34410A;
-$Lab::Moose::Instrument::Agilent34410A::VERSION = '3.820';
+$Lab::Moose::Instrument::Agilent34410A::VERSION = '3.821';
 #ABSTRACT: Agilent 34410A digital multimeter.
 
 use v5.20;
@@ -36,7 +36,7 @@ Lab::Moose::Instrument::Agilent34410A - Agilent 34410A digital multimeter.
 
 =head1 VERSION
 
-version 3.820
+version 3.821
 
 =head1 DESCRIPTION
 

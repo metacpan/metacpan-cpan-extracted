@@ -6,7 +6,7 @@ package Lingua::Translit;
 #   Rona Linke <rlinke@lingua-systems.com>
 # Copyright (C) 2009-2016 Lingua-Systems Software GmbH
 # Copyright (C) 2016-2017 Netzum Sorglos, Lingua-Systems Software GmbH
-# Copyright (C) 2017 Netzum Sorglos Software GmbH
+# Copyright (C) 2017-2022 Netzum Sorglos Software GmbH
 #
 
 use strict;
@@ -19,7 +19,7 @@ use Encode qw/encode decode/;
 
 use Lingua::Translit::Tables;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 =pod
 
@@ -134,7 +134,8 @@ sub translit {
     my $text = shift();
 
     # Return if no input was given
-    return unless $text;
+    return undef if ! defined $text;
+    return ''    if $text eq '';
 
     my $utf8_flag_on = Encode::is_utf8($text);
 
@@ -194,7 +195,8 @@ sub translit_reverse {
     my $text = shift();
 
     # Return if no input was given
-    return unless $text;
+    return undef if ! defined $text;
+    return ''    if $text eq '';
 
     # Is this transliteration reversible?
     croak("$self->{name} cannot be reversed") unless $self->{reverse};
@@ -417,7 +419,7 @@ Copyright (C) 2009-2016 Lingua-Systems Software GmbH
 
 Copyright (C) 2016-2017 Netzum Sorglos, Lingua-Systems Software GmbH
 
-Copyright (C) 2017 Netzum Sorglos Software GmbH
+Copyright (C) 2017-2022 Netzum Sorglos Software GmbH
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

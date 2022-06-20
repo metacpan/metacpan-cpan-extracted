@@ -13,7 +13,7 @@ Neo4j::Driver::Deprecations - Explains features that have been deprecated, but n
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 OVERVIEW
 
@@ -59,6 +59,81 @@ consistent with the C<tls> option, then later renamed C<trust_ca>
 in S<version 0.27> to be more consistent with the Neo4j Driver API.
 See L<Neo4j::Driver/"trust_ca">.
 
+=head2 Custom networking modules
+
+I<Deprecated in version 0.31 and to be removed in 1.00.
+Originally added in 0.21 as an experimental feature.>
+
+ use Local::MyNetModule;
+ $driver->config(net_module => 'Local::MyNetModule');
+
+The module to be used for network communication may be specified
+using the C<net_module> config option. The specified module must
+implement the API described in L<Neo4j::Driver::Net/"EXTENSIONS">.
+Your code must C<use> or C<require> the module it specifies here.
+
+The default value of C<undef> will cause the driver to use its
+built-in modules. An empty string C<""> will do the same.
+
+ # use the built-in networking modules
+ $driver->config(net_module => undef);
+ $driver->config(net_module => '');
+
+Some versions of the driver also allow users to run its test suite
+against a custom net module.
+
+ TEST_NEO4J_NETMODULE=Local::MyNetModule prove
+
+The C<net_module> option provides decent flexibility for extending
+the driver. However, some interesting possible extensions have
+little to do with networking, and the C<net_module> API itself
+lacks flexibility.
+
+Existing networking modules should be converted to HTTP network
+adapters. This is easily done with the the following two steps.
+
+=over
+
+=item 1.
+
+Rename your existing C<sub new {}> constructor to (for example)
+C<sub _net_module_new {}>.
+
+=item 2.
+
+Insert the following code into your module:
+
+ use parent 'Neo4j::Driver::Plugin';
+ 
+ sub new {
+   bless [], shift;
+ }
+ 
+ sub register {
+   my ($self, $manager) = @_;
+   $manager->add_event_handler(
+     http_adapter_factory => sub {
+       my ($continue, $driver) = @_;
+       __PACKAGE__->_net_module_new($driver);
+     },
+   );
+ }
+
+See L<Neo4j::Driver::Plugin/"http_adapter_factory"> for details.
+
+=back
+
+At that point, your code setting the C<net_module> config option
+can simply be replaced by calls to L<Neo4j::Driver/"plugin">.
+
+ # Deprecated config option:
+ use Local::Foo;
+ $driver->config( net_module => 'Local::Foo' );
+ 
+ # New plug-in interface:
+ use Local::Foo;
+ $driver->plugin( 'Local::Foo' );
+
 =head2 Disable or enforce Jolt
 
 I<Deprecated in version 0.30 and to be removed in 1.00.
@@ -83,7 +158,7 @@ This option is no longer useful. The driver will pick the fastest
 and most reliable format automatically (S<RFC 7464> sparse Jolt, if
 available). If you do need a specific response format, for example
 because you use driver internals to access the raw server response,
-you can use a custom networking module to manipulate the HTTP
+you can use a plug-in to manipulate the HTTP
 C<Accept> header according to your needs. See L<Neo4j::Driver::Net>.
 
 =head2 Mutable auth credentials
@@ -112,7 +187,7 @@ supported by Neo4j S<versions 2 and 3> to the new syntax C<$param>
 supported by Neo4j S<versions 3 and 4>.
 
 This option was meant to support more general filtering of Cypher
-statements at some point in the future. But custom net modules
+statements at some point in the future. But plug-ins
 already make that very easy. Therefore the C<cypher_filter>
 option won't be extended any further. However, the existing
 parameter syntax conversion is probably useful enough to stand
@@ -562,9 +637,9 @@ between Bolt and HTTP connections are very clear. The driver
 currently uses C<{return_stats} = 0> internally, so this feature
 will likely not be removed soon, but going forward, it will be
 treated as an internal API. There will be no deprecation warning.
-See L<Neo4j::Driver::Net/"USE OF INTERNAL APIS">.
+See L<Neo4j::Driver::Plugin/"USE OF INTERNAL APIS">.
 
-To disable query stats in future, use a custom networking module
+To disable query stats in future, use a plug-in
 to modify C<includeStats> in the server request.
 
 =head2 Return results in graph format
@@ -586,11 +661,11 @@ L<"graph" results data format|https://neo4j.com/docs/http-api/4.4/actions/return
 This feature is only available when Jolt is disabled, which is
 not recommended.
 
-To request graph format in future, use a custom networking module
+To request graph format in future, use a plug-in
 to disable Jolt and modify the C<resultDataContents> in the server
 request. Note that C<< $record->{graph} >> is an internal API that
 may or may not be available in future versions.
-See L<Neo4j::Driver::Net/"USE OF INTERNAL APIS">.
+See L<Neo4j::Driver::Plugin/"USE OF INTERNAL APIS">.
 
 If there is demand for the graph format, equivalent functionality
 might be added to a future version of the driver itself.
@@ -627,9 +702,9 @@ not a transaction was successful or rolled back.
 
 Given the low availability and reliability of this indicator,
 consistency suggests to remove the C<deleted()> method entirely.
-To obtain this indicator in the future, use a custom net module
+To obtain this indicator in the future, use a plug-in
 to disable Jolt, then try to access the result's raw meta data.
-For caveats, see L<Neo4j::Driver::Net/"USE OF INTERNAL APIS">.
+For caveats, see L<Neo4j::Driver::Plugin/"USE OF INTERNAL APIS">.
 
 =head1 Neo4j::Driver::Type::Path
 

@@ -1,58 +1,79 @@
 package Date::Holidays::NZ;
 use strict;
 use base qw(Exporter);
-
-our $SET;
-BEGIN {
-    eval { require Set::Scalar };
-    if ($@) {
-	require Set::Object;
-        die "Need at least Set::Object 1.09"
-	    if ($Set::Object::VERSION < 1.09);
-	$SET = "Set::Object";
-    } else {
-	$SET = "Set::Scalar";
-    }
-}
+use utf8;
 
 use vars qw($VERSION @EXPORT @EXPORT_OK);
-$VERSION = '1.05';
+$VERSION = '1.06';
 @EXPORT = qw(is_nz_holiday nz_holidays nz_regional_day nz_holiday_date);
-@EXPORT_OK = qw(%HOLIDAYS $NATIONAL_HOLIDAYS %regions
+@EXPORT_OK = qw(%HOLIDAYS @NATIONAL_HOLIDAYS %regions
 		nz_region_code nz_region_name %holiday_cache);
 
 my $AD = "Anniversary Day";
 
+# Matariki dates 2022-2052 from
+# https://www.mbie.govt.nz/assets/matariki-dates-2022-to-2052-matariki-advisory-group.pdf
+our %MATARIKI = (
+        2022 => '2022-06-24',
+        2023 => '2023-07-14',
+        2024 => '2024-06-28',
+        2025 => '2025-06-20',
+        2026 => '2026-07-10',
+        2027 => '2027-06-25',
+        2028 => '2028-07-14',
+        2029 => '2029-07-06',
+        2030 => '2030-06-21',
+        2031 => '2031-07-11',
+        2032 => '2032-07-02',
+        2033 => '2033-06-24',
+        2034 => '2034-07-07',
+        2035 => '2035-06-29',
+        2036 => '2036-07-21',
+        2037 => '2037-07-10',
+        2038 => '2038-06-25',
+        2039 => '2039-07-15',
+        2040 => '2040-07-06',
+        2041 => '2041-07-19',
+        2042 => '2042-07-11',
+        2043 => '2043-07-03',
+        2044 => '2044-06-24',
+        2045 => '2045-07-07',
+        2046 => '2046-06-29',
+        2047 => '2047-07-19',
+        2048 => '2048-07-03',
+        2049 => '2049-06-25',
+        2050 => '2050-07-15',
+        2051 => '2051-06-30',
+        2052 => '2052-06-21'
+        );
+
 our %HOLIDAYS
     = (
-       # holidays which are fixed, but unless you would "normally have
-       # worked on that day", then they are moved to the next working
-       # day
-       "New Years Day" => "0101+",
-       "Day after New Years Day" => '0102+',
+       # Holidays which are fixed, but are moved to the next working
+       # day if you would not normally have worked on that day
+       "New Year's Day" => "0101+",
+       "Day after New Year's Day" => '0102+',
        "Christmas Day" => "1225+",
        "Boxing Day" => '1226+',
        "Waitangi Day" => "0206+",
-       "ANZAC Day" => "0425+",
+       "Anzac Day" => "0425+",
 
-       # other nationwide holidays
+       # Other national holidays
        "Easter Monday" => "Easter + 1day",
        "Good Friday" => "Easter - 2days",
-       "Queens Birthday" => '1st Monday in June',
+       "Queen's Birthday" => '1st Monday in June',
        "Labour Day" => "4th Monday in October",
+       "Matariki" => "Matariki",
 
        # Anniversary days - these are the official dates, but regional
-       # authorities and sometimes district councils pick the actual
-       # dates.
+       # authorities and sometimes district councils pick the actual dates.
        "Auckland $AD" => "Closest Monday to 0129",
 
-       #"Taranaki $AD" => "Closest Monday to 0331",
-       # Moves to 2nd Monday in March to avoid Easter.
+       # 2nd Monday in March to avoid Easter.
        "Taranaki $AD" => "2nd Monday in March",
 
-       #"Hawkes' Bay $AD" => "Closest Monday to 1101",
        # Moved to Friday before Labour Day.
-       "Hawkes' Bay $AD" => "4th Monday in October - 3days",
+       "Hawke's Bay $AD" => "4th Monday in October - 3days",
 
        "Wellington $AD" => "Closest Monday to 0122",
 
@@ -62,56 +83,68 @@ our %HOLIDAYS
 
        "Nelson $AD" => "Closest Monday to 0201",
 
-       #"Westland $AD" => "Closest Monday to 1201",
-       "Westland $AD" => "1st monday in december",
+       "Westland $AD" => "Closest Monday to 1201",
+       # "Varies throughout Westland, but Greymouth observes the
+       # official day." - that's the West Coast for you
 
-       # ``Varies throughout Westland, but Greymouth observes the
-       # official day.'' - that's the West Coast for you
-
+       # https://www.employment.govt.nz/leave-and-holidays/public-holidays/public-holidays-and-anniversary-dates/ states: "there is no easily determined single day of local observance for Otago"
        "Otago $AD" => "Closest Monday to 0323",
-       "Southland $AD" => "Closest Monday to 0117",
+
+       # In 2011, the three southern mayors decided Southland Anniversary Day
+       # would be celebrated on Easter Tuesday.
+       "Southland $AD" => "Easter + 2days",
+
        "Chatham Islands $AD" => "Closest Monday to 1130",
 
-       # oddballs
-       #"Canterbury $AD" => "Closest Monday to 1216",
+       # South Canterbury observes Dominion Day
        "Dominion Day" => "4th Monday in September",
+
+       # North Canterbury observes Christchurch show day
+       # "2nd Friday after the first Tuesday in November"
        "Christchurch Show Day" => "1st Tuesday in November + 10d",
       );
 
-our %CHANGESET_2014 = (
-       # Pre-mondayisation dates for Waitangi and ANZAC days
-       "Waitangi Day" => "0206",
-       "ANZAC Day" => "0425",
+our %CHANGESET_2010 = (
+       # Pre-2011 dates for Southland
+       "Southland $AD" => "Closest Monday to 0117",
     );
 
-our $NATIONAL_HOLIDAYS =
-    $SET->new( "Waitangi Day",
-		      "ANZAC Day",
-		      "New Years Day",
-		      "Day after New Years Day",
-		      "Christmas Day",
-		      "Boxing Day",
-		      "Easter Monday",
-		      "Good Friday",
-		      "Queens Birthday",
-		      "Labour Day",
-		    );
+our %CHANGESET_2014 = (
+       # Pre-mondayisation dates for Waitangi and Anzac days
+       "Waitangi Day" => "0206",
+       "Anzac Day" => "0425",
+    );
+
+our @NATIONAL_HOLIDAYS = ( "Waitangi Day",
+        "Anzac Day",
+        "New Year's Day",
+        "Day after New Year's Day",
+        "Christmas Day",
+        "Boxing Day",
+        "Easter Monday",
+        "Good Friday",
+        "Queen's Birthday",
+        "Labour Day",
+        );
+
+our @NATIONAL_HOLIDAYS_ADDED_2022 = ( "Matariki" );
 
 our %holiday_aliases =
-    ( "Birthday of the Reigning Sovereign" => "Queens Birthday",
+    ( "Birthday of the Reigning Sovereign" => "Queen's Birthday",
     );
 
-# These are Census 2001 region codes.
+# These are region codes from 2022 Regional Councils:
+# https://datafinder.stats.govt.nz/layer/106666-regional-council-2022-generalised/data/
 our %regions =
     (
       1 => "Northland",
       2 => "Auckland",
       3 => "Waikato",
       4 => "Bay of Plenty",
-      5 => "Gisbourne",
-      6 => "Hawkes' Bay",
+      5 => "Gisborne",
+      6 => "Hawke's Bay",
       7 => "Taranaki",
-      8 => "Manuwatu-Wanganui",
+      8 => "Manawatū-Whanganui",
       9 => "Wellington",
       12 => "West Coast",
       13 => "Canterbury",
@@ -125,10 +158,10 @@ our %regions =
     );
 our %rev_regions;
 
-# which anniversary days are followed by each region is largely
-# educated guesses, please e-mail samv@cpan.org if this list is
-# incorrect.
-our %FOLLOW = ( 1 => 2, 3 => 2, 4 => 5, 5 => 6,
+# Some regions may be split in which Anniversary Day they follow, this has been updated
+# using various government and web sources, including: Wikipedia and
+# https://www.employment.govt.nz/leave-and-holidays/public-holidays/public-holidays-and-anniversary-dates/
+our %FOLLOW = ( 1 => 2, 3 => 2, 4 => 2, 5 => 2,
 	       8 => 9, 12 => "Westland",
 	       13 => "Christchurch Show Day",
 	       -13 => "Dominion Day",
@@ -201,18 +234,13 @@ sub check_falling_on {
 	my $falls_on = UnixDate($year.$date, "%w");
 	if ( $falls_on >= 6 ) {
 	    my $name = delete $h->{$date};
-	    #print STDERR "Blast, $name falls on a ".UnixDate($year.$date, "%A"). " ($falls_on)\n";
 	    my $add = ($falls_on == 6) ? 2 : 1;
-	    #print STDERR "Adding $add days to it.\n";
 	    my $to_fall_on = UnixDate(DateCalc($year.$date, "+${add}d"), "%m%d");
-	    #print STDERR "Trying $to_fall_on instead.\n";
 	    while ( exists $h->{$to_fall_on} or
 		    UnixDate($year.$to_fall_on, "%w") >= 6
 		  ) {
 		$to_fall_on = UnixDate(DateCalc($year.$to_fall_on, "+1d"), "%m%d");
-		#print STDERR "That's no bloody good, trying $to_fall_on instead.\n";
 	    }
-	    #print STDERR "Settling on $to_fall_on ($name Holiday)\n";
 	    $h->{$to_fall_on} = "$name Holiday";
 	}
 }
@@ -232,30 +260,26 @@ sub interpret_date {
 	$date = ParseDate($spec. " $year");
     }
     elsif ( $value =~ m/^Closest (\w+day) to (\d\d)(\d\d)(.*)$/i) {
-	#print STDERR "**** $value($year):\n";
 	(my ($day, $month, $dom), $add) = ($1, $2, $3, $4);
 	$date = ParseDate("$year-$month-$dom");
 	my $wanted = UnixDate($day, "%w");
 	my $got    = UnixDate($date, "%w");
-	#print STDERR "    $year-$month-$dom is a ".UnixDate($date, "%A")
-	    #." ($got)\n";
 	if ( my $diff = ($wanted - $got + 7) % 7 ) {
-	    #print STDERR "    difference is $diff days\n";
 	    if ( $diff < 4 ) {
-		#print STDERR "Adding $diff days\n";
 		$date = DateCalc($date, "+${diff}d");
 	    } else {
 		$diff = 7 - $diff;
-		#print STDERR "Subtracting $diff days\n";
 		$date = DateCalc($date, "-${diff}d");
 	    }
-	} else {
-	    #print STDERR "Which is good\n";
 	}
     }
     elsif ( $value =~ m/^Easter(.*)$/i) {
 	($date) = ParseRecur("*$year:0:0:0:0:0:0*EASTER");
 	$add = $1;
+    }
+    elsif ( $value =~ m/^Matariki$/i) {
+        # return a date for Matariki if one is available for the year
+        ($date) = ParseDate($MATARIKI{$year});
     }
     $date = DateCalc($date, "$add") if $add;
     return UnixDate($date, "%m%d");
@@ -264,15 +288,25 @@ sub interpret_date {
 sub nz_stat_holidays {
     my $year = shift;
 
-    # merge the old definitions of Waitangi day and ANZAC day if year is pre-mondayisation
     my %holidays = %HOLIDAYS;
-    if ( $year < 2014 ){
+
+    if ( $year < 2011 ){
+        %holidays = ( %holidays, %CHANGESET_2010 );
+    }
+
+    # merge the old definitions of Waitangi day and Anzac day if year is pre-mondayisation
+    if ( $year < 2014 ) {
         %holidays = ( %holidays, %CHANGESET_2014 );
+    }
+
+    my @national_holidays = @NATIONAL_HOLIDAYS;
+    if ( $year >= 2022 ) {
+        push(@national_holidays, @NATIONAL_HOLIDAYS_ADDED_2022);
     }
 
     # build the relative dates
     my (%h, @tentative);
-    foreach my $holiday ($NATIONAL_HOLIDAYS->members) {
+    foreach my $holiday (@national_holidays) {
 
 	my $when = interpret_date($year, $holidays{$holiday}||die)
 	    or die "couldn't interpret $year, $holidays{$holiday}";
@@ -292,7 +326,6 @@ sub nz_stat_holidays {
 our %regional_holiday_cache
     = # exceptions
     ( "2004/Westland $AD" => "1129",
-      "2008/Hawkes' Bay $AD" => "1017",
       "2008/Otago $AD" => "0325",
     );
 
@@ -303,12 +336,17 @@ sub nz_holidays {
 
   my $hols = $holiday_cache{$year} ||= nz_stat_holidays($year);
 
+  my %holidays = %HOLIDAYS;
+  if ( $year < 2011 ){
+      %holidays = ( %holidays, %CHANGESET_2010 );
+  }
+
   if ( $region ) {
       my $rd = nz_regional_day($region);
 
       my $when = $regional_holiday_cache{"$year/$rd"} ||=
-	  (interpret_date($year, $HOLIDAYS{$rd}||die)
-	   or die "couldn't interpret $year, $HOLIDAYS{$rd}");
+	  (interpret_date($year, $holidays{$rd}||die)
+	   or die "couldn't interpret $year, $holidays{$rd}");
 
       $hols = { %$hols, $when => "$rd" };
   }
@@ -320,6 +358,11 @@ sub is_nz_holiday {
   my ($year, $month, $day, $region) = @_;
   my $mmdd = sprintf("%.2d%.2d", $month, $day);
 
+  my %holidays = %HOLIDAYS;
+  if ( $year < 2011 ){
+      %holidays = ( %holidays, %CHANGESET_2010 );
+  }
+
   my $hols = $holiday_cache{$year} ||= nz_stat_holidays($year);
 
   if ( exists $hols->{$mmdd} ) {
@@ -330,8 +373,8 @@ sub is_nz_holiday {
       my $rd = nz_regional_day($region);
 
       my $when = $regional_holiday_cache{"$year/$rd"} ||=
-	  (interpret_date($year, $HOLIDAYS{$rd}||die)
-	   or die "couldn't interpret $year, $HOLIDAYS{$rd}");
+	  (interpret_date($year, $holidays{$rd}||die)
+	   or die "couldn't interpret $year, $holidays{$rd}");
 
       if ( $when eq $mmdd ) {
 	  return $rd;
@@ -344,10 +387,24 @@ sub is_nz_holiday {
 sub nz_holiday_date {
     my ($year, $holname) = @_;
     $holname = $holiday_aliases{$holname} if $holiday_aliases{$holname};
-    exists $HOLIDAYS{$holname} or croak "no such holiday $holname";
 
-    if ( $NATIONAL_HOLIDAYS->has($holname) ) {
-	my $date = interpret_date($year, $HOLIDAYS{$holname});
+    # merge the old definitions of Waitangi day and Anzac day if year is pre-mondayisation
+    my %holidays = %HOLIDAYS;
+    if ( $year < 2014 ){
+        %holidays = ( %holidays, %CHANGESET_2014 );
+    }
+
+    my @national_holidays = @NATIONAL_HOLIDAYS;
+    # include Matariki from 2022
+    if ( $year >= 2022 ){
+        push(@national_holidays, @NATIONAL_HOLIDAYS_ADDED_2022);
+    }
+
+    exists $holidays{$holname} or croak "no such holiday $holname";
+
+    if ( grep $_ eq $holname, @national_holidays ) {
+
+	my $date = interpret_date($year, $holidays{$holname});
 	my $hols = nz_holidays($year);
 
 	if ( $date =~ s/\+$// ) {
@@ -362,7 +419,7 @@ sub nz_holiday_date {
 	return $date;
     } else {
 	return $regional_holiday_cache{"$year/$holname"}
-		|| interpret_date($year, $HOLIDAYS{$holname});
+		|| interpret_date($year, $holidays{$holname});
     }
 }
 
@@ -384,7 +441,7 @@ Date::Holidays::NZ - Determine New Zealand public holidays
   $month += 1;
   print "Woohoo" if is_nz_holiday( $year, $month, $day );
 
-  # supply Census 2001 region codes (1-19), or names like
+  # supply Statistics NZ region codes (1-19), or names like
   # "Wellington", "Canterbury (South)", etc
   print "Yes!" if is_nz_holiday( $year, $month, $day, $region );
 
@@ -397,24 +454,25 @@ Determines whether a given date is a New Zealand public holiday or
 not.
 
 As described at
-L<http://www.ers.dol.govt.nz/holidays_act_2003/dates/>, the system of
-determining holidays in New Zealand is a complicated matter.  Not only
-do you need to know what region the country is living in to figure out
-the relevant Anniversary Day, but sometimes the district too (for the
-West Coast and Canterbury).  As regions are free to pick the actual
-days observed for particular holidays, this module cannot guarantee
-dates past the last time it was checked against the Employment
-Relations Service web site (currently returns known good values for
-statutory holidays 2003 - 2009 and regional holidays for 2005).
+L<https://www.govt.nz/browse/work/public-holidays-and-work/public-holidays-and-anniversary-dates/>, 
+the system of determining holidays in New Zealand is a complicated
+atter.  Not only do you need to know what region the country is
+living in to figure out the relevant Anniversary Day, but
+sometimes the district too (for the West Coast and Canterbury). As
+regions are free to pick the actual days observed for particular
+holidays, this module cannot guarantee dates past the last time it
+was checked against the New Zealand Government web site (which, at
+the time of revision provides statutory holiday details from 2021
+to 2024 regional holidays for 2022 and 2023).
 
 This module hopes to return values that are Mostly Right(tm) when
-passed in census 2001 region codes (widely used throughout government
+passed in Statistics NZ region codes (widely used throughout government
 and industry), and can also be passed in textual region labels, which
 includes the appropriate Anniversary Day.
 
 Also, there is a difference between what is considered a holiday by
 the Holidays Act 2003 - and hence entitling a person to time in lieu
-and/or extra pay - and what is considered to be a Bank Holiday.  This
+and/or extra pay - and what is considered to be a Bank Holiday. This
 module returns Bank Holiday dates, so if Christmas Day falls on a
 Sunday, the 26th will be called "Boxing Day", and the 27th "Christmas
 Day Holiday".
@@ -453,14 +511,13 @@ Valid regions are:
 
   Number    Region Name
     1       Northland
-    1       Northland
     2       Auckland
     3       Waikato
     4       Bay of Plenty
-    5       Gisbourne
-    6       Hawkes' Bay
+    5       Gisborne
+    6       Hawke's Bay
     7       Taranaki
-    8       Manuwatu-Wanganui
+    8       Manawatū-Wanganui
     9       Wellington
     12      West Coast
     13      Canterbury
@@ -485,22 +542,23 @@ year.
 
 Valid holiday names are:
 
-  ANZAC Day
+  Anzac Day
   Boxing Day
   Christmas Day
-  Day after New Years Day
+  Day after New Year's Day
   Dominion Day
   Easter Monday
   Good Friday
   Labour Day
-  New Years Day
-  Queens Birthday
+  Matariki (from 2022)
+  New Year's Day
+  Queen's Birthday
   Waitangi Day
 
   Auckland Anniversary Day
   Chatham Islands Anniversary Day
   Christchurch Show Day
-  Hawkes' Bay Anniversary Day
+  Hawke's Bay Anniversary Day
   Marlborough Anniversary Day
   Nelson Anniversary Day
   Otago Anniversary Day
@@ -511,11 +569,8 @@ Valid holiday names are:
 
 Somebody let me know if any of those are incorrect.
 
-C<Date::Holidays::NZ> version 1.00 and later also supports referring
-to Queen's Birthday as "Birthday of the Reigning Sovereign".  Not that
-it has anything to do with the Queen's Birthday, really - it's just
-another day off to stop us British subjects getting all restless,
-revolutionary and whatnot.
+C<Date::Holidays::NZ> version 1.00 and later also support referring
+to Queen's Birthday as "Birthday of the Reigning Sovereign".
 
 =back
 
@@ -536,7 +591,7 @@ the "normal" day for a holiday, rather than the day listed on the
 official government site, for a couple of regional days which did not
 match the general rule for when they were due.
 
-In 1.03 was a fix to correct for the newly Monday-ised ANZAC and
+In 1.03 was a fix to correct for the newly Monday-ised Anzac and
 Waitangi days, which came into force on 1 January 2014, but had no
 effect until 25 April 2015. Pre-2014 instances of these holidays are
 unaffected and will continue to match their original dates.
@@ -561,7 +616,7 @@ BOP (assumed Auckland)
 
 =item *
 
-Gisborne (assumed Hawkes' Bay)
+Gisborne (assumed Auckland)
 
 =item *
 
@@ -584,12 +639,12 @@ holidays or even time there is only a loosely observed phenomenon.
 Exports the four listed functions in this manual page by default.
 
 You may also import various internal variables and methods used by this
-module if you like.  Log a ticket if you want any of them to be added to
+module if you like. Log a ticket if you want any of them to be added to
 the documentation.
 
 =head1 BUGS
 
-This module does not support Te Reo Māori.  If you would be interested
+This module does not support Te Reo Māori. If you would be interested
 in translating the holiday names, region names or manual page to Māori,
 please contact the author.
 

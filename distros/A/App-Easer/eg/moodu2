@@ -1,0 +1,392 @@
+#!/usr/bin/env perl
+use v5.24;
+use warnings;
+use experimental 'signatures';
+no warnings 'experimental::signatures';
+
+exit(TuDu->new->run($0, @ARGV) // 0);
+
+package TuDu;
+use Path::Tiny 'path';
+use App::Easer::V2 -command => -spec => {
+   help        => 'to-do application',
+   description => 'A simple to-do application',
+
+   # this is not needed strictly speaking, but comes handy if this gets
+   # integrated within a higher level command
+   aliases => [qw< tudu todo >],
+
+   # as a top-level command, the sources also include configuration files
+   sources => [
+      qw< +Default +CmdLine +Environment +JsonFileFromConfig >,
+      ['+JsonFiles', "$ENV{HOME}/.tudu.conf", '/etc/tudu.conf'],
+   ],
+   options => [
+      {
+         help        => 'path to the configuration file',
+         getopt      => 'config|c=s',
+         environment => 'TUDU_CONFIG',
+      },
+      {
+         help        => 'base directory where tasks are kept',
+         getopt      => 'basedir|dir|d=s',
+         environment => 'TUDU_BASEDIR',
+         default     => "$ENV{HOME}/.tudu",
+      },
+      {
+         help    => 'max number of attempts to find non-colliding id',
+         getopt  => 'attempts|max-attempts|M=i',
+         default => 9,
+      },
+      {
+         help    => 'format of time when generating time stamps',
+         getopt  => 'time_format|time-format|T=s',
+         default => '%Y%m%d-%H%M%S',
+         environment => 'TUDU_TIME_FORMAT',
+      },
+   ],
+
+   # Class used for all children commands, specified as hashes
+   hashy_class => 'TuDu::Command',
+   children    => [
+      {
+         aliases     => [qw< list ls >],
+         description => 'Get full or partial list of tasks',
+         help        => 'list tasks',
+         options     => [
+            {
+               help => 'include all tasks (including done) '
+                 . '(exclusion is not honored)',
+               getopt => 'all|A!',
+            },
+            {
+               help => 'include(/exclude) all active tasks '
+                 . '(ongoing and waiting)',
+               getopt => 'active|a!',
+            },
+            {
+               help   => 'include(/exclude) done tasks',
+               getopt => 'done|d!',
+            },
+            {
+               help   => 'include(/exclude) ongoing tasks',
+               getopt => 'ongoing|o!',
+            },
+            {
+               help   => 'include(/exclude) waiting tasks',
+               getopt => 'waiting|w!',
+            },
+            {
+               help   => 'use extended, unique identifiers',
+               getopt => 'id|i!',
+            },
+            {
+               help => 'limit up to n items for each category (0 -> inf)',
+               getopt => 'n=i'
+            },
+         ],
+         execute => 'cmd_list',
+      },
+      {
+         aliases     => [qw< add new post >],
+         help        => 'add a task',
+         description => 'Add a task, optionally setting it as waiting',
+         options     => [
+            {
+               help   => 'add the tasks as waiting',
+               getopt => 'waiting|w!'
+            },
+            {
+               help   => 'set the editor for adding the task, if needed',
+               getopt => 'editor|visual|e=s',
+               environment => 'VISUAL',
+               default     => 'vi',
+            }
+         ],
+         execute => 'cmd_add',
+      },
+      {
+         aliases     => [qw< show print get >],
+         help        => 'print one task',
+         description => 'Print one whole task',
+         execute     => 'cmd_show',
+      },
+      {
+         aliases     => [qw< cat >],
+         help        => 'print one task (no delimiters)',
+         description => 'Print one whole task, without adding delimiters',
+         execute     => 'cmd_cat',
+      },
+      {
+         aliases     => [qw< edit modify change update >],
+         help        => 'edit a task',
+         description => 'Start an editor to modify the task',
+         options     => [
+            {
+               help   => 'set the editor for adding the task, if needed',
+               getopt => 'editor|visual|e=s',
+               environment => 'VISUAL',
+               default     => 'vi',
+            }
+         ],
+         execute => 'cmd_edit',
+      },
+      {
+         aliases     => [qw< done tick yay >],
+         help        => 'mark a task as completed',
+         description => 'Archive a task as completed',
+         execute     => 'cmd_done',
+      },
+      {
+         aliases     => [qw< waiting wait >],
+         help        => 'mark a task as waiting',
+         description => 'Set a task as waiting for external action',
+         execute     => 'cmd_waiting',
+      },
+      {
+         aliases     => [qw< resume active restart ongoing >],
+         help        => 'mark a task as ongoing',
+         description => 'Set a task in active mode (from done or waiting)',
+         execute     => 'cmd_ongoing',
+      },
+      {
+         aliases     => [qw< remove rm delete del >],
+         help        => 'delete a task',
+         description => 'Get rid of a task (definitively)',
+         execute     => 'cmd_remove',
+      },
+   ],
+};
+
+use Moo;
+use experimental 'signatures';
+no warnings 'experimental::signatures';
+
+BEGIN {
+   has child_paths => (
+      is => 'ro',
+      default => sub { [qw< ongoing waiting done >] },
+   );
+}
+
+# commit the configuration by ensuring that the basedir exists and has
+# the right structure.
+sub commit ($self) {
+   my $path = path($self->config('basedir'));
+   $path->mkpath;
+   $path->child($_)->mkpath for $self->child_paths->@*;
+   return;
+} ## end sub commit ($self)
+
+package TuDu::Command;
+use Path::Tiny 'path';
+use POSIX 'strftime';
+use App::Easer::V2 '-command';
+
+use Moo;
+use experimental 'signatures';
+no warnings 'experimental::signatures';
+
+BEGIN {
+   has time_format => (is => 'lazy');
+}
+
+sub _build_time_format ($self) { $self->config('time_format') }
+
+sub format_time ($self, $time = undef) {
+   return strftime($self->time_format, localtime($time // time()));
+}
+
+########################################################################
+# Command methods
+
+sub cmd_add ($self) {
+   my $id = $self->format_time;
+   my $category = $self->config('waiting') ? 'waiting' : 'ongoing';
+   my $hint = $self->basedir->child($category, $id);
+   my $target = $self->add_file($hint, '');
+   if (my @args = $self->residual_args) {
+      $target->spew_utf8(join(' ', @args) . "\n");
+      return 0;
+   }
+   return 0
+     if $self->edit_file($target) && length $self->get_title($target);
+   $target->remove if -e $target;
+   $self->fatal("bailing out creating new task");
+} ## end sub add ($self)
+
+sub cmd_cat ($self) {
+   print {*STDOUT} $self->resolve->slurp_utf8;
+   return 0;
+}
+
+sub cmd_done ($self) {
+   $self->move_task;
+}
+
+sub cmd_edit ($self) {
+   my $target   = $self->resolve;
+   my $previous = $target->slurp_utf8;
+   return 0
+     if $self->edit_file($target) && length $self->get_title($target);
+   $target->spew_utf8($previous);
+   $self->fatal("bailing out editing task");
+} ## end sub edit ($self)
+
+sub cmd_list ($self) {
+   my $config = $self->config_hash;
+
+   my @active = qw< ongoing waiting >;
+   my @candidates = (@active, 'done');
+   my %included;
+
+   # Add stuff
+   if ($config->{all}) {
+      @included{@candidates} = (1) x @candidates;
+   }
+   for my $option (@candidates) {
+      $included{$option} = 1 if $config->{$option};
+   }
+   if ($config->{active} || !scalar keys %included) {
+      @included{@active} = (1) x @active;
+   }
+
+   # Remove stuff
+   delete @included{@active}
+     if exists $config->{active} && !$config->{active};
+   for my $option (@candidates) {
+      delete $included{$option}
+        if exists $config->{$option} && !$config->{$option};
+   }
+
+   my $basedir = $self->basedir;
+   my (%cf, %pf);
+   my $limit = $config->{n};
+   for my $source (@candidates) {
+      next unless $included{$source};
+      for my $file ($self->list_category($source)) {
+         my $title = $self->get_title($file);
+         my $sid = $config->{id} ? '-' . $file->basename : ++$cf{$source};
+         my $id = substr($source, 0, 1) . $sid;
+         say "$id [$source] $title";
+         last if $limit && ++$pf{$source} >= $limit;
+      } ## end for my $file ($self->list_category...)
+   } ## end for my $source (@candidates)
+
+   return 0;
+} ## end sub list ($self)
+
+sub cmd_ongoing ($self) {
+   $self->move_task;
+}
+
+sub cmd_remove ($self) {
+   $self->resolve->remove;
+   return 0;
+}
+
+sub cmd_show ($self) {
+   my $contents = $self->resolve->slurp_utf8;
+   $contents =~ s{\n\z}{}mxs;
+   say "----\n$contents\n----";
+   return 0;
+} ## end sub show ($self)
+
+sub cmd_waiting ($self) {
+   $self->move_task;
+}
+
+
+########################################################################
+# Support methods
+
+sub add_file ($self, $hint, $contents) {
+   my $attempts         = 0;
+   my $file             = path($hint);
+   my $allowed_attempts = $self->config('attempts');
+   while ('necessary') {
+      eval {
+         my $fh =
+           $file->filehandle({exclusive => 1}, '>', ':encoding(UTF-8)');
+         print {$fh} $contents;
+         close $fh;
+      } && return $file;
+      ++$attempts;
+      last if $allowed_attempts && $attempts >= $allowed_attempts;
+      $file = $hint->sibling($hint->basename . "-$attempts");
+   } ## end while ('necessary')
+   $self->fatal("cannot save file '$hint' or variants");
+} ## end sub add_file
+
+sub basedir ($self) {
+   return path($self->config('basedir'));
+}
+
+sub edit_file ($self, $path) {
+   my $editor = $self->config('editor');
+   my $outcome = system {$editor} $editor, $path->stringify;
+   return $outcome == 0;
+}
+
+sub fatal ($self, @message) {
+   die join(' ', @message) . "\n";
+}
+
+sub get_title ($self, $path) {
+   my ($title) = $path->lines({count => 1});
+   ($title // '') =~ s{\A\s+|\s+\z}{}grmxs;
+}
+
+sub list_category ($self, $category) {
+   my $dir = $self->basedir->child($category);
+   return reverse sort { $a cmp $b } $dir->children;
+}
+
+sub move_task ($self) {
+   my $category = (caller(1))[3] =~ s{\A cmd_}{}rmxs;
+   my $child  = $self->resolve;
+   my $parent = $child->parent;
+   if ($parent->basename eq $category) {
+      $self->notice("task is already $category");
+      return 0;
+   }
+   my $dest = $parent->sibling($category)->child($child->basename);
+   $self->add_file($dest, $child->slurp_utf8);
+   $child->remove;
+   return 0;
+} ## end sub move_task
+
+sub notice ($self, @message) {
+   warn join(' ', @message) . "\n";
+}
+
+sub resolve ($self) {
+   my ($oid, @rest) = $self->residual_args;
+   $self->fatal("no identifier provided") unless defined $oid;
+   $self->fatal("too many identifiers provided") if @rest;
+   my $id = $oid;
+
+   my %name_for = (o => 'ongoing', d => 'done', w => 'waiting');
+   my $first = substr $id, 0, 1, '';
+   my $type = $name_for{$first}
+     // $self->fatal("invalid identifier '$oid'");
+
+   my $child;
+   if ($id =~ s{\A -}{}mxs) {    # exact id
+      $child = $self->basedir->child($type, $id);
+      $self->fatal("unknown identifier '$oid'") unless -r $child;
+   }
+   else {
+      $self->fatal("invalid identifier '$oid'")
+        unless $id =~ m{\A [1-9]\d* \z}mxs;
+      my @children = $self->list_category($type);
+      $self->fatal("invalid identifier '$oid' "
+           . "(too high, max $first@{[scalar @children]})")
+        if $id > @children;
+      $child = $children[$id - 1];
+   } ## end else [ if ($id =~ s{\A -}{}mxs)]
+
+   return $child;
+} ## end sub resolve ($self)
+
+1;

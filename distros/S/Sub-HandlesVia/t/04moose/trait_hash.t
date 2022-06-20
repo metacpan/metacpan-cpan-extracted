@@ -12,7 +12,7 @@ use lib 't/lib';
 #use NoInlineAttribute;
 use Test::More;
 use Test::Fatal;
-#use Test::Moose;
+use Test::Moose;
 
 {
     my %handles = (
@@ -86,7 +86,7 @@ note "Testing class $class";
 
     can_ok( $class, $_ ) for sort keys %{$handles};
 
-#    with_immutable {
+    with_immutable {
         my $obj = $class->new( options => {} );
 
         ok( $obj->has_no_options, '... we have no options' );
@@ -312,14 +312,14 @@ note "Testing class $class";
                 'accessor triggers lazy default generator'
             );
         }
-#    }
-#    $class;
+    }
+    $class;
 }
 
 {
     my ( $class, $handles ) = build_class( isa => HashRef );
     my $obj = $class->new;
-#    with_immutable {
+    with_immutable {
         is(
             exception { $obj->option_accessor( 'foo', undef ) },
             undef,
@@ -330,8 +330,8 @@ note "Testing class $class";
             undef,
             'can use accessor to set value to undef'
         );
-#    }
-#    $class;
+    }
+    $class;
 }
 
 done_testing;

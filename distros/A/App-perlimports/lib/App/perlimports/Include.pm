@@ -2,22 +2,26 @@ package App::perlimports::Include;
 
 use Moo;
 
-our $VERSION = '0.000044';
+our $VERSION = '0.000045';
 
 use Data::Dumper qw( Dumper );
-use List::Util qw( any none uniq );
-use Memoize qw( memoize );
+use List::Util   qw( any none uniq );
+use Memoize      qw( flush_cache memoize );
 use MooX::StrictConstructor;
-use PPI::Document ();
+use PPI::Document               ();
 use PPIx::Utils::Classification qw( is_function_call is_perl_builtin );
-use Ref::Util qw( is_plain_arrayref is_plain_hashref );
+use Ref::Util                   qw( is_plain_arrayref is_plain_hashref );
 use Sub::HandlesVia;
-use Try::Tiny qw( catch try );
+use Try::Tiny       qw( catch try );
 use Types::Standard qw(ArrayRef Bool HashRef InstanceOf Maybe Object Str);
 
 with 'App::perlimports::Role::Logger';
 
 memoize('is_function_call');
+
+sub BUILD {
+    flush_cache('is_function_call');
+}
 
 has _explicit_exports => (
     is          => 'ro',
@@ -750,7 +754,7 @@ App::perlimports::Include - Encapsulate one use statement in a document
 
 =head1 VERSION
 
-version 0.000044
+version 0.000045
 
 =head1 METHODS
 

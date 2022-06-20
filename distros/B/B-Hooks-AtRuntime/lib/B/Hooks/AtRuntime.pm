@@ -12,7 +12,7 @@ our @EXPORT     = qw/at_runtime/;
 our @EXPORT_OK  = qw/at_runtime after_runtime lex_stuff/;
 
 BEGIN {
-    our $VERSION = "6";
+    our $VERSION = "7";
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -54,6 +54,41 @@ if (USE_FILTER) {
         });
     };
 }
+
+# In order to avoid needing to stuff text into perl's lexer too often,
+# the code stuffed looks like this
+#
+#   B::Hooks::AtRuntime::run(@B::Hooks::Runtime::hooks);
+#   BEGIN { B::Hooks::Runtime::clear(1) }
+#
+# The way this works is as follows.
+#
+# - The @hooks global refers to a different array every time it is used.
+#   The sub replace_hooks is responsible for making sure that the global
+#   points to the correct array at the time the stuffed code is
+#   compiled.
+#
+# - The lexical array @Hooks below contains one entry for each time we
+#   have recursively entered compile time. So, for example, if the user
+#   writes
+#
+#       BEGIN {
+#           BEGIN {
+#               at_runtime { ... };
+#           }
+#       }
+#
+#   then the at_runtime sub is pushed onto @Hooks[2], because we are in
+#   our second recursive BEGIN. (@Hooks[0] is never used.)
+#
+# - The XS sub count_BEGINs is responsible for finding which level of
+#   @Hooks to push onto. It does this by looking for BEGIN blocks,
+#   because even use compiles out as a BEGIN block.
+#
+# - The call to clear() ensures that if we leave and re-enter compile
+#   time at this level we get a new array of hooks and a new code-stuff
+#   to call them. The number passed (interpolated into the compiled
+#   code) is the level of @Hooks to clear.
 
 my @Hooks;
 
@@ -106,6 +141,7 @@ sub at_runtime (&) {
     push @$hk, subname scalar(caller) . "::(at_runtime)", $cv;
 }
 
+# The XS sub run() knows that a ref to a ref is an after_runtime sub.
 sub after_runtime (&) {
     my ($cv) = @_;
     my $hk = find_hooks;

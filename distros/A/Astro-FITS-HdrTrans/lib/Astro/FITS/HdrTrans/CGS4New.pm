@@ -28,7 +28,7 @@ use base qw/ Astro::FITS::HdrTrans::UIST /;
 
 use vars qw/ $VERSION /;
 
-$VERSION = "1.64";
+$VERSION = "1.65";
 
 my %CONST_MAP = ( OBSERVATION_MODE => 'spectroscopy',
                 );

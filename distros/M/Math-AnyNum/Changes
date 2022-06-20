@@ -1,5 +1,27 @@
 Revision history for Math-AnyNum
 
+0.39    2022-06-11
+
+        [ADDITIONS]
+
+        - Added the `addmod(a,b,m)`, `submod(a,b,m)` and `mulmod(a,b,m)` methods.
+        - Added the `chebyshevTmod(n,x,m)` and `chebyshevUmod(n,x,m)` methods.
+        - Added the `quadratic_powmod(a,b,w,n,m)` method.
+        - Added the `idiv_ceil(a,b)`, `idiv_trunc(a,b)`, `idiv_round(a,b)` methods.
+        - Added the `is_power_of(n,b)` method, which returns true if n is a power of b.
+
+        [CHANGES]
+
+        - Changed `idiv(a,b)` to do floor-division instead of truncated-division.
+        - Return zero when k > n in subfactorial(n, k).
+
+        [IMPROVEMENTS]
+
+        - Extended `divmod()` to support an additional argument.
+        - Optimization in `digits(n,b)` and `sumdigits(n,b)` for large n and b.
+        - Faster computation of `chebyshevT(n,x)` and `chebyshevU(n,x)` for large n.
+        - Less memory usage in `sumdigits(n,b=10)` for very large n.
+
 0.38    2021-02-21
 
         - Changed the result of `RATIONAL % INTEGER` to match the output of `ratmod`.

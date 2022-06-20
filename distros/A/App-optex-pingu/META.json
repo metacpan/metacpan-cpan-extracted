@@ -1,0 +1,81 @@
+{
+   "abstract" : "optex make-everything-pingu filter",
+   "author" : [
+      "Kazumasa Utashiro"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.12",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-optex-pingu",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::optex" : "v0.5.3",
+            "File::Share" : "0",
+            "List::Util" : "0",
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "App::optex::pingu" : {
+         "file" : "lib/App/optex/pingu.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kaz-utashiro/optex-pingu/issues"
+      },
+      "homepage" : "https://github.com/kaz-utashiro/optex-pingu",
+      "repository" : {
+         "url" : "git://github.com/kaz-utashiro/optex-pingu.git",
+         "web" : "https://github.com/kaz-utashiro/optex-pingu"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:UTASHIRO",
+   "x_contributors" : [
+      "Kazumasa Utashiro <kaz@utashiro.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_static_install" : 1
+}

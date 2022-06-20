@@ -15,6 +15,7 @@ doap.ttl
 examples/benchmark.pl
 lib/Lexical/Accessor.pm
 lib/Sub/Accessor/Small.pm
+lib/Sub/HandlesVia/Toolkit/SubAccessorSmall.pm
 t/01basic.t
 t/02moose.t
 t/03mouse.t

@@ -36,7 +36,7 @@ use constant CLIGHT => 2.99792458e5;
 
 use vars qw/ $VERSION /;
 
-$VERSION = "1.64";
+$VERSION = "1.65";
 
 # Cache UTC definition
 our $UTC = DateTime::TimeZone->new( name => 'UTC' );
@@ -71,6 +71,9 @@ my %UNIT_MAP = (
                 SWITCH_MODE        => 'SW_MODE',
                 SPECIES            => 'MOLECULE',
                 VELOCITY_TYPE      => 'DOPPLER',
+                SIDEBAND_MODE      => 'SB_MODE',
+                OBSERVED_SIDEBAND  => 'OBS_SB',
+                TRACKING_SIDEBAND  => 'TRACK_SB',
                );
 
 # Create the translation methods
@@ -409,8 +412,10 @@ sub to_EXPOSURE_TIME {
        exists( $FITS_headers->{'DATE-END'} ) ) {
     my $start = $self->to_UTSTART( $FITS_headers );
     my $end = $self->to_UTEND( $FITS_headers );
-    my $duration = $end - $start;
-    $return = $duration->seconds;
+    if (defined $start and defined $end) {
+      my $duration = $end - $start;
+      $return = $duration->seconds;
+    }
   }
   return $return;
 }

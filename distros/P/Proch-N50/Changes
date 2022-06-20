@@ -1,3 +1,10 @@
+1.4.4	2022-06-12
+	* Starting migration of the repository to telatin/proch-n50
+
+1.4.3	2022-06-02
+	* Fixed future deprecation on regexes
+	* Update FASTX::Reader version required (should fix a bug opened in rt)
+
 1.4.2	2021-11-02
 	* Fixed perlcritic warnings on 'n50' 
 	* Repository update, documentation update, improved errors in wrong lib version detected

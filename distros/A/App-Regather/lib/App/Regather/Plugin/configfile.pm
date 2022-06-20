@@ -333,11 +333,11 @@ sub ldap_sync_delete {
 		ls => [ sprintf("%s:%s",__FILE__,__LINE__), $out_to ] )
 	if $self->{v} > 0;
     } else {
-      $self->log->cc( pr => 'err', fm => "%s: file %s was not removed; error: ",
+      $self->log->cc( pr => 'err', fm => "%s: file %s was not removed; error: %s",
 		ls => [ sprintf("%s:%s",__FILE__,__LINE__), $out_to, $! ] );
     }
   }
-  $self->log->cc( pr => 'debug', fm => "%s: control %s: dn: %s processed successfully..",
+  $self->log->cc( pr => 'debug', fm => "%s: control %s: dn: %s processing finished",
 	    ls => [ sprintf("%s:%s",__FILE__,__LINE__), SYNST->[$self->syncstate], $self->obj->dn ] );
 
   if ( $self->cf->is_set('service', $self->service, 'post_process') ) {

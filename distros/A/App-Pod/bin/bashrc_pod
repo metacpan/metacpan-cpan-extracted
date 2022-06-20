@@ -1,0 +1,92 @@
+#!/bin/bash
+
+export MY_CACHE_DIR="$HOME/.cache"
+export MY_POD_CACHE="$MY_CACHE_DIR/my_pod_clases.cache"
+
+# Colon should not be a word break in perl.
+export COMP_WORDBREAKS=${COMP_WORDBREAKS//:}
+
+_tab__pod_make_class_cache(){
+   _tab__pod_get_modules_list  > "$MY_POD_CACHE"
+   pod --tool_options         >> "$MY_POD_CACHE"
+}
+
+_my_clear_cache(){
+   rm -frv $MY_CACHE_DIR/my_*.cache
+}
+
+_tab__pod_get_modules_list(){
+   perl -le 'print for @INC' | while
+      read dir; do
+         find $dir \( -type f -or -type l \) \( -name "*.pm" \) -printf "%P\n" |
+         perl -lpe '
+            s&^[^/]+/&& while /-/;
+            s&/&::&g;
+            s/\.pm$//
+         ' | sort -u
+      done
+}
+
+_tab__pod_get_command(){
+   perl -e '
+        my $cnt   = 0;
+        my $class = "";
+
+        $_ ||= " " for @ARGV;       # Empty input.
+        shift;                      # Skip script name.
+
+        while ($_ = shift) {
+            if ( / ^ - /x) {        # Skip options.
+                # Skip query value.
+                shift if / ^ -+ q(uery)? $ /x;
+                next;
+            }
+            $class = $_ if not $cnt++;
+        }
+
+        if($cnt == 1) {
+            print q(cat $MY_POD_CACHE);
+        }
+        elsif($cnt == 2){
+            print qq(pod $class --class_options --tool_options --no_error);
+        }
+        else{
+            print q(pod --tool_options);
+        }
+   ' -- "$@"
+}
+
+_tab__pod(){
+   if [ ! -e "$MY_POD_CACHE" ]; then
+      _tab__pod_make_class_cache
+   fi
+
+   local prev="${COMP_WORDS[COMP_CWORD-1]}"
+   local cur="${COMP_WORDS[COMP_CWORD]}"
+
+   if [[ $cur =~ ^- ]]; then                    # Option
+       words=$(pod --tool_options)
+   elif [[ "$prev" =~ ^-+q(uery)?$ ]]; then     # --query
+       return                                   # Since it can be anything.
+   else
+       # Filter out script name, options, and query value.
+       # Then count how many arguments remain.
+       local command=$(_tab__pod_get_command "${COMP_WORDS[@]}")
+       words=$(eval "$command")
+   fi
+
+   COMPREPLY=( $(compgen -W "${words[@]}" -- "$cur") )
+
+ # echo
+ # echo "COMP_WORDS    = [${#COMP_WORDS[@]}] [${COMP_WORDS[*]}]"
+ # echo "COMP_CWORD    = [$COMP_CWORD]"
+ # echo "prev          = [$prev]"
+ # echo "cur           = [$cur]"
+ # echo "args_cnt      = [$args_cnt]"
+ # echo "COMP_LINE     = [$COMP_LINE]"
+ # echo "COMPREPLY     = [${COMPREPLY[@]}]"
+ # echo
+}
+
+complete -F _tab__pod pod
+

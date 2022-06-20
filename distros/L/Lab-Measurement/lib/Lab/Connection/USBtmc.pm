@@ -1,6 +1,6 @@
 package Lab::Connection::USBtmc;
 #ABSTRACT: F</dev/usbtmc> Linux USB Test&Measurement kernel driver connection
-$Lab::Connection::USBtmc::VERSION = '3.820';
+$Lab::Connection::USBtmc::VERSION = '3.821';
 use v5.20;
 
 use strict;
@@ -98,7 +98,7 @@ Lab::Connection::USBtmc - F</dev/usbtmc> Linux USB Test&Measurement kernel drive
 
 =head1 VERSION
 
-version 3.820
+version 3.821
 
 =head1 SYNOPSIS
 

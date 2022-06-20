@@ -3,8 +3,8 @@ NAME
     object
 
 VERSION
-    This document describes version 0.115 of Data::TableData::Object (from
-    Perl distribution Data-TableData-Object), released on 2021-11-17.
+    This document describes version 0.116 of Data::TableData::Object (from
+    Perl distribution Data-TableData-Object), released on 2022-05-19.
 
 DESCRIPTION
     This module provides a common interface to manipulate a few kinds of
@@ -78,8 +78,8 @@ CONTRIBUTING
     me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2019, 2017, 2016, 2015, 2014 by
-    perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2022, 2021, 2019, 2017, 2016, 2015, 2014
+    by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,10 @@
 Revision history for Perl module Text::Table::Tiny
 
+1.03 2022-06-17 NEILB
+    - Added a "header" option, which lets you pass the header row separate
+      from the body rows. Suggested by @rovo89.
+    - Support for 5.8 added by removing use of //. PR frpm @rovo89.
+
 1.02 2020-09-13 NEILB
     - Now handles (at least some) wide characters correctly.
 

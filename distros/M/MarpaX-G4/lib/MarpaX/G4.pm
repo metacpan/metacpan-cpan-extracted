@@ -3,7 +3,7 @@
 #                                                                                                       #
 # translate the parsed antlr4 rules to Marpa::R2 syntax.                                                #
 #                                                                                                       #
-# V 1.0                                                                                                 #
+# V 0.9.6                                                                                               #
 # ----------------------------------------------------------------------------------------------------- #
 
 package MarpaX::G4;
@@ -17,7 +17,8 @@ use MarpaX::G4::Parser;
 use MarpaX::G4::Symboltable;
 use MarpaX::G4::MarpaGen;
 
-our $optstr = 'cdefghiko:prs:tuv';
+our $VERSION = '0.9.6';
+our $optstr  = 'cdefghiko:prs:tuv';
 
 sub new
 {
@@ -28,7 +29,6 @@ sub new
 
     return $self;
 }
-
 
 sub printHelpScreen
 {
@@ -66,6 +66,9 @@ sub printHelpScreen
     exit 0;
 }
 
+##
+#   readFile: swallow an entire input file into a string
+##
 sub readFile
 {
     my ($infile) = @_;
@@ -84,11 +87,49 @@ sub readFile
     return $file_text;
 }
 
+##
+#   processSymboltable: generate the output grammar from the symbol table
+##
+sub processSymboltable
+{
+    my ($self, $symboltable, $options ) = @_;
+
+    if ( exists $options->{v} )
+    {
+        $Data::Dumper::Indent = 1;
+        print Dumper($symboltable);
+    }
+
+    $symboltable->setStartRule($options->{s}) if exists $options->{s};
+    $symboltable->validateSymbolTable()       if exists $options->{r};
+
+    my $generator = new MarpaX::G4::MarpaGen;
+
+    $generator->stripallcomments     if exists $options->{c};
+    $generator->embedactions         if exists $options->{e};
+    $generator->fragment2class       if exists $options->{f};
+    $generator->shiftlazytogreedy    if exists $options->{g};
+    $generator->buildkeywords        if exists $options->{k};
+    $generator->stripactions         if exists $options->{p};
+    $generator->setVerbosity(2)      if exists $options->{t};
+    $generator->matchcaseinsensitive if exists $options->{u} || exists $options->{k};
+
+    my $outputfile  = '-';
+    $outputfile     = $options->{o}  if exists $options->{o};
+    $generator->setoutputfile($outputfile);
+
+    $generator->generate($symboltable);
+}
+
+##
+#   translatestring: parse the antlr4 input grammar from '$grammartext',
+#                    generate the Marpa::R2 output grammar.
+##
 sub translatestring
 {
     my ( $self, $grammartext, $options ) = @_;
 
-    my $parser = MarpaX::G4::Parser->new();
+    my $parser = new MarpaX::G4::Parser;
     $parser->enabletrace     if exists $options->{t};
     $parser->ignoreredirect  if exists $options->{i};
 
@@ -103,33 +144,18 @@ sub translatestring
     }
     $symboltable->importParseTree($data);
 
-    $symboltable->setStartRule($options->{s}) if exists $options->{s};
-    $symboltable->validateSymbolTable()       if exists $options->{r};
-
-    my $generator = new MarpaX::G4::MarpaGen;
-
-    $generator->stripallcomments    if exists $options->{c};
-    $generator->embedactions        if exists $options->{e};
-    $generator->fragment2class      if exists $options->{f};
-    $generator->shiftlazytogreedy   if exists $options->{g};
-    $generator->buildkeywords       if exists $options->{k};
-    $generator->stripactions        if exists $options->{p};
-    $generator->setVerbosity(2)     if exists $options->{t};
-    $generator->splitliteral        if exists $options->{u} || exists $options->{k};
-
-    my $outputfile  = '-';
-    $outputfile     = $options->{o} if exists $options->{o};
-    $generator->setoutputfile($outputfile);
-
-    $generator->generate($symboltable);
+    $self->processSymboltable($symboltable, $options);
 }
 
-
+##
+#   translatefiles:  parse the antlr4 input grammar from the input file(s),
+#                    generate the Marpa::R2 output grammar.
+##
 sub translatefiles
 {
     my ( $self, $inputfiles, $options ) = @_;
 
-    my $parser = MarpaX::G4::Parser->new();
+    my $parser = new MarpaX::G4::Parser;
     $parser->enabletrace     if exists $options->{t};
     $parser->ignoreredirect  if exists $options->{i};
 
@@ -148,35 +174,7 @@ sub translatefiles
         $symboltable->importParseTree($data);
     }
 
-    $symboltable->setStartRule($options->{s}) if exists $options->{s};
-
-    ## -----------
-    #  optional debugging stages
-    ## -----------
-    if ( exists $options->{v} )
-    {
-        $Data::Dumper::Indent = 1;
-        print Dumper($symboltable);
-    }
-
-    $symboltable->validateSymbolTable() if exists $options->{r};
-
-    my $generator = new MarpaX::G4::MarpaGen;
-
-    $generator->stripallcomments    if exists $options->{c};
-    $generator->embedactions        if exists $options->{e};
-    $generator->fragment2class      if exists $options->{f};
-    $generator->shiftlazytogreedy   if exists $options->{g};
-    $generator->buildkeywords       if exists $options->{k};
-    $generator->stripactions        if exists $options->{p};
-    $generator->setVerbosity(2)     if exists $options->{t};
-    $generator->splitliteral        if exists $options->{u} || exists $options->{k};
-
-    my $outputfile  = '-';
-    $outputfile     = $options->{o} if exists $options->{o};
-    $generator->setoutputfile($outputfile);
-
-    $generator->generate($symboltable);
+    $self->processSymboltable($symboltable, $options);
 }
 
 1;

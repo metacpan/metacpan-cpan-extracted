@@ -19,7 +19,7 @@ name: App-PericmdUtils
 provides:
   App::PericmdUtils:
     file: lib/App/PericmdUtils.pm
-    version: '0.052'
+    version: '0.053'
 requires:
   Data::Sah::Compiler::perl::TH::any: '0.911'
   Data::Sah::Compiler::perl::TH::array: '0.911'
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-PericmdUtils
   homepage: https://metacpan.org/release/App-PericmdUtils
   repository: git://github.com/perlancar/perl-App-PericmdUtils.git
-version: '0.052'
+version: '0.053'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

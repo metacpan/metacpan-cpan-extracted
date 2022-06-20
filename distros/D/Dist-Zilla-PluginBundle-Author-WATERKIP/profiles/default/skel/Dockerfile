@@ -4,14 +4,11 @@
 # but it is intended to be easy to go into an environment and poke
 # around and edit and less things
 #
-FROM registry.gitlab.com/opndev/perl5/docker-p5/moosy-development:latest as dependencies
+FROM registry.gitlab.com/opndev/perl5/docker-p5/mmoosy-development:latest
 
 COPY cpanfile .
-RUN ./dev-bin/cpanm --installdeps --test-only . \
-    && ./dev-bin/cpanm -n --installdeps . \
-    && rm -rf $HOME/.cpanm
+RUN docker-cpanm --installdeps --test-only . \
+    && docker-cpanm -n --installdeps .
 
 COPY . .
-RUN prove -l \
-    && ./dev-bin/cpanm -n . \
-    && rm -rf $HOME/.cpanm
+RUN prove -l && docker-cpanm -n .

@@ -13,4 +13,6 @@ Revision history for Moonshine-Element
 
 0.10    05/03/2017
         Adds - get_element('', []) - get_elements('', []), get_elements_by_class(), get_elements_by_tag()
-       
+
+0.12    15/06/2022
+        Adds - insert_child($index, { tag => "p", ... );

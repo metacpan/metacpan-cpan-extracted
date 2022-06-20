@@ -4,7 +4,7 @@
 use v5.12;
 
 package Chart::Constants;
-our $VERSION = 'v2.402.1';
+our $VERSION = 'v2.402.3';
 
 use constant PI => 4 * atan2( 1, 1 );
 
