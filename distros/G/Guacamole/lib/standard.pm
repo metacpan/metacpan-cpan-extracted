@@ -1,7 +1,7 @@
 package standard;
 our $AUTHORITY = 'cpan:XSAWYERX';
 # ABSTRACT: Enforce Standard Perl syntax with Guacamole
-$standard::VERSION = '0.007';
+$standard::VERSION = '0.008';
 use strict;
 use warnings;
 use experimental qw< signatures >;
@@ -70,7 +70,7 @@ standard - Enforce Standard Perl syntax with Guacamole
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -139,14 +139,14 @@ thus not supported.
 
     open FOO, ...    # not ok
     open my $fh, ... # ok
-    open $fh, ...    # also ok
+    open $fh, ...    # ok
 
-    print STDOUT $foo; # also ok
-    print STDERR $foo; # also ok
+    print STDOUT $foo; # ok
+    print STDERR $foo; # ok
 
     while ( <FOO>   ) {...} # not ok
     while ( <$foo>  ) {...} # ok
-    while ( <STDIN> ) {...} # also ok
+    while ( <STDIN> ) {...} # ok
 
 The following bareword filehandles are supported:
 
@@ -171,17 +171,56 @@ The following bareword filehandles are supported:
     print $fh $foo;   # not ok
     print {$fh} $foo; # ok
 
-=item * C<_> in file operations
+=item * C<_> outside file operations
 
-    if ( -f $foo && -r _ )    {...} # not ok
-    if ( -f $foo && -r $foo ) {...} $ ok
+    if ( -f $foo && -r _ ) {...} # ok
+    print {$fh} _                # not ok
 
-C<_> is an ambiguous bareword identifier. For example, using it in
-C<print> is parsed different than when used with C<-r>.
+C<_> should only be used as a bareword identifier within C<-X> file
+operations. In the C<print> example, Perl understands it as printing
+an underscore character (C<"_">) to the filehandle, which is just
+odd, so we do not support that.
 
 =item * C<given> / C<when> / C<default>
 
 Not supported.
+
+=item * Anonymous hashes vs. bare block as top-level expressions
+
+    # not ok
+    package Foo {
+        { 'bar' => 'baz' };
+    }
+
+The above shows a useless use of anonymous hash (per the Perl warning
+on it) as a top-level expression (in this case, inside a C<package>
+block).
+
+Standard Perl does not support this since it can be confused with a
+bare code block. Instead, you should add some top-level token to
+disambiguate:
+
+    # ok
+    package Foo {
+        +{ 'bar' => 'baz' }
+    }
+
+It's still useless (and Perl would warn about it), but it's allowed.
+
+    # not ok:
+    sub foo {
+        { 'a' => 'b' };
+    }
+
+    # ok
+    sub foo {
+        +{ 'a' => 'b' }; # "+" is a top-level token
+    }
+
+    # ok
+    sub foo {
+        return { 'a' => 'b' }; # used as argument to "return"
+    }
 
 =back
 
@@ -190,7 +229,7 @@ Not supported.
 The following are limitations that Standard Perl has which the perl
 interpreter doesn't.
 
-=head3 Q-Like values delimiters
+=head3 Q-Like values
 
 Q-Like values are one of the following: C<q>, C<qq>, C<qw>, C<qx>, C<qr>
 
@@ -224,12 +263,17 @@ C<()>, C<[]>, C<{}>, C<< E<lt> E<gt> >>, C<//>, C<!!>, and C<||>.
     $val = q#...#    # not ok
     $val = q Z ... Z # not ok
 
-=item * No spaces between before delimiters:
+If you want to advocate for another set of delimiters, open a ticket.
 
-    q <foo> # not ok
-    q<foo>  # ok
-    q ()    # not ok
-    q()     # ok
+=item * No spaces between before delimiters in Q-like values:
+
+    q <foo>   # not ok
+    q < foo > # not ok
+    q ()      # not ok
+
+    q<foo>    # ok
+    q< foo >; # ok
+    q()       # ok
 
 =back
 
@@ -245,10 +289,10 @@ C<()>, C<[]>, C<{}>, C<< E<lt> E<gt> >>, C<//>, C<!!>, and C<||>.
 There is an exception for methods:
 
     $foo->bar()         # ok
-    $foo->bar           # also ok
+    $foo->bar           # ok
 
     $foo->bar()->baz()  # ok
-    $foo->bar->baz      # also ok
+    $foo->bar->baz      # ok
 
 =item * Subroutines can have attributes and signatures
 
@@ -264,12 +308,15 @@ Standard Perl accepts both attributes and signatures.
     first {...} @foo         # not ok
     first( sub {...}, @foo ) # ok
 
-We are looking into allowing developers to have their grammars hooking
-up to the L<Guacamole> parser so it could allow to extend Standard Perl.
-This will be useful for stuff like L<List::Util>, L<Dancer2>,
-L<Mojolicious::Lite>, L<Moose>, etc.
+There is preliminary support for adding your own keywords by hooking
+into the grammar of the L<Guacamole> parser, but it is B<ALPHA> stage,
+so it's not widely docuemnted.
 
-Having said that, Standard Perl doesn't accept this.
+This will be useful for stuff like L<List::Util>, L<Dancer2>,
+L<Mojolicious::Lite>, L<Try::Tiny>, L<Moose>, etc.
+
+Having said that, Standard Perl will likely never prototypes directly,
+nor should it.
 
 =back
 
@@ -282,7 +329,7 @@ Having said that, Standard Perl doesn't accept this.
     Foo->new(); # always a class, never a function "Foo"
 
 This is tricky because the perl interpreter might see a function called
-C<foo> in the same scope and call that instead. This would mean that
+C<Foo> in the same scope and call that instead. This would mean that
 Standard Perl and the perl interpreter would report different results.
 
 We have a shim layer in L<standard> that checks for this and alerts if
@@ -295,7 +342,7 @@ We advise other parsers who use Standard Perl BNF to include this part.
     Foo->bar();   # ok
     Foo::->bar(); # not ok
 
-This might be changed.
+This might be changed in the future.
 
 =back
 
@@ -322,17 +369,6 @@ This might be changed.
 
 =back
 
-=head3 Eval
-
-=over 4
-
-=item * C<eval> only supports a block, not an expression
-
-    eval { ... }   # ok
-    eval " ... "   # not ok
-
-=back
-
 =head1 SEE ALSO
 
 L<Guacamole>
@@ -353,7 +389,7 @@ Vickenty Fesunov
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Sawyer X.
+This software is Copyright (c) 2022 by Sawyer X.
 
 This is free software, licensed under:
 

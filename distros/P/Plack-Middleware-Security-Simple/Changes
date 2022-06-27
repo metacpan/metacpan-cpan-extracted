@@ -1,5 +1,16 @@
 Revision history for Plack-Middleware-Security-Simple:
 
+v0.8.0    2022-06-21 16:36:30+01:00 Europe/London
+  [Enhancements]
+  - Added .bkp, .backup, .npb, .old, .psb and .psc to the misc_extensions rule.
+
+  - Added cms_prefixes rule.
+
+  - Added backup_files rule.
+
+  [Bug Fixes]
+  - Disable capturing on some regexes.
+
 v0.7.0    2022-06-13 16:46:40+01:00 Europe/London
   [Enhancements]
   - Add header_injection rule.

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.551-3-gb026a1f2
+package JSON::Schema::Modern; # git description: v0.552-8-g2c387616
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
-# KEYWORDS: JSON Schema data validation structure specification
+# KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.552';
+our $VERSION = '0.553';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -962,7 +962,7 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.552
+version 0.553
 
 =head1 SYNOPSIS
 
@@ -1004,15 +1004,15 @@ May be one of:
 
 =item *
 
-L<C<draft2020-12 or 2020-12>|https://json-schema.org/specification-links.html#2020-12>, corresponding to metaschema C<https://json-schema.org/draft/2020-12/schema>.
+L<C<draft2020-12> or C<2020-12>|https://json-schema.org/specification-links.html#2020-12>, corresponding to metaschema C<https://json-schema.org/draft/2020-12/schema>.
 
 =item *
 
-L<C<draft2019-09 or 2019-09>|https://json-schema.org/specification-links.html#2019-09-formerly-known-as-draft-8>, corresponding to metaschema C<https://json-schema.org/draft/2019-09/schema>.
+L<C<draft2019-09> or C<2019-09>|https://json-schema.org/specification-links.html#2019-09-formerly-known-as-draft-8>, corresponding to metaschema C<https://json-schema.org/draft/2019-09/schema>.
 
 =item *
 
-L<C<draft7 or 7>|https://json-schema.org/specification-links.html#draft-7>, corresponding to metaschema C<http://json-schema.org/draft-07/schema#>
+L<C<draft7> or C<7>|https://json-schema.org/specification-links.html#draft-7>, corresponding to metaschema C<http://json-schema.org/draft-07/schema#>
 
 =back
 
@@ -1146,7 +1146,7 @@ C<effective_base_uri>: locations in errors and annotations are resolved against 
 
 =back
 
-The result is a L<JSON::Schema::Modern::Result> object, which can also be used as a boolean.
+The return value is a L<JSON::Schema::Modern::Result> object, which can also be used as a boolean.
 
 =head2 evaluate
 
@@ -1219,7 +1219,7 @@ For example, to find the locations where all C<$ref> keywords are applied B<succ
     },
   });
 
-The result is a L<JSON::Schema::Modern::Result> object, which can also be used as a boolean.
+The return value is a L<JSON::Schema::Modern::Result> object, which can also be used as a boolean.
 
 =head2 validate_schema
 

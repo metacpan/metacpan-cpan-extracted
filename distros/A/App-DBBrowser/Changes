@@ -1,6 +1,22 @@
 Revision history for App-DBBrowser
 
 
+2.299    2022-06-25
+        - Update Functions.pm.
+        - Term::Form minimum version is '0.551'.
+
+2.298    2022-06-23
+        - Update and bugfixes Functions.pm.
+
+2.297    2022-06-20
+        - Added Firebird-plugin.
+        - Update plugin-API: 'sqlite_search' is now 'search'.
+        - Bugfix: reading file with Text::CSV.
+        - Update 'from_col_by_col'.
+        - Update function 'Epoch_to_DateTime'.
+        - Refactoring Functions.pm.
+        - Removed backward compatibility for removed option values.
+
 2.296    2022-05-01
         - Term::Choose minimum version is '1.749'.
         - Term::Form minimum version is '0.547'.

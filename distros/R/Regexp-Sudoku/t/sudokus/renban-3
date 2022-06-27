@@ -1,0 +1,41 @@
+3 . .  . . 7  . . .
+. 7 .  . 1 .  . . .
+. . .  9 . .  . . .
+
+. . 1  . . .  . . 9
+. 2 .  . . .  . 8 .
+9 . .  . . .  7 . .
+
+. . .  . . 4  . . .
+. . .  . 3 .  . 7 .
+. . .  2 . .  . . 6
+
+==
+Solution
+3 4 9  6 2 7  8 5 1
+2 7 6  8 1 5  3 9 4
+5 1 8  9 4 3  2 6 7
+
+8 3 1  7 5 2  6 4 9
+6 2 7  4 9 1  5 8 3
+9 5 4  3 8 6  7 1 2
+
+7 9 3  5 6 4  1 2 8
+4 6 2  1 3 8  9 7 5
+1 8 5  2 7 9  4 3 6
+==
+Create
+Regexp::Sudoku:: -> new -> init
+                 -> set_renban (qw [R1C7 R1C8 R2C8 R3C8 R3C9])
+                 -> set_renban (qw [R2C6 R2C7 R3C7 R4C7 R4C8])
+                 -> set_renban (qw [R3C5 R3C6 R4C6 R5C6 R5C7])
+                 -> set_renban (qw [R4C4 R4C5 R5C5 R6C5 R6C6])
+                 -> set_renban (qw [R5C3 R5C4 R6C4 R7C4 R7C5])
+                 -> set_renban (qw [R6C2 R6C3 R7C3 R8C3 R8C4])
+                 -> set_renban (qw [R7C1 R7C2 R8C2 R9C2 R9C3])
+==
+Name: A Superb Renban Sudoku by Gaurav Kumar Jain
+URL: https://www.youtube.com/watch?v=qGG8cw-1Ea0
+Runtime: 05:12:46
+Lengths: 62200 (subject) & 26451 (pattern)
+Number of statements: 883

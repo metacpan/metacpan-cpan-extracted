@@ -100,10 +100,10 @@ TEST("due_in") {
 TEST("pause/resume") {
     AsyncTest test(1000, 0);
     TimerSP t = new Timer(test.loop);
-    
+
     SECTION("pause") {
         t->event.add([](auto){ FAIL(); });
-        t->start(1);
+        t->start(2);
         test.run_nowait();
         t->pause();
         test.run();
@@ -143,7 +143,7 @@ TEST("pause/resume") {
             REQUIRE(!res);
             CHECK(res.error() & std::errc::invalid_argument);
         }
-                
+
         SECTION("stopped") {
             t->start(1);
             t->stop();
@@ -151,7 +151,7 @@ TEST("pause/resume") {
             REQUIRE(!res);
             CHECK(res.error() & std::errc::invalid_argument);
         }
-        
+
         SECTION("paused&stopped") {
             t->start(1);
             t->pause();

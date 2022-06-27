@@ -518,15 +518,11 @@ sub __create {
 sub __insert_data {
     my ( $sf, $sql ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $sql->{table} . " LIMIT 0" );
-    if ( $sf->{i}{driver} ne 'SQLite' ) {
-        $sth->execute();
-    }
-    my @columns = @{$sth->{NAME}};
+    my $columns = $ax->column_names( $sql->{table} );
     if ( length $sf->{col_auto} ) {
-        shift @columns;
+        shift @$columns;
     }
-    $sql->{insert_into_cols} = $ax->quote_simple_many( \@columns );
+    $sql->{insert_into_cols} = $ax->quote_simple_many( $columns );
     require App::DBBrowser::Table::CommitWriteSQL;
     my $cs = App::DBBrowser::Table::CommitWriteSQL->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $commit_ok = $cs->commit_sql( $sql );

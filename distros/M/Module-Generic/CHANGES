@@ -1,6 +1,27 @@
 Revision history for Perl module Module::Generic
 
-v0.23.1 2022-03-28T11:18:17+0900
+v0.24.1 2022-06-24T07:36:36+0900
+    - Added the extensions method in Module::Generic::File
+
+v0.24.0 2022-04-28T06:55:11Z +0900
+    - Corrected minor bug in _filehandle_method() in Module::Generic::File
+    - Implemented mitigation for URI module who removes any leading and/or trailing space in the path
+    - Made substantial improvements to glob() in Module::Generic::File
+    - Added value_name and value_data in Module::Generic::HeaderValue
+    - Spun off the package Module::Generic::Scalar::IO into its own file and heavily modified it, getting rid of IO::Scalar
+    - Optimised Module::Generic to remove unnecessary modules and only load them when required
+    - Added method has_valid_name() in Module::Generic::File
+    - Added module Module::Generic::File::IO to provide a uniform and exception safe interface to IO::File
+    - Modified tempfile() in Module::Generic::File to accept an extension with or without leading dot.
+    - Added method _load_classes to Module::Generic
+    - Changed read() in Module::Generic::File so that it accept the as_object option to return an object instead of a string.
+    - Added method except() in Module::Generic::Array
+    - Corrected _parse_timestamp for a date patter that is for GMT and ensures the format set has GMT time zone.
+    - Improved the support method _warnings_is_enabled to check if class is even registered
+    - Corrected mishandling of IO layer when opening scalar with Module::Generic::Scalar::IO
+    - Improved _get_args_as_hash in Module::Generic to allow parameters to be mixed with other arguments
+
+v0.23.1 2022-03-28T11:18:17Z +0900
     - Added method  _set_get_glob in Module::Generic
     - Corrected a small bug in Module::Generic::Dynamic
     - Corrected a small bug in method content() in Module::Generic::File

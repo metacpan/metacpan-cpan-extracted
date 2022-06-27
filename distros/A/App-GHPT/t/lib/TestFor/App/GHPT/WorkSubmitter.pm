@@ -2,7 +2,7 @@ package TestFor::App::GHPT::WorkSubmitter;
 
 use App::GHPT::Wrapper::OurTest::Class::Moose;
 
-use Hash::Objectify qw( objectify );
+use Hash::Objectify       qw( objectify );
 use Helper::MockPTAPI     ();
 use Helper::WorkSubmitter ();
 use Test::Differences;
@@ -152,7 +152,10 @@ sub test_chore_filter ( $self, @ ) {
 sub test_token_from_env ( $self, @ ) {
     my $ws = App::GHPT::WorkSubmitter->new;
     local $ENV{PIVOTALTRACKER_TOKEN} = 'env value';
-    is( $ws->_pt_token, 'env value', 'value comes from environment' );
+    is(
+        $ws->pivotaltracker_token, 'env value',
+        'value comes from environment'
+    );
 }
 
 __PACKAGE__->meta->make_immutable;

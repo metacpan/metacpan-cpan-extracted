@@ -379,7 +379,7 @@ struct TypemapObject : TypemapBase<TYPEMAP, TYPE> {
 
         if (!SvOBJECT(base)) { // not blessed -> bless to default typemap's class
             BLESS:
-            static PERL_THREAD_LOCAL HV* stash = gv_stashpvn(Typemap<TYPE>::package().data(), Typemap<TYPE>::package().length(), GV_ADD);
+            static PERL_ITHREADS_LOCAL HV* stash = gv_stashpvn(Typemap<TYPE>::package().data(), Typemap<TYPE>::package().length(), GV_ADD);
             sv_bless(rv, stash); // TODO: custom faster bless
         }
 
@@ -407,7 +407,7 @@ struct TypemapObject : TypemapBase<TYPEMAP, TYPE> {
     static panda::string_view package () { typemap::object::_throw_no_package(typeid(TYPE)); return ""; }
 
     static Stash default_stash () {
-        static PERL_THREAD_LOCAL Stash stash = gv_stashpvn(Typemap<TYPE>::package().data(), Typemap<TYPE>::package().length(), GV_ADD);
+        static PERL_ITHREADS_LOCAL Stash stash = gv_stashpvn(Typemap<TYPE>::package().data(), Typemap<TYPE>::package().length(), GV_ADD);
         return stash;
     }
 

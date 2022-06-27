@@ -6,7 +6,7 @@ using namespace xs;
 using namespace xs::unievent;
 using namespace panda::unievent;
 
-static PERL_THREAD_LOCAL struct {
+static PERL_ITHREADS_LOCAL struct {
     Simple on_idle = Simple::shared("on_idle");
 } cbn;
 

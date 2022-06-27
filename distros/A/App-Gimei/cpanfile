@@ -1,8 +1,10 @@
 requires 'perl', '5.022001';
 
 requires 'Class::Tiny',  '1.008';
-requires 'Data::Gimei',  'v0.1.0';
+requires 'Data::Gimei',  'v0.2.0';
 requires 'Getopt::Long', '2.52';
+requires 'Pod::Find',    '1.65';
+requires 'Pod::Usage',   '2.03';
 
 on configure => sub {
     requires 'Module::Build::Tiny', '0.039';

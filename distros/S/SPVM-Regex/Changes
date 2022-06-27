@@ -1,3 +1,11 @@
+0.05  2022-06-23
+  * Catch up with SPVM 0.9612.
+
+0.04  2022-06-22
+  * Catch up with SPVM::Unicode 0.03.
+
+0.03  2022-06-21
+  * Fix some bugs
 0.02  2022-06-13
 
   - Catch up with latest SPVM.

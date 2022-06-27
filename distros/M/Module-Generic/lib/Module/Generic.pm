@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.23.1
+## Version v0.24.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2022/03/28
+## Modified 2022/06/24
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -31,7 +31,6 @@ BEGIN
     use File::Spec ();
     use Module::Metadata;
     use Nice::Try v1.2.0;
-    use Number::Format;
     use Scalar::Util qw( openhandle );
     use Sub::Util ();
     # use B;
@@ -43,7 +42,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.23.1';
+    our $VERSION     = 'v0.24.1';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -91,18 +90,18 @@ BEGIN
 # use strict;
 
 # We put it here to avoid 'redefine' error
-require Module::Generic::Array;
+# require Module::Generic::Array;
 require Module::Generic::Boolean;
-require Module::Generic::DateTime;
-require Module::Generic::Dynamic;
-require Module::Generic::Exception;
-require Module::Generic::File;
+# require Module::Generic::DateTime;
+# require Module::Generic::Dynamic;
+# require Module::Generic::Exception;
+# require Module::Generic::File;
 # Module::Generic::File->import( qw( stderr ) );
-require Module::Generic::Hash;
-require Module::Generic::Iterator;
-require Module::Generic::Null;
-require Module::Generic::Number;
-require Module::Generic::Scalar;
+# require Module::Generic::Hash;
+# require Module::Generic::Iterator;
+# require Module::Generic::Null;
+# require Module::Generic::Number;
+# require Module::Generic::Scalar;
 
 require IO::File;
 our $stderr = IO::File->new;
@@ -122,32 +121,133 @@ $stderr_raw->autoflush( 1 );
     $false = $Module::Generic::Boolean::false;
 }
 
-# Subs that are inline autoloaded
+# for sub in `egrep -E '^sub ' ./lib/Module/Generic.pm| awk '{print $2 }' | perl -pe 's/\;$//' | LC_COLLATE=C sort -uV`; do echo "sub $sub;"; done
+sub DEBUG;
+sub VERBOSE;
 sub as_hash;
 sub clear;
 sub clear_error;
 sub clone;
+sub coloured;
 sub colour_close;
 sub colour_closest;
 sub colour_format;
 sub colour_open;
 sub colour_parse;
 sub colour_to_rgb;
-sub coloured;
+sub debug;
+sub deserialise;
+sub deserialize;
+sub dump;
+sub dumper;
+sub dumpto_dumper;
+sub dumpto_printer;
 sub dump_hex;
 sub dump_print;
-sub dumper;
-sub dumpto_printer;
-sub dumpto_dumper;
 sub errno;
-sub message_colour;
+sub error;
+sub error_handler;
+sub false;
+sub fatal;
+sub get;
+sub import;
+sub init;
+sub log_handler;
+sub message;
+sub messagef;
 sub messagef_colour;
+sub message_check;
+sub message_colour;
+sub message_frame;
 sub message_log;
 sub message_log_io;
+sub new;
+sub new_array;
+sub new_datetime;
+sub new_file;
+sub new_glob;
+sub new_hash;
+sub new_json;
+sub new_null;
+sub new_number;
+sub new_scalar;
+sub new_tempdir;
+sub new_tempfile;
+sub noexec;
+sub pass_error;
 sub printer;
+sub quiet;
 sub save;
+sub serialise;
+sub serialize;
+sub set;
 sub subclasses;
+sub true;
+sub verbose;
+sub will;
+sub _autoload_subs;
+sub _can;
+sub _get_args_as_array;
+sub _get_args_as_hash;
+sub _get_stack_trace;
+sub _instantiate_object;
+sub _is_a;
+sub _is_array;
+sub _is_class_loadable;
+sub _is_class_loaded;
+sub _is_code;
+sub _is_glob;
+sub _is_hash;
+sub _is_integer;
+sub _is_ip;
+sub _is_number;
+sub _is_object;
+sub _is_scalar;
+sub _is_uuid;
+sub _load_class;
+sub _load_classes;
+sub _lvalue;
+sub _obj2h;
+sub _parse_timestamp;
+sub _refaddr;
+sub _set_get;
+sub _set_get_array;
+sub _set_get_array_as_object;
+sub _set_get_boolean;
+sub _set_get_class;
+sub _set_get_class_array;
+sub _set_get_code;
+sub _set_get_datetime;
+sub _set_get_file;
+sub _set_get_glob;
+sub _set_get_hash;
+sub _set_get_hash_as_mix_object;
+sub _set_get_hash_as_object;
+sub _set_get_ip;
+sub _set_get_lvalue;
+sub _set_get_number;
+sub _set_get_number_as_object;
+sub _set_get_number_as_scalar;
+sub _set_get_number_or_object;
+sub _set_get_object;
+sub _set_get_object_array;
+sub _set_get_object_array2;
+sub _set_get_object_array_object;
+sub _set_get_object_lvalue;
+sub _set_get_object_variant;
+sub _set_get_object_without_init;
+sub _set_get_scalar;
+sub _set_get_scalar_as_object;
+sub _set_get_scalar_or_object;
+sub _set_get_uri;
+sub _set_get_uuid;
+sub _to_array_object;
+sub _warnings_is_enabled;
+sub _warnings_is_registered;
 sub __colour_data;
+sub __create_class;
+sub __dbh;
+sub __instantiate_object;
 
 # no warnings 'redefine';
 sub import
@@ -233,10 +333,43 @@ sub new
     return( $new );
 }
 
+sub new_glob
+{
+    my $that  = shift( @_ );
+    my $class = ref( $that ) || $that;
+    no warnings 'once';
+    my $self = bless( \do{ local *FH } => $class );
+    *$self = {};
+    if( defined( ${ "${class}\::LOG_DEBUG" } ) )
+    {
+        *$self->{log_debug} = ${ "${class}::LOG_DEBUG" };
+    }
+    if( Want::want( 'OBJECT' ) )
+    {
+        return( $self->init( @_ ) );
+    }
+    my $new = $self->init( @_ );
+    if( !defined( $new ) )
+    {
+        # If we are called on an object, we hand it the error so the caller can check it using the object:
+        # my $new = $old->new || die( $old->error );
+        if( $self->_is_object( $that ) && $that->can( 'pass_error' ) )
+        {
+            return( $that->pass_error( $self->error ) );
+        }
+        else
+        {
+            return( $self->pass_error );
+        }
+    };
+    return( $new );
+}
+
 sub deserialise
 {
     my $self = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
+    my $this  = $self->_obj2h;
     my $class = $opts->{serialiser} || $opts->{serializer} || $SERIALISER;
     return( $self->error( "No serialiser class was provided nor set in \$Module::Generic::SERIALISER" ) ) if( !defined( $class ) || !length( $class ) );
     $self->_load_class( $class ) || return( $self->pass_error );
@@ -293,7 +426,7 @@ sub deserialise
                 my $info = Storable::file_magic( "$opts->{file}" );
                 if( ref( $info ) eq 'HASH' )
                 {
-                    if( $self->{debug} || $opts->{debug} )
+                    if( $this->{debug} || $opts->{debug} )
                     {
                         print( STDOUT <<EOT );
 Byte order... : $info->{byteorder}
@@ -452,9 +585,11 @@ sub error
                 ? $args->{class}
                 : ( CORE::exists( $this->{_exception_class} ) && CORE::length( $this->{_exception_class} ) )
                     ? $this->{_exception_class}
-                    : 'Module::Generic::Exception';
+                    : ( defined( ${"${class}\::EXCEPTION_CLASS"} ) && CORE::length( ${"${class}\::EXCEPTION_CLASS"} ) )
+                        ? ${"${class}\::EXCEPTION_CLASS"}
+                        : 'Module::Generic::Exception';
             $self->message( 4, "Using exception class '$ex_class'. Property '_exception_class' is '$this->{_exception_class}'" );
-            unless( $this->_is_class_loaded( $ex_class ) || scalar( keys( %{"${ex_class}\::"} ) ) )
+            unless( $self->_is_class_loaded( $ex_class ) || scalar( keys( %{"${ex_class}\::"} ) ) )
             {
                 my $pl = "use $ex_class;";
                 # $self->message( 3, "Evaluating '$pl'" );
@@ -548,7 +683,7 @@ sub error
             else
             {
                 my $enc_str = eval{ Encode::encode( 'UTF-8', "$o", Encode::FB_CROAK ) };
-                ## Display warnings if warnings for this class is registered and enabled or if not registered
+                # Display warnings if warnings for this class is registered and enabled or if not registered
                 warn( $@ ? $o : $enc_str );
             }
         }
@@ -584,6 +719,7 @@ sub error
         # A Null object would trigger a fatal perl segmentation fault
         if( !$args->{no_return_null_object} && want( 'OBJECT' ) )
         {
+            require Module::Generic::Null;
             my $null = Module::Generic::Null->new( $o, { debug => $this->{debug}, has_error => 1 });
             rreturn( $null );
         }
@@ -593,6 +729,7 @@ sub error
     # $o->error->message for example without concerning himself/herself whether an exception object is actually set
     if( !$this->{error} && want( 'OBJECT' ) )
     {
+        require Module::Generic::Null;
         my $null = Module::Generic::Null->new( $o, { debug => $this->{debug}, wants => 'object' });
         rreturn( $null );
     }
@@ -649,20 +786,20 @@ sub init
     }
     
     ## If the calling module wants to set up object cleanup
-    if( $self->{_mod_perl_cleanup} && $MOD_PERL )
+    if( $this->{_mod_perl_cleanup} && $MOD_PERL )
     {
         try
         {
             local $SIG{__DIE__};
-            ## Must enable GlobalRequest for this to work.
+            # Must enable GlobalRequest for this to work.
             my $r = Apache2::RequestUtil->request;
             if( $r )
             {
                 $r->pool->cleanup_register(sub
                 {
                     $self->message( 3, "Cleaning up object." );
-                    map{ delete( $self->{ $_ } ) } keys( %$self );
-                    undef( %$self );
+                    map{ delete( $this->{ $_ } ) } keys( %$this );
+                    undef( %$this );
                     return( 1 );
                 });
             }
@@ -681,19 +818,19 @@ sub init
         if( ref( $args[0] ) eq 'HASH' ||
             ( Scalar::Util::blessed( $args[0] ) && $args[0]->isa( 'Module::Generic::Hash' ) ) )
         {
-            ## $self->_message( 3, "Got an hash ref" );
+            # $self->_message( 3, "Got an hash ref" );
             my $h = shift( @args );
             my $debug_value;
-            $debug_value = $h->{debug} if( CORE::exists( $h->{debug} ) );
+            $debug_value = CORE::delete( $h->{debug} ) if( CORE::exists( $h->{debug} ) );
             $vals = [ %$h ];
             unshift( @$vals, debug => $debug_value ) if( CORE::defined( $debug_value ) );
         }
         elsif( ref( $args[0] ) eq 'ARRAY' )
         {
-            ## $self->_message( 3, "Got an array ref" );
+            # $self->_message( 3, "Got an array ref" );
             $vals = $args[0];
         }
-        ## Special case when there is an undefined value passed (null) even though it is declared as a hash or object
+        # Special case when there is an undefined value passed (null) even though it is declared as a hash or object
         elsif( scalar( @args ) == 1 && !defined( $args[0] ) )
         {
             $self->message( 3, "Only argument is provided to init ", ref( $self ), " object and its value is undefined." );
@@ -706,11 +843,11 @@ sub init
         }
         else
         {
-            ## $self->message( 3, "Got an array: ", sub{ $self->dumper( \@args ) } );
+            # $self->message( 3, "Got an array: ", sub{ $self->dumper( \@args ) } );
             $vals = \@args;
         }
         
-        my $order = $self->{_init_params_order};
+        my $order = $this->{_init_params_order};
         if( scalar( @$order ) )
         {
             my $new = [];
@@ -809,13 +946,13 @@ sub init
                     }
                 }
             }
-            ## The name parameter does not exist
+            # The name parameter does not exist
             else
             {
-                ## If we are strict, we reject
+                # If we are strict, we reject
                 next if( $this->{_init_strict} );
             }
-            ## We passed all tests
+            # We passed all tests
             $data->{ $name } = $val;
         }
     }
@@ -830,7 +967,11 @@ sub message
     my $class = ref( $self ) || $self;
     my $this = $self->_obj2h;
     no strict 'refs';
-    if( $this->{verbose} || $this->{debug} || ${ $class . '::DEBUG' } )
+    if( $this->{verbose} || 
+        $this->{debug} || 
+        ${ $class . '::DEBUG' } || 
+        # Last parameter is an hash and there is a debug property
+        ( scalar( @_ ) && ref( $_[-1] ) eq 'HASH' && exists( $_[-1]->{debug} ) && $_[-1]->{debug} ) )
     {
         my $r;
         if( $MOD_PERL )
@@ -1031,6 +1172,7 @@ sub message_check
             if( int( $this->{debug} ) >= $message_level ||
                 int( $this->{verbose} ) >= $message_level ||
                 ( defined( ${ $class . '::DEBUG' } ) && ${ $class . '::DEBUG' } >= $message_level ) ||
+                ( ref( $_[-1] ) eq 'HASH' && CORE::exists( $_[-1]->{debug} ) && defined( $_[-1]->{debug} ) && $_[-1]->{debug} >= $message_level ) ||
                 int( $this->{debug_level} ) >= $message_level ||
                 int( $this->{debug} ) >= 100 || 
                 ( length( $target_re ) && $class =~ /^$target_re$/ && ${ $class . '::GLOBAL_DEBUG' } >= $message_level ) )
@@ -1118,6 +1260,7 @@ sub message_log_io
         our $DEB_LOG = ${ "${class}::DEB_LOG" };
         unless( $DEBUG_LOG_IO )
         {
+            require Module::Generic::File;
             $DEB_LOG = Module::Generic::File::file( $DEB_LOG );
             $DEBUG_LOG_IO = $DEB_LOG->open( '>>', { binmode => 'utf-8', autoflush => 1 }) || 
                 die( "Unable to open debug log file $DEB_LOG in append mode: $!\n" );
@@ -1173,24 +1316,28 @@ sub messagef
 sub new_array
 {
     my $self = shift( @_ );
+    require Module::Generic::Array;
     return( Module::Generic::Array->new( @_ ) );
 }
 
 sub new_datetime
 {
     my $self = shift( @_ );
+    require Module::Generic::DateTime;
     return( Module::Generic::DateTime->new( @_ ) );
 }
 
 sub new_file
 {
     my $self = shift( @_ );
+    require Module::Generic::File;
     return( Module::Generic::File->new( @_ ) );
 }
 
 sub new_hash
 {
     my $self = shift( @_ );
+    require Module::Generic::Hash;
     return( Module::Generic::Hash->new( @_ ) );
 }
 
@@ -1229,6 +1376,7 @@ sub new_null
     # $self->message( 3, "Caller wants $what." );
     if( $what eq 'OBJECT' )
     {
+        require Module::Generic::Null;
         return( Module::Generic::Null->new( @_ ) );
     }
     elsif( $what eq 'ARRAY' )
@@ -1256,24 +1404,28 @@ sub new_null
 sub new_number
 {
     my $self = shift( @_ );
+    require Module::Generic::Number;
     return( Module::Generic::Number->new( @_ ) );
 }
 
 sub new_scalar
 {
     my $self = shift( @_ );
+    require Module::Generic::Scalar;
     return( Module::Generic::Scalar->new( @_ ) );
 }
 
 sub new_tempdir
 {
     my $self = shift( @_ );
+    require Module::Generic::File;
     return( Module::Generic::File::tempdir( @_ ) );
 }
 
 sub new_tempfile
 {
     my $self = shift( @_ );
+    require Module::Generic::File;
     return( Module::Generic::File::tempfile( @_ ) );
 }
 
@@ -1322,14 +1474,15 @@ sub pass_error
     # with an hash containing just one argument class => 'Some::ExceptionClass'
     if( !defined( $err ) && ( !scalar( @_ ) || defined( $class ) ) )
     {
-        if( !defined( $this->{error} ) )
+        my $error = ref( $self ) ? $this->{error} : length( ${ $pack . '::ERROR' } ) ? ${ $pack . '::ERROR' } : undef;
+        if( !defined( $error ) )
         {
-            warn( "No error object provided and no previous error set either! It seems the previous method call returned a simple undef\n" );
+            warn( "No error object provided and no previous error set either! It seems the previous method call returned a simple undef\n", $self->_get_stack_trace );
         }
         else
         {
-            $this->message( 3, "Reusing previously set error object: $this->{error}" );
-            $err = ( defined( $class ) ? bless( $this->{error} => $class ) : $this->{error} );
+            $self->message( 3, "Reusing previously set error object: $error" );
+            $err = ( defined( $class ) ? bless( $error => $class ) : $error );
         }
     }
     elsif( defined( $err ) && 
@@ -1339,6 +1492,10 @@ sub pass_error
            ) )
     {
         $this->{error} = ${ $pack . '::ERROR' } = ( defined( $class ) ? bless( $err => $class ) : $err );
+        if( $this->{fatal} || ( defined( ${"${class}\::FATAL_ERROR"} ) && ${"${class}\::FATAL_ERROR"} ) )
+        {
+            die( $this->{error} );
+        }
     }
     # If the error provided is not an object, we call error to create one
     else
@@ -1348,14 +1505,15 @@ sub pass_error
     
     if( want( 'OBJECT' ) )
     {
+        require Module::Generic::Null;
         my $null = Module::Generic::Null->new( $err, { debug => $this->{debug}, has_error => 1 });
         rreturn( $null );
     }
-    my $wantarray = wantarray();
-    if( $this->debug )
+    if( $self->debug )
     {
+        my $wantarray = wantarray();
         my $caller = [caller(1)];
-        $this->message( 3, "Not called in object context, returning undef(). Wantarray ($wantarray) is defined? ", ( defined( wantarray() ) ? 'yes' : 'no' ), " for caller in package ", $caller->[0], " in file ", $caller->[1], " at line ", $caller->[2] );
+        $self->message( 3, "Not called in object context, returning undef(). Wantarray ($wantarray) is defined? ", ( defined( wantarray() ) ? 'yes' : 'no' ), " for caller in package ", $caller->[0], " in file ", $caller->[1], " at line ", $caller->[2] );
     }
     return;
 }
@@ -1585,15 +1743,91 @@ sub _get_args_as_hash
     return( {} ) if( !scalar( @_ ) );
     no warnings 'uninitialized';
     my $ref = {};
+    my $order = $self->new_array;
+    my $need_list = Want::want( 'LIST' ) ? 1 : 0;
+    my $ok = {};
+    
+    my $process = sub
+    {
+        my $this = shift( @_ );
+        # Check if among the parameters there is a special args_list one and its value is an array reference
+        if( scalar( grep( $_ eq 'args_list', @$this ) ) )
+        {
+            # $self->message( 4, "args_list found among the argv, extracting it." );
+            for( my $i = 0; $i < scalar( @$this ); $i++ )
+            {
+                if( defined( $this->[$i] ) && $this->[$i] eq 'args_list' && 
+                    defined( $this->[$i+1] ) && Scalar::Util::reftype( $this->[$i+1] ) eq 'ARRAY' )
+                {
+                    my $list = $this->[$i+1];
+                    @$ok{ @$list } = (1) x scalar( @$list );
+                    last;
+                }
+            }
+        }
+#         else
+#         {
+#             $self->message( 4, "No args_list found. \$ok is -> ", sub{ $self->Module::Generic::dump( $ok ) } );
+#         }
+        
+        # If we have a restricted list of parameters, obey it
+        if( scalar( keys( %$ok ) ) )
+        {
+            # $self->message( 4, "Building list of params based on restricted list (\$ok)" );
+            for( my $i = 0; $i < scalar( @$this ); $i++ )
+            {
+                if( exists( $ok->{ $this->[$i] } ) )
+                {
+                    # $self->message( 4, "Found supported argument '", $this->[$i], "'" );
+                    $ref->{ $this->[$i] } = $this->[$i+1];
+                    $order->push( $this->[$i] ) if( $need_list );
+                    splice( @$this, $i, 2 );
+                    $i--;
+                }
+            }
+            # $self->message( 4, "\$ref is ", sub{ $self->Module::Generic::dump( $ref ); } );
+        }
+        # or, if we have simple a list of key-value pairs, take this and put it into an hash reference
+        elsif( !( scalar( @$this ) % 2 ) )
+        {
+            # $self->message( 4, "Simply found an even number of argv" );
+            $ref = { @$this };
+            if( $need_list )
+            {
+                for( my $i = 0; $i < scalar( @$this ); $i += 2 )
+                {
+                    $order->push( $this->[$i] );
+                }
+            }
+        }
+        return( $ref, $order );
+    };
+    
+    # A single hash reference was provided
     if( scalar( @_ ) == 1 && $self->_is_hash( $_[0] ) )
     {
+        # $self->message( 4, "Simply received an hash reference." );
         $ref = shift( @_ );
+        $order = $self->new_array( [sort( keys( %$ref ) )] ) if( $need_list );
     }
-    elsif( !( scalar( @_ ) % 2 ) )
+    elsif( scalar( @_ ) == 1 && Scalar::Util::reftype( $_[0] ) eq 'ARRAY' ||
+           ( scalar( @_ ) == 3 && Scalar::Util::reftype( $_[0] ) eq 'ARRAY' && defined( $_[1] ) && $_[1] eq 'args_list' && defined( $_[2] ) && Scalar::Util::reftype( $_[2] ) eq 'ARRAY' ) )
     {
-        $ref = { @_ };
+        # $self->message( 4, "Argv provided is an array reference. \@_ is '", join( "', '", @_ ), "'" );
+        if( @_ > 1 )
+        {
+            my $list = $_[2];
+            # $self->message( 4, "Creating support parameters list from args_list: '", join( "', '", @$list ), "'" );
+            @$ok{ @$list } = (1) x scalar( @$list );
+        }
+        ( $ref, $order ) = $process->( $_[0] );
     }
-    return( $ref );
+    else
+    {
+        # $self->message( 4, "Argv provided is a list of arguments." );
+        ( $ref, $order ) = $process->( \@_ );
+    }
+    return( $need_list ? ( $ref, $order ) : $ref );
 }
 
 ## Call to the actual method doing the work
@@ -1619,11 +1853,26 @@ sub _is_a
     no overloading;
     return if( !$obj || !$pkg );
     return if( !$self->_is_object( $obj ) );
-    if( $pkg !~ /^\w+(?:\:\:\w+)*$/ )
+    if( $self->_is_array( $pkg ) )
     {
-        warn( "Warning only: package name provided \"$pkg\" contains illegal characters.\n" );
+        for( @$pkg )
+        {
+            if( $_ !~ /^\w+(?:\:\:\w+)*$/ )
+            {
+                warn( "Warning only: package name provided \"$_\" contains illegal characters.\n" );
+            }
+            return(1) if( $obj->isa( $_ ) );
+        }
+        return(0);
     }
-    return( $obj->isa( $pkg ) );
+    else
+    {
+        if( $pkg !~ /^\w+(?:\:\:\w+)*$/ )
+        {
+            warn( "Warning only: package name provided \"$pkg\" contains illegal characters.\n" );
+        }
+        return( $obj->isa( $pkg ) );
+    }
 }
 
 sub _is_class_loadable
@@ -1698,25 +1947,52 @@ sub _is_class_loaded
 # sub _is_array { return( UNIVERSAL::isa( $_[1], 'ARRAY' ) ); }
 sub _is_array
 {
-    return( 0 ) if( scalar( @_ < 2 ) );
-    return( 0 ) if( !defined( $_[1] ) );
-    return( Scalar::Util::reftype( $_[1] ) eq 'ARRAY' );
+    return(0) if( scalar( @_ < 2 ) );
+    return(0) if( !defined( $_[1] ) );
+    my $type = Scalar::Util::reftype( $_[1] );
+    return(0) if( !defined( $type ) );
+    return( $type eq 'ARRAY' );
+}
+
+sub _is_code
+{
+    return(0) if( scalar( @_ < 2 ) );
+    return(0) if( !defined( $_[1] ) );
+    my $type = ref( $_[1] );
+    return(0) if( !defined( $type ) );
+    return( $type eq 'CODE' );
+}
+
+sub _is_glob
+{
+    return(0) if( scalar( @_ < 2 ) );
+    return(0) if( !defined( $_[1] ) );
+    my $type = Scalar::Util::reftype( $_[1] );
+    return(0) if( !defined( $type ) );
+    return( $type eq 'GLOB' );
 }
 
 sub _is_hash
 {
-    return( 0 ) if( scalar( @_ < 2 ) );
-    return( 0 ) if( !defined( $_[1] ) );
-    return( Scalar::Util::reftype( $_[1] ) eq 'HASH' );
+    return(0) if( scalar( @_ < 2 ) );
+    return(0) if( !defined( $_[1] ) );
+    my $type = Scalar::Util::reftype( $_[1] );
+    return(0) if( !defined( $type ) );
+    return( $type eq 'HASH' );
 }
 
-sub _is_integer { return( $_[1] =~ /^[\+\-]?\d+$/ ? 1 : 0 ); }
+sub _is_integer
+{
+    return(0) if( scalar( @_ < 2 ) );
+    return(0) if( !defined( $_[1] ) || !length( $_[1] ) );
+    return( $_[1] =~ /^[\+\-]?\d+$/ ? 1 : 0 );
+}
 
 sub _is_ip
 {
     my $self = shift( @_ );
     my $ip   = shift( @_ );
-    return(0) if( !length( $ip ) );
+    return(0) if( !defined( $ip ) || !length( $ip ) );
     # Already loaded
     unless( $RE{net}{IPv4} )
     {
@@ -1731,8 +2007,8 @@ sub _is_ip
 
 sub _is_number
 {
-    return( 0 ) if( scalar( @_ < 2 ) );
-    return( 0 ) if( !defined( $_[1] ) );
+    return(0) if( scalar( @_ < 2 ) );
+    return(0) if( !defined( $_[1] ) || !length( $_[1] ) );
     $_[0]->_load_class( 'Regexp::Common' ) || return( $_[0]->pass_error );
     no warnings 'once';
     return( $_[1] =~ /^$Regexp::Common::RE{num}{real}$/ );
@@ -1740,19 +2016,24 @@ sub _is_number
 
 sub _is_object
 {
-    return( 0 ) if( scalar( @_ < 2 ) );
-    return( 0 ) if( !defined( $_[1] ) );
+    return(0) if( scalar( @_ < 2 ) );
+    return(0) if( !defined( $_[1] ) );
     return( Scalar::Util::blessed( $_[1] ) );
 }
 
 sub _is_scalar
 {
-    return( 0 ) if( scalar( @_ < 2 ) );
-    return( 0 ) if( !defined( $_[1] ) );
+    return(0) if( scalar( @_ < 2 ) );
+    return(0) if( !defined( $_[1] ) );
     return( Scalar::Util::reftype( $_[1] ) eq 'SCALAR' );
 }
 
-sub _is_uuid { return( $_[1] =~ /^[a-fA-F0-9]{8}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{12}$/ ? 1 : 0 ); }
+sub _is_uuid
+{
+    return(0) if( scalar( @_ < 2 ) );
+    return(0) if( !defined( $_[1] ) || !length( $_[1] ) );
+    return( $_[1] =~ /^[a-fA-F0-9]{8}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{12}$/ ? 1 : 0 );
+}
 
 sub _load_class
 {
@@ -1771,7 +2052,14 @@ sub _load_class
     }
     my $pl = "package ${caller_class}; use $class";
     $pl .= ' ' . $opts->{version} if( CORE::defined( $opts->{version} ) && CORE::length( $opts->{version} ) );
-    $pl .= ' qw( ' . CORE::join( ' ', @$args ) . ' );' if( scalar( @$args ) );
+    if( scalar( @$args ) )
+    {
+        $pl .= ' qw( ' . CORE::join( ' ', @$args ) . ' );';
+    }
+    elsif( $opts->{no_import} )
+    {
+        $pl .= ' ();';
+    }
     # $self->message( 3, "Evaluating '$pl'" );
     local $SIG{__DIE__} = sub{};
     eval( $pl );
@@ -1779,6 +2067,19 @@ sub _load_class
     return( $self->error( "Unable to load package ${class}: $@" ) ) if( $@ );
     # $self->message( 3, "Is package $class loaded now? ", $self->_is_class_loaded( $class ) ? 'yes' : 'no' );
     return( $self->_is_class_loaded( $class ) ? $class : '' );
+}
+
+sub _load_classes
+{
+    my $self  = shift( @_ );
+    my $ref   = shift( @_ ) || return( $self->error( "No array reference of classes to load was provided." ) );
+    return( $self->error( "Value provided is not an array reference." ) ) if( !$self->_is_array( $ref ) );
+    my $opts = $self->_get_args_as_hash( @_ );
+    for( @$ref )
+    {
+        $self->_load_class( $_, $opts ) || return( $self->pass_error );
+    }
+    return( $self );
 }
 
 sub _obj2h
@@ -1804,7 +2105,14 @@ sub _obj2h
     }
     elsif( Scalar::Util::reftype( $self ) eq 'GLOB' )
     {
-        return( \%{*$self} );
+        if( ref( *$self ) eq 'HASH' )
+        {
+            return( *$self );
+        }
+        else
+        {
+            return( \%{*$self} );
+        }
     }
     # Because object may be accessed as My::Package->method or My::Package::method
     # there is not always an object available, so we need to fake it to avoid error
@@ -1815,6 +2123,2966 @@ sub _obj2h
     }
 }
 
+sub _refaddr { return( Scalar::Util::refaddr( $_[1] ) ); }
+
+sub _set_get
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    if( @_ )
+    {
+        my $val = ( @_ == 1 ) ? shift( @_ ) : [ @_ ];
+        $data->{ $field } = $val;
+    }
+    if( wantarray() )
+    {
+        if( ref( $data->{ $field } ) eq 'ARRAY' )
+        {
+            return( @{ $data->{ $field } } );
+        }
+        elsif( ref( $data->{ $field } ) eq 'HASH' )
+        {
+            return( %{ $data->{ $field } } );
+        }
+        else
+        {
+            return( ( $data->{ $field } ) );
+        }
+    }
+    else
+    {
+        return( $data->{ $field } );
+    }
+}
+
+sub _set_get_array
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    if( @_ )
+    {
+        my $val = ( @_ == 1 && ( ( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'ARRAY' ) ) || ref( $_[0] ) eq 'ARRAY' ) ) ? shift( @_ ) : [ @_ ];
+        $data->{ $field } = $val;
+    }
+    return( $data->{ $field } );
+}
+
+sub _set_get_array_as_object : lvalue
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    my $has_arg = 0;
+    my $arg;
+    if( want( qw( LVALUE ASSIGN ) ) )
+    {
+        ( $arg ) = want( 'ASSIGN' );
+        $has_arg++;
+    }
+    else
+    {
+        if( @_ )
+        {
+            $arg = ( @_ == 1 && ( ( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'ARRAY' ) ) || ref( $_[0] ) eq 'ARRAY' ) ) ? shift( @_ ) : [ @_ ];
+            $has_arg++;
+        }
+    }
+    
+    my $callbacks = {};
+    if( ref( $field ) eq 'HASH' )
+    {
+        my $def = $field;
+        $field = $def->{field} if( CORE::exists( $def->{field} ) && defined( $def->{field} ) && CORE::length( $def->{field} ) );
+        $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
+    }
+    
+    if( $has_arg )
+    {
+        my $val = ( ( Scalar::Util::blessed( $arg ) && $arg->isa( 'ARRAY' ) ) || ref( $arg ) eq 'ARRAY' ) ? $arg : [ $arg ];
+        require Module::Generic::Array;
+        # $self->message( 4, "Processing value provided '$val' (", overload::StrVal( $val ), ")." );
+        my $o = $data->{ $field };
+        # Some existing data, like maybe default value
+        if( $o )
+        {
+            if( !$self->_is_object( $o ) )
+            {
+                my $tmp = $o;
+                $o = Module::Generic::Array->new( $tmp );
+            }
+            $o->set( $val );
+        }
+        else
+        {
+            $o = Module::Generic::Array->new( $val );
+            $data->{ $field } = $o;
+            if( scalar( keys( %$callbacks ) ) && CORE::exists( $callbacks->{add} ) )
+            {
+                my $coderef = ref( $callbacks->{add} ) eq 'CODE' ? $callbacks->{add} : $self->can( $callbacks->{add} );
+                if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
+                {
+                    $coderef->( $self );
+                }
+            }
+        }
+    }
+    if( !$data->{ $field } || !$self->_is_object( $data->{ $field } ) )
+    {
+        my $o = Module::Generic::Array->new( ( defined( $data->{ $field } ) && CORE::length( $data->{ $field } ) ) ? $data->{ $field } : [] );
+        $data->{ $field } = $o;
+    }
+    return( $data->{ $field } ) if( want( 'LVALUE' ) );
+    rreturn( $data->{ $field } );
+    return;
+}
+
+sub _set_get_boolean : lvalue
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    my $has_arg = 0;
+    my $arg;
+    if( want( qw( LVALUE ASSIGN ) ) )
+    {
+        ( $arg ) = want( 'ASSIGN' );
+        $has_arg++;
+    }
+    else
+    {
+        if( @_ )
+        {
+            $arg = shift( @_ );
+            $has_arg++;
+        }
+    }
+    
+    my $callbacks = {};
+    if( ref( $field ) eq 'HASH' )
+    {
+        my $def = $field;
+        $field = $def->{field} if( CORE::exists( $def->{field} ) && defined( $def->{field} ) && CORE::length( $def->{field} ) );
+        $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
+    }
+    
+    if( $has_arg )
+    {
+        my $val = $arg;
+        $val //= '';
+        no warnings 'uninitialized';
+        if( Scalar::Util::blessed( $val ) && 
+            ( $val->isa( 'JSON::PP::Boolean' ) || $val->isa( 'Module::Generic::Boolean' ) ) )
+        {
+            $data->{ $field } = $val;
+        }
+        elsif( Scalar::Util::reftype( $val ) eq 'SCALAR' )
+        {
+            $data->{ $field } = defined( $$val )
+                ? $$val
+                    ? Module::Generic::Boolean->true
+                    : Module::Generic::Boolean->false
+                : Module::Generic::Boolean->false;
+        }
+        elsif( lc( $val ) eq 'true' || lc( $val ) eq 'false' )
+        {
+            $data->{ $field } = lc( $val ) eq 'true' ? Module::Generic::Boolean->true : Module::Generic::Boolean->false;
+        }
+        else
+        {
+            $data->{ $field } = $val
+                ? Module::Generic::Boolean->true
+                : Module::Generic::Boolean->false;
+        }
+        
+        if( scalar( keys( %$callbacks ) ) && CORE::exists( $callbacks->{add} ) )
+        {
+            my $coderef = ref( $callbacks->{add} ) eq 'CODE' ? $callbacks->{add} : $self->can( $callbacks->{add} );
+            if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
+            {
+                $coderef->( $self );
+            }
+        }
+    }
+    # If there is a value set, like a default value and it is not an object or at least not one we recognise
+    # We transform it into a Module::Generic::Boolean object
+    if( CORE::length( $data->{ $field } ) && 
+        ( 
+            !Scalar::Util::blessed( $data->{ $field } ) || 
+            ( 
+                Scalar::Util::blessed( $data->{ $field } ) && 
+                !$data->{ $field }->isa( 'Module::Generic::Boolean' ) && 
+                !$data->{ $field }->isa( 'JSON::PP::Boolean' ) 
+            ) 
+        ) )
+    {
+        my $val = $data->{ $field };
+        $data->{ $field } = $val ? Module::Generic::Boolean->true : Module::Generic::Boolean->false;
+    }
+    return( $data->{ $field } ) if( want( 'LVALUE' ) );
+    rreturn( $data->{ $field } );
+}
+
+# $self->_set_get_class( 'my_field', {
+# _class => 'My::Class',
+# field1 => { type => 'datetime' },
+# field2 => { type => 'scalar' },
+# field3 => { type => 'boolean' },
+# field4 => { type => 'object', class => 'Some::Class' },
+# }, @_ );
+sub _set_get_class
+{
+    my $self  = shift( @_ );
+    # $self->message( 3, "Got here with arguments: '", join( "', '", @_ ), "'." );
+    my $field = shift( @_ );
+    my $def   = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
+    if( ref( $def ) ne 'HASH' )
+    {
+        CORE::warn( "Warning only: dynamic class field definition hash ($def) for field \"$field\" is not a hash reference.\n" );
+        return;
+    }
+    
+    my $class = $self->__create_class( $field, $def ) || die( "Failed to create the dynamic class for field \"$field\".\n" );
+    
+    if( @_ )
+    {
+        my $hash = shift( @_ );
+        # my $o = $class->new( $hash );
+        $self->messagef( 3, "Instantiating object of class '$class' with hash '$hash' containing %d elements: '%s'", scalar( keys( %$hash ) ), join( "', '", map{ "$_ => $hash->{$_}" } sort( keys( %$hash ) ) ) );
+        ## $self->messagef( 3, "Instantiating object of class '$class' with hash '$hash' containing %d elements: '%s'", scalar( keys( %$hash ) ), $self->dumper( $hash ) );
+        my $o = $self->__instantiate_object( $field, $class, $hash );
+        # $self->message( 3, "\tReturning object for field '$field' and class '$class': '$o'." );
+        $data->{ $field } = $o;
+    }
+    
+    if( !$data->{ $field } )
+    {
+        my $o = $self->__instantiate_object( $field, $class );
+        $data->{ $field } = $o;
+    }
+    return( $data->{ $field } );
+}
+
+sub _set_get_class_array
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    my $def   = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    if( ref( $def ) ne 'HASH' )
+    {
+        CORE::warn( "Warning only: dynamic class field definition hash ($def) for field \"$field\" is not a hash reference.\n" );
+        return;
+    }
+    @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
+    my $class = $self->__create_class( $field, $def ) || die( "Failed to create the dynamic class for field \"$field\".\n" );
+    ## return( $self->_set_get_object_array( $field, $class, @_ ) );
+    if( @_ )
+    {
+        my $ref = shift( @_ );
+        ## $self->message( 7, "Populating data for class '$class' using '$ref' (containing ", scalar( @$ref ), " elements): ", sub{ $self->dump( $ref ) } );
+        return( $self->error( "I was expecting an array ref, but instead got '$ref'. _is_array returned: '", $self->_is_array( $ref ), "'" ) ) if( !$self->_is_array( $ref ) );
+        my $arr = [];
+        for( my $i = 0; $i < scalar( @$ref ); $i++ )
+        {
+            if( ref( $ref->[$i] ) ne 'HASH' )
+            {
+                return( $self->error( "Array offset $i is not a hash reference. I was expecting a hash reference to instantiate an object of class $class." ) );
+            }
+            my $o = $self->__instantiate_object( $field, $class, $ref->[$i] ) || return( $self->pass_error );
+            ## If an error occurred, we report it to the caller and do not add it, since even if we did add it, it would be undef, because no object would have been created.
+            ## And the caller needs to know there has been some errors
+            CORE::push( @$arr, $o );
+        }
+        $data->{ $field } = $arr;
+    }
+    return( $data->{ $field } );
+}
+
+sub _set_get_code : lvalue
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    my $has_arg = 0;
+    my $arg;
+    my $opts = {};
+    $opts->{undef_ok} //= 0;
+    $opts->{return_undef} //= 0;
+    
+    if( want( qw( LVALUE ASSIGN ) ) )
+    {
+        ( $arg ) = want( 'ASSIGN' );
+        $has_arg = 'assign';
+    }
+    else
+    {
+        if( @_ )
+        {
+            $arg = shift( @_ );
+            $has_arg++;
+        }
+    }
+
+    if( ref( $field ) eq 'HASH' )
+    {
+        $opts = $field;
+        if( CORE::exists( $opts->{field} ) && 
+            defined( $opts->{field} ) && 
+            CORE::length( $opts->{field} ) )
+        {
+            $field = $opts->{field};
+        }
+        else
+        {
+            my $error = "No field name was provided.";
+            if( $has_arg eq 'assign' )
+            {
+                $self->error( $error );
+                my $dummy = 'dummy';
+                return( $dummy );
+            }
+            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
+            rreturn( $self->error( $error ) );
+        }
+    }
+    
+    if( $has_arg )
+    {
+        my $v = $arg;
+        if( ( ( $opts->{undef_ok} && defined( $v ) ) || !$opts->{undef_ok} ) && 
+            ref( $v ) ne 'CODE' )
+        {
+            my $error = "Value provided for \"$field\" ($v) is not an anonymous subroutine (code). You can pass as argument something like \$self->curry::my_sub or something like sub { some_code_here; }";
+            if( $has_arg eq 'assign' )
+            {
+                $self->error( $error );
+                my $dummy = 'dummy';
+                return( $dummy );
+            }
+            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
+            rreturn( $self->error( $error ) );
+        }
+        $data->{ $field } = $v;
+    }
+    
+    if( ( !defined( $data->{ $field } ) || !$data->{ $field } ) && !$opts->{return_undef} )
+    {
+        return( sub{} ) if( want( 'LVALUE' ) );
+        rreturn( sub{} );
+    }
+    return( $data->{ $field } ) if( want( 'LVALUE' ) );
+    rreturn( $data->{ $field } );
+}
+
+sub _set_get_file : lvalue
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    no overloading;
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    my $has_arg = 0;
+    my $arg;
+    if( want( qw( LVALUE ASSIGN ) ) )
+    {
+        ( $arg ) = want( 'ASSIGN' );
+        $has_arg = 'assign';
+    }
+    else
+    {
+        @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
+        if( @_ )
+        {
+            $arg = shift( @_ );
+            $has_arg++;
+        }
+    }
+    if( $has_arg )
+    {
+        require Module::Generic::File;
+        my $val;
+        if( $self->_is_a( $arg => 'Module::Generic::File' ) )
+        {
+            $val = $arg;
+        }
+        else
+        {
+            $val = Module::Generic::File->new( $arg ) || do
+            {
+                my $error = Module::Generic::File->error;
+                if( $has_arg eq 'assign' )
+                {
+                    $self->error( $error );
+                    my $dummy = 'dummy';
+                    return( $dummy );
+                }
+                return( $self->error( $error ) ) if( want( 'LVALUE' ) );
+                rreturn( $self->error( $error ) );
+            };
+        }
+        $data->{ $field } = $val;
+        my $dummy = 'dummy';
+        # We need to return something else than our object, or by virtue of perl's way of working
+        # we would return our object as coded below, and that object will be assigned the
+        # very value we will have passed in assignment !
+        return( $dummy ) if( $has_arg eq 'assign' );
+    }
+    return( $data->{ $field } ) if( want( 'LVALUE' ) );
+    rreturn( $data->{ $field } );
+    # To make perl happy
+    return;
+}
+
+sub _set_get_glob : lvalue
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    my $has_arg = 0;
+    my $arg;
+    if( want( qw( LVALUE ASSIGN ) ) )
+    {
+        ( $arg ) = want( 'ASSIGN' );
+        $has_arg = 'assign';
+    }
+    else
+    {
+        @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
+        if( @_ )
+        {
+            $arg = shift( @_ );
+            $has_arg++;
+        }
+    }
+    
+    if( $has_arg )
+    {
+        if( Scalar::Util::reftype( $arg ) ne 'GLOB' )
+        {
+            my $error = "Method $field takes only a glob, but value provided ($arg) is not supported";
+            if( $has_arg eq 'assign' )
+            {
+                $self->error( $error );
+                my $dummy = 'dummy';
+                return( $dummy );
+            }
+            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
+            rreturn( $self->error( $error ) );
+        }
+        # $self->message( 3, "Setting value $val for field $field" );
+        $data->{ $field } = $arg;
+    }
+    return( $data->{ $field } ) if( want( 'LVALUE' ) );
+    rreturn( $data->{ $field } );
+}
+
+sub _set_get_hash : lvalue
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    # $self->message( 3, "Called for field '$field' with data '", join( "', '", @_ ), "'." );
+    my $has_arg = 0;
+    my $arg;
+    if( want( qw( LVALUE ASSIGN ) ) )
+    {
+        ( $arg ) = want( 'ASSIGN' );
+        $has_arg = 'assign';
+    }
+    else
+    {
+        @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
+        if( @_ )
+        {
+            if( ref( $_[0] ) eq 'HASH' )
+            {
+                $arg = shift( @_ );
+            }
+            elsif( !( @_ % 2 ) )
+            {
+                $arg = { @_ };
+            }
+            else
+            {
+                $arg = shift( @_ );
+            }
+            $has_arg++;
+        }
+    }
+    if( $has_arg )
+    {
+        if( ref( $arg ) ne 'HASH' )
+        {
+            my $error = "Method $field takes only a hash or reference to a hash, but value provided ($arg) is not supported";
+            if( $has_arg eq 'assign' )
+            {
+                $self->error( $error );
+                my $dummy = 'dummy';
+                return( $dummy );
+            }
+            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
+            rreturn( $self->error( $error ) );
+        }
+        # $self->message( 3, "Setting value $val for field $field" );
+        $data->{ $field } = $arg;
+    }
+    return( $data->{ $field } ) if( want( 'LVALUE' ) );
+    rreturn( $data->{ $field } );
+}
+
+sub _set_get_hash_as_mix_object : lvalue
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    my $has_arg = 0;
+    my $arg;
+    if( want( qw( LVALUE ASSIGN ) ) )
+    {
+        ( $arg ) = want( 'ASSIGN' );
+        $has_arg = 'assign';
+    }
+    else
+    {
+        @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
+        if( @_ )
+        {
+            if( ref( $_[0] ) eq 'HASH' )
+            {
+                $arg = shift( @_ );
+            }
+            elsif( ref( $_[0] ) eq 'Module::Generic::Hash' )
+            {
+                $arg = $_[0]->clone;
+            }
+            elsif( ( @_ % 2 ) )
+            {
+                $arg = { @_ };
+            }
+            else
+            {
+                $arg = shift( @_ );
+                my $error = "Method $field takes only a hash or reference to a hash, but value provided ($arg) is not supported";
+                if( $has_arg eq 'assign' )
+                {
+                    $self->error( $error );
+                    my $dummy = 'dummy';
+                    return( $dummy );
+                }
+                return( $self->error( $error ) ) if( want( 'LVALUE' ) );
+                rreturn( $self->error( $error ) );
+            }
+            $has_arg++;
+        }
+    }
+    # $self->message( 3, "Called for field '$field' with data '", join( "', '", @_ ), "'." );
+    if( $has_arg )
+    {
+        my $val = $arg;
+        if( ref( $val ) eq 'Module::Generic::Hash' )
+        {
+            $data->{ $field } = $val;
+            return( $data->{ $field } ) if( want( 'LVALUE' ) );
+            rreturn( $data->{ $field } );
+        }
+        else
+        {
+            # $self->message( 3, "Setting value $val for field $field" );
+            require Module::Generic::Hash;
+            $data->{ $field } = Module::Generic::Hash->new( $val );
+        }
+    }
+    if( $data->{ $field } && !$self->_is_object( $data->{ $field } ) )
+    {
+        require Module::Generic::Hash;
+        my $o = Module::Generic::Hash->new( $data->{ $field } );
+        $data->{ $field } = $o;
+    }
+    return( $data->{ $field } ) if( want( 'LVALUE' ) );
+    rreturn( $data->{ $field } );
+}
+
+sub _set_get_ip : lvalue
+{
+    my $self = shift( @_ );
+    my $field = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    my $has_arg = 0;
+    my $arg;
+    if( want( qw( LVALUE ASSIGN ) ) )
+    {
+        ( $arg ) = want( 'ASSIGN' );
+        $has_arg = 'assign';
+    }
+    else
+    {
+        if( @_ )
+        {
+            $arg = shift( @_ );
+            $has_arg++;
+        }
+    }
+    if( $has_arg )
+    {
+        my $v = $arg;
+        # If the user wants to remove it
+        if( !defined( $v ) )
+        {
+            $data->{ $field } = $v;
+        }
+        # If the user provided a string, let's check it
+        elsif( length( $v ) && !$self->_is_ip( $v ) )
+        {
+            my $error = "Value provided ($v) is not a valid ip address.";
+            if( $has_arg eq 'assign' )
+            {
+                $self->error( $error );
+                my $dummy = 'dummy';
+                return( $dummy );
+            }
+            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
+            rreturn( $self->error( $error ) );
+        }
+        $data->{ $field } = $self->new_scalar( $v );
+    }
+    my $v = $self->_is_a( $data->{ $field }, 'Module::Generic::Scalar' )
+        ? $data->{ $field }
+        : $self->new_scalar( $data->{ $field } );
+    if( !$v->defined )
+    {
+        if( Want::want( 'OBJECT' ) )
+        {
+            # We might have need to specify, because I found a race condition where
+            # even though the context is object, once in Null, the context became 'code'
+            require Module::Generic::Null;
+            return( Module::Generic::Null->new( wants => 'OBJECT' ) );
+        }
+        else
+        {
+            return if( want( 'LVALUE' ) );
+            rreturn;
+        }
+    }
+    else
+    {
+        return( $v ) if( want( 'LVALUE' ) );
+        rreturn( $v );
+    }
+}
+
+sub _set_get_lvalue : lvalue
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    if( want( qw( LVALUE ASSIGN ) ) )
+    {
+        my( $a ) = want( 'ASSIGN' );
+        $data->{ $field } = $a;
+        # lnoreturn;
+        return( $data->{ $field } );
+    }
+    else
+    {
+        if( @_ )
+        {
+            @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
+            $data->{ $field } = shift( @_ );
+        }
+        return( $data->{ $field } ) if( want( 'LVALUE' ) );
+        rreturn( $data->{ $field } );
+    }
+    return;
+}
+
+sub _set_get_number : lvalue
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    my $this  = $self->_obj2h;
+    no overload;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    
+    my $callbacks = {};
+    if( ref( $field ) eq 'HASH' )
+    {
+        my $def = $field;
+        if( CORE::exists( $def->{field} ) && 
+            defined( $def->{field} ) && 
+            CORE::length( $def->{field} ) )
+        {
+            $field = $def->{field};
+        }
+        else
+        {
+            my $error = "No field name was provided.";
+            if( want( qw( LVALUE ASSIGN ) ) )
+            {
+                $self->error( $error );
+                my $dummy = 'dummy';
+                return( $dummy );
+            }
+            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
+            rreturn( $self->error( $error ) );
+        }
+        $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
+    }
+    
+    my $do_callback = sub
+    {
+        if( scalar( keys( %$callbacks ) ) && CORE::exists( $callbacks->{add} ) )
+        {
+            my $coderef = ref( $callbacks->{add} ) eq 'CODE' ? $callbacks->{add} : $self->can( $callbacks->{add} );
+            if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
+            {
+                $coderef->( $self );
+            }
+        }
+    };
+    
+    require Module::Generic::Number;
+    if( want( qw( LVALUE ASSIGN ) ) )
+    {
+        my( $a ) = want( 'ASSIGN' );
+        $data->{ $field } = Module::Generic::Number->new( $a );
+        $do_callback->();
+        return( $data->{ $field } );
+    }
+    else
+    {
+        @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
+        if( @_ )
+        {
+            $data->{ $field } = Module::Generic::Number->new( shift( @_ ) );
+            $do_callback->();
+        }
+        
+        if( CORE::length( $data->{ $field } ) && !ref( $data->{ $field } ) )
+        {
+            $data->{ $field } = Module::Generic::Number->new( $data->{ $field } );
+        }
+        elsif( !CORE::length( $data->{ $field } ) && want( 'OBJECT' ) )
+        {
+            require Module::Generic::Null;
+            my $null = Module::Generic::Null->new( '', { debug => $this->{debug} });
+            rreturn( $null );
+        }
+        return( $data->{ $field } ) if( want( 'LVALUE' ) );
+        rreturn( $data->{ $field } );
+    }
+    return;
+}
+
+sub _set_get_number_as_object : lvalue { return( shift->_set_get_number( @_ ) ); }
+
+sub _set_get_number_as_scalar : lvalue
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    my $this  = $self->_obj2h;
+    no overload;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    
+    my $callbacks = {};
+    if( ref( $field ) eq 'HASH' )
+    {
+        my $def = $field;
+        $field = $def->{field} if( CORE::exists( $def->{field} ) && defined( $def->{field} ) && CORE::length( $def->{field} ) );
+        $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
+    }
+    
+    my $do_callback = sub
+    {
+        if( scalar( keys( %$callbacks ) ) && CORE::exists( $callbacks->{add} ) )
+        {
+            my $coderef = ref( $callbacks->{add} ) eq 'CODE' ? $callbacks->{add} : $self->can( $callbacks->{add} );
+            if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
+            {
+                $coderef->( $self );
+            }
+        }
+    };
+    
+    my $has_arg = 0;
+    my $arg;
+    if( want( qw( LVALUE ASSIGN ) ) )
+    {
+        ( $arg ) = want( 'ASSIGN' );
+        $has_arg = 'assign';
+    }
+    else
+    {
+        if( @_ )
+        {
+            $arg = shift( @_ );
+            $has_arg++;
+        }
+    }
+    if( $has_arg )
+    {
+        my $v = $arg;
+        require Regexp::Common;
+        Regexp::Common->import( 'number' );
+        # If the user wants to remove it
+        if( defined( $v ) && $v !~ /^$RE{num}{real}$/ )
+        {
+            my $error = "Method $field takes only a number, but value provided ($arg) is not a number";
+            if( $has_arg eq 'assign' )
+            {
+                $self->error( $error );
+                my $dummy = 'dummy';
+                return( $dummy );
+            }
+            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
+            rreturn( $self->error( $error ) );
+        }
+        $data->{ $field } = $v;
+        $do_callback->();
+    }
+    
+    if( !CORE::length( $data->{ $field } ) && want( 'OBJECT' ) )
+    {
+        require Module::Generic::Null;
+        my $null = Module::Generic::Null->new( '', { debug => $this->{debug} });
+        rreturn( $null );
+    }
+    return( $data->{ $field } ) if( want( 'LVALUE' ) );
+    rreturn( $data->{ $field } );
+    return;
+}
+
+sub _set_get_number_or_object
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    my $class = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    if( @_ )
+    {
+        if( ref( $_[0] ) eq 'HASH' || Scalar::Util::blessed( $_[0] ) )
+        {
+            return( $self->_set_get_object( $field, $class, @_ ) );
+        }
+        else
+        {
+            return( $self->_set_get_number( $field, @_ ) );
+        }
+    }
+    return( $data->{ $field } );
+}
+
+sub _set_get_object
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    my $class = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    no overloading;
+    # $self->message( 3, "Called for field '$field' and class '$class'." );
+    if( @_ )
+    {
+        if( scalar( @_ ) == 1 )
+        {
+            # $self->message( 3, "Object provided is '", overload::StrVal( $_[0] ), "' for class '$class'. Is it a legit object? ", ( $self->_is_a( $_[0], $class ) ? 'yes' : 'no' ) );
+            # User removed the value by passing it an undefined value
+            if( !defined( $_[0] ) )
+            {
+                $data->{ $field } = undef();
+            }
+            # User pass an object
+            elsif( Scalar::Util::blessed( $_[0] ) )
+            {
+                my $o = shift( @_ );
+                if( ref( $class ) eq 'ARRAY' )
+                {
+                    my $ok = 0;
+                    foreach my $c ( @$class )
+                    {
+                        if( $o->isa( $c ) )
+                        {
+                            $ok++, last;
+                        }
+                    }
+                    return( $self->error( "Object provided (", ref( $o ), ") for $field does not match any of the possible classes: '", join( "', '", @$class ), "'." ) ) if( !$ok );
+                }
+                else
+                {
+                    # $self->message( 3, "Object provided (", ref( $o ), ") for $field is not a valid $class object" ) if( !$o->isa( "$class" ) );
+                    return( $self->error( "Object provided (", ref( $o ), ") for $field is not a valid $class object" ) ) if( !$o->isa( "$class" ) );
+                }
+                $data->{ $field } = $o;
+            }
+            else
+            {
+                $class = $class->[0] if( ref( $class ) eq 'ARRAY' );
+                # $self->message( 3, "Got here, instantiating object for field '$field' and class '$class'." );
+                my $o = $self->_instantiate_object( $field, $class, @_ ) || do
+                {
+                    if( $class->can( 'error' ) )
+                    {
+                        return( $self->pass_error( $class->error ) );
+                    }
+                    else
+                    {
+                        return( $self->error( "Unable to instantiate an object for class \"$class\" and values provided: '", join( "', '", @_ ), "'." ) );
+                    }
+                };
+                # $self->message( 3, "Setting field $field value to $o" );
+                $data->{ $field } = $o;
+            }
+        }
+        else
+        {
+            $class = $class->[0] if( ref( $class ) eq 'ARRAY' );
+            # $self->message( 3, "Argument provideds ('", join( "', '", map( overload::StrVal( $_ ), @_ ) ), "'), instantiating object for field '$field' and class '$class' called from file ", [caller(1)]->[1], " at line ", [caller(1)]->[2], "." );
+            # There is already an object, so we pass any argument to the existing object
+            if( $data->{ $field } && $self->_is_a( $data->{ $field }, $class ) )
+            {
+                warn( "Re-setting existing object '", overload::StrVal( $data->{ $field } ), "' for field '$field' and class '$class'\n" );
+            }
+            
+            my $o = $self->_instantiate_object( $field, $class, @_ ) || do
+            {
+                if( $class->can( 'error' ) )
+                {
+                    return( $self->pass_error( $class->error ) );
+                }
+                else
+                {
+                    return( $self->error( "Unable to instantiate an object for class \"$class\" with no value provided." ) );
+                }
+            };
+            # $self->message( 3, "Setting field $field value to $o" );
+            $data->{ $field } = $o;
+        }
+    }
+    # If nothing has been set for this field, ie no object, but we are called in chain
+    # we set a dummy object that will just call itself to avoid perl complaining about undefined value calling a method
+    if( !$data->{ $field } && want( 'OBJECT' ) )
+    {
+        $class = $class->[0] if( ref( $class ) eq 'ARRAY' );
+        my $o = $self->_instantiate_object( $field, $class, @_ ) || do
+        {
+            if( $class->can( 'error' ) )
+            {
+                return( $self->pass_error( $class->error ) );
+            }
+            else
+            {
+                return( $self->error( "Unable to instantiate an object for class \"$class\" with no value provided." ) );
+            }
+        };
+        $data->{ $field } = $o;
+        return( $o );
+    }
+    # $self->message( 3, "Returning for field '$field' value: ", $self->{ $field } );
+    return( $data->{ $field } );
+}
+
+sub _set_get_object_lvalue : lvalue
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    my $class = shift( @_ );
+    no overloading;
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    my $has_arg = 0;
+    my $arg;
+    if( want( qw( LVALUE ASSIGN ) ) )
+    {
+        ( $arg ) = want( 'ASSIGN' );
+        $has_arg = 'assign';
+    }
+    else
+    {
+        if( @_ )
+        {
+            $arg = shift( @_ );
+            $has_arg++;
+        }
+    }
+    if( $has_arg )
+    {
+        if( !defined( $arg ) )
+        {
+            $data->{ $field } = undef();
+        }
+        # User pass an object
+        elsif( Scalar::Util::blessed( $arg ) )
+        {
+            if( ref( $class ) eq 'ARRAY' )
+            {
+                my $ok = 0;
+                foreach my $c ( @$class )
+                {
+                    if( $arg->isa( $c ) )
+                    {
+                        $ok++, last;
+                    }
+                }
+                my $error = "Object provided (" . ref( $arg ) . ") for $field does not match any of the possible classes: '" . join( "', '", @$class ) . "'.";
+                if( $has_arg eq 'assign' )
+                {
+                    $self->error( $error );
+                    my $dummy = 'dummy';
+                    return( $dummy );
+                }
+                return( $self->error( $error ) ) if( want( 'LVALUE' ) );
+                rreturn( $self->error( $error ) );
+            }
+            else
+            {
+                if( !$arg->isa( "$class" ) )
+                {
+                    my $error = "Object provided (" . ref( $arg ) . ") for $field is not a valid $class object";
+                    if( $has_arg eq 'assign' )
+                    {
+                        $self->error( $error );
+                        my $dummy = 'dummy';
+                        return( $dummy );
+                    }
+                    return( $self->error( $error ) ) if( want( 'LVALUE' ) );
+                    rreturn( $self->error( $error ) );
+                }
+            }
+            $data->{ $field } = $arg;
+        }
+        else
+        {
+            my $error = "Value provided (" . overload::StrVal( $arg ) . " is not an object.";
+            if( $has_arg eq 'assign' )
+            {
+                $self->error( $error );
+                my $dummy = 'dummy';
+                return( $dummy );
+            }
+            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
+            rreturn( $self->error( $error ) );
+        }
+        my $dummy = 'dummy';
+        # We need to return something else than our object, or by virtue of perl's way of working
+        # we would return our object as coded below, and that object will be assigned the
+        # very value we will have passed in assignment !
+        return( $dummy ) if( $has_arg eq 'assign' );
+    }
+    return( $data->{ $field } ) if( want( 'LVALUE' ) );
+    rreturn( $data->{ $field } );
+    # To make perl happy
+    return;
+}
+
+sub _set_get_object_without_init
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    my $class = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    no overloading;
+    if( @_ )
+    {
+        if( scalar( @_ ) == 1 )
+        {
+            # User removed the value by passing it an undefined value
+            if( !defined( $_[0] ) )
+            {
+                $data->{ $field } = undef();
+            }
+            # User pass an object
+            elsif( Scalar::Util::blessed( $_[0] ) )
+            {
+                my $o = shift( @_ );
+                if( ref( $class ) eq 'ARRAY' )
+                {
+                    my $ok = 0;
+                    foreach my $c ( @$class )
+                    {
+                        if( $o->isa( $c ) )
+                        {
+                            $ok++, last;
+                        }
+                    }
+                    return( $self->error( "Object provided (", ref( $o ), ") for $field does not match any of the possible classes: '", join( "', '", @$class ), "'." ) ) if( !$ok );
+                }
+                else
+                {
+                    $self->message( 4, "Object provided (", ref( $o ), ") for $field is not a valid $class object" ) if( !$o->isa( "$class" ) );
+                    return( $self->error( "Object provided (", ref( $o ), ") for $field is not a valid $class object" ) ) if( !$o->isa( "$class" ) );
+                }
+                $data->{ $field } = $o;
+            }
+            else
+            {
+                my $o = $self->_instantiate_object( $field, $class, @_ ) || do
+                {
+                    if( $class->can( 'error' ) )
+                    {
+                        return( $self->pass_error( $class->error ) );
+                    }
+                    else
+                    {
+                        return( $self->error( "Unable to instantiate an object for class \"$class\" and values provided: '", join( "', '", @_ ), "'." ) );
+                    }
+                };
+                # $self->message( 3, "Setting field $field value to $o" );
+                $data->{ $field } = $o;
+            }
+        }
+        else
+        {
+            my $o = $self->_instantiate_object( $field, $class, @_ ) || do
+            {
+                if( $class->can( 'error' ) )
+                {
+                    return( $self->pass_error( $class->error ) );
+                }
+                else
+                {
+                    return( $self->error( "Unable to instantiate an object for class \"$class\" with no value provided." ) );
+                }
+            };
+            # $self->message( 3, "Setting field $field value to $o" );
+            $data->{ $field } = $o;
+        }
+    }
+    # If nothing has been set for this field, ie no object, but we are called in chain, this will fail on purpose.
+    # To avoid this, use _set_get_object
+    return( $data->{ $field } );
+}
+
+sub _set_get_object_array2
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    my $class = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    if( @_ )
+    {
+        my $data_to_process = shift( @_ );
+        return( $self->error( "I was expecting an array ref, but instead got '$data_to_process'. _is_array returned: '", $self->_is_array( $data_to_process ), "'" ) ) if( !$self->_is_array( $data_to_process ) );
+        my $arr1 = [];
+        foreach my $ref ( @$data_to_process )
+        {
+            return( $self->error( "I was expecting an embeded array ref, but instead got '$ref'." ) ) if( ref( $ref ) ne 'ARRAY' );
+            my $arr = [];
+            for( my $i = 0; $i < scalar( @$ref ); $i++ )
+            {
+                my $o;
+                if( defined( $ref->[$i] ) )
+                {
+                    return( $self->error( "Parameter provided for adding object of class $class is not a reference." ) ) if( !ref( $ref->[$i] ) );
+                    if( Scalar::Util::blessed( $ref->[$i] ) )
+                    {
+                        return( $self->error( "Array offset $i contains an object from class ", $ref->[$i], ", but was expecting an object of class $class." ) ) if( !$ref->[$i]->isa( $class ) );
+                        $o = $ref->[$i];
+                    }
+                    elsif( ref( $ref->[$i] ) eq 'HASH' )
+                    {
+                        #$o = $class->new( $h, $ref->[$i] );
+                        $o = $self->_instantiate_object( $field, $class, $ref->[$i] );
+                    }
+                    else
+                    {
+                        $self->error( "Warning only: data provided to instaantiate object of class $class is not a hash reference" );
+                    }
+                }
+                else
+                {
+                    #$o = $class->new( $h );
+                    $o = $self->_instantiate_object( $field, $class );
+                }
+                return( $self->error( "Unable to instantiate an object of class $class: ", $class->error ) ) if( !defined( $o ) );
+                # $o->{_parent} = $self->{_parent};
+                push( @$arr, $o );
+            }
+            push( @$arr1, $arr );
+        }
+        $data->{ $field } = $arr1;
+    }
+    return( $data->{ $field } );
+}
+
+sub _set_get_object_array
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    my $class = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
+    my $process = sub
+    {
+        my $ref = shift( @_ );
+        return( $self->error( "I was expecting an array ref, but instead got '$ref'. _is_array returned: '", $self->_is_array( $ref ), "'" ) ) if( !$self->_is_array( $ref ) );
+        my $arr = [];
+        for( my $i = 0; $i < scalar( @$ref ); $i++ )
+        {
+            if( defined( $ref->[$i] ) )
+            {
+#                 return( $self->error( "Array offset $i is not a reference. I was expecting an object of class $class or an hash reference to instantiate an object." ) ) if( !ref( $ref->[$i] ) );
+                if( Scalar::Util::blessed( $ref->[$i] ) )
+                {
+                    return( $self->error( "Array offset $i contains an object from class ", $ref->[$i], ", but was expecting an object of class $class." ) ) if( !$ref->[$i]->isa( $class ) );
+                    push( @$arr, $ref->[$i] );
+                }
+#                 elsif( ref( $ref->[$i] ) eq 'HASH' )
+#                 {
+#                     #$o = $class->new( $h, $ref->[$i] );
+#                     $o = $self->_instantiate_object( $field, $class, $ref->[$i] ) || return;
+#                     push( @$arr, $o );
+#                 }
+#                 else
+#                 {
+#                     $self->error( "Warning only: data provided to instantiate object of class $class is not a hash reference" );
+#                 }
+                else
+                {
+                    my $o = $self->_instantiate_object( $field, $class, $ref->[$i] ) || return( $self->pass_error );
+                    push( @$arr, $o );
+                }
+            }
+            else
+            {
+                return( $self->error( "Array offset $i contains an undefined value. I was expecting an object of class $class." ) );
+                my $o = $self->_instantiate_object( $field, $class ) || return( $self->pass_error );
+                push( @$arr, $o );
+            }
+        }
+        return( $arr );
+    };
+    
+    if( @_ )
+    {
+        $data->{ $field } = $process->( @_ );
+    }
+    # For example, if the object property is set at init, without using a method
+    if( $data->{ $field } && ref( $data->{ $field } ) ne 'ARRAY' )
+    {
+        $data->{ $field } = $process->( $data->{ $field } );
+    }
+    return( $data->{ $field } );
+}
+
+sub _set_get_object_array_object
+{
+    my $self = shift( @_ );
+    my $field = shift( @_ ) || return( $self->error( "No field name was provided for this array of object." ) );
+    my $class = shift( @_ ) || return( $self->error( "No class was provided for this array of objects." ) );
+    my $this = $self->_obj2h;
+    my $data = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
+    require Module::Generic::Array;
+    my $process = sub
+    {
+        my $that = ( scalar( @_ ) == 1 && UNIVERSAL::isa( $_[0], 'ARRAY' ) ) ? shift( @_ ) : [ @_ ];
+        my $ref = $self->_set_get_object_array( $field, $class, $that ) || return( $self->pass_error );
+        return( Module::Generic::Array->new( $ref ) );
+    };
+    
+    if( @_ )
+    {
+        $data->{ $field } = $process->( @_ );
+    }
+    ## Default value so that call to the caller's method like my_sub->length will not produce something like "Can't call method "length" on an undefined value"
+    ## Also, this will make it possible to set default value in caller's object and we would turn it into array object.
+    if( !$data->{ $field } || !$self->_is_a( $data->{ $field }, 'Module::Generic::Array' ) )
+    {
+        $data->{ $field } = $process->( CORE::defined( $data->{ $field } ) ? $data->{ $field } : () );
+    }
+    return( $data->{ $field } );
+}
+
+sub _set_get_object_variant
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    ## The class precisely depends on what we find looking ahead
+    my $class = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    my $process = sub
+    {
+        if( ref( $_[0] ) eq 'HASH' )
+        {
+            my $o = $self->_instantiate_object( $field, $class, @_ );
+            return( $o );
+        }
+        ## An array of objects hash
+        elsif( ref( $_[0] ) eq 'ARRAY' )
+        {
+            my $arr = shift( @_ );
+            my $res = [];
+            foreach my $data ( @$arr )
+            {
+                my $o = $self->_instantiate_object( $field, $class, $data ) || return( $self->error( "Unable to create object: ", $self->error ) );
+                push( @$res, $o );
+            }
+            return( $res );
+        }
+    };
+    
+    if( @_ )
+    {
+        $data->{ $field } = $process->( @_ );
+    }
+    return( $data->{ $field } );
+}
+
+sub _set_get_scalar : lvalue
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    my $has_arg = 0;
+    my $arg;
+    if( want( qw( LVALUE ASSIGN ) ) )
+    {
+        ( $arg ) = want( 'ASSIGN' );
+        $has_arg = 'assign';
+    }
+    else
+    {
+        if( @_ )
+        {
+            $arg = ( @_ == 1 ) ? shift( @_ ) : join( '', @_ );
+            $has_arg++;
+        }
+    }
+
+    if( $has_arg )
+    {
+        my $val = $arg;
+        # Just in case, we force stringification
+        # $val = "$val" if( defined( $val ) );
+        if( ref( $val ) eq 'HASH' || ref( $val ) eq 'ARRAY' )
+        {
+            my $error = "Method $field takes only a scalar, but value provided ($val) is a reference";
+            if( $has_arg eq 'assign' )
+            {
+                $self->error( $error );
+                my $dummy = 'dummy';
+                return( $dummy );
+            }
+            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
+            rreturn( $self->error( $error ) );
+        }
+        $data->{ $field } = $val;
+    }
+    return( $data->{ $field } ) if( want( 'LVALUE' ) );
+    rreturn( $data->{ $field } );
+}
+
+sub _set_get_scalar_as_object : lvalue
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    my $has_arg = 0;
+    my $arg;
+    if( want( qw( LVALUE ASSIGN ) ) )
+    {
+        ( $arg ) = want( 'ASSIGN' );
+        $has_arg = 'assign';
+    }
+    else
+    {
+        if( @_ )
+        {
+            $arg = shift( @_ );
+            $has_arg++;
+        }
+    }
+    
+    my $callbacks = {};
+    if( ref( $field ) eq 'HASH' )
+    {
+        my $def = $field;
+        $field = $def->{field};
+        $callbacks = $def->{callbacks};
+    }
+
+    if( $has_arg )
+    {
+        my $val;
+        # $self->message( 4, "Processing value provided '$arg' (", overload::StrVal( $arg ), ")." );
+        if( ref( $arg ) eq 'SCALAR' || 
+            UNIVERSAL::isa( $arg, 'SCALAR' ) )
+        {
+            $val = $$arg;
+        }
+        elsif( ref( $arg ) && 
+               $self->_is_object( $arg ) && 
+               overload::Overloaded( $arg ) && 
+               overload::Method( $arg, '""' ) )
+        {
+            # $self->message( 3, "Value provided is an overloaded object with stringification capability. Changing it into a plain string => '$arg'." );
+            $val = "$arg";
+        }
+        elsif( ref( $arg ) )
+        {
+            my $error = "I was expecting a string or a scalar reference, but instead got '$arg'";
+            if( $has_arg eq 'assign' )
+            {
+                $self->error( $error );
+                my $dummy = 'dummy';
+                return( $dummy );
+            }
+            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
+            rreturn( $self->error( $error ) );
+        }
+        else
+        {
+            $val = $arg;
+        }
+        
+        my $o = $data->{ $field };
+        # $self->message( 3, "Value to use is '$val' and current object is '", ref( $o ), "'." );
+        if( ref( $o ) )
+        {
+            $o->set( $val );
+        }
+        else
+        {
+            require Module::Generic::Scalar;
+            $data->{ $field } = Module::Generic::Scalar->new( $val );
+            if( scalar( keys( %$callbacks ) ) && CORE::exists( $callbacks->{add} ) )
+            {
+                my $coderef = ref( $callbacks->{add} ) eq 'CODE' ? $callbacks->{add} : $self->can( $callbacks->{add} );
+                if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
+                {
+                    $coderef->( $self );
+                }
+            }
+        }
+        # $self->message( 3, "Object now is: '", ref( $data->{ $field } ), "'." );
+    }
+    
+    # $self->message( 3, "Checking if object '", ref( $data->{ $field } ), "' is set. Is it an object? ", $self->_is_object( $data->{ $field } ) ? 'yes' : 'no', " and its stringified value is '", $data->{ $field }, "'." );
+    if( !$self->_is_object( $data->{ $field } ) || ( $self->_is_object( $data->{ $field } ) && ref( $data->{ $field } ) ne ref( $self ) ) )
+    {
+        # $self->message( 3, "No object is set yet, initiating one." );
+        require Module::Generic::Scalar;
+        $data->{ $field } = Module::Generic::Scalar->new( $data->{ $field } );
+    }
+    my $v = $data->{ $field };
+    if( !$v->defined )
+    {
+        if( Want::want( 'OBJECT' ) )
+        {
+            # We might have need to specify, because I found a race condition where
+            # even though the context is object, once in Null, the context became 'code'
+            # return( Module::Generic::Null->new( wants => 'OBJECT' ) );
+            return( $v ) if( want( 'LVALUE' ) );
+            rreturn( $v );
+        }
+        else
+        {
+            return if( want( 'LVALUE' ) );
+            rreturn;
+        }
+    }
+    else
+    {
+        return( $v ) if( want( 'LVALUE' ) );
+        rreturn( $v );
+    }
+}
+
+sub _set_get_scalar_or_object
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    my $class = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    if( @_ )
+    {
+        if( ref( $_[0] ) eq 'HASH' || Scalar::Util::blessed( $_[0] ) )
+        {
+            return( $self->_set_get_object( $field, $class, @_ ) );
+        }
+        else
+        {
+            return( $self->_set_get_scalar( $field, @_ ) );
+        }
+    }
+    if( !$data->{ $field } && want( 'OBJECT' ) )
+    {
+        # $self->message( 3, "Called in a chain for field $field and class $class, but no object is set, reverting to dummy object." );
+        # $self->messagef( 3, "Expecting void? '%s'. Want scalar? '%s'. Want hash? '%s', wantref: '%s'", want('VOID'), want('SCALAR'), Want::want('HASH'), Want::wantref() );
+        require Module::Generic::Null;
+        my $null = Module::Generic::Null->new({ debug => $this->{debug}, has_error => 1 });
+        rreturn( $null );
+    }
+    return( $data->{ $field } );
+}
+
+sub _set_get_uri : lvalue
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    my $has_arg = 0;
+    my $arg;
+    if( want( qw( LVALUE ASSIGN ) ) )
+    {
+        ( $arg ) = want( 'ASSIGN' );
+        $has_arg = 'assign';
+    }
+    else
+    {
+        if( @_ )
+        {
+            $arg = shift( @_ );
+            $has_arg++;
+        }
+    }
+
+    my $uri_class = 'URI';
+    if( ref( $field ) eq 'HASH' )
+    {
+        my $def = $field;
+        $field = $def->{field} if( CORE::exists( $def->{field} ) && defined( $def->{field} ) && CORE::length( $def->{field} ) );
+        $uri_class = $def->{class} if( CORE::exists( $def->{class} ) && ref( $def->{class} ) eq 'HASH' );
+    }
+    
+    $self->_load_class( $uri_class ) || do
+    {
+        my $error = $self->error;
+        if( $has_arg eq 'assign' )
+        {
+            $self->error( $error );
+            my $dummy = 'dummy';
+            return( $dummy );
+        }
+        return( $self->error( $error ) ) if( want( 'LVALUE' ) );
+        rreturn( $self->error( $error ) );
+    };
+    
+    if( $has_arg )
+    {
+        my $str = $arg;
+        if( Scalar::Util::blessed( $str ) && $str->isa( $uri_class ) )
+        {
+            $data->{ $field } = $str;
+        }
+        elsif( defined( $str ) && ( $str =~ /^[a-zA-Z]+:\/{2}/ || $str =~ /^urn\:[a-z]+\:/ || $str =~ /^[a-z]+\:/ ) )
+        {
+            $data->{ $field } = $uri_class->new( $str );
+            warn( "$uri_class subclass is missing to handle this specific URI '$str'\n" ) if( !$data->{ $field }->has_recognized_scheme );
+        }
+        # Is it an absolute path?
+        elsif( substr( $str, 0, 1 ) eq '/' )
+        {
+            $data->{ $field } = $uri_class->new( $str );
+        }
+        elsif( defined( $str ) )
+        {
+            try
+            {
+                die( "Cannot use a reference as an URI. Received '$str'" ) if( ref( $str ) && !$self->_is_object( $str ) );
+                my $u = $uri_class->new( $str );
+                $data->{ $field } = $u;
+            }
+            catch( $e )
+            {
+                my $error = "URI value provided '$str' does not look like an URI, so I do not know what to do with it: $e";
+                if( $has_arg eq 'assign' )
+                {
+                    $self->error( $error );
+                    my $dummy = 'dummy';
+                    return( $dummy );
+                }
+                return( $self->error( $error ) ) if( want( 'LVALUE' ) );
+                rreturn( $self->error( $error ) );
+            }
+        }
+        else
+        {
+            $data->{ $field } = undef();
+        }
+    }
+    # Data was pre-set or directly set but is not an URI object, so we convert it now
+    if( $data->{ $field } && !$self->_is_a( $data->{ $field }, $uri_class ) )
+    {
+        # Force stringification if this is an overloaded value
+        $data->{ $field } = $uri_class->new( $data->{ $field } . '' );
+    }
+    return( $data->{ $field } ) if( want( 'LVALUE' ) );
+    rreturn( $data->{ $field } );
+}
+
+# Universally Unique Identifier
+sub _set_get_uuid : lvalue
+{
+    my $self = shift( @_ );
+    my $field = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    my $has_arg = 0;
+    my $arg;
+    if( want( qw( LVALUE ASSIGN ) ) )
+    {
+        ( $arg ) = want( 'ASSIGN' );
+        $has_arg = 'assign';
+    }
+    else
+    {
+        if( @_ )
+        {
+            $arg = shift( @_ );
+            $has_arg++;
+        }
+    }
+    if( $has_arg )
+    {
+        my $v = $arg;
+        # If the user wants to remove it
+        if( !defined( $v ) )
+        {
+            $data->{ $field } = $v;
+        }
+        # If the user provided a string, let's check it
+        elsif( length( $v ) && !$self->_is_uuid( $v ) )
+        {
+            my $error = "Value provided is not a valid uuid.";
+            if( $has_arg eq 'assign' )
+            {
+                $self->error( $error );
+                my $dummy = 'dummy';
+                return( $dummy );
+            }
+            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
+            rreturn( $self->error( $error ) );
+        }
+        $data->{ $field } = $self->new_scalar( $v );
+    }
+    my $v = $self->_is_a( $data->{ $field }, 'Module::Generic::Scalar' )
+        ? $data->{ $field }
+        : $self->new_scalar( $data->{ $field } );
+    if( !$v->defined )
+    {
+        if( Want::want( 'OBJECT' ) )
+        {
+            # We might have need to specify, because I found a race condition where
+            # even though the context is object, once in Null, the context became 'code'
+            require Module::Generic::Null;
+            return( Module::Generic::Null->new( wants => 'OBJECT' ) ) if( want( 'LVALUE' ) );
+            rreturn( Module::Generic::Null->new( wants => 'OBJECT' ) );
+        }
+        else
+        {
+            return if( want( 'LVALUE' ) );
+            rreturn;
+        }
+    }
+    else
+    {
+        return( $v ) if( want( 'LVALUE' ) );
+        rreturn( $v );
+    }
+}
+
+sub _to_array_object
+{
+    my $self = shift( @_ );
+    my $data = scalar( @_ ) == 1 && $self->_is_array( $_[0] ) 
+        ? shift( @_ ) 
+        : ( scalar( @_ ) == 0 || ( scalar( @_ ) == 1 && !defined( $_[0] ) ) )
+            ? [] 
+            : [ @_ ];
+    return( $self->new_array( $data ) );
+}
+
+# $self->_warnings_is_enabled()
+# $self->_warnings_is_enabled( $other_object );
+sub _warnings_is_enabled
+{
+    my $self = shift( @_ );
+    # I hate dying, but here this is a show-stopper
+    die( "Object provided is undef!\n" ) if( @_ && !defined( $_[0] ) );
+    my $obj = @_ ? shift( @_ ) : $self;
+    return(0) if( !$self->_warnings_is_registered( $obj ) );
+    return( warnings::enabled( ref( $obj ) || $obj ) );
+}
+
+sub _warnings_is_registered
+{
+    my $self = shift( @_ );
+    # I hate dying, but here this is a show-stopper
+    die( "Object provided is undef!\n" ) if( @_ && !defined( $_[0] ) );
+    my $obj = @_ ? shift( @_ ) : $self;
+    return(1) if( defined( $warnings::Bits{ ref( $obj ) || $obj } ) );
+    return(0);
+}
+
+sub _autoload_subs
+{
+    $AUTOLOAD_SUBS = 
+    {
+    # NOTE: as_hash()
+    as_hash => <<'PERL',
+sub as_hash
+{
+    my $self = shift( @_ );
+    my $this = $self->_obj2h;
+    my $p = {};
+    $p = shift( @_ ) if( scalar( @_ ) == 1 && ref( $_[0] ) eq 'HASH' );
+    $p->{_seen} = {} if( !exists( $p->{_seen} ) || !ref( $p->{_seen} ) );
+    # $self->message( 3, "Parameters are: ", sub{ $self->dumper( $p ) } );
+    my $class = ref( $this );
+    no strict 'refs';
+    my @methods = grep( !/^(?:new|init)$/, grep{ defined &{"${class}::$_"} } keys( %{"${class}::"} ) );
+
+    $self->messagef( 3, "The following methods found in package $class: '%s'.", join( "', '", sort( @methods ) ) );
+    use strict 'refs';
+    my $ref = {};
+    my $added_subs = CORE::exists( $this->{_added_method} ) && ref( $this->{_added_method} ) eq 'HASH'
+        ? $this->{_added_method}
+        : {};
+    
+    my $check;
+    $check = sub
+    {
+        my $meth = shift( @_ );
+        my $rv   = shift( @_ );
+        no overloading;
+        $self->message( 3, "Value for method '$meth' is '$rv'." );
+        use overloading;
+        if( $p->{json} && ( ref( $rv ) eq 'JSON::PP::Boolean' || ref( $rv ) eq 'Module::Generic::Boolean' || ref( $rv ) eq 'Class::Boolean' ) )
+        {
+            # $self->message( 3, "Encoding boolean to true or false for method '$meth'." );
+            # $ref->{ $meth } = Module::Generic::Boolean::TO_JSON( $ref->{ $meth } );
+            return( Module::Generic::Boolean::TO_JSON( $ref->{ $meth } ) );
+        }
+        elsif( $self->_is_object( $rv ) )
+        {
+            # Order of the checks here matter
+            if( $rv->can( 'as_hash' ) && overload::Overloaded( $rv ) && overload::Method( $rv, '""' ) )
+            {
+                $rv = $rv . '';
+                return( $rv );
+            }
+            elsif( $rv->can( 'as_hash' ) )
+            {
+                $self->message( 3, "$rv is an object (", ref( $rv ), ") capable of as_hash, calling it." );
+                if( !$p->{_seen}->{ Scalar::Util::refaddr( $rv ) } )
+                {
+                    $p->{_seen}->{ Scalar::Util::refaddr( $rv ) }++;
+                    $rv = $rv->as_hash( $p );
+                    $self->message( 4, "returned value is '$rv' -> ", sub{ $self->dump( $rv ) });
+                    if( Scalar::Util::blessed( $rv ) )
+                    {
+                        return( $check->( $meth => $rv ) );
+                    }
+                    else
+                    {
+                        return( $rv );
+                    }
+                }
+                else
+                {
+                    return;
+                }
+            }
+            # If the object can be overloaded, and has no TO_JSON method we get its string representation here.
+            # If it has a TO_JSON and we are asked to return data for json, we let the JSON module call the TO_JSON method
+            elsif( overload::Overloaded( $rv ) && overload::Method( $rv, '""' ) )
+            {
+                $rv = "$rv" unless( $p->{json} && $rv->can( 'TO_JSON' ) );
+                return( $rv );
+            }
+        }
+        else
+        {
+            return( $rv );
+        }
+    };
+    
+    foreach my $meth ( sort( @methods ) )
+    {
+        next if( substr( $meth, 0, 1 ) eq '_' );
+        next if( CORE::exists( $added_subs->{ $meth } ) );
+        my $rv = eval{ $self->$meth };
+        if( $@ )
+        {
+            warn( "An error occured while accessing method $meth: $@\n" );
+            next;
+        }
+        $rv = $check->( $meth => $rv );
+        next if( !defined( $rv ) );
+        
+        # $self->message( 3, "Checking field '$meth' with value '$rv'." );
+        
+        if( ref( $rv ) eq 'HASH' )
+        {
+            $ref->{ $meth } = $rv if( scalar( keys( %$rv ) ) );
+        }
+        # If method call returned an array, like array of string or array of object such as in data from Net::API::Stripe::List
+        elsif( ref( $rv ) eq 'ARRAY' )
+        {
+            my $arr = [];
+            foreach my $this_ref ( @$rv )
+            {
+                # my $that_ref = ( $self->_is_object( $this_ref ) && $this_ref->can( 'as_hash' ) ) ? $this_ref->as_hash : $this_ref;
+                my $that_ref;
+                if( $self->_is_object( $this_ref ) && $this_ref->can( 'as_hash' ) )
+                {
+                    if( !$p->{_seen}->{ Scalar::Util::refaddr( $this_ref ) } )
+                    {
+                        $p->{_seen}->{ Scalar::Util::refaddr( $this_ref ) }++;
+                        $that_ref = $this_ref->as_hash( $p );
+                    }
+                }
+                else
+                {
+                    $that_ref = $this_ref;
+                }
+                CORE::push( @$arr, $that_ref );
+            }
+            $ref->{ $meth } = $arr if( scalar( @$arr ) );
+        }
+        elsif( !ref( $rv ) )
+        {
+            $ref->{ $meth } = $rv if( CORE::length( $rv ) );
+        }
+        elsif( CORE::length( "$rv" ) )
+        {
+            $self->message( 3, "Adding value '$rv' to field '$meth' in hash \$ref" );
+            $ref->{ $meth } = $rv;
+        }
+    }
+    return( $ref );
+}
+PERL
+    # NOTE: clear()
+    clear => <<'PERL',
+sub clear
+{
+    return( shift->clear_error );
+}
+PERL
+    # NOTE: clear_error()
+    clear_error => <<'PERL',
+sub clear_error
+{
+    my $self  = shift( @_ );
+    my $class = ref( $self ) || $self;
+    my $this  = $self->_obj2h;
+    no strict 'refs';
+    $this->{error} = ${ "$class\::ERROR" } = '';
+    return( $self );
+}
+PERL
+    # NOTE: clone()
+    clone => <<'PERL',
+sub clone
+{
+    my $self  = shift( @_ );
+    try
+    {
+        # $self->message( 3, "Cloning object '", overload::StrVal( $self ), "'." );
+        return( Clone::clone( $self ) );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Error cloning object \"", overload::StrVal( $self ), "\": $e" ) );
+    }
+}
+PERL
+    # NOTE: colour_close()
+    colour_close => <<'PERL',
+sub colour_close { return( shift->_set_get( 'colour_close', @_ ) ); }
+PERL
+    # NOTE: colour_closest()
+    colour_closest => <<'PERL',
+sub colour_closest
+{
+    my $self    = shift( @_ );
+    my $colour  = uc( shift( @_ ) );
+    my $this  = $self->_obj2h;
+    my $colours = 
+    {
+    '000000000' => 'black',
+    '000000255' => 'blue',
+    '000255000' => 'green',
+    '000255255' => 'cyan',
+    '255000000' => 'red',
+    '255000255' => 'magenta',
+    '255255000' => 'yellow',
+    '255255255' => 'white',
+    };
+    my( $red, $green, $blue ) = ( '', '', '' );
+    our $COLOUR_NAME_TO_RGB;
+    if( $colour =~ /^[A-Z]+([A-Z\s]+)*$/ )
+    {
+        $self->message( 9, "Checking colour '$colour' as string. Looking up its rgb value." );
+        if( !scalar( keys( %$COLOUR_NAME_TO_RGB ) ) )
+        {
+            $self->message( 9, "Processing colour map in <DATA> section." );
+            my $colour_data = $self->__colour_data;
+            $COLOUR_NAME_TO_RGB = eval( $colour_data );
+            if( $@ )
+            {
+                return( $self->error( "An error occurred loading data from __colour_data: $@" ) );
+            }
+        }
+        if( CORE::exists( $COLOUR_NAME_TO_RGB->{ lc( $colour ) } ) )
+        {
+            ( $red, $green, $blue ) = @{$COLOUR_NAME_TO_RGB->{ lc( $colour ) }};
+        }
+    }
+    # Colour all in decimal??
+    elsif( $colour =~ /^\d{9}$/ )
+    {
+        # $self->message( 3, "Got colour all in decimal. Less work to do..." );
+        $red   = substr( $colour, 0, 3 );
+        $green = substr( $colour, 3, 3 );
+        $blue  = substr( $colour, 6, 3 );
+    }
+    # Colour in hexadecimal, convert it
+    elsif( $colour =~ /^[A-F0-9]+$/ )
+    {
+        $red   = hex( substr( $colour, 0, 2 ) );
+        $green = hex( substr( $colour, 2, 2 ) );
+        $blue  = hex( substr( $colour, 4, 2 ) );
+    }
+    # Clueless
+    else
+    {
+        # Not undef, but rather empty string. Undef is associated with an error
+        return( '' );
+    }
+    my $dec_colour = CORE::sprintf( '%3d%3d%3d', $red, $green, $blue );
+    my $last = '';
+    my @colours = reverse( sort( keys( %$colours ) ) );
+    $red    = CORE::sprintf( '%03d', $red );
+    $green  = CORE::sprintf( '%03d', $green );
+    $blue   = CORE::sprintf( '%03d', $blue );
+    my $cur = CORE::sprintf( '%03d%03d%03d', $red, $green, $blue );
+    my( $red_ok, $green_ok, $blue_ok ) = ( 0, 0, 0 );
+    # $self->message( 3, "Current colour: '$cur'." );
+    for( my $i = 0; $i < scalar( @colours ); $i++ )
+    {
+        my $r = CORE::sprintf( '%03d', substr( $colours[ $i ], 0, 3 ) );
+        my $g = CORE::sprintf( '%03d', substr( $colours[ $i ], 3, 3 ) );
+        my $b = CORE::sprintf( '%03d', substr( $colours[ $i ], 6, 3 ) );
+ 
+        my $r_p = CORE::sprintf( '%03d', substr( $colours[ $i - 1 ], 0, 3 ) );
+        my $g_p = CORE::sprintf( '%03d', substr( $colours[ $i - 1 ], 3, 3 ) );
+        my $b_p = CORE::sprintf( '%03d', substr( $colours[ $i - 1 ], 6, 3 ) );
+ 
+        # $self->message( 3, "$r ($red), $g ($green), $b ($blue)" );
+        if( $red == $r ||
+            ( $red < $r && $red > int( $r / 2 ) ) ||
+            ( $red > $r && $red < int( $r_p / 2 ) && $r_p ) ||
+            $red > $r )
+        {
+            $red_ok++;
+        }
+ 
+        if( $red_ok )
+        {
+            if( $green == $g ||
+                ( $green < $g && $green > int( $g / 2 ) ) ||
+                ( $green > $g && $green < int( $g_p / 2 ) && $g_p ) ||
+                $green > $g )
+            {
+                $blue_ok++;
+            }
+        } 
+ 
+        if( $blue_ok )
+        {
+            if( $blue == $b ||
+                ( $blue < $b && $blue > int( $b / 2 ) ) ||
+                ( $blue > $b && $blue < int( $b_p / 2 ) && $b_p ) ||
+                $blue > $b )
+            {
+                $last = $colours[ $i ];
+                last;
+            }
+        }
+    }
+    return( $colours->{ $last } );
+}
+PERL
+    # NOTE: colour_format()
+    colour_format => <<'PERL',
+sub colour_format
+{
+    my $self = shift( @_ );
+    # style, colour or color and text
+    my $opts = shift( @_ );
+    return( $self->error( "Parameter hash provided is not an hash reference." ) ) if( !$self->_is_hash( $opts ) );
+    my $this = $self->_obj2h;
+    # To make it possible to use either text or message property
+    $opts->{text} = CORE::delete( $opts->{message} ) if( CORE::length( $opts->{message} ) && !CORE::length( $opts->{text} ) );
+    return( $self->error( "No text was provided to format." ) ) if( !CORE::length( $opts->{text} ) );
+    
+    $opts->{colour} //= CORE::delete( $opts->{color} ) || CORE::delete( $opts->{fg_colour} ) || CORE::delete( $opts->{fg_color} ) || CORE::delete( $opts->{fgcolour} ) || CORE::delete( $opts->{fgcolor} );
+    $opts->{bgcolour} //= CORE::delete( $opts->{bgcolor} ) || CORE::delete( $opts->{bg_colour} ) || CORE::delete( $opts->{bg_color} );
+    
+    my $bold      = "\e[1m";
+    my $underline = "\e[4m";
+    my $reverse   = "\e[7m";
+    my $normal    = "\e[m";
+    my $cls       = "\e[H\e[2J";
+    my $styles =
+    {
+    # Bold
+    b       => 1,
+    bold    => 1,
+    strong  => 1,
+    # Italic
+    i       => 3,
+    italic  => 3,
+    # Underline
+    u       => 4,
+    underline => 4,
+    underlined => 4,
+    blink   => 5,
+    # Reverse
+    r       => 7,
+    reverse => 7,
+    reversed => 7,
+    # Concealed
+    c       => 8,
+    conceal => 8,
+    concealed => 8,
+    strike  => 9,
+    striked  => 9,
+    striken  => 9,
+    };
+    
+    my $convert_24_To_8bits = sub
+    {
+        my( $r, $g, $b ) = @_;
+        $self->message( 9, "Converting $r, $g, $b to 8 bits" );
+        return( ( POSIX::floor( $r * 7 / 255 ) << 5 ) +
+                ( POSIX::floor( $g * 7 / 255 ) << 2 ) +
+                ( POSIX::floor( $b * 3 / 255 ) ) 
+              );
+    };
+    
+    # opacity * original + (1-opacity)*background = resulting pixel
+    # https://stackoverflow.com/a/746934/4814971
+    my $colour_with_alpha = sub
+    {
+        my( $r, $g, $b, $a, $bg ) = @_;
+        ## Assuming a white background (255)
+        my( $bg_r, $bg_g, $bg_b ) = ( 255, 255, 255 );
+        if( ref( $bg ) eq 'HASH' )
+        {
+            ( $bg_r, $bg_g, $bg_b ) = @$bg{qw( red green blue )};
+        }
+        $r = POSIX::round( ( $a * $r ) + ( ( 1 - $a ) * $bg_r ) );
+        $g = POSIX::round( ( $a * $g ) + ( ( 1 - $a ) * $bg_g ) );
+        $b = POSIX::round( ( $a * $b ) + ( ( 1 - $a ) * $bg_b ) );
+        return( [$r, $g, $b] );
+    };
+    
+    my $check_colour = sub
+    {
+        my $col = shift( @_ );
+        # $self->message( 3, "Checking colour '$col'." );
+        # $colours or $bg_colours
+        my $map = shift( @_ );
+        my $code;
+        my $light;
+        # Example: 'light red' or 'light_red'
+        if( $col =~ /^(?:(?<light>bright|light)[[:blank:]\_]+)?
+        (?<colour>
+            (?:[a-zA-Z]+)(?:[[:blank:]]+\w+)?
+            |
+            (?<rgb_type>rgb[a]?)\([[:blank:]]*(?<red>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<green>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<blue>\d{1,3})
+            (?:[[:blank:]]*\,[[:blank:]]*(?<opacity>\d(?:\.\d+)?))?[[:blank:]]*
+            \)
+        )$/xi )
+        {
+            my %regexp = %+;
+            $self->message( 9, "Light colour request '$col'. Capture: ", sub{ $self->dumper( \%regexp ) } );
+            ( $light, $col ) = ( $+{light}, $+{colour} );
+            if( CORE::length( $+{rgb_type} ) &&
+                CORE::length( $+{red} ) &&
+                CORE::length( $+{green} ) &&
+                CORE::length( $+{blue} ) )
+            {
+                if( $+{opacity} || $light )
+                {
+                    my $opacity = CORE::length( $+{opacity} )
+                        ? $+{opacity}
+                        : $light
+                            ? 0.5
+                            : 1;
+                    $col = CORE::sprintf( 'rgba(%03d%03d%03d,%.1f)', $+{red}, $+{green}, $+{blue}, $opacity );
+                }
+                else
+                {
+                    $col = CORE::sprintf( 'rgb(%03d%03d%03d)', $+{red}, $+{green}, $+{blue} );
+                }
+            }
+            else
+            {
+                $self->message( 9, "Colour '$col' is not rgb[a]" );
+            }
+        }
+        elsif( $col =~ /^(?<rgb_type>rgb[a]?)\([[:blank:]]*(?<red>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<green>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<blue>\d{1,3})[[:blank:]]*(?:\,[[:blank:]]*(?<opacity>\d(?:\.\d+)?))?[[:blank:]]*\)$/i )
+        {
+            if( $+{opacity} )
+            {
+                $col = CORE::sprintf( 'rgba(%03d%03d%03d,%.1f)', $+{red}, $+{green}, $+{blue}, $+{opacity} );
+            }
+            else
+            {
+                $col = CORE::sprintf( '%03d%03d%03d', $+{red}, $+{green}, $+{blue} );
+            }
+        }
+        else
+        {
+            $self->message( 9, "Colour '$col' failed to match our rgba regexp." );
+        }
+        
+        my $col_ref;
+        if( $col =~ /^rgb[a]?\((?<red>\d{3})(?<green>\d{3})(?<blue>\d{3})\)$/i )
+        {
+            $col_ref = {};
+            %$col_ref = %+;
+            $self->message( 9, "Rgb colour '$+{red}', '$+{green}' and '$+{blue}' found: ", sub{ $self->dumper( $col_ref ) });
+            return({
+                _24bits => [@$col_ref{qw( red green blue )}],
+                _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
+            });
+        }
+        # Treating opacity to make things lighter; not ideal, but standard scheme
+        elsif( $col =~ /^rgba\((?<red>\d{3})(?<green>\d{3})(?<blue>\d{3})[[:blank:]]*\,[[:blank:]]*(?<opacity>\d(?:\.\d)?)\)$/i )
+        {
+            $col_ref = {};
+            %$col_ref = %+;
+            $self->message( 9, "Rgba colour '$+{red}', '$+{green}' and '$+{blue}' found with opacity $+{opacity}: ", sub{ $self->dumper( $col_ref ) });
+            if( $+{opacity} )
+            {
+                my $opacity = $+{opacity};
+                $self->message( 9, "Opacity of $opacity found, applying the factor to the colour." );
+                my $bg;
+                if( $opts->{bgcolour} )
+                {
+                    $bg = $self->colour_to_rgb( $opts->{bgcolour} );
+                    $self->message( 9, "Calculating new rgb with opacity and background information: ", sub{ $self->dumper( $bg ) });
+                }
+                my $new_col = $colour_with_alpha->( @$col_ref{qw( red green blue )}, $opacity, $bg );
+                $self->message( 9, "New colour with opacity applied: ", sub{ $self->dumper( $new_col ) });
+                @$col_ref{qw( red green blue )} = @$new_col;
+                $self->message( 9, "Colour $+{red}, $+{green}, $+{blue} * $opacity => $col_ref->{red}, $col_ref->{green}, $col_ref->{blue}" );
+            }
+            return({
+                _24bits => [@$col_ref{qw( red green blue )}],
+                _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
+            });
+        }
+        elsif( $self->message( 9, "Checking if rgb value exists for colour '$col'" ) &&
+               ( $col_ref = $self->colour_to_rgb( $col ) ) )
+        {
+            $self->message( 9, "Setting up colour '$col' with data: ", sub{ $self->dumper( $col_ref ) });
+            # $code = $map->{ $col };
+            return({
+                _24bits => [@$col_ref{qw( red green blue )}],
+                _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
+            });
+        }
+        else
+        {
+            $self->message( 9, "Could not find a match for colour '$col'." );
+            return( {} );
+        }
+#         my $is_bg = ( CORE::substr( $code, 0, 1 ) == 4 );
+#         if( CORE::length( $code ) && $light )
+#         {
+#             ## If the colour is a background colour, replace 4 by 10 (e.g.: 42 becomes 103)
+#             ## and if foreground colour, replace 3 by 9
+#             CORE::substr( $code, 0, 1 ) = ( $is_bg ? 10 : 9 );
+#         }
+#         return( $code );
+    };
+    my $data = [];
+    my $data8 = [];
+    my $params = [];
+    # 8 bits parameters compatible
+    my $params8 = [];
+    if( $opts->{colour} || $opts->{color} || $opts->{fgcolour} || $opts->{fgcolor} || $opts->{fg_colour} || $opts->{fg_color} )
+    {
+        $opts->{colour} ||= CORE::delete( $opts->{color} ) || CORE::delete( $opts->{fg_colour} ) || CORE::delete( $opts->{fg_color} ) || CORE::delete( $opts->{fgcolour} ) || CORE::delete( $opts->{fgcolor} );
+        # my $col_ref = $check_colour->( $opts->{colour}, $colours );
+        my $col_ref = $check_colour->( $opts->{colour} );
+        # CORE::push( @$params, $col ) if( CORE::length( $col ) );
+        if( scalar( keys( %$col_ref ) ) )
+        {
+            $self->message( 9, "Foreground colour '$opts->{colour}' data are: ", sub{ $self->dumper( $col_ref ) });
+            CORE::push( @$params8, sprintf( '38;5;%d', $col_ref->{_8bits} ) );
+            CORE::push( @$params, sprintf( '38;2;%d;%d;%d', @{$col_ref->{_24bits}} ) );
+        }
+        else
+        {
+            $self->message( 9, "Could not resolve the foreground colour '$opts->{colour}'." );
+        }
+    }
+    if( $opts->{bgcolour} || $opts->{bgcolor} || $opts->{bg_colour} || $opts->{bg_color} )
+    {
+        $opts->{bgcolour} ||= CORE::delete( $opts->{bgcolor} ) || CORE::delete( $opts->{bg_colour} ) || CORE::delete( $opts->{bg_color} );
+        # my $col_ref = $check_colour->( $opts->{bgcolour}, $bg_colours );
+        my $col_ref = $check_colour->( $opts->{bgcolour} );
+        ## CORE::push( @$params, $col ) if( CORE::length( $col ) );
+        if( scalar( keys( %$col_ref ) ) )
+        {
+            $self->message( 9, "Foreground colour '$opts->{bgcolour}' data are: ", sub{ $self->dumper( $col_ref ) });
+            CORE::push( @$params8, sprintf( '48;5;%d', $col_ref->{_8bits} ) );
+            CORE::push( @$params, sprintf( '48;2;%d;%d;%d', @{$col_ref->{_24bits}} ) );
+        }
+        else
+        {
+            $self->message( 9, "Could not resolve the background colour '$opts->{colour}'." );
+        }
+    }
+    if( $opts->{style} )
+    {
+        # $self->message( 9, "Style '$opts->{style}' provided." );
+        my $those_styles = [CORE::split( /\|/, $opts->{style} )];
+        # $self->message( 9, "Split styles: ", sub{ $self->dumper( $those_styles ) } );
+        foreach my $s ( @$those_styles )
+        {
+            # $self->message( 9, "Adding style '$s'" ) if( CORE::exists( $styles->{lc($s)} ) );
+            if( CORE::exists( $styles->{lc($s)} ) )
+            {
+                CORE::push( @$params, $styles->{lc($s)} );
+                # We add the 8 bits compliant version only if any colour was provided, i.e.
+                # This is not just a style definition
+                CORE::push( @$params8, $styles->{lc($s)} ) if( scalar( @$params8 ) );
+            }
+        }
+    }
+    CORE::push( @$data, "\e[" . CORE::join( ';', @$params8 ) . "m" ) if( scalar( @$params8 ) );
+    CORE::push( @$data, "\e[" . CORE::join( ';', @$params ) . "m" ) if( scalar( @$params ) );
+    $self->message( 9, "Pre final colour data contains: ", sub{ $self->dumper( $data ) });
+    # If the text contains libe breaks, we must stop the formatting before, or else there would be an ugly formatting on the entire screen following the line break
+    if( scalar( @$params ) && $opts->{text} =~ /\n+/ )
+    {
+        my $text_parts = [CORE::split( /\n/, $opts->{text} )];
+        my $fmt = CORE::join( '', @$data );
+        my $fmt8 = CORE::join( '', @$data8 );
+        for( my $i = 0; $i < scalar( @$text_parts ); $i++ )
+        {
+            # Empty due to \n repeated
+            next if( !CORE::length( $text_parts->[$i] ) );
+            $text_parts->[$i] = $fmt . $text_parts->[$i] . $normal;
+        }
+        $opts->{text} = CORE::join( "\n", @$text_parts );
+        CORE::push( @$data, $opts->{text} );
+    }
+    else
+    {
+        CORE::push( @$data, $opts->{text} );
+        CORE::push( @$data, $normal, $normal ) if( scalar( @$params ) );
+    }
+    ## $self->message( "Returning '", quotemeta( CORE::join( '', @$data ) ), "'" );
+    return( CORE::join( '', @$data ) );
+}
+PERL
+    # NOTE: open()
+    colour_open => <<'PERL',
+sub colour_open { return( shift->_set_get( 'colour_open', @_ ) ); }
+PERL
+    # NOTE: parse()
+    colour_parse => <<'PERL',
+sub colour_parse
+{
+    my $self = shift( @_ );
+    my $txt  = join( '', @_ );
+    my $this  = $self->_obj2h;
+    my $open  = $this->{colour_open} || COLOUR_OPEN;
+    my $close = $this->{colour_close} || COLOUR_CLOSE;
+    no strict;
+    my $re = qr/
+(?<all>
+\Q$open\E(?!\/)(?<params>.*?)\Q$close\E
+    (?<content>
+        (?:
+            (?> [^$open$close]+ )
+            |
+            (?R)
+        )*+
+    )
+\Q$open\E\/\Q$close\E
+)
+    /x;
+    my $colour_re = qr/(?:(?:bright|light)[[:blank:]])?(?:[a-zA-Z]+(?:[[:blank:]]+[\w\-]+)?|rgb[a]?\([[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*(?:\,[[:blank:]]*\d(?:\.\d)?)?[[:blank:]]*\))/;
+    my $style_re = qr/(?:bold|faint|italic|underline|blink|reverse|conceal|strike)/;
+    my $parse;
+    $parse = sub
+    {
+        my $str = shift( @_ );
+        # $self->message( 9, "Parsing coloured text '$str'" );
+        $str =~ s{$re}
+        {
+            my $re = { %- };
+            my $catch = substr( $str, $-[0], $+[0] - $-[0] );
+            ## $self->message( 9, "Regexp is: ", sub{ $self->dump( $re ) } );
+            my $all = $+{all};
+            my $ct = $+{content};
+            my $params = $+{params};
+            if( index( $ct, $open ) != -1 && index( $ct, $close ) != -1 )
+            {
+                $ct = $parse->( $ct );
+            }
+            my $def = {};
+            if( $params =~ /^[[:blank:]]*(?:(?<style1>$style_re)[[:blank:]]+)?(?<fg_colour>$colour_re)(?:[[:blank:]]+(?<style2>$style_re))?(?:[[:blank:]]+on[[:blank:]]+(?<bg_colour>$colour_re))?[[:blank:]]*$/i )
+            {
+                my $style = $+{style1} || $+{style2};
+                my $fg = $+{fg_colour};
+                my $bg = $+{bg_colour};
+                # $self->message( 9, "Found style '$style', colour '$fg' and background colour '$bg'." );
+                $def = 
+                {
+                style => $style,
+                colour => $fg,
+                bg_colour => $bg,
+                };
+            }
+            else
+            {
+                # $self->message( 9, "Evaluating the styling '$params'." );
+                local $SIG{__WARN__} = sub{};
+                local $SIG{__DIE__} = sub{};
+                my @res = eval( $params );
+                # $self->message( 9, "Evaluation result is: ", sub{ $self->dump( [ @res ] ) } );
+                $def = { @res } if( scalar( @res ) && !( scalar( @res ) % 2 ) );
+                if( $@ || ref( $def ) ne 'HASH' )
+                {
+                    my $err = $@ || "Invalid styling \"${params}\"";
+                    $self->message( 9, "Error evaluating: $err" );
+                    $def = {};
+                }
+            }
+            if( scalar( keys( %$def ) ) )
+            {
+                $def->{text} = $ct;
+                $self->message( 9, "Calling colour_parse with parameters: ", sub{ $self->dump( $def )} );
+                my $res = $self->colour_format( $def );
+                length( $res ) ? $res : $catch;
+            }
+            else
+            {
+                $self->message( 9, "Returning '$catch'" );
+                $catch;
+            }
+        }gex;
+        return( $str );
+    };
+    return( $parse->( $txt ) );
+}
+PERL
+    # NOTE: colour_to_rgb()
+    colour_to_rgb => <<'PERL',
+sub colour_to_rgb
+{
+    my $self    = shift( @_ );
+    my $colour  = lc( shift( @_ ) );
+    my $this  = $self->_obj2h;
+    my( $red, $green, $blue ) = ( '', '', '' );
+    our $COLOUR_NAME_TO_RGB;
+    $self->message( 9, "Checking rgb value for '$colour'. Called from line ", (caller)[2] );
+    if( $colour =~ /^[A-Za-z]+([\w\-]+)*([[:blank:]]+\w+)?$/ )
+    {
+        $self->message( 9, "Checking colour '$colour' as string. Looking up its rgb value." );
+        if( !scalar( keys( %$COLOUR_NAME_TO_RGB ) ) )
+        {
+            $self->message( 9, "Processing colour map in <DATA> section." );
+            my $colour_data = $self->__colour_data;
+            $COLOUR_NAME_TO_RGB = eval( $colour_data );
+            if( $@ )
+            {
+                return( $self->error( "An error occurred loading data from __colour_data: $@" ) );
+            }
+        }
+        if( CORE::exists( $COLOUR_NAME_TO_RGB->{ $colour } ) )
+        {
+            ( $red, $green, $blue ) = @{$COLOUR_NAME_TO_RGB->{ $colour }};
+            $self->message( 9, "Found rgb '$red, $green, $blue' for colour '$colour'." );
+        }
+        else
+        {
+            $self->message( 9, "Could not find colour '$colour' in our colour map." );
+            return( '' );
+        }
+    }
+    ## Colour all in decimal??
+    elsif( $colour =~ /^\d{9}$/ )
+    {
+        ## $self->message( 9, "Got colour all in decimal. Less work to do..." );
+        $red   = substr( $colour, 0, 3 );
+        $green = substr( $colour, 3, 3 );
+        $blue  = substr( $colour, 6, 3 );
+    }
+    ## Colour in hexadecimal, convert it
+    elsif( $colour =~ /^[A-F0-9]+$/ )
+    {
+        $red   = hex( substr( $colour, 0, 2 ) );
+        $green = hex( substr( $colour, 2, 2 ) );
+        $blue  = hex( substr( $colour, 4, 2 ) );
+    }
+    ## Clueless
+    else
+    {
+        $self->message( 9, "Clueless about what to do with colour '$colour'." );
+        ## Not undef, but rather empty string. Undef is associated with an error
+        return( '' );
+    }
+    return({ red => $red, green => $green, blue => $blue });
+}
+PERL
+    # NOTE: coloured()
+    coloured => <<'PERL',
+sub coloured
+{
+    my $self = shift( @_ );
+    my $pref = shift( @_ );
+    my $text = CORE::join( '', @_ );
+    my $this  = $self->_obj2h;
+    my( $style, $fg, $bg );
+    ## my $colour_re = qr/(?:(?:bright|light)[[:blank:]])?[a-zA-Z]+/;
+    my $colour_re = qr/(?:(?:bright|light)[[:blank:]])?(?:[a-zA-Z]+(?:[[:blank:]]+[\w\-]+)?|rgb[a]?\([[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*(?:\,[[:blank:]]*\d(?:\.\d)?)?[[:blank:]]*\))/;
+    my $style_re = qr/(?:bold|faint|italic|underline|blink|reverse|conceal|strike)/;
+    if( $pref =~ /^(?:(?<style1>$style_re)[[:blank:]]+)?(?<fg_colour>$colour_re)(?:[[:blank:]]+(?<style2>$style_re))?(?:[[:blank:]]+on[[:blank:]]+(?<bg_colour>$colour_re))?$/i )
+    {
+        $style = $+{style1} || $+{style2};
+        $fg = $+{fg_colour};
+        $bg = $+{bg_colour};
+        ## $self->message( 9, "Found style '$style', colour '$fg' and background colour '$bg'." );
+        return( $self->colour_format({ text => $text, style => $style, colour => $fg, bg_colour => $bg }) );
+    }
+    else
+    {
+        $self->message( 9, "No match." );
+        return( '' );
+    }
+}
+PERL
+    # NOTE: dump_hex()
+    dump_hex => <<'PERL',
+sub dump_hex
+{
+    my $self = shift( @_ );
+    try
+    {
+        require Devel::Hexdump;
+        return( Devel::Hexdump::xd( shift( @_ ) ) );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Devel::Hexdump is not installed on your system." ) );
+    }
+}
+PERL
+    # NOTE: dump_print()
+    dump_print => <<'PERL',
+# For backward compatibility and traceability
+sub dump_print { return( shift->dumpto_printer( @_ ) ); }
+PERL
+    # NOTE: dumper()
+    dumper => <<'PERL',
+sub dumper
+{
+    my $self = shift( @_ );
+    my $opts = {};
+    $opts = pop( @_ ) if( scalar( @_ ) > 1 && ref( $_[-1] ) eq 'HASH' );
+    try
+    {
+        no warnings 'once';
+        require Data::Dumper;
+        # local $Data::Dumper::Sortkeys = 1;
+        local $Data::Dumper::Terse = 1;
+        local $Data::Dumper::Indent = 1;
+        local $Data::Dumper::Useqq = 1;
+        local $Data::Dumper::Maxdepth = $opts->{depth} if( CORE::length( $opts->{depth} ) );
+        local $Data::Dumper::Sortkeys = sub
+        {
+            my $h = shift( @_ );
+            return( [ sort( grep{ ref( $h->{ $_ } ) !~ /^(DateTime|DateTime\:\:)/ } keys( %$h ) ) ] );
+        };
+        return( Data::Dumper::Dumper( @_ ) );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Data::Dumper is not installed on your system." ) );
+    }
+}
+PERL
+    # NOTE: dumpto_printer()
+    dumpto_printer => <<'PERL',
+sub dumpto_printer
+{
+    my $self  = shift( @_ );
+    my( $data, $file ) = @_;
+    require Module::Generic::File;
+    $file = Module::Generic::File::file( $file );
+    my $fh =  $file->open( '>', { binmode => 'utf-8', autoflush => 1 }) || 
+        die( "Unable to create file '$file': $!\n" );
+    $fh->print( Data::Dump::dump( $data ), "\n" );
+    $fh->close;
+    # 666 so it can work under command line and web alike
+    chmod( 0666, $file );
+    return(1);
+}
+PERL
+    # NOTE: dumpto_dumper()
+    dumpto_dumper => <<'PERL',
+sub dumpto_dumper
+{
+    my $self  = shift( @_ );
+    my( $data, $file ) = @_;
+    try
+    {
+        require Data::Dumper;
+        local $Data::Dumper::Sortkeys = 1;
+        local $Data::Dumper::Terse = 1;
+        local $Data::Dumper::Indent = 1;
+        local $Data::Dumper::Useqq = 1;
+        require Module::Generic::File;
+        $file = Module::Generic::File::file( $file );
+        my $fh =  $file->open( '>', { autoflush => 1 }) || 
+            die( "Unable to create file '$file': $!\n" );
+        if( ref( $data ) )
+        {
+            $fh->print( Data::Dumper::Dumper( $data ), "\n" );
+        }
+        else
+        {
+            $fh->binmode( ':utf8' );
+            $fh->print( $data );
+        }
+        $fh->close;
+        ## 666 so it can work under command line and web alike
+        chmod( 0666, $file );
+        return(1);
+    }
+    catch( $e )
+    {
+        return( $self->error( "Unable to dump data to \"$file\" using Data::Dumper: $e" ) );
+    }
+}
+PERL
+    # NOTE: errno()
+    errno => <<'PERL',
+sub errno
+{
+    my $self = shift( @_ );
+    my $this = $self->_obj2h;
+    if( @_ )
+    {
+        $this->{errno} = shift( @_ ) if( $_[ 0 ] =~ /^\-?\d+$/ );
+        return( $self->error( @_ ) ) if( @_ );
+    }
+    return( $this->{errno} );
+}
+PERL
+    # NOTE: message_colour()
+    message_colour => <<'PERL',
+sub message_colour
+{
+    my $self  = shift( @_ );
+    my $class = ref( $self ) || $self;
+    my $this  = $self->_obj2h;
+    no strict 'refs';
+    if( $this->{verbose} || $this->{debug} || ${ $class . '::DEBUG' } )
+    {
+        my $level = ( $_[0] =~ /^\d+$/ ? shift( @_ ) : undef() );
+        my $opts = {};
+        if( scalar( @_ ) > 1 && ref( $_[-1] ) eq 'HASH' && ( CORE::exists( $_[-1]->{level} ) || CORE::exists( $_[-1]->{type} ) || CORE::exists( $_[-1]->{message} ) ) )
+        {
+            $opts = pop( @_ );
+        }
+        my $ref = [@_];
+        $level = $opts->{level} if( !defined( $level ) && CORE::exists( $opts->{level} ) );
+        my $txt;
+        if( $opts->{message} )
+        {
+            if( ref( $opts->{message} ) eq 'ARRAY' )
+            {
+                $txt = join( '', map( ( ref( $_ ) eq 'CODE' && !$this->{_msg_no_exec_sub} ) ? $_->() : $_, @{$opts->{message}} ) );
+            }
+            else
+            {
+                $txt = $opts->{message};
+            }
+        }
+        else
+        {
+            $txt = join( '', map( ( ref( $_ ) eq 'CODE' && !$this->{_msg_no_exec_sub} ) ? $_->() : $_, @$ref ) );
+        }
+        $txt = $self->colour_parse( $txt );
+        $opts->{message} = $txt;
+        $opts->{level} = $level if( defined( $level ) );
+        return( $self->message( ( $level || 0 ), $opts ) );
+    }
+    return( 1 );
+}
+PERL
+    # NOTE: messagef_colour()
+    messagef_colour => <<'PERL',
+sub messagef_colour
+{
+    my $self  = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $class = ref( $self ) || $self;
+    no strict 'refs';
+    if( $this->{verbose} || $this->{debug} || ${ $class . '::DEBUG' } )
+    {
+        my @args = @_;
+        my $opts = {};
+        if( scalar( @args ) > 1 && ref( $args[-1] ) eq 'HASH' && ( CORE::exists( $args[-1]->{level} ) || CORE::exists( $args[-1]->{type} ) || CORE::exists( $args[-1]->{message} ) ) )
+        {
+            $opts = pop( @args );
+        }
+        $opts->{colour} = 1;
+        CORE::push( @args, $opts );
+        ## $self->message( 0, "Sending arguments: ", sub{ $self->dumper( \@args ) } );
+        return( $self->messagef( @args ) );
+    }
+    return( 1 );
+}
+PERL
+    # NOTE: printer()
+    printer => <<'PERL',
+sub printer
+{
+    my $self = shift( @_ );
+    my $opts = {};
+    $opts = pop( @_ ) if( scalar( @_ ) > 1 && ref( $_[-1] ) eq 'HASH' );
+    try
+    {
+        local $SIG{__WARN__} = sub{ };
+        require Data::Printer;
+        if( scalar( keys( %$opts ) ) )
+        {
+            return( Data::Printer::np( @_, %$opts ) );
+        }
+        else
+        {
+            return( Data::Printer::np( @_ ) );
+        }
+    }
+    catch( $e )
+    {
+        return( $self->error( "Data::Printer is not installed on your system." ) );
+    }
+}
+PERL
+    # NOTE: save()
+    save => <<'PERL',
+sub save
+{
+    my $self = shift( @_ );
+    my $this = $self->_obj2h;
+    my $opts = {};
+    $opts = pop( @_ ) if( ref( $_[-1] ) eq 'HASH' );
+    my( $file, $data );
+    if( @_ == 2 )
+    {
+        $opts->{data} = shift( @_ );
+        $opts->{file} = shift( @_ );
+    }
+    return( $self->error( "No file was provided to save data to." ) ) if( !$opts->{file} );
+    require Module::Generic::File;
+    $file = Module::Generic::File::file( $opts->{file} );
+    my $fh = $file->open( '>', {
+        ( $opts->{encoding} ? ( binmode => $opts->{encoding} ) : () ),
+        autoflush => 1,
+    }) ||
+        return( $self->error( "Unable to open file \"$file\" in write mode: $!" ) );
+    if( !defined( $fh->print( ref( $opts->{data} ) eq 'SCALAR' ? ${$opts->{data}} : $opts->{data} ) ) )
+    {
+        return( $self->error( "Unable to write data to file \"$file\": $!" ) )
+    }
+    $fh->close;
+    my $bytes = -s( $opts->{file} );
+    return( $bytes );
+}
+PERL
+    # NOTE: subclasses()
+    subclasses => <<'PERL',
+sub subclasses
+{
+    my $self  = shift( @_ );
+    my $that  = '';
+    $that     = @_ ? shift( @_ ) : $self;
+    my $base  = ref( $that ) || $that;
+    $base  =~ s,::,/,g;
+    $base .= '.pm';
+    
+    require IO::Dir;
+    # remove '.pm'
+    my $dir = substr( $INC{ $base }, 0, ( length( $INC{ $base } ) ) - 3 );
+    
+    my @packages = ();
+    my $io = IO::Dir->open( $dir );
+    if( defined( $io ) )
+    {
+        @packages = map{ substr( $_, 0, length( $_ ) - 3 ) } grep{ substr( $_, -3 ) eq '.pm' && -f( "$dir/$_" ) } $io->read();
+        $io->close ||
+        warn( "Unable to close directory \"$dir\": $!\n" );
+    }
+    else
+    {
+        warn( "Unable to open directory \"$dir\": $!\n" );
+    }
+    return( wantarray() ? @packages : \@packages );
+}
+PERL
+    __dbh => <<'PERL',
+sub __dbh
+{
+    my $self  = shift( @_ );
+    my $class = ref( $self ) || $self;
+    my $this  = $self->_obj2h;
+    no strict 'refs';
+    if( !$this->{__dbh} )
+    {
+        return( '' ) if( !${ "$class\::DB_DSN" } );
+        require DBI;
+        ## Connecting to database
+        my $db_opt = {};
+        $db_opt->{RaiseError} = ${ "$class\::DB_RAISE_ERROR" } if( length( ${ "$class\::DB_RAISE_ERROR" } ) );
+        $db_opt->{AutoCommit} = ${ "$class\::DB_AUTO_COMMIT" } if( length( ${ "$class\::DB_AUTO_COMMIT" } ) );
+        $db_opt->{PrintError} = ${ "$class\::DB_PRINT_ERROR" } if( length( ${ "$class\::DB_PRINT_ERROR" } ) );
+        $db_opt->{ShowErrorStatement} = ${ "$class\::DB_SHOW_ERROR_STATEMENT" } if( length( ${ "$class\::DB_SHOW_ERROR_STATEMENT" } ) );
+        $db_opt->{client_encoding} = ${ "$class\::DB_CLIENT_ENCODING" } if( length( ${ "$class\::DB_CLIENT_ENCODING" } ) );
+        my $dbh = DBI->connect_cached( ${ "$class\::DB_DSN" } ) ||
+        die( "Unable to connect to sql database with dsn '", ${ "$class\::DB_DSN" }, "'\n" );
+        $dbh->{pg_server_prepare} = 1 if( ${ "$class\::DB_SERVER_PREPARE" } );
+        $this->{__dbh} = $dbh;
+    }
+    return( $this->{__dbh} );
+}
+PERL
+    # NOTE: __colour_data()
+    __colour_data => <<'PERL',
+# Initially those data were stored after the __END__, but it seems some module is interfering with <DATA>
+# and so those data could not be loaded reliably
+# This is called once by colour_to_rgb to generate the hash reference COLOUR_NAME_TO_RGB
+sub __colour_data
+{
+    my $colour_data = <<EOT;
+{'alice blue' => ['240','248','255'],'aliceblue' => ['240','248','255'],'antique white' => ['250','235','215'],'antiquewhite' => ['250','235','215'],'antiquewhite1' => ['255','239','219'],'antiquewhite2' => ['238','223','204'],'antiquewhite3' => ['205','192','176'],'antiquewhite4' => ['139','131','120'],'aquamarine' => ['127','255','212'],'aquamarine1' => ['127','255','212'],'aquamarine2' => ['118','238','198'],'aquamarine3' => ['102','205','170'],'aquamarine4' => ['69','139','116'],'azure' => ['240','255','255'],'azure1' => ['240','255','255'],'azure2' => ['224','238','238'],'azure3' => ['193','205','205'],'azure4' => ['131','139','139'],'beige' => ['245','245','220'],'bisque' => ['255','228','196'],'bisque1' => ['255','228','196'],'bisque2' => ['238','213','183'],'bisque3' => ['205','183','158'],'bisque4' => ['139','125','107'],'black' => ['0','0','0'],'blanched almond' => ['255','235','205'],'blanchedalmond' => ['255','235','205'],'blue' => ['0','0','255'],'blue violet' => ['138','43','226'],'blue1' => ['0','0','255'],'blue2' => ['0','0','238'],'blue3' => ['0','0','205'],'blue4' => ['0','0','139'],'blueviolet' => ['138','43','226'],'brown' => ['165','42','42'],'brown1' => ['255','64','64'],'brown2' => ['238','59','59'],'brown3' => ['205','51','51'],'brown4' => ['139','35','35'],'burlywood' => ['222','184','135'],'burlywood1' => ['255','211','155'],'burlywood2' => ['238','197','145'],'burlywood3' => ['205','170','125'],'burlywood4' => ['139','115','85'],'cadet blue' => ['95','158','160'],'cadetblue' => ['95','158','160'],'cadetblue1' => ['152','245','255'],'cadetblue2' => ['142','229','238'],'cadetblue3' => ['122','197','205'],'cadetblue4' => ['83','134','139'],'chartreuse' => ['127','255','0'],'chartreuse1' => ['127','255','0'],'chartreuse2' => ['118','238','0'],'chartreuse3' => ['102','205','0'],'chartreuse4' => ['69','139','0'],'chocolate' => ['210','105','30'],'chocolate1' => ['255','127','36'],'chocolate2' => ['238','118','33'],'chocolate3' => ['205','102','29'],'chocolate4' => ['139','69','19'],'coral' => ['255','127','80'],'coral1' => ['255','114','86'],'coral2' => ['238','106','80'],'coral3' => ['205','91','69'],'coral4' => ['139','62','47'],'cornflower blue' => ['100','149','237'],'cornflowerblue' => ['100','149','237'],'cornsilk' => ['255','248','220'],'cornsilk1' => ['255','248','220'],'cornsilk2' => ['238','232','205'],'cornsilk3' => ['205','200','177'],'cornsilk4' => ['139','136','120'],'cyan' => ['0','255','255'],'cyan1' => ['0','255','255'],'cyan2' => ['0','238','238'],'cyan3' => ['0','205','205'],'cyan4' => ['0','139','139'],'dark blue' => ['0','0','139'],'dark cyan' => ['0','139','139'],'dark goldenrod' => ['184','134','11'],'dark gray' => ['169','169','169'],'dark green' => ['0','100','0'],'dark grey' => ['169','169','169'],'dark khaki' => ['189','183','107'],'dark magenta' => ['139','0','139'],'dark olive green' => ['85','107','47'],'dark orange' => ['255','140','0'],'dark orchid' => ['153','50','204'],'dark red' => ['139','0','0'],'dark salmon' => ['233','150','122'],'dark sea green' => ['143','188','143'],'dark slate blue' => ['72','61','139'],'dark slate gray' => ['47','79','79'],'dark slate grey' => ['47','79','79'],'dark turquoise' => ['0','206','209'],'dark violet' => ['148','0','211'],'darkblue' => ['0','0','139'],'darkcyan' => ['0','139','139'],'darkgoldenrod' => ['184','134','11'],'darkgoldenrod1' => ['255','185','15'],'darkgoldenrod2' => ['238','173','14'],'darkgoldenrod3' => ['205','149','12'],'darkgoldenrod4' => ['139','101','8'],'darkgray' => ['169','169','169'],'darkgreen' => ['0','100','0'],'darkgrey' => ['169','169','169'],'darkkhaki' => ['189','183','107'],'darkmagenta' => ['139','0','139'],'darkolivegreen' => ['85','107','47'],'darkolivegreen1' => ['202','255','112'],'darkolivegreen2' => ['188','238','104'],'darkolivegreen3' => ['162','205','90'],'darkolivegreen4' => ['110','139','61'],'darkorange' => ['255','140','0'],'darkorange1' => ['255','127','0'],'darkorange2' => ['238','118','0'],'darkorange3' => ['205','102','0'],'darkorange4' => ['139','69','0'],'darkorchid' => ['153','50','204'],'darkorchid1' => ['191','62','255'],'darkorchid2' => ['178','58','238'],'darkorchid3' => ['154','50','205'],'darkorchid4' => ['104','34','139'],'darkred' => ['139','0','0'],'darksalmon' => ['233','150','122'],'darkseagreen' => ['143','188','143'],'darkseagreen1' => ['193','255','193'],'darkseagreen2' => ['180','238','180'],'darkseagreen3' => ['155','205','155'],'darkseagreen4' => ['105','139','105'],'darkslateblue' => ['72','61','139'],'darkslategray' => ['47','79','79'],'darkslategray1' => ['151','255','255'],'darkslategray2' => ['141','238','238'],'darkslategray3' => ['121','205','205'],'darkslategray4' => ['82','139','139'],'darkslategrey' => ['47','79','79'],'darkturquoise' => ['0','206','209'],'darkviolet' => ['148','0','211'],'deep pink' => ['255','20','147'],'deep sky blue' => ['0','191','255'],'deeppink' => ['255','20','147'],'deeppink1' => ['255','20','147'],'deeppink2' => ['238','18','137'],'deeppink3' => ['205','16','118'],'deeppink4' => ['139','10','80'],'deepskyblue' => ['0','191','255'],'deepskyblue1' => ['0','191','255'],'deepskyblue2' => ['0','178','238'],'deepskyblue3' => ['0','154','205'],'deepskyblue4' => ['0','104','139'],'dim gray' => ['105','105','105'],'dim grey' => ['105','105','105'],'dimgray' => ['105','105','105'],'dimgrey' => ['105','105','105'],'dodger blue' => ['30','144','255'],'dodgerblue' => ['30','144','255'],'dodgerblue1' => ['30','144','255'],'dodgerblue2' => ['28','134','238'],'dodgerblue3' => ['24','116','205'],'dodgerblue4' => ['16','78','139'],'firebrick' => ['178','34','34'],'firebrick1' => ['255','48','48'],'firebrick2' => ['238','44','44'],'firebrick3' => ['205','38','38'],'firebrick4' => ['139','26','26'],'floral white' => ['255','250','240'],'floralwhite' => ['255','250','240'],'forest green' => ['34','139','34'],'forestgreen' => ['34','139','34'],'gainsboro' => ['220','220','220'],'ghost white' => ['248','248','255'],'ghostwhite' => ['248','248','255'],'gold' => ['255','215','0'],'gold1' => ['255','215','0'],'gold2' => ['238','201','0'],'gold3' => ['205','173','0'],'gold4' => ['139','117','0'],'goldenrod' => ['218','165','32'],'goldenrod1' => ['255','193','37'],'goldenrod2' => ['238','180','34'],'goldenrod3' => ['205','155','29'],'goldenrod4' => ['139','105','20'],'gray' => ['190','190','190'],'gray0' => ['0','0','0'],'gray1' => ['3','3','3'],'gray10' => ['26','26','26'],'gray100' => ['255','255','255'],'gray11' => ['28','28','28'],'gray12' => ['31','31','31'],'gray13' => ['33','33','33'],'gray14' => ['36','36','36'],'gray15' => ['38','38','38'],'gray16' => ['41','41','41'],'gray17' => ['43','43','43'],'gray18' => ['46','46','46'],'gray19' => ['48','48','48'],'gray2' => ['5','5','5'],'gray20' => ['51','51','51'],'gray21' => ['54','54','54'],'gray22' => ['56','56','56'],'gray23' => ['59','59','59'],'gray24' => ['61','61','61'],'gray25' => ['64','64','64'],'gray26' => ['66','66','66'],'gray27' => ['69','69','69'],'gray28' => ['71','71','71'],'gray29' => ['74','74','74'],'gray3' => ['8','8','8'],'gray30' => ['77','77','77'],'gray31' => ['79','79','79'],'gray32' => ['82','82','82'],'gray33' => ['84','84','84'],'gray34' => ['87','87','87'],'gray35' => ['89','89','89'],'gray36' => ['92','92','92'],'gray37' => ['94','94','94'],'gray38' => ['97','97','97'],'gray39' => ['99','99','99'],'gray4' => ['10','10','10'],'gray40' => ['102','102','102'],'gray41' => ['105','105','105'],'gray42' => ['107','107','107'],'gray43' => ['110','110','110'],'gray44' => ['112','112','112'],'gray45' => ['115','115','115'],'gray46' => ['117','117','117'],'gray47' => ['120','120','120'],'gray48' => ['122','122','122'],'gray49' => ['125','125','125'],'gray5' => ['13','13','13'],'gray50' => ['127','127','127'],'gray51' => ['130','130','130'],'gray52' => ['133','133','133'],'gray53' => ['135','135','135'],'gray54' => ['138','138','138'],'gray55' => ['140','140','140'],'gray56' => ['143','143','143'],'gray57' => ['145','145','145'],'gray58' => ['148','148','148'],'gray59' => ['150','150','150'],'gray6' => ['15','15','15'],'gray60' => ['153','153','153'],'gray61' => ['156','156','156'],'gray62' => ['158','158','158'],'gray63' => ['161','161','161'],'gray64' => ['163','163','163'],'gray65' => ['166','166','166'],'gray66' => ['168','168','168'],'gray67' => ['171','171','171'],'gray68' => ['173','173','173'],'gray69' => ['176','176','176'],'gray7' => ['18','18','18'],'gray70' => ['179','179','179'],'gray71' => ['181','181','181'],'gray72' => ['184','184','184'],'gray73' => ['186','186','186'],'gray74' => ['189','189','189'],'gray75' => ['191','191','191'],'gray76' => ['194','194','194'],'gray77' => ['196','196','196'],'gray78' => ['199','199','199'],'gray79' => ['201','201','201'],'gray8' => ['20','20','20'],'gray80' => ['204','204','204'],'gray81' => ['207','207','207'],'gray82' => ['209','209','209'],'gray83' => ['212','212','212'],'gray84' => ['214','214','214'],'gray85' => ['217','217','217'],'gray86' => ['219','219','219'],'gray87' => ['222','222','222'],'gray88' => ['224','224','224'],'gray89' => ['227','227','227'],'gray9' => ['23','23','23'],'gray90' => ['229','229','229'],'gray91' => ['232','232','232'],'gray92' => ['235','235','235'],'gray93' => ['237','237','237'],'gray94' => ['240','240','240'],'gray95' => ['242','242','242'],'gray96' => ['245','245','245'],'gray97' => ['247','247','247'],'gray98' => ['250','250','250'],'gray99' => ['252','252','252'],'green' => ['0','255','0'],'green yellow' => ['173','255','47'],'green1' => ['0','255','0'],'green2' => ['0','238','0'],'green3' => ['0','205','0'],'green4' => ['0','139','0'],'greenyellow' => ['173','255','47'],'grey' => ['190','190','190'],'grey0' => ['0','0','0'],'grey1' => ['3','3','3'],'grey10' => ['26','26','26'],'grey100' => ['255','255','255'],'grey11' => ['28','28','28'],'grey12' => ['31','31','31'],'grey13' => ['33','33','33'],'grey14' => ['36','36','36'],'grey15' => ['38','38','38'],'grey16' => ['41','41','41'],'grey17' => ['43','43','43'],'grey18' => ['46','46','46'],'grey19' => ['48','48','48'],'grey2' => ['5','5','5'],'grey20' => ['51','51','51'],'grey21' => ['54','54','54'],'grey22' => ['56','56','56'],'grey23' => ['59','59','59'],'grey24' => ['61','61','61'],'grey25' => ['64','64','64'],'grey26' => ['66','66','66'],'grey27' => ['69','69','69'],'grey28' => ['71','71','71'],'grey29' => ['74','74','74'],'grey3' => ['8','8','8'],'grey30' => ['77','77','77'],'grey31' => ['79','79','79'],'grey32' => ['82','82','82'],'grey33' => ['84','84','84'],'grey34' => ['87','87','87'],'grey35' => ['89','89','89'],'grey36' => ['92','92','92'],'grey37' => ['94','94','94'],'grey38' => ['97','97','97'],'grey39' => ['99','99','99'],'grey4' => ['10','10','10'],'grey40' => ['102','102','102'],'grey41' => ['105','105','105'],'grey42' => ['107','107','107'],'grey43' => ['110','110','110'],'grey44' => ['112','112','112'],'grey45' => ['115','115','115'],'grey46' => ['117','117','117'],'grey47' => ['120','120','120'],'grey48' => ['122','122','122'],'grey49' => ['125','125','125'],'grey5' => ['13','13','13'],'grey50' => ['127','127','127'],'grey51' => ['130','130','130'],'grey52' => ['133','133','133'],'grey53' => ['135','135','135'],'grey54' => ['138','138','138'],'grey55' => ['140','140','140'],'grey56' => ['143','143','143'],'grey57' => ['145','145','145'],'grey58' => ['148','148','148'],'grey59' => ['150','150','150'],'grey6' => ['15','15','15'],'grey60' => ['153','153','153'],'grey61' => ['156','156','156'],'grey62' => ['158','158','158'],'grey63' => ['161','161','161'],'grey64' => ['163','163','163'],'grey65' => ['166','166','166'],'grey66' => ['168','168','168'],'grey67' => ['171','171','171'],'grey68' => ['173','173','173'],'grey69' => ['176','176','176'],'grey7' => ['18','18','18'],'grey70' => ['179','179','179'],'grey71' => ['181','181','181'],'grey72' => ['184','184','184'],'grey73' => ['186','186','186'],'grey74' => ['189','189','189'],'grey75' => ['191','191','191'],'grey76' => ['194','194','194'],'grey77' => ['196','196','196'],'grey78' => ['199','199','199'],'grey79' => ['201','201','201'],'grey8' => ['20','20','20'],'grey80' => ['204','204','204'],'grey81' => ['207','207','207'],'grey82' => ['209','209','209'],'grey83' => ['212','212','212'],'grey84' => ['214','214','214'],'grey85' => ['217','217','217'],'grey86' => ['219','219','219'],'grey87' => ['222','222','222'],'grey88' => ['224','224','224'],'grey89' => ['227','227','227'],'grey9' => ['23','23','23'],'grey90' => ['229','229','229'],'grey91' => ['232','232','232'],'grey92' => ['235','235','235'],'grey93' => ['237','237','237'],'grey94' => ['240','240','240'],'grey95' => ['242','242','242'],'grey96' => ['245','245','245'],'grey97' => ['247','247','247'],'grey98' => ['250','250','250'],'grey99' => ['252','252','252'],'honeydew' => ['240','255','240'],'honeydew1' => ['240','255','240'],'honeydew2' => ['224','238','224'],'honeydew3' => ['193','205','193'],'honeydew4' => ['131','139','131'],'hot pink' => ['255','105','180'],'hotpink' => ['255','105','180'],'hotpink1' => ['255','110','180'],'hotpink2' => ['238','106','167'],'hotpink3' => ['205','96','144'],'hotpink4' => ['139','58','98'],'indian red' => ['205','92','92'],'indianred' => ['205','92','92'],'indianred1' => ['255','106','106'],'indianred2' => ['238','99','99'],'indianred3' => ['205','85','85'],'indianred4' => ['139','58','58'],'ivory' => ['255','255','240'],'ivory1' => ['255','255','240'],'ivory2' => ['238','238','224'],'ivory3' => ['205','205','193'],'ivory4' => ['139','139','131'],'khaki' => ['240','230','140'],'khaki1' => ['255','246','143'],'khaki2' => ['238','230','133'],'khaki3' => ['205','198','115'],'khaki4' => ['139','134','78'],'lavender' => ['230','230','250'],'lavender blush' => ['255','240','245'],'lavenderblush' => ['255','240','245'],'lavenderblush1' => ['255','240','245'],'lavenderblush2' => ['238','224','229'],'lavenderblush3' => ['205','193','197'],'lavenderblush4' => ['139','131','134'],'lawn green' => ['124','252','0'],'lawngreen' => ['124','252','0'],'lemon chiffon' => ['255','250','205'],'lemonchiffon' => ['255','250','205'],'lemonchiffon1' => ['255','250','205'],'lemonchiffon2' => ['238','233','191'],'lemonchiffon3' => ['205','201','165'],'lemonchiffon4' => ['139','137','112'],'light blue' => ['173','216','230'],'light coral' => ['240','128','128'],'light cyan' => ['224','255','255'],'light goldenrod' => ['238','221','130'],'light goldenrod yellow' => ['250','250','210'],'light gray' => ['211','211','211'],'light green' => ['144','238','144'],'light grey' => ['211','211','211'],'light pink' => ['255','182','193'],'light salmon' => ['255','160','122'],'light sea green' => ['32','178','170'],'light sky blue' => ['135','206','250'],'light slate blue' => ['132','112','255'],'light slate gray' => ['119','136','153'],'light slate grey' => ['119','136','153'],'light steel blue' => ['176','196','222'],'light yellow' => ['255','255','224'],'lightblue' => ['173','216','230'],'lightblue1' => ['191','239','255'],'lightblue2' => ['178','223','238'],'lightblue3' => ['154','192','205'],'lightblue4' => ['104','131','139'],'lightcoral' => ['240','128','128'],'lightcyan' => ['224','255','255'],'lightcyan1' => ['224','255','255'],'lightcyan2' => ['209','238','238'],'lightcyan3' => ['180','205','205'],'lightcyan4' => ['122','139','139'],'lightgoldenrod' => ['238','221','130'],'lightgoldenrod1' => ['255','236','139'],'lightgoldenrod2' => ['238','220','130'],'lightgoldenrod3' => ['205','190','112'],'lightgoldenrod4' => ['139','129','76'],'lightgoldenrodyellow' => ['250','250','210'],'lightgray' => ['211','211','211'],'lightgreen' => ['144','238','144'],'lightgrey' => ['211','211','211'],'lightpink' => ['255','182','193'],'lightpink1' => ['255','174','185'],'lightpink2' => ['238','162','173'],'lightpink3' => ['205','140','149'],'lightpink4' => ['139','95','101'],'lightsalmon' => ['255','160','122'],'lightsalmon1' => ['255','160','122'],'lightsalmon2' => ['238','149','114'],'lightsalmon3' => ['205','129','98'],'lightsalmon4' => ['139','87','66'],'lightseagreen' => ['32','178','170'],'lightskyblue' => ['135','206','250'],'lightskyblue1' => ['176','226','255'],'lightskyblue2' => ['164','211','238'],'lightskyblue3' => ['141','182','205'],'lightskyblue4' => ['96','123','139'],'lightslateblue' => ['132','112','255'],'lightslategray' => ['119','136','153'],'lightslategrey' => ['119','136','153'],'lightsteelblue' => ['176','196','222'],'lightsteelblue1' => ['202','225','255'],'lightsteelblue2' => ['188','210','238'],'lightsteelblue3' => ['162','181','205'],'lightsteelblue4' => ['110','123','139'],'lightyellow' => ['255','255','224'],'lightyellow1' => ['255','255','224'],'lightyellow2' => ['238','238','209'],'lightyellow3' => ['205','205','180'],'lightyellow4' => ['139','139','122'],'lime green' => ['50','205','50'],'limegreen' => ['50','205','50'],'linen' => ['250','240','230'],'magenta' => ['255','0','255'],'magenta1' => ['255','0','255'],'magenta2' => ['238','0','238'],'magenta3' => ['205','0','205'],'magenta4' => ['139','0','139'],'maroon' => ['176','48','96'],'maroon1' => ['255','52','179'],'maroon2' => ['238','48','167'],'maroon3' => ['205','41','144'],'maroon4' => ['139','28','98'],'medium aquamarine' => ['102','205','170'],'medium blue' => ['0','0','205'],'medium orchid' => ['186','85','211'],'medium purple' => ['147','112','219'],'medium sea green' => ['60','179','113'],'medium slate blue' => ['123','104','238'],'medium spring green' => ['0','250','154'],'medium turquoise' => ['72','209','204'],'medium violet red' => ['199','21','133'],'mediumaquamarine' => ['102','205','170'],'mediumblue' => ['0','0','205'],'mediumorchid' => ['186','85','211'],'mediumorchid1' => ['224','102','255'],'mediumorchid2' => ['209','95','238'],'mediumorchid3' => ['180','82','205'],'mediumorchid4' => ['122','55','139'],'mediumpurple' => ['147','112','219'],'mediumpurple1' => ['171','130','255'],'mediumpurple2' => ['159','121','238'],'mediumpurple3' => ['137','104','205'],'mediumpurple4' => ['93','71','139'],'mediumseagreen' => ['60','179','113'],'mediumslateblue' => ['123','104','238'],'mediumspringgreen' => ['0','250','154'],'mediumturquoise' => ['72','209','204'],'mediumvioletred' => ['199','21','133'],'midnight blue' => ['25','25','112'],'midnightblue' => ['25','25','112'],'mint cream' => ['245','255','250'],'mintcream' => ['245','255','250'],'misty rose' => ['255','228','225'],'mistyrose' => ['255','228','225'],'mistyrose1' => ['255','228','225'],'mistyrose2' => ['238','213','210'],'mistyrose3' => ['205','183','181'],'mistyrose4' => ['139','125','123'],'moccasin' => ['255','228','181'],'navajo white' => ['255','222','173'],'navajowhite' => ['255','222','173'],'navajowhite1' => ['255','222','173'],'navajowhite2' => ['238','207','161'],'navajowhite3' => ['205','179','139'],'navajowhite4' => ['139','121','94'],'navy' => ['0','0','128'],'navy blue' => ['0','0','128'],'navyblue' => ['0','0','128'],'old lace' => ['253','245','230'],'oldlace' => ['253','245','230'],'olive drab' => ['107','142','35'],'olivedrab' => ['107','142','35'],'olivedrab1' => ['192','255','62'],'olivedrab2' => ['179','238','58'],'olivedrab3' => ['154','205','50'],'olivedrab4' => ['105','139','34'],'orange' => ['255','165','0'],'orange red' => ['255','69','0'],'orange1' => ['255','165','0'],'orange2' => ['238','154','0'],'orange3' => ['205','133','0'],'orange4' => ['139','90','0'],'orangered' => ['255','69','0'],'orangered1' => ['255','69','0'],'orangered2' => ['238','64','0'],'orangered3' => ['205','55','0'],'orangered4' => ['139','37','0'],'orchid' => ['218','112','214'],'orchid1' => ['255','131','250'],'orchid2' => ['238','122','233'],'orchid3' => ['205','105','201'],'orchid4' => ['139','71','137'],'pale goldenrod' => ['238','232','170'],'pale green' => ['152','251','152'],'pale turquoise' => ['175','238','238'],'pale violet red' => ['219','112','147'],'palegoldenrod' => ['238','232','170'],'palegreen' => ['152','251','152'],'palegreen1' => ['154','255','154'],'palegreen2' => ['144','238','144'],'palegreen3' => ['124','205','124'],'palegreen4' => ['84','139','84'],'paleturquoise' => ['175','238','238'],'paleturquoise1' => ['187','255','255'],'paleturquoise2' => ['174','238','238'],'paleturquoise3' => ['150','205','205'],'paleturquoise4' => ['102','139','139'],'palevioletred' => ['219','112','147'],'palevioletred1' => ['255','130','171'],'palevioletred2' => ['238','121','159'],'palevioletred3' => ['205','104','137'],'palevioletred4' => ['139','71','93'],'papaya whip' => ['255','239','213'],'papayawhip' => ['255','239','213'],'peach puff' => ['255','218','185'],'peachpuff' => ['255','218','185'],'peachpuff1' => ['255','218','185'],'peachpuff2' => ['238','203','173'],'peachpuff3' => ['205','175','149'],'peachpuff4' => ['139','119','101'],'peru' => ['205','133','63'],'pink' => ['255','192','203'],'pink1' => ['255','181','197'],'pink2' => ['238','169','184'],'pink3' => ['205','145','158'],'pink4' => ['139','99','108'],'plum' => ['221','160','221'],'plum1' => ['255','187','255'],'plum2' => ['238','174','238'],'plum3' => ['205','150','205'],'plum4' => ['139','102','139'],'powder blue' => ['176','224','230'],'powderblue' => ['176','224','230'],'purple' => ['160','32','240'],'purple1' => ['155','48','255'],'purple2' => ['145','44','238'],'purple3' => ['125','38','205'],'purple4' => ['85','26','139'],'red' => ['255','0','0'],'red1' => ['255','0','0'],'red2' => ['238','0','0'],'red3' => ['205','0','0'],'red4' => ['139','0','0'],'rosy brown' => ['188','143','143'],'rosybrown' => ['188','143','143'],'rosybrown1' => ['255','193','193'],'rosybrown2' => ['238','180','180'],'rosybrown3' => ['205','155','155'],'rosybrown4' => ['139','105','105'],'royal blue' => ['65','105','225'],'royalblue' => ['65','105','225'],'royalblue1' => ['72','118','255'],'royalblue2' => ['67','110','238'],'royalblue3' => ['58','95','205'],'royalblue4' => ['39','64','139'],'saddle brown' => ['139','69','19'],'saddlebrown' => ['139','69','19'],'salmon' => ['250','128','114'],'salmon1' => ['255','140','105'],'salmon2' => ['238','130','98'],'salmon3' => ['205','112','84'],'salmon4' => ['139','76','57'],'sandy brown' => ['244','164','96'],'sandybrown' => ['244','164','96'],'sea green' => ['46','139','87'],'seagreen' => ['46','139','87'],'seagreen1' => ['84','255','159'],'seagreen2' => ['78','238','148'],'seagreen3' => ['67','205','128'],'seagreen4' => ['46','139','87'],'seashell' => ['255','245','238'],'seashell1' => ['255','245','238'],'seashell2' => ['238','229','222'],'seashell3' => ['205','197','191'],'seashell4' => ['139','134','130'],'sienna' => ['160','82','45'],'sienna1' => ['255','130','71'],'sienna2' => ['238','121','66'],'sienna3' => ['205','104','57'],'sienna4' => ['139','71','38'],'sky blue' => ['135','206','235'],'skyblue' => ['135','206','235'],'skyblue1' => ['135','206','255'],'skyblue2' => ['126','192','238'],'skyblue3' => ['108','166','205'],'skyblue4' => ['74','112','139'],'slate blue' => ['106','90','205'],'slate gray' => ['112','128','144'],'slate grey' => ['112','128','144'],'slateblue' => ['106','90','205'],'slateblue1' => ['131','111','255'],'slateblue2' => ['122','103','238'],'slateblue3' => ['105','89','205'],'slateblue4' => ['71','60','139'],'slategray' => ['112','128','144'],'slategray1' => ['198','226','255'],'slategray2' => ['185','211','238'],'slategray3' => ['159','182','205'],'slategray4' => ['108','123','139'],'slategrey' => ['112','128','144'],'snow' => ['255','250','250'],'snow1' => ['255','250','250'],'snow2' => ['238','233','233'],'snow3' => ['205','201','201'],'snow4' => ['139','137','137'],'spring green' => ['0','255','127'],'springgreen' => ['0','255','127'],'springgreen1' => ['0','255','127'],'springgreen2' => ['0','238','118'],'springgreen3' => ['0','205','102'],'springgreen4' => ['0','139','69'],'steel blue' => ['70','130','180'],'steelblue' => ['70','130','180'],'steelblue1' => ['99','184','255'],'steelblue2' => ['92','172','238'],'steelblue3' => ['79','148','205'],'steelblue4' => ['54','100','139'],'tan' => ['210','180','140'],'tan1' => ['255','165','79'],'tan2' => ['238','154','73'],'tan3' => ['205','133','63'],'tan4' => ['139','90','43'],'thistle' => ['216','191','216'],'thistle1' => ['255','225','255'],'thistle2' => ['238','210','238'],'thistle3' => ['205','181','205'],'thistle4' => ['139','123','139'],'tomato' => ['255','99','71'],'tomato1' => ['255','99','71'],'tomato2' => ['238','92','66'],'tomato3' => ['205','79','57'],'tomato4' => ['139','54','38'],'turquoise' => ['64','224','208'],'turquoise1' => ['0','245','255'],'turquoise2' => ['0','229','238'],'turquoise3' => ['0','197','205'],'turquoise4' => ['0','134','139'],'violet' => ['238','130','238'],'violet red' => ['208','32','144'],'violetred' => ['208','32','144'],'violetred1' => ['255','62','150'],'violetred2' => ['238','58','140'],'violetred3' => ['205','50','120'],'violetred4' => ['139','34','82'],'wheat' => ['245','222','179'],'wheat1' => ['255','231','186'],'wheat2' => ['238','216','174'],'wheat3' => ['205','186','150'],'wheat4' => ['139','126','102'],'white' => ['255','255','255'],'white smoke' => ['245','245','245'],'whitesmoke' => ['245','245','245'],'yellow' => ['255','255','0'],'yellow green' => ['154','205','50'],'yellow1' => ['255','255','0'],'yellow2' => ['238','238','0'],'yellow3' => ['205','205','0'],'yellow4' => ['139','139','0'],'yellowgreen' => ['154','205','50']}
+EOT
+}
+PERL
+    # NOTE: __create_class()
+    __create_class => <<'PERL',
+sub __create_class
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ ) || return( $self->error( "No field was provided to create a dynamic class." ) );
+    my $def   = shift( @_ );
+    my $class;
+    if( $def->{_class} )
+    {
+        $class = $def->{_class};
+    }
+    else
+    {
+        my $new_class = $field;
+        $new_class =~ tr/-/_/;
+        $new_class =~ s/\_{2,}/_/g;
+        $new_class = join( '', map( ucfirst( lc( $_ ) ), split( /\_/, $new_class ) ) );
+        $class = ( ref( $self ) || $self ) . "\::${new_class}";
+    }
+    unless( Class::Load::is_class_loaded( $class ) )
+    {
+        my $type2func =
+        {
+        array       => '_set_get_array',
+        array_as_object => '_set_get_array_as_object',
+        boolean     => '_set_get_boolean',
+        class       => '_set_get_class',
+        class_array => '_set_get_class_array',
+        datetime    => '_set_get_datetime',
+        decimal     => '_set_get_number',
+        hash        => '_set_get_hash',
+        hash_as_object => '_set_get_hash_as_mix_object',
+        integer     => '_set_get_number',
+        number      => '_set_get_number',
+        object      => '_set_get_object',
+        object_array => '_set_get_object_array',
+        object_array_object => '_set_get_object_array_object',
+        scalar      => '_set_get_scalar',
+        scalar_as_object => '_set_get_scalar_as_object',
+        scalar_or_object => '_set_get_scalar_or_object',
+        uri         => '_set_get_uri',
+        };
+        # Alias
+        $type2func->{string} = $type2func->{scalar};
+        
+        my $perl = <<EOT;
+package $class;
+BEGIN
+{
+    use strict;
+    use Module::Generic;
+    use parent -norequire, qw( Module::Generic );
+};
+
+EOT
+        my $call_sub = ( split( /::/, ( caller(1) )[3] ) )[-1];
+        my $call_frame = $call_sub eq '_set_get_class' ? 1 : 0;
+        my( $pack, $file, $line ) = caller( $call_frame );
+        my $code_lines = [];
+        foreach my $f ( sort( keys( %$def ) ) )
+        {
+            # $self->message( 3, "Checking field '$f'." );
+            my $info = $def->{ $f };
+            ## Convenience
+            $info->{class} = $info->{package} if( $info->{package} && !length( $info->{class} ) );
+            my $type = lc( $info->{type} );
+            if( !CORE::exists( $type2func->{ $type } ) )
+            {
+                warn( "Warning only: _set_get_class was called from package $pack at line $line in file $file, but the type provided \"$type\" is unknown to us, so we are skipping this field \"$f\" in the creation of our virtual class.\n" );
+                next;
+            }
+            my $func = $type2func->{ $type };
+            if( $type eq 'object' || 
+                $type eq 'scalar_or_object' || 
+                $type eq 'object_array_object' ||
+                $type eq 'object_array' )
+            {
+                if( !$info->{class} && !$info->{package} )
+                {
+                    warn( "Warning only: _set_get_class was called from package $pack at line $line in file $file, and class \"$class\" field \"$f\" is to require an object, but no object class name was provided. Use the \"class\" or \"package\" property parameter. So we are skipping this field \"$f\" in the creation of our virtual class.\n" );
+                    next;
+                }
+                my $this_class = $info->{class} || $info->{package};
+                CORE::push( @$code_lines, "sub $f { return( shift->${func}( '$f', '$this_class', \@_ ) ); }" );
+            }
+            elsif( $type eq 'class' || $type eq 'class_array' )
+            {
+                my $this_def = $info->{definition};
+                if( !CORE::exists( $info->{definition} ) )
+                {
+                    warn( "Warning only: No dynamic class fields definition was provided for this field \"$f\". Skipping this field.\n" );
+                    next;
+                }
+                elsif( ref( $this_def ) ne 'HASH' )
+                {
+                    warn( "Warning only: I was expecting a fields definition hash reference for dynamic class field \"$f\", but instead got '$this_def'. Skipping this field.\n" );
+                    next;
+                }
+                # my $d = Data::Dumper->new( [ $this_def ] );
+                # $d->Indent( 0 );
+                # $d->Purity( 1 );
+                # $d->Pad( '' );
+                # $d->Terse( 1 );
+                # $d->Sortkeys( 1 );
+                # my $hash_str = $d->Dump;
+                my $hash_str = Data::Dump::dump( $this_def );
+                CORE::push( @$code_lines, "sub $f { return( shift->${func}( '$f', $hash_str, \@_ ) ); }" );
+            }
+            else
+            {
+                CORE::push( @$code_lines, "sub $f { return( shift->${func}( '$f', \@_ ) ); }" );
+            }
+        }
+        $perl .= join( "\n\n", @$code_lines );
+
+        $perl .= <<EOT;
+
+
+1;
+
+EOT
+        my $rc = eval( $perl );
+        die( "Unable to dynamically create module $class: $@" ) if( $@ );
+    }
+    return( $class );
+}
+PERL
+    # NOTE: _lvalue()
+    _lvalue => <<'PERL',
+sub _lvalue : lvalue
+{
+    my $self = shift( @_ );
+    my $def  = shift( @_ );
+    my $has_arg = 0;
+    my $arg;
+    if( want( qw( LVALUE ASSIGN ) ) )
+    {
+        ( $arg ) = want( 'ASSIGN' );
+        $arg = [ $arg ];
+        $has_arg = 'assign';
+    }
+    else
+    {
+        if( @_ )
+        {
+            $arg = [@_];
+            $has_arg++;
+        }
+    }
+    
+    if( $has_arg && CORE::exists( $def->{set} ) && ref( $def->{set} ) eq 'CODE' )
+    {
+        my $code = $def->{set};
+        my $rv = $code->( $self, $arg );
+        if( !defined( $rv ) )
+        {
+            if( $has_arg eq 'assign' )
+            {
+                my $dummy = '';
+                return( $dummy );
+            }
+            return if( want( 'LVALUE' ) );
+            rreturn;
+        }
+        return( $rv ) if( want( 'LVALUE' ) );
+        rreturn( $rv );
+    }
+    else
+    {
+        if( CORE::exists( $def->{get} ) && ref( $def->{get} ) eq 'CODE' )
+        {
+            if( want( 'LVALUE' ) )
+            {
+                return( $def->{get}->( $self ) );
+            }
+            rreturn( $def->{get}->( $self ) );
+        }
+        # lnoreturn;
+        return;
+    }
+}
+PERL
+    # NOTE: _parse_timestamp()
+    _parse_timestamp => <<'PERL',
 # Ref:
 # <https://en.wikipedia.org/wiki/Date_format_by_country>
 sub _parse_timestamp
@@ -1827,6 +5095,8 @@ sub _parse_timestamp
     my $this = $self->_obj2h;
     my $class = ref( $self ) || $self;
     my $tz;
+    # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
+    # "Cannot determine local time zone"
     try
     {
         $tz = DateTime::TimeZone->new( name => 'local' );
@@ -1969,6 +5239,7 @@ sub _parse_timestamp
     {
         my $re = { %+ };
         $opt->{pattern} = $fmt->{pattern} = q{%a, %d %b %Y %T GMT};
+        $fmt->{time_zone} = $opt->{time_zone} = 'UTC';
         $self->message( 3, "Pattern 'Sun, 06 Oct 2019 06:41:11 GMT'" );
     }
     # 12 March 2001 17:07:30 JST
@@ -2296,512 +5567,9 @@ sub _parse_timestamp
         return( $self->error( "Error creating a DateTime object with the timestamp '$str': $e" ) );
     }
 }
-
-sub _lvalue : lvalue
-{
-    my $self = shift( @_ );
-    my $def  = shift( @_ );
-    my $has_arg = 0;
-    my $arg;
-    if( want( qw( LVALUE ASSIGN ) ) )
-    {
-        ( $arg ) = want( 'ASSIGN' );
-        $arg = [ $arg ];
-        $has_arg = 'assign';
-    }
-    else
-    {
-        if( @_ )
-        {
-            $arg = [@_];
-            $has_arg++;
-        }
-    }
-    
-    if( $has_arg && CORE::exists( $def->{set} ) && ref( $def->{set} ) eq 'CODE' )
-    {
-        my $code = $def->{set};
-        my $rv = $code->( $self, $arg );
-        if( !defined( $rv ) )
-        {
-            if( $has_arg eq 'assign' )
-            {
-                my $dummy = '';
-                return( $dummy );
-            }
-            return if( want( 'LVALUE' ) );
-            rreturn;
-        }
-        return( $rv ) if( want( 'LVALUE' ) );
-        rreturn( $rv );
-    }
-    else
-    {
-        if( CORE::exists( $def->{get} ) && ref( $def->{get} ) eq 'CODE' )
-        {
-            if( want( 'LVALUE' ) )
-            {
-                return( $def->{get}->( $self ) );
-            }
-            rreturn( $def->{get}->( $self ) );
-        }
-        # lnoreturn;
-        return;
-    }
-}
-
-sub _refaddr { return( Scalar::Util::refaddr( $_[1] ) ); }
-
-sub _set_get
-{
-    my $self  = shift( @_ );
-    my $field = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    if( @_ )
-    {
-        my $val = ( @_ == 1 ) ? shift( @_ ) : [ @_ ];
-        $data->{ $field } = $val;
-    }
-    if( wantarray() )
-    {
-        if( ref( $data->{ $field } ) eq 'ARRAY' )
-        {
-            return( @{ $data->{ $field } } );
-        }
-        elsif( ref( $data->{ $field } ) eq 'HASH' )
-        {
-            return( %{ $data->{ $field } } );
-        }
-        else
-        {
-            return( ( $data->{ $field } ) );
-        }
-    }
-    else
-    {
-        return( $data->{ $field } );
-    }
-}
-
-sub _set_get_array
-{
-    my $self  = shift( @_ );
-    my $field = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    if( @_ )
-    {
-        my $val = ( @_ == 1 && ( ( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'ARRAY' ) ) || ref( $_[0] ) eq 'ARRAY' ) ) ? shift( @_ ) : [ @_ ];
-        $data->{ $field } = $val;
-    }
-    return( $data->{ $field } );
-}
-
-sub _set_get_array_as_object : lvalue
-{
-    my $self  = shift( @_ );
-    my $field = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    my $has_arg = 0;
-    my $arg;
-    if( want( qw( LVALUE ASSIGN ) ) )
-    {
-        ( $arg ) = want( 'ASSIGN' );
-        $has_arg++;
-    }
-    else
-    {
-        if( @_ )
-        {
-            $arg = ( @_ == 1 && ( ( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'ARRAY' ) ) || ref( $_[0] ) eq 'ARRAY' ) ) ? shift( @_ ) : [ @_ ];
-            $has_arg++;
-        }
-    }
-    
-    my $callbacks = {};
-    if( ref( $field ) eq 'HASH' )
-    {
-        my $def = $field;
-        $field = $def->{field} if( CORE::exists( $def->{field} ) && defined( $def->{field} ) && CORE::length( $def->{field} ) );
-        $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
-    }
-    
-    if( $has_arg )
-    {
-        my $val = ( ( Scalar::Util::blessed( $arg ) && $arg->isa( 'ARRAY' ) ) || ref( $arg ) eq 'ARRAY' ) ? $arg : [ $arg ];
-        # $self->message( 4, "Processing value provided '$val' (", overload::StrVal( $val ), ")." );
-        my $o = $data->{ $field };
-        ## Some existing data, like maybe default value
-        if( $o )
-        {
-            if( !$self->_is_object( $o ) )
-            {
-                my $tmp = $o;
-                $o = Module::Generic::Array->new( $tmp );
-            }
-            $o->set( $val );
-        }
-        else
-        {
-            $o = Module::Generic::Array->new( $val );
-            $data->{ $field } = $o;
-            if( scalar( keys( %$callbacks ) ) && CORE::exists( $callbacks->{add} ) )
-            {
-                my $coderef = ref( $callbacks->{add} ) eq 'CODE' ? $callbacks->{add} : $self->can( $callbacks->{add} );
-                if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
-                {
-                    $coderef->( $self );
-                }
-            }
-        }
-    }
-    if( !$data->{ $field } || !$self->_is_object( $data->{ $field } ) )
-    {
-        my $o = Module::Generic::Array->new( ( defined( $data->{ $field } ) && CORE::length( $data->{ $field } ) ) ? $data->{ $field } : [] );
-        $data->{ $field } = $o;
-    }
-    return( $data->{ $field } ) if( want( 'LVALUE' ) );
-    rreturn( $data->{ $field } );
-}
-
-sub _set_get_boolean : lvalue
-{
-    my $self  = shift( @_ );
-    my $field = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    my $has_arg = 0;
-    my $arg;
-    if( want( qw( LVALUE ASSIGN ) ) )
-    {
-        ( $arg ) = want( 'ASSIGN' );
-        $has_arg++;
-    }
-    else
-    {
-        if( @_ )
-        {
-            $arg = shift( @_ );
-            $has_arg++;
-        }
-    }
-    
-    my $callbacks = {};
-    if( ref( $field ) eq 'HASH' )
-    {
-        my $def = $field;
-        $field = $def->{field} if( CORE::exists( $def->{field} ) && defined( $def->{field} ) && CORE::length( $def->{field} ) );
-        $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
-    }
-    
-    if( $has_arg )
-    {
-        my $val = $arg;
-        $val //= '';
-        no warnings 'uninitialized';
-        if( Scalar::Util::blessed( $val ) && 
-            ( $val->isa( 'JSON::PP::Boolean' ) || $val->isa( 'Module::Generic::Boolean' ) ) )
-        {
-            $data->{ $field } = $val;
-        }
-        elsif( Scalar::Util::reftype( $val ) eq 'SCALAR' )
-        {
-            $data->{ $field } = defined( $$val )
-                ? $$val
-                    ? Module::Generic::Boolean->true
-                    : Module::Generic::Boolean->false
-                : Module::Generic::Boolean->false;
-        }
-        elsif( lc( $val ) eq 'true' || lc( $val ) eq 'false' )
-        {
-            $data->{ $field } = lc( $val ) eq 'true' ? Module::Generic::Boolean->true : Module::Generic::Boolean->false;
-        }
-        else
-        {
-            $data->{ $field } = $val
-                ? Module::Generic::Boolean->true
-                : Module::Generic::Boolean->false;
-        }
-        
-        if( scalar( keys( %$callbacks ) ) && CORE::exists( $callbacks->{add} ) )
-        {
-            my $coderef = ref( $callbacks->{add} ) eq 'CODE' ? $callbacks->{add} : $self->can( $callbacks->{add} );
-            if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
-            {
-                $coderef->( $self );
-            }
-        }
-    }
-    # If there is a value set, like a default value and it is not an object or at least not one we recognise
-    # We transform it into a Module::Generic::Boolean object
-    if( CORE::length( $data->{ $field } ) && 
-        ( 
-            !Scalar::Util::blessed( $data->{ $field } ) || 
-            ( 
-                Scalar::Util::blessed( $data->{ $field } ) && 
-                !$data->{ $field }->isa( 'Module::Generic::Boolean' ) && 
-                !$data->{ $field }->isa( 'JSON::PP::Boolean' ) 
-            ) 
-        ) )
-    {
-        my $val = $data->{ $field };
-        $data->{ $field } = $val ? Module::Generic::Boolean->true : Module::Generic::Boolean->false;
-    }
-    return( $data->{ $field } ) if( want( 'LVALUE' ) );
-    rreturn( $data->{ $field } );
-}
-
-sub __create_class
-{
-    my $self  = shift( @_ );
-    my $field = shift( @_ ) || return( $self->error( "No field was provided to create a dynamic class." ) );
-    my $def   = shift( @_ );
-    my $class;
-    if( $def->{_class} )
-    {
-        $class = $def->{_class};
-    }
-    else
-    {
-        my $new_class = $field;
-        $new_class =~ tr/-/_/;
-        $new_class =~ s/\_{2,}/_/g;
-        $new_class = join( '', map( ucfirst( lc( $_ ) ), split( /\_/, $new_class ) ) );
-        $class = ( ref( $self ) || $self ) . "\::${new_class}";
-    }
-    unless( Class::Load::is_class_loaded( $class ) )
-    {
-        my $type2func =
-        {
-        array       => '_set_get_array',
-        array_as_object => '_set_get_array_as_object',
-        boolean     => '_set_get_boolean',
-        class       => '_set_get_class',
-        class_array => '_set_get_class_array',
-        datetime    => '_set_get_datetime',
-        decimal     => '_set_get_number',
-        hash        => '_set_get_hash',
-        hash_as_object => '_set_get_hash_as_mix_object',
-        integer     => '_set_get_number',
-        number      => '_set_get_number',
-        object      => '_set_get_object',
-        object_array => '_set_get_object_array',
-        object_array_object => '_set_get_object_array_object',
-        scalar      => '_set_get_scalar',
-        scalar_as_object => '_set_get_scalar_as_object',
-        scalar_or_object => '_set_get_scalar_or_object',
-        uri         => '_set_get_uri',
-        };
-        # Alias
-        $type2func->{string} = $type2func->{scalar};
-        
-        my $perl = <<EOT;
-package $class;
-BEGIN
-{
-    use strict;
-    use Module::Generic;
-    use parent -norequire, qw( Module::Generic );
-};
-
-EOT
-        my $call_sub = ( split( /::/, ( caller(1) )[3] ) )[-1];
-        my $call_frame = $call_sub eq '_set_get_class' ? 1 : 0;
-        my( $pack, $file, $line ) = caller( $call_frame );
-        my $code_lines = [];
-        foreach my $f ( sort( keys( %$def ) ) )
-        {
-            # $self->message( 3, "Checking field '$f'." );
-            my $info = $def->{ $f };
-            ## Convenience
-            $info->{class} = $info->{package} if( $info->{package} && !length( $info->{class} ) );
-            my $type = lc( $info->{type} );
-            if( !CORE::exists( $type2func->{ $type } ) )
-            {
-                warn( "Warning only: _set_get_class was called from package $pack at line $line in file $file, but the type provided \"$type\" is unknown to us, so we are skipping this field \"$f\" in the creation of our virtual class.\n" );
-                next;
-            }
-            my $func = $type2func->{ $type };
-            if( $type eq 'object' || 
-                $type eq 'scalar_or_object' || 
-                $type eq 'object_array_object' ||
-                $type eq 'object_array' )
-            {
-                if( !$info->{class} && !$info->{package} )
-                {
-                    warn( "Warning only: _set_get_class was called from package $pack at line $line in file $file, and class \"$class\" field \"$f\" is to require an object, but no object class name was provided. Use the \"class\" or \"package\" property parameter. So we are skipping this field \"$f\" in the creation of our virtual class.\n" );
-                    next;
-                }
-                my $this_class = $info->{class} || $info->{package};
-                CORE::push( @$code_lines, "sub $f { return( shift->${func}( '$f', '$this_class', \@_ ) ); }" );
-            }
-            elsif( $type eq 'class' || $type eq 'class_array' )
-            {
-                my $this_def = $info->{definition};
-                if( !CORE::exists( $info->{definition} ) )
-                {
-                    warn( "Warning only: No dynamic class fields definition was provided for this field \"$f\". Skipping this field.\n" );
-                    next;
-                }
-                elsif( ref( $this_def ) ne 'HASH' )
-                {
-                    warn( "Warning only: I was expecting a fields definition hash reference for dynamic class field \"$f\", but instead got '$this_def'. Skipping this field.\n" );
-                    next;
-                }
-                # my $d = Data::Dumper->new( [ $this_def ] );
-                # $d->Indent( 0 );
-                # $d->Purity( 1 );
-                # $d->Pad( '' );
-                # $d->Terse( 1 );
-                # $d->Sortkeys( 1 );
-                # my $hash_str = $d->Dump;
-                my $hash_str = Data::Dump::dump( $this_def );
-                CORE::push( @$code_lines, "sub $f { return( shift->${func}( '$f', $hash_str, \@_ ) ); }" );
-            }
-            else
-            {
-                CORE::push( @$code_lines, "sub $f { return( shift->${func}( '$f', \@_ ) ); }" );
-            }
-        }
-        $perl .= join( "\n\n", @$code_lines );
-
-        $perl .= <<EOT;
-
-
-1;
-
-EOT
-        my $rc = eval( $perl );
-        die( "Unable to dynamically create module $class: $@" ) if( $@ );
-    }
-    return( $class );
-}
-
-# $self->_set_get_class( 'my_field', {
-# _class => 'My::Class',
-# field1 => { type => 'datetime' },
-# field2 => { type => 'scalar' },
-# field3 => { type => 'boolean' },
-# field4 => { type => 'object', class => 'Some::Class' },
-# }, @_ );
-sub _set_get_class
-{
-    my $self  = shift( @_ );
-    # $self->message( 3, "Got here with arguments: '", join( "', '", @_ ), "'." );
-    my $field = shift( @_ );
-    my $def   = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
-    if( ref( $def ) ne 'HASH' )
-    {
-        CORE::warn( "Warning only: dynamic class field definition hash ($def) for field \"$field\" is not a hash reference.\n" );
-        return;
-    }
-    
-    my $class = $self->__create_class( $field, $def ) || die( "Failed to create the dynamic class for field \"$field\".\n" );
-    
-    if( @_ )
-    {
-        my $hash = shift( @_ );
-        # my $o = $class->new( $hash );
-        $self->messagef( 3, "Instantiating object of class '$class' with hash '$hash' containing %d elements: '%s'", scalar( keys( %$hash ) ), join( "', '", map{ "$_ => $hash->{$_}" } sort( keys( %$hash ) ) ) );
-        ## $self->messagef( 3, "Instantiating object of class '$class' with hash '$hash' containing %d elements: '%s'", scalar( keys( %$hash ) ), $self->dumper( $hash ) );
-        my $o = $self->__instantiate_object( $field, $class, $hash );
-        # $self->message( 3, "\tReturning object for field '$field' and class '$class': '$o'." );
-        $data->{ $field } = $o;
-    }
-    
-    if( !$data->{ $field } )
-    {
-        my $o = $self->__instantiate_object( $field, $class );
-        $data->{ $field } = $o;
-    }
-    return( $data->{ $field } );
-}
-
-sub _set_get_class_array
-{
-    my $self  = shift( @_ );
-    my $field = shift( @_ );
-    my $def   = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    if( ref( $def ) ne 'HASH' )
-    {
-        CORE::warn( "Warning only: dynamic class field definition hash ($def) for field \"$field\" is not a hash reference.\n" );
-        return;
-    }
-    @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
-    my $class = $self->__create_class( $field, $def ) || die( "Failed to create the dynamic class for field \"$field\".\n" );
-    ## return( $self->_set_get_object_array( $field, $class, @_ ) );
-    if( @_ )
-    {
-        my $ref = shift( @_ );
-        ## $self->message( 7, "Populating data for class '$class' using '$ref' (containing ", scalar( @$ref ), " elements): ", sub{ $self->dump( $ref ) } );
-        return( $self->error( "I was expecting an array ref, but instead got '$ref'. _is_array returned: '", $self->_is_array( $ref ), "'" ) ) if( !$self->_is_array( $ref ) );
-        my $arr = [];
-        for( my $i = 0; $i < scalar( @$ref ); $i++ )
-        {
-            if( ref( $ref->[$i] ) ne 'HASH' )
-            {
-                return( $self->error( "Array offset $i is not a hash reference. I was expecting a hash reference to instantiate an object of class $class." ) );
-            }
-            my $o = $self->__instantiate_object( $field, $class, $ref->[$i] ) || return( $self->pass_error );
-            ## If an error occurred, we report it to the caller and do not add it, since even if we did add it, it would be undef, because no object would have been created.
-            ## And the caller needs to know there has been some errors
-            CORE::push( @$arr, $o );
-        }
-        $data->{ $field } = $arr;
-    }
-    return( $data->{ $field } );
-}
-
-sub _set_get_code : lvalue
-{
-    my $self  = shift( @_ );
-    my $field = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    my $has_arg = 0;
-    my $arg;
-    if( want( qw( LVALUE ASSIGN ) ) )
-    {
-        ( $arg ) = want( 'ASSIGN' );
-        $has_arg = 'assign';
-    }
-    else
-    {
-        if( @_ )
-        {
-            $arg = shift( @_ );
-            $has_arg++;
-        }
-    }
-    
-    if( $has_arg )
-    {
-        my $v = $arg;
-        if( ref( $v ) ne 'CODE' )
-        {
-            my $error = "Value provided for \"$field\" ($v) is not an anonymous subroutine (code). You can pass as argument something like \$self->curry::my_sub or something like sub { some_code_here; }";
-            if( $has_arg eq 'assign' )
-            {
-                $self->error( $error );
-                my $dummy = 'dummy';
-                return( $dummy );
-            }
-            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-            rreturn( $self->error( $error ) );
-        }
-        $data->{ $field } = $v;
-    }
-    return( $data->{ $field } ) if( want( 'LVALUE' ) );
-    rreturn( $data->{ $field } );
-}
-
+PERL
+    # NOTE: _set_get_datetime()
+    _set_get_datetime => <<'PERL',
 sub _set_get_datetime : lvalue
 {
     my $self  = shift( @_ );
@@ -2915,6 +5683,7 @@ sub _set_get_datetime : lvalue
     # So that a call to this field will not trigger an error: "Can't call method "xxx" on an undefined value"
     if( !$data->{ $field } && want( 'OBJECT' ) )
     {
+        require Module::Generic::Null;
         my $null = Module::Generic::Null->new( '', { debug => $this->{debug}, has_error => 1 });
         rreturn( $null );
     }
@@ -2935,227 +5704,9 @@ sub _set_get_datetime : lvalue
     return( $data->{ $field } ) if( want( 'LVALUE' ) );
     rreturn( $data->{ $field } );
 }
-
-sub _set_get_file : lvalue
-{
-    my $self  = shift( @_ );
-    my $field = shift( @_ );
-    no overloading;
-    my $this  = $self->_obj2h;
-    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    my $has_arg = 0;
-    my $arg;
-    if( want( qw( LVALUE ASSIGN ) ) )
-    {
-        ( $arg ) = want( 'ASSIGN' );
-        $has_arg = 'assign';
-    }
-    else
-    {
-        @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
-        if( @_ )
-        {
-            $arg = shift( @_ );
-            $has_arg++;
-        }
-    }
-    if( $has_arg )
-    {
-        my $val = Module::Generic::File->new( $arg ) || do
-        {
-            my $error = Module::Generic::File->error;
-            if( $has_arg eq 'assign' )
-            {
-                $self->error( $error );
-                my $dummy = 'dummy';
-                return( $dummy );
-            }
-            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-            rreturn( $self->error( $error ) );
-        };
-        $data->{ $field } = $val;
-        my $dummy = 'dummy';
-        # We need to return something else than our object, or by virtue of perl's way of working
-        # we would return our object as coded below, and that object will be assigned the
-        # very value we will have passed in assignment !
-        return( $dummy ) if( $has_arg eq 'assign' );
-    }
-    return( $data->{ $field } ) if( want( 'LVALUE' ) );
-    rreturn( $data->{ $field } );
-    # To make perl happy
-    return;
-}
-
-sub _set_get_glob : lvalue
-{
-    my $self  = shift( @_ );
-    my $field = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    my $has_arg = 0;
-    my $arg;
-    if( want( qw( LVALUE ASSIGN ) ) )
-    {
-        ( $arg ) = want( 'ASSIGN' );
-        $has_arg = 'assign';
-    }
-    else
-    {
-        @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
-        if( @_ )
-        {
-                $arg = shift( @_ );
-        }
-        $has_arg++;
-    }
-    
-    if( $has_arg )
-    {
-        if( Scalar::Util::reftype( $arg ) ne 'GLOB' )
-        {
-            my $error = "Method $field takes only a glob, but value provided ($arg) is not supported";
-            if( $has_arg eq 'assign' )
-            {
-                $self->error( $error );
-                my $dummy = 'dummy';
-                return( $dummy );
-            }
-            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-            rreturn( $self->error( $error ) );
-        }
-        # $self->message( 3, "Setting value $val for field $field" );
-        $data->{ $field } = $arg;
-    }
-    return( $data->{ $field } ) if( want( 'LVALUE' ) );
-    rreturn( $data->{ $field } );
-}
-
-sub _set_get_hash : lvalue
-{
-    my $self  = shift( @_ );
-    my $field = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    # $self->message( 3, "Called for field '$field' with data '", join( "', '", @_ ), "'." );
-    my $has_arg = 0;
-    my $arg;
-    if( want( qw( LVALUE ASSIGN ) ) )
-    {
-        ( $arg ) = want( 'ASSIGN' );
-        $has_arg = 'assign';
-    }
-    else
-    {
-        @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
-        if( @_ )
-        {
-            if( ref( $_[0] ) eq 'HASH' )
-            {
-                $arg = shift( @_ );
-            }
-            elsif( !( @_ % 2 ) )
-            {
-                $arg = { @_ };
-            }
-            else
-            {
-                $arg = shift( @_ );
-            }
-            $has_arg++;
-        }
-    }
-    if( $has_arg )
-    {
-        if( ref( $arg ) ne 'HASH' )
-        {
-            my $error = "Method $field takes only a hash or reference to a hash, but value provided ($arg) is not supported";
-            if( $has_arg eq 'assign' )
-            {
-                $self->error( $error );
-                my $dummy = 'dummy';
-                return( $dummy );
-            }
-            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-            rreturn( $self->error( $error ) );
-        }
-        # $self->message( 3, "Setting value $val for field $field" );
-        $data->{ $field } = $arg;
-    }
-    return( $data->{ $field } ) if( want( 'LVALUE' ) );
-    rreturn( $data->{ $field } );
-}
-
-sub _set_get_hash_as_mix_object : lvalue
-{
-    my $self  = shift( @_ );
-    my $field = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    my $has_arg = 0;
-    my $arg;
-    if( want( qw( LVALUE ASSIGN ) ) )
-    {
-        ( $arg ) = want( 'ASSIGN' );
-        $has_arg = 'assign';
-    }
-    else
-    {
-        @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
-        if( @_ )
-        {
-            if( ref( $_[0] ) eq 'HASH' )
-            {
-                $arg = shift( @_ );
-            }
-            elsif( ref( $_[0] ) eq 'Module::Generic::Hash' )
-            {
-                $arg = $_[0]->clone;
-            }
-            elsif( ( @_ % 2 ) )
-            {
-                $arg = { @_ };
-            }
-            else
-            {
-                $arg = shift( @_ );
-                my $error = "Method $field takes only a hash or reference to a hash, but value provided ($arg) is not supported";
-                if( $has_arg eq 'assign' )
-                {
-                    $self->error( $error );
-                    my $dummy = 'dummy';
-                    return( $dummy );
-                }
-                return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-                rreturn( $self->error( $error ) );
-            }
-            $has_arg++;
-        }
-    }
-    # $self->message( 3, "Called for field '$field' with data '", join( "', '", @_ ), "'." );
-    if( $has_arg )
-    {
-        my $val = $arg;
-        if( ref( $val ) eq 'Module::Generic::Hash' )
-        {
-            $data->{ $field } = $val;
-            return( $data->{ $field } ) if( want( 'LVALUE' ) );
-            rreturn( $data->{ $field } );
-        }
-        else
-        {
-            # $self->message( 3, "Setting value $val for field $field" );
-            $data->{ $field } = Module::Generic::Hash->new( $val );
-        }
-    }
-    if( $data->{ $field } && !$self->_is_object( $data->{ $field } ) )
-    {
-        my $o = Module::Generic::Hash->new( $data->{ $field } );
-        $data->{ $field } = $o;
-    }
-    return( $data->{ $field } ) if( want( 'LVALUE' ) );
-    rreturn( $data->{ $field } );
-}
-
+PERL
+    # NOTE: _set_get_hash_as_object()
+    _set_get_hash_as_object => <<'PERL',
 # There is no lvalue here on purpose
 sub _set_get_hash_as_object
 {
@@ -3206,7 +5757,7 @@ BEGIN
     use strict;
     use warnings::register;
     use Module::Generic;
-    use parent -norequire, qw( Module::Generic::Dynamic );
+    use parent qw( Module::Generic::Dynamic );
 };
 
 1;
@@ -3229,2022 +5780,6 @@ EOT
         my $o = $data->{ $field } = $self->__instantiate_object( $field, $class, $data->{ $field } );
     }
     return( $data->{ $field } );
-}
-
-sub _set_get_ip : lvalue
-{
-    my $self = shift( @_ );
-    my $field = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    my $has_arg = 0;
-    my $arg;
-    if( want( qw( LVALUE ASSIGN ) ) )
-    {
-        ( $arg ) = want( 'ASSIGN' );
-        $has_arg = 'assign';
-    }
-    else
-    {
-        if( @_ )
-        {
-            $arg = shift( @_ );
-            $has_arg++;
-        }
-    }
-    if( $has_arg )
-    {
-        my $v = $arg;
-        # If the user wants to remove it
-        if( !defined( $v ) )
-        {
-            $data->{ $field } = $v;
-        }
-        # If the user provided a string, let's check it
-        elsif( length( $v ) && !$self->_is_ip( $v ) )
-        {
-            my $error = "Value provided ($v) is not a valid ip address.";
-            if( $has_arg eq 'assign' )
-            {
-                $self->error( $error );
-                my $dummy = 'dummy';
-                return( $dummy );
-            }
-            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-            rreturn( $self->error( $error ) );
-        }
-        $data->{ $field } = $self->new_scalar( $v );
-    }
-    my $v = $self->_is_a( $data->{ $field }, 'Module::Generic::Scalar' )
-        ? $data->{ $field }
-        : $self->new_scalar( $data->{ $field } );
-    if( !$v->defined )
-    {
-        if( Want::want( 'OBJECT' ) )
-        {
-            # We might have need to specify, because I found a race condition where
-            # even though the context is object, once in Null, the context became 'code'
-            return( Module::Generic::Null->new( wants => 'OBJECT' ) );
-        }
-        else
-        {
-            return if( want( 'LVALUE' ) );
-            rreturn;
-        }
-    }
-    else
-    {
-        return( $v ) if( want( 'LVALUE' ) );
-        rreturn( $v );
-    }
-}
-
-sub _set_get_lvalue : lvalue
-{
-    my $self  = shift( @_ );
-    my $field = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    if( want( qw( LVALUE ASSIGN ) ) )
-    {
-        my( $a ) = want( 'ASSIGN' );
-        $data->{ $field } = $a;
-        # lnoreturn;
-        return( $data->{ $field } );
-    }
-    else
-    {
-        if( @_ )
-        {
-            @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
-            $data->{ $field } = shift( @_ );
-        }
-        return( $data->{ $field } ) if( want( 'LVALUE' ) );
-        rreturn( $data->{ $field } );
-    }
-    return;
-}
-
-sub _set_get_number : lvalue
-{
-    my $self  = shift( @_ );
-    my $field = shift( @_ );
-    my $this  = $self->_obj2h;
-    no overload;
-    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    
-    my $callbacks = {};
-    if( ref( $field ) eq 'HASH' )
-    {
-        my $def = $field;
-        $field = $def->{field} if( CORE::exists( $def->{field} ) && defined( $def->{field} ) && CORE::length( $def->{field} ) );
-        $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
-    }
-    
-    my $do_callback = sub
-    {
-        if( scalar( keys( %$callbacks ) ) && CORE::exists( $callbacks->{add} ) )
-        {
-            my $coderef = ref( $callbacks->{add} ) eq 'CODE' ? $callbacks->{add} : $self->can( $callbacks->{add} );
-            if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
-            {
-                $coderef->( $self );
-            }
-        }
-    };
-    
-    if( want( qw( LVALUE ASSIGN ) ) )
-    {
-        my( $a ) = want( 'ASSIGN' );
-        $data->{ $field } = Module::Generic::Number->new( $a );
-        $do_callback->();
-        return( $data->{ $field } );
-    }
-    else
-    {
-        @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
-        if( @_ )
-        {
-            $data->{ $field } = Module::Generic::Number->new( shift( @_ ) );
-            $do_callback->();
-        }
-        
-        if( CORE::length( $data->{ $field } ) && !ref( $data->{ $field } ) )
-        {
-            $data->{ $field } = Module::Generic::Number->new( $data->{ $field } );
-        }
-        elsif( !CORE::length( $data->{ $field } ) && want( 'OBJECT' ) )
-        {
-            my $null = Module::Generic::Null->new( '', { debug => $this->{debug} });
-            rreturn( $null );
-        }
-        return( $data->{ $field } ) if( want( 'LVALUE' ) );
-        rreturn( $data->{ $field } );
-    }
-    return;
-}
-
-sub _set_get_number_as_object : lvalue { return( shift->_set_get_number( @_ ) ); }
-
-sub _set_get_number_or_object
-{
-    my $self  = shift( @_ );
-    my $field = shift( @_ );
-    my $class = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    if( @_ )
-    {
-        if( ref( $_[0] ) eq 'HASH' || Scalar::Util::blessed( $_[0] ) )
-        {
-            return( $self->_set_get_object( $field, $class, @_ ) );
-        }
-        else
-        {
-            return( $self->_set_get_number( $field, @_ ) );
-        }
-    }
-    return( $data->{ $field } );
-}
-
-sub _set_get_object
-{
-    my $self  = shift( @_ );
-    my $field = shift( @_ );
-    my $class = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    no overloading;
-    # $self->message( 3, "Called for field '$field' and class '$class'." );
-    if( @_ )
-    {
-        if( scalar( @_ ) == 1 )
-        {
-            # $self->message( 3, "Object provided is '", overload::StrVal( $_[0] ), "' for class '$class'. Is it a legit object? ", ( $self->_is_a( $_[0], $class ) ? 'yes' : 'no' ) );
-            # User removed the value by passing it an undefined value
-            if( !defined( $_[0] ) )
-            {
-                $data->{ $field } = undef();
-            }
-            # User pass an object
-            elsif( Scalar::Util::blessed( $_[0] ) )
-            {
-                my $o = shift( @_ );
-                if( ref( $class ) eq 'ARRAY' )
-                {
-                    my $ok = 0;
-                    foreach my $c ( @$class )
-                    {
-                        if( $o->isa( $c ) )
-                        {
-                            $ok++, last;
-                        }
-                    }
-                    return( $self->error( "Object provided (", ref( $o ), ") for $field does not match any of the possible classes: '", join( "', '", @$class ), "'." ) ) if( !$ok );
-                }
-                else
-                {
-                    # $self->message( 3, "Object provided (", ref( $o ), ") for $field is not a valid $class object" ) if( !$o->isa( "$class" ) );
-                    return( $self->error( "Object provided (", ref( $o ), ") for $field is not a valid $class object" ) ) if( !$o->isa( "$class" ) );
-                }
-                $data->{ $field } = $o;
-            }
-            else
-            {
-                $class = $class->[0] if( ref( $class ) eq 'ARRAY' );
-                # $self->message( 3, "Got here, instantiating object for field '$field' and class '$class'." );
-                my $o = $self->_instantiate_object( $field, $class, @_ ) || do
-                {
-                    if( $class->can( 'error' ) )
-                    {
-                        return( $self->pass_error( $class->error ) );
-                    }
-                    else
-                    {
-                        return( $self->error( "Unable to instantiate an object for class \"$class\" and values provided: '", join( "', '", @_ ), "'." ) );
-                    }
-                };
-                # $self->message( 3, "Setting field $field value to $o" );
-                $data->{ $field } = $o;
-            }
-        }
-        else
-        {
-            $class = $class->[0] if( ref( $class ) eq 'ARRAY' );
-            # $self->message( 3, "Argument provideds ('", join( "', '", map( overload::StrVal( $_ ), @_ ) ), "'), instantiating object for field '$field' and class '$class' called from file ", [caller(1)]->[1], " at line ", [caller(1)]->[2], "." );
-            # There is already an object, so we pass any argument to the existing object
-            if( $data->{ $field } && $self->_is_a( $data->{ $field }, $class ) )
-            {
-                warn( "Re-setting existing object '", overload::StrVal( $data->{ $field } ), "' for field '$field' and class '$class'\n" );
-            }
-            
-            my $o = $self->_instantiate_object( $field, $class, @_ ) || do
-            {
-                if( $class->can( 'error' ) )
-                {
-                    return( $self->pass_error( $class->error ) );
-                }
-                else
-                {
-                    return( $self->error( "Unable to instantiate an object for class \"$class\" with no value provided." ) );
-                }
-            };
-            # $self->message( 3, "Setting field $field value to $o" );
-            $data->{ $field } = $o;
-        }
-    }
-    # If nothing has been set for this field, ie no object, but we are called in chain
-    # we set a dummy object that will just call itself to avoid perl complaining about undefined value calling a method
-    if( !$data->{ $field } && want( 'OBJECT' ) )
-    {
-        $class = $class->[0] if( ref( $class ) eq 'ARRAY' );
-        my $o = $self->_instantiate_object( $field, $class, @_ ) || do
-        {
-            if( $class->can( 'error' ) )
-            {
-                return( $self->pass_error( $class->error ) );
-            }
-            else
-            {
-                return( $self->error( "Unable to instantiate an object for class \"$class\" with no value provided." ) );
-            }
-        };
-        $data->{ $field } = $o;
-        return( $o );
-    }
-    # $self->message( 3, "Returning for field '$field' value: ", $self->{ $field } );
-    return( $data->{ $field } );
-}
-
-sub _set_get_object_lvalue : lvalue
-{
-    my $self  = shift( @_ );
-    my $field = shift( @_ );
-    my $class = shift( @_ );
-    no overloading;
-    my $this  = $self->_obj2h;
-    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    my $has_arg = 0;
-    my $arg;
-    if( want( qw( LVALUE ASSIGN ) ) )
-    {
-        ( $arg ) = want( 'ASSIGN' );
-        $has_arg = 'assign';
-    }
-    else
-    {
-        if( @_ )
-        {
-            $arg = shift( @_ );
-            $has_arg++;
-        }
-    }
-    if( $has_arg )
-    {
-        if( !defined( $arg ) )
-        {
-            $data->{ $field } = undef();
-        }
-        # User pass an object
-        elsif( Scalar::Util::blessed( $arg ) )
-        {
-            if( !$arg->isa( "$class" ) )
-            {
-                my $error = "Object provided (" . ref( $arg ) . ") for $field is not a valid $class object";
-                if( $has_arg eq 'assign' )
-                {
-                    $self->error( $error );
-                    my $dummy = 'dummy';
-                    return( $dummy );
-                }
-                return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-                rreturn( $self->error( $error ) );
-            }
-            $data->{ $field } = $arg;
-        }
-        else
-        {
-            my $error = "Value provided (" . overload::StrVal( $arg ) . " is not an object.";
-            if( $has_arg eq 'assign' )
-            {
-                $self->error( $error );
-                my $dummy = 'dummy';
-                return( $dummy );
-            }
-            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-            rreturn( $self->error( $error ) );
-        }
-        my $dummy = 'dummy';
-        # We need to return something else than our object, or by virtue of perl's way of working
-        # we would return our object as coded below, and that object will be assigned the
-        # very value we will have passed in assignment !
-        return( $dummy ) if( $has_arg eq 'assign' );
-    }
-    return( $data->{ $field } ) if( want( 'LVALUE' ) );
-    rreturn( $data->{ $field } );
-    # To make perl happy
-    return;
-}
-
-sub _set_get_object_without_init
-{
-    my $self  = shift( @_ );
-    my $field = shift( @_ );
-    my $class = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    no overloading;
-    if( @_ )
-    {
-        if( scalar( @_ ) == 1 )
-        {
-            # User removed the value by passing it an undefined value
-            if( !defined( $_[0] ) )
-            {
-                $data->{ $field } = undef();
-            }
-            # User pass an object
-            elsif( Scalar::Util::blessed( $_[0] ) )
-            {
-                my $o = shift( @_ );
-                if( ref( $class ) eq 'ARRAY' )
-                {
-                    my $ok = 0;
-                    foreach my $c ( @$class )
-                    {
-                        if( $o->isa( $c ) )
-                        {
-                            $ok++, last;
-                        }
-                    }
-                    return( $self->error( "Object provided (", ref( $o ), ") for $field does not match any of the possible classes: '", join( "', '", @$class ), "'." ) ) if( !$ok );
-                }
-                else
-                {
-                    $self->message( 4, "Object provided (", ref( $o ), ") for $field is not a valid $class object" ) if( !$o->isa( "$class" ) );
-                    return( $self->error( "Object provided (", ref( $o ), ") for $field is not a valid $class object" ) ) if( !$o->isa( "$class" ) );
-                }
-                $data->{ $field } = $o;
-            }
-            else
-            {
-                my $o = $self->_instantiate_object( $field, $class, @_ ) || do
-                {
-                    if( $class->can( 'error' ) )
-                    {
-                        return( $self->pass_error( $class->error ) );
-                    }
-                    else
-                    {
-                        return( $self->error( "Unable to instantiate an object for class \"$class\" and values provided: '", join( "', '", @_ ), "'." ) );
-                    }
-                };
-                # $self->message( 3, "Setting field $field value to $o" );
-                $data->{ $field } = $o;
-            }
-        }
-        else
-        {
-            my $o = $self->_instantiate_object( $field, $class, @_ ) || do
-            {
-                if( $class->can( 'error' ) )
-                {
-                    return( $self->pass_error( $class->error ) );
-                }
-                else
-                {
-                    return( $self->error( "Unable to instantiate an object for class \"$class\" with no value provided." ) );
-                }
-            };
-            # $self->message( 3, "Setting field $field value to $o" );
-            $data->{ $field } = $o;
-        }
-    }
-    # If nothing has been set for this field, ie no object, but we are called in chain, this will fail on purpose.
-    # To avoid this, use _set_get_object
-    return( $data->{ $field } );
-}
-
-sub _set_get_object_array2
-{
-    my $self  = shift( @_ );
-    my $field = shift( @_ );
-    my $class = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    if( @_ )
-    {
-        my $data_to_process = shift( @_ );
-        return( $self->error( "I was expecting an array ref, but instead got '$data_to_process'. _is_array returned: '", $self->_is_array( $data_to_process ), "'" ) ) if( !$self->_is_array( $data_to_process ) );
-        my $arr1 = [];
-        foreach my $ref ( @$data_to_process )
-        {
-            return( $self->error( "I was expecting an embeded array ref, but instead got '$ref'." ) ) if( ref( $ref ) ne 'ARRAY' );
-            my $arr = [];
-            for( my $i = 0; $i < scalar( @$ref ); $i++ )
-            {
-                my $o;
-                if( defined( $ref->[$i] ) )
-                {
-                    return( $self->error( "Parameter provided for adding object of class $class is not a reference." ) ) if( !ref( $ref->[$i] ) );
-                    if( Scalar::Util::blessed( $ref->[$i] ) )
-                    {
-                        return( $self->error( "Array offset $i contains an object from class ", $ref->[$i], ", but was expecting an object of class $class." ) ) if( !$ref->[$i]->isa( $class ) );
-                        $o = $ref->[$i];
-                    }
-                    elsif( ref( $ref->[$i] ) eq 'HASH' )
-                    {
-                        #$o = $class->new( $h, $ref->[$i] );
-                        $o = $self->_instantiate_object( $field, $class, $ref->[$i] );
-                    }
-                    else
-                    {
-                        $self->error( "Warning only: data provided to instaantiate object of class $class is not a hash reference" );
-                    }
-                }
-                else
-                {
-                    #$o = $class->new( $h );
-                    $o = $self->_instantiate_object( $field, $class );
-                }
-                return( $self->error( "Unable to instantiate an object of class $class: ", $class->error ) ) if( !defined( $o ) );
-                # $o->{ '_parent' } = $self->{ '_parent' };
-                push( @$arr, $o );
-            }
-            push( @$arr1, $arr );
-        }
-        $data->{ $field } = $arr1;
-    }
-    return( $data->{ $field } );
-}
-
-sub _set_get_object_array
-{
-    my $self  = shift( @_ );
-    my $field = shift( @_ );
-    my $class = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
-    my $process = sub
-    {
-        my $ref = shift( @_ );
-        return( $self->error( "I was expecting an array ref, but instead got '$ref'. _is_array returned: '", $self->_is_array( $ref ), "'" ) ) if( !$self->_is_array( $ref ) );
-        my $arr = [];
-        for( my $i = 0; $i < scalar( @$ref ); $i++ )
-        {
-            if( defined( $ref->[$i] ) )
-            {
-#                 return( $self->error( "Array offset $i is not a reference. I was expecting an object of class $class or an hash reference to instantiate an object." ) ) if( !ref( $ref->[$i] ) );
-                if( Scalar::Util::blessed( $ref->[$i] ) )
-                {
-                    return( $self->error( "Array offset $i contains an object from class ", $ref->[$i], ", but was expecting an object of class $class." ) ) if( !$ref->[$i]->isa( $class ) );
-                    push( @$arr, $ref->[$i] );
-                }
-#                 elsif( ref( $ref->[$i] ) eq 'HASH' )
-#                 {
-#                     #$o = $class->new( $h, $ref->[$i] );
-#                     $o = $self->_instantiate_object( $field, $class, $ref->[$i] ) || return;
-#                     push( @$arr, $o );
-#                 }
-#                 else
-#                 {
-#                     $self->error( "Warning only: data provided to instantiate object of class $class is not a hash reference" );
-#                 }
-                else
-                {
-                    my $o = $self->_instantiate_object( $field, $class, $ref->[$i] ) || return( $self->pass_error );
-                    push( @$arr, $o );
-                }
-            }
-            else
-            {
-                return( $self->error( "Array offset $i contains an undefined value. I was expecting an object of class $class." ) );
-                my $o = $self->_instantiate_object( $field, $class ) || return( $self->pass_error );
-                push( @$arr, $o );
-            }
-        }
-        return( $arr );
-    };
-    
-    if( @_ )
-    {
-        $data->{ $field } = $process->( @_ );
-    }
-    # For example, if the object property is set at init, without using a method
-    if( $data->{ $field } && ref( $data->{ $field } ) ne 'ARRAY' )
-    {
-        $data->{ $field } = $process->( $data->{ $field } );
-    }
-    return( $data->{ $field } );
-}
-
-sub _set_get_object_array_object
-{
-    my $self = shift( @_ );
-    my $field = shift( @_ ) || return( $self->error( "No field name was provided for this array of object." ) );
-    my $class = shift( @_ ) || return( $self->error( "No class was provided for this array of objects." ) );
-    my $this = $self->_obj2h;
-    my $data = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
-    my $process = sub
-    {
-        my $that = ( scalar( @_ ) == 1 && UNIVERSAL::isa( $_[0], 'ARRAY' ) ) ? shift( @_ ) : [ @_ ];
-        my $ref = $self->_set_get_object_array( $field, $class, $that ) || return( $self->pass_error );
-        return( Module::Generic::Array->new( $ref ) );
-    };
-    
-    if( @_ )
-    {
-        $data->{ $field } = $process->( @_ );
-    }
-    ## Default value so that call to the caller's method like my_sub->length will not produce something like "Can't call method "length" on an undefined value"
-    ## Also, this will make it possible to set default value in caller's object and we would turn it into array object.
-    if( !$data->{ $field } || !$self->_is_a( $data->{ $field }, 'Module::Generic::Array' ) )
-    {
-        $data->{ $field } = $process->( CORE::defined( $data->{ $field } ) ? $data->{ $field } : () );
-    }
-    return( $data->{ $field } );
-}
-
-sub _set_get_object_variant
-{
-    my $self  = shift( @_ );
-    my $field = shift( @_ );
-    ## The class precisely depends on what we find looking ahead
-    my $class = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    my $process = sub
-    {
-        if( ref( $_[0] ) eq 'HASH' )
-        {
-            my $o = $self->_instantiate_object( $field, $class, @_ );
-            return( $o );
-        }
-        ## An array of objects hash
-        elsif( ref( $_[0] ) eq 'ARRAY' )
-        {
-            my $arr = shift( @_ );
-            my $res = [];
-            foreach my $data ( @$arr )
-            {
-                my $o = $self->_instantiate_object( $field, $class, $data ) || return( $self->error( "Unable to create object: ", $self->error ) );
-                push( @$res, $o );
-            }
-            return( $res );
-        }
-    };
-    
-    if( @_ )
-    {
-        $data->{ $field } = $process->( @_ );
-    }
-    return( $data->{ $field } );
-}
-
-sub _set_get_scalar : lvalue
-{
-    my $self  = shift( @_ );
-    my $field = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    my $has_arg = 0;
-    my $arg;
-    if( want( qw( LVALUE ASSIGN ) ) )
-    {
-        ( $arg ) = want( 'ASSIGN' );
-        $has_arg = 'assign';
-    }
-    else
-    {
-        if( @_ )
-        {
-            $arg = ( @_ == 1 ) ? shift( @_ ) : join( '', @_ );
-            $has_arg++;
-        }
-    }
-
-    if( $has_arg )
-    {
-        my $val = $arg;
-        # Just in case, we force stringification
-        # $val = "$val" if( defined( $val ) );
-        if( ref( $val ) eq 'HASH' || ref( $val ) eq 'ARRAY' )
-        {
-            my $error = "Method $field takes only a scalar, but value provided ($val) is a reference";
-            if( $has_arg eq 'assign' )
-            {
-                $self->error( $error );
-                my $dummy = 'dummy';
-                return( $dummy );
-            }
-            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-            rreturn( $self->error( $error ) );
-        }
-        $data->{ $field } = $val;
-    }
-    return( $data->{ $field } ) if( want( 'LVALUE' ) );
-    rreturn( $data->{ $field } );
-}
-
-sub _set_get_scalar_as_object : lvalue
-{
-    my $self  = shift( @_ );
-    my $field = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    my $has_arg = 0;
-    my $arg;
-    if( want( qw( LVALUE ASSIGN ) ) )
-    {
-        ( $arg ) = want( 'ASSIGN' );
-        $has_arg = 'assign';
-    }
-    else
-    {
-        if( @_ )
-        {
-            $arg = shift( @_ );
-            $has_arg++;
-        }
-    }
-    
-    my $callbacks = {};
-    if( ref( $field ) eq 'HASH' )
-    {
-        my $def = $field;
-        $field = $def->{field};
-        $callbacks = $def->{callbacks};
-    }
-
-    if( $has_arg )
-    {
-        my $val;
-        # $self->message( 4, "Processing value provided '$arg' (", overload::StrVal( $arg ), ")." );
-        if( ref( $arg ) eq 'SCALAR' || 
-            UNIVERSAL::isa( $arg, 'SCALAR' ) )
-        {
-            $val = $$arg;
-        }
-        elsif( ref( $arg ) && 
-               $self->_is_object( $arg ) && 
-               overload::Overloaded( $arg ) && 
-               overload::Method( $arg, '""' ) )
-        {
-            # $self->message( 3, "Value provided is an overloaded object with stringification capability. Changing it into a plain string => '$arg'." );
-            $val = "$arg";
-        }
-        elsif( ref( $arg ) )
-        {
-            my $error = "I was expecting a string or a scalar reference, but instead got '$arg'";
-            if( $has_arg eq 'assign' )
-            {
-                $self->error( $error );
-                my $dummy = 'dummy';
-                return( $dummy );
-            }
-            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-            rreturn( $self->error( $error ) );
-        }
-        else
-        {
-            $val = $arg;
-        }
-        
-        my $o = $data->{ $field };
-        # $self->message( 3, "Value to use is '$val' and current object is '", ref( $o ), "'." );
-        if( ref( $o ) )
-        {
-            $o->set( $val );
-        }
-        else
-        {
-            $data->{ $field } = Module::Generic::Scalar->new( $val );
-            if( scalar( keys( %$callbacks ) ) && CORE::exists( $callbacks->{add} ) )
-            {
-                my $coderef = ref( $callbacks->{add} ) eq 'CODE' ? $callbacks->{add} : $self->can( $callbacks->{add} );
-                if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
-                {
-                    $coderef->( $self );
-                }
-            }
-        }
-        # $self->message( 3, "Object now is: '", ref( $data->{ $field } ), "'." );
-    }
-    
-    # $self->message( 3, "Checking if object '", ref( $data->{ $field } ), "' is set. Is it an object? ", $self->_is_object( $data->{ $field } ) ? 'yes' : 'no', " and its stringified value is '", $data->{ $field }, "'." );
-    if( !$self->_is_object( $data->{ $field } ) || ( $self->_is_object( $data->{ $field } ) && ref( $data->{ $field } ) ne ref( $self ) ) )
-    {
-        # $self->message( 3, "No object is set yet, initiating one." );
-        $data->{ $field } = Module::Generic::Scalar->new( $data->{ $field } );
-    }
-    my $v = $data->{ $field };
-    if( !$v->defined )
-    {
-        if( Want::want( 'OBJECT' ) )
-        {
-            # We might have need to specify, because I found a race condition where
-            # even though the context is object, once in Null, the context became 'code'
-            # return( Module::Generic::Null->new( wants => 'OBJECT' ) );
-            return( $v ) if( want( 'LVALUE' ) );
-            rreturn( $v );
-        }
-        else
-        {
-            return if( want( 'LVALUE' ) );
-            rreturn;
-        }
-    }
-    else
-    {
-        return( $v ) if( want( 'LVALUE' ) );
-        rreturn( $v );
-    }
-}
-
-sub _set_get_scalar_or_object
-{
-    my $self  = shift( @_ );
-    my $field = shift( @_ );
-    my $class = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    if( @_ )
-    {
-        if( ref( $_[0] ) eq 'HASH' || Scalar::Util::blessed( $_[0] ) )
-        {
-            return( $self->_set_get_object( $field, $class, @_ ) );
-        }
-        else
-        {
-            return( $self->_set_get_scalar( $field, @_ ) );
-        }
-    }
-    if( !$data->{ $field } && want( 'OBJECT' ) )
-    {
-        # $self->message( 3, "Called in a chain for field $field and class $class, but no object is set, reverting to dummy object." );
-        # $self->messagef( 3, "Expecting void? '%s'. Want scalar? '%s'. Want hash? '%s', wantref: '%s'", want('VOID'), want('SCALAR'), Want::want('HASH'), Want::wantref() );
-        my $null = Module::Generic::Null->new({ debug => $this->{debug}, has_error => 1 });
-        rreturn( $null );
-    }
-    return( $data->{ $field } );
-}
-
-sub _set_get_uri : lvalue
-{
-    my $self  = shift( @_ );
-    my $field = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    my $has_arg = 0;
-    my $arg;
-    if( want( qw( LVALUE ASSIGN ) ) )
-    {
-        ( $arg ) = want( 'ASSIGN' );
-        $has_arg = 'assign';
-    }
-    else
-    {
-        if( @_ )
-        {
-            $arg = shift( @_ );
-            $has_arg++;
-        }
-    }
-
-    my $uri_class = 'URI';
-    if( ref( $field ) eq 'HASH' )
-    {
-        my $def = $field;
-        $field = $def->{field} if( CORE::exists( $def->{field} ) && defined( $def->{field} ) && CORE::length( $def->{field} ) );
-        $uri_class = $def->{class} if( CORE::exists( $def->{class} ) && ref( $def->{class} ) eq 'HASH' );
-    }
-    
-    $self->_load_class( $uri_class ) || do
-    {
-        my $error = $self->error;
-        if( $has_arg eq 'assign' )
-        {
-            $self->error( $error );
-            my $dummy = 'dummy';
-            return( $dummy );
-        }
-        return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-        rreturn( $self->error( $error ) );
-    };
-    
-    if( $has_arg )
-    {
-        my $str = $arg;
-        if( Scalar::Util::blessed( $str ) && $str->isa( $uri_class ) )
-        {
-            $data->{ $field } = $str;
-        }
-        elsif( defined( $str ) && ( $str =~ /^[a-zA-Z]+:\/{2}/ || $str =~ /^urn\:[a-z]+\:/ || $str =~ /^[a-z]+\:/ ) )
-        {
-            $data->{ $field } = $uri_class->new( $str );
-            warn( "$uri_class subclass is missing to handle this specific URI '$str'\n" ) if( !$data->{ $field }->has_recognized_scheme );
-        }
-        # Is it an absolute path?
-        elsif( substr( $str, 0, 1 ) eq '/' )
-        {
-            $data->{ $field } = $uri_class->new( $str );
-        }
-        elsif( defined( $str ) )
-        {
-            try
-            {
-                die( "Cannot use a reference as an URI. Received '$str'" ) if( ref( $str ) && !$self->_is_object( $str ) );
-                my $u = $uri_class->new( $str );
-                $data->{ $field } = $u;
-            }
-            catch( $e )
-            {
-                my $error = "URI value provided '$str' does not look like an URI, so I do not know what to do with it: $e";
-                if( $has_arg eq 'assign' )
-                {
-                    $self->error( $error );
-                    my $dummy = 'dummy';
-                    return( $dummy );
-                }
-                return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-                rreturn( $self->error( $error ) );
-            }
-        }
-        else
-        {
-            $data->{ $field } = undef();
-        }
-    }
-    # Data was pre-set or directly set but is not an URI object, so we convert it now
-    if( $data->{ $field } && !$self->_is_a( $data->{ $field }, $uri_class ) )
-    {
-        # Force stringification if this is an overloaded value
-        $data->{ $field } = $uri_class->new( $data->{ $field } . '' );
-    }
-    return( $data->{ $field } ) if( want( 'LVALUE' ) );
-    rreturn( $data->{ $field } );
-}
-
-# Universally Unique Identifier
-sub _set_get_uuid : lvalue
-{
-    my $self = shift( @_ );
-    my $field = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    my $has_arg = 0;
-    my $arg;
-    if( want( qw( LVALUE ASSIGN ) ) )
-    {
-        ( $arg ) = want( 'ASSIGN' );
-        $has_arg = 'assign';
-    }
-    else
-    {
-        if( @_ )
-        {
-            $arg = shift( @_ );
-            $has_arg++;
-        }
-    }
-    if( $has_arg )
-    {
-        my $v = $arg;
-        # If the user wants to remove it
-        if( !defined( $v ) )
-        {
-            $data->{ $field } = $v;
-        }
-        # If the user provided a string, let's check it
-        elsif( length( $v ) && !$self->_is_uuid( $v ) )
-        {
-            my $error = "Value provided is not a valid uuid.";
-            if( $has_arg eq 'assign' )
-            {
-                $self->error( $error );
-                my $dummy = 'dummy';
-                return( $dummy );
-            }
-            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
-            rreturn( $self->error( $error ) );
-        }
-        $data->{ $field } = $self->new_scalar( $v );
-    }
-    my $v = $self->_is_a( $data->{ $field }, 'Module::Generic::Scalar' )
-        ? $data->{ $field }
-        : $self->new_scalar( $data->{ $field } );
-    if( !$v->defined )
-    {
-        if( Want::want( 'OBJECT' ) )
-        {
-            # We might have need to specify, because I found a race condition where
-            # even though the context is object, once in Null, the context became 'code'
-            return( Module::Generic::Null->new( wants => 'OBJECT' ) ) if( want( 'LVALUE' ) );
-            rreturn( Module::Generic::Null->new( wants => 'OBJECT' ) );
-        }
-        else
-        {
-            return if( want( 'LVALUE' ) );
-            rreturn;
-        }
-    }
-    else
-    {
-        return( $v ) if( want( 'LVALUE' ) );
-        rreturn( $v );
-    }
-}
-
-sub _to_array_object
-{
-    my $self = shift( @_ );
-    my $data = scalar( @_ ) == 1 && $self->_is_array( $_[0] ) 
-        ? shift( @_ ) 
-        : ( scalar( @_ ) == 0 || ( scalar( @_ ) == 1 && !defined( $_[0] ) ) )
-            ? [] 
-            : [ @_ ];
-    return( $self->new_array( $data ) );
-}
-
-sub _warnings_is_enabled
-{
-#     return( warnings::enabled( $_[0] ) );
-    return( 0 ) if( !defined( $warnings::Bits{ ref( $_[0] ) || $_[0] } ) );
-    return( warnings::enabled( ref( $_[0] ) || $_[0] ) );
-}
-
-sub __dbh
-{
-    my $self  = shift( @_ );
-    my $class = ref( $self ) || $self;
-    my $this  = $self->_obj2h;
-    no strict 'refs';
-    if( !$this->{__dbh} )
-    {
-        return( '' ) if( !${ "$class\::DB_DSN" } );
-        require DBI;
-        ## Connecting to database
-        my $db_opt = {};
-        $db_opt->{RaiseError} = ${ "$class\::DB_RAISE_ERROR" } if( length( ${ "$class\::DB_RAISE_ERROR" } ) );
-        $db_opt->{AutoCommit} = ${ "$class\::DB_AUTO_COMMIT" } if( length( ${ "$class\::DB_AUTO_COMMIT" } ) );
-        $db_opt->{PrintError} = ${ "$class\::DB_PRINT_ERROR" } if( length( ${ "$class\::DB_PRINT_ERROR" } ) );
-        $db_opt->{ShowErrorStatement} = ${ "$class\::DB_SHOW_ERROR_STATEMENT" } if( length( ${ "$class\::DB_SHOW_ERROR_STATEMENT" } ) );
-        $db_opt->{client_encoding} = ${ "$class\::DB_CLIENT_ENCODING" } if( length( ${ "$class\::DB_CLIENT_ENCODING" } ) );
-        my $dbh = DBI->connect_cached( ${ "$class\::DB_DSN" } ) ||
-        die( "Unable to connect to sql database with dsn '", ${ "$class\::DB_DSN" }, "'\n" );
-        $dbh->{pg_server_prepare} = 1 if( ${ "$class\::DB_SERVER_PREPARE" } );
-        $this->{__dbh} = $dbh;
-    }
-    return( $this->{__dbh} );
-}
-
-sub _autoload_subs
-{
-    $AUTOLOAD_SUBS = 
-    {
-    as_hash => <<'PERL',
-sub as_hash
-{
-    my $self = shift( @_ );
-    my $this = $self->_obj2h;
-    my $p = {};
-    $p = shift( @_ ) if( scalar( @_ ) == 1 && ref( $_[0] ) eq 'HASH' );
-    $p->{_seen} = {} if( !exists( $p->{_seen} ) || !ref( $p->{_seen} ) );
-    # $self->message( 3, "Parameters are: ", sub{ $self->dumper( $p ) } );
-    my $class = ref( $this );
-    no strict 'refs';
-    my @methods = grep( !/^(?:new|init)$/, grep{ defined &{"${class}::$_"} } keys( %{"${class}::"} ) );
-
-    $self->messagef( 3, "The following methods found in package $class: '%s'.", join( "', '", sort( @methods ) ) );
-    use strict 'refs';
-    my $ref = {};
-    my $added_subs = CORE::exists( $this->{_added_method} ) && ref( $this->{_added_method} ) eq 'HASH'
-        ? $this->{_added_method}
-        : {};
-    
-    my $check;
-    $check = sub
-    {
-        my $meth = shift( @_ );
-        my $rv   = shift( @_ );
-        no overloading;
-        $self->message( 3, "Value for method '$meth' is '$rv'." );
-        use overloading;
-        if( $p->{json} && ( ref( $rv ) eq 'JSON::PP::Boolean' || ref( $rv ) eq 'Module::Generic::Boolean' || ref( $rv ) eq 'Class::Boolean' ) )
-        {
-            # $self->message( 3, "Encoding boolean to true or false for method '$meth'." );
-            # $ref->{ $meth } = Module::Generic::Boolean::TO_JSON( $ref->{ $meth } );
-            return( Module::Generic::Boolean::TO_JSON( $ref->{ $meth } ) );
-        }
-        elsif( $self->_is_object( $rv ) )
-        {
-            # Order of the checks here matter
-            if( $rv->can( 'as_hash' ) && overload::Overloaded( $rv ) && overload::Method( $rv, '""' ) )
-            {
-                $rv = $rv . '';
-                return( $rv );
-            }
-            elsif( $rv->can( 'as_hash' ) )
-            {
-                $self->message( 3, "$rv is an object (", ref( $rv ), ") capable of as_hash, calling it." );
-                if( !$p->{_seen}->{ Scalar::Util::refaddr( $rv ) } )
-                {
-                    $p->{_seen}->{ Scalar::Util::refaddr( $rv ) }++;
-                    $rv = $rv->as_hash( $p );
-                    $self->message( 4, "returned value is '$rv' -> ", sub{ $self->dump( $rv ) });
-                    if( Scalar::Util::blessed( $rv ) )
-                    {
-                        return( $check->( $meth => $rv ) );
-                    }
-                    else
-                    {
-                        return( $rv );
-                    }
-                }
-                else
-                {
-                    return;
-                }
-            }
-            # If the object can be overloaded, and has no TO_JSON method we get its string representation here.
-            # If it has a TO_JSON and we are asked to return data for json, we let the JSON module call the TO_JSON method
-            elsif( overload::Overloaded( $rv ) && overload::Method( $rv, '""' ) )
-            {
-                $rv = "$rv" unless( $p->{json} && $rv->can( 'TO_JSON' ) );
-                return( $rv );
-            }
-        }
-        else
-        {
-            return( $rv );
-        }
-    };
-    
-    foreach my $meth ( sort( @methods ) )
-    {
-        next if( substr( $meth, 0, 1 ) eq '_' );
-        next if( CORE::exists( $added_subs->{ $meth } ) );
-        my $rv = eval{ $self->$meth };
-        if( $@ )
-        {
-            warn( "An error occured while accessing method $meth: $@\n" );
-            next;
-        }
-        $rv = $check->( $meth => $rv );
-        next if( !defined( $rv ) );
-        
-        # $self->message( 3, "Checking field '$meth' with value '$rv'." );
-        
-        if( ref( $rv ) eq 'HASH' )
-        {
-            $ref->{ $meth } = $rv if( scalar( keys( %$rv ) ) );
-        }
-        # If method call returned an array, like array of string or array of object such as in data from Net::API::Stripe::List
-        elsif( ref( $rv ) eq 'ARRAY' )
-        {
-            my $arr = [];
-            foreach my $this_ref ( @$rv )
-            {
-                # my $that_ref = ( $self->_is_object( $this_ref ) && $this_ref->can( 'as_hash' ) ) ? $this_ref->as_hash : $this_ref;
-                my $that_ref;
-                if( $self->_is_object( $this_ref ) && $this_ref->can( 'as_hash' ) )
-                {
-                    if( !$p->{_seen}->{ Scalar::Util::refaddr( $this_ref ) } )
-                    {
-                        $p->{_seen}->{ Scalar::Util::refaddr( $this_ref ) }++;
-                        $that_ref = $this_ref->as_hash( $p );
-                    }
-                }
-                else
-                {
-                    $that_ref = $this_ref;
-                }
-                CORE::push( @$arr, $that_ref );
-            }
-            $ref->{ $meth } = $arr if( scalar( @$arr ) );
-        }
-        elsif( !ref( $rv ) )
-        {
-            $ref->{ $meth } = $rv if( CORE::length( $rv ) );
-        }
-        elsif( CORE::length( "$rv" ) )
-        {
-            $self->message( 3, "Adding value '$rv' to field '$meth' in hash \$ref" );
-            $ref->{ $meth } = $rv;
-        }
-    }
-    return( $ref );
-}
-PERL
-    clear => <<'PERL',
-sub clear
-{
-    return( shift->clear_error );
-}
-PERL
-    clear_error => <<'PERL',
-sub clear_error
-{
-    my $self  = shift( @_ );
-    my $class = ref( $self ) || $self;
-    my $this  = $self->_obj2h;
-    no strict 'refs';
-    $this->{error} = ${ "$class\::ERROR" } = '';
-    return( $self );
-}
-PERL
-    clone => <<'PERL',
-sub clone
-{
-    my $self  = shift( @_ );
-    try
-    {
-        # $self->message( 3, "Cloning object '", overload::StrVal( $self ), "'." );
-        return( Clone::clone( $self ) );
-    }
-    catch( $e )
-    {
-        return( $self->error( "Error cloning object \"", overload::StrVal( $self ), "\": $e" ) );
-    }
-}
-PERL
-    colour_close => <<'PERL',
-sub colour_close { return( shift->_set_get( 'colour_close', @_ ) ); }
-PERL
-    colour_closest => <<'PERL',
-sub colour_closest
-{
-    my $self    = shift( @_ );
-    my $colour  = uc( shift( @_ ) );
-    my $this  = $self->_obj2h;
-    my $colours = 
-    {
-    '000000000' => 'black',
-    '000000255' => 'blue',
-    '000255000' => 'green',
-    '000255255' => 'cyan',
-    '255000000' => 'red',
-    '255000255' => 'magenta',
-    '255255000' => 'yellow',
-    '255255255' => 'white',
-    };
-    my( $red, $green, $blue ) = ( '', '', '' );
-    our $COLOUR_NAME_TO_RGB;
-    if( $colour =~ /^[A-Z]+([A-Z\s]+)*$/ )
-    {
-        $self->message( 9, "Checking colour '$colour' as string. Looking up its rgb value." );
-        if( !scalar( keys( %$COLOUR_NAME_TO_RGB ) ) )
-        {
-            $self->message( 9, "Processing colour map in <DATA> section." );
-            my $colour_data = $self->__colour_data;
-            $COLOUR_NAME_TO_RGB = eval( $colour_data );
-            if( $@ )
-            {
-                return( $self->error( "An error occurred loading data from __colour_data: $@" ) );
-            }
-        }
-        if( CORE::exists( $COLOUR_NAME_TO_RGB->{ lc( $colour ) } ) )
-        {
-            ( $red, $green, $blue ) = @{$COLOUR_NAME_TO_RGB->{ lc( $colour ) }};
-        }
-    }
-    # Colour all in decimal??
-    elsif( $colour =~ /^\d{9}$/ )
-    {
-        # $self->message( 3, "Got colour all in decimal. Less work to do..." );
-        $red   = substr( $colour, 0, 3 );
-        $green = substr( $colour, 3, 3 );
-        $blue  = substr( $colour, 6, 3 );
-    }
-    # Colour in hexadecimal, convert it
-    elsif( $colour =~ /^[A-F0-9]+$/ )
-    {
-        $red   = hex( substr( $colour, 0, 2 ) );
-        $green = hex( substr( $colour, 2, 2 ) );
-        $blue  = hex( substr( $colour, 4, 2 ) );
-    }
-    # Clueless
-    else
-    {
-        # Not undef, but rather empty string. Undef is associated with an error
-        return( '' );
-    }
-    my $dec_colour = CORE::sprintf( '%3d%3d%3d', $red, $green, $blue );
-    my $last = '';
-    my @colours = reverse( sort( keys( %$colours ) ) );
-    $red    = CORE::sprintf( '%03d', $red );
-    $green  = CORE::sprintf( '%03d', $green );
-    $blue   = CORE::sprintf( '%03d', $blue );
-    my $cur = CORE::sprintf( '%03d%03d%03d', $red, $green, $blue );
-    my( $red_ok, $green_ok, $blue_ok ) = ( 0, 0, 0 );
-    # $self->message( 3, "Current colour: '$cur'." );
-    for( my $i = 0; $i < scalar( @colours ); $i++ )
-    {
-        my $r = CORE::sprintf( '%03d', substr( $colours[ $i ], 0, 3 ) );
-        my $g = CORE::sprintf( '%03d', substr( $colours[ $i ], 3, 3 ) );
-        my $b = CORE::sprintf( '%03d', substr( $colours[ $i ], 6, 3 ) );
- 
-        my $r_p = CORE::sprintf( '%03d', substr( $colours[ $i - 1 ], 0, 3 ) );
-        my $g_p = CORE::sprintf( '%03d', substr( $colours[ $i - 1 ], 3, 3 ) );
-        my $b_p = CORE::sprintf( '%03d', substr( $colours[ $i - 1 ], 6, 3 ) );
- 
-        # $self->message( 3, "$r ($red), $g ($green), $b ($blue)" );
-        if( $red == $r ||
-            ( $red < $r && $red > int( $r / 2 ) ) ||
-            ( $red > $r && $red < int( $r_p / 2 ) && $r_p ) ||
-            $red > $r )
-        {
-            $red_ok++;
-        }
- 
-        if( $red_ok )
-        {
-            if( $green == $g ||
-                ( $green < $g && $green > int( $g / 2 ) ) ||
-                ( $green > $g && $green < int( $g_p / 2 ) && $g_p ) ||
-                $green > $g )
-            {
-                $blue_ok++;
-            }
-        } 
- 
-        if( $blue_ok )
-        {
-            if( $blue == $b ||
-                ( $blue < $b && $blue > int( $b / 2 ) ) ||
-                ( $blue > $b && $blue < int( $b_p / 2 ) && $b_p ) ||
-                $blue > $b )
-            {
-                $last = $colours[ $i ];
-                last;
-            }
-        }
-    }
-    return( $colours->{ $last } );
-}
-PERL
-    colour_format => <<'PERL',
-sub colour_format
-{
-    my $self = shift( @_ );
-    # style, colour or color and text
-    my $opts = shift( @_ );
-    return( $self->error( "Parameter hash provided is not an hash reference." ) ) if( !$self->_is_hash( $opts ) );
-    my $this = $self->_obj2h;
-    # To make it possible to use either text or message property
-    $opts->{text} = CORE::delete( $opts->{message} ) if( CORE::length( $opts->{message} ) && !CORE::length( $opts->{text} ) );
-    return( $self->error( "No text was provided to format." ) ) if( !CORE::length( $opts->{text} ) );
-    
-    $opts->{colour} //= CORE::delete( $opts->{color} ) || CORE::delete( $opts->{fg_colour} ) || CORE::delete( $opts->{fg_color} ) || CORE::delete( $opts->{fgcolour} ) || CORE::delete( $opts->{fgcolor} );
-    $opts->{bgcolour} //= CORE::delete( $opts->{bgcolor} ) || CORE::delete( $opts->{bg_colour} ) || CORE::delete( $opts->{bg_color} );
-    
-    my $bold      = "\e[1m";
-    my $underline = "\e[4m";
-    my $reverse   = "\e[7m";
-    my $normal    = "\e[m";
-    my $cls       = "\e[H\e[2J";
-    my $styles =
-    {
-    # Bold
-    b       => 1,
-    bold    => 1,
-    strong  => 1,
-    # Italic
-    i       => 3,
-    italic  => 3,
-    # Underline
-    u       => 4,
-    underline => 4,
-    underlined => 4,
-    blink   => 5,
-    # Reverse
-    r       => 7,
-    reverse => 7,
-    reversed => 7,
-    # Concealed
-    c       => 8,
-    conceal => 8,
-    concealed => 8,
-    strike  => 9,
-    striked  => 9,
-    striken  => 9,
-    };
-    
-    my $convert_24_To_8bits = sub
-    {
-        my( $r, $g, $b ) = @_;
-        $self->message( 9, "Converting $r, $g, $b to 8 bits" );
-        return( ( POSIX::floor( $r * 7 / 255 ) << 5 ) +
-                ( POSIX::floor( $g * 7 / 255 ) << 2 ) +
-                ( POSIX::floor( $b * 3 / 255 ) ) 
-              );
-    };
-    
-    # opacity * original + (1-opacity)*background = resulting pixel
-    # https://stackoverflow.com/a/746934/4814971
-    my $colour_with_alpha = sub
-    {
-        my( $r, $g, $b, $a, $bg ) = @_;
-        ## Assuming a white background (255)
-        my( $bg_r, $bg_g, $bg_b ) = ( 255, 255, 255 );
-        if( ref( $bg ) eq 'HASH' )
-        {
-            ( $bg_r, $bg_g, $bg_b ) = @$bg{qw( red green blue )};
-        }
-        $r = POSIX::round( ( $a * $r ) + ( ( 1 - $a ) * $bg_r ) );
-        $g = POSIX::round( ( $a * $g ) + ( ( 1 - $a ) * $bg_g ) );
-        $b = POSIX::round( ( $a * $b ) + ( ( 1 - $a ) * $bg_b ) );
-        return( [$r, $g, $b] );
-    };
-    
-    my $check_colour = sub
-    {
-        my $col = shift( @_ );
-        # $self->message( 3, "Checking colour '$col'." );
-        # $colours or $bg_colours
-        my $map = shift( @_ );
-        my $code;
-        my $light;
-        # Example: 'light red' or 'light_red'
-        if( $col =~ /^(?:(?<light>bright|light)[[:blank:]\_]+)?
-        (?<colour>
-            (?:[a-zA-Z]+)(?:[[:blank:]]+\w+)?
-            |
-            (?<rgb_type>rgb[a]?)\([[:blank:]]*(?<red>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<green>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<blue>\d{1,3})
-            (?:[[:blank:]]*\,[[:blank:]]*(?<opacity>\d(?:\.\d+)?))?[[:blank:]]*
-            \)
-        )$/xi )
-        {
-            my %regexp = %+;
-            $self->message( 9, "Light colour request '$col'. Capture: ", sub{ $self->dumper( \%regexp ) } );
-            ( $light, $col ) = ( $+{light}, $+{colour} );
-            if( CORE::length( $+{rgb_type} ) &&
-                CORE::length( $+{red} ) &&
-                CORE::length( $+{green} ) &&
-                CORE::length( $+{blue} ) )
-            {
-                if( $+{opacity} || $light )
-                {
-                    my $opacity = CORE::length( $+{opacity} )
-                        ? $+{opacity}
-                        : $light
-                            ? 0.5
-                            : 1;
-                    $col = CORE::sprintf( 'rgba(%03d%03d%03d,%.1f)', $+{red}, $+{green}, $+{blue}, $opacity );
-                }
-                else
-                {
-                    $col = CORE::sprintf( 'rgb(%03d%03d%03d)', $+{red}, $+{green}, $+{blue} );
-                }
-            }
-            else
-            {
-                $self->message( 9, "Colour '$col' is not rgb[a]" );
-            }
-        }
-        elsif( $col =~ /^(?<rgb_type>rgb[a]?)\([[:blank:]]*(?<red>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<green>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<blue>\d{1,3})[[:blank:]]*(?:\,[[:blank:]]*(?<opacity>\d(?:\.\d+)?))?[[:blank:]]*\)$/i )
-        {
-            if( $+{opacity} )
-            {
-                $col = CORE::sprintf( 'rgba(%03d%03d%03d,%.1f)', $+{red}, $+{green}, $+{blue}, $+{opacity} );
-            }
-            else
-            {
-                $col = CORE::sprintf( '%03d%03d%03d', $+{red}, $+{green}, $+{blue} );
-            }
-        }
-        else
-        {
-            $self->message( 9, "Colour '$col' failed to match our rgba regexp." );
-        }
-        
-        my $col_ref;
-        if( $col =~ /^rgb[a]?\((?<red>\d{3})(?<green>\d{3})(?<blue>\d{3})\)$/i )
-        {
-            $col_ref = {};
-            %$col_ref = %+;
-            $self->message( 9, "Rgb colour '$+{red}', '$+{green}' and '$+{blue}' found: ", sub{ $self->dumper( $col_ref ) });
-            return({
-                _24bits => [@$col_ref{qw( red green blue )}],
-                _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
-            });
-        }
-        # Treating opacity to make things lighter; not ideal, but standard scheme
-        elsif( $col =~ /^rgba\((?<red>\d{3})(?<green>\d{3})(?<blue>\d{3})[[:blank:]]*\,[[:blank:]]*(?<opacity>\d(?:\.\d)?)\)$/i )
-        {
-            $col_ref = {};
-            %$col_ref = %+;
-            $self->message( 9, "Rgba colour '$+{red}', '$+{green}' and '$+{blue}' found with opacity $+{opacity}: ", sub{ $self->dumper( $col_ref ) });
-            if( $+{opacity} )
-            {
-                my $opacity = $+{opacity};
-                $self->message( 9, "Opacity of $opacity found, applying the factor to the colour." );
-                my $bg;
-                if( $opts->{bgcolour} )
-                {
-                    $bg = $self->colour_to_rgb( $opts->{bgcolour} );
-                    $self->message( 9, "Calculating new rgb with opacity and background information: ", sub{ $self->dumper( $bg ) });
-                }
-                my $new_col = $colour_with_alpha->( @$col_ref{qw( red green blue )}, $opacity, $bg );
-                $self->message( 9, "New colour with opacity applied: ", sub{ $self->dumper( $new_col ) });
-                @$col_ref{qw( red green blue )} = @$new_col;
-                $self->message( 9, "Colour $+{red}, $+{green}, $+{blue} * $opacity => $col_ref->{red}, $col_ref->{green}, $col_ref->{blue}" );
-            }
-            return({
-                _24bits => [@$col_ref{qw( red green blue )}],
-                _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
-            });
-        }
-        elsif( $self->message( 9, "Checking if rgb value exists for colour '$col'" ) &&
-               ( $col_ref = $self->colour_to_rgb( $col ) ) )
-        {
-            $self->message( 9, "Setting up colour '$col' with data: ", sub{ $self->dumper( $col_ref ) });
-            # $code = $map->{ $col };
-            return({
-                _24bits => [@$col_ref{qw( red green blue )}],
-                _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
-            });
-        }
-        else
-        {
-            $self->message( 9, "Could not find a match for colour '$col'." );
-            return( {} );
-        }
-#         my $is_bg = ( CORE::substr( $code, 0, 1 ) == 4 );
-#         if( CORE::length( $code ) && $light )
-#         {
-#             ## If the colour is a background colour, replace 4 by 10 (e.g.: 42 becomes 103)
-#             ## and if foreground colour, replace 3 by 9
-#             CORE::substr( $code, 0, 1 ) = ( $is_bg ? 10 : 9 );
-#         }
-#         return( $code );
-    };
-    my $data = [];
-    my $data8 = [];
-    my $params = [];
-    # 8 bits parameters compatible
-    my $params8 = [];
-    if( $opts->{colour} || $opts->{color} || $opts->{fgcolour} || $opts->{fgcolor} || $opts->{fg_colour} || $opts->{fg_color} )
-    {
-        $opts->{colour} ||= CORE::delete( $opts->{color} ) || CORE::delete( $opts->{fg_colour} ) || CORE::delete( $opts->{fg_color} ) || CORE::delete( $opts->{fgcolour} ) || CORE::delete( $opts->{fgcolor} );
-        # my $col_ref = $check_colour->( $opts->{colour}, $colours );
-        my $col_ref = $check_colour->( $opts->{colour} );
-        # CORE::push( @$params, $col ) if( CORE::length( $col ) );
-        if( scalar( keys( %$col_ref ) ) )
-        {
-            $self->message( 9, "Foreground colour '$opts->{colour}' data are: ", sub{ $self->dumper( $col_ref ) });
-            CORE::push( @$params8, sprintf( '38;5;%d', $col_ref->{_8bits} ) );
-            CORE::push( @$params, sprintf( '38;2;%d;%d;%d', @{$col_ref->{_24bits}} ) );
-        }
-        else
-        {
-            $self->message( 9, "Could not resolve the foreground colour '$opts->{colour}'." );
-        }
-    }
-    if( $opts->{bgcolour} || $opts->{bgcolor} || $opts->{bg_colour} || $opts->{bg_color} )
-    {
-        $opts->{bgcolour} ||= CORE::delete( $opts->{bgcolor} ) || CORE::delete( $opts->{bg_colour} ) || CORE::delete( $opts->{bg_color} );
-        # my $col_ref = $check_colour->( $opts->{bgcolour}, $bg_colours );
-        my $col_ref = $check_colour->( $opts->{bgcolour} );
-        ## CORE::push( @$params, $col ) if( CORE::length( $col ) );
-        if( scalar( keys( %$col_ref ) ) )
-        {
-            $self->message( 9, "Foreground colour '$opts->{bgcolour}' data are: ", sub{ $self->dumper( $col_ref ) });
-            CORE::push( @$params8, sprintf( '48;5;%d', $col_ref->{_8bits} ) );
-            CORE::push( @$params, sprintf( '48;2;%d;%d;%d', @{$col_ref->{_24bits}} ) );
-        }
-        else
-        {
-            $self->message( 9, "Could not resolve the background colour '$opts->{colour}'." );
-        }
-    }
-    if( $opts->{style} )
-    {
-        # $self->message( 9, "Style '$opts->{style}' provided." );
-        my $those_styles = [CORE::split( /\|/, $opts->{style} )];
-        # $self->message( 9, "Split styles: ", sub{ $self->dumper( $those_styles ) } );
-        foreach my $s ( @$those_styles )
-        {
-            # $self->message( 9, "Adding style '$s'" ) if( CORE::exists( $styles->{lc($s)} ) );
-            if( CORE::exists( $styles->{lc($s)} ) )
-            {
-                CORE::push( @$params, $styles->{lc($s)} );
-                # We add the 8 bits compliant version only if any colour was provided, i.e.
-                # This is not just a style definition
-                CORE::push( @$params8, $styles->{lc($s)} ) if( scalar( @$params8 ) );
-            }
-        }
-    }
-    CORE::push( @$data, "\e[" . CORE::join( ';', @$params8 ) . "m" ) if( scalar( @$params8 ) );
-    CORE::push( @$data, "\e[" . CORE::join( ';', @$params ) . "m" ) if( scalar( @$params ) );
-    $self->message( 9, "Pre final colour data contains: ", sub{ $self->dumper( $data ) });
-    # If the text contains libe breaks, we must stop the formatting before, or else there would be an ugly formatting on the entire screen following the line break
-    if( scalar( @$params ) && $opts->{text} =~ /\n+/ )
-    {
-        my $text_parts = [CORE::split( /\n/, $opts->{text} )];
-        my $fmt = CORE::join( '', @$data );
-        my $fmt8 = CORE::join( '', @$data8 );
-        for( my $i = 0; $i < scalar( @$text_parts ); $i++ )
-        {
-            # Empty due to \n repeated
-            next if( !CORE::length( $text_parts->[$i] ) );
-            $text_parts->[$i] = $fmt . $text_parts->[$i] . $normal;
-        }
-        $opts->{text} = CORE::join( "\n", @$text_parts );
-        CORE::push( @$data, $opts->{text} );
-    }
-    else
-    {
-        CORE::push( @$data, $opts->{text} );
-        CORE::push( @$data, $normal, $normal ) if( scalar( @$params ) );
-    }
-    ## $self->message( "Returning '", quotemeta( CORE::join( '', @$data ) ), "'" );
-    return( CORE::join( '', @$data ) );
-}
-PERL
-    colour_open => <<'PERL',
-sub colour_open { return( shift->_set_get( 'colour_open', @_ ) ); }
-PERL
-    colour_parse => <<'PERL',
-sub colour_parse
-{
-    my $self = shift( @_ );
-    my $txt  = join( '', @_ );
-    my $this  = $self->_obj2h;
-    my $open  = $this->{colour_open} || COLOUR_OPEN;
-    my $close = $this->{colour_close} || COLOUR_CLOSE;
-    no strict;
-    my $re = qr/
-(?<all>
-\Q$open\E(?!\/)(?<params>.*?)\Q$close\E
-    (?<content>
-        (?:
-            (?> [^$open$close]+ )
-            |
-            (?R)
-        )*+
-    )
-\Q$open\E\/\Q$close\E
-)
-    /x;
-    my $colour_re = qr/(?:(?:bright|light)[[:blank:]])?(?:[a-zA-Z]+(?:[[:blank:]]+[\w\-]+)?|rgb[a]?\([[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*(?:\,[[:blank:]]*\d(?:\.\d)?)?[[:blank:]]*\))/;
-    my $style_re = qr/(?:bold|faint|italic|underline|blink|reverse|conceal|strike)/;
-    my $parse;
-    $parse = sub
-    {
-        my $str = shift( @_ );
-        # $self->message( 9, "Parsing coloured text '$str'" );
-        $str =~ s{$re}
-        {
-            my $re = { %- };
-            my $catch = substr( $str, $-[0], $+[0] - $-[0] );
-            ## $self->message( 9, "Regexp is: ", sub{ $self->dump( $re ) } );
-            my $all = $+{all};
-            my $ct = $+{content};
-            my $params = $+{params};
-            if( index( $ct, $open ) != -1 && index( $ct, $close ) != -1 )
-            {
-                $ct = $parse->( $ct );
-            }
-            my $def = {};
-            if( $params =~ /^[[:blank:]]*(?:(?<style1>$style_re)[[:blank:]]+)?(?<fg_colour>$colour_re)(?:[[:blank:]]+(?<style2>$style_re))?(?:[[:blank:]]+on[[:blank:]]+(?<bg_colour>$colour_re))?[[:blank:]]*$/i )
-            {
-                my $style = $+{style1} || $+{style2};
-                my $fg = $+{fg_colour};
-                my $bg = $+{bg_colour};
-                # $self->message( 9, "Found style '$style', colour '$fg' and background colour '$bg'." );
-                $def = 
-                {
-                style => $style,
-                colour => $fg,
-                bg_colour => $bg,
-                };
-            }
-            else
-            {
-                # $self->message( 9, "Evaluating the styling '$params'." );
-                local $SIG{__WARN__} = sub{};
-                local $SIG{__DIE__} = sub{};
-                my @res = eval( $params );
-                # $self->message( 9, "Evaluation result is: ", sub{ $self->dump( [ @res ] ) } );
-                $def = { @res } if( scalar( @res ) && !( scalar( @res ) % 2 ) );
-                if( $@ || ref( $def ) ne 'HASH' )
-                {
-                    my $err = $@ || "Invalid styling \"${params}\"";
-                    $self->message( 9, "Error evaluating: $err" );
-                    $def = {};
-                }
-            }
-            if( scalar( keys( %$def ) ) )
-            {
-                $def->{text} = $ct;
-                $self->message( 9, "Calling colour_parse with parameters: ", sub{ $self->dump( $def )} );
-                my $res = $self->colour_format( $def );
-                length( $res ) ? $res : $catch;
-            }
-            else
-            {
-                $self->message( 9, "Returning '$catch'" );
-                $catch;
-            }
-        }gex;
-        return( $str );
-    };
-    return( $parse->( $txt ) );
-}
-PERL
-    colour_to_rgb => <<'PERL',
-sub colour_to_rgb
-{
-    my $self    = shift( @_ );
-    my $colour  = lc( shift( @_ ) );
-    my $this  = $self->_obj2h;
-    my( $red, $green, $blue ) = ( '', '', '' );
-    our $COLOUR_NAME_TO_RGB;
-    $self->message( 9, "Checking rgb value for '$colour'. Called from line ", (caller)[2] );
-    if( $colour =~ /^[A-Za-z]+([\w\-]+)*([[:blank:]]+\w+)?$/ )
-    {
-        $self->message( 9, "Checking colour '$colour' as string. Looking up its rgb value." );
-        if( !scalar( keys( %$COLOUR_NAME_TO_RGB ) ) )
-        {
-            $self->message( 9, "Processing colour map in <DATA> section." );
-            my $colour_data = $self->__colour_data;
-            $COLOUR_NAME_TO_RGB = eval( $colour_data );
-            if( $@ )
-            {
-                return( $self->error( "An error occurred loading data from __colour_data: $@" ) );
-            }
-        }
-        if( CORE::exists( $COLOUR_NAME_TO_RGB->{ $colour } ) )
-        {
-            ( $red, $green, $blue ) = @{$COLOUR_NAME_TO_RGB->{ $colour }};
-            $self->message( 9, "Found rgb '$red, $green, $blue' for colour '$colour'." );
-        }
-        else
-        {
-            $self->message( 9, "Could not find colour '$colour' in our colour map." );
-            return( '' );
-        }
-    }
-    ## Colour all in decimal??
-    elsif( $colour =~ /^\d{9}$/ )
-    {
-        ## $self->message( 9, "Got colour all in decimal. Less work to do..." );
-        $red   = substr( $colour, 0, 3 );
-        $green = substr( $colour, 3, 3 );
-        $blue  = substr( $colour, 6, 3 );
-    }
-    ## Colour in hexadecimal, convert it
-    elsif( $colour =~ /^[A-F0-9]+$/ )
-    {
-        $red   = hex( substr( $colour, 0, 2 ) );
-        $green = hex( substr( $colour, 2, 2 ) );
-        $blue  = hex( substr( $colour, 4, 2 ) );
-    }
-    ## Clueless
-    else
-    {
-        $self->message( 9, "Clueless about what to do with colour '$colour'." );
-        ## Not undef, but rather empty string. Undef is associated with an error
-        return( '' );
-    }
-    return({ red => $red, green => $green, blue => $blue });
-}
-PERL
-    coloured => <<'PERL',
-sub coloured
-{
-    my $self = shift( @_ );
-    my $pref = shift( @_ );
-    my $text = CORE::join( '', @_ );
-    my $this  = $self->_obj2h;
-    my( $style, $fg, $bg );
-    ## my $colour_re = qr/(?:(?:bright|light)[[:blank:]])?[a-zA-Z]+/;
-    my $colour_re = qr/(?:(?:bright|light)[[:blank:]])?(?:[a-zA-Z]+(?:[[:blank:]]+[\w\-]+)?|rgb[a]?\([[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*(?:\,[[:blank:]]*\d(?:\.\d)?)?[[:blank:]]*\))/;
-    my $style_re = qr/(?:bold|faint|italic|underline|blink|reverse|conceal|strike)/;
-    if( $pref =~ /^(?:(?<style1>$style_re)[[:blank:]]+)?(?<fg_colour>$colour_re)(?:[[:blank:]]+(?<style2>$style_re))?(?:[[:blank:]]+on[[:blank:]]+(?<bg_colour>$colour_re))?$/i )
-    {
-        $style = $+{style1} || $+{style2};
-        $fg = $+{fg_colour};
-        $bg = $+{bg_colour};
-        ## $self->message( 9, "Found style '$style', colour '$fg' and background colour '$bg'." );
-        return( $self->colour_format({ text => $text, style => $style, colour => $fg, bg_colour => $bg }) );
-    }
-    else
-    {
-        $self->message( 9, "No match." );
-        return( '' );
-    }
-}
-PERL
-    dump_hex => <<'PERL',
-sub dump_hex
-{
-    my $self = shift( @_ );
-    try
-    {
-        require Devel::Hexdump;
-        return( Devel::Hexdump::xd( shift( @_ ) ) );
-    }
-    catch( $e )
-    {
-        return( $self->error( "Devel::Hexdump is not installed on your system." ) );
-    }
-}
-PERL
-    dump_print => <<'PERL',
-# For backward compatibility and traceability
-sub dump_print { return( shift->dumpto_printer( @_ ) ); }
-PERL
-    dumper => <<'PERL',
-sub dumper
-{
-    my $self = shift( @_ );
-    my $opts = {};
-    $opts = pop( @_ ) if( scalar( @_ ) > 1 && ref( $_[-1] ) eq 'HASH' );
-    try
-    {
-        no warnings 'once';
-        require Data::Dumper;
-        # local $Data::Dumper::Sortkeys = 1;
-        local $Data::Dumper::Terse = 1;
-        local $Data::Dumper::Indent = 1;
-        local $Data::Dumper::Useqq = 1;
-        local $Data::Dumper::Maxdepth = $opts->{depth} if( CORE::length( $opts->{depth} ) );
-        local $Data::Dumper::Sortkeys = sub
-        {
-            my $h = shift( @_ );
-            return( [ sort( grep{ ref( $h->{ $_ } ) !~ /^(DateTime|DateTime\:\:)/ } keys( %$h ) ) ] );
-        };
-        return( Data::Dumper::Dumper( @_ ) );
-    }
-    catch( $e )
-    {
-        return( $self->error( "Data::Dumper is not installed on your system." ) );
-    }
-}
-PERL
-    dumpto_printer => <<'PERL',
-sub dumpto_printer
-{
-    my $self  = shift( @_ );
-    my( $data, $file ) = @_;
-    $file = Module::Generic::File::file( $file );
-    my $fh =  $file->open( '>', { binmode => 'utf-8', autoflush => 1 }) || 
-        die( "Unable to create file '$file': $!\n" );
-    $fh->print( Data::Dump::dump( $data ), "\n" );
-    $fh->close;
-    # 666 so it can work under command line and web alike
-    chmod( 0666, $file );
-    return(1);
-}
-PERL
-    dumpto_dumper => <<'PERL',
-sub dumpto_dumper
-{
-    my $self  = shift( @_ );
-    my( $data, $file ) = @_;
-    try
-    {
-        require Data::Dumper;
-        local $Data::Dumper::Sortkeys = 1;
-        local $Data::Dumper::Terse = 1;
-        local $Data::Dumper::Indent = 1;
-        local $Data::Dumper::Useqq = 1;
-        $file = Module::Generic::File::file( $file );
-        my $fh =  $file->open( '>', { autoflush => 1 }) || 
-            die( "Unable to create file '$file': $!\n" );
-        if( ref( $data ) )
-        {
-            $fh->print( Data::Dumper::Dumper( $data ), "\n" );
-        }
-        else
-        {
-            $fh->binmode( ':utf8' );
-            $fh->print( $data );
-        }
-        $fh->close;
-        ## 666 so it can work under command line and web alike
-        chmod( 0666, $file );
-        return(1);
-    }
-    catch( $e )
-    {
-        return( $self->error( "Unable to dump data to \"$file\" using Data::Dumper: $e" ) );
-    }
-}
-PERL
-    errno => <<'PERL',
-sub errno
-{
-    my $self = shift( @_ );
-    my $this = $self->_obj2h;
-    if( @_ )
-    {
-        $this->{errno} = shift( @_ ) if( $_[ 0 ] =~ /^\-?\d+$/ );
-        return( $self->error( @_ ) ) if( @_ );
-    }
-    return( $this->{errno} );
-}
-PERL
-    message_colour => <<'PERL',
-sub message_colour
-{
-    my $self  = shift( @_ );
-    my $class = ref( $self ) || $self;
-    my $this  = $self->_obj2h;
-    no strict 'refs';
-    if( $this->{verbose} || $this->{debug} || ${ $class . '::DEBUG' } )
-    {
-        my $level = ( $_[0] =~ /^\d+$/ ? shift( @_ ) : undef() );
-        my $opts = {};
-        if( scalar( @_ ) > 1 && ref( $_[-1] ) eq 'HASH' && ( CORE::exists( $_[-1]->{level} ) || CORE::exists( $_[-1]->{type} ) || CORE::exists( $_[-1]->{message} ) ) )
-        {
-            $opts = pop( @_ );
-        }
-        my $ref = [@_];
-        $level = $opts->{level} if( !defined( $level ) && CORE::exists( $opts->{level} ) );
-        my $txt;
-        if( $opts->{message} )
-        {
-            if( ref( $opts->{message} ) eq 'ARRAY' )
-            {
-                $txt = join( '', map( ( ref( $_ ) eq 'CODE' && !$this->{_msg_no_exec_sub} ) ? $_->() : $_, @{$opts->{message}} ) );
-            }
-            else
-            {
-                $txt = $opts->{message};
-            }
-        }
-        else
-        {
-            $txt = join( '', map( ( ref( $_ ) eq 'CODE' && !$this->{_msg_no_exec_sub} ) ? $_->() : $_, @$ref ) );
-        }
-        $txt = $self->colour_parse( $txt );
-        $opts->{message} = $txt;
-        $opts->{level} = $level if( defined( $level ) );
-        return( $self->message( ( $level || 0 ), $opts ) );
-    }
-    return( 1 );
-}
-PERL
-    messagef_colour => <<'PERL',
-sub messagef_colour
-{
-    my $self  = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $class = ref( $self ) || $self;
-    no strict 'refs';
-    if( $this->{verbose} || $this->{debug} || ${ $class . '::DEBUG' } )
-    {
-        my @args = @_;
-        my $opts = {};
-        if( scalar( @args ) > 1 && ref( $args[-1] ) eq 'HASH' && ( CORE::exists( $args[-1]->{level} ) || CORE::exists( $args[-1]->{type} ) || CORE::exists( $args[-1]->{message} ) ) )
-        {
-            $opts = pop( @args );
-        }
-        $opts->{colour} = 1;
-        CORE::push( @args, $opts );
-        ## $self->message( 0, "Sending arguments: ", sub{ $self->dumper( \@args ) } );
-        return( $this->messagef( @args ) );
-    }
-    return( 1 );
-}
-PERL
-    printer => <<'PERL',
-sub printer
-{
-    my $self = shift( @_ );
-    my $opts = {};
-    $opts = pop( @_ ) if( scalar( @_ ) > 1 && ref( $_[-1] ) eq 'HASH' );
-    try
-    {
-        local $SIG{__WARN__} = sub{ };
-        require Data::Printer;
-        if( scalar( keys( %$opts ) ) )
-        {
-            return( Data::Printer::np( @_, %$opts ) );
-        }
-        else
-        {
-            return( Data::Printer::np( @_ ) );
-        }
-    }
-    catch( $e )
-    {
-        return( $self->error( "Data::Printer is not installed on your system." ) );
-    }
-}
-PERL
-    save => <<'PERL',
-sub save
-{
-    my $self = shift( @_ );
-    my $this = $self->_obj2h;
-    my $opts = {};
-    $opts = pop( @_ ) if( ref( $_[-1] ) eq 'HASH' );
-    my( $file, $data );
-    if( @_ == 2 )
-    {
-        $opts->{data} = shift( @_ );
-        $opts->{file} = shift( @_ );
-    }
-    return( $self->error( "No file was provided to save data to." ) ) if( !$opts->{file} );
-    $file = Module::Generic::File::file( $opts->{file} );
-    my $fh = $file->open( '>', {
-        ( $opts->{encoding} ? ( binmode => $opts->{encoding} ) : () ),
-        autoflush => 1,
-    }) ||
-        return( $self->error( "Unable to open file \"$file\" in write mode: $!" ) );
-    if( !defined( $fh->print( ref( $opts->{data} ) eq 'SCALAR' ? ${$opts->{data}} : $opts->{data} ) ) )
-    {
-        return( $self->error( "Unable to write data to file \"$file\": $!" ) )
-    }
-    $fh->close;
-    my $bytes = -s( $opts->{file} );
-    return( $bytes );
-}
-PERL
-    subclasses => <<'PERL',
-sub subclasses
-{
-    my $self  = shift( @_ );
-    my $that  = '';
-    $that     = @_ ? shift( @_ ) : $self;
-    my $base  = ref( $that ) || $that;
-    $base  =~ s,::,/,g;
-    $base .= '.pm';
-    
-    require IO::Dir;
-    # remove '.pm'
-    my $dir = substr( $INC{ $base }, 0, ( length( $INC{ $base } ) ) - 3 );
-    
-    my @packages = ();
-    my $io = IO::Dir->open( $dir );
-    if( defined( $io ) )
-    {
-        @packages = map{ substr( $_, 0, length( $_ ) - 3 ) } grep{ substr( $_, -3 ) eq '.pm' && -f( "$dir/$_" ) } $io->read();
-        $io->close ||
-        warn( "Unable to close directory \"$dir\": $!\n" );
-    }
-    else
-    {
-        warn( "Unable to open directory \"$dir\": $!\n" );
-    }
-    return( wantarray() ? @packages : \@packages );
-}
-PERL
-    __colour_data => <<'PERL',
-# Initially those data were stored after the __END__, but it seems some module is interfering with <DATA>
-# and so those data could not be loaded reliably
-# This is called once by colour_to_rgb to generate the hash reference COLOUR_NAME_TO_RGB
-sub __colour_data
-{
-    my $colour_data = <<EOT;
-{'alice blue' => ['240','248','255'],'aliceblue' => ['240','248','255'],'antique white' => ['250','235','215'],'antiquewhite' => ['250','235','215'],'antiquewhite1' => ['255','239','219'],'antiquewhite2' => ['238','223','204'],'antiquewhite3' => ['205','192','176'],'antiquewhite4' => ['139','131','120'],'aquamarine' => ['127','255','212'],'aquamarine1' => ['127','255','212'],'aquamarine2' => ['118','238','198'],'aquamarine3' => ['102','205','170'],'aquamarine4' => ['69','139','116'],'azure' => ['240','255','255'],'azure1' => ['240','255','255'],'azure2' => ['224','238','238'],'azure3' => ['193','205','205'],'azure4' => ['131','139','139'],'beige' => ['245','245','220'],'bisque' => ['255','228','196'],'bisque1' => ['255','228','196'],'bisque2' => ['238','213','183'],'bisque3' => ['205','183','158'],'bisque4' => ['139','125','107'],'black' => ['0','0','0'],'blanched almond' => ['255','235','205'],'blanchedalmond' => ['255','235','205'],'blue' => ['0','0','255'],'blue violet' => ['138','43','226'],'blue1' => ['0','0','255'],'blue2' => ['0','0','238'],'blue3' => ['0','0','205'],'blue4' => ['0','0','139'],'blueviolet' => ['138','43','226'],'brown' => ['165','42','42'],'brown1' => ['255','64','64'],'brown2' => ['238','59','59'],'brown3' => ['205','51','51'],'brown4' => ['139','35','35'],'burlywood' => ['222','184','135'],'burlywood1' => ['255','211','155'],'burlywood2' => ['238','197','145'],'burlywood3' => ['205','170','125'],'burlywood4' => ['139','115','85'],'cadet blue' => ['95','158','160'],'cadetblue' => ['95','158','160'],'cadetblue1' => ['152','245','255'],'cadetblue2' => ['142','229','238'],'cadetblue3' => ['122','197','205'],'cadetblue4' => ['83','134','139'],'chartreuse' => ['127','255','0'],'chartreuse1' => ['127','255','0'],'chartreuse2' => ['118','238','0'],'chartreuse3' => ['102','205','0'],'chartreuse4' => ['69','139','0'],'chocolate' => ['210','105','30'],'chocolate1' => ['255','127','36'],'chocolate2' => ['238','118','33'],'chocolate3' => ['205','102','29'],'chocolate4' => ['139','69','19'],'coral' => ['255','127','80'],'coral1' => ['255','114','86'],'coral2' => ['238','106','80'],'coral3' => ['205','91','69'],'coral4' => ['139','62','47'],'cornflower blue' => ['100','149','237'],'cornflowerblue' => ['100','149','237'],'cornsilk' => ['255','248','220'],'cornsilk1' => ['255','248','220'],'cornsilk2' => ['238','232','205'],'cornsilk3' => ['205','200','177'],'cornsilk4' => ['139','136','120'],'cyan' => ['0','255','255'],'cyan1' => ['0','255','255'],'cyan2' => ['0','238','238'],'cyan3' => ['0','205','205'],'cyan4' => ['0','139','139'],'dark blue' => ['0','0','139'],'dark cyan' => ['0','139','139'],'dark goldenrod' => ['184','134','11'],'dark gray' => ['169','169','169'],'dark green' => ['0','100','0'],'dark grey' => ['169','169','169'],'dark khaki' => ['189','183','107'],'dark magenta' => ['139','0','139'],'dark olive green' => ['85','107','47'],'dark orange' => ['255','140','0'],'dark orchid' => ['153','50','204'],'dark red' => ['139','0','0'],'dark salmon' => ['233','150','122'],'dark sea green' => ['143','188','143'],'dark slate blue' => ['72','61','139'],'dark slate gray' => ['47','79','79'],'dark slate grey' => ['47','79','79'],'dark turquoise' => ['0','206','209'],'dark violet' => ['148','0','211'],'darkblue' => ['0','0','139'],'darkcyan' => ['0','139','139'],'darkgoldenrod' => ['184','134','11'],'darkgoldenrod1' => ['255','185','15'],'darkgoldenrod2' => ['238','173','14'],'darkgoldenrod3' => ['205','149','12'],'darkgoldenrod4' => ['139','101','8'],'darkgray' => ['169','169','169'],'darkgreen' => ['0','100','0'],'darkgrey' => ['169','169','169'],'darkkhaki' => ['189','183','107'],'darkmagenta' => ['139','0','139'],'darkolivegreen' => ['85','107','47'],'darkolivegreen1' => ['202','255','112'],'darkolivegreen2' => ['188','238','104'],'darkolivegreen3' => ['162','205','90'],'darkolivegreen4' => ['110','139','61'],'darkorange' => ['255','140','0'],'darkorange1' => ['255','127','0'],'darkorange2' => ['238','118','0'],'darkorange3' => ['205','102','0'],'darkorange4' => ['139','69','0'],'darkorchid' => ['153','50','204'],'darkorchid1' => ['191','62','255'],'darkorchid2' => ['178','58','238'],'darkorchid3' => ['154','50','205'],'darkorchid4' => ['104','34','139'],'darkred' => ['139','0','0'],'darksalmon' => ['233','150','122'],'darkseagreen' => ['143','188','143'],'darkseagreen1' => ['193','255','193'],'darkseagreen2' => ['180','238','180'],'darkseagreen3' => ['155','205','155'],'darkseagreen4' => ['105','139','105'],'darkslateblue' => ['72','61','139'],'darkslategray' => ['47','79','79'],'darkslategray1' => ['151','255','255'],'darkslategray2' => ['141','238','238'],'darkslategray3' => ['121','205','205'],'darkslategray4' => ['82','139','139'],'darkslategrey' => ['47','79','79'],'darkturquoise' => ['0','206','209'],'darkviolet' => ['148','0','211'],'deep pink' => ['255','20','147'],'deep sky blue' => ['0','191','255'],'deeppink' => ['255','20','147'],'deeppink1' => ['255','20','147'],'deeppink2' => ['238','18','137'],'deeppink3' => ['205','16','118'],'deeppink4' => ['139','10','80'],'deepskyblue' => ['0','191','255'],'deepskyblue1' => ['0','191','255'],'deepskyblue2' => ['0','178','238'],'deepskyblue3' => ['0','154','205'],'deepskyblue4' => ['0','104','139'],'dim gray' => ['105','105','105'],'dim grey' => ['105','105','105'],'dimgray' => ['105','105','105'],'dimgrey' => ['105','105','105'],'dodger blue' => ['30','144','255'],'dodgerblue' => ['30','144','255'],'dodgerblue1' => ['30','144','255'],'dodgerblue2' => ['28','134','238'],'dodgerblue3' => ['24','116','205'],'dodgerblue4' => ['16','78','139'],'firebrick' => ['178','34','34'],'firebrick1' => ['255','48','48'],'firebrick2' => ['238','44','44'],'firebrick3' => ['205','38','38'],'firebrick4' => ['139','26','26'],'floral white' => ['255','250','240'],'floralwhite' => ['255','250','240'],'forest green' => ['34','139','34'],'forestgreen' => ['34','139','34'],'gainsboro' => ['220','220','220'],'ghost white' => ['248','248','255'],'ghostwhite' => ['248','248','255'],'gold' => ['255','215','0'],'gold1' => ['255','215','0'],'gold2' => ['238','201','0'],'gold3' => ['205','173','0'],'gold4' => ['139','117','0'],'goldenrod' => ['218','165','32'],'goldenrod1' => ['255','193','37'],'goldenrod2' => ['238','180','34'],'goldenrod3' => ['205','155','29'],'goldenrod4' => ['139','105','20'],'gray' => ['190','190','190'],'gray0' => ['0','0','0'],'gray1' => ['3','3','3'],'gray10' => ['26','26','26'],'gray100' => ['255','255','255'],'gray11' => ['28','28','28'],'gray12' => ['31','31','31'],'gray13' => ['33','33','33'],'gray14' => ['36','36','36'],'gray15' => ['38','38','38'],'gray16' => ['41','41','41'],'gray17' => ['43','43','43'],'gray18' => ['46','46','46'],'gray19' => ['48','48','48'],'gray2' => ['5','5','5'],'gray20' => ['51','51','51'],'gray21' => ['54','54','54'],'gray22' => ['56','56','56'],'gray23' => ['59','59','59'],'gray24' => ['61','61','61'],'gray25' => ['64','64','64'],'gray26' => ['66','66','66'],'gray27' => ['69','69','69'],'gray28' => ['71','71','71'],'gray29' => ['74','74','74'],'gray3' => ['8','8','8'],'gray30' => ['77','77','77'],'gray31' => ['79','79','79'],'gray32' => ['82','82','82'],'gray33' => ['84','84','84'],'gray34' => ['87','87','87'],'gray35' => ['89','89','89'],'gray36' => ['92','92','92'],'gray37' => ['94','94','94'],'gray38' => ['97','97','97'],'gray39' => ['99','99','99'],'gray4' => ['10','10','10'],'gray40' => ['102','102','102'],'gray41' => ['105','105','105'],'gray42' => ['107','107','107'],'gray43' => ['110','110','110'],'gray44' => ['112','112','112'],'gray45' => ['115','115','115'],'gray46' => ['117','117','117'],'gray47' => ['120','120','120'],'gray48' => ['122','122','122'],'gray49' => ['125','125','125'],'gray5' => ['13','13','13'],'gray50' => ['127','127','127'],'gray51' => ['130','130','130'],'gray52' => ['133','133','133'],'gray53' => ['135','135','135'],'gray54' => ['138','138','138'],'gray55' => ['140','140','140'],'gray56' => ['143','143','143'],'gray57' => ['145','145','145'],'gray58' => ['148','148','148'],'gray59' => ['150','150','150'],'gray6' => ['15','15','15'],'gray60' => ['153','153','153'],'gray61' => ['156','156','156'],'gray62' => ['158','158','158'],'gray63' => ['161','161','161'],'gray64' => ['163','163','163'],'gray65' => ['166','166','166'],'gray66' => ['168','168','168'],'gray67' => ['171','171','171'],'gray68' => ['173','173','173'],'gray69' => ['176','176','176'],'gray7' => ['18','18','18'],'gray70' => ['179','179','179'],'gray71' => ['181','181','181'],'gray72' => ['184','184','184'],'gray73' => ['186','186','186'],'gray74' => ['189','189','189'],'gray75' => ['191','191','191'],'gray76' => ['194','194','194'],'gray77' => ['196','196','196'],'gray78' => ['199','199','199'],'gray79' => ['201','201','201'],'gray8' => ['20','20','20'],'gray80' => ['204','204','204'],'gray81' => ['207','207','207'],'gray82' => ['209','209','209'],'gray83' => ['212','212','212'],'gray84' => ['214','214','214'],'gray85' => ['217','217','217'],'gray86' => ['219','219','219'],'gray87' => ['222','222','222'],'gray88' => ['224','224','224'],'gray89' => ['227','227','227'],'gray9' => ['23','23','23'],'gray90' => ['229','229','229'],'gray91' => ['232','232','232'],'gray92' => ['235','235','235'],'gray93' => ['237','237','237'],'gray94' => ['240','240','240'],'gray95' => ['242','242','242'],'gray96' => ['245','245','245'],'gray97' => ['247','247','247'],'gray98' => ['250','250','250'],'gray99' => ['252','252','252'],'green' => ['0','255','0'],'green yellow' => ['173','255','47'],'green1' => ['0','255','0'],'green2' => ['0','238','0'],'green3' => ['0','205','0'],'green4' => ['0','139','0'],'greenyellow' => ['173','255','47'],'grey' => ['190','190','190'],'grey0' => ['0','0','0'],'grey1' => ['3','3','3'],'grey10' => ['26','26','26'],'grey100' => ['255','255','255'],'grey11' => ['28','28','28'],'grey12' => ['31','31','31'],'grey13' => ['33','33','33'],'grey14' => ['36','36','36'],'grey15' => ['38','38','38'],'grey16' => ['41','41','41'],'grey17' => ['43','43','43'],'grey18' => ['46','46','46'],'grey19' => ['48','48','48'],'grey2' => ['5','5','5'],'grey20' => ['51','51','51'],'grey21' => ['54','54','54'],'grey22' => ['56','56','56'],'grey23' => ['59','59','59'],'grey24' => ['61','61','61'],'grey25' => ['64','64','64'],'grey26' => ['66','66','66'],'grey27' => ['69','69','69'],'grey28' => ['71','71','71'],'grey29' => ['74','74','74'],'grey3' => ['8','8','8'],'grey30' => ['77','77','77'],'grey31' => ['79','79','79'],'grey32' => ['82','82','82'],'grey33' => ['84','84','84'],'grey34' => ['87','87','87'],'grey35' => ['89','89','89'],'grey36' => ['92','92','92'],'grey37' => ['94','94','94'],'grey38' => ['97','97','97'],'grey39' => ['99','99','99'],'grey4' => ['10','10','10'],'grey40' => ['102','102','102'],'grey41' => ['105','105','105'],'grey42' => ['107','107','107'],'grey43' => ['110','110','110'],'grey44' => ['112','112','112'],'grey45' => ['115','115','115'],'grey46' => ['117','117','117'],'grey47' => ['120','120','120'],'grey48' => ['122','122','122'],'grey49' => ['125','125','125'],'grey5' => ['13','13','13'],'grey50' => ['127','127','127'],'grey51' => ['130','130','130'],'grey52' => ['133','133','133'],'grey53' => ['135','135','135'],'grey54' => ['138','138','138'],'grey55' => ['140','140','140'],'grey56' => ['143','143','143'],'grey57' => ['145','145','145'],'grey58' => ['148','148','148'],'grey59' => ['150','150','150'],'grey6' => ['15','15','15'],'grey60' => ['153','153','153'],'grey61' => ['156','156','156'],'grey62' => ['158','158','158'],'grey63' => ['161','161','161'],'grey64' => ['163','163','163'],'grey65' => ['166','166','166'],'grey66' => ['168','168','168'],'grey67' => ['171','171','171'],'grey68' => ['173','173','173'],'grey69' => ['176','176','176'],'grey7' => ['18','18','18'],'grey70' => ['179','179','179'],'grey71' => ['181','181','181'],'grey72' => ['184','184','184'],'grey73' => ['186','186','186'],'grey74' => ['189','189','189'],'grey75' => ['191','191','191'],'grey76' => ['194','194','194'],'grey77' => ['196','196','196'],'grey78' => ['199','199','199'],'grey79' => ['201','201','201'],'grey8' => ['20','20','20'],'grey80' => ['204','204','204'],'grey81' => ['207','207','207'],'grey82' => ['209','209','209'],'grey83' => ['212','212','212'],'grey84' => ['214','214','214'],'grey85' => ['217','217','217'],'grey86' => ['219','219','219'],'grey87' => ['222','222','222'],'grey88' => ['224','224','224'],'grey89' => ['227','227','227'],'grey9' => ['23','23','23'],'grey90' => ['229','229','229'],'grey91' => ['232','232','232'],'grey92' => ['235','235','235'],'grey93' => ['237','237','237'],'grey94' => ['240','240','240'],'grey95' => ['242','242','242'],'grey96' => ['245','245','245'],'grey97' => ['247','247','247'],'grey98' => ['250','250','250'],'grey99' => ['252','252','252'],'honeydew' => ['240','255','240'],'honeydew1' => ['240','255','240'],'honeydew2' => ['224','238','224'],'honeydew3' => ['193','205','193'],'honeydew4' => ['131','139','131'],'hot pink' => ['255','105','180'],'hotpink' => ['255','105','180'],'hotpink1' => ['255','110','180'],'hotpink2' => ['238','106','167'],'hotpink3' => ['205','96','144'],'hotpink4' => ['139','58','98'],'indian red' => ['205','92','92'],'indianred' => ['205','92','92'],'indianred1' => ['255','106','106'],'indianred2' => ['238','99','99'],'indianred3' => ['205','85','85'],'indianred4' => ['139','58','58'],'ivory' => ['255','255','240'],'ivory1' => ['255','255','240'],'ivory2' => ['238','238','224'],'ivory3' => ['205','205','193'],'ivory4' => ['139','139','131'],'khaki' => ['240','230','140'],'khaki1' => ['255','246','143'],'khaki2' => ['238','230','133'],'khaki3' => ['205','198','115'],'khaki4' => ['139','134','78'],'lavender' => ['230','230','250'],'lavender blush' => ['255','240','245'],'lavenderblush' => ['255','240','245'],'lavenderblush1' => ['255','240','245'],'lavenderblush2' => ['238','224','229'],'lavenderblush3' => ['205','193','197'],'lavenderblush4' => ['139','131','134'],'lawn green' => ['124','252','0'],'lawngreen' => ['124','252','0'],'lemon chiffon' => ['255','250','205'],'lemonchiffon' => ['255','250','205'],'lemonchiffon1' => ['255','250','205'],'lemonchiffon2' => ['238','233','191'],'lemonchiffon3' => ['205','201','165'],'lemonchiffon4' => ['139','137','112'],'light blue' => ['173','216','230'],'light coral' => ['240','128','128'],'light cyan' => ['224','255','255'],'light goldenrod' => ['238','221','130'],'light goldenrod yellow' => ['250','250','210'],'light gray' => ['211','211','211'],'light green' => ['144','238','144'],'light grey' => ['211','211','211'],'light pink' => ['255','182','193'],'light salmon' => ['255','160','122'],'light sea green' => ['32','178','170'],'light sky blue' => ['135','206','250'],'light slate blue' => ['132','112','255'],'light slate gray' => ['119','136','153'],'light slate grey' => ['119','136','153'],'light steel blue' => ['176','196','222'],'light yellow' => ['255','255','224'],'lightblue' => ['173','216','230'],'lightblue1' => ['191','239','255'],'lightblue2' => ['178','223','238'],'lightblue3' => ['154','192','205'],'lightblue4' => ['104','131','139'],'lightcoral' => ['240','128','128'],'lightcyan' => ['224','255','255'],'lightcyan1' => ['224','255','255'],'lightcyan2' => ['209','238','238'],'lightcyan3' => ['180','205','205'],'lightcyan4' => ['122','139','139'],'lightgoldenrod' => ['238','221','130'],'lightgoldenrod1' => ['255','236','139'],'lightgoldenrod2' => ['238','220','130'],'lightgoldenrod3' => ['205','190','112'],'lightgoldenrod4' => ['139','129','76'],'lightgoldenrodyellow' => ['250','250','210'],'lightgray' => ['211','211','211'],'lightgreen' => ['144','238','144'],'lightgrey' => ['211','211','211'],'lightpink' => ['255','182','193'],'lightpink1' => ['255','174','185'],'lightpink2' => ['238','162','173'],'lightpink3' => ['205','140','149'],'lightpink4' => ['139','95','101'],'lightsalmon' => ['255','160','122'],'lightsalmon1' => ['255','160','122'],'lightsalmon2' => ['238','149','114'],'lightsalmon3' => ['205','129','98'],'lightsalmon4' => ['139','87','66'],'lightseagreen' => ['32','178','170'],'lightskyblue' => ['135','206','250'],'lightskyblue1' => ['176','226','255'],'lightskyblue2' => ['164','211','238'],'lightskyblue3' => ['141','182','205'],'lightskyblue4' => ['96','123','139'],'lightslateblue' => ['132','112','255'],'lightslategray' => ['119','136','153'],'lightslategrey' => ['119','136','153'],'lightsteelblue' => ['176','196','222'],'lightsteelblue1' => ['202','225','255'],'lightsteelblue2' => ['188','210','238'],'lightsteelblue3' => ['162','181','205'],'lightsteelblue4' => ['110','123','139'],'lightyellow' => ['255','255','224'],'lightyellow1' => ['255','255','224'],'lightyellow2' => ['238','238','209'],'lightyellow3' => ['205','205','180'],'lightyellow4' => ['139','139','122'],'lime green' => ['50','205','50'],'limegreen' => ['50','205','50'],'linen' => ['250','240','230'],'magenta' => ['255','0','255'],'magenta1' => ['255','0','255'],'magenta2' => ['238','0','238'],'magenta3' => ['205','0','205'],'magenta4' => ['139','0','139'],'maroon' => ['176','48','96'],'maroon1' => ['255','52','179'],'maroon2' => ['238','48','167'],'maroon3' => ['205','41','144'],'maroon4' => ['139','28','98'],'medium aquamarine' => ['102','205','170'],'medium blue' => ['0','0','205'],'medium orchid' => ['186','85','211'],'medium purple' => ['147','112','219'],'medium sea green' => ['60','179','113'],'medium slate blue' => ['123','104','238'],'medium spring green' => ['0','250','154'],'medium turquoise' => ['72','209','204'],'medium violet red' => ['199','21','133'],'mediumaquamarine' => ['102','205','170'],'mediumblue' => ['0','0','205'],'mediumorchid' => ['186','85','211'],'mediumorchid1' => ['224','102','255'],'mediumorchid2' => ['209','95','238'],'mediumorchid3' => ['180','82','205'],'mediumorchid4' => ['122','55','139'],'mediumpurple' => ['147','112','219'],'mediumpurple1' => ['171','130','255'],'mediumpurple2' => ['159','121','238'],'mediumpurple3' => ['137','104','205'],'mediumpurple4' => ['93','71','139'],'mediumseagreen' => ['60','179','113'],'mediumslateblue' => ['123','104','238'],'mediumspringgreen' => ['0','250','154'],'mediumturquoise' => ['72','209','204'],'mediumvioletred' => ['199','21','133'],'midnight blue' => ['25','25','112'],'midnightblue' => ['25','25','112'],'mint cream' => ['245','255','250'],'mintcream' => ['245','255','250'],'misty rose' => ['255','228','225'],'mistyrose' => ['255','228','225'],'mistyrose1' => ['255','228','225'],'mistyrose2' => ['238','213','210'],'mistyrose3' => ['205','183','181'],'mistyrose4' => ['139','125','123'],'moccasin' => ['255','228','181'],'navajo white' => ['255','222','173'],'navajowhite' => ['255','222','173'],'navajowhite1' => ['255','222','173'],'navajowhite2' => ['238','207','161'],'navajowhite3' => ['205','179','139'],'navajowhite4' => ['139','121','94'],'navy' => ['0','0','128'],'navy blue' => ['0','0','128'],'navyblue' => ['0','0','128'],'old lace' => ['253','245','230'],'oldlace' => ['253','245','230'],'olive drab' => ['107','142','35'],'olivedrab' => ['107','142','35'],'olivedrab1' => ['192','255','62'],'olivedrab2' => ['179','238','58'],'olivedrab3' => ['154','205','50'],'olivedrab4' => ['105','139','34'],'orange' => ['255','165','0'],'orange red' => ['255','69','0'],'orange1' => ['255','165','0'],'orange2' => ['238','154','0'],'orange3' => ['205','133','0'],'orange4' => ['139','90','0'],'orangered' => ['255','69','0'],'orangered1' => ['255','69','0'],'orangered2' => ['238','64','0'],'orangered3' => ['205','55','0'],'orangered4' => ['139','37','0'],'orchid' => ['218','112','214'],'orchid1' => ['255','131','250'],'orchid2' => ['238','122','233'],'orchid3' => ['205','105','201'],'orchid4' => ['139','71','137'],'pale goldenrod' => ['238','232','170'],'pale green' => ['152','251','152'],'pale turquoise' => ['175','238','238'],'pale violet red' => ['219','112','147'],'palegoldenrod' => ['238','232','170'],'palegreen' => ['152','251','152'],'palegreen1' => ['154','255','154'],'palegreen2' => ['144','238','144'],'palegreen3' => ['124','205','124'],'palegreen4' => ['84','139','84'],'paleturquoise' => ['175','238','238'],'paleturquoise1' => ['187','255','255'],'paleturquoise2' => ['174','238','238'],'paleturquoise3' => ['150','205','205'],'paleturquoise4' => ['102','139','139'],'palevioletred' => ['219','112','147'],'palevioletred1' => ['255','130','171'],'palevioletred2' => ['238','121','159'],'palevioletred3' => ['205','104','137'],'palevioletred4' => ['139','71','93'],'papaya whip' => ['255','239','213'],'papayawhip' => ['255','239','213'],'peach puff' => ['255','218','185'],'peachpuff' => ['255','218','185'],'peachpuff1' => ['255','218','185'],'peachpuff2' => ['238','203','173'],'peachpuff3' => ['205','175','149'],'peachpuff4' => ['139','119','101'],'peru' => ['205','133','63'],'pink' => ['255','192','203'],'pink1' => ['255','181','197'],'pink2' => ['238','169','184'],'pink3' => ['205','145','158'],'pink4' => ['139','99','108'],'plum' => ['221','160','221'],'plum1' => ['255','187','255'],'plum2' => ['238','174','238'],'plum3' => ['205','150','205'],'plum4' => ['139','102','139'],'powder blue' => ['176','224','230'],'powderblue' => ['176','224','230'],'purple' => ['160','32','240'],'purple1' => ['155','48','255'],'purple2' => ['145','44','238'],'purple3' => ['125','38','205'],'purple4' => ['85','26','139'],'red' => ['255','0','0'],'red1' => ['255','0','0'],'red2' => ['238','0','0'],'red3' => ['205','0','0'],'red4' => ['139','0','0'],'rosy brown' => ['188','143','143'],'rosybrown' => ['188','143','143'],'rosybrown1' => ['255','193','193'],'rosybrown2' => ['238','180','180'],'rosybrown3' => ['205','155','155'],'rosybrown4' => ['139','105','105'],'royal blue' => ['65','105','225'],'royalblue' => ['65','105','225'],'royalblue1' => ['72','118','255'],'royalblue2' => ['67','110','238'],'royalblue3' => ['58','95','205'],'royalblue4' => ['39','64','139'],'saddle brown' => ['139','69','19'],'saddlebrown' => ['139','69','19'],'salmon' => ['250','128','114'],'salmon1' => ['255','140','105'],'salmon2' => ['238','130','98'],'salmon3' => ['205','112','84'],'salmon4' => ['139','76','57'],'sandy brown' => ['244','164','96'],'sandybrown' => ['244','164','96'],'sea green' => ['46','139','87'],'seagreen' => ['46','139','87'],'seagreen1' => ['84','255','159'],'seagreen2' => ['78','238','148'],'seagreen3' => ['67','205','128'],'seagreen4' => ['46','139','87'],'seashell' => ['255','245','238'],'seashell1' => ['255','245','238'],'seashell2' => ['238','229','222'],'seashell3' => ['205','197','191'],'seashell4' => ['139','134','130'],'sienna' => ['160','82','45'],'sienna1' => ['255','130','71'],'sienna2' => ['238','121','66'],'sienna3' => ['205','104','57'],'sienna4' => ['139','71','38'],'sky blue' => ['135','206','235'],'skyblue' => ['135','206','235'],'skyblue1' => ['135','206','255'],'skyblue2' => ['126','192','238'],'skyblue3' => ['108','166','205'],'skyblue4' => ['74','112','139'],'slate blue' => ['106','90','205'],'slate gray' => ['112','128','144'],'slate grey' => ['112','128','144'],'slateblue' => ['106','90','205'],'slateblue1' => ['131','111','255'],'slateblue2' => ['122','103','238'],'slateblue3' => ['105','89','205'],'slateblue4' => ['71','60','139'],'slategray' => ['112','128','144'],'slategray1' => ['198','226','255'],'slategray2' => ['185','211','238'],'slategray3' => ['159','182','205'],'slategray4' => ['108','123','139'],'slategrey' => ['112','128','144'],'snow' => ['255','250','250'],'snow1' => ['255','250','250'],'snow2' => ['238','233','233'],'snow3' => ['205','201','201'],'snow4' => ['139','137','137'],'spring green' => ['0','255','127'],'springgreen' => ['0','255','127'],'springgreen1' => ['0','255','127'],'springgreen2' => ['0','238','118'],'springgreen3' => ['0','205','102'],'springgreen4' => ['0','139','69'],'steel blue' => ['70','130','180'],'steelblue' => ['70','130','180'],'steelblue1' => ['99','184','255'],'steelblue2' => ['92','172','238'],'steelblue3' => ['79','148','205'],'steelblue4' => ['54','100','139'],'tan' => ['210','180','140'],'tan1' => ['255','165','79'],'tan2' => ['238','154','73'],'tan3' => ['205','133','63'],'tan4' => ['139','90','43'],'thistle' => ['216','191','216'],'thistle1' => ['255','225','255'],'thistle2' => ['238','210','238'],'thistle3' => ['205','181','205'],'thistle4' => ['139','123','139'],'tomato' => ['255','99','71'],'tomato1' => ['255','99','71'],'tomato2' => ['238','92','66'],'tomato3' => ['205','79','57'],'tomato4' => ['139','54','38'],'turquoise' => ['64','224','208'],'turquoise1' => ['0','245','255'],'turquoise2' => ['0','229','238'],'turquoise3' => ['0','197','205'],'turquoise4' => ['0','134','139'],'violet' => ['238','130','238'],'violet red' => ['208','32','144'],'violetred' => ['208','32','144'],'violetred1' => ['255','62','150'],'violetred2' => ['238','58','140'],'violetred3' => ['205','50','120'],'violetred4' => ['139','34','82'],'wheat' => ['245','222','179'],'wheat1' => ['255','231','186'],'wheat2' => ['238','216','174'],'wheat3' => ['205','186','150'],'wheat4' => ['139','126','102'],'white' => ['255','255','255'],'white smoke' => ['245','245','245'],'whitesmoke' => ['245','245','245'],'yellow' => ['255','255','0'],'yellow green' => ['154','205','50'],'yellow1' => ['255','255','0'],'yellow2' => ['238','238','0'],'yellow3' => ['205','205','0'],'yellow4' => ['139','139','0'],'yellowgreen' => ['154','205','50']}
-EOT
 }
 PERL
     };
@@ -5354,8 +5889,6 @@ AUTOLOAD
         # goto( &$AUTOLOAD );
         return( &$meth( $self, @_ ) ) if( $self );
         return( &$AUTOLOAD( @_ ) );
-        # return( $ref->( $self, @_ ) ) if( $self );
-        # return( $ref->() );
     }
     
     $meth = lc( $meth );
@@ -5599,7 +6132,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.23.1
+    v0.24.1
 
 =head1 DESCRIPTION
 
@@ -6565,20 +7098,58 @@ For example:
 
 Provided with arguments and this support method will return the arguments provided as hash reference irrespective of whether they were initially provided as hash reference or a simple hash.
 
+In list context, this returns an hash reference and an array reference containing the order of the properties provided.
+
 For example:
 
     my $ref = $self->_get_args_as_hash( first => 'John', last => 'Doe' );
     # returns hash reference { first => 'John', last => 'Doe' }
     my $ref = $self->_get_args_as_hash({ first => 'John', last => 'Doe' });
     # same result as previous example
-    my $res = $self->_get_args_as_hash(); # no args provided
+    my $ref = $self->_get_args_as_hash(); # no args provided
     # returns an empty hash reference
+    my( $ref, $keys ) = $self->_get_args_as_hash( first => 'John', last => 'Doe' );
+
+In the last example, C<$keys> is an L<array object|Module::Generic::Array> containing the list of properties passed an in the order they were provided, i.e. C<first> and C<last>. If the properties were provided as an hash reference, the C<$keys> returned will be the sorted list of properties, such as:
+
+    my( $ref, $keys ) = $self->_get_args_as_hash({ last => 'Doe', first => 'John' });
+
+Here, C<$keys> will be sorted and contain the properties in their alphabetical order.
 
 However, this will return empty:
 
     my $ref = $self->_get_args_as_hash( { age => 42, city => 'Tokyo' }, some_other => 'parameter' );
 
-This returns an empty hash reference, because although the first parameter is an hash reference, there is more than on parameter.
+This returns an empty hash reference, because although the first parameter is an hash reference, there is more than one parameter.
+
+As of version v0.24.0, this utility method allows for more advanced use and permits embedding parameters among arguments, remove them from the list and return them.
+
+For example:
+
+Assuming C<@_> contains: C<foo bar debug 4 baz>
+
+    my $ref = $self->_get_args_as_hash( @_, args_list => [qw( debug )] );
+
+This will set C<$ref> with C<debug> only.
+
+Even the special parameter C<args_list> does not have to be at the end and could be anywhere:
+
+    my $ref = $self->_get_args_as_hash( 'foo', 'bar', args_list => [qw( debug )], 'debug', 4, 'baz' );
+
+If you want to modify C<@_>,because you need its content without any params, pass C<@_> as an array reference.
+
+    my $ref = $self->_get_args_as_hash( \@_, args_list => [qw( debug )] );
+    say "@_";
+
+C<$ref> is an hash reference that would contain C<debug> and C<@_> only contains C<foo bar baz>
+
+You can also simply pass C<@_> as a reference to simply save memory.
+
+Assuming C<@_> is C<foo bar baz 3 debug 4>
+
+    my $ref = $self->_get_args_as_hash( \@_ );
+
+This would set C<$ref> to be an hash reference with keys C<foo baz debug>
 
 =head2 _get_stack_trace
 
@@ -6651,6 +7222,30 @@ If you would use :
 
 It would rather return the module package name: C<My::Module>
 
+=head2 _is_class_loadable
+
+Provided with a package name, a.k.a. a class, and an optional version and this will endeavour to check if that class is installed and if a version is provided, if it is greater or equal to the version provided.
+
+If the module is not already loaded and a version was provided, it uses L<Module::Metadata> to get that module version.
+
+It returns true if the module can be loaded or false otherwise.
+
+If an error occurred, it sets an L<error|/error> and returns C<undef>, so be sure to check whether the return value is defined.
+
+=head2 _is_class_loaded
+
+Provided with a package name, a.k.a. a class, and this returns true if the class has already been loaded or false otherwise.
+
+If you are running under mod_perl, this method will use L<Apache2::Module/loaded> to find out, otherwise, it will simply check if the class exists in C<%INC>
+
+=head2 _is_code
+
+Provided with some value, possibly, undefined, and this returns true if it is a C<CODE>, such as a subroutine reference or an anonymous subroutine, or false otherwise.
+
+=head2 _is_glob
+
+Provided with some value, possibly, undefined, and this returns true if it is a filehandle, or false otherwise.
+
 =head2 _is_hash
 
 Same as L</"_is_array">, but for hash reference.
@@ -6692,6 +7287,7 @@ An empty string or C<undef> can be provided and will not be checked.
         qw( :some_tags SOME_CONSTANTS_TO_IMPORT ),
         { version => 'v1.2.3', caller => 'Its::Me' }
     ) || die( $self->error );
+    $self->_load_class( 'My::Module', { no_import => 1 } ) || die( $self->error );
 
 Provided with a class/package name, some optional list of semantics to import, and, as the last parameter, an optional hash reference of options and this will attempt to load the module. This uses L<perlfunc/use>, no external module.
 
@@ -6707,11 +7303,25 @@ Possible options are:
 
 The package name of the caller. If this is not provided, it will default to the value provided with L<perlfunc/caller>
 
+=item I<no_import>
+
+Set to a true value and this will prevent the loaded module from importing anything into your namespace.
+
+This is the equivalent of doing:
+
+    use My::Module ();
+
 =item I<version>
 
 The minimum version for this class to load. This value is passed directly to L<perlfunc/use>
 
 =back
+
+=head2 _load_classes
+
+This will load multiple classes by providing it an array reference of class name to load and an optional hash or hash reference of options, similar to those provided to L</_load_class>
+
+If one of those classes failed to load, it will return immediately after setting an L</error>.
 
 =head2 _lvalue
 
@@ -7351,7 +7961,25 @@ Provided with arguments or not, and this will return a L<Module::Generic::Array>
 
 =head2 _warnings_is_enabled
 
-Returns true of warnings are enabled, false otherwise.
+Called with the class object or providing another class object as argument, and this returns true if warnings are enabled for the given class, false otherwise.
+
+Example:
+
+    $self->_warnings_is_enabled();
+    # Providing another class object
+    $self->_warnings_is_enabled( $other_object );
+
+=head2 _warnings_is_registered
+
+Called with the class object or providing another class object as argument, and this returns true if warnings are registered for the given class, false otherwise.
+
+This is useful, because calling C<warnings::enabled()> to check if warnings are enabled for a given class when that class has not registered for warnings using the pragma C<use warnings::register> will produce an error C<Unknown warnings category>.
+
+Example:
+
+    $self->_warnings_is_registered();
+    # Providing another class object
+    $self->_warnings_is_registered( $other_object );
 
 =head2 __dbh
 

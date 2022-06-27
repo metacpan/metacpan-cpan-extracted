@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -26,11 +26,11 @@
       "configure" : {
          "requires" : {
             "Alien::cmake3" : "0",
-            "Export::XS" : "v3.0.5",
-            "Net::SockAddr" : "v1.1.2",
+            "Export::XS" : "v3.0.6",
+            "Net::SockAddr" : "v1.1.3",
             "Test::Catch" : "v2.0.0",
-            "XLog" : "v1.1.2",
-            "XS::Framework" : "v1.5.2",
+            "XLog" : "v1.1.3",
+            "XS::Framework" : "v1.5.3",
             "XS::Install" : "v1.3.5",
             "XS::libcares" : "v1.17.1.2",
             "XS::libcatch" : "v3.0.0.4",
@@ -41,10 +41,10 @@
       },
       "runtime" : {
          "requires" : {
-            "Export::XS" : "v3.0.5",
-            "Net::SockAddr" : "v1.1.2",
-            "XLog" : "v1.1.2",
-            "XS::Framework" : "v1.5.2",
+            "Export::XS" : "v3.0.6",
+            "Net::SockAddr" : "v1.1.3",
+            "XLog" : "v1.1.3",
+            "XS::Framework" : "v1.5.3",
             "XS::Install" : "v1.3.5",
             "XS::libcares" : "v1.17.1.2",
             "XS::libpanda" : "v1.5.8",
@@ -54,16 +54,16 @@
       },
       "test" : {
          "requires" : {
-            "Export::XS" : "v3.0.5",
+            "Export::XS" : "v3.0.6",
             "Net::SSLeay" : "0",
-            "Net::SockAddr" : "v1.1.2",
+            "Net::SockAddr" : "v1.1.3",
             "Test::Catch" : "v2.0.0",
             "Test::Deep" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
             "Test::Simple" : "0.96",
-            "XLog" : "v1.1.2",
-            "XS::Framework" : "v1.5.2",
+            "XLog" : "v1.1.3",
+            "XS::Framework" : "v1.5.3",
             "XS::libcares" : "v1.17.1.2",
             "XS::libcatch" : "v3.0.0.4",
             "XS::libpanda" : "v1.5.8",
@@ -73,6 +73,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.2.10",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "v1.2.11",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

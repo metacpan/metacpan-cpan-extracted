@@ -12,7 +12,7 @@ my %META = (
 			ExtUtils::MakeMaker 0
 		)} },
 		runtime => { requires => {qw(
-			perl                5.005_04
+			perl                5.006
 			Try::Tiny           0
 		)} },
 	},
@@ -23,14 +23,14 @@ my %META = (
 	},
 );
 
-sub MY::postamble { <<'' }
+sub MY::postamble { -f 'META.yml' ? return : <<'' }
 create_distdir : MANIFEST
 MANIFEST :
 	( git ls-files ':!README.pod' . ; echo MANIFEST ) > MANIFEST
 distdir : boilerplate
 .PHONY  : boilerplate
 boilerplate : distmeta
-	$(PERL) boilerplate.pl $(DISTVNAME)
+	$(PERL) -Ilib boilerplate.pl $(DISTVNAME)
 
 ## BOILERPLATE ###############################################################
 require ExtUtils::MakeMaker;
@@ -66,7 +66,7 @@ for (qw(configure build test runtime)) {
 	defined $r->{$_} or delete $r->{$_} for keys %$r;
 }
 
-$MM_ARGS{MIN_PERL_VERSION} = delete $MM_ARGS{PREREQ_PM}{perl} || 0;
+$MM_ARGS{MIN_PERL_VERSION} = eval delete $MM_ARGS{PREREQ_PM}{perl} || 0;
 
 delete $MM_ARGS{MIN_PERL_VERSION}
 	if $eumm_version < 6.47_01;

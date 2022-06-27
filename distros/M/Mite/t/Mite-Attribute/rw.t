@@ -46,6 +46,8 @@ tests "try various tricky values" => sub {
 
     $obj->name("");
     is $obj->name, "",            "set to empty string";
+
+    is $obj->name(0), $obj,       "chainable!";
 };
 
 done_testing;

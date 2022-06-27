@@ -9,7 +9,7 @@ my $root=dirname __FILE__;
 
 my %hash=(title=>"hello");
 
-my $template=plex "html.plex"=>\%hash, root=>$root;
+my $template=Template::Plex->load("html.plex"=>\%hash, root=>$root);
 
 say "Original base/lexical value and field value";
 say $template->render({title=>"Jacky"});

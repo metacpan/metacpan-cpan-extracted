@@ -101,8 +101,8 @@ cpansite -- extend CPAN with private packages
 
 =head1 DESCRIPTION
 
-B<WARNING: A lot has changed with the 1.01 release.  Please read more
-about these changes in the file "explain_101.txt" included in the
+B<WARNING: A lot has changed with the 1.01 release (2009).  Please read
+more about these changes in the file "explain_101.txt" included in the
 distribution.>
 
 The C<cpansite> script is used to create your own CPAN server. The

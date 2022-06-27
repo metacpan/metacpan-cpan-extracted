@@ -1,3 +1,6 @@
+1.1.2   xx.xx.2022
+    - improve exception wrapping api
+
 1.1.1   10.12.2021
     - avoid calling overloaded stringification in the default
       frame decorator

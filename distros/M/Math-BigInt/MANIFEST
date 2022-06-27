@@ -83,12 +83,13 @@ t/use_lib6.t
 t/use_mbfw.t
 t/with_sub.t
 TODO
-xt/author/_bin_parts_to_lib_parts.t
-xt/author/_bin_str_to_str_parts.t
-xt/author/_dec_parts_to_lib_parts.t
-xt/author/_dec_str_to_str_parts.t
-xt/author/_hex_str_to_str_parts.t
-xt/author/_oct_str_to_str_parts.t
+xt/author/_bin_str_parts_to_flt_lib_parts.t
+xt/author/_bin_str_to_bin_str_parts.t
+xt/author/_dec_str_parts_to_flt_lib_parts.t
+xt/author/_dec_str_to_dec_str_parts.t
+xt/author/_flt_lib_parts_to_rat_lib_parts.t
+xt/author/_hex_str_to_hex_str_parts.t
+xt/author/_oct_str_to_oct_str_parts.t
 xt/author/as_float-mbf.t
 xt/author/as_float-mbi.t
 xt/author/as_int-mbf.t
@@ -300,6 +301,7 @@ xt/author/sparts-mbi.t
 xt/author/to_base-mbi.t
 xt/author/to_base_num-mbi.t
 xt/author/to_ieee754-mbf.t
+xt/author/upgrade-mbf-mbr.t
 xt/author/upgrade-mbi-mbf.t
 xt/release/cpan-changes.t
 xt/release/dist-manifest.t

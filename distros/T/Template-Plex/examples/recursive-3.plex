@@ -1,7 +1,5 @@
-@{[ do {
-	BEGIN {
+@{[ init {
 		use Time::HiRes qw<time>;
-		}
 	}
 ]}
 ====Template started at @{[time]};

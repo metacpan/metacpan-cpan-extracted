@@ -26,17 +26,32 @@ BEGIN
 };
 
 use strict;
-require Module::Generic::Array;
-require Module::Generic::Number;
-require Module::Generic::Scalar;
+# require Module::Generic::Array;
+# require Module::Generic::Number;
+# require Module::Generic::Scalar;
 
 sub new { return( $_[1] ? $true : $false ); }
 
-sub as_array { return( Module::Generic::Array->new( [ ${$_[0]} ] ) ); }
+# sub as_array { return( Module::Generic::Array->new( [ ${$_[0]} ] ) ); }
+sub as_array
+{
+    require Module::Generic::Array;
+    return( Module::Generic::Array->new( [ ${$_[0]} ] ) );
+}
 
-sub as_number { return( Module::Generic::Number->new( ${$_[0]} ) ); }
+# sub as_number { return( Module::Generic::Number->new( ${$_[0]} ) ); }
+sub as_number
+{
+    require Module::Generic::Number;
+    return( Module::Generic::Number->new( ${$_[0]} ) );
+}
 
-sub as_scalar { return( Module::Generic::Scalar->new( ${$_[0]} ) ); }
+# sub as_scalar { return( Module::Generic::Scalar->new( ${$_[0]} ) ); }
+sub as_scalar
+{
+    require Module::Generic::Scalar;
+    return( Module::Generic::Scalar->new( ${$_[0]} ) );
+}
 
 sub defined { return( 1 ); }
 

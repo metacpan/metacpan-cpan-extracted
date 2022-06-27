@@ -7,9 +7,9 @@ use Getopt::Long qw(:config bundling no_ignore_case);
 use POSIX qw(ceil);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-11'; # DATE
+our $DATE = '2022-05-20'; # DATE
 our $DIST = 'App-freqtable'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 my $tmp_freq;
 my %Opts = (
@@ -19,6 +19,8 @@ my %Opts = (
     # XXX options to limit memory usage, e.g. max keys, max line length, --md5 (like in nauniq), ...
     min_freq => undef,
     max_freq => undef,
+    sort_args => {},
+    sort_sub => undef,
 );
 
 sub parse_cmdline {
@@ -33,6 +35,9 @@ sub parse_cmdline {
         'no-print-freq|F' => sub { $Opts{print_freq} = 0 },
         'print-freq'      => sub { $Opts{print_freq} = 1 },
         'freq=s'    => \$tmp_freq,
+        'sort-sub=s' => \$Opts{sort_sub},
+        'sort-arg=s%' => $Opts{sort_args},
+        'a'   => sub { $Opts{sort_sub} = 'asciibetically' },
         'help|h'  => sub {
             print <<USAGE;
 Usage:
@@ -48,6 +53,9 @@ Options:
   --ignore-case, -f
   --no-print-freq, -F
   --freq N|M-N|M-|-N
+  --sort-sub=SPEC
+  --sort-arg=ARG=VAL
+  -a
 For more details, see the manpage/documentation.
 USAGE
             exit 0;
@@ -138,10 +146,19 @@ sub run {
     }
 
     my $fmt;
-    for my $k (sort {
+    my @keys = keys %occurences;
+    if (defined $Opts{sort_sub}) {
+        require Sort::Sub;
+        my $sorter = Sort::Sub::get_sorter($Opts{sort_sub}, $Opts{sort_args});
+        @keys = sort $sorter @keys;
+    } else {
+        @keys = sort {
         $occurences{$b} <=> $occurences{$a} ||
             ($numeric ? $a <=> $b : $a cmp $b)
-    } keys %occurences) {
+        } @keys;
+    }
+
+    for my $k (@keys) {
         my $n = $occurences{$k};
         next if defined $Opts{min_freq} && $n < $Opts{min_freq};
         next if defined $Opts{max_freq} && $n > $Opts{max_freq};
@@ -177,7 +194,7 @@ freqtable - Print frequency table of lines/words/characters/bytes/numbers
 
 =head1 VERSION
 
-This document describes version 0.005 of freqtable (from Perl distribution App-freqtable), released on 2022-02-11.
+This document describes version 0.007 of freqtable (from Perl distribution App-freqtable), released on 2022-05-20.
 
 =head1 SYNOPSIS
 
@@ -309,6 +326,48 @@ Only display lines that appear less than three times:
  1       three
  1       two
 
+=head2 Sorting
+
+Instead of the default sorting by frequency (descending order), if you specify
+C<--sort-sub> (and optionally one or more C<--sort-arg>) you can sort by the
+keys using one of L<Sort::Sub>::* subroutines. Examples:
+
+ # sort by keys, asciibetically
+ % freqtable -F input-lines.txt --sort-sub asciibetically
+ 2       eight
+ 3       five
+ 1       four
+ 1       nine
+ 2       one
+ 1       seven
+ 1       six
+ 1       three
+ 1       two
+
+ # sort by keys, asciibetically (descending order)
+ % freqtable -F input-lines.txt --sort-sub 'asciibetically<r>'
+ 1       two
+ 1       three
+ 1       six
+ 1       seven
+ 2       one
+ 1       nine
+ 1       four
+ 3       five
+ 2       eight
+
+ # sort by keys, randomly using perl code (essentially, shuffling)
+ % freqtable -F input-lines.txt --sort-sub 'by_perl_code' --sort-arg 'code=int(rand()*3)-1'
+ 3       five
+ 1       three
+ 2       eight
+ 1       seven
+ 2       one
+ 1       six
+ 1       nine
+ 1       two
+ 1       four
+
 =head1 DESCRIPTION
 
 This utility counts the occurences of lines (or words/characters) in the input
@@ -376,6 +435,32 @@ N times. C<M-N> (e.g. --freq 5-10) means only display items that occur between M
 and N times. C<M-> (e.g. --freq 5-) means only display items that occur at least
 M times. C<-N> (e.g. --freq -10) means only display items that occur at most N
 times.
+
+=item * --sort-sub=s
+
+This will cause C<freqtable> to sort by key name instead of by frequencies. You
+pass this option to specify a L<Sort::Sub> routine, which is the name of a
+C<Sort::Sub::*> module without the C<Sort::Sub::> prefix, e.g.
+C<asciibetically>. The name can optionally be followed by C<< <i> >>, or C<< <r>
+>>, or C<< <ir> >> to mean case-insensitive sorting, reverse order, and reverse
+order case-insensitive sorting, respectively. When you use one of these suffixes
+on the command-line, remember to quote since C<< < >> and C<< > >> can be
+intereprted by shell.
+
+Examples:
+
+ asciibetically
+ asciibetically<i>
+ by_length<r>
+
+=item * --sort-arg=ARGNAME=ARGVALUE
+
+Pass argument(s) to the sort subroutine. Can be specified multiple times, once
+for every argument.
+
+=item * -a
+
+Shortcut for C<--sort=asciibetically>.
 
 =back
 

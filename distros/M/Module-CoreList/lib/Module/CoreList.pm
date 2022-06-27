@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20220527';
+our $VERSION = '5.20220620';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -393,6 +393,7 @@ sub changes_between {
     5.035011 => '2022-04-20',
     5.036000 => '2022-05-27',
     5.037000 => '2022-05-27',
+    5.037001 => '2022-06-20',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -19441,6 +19442,64 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         removed => {
         }
     },
+    5.037001 => {
+        delta_from => 5.037000,
+        changed => {
+            'B'                     => '1.84',
+            'B::Op_private'         => '5.037001',
+            'Carp'                  => '1.53',
+            'Carp::Heavy'           => '1.53',
+            'Config'                => '5.037001',
+            'Cwd'                   => '3.85',
+            'Data::Dumper'          => '2.185',
+            'ExtUtils::CBuilder'    => '0.280237',
+            'ExtUtils::CBuilder::Base'=> '0.280237',
+            'ExtUtils::CBuilder::Platform::Unix'=> '0.280237',
+            'ExtUtils::CBuilder::Platform::VMS'=> '0.280237',
+            'ExtUtils::CBuilder::Platform::Windows'=> '0.280237',
+            'ExtUtils::CBuilder::Platform::Windows::BCC'=> '0.280237',
+            'ExtUtils::CBuilder::Platform::Windows::GCC'=> '0.280237',
+            'ExtUtils::CBuilder::Platform::Windows::MSVC'=> '0.280237',
+            'ExtUtils::CBuilder::Platform::aix'=> '0.280237',
+            'ExtUtils::CBuilder::Platform::android'=> '0.280237',
+            'ExtUtils::CBuilder::Platform::cygwin'=> '0.280237',
+            'ExtUtils::CBuilder::Platform::darwin'=> '0.280237',
+            'ExtUtils::CBuilder::Platform::dec_osf'=> '0.280237',
+            'ExtUtils::CBuilder::Platform::os2'=> '0.280237',
+            'ExtUtils::Miniperl'    => '1.12',
+            'File::Spec'            => '3.85',
+            'File::Spec::AmigaOS'   => '3.85',
+            'File::Spec::Cygwin'    => '3.85',
+            'File::Spec::Epoc'      => '3.85',
+            'File::Spec::Functions' => '3.85',
+            'File::Spec::Mac'       => '3.85',
+            'File::Spec::OS2'       => '3.85',
+            'File::Spec::Unix'      => '3.85',
+            'File::Spec::VMS'       => '3.85',
+            'File::Spec::Win32'     => '3.85',
+            'FileHandle'            => '2.04',
+            'GDBM_File'             => '1.24',
+            'IO::Handle'            => '1.49',
+            'IO::Pipe'              => '1.50',
+            'IO::Socket::INET'      => '1.50',
+            'IO::Socket::UNIX'      => '1.50',
+            'Module::CoreList'      => '5.20220620',
+            'Module::CoreList::Utils'=> '5.20220620',
+            'ODBM_File'             => '1.18',
+            'OS2::REXX'             => '1.06',
+            'Opcode'                => '1.58',
+            'POSIX'                 => '2.04',
+            'SDBM_File'             => '1.16',
+            'Unicode::Normalize'    => '1.32',
+            'XS::APItest'           => '1.23',
+            'builtin'               => '0.007',
+            'encoding::warnings'    => '0.14',
+            'feature'               => '1.74',
+            'threads'               => '2.28',
+        },
+        removed => {
+        }
+    },
 );
 
 sub is_core
@@ -20746,6 +20805,13 @@ sub is_core
     },
     5.037000 => {
         delta_from => 5.036000,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.037001 => {
+        delta_from => 5.037000,
         changed => {
         },
         removed => {

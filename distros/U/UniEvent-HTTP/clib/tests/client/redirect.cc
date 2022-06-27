@@ -76,7 +76,7 @@ TEST("different server") {
 }
 
 TEST("redirection limit") {
-    AsyncTest test(1000);
+    AsyncTest test(5000);
 
     auto req = Request::Builder().uri("/").build();
 

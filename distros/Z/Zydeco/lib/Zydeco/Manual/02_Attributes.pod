@@ -390,6 +390,32 @@ It is worth mentioning that roles can have attributes too.
     }
   }
 
+=head2 C<param> and C<field>
+
+As of version 0.615, Zydeco supports C<param> and C<field> as
+almost-synonyms for C<has>, which are analagous to the keywords
+provided by L<MooseX::Extended>. They have the following semantics:
+
+=over
+
+=item C<param>
+
+This indicates that the attribute is expected to be set in the constructor.
+Unless a default or builder is provided, or you explicitly specify
+C<< required => false >>, this attribute will be required.
+
+=item C<field>
+
+This indicates that the attribute should not be set in the constructor.
+Unless you explicitly specify an C<init_arg> it will be C<undef>, and
+if you do explicitly specify an C<init_arg> it muse start with an
+underscore.
+
+If there's no default or builder and the attibute is read-only, then
+a writer C<< _set_$attribute >> will be provided.
+
+=back
+
 =head1 KEYWORDS
 
 In this chapter, we looked at the following keywords:
@@ -397,6 +423,10 @@ In this chapter, we looked at the following keywords:
 =over
 
 =item C<< has >>
+
+=item C<< param >>
+
+=item C<< field >>
 
 =back
 
@@ -420,7 +450,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2020 by Toby Inkster.
+This software is copyright (c) 2020-2022 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -26,23 +26,20 @@ BEGIN {
 package Game::Combos::Base {
 	use Role::Tiny;
 	use Game::Types -types;
-	use Sub::MultiMethod -role, qw(multimethod);
+	use Sub::MultiMethod qw(multimethod);
 	
 	multimethod play => (
 		signature => [Any, Any],
 		code      => sub { 0 },
 	);
-	
-	no Sub::MultiMethod;
 }
 
 package Game::Combos::Standard {
 	use Role::Tiny;
 	use Game::Types -types;
-	use Sub::MultiMethod -role, qw( multimethod multimethods_from_roles );
+	use Sub::MultiMethod qw( multimethod );
 	
 	with qw( Game::Combos::Base );
-	multimethods_from_roles qw( Game::Combos::Base );
 	
 	multimethod play => (
 		signature => [Paper, Rock],
@@ -56,17 +53,14 @@ package Game::Combos::Standard {
 		signature => [Rock, Scissors],
 		code      => sub { 1 },
 	);
-
-	no Sub::MultiMethod;
 }
 
 package Game::Combos::Extra {
 	use Role::Tiny;
 	use Game::Types -types;
-	use Sub::MultiMethod -role, qw( multimethod multimethods_from_roles );
+	use Sub::MultiMethod qw( multimethod );
 	
 	with qw( Game::Combos::Standard );
-	multimethods_from_roles qw( Game::Combos::Standard );
 
 	multimethod play => (
 		signature => [Paper, Spock],
@@ -96,26 +90,20 @@ package Game::Combos::Extra {
 		signature => [Spock, Scissors],
 		code      => sub { 1 },
 	);
-
-	no Sub::MultiMethod;
 }
 
 package Game::Standard {
 	use Class::Tiny;
 	use Role::Tiny::With;
-	use Sub::MultiMethod qw( multimethods_from_roles );
 
 	with qw( Game::Combos::Standard );
-	multimethods_from_roles qw( Game::Combos::Standard );
 }
 
 package Game::Extended {
 	use Class::Tiny;
 	use Role::Tiny::With;
-	use Sub::MultiMethod qw( multimethods_from_roles );
 
 	with qw( Game::Combos::Extra );
-	multimethods_from_roles qw( Game::Combos::Extra );
 }
 
 my $game = Game::Extended->new;

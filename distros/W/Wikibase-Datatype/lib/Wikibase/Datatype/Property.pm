@@ -27,7 +27,7 @@ Readonly::Hash our %DATA_TYPES => (
 	'wikibase-property' => 'Wikibase::Datatype::Value::Property',
 );
 
-our $VERSION = 0.12;
+our $VERSION = 0.16;
 
 has aliases => (
 	default => [],
@@ -213,7 +213,7 @@ Parameter is optional.
 =item * C<ns>
 
 Namespace.
-Default value is 0.
+Default value is 120.
 
 =item * C<page_id>
 
@@ -495,6 +495,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.12
+0.16
 
 =cut

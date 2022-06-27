@@ -4,7 +4,7 @@
       "Horimoto Yasuhiro <horimoto@clear-code.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.14",
+   "generated_by" : "Minilla/v3.1.19",
    "license" : [
       "lgpl_3_0"
    ],
@@ -63,7 +63,7 @@
       },
       "Groonga::HTTP" : {
          "file" : "lib/Groonga/HTTP.pm",
-         "version" : "0.07"
+         "version" : "1.06"
       },
       "Groonga::HTTP::Client" : {
          "file" : "lib/Groonga/HTTP/Client.pm"
@@ -79,11 +79,12 @@
       },
       "homepage" : "https://github.com/groonga/Groonga-HTTP",
       "repository" : {
-         "url" : "git://github.com/groonga/Groonga-HTTP.git",
+         "type" : "git",
+         "url" : "https://github.com/groonga/Groonga-HTTP.git",
          "web" : "https://github.com/groonga/Groonga-HTTP"
       }
    },
-   "version" : "0.07",
-   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "version" : "1.06",
+   "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 1
 }

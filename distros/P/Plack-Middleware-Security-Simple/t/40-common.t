@@ -20,7 +20,9 @@ my $handler = builder {
                 -notany => [ PATH_INFO => qr{^/downloads/} ],
                 -any => [ archive_extensions ],
             ],
+            backup_files,
             cgi_bin,
+            cms_prefixes,
             dot_files,
             fake_extensions,
             header_injection,
@@ -142,7 +144,56 @@ test_psgi
     };
 
     subtest 'blocked' => sub {
+        my $req = GET "/example.backup";
+        my $res = $cb->($req);
+        ok is_error( $res->code ), join( " ", $req->method, $req->uri );
+        is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";
+    };
+
+    subtest 'blocked' => sub {
+        my $req = GET "/example.bkp";
+        my $res = $cb->($req);
+        ok is_error( $res->code ), join( " ", $req->method, $req->uri );
+        is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";
+    };
+
+    subtest 'blocked' => sub {
+        my $req = GET "/example.npb";
+        my $res = $cb->($req);
+        ok is_error( $res->code ), join( " ", $req->method, $req->uri );
+        is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";
+    };
+
+    subtest 'blocked' => sub {
+        my $req = GET "/example.psc";
+        my $res = $cb->($req);
+        ok is_error( $res->code ), join( " ", $req->method, $req->uri );
+        is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";
+    };
+
+    subtest 'not blocked' => sub {
+        my $req = GET "/example.ps";
+        my $res = $cb->($req);
+        ok is_success( $res->code ), join( " ", $req->method, $req->uri );
+        is $res->code, HTTP_OK, "HTTP_OK";
+    };
+
+    subtest 'blocked' => sub {
+        my $req = GET "/example.old";
+        my $res = $cb->($req);
+        ok is_error( $res->code ), join( " ", $req->method, $req->uri );
+        is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";
+    };
+
+    subtest 'blocked' => sub {
         my $req = POST "/aws.yml";
+        my $res = $cb->($req);
+        ok is_error( $res->code ), join( " ", $req->method, $req->uri );
+        is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";
+    };
+
+    subtest 'blocked' => sub {
+        my $req = GET "/example-com-backup.file";
         my $res = $cb->($req);
         ok is_error( $res->code ), join( " ", $req->method, $req->uri );
         is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";

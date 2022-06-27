@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.0;
 
-our $VERSION = '0.550';
+our $VERSION = '0.551';
 use Exporter 'import';
 our @EXPORT_OK = qw( read_line );
 
@@ -195,7 +195,7 @@ sub __modify_readline_options {
     if ( $self->{page} == 2 && $self->{clear_screen} != 1 ) {
         $self->{clear_screen} = 1;
     }
-    $self->{history} = [ grep { length } @{$self->{history}} ];
+    $self->{history} = [ reverse grep { length } @{$self->{history}} ];
 }
 
 
@@ -499,7 +499,7 @@ Term::Form::ReadLine - Read a line from STDIN.
 
 =head1 VERSION
 
-Version 0.550
+Version 0.551
 
 =cut
 

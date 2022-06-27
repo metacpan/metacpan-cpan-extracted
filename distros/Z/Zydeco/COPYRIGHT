@@ -3,7 +3,11 @@ Upstream-Name: Zydeco
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: http://zydeco.toby.ink/
 
-Files: dist.ini
+Files: Changes
+ META.json
+ META.yml
+ doap.ttl
+ lib/MooX/Pression.pm
  t/00begin.t
  t/02synopsis.t
  t/03subclass.t
@@ -17,6 +21,8 @@ Files: dist.ini
  t/20moosex.t
  t/21coderef.t
  t/22overload.t
+ t/24mm.t
+ t/24mm_coderef.t
  t/25abstract.t
  t/26accumulate.t
  t/27rolehooks.t
@@ -25,6 +31,7 @@ Files: dist.ini
  t/41ps.t
  t/42mf.t
  t/50complextypes.t
+ t/51mixedsigs.t
  t/52lists.t
  t/53outsiders.t
  t/80lines.t
@@ -35,7 +42,7 @@ Files: dist.ini
  t/lib/Local/Example.pm
  t/lib/Local/Example/MoreClasses.zydeco.pm
  t/lib/Local/Example/Roles.zydeco.pm
-Copyright: Copyright 2020 Toby Inkster.
+Copyright: Copyright 2022 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: README
@@ -53,7 +60,7 @@ Files: README
  lib/Zydeco/Manual/10_BeyondZydeco.pod
  t/01basic.t
  t/70symmethods.t
-Copyright: This software is copyright (c) 2020 by Toby Inkster.
+Copyright: This software is copyright (c) 2020-2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: INSTALL
@@ -67,22 +74,15 @@ Files: INSTALL
 Copyright: Unknown
 License: Unknown
 
-Files: Changes
- META.json
- META.yml
- doap.ttl
- lib/MooX/Pression.pm
- t/24mm.t
- t/24mm_coderef.t
- t/51mixedsigs.t
-Copyright: Copyright 2022 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: COPYRIGHT
  CREDITS
  SIGNATURE
 Copyright: None
 License: public-domain
+
+Files: dist.ini
+Copyright: Copyright 2020 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
 
 Files: examples/bench.pl
 Copyright: This software is copyright (c) 2013, 2020 by Toby Inkster.

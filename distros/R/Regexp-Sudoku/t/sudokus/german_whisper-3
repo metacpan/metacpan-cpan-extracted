@@ -1,0 +1,29 @@
+. 7 .  . . .  . . .
+. . .  . . .  . . .
+. . .  . . .  . . .
+
+. . .  . . .  . . .
+. . .  . . .  . . .
+. . .  . . .  . . .
+
+. . .  . . .  . . .
+. . .  . . .  . . .
+. . .  . . .  . 3 .
+==
+Solution
+==
+Create
+Regexp::Sudoku:: -> new -> init
+                 -> set_german_whisper (qw [R1C1 R1C2 R1C3 R2C3 R3C3
+                                            R3C2 R3C1 R4C1 R5C1 R6C1
+                                            R6C2 R6C3 R5C3 R4C3 R4C4
+                                            R4C5 R4C6 R5C6 R6C6 R6C5
+                                            R6C4 R7C4 R8C4 R9C4 R9C5
+                                            R9C6 R8C4 R7C4])
+                 -> set_german_whisper (qw [R1C8 R2C8 R2C7 R3C7 R4C7
+                                            R5C7 R6C7 R7C7 R7C8 R7C9
+                                            R8C9 R9C9 R9C8])
+==
+Name: German Whispers Sudoku
+URL: https://www.youtube.com/watch?v=c35lhg7wyRc
+     https://app.crackingthecryptic.com/sudoku/DgR37JjRqG

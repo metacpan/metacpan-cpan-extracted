@@ -1,0 +1,59 @@
+#! perl
+
+use strict;
+use warnings;
+use Path::Tiny;
+use Sort::Versions;
+
+use alienfile;
+
+# we support any CFITSIO library higher than this
+use constant CFITSIO_VERSION => '4.1.0';
+
+my %req_version = (
+    defined $ENV{ALIEN_CFITSIO_EXACT_VERSION}
+    ? ( exact_version => $ENV{ALIEN_CFITSIO_EXACT_VERSION} )
+    : ( atleast_version => $ENV{ALIEN_CFITSIO_ATLEAST_VERSION} // CFITSIO_VERSION ) );
+
+die( "This distribution only supports CFITSIO versions @{[ CFITSIO_VERSION]} or greater\n" )
+  if versioncmp( CFITSIO_VERSION, (values(%req_version))[0]) == 1;
+
+plugin 'Gather::IsolateDynamic';
+
+
+plugin PkgConfig => (
+    pkg_name => 'cfitsio',
+    %req_version,
+);
+
+share {
+    start_url 'https://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c';
+    plugin Download => (
+        filter  => qr/cfitsio-4.*[.]tar[.]gz/,
+        version => qr/(\d+\.\d+\.\d+)[.]tar[.]gz$/,
+    );
+
+    alienfile::_add_modifier(
+        around => prefer => sub {
+            my ( $orig, $build, @args ) = @_;
+            my $ret  = $build->$orig( @args );
+            my $list = $ret->{list};
+            if ( exists $req_version{exact_version} ) {
+                $ret->{list} = [ grep { $_->{version} eq $req_version{exact_version} } @$list ];
+            }
+            else {
+                $ret->{list} = [grep { versioncmp( $req_version{atleast_version}, $_->{version} ) < 1 } @$list ];
+            }
+            return $ret;
+        } );
+
+    plugin Extract => 'tar.gz';
+    patch sub {
+        my $build = shift;
+        my $patch
+          = path( $build->install_prop->{patch}, "cfitsio-@{[ $build->runtime_prop->{version} ]}.patch", );
+        return unless $patch->exists;
+        Alien::Build::CommandSequence->new( ["%{patch} -p1 <  $patch"] )->execute( $build );
+    };
+    plugin 'Build::Autoconf';
+};

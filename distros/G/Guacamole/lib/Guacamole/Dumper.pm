@@ -1,7 +1,7 @@
 package Guacamole::Dumper;
 our $AUTHORITY = 'cpan:XSAWYERX';
 # ABSTRACT: Dump Guacamole ASTs
-$Guacamole::Dumper::VERSION = '0.007';
+$Guacamole::Dumper::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -65,7 +65,7 @@ Guacamole::Dumper - Dump Guacamole ASTs
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -97,7 +97,7 @@ Vickenty Fesunov
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Sawyer X.
+This software is Copyright (c) 2022 by Sawyer X.
 
 This is free software, licensed under:
 

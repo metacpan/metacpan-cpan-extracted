@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use FindBin;
 use lib $FindBin::RealBin."/../lib";
-use lib $FindBin::RealBin."../..";
+use lib $FindBin::RealBin."/../..";
 
 use Finance::IG; 
 use Getopt::Std; 
@@ -21,7 +21,7 @@ my @credentials=(
                $ENV{HOME}.'/.config/IG/credentials.pl', 
              ); 
 
-our $VERSION=0.099; 
+our $VERSION=0.103; 
 ######### code for multiiple -n x arguments treat as single joined with |. Not handled with getopts. 
 $opt{n}=[]; 
 for my $i (0..$#ARGV)
@@ -46,7 +46,7 @@ $opt{n} or delete $opt{n};
 $opt{a}=1; 
 #########
 
-getopts('ra:c:eotf:FNhn:s:SO:g:', \%opt) or help("Aborted! -h for help "); 
+getopts('ra:c:eotf:FNhn:s:SO:g:v:', \%opt) or help("Aborted! -h for help "); 
 
 my $ig; 
 # IG Credentials needed. 
@@ -271,8 +271,8 @@ my @format=(
            "%-9.2fbid £%-8.2fprofit %5.1fprofitpc%% £%10.2fatrisk\n", 
 
            #5 
-           #"%-41sinstrumentName %6sheld %-6.1fdailyp %+4.2fsize %-9.2flevel  %-41sinstrumentName %screatedDateUTC %+6.2fsize %-9.2flevel\n", 
-           "%-41sinstrumentName %6sheld %-6.1fdailyp %+4.2fsize %-9.2flevel  %-41sinstrumentName %screatedDateUTC ".
+           #"%-41sinstrumentName %6sheld %-6.2fdailyp %+4.2fsize %-9.2flevel  %-41sinstrumentName %screatedDateUTC %+6.2fsize %-9.2flevel\n", 
+           "%-41sinstrumentName %8sheld %-6.2fdailyp %+4.2fsize %-9.2flevel %screatedDateUTC ".
            "£%-7.2fprofit %8.1fprofitpc%%  £%9.2fatrisk\n", 
            , 
      
@@ -301,36 +301,60 @@ else
 } 
 
 $opt{F} and print $format and exit; 
-printf "%d Positions\n",@$p+0 if (!$opt{S}); 
+# printf "%d Positions\n",@$p+0 if (!$opt{S}); 
 
-my $titles=["Epic", 'Name','Size','Open','Latest','P/L','P/L','Value']; 
-$titles=undef; 
+my $count=0; 
+if (!$opt{S})
+{
+for my $position (@$p)
+{ 
+  if ((!$opt{n} or $position->{instrumentName}=~m/$opt{n}/i) and 
+      (!$opt{O} or datecmp($position->{createdDateUTC},$opt{O},$maskint,$gel)) and 
+        ($opt{g}!~m/t/  or  $position->{marketStatus} eq 'TRADEABLE') and
+        ($opt{g}!~m/n/  or  $position->{marketStatus} ne 'TRADEABLE') and   # not tradeable 
+        (!defined $opt{v} or expression($opt{v},$position)) and 
+      1
+     )
+  { 
+     $count++;
+  } 
+} 
+if (@$p==$count) 
+{ 
+  printf "%d Positions\n",$count; 
+} 
+else
+{ 
+  printf "%d of %d Positions\n",$count,0+@$p; 
+}
+}
 
-#print"\n"; 
 
-
+my $titles=undef; 
 
 my $value=0;
 my $profit=0;  
-my $count=0; 
+$count=0; 
 
 for my $position (@$p)
 { 
   # $ig-> printpos($out,$position,$format,-0.5,+0.5); 
-  if (!$opt{N} and ($count==0 or  ( $opt{t} and ($count+1)%10==0)))
+  $position->{rank}=$count+1; 
+  if ((!$opt{n} or $position->{instrumentName}=~m/$opt{n}/i) and 
+      (!$opt{O} or datecmp($position->{createdDateUTC},$opt{O},$maskint,$gel)) and 
+        ($opt{g}!~m/t/  or  $position->{marketStatus} eq 'TRADEABLE') and
+        ($opt{g}!~m/n/  or  $position->{marketStatus} ne 'TRADEABLE') and   # not tradeable 
+        (!defined $opt{v} or expression($opt{v},$position)) and 
+      1
+     )
   { 
-     $ig->printpos($out , $titles, $format); 
+     if (!$opt{N} and ($count==0 or  ( $opt{t} and ($count+1)%10==0)))
+     { 
+       $ig->printpos($out , $titles, $format); 
+     } 
+     $count++;
+     $ig-> printpos($out,$position,$format); 
   } 
-  $count++;
-  $position->{rank}=$count; 
-  $ig-> printpos($out,$position,$format)
-      if ((!$opt{n} or $position->{instrumentName}=~m/$opt{n}/i) and 
-          (!$opt{O} or datecmp($position->{createdDateUTC},$opt{O},$maskint,$gel)) and 
-            ($opt{g}!~m/t/  or  $position->{marketStatus} eq 'TRADEABLE') and
-            ($opt{g}!~m/n/  or  $position->{marketStatus} ne 'TRADEABLE') and   # not tradeable 
-          1
-         )
-      ; 
 
   $value+=$position->{bid}*$position->{size}; 
   $profit+=$position->{profit}; 
@@ -379,6 +403,33 @@ sub datecmp
   return $t1==$t2 if ($gel==0); 
   return $t1<=$t2 if ($gel==-1); 
   return $t1>=$t2; # if ($gel==1); 
+} 
+sub expression
+{ 
+  my ($expr,$position)=@_; 
+  my $eval; 
+
+  # the expression consists of lines like 
+  # $held>100 and $dailyp>0.1 
+  # the  evaluated value is returned by the function
+  # is important to substitute variables longest first so profitpc is done before profit 
+  for my $key (sort { length($b) <=> length($a) } keys %$position) 
+  { 
+    my $x=$position->{$key}; 
+    if (defined($x))
+    { 
+      $x=~s/[%£]//g; 
+      $x=~s/ av// if ($key eq 'dailyp'); 
+      $expr=~s/\$$key/$x/g; 
+    } 
+    else
+    { 
+      $expr=~s/\$$key/undef/g; 
+    } 
+  } 
+  $eval=eval  $expr ; 
+  # print "$position->{instrumentName} => $eval\n"; 
+  return $eval ; 
 } 
 sub help
 { my ($mess)=@_; 
@@ -431,9 +482,13 @@ The default display is decending order of percent profit.  Various formats are p
    -O 2020/11/05 or -O 2020/11/05T15:00:00
    Equal to means with ref to the format so that 
    2020/11/05 means the days are equal while 2020/11 means amy time that month 
+-g x print only tradeable (x=t) or non-tradable (x=n) positions 
+-v exp Evaluate expression and print if true. Example expressions (format id perl format) 
+   '\$dailyp> 0.1 and \$held>100' means daily profit more than 0.1% and held for more than 100 days
+   Any variable (full list below) can be used 
 "; 
 exit 1 if (defined $mess and length($mess)>1); 
-print "A complete list of fields in a position is as follows. Some of these 
+print "\n A complete list of fields in a position is as follows. Some of these 
 are IG things, and some are calculated: 
 
     bid

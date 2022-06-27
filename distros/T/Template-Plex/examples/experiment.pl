@@ -6,7 +6,6 @@ use warnings;
 use Template::Plex;
 use Data::Dumper;
 use File::Basename qw<dirname>;
-use File::Spec::Functions qw<rel2abs>;
 
 my @items=qw<eggs watermellon hensteeth>;
 my $hash={
@@ -17,6 +16,6 @@ my $hash={
 
 my $root=dirname __FILE__;
 
-my $template=plex("external.plex", $hash, root=>$root, no_include=>0);
+my $template=Template::Plex->load("external.plex", $hash, root=>$root, no_include=>0);
 
 say $template->render();

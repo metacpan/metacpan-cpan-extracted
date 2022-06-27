@@ -3,30 +3,38 @@ abstract: 'simple object container'
 author:
   - 'Daisuke Murase <typester@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
-  Test::Requires: 0
+  FindBin: '0'
+  Module::Build::Pluggable::CPANfile: '0.05'
+  Test::Base: '0'
+  Test::More: '0.88'
+  Test::Requires: '0'
+  lib: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
-distribution_type: module
-generated_by: 'Module::Install version 1.00'
-license: perl
+  Module::Build: '0.42'
+  Module::Build::Pluggable: '0'
+  Module::Build::Pluggable::CPANfile: '0.05'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Object-Container
 no_index:
   directory:
-    - inc
     - t
     - xt
-recommends:
-  Exporter::AutoClean: 0
+    - share
 requires:
-  Carp: 0
-  Class::Accessor::Fast: 0
-  Filter::Util::Call: 0
-  parent: 0
+  Carp: '0'
+  Class::Accessor::Fast: '0'
+  Exporter::AutoClean: '0'
+  parent: '0'
+  perl: '5.008005'
+  strict: '0'
+  warnings: '0'
 resources:
-  license: http://dev.perl.org/licenses/
-  repository: git://github.com/typester/object-container-perl.git
-version: 0.14
+  bugtracker: https://github.com/typester/object-container-perl/issues
+  repository: https://github.com/typester/object-container-perl/
+version: '0.15'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

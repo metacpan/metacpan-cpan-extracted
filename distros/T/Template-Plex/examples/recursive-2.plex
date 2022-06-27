@@ -5,7 +5,7 @@ Package in rec 2 @{[__PACKAGE__]}
 do{
 	our $john="cool";
 	#Note this is an immediate render
-	plx "recursive-3.plex";
+	immediate undef, "recursive-3.plex";
 }
 ]}
 

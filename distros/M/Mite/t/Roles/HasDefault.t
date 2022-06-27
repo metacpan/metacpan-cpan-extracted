@@ -5,11 +5,11 @@ use Test::Mite;
 
 after_case "Setup classes" => sub {
     package Foo;
-    use Mouse;
+    use Moo;
     with 'Mite::Role::HasDefault';
 
     package Bar;
-    use Mouse;
+    use Moo;
     with 'Mite::Role::HasDefault';
 };
 

@@ -10,6 +10,7 @@ WriteMakefile(
     PREREQ_PM      => {
         'Exporter'   => '5.57',
         'XSLoader'   => 0,
+        'HTTP::Date' => 0,
     },
     TEST_REQUIRES  => {
         'Test::More' => 0,

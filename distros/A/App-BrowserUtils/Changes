@@ -1,3 +1,8 @@
+0.016   2022-05-20  Released-By: PERLANCAR; Urgency: medium
+
+        - Add argument 'signal' for terminate.
+
+
 0.015   2021-09-27  Released-By: PERLANCAR; Urgency: low
 
 	- [cli pause-and-unpause-browsers] Tweak option --periods (--period

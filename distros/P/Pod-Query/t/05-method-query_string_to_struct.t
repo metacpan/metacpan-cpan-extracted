@@ -4,10 +4,6 @@ use strict;
 use warnings;
 use Test::More;
 
-#TODO: Remove this debug code !!!
-use feature qw(say);
-use Mojo::Util qw(dumper);
-
 BEGIN {
     use_ok( 'Pod::Query' ) || print "Bail out!\n";
 }

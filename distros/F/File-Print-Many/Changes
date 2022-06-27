@@ -1,4 +1,7 @@
 Revision history for File-Print-Many
 
+0.02	Mon Jun 20 11:28:28 EDT 2022
+	print() can now be daisy-chained
+
 0.01	Thu Aug  2 09:48:58 EDT 2018
         First draft

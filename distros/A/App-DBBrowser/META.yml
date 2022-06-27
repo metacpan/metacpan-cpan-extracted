@@ -38,11 +38,11 @@ requires:
   Scalar::Util: '0'
   Spreadsheet::Read: '0'
   String::Unescape: '0'
-  Term::Choose: '1.749'
-  Term::Choose::Util: '0.133'
-  Term::Form: '0.547'
-  Term::Form::ReadLine: '0.543'
-  Term::TablePrint: '0.149'
+  Term::Choose: '1.754'
+  Term::Choose::Util: '0.137'
+  Term::Form: '0.551'
+  Term::Form::ReadLine: '0.551'
+  Term::TablePrint: '0.151'
   Text::CSV: '0'
   bytes: '0'
   open: '0'
@@ -51,7 +51,7 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/App-DBBrowser.git
-version: '2.296'
+version: '2.299'
 x_bugtracker:
   web: https://github.com/kuerbis/App-DBBrowser/issues
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

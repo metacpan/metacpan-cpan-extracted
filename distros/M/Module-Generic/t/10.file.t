@@ -58,6 +58,7 @@ if( $expected_location eq "$f2" )
     $f2->debug( $DEBUG );
     my $io = $f2->open( '+>' );
     diag( $f2->error ) if( !defined( $io ) && $DEBUG );
+    # isa_ok( $io, 'Module::Generic::File::IO', 'opened filehandle object class' );
     isa_ok( $io, 'IO::File', 'opened filehandle object class' );
     $io->print( join( "\n", ( 'line 1', 'line 2', '' ) ) ) || BAIL_OUT( "Unable to write to file \"$f2\": $!" );
     my $pos = $io->tell;
@@ -152,9 +153,10 @@ subtest 'children' => sub
     for( 1..$n_files )
     {
         my $f = $d->child( "file${_}.txt" )->touch;
-        $f->debug( $DEBUG );
+        diag( "Creating file '$f'" );
         push( @files, $f ) if( $f );
         isa_ok( $f, 'Module::Generic::File', "File No ${_} created is object" );
+        $f->debug( $DEBUG );
         SKIP:
         {
             skip( "File No ${_} could not be touched, skipping.", 3 ) if( !$f );

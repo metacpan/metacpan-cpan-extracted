@@ -1,5 +1,8 @@
 #include "Request.h"
 #include "Client.h"
+#include "Pool.h"
+#include "panda/error.h"
+#include "panda/unievent/http/Response.h"
 #include <ostream>
 
 namespace panda { namespace unievent { namespace http {
@@ -23,6 +26,25 @@ void Request::send_final_chunk (const string& chunk) {
 
 void Request::cancel (const ErrorCode& err) {
     if (_client) _client->cancel(err);
+    else if (_pool) _pool->cancel_request(this, err);
+}
+
+void Request::on_timer(const TimerSP&) {
+    if (_client) _client->timed_out(); // when active
+    else if (_pool) _pool->cancel_request(this, make_error_code(std::errc::timed_out)); // when queued in pool
+}
+
+void Request::finish_and_notify (ResponseSP res, const ErrorCode& err) {
+    if (!res) res = static_pointer_cast<Response>(new_response()); // ensure we pass non-null response even for earliest errors
+    cleanup_after_redirect();
+    _redirection_counter = 0;
+    _pool = nullptr;
+
+    if (_timer) _timer->clear();
+
+    RequestSP self = this;
+    partial_event(self, res, err);
+    response_event(self, res, err);
 }
 
 std::ostream& operator<< (std::ostream& os, const NetLoc& h) {

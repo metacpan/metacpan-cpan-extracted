@@ -141,13 +141,39 @@ TEST("compression") {
         .compress(Compression::GZIP)
         .build();
     CHECK(req->compression.type == Compression::GZIP);
-    
+
     auto res = p.client->get_response(req);
     CHECK(res->compression.type == Compression::GZIP);
 
     CHECK(res->code == 200);
     CHECK(res->http_version == 11);
     CHECK(res->body.to_string() == "hello world");
+}
+
+TEST("uncompression") {
+    AsyncTest test(1000);
+    ClientPair p(test.loop);
+    p.server->enable_echo();
+    p.client->uncompress_response(false);
+
+    auto req = Request::Builder()
+        .method(Request::Method::Post)
+        .uri("/")
+        .body("hello world")
+        .compress(Compression::GZIP)
+        .build();
+    CHECK(req->compression.type == Compression::GZIP);
+
+    auto res = p.client->get_response(req);
+    CHECK(res->headers.get("Content-Encoding") == "gzip");
+
+    static const uint8_t compressed_src[] = {0x1f,0x8b,0x08,0x00,0x00,0x00,0x00,0x00,0x04,0x03,0xcb,0x48,0xcd,0xc9,0xc9,0x57,0x28,0xcf,0x2f,0xca,0x49,0x01,0x00,0x85,0x11,0x4a,0x0d,0x0b,0x00,0x00,0x00};
+    string compressed((char*)compressed_src, sizeof(compressed_src));
+
+    CHECK(res->code == 200);
+    CHECK(res->http_version == 11);
+    CHECK(!!res->body.to_string());
+    CHECK((res->body.to_string() == compressed));
 }
 
 TEST("accept-encoding") {

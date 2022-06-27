@@ -13,7 +13,7 @@ dist.ini
 doap.ttl
 examples/benchmark.pl
 examples/json.pl
-examples/rock-paper-scissors-mxp.pl
+examples/rock-paper-scissors-zydeco.pl
 examples/rock-paper-scissors.pl
 examples/roles.pl
 lib/Sub/MultiMethod.pm

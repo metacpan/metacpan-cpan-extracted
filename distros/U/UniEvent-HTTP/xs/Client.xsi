@@ -14,6 +14,15 @@ void Client::request (xs::nn<RequestSP> req)
 
 void Client::cancel (std::error_code err = make_error_code(std::errc::operation_canceled))
 
+bool Client::uncompress_response(SV* v = nullptr) {
+    if (v) {
+        THIS->uncompress_response(xs::in<bool>(v));
+        XSRETURN_UNDEF;
+    } else {
+        RETVAL = THIS->uncompress_response();
+    }
+}
+
 SV* CLONE_SKIP (...) {
     XSRETURN_YES;
     PERL_UNUSED_VAR(items);

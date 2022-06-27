@@ -27,7 +27,7 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.9608"
+            "SPVM" : "0.9610"
          }
       },
       "runtime" : {
@@ -40,6 +40,6 @@
          "type" : "git"
       }
    },
-   "version" : "0.02",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Gimei
 
+v0.1.1 2022-06-20T07:04:01Z
+
+    - ues Pod::Usage instead of perldoc
+
 v0.1.0 2022-06-01T04:00:43Z
 
     - support 'name:sex'

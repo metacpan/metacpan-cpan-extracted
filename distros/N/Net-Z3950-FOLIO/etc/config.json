@@ -25,7 +25,7 @@
     },
     "9999": "contributors/@name,title,hrid,subjects"
   },
-  "graphqlQuery": "instances.graphql-query",
+  "graphqlQuery": "mod-search.graphql-query",
   "queryFilter": "cql.allRecords=1 NOT discoverySuppress=true",
   "chunkSize": 5
 }

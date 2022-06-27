@@ -12,18 +12,15 @@ my @module_files = (
     'Org/Document.pm',
     'Org/Element.pm',
     'Org/Element/Block.pm',
-    'Org/Element/BlockRole.pm',
     'Org/Element/Comment.pm',
     'Org/Element/Drawer.pm',
     'Org/Element/FixedWidthSection.pm',
     'Org/Element/Footnote.pm',
     'Org/Element/Headline.pm',
-    'Org/Element/InlineRole.pm',
     'Org/Element/Link.pm',
     'Org/Element/List.pm',
     'Org/Element/ListItem.pm',
     'Org/Element/RadioTarget.pm',
-    'Org/Element/Role.pm',
     'Org/Element/Setting.pm',
     'Org/Element/Table.pm',
     'Org/Element/TableCell.pm',
@@ -33,6 +30,9 @@ my @module_files = (
     'Org/Element/Text.pm',
     'Org/Element/TimeRange.pm',
     'Org/Element/Timestamp.pm',
+    'Org/ElementRole.pm',
+    'Org/ElementRole/Block.pm',
+    'Org/ElementRole/Inline.pm',
     'Org/Parser.pm'
 );
 

@@ -1,6 +1,16 @@
 CHANGES
 -------
 
+  1.000 25 June  2022
+
+        * version 1.000
+          Sat Jun 25 15:04:32 2022 +0100
+          b7993a4fd0a3ee3998fa3b2659bdcd5caa74025a
+
+        * Changes for zlib-ng
+          Thu Jun 23 22:43:31 2022 +0100
+          07e46a435ccba2a4b4d4699e4c8baf89019f4cb4
+
   0.040 8 July 2020
 
         * Test "at least" version for optional modules

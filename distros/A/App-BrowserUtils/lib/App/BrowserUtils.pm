@@ -8,9 +8,9 @@ use Log::ger;
 use Hash::Subset qw(hash_subset);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-27'; # DATE
+our $DATE = '2022-05-20'; # DATE
 our $DIST = 'App-BrowserUtils'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 our %SPEC;
 
@@ -161,6 +161,13 @@ our %argopt_quiet = (
     },
 );
 
+our %argopt_signal = (
+    signal => {
+        schema=>'unix::signal*',
+        cmdline_aliases => {s=>{}},
+    },
+);
+
 our %argopt_periods = (
     periods => {
         'x.name.is_plural' => 1,
@@ -276,8 +283,15 @@ sub _do_browser {
             kill CONT => @pids;
             return [200, "OK", "", {"func.pids" => \@pids}];
         } elsif ($which_action eq 'terminate') {
-            log_info "Terminating $which_browser ...";
-            kill KILL => @pids;
+            my $signal;
+            if (defined $args{signal}) {
+                log_info "Sending %s signal to $which_browser ...", $args{signal};
+                $signal = $args{signal};
+            } else {
+                log_info "Terminating $which_browser ...";
+                $signal = 'KILL';
+            }
+            kill $signal => @pids;
             return [200, "OK", "", {"func.pids" => \@pids}];
         } elsif ($which_action eq 'has_processes' || $which_action eq 'is_paused' || $which_action eq 'is_running') {
             my $num_stopped = 0;
@@ -447,9 +461,10 @@ sub browsers_are_paused {
 
 $SPEC{terminate_browsers} = {
     v => 1.1,
-    summary => "Terminate (kill -KILL) browsers",
+    summary => "Terminate browsers (by default with -KILL)",
     args => {
         %args_common,
+        %argopt_signal,
     },
 };
 sub terminate_browsers {
@@ -702,7 +717,7 @@ App::BrowserUtils - Utilities related to browsers, particularly modern GUI ones
 
 =head1 VERSION
 
-This document describes version 0.015 of App::BrowserUtils (from Perl distribution App-BrowserUtils), released on 2021-09-27.
+This document describes version 0.016 of App::BrowserUtils (from Perl distribution App-BrowserUtils), released on 2022-05-20.
 
 =head1 SYNOPSIS
 
@@ -1086,13 +1101,15 @@ Usage:
 
  terminate_browsers(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Terminate (kill -KILL) browsers.
+Terminate browsers (by default with -KILL).
 
 This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<signal> => I<unix::signal>
 
 =item * B<users> => I<array[unix::local_uid]>
 
@@ -1192,7 +1209,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

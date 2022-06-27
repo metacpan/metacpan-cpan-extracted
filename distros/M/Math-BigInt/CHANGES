@@ -1,3 +1,24 @@
+1.999836 2022-06-24
+
+ * Improve compatibility with older versions of the Math-BigRat distribution.
+   Math-BigInt version 1.999835 works with Math-BigRat version 0.2623 and newer.
+   Math-BigInt version 1.999836 works with Math-BigRat version 0.2618 and newer.
+
+ * Re-enable upgrading in Math::BigFloat->bdiv().
+
+ * Fix an error in the enabling/disabling of upgrading/downgrading.
+
+ * Fix typos and other formatting errors.
+
+1.999835 2022-05-24
+
+ * Fix bug related to upgrading in Math::BigInt->brsft(). This bug
+   only showed up in Perl versions 5.16 and older.
+
+1.999834 2022-05-23
+
+ * Further improvements to upgrading and downgrading.
+
 1.999833 2022-05-23
 
  * Fix Math::BigFloat->bpi(). The previous attempt at correcting it

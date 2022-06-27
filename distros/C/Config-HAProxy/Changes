@@ -1,5 +1,10 @@
 Revision history for Perl extension Config::HAProxy.
 
+1.08  Thu Jun 23 15:21:17 2022
+	- Handle the 'resolvers' section.
+	- New class methods for declaring (and undeclaring) sections.
+	- Fix changing the argv of a Node.
+
 1.06  Fri Feb 12 20:37:32 2021
 	- Change bugtracker address.
 

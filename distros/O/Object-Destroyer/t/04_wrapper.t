@@ -5,13 +5,10 @@
 ##
 
 use strict;
-BEGIN {
-    $|  = 1;
-    $^W = 1;
-}
+use warnings;
 
-use Test::More tests => 34;
-use Object::Destroyer 2.01;
+use Test::More;
+use Object::Destroyer;
 
 my $foo = Foo->new;
 my $sentry = Object::Destroyer->new($foo, 'release');
@@ -71,6 +68,40 @@ my $new = $sentry->new;
 is(ref $new, 'Foo');
 
 ##
+## Test that AUTOLOAD handles errors correctly
+##
+eval { $sentry->impossible };
+like(
+    $@,
+    qr/Can't locate object method "impossible"/,
+    'AUTOLOAD handles errors correctly'
+);
+
+eval {
+    $sentry->DESTROY;
+    $sentry->impossible;
+};
+like(
+    $@,
+    qr/Can't locate object to call method 'impossible'/,
+    'AUTOLOAD cannot find method after DESTROY'
+);
+
+$sentry = Object::Destroyer->new(sub { 123; });
+eval { $sentry->impossible };
+like(
+    $@,
+    qr/Can't locate object to call method 'impossible'/,
+    'AUTOLOAD cannot find method when there is no object'
+);
+
+isnt(
+    ref($sentry->can('foo')),
+    'CODE',
+    'can does not pass through without object'
+);
+
+##
 ## Test for AUTOLOAD'ed methods
 ##
 my $buzz = Buzz->new();
@@ -81,8 +112,14 @@ is( scalar($sentry->bar(3)), "barbarbar");
 is_deeply( [$sentry->bar], ["bar", "bar"]);
 is_deeply( [$sentry->foo(1)], ["foo"]);
 is_deeply( [$sentry->t(3)], [qw/t t t/]);
+eval {
+    $sentry->void;
+    return;
+};
+ok !$@, 'AUTOLOAD in void context works';
 
 
+done_testing;
 
 #####################################################################
 # Test Classes
@@ -109,17 +146,17 @@ sub params_count{
     return scalar(@_);
 }
 
-sub hello { 
-    shift; 
-    return (@_) ? "Hello $_[0]!" : "Hello World!" 
+sub hello {
+    shift;
+    return (@_) ? "Hello $_[0]!" : "Hello World!"
 }
 
-sub test_context{ 
-    return  (wantarray) ? (1, 2) : 
+sub test_context{
+    return  (wantarray) ? (1, 2) :
             (defined wantarray) ? -1 : ++$_;
 }
 
-sub DESTROY { 
+sub DESTROY {
     $destroy_counter++;
 }
 
@@ -141,11 +178,11 @@ use vars '$AUTOLOAD';
 sub AUTOLOAD{
     my $self = shift;
     my $repeat_number = shift || 2;
-    
+
     my ($method) = $AUTOLOAD =~ /.*::(.*)$/;
     return (wantarray) ?
         ($method) x $repeat_number :
-        $method   x $repeat_number; 
+        $method   x $repeat_number;
 }
 
 sub DESTROY{

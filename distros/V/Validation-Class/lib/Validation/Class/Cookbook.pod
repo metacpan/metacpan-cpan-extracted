@@ -13,7 +13,7 @@ Validation::Class::Cookbook - Recipes for Validation::Class
 
 =head1 VERSION
 
-version 7.900057
+version 7.900058
 
 =head1 GUIDED TOUR
 
@@ -524,7 +524,7 @@ A validation class using Moose as an object system could be configured as follow
 
     # the order in which these frameworks are used is important
     # loading Moose first ensures that the Moose::Object constructor
-    # has precendence
+    # has precedence
 
     sub BUILD {
 
@@ -661,12 +661,12 @@ for other purposes.
 =head2 Problem
 
 You want to know how to use your data validation classes to perform other tasks
-programatically (e.g. generate documentation, etc).
+programmatically (e.g. generate documentation, etc).
 
 =head2 Solution
 
 By using the prototype class associated with your validation class you can
-introspect it's configuration and perform additional tasks programatically.
+introspect it's configuration and perform additional tasks programmatically.
 
 =head2 Discussion
 

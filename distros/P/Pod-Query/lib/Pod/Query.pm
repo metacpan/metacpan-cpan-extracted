@@ -3,13 +3,13 @@ package Pod::Query;
 use v5.24;    # Postfix defef :)
 use strict;
 use warnings;
-use File::Spec::Functions qw/ catfile /;
-use List::Util            qw/ first /;
-use Text::ParseWords      qw/ parse_line /;
-use Mojo::Base            qw/ -base /;
-use Mojo::Util            qw/ dumper class_to_path /;
-use Mojo::ByteStream      qw/ b/;
-use Term::ReadKey         qw/ GetTerminalSize /;
+use File::Spec::Functions qw( catfile );
+use List::Util            qw( first );
+use Text::ParseWords      qw( parse_line );
+use Mojo::Base            qw( -base );
+use Mojo::Util            qw( dumper class_to_path );
+use Mojo::ByteStream      qw( b );
+use Term::Size::Any       qw( chars );
 use Pod::Text();
 use Pod::LOL;
 
@@ -19,11 +19,11 @@ Pod::Query - Query pod documents
 
 =head1 VERSION
 
-Version 0.19
+Version 0.24
 
 =cut
 
-our $VERSION                   = '0.19';
+our $VERSION                   = '0.24';
 our $DEBUG_LOL_DUMP            = 0;
 our $DEBUG_STRUCT_OVER         = 0;
 our $DEBUG_TREE                = 0;
@@ -42,6 +42,7 @@ has [
       path
       lol
       tree
+      class_is_path
       /
 ];
 
@@ -57,6 +58,8 @@ Query POD information from a file
    % perl -MPod::Query -E 'say Pod::Query->new("ojo")->find("head1[0]/Para[0]")'
 
    ojo - Fun one-liners with Mojo
+
+   % perl -MPod::Query -E 'say Pod::Query->new(shift)->find("head1[0]/Para[0]")' my.pod
 
 Find Methods:
 
@@ -97,10 +100,11 @@ sub new {
 
     my $s = bless {
         pod_class => $pod_class,
-        path      => _class_to_path( $pod_class ),
         lol       => [],
         tree      => [],
     }, $class;
+
+    $s->path( $s->_class_to_path( $pod_class ) );
 
     return $s if $path_only or not $s->path;
 
@@ -123,18 +127,20 @@ sub new {
     $s;
 }
 
-
 =head2 _class_to_path
 
 Given a class name, returns the path to the pod file.
 Return value is cached (based on the class of the pod file).
+
+If the class is not found in INC, it will be checked whether
+the input is an existing file path.
 
 Returns an empty string if there are any errors.
 
 =cut
 
 sub _class_to_path {
-    my ( $pod_class ) = @_;
+    my ( $s, $pod_class ) = @_;
     state %CACHE;
     my $path;
 
@@ -152,9 +158,19 @@ sub _class_to_path {
         return $CACHE{$pod_class} = $path if $path and -f $path;
     }
 
+    # Check for it in PATH also.
+    # Maybe pod_class is the path.
+    for ( split /:/, $ENV{PATH} ) {
+        $path = catfile( $_, $pod_class );
+        if ( $path and -f $path ) {
+            $path = $pod_class if $_ eq ".";    # Ignore current directory.
+            $s->class_is_path( 1 );
+            return $CACHE{$pod_class} = $path;
+        }
+    }
+
     return "";
 }
-
 
 =head2 _mock_root
 
@@ -278,7 +294,6 @@ sub _lol_to_tree {
     \@tree;
 }
 
-
 =head2 _define_heads_regex_table
 
 Generates the regexes for head elements inside
@@ -294,7 +309,6 @@ sub _define_heads_regex_table {
         $_ => [ map { qr/ ^ head ([$_]) $ /x } $inner, $outer ]
     } 1 .. 4;
 }
-
 
 =head2 _make_leaf
 
@@ -319,7 +333,6 @@ sub _make_leaf {
 
     $leaf;
 }
-
 
 =head2 _structure_over
 
@@ -364,7 +377,6 @@ sub _structure_over {
     \@struct;
 }
 
-
 =head2 find_title
 
 Extracts the title information.
@@ -375,7 +387,6 @@ sub find_title {
     my ( $s ) = @_;
     scalar $s->find( 'head1=NAME[0]/Para[0]' );
 }
-
 
 =head2 find_method
 
@@ -389,7 +400,6 @@ sub find_method {
 
     $s->find( sprintf '~head=~^%s\b.*$[0]**', $m );
 }
-
 
 =head2 find_method_summary
 
@@ -423,7 +433,6 @@ sub _clean_method_name {
     $clean;
 }
 
-
 =head2 find_events
 
 Extracts a list of events with a description.
@@ -436,7 +445,6 @@ sub find_events {
     my ( $s ) = @_;
     $s->find( '~head=EVENTS[0]/~head*/(Para)[0]' );
 }
-
 
 =head2 find
 
@@ -522,7 +530,6 @@ sub find {
 
     _render( $kept_all, @tree );
 }
-
 
 =head2 _query_string_to_struct
 
@@ -614,7 +621,6 @@ sub _query_string_to_struct {
     \@query_struct;
 }
 
-
 =head2 _check_conditions
 
 Check if queries are valid.
@@ -668,7 +674,6 @@ sub _check_conditions {
           and defined $section->{nth_in_group};
     }
 }
-
 
 =head2 _set_condition_defaults
 
@@ -725,7 +730,6 @@ sub _set_condition_defaults {
     }
 }
 
-
 =head2 _find
 
 Lower level find command.
@@ -768,11 +772,13 @@ sub _find {
                     say "next->{text}=$need->{text}";
                 }
 
-                if ( defined $try->{keep} ) {    # TODO; Why empty block?
-                    say "ENFORCING: keep" if $DEBUG_FIND;
-                }
-                elsif ( $try->{tag} =~ /$need->{tag}/
-                    and $try->{text} =~ /$need->{text}/ )
+                elsif (
+                        $try->{tag}  =~ /$need->{tag}/
+                    and $try->{text} =~ /$need->{text}/
+                    and not defined $try->{keep} # Already found the node.
+                                                 # Since nodes are checked again
+                                                 # on next call to _find.
+                  )
                 {
                     say "Found:  tag=$try->{tag}, text=$try->{text}"
                       if $DEBUG_FIND;
@@ -837,7 +843,6 @@ sub _find {
     @found;
 }
 
-
 =head2 _invert
 
 Previous elements are inside of the child
@@ -893,7 +898,6 @@ sub _invert {
 
     @tree;
 }
-
 
 =head2 _render
 
@@ -971,14 +975,13 @@ sub get_term_width {
     state $term_width;
 
     if ( not $term_width ) {
-        ( $term_width ) = eval { GetTerminalSize() };
+        $term_width = eval { chars() };
         $term_width ||= 80;    # Safe default.
         $term_width--;         # Padding.
     }
 
     $term_width;
 }
-
 
 =head1 SEE ALSO
 

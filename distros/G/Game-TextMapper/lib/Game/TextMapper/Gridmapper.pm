@@ -220,6 +220,7 @@ Matthew J. Neagley, for Gnome Stew.
 
 sub five_room_shape {
   my $self = shift;
+  my $n = shift;
   my @shapes;
 
 =head3 The Railroad
@@ -333,7 +334,7 @@ sub five_room_shape {
        [[0, 2], [1, 2], [2, 2], [2, 1], [1, 1, 1, 3]],
        [[0, 2], [0, 1], [1, 1], [2, 1], [1, 2, 0, 2]]);
 
-  return $self->shape_flip(one(@shapes));
+  return $self->shape_trim($self->shape_flip(one(@shapes)), $n);
 }
 
 =head2 7 Room Dungeons
@@ -346,6 +347,7 @@ shapes in addition to the five room shapes.
 
 sub seven_room_shape {
   my $self = shift;
+  my $n = shift;
   my @shapes;
 
 =head3 The Snake
@@ -487,7 +489,7 @@ sub seven_room_shape {
     [[0, 2], [0, 1], [0, 0], [1, 0], [1, 1], [1, 2, 0, 4], [2, 2, 5]],
     [[0, 2], [0, 1], [0, 0], [1, 0], [1, 1], [1, 2, 0, 4], [2, 1, 4]]);
 
-  return $self->shape_flip(one(@shapes));
+  return $self->shape_trim($self->shape_flip(one(@shapes)), $n);
 }
 
 sub shape_flip {
@@ -515,6 +517,14 @@ sub shape_flip {
 		   $_ } @$shape];
     # $log->debug("flip both: " . join(", ", map { "[@$_]"} @$shape));
   }
+  return $shape;
+}
+
+sub shape_trim {
+  my $self = shift;
+  my $shape = shift;
+  my $n = shift;
+  splice(@$shape, $n);
   return $shape;
 }
 
@@ -610,7 +620,7 @@ sub shape_reconnect {
   # $log->debug("left candidates: " . join(", ", map { join(" → ", map { $_ < 10 ? $_ : chr(55 + $_) } @$_) } @left_candidates));
   for (one(@up_candidates), one(@left_candidates)) {
     next unless $_;
-    # $log->debug("Connecting " . join(" → ", map { $_ < 10 ? $_ : chr(55 + $_) } @$_));
+    $log->debug("Connecting " . join(" → ", map { sprintf("%2x", $_) } @$_));
     my ($start, $end) = @$_;
     if (@{$result->[$start]} == 3 and $result->[$start]->[2] == $start) {
       # remove the fake connection if there is one
@@ -653,10 +663,12 @@ sub shape {
     $sevens--;
     $rest = $num - 7 * $sevens;
   }
-  my $fives = POSIX::ceil($rest/5);
+  my $fives = POSIX::floor($rest/5);
   my @sequence = shuffle((5) x $fives, (7) x $sevens);
-  @sequence = (5) unless @sequence;
-  $shape = $self->shape_merge(map { $_ == 5 ? $self->five_room_shape() : $self->seven_room_shape() } @sequence);
+  $rest = $num - 7 * $sevens - 5 * $fives;
+  push(@sequence, $rest) if $rest;
+  $log->debug("Sequence for $num rooms: " . join(" ", @sequence));
+  $shape = $self->shape_merge(map { $_ == 7 ? $self->seven_room_shape($_) : $self->five_room_shape($_) } @sequence);
   for (my $n = 0; @sequence; $n += shift(@sequence)) {
     push(@$stairs, $n + 1);
   }

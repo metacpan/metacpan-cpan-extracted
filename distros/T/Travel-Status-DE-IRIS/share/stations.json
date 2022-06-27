@@ -468,6 +468,15 @@
       "name" : "Ahrensfelde Nord"
    },
    {
+      "ds100" : "AARF",
+      "eva" : 8071338,
+      "latlong" : [
+         53.233409,
+         8.818139
+      ],
+      "name" : "Ahrensfelde(Bz. Bremen)"
+   },
+   {
       "ds100" : "KAH",
       "eva" : 8000448,
       "latlong" : [
@@ -2916,8 +2925,8 @@
       "name" : "Aufhausen(b Erding)"
    },
    {
-      "ds100" : "PQKAG",
-      "eva" : 150074,
+      "ds100" : "RKAG",
+      "eva" : 721323,
       "latlong" : [
          48.99874,
          8.40384
@@ -11340,6 +11349,15 @@
       "name" : "Brigachtal Klengen"
    },
    {
+      "ds100" : "ABRI",
+      "eva" : 8071333,
+      "latlong" : [
+         53.414533,
+         9.013664
+      ],
+      "name" : "Brillit"
+   },
+   {
       "ds100" : "EBRS",
       "eva" : 8001182,
       "latlong" : [
@@ -11392,15 +11410,6 @@
          14.728753
       ],
       "name" : "Brniste"
-   },
-   {
-      "ds100" : "XTBDN",
-      "eva" : 5438015,
-      "latlong" : [
-         49.182897,
-         16.615733
-      ],
-      "name" : "Brno dolni nadrazi"
    },
    {
       "ds100" : "XTBR",
@@ -16290,7 +16299,7 @@
       "name" : "Dießen"
    },
    {
-      "ds100" : "XLDI",
+      "ds100" : "OLDI",
       "eva" : 8200920,
       "latlong" : [
          49.528329,
@@ -19062,7 +19071,7 @@
       "name" : "Eggenstein Spöcker Weg, Eggenstein-Leopoldshafen"
    },
    {
-      "ds100" : "PQEGS",
+      "ds100" : "REGS",
       "eva" : 720703,
       "latlong" : [
          49.071428,
@@ -24732,6 +24741,15 @@
       "name" : "Gallarate"
    },
    {
+      "ds100" : "WGAL",
+      "eva" : 8011593,
+      "latlong" : [
+         53.516641,
+         12.129379
+      ],
+      "name" : "Gallin"
+   },
+   {
       "ds100" : "TGAM",
       "eva" : 8002177,
       "latlong" : [
@@ -26307,6 +26325,15 @@
       "name" : "Gnevkow"
    },
    {
+      "ds100" : "OAGNI",
+      "eva" : 8100857,
+      "latlong" : [
+         46.961986,
+         15.852711
+      ],
+      "name" : "Gniebing"
+   },
+   {
       "ds100" : "XPGN",
       "eva" : 5100013,
       "latlong" : [
@@ -26899,6 +26926,15 @@
          15.448298
       ],
       "name" : "Graz Ostbahnhof-Messe"
+   },
+   {
+      "ds100" : "OAGLM",
+      "eva" : 8103487,
+      "latlong" : [
+         47.039949,
+         15.462831
+      ],
+      "name" : "Graz-Liebenau Murpark"
    },
    {
       "ds100" : "FGSN",
@@ -30483,6 +30519,15 @@
       "name" : "Harsum"
    },
    {
+      "ds100" : "PAHA",
+      "eva" : 8102050,
+      "latlong" : [
+         47.041693,
+         15.507363
+      ],
+      "name" : "Hart b. Graz"
+   },
+   {
       "ds100" : "DHST",
       "eva" : 8011823,
       "latlong" : [
@@ -33451,6 +33496,15 @@
          16.9007221022991
       ],
       "name" : "Hohenau"
+   },
+   {
+      "ds100" : "OAHHR",
+      "eva" : 8100945,
+      "latlong" : [
+         46.944322,
+         16.060353
+      ],
+      "name" : "Hohenbrugg an der Raab"
    },
    {
       "ds100" : "MHOB",
@@ -37123,6 +37177,15 @@
          9.768148
       ],
       "name" : "Karlstadt(Main)"
+   },
+   {
+      "ds100" : "WKA",
+      "eva" : 8010188,
+      "latlong" : [
+         53.540373,
+         12.272118
+      ],
+      "name" : "Karow(Meckl)"
    },
    {
       "ds100" : "MKH",
@@ -41112,7 +41175,7 @@
       "name" : "Lancken"
    },
    {
-      "ds100" : "OPLAT",
+      "ds100" : "XPLAN",
       "eva" : 5101932,
       "latlong" : [
          50.081431,
@@ -42109,6 +42172,24 @@
          8.624525
       ],
       "name" : "Laveno Mombello"
+   },
+   {
+      "ds100" : "OALH",
+      "eva" : 8100194,
+      "latlong" : [
+         47.078899,
+         15.588473
+      ],
+      "name" : "Laßnitzhöhe"
+   },
+   {
+      "ds100" : "OALNT",
+      "eva" : 8101161,
+      "latlong" : [
+         47.088167,
+         15.656341
+      ],
+      "name" : "Laßnitzthal"
    },
    {
       "ds100" : "XFBLM",
@@ -45054,6 +45135,15 @@
       "name" : "Löcknitz"
    },
    {
+      "ds100" : "OALOF",
+      "eva" : 8101164,
+      "latlong" : [
+         46.954641,
+         15.9461
+      ],
+      "name" : "Lödersdorf"
+   },
+   {
       "ds100" : "HLOD",
       "eva" : 8003722,
       "latlong" : [
@@ -45376,6 +45466,15 @@
          11.411316
       ],
       "name" : "Lübstorf"
+   },
+   {
+      "ds100" : "WLZ",
+      "eva" : 8012265,
+      "latlong" : [
+         53.466877,
+         12.025535
+      ],
+      "name" : "Lübz"
    },
    {
       "ds100" : "ELS",
@@ -48672,6 +48771,15 @@
       "name" : "Moers"
    },
    {
+      "ds100" : "OAMOG",
+      "eva" : 8101231,
+      "latlong" : [
+         46.945481,
+         16.228604
+      ],
+      "name" : "Mogersdorf"
+   },
+   {
       "ds100" : "WMOI",
       "eva" : 8012384,
       "latlong" : [
@@ -51435,15 +51543,6 @@
       "name" : "Nestemice"
    },
    {
-      "ds100" : "D730823",
-      "eva" : 730823,
-      "latlong" : [
-         52.544431,
-         13.370133
-      ],
-      "name" : "Nettelbeckplatz/Wedding (S), Berlin"
-   },
-   {
       "ds100" : "KNEH",
       "eva" : 8004242,
       "latlong" : [
@@ -52263,7 +52362,7 @@
       "name" : "Neuruppin Rheinsberger Tor"
    },
    {
-      "ds100" : "WNR",
+      "ds100" : "WNRW",
       "eva" : 8010246,
       "latlong" : [
          52.926244,
@@ -55725,7 +55824,7 @@
          53.144323,
          8.222713
       ],
-      "name" : "Oldenburg(Oldb)"
+      "name" : "Oldenburg(Oldb)Hbf"
    },
    {
       "ds100" : "HOLW",
@@ -57024,6 +57123,15 @@
       "name" : "Passau Hbf"
    },
    {
+      "ds100" : "WPAW",
+      "eva" : 8012612,
+      "latlong" : [
+         53.50811,
+         12.054112
+      ],
+      "name" : "Passow(Meckl)"
+   },
+   {
       "ds100" : "WPS",
       "eva" : 8012611,
       "latlong" : [
@@ -57888,15 +57996,6 @@
       "name" : "Plaue(Thür)"
    },
    {
-      "ds100" : "DPU",
-      "eva" : 8013463,
-      "latlong" : [
-         50.48624,
-         12.129382
-      ],
-      "name" : "Plauen(V) unt Bf"
-   },
-   {
       "ds100" : "DPM",
       "eva" : 8017442,
       "latlong" : [
@@ -58686,7 +58785,7 @@
          47.855513,
          12.346615
       ],
-      "name" : "Prien a Chiemsee"
+      "name" : "Prien am Chiemsee"
    },
    {
       "ds100" : "DPR",
@@ -58786,6 +58885,15 @@
          13.838399
       ],
       "name" : "Probostov"
+   },
+   {
+      "ds100" : "APSH",
+      "eva" : 8007318,
+      "latlong" : [
+         54.364899,
+         10.291408
+      ],
+      "name" : "Probsteierhagen"
    },
    {
       "ds100" : "UPR",
@@ -61792,6 +61900,15 @@
          14.1911327556412
       ],
       "name" : "Rohr-Bad Hall"
+   },
+   {
+      "ds100" : "OARRH",
+      "eva" : 8101454,
+      "latlong" : [
+         46.976314,
+         15.812412
+      ],
+      "name" : "Rohr/Raab"
    },
    {
       "ds100" : "MRBI",
@@ -66114,6 +66231,15 @@
       "name" : "Schönhausen(Elbe)"
    },
    {
+      "ds100" : "ASCK",
+      "eva" : 8007314,
+      "latlong" : [
+         54.332691,
+         10.229356
+      ],
+      "name" : "Schönkirchen Bf"
+   },
+   {
       "ds100" : "RSOM",
       "eva" : 8005409,
       "latlong" : [
@@ -69597,15 +69723,6 @@
       "name" : "Stolberg(Harz)"
    },
    {
-      "ds100" : "KST G",
-      "eva" : 8099506,
-      "latlong" : [
-         50.797555,
-         6.22488
-      ],
-      "name" : "Stolberg(Rheinl)Gbf"
-   },
-   {
       "ds100" : "KST",
       "eva" : 8000348,
       "latlong" : [
@@ -69991,6 +70108,15 @@
          9.920377
       ],
       "name" : "Stubersheim"
+   },
+   {
+      "ds100" : "OASU",
+      "eva" : 8100196,
+      "latlong" : [
+         46.99903,
+         15.774747
+      ],
+      "name" : "Studenzen-Fladnitz"
    },
    {
       "ds100" : "LSTF",
@@ -70819,6 +70945,15 @@
          12.567336
       ],
       "name" : "Tacherting"
+   },
+   {
+      "ds100" : "OATSM",
+      "eva" : 8100318,
+      "latlong" : [
+         47.045657,
+         15.757767
+      ],
+      "name" : "Takern-St.Margarethen"
    },
    {
       "ds100" : "OATAL",
@@ -80910,7 +81045,7 @@
       "name" : "Zittau Vorstadt"
    },
    {
-      "ds100" : "XSZI",
+      "ds100" : "PSZI",
       "eva" : 8509054,
       "latlong" : [
          46.9348427166025,

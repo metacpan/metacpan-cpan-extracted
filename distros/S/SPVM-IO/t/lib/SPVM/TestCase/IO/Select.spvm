@@ -2,6 +2,7 @@ class TestCase::IO::Select {
   use IO::Select;
   use IO::File;
   use Fn;
+  use Array;
 
   static method add : int () {
     my $select = IO::Select->new;
@@ -38,7 +39,7 @@ class TestCase::IO::Select {
     }
     {
       my $handles = $select->handles;
-      unless (Fn->equals_array_int($handles, [IO::File->STDIN(), IO::File->STDOUT(), 4, 5])) {
+      unless (Array->equals_int($handles, [IO::File->STDIN(), IO::File->STDOUT(), 4, 5])) {
         return 0;
       }
     }
@@ -90,7 +91,7 @@ class TestCase::IO::Select {
     
     {
       my $handles = $select->handles;
-      unless (Fn->equals_array_int($handles, [IO::File->STDIN(), IO::File->STDOUT(), 5])) {
+      unless (Array->equals_int($handles, [IO::File->STDIN(), IO::File->STDOUT(), 5])) {
         return 0;
       }
     }

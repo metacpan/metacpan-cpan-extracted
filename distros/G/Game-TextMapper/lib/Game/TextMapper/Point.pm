@@ -107,7 +107,7 @@ sub coordinates {
   return $self->x . "," . $self->y;
 }
 
-=head3 coord
+=head3 coord($x, $y, $separator)
 
 Return "0101" or "-01-01" for coordinates. Often this what we want in text.
 

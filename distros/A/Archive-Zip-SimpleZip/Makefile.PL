@@ -7,7 +7,7 @@ use lib '.';
 use private::MakeUtil;
 use ExtUtils::MakeMaker 5.16 ;
 
-my $ParentVersion = 2.096 ;
+my $ParentVersion = 2.201 ;
 
 # Check if th eother IO::Compress::* modules are installed.
 # If any are, add to PREREQ_PM.

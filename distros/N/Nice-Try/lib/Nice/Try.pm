@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## A real Try Catch Block Implementation Using Perl Filter - ~/lib/Nice/Try.pm
-## Version v1.2.0
+## Version v1.3.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/05/17
-## Modified 2022/03/27
+## Modified 2022/04/24
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,6 +17,10 @@ BEGIN
     use strict;
     use warnings;
     use warnings::register;
+    use vars qw(
+        $CATCH $DIED $EXCEPTION $FINALLY $HAS_CATCH @RETVAL $SENTINEL $TRY $WANTARRAY
+        $VERSION $ERROR
+    );
     # XXX Only for debugging
     # use Devel::Confess;
     use PPI;
@@ -24,10 +28,13 @@ BEGIN
     use Scalar::Util ();
     use List::Util ();
     use Want ();
-    our $VERSION = 'v1.2.0';
+    our $VERSION = 'v1.3.0';
     our $ERROR;
     our( $CATCH, $DIED, $EXCEPTION, $FINALLY, $HAS_CATCH, @RETVAL, $SENTINEL, $TRY, $WANTARRAY );
 }
+
+use strict;
+use warnings;
 
 # Taken from Try::Harder version 0.005
 our $SENTINEL = bless( {} => __PACKAGE__ . '::SENTINEL' );
@@ -118,7 +125,7 @@ sub filter
     unless( $status < 0 )
     {
         # $self->_message( 5, "Processing at line $line code:\n$code" );
-        # 2021-06-05 (Jacques): fixes the issue No. 3 <https://git.deguest.jp/jack/Nice-Try/issues/3>
+        # 2021-06-05 (Jacques): fixes the issue No. 3 <https://gitlab.com/jackdeguest/Nice-Try/issues/3>
         # Make sure there is at least a space at the beginning
         $code = ' ' . $code;
         $self->_message( 4, "Processing $line lines of code." ) if( $self->{debug} >= 4 );
@@ -170,12 +177,28 @@ sub filter
 
 sub implement
 {
-    my( $self, $code ) = @_;
+    my $self = shift( @_ );
+    my $code = shift( @_ );
     return( $code ) if( !CORE::defined( $code ) || !CORE::length( $code ) );
-    # 2021-06-05 (Jacques): fixes the issue No. 3 <https://git.deguest.jp/jack/Nice-Try/issues/3>
+    unless( ref( $self ) )
+    {
+        my $opts = ( !@_ || !defined( $_[0] ) )
+            ? {}
+            : ref( $_[0] ) eq 'HASH'
+                ? shift( @_ )
+                : !( @_ % 2 )
+                    ? { @_ }
+                    : {};
+        for( qw( debug no_context no_filter debug_code debug_dump debug_file dont_want is_tied is_overloaded ) )
+        {
+            $opts->{ $_ } //= 0;
+        }
+        $self = bless( $opts => $self );
+    }
+    # 2021-06-05 (Jacques): fixes the issue No. 3 <https://gitlab.com/jackdeguest/Nice-Try/issues/3>
     # Make sure there is at least a space at the beginning
     $code = ' ' . $code;
-    $self->_message( 4, "Processing $line lines of code." ) if( $self->{debug} >= 4 );
+    $self->_message( 4, "Processing ", CORE::length( $code ), " bytes of code." ) if( $self->{debug} >= 4 );
     my $doc = PPI::Document->new( \$code, readonly => 1 ) || die( "Unable to parse: ", PPI::Document->errstr, "\n$code\n" );
     $self->_browse( $doc ) if( $self->{debug_dump} );
     if( $doc = $self->_parse( $doc ) )
@@ -226,7 +249,7 @@ sub _message
     my $level = $_[0] =~ /^\d+$/ ? shift( @_ ) : 0;
     return if( $self->{debug} < $level );
     my @data = @_;
-    $stackFrame = 0;
+    my $stackFrame = 0;
     my( $pkg, $file, $line, @otherInfo ) = CORE::caller( $stackFrame );
     my $sub = ( CORE::caller( $stackFrame + 1 ) )[3];
     my $sub2 = substr( $sub, rindex( $sub, '::' ) + 2 );
@@ -242,7 +265,7 @@ sub _messagef
     my $level = $_[0] =~ /^\d+$/ ? shift( @_ ) : 0;
     return if( $self->{debug} < $level );
     my @data = @_;
-    $stackFrame = 0;
+    my $stackFrame = 0;
     my $fmt = shift( @data );
     my( $pkg, $file, $line, @otherInfo ) = CORE::caller( $stackFrame );
     my $sub = ( CORE::caller( $stackFrame + 1 ) )[3];
@@ -274,8 +297,8 @@ sub _parse
         return( $this->class eq 'PPI::Statement' && substr( $this->content, 0, 3 ) eq 'try' );
     });
     return( $self->_error( "Failed to find any try-catch clause: $@" ) ) if( !defined( $ref ) );
-    $self->_messagef( 4, "Found %d match(es)", scalar( @$ref ) ) if( $self->{debug} >= 4 );
-    return if( !scalar( @$ref ) );
+    $self->_messagef( 4, "Found %d match(es)", scalar( @$ref ) ) if( $ref && ref( $ref ) && $self->{debug} >= 4 );
+    return if( !$ref || !scalar( @$ref ) );
     
     # 2020-09-13: PPI will return 2 or more consecutive try-catch block as 1 statement
     # It does not tell them apart, so we need to post process the result to effectively search within for possible for other try-catch blocks and update the @$ref array consequently
@@ -322,7 +345,7 @@ sub _parse
             foreach my $arr ( @$tmp_ref )
             {
                 $self->_message( 3, "Adding statement block with ", scalar( @$arr ), " children after '$last_obj'" ) if( $self->{debug} >= 3 );
-                # 2021-06-05 (Jacques): Fixing issue No. 2: <https://git.deguest.jp/jack/Nice-Try/issues/2>
+                # 2021-06-05 (Jacques): Fixing issue No. 2: <https://gitlab.com/jackdeguest/Nice-Try/issues/2>
                 # Find the last block that belongs to us
                 $self->_message( 4, "Checking first level objects collected." ) if( $self->{debug} >= 4 );
                 my $last_control = '';
@@ -412,7 +435,7 @@ sub _parse
                         {
                             $self->_messagef( 4, "Adding trailing insignificant object of class '%s' after last element of class '%s'", $o->class, $last_obj->class ) if( $self->{debug} >= 4 );
                             ## printf( STDERR "Inserting object '%s' (%s) of type '%s' after object '%s' (%s) of type %s who has parent '%s' of type '%s'\n", overload::StrVal( $o ), Scalar::Util::refaddr( $o ), ref( $o ), overload::StrVal( $last_obj), Scalar::Util::refaddr( $last_obj ), ref( $last_obj ), overload::StrVal( $last_obj->parent ), ref( $last_obj->parent ) );
-                            eval
+                            CORE::eval
                             {
                                 $rc = $last_obj->insert_after( $o ) ||
                                 do
@@ -732,7 +755,7 @@ CORE::local \$Nice::Try::NOOP = sub
 };
 if( CORE::defined( \$Nice::Try::WANTARRAY ) && !\$Nice::Try::THREADED && !( !CORE::length( [CORE::caller]->[1] ) && [CORE::caller(1)]->[3] eq '(eval)' ) )
 {
-    eval "\\\$Nice::Try::WANT = Want::want( 'LIST' )
+    CORE::eval "\\\$Nice::Try::WANT = Want::want( 'LIST' )
             ? 'LIST'
             : Want::want( 'HASH' )
                 ? 'HASH'
@@ -1038,7 +1061,7 @@ EOT
                         my $ex_class = $cdef->{class};
                         my $eval = "q{CORE::local \$_ = \$Nice::Try::EXCEPTION; my $ex_var = \$Nice::Try::EXCEPTION; CORE::local \$\@ = \$Nice::Try::EXCEPTION; $cdef->{where}}";
                         $catch_section = <<EOT;
-        ${cond}( Scalar::Util::blessed( \$Nice::Try::EXCEPTION ) && \$Nice::Try::EXCEPTION->isa( '$ex_class' ) && eval( $eval ) )
+        ${cond}( Scalar::Util::blessed( \$Nice::Try::EXCEPTION ) && \$Nice::Try::EXCEPTION->isa( '$ex_class' ) && CORE::eval( $eval ) )
         {
             CORE::local \$\@ = \$Nice::Try::EXCEPTION;
             my $ex_var = \$Nice::Try::EXCEPTION;
@@ -1063,7 +1086,7 @@ EOT
                     {
                         my $eval = "q{CORE::local \$_ = \$Nice::Try::EXCEPTION; my $ex_var = \$Nice::Try::EXCEPTION; CORE::local \$\@ = \$Nice::Try::EXCEPTION; $cdef->{where}}";
                         $catch_section = <<EOT;
-        ${cond}( eval( $eval ) )
+        ${cond}( CORE::eval( $eval ) )
         {
             CORE::local \$\@ = \$Nice::Try::EXCEPTION;
             my $ex_var = \$Nice::Try::EXCEPTION;
@@ -1601,7 +1624,7 @@ sub _serialize
         # and to restore it after the eval
         my $err = $@;
         local $@ if( UNSTABLE_DOLLARAT );
-        eval 
+        CORE::eval 
         {
             $@ = $err;
             $code->( @args );
@@ -1805,7 +1828,7 @@ And you also have granular power in the catch block to filter which exception to
 
 =head1 VERSION
 
-    v1.2.0
+    v1.3.0
 
 =head1 DESCRIPTION
 
@@ -2538,7 +2561,7 @@ The use of L<Want> is also automatically disabled when running under a package t
 
 =head1 LIMITATIONS
 
-Currently, the only known limitation is when one use experimental subroutine attributes inside a try-catch block. For example:
+Currently, the only known limitation is when one use experimental subroutine attributes inside a try-catch block on an anonymous subroutine. For example:
 
     use strict;
     use warnings;
@@ -2614,7 +2637,26 @@ The following class functions can be used.
 
 Provided with a perl code having one or more try-catch blocks and this will return a perl code converted to support try-catch blocks.
 
-This is designed to be used for perl code you store, such as subroutines dynamically loaded.
+This is designed to be used for perl code you store, such as subroutines dynamically loaded or eval'ed.
+
+For example:
+
+    my $code = Nice::Try->implement( <<EOT );
+    sub $method
+    {
+        my \$self = shift( \@_ );
+        try
+        {
+            # doing something that may die here
+        }
+        catch( \$e )
+        {
+            return( \$self->error( "Oops: \$e ) );
+        }
+    }
+    EOT
+
+You can also pass an optional hash or hash reference of options to L</implement> and it will be used to instantiate a new L<Nice::Try> method. The options accepted are the same ones that can be passed when using C<use Nice::Try>
 
 =head1 CREDITS
 

@@ -1,6 +1,18 @@
 Revision history for Perl module Cookie
 
-v0.1.9 2022-06-19T08:38:19+0900
+v0.1.13 2022-06-27T13:59:30+0900
+    - Minor correction in Cookie::Jar for cases where the host is an IP address
+
+v0.1.12 2022-06-23T15:47:58Z +0900
+    - Improved correction for a race condition when no local time has been set
+
+v0.1.11 2022-06-22T15:20:03Z +0900
+    - Corrected for a race condition when no local time has been set
+
+v0.1.10 2022-06-21T00:00:24Z +0900
+    - Corrected a small error in Makefile.PL
+
+v0.1.9 2022-06-19T08:38:19Z +0900
     - Improvement of the Makefile.PL
 
 v0.1.8 2021-12-15T07:01:04Z +0900

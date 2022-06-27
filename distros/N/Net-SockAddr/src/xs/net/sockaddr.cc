@@ -4,9 +4,9 @@ namespace xs { namespace net {
 
 using panda::net::SockAddr;
 
-static PERL_THREAD_LOCAL HV* s1 = gv_stashpvs("Net::SockAddr::Inet4", GV_ADD);
-static PERL_THREAD_LOCAL HV* s2 = gv_stashpvs("Net::SockAddr::Inet6", GV_ADD);
-static PERL_THREAD_LOCAL HV* s3 = gv_stashpvs("Net::SockAddr::Unix", GV_ADD);
+static PERL_ITHREADS_LOCAL HV* s1 = gv_stashpvs("Net::SockAddr::Inet4", GV_ADD);
+static PERL_ITHREADS_LOCAL HV* s2 = gv_stashpvs("Net::SockAddr::Inet6", GV_ADD);
+static PERL_ITHREADS_LOCAL HV* s3 = gv_stashpvs("Net::SockAddr::Unix", GV_ADD);
 
 SockAddr* _in_sockaddr_ptr (SV* arg) {
     if (!SvOK(arg)) return nullptr;

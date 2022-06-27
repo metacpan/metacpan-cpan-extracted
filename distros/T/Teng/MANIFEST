@@ -50,6 +50,7 @@ t/001_basic/033_load_plugin_with_args.t
 t/001_basic/034_execute.t
 t/001_basic/035_new_row_from_hash.t
 t/001_basic/036_sql_builder.t
+t/001_basic/037_trace_query_set_comment.t
 t/002_common/000_new.t
 t/002_common/001_insert.t
 t/002_common/002_update.t
@@ -91,7 +92,6 @@ t/999_regression/prepare_error_handling.t
 t/999_regression/reconnect.t
 t/999_regression/reconnect_from_dbh.t
 t/999_regression/set_column_bug.t
-t/Utils.pm
 t/lib/Mock/Basic.pm
 t/lib/Mock/Basic/Schema.pm
 t/lib/Mock/BasicBindColumn.pm
@@ -102,6 +102,7 @@ t/lib/Mock/Inflate/Schema.pm
 t/lib/MyGuard.pm
 t/lib/Teng/Plugin/ArgsTest.pm
 t/lib/TengTest.pm
+t/lib/t/Utils.pm
 xt/01_spell.t
 xt/02_pod.t
 xt/03_pod_coverage.t

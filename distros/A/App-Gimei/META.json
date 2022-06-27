@@ -44,8 +44,10 @@
       "runtime" : {
          "requires" : {
             "Class::Tiny" : "1.008",
-            "Data::Gimei" : "v0.1.0",
+            "Data::Gimei" : "v0.2.0",
             "Getopt::Long" : "2.52",
+            "Pod::Find" : "1.65",
+            "Pod::Usage" : "2.03",
             "perl" : "5.022001"
          }
       },
@@ -59,7 +61,7 @@
    "provides" : {
       "App::Gimei" : {
          "file" : "lib/App/Gimei.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.1.1"
       },
       "App::Gimei::Runner" : {
          "file" : "lib/App/Gimei/Runner.pm"
@@ -76,7 +78,7 @@
          "web" : "https://github.com/youpong/App-Gimei"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.1.1",
    "x_authority" : "cpan:YOUPONG",
    "x_contributors" : [
       "NAKAJIMA Yusaku <yupong7@gmail.com>",

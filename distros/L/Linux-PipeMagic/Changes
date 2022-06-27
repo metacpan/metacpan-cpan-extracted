@@ -1,5 +1,15 @@
 Revision history for Perl extension Linux::PipeMagic.
 
+0.05  Fri 24 Jun 13:51:42 BST 2022
+    - Tidy dependencies.
+
+0.04   Thu 23 Jun 11:37:21 BST 2022
+    - Update documentation.
+
+0.04_01  Wed 22 Jun 14:29:02 BST 2022
+    - Documentation fixes
+    - Attempt to stub functions when not on Linux.
+
 0.03  Tue Jan 31 11:55:54 2012
     - Add sendfile(2) support.
 

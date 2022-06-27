@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use Test::Shared::Fixture::Wikibase::Datatype::Value::Item::Wikidata::WikidataEntity;
 
 # Test.
-is($Test::Shared::Fixture::Wikibase::Datatype::Value::Item::Wikidata::WikidataEntity::VERSION, 0.12, 'Version.');
+is($Test::Shared::Fixture::Wikibase::Datatype::Value::Item::Wikidata::WikidataEntity::VERSION, 0.16, 'Version.');

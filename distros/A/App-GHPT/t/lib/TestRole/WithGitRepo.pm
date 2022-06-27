@@ -3,9 +3,9 @@ package TestRole::WithGitRepo;
 use App::GHPT::Wrapper::OurMoose::Role;
 
 use File::pushd qw( pushd );
+use File::Temp  qw( tempdir );
 use File::Which qw( which );
-use IPC::Run3 qw( run3 );
-use Path::Class qw( tempdir );
+use IPC::Run3   qw( run3 );
 use Try::Tiny;
 
 has _tempdir => (
@@ -24,6 +24,7 @@ before test_startup => sub ( $self, @ ) {
     $self->_tempdir;
 
     $self->_run(qw( git init ));
+    $self->_run(qw( git symbolic-ref HEAD refs/heads/main ));
     open my $fh, '>', 'foo';
     print {$fh} 42 or die $!;
     close $fh;

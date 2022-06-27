@@ -30,6 +30,7 @@ GHPT
 Greg
 Inc
 Kevin
+Logan
 MAXMIND
 MAXMIND's
 Mark
@@ -37,6 +38,7 @@ MaxMind
 MaxMind's
 Meta
 Narsimham
+Nick
 OAuth
 Oschwald
 Oschwald's
@@ -74,6 +76,7 @@ lib
 mark
 mfowler
 nchelluri
+nlogan
 pcronin
 phair
 rafl

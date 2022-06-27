@@ -1,3 +1,8 @@
+v0.3.0
+	- Released at 2022-06-27T00:22:45+0900
+        - Fixed a failure test case about the non-commutative operator `.`
+        - cleanup of dependency: GitHub issue #7
+
 v0.2.0
 	- Released at 2022-03-13T20:09:59+0900
 	- add rule: RemoveUnnecessaryScalarKeyword

@@ -1,15 +1,16 @@
 package Mite::Role::HasYAML;
+use Mite::MyMoo -Role;
 
-use feature ':5.10';
-use Mouse::Role;
-use Method::Signatures;
+sub yaml_load {
+    my ( $class, $yaml ) = ( shift, @_ );
 
-method yaml_load($yaml) {
     require YAML::XS;
     return YAML::XS::Load($yaml);
 }
 
-method yaml_dump($data) {
+sub yaml_dump {
+    my ( $class, $data ) = ( shift, @_ );
+
     require YAML::XS;
     return YAML::XS::Dump($data);
 }

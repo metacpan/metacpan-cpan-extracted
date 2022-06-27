@@ -178,6 +178,12 @@ my %tests = (
           '"3foo"->CORE::uc', '3FOO' ],
     ],
 
+    '5.016' => [
+        [ 'charnames',
+          'require Encode; Encode::encode("UTF-8", "\N{PILL}")',
+          "\xf0\x9f\x92\x8a" ],
+    ],
+
     '5.014' => [
         [ '?^',
           '"Ab" =~ /(?i)a(?^)b/', 1],

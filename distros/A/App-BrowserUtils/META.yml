@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,7 +19,7 @@ name: App-BrowserUtils
 provides:
   App::BrowserUtils:
     file: lib/App/BrowserUtils.pm
-    version: '0.015'
+    version: '0.016'
 requires:
   Capture::Tiny: '0'
   Data::Sah::Coerce::perl::To_array::From_str::comma_sep: '0'
@@ -27,22 +27,23 @@ requires:
   Data::Sah::Coerce::perl::To_duration::From_obj::datetime_duration: '0'
   Data::Sah::Coerce::perl::To_duration::From_str::human: '0'
   Data::Sah::Coerce::perl::To_duration::From_str::iso8601: '0'
-  Data::Sah::Compiler::perl::TH::any: '0.910'
-  Data::Sah::Compiler::perl::TH::array: '0.910'
-  Data::Sah::Compiler::perl::TH::bool: '0.910'
-  Data::Sah::Compiler::perl::TH::duration: '0.910'
-  Data::Sah::Compiler::perl::TH::int: '0.910'
-  Data::Sah::Compiler::perl::TH::str: '0.910'
+  Data::Sah::Compiler::perl::TH::any: '0.911'
+  Data::Sah::Compiler::perl::TH::array: '0.911'
+  Data::Sah::Compiler::perl::TH::bool: '0.911'
+  Data::Sah::Compiler::perl::TH::duration: '0.911'
+  Data::Sah::Compiler::perl::TH::int: '0.911'
+  Data::Sah::Compiler::perl::TH::str: '0.911'
   Data::Sah::Filter::perl::Unix::check_uid_exists: '0'
   Data::Sah::Filter::perl::Unix::convert_unix_user_to_uid: '0'
   Hash::Subset: '0.006'
   Log::ger: '0.038'
   Perinci::CmdLine::Any: '0.152'
-  Perinci::CmdLine::Lite: '1.905'
+  Perinci::CmdLine::Lite: '1.915'
   Proc::Background: '0'
   Proc::Find: '0.051'
   Sah::Schema::true: '0'
   Sah::Schema::unix::local_uid: '0'
+  Sah::Schema::unix::signal: '0'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -50,7 +51,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-BrowserUtils
   homepage: https://metacpan.org/release/App-BrowserUtils
   repository: git://github.com/perlancar/perl-App-BrowserUtils.git
-version: '0.015'
+version: '0.016'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -58,39 +59,39 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript browsers-are-paused'
-      version: '0.423'
+      version: '0.424'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript kill-browsers'
-      version: '0.423'
+      version: '0.424'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript pause-browsers'
-      version: '0.423'
+      version: '0.424'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript pause-and-unpause-browsers'
-      version: '0.423'
+      version: '0.424'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript ps-browsers'
-      version: '0.423'
+      version: '0.424'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript restart-browsers'
-      version: '0.423'
+      version: '0.424'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript start-browsers'
-      version: '0.423'
+      version: '0.424'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript terminate-browsers'
-      version: '0.423'
+      version: '0.424'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript unpause-browsers'
-      version: '0.423'
+      version: '0.424'
     -
       class: Dist::Zilla::Plugin::InsertExecsList
       name: InsertExecsList
@@ -111,66 +112,66 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Author::PERLANCAR/@Filter/GatherDir'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Author::PERLANCAR/@Filter/PruneCruft'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::PERLANCAR/@Filter/ManifestSkip'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::PERLANCAR/@Filter/MetaYAML'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Author::PERLANCAR/@Filter/License'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@Author::PERLANCAR/@Filter/PodCoverageTests'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::PERLANCAR/@Filter/PodSyntaxTests'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Author::PERLANCAR/@Filter/ExtraTests'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/@Filter/ExecDir'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::PERLANCAR/@Filter/ShareDir'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Author::PERLANCAR/@Filter/MakeMaker'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::PERLANCAR/@Filter/Manifest'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::PERLANCAR/@Filter/ConfirmRelease'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/ExecDir script'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.605'
+      version: '0.606'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -181,8 +182,12 @@ x_Dist_Zilla:
       version: '0.02'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.062'
+      version: '0.064'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
@@ -228,11 +233,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::PERLANCAR/MetaConfig'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -241,7 +246,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.017'
+              version: '6.024'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -394,7 +399,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PruneFiles
       name: '@Author::PERLANCAR/PruneFiles'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Pod2Readme
       name: '@Author::PERLANCAR/Pod2Readme'
@@ -482,7 +487,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -490,7 +495,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -498,56 +503,56 @@ x_Dist_Zilla:
           phase: develop
           type: x_spec
       name: DevelopX_spec
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.017'
+      version: '6.024'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.017'
+    version: '6.024'
 x_authority: cpan:PERLANCAR
 x_contributors:
   - 'Steven Haryanto <stevenharyanto@gmail.com>'

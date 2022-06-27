@@ -16,15 +16,16 @@ my $file = "$RealBin/../data/sim2.fa";
 my $script = "$RealBin/../bin/n50";
 
 if (-e "$file" and -e "$script") {
-	my $output = `perl "$script" "$file" 2>/dev/null`;
+	my $output = `$^X "$script" "$file" 2>/dev/null`;
 	ok($? == 0, '"n50" script executed');
 	chomp($output);
+	ok(defined $output, "Output from the n50 script is defined");
 	ok($output == 493,  "N50==493 as expected: got $output");
 
 	# TSV FORMAT
 	$output = undef;
 
-	$output = `perl "$script" --format tsv "$file" 2>/dev/null`;
+	$output = `$^X "$script" --format tsv "$file" 2>/dev/null`;
 	ok($? == 0, '"n50" script executed');
 	chomp($output);
 
@@ -37,7 +38,7 @@ if (-e "$file" and -e "$script") {
 	# THOUSAND SEPARATOR
 	$output = undef;
 
-	$output = `perl "$script" --format tsv -q "$file" 2>/dev/null`;
+	$output = `$^X "$script" --format tsv -q "$file" 2>/dev/null`;
 	ok($? == 0, '"n50" script executed');
 	chomp($output);
 

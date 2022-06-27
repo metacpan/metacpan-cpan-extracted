@@ -66,11 +66,11 @@
    "provides" : {
       "MooX::Pression" : {
          "file" : "lib/MooX/Pression.pm",
-         "version" : "0.614"
+         "version" : "0.615"
       },
       "Zydeco" : {
          "file" : "lib/Zydeco.pm",
-         "version" : "0.614"
+         "version" : "0.615"
       }
    },
    "release_status" : "stable",
@@ -89,7 +89,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Zydeco/project"
    },
-   "version" : "0.614",
+   "version" : "0.615",
    "x_contributors" : [
       "Sébastien Feugère (SMONFF) <smonff@cpan.org>"
    ],

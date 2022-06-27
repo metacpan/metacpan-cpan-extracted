@@ -18,24 +18,25 @@ __WARN
 WriteMakefile
  ( NAME       => 'CPAN::Site'
  , ABSTRACT   => 'adding site local modules'
- , VERSION    => '1.15'
+ , VERSION    => '1.16'
 
  , EXE_FILES  => [ 'bin/cpansite' ]
 
  , AUTHOR     => 'Mark Overmeer'
  , PREREQ_PM  =>
-   { Archive::Tar       => 1.00
-   , Archive::Zip       => 0
-   , CPAN::Checksums    => 0
-   , Getopt::Long       => 0
-   , HTTP::Date         => 0
-   , IO::Zlib           => 0
-   , Log::Report        => 0.25
-   , LWP                => 0
-   , Test::More         => 0.82
-   , version            => 0.76
+   { Archive::Tar        => 1.00
+   , Archive::Zip        => 0
+   , CPAN::Checksums     => 2.14
+   , Getopt::Long        => 0
+   , HTTP::Date          => 0
+   , IO::Zlib            => 0
+   , Log::Report         => 0.25
+   , LWP                 => 0
+   , Test::More          => 0.82
+   , Test::TempDir::Tiny => 0.018
+   , version             => 0.76
    }
- , LICENSE    => 'perl'
+ , LICENSE    => 'perl_5'
 
   , META_MERGE =>
       { 'meta-spec' => { version => 2 }
@@ -45,6 +46,8 @@ WriteMakefile
               , url  => 'https://github.com/markov2/perl5-CPAN-Site.git'
               , web  => 'https://github.com/markov2/perl5-CPAN-Site'
               }
+          , homepage => 'http://perl.overmeer.net/CPAN/'
+          , license  => [ 'http://dev.perl.org/licenses/' ]
           }
       }
  );

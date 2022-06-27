@@ -399,10 +399,16 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                   SPVM_LIST_push(push_eval_opcode_rel_index_stack, (void*)(intptr_t)opcode_rel_index);
 
                   // Set exception var to undef in eval block start
-                  SPVM_OPCODE opcode = {0};
-                  
-                  SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_EXCEPTION_VAR_UNDEF);
-                  SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
+                  {
+                    SPVM_OPCODE opcode = {0};
+                    SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CLEAR_BEFORE_ERROR);
+                    SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
+                  }
+                  {
+                    SPVM_OPCODE opcode = {0};
+                    SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_EXCEPTION_VAR_UNDEF);
+                    SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
+                  }
                 }
                 
                 int32_t mortal_top = mortal_stack->length;
@@ -1223,8 +1229,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           
 
                           SPVM_TYPE* call_method_return_type = call_method->method->return_type;
-                          if (method_call_method->class->category == SPVM_CLASS_C_CATEGORY_INTERFACE)
-                          {
+                          if (!call_method->is_class_method_call && !call_method->is_static_instance_method_call) {
                             SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CALL_INSTANCE_METHOD_BY_SIGNATURE);
 
                             // Numeric type
@@ -1408,6 +1413,8 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             opcode.operand0 = mem_id_out;
                             opcode.operand1 = call_method->method->id;
                           }
+                          
+                          opcode.operand2 = call_method->call_super;
                           
                           int32_t call_method_return_type_width = SPVM_TYPE_get_width(compiler, call_method_return_type->basic_type->id, call_method_return_type->dimension, call_method_return_type->flag);
                           int32_t operand3 = call_method_return_type_width;
@@ -3474,6 +3481,45 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           
                           break;
                         }
+                        case SPVM_OP_C_ID_ERROR : {
+                          
+                          SPVM_OPCODE opcode = {0};
+                          SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_BEFORE_ERROR);
+                          
+                          int32_t mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
+                          opcode.operand0 = mem_id_out;
+                          SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
+                          
+                          break;
+                        }
+                        case SPVM_OP_C_ID_ERROR_CODE : {
+                          
+                          SPVM_OPCODE opcode = {0};
+                          SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_ERROR_CODE);
+                          
+                          int32_t mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
+                          opcode.operand0 = mem_id_out;
+                          SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
+                          
+                          break;
+                        }
+                        case SPVM_OP_C_ID_SET_ERROR_CODE : {
+                          
+                          SPVM_OP* op_number = op_assign_src->first;
+                          
+                          SPVM_OPCODE opcode = {0};
+                          SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_ERROR_CODE);
+                          
+                          int32_t mem_id_in = SPVM_OP_get_mem_id(compiler, op_number);
+                          int32_t mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
+                          opcode.operand0 = mem_id_out;
+                          opcode.operand1 = mem_id_in;
+                          SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
+
+                          SPVM_OPCODE_BUILDER_push_if_die(compiler, opcode_array, push_eval_opcode_rel_index_stack, if_die_catch_goto_opcode_rel_index_stack, if_die_return_goto_opcode_rel_index_stack, method->op_method, op_cur->line);
+
+                          break;
+                        }
                         case SPVM_OP_C_ID_VAR : {
                           // Multi numeric type
                           if (SPVM_TYPE_is_mulnum_type(compiler, type_dist->basic_type->id, type_dist->dimension, type_dist->flag)) {
@@ -4088,12 +4134,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           SPVM_OPCODE opcode = {0};
                           
                           
-                          if (SPVM_TYPE_is_interface_type(compiler, type->basic_type->id, type->dimension, type->flag)) {
-                            SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_HAS_INTERFACE);
-                          }
-                          else {
-                            SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_IS_TYPE);
-                          }
+                          SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_ISA);
 
                           opcode.operand1 = mem_id_in;
 
@@ -4196,12 +4237,12 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                         }
                         case SPVM_OP_C_ID_DIE: {
                           
-                          // SET_DIE_FLAG_TRUE
+                          // SET_ERROR
                           {
                             SPVM_OPCODE opcode = {0};
                             
                             
-                            SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_DIE_FLAG_TRUE);
+                            SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_ERROR);
                             
                             SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
                           }

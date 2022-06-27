@@ -40,7 +40,7 @@ use warnings FATAL => 'all';
 use strict;
 
 use Marpa::R2;
-use Data::Dump;
+use Data::Dumper;
 
 my $dsl = <<'END_OF_DSL';
 lexeme default = latm => 1
@@ -86,14 +86,14 @@ my $input = <<'__INPUT__';
 2*((5+2)*3)
 __INPUT__
 
-$Actions::generateparsetree = 0;
+$Actions::generateparsetree = 1;
 $Actions::traceprocessing   = 1;
 
 $parser->read(\$input);
 
 my $value_ref   = $parser->value();
 
-print Data::Dump::dump($$value_ref);
+print Dumper($$value_ref);
 
 exit 0;
 
@@ -117,7 +117,7 @@ sub trace
     return if !$Actions::traceprocessing;
 
     printf "%1s %-8s", $direction, $function;
-    print Data::Dump::dump($data);
+    print Dumper($data);
     printf "\n";
 }
 

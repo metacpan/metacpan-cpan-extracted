@@ -1,2 +1,3 @@
+@{[ init{} ]}
 Sub template 2 $value
-@{[ skip ]}
+@{[skip ]}

@@ -17,7 +17,7 @@ sub test_question_namespaces {
     local @INC = ( @INC, 't/lib' );
 
     my $ask = App::GHPT::WorkSubmitter::AskPullRequestQuestions->new(
-        merge_to_branch_name => 'master',
+        merge_to_branch_name => 'main',
         question_namespaces  => ['Helper::QuestionNamespace1'],
     );
 
@@ -28,7 +28,7 @@ sub test_question_namespaces {
     );
 
     $ask = App::GHPT::WorkSubmitter::AskPullRequestQuestions->new(
-        merge_to_branch_name => 'master',
+        merge_to_branch_name => 'main',
         question_namespaces  =>
             [ 'Helper::QuestionNamespace1', 'Helper::QuestionNamespace2' ],
     );

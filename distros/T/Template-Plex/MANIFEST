@@ -1,11 +1,11 @@
 Changes
-examples/begin.pl
 examples/examples.pl
 examples/experiment.pl
 examples/external.plex
 examples/header.plex
 examples/html.pl
 examples/html.plex
+examples/parent.plex
 examples/recursive-2.plex
 examples/recursive-3.plex
 examples/recursive-top.plex
@@ -13,11 +13,16 @@ examples/recursive.pl
 examples/synopsis.pl
 lib/Template/Plex.pm
 lib/Template/Plex.pod
+lib/Template/Plex/Internal.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README
 README.md
+t/child.plex
+t/grandparent.plex
+t/inherit.t
+t/parent.plex
 t/sub1.plex
 t/sub2.plex
 t/sub3.plex

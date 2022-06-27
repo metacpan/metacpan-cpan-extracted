@@ -20,11 +20,11 @@
 %}
 
 %token <opval> CLASS HAS METHOD OUR ENUM MY USE AS REQUIRE ALIAS ALLOW CURRENT_CLASS MUTABLE
-%token <opval> DESCRIPTOR MAKE_READ_ONLY INTERFACE
+%token <opval> DESCRIPTOR MAKE_READ_ONLY INTERFACE ERROR_CODE ERROR
 %token <opval> IF UNLESS ELSIF ELSE FOR WHILE LAST NEXT SWITCH CASE DEFAULT BREAK EVAL
 %token <opval> SYMBOL_NAME VAR_NAME CONSTANT EXCEPTION_VAR
 %token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT TRUE FALSE END_OF_FILE
-%token <opval> DOT3 FATCAMMA RW RO WO INIT NEW OF CLASS_ID
+%token <opval> DOT3 FATCAMMA RW RO WO INIT NEW OF CLASS_ID EXTENDS SUPER
 %token <opval> RETURN WEAKEN DIE WARN PRINT CURRENT_CLASS_NAME UNWEAKEN '[' '{' '('
 
 %type <opval> grammar
@@ -41,7 +41,7 @@
 %type <opval> call_spvm_method opt_vaarg
 %type <opval> array_access field_access weaken_field unweaken_field isweak_field convert array_length
 %type <opval> assign inc dec allow has_impl
-%type <opval> new array_init
+%type <opval> new array_init die opt_extends
 %type <opval> var_decl var interface
 %type <opval> operator opt_operators operators opt_operator logical_operator
 %type <opval> field_name method_name class_name class_alias_name is_read_only
@@ -58,7 +58,7 @@
 %left <opval> SHIFT
 %left <opval> '+' '-' '.'
 %left <opval> '*' DIVIDE DIVIDE_UNSIGNED_INT DIVIDE_UNSIGNED_LONG REMAINDER  REMAINDER_UNSIGNED_INT REMAINDER_UNSIGNED_LONG
-%right <opval> LOGICAL_NOT BIT_NOT '@' CREATE_REF DEREF PLUS MINUS CONVERT SCALAR STRING_LENGTH ISWEAK REFCNT REFOP DUMP NEW_STRING_LEN IS_READ_ONLY COPY HAS_IMPL
+%right <opval> LOGICAL_NOT BIT_NOT '@' CREATE_REF DEREF PLUS MINUS CONVERT SCALAR STRING_LENGTH ISWEAK REFCNT REFOP DUMP NEW_STRING_LEN IS_READ_ONLY COPY HAS_IMPL SET_ERROR_CODE
 %nonassoc <opval> INC DEC
 %left <opval> ARROW
 
@@ -102,21 +102,31 @@ classes
   | class
 
 class
-  : CLASS basic_type class_block END_OF_FILE
+  : CLASS basic_type opt_extends class_block END_OF_FILE
     {
-      $$ = SPVM_OP_build_class(compiler, $1, $2, $3, NULL);
+      $$ = SPVM_OP_build_class(compiler, $1, $2, $4, NULL, $3);
     }
-  | CLASS basic_type ':' opt_descriptors class_block END_OF_FILE
+  | CLASS basic_type opt_extends ':' opt_descriptors class_block END_OF_FILE
     {
-      $$ = SPVM_OP_build_class(compiler, $1, $2, $5, $4);
+      $$ = SPVM_OP_build_class(compiler, $1, $2, $6, $5, $3);
     }
-  | CLASS basic_type ';' END_OF_FILE
+  | CLASS basic_type opt_extends ';' END_OF_FILE
     {
-      $$ = SPVM_OP_build_class(compiler, $1, $2, NULL, NULL);
+      $$ = SPVM_OP_build_class(compiler, $1, $2, NULL, NULL, $3);
     }
-  | CLASS basic_type ':' opt_descriptors ';' END_OF_FILE
+  | CLASS basic_type opt_extends ':' opt_descriptors ';' END_OF_FILE
     {
-      $$ = SPVM_OP_build_class(compiler, $1, $2, NULL, $4);
+      $$ = SPVM_OP_build_class(compiler, $1, $2, NULL, $5, $3);
+    }
+
+opt_extends
+  : /* Empty */
+    {
+      $$ = NULL;
+    }
+  | EXTENDS class_name
+    {
+      $$ = SPVM_OP_build_extends(compiler, $1, $2);
     }
 
 class_block
@@ -480,14 +490,7 @@ statement
     {
       $$ = SPVM_OP_build_return(compiler, $1, $2);
     }
-  | DIE operator ';'
-    {
-      $$ = SPVM_OP_build_die(compiler, $1, $2);
-    }
-  | DIE ';'
-    {
-      $$ = SPVM_OP_build_die(compiler, $1, NULL);
-    }
+  | die
   | WARN operator ';'
     {
       $$ = SPVM_OP_build_warn(compiler, $1, $2);
@@ -505,6 +508,16 @@ statement
   | MAKE_READ_ONLY operator ';'
     {
       $$ = SPVM_OP_build_make_read_only(compiler, $1, $2);
+    }
+
+die
+  : DIE operator ';'
+    {
+      $$ = SPVM_OP_build_die(compiler, $1, $2);
+    }
+  | DIE ';'
+    {
+      $$ = SPVM_OP_build_die(compiler, $1, NULL);
     }
 
 for_statement
@@ -738,7 +751,12 @@ operator
     {
       $$ = SPVM_OP_build_class_id(compiler, $1, $2);
     }
-
+  | ERROR_CODE
+  | SET_ERROR_CODE operator
+    {
+      $$ = SPVM_OP_build_set_error_code(compiler, $1, $2);
+    }
+  | ERROR
 
 operators
   : operators ',' operator
@@ -1015,7 +1033,7 @@ new
       SPVM_OP_insert_child(compiler, op_class_block, op_class_block->last, op_list_declarations);
       
       // Build class
-      SPVM_OP_build_class(compiler, op_class, NULL, op_class_block, NULL);
+      SPVM_OP_build_class(compiler, op_class, NULL, op_class_block, NULL, NULL);
 
       // Type
       SPVM_OP* op_type = SPVM_OP_new_op_type(compiler, op_class->uv.class->type, op_method->file, op_method->line);

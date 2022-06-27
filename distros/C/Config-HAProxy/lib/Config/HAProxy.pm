@@ -16,13 +16,14 @@ use File::Spec;
 use IPC::Cmd qw(run);
 use Carp;
 
-our $VERSION = '1.06';
+our $VERSION = '1.08';
 
 my %sections = (
     global => 1,
     defaults => 1,
     frontend => 1,
     backend => 1,
+    resolvers => 1
 );
 
 sub new {
@@ -86,6 +87,16 @@ sub parse {
     $self->pop;
     close $fh;
     return $self;
+}
+
+sub declare_section {
+    my ($class, $name) = @_;
+    $sections{$name} = 1;
+}
+
+sub undeclare_section {
+    my ($class, $name) = @_;
+    $sections{$name} = 0;
 }
 
 sub reset {
@@ -344,7 +355,9 @@ Represents a simple statement.
 
 A container, representing a C<compound statement>, i.e. a statement that
 contains multiple sub-statements. Compound statements are: B<global>,
-B<defaults>, B<frontend>, and B<backend>.    
+B<defaults>, B<frontend>, B<backend>, and B<resolvers>. The list of
+compound statements may be modified using the B<declare_section> and
+B<undeclare_section> class methods (see below).
 
 =back
 
@@ -369,7 +382,17 @@ Additionally, section nodes provide methods for accessing their subtrees.
 
 For a detailed description of the node class and its methods, please refer to
 B<Config::HAProxy::Node>.    
-    
+
+=head1 CLASS METHODS
+
+    $cfg = Config::HAProxy::declare_section($name)
+
+Declares B<$name> as a top-level section.
+
+    $cfg = Config::HAProxy::undeclare_section($name)
+
+Cancels declaration of B<$name> as a top-level section.
+
 =head1 CONSTRUCTOR
 
     $cfg = new Config::HAProxy($filename);

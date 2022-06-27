@@ -23,5 +23,5 @@ resources:
   bugtracker: https://github.com/pmqs/Compress-Raw-Lzma/issues
   homepage: https://github.com/pmqs/Compress-Raw-Lzma
   repository: git://github.com/pmqs/Compress-Raw-Lzma.git
-version: '2.103'
+version: '2.201'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

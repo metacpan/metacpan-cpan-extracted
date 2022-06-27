@@ -10,7 +10,7 @@ use Alien::Build::Plugin::Extract::CommandLine;
 use Alien::Build::Plugin::Extract::Directory;
 
 # ABSTRACT: Extraction negotiation plugin
-our $VERSION = '2.48'; # VERSION
+our $VERSION = '2.50'; # VERSION
 
 
 has '+format' => 'tar';
@@ -88,7 +88,7 @@ Alien::Build::Plugin::Extract::Negotiate - Extraction negotiation plugin
 
 =head1 VERSION
 
-version 2.48
+version 2.50
 
 =head1 SYNOPSIS
 
@@ -188,7 +188,7 @@ nick nauwelaerts (INPHOBIA)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011-2020 by Graham Ollis.
+This software is copyright (c) 2011-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

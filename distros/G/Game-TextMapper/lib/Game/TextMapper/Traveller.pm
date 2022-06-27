@@ -36,6 +36,7 @@ use Modern::Perl '2018';
 use List::Util qw(shuffle max any);
 use Mojo::Base -base;
 use Role::Tiny::With;
+use Game::TextMapper::Constants qw($dx $dy);
 with 'Game::TextMapper::Schroeder::Hex';
 
 my $log = Game::TextMapper::Log->get;
@@ -122,7 +123,7 @@ sub system {
   $tech += 1 if $government == 0 or $government == 5;
   $tech -= 2 if $government == 13; # D
   $tech = 0 if $tech < 0;
-  my $gas_giant = roll1d6() <= 9;
+  my $gas_giant = roll2d6() <= 9;
   my $name = $self->compute_name();
   $name = uc($name) if $population >= 9;
   my $uwp = join("", $starport, map { code($_) } $size, $atmosphere, $hydro, $population, $government, $law) . "-" . code($tech);
@@ -396,7 +397,38 @@ sub to_text {
     }
   }
   $text .= join("\n", @$comms, "\ninclude traveller.txt\n");
+  $text .= $self->legend();
   return $text;
+}
+
+sub legend {
+  my $self = shift;
+  my $template = qq{# frame and legend};
+  my $x = int(($self->cols + 1) * 1.5 * $dx);
+  my $y = int(($self->rows + 1) * $dy + 5);
+  $template .= qq{
+other <rect fill="none" stroke="black" stroke-width="10" x="0" y="-50" width="$x" height="$y" />},
+  $x = int(($self->cols + 1) * 0.75 * $dx);
+  $y = int(($self->rows + 1) * $dy - 60);
+  $template .= qq{
+other <text font-size="24pt" y="-10" x="$x" font-family="Optima, Helvetica, sans-serif" text-anchor="middle">coreward</text>
+other <text font-size="24pt" y="$y" x="$x" font-family="Optima, Helvetica, sans-serif" text-anchor="middle">rimward</text>};
+  $x = int($self->rows * $dy / 2);
+  $template .= qq{
+other <text font-size="24pt" x="-$x" y="40" transform="rotate(-90)" font-family="Optima, Helvetica, sans-serif" text-anchor="middle">spinward</text>
+};
+  $y = int(($self->cols + 1) * 1.5 * $dx);
+  $template .= qq{
+other <text font-size="24pt" x="$x" y="40" transform="rotate(90) translate(0, -$y)" font-family="Optima, Helvetica, sans-serif" text-anchor="middle">trailing</text>
+};
+  $x = int(($self->rows + 0.5) * $dy);
+  $template .= qq{
+other <text font-size="14pt" x="-$x" y="30" transform="rotate(-90)" font-family="Optima, Helvetica, sans-serif">◉ gas giant – ▲ scout base – ★ navy base – π research base – ☠ pirate base</text>
+} if $self->rows > 8;
+  $template .= qq{
+other <text font-size="14pt" x="-650" y="30" transform="rotate(-90)" font-family="Optima, Helvetica, sans-serif">■ imperial consulate – ☼ TAS – <tspan fill="#ff6347">▮</tspan> communication – <tspan fill="#afeeee">▮</tspan> trade <tspan fill="#ffd700">▮</tspan> long distance trade</text>
+} if $self->rows > 8;
+  return $template;
 }
 
 1;

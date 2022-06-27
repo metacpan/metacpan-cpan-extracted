@@ -1,5 +1,9 @@
 Revision history for Perl extension Geo::IP2Location.
 
+8.60  Tue June 21 16:00:00 2022
+      Twenty-second release under the Geo::IP2Location
+      Reduced file I/O to improve query performance
+
 8.51  Tue June 02 16:00:00 2021
       Twenty-first release under the Geo::IP2Location
       Bug fix to include bigint in library
@@ -21,7 +25,7 @@ Revision history for Perl extension Geo::IP2Location.
 
 8.20  Tue Oct 08 12:00:00 2019
       Seventeenth release under the Geo::IP2Location
-      Reduce file I/O to improve query performance
+      Reduced file I/O to improve query performance
 
 8.10  Wed Jun 26 12:00:00 2019
       Sixteenth release under the Geo::IP2Location

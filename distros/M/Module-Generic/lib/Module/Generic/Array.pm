@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Array.pm
-## Version v1.3.1
+## Version v1.4.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/03/10
+## Modified 2022/05/10
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -33,17 +33,17 @@ BEGIN
     );
     $DEBUG  = 0;
     $RETURN = {};
-    our $VERSION = 'v1.3.1';
+    our $VERSION = 'v1.4.0';
 };
 
 use strict;
 no warnings 'redefine';
 require Module::Generic::Boolean;
-require Module::Generic::Hash;
-require Module::Generic::Iterator;
-require Module::Generic::Null;
-require Module::Generic::Number;
-require Module::Generic::Scalar;
+# require Module::Generic::Hash;
+# require Module::Generic::Iterator;
+# require Module::Generic::Null;
+# require Module::Generic::Number;
+# require Module::Generic::Scalar;
 {
     no strict 'refs';
     $TRUE  = ${"Module::Generic::Boolean::true"};
@@ -89,6 +89,7 @@ sub as_hash
         }
     }
     @$ref{ @$self } = @$offsets;
+    require Module::Generic::Hash;
     CORE::return( Module::Generic::Hash->new( $ref ) );
 }
 
@@ -244,6 +245,31 @@ sub even
     CORE::return( $self->new( \@new ) );
 }
 
+# Mostly the same as with remove() except for the end
+sub except
+{
+    my $self = CORE::shift( @_ );
+    my $ref;
+    if( scalar( @_ ) == 1 && 
+        Scalar::Util::blessed( $_[0] ) && 
+        $_[0]->isa( 'Module::Generic::Array' ) )
+    {
+        $ref = CORE::shift( @_ );
+    }
+    elsif( scalar( @_ ) == 1 &&
+           Scalar::Util::reftype( $_[0] ) eq 'ARRAY' )
+    {
+        $ref = $self->new( CORE::shift( @_ ) );
+    }
+    else
+    {
+        $ref = $self->new( [ @_ ] );
+    }
+    my $hash = $ref->as_hash;
+    my @res = grep{ !CORE::exists( $hash->{ $_ } ) } @$self;
+    CORE::return( $self->new( \@res ) );
+}
+
 sub exists
 {
     my $self = CORE::shift( @_ );
@@ -352,6 +378,7 @@ sub get
     # offset may be out of bound, which will lead Module::Generic::Scalar to hold an undefined value or the offset exists but contains an undef value which will lead to the same
     if( want( 'OBJECT' ) && ( !ref( $self->[ $offset ] ) || Scalar::Util::reftype( $self->[ $offset ] ) eq 'SCALAR' ) )
     {
+        require Module::Generic::Scalar;
         rreturn( Module::Generic::Scalar->new( $self->[ $offset ] ) );
     }
     # If the enclosed value is a regular ref like array or hash and user wants an object, this will trigger an error, but that is the user's fault. I think it would be bad design to prevent the error from happening and second guess what the user is trying to do.
@@ -369,6 +396,7 @@ sub get_null
     {
         if( want( 'OBJECT' ) && ( !ref( $self->[ $offset ] ) || Scalar::Util::reftype( $self->[ $offset ] ) eq 'SCALAR' ) )
         {
+            require Module::Generic::Scalar;
             rreturn( Module::Generic::Scalar->new( $self->[ $offset ] ) );
         }
         # If the enclosed value is a regular ref like array or hash and user wants an object, this will trigger an error, but that is the user's fault. I think it would be bad design to prevent the error from happening and second guess what the user is trying to do.
@@ -381,6 +409,7 @@ sub get_null
     {
         if( Want::want( 'OBJECT' ) )
         {
+            require Module::Generic::Null;
             rreturn( Module::Generic::Null->new( wants => 'object' ) );
         }
         CORE::return( $self->[ $offset ] );
@@ -422,6 +451,7 @@ sub index
     my $pos  = CORE::int( CORE::shift( @_ ) );
     if( want( 'OBJECT' ) && ( !ref( $self->[ $pos ] ) || Scalar::Util::reftype( $self->[ $pos ] ) eq 'SCALAR' ) )
     {
+        require Module::Generic::Scalar;
         rreturn( Module::Generic::Scalar->new( $self->[ $pos ] ) );
     }
     else
@@ -441,7 +471,12 @@ sub intersection
 
 sub is_empty { CORE::return( CORE::scalar( @{$_[0]} ) ? $FALSE : $TRUE ) }
 
-sub iterator { CORE::return( Module::Generic::Iterator->new( CORE::shift( @_ ) ) ); }
+# sub iterator { CORE::return( Module::Generic::Iterator->new( CORE::shift( @_ ) ) ); }
+sub iterator
+{
+    require Module::Generic::Iterator;
+    CORE::return( Module::Generic::Iterator->new( CORE::shift( @_ ) ) );
+}
 
 sub join
 {
@@ -484,6 +519,7 @@ sub map
 sub max
 {
     my $self = CORE::shift( @_ );
+    require Module::Generic::Scalar;
     return( Module::Generic::Scalar->new( List::Util::max( @$self ) ) );
 }
 
@@ -506,6 +542,7 @@ sub merge
 sub min
 {
     my $self = CORE::shift( @_ );
+    require Module::Generic::Scalar;
     return( Module::Generic::Scalar->new( List::Util::min( @$self ) ) );
 }
 
@@ -550,6 +587,7 @@ sub pop
     my $self = CORE::shift( @_ );
     if( Want::want( 'OBJECT' ) && ( !ref( $self->[-1] ) || Scalar::Util::reftype( $self->[-1] ) eq 'SCALAR' ) )
     {
+        require Module::Generic::Scalar;
         rreturn( Module::Generic::Scalar->new( CORE::pop( @$self ) ) );
     }
     else
@@ -692,6 +730,7 @@ sub shift
     my $self = CORE::shift( @_ );
     if( Want::want( 'OBJECT' ) && ( !ref( $self->[0] ) || Scalar::Util::reftype( $self->[0] ) eq 'SCALAR' ) )
     {
+        require Module::Generic::Scalar;
         rreturn( Module::Generic::Scalar->new( CORE::shift( @$self ) ) );
     }
     else
@@ -845,6 +884,7 @@ sub _number
     my $num = CORE::shift( @_ );
     CORE::return if( !defined( $num ) );
     CORE::return( $num ) if( !CORE::length( $num ) );
+    require Module::Generic::Number;
     CORE::return( Module::Generic::Number->new( $num ) );
 }
 
@@ -878,6 +918,7 @@ sub _scalar
     my $str  = CORE::shift( @_ );
     CORE::return if( !defined( $str ) );
     # Whether empty or not, return an object
+    require Module::Generic::Scalar;
     CORE::return( Module::Generic::Scalar->new( $str ) );
 }
 

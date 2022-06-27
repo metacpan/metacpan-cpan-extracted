@@ -9,9 +9,14 @@ tests compile => sub {
     # Mite.pm won't stand for that.
     local $ENV{TEST_COMPILE} = 1;
 
+    my $fail = 0;
     for my $file (all_pm_files("lib")) {
-        pm_file_ok($file) or BAIL_OUT("Failed to compile: $@");
+        if (not pm_file_ok $file) {
+            diag "Error: $@";
+            ++$fail;
+        }
     }
+    BAIL_OUT("Failed to compile") if $fail;
 };
 
 done_testing;

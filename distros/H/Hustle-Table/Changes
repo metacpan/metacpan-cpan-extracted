@@ -1,5 +1,8 @@
 Revision history for Perl extension Hustle::Table
 
+0.5.2   Wed 22 Jun 2022 07:42:37 AEST
+	- Compatibility update for Template::Plex v0.4.1
+
 0.5.1   Sat  2 Apr 2022 21:01:36 AEST
 	- Bump min perl version to 5.26 for @{^CAPTURE} variable
 	- Fixed issue where a cached entry did not return captures

@@ -14,6 +14,16 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Proch-N50",
   "EXE_FILES" => [
+    "bin/fu-cat",
+    "bin/fu-compare",
+    "bin/fu-count",
+    "bin/fu-extract",
+    "bin/fu-grep",
+    "bin/fu-hash",
+    "bin/fu-len",
+    "bin/fu-rename",
+    "bin/fu-sort",
+    "bin/fu-uniq",
     "bin/n50"
   ],
   "LICENSE" => "mit",
@@ -23,10 +33,11 @@ my %WriteMakefileArgs = (
     "FASTX::Reader" => "1.3.0",
     "Getopt::Long" => "2.39",
     "JSON::PP" => "2.27",
+    "PerlIO::encoding" => 0,
     "Pod::Usage" => "1.61",
     "Text::ASCIITable" => 0
   },
-  "VERSION" => "1.4.4",
+  "VERSION" => "1.4.10",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,6 +48,7 @@ my %FallbackPrereqs = (
   "FASTX::Reader" => "1.3.0",
   "Getopt::Long" => "2.39",
   "JSON::PP" => "2.27",
+  "PerlIO::encoding" => 0,
   "Pod::Usage" => "1.61",
   "Text::ASCIITable" => 0
 );

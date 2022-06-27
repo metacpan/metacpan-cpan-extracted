@@ -10,10 +10,14 @@ Module::Generic::Scalar::IO - Generic Module Scalar IO Class
     my $io = $s->open || die( $s->error );
     # or
     my $io = Module::Generic::Scalar::IO->new( $scalar_object );
+    # using PerlIO
+    my $io = Module::Generic::Scalar::IO->new( $scalar_object, '+>:ut8' );
+    my $io = Module::Generic::Scalar::IO->new( $scalar_object, '+>:binmode(ut-8)' );
+    my $io = Module::Generic::Scalar::IO->new( $scalar_object, '+>:bytes' );
 
     $io->opened; # Return true if opened or false otherwise
-    $io->fileno; # no-op method
-    $io->flush; # ditto
+    $io->fileno; # returns -1
+    $io->flush;
     $io->print( <<EOT );
     Mignonne, allons voir si la rose
     Qui ce matin avoit desclose
@@ -34,28 +38,69 @@ Module::Generic::Scalar::IO - Generic Module Scalar IO Class
     @lines = $io->getlines;
     print $lines[-1], "\n";
     # Returns: Author: Pierre de Ronsard, Les Odes\n
-
-    # The file handle is overloaded, so we can do:
-    print "Data is now: $io\n";
-    # This will return the content of the string.
-
     $io->close;
 
 =head1 VERSION
 
-    v0.1.1
+    v0.2.0
 
 =head1 DESCRIPTION
 
-This class L<Module::Generic::Scalar::IO> inherits from L<IO::Scalar> while enable it to use L<Module::Generic::Scalar> objects.
+This class L<Module::Generic::Scalar::IO> implements object oriented IO methods on a scalar reference. It inherits from L<Module::Generic::File::IO> and you can use all the methods from L<IO::Handle>
 
-Thus, this makes it possible to use L<Module::Generic::Scalar> object as file handle to print and get data to and from it.
+Thus, this makes it possible to use L<Module::Generic::Scalar> object as file handle to print and get data to and from it, and you can use it directly as well.
+
+This normally can be achieved with L<PerlIO>, like this:
+
+    my $ref = \"Hello";
+    open( my $fh, '+<:scalar', $ref ) || die( $! );
+
+However, this interface provides some additions such as setting filehandle flags based on opening mode, so that following calls work, which they normally do not if one uses directly L<perlfunc/open>
+
+    my $flags = $fh->fcntl( F_GETFL, 0 );
+    $fh->fcntl( F_SETFL, O_RDWR );
+
+This, in turn, allows the methods L</can_read> and L</can_write> and L</is_append>, L</is_create>, L</is_readonly>, L</is_readwrite>, L</is_writeonly> to work.
+
+One shortcoming due to perl's own design, is if you call C<sysread( $fh, $buffer )> instead of C<$fh->sysread( $buffer )> or C<syswrite( $fh, $string )> instead of C<$fh->syswrite( $string )>. While the latter works of course, the former does not, so always make sure to call hose methods in an object oriented way.
 
 =head1 METHODS
 
 =head2 new
 
-It takes an L<Module::Generic::Scalar> object and calls L</open>. It returns a blessed file handle created by L<IO::Scalar>
+It takes an L<Module::Generic::Scalar> object or any other scalar reference, and some optional mode and calls L</open>. It returns a blessed file handle.
+
+If no mode is provided, it defaults to C<< +< >> to allow for read and write, but without clobbering.
+
+Supported modes are:
+
+=over 4
+
+=item C<< < >> or C<r>
+
+Read-only
+
+=item C<< <+ >> or C<r+>
+
+Read and write. This is the default.
+
+=item C<< > >> or C<w>
+
+Clobbering. This will empty the content of the scalar reference, before writing to it.
+
+=item C<< +> >> or C<w+>
+
+Cloberring, and read and write.
+
+=item C<< >> >> or C<a>
+
+Append mode. This will allow for appending data to the underlying scalar reference, but not read from it.
+
+=item C<< +>> >> C<a+>
+
+Append and read mode. This allows to append data and read from it.
+
+=back
 
 =head2 autoflush
 
@@ -64,6 +109,26 @@ This is a no-ope; it does not do anything.
 =head2 binmode
 
 This is a no-ope; it does not do anything.
+
+=head2 bit
+
+Returns the bitwise value of the mode used to open the scalar reference io interface.
+
+You can then use L<Fcntl> constants C<O_RDONLY>, C<O_RDWR>, C<O_CREAT>, C<O_WRONLY>, C<O_APPEND> to query in bitwise mode, such as:
+
+    use Fcntl;
+    if( $io->bit & O_RDWR )
+    {
+        say "Can write";
+    }
+
+=head2 can_read
+
+Returns true if one can read from the scalar reference.
+
+=head2 can_write
+
+Returns true if one can write to the scalar reference.
 
 =head2 clearerr
 
@@ -79,23 +144,32 @@ This method overrides the one from L<IO::Scalar> that would otherwise destroy ou
 
 Returns true if we are positioned at the end of the string, false otherwise.
 
+=head2 fcntl
+
+This is used to query or set the bitwise mode. For example:
+
+    use Fcntl;
+    my $bits = $io->fcntl( F_GETFL, $whatever );
+    # Set bits. Here same as +>
+    $io->fcntl( F_SETFL, ( O_CREAT | O_RDWR ) );
+
 =head2 fileno
 
-This is a no-op that does not do anything.
+As perl documentation for L<perlfunc/open>, this returns C<-1>
 
 =head2 flush
 
-This is a no-op that does not do anything.
+This causes perl to flush any buffered data at the perlio api level. Any unread data in the buffer will be discarded, and any unwritten data will be written to the underlying file descriptor.
+
+It returns "0 but true" on success, and upon error sets an L<error/Module::Generic/error> and returns C<undef>.
 
 =head2 getc
 
-Return the next character from our last position, or undef if none remain.
+Return the next character from our last position, or C<undef> if none remains.
 
-head2 getline
+=head2 getline
 
 Return the next line, or undef on end of string.
-
-This can only be called in list context, or L<IO::Scalar> will raise an exception.
 
 =head2 getlines
 
@@ -106,6 +180,7 @@ So using our example in the L</SYNOPSIS> above :
     $io->seek(0,0); # position ourself at the start of the string
     my $c = $io->getc; # get the first character, which is 'M'
     my @lines = $io->getlines;
+
 This will fetch all 6 lines, except the first one will only contain:
 
     ignonne, allons voir si la rose
@@ -113,6 +188,30 @@ This will fetch all 6 lines, except the first one will only contain:
 i.e. without the leading "M", since L</getc> positioned us after.
 
 So, be careful about your position in the string.
+
+This can only be called in list context, or this will return an L<error|Module::Generic/error>
+
+=for Pod::Coverage getpos
+
+=head2 is_append
+
+Returns true if the bitwise mode has the C<O_APPEND> bit enabled, false otherwise.
+
+=head2 is_create
+
+Returns true if the bitwise mode has the C<O_CREAT> bit enabled, false otherwise.
+
+=head2 is_readonly
+
+Returns true if the bitwise mode has the C<O_RDONLY> bit enabled, false otherwise.
+
+=head2 is_readwrite
+
+Returns true if the bitwise mode has the C<O_RDWR> bit enabled, false otherwise.
+
+=head2 is_writeonly
+
+Returns true if the bitwise mode has the C<O_WRONLY> bit enabled, false otherwise.
 
 =head2 length
 
@@ -140,27 +239,33 @@ If true, this will ignore the return value from the callback and will move on to
 
 =head2 object
 
-Returns the underlying L<Module::Generic::Scalar> object.
+Returns the underlying L<Module::Generic::Scalar> object or any other scalar reference that was provided during object instantiation.
 
 =head2 open
 
-This takes as its sole argument an L<Module::Generic::Scalar> object
+This takes an L<Module::Generic::Scalar> object or any other scalar reference and a mode. See L</new> for the list of supported modes.
+
+This will reeturn an L<error|Module::Generic/error> if the scalar reference provided is not appropriate or if the mode provided is unsupported.
+
+It returns the current object this was called with. It will return an error if it is called as a class function and not using an object.
 
 =head2 opened
 
-Returns true if the scalar is opened or false otherwise.
-
-When the filehandle is active, it is L<perlfunc/tied>, so this checks that. Otherwise, it does not do anything else.
+Returns true if the filehanle is opened or false otherwise.
 
 =head2 print
 
-This print at the last position in the string the list of data provided.
+This prints at the last position in the string the list of data provided, just like L<perlfunc/print>
 
-As of version 2.113 of L<IO::Scalar>, this method merely pushes data at the end of the string without accounting for the last position.
-
-This method corrects this. If you want to make sure you are at the end, do:
+If you want to make sure you are at the end, do:
 
     $io->seek(0,2);
+    # or better yet:
+    $io->seek(0,SEEK_END);
+
+=head2 printf
+
+Same as L<perlfunc/printf>
 
 =head2 read
 
@@ -169,9 +274,15 @@ This method corrects this. If you want to make sure you are at the end, do:
     # or
     $io->read( $buff, 1024, $offset );
 
+Same as L<perlfunc/read>
+
 Takes a string as a buffer, a length and an optional offset in the buffer and will attempt to read from our scalar the requested length and place the result in the buffer.
 
 It returns the number of data read at the last position, or C<undef> if there was an error.
+
+=head2 say
+
+Same as L<perlfunc/say>
 
 =head2 seek
 
@@ -181,23 +292,37 @@ This takes 2 arguments: an integer representing a position in the string and ano
 
 Quoting from L<perlfunc/seek>: "The values for WHENCE are 0 to set the new position *in bytes* to POSITION; 1 to set it to the current position plus POSITION; and 2 to set it to EOF plus POSITION, typically negative."
 
+You can also use L<Fcntl>, such as:
+
+    $io->seek( $some_pos, SEEK_SET );
+
+=for Pod::Coverage setpos
+
 =head2 size
 
 Alias for L</length>
 
+=for Pod::Coverage sref
+
+=head2 stat
+
+This is a no-op and always returns C<undef> or an empty list in list context.
+
 =head2 sysread
 
-This is an alias for L</read>
+Same as L<perlfunc/sysread>
 
 =head2 sysseek
 
-This is an alias for L</seek>
+Same as L<perlfunc/sysseek>
 
 =head2 syswrite
 
-This is an alias for L</write>
+Same as L<perlfunc/syswrite>
 
 =head2 tell
+
+Same as L<perlfunc/tell>
 
 Returns the current position in the string.
 
@@ -206,9 +331,15 @@ Returns the current position in the string.
     $io->truncate( $length );
     $io->truncate( $io->tell );
 
+Same as L<perlfunc/truncate>
+
 This truncates the string to the specified length C<$length>. It returns true if successful, and false otherwise, such as when at the end of the string.
 
 The position in the string is left unchanged. You may want to call seek before writing to the string.
+
+This is an improvement from L<IO::Handle/truncate>, which would otherwise fail on a scalar reference and return C<Bad file descriptor>
+
+=for Pod::Coverage ungetc
 
 =head2 write
 
@@ -216,11 +347,17 @@ The position in the string is left unchanged. You may want to call seek before w
     $io->write( $data, 1024 );
     $io->write( $data, 1024, $offset );
 
+Same as L<IO::Handle/write>
+
 This takes some data C<$data>, and optionally some length of those data to take and optionally at a given C<$offset> in C<$data>, and will L</print> those data at the last position in string.
+
+This is an improvement from L<IO::Handle/write>, which does a simple C<print> and thus returns only true or false.
+
+It returns the number of bytes printed, or C<undef> if there was an error, in which cases the error message can be retrieved with L<error|Module::Generic/error>
 
 =head1 SEE ALSO
 
-L<Module::Generic::Scalar>, L<IO::Scalar>
+L<Module::Generic::Scalar>, L<PerlIO::scalar>, L<Module::Generic::File::IO>
 
 =head1 AUTHOR
 
@@ -228,7 +365,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2021 DEGUEST Pte. Ltd.
+Copyright (c) 2021-2022 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

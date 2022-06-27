@@ -1,11 +1,16 @@
 use Template::Plex;
+use File::Basename qw<dirname>;
+
+my $root=dirname __FILE__;
+my @opts=(root=>$root);
+
 {	
 	print "EXAMPLE SYNOPSIS\n";
 	my $base_data={name=>"James", age=>"12", fruit=>"banana"};
 	my $template = '$name is $age and favourite fruit is $fruit';
 	print "Template is: $template\n";
 
-	my $t=plex [$template], $base_data;
+	my $t=Template::Plex->load([$template], $base_data,@opts);
 
 	my $string=$t->render();		#renders with base values. 
 	print "Rendered: $string\n";
@@ -37,7 +42,7 @@ use Template::Plex;
 
 	#Any keys present at preparation time are used to generate lexical aliases of the hash entries. This 
 	#Returned item is  code ref to execute
-	my $t=plex [$template], $data;
+	my $t=Template::Plex->load([$template], $data,@opts);
 
 
 	#executing with no arguments will only draw data from the base values specified
@@ -69,7 +74,7 @@ use Template::Plex;
 	my $data={field1=>"monkeys", field2=>"hippos"};		
 	#field3 is not specified and will be undefined
 	
-	my $t=plex [$template], $data;
+	my $t=Template::Plex->load([$template], $data,@opts);
 	my $string=$t->render();	
 
 	print "Rendered (base): $string\n";
@@ -79,4 +84,15 @@ use Template::Plex;
 	$string=$t->render($new_data);
 	print "Rendered (override): $string\n";
 	print "\n\n";
+}
+
+{
+	print "EXAMPLE 3: Inheritance";
+	my $child='@{[init { inherit "parent.plex" }]}
+		CHILD CONTENT
+		@{[fill_slot header=>"CHILD HEADER"]}
+	';
+	my $data={a=>1,b=>2};
+	my $t=Template::Plex->load([$child],$data,@opts);
+	print $t->render;
 }

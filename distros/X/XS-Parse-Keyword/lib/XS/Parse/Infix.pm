@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Infix 0.23;
+package XS::Parse::Infix 0.24;
 
 use v5.14;
 use warnings;
@@ -310,6 +310,13 @@ C<OP_ANONLIST> type, which is used by anonymous array-ref construction:
 
 This optimisation is only performed if the operator declared it safe to do so,
 via the C<XPI_OPERAND_ONLY_LOOK> flag.
+
+If a function of the given name already exists at registration time it will be
+left undisturbed and no new wrapper will be created. This permits the same
+infix operator to have multiple spellings of its name; for example to allow
+both a real Unicode and a fallback ASCII transliteration of the same operator.
+The first registration will create the wrapper function; the subsequent one
+will skip it because it would otherwise be identical.
 
 =cut
 

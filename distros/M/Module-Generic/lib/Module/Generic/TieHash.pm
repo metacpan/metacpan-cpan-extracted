@@ -16,7 +16,7 @@ BEGIN
     use strict;
     use warnings::register;
     use warnings;
-    use parent qw( Module::Generic );
+    # use parent qw( Module::Generic );
     use Scalar::Util ();
     our $VERSION = 'v1.1.0';
 };
@@ -171,7 +171,13 @@ sub STORE
     }
 }
 
-sub enable { return( shift->_set_get_boolean( 'enable', @_ ) ); }
+# sub enable { return( shift->_set_get_boolean( 'enable', @_ ) ); }
+sub enable
+{
+    my $self = shift( @_ );
+    $self->{enable} = shift( @_ ) if( @_ );
+    return( $self->{enable} );
+}
 
 sub _exclude
 {

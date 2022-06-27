@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-12'; # DATE
+our $DATE = '2022-06-24'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our %SPEC;
 
@@ -24,6 +24,7 @@ our %argspecs_common = (
         'x.name.is_plural' => 1,
         'x.name.singular' => 'file',
         schema => ['array*', of=>'filename*', min_len=>1],
+        cmdline_aliases=>{f=>{}},
         tags => ['category:input'],
     },
 );
@@ -264,7 +265,7 @@ App::orgadb - An opinionated Org addressbook tool
 
 =head1 VERSION
 
-This document describes version 0.001 of App::orgadb (from Perl distribution App-orgadb), released on 2022-06-12.
+This document describes version 0.002 of App::orgadb (from Perl distribution App-orgadb), released on 2022-06-24.
 
 =head1 SYNOPSIS
 

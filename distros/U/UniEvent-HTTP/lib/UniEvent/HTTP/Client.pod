@@ -5,7 +5,7 @@ UniEvent::HTTP::Client - HTTP client connection
 =head1 SYNOPSIS
 
     my $client = UE::HTTP::Client->new();
-    
+
     $client->request({
         uri => "http://example.com",
         timeout => 3,
@@ -14,7 +14,7 @@ UniEvent::HTTP::Client - HTTP client connection
             ...
         },
     });
-    
+
     UE::Loop->default->run;
 
 
@@ -37,7 +37,7 @@ Client inherits L<UniEvent::Tcp> handle.
 
 =head1 METHODS
 
-All methods of L<UniEvent::Tcp> also apply. Keep in mind that if you intervene in network I/O via C<UniEvent::Tcp> methods (like manually calling C<connect()>, 
+All methods of L<UniEvent::Tcp> also apply. Keep in mind that if you intervene in network I/O via C<UniEvent::Tcp> methods (like manually calling C<connect()>,
 C<disconnect()>, etc...) you may break Client's behaviour.
 
 
@@ -55,5 +55,9 @@ Executes an http request. Argument can be a L<UniEvent::HTTP::Request> object or
 
 Cancels current http request execution (if any). Callbacks will be called with C<$error> error (C<UniEvent::SystemError::operation_canceled> by default).
 If no request is currently executing, does nothing.
+
+=head2 uncompress_response()
+
+A property that controls automatic uncompression of response body. Default is true. If false body remains compressed, usefull for proxy.
 
 =cut

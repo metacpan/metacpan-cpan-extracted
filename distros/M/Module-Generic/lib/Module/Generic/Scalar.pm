@@ -16,12 +16,8 @@ BEGIN
     use common::sense;
     use warnings;
     use warnings::register;
-    use vars qw( $DEBUG );
-    use Module::Generic::Array;
-    use Module::Generic::Boolean;
-    use Module::Generic::Null;
-    use Module::Generic::Number;
-    use Module::Generic::Scalar;
+    use vars qw( $DEBUG $ERROR $ERRORS );
+    use Encode ();
     # So that the user can say $obj->isa( 'Module::Generic::Scalar' ) and it would return true
     # use parent -norequire, qw( Module::Generic::Scalar );
     use Scalar::Util ();
@@ -81,16 +77,22 @@ BEGIN
         fallback => 1,
     );
     $DEBUG = 0;
+    $ERRORS = {};
     our $VERSION = 'v1.2.1';
 };
 
 use strict;
 no warnings 'redefine';
+require Module::Generic::Array;
+require Module::Generic::Boolean;
+require Module::Generic::Null;
+require Module::Generic::Number;
 
 # sub new { return( shift->_new( @_ ) ); }
 sub new
 {
     my $this = shift( @_ );
+    my $class = ref( $this ) || $this;
     my $init = '';
     if( ref( $_[0] ) eq 'SCALAR' || UNIVERSAL::isa( $_[0], 'SCALAR' ) )
     {
@@ -102,8 +104,7 @@ sub new
     }
     elsif( ref( $_[0] ) )
     {
-        warn( "I do not know what to do with \"", $_[0], "\"\n" ) if( $this->_warnings_is_enabled );
-        return;
+        return( $this->error( "I do not know what to do with \"", overload::StrVal( $_[0] ), "\". ${class} only suport string, scalar reference or array reference." ) );
     }
     elsif( @_ )
     {
@@ -134,23 +135,19 @@ sub callback
     my( $what, $code ) = @_;
     if( !defined( $what ) )
     {
-        warnings::warn( "No callback type was provided.\n" ) if( warnings::enabled( 'Module::Generic::Scalar' ) );
-        return;
+        return( $self->error( "No callback type was provided." ) );
     }
     elsif( $what ne 'add' && $what ne 'remove' )
     {
-        warnings::warn( "Callback type provided ($what) is unsupported. Use 'add' or 'remove'.\n" ) if( warnings::enabled( 'Module::Generic::Scalar' ) );
-        return;
+        return( $self->error( "Callback type provided ($what) is unsupported. Use 'add' or 'remove'." ) );
     }
     elsif( scalar( @_ ) == 1 )
     {
-        warnings::warn( "No callback code was provided. Provide an anonymous subroutine, or reference to existing subroutine.\n" ) if( warnings::enabled( 'Module::Generic::Scalar' ) );
-        return;
+        return( $self->error( "No callback code was provided. Provide an anonymous subroutine, or reference to existing subroutine." ) );
     }
     elsif( defined( $code ) && ref( $code ) ne 'CODE' )
     {
-        warnings::warn( "Callback provided is not a code reference. Provide an anonymous subroutine, or reference to existing subroutine." ) if( warnings::enabled( 'Module::Generic::Scalar' ) );
-        return;
+        return( $self->error( "Callback provided is not a code reference. Provide an anonymous subroutine, or reference to existing subroutine." ) );
     }
     
     if( !defined( $code ) )
@@ -286,6 +283,71 @@ sub defined { return( CORE::defined( ${$_[0]} ) ); }
 
 sub empty { return( shift->reset( @_ ) ); }
 
+sub error
+{
+    my $self = CORE::shift( @_ );
+    my $addr = Scalar::Util::refaddr( $self ) || $self;
+    my $class = ref( $self ) || $self;
+    my $o;
+    no strict 'refs';
+    if( @_ )
+    {
+        my $args = {};
+        # We got an object as first argument. It could be a child from our exception package or from another package
+        # Either way, we use it as it is
+        if( ( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'Module::Generic::Exception' ) ) ||
+            Scalar::Util::blessed( $_[0] ) )
+        {
+            $o = CORE::shift( @_ );
+        }
+        elsif( ref( $_[0] ) eq 'HASH' )
+        {
+            $args  = CORE::shift( @_ );
+        }
+        else
+        {
+            $args->{message} = CORE::join( '', CORE::map( ref( $_ ) eq 'CODE' ? $_->() : $_, @_ ) );
+        }
+        
+        $args->{class} //= '';
+        my $ex_class = CORE::length( $args->{class} )
+            ? $args->{class}
+            : ( defined( ${"${class}\::EXCEPTION_CLASS"} ) && CORE::length( ${"${class}\::EXCEPTION_CLASS"} ) )
+                ? ${"${class}\::EXCEPTION_CLASS"}
+                : 'Module::Generic::Exception';
+        unless( CORE::scalar( CORE::keys( %{"${ex_class}\::"} ) ) )
+        {
+            my $pl = "use $ex_class;";
+            local $SIG{__DIE__} = sub{};
+            eval( $pl );
+            # We have to die, because we have an error within another error
+            die( "${class}\::error() is unable to load exception class \"$ex_class\": $@" ) if( $@ );
+        }
+        $o = $ERRORS->{ $addr } = $ERROR = $ex_class->new( $args );
+        my $enc_str = eval
+        {
+            Encode::encode( 'UTF-8', "$o", Encode::FB_CROAK );
+        };
+        # Display warnings if warnings for this class is registered and enabled or if not registered
+        warn( $@ ? $o : $enc_str ) if( $self->_warnings_is_enabled );
+
+        if( !$args->{no_return_null_object} && want( 'OBJECT' ) )
+        {
+            require Module::Generic::Null;
+            my $null = Module::Generic::Null->new( $o, { debug => $DEBUG, has_error => 1 });
+            rreturn( $null );
+        }
+        return;
+    }
+    if( !$ERRORS->{ $addr } && want( 'OBJECT' ) )
+    {
+        require Module::Generic::Null;
+        my $null = Module::Generic::Null->new( $o, { debug => $DEBUG, wants => 'object' });
+        rreturn( $null );
+    }
+    return( $ERRORS->{ $addr } );
+}
+
 sub fc { return( CORE::fc( ${$_[0]} ) eq CORE::fc( $_[1] ) ); }
 
 sub hex { return( $_[0]->_number( CORE::hex( ${$_[0]} ) ) ); }
@@ -396,6 +458,7 @@ sub object { return( $_[0] ); }
 sub open
 {
     my $self = shift( @_ );
+    require Module::Generic::Scalar::IO;
     my $io = Module::Generic::Scalar::IO->new( $self, @_ ) || 
         return( $self->pass_error( Module::Generic::Scalar::IO->error ) );
     return( $io );
@@ -428,6 +491,72 @@ sub pad
         CORE::substr( $$self, 0, 0 ) = ( "$str" x $n );
     }
     return( $self );
+}
+
+sub pass_error
+{
+    my $self = CORE::shift( @_ );
+    my $addr = Scalar::Util::refaddr( $self ) || $self;
+    my $opts = {};
+    my $err;
+    my $class;
+    no strict 'refs';
+    if( scalar( @_ ) )
+    {
+        # Either an hash defining a new error and this will be passed along to error(); or
+        # an hash with a single property: { class => 'Some::ExceptionClass' }
+        if( CORE::scalar( @_ ) == 1 && ref( $_[0] ) eq 'HASH' )
+        {
+            $opts = $_[0];
+        }
+        else
+        {
+            # $self->pass_error( $error_object, { class => 'Some::ExceptionClass' } );
+            if( CORE::scalar( @_ ) > 1 && ref( $_[-1] ) eq 'HASH' )
+            {
+                $opts = CORE::pop( @_ );
+            }
+            $err = $_[0];
+        }
+    }
+    # We set $class only if the hash provided is a one-element hash and not an error-defining hash
+    $class = CORE::delete( $opts->{class} ) if( CORE::scalar( CORE::keys( %$opts ) ) == 1 && [CORE::keys( %$opts )]->[0] eq 'class' );
+    
+    # called with no argument, most likely from the same class to pass on an error 
+    # set up earlier by another method; or
+    # with an hash containing just one argument class => 'Some::ExceptionClass'
+    if( !CORE::defined( $err ) && ( !CORE::scalar( @_ ) || CORE::defined( $class ) ) )
+    {
+        if( !CORE::defined( $ERRORS->{ $addr } ) )
+        {
+            warnings::warnif( "No error object provided and no previous error set either! It seems the previous method call returned a simple undef\n" );
+        }
+        else
+        {
+            $err = ( CORE::defined( $class ) ? bless( $ERRORS->{ $addr } => $class ) : $ERRORS->{ $addr } );
+        }
+    }
+    elsif( CORE::defined( $err ) && 
+           Scalar::Util::blessed( $err ) && 
+           ( CORE::scalar( @_ ) == 1 || 
+             ( CORE::scalar( @_ ) == 2 && CORE::defined( $class ) ) 
+           ) )
+    {
+        $ERRORS->{ $addr } = $ERROR = ( CORE::defined( $class ) ? bless( $err => $class ) : $err );
+    }
+    # If the error provided is not an object, we call error to create one
+    else
+    {
+        return( $self->error( @_ ) );
+    }
+    
+    if( want( 'OBJECT' ) )
+    {
+        require Module::Generic::Null;
+        my $null = Module::Generic::Null->new( $err, { debug => $ERRORS->{ $addr }, has_error => 1 });
+        rreturn( $null );
+    }
+    return;
 }
 
 sub pos { return( $_[0]->_number( @_ > 1 ? ( CORE::pos( ${$_[0]} ) = $_[1] ) : CORE::pos( ${$_[0]} ) ) ); }
@@ -500,25 +629,29 @@ sub scalar { return( shift->as_string ); }
 sub set
 {
     my $self = CORE::shift( @_ );
-    my $init;
-    if( Scalar::Util::reftype( $_[0] ) eq 'SCALAR' )
+    if( @_ )
     {
-        $init = ${$_[0]};
+        my $init;
+        my $type = Scalar::Util::reftype( $_[0] ) // '';
+        if( $type eq 'SCALAR' )
+        {
+            $init = ${$_[0]};
+        }
+        elsif( $type eq 'ARRAY' )
+        {
+            $init = CORE::join( '', @{$_[0]} );
+        }
+        elsif( ref( $_[0] ) )
+        {
+            warn( "I do not know what to do with \"", $_[0], "\" (", overload::StrVal( $_[0] ), ")\n" ) if( $self->_warnings_is_enabled );
+            return;
+        }
+        else
+        {
+            $init = shift( @_ );
+        }
+        $$self = $init;
     }
-    elsif( Scalar::Util::reftype( $_[0] ) eq 'ARRAY' )
-    {
-        $init = CORE::join( '', @{$_[0]} );
-    }
-    elsif( ref( $_[0] ) )
-    {
-        warn( "I do not know what to do with \"", $_[0], "\" (", overload::StrVal( $_[0] ), ")\n" ) if( $self->_warnings_is_enabled );
-        return;
-    }
-    else
-    {
-        $init = shift( @_ );
-    }
-    $$self = $init;
     return( $self );
 }
 
@@ -642,159 +775,36 @@ sub _number
 
 sub _new { return( shift->Module::Generic::Scalar::new( @_ ) ); }
 
-sub _warnings_is_enabled { return( warnings::enabled( ref( $_[0] ) || $_[0] ) ); }
-
-# XXX Module::Generic::Scalar::IO class
+sub _warnings_is_enabled
 {
-    package
-        Module::Generic::Scalar::IO;
-    use parent qw( IO::Scalar );
-    use Module::Generic::Exception ();
-    use Scalar::Util ();
-    use overload (
-        '""' => sub{ ${ *{$_[0]}->{SR} } },
-        # '""' => 'as_string',
-        fallback => 1,
-    );
-    our $ERROR = '';
-    our $VERSION = 'v0.1.1';
-
-#     sub as_string
-#     {
-#         my $self = shift( @_ );
-#         print( STDERR __PACKAGE__, "::as_string: Scalar ref object is: ", overload::StrVal( *$self->{SR} ), "\n" );
-#         return( ${ *$self->{SR} } );
-#     }
-    
-    sub close
-    {
-        my $self = CORE::shift( @_ );
-        untie( *$self );
-        return( 1 );
-    }
-    
-    sub error
-    {
-        my $self = shift( @_ );
-        if( @_ )
-        {
-            my $opts = {};
-            if( ref( $_[0] ) eq 'HASH' )
-            {
-                $opts = shift( @_ );
-            }
-            else
-            {
-                $opts->{message} = join( '', map( ref( $_ ) eq 'CODE' ? $_->() : $_, @_ ) );
-                # http server error
-                $opts->{code} = 500;
-            }
-            $opts->{skip_frames} = 1;
-            *$self->{error} = $ERROR = Module::Generic::Exception->new( $opts );
-            return;
-        }
-        else
-        {
-            return( ref( $self ) ? *$self->{error} : $ERROR );
-        }
-    }
-
-    # Redo this method, because we do not want 'croak'
-    sub getlines
-    {
-        my $self = shift( @_ );
-        wantarray or return( $self->error( "Cannot call getlines in scalar context!" ) );
-        my( $line, @lines );
-        push( @lines, $line ) while( defined( $line = $self->getline ) );
-        return( @lines );
-    }
-
-    sub length
-    {
-        my $self = CORE::shift( @_ );
-        return( CORE::length( ${ *$self->{SR} } ) );
-    }
-    
-    sub line
-    {
-        my $self = shift( @_ );
-        my $code = shift( @_ );
-        return( $self->error( "No callback code was provided for line()" ) ) if( !defined( $code ) || ref( $code ) ne 'CODE' );
-        my $opts = ref( $_[0] ) eq 'HASH' ? shift( @_ ) : { @_ };
-        $opts->{chomp} //= 0;
-        $opts->{auto_next} //= 0;
-        my $l;
-        while( defined( $l = $self->getline ) )
-        {
-            chomp( $l ) if( $opts->{chomp} );
-            local $_ = $l;
-            my $rv = $code->( $l );
-            if( !defined( $rv ) && !$opts->{auto_next} )
-            {
-                last;
-            }
-        }
-        return( $self );
-    }
-    
-    sub object { return( *{ $_[0] }->{SR} ) }
-
-    sub open
-    {
-        my( $self, $ref ) = @_;
-        # print( STDERR __PACKAGE__, "::open: scalar ref provded is: ", overload::StrVal( $ref ), " (", defined( $$sref ) ? 'undefined' : $$sref, ")\n" );
-        unless( Scalar::Util::blessed( $ref ) && $ref->isa( 'Module::Generic::Scalar' ) )
-        {
-            return( $self->error( "Value provided for ", ref( $self ), " is not an Module::Generic::Scalar object." ) );
-        }
-
-        # Setup:
-        *$self->{Pos} = 0;         # seek position
-        *$self->{SR}  = $ref;      # scalar reference
-        # print( STDERR __PACKAGE__, "::open: Scalar ref object is: ", overload::StrVal( *$self->{SR} ), "\n" );
-        return( $self );
-    }
-    
-    sub opened { return( tied( *{$_[0]} ) ); }
-    
-    sub print
-    {
-        my $self = CORE::shift( @_ );
-        my $len  = CORE::length( ${*$self->{SR}} );
-        substr( ${*$self->{SR}}, *$self->{Pos}, 0, CORE::join( '', @_ ) . (CORE::defined( $\ ) ? $\ : "" ) );
-        *$self->{Pos} += ( CORE::length( ${*$self->{SR}} ) - $len );
-        # print( STDERR __PACKAGE__, "::print: Position is ", *$self->{Pos}, " and length is: ", length( ${*$self->{SR}} ), "\n" );
-        1;
-    }
-    
-    # Redo this method to remove 'croak'
-    sub seek
-    {
-        my( $self, $pos, $whence ) = @_;
-        my $eofpos = CORE::length( ${*$self->{SR}} );
-
-        # Seek:
-        if    ( $whence == 0) { *$self->{Pos} = $pos }             # SEEK_SET
-        elsif ( $whence == 1) { *$self->{Pos} += $pos }            # SEEK_CUR
-        elsif ( $whence == 2) { *$self->{Pos} = $eofpos + $pos }   # SEEK_END
-        else                  { return( $self->error( "Bad seek whence ($whence)" ) ); }
-
-        # Fixup:
-        if( *$self->{Pos} < 0)       { *$self->{Pos} = 0 }
-        if( *$self->{Pos} > $eofpos) { *$self->{Pos} = $eofpos }
-        return(1);
-    }
-    
-    sub size { return( CORE::shift->length ); }
-
-    sub truncate
-    {
-        my $self = CORE::shift( @_ );
-        my $removed = CORE::substr( ${*$self->{SR}}, *$self->{Pos}, CORE::length( ${*$self->{SR}} ) - *$self->{Pos}, '' );
-        return( CORE::length( $removed ) );
-    }
+    my $self = shift( @_ );
+    # I hate dying, but here this is a show-stopper
+    die( "Object provided is undef!\n" ) if( @_ && !defined( $_[0] ) );
+    my $obj = @_ ? shift( @_ ) : $self;
+    return(0) if( !$self->_warnings_is_registered( $obj ) );
+    return( warnings::enabled( ref( $obj ) || $obj ) );
 }
 
+sub _warnings_is_registered
+{
+    my $self = shift( @_ );
+    # I hate dying, but here this is a show-stopper
+    die( "Object provided is undef!\n" ) if( @_ && !defined( $_[0] ) );
+    my $obj = @_ ? shift( @_ ) : $self;
+    return(1) if( defined( $warnings::Bits{ ref( $obj ) || $obj } ) );
+    return(0);
+}
+
+DESTROY
+{
+    local( $., $@, $!, $^E, $? );
+    my $self = shift( @_ );
+    my $addr = Scalar::Util::refaddr( $self );
+    CORE::delete( $ERRORS->{ $addr } );
+};
+
+
+# XXX Module::Generic::RegexpCapture package
 {
     package
         Module::Generic::RegexpCapture;

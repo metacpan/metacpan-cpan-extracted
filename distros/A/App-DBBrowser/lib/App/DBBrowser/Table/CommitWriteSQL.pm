@@ -82,6 +82,10 @@ sub commit_sql {
     eval {
         $dbh->{AutoCommit} = 1;
         $transaction = $dbh->begin_work;
+        # https://metacpan.org/pod/DBI#begin_work
+        # begin_work enables transactions by turning AutoCommit off until the next call to commit or rollback.
+        # If AutoCommit is already off when begin_work is called then it does nothing except return an error.
+        # If the driver does not support transactions then when begin_work attempts to set AutoCommit off the driver will trigger a fatal error.
     } or do {
         $dbh->{AutoCommit} = 1;
         $transaction = 0;

@@ -7,7 +7,6 @@ use Wikibase::Datatype::Value::Quantity;
 
 # Object.
 my $obj = Wikibase::Datatype::Value::Quantity->new(
-        'unit' => 'Q190900',
         'value' => '10',
 );
 
@@ -22,10 +21,11 @@ my $value = $obj->value;
 
 # Print out.
 print "Type: $type\n";
-print "Unit: $unit\n";
+if (defined $unit) {
+        print "Unit: $unit\n";
+}
 print "Value: $value\n";
 
 # Output:
 # Type: quantity
-# Unit: Q190900
 # Value: 10

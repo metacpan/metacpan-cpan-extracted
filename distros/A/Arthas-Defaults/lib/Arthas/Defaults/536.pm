@@ -7,6 +7,7 @@ use utf8;
 use feature();
 use feature 'try';
 no warnings 'experimental::try';
+no warnings 'experimental::defer';
 use version;
 use Carp qw/carp croak confess cluck/;
 
@@ -14,7 +15,6 @@ require Exporter;
 our @ISA       = ('Exporter');
 our @EXPORT    = qw/
     carp croak confess cluck
-    try catch finally
 /;
 
 sub import {
@@ -25,6 +25,7 @@ sub import {
     utf8->import();
 
     experimental->import('try');
+    experimental->import('defer');
 
     # Export all @EXPORT
     Arthas::Defaults::536->export_to_level(1, @_);
@@ -37,6 +38,7 @@ sub unimport {
     utf8->unimport();
 
     experimental->unimport('try');
+    experimental->unimport('defer');
 }
 
 1;
@@ -49,7 +51,7 @@ Arthas::Defaults::536 - Defaults for coding with perl 5.36 - Do not use if you'r
 
 =head1 SYNOPSIS
 
-    use Arthas::Defaults;
+    use Arthas::Defaults::536;
 
 =head1 DESCRIPTION
 
@@ -60,8 +62,9 @@ It's like saying:
     use warnings;
     no warnings 'uninitialized';
     use experimental 'signatures';
+    use experimental 'try';
+    use experimental 'defer';
     use Carp qw/carp croak confess cluck/;
-    use Try::Tiny;
 
 Might change without notice, at any time. DO NOT USE!
 
@@ -119,7 +122,11 @@ than that of C<die()> and C<warn()>.
 
 =item C<use experimental 'try'>
 
-Try - catch - finaly... finally!
+Try - catch - finally... finally!
+
+=item C<use experimental 'defer'>
+
+Defer blocks seem to be very useful.
 
 =back
 

@@ -19,17 +19,18 @@ name: App-freqtable
 provides:
   App::freqtable:
     file: lib/App/freqtable.pm
-    version: '0.005'
+    version: '0.007'
 requires:
   Getopt::Long: '2.50'
   POSIX: '0'
+  Sort::Sub: '0.120'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-freqtable
   homepage: https://metacpan.org/release/App-freqtable
   repository: git://github.com/perlancar/perl-App-freqtable.git
-version: '0.005'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -120,8 +121,12 @@ x_Dist_Zilla:
       version: '0.02'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.062'
+      version: '0.064'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'

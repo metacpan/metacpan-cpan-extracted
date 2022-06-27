@@ -1,3 +1,8 @@
+0.05     2022-06-20
+
+- Fixed failing tests on msys. Fixed by Paulo Custodio. PR #1.
+
+
 0.04     2016-10-15
 
 - More path tweaks for tests to try to make Windows and OSX happy. Tests pass

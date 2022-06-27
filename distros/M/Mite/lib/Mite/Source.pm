@@ -1,4 +1,5 @@
 package Mite::Source;
+use Mite::MyMoo;
 
 =head1 NAME
 
@@ -31,49 +32,51 @@ L<Mite::Class>, L<Mite::Compiled>, L<Mite::Project>
 
 =cut
 
-use feature ':5.10';
-use Mouse;
-use Mite::Types;
-
 use Mite::Compiled;
 use Mite::Class;
-use Method::Signatures;
 
 has file =>
-  is            => 'ro',
-  isa           => 'Path',
-  coerce        => 1,
-  required      => 1;
+  is            => ro,
+  isa           => Path,
+  coerce        => true,
+  required      => true;
 
 has classes =>
-  is            => 'ro',
-  isa           => 'HashRef[Mite::Class]',
+  is            => ro,
+  isa           => HashRef[InstanceOf['Mite::Class']],
   default       => sub { {} };
 
 has compiled =>
-  is            => 'ro',
-  isa           => 'Mite::Compiled',
-  lazy          => 1,
-  default       => method {
+  is            => ro,
+  isa           => InstanceOf['Mite::Compiled'],
+  lazy          => true,
+  default       => sub {
+      my $self = shift;
       return Mite::Compiled->new( source => $self );
   };
 
 has project =>
-  is            => 'rw',
-  isa           => 'Mite::Project',
+  is            => rw,
+  isa           => InstanceOf['Mite::Project'],
   # avoid a circular dep with Mite::Project
-  weak_ref      => 1;
+  weak_ref      => true;
 
-method has_class($name) {
+sub has_class {
+    my ( $self, $name ) = ( shift, @_ );
+
     return defined $self->classes->{$name};
 }
 
-method compile() {
+sub compile {
+    my $self = shift;
+
     return $self->compiled->compile();
 }
 
 # Add an existing class instance to this source
-method add_classes(@classes) {
+sub add_classes {
+    my ( $self, @classes ) = ( shift, @_ );
+
     for my $class (@classes) {
         $self->classes->{$class->name} = $class;
         $class->source($self);
@@ -83,7 +86,9 @@ method add_classes(@classes) {
 }
 
 # Create or reuse a class instance for this source give a name
-method class_for($name) {
+sub class_for {
+    my ( $self, $name ) = ( shift, @_ );
+
     return $self->classes->{$name} ||= Mite::Class->new(
         name    => $name,
         source  => $self,

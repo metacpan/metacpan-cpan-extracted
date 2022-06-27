@@ -2,7 +2,7 @@ package App::GHPT::Wrapper::OurMooseX::Role::Parameterized::Meta::Trait::Paramet
 
 use App::GHPT::Wrapper::OurMoose::Role;
 
-our $VERSION = '1.001000';
+our $VERSION = '2.000000';
 
 with 'MooseX::Role::Parameterized::Meta::Trait::Parameterizable';
 

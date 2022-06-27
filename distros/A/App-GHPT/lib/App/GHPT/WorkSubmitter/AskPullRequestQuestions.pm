@@ -2,7 +2,7 @@ package App::GHPT::WorkSubmitter::AskPullRequestQuestions;
 
 use App::GHPT::Wrapper::OurMoose;
 
-our $VERSION = '1.001000';
+our $VERSION = '2.000000';
 
 use App::GHPT::Types qw( ArrayRef Str );
 use Module::Pluggable::Object;
@@ -72,12 +72,12 @@ App::GHPT::WorkSubmitter::AskPullRequestQuestions - Ask questions to go in the p
 
 =head1 VERSION
 
-version 1.001000
+version 2.000000
 
 =head1 SYNOPSIS
 
    my $markdown = App::GHPT::WorkSubmitter::AskPullRequestQuestions->new(
-        merge_to_branch_name => 'master',
+        merge_to_branch_name => 'main',
    )->ask_questions;
 
 =head1 DESCRIPTION
@@ -93,7 +93,7 @@ them to produce markdown.
 =head2 merge_to_branch_name
 
 The name of the branch that we're creating the pull request against.  This is
-probably C<master>.
+probably C<main>.
 
 Required. Str.
 
@@ -123,7 +123,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by MaxMind, Inc.
+This software is Copyright (c) 2022 by MaxMind, Inc.
 
 This is free software, licensed under:
 

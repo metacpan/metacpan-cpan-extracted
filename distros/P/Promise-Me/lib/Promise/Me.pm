@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Promise - ~/lib/Promise/Me.pm
-## Version v0.2.2
+## Version v0.3.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/28
-## Modified 2022/04/03
+## Modified 2022/04/07
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -20,7 +20,8 @@ BEGIN
     use parent qw( Module::Generic );
     use vars qw( $KIDS $DEBUG $FILTER_RE_FUNC_ARGS $FILTER_RE_SHARED_ATTRIBUTE 
                  $SHARED_MEMORY_SIZE $SHARED $VERSION $SHARE_MEDIUM $SHARE_FALLBACK 
-                 $SHARE_AUTO_DESTROY $OBJECTS_REPO );
+                 $SHARE_AUTO_DESTROY $OBJECTS_REPO $EXCEPTION_CLASS );
+    use curry;
     use Clone;
     use Filter::Util::Call ();
     use Module::Generic::File::Cache v0.1.0;
@@ -115,8 +116,12 @@ BEGIN
     # A repository of objects that is used by END and DESTROY to remove the shared
     # space only when no proces is using it, since the processes run asynchronously
     our $OBJECTS_REPO = [];
-    our $VERSION = 'v0.2.2';
+    our $EXCEPTION_CLASS = 'Module::Generic::Exception';
+    our $VERSION = 'v0.3.0';
 };
+
+use strict;
+use warnings;
 
 sub import
 {
@@ -258,6 +263,7 @@ sub init
     my $code = shift( @_ );
     return( $self->error( "No code was provided to execute." ) ) if( !defined( $code ) || ref( $code ) ne 'CODE' );
     $self->{args}  = [];
+    $self->{exception_class} = $EXCEPTION_CLASS;
     $self->{result_shared_mem_size} = '';
     $self->{shared_vars_mem_size}   = $SHARED_MEMORY_SIZE;
     $self->{use_async} = 0;
@@ -280,13 +286,14 @@ sub init
     # Promise::Me->new(sub{ my( $resolve, $reject ) = @_; });
     else
     {
-        $self->{_code} = sub
-        {
-            $code->(
-                sub{ $self->resolve( @_ ) },
-                sub{ $self->reject( @_ ) },
-            );
-        };
+#         $self->{_code} = sub
+#         {
+#             $code->(
+#                 sub{ $self->resolve( @_ ) },
+#                 sub{ $self->reject( @_ ) },
+#             );
+#         };
+        $self->{_code} = $code;
     }
     $self->{_handlers} = [];
     $self->{_no_more_chaining} = 0;
@@ -546,6 +553,8 @@ sub catch
 
 sub child { return( shift->_set_get_scalar( 'child', @_ ) ); }
 
+sub exception_class { return( shift->_set_get_scalar( 'exception_class', @_ ) ); }
+
 sub exec
 {
     my $self = shift( @_ );
@@ -608,12 +617,14 @@ sub exec
         $self->is_child(1);
         $self->pid( $$ );
         $self->_set_shared_space();
+        my $exception_class = $self->exception_class;
         # $self->messagef( 3, "[child] Within child with pid '$$', %d variables to share.", scalar( keys( %{$self->{_shared}} ) ) );
         
         try
         {
             # Possibly any arguments passed in the 'async sub some_routine'; or
             # Promise::Me->new( args => [@args] );
+            local $_ = [ $self->curry::resolve, $self->curry::reject ];
             my $args = $self->args;
             my $code = $self->{_code};
             # $self->messagef( 4, "[child] %d arguments set: '%s'.", scalar( @$args ), join( "', '", @$args ) );
@@ -628,10 +639,29 @@ sub exec
                 # $self->message( 3, "[child] Execution of the primary code returned a promise object, calling resolve on it, paassing ", scalar( @rv ), " arguments: [", join( ', ', map( overload::StrVal( $_ ), @rv ) ), "]" );
                 shift( @rv )->resolve( @rv );
             }
+            elsif( scalar( @rv ) &&
+                   Scalar::Util::blessed( $rv[0] ) && 
+                   $exception_class &&
+                   $rv[0]->isa( $exception_class ) )
+            {
+                $self->reject( shift( @rv ) );
+            }
             elsif( scalar( @rv ) )
             {
                 # $self->message( 3, "[child] Execution of the primary code succeeded, calling resolve on it, paassing ", scalar( @rv ), " arguments: [", join( ', ', map( overload::StrVal( $_ ), @rv ) ), "]" );
                 $self->resolve( @rv );
+            }
+            # If the callback has used the $_->[0] to resolve the promise, we pass on to then
+            elsif( $self->resolved )
+            {
+                # $self->resolve;
+                # The user already called resolve, so we do nothing.
+            }
+            # If the callback has used the $_->[1] to reject the promise, we pass on to catch
+            elsif( $self->rejected )
+            {
+                # $self->reject;
+                # The user already called reject, so we do nothing.
             }
         }
         catch( $e )
@@ -820,7 +850,7 @@ sub resolve
         # $self->message( 4, "${prefix} Using code: '$code' (possibly none) for resolve handler." );
     }
     # # No more resolve handler. We are at the end of the chain. Mark this as resolved
-    # No actually, marke this resolved right now, and if next iteration is a fail, 
+    # No actually, mark this resolved right now, and if next iteration is a fail, 
     # then it will be marked differently
     $self->resolved(1);
     if( !defined( $code ) || !ref( $code ) )
@@ -2203,6 +2233,9 @@ Promise::Me - Fork Based Promise with Asynchronous Execution, Async, Await and S
     use Promise::Me; # exports async, await and share
     my $p = Promise::Me->new(sub
     {
+        # $_ is available as an array reference containing
+        # $_->[0] the code reference to the resolve method
+        # $_->[1] the code reference to the reject method
         # Some regular code here
     })->then(sub
     {
@@ -2303,7 +2336,7 @@ Promise::Me - Fork Based Promise with Asynchronous Execution, Async, Await and S
 
 =head1 VERSION
 
-    v0.2.2
+    v0.3.0
 
 =head1 DESCRIPTION
 
@@ -2418,7 +2451,16 @@ For a framework to do asynchronous tasks, you might also be interested in L<Coro
 
     my $p = Promise::Me->new(sub
     {
+        # $_ is available as an array reference containing
+        # $_->[0] the code reference to the resolve method
+        # $_->[1] the code reference to the reject method
+        my( $resolve, $reject ) = @$_;
         # some code to run asynchronously
+        $resolve->();
+        # or
+        $reject->();
+        # or maybe just
+        die( "Something\n" ); # will be trapped by catch()
     });
 
     # or
@@ -2431,6 +2473,12 @@ Instantiate a new C<Promise::Me> object.
 
 It takes a code reference such as an anonymous subroutine or a reference to a subroutine, and optionally an hash reference of options.
 
+The variable C<$_> is available and contains an array reference containing a code reference for C<$resolve> and C<$reject>. Thus if you wanted the execution fo your code to be resolved and calling L</then>, you could either return some return values, or explicitly call the code reference C<< $resolve->() >>. Likewise if you want to force the promise to be rejected so it call the next chained L</catch>, you can explicitly call C<< $reject->() >>. This is similar in spirit to what JavaScript Promise does.
+
+Also, if you return an exception object, whose class you have set with the I<exception_class> option, L<Promise::Me> will be able to detect it and call L</reject> accordingly and pass it the exception object as its sole argument.
+
+You can also die with a an exception object (see L<perlfunc/die>) and it will be caught by L<Promise::Me> and the exception object will be passed to L</reject> calling the next chained L</catch> method.
+
 The options supported are:
 
 =over 4
@@ -2438,6 +2486,10 @@ The options supported are:
 =item I<debug> integer
 
 Sets the debug level. This can be quite verbose and will slow down the process, so use with caution.
+
+=item I<exception_class>
+
+The exception class you want to use, so that L<Promise::Me> can properly detect it when it is return from the main callback and call L</reject>, passing the exception object as it sole parameter.
 
 =item I<result_shared_mem_size> integer
 
@@ -2462,6 +2514,8 @@ C<$SHARE_MEDIUM> value can be either C<memory> for shared memory or C<file> for 
 This takes a code reference as its unique argument and is added to the chain of handlers.
 
 It will be called upon an exception being met or if L</reject> is called.
+
+The callback subroutine will be passed the error object as its unique argument.
 
 =head2 reject
 
@@ -2498,6 +2552,14 @@ The value returned is always a reference, such as array, hash or scalar referenc
 If the asynchronous process returns a simple string for example, C<result> will be an array reference containing that string.
 
 Thus, unless the value returned is 1 element and it is a reference, it will be made of an array reference.
+
+=head2 then
+
+This takes a code reference as its unique argument and is added to the chain of handlers.
+
+It will be called upon resolution of the promise or when L</resolve> is called.
+
+The callback subroutine is passed as arguments whatever the previous callback returned.
 
 =head2 timeout
 

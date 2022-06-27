@@ -16,11 +16,11 @@ Sagan::Monitoring - LibreNMS JSON SNMP extend and Nagios style check for Sagan s
 
 =head1 VERSION
 
-Version 0.0.1
+Version 1.0.1
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '1.0.1';
 
 =head1 SYNOPSIS
 
@@ -52,7 +52,7 @@ The args are taken as a hash ref. The keys are documented as below.
 The only must have is 'files'.
 
 This assumes that stats-json.subtract_old_values is set to 'true'
-for Suricata.
+for Sagan.
 
     - drop_percent_warn :: Drop percent warning threshold.
       - Default :: .75;
@@ -245,33 +245,33 @@ sub run {
 
 					my $new_stats = {
 						uptime              => $json->{stats}{uptime},
-						total_delta         => $json->{stats}{captured}{total},
-						drop_delta          => $json->{stats}{captured}{drop},
-						ignore_delta        => $json->{stats}{captured}{ignore},
-						threshold_delta     => $json->{stats}{captured}{threshold},
-						after_delta         => $json->{stats}{captured}{after},
-						match_delta         => $json->{stats}{captured}{match},
-						bytes_delta         => $json->{stats}{captured}{bytes_total},
-						bytes_ignored_delta => $json->{stats}{captured}{bytes_ignored},
+						total         => $json->{stats}{captured}{total},
+						drop          => $json->{stats}{captured}{drop},
+						ignore        => $json->{stats}{captured}{ignore},
+						threshold     => $json->{stats}{captured}{threshold},
+						after         => $json->{stats}{captured}{after},
+						match         => $json->{stats}{captured}{match},
+						bytes         => $json->{stats}{captured}{bytes_total},
+						bytes_ignored => $json->{stats}{captured}{bytes_ignored},
 						max_bytes_log_line  => $json->{stats}{captured}{max_bytes_log_line},
 						eps                 => $json->{stats}{captured}{eps},
-						f_total_delta       => $json->{stats}{flow}{total},
-						f_dropped_delta     => $json->{stats}{flow}{dropped},
+						f_total       => $json->{stats}{flow}{total},
+						f_dropped     => $json->{stats}{flow}{dropped},
 						alert               => 0,
 						alertString         => '',
 					};
 
 					# find the drop percentages
-					if ( $new_stats->{total_delta} != 0 ) {
-						$new_stats->{drop_percent} = ( $new_stats->{drop_delta} / $new_stats->{total_delta} ) * 100;
+					if ( $new_stats->{total} != 0 ) {
+						$new_stats->{drop_percent} = ( $new_stats->{drop} / $new_stats->{total} ) * 100;
 						$new_stats->{drop_percent} = sprintf( '%0.5f', $new_stats->{drop_percent} );
 					}
 					else {
 						$new_stats->{total_percent} = 0;
 					}
-					if ( $new_stats->{f_total_delta} != 0 ) {
+					if ( $new_stats->{f_total} != 0 ) {
 						$new_stats->{f_drop_percent}
-							= ( $new_stats->{f_dropped_delta} / $new_stats->{f_total_delta} ) * 100;
+							= ( $new_stats->{f_dropped} / $new_stats->{f_total} ) * 100;
 						$new_stats->{f_drop_percent} = sprintf( '%0.5f', $new_stats->{f_drop_percent} );
 					}
 					else {
@@ -344,17 +344,17 @@ sub run {
 	}
 
 	# find the drop percentages
-	if ( $to_return->{data}{'.total'}{total_delta} != 0 ) {
+	if ( $to_return->{data}{'.total'}{total} != 0 ) {
 		$to_return->{data}{'.total'}{drop_percent}
-			= ( $to_return->{data}{'.total'}{drop_delta} / $to_return->{data}{'.total'}{total_delta} ) * 100;
+			= ( $to_return->{data}{'.total'}{drop} / $to_return->{data}{'.total'}{total} ) * 100;
 		$to_return->{data}{'.total'}{drop_percent} = sprintf( '%0.5f', $to_return->{data}{'.total'}{drop_percent} );
 	}
 	else {
 		$to_return->{data}{'.total'}{drop_percent} = 0;
 	}
-	if ( $to_return->{data}{'.total'}{f_dropped_delta} != 0 ) {
+	if ( $to_return->{data}{'.total'}{f_dropped} != 0 ) {
 		$to_return->{data}{'.total'}{f_drop_percent}
-			= ( $to_return->{data}{'.total'}{f_dropped_delta} / $to_return->{data}{'.total'}{f_total_delta} ) * 100;
+			= ( $to_return->{data}{'.total'}{f_dropped} / $to_return->{data}{'.total'}{f_total} ) * 100;
 		$to_return->{data}{'.total'}{f_drop_percent} = sprintf( '%0.5f', $to_return->{data}{'.total'}{f_drop_percent} );
 	}
 	else {
@@ -481,7 +481,7 @@ sub print_output {
     + $hash{'errorString'} :: A string description of the error.
     
     + $hash{'data'}{$instance} :: Values migrated from the
-      instance. *_delta values are created via computing the difference
+      instance. Non *_percent values are created via computing the difference
       from the previously saved info. *_percent is based off of the delta
       in question over the packet delta. Delta are created for packet,
       drop, ifdrop, and error. Percents are made for drop, ifdrop, and
@@ -494,18 +494,18 @@ sub print_output {
     The stat keys are migrated as below.
     
     uptime              => $json->{stats}{uptime},
-    total_delta         => $json->{stats}{captured}{total},
-    drop_delta          => $json->{stats}{captured}{drop},
-    ignore_delta        => $json->{stats}{captured}{ignore},
-    threshold_delta     => $json->{stats}{captured}{theshold},
-    after_delta         => $json->{stats}{captured}{after},
-    match_delta         => $json->{stats}{captured}{match},
-    bytes_delta         => $json->{stats}{captured}{bytes_total},
-    bytes_ignored_delta => $json->{stats}{captured}{bytes_ignored},
+    total               => $json->{stats}{captured}{total},
+    drop                => $json->{stats}{captured}{drop},
+    ignore              => $json->{stats}{captured}{ignore},
+    threshold           => $json->{stats}{captured}{theshold},
+    after               => $json->{stats}{captured}{after},
+    match               => $json->{stats}{captured}{match},
+    bytes               => $json->{stats}{captured}{bytes_total},
+    bytes_ignored       => $json->{stats}{captured}{bytes_ignored},
     max_bytes_log_line  => $json->{stats}{captured}{max_bytes_log_line},
     eps                 => $json->{stats}{captured}{eps},
-    f_total_delta       => $json->{stats}{flow}{total},
-    f_dropped_delta     => $json->{stats}{flow}{dropped},
+    f_total             => $json->{stats}{flow}{total},
+    f_dropped           => $json->{stats}{flow}{dropped},
 
 =head1 AUTHOR
 

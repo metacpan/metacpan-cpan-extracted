@@ -16,7 +16,7 @@ my $build = Module::Build->new
     module_name    => 'MarpaX::G4',
     dist_author    => 'Axel Zuber',
     dist_abstract  => 'Release 1.0 of MarpaX::G4',
-    dist_version   => '1.0.1',
+    dist_version   => '1.0.2',
     configure_requires => {
                     'Module::Build' => '0.4.2',
     },

@@ -7,7 +7,7 @@ use Carp ();
 use Ref::Util qw( is_ref is_plain_arrayref is_plain_hashref );
 
 # ABSTRACT: C data types for FFI
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 
 our %ffi;
@@ -150,7 +150,7 @@ FFI::C - C data types for FFI
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -245,8 +245,14 @@ This distribution provides tools for building classes to interface for common C
 data types.  Arrays, C<struct>, C<union> and nested types based on those are
 supported.
 
+Core L<FFI::Platypus> also provides L<FFI::Platypus::Record> for manipulating and
+passing structured data.  Typically you want to use L<FFI::C> instead, the main
+exception is when you need to pass structured data by value instead of by
+reference.
+
 To work with C APIs that work with C file pointers you can use
-L<FFI::C::File> and L<FFI::C::PosixFile>.
+L<FFI::C::File> and L<FFI::C::PosixFile>.  For C APIs that expose the POSIX
+C<stat> structure use L<FFI::C::Stat>.
 
 =head1 METHODS
 
@@ -423,7 +429,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020,2021 by Graham Ollis.
+This software is copyright (c) 2020-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

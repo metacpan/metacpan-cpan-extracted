@@ -10,7 +10,6 @@ my %WriteMakefileArgs = (
     AUTHOR              => 'Jacques Deguest (jack@deguest.jp)',
     VERSION_FROM        => 'lib/Nice/Try.pm',
     ABSTRACT_FROM       => 'lib/Nice/Try.pm',
-    ABSTRACT            => 'A real Try Catch Block Implementation Using Perl Filter',
     PL_FILES            => {},
     INSTALLDIRS         => ($] < 5.011 ? 'perl' : 'site'),
     PREREQ_PM 			=> {
@@ -19,7 +18,8 @@ my %WriteMakefileArgs = (
     	'Exporter'		=> '5.73',
     	'Filter::Util::Call' => '1.59',
     	'List::Util'    => '1.33',
-    	'PPI'           => '1.270',
+    	'PPI'           => '1.272',
+        'PPI::XS'       => '0.910',
     	'Scalar::Util'	=> '1.50',
     	'Want'          => '0.29',
     },
@@ -39,13 +39,13 @@ my %WriteMakefileArgs = (
         resources => {
         #    homepage    => undef,
             repository  => {
-                url         => 'git@git.deguest.jp:jack/Nice-Try.git',
-                web         => 'https://git.deguest.jp/jack/Nice-Try',
+                url         => 'git@gitlab.com:jackdeguest/Nice-Try.git',
+                web         => 'https://gitlab.com/jackdeguest/Nice-Try',
                 type        => 'git',
             },
             bugtracker => {
                 ## web         => 'https://rt.cpan.org/NoAuth/Bugs.html?Dist=Nice-Try',
-                web         => 'https://git.deguest.jp/jack/Nice-Try/issues',
+                web         => 'https://gitlab.com/jackdeguest/Nice-Try/issues',
             },
         },
     }) : ()),

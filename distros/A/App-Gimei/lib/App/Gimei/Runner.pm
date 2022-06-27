@@ -5,6 +5,8 @@ use v5.22;
 binmode STDOUT, ":utf8";
 
 use Getopt::Long;
+use Pod::Usage;
+use Pod::Find qw( pod_where );
 
 use App::Gimei;
 use Data::Gimei;
@@ -12,7 +14,13 @@ use Data::Gimei;
 use Class::Tiny;
 
 #
-# methods ...
+# global vars
+#
+
+my %conf = ( POD_FILE => pod_where({-inc => 1}, 'App::Gimei') );
+
+#
+# methods
 #
 
 sub parse_option {
@@ -24,8 +32,8 @@ sub parse_option {
     my $p = Getopt::Long::Parser->new( config => ["no_ignore_case"], );
 
     local $SIG{__WARN__} = sub { die "Error: $_[0]" };
-    my $err = $p->getoptionsfromarray( $args_ref, $opts_ref, "help|h", "version|v", "n=i",
-        "sep=s", );
+    my $ok = $p->getoptionsfromarray( $args_ref, $opts_ref, "help|h", "version|v", "n=i",
+                                       "sep=s", );
 
     if ( $opts_ref->{n} < 1 ) {
         die
@@ -45,7 +53,7 @@ sub execute {
     }
 
     if ( $opts{help} ) {
-        system "perldoc", "App::Gimei";
+        pod2usage( -input => $conf{POD_FILE}, -exitval => 'noexit' );
         return 0;
     }
 

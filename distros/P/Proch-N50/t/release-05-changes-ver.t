@@ -35,7 +35,7 @@ if (-e "$changes_file") {
 			"Line #$c has not weird chars: " . length($line) . ' == ' . length($clean_line)
 		);
 	}
-	ok($version_found == 1, "Last version ${last_ver} was found only once: $version_found in $changes_file:\n$text");
+	ok($version_found == 1, "Last version \"${last_ver}\\t\" (tab required) was found only once: $version_found in $changes_file");
 	done_testing();
 
 } else {

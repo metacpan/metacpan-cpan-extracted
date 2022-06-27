@@ -14,13 +14,15 @@ my $build = Module::Build->new(
     },
 
     requires => {
+        'namespace::autoclean'  => '0',
         'perl'                  => '5.10.1',
-        version                 => '0.77',
-        Mouse                   => '1.08',
-        'Method::Signatures'    => '20140224',
-        'Path::Tiny'            => '0.052',
+        'version'               => '0.77',
         'App::Cmd'              => '0.323',
-        'MouseX::Foreign'       => '1.000',
+        'Import::Into'          => '0',
+        'Moo'                   => '2.000',
+        'Path::Tiny'            => '0.052',
+        'Types::Path::Tiny'     => '0',
+        'Types::Standard'       => '1.012',
         'YAML::XS'              => '0.41',
     },
 
@@ -31,8 +33,8 @@ my $build = Module::Build->new(
         'Test::Compile' => '0.24',
         'Test::Output'  => '1.02',
         'Test::FailWarnings' => '0.008',
-        Fennec          => '2.016',
-        Child           => '0.010',     # fix for die in eval bug
+        'Fennec'        => '2.016',
+        'Child'         => '0.010',     # fix for die in eval bug
         'File::Copy::Recursive' => '0.38',
         'Capture::Tiny' => '0.22',
         'Devel::Hide'   => '0.0009',
@@ -44,8 +46,8 @@ my $build = Module::Build->new(
 
     meta_merge => {
         resources => {
-            bugtracker => 'https://github.com/evalEmpire/Mite/issues',
-            repository => 'https://github.com/evalEmpire/Mite',
+            bugtracker => 'https://github.com/tobyink/p5-mite/issues',
+            repository => 'https://github.com/tobyink/p5-mite',
         },
         no_index => {
             package => [qw(MY)],

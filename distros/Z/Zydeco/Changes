@@ -7,6 +7,11 @@ Home page:    <https://metacpan.org/release/Zydeco>
 Bug tracker:  <https://github.com/tobyink/p5-zydeco/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.615	2022-06-20
+
+ - Added: Steal `field` from MooseX::Extended.
+ - Added: Steal `param` from MooseX::Extended.
+
 0.614	2022-06-19
 
  - Added: Support coderef multimethods.

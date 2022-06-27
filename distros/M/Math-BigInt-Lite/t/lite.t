@@ -79,10 +79,10 @@ $z = $x->copy()->bnan();        is(ref($z), $mbi);      is($z, 'NaN');
 ###############################################################################
 # non-objects
 
-$x = Math::BigInt::Lite::badd('1', '2'); is($x, 3);
-$x = Math::BigInt::Lite::badd('1', 2);   is($x, 3);
-$x = Math::BigInt::Lite::badd(1, '2');   is($x, 3);
-$x = Math::BigInt::Lite::badd(1, 2);     is($x, 3);
+$x = Math::BigInt::Lite->badd('1', '2'); is($x, 3);
+$x = Math::BigInt::Lite->badd('1', 2);   is($x, 3);
+$x = Math::BigInt::Lite->badd(1, '2');   is($x, 3);
+$x = Math::BigInt::Lite->badd(1, 2);     is($x, 3);
 
 $x = Math::BigInt::Lite->new(123456);
 is($x->copy()->round(3), 123000);

@@ -24,11 +24,11 @@ You will need an API key to use this module, available free from IG Markets.
 
 =head1 VERSION
 
-Version 0.102
+Version 0.103
 
 =cut
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 
 =head1 SYNOPSIS
@@ -862,9 +862,14 @@ sub agg
    $position->{size}=-abs($position->{size}) if ($position->{direction} eq 'SELL'); 
 #   $position->{size}= -abs($position->{size}) if ($position->{direction}//'' ne 'BUY'); 
    $position->{profit}=($self->fetch($position,'bid')-$self->fetch($position,'level'))*$self->fetch($position,'size');
+     $position->{profitpc}=int(0.5+1000*$position->{profit}/($position->{level}*abs($position->{size})))/10;
 
    $position->{held}=Time::Piece->strptime($position->{createdDateUTC},"%Y-%m-%dT%H:%M:%S")  or die "strptime failed for ".$position->{createdDateOnly}; 
    $position->{held}=(gmtime()-$position->{held})/(24*3600); 
+   $position->{held}=int($position->{held}*10+0.5)/10; 
+
+   $position->{dailyp}=''; 
+   $position->{dailyp}=((1+$position->{profitpc}/100.0)**(1/$position->{held})-1)*100 if (exists $position->{held}  and $position->{held}>0); 
 
    my $ra=($totals{$position->{instrumentName}}||=[]);
    push(@$ra,$position);
@@ -911,7 +916,6 @@ sub agg
      ###########
 
      $position->{held}=sprintf("%0.1f",$position->{held}/$position->{size});  $position->{held}.=" av" if (@$total>1); 
-
 
      $position->{level}=$position->{bid}-$position->{profit}/$position->{size}; # open level for multiple positions
 
@@ -1058,6 +1062,7 @@ sub sorter
                     next if (!exists($a->{$key}) or !exists($b->{$key}));
                     my ($x1,$x2)=($a->{$key},$b->{$key});
                     map { s/[£%]//g } ($x1,$x2);
+                    map { s/ av//; s/\.0$//;    } ($x1,$x2) if ($key eq 'held'); # Handles held aggrevated like "1.0 av" , treated numerically 
 
                     { no warnings qw(numeric);
                       my $warning;
@@ -1065,12 +1070,15 @@ sub sorter
                       if ($x1  eq  $x1+0 and $x2 eq $x2+0)
                       {
                           $result=$x1<=>$x2;
+                          #print "::: '$x1' '$x2' $result\n"; 
                       }
                       else
                       {   # note that this correctly handles a formatted date
                           $result=$x1 cmp $x2;
+                          #print "cmp '$x1' '$x2' $result\n"; 
                       }
                     }
+                    
                     return $result*$dir if ($result);
                   }
                   return 0;
@@ -1896,6 +1904,7 @@ changed.
 sub readfile
 {
   my ($self,$f)=@_;
+  my $debug=1; 
 
   my $positions={};
   $f="/home/mark/igrec/r2/$f";
@@ -1948,6 +1957,7 @@ sub readfile
       $position->{marketStatus}//='';  # older files do not record this. 
     }
  }
+ $debug and print "$ln lines read\n"; 
  return $positions;
 }
 #####################################################################
@@ -2197,7 +2207,8 @@ sub printpos
      $format=~s/%s/$s/;
   }
 
-  $col=&$colsub($position)//'' if ($self->col and defined $INC{'Term/Chrome.pm'});
+  $col=&$colsub($position) if ($self->col and defined $INC{'Term/Chrome.pm'});
+  $col//=''; 
   $format=~s/##/%/g;
   $format=~s/£-/-£/g;
   $format=~s/[\x82\x83\xc3]+//g;   # so we get some strange characters like ÃÂ occuring in pairs. Not sure why. This removes them.   

@@ -231,9 +231,11 @@ DESCRIPTION
     `multimethod(undef, alias => $name, %spec)` though with error messages
     which don't mention it being an alias.
 
-   `multimethods_from_roles`
-    This function is exported for compatibility with older versions of
-    Sub::MultiMethod, but in recent versions does nothing.
+   `multifunction $name => %spec`
+    Like `multimethod` but defaults to `method => 0`.
+
+   `monofunction $name => %spec`
+    Like `monomethod` but defaults to `method => 0`.
 
   Dispatch Technique
     When a multimethod is called, a list of packages to inspect for candidates

@@ -5,10 +5,14 @@ use warnings;
 package Sub::MultiMethod;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.905';
+our $VERSION   = '0.908';
 
 use B ();
-use Exporter::Shiny qw( multimethod multimethods_from_roles monomethod );
+use Exporter::Shiny qw(
+	multimethod   monomethod
+	multifunction monofunction
+	multimethods_from_roles
+);
 use Role::Hooks;
 use Scalar::Util qw( refaddr );
 use Type::Params ();
@@ -37,17 +41,19 @@ sub get_multimethods {
 
 sub _get_multimethod_candidates_ref {
 	my ($me, $target, $method_name) = @_;
-	my $method_key  = ref($method_name) ? refaddr($method_name) : $method_name;
-	my $package_key = is_Int($method_key) ? '__CODE__' : $target;
-	my $mm = $me->_get_multimethods_ref($package_key);
+	my ( $package_key, $method_key ) = ref( $method_name )
+		? ( '__CODE__', refaddr( $method_name ) )
+		: ( $target, $method_name );
+	my $mm = $me->_get_multimethods_ref( $package_key );
 	$mm->{$method_key} ||= [];
 }
 
 sub _clear_multimethod_candidates_ref {
-	my ($me, $target, $method_name) = @_;
-	my $method_key  = ref($method_name) ? refaddr($method_name) : $method_name;
-	my $package_key = is_Int($method_key) ? '__CODE__' : $target;
-	my $mm = $me->_get_multimethods_ref($package_key);
+	my ( $me, $target, $method_name ) = ( shift, @_ );
+	my ( $package_key, $method_key ) = ref( $method_name )
+		? ( '__CODE__', refaddr( $method_name ) )
+		: ( $target, $method_name );
+	my $mm = $me->_get_multimethods_ref( $package_key );
 	delete $mm->{$method_key};
 	return $me;
 }
@@ -65,8 +71,7 @@ sub has_multimethod_candidates {
 sub _add_multimethod_candidate {
 	my ($me, $target, $method_name, $spec) = @_;
 	my $mmc = $me->_get_multimethod_candidates_ref($target, $method_name);
-	push @$mmc, $spec;
-	if ($spec->{method} != $mmc->[0]{method}) {
+	if ( @$mmc and $spec->{method} != $mmc->[0]{method} ) {
 		require Carp;
 		Carp::carp(sprintf(
 			"Added multimethod candidate for %s with method=>%d but expected method=>%d",
@@ -75,6 +80,7 @@ sub _add_multimethod_candidate {
 			$mmc->[0]{method},
 		));
 	}
+	push @$mmc, $spec;
 	$me;
 }
 
@@ -156,37 +162,66 @@ sub get_all_multimethod_candidates {
 	}
 }
 
-sub _generate_multimethod {
+sub _generate_multimethods_from_roles {
 	my ($me, $name, $args, $globals) = (shift, @_);
-	
-	my $target = $globals->{into};
-	!defined $target and die;
-	ref $target and die;
-	
 	return sub {
-		my ($sub_name, %spec) = @_;
-		my $is_role = !! 'Role::Hooks'->is_role($target);
-		
-		$me->install_candidate($target, $sub_name, no_dispatcher => $is_role, %spec);
+		require Carp;
+		Carp::carp( "Calling multimethods_from_roles is no longer needed and the function will be removed in a future release. Called" );
 	};
 }
 
-sub _generate_multimethods_from_roles {
-	my ($me, $name, $args, $globals) = (shift, @_);
-	return sub { return; };  # this is a no-op now
+sub _generate_exported_function {
+	my ( $me, $name, $args, $globals ) = ( shift, @_ );
+	
+	my $target = $globals->{into};
+	if ( ref $target or not defined $target ) {
+		require Carp;
+		Carp::croak( "Function $name can only be installed into a package by package name" );
+	}
+	
+	my %defaults = %{ $args->{defaults} || {} };
+	my $api_call = $args->{api_call} || 'install_candidate';
+	
+	return sub {
+		my ( $sub_name, %spec ) = @_;
+		if ( $defaults{no_dispatcher} eq 'auto' ) {
+			$defaults{no_dispatcher} = 0+!! 'Role::Hooks'->is_role( $target );
+		}
+		$me->$api_call(
+			$target,
+			$sub_name,
+			%defaults,
+			%spec,
+		);
+	};
+}
+
+sub _generate_multimethod {
+	my ( $me, $name, $args, $globals ) = ( shift, @_ );
+	$args->{defaults}{no_dispatcher} = 'auto';
+	return $me->_generate_exported_function( $name, $args, $globals );
 }
 
 sub _generate_monomethod {
-	my ($me, $name, $args, $globals) = (shift, @_);
-	
-	my $target = $globals->{into};
-	!defined $target and die;
-	ref $target and die;
-	
-	return sub {
-		my ($sub_name, %spec) = @_;
-		$me->install_monomethod($target, $sub_name, no_dispatcher => 1, %spec);
-	};
+	my ( $me, $name, $args, $globals ) = ( shift, @_ );
+	$args->{defaults}{no_dispatcher} = 1;
+	$args->{api_call} = 'install_monomethod';
+	return $me->_generate_exported_function( $name, $args, $globals );
+}
+
+sub _generate_multifunction {
+	my ( $me, $name, $args, $globals ) = ( shift, @_ );
+	$args->{defaults}{no_dispatcher} = 'auto';
+	$args->{defaults}{method} = 0;
+	return $me->_generate_exported_function( $name, $args, $globals );
+}
+
+sub _generate_monofunction {
+	my ( $me, $name, $args, $globals ) = ( shift, @_ );
+	$args->{defaults}{no_dispatcher} = 1;
+	$args->{defaults}{method} = 0;
+	$args->{api_call} = 'install_monomethod';
+	return $me->_generate_exported_function( $name, $args, $globals );
 }
 
 my %keep_while_copying = qw(
@@ -340,7 +375,7 @@ sub install_candidate {
 				$CLEANUP{"$coderef"} = [ $target, refaddr($sub_name) ];
 				return( $$sub_name = $coderef );
 			}
-			elsif (is_CodeRef $$sub_name || is_Object $$sub_name) {
+			elsif (is_CodeRef $$sub_name or is_Object $$sub_name) {
 				if ( $me->known_dispatcher($$sub_name) ) {
 					return $$sub_name;
 				}
@@ -361,7 +396,7 @@ sub install_candidate {
 		}
 		require Carp;
 		Carp::croak(sprintf(
-			'Expected string or reference to coderef as sub name, but got: %s',
+			'Expected string or reference to coderef as sub name, but got: %s %s',
 			$sub_name,
 		));
 	}
@@ -868,10 +903,13 @@ C<< monomethod($name, %spec) >> is basically just a shortcut for
 C<< multimethod(undef, alias => $name, %spec) >> though with error
 messages which don't mention it being an alias.
 
-=head3 C<< multimethods_from_roles >>
+=head3 C<< multifunction $name => %spec >>
 
-This function is exported for compatibility with older versions of
-Sub::MultiMethod, but in recent versions does nothing.
+Like C<multimethod> but defaults to C<< method => 0 >>.
+
+=head3 C<< monofunction $name => %spec >>
+
+Like C<monomethod> but defaults to C<< method => 0 >>.
 
 =head2 Dispatch Technique
 

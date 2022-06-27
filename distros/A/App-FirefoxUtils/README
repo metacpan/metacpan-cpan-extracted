@@ -2,8 +2,8 @@ NAME
     App::FirefoxUtils - Utilities related to Firefox
 
 VERSION
-    This document describes version 0.016 of App::FirefoxUtils (from Perl
-    distribution App-FirefoxUtils), released on 2021-09-27.
+    This document describes version 0.017 of App::FirefoxUtils (from Perl
+    distribution App-FirefoxUtils), released on 2022-05-20.
 
 SYNOPSIS
 DESCRIPTION
@@ -346,11 +346,13 @@ FUNCTIONS
 
      terminate_firefox(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-    Terminate (kill -KILL) Firefox.
+    Terminate Firefox (by default with -KILL signal).
 
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
+
+    *   signal => *unix::signal*
 
     *   users => *array[unix::local_uid]*
 
@@ -439,7 +441,7 @@ CONTRIBUTING
     me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2019 by perlancar
+    This software is copyright (c) 2022, 2021, 2020, 2019 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

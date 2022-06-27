@@ -6,8 +6,6 @@ package Mite::Shim;
 use strict;
 use warnings;
 
-use version 0.77; our $VERSION = qv("v0.0.1");
-
 sub _is_compiling {
     return $ENV{MITE_COMPILE} ? 1 : 0;
 }
@@ -46,13 +44,27 @@ sub import {
 
         no strict 'refs';
         *{ $caller .'::has' } = sub {
-            my $name = shift;
+            my $names = shift;
+            $names = [$names] unless ref $names;
             my %args = @_;
+            for my $name ( @$names ) {
+               $name =~ s/^\+//;
 
-            my $default = $args{default};
-            return unless ref $default eq 'CODE';
+               my $default = $args{default};
+               if ( ref $default eq 'CODE' ) {
+                   ${$caller .'::__'.$name.'_DEFAULT__'} = $default;
+               }
 
-            ${$caller .'::__'.$name.'_DEFAULT__'} = $default;
+               my $builder = $args{builder};
+               if ( ref $builder eq 'CODE' ) {
+                   *{"$caller\::_build_$name"} = $builder;
+               }
+
+               my $trigger = $args{trigger};
+               if ( ref $trigger eq 'CODE' ) {
+                   *{"$caller\::_trigger_$name"} = $trigger;
+               }
+            }
 
             return;
         };

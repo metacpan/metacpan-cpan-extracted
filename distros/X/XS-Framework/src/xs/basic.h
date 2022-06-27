@@ -3,9 +3,9 @@
 #include <panda/function.h>
 
 #ifdef USE_ITHREADS
-    #define PERL_THREAD_LOCAL thread_local
+    #define PERL_ITHREADS_LOCAL thread_local
 #else
-    #define PERL_THREAD_LOCAL
+    #define PERL_ITHREADS_LOCAL
 #endif
 
 #define XS_BOOT(mod)                        \

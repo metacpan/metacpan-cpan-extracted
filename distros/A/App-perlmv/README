@@ -2,8 +2,8 @@ NAME
     App::perlmv - Rename files using Perl code
 
 VERSION
-    This document describes version 0.605 of App::perlmv (from Perl
-    distribution App-perlmv), released on 2022-02-25.
+    This document describes version 0.606 of App::perlmv (from Perl
+    distribution App-perlmv), released on 2022-06-24.
 
 HOMEPAGE
     Please visit the project's homepage at

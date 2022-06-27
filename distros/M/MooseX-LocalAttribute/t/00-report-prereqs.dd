@@ -1,0 +1,52 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'recommends' => {
+                                        'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
+                                      },
+                      'requires' => {
+                                      'Test::EOL' => '0',
+                                      'Test::MinimumVersion' => '0',
+                                      'Test::Mojibake' => '0',
+                                      'Test::More' => '0.88',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Version' => '1'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Exporter' => '0',
+                                      'Scope::Guard' => '0',
+                                      'perl' => '5.008'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900',
+                                     'Class::Accessor' => '0',
+                                     'Mo' => '0',
+                                     'Moo' => '0',
+                                     'Moose' => '0',
+                                     'Mouse' => '0',
+                                     'Util::H2O' => '0'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'FindBin' => '0',
+                                   'Test::Exception' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Requires' => '0'
+                                 },
+                   'suggests' => {
+                                   'Mojolicious' => '0',
+                                   'Object::Pad' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

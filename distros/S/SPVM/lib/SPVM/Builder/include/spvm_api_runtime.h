@@ -20,6 +20,7 @@ SPVM_RUNTIME_FIELD* SPVM_API_RUNTIME_get_field_by_class_id_and_field_name(SPVM_R
 SPVM_RUNTIME_METHOD* SPVM_API_RUNTIME_get_method(SPVM_RUNTIME* runtime, int32_t method_id);
 SPVM_RUNTIME_METHOD* SPVM_API_RUNTIME_get_method_by_class_id_and_method_name(SPVM_RUNTIME* runtime, int32_t class_id, const char* search_method_name);
 int32_t SPVM_API_RUNTIME_has_interface_by_id(SPVM_RUNTIME* runtime, int32_t class_basic_type_id, int32_t interface_basic_type_id);
+int32_t SPVM_API_RUNTIME_is_super_class_by_id(SPVM_RUNTIME* runtime, int32_t super_class_basic_type_id, int32_t child_class_basic_type_id);
 
 // Runtime
 SPVM_RUNTIME* SPVM_API_RUNTIME_new_runtime();
@@ -65,6 +66,8 @@ int32_t SPVM_API_RUNTIME_get_class_methods_base_id(SPVM_RUNTIME* runtime, int32_
 int32_t SPVM_API_RUNTIME_get_class_methods_length(SPVM_RUNTIME* runtime, int32_t class_id);
 int32_t SPVM_API_RUNTIME_get_class_class_vars_base_id(SPVM_RUNTIME* runtime, int32_t class_id);
 int32_t SPVM_API_RUNTIME_get_class_class_vars_length(SPVM_RUNTIME* runtime, int32_t class_id);
+int32_t SPVM_API_RUNTIME_get_class_parent_class_id(SPVM_RUNTIME* runtime, int32_t class_id);
+
 // Class variable
 int32_t SPVM_API_RUNTIME_get_class_var_id_by_index(SPVM_RUNTIME* runtime, int32_t class_id, int32_t class_var_index);
 int32_t SPVM_API_RUNTIME_get_class_var_id_by_name(SPVM_RUNTIME* runtime, const char* class_name, const char* class_var_name);

@@ -1,3 +1,14 @@
+0.25 2022-06-27
+
+ * Add new methods as_int(), bdstr(), bestr(), bfstr(), bnstr(), dparts(),
+   eparts(), fparts(), nparts(), and sparts().
+
+ * Improve handling of "foreign" objects in bgcd() and blcm().
+
+ * Reorganize test files, add more test files, improve test output, harmonize
+   code with Math::BigInt, and miscellaneous other imporovements and
+   corrections.
+
 0.24 2021-09-28
 
  * Add method bpi().

@@ -52,7 +52,7 @@ static void XS_function_call (pTHX_ CV* cv) { xs::throw_guard(cv, [=](){
     XSRETURN(1);
 }); }
 
-static PERL_THREAD_LOCAL CV* proto = (CV*)Sub::create(&XS_function_call).detach();
+static PERL_ITHREADS_LOCAL CV* proto = (CV*)Sub::create(&XS_function_call).detach();
 
 Sub create_sub (IFunctionCaller* fc) {
     auto ret = Sub::clone_anon_xsub(proto);

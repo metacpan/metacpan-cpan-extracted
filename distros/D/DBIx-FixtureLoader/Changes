@@ -1,5 +1,8 @@
 Revision history for Perl extension DBIx-FixtureLoader
 
+0.21 2022-06-25T13:11:35Z
+    - Avoid warning "Possible precedence issue with control flow operator"
+
 0.20 2020-09-18T15:24:58Z
     - Even if the fixture is empty, it issues delete properly when the delete option is specified (chibapse++)
 

@@ -17,7 +17,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.141520'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,7 +31,7 @@ provides:
     file: lib/Mite/MakeMaker.pm
   Mite:
     file: lib/Mite.pm
-    version: v0.0.1
+    version: v0.0.8
   Mite::App:
     file: lib/Mite/App.pm
   Mite::App::Command:
@@ -54,6 +54,8 @@ provides:
     file: lib/Mite/MakeMaker.pm
   Mite::ModuleBuild:
     file: lib/Mite/ModuleBuild.pm
+  Mite::MyMoo:
+    file: lib/Mite/MyMoo.pm
   Mite::Project:
     file: lib/Mite/Project.pm
   Mite::Role::HasConfig:
@@ -64,22 +66,22 @@ provides:
     file: lib/Mite/Role/HasYAML.pm
   Mite::Shim:
     file: lib/Mite/Shim.pm
-    version: v0.0.1
   Mite::Source:
     file: lib/Mite/Source.pm
-  Mite::Types:
-    file: lib/Mite/Types.pm
 requires:
   App::Cmd: '0.323'
-  Method::Signatures: '20140224'
-  Mouse: '1.08'
-  MouseX::Foreign: '1.000'
+  Import::Into: '0'
+  Moo: '2.000'
   Path::Tiny: '0.052'
+  Types::Path::Tiny: '0'
+  Types::Standard: '1.012'
   YAML::XS: '0.41'
+  namespace::autoclean: '0'
   perl: v5.10.1
   version: '0.77'
 resources:
-  bugtracker: https://github.com/evalEmpire/Mite/issues
+  bugtracker: https://github.com/tobyink/p5-mite/issues
   license: http://dev.perl.org/licenses/
-  repository: https://github.com/evalEmpire/Mite
-version: v0.0.1
+  repository: https://github.com/tobyink/p5-mite
+version: v0.0.8
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

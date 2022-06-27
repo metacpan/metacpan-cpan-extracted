@@ -28,7 +28,7 @@ sub union_tables {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $tables = [ @{$sf->{d}{user_tables}}, @{$sf->{d}{sys_tables}} ];
-    ( $sf->{d}{col_names}, $sf->{d}{col_types} ) = $ax->column_names_and_types( $tables );
+    ( $sf->{d}{col_names}, $sf->{d}{col_types} ) = $ax->tables_column_names_and_types( $tables );
     my $union = {
         used_tables    => [],
         subselect_data => [],
@@ -96,9 +96,7 @@ sub union_tables {
             my $default_alias = 'U_TBL_' . $unique_char++;
             my $alias = $ax->alias( $union, 'union', $union_table, $default_alias );
             $qt_union_table = $union_table . " AS " . $ax->quote_col_qualified( [ $alias ] );
-            my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $qt_union_table . " LIMIT 0" );
-            $sth->execute() if $sf->{i}{driver} ne 'SQLite';
-            $sf->{d}{col_names}{$union_table} = $sth->{NAME};
+            $sf->{d}{col_names}{$union_table} = $ax->column_names( $qt_union_table );
         }
         else {
             $union_table =~ s/^-\s//;

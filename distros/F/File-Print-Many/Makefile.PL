@@ -14,6 +14,7 @@ WriteMakefile(
 	  : ()),
 	PL_FILES	=> {},
 	TEST_REQUIRES => {
+		'File::Path' => 2.15,
 		'File::Spec' => 0,
 		'Test::Carp' => 0,
 		'Test::Exception' => 0.42,
@@ -25,11 +26,10 @@ WriteMakefile(
 		# 'Test::Kwalitee' => 0,
 		'autodie' => 0,
 		'Test::Warn' => 0,
-		'warnings::unused' => 0,
 	},
 	PREREQ_PM => {
 		'Carp' => 0,
-		'Tie::Handle' => 0,
+		# 'Tie::Handle' => 0,
 		'namespace::autoclean' => 0,
 	},
 	dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
@@ -41,11 +41,10 @@ WriteMakefile(
 		'meta-spec' => { version => 2 },
 		resources => {
 			repository => {
-			type => 'git',
-			url => 'git://github.com/nigelhorne/File-Print-Many.git',
-			web => 'https://github.com/nigelhorne/File-Print-Many',
-			},
-			bugtracker => {
+				type => 'git',
+				url => 'git://github.com/nigelhorne/File-Print-Many.git',
+				web => 'https://github.com/nigelhorne/File-Print-Many',
+			}, bugtracker => {
 				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=File-Print-Many',
 				mailto => 'bug-File-Print-Many@rt.cpan.org'
 			}

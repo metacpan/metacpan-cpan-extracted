@@ -34,25 +34,30 @@
          "requires" : {
             "Archive::Tar" : "1",
             "Archive::Zip" : "0",
-            "CPAN::Checksums" : "0",
+            "CPAN::Checksums" : "2.14",
             "Getopt::Long" : "0",
             "HTTP::Date" : "0",
             "IO::Zlib" : "0",
             "LWP" : "0",
             "Log::Report" : "0.25",
             "Test::More" : "0.82",
+            "Test::TempDir::Tiny" : "0.018",
             "version" : "0.76"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "homepage" : "http://perl.overmeer.net/CPAN/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/markov2/perl5-CPAN-Site.git",
          "web" : "https://github.com/markov2/perl5-CPAN-Site"
       }
    },
-   "version" : "1.15",
+   "version" : "1.16",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

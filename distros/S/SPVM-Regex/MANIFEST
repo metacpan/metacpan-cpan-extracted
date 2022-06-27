@@ -6,6 +6,12 @@ lib/SPVM/Regex.native/include/.gitkeep
 lib/SPVM/Regex.native/src/.gitkeep
 lib/SPVM/Regex.pm
 lib/SPVM/Regex.spvm
+lib/SPVM/Regex/Opcode.pm
+lib/SPVM/Regex/Opcode.spvm
+lib/SPVM/Regex/Pattern.pm
+lib/SPVM/Regex/Pattern.spvm
+lib/SPVM/Regex/Replacer.pm
+lib/SPVM/Regex/Replacer.spvm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP

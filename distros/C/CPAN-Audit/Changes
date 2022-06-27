@@ -1,5 +1,28 @@
 Revision history for Perl extension CPAN-Audit
 
+20220625.001 2022-06-25T19:44:05Z
+	* Updates to File::Slurp and JavaScript::Duktape(::XS)?
+	* New reports for Crypt
+
+20220624.001 2022-06-25T00:35:07Z
+	* reports for JavaScript-Duktape-XS, File-Slurp, RPC-XML, CBOX-XS,
+	IPC-Run, XML-Simple, Sys-Syslog, WWW-Mechanize, LWP, Imager, GD,
+	CryptX, Mojolicious, all from Robert Rothenberg.
+
+20220622.002 2022-06-22T23:33:43Z
+	* I put the docs in the wrong file!
+
+20220622.001 2022-06-22T20:59:18Z
+	* Advisories for Plack, DBD::SQLite from Robert Rothenberg
+	* Refactored and documented util/generated - can now output JSON,
+	although that probably isn't useful yet
+
+20220620.001 2022-06-21T03:14:25Z
+	* Add CVE-2020-8927 for IO-Compress-Brotli (Robert Rothenberg)
+	briandfoy/cpan-security-advisory#18
+	* Fix to perl versions so they don't appear as if they are in 
+	the future (#4)
+
 20220613.001 2022-06-13T18:10:47Z
 	* Fix DB for Perl versions by specify all versions as semantic versions
 	(noted by Robert Rothenberg)

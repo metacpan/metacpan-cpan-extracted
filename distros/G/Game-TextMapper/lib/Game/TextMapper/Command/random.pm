@@ -114,6 +114,7 @@ use Mojo::Base 'Mojolicious::Command';
 use Pod::Simple::Text;
 use Getopt::Long qw(GetOptionsFromArray);
 use Role::Tiny;
+binmode(STDOUT, ':utf8');
 
 has description => 'Print a random map to STDOUT';
 

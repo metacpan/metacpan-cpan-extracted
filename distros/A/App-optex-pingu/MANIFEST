@@ -4,8 +4,6 @@ LICENSE
 META.json
 README.md
 cpanfile
-images/pingu-black.png
-images/pingu-white.png
 lib/App/optex/pingu.pm
 minil.toml
 share/pingu.asc

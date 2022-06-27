@@ -7,7 +7,7 @@ use Error::Pure qw(err);
 use Mo qw(build default is);
 use Mo::utils qw(check_array_object check_number check_number_of_items);
 
-our $VERSION = 0.12;
+our $VERSION = 0.16;
 
 has descriptions => (
 	default => [],
@@ -117,7 +117,7 @@ Returns instance of object.
 
 =item * C<descriptions>
 
-Item descriptions. One per language.
+Mediainfo descriptions. One per language.
 Reference to array with Wikibase::Datatype::Value::Monolingual instances.
 Parameter is optional.
 
@@ -128,7 +128,7 @@ Parameter is optional.
 
 =item * C<labels>
 
-Item descriptions. One per language.
+Mediainfo descriptions. One per language.
 Reference to array with Wikibase::Datatype::Value::Monolingual instances.
 Parameter is optional.
 
@@ -473,6 +473,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.12
+0.16
 
 =cut

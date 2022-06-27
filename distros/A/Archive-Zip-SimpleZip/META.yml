@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,29 +20,26 @@ no_index:
     - t
     - private
 recommends:
-  IO::Compress::Bzip2: '2.096'
-  IO::Compress::Lzma: '2.096'
-  IO::Compress::Xz: '2.096'
-  IO::Compress::Zstd: '2.096'
-  IO::Uncompress::Bunzip2: '2.096'
-  IO::Uncompress::UnLzma: '2.096'
-  IO::Uncompress::UnXz: '2.096'
-  IO::Uncompress::UnZstd: '2.096'
+  IO::Compress::Bzip2: '2.201'
+  IO::Compress::Lzma: '2.201'
+  IO::Compress::Xz: '2.201'
+  IO::Compress::Zstd: '2.201'
+  IO::Uncompress::Bunzip2: '2.201'
+  IO::Uncompress::UnLzma: '2.201'
+  IO::Uncompress::UnXz: '2.201'
+  IO::Uncompress::UnZstd: '2.201'
 requires:
-  IO::Compress::Base: '2.096'
-  IO::Compress::Bzip2: '2.096'
-  IO::Compress::Lzma: '2.096'
-  IO::Compress::RawDeflate: '2.096'
-  IO::Compress::Xz: '2.096'
-  IO::Compress::Zip: '2.096'
-  IO::Compress::Zstd: '2.096'
-  IO::Uncompress::Base: '2.096'
-  IO::Uncompress::RawInflate: '2.096'
-  IO::Uncompress::Unzip: '2.096'
+  IO::Compress::Base: '2.201'
+  IO::Compress::Bzip2: '2.201'
+  IO::Compress::RawDeflate: '2.201'
+  IO::Compress::Zip: '2.201'
+  IO::Uncompress::Base: '2.201'
+  IO::Uncompress::RawInflate: '2.201'
+  IO::Uncompress::Unzip: '2.201'
   Perl::OSType: '0'
 resources:
   bugtracker: https://github.com/pmqs/Archive-Zip-SimpleZip/issues
   homepage: https://github.com/pmqs/Archive-Zip-SimpleZip
   repository: git://github.com/pmqs/Archive-Zip-SimpleZip.git
-version: '0.040'
+version: '1.000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -3,23 +3,29 @@
 use strict;
 use warnings;
 
-use Wikibase::Datatype::Value::Property;
+use Wikibase::Datatype::Value::Monolingual;
 
 # Object.
-my $obj = Wikibase::Datatype::Value::Property->new(
-        'value' => 'P123',
+my $obj = Wikibase::Datatype::Value::Monolingual->new(
+        'language' => 'en',
+        'value' => 'English text',
 );
 
-# Get value.
-my $value = $obj->value;
+# Get language.
+my $language = $obj->language;
 
 # Get type.
 my $type = $obj->type;
 
+# Get value.
+my $value = $obj->value;
+
 # Print out.
+print "Language: $language\n";
 print "Type: $type\n";
 print "Value: $value\n";
 
 # Output:
-# Type: property
-# Value: P123
+# Language: en
+# Type: monolingualtext
+# Value: English text

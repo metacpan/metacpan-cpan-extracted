@@ -3,10 +3,11 @@ use v5.24;    # Postfix defef.
 use strict;
 use warnings;
 use Test::More;
-use Term::ANSIColor qw( colorstrip );
+use Term::ANSIColor       qw( colorstrip );
+use File::Spec::Functions qw( catfile );
 
 #TODO: Remove this debug code !!!
-use feature qw(say);
+use feature    qw(say);
 use Mojo::Util qw(dumper);
 
 BEGIN {
@@ -24,6 +25,8 @@ diag( "Testing App::Pod $App::Pod::VERSION, Perl $], $^X" );
 
     *Pod::Query::get_term_width = sub { 56 };    # Match android.
 }
+
+my $sample_pod = catfile( qw( t ex_Mojo_UserAgent.pm ) );
 
 my @cases = (
 
@@ -44,7 +47,7 @@ my @cases = (
             "  --doc, -d             - View class documentation.",
             "  --edit, -e            - Edit the source code.",
             "  --query, -q           - Run a pod query.",
-            "  --dump, --dd          - Dump extra info.",
+            "  --dump, --dd          - Dump extra info (adds up).",
             "  --all, -a             - Show all class functions.",
             '  --no_error            - Suppress some error message.',
             "  --flush_cache, -f     - Flush cache file(s).",
@@ -84,7 +87,7 @@ my @cases = (
             "  --doc, -d             - View class documentation.",
             "  --edit, -e            - Edit the source code.",
             "  --query, -q           - Run a pod query.",
-            "  --dump, --dd          - Dump extra info.",
+            "  --dump, --dd          - Dump extra info (adds up).",
             "  --all, -a             - Show all class functions.",
             '  --no_error            - Suppress some error message.',
             "  --flush_cache, -f     - Flush cache file(s).",
@@ -475,6 +478,14 @@ my @cases = (
           ["Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent"],
     },
     {
+        name            => "query TOC",
+        input           => [qw( Mojo::UserAgent --query head1 )],
+        expected_output => [
+            "NAME",       "SYNOPSIS", "DESCRIPTION", "EVENTS",
+            "ATTRIBUTES", "METHODS",  "DEBUGGING",   "SEE ALSO"
+        ]
+    },
+    {
         name            => "query with class at end",
         input           => [qw( --query head1[0]/Para Mojo::UserAgent )],
         expected_output =>
@@ -490,8 +501,21 @@ my @cases = (
         name            => "query_dump",
         input           => [qw( Mojo::UserAgent --query head1[0]/Para --dump )],
         expected_output => [
-            "self=bless( {",
+            "_process_non_main()",
+            "Processing: query",
+            "DEBUG_FIND_DUMP: [",
+            "  {",
+            "    \"keep\" => 1,",
+            "    \"prev\" => [],",
+            "    \"tag\" => \"Para\",",
+"    \"text\" => \"Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent\"",
+            "  }",
+            "]",
+            "",
+            "Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent",
+            "self={",
             "  \"args\" => [],",
+            "  \"cache_path\" => \"PATH\",",
             "  \"class\" => \"Mojo::UserAgent\",",
             "  \"core_flags\" => [],",
             "  \"method\" => undef,",
@@ -507,8 +531,41 @@ my @cases = (
             "    \"dump\" => 1,",
             "    \"query\" => \"head1[0]/Para\"",
             "  }",
-            "}, 'App::Pod' )",
-            "",
+            "}"
+        ],
+    },
+
+    # --query good - using a file.
+    {
+        name            => "query file",
+        input           => [ $sample_pod, qw( --query head1[0]/Para ) ],
+        expected_output =>
+          ["Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent"],
+    },
+    {
+        name            => "query TOC file",
+        input           => [ $sample_pod, qw( --query head1 ) ],
+        expected_output => [
+            "NAME",       "SYNOPSIS", "DESCRIPTION", "EVENTS",
+            "ATTRIBUTES", "METHODS",  "DEBUGGING",   "SEE ALSO"
+        ]
+    },
+    {
+        name            => "query with file at end",
+        input           => [ qw( --query head1[0]/Para ), $sample_pod ],
+        expected_output =>
+          ["Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent"],
+    },
+    {
+        name  => "query with file at end and method",
+        input => [ qw( --query head1[0]/Para ), $sample_pod, qw( get ) ],
+        expected_output =>
+          ["Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent"],
+    },
+    {
+        name            => "query_dump file",
+        input           => [ $sample_pod, qw( --query head1[0]/Para --dump ) ],
+        expected_output => [
             "_process_non_main()",
             "Processing: query",
             "DEBUG_FIND_DUMP: [",
@@ -520,9 +577,30 @@ my @cases = (
             "  }",
             "]",
             "",
-            "Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent"
+            "Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent",
+            "self={",
+            "  \"args\" => [],",
+            "  \"cache_path\" => \"PATH\",",
+            "  \"class\" => \"$sample_pod\",",
+            "  \"core_flags\" => [],",
+            "  \"method\" => undef,",
+            "  \"non_main_flags\" => [",
+            "    {",
+            "      \"description\" => \"Run a pod query.\",",
+            "      \"handler\" => \"query_class\",",
+            "      \"name\" => \"query\",",
+            "      \"spec\" => \"query|q=s\"",
+            "    }",
+            "  ],",
+            "  \"opts\" => {",
+            "    \"dump\" => 1,",
+            "    \"query\" => \"head1[0]/Para\"",
+            "  }",
+            "}"
         ],
     },
+
+    # Specific modules.
     {
         name            => "Module - Mojo::File",
         input           => [qw( Mojo::File )],
@@ -642,8 +720,9 @@ my @cases = (
     },
 );
 
-my $is_path    = qr/ ^ Path: \s* \K (.*) $ /x;
-my $is_version = qr/ \b \d+\.\d+  $ /x;
+my $is_path       = qr/ ^ Path: \s* \K (.*) $ /x;
+my $is_version    = qr/ \b \d+\.\d+  $ /x;
+my $is_cache_path = qr/ "cache_path" \s+ => \K \s+ ".*" /x;
 
 for my $case ( @cases ) {
     my $input = join( "", $case->{input}->@* ) // "";
@@ -665,9 +744,10 @@ for my $case ( @cases ) {
 
     my @lines = split /\n/, colorstrip( $out // '' );
 
-    # Normalize Path.
+    # Normalize PATHs
     for ( @lines ) {
-        last if s/$is_path/<PATH>/;
+        s/$is_path/<PATH>/;
+        s/$is_cache_path/ "PATH"/g;
     }
 
     my $need = $case->{expected_output};
@@ -682,5 +762,5 @@ for my $case ( @cases ) {
       unless is_deeply \@lines, $need, "$name";
 }
 
-done_testing( 26 );
+done_testing( 32 );
 

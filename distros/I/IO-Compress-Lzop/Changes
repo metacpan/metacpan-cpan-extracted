@@ -1,6 +1,16 @@
 CHANGES
 -------
 
+  2.201 25 June 2022
+
+      * 2.201
+        Sat Jun 25 09:07:27 2022 +0100
+        a92fdbb1888c4aa05aa5b0dd14b3fbea6c59cbb5
+
+      * Add perl 5.26
+        Sun Jun 5 13:38:46 2022 +0100
+        63c1f84b223a27c557dd4741f3736252e5e2404e
+
   2.103 3 April 2022
 
       * No changes

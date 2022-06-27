@@ -3,38 +3,46 @@ abstract: "Signs requests using Amazon's Signature Version 4."
 author:
   - 'Charles A. Wimmer <charles@wimmer.net>'
 build_requires:
-  Dist::Zilla::App::Command::cover: 0
-  File::Slurp: 0
-  HTTP::Request: 0
-  JSON: 0
-  LWP::UserAgent: 0
-  List::Compare: 0
-  Pod::Coverage::TrustPod: 0
-  TAP::Formatter::JUnit: 0
-  TAP::Harness::JUnit: 0
-  Test::More: 0
-  Test::Perl::Critic: 0
-  Test::Pod: 0
-  Test::Pod::Coverage: 0
+  Config::Any: '0.32'
+  Config::General: '2.65'
+  Dist::Zilla::App::Command::cover: '1.101001'
+  File::Slurp: '0'
+  HTTP::Request: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  List::Compare: '0'
+  Pod::Coverage::TrustPod: '0.1000005'
+  TAP::Formatter::JUnit: '0.16'
+  TAP::Harness::JUnit: '0.42'
+  Test::More: '0'
+  Test::Perl::Critic: '1.04'
+  Test::Pod: '1.52'
+  Test::Pod::Coverage: '1.10'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Net-Amazon-SignatureVersion4
 requires:
-  Data::Dumper: 0
-  Digest::SHA: 0
-  HTTP::Date: 0
-  MooseX::App: 0
-  POSIX: 0
-  URI::Encode: 0
-  perl: 5.010
-  strict: 0
-  warnings: 0
+  Class::XSAccessor: '0'
+  Data::Dumper: '0'
+  Digest::SHA: '0'
+  HTTP::Date: '0'
+  MooseX::App: '0'
+  POSIX: '0'
+  URI::Encode: '0'
+  feature: '0'
+  open: '0'
+  perl: v5.32.0
+  utf8: '0'
+  warnings: '0'
 resources:
   repository: https://github.com/cwimmer/Net-Amazon-SignatureVersion4.git
-version: 0.006
+version: '0.007'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: BSD

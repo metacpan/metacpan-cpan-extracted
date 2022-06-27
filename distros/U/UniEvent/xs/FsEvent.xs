@@ -9,7 +9,7 @@ using namespace xs::unievent;
 using namespace panda::unievent;
 using panda::string_view;
 
-static PERL_THREAD_LOCAL struct {
+static PERL_ITHREADS_LOCAL struct {
     Simple on_fs_event = Simple::shared("on_fs_event");
 } cbn;
 

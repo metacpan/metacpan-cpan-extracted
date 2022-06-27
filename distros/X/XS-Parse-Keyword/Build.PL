@@ -32,6 +32,15 @@ EOF
 {
    print "Checking for PL_infix_plugin...\n";
 
+   # Teach $cc how to find and link to libperl
+   require Config;
+   require Text::ParseWords;
+
+   my @linker_flags = (
+      "-L" . File::Spec->catdir($Config::Config{archlibexp}, "CORE"),
+      "-lperl", Text::ParseWords::shellwords( $Config::Config{libs} ),
+   );
+
    my $have_pl_infix_plugin = 0;
 
    # No released version of perl (yet) has PL_infix_plugin. This commandline
@@ -39,6 +48,7 @@ EOF
    $have_pl_infix_plugin = 1 if grep { $_ eq "--have-pl_infix_plugin" } @ARGV;
 
    $have_pl_infix_plugin ||= $cc->try_compile_run(
+      extra_linker_flags => \@linker_flags,
       source => <<'EOF'
 #include "EXTERN.h"
 #include "perl.h"

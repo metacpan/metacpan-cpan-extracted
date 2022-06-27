@@ -6,10 +6,9 @@ use Test::Fatal;
 {
 	package Local;
 	use Types::Standard -types;
-	use Sub::MultiMethod 'multimethod';
+	use Sub::MultiMethod 'multifunction';
 	
-	multimethod sum => (
-		method    => 0,
+	multifunction sum => (
 		signature => [ Num, Num ],
 		code      => sub {
 			my ($x, $y) = @_;
@@ -17,8 +16,7 @@ use Test::Fatal;
 		},
 	);
 	
-	multimethod sum => (
-		method    => 0,
+	multifunction sum => (
 		signature => [ ArrayRef ],
 		code      => sub {
 			my ($arr) = @_;

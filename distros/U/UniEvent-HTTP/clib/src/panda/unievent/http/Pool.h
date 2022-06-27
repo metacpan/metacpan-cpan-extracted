@@ -1,5 +1,7 @@
 #pragma once
 #include "Client.h"
+#include "panda/error.h"
+#include "panda/unievent/http/Request.h"
 #include <set>
 #include <unordered_map>
 #include <deque>
@@ -52,7 +54,7 @@ protected:
     virtual ClientSP new_client () { return _factory ? _factory->new_client(this) : ClientSP(new Client(this)); }
 
 private:
-    friend Client;
+    friend Client; friend Request;
 
     struct NetLocList {
         std::set<ClientSP> free;
@@ -88,6 +90,8 @@ private:
     void check_inactivity ();
 
     void putback (const ClientSP&); // called from Client when it's done
+    
+    void cancel_request(const RequestSP&, const ErrorCode&);
 };
 
 }}}

@@ -1,4 +1,6 @@
-1.5.2  xx.xx.2021
+1.5.3  xx.xx.2022
+           - fixes for perl 5.36
+1.5.2  26.11.2021
            - upgrade tests for catch-v3
 1.5.1  06.09.2021
            - fix https://rt.cpan.org/Ticket/Display.html?id=139149 (defined @array %hash)

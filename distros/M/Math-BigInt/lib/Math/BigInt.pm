@@ -23,7 +23,7 @@ use warnings;
 use Carp          qw< carp croak >;
 use Scalar::Util  qw< blessed refaddr >;
 
-our $VERSION = '1.999833';
+our $VERSION = '1.999836';
 $VERSION =~ tr/_//d;
 
 require Exporter;
@@ -58,7 +58,6 @@ use overload
 
   '%'     =>      sub { $_[2] ? ref($_[0]) -> new($_[1]) -> bmod($_[0])
                               : $_[0] -> copy() -> bmod($_[1]); },
-
   '**'    =>      sub { $_[2] ? ref($_[0]) -> new($_[1]) -> bpow($_[0])
                               : $_[0] -> copy() -> bpow($_[1]); },
 
@@ -581,8 +580,8 @@ sub new {
 
     if (defined(blessed($wanted)) && $wanted -> isa($class)) {
 
-        # We don't copy the accuracy and precision, because a new object should
-        # get them from the global configuration.
+        # Don't copy the accuracy and precision, because a new object should get
+        # them from the global configuration.
 
         $self -> {sign}  = $wanted -> {sign};
         $self -> {value} = $LIB -> _copy($wanted -> {value});
@@ -593,40 +592,48 @@ sub new {
 
     # Shortcut for non-zero scalar integers with no non-zero exponent.
 
-    if ($wanted =~ / ^
-                     ([+-]?)            # optional sign
-                     ([1-9][0-9]*)      # non-zero significand
-                     (\.0*)?            # ... with optional zero fraction
-                     ([Ee][+-]?0+)?     # optional zero exponent
-                     \z
-                   /x)
+    if ($wanted =~
+        / ^
+          ( [+-]? )             # optional sign
+          ( [1-9] [0-9]* )      # non-zero significand
+          ( \.0* )?             # ... with optional zero fraction
+          ( [Ee] [+-]? 0+ )?    # optional zero exponent
+          \z
+        /x)
     {
         my $sgn = $1;
         my $abs = $2;
         $self->{sign} = $sgn || '+';
         $self->{value} = $LIB->_new($abs);
-        $self = $self->round(@r)
-          unless @r >= 2 && !defined($r[0]) && !defined($r[1]);
+        $self = $self->round(@r);
         return $self;
     }
 
     # Handle Infs.
 
-    if ($wanted =~ /^\s*([+-]?)inf(inity)?\s*\z/i) {
+    if ($wanted =~ / ^
+                     \s*
+                     ( [+-]? )
+                     inf (?: inity )?
+                     \s*
+                     \z
+                   /ix)
+    {
         my $sgn = $1 || '+';
-        $self = $class -> binf($sgn);
-        $self = $self->round(@r)
-          unless @r >= 2 && !defined($r[0]) && !defined($r[1]);
-        return $self;
+        return $class -> binf($sgn, @r);
     }
 
     # Handle explicit NaNs (not the ones returned due to invalid input).
 
-    if ($wanted =~ /^\s*([+-]?)nan\s*\z/i) {
-        $self = $class -> bnan(@r);
-        $self = $self->round(@r)
-          unless @r >= 2 && !defined($r[0]) && !defined($r[1]);
-        return $self;
+    if ($wanted =~ / ^
+                     \s*
+                     ( [+-]? )
+                     nan
+                     \s*
+                     \z
+                   /ix)
+    {
+        return $class -> bnan(@r);
     }
 
     my @parts;
@@ -636,7 +643,7 @@ sub new {
         # have a "0x", "0X", "x", or "X" prefix, cf. CORE::oct().
 
         $wanted =~ /^\s*[+-]?0?[Xx]/ and
-        @parts = $class -> _hex_str_to_lib_parts($wanted)
+        @parts = $class -> _hex_str_to_flt_lib_parts($wanted)
 
           or
 
@@ -644,7 +651,7 @@ sub new {
         # "0o", "0O", "o", "O" prefix, cf. CORE::oct().
 
         $wanted =~ /^\s*[+-]?0?[Oo]/ and
-        @parts = $class -> _oct_str_to_lib_parts($wanted)
+        @parts = $class -> _oct_str_to_flt_lib_parts($wanted)
 
           or
 
@@ -652,7 +659,7 @@ sub new {
         # "0b", "0B", "b", or "B" prefix, cf. CORE::oct().
 
         $wanted =~ /^\s*[+-]?0?[Bb]/ and
-        @parts = $class -> _bin_str_to_lib_parts($wanted)
+        @parts = $class -> _bin_str_to_flt_lib_parts($wanted)
 
           or
 
@@ -660,18 +667,18 @@ sub new {
         # above and octal floating point numbers that don't have any of the
         # "0o", "0O", "o", or "O" prefixes. First see if it is a decimal number.
 
-        @parts = $class -> _dec_str_to_lib_parts($wanted)
+        @parts = $class -> _dec_str_to_flt_lib_parts($wanted)
           or
 
         # See if it is an octal floating point number. The extra check is
-        # included because _oct_str_to_lib_parts() accepts octal numbers that
-        # don't have a prefix (this is needed to make it work with, e.g.,
+        # included because _oct_str_to_flt_lib_parts() accepts octal numbers
+        # that don't have a prefix (this is needed to make it work with, e.g.,
         # from_oct() that don't require a prefix). However, Perl requires a
         # prefix for octal floating point literals. For example, "1p+0" is not
         # valid, but "01p+0" and "0__1p+0" are.
 
         $wanted =~ /^\s*[+-]?0_*\d/ and
-        @parts = $class -> _oct_str_to_lib_parts($wanted))
+        @parts = $class -> _oct_str_to_flt_lib_parts($wanted))
     {
         # The value is an integer iff the exponent is non-negative.
 
@@ -714,7 +721,7 @@ sub from_dec {
 
     $self = $class -> bzero(@r) unless $selfref;
 
-    if (my @parts = $class -> _dec_str_to_lib_parts($str)) {
+    if (my @parts = $class -> _dec_str_to_flt_lib_parts($str)) {
 
         # The value is an integer iff the exponent is non-negative.
 
@@ -750,7 +757,7 @@ sub from_hex {
 
     $self = $class -> bzero(@r) unless $selfref;
 
-    if (my @parts = $class -> _hex_str_to_lib_parts($str)) {
+    if (my @parts = $class -> _hex_str_to_flt_lib_parts($str)) {
 
         # The value is an integer iff the exponent is non-negative.
 
@@ -786,7 +793,7 @@ sub from_oct {
 
     $self = $class -> bzero(@r) unless $selfref;
 
-    if (my @parts = $class -> _oct_str_to_lib_parts($str)) {
+    if (my @parts = $class -> _oct_str_to_flt_lib_parts($str)) {
 
         # The value is an integer iff the exponent is non-negative.
 
@@ -822,7 +829,7 @@ sub from_bin {
 
     $self = $class -> bzero(@r) unless $selfref;
 
-    if (my @parts = $class -> _bin_str_to_lib_parts($str)) {
+    if (my @parts = $class -> _bin_str_to_flt_lib_parts($str)) {
 
         # The value is an integer iff the exponent is non-negative.
 
@@ -1429,7 +1436,7 @@ sub bcmp {
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
     return $upgrade->bcmp($x, $y)
-      if defined($upgrade) && (!$x->is_int() || !$y->is_int());
+      if defined($upgrade) && (!$x->isa($class) || !$y->isa($class));
 
     if (($x->{sign} !~ /^[+-]$/) || ($y->{sign} !~ /^[+-]$/)) {
         # handle +-inf and NaN
@@ -1472,7 +1479,7 @@ sub bacmp {
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
     return $upgrade->bacmp($x, $y)
-      if defined($upgrade) && (!$x->is_int() || !$y->is_int());
+      if defined($upgrade) && (!$x->isa($class) || !$y->isa($class));
 
     if (($x->{sign} !~ /^[+-]$/) || ($y->{sign} !~ /^[+-]$/)) {
         # handle +-inf and NaN
@@ -1557,9 +1564,11 @@ sub bge {
 sub bneg {
     # (BINT or num_str) return BINT
     # negate number or make a negated number from string
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     return $x if $x->modify('bneg');
+
+    return $upgrade -> bneg($x, @r) if defined($upgrade) && !$x->isa($class);
 
     # Don't negate +0 so we always have the normalized form +0. Does nothing for
     # 'NaN'.
@@ -1572,9 +1581,11 @@ sub bneg {
 sub babs {
     # (BINT or num_str) return BINT
     # make number absolute, or return absolute BINT from string
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     return $x if $x->modify('babs');
+
+    return $upgrade -> babs($x, @r) if defined($upgrade) && !$x->isa($class);
 
     $x->{sign} =~ s/^-/+/;
 
@@ -1583,9 +1594,11 @@ sub babs {
 
 sub bsgn {
     # Signum function.
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     return $x if $x->modify('bsgn');
+
+    return $upgrade -> bsgn($x, @r) if defined($upgrade) && !$x->isa($class);
 
     return $x -> bone("+", @r) if $x -> is_pos();
     return $x -> bone("-", @r) if $x -> is_neg();
@@ -1615,7 +1628,7 @@ sub binc {
 
     return $x->round(@r) if $x -> is_inf() || $x -> is_nan();
 
-    return $upgrade -> binc($x, @r) if defined($upgrade) && !$x -> is_int();
+    return $upgrade -> binc($x, @r) if defined($upgrade) && !$x -> isa($class);
 
     if ($x->{sign} eq '+') {
         $x->{value} = $LIB->_inc($x->{value});
@@ -1635,7 +1648,7 @@ sub bdec {
 
     return $x->round(@r) if $x -> is_inf() || $x -> is_nan();
 
-    return $upgrade -> bdec($x, @r) if defined($upgrade) && !$x->is_int();
+    return $upgrade -> bdec($x, @r) if defined($upgrade) && !$x -> isa($class);;
 
     if ($x->{sign} eq '-') {
         $x->{value} = $LIB->_inc($x->{value});
@@ -1755,7 +1768,7 @@ sub badd {
     $r[3] = $y;                 # no push!
 
     return $upgrade->badd($x, $y, @r)
-      if defined($upgrade) && (!$x->is_int() || !$y->is_int());
+      if defined($upgrade) && (!$x->isa($class) || !$y->isa($class));
 
     # Inf and NaN handling
     if ($x->{sign} !~ /^[+-]$/ || $y->{sign} !~ /^[+-]$/) {
@@ -1792,7 +1805,7 @@ sub bsub {
     return $x if $x -> modify('bsub');
 
     return $upgrade -> bsub($x, $y, @r)
-      if defined($upgrade) && (!$x->is_int() || !$y->is_int());
+      if defined($upgrade) && (!$x->isa($class) || !$y->isa($class));
 
     return $x -> round(@r) if $y -> is_zero();
 
@@ -1838,7 +1851,7 @@ sub bmul {
     }
 
     return $upgrade->bmul($x, $y, @r)
-      if defined($upgrade) && (!$x->is_int() || !$y->is_int());
+      if defined($upgrade) && (!$x->isa($class) || !$y->isa($class));
 
     $r[3] = $y;                 # no push here
 
@@ -1870,7 +1883,7 @@ sub bmuladd {
     {
         return $upgrade->bmuladd($x, $y, $z, @r)
           if defined($upgrade)
-               && (!$x->is_int() || !$y->is_int() || !$z->is_int());
+               && (!$x->isa($class) || !$y->isa($class) || !$z->isa($class));
 
         # TODO: what if $y and $z have A or P set?
         $r[3] = $z;             # no push here
@@ -2100,6 +2113,9 @@ sub bdiv {
     # At this point, both the numerator and denominator are finite numbers, and
     # the denominator (divisor) is non-zero.
 
+    # Division might return a non-integer result, so upgrade unconditionally, if
+    # upgrading is enabled.
+
     return $upgrade -> bdiv($x, $y, @r) if defined $upgrade;
 
     $r[3] = $y;                                   # no push!
@@ -2262,6 +2278,9 @@ sub btdiv {
         return $wantarray ? ($x, $rem) : $x;
     }
 
+    # Division might return a non-integer result, so upgrade unconditionally, if
+    # upgrading is enabled.
+
     return $upgrade -> btdiv($x, $y, @r) if defined $upgrade;
 
     $r[3] = $y;                 # no push!
@@ -2312,6 +2331,7 @@ sub bmod {
                             : objectify(2, @_);
 
     return $x if $x -> modify('bmod');
+
     $r[3] = $y;                 # no push!
 
     # At least one argument is NaN.
@@ -2342,7 +2362,8 @@ sub bmod {
         }
     }
 
-    return $upgrade -> bmod($x, $y, @r) if defined $upgrade;
+    return $upgrade -> bmod($x, $y, @r)
+      if defined($upgrade) && (!$x -> isa($class) || !$y -> isa($class));
 
     # Calc new sign and in case $y == +/- 1, return $x.
 
@@ -2362,9 +2383,9 @@ sub btmod {
     # Remainder after truncated division.
 
     # set up parameters
-    my (undef, $x, $y, @r) = ref($_[0]) && ref($_[0]) eq ref($_[1])
-                           ? (undef, @_)
-                           : objectify(2, @_);
+    my ($class, $x, $y, @r) = ref($_[0]) && ref($_[0]) eq ref($_[1])
+                            ? (ref($_[0]), @_)
+                            : objectify(2, @_);
 
     return $x if $x -> modify('btmod');
 
@@ -2392,7 +2413,8 @@ sub btmod {
         return $x -> round(@r);
     }
 
-    return $upgrade -> btmod($x, $y, @r) if defined $upgrade;
+    return $upgrade -> btmod($x, $y, @r)
+      if defined($upgrade) && (!$x -> isa($class) || !$y -> isa($class));
 
     $r[3] = $y;                 # no push!
 
@@ -2418,9 +2440,9 @@ sub bmodinv {
     # If no modular multiplicative inverse exists, NaN is returned.
 
     # set up parameters
-    my (undef, $x, $y, @r) = ref($_[0]) && ref($_[0]) eq ref($_[1])
-                           ? (undef, @_)
-                           : objectify(2, @_);
+    my ($class, $x, $y, @r) = ref($_[0]) && ref($_[0]) eq ref($_[1])
+                            ? (ref($_[0]), @_)
+                            : objectify(2, @_);
 
     return $x if $x->modify('bmodinv');
 
@@ -2439,7 +2461,8 @@ sub bmodinv {
     return $x->bzero(@r) if ($y->is_one('+') ||
                              $y->is_one('-'));
 
-    return $upgrade -> bmodinv($x, $y, @r) if defined $upgrade;
+    return $upgrade -> bmodinv($x, $y, @r)
+      if defined($upgrade) && (!$x -> isa($class) || !$y -> isa($class));
 
     # Return NaN if $x = 0, or $x modulo $y is zero. The only valid case when
     # $x = 0 is when $y = 1 or $y = -1, but that was covered above.
@@ -2520,7 +2543,10 @@ sub bmodpow {
         }
     }
 
-    return $upgrade -> bmodinv($num, $exp, $mod, @r) if defined $upgrade;
+    return $upgrade -> bmodinv($num, $exp, $mod, @r)
+      if defined($upgrade) && (!$num -> isa($class) ||
+                               !$exp -> isa($class) ||
+                               !$mod -> ($class));
 
     # Compute 'a (mod m)', ignoring the signs on 'a' and 'm'. If the resulting
     # value is zero, the output is also zero, regardless of the signs on 'a' and
@@ -2753,9 +2779,9 @@ sub bnok {
     # integer.
 
     # Set up parameters.
-    my (undef, $n, $k, @r) = ref($_[0]) && ref($_[0]) eq ref($_[1])
-                           ? (undef, @_)
-                           : objectify(2, @_);
+    my ($class, $n, $k, @r) = ref($_[0]) && ref($_[0]) eq ref($_[1])
+                            ? (ref($_[0]), @_)
+                            : objectify(2, @_);
 
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
@@ -2790,7 +2816,8 @@ sub bnok {
 
     # At this point, both n and k are real numbers.
 
-    return $upgrade -> bnok($n, $k, @r) if defined $upgrade;
+    return $upgrade -> bnok($n, $k, @r)
+      if defined($upgrade) && (!$n -> isa($class) || !$k -> isa($class));
 
     my $sign = 1;
 
@@ -2954,7 +2981,7 @@ sub ackermann {
 sub bsin {
     # Calculate sin(x) to N digits. Unless upgrading is in effect, returns the
     # result truncated to an integer.
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     return $x if $x->modify('bsin');
 
@@ -2975,7 +3002,7 @@ sub bsin {
 sub bcos {
     # Calculate cos(x) to N digits. Unless upgrading is in effect, returns the
     # result truncated to an integer.
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     return $x if $x->modify('bcos');
 
@@ -2993,12 +3020,13 @@ sub bcos {
 sub batan {
     # Calculate arctan(x) to N digits. Unless upgrading is in effect, returns
     # the result truncated to an integer.
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     return $x if $x->modify('batan');
 
     return $x -> bnan(@r)  if $x -> is_nan();
     return $x -> bzero(@r) if $x -> is_zero();
+
     return $upgrade -> batan($x, @r) if defined $upgrade;
 
     return $x -> bone("+", @r) if $x -> bgt("1");
@@ -3060,7 +3088,7 @@ sub batan2 {
 
 sub bsqrt {
     # calculate square root of $x
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     return $x if $x->modify('bsqrt');
 
@@ -3101,13 +3129,14 @@ sub broot {
 sub bfac {
     # (BINT or num_str, BINT or num_str) return BINT
     # compute factorial number from $x, modify $x in place
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     return $x if $x->modify('bfac') || $x->{sign} eq '+inf'; # inf => inf
 
     return $x->bnan(@r) if $x->{sign} ne '+'; # NaN, <0 => NaN
 
-    return $upgrade -> bfac($x, @r) if defined $upgrade;
+    return $upgrade -> bfac($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
 
     $x->{value} = $LIB->_fac($x->{value});
     $x->round(@r);
@@ -3115,14 +3144,15 @@ sub bfac {
 
 sub bdfac {
     # compute double factorial, modify $x in place
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     return $x if $x->modify('bdfac') || $x->{sign} eq '+inf'; # inf => inf
 
     return $x->bnan(@r) if $x->is_nan() || $x <= -2;
     return $x->bone(@r) if $x <= 1;
 
-    return $upgrade -> bdfac($x, @r) if defined $upgrade;
+    return $upgrade -> bdfac($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
 
     croak("bdfac() requires a newer version of the $LIB library.")
         unless $LIB->can('_dfac');
@@ -3139,7 +3169,7 @@ sub btfac {
 
     return $x->bnan(@r) if $x->is_nan();
 
-    return $upgrade -> btfac($x, @r) if defined $upgrade;
+    return $upgrade -> btfac($x, @r) if defined($upgrade) && !$x -> isa($class);
 
     my $k = $class -> new("3");
     return $x->bnan(@r) if $x <= -$k;
@@ -3163,7 +3193,8 @@ sub bmfac {
     return $x if $x->modify('bmfac') || $x->{sign} eq '+inf';
     return $x->bnan(@r) if $x->is_nan() || $k->is_nan() || $k < 1 || $x <= -$k;
 
-    return $upgrade -> bmfac($x, $k, @r) if defined $upgrade;
+    return $upgrade -> bmfac($x, $k, @r)
+      if defined($upgrade) && !$x -> isa($class);
 
     my $one = $class -> bone();
     return $x->bone(@r) if $x <= $one;
@@ -3183,6 +3214,9 @@ sub bfib {
         unless $LIB->can('_fib');
 
     return $x if $x->modify('bfib');
+
+    return $upgrade -> bfib($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
 
     # List context.
 
@@ -3239,6 +3273,9 @@ sub blucas {
         unless $LIB->can('_lucas');
 
     return $x if $x->modify('blucas');
+
+    return $upgrade -> blucas($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
 
     # List context.
 
@@ -3310,8 +3347,19 @@ sub blsft {
     return $x -> bnan() if ($x -> {sign} !~ /^[+-]$/ ||
                             $y -> {sign} !~ /^[+-]$/);
     return $x -> round(@r) if $y -> is_zero();
+    return $x -> bzero(@r) if $x -> is_zero(); # 0 => 0
 
-    $b = defined($b) ? $b -> numify() : 2;
+    $b = 2 if !defined $b;
+    return $x -> bnan(@r) if $b <= 0 || $y -> {sign} eq '-';
+    $b = $class -> new($b) unless defined(blessed($b));
+
+    #return $upgrade -> blsft($x, $y, $b, @r)
+    #  if defined($upgrade) && (!$x -> isa($class) ||
+    #                           !$y -> isa($class) ||
+    #                           !$b -> isa($class));
+
+    # shift by a negative amount?
+    #return $x -> brsft($y -> copy() -> babs(), $b) if $y -> {sign} =~ /^-/;
 
     # While some of the libraries support an arbitrarily large base, not all of
     # them do, so rather than returning an incorrect result in those cases,
@@ -3319,6 +3367,8 @@ sub blsft {
 
     my $uintmax = ~0;
     croak("Base is too large.") if $b > $uintmax;
+
+    $b = $b -> numify();
 
     return $x -> bnan() if $b <= 0 || $y -> {sign} eq '-';
 
@@ -3330,12 +3380,19 @@ sub brsft {
     # (BINT or num_str, BINT or num_str) return BINT
     # compute x >> y, base n, y >= 0
 
-    # set up parameters
     my ($class, $x, $y, $b, @r) = (ref($_[0]), @_);
 
-    # objectify is costly, so avoid it
-    if ((!ref($_[0])) || (ref($_[0]) ne ref($_[1]))) {
-        ($class, $x, $y, $b, @r) = objectify(2, @_);
+    # Objectify the base only when it is defined, since an undefined base, as
+    # in $x->blsft(3) or $x->blog(3, undef) means use the default base 2.
+
+    if (!ref($_[0]) && $_[0] =~ /^[A-Za-z]|::/) {
+        # E.g., Math::BigInt->blog(256, 5, 2)
+        ($class, $x, $y, $b, @r) =
+          defined $_[3] ? objectify(3, @_) : objectify(2, @_);
+    } else {
+        # E.g., Math::BigInt::blog(256, 5, 2) or $x->blog(5, 2)
+        ($class, $x, $y, $b, @r) =
+          defined $_[2] ? objectify(3, @_) : objectify(2, @_);
     }
 
     return $x if $x -> modify('brsft');
@@ -3346,8 +3403,25 @@ sub brsft {
 
     $b = 2 if !defined $b;
     return $x -> bnan(@r) if $b <= 0 || $y -> {sign} eq '-';
+    $b = $class -> new($b) unless defined(blessed($b));
 
-    return $upgrade -> brsft($x, $y, $b, @r) if defined $upgrade;
+    # Shifting right by a positive amount might lead to a non-integer result, so
+    # include this case in the test.
+
+    return $upgrade -> brsft($x, $y, $b, @r)
+      if defined($upgrade) && (!$x -> isa($class) ||
+                               !$y -> isa($class) ||
+                               !$b -> isa($class) ||
+                               $y -> is_pos());
+
+    # While some of the libraries support an arbitrarily large base, not all of
+    # them do, so rather than returning an incorrect result in those cases,
+    # disallow bases that don't work with all libraries.
+
+    my $uintmax = ~0;
+    croak("Base is too large.") if $b > $uintmax;
+
+    $b = $b -> numify();
 
     # this only works for negative numbers when shifting in base 2
     if (($x -> {sign} eq '-') && ($b == 2)) {
@@ -3395,10 +3469,14 @@ sub band {
     #(BINT or num_str, BINT or num_str) return BINT
     # compute x & y
 
-    my (undef, $x, $y, @r) = ref($_[0]) && ref($_[0]) eq ref($_[1])
-                           ? (undef, @_) : objectify(2, @_);
+    my ($class, $x, $y, @r) = ref($_[0]) && ref($_[0]) eq ref($_[1])
+                            ? (ref($_[0]), @_) : objectify(2, @_);
 
     return $x if $x->modify('band');
+
+    return $upgrade -> band($x, $y, @r)
+      if defined($upgrade) && (!$x -> isa($class) ||
+                               !$y -> isa($class));
 
     $r[3] = $y;                 # no push!
 
@@ -3417,10 +3495,14 @@ sub bior {
     #(BINT or num_str, BINT or num_str) return BINT
     # compute x | y
 
-    my (undef, $x, $y, @r) = ref($_[0]) && ref($_[0]) eq ref($_[1])
-                           ? (undef, @_) : objectify(2, @_);
+    my ($class, $x, $y, @r) = ref($_[0]) && ref($_[0]) eq ref($_[1])
+                            ? (ref($_[0]), @_) : objectify(2, @_);
 
     return $x if $x->modify('bior');
+
+    return $upgrade -> bior($x, $y, @r)
+      if defined($upgrade) && (!$x -> isa($class) ||
+                               !$y -> isa($class));
 
     $r[3] = $y;                 # no push!
 
@@ -3439,10 +3521,14 @@ sub bxor {
     #(BINT or num_str, BINT or num_str) return BINT
     # compute x ^ y
 
-    my (undef, $x, $y, @r) = ref($_[0]) && ref($_[0]) eq ref($_[1])
-                           ? (undef, @_) : objectify(2, @_);
+    my ($class, $x, $y, @r) = ref($_[0]) && ref($_[0]) eq ref($_[1])
+                            ? (ref($_[0]), @_) : objectify(2, @_);
 
     return $x if $x->modify('bxor');
+
+    return $upgrade -> bxor($x, $y, @r)
+      if defined($upgrade) && (!$x -> isa($class) ||
+                               !$y -> isa($class));
 
     $r[3] = $y;                 # no push!
 
@@ -3460,9 +3546,12 @@ sub bxor {
 sub bnot {
     # (num_str or BINT) return BINT
     # represent ~x as twos-complement number
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     return $x if $x->modify('bnot');
+
+    return $upgrade -> bnot($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
 
     $x -> binc() -> bneg(@r);
 }
@@ -3686,21 +3775,30 @@ sub fround {
 
 sub bfloor {
     # round towards minus infinity; no-op since it's already integer
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
+
+    return $upgrade -> bfloor($x)
+      if defined($upgrade) && !$x -> isa($class);
 
     $x->round(@r);
 }
 
 sub bceil {
     # round towards plus infinity; no-op since it's already int
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
+
+    return $upgrade -> bceil($x)
+      if defined($upgrade) && !$x -> isa($class);
 
     $x->round(@r);
 }
 
 sub bint {
     # round towards zero; no-op since it's already integer
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
+
+    return $upgrade -> bint($x)
+      if defined($upgrade) && !$x -> isa($class);
 
     $x->round(@r);
 }
@@ -3715,6 +3813,19 @@ sub bgcd {
     # GCD -- Euclid's algorithm, variant C (Knuth Vol 3, pg 341 ff)
 
     my ($class, @args) = objectify(0, @_);
+
+    # Upgrade?
+
+    if (defined $upgrade) {
+        my $do_upgrade = 0;
+        for my $arg (@args) {
+            unless ($arg -> isa($class)) {
+                $do_upgrade = 1;
+                last;
+            }
+        }
+        return $upgrade -> bgcd(@args) if $do_upgrade;
+    }
 
     my $x = shift @args;
     $x = ref($x) && $x -> isa($class) ? $x -> copy() : $class -> new($x);
@@ -3739,6 +3850,19 @@ sub blcm {
 
     my ($class, @args) = objectify(0, @_);
 
+    # Upgrade?
+
+    if (defined $upgrade) {
+        my $do_upgrade = 0;
+        for my $arg (@args) {
+            unless ($arg -> isa($class)) {
+                $do_upgrade = 1;
+                last;
+            }
+        }
+        return $upgrade -> blcm(@args) if $do_upgrade;
+    }
+
     my $x = shift @args;
     $x = ref($x) && $x -> isa($class) ? $x -> copy() : $class -> new($x);
     return $class->bnan() if $x->{sign} !~ /^[+-]$/;    # x NaN?
@@ -3759,7 +3883,7 @@ sub blcm {
 
 sub sign {
     # return the sign of the number: +/-/-inf/+inf/NaN
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
@@ -3778,7 +3902,7 @@ sub digit {
 
 sub bdigitsum {
     # like digitsum(), but assigns the result to the invocand
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
@@ -3805,7 +3929,7 @@ sub digitsum {
 }
 
 sub length {
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
@@ -3818,6 +3942,11 @@ sub exponent {
     my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
+
+    # Upgrade?
+
+    return $upgrade -> exponent($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
 
     if ($x->{sign} !~ /^[+-]$/) {
         my $s = $x->{sign};
@@ -3836,6 +3965,11 @@ sub mantissa {
 
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
+    # Upgrade?
+
+    return $upgrade -> mantissa($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
+
     if ($x->{sign} !~ /^[+-]$/) {
         # for NaN, +inf, -inf: keep the sign
         return $class->new($x->{sign}, @r);
@@ -3852,9 +3986,14 @@ sub mantissa {
 
 sub parts {
     # return a copy of both the exponent and the mantissa
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
+
+    # Upgrade?
+
+    return $upgrade -> parts($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
 
     ($x->mantissa(@r), $x->exponent(@r));
 }
@@ -3886,14 +4025,19 @@ sub sparts {
         return ($mant, $expo);                      # list context
     }
 
+    # Upgrade?
+
+    return $upgrade -> sparts($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
+
     # Finite number.
 
     my $mant   = $x -> copy();
     my $nzeros = $LIB -> _zeros($mant -> {value});
-    $mant = $mant -> brsft($nzeros, 10) if $nzeros != 0;
-    $mant = $mant -> round(@r);
-    $mant = $downgrade -> new($mant, @r)
-      if defined($downgrade) && $mant -> is_int();
+
+    $mant -> {value}
+      = $LIB -> _rsft($mant -> {value}, $LIB -> _new($nzeros), 10)
+        if $nzeros != 0;
     return $mant unless wantarray;
 
     my $expo = $class -> new($nzeros, @r);
@@ -3911,7 +4055,12 @@ sub nparts {
 
     # Not-a-Number and Infinity.
 
-    return $x -> sparts() if $x -> is_nan() || $x -> is_inf();
+    return $x -> sparts(@r) if $x -> is_nan() || $x -> is_inf();
+
+    # Upgrade?
+
+    return $upgrade -> nparts($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
 
     # Finite number.
 
@@ -3921,7 +4070,7 @@ sub nparts {
         my $expo10adj = $ndigtot - $ndigfrac - 1;
 
         if ($expo10adj > 0) {          # if mantissa is not an integer
-            return $upgrade -> nparts($x, @r) if $upgrade;
+            return $upgrade -> nparts($x, @r) if defined $upgrade;
             $mant = $mant -> bnan(@r);
             return $mant unless wantarray;
             $expo = $expo -> badd($expo10adj, @r);
@@ -3946,6 +4095,11 @@ sub eparts {
 
     return $x -> sparts(@r) if $x -> is_nan() || $x -> is_inf();
 
+    # Upgrade?
+
+    return $upgrade -> eparts($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
+
     # Finite number.
 
     my ($mant, $expo) = $x -> sparts(@r);
@@ -3961,7 +4115,7 @@ sub eparts {
         $expo = $expo -> bsub($c);
 
         if ($ndigmant > $c) {
-            return $upgrade -> eparts($x, @r) if $upgrade;
+            return $upgrade -> eparts($x, @r) if defined $upgrade;
             $mant = $mant -> bnan(@r);
             return $mant unless wantarray;
             return ($mant, $expo);
@@ -4000,6 +4154,11 @@ sub dparts {
         return ($int, $frc);
     }
 
+    # Upgrade?
+
+    return $upgrade -> dparts($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
+
     # Finite number.
 
     my $int = $x -> copy() -> round(@r);
@@ -4033,6 +4192,11 @@ sub fparts {
         return $numer, $denom;
     }
 
+    # Upgrade?
+
+    return $upgrade -> fparts($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
+
     # N => N/1
 
     my $numer = $x -> copy() -> round(@r);
@@ -4046,6 +4210,9 @@ sub numerator {
 
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
+    return $upgrade -> numerator($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
+
     return $x -> copy() -> round(@r);
 }
 
@@ -4053,6 +4220,9 @@ sub denominator {
     my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
+
+    return $upgrade -> denominator($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
 
     return $x -> is_nan() ? $class -> bnan(@r) : $class -> bone(@r);
 }
@@ -4062,14 +4232,24 @@ sub denominator {
 ###############################################################################
 
 sub bstr {
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
+
+    # Inf and NaN
 
     if ($x->{sign} ne '+' && $x->{sign} ne '-') {
         return $x->{sign} unless $x->{sign} eq '+inf'; # -inf, NaN
         return 'inf';                                  # +inf
     }
+
+    # Upgrade?
+
+    return $upgrade -> bstr($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
+
+    # Finite number
+
     my $str = $LIB->_str($x->{value});
     return $x->{sign} eq '-' ? "-$str" : $str;
 }
@@ -4078,140 +4258,173 @@ sub bstr {
 # written as "1.2345e+4".
 
 sub bsstr {
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
+
+    # Inf and NaN
 
     if ($x->{sign} ne '+' && $x->{sign} ne '-') {
         return $x->{sign} unless $x->{sign} eq '+inf';  # -inf, NaN
         return 'inf';                                   # +inf
     }
 
-    my ($m, $e) = $x -> sparts();
+    # Upgrade?
 
-    # If upgrading is enabled, but not downgrading, $m and $e might not be
-    # Math::BigInt objects.
+    return $upgrade -> bsstr($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
 
-    my $str;
-    $str .= '-' if $x->{sign} eq '-';
-    $str .= $m -> isa("Math::BigInt") ? $LIB->_str($m->{value})
-                                      : $m -> bdstr();
-    $str .= 'e' . $e->{sign};
-    $str .= $e -> isa("Math::BigInt") ? $LIB->_str($e->{value})
-                                      : $m -> babs() -> bdstr();
-    return $str;
+    # Finite number
+
+    my $expo = $LIB -> _zeros($x->{value});
+    my $mant = $LIB -> _str($x->{value});
+    $mant = substr($mant, 0, -$expo) if $expo;  # strip trailing zeros
+
+    ($x->{sign} eq '-' ? '-' : '') . $mant . 'e+' . $expo;
 }
 
-# Normalized notation, e.g., "12345" is written as "12345e+0".
+# Normalized notation, e.g., "12345" is written as "1.2345e+4".
 
 sub bnstr {
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
+
+    # Inf and NaN
 
     if ($x->{sign} ne '+' && $x->{sign} ne '-') {
         return $x->{sign} unless $x->{sign} eq '+inf';  # -inf, NaN
         return 'inf';                                   # +inf
     }
 
-    return $x -> bstr() if $x -> is_nan() || $x -> is_inf();
+    # Upgrade?
 
-    my ($mant, $expo) = $x -> sparts();
+    return $upgrade -> bnstr($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
 
-    # The "fraction posision" is the position (offset) for the decimal point
-    # relative to the end of the digit string.
+    # Finite number
 
-    my $fracpos = $mant -> length() - 1;
-    if ($fracpos == 0) {
-        my $str = $LIB->_str($mant->{value}) . "e+"
-                . $LIB->_str($expo->{value});
-        return $x->{sign} eq '-' ? "-$str" : $str;
+    my $expo = $LIB -> _zeros($x->{value});
+    my $mant = $LIB -> _str($x->{value});
+    $mant = substr($mant, 0, -$expo) if $expo;  # strip trailing zeros
+
+    my $mantlen = CORE::length($mant);
+    if ($mantlen > 1) {
+        $expo += $mantlen - 1;                  # adjust exponent
+        substr $mant, 1, 0, ".";                # insert decimal point
     }
 
-    $expo += $fracpos;
-    my $mantstr = $LIB->_str($mant -> {value});
-    substr($mantstr, -$fracpos, 0) = '.';
-
-    my $str = $mantstr . 'e+' . $LIB->_str($expo -> {value});
-    return $x->{sign} eq '-' ? "-$str" : $str;
+    ($x->{sign} eq '-' ? '-' : '') . $mant . 'e+' . $expo;
 }
 
 # Engineering notation, e.g., "12345" is written as "12.345e+3".
 
 sub bestr {
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
+
+    # Inf and NaN
 
     if ($x->{sign} ne '+' && $x->{sign} ne '-') {
         return $x->{sign} unless $x->{sign} eq '+inf';  # -inf, NaN
         return 'inf';                                   # +inf
     }
 
-    my ($mant, $expo) = $x -> sparts();
+    # Upgrade?
 
-    my $sign = $mant -> sign();
-    $mant = $mant -> babs();
+    return $upgrade -> bestr($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
 
-    my $mantstr = $LIB->_str($mant -> {value});
-    my $mantlen = CORE::length($mantstr);
+    # Finite number
 
-    my $dotidx = 1;
-    $expo += $mantlen - 1;
+    my $expo = $LIB -> _zeros($x->{value});     # number of trailing zeros
+    my $mant = $LIB -> _str($x->{value});       # mantissa as a string
+    $mant = substr($mant, 0, -$expo) if $expo;  # strip trailing zeros
+    my $mantlen = CORE::length($mant);          # length of mantissa
+    $expo += $mantlen;
 
-    my $c = $expo -> copy() -> bmod(3);
-    $expo   -= $c;
-    $dotidx += $c;
+    my $dotpos = ($expo - 1) % 3 + 1;           # offset of decimal point
+    $expo -= $dotpos;
 
-    if ($mantlen < $dotidx) {
-        $mantstr .= "0" x ($dotidx - $mantlen);
-    } elsif ($mantlen > $dotidx) {
-        substr($mantstr, $dotidx, 0) = ".";
+    if ($dotpos < $mantlen) {
+        substr $mant, $dotpos, 0, ".";          # insert decimal point
+    } elsif ($dotpos > $mantlen) {
+        $mant .= "0" x ($dotpos - $mantlen);    # append zeros
     }
 
-    my $str = $mantstr . 'e+' . $LIB->_str($expo -> {value});
-    return $sign eq "-" ? "-$str" : $str;
+    ($x->{sign} eq '-' ? '-' : '') . $mant . 'e+' . $expo;
 }
 
-# Decimal notation, e.g., "12345".
+# Decimal notation, e.g., "12345" (no exponent).
 
 sub bdstr {
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
+    # Inf and NaN
+
     if ($x->{sign} ne '+' && $x->{sign} ne '-') {
-        return $x->{sign} unless $x->{sign} eq '+inf'; # -inf, NaN
-        return 'inf';                                  # +inf
+        return $x->{sign} unless $x->{sign} eq '+inf';  # -inf, NaN
+        return 'inf';                                   # +inf
     }
+
+    # Upgrade?
+
+    return $upgrade -> bdstr($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
+
+    # Finite number
 
     ($x->{sign} eq '-' ? '-' : '') . $LIB->_str($x->{value});
 }
 
-# Fractional notation, e.g., "123.4375" is written as "1975/16".
+# Fraction notation, e.g., "123.4375" is written as "1975/16", but "123" is
+# written as "123", not "123/1".
 
 sub bfstr {
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
+    # Inf and NaN
+
     if ($x->{sign} ne '+' && $x->{sign} ne '-') {
-        return $x->{sign} unless $x->{sign} eq '+inf'; # -inf, NaN
-        return 'inf';                                  # +inf
+        return $x->{sign} unless $x->{sign} eq '+inf';  # -inf, NaN
+        return 'inf';                                   # +inf
     }
 
-    return $x -> bdstr() if $x -> is_int();
-    return join '/', $x -> fparts();
+    # Upgrade?
+
+    return $upgrade -> bfstr($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
+
+    # Finite number
+
+    ($x->{sign} eq '-' ? '-' : '') . $LIB->_str($x->{value});
 }
 
 sub to_hex {
     # return as hex string with no prefix
 
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
-    return $x->bstr() if $x->{sign} !~ /^[+-]$/; # inf, nan etc
+    # Inf and NaN
+
+    if ($x->{sign} ne '+' && $x->{sign} ne '-') {
+        return $x->{sign} unless $x->{sign} eq '+inf';  # -inf, NaN
+        return 'inf';                                   # +inf
+    }
+
+    # Upgrade?
+
+    return $upgrade -> to_hex($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
+
+    # Finite number
 
     my $hex = $LIB->_to_hex($x->{value});
     return $x->{sign} eq '-' ? "-$hex" : $hex;
@@ -4220,11 +4433,23 @@ sub to_hex {
 sub to_oct {
     # return as octal string with no prefix
 
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
-    return $x->bstr() if $x->{sign} !~ /^[+-]$/; # inf, nan etc
+    # Inf and NaN
+
+    if ($x->{sign} ne '+' && $x->{sign} ne '-') {
+        return $x->{sign} unless $x->{sign} eq '+inf';  # -inf, NaN
+        return 'inf';                                   # +inf
+    }
+
+    # Upgrade?
+
+    return $upgrade -> to_oct($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
+
+    # Finite number
 
     my $oct = $LIB->_to_oct($x->{value});
     return $x->{sign} eq '-' ? "-$oct" : $oct;
@@ -4233,11 +4458,23 @@ sub to_oct {
 sub to_bin {
     # return as binary string with no prefix
 
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
-    return $x->bstr() if $x->{sign} !~ /^[+-]$/; # inf, nan etc
+    # Inf and NaN
+
+    if ($x->{sign} ne '+' && $x->{sign} ne '-') {
+        return $x->{sign} unless $x->{sign} eq '+inf';  # -inf, NaN
+        return 'inf';                                   # +inf
+    }
+
+    # Upgrade?
+
+    return $upgrade -> to_bin($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
+
+    # Finite number
 
     my $bin = $LIB->_to_bin($x->{value});
     return $x->{sign} eq '-' ? "-$bin" : $bin;
@@ -4246,12 +4483,15 @@ sub to_bin {
 sub to_bytes {
     # return a byte string
 
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
     croak("to_bytes() requires a finite, non-negative integer")
         if $x -> is_neg() || ! $x -> is_int();
+
+    return $upgrade -> to_bytes($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
 
     croak("to_bytes() requires a newer version of the $LIB library.")
         unless $LIB->can('_to_bytes');
@@ -4263,8 +4503,8 @@ sub to_base {
     # return a base anything string
 
     # $cs is the collation sequence
-    my (undef, $x, $base, $cs, @r) = ref($_[0]) && ref($_[0]) eq ref($_[1])
-                                   ? (undef, @_) : objectify(2, @_);
+    my ($class, $x, $base, $cs, @r) = ref($_[0]) && ref($_[0]) eq ref($_[1])
+                                    ? (ref($_[0]), @_) : objectify(2, @_);
 
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
@@ -4286,6 +4526,9 @@ sub to_base {
 
     croak("to_base() requires a newer version of the $LIB library.")
       unless $LIB->can('_to_base');
+
+    return $upgrade -> to_base($x, $base, $cs, @r)
+      if defined($upgrade) && (!$x -> isa($class) || !$base -> isa($class));
 
     return $LIB->_to_base($x->{value}, $base -> {value},
                           defined($cs) ? $cs : ());
@@ -4310,6 +4553,9 @@ sub to_base_num {
     croak("to_base() requires a newer version of the $LIB library.")
       unless $LIB->can('_to_base');
 
+    return $upgrade -> to_base_num($x, $base, @r)
+      if defined($upgrade) && (!$x -> isa($class) || !$base -> isa($class));
+
     # Get a reference to an array of library thingies, and replace each element
     # with a Math::BigInt object using that thingy.
 
@@ -4327,11 +4573,14 @@ sub to_base_num {
 sub as_hex {
     # return as hex string, with prefixed 0x
 
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
     return $x->bstr() if $x->{sign} !~ /^[+-]$/; # inf, nan etc
+
+    return $upgrade -> as_hex($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
 
     my $hex = $LIB->_as_hex($x->{value});
     return $x->{sign} eq '-' ? "-$hex" : $hex;
@@ -4340,11 +4589,14 @@ sub as_hex {
 sub as_oct {
     # return as octal string, with prefixed 0
 
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
     return $x->bstr() if $x->{sign} !~ /^[+-]$/; # inf, nan etc
+
+    return $upgrade -> as_oct($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
 
     my $oct = $LIB->_as_oct($x->{value});
     return $x->{sign} eq '-' ? "-$oct" : $oct;
@@ -4353,11 +4605,14 @@ sub as_oct {
 sub as_bin {
     # return as binary string, with prefixed 0b
 
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
     return $x->bstr() if $x->{sign} !~ /^[+-]$/; # inf, nan etc
+
+    return $upgrade -> as_bin($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
 
     my $bin = $LIB->_as_bin($x->{value});
     return $x->{sign} eq '-' ? "-$bin" : $bin;
@@ -4371,7 +4626,7 @@ sub as_bin {
 
 sub numify {
     # Make a Perl scalar number from a Math::BigInt object.
-    my (undef, $x, @r) = ref($_[0]) ? (undef, @_) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
@@ -4386,6 +4641,9 @@ sub numify {
         my $inf = $Math::Complex::Inf;
         return $x -> is_negative() ? -$inf : $inf;
     }
+
+    return $upgrade -> numify($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
 
     my $num = 0 + $LIB->_num($x->{value});
     return $x->{sign} eq '-' ? -$num : $num;
@@ -4894,7 +5152,7 @@ sub _trim_split_parts {
 #
 #   "10.01e+01"
 
-sub _dec_str_to_str_parts {
+sub _dec_str_to_dec_str_parts {
     my $class = shift;
     my $str   = shift;
 
@@ -4957,7 +5215,7 @@ sub _dec_str_to_str_parts {
 #   "x_1_0"
 #   "_1_0"
 
-sub _hex_str_to_str_parts {
+sub _hex_str_to_hex_str_parts {
     my $class = shift;
     my $str   = shift;
 
@@ -5011,7 +5269,7 @@ sub _hex_str_to_str_parts {
 # the sign of the exponent, and the absolute value of the exponent. The
 # significand is in base 8, and the exponent is in base 2.
 
-sub _oct_str_to_str_parts {
+sub _oct_str_to_oct_str_parts {
     my $class = shift;
     my $str   = shift;
 
@@ -5065,7 +5323,7 @@ sub _oct_str_to_str_parts {
 # the sign of the exponent, and the absolute value of the exponent. The
 # significand is in base 2, and the exponent is in base 2.
 
-sub _bin_str_to_str_parts {
+sub _bin_str_to_bin_str_parts {
     my $class = shift;
     my $str   = shift;
 
@@ -5119,7 +5377,7 @@ sub _bin_str_to_str_parts {
 # libray thingy, the sign of the exponent, and the absolute value of the
 # exponent as a library thingy.
 
-sub _dec_parts_to_lib_parts {
+sub _dec_str_parts_to_flt_lib_parts {
     shift;               # class name
 
     my ($sig_sgn, $sig_str, $exp_sgn, $exp_str) = @_;
@@ -5188,7 +5446,7 @@ sub _dec_parts_to_lib_parts {
 # libray thingy, the sign of the exponent, and the absolute value of the
 # exponent as a library thingy.
 
-sub _bin_parts_to_lib_parts {
+sub _bin_str_parts_to_flt_lib_parts {
     shift;               # class name
 
     my ($sig_sgn, $sig_str, $exp_sgn, $exp_str, $bpc) = @_;
@@ -5305,11 +5563,11 @@ sub _bin_parts_to_lib_parts {
 # as a libray thingy, the sign of the exponent, and the absolute value of the
 # exponent as a library thingy.
 
-sub _hex_str_to_lib_parts {
+sub _hex_str_to_flt_lib_parts {
     my $class = shift;
     my $str   = shift;
-    if (my @parts = $class -> _hex_str_to_str_parts($str)) {
-        return $class -> _bin_parts_to_lib_parts(@parts, 4);  # 4 bits pr. chr
+    if (my @parts = $class -> _hex_str_to_hex_str_parts($str)) {
+        return $class -> _bin_str_parts_to_flt_lib_parts(@parts, 4);  # 4 bits pr. chr
     }
     return;
 }
@@ -5319,11 +5577,11 @@ sub _hex_str_to_lib_parts {
 # libray thingy, the sign of the exponent, and the absolute value of the
 # exponent as a library thingy.
 
-sub _oct_str_to_lib_parts {
+sub _oct_str_to_flt_lib_parts {
     my $class = shift;
     my $str   = shift;
-    if (my @parts = $class -> _oct_str_to_str_parts($str)) {
-        return $class -> _bin_parts_to_lib_parts(@parts, 3);  # 3 bits pr. chr
+    if (my @parts = $class -> _oct_str_to_oct_str_parts($str)) {
+        return $class -> _bin_str_parts_to_flt_lib_parts(@parts, 3);  # 3 bits pr. chr
     }
     return;
 }
@@ -5333,11 +5591,11 @@ sub _oct_str_to_lib_parts {
 # libray thingy, the sign of the exponent, and the absolute value of the
 # exponent as a library thingy.
 
-sub _bin_str_to_lib_parts {
+sub _bin_str_to_flt_lib_parts {
     my $class = shift;
     my $str   = shift;
-    if (my @parts = $class -> _bin_str_to_str_parts($str)) {
-        return $class -> _bin_parts_to_lib_parts(@parts, 1);  # 1 bit pr. chr
+    if (my @parts = $class -> _bin_str_to_bin_str_parts($str)) {
+        return $class -> _bin_str_parts_to_flt_lib_parts(@parts, 1);  # 1 bit pr. chr
     }
     return;
 }
@@ -5346,11 +5604,11 @@ sub _bin_str_to_lib_parts {
 # the significand as library thingy, the sign of the exponent, and the absolute
 # value of the exponent as a a library thingy.
 
-sub _dec_str_to_lib_parts {
+sub _dec_str_to_flt_lib_parts {
     my $class = shift;
     my $str   = shift;
-    if (my @parts = $class -> _dec_str_to_str_parts($str)) {
-        return $class -> _dec_parts_to_lib_parts(@parts);
+    if (my @parts = $class -> _dec_str_to_dec_str_parts($str)) {
+        return $class -> _dec_str_parts_to_flt_lib_parts(@parts);
     }
     return;
 }
@@ -5360,8 +5618,8 @@ sub _dec_str_to_lib_parts {
 sub hex_str_to_dec_flt_str {
     my $class = shift;
     my $str   = shift;
-    if (my @parts = $class -> _hex_str_to_lib_parts($str)) {
-        return $class -> _lib_parts_to_flt_str(@parts);
+    if (my @parts = $class -> _hex_str_to_flt_lib_parts($str)) {
+        return $class -> _flt_lib_parts_to_flt_str(@parts);
     }
     return;
 }
@@ -5371,8 +5629,8 @@ sub hex_str_to_dec_flt_str {
 sub oct_str_to_dec_flt_str {
     my $class = shift;
     my $str   = shift;
-    if (my @parts = $class -> _oct_str_to_lib_parts($str)) {
-        return $class -> _lib_parts_to_flt_str(@parts);
+    if (my @parts = $class -> _oct_str_to_flt_lib_parts($str)) {
+        return $class -> _flt_lib_parts_to_flt_str(@parts);
     }
     return;
 }
@@ -5382,8 +5640,8 @@ sub oct_str_to_dec_flt_str {
 sub bin_str_to_dec_flt_str {
     my $class = shift;
     my $str   = shift;
-    if (my @parts = $class -> _bin_str_to_lib_parts($str)) {
-        return $class -> _lib_parts_to_flt_str(@parts);
+    if (my @parts = $class -> _bin_str_to_flt_lib_parts($str)) {
+        return $class -> _flt_lib_parts_to_flt_str(@parts);
     }
     return;
 }
@@ -5393,8 +5651,8 @@ sub bin_str_to_dec_flt_str {
 sub dec_str_to_dec_flt_str {
     my $class = shift;
     my $str   = shift;
-    if (my @parts = $class -> _dec_str_to_lib_parts($str)) {
-        return $class -> _lib_parts_to_flt_str(@parts);
+    if (my @parts = $class -> _dec_str_to_flt_lib_parts($str)) {
+        return $class -> _flt_lib_parts_to_flt_str(@parts);
     }
     return;
 }
@@ -5404,8 +5662,8 @@ sub dec_str_to_dec_flt_str {
 sub hex_str_to_dec_str {
     my $class = shift;
     my $str   = shift;
-    if (my @parts = $class -> _dec_str_to_lib_parts($str)) {
-        return $class -> _lib_parts_to_dec_str(@parts);
+    if (my @parts = $class -> _dec_str_to_flt_lib_parts($str)) {
+        return $class -> _flt_lib_parts_to_dec_str(@parts);
     }
     return;
 }
@@ -5415,8 +5673,8 @@ sub hex_str_to_dec_str {
 sub oct_str_to_dec_str {
     my $class = shift;
     my $str   = shift;
-    if (my @parts = $class -> _oct_str_to_lib_parts($str)) {
-        return $class -> _lib_parts_to_dec_str(@parts);
+    if (my @parts = $class -> _oct_str_to_flt_lib_parts($str)) {
+        return $class -> _flt_lib_parts_to_dec_str(@parts);
     }
     return;
 }
@@ -5426,8 +5684,8 @@ sub oct_str_to_dec_str {
 sub bin_str_to_dec_str {
     my $class = shift;
     my $str   = shift;
-    if (my @parts = $class -> _bin_str_to_lib_parts($str)) {
-        return $class -> _lib_parts_to_dec_str(@parts);
+    if (my @parts = $class -> _bin_str_to_flt_lib_parts($str)) {
+        return $class -> _flt_lib_parts_to_dec_str(@parts);
     }
     return;
 }
@@ -5437,20 +5695,20 @@ sub bin_str_to_dec_str {
 sub dec_str_to_dec_str {
     my $class = shift;
     my $str   = shift;
-    if (my @parts = $class -> _dec_str_to_lib_parts($str)) {
-        return $class -> _lib_parts_to_dec_str(@parts);
+    if (my @parts = $class -> _dec_str_to_flt_lib_parts($str)) {
+        return $class -> _flt_lib_parts_to_dec_str(@parts);
     }
     return;
 }
 
-sub _lib_parts_to_flt_str {
+sub _flt_lib_parts_to_flt_str {
     my $class = shift;
     my @parts = @_;
     return $parts[0] . $LIB -> _str($parts[1])
       . 'e' . $parts[2] . $LIB -> _str($parts[3]);
 }
 
-sub _lib_parts_to_dec_str {
+sub _flt_lib_parts_to_dec_str {
     my $class = shift;
     my @parts = @_;
 
@@ -5477,6 +5735,55 @@ sub _lib_parts_to_dec_str {
         }
     }
 }
+
+# Takes four arguments, the sign of the significand, the absolute value of the
+# significand as a libray thingy, the sign of the exponent, and the absolute
+# value of the exponent as a library thingy, and returns three parts: the sign
+# of the rational number, the absolute value of the numerator as a libray
+# thingy, and the absolute value of the denominator as a library thingy.
+#
+# For example, to convert data representing the value "+12e-2", then
+#
+#   $sm = "+";
+#   $m  = $LIB -> _new("12");
+#   $se = "-";
+#   $e  = $LIB -> _new("2");
+#   ($sr, $n, $d) = $class -> _flt_lib_parts_to_rat_lib_parts($sm, $m, $se, $e);
+#
+# returns data representing the same value written as the fraction "+3/25"
+#
+#   $sr = "+"
+#   $n  = $LIB -> _new("3");
+#   $d  = $LIB -> _new("12");
+
+sub _flt_lib_parts_to_rat_lib_parts {
+    my $self = shift;
+    my ($msgn, $mabs, $esgn, $eabs) = @_;
+
+    if ($esgn eq '-') {                 # "12e-2" -> "12/100" -> "3/25"
+        my $num_lib = $LIB -> _copy($mabs);
+        my $den_lib = $LIB -> _1ex($LIB -> _num($eabs));
+        my $gcd_lib = $LIB -> _gcd($LIB -> _copy($num_lib), $den_lib);
+        $num_lib = $LIB -> _div($LIB -> _copy($num_lib), $gcd_lib);
+        $den_lib = $LIB -> _div($den_lib, $gcd_lib);
+        return $msgn, $num_lib, $den_lib;
+    }
+
+    elsif (!$LIB -> _is_zero($eabs)) {  # "12e+2" -> "1200" -> "1200/1"
+        return $msgn, $LIB -> _lsft($LIB -> _copy($mabs), $eabs, 10),
+                      $LIB -> _one();
+    }
+
+    else {                              # "12e+0" -> "12" -> "12/1"
+        return $msgn, $mabs, $LIB -> _one();
+    }
+}
+
+# Add the function _register_callback() to Math::BigInt. It is provided for
+# backwards compabibility so that old version of Math::BigRat etc. don't
+# complain about missing it.
+
+sub _register_callback { }
 
 ###############################################################################
 # this method returns 0 if the object can be modified, or 1 if not.

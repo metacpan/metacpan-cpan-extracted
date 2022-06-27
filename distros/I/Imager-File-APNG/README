@@ -1,0 +1,16 @@
+Animated PNG (APNG) support for Imager.
+
+```
+use Imager;
+use Imager::File::APNG;
+
+my @frames = Imager->read_multi(file => "foo.png", type => "apng)
+  or die Imager->errstr;
+
+Imager->write_multi({
+    file => "foo.png",
+    type => "apng",
+    apng_delay => 1/60,
+  }, @frames)
+  or die Imager->errstr;
+```

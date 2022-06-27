@@ -1,0 +1,160 @@
+<%init>
+use JSON;
+use Data::Dumper;
+
+if ( !$ARGS{'POSTDATA'} ) {
+    RT->Logger->error('PagerDuty webhook failed no POSTDATA');
+    $m->abort(400);
+}
+
+# payload example: https://developer.pagerduty.com/docs/ZG9jOjExMDI5NTkw-v3-overview#webhook-payload
+my $data;
+eval { $data = decode_json( $ARGS{'POSTDATA'} ); };
+
+if ($@) {
+    RT->Logger->error("PagerDuty webhook failed to decode json data: $@");
+    $m->abort(400);
+}
+
+RT->Logger->debug( 'PagerDuty webhook got data: ' . Dumper($data) );
+
+# this webhook only handles incident events
+if ( $data->{event}{data}{type} ne 'incident' ) {
+    RT->Logger->debug('PagerDuty webhook ignoring non incident event');
+    $m->abort(400);
+}
+
+my $config  = RT::Config->Get('PagerDuty') // {};
+my $service = $config->{services}{ $data->{event}{data}{service}{id} }
+    // $config->{services}{'*'};
+
+unless ( defined $service ) {
+    RT->Logger->error( "PagerDuty webhook no service config found for id: "
+            . $data->{event}{data}{service}{id} );
+    $m->abort(400);
+}
+
+my $user_obj = $session{CurrentUser};
+unless ($user_obj) {
+    RT->Logger->error('PagerDuty webhook failed no current user');
+    $m->abort(401);
+}
+
+# check required rights
+my $queue_name = $service->{create_queue} // 'General';
+my $queue      = RT::Queue->new($user_obj);
+$queue->Load($queue_name);
+unless ( $queue->Id ) {
+    RT->Logger->error("Could not find queue $queue_name");
+    $m->abort(400);
+}
+
+my @missing_rights;
+for my $right (qw/SeeQueue ShowTicket CreateTicket ModifyTicket/) {
+    push @missing_rights, "Queue $queue_name: $right" unless $queue->CurrentUserHasRight($right);
+}
+
+my %cf;
+for my $name ( 'PagerDuty ID', 'PagerDuty URL' ) {
+    my $object = RT::CustomField->new($user_obj);
+    $object->LoadByName( Name => $name );
+    if ( my $id = $object->Id ) {
+        $cf{$name} = $id;
+        push @missing_rights, "CustomField $name: SeeCustomField" unless $object->CurrentUserHasRight('SeeCustomField');
+        push @missing_rights, "CustomField $name: SetInitialCustomField or ModifyCustomField"
+            unless $object->CurrentUserHasRight('SetInitialCustomField')
+            || $object->CurrentUserHasRight('ModifyCustomField');
+    }
+    else {
+        RT->Logger->error("Could not find custom field $name");
+        $m->abort(400);
+    }
+}
+
+if (@missing_rights) {
+    RT->Logger->error( "User " . $user_obj->Name . " lacks the following rights: " . join ', ', @missing_rights );
+    $m->abort(401);
+}
+
+
+# need to see if a ticket already exists for this incident
+my $tickets = RT::Tickets->new($user_obj);
+$tickets->LimitCustomField(
+    CUSTOMFIELD => 'PagerDuty ID',
+    OPERATOR    => '=',
+    VALUE       => $data->{event}{data}{id},
+);
+
+# if there is a ticket already we ignore the triggered event to avoid a loop between RT and PagerDuty
+# XXX - should we log an error if there is more than 1 ticket for this incident?
+my $pd_event = $data->{event}{event_type};
+if ( ( $tickets->Count > 0 ) && ( $pd_event ne 'incident.triggered' ) ) {
+    my $ticket = $tickets->First;
+    my $queue  = $config->{queues}{ $ticket->QueueObj->Name }
+        // $config->{queues}{'*'};
+
+    unless ( defined $queue ) {
+        RT->Logger->error( "PagerDuty webhook no queue config found for: "
+                . $ticket->QueueObj->Name );
+        $m->abort(400);
+    }
+
+    if ( $pd_event eq 'incident.acknowledged' ) {
+        if ( $ticket->LifecycleObj->IsInitial( $ticket->Status ) ) {
+            my ( $ret, $msg )
+                = $ticket->SetStatus( $queue->{acknowledged} // 'open' );
+            unless ($ret) {
+                RT->Logger->error(
+                    "Pagerduty webhook could not set ticket status: $msg");
+            }
+            ( $ret, $msg )
+                = $ticket->Comment( Content => 'acknowledged on PagerDuty' );
+            unless ($ret) {
+                RT->Logger->error(
+                    "Pagerduty webhook could not add comment: $msg");
+            }
+        }
+    } elsif ( $pd_event eq 'incident.resolved' ) {
+        my $resolved_status = $queue->{resolved} // 'resolved';
+        if ( $ticket->Status ne $resolved_status ) {
+            my ( $ret, $msg ) = $ticket->SetStatus($resolved_status);
+            unless ($ret) {
+                RT->Logger->error(
+                    "Pagerduty webhook could not set ticket status: $msg");
+            }
+            ( $ret, $msg )
+                = $ticket->Comment( Content => 'resolved on PagerDuty' );
+            unless ($ret) {
+                RT->Logger->error(
+                    "Pagerduty webhook could not add comment: $msg");
+            }
+        }
+    }
+}
+
+# if there is not a ticket already we only handle the triggered event
+elsif ( ( $tickets->Count == 0 ) && ( $pd_event eq 'incident.triggered' ) ) {
+    my $Ticket = RT::Ticket->new($user_obj);
+    my ( $id, $Trans, $ErrMsg ) = $Ticket->Create(
+        Type    => 'ticket',
+        Queue   => $queue,
+        Subject => 'PagerDuty Incident: '
+            . $data->{event}{data}{service}{summary} . ' - '
+            . $data->{event}{data}{title},
+        "CustomField-$cf{'PagerDuty ID'}"  => $data->{event}{data}{id}       // '',
+        "CustomField-$cf{'PagerDuty URL'}" => $data->{event}{data}{html_url} // '',
+    );
+
+    if ($id) {
+        RT::Logger->debug(
+            'PagerDuty webhook created new ticket with custom field values: '
+                . $data->{event}{data}{id} . ' - '
+                . $data->{event}{data}{html_url} );
+    } else {
+        RT::Logger->error(
+            "PagerDuty webhook failed to create new ticket: $ErrMsg");
+    }
+}
+
+</%init>
+% $m->abort;

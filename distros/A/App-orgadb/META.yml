@@ -19,7 +19,7 @@ name: App-orgadb
 provides:
   App::orgadb:
     file: lib/App/orgadb.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   ColorThemeUtil::ANSI: '0'
   Data::CSel: '0.128'
@@ -37,7 +37,7 @@ requires:
   Data::Sah::Filter::perl::Str::maybe_convert_to_re: '0'
   Log::ger: '0.038'
   Module::Load::Util: '0.004'
-  Org::Parser: '0.556'
+  Org::Parser: '0.558'
   Perinci::CmdLine::Any: '0'
   Sah::Schema::array_from_json: '0'
   Sah::Schema::filename: '0'
@@ -51,7 +51,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-orgadb
   homepage: https://metacpan.org/release/App-orgadb
   repository: git://github.com/perlancar/perl-App-orgadb.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -337,7 +337,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.780'
+              version: '0.783'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

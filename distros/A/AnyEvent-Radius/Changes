@@ -1,3 +1,9 @@
+1.1.4 2022-06-24
+
+- Extended AnyEvent::Radius::Client with bind_ip option
+- Fixed missing AnyEvent::Radius::Client destroy on fatal error in AnyEvent::Handle::UDP
+- Fixed the request id generation to avoid queue mismatches
+
 1.1.3 2020-10-19
 
 - Fixed MIN_PERL_VERSION in Makefile.PL, required by ExtUtils::MakeMaker@7.48

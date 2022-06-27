@@ -8,7 +8,7 @@ using namespace panda::unievent;
 using panda::string;
 using panda::string_view;
 
-static PERL_THREAD_LOCAL struct {
+static PERL_ITHREADS_LOCAL struct {
     Simple on_fs_start = Simple::shared("on_fs_start");
     Simple on_fs_poll  = Simple::shared("on_fs_poll");
 } cbn;

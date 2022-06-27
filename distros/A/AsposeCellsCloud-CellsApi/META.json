@@ -62,7 +62,7 @@
       },
       "AsposeCellsCloud::CellsApi" : {
          "file" : "lib/AsposeCellsCloud/CellsApi.pm",
-         "version" : "22.5"
+         "version" : "22.6"
       },
       "AsposeCellsCloud::LiteCellsApi" : {
          "file" : "lib/AsposeCellsCloud/LiteCellsApi.pm"
@@ -849,6 +849,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "22.5",
+   "version" : "22.6",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

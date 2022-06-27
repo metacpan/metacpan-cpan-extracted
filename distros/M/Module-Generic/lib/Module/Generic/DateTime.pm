@@ -15,8 +15,9 @@ BEGIN
 {
     use strict;
     use warnings;
+    use warnings::register;
     use parent qw( Module::Generic );
-    use vars qw( $ERROR $TS_RE );
+    use vars qw( $ERROR $TS_RE $VERSION );
     use DateTime 1.57;
     use DateTime::Format::Strptime 1.79;
     use DateTime::TimeZone 2.51;
@@ -24,16 +25,16 @@ BEGIN
     use Regexp::Common;
     use Scalar::Util ();
     use overload (
-        q{""}   => sub { $_[0]->{dt}->stringify },
-        bool    => sub () { 1 },
-        q{>}    => sub { &op( @_, '>' ) },
-        q{>=}   => sub { &op( @_, '>=' ) },
-        q{<}    => sub { &op( @_, '<' ) },
-        q{<=}   => sub { &op( @_, '<=' ) },
-        q{==}   => sub { &op( @_, '==' ) },
-        q{!=}   => sub { &op( @_, '!=' ) },
-        q{-}    => sub { &op_minus_plus( @_, '-' ) },
-        q{+}    => sub { &op_minus_plus( @_, '+' ) },
+        q{""}   => sub{ $_[0]->{dt}->stringify },
+        bool    => sub{1},
+        q{>}    => sub{ &op( @_, '>' ) },
+        q{>=}   => sub{ &op( @_, '>=' ) },
+        q{<}    => sub{ &op( @_, '<' ) },
+        q{<=}   => sub{ &op( @_, '<=' ) },
+        q{==}   => sub{ &op( @_, '==' ) },
+        q{!=}   => sub{ &op( @_, '!=' ) },
+        q{-}    => sub{ &op_minus_plus( @_, '-' ) },
+        q{+}    => sub{ &op_minus_plus( @_, '+' ) },
         fallback => 1,
     );
     $TS_RE = qr/
@@ -117,7 +118,7 @@ sub new
         {
             warn( "Warning: Your system is missing key timezone components. Module::Generic::DateTime is reverting to UTC instead of local time zone." );
             $opts->{time_zone} = 'UTC';
-            $today = DateTime->now( %$opts );
+            $today = DateTime->new( %$opts );
             my $dt_fmt = DateTime::Format::Strptime->new(
                 pattern => '%FT%T%z',
                 locale => 'en_GB',
@@ -132,7 +133,37 @@ sub new
     return( bless( { dt => $dt->clone } => ( ref( $this ) || $this ) )->init( @_ ) );
 }
 
+sub as_string { return( shift->stringify( @_ ) ); }
+
 sub datetime { return( shift->_set_get_object_without_init( 'dt' => 'DateTime' ) ); }
+
+sub from_epoch
+{
+    my $this = shift( @_ );
+    try
+    {
+        my $dt = DateTime->from_epoch( @_ );
+        return( $this->new( $dt ) );
+    }
+    catch( $e )
+    {
+        return( $this->error( "Error trying to create a new DateTime object using new_from_epoch(): $e" ) );
+    }
+}
+
+sub now
+{
+    my $this = shift( @_ );
+    try
+    {
+        my $dt = DateTime->now( @_ );
+        return( $this->new( $dt ) );
+    }
+    catch( $e )
+    {
+        return( $this->error( "Error trying to create a new DateTime object: $e" ) );
+    }
+}
 
 sub op
 {
@@ -256,8 +287,9 @@ sub op_minus_plus
         }
     }
     
-    my $v = "$other" unless( ref( $other ) );
-    die( "\$other ($other) is not a number, a DateTime, or a DateTime::Duration object!\n" ) if( $v !~ /^(?:$RE{num}{real}|$RE{num}{int})$/ );
+    my $v;
+    $v = "$other" if( !ref( $other ) || ( ref( $other ) && overload::Method( $other => '""' ) ) );
+    die( "\$other (", overload::StrVal( $other // '' ), ") is not a number, a DateTime, or a DateTime::Duration object!\n" ) if( !defined( $v ) || $v !~ /^(?:$RE{num}{real}|$RE{num}{int})$/ );
     try
     {
         my $new_dt;
@@ -274,7 +306,7 @@ sub op_minus_plus
                 catch( $e )
                 {
                     $clone->set_time_zone( 'UTC' );
-                    warn( "Your system is missing key timezone components. ${class} is reverting to UTC instead of local time zone.\n" );
+                    warn( "Your system is missing key timezone components. ${class} is reverting to UTC instead of local time zone.\n" ) if( warnings::enabled() );
                 }
                 my $new_ts = $v - $ts;
                 $new_dt = DateTime->from_epoch( epoch => $new_ts, time_zone => $dt1->time_zone );
@@ -380,16 +412,35 @@ sub TO_JSON
     return( $self->{dt}->stringify );
 }
 
-DESTROY
-{
-};
+# NOTE: DESTROY
+DESTROY {};
 
+# NOTE: AUTOLOAD
 AUTOLOAD
 {
     my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
     no overloading;
     my $self = shift( @_ );
     my $class = ref( $self ) || $self;
+    if( !ref( $self ) )
+    {
+        if( DateTime->can( $method ) )
+        {
+            my $rv = DateTime->$method( @_ );
+            if( Scalar::Util::blessed( $rv ) && $rv->isa( 'DateTime' ) )
+            {
+                return( $class->new( $rv ) );
+            }
+            else
+            {
+                return( $rv );
+            }
+        }
+        else
+        {
+            die( "Method ${method} unsupported by DateTime\n" );
+        }
+    }
     die( "DateTime object is gone !\n" ) if( !ref( $self->{dt} ) );
     no overloading;
     my $dt = $self->{dt};
@@ -418,6 +469,8 @@ BEGIN
     use warnings;
     use parent qw( Module::Generic );
     use overload (
+        '""'     => 'as_string',
+        'bool'   => sub{1},
         '+'      => '__add_overload',
         '-'      => '__subtract_overload',
         '*'      => '__multiply_overload',
@@ -438,11 +491,17 @@ sub new
     return( bless( { interval => $dur->clone } => ( ref( $this ) || $this ) )->init( @_ ) );
 }
 
+sub as_string
+{
+    my $self = shift( @_ );
+    return( $self->{interval}->in_units( 'seconds' ) );
+}
+
 sub dump
 {
     my $self = shift( @_ );
     my @info = $self->{interval}->in_units( qw( years months weeks days hours minutes seconds nanoseconds ) );
-    return( sprintf( <<EOT, @info ) );
+    my $tmpl = <<EOT;
 Years ... %d
 Months .. %d
 Weeks ... %d
@@ -451,6 +510,7 @@ Hours ... %d
 Minutes . %d
 Seconds . %d
 EOT
+    return( sprintf( $tmpl, @info ) );
 }
 
 sub days : lvalue { return( shift->__set_get_unit( 'days', @_ ) ); }
@@ -480,10 +540,24 @@ sub __add_overload
         $dur1 += $other;
         return( $self );
     }
-    else
+    elsif( Scalar::Util::blessed( $other ) && 
+           ( $other->isa( 'DateTime::Duration' ) || $other->isa( 'Module::Generic::DateTime::Interval' ) ) )
     {
+        $other = $other->{interval} if( $other->isa( 'Module::Generic::DateTime::Interval' ) );
         $res = $swap ? ( $other + $dur1 ) : ( $dur1 + $other );
         return( $self->_make_my_own( $res ) );
+    }
+    elsif( !ref( $other ) || overload::Method( $other => '""' ) )
+    {
+        $other = $other + 0;
+        my $d = $dur1->in_units( 'seconds' );
+        my $n = $swap ? ( $other + $d ) : ( $d + $other );
+        $res = DateTime::Duration->new( seconds => $n );
+        return( $self->_make_my_own( $res ) );
+    }
+    else
+    {
+        die( "Usupported data '", ref( $other ), "' in subtraction\n" );
     }
 }
 
@@ -492,13 +566,51 @@ sub __compare_overload
     my( $self, $other, $swap ) = @_;
     my $d1 = $self->{interval};
     my $d2 = $self->_get_other( $other );
-    my $dt = DateTime->now;
+    # my $dt = DateTime->now;
     ( $d1, $d2 ) = ( $d2, $d1 ) if( $swap );
+    my $to_secs = sub
+    {
+        my $this = shift( @_ );
+        if( Scalar::Util::blessed( $this ) )
+        {
+            if( $this->isa( 'DateTime::Duration' ) )
+            {
+                return( $this->in_units( 'seconds' ) );
+            }
+            elsif( $this->isa( 'DateTime' ) )
+            {
+                return( $this->epoch );
+            }
+            elsif( $this->isa( 'Module::Generic::DateTime' ) )
+            {
+                return( $this->{dt}->epoch );
+            }
+            elsif( $this->isa( 'Module::Generic::DateTime::Duration' ) )
+            {
+                return( $this->{duration}->in_units( 'seconds' ) );
+            }
+            elsif( overload::Method( $this => '""' ) )
+            {
+                return( $this + 0 );
+            }
+            else
+            {
+                die( "Unsupported object '", ref( $this ), "'\n" );
+            }
+        }
+        else
+        {
+            return( $this + 0 );
+        }
+    };
  
-    return( DateTime->compare(
-        $dt->clone->add_duration( $d1 ),
-        $dt->clone->add_duration( $d2 )
-    ) );
+#     return( DateTime->compare(
+#         $dt->clone->add_duration( $d1 ),
+#         $dt->clone->add_duration( $d2 )
+#     ) );
+    my $d1_secs = $to_secs->( $d1 );
+    my $d2_secs = $to_secs->( $d2 );
+    return( $d1_secs <=> $d2_secs );
 }
 
 sub __multiply_overload
@@ -628,10 +740,24 @@ sub __subtract_overload
         $dur1 -= $other;
         return( $self );
     }
-    else
+    elsif( Scalar::Util::blessed( $other ) && 
+           ( $other->isa( 'DateTime::Duration' ) || $other->isa( 'Module::Generic::DateTime::Interval' ) ) )
     {
+        $other = $other->{interval} if( $other->isa( 'Module::Generic::DateTime::Interval' ) );
         $res = $swap ? ( $other - $dur1 ) : ( $dur1 - $other );
         return( $self->_make_my_own( $res ) );
+    }
+    elsif( !ref( $other ) || overload::Method( $other => '""' ) )
+    {
+        $other = $other + 0;
+        my $d = $dur1->in_units( 'seconds' );
+        my $n = $swap ? ( $other - $d ) : ( $d - $other );
+        $res = DateTime::Duration->new( seconds => $n );
+        return( $self->_make_my_own( $res ) );
+    }
+    else
+    {
+        die( "Usupported data '", ref( $other ), "' in subtraction\n" );
     }
 }
 

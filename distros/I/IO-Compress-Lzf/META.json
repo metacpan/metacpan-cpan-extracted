@@ -35,8 +35,8 @@
       "runtime" : {
          "requires" : {
             "Compress::LZF" : "0",
-            "IO::Compress::Base" : "2.103",
-            "IO::Uncompress::Base" : "2.103"
+            "IO::Compress::Base" : "2.201",
+            "IO::Uncompress::Base" : "2.201"
          }
       }
    },
@@ -52,6 +52,6 @@
          "web" : "https://github.com/pmqs/IO-Compress-Lzf"
       }
    },
-   "version" : "2.103",
+   "version" : "2.201",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

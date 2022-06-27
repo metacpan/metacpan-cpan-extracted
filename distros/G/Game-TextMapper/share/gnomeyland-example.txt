@@ -43,10 +43,13 @@
 1101 light-green "light-green"
 1102 green "green"
 1103 dark-green "dark-green"
-1104 water "water"
+1104 blue-green "blue-green"
+1105 water "water"
 1201 light-grey "light-grey"
 1202 grey "grey"
 1203 dark-grey "dark-grey"
+1204 poisoned "poisoned"
+1205 zone "zone"
 
 # trail example and larger label example
 0106 dark-green fir-forest "Deep Forest" 30

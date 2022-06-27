@@ -1,6 +1,6 @@
 package App::optex::textconv::pdf;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 =encoding utf-8
 
@@ -10,7 +10,7 @@ textconv::pdf - optex::textconv submodule to handle PDF files
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 SYNOPSIS
 

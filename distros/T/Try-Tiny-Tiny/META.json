@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Try-Tiny-Tiny",
    "no_index" : {
@@ -29,7 +29,7 @@
       "runtime" : {
          "requires" : {
             "Try::Tiny" : "0",
-            "perl" : "5.005_04"
+            "perl" : "5.006"
          }
       },
       "test" : {}
@@ -45,10 +45,10 @@
          "web" : "https://github.com/ap/Try-Tiny-Tiny"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_copyright" : {
       "holder" : "Aristotle Pagaltzis",
       "year" : 2017
    },
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

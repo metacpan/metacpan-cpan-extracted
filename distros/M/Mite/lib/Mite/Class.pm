@@ -1,26 +1,22 @@
 package Mite::Class;
+use Mite::MyMoo;
 
-use feature ':5.10';
-use Mouse;
-use Mouse::Util::TypeConstraints;
-use Method::Signatures;
 use Path::Tiny;
-use Carp;
 use mro;
 
-class_type "Path::Tiny";
-
 has attributes =>
-  is            => 'ro',
-  isa           => 'HashRef[Mite::Attribute]',
+  is            => ro,
+  isa           => HashRef[InstanceOf['Mite::Attribute']],
   default       => sub { {} };
 
 # Super classes as class names
 has extends =>
-  is            => 'rw',
-  isa           => 'ArrayRef[Str]',
+  is            => rw,
+  isa           => ArrayRef[Str],
   default       => sub { [] },
-  trigger       => method(...) {
+  trigger       => sub {
+      my $self = shift;
+
       # Set up our @ISA so we can use mro to calculate the class hierarchy
       $self->_set_isa;
 
@@ -30,33 +26,39 @@ has extends =>
 
 # Super classes as Mite::Classes populated from $self->extends
 has parents =>
-  is            => 'ro',
-  isa           => 'ArrayRef[Mite::Class]',
+  is            => ro,
+  isa           => ArrayRef[InstanceOf['Mite::Class']],
   # Build on demand to allow the project to load all the classes first
-  lazy          => 1,
+  lazy          => true,
   builder       => '_build_parents',
   clearer       => '_clear_parents';
 
 has name =>
-  is            => 'ro',
-  isa           => 'Str',
-  required      => 1;
+  is            => ro,
+  isa           => Str,
+  required      => true;
 
 has source =>
-  is            => 'rw',
-  isa           => 'Mite::Source',
+  is            => rw,
+  isa           => InstanceOf['Mite::Source'],
   # avoid a circular dep with Mite::Source
-  weak_ref      => 1;
+  weak_ref      => true;
 
-method project() {
+sub project {
+    my $self = shift;
+
     return $self->source->project;
 }
 
-method class($name) {
+sub class {
+    my ( $self, $name ) = ( shift, @_ );
+
     return $self->project->class($name);
 }
 
-method _set_isa {
+sub _set_isa {
+    my $self = shift;
+
     my $name = $self->name;
 
     mro::set_mro($name, "c3");
@@ -66,24 +68,32 @@ method _set_isa {
     return;
 }
 
-method get_isa() {
+sub get_isa {
+    my $self = shift;
+
     my $name = $self->name;
 
     no strict 'refs';
     return @{$name.'::ISA'};
 }
 
-method linear_isa() {
+sub linear_isa {
+    my $self = shift;
+
     return @{mro::get_linear_isa($self->name)};
 }
 
-method linear_parents() {
+sub linear_parents {
+    my $self = shift;
+
     my $project = $self->project;
 
     return map { $project->class($_) } $self->linear_isa;
 }
 
-method chained_attributes(@classes) {
+sub chained_attributes {
+    my ( $self, @classes ) = ( shift, @_ );
+
     my %attributes;
     for my $class (reverse @classes) {
         for my $attribute (values %{$class->attributes}) {
@@ -94,17 +104,23 @@ method chained_attributes(@classes) {
     return \%attributes;
 }
 
-method all_attributes() {
+sub all_attributes {
+    my $self = shift;
+
     return $self->chained_attributes($self->linear_parents);
 }
 
-method parents_attributes() {
+sub parents_attributes {
+    my $self = shift;
+
     my @parents = $self->linear_parents;
     shift @parents;  # remove ourselves from the inheritance list
     return $self->chained_attributes(@parents);
 }
 
-method _build_parents {
+sub _build_parents {
+    my $self = shift;
+
     my $extends = $self->extends;
     return [] if !@$extends;
 
@@ -117,7 +133,9 @@ method _build_parents {
     return \@parents;
 }
 
-method _get_parent($parent_name) {
+sub _get_parent {
+    my ( $self, $parent_name ) = ( shift, @_ );
+
     my $project = $self->project;
 
     # See if it's already loaded
@@ -136,20 +154,25 @@ Sorry.
 ERROR
 }
 
-method add_attributes(Mite::Attribute @attributes) {
-    for my $attribute (@attributes) {
+sub add_attributes {
+    state $sig = sig_pos( Object, slurpy ArrayRef[InstanceOf['Mite::Attribute']] );
+    my ( $self, $attributes ) = &$sig;
+
+    for my $attribute (@$attributes) {
         $self->attributes->{ $attribute->name } = $attribute;
     }
 
     return;
 }
-{
-    no warnings 'once';
-    *add_attribute = \&add_attributes;
+
+sub add_attribute {
+    shift->add_attributes( @_ );
 }
 
 
-method extend_attribute(%attr_args) {
+sub extend_attribute {
+    my ($self, %attr_args) = ( shift, @_ );
+
     my $name = delete $attr_args{name};
 
     my $parent_attr = $self->parents_attributes->{$name};
@@ -163,29 +186,41 @@ ERROR
 }
 
 
-method compile() {
-    return join "\n", '{',
+sub compile {
+    my $self = shift;
+
+    my $code = join "\n", '{',
                       $self->_compile_package,
                       $self->_compile_pragmas,
                       $self->_compile_extends,
                       $self->_compile_new,
-                      $self->_compile_attributes,
+                      $self->_compile_buildall_method,
+                      $self->_compile_meta_method,
+                      $self->_compile_attribute_accessors,
                       '1;',
                       '}';
+    #::diag $code;
+    return $code;
 }
 
-method _compile_package {
+sub _compile_package {
+    my $self = shift;
+
     return "package @{[ $self->name ]};";
 }
 
-method _compile_pragmas {
+sub _compile_pragmas {
+    my $self = shift;
+
     return <<'CODE';
 use strict;
 use warnings;
 CODE
 }
 
-method _compile_extends() {
+sub _compile_extends {
+    my $self = shift;
+
     my $extends = $self->extends;
     return '' unless @$extends;
 
@@ -210,18 +245,39 @@ BEGIN {
 END
 }
 
-method _compile_bless() {
-    return 'bless \%args, $class';
+sub _compile_bless {
+    my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
+
+    return "bless {}, $classvar";
 }
 
-method _compile_new() {
-    return sprintf <<'CODE', $self->_compile_bless, $self->_compile_defaults;
+sub _compile_strict_constructor {
+    my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
+    my $check = Enum->of( keys %{ $self->all_attributes } )->inline_check( '$_' );
+
+    return sprintf 'my @unknown = grep not( %s ), keys %%{%s}; @unknown and require Carp and Carp::croak("Unexpected keys in constructor: " . join(q[, ], sort @unknown));',
+        $check, $argvar;
+}
+
+sub _compile_new {
+    my $self = shift;
+    my @vars = ('$class', '$self', '$args', '$meta');
+
+    return sprintf <<'CODE', $self->_compile_meta(@vars), $self->_compile_bless(@vars), $self->_compile_buildargs(@vars), $self->_compile_init_attributes(@vars), $self->_compile_strict_constructor(@vars), $self->_compile_buildall(@vars, '$no_build');
 sub new {
     my $class = shift;
-    my %%args  = @_;
+    my $meta  = %s;
+    my $self  = %s;
+    my $args  = %s;
+    my $no_build = delete $args->{__no_BUILD__};
 
-    my $self = %s;
+    # Initialize attributes
+    %s
 
+    # Enforce strict constructor
+    %s
+
+    # Call BUILD methods
     %s
 
     return $self;
@@ -229,51 +285,76 @@ sub new {
 CODE
 }
 
-method _compile_undef_default($attribute) {
-    return sprintf '$self->{%s} //= undef;', $attribute->name;
+sub _compile_buildargs {
+    my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
+    return sprintf '%s->{HAS_BUILDARGS} ? %s->BUILDARGS( @_ ) : { ( @_ == 1 ) ? %%{$_[0]} : @_ }',
+        $metavar, $classvar;
 }
 
-method _compile_simple_default($attribute) {
-    return $self->_compile_undef_default($attribute) if !defined $attribute->default;
-    return sprintf '$self->{%s} //= q[%s];', $attribute->name, $attribute->default;
+sub _compile_buildall {
+    my ( $self, $classvar, $selfvar, $argvar, $metavar, $nobuildvar ) = @_;
+    return sprintf '!%s and @{%s->{BUILD}||[]} and %s->BUILDALL(%s);',
+        $nobuildvar, $metavar, $selfvar, $argvar;
 }
 
-method _compile_coderef_default($attribute) {
-    my $var = $attribute->coderef_default_variable;
-
-    return sprintf 'our %s; $self->{%s} //= %s->(\$self);',
-      $var, $attribute->name, $var;
+sub _compile_buildall_method {
+    my $self;
+    return <<'CODE';
+sub BUILDALL {
+    $_->(@_) for @{ $Mite::META{ref($_[0])}{BUILD} || [] };
+}
+CODE
 }
 
-method _compile_defaults {
-    my @simple_defaults = map { $self->_compile_simple_default($_) }
-                              $self->_attributes_with_simple_defaults;
-    my @coderef_defaults = map { $self->_compile_coderef_default($_) }
-                               $self->_attributes_with_coderef_defaults;
-
-    return join "\n", @simple_defaults, @coderef_defaults;
+sub _compile_meta {
+    my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
+    return sprintf '( $Mite::META{%s} ||= %s->__META__ )',
+        $classvar, $classvar;
 }
 
-method _attributes_with_defaults() {
-    return grep { $_->has_default } values %{$self->all_attributes};
+sub _compile_meta_method {
+    return <<'CODE';
+sub __META__ {
+    no strict 'refs';
+    require mro;
+    my $class = shift;
+    my $linear_isa = mro::get_linear_isa( $class );
+    return {
+        BUILD => [
+            map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+            map { "$_\::BUILD" } reverse @$linear_isa
+        ],
+        DEMOLISH => [
+            map { ( *{$_}{CODE} ) ? ( *{$_}{CODE} ) : () }
+            map { "$_\::DEMOLISH" } reverse @$linear_isa
+        ],
+        HAS_BUILDARGS => $class->can('BUILDARGS'),
+    };
+}
+CODE
 }
 
-method _attributes_with_simple_defaults() {
-    return grep { $_->has_simple_default } values %{$self->all_attributes};
+sub _compile_init_attributes {
+    my ( $self, $classvar, $selfvar, $argvar, $metavar ) = @_;
+
+    my @code;
+    my $attributes = $self->all_attributes;
+    for my $name ( sort keys %$attributes ) {
+        push @code, $attributes->{$name}->compile_init( $selfvar, $argvar );
+    }
+
+    return join "\n    ", @code;
 }
 
-method _attributes_with_coderef_defaults() {
-    return grep { $_->has_coderef_default } values %{$self->all_attributes};
-}
+sub _compile_attribute_accessors {
+    my $self = shift;
 
-method _attributes_with_dataref_defaults() {
-    return grep { $_->has_dataref_default } values %{$self->all_attributes};
-}
+    my $attributes = $self->attributes;
+    keys %$attributes or return '';
 
-method _compile_attributes() {
-    my $code = '';
-    for my $attribute (values %{$self->all_attributes}) {
-        $code .= $attribute->compile;
+    my $code = 'my $__XS = !$ENV{MITE_PURE_PERL} && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };' . "\n\n";
+    for my $name ( sort keys %$attributes ) {
+        $code .= $attributes->{$name}->compile( xs_condition => '$__XS' );
     }
 
     return $code;

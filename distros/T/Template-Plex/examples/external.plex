@@ -14,7 +14,8 @@ Items: @$items;
 @{['other perl code']}
 
 Doing a recursive template load, and execute
-@{[ plex("header.plex", \%fields, %options)->render() ]}
+@{[ load ("header.plex", \%fields, %options)->render() ]}
+
 
 Doing an inline include subtitution
 @{[include("header.plex")]}

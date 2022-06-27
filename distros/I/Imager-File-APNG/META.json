@@ -1,0 +1,65 @@
+{
+   "abstract" : "APNG image file support for Imager",
+   "author" : [
+      "Tony Cook <tonyc@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Imager-File-APNG",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Imager" : "1.013",
+            "Imager::File::PNG" : "0",
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Imager" : "1.013",
+            "Imager::File::PNG" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Imager" : "1.013",
+            "Imager::File::PNG" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "Test::More" : "0.47"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tonycoz/imager-file-apng/issues"
+      },
+      "homepage" : "http://imager.perl.org/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/tonycoz/imager-file-apng.git",
+         "web" : "https://github.com/tonycoz/imager-file-apng"
+      }
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

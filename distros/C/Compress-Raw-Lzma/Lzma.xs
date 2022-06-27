@@ -1381,6 +1381,7 @@ _mk(want_lzma2, dict_size, lc, lp, pb, mode, nice_len, mf, depth, preset_dict)
     SV* preset_dict
     CODE:
         lzma_options_lzma* p;
+        size_t preset_len = 0;
         ZMALLOC(RETVAL, di_filter) ;
         RETVAL->filter.id = want_lzma2 ? LZMA_FILTER_LZMA2 : LZMA_FILTER_LZMA1 ;
         ZMALLOC(RETVAL->filter.options, lzma_options_lzma) ;
@@ -1389,8 +1390,7 @@ _mk(want_lzma2, dict_size, lc, lp, pb, mode, nice_len, mf, depth, preset_dict)
 
         RETVAL->dict = newSVsv( deRef(preset_dict, (char*)"preset dict") );
 
-        size_t preset_len = 0;
-        p->preset_dict = (void *)SvPVbyte_force(RETVAL->dict,preset_len);
+        p->preset_dict = (const uint8_t*)SvPVbyte_force(RETVAL->dict,preset_len);
         p->preset_dict_size = preset_len;
         if ( p->preset_dict_size == 0 ) {
           SvREFCNT_dec(RETVAL->dict);

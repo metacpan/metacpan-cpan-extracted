@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -25,7 +25,7 @@
       },
       "configure" : {
          "requires" : {
-            "XS::Framework" : "v1.5.2",
+            "XS::Framework" : "v1.5.3",
             "XS::Install" : "v1.3.5",
             "XS::libdwarf" : "20201123.0",
             "XS::libpanda" : "v1.5.8",
@@ -35,7 +35,7 @@
       },
       "runtime" : {
          "requires" : {
-            "XS::Framework" : "v1.5.2",
+            "XS::Framework" : "v1.5.3",
             "XS::Install" : "v1.3.5",
             "XS::libdwarf" : "20201123.0",
             "XS::libpanda" : "v1.5.8",
@@ -50,7 +50,7 @@
             "Test::More" : "0",
             "Test::Simple" : "0.96",
             "Test::Warnings" : "0",
-            "XS::Framework" : "v1.5.2",
+            "XS::Framework" : "v1.5.3",
             "XS::libdwarf" : "20201123.0",
             "XS::libpanda" : "v1.5.8",
             "XS::libpanda::backtrace" : "v1.0.2",
@@ -59,6 +59,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.1.1",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "v1.1.2",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

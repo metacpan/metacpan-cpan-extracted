@@ -6,13 +6,13 @@ use utf8;
 use Moo;
 no if $] >= 5.021_006, warnings => "locale";
 extends 'Org::Element';
-with 'Org::Element::Role';
-with 'Org::Element::InlineRole';
+with 'Org::ElementRole';
+with 'Org::ElementRole::Inline';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-03-27'; # DATE
+our $DATE = '2022-06-23'; # DATE
 our $DIST = 'Org-Parser'; # DIST
-our $VERSION = '0.557'; # VERSION
+our $VERSION = '0.558'; # VERSION
 
 my @attrs = (qw/datetime has_time event_duration recurrence is_active/);
 for (@attrs) {
@@ -213,7 +213,7 @@ Org::Element::Timestamp - Represent Org timestamp
 
 =head1 VERSION
 
-This document describes version 0.557 of Org::Element::Timestamp (from Perl distribution Org-Parser), released on 2022-03-27.
+This document describes version 0.558 of Org::Element::Timestamp (from Perl distribution Org-Parser), released on 2022-06-23.
 
 =head1 DESCRIPTION
 
@@ -285,7 +285,7 @@ From L<Org::Element>.
 
 =head2 as_text => str
 
-From L<Org::Element::InlineRole>.
+From L<Org::ElementRole::Inline>.
 
 =head1 HOMEPAGE
 

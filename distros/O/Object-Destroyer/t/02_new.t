@@ -5,13 +5,10 @@
 ##
 
 use strict;
-BEGIN {
-    $|  = 1;
-    $^W = 1;
-}
+use warnings;
 
-use Test::More tests => 19;
-use Object::Destroyer 2.01;
+use Test::More;
+use Object::Destroyer;
 
 my $foo = Foo->new;
 my $bar = Bar->new;
@@ -63,7 +60,7 @@ like( $@, qr/^Extra arguments to constructor at.*/ );
 ok( !eval{ Object::Destroyer->new('extra'); 1;} );
 like( $@, qr/^You should pass an object or code reference to constructor at .*/ );
 
-
+done_testing;
 
 
 

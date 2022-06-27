@@ -12,6 +12,7 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM       => 'lib/Promise/Me.pm',
     INSTALLDIRS         => ($] < 5.011 ? 'perl' : 'site'),
     PREREQ_PM           => {
+        'curry'         => 0,
         'parent'        => 0,
         'strict'        => 0,
         'vars'          => 0,
@@ -47,12 +48,12 @@ my %WriteMakefileArgs = (
         resources => {
         #    homepage    => undef,
             repository  => {
-                url         => 'git@git.deguest.jp:jack/Promise-Me.git',
-                web         => 'https://git.deguest.jp/jack/Promise-Me',
+                url         => 'git@gitlab.com:jackdeguest/Promise-Me.git',
+                web         => 'https://gitlab.com/jackdeguest/Promise-Me',
                 type        => 'git',
             },
             bugtracker => {
-                web         => 'https://git.deguest.jp/jack/Promise-Me/issues',
+                web         => 'https://gitlab.com/jackdeguest/Promise-Me/issues',
             },
         },
     }) : ()),

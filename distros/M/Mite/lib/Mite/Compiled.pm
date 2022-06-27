@@ -1,4 +1,7 @@
 package Mite::Compiled;
+use Mite::MyMoo;
+
+use Path::Tiny;
 
 =head1 NAME
 
@@ -26,55 +29,78 @@ L<Mite::Source>, L<Mite::Class>, L<Mite::Project>
 
 =cut
 
-use feature ':5.10';
-use Mouse;
-use Mite::Types;
-
 # Don't load Mite::Source else it will go circular
-use Method::Signatures;
-use Path::Tiny;
-
-use Mouse::Util::TypeConstraints;
-class_type 'Path::Tiny';
 
 has file =>
-  is            => 'ro',
-  isa           => 'Path',
-  coerce        => 1,
-  lazy          => 1,
-  default       => method {
+  is            => ro,
+  isa           => Path,
+  coerce        => true,
+  lazy          => true,
+  default       => sub {
+      my $self = shift;
       return $self->_source_file2compiled_file( $self->source->file );
   };
 
 has source =>
-  is            => 'ro',
-  isa           => 'Mite::Source',
+  is            => ro,
+  isa           => InstanceOf['Mite::Source'],
   # avoid a circular dep with Mite::Source
-  weak_ref      => 1,
-  required      => 1;
+  weak_ref      => true,
+  required      => true;
 
-method compile() {
+sub compile {
+    my $self = shift;
+
     my $code;
     for my $class (values %{$self->classes}) {
+
+        # Only supported by Type::Tiny 1.013_001 but no harm
+        # in doing this anyway.
+        local $Type::Tiny::SafePackage = sprintf 'package %s;',
+            eval { $self->source->project->config->data->{shim} }
+            // do { $class->name . '::__SAFE_NAMESPACE__' };
+
         $code .= $class->compile;
     }
+
+    my $tidied;
+    eval {
+        my $flag;
+        if ( $self->source->project->config->should_tidy ) {
+            $flag = Perl::Tidy::perltidy(
+                source      => \$code,
+                destination => \$tidied,
+                argv        => [],
+            );
+        }
+        !$flag;
+    } and length($tidied) and ( $code = $tidied );
 
     return $code;
 }
 
-method write() {
+sub write {
+    my $self = shift;
+
     return $self->file->spew_utf8($self->compile);
 }
 
-method remove() {
+sub remove {
+    my $self = shift;
+
     return $self->file->remove;
 }
 
-method classes() {
+sub classes {
+    my $self = shift;
+
     return $self->source->classes;
 }
 
-method _source_file2compiled_file(Defined $source_file) {
+sub _source_file2compiled_file {
+    state $sig = sig_pos( Object, Defined );
+    my ( $self, $source_file ) = &$sig;
+
     # Changes here must be coordinated with Mite.pm
     return $source_file . '.mite.pm';
 }

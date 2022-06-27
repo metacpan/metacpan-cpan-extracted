@@ -4,14 +4,15 @@ WriteMakefile(
 	VERSION_FROM		=> 'lib/Template/Plex.pm', 
 	PREREQ_PM		=> {
 					enum=>0,
-					"String::Util"=>0
+					"Log::ger"=>0,
+					"Log::OK"=>0
 
 				}, 
 	ABSTRACT_FROM		=> 'lib/Template/Plex.pod', # retrieve abstract from module
 	AUTHOR			=> 'Ruben Westerberg <drclaw@mac.com>',
 	LICENSE			=> 'mit',
 
-	MIN_PERL_VERSION	=> '5.24.0',		#for ref aliasing
+	MIN_PERL_VERSION	=> '5.24.0',		
 	TEST_REQUIRES		=> { "Test::More" => 0},
 	CONFIGURE_REQUIRES 	=> {"ExtUtils::MakeMaker"=>0},
 

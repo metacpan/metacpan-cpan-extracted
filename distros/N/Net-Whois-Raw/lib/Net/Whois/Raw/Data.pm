@@ -1,5 +1,5 @@
 package Net::Whois::Raw::Data;
-$Net::Whois::Raw::Data::VERSION = '2.99034';
+$Net::Whois::Raw::Data::VERSION = '2.99036';
 # ABSTRACT: Config for Net::Whois::Raw.
 
 use utf8;
@@ -127,7 +127,7 @@ our %servers = qw(
     ARPA            whois.iana.org
     ASIA            whois.nic.asia
     BIZ             whois.biz
-    CAT             whois.cat
+    CAT             whois.nic.cat
     CC              whois.nic.cc
     COM             whois.crsnic.net
     EDU             whois.educause.edu
@@ -143,7 +143,7 @@ our %servers = qw(
     NOTLD           whois.iana.org
     ORG             whois.pir.org
     PRO             whois.nic.pro
-    TEL             whois-tel.neustar.biz
+    TEL             whois.nic.tel
     TRAVEL          whois.nic.travel
 
     ACADEMY         whois.donuts.co
@@ -2167,8 +2167,8 @@ our %notfound = (
     'whois.aero'                 => '^NOT FOUND',
     'whois.nic.asia'             => '^NOT FOUND',
     'whois.biz'                  => '^No Data Found',
-    'whois-tel.neustar.biz'      => 'No Domain exists for',
-    'whois.cat'                  => 'no matching objects found',
+    'whois.nic.tel'              => '^No Data Found',
+    'whois.nic.cat'              => 'no matching objects found',
     'whois.educause.edu'         => '^No Match',
     'whois.nic.mil'              => '^No match for',
     'whois.museum'               => 'NOT FOUND',
@@ -2939,6 +2939,9 @@ our %notfound = (
     'whois.nic.krd'                        => 'No Data Found',
     'whois.nic.melbourne'                  => 'No Data Found',
     'whois.nic.saxo'                       => 'No Data Found',
+    'whois.nic.ink'                        => 'No Data Found',
+    'whois.nic.wiki'                       => 'No Data Found',
+    'whois.nic.design'                     => 'No Data Found',
 );
 
 # Common whois stripping REs
@@ -3063,56 +3066,7 @@ our %strip = (
         '^NeuStar registry database',
         '^allowed without NeuStar',
     ],
-    'whois-tel.neustar.biz' => [ # .tel
-        '^>>>> Whois database was last updated',
-        'Telnic, Ltd., the Registry Operator',
-        'for the WHOIS database through an',
-        'is provided to you for informational',
-        'persons in determining contents of a',
-        'Telnic registry database. Telnic makes',
-        '"as is" and does not guarantee its',
-        'agree that you will use this data',
-        'circumstances will you use this data',
-        'support the transmission of mass',
-        'solicitations via direct mail,',
-        'contravention of any applicable',
-        'enable high volume, automated,',
-        '\(or its systems\). Compilation,',
-        'WHOIS database in its entirety,',
-        'allowed without Telnic\'s prior',
-        'right to modify or change these',
-        'subsequent notification of any',
-        'whatsoever, you agree to abide',
-        'Contact information: Disclosure',
-        'of UK and EU Data Protection',
-        'contact ID may be available by',
-        'system. The information can also',
-        'Special Access Service. Visit',
-        '.TEL WHOIS DISCLAIMER AND TERMS',
-        'By submitting a query and/or',
-        'agree to these terms and',
-        'This whois information is',
-        'Telnic operates the Registry',
-        'is provided for information',
-        'and shall have no liability',
-        'inaccurate.',
-        'Telnic is the owner of all',
-        'that is made available via this',
-        'the information you obtain from',
-        'than to obtain information about',
-        'for registration or to obtain the',
-        'of a domain name that is already',
-        'utilise, combine or compile any',
-        'to produce a list or database',
-        'a license from Telnic to do so.',
-        'reason, you will destroy all',
-        'using this whois service.',
-        'You must not use the information',
-        'to: \(a\) allow, enable or otherwise',
-        'unsolicited commercial advertising',
-        '\(b\) harass any person; or',
-    ],
-    'whois.cat' => [
+    'whois.nic.cat' => [
         '^%',
     ],
     'ccwhois.verisign-grs.com' => [ # .CC
@@ -4531,7 +4485,7 @@ Net::Whois::Raw::Data - Config for Net::Whois::Raw.
 
 =head1 VERSION
 
-version 2.99034
+version 2.99036
 
 =head1 AUTHOR
 

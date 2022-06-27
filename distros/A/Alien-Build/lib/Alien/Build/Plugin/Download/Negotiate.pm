@@ -8,7 +8,7 @@ use Alien::Build::Util qw( _has_ssl );
 use Carp ();
 
 # ABSTRACT: Download negotiation plugin
-our $VERSION = '2.48'; # VERSION
+our $VERSION = '2.50'; # VERSION
 
 
 has '+url' => undef;
@@ -195,7 +195,7 @@ Alien::Build::Plugin::Download::Negotiate - Download negotiation plugin
 
 =head1 VERSION
 
-version 2.48
+version 2.50
 
 =head1 SYNOPSIS
 
@@ -371,7 +371,7 @@ nick nauwelaerts (INPHOBIA)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011-2020 by Graham Ollis.
+This software is copyright (c) 2011-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

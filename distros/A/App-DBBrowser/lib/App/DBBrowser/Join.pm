@@ -41,7 +41,7 @@ sub join_tables {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     #my $tables = [ sort keys %{$sf->{d}{tables_info}} ];
     my $tables = [ @{$sf->{d}{user_tables}}, @{$sf->{d}{sys_tables}} ];
-    ( $sf->{d}{col_names}, $sf->{d}{col_types} ) = $ax->column_names_and_types( $tables );
+    ( $sf->{d}{col_names}, $sf->{d}{col_types} ) = $ax->tables_column_names_and_types( $tables );
     my $join = {};
 
     MASTER: while ( 1 ) {
@@ -92,9 +92,7 @@ sub join_tables {
         $join->{stmt} .= " " . $qt_master;
         $join->{stmt} .= " AS " . $ax->quote_col_qualified( [ $master_alias ] );
         if ( $master eq $qt_master ) {
-            my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $qt_master . " AS " . $master_alias . " LIMIT 0" );
-            $sth->execute() if $sf->{i}{driver} ne 'SQLite';
-            $sf->{d}{col_names}{$master} = $sth->{NAME};
+            $sf->{d}{col_names}{$master} = $ax->column_names( $qt_master . " AS " . $master_alias );
         }
         my @bu;
 
@@ -216,9 +214,7 @@ sub __add_slave_with_join_condition {
         $join->{stmt} .= " AS " . $ax->quote_col_qualified( [ $slave_alias ] );
         push @{$join->{aliases}}, [ $slave, $slave_alias ];
         if ( $slave eq $qt_slave ) {
-            my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $qt_slave . " AS " . $slave_alias . " LIMIT 0" );
-            $sth->execute() if $sf->{i}{driver} ne 'SQLite';
-            $sf->{d}{col_names}{$slave} = $sth->{NAME};
+            $sf->{d}{col_names}{$slave} = $ax->column_names( $qt_slave . " AS " . $slave_alias );
         }
         if ( $join_type ne 'CROSS JOIN' ) {
             my $ok = $sf->__add_join_condition( $join, $tables, $slave, $slave_alias );

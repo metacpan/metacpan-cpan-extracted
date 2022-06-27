@@ -38,9 +38,9 @@ target_link_libraries(tests PUBLIC Catch2::Catch2)
 ########################ctests######################################
 #executable should be MyTest to pass test esception.cc that checks "library" name
 enable_testing()
-add_executable(runtests ${EXCLUDE_TEST} ${testSource} "tests/main.cc")
-target_link_libraries(runtests tests Catch2::Catch2WithMain)
-add_test(test-all runtests)
+add_executable(${PROJECT_NAME}-runtests ${EXCLUDE_TEST} ${testSource} "tests/main.cc")
+target_link_libraries(${PROJECT_NAME}-runtests tests Catch2::Catch2WithMain)
+add_test(${PROJECT_NAME} ${PROJECT_NAME}-runtests)
 
 ########################install#####################################
 install(DIRECTORY src/ DESTINATION include FILES_MATCHING PATTERN "*.h")

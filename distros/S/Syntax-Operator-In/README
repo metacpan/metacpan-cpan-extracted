@@ -1,0 +1,48 @@
+NAME
+
+    Syntax::Operator::In - placeholder module for infix element-of-list
+    meta-operator
+
+DESCRIPTION
+
+    This empty module is a placeholder for eventually implementing syntax
+    for a generic element-of-list meta-operator, perhaps using syntax such
+    as the following:
+
+       use Syntax::Operator::In;
+    
+       if($x in<eq> @some_strings) {
+          say "x is one of the given strings";
+       }
+
+    It is currently empty, because the underlying syntax parsing module,
+    XS::Parse::Infix, does not yet support the additional syntax required
+    to parameterize this meta-operator.
+
+    Instead, for operators that already specialize on string or numerical
+    equality, see instead Syntax::Operator::Elem.
+
+TODO
+
+      * Improve runtime performance of compiletime-constant sets of
+      strings, by detecting when the RHS contains string constants and
+      convert it into a hash lookup.
+
+      * The real in meta-operator. This first requires more extensive
+      parsing support from XS::Parse::Infix.
+
+      * Consider cross-module integration with Syntax::Keyword::Match,
+      permitting
+
+         match($val : elem) {
+            case(@arr_of_strings) { ... }
+         }
+
+      Or perhaps this would be too weird, and maybe match/case should have
+      an "any-of" list/array matching ability itself. See also
+      https://rt.cpan.org/Ticket/Display.html?id=143482.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

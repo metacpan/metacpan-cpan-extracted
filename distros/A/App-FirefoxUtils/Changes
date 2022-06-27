@@ -1,3 +1,9 @@
+0.017   2022-05-20  Released-By: PERLANCAR; Urgency: medium
+
+        - Adjust to App::BrowserUtils 0.016 (add 'signal' argument to
+          terminate).
+
+
 0.016   2021-09-27  Released-By: PERLANCAR; Urgency: medium
 
 	- Add CLI: pause-and-unpause-firefox.

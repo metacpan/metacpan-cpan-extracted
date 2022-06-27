@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use XSLoader;
 
-our $VERSION = '0.400004';
+our $VERSION = '0.400005';
 
 eval {
     require HTTP::Headers::Fast;
@@ -238,6 +238,11 @@ sub last_modified       { shift->_date_header( 'last-modified',       @_ ); }
 # added as a timestamp to a response when it has been received.
 sub client_date { shift->_date_header( 'client-date', @_ ); }
 
+sub content_is_text {
+    my $self = shift;
+    return $self->content_type =~ m{^text/};
+}
+
 sub content_is_html {
     my $self = shift;
     return $self->content_type eq 'text/html' || $self->content_is_xhtml;
@@ -272,7 +277,7 @@ HTTP::Headers::Fast.
 
 =head1 VERSION
 
-Version 0.400004
+Version 0.400005
 
 =head1 SYNOPSIS
 

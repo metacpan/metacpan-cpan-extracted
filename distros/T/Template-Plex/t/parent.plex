@@ -1,0 +1,15 @@
+@{[init {
+	inherit "grandparent.plex";
+	}
+]}
+###START OF PARENT
+@{[slot "header"]}
+
+@{[slot]}
+@{[slot "footer"]}
+
+@{[slot "sub"]}
+
+@{[slot missing=>"use this in stead"]}
+
+###END OF PARENT

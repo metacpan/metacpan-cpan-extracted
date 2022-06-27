@@ -29,12 +29,13 @@
          },
          "x_spec" : {
             "DefHash" : "v2.0.0",
-            "Rinci" : "v1.1.100"
+            "Rinci" : "v1.1.102"
          }
       },
       "runtime" : {
          "recommends" : {
             "File::HomeDir" : "0",
+            "LWP::MediaTypes" : "0",
             "Lingua::Han::PinYin" : "0",
             "Text::Unaccent::PurePerl" : "0"
          },
@@ -73,23 +74,27 @@
    "provides" : {
       "App::perlmv" : {
          "file" : "lib/App/perlmv.pm",
-         "version" : "0.605"
+         "version" : "0.606"
+      },
+      "App::perlmv::scriptlet::add_extension_according_to_mime_type" : {
+         "file" : "lib/App/perlmv/scriptlet/add_extension_according_to_mime_type.pm",
+         "version" : "0.606"
       },
       "App::perlmv::scriptlet::remove_common_prefix" : {
          "file" : "lib/App/perlmv/scriptlet/remove_common_prefix.pm",
-         "version" : "0.605"
+         "version" : "0.606"
       },
       "App::perlmv::scriptlet::remove_common_suffix" : {
          "file" : "lib/App/perlmv/scriptlet/remove_common_suffix.pm",
-         "version" : "0.605"
+         "version" : "0.606"
       },
       "App::perlmv::scriptlets::std" : {
          "file" : "lib/App/perlmv/scriptlets/std.pm",
-         "version" : "0.605"
+         "version" : "0.606"
       },
       "Complete::App::perlmv" : {
          "file" : "lib/Complete/App/perlmv.pm",
-         "version" : "0.605"
+         "version" : "0.606"
       }
    },
    "release_status" : "stable",
@@ -104,7 +109,7 @@
          "web" : "https://github.com/perlancar/perl-App-perlmv"
       }
    },
-   "version" : "0.605",
+   "version" : "0.606",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -471,7 +476,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.780"
+                        "version" : "0.783"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",

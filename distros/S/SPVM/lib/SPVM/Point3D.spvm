@@ -1,0 +1,39 @@
+class Point3D extends Point {
+  
+  has z : rw int;
+
+  static method new : Point3D () {
+    return new Point3D;
+  }
+  
+  static method new_xyz : Point3D ($x : int, $y : int, $z : int) {
+    my $self = Point3D->new;
+    
+    $self->set_x($x);
+    $self->set_y($y);
+    $self->set_z($z);
+    
+    return $self;
+  }
+
+  method clear : void () {
+    $self->SUPER::clear;
+    $self->{z} = 0;
+  }
+  
+  method to_string : string () {
+    my $x = $self->x;
+    my $y = $self->y;
+    my $z = $self->z;
+    
+    my $string = "($x,$y,$z)";
+    
+    return $string;
+  }
+  
+  method cloneable_clone : object () {
+    my $self_clone = Point3D->new_xyz($self->x, $self->y, $self->z);
+    
+    return $self_clone;
+  }
+}

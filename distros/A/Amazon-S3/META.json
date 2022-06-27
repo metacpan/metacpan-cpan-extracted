@@ -44,7 +44,8 @@
             "Test::Output" : "1.033",
             "URI" : "5.10",
             "URI::Escape" : "5.10",
-            "XML::Simple" : "2.25"
+            "XML::Simple" : "2.25",
+            "perl" : "5.01"
          }
       },
       "test" : {
@@ -57,19 +58,19 @@
    "provides" : {
       "Amazon::S3" : {
          "file" : "lib/Amazon/S3.pm",
-         "version" : "0.52"
+         "version" : "0.53"
       },
       "Amazon::S3::Bucket" : {
          "file" : "lib/Amazon/S3/Bucket.pm",
-         "version" : "0.52"
+         "version" : "0.53"
       },
       "Amazon::S3::Constants" : {
          "file" : "lib/Amazon/S3/Constants.pm",
-         "version" : "0.52"
+         "version" : "0.53"
       },
       "Amazon::S3::Logger" : {
          "file" : "lib/Amazon/S3/Logger.pm",
-         "version" : "0.52"
+         "version" : "0.53"
       }
    },
    "release_status" : "stable",
@@ -85,6 +86,6 @@
          "web" : "http://github.com/rlauer6/perl-amazon-s3"
       }
    },
-   "version" : "0.52",
+   "version" : "0.53",
    "x_serialization_backend" : "JSON::PP version 4.09"
 }

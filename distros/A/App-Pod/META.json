@@ -21,9 +21,10 @@
       },
       "runtime" : {
          "requires" : {
+            "File::HomeDir" : "1.006",
             "Module::Functions" : "v2.1.3",
             "Mojolicious" : "9.19",
-            "Pod::Query" : "0.18"
+            "Pod::Query" : "0.24"
          }
       },
       "test" : {
@@ -35,15 +36,15 @@
    "provides" : {
       "App::Pod" : {
          "file" : "lib/App/Pod.pm",
-         "version" : "0.12"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://www.perlfoundation.org/artistic_license_2_0"
+         "http://opensource.org/licenses/artistic-license-2.0.php"
       ]
    },
-   "version" : "0.12",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

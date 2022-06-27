@@ -32,32 +32,56 @@ sub read_db_config_files {
 }
 
 
-sub attributes {
+sub get_set_attributes {
     my ( $sf, $db, $db_opt ) = @_;
     my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
     my $plugin = $sf->{i}{plugin};
+    my $prepared_set_attrs = {};
     # attributes added by hand to the config file:
     # added attribues are only used if they have entries in the set_attributes method
-    my $attributes = $plui->set_attributes();
-    my $prepared_attrs = {};
-    for my $attribute ( @$attributes )  {
-        my $name = $attribute->{name};
-        my $idx = $db_opt->{$db//''}{$name} // $db_opt->{$plugin}{$name} // $attribute->{default};
-        $prepared_attrs->{$name} = $attribute->{values}[$idx];
-        if ( $prepared_attrs->{$name} =~ /^(\d+)\s/ ) { # e.g.: '5 DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK'
-            $prepared_attrs->{$name} = $1;
+    my $set_attributes = $plui->set_attributes();
+
+    for my $set_attribute ( @$set_attributes )  {
+        my $name = $set_attribute->{name};
+        my $idx = $db_opt->{$db//''}{$name} // $db_opt->{$plugin}{$name} // $set_attribute->{default};
+        $prepared_set_attrs->{$name} = $set_attribute->{values}[$idx];
+        if ( $prepared_set_attrs->{$name} =~ /^(\d+)\s/ ) { # e.g.: '5 DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK'
+            $prepared_set_attrs->{$name} = $1;
         }
     }
-    return $prepared_attrs;
-
+    return $prepared_set_attrs;
 }
 
-sub login_data {
+
+sub get_read_attributes {
     my ( $sf, $db, $db_opt ) = @_;
     my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
     my $plugin = $sf->{i}{plugin};
-    my $arg = $plui->read_arguments();
-    my $data = {};
+    my $prepared_read_attrs = {};
+    my $read_attributes = $plui->read_attributes();
+
+    for my $read_attribute ( @$read_attributes )  {
+        my $name = $read_attribute->{name};
+        if ( length $db_opt->{$db//''}{$name} ) {
+            $prepared_read_attrs->{$name} = $db_opt->{$db//''}{$name};
+        }
+        elsif ( length $db_opt->{$plugin}{$name} ) {
+            $prepared_read_attrs->{$name} = $db_opt->{$plugin}{$name};
+        }
+        elsif ( length $read_attribute->{default} ) {
+            $prepared_read_attrs->{$name} = $read_attribute->{default};
+        }
+    }
+    return $prepared_read_attrs;
+}
+
+
+sub get_login_data {
+    my ( $sf, $db, $db_opt ) = @_;
+    my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
+    my $plugin = $sf->{i}{plugin};
+    my $arg = $plui->read_login_data();
+    my $login_data = {};
 
     for my $item ( @$arg ) {
         my $name = $item->{name};
@@ -65,16 +89,21 @@ sub login_data {
         my $field_is_required = $db_opt->{$db//''}{'field_' . $name} // $db_opt->{$plugin}{'field_' . $name} // 1; # set to "required" (1) if undefined
         if ( $field_is_required ) {
             if ( exists $sf->{i}{login_error} && $sf->{i}{login_error} ) {
-                $data->{$name}{default} = undef; # if a login error occured, the user has to enter the arguments by hand
+                $login_data->{$name}{default} = undef; # if a login error occured, the user has to enter the arguments by hand
                 delete $sf->{i}{login_error};
             }
             else {
-                $data->{$name}{default} = $db_opt->{$db//''}{$name} // $db_opt->{$plugin}{$name} // undef;
+                if ( length $db_opt->{$db//''}{$name} ) {
+                    $login_data->{$name}{default} = $db_opt->{$db//''}{$name};
+                }
+                else {
+                    $login_data->{$name}{default} = $db_opt->{$plugin}{$name};
+                }
             }
-            $data->{$name}{secret}  = $secret;
+            $login_data->{$name}{secret} = $secret;
         }
     }
-    return $data;
+    return $login_data;
 }
 
 

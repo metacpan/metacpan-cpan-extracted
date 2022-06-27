@@ -28,7 +28,7 @@ DESCRIPTION
 
 BACKEND SELECTION
 
-    Backends are searched in the order of: LWP, HTTP::Tiny, Curl and Wget.
+    Backends are searched in the order of: LWP, HTTP::Tiny, curl and wget.
     HTTP::Tinyish will auto-detect if the backend also supports HTTPS, and
     use the appropriate backend based on the given URL to the request
     methods.

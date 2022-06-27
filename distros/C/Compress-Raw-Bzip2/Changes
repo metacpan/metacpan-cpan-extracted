@@ -1,13 +1,23 @@
 CHANGES
 -------
 
+  2.201 25 June 2022
+
+      * 2.201
+        Sat Jun 25 08:46:32 2022 +0100
+        92a318bb03b85e2dcb4991f4b958fbce6ce9913f
+
+      * Add perl 5.36
+        Sun Jun 5 13:45:55 2022 +0100
+        23064d78dcd14f0898aeb64ce408914dac0805a0
+
   2.103 3 April 2022
 
       * Silence uninitialized warnings
         https://github.com/pmqs/Compress-Raw-Bzip2/pull/5
         ff3d907325091287ac1525db384b99a968d763d7
         641a440ec6229c1d368b9ead48f4968b955c0115
-  
+
   2.101 20 February 2021
 
       * fix version numbers in meta files

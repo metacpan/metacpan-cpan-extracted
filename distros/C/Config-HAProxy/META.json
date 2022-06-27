@@ -46,7 +46,7 @@
    "provides" : {
       "Config::HAProxy" : {
          "file" : "lib/Config/HAProxy.pm",
-         "version" : "1.06"
+         "version" : "1.08"
       },
       "Config::HAProxy::Iterator" : {
          "file" : "lib/Config/HAProxy/Iterator.pm"
@@ -85,5 +85,5 @@
          "web" : "http://git.gnu.org.ua/cgit/config-haproxy.git/"
       }
    },
-   "version" : "1.06"
+   "version" : "1.08"
 }

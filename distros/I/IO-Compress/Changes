@@ -1,6 +1,55 @@
 CHANGES
 -------
 
+  2.201 25 June 2022
+
+      * Disable zib header tests
+        Sat Jun 25 09:10:59 2022 +0100
+        63eb5d37291b40dbf07d191a09b7876168008cd4
+
+      * Version 2.201
+        Sat Jun 25 09:00:42 2022 +0100
+        af51310f68bb225d94eaa29b7f3d2bece1935dfd
+
+      * doc update https://github.com/pmqs/IO-Compress/issues/38
+        Thu Jun 23 23:00:31 2022 +0100
+        2002d4fd3b3a6f5de6c6c3dc5989cf42581c1758
+
+      * Changes for zlib-ng
+        Thu Jun 23 22:43:50 2022 +0100
+        2bd52d2918823cc567c3e92dd3d15f87cb4ee8f8
+
+      * Add perl 5.36
+        Sun Jun 5 13:34:18 2022 +0100
+        ede55370ed4c7eb3c66abc71bc25c7e4019b4c44
+
+      * force streaming zip file when writing to stdout https://github.com/pmqs/IO-Compress/issues/42
+        Sun Apr 24 19:43:19 2022 +0100
+        b57a3f83f404f5a24242680de5b406cfcf5c03ac
+
+      * read zip timestamp in localtime
+        Sun Apr 24 13:11:58 2022 +0100
+        0c838f43dc46f292714c82145c9add9932196b01
+
+      * streamzip: tighten up version tests for failing windows tests https://github.com/pmqs/IO-Compress/issues/41
+        Sun Apr 24 12:49:57 2022 +0100
+        3497645228235ea12c4d559d6dedd4cef47fc94a
+
+      * streamzip: update year
+        Sun Apr 24 12:11:35 2022 +0100
+        0ac0d1ef603d8854ffc35976196735b663764992
+
+      * Use Time::Local instead of  POSIX::mktime
+        Tue Apr 19 11:31:43 2022 +0100
+        64a106f1119cbc7dec8db52dca016bb8baacf2d4
+
+  2.106 12 April 2022
+
+      * bin/zipdetails
+        sync 2.104 from https://github.com/pmqs/zipdetails
+        Tue Apr 12 15:39:59 2022 +0100
+        3fe7b8788ab816bebddfdfbb1462d3f439c6b2f1
+
   2.105 9 April 2022
 
       * remove WeakDecrypt

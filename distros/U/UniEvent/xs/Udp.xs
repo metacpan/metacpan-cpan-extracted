@@ -11,7 +11,7 @@ using panda::string;
 using panda::string_view;
 using panda::net::SockAddr;
 
-static PERL_THREAD_LOCAL struct {
+static PERL_ITHREADS_LOCAL struct {
     Simple on_receive = Simple::shared("on_receive");
     Simple on_send    = Simple::shared("on_send");
 } cbn;

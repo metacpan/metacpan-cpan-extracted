@@ -1,5 +1,10 @@
 #include "lib/test.h"
+#include "panda/log/log.h"
+#include "panda/unievent/forward.h"
+#include "panda/unievent/log.h"
+#include "uv.h"
 #include <catch2/generators/catch_generators.hpp>
+
 
 TEST_PREFIX("regression: ", "[regression]");
 
@@ -86,3 +91,56 @@ TEST("MEIACORE-751 callback recursion") {
     test.loop->run();
     REQUIRE(counter == 5);
 }
+
+
+#ifndef _WIN32
+
+#include <unistd.h>
+#include <csignal>
+
+TEST("MEIACORE-1839 signal remove") {
+    LoopSP main_loop = new Loop();
+    SignalSP s = new Signal(main_loop);
+
+    LoopSP loop = new Loop();
+    SignalSP child_sig = new Signal(loop);
+    child_sig->start(SIGHUP, [&](auto, int) {
+        panda_log_debug(unievent::panda_log_module, "child caught");
+    });
+
+    pid_t child_pid;
+    TimerSP timer;
+
+    auto timeout = [&](auto) {
+        if (child_pid) {
+            kill(child_pid, SIGKILL);
+        }
+        FAIL("timeout");
+    };
+
+    s->start(SIGHUP, [&](auto, int) {
+        child_pid = fork();
+        if (child_pid) {
+            timer = Timer::create_once(5000, timeout, main_loop);
+            s = new Signal(main_loop);
+            s->start(SIGCHLD, [&](auto, int) {
+                s.reset();
+                timer.reset();
+            });
+        } else {
+            s.reset();
+        }
+        child_sig.reset();
+        loop->run();
+    });
+
+    auto pid = ::getpid();
+    kill(pid, SIGHUP);
+    main_loop->run();
+
+    if (!child_pid) { // child
+        exit(0); // to prevent any test output from child process
+    }
+}
+
+#endif

@@ -16,6 +16,7 @@ The name of the Docker container is `mod-z3950`.
 Dependencies are defined in the [module descriptor](ModuleDescriptor.json) but since the FOLIO Z39.50 server is strictly a client to the rest of FOLIO it does not need to be installed as a part of FOLIO itself, and can run outside of a FOLIO installation provided it is pointing to an Okapi server with the following modules enabled:
 
 * [`mod-graphql`](https://github.com/folio-org/mod-graphql)
+* [`mod-search`](https://github.com/folio-org/mod-search)
 * [`mod-inventory`](https://github.com/folio-org/mod-inventory)
 * [`mod-inventory-storage`](https://github.com/folio-org/mod-inventory-storage)
 * [`mod-source-record-storage`](https://github.com/folio-org/mod-source-record-storage)
@@ -66,6 +67,14 @@ Whichever approach to running the server you prefer, the [default configuration 
 Thanks to the magic of the protocol-polyglot [YAZ GFS](https://software.indexdata.com/yaz/doc/server.html), the FOLIO Z39.50 server also serves the SRU (REST-like) and SRW (SOAP-based) protocols. For example, if running the server on your local host, you can use the following to obtain an XML-formatted OPAC record containing both bibliographic metadata in MARCXML format and holdings-and-item information such as might be used by an OPAC. Replace placeholder <dbname> with the real database name (or tenant id).
 
     http://localhost:9997/<dbname>?version=1.1&operation=searchRetrieve&query=title=a&maximumRecords=1&recordSchema=opac
+
+## Troubleshooting
+
+If when you perform a search your Z39.50 client reports
+
+> Cannot query field "search_instances" on type "Query".
+
+The problem is that the back-end FOLIO service you are searching in does not have `mod-search` (ElasticSearch-based searching in inventory), which was first released in FOLIO R1-2021 (Iris). In this case, you should configure the Z39.50 server to use the older approach of searching directly in `mod-inventory-storage`. You can most easily do this by changing the `graphqlQuery` entry in [`etc/config.json`](etc/config.json) from "mod-search.graphql-query" to "instances.graphql-query". Note, however, that as of FOLIO R2-2022 (Morning Glory), searching directly in inventory will no longer work for full-text searches such as author and title, only for exact-value searches such as HRID and ISBN.
 
 ## Additional information
 

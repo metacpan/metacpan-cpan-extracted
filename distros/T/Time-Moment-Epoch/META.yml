@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,6 +16,7 @@ meta-spec:
 name: Time-Moment-Epoch
 requires:
   Data::Printer: '0'
+  Encode::Base32::GMP: '0'
   Exporter: '0'
   Getopt::Long: '0'
   Hash::MostUtils: '0'
@@ -31,8 +32,14 @@ requires:
   perl: v5.24.0
   strict: '0'
   warnings: '0'
-version: '1.003002'
+resources:
+  repository: http://github.com/oylenshpeegul/Time-Moment-Epoch
+version: '1.004001'
 x_contributors:
+  - 'Alexandr Ciornii <alexchorny@gmail.com>'
   - 'Mary Ehlers <regina.verb.ae@gmail.com>'
+  - 'Tim Heaney <oylenshpeegul@proton.me>'
   - 'iopuckoi <iopuckoi@gmail.com>'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -5,13 +5,10 @@
 ##
 
 use strict;
-BEGIN {
-    $|  = 1;
-    $^W = 1;
-}
+use warnings;
 
-use Test::More tests => 8;
-use Object::Destroyer 2.01;
+use Test::More;
+use Object::Destroyer;
 
 
 SCOPE: {
@@ -38,7 +35,7 @@ SCOPE: {
 }
 is($Foo::destroy_counter, 0, 'Foo must not ve destroyed');
 
-
+done_testing;
 
 
 
@@ -62,7 +59,7 @@ sub self_test{
     return $self==$self->{self};
 }
 
-sub DESTROY { 
+sub DESTROY {
     $destroy_counter++;
 }
 

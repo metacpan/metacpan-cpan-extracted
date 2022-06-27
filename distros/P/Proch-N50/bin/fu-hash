@@ -1,0 +1,173 @@
+#!/usr/bin/env perl
+# ABSTRACT: Print sequence hashes
+# PODNAME: fu-hash
+
+use 5.012;
+use Getopt::Long;
+use Pod::Usage;
+use File::Basename;
+use Digest::MD5 qw( md5_hex );
+use FindBin qw($RealBin);
+use FASTX::Reader;
+use Proch::Seqfu;
+
+my $PROGRAM = basename($0);
+my $VERSION = $Proch::Seqfu::VERSION;
+my ($opt_rename_prefix, $opt_fast,$opt_rename_with_hash, $opt_help, $opt_verbose, $opt_version);
+my $opt_upper = 1;
+my $opt_size_as_comment;
+my $opt_nosize;
+my $opt_line_size = $Proch::Seqfu::fu_linesize;
+
+if (!GetOptions(
+    'h|hash'        => \$opt_rename_with_hash,
+    'f|fast'        => \$opt_fast,
+    'p|prefix=s'    => \$opt_rename_prefix,
+    'w|width=i'     => \$opt_line_size,
+    'c|size-as-comment' => \$opt_size_as_comment,
+    'n|no-size'     => \$opt_nosize,
+    'version'       => \$opt_version,
+    'verbose'       => \$opt_verbose,
+    'help'          => \$opt_help,
+)) { 
+        say STDERR "Wrong parameters: type $PROGRAM --help for full documentation."; 
+        exit 1  ;
+}
+
+
+$Proch::Seqfu::fu_linesize  = $opt_line_size;
+$Proch::Seqfu::fu_verbose   = $opt_verbose;
+
+# Check consistency of parameters
+if ($opt_rename_prefix and $opt_rename_with_hash) {
+    die " ERROR: Please specify either --hash or --prefix to rename sequences with MD5 or a string\n";
+}
+if ($opt_fast and ($opt_size_as_comment)) {
+    say STDERR "WARNING: Size will not be printed in fast mode.";
+}
+
+# Print version
+if ($opt_version) {
+    version();
+}
+
+# Print man (help)
+pod2usage({-exitval => 0, -verbose => 2}) if $opt_help;
+# Read from STDIN
+if (not defined $ARGV[0]) {
+    # Read from STDIN but also print a help message
+    usage();
+    push(@ARGV, '-');
+} 
+
+
+my %seqs = ();
+my %printed_seqs = ();
+
+
+# Process all the files
+for my $filename (@ARGV) {
+    $filename = '{{STDIN}}' if ($filename eq '-');
+    my $reader = FASTX::Reader->new({ filename => "$filename"});
+    while (my $s = $reader->getRead() ) {
+        if ($opt_upper) {
+            $s->{seq} = uc($s->{seq});
+        }
+        my $name = $s->{name};
+        my $hash = md5_hex(uc($s->{seq}));
+
+        if (not defined $opt_fast) {
+            $seqs{$hash}=$s->{seq} unless defined $seqs{$hash};
+            $printed_seqs{$hash}++;
+        } else {
+
+            $printed_seqs{ $hash }++;
+            
+            next if ($printed_seqs{ $hash} > 1);
+
+            # Print seq
+            fu_printfasta($name, undef, $s->{seq});
+
+        }
+        
+
+        
+    }
+}
+
+if (not defined $opt_fast) {
+    for my $hash (sort {$a <=> $b} keys %printed_seqs) {
+        my $count = 0+$printed_seqs{$hash};
+        if ($opt_nosize) {
+            fu_printfasta("$hash", undef, $seqs{$hash});
+        } elsif ($opt_size_as_comment) {
+            fu_printfasta("$hash", "size=$count", $seqs{$hash});
+        } else {
+            fu_printfasta("$hash;size=$count", undef, $seqs{$hash});
+        }
+        
+    }
+}
+
+
+
+sub usage {
+    my $horizontal_bar = " " . '-' x 50;
+    say STDERR " $PROGRAM $VERSION";
+    say STDERR " A program to concatenate sequence files";
+
+    say STDERR $horizontal_bar;
+    say STDERR " Type \`$PROGRAM --help\` to display the full manual";
+    say STDERR " Waiting for sequences from STDIN. Press Ctrl-C to exit."
+}
+
+sub version {
+    say STDOUT "$PROGRAM $VERSION";
+    exit;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+fu-hash - Print sequence hashes
+
+=head1 VERSION
+
+version 1.4.10
+
+=head1 SYNOPSIS
+
+  fu-hash [options] [FILE1 FILE2 FILE3...]
+
+=head1 NAME
+
+fu-hash - hash sequences (dereplicate and rename)
+
+=head1 OUTPUT
+
+A multifasta file with MD5 hash and size of each
+sequence like
+
+  >6310f1f8992a4d08dc4e601e66e28286;size=2
+  ACAGCGTACGTGATCGACGTAGCTAGCTGACGAGCTAGCTACACACGATCGTAGCTGGTAGTCAGTCGAT
+  CGACGTAGCTAGCAACAGCGTACGTGATCGACGTAGCTAGCTGACGAGCTAGCTACACACGATCGTAGCTGG
+  TAGTCAGTCGATCGACGTAGCTAGCA
+
+=head1 AUTHOR
+
+Andrea Telatin <andrea@telatin.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018-2022 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

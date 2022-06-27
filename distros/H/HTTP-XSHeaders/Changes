@@ -1,3 +1,7 @@
+0.400005    2022-06-23
+            * RT #131685: Indicate dependency on HTTP::Date.
+            * GH #11, RT #142201: Add content_is_text() method.
+
 0.400004    2018-10-01
             * RT #127249: Remove dependency of dot in @INC.
 

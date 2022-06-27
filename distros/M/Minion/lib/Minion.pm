@@ -21,7 +21,7 @@ has missing_after                  => 1800;
 has [qw(remove_after stuck_after)] => 172800;
 has tasks                          => sub { {} };
 
-our $VERSION = '10.24';
+our $VERSION = '10.25';
 
 sub add_task {
   my ($self, $name, $task) = @_;
@@ -937,6 +937,12 @@ Number of workers that are currently not processing a job.
   uptime => 1000
 
 Uptime in seconds.
+
+=item workers
+
+  workers => 200;
+
+Number of registered workers.
 
 =back
 

@@ -43,7 +43,7 @@ tests "sim_project" => sub {
 
 tests "sim_attribute" => sub {
     my $attr = sim_attribute;
-    ok $attr->name;
+    ok $attr->name, "->name";
 };
 
 done_testing;

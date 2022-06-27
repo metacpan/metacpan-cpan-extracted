@@ -4,6 +4,7 @@ author:
   - 'Nigel Horne <njh@bandsman.co.uk>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Path: '2.15'
   File::Spec: '0'
   Test::Carp: '0'
   Test::CleanNamespaces: '0'
@@ -14,11 +15,10 @@ build_requires:
   Test::TempDir::Tiny: '0'
   Test::Warn: '0'
   autodie: '0'
-  warnings::unused: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,11 +30,10 @@ no_index:
     - inc
 requires:
   Carp: '0'
-  Tie::Handle: '0'
   namespace::autoclean: '0'
   perl: '5.006002'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=File-Print-Many
   repository: git://github.com/nigelhorne/File-Print-Many.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

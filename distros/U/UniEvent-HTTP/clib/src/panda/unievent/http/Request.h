@@ -13,6 +13,7 @@ namespace panda { namespace unievent { namespace http {
 struct Client;          using ClientSP  = iptr<Client>;
 struct Request;         using RequestSP = iptr<Request>;
 struct RedirectContext; using RedirectContextSP = iptr<RedirectContext>;
+struct Pool;
 
 using panda::unievent::AddrInfoHints;
 
@@ -33,7 +34,7 @@ struct NetLoc {
 };
 std::ostream& operator<< (std::ostream& os, const NetLoc& h);
 
-struct Request : protocol::http::Request {
+struct Request : protocol::http::Request, private ITimerListener {
     struct Builder;
     using response_fptr = void(const RequestSP&, const ResponseSP&, const ErrorCode&);
     using partial_fptr  = void(const RequestSP&, const ResponseSP&, const ErrorCode&);
@@ -80,7 +81,8 @@ private:
 
     uint16_t _redirection_counter = 0;
     bool     _transfer_completed  = false;
-    ClientSP _client; // holds client when active
+    ClientSP _client;         // holds client when active, set if request is active and maintained by client
+    Pool*    _pool = nullptr; // this backref only needed for method cancel() to work when queued (no active client)
     TimerSP  _timer;
 
     NetLoc netloc () const {
@@ -94,6 +96,23 @@ private:
         if (!uri) throw HttpError("request must have uri");
         if (!uri->host()) throw HttpError("uri must have host");
     }
+    
+    void ensure_timer_active(const LoopSP& loop) {
+        if (!timeout) return;
+        if (!_timer) _timer = new Timer(loop);
+        if (!_timer->active()) _timer->once(timeout); // if active it may be redirected request
+        _timer->event_listener(this);
+    }
+    
+    void on_timer(const TimerSP&) override;
+    
+    void cleanup_after_redirect() {
+        _client = nullptr;
+        _transfer_completed = false;
+        if (_timer) _timer->event_listener(nullptr);
+    }
+    
+    void finish_and_notify(ResponseSP, const ErrorCode&);
 };
 
 struct Request::Builder : protocol::http::Request::BuilderImpl<Builder, RequestSP> {

@@ -1,6 +1,7 @@
 class TestCase::Time::Local {
   use Time;
   use Time::Info;
+  use Time::Local;
   
   static method time_info : int () {
     my $time_info = Time::Info->new;
@@ -36,7 +37,7 @@ class TestCase::Time::Local {
       
       my $time_info = Time->localtime($time);
       
-      my $time_ret = Time->timelocal($time_info);
+      my $time_ret = Time::Local->timelocal($time_info);
       
       unless ($time_ret isa long) {
         return 0;
@@ -55,7 +56,7 @@ class TestCase::Time::Local {
       
       my $time_info = Time->gmtime($time);
       
-      my $time_ret = Time->timegm($time_info);
+      my $time_ret = Time::Local->timegm($time_info);
 
       unless ($time_ret isa long) {
         return 0;

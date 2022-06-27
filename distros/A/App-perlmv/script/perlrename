@@ -6,9 +6,9 @@ use App::perlmv;
 use Getopt::Long::Complete; # just so we can detect script as using Getopt::Long::Complete
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-25'; # DATE
+our $DATE = '2022-06-24'; # DATE
 our $DIST = 'App-perlmv'; # DIST
-our $VERSION = '0.605'; # VERSION
+our $VERSION = '0.606'; # VERSION
 
 my $pmv = App::perlmv->new;
 $pmv->{ 'mode' } = 'rename';
@@ -30,7 +30,7 @@ perlrename - Rename files using Perl code
 
 =head1 VERSION
 
-This document describes version 0.605 of perlrename (from Perl distribution App-perlmv), released on 2022-02-25.
+This document describes version 0.606 of perlrename (from Perl distribution App-perlmv), released on 2022-06-24.
 
 =head1 DESCRIPTION
 

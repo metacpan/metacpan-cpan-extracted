@@ -31,6 +31,7 @@ etc/config.indexdata.json
 etc/config.invalidisbn.json
 etc/config.json
 etc/config.lehigh.json
+etc/config.local.json
 etc/config.localgql.json
 etc/config.marcHoldings.json
 etc/config.snapshot.json
@@ -39,6 +40,7 @@ etc/config.unsuppressed-items.json
 etc/folio2marcxml.xsl
 etc/folio2opac.xsl
 etc/instances.graphql-query
+etc/mod-search.graphql-query
 etc/yazgfs.xml
 lib/Net/Z3950/FOLIO.pm
 lib/Net/Z3950/FOLIO/Config.pm

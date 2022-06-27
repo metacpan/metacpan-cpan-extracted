@@ -49,6 +49,13 @@ sub search_and_replace {
                 push @tmp_info, '  s/' . join( '/', @$sr_single ) . ';';
             }
         }
+        #for my $i ( 0 .. $#$all_sr_groups ) {
+        #    push @tmp_info, '  ' . $used_names->[$i];
+        #    my $sr_group = $all_sr_groups->[$i];
+        #    for my $sr_single ( @$sr_group ) {
+        #        push @tmp_info, '    s/' . join( '/', @$sr_single ) . ';';
+        #    }
+        #}
         push @tmp_info, '';
         my @pre = ( $hidden, undef, $sf->{i}{_confirm}, $add );
         my $available = [];

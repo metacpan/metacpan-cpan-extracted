@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.11
+    version 0.12
 
 SYNOPSIS
 
@@ -99,8 +99,14 @@ DESCRIPTION
     common C data types. Arrays, struct, union and nested types based on
     those are supported.
 
+    Core FFI::Platypus also provides FFI::Platypus::Record for manipulating
+    and passing structured data. Typically you want to use FFI::C instead,
+    the main exception is when you need to pass structured data by value
+    instead of by reference.
+
     To work with C APIs that work with C file pointers you can use
-    FFI::C::File and FFI::C::PosixFile.
+    FFI::C::File and FFI::C::PosixFile. For C APIs that expose the POSIX
+    stat structure use FFI::C::Stat.
 
 METHODS
 
@@ -274,7 +280,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2020,2021 by Graham Ollis.
+    This software is copyright (c) 2020-2022 by Graham Ollis.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -61,8 +61,9 @@ sub parse_with_Text_CSV {
     my $csv = Text::CSV->new( $options ) or die Text::CSV->error_diag();
     $csv->callbacks( error => sub {
         my ( $code, $str, $pos, $rec, $fld ) = @_;
-        if ( $code == 2012 ) { # ignore this error
-            Text::CSV->SetDiag (0);
+        if ( $code == 2012 ) {
+            # no warnings for end of data.
+            # 2012 "EOF - End of data in parsing input stream"
         }
         else {
             my $error_input = $csv->error_input() // 'No Error Input defined.';

@@ -24,6 +24,6 @@ requires:
 resources:
   bugtracker: https://github.com/Perl/perl5/issues
   homepage: http://dev.perl.org/
-  repository: git://github.com/Perl/perl5.git
-version: '5.20220527'
+  repository: https://github.com/Perl/perl5.git
+version: '5.20220620'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

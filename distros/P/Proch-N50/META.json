@@ -24,6 +24,7 @@
             "FASTX::Reader" : "v1.3.0",
             "Getopt::Long" : "2.39",
             "JSON::PP" : "2.27",
+            "PerlIO::encoding" : "0",
             "Pod::Usage" : "1.61",
             "Text::ASCIITable" : "0",
             "perl" : "5.012"
@@ -31,6 +32,7 @@
       },
       "test" : {
          "recommends" : {
+            "Pod::Markdown" : "3.300",
             "Text::ASCIITable" : "0.2"
          }
       }
@@ -38,7 +40,11 @@
    "provides" : {
       "Proch::N50" : {
          "file" : "lib/Proch/N50.pm",
-         "version" : "v1.4.4"
+         "version" : "v1.4.10"
+      },
+      "Proch::Seqfu" : {
+         "file" : "lib/Proch/Seqfu.pm",
+         "version" : "v1.4.10"
       }
    },
    "release_status" : "stable",
@@ -48,7 +54,7 @@
          "url" : "https://github.com/telatin/proch-n50.git"
       }
    },
-   "version" : "1.4.4",
+   "version" : "1.4.10",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

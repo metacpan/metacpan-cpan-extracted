@@ -1,3 +1,15 @@
+0.007   2022-05-20  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add -a as shortcut for --sort=asciibetically.
+
+        - [doc] Forgot to document --sort-sub, --sort-arg, and -a.
+
+
+0.006   2022-05-20  Released-By: PERLANCAR; Urgency: medium
+
+        - Add options: --sort-sub, --sort-arg.
+
+
 0.005   2022-02-11  Released-By: PERLANCAR; Urgency: high
 
         - Merge releases 0.004 and 0.004.2.
@@ -9,7 +21,7 @@
 
         - [doc] Mention csv-freqtable.
 
-        - UPDATE: rename release from 0.004 to 0.004.2 due to conflict.
+        - UPDATE: Rename release from 0.004 to 0.004.2 due to conflict.
 
 
 0.004   2020-10-19  Released-By: PERLANCAR; Urgency: medium

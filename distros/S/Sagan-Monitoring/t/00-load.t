@@ -7,7 +7,7 @@ use Test::More;
 plan tests => 1;
 
 BEGIN {
-    use_ok( 'Suricata::Monitoring' ) || print "Bail out!\n";
+    use_ok( 'Sagan::Monitoring' ) || print "Bail out!\n";
 }
 
-diag( "Testing Suricata::Monitoring $Suricata::Monitoring::VERSION, Perl $], $^X" );
+diag( "Testing Sagan::Monitoring $Sagan::Monitoring::VERSION, Perl $], $^X" );

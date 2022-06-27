@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.296';
+our $VERSION = '2.299';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -100,7 +100,7 @@ sub __options {
         my $help;
         GetOptions (
             'h|?|help' => \$help,
-            's|search' => \$sf->{i}{sqlite_search},
+            's|search' => \$sf->{i}{search},
         );
         if ( $help ) {
             if ( $sf->{o}{table}{mouse} ) {
@@ -206,7 +206,7 @@ sub run {
             else {
                 @databases = ( @$user_dbs, $sf->{o}{G}{metadata} ? @$sys_dbs : () );
             }
-            $sf->{i}{sqlite_search} = 0 if $sf->{i}{sqlite_search};
+            $sf->{i}{search} = 0 if $sf->{i}{search};
             1 }
         ) {
             $ax->print_error_message( $@ );
@@ -523,9 +523,7 @@ sub run {
                             $sf->{d}{table} = $table;
                             my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
                             $qt_table = $ax->quote_table( $sf->{d}{tables_info}{$table} );
-                            my $sth = $dbh->prepare( "SELECT * FROM " . $qt_table . " LIMIT 0" );
-                            $sth->execute() if $driver ne 'SQLite';
-                            $sf->{d}{cols} = [ @{$sth->{NAME}} ];
+                            $sf->{d}{cols} = $ax->column_names( $qt_table );
                             $qt_columns = $ax->quote_simple_many( $sf->{d}{cols} );
                             1 }
                         ) {
@@ -567,9 +565,8 @@ sub __derived_table {
     my $alias = $ax->alias( $tmp, 'derived_table', $qt_table, 'From_SQ' );
     $qt_table .= " AS " . $ax->quote_col_qualified( [ $alias ] );
     $tmp->{table} = $qt_table;
-    my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $qt_table . " LIMIT 0" );
-    $sth->execute() if $sf->{i}{driver} ne 'SQLite';
-    my $qt_columns = $ax->quote_simple_many( $sth->{NAME} );
+    my $columns = $ax->column_names( $qt_table );
+    my $qt_columns = $ax->quote_simple_many( $columns );
     return $qt_table, $qt_columns;
 }
 
@@ -594,7 +591,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.296
+Version 2.299
 
 =head1 DESCRIPTION
 

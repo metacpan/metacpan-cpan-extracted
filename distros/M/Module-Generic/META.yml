@@ -18,7 +18,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -39,6 +39,7 @@ requires:
   DateTime::Format::Strptime: '1.79'
   DateTime::TimeZone: '2.51'
   Devel::StackTrace: '0'
+  Encode: '0'
   Exporter: '5.70'
   Fcntl: '0'
   File::Basename: '2.85'
@@ -77,5 +78,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/Module-Generic/issues
   repository: https://gitlab.com/jackdeguest/Module-Generic
-version: v0.23.1
+version: v0.24.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

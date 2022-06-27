@@ -35,13 +35,13 @@ sub env_variables {
 }
 
 
-sub read_arguments {
+sub read_login_data {
     my ( $sf ) = @_;
     return [
-        { name => 'host', prompt => "Host",     secret => 0 },
-        { name => 'port', prompt => "Port",     secret => 0 },
-        { name => 'user', prompt => "User",     secret => 0 },
-        { name => 'pass', prompt => "Password", secret => 1 },
+        { name => 'host', secret => 0 },
+        { name => 'port', secret => 0 },
+        { name => 'user', secret => 0 },
+        { name => 'pass', secret => 1 },
     ];
 }
 
@@ -56,11 +56,12 @@ sub set_attributes {
 
 sub get_db_handle {
     my ( $sf, $db ) = @_;
-    my $db_opt_get = App::DBBrowser::Opt::DBGet->new( $sf->{i}, $sf->{o} );
-    my $db_opt = $db_opt_get->read_db_config_files();
-    my $login_data  = $db_opt_get->login_data( $db, $db_opt );
-    my $env_var_yes = $db_opt_get->enabled_env_vars( $db, $db_opt );
-    my $attributes  = $db_opt_get->attributes( $db, $db_opt );
+    my $db_opt_get     = App::DBBrowser::Opt::DBGet->new( $sf->{i}, $sf->{o} );
+    my $db_opt         = $db_opt_get->read_db_config_files();
+    my $login_data     = $db_opt_get->get_login_data( $db, $db_opt );
+    my $env_var_yes    = $db_opt_get->enabled_env_vars( $db, $db_opt );
+    my $set_attributes = $db_opt_get->get_set_attributes( $db, $db_opt );
+
     my $cred = App::DBBrowser::Credentials->new( $sf->{i}, $sf->{o} );
     my $settings = { login_data => $login_data, env_var_yes => $env_var_yes };
     my $dsn;
@@ -86,7 +87,7 @@ sub get_db_handle {
         RaiseError => 1,
         AutoCommit => 1,
         ShowErrorStatement => 1,
-        %$attributes,
+        %$set_attributes,
     } ) or die DBI->errstr;
     return $dbh;
 }

@@ -3,7 +3,7 @@ package Module::ScanDeps::Static;
 use strict;
 use warnings;
 
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 
 use 5.010;
 
@@ -544,7 +544,7 @@ sub format_json {
 
   my %requires = %{ $self->get_require };
 
-  if ( exists $perlreq{'perl'} && $self->get_core ) {
+  if ( exists $perlreq{'perl'} ) {
     my $perl_version = $perlreq{'perl'};
 
     if ( !$perl_version && $self->get_add_version ) {
@@ -951,7 +951,7 @@ dafault: B<true>
 
 Boolean value that indicates output should be in raw format (module version).
 
-default: B<falue>
+default: B<false>
 
 =back
 

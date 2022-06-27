@@ -1,4 +1,11 @@
 Revision history for Sagan-Monitoring
 
+1.0.1	2022-06-26/16:45
+		-Fix a few instances of where it said Suricata instead of Sagan
+
+1.0.0	2022-06-25/16:50
+		-Drop the _delta since it is always delta.
+
+
 0.0.1	2022-05-11/13:00
 		-Initial release.

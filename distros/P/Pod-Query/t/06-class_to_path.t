@@ -35,7 +35,7 @@ my @cases = (
 
 for my $case ( @cases ) {
     my ( $class, $expect ) = @$case{qw/ pod_class expect /};
-    my $got = Pod::Query::_class_to_path( $class ) // "";
+    my $got = Pod::Query->_class_to_path( $class ) // "";
 
     like( $got, $expect, "Correct class for $class" );
 }

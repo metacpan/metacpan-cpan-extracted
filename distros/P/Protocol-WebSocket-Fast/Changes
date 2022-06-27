@@ -1,4 +1,6 @@
-1.2.5    xx.xx.2022
+1.2.6    xx.xx.2022
+           - misaligned address fix
+1.2.5    10.02.2022
            - minor C API changes
            - doc for accessing logs
            - add dependency from XLog framework

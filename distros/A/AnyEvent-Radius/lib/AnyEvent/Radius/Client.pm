@@ -10,6 +10,7 @@ __PACKAGE__->mk_accessors(qw(
                 handler packer send_cache
                 queue_cv write_cv read_cv
                 sent_cnt reply_cnt queue_cnt
+                last_request_id
             ));
 
 use Data::Radius::Constants qw(%RADIUS_PACKET_TYPES);
@@ -31,6 +32,7 @@ use constant {
 #   dictionary
 #   read_timeout
 #   write_timeout
+#   bind_ip
 #- callbacks:
 #    on_read
 #    on_read_raw
@@ -40,15 +42,28 @@ use constant {
 sub new {
     my ($class, %h) = @_;
 
-    die "No IP argument" if (! $h{ip});
+    my $obj = bless {}, $class;
+
     # either pre-created packer object, or need radius secret to create new one
     # dictionary is optional
-    die "No radius secret" if (! $h{packer} && ! $h{secret});
+    if ( defined $h{packer} ) {
+        $obj->packer( $h{packer} );
+    } elsif ( defined $h{secret} ) {
+        $obj->packer( Data::Radius::Packet->new(dict => $h{dictionary}, secret => $h{secret}) );
+    } else {
+        die "No radius secret";
+    }
 
-    my $obj = bless {}, $class;
-    $obj->init();
+    my %udp_handle_args = (
+        rtimeout => $h{read_timeout} // READ_TIMEOUT_SEC,
+        wtimeout => $h{write_timeout} // WRITE_TIMEOUT_SEC,
+    );
 
-    my $on_read_cb = sub {
+    die "No IP argument" if ! exists $h{ip};
+    $udp_handle_args{connect} = [ $h{ip}, $h{port} // RADIUS_PORT ];
+    $udp_handle_args{bind} = [$h{bind_ip}, 0] if exists $h{bind_ip};
+
+    $udp_handle_args{on_recv} = sub {
         my ($data, $handle, $from) = @_;
         $obj->read_cv->end;
         $obj->reply_cnt($obj->reply_cnt + 1);
@@ -96,7 +111,7 @@ sub new {
         $obj->queue_cv->end;
     };
 
-    my $on_read_timeout_cb = sub {
+    $udp_handle_args{on_rtimeout} = sub {
         my $handle = shift;
         if(! $obj->read_cv->ready) {
             if($h{on_read_timeout}) {
@@ -109,7 +124,7 @@ sub new {
         $handle->clear_rtimeout();
     };
 
-    my $on_write_timeout_cb = sub {
+    $udp_handle_args{on_wtimeout}  = sub {
         my $handle = shift;
         if(! $obj->write_cv->ready) {
             if($h{on_write_timeout}) {
@@ -123,7 +138,7 @@ sub new {
     };
 
     # low-level socket errors
-    my $on_error_cb = sub {
+    $udp_handle_args{on_error} = sub {
         my ($handle, $fatal, $error) = @_;
         # abort all
         $handle->clear_wtimeout();
@@ -136,24 +151,14 @@ sub new {
         else {
             warn "Error occured: $error";
         }
+        # the handle::udp self destroys right after calling the on_error_handler
+        # so the client have to do the same
+        $obj->destroy() if $fatal;
     };
 
-    my $handler = AnyEvent::Handle::UDP->new(
-                connect => [ $h{ip}, $h{port} // RADIUS_PORT ],
-                rtimeout => $h{read_timeout} // READ_TIMEOUT_SEC,
-                wtimeout => $h{write_timeout} // WRITE_TIMEOUT_SEC,
-                on_recv => $on_read_cb,
-                on_rtimeout => $on_read_timeout_cb,
-                on_wtimeout => $on_write_timeout_cb,
-                # no packets to send
-                #on_drain => sub { ... },
-                on_error => $on_error_cb,
-            );
-    $obj->handler($handler);
+    $obj->handler( AnyEvent::Handle::UDP->new(%udp_handle_args) );
 
-    # allow to pass custom object
-    my $packer = $h{packer} || Data::Radius::Packet->new(dict => $h{dictionary}, secret => $h{secret});
-    $obj->packer($packer);
+    $obj->init();
 
     return $obj;
 }
@@ -213,6 +218,7 @@ sub init {
     $self->reply_cnt(0);
     $self->queue_cnt(0);
     $self->send_cache({});
+    $self->last_request_id( int rand(0x100) );
 }
 
 # close open socket, object is unusable after it was called
@@ -270,6 +276,18 @@ sub load_dictionary {
     return $dict;
 }
 
+sub new_request_id {
+    my $self = shift;
+    my $last_request_id = $self->last_request_id();
+    my $new_request_id = ($last_request_id + 1) & 0xFF;
+    my $send_cache = $self->send_cache();
+    while (exists $send_cache->{$new_request_id}) {
+        $new_request_id = ($new_request_id + 1) & 0xFF;
+        return undef if $new_request_id == $last_request_id; # send cache full ??
+    }
+    return $new_request_id;
+}
+
 # add packet to the queue
 # type - radius request packet type code or its text alias
 # av_list - list of attributes in {Name => ... Value => ... } form
@@ -285,13 +303,20 @@ sub send_packet {
         return undef;
     }
 
+    my $request_id = $self->new_request_id();
+    return undef if !defined $request_id;
+
     $type = $RADIUS_PACKET_TYPES{$type} if exists $RADIUS_PACKET_TYPES{$type};
 
     my ($packet, $req_id, $auth) = $self->packer()->build(
                         type => $type,
                         av_list => $av_list,
                         with_msg_auth => 1,
+                        request_id => $request_id,
                     );
+
+    $self->last_request_id( $req_id );
+
     # required to verify reply
     $self->send_cache()->{ $req_id } = {
         authenticator => $auth,
@@ -383,6 +408,8 @@ and then wait for responses.
 =item secret - RADIUS secret string for remote server
 
 =item dictionary - optional, dictionary loaded by L<load_dictionary()> method
+
+=item bind_ip - optional, the local ip address to bind client to
 
 =item read_timeout
 

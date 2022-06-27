@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Filter::perl::Str::maybe_convert_to_re" => 0,
     "Log::ger" => "0.038",
     "Module::Load::Util" => "0.004",
-    "Org::Parser" => "0.556",
+    "Org::Parser" => "0.558",
     "Perinci::CmdLine::Any" => 0,
     "Sah::Schema::array_from_json" => 0,
     "Sah::Schema::filename" => 0,
@@ -52,7 +52,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -79,7 +79,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Log::ger" => "0.038",
   "Module::Load::Util" => "0.004",
-  "Org::Parser" => "0.556",
+  "Org::Parser" => "0.558",
   "Perinci::CmdLine::Any" => 0,
   "Sah::Schema::array_from_json" => 0,
   "Sah::Schema::filename" => 0,

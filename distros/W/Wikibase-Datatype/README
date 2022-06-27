@@ -20,6 +20,9 @@ SEE ALSO
     Wikibase::Datatype::MediainfoSnak
         Wikibase mediainfo snak datatype.
 
+    Wikibase::Datatype::Property
+        Wikibase property datatype.
+
     Wikibase::Datatype::Reference
         Wikibase reference datatype.
 
@@ -81,5 +84,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.12
+    0.16
 

@@ -1,6 +1,14 @@
 
 === version history for CPAN::Site
 
+version 1.16: Thu 23 Jun 10:57:25 CEST 2022
+
+	Improvements:
+	- this module does not use OODoc for manuals.  Remove that from the
+	  README.md
+	- Sort of packages-list is case-insensitive [Steven Leung]
+	- Add cpan_path to CHECKSUMS file for modern CPAN clients [Jason McCarver]
+
 version 1.15: Sat Jan 13 23:27:38 CET 2018
 
 	Improvements:

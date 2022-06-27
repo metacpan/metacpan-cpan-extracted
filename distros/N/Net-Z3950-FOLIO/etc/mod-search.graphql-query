@@ -1,0 +1,427 @@
+query($cql: String, $offset: Int, $limit: Int) {
+  search_instances(query: $cql, offset: $offset, limit: $limit) {
+    totalRecords
+    instances {
+      alternativeTitles {
+        alternativeTitle
+        alternativeTitleTypeId
+      }
+      catalogedDate
+      classifications {
+        classificationNumber
+        classificationTypeId
+        classificationType {
+          id
+          name
+          metadata {
+            createdByUserId
+            createdByUsername
+            createdDate
+            updatedByUserId
+            updatedByUsername
+            updatedDate
+          }
+        }
+      }
+      contributors {
+        contributorNameTypeId
+        contributorNameType {
+          id
+          name
+          ordering
+          metadata {
+            createdByUserId
+            createdByUsername
+            createdDate
+            updatedByUserId
+            updatedByUsername
+            updatedDate
+          }
+        }
+        contributorTypeId
+        contributorTypeText
+        name
+        primary
+      }
+      discoverySuppress
+      editions
+      electronicAccess {
+        linkText
+        materialsSpecification
+        publicNote
+        relationshipId
+        uri
+      }
+      holdingsRecords2(limit: 100) {
+        acquisitionFormat
+        acquisitionMethod
+        callNumber
+        callNumberPrefix
+        callNumberSuffix
+        callNumberTypeId
+        copyNumber
+        digitizationPolicy
+        discoverySuppress
+        electronicAccess {
+          linkText
+          materialsSpecification
+          publicNote
+          relationshipId
+          uri
+        }
+        formerIds
+        # No need to loop back to holdingsInstance
+        bareHoldingsItems(limit: 100) {
+          accessionNumber
+          barcode
+          chronology
+          copyNumber
+          descriptionOfPieces
+          discoverySuppress
+          electronicAccess {
+            linkText
+            materialsSpecification
+            publicNote
+            relationshipId
+            uri
+          }
+          enumeration
+          formerIds
+          # No need to loop back to holdingsRecordId
+          hrid
+          id
+          inTransitDestinationServicePointId
+          itemDamagedStatusDate
+          itemDamagedStatusId
+          itemIdentifier
+          itemLevelCallNumber
+          itemLevelCallNumberPrefix
+          itemLevelCallNumberSuffix
+          itemLevelCallNumberTypeId
+          effectiveCallNumberComponents {
+            callNumber
+            prefix
+            suffix
+            typeId
+          }
+          materialTypeId
+          metadata {
+            createdByUserId
+            createdByUsername
+            createdDate
+            updatedByUserId
+            updatedByUsername
+            updatedDate
+          }
+          missingPieces
+          missingPiecesDate
+          notes {
+            itemNoteTypeId
+            itemNoteType {
+              id
+              name
+              source
+            }
+            note
+            staffOnly
+          }
+          numberOfMissingPieces
+          numberOfPieces
+          permanentLocationId
+          permanentLocation {
+            campusId
+            campus {
+              code
+              id
+              institutionId # no need to resolve, it's redundant
+              name
+            }
+            code
+            description
+            # Nothing known about the details subrecord
+            discoveryDisplayName
+            id
+            institutionId
+            institution {
+              code
+              id
+              name
+            }
+            isActive
+            libraryId
+            library {
+              code
+              id
+              name
+            }
+            metadata {
+              createdByUserId
+              createdByUsername
+              createdDate
+              updatedByUserId
+              updatedByUsername
+              updatedDate
+            }
+            name
+            primaryServicePoint
+            primaryServicePointObject {
+              code
+              description
+              discoveryDisplayName
+              id
+              name
+              pickupLocation
+              shelvingLagTime
+            }
+            servicePointIds
+            servicePoints {
+              code
+              description
+              discoveryDisplayName
+              id
+              name
+              pickupLocation
+              shelvingLagTime
+            }
+          }
+          statisticalCodeIds
+          status {
+            name
+          }
+          temporaryLoanTypeId
+          temporaryLocationId
+          temporaryLocation {
+            campusId
+            campus {
+              code
+              id
+              institutionId # no need to resolve, it's redundant
+              name
+            }
+            code
+            description
+            # Nothing known about the details subrecord
+            discoveryDisplayName
+            id
+            institutionId
+            institution {
+              code
+              id
+              name
+            }
+            isActive
+            libraryId
+            library {
+              code
+              id
+              name
+            }
+            metadata {
+              createdByUserId
+              createdByUsername
+              createdDate
+              updatedByUserId
+              updatedByUsername
+              updatedDate
+            }
+            name
+            primaryServicePoint
+            primaryServicePointObject {
+              code
+              description
+              discoveryDisplayName
+              id
+              name
+              pickupLocation
+              shelvingLagTime
+            }
+            servicePointIds
+            servicePoints {
+              code
+              description
+              discoveryDisplayName
+              id
+              name
+              pickupLocation
+              shelvingLagTime
+            }
+          }
+          volume
+          yearCaption
+        }
+        holdingsStatements {
+          note
+          statement
+        }
+        holdingsStatementsForIndexes {
+          note
+          statement
+        }
+        holdingsStatementsForSupplements {
+          note
+          statement
+        }
+        holdingsTypeId
+        hrid
+        id
+        illPolicyId
+        instanceId
+        metadata {
+          createdByUserId
+          createdByUsername
+          createdDate
+          updatedByUserId
+          updatedByUsername
+          updatedDate
+        }
+        notes {
+          holdingsNoteType {
+            id
+            name
+            source
+          }
+          holdingsNoteTypeId
+          note
+          staffOnly
+        }
+        numberOfItems
+        permanentLocationId
+        permanentLocation {
+          campusId
+          campus {
+            code
+            id
+            institutionId # no need to resolve, it's redundant
+            name
+          }
+          code
+          description
+          # Nothing known about the details subrecord
+          discoveryDisplayName
+          id
+          institutionId
+          institution {
+            code
+            id
+            name
+          }
+          isActive
+          libraryId
+          library {
+            code
+            id
+            name
+          }
+          metadata {
+            createdByUserId
+            createdByUsername
+            createdDate
+            updatedByUserId
+            updatedByUsername
+            updatedDate
+          }
+          name
+          primaryServicePoint
+          primaryServicePointObject {
+            code
+            description
+            discoveryDisplayName
+            id
+            name
+            pickupLocation
+            shelvingLagTime
+          }
+          servicePointIds
+          servicePoints {
+            code
+            description
+            discoveryDisplayName
+            id
+            name
+            pickupLocation
+            shelvingLagTime
+          }
+        }
+        receiptStatus
+        receivingHistory {
+          displayType
+          entries {
+            chronology
+            enumeration
+            publicDisplay
+          }
+        }
+        retentionPolicy
+        shelvingTitle
+        statisticalCodeIds
+        temporaryLocationId
+      }
+      hrid
+      id
+      identifiers {
+        identifierTypeId
+        identifierTypeObject {
+          id
+          name
+          metadata {
+            createdByUserId
+            createdByUsername
+            createdDate
+            updatedByUserId
+            updatedByUsername
+            updatedDate
+          }
+        }
+        value
+      }
+      indexTitle
+      instanceFormatIds
+      instanceFormats {
+        id
+        name
+        code
+        source
+        metadata {
+          createdByUserId
+          createdByUsername
+          createdDate
+          updatedByUserId
+          updatedByUsername
+          updatedDate
+        }
+      }
+      languages
+      metadata {
+        createdByUserId
+        createdByUsername
+        createdDate
+        updatedByUserId
+        updatedByUsername
+        updatedDate
+      }
+      modeOfIssuanceId
+      notes {
+        note
+        staffOnly
+      }
+      physicalDescriptions
+      previouslyHeld
+      publication {
+        dateOfPublication
+        place
+        publisher
+        role
+      }
+      publicationFrequency
+      publicationRange
+      series
+      sourceRecordFormat
+      staffSuppress
+      statisticalCodeIds
+      statusId
+      statusUpdatedDate
+      subjects
+      title
+    }
+  }
+}

@@ -10,7 +10,7 @@ using namespace xs::unievent;
 using namespace panda::unievent;
 using panda::string;
 
-static PERL_THREAD_LOCAL struct {
+static PERL_ITHREADS_LOCAL struct {
     Simple on_signal = Simple::shared("on_signal");
 } cbn;
 

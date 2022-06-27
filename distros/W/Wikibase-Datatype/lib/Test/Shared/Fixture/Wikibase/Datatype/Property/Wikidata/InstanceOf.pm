@@ -7,7 +7,7 @@ use warnings;
 use Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::InstanceOf::WikidataProperty;
 use Wikibase::Datatype::Value::Monolingual;
 
-our $VERSION = 0.12;
+our $VERSION = 0.16;
 
 sub new {
 	my $class = shift;
@@ -27,6 +27,7 @@ sub new {
 			),
 		],
 		'lastrevid' => 1645333097,
+		'modified' => '2022-06-24T13:05:10Z',
 		'statements' => [
 			Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::InstanceOf::WikidataProperty->new,
 		],

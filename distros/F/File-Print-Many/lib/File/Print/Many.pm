@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use Carp;
 use namespace::autoclean;
-require Tie::Handle;
+# require Tie::Handle;
 
 =head1 NAME
 
@@ -12,12 +12,12 @@ File::Print::Many - Print to more than one file descriptor at once
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
-our @ISA = ('Tie::Handle');
+our $VERSION = '0.02';
+# our @ISA = ('Tie::Handle');
 
 =head1 SYNOPSIS
 
@@ -27,7 +27,10 @@ Print to more than one file descriptor at once.
 
 =head2 new
 
-	my $many = File::Print::Many(fds => [$fout1, $fout2]);
+    use File::Print::Many;
+    open(my $fout1, '>', '/tmp/foo');
+    open(my $fout2, '>', '/tmp/bar');
+    my $many = File::Print::Many->new(fds => [$fout1, $fout2]);
 
 =cut
 
@@ -64,13 +67,15 @@ sub new {
 
 Send output.
 
-	$many->print("hello, world!\n");
+    $many->print("hello, world!\n");
+    $many->print('hello, ', "world!\n");
+    $many->print('hello, ')->print("world!\n");
 
 =cut
 
 # sub PRINT {
 	# my $self = shift;
-# 
+#
 	# foreach my $fd(@{$self->{'_fds'}}) {
 		# print $fd @_;
 	# }
@@ -87,6 +92,8 @@ sub print {
 	foreach my $fd(@{$self->{'_fds'}}) {
 		print $fd @data;
 	}
+
+	return $self;
 }
 
 =head1 AUTHOR
@@ -102,8 +109,6 @@ I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 =head1 SEE ALSO
-
-L<HTTP::BrowserDetect>
 
 =head1 SUPPORT
 
@@ -127,17 +132,13 @@ L<http://annocpan.org/dist/File-Print-Many>
 
 L<http://cpanratings.perl.org/d/File-Print-Many>
 
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/File-Print-Many/>
-
 =back
 
-=head1 LICENSE AND COPYRIGHT
+=head1 LICENCE AND COPYRIGHT
 
-Copyright 2018 Nigel Horne.
+Copyright 2018-2022 Nigel Horne.
 
-This program is released under the following licence: GPL
+This program is released under the following licence: GPL2
 
 =cut
 

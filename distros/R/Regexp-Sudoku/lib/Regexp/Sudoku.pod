@@ -1,0 +1,852 @@
+=begin html
+
+<style>
+    ul#index::before {
+        content:                  "Regexp::Sudoku";
+        font-size:                            300%;
+        font-family:                     monospace;
+        font-weight:                          bold;
+        text-align:                         center;
+        line-height:                           2em;
+        margin-left:                           30%;
+        margin-top:                           -1em;
+    }
+    ul#index li ul li ul li {
+        font-family:                     monospace;
+    }
+    html {
+        margin-left:                            5%;
+        margin-right:                          10%;
+    }
+    h1 {
+        margin-left:                           -4%;
+    }
+    h2 {
+        margin-left:                           -3%;
+    }
+    h3 {
+        margin-left:                           -2%;
+    }
+    pre {
+        background:                          black;
+        padding-top:                           1em;
+        padding-bottom:                        1em;
+        border-radius:                         1em;
+    }
+    pre code {
+        color:                          lightgreen;
+    }
+</style>
+
+=end html
+
+=head1 NAME
+
+Regexp::Sudoku - Solve Sudokus with regular expressions.
+
+=head1 SYNOPSIS
+
+ use Regexp::Sudoku;
+ my $sudoku = Regexp::Sudoku:: -> new -> init
+                                      -> set_clues (<<~ '--');
+     5 3 .  . 7 .  . . .
+     6 . .  1 9 5  . . .
+     . 9 8  . . .  . 6 .
+
+     8 . .  . 6 .  . . 3
+     4 . .  8 . 3  . . 1
+     7 . .  . 2 .  . . 6
+
+     . 6 .  . . .  2 8 .
+     . . .  4 1 9  . . 5
+     . . .  . 8 .  . 7 9
+     --
+
+ my $subject = $sudoku -> subject;
+ my $pattern = $sudoku -> pattern;
+
+ if ($subject =~ $pattern) {
+    for my $row (1 .. 9) {
+        for my $col (1 .. 9) {
+            print $+ {"R${r}C${c}"}, " ";
+        }
+        print "\n";
+    }
+ }
+
+=head1 DESCRIPTION
+
+This module takes a Sudoku (or variant) as input, calculates a subject
+and pattern, such that, if the pattern is matched agains the subject,
+the match succeeds if, and only if, the Sudoku has a solution. And if
+it has a solution C<< %+ >> is populated with the values of the cells of
+the solved Sudoku.
+
+After constructing, initializing and constructing a Sudoku object using
+C<< new >>, C<< init >> and various C<< set_* >> methods (see below),
+the object can be queried
+with C<< subject >> and C<< pattern >>. C<< subject >> returns 
+a string, while C<< pattern >> returns a pattern (as a string).
+
+Once the subject has been matched against the pattern, 81 (or rather
+C<< N ** 2 >> for an C<< N x N >> Sudoku) named captures will be set:
+C<< R1C1 >> .. C<< R1C9 >> .. C<< R9C1 >> .. C<< R9C9 >>. These correspond
+to the values of the cells of a solved Sudoku, where the cell in the
+top left is named C<< R1C1 >>, the cell in the top right C<< R1C9 >>,
+the cell in the bottom left C<< R9C1 >> and the cell in the bottom right
+C<< R9C9 >>. In general, the cell on row C<< r >> and column C<< c >>
+is named C<< RrCc >>. Named captures are available in C<< %+ >>
+(see L<< perlvar >>).
+
+For regular, C<< 9 x 9 >> Sudokus, one would just call C<< new >>,
+C<< init >> and C<< set_clues >>. Various variants need to call
+different methods.
+
+Unless specified otherwise, all the methods below return the object
+it was called with; this methods can be chained.
+
+=head2 Main methods
+
+=head3 C<< new () >>
+
+This is a I<< class >> method called on the C<< Regexp::Sudoku >>
+package. It takes no arguments, and just returns an uninitialized
+object. (Basically, it just calls C<< bless >> for you).
+
+=head3 C<< init () >>
+
+C<< init >> initializes the Sudoku object. This method B<< must >> 
+be called on the return value of C<< new >> before calling any other
+methods.
+
+C<< init >> takes one, optional, (named) argument.
+
+=over 4
+
+=item C<< size => INTEGER >>
+
+Usually, Sudokus are C<< 9 x 9 >>. For a Sudoku of a different size,
+we need to pass in the size. Smallest size for which Sudokus exist,
+is C<< 4 >>. Largest size we accept is C<< 35 >>. For a Sudoku with
+a size exceeding 9, we will letters as values. (So, for a C<< 12 x 12 >>
+Sudoku, we have C<< 1 .. 9, 'A', 'B' >> as values.)
+
+The size directly influences the size of the boxes (the rectangles where
+each of the numbers appears exactly once). For a size C<< N >>, the size
+of a box will be those integers C<< p >> and C<< q >> where C<< N = p * q >>,
+and which minimizes C<< abs (p - q) >>. Common sizes lead to the following
+box sizes:
+
+    size (N x N) | box size (width x height)
+    =============+==========================
+          4 *    |      2 x 2
+          6      |      3 x 2
+          8      |      4 x 2
+          9 *    |      3 x 3  (Default)
+         10      |      5 x 2
+         12      |      4 x 3
+         15      |      5 x 3
+         16 *    |      4 x 4
+         24      |      6 x 4
+         25 *    |      5 x 5
+         30      |      6 x 5
+         35      |      7 x 5
+
+Sizes which are perfect squares (marked with C<< * >> in the table above)
+lead to square boxes.
+
+A size which is a prime number leads to boxes which are identical to
+rows -- you would need to configure different boxes.
+
+=back
+
+=head3 C<< set_clues (STRING | ARRAYREF) >>
+
+The C<< set_clues >> method is used to pass in the clues (aka givens)
+of a Suduko. Most Sudokus will have at least one clue, but there are
+a few variants which allow clueless Sudokus. For a standard C<< 9 x 9 >>
+Sudoku, the minimum amount of clues is 17.
+
+The clues are either given as a string, or a two dimensional arrayref. 
+
+In the case of a string, rows are separated by newlines, and values
+in a row by whitespace. The first line of the string corresponds
+with the first row of the Sudoku, the second line with the second 
+row, etc. In each line, the first value corresponds with the first
+cell of that row, the second value with the second cell, etc.
+In case of an arrayref, the array consists of arrays of values. Each
+array corresponds with a row, and each element of the inner arrays
+corresponds with a cell.
+
+The values have the following meaning:
+
+=over 4
+
+=item C<< '1' .. '9', 'A' .. 'Z' >>
+
+This corresponds to a clue/given in the corresponding cell. For standard
+Sudokus, we use C<< '1' .. '9' >>. Smaller Sudokus use less digits.
+For Sudokus greater than C<< 9 x 9 >>, capital letters are used, up to 
+C<< 'Z' >> for a C<< 35 x 35 >> Sudoku.
+
+=item C<< '.' >>, C<< 0 >>, C<< "" >>, C<< undef >>
+
+These values indicate the Sudoku does not have a clue for the corresponding
+cell: the cell is blank. C<< "" >> and C<< undef >> can only be used
+if the array form is being used.
+
+=item C<< 'e' >>
+
+This indicates the cell should have an I<< even >> number in its solution.
+(Note that C<< 'E' >> indicates a clue (if the size is at least C<< 15 x 15 >>),
+and is different from C<< 'e' >>).
+
+=item C<< 'o' >>
+
+This indicates the cell should have an I<< odd >> number in its solution.
+(Note that C<< 'O' >> indicates a clue (if the size is at least C<< 25 x 25 >>),
+and is different from C<< 'o' >>).
+
+=back
+
+=head2 Additional Houses
+
+A I<< house >> is a region which 
+contains each of the numbers C<< 1 .. 9 >> (or C<< 1 .. N >> for an
+C<< N x N >> sized Sudoku) exactly once. With a standard Sudoku, each
+row, each column, and each C<< 3 x 3 >> box is a house.
+
+Some variants have additional houses, next to the rows, columns and boxes.
+In this section, we describe the methods which can be used to configure
+the Sukodu to have additional houses.
+
+=head3 C<< set_nrc_houses () >>
+
+An I<< NRC >> Sudoku has four additional houses, indicated below with
+the numbers C<< 1 .. 4 >>. This variant is only defined for C<< 9 x 9 >>
+Sudokus:
+
+    . . .  . . .  . . .
+    . 1 1  1 . 2  2 2 .
+    . 1 1  1 . 2  2 2 .
+
+    . 1 1  1 . 2  2 2 .
+    . . .  . . .  . . .
+    . 3 3  3 . 4  4 4 .
+
+    . 3 3  3 . 4  4 4 .
+    . 3 3  3 . 4  4 4 .
+    . . .  . . .  . . .
+
+Calling the C<< set_nrc_houses () >> sets up those houses.
+
+The NRC Sudoku is named after the Dutch newspaper
+L<< NRC|https://www.nrc.nl/ >>, which first publishes such a Sudoku
+and still publishes one L<< daily|https://www.nrc.nl/sudoku/ >>.
+It is also known under
+the names I<< Windoku >> and I<< Hyper Sudoku >>.
+
+=head3 C<< set_asterisk_house () >>
+
+An I<< asterisk >> Sudoku has an additional house, roughly in the
+shape of an asterisk, as indicated below. This variant is only defined
+for C<< 9 x 9 >> Sudokus:
+
+    . . .  . . .  . . .
+    . . .  . * .  . . .
+    . . *  . . .  * . .
+
+    . . .  . . .  . . .
+    . * .  . * .  . * .
+    . . .  . . .  . . .
+
+    . . *  . . .  * . .
+    . . .  . * .  . . .
+    . . .  . . .  . . .
+
+Calling the C<< set_asterisk_house () >> sets up those houses.
+
+=head3 C<< set_girandola_house () >>
+
+An I<< girandola >> Sudoku has an additional house, roughly in the
+shape of a I<< windmill pinwheel >> (a childs toy), as indicated below.
+This variant is only defined for C<< 9 x 9 >> Sudokus:
+
+    * . .  . . .  . . *
+    . . .  . * .  . . .
+    . . .  . . .  . . .
+
+    . . .  . . .  . . .
+    . * .  . * .  . * .
+    . . .  . . .  . . .
+
+    . . .  . . .  . . .
+    . . .  . * .  . . .
+    * . .  . . .  . . *
+
+Calling the C<< set_girandola_house () >> sets up those houses.
+
+=head3 C<< set_center_dot_house () >>
+
+A I<< center dot >> house is an additional house which consists of
+all the center cell of all the boxes. This is only defined for Sudokus
+where the boxes have odd sizes. (Sizes C<< 9 >>, C<< 15 >>, C<< 25 >>,
+and C<< 35 >>; see the table with sizes above). For a C<< 9 x 9 >>
+Sudoku, this looks like:
+
+    . . .  . . .  . . .
+    . * .  . * .  . * .
+    . . .  . . .  . . .
+
+    . . .  . . .  . . .
+    . * .  . * .  . * .
+    . . .  . . .  . . .
+
+    . . .  . . .  . . .
+    . * .  . * .  . * .
+    . . .  . . .  . . .
+
+Calling the C<< set_center_dot_house () >> sets up those houses.
+
+
+
+=head2 Diagonals
+
+A common constraint used in variant Sudokus is uniqueness of one
+or more diagonals: all the values on each of the marked diagonals 
+should be unique.
+
+The I<< main >> diagonal of a Sudoku is the diagonal which runs
+from the top left to the bottom right. The I<< minor >> diagonal
+the diagonal which runs from the top right to the bottom left.
+
+
+    \ . .  . . .  . . .            . . .  . . .  . . /
+    . \ .  . . .  . . .            . . .  . . .  . / .
+    . . \  . . .  . . .            . . .  . . .  / . .
+
+    . . .  \ . .  . . .            . . .  . . /  . . .
+    . . .  . \ .  . . .            . . .  . / .  . . .
+    . . .  . . \  . . .            . . .  / . .  . . .
+
+    . . .  . . .  \ . .            . . /  . . .  . . .
+    . . .  . . .  . \ .            . / .  . . .  . . .
+    . . .  . . .  . . \            / . .  . . .  . . .
+
+      Main  Diagonal                 Minor Diagonal
+
+
+A I<< super >> diagonal is a diagonal which parallel and above
+of the main or minor diagonal. A I<< sub >> diagonal is a diagonal
+which runs parallel and below the main or minor diagonal.
+Super and sub diagonals have an I<< offset >>, indicating their
+distance from the main or minor diagonal. The super and sub diagonal
+directly next to the main and minor diagonals have an offset of 1.
+The maximum offset for an C<< N x N >> Sudoku is C<< N - 1 >>, although
+such an offset reduces the diagonal to a single cell.
+
+    . \ .  . . .  . . .            . . .  . . .  . / .
+    . . \  . . .  . . .            . . .  . . .  / . .
+    \ . .  \ . .  . . .            . . .  . . /  . . /
+
+    . \ .  . \ .  . . .            . . .  . / .  . / .
+    . . \  . . \  . . .            . . .  / . .  / . .
+    . . .  \ . .  \ . .            . . /  . . /  . . .
+
+    . . .  . \ .  . \ .            . / .  . / .  . . .
+    . . .  . . \  . . \            / . .  / . .  . . .
+    . . .  . . .  \ . .            . . /  . . .  . . .
+
+   Super and sub diagonals       Super and sub diagonals
+    off the main diagonal         off the minor diagonal
+
+
+In total, an C<< N x N >> Sudoku can have C<< 4 * N - 2 >> diagonals
+(34 for a standard C<< 9 x 9 >> Sudoku).
+
+There will be a method to set uniqness for each possible diagonal.
+
+=head3 C<< set_diagonal_main () >>
+
+This method sets a uniqness constraint on the I<< main diagonal >>.
+
+=head3 C<< set_diagonal_minor () >>
+
+This method sets a uniqness constraint on the I<< minor diagonal >>.
+
+=head3 C<< set_diagonal_main_super_1 () .. set_diagonal_main_super_34 () >>
+
+These methods set uniqness constraints on I<< super diagonals >> 
+parallel to the main diagonal, with the given offset. If the 
+offset equals or exceeds the size of the Sudoku, the diagonal
+falls completely outside of the Sudoku, and hence, does not add
+a constraint.
+
+=head3 C<< set_diagonal_main_sub () .. set_diagonal_main_sub () >>
+
+These methods set uniqness constraints on I<< sub diagonals >> 
+parallel to the main diagonal, with the given offset. If the 
+offset equals or exceeds the size of the Sudoku, the diagonal
+falls completely outside of the Sudoku, and hence, does not add
+a constraint.
+
+=head3 C<< set_diagonal_minor_super_1 () .. set_diagonal_minor_super_34 () >>
+
+These methods set uniqness constraints on I<< super diagonals >> 
+parallel to the minor diagonal, with the given offset. If the 
+offset equals or exceeds the size of the Sudoku, the diagonal
+falls completely outside of the Sudoku, and hence, does not add
+a constraint.
+
+=head3 C<< set_diagonal_minor_sub () .. set_diagonal_minor_sub () >>
+
+These methods set uniqness constraints on I<< sub diagonals >> 
+parallel to the minor diagonal, with the given offset. If the 
+offset equals or exceeds the size of the Sudoku, the diagonal
+falls completely outside of the Sudoku, and hence, does not add
+a constraint.
+
+
+=head2 Crosses and other diagonal sets
+
+It is quite common for variants which have constraints on diagonals
+to do so in a symmetric fashion. To avoid having to call multiple
+C<< set_diagonal_* >> methods, we provide a bunch of wrappers which
+set uniqness constraints on two or more diagonals.
+
+=head3 C<< set_cross () >>
+
+A common variant has uniqness constraints for both the main and minor
+diagonal -- this variant is widely known under the name I<< X-Sudoku >>.
+C<< set_cross () >> sets the uniqness constraints for both the main
+and minor diagonals:
+
+    \ . .  . . .  . . /
+    . \ .  . . .  . / .
+    . . \  . . .  / . .
+
+    . . .  \ . /  . . .
+    . . .  . X .  . . .
+    . . .  / . \  . . .
+
+    . . /  . . .  \ . .
+    . / .  . . .  . \ .
+    / . .  . . .  . . \
+
+     Cross constraints
+
+
+=head3 C<< set_cross_1 () .. set_cross_34 () >>
+
+Each of the C<< set_cross_N () >> methods enable a uniqness constraint
+on B<< four >> diagonals: the I<< super >> and I<< sub >> diaganols
+(relative to both the main and minor diagonals) with offset C<< N >>.
+Note that if C<< N >> is equal, or exceeds the size of the Sudoku, 
+all the diagonals lie fully outside the Sudoku, rendering the method
+useless.
+
+=head3 C<< set_diagonal_double () >>
+
+This method enables a uniqness constraints on the diagonals parallel,
+and directly next to the main and minor diagonals. This is method is
+equivalent to C<< set_cross_1 >>.
+
+    . \ .  . . .  . / .
+    \ . \  . . .  / . /
+    . \ .  \ . /  . / .
+
+    . . \  . X .  / . .
+    . . .  X . X  . . .
+    . . /  . X .  \ . .
+
+    . / .  / . \  . \ .
+    / . /  . . .  \ . \
+    . / .  . . .  . \ .
+
+      Diagonal Double
+
+
+=head3 C<< set_diagonal_triple () >>
+
+This methods enables uniqness constraints on six diagonals: the main
+and minor diagonals, and the diagonals parallel to them, and directly
+next to them. Calling this method is equivalent to calling both
+C<< set_cross () >> and C<< set_diagonal_double () >>.
+
+    \ \ .  . . .  . / /
+    \ \ \  . . .  / / /
+    . \ \  \ . /  / / .
+
+    . . \  X X X  / . .
+    . . .  X X X  . . .
+    . . /  X X X  \ . .
+
+    . / /  / . \  \ \ .
+    / / /  . . .  \ \ \
+    / / .  . . .  . \ \
+
+      Diagonal Triple
+
+=head3 C<< set_argyle () >>
+
+The I<< Argyle Sudoku >> variant has uniqness constraints on
+B<< eight >> diagonals. This is named after a L<< pattern consisting of
+lozenges|https://en.wikipedia.org/wiki/Argyle_(pattern) >>, which
+itself was named after the tartans of the 
+L<< Clan Cambell |https://en.wikipedia.org/wiki/Clan_Campbell >>
+in Argyll in the Scottish highlands.
+
+Calling C<< set_argyle () >> is equivalent to calling 
+C<< set_cross_1 () >> and C<< set_cross_4 () >>.
+
+    . \ .  . X .  . / .
+    \ . \  / . \  / . /
+    . \ /  \ . /  \ / .
+
+    . / \  . X .  / \ .
+    X . .  X . X  . . X
+    . \ /  . X .  \ / .
+
+    . / \  / . \  / \ .
+    / . /  \ . /  \ . \
+    . / .  . X .  . \ .
+
+       Argyle Pattern
+
+
+
+=head2 Global constraints
+
+There are Sudoku variants which enable specific constraints on
+all the cells in the Sudoku.
+
+=head3 C<< set_anti_knight_constraint () >>
+
+An I<< anti knight >> constraint implies that two cells which are
+a knights move (as in classical Chess) apart must have different values.
+(A knights move
+is first two cells in an orthognal direction, then one cell
+perpendicular). For each cell, this puts a restriction to up to
+eight different cells. In the diagram below, C<< * >> marks all
+the cells which are a knights move away from the cell marked C<< O >>.
+
+    . . .  . . .  . . .
+    . . .  . . .  . . .
+    . . *  . * .  . . .
+
+    . * .  . . *  . . .
+    . . .  O . .  . . .
+    . * .  . . *  . . .
+
+    . . *  . * .  . . .
+    . . .  . . .  . . .
+    . . .  . . .  . . .
+
+   Anti Knight Constraint
+
+
+=head3 C<< set_anti_king_constraint () >>
+
+Also known as the I<< no touch constraint >>.
+
+An I<< anti king >> constraint implies that two cells which are
+a kings move (as in classical Chess) apart must have different values.
+(A kings move is one step in any of the eight directions).
+
+For each cell, this puts a restriction to up to
+eight different cells. Four of them are already restricted
+because they are one the same row or columns. And at least
+one kings move will end in the same box. So, this restriction
+is far less restrictive than the anti knights move restriction.
+
+In the diagram below, C<< * >> marks all
+the cells which are a kings move away from the cell marked C<< O >>.
+
+    . . .  . . .  . . .
+    . . .  . . .  . . .
+    . . .  . . .  . . .
+
+    . . *  * * .  . . .
+    . . *  O * .  . . .
+    . . *  * * .  . . .
+
+    . . .  . . .  . . .
+    . . .  . . .  . . .
+    . . .  . . .  . . .
+
+   Anti King Constraint
+
+=head2 Restricted lines and areas
+
+=head3 C<< set_renban (LIST) >>
+
+A I<< Renban >> line (or area) consist of a number of cells where all
+the values should form a consecutive sets of numbers. The numbers do
+not have to be in order. For example, a Renban area of size four may
+contain the numbers C<< 5-7-4-6 >> or C<< 2-3-4-5 >>, but not 
+C<< 2-3-5-6 >>. 
+
+This method takes a list of cell names as argument, where each name
+is of the form C<< RxCy >>, with C<< 1 <= x, y <= N >>, where C<< N >>
+is the size of the Sudoku.
+
+No validation of cell names is performed. Names which aren't of the
+form C<< RxCy >>, or which are outside of the Sudoku have no effect.
+A Renban area with more cells than the size of the Sudoku leads to
+an unsolvable Sudoku.
+
+This method can be called more than once, and should be called more
+than once if a Sudoku has more than one Renban line/area.
+
+=head3 C<< set_german_whisper (LIST) >>
+
+A I<< German Whisper >> line consists of two and more cells, where
+two consecutive cells should differ by at least 5 (or, for Sudoku's
+which aren't of size 9, at least half the size). So, a C<< 7 >> may
+be next to a C<< 1 >> or C<< 2 >>, but not next to any other number.
+The order of the cells matter: they should be in the same order
+as the German Whisper line.
+
+The same number may appear more than once on a German Whisper line,
+if it doesn't violate any other constraint. The length of a German
+Whisper line is at least 2, but it can be longer than the size of
+the Sudoku.
+
+This method takes a list of cell names as argument, where each name
+is of the form C<< RxCy >>, with C<< 1 <= x, y <= N >>, where C<< N >>
+is the size of the Sudoku.
+
+No validation of cell names is performed. Names which aren't of the
+form C<< RxCy >>, or which are outside of the Sudoku have no effect.
+
+This method can be called more than once, and should be called more
+than once if a Sudoku has more than one German Whisper line.
+
+=head3 C<< set_battenburg (LIST) >>, C<< set_anti_battenburg (LIST) >>
+
+A I<< Battenburg >> is a C<< 2 x 2 >> block of cells with the odd
+and evens in an Batterburg pattern: one diagonal has two cells with
+even values; the other diagonal has two cells with odd values.
+
+An I<< anti-Battenburg >> is a C<< 2 x 2 >> block of cells which
+does not have a Battenburg pattern for the odd and even cells.
+(That is, it either has a diagonal with an even and an odd cell,
+or all the cells have the same parity).
+
+Battenburgs and anti-Battenburgs are identified by their top-left
+cell:
+
+  set_battenburg ("R3C5")
+
+signals that the four cells C<< R3C5 >>, C<< R3C6 >>, C<< R4C6 >>, and
+C<< R4C5 >> have their odd and even cells in a Battenburg pattern.
+Hence, either C<< R3C5 >> and C<< R4C6 >> are odd and C<< R3C6 >>
+and C<< R4C5 >> are even, or C<< R3C5 >> and C<< R4C6 >> are even and
+C<< R3C6 >> and C<< R4C5 >> are odd.
+
+  set_anti_battenburg ("R6C3", "R7C6")
+
+signals that the four cells C<< R6C3 >>, C<< R6C4 >>, C<< R7C4 >>
+and C<< R7C3 >> do not form a Battenburg pattern with their odd
+and even values, and that the same is true for the four cells
+C<< R7C6 >>, C<< R7C7 >>, C<< R8C7 >>, and C<< R8C6 >>.
+
+=head3 C<< set_quadruples (HASH) >>
+
+A I<< quadruple >> constraint is a set of one to four numbers which must
+appear on a C<< 2 x 2 >> block. The set of numbers may contain duplicates,
+but a number appearing three times or more is impossible, as each
+C<< 2 x 2 >> block is covered by no more than two rows (and two columns)
+and values should be unique in each row and column.
+
+The C<< 2 x 2 >> blocks are identified by the name of their upper left
+corner cell. The C<< HASH >> which is taken as an argument to this
+method maps cell names (the ones identifying the C<< 2 x 2 >> block) to
+an arrayref containing the values.
+
+  set_quadruples (R2C2 => [6, 7],
+                  R6C5 => [3, 4, 5, 5])
+
+This means the that at least one of the cells C<< R2C2 >>, C<< R2C3 >>,
+C<< R2C3 >> and C<< R3C3 >> contain the number C<< 6 >>, and the same
+set of cells contains at least one C<< 7 >>. And the set of cells
+C<< R6C5 >>, C<< R6C6 >>, C<< R7C5 >>, and C<< R7C6 >> contain a
+C<< 3 >>, a C<< 4 >> and two C<< 5 >>'s.
+                 
+
+=head1 BUGS
+
+There are no known bugs.
+
+=head1 TODO
+
+=over 2
+
+=item *
+
+Disjoint Groups
+
+=item *
+
+Jigsaw
+
+=item *
+
+Greater Than
+
+=over 2
+
+=item *
+
+Thermo
+
+=item *
+
+Slow Thermo
+
+=item *
+
+Rossini
+
+=back
+
+=item *
+
+Consecutive Sudoku
+
+=over 2
+
+=item *
+
+Non-consecutive Sudoku
+
+=back
+
+=item *
+
+Kropki
+
+=over 2
+
+=item *
+
+Absolute difference = 1
+
+=item *
+
+Other differences
+
+=item *
+
+Ratio 1:2
+
+=item *
+
+Other ratios
+
+=back
+
+=item *
+
+XV Sudoku
+
+=item *
+
+CL Sudoku
+
+=item *
+
+Outsize Sudoku
+
+=item *
+
+Young Tableaux
+
+=item *
+
+Palindromes
+
+=item *
+
+Renban lines
+
+=over 2
+
+=item *
+
+Nabner
+
+=back
+
+=item *
+
+Clones
+
+=item *
+
+Killer Sudoku
+
+=item *
+
+Little Killer Sudoku
+
+=item *
+
+Frame Sudoku
+
+=item *
+
+Arrow Sudoku
+
+=item *
+
+Sandwich
+
+=item *
+
+Clock Sudoku
+
+=back
+
+=head1 DEVELOPMENT
+
+The current sources of this module are found on github,
+L<< git://github.com/Abigail/Regexp-Sudoku.git >>.
+
+=head1 AUTHOR
+
+Abigail, L<< mailto:cpan@abigail.freedom.nl >>.
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (C) 2021-2022 by Abigail.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),   
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT
+OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+=head1 INSTALLATION
+
+To install this module, run, after unpacking the tar-ball, the 
+following commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+=cut

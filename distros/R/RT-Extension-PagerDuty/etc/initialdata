@@ -1,0 +1,68 @@
+use strict;
+use warnings;
+
+our @ScripActions = (
+    {   Name        => 'PagerDuty Trigger',
+        Description => 'Trigger an incident on PagerDuty',
+        ExecModule  => 'UpdatePagerDuty',
+        Argument    => 'trigger',
+    },
+    {   Name        => 'PagerDuty Acknowledge',
+        Description => 'Acknowledge an incident on PagerDuty',
+        ExecModule  => 'UpdatePagerDuty',
+        Argument    => 'acknowledge',
+    },
+    {   Name        => 'PagerDuty Resolve',
+        Description => 'Resolve an incident on PagerDuty',
+        ExecModule  => 'UpdatePagerDuty',
+        Argument    => 'resolve',
+    },
+);
+
+our @ScripConditions = (
+    {   Name        => 'On Acknowledge',
+        Description => 'When a ticket is changed from an initial status',
+        ExecModule  => 'StatusChange',
+        Argument    => 'old: initial; new: active',
+        ApplicableTransTypes => 'Status',
+    },
+);
+
+our @Scrips = (
+    {   NoAutoGlobal   => 1,
+        Description    => 'On Create PagerDuty Trigger',
+        ScripCondition => 'On Create',
+        ScripAction    => 'PagerDuty Trigger',
+        Template       => 'Blank',
+    },
+    {   NoAutoGlobal   => 1,
+        Description    => 'On Acknowledge PagerDuty Acknowledge',
+        ScripCondition => 'On Acknowledge',
+        ScripAction    => 'PagerDuty Acknowledge',
+        Template       => 'Blank',
+    },
+    {   NoAutoGlobal   => 1,
+        Description    => 'On Resolve PagerDuty Resolve',
+        ScripCondition => 'On Resolve',
+        ScripAction    => 'PagerDuty Resolve',
+        Template       => 'Blank',
+    },
+);
+
+our @CustomFields = (
+    {   Name        => 'PagerDuty ID',
+        Description => 'ID for the related incident on PagerDuty',
+        Type        => 'FreeformSingle',
+        LookupType  => 'RT::Queue-RT::Ticket',
+        ApplyTo     => [],
+    },
+    {   Name        => 'PagerDuty URL',
+        Description => 'URL to view the incident on PagerDuty',
+        Type        => 'FreeformSingle',
+        LookupType  => 'RT::Queue-RT::Ticket',
+        ApplyTo     => [],
+        LinkValueTo => '__CustomField__ ',
+    },
+);
+
+1;

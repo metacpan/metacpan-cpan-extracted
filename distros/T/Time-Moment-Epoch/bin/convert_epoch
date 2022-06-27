@@ -3,7 +3,7 @@
 #####################################################################
 ## ABSTRACT: Convert various epoch times to Time::Moment times.
 ## PODNAME: convert_epoch
-our $VERSION = '1.003002'; ## VERSION
+our $VERSION = '1.004001'; ## VERSION
 #####################################################################
 
 use v5.24;
@@ -16,13 +16,13 @@ use Time::Moment::Epoch ':all';
 
 my %opt;
 GetOptions(
-	\%opt,
-	'conversion=s@',
-	'debug!',
-	'help|?',
-	'man',
-	'reverse',
-	'verbose!',
+    \%opt,
+    'conversion=s@',
+    'debug!',
+    'help|?',
+    'man',
+    'reverse',
+    'verbose!',
 ) or pod2usage(2);
 pod2usage(1) if $opt{help};
 pod2usage(-verbose => 2) if $opt{man};
@@ -36,11 +36,11 @@ for my $conv ($opt{conversion}->@*) {
 
 for my $arg (@ARGV) {
     for my $conv ($opt{conversion}->@*) {
-		no strict 'refs';
+        no strict 'refs';
 
         my $tm = $opt{reverse}
-			? "to_$conv"->($arg)
-			: $conv->($arg);
+            ? "to_$conv"->($arg)
+            : $conv->($arg);
 
         p $tm if $opt{debug};
 
@@ -54,7 +54,7 @@ __END__
 
 =pod
 
-=for :stopwords Tim Heaney Ehlers Mary iopuckoi
+=for :stopwords Tim Heaney Alexandr Ciornii Ehlers Mary iopuckoi
 
 =head1 NAME
 
@@ -181,7 +181,7 @@ reverse option is used).
 
 =head1 VERSION
 
-version 1.003002
+version 1.004001
 
 =head1 AUTHOR
 

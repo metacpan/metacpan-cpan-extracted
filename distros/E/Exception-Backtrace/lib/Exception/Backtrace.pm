@@ -3,12 +3,9 @@ use 5.018;
 use warnings;
 
 use XS::libpanda::backtrace;
+use Exception::Backtrace::Wrapper;
 
-use overload
-    '""'     => sub { shift->{_value} },
-    fallback => 1;
-
-our $VERSION = '1.1.1';
+our $VERSION = '1.1.2';
 
 
 require XS::Loader;
@@ -27,12 +24,6 @@ sub install {
     $decorator = (shift) // \&default_decorator;
     $SIG{__DIE__} = $handler;
 };
-
-sub new {
-    my ($class, $value) = @_;
-    my $obj = { _value => $value };
-    return bless $obj => $class;
-}
 
 sub default_decorator {
     my $args = shift;

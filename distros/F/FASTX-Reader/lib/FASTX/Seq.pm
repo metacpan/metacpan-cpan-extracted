@@ -82,6 +82,14 @@ sub rev {
 }
 
 
+
+sub len {
+    # Update comment
+    my ($self) = @_;
+    return length($self->{seq});
+}
+
+
 sub rc {
     # Update comment
     my ($self) = @_;
@@ -97,6 +105,25 @@ sub rc {
 
 
 
+sub asfasta {
+    # Update comment
+    my ($self) = @_;
+    my $space = length($self->{comment}) > 0 ? " " : "";
+    my $name  = $self->{name} // "sequence";
+    my $comment = length($self->{comment}) > 0 ? " " . $self->{comment} : "";
+    return ">" . $name . $comment . "\n" . $self->{seq} . "\n";
+}
+
+
+sub asfastq {
+    # Update comment
+    my ($self) = @_;
+    my $name  = $self->{name} // "sequence";
+    my $comment = length($self->{comment}) > 0 ? " " . $self->{comment} : "";
+    my $quality = defined $self->{qual} ? " " . $self->{qual} : "I" x length($self->{seq});
+    return "@" . $name . $comment . "\n" . $self->{seq} . "\n+\n" . $quality;
+}
+
 1;
 
 __END__
@@ -111,7 +138,7 @@ FASTX::Seq - A class for representing a sequence for FASTX::Reader
 
 =head1 VERSION
 
-version 1.3.0
+version 1.5.0
 
 =head1 SYNOPSIS
 
@@ -166,11 +193,30 @@ Reverse (no complement) the sequence.
 
     my $rev = $fastq->rev();
 
+=head2 len()
+
+Length of the sequence
+
+    my $len = $fastq->len();
+
 =head2 rc()
 
 Reverse and complement the sequence.
 
     my $rc = $fastq->rc();
+
+=head2 asfasta()
+
+Return the sequence as a FASTA string.
+
+    my $fasta = $seq->asfasta();
+
+=head2 asfastq()
+
+Return the sequence as a FASTQ string. Will use a dummy fixed value quality
+if the sequence didnt have a quality string.
+
+    my $fasta = $seq->asfastq();
 
 =head1 AUTHOR
 

@@ -4,6 +4,8 @@ lib/URI/_ado.pm
 lib/URI/_db.pm
 lib/URI/_odbc.pm
 lib/URI/cassandra.pm
+lib/URI/cockroach.pm
+lib/URI/cockroachdb.pm
 lib/URI/couch.pm
 lib/URI/couchdb.pm
 lib/URI/cubrid.pm
@@ -44,11 +46,13 @@ lib/URI/sybase.pm
 lib/URI/teradata.pm
 lib/URI/unify.pm
 lib/URI/vertica.pm
+lib/URI/yugabyte.pm
+lib/URI/yugabytedb.pm
 MANIFEST			This list of files
+META.json
+META.yml
 README
 README.md
 t/db.t
 t/dbi.t
 t/engines.t
-META.yml
-META.json

@@ -1,3 +1,8 @@
+0.606   2022-06-24  Released-By: PERLANCAR; Urgency: medium
+
+        - Add scriptlet: add-extension-according-to-mime-type.
+
+
 0.605   2022-02-25  Released-By: PERLANCAR; Urgency: high
 
         - Merge releases 0.604 and 0.604.2.

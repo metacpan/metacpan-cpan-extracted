@@ -1,0 +1,62 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 106cc1103a9ea03a083ecc164c011cdc20d6ddf5732f84376535d4c5b35fb13d COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 33757a4b516ecffb2d62528f98872dab126492e5de7f227dd0ebce14bcdcae25 Changes
+SHA256 9deb2960d7fc9e57ac1b962fb1c1f615d3ceac751e7a5bc466fa421663929181 INSTALL
+SHA256 a4f85c6f4d6e8bdd37b7ab08013e3e3bee1fe8e910e20f8f54d5025ffe40f384 LICENSE
+SHA256 ac3e548cd7dd13d4b5a0a72d41c1f4be971aa7dc0a821e22b64d9c5bf66d9cb3 MANIFEST
+SHA256 74736c40cf510a8e93ba224b3bc8389ef723b84ddb077b11f6dfdc5855ce3dbc META.json
+SHA256 530809f7ece24969d98da83eb2426db154def0a6a690f820bb581cb45e66bdd2 META.yml
+SHA256 73f730bda73b3b8436b9ee75d049eb1d843245de79998d12f9e0b2201fb3d1f0 Makefile.PL
+SHA256 7e555891b23a7849c30cf050882a727eeabdcf6c1580d254fdb16afadb2ef98d README
+SHA256 1125bbecbd6788d94f1e6139b10c4cef6c20d361a2068811ca959a1851852e30 dist.ini
+SHA256 4247adc145b28a0db9c65442f45d13aa166c293a562437e28c4759e23a1b94e1 doap.ttl
+SHA256 44ff551d89e11f6e2d5b5a545d6ca4e1142a0912260ccfb1fdb7300172e5bbc7 examples/demo.pl
+SHA256 9bd4e1429a39d7efcec27c09983d685d758f005a2e6c067b98718f29db84087d lib/Acme/Mitey/Cards.pm
+SHA256 8d125dbc918229626de2014dce4145bbe5485e558b3db05d863a8ca71f5f5e70 lib/Acme/Mitey/Cards/Card.pm
+SHA256 83015d2f65a96491ec0e442137284ba849c808e5d5e3d3efaebed2efa88d31f1 lib/Acme/Mitey/Cards/Card.pm.mite.pm
+SHA256 72e0ebddec74a1c387844b53ee5596ebc7410c0f93e572a0e7c06bb2dc2007c9 lib/Acme/Mitey/Cards/Card/Face.pm
+SHA256 5b104d820f866400b3030558669ca54aa14699380cd5f8d92080714d45f38e82 lib/Acme/Mitey/Cards/Card/Face.pm.mite.pm
+SHA256 c392bade2667729e0346bb441862fb0def032bda5d0c65b583a3b581f2d1923d lib/Acme/Mitey/Cards/Card/Joker.pm
+SHA256 c34e64de95ca2bca9d68992651b2bfd0ad008dda98d8fb2f620b6cc922922ba1 lib/Acme/Mitey/Cards/Card/Joker.pm.mite.pm
+SHA256 10216c1533242564b61afcb22b01388084725bf9ff259cd6a6a66f3449761cf7 lib/Acme/Mitey/Cards/Card/Numeric.pm
+SHA256 8c5ac5807ce3a60017cc6355fee9bac7783f50f1308e86a23d020e593c421e9e lib/Acme/Mitey/Cards/Card/Numeric.pm.mite.pm
+SHA256 30c15e160b81f8b8397022ec53b669d29880ec6cc123926d05ee9c559165c4d2 lib/Acme/Mitey/Cards/Deck.pm
+SHA256 d5a1719163f21e4a9871cdb7186ea766ee430c91098d024a4205961f810ca211 lib/Acme/Mitey/Cards/Deck.pm.mite.pm
+SHA256 d8b42e3413a95d1b93208eb0984750e7e4c8932f27819722631409793667ff99 lib/Acme/Mitey/Cards/Hand.pm
+SHA256 077e1a578d2022b6cfc6e7fee9fe0c70a6dbfdab5bb088e71d4c51b484332d16 lib/Acme/Mitey/Cards/Hand.pm.mite.pm
+SHA256 c9c63e5ce6fcb627ab984e880b00cbccfa5326e0193bd743a695e45f40a4d1bc lib/Acme/Mitey/Cards/Mite.pm
+SHA256 21e561e97e95af20688d3d7ef542e193c17f129abdc21f6bfe8bb1fc28c4d63f lib/Acme/Mitey/Cards/Set.pm
+SHA256 f91e2e589898b4341afab6594fe42c8f692051e130088a32fd67774a66c7ffa7 lib/Acme/Mitey/Cards/Set.pm.mite.pm
+SHA256 3a366dd6f71d9e808c1650c3429e4e3ba3476fae58e4324fcf29c9debc9e12e9 lib/Acme/Mitey/Cards/Suit.pm
+SHA256 8c7601704f71511820bcd09350325d5724c54e472f5b29fe9df1757fcbbd6b97 lib/Acme/Mitey/Cards/Suit.pm.mite.pm
+SHA256 4bbdf032ce9b1cf1e46c7cbd0732d7f1aba757f8f16e428fa2c57de049f69374 t/00-cards.t
+SHA256 c4858122c9956fd3a53747cef0a5900fdd08215fb4f7409003c78424d67b3847 t/card-face.t
+SHA256 8379204afa0b7476e7142d11cb6b5b415c1fa8943e3f7efa8081eb9af275cadc t/card-joker.t
+SHA256 4a06a7044af7d5374cea685ac350d24e41313ad3699a6264fd8734a2dcfd93ea t/card-numeric.t
+SHA256 d8eab91636d9774f02a2f8b21efeb0686b8103528c5dac062261ab309ece4ec0 t/card.t
+SHA256 f824f11dc4d357f43926a95ac045a3b64d06fc9c430056b9270bc7252a9df11f t/deck.t
+SHA256 0bba6f20f066e89cba9499bbc896430ca0147ac7f24d10e1bea852bb5d8334a3 t/hand.t
+SHA256 8fff32413b19152a943f20ef4f237fe9d505367265bf8dfb5a4e64c7e1876c75 t/set.t
+SHA256 7fa25d832f9ead096e674280582b38842b1475a37df8bb73f576473e0d381c65 t/suit.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCYrTCIQAKCRDOv4Eoaip9
+ORo2AJ9q5AKyNcfGpu2Tw71hbqWjWS58UQCgmZXya+E0Lo4Yytv+8xbxAv4SKNk=
+=huoZ
+-----END PGP SIGNATURE-----

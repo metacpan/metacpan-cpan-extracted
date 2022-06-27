@@ -5,8 +5,7 @@ package Role::Test::Module;
 use Mojo::Base -role;
 use Test::More;
 
-#TODO: Remove this debug code !!!
-use feature qw(say);
+use feature    qw(say);
 use Mojo::Util qw(dumper);
 
 requires qw(
@@ -31,10 +30,11 @@ sub run {
     # TODO: Tidy up after restructuring Pod::Query.
     {
         no warnings qw( redefine once );
-        $Pod::Query::MOCK_ROOT      = 1;
-        *Pod::Query::_class_to_path = sub { "$class_dir/" . shift() . ".pm" };
+        $Pod::Query::MOCK_ROOT = 1;
+        *Pod::Query::_class_to_path =
+          sub { shift; "$class_dir/" . shift() . ".pm" };
         *Pod::Query::_mock_root     = sub { $obj->lol };
-        *Pod::Query::get_term_width = sub { 56 };    # Match android.
+        *Pod::Query::get_term_width = sub { 56 };          # Match android.
     }
 
     my $query = Pod::Query->new( $class );
@@ -104,7 +104,6 @@ sub run {
             next;
         }
 
-        # say dumper [ $query->find_method( $case->{method} ) ];
         my $name = "find - $case->{name}";
 
         if ( ref $case->{find} ) {

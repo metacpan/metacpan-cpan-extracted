@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/HeaderValue.pm
-## Version v0.2.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.3.0
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/11/03
-## Modified 2022/02/27
+## Modified 2022/04/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -15,13 +15,16 @@ BEGIN
 {
     use strict;
     use warnings;
+    use warnings::register;
     use parent qw( Module::Generic );
-    use vars qw( $QUOTE_REGEXP $TOKEN_REGEXP $TEXT_REGEXP );
+    use vars qw( $QUOTE_REGEXP $DELIMITER $DELIMITERS $VCHAR $VCHAR_WITHOUT_DELIM
+                 $TOKEN_REGEXP $TEXT_REGEXP );
     use overload (
         '""'     => 'as_string',
         bool     => sub{ return( $_[0] ) },  
         fallback => 1,
     );
+    use URI::Escape;
     our $QUOTE_REGEXP = qr/([\\"])/;
     #
     # RegExp to match type in rfc7231 section 3.1.1.1
@@ -39,7 +42,20 @@ BEGIN
     #
     # token syntax
     # rfc2616 <https://datatracker.ietf.org/doc/html/rfc2616#section-2.2>
-    our $TOKEN_REGEXP = qr/[^[:cntrl:]()<>\@,;:\\"\/\[\]\?\=\{\}[:blank:]\h]+/;
+    our $DELIMITER  = qr/["\(\),\/:;<=>\?\@\[\]{}]/;
+    our $DELIMITERS = qr/["\(\),\/:;<=>\?\@\[\]{}]+/;
+    # Visible ASCII, i.e. 32 to 126
+    our $VCHAR = qr/[\032-\126]+/;
+    our $VCHAR_WITHOUT_DELIM = q/\!\#\$\%\'\*\+\-\.\&\-A-Z\^_\`a-z\|\~/;
+    # rfc7230 <https://datatracker.ietf.org/doc/html/rfc7230#section-3.2.6>
+    # TOKEN_REGEXP = 
+    # "!" / "#" / "$" / "%" / "&" / "'" / "*"
+    # / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~"
+    # / DIGIT / ALPHA
+    # ; any VCHAR, except delimiters
+    # our $TOKEN_REGEXP = qr/[^[:cntrl:]()<>\@,;:\\"\/\[\]\?\=\{\}[:blank:]\h]+/;
+    # More explicit version from the previous and also based on rfc7230, section 3.2.6
+    our $TOKEN_REGEXP = qr/[\!#\$\%\&'\*\+\-\.\^_\`\|\~[:alnum:]$VCHAR_WITHOUT_DELIM]+/;
     # "<any OCTET except CTLs, but including LWS>"
     # <https://datatracker.ietf.org/doc/html/rfc2616#section-2.2>
     our $TEXT_REGEXP  = qr/(?>[[:blank:]\h]|[^[:cntrl:]\"])*+/;
@@ -50,7 +66,7 @@ BEGIN
     # our $TYPE_REGEXP  = qr/(?:[!#$%&'*+.^_`|~0-9A-Za-z-]+\/[!#$%&'*+.^_`|~0-9A-Za-z-]+)|$TOKEN_REGEXP/;
     # our $TOKEN_REGEXP = qr/[!#$%&'*+.^_`|~0-9A-Za-z-]+/;
     # our $TEXT_REGEXP  = qr/[\u000b\u0020-\u007e\u0080-\u00ff]+|$COOKIE_DATA_RE/;
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.3.0';
 };
 
 use strict;
@@ -137,6 +153,9 @@ sub new_from_header
     $opts->{token_max} //= $self->token_max;
     $opts->{value_max} //= $self->value_max;
     $opts->{separator} //= '';
+    # If true, this will not assume the first part of the parameters passed is the main value
+    # This is the case for the header field Strict-Transport-Security
+    $opts->{params_only} //= 0;
     unless( $self->_is_object( $self ) )
     {
         $self = bless( $opts => $self );
@@ -149,22 +168,31 @@ sub new_from_header
     {
         defined( $_ ) ? do{ $parts[$i] .= $_ } : do{ $i++ };
     }
-    # $self->message( 3, "Field parts are: ", sub{ $self->SUPER::dump( \@parts ) } );
-    my $header_val = shift( @parts );
-    my( $n, $v ) = split( /[[:blank:]\h]*\=[[:blank:]\h]*/, $header_val, 2 );
-#     if( $self->debug )
-#     {
-#         my $trace = $self->_get_stack_trace;
-#         $self->message( 4, "\$self is '", overload::StrVal( $self ), "' and \$DEBUG value is '$DEBUG' and debug flag is '", $self->debug, "' stack trace: ", $trace->as_string );
-#     }
-    $self->message( 4, "Header value '$n' and its own value is '$v' (", defined( $v ) ? 'defined' : 'undefined', ")." );
-    if( $opts->{decode} )
+    
+    my $obj;
+    if( $opts->{params_only} )
     {
-        $n = URI::Escape::uri_unescape( $n );
-        $v = URI::Escape::uri_unescape( $v ) if( defined( $v ) );
-        $self->message( 4, "After decoding, header value is '$n' and its value is '$v'." );
+        $obj = $self->new( [] );
     }
-    my $obj = $self->new( defined( $v ) ? [$n, $v] : $n );
+    else
+    {
+        my $header_val = shift( @parts );
+        my( $n, $v ) = split( /[[:blank:]\h]*\=[[:blank:]\h]*/, $header_val, 2 );
+    #     if( $self->debug )
+    #     {
+    #         my $trace = $self->_get_stack_trace;
+    #         $self->message( 4, "\$self is '", overload::StrVal( $self ), "' and \$DEBUG value is '$DEBUG' and debug flag is '", $self->debug, "' stack trace: ", $trace->as_string );
+    #     }
+        $self->message( 4, "Header value '$n' and its own value is '$v' (", defined( $v ) ? 'defined' : 'undefined', ")." );
+        $v =~ s/^\"|(?<!\\)\"$//g;
+        if( $opts->{decode} )
+        {
+            $n = URI::Escape::uri_unescape( $n );
+            $v = URI::Escape::uri_unescape( $v ) if( defined( $v ) );
+            $self->message( 4, "After decoding, header value is '$n' and its value is '$v'." );
+        }
+        $obj = $self->new( defined( $v ) ? [$n, $v] : $n );
+    }
     $obj->debug( $opts->{debug} );
     $obj->decode( $opts->{decode} );
     $obj->encode( $opts->{encode} );
@@ -175,7 +203,7 @@ sub new_from_header
 
     foreach my $frag ( @parts )
     {
-        $frag =~ s/^[[:blank:]\h]+|[[:blank:]\h]+$//g;
+        $frag =~ s/^[[:blank:]\h\v]+|[[:blank:]\h\v]+$//g;
         # Values are forbidden from having "="
         # <https://datatracker.ietf.org/doc/html/rfc6265#section-5.2>
         my( $attribute, $value ) = split( /[[:blank:]\h]*\=[[:blank:]\h]*/, $frag, 2 );
@@ -229,11 +257,26 @@ sub as_string
         my $string = $self->value_as_string;
         my $token_max_len = $self->token_max;
         my $value_max_len = $self->value_max;
+        my $prime_params  = $self->new_array( ( @_ && $self->_is_array( $_[0] ) ) ? shift( @_ ) : [] );
 
         # Append parameters
         if( $self->params->length )
         {
-            my $params = $self->params->keys->sort;
+            my $params;
+            if( !$prime_params->is_empty )
+            {
+                $params = $self->new_array;
+                foreach( @$prime_params )
+                {
+                    $params->push( $_ ) if( $self->params->exists( $_ ) );
+                }
+                my $others = $self->params->keys->except( $params );
+                $params->merge( $others );
+            }
+            else
+            {
+                $params = $self->params->keys->sort;
+            }
             # $self->message( 3, "Properties found: '", $params->join( "', '" ), "'" );
             for( my $i = 0; $i < $params->length; $i++ )
             {
@@ -330,11 +373,18 @@ sub reset
     return( $self );
 }
 
+sub token_escape
+{
+    my $self = shift( @_ );
+    my $v = shift( @_ );
+    return( $v ) if( !defined( $v ) || !length( $v ) );
+    $v =~ s/($DELIMITER)/sprintf("%%%02X", ord($1))/ge;
+    return( $v );
+}
+
 sub token_max { return( shift->_set_get_number( 'token_max', @_ ) ); }
 
 sub value { return( shift->_set_get_array_as_object( 'value', @_ ) ); }
-
-sub value_max { return( shift->_set_get_number( 'value_max', @_ ) ); }
 
 sub value_as_string
 {
@@ -347,8 +397,18 @@ sub value_as_string
         $self->message( 3, "header value is '$n' and its value (possibly null) is '$v'" );
         if( defined( $v ) && $n !~ /^$TOKEN_REGEXP$/ )
         {
-            $self->message( 3, "Invalid token \"$n\"" );
-            return( $self->error( "Invalid token \"$n\"" ) );
+            if( $self->encode )
+            {
+                # $n = URI::Escape::uri_escape( $n );
+                # We cannot simply use URI::Escape, because the scope of what we need to 
+                # escape and NOT escape is not aligned with what URI::Escape does
+                $n = $self->token_escape( $n );
+            }
+            else
+            {
+                $self->message( 3, "Invalid token \"$n\"" );
+                return( $self->error( "Invalid token \"$n\"" ) );
+            }
         }
         elsif( !defined( $v ) && $n !~ /^$TEXT_REGEXP$/ )
         {
@@ -357,11 +417,44 @@ sub value_as_string
         }
         if( defined( $v ) && $self->encode )
         {
-            $v = URI::Escape::uri_escape( $v );
+            $v = URI::Escape::uri_escape( $v ) if( $v !~ /^$TEXT_REGEXP$/ || $v =~ /=/ );
         }
+        $v = qq{"${v}"} if( $v =~ /$DELIMITERS/ );
         $string = defined( $v ) ? join( '=', $n, $v ) : $n;
     }
     return( $string );
+}
+
+sub value_data
+{
+    my $self = shift( @_ );
+    my $ref  = $self->value;
+    # If this is only one-element array, this means the only element is the value
+    # return( $ref->first ) if( $ref->length == 1 );
+    # otherwise, the first element is the name, and this is not what the caller wants
+    # we return an empty string, not undef, because undef is associated with errors
+    # return( '' );
+    if( $ref->length == 1 )
+    {
+        return( $ref->first );
+    }
+    # either nothing or more than 1
+    else
+    {
+        return( $ref->second );
+    }
+}
+
+sub value_max { return( shift->_set_get_number( 'value_max', @_ ) ); }
+
+sub value_name
+{
+    my $self = shift( @_ );
+    my $ref  = $self->value;
+    # If this is only one-element array, this means the only element is the value
+    return( '' ) if( $ref->length == 1 );
+    # otherwise, the first element is the name
+    return( $ref->first );
 }
 
 1;
@@ -388,7 +481,7 @@ Module::Generic::HeaderValue - Generic Header Value Parser
 
 =head1 VERSION
 
-    v0.2.0
+    v0.3.0
 
 =head1 DESCRIPTION
 
@@ -426,7 +519,7 @@ See L<Module::Generic/debug>
 
 =head2 new_from_header
 
-Takes a header value such as C<foo; bar=2> and this will parse it and return a new L<Module::Generic::HeaderValue> object.
+Takes a header value such as C<foo; bar=2> and and an hash or hash reference of options and this will parse it and return a new L<Module::Generic::HeaderValue> object.
 
 If L</decode>, it will decode the value found, if any. For example:
 
@@ -459,6 +552,40 @@ Takes a header value that contains potentially multiple values separated by a pr
     );
 
 Note that the comma in this string is found to be a separator only when it is followed by some token itself followed by C<=>, C<;>, C<,> or the end of string.
+
+Possible options are:
+
+=over 4
+
+=item C<decode>
+
+Takes a boolean value. Defaults to false.
+
+If true, this will decode the values.
+
+=item C<encode>
+
+Takes a boolean value. Defaults to false.
+
+If true, this will encode the values.
+
+=item C<params_only>
+
+Takes a boolean value. Defaults to false.
+
+If true, this will not assume the first part of the parameters passed is the main value.
+
+This is the case for the header field Strict-Transport-Security
+
+=item C<separator>
+
+Takes a string, which defaults to C<;>. This is used as the separator between the parameters.
+
+=item C<token_max>
+
+Takes an integer. This is the maximum size of a token. Defaults to 0, i.e. no limit.
+
+=back
 
 =head1 METHODS
 
@@ -525,15 +652,44 @@ A value of 0 means no limit.
 
 Set or get the main header value. For example, in the case of C<foo; bar=2>, the main value here is C<foo>.
 
+However, the value returned is always an L<array object|Module::Generic::Array> because some value could itself be a name-value pairs, like in the case of cookies, so to get the actual value, you would do:
+
+If this is a regular field-value definition, such as C<Content-Type: text/plain>:
+
+    my $val = $hv->value->first;
+
+But if this is a value of type C<name-value> like with cookies, to get the value, you would do instead:
+
+    my $cookie_name = $hv->value->first;
+    my $cookie_val = $hv->value->last;
+
+=head2 value_as_string
+
+Returns a header value, without any possible attribute, as a string properly formatted and uri-escaped, if necessary.
+
+=head2 value_data
+
+This method returns the value part of a header field value. The need for distinction stems from some header field value, such as cookies, who have field value such as C<foo=bar> where C<foo> is the name and C<bar> is the actual value.
+
+This method ensures that, no matter the header field type, this returns the actual value, For example:
+
+    my $hv = Module::Generic::HeaderValue->new_from_header( 'text/plain' );
+    say $hv->value_data; # text/plain
+    my $hv = Module::Generic::HeaderValue->new_from_header( 'foo=bar' );
+    say $hv->value_data; # bar
+    say $hv->value_name; # foo
+
 =head2 value_max
 
 Integer. Default to 0. Set or get the maximum length of a token value. which applies to an attribute value.
 
 A value of 0 means no limit.
 
-=head2 value_as_string
+=head2 value_name
 
-Returns a header value, without any possible attribute, as a string properly formatted and uri-escaped, if necessary.
+This method returns the name part of the header field value. This is typically useful when dealing with cookies whose value is comprised of a cookie name and a cookie value. Thus with a cook with value C<foo=bar>, this method would return C<foo>.
+
+See also L</value_data>
 
 =head1 AUTHOR
 

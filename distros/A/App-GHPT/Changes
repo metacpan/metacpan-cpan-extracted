@@ -1,3 +1,8 @@
+2.000000 2022-06-23
+
+- The default branch is now C<main> instead of C<master>.
+- Remove C<Path::Class> dependency.
+
 1.001000 2021-01-19
 
 - Support retrieving the Pivotal Tracker token from the environment variable

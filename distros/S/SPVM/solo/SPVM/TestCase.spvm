@@ -25,6 +25,7 @@ class TestCase {
   use TestCase::Complex_2f;
   use TestCase::Complex_2d;
   use TestCase::CommonInterface;
+  use TestCase::MinimalExtend;
   
 =pod
 
@@ -95,6 +96,48 @@ SPVM::Test - SPVM test module
   }
 
   static method main : int ($start_file : string, $args : string[]) {
+    
+    {
+      my $minimal_extend = TestCase::MinimalExtend->new;
+      
+      $minimal_extend->{x} = 1;
+      $minimal_extend->{y} = 2;
+      $minimal_extend->{z} = 3;
+      
+      my $shared1 = $minimal_extend->shared1;
+      
+      my $string = "$minimal_extend->{x},$minimal_extend->{y},$minimal_extend->{z}";
+      
+      warn $string;
+      
+      $minimal_extend->clear;
+      
+      my $common_interface = (TestCase::CommonInterface)$minimal_extend;
+      
+      $minimal_extend->{x} = 4;
+      $minimal_extend->{y} = 5;
+      $minimal_extend->{z} = 6;
+      
+      $minimal_extend->SUPER::clear;
+      
+      warn "$minimal_extend->{x},$minimal_extend->{y},$minimal_extend->{z}";
+
+      $minimal_extend->{x} = 4;
+      $minimal_extend->{y} = 5;
+      $minimal_extend->{z} = 6;
+      
+      $minimal_extend->clear;
+
+      warn "$minimal_extend->{x},$minimal_extend->{y},$minimal_extend->{z}";
+
+      $minimal_extend->{x} = 4;
+      $minimal_extend->{y} = 5;
+      $minimal_extend->{z} = 6;
+      
+      $common_interface->clear;
+
+      warn "$minimal_extend->{x},$minimal_extend->{y},$minimal_extend->{z}";
+    }
     
     my $class_id = class_id TestCase;
     

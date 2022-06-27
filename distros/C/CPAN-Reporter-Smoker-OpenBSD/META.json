@@ -4,7 +4,7 @@
       "Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -58,11 +58,11 @@
    "provides" : {
       "CPAN::Reporter::Smoker::OpenBSD" : {
          "file" : "lib/CPAN/Reporter/Smoker/OpenBSD.pm",
-         "version" : "0.019"
+         "version" : "0.020"
       },
       "CPAN::Reporter::Smoker::OpenBSD::PerlConfig" : {
          "file" : "lib/CPAN/Reporter/Smoker/OpenBSD/PerlConfig.pm",
-         "version" : "0.019"
+         "version" : "0.020"
       }
    },
    "release_status" : "stable",
@@ -77,9 +77,9 @@
          "web" : "https://github.com/glasswalk3r/cpan-openbsd-smoker"
       }
    },
-   "version" : "0.019",
-   "x_generated_by_perl" : "v5.35.11",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "version" : "0.020",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
    "x_spdx_expression" : "GPL-3.0-only"
 }
 

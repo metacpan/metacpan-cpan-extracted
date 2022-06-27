@@ -41,11 +41,17 @@ ocean attributes fill="#1c86ee"
 light-grey attributes fill="#dcddbe"
 grey attributes fill="#afbc9e"
 dark-grey attributes fill="#859d70"
+blue-green attributes fill="#6f9487"
+poisoned attributes fill="#af84a5"
 
 # suitable for forests
 light-green attributes fill="#b7c18c"
 green attributes fill="#77904c"
 dark-green attributes fill="#2d501a"
+
+# invisible stuff that we need to create correct PDF files
+dry attributes fill="black" opacity="0.1"
+port attributes opacity="0"
 
 # debug
 red attributes fill="red" opacity="0.8" transform="scale(0.5)"
@@ -66,8 +72,8 @@ red attributes fill="red" opacity="0.8" transform="scale(0.5)"
 <g id="Star"><circle cx="0" cy="0" r="10"/><use xlink:href="#Arrow"/><use xlink:href="#Arrow" transform="rotate(45)"/><use xlink:href="#Arrow" transform="rotate(90)"/><use xlink:href="#Arrow" transform="rotate(135)"/><use xlink:href="#Arrow" transform="rotate(180)"/><use xlink:href="#Arrow" transform="rotate(225)"/><use xlink:href="#Arrow" transform="rotate(270)"/><use xlink:href="#Arrow" transform="rotate(315)"/></g>
 # Settlement Icons
 <use id="thorp" xlink:href="#Thorp" transform="scale(0.7)"/>
-<g id="village" transform="scale(0.7), translate(0,40)"><use xlink:href="#House"/><use xlink:href="#Thorp"/><use xlink:href="#Flag"/></g>
-<g id="town" transform="scale(0.7)"><g transform="translate(-10,40)"><use xlink:href="#House"/><use xlink:href="#Flag"/><use xlink:href="#Thorp"/><use xlink:href="#Hut" transform="translate(43,15)"/><path stroke="black" stroke-width="7" d="M0,15 h70"/></g></g>
+<g id="village"><g transform="scale(0.7)"><g transform="translate(0,40)"><use xlink:href="#House"/><use xlink:href="#Thorp"/><use xlink:href="#Flag"/></g></g></g>
+<g id="town"><g transform="scale(0.7)"><g transform="translate(-10,40)"><use xlink:href="#House"/><use xlink:href="#Flag"/><use xlink:href="#Thorp"/><use xlink:href="#Hut" transform="translate(43,15)"/><path stroke="black" stroke-width="7" d="M0,15 h70"/></g></g></g>
 <g id="large-town"><g transform="scale(0.7)"><g transform="translate(0,45)"><use xlink:href="#House" transform="translate(-40,0)"/><use xlink:href="#Flag" transform="translate(-40,0)"/><use xlink:href="#House" transform="translate(40,0)"/><use xlink:href="#Flag" transform="translate(40,0)"/><use xlink:href="#Thorp" transform="translate(0,-15)"/><path stroke="black" stroke-width="7" d="M-70,0 h140"/></g></g></g>
 <g id="city"><g transform="scale(0.7)"><g transform="translate(0,60)"><use xlink:href="#House" transform="translate(-40,0)"/><use xlink:href="#Flag" transform="translate(-40,0)"/><use xlink:href="#House" transform="translate(40,0)"/><use xlink:href="#Flag" transform="translate(40,0)"/><use xlink:href="#House" transform="translate(0,-15)"/><use xlink:href="#Flag" transform="translate(0,-15)"/><use xlink:href="#Thorp" transform="translate(0,-15)"/><path stroke="black" stroke-width="7" d="M-70,0 h140"/></g></g></g>
 <g id="shrine"><path transform="scale(0.7)" fill="none" stroke="black" stroke-width="7" d="M-20,20 v-40 h40 v40 M-20,-20 v-10 M20,-20 v-10 M-30,-30 h60"/></g>
@@ -107,11 +113,13 @@ red attributes fill="red" opacity="0.8" transform="scale(0.5)"
 <g id="fir-mountains"><use xlink:href="#Mountain" transform="scale(0.7) translate(-45,0)"/><use xlink:href="#Peak" transform="scale(0.7)"/><use xlink:href="#Mountain" transform="scale(0.7) translate(40,25)"/><use xlink:href="#Fir" transform="scale(0.3) translate(-120,-40)"/><use xlink:href="#Fir" transform="scale(0.3) translate(10,-20)"/><use xlink:href="#Fir" transform="scale(0.3) translate(150,10)"/></g>
 
 # Simple things to layer on top
-<path id="desert" stroke="black" stroke-width="3" d="M-60,10 v3 M-50,-30 v3 M-40,-0 v3 M-30,40 v3 M-20,-20 v3 M-10,10 v3 M5,-30 v3 M10,20 v3 M20,0 v3 M30,30 v3 M30,-40 v3 M40,10 v3 M60,-10 v3 "/>
+<path id="desert" stroke="black" stroke-width="4" d="M-60,10 v4 M-50,-30 v4 M-40,-0 v4 M-30,40 v4 M-20,-20 v4 M-10,10 v4 M5,-30 v4 M10,20 v4 M20,0 v4 M30,30 v4 M30,-40 v4 M40,10 v4 M60,-10 v4 "/>
 <g id="grass"><path stroke="black" stroke-width="6" d="m -21,-24 c -2,7 1,11 4,17"/><path stroke="black" stroke-width="6" d="m -10,-32 c 0,0 -1,15 3,23"/><path stroke="black" stroke-width="6" d="m 3,-20 c 0,0 0,11 -3,13"/><path stroke="black" stroke-width="6" d="m 25,1 c 0,10 7,11 7,21"/><path stroke="black" stroke-width="6" d="m 36,4 c 0,0 6,4 4,15"/><path stroke="black" stroke-width="6" d="m 49,7 c 0,0 -1,11 -1,12"/><path stroke="black" stroke-width="6" d="m -44,10 c 0,7 4,10 6,17"/><path stroke="black" stroke-width="6" d="m -33,5 c -1,7 1,13 3,19"/><path stroke="black" stroke-width="6" d="m -24,14 c 0,0 3,7 3,11"/></g>
 <g id="marsh"><path stroke="black" stroke-width="6" d="m -44,6 c 0,0 8,4 9,9"/><path stroke="black" stroke-width="6" d="m -32,1 c 0,0 6,9 6,12"/><path stroke="black" stroke-width="6" d="m -15,-1 c 0,0 -4,10 -3,13"/><path stroke="black" stroke-width="6" d="m -4,5 c 0,0 -7,7 -7,9"/><line stroke="black" stroke-width="6" y2="22" x2="-9" y1="22" x1="-36"/><path stroke="black" stroke-width="6" d="m 2,-16 c 0,0 7,5 7,9"/><path stroke="black" stroke-width="6" d="m 10,-26 c 0,0 7,12 7,16"/><line stroke="black" stroke-width="6" y2="-10" x2="25" y1="-32" x1="25"/><path stroke="black" stroke-width="6" d="m 40,-24 c 0,0 -6,11 -5,16"/><line stroke="black" stroke-width="6" y2="-2" x2="34" y1="-2" x1="11"/></g>
 <g id="swamp"><path d="m -24,12 c 0,0 7,3 7,7" stroke="black" stroke-width="5"/><path d="m -14,8 c 0,0 4,7 4,9" stroke="black" stroke-width="5"/><path d="m 0,7 c 0,0 -4,5 -3,9" stroke="black" stroke-width="5"/><path d="m 9,11 c 0,0 -6,6 -6,8" stroke="black" stroke-width="5"/><path stroke="black" stroke-width="5" d="m 12,38 c 0,0 -7,-3 -7,-7"/><path stroke="black" stroke-width="5" d="m 3,43 c 0,0 -4,-7 -4,-9"/><path stroke="black" stroke-width="5" d="m -11,44 c 0,0 4,-6 3,-10"/><path stroke="black" stroke-width="5" d="m -20,40 c 0,0 6,-6 6,-8"/><line x1="-17" y1="25" x2="4" y2="25" stroke="black" stroke-width="5"/><path d="m -4,-34 c 0,0 7,3 7,7" stroke="black" stroke-width="5"/><path d="m 6,-39 c 0,0 4,7 4,9" stroke="black" stroke-width="5"/><path d="m 19,-40 c 0,0 -3,5 -2,9" stroke="black" stroke-width="5"/><path d="m 28,-36 c 0,0 -6,6 -6,8" stroke="black" stroke-width="5"/><path stroke="black" stroke-width="5" d="m 32,-9 c 0,0 -7,-3 -7,-7"/><path stroke="black" stroke-width="5" d="m 22,-4 c 0,0 -4,-7 -4,-9"/><path stroke="black" stroke-width="5" d="m 8,-3 c 0,0 5,-5 3,-10"/><path stroke="black" stroke-width="5" d="m -1,-7 c 0,0 6,-6 6,-8"/><line x1="2" y1="-22" x2="24" y2="-22" stroke="black" stroke-width="5"/></g>
 <g id="swamp2"><g transform="translate(-50,-10)"><path d="m -24,12 c 0,0 7,3 7,7" stroke="black" stroke-width="5"/><path d="m -14,8 c 0,0 4,7 4,9" stroke="black" stroke-width="5"/><path d="m 0,7 c 0,0 -4,5 -3,9" stroke="black" stroke-width="5"/><path d="m 9,11 c 0,0 -6,6 -6,8" stroke="black" stroke-width="5"/><path stroke="black" stroke-width="5" d="m 12,38 c 0,0 -7,-3 -7,-7"/><path stroke="black" stroke-width="5" d="m 3,43 c 0,0 -4,-7 -4,-9"/><path stroke="black" stroke-width="5" d="m -11,44 c 0,0 4,-6 3,-10"/><path stroke="black" stroke-width="5" d="m -20,40 c 0,0 6,-6 6,-8"/><line x1="-17" y1="25" x2="4" y2="25" stroke="black" stroke-width="5"/></g><g transform="translate(30,0)"><path d="m -4,-34 c 0,0 7,3 7,7" stroke="black" stroke-width="5"/><path d="m 6,-39 c 0,0 4,7 4,9" stroke="black" stroke-width="5"/><path d="m 19,-40 c 0,0 -3,5 -2,9" stroke="black" stroke-width="5"/><path d="m 28,-36 c 0,0 -6,6 -6,8" stroke="black" stroke-width="5"/><path stroke="black" stroke-width="5" d="m 32,-9 c 0,0 -7,-3 -7,-7"/><path stroke="black" stroke-width="5" d="m 22,-4 c 0,0 -4,-7 -4,-9"/><path stroke="black" stroke-width="5" d="m 8,-3 c 0,0 5,-5 3,-10"/><path stroke="black" stroke-width="5" d="m -1,-7 c 0,0 6,-6 6,-8"/><line x1="2" y1="-22" x2="24" y2="-22" stroke="black" stroke-width="5"/></g></g>
+<pattern id="striped" width="10" height="10" patternTransform="rotate(-30)" patternUnits="userSpaceOnUse"><rect x="0" y="0" width="10" height="2" fill="red"/></pattern>
+<polygon id="zone" opacity="0.3" fill="url(#striped)" points='-100.0,0.0 -50.0,86.6 50.0,86.6 100.0,0.0 50.0,-86.6 -50.0,-86.6' />
 
 # cliffs for hex maps
 <path id="cliff0" transform="rotate(  0)" d="M-90,-17.3 l-8.7,-5 M-80,-34.6 l-8.7,-5 M-70,-52 l-8.7,-5 M-60,-69.3 l-8.7,-5" stroke="black" stroke-width="5px" fill="none"/>

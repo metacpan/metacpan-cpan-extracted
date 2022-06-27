@@ -1,4 +1,39 @@
 Revision history for Perl extension Template::Plex.
+0.4.2	Thu 23 Jun 2022 14:41:55 AEST
+	- Removed usage of perl-5.36 features isa  and multi-element for loops
+	- Reverted min perl version back to 5.24 for better compatability
+	- Checked dependencies also work with perl 5.24
+	- Removed other non used features
+
+0.4.1	Wed 22 Jun 2022 14:30:56 AEST
+	- Fix bad tests
+
+0.4.0	Wed 22 Jun 2022 12:30:56 AEST
+	- Template inheritance and slotting
+	- Requires Perl 5.36 (for isa)
+	- User subclassing is now possible
+	- Removed redundant code in in peparing templates
+	- Sub classes can access metadata (options) and arguments( variables) via
+   	  accessor methods meta and args
+	- The current template is stored in a lexical variable $self
+	- Template is of type Template::Plex or user subclass
+	- Added %meta to store filename and load/processing options
+	- Added 'use' key in options hash to allow using of packages in lexical scope
+	- Added 'base' key in options hash to specify base class for template
+	- Much easier to implement new templating systems on top of this module now
+	- Removed automatic using of String::Util. Templates can use on demand manually
+	- Fixed bug in recursive template loading that would not update the dynamic 
+	  package name
+	- Added logging support with Log::ger and Log::OK
+	- jmap now requires at least two arguments and works with array/list
+	  instead of a reference
+	- Block fix no longer kills multiple newlines after a directive close
+	- die is  called on template compilation error. (=> try/catch)
+	- Error message include a summary of the error location and tempalte name
+	- plx and plex function depreciated
+	- Class methods load/cache/immediate for loading templates
+
+
 
 0.3.0  Mon 25 Apr 2022 20:43:10 AEST
 

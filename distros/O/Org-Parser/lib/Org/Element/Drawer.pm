@@ -5,13 +5,13 @@ use locale;
 use Moo;
 use experimental 'smartmatch';
 extends 'Org::Element';
-with 'Org::Element::Role';
-with 'Org::Element::BlockRole';
+with 'Org::ElementRole';
+with 'Org::ElementRole::Block';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-03-27'; # DATE
+our $DATE = '2022-06-23'; # DATE
 our $DIST = 'Org-Parser'; # DIST
-our $VERSION = '0.557'; # VERSION
+our $VERSION = '0.558'; # VERSION
 
 has name => (is => 'rw');
 has properties => (is => 'rw');
@@ -59,7 +59,7 @@ Org::Element::Drawer - Represent Org drawer
 
 =head1 VERSION
 
-This document describes version 0.557 of Org::Element::Drawer (from Perl distribution Org-Parser), released on 2022-03-27.
+This document describes version 0.558 of Org::Element::Drawer (from Perl distribution Org-Parser), released on 2022-06-23.
 
 =head1 DESCRIPTION
 

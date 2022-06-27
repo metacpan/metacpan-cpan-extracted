@@ -12,6 +12,8 @@ my  $PACKAGE      =  'Regexp::Sudoku';
 
 my  $LIB_FILE     =  "lib/$PACKAGE.pm";
     $LIB_FILE     =~  s!::!/!g;
+my  $POD_FILE     =   $LIB_FILE;
+    $POD_FILE     =~  s/\.pm$/.pod/;
 my  $LOCAL_ADDR   =  'cpan';
 my  $DOMAIN       =  'abigail.freedom.nl';
 my  $REPO         =   $PACKAGE;
@@ -24,7 +26,7 @@ my  $REPOSITORY   =  "git://$REPO_HOST/$ME/$REPO.git";
 my %args = (
     NAME                 =>  $PACKAGE,
     VERSION_FROM         =>  $LIB_FILE,
-    ABSTRACT_FROM        =>  $LIB_FILE,
+    ABSTRACT_FROM        =>  $POD_FILE,
     PREREQ_PM            => {
         'strict'                     =>  0,
         'warnings'                   =>  0,

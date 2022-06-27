@@ -8,7 +8,7 @@ use warnings;
 use Validation::Class::Util '!has', '!hold';
 use Hash::Merge ();
 
-our $VERSION = '7.900057'; # VERSION
+our $VERSION = '7.900058'; # VERSION
 
 
 
@@ -302,7 +302,7 @@ Validation::Class::Mapping - Generic Container Class for a Hash Reference
 
 =head1 VERSION
 
-version 7.900057
+version 7.900058
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,10 @@
 Release history for Try-Tiny-Tiny
 
+0.003 Wed 22 Jun 2022
+	- No functional changes
+	- Corrected minimum Perl version requirement
+	- Packaging fixes
+
 0.002 Tue 18 Sep 2018
 	- No functional changes
 	- Expanded documentation with better structure

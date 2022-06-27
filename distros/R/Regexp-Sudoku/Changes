@@ -1,4 +1,6 @@
-Version 2022030401 Fri Mar  4 20:22:28 CET 2022
+Version 2022062101 Tue Jun 21 07:32:23 CDT 2022
++ Added Quadruple constraints.
++ Added German Whisper constraints.
 + Added Renban constraints.
 + Reworked Initialization.
 

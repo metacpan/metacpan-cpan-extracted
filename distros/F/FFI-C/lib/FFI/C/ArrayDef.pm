@@ -13,7 +13,7 @@ use base qw( FFI::C::Def );
 our @CARP_NOT = qw( FFI::C );
 
 # ABSTRACT: Array data definition for FFI
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 
 sub new
@@ -151,7 +151,7 @@ FFI::C::ArrayDef - Array data definition for FFI
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -303,7 +303,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020,2021 by Graham Ollis.
+This software is copyright (c) 2020-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,12 @@
 Revision history for Syntax-Operator-Equ
 
+0.03    2022-06-26
+        [CHANGES]
+         * Use the new Perl API functions sv_numeq_flags() and
+           sv_streq_flags() where they exist; provide hax/ back-compat where
+           they do not
+         * Add unit tests for automatic deparse logic from XS::Parse::Infix
+
 0.02    2021-09-06
         [CHANGES]
          * Provide some plain-perl wrapper functions so perls without

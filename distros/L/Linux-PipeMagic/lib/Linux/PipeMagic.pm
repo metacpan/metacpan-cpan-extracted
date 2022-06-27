@@ -31,7 +31,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw();
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -72,14 +72,15 @@ Linux::PipeMagic - Perl extension to use the zero copy IO syscalls
 
 =head1 SYNOPSIS
 
-  use Linux::PipeMagic qw/ systee syssplice /;
+  use Linux::PipeMagic qw/ systee syssplice syssendfile /;
   systee($fh_in, $fh_out, $num_bytes, 0);
   syssplice($fh_in, $fh_out, $num_bytes, 0);
+  syssendfile($fh_out, $fh_in, $num_bytes);
 
 =head1 DESCRIPTION
 
-Linux::PipeMagic is a Perl XS wrapper around the L<splice(2)> and L<tee(2)>
-syscalls.  You can use them to efficiently data from one file descriptor to
+Linux::PipeMagic is a Perl XS wrapper around the L<splice(2)>, L<tee(2)> and L<sendfile(2)>
+syscalls.  You can use them to efficiently copy data from one file descriptor to
 another inside the kernel (splice), or to efficiently copy data from one pipe
 to another (tee).
 
@@ -89,22 +90,29 @@ to another (tee).
 
 =item sysplice($fh_in, $fh_out, $num_bytes, $flags)
 
-Moves C<$num_bytes> from C<$fh_in> to C<$fh_out>.  This is roughly equivilent to,
+Copies C<$num_bytes> from C<$fh_in> to C<$fh_out>.  This is roughly equivalent to,
 
     sysread($fh_in, my $buf, $num_bytes);
     syswrite($fh_out, $buf);
 
-although the transfer takes place entirely in kernel-space.
+although the transfer takes place entirely in kernel space.
 
 Returns the number of bytes transferred.
 
 =item systee($fh_in, $fh_out, $num_bytes, $flags)
 
 Copies C<$num_bytes> from C<$fh_in> to C<$fh_out>.  The filehandles must both
-be of pipes.  This works similarly to C<syssplice>, but does not advance the
+be of type pipe.  This works similarly like C<syssplice> but does not advance the
 read pointer in C<$fh_in>.
 
 Returns the number of bytes transferred.
+
+=item syssendfile($fh_out, $fh_in, $num_bytes)
+
+Copies C<$num_bytes> from C<$fh_in> to C<$fh_out>.  With current versions of
+Linux, C<$fh_in> must be a file opened for reading, and C<$fh_out> must be a
+writable socket.  Note the different order of parameters compared to the other
+functions.
 
 =back
 
@@ -126,6 +134,13 @@ SPLICE_F_GIFT
 
 =back
 
+=head1 CAVEATS
+
+Only Linux is supported, on other OSs the calls will fail with C<ENOSYS> and
+the constants will not be available. L<tee(2)> and L<splice(2)> syscalls only
+exist on Linux. L<sendfile(2)> is provided by the BSDs, however it takes different
+parameters to the Linux call.
+
 =head1 SEE ALSO
 
 =over
@@ -146,15 +161,18 @@ L<splice(2)>
 =item *
 L<tee(2)>
 
+=item *
+L<sendfile(2)>
+
 =back
 
 =head1 AUTHOR
 
-Dave Lambley, E<lt>cpan@davel.org.ukE<gt>
+Dave Lambley, E<lt>dlambley@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011 by Dave Lambley
+Copyright (C) 2011, 2012, 2022 by Dave Lambley
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.1 or,

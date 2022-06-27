@@ -1,0 +1,10 @@
+Parent template
+@{[slot header=>"DEFAULT HEADER"]}
+
+will render child here ==>@[{slot}]<==
+and continue rendering 
+adding another slot for the footer
+@{[slot footer=>"DEFAULT FOOTER"]}
+
+After the footer
+

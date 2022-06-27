@@ -1,12 +1,14 @@
 Revision history for Term::Form
 
 
+0.551   2022-06-25
+    - Update readline history.
+
 0.550   2022-06-17
     - It is now required to load Term::From::ReadLine to call 'readline'.
     - No restrictions when clear_screen is set to '2'.
     - Bugfix: return empty string for all non set values.
     - Bugfix Control-X.
-    - Bugfix: load 'any'.
 
 0.547   2022-05-01
     - readline: refactoring output.

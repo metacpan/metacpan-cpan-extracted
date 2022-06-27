@@ -1,0 +1,285 @@
+#!/usr/bin/env perl
+# PODNAME: fu-sort
+# ABSTRACT: Sort sequences by size
+use 5.012;
+use warnings;
+use Getopt::Long;                   # Receive options from the command line
+use Pod::Usage;                     # For  --help
+use File::Basename;
+use FASTX::Reader;
+use FASTX::Seq;
+use Data::Dumper;
+
+my $EXE = basename($0);
+use Proch::Seqfu;
+my $VERSION = $Proch::Seqfu::VERSION // "<Dev>";
+my $AUTHOR = 'Andrea Telatin';
+my $DESC = 'Sort sequences by size';
+
+my $opt_def_qual    = $ENV{'SEQFU_DEF_QUAL'}   // 33;     # Default quality if printing FASTA to FASTQ
+my $opt_line_length = $ENV{'FU_LINE_LENGTH'} // 80;       # Default line length for FASTA files
+
+my( @Options,
+	$opt_ascending,
+    $opt_comment_len,
+	$opt_fasta,
+    $opt_fastq,
+    $opt_strip_comm,
+    $opt_upper,
+    $opt_revcompl,
+	$opt_quiet,
+    $opt_debug,
+);
+
+
+setOptions();
+
+my %seqs = ();
+
+foreach my $file (@ARGV) {
+	debug("Reading $file");
+	$file = undef if ($file eq '-');
+	my $FASTX = FASTX::Reader->new({ filename => "$file" });
+  while (my $seq = $FASTX->next() ) {
+	    my $len = length($seq->seq);
+	    push(@{ $seqs{$len} }, \$seq );
+  }
+
+}
+
+my %sorters = (
+   asc  => sub { $a <=> $b },
+   desc => sub { $b <=> $a },
+);
+
+my $sorter = $opt_ascending ? $sorters{'asc'} : $sorters{'desc'};
+for my $size (sort $sorter keys %seqs ) {
+	for my $s ( @{ $seqs{$size} }) {
+		my $seq = ${$s};
+
+		# Edit
+		$seq->{desc} = undef if ($opt_strip_comm);
+		$seq->{seq} = uc($seq->{seq}) if ($opt_upper);
+		$seq->rev() if ($opt_revcompl);
+
+        # comments
+        if ($opt_comment_len) {
+          if ($seq->{desc}) {
+            $seq->{desc} .= ";length=" . length($seq->{seq});
+          } else {
+            $seq->{desc} = "length=" . length($seq->{seq});
+          }
+        }
+		# Print sequences
+    my $sep = length($seq->comment()) ? " " : "";
+		if ( ($opt_fasta) or (not $opt_fastq and not $seq->{qual})) {
+      
+			print ">", $seq->name, $sep, $seq->comment, "\n", $seq->seq, "\n";
+		} elsif ( $opt_fastq or (not $opt_fasta and  $seq->{qual}) ) {
+			my $q = $seq->{qual} ? undef : $opt_def_qual;
+      my $Q = chr($q + 33);
+      my $qualstring = $Q x length($seq->seq);
+			print "@", $seq->name, $sep, $seq->comment, "\n", $seq->seq, "\n+\n", $qualstring, "\n";
+		} else {
+			debug("What");
+			say Dumper $seq;
+		}
+	}
+}
+
+sub ver {
+ say "$EXE $VERSION";
+ exit;
+}
+
+sub setOptions {
+  use Getopt::Long;
+
+  @Options = (
+  'Options:',
+    {OPT=>"asc",       VAR=>\$opt_ascending,         DESC=>"Print in ascending order (defaul: descending)"},
+
+  'General:',
+    {OPT=>"help",             VAR=>\&usage ,                        DESC=>"This help"},
+    {OPT=>"version",          VAR=>\&ver,                           DESC=>"Print version and exit"},
+    {OPT=>"citation",         VAR=>\&show_citation,                 DESC=>"Print citation for seqfu"},
+    {OPT=>"quiet!",           VAR=>\$opt_quiet, DEFAULT=>0,         DESC=>"No screen output"},
+    {OPT=>"debug!",           VAR=>\$opt_debug, DEFAULT=>0,         DESC=>"Debug mode"},
+
+  'Common seqfu options:',
+    {OPT=>"w|line-width=i",    VAR=>\$opt_line_length,              DESC=>"FASTA line size (0 for unlimited)"},
+    {OPT=>"sc|strip-comments", VAR=>\$opt_strip_comm,               DESC=>"Strip comments"},
+    {OPT=>"fasta",             VAR=>\$opt_fasta,                    DESC=>"Force FASTA output"},
+    {OPT=>"fastq",             VAR=>\$opt_fastq,                    DESC=>"Force FASTQ output"},
+    {OPT=>"rc",                VAR=>\$opt_revcompl,                 DESC=>"Print reverse complementary"},
+    {OPT=>'q|qual=f',          VAR=>\$opt_def_qual,                 DESC=>"Default quality for FASTQ files"},
+    {OPT=>'u|upper',           VAR=>\$opt_upper,                    DESC=>"Convert sequence to uppercase"},
+
+  'Sequence comments:',
+    {OPT=>'al|add-length',   VAR=>\$opt_comment_len,                DESC=>"Add length=LEN to the comment"}
+
+  );
+
+  (!@ARGV) && (usage(1));
+
+  &GetOptions(map {$_->{OPT}, $_->{VAR}} grep { ref } @Options) || usage(1);
+  # Check bad parameters
+  if ($opt_fasta and $opt_fastq) { die "ERROR: Please specify either --fasta or --fastq.\n"; }
+  if ($opt_line_length < 1) { $opt_line_length = 1_000_000_000_000_000 }
+
+  # Now setup default values.
+  foreach (@Options) {
+    if (ref $_ && defined($_->{DEFAULT}) && !defined(${$_->{VAR}})) {
+      ${$_->{VAR}} = $_->{DEFAULT};
+    }
+  }
+
+}
+
+
+sub debug {
+	say STDERR '#' , $_[0] if ($opt_debug);
+}
+sub usage {
+
+  my($exitcode) = @_;
+  $exitcode ||= 0;
+  $exitcode = 0 if $exitcode eq 'help';  # what gets passed by getopt func ref
+  select STDERR if $exitcode;            # write to STDERR if exitcode is error
+
+  print
+    "Name:\n  ", ucfirst($EXE), " $VERSION by $AUTHOR\n",
+    "Synopsis:\n  $DESC\n",
+    "Usage:\n  $EXE [options] filename (or '-' for STDIN)\n";
+
+  foreach (@Options) {
+    if (ref) {
+      my $def = defined($_->{DEFAULT}) ? " (default '$_->{DEFAULT}')" : "";
+      $def = ($def ? ' (default OFF)' : '(default ON)') if $_->{OPT} =~ m/!$/;
+      my $opt = $_->{OPT};
+      $opt =~ s/!$//;
+      $opt =~ s/=s$/ [X]/;
+      $opt =~ s/=i$/ [N]/;
+      $opt =~ s/=f$/ [n.n]/;
+      printf STDERR "  --%-16s %s%s\n", $opt, $_->{DESC}, $def;
+    }
+    else {
+      print "$_\n"; # Subheadings in the help output
+    }
+  }
+  exit($exitcode);
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+fu-sort - Sort sequences by size
+
+=head1 VERSION
+
+version 1.4.10
+
+=head1 EXAMPLES
+
+  fu-sort seq.fa > sorted.fa
+
+=head1 PARAMETERS
+
+=over 4
+
+=item C<--asc>             
+
+Print in ascending order (defaul: descending)
+
+=item C<--al|add-length>    
+
+Add length=LEN to the comment
+
+=item C<--help>             
+
+This help
+
+=item C<--version>          
+
+Print version and exit
+
+=item C<--quiet>            
+
+No screen output (default OFF)
+
+=item C<--debug>            
+
+Debug mode (default OFF)
+
+=back
+
+=head2 Common options
+
+=over 4
+
+=item C<--w|line-width> [N] 
+
+FASTA line size (0 for unlimited)
+
+=item C<--sc|strip-comments> 
+
+Strip comments
+
+=item C<--fasta>            
+
+Force FASTA output
+
+=item C<--fastq>            
+
+Force FASTQ output
+
+=item C<--rc>               
+
+Print reverse complementary
+
+=item C<--q|qual> [n.n]     
+
+Default quality for FASTQ files
+
+=item C<--u|upper>          
+
+Convert sequence to uppercase
+
+=back
+
+=head1 MODERN ALTERNATIVE
+
+This suite of tools has been superseded by B<SeqFu>, a compiled
+program providing faster and safer tools for sequence analysis.
+This suite is maintained for the higher portability of Perl scripts
+under certain circumstances.
+
+SeqFu is available at L<https://github.com/telatin/seqfu2>, and
+can be installed with BioConda C<conda install -c bioconda seqfu>
+
+=head1 CITING
+
+Telatin A, Fariselli P, Birolo G.
+I<SeqFu: A Suite of Utilities for the Robust and Reproducible Manipulation of Sequence Files>.
+Bioengineering 2021, 8, 59. L<https://doi.org/10.3390/bioengineering8050059>
+
+=cut
+
+=head1 AUTHOR
+
+Andrea Telatin <andrea@telatin.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018-2022 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

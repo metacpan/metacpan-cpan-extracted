@@ -1,8 +1,12 @@
-1.2.0    xx.xx.2021
+1.2.1    xx.xx.2022
+           - bugfix with client's queued requests & timeout
+           - bugfix with client's queued requests & pool desctructor
+1.2.0    10.02.2022
            - support for connections upgrade
            - add tcp_nodelay to location config
            - idle_timeout now affects connection establishment and closing
            - docs for logging
+           - optional uncompression for requests in Client
 1.1.3    26.11.2021
            - remove junk after testing unix sockets
 1.1.2    26.11.2021

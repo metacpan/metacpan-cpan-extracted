@@ -36,30 +36,24 @@
          "requires" : {
             "Class::Accessor::Fast" : "0.51",
             "IO::Scalar" : "2.111",
-            "JSON::PP" : "2.97001",
-            "Pod::Find" : "0",
+            "List::Util" : "1.50",
+            "Module::ScanDeps::Static" : "0.4",
+            "Pod::Find" : "1.63",
             "Readonly" : "2.05",
-            "version" : "0"
+            "perl" : "5.01"
          }
       },
       "test" : {
-         "requires" : {
-            "Class::Accessor::Fast" : "0.51",
-            "IO::Scalar" : "2.111",
-            "JSON::PP" : "2.97001",
-            "Pod::Find" : "0",
-            "Readonly" : "2.05",
-            "version" : "0"
-         }
+         "requires" : {}
       }
    },
    "provides" : {
       "Module::ScanDeps::Static" : {
          "file" : "lib/Module/ScanDeps/Static.pm",
-         "version" : "0.4"
+         "version" : "0.5"
       }
    },
    "release_status" : "stable",
-   "version" : "0.4",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.5",
+   "x_serialization_backend" : "JSON::PP version 4.09"
 }

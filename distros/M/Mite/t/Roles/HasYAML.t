@@ -5,7 +5,7 @@ use Test::Mite;
 
 before_all "Setup class for testing" => sub {
     package Foo;
-    use Mouse;
+    use Moo;
     with 'Mite::Role::HasYAML';
 };
 

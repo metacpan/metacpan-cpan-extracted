@@ -98,6 +98,14 @@ struct sockaddr_un
 
 #endif
 
+/*
+ * The Windows implementations of inet_ntop and inet_pton are available
+ * whenever (and only when) InetNtopA is defined.
+ * Use those implementations whenever they are available.
+ * Else use the implementations provided below.
+*/
+#ifndef InetNtopA
+
 static int inet_pton(int af, const char *src, void *dst)
 {
   struct sockaddr_storage ss;
@@ -145,6 +153,8 @@ static const char *inet_ntop(int af, const void *src, char *dst, socklen_t size)
   else
     return dst;
 }
+
+#endif /* InetNtopA  not defined */
 
 #define HAS_INETPTON
 #define HAS_INETNTOP

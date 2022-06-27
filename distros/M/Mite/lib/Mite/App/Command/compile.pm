@@ -1,20 +1,14 @@
 package Mite::App::Command::compile;
-
-use feature ':5.10';
-use Mouse;
-use MouseX::Foreign;
+use Mite::MyMoo;
 extends qw(Mite::App::Command);
 
-use Method::Signatures;
-use Path::Tiny;
-use Carp;
-
-method abstract() {
+sub abstract {
     return "Make your code ready to run";
 }
 
+sub execute {
+    my ( $self, $opts, $args ) = ( shift, @_ );
 
-method execute($opts, $args) {
     return if $self->should_exit_quietly($opts);
 
     my $config = Mite::Config->new(

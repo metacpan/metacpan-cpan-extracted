@@ -20,14 +20,11 @@ BEGIN
     use Clone ();
     use Data::Dumper;
     use JSON;
-    use Module::Generic::Array;
-    use Module::Generic::Number;
-    use Module::Generic::Scalar;
     use Module::Generic::TieHash;
     use Regexp::Common;
     use Want;
     use overload (
-        ## '""'    => 'as_string',
+        # '""'    => 'as_string',
         'eq'    => sub { _obj_eq(@_) },
         'ne'    => sub { !_obj_eq(@_) },
         '<'     => sub { _obj_comp( @_, '<') },
@@ -47,6 +44,9 @@ BEGIN
 
 use strict;
 no warnings 'redefine';
+require Module::Generic::Array;
+require Module::Generic::Number;
+require Module::Generic::Scalar;
 
 sub new
 {

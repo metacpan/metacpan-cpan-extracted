@@ -4,6 +4,9 @@ SYNOPSIS
         use Promise::Me; # exports async, await and share
         my $p = Promise::Me->new(sub
         {
+            # $_ is available as an array reference containing
+            # $_->[0] the code reference to the resolve method
+            # $_->[1] the code reference to the reject method
             # Some regular code here
         })->then(sub
         {
@@ -105,7 +108,7 @@ SYNOPSIS
 VERSION
 =======
 
-        v0.2.2
+        v0.3.0
 
 DESCRIPTION
 ===========
@@ -260,7 +263,16 @@ new
 
         my $p = Promise::Me->new(sub
         {
+            # $_ is available as an array reference containing
+            # $_->[0] the code reference to the resolve method
+            # $_->[1] the code reference to the reject method
+            my( $resolve, $reject ) = @$_;
             # some code to run asynchronously
+            $resolve->();
+            # or
+            $reject->();
+            # or maybe just
+            die( "Something\n" ); # will be trapped by catch()
         });
 
         # or
@@ -274,12 +286,44 @@ Instantiate a new `Promise::Me` object.
 It takes a code reference such as an anonymous subroutine or a reference
 to a subroutine, and optionally an hash reference of options.
 
+The variable `$_` is available and contains an array reference
+containing a code reference for `$resolve` and `$reject`. Thus if you
+wanted the execution fo your code to be resolved and calling
+[\"then\"](#then){.perl-module}, you could either return some return
+values, or explicitly call the code reference `$resolve->()`. Likewise
+if you want to force the promise to be rejected so it call the next
+chained [\"catch\"](#catch){.perl-module}, you can explicitly call
+`$reject->()`. This is similar in spirit to what JavaScript Promise
+does.
+
+Also, if you return an exception object, whose class you have set with
+the *exception\_class* option,
+[Promise::Me](https://metacpan.org/pod/Promise::Me){.perl-module} will
+be able to detect it and call [\"reject\"](#reject){.perl-module}
+accordingly and pass it the exception object as its sole argument.
+
+You can also die with a an exception object (see [\"die\" in
+perlfunc](https://metacpan.org/pod/perlfunc#die){.perl-module}) and it
+will be caught by
+[Promise::Me](https://metacpan.org/pod/Promise::Me){.perl-module} and
+the exception object will be passed to
+[\"reject\"](#reject){.perl-module} calling the next chained
+[\"catch\"](#catch){.perl-module} method.
+
 The options supported are:
 
 *debug* integer
 
 :   Sets the debug level. This can be quite verbose and will slow down
     the process, so use with caution.
+
+*exception\_class*
+
+:   The exception class you want to use, so that
+    [Promise::Me](https://metacpan.org/pod/Promise::Me){.perl-module}
+    can properly detect it when it is return from the main callback and
+    call [\"reject\"](#reject){.perl-module}, passing the exception
+    object as it sole parameter.
 
 *result\_shared\_mem\_size* integer
 
@@ -316,6 +360,9 @@ chain of handlers.
 
 It will be called upon an exception being met or if
 [\"reject\"](#reject){.perl-module} is called.
+
+The callback subroutine will be passed the error object as its unique
+argument.
 
 reject
 ------
@@ -373,6 +420,18 @@ If the asynchronous process returns a simple string for example,
 
 Thus, unless the value returned is 1 element and it is a reference, it
 will be made of an array reference.
+
+then
+----
+
+This takes a code reference as its unique argument and is added to the
+chain of handlers.
+
+It will be called upon resolution of the promise or when
+[\"resolve\"](#resolve){.perl-module} is called.
+
+The callback subroutine is passed as arguments whatever the previous
+callback returned.
 
 timeout
 -------
@@ -925,7 +984,7 @@ This will yield:
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x55960872b810)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x55829557aec8)"}\>
 
 SEE ALSO
 ========

@@ -23,21 +23,25 @@ name: App-perlmv
 provides:
   App::perlmv:
     file: lib/App/perlmv.pm
-    version: '0.605'
+    version: '0.606'
+  App::perlmv::scriptlet::add_extension_according_to_mime_type:
+    file: lib/App/perlmv/scriptlet/add_extension_according_to_mime_type.pm
+    version: '0.606'
   App::perlmv::scriptlet::remove_common_prefix:
     file: lib/App/perlmv/scriptlet/remove_common_prefix.pm
-    version: '0.605'
+    version: '0.606'
   App::perlmv::scriptlet::remove_common_suffix:
     file: lib/App/perlmv/scriptlet/remove_common_suffix.pm
-    version: '0.605'
+    version: '0.606'
   App::perlmv::scriptlets::std:
     file: lib/App/perlmv/scriptlets/std.pm
-    version: '0.605'
+    version: '0.606'
   Complete::App::perlmv:
     file: lib/Complete/App/perlmv.pm
-    version: '0.605'
+    version: '0.606'
 recommends:
   File::HomeDir: '0'
+  LWP::MediaTypes: '0'
   Lingua::Han::PinYin: '0'
   Text::Unaccent::PurePerl: '0'
 requires:
@@ -61,7 +65,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-perlmv
   homepage: https://metacpan.org/release/App-perlmv
   repository: git://github.com/perlancar/perl-App-perlmv.git
-version: '0.605'
+version: '0.606'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -351,7 +355,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.780'
+              version: '0.783'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

@@ -227,15 +227,16 @@ Les plis de sa robe pourprée,
 Et son teint au vostre pareil.
 EOT
     my $s = Module::Generic::Scalar->new;
-    my $io = $s->open || die( $s->error );
+    my $io = $s->open( { debug => $DEBUG, fatal => 0 } ) || die( $s->error );
     isa_ok( $io, 'Module::Generic::Scalar::IO', 'open' );
     diag( "File handle is: '$io'" ) if( $DEBUG );
     ok( $io->opened, 'opened' );
-    ok( !$io->fileno, 'fileno' );
+    is( $io->fileno, -1, 'fileno' );
     ok( $io->flush, 'flush' );
-    $io->print( $text );
-    diag( "String (", overload::StrVal( $s ), ") is now: $s" ) if( $DEBUG );
-    diag( "String (", overload::StrVal( $io ), ") is now: $io" ) if( $DEBUG );
+    my $rv = $io->print( $text );
+    diag( "Error printing to scalar: ", $io->error ) if( $DEBUG && !defined( $rv ) );
+    # diag( "String (", overload::StrVal( $s ), ") is now: $s" ) if( $DEBUG );
+    # diag( "String (", overload::StrVal( $io ), ") is now: $io" ) if( $DEBUG );
     is( "$s", $text, 'print' );
     $io->printf( "Author: %s\n", 'Pierre de Ronsard' );
     is( $io->getc, undef(), 'getc' );
@@ -266,9 +267,10 @@ EOT
     # diag( "Text is now:\n$io" );
     $io->seek(0,0);
     @lines = $io->getlines;
-    is( $lines[-1], "Author: Pierre de Ronsard, Les Odes\n", 'write resulting value' );
-    $io->seek( $io->length - length( $lines[-1] ) );
+    is( $lines[-1], "Author: Pierre de Ronsard, Les Odes", 'write resulting value' );
+    $io->seek( $io->length - length( $lines[-1] ), 0 );
     my $len = $io->truncate( $io->tell );
+    diag( "Error trying to truncate: ", $io->error ) if( $DEBUG && !defined( $len ) );
     is( $len, length( $lines[-1] ), 'truncate returned length' );
     $io->seek(0,0);
     @lines = $io->getlines;
@@ -278,6 +280,44 @@ EOT
     ok( $io->close, 'close' );
     ok( !tied( $io ), 'untied' );
     ok( !$io->opened, 'opened' );
+    
+    my $s2 = Module::Generic::Scalar->new( \$text );
+    $io = $s2->open( '<' );
+    isa_ok( $io => 'Module::Generic::Scalar::IO' );
+    $rv = $io->print( "print should not work\n" );
+    ok( !$rv, 'cannot print in read-only mode' );
+    $rv = $io->write( "write should not work either\n" );
+    ok( !$rv, 'cannot write in read-only mode' );
+    $rv = $io->syswrite( "syswrite should not work either\n" );
+    ok( !$rv, 'cannot syswrite in read-only mode' );
+    SKIP:
+    {
+        try
+        {
+            # require Fcntl;
+            # Fcntl->import;
+            use Fcntl;
+            skip( "Fcntl constants not loaded.", 1 ) if( !defined( &F_GETFL ) || !defined( &F_SETFL ) );
+            diag( "F_GETFL is '", F_GETFL, "' and F_SETFL is '", F_SETFL, "'" ) if( $DEBUG );
+            my $bit = $io->fcntl( F_GETFL, 0 );
+            diag( "Bit value returned is '$bit' and O_RDONLY is '", O_RDONLY, "'" ) if( $DEBUG );
+            if( !defined( $bit ) )
+            {
+                diag( "Error getting bitwise value: ", $io->error ) if( $DEBUG );
+                skip( 'failed getting bitwise value', 1 );
+            }
+            elsif( $bit !~ /^\d+$/ )
+            {
+                diag( "Bit value returned is not an integer -> '$bit'" ) if( $DEBUG );
+            }
+            ok( ( ( $bit > 0 && $bit & O_RDONLY ) || $bit == O_RDONLY ), 'scalar io has read-only bit' );
+            ok( !( $bit & O_RDWR ), 'scalar io does not have write bit' );
+        }
+        catch( $e )
+        {
+            skip( "Fcntl is not available on $^O", 1 );
+        }
+    };
 };
 
 # From perlpacktut

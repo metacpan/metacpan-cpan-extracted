@@ -12,7 +12,7 @@ using panda::string;
 struct Message : virtual panda::Refcnt {
     std::vector<string> payload;
 
-    Message (size_t max_size) : _max_size(max_size), _state(State::PENDING), _payload_length(0), _frame_count(0) {}
+    Message (size_t max_size) : _max_size(max_size), _state(State::PENDING), _payload_length(0), _frame_count(0), _deflated(false) {}
 
     Opcode   opcode         () const { return _opcode; }
     bool     is_control     () const { return FrameHeader::is_control_opcode(_opcode); }

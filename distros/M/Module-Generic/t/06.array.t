@@ -10,7 +10,11 @@ BEGIN
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
-BEGIN { use_ok( 'Module::Generic::Array' ) || BAIL_OUT( "Unable to load Module::Generic::Array" ); }
+BEGIN
+{
+    use_ok( 'Module::Generic::Array' ) || BAIL_OUT( "Unable to load Module::Generic::Array" );
+    use_ok( 'Module::Generic::Scalar' ) || BAIL_OUT( "Unable to load Module::Generic::Scalar" );
+}
 # use warnings 'Module::Generic::Array';
 # no warnings 'Module::Generic::Array';
 
@@ -382,6 +386,11 @@ ok( !$max_val->defined, 'max on empty list returns undef as an object' );
 
 my $min = $values->min;
 is( "$min", 3, 'min' );
+
+my $ex1 = Module::Generic::Array->new( [qw( Jack John Paul Peter )] );
+my $other = Module::Generic::Array->new( [qw( Emmanuel Gabriel Paul Peter Raphael )] );
+my $ex2 = $ex1->except( $other );
+is( "@$ex2", "Jack John" );
 
 subtest 'callback' => sub
 {

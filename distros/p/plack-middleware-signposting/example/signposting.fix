@@ -1,0 +1,28 @@
+do list(path: data.author, var: loop)
+  if exists(loop.orcid)
+    prepend(loop.orcid, 'https://orcid.org/')
+    move_field(loop.orcid, tmp.$append)
+
+    add_field(tmp.$append,author)
+    move_field(tmp, r.$append)
+  end
+end
+
+if exists(data.doi)
+  prepend(data.doi, 'https://doi.org/')
+  copy_field(data.doi,tmp.$append)
+  add_field(tmp.$append, describedby)
+  add_field(tmp.$append, 'application/vnd.citationstyles.csl+json')
+  move_field(tmp, r.$append)
+
+  copy_field(data.doi,tmp2.$append)
+  add_field(tmp2.$append, identifier)
+  move_field(tmp2, r.$append)
+end
+
+add_field(tmp3.$append, 'http://schema.org/ScholarlyArticle')
+add_field(tmp3.$append, type)
+move_field(tmp3, r.$append)
+
+move_field(r, signs)
+retain(signs)

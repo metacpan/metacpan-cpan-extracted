@@ -5,7 +5,7 @@ use Test::Mite;
 
 before_all "setup testing class" => sub {
     package Foo;
-    use Mouse;
+    use Moo;
     with "Mite::Role::HasConfig";
 };
 

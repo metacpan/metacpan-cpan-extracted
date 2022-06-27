@@ -45,6 +45,7 @@
             "App::optex" : "v0.5.3",
             "File::Share" : "0",
             "List::Util" : "0",
+            "Time::HiRes" : "0",
             "perl" : "v5.14.0"
          }
       },
@@ -57,7 +58,7 @@
    "provides" : {
       "App::optex::pingu" : {
          "file" : "lib/App/optex/pingu.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -71,11 +72,11 @@
          "web" : "https://github.com/kaz-utashiro/optex-pingu"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 4.07",
-   "x_static_install" : 1
+   "x_static_install" : 0
 }

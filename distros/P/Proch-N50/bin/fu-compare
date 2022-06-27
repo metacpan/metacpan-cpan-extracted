@@ -1,0 +1,103 @@
+#!/usr/bin/env perl 
+# PODNAME: fu-compare
+# ABSTRACT: Find the common sequences between two files
+
+use 5.012;
+use warnings;
+use Getopt::Long;
+use FindBin qw($RealBin);
+use FASTX::Reader;
+use File::Basename;
+use Data::Dumper;
+sub loadseqs($);
+my $BASENAME = basename($0);
+my $opt_verbose;
+
+my ($file1, $file2) = @ARGV;
+
+usage() unless (defined $file2);
+
+my %s1 = loadseqs "$file1";
+my %s2 = loadseqs "$file2";
+
+
+for my $seq1 (keys %s1) {
+	my $matches = 0;
+	for my $seq2 (keys %s2) {
+		if ($seq1 =~/$seq2/) {
+			$matches++;
+			say "$s1{$seq1}\t$s2{$seq2}\tOK";
+		} elsif ($seq2 =~/$seq1/) {
+			$matches++;
+			say "$s2{$seq2}\t$s1{$seq1}\tOK";
+		} 
+	}
+	say "$s1{$seq1}\t..\tKO" if (!$matches and $opt_verbose);
+}
+sub loadseqs($) {
+	my ($filename) = @_;
+	my %seqs = ();
+	my $READER = FASTX::Reader->new({ filename => "$filename" });
+	while (my $s = $READER->getRead() ) {
+		$seqs{ $s->{seq} } = $s->{name};
+	}
+	return %seqs;
+}
+
+sub usage {
+	say<<END;
+ $BASENAME File1.fa File2.fa
+ -----------------------------------------------
+ Prints the common sequences between two files
+
+END
+ exit;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+fu-compare - Find the common sequences between two files
+
+=head1 VERSION
+
+version 1.4.10
+
+=head1 SYNOPSIS
+
+  fu-cat File1 File2
+
+=head1 MODERN ALTERNATIVE
+
+This suite of tools has been superseded by B<SeqFu>, a compiled
+program providing faster and safer tools for sequence analysis.
+This suite is maintained for the higher portability of Perl scripts
+under certain circumstances.
+
+SeqFu is available at L<https://github.com/telatin/seqfu2>, and
+can be installed with BioConda C<conda install -c bioconda seqfu>
+
+=head1 CITING
+
+Telatin A, Fariselli P, Birolo G.
+I<SeqFu: A Suite of Utilities for the Robust and Reproducible Manipulation of Sequence Files>.
+Bioengineering 2021, 8, 59. L<https://doi.org/10.3390/bioengineering8050059>
+
+=head1 AUTHOR
+
+Andrea Telatin <andrea@telatin.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018-2022 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

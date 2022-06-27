@@ -4,7 +4,7 @@
       "Atsushi Kobayashi  C<< <nekokak __at__ gmail.com> >>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.9",
+   "generated_by" : "Minilla/v3.1.18",
    "license" : [
       "perl_5"
    ],
@@ -74,7 +74,7 @@
    "provides" : {
       "Teng" : {
          "file" : "lib/Teng.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Teng::Iterator" : {
          "file" : "lib/Teng/Iterator.pm"
@@ -135,13 +135,15 @@
       },
       "homepage" : "https://github.com/nekokak/p5-Teng",
       "repository" : {
-         "url" : "git://github.com/nekokak/p5-Teng.git",
+         "type" : "git",
+         "url" : "https://github.com/nekokak/p5-Teng.git",
          "web" : "https://github.com/nekokak/p5-Teng"
       }
    },
-   "version" : "0.32",
+   "version" : "0.33",
    "x_authority" : "cpan:NEKOKAK",
    "x_contributors" : [
+      "AnaTofuZ <anatofuz@gmail.com>",
       "Asato Wakisaka <caaov627@hcn.zaq.ne.jp>",
       "Atsushi Kato <ktat@cpan.org>",
       "Atsushi Kobayashi <nekokak _at_ gmail dot com>",
@@ -159,14 +161,15 @@
       "Masahiro Nagano <kazeburo@gmail.com>",
       "Mihyaeru <mihyaeru21@gmail.com>",
       "Nishibayashi Takuji <takuji@senchan.jp>",
-      "Satoh, Hiroh <cho45@lowreal.net>",
       "Songmu <y.songmu@gmail.com>",
       "Syohei YOSHIDA <syohex@gmail.com>",
+      "Takafumi ONAKA <takafumi.onaka@gmail.com>",
       "Takuji Nishibayashi <takuji31@gmail.com>",
       "Tokuhiro Matsuno <tokuhirom@gmail.com>",
       "Tomohiro Hosaka <bokutin@bokut.in>",
       "Yuki Ibe <yibe@yibe.org>",
       "aereal <aereal@aereal.org>",
+      "cho45 <cho45@lowreal.net>",
       "issm <issmxx@gmail.com>",
       "k-sato <k-sato@mfac.jp>",
       "karupanerura <karupa@cpan.org>",
@@ -179,5 +182,6 @@
       "nobuoka <nobuoka@vividcode.info>",
       "zentooo <ankerasoy@gmail.com>"
    ],
+   "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 1
 }

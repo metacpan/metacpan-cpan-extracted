@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Cookies API for Server & Client - ~/lib/Cookie/Jar.pm
-## Version v0.1.1
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.1.4
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/10/08
-## Modified 2021/11/17
+## Modified 2022/06/27
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -39,7 +39,7 @@ BEGIN
     use Nice::Try;
     use Scalar::Util;
     use URI::Escape ();
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.1.4';
     # This flag to allow extensive debug message to be enabled
     our $COOKIES_DEBUG = 0;
     use constant CRYPTX_VERSION => '0.074';
@@ -166,15 +166,23 @@ sub add_request_header
     # my $now = time();
     my $now = DateTime->now;
     $path = $self->_normalize_path( $path ) if( CORE::index( $path, '%' ) != -1 );
-    my $dom = Cookie::Domain->new || return( $self->pass_error( Cookie::Domain->error ) );
-    my $res = $dom->stat( $host );
-    return( $self->pass_error( $dom->error ) ) if( !defined( $res ) );
-    if( !CORE::length( $res ) || ( $res && !$res->domain->length ) )
+    my $root;
+    if( $self->_is_ip( $host ) )
     {
-        $self->message( 3, "No root domain found for host \"$host\"." );
-        return( $self->error( "No root domain found for host \"$host\"." ) );
+        $root = $host;
     }
-    my $root = $res->domain;
+    else
+    {
+        my $dom = Cookie::Domain->new || return( $self->pass_error( Cookie::Domain->error ) );
+        my $res = $dom->stat( $host );
+        return( $self->pass_error( $dom->error ) ) if( !defined( $res ) );
+        if( !CORE::length( $res ) || ( $res && !$res->domain->length ) )
+        {
+            $self->message( 3, "No root domain found for host \"$host\"." );
+            return( $self->error( "No root domain found for host \"$host\"." ) );
+        }
+        $root = $res->domain;
+    }
     # rfc6265, section 5.4
     # "Either:
     # The cookie's host-only-flag is true and the canonicalized request-host is identical to the cookie's domain.
@@ -477,17 +485,25 @@ sub extract
     }
     $path = '/' unless( length( $path ) );
     $port = $uri->port if( !defined( $port ) || !length( $port ) );
-    my $dom = Cookie::Domain->new || return( $self->pass_error( Cookie::Domain->error ) );
-    $self->message( 3, "Guessing root domain for host '$host'." ) if( $COOKIES_DEBUG );
-    my $res = $dom->stat( $host );
-    if( !defined( $res ) )
+    my $root;
+    if( $self->_is_ip( $host ) )
     {
-        $self->message( 3, "Error found while trying to get root domain for host \"$host\"." ) if( $COOKIES_DEBUG );
-        return( $self->pass_error( $dom->error ) );
+        $root = $host;
     }
-    # Possibly empty
-    $self->message( 3, "No root found in public suffix for host \"$host\"." ) if( !$res );
-    my $root = $res ? $res->domain : '';
+    else
+    {
+        my $dom = Cookie::Domain->new || return( $self->pass_error( Cookie::Domain->error ) );
+        $self->message( 3, "Guessing root domain for host '$host'." ) if( $COOKIES_DEBUG );
+        my $res = $dom->stat( $host );
+        if( !defined( $res ) )
+        {
+            $self->message( 3, "Error found while trying to get root domain for host \"$host\"." ) if( $COOKIES_DEBUG );
+            return( $self->pass_error( $dom->error ) );
+        }
+        # Possibly empty
+        $self->message( 3, "No root found in public suffix for host \"$host\"." ) if( !$res );
+        $root = $res ? $res->domain : '';
+    }
     
     foreach my $o ( @$all )
     {
@@ -1247,11 +1263,22 @@ sub save
     {
         push( @$all, $c->as_hash );
     }
-    my $today = DateTime->now( time_zone => 'local' );
+    my $tz;
+    # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
+    # "Cannot determine local time zone"
+    try
+    {
+        $tz = DateTime::TimeZone->new( name => 'local' );
+    }
+    catch( $e )
+    {
+        $tz = DateTime::TimeZone->new( name => 'UTC' );
+    }
+    my $today = DateTime->now( time_zone => $tz );
     my $dt_fmt = DateTime::Format::Strptime->new(
         pattern => '%FT%T%z',
         locale => 'en_GB',
-        time_zone => 'local',
+        time_zone => $tz->name,
     );
     $today->set_formatter( $dt_fmt );
     my $data = { cookies => $all, updated_on => "$today" };
@@ -1510,7 +1537,7 @@ Cookie::Jar - Cookies API for Server & Client
 
     use Cookie::Jar;
     my $jar = Cookie::Jar->new( request => $r ) ||
-    return( $self->error( "An error occurred while trying to get the cookie jar." ) );
+        die( "An error occurred while trying to get the cookie jar:", Cookie::Jar->error );
     # set the default host
     $jar->host( 'www.example.com' );
     $jar->fetch;
@@ -1603,7 +1630,7 @@ Cookie::Jar - Cookies API for Server & Client
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.4
 
 =head1 DESCRIPTION
 
@@ -1734,7 +1761,7 @@ So, when L</fetch> creates an object for each one and store them, those cookies 
 
 The http client, when receiving those cookies will derive the  missing cookie path to be C</my/path>, i.e. the current uri path, and will create a duplicate cookie from the previously stored cookie with the same name for that host, but that had the path set to C</>
 
-So you can create a repository and use it to store the cookies sent by the http client using L</fetch>, but in preparation of the server response, either use a separate repository with, for example, C<my $jar_out = Cookie::Jar->new> or use L</set> which will not add the cookie to the repository, but rather only set the C<Set-Cookie> header for that cookie.
+So you can create a repository and use it to store the cookies sent by the http client using L</fetch>, but in preparation of the server response, either use a separate repository with, for example, C<< my $jar_out = Cookie::Jar->new >> or use L</set> which will not add the cookie to the repository, but rather only set the C<Set-Cookie> header for that cookie.
 
     # Add Set-Cookie header for that cookie, but do not add cookie to repository
     $jar->set( $cookie_object );
@@ -2103,7 +2130,7 @@ It can be any of L<AES|Crypt::Cipher::AES>, L<Anubis|Crypt::Cipher::Anubis>, L<B
 
 =item I<encrypt> boolean
 
-Must be set to true to enable decryption.
+Must be set to true to enable encryption.
 
 =item I<iv> string
 
@@ -2123,7 +2150,7 @@ The key must be the same one used to decrypt the file and must have a size big e
 
     perl -MCrypt::Cipher::AES -lE 'say Crypt::Cipher::AES->keysize'
 
-In this case, it will yield C<32>. Replace above C<AES>, byt whatever algorithm you have chosen.
+In this case, it will yield C<32>. Replace above C<AES>, by whatever algorithm you have chosen.
 
     perl -MCrypt::Cipher::Blowfish -lE 'say Crypt::Cipher::Blowfish->keysize'
 
@@ -2190,7 +2217,7 @@ To import cookies, you can either use the methods L<scan|HTTP::Cookies/scan> fro
     use Cookie::Jar;
     use HTTP::Cookies;
     my $jar = Cookie::Jar->new;
-    my $old = HTTP::Cookies;
+    my $old = HTTP::Cookies->new;
     $old->load( '/home/joe/old_cookies_file.txt' );
     my @keys = qw( version key val path domain port path_spec secure expires discard hash );
     $old->scan(sub

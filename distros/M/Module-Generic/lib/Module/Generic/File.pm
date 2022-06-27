@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.4.0
+## Version v0.4.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2022/04/07
+## Modified 2022/06/26
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,7 +19,8 @@ BEGIN
     use warnings::register;
     use version;
     use parent qw( Module::Generic );
-    use vars qw( $OS2SEP $DIR_SEP $MODE_BITS $DEFAULT_MMAP_SIZE $FILES_TO_REMOVE $MMAP_USE_FILE_MAP $GLOBBING );
+    use vars qw( $OS2SEP $DIR_SEP $MODE_BITS $DEFAULT_MMAP_SIZE $FILES_TO_REMOVE 
+                 $MMAP_USE_FILE_MAP $GLOBBING $ILLEGAL_CHARACTERS );
     use Data::UUID ();
     use Fcntl qw( :DEFAULT :flock SEEK_SET SEEK_CUR SEEK_END );
     use File::Copy ();
@@ -28,6 +29,8 @@ BEGIN
     use IO::Dir ();
     use IO::File ();
     use Module::Generic::Finfo;
+    # constants are already exported with the use Fcntl
+    use Module::Generic::File::IO ();
     use Nice::Try;
     use Scalar::Util ();
     use URI ();
@@ -119,7 +122,12 @@ BEGIN
     # $URI::file::DEFAULT_AUTHORITY = undef;
     $FILES_TO_REMOVE = {};
     $GLOBBING = 0;
-    our $VERSION = 'v0.4.0';
+    # [\\/:"*?<>|]+ are illegal characters under Windows
+    # <https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/ch08s25.html>
+    # Catching non-ascii characters: [^\x00-\x7F]
+    # Credits to: File::Util
+    $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
+    our $VERSION = 'v0.4.2';
 };
 
 use strict;
@@ -147,6 +155,7 @@ sub init
     # Should we collapse dots? In most of the cases, it is ok, but there might be
     # symbolic links in the path that could complicate things and even create recursion
     $self->{collapse}       = 1;
+    $self->{debug}          = 0;
     # Do glob on file upon resolve so that any shell meta characters are resolved
     # e.g. ~joe/some/file.txt would be resolved to /home/joe/some/file.txt
     # otherwise the filename would remain "~joe/some/file.txt"
@@ -460,7 +469,7 @@ sub can_read
             # $rv = $io->read( my $buff, 1024 );
             my $flags = $io->fcntl( F_GETFL, 0 );
             $self->message( 4, "Flags are: $flags and O_RDONLY is '", O_RDONLY, "' and O_RDWR is '", O_RDWR, "'." );
-            my $v = ( $flags & ( O_RDONLY | & O_RDWR ) );
+            my $v = ( ( $flags == O_RDONLY ) || ( $flags & ( O_RDONLY | O_RDWR ) ) );
             $v++ unless( $flags & O_ACCMODE );
             $io->close unless( $opened );
             return( $v );
@@ -488,7 +497,11 @@ sub can_write
             if( $io )
             {
                 my $flags = $io->fcntl( F_GETFL, 0 );
-                return( $flags & ( O_APPEND | & O_WRONLY | O_CREAT | & O_RDWR ) );
+                warn( "Error getting the file handle flags: ", $io->error ) if( !defined( $flags ) );
+                return( $self->pass_error( $io->error ) ) if( !defined( $flags ) );
+                my $bits = ( O_APPEND | O_WRONLY | O_CREAT | O_RDWR );
+                $self->message( 4, "F_GETFL is '", F_GETFL, "'. Flags are: $flags and O_WRONLY is '", O_WRONLY, "' and O_RDWR is '", O_RDWR, "'. Comparings flags '$flags' against '$bits'. is flags defined? ", ( defined( $flags ) ? 'yes' : 'no' ) );
+                return( $flags & ( O_APPEND | O_WRONLY | O_CREAT | O_RDWR ) );
             }
             elsif( $self->finfo->can_write )
             {
@@ -586,7 +599,7 @@ sub child
     }
     $new = $self->_spec_catpath( $vol, $path, $file );
     # We do not resolve the overall file path, because the user may depend on what he/she provided us initially, or here as a child
-    return( $self->new( $new, { resolved => 1, os => $self->{os} } ) );
+    return( $self->new( $new, { resolved => 1, os => $self->{os}, debug => $self->debug } ) );
 }
 
 sub chmod
@@ -697,6 +710,7 @@ sub code
                 }
                 elsif( $self->is_empty )
                 {
+                    $self->message( 4, "Code for file is $code" );
                     if( $code == 201 )
                     {
                         # ok then
@@ -733,9 +747,11 @@ sub collapse_dots
     # We use this to know what to return and how to behave
     my $sep  = CORE::length( $opts->{separator} ) ? $opts->{separator} : '/';
     return( '' ) if( !CORE::length( $path ) );
+    $self->message( 4, "Path to process is '${path}' with separator '$opts->{separator}'" );
     # my $u = $opts->{separator} ? URI::file->new( $path ) : URI->new( $path );
     $self->message( 4, "URI::file class used for os '", ( $self->{os} // '' ), "' is '", $self->_uri_file_class, "'" );
     my $u = $opts->{separator} ? $self->_uri_file_class->new( $path ) : URI->new( $path );
+    $u->path( $path ) if( $path =~ /^[[:blank:]\h]+/ || $path =~ /[[:blank:]\h]+$/ );
     # unless( CORE::index( "$u", '.' ) != -1 || CORE::index( "$u", '..' ) != -1 )
     unless( $u =~ /(?:(?:(?:^|\/)\.{1,2}\/)|(?:\/\.{1,2}(?:\/|$)))/ )
     {
@@ -1089,6 +1105,34 @@ sub extension
     }
 }
 
+sub extensions
+{
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        return( $self ) if( $self->is_dir );
+        my $extensions = shift( @_ ); # It could be empty if the user wanted to remove the extension
+        $extensions //= '';
+        my $parent = $self->parent;
+        my $base = $self->basename;
+        my @parts = split( /\./, $base );
+        my $top = shift( @parts );
+        my $new = $parent->child( length( $extensions ) ? join( '.', $top, $extensions ) : $top );
+        return( $new );
+    }
+    else
+    {
+        my $a = $self->new_array;
+        # Return empty if this is a directory
+        return( $a ) if( $self->is_dir );
+        my $base = $self->basename;
+        my @parts = split( /\./, $base );
+        shift( @parts );
+        $a = $self->new_array( \@parts );
+        return( $a );
+    }
+}
+
 sub fcntl { return( shift->_filehandle_method( 'fcntl', 'file', @_ ) ); }
 
 sub fdopen { return( shift->_filehandle_method( 'fdopen', 'file', @_ ) ); }
@@ -1181,7 +1225,7 @@ sub filename
         {
             # $newfile = URI::file->new( $newfile )->abs( URI::file->new( $base_dir ) )->file( $^O );
             $newfile = $self->_uri_file_abs( $newfile, $base_dir );
-            $self->message( 3, "Made file provided absolute => $newfile" );
+            $self->message( 3, "Made file provided absolute => '$newfile'" );
         }
         $self->message( 3, "Getting the new file real path: '$newfile'" );
         if( $self->collapse )
@@ -1355,20 +1399,95 @@ sub gid { return( shift->finfo->gid ); }
 sub glob
 {
     my $self = shift( @_ );
+    my $opts = {};
+    $opts = pop( @_ ) if( @_ && ref( $_[-1] ) eq 'HASH' );
     my $os = $self->{os} || $^O;
     my $path = $self->filename;
-    $self->message( 4, "Resolving file '$path' for  provided os value '$os' and real os '$^O'." );
+    my $pattern;
+    if( scalar( @_ ) )
+    {
+        # patter provided, if any, must be a regular string
+        return( $self->error( "Unsupported pattern provided ($_[0]). It must be a regular scalar, but instead is '", overload::StrVal( $_[0] ), "'" ) ) if( ref( $_[0] ) );
+        $pattern = shift( @_ );
+        $self->message( 4, "Pattern supplied is '$pattern'" );
+    }
+    my $make_objects = ( exists( $opts->{object} ) ? CORE::delete( $opts->{object} ) : 1 );
+    my $flags;
+    # Parameters have been provided, so we set the flags.
+    $self->messagef( 4, "%d options provided.", scalar( keys( %$opts ) ) );
+    if( scalar( keys( %$opts ) ) && $os !~ /^(mswin32|win32|vms|riscos)$/i )
+    {
+        $opts->{brace} //= 0;
+        # Expand expression starting with ~ to user home directory
+        $opts->{expand} //= 1;
+        $opts->{no_case} //= 0;
+        $opts->{no_magic} //= 0;
+        $flags = 0;
+        $flags |= File::Glob::GLOB_NOCASE if( $opts->{no_case} );
+        if( exists( $opts->{sort} ) )
+        {
+            # By default, File::Glob sort the files, but you can speed it up by providing 'sort' with a false value to indicate it not to do any sorting.
+            if( $opts->{sort} )
+            {
+                $flags |= File::Glob::GLOB_ALPHASORT;
+            }
+            else
+            {
+                $flags |= File::Glob::GLOB_NOSORT;
+            }
+        }
+        $flags |= File::Glob::GLOB_BRACE if( $opts->{brace} );
+        $flags |= File::Glob::GLOB_NOMAGIC if( $opts->{no_magic} );
+        $flags |= File::Glob::GLOB_TILDE if( $opts->{expand} );
+    }
+    $self->message( 4, "Resolving file '$path' for  provided os value '$os' and real os '$^O', file is a ", ( $self->is_dir ? 'directory' : 'file' ), " and wantarray is -> ", ( wantarray() ? 'yes' : 'no' ) );
     # Those do not work in virtualisation
     if( $os eq $^O )
     {
-        if( $os =~ /^(mswin32|win32|vms|riscos)$/i )
+        if( Want::want( 'LIST' ) )
         {
-            require File::DosGlob;
-            $path = File::DosGlob::glob( $path );
+            $self->message( 4, "Caller wants a list of files found." );
+            my @files;
+            if( $os =~ /^(mswin32|win32|vms|riscos)$/i )
+            {
+                require File::DosGlob;
+                @files = File::DosGlob::glob( ( $self->is_dir && defined( $pattern ) ) ? CORE::join( $OS2SEP->{ lc( $os ) }, $path, $pattern ) : $path );
+            }
+            else
+            {
+                @files = File::Glob::bsd_glob( ( ( $self->is_dir && defined( $pattern ) ) ? CORE::join( $OS2SEP->{ lc( $os ) }, $path, $pattern ) : $path ), ( ( defined( $flags ) && $flags != 0 ) ? $flags : () ) );
+                return( $self->error( "Error globbing with pattern '", ( defined( $pattern ) ? $pattern : $path ), "': $!" ) ) if( !scalar( @files ) && &File::Glob::GLOB_ERROR );
+            }
+            
+            if( $make_objects )
+            {
+                for( my $i = 0; $i < scalar( @files ); $i++ )
+                {
+                    my $f = $self->new( $files[$i] ) || do
+                    {
+                        # Somehow, we failed at creating an object for this file, so we skip it.
+                        CORE::splice( @files, $i, 1 );
+                        $i--;
+                        next;
+                    };
+                    $files[$i] = $f;
+                }
+            }
+            return( @files );
         }
         else
         {
-            $path = File::Glob::bsd_glob( $path );
+            $self->message( 4, "Caller only wants one file." );
+            if( $os =~ /^(mswin32|win32|vms|riscos)$/i )
+            {
+                require File::DosGlob;
+                $path = File::DosGlob::glob( ( $self->is_dir && defined( $pattern ) ) ? CORE::join( $OS2SEP->{ lc( $os ) }, $path, $pattern ) : $path );
+            }
+            else
+            {
+                $path = File::Glob::bsd_glob( ( ( $self->is_dir && defined( $pattern ) ) ? CORE::join( $OS2SEP->{ lc( $os ) }, $path, $pattern ) : $path ), ( ( defined( $flags ) && $flags != 0 ) ? $flags : () ) );
+                return( $self->error( "Error globbing with pattern '", ( defined( $pattern ) ? $pattern : $path ), "': $!" ) ) if( !$path && &File::Glob::GLOB_ERROR );
+            }
         }
     }
     return( $path ) if( !CORE::length( $path ) );
@@ -1388,6 +1507,13 @@ sub handle
     return( $opened ) if( $opened );
     $opened = $self->open( @_ ) || return( $self->pass_error );
     return( $opened );
+}
+
+sub has_valid_name
+{
+    my $self = shift( @_ );
+    my $name = @_ ? shift( @_ ) : $self->basename;
+    return( $name !~ /$ILLEGAL_CHARACTERS/ ? $self->true : $self->false );
 }
 
 sub inode { return( shift->finfo->inode ); }
@@ -1563,6 +1689,7 @@ sub lines
 {
     my $self = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
+    return( $self->error( "You can only call lines() on a file." ) ) unless( $self->is_file );
     my $a = $self->new_array;
     return( $a ) if( !$self->exists || $self->is_dir || !$self->finfo->can_read );
     # If binmode option was provided, the file was opened with it
@@ -2036,8 +2163,8 @@ sub mmap
     }
     else
     {
-        $self->message( 3, "Cannot write to file '$file'" );
-        my $fsize = $file->length;
+        $self->message( 3, "Cannot write to file '$file'");
+        my $fsize = $self->length;
         if( $size > $fsize )
         {
             $self->message( 3, "Required size is $size but file size is smaller with $fsize bytes, and I do not have permission to write to it to fill the gap necessary for File::Map to work." );
@@ -2124,7 +2251,15 @@ sub open
                 $mode = '>>';
             }
             $self->message( 3, "Opening file \"$file\" with mode '$mode'." );
-            $io = IO::File->new( $file, $mode, @_ ) || return( $self->error( "Unable to open file \"$file\": $!" ) );
+            try
+            {
+                $io = Module::Generic::File::IO->new( $file, $mode, @_ ) || return( $self->error( "Unable to open file \"$file\": $!" ) );
+            }
+            catch( $err )
+            {
+                return( $self->error( "Unable to open file \"${file}\" with mode '${mode}': ${err}" ) );
+            }
+            
             if( CORE::exists( $opts->{binmode} ) )
             {
                 if( !defined( $opts->{binmode} ) || !CORE::length( $opts->{binmode} ) )
@@ -2141,6 +2276,7 @@ sub open
             }
             $io->autoflush( $opts->{autoflush} ) if( CORE::exists( $opts->{autoflush} ) && CORE::length( $opts->{autoflush} ) );
             $self->opened( $io );
+            $self->message( 4, "Did the file exist before? ", ( $existed ? 'yes' : 'no' ), " and can I write to it? ", ( $self->can_write ? 'yes' : 'no' ) );
             if( !$existed && $self->can_write )
             {
                 $self->code( 201 ); # created
@@ -2294,7 +2430,19 @@ sub read
     {
         if( $self->is_dir )
         {
-            return( $io->read );
+            my $opts = $self->_get_args_as_hash( @_[1..$#_] );
+            my $f = $io->read;
+            return( $f ) if( !defined( $f ) );
+            if( substr( $f, 0, 1 ) eq '.' && $opts->{exclude_invisible} )
+            {
+                return( $self->read( $opts ) );
+            }
+            
+            if( $opts->{as_object} )
+            {
+                $f = $self->new( $f, base_dir => $self->filename ) || return( $self->pass_error );
+            }
+            return( $f );
         }
         else
         {
@@ -2331,23 +2479,6 @@ sub relative
     my $self = shift( @_ );
     my $base = @_ ? shift( @_ ) : $self->base_dir;
     return( $self->_spec_abs2rel( [ $self->filepath, $base ] ) );
-}
-
-sub rmdir
-{
-    my $self = shift( @_ );
-    return( $self ) if( !$self->is_dir );
-    my $dir = $self->filename;
-    try
-    {
-        CORE::rmdir( $dir ) ||
-            return( $self->error( "Unable to remove directory \"$dir\": $!. Is it empty?" ) );
-        return( $self );
-    }
-    catch( $e )
-    {
-        return( $self->error( "An error occurred while trying to remove the directory \"$dir\": $e" ) );
-    }
 }
 
 sub remove { return( shift->delete( @_ ) ); }
@@ -2423,7 +2554,8 @@ sub resolve
     }
     $self->message( 3, "Returning '", sub{ $self->_spec_catpath( $vol, $self->_spec_catdir( [ @$curr ] ), $fname ) }, "'" );
     # XXX Remove debugging
-    if( $self->debug >= 4 )
+    my $debug = $self->debug // 0;
+    if( $debug >= 4 )
     {
         my $test = $self->_spec_catpath( $vol, $self->_spec_catdir( [ @$curr ] ), $fname );
         if( !CORE::length( $test ) )
@@ -2432,10 +2564,27 @@ sub resolve
             $self->message( 4, "Volume is '$vol', \$fname is '$fname' and directories are: '", CORE::join( "', '", @$curr ), "'." );
         }
     }
-    return( $self->new( $self->_spec_catpath( $vol, $self->_spec_catdir( [ @$curr ] ), $fname ), { resolved => 1, os => $self->{os}, ( $self->{base_dir} ? ( base_dir => $self->{base_dir} ) : () ) }) );
+    return( $self->new( $self->_spec_catpath( $vol, $self->_spec_catdir( [ @$curr ] ), $fname ), { resolved => 1, os => $self->{os}, ( $self->{base_dir} ? ( base_dir => $self->{base_dir} ) : () ), debug => $self->debug }) );
 }
 
 sub resolved { return( shift->_set_get_boolean( 'resolved', @_ ) ); }
+
+sub rmdir
+{
+    my $self = shift( @_ );
+    return( $self ) if( !$self->is_dir );
+    my $dir = $self->filename;
+    try
+    {
+        CORE::rmdir( $dir ) ||
+            return( $self->error( "Unable to remove directory \"$dir\": $!. Is it empty?" ) );
+        return( $self );
+    }
+    catch( $e )
+    {
+        return( $self->error( "An error occurred while trying to remove the directory \"$dir\": $e" ) );
+    }
+}
 
 # $obj->rmtree( $some_dir_path );
 # $obj->rmtree( $some_dir_path, $options_hashref );
@@ -2710,6 +2859,8 @@ sub stdin { return( &_function2method( \@_ )->_standard_io( 'stdin', @_ ) ); }
 
 sub stdout { return( &_function2method( \@_ )->_standard_io( 'stdout', @_ ) ); }
 
+sub suffix { return( shift->extension( @_ ) ); }
+
 sub symlink
 {
     my $self = shift( @_ );
@@ -2781,7 +2932,11 @@ sub tempfile
     }
     
     # $fname .= $opts->{suffix} if( CORE::defined( $opts->{suffix} ) && CORE::length( $opts->{suffix} ) && $opts->{suffix} =~ /^\.[\w\-\_]+$/ );
-    $fname .= $opts->{suffix} if( CORE::defined( $opts->{suffix} ) && CORE::length( $opts->{suffix} ) && $opts->{suffix} =~ /^[\w\-\_\.]+$/ );
+    if( CORE::defined( $opts->{suffix} ) && CORE::length( $opts->{suffix} ) && $opts->{suffix} =~ /^[\w\-\_\.]+$/ )
+    {
+        substr( $opts->{suffix}, 0, 0, '.' ) if( substr( $opts->{suffix}, 0, 1 ) ne '.' );
+        $fname .= $opts->{suffix};
+    }
     $self->message( 3, "Filename generated is '$fname'" );
     my $dir;
     my $sys_tmpdir = $self->_spec_tmpdir;
@@ -3228,9 +3383,17 @@ sub _filehandle_method
             return( $self->error( ucfirst( $type ), " \"${file}\" is not opened yet." ) );
         $self->message( 3, "File handle is '$opened'. Calling method '$what' with arguments: '", CORE::join( "', '", @_ ), "'." );
         # return( $opened->$what( @_ ) );
-        my $rv = $opened->$what( @_ );
-        return( $self->error({ skip_frames => 1, message => "Error with $what on file \"$file\": $!" }) ) if( !CORE::defined( $rv ) && $what ne 'getline' );
-        return( $rv );
+        my @rv = ();
+        if( wantarray() )
+        {
+            @rv = $opened->$what( @_ );
+        }
+        else
+        {
+            $rv[0] = $opened->$what( @_ );
+        }
+        return( $self->error({ skip_frames => 1, message => "Error with $what on file \"$file\": $!" }) ) if( ( !scalar( @rv ) || !CORE::defined( $rv[0] ) ) && $what ne 'getline' );
+        return( wantarray() ? @rv : $rv[0] );
     }
     catch( $e )
     {
@@ -3663,7 +3826,19 @@ sub _uri_file_abs
     my( $path, $base ) = @_;
     # Maybe better?
     # return( URI::file->new( $path )->abs( URI::file->new( $base ) )->file( $self->{os} ) );
-    return( URI::file->new( $path )->abs( $base )->file( $self->{os} ) );
+    # URI->new expressly removes leading and trailing space, and URI::file calls URI->new
+    # So, we need to create an instance and replace the modified path with the original one, i.e. the one with some leading and/or trailing spaces
+    if( $path =~ /^[[:blank:]\h]+/ || $path =~ /[[:blank:]\h]+$/ )
+    {
+        $self->message( 3, "File path '$path' has some leading oe trailing white space." );
+        my $u = URI::file->new( $path );
+        $u->path( $path );
+        return( $u->abs( $base )->file( $self->{os} ) );
+    }
+    else
+    {
+        return( URI::file->new( $path )->abs( $base )->file( $self->{os} ) );
+    }
 }
 
 sub _uri_file_class
@@ -3957,9 +4132,22 @@ Module::Generic::File - File Object Abstraction Class
     # or by object:
     my $f = file( "~john/some/where/file.txt", { globbing => 1 } );
 
+    my $d = file( './some/where' );
+    my @files = $d->glob( '*.pl' );
+    die( "Something went wrong: ", $d->error ) if( !@files && $d->error );
+    my $last_file = $d->glob( '*.pl' ) ||
+    die( "Something went wrong: ", $d->error ) if( !defined( $last_file ) );
+    my @all = $d->glob( '*.pl', {
+        brace => 1,
+        expand => 1,
+        no_case => 1,
+        no_magic => 1,
+        sort => 1,
+    });
+
 =head1 VERSION
 
-    v0.4.0
+    v0.4.2
 
 =head1 DESCRIPTION
 
@@ -4321,7 +4509,7 @@ This uses L<Module::Generic::Finfo/exists>
 
 =head2 extension
 
-if an argument is provided, and is undefined or zero byte in length, this will remove the extension characterised with the following pattern C<qr/\.(\w+)$/>. otherwise, if a non-empty value was provided, it will substitute any previous value for the new one and return a new L<Module::Generic::File> object.
+If an argument is provided, and is undefined or zero byte in length, this will remove the extension characterised with the following pattern C<qr/\.(\w+)$/>. otherwise, if a non-empty value was provided, it will substitute any previous value for the new one and return a new L<Module::Generic::File> object.
 
 If no argument is provided, this simply returns the current file extension as a L<Module::Generic::Scalar> object if it is a regular file, or an empty string if it is a directory.
 
@@ -4330,6 +4518,53 @@ Extension is simply defined with the regular expression C<\.(\w+)$>
     my $f = file( "/some/where/file.txt" );
     my $new = $f->extension( 'pl' ); # /some/where/file.pl
     my $new = $f->extension( undef() ); # /some/where/file
+
+Keep in mind that changing the extension of the file object does not actually alter the file on the filesystem, if any. For that you need to do something like:
+
+    my $f2 = $f->extension( 'png' );
+    $f->move( $f2 ) || die( $f->error );
+
+Now C</some/where/file.txt> has been moved to C</some/where/file.png> on the filesystem.
+
+=head2 extensions
+
+In retrieval mode, this returns all extensions found as an L<array object|Module::Generic::Array>.
+
+Because the notion of "extension" is very fluid, this treats as extension anything that follows the initial dot in a filename. For example:
+
+    my $f = Module::Generic::File->new( '/some/where/file.txt' );
+    my $exts = $f->extensions;
+
+C<$exts> contains C<txt> only, but:
+
+    my $f = Module::Generic::File->new( '/some/where/file.txt.gz' );
+    my $exts = $f->extensions;
+
+C<$exts> now contains C<txt> and C<gz>. And:
+
+    my $f = Module::Generic::File->new( '/some/where/file.unknown.txt.gz' );
+    my $exts = $f->extensions;
+
+C<$exts> would contain C<unknown>, C<txt> and C<gz>. However:
+
+    my $f = Module::Generic::File->new( '/some/where/file' );
+    my $exts = $f->extensions;
+
+C<$exts> would be an empty L<array object|Module::Generic::Array>.
+
+If this is called on a directory, this returns an empty L<array object|Module::Generic::Array>.
+
+In assignment mode, this takes a string of one or more extensions and change the file object basename accordingly.
+
+For example:
+
+    my $f = Module::Generic::File->new( '/some/where/file.txt' );
+    $f->extensions( 'txt.gz' );
+    # $f is now /some/where/file.txt.gz
+
+    my $f = Module::Generic::File->new( '/some/where/file.txt.gz' );
+    $f->extensions( undef );
+    # $f is now /some/where/file
 
 =head2 fcntl
 
@@ -4440,7 +4675,7 @@ This is a thin wrapper around L<IO::Handle> method of the same name.
 
 This is a thin wrapper around L<IO::Handle> method of the same name.
 
-"This works like <$io> when called in a list context to read all the remaining lines in a file, except that it's more readable. It will also croak() if accidentally called in a scalar context."
+"This works like <$io> when called in a list context to read all the remaining lines in a file, except that it's more readable. It will also return an error if accidentally called in a scalar context."
 
 =head2 gid
 
@@ -4448,7 +4683,7 @@ This is a shortcut to L<Module::Generic::Finfo/gid>
 
 =head2 glob
 
-Provided with a file name with meta characters, or using the current object underlying filename by default, and this will call L<perlfunc/glob> to resolve those meta characters, if any. For example:
+Provided with a pattern with meta characters, or using the current object underlying filename by default, and this will call L<perlfunc/glob> to resolve those meta characters, if any. For example:
 
 C<~joe/some/file.txt> would be resolved to C</home/joe/some/file.txt>
 
@@ -4458,9 +4693,68 @@ This is useful when you have filename with meta characters in their file path, l
 
 C</some/where/A [A-12] file.pdf>
 
+It also accepts the following options, but only for operating systems that are not Windows, VMS or RiscOS:
+
+Quoting, for convenience, from L<File::Glob>
+
+=over 4
+
+=item C<brace>
+
+"Pre-process the string to expand "{pat,pat,...}" strings like csh(1).  The pattern '{}' is left unexpanded for historical reasons (and csh(1) does the same thing to ease typing of find(1) patterns)."
+
+=item C<expand>
+
+"Expand patterns that start with '~' to user name home directories."
+
+=item C<no_case>
+
+"By default, file names are assumed to be case sensitive; this flag makes C<glob()> treat case differences as not significant."
+
+=item C<no_magic>
+
+"Only returns the pattern if it does not contain any of the special characters C<*>, C<?> or C<[>." This option "is provided to simplify implementing the historic csh(1) globbing behaviour and should probably not be used anywhere else."
+
+=item C<object>
+
+If this is false, then C<glob> will not turn each of the files found into an L<Module::Generic::File> object, which means the list returned will contain files as a regular string, essentially a pass-through from the results returned by L<File::Glob/bsd_glob>
+
+=item C<sort>
+
+if true, this will "sort filenames is alphabetical order (case does not matter) rather than in ASCII order."
+
+If false, this will not sort files, which speeds up L<File::Glob/bsd_glob>.
+
+This defaults to true.
+
+=back
+
 If the resulting value is empty, which means that nothing was found, it returns an empty string (not C<undef>), otherwise, it returns a new L<Module::Generic::File> object of the resolved file.
 
 This method uses L<File::DosGlob> for windows-related platforms and L<File::Glob> for all other cases to perform globbing.
+
+If the current file object represents a directory, the pattern provided, if any, will be expanded inside that directory.
+
+In list context, it returns a list of all the files expanded, each one as a L<Module::Generic::File> object, and in scalar context, it returns the last file expanded, also as a L<Module::Generic::File> object.
+
+If you call C<glob> in list context, but do not want all the files found to be turned into L<Module::Generic::File> objects, then pass the option C<object> with a false value.
+
+Example:
+
+    use Module::Generic::File qw( file );
+    my $d = file( './some/where/' );
+    my @files = $d->glob( '*.pl' );
+    die( "Something went wrong: ", $d->error ) if( !@files && $d->error );
+    my $last_file = $d->glob( '*.pl' ) ||
+    die( "Something went wrong: ", $d->error ) if( !defined( $last_file ) );
+    my @all = $d->glob( '*.pl', {
+        brace => 1,
+        expand => 1,
+        no_case => 1,
+        no_magic => 1,
+        sort => 1,
+    });
+    my $new_file = $file->glob( './some/where/*.pl' );
 
 =head2 globbing
 
@@ -4491,6 +4785,14 @@ See also L</unload>
 Returns the current file/directory handle if it is already opened, or attempts to open it.
 
 It will return undef and set an exception object if an error occurred.
+
+=head2 has_valid_name
+
+This optionally takes a file name, or default to the underlying object file base name, and checks if it contains any illegal characters.
+
+It returns true if it is clean or false otherwise.
+
+The regular expression used is: C<< [\x5C\/\|\015\012\t\013\*\"\?\<\:\>] >>
 
 =head2 inode
 
@@ -5561,9 +5863,9 @@ This is the mode used to open this temporary file. It is used as arguement to L<
 
 If true, the temporary file will be opened. It defaults to false.
 
-=item I<suffix>
+=item I<suffix> or I<extension>
 
-A suffix to add to the temporary file including leading dot, such as C<.txt>
+A suffix to add to the temporary file including leading dot, such as C<.txt>. You can also specify the extension without any leading dot, such as C<txt>
 
 =item I<tmpdir>
 

@@ -2,6 +2,16 @@ This is the changelog for FASTX::Reader. Version prior to v 0.1 are preliminary 
 Some APIs *can change* with the release of the first stable release (v 1.0).
 Version 0.61 has been available via BioConda
 
+1.5.0 2022-06-24
+  * FASTX::Seq with undef name is now rendered as FASTA/Q with name "sequence"
+  
+1.4.1 2022-06-22
+  * Added PerlIO::encoding in prerequisites (in core since 5.8.0)
+
+1.4.0 2022-06-19
+  * Updated documentation
+  * Added a len() method for FASTX::Seq
+
 1.3.0 2021-11-04
   * Standalone FASTX::Seq class
 

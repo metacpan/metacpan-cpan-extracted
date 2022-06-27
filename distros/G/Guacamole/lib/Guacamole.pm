@@ -1,15 +1,17 @@
 package Guacamole;
 our $AUTHORITY = 'cpan:XSAWYERX';
 # ABSTRACT: A parser toolkit for Standard Perl
-$Guacamole::VERSION = '0.007';
+$Guacamole::VERSION = '0.008';
 use strict;
 use warnings;
-use Marpa::R2;
+use feature qw< state >;
 use constant {
     'DEBUG' => 0,
 };
 
-my $grammar_source = q{
+use Marpa::R2;
+
+our $grammar_source = q{
 lexeme default = latm => 1
 :default ::= action => [ name, start, length, values ]
 
@@ -43,6 +45,16 @@ LoopStatement ::= ForStatement
 
 ForStatement ::= ForStatementOp LParen Statement Semicolon Statement Semicolon Statement RParen Block ContinueExpr
                | ForStatementOp LParen Statement Semicolon Statement Semicolon Statement RParen Block
+               | ForStatementOp LParen Semicolon Statement Semicolon Statement RParen Block ContinueExpr
+               | ForStatementOp LParen Semicolon Statement Semicolon Statement RParen Block
+               | ForStatementOp LParen Statement Semicolon Semicolon Statement RParen Block ContinueExpr
+               | ForStatementOp LParen Statement Semicolon Semicolon Statement RParen Block
+               | ForStatementOp LParen Statement Semicolon Statement Semicolon RParen Block ContinueExpr
+               | ForStatementOp LParen Statement Semicolon Statement Semicolon RParen Block
+               | ForStatementOp LParen Semicolon Semicolon Statement RParen Block ContinueExpr
+               | ForStatementOp LParen Semicolon Semicolon Statement RParen Block
+               | ForStatementOp LParen Statement Semicolon Semicolon RParen Block ContinueExpr
+               | ForStatementOp LParen Statement Semicolon Semicolon RParen Block
                | ForStatementOp OpKeywordMy VarScalar LParen Expression RParen Block ContinueExpr
                | ForStatementOp OpKeywordMy VarScalar LParen Expression RParen Block
                | ForStatementOp VarScalar LParen Expression RParen Block ContinueExpr
@@ -92,6 +104,7 @@ RequireStatement ::= OpKeywordRequire VersionExpr
 
 PackageStatement ::= OpKeywordPackage ClassIdent VersionExpr Block
                    | OpKeywordPackage ClassIdent Block
+
 PackageDeclaration ::= OpKeywordPackage ClassIdent VersionExpr
                      | OpKeywordPackage ClassIdent
 
@@ -137,10 +150,23 @@ ConditionForeachPostfixExpr ::= ConditionForeach Expression
 Label ::= IdentComp Colon
 
 # this is based on the order of ops in `perldoc perlop`
-# U can be LHS of shift and up
-# 0 can be LHS of assignment and up
-# L can be LHS of comma and up
-# R can be LHS of anything
+# U can be LHS of shift and up      (value)                       << >>
+# 0 can be LHS of assignment and up (value or unary)              = += -= *=
+# L can be LHS of comma and up      (value, assign, unary)        , =>
+# R can be LHS of anything          (value, list, assign, unary) (anything)
+
+# There are four types of keywords:
+# * Nullary (This is "OpNullaryKeywordExpr" -> Value")
+# * Unary   (This is "OpUnaryKeywordExpr")
+# * Assign  (This is "OpAssignKeywordExpr")
+# * List    (This is "OpListKeywordExpr")
+
+# Hence, there are four types of expressions:
+# ExprValueU: Those that are just values
+# ExprValue0: Those that are values, and unary keywords
+# ExprValueL: Those that are values, assignment keywords (+ goto,last,next,redo,dump), or unary keywords
+# ExprValueR: Those that are values, list, assigment, or unary
+
 ExprValueU    ::= Value
 ExprValue0    ::= Value | OpUnaryKeywordExpr
 ExprValueL    ::= Value | OpAssignKeywordExpr | OpUnaryKeywordExpr
@@ -210,10 +236,9 @@ ExprNameAnd   ::= ExprNameAnd OpNameAnd ExprNameNot     | ExprNameNot   action =
 ExprNameOr    ::= ExprNameOr  OpNameOr  ExprNameAnd     | ExprNameAnd   action => ::first
 Expression    ::=                                         ExprNameOr    action => ::first
 
-# These will never be evaluated as a hashref (LiteralHash)
-# because hashrefs are not allowed to be top-level
-# Being combined combined with '+' or 'return' means they aren't top-level,
-# but follow top-level tokens ('+' or 'return')
+# Hashrefs (LiteralHash) are not allowed to be top-level so they aren't confused with block
+# However, "+{...}" or "return {...}" means they aren't top level because of the preceding op
+# which are themselves top-level tokens ("+", "return")
 NonBraceExprValueU    ::= NonBraceValue
 NonBraceExprValue0    ::= NonBraceValue | OpUnaryKeywordExpr
 NonBraceExprValueL    ::= NonBraceValue | OpAssignKeywordExpr | OpUnaryKeywordExpr
@@ -230,10 +255,10 @@ NonBraceExprPowerU    ::= NonBraceExprIncU    OpPower   ExprUnaryU      | NonBra
 NonBraceExprPower0    ::= NonBraceExprIncU    OpPower   ExprUnary0      | NonBraceExprInc0     action => ::first
 NonBraceExprPowerL    ::= NonBraceExprIncU    OpPower   ExprUnaryL      | NonBraceExprIncL     action => ::first
 NonBraceExprPowerR    ::= NonBraceExprIncU    OpPower   ExprUnaryR      | NonBraceExprIncR     action => ::first
-NonBraceExprUnaryU    ::= OpUnary     ExprUnaryU                | NonBraceExprPowerU   action => ::first
-NonBraceExprUnary0    ::= OpUnary     ExprUnary0                | NonBraceExprPower0   action => ::first
-NonBraceExprUnaryL    ::= OpUnary     ExprUnaryL                | NonBraceExprPowerL   action => ::first
-NonBraceExprUnaryR    ::= OpUnary     ExprUnaryR                | NonBraceExprPowerR   action => ::first
+NonBraceExprUnaryU    ::= OpUnary     ExprUnaryU                        | NonBraceExprPowerU   action => ::first
+NonBraceExprUnary0    ::= OpUnary     ExprUnary0                        | NonBraceExprPower0   action => ::first
+NonBraceExprUnaryL    ::= OpUnary     ExprUnaryL                        | NonBraceExprPowerL   action => ::first
+NonBraceExprUnaryR    ::= OpUnary     ExprUnaryR                        | NonBraceExprPowerR   action => ::first
 NonBraceExprRegexU    ::= NonBraceExprRegexU  OpRegex   ExprUnaryU      | NonBraceExprUnaryU   action => ::first
 NonBraceExprRegex0    ::= NonBraceExprRegexU  OpRegex   ExprUnary0      | NonBraceExprUnary0   action => ::first
 NonBraceExprRegexL    ::= NonBraceExprRegexU  OpRegex   ExprUnaryL      | NonBraceExprUnaryL   action => ::first
@@ -276,7 +301,7 @@ NonBraceExprCondL     ::= NonBraceExprRange0  OpTriThen ExprRangeL OpTriElse Exp
 NonBraceExprCondR     ::= NonBraceExprRange0  OpTriThen ExprRangeR OpTriElse ExprCondR | NonBraceExprRangeR action => ::first
 NonBraceExprAssignL   ::= NonBraceExprCond0   OpAssign  ExprAssignL     | OpAssignKeywordExpr
                                                         | NonBraceExprCondL     action => ::first
-NonBraceExprAssignR   ::= NonBraceExprCond0   OpAssign  ExprAssignR     | NonBraceExprCondR     action => ::first
+NonBraceExprAssignR   ::= NonBraceExprCond0   OpAssign  ExprAssignR     | NonBraceExprCondR    action => ::first
 
 
 NonBraceExprComma     ::= NonBraceExprAssignL OpComma ExprComma    | NonBraceExprAssignR action => ::first
@@ -287,7 +312,7 @@ BlockLevelExprNameAnd ::= BlockLevelExprNameAnd OpNameAnd ExprNameNot | BlockLev
 BlockLevelExprNameOr  ::= BlockLevelExprNameOr OpNameOr ExprNameAnd | BlockLevelExprNameAnd action => ::first
 BlockLevelExpression  ::= BlockLevelExprNameOr action => ::first
 
-Value         ::= Literal | NonLiteral | QLikeValue
+Value ::= Literal | NonLiteral | QLikeValue
 
 # Arguments of operators according to the operator precedence
 OpUnaryKeywordArg         ::= ExprShiftR
@@ -363,6 +388,7 @@ VarHash     ::= SigilHash VarIdentExpr ElemSeq0
 VarCode     ::= SigilCode VarIdentExpr
 VarGlob     ::= SigilGlob VarIdentExpr
 VarArrayTop ::= SigilArrayTop VarIdentExpr
+              | '$#_'
 
 SubCall ::= SubNameCallExpr CallArgs
           | VarCode CallArgs
@@ -488,6 +514,8 @@ GlobalVariables ~ '!'
                 | '{^CAPTURE_ALL}'
                 | Digits
 
+VarDefaultArg ::= '$_'
+
 # This uses the same definition as subroutine names
 # In the future, we might want to split those
 # but they are basically the same
@@ -532,6 +560,8 @@ ArrowRHS ::= ArrowDerefCall
            | ArrowMethodCall
            | ArrowIndirectCall
            | ElemSeq1
+           | VarScalar
+           | VarDefaultArg
 
 ArrowDerefCall     ::= CallArgs
 ArrowDerefVariable ::= DerefVariableArgsAll
@@ -783,6 +813,10 @@ OpKeywordAtan2Expr            ::= OpKeywordAtan2 OpListKeywordArg
 OpKeywordBindExpr             ::= OpKeywordBind OpListKeywordArg
 
 OpKeywordBinmodeExpr          ::= OpKeywordBinmode OpListKeywordArg
+                                | OpKeywordBinmode LParen BuiltinFilehandle RParen
+                                | OpKeywordBinmode BuiltinFilehandle
+                                | OpKeywordBinmode LParen BuiltinFilehandle OpComma ExprAssignR RParen
+                                | OpKeywordBinmode BuiltinFilehandle OpComma ExprAssignR
 
 OpKeywordBlessExpr            ::= OpKeywordBless OpListKeywordArg
 
@@ -832,6 +866,7 @@ OpKeywordDefinedExpr          ::= OpKeywordDefined OpUnaryKeywordArg
 OpKeywordDeleteExpr           ::= OpKeywordDelete OpUnaryKeywordArg
 
 OpKeywordDieExpr              ::= OpKeywordDie OpListKeywordArg
+                                | OpKeywordDie
 
 OpKeywordDoExpr               ::= OpKeywordDo BlockNonEmpty
                                 | OpKeywordDo OpUnaryKeywordArgNonBrace
@@ -846,6 +881,7 @@ OpKeywordEofExpr              ::= OpKeywordEof OpUnaryKeywordArg
                                 | OpKeywordEof
 
 OpKeywordEvalExpr             ::= OpKeywordEval BlockNonEmpty
+                                | OpKeywordEval Value
 
 OpKeywordEvalbytesExpr        ::= OpKeywordEvalbytes OpUnaryKeywordArg
                                 | OpKeywordEvalbytes
@@ -867,18 +903,21 @@ OpKeywordFilenoExpr           ::= OpKeywordFileno OpUnaryKeywordArg
 
 OpKeywordFlockExpr            ::= OpKeywordFlock OpListKeywordArg
 
-OpKeywordForkExpr             ::= OpKeywordFork
+OpKeywordForkExpr             ::= OpKeywordFork LParen RParen
+                                | OpKeywordFork
 
 OpKeywordGetcExpr             ::= OpKeywordGetc OpUnaryKeywordArg
                                 | OpKeywordGetc
 
-OpKeywordGetloginExpr         ::= OpKeywordGetlogin
+OpKeywordGetloginExpr         ::= OpKeywordGetlogin LParen RParen
+                                | OpKeywordGetlogin
 
 OpKeywordGetpeernameExpr      ::= OpKeywordGetpeername OpUnaryKeywordArg
 
 OpKeywordGetpgrpExpr          ::= OpKeywordGetpgrp OpUnaryKeywordArg
 
-OpKeywordGetppidExpr          ::= OpKeywordGetppid
+OpKeywordGetppidExpr          ::= OpKeywordGetppid LParen RParen
+                                | OpKeywordGetppid
 
 OpKeywordGetpriorityExpr      ::= OpKeywordGetpriority OpListKeywordArg
 
@@ -906,21 +945,29 @@ OpKeywordGetprotobynumberExpr ::= OpKeywordGetprotobynumber OpUnaryKeywordArg
 
 OpKeywordGetservbyportExpr    ::= OpKeywordGetservbyport OpListKeywordArg
 
-OpKeywordGetpwentExpr         ::= OpKeywordGetpwent
+OpKeywordGetpwentExpr         ::= OpKeywordGetpwent LParen RParen
+                                | OpKeywordGetpwent
 
-OpKeywordGetgrentExpr         ::= OpKeywordGetgrent
+OpKeywordGetgrentExpr         ::= OpKeywordGetgrent LParen RParen
+                                | OpKeywordGetgrent
 
-OpKeywordGethostentExpr       ::= OpKeywordGethostent
+OpKeywordGethostentExpr       ::= OpKeywordGethostent LParen RParen
+                                | OpKeywordGethostent
 
-OpKeywordGetnetentExpr        ::= OpKeywordGetnetent
+OpKeywordGetnetentExpr        ::= OpKeywordGetnetent LParen RParen
+                                | OpKeywordGetnetent
 
-OpKeywordGetprotoentExpr      ::= OpKeywordGetprotoent
+OpKeywordGetprotoentExpr      ::= OpKeywordGetprotoent LParen RParen
+                                | OpKeywordGetprotoent
 
-OpKeywordGetserventExpr       ::= OpKeywordGetservent
+OpKeywordGetserventExpr       ::= OpKeywordGetservent LParen RParen
+                                | OpKeywordGetservent
 
-OpKeywordSetpwentExpr         ::= OpKeywordSetpwent
+OpKeywordSetpwentExpr         ::= OpKeywordSetpwent LParen RParen
+                                | OpKeywordSetpwent
 
-OpKeywordSetgrentExpr         ::= OpKeywordSetgrent
+OpKeywordSetgrentExpr         ::= OpKeywordSetgrent LParen RParen
+                                | OpKeywordSetgrent
 
 OpKeywordSethostentExpr       ::= OpKeywordSethostent OpUnaryKeywordArg
 
@@ -930,17 +977,23 @@ OpKeywordSetprotoentExpr      ::= OpKeywordSetprotoent OpUnaryKeywordArg
 
 OpKeywordSetserventExpr       ::= OpKeywordSetservent OpUnaryKeywordArg
 
-OpKeywordEndpwentExpr         ::= OpKeywordEndpwent
+OpKeywordEndpwentExpr         ::= OpKeywordEndpwent LParen RParen
+                                | OpKeywordEndpwent
 
-OpKeywordEndgrentExpr         ::= OpKeywordEndgrent
+OpKeywordEndgrentExpr         ::= OpKeywordEndgrent LParen RParen
+                                | OpKeywordEndgrent
 
-OpKeywordEndhostentExpr       ::= OpKeywordEndhostent
+OpKeywordEndhostentExpr       ::= OpKeywordEndhostent LParen RParen
+                                | OpKeywordEndhostent
 
-OpKeywordEndnetentExpr        ::= OpKeywordEndnetent
+OpKeywordEndnetentExpr        ::= OpKeywordEndnetent LParen RParen
+                                | OpKeywordEndnetent
 
-OpKeywordEndprotoentExpr      ::= OpKeywordEndprotoent
+OpKeywordEndprotoentExpr      ::= OpKeywordEndprotoent LParen RParen
+                                | OpKeywordEndprotoent
 
-OpKeywordEndserventExpr       ::= OpKeywordEndservent
+OpKeywordEndserventExpr       ::= OpKeywordEndservent LParen RParen
+                                | OpKeywordEndservent
 
 OpKeywordExecExpr             ::= OpKeywordExec BlockNonEmpty OpListKeywordArg
                                 | OpKeywordExec OpListKeywordArgNonBrace
@@ -1073,7 +1126,9 @@ OpKeywordReadExpr             ::= OpKeywordRead OpListKeywordArg
 
 OpKeywordReaddirExpr          ::= OpKeywordReaddir OpUnaryKeywordArg
 
-OpKeywordReadlineExpr         ::= OpKeywordReadline OpUnaryKeywordArg
+OpKeywordReadlineExpr         ::= OpKeywordReadline LParen BuiltinFilehandle RParen
+                                | OpKeywordReadline BuiltinFilehandle
+                                | OpKeywordReadline OpUnaryKeywordArg
                                 | OpKeywordReadline
 
 OpKeywordReadlinkExpr         ::= OpKeywordReadlink OpUnaryKeywordArg
@@ -1212,9 +1267,11 @@ OpKeywordTieExpr              ::= OpKeywordTie OpListKeywordArg
 
 OpKeywordTiedExpr             ::= OpKeywordTied OpUnaryKeywordArg
 
-OpKeywordTimeExpr             ::= OpKeywordTime
+OpKeywordTimeExpr             ::= OpKeywordTime LParen RParen
+                                | OpKeywordTime
 
-OpKeywordTimesExpr            ::= OpKeywordTimes
+OpKeywordTimesExpr            ::= OpKeywordTimes LParen RParen
+                                | OpKeywordTimes
 
 OpKeywordTruncateExpr         ::= OpKeywordTruncate OpListKeywordArg
 
@@ -1245,11 +1302,13 @@ OpKeywordValuesExpr           ::= OpKeywordValues OpUnaryKeywordArg
 
 OpKeywordVecExpr              ::= OpKeywordVec OpListKeywordArg
 
-OpKeywordWaitExpr             ::= OpKeywordWait
+OpKeywordWaitExpr             ::= OpKeywordWait LParen RParen
+                                | OpKeywordWait
 
 OpKeywordWaitpidExpr          ::= OpKeywordWaitpid OpListKeywordArg
 
-OpKeywordWantarrayExpr        ::= OpKeywordWantarray
+OpKeywordWantarrayExpr        ::= OpKeywordWantarray LParen RParen
+                                | OpKeywordWantarray
 
 OpKeywordWarnExpr             ::= OpKeywordWarn OpListKeywordArg
                                 | OpKeywordWarn
@@ -1289,6 +1348,9 @@ OpFile ::=
 OpFileExpr ::= OpFile OpFileArg
 OpFileArg  ::= OpUnaryKeywordArg
              | BuiltinFilehandle
+             | OpFileDefaultArg
+
+OpFileDefaultArg ~ '_'
 
 QLikeValue ::= QLikeValueExpr | QLikeValueExprWithMods
 
@@ -1436,13 +1498,13 @@ DoubleQuote ~ ["]
 
 NonDoubleOrEscapedQuote_Many ~ NonDoubleOrEscapedQuote+
 NonDoubleOrEscapedQuote      ~ EscapedDoubleQuote | NonDoubleQuote
-EscapedDoubleQuote           ~ Escape ["]
-NonDoubleQuote               ~ [^"]
+EscapedDoubleQuote           ~ Escape ["] | Escape [^"]
+NonDoubleQuote               ~ [^"\x{005C}]
 
 NonSingleOrEscapedQuote_Many ~ NonSingleOrEscapedQuote+
 NonSingleOrEscapedQuote      ~ EscapedSingleQuote | NonSingleQuote
-EscapedSingleQuote           ~ Escape [']
-NonSingleQuote               ~ [^']
+EscapedSingleQuote           ~ Escape ['] | Escape [^']
+NonSingleQuote               ~ [^'\x{005C}]
 
 Colon     ~ ':'
 Semicolon ~ ';'
@@ -1466,49 +1528,51 @@ NonRParenOrEscapedParens_Any ~ NonRParenOrEscapedParens*
 NonRParenOrEscapedParens     ~ EscapedParens | NonRParen
 EscapedParens                ~ EscapedLParen | EscapedRParen
 EscapedLParen                ~ Escape [(]
-EscapedRParen                ~ Escape [)]
-NonRParen                    ~ [^)]
+EscapedRParen                ~ Escape [)] | Escape [^)]
+NonRParen                    ~ [^)\x{005C}]
 
 NonRBracketOrEscapedBrackets_Any ~ NonRBracketOrEscapedBrackets*
 NonRBracketOrEscapedBrackets     ~ EscapedBrackets | NonRBracket
 EscapedBrackets                  ~ EscapedLBracket | EscapedRBracket
 EscapedLBracket                  ~ Escape [\[]
-EscapedRBracket                  ~ Escape [\]]
-NonRBracket                      ~ [^\]]
+EscapedRBracket                  ~ Escape [\]] | Escape [^\]]
+NonRBracket                      ~ [^\]\x{005C}]
 
 NonRBraceOrEscapedBraces_Any ~ NonRBraceOrEscapedBraces*
 NonRBraceOrEscapedBraces     ~ EscapedBraces | NonRBrace
 EscapedBraces                ~ EscapedLBrace | EscapedRBrace
 EscapedLBrace                ~ Escape [\{]
-EscapedRBrace                ~ Escape [\}]
-NonRBrace                    ~ [^\}]
+EscapedRBrace                ~ Escape [\}] | Escape [^\}]
+NonRBrace                    ~ [^\}\x{005C}]
 
 NonRAngleOrEscapedAngles_Any ~ NonRAngleOrEscapedAngles*
 NonRAngleOrEscapedAngles     ~ EscapedAngles | NonRAngle
 EscapedAngles                ~ EscapedLAngle | EscapedRAngle
 EscapedLAngle                ~ Escape [<]
-EscapedRAngle                ~ Escape [>]
-NonRAngle                    ~ [^>]
+EscapedRAngle                ~ Escape [>] | Escape [^>]
+NonRAngle                    ~ [^>\x{005C}]
 
+# Escape                 == \x{005C}
+# ForwardSlash (solidus) == \x{002F}
 NonForwardSlashOrEscapedForwardSlashes_Any ~ NonForwardSlashOrEscapedForwardSlashes*
 NonForwardSlashOrEscapedForwardSlashes     ~ EscapedForwardSlash | NonForwardSlash
-EscapedForwardSlash                        ~ Escape [/]
-NonForwardSlash                            ~ [^\/]
+EscapedForwardSlash                        ~ Escape Escape | Escape [^\x{005C}]
+NonForwardSlash                            ~ [^\x{002F}\x{005C}]
 
 NonExclamPointOrEscapedExclamPoints_Any ~ NonExclamPointOrEscapedExclamPoints*
 NonExclamPointOrEscapedExclamPoints     ~ EscapedExclamPoint | NonExclamPoint
-EscapedExclamPoint                      ~ Escape [!]
-NonExclamPoint                          ~ [^\!]
+EscapedExclamPoint                      ~ Escape [!] | Escape [^!]
+NonExclamPoint                          ~ [^!\x{005C}]
 
 NonPipeOrEscapedPipes_Any ~ NonPipeOrEscapedPipes*
 NonPipeOrEscapedPipes     ~ EscapedPipe | NonPipe
-EscapedPipe               ~ Escape [\|]
-NonPipe                   ~ [^\|]
+EscapedPipe               ~ Escape [\|] | Escape [^\|]
+NonPipe                   ~ [^\|\x{005C}]
 
 NonBacktickOrEscapedBackticks_Any ~ NonBacktickOrEscapedBackticks*
 NonBacktickOrEscapedBackticks     ~ EscapedBacktick | NonBacktick
-EscapedBacktick                   ~ Escape [`]
-NonBacktick                       ~ [^\`]
+EscapedBacktick                   ~ Escape [\`] | Escape [^\`]
+NonBacktick                       ~ [^`\x{005C}]
 
 Ellipsis ~ '...'
 
@@ -1809,13 +1873,13 @@ BuiltinFilehandle ~ 'STDIN' | 'STDOUT' | 'STDERR' | 'ARGV' | 'ARGVOUT' | 'DATA'
 whitespace ~ [\s]+
 
 # Comments
-:discard ~ <hash comment>
+:discard                          ~ <hash comment>
 <hash comment>                    ~ <terminated hash comment> | <unterminated final hash comment>
 <terminated hash comment>         ~ '#' <hash comment body> <vertical space char>
 <unterminated final hash comment> ~ '#' <hash comment body>
 <hash comment body>               ~ <hash comment char>*
-<vertical space char>             ~ [\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
-<hash comment char>               ~ [^\x{A}\x{B}\x{C}\x{D}\x{2028}\x{2029}]
+<vertical space char>             ~ [\x{A}\x{B}\x{C}\x{D}\x{0085}\x{2028}\x{2029}]
+<hash comment char>               ~ [^\x{A}\x{B}\x{C}\x{D}\x{0085}\x{2028}\x{2029}]
 
 # Recognize phases before subroutines
 :lexeme ~ PhaseName              priority => 1
@@ -2037,15 +2101,52 @@ whitespace ~ [\s]+
 :lexeme ~ OpKeywordWarn             priority => 1
 :lexeme ~ OpKeywordWrite            priority => 1
 
-# This is the only Op that conflicts
-# OpInc conflicts with OpUnary
-# So when it's both, OpInc wins
-# (such as: sort $x + $y
+# OpAdd ("+") conflicts with OpUnary ("+")
+# So when it's both, OpAdd should win
+# (e.g., "sort $x + $y" should be OpAdd, not OpUnary)
 :lexeme ~ OpAdd priority => 1
 
 };
 
-our $grammar = Marpa::R2::Scanless::G->new({ source => \$grammar_source });
+sub add_lexemes {
+    my ( $class, @items ) = @_;
+
+    foreach my $item (@items) {
+        ref $item eq 'ARRAY'
+            or die 'add_lexemes( [NAME, VALUE], [NAME, VALUE] )';
+
+        $grammar_source .= "$item->[0] ~ '$item->[1]'\n";
+    }
+}
+
+sub add_keyword {
+    my ( $class, $name, $type, $value, $rules_arrayref ) = @_;
+    $name && $type && $value && $rules_arrayref
+        or die 'add_keyword( NAME_STR, TYPE_STR, VALUE_STR, RULES_ARRAYREF )';
+
+    ref $rules_arrayref eq 'ARRAY'
+        or die 'rules must be an arrayref';
+
+    $type =~ /^( nullary | unary | assign | list )$/xms
+        or die 'Type must be "nullary", "unary", "assign", or "list"';
+
+    grep !length, $name, $type, $value
+        and die 'name, type, value must have length';
+
+    $name = ucfirst $name; # Just in case
+    $type = ucfirst $type;
+
+    my $rules_string = join "\n | ", $rules_arrayref->@*;
+
+    $grammar_source .= qq{
+OpKeyword$name ~ '$value'
+OpKeyword${name}Expr ::= $rules_string
+:lexeme ~ OpKeyword${name} priority => 1
+};
+
+    my $type_rule = "Op${type}KeywordExpr";
+    $grammar_source =~ s{($type_rule\s+::=)}{$1 OpKeyword${name}Expr | }xms;
+}
 
 sub build_struct {
     my ( $rec, $initial_valueref ) = @_;
@@ -2085,6 +2186,8 @@ sub build_struct {
 sub parse {
     my ($class, $text) = @_;
 
+    state $grammar = Marpa::R2::Scanless::G->new({ source => \$grammar_source });
+
     my %args = (
         'grammar' => $grammar,
 
@@ -2122,6 +2225,13 @@ sub parse {
         }
     };
 
+    if (!@values) {
+        my ( $g1_start, $g1_length ) = $rec->last_completed('Program');
+        die "Program could not be successfully parsed\n" if not defined $g1_start;
+        my $last_expression = $rec->substring( $g1_start, $g1_length );
+        die "Last text successfully parsed was: $last_expression\n";
+    }
+
     return @values;
 }
 
@@ -2139,7 +2249,7 @@ Guacamole - A parser toolkit for Standard Perl
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -2290,7 +2400,7 @@ Vickenty Fesunov
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Sawyer X.
+This software is Copyright (c) 2022 by Sawyer X.
 
 This is free software, licensed under:
 

@@ -1,6 +1,6 @@
 package App::optex::textconv;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use v5.14;
 use warnings;
@@ -16,7 +16,7 @@ textconv - optex module to replace document file by its text contents
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 SYNOPSIS
 
@@ -102,8 +102,11 @@ See L<App::optex::textconv::tika>.
 
 Microsoft office document in XML format (.docx, .pptx, .xlsx) is
 converted to plain text by original code implemented in
-L<App::optex::textconv::msdoc> module.  Algorithm used in this module
-is extremely simple, and consequently runs fast.
+L<App::optex::textconv::ooxml::regex> module.  Algorithm used in this
+module is extremely simple, and consequently runs fast.
+
+If related modules are available, L<App::optex::textconv::ooxml::xslt>
+is used to covert XML using XSLT mechanism.
 
 Two module are included in this distribution to use other external
 converter program, B<pandoc> and B<tika>, those implement much more
@@ -118,9 +121,7 @@ with module declaration like:
 
 =head2 CPANM
 
-    $ cpanm App::optex::textconv
-    or
-    $ curl -sL http://cpanmin.us | perl - App::optex::textconv
+    cpanm App::optex::textconv
 
 =head2 GIT
 
@@ -187,12 +188,7 @@ sub initialize {
 }
 
 sub finalize {
-    textconv();
-}
-
-sub argv (&) {
-    my $sub = shift;
-    @$argv = $sub->(@$argv);
+    @$argv = textconv(@$argv);
 }
 
 sub hit {
@@ -239,60 +235,58 @@ sub load {
 my @persist;
 
 sub textconv {
-    argv {
-      ARGV:
-	for (@_) {
-	    # check file existence
-	    do {{
-		m[^https?://] and last; # skip URL
-		-f or next ARGV;
-	    }};
-	    my($suffix) = map { lc } /\.(\w+)$/x;
-	    my $func = do {
-		if (my $converter = converter $_) {
-		    if (ref $converter eq 'CODE') {
-			$converter;
-		    }
-		    else {
-			sub { exec_command $converter, $_ };
-		    }
+  ARGV:
+    for (@_) {
+	# check file existence
+	do {{
+	    m[^https?://] and last; # skip URL
+	    -f or next ARGV;
+	}};
+	my($suffix) = map { lc } /\.(\w+)$/x;
+	my $func = do {
+	    if (my $converter = converter $_) {
+		if (ref $converter eq 'CODE') {
+		    $converter;
 		}
-		elsif ($suffix) {
-		    state %tried;
-		    my $to_text = join '::', __PACKAGE__, $suffix, 'to_text';
-		    if (defined &{$to_text}) {
-			$to_text;
-		    } elsif ($tried{$suffix}++) {
-			next;
-		    } else {
-			load_module $suffix or next;
-			redo;
-		    }
+		else {
+		    sub { exec_command $converter, $_ };
+		}
+	    }
+	    elsif ($suffix) {
+		state %tried;
+		my $to_text = join '::', __PACKAGE__, $suffix, 'to_text';
+		if (defined &{$to_text}) {
+		    $to_text;
+		} elsif ($tried{$suffix}++) {
+		    next;
 		} else {
-		    next;
+		    load_module $suffix or next;
+		    redo;
 		}
+	    } else {
+		next;
+	    }
+	};
+	my $data = do {
+	    no strict 'refs';
+	    use charnames ':full';
+	    local $_ = &$func($_) // do {
+		warn "$_: READ ERROR in textconv module.\n";
+		next;
 	    };
-	    my $data = do {
-		no strict 'refs';
-		use charnames ':full';
-		local $_ = &$func($_) // do {
-		    warn "$_: READ ERROR in textconv module.\n";
-		    next;
-		};
-		$_ = decode 'utf8', $_ unless utf8::is_utf8($_);
-		s/[\p{Private_Use}\p{Unassigned}]/\N{GETA MARK}/g;
-		encode 'utf8', $_;
-	    };
-	    use App::optex::Tmpfile;
-	    my $tmp = $persist[@persist] = App::optex::Tmpfile->new;
-	    $_ = $tmp->write($data)->rewind->path;
-	}
-	@_;
-    };
+	    $_ = decode 'utf8', $_ unless utf8::is_utf8($_);
+	    s/[\p{Private_Use}\p{Unassigned}]/\N{GETA MARK}/g;
+	    encode 'utf8', $_;
+	};
+	use App::optex::Tmpfile;
+	my $tmp = $persist[@persist] = App::optex::Tmpfile->new;
+	$_ = $tmp->write($data)->rewind->path;
+    }
+    @_;
 }
 
 1;
 
 __DATA__
 
-#  LocalWords:  docx pptx xlsx pandoc tika
+#  LocalWords:  docx pptx xlsx pandoc tika XSLT

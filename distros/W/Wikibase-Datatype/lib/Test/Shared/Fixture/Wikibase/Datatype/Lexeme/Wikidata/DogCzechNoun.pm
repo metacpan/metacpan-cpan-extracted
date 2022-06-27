@@ -10,7 +10,7 @@ use Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::InstanceOf::
 use Test::Shared::Fixture::Wikibase::Datatype::Statement::Wikidata::SexOrGender::Male;
 use Wikibase::Datatype::Value::Monolingual;
 
-our $VERSION = 0.12;
+our $VERSION = 0.16;
 
 sub new {
 	my $class = shift;
@@ -28,6 +28,8 @@ sub new {
 				'value' => 'pes',
 			),
 		],
+		'modified' => '2022-06-24T12:42:10Z',
+		'ns' => 146,
 		'senses' => [
 			Test::Shared::Fixture::Wikibase::Datatype::Sense::Wikidata::Dog->new,
 		],

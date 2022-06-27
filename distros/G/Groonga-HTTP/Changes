@@ -1,24 +1,63 @@
 Revision history for Perl extension Groonga-HTTP
 
+1.06 2022-06-23T09:10:54Z
+
+    - Add support for using multiple dynamic columns.
+
+    - Add support for "snippet_html" again.
+
+1.05 2022-06-22T13:38:51Z
+
+    - Add support for "drilldown_sort_keys" as the argument of "select".
+
+1.04 2022-06-22T12:23:25Z
+
+    - Add support for using multiple "snippet_html".
+
+1.03 2022-06-21T08:11:28Z
+
+    - Reconfigure tag.
+      Because we mistake setting tag of before version.
+
+1.01 2022-06-21T07:52:57Z
+
+    - Add support for getting results of drilldown with a column name.
+      We can get the result of the drilldown with a column name.
+
+    - Add support for a new item of the "status" command
+      Because "memory_map_size" is added since Groonga 12.0.4.
+
+    - Add support for getting value with column name.
+      We can get the result of the search with a column name.
+
+    - Add support Array in "output_columns".
+      We can specify "output_columns" with Array as below.
+
+        * output_columns => ["_id", "title"]
+
+    - Add a support for "query_expander" as the argument of "select".
+      This is an alias for "synonym".
+      "query_expander" is the same as "synonym".
+
 0.07 2022-02-14T09:44:32Z
 
     - Published "Groonga-HTTP" to CPAN
 
-v0.05 2022-02-03T08:34:00Z
+0.05 2022-02-03T08:34:00Z
 
     - Add support for "match_columns" as the argument of "select"
     - Add support for "drilldown_output_columns" as the argument of "select"
 
-v0.04 2022-01-27T09:23:00Z
+0.04 2022-01-27T09:23:00Z
 
     - Added support for "drilldown_filter" as the argument of "select".
 
-v0.03 2022-01-27T07:59:00Z
+0.03 2022-01-27T07:59:00Z
 
     - Added support for "filter" as the argument of "select".
     - Added support for dynamic columns.
 
-v0.01 2022-01-18T09:13:00Z
+0.01 2022-01-18T09:13:00Z
 
     - Added support for "status" command.
     - Added support for "select" command.

@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,19 +21,19 @@ name: Guacamole
 provides:
   Guacamole:
     file: lib/Guacamole.pm
-    version: '0.007'
+    version: '0.008'
   Guacamole::Deparse:
     file: lib/Guacamole/Deparse.pm
-    version: '0.007'
+    version: '0.008'
   Guacamole::Dumper:
     file: lib/Guacamole/Dumper.pm
-    version: '0.007'
+    version: '0.008'
   Guacamole::Test:
     file: lib/Guacamole/Test.pm
-    version: '0.007'
+    version: '0.008'
   standard:
     file: lib/standard.pm
-    version: '0.007'
+    version: '0.008'
 requires:
   Data::Dumper: '0'
   Data::Visitor::Tiny: '0'
@@ -45,8 +45,8 @@ requires:
   parent: '0'
 resources:
   repository: git://github.com/xsawyerx/guacamole.git
-version: '0.007'
+version: '0.008'
 x_authority: cpan:XSAWYERX
-x_generated_by_perl: v5.30.0
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: MIT

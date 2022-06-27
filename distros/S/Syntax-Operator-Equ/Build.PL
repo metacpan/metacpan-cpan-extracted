@@ -5,6 +5,8 @@ use warnings;
 use Module::Build;
 use XS::Parse::Infix::Builder;
 
+my @extra_compiler_flags = qw( -Ihax );
+
 my $build = Module::Build->new(
    module_name => "Syntax::Operator::Equ",
    test_requires => {
@@ -26,6 +28,7 @@ my $build = Module::Build->new(
          x_IRC => "irc://irc.perl.org/#io-async",
       },
    },
+   extra_compiler_flags => \@extra_compiler_flags,
 );
 
 XS::Parse::Infix::Builder->extend_module_build( $build );

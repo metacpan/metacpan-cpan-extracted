@@ -1,6 +1,7 @@
+@{[ init{} ]}
 @{[
 	block {
-		$fields{"new_field"}="NEW";
+		$fields{user}{new_field}="NEW";
 		#say "fields: ", %fields#;
 	}
 ]}

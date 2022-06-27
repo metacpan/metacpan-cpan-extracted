@@ -28,7 +28,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Sub-MultiMethod";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-900>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-901>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-902>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-903>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-904>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-905>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-900>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-901>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-902>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-903>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-904>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-905>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-906>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-907>, <http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-908>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-sub-multimethod>;
@@ -261,6 +261,54 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-MultiMethod-0.905.tar.gz>;
 	doap:revision        "0.905"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-906>
+	a                    doap:Version;
+	dc:identifier        "Sub-MultiMethod-0.906"^^xsd:string;
+	dc:issued            "2022-06-25"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix precedence issue which somehow only came up with Type::Tiny::XS installed.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-MultiMethod-0.906.tar.gz>;
+	doap:revision        "0.906"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-907>
+	a                    doap:Version;
+	dc:identifier        "Sub-MultiMethod-0.907"^^xsd:string;
+	dc:issued            "2022-06-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Add `multifunction` and `monofunction` to the exports.";
+		], [
+			a doap-changeset:BackCompat;
+			rdfs:label "The `multimethods_from_roles` function is deprecated. Prior to Sub::MultiMethods 0.900, this was a function you'd call in your class to auto-copy any multimethods defined in roles into your class. In Sub::MultiMethods 0.900 that functionality became automatic, and the function to do it manually became a dummy do-nothing sub. It now issues a warning and will be removed at a later date.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-MultiMethod-0.907.tar.gz>;
+	doap:revision        "0.907"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-MultiMethod/v_0-908>
+	a                    doap:Version;
+	dc:identifier        "Sub-MultiMethod-0.908"^^xsd:string;
+	dc:issued            "2022-06-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Update examples to no longer call deprecated methods.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Minor code tidy ups.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-MultiMethod-0.908.tar.gz>;
+	doap:revision        "0.908"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

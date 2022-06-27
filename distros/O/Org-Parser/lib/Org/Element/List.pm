@@ -6,9 +6,9 @@ use Moo;
 extends 'Org::Element';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-03-27'; # DATE
+our $DATE = '2022-06-23'; # DATE
 our $DIST = 'Org-Parser'; # DIST
-our $VERSION = '0.557'; # VERSION
+our $VERSION = '0.558'; # VERSION
 
 has indent => (is => 'rw');
 has type => (is => 'rw');
@@ -38,7 +38,7 @@ Org::Element::List - Represent Org list
 
 =head1 VERSION
 
-This document describes version 0.557 of Org::Element::List (from Perl distribution Org-Parser), released on 2022-03-27.
+This document describes version 0.558 of Org::Element::List (from Perl distribution Org-Parser), released on 2022-06-23.
 
 =head1 DESCRIPTION
 

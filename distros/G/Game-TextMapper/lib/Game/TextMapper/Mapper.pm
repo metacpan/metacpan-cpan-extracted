@@ -102,6 +102,7 @@ sub example {
 0403 jungle "jungle"
 0501 mountain cave "cave"
 0502 sand "sand"
+0503 hill castle "castle"
 0205-0103-0202-0303-0402 road
 0101-0203 river
 0401-0303-0403 border

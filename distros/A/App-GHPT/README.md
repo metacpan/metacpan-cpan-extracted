@@ -4,7 +4,7 @@ App::GHPT - A command line tool to simplify using Github and Pivotal Tracker for
 
 # VERSION
 
-version 1.001000
+version 2.000000
 
 # SYNOPSIS
 
@@ -42,21 +42,22 @@ which you want to submit a PR currently checked out.
 
 # SETUP
 
-## hub
+## GitHub config
 
-You should first set up `hub`. It's available at [https://hub.github.com](https://hub.github.com)
-and has installation instructions there.
+You'll need to tell git about your GitHub account:
 
-After installation, tell git config about it and check that it's working.
+    git config --global submit-work.github.token gh_ae158fa0dc6570c8403f04bd35738d81
 
-    git config --global --add hub.host github.com
-    hub issue
+This is a GitHub personal access token.
 
-(You'll need your GitHub and/or GHE credentials.)
+You can alternatively provide the token via the `GITHUB_TOKEN` environment variable.
 
-## pt config
+For compatibility with prior versions, the configuration file for `hub` will be
+used if the above are not set.
 
-You'll also need to tell git about your PT account:
+## Pivotal Tracker config
+
+You'll also need to tell git about your Pivotal Tracker account:
 
     git config --global submit-work.pivotaltracker.username thor
     git config --global submit-work.pivotaltracker.token ae158fa0dc6570c8403f04bd35738d81
@@ -64,19 +65,22 @@ You'll also need to tell git about your PT account:
 Your actual username and token can be found at
 [https://www.pivotaltracker.com/profile](https://www.pivotaltracker.com/profile).
 
-You can alternatively provide the token via the `PIVOTALTRACKER_TOKEN` environment variable.
+You can alternatively provide your username via the `PIVOTALTRACKER_USERNAME`
+environment variable and your token via the `PIVOTALTRACKER_TOKEN` environment
+variable.
 
 # CREATING PULL REQUEST QUESTIONS
 
 A question is a class which consumes the
-[App::GHPT::WorkSubmitter::Role::Question](https://metacpan.org/pod/App::GHPT::WorkSubmitter::Role::Question) and implements a method named
+[App::GHPT::WorkSubmitter::Role::Question](https://metacpan.org/pod/App%3A%3AGHPT%3A%3AWorkSubmitter%3A%3ARole%3A%3AQuestion) and implements a method named
 `ask`. See that role's documentation for details.
 
 By default, this tool looks for modules that have a package name beginning
 with `App::GHPT::WorkSubmitter::Question` to find question classes. However,
-you can configure one or more alternative namespaces by setting the git config
-key `submit-work.question-namespaces`. This should be a space-separated list
-of namespaces under which questions can live.
+you can configure one or more alternative namespaces by setting the
+`APP_GHPT_QUESTION_NAMESPACES` environment variable or the
+`submit-work.question-namespaces` Git config key. This should be a
+space-separated list of namespaces under which questions can live.
 
 # REQUESTER NAME IN PULL REQUESTS
 
@@ -84,8 +88,9 @@ By default, the name of the PT story's requester will be included in the pull
 request text. This is helpful if you relay your project's PRs to Slack, as the
 requester can get alerted when their name is used.
 
-If you want to disable this, set the git config key
-`submit-work.include-requester-name-in-pr` to `0`.
+If you want to disable this, set the `APP_GHPT_INCLUDE_REQUESTER_NAME_IN_PR`
+environment variable or the `submit-work.include-requester-name-in-pr` Git
+config key to `0`.
 
 # COMMAND LINE OPTIONS
 
@@ -99,7 +104,7 @@ want to limit this to just one.
 
 ## --base branch
 
-The branch against which the PR should be made. This defaults to the master
+The branch against which the PR should be made. This defaults to the main
 branch.
 
 ## --dry-run
@@ -108,20 +113,6 @@ Doesn't create a PR, just prints out the body of the PR that would have been
 created.
 
 # TROUBLESHOOTING
-
-## Bad Credentials
-
-When hub is first used to connect to GitHub/GitHub Enterprise, hub requires a
-name and password that it uses to generate an OAuth token and stores it in
-`~/.config/hub`. If you have not used hub yet, this script will exit with:
-
-    $ gh-pt.pl
-    Error creating pull request: Unauthorized (HTTP 401)
-    Bad credentials
-
-The fix is to regenerate the OAuth token. Delete the `~/.config/hub` file if
-you've got one, and then run a `hub` command manually, such as
-`hub browse`. After authenticating, you should be able to use this script.
 
 ## "No started stories found"
 
@@ -132,8 +123,6 @@ configuration. Double check your PT username and token as seen on
 config --global --get-regexp '^submit-work'`
 
 # BUGS
-
-This requires 'hub' to be installed and configured.
 
 A fatal error may occur if your branch exists locally, but you haven't pushed it yet.
 
@@ -157,12 +146,13 @@ Bugs may be submitted through [https://github.com/maxmind/App-GHPT/issues](https
 - Kevin Phair <phair.kevin@gmail.com>
 - Mark Fowler <mfowler@maxmind.com>
 - Narsimham Chelluri <nchelluri@maxmind.com>
+- Nick Logan <nlogan@gmail.com>
 - Patrick Cronin <pcronin@maxmind.com>
 - William Storey <wstorey@maxmind.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by MaxMind, Inc.
+This software is Copyright (c) 2022 by MaxMind, Inc.
 
 This is free software, licensed under:
 

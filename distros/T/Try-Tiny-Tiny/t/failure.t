@@ -23,4 +23,4 @@ $e =~ m!\ATry/Tiny/Tiny.pm did not return a true value ! or fail; print "ok 3 - 
 $w eq "Try::Tiny::Tiny is ineffective (probably loaded too late)\n" or fail; print "ok 4 - ... and warning\n";
 
 $fails ? require Data::Dumper : exit;
-print map "# $_\n", split /\n/, Data::Dumper->new([$r, $e, $w], [qw(require @ __WARN__)])->Useqq(1)->Dump;
+$|++, print STDERR map "# $_\n", split /\n/, Data::Dumper->new([$r, $e, $w], [qw(require @ __WARN__)])->Useqq(1)->Dump;

@@ -23,8 +23,8 @@ int32_t SPVM__IO__Select___can_read(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   // Handles
   void* obj_handles = stack[1].oval;
-  int32_t* handles = env->get_elems_int(env, obj_handles);
-  int32_t handles_len = env->length(env, obj_handles);
+  int32_t* handles = env->get_elems_int(env, stack, obj_handles);
+  int32_t handles_len = env->length(env, stack, obj_handles);
   
   // Timeout
   double timeout = stack[2].dval;
@@ -53,12 +53,12 @@ int32_t SPVM__IO__Select___can_read(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   // Error check
   if (success_count == -1) {
-    return env->die(env, "select fail", MFILE, __LINE__);
+    return env->die(env, stack, "select fail", MFILE, __LINE__);
   }
   
   // Can handles
-  void* obj_can_handles = env->new_int_array(env, success_count);
-  int32_t* can_handles = env->get_elems_int(env, obj_can_handles);
+  void* obj_can_handles = env->new_int_array(env, stack, success_count);
+  int32_t* can_handles = env->get_elems_int(env, stack, obj_can_handles);
   int32_t can_handles_index = 0;
   for (int32_t i = 0; i < handles_len; i++) {
     int32_t handle = handles[i];
@@ -79,8 +79,8 @@ int32_t SPVM__IO__Select___can_write(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   // Handles
   void* obj_handles = stack[1].oval;
-  int32_t* handles = env->get_elems_int(env, obj_handles);
-  int32_t handles_len = env->length(env, obj_handles);
+  int32_t* handles = env->get_elems_int(env, stack, obj_handles);
+  int32_t handles_len = env->length(env, stack, obj_handles);
   
   // Timeout
   double timeout = stack[2].dval;
@@ -109,12 +109,12 @@ int32_t SPVM__IO__Select___can_write(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   // Error check
   if (success_count == -1) {
-    return env->die(env, "select fail", MFILE, __LINE__);
+    return env->die(env, stack, "select fail", MFILE, __LINE__);
   }
   
   // Can handles
-  void* obj_can_handles = env->new_int_array(env, success_count);
-  int32_t* can_handles = env->get_elems_int(env, obj_can_handles);
+  void* obj_can_handles = env->new_int_array(env, stack, success_count);
+  int32_t* can_handles = env->get_elems_int(env, stack, obj_can_handles);
   int32_t can_handles_index = 0;
   for (int32_t i = 0; i < handles_len; i++) {
     int32_t handle = handles[i];
@@ -135,8 +135,8 @@ int32_t SPVM__IO__Select___has_exception(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   // Handles
   void* obj_handles = stack[1].oval;
-  int32_t* handles = env->get_elems_int(env, obj_handles);
-  int32_t handles_len = env->length(env, obj_handles);
+  int32_t* handles = env->get_elems_int(env, stack, obj_handles);
+  int32_t handles_len = env->length(env, stack, obj_handles);
   
   // Timeout
   double timeout = stack[2].dval;
@@ -166,12 +166,12 @@ int32_t SPVM__IO__Select___has_exception(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   // Error check
   if (success_count == -1) {
-    return env->die(env, "select fail", MFILE, __LINE__);
+    return env->die(env, stack, "select fail", MFILE, __LINE__);
   }
   
   // Can handles
-  void* obj_can_handles = env->new_int_array(env, success_count);
-  int32_t* can_handles = env->get_elems_int(env, obj_can_handles);
+  void* obj_can_handles = env->new_int_array(env, stack, success_count);
+  int32_t* can_handles = env->get_elems_int(env, stack, obj_can_handles);
   int32_t can_handles_index = 0;
   for (int32_t i = 0; i < handles_len; i++) {
     int32_t handle = handles[i];

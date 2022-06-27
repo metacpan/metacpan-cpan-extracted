@@ -7,7 +7,7 @@ use constant ();
 use base qw( Exporter );
 
 # ABSTRACT: Private module for FFI::C
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 
 our @EXPORT_OK = qw( malloc free memset memcpy_addr );
@@ -53,7 +53,7 @@ FFI::C::FFI - Private module for FFI::C
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -99,7 +99,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020,2021 by Graham Ollis.
+This software is copyright (c) 2020-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

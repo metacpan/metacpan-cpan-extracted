@@ -2048,9 +2048,21 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_STRING_EQ);
                   keyword_token = STREQ;
                 }
+                else if (strcmp(symbol_name, "error") == 0) {
+                  yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_ERROR);
+                  keyword_token = ERROR;
+                }
+                else if (strcmp(symbol_name, "error_code") == 0) {
+                  yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_ERROR_CODE);
+                  keyword_token = ERROR_CODE;
+                }
                 else if (strcmp(symbol_name, "eval") == 0) {
                   yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_EVAL);
                   keyword_token = EVAL;
+                }
+                else if (strcmp(symbol_name, "extends") == 0) {
+                  yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_EXTENDS);
+                  keyword_token = EXTENDS;
                 }
                 break;
               }
@@ -2231,6 +2243,12 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   
                   keyword_token = DESCRIPTOR;
                 }
+                else if (strcmp(symbol_name, "protected") == 0) {
+                  SPVM_OP* op_descriptor = SPVM_OP_new_op_descriptor(compiler, SPVM_DESCRIPTOR_C_ID_PROTECTED, compiler->cur_file, compiler->cur_line);
+                  yylvalp->opval = op_descriptor;
+                  
+                  keyword_token = DESCRIPTOR;
+                }
                 else if (strcmp(symbol_name, "public") == 0) {
                   SPVM_OP* op_descriptor = SPVM_OP_new_op_descriptor(compiler, SPVM_DESCRIPTOR_C_ID_PUBLIC, compiler->cur_file, compiler->cur_line);
                   yylvalp->opval = op_descriptor;
@@ -2294,7 +2312,11 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 break;
               }
               case 's' : {
-                if (strcmp(symbol_name, "static") == 0) {
+                if (strcmp(symbol_name, "set_error_code") == 0) {
+                  yylvalp->opval = SPVM_TOKE_new_op(compiler, SPVM_OP_C_ID_SET_ERROR_CODE);
+                  keyword_token = SET_ERROR_CODE;
+                }
+                else if (strcmp(symbol_name, "static") == 0) {
                   SPVM_OP* op_descriptor = SPVM_OP_new_op_descriptor(compiler, SPVM_DESCRIPTOR_C_ID_STATIC, compiler->cur_file, compiler->cur_line);
                   yylvalp->opval = op_descriptor;
                   keyword_token = DESCRIPTOR;

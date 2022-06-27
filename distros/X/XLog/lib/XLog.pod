@@ -340,6 +340,8 @@ In next examples, module/message is a complex expression, so optimizations are d
 
 =back
 
+P.S. Under perl debugger OP optimizations are disabled as debugger may produce completely different OP tree and author doesn't want
+to support this kind of strange things.
 
 
 =head1 SEE ALSO

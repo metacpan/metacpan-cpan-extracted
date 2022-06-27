@@ -36,4 +36,8 @@ Revision history for MarpaX::G4
 
        * Bug fixes
 
+1.020000 25-June 2022 09:50
+
+       * corrected requirements
+
 # vim: set expandtab shiftwidth=4:

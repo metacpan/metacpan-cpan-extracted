@@ -6,7 +6,7 @@ use warnings;
 use Mo qw(build default is);
 use Mo::utils qw(check_array_object check_number_of_items);
 
-our $VERSION = 0.12;
+our $VERSION = 0.16;
 
 has glosses => (
 	default => [],
@@ -240,6 +240,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.12
+0.16
 
 =cut

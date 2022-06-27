@@ -17,7 +17,7 @@ BEGIN
 BEGIN
 {
     use_ok( 'Cookie' );
-    require "t/env.pl";
+    require( "./t/env.pl" ) if( -e( "t/env.pl" ) );
 };
 
 subtest 'methods' => sub

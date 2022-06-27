@@ -316,8 +316,7 @@ const char* const* SPVM_OPCODE_C_ID_NAMES(void) {
     "SET_FIELD_DOUBLE",
     "SET_FIELD_OBJECT",
     "SET_FIELD_UNDEF",
-    "IS_TYPE",
-    "HAS_INTERFACE",
+    "ISA",
     "HAS_IMPL",
     "ENTER_SCOPE",
     "PUSH_MORTAL",
@@ -478,6 +477,10 @@ const char* const* SPVM_OPCODE_C_ID_NAMES(void) {
     "SET_MULNUM_FIELD_DEREF_FLOAT",
     "SET_MULNUM_FIELD_DEREF_DOUBLE",
     "GET_CLASS_ID",
+    "GET_ERROR_CODE",
+    "SET_ERROR_CODE",
+    "CLEAR_BEFORE_ERROR",
+    "GET_BEFORE_ERROR",
   };
   
   return id_names;

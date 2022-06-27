@@ -201,7 +201,7 @@ FASTX::PE - A Paired-End FASTQ files reader, based on FASTX::Reader.
 
 =head1 VERSION
 
-version 1.3.0
+version 1.5.0
 
 =head1 SYNOPSIS
 
@@ -216,14 +216,6 @@ version 1.3.0
     print $seq->{name}, "\t", $seq->{seq1}, "\t", $seq->{qual1}, "\n";
     print $seq->{name}, "\t", $seq->{seq2}, "\t", $seq->{qual2}, "\n";
   }
-
-=head1 BUILD TEST
-
-=for html <p><a href="https://travis-ci.org/telatin/FASTQ-Parser"><img src="https://travis-ci.org/telatin/FASTQ-Parser.svg?branch=master"></a></p>
-
-Each GitHub release of the module is tested by L<Travis-CI|https://travis-ci.org/telatin/FASTQ-Parser/builds> using multiple Perl versions (5.14 to 5.28).
-
-In addition to this, every CPAN release is tested by the L<CPAN testers grid|http://matrix.cpantesters.org/?dist=FASTX-Reader>.
 
 =head1 METHODS
 

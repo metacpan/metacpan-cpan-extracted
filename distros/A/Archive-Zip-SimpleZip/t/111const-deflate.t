@@ -20,7 +20,7 @@ BEGIN {
     $extra = 1
         if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
 
-    plan tests => 86 + $extra ;
+    plan tests => 93 + $extra ;
 
     use_ok('Archive::Zip::SimpleZip') ;
 }
@@ -34,6 +34,8 @@ BEGIN {
     my %all;
     for my $symbol (@Compress::Raw::Zlib::DEFLATE_CONSTANTS)
     {
+        next if $symbol eq 'Z_NULL';
+
         eval "defined Compress::Raw::Zlib::$symbol" ;
         $all{$symbol} = ! $@ ;
     }

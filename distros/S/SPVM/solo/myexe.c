@@ -21,32 +21,36 @@ int32_t main(int32_t argc, const char *argv[]) {
     return -1;
   }
   
+  SPVM_VALUE* stack = env->new_stack(env);
+
   // Enter scope
-  int32_t scope_id = env->enter_scope(env);
+  int32_t scope_id = env->enter_scope(env, stack);
   
   // Starting file name
-  void* cmd_start_file_obj = env->new_string(env, argv[0], strlen(argv[0]));
+  void* cmd_start_file_obj = env->new_string(env, stack, argv[0], strlen(argv[0]));
   
   // new byte[][args_length] object
   int32_t arg_type_basic_id = env->get_basic_type_id(env, "byte");
-  void* cmd_args_obj = env->new_muldim_array(env, arg_type_basic_id, 1, argc - 1);
+  void* cmd_args_obj = env->new_muldim_array(env, stack, arg_type_basic_id, 1, argc - 1);
   
   // Set command line arguments
   for (int32_t arg_index = 1; arg_index < argc; arg_index++) {
-    void* cmd_arg_obj = env->new_string(env, argv[arg_index], strlen(argv[arg_index]));
-    env->set_elem_object(env, cmd_args_obj, arg_index - 1, cmd_arg_obj);
+    void* cmd_arg_obj = env->new_string(env, stack, argv[arg_index], strlen(argv[arg_index]));
+    env->set_elem_object(env, stack, cmd_args_obj, arg_index - 1, cmd_arg_obj);
   }
   
-  SPVM_VALUE stack[255];
   stack[0].oval = cmd_start_file_obj;
   stack[1].oval = cmd_args_obj;
 
+  // Call INIT blocks
+  env->call_init_blocks(env, stack);
+  
   // Run
-  int32_t exception_flag = env->call_spvm_method(env, method_id, stack);
+  int32_t error = env->call_spvm_method(env, stack, method_id);
 
   int32_t status;
-  if (exception_flag) {
-    env->print_stderr(env, env->exception_object);
+  if (error) {
+    env->print_stderr(env, stack, env->get_exception(env, stack));
     printf("\n");
     status = 255;
   }
@@ -55,7 +59,11 @@ int32_t main(int32_t argc, const char *argv[]) {
   }
 
   // Leave scope
-  env->leave_scope(env, scope_id);
+  env->leave_scope(env, stack, scope_id);
+
+  env->cleanup_global_vars(env, stack);
+  
+  env->free_stack(env, stack);
   
   env->free_env_prepared(env);
   
@@ -116,9 +124,6 @@ SPVM_ENV* SPVM_NATIVE_new_env_prepared() {
   
   // Initialize env
   env->init_env(env);
-  
-  // Call INIT blocks
-  env->call_init_blocks(env);
   
   return env;
 }

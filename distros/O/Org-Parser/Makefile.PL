@@ -34,6 +34,7 @@ my %WriteMakefileArgs = (
     "experimental" => 0,
     "if" => 0,
     "locale" => 0,
+    "strict" => 0,
     "utf8" => 0,
     "warnings" => 0
   },
@@ -47,10 +48,9 @@ my %WriteMakefileArgs = (
     "Org::Dump" => "0.551",
     "Test::Exception" => 0,
     "Test::More" => "0.98",
-    "lib" => 0,
-    "strict" => 0
+    "lib" => 0
   },
-  "VERSION" => "0.557",
+  "VERSION" => "0.558",
   "test" => {
     "TESTS" => "t/*.t"
   }

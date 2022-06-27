@@ -8,9 +8,11 @@ Module::Build->VERSION( '0.4004' );
 
 my $class = Module::Build->subclass(
     code => q{
-        use Perl::OSType qw(os_type);
+        use Perl::OSType    qw(os_type);
+        use File::HomeDir   qw( home );
         sub _clear_cache {
-            for ( glob qq("$ENV{HOME}/.cache/my_pod*.cache") ) {
+            my $home = home();
+            for ( glob qq("$home/.cache/my_pod*.cache") ) {
                 print "Removing: $_\n";
                 unlink or warn $!;
             }
@@ -44,6 +46,11 @@ ECHO
             $s->_clear_cache;
             $s->SUPER::ACTION_clean;
         }
+        sub ACTION_test {
+            my ($s) = @_;
+            $s->_clear_cache;
+            $s->SUPER::ACTION_test;
+        }
     },
 );
 
@@ -61,8 +68,9 @@ my $builder = $class->new(
     },
     requires => {
         'Module::Functions' => '2.1.3',
-        'Pod::Query'        => '0.18',
+        'Pod::Query'        => '0.24',
         'Mojolicious'       => '9.19',
+        'File::HomeDir'     => '1.006',
     },
     add_to_cleanup => [ 'App-Pod-*', "$ENV{HOME}/.cache/my_pod*.cache", ],
 );

@@ -16,40 +16,8 @@ msgstr ""
 msgid "# News"
 msgstr ""
 
-msgid "## 0.05: 2022-02-03 {#version-0-05}"
+msgid "See: [Changes]."
 msgstr ""
 
-msgid "### Improvements"
-msgstr ""
-
-msgid ""
-"  * Add support for \"match_columns\" as the argument of \"select\"\n"
-"  * Add support for \"drilldown_output_columns\" as the argument of \"select\""
-msgstr ""
-
-msgid "## 0.04: 2022-01-27 {#version-0-04}"
-msgstr ""
-
-msgid "  * Added support for \"drilldown_filter\" as the argument of \"select\"."
-msgstr ""
-
-msgid "## 0.03: 2022-01-27 {#version-0-03}"
-msgstr ""
-
-msgid "  * Added support for \"filter\" as the argument of \"select\"."
-msgstr ""
-
-msgid "  * Added support for dynamic columns."
-msgstr ""
-
-msgid "## 0.01: 2022-01-18 {#version-0-01}"
-msgstr ""
-
-msgid "  * Added support for \"status\" command."
-msgstr ""
-
-msgid "  * Added support for \"select\" command."
-msgstr ""
-
-msgid "    However, we support only a part of the arguments of \"select\"."
+msgid "[Changes]:https://metacpan.org/dist/Groonga-HTTP/changes"
 msgstr ""

@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
         'DateTime'      => '1.52',
         'DateTime::Format::Strptime' => '1.77',
         'JSON'          => '4.03',
-        'Module::Generic' => 'v0.18.3',
+        'Module::Generic' => 'v0.24.0',
         'Net::IDN::Encode' => '2.500',
         'Nice::Try'     => 'v1.1.2',
         'Scalar::Util'  => '1.50',
@@ -329,6 +329,21 @@ if( !$@ && !$ENV{NO_MOD_PERL} )
         @Apache::TestMM::Argv = %$ref;
         print( STDERR "Apache::TestMM::Argv is now: '", join( "', '", @Apache::TestMM::Argv ), "'\n" ) if( $MY_DEBUG );
     }
+    
+    # Set the necessary environment variable we stored in Apache::TestConfig::Argv in our Makefile.PL
+    # We had to do a round-about way to achieve this, because there is no clean easy way with current Apache::Test version to achieve this
+    open( my $fh, '>./t/env.pl' ) || die( "t/env.pl: $!\n" );
+    foreach my $k ( sort( keys( %$ref ) ) )
+    {
+        if( substr( $k, 0, 1 ) eq '_' )
+        {
+            # print( STDERR "Setting environment variable \"", substr( $k, 1 ), "\"\n" );
+            $ENV{ substr( $k, 1 ) } = $ref->{ $k };
+            $fh->printf( "\$ENV{ '%s' } = q|%s|;\n", substr( $k, 1 ), $ref->{ $k } ) || die( "t/env.pl: $!\n" );
+        }
+    }
+    $fh->print( "\n1;\n" ) || die( "t/env.pl: $!\n" );
+    $fh->close;
     
     if( $ENV{COOKIES_DEBUG} )
     {

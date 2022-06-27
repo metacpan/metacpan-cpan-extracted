@@ -22,6 +22,7 @@ struct spvm_class {
   SPVM_HASH* class_var_symtable;
   SPVM_LIST* fields;
   SPVM_HASH* field_symtable;
+  SPVM_LIST* tmp_merged_fields;
   SPVM_LIST* methods;
   SPVM_HASH* method_symtable;
   SPVM_LIST* interfaces;
@@ -32,16 +33,15 @@ struct spvm_class {
   SPVM_HASH* class_alias_symtable;
   SPVM_METHOD* required_method;
   SPVM_METHOD* destructor_method;
+  const char* parent_class_name;
   int32_t id;
-  int32_t object_fields_length;
-  int32_t object_fields_offset;
   int32_t fields_byte_size;
   int8_t has_init_block;
   int8_t is_anon;
   int8_t category;
   int8_t is_precompile;
-  int8_t is_public;
   int8_t is_pointer;
+  int8_t access_control_type;
 };
 
 SPVM_CLASS* SPVM_CLASS_new(SPVM_COMPILER* compiler);

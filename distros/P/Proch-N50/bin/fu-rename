@@ -1,0 +1,195 @@
+#!/usr/bin/env perl
+# PODNAME: fu-rename
+# ABSTRACT: rename sequences
+use 5.012;
+use warnings;
+use Getopt::Long;
+use FindBin qw($RealBin);
+
+use FASTX::Reader;
+use File::Basename;
+use Data::Dumper;
+my $BASENAME = basename($0);
+use Proch::Seqfu;
+my $VERSION = $Proch::Seqfu::VERSION // "<Dev>";
+my $warnings = 0;
+my ($opt_verbose, $opt_debug);
+my $opt_separator   = ".";
+my $opt_prefix      = "{b}";
+my $opt_reset       = 0;
+my $opt_fasta;
+my $opt_nocomm;
+my $opt_help;
+
+my $_opt          = GetOptions(
+	'p|prefix=s'    => \$opt_prefix,
+	'r|reset'       => \$opt_reset,
+	's|separator=s' => \$opt_separator,
+	'f|fasta'       => \$opt_fasta,
+	'v|verbose'     => \$opt_verbose,
+	'n|nocomments'  => \$opt_nocomm,
+	'd|debug'		    => \$opt_debug,
+	'h|help'        => \$opt_help,
+);
+
+$opt_help && usage();
+
+my $total_seqs = 0;
+for my $file (@ARGV) {
+	my $seq_filename = $file;
+
+	my $seqs = 0;
+	vprint(" - Processing \"$file\"");
+	if ($file eq '-') {
+		$seq_filename = '{{STDIN}}';
+		$file = 'stream'
+	}
+	my $reader = FASTX::Reader->new({ filename => "$seq_filename"});
+
+	# Prepare {b} or {B}
+	my $basename = basename($file);
+	$basename =~s/\.\w+\.?g?z?$// if ($opt_prefix =~/{b}/);
+
+	while (my $seq = $reader->getRead() ) {
+		$seqs++;
+		$total_seqs++;
+
+		# Prepare prefix
+		my $seqname = $opt_prefix;
+		$seqname =~s/\{[bB]\}/$basename/;
+
+		if (index($seqname, $opt_separator) != -1) {
+			$warnings++;
+			say STDERR " [WARNING!] The prefix <$seqname> contains the separator <$opt_separator>!";
+		}
+
+		$seqname .= $opt_separator;
+
+		# Counter
+		if ($opt_reset) {
+			$seqname .= $seqs;
+		} else {
+			$seqname .= $total_seqs;
+		}
+
+		my $comments = '';
+		$comments .= " ".$seq->{comment} if (defined $seq->{comment} and not $opt_nocomm);
+		if ($seq->{qual} and not $opt_fasta) {
+			say '@', $seqname, $comments, "\n", $seq->{seq}, "\n+\n", $seq->{qual};
+		} else {
+			say '>', $seqname, $comments, "\n", $seq->{seq};
+		}
+	}
+}
+
+say STDERR "$warnings warnings emitted" if ($warnings);
+
+
+sub usage {
+	say STDERR<<END;
+	$BASENAME $VERSION
+
+	Usage:
+	$BASENAME [options] InputFile.fa [...]
+
+	-p, --prefix STRING
+		New sequence name (accept placehodlers),
+		default is "{b}"
+
+	-s, --separator STRING
+		Separator between prefix and sequence
+		number
+
+	-r, --reset
+		Reset counter at each file
+
+	example:
+	$BASENAME -p '{b}' test.fa test2.fa > renamed.fa
+
+	Placeholders:
+	{b} = File basename without extensions
+	{B} = File basename with extension
+END
+	exit 0;
+}
+
+sub vprint {
+	say $_[0] if ($opt_verbose or $opt_debug) ;
+}
+
+sub dprint {
+	say "#$_[0]" if ($opt_debug);
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+fu-rename - rename sequences
+
+=head1 VERSION
+
+version 1.4.10
+
+=head1 SYNOPSIS
+
+  fu-cat [options] [FILE1 FILE2 FILE3...]
+
+=head1 PARAMETERS
+
+=over 4
+
+=item C<-p>, C<--prefix> STRING
+
+New sequence name (accept placehodlers), default is "{b}"
+
+=item C<-s>, C<--separator> STRING
+
+Separator between prefix and sequence number
+
+=item C<-r>, C<--reset>
+
+Reset counter at each file
+
+=back
+
+=head1 EXAMPLE
+
+  fu-rename -p '{b}' test.fa test2.fa > renamed.fa
+
+Placeholders: C<{b}> = File basename without extensions, and 
+C<{B}> = File basename with extension
+
+=head1 MODERN ALTERNATIVE
+
+This suite of tools has been superseded by B<SeqFu>, a compiled
+program providing faster and safer tools for sequence analysis.
+This suite is maintained for the higher portability of Perl scripts
+under certain circumstances.
+
+SeqFu is available at L<https://github.com/telatin/seqfu2>, and
+can be installed with BioConda C<conda install -c bioconda seqfu>
+
+=head1 CITING
+
+Telatin A, Fariselli P, Birolo G.
+I<SeqFu: A Suite of Utilities for the Robust and Reproducible Manipulation of Sequence Files>.
+Bioengineering 2021, 8, 59. L<https://doi.org/10.3390/bioengineering8050059>
+
+=head1 AUTHOR
+
+Andrea Telatin <andrea@telatin.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018-2022 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

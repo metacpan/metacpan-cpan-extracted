@@ -1,5 +1,9 @@
 Revision history for Perl extension App-optex-textconv
 
+1.03 2022-06-21T10:48:49Z
+
+    - Simplified @ARGV handling.
+
 1.02 2022-01-13T02:17:44Z
 
     - Simplified algorithm.

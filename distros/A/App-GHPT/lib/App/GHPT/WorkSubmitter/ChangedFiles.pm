@@ -2,9 +2,9 @@ package App::GHPT::WorkSubmitter::ChangedFiles;
 
 use App::GHPT::Wrapper::OurMoose;
 
-our $VERSION = '1.001000';
+our $VERSION = '2.000000';
 
-use List::Util 1.44 qw( any uniq );
+use List::Util 1.44  qw( any uniq );
 use App::GHPT::Types qw( ArrayRef HashRef Str );
 
 has [
@@ -75,7 +75,7 @@ App::GHPT::WorkSubmitter::ChangedFiles - Contains all the files that were modifi
 
 =head1 VERSION
 
-version 1.001000
+version 2.000000
 
 =head1 SYNOPSIS
 
@@ -89,7 +89,7 @@ Normally constructed by L<App::GHPT::WorkSubmitter::ChangedFilesFactory>.
 =for test_synopsis use v5.20;
 
     my $factory = App::GHPT::WorkSubmitter::ChangedFilesFactory->new(
-        merge_to_branch_name => 'master',
+        merge_to_branch_name => 'main',
     );
 
     my $changed_files = $factory->changed_files;
@@ -171,7 +171,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by MaxMind, Inc.
+This software is Copyright (c) 2022 by MaxMind, Inc.
 
 This is free software, licensed under:
 

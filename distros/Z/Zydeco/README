@@ -275,6 +275,21 @@ KEYWORDS
         has uc_name  = uc($self->name);
       }
 
+  `param`
+    Synonym for `has` but defaults to `required => true`.
+
+      class MyClass {
+        param foo ( type => Str );
+      }
+
+  `field`
+    Synonym for `has` but defaults to `init_arg => undef`.
+
+      class MyClass {
+        field foo ( builder => true );
+        method _build_foo { ... }
+      }
+
   `constant`
       class MyClass {
         constant PI = 3.2;
@@ -600,7 +615,7 @@ AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2020 by Toby Inkster.
+    This software is copyright (c) 2020-2022 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

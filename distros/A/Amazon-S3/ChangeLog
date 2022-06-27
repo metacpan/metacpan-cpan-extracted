@@ -1,10 +1,18 @@
-Sun Jun 19 08:19:19 2022  Rob Lauer  <rlauer@usgn.net>
+Tue Jun 21 12:57:31 2022  Rob Lauer  <rlauer6@comcast.net>
 
-	[0.52 - specify version of List::Util required]
+	[0.53 - unit test perl > 5.010]:
+	* VERSION: bump
+	* cpan/requires: sorted
+	* src/main/perl/lib/Amazon/S3.pm.in
+	- use 5.010
+
+Sun Jun 19 08:19:19 2022  Rob Lauer  <rlauer6@comast.net>
+
+	[0.52 - specify version of List::Util required]:
 	* cpan/requires: List::Util
 	* cpan/Makefile.am: option of --no-core
 
-Sat Jun 18 07:05:14 2022  Rob Lauer  <rlauer@usgn.net>
+Sat Jun 18 07:05:14 2022  Rob Lauer  <rlauer6@comcast.net>
 
 	[0.51 - unit tests]:
 	* src/main/perl/t/02-logger.t: remove Log::Log4perl from test

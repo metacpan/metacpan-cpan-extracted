@@ -151,32 +151,6 @@ sub read_config_files {
             }
         }
     }
-    ################################################################ July 2021
-    my $m = 0;
-    for my $key ( keys %{$o->{enable}} ) {
-        if ( $o->{enable}{$key} > 1 ) {
-            $o->{enable}{$key} = 1;
-            $m++;
-        }
-    }
-    if ( $o->{insert}{data_source_Create_table} == 3) {
-        $o->{insert}{data_source_Create_table} = 2;
-        $m++;
-    }
-    if ( $o->{insert}{data_source_Insert} == 3 ) {
-        $o->{insert}{data_source_Insert} = 2;
-        $m++
-    }
-    if ( $o->{table}{table_expand} == 2 ) {
-        $o->{table}{table_expand} = 1;
-        $m++
-    }
-    if ( $m ) {
-        require App::DBBrowser::Opt::Set;
-        my $opt_set = App::DBBrowser::Opt::Set->new( $sf->{i}, $o );
-        $opt_set->__write_config_files();
-    }
-    ################################################################
     return $o;
 }
 

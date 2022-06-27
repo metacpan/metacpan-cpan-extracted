@@ -108,11 +108,12 @@ sub doSearch {
     my $obj = decode_json($res->content());
     # warn "result: ", Net::Z3950::FOLIO::Record::_formatJSON($obj);
     my $data = $obj->{data} or _throw(1, "no data in response");
-    my $isi = $data->{instance_storage_instances};
+    my $isi = ($data->{search_instances} ||
+	       $data->{instance_storage_instances});
     if (!$isi) {
 	my $errors = $obj->{errors};
 	_throw(1, join(', ', map { $_->{message} } @$errors)) if $errors;
-	_throw(1, "no instance_storage_instances in response data");
+	_throw(1, "no instance_storage_instances in response data " . $res->content());
     }
     $rs->totalCount($isi->{totalRecords} + 0);
     $rs->insertRecords($offset, $isi->{instances});

@@ -44,7 +44,7 @@ SKIP: {
         'the created distroprefs has the expected distro name' );
 
     # to match the current running OS
-    update_per_os($expected);
+    update_per_env($expected);
     my $perl_info = CPAN::Reporter::Smoker::OpenBSD::PerlConfig->new;
     $data_ref
         = block_distro( $distro_name, $perl_info->dump, 'Tests hang smoker' );
@@ -54,7 +54,7 @@ SKIP: {
         or diag( explain($data_ref) );
 }
 
-sub update_per_os {
+sub update_per_env {
     my $expected = shift;
     my $shortcut = $expected->{match}->{perlconfig};
     $shortcut->{osname}   = $Config{osname};
@@ -65,7 +65,6 @@ sub update_per_os {
         and ( defined( $Config{$attrib_name} ) )
         and ( $Config{$attrib_name} eq 'define' ) )
     {
-        delete( $shortcut->{"no_$attrib_name"} );
         $shortcut->{$attrib_name} = 'define';
     }
 

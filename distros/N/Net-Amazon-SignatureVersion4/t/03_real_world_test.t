@@ -1,7 +1,13 @@
 # -*- perl -*-
 
-use strict;
+use v5.32;
+use utf8;
 use warnings;
+use open qw(:std :utf8);
+no feature qw(indirect);
+use feature qw(signatures);
+no warnings qw(experimental::signatures);
+
 use Test::More;
 use LWP::UserAgent;
 use HTTP::Request;
@@ -9,15 +15,13 @@ use HTTP::Date;
 use Net::Amazon::SignatureVersion4;
 use POSIX qw(strftime);
 use JSON;
-use 5.010;
 use Data::Dumper;
-
 
 
  SKIP: {
      skip "Skipping live connection tests because AWS_ACCESS_KEY_ID and AWS_SECRET_KEY are not set", 1 unless (defined $ENV{'AWS_ACCESS_KEY_ID'} & defined $ENV{'AWS_SECRET_KEY'});
 
-     my $sig=new Net::Amazon::SignatureVersion4();
+     my $sig=Net::Amazon::SignatureVersion4->new();
      
      my $hr=HTTP::Request->new('GET','http://glacier.us-west-2.amazonaws.com/-/vaults', [ 
 				   'Host', 'glacier.us-west-2.amazonaws.com', 

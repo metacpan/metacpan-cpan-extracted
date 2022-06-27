@@ -1,27 +1,24 @@
 package Mite::App::Command::init;
-
-use feature ':5.10';
-
-use Mouse;
-use MouseX::Foreign;
+use Mite::MyMoo;
 extends qw(Mite::App::Command);
 
-use Method::Signatures;
-use Carp;
-
-method usage_desc(...) {
+sub usage_desc {
     return "%c init %o <project name>";
 }
 
-method abstract() {
+sub abstract {
     return "Begin using mite with your project";
 }
 
-method validate_args($opt, $args) {
+sub validate_args {
+    my ( $self, $opts, $args ) = ( shift, @_ );
+
     $self->usage_error("init needs the name of your project") unless @$args;
 }
 
-method execute($opt, $args) {
+sub execute {
+    my ( $self, $opts, $args ) = ( shift, @_ );
+
     my $project_name = shift @$args;
 
     require Mite::Project;

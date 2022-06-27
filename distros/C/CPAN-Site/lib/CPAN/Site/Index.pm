@@ -1,13 +1,13 @@
-# Copyrights 1998,2005-2018 by [Mark Overmeer].
+# Copyrights 1998,2005-2022 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
+# Pod stripped from pm file by OODoc 2.03.
 # This code is part of distribution CPAN::Site.
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package CPAN::Site::Index;
 use vars '$VERSION';
-$VERSION = '1.15';
+$VERSION = '1.16';
 
 use base 'Exporter';
 
@@ -28,7 +28,7 @@ use File::Spec::Functions qw/catfile catdir splitdir/;
 use LWP::UserAgent  ();
 use Archive::Tar    ();
 use Archive::Zip    qw(:ERROR_CODES :CONSTANTS);
-use CPAN::Checksums ();
+use CPAN::Checksums qw(updatedir);  # horrible function name
 use IO::Zlib        ();
 
 my $tar_gz      = qr/ \.tar\.gz$ | \.tar\.Z$ | \.tgz$/xi;
@@ -49,7 +49,7 @@ sub update_global_cpan($$);
 sub load_file($$);
 sub merge_global_cpan($$$);
 sub create_details($$$$$);
-sub calculate_checksums($);
+sub calculate_checksums($$);
 sub read_details($);
 sub remove_expired_details($$$);
 sub mkdirhier(@);
@@ -129,7 +129,7 @@ sub cpan_index($@)
                  , from => $newlist, to => $details;
     }
 
-    calculate_checksums $distdirs;
+    calculate_checksums $distdirs, catdir($mycpan, 'authors', 'id');
 }
 
 #
@@ -382,7 +382,7 @@ Last-Updated: $date
 
 __HEADER
 
-   foreach my $pkg (sort keys %$pkgs)
+   foreach my $pkg (sort { lc($a) cmp lc($b) } keys %$pkgs)
    {  my ($version, $path) = @{$pkgs->{$pkg}};
 
       $version = 'undef'
@@ -396,13 +396,14 @@ __HEADER
    }
 }
 
-sub calculate_checksums($)
+sub calculate_checksums($$)
 {   my $dirs = shift;
+    my $root = shift;
     trace "updating checksums";
 
     foreach my $dir (keys %$dirs)
     {   trace "summing $dir";
-        CPAN::Checksums::updatedir($dir)
+        updatedir($dir, $root)
             or warning 'failed calculating checksums in {dir}', dir => $dir;
     }
 }

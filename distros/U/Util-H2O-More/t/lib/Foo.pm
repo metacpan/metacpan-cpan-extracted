@@ -7,13 +7,6 @@ use Util::H2O::More qw/baptise/;
 sub new {
     my $pkg  = shift;
     my %opts = @_;
-    my $self = baptise \%opts, $pkg, qw/bar/;
-    return $self;
-}
-
-sub new_deeply {
-    my $pkg  = shift;
-    my %opts = @_;
     my $self = baptise -recurse, \%opts, $pkg, qw/bar/;
     return $self;
 }

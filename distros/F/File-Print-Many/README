@@ -1,4 +1,4 @@
-File-Print-Many Version 0.01
+File-Print-Many Version 0.02
 
 INSTALLATION
 
@@ -38,6 +38,6 @@ When filing a bug, please include a patch or pull request.
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2018 Nigel Horne
+Copyright (C) 2018-2022 Nigel Horne
 
 For personal use, this program is released under the following licence: GPL2

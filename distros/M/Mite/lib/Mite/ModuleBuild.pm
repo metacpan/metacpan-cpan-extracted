@@ -1,23 +1,27 @@
 package Mite::ModuleBuild;
-
 use strict;
 use warnings;
 use feature ':5.10';
-use Method::Signatures;
 
 use parent 'Module::Build';
 
-method _mite() {
+sub _mite {
+    my $self = shift;
+
     return $ENV{MITE} || 'mite';
 }
 
-method ACTION_code() {
+sub ACTION_code {
+    my $self = shift;
+
     system $self->_mite. " compile --exit-if-no-mite-dir --no-search-mite-dir";
 
     return $self->SUPER::ACTION_code;
 }
 
-method ACTION_clean() {
+sub ACTION_clean {
+    my $self = shift;
+
     system $self->_mite. " clean --exit-if-no-mite-dir --no-search-mite-dir";
 
     return $self->SUPER::ACTION_clean;

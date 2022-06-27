@@ -8,7 +8,7 @@ use Mo qw(build default is);
 use Mo::utils qw(check_array_object);
 use Wikibase::Datatype::Utils qw(check_entity);
 
-our $VERSION = 0.12;
+our $VERSION = 0.16;
 
 has forms => (
 	default => [],
@@ -37,7 +37,7 @@ has modified => (
 );
 
 has ns => (
-	default => 0,
+	default => 146,
 	is => 'ro',
 );
 
@@ -162,7 +162,7 @@ Parameter is optional.
 =item * C<ns>
 
 Namespace.
-Default value is 0.
+Default value is 146.
 
 =item * C<senses>
 
@@ -481,6 +481,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.12
+0.16
 
 =cut

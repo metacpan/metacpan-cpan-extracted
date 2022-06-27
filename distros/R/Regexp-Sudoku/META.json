@@ -4,7 +4,7 @@
       "Abigail <cpan@abigail.freedom.nl>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "keywords" : [],
    "license" : [
       "mit"
@@ -67,8 +67,8 @@
          "url" : "git://github.com/Abigail/Regexp-Sudoku.git"
       }
    },
-   "version" : "2022030401",
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "version" : "2022062101",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_test_requires" : {
       "Exporter" : 0,
       "List::Util" : 0,

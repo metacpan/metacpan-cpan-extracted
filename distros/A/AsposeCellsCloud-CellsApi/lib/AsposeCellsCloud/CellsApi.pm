@@ -23372,7 +23372,12 @@ sub cells_ranges_put_worksheet_cells_range {
         data_type => 'hash',
         description => 'extended query parameters',
         required => '1',
-    },    
+    },  
+    'check_excel_restriction' => {
+        data_type => 'boolean',
+        description => 'Check excel restriction.',
+        required => '0',
+    },  
     };
     __PACKAGE__->method_documentation->{ 'cells_save_as_post_document_save_as' } = { 
     	summary => 'Convert document and save result to storage.',
@@ -23439,6 +23444,10 @@ sub cells_save_as_post_document_save_as {
         while ( my ($key,$value) = each( %$map_extended_query_parameters ) ) {
              $query_params->{$key} = $self->{api_client}->to_query_value($value);
         }
+    }
+    # query params
+    if ( exists $args{'check_excel_restriction'}) {
+        $query_params->{'checkExcelRestriction'} = $self->{api_client}->to_query_value($args{'check_excel_restriction'});
     }
     # path params
     if ( exists $args{'name'}) {

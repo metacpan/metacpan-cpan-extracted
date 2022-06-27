@@ -27,9 +27,10 @@ my %WriteMakefileArgs = (
     "File::Fetch" => 0,
     "FindBin" => "1.3",
     "JSON::PP" => 0,
+    "PerlIO::encoding" => 0,
     "Time::HiRes" => 0
   },
-  "VERSION" => "1.3.0",
+  "VERSION" => "1.5.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,6 +44,7 @@ my %FallbackPrereqs = (
   "File::Fetch" => 0,
   "FindBin" => "1.3",
   "JSON::PP" => 0,
+  "PerlIO::encoding" => 0,
   "Time::HiRes" => 0
 );
 

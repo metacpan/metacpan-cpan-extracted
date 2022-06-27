@@ -446,11 +446,17 @@ static OP *S_newSLUGOP(pTHX_ int idx)
 
 static void make_wrapper_func(pTHX_ const struct HooksAndData *hd)
 {
+  SV *funcname = newSVpvn(hd->hooks->wrapper_func_name, strlen(hd->hooks->wrapper_func_name));
+  if(gv_fetchsv(funcname, 0, 0)) {
+    /* The wrapper function already exists. We presume this is due to a duplicate
+     * registration of identical hooks under a different name and just skip
+     */
+    return;
+  }
+
   /* Prepare to make a new optree-based CV */
   I32 floor_ix = start_subparse(FALSE, 0);
   SAVEFREESV(PL_compcv);
-
-  SV *funcname = newSVpvn(hd->hooks->wrapper_func_name, strlen(hd->hooks->wrapper_func_name));
 
   I32 save_ix = block_start(TRUE);
 

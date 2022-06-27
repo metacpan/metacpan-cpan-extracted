@@ -1,0 +1,247 @@
+#!/usr/bin/env perl
+# ABSTRACT: Extract sequences using patterns
+# PODNAME: fu-grep
+use 5.012;
+use warnings;
+use Getopt::Long;
+use FindBin qw($RealBin);
+
+use FASTX::Reader;
+use File::Basename;
+use Data::Dumper;
+my $opt_comment_separator = "\t";
+use Proch::Seqfu;
+my $VERSION = $Proch::Seqfu::VERSION // "<Dev>";
+my $BASENAME = basename($0);
+my $warnings = 0;
+my ($opt_verbose, $opt_debug, $opt_fasta);
+my $opt_search_in_name;
+my $opt_search_in_comm;
+my $opt_stranded;
+my $opt_annotate;
+
+my $_opt          = GetOptions(
+	'a|annotate'    => \$opt_annotate,
+	's|stranded'    => \$opt_stranded,
+	'n|name'        => \$opt_search_in_name,
+	'c|comment'     => \$opt_search_in_comm,
+	'f|fasta'       => \$opt_fasta,
+	'v|verbose'     => \$opt_verbose,
+	'cs|comment-separator=s'
+	                => \$opt_comment_separator,
+	'd|debug'		=> \$opt_debug,
+);
+
+usage() unless (defined $ARGV[1]);
+
+if ($opt_debug) {
+	say STDERR "Using FASTX::Reader $FASTX::Reader::VERSION";
+}
+my $pattern = shift @ARGV;
+
+check_pattern($pattern) if (not $opt_search_in_name and not $opt_search_in_comm);
+my $regex = "($pattern)";
+my $rc    = rc($pattern);
+$regex = rc_pattern($pattern) if (not defined $opt_stranded);
+
+for my $file (@ARGV) {
+	my $seq_filename = $file;
+
+
+	vprint(" - Processing \"$file\"");
+	if ($file eq '-') {
+		$seq_filename = '{{STDIN}}';
+		$file = 'stream'
+	}
+	my $reader = FASTX::Reader->new({ filename => "$seq_filename" });
+
+	# Prepare {b} or {B}
+	my $basename = basename($file);
+	$basename =~s/\.\w+\.?g?z?$//;
+
+	my $annotation = '';
+	while (my $seq = $reader->getRead() ) {
+		my $print = 0;
+		my $comments = '';
+		$comments .= $opt_comment_separator . $seq->{comment} if defined $seq->{comment};
+
+		if ($opt_search_in_comm) {
+			# search in comments
+			next if not defined $seq->{comment};
+			$print++ if ($seq->{comment} =~/$regex/i);
+
+		} elsif ($opt_search_in_name) {
+			# search in sequence name
+			$print++ if ($seq->{name} =~/$regex/i);
+		} else {
+			# search in DNA sequence
+			if ($seq->{seq} =~/$regex/i) {
+				$print++;
+
+				# Prepare annotation with results
+				if ($opt_annotate) {
+					my $matches = 0;
+					my $for = 0;
+					my $rev = 0;
+					while ($seq->{seq} =~/$regex/gi) {
+						$matches++;
+						if (uc($1) eq uc($pattern)) {
+							$for++;
+						} else {
+							$rev++
+						}
+					}
+
+					$annotation = "$opt_comment_separator#matches=$matches;";
+					$annotation .= "for=$pattern:$for;rev=$rc:$rev" if not defined $opt_stranded;
+				}
+			}
+		}
+
+		next unless $print;
+
+		if ($seq->{qual} and not $opt_fasta) {
+			say '@', $seq->{name}, $comments, "$annotation\n", $seq->{seq}, "\n+\n", $seq->{qual};
+		} else {
+			say '>', $seq->{name}, $comments, "$annotation\n", $seq->{seq};
+		}
+
+	}
+}
+
+say STDERR "$warnings warnings emitted" if ($opt_verbose or $opt_debug);
+
+
+sub usage {
+	say STDERR<<END;
+  $BASENAME Version $VERSION
+
+  Usage:
+  $BASENAME [options] Pattern InputFile.fa [...]
+
+  -a, --annotate
+     Add comments to the sequence when match is found
+
+  -n, --name
+     Search pattern in sequence name (default: sequence)
+
+  -c, --comments
+     Search pattern in sequence comments (default: sequence)
+
+  -s, --stranded
+     Do not search reverse complemented oligo
+
+  -f, --fasta
+     Force output in FASTA format
+
+  example:
+  $BASENAME DNASTRING test.fa test2.fa > matched.fa
+END
+	exit 0;
+}
+
+sub check_pattern {
+	my $pattern = shift @_;
+	if ($pattern !~/^[ACGTNacgtn\.	]+$/) {
+		die "ERROR: Pattern should be a DNA string <$pattern>\n";
+	}
+}
+sub rc_pattern {
+	my $string = shift @_;
+	my $rc = rc($string);
+	return '(' . $string .'|'. $rc . ')';
+}
+
+# sub rc {
+# 	my $string = shift @_;
+# 	$string = reverse $string;
+# 	$string =~tr/ACGTacgt/TGCAtgca/;
+# 	return $string;
+# }
+sub vprint {
+	say STDERR $_[0] if ($opt_verbose or $opt_debug) ;
+}
+
+sub dprint {
+	say STDERR "#$_[0]" if ($opt_debug);
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+fu-grep - Extract sequences using patterns
+
+=head1 VERSION
+
+version 1.4.10
+
+=head1 USAGE
+
+  fu-grep [options] Pattern InputFile.fa [...]
+
+=head2 PARAMETERS
+
+=over 4
+
+=item C<-a>, C<--annotate>
+
+Add comments to the sequence when match is found
+
+=item C<n>, C<--name>
+
+Search pattern in sequence name (default: sequence)
+
+=item C<c>, C<--comments>
+
+Search pattern in sequence comments (default: sequence)
+
+=item C<s>, C<--stranded>
+
+Do not search reverse complemented oligo
+
+=item C<f>, C<--fasta>
+
+Force output in FASTA format
+
+=back
+
+=head1 EXAMPLES
+
+  fu-grep DNASTRING test.fa test2.fa > matched.fa
+
+=head1 MODERN ALTERNATIVE
+
+This suite of tools has been superseded by B<SeqFu>, a compiled
+program providing faster and safer tools for sequence analysis.
+This suite is maintained for the higher portability of Perl scripts
+under certain circumstances.
+
+SeqFu is available at L<https://github.com/telatin/seqfu2>, and
+can be installed with BioConda C<conda install -c bioconda seqfu>
+
+=head1 CITING
+
+Telatin A, Fariselli P, Birolo G.
+I<SeqFu: A Suite of Utilities for the Robust and Reproducible Manipulation of Sequence Files>.
+Bioengineering 2021, 8, 59. L<https://doi.org/10.3390/bioengineering8050059>
+
+=cut
+
+=head1 AUTHOR
+
+Andrea Telatin <andrea@telatin.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018-2022 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

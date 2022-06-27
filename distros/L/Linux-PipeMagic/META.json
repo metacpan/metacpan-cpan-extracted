@@ -1,0 +1,59 @@
+{
+   "abstract" : "Perl extension to use the zero copy IO syscalls",
+   "author" : [
+      "Dave Lambley <dlambley@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Linux-PipeMagic",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Copy" : "0",
+            "File::Spec" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Slurp" : "0",
+            "File::Temp" : "0",
+            "IO::Socket::INET" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/davel/Linux-PipeMagic"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "Simon Wilper <sxw@chronowerks.de>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

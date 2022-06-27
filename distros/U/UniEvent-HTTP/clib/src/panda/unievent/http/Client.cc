@@ -93,11 +93,7 @@ void Client::request (const RequestSP& request) {
     }
 
     // this code should be after connect, because in case of connect timeout, timer inside Tcp class must react first to mark multiDNS address as bad
-    if (request->timeout) {
-        if (!request->_timer) request->_timer = new Timer(loop());
-        request->_timer->event_listener(this);
-        if (!request->_timer->active()) request->_timer->once(request->timeout); // if active it may be redirected request
-    }
+    if (request->timeout) request->ensure_timer_active(loop());
 
     Tcp::weak(false);
     _request = request;
@@ -152,10 +148,8 @@ void Client::on_write (const ErrorCode& err, const WriteRequestSP&) {
     if (_request && err) cancel(err);
 }
 
-void Client::on_timer (const TimerSP& t) {
+void Client::timed_out () {
     HOLD_ON(this);
-    assert(_request);
-    assert(_request->_timer == t);
     auto err = make_error_code(std::errc::timed_out);
     cancel(connecting() ? nest_error(errc::connect_error, err) : err);
 }
@@ -262,6 +256,7 @@ void Client::analyze_request () {
         req->_client = nullptr;
         if (!res->keep_alive()) Tcp::reset();
 
+        req->cleanup_after_redirect();
         if (_pool && (netloc.host != _netloc.host || netloc.port != _netloc.port)) {
             panda_log_debug("using pool");
             _last_activity_time = loop()->now();
@@ -294,26 +289,15 @@ void Client::finish_request (const ErrorCode& _err) {
     if (err || !res->keep_alive() || !req->keep_alive()) drop_connection();
     else Tcp::weak(true);
 
-    req->_redirection_counter = 0;
-    req->_client = nullptr;
-    req->_transfer_completed = false;
-
-    if (req->_timer) {
-        req->_timer->event_listener(nullptr);
-        req->_timer->stop();
+    if (_form_field >= 0) {
+        req->form[_form_field]->stop();
+        _form_field = -1;
     }
 
     _last_activity_time = loop()->now();
     if (_pool) _pool->putback(this);
 
-    if (!res) res = static_pointer_cast<Response>(req->new_response()); // ensure we pass non-null response even for earliest errors
-
-    req->partial_event(req, res, err);
-    req->response_event(req, res, err);
-    if (_form_field >= 0) {
-        req->form[_form_field]->stop();
-        _form_field = -1;
-    }
+    req->finish_and_notify(res, err);
 }
 
 void Client::on_eof () {

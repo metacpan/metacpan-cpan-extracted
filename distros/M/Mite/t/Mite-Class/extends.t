@@ -35,6 +35,9 @@ CODE
 
     my $child = new_ok "C1";
     is $child->foo, 42;
+
+    ok 'C1'->can('foo'), 'C1 can foo';
+    ok !exists( &C1::foo ), 'C1 inherited foo';
 };
 
 

@@ -9,7 +9,7 @@ using namespace xs::unievent;
 using namespace panda::unievent;
 using panda::string;
 
-static PERL_THREAD_LOCAL struct {
+static PERL_ITHREADS_LOCAL struct {
     Simple create_connection = Simple::shared("create_connection");
     Simple on_establish      = Simple::shared("on_establish");
     Simple on_connection     = Simple::shared("on_connection");

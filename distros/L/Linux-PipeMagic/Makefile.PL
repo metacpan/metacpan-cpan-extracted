@@ -7,14 +7,19 @@ WriteMakefile(
     VERSION_FROM      => 'lib/Linux/PipeMagic.pm', # finds $VERSION
     PREREQ_PM         => {}, # e.g., Module::Name => 1.1
     BUILD_REQUIRES    => {
+        'File::Copy'    => 0,
+        'File::Spec'    => 0,
+    },
+    TEST_REQUIRES     => {
         'Test::More'    => 0,
         'File::Slurp'   => 0,
         'File::Temp'    => 0,
+        'IO::Socket::INET' => 0,
 
     },
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Linux/PipeMagic.pm', # retrieve abstract from module
-       AUTHOR         => 'Dave Lambley <cpan@davel.org.uk>') : ()),
+       AUTHOR         => 'Dave Lambley <dlambley@cpan.org>') : ()),
     LIBS              => [''], # e.g., '-lm'
     DEFINE            => '', # e.g., '-DHAVE_SOMETHING'
     INC               => '-I.', # e.g., '-I. -I/usr/include/other'
@@ -24,8 +29,12 @@ WriteMakefile(
         resources => {
             repository => "http://github.com/davel/Linux-PipeMagic",
         },
+        x_contributors => [
+            "Simon Wilper <sxw\@chronowerks.de>",
+        ],
     },
     LICENSE           => "perl",
+    MIN_PERL_VERSION  => v5.10.1,
 );
 if  (eval {require ExtUtils::Constant; 1}) {
   # If you edit these definitions to change the constants used by this module,

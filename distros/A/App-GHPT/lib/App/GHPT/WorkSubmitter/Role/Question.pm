@@ -2,10 +2,10 @@ package App::GHPT::WorkSubmitter::Role::Question;
 
 use App::GHPT::Wrapper::OurMoose::Role;
 
-our $VERSION = '1.001000';
+our $VERSION = '2.000000';
 
 use Term::CallEditor qw( solicit );
-use Term::Choose qw( choose );
+use Term::Choose     qw( choose );
 
 requires 'ask';
 
@@ -80,7 +80,7 @@ App::GHPT::WorkSubmitter::Role::Question - Role for writing interactive question
 
 =head1 VERSION
 
-version 1.001000
+version 2.000000
 
 =head1 SYNOPSIS
 
@@ -153,7 +153,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by MaxMind, Inc.
+This software is Copyright (c) 2022 by MaxMind, Inc.
 
 This is free software, licensed under:
 

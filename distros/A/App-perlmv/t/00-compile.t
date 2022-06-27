@@ -6,10 +6,11 @@ use warnings;
 
 use Test::More;
 
-plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/perlmv.pm',
+    'App/perlmv/scriptlet/add_extension_according_to_mime_type.pm',
     'App/perlmv/scriptlet/remove_common_prefix.pm',
     'App/perlmv/scriptlet/remove_common_suffix.pm',
     'App/perlmv/scriptlets/std.pm',

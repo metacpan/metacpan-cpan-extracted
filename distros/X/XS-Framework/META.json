@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -27,7 +27,7 @@
          "requires" : {
             "Test::Catch" : "v2.0.0",
             "XS::Install" : "v1.3.5",
-            "XS::libcatch" : "v3.0.0.3",
+            "XS::libcatch" : "v3.0.0.4",
             "XS::libpanda" : "v1.5.8",
             "next::XS" : "v1.0.7"
          }
@@ -47,13 +47,13 @@
             "Test::Exception" : "0",
             "Test::More" : "0",
             "Test::Simple" : "0.96",
-            "XS::libcatch" : "v3.0.0.3",
+            "XS::libcatch" : "v3.0.0.4",
             "XS::libpanda" : "v1.5.8",
             "next::XS" : "v1.0.7"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.5.2",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "v1.5.3",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

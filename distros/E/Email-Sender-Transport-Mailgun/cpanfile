@@ -1,7 +1,7 @@
 requires 'perl', '5.008001';
 
 requires 'Email::Sender';
-requires 'HTTP::Tiny';
+requires 'HTTP::Tiny', '>= 0.037';
 requires 'HTTP::Tiny::Multipart';
 requires 'IO::Socket::SSL';
 requires 'JSON::MaybeXS';

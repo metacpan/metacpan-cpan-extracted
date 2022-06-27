@@ -30,7 +30,6 @@ sub new {
 }
 
 
-
 sub browse_the_table {
     my ( $sf, $qt_table, $qt_columns ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
@@ -204,7 +203,7 @@ sub __selected_statement_result {
         $#{$sf->{i}{history}{ $sf->{d}{db} }{print}} = 50;
     }
     if ( $sf->{o}{G}{max_rows} && ! $sql->{limit_stmt} ) {
-        $statement .= " LIMIT " . $sf->{o}{G}{max_rows};
+        $statement .= $ax->sql_limit( $sf->{o}{G}{max_rows} );
         $sf->{o}{table}{max_rows} = $sf->{o}{G}{max_rows};
     }
     else {

@@ -238,7 +238,7 @@ pwhois - Get Whois information of domains and IP addresses.
 
 =head1 VERSION
 
-version 2.99034
+version 2.99036
 
 =head1 SYNOPSIS
 

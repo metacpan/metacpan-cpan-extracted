@@ -1,16 +1,16 @@
 {
-   "abstract" : "Templates in (P)erl using (Lex)ical Aliasing",
+   "abstract" : "(P)erl (L)exical and (EX)tendable Templating",
    "author" : [
       "Ruben Westerberg <drclaw@mac.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Template-Plex",
    "no_index" : {
@@ -32,7 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "String::Util" : "0",
+            "Log::OK" : "0",
+            "Log::ger" : "0",
             "enum" : "0",
             "perl" : "5.024000"
          }
@@ -51,6 +52,6 @@
          "web" : "http://github.com/drclaw1394/perl-template-plex"
       }
    },
-   "version" : "v0.3.0",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "v0.4.2",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -12,7 +12,7 @@ my $root=dirname __FILE__;
 
 my @options=(root=>$root);
 
-my $template=plex "recursive-top.plex", {}, @options;
+my $template=Template::Plex->load( "recursive-top.plex", {}, @options);
 
 $hash{title}="goodbye";
 say $template->render;

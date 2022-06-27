@@ -334,6 +334,16 @@ sub post_assemble {
         description => '',
         required => '1',
     },
+    'sheetname' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'out_format' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },        
     };
     __PACKAGE__->method_documentation->{ 'post_clear_objects' } = { 
     	summary => '',
@@ -376,6 +386,13 @@ sub post_clear_objects {
         $query_params->{'objecttype'} = $self->{api_client}->to_query_value($args{'objecttype'});
     }
 
+    if ( exists $args{'sheetname'}) {
+        $query_params->{'sheetname'} = $self->{api_client}->to_query_value($args{'sheetname'});
+    }
+
+    if ( exists $args{'out_format'}) {
+        $query_params->{'outFormat'} = $self->{api_client}->to_query_value($args{'out_format'});
+    }    
     # form params
     # if ( exists $args{'file'} ) {
     #     $form_params->{'File'} = [] unless defined $form_params->{'File'};

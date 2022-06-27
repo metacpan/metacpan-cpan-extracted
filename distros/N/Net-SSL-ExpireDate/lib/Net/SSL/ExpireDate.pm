@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 
 use base qw(Class::Accessor);
 use Crypt::OpenSSL::X509 qw(FORMAT_ASN1);
@@ -241,22 +241,24 @@ sub _peer_certificate {
 sub _send_client_hello {
     my($sock, $servername) = @_;
 
-    my(@buf,$len);
-    ## record
+    my(@buf, $len);
+    # Record Layer
+    # Content Type: Handshake
     push @buf, $SSL3_RT_HANDSHAKE;
+    # Version: TLS 1.0 (SSL 3.1)
     push @buf, 3, 1;
+    # Length: set later
     push @buf, undef, undef;
     my $pos_record_len = $#buf-1;
 
-    ## handshake
+    ## Handshake Protocol: Client Hello
     push @buf, $SSL3_MT_CLIENT_HELLO;
+    ## Length: set later
     push @buf, undef, undef, undef;
     my $pos_handshake_len = $#buf-2;
-
-    ## ClientHello
-    # client_version
-    push @buf, 3, 3;
-    # random
+    ## Version: TLS 1.2
+    push @buf, 3, 3; # TLS 1.2
+    ## Random
     my $time = time;
     push @buf, (($time>>24) & 0xFF);
     push @buf, (($time>>16) & 0xFF);
@@ -265,153 +267,187 @@ sub _send_client_hello {
     for (1..28) {
         push @buf, int(rand(0xFF));
     }
-    # session_id
+    ## Session ID Length: 0
     push @buf, 0;
-    # cipher_suites
-    my @decCipherSuites = (
-      49199,
-      49195,
-      49200,
-      49196,
-      158,
-      162,
-      163,
-      159,
-      49191,
-      49187,
-      49171,
-      49161,
-      49192,
-      49188,
-      49172,
-      49162,
-      103,
-      51,
-      64,
-      107,
-      56,
-      57,
-      49170,
-      49160,
-      156,
-      157,
-      60,
-      61,
-      47,
-      53,
-      49186,
-      49185,
-      49184,
-      165,
-      161,
-      106,
-      105,
-      104,
-      55,
-      54,
-      49183,
-      49182,
-      49181,
-      164,
-      160,
-      63,
-      62,
-      50,
-      49,
-      48,
-      10,
-      136,
-      135,
-      134,
-      133,
-      132,
-      69,
-      68,
-      67,
-      66,
-      65,
+
+    # https://wiki.mozilla.org/Security/Server_Side_TLS#Intermediate_compatibility_.28recommended.29
+    my @cipher_suites = (
+        0xc02c, # TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+        0xc030, # TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        0x009f, # TLS_DHE_RSA_WITH_AES_256_GCM_SHA384
+        0xcca9, # TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256
+        0xcca8, # TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+        0xccaa, # TLS_DHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+        0xc02b, # TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+        0xc02f, # TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        0x009e, # TLS_DHE_RSA_WITH_AES_128_GCM_SHA256
+        0xc024, # TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384
+        0xc028, # TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
+        0x006b, # TLS_DHE_RSA_WITH_AES_256_CBC_SHA256
+        0xc023, # TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256
+        0xc027, # TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256
+        0x0067, # TLS_DHE_RSA_WITH_AES_128_CBC_SHA256
+        0xc00a, # TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA
+        0xc014, # TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA
+        0x0039, # TLS_DHE_RSA_WITH_AES_256_CBC_SHA
+        0xc009, # TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA
+        0xc013, # TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA
+        0x0033, # TLS_DHE_RSA_WITH_AES_128_CBC_SHA
+        0x009d, # TLS_RSA_WITH_AES_256_GCM_SHA384
+        0x009c, # TLS_RSA_WITH_AES_128_GCM_SHA256
+        0x003d, # TLS_RSA_WITH_AES_256_CBC_SHA256
+        0x003c, # TLS_RSA_WITH_AES_128_CBC_SHA256
+        0x0035, # TLS_RSA_WITH_AES_256_CBC_SHA
+        0x002f, # TLS_RSA_WITH_AES_128_CBC_SHA
+        0x00ff, # TLS_EMPTY_RENEGOTIATION_INFO_SCSV
     );
-    $len = scalar(@decCipherSuites) * 2;
+    $len = scalar(@cipher_suites) * 2;
+    ## Cipher Suites Length
     push @buf, (($len >> 8) & 0xFF);
     push @buf, (($len     ) & 0xFF);
-    foreach my $i (@decCipherSuites) {
+    ## Cipher Suites
+    for my $i (@cipher_suites) {
         push @buf, (($i >> 8) & 0xFF);
         push @buf, (($i     ) & 0xFF);
     }
 
-    # compression
+    ## Compression Methods Length
     push @buf, 1;
+    ## Compression Methods: null
     push @buf, 0;
 
-    # Extensions length
+    ## Extensions Length: set later
     my @ext = (undef, undef);
 
-    # Extension: server_name
+    ## Extension: server_name
     if ($servername) {
-        # my $buf_len = scalar(@buf);
-        # my $buf_len_pos = $#buf+1;
-        # push @buf, undef, undef;
-
         # SNI (Server Name Indication)
         my $sn_len = length $servername;
-        # Extension Type: Server Name
+        ### Type: Server Name
         push @ext, 0, 0;
-        # Length
+        ### Length
+        # 5 is this part(2) + Server Name Indication Length(3)
         push @ext, ((($sn_len+5) >> 8) & 0xFF);
         push @ext, ((($sn_len+5)     ) & 0xFF);
-        # Server Name Indication Length
+        ### Server Name Indication extension
+        #### Server Name list length
+        # 3 is this part(2) + Server Name Type(1)
         push @ext, ((($sn_len+3) >> 8) & 0xFF);
         push @ext, ((($sn_len+3)     ) & 0xFF);
-        # Server Name Type: host_name
+        #### Server Name Type: host_name
         push @ext, 0;
-        # Length of servername
+        #### Server Name length
         push @ext, (($sn_len >> 8) & 0xFF);
         push @ext, (($sn_len     ) & 0xFF);
-        # Servername
+        #### Server Name
         for my $c (split //, $servername) {
             push @ext, ord($c);
         }
     }
 
-    # Extension: supported_groups
-    push @ext, 0x00, 0x0a; # supported_groups
-    my @supportedGroups = (
-	0x000a, # sect163r1
-	0x0017, # secp256r1
-	0x0018, # secp384r1
-	0x0019, # secp521r1
-	0x001d, # x25519
-	0x001e, # x448
+    ## Extension: supported_groups
+    ### Type: supported_groups
+    push @ext, 0x00, 0x0a;
+
+    my @supported_groups = (
+        0x0017, # secp256r1
+        0x0018, # secp384r1
+        0x0019, # secp521r1
+        0x001d, # x25519
+        0x001e, # x448
     );
-    $len = scalar(@supportedGroups) * 2;
+
+    ### Length
+    # Supported Group List Length(2) + Supported Groups
+    $len = 2 + scalar(@supported_groups) * 2;
     push @ext, (($len >> 8) & 0xFF);
     push @ext, (($len     ) & 0xFF);
-    foreach my $i (@supportedGroups) {
+
+    ### Supported Group List Length
+    $len = scalar(@supported_groups) * 2;
+    push @ext, (($len >> 8) & 0xFF);
+    push @ext, (($len     ) & 0xFF);
+
+    ### Supported Groups
+    for my $i (@supported_groups) {
         push @ext, (($i >> 8) & 0xFF);
         push @ext, (($i     ) & 0xFF);
     }
 
-    # Extension: signature_algorithms (>= TLSv1.2)
-    push @ext, 0x00, 0x0D; # signature_algorithms
-    push @ext, 0, 32; # length
-    push @ext, 0, 30; # signature hash algorithms length
+    ## Extension: signature_algorithms (>= TLSv1.2)
+    ### Type: signature_algorithms
+    push @ext, 0x00, 0x0D;
+
+    # https://datatracker.ietf.org/doc/html/rfc5246#section-7.4.1.4.1
     # enum {
     #     none(0), md5(1), sha1(2), sha224(3), sha256(4), sha384(5),
     #     sha512(6), (255)
     # } HashAlgorithm;
-    for my $ha (2..6) {
-        # enum { anonymous(0), rsa(1), dsa(2), ecdsa(3), (255) }
-        #   SignatureAlgorithm;
-        for my $sa (1..3) {
-            push @ext, $ha, $sa;
-        }
+    # enum { anonymous(0), rsa(1), dsa(2), ecdsa(3), (255)
+    # } SignatureAlgorithm;
+    my @signature_algorithms = (
+        0x0403, # ecdsa_secp256r1_sha256
+        0x0503, # ecdsa_secp384r1_sha384
+        0x0603, # ecdsa_secp521r1_sha512
+        0x0807, # ed25519
+        0x0808, # ed448
+        0x0809, # rsa_pss_pss_sha256
+        0x080a, # rsa_pss_pss_sha384
+        0x080b, # rsa_pss_pss_sha512
+        0x0804, # rsa_pss_rsae_sha256
+        0x0805, # rsa_pss_rsae_sha384
+        0x0806, # rsa_pss_rsae_sha512
+        0x0401, # rsa_pkcs1_sha256
+        0x0501, # rsa_pkcs1_sha384
+        0x0601, # rsa_pkcs1_sha512
+        0x0303, # SHA224 ECDSA
+        0x0203, # ecdsa_sha1
+        0x0301, # SHA224 RSA
+        0x0201, # rsa_pkcs1_sha1
+        0x0302, # SHA224 DSA
+        0x0202, # SHA1 DSA
+        0x0402, # SHA256 DSA
+        0x0502, # SHA384 DSA
+        0x0602, # SHA512 DSA
+    );
+
+    ### Length
+    # Signature Hash Algorithms Length(2) + Signature hash Algorithms
+    $len = 2 + scalar(@signature_algorithms) * 2;
+    push @ext, (($len >> 8) & 0xFF);
+    push @ext, (($len     ) & 0xFF);
+
+    ### Signature Hash Algorithms Length
+    $len = scalar(@signature_algorithms) * 2;
+    push @ext, (($len >> 8) & 0xFF);
+    push @ext, (($len     ) & 0xFF);
+
+    ### Signature Hash Algorithms
+    for my $i (@signature_algorithms) {
+        push @ext, (($i >> 8) & 0xFF);
+        push @ext, (($i     ) & 0xFF);
     }
 
-    # Extension: Heartbeat
-    push @ext, 0x00, 0x0F; # heartbeat
-    push @ext, 0x00, 0x01; # length
-    push @ext, 0x01;       # peer_allowed_to_send
+    ## Extension: ec_point_formats
+    ### Type: ec_point_formats
+    push @ext, 0x00, 0x0b;
+    ### Length: 4
+    push @ext, 0x00, 0x04;
+    ### EC point formats Length: 3
+    push @ext, 0x03;
+    ### Elliptic curves point formats
+    push @ext, 0x00; # uncompressed
+    push @ext, 0x01; # ansiX962_compressed_prime
+    push @ext, 0x02; # ansiX962_compressed_char2 (2)
 
+    ## Extension: Heartbeat
+    push @ext,
+        0x00, 0x0F, # Type: heartbeat
+        0x00, 0x01, # Lengh
+        0x01,       # Peer allowed to send requests
+        ;
+
+    ## Extensions Length
     my $ext_len = scalar(@ext) - 2;
     if ($ext_len > 0) {
         $ext[0] = (($ext_len) >> 8) & 0xFF;
@@ -419,24 +455,20 @@ sub _send_client_hello {
         push @buf, @ext;
     }
 
-    # record length
+    # Record Length
     $len = scalar(@buf) - $pos_record_len - 2;
     $buf[ $pos_record_len   ] = (($len >>  8) & 0xFF);
     $buf[ $pos_record_len+1 ] = (($len      ) & 0xFF);
 
-    # handshake length
+    ## Handshake Length
     $len = scalar(@buf) - $pos_handshake_len - 3;
     $buf[ $pos_handshake_len   ] = (($len >> 16) & 0xFF);
     $buf[ $pos_handshake_len+1 ] = (($len >>  8) & 0xFF);
     $buf[ $pos_handshake_len+2 ] = (($len      ) & 0xFF);
 
-    my $data;
+    my $data = '';
     for my $c (@buf) {
-        if ($c =~ /^[0-9]+$/) {
-            $data .= pack('C', $c);
-        } else {
-            $data .= $c;
-        }
+        $data .= pack('C', $c);
     }
 
     return $sock->write_atomically($data);
@@ -500,20 +532,30 @@ sub _get_handshake {
 sub _sendalert {
     my($sock, $level, $desc) = @_;
 
-    my $data = "";
+    my(@buf, $len);
+    # Record Layer
+    # Content Type: Alert
+    push @buf, $SSL3_RT_ALERT;
+    # Version: TLS 1.0 (SSL 3.1)
+    push @buf, 3, 1;
+    # Length:
+    push @buf, 0x00, 0x02;
+    # Alert Message
+    ## Level: Fatal (2)
+    push @buf, $level;
+    ## Description: Handshake Failure (40)
+    push @buf, $desc;
 
-    $data .= pack('C', $SSL3_RT_ALERT);
-    $data .= pack('C', 3);
-    $data .= pack('C', 0);
-    $data .= pack('C', 0);
-    $data .= pack('C', 2);
-    $data .= pack('C', $level);
-    $data .= pack('C', $desc);
+    my $data = '';
+    for my $c (@buf) {
+        $data .= pack('C', $c);
+    }
 
     return $sock->write_atomically($data);
 }
 
 1; # Magic true value required at end of module
+
 __END__
 
 =head1 NAME

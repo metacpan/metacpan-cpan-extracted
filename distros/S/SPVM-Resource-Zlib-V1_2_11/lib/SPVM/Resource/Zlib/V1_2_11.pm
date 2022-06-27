@@ -1,6 +1,6 @@
 package SPVM::Resource::Zlib::V1_2_11;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 1;
 

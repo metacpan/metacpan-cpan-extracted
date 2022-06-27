@@ -1,5 +1,11 @@
 Revision history for Perl module Net::Whois::Raw.
 
+2.99036  Jun 21 2022 Alexander Nalobin
+    - Fix whois servers for .cat and .tel
+
+2.99035  May 25 2022    Alexander Nalobin
+    - Added .ink, .wiki, .design not found patterns
+
 2.99034  Apr 18 2022    Alexander Nalobin
     - .ink, .wiki, .design moved from centralnic
 

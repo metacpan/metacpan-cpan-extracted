@@ -24,6 +24,7 @@ my $md5=Digest::MD5->new;
 my @lines; 
 while (<F>)
 {
+   s/[ÃÂ]//g;  
    s/\s+/ /g; # remove all multiple spaces 
    $lc++; 
    chomp; 

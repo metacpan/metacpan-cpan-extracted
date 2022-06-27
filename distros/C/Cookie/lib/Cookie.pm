@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Cookies API for Server & Client - ~/lib/Cookie.pm
-## Version v0.1.9
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.1.13
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/10/08
-## Modified 2022/06/19
+## Modified 2022/06/27
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -28,7 +28,7 @@ BEGIN
         '=='     => \&same_as,
         fallback => 1,
     );
-    our $VERSION = 'v0.1.9';
+    our $VERSION = 'v0.1.13';
     our $SUBS;
     our $COOKIE_DEBUG = 0;
     use constant CRYPTX_VERSION => '0.074';
@@ -325,6 +325,17 @@ sub expires
         $self->reset(1);
         my $exp = shift( @_ );
         $self->message( 3, "Received expiration value of '", ( $exp // '' ), "' (", ( defined( $exp ) ? 'defined' : 'undefined' ), ")." ) if( $COOKIE_DEBUG );
+        my $tz;
+        # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
+        # "Cannot determine local time zone"
+        try
+        {
+            $tz = DateTime::TimeZone->new( name => 'local' );
+        }
+        catch( $e )
+        {
+            $tz = DateTime::TimeZone->new( name => 'UTC' );
+        }
         my $dt;
         # unsets the value
         if( !defined( $exp ) )
@@ -344,7 +355,7 @@ sub expires
                 # to being in Asia/Tokyo time zone!
                 # Issue #126
                 # <https://github.com/houseabsolute/DateTime.pm/issues/126>
-                $dt = DateTime->from_epoch( epoch => $exp, time_zone => 'local' );
+                $dt = DateTime->from_epoch( epoch => $exp, time_zone => $tz );
             }
             catch( $e )
             {
@@ -373,12 +384,12 @@ sub expires
             };
             my $offset = ( $interval->{ $unit } || 1 ) * int( $num );
             my $ts = time() + $offset;
-            $dt = DateTime->from_epoch( epoch => $ts, time_zone => 'local' );
+            $dt = DateTime->from_epoch( epoch => $ts, time_zone => $tz );
         }
         elsif( lc( $exp ) eq 'now' )
         {
             # $self->message( 3, "Value is actually a special keyword." );
-            $dt = DateTime->now( time_zone => 'local' );
+            $dt = DateTime->now( time_zone => $tz );
         }
         elsif( defined( $exp ) && CORE::length( $exp ) )
         {
@@ -548,7 +559,18 @@ sub max_age
             }
             else
             {
-                $exp = DateTime->now( time_zone => 'local' );
+                my $tz;
+                # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
+                # "Cannot determine local time zone"
+                try
+                {
+                    $tz = DateTime::TimeZone->new( name => 'local' );
+                }
+                catch( $e )
+                {
+                    $tz = DateTime::TimeZone->new( name => 'UTC' );
+                }
+                $exp = DateTime->now( time_zone => $tz );
                 $exp->add( seconds => $v );
             }
             $self->expires( $exp );
@@ -838,7 +860,7 @@ Cookie - Cookie Object with Encryption or Signature
 
 =head1 VERSION
 
-    v0.1.9
+    v0.1.13
 
 =head1 DESCRIPTION
 

@@ -56,14 +56,14 @@ sub get_db_handle {
     my ( $sf, $db ) = @_;
     my $db_opt_get = App::DBBrowser::Opt::DBGet->new( $sf->{i}, $sf->{o} );
     my $db_opt = $db_opt_get->read_db_config_files();
-    my $attributes = $db_opt_get->attributes( $db, $db_opt );
+    my $set_attributes = $db_opt_get->get_set_attributes( $db, $db_opt );
     my $dsn = "dbi:$sf->{i}{driver}:dbname=$db";
     my $dbh = DBI->connect( $dsn, '', '', {
         PrintError => 0,
         RaiseError => 1,
         AutoCommit => 1,
         ShowErrorStatement => 1,
-        %$attributes,
+        %$set_attributes,
     } ) or die DBI->errstr;
     return $dbh;
 }
@@ -78,7 +78,7 @@ sub get_databases {
     my $db_cache = $ax->read_json( $cache_sqlite_files ) // {};
     my $dirs = $db_cache->{directories} // [ $sf->{i}{home_dir} ];
     my $databases = $db_cache->{databases} // [];
-    if ( ! $sf->{i}{sqlite_search} && @$databases ) {
+    if ( ! $sf->{i}{search} && @$databases ) {
         return $databases;
     }
     while ( 1 ) {

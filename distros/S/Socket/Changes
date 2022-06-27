@@ -1,5 +1,10 @@
 Revision history for Socket
 
+2.034   2022-06-27
+        [BUGFIXES]
+         * Workaround for inet_ntop/inet_pton being defined by recent releases
+           of mingw-w64 (RT142390)
+
 2.033   2022-04-29
         [CHANGES]
          * Apply patch from core perl for z/OS support (RT142470)

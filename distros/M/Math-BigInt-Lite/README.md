@@ -70,11 +70,6 @@ you can roll it all into one line:
 
 Use the lib, Luke!
 
-## Using Lite as substitute for Math::BigInt
-
-The pragmas [bigrat](https://metacpan.org/pod/bigrat), [bignum](https://metacpan.org/pod/bignum) and [bigint](https://metacpan.org/pod/bigint) will automatically use
-Math::BigInt::Lite whenever possible.
-
 # METHODS
 
 ## new

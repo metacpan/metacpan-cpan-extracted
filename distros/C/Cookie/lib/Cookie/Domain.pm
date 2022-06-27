@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
-## Cookies API for Server & Client - ~/lib/Cookies/Domain.pm
-## Version v0.1.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Cookies API for Server & Client - ~/lib/Cookie/Domain.pm
+## Version v0.1.2
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/06
-## Modified 2021/05/06
+## Modified 2022/06/23
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -15,6 +15,7 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
+    use vars qw( $DOMAIN_RE $PUBLIC_SUFFIX_DATA $VERSION );
 	use DateTime;
 	use DateTime::Format::Strptime;
 	use Module::Generic::File qw( tempfile );
@@ -22,7 +23,6 @@ BEGIN
     use Net::IDN::Encode ();
     use Nice::Try;
     use Want;
-    our $VERSION = 'v0.1.0';
     use constant URL => 'https://publicsuffix.org/list/effective_tld_names.dat';
     # Properly formed domain name according to rfc1123
     our $DOMAIN_RE = qr/^
@@ -41,8 +41,11 @@ BEGIN
             )*
         )
     $/x;
-    our $PUBLIC_SUFFIX_DATA;
+    our $VERSION = 'v0.1.2';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -147,13 +150,26 @@ sub cron_fetch
         $self->message( 3, "Server responded with code $code and ", length( $data ), " bytes of data." );
         my $last_mod = $resp->header( 'Last-Modified' );
         $self->message( 3, "Last-Modified header value found: '$last_mod'" );
+
+        my $tz;
+        # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
+        # "Cannot determine local time zone"
+        try
+        {
+            $tz = DateTime::TimeZone->new( name => 'local' );
+        }
+        catch( $e )
+        {
+            $tz = DateTime::TimeZone->new( name => 'UTC' );
+        }
+        
         if( $last_mod )
         {
-            $last_mod = $self->_parse_timestamp( $last_mod )->set_time_zone( 'local' );
+            $last_mod = $self->_parse_timestamp( $last_mod )->set_time_zone( $tz );
         }
         else
         {
-            $last_mod = DateTime->now( time_zone => 'local' );
+            $last_mod = DateTime->now( time_zone => $tz );
         }
         my $epoch = $last_mod->epoch;
         if( $resp->header( 'etag' ) )
@@ -392,12 +408,23 @@ sub save_as_json
     # $self->message( 3, "Save public prefixes data to json file \"$file\"." );
     my $data = $self->suffixes;
     # $self->message( 3, "Data to save are: ", sub{ $self->SUPER::dump( $data ) });
+    my $tz;
+    # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
+    # "Cannot determine local time zone"
+    try
+    {
+        $tz = DateTime::TimeZone->new( name => 'local' );
+    }
+    catch( $e )
+    {
+        $tz = DateTime::TimeZone->new( name => 'UTC' );
+    }
     my $dt_fmt = DateTime::Format::Strptime->new(
         pattern => '%FT%T%z',
         locale => 'en_GB',
-        time_zone => 'local',
+        time_zone => $tz->name,
     );
-    my $today = DateTime->now( time_zone => 'local', formatter => $dt_fmt );
+    my $today = DateTime->now( time_zone => $tz, formatter => $dt_fmt );
     my $meta  = $self->meta;
     my $ref =
     {
@@ -635,7 +662,7 @@ Cookie::Domain - Domain Name Public Suffix Query Interface
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.2
 
 =head1 DESCRIPTION
 

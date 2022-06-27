@@ -1,13 +1,19 @@
 # -*- perl -*-
 
-use strict;
+use v5.32;
+use utf8;
 use warnings;
+use open qw(:std :utf8);
+no feature qw(indirect);
+use feature qw(signatures);
+no warnings qw(experimental::signatures);
+
 use Test::More;
 use POSIX qw(strftime);
 use HTTP::Request;
 
 use Net::Amazon::SignatureVersion4;
-my $sig=new Net::Amazon::SignatureVersion4();
+my $sig=Net::Amazon::SignatureVersion4->new();
 my $hr=HTTP::Request->new('GET','/-/vaults', [ 
 			      'Host', 'glacier.us-west-2.amazonaws.com', 
 			      'Date', strftime("%Y%m%dT%H%M%SZ",gmtime(1329307200)) , 

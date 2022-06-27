@@ -4,12 +4,12 @@ package Specio::Library::Path::Tiny;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use overload ();
 use Path::Tiny 0.087;
 use Scalar::Util qw( blessed );
-use Specio 0.29 ();
+use Specio 0.29  ();
 use Specio::Declare;
 use Specio::Library::Builtins;
 use Specio::PartialDump qw( partial_dump );
@@ -231,14 +231,14 @@ for my $type ( map { t($_) } qw( AbsPath AbsFile AbsDir ) ) {
 
     coerce(
         $type,
-        from => t('Str'),
+        from   => t('Str'),
         inline =>
             sub { sprintf( 'Path::Tiny::path( %s )->absolute', $_[1] ) },
     );
 
     coerce(
         $type,
-        from => t('ArrayRef'),
+        from   => t('ArrayRef'),
         inline =>
             sub { sprintf( 'Path::Tiny::path( @{ %s } )->absolute', $_[1] ) },
     );
@@ -253,14 +253,14 @@ for my $type ( map { t($_) } qw( RealPath RealFile RealDir ) ) {
 
     coerce(
         $type,
-        from => t('Str'),
+        from   => t('Str'),
         inline =>
             sub { sprintf( 'Path::Tiny::path( %s )->realpath', $_[1] ) },
     );
 
     coerce(
         $type,
-        from => t('ArrayRef'),
+        from   => t('ArrayRef'),
         inline =>
             sub { sprintf( 'Path::Tiny::path( @{ %s } )->realpath', $_[1] ) },
     );
@@ -282,7 +282,7 @@ Specio::Library::Path::Tiny - Path::Tiny types and coercions for Specio
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -292,9 +292,9 @@ version 0.04
 
 =head1 DESCRIPTION
 
-This library provides a set of L<Path::Tiny> types and coercions for
-L<Specio>. These types can be used with L<Moose>, L<Moo>,
-L<Params::ValidationCompiler>, and other modules.
+This library provides a set of L<Path::Tiny> types and coercions for L<Specio>.
+These types can be used with L<Moose>, L<Moo>, L<Params::ValidationCompiler>,
+and other modules.
 
 =head1 TYPES
 
@@ -373,10 +373,11 @@ L<Types::Path::Tiny> distribution.
 
 =head1 SUPPORT
 
-Bugs may be submitted through L<the RT bug tracker|http://rt.cpan.org/Public/Dist/Display.html?Name=Specio-Library-Path-Tiny>
-(or L<bug-specio-library-path-tiny@rt.cpan.org|mailto:bug-specio-library-path-tiny@rt.cpan.org>).
+Bugs may be submitted at L<https://github.com/houseabsolute/Specio-Library-Path-Tiny/issues>.
 
-I am also usually active on IRC as 'drolsky' on C<irc://irc.perl.org>.
+=head1 SOURCE
+
+The source code repository for Specio-Library-Path-Tiny can be found at L<https://github.com/houseabsolute/Specio-Library-Path-Tiny>.
 
 =head1 DONATIONS
 
@@ -393,18 +394,27 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at L<http://www.urth.org/~autarch/fs-donation.html>.
+button at L<https://www.urth.org/fs-donation.html>.
 
 =head1 AUTHOR
 
 Dave Rolsky <autarch@urth.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Paulo Custodio
+
+Paulo Custodio <pauloscustodio@gmail.com>
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Dave Rolsky.
+This software is Copyright (c) 2016 - 2022 by Dave Rolsky.
 
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

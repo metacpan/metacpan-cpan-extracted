@@ -1,0 +1,39 @@
+Revision history for Alien-CFITSIO
+
+v4.1.0.4  2022-06-22 18:02:23-04:00 America/New_York
+
+  [PACKAGING]
+
+    * no functional changes. remove extraneous material from
+      distribution.
+
+v4.1.0.3  2022-06-22 17:46:46-04:00 America/New_York
+
+  [BUILD]
+
+    * environment variables ALIEN_CFITSIO_EXACT_VERSION and
+      ALIEN_CFITSIO_ATLEAST_VERSION are available to force exact or
+      minimum version of CFITSIO
+
+    * extend exact_version and atleast_version functionality to share
+      as well as system installations
+
+    * only patch CFITSIO if a version specific patch is available
+
+    * use Dist::Zilla::Plugin::Templates to ensure all hardwired
+      CFITSIO version information is kept in synch
+
+v4.1.0.2  2022-06-15 17:53:42-04:00 America/New_York (TRIAL RELEASE)
+
+  [BUILD]
+
+    * CFITSIO 4.1.0 doesn't add -lcurl to the autoconf generated
+      pkg-config file. patch it
+
+  [DOCUMENTATION]
+
+    * update doc to indicate this supports _at least_ 4.1.0, not _exactly_ 4.1.0
+
+v4.1.0.1  2022-06-15 11:07:43-04:00 America/New_York
+
+    * First release upon an unsuspecting world.

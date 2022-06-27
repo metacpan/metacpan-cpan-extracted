@@ -1,6 +1,9 @@
 Revision history for Perl module Promise::Me
 
-v0.2.2 2022-04-03T05:55:48+0900
+v0.3.0 2022-04-07T18:22:58+0900
+    - Added $_ as an array reference containing the code reference for resolve() and reject()
+
+v0.2.2 2022-04-03T05:55:48Z +0900
     - Corrected a small bug in _share_vars when falling back to cache file
 
 v0.2.1 2022-03-30T13:51:28Z +0900

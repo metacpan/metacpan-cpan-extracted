@@ -1,3 +1,23 @@
+1.04
+
+- Added better UI and parameters for Traveller and Apocalypse maps.
+
+= Fixed Gridmapper maps with room numbers that cannot be divided by 5
+  and 7, e.g. 16. Those dungeons often had the last room disconnected.
+
+- Add castle to the default icons.
+
+- Gnomeyland icons: more background colours; fix scaling issues in
+  Inkscape.
+
+- Alping algorithm: the wind shadow now reduces the number of rivers
+  on one particular side of a mountain; add marshlands for estuaries;
+  add variety to badlands.
+
+- Traveller algorithm: fix gas giant occurence.
+
+- Add Dockerfile, add better Docker instructions.
+
 1.03
 
 - Better documentation.

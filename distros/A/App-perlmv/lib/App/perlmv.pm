@@ -3,9 +3,9 @@
 package App::perlmv;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-25'; # DATE
+our $DATE = '2022-06-24'; # DATE
 our $DIST = 'App-perlmv'; # DIST
-our $VERSION = '0.605'; # VERSION
+our $VERSION = '0.606'; # VERSION
 
 use 5.010001;
 use strict;
@@ -644,7 +644,7 @@ App::perlmv - Rename files using Perl code
 
 =head1 VERSION
 
-This document describes version 0.605 of App::perlmv (from Perl distribution App-perlmv), released on 2022-02-25.
+This document describes version 0.606 of App::perlmv (from Perl distribution App-perlmv), released on 2022-06-24.
 
 =for Pod::Coverage ^(.*)$
 

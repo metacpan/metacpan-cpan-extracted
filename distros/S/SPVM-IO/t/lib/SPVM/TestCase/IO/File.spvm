@@ -2,6 +2,7 @@ class TestCase::IO::File {
   use IO::File;
   use StringList;
   use Fn;
+  use Array;
 
   static method test_flush : int ($file : string) {
     
@@ -122,7 +123,7 @@ class TestCase::IO::File {
       }
       {
         my $read_length = $io_file->read($buffer);
-        unless ((string)Fn->copy_array_range_byte($buffer, 0, 4) eq "klm\n") {
+        unless ((string)Array->copy_range_byte($buffer, 0, 4) eq "klm\n") {
           return 0;
         }
         unless ($read_length == 4) {
@@ -184,7 +185,7 @@ class TestCase::IO::File {
     my $strings = $lstrings->to_array;
     
 
-    unless (Fn->equals_array_string($strings, ["abcd\n", "fghi\n", "klm\n"])) {
+    unless (Array->equals_string($strings, ["abcd\n", "fghi\n", "klm\n"])) {
       return 0;
     }
     
@@ -323,7 +324,7 @@ class TestCase::IO::File {
     }
     my $strings = $lstrings->to_array;
     
-    unless (Fn->equals_array_string($strings, ["abcd", "fghi", "klm"])) {
+    unless (Array->equals_string($strings, ["abcd", "fghi", "klm"])) {
       return 0;
     }
     

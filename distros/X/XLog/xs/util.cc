@@ -1,4 +1,6 @@
 #include "util.h"
+#include "xs/Glob.h"
+#include "xs/Stash.h"
 #include <xs/xlog.h>
 #include <panda/optional.h>
 
@@ -303,7 +305,14 @@ backend_t compose (LevelAccess level_access, ModuleAccess module_access) {
 
 }
 
+static inline bool is_under_debugger() {
+    return (bool)PL_DBsub;
+}
+
 static void optimize (size_t module_pos, Optimizer&& optimizer) {
+    static bool is_dbg = is_under_debugger();
+    if (is_dbg) return; // do not optimize under debugger as it OP structure may differ and may lead to corruption
+    
     OP* op = PL_op;
     bool already_optimized = op->op_spare & 1;
     if (already_optimized) return;

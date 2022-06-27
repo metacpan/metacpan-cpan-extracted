@@ -813,7 +813,7 @@ sub _decode_json
     {
         my $this = shift( @_ );
         my $type = Scalar::Util::reftype( $this );
-        return( $hits ) if( ( $type eq 'HASH' || $type eq 'ARRAY' ) && ++$seen->{ Scalar::Util::refaddr( $this ) } > 1 );
+        return( $this ) if( ( $type eq 'HASH' || $type eq 'ARRAY' ) && ++$seen->{ Scalar::Util::refaddr( $this ) } > 1 );
         if( $type eq 'HASH' )
         {
             # Found a former scalar reference, restore it

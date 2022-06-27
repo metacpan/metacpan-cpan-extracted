@@ -5,7 +5,7 @@ use warnings;
 use parent qw(Class::Accessor::Fast);
 use Carp;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 __PACKAGE__->mk_accessors(qw/registered_classes autoloader_rules objects/);
 
@@ -117,14 +117,13 @@ sub register {
     }
     elsif (ref $args eq 'HASH') {
         $class = $args->{class};
-        $args->{args} ||= [];
-        if (ref $args->{initializer} eq 'CODE') {
+        if (exists $args->{initializer} && ref $args->{initializer} eq 'CODE') {
             $initializer = $args->{initializer};
         }
         else {
             $initializer = sub {
                 $self->ensure_class_loaded($class);
-                $class->new(@{$args->{args}});
+                $class->new(@{exists $args->{args} ? $args->{args} : []});
             };
         }
 
@@ -300,7 +299,7 @@ Object::Container - simple object container
     use Object::Container 'container';
     container->register('WWW::Mechanize');
     my $mech = container->get('WWW::Mechanize');
-    my $mech = container('WWW::Mechanize'); # save as above
+    my $mech = container('WWW::Mechanize'); # same as above
     
     # Subclassing singleton interface
     package MyContainer;

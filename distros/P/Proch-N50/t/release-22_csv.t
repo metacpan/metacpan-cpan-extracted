@@ -20,12 +20,13 @@ my $script = "$RealBin/../bin/n50";
 if (-e "$file" and -e "$script") {
 	# TSV FORMAT
 
-	my @data = `perl "$script" --format csv "$file" 2>/dev/null`;
-	ok($? == 0, "OK: perl \"$script\" --format csv \"$file\"");
-
-
+	my @data = `$^X "$script" --format csv "$file" 2>/dev/null`;
+	ok($? == 0, "OK: $^X \"$script\" --format csv \"$file\"");
+	my $dataLen = scalar @data;
+	ok($dataLen > 1, "Produced > 1 lines of output: $dataLen");
 	my @header = split /,/, $data[0];
 	my @stats  = split /,/, $data[1];
+	ok($#header == $#stats, "Header and stats have the same number of columns");
 	ok($header[0] =~/^#/, "Header found: <$header[0]>");
 	ok(basename($file) eq basename($stats[0]), 
 			"First column is filename: <$stats[0]>");

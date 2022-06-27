@@ -1,5 +1,9 @@
 Revision history for Perl extension Email-Sender-Transport-Mailgun
 
+0.04 2022-06-23T02:01:20Z
+
+    - need HTTP::Tiny >= 0.037 for apikey encoding
+
 0.03 2022-06-19T22:58:43Z
 
     - fix documentation links (#3)

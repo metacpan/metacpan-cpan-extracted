@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
 		'Time::Piece'         => '0',
 	},
 	dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-	clean      => { FILES    => 'Suricata-Monitoring-*' },
+	clean      => { FILES    => 'Sagan-Monitoring-*' },
 	META_MERGE => {
 		"meta-spec" => { version => 2 },
 		resources   => {

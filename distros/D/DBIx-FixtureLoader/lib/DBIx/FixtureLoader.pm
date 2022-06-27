@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.20";
+our $VERSION = "0.21";
 
 use Carp qw/croak/;
 use DBIx::TransactionManager;
@@ -199,7 +199,10 @@ sub _load_fixture_from_data {
         $dbh->do($sql, undef, @binds);
     }
 
-    return $txn->commit or croak $dbh->errstr unless scalar @$data;
+    unless (scalar @$data) {
+        my $ret = $txn->commit or croak $dbh->errstr;
+        return $ret;
+    }
 
     my $opt; $opt->{prefix} = 'INSERT IGNORE INTO' if $ignore;
     if ($bulk_insert) {

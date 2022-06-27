@@ -36,7 +36,7 @@ sub __stmt_fold {
                 $stmt = $filled;
             }
         }
-        return line_fold( $stmt, $term_w, { %$fold_opt, join => 0 } );
+        return line_fold( $stmt, $term_w, { %$fold_opt, join => 0 } ); ##
     }
     else {
         return ' ' . $stmt;
@@ -84,8 +84,14 @@ sub get_stmt {
         push @tmp, $sf->__stmt_fold( $sql->{group_by_stmt}, $term_w, $indent2                      ) if $sql->{group_by_stmt};
         push @tmp, $sf->__stmt_fold( $sql->{having_stmt},   $term_w, $indent2, $sql->{having_args} ) if $sql->{having_stmt};
         push @tmp, $sf->__stmt_fold( $sql->{order_by_stmt}, $term_w, $indent2                      ) if $sql->{order_by_stmt};
-        push @tmp, $sf->__stmt_fold( $sql->{limit_stmt},    $term_w, $indent2                      ) if $sql->{limit_stmt};
-        push @tmp, $sf->__stmt_fold( $sql->{offset_stmt},   $term_w, $indent2                      ) if $sql->{offset_stmt};
+        if ( $sf->{i}{driver} =~ /^(?:Firebird|DB2|Oracle)\z/ ) {
+            push @tmp, $sf->__stmt_fold( $sql->{offset_stmt},   $term_w, $indent2 ) if $sql->{offset_stmt};
+            push @tmp, $sf->__stmt_fold( $sql->{limit_stmt},    $term_w, $indent2 ) if $sql->{limit_stmt};
+        }
+        else {
+            push @tmp, $sf->__stmt_fold( $sql->{limit_stmt},    $term_w, $indent2 ) if $sql->{limit_stmt};
+            push @tmp, $sf->__stmt_fold( $sql->{offset_stmt},   $term_w, $indent2 ) if $sql->{offset_stmt};
+        }
     }
     elsif ( $stmt_type eq 'Delete' ) {
         @tmp = ( $sf->__stmt_fold( "DELETE FROM " . $table, $term_w, $indent0 ) );
@@ -391,13 +397,23 @@ sub print_error_message {
     );
 }
 
+sub sql_limit {
+    my ( $sf, $rows ) = @_;
+    if ( $sf->{i}{driver} =~ /^(?:Firebird|DB2|Oracle)\z/ ) {
+        return " FETCH NEXT $rows ROWS ONLY" # 0
+    }
+    else {
+        return " LIMIT $rows";
+    }
+}
 
-sub column_names_and_types { # db
+
+sub tables_column_names_and_types { # db
     my ( $sf, $tables ) = @_;
     my ( $col_names, $col_types );
     for my $table ( @$tables ) {
         if ( ! eval {
-            my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $sf->quote_table( $sf->{d}{tables_info}{$table} ) . " LIMIT 0" );
+            my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $sf->quote_table( $sf->{d}{tables_info}{$table} ) . $sf->sql_limit( 0 ) );
             $sth->execute() if $sf->{i}{driver} ne 'SQLite';
             $col_names->{$table} //= $sth->{NAME};
             $col_types->{$table} //= $sth->{TYPE};
@@ -407,6 +423,14 @@ sub column_names_and_types { # db
         }
     }
     return $col_names, $col_types;
+}
+
+
+sub column_names {
+    my ( $sf, $qt_table ) = @_;
+    my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $qt_table . $sf->sql_limit( 0 ) );
+    $sth->execute() if $sf->{i}{driver} ne 'SQLite';
+    return [ @{$sth->{NAME}} ];
 }
 
 

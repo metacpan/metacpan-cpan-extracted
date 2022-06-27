@@ -12,7 +12,7 @@ static Object    global_loop;
 static Loop*     global_loop_for;
 static PrepareSP global_loop_freetmps;
 
-static PERL_THREAD_LOCAL struct {
+static PERL_ITHREADS_LOCAL struct {
     Object    default_loop;
     Loop*     default_loop_for;
     PrepareSP default_loop_freetmps;

@@ -1,5 +1,8 @@
 Revision history for FFI-C
 
+0.12      2022-06-24 10:08:47 -0500
+  - Documentation improvements (gh#58)
+
 0.11      2021-12-06 15:59:29 -0700
   - Add addressof function to FFI::C::Util (gh#49)
   - Fix version prereq for Sub::Identify (gh#55)

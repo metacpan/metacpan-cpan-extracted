@@ -5,9 +5,11 @@ README
 bin/cpansite
 explain_101.txt
 lib/CPAN/Site.pm
+lib/CPAN/Site.pod
 lib/CPAN/Site/Index.pm
 t/10index.t
 t/20qv.t
+t/30cpan_path.t
 t/test_data/Distro-With-Multi-Package-Module.tar.gz
 t/test_data/Distro-With-Packages-Outside-lib.tar.gz
 t/test_data/Text-PDF-0.29a.tar.gz

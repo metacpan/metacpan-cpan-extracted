@@ -22,7 +22,6 @@ tests add_mite_shim => sub {
     ok -e $shim;
 
     require $shim->absolute;
-    isa_ok("Foo::Bar::Mite", "Mite::Shim");
 
     chdir $Orig_Cwd;
 };

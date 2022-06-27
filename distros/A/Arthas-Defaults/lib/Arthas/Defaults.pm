@@ -9,7 +9,7 @@ use version;
 use Carp qw/carp croak confess cluck/;
 use Try::Tiny;
 
-our $VERSION = qv("v5.0.1");
+our $VERSION = qv("v5.2.0");
 
 require Exporter;
 our @ISA       = ('Exporter');
@@ -67,7 +67,7 @@ Might change without notice, at any time. DO NOT USE!
 =item C<use v5.14>
 
 This is actually C<use feature ':5.14'>. It imports some perl 5.10 -> 5.14
-semantics, such as strict, given-when syntax, Unicode strings, ... See
+semantics, such as strict, Unicode strings, ... See
 L<feature> documentation and source code for more information.
 
 =item C<use utf8>

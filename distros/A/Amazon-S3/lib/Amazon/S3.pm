@@ -3,6 +3,8 @@ package Amazon::S3;
 use strict;
 use warnings;
 
+use 5.010;
+
 use Amazon::S3::Bucket;
 use Amazon::S3::Constants qw{:all};
 use Amazon::S3::Logger;
@@ -45,7 +47,7 @@ __PACKAGE__->mk_accessors(
   }
 );
 
-our $VERSION = '0.52'; ## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
+our $VERSION = '0.53'; ## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
 
 ########################################################################
 sub new {

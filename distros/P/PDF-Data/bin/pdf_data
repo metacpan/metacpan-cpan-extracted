@@ -1,0 +1,140 @@
+#!/usr/bin/env perl
+#
+# Utility script for PDF::Data module.
+#
+
+# Require Perl 5.16; enable warnings.
+use v5.16;
+use warnings;
+
+# Program version.
+use version; our $version = version->declare('v1.0.0');
+
+# Initialize modules.
+use File::Basename qw[basename dirname];
+use FindBin;
+use Getopt::Long   qw[:config gnu_compat bundling no_getopt_compat require_order];
+use IO::Handle     qw[autoflush];
+use POSIX          qw[strftime];
+
+# Use local library path if PDF::Data module exists there.
+use if -f "@{[dirname $FindBin::Bin]}/lib/PDF/Data.pm", "lib", "@{[dirname $FindBin::Bin]}/lib";
+
+# Load PDF::Data module.
+use PDF::Data;
+
+# Get program name.
+our $program = basename $0;
+
+# List of command-line options.
+our @option_list = (
+  "output_file|o=s" => \( our $output_file   = "" ),
+
+  "verbose|v"       => \( our $verbose       = "" ),
+  "inplace|i"       => \( our $inplace       = "" ),
+
+  "dump"            => \( our $dump          = "" ),
+  "outline"         => \( our $outline       = "" ),
+
+  "find_bbox"       => \( our $find_bbox     = "" ),
+  "new_bbox"        => \( our $new_bbox      = "" ),
+
+  "compress"        => \( our $compress      = 0  ),
+  "decompress"      => \( our $decompress    = "" ),
+  "minify"          => \( our $minify        = 0  ),
+
+  "help|h|?"        => \( our $print_help    = "" ),
+  "version|V"       => \( our $print_version = "" ),
+);
+
+# Help message.
+our $help_message = <<EOF;
+
+Usage: $program [-v] [-i] [-o <output.pdf>] [<options>] [<input.pdf>]\n";
+
+Utility script for PDF::Data module.
+
+Options:
+
+  --output_file (-o) <filename>  Specify output filename.
+
+  --verbose     (-v)             Enable verbose mode.
+  --inplace     (-i)             Rewrite PDF file in place.
+
+  --dump                         Dump complete parsed PDF data structure.
+  --outline                      Dump outline of parsed PDF data structure.
+
+  --find_bbox                    Find the bounding box of the PDF file.
+  --new_bbox                     Generate a new bounding box for the PDF file.
+
+  --compress                     Compress all PDF stream objects.
+  --decompress                   Decompress all compressed PDF stream objects.
+  --minify                       Remove whitespace/comments from content streams.
+
+  --help        (-h)             Print this help message.
+  --version     (-V)             Print the version number of this program.
+EOF
+
+# Extract usage message from help message.
+our ($usage) = $help_message =~ /\A\s*(Usage: .*?\n)\n/s or die "$program: Usage message missing!\n";
+
+# Parse command-line options.
+GetOptions(@option_list) or die $usage;
+
+# For standard --help and --version options, print message and exit.
+if ($print_help or $print_version) {
+  print "$program $version\n";
+  print $help_message if $print_help;
+  exit 0;
+}
+
+# Don't buffer output.
+autoflush STDOUT;
+
+# Get input and output PDF filenames from command-line arguments.
+my $input_pdf = shift @ARGV || "-";
+
+# Override output filename if --inplace is specified.
+if ($inplace) {
+  die "Error: --inplace is incompatible with --dump!\n" if $dump;
+  die "Error: --inplace is incompatible with --outline!\n" if $outline;
+  die "Error: --inplace is incompatible with --output_file!\n" if $output_file;
+  $output_file = $input_pdf;
+}
+
+# Get current timestamp.
+my $time = time;
+
+# Attempt to get file modification timestamp.
+unless ($input_pdf eq "-") {
+  die "$input_pdf $!\n" unless -e $input_pdf;
+  $time = (stat _)[9];
+}
+
+# Parse input PDF file.
+my $pdf = PDF::Data->read_pdf($input_pdf);
+printf STDERR "\nSuccessfully parsed PDF file %s.\n\n", ($input_pdf eq "-" ? "on standard input" : "\"$input_pdf\"");
+
+# Find bounding box or generate new bounding box, if requested.
+$pdf->find_bbox($pdf, $new_bbox) if $find_bbox or $new_bbox;
+
+# Determine output mode.
+if ($dump) {
+  # Dump PDF structure.
+  $pdf->dump_pdf($output_file, "dump");
+} elsif ($outline) {
+  # Dump outline of PDF structure.
+  $pdf->dump_pdf($output_file, "outline");
+} else {
+  # Rename original PDF file to a backup filename for --inplace.
+  if ($inplace and $output_file ne "-") {
+    rename $output_file, "$output_file.bak" or die "$output_file -> $output_file.bak: $!\n";
+    print STDERR "Renamed original PDF file \"$output_file\" to \"$output_file.bak\".\n\n";
+  }
+
+  # Generate output PDF.
+  $pdf->{-compress}   = $compress;
+  $pdf->{-decompress} = 1 if $decompress;
+  $pdf->{-minify}     = $minify;
+  $pdf->write_pdf($output_file, $time);
+}

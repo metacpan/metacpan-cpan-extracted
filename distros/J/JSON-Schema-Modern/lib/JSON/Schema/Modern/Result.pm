@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.552';
+our $VERSION = '0.553';
 
 use 5.020;
 use Moo;
@@ -201,7 +201,7 @@ JSON::Schema::Modern::Result - Contains the result of a JSON Schema evaluation
 
 =head1 VERSION
 
-version 0.552
+version 0.553
 
 =head1 SYNOPSIS
 
@@ -235,7 +235,7 @@ use the result of L<JSON::Schema::Modern/evaluate> in boolean context.
 
 The object also contains a I<bitwise AND> overload (C<&>), for combining two results into one (the
 result is valid iff both inputs are valid; annotations and errors from the second argument are
-appended to those of the first).
+appended to those of the first in a new Result object).
 
 =head1 ATTRIBUTES
 
@@ -320,6 +320,22 @@ See C<&> at L</OVERLOADS>.
 
 Returns a JSON string representing the result object, using the requested L</format>, according to
 the L<specification|https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.10>.
+
+=head1 SERIALIZATION
+
+Results (and their contained errors and annotations) can be serialized in a number of ways.
+
+Results have defined L</output_format>s, which can be generated as nested unblessed hashes/arrays
+and are suitable for serializing using a JSON encoder for use in another application. A JSON string of
+the result can be obtained directly using L</dump>.
+
+If it is preferable to omit direct references to the schema (for example in an application where the
+schema is not published), but still convey some semantic information about the nature of the errors,
+stringify the object directly. This also means that result objects can be thrown as exceptions, or
+embedded in error messages.
+
+If you are embedding the full result inside another data structure, perhaps to be serialized to JSON
+(or another format) later on, use L</TO_JSON> or L</format>.
 
 =for stopwords OpenAPI
 

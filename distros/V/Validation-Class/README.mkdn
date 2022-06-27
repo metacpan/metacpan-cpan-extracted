@@ -4,7 +4,7 @@ Validation::Class - Powerful Data Validation Framework
 
 # VERSION
 
-version 7.900057
+version 7.900058
 
 # SYNOPSIS
 
@@ -32,7 +32,7 @@ transform class namespaces into data validation domains where consistency and
 reuse are primary concerns. Validation::Class provides an extensible framework
 for defining reusable data validation rules. It ships with a complete set of
 pre-defined validations and filters referred to as
-["directives"](https://metacpan.org/pod/Validation::Class::Directives#DIRECTIVES).
+["directives"](https://metacpan.org/pod/Validation%3A%3AClass%3A%3ADirectives#DIRECTIVES).
 
 The core feature-set consist of self-validating methods, validation profiles,
 reusable validation rules and templates, pre and post input filtering, class
@@ -84,11 +84,11 @@ validator class:
 
 If you are looking for a simple in-line data validation module built
 using the same tenets and principles as Validation::Class, please review
-[Validation::Class::Simple](https://metacpan.org/pod/Validation::Class::Simple) or [Validation::Class::Simple::Streamer](https://metacpan.org/pod/Validation::Class::Simple::Streamer). If you
+[Validation::Class::Simple](https://metacpan.org/pod/Validation%3A%3AClass%3A%3ASimple) or [Validation::Class::Simple::Streamer](https://metacpan.org/pod/Validation%3A%3AClass%3A%3ASimple%3A%3AStreamer). If you
 are new to Validation::Class, or would like more information on the
 underpinnings of this library and how it views and approaches data validation,
-please review [Validation::Class::Whitepaper](https://metacpan.org/pod/Validation::Class::Whitepaper). Please review the
-["GUIDED-TOUR" in Validation::Class::Cookbook](https://metacpan.org/pod/Validation::Class::Cookbook#GUIDED-TOUR) for a detailed step-by-step look into
+please review [Validation::Class::Whitepaper](https://metacpan.org/pod/Validation%3A%3AClass%3A%3AWhitepaper). Please review the
+["GUIDED-TOUR" in Validation::Class::Cookbook](https://metacpan.org/pod/Validation%3A%3AClass%3A%3ACookbook#GUIDED-TOUR) for a detailed step-by-step look into
 how Validation::Class works.
 
 # KEYWORDS
@@ -166,8 +166,8 @@ class object.
 The directive keyword (or dir) registers custom validator directives to be used
 in your field definitions. Please note that custom directives can only be used
 with field definitions. This is a means of extending the list of directives per
-instance. See the list of core directives, [Validation::Class::Directives](https://metacpan.org/pod/Validation::Class::Directives),
-or review [Validation::Class::Directive](https://metacpan.org/pod/Validation::Class::Directive) for insight into creating your own
+instance. See the list of core directives, [Validation::Class::Directives](https://metacpan.org/pod/Validation%3A%3AClass%3A%3ADirectives),
+or review [Validation::Class::Directive](https://metacpan.org/pod/Validation%3A%3AClass%3A%3ADirective) for insight into creating your own
 CPAN installable directives.
 
     package MyApp::Person;
@@ -430,7 +430,7 @@ passing the document specification directly instead of by name.
 The ensure keyword (or ens) is used to convert a pre-existing method
 into an auto-validating method. The auto-validating method will be
 registered and function as if it was created using the method keyword.
-The original pre-existing method will be overridden with a modifed version
+The original pre-existing method will be overridden with a modified version
 which performs the pre and/or post validation routines.
 
     package MyApp::Person;
@@ -488,7 +488,7 @@ expected to be passed to your validation class or validated against.
 
 The field keyword takes two arguments, the field name and a hashref of key/values
 pairs known as directives. For more information on pre-defined directives, please
-review the ["list of core directives"](https://metacpan.org/pod/Validation::Class::Directives#DIRECTIVES).
+review the ["list of core directives"](https://metacpan.org/pod/Validation%3A%3AClass%3A%3ADirectives#DIRECTIVES).
 
 The field keyword also creates accessors which provide easy access to the
 field's corresponding parameter value(s). Accessors will be created using the
@@ -528,7 +528,7 @@ pre-existing declarations.
 
 The filter keyword (or flt) registers custom filters to be used in your field
 definitions. It is a means of extending the pre-existing filters declared by
-the ["filters directive"](https://metacpan.org/pod/Validation::Class::Directive::Filters) before
+the ["filters directive"](https://metacpan.org/pod/Validation%3A%3AClass%3A%3ADirective%3A%3AFilters) before
 instantiation.
 
     package MyApp::Person;
@@ -562,9 +562,9 @@ parts of the prototype configuration.
 
 ## load-classes
 
-The \`classes\` (or class) option uses [Module::Find](https://metacpan.org/pod/Module::Find) to load all child classes
+The \`classes\` (or class) option uses [Module::Find](https://metacpan.org/pod/Module%3A%3AFind) to load all child classes
 (in-all-subdirectories) for convenient access through the
-["class" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#class) method, and when introspecting a larger
+["class" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#class) method, and when introspecting a larger
 application. This option accepts an arrayref or single argument.
 
     package MyApp;
@@ -639,7 +639,7 @@ accepts an arrayref or single argument.
 The message keyword (or msg) registers a class-level error message template that
 will be used in place of the error message defined in the corresponding directive
 class if defined. Error messages can also be overridden at the individual
-field-level as well. See the [Validation::Class::Directive::Messages](https://metacpan.org/pod/Validation::Class::Directive::Messages) for
+field-level as well. See the [Validation::Class::Directive::Messages](https://metacpan.org/pod/Validation%3A%3AClass%3A%3ADirective%3A%3AMessages) for
 instructions on how to override error messages at the field-level.
 
     package MyApp::Person;
@@ -911,7 +911,7 @@ code (magic) necessary to normalize your environment.
 The prototype method (or proto) returns an instance of the associated class
 prototype. The class prototype is responsible for manipulating and validating
 the data model (the class). It is not likely that you'll need to access
-this method directly, see [Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype).
+this method directly, see [Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype).
 
     package MyApp::Person;
 
@@ -930,7 +930,7 @@ this method directly, see [Validation::Class::Prototype](https://metacpan.org/po
 Validation::Class mostly provides sugar functions for modeling your data
 validation requirements. Each class you create is associated with a prototype
 class which provides the data validation engine and keeps your class namespace
-free from pollution, please see [Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype) for more
+free from pollution, please see [Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype) for more
 information on specific methods and attributes. Validation::Class injects a few
 proxy methods into your class which are basically aliases to the corresponding
 prototype class methods, however it is possible to access the prototype directly
@@ -940,219 +940,219 @@ using the proto/prototype methods.
 
     $self->class;
 
-See ["class" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#class) for full documentation.
+See ["class" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#class) for full documentation.
 
 ## clear\_queue
 
     $self->clear_queue;
 
-See ["clear\_queue" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#clear_queue) for full documentation.
+See ["clear\_queue" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#clear_queue) for full documentation.
 
 ## error\_count
 
     $self->error_count;
 
-See ["error\_count" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#error_count) for full documentation.
+See ["error\_count" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#error_count) for full documentation.
 
 ## error\_fields
 
     $self->error_fields;
 
-See ["error\_fields" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#error_fields) for full documentation.
+See ["error\_fields" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#error_fields) for full documentation.
 
 ## errors
 
     $self->errors;
 
-See ["errors" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#errors) for full documentation.
+See ["errors" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#errors) for full documentation.
 
 ## errors\_to\_string
 
     $self->errors_to_string;
 
-See ["errors\_to\_string" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#errors_to_string) for full documentation.
+See ["errors\_to\_string" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#errors_to_string) for full documentation.
 
 ## get\_errors
 
     $self->get_errors;
 
-See ["get\_errors" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#get_errors) for full documentation.
+See ["get\_errors" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#get_errors) for full documentation.
 
 ## get\_fields
 
     $self->get_fields;
 
-See ["get\_fields" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#get_fields) for full documentation.
+See ["get\_fields" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#get_fields) for full documentation.
 
 ## get\_hash
 
     $self->get_hash;
 
-See ["get\_hash" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#get_hash) for full documentation.
+See ["get\_hash" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#get_hash) for full documentation.
 
 ## get\_params
 
     $self->get_params;
 
-See ["get\_params" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#get_params) for full documentation.
+See ["get\_params" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#get_params) for full documentation.
 
 ## get\_values
 
     $self->get_values;
 
-See ["get\_values" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#get_values) for full documentation.
+See ["get\_values" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#get_values) for full documentation.
 
 ## fields
 
     $self->fields;
 
-See ["fields" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#fields) for full documentation.
+See ["fields" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#fields) for full documentation.
 
 ## filtering
 
     $self->filtering;
 
-See ["filtering" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#filtering) for full documentation.
+See ["filtering" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#filtering) for full documentation.
 
 ## ignore\_failure
 
     $self->ignore_failure;
 
-See ["ignore\_failure" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#ignore_failure) for full documentation.
+See ["ignore\_failure" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#ignore_failure) for full documentation.
 
 ## ignore\_intervention
 
     $self->ignore_intervention;
 
-See ["ignore\_intervention" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#ignore_intervention) for full documentation.
+See ["ignore\_intervention" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#ignore_intervention) for full documentation.
 
 ## ignore\_unknown
 
     $self->ignore_unknown;
 
-See ["ignore\_unknown" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#ignore_unknown) for full documentation.
+See ["ignore\_unknown" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#ignore_unknown) for full documentation.
 
 ## is\_valid
 
     $self->is_valid;
 
-See ["is\_valid" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#is_valid) for full documentation.
+See ["is\_valid" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#is_valid) for full documentation.
 
 ## param
 
     $self->param;
 
-See ["param" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#param) for full documentation.
+See ["param" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#param) for full documentation.
 
 ## params
 
     $self->params;
 
-See ["params" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#params) for full documentation.
+See ["params" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#params) for full documentation.
 
 ## plugin
 
     $self->plugin;
 
-See ["plugin" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#plugin) for full documentation.
+See ["plugin" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#plugin) for full documentation.
 
 ## queue
 
     $self->queue;
 
-See ["queue" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#queue) for full documentation.
+See ["queue" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#queue) for full documentation.
 
 ## report\_failure
 
     $self->report_failure;
 
-See ["report\_failure" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#report_failure) for full
+See ["report\_failure" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#report_failure) for full
 documentation.
 
 ## report\_unknown
 
     $self->report_unknown;
 
-See ["report\_unknown" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#report_unknown) for full documentation.
+See ["report\_unknown" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#report_unknown) for full documentation.
 
 ## reset\_errors
 
     $self->reset_errors;
 
-See ["reset\_errors" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#reset_errors) for full documentation.
+See ["reset\_errors" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#reset_errors) for full documentation.
 
 ## reset\_fields
 
     $self->reset_fields;
 
-See ["reset\_fields" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#reset_fields) for full documentation.
+See ["reset\_fields" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#reset_fields) for full documentation.
 
 ## reset\_params
 
     $self->reset_params;
 
-See ["reset\_params" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#reset_params) for full documentation.
+See ["reset\_params" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#reset_params) for full documentation.
 
 ## set\_errors
 
     $self->set_errors;
 
-See ["set\_errors" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#set_errors) for full documentation.
+See ["set\_errors" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#set_errors) for full documentation.
 
 ## set\_fields
 
     $self->set_fields;
 
-See ["set\_fields" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#set_fields) for full documentation.
+See ["set\_fields" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#set_fields) for full documentation.
 
 ## set\_params
 
     $self->set_params;
 
-See ["set\_params" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#set_params) for full documentation.
+See ["set\_params" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#set_params) for full documentation.
 
 ## set\_method
 
     $self->set_method;
 
-See ["set\_method" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#set_method) for full documentation.
+See ["set\_method" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#set_method) for full documentation.
 
 ## stash
 
     $self->stash;
 
-See ["stash" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#stash) for full documentation.
+See ["stash" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#stash) for full documentation.
 
 ## validate
 
     $self->validate;
 
-See ["validate" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#validate) for full documentation.
+See ["validate" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#validate) for full documentation.
 
 ## validate\_document
 
     $self->validate_document;
 
-See ["validate\_document" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#validate_document) for full documentation.
+See ["validate\_document" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#validate_document) for full documentation.
 
 ## validate\_method
 
     $self->validate_method;
 
-See ["validate\_method" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#validate_method) for full documentation.
+See ["validate\_method" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#validate_method) for full documentation.
 
 ## validate\_profile
 
     $self->validate_profile;
 
-See ["validate\_profile" in Validation::Class::Prototype](https://metacpan.org/pod/Validation::Class::Prototype#validate_profile) for full documentation.
+See ["validate\_profile" in Validation::Class::Prototype](https://metacpan.org/pod/Validation%3A%3AClass%3A%3APrototype#validate_profile) for full documentation.
 
 # UPGRADE
 
 Validation::Class is stable, its feature-set is complete, and is currently in
 maintenance-only mode, i.e. Validation::Class will only be updated with minor
 enhancements and bug fixes. However, the lessons learned will be incorporated
-into a compelete rewrite uploaded under the namespace [Validation::Interface](https://metacpan.org/pod/Validation::Interface).
+into a compelete rewrite uploaded under the namespace [Validation::Interface](https://metacpan.org/pod/Validation%3A%3AInterface).
 The Validation::Interface fork is designed to have a much simpler API with less
 options and better execution, focused on validating hierarchical data as its
 primarily objective.
@@ -1160,27 +1160,27 @@ primarily objective.
 # EXTENSIBILITY
 
 Validation::Class does NOT provide method modifiers but can be easily extended
-with [Class::Method::Modifiers](https://metacpan.org/pod/Class::Method::Modifiers).
+with [Class::Method::Modifiers](https://metacpan.org/pod/Class%3A%3AMethod%3A%3AModifiers).
 
 ## before
 
     before foo => sub { ... };
 
-See ["before method(s) => sub { ... }" in Class::Method::Modifiers](https://metacpan.org/pod/Class::Method::Modifiers#before-method-s-sub) for full
+See ["before method(s) => sub { ... }" in Class::Method::Modifiers](https://metacpan.org/pod/Class%3A%3AMethod%3A%3AModifiers#before-method-s-sub) for full
 documentation.
 
 ## around
 
     around foo => sub { ... };
 
-See ["around method(s) => sub { ... }" in Class::Method::Modifiers](https://metacpan.org/pod/Class::Method::Modifiers#around-method-s-sub) for full
+See ["around method(s) => sub { ... }" in Class::Method::Modifiers](https://metacpan.org/pod/Class%3A%3AMethod%3A%3AModifiers#around-method-s-sub) for full
 documentation.
 
 ## after
 
     after foo => sub { ... };
 
-See ["after method(s) => sub { ... }" in Class::Method::Modifiers](https://metacpan.org/pod/Class::Method::Modifiers#after-method-s-sub) for full
+See ["after method(s) => sub { ... }" in Class::Method::Modifiers](https://metacpan.org/pod/Class%3A%3AMethod%3A%3AModifiers#after-method-s-sub) for full
 documentation.
 
 # SEE ALSO
@@ -1188,7 +1188,7 @@ documentation.
 Validation::Class does not validate blessed objects. If you need a means for
 validating object types you should use a modern object system like [Moo](https://metacpan.org/pod/Moo),
 [Mouse](https://metacpan.org/pod/Mouse), or [Moose](https://metacpan.org/pod/Moose). Alternatively, you could use decoupled object
-validators like [Type::Tiny](https://metacpan.org/pod/Type::Tiny), [Params::Validate](https://metacpan.org/pod/Params::Validate) or [Specio](https://metacpan.org/pod/Specio).
+validators like [Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny), [Params::Validate](https://metacpan.org/pod/Params%3A%3AValidate) or [Specio](https://metacpan.org/pod/Specio).
 
 # AUTHOR
 

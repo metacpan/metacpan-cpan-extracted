@@ -1,5 +1,10 @@
 Revision history for Net-SSL-ExpireDate
 
+1.24 2022-06-22
+  * Add extension ec_point_formats
+    ref: #14
+  * Refactor: add notes on TLS protocol
+
 1.23 2022-02-02
   * Adding support for SNI
     ref: #13

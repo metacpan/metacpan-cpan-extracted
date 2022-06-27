@@ -1,0 +1,59 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'strict' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Clone' => '0',
+                                      'Compress::Raw::Zlib' => '0',
+                                      'Data::Dump' => '0',
+                                      'File::Basename' => '0',
+                                      'FindBin' => '0',
+                                      'Getopt::Long' => '0',
+                                      'IO::Handle' => '0',
+                                      'List::MoreUtils' => '0',
+                                      'List::Util' => '0',
+                                      'Math::Trig' => '0',
+                                      'POSIX' => '0',
+                                      'Scalar::Util' => '0',
+                                      'bytes' => '0',
+                                      'if' => '0',
+                                      'mro' => '0',
+                                      'namespace::autoclean' => '0',
+                                      'perl' => 'v5.16.0',
+                                      'utf8' => '0',
+                                      'version' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Cwd' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test2::V0' => '0',
+                                   'Test::More' => '0',
+                                   'lib' => '0',
+                                   'ok' => '0',
+                                   'strict' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

@@ -1,7 +1,7 @@
 package Guacamole::Test;
 our $AUTHORITY = 'cpan:XSAWYERX';
 # ABSTRACT: What Guacamole uses to test itself
-$Guacamole::Test::VERSION = '0.007';
+$Guacamole::Test::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -30,9 +30,11 @@ sub parses {
     or do { diag($@); };
 
     # debugging
-    # use DDP;
-    # my @dumped_trees = map dump_tree($_), @trees;
-    # p @dumped_trees;
+    if (0) {
+        require DDP;
+        my @dumped_trees = map dump_tree($_), @trees;
+        &DDP::p([@dumped_trees]);
+    }
 
     is( scalar(@trees), 1, "'$text': parsed unambiguously" );
     return \@trees;
@@ -86,7 +88,7 @@ Guacamole::Test - What Guacamole uses to test itself
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -116,7 +118,7 @@ Vickenty Fesunov
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Sawyer X.
+This software is Copyright (c) 2022 by Sawyer X.
 
 This is free software, licensed under:
 

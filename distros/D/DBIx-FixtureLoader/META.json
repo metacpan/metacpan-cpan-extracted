@@ -4,7 +4,7 @@
       "Masayuki Matsuki <y.songmu@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.11",
+   "generated_by" : "Minilla/v3.1.19",
    "license" : [
       "perl_5"
    ],
@@ -68,7 +68,7 @@
    "provides" : {
       "DBIx::FixtureLoader" : {
          "file" : "lib/DBIx/FixtureLoader.pm",
-         "version" : "0.20"
+         "version" : "0.21"
       }
    },
    "release_status" : "stable",
@@ -78,16 +78,18 @@
       },
       "homepage" : "https://github.com/Songmu/p5-DBIx-FixtureLoader",
       "repository" : {
-         "url" : "git://github.com/Songmu/p5-DBIx-FixtureLoader.git",
+         "type" : "git",
+         "url" : "https://github.com/Songmu/p5-DBIx-FixtureLoader.git",
          "web" : "https://github.com/Songmu/p5-DBIx-FixtureLoader"
       }
    },
-   "version" : "0.20",
+   "version" : "0.21",
    "x_contributors" : [
+      "Dai Okabayashi <bayashi@cpan.org>",
       "Motonobu Ichimura <ichimuram@intellilink.co.jp>",
       "chibapse <tall.toothpick.102248@gmail.com>",
       "taiyoh <sun.basix@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 1
 }

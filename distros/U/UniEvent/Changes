@@ -1,4 +1,6 @@
-1.2.10    xx.xx.2021
+1.2.11    xx.xx.2022
+           - perl 5.36 related
+1.2.10    10.02.2022
            - add on_establish to event listener API
            - move sockaddr() peeraddr() from Tcp to Stream
            - Timer new feature: pause/resume

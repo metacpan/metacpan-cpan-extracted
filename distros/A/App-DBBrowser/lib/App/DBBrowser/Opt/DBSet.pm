@@ -31,10 +31,10 @@ sub database_setting {
     my $old_idx_sec = 0;
 
     SECTION: while ( 1 ) {
-        my ( $plugin, $section );
+        my ( $plugin, $key );
         if ( defined $db ) {
             $plugin = $sf->{i}{plugin};
-            $section = $db;
+            $key = $db;
         }
         else {
             if ( @{$sf->{o}{G}{plugins}} == 1 ) {
@@ -62,34 +62,22 @@ sub database_setting {
             }
             $plugin = 'App::DBBrowser::DB::' . $plugin;
             $sf->{i}{plugin} = $plugin;
-            $section = $plugin;
+            $key = $plugin;
         }
         my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
-        my $env_var    = $plui->env_variables();
-        my $login_data = $plui->read_arguments();
-        my $attr       = $plui->set_attributes();
-        my $items = {
-            required => [ map { {
-                    name   => 'field_' . $_->{name},
-                    prompt => exists $_->{prompt} ? $_->{prompt} : $_->{name},
-                    values => [ 'NO', 'YES' ]
-                } } @$login_data ],
-            arguments => [
-                    grep { ! $_->{secret} } @$login_data
-                ],
-            env_variables => [ map { { #
-                    name   => $_,
-                    prompt => $_,
-                    values => [ 'NO', 'YES' ]
-                } } @$env_var ],
-
-            attributes => $attr,
-        };
+        my $tmp_env_var     = $plui->env_variables();
+        my $env_variables   = [ map { { name => $_, values => [ 'NO', 'YES' ] } } @$tmp_env_var ]; #
+        my $tmp_login_data  = $plui->read_login_data();
+        my $required_fields = [ map { { name   => 'field_' . $_->{name}, values => [ 'NO', 'YES' ] } } @$tmp_login_data ];
+        my $login_data      = [ grep { ! $_->{secret}                                                } @$tmp_login_data ];
+        my $read_attributes = $plui->read_attributes();
+        my $set_attributes  = $plui->set_attributes();
         my @groups;
-        push @groups, [ 'required',      "- Fields"        ] if @{$items->{required}};
-        push @groups, [ 'arguments',     "- Login Data"    ] if @{$items->{arguments}};
-        push @groups, [ 'env_variables', "- ENV Variables" ] if @{$items->{env_variables}};
-        push @groups, [ 'attributes',    "- Attributes"    ] if @{$items->{attributes}};
+        push @groups, [ 'required_fields', "- Fields"          ] if @$required_fields;
+        push @groups, [ 'login_data',      "- Login Data"      ] if @$login_data;
+        push @groups, [ 'env_variables',   "- ENV Variables"   ] if @$env_variables;
+        push @groups, [ 'read_attributes', "- Read Attributes" ] if @$read_attributes;
+        push @groups, [ 'set_attributes',  "- Set Attributes"  ] if @$set_attributes;
         if ( ! @groups ) {
             $tc->choose(
                 [ 'No database settings available!' ],
@@ -97,7 +85,7 @@ sub database_setting {
             );
             return;
         }
-        push @groups, [ 'reset_db_dummy_str', "  Reset DB" ] if ! defined $db;
+        push @groups, [ 'reset_db_dummy_str', "  Reset DB settings" ] if ! defined $db;
         my $prompt = defined $db ? 'DB: ' . $db . '' : '' . $plugin . '';
         my $db_opt_get = App::DBBrowser::Opt::DBGet->new( $sf->{i}, $sf->{o} );
         my $db_opt = $db_opt_get->read_db_config_files();
@@ -132,8 +120,8 @@ sub database_setting {
             if ( $group eq 'reset_db_dummy_str' ) {
                 my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
                 my @databases;
-                for my $section ( keys %$db_opt ) {
-                    push @databases, $section if $section ne $plugin;
+                for my $key ( keys %$db_opt ) {
+                    push @databases, $key if $key ne $plugin;
                 }
                 if ( ! @databases ) {
                     $tc->choose(
@@ -144,7 +132,7 @@ sub database_setting {
                 }
                 my $db_to_reset = $tu->choose_a_subset(
                     [ sort @databases ],
-                    { cs_label => 'DB to reset: ', layout => 2, cs_separator => "\n", cs_begin => "\n", prompt => "\nChoose:" }
+                    { cs_label => 'DB settings to reset: ', layout => 2, cs_separator => "\n", cs_begin => "\n", prompt => "\nChoose:" }
                 );
                 if ( ! $db_to_reset->[0] ) {
                     next GROUP;
@@ -154,45 +142,64 @@ sub database_setting {
                 }
                 $sf->{write_config}++;
             }
-            elsif ( $group eq 'required' ) {
+            elsif ( $group eq 'required_fields' ) {
                 my $sub_menu = [];
-                for my $item ( @{$items->{$group}} ) {
-                    my $required = $item->{name};
-                    push @$sub_menu, [ $required, '- ' . $item->{prompt}, $item->{values} ];
-                              # db specific                      # global
-                    $db_opt->{$section}{$required} //= $db_opt->{$plugin}{$required} // 1; # the default: "required" is true (1)
+                for my $item ( @$required_fields ) {
+                    my $opt = $item->{name};
+                    my $prompt = '- ' . $item->{name} =~ s/^field_//r;
+                    push @$sub_menu, [ $opt, $prompt, $item->{values} ];
+                            # db specific               # global
+                    $db_opt->{$key}{$opt} //= $db_opt->{$plugin}{$opt} // 1; # by default enabled
                 }
                 my $prompt = 'Required fields (' . $plugin . '):';
-                $sf->__settings_menu_wrap_db( $db_opt, $section, $sub_menu, $prompt );
+                $sf->__settings_menu_wrap_db( $db_opt, $key, $sub_menu, $prompt );
             }
-            elsif ( $group eq 'arguments' ) {
-               for my $item ( @{$items->{$group}} ) {
+            elsif ( $group eq 'login_data' ) {
+               for my $item ( @$login_data ) {
                     my $opt = $item->{name};
-                    $db_opt->{$section}{$opt} //= $db_opt->{$plugin}{$opt};
+                    if ( ! length $db_opt->{$key}{$opt} ) {
+                        $db_opt->{$key}{$opt} = $db_opt->{$plugin}{$opt};
+                    }
                 }
                 my $prompt = 'Default login data (' . $plugin . ')';
-                $sf->__group_readline_db( $db_opt, $section, $items->{$group}, $prompt );
+                $sf->__group_readline_db( $db_opt, $key, $login_data, $prompt );
+            }
+            elsif ( $group eq 'read_attributes' ) {
+               for my $item ( @$read_attributes ) {
+                    my $opt = $item->{name};
+                    if ( ! length $db_opt->{$key}{$opt} ) {
+                        if ( length $db_opt->{$plugin}{$opt} ) {
+                            $db_opt->{$key}{$opt} = $db_opt->{$plugin}{$opt};
+                        }
+                        elsif ( length $item->{default} ) {
+                            $db_opt->{$key}{$opt} = $item->{default};
+                        }
+                    }
+                }
+                my $prompt = 'Options ' . $plugin . ':';
+                $sf->__group_readline_db( $db_opt, $key, $read_attributes, $prompt );
             }
             elsif ( $group eq 'env_variables' ) {
                 my $sub_menu = [];
-                for my $item ( @{$items->{$group}} ) {
-                    my $env_variable = $item->{name};
-                    push @$sub_menu, [ $env_variable, '- ' . $item->{prompt}, $item->{values} ];
-                    $db_opt->{$section}{$env_variable} //= $db_opt->{$plugin}{$env_variable} // 0; # default: "disabled" (0)
+                for my $item ( @$env_variables ) {
+                    my $opt = $item->{name};
+                    my $prompt = '- ' . $item->{name};
+                    push @$sub_menu, [ $opt, $prompt, $item->{values} ];
+                    $db_opt->{$key}{$opt} //= $db_opt->{$plugin}{$opt} // 0; # by default disabled
                 }
                 my $prompt = 'Use ENV variables (' . $plugin . '):';
-                $sf->__settings_menu_wrap_db( $db_opt, $section, $sub_menu, $prompt );
+                $sf->__settings_menu_wrap_db( $db_opt, $key, $sub_menu, $prompt );
             }
-            elsif ( $group eq 'attributes' ) {
+            elsif ( $group eq 'set_attributes' ) {
                 my $sub_menu = [];
-                for my $item ( @{$items->{$group}} ) {
+                for my $item ( @$set_attributes ) {
                     my $opt = $item->{name};
-                    my $prompt = '- ' . ( exists $item->{prompt} ? $item->{prompt} : $item->{name} );
+                    my $prompt = '- ' . $item->{name};
                     push @$sub_menu, [ $opt, $prompt, $item->{values} ];
-                    $db_opt->{$section}{$opt} //= $db_opt->{$plugin}{$opt} // $item->{values}[$item->{default}];
+                    $db_opt->{$key}{$opt} //= $db_opt->{$plugin}{$opt} // $item->{values}[$item->{default}];
                 }
                 my $prompt = 'Options ' . $plugin . ':';
-                $sf->__settings_menu_wrap_db( $db_opt, $section, $sub_menu, $prompt );
+                $sf->__settings_menu_wrap_db( $db_opt, $key, $sub_menu, $prompt );
             }
         }
     }
@@ -200,10 +207,10 @@ sub database_setting {
 
 
 sub __settings_menu_wrap_db {
-    my ( $sf, $db_opt, $section, $sub_menu, $prompt ) = @_;
+    my ( $sf, $db_opt, $key, $sub_menu, $prompt ) = @_;
     my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
     my $changed = $tu->settings_menu(
-        $sub_menu, $db_opt->{$section},
+        $sub_menu, $db_opt->{$key},
         { prompt => $prompt, back => $sf->{i}{_back}, confirm => $sf->{i}{_confirm} }
     );
     return if ! $changed;
@@ -212,13 +219,8 @@ sub __settings_menu_wrap_db {
 
 
 sub __group_readline_db {
-    my ( $sf, $db_opt, $section, $items, $prompt ) = @_;
-    my $list = [ map {
-        [
-            exists $_->{prompt} ? $_->{prompt} : $_->{name},
-            $db_opt->{$section}{$_->{name}}
-        ]
-    } @{$items} ];
+    my ( $sf, $db_opt, $key, $items, $prompt ) = @_;
+    my $list = [ map { [ $_->{name}, $db_opt->{$key}{$_->{name}} ] } @{$items} ];
     my $tf = Term::Form->new( $sf->{i}{tf_default} );
     my $new_list = $tf->fill_form(
         $list,
@@ -226,7 +228,7 @@ sub __group_readline_db {
     );
     if ( $new_list ) {
         for my $i ( 0 .. $#$items ) {
-            $db_opt->{$section}{$items->[$i]{name}} = $new_list->[$i][1];
+            $db_opt->{$key}{$items->[$i]{name}} = $new_list->[$i][1];
         }
         $sf->{write_config}++;
     }

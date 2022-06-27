@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-12'; # DATE
+our $DATE = '2022-06-24'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use Perinci::CmdLine::Any;
 
@@ -43,7 +43,7 @@ orgadb - Select entries and fields from Org addressbook
 
 =head1 VERSION
 
-This document describes version 0.001 of orgadb (from Perl distribution App-orgadb), released on 2022-06-12.
+This document describes version 0.002 of orgadb (from Perl distribution App-orgadb), released on 2022-06-24.
 
 =head1 SYNOPSIS
 
@@ -54,7 +54,9 @@ like the following (use INI syntax, or L<IOD> to be more exact):
  files = ~/addressbook.org
  files = /path/to/another-addressbook.org
 
-Suppose you have F<~/addressbook.org> like the following:
+Suppose you have F<~/addressbook.org> like the following (entries are written as
+level-2 headings, level 1 is used for categories, hierarchical categories can be
+written using breadcrumb-style notation with ">" separator):
 
  * family
  ** iwan
@@ -91,7 +93,9 @@ Suppose you have F<~/addressbook.org> like the following:
  * work > newsradio > ex
  ** matthew
 
-To list all entries:
+=head2 Listing all entries
+
+To list all entries (categories will be shown as path prefix):
 
  % orgadb
  family/iwan
@@ -109,25 +113,28 @@ To list all entries:
  work > newsradio/beth
  work > newsradio > ex/matthew
 
-To list entries that match the string 'sa' (the categories will be shown also as
-the path prefix for each matching entry title):
+=head2 Searching entries
+
+To list entries that match the string 'sa':
 
  % orgadb sa
  family/satya
  work > newsradio/lisa
 
-To hide the category, add C<-C>:
+To hide the category prefix, use C<-C> (C<--hide-category>):
 
  % orgadb -C sa
  satya
  lisa
+
+=head2 Searching categories
 
 To search against the category, use the C<-c> option:
 
  % orgadb sa -c work; # search for 'sa' from work
  work > newsradio/lisa
 
- % orgadb sa -c work; # list all entries from work
+ % orgadb -c work; # list all entries from work
  work > newsradio/dave
  work > newsradio/lisa
  work > newsradio/joe
@@ -137,7 +144,7 @@ To search against the category, use the C<-c> option:
 To display Lisa's full entry:
 
  % orgadb lisa -l
- * work > newsradio
+ work > newsradio/lisa
  ** lisa
  - cell :: 555-1234-710
  - home phone :: 555-1234-712
@@ -145,13 +152,23 @@ To display Lisa's full entry:
    + do not call cell after office hours
 
  % orgadb lisa -Cl  ;# do not show the category
+ lisa
  ** lisa
  - cell :: 555-1234-710
  - home phone :: 555-1234-712
  - note ::
    + do not call cell after office hours
 
-To get Lisa's cell phone number (search field):
+ % orgadb lisa -El  ;# do not show the entry line
+ ** lisa
+ - cell :: 555-1234-710
+ - home phone :: 555-1234-712
+ - note ::
+   + do not call cell after office hours
+
+=head2 Searching fields
+
+To get Lisa's cell phone number (search against field):
 
  % orgadb lisa cell
  work > newsradio/lisa
@@ -169,19 +186,28 @@ To get all Lisa's phone numbers:
  - cell :: 555-1234-710
  - home phone :: 555-1234-712
 
-(NOT YET IMPLEMENTED) Formatting:
+=head2 Formatting
 
- TODO
+NOT YET IMPLEMENTED
 
 =head1 DESCRIPTION
 
 B<EARLY RELEASE, MANY OPTIONS ARE NOT YET ADDED OR IMPLEMETED.>
 
-B<orgadb> is a tool for your addressbook written in Org format. It currently
-can: find/show addressbook entries/fields.
+B<App::orgadb> is a tool for your addressbook written in Org format. It
+currently contains:
 
-The addressbook must be written in a certain structure, as shown in the
-Synopsis: the first heading level is for putting categories.
+=over
+
+=item * orgadb
+
+CLI to find/show addressbook entries/fields.
+
+=back
+
+The addressbook must be written following a certain structure, as shown in the
+Synopsis. The first heading level is for putting categories. The second heading
+level is where you put all your entries. Fields are written in description list.
 
 =head1 OPTIONS
 
@@ -458,11 +484,69 @@ It is also recommended to install L<shcompgen> (see above).
 
 For fish and zsh, install L<shcompgen> as described above.
 
+=head1 FAQ
+
+=head2 Why doesn't 'orgadb' list all my entries? It returns nothing.
+
+ % orgadb
+ % _
+
+Probably because the addressbook is not written following the expected
+structure, where the entries should be as I<level-2> headings. You might use the
+level-1 heading:
+
+ * jimmy
+ - cell :: 555-123-4567
+ * john
+ * jack
+
+or use deeper-than-level-2 heading:
+
+ * friends
+ ** high school
+ *** jimmy
+ - cell :: 555-123-4567
+ *** john
+ *** jack
+
+This is the correct structure:
+
+ * friends > high school
+ ** jimmy
+ - cell :: 555-123-4567
+ ** john
+ ** jack
+
+When queried:
+
+ % orgadb
+ friends > high school/jimmy
+ friends > high school/john
+ friends > high school/jack
+
+=head2 Why can't I search against entry fields? It returns nothing. (I can list entries.)
+
+ % orgadb jimmy cell
+ % _
+
+Probably because the addressbook is not written following the expected
+structure, where you should use a description list. A common mistake is writing
+a description list like this:
+
+ ** jimmy
+ - cell: 555-123-4567
+
+This is still an unordered list in Org, you have to use C< :: > (space, followed
+by two colons, followed by another space) as the separator:
+
+ ** jimmy
+ - cell :: 555-123-4567
+
 =head1 CONFIGURATION FILE
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/39ZIQFynK5.conf>, F</home/u1/39ZIQFynK5.conf>, or F</etc/39ZIQFynK5.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/S2iHHrTD2a.conf>, F</home/u1/S2iHHrTD2a.conf>, or F</etc/S2iHHrTD2a.conf>.
 
 All found files will be read and merged.
 
@@ -506,17 +590,17 @@ List of available configuration parameters:
 
 =head1 ENVIRONMENT
 
-=head2 _39ZIQFYNK5_OPT => str
+=head2 S2IHHRTD2A_OPT => str
 
 Specify additional command-line options.
 
 =head1 FILES
 
-F</home/u1/.config/39ZIQFynK5.conf>
+F</home/u1/.config/S2iHHrTD2a.conf>
 
-F</home/u1/39ZIQFynK5.conf>
+F</home/u1/S2iHHrTD2a.conf>
 
-F</etc/39ZIQFynK5.conf>
+F</etc/S2iHHrTD2a.conf>
 
 =head1 HOMEPAGE
 

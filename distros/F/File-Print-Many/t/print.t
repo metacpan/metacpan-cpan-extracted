@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use autodie;
-use Test::Most tests => 13;
+use Test::Most tests => 18;
 use Test::NoWarnings;
 use Test::TempDir::Tiny;
 use File::Spec;
@@ -99,6 +99,31 @@ PRINT: {
 	close($fin);
 	ok($contents eq "hello, world!\n");
 
+	open($fout1, '>', $tmp1);
+	open($fout2, '>', $tmp2);
+
+	$many = File::Print::Many->new({ fds => [ $fout1, $fout2 ] });
+
+	$many->print('hello, ')->print("world!\n");
+
+	close $fout1;
+	close $fout2;
+
+	open($fin, '<', $tmp1);
+	$contents = undef;
+	while(<$fin>) {
+		$contents .= $_;
+	}
+	close($fin);
+	cmp_ok($contents, 'eq', "hello, world!\n", 'daisy chain works');
+
+	open($fin, '<', $tmp2);
+	$contents = undef;
+	while(<$fin>) {
+		$contents .= $_;
+	}
+	close($fin);
+	cmp_ok($contents, 'eq', "hello, world!\n", 'daisy chain works');
 	unlink $tmp1;
 	unlink $tmp2;
 
@@ -115,6 +140,15 @@ PRINT: {
 		my $foo = File::Print::Many->new({ fds => [ undef ] });
 	});
 	does_croak(sub {
+		my $foo = File::Print::Many->new({ fds => ( undef ) });
+	});
+	does_croak(sub {
+		my $foo = File::Print::Many->new(fds => ( undef ));
+	});
+	does_croak(sub {
 		my $foo = File::Print::Many->new({ fds => undef });
+	});
+	does_croak(sub {
+		my $foo = File::Print::Many->new('bar');
 	});
 }

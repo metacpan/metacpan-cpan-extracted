@@ -47,7 +47,6 @@ use lib 'lib';
 use Data::Dumper;
 use Getopt::Std;
 use Marpa::R2;
-use Data::Dump;
 
 # ------------------------------------------------------------------------------------ #
 # Subroutines                                                                          #
@@ -105,7 +104,7 @@ $input = undef;
 
 my $value_ref   = $parser->value();
 
-print Data::Dump::dump($value_ref);
+print Dumper($value_ref);
 
 exit 0;
 

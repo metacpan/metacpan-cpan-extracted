@@ -45,10 +45,9 @@
       },
       "homepage" : "http://dev.perl.org/",
       "repository" : {
-         "type" : "git",
-         "url" : "git://github.com/Perl/perl5.git"
+         "url" : "https://github.com/Perl/perl5.git"
       }
    },
-   "version" : "5.20220527",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "5.20220620",
+   "x_serialization_backend" : "JSON::PP version 4.09"
 }

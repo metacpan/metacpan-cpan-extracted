@@ -48,6 +48,10 @@ features.
     Specify replacement character.  Default is Unicode `FULL BLOCK`
     (U+2588: █).
 
+- **--pingu-interval**=_sec_
+
+    Set interval time between printing each lines.  Default is zero.
+
 # IMAGE FILE FORMAT
 
 - ASCII
@@ -64,6 +68,8 @@ features.
         Y  y  Yellow
         K  k  Black
         W  w  White
+
+    Line start with `#` is treated as a comment.
 
     Default pingu image:
 
@@ -145,7 +151,11 @@ your `~/.optex.d/ping.rc`:
 
 [https://github.com/sheepla/pingu](https://github.com/sheepla/pingu)
 
-[App::optex](https://metacpan.org/pod/App%3A%3Aoptex)
+[App::optex](https://metacpan.org/pod/App%3A%3Aoptex),
+[https://github.com/kaz-utashiro/optex/](https://github.com/kaz-utashiro/optex/)
+
+[App::optex::pingu](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Apingu),
+[https://github.com/kaz-utashiro/optex-pingu/](https://github.com/kaz-utashiro/optex-pingu/)
 
 # AUTHOR
 

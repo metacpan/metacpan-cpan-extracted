@@ -1,5 +1,9 @@
 Revision history for Data-MoneyCurrency
 
+0.23    Sa 25 Jun 2022 12:59:39 CEST
+        - newest ruby-money conf
+        - VE now mapped to ves as currency
+
 0.22    Wed Sep  8 09:44:59 CEST 2021
         - back to File::ShareDir other way wasnt working
         

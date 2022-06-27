@@ -1,0 +1,12 @@
+^[^/\\]+\.png$
+^blib/
+~$
+^\.git
+^pm_to_blib$
+^MANIFEST\.bak$
+^MYMETA\.
+^Imager-File-APNG
+^Makefile$
+^testout/
+\.zip$
+\#

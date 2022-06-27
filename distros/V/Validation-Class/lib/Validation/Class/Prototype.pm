@@ -15,7 +15,7 @@ use Validation::Class::Fields;
 use Validation::Class::Errors;
 use Validation::Class::Util;
 
-our $VERSION = '7.900057'; # VERSION
+our $VERSION = '7.900058'; # VERSION
 
 use List::MoreUtils 'uniq', 'firstval';
 use Hash::Flatten 'flatten', 'unflatten';
@@ -1733,7 +1733,7 @@ sub register_settings {
                     # merge configurations
 
                     my $self_profile = $self->configuration->profile;
-                    my $role_profile = $role_proto->configuration->profile;
+                    my $role_profile = clone $role_proto->configuration->profile;
 
                     # manually merge profiles with list/map containers
 
@@ -2542,7 +2542,7 @@ Validation::Class::Prototype - Data Validation Engine for Validation::Class Clas
 
 =head1 VERSION
 
-version 7.900057
+version 7.900058
 
 =head1 DESCRIPTION
 

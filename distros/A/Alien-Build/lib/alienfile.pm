@@ -11,7 +11,7 @@ use Carp ();
 sub _path { Path::Tiny::path(@_) }
 
 # ABSTRACT: Specification for defining an external dependency for CPAN
-our $VERSION = '2.48'; # VERSION
+our $VERSION = '2.50'; # VERSION
 
 
 our @EXPORT = qw( requires on plugin probe configure share sys download fetch decode prefer extract patch patch_ffi build build_ffi gather gather_ffi meta_prop ffi log test start_url before after );
@@ -369,7 +369,7 @@ alienfile - Specification for defining an external dependency for CPAN
 
 =head1 VERSION
 
-version 2.48
+version 2.50
 
 =head1 SYNOPSIS
 
@@ -705,7 +705,8 @@ Get the meta_prop hash reference.
 
  my $meta = meta;
 
-Returns the meta object for your L<alienfile>.
+Returns the meta object for your L<alienfile>.  For methods that can be used on the
+meta object, see L<Alien::Build/META-METHODS>.
 
 =head2 log
 
@@ -846,7 +847,7 @@ nick nauwelaerts (INPHOBIA)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011-2020 by Graham Ollis.
+This software is copyright (c) 2011-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

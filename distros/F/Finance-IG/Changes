@@ -17,4 +17,7 @@ Revision history for Finance-IG
 0.099    Extra diagnostics added for tests that fail on some platforms
 0.100    Change to fix sporadic test failures with certain versions of perl. 
 0.101    Further deployment of changes. 
-
+0.102    Change to document in pod certain constants that caiuse pod failure. Change to make shot holdings give a negative size.  
+		 (Previously short holdings displayed as long! this was a bug.) 
+0.103    Fix to -sheld to sort correctly for aggreated values and values ending .0 
+         Fix odd characters that upset md5 on certain other perl versions

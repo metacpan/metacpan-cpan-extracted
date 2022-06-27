@@ -1,6 +1,7 @@
 class IO::File : precompile {
   use IO::FileHandle;
   use Fn;
+  use Array;
 
   interface IO::Handlable;
 
@@ -42,7 +43,7 @@ class IO::File : precompile {
       my $read_length = $self->read($buffer);
       
       if ($read_length < $buffer_length) {
-        $string .= (string)Fn->copy_array_range_byte((byte[])$buffer, 0, $read_length);
+        $string .= (string)Array->copy_range_byte((byte[])$buffer, 0, $read_length);
         last;
       }
       else {

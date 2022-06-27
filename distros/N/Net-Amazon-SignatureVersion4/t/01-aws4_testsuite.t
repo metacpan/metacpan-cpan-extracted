@@ -1,12 +1,18 @@
 # -*- perl -*-
 
-use strict;
+use v5.32;
+use utf8;
 use warnings;
+use open qw(:std :utf8);
+no feature qw(indirect);
+use feature qw(signatures);
+no warnings qw(experimental::signatures);
+
 use Test::More;
 use HTTP::Request;
 
 use Net::Amazon::SignatureVersion4;
-my $sig=new Net::Amazon::SignatureVersion4();
+my $sig=Net::Amazon::SignatureVersion4->new();
 
 my $test_suite_location="t/aws4_testsuite";
 
@@ -18,7 +24,7 @@ if ( ! opendir($testsuite, $test_suite_location)){
 }
 
 my @tests=readdir $testsuite;
-while(my $_=pop @tests) {
+while(local $_=pop @tests) {
     next unless ($_=~m/(.*)\.req/);
     my $test=$1;
 #    diag "Test: $test\n";

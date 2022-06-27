@@ -1,14 +1,16 @@
 {
    "abstract" : "Moose-like OO, fast to load, with zero dependencies.",
-   "author" : [],
+   "author" : [
+      "unknown"
+   ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4205",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mite",
    "no_index" : {
@@ -40,11 +42,13 @@
       "runtime" : {
          "requires" : {
             "App::Cmd" : "0.323",
-            "Method::Signatures" : "20140224",
-            "Mouse" : "1.08",
-            "MouseX::Foreign" : "1.000",
+            "Import::Into" : "0",
+            "Moo" : "2.000",
             "Path::Tiny" : "0.052",
+            "Types::Path::Tiny" : "0",
+            "Types::Standard" : "1.012",
             "YAML::XS" : "0.41",
+            "namespace::autoclean" : "0",
             "perl" : "v5.10.1",
             "version" : "0.77"
          }
@@ -56,7 +60,7 @@
       },
       "Mite" : {
          "file" : "lib/Mite.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.0.8"
       },
       "Mite::App" : {
          "file" : "lib/Mite/App.pm"
@@ -91,6 +95,9 @@
       "Mite::ModuleBuild" : {
          "file" : "lib/Mite/ModuleBuild.pm"
       },
+      "Mite::MyMoo" : {
+         "file" : "lib/Mite/MyMoo.pm"
+      },
       "Mite::Project" : {
          "file" : "lib/Mite/Project.pm"
       },
@@ -104,27 +111,24 @@
          "file" : "lib/Mite/Role/HasYAML.pm"
       },
       "Mite::Shim" : {
-         "file" : "lib/Mite/Shim.pm",
-         "version" : "v0.0.1"
+         "file" : "lib/Mite/Shim.pm"
       },
       "Mite::Source" : {
          "file" : "lib/Mite/Source.pm"
-      },
-      "Mite::Types" : {
-         "file" : "lib/Mite/Types.pm"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/evalEmpire/Mite/issues"
+         "web" : "https://github.com/tobyink/p5-mite/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "https://github.com/evalEmpire/Mite"
+         "url" : "https://github.com/tobyink/p5-mite"
       }
    },
-   "version" : "v0.0.1"
+   "version" : "v0.0.8",
+   "x_serialization_backend" : "JSON::PP version 4.09"
 }

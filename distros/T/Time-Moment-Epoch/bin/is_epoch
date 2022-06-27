@@ -3,7 +3,7 @@
 #####################################################################
 ## ABSTRACT: Guess if the given string could be an epoch time.
 ## PODNAME: is_epoch
-our $VERSION = '1.003002'; ## VERSION
+our $VERSION = '1.004001'; ## VERSION
 #####################################################################
 
 use v5.24;
@@ -12,27 +12,28 @@ use experimental 'signatures';
 use Data::Printer;
 use Getopt::Long;
 use JSON;
+use Encode::Base32::GMP;
 use Math::BigInt try => 'GMP';
 use Pod::Usage;
 use Time::Moment::Epoch ':all';
 
 my %opt = (
-	max_date => '9999-12-31T23:59:59Z',
-	min_date => '0001-01-01T00:00:00Z',
-	output	 => 'as_string',
+    max_date => '9999-12-31T23:59:59Z',
+    min_date => '0001-01-01T00:00:00Z',
+    output   => 'as_string',
 );
 
 GetOptions(
-	\%opt,
+    \%opt,
 
-	'max_date=s',
-	'min_date=s',
-	'output=s',
+    'max_date=s',
+    'min_date=s',
+    'output=s',
 
-	'debug!',
-	'help|?',
-	'man',
-	'verbose!',
+    'debug!',
+    'help|?',
+    'man',
+    'verbose!',
 ) or pod2usage(2);
 pod2usage(1) if $opt{help};
 pod2usage(-verbose => 2) if $opt{man};
@@ -41,156 +42,212 @@ p %opt if $opt{debug};
 my $epochs = get_epochs(@ARGV);
 
 if ($opt{output} eq 'as_string') {
-	as_string($epochs);
+    as_string($epochs);
 } elsif ($opt{output} eq 'as_json') {
-	as_json($epochs);
+    as_json($epochs);
 } else {
-	die "Don't know how to output '$opt{output}'";
+    die "Don't know how to output '$opt{output}'";
 }
 
 sub get_epochs (@args) {
-	my %convs = (
-		floats	   => [qw(icq)],
-		hex64bits  => [qw(ole)],
-		hex128bits => [qw(windows_system)],
-		ints	   => [qw(apfs chrome cocoa dos google_calendar
-						  icq java mozilla symbian unix uuid_v1
-						  windows_date windows_file)],
-	);
+    my %convs = (
+        floats       => [qw(icq)],
+        hex64bits  => [qw(ole)],
+        hex128bits => [qw(windows_system)],
+        ints       => [qw(apfs chrome cocoa dos google_calendar
+                          icq java mozilla symbian unix uuid_v1
+                          windows_date windows_file)],
+    );
 
-	# Version 1 UUID's have timestamps in them. For example,
-	# 33c41a44-6cea-11e7-907b-a6006ad3dba0 => 1e76cea33c41a44
-	# -------- ----  ---               $+{high}$+{mid}$+{low}
-	# low      mid   high
-	#  8        4     3
-	# and 1e76cea33c41a44 => 2017-07-20T01:24:40.472634Z
-	my $UUIDv1 = qr{(?<low>[0-9A-Fa-f]{8})    -?
+    # Version 1 UUID's have timestamps in them. For example,
+    # 33c41a44-6cea-11e7-907b-a6006ad3dba0 => 1e76cea33c41a44
+    # -------- ----  ---               $+{high}$+{mid}$+{low}
+    # low      mid   high
+    #  8        4     3
+    # and 1e76cea33c41a44 => 2017-07-20T01:24:40.472634Z
+    my $UUIDv1 = qr{(?<low>[0-9A-Fa-f]{8})    -?
                     (?<mid>[0-9A-Fa-f]{4})    -?
                     1                            # this means version 1
                     (?<high>[0-9A-Fa-f]{3})   -?
                     [0-9A-Fa-f]{4}            -?
                     [0-9A-Fa-f]{12}              }mxs;
-	
-	my %epochs;
-	for my $arg (@args) {
+    
+    # Version 6 UUID's have UUIDv1 timestamps in them, but in the
+    # reverse order. For example,
+    # 1e76cea3-3c41-6a44-907b-a6006ad3dba0 => 1e76cea33c41a44
+    # -------- ----  ---               $+{high}$+{mid}$+{low}
+    # high     mid   low
+    #  8        4     3
+    # and 1e76cea33c41a44 => 2017-07-20T01:24:40.472634Z
+    my $UUIDv6 = qr{(?<high>[0-9A-Fa-f]{8})   -?
+                    (?<mid>[0-9A-Fa-f]{4})    -?
+                    6                            # this means version 6
+                    (?<low>[0-9A-Fa-f]{3})    -?
+                    [0-9A-Fa-f]{4}            -?
+                    [0-9A-Fa-f]{12}              }mxs;
 
-		# Full UUIDv1 string (with or without hyphens).
-		if ($arg =~ /^$UUIDv1$/) {
-			my $bstr = Math::BigInt->new("0x$+{high}$+{mid}$+{low}")->bstr;
-			if (my $href = try_as($bstr, 'uuid_v1')) {
-				$epochs{$arg}{uuid_v1} = $href;
-			}
-		}
+    # Version 7 UUID's have UNIX timestamps in milliseconds (like
+    # Java) in them.  For example,
+    # 017F22E2-79B0-7CC3-98C4-DC0C0C07398F => 017f22e279b0
+    # and 017f22e279b0 => 2022-02-22T19:22:22Z
+    my $UUIDv7 = qr{(?<ts1>[0-9A-Fa-f]{8})    -?
+                    (?<ts2>[0-9A-Fa-f]{4})    -?
+                    7                            # this means version 7
+                    [0-9A-Fa-f]{3}            -?
+                    [0-9A-Fa-f]{4}            -?
+                    [0-9A-Fa-f]{12}              }mxs;
 
-		# Floating point number.
-		if ($arg =~ /^-?\d+\.\d+$/) {
-			if (my $href = try_as($arg, $convs{floats}->@*)) {
-				$epochs{$arg}{float} = $href;
-			}
-		}
+    my %epochs;
+    for my $arg (@args) {
 
-		# Decimal number.
-		if ($arg =~ /^-?\d+$/) {
-			if (my $href = try_as($arg, $convs{ints}->@*)) {
-				$epochs{$arg}{decimal} = $href;
-			}
-		}
+        # ULID strings are Base32-encoded (https://github.com/ulid/spec).
+        if ($arg =~ /^[0123456789ABCDEFGHJKMNPQRSTVWXYZ]{26}$/) {
+            my $decoded = decode_base32($arg);
 
-		# Hexadecimal number.
-		if ($arg =~ /^[0-9a-fA-F]+$/) {
-			my $bstr = Math::BigInt->new("0x$arg")->bstr;
-			if (my $href = try_as($bstr, $convs{ints}->@*)) {
-				$epochs{$arg}{hexadecimal} = $href;
-			}
+            # Decoded, it's our 128 bits. Our timestamp is the top 48
+            # bits of this, so shift right 80 bits.
+            Math::GMPz::Rmpz_div_2exp($decoded, $decoded, 80);
 
-			# Some hexadecimals could be big-endian or little-endian.
-			if (length($arg) == 8 or length($arg) == 16) {
-				my $swapped = swap_endian($arg);
-				my $bstr = Math::BigInt->new("0x$swapped")->bstr;
-				if (my $href = try_as($bstr, $convs{ints}->@*)) {
-					$epochs{$arg}{hexadecimal_swapped} = $href;
-				}
-			}
-		}
+            # The timestamp is Unix time in milliseconds, which we
+            # call Java time.
+            if (my $href = try_as($decoded, 'java')) {
+                $epochs{$arg}{ulid} = $href;
+            }
+        }
 
-		# 64-bit Hexadecimal.
-		if ($arg =~ /^[0-9a-fA-F]{16}$/) {
-			if (my $href = try_as($arg, $convs{hex64bits}->@*)) {
-				$epochs{$arg}{hex64bit} = $href;
-			}
-		}
+        # Full UUIDv1 string (with or without hyphens).
+        if ($arg =~ /^$UUIDv1$/) {
+            my $bstr = Math::BigInt->new("0x$+{high}$+{mid}$+{low}")->bstr;
+            if (my $href = try_as($bstr, 'uuid_v1')) {
+                $epochs{$arg}{uuid_v1} = $href;
+            }
+        }
 
-		# 128-bit Hexadecimal.
-		if ($arg =~ /^(?:0x)?[0-9a-fA-F]{32}$/) {
-			if (my $href = try_as($arg, $convs{hex128bits}->@*)) {
-				$epochs{$arg}{hex128bit} = $href;
-			}
-		}
+        # Full UUIDv6 string (with or without hyphens).
+        if ($arg =~ /^$UUIDv6$/) {
+            my $bstr = Math::BigInt->new("0x$+{high}$+{mid}$+{low}")->bstr;
+            if (my $href = try_as($bstr, 'uuid_v1')) {
+                $epochs{$arg}{uuid_v6} = $href;
+            }
+        }
 
-	}
-	return \%epochs;
+        # Full UUIDv7 string (with or without hyphens).
+        if ($arg =~ /^$UUIDv7$/) {
+            my $bstr = Math::BigInt->new("0x$+{ts1}$+{ts2}")->bstr;
+            if (my $href = try_as($bstr, 'java')) {
+                $epochs{$arg}{uuid_v7} = $href;
+            }
+        }
+
+        # Floating point number.
+        if ($arg =~ /^-?\d+\.\d+$/) {
+            if (my $href = try_as($arg, $convs{floats}->@*)) {
+                $epochs{$arg}{float} = $href;
+            }
+        }
+
+        # Decimal number.
+        if ($arg =~ /^-?\d+$/) {
+            if (my $href = try_as($arg, $convs{ints}->@*)) {
+                $epochs{$arg}{decimal} = $href;
+            }
+        }
+
+        # Hexadecimal number.
+        if ($arg =~ /^[0-9a-fA-F]+$/) {
+            my $bstr = Math::BigInt->new("0x$arg")->bstr;
+            if (my $href = try_as($bstr, $convs{ints}->@*)) {
+                $epochs{$arg}{hexadecimal} = $href;
+            }
+
+            # Some hexadecimals could be big-endian or little-endian.
+            if (length($arg) == 8 or length($arg) == 16) {
+                my $swapped = swap_endian($arg);
+                my $bstr = Math::BigInt->new("0x$swapped")->bstr;
+                if (my $href = try_as($bstr, $convs{ints}->@*)) {
+                    $epochs{$arg}{hexadecimal_swapped} = $href;
+                }
+            }
+        }
+
+        # 64-bit Hexadecimal.
+        if ($arg =~ /^[0-9a-fA-F]{16}$/) {
+            if (my $href = try_as($arg, $convs{hex64bits}->@*)) {
+                $epochs{$arg}{hex64bit} = $href;
+            }
+        }
+
+        # 128-bit Hexadecimal.
+        if ($arg =~ /^(?:0x)?[0-9a-fA-F]{32}$/) {
+            if (my $href = try_as($arg, $convs{hex128bits}->@*)) {
+                $epochs{$arg}{hex128bit} = $href;
+            }
+        }
+
+    }
+    return \%epochs;
 }
 
 sub as_json ($epochs) {
-	if (my $results = stringify($epochs, 0)) {
-		say encode_json($results);
-	} else {
-		say "no results" if $opt{verbose};
-	}
+    if (my $results = stringify($epochs, 0)) {
+        say encode_json($results);
+    } else {
+        say "no results" if $opt{verbose};
+    }
 }
 
 sub as_string ($epochs) {
-	if (my $results = stringify($epochs)) {
-		say for reverse sort @{$results};
-	} else {
-		say "no results" if $opt{verbose};
-	}
+    if (my $results = stringify($epochs)) {
+        say for reverse sort @{$results};
+    } else {
+        say "no results" if $opt{verbose};
+    }
 }
 
 sub stringify ($epochs, $flatten=1) {
-	my $stringified;
-	for my $arg (keys $epochs->%*) {
-		for my $type (keys $epochs->{$arg}->%*) {
-			for my $conv (keys $epochs->{$arg}{$type}->%*) {
-				my $s = $epochs->{$arg}{$type}{$conv}->to_string;
-				next if $s lt $opt{min_date} or $s gt $opt{max_date};
-				if ($flatten) {
-					push @$stringified,
-						"$epochs->{$arg}{$type}{$conv}\t($arg, $type, $conv)";
-				} else {
-					$stringified->{$arg}{$type}{$conv} = $s;
-				}
-			}
-		}
-	}
-	return $stringified;
+    my $stringified;
+    for my $arg (keys $epochs->%*) {
+        for my $type (keys $epochs->{$arg}->%*) {
+            for my $conv (keys $epochs->{$arg}{$type}->%*) {
+                my $s = $epochs->{$arg}{$type}{$conv}->to_string;
+                next if $s lt $opt{min_date} or $s gt $opt{max_date};
+                if ($flatten) {
+                    push @$stringified,
+                        "$epochs->{$arg}{$type}{$conv}\t($arg, $type, $conv)";
+                } else {
+                    $stringified->{$arg}{$type}{$conv} = $s;
+                }
+            }
+        }
+    }
+    return $stringified;
 }
 
 sub swap_endian ($bs) {
-	my $HB = qr{(?<hb>[0-9a-fA-F]{2})};
-	if ($bs =~ /^$HB$HB$HB$HB$HB?$HB?$HB?$HB?$/) {
-		no warnings 'uninitialized';
-		return join q{}, reverse $-{hb}->@*;
-	}
-	return;
+    my $HB = qr{(?<hb>[0-9a-fA-F]{2})};
+    if ($bs =~ /^$HB$HB$HB$HB$HB?$HB?$HB?$HB?$/) {
+        no warnings 'uninitialized';
+        return join q{}, reverse $-{hb}->@*;
+    }
+    return;
 }
 
 sub try_as ($arg, @convs) {
-	no strict 'refs';
-	my %h;
-	for my $conv (@convs) {
-		if (my $tm = $conv->($arg)) {
-			$h{$conv} = $tm;
-		}
-	}
-	return \%h;
+    no strict 'refs';
+    my %h;
+    for my $conv (@convs) {
+        if (my $tm = $conv->($arg)) {
+            $h{$conv} = $tm;
+        }
+    }
+    return \%h;
 }
 
 __END__
 
 =pod
 
-=for :stopwords Tim Heaney Ehlers Mary iopuckoi
+=for :stopwords Tim Heaney Alexandr Ciornii Ehlers Mary iopuckoi
 
 =head1 NAME
 
@@ -219,7 +276,7 @@ You can also ask for JSON output instead.
     $ is_epoch 1234567890 --min 2007 --max 2017 --output=as_json
     {"1234567890":{"decimal":{"dos":"2016-12-22T00:22:36Z","unix":"2009-02-13T23:31:30Z","google_calendar":"2007-03-16T23:31:30Z"}}}
 
-To make it more readable, just pipe it json_xs or jq whatever your
+To make it more readable, just pipe it json_xs or or jq whatever your
 favorite JSON prettifier is.
 
     $ is_epoch 1234567890 --min 2007 --max 2017 --output=as_json | json_xs
@@ -238,7 +295,25 @@ can also put a whole UUID in and it will grab the parts that make the
 date-time.
 
     $ is_epoch 33c41a44-6cea-11e7-907b-a6006ad3dba0
-    2017-07-20T01:24:40.472634Z    (33c41a44-6cea-11e7-907b-a6006ad3dba0, uuid_v1, uuid_v1)
+    2017-07-20T01:24:40.472634Z	(33c41a44-6cea-11e7-907b-a6006ad3dba0, uuid_v1, uuid_v1)
+
+That's a version 1 UUID. Now there are more UUIDs with timestamps in
+them (https://uuid6.github.io/uuid6-ietf-draft/).
+
+Version 6 UUIDs also contain a uuid_v1 timestamp, but the bits are in a different order
+
+    $ is_epoch 1e76cea3-3c41-6a44-907b-a6006ad3dba0
+    2017-07-20T01:24:40.472634Z	(1e76cea3-3c41-6a44-907b-a6006ad3dba0, uuid_v6, uuid_v1)
+
+Version 7 UUIDs contain a java timestamp (Unix time in milliseconds)
+
+    $ is_epoch 017F22E2-79B0-7CC3-98C4-DC0C0C07398F
+    2022-02-22T19:22:22Z	(017F22E2-79B0-7CC3-98C4-DC0C0C07398F, uuid_v7, java)
+
+ULIDs (https://github.com/ulid/spec) also have java timestamps in them
+
+    $ is_epoch 01FWHE4YDGFK1SHH6W1G60EECF
+    2022-02-22T19:22:22Z	(01FWHE4YDGFK1SHH6W1G60EECF, ulid, java)
 
 =head1 OPTIONS
 
@@ -281,7 +356,7 @@ Time::Moment::Epoch gives a reasonable date for the given numbers.
 
 =head1 VERSION
 
-version 1.003002
+version 1.004001
 
 =head1 AUTHOR
 

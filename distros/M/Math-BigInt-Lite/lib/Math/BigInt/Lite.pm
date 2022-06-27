@@ -1,6 +1,6 @@
-# For speed and simplicity, Lite objects are a reference to a scalar. When
-# something more complex needs to happen (like +inf,-inf, NaN or rounding),
-# they will upgrade themselves to Math::BigInt.
+# For speed and simplicity, a Math::BigInt::Lite object is a reference to a
+# scalar. When something more complex needs to happen (like +inf,-inf, NaN or
+# rounding), Math::BigInt::Lite objects are upgraded.
 
 package Math::BigInt::Lite;
 
@@ -8,6 +8,8 @@ require 5.006002;
 
 use strict;
 use warnings;
+
+use Scalar::Util qw< blessed >;
 
 use Math::BigInt;
 
@@ -17,7 +19,7 @@ our @ISA = qw(Math::BigInt);
 our @EXPORT_OK = qw/objectify/;
 my $class = 'Math::BigInt::Lite';
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 ##############################################################################
 # global constants, flags and accessory
@@ -188,28 +190,30 @@ sub precision {
 use overload
   '+'     => sub {
                  my $x = $_[0];
-                 my $s = $_[1];
-                 $s = $class->new($s) unless ref($s);
-                 if ($s->isa($class)) {
-                     $x = \($$x + $$s);
-                     bless $x, $class;     # inline copy
-                     $upgrade->new($$x) if abs($$x) >= $MAX_ADD;
+                 my $y = $_[1];
+                 my $class = ref $x;
+                 $y = $class->new($y) unless ref($y);
+                 if ($y->isa($class)) {
+                     $x = \($$x + $$y);
+                     bless $x, $class;
+                     $x = $upgrade->new($$x) if abs($$x) >= $MAX_ADD;
                  } else {
-                     $x = $upgrade->new($$x)->badd($s);
+                     $x = $upgrade->new($$x)->badd($y);
                  }
                  $x;
              },
 
   '*'     => sub {
                  my $x = $_[0];
-                 my $s = $_[1];
-                 $s = $class->new($s) unless ref($s);
-                 if ($s->isa($class)) {
-                     $x = \($$x * $$s);
+                 my $y = $_[1];
+                 my $class = ref $x;
+                 $y = $class->new($y) unless ref($y);
+                 if ($y->isa($class)) {
+                     $x = \($$x * $$y);
                      $$x = 0 if $$x eq '-0';      # correct 5.x.x bug
                      bless $x, $class;            # inline copy
                  } else {
-                     $x = $upgrade->new(${$_[0]})->bmul($s);
+                     $x = $upgrade->new(${$_[0]})->bmul($y);
                  }
              },
 
@@ -226,9 +230,10 @@ use overload
   #'|='    =>      sub { $_[0]->bior($_[1]); },
   #'**='   =>      sub { $upgrade->bpow($_[0], $_[1]); },
 
-  '<=>'   => sub { $_[2] ? bcmp($_[1], $_[0]) : bcmp($_[0], $_[1]); },
+  '<=>'   => sub { my $cmp = $_[0] -> bcmp($_[1]);
+                   defined($cmp) && $_[2] ? -$cmp : $cmp; },
 
-  '""'    => sub { ${$_[0]}; },
+  '""'    => sub { "${$_[0]}"; },
 
   '0+'    => sub { ${$_[0]}; },
 
@@ -287,31 +292,83 @@ sub config {
 }
 
 sub bgcd {
-    if (@_ == 1) {              # bgcd (8) == bgcd(8, 0) == 8
-        my $x = shift;
-        $x = $class->new($x) unless ref($x);
-        return $x;
+
+    # Convert calls like Class::method(2) into Class->method(2). It ignores
+    # cases like Class::method($x), where $x is an object, because this is
+    # indistinguishable from $x->method().
+
+    unless (@_ && (ref($_[0]) || $_[0] =~ /^[a-z]\w*(?:::[a-z]\w*)*$/i)) {
+        #carp "Using ", (caller(0))[3], "() as a function is deprecated;",
+        #  " use is as a method instead" if warnings::warnif("deprecated");
+        unshift @_, __PACKAGE__;
     }
 
-    my @a = ();
-    foreach (@_) {
-        my $x = $_;
-        $x = $upgrade->new($x) unless ref ($x);
-        $x = $upgrade->new($$x) if $x->isa($class);
-        push @a, $x;
+    # Make sure each argument is an object.
+
+    my ($class, @args) = objectify(0, @_);
+
+    # If bgcd() is called as a function, the class might be anything.
+
+    return $class -> bgcd(@args) unless $class -> isa(__PACKAGE__);
+
+    # Upgrade if one of the operands are upgraded. This is for cases like
+    #
+    #   $x = Math::BigInt::Lite::bgcd("1e50");
+    #   $gcd = Math::BigInt::Lite::bgcd(5, $x);
+    #   $gcd = Math::BigInt::Lite->bgcd(5, $x);
+
+    my $do_upgrade = 0;
+    for my $arg (@args) {
+        unless ($arg -> isa($class)) {
+            $do_upgrade = 1;
+            last;
+        }
     }
-    Math::BigInt::bgcd(@a);
+    return $upgrade -> bgcd(@args) if $do_upgrade;
+
+    # Now compute the GCD.
+
+    my ($a, $b, $c);
+    $a = shift @args;
+    $a = abs($$a);
+    while (@args && $a != 1) {
+        $b = shift @args;
+        next if $$b == 0;
+        $b = abs($$b);
+        do {
+            $c = $a % $b;
+            $a = $b;
+            $b = $c;
+        } while $c;
+    }
+
+    return bless \( $a ), $class;
 }
 
 sub blcm {
-    my @a = ();
-    foreach (@_) {
-        my $x = $_;
-        $x = $upgrade->new($x) unless ref ($x);
-        $x = $upgrade->new($$x) if $x->isa($class);
-        push @a, $x;
+
+    # Convert calls like Class::method(2) into Class->method(2). It ignores
+    # cases like Class::method($x), where $x is an object, because this is
+    # indistinguishable from $x->method().
+
+    unless (@_ && (ref($_[0]) || $_[0] =~ /^[a-z]\w*(?:::[a-z]\w*)*$/i)) {
+        #carp "Using ", (caller(0))[3], "() as a function is deprecated;",
+        #  " use is as a method instead" if warnings::warnif("deprecated");
+        unshift @_, __PACKAGE__;
     }
-    Math::BigInt::blcm(@a);
+
+    # Make sure each argument is an object.
+
+    my ($class, @args) = objectify(0, @_);
+
+    my @a = ();
+    for my $arg (@args) {
+        $arg = $upgrade -> new("$arg")
+          unless defined(blessed($arg)) && $arg -> isa($upgrade);
+        push @a, $arg;
+    }
+
+    $upgrade -> blcm(@a);
 }
 
 sub isa {
@@ -343,18 +400,148 @@ sub new {
     $upgrade->new($wanted, @r);
 }
 
+###############################################################################
+# String conversion methods
+###############################################################################
+
 sub bstr {
     my ($class, $x) = ref($_[0]) ? (ref($_[0]), $_[0]) : objectify(1, @_);
 
-    return $x->bstr() unless $x->isa($class);
-    $$x;
+    return $upgrade -> exponent($x)
+      if defined($upgrade) && !$x -> isa($class);
+
+    "$$x";
 }
+
+# Scientific notation with significand/mantissa as an integer, e.g., "12345" is
+# written as "1.2345e+4".
 
 sub bsstr {
     my ($class, $x) = ref($_[0]) ? (ref($_[0]), $_[0]) : objectify(1, @_);
 
-    $upgrade->new($$x)->bsstr();
+    return $upgrade -> exponent($x)
+      if defined($upgrade) && !$x -> isa($class);
+
+    if ($$x =~ / ^
+                 (
+                     [+-]?
+                     (?: 0 | [1-9] (?: \d* [1-9] )? )
+                 )
+                 ( 0* )
+                 $
+               /x)
+    {
+        my $mant = $1;
+        my $expo = CORE::length($2);
+        return $mant . "e+" . $expo;
+    }
+
+    die "Internal error: ", (caller(0))[3], "() couldn't handle",
+      " the value '", $$x, "', which is likely a bug";
 }
+
+# Normalized notation, e.g., "12345" is written as "1.2345e+4".
+
+sub bnstr {
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
+
+    return $upgrade -> exponent($x)
+      if defined($upgrade) && !$x -> isa($class);
+
+    my ($mant, $expo);
+
+    if ($$x =~ / ^
+                 (
+                     [+-]?
+                     \d
+                 )
+                 ( 0* )
+                 $
+               /x)
+    {
+        return $1 . "e+" . CORE::length($2);
+    }
+
+    if ($$x =~
+        / ^
+          ( [+-]? [1-9] )
+          (
+              ( \d* [1-9] )
+              0*
+          )
+          $
+        /x)
+    {
+        return $1 . "." . $3 . "e+" . CORE::length($2);
+    }
+
+    die "Internal error: ", (caller(0))[3], "() couldn't handle",
+      " the value '", $$x, "', which is likely a bug";
+}
+
+# Engineering notation, e.g., "12345" is written as "12.345e+3".
+
+sub bestr {
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
+
+    return $upgrade -> exponent($x)
+      if defined($upgrade) && !$x -> isa($class);
+
+    if ($$x =~ / ^
+                 ( [+-]? )
+                 (
+                     0 | [1-9] (?: \d* [1-9] )?
+                 )
+                 ( 0* )
+                 $
+               /x)
+    {
+        my $sign = $1;
+        my $mant = $2;
+        my $expo = CORE::length($3);
+        my $mantlen = CORE::length($mant);          # length of mantissa
+        $expo += $mantlen;
+
+        my $dotpos = ($expo - 1) % 3 + 1;           # offset of decimal point
+        $expo -= $dotpos;
+
+        if ($dotpos < $mantlen) {
+            substr $mant, $dotpos, 0, ".";          # insert decimal point
+        } elsif ($dotpos > $mantlen) {
+            $mant .= "0" x ($dotpos - $mantlen);    # append zeros
+        }
+
+        return ($sign eq '-' ? '-' : '') . $mant . 'e+' . $expo;
+    }
+
+    die "Internal error: ", (caller(0))[3], "() couldn't handle",
+      " the value '", $$x, "', which is likely a bug";
+}
+
+# Decimal notation, e.g., "12345" (no exponent).
+
+sub bdstr {
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
+
+    return $upgrade -> exponent($x)
+      if defined($upgrade) && !$x -> isa($class);
+
+    "$$x";
+}
+
+# Fraction notation, e.g., "123.4375" is written as "1975/16", but "123" is
+# written as "123", not "123/1".
+
+sub bfstr {
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
+
+    return $upgrade -> exponent($x)
+      if defined($upgrade) && !$x -> isa($class);
+
+    "$$x";
+}
+
+###############################################################################
 
 sub bnorm {
     # no-op
@@ -375,12 +562,12 @@ sub _upgrade_2 {
     # Math::BigInt::Lite->badd(1, 2) style calls
     shift if !ref($_[0]) && $_[0] =~ /^Math::BigInt::Lite/;
 
-    my ($x, $y, $a, $p, $r) = @_;
+    my ($x, $y, @r) = @_;
 
     my $up = 0;                 # default: don't upgrade
 
     $up = 1
-      if (defined $a || defined $p || defined $accuracy || defined $precision);
+      if (defined $r[0] || defined $r[1] || defined $accuracy || defined $precision);
     $x = __PACKAGE__->new($x) unless ref $x; # upgrade literals
     $y = __PACKAGE__->new($y) unless ref $y; # upgrade literals
     $up = 1 unless $x->isa($class) && $y->isa($class);
@@ -390,7 +577,7 @@ sub _upgrade_2 {
         $y = $upgrade->new($$y) if $y->isa($class);
     }
 
-    ($up, $x, $y, $a, $p, $r);
+    ($up, $x, $y, @r);
 }
 
 sub _upgrade_2_mul {
@@ -406,12 +593,12 @@ sub _upgrade_2_mul {
     # Math::BigInt::Lite->badd(1, 2) style calls
     shift if !ref($_[0]) && $_[0] =~ /^Math::BigInt::Lite/;
 
-    my ($x, $y, $a, $p, $r) = @_;
+    my ($x, $y, @r) = @_;
 
     my $up = 0;                 # default: don't upgrade
 
     $up = 1
-      if (defined $a || defined $p || defined $accuracy || defined $precision);
+      if (defined $r[0] || defined $r[1] || defined $accuracy || defined $precision);
     $x = __PACKAGE__->new($x) unless ref $x; # upgrade literals
     $y = __PACKAGE__->new($y) unless ref $y; # upgrade literals
     $up = 1 unless $x->isa($class) && $y->isa($class);
@@ -420,7 +607,7 @@ sub _upgrade_2_mul {
         $x = $upgrade->new($$x) if $x->isa($class);
         $y = $upgrade->new($$y) if $y->isa($class);
     }
-    ($up, $x, $y, $a, $p, $r);
+    ($up, $x, $y, @r);
 }
 
 sub _upgrade_1 {
@@ -430,76 +617,83 @@ sub _upgrade_1 {
     # * global A or P are set
     # Input arguments: x, a, p, r
     # Output: flag (1: need to upgrade, 0: need not), x, $a, $p, $r
-    my ($x, $a, $p, $r) = @_;
+    my ($x, @r) = @_;
 
     my $up = 0;                 # default: don't upgrade
 
     $up = 1
-      if (defined $a || defined $p || defined $accuracy || defined $precision);
+      if (defined $r[0] || defined $r[1] || defined $accuracy || defined $precision);
     $x = __PACKAGE__->new($x) unless ref $x; # upgrade literals
     $up = 1 unless $x->isa($class);
     if ($up == 1) {
         $x = $upgrade->new($$x) if $x->isa($class);
     }
-    ($up, $x, $a, $p, $r);
+    ($up, $x, @r);
 }
 
 ##############################################################################
 # rounding functions
 
 sub bround {
-    my ($self, $x, $a, $m) = ref($_[0]) ? (ref($_[0]), @_) :
-      ($class, $class->new($_[0]), $_[1], $_[2]);
+    my ($class, $x, @a) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     #$m = $self->round_mode() if !defined $m;
     #$a = $self->accuracy() if !defined $a;
 
     $x = $upgrade->new($$x) if $x->isa($class);
-    $x->bround($a, $m);
+    $x->bround(@a);
 }
 
 sub bfround {
-    my ($self, $x, $p, $m) = ref($_[0]) ? (ref($_[0]), @_) :
-      ($class, $class->new($_[0]), $_[1], $_[2]);
+    my ($class, $x, @p) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     #$m = $self->round_mode() if !defined $m;
     #$p = $self->precision() if !defined $p;
 
     $x = $upgrade->new($$x) if $x->isa($class);
-    $x->bfround($p, $m);
+    $x->bfround(@p);
 
 }
 
 sub round {
-    my ($self, $x, $a, $p, $r) = ref($_[0]) ? (ref($_[0]), @_) :
-      ($class, $class->new(@_), $_[0], $_[1], $_[2]);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     $x = $upgrade->new($$x) if $x->isa($class);
-    $x->round($a, $p, $r);
+    $x->round(@r);
 }
 
 ##############################################################################
 # special values
 
 sub bnan {
-    # return a bnan or set object to NaN
-    $upgrade->bnan();
+    # return a NaN
+    shift;
+    $upgrade -> bnan(@_);
 }
 
 sub binf {
-    # return a binf
+    # return a +/-Inf
     shift;
-
-    #  return $upgrade->new($$x)->binf(@_) if ref $x;
-    $upgrade->binf(@_);         # binf(1, '-') form
+    $upgrade -> binf(@_);
 }
 
 sub bone {
-    # return a one
+    # return a +/-1
     my $x = shift;
 
-    my $num = ($_[0] || '') eq '-' ? -1 : 1;
-    return $x->new($num) unless ref $x; # Class->bone();
+    my ($sign, @r) = @_;
+
+    # Get the sign.
+
+    if (defined($_[0]) && $_[0] =~ /^\s*([+-])\s*$/) {
+        $sign = $1;
+        shift;
+    } else {
+        $sign = '+';
+    }
+
+    my $num = $sign eq "-" ? -1 : 1;
+    return $x -> new($num) unless ref $x;       # $class->bone();
     $$x = $num;
     $x;
 }
@@ -508,56 +702,76 @@ sub bzero {
     # return a one
     my $x = shift;
 
-    return $x->new(0) unless ref $x; # Class->bone();
+    return $x->new(0) unless ref $x;            # $class->bone();
     $$x = 0;
     $x;
 }
 
 sub bcmp {
-    # compare two objects
-    my ($x, $y) = @_;
+    # compare the value of two objects
+    my ($class, $x, $y, @r) = ref($_[0]) && ref($_[0]) eq ref($_[1])
+                            ? (ref($_[0]), @_)
+                            : objectify(2, @_);
 
-    $x = $class->new($x) unless ref $x;
-    $y = $class->new($y) unless ref $y;
+    return $upgrade->bcmp($x, $y)
+      if defined($upgrade) && (!$x->isa($class) || !$y->isa($class));
 
-    return $$x <=> $$y if $x->isa($class) && $y->isa($class);
-    my $x1 = $x;
-    my $y1 = $y;
-    $x1 = $upgrade->new($$x) if $x->isa($class);
-    $y1 = $upgrade->new($$y) if $y->isa($class);
-    $x1->bcmp($y1);             # one of them other class
+    $$x <=> $$y;
 }
 
 sub bacmp {
-    # compare two objects
-    my ($x, $y) = @_;
+    # compare the absolute value of two objects
+    my ($class, $x, $y, @r) = ref($_[0]) && ref($_[0]) eq ref($_[1])
+                            ? (ref($_[0]), @_)
+                            : objectify(2, @_);
 
-    #  print "bacmp $x $y\n";
-    $x = $class->new($x) unless ref $x;
-    $y = $class->new($y) unless ref $y;
-    return (abs($$x) <=> abs($$y))
-      if $x->isa($class) && $y->isa($class);
-    my $x1 = $x;
-    my $y1 = $y;
-    $x1 = $upgrade->new($$x) if $x->isa($class);
-    $y1 = $upgrade->new($$y) if $y->isa($class);
-    $x1->bacmp($y1);            # one of them other class
+    return $upgrade->bacmp($x, $y)
+      if defined($upgrade) && (!$x->isa($class) || !$y->isa($class));
+
+    abs($$x) <=> abs($$y);
 }
 
 ##############################################################################
 # copy/conversion
 
 sub copy {
-    my $x = shift;
-    return $class->new($x) if !ref $x;
+    my ($x, $class);
+    if (ref($_[0])) {           # $y = $x -> copy()
+        $x = shift;
+        $class = ref($x);
+    } else {                    # $y = $class -> copy($y)
+        $class = shift;
+        $x = shift;
+    }
 
-    my $a = $$x;
-    my $t = \$a;
-    bless $t, $class;
+    my $val = $$x;
+    bless \$val, $class;
+}
+
+sub as_int {
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
+
+    return $x -> copy() if $x -> isa("Math::BigInt");
+
+    # disable upgrading and downgrading
+
+    my $upg = Math::BigInt -> upgrade();
+    my $dng = Math::BigInt -> downgrade();
+    Math::BigInt -> upgrade(undef);
+    Math::BigInt -> downgrade(undef);
+
+    my $y = Math::BigInt -> new($x -> bsstr());
+
+    # reset upgrading and downgrading
+
+    Math::BigInt -> upgrade($upg);
+    Math::BigInt -> downgrade($dng);
+
+    return $y;
 }
 
 sub as_number {
-    my ($x) = shift;
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     return $upgrade->new($x) unless ref($x);
     # as_number needs to return a BigInt
@@ -566,32 +780,28 @@ sub as_number {
 }
 
 sub numify {
-    my ($self, $x) = ref($_[0]) ? (ref($_[0]), $_[0])
-                                : ($class, $class->new(@_));
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     return $$x if $x->isa($class);
     $x->numify();
 }
 
 sub as_hex {
-    my ($self, $x) = ref($_[0]) ? (ref($_[0]), $_[0])
-                                : ($class, $class->new(@_));
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     return $upgrade->new($$x)->as_hex() if $x->isa($class);
     $x->as_hex();
 }
 
 sub as_oct {
-    my ($self, $x) = ref($_[0]) ? (ref($_[0]), $_[0])
-                                : ($class, $class->new(@_));
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     return $upgrade->new($$x)->as_oct() if $x->isa($class);
     $x->as_hex();
 }
 
 sub as_bin {
-    my ($self, $x) = ref($_[0]) ? (ref($_[0]), $_[0])
-                                : ($class, $class->new(@_));
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
     return $upgrade->new($$x)->as_bin() if $x->isa($class);
     $x->as_bin();
@@ -743,9 +953,9 @@ sub from_bin {
 
 sub binc {
     # increment by one
-    my ($up, $x, $y, $a, $p, $r) = _upgrade_1(@_);
+    my ($up, $x, $y, @r) = _upgrade_1(@_);
 
-    return $x->binc($a, $p, $r) if $up;
+    return $x->binc(@r) if $up;
     $$x++;
     return $upgrade->new($$x) if abs($$x) > $MAX_ADD;
     $x;
@@ -753,9 +963,9 @@ sub binc {
 
 sub bdec {
     # decrement by one
-    my ($up, $x, $y, $a, $p, $r) = _upgrade_1(@_);
+    my ($up, $x, $y, @r) = _upgrade_1(@_);
 
-    return $x->bdec($a, $p, $r) if $up;
+    return $x->bdec(@r) if $up;
     $$x--;
     return $upgrade->new($$x) if abs($$x) > $MAX_ADD;
     $x;
@@ -816,13 +1026,13 @@ sub blsft {
 
 sub band {
     # AND two objects
-    my ($x, $y, $a, $p, $r) = @_;   #objectify(2, @_);
+    my ($x, $y, @r) = @_;   #objectify(2, @_);
 
     $x = $class->new($x) unless ref($x);
     $y = $class->new($x) unless ref($y);
 
-    return $x->band($y, $a, $p, $r) unless $x->isa($class);
-    return $upgrade->band($x, $y, $a, $p, $r) unless $y->isa($class);
+    return $x->band($y, @r) unless $x->isa($class);
+    return $upgrade->band($x, $y, @r) unless $y->isa($class);
     use integer;
     $$x = ($$x+0) & ($$y+0);    # +0 to avoid string-context
     $x;
@@ -830,13 +1040,13 @@ sub band {
 
 sub bxor {
     # XOR two objects
-    my ($x, $y, $a, $p, $r) = @_;   #objectify(2, @_);
+    my ($x, $y, @r) = @_;   #objectify(2, @_);
 
     $x = $class->new($x) unless ref($x);
     $y = $class->new($x) unless ref($y);
 
-    return $x->bxor($y, $a, $p, $r) unless $x->isa($class);
-    return $upgrade->bxor($x, $y, $a, $p, $r) unless $y->isa($class);
+    return $x->bxor($y, @r) unless $x->isa($class);
+    return $upgrade->bxor($x, $y, @r) unless $y->isa($class);
     use integer;
     $$x = ($$x+0) ^ ($$y+0);    # +0 to avoid string-context
     $x;
@@ -844,13 +1054,13 @@ sub bxor {
 
 sub bior {
     # OR two objects
-    my ($x, $y, $a, $p, $r) = @_;   #objectify(2, @_);
+    my ($x, $y, @r) = @_;   #objectify(2, @_);
 
     $x = $class->new($x) unless ref($x);
     $y = $class->new($x) unless ref($y);
 
-    return $x->bior($y, $a, $p, $r) unless $x->isa($class);
-    return $upgrade->bior($x, $y, $a, $p, $r) unless $y->isa($class);
+    return $x->bior($y, @r) unless $x->isa($class);
+    return $upgrade->bior($x, $y, @r) unless $y->isa($class);
     use integer;
     $$x = ($$x+0) | ($$y+0);    # +0 to avoid string-context
     $x;
@@ -861,9 +1071,9 @@ sub bior {
 
 sub badd {
     # add two objects
-    my ($up, $x, $y, $a, $p, $r) = _upgrade_2(@_);
+    my ($up, $x, $y, @r) = _upgrade_2(@_);
 
-    return $x->badd($y, $a, $p, $r) if $up;
+    return $x->badd($y, @r) if $up;
 
     $$x = $$x + $$y;
     return $upgrade->new($$x) if abs($$x) > $MAX_ADD;
@@ -872,8 +1082,8 @@ sub badd {
 
 sub bsub {
     # subtract two objects
-    my ($up, $x, $y, $a, $p, $r) = _upgrade_2(@_);
-    return $x->bsub($y, $a, $p, $r) if $up;
+    my ($up, $x, $y, @r) = _upgrade_2(@_);
+    return $x->bsub($y, @r) if $up;
     $$x = $$x - $$y;
     return $upgrade->new($$x) if abs($$x) > $MAX_ADD;
     $x;
@@ -881,8 +1091,8 @@ sub bsub {
 
 sub bmul {
     # multiply two objects
-    my ($up, $x, $y, $a, $p, $r) = _upgrade_2_mul(@_);
-    return $x->bmul($y, $a, $p, $r) if $up;
+    my ($up, $x, $y, @r) = _upgrade_2_mul(@_);
+    return $x->bmul($y, @r) if $up;
     $$x = $$x * $$y;
     $$x = 0 if $$x eq '-0';  # for some Perls leave '-0' here
     #return $upgrade->new($$x) if abs($$x) > $MAX_ADD;
@@ -891,23 +1101,23 @@ sub bmul {
 
 sub bmod {
     # remainder of div
-    my ($up, $x, $y, $a, $p, $r) = _upgrade_2(@_);
-    return $x->bmod($y, $a, $p, $r) if $up;
-    return $upgrade->new($$x)->bmod($y, $a, $p, $r) if $$y == 0;
+    my ($up, $x, $y, @r) = _upgrade_2(@_);
+    return $x->bmod($y, @r) if $up;
+    return $upgrade->new($$x)->bmod($y, @r) if $$y == 0;
     $$x = $$x % $$y;
     $x;
 }
 
 sub bdiv {
     # divide two objects
-    my ($up, $x, $y, $a, $p, $r) = _upgrade_2(@_);
+    my ($up, $x, $y, @r) = _upgrade_2(@_);
 
-    return $x->bdiv($y, $a, $p, $r) if $up;
+    return $x->bdiv($y, @r) if $up;
 
-    return $upgrade->new($$x)->bdiv($$y, $a, $p, $r) if $$y == 0;
+    return $upgrade->new($$x)->bdiv($$y, @r) if $$y == 0;
 
     # need to give Math::BigInt a chance to upgrade further
-    return $upgrade->new($$x)->bdiv($$y, $a, $p, $r)
+    return $upgrade->new($$x)->bdiv($$y, @r)
       if defined $Math::BigInt::upgrade;
 
     my ($quo, $rem);
@@ -928,14 +1138,14 @@ sub bdiv {
 
 sub btdiv {
     # divide two objects
-    my ($up, $x, $y, $a, $p, $r) = _upgrade_2(@_);
+    my ($up, $x, $y, @r) = _upgrade_2(@_);
 
-    return $x->btdiv($y, $a, $p, $r) if $up;
+    return $x->btdiv($y, @r) if $up;
 
-    return $upgrade->new($$x)->btdiv($$y, $a, $p, $r) if $$y == 0;
+    return $upgrade->new($$x)->btdiv($$y, @r) if $$y == 0;
 
     # need to give Math::BigInt a chance to upgrade further
-    return $upgrade->new($$x)->btdiv($$y, $a, $p, $r)
+    return $upgrade->new($$x)->btdiv($$y, @r)
       if defined $Math::BigInt::upgrade;
 
     my ($quo, $rem);
@@ -1033,35 +1243,186 @@ sub is_even {
 ##############################################################################
 # parts() and friends
 
-sub parts {
-    my ($self, $x) = ref($_[0]) ? (ref($_[0]), $_[0]) :
-      ($class, $class->new($_[0]));
-
-    $x = $upgrade->new("$x") if $x->isa($class);
-    return $x->parts();
-}
-
 sub sign {
-    my ($self, $x) = ref($_[0]) ? (ref($_[0]), $_[0]) :
-      ($class, $class->new($_[0]));
+    my ($class, $x) = ref($_[0]) ? (ref($_[0]), $_[0]) : objectify(1, @_);
 
     $$x >= 0 ? '+' : '-';
 }
 
-sub exponent {
-    my ($self, $x) = ref($_[0]) ? (ref($_[0]), $_[0]) :
-      ($class, $class->new($_[0]));
+sub parts {
+    my ($class, $x) = ref($_[0]) ? (ref($_[0]), $_[0]) : objectify(1, @_);
 
-    return $upgrade->new($$x)->exponent() if $x->isa($class);
-    $x->exponent();
+    return $upgrade -> exponent($x)
+      if defined($upgrade) && !$x -> isa($class);
+
+    if ($$x =~ / ^
+                 (
+                     [+-]?
+                     (?: 0 | [1-9] (?: \d* [1-9] )? )
+                 )
+                 ( 0* )
+                 $
+               /x)
+    {
+        my $mant = $1;
+        my $expo = CORE::length($2);
+        return $class -> new($mant), $class -> new($expo);
+    }
+
+    die "Internal error: ", (caller(0))[3], "() couldn't handle",
+      " the value '", $$x, "', which is likely a bug";
+}
+
+sub exponent {
+    my ($class, $x) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
+
+    return $upgrade -> exponent($x)
+      if defined($upgrade) && !$x -> isa($class);
+
+    my $expo;
+    if ($$x =~ / (?: ^ 0 | [1-9] ) ( 0* ) $/x) {
+        $expo = CORE::length($1);
+        return $class -> new($expo);
+    }
+
+    die "Internal error: ", (caller(0))[3], "() couldn't handle",
+      " the value '", $$x, "', which is likely a bug";
 }
 
 sub mantissa {
-    my ($self, $x) = ref($_[0]) ? (ref($_[0]), $_[0]) :
-      ($class, $class->new($_[0]));
+    my ($class, $x) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
-    return $upgrade->new($$x)->mantissa() if $x->isa($class);
-    $x->mantissa();
+    return $upgrade -> exponent($x)
+      if defined($upgrade) && !$x -> isa($class);
+
+    if ($$x =~ / ^
+                 (
+                     [+-]?
+                     (?: 0 | [1-9] (?: \d* [1-9] )? )
+                 )
+               /x)
+    {
+        return $class -> new($1);
+    }
+
+    die "Internal error: ", (caller(0))[3], "() couldn't handle",
+      " the value '", $$x, "', which is likely a bug";
+}
+
+sub sparts {
+    my ($class, $x) = ref($_[0]) ? (ref($_[0]), $_[0]) : objectify(1, @_);
+
+    return $upgrade -> exponent($x)
+      if defined($upgrade) && !$x -> isa($class);
+
+    if ($$x =~ / ^
+                 (
+                     [+-]?
+                     (?: 0 | [1-9] (?: \d* [1-9] )? )
+                 )
+                 ( 0* )
+                 $
+               /x)
+    {
+        my $mant = $1;
+        my $expo = CORE::length($2);
+        return $class -> new($mant) unless wantarray;
+        return $class -> new($mant), $class -> new($expo);
+    }
+
+    die "Internal error: ", (caller(0))[3], "() couldn't handle",
+      " the value '", $$x, "', which is likely a bug";
+}
+
+sub nparts {
+    my ($class, $x) = ref($_[0]) ? (ref($_[0]), $_[0]) : objectify(1, @_);
+
+    return $upgrade -> exponent($x)
+      if defined($upgrade) && !$x -> isa($class);
+
+    my ($mant, $expo);
+    if ($$x =~ / ^
+                 ( [+-]? \d )
+                 ( 0* )
+                 $
+               /x)
+    {
+        $mant = $class -> new($1);
+        $expo = $class -> new(CORE::length($2));
+    } elsif ($$x =~
+             / ^
+               ( [+-]? [1-9] )
+               ( \d+ )
+               $
+             /x)
+    {
+        $mant = $upgrade -> new($1 . "." . $2);
+        $expo = $class -> new(CORE::length($2));
+    } else {
+        die "Internal error: ", (caller(0))[3], "() couldn't handle",
+          " the value '", $$x, "', which is likely a bug";
+    }
+
+    return $mant unless wantarray;
+    return $mant, $expo;
+}
+
+sub eparts {
+    my ($class, $x) = ref($_[0]) ? (ref($_[0]), $_[0]) : objectify(1, @_);
+
+    return $upgrade -> exponent($x)
+      if defined($upgrade) && !$x -> isa($class);
+
+    # Finite number.
+
+    my ($mant, $expo) = $x -> sparts();
+
+    if ($mant -> bcmp(0)) {
+        my $ndigmant  = $mant -> length();
+        $expo = $expo -> badd($ndigmant);
+
+        # $c is the number of digits that will be in the integer part of the
+        # final mantissa.
+
+        my $c = $expo -> copy() -> bdec() -> bmod(3) -> binc();
+        $expo = $expo -> bsub($c);
+
+        if ($ndigmant > $c) {
+            return $upgrade -> eparts($x) if defined $upgrade;
+            $mant = $mant -> bnan();
+            return $mant unless wantarray;
+            return ($mant, $expo);
+        }
+
+        $mant = $mant -> blsft($c - $ndigmant, 10);
+    }
+
+    return $mant unless wantarray;
+    return ($mant, $expo);
+}
+
+sub dparts {
+    my ($class, $x) = ref($_[0]) ? (ref($_[0]), $_[0]) : objectify(1, @_);
+
+    return $upgrade -> exponent($x)
+      if defined($upgrade) && !$x -> isa($class);
+
+    my $int = $x -> copy();
+    my $frc = $class -> bzero();
+    return $int unless wantarray;
+    return $int, $frc;
+}
+
+sub fparts {
+    my ($class, $x) = ref($_[0]) ? (ref($_[0]), $_[0]) : objectify(1, @_);
+
+    return $upgrade -> exponent($x)
+      if defined($upgrade) && !$x -> isa($class);
+
+    my $num = $x -> copy();
+    my $den = $class -> bone();
+    return $num unless wantarray;
+    return $num, $den;
 }
 
 sub digit {
@@ -1127,19 +1488,19 @@ sub bfloor {
 }
 
 sub bfac {
-    my ($self, $x, $a, $p, $r) = ref($_[0]) ? (ref($_[0]), @_) :
+    my ($self, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) :
       ($class, $class->new($_[0]), $_[1], $_[2], $_[3], $_[4]);
 
     $x = $upgrade->new($$x) if $x->isa($class);
-    $upgrade->bfac($x, $a, $p, $r);
+    $upgrade->bfac($x, @r);
 }
 
 sub bdfac {
-    my ($self, $x, $a, $p, $r) = ref($_[0]) ? (ref($_[0]), @_) :
+    my ($self, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) :
       ($class, $class->new($_[0]), $_[1], $_[2], $_[3], $_[4]);
 
     $x = $upgrade->new($$x) if $x->isa($class);
-    $upgrade->bdfac($x, $a, $p, $r);
+    $upgrade->bdfac($x, @r);
 }
 
 sub bpow {
@@ -1387,11 +1748,6 @@ you can roll it all into one line:
     use Math::BigInt::Lite lib => 'GMP';
 
 Use the lib, Luke!
-
-=head2 Using Lite as substitute for Math::BigInt
-
-The pragmas L<bigrat>, L<bignum> and L<bigint> will automatically use
-Math::BigInt::Lite whenever possible.
 
 =head1 METHODS
 

@@ -18,7 +18,7 @@ use URI;
 
 use parent qw{Class::Accessor::Fast};
 
-our $VERSION = '0.52'; ## no critic
+our $VERSION = '0.53'; ## no critic
 
 __PACKAGE__->mk_accessors(qw{bucket creation_date account buffer_size});
 

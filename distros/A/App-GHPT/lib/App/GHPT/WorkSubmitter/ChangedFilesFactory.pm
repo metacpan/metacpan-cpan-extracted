@@ -2,9 +2,9 @@ package App::GHPT::WorkSubmitter::ChangedFilesFactory;
 
 use App::GHPT::Wrapper::OurMoose;
 
-our $VERSION = '1.001000';
+our $VERSION = '2.000000';
 
-use IPC::Run3 qw( run3 );
+use IPC::Run3        qw( run3 );
 use App::GHPT::Types qw( ArrayRef HashRef Str );
 use App::GHPT::WorkSubmitter::ChangedFiles;
 
@@ -170,7 +170,7 @@ App::GHPT::WorkSubmitter::ChangedFilesFactory - Work out what files have changed
 
 =head1 VERSION
 
-version 1.001000
+version 2.000000
 
 =head1 SYNOPSIS
 
@@ -185,7 +185,7 @@ Used by L<App::GHPT::WorkSubmitter::AskPullRequestQuestions>.
 =for test_synopsis use v5.20;
 
   my $factory = App::GHPT::WorkSubmitter::ChangedFilesFactory->new(
-      merge_to_branch_name => 'master',
+      merge_to_branch_name => 'main',
   );
 
   my $changed_files = $factory->changed_files;
@@ -213,7 +213,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by MaxMind, Inc.
+This software is Copyright (c) 2022 by MaxMind, Inc.
 
 This is free software, licensed under:
 

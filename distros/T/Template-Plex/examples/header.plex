@@ -1,4 +1,4 @@
-Header sub tempalte:
+Header sub template:
 @{[ do { 
 	my $var =1;
 	$package=__PACKAGE__;

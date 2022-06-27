@@ -1,0 +1,65 @@
+Mite
+====
+
+Creator:      Michael G Schwern (MSCHWERN)
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+v0.0.8    2022-06-24
+
+  - Implement trigger for has
+  - Implement BUILD
+  - Implement BUILDARGS
+  - Child classes no longer re-implement accessors for attributes defined
+    in parent classes, unless they have altered the attribute in some way
+  - Mite::Shim now copes better with "+" prefix on attribute names.
+  - has \@names is now supported, like Moose and Moo
+
+v0.0.7    2022-06-23
+
+  - Avoid Mite::Shim and Type::Tiny from appearing in compiled modules
+    so they don't confuse the CPAN indexer.
+
+v0.0.6    2022-06-23
+
+  - Support Types::Common::Numeric types
+  - Support Types::Common::String types
+  - Implement coerce => 1 for has
+  - Implement weak_ref => 1 for has
+  - Clearers, setters and accessors used as setters are now chainable
+  - Add "perltidy" option in ".mite/config"
+  - Output accessor code in a stable order instead of hash order
+  - Allow type => $blessed_type for has. Using it will void your warranty.
+
+v0.0.5    2022-06-22
+
+  - Bugfix inlining type constraints
+  - Hide Mite::Shim embedded in Mite projects from CPAN indexer
+
+v0.0.4    2022-06-22
+
+  - Implement builder option for has
+  - Implement lazy option for has
+  - Implement isa option for has
+  - Implement is => 'lazy' like Moo
+
+v0.0.3    2022-06-21
+
+  - Bugfixes
+  - Implement reader option for has
+  - Implement writer option for has
+  - Implement accessor option for has
+  - Implement predicates
+  - Implement clearers
+  - Implement is => 'rwp' like Moo
+
+v0.0.2    2022-06-21
+
+  - New maintainer
+  - Port from Mouse to Moo
+  - Implement strict constructors
+  - Implement init_arg for attributes
+  - Implement required attributes
+
+v0.0.1    2014-07-19
+
+  - Initial release

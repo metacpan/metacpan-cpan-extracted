@@ -8,7 +8,7 @@ namespace xs { namespace exp {
 using panda::string;
 using panda::string_view;
 
-static PERL_THREAD_LOCAL struct {
+static PERL_ITHREADS_LOCAL struct {
     Hash  clists;
     Stash self_stash = Stash("Export::XS", GV_ADD);
 } tls;

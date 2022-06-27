@@ -13,6 +13,7 @@ lib/Module/Generic/Exception.pm
 lib/Module/Generic/Exception.pod
 lib/Module/Generic/File.pm
 lib/Module/Generic/File/Cache.pm
+lib/Module/Generic/File/IO.pm
 lib/Module/Generic/Finfo.pm
 lib/Module/Generic/Hash.pm
 lib/Module/Generic/Hash.pod
@@ -27,6 +28,7 @@ lib/Module/Generic/Number.pod
 lib/Module/Generic/RegexpCapture.pod
 lib/Module/Generic/Scalar.pm
 lib/Module/Generic/Scalar.pod
+lib/Module/Generic/Scalar/IO.pm
 lib/Module/Generic/Scalar/IO.pod
 lib/Module/Generic/SemStat.pod
 lib/Module/Generic/SharedMem.pm
@@ -56,6 +58,7 @@ t/12.sharedmem.t
 t/13.header_value.t
 t/14.core.t
 t/15.cache.t
+t/16.file_io.t
 t/90.coverage.t
 t/91.signature.t
 t/99.kwalitee.t

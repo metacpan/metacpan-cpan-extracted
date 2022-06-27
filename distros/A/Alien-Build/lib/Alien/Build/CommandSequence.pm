@@ -7,7 +7,7 @@ use Text::ParseWords qw( shellwords );
 use Capture::Tiny qw( capture );
 
 # ABSTRACT: Alien::Build command sequence
-our $VERSION = '2.48'; # VERSION
+our $VERSION = '2.50'; # VERSION
 
 
 sub new
@@ -202,7 +202,7 @@ Alien::Build::CommandSequence - Alien::Build command sequence
 
 =head1 VERSION
 
-version 2.48
+version 2.50
 
 =head1 CONSTRUCTOR
 
@@ -284,7 +284,7 @@ nick nauwelaerts (INPHOBIA)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011-2020 by Graham Ollis.
+This software is copyright (c) 2011-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -83,7 +83,7 @@ sub _options {
             { name => '_e_write_access',  text => "- Write access",  section => 'enable' },
         ],
         group_sql => [
-            { name => '_meta',                   text => "- Metadata",         section => 'G'      },
+            { name => '_meta',                   text => "- System DB/Tables", section => 'G'      },
             { name => 'operators',               text => "- Operators",        section => 'G'      },
             { name => '_alias',                  text => "- Alias",            section => 'alias'  },
             { name => '_sql_identifiers',        text => "- Identifiers",      section => 'G'      },
@@ -121,9 +121,6 @@ sub _options {
             { name => 'export_dir',           text => "- Destination folder",  section => 'export' },
             { name => '_exported_files',      text => "- Auto-File-Extension", section => 'export' },
             { name => '_export_csv_settings', text => "- Encoding to CSV",     section => 'export' },
-        ],
-        group_function => [ # available only in the Function-menu
-            { name => '_round_precision_sign', text => "- Function round", section => 'G' },
         ],
     };
     return $groups->{$group};
@@ -444,9 +441,9 @@ sub set_options {
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq '_meta' ) {
-                my $prompt = 'DB/schemas/tables ';
+                my $prompt = 'System data ';
                 my $sub_menu = [
-                    [ 'metadata', "- Add metadata", [ $no, $yes ] ]
+                    [ 'metadata', "- Show system DB/Schemas/Tables", [ $no, $yes ] ]
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }

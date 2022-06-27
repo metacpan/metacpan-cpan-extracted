@@ -25,31 +25,31 @@ for my $class ('Math::BigInt', 'Math::BigInt::Subclass') {
 
     my $int_percent1 = My::Percent::Int1 -> new(100);
     is($int * $int_percent1, 10,
-       qq|\$class -> new(10);|
+       qq|$class -> new(10);|
        . q| $int_percent1 = My::Percent::Int1 -> new(100);|
        . q| $int * $int_percent1|);
 
     my $int_percent2 = My::Percent::Int2 -> new(100);
     is($int * $int_percent2, 10,
-       qq|\$class -> new(10);|
+       qq|$class -> new(10);|
        . q| $int_percent2 = My::Percent::Int2 -> new(100);|
        . q| $int * $int_percent2|);
 
     my $int_percent3 = My::Percent::Int3 -> new(100);
     is($int * $int_percent3, 10,
-       qq|\$class -> new(10);|
+       qq|$class -> new(10);|
        . q| $int_percent3 = My::Percent::Int3 -> new(100);|
        . q| $int * $int_percent3|);
 
     my $int_percent4 = My::Percent::Int4 -> new(100);
     is($int * $int_percent4, 10,
-       qq|\$class -> new(10);|
+       qq|$class -> new(10);|
        . q| $int_percent4 = My::Percent::Int4 -> new(100);|
        . q| $int * $int_percent4|);
 
     my $int_percent5 = My::Percent::Int5 -> new(100);
     is($int * $int_percent5, 10,
-       qq|\$class -> new(10);|
+       qq|$class -> new(10);|
        . q| $int_percent5 = My::Percent::Int5 -> new(100);|
        . q| $int * $int_percent5|);
 }

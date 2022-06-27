@@ -11,7 +11,7 @@ tests "bad is" => sub {
             name        => 'foo',
             is          => 'blah'
         );
-    } qr/^I do not understand this option \(is => blah\) on attribute \(foo\) at \Q$0\E/;
+    } qr/"blah"/;
 };
 
 done_testing;

@@ -3,36 +3,28 @@
 use strict;
 use warnings;
 
-use Unicode::UTF8 qw(decode_utf8 encode_utf8);
-use Wikibase::Datatype::Sitelink;
-use Wikibase::Datatype::Value::Item;
+use Wikibase::Datatype::Reference;
+use Wikibase::Datatype::Snak;
+use Wikibase::Datatype::Value::String;
 
 # Object.
-my $obj = Wikibase::Datatype::Sitelink->new(
-        'badges' => [
-                 Wikibase::Datatype::Value::Item->new(
-                         'value' => 'Q123',
-                 ),
+my $obj = Wikibase::Datatype::Reference->new(
+        'snaks' => [
+                Wikibase::Datatype::Snak->new(
+                        'datatype' => 'string',
+                        'datavalue' => Wikibase::Datatype::Value::String->new(
+                                'value' => 'text',
+                        ),
+                        'property' => 'P11',
+                ),
         ],
-        'site' => 'cswiki',
-        'title' => decode_utf8('Hlavní strana'),
 );
 
-# Get badges.
-my $badges_ar = [map { $_->value } @{$obj->badges}];
+# Get value.
+my $snaks_ar = $obj->snaks;
 
-# Get site.
-my $site = $obj->site;
-
-# Get title.
-my $title = $obj->title;
-
-# Print out.
-print 'Badges: '.(join ', ', @{$badges_ar})."\n";
-print "Site: $site\n";
-print 'Title: '.encode_utf8($title)."\n";
+# Print out number of snaks.
+print "Number of snaks: ".@{$snaks_ar}."\n";
 
 # Output:
-# Badges: Q123
-# Site: cswiki
-# Title: Hlavní strana
+# Number of snaks: 1

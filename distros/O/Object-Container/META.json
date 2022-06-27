@@ -1,0 +1,68 @@
+{
+   "abstract" : "simple object container",
+   "author" : [
+      "Daisuke Murase <typester@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Object-Container",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "share"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build::Pluggable::CPANfile" : "0.05"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42",
+            "Module::Build::Pluggable" : "0",
+            "Module::Build::Pluggable::CPANfile" : "0.05"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor::Fast" : "0",
+            "Exporter::AutoClean" : "0",
+            "parent" : "0",
+            "perl" : "5.008005",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Test::Base" : "0",
+            "Test::More" : "0.88",
+            "Test::Requires" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/typester/object-container-perl/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/typester/object-container-perl/"
+      }
+   },
+   "version" : "0.15",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

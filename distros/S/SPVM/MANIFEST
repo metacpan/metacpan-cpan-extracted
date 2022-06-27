@@ -242,6 +242,8 @@ lib/SPVM/LongList.pm
 lib/SPVM/LongList.spvm
 lib/SPVM/Point.pm
 lib/SPVM/Point.spvm
+lib/SPVM/Point3D.pm
+lib/SPVM/Point3D.spvm
 lib/SPVM/Short.pm
 lib/SPVM/ShortList.pm
 lib/SPVM/ShortList.spvm
@@ -297,6 +299,7 @@ solo/SPVM/TestCase/Inline.spvm
 solo/SPVM/TestCase/List.spvm
 solo/SPVM/TestCase/Minimal.spvm
 solo/SPVM/TestCase/Minimal/XGetter.spvm
+solo/SPVM/TestCase/MinimalExtend.spvm
 solo/SPVM/TestCase/OnlyField.spvm
 solo/SPVM/TestCase/Point_3b.spvm
 solo/SPVM/TestCase/Point_3d.spvm
@@ -316,8 +319,13 @@ t/builder_config_exe.t
 t/builder_link_info.pl
 t/builder_object_file_info.t
 t/compile_error.t
+t/compile_error_definition.t
 t/compile_error_dist.pl
+t/compile_error_literal.t
+t/compile_error_operator.t
 t/compile_error_perl_program.pl
+t/compile_error_statement.t
+t/compile_error_type.t
 t/copy_default_to_precompile.pl
 t/default/000_use_spvm.t
 t/default/001_use_empty_class.t
@@ -350,6 +358,7 @@ t/default/default_loaded_modules.t
 t/default/divide.t
 t/default/dump.t
 t/default/enum.t
+t/default/error_code.t
 t/default/examples.t
 t/default/exception.t
 t/default/exchange_api.t
@@ -519,6 +528,7 @@ t/default/lib/SPVM/TestCase/DumpTest1.spvm
 t/default/lib/SPVM/TestCase/Empty.spvm
 t/default/lib/SPVM/TestCase/Enum.spvm
 t/default/lib/SPVM/TestCase/Enum/Data1.spvm
+t/default/lib/SPVM/TestCase/ErrorCode.spvm
 t/default/lib/SPVM/TestCase/Examples.spvm
 t/default/lib/SPVM/TestCase/Exception.spvm
 t/default/lib/SPVM/TestCase/ExchangeAPI.spvm
@@ -541,9 +551,7 @@ t/default/lib/SPVM/TestCase/Lib/Double.spvm
 t/default/lib/SPVM/TestCase/Lib/DoubleList.spvm
 t/default/lib/SPVM/TestCase/Lib/Float.spvm
 t/default/lib/SPVM/TestCase/Lib/FloatList.spvm
-t/default/lib/SPVM/TestCase/Lib/Fn1.spvm
-t/default/lib/SPVM/TestCase/Lib/Fn2.spvm
-t/default/lib/SPVM/TestCase/Lib/Fn3.spvm
+t/default/lib/SPVM/TestCase/Lib/Fn.spvm
 t/default/lib/SPVM/TestCase/Lib/Format.spvm
 t/default/lib/SPVM/TestCase/Lib/Hash.spvm
 t/default/lib/SPVM/TestCase/Lib/Int.spvm
@@ -551,6 +559,8 @@ t/default/lib/SPVM/TestCase/Lib/IntList.spvm
 t/default/lib/SPVM/TestCase/Lib/List.spvm
 t/default/lib/SPVM/TestCase/Lib/Long.spvm
 t/default/lib/SPVM/TestCase/Lib/LongList.spvm
+t/default/lib/SPVM/TestCase/Lib/Point.spvm
+t/default/lib/SPVM/TestCase/Lib/Point3D.spvm
 t/default/lib/SPVM/TestCase/Lib/Short.spvm
 t/default/lib/SPVM/TestCase/Lib/ShortList.spvm
 t/default/lib/SPVM/TestCase/Lib/Sort.spvm
@@ -604,7 +614,6 @@ t/default/lib/SPVM/TestCase/NativeAPICpp.spvm
 t/default/lib/SPVM/TestCase/NumericOperator.spvm
 t/default/lib/SPVM/TestCase/Object.spvm
 t/default/lib/SPVM/TestCase/OnlyField.spvm
-t/default/lib/SPVM/TestCase/Point.spvm
 t/default/lib/SPVM/TestCase/Point_3b.spvm
 t/default/lib/SPVM/TestCase/Point_3d.spvm
 t/default/lib/SPVM/TestCase/Point_3f.spvm
@@ -705,6 +714,7 @@ t/default/SPVM_List.t
 t/default/SPVM_Long.t
 t/default/SPVM_LongList.t
 t/default/SPVM_Point.t
+t/default/SPVM_Point3D.t
 t/default/SPVM_Short.t
 t/default/SPVM_ShortList.t
 t/default/SPVM_Sort.t

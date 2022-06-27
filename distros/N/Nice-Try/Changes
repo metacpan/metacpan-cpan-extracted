@@ -1,6 +1,10 @@
 Revision history for Perl module Nice::Try.
 
-v1.2.0 2022-03-27T17:26:17+0900
+v1.3.0 2022-04-19T19:09:29Z +0900
+    - Now use PPI::XS to further speed up processing of perl code
+    - Better declaration of global variables
+
+v1.2.0 2022-03-27T17:26:17Z +0900
     - Corrected bug #4 and added method implement()
 
 v1.1.4 2022-03-10T11:22:42Z +0900

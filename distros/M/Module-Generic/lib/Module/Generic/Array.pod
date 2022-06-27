@@ -175,7 +175,7 @@ Module::Generic::Array - An Array Manipulation Object Class
 
 =head1 VERSION
 
-    v1.3.1
+    v1.4.0
 
 =head1 DESCRIPTION
 
@@ -400,6 +400,17 @@ This is just an intuitive alias for L</reset>
 =head2 error
 
 Returns the value of the global variable C<$ERROR>. However, since this package does not set any error, this does not need to be called, but exists nonetheless for conformity with other packages of this distribution.
+
+=head2 except
+
+Provided with an array reference or an array object, and thi will return a new array object containg all the items that are not in the current array object.
+
+For example:
+
+    my $a = Module::Generic::Array->new( [qw( Jack John Paul Peter )] );
+    my $other = Module::Generic::Array->new( [qw( Emmanuel Gabriel Paul Peter Raphael )] );
+    my $b = $a->except( $other );
+    # $b now contains: Jack John
 
 =head2 exists
 
@@ -1054,6 +1065,12 @@ This is different from L</length> that returns value from 1 and 0 if the array i
 =head2 sort
 
 Sort the array and return the new array as a list in list context or a new L<Module::Generic::Array> object in scalar context.
+
+If takes an anonymous subroutine or a code reference as an optional argument and if provided, it will be used to sort the data. See L<perlfunc/sort> for more information. This sub will be passed the two elements C<$a> and C<$b> and must return less than, equal to, or greater than 0.
+
+    my $new_object = $array->sort;
+    my @list = $array->sort;
+    my $new_object = $array->sort(sub{ $_[0] <=> $_[1] });
 
 =head2 splice
 

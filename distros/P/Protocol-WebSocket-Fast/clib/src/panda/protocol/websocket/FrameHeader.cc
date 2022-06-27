@@ -125,7 +125,8 @@ bool FrameHeader::parse_close_payload (const string& payload, uint16_t& code, st
         return false;
     }
     auto ptr = payload.data();
-    code = be2h16(*((uint16_t*)ptr));
+    memcpy(&code, ptr, sizeof(uint16_t));
+    code = be2h16(code);
     message = payload.substr(sizeof(code));
     // check for invalid close codes
     return !CloseCode::is_sending_forbidden(code);

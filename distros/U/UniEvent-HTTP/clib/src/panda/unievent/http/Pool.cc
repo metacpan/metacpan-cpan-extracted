@@ -1,4 +1,7 @@
 #include "Pool.h"
+#include "panda/error.h"
+#include "panda/unievent/http/Request.h"
+#include "panda/unievent/http/error.h"
 
 namespace panda { namespace unievent { namespace http {
 
@@ -16,6 +19,7 @@ Pool::~Pool () {
     // there might be some clients still active, remove event listener as we no longer care about of those clients
     for (auto& list : _clients) {
         for (auto& client : list.second.busy) client->_pool = nullptr;
+        for (auto& queued_req : list.second.queue) queued_req->finish_and_notify({}, make_error_code(std::errc::operation_canceled));
     }
 }
 
@@ -38,6 +42,7 @@ void Pool::idle_timeout (uint32_t val) {
 
 ClientSP Pool::request (const RequestSP& req) {
     req->check();
+    req->_pool = this;
     ClientSP client;
 
     auto netloc = req->netloc();
@@ -63,6 +68,7 @@ ClientSP Pool::request (const RequestSP& req) {
     // just enqueue the request
     else {
         it->second.queue.emplace_back(req);
+        if (req->timeout) req->ensure_timer_active(loop());
     }
 
     if (client) { client->request(req); }
@@ -70,6 +76,22 @@ ClientSP Pool::request (const RequestSP& req) {
     return client;
 }
 
+void Pool::cancel_request(const RequestSP& req, const ErrorCode& err) {
+    auto netloc = req->netloc();
+    auto it = _clients.find(netloc);
+    assert(it != _clients.end());
+    auto& q = it->second.queue;
+    bool found = false;
+    // TODO: O(1) search (for example via additional set<Request*> index)
+    for (auto it = q.cbegin(); it != q.cend(); ++it) {
+        if (*it != req) continue;
+        (*it)->finish_and_notify({}, err);
+        q.erase(it);
+        found = true;
+        break;
+    }
+    assert(found);
+}
 
 void Pool::putback (const ClientSP& client) {
     auto it = _clients.find(client->last_netloc());

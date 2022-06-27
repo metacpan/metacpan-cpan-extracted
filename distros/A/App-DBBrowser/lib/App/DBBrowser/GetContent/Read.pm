@@ -57,12 +57,13 @@ sub from_col_by_col {
     my $col_names;
     if ( $sf->{i}{stmt_types}[0] eq 'Create_table' ) {
         my $col_count;
+        my $info = 'CREATE TABLE';
 
         COL_COUNT: while ( 1 ) {
             # Choose a number
             $col_count = $tu->choose_a_number( 2,
-                { cs_label => 'Number of columns: ', small_first => 1, confirm => 'Confirm',
-                  default_number => $col_count, back => 'Back' }
+                { info => $info, cs_label => 'Number of columns: ', small_first => 1, confirm => 'Confirm',
+                  default_number => $col_count, back => 'Back', prompt => '' }
             );
             if ( ! $col_count ) {
                 return;
@@ -73,7 +74,7 @@ sub from_col_by_col {
             # Fill_form
             my $form = $tf->fill_form(
                 $fields,
-                { prompt => 'Column names:', auto_up => 2, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} . '   ' }
+                { info => $info, prompt => 'Column names:', auto_up => 2, confirm => $sf->{i}{_confirm}, back => $sf->{i}{_back} . '   ' }
             );
             if ( ! $form ) {
                 next COL_COUNT;
@@ -86,8 +87,42 @@ sub from_col_by_col {
     else {
         $col_names = $sql->{insert_into_cols};
     }
+    my $default = 2;
 
     ROWS: while ( 1 ) {
+        if ( @$aoa ) {
+            ASK: while ( 1 ) {
+                my $add = 'Add Data';
+                my @pre = ( undef, $sf->{i}{ok} );
+                my $menu = [ @pre, $add ];
+                my $info = $sf->__get_read_info( $aoa );
+                # Choose
+                my $add_row = $tc->choose(
+                    $menu,
+                    { %{$sf->{i}{lyt_h}}, info => $info, prompt => '', default => $default }
+                );
+                $ax->print_sql_info( $info );
+                if ( ! defined $add_row ) {
+                    if ( @$aoa ) {
+                        $default = 0;
+                        $#$aoa--;
+                        next ASK;
+                    }
+                    $aoa = []; ##
+                    return;
+                }
+                elsif ( $add_row eq $sf->{i}{ok} ) {
+                    if ( ! @$aoa ) {
+                        return;
+                    }
+                    my $file_fs = $sf->{i}{f_plain};
+                    require Text::CSV;
+                    Text::CSV::csv( in => $aoa, out => $file_fs ) or die Text::CSV->error_diag;
+                    return 1, $file_fs;
+                }
+                last ASK;
+            }
+        }
         my $info = $sf->__get_read_info( $aoa );
         my $fields = [ map { [ $_, ] } @$col_names ];
         # Fill_form
@@ -96,45 +131,12 @@ sub from_col_by_col {
             { info => $info, auto_up => 1, confirm => $sf->{i}{confirm}, back => $sf->{i}{back} . '   ' }
         );
         $ax->print_sql_info( $info );
-        my $default;
         if ( ! defined $row ) {
             $default = 0;
         }
         else {
             push @{$aoa}, [ map { $_->[1] } @$row ];
             $default = 2;
-        }
-
-        ASK: while ( 1 ) {
-            my $add = 'Add';
-            my @pre = ( undef, $sf->{i}{ok} );
-            my $menu = [ @pre, $add ];
-            my $info = $sf->__get_read_info( $aoa );
-            # Choose
-            my $add_row = $tc->choose(
-                $menu,
-                { %{$sf->{i}{lyt_h}}, info => $info, prompt => '', default => $default }
-            );
-            $ax->print_sql_info( $info );
-            if ( ! defined $add_row ) {
-                if ( @$aoa ) {
-                    $default = 0;
-                    $#$aoa--;
-                    next ASK;
-                }
-                $aoa = []; ##
-                return;
-            }
-            elsif ( $add_row eq $sf->{i}{ok} ) {
-                if ( ! @$aoa ) {
-                    return;
-                }
-                my $file_fs = $sf->{i}{f_plain};
-                require Text::CSV;
-                Text::CSV::csv( in => $aoa, out => $file_fs ) or die Text::CSV->error_diag;
-                return 1, $file_fs;
-            }
-            last ASK;
         }
     }
 }

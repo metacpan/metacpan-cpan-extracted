@@ -139,6 +139,7 @@ docs/assets/stylesheets/font-awesome/_rotated-flipped.scss
 docs/assets/stylesheets/font-awesome/_stacked.scss
 docs/assets/stylesheets/font-awesome/_variables.scss
 docs/assets/stylesheets/syntax.css
+docs/development/release.md
 docs/index.md
 docs/install/index.md
 docs/ja/index.md

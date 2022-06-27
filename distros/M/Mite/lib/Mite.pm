@@ -1,6 +1,6 @@
 package Mite;
 
-use version; our $VERSION = qv("v0.0.1");
+use version; our $VERSION = qv("v0.0.8");
 
 =head1 NAME
 
@@ -111,7 +111,17 @@ else, please read L<Moose> and L<Moose::Manual>.
 
 =head2 C<has>
 
-Supports C<is> and C<default>.
+Supports C<is>, C<reader>, C<writer>, C<accessor>, C<clearer>, C<predicate>,
+C<init_arg>, C<required>, C<weak_ref>, C<isa>, C<coerce>, C<trigger>,
+C<default>, C<builder>, and C<lazy>.
+
+C<isa> should be strings understood by C<dwim_type> from L<Type::Utils>,
+including all the type constraints from L<Types::Standard>,
+L<Types::Common::Numeric>, and L<Types::Common::String>. Other type
+constraints are not supported. (This does still allow some pretty complex
+types though, like C<< "ArrayRef[ Int | Math::BigInt ]" >>.)
+
+(No support yet for C<handles>.)
 
 =head2 C<extends>
 
@@ -125,6 +135,13 @@ Mite will turn strict on for you.
 
 Mite will turn warnings on for you.
 
+=head2 C<BUILDARGS>
+
+Works as in L<Moose>.
+
+=head2 B<BUILD>
+
+Works as in L<Moose>.
 
 =head1 OPTIMIZATIONS
 

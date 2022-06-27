@@ -1,0 +1,19 @@
+Revision history for Perl extension MooseX::LocalAttribute
+
+0.05      2022-06-27 10:36:12Z
+    - Fix typo in synopsis (#2)
+
+0.04      2022-06-26 14:34:00Z
+    - Support Object::Pad
+    - Documentation on modules that are not supported
+    - Tests for support of Mouse accidentally used Moo and would fail in a
+      situation where Mouse was installed, but Moo was not
+
+0.03      2022-06-24 16:48:05Z
+    - Support Util::H2O
+
+0.02      2022-06-23 13:31:06Z
+    - Fix POD and release stable version
+
+0.01      2022-06-23 11:34:37Z (TRIAL RELEASE)
+    - Initial release

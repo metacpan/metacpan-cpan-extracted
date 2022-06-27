@@ -1,6 +1,6 @@
 package App::optex::textconv::ooxml::regex;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use v5.14;
 use warnings;

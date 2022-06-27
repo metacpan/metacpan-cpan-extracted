@@ -1,16 +1,15 @@
 package Mite::Role::HasDefault;
-
-use feature ':5.10';
-use Mouse::Role;
-use Method::Signatures;
+use Mite::MyMoo -Role;
 
 # Get/set the default for a class
 my %Defaults;
-method default($class:) {
+sub default {
+    my $class = shift;
     return $Defaults{$class} ||= $class->new;
 }
 
-method set_default($class: $new_default) {
+sub set_default {
+    my ( $class, $new_default ) = ( shift, @_ );
     $Defaults{$class} = $new_default;
     return;
 }

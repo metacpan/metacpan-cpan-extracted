@@ -28,7 +28,7 @@ _tab__pod_get_modules_list(){
 }
 
 _tab__pod_get_command(){
-   perl -e '
+   perl -le '
         my $cnt   = 0;
         my $class = "";
 
@@ -45,7 +45,10 @@ _tab__pod_get_command(){
         }
 
         if($cnt == 1) {
-            print q(cat $MY_POD_CACHE);
+          print q(cat $MY_POD_CACHE);
+          print join " ", " echo",
+                map { -d ? "$_/" : $_  }
+                glob qq("$class*");
         }
         elsif($cnt == 2){
             print qq(pod $class --class_options --tool_options --no_error);
@@ -73,6 +76,7 @@ _tab__pod(){
        # Then count how many arguments remain.
        local command=$(_tab__pod_get_command "${COMP_WORDS[@]}")
        words=$(eval "$command")
+       compopt -o nospace                       # No space afterwards.
    fi
 
    COMPREPLY=( $(compgen -W "${words[@]}" -- "$cur") )

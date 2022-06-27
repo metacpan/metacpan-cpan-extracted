@@ -1,15 +1,17 @@
+use Test::More;
+
 use strict;
 use warnings;
 use FindBin;
 use lib "$FindBin::Bin/lib";
+BEGIN { $ENV{SPVM_BUILD_DIR} = "$FindBin::Bin/.spvm_build"; }
 
-use Test::More 'no_plan';
+use SPVM 'TestCase::Lib::Math';
 
 use POSIX();
 use Math::Complex;
 
 use Math::Trig 'pi';
-
 
 my $BYTE_MAX = 127;
 my $BYTE_MIN = -128;
@@ -28,8 +30,6 @@ my $POSITIVE_INFINITY = 9**9**9;
 my $NaN = 9**9**9 / 9**9**9;
 
 my $nan_re = qr/(nan|ind)/i;
-
-use SPVM 'TestCase::Lib::Math';
 
 
 
@@ -290,3 +290,4 @@ ok(SPVM::TestCase::Lib::Math->test_isunorderedf);
 my $end_memory_blocks_count = SPVM::get_memory_blocks_count();
 is($end_memory_blocks_count, $start_memory_blocks_count);
 
+done_testing;

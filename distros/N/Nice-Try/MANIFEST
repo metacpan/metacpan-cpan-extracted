@@ -4,7 +4,6 @@ lib/Nice/Try.pm
 LICENSE
 Makefile.PL
 MANIFEST
-pm_to_blib
 README
 README.md
 SIGNATURE			Public-key signature (added by MakeMaker)
@@ -29,6 +28,7 @@ t/018_context_aware.t
 t/019_caller.t
 t/020_threads.t
 t/021_forks.t
+t/022_do.t
 t/022_use_try_right_after.t
 t/900_pod.t
 t/910_signature.t

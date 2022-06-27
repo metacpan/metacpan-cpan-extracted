@@ -6,6 +6,33 @@ Home page:    <https://metacpan.org/release/Sub-MultiMethod>
 Bug tracker:  <https://github.com/tobyink/p5-sub-multimethod/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.908	2022-06-26
+
+ [ Documentation ]
+ - Update examples to no longer call deprecated methods.
+
+ [ Other ]
+ - Minor code tidy ups.
+
+0.907	2022-06-26
+
+ [ BACK COMPAT ]
+ - The `multimethods_from_roles` function is deprecated. Prior to
+   Sub::MultiMethods 0.900, this was a function you'd call in your class to
+   auto-copy any multimethods defined in roles into your class. In
+   Sub::MultiMethods 0.900 that functionality became automatic, and the
+   function to do it manually became a dummy do-nothing sub. It now issues
+   a warning and will be removed at a later date.
+
+ [ Other ]
+ - Added: Add `multifunction` and `monofunction` to the exports.
+
+0.906	2022-06-25
+
+ [ Bug Fixes ]
+ - Fix precedence issue which somehow only came up with Type::Tiny::XS
+   installed.
+
 0.905	2022-06-19
 
  - Avoid using a particular optimization if Type::Param's head or tail

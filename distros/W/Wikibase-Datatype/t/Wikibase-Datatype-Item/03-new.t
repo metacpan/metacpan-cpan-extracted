@@ -3,7 +3,7 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 13;
+use Test::More 'tests' => 14;
 use Test::NoWarnings;
 use Wikibase::Datatype::Item;
 use Wikibase::Datatype::Sitelink;
@@ -151,4 +151,14 @@ eval {
 };
 is($EVAL_ERROR, "Statement isn't 'Wikibase::Datatype::Statement' object.\n",
 	"Statement isn't 'Wikibase::Datatype::Statement' object.");
+clean();
+
+# Test.
+eval {
+	Wikibase::Datatype::Item->new(
+		'page_id' => 'bad',
+	);
+};
+is($EVAL_ERROR, "Parameter 'page_id' must be a number.\n",
+	"Parameter 'page_id' must be a number.");
 clean();

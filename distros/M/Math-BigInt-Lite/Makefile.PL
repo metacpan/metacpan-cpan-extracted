@@ -27,8 +27,9 @@ WriteMakefile
    # A hash of modules that are needed to run the module.
 
    'PREREQ_PM'          => {
-                            'Math::BigInt'        => 1.999821,
+                            'Math::BigInt'        => 1.999819,
                             'Carp'                => 0,
+                            'Scalar::Util'        => 0,
                            },
 
    # A hash of modules that are needed to test the module but not run or build
@@ -36,7 +37,7 @@ WriteMakefile
 
    'TEST_REQUIRES'      => {
                             'Test::More'          => 0.94,
-                            'Math::BigRat'        => 0.2616,
+                            'Math::BigRat'        => 0.14,
                            },
 
    'LICENSE'            => 'perl_5',

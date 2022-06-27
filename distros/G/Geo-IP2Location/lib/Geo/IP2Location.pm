@@ -1,6 +1,6 @@
 #MIT License
 #
-#Copyright (c) 2021 IP2Location.com
+#Copyright (c) 2022 IP2Location.com
 #
 #Permission is hereby granted, free of charge, to any person obtaining a copy
 #of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@ use vars qw(@ISA $VERSION @EXPORT);
 use Math::BigInt;
 use bigint;
 
-$VERSION = '8.51';
+$VERSION = '8.60';
 require Exporter;
 @ISA = qw(Exporter);
 
@@ -183,27 +183,28 @@ sub close {
 
 sub initialize {
 	my ($obj) = @_;
-	$obj->{"databasetype"} = $obj->read8($obj->{filehandle}, 1);
-	$obj->{"databasecolumn"} = $obj->read8($obj->{filehandle}, 2);
-	$obj->{"databaseyear"} = $obj->read8($obj->{filehandle}, 3);
-	$obj->{"databasemonth"} = $obj->read8($obj->{filehandle}, 4);
-	$obj->{"databaseday"} = $obj->read8($obj->{filehandle}, 5);
-	$obj->{"ipv4databasecount"} = $obj->read32($obj->{filehandle}, 6);
-	$obj->{"ipv4databaseaddr"} = $obj->read32($obj->{filehandle}, 10);
-	$obj->{"ipv6databasecount"} = $obj->read32($obj->{filehandle}, 14);
-	$obj->{"ipv6databaseaddr"} = $obj->read32($obj->{filehandle}, 18);
-	$obj->{"ipv4indexbaseaddr"} = $obj->read32($obj->{filehandle}, 22);
-	$obj->{"ipv6indexbaseaddr"} = $obj->read32($obj->{filehandle}, 26);
-	$obj->{"productcode"} = $obj->read8($obj->{filehandle}, 30);
-	$obj->{"licensecode"} = $obj->read8($obj->{filehandle}, 31);
-	$obj->{"databasesize"} = $obj->read32($obj->{filehandle}, 32);
+	my @header = $obj->read512($obj->{filehandle}, 1);
+	$obj->{"databasetype"} = unpack("C", $header[0]);
+	$obj->{"databasecolumn"} = unpack("C", $header[1]);
+	$obj->{"databaseyear"} = unpack("C", $header[2]);
+	$obj->{"databasemonth"} = unpack("C", $header[3]);
+	$obj->{"databaseday"} = unpack("C", $header[4]);
+	$obj->{"ipv4databasecount"} = unpack("V", join('', @header[5..8]));
+	$obj->{"ipv4databaseaddr"} = unpack("V", join('', @header[9..12]));
+	$obj->{"ipv6databasecount"} = unpack("V", join('', @header[13..16]));
+	$obj->{"ipv6databaseaddr"} = unpack("V", join('', @header[17..20]));
+	$obj->{"ipv4indexbaseaddr"} = unpack("V", join('', @header[21..24]));
+	$obj->{"ipv6indexbaseaddr"} = unpack("V", join('', @header[25..28]));
+	$obj->{"productcode"} = unpack("C", $header[29]);
+	$obj->{"licensecode"} = unpack("C", $header[30]);
+	$obj->{"databasesize"} = unpack("V", join('', @header[31..34]));
 	return $obj;
 }
 
-sub get_last_error_message	{  
+sub get_last_error_message	{
 	my $class = shift(@_);
-	return ($getLastErrorMessage);      
-}   
+	return ($getLastErrorMessage);
+}
 
 sub get_module_version {
 	my $obj = shift(@_);
@@ -664,8 +665,7 @@ sub get_ipv6_record {
 	my $low = 0;
 	my $high = $dbcount;
 	if ($indexbaseaddr > 0) {
-		$low = $obj->read32($handle, $indexaddr);
-		$high = $obj->read32($handle, $indexaddr + 4);
+		($low, $high) = $obj->read32x2($handle, $indexaddr);
 	}
 
 	my $mid = 0;
@@ -678,16 +678,14 @@ sub get_ipv6_record {
 		$ipno = $ipno->bsub(1);
 	}
 
+	my $raw_positions_row;
+	
 	while ($low <= $high) {
 		$mid = int(($low + $high)/2);
-		$ipfrom = $obj->read128($handle, $baseaddr + $mid * (($dbcolumn * 4) + 12));
-		$ipto = $obj->read128($handle, $baseaddr + ($mid + 1) * (($dbcolumn * 4) + 12));
+		($ipfrom, $ipto, $raw_positions_row) = $obj->readRow128($handle, $baseaddr + $mid * (($dbcolumn * 4) + 12), $dbcolumn);
+		
 		if (($ipno >= $ipfrom) && ($ipno < $ipto)) {
 			my $row_pointer = $baseaddr + $mid * (($dbcolumn * 4) + 12);
-			# read whole results string into temp string and parse results from memory
-			my $raw_positions_row;
-			seek($handle, $row_pointer - 1, 0);
-			read($handle, $raw_positions_row, $dbcolumn * 4 + 12);
 			
 			if ($mode == ALL) {
 				my $country_short = NOT_SUPPORTED;
@@ -960,8 +958,7 @@ sub get_ipv4_record {
 	my $low = 0;
 	my $high = $dbcount;
 	if ($indexbaseaddr > 0) {
-		$low = $obj->read32($handle, $indexaddr);
-		$high = $obj->read32($handle, $indexaddr + 4);
+		($low, $high) = $obj->read32x2($handle, $indexaddr);
 	}
 	my $mid = 0;
 	my $ipfrom = 0;
@@ -974,16 +971,14 @@ sub get_ipv4_record {
 		$ipno = $realipno;
 	}
 
+	my $raw_positions_row;
+
 	while ($low <= $high) {
 		$mid = int(($low + $high) >> 1);
-		$ipfrom = $obj->read32($handle, $baseaddr + $mid * $dbcolumn * 4);
-		$ipto = $obj->read32($handle, $baseaddr + ($mid + 1) * $dbcolumn * 4);
-		if (($ipno >= $ipfrom) && ($ipno < $ipto)) {
-			# read whole results string into temp string and parse results from memory
-			my $raw_positions_row;
-			seek($handle, ($baseaddr + $mid * $dbcolumn * 4) - 1, 0);
-			read($handle, $raw_positions_row, $dbcolumn * 4);
 
+		($ipfrom, $ipto, $raw_positions_row) = $obj->readRow32($handle, $baseaddr + $mid * $dbcolumn * 4, $dbcolumn);
+
+		if (($ipno >= $ipfrom) && ($ipno < $ipto)) {
 			if ($mode == ALL) {
 				my $country_short = NOT_SUPPORTED;
 				my $country_long = NOT_SUPPORTED;
@@ -1162,12 +1157,58 @@ sub get_ipv4_record {
 	}
 }
 
+sub readRow32 {
+	my ($obj, $handle, $position, $column) = @_;
+	my $data = "";
+	my $data_length = $column * 4 + 4;
+	seek($handle, $position-1, 0);
+	read($handle, $data, $data_length);
+	my $ipfrom = substr($data, 0, 4);
+	my $ipfrom_next = substr($data, $data_length - 4, 4);
+	my $result_row = substr($data, 0, $data_length - 4);
+	return (unpack("V", $ipfrom), unpack("V", $ipfrom_next), $result_row);
+}
+
+sub readRow128 {
+	my ($obj, $handle, $position, $column) = @_;
+	my $data = "";
+	my $data_length = $column * 4 + 12 + 16;
+	seek($handle, $position-1, 0);
+	read($handle, $data, $data_length);
+	my $ipfrom = substr($data, 0, 16);
+	my $ipfrom_next = substr($data, $data_length - 16, 16);
+	my $result_row = substr($data, 0, $data_length - 16);
+	return (&bytesInt($ipfrom), &bytesInt($ipfrom_next), $result_row);
+}
+
+sub read512 {
+	my ($obj, $handle, $position) = @_;
+	my $data = "";
+	seek($handle, $position-1, 0);
+	read($handle, $data, 64);
+	my @data_array = split('', $data);
+	while ($#data_array < 63) {
+		$data_array[$#data_array+1] = 0x00;
+	}
+	return @data_array;
+}
+
+sub read32x2 {
+	my ($obj, $handle, $position) = @_;
+	my $data = "";
+	seek($handle, $position-1, 0);
+	read($handle, $data, 8);
+	my $data_1 = substr($data, 0, 4);
+	my $data_2 = substr($data, 4, 4);
+	return (unpack("V", $data_1), unpack("V", $data_2));
+}
+
 sub read128 {
 	my ($obj, $handle, $position) = @_;
 	my $data = "";
 	seek($handle, $position-1, 0);
 	read($handle, $data, 16);
-	return &bytes2int($data);
+	return &bytesInt($data);
 }
 
 sub read32 {
@@ -1189,10 +1230,10 @@ sub read8 {
 sub readStr {
 	my ($obj, $handle, $position) = @_;
 	my $data = "";
-	my $string = "";
 	seek($handle, $position, 0);
-	read($handle, $data, 1);
-	read($handle, $string, unpack("C", $data));
+	read($handle, $data, 257);
+	my $char_count = unpack("C", substr($data, 0, 1));
+	my $string = substr($data, 1, $char_count);
 	return $string;
 }
 
@@ -1208,7 +1249,7 @@ sub readFloat {
 	}
 }
 
-sub bytes2int {
+sub bytesInt {
 	my $binip = shift(@_);
 	my @array = split(//, $binip);
 	return 0 if ($#array != 15);
@@ -1268,7 +1309,7 @@ sub validate_ip {
 				#bitwise not to invert binary
 				$ipnum->bnot();
 				#bitwise modulus to get the last 32 bit
-				$ipnum->bmod(4294967296); 
+				$ipnum->bmod(4294967296);
 			}
 
 		} else {
@@ -1300,9 +1341,10 @@ sub expand_ipv6_address {
 	}
 
 	foreach (0..(scalar(@ip)-1)) {
-		$ip[$_] = ('0'x(4-length ($ip[$_]))).$ip[$_];
+		next if (length($ip[$_]) > 3);
+		$ip[$_] = ('0'x(4-length($ip[$_]))).$ip[$_];
 	}
-
+ 	
 	foreach (0..(scalar(@ip)-1)) {
 		next unless ($ip[$_] eq '000Z');
 		my @empty = map { $_ = '0'x4 } (0..7);
@@ -1596,11 +1638,11 @@ L<IP2Location Product Page|https://www.ip2location.com>
 
 =head1 VERSION
 
-8.51
+8.60
 
 =head1 AUTHOR
 
-Copyright (c) 2021 IP2Location.com
+Copyright (c) 2022 IP2Location.com
 
 All rights reserved. This package is free software. It is licensed under the MIT. See the LICENSE file for full license information.
 

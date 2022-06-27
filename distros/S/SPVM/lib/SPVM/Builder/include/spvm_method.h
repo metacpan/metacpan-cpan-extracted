@@ -42,13 +42,13 @@ struct spvm_method {
   int8_t is_constant;
   int8_t is_class_method;
   int8_t is_init;
-  int8_t is_private;
   int8_t is_destructor;
   int8_t is_enum;
   int8_t is_precompile;
   int8_t is_native;
   int8_t is_anon;
   int8_t is_required;
+  int8_t access_control_type;
 };
 
 SPVM_METHOD* SPVM_METHOD_new(SPVM_COMPILER* compiler);

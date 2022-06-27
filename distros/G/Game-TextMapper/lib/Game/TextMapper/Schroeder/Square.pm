@@ -19,6 +19,19 @@
 
 Game::TextMapper::Schroeder::Square - a role for square map generators
 
+=head1 SYNOPSIS
+
+    # create a map
+    package World;
+    use Modern::Perl;
+    use Mojo::Base -base;
+    use Role::Tiny::With;
+    with 'Game::TextMapper::Schroeder::Base';
+    with 'Game::TextMapper::Schroeder::Square';
+    # use it
+    package main;
+    my $map = World->new(height => 10, width => 10);
+
 =head1 DESCRIPTION
 
 This role provides basic functionality for map generation with square maps: the
@@ -26,10 +39,8 @@ number of neighbours within one or two regions distance, how to pick a random
 neighbour direction, how to compute the coordinates of these neighbours, how to
 draw arrows towards these neighbours.
 
-=head1 SEE ALSO
-
-L<Game::TextMapper::Schroeder::Base>
-L<Game::TextMapper::Schroeder::Hex>
+This inherits attributes and methods from L<Game::TextMapper::Schroeder::Base>,
+such as C<width> and C<height>.
 
 =cut
 
@@ -37,15 +48,68 @@ package Game::TextMapper::Schroeder::Square;
 use Modern::Perl '2018';
 use Mojo::Base -role;
 
+=head1 METHODS
+
+=head2 reverse
+
+Reverses a direction.
+
+=cut
+
+sub reverse {
+  my ($self, $i) = @_;
+  return ($i + 2) % 4;
+}
+
+=head2 neighbors
+
+The list of directions for neighbours one step away (0 to 3).
+
+=cut
+
 sub neighbors { 0 .. 3 }
+
+=head2 neighbors2
+
+The list of directions for neighbours two steps away (0 to 7).
+
+=cut
 
 sub neighbors2 { 0 .. 7 }
 
+=head2 random_neighbor
+
+A random direction for a neighbour one step away (a random integer from 0 to 3).
+
+=cut
+
 sub random_neighbor { int(rand(4)) }
+
+=head2 random_neighbor2
+
+A random direction for a neighbour two steps away (a random integer from 0 to
+7).
+
+=cut
 
 sub random_neighbor2 { int(rand(8)) }
 
 my $delta_square = [[-1,  0], [ 0, -1], [+1,  0], [ 0, +1]];
+
+=head2 neighbor($square, $i)
+
+    say join(",", $map->neighbor("0203", 1));
+    # 2,2
+
+Returns the coordinates of a neighbor in a particular direction (0 to 3), one
+step away.
+
+C<$square> is an array reference of coordinates or a string that can be turned
+into one using the C<xy> method from L<Game::TextMapper::Schroeder::Base>.
+
+C<$i> is a direction (0 to 3).
+
+=cut
 
 sub neighbor {
   my $self = shift;
@@ -61,6 +125,21 @@ my $delta_square2 = [
   [-2,  0], [-1, -1], [ 0, -2], [+1, -1],
   [+2,  0], [+1, +1], [ 0, +2], [-1, +1]];
 
+=head2 neighbor2($square, $i)
+
+    say join(",", $map->neighbor2("0203", 1));
+    # 1, 2
+
+Returns the coordinates of a neighbor in a particular direction (0 to 7), two
+steps away.
+
+C<$square> is an array reference of coordinates or a string that can be turned
+into one using the C<xy> method from L<Game::TextMapper::Schroeder::Base>.
+
+C<$i> is a direction (0 to 3).
+
+=cut
+
 sub neighbor2 {
   my $self = shift;
   # $hex is [x,y] or "0x0y" and $i is a number 0 .. 7
@@ -72,6 +151,15 @@ sub neighbor2 {
 	  $hex->[1] + $delta_square2->[$i]->[1]);
 }
 
+=head2 distance($x1, $y1, $x2, $y2) or distance($coords1, $coords2)
+
+    say $map->distance("0203", "0003");
+    # 2
+
+Returns the distance between two coordinates.
+
+=cut
+
 sub distance {
   my $self = shift;
   my ($x1, $y1, $x2, $y2) = @_;
@@ -81,14 +169,30 @@ sub distance {
   return abs($x2 - $x1) + abs($y2 - $y1);
 }
 
+=head2 arrows
+
+A helper that returns the SVG fragments for arrows in four directions, to be
+used in a C<defs> element.
+
+=cut
+
 sub arrows {
   my $self = shift;
   return
       qq{<marker id="arrow" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M6,0 V6 L0,3 Z" style="fill: black;" /></marker>},
+      qq{<marker id="wind" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto"><path d="M6,0 V6 L0,3 Z" style="fill: purple;" /></marker>},
       map {
 	my $angle = 90 * $_;
 	qq{<path id="arrow$_" transform="rotate($angle)" d="M-15,0 H30" style="stroke: black; stroke-width: 3px; fill: none; marker-start: url(#arrow);"/>},
+	qq{<path id="wind$_" transform="translate(40,40) rotate($angle)" d="M-15,0 H30" style="stroke: purple; stroke-width: 3px; fill: none; marker-start: url(#wind);"/>},
   } ($self->neighbors());
 }
+
+=head1 SEE ALSO
+
+L<Game::TextMapper::Schroeder::Base>
+L<Game::TextMapper::Schroeder::Hex>
+
+=cut
 
 1;

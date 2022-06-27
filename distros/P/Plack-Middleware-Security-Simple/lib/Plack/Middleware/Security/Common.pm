@@ -11,7 +11,9 @@ use Regexp::Common qw/ net /;
 
 our @EXPORT = qw(
    archive_extensions
+   backup_files
    cgi_bin
+   cms_prefixes
    dot_files
    fake_extensions
    header_injection
@@ -28,7 +30,7 @@ our @EXPORT = qw(
    wordpress
 );
 
-our $VERSION = 'v0.7.0';
+our $VERSION = 'v0.8.0';
 
 
 
@@ -41,11 +43,27 @@ sub archive_extensions {
 }
 
 
+sub backup_files {
+    return (
+        misc_extensions(),
+        PATH_INFO =>  qr{(?:backup|database|db|dump)\.},
+    );
+}
+
+
 sub cgi_bin {
-    my $re = qr{/cgi[_\-](bin|wrapper)};
+    my $re = qr{/cgi[_\-](?:bin|wrapper)};
     return (
         PATH_INFO    => $re,
         QUERY_STRING => $re,
+    );
+}
+
+
+sub cms_prefixes {
+    my $re = qr{/(?:drupal|include|joomla|laravel|lib|magento|plugin|plus|vendor|wordpress|wp|yii|zend)};
+    return (
+        PATH_INFO    => $re,
     );
 }
 
@@ -67,7 +85,7 @@ sub fake_extensions {
 
 
 sub header_injection {
-    my $re = qr{(\%20HTTP/[0-9]|%0d%0a)}i;
+    my $re = qr{(?:\%20HTTP/[0-9]|%0d%0a)}i;
     return (
         PATH_INFO    => $re,
     );
@@ -84,7 +102,7 @@ sub ip_address_referer {
 
 
 sub misc_extensions {
-    my $re = qr{[.](?:bak|cfg|conf|dat|inc|ini|yml)\b};
+    my $re = qr{[.](?:backup|bak|bck|bkp|cfg|conf|dat|ibz|in[ci]|npb|old|ps[bc]|yml)\b};
     return (
         PATH_INFO    => $re,
         QUERY_STRING => $re,
@@ -178,7 +196,7 @@ Plack::Middleware::Security::Common - A simple security filter for Plack with co
 
 =head1 VERSION
 
-version v0.7.0
+version v0.8.0
 
 =head1 SYNOPSIS
 
@@ -245,10 +263,24 @@ them you will need to put them in an array reference.
 This blocks requests with common archive file extensions in the path
 or query string.
 
+=head2 backup_files
+
+This includes L</misc_extensions> plus filename suffixes associated
+with backup files, e.g. F<example.com-database.zip>.
+
+Added in v0.8.0.
+
 =head2 cgi_bin
 
 This blocks requests that refer to the C<cgi-bin> directory in the path
 or query string, or a C<cgi_wrapper> script.
+
+=head2 cms_prefixes
+
+This blocks requests that refer to directories with common CMS
+applications or libraries.
+
+Added in v0.8.0.
 
 =head2 dot_files
 
@@ -284,8 +316,8 @@ Added in v0.5.0.
 This blocks requests with miscellenious extensions in the path or
 query string.
 
-This includes common extensions for backups, includes or configuration
-files.
+This includes common extensions and suffixes for backups, includes or
+configuration files.
 
 =head2 non_printable_chars
 

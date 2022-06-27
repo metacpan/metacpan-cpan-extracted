@@ -50,6 +50,6 @@
          "http://www.gnu.org/licenses/lgpl-3.0.txt"
       ]
    },
-   "version" : "v1.0.1",
+   "version" : "v1.0.2",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

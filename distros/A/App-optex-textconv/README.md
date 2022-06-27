@@ -5,7 +5,7 @@ textconv - optex module to replace document file by its text contents
 
 # VERSION
 
-Version 1.02
+Version 1.03
 
 # SYNOPSIS
 
@@ -42,25 +42,25 @@ Next command simply produces the same result.
     Microsoft office format files in XML (.docx, .pptx, .xlsx, .docm,
     .pptm, .xlsm).
     Use
-    [App::optex::textconv::msdoc](https://metacpan.org/pod/App::optex::textconv::msdoc),
-    [App::optex::textconv::ooxml](https://metacpan.org/pod/App::optex::textconv::ooxml),
-    [App::optex::textconv::ooxml::regex](https://metacpan.org/pod/App::optex::textconv::ooxml::regex),
-    [App::optex::textconv::ooxml::xslt](https://metacpan.org/pod/App::optex::textconv::ooxml::xslt).
+    [App::optex::textconv::msdoc](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Atextconv%3A%3Amsdoc),
+    [App::optex::textconv::ooxml](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Atextconv%3A%3Aooxml),
+    [App::optex::textconv::ooxml::regex](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Atextconv%3A%3Aooxml%3A%3Aregex),
+    [App::optex::textconv::ooxml::xslt](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Atextconv%3A%3Aooxml%3A%3Axslt).
 
 - doc
 
     Microsoft Word file.
-    Use [Text::Extract::Word](https://metacpan.org/pod/Text::Extract::Word) module.
+    Use [Text::Extract::Word](https://metacpan.org/pod/Text%3A%3AExtract%3A%3AWord) module.
 
 - xls
 
     Microsoft Excel file.
-    Use [Spreadsheet::ParseExcel](https://metacpan.org/pod/Spreadsheet::ParseExcel) module.
+    Use [Spreadsheet::ParseExcel](https://metacpan.org/pod/Spreadsheet%3A%3AParseExcel) module.
 
 - pdf
 
     Use [pdftotext(1)](http://man.he.net/man1/pdftotext) command to covert PDF format.
-    See [App::optex::textconv::pdf](https://metacpan.org/pod/App::optex::textconv::pdf).
+    See [App::optex::textconv::pdf](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Atextconv%3A%3Apdf).
 
 - jpeg
 
@@ -75,20 +75,23 @@ Next command simply produces the same result.
 
     Use [pandoc](https://pandoc.org/) command to translate Microsoft
     office document in XML format.
-    See [App::optex::textconv::pandoc](https://metacpan.org/pod/App::optex::textconv::pandoc).
+    See [App::optex::textconv::pandoc](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Atextconv%3A%3Apandoc).
 
 - tika
 
     Use [Apache Tika](https://tika.apache.org/) command to translate
     Microsoft office document in XML and non-XML format.
-    See [App::optex::textconv::tika](https://metacpan.org/pod/App::optex::textconv::tika).
+    See [App::optex::textconv::tika](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Atextconv%3A%3Atika).
 
 # MICROSOFT DOCUMENTS
 
 Microsoft office document in XML format (.docx, .pptx, .xlsx) is
 converted to plain text by original code implemented in
-[App::optex::textconv::msdoc](https://metacpan.org/pod/App::optex::textconv::msdoc) module.  Algorithm used in this module
-is extremely simple, and consequently runs fast.
+[App::optex::textconv::ooxml::regex](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Atextconv%3A%3Aooxml%3A%3Aregex) module.  Algorithm used in this
+module is extremely simple, and consequently runs fast.
+
+If related modules are available, [App::optex::textconv::ooxml::xslt](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Atextconv%3A%3Aooxml%3A%3Axslt)
+is used to covert XML using XSLT mechanism.
 
 Two module are included in this distribution to use other external
 converter program, **pandoc** and **tika**, those implement much more
@@ -103,13 +106,11 @@ with module declaration like:
 
 ## CPANM
 
-    $ cpanm App::optex::textconv
-    or
-    $ curl -sL http://cpanmin.us | perl - App::optex::textconv
+    cpanm App::optex::textconv
 
 ## GIT
 
-These are sample configurations using [App::optex::textconv](https://metacpan.org/pod/App::optex::textconv) in git
+These are sample configurations using [App::optex::textconv](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Atextconv) in git
 environment.
 
         ~/.gitconfig

@@ -6,6 +6,8 @@ BEGIN
     use warnings;
     use lib './lib';
     use Module::Generic;
+    use Module::Generic::Exception;
+    use Module::Generic::File;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 

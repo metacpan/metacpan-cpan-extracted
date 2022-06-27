@@ -194,11 +194,11 @@ Ref _is_safe_to_wrap(Sv& ex, bool add_frame_info) {
             bool ends_with_newline = str.size() && str[str.size() - 1] == '\n';
             if (!ends_with_newline) {
                 auto messed = Perl_mess_sv(aTHX_ ex, false);
-                ref = Stash("Exception::Backtrace").call("new", Simple(messed));
+                ref = Stash("Exception::Backtrace::Wrapper").call("new", Simple(messed));
             }
         }
         if (!ref) {
-            ref = Stash("Exception::Backtrace").call("new", ex);
+            ref = Stash("Exception::Backtrace::Wrapper").call("new", ex);
         }
     }
     else {  

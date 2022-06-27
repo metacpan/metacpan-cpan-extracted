@@ -31,6 +31,10 @@ sub new {
     if ( $info->{driver} eq 'Pg' ) {
         $sf->{aggregate}[3] = "STRING_AGG(X)";
     }
+    elsif ( $info->{driver} eq 'Firebird' ) {
+        # LIST ([ALL | DISTINCT] <expr> [, separator ])
+        $sf->{aggregate}[3] = "LIST(X)";
+    }
     $sf->{i}{menu_addition} = '%%';
     bless $sf, $class;
 }
@@ -186,7 +190,7 @@ sub __add_aggregate_substmt {
     else {
         $aggr =~ s/\(\S\)\z//; #
         $sql->{aggr_cols}[$i] = $aggr . "(";
-        if ( $aggr =~ /^(?:COUNT|GROUP_CONCAT|STRING_AGG)\z/ ) {
+        if ( $aggr =~ /^(?:COUNT|GROUP_CONCAT|STRING_AGG|LIST)\z/ ) {
             my $info = $ax->get_sql_info( $sql );
             # Choose
             my $all_or_distinct = $tc->choose(
@@ -676,8 +680,13 @@ sub limit_offset {
         push @bu, [ $sql->{limit_stmt}, $sql->{offset_stmt} ];
         my $digits = 7;
         if ( $choice eq $limit ) {
-            #$sql->{limit_stmt} = " LIMIT";
-            $sql->{limit_stmt} = "LIMIT";
+            if ( $sf->{i}{driver} =~ /^(?:Firebird|DB2|Oracle)\z/ ) {
+                # https://www.ibm.com/docs/en/db2-for-zos/12?topic=subselect-fetch-clause
+                $sql->{limit_stmt} = "FETCH NEXT";
+            }
+            else {
+                $sql->{limit_stmt} = "LIMIT";
+            }
             my $info = $ax->get_sql_info( $sql );
             # Choose_a_number
             my $limit = $tu->choose_a_number( $digits,
@@ -689,6 +698,9 @@ sub limit_offset {
                 next LIMIT;
             }
             $sql->{limit_stmt} .=  sprintf ' %d', $limit;
+            if ( $sf->{i}{driver} =~ /^(?:Firebird|DB2|Oracle)\z/ ) {
+                $sql->{limit_stmt} .= " ROWS ONLY";
+            }
         }
         if ( $choice eq $offset ) {
             if ( ! $sql->{limit_stmt} ) {
@@ -708,6 +720,9 @@ sub limit_offset {
                 next LIMIT;
             }
             $sql->{offset_stmt} .= sprintf ' %d', $offset;
+            if ( $sf->{i}{driver} =~ /^(?:Firebird|DB2|Oracle)\z/ ) {
+                $sql->{offset_stmt} .= " ROWS";
+            }
         }
     }
 }

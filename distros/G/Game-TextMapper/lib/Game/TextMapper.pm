@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Copyright (C) 2009-2021  Alex Schroeder <alex@gnu.org>
+# Copyright (C) 2009-2022  Alex Schroeder <alex@gnu.org>
 #
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU Affero General Public License as published by the Free
@@ -16,7 +16,7 @@
 
 package Game::TextMapper;
 
-our $VERSION = 1.03;
+our $VERSION = 1.04;
 
 use Game::TextMapper::Log;
 use Game::TextMapper::Point;
@@ -177,6 +177,7 @@ sub alpine_map {
 		$c->param('bump'),
 		$c->param('bottom'),
 		$c->param('arid'),
+		$c->param('wind'),
 		$seed,
 		$url,
 		$step,
@@ -230,8 +231,11 @@ get '/alpine/document' => sub {
   my $type = $c->param('type') || 'hex';
   # use the same seed for all the calls
   my $seed = $c->param('seed');
-  $seed = $c->param('seed' => int(rand(1000000000))) unless defined $seed;
-  for my $step (1 .. 16) {
+  if (not defined $seed) {
+    $seed = int(rand(1000000000));
+    $c->param('seed' => $seed);
+  }
+  for my $step (1 .. 18) {
     my $map = alpine_map($c, $step);
     my $mapper;
     if ($type eq 'hex') {
@@ -245,8 +249,8 @@ get '/alpine/document' => sub {
   };
   $c->stash("maps" => \@maps);
 
-  # the documentation needs all the defaults of Alpine::generate_map (but
-  # we'd like to use a smaller map because it is so slow)
+  # The documentation needs all the defaults of Alpine::generate_map (but
+  # we'd like to use a smaller map because it is so slow).
   my $width = $c->param('width') // 20;
   my $height = $c->param('height') // 5; # instead of 10
   my $steepness = $c->param('steepness') // 3;
@@ -257,6 +261,7 @@ get '/alpine/document' => sub {
   my $bottom = $c->param('bottom') // 0;
   my $arid = $c->param('arid') // 2;
 
+  # Generate the documentation text based on the stashed maps.
   $c->render(template => 'alpine_document',
 	     seed => $seed,
 	     width => $width,
@@ -524,7 +529,8 @@ sub apocalypse_map {
   my $c = shift;
   my $seed = $c->param('seed') || int(rand(1000000000));
   srand($seed);
-  return Game::TextMapper::Apocalypse->new()
+  my $hash = $c->req->params->to_hash;
+  return Game::TextMapper::Apocalypse->new(%$hash)
       ->generate_map();
 }
 
@@ -556,7 +562,8 @@ sub star_map {
   my $c = shift;
   my $seed = $c->param('seed') || int(rand(1000000000));
   srand($seed);
-  return Game::TextMapper::Traveller->new->generate_map;
+  my $hash = $c->req->params->to_hash;
+  return Game::TextMapper::Traveller->new(%$hash)->generate_map();
 }
 
 get '/traveller' => sub {
@@ -581,13 +588,6 @@ get '/traveller/random/text' => sub {
   my $c = shift;
   my $map = star_map($c);
   $c->render(text => $map, format => 'txt');
-};
-
-get '/source' => sub {
-  my $c = shift;
-  seek(DATA,0,0);
-  local $/ = undef;
-  $c->render(text => <DATA>, format => 'txt');
 };
 
 get '/help' => sub {
@@ -1394,7 +1394,7 @@ for an explanation of what these parameters do.
 <hr>
 <p>
 <%= link_to smale => begin %>Random<% end %>
-will generate map data based on Erin D. Smale's <em>Hex-Based Campaign Design</em>
+generates map data based on Erin D. Smale's <em>Hex-Based Campaign Design</em>
 (<a href="http://www.welshpiper.com/hex-based-campaign-design-part-1/">Part 1</a>,
 <a href="http://www.welshpiper.com/hex-based-campaign-design-part-2/">Part 2</a>).
 You can also generate a random map
@@ -1416,7 +1416,7 @@ You'll find the map description in a comment within the SVG file.
 
 <hr>
 <p>
-<%= link_to alpine => begin %>Alpine<% end %> will generate map data based on Alex
+<%= link_to alpine => begin %>Alpine<% end %> generates map data based on Alex
 Schroeder's algorithm that's trying to recreate a medieval Swiss landscape, with
 no info to back it up, whatsoever. See it
 <%= link_to url_for('alpinedocument')->query(height => 5) => begin %>documented<% end %>.
@@ -1463,7 +1463,7 @@ explanation of what these parameters do.
 <hr>
 <p>
 <%= link_to url_for('gridmapper')->query(type => 'square') => begin %>Gridmapper<% end %>
-will generate dungeon map data based on geomorph sketches by Robin Green. Or
+generates dungeon map data based on geomorph sketches by Robin Green. Or
 just keep reloading one of these links:
 <%= link_to url_for('gridmapperrandom')->query(rooms => 5) => begin %>5 rooms<% end %>,
 <%= link_to url_for('gridmapperrandom')->query(rooms => 10) => begin %>10 rooms<% end %>,
@@ -1491,15 +1491,47 @@ Just caves
 
 <hr>
 
-<p>Ideas and work in progress…
-
 <p><%= link_to url_for('apocalypse') => begin %>Apocalypse<% end %> generates a post-apocalyptic map.
 <%= link_to url_for('apocalypserandom') => begin %>Reload<% end %> for lots of post-apocalyptic maps.
 You'll find the map description in a comment within the SVG file.
+%= form_for apocalypse => begin
+<p>
+<table>
+<tr><td>Width:</td><td>
+%= number_field cols => 20, min => 1
+</td><td>Height:</td><td>
+%= number_field rows => 10, min => 1
+</td></tr>
+<tr><td>Region Size:</td><td>
+%= number_field region_size => 5, min => 1
+</td><td>Settlement Chance:</td><td>
+%= number_field settlement_chance => 0.1, min => 0, max => 1, step => 0.1
+</td></tr></table>
+<p>
+%= submit_button "Generate Map Data"
+% end
+
+<hr>
 
 <p><%= link_to url_for('traveller') => begin %>Traveller<% end %> generates a star map.
 <%= link_to url_for('travellerrandom') => begin %>Reload<% end %> for lots of random star maps.
 You'll find the map description in a comment within the SVG file.
+%= form_for traveller => begin
+<p>
+<table>
+<tr><td>Width:</td><td>
+%= number_field cols => 8, min => 1
+</td></tr>
+<tr><td>Height:</td><td>
+%= number_field rows => 10, min => 1
+</td></tr></table>
+<p>
+%= submit_button "Generate Map Data"
+% end
+
+<hr>
+
+<p>Ideas and work in progress…
 
 <p><%= link_to url_for('island') => begin %>Island<% end %> generates a hotspot-inspired island chain.
 Reload <%= link_to url_for('islandrandom') => begin %>Hex Island<% end %>
@@ -1692,6 +1724,15 @@ It is insufficiently drained. We use grey swamps to indicate this.</p>
 
 %== shift(@$maps)
 
+<p>We determined the predominant wind direction (see purple arrow in 01.01) and
+mark areas in the wind shadow of mountains as having no river sources,
+presumably because of reduced rainfall. Specifically, a hex with altitude 7 or 8
+next to a hex where the wind is coming from that is at the same altitude or
+higher is marked as "dry". The only effect is that there can be no river sources
+in these hexes (as these are all at altitudes 7 and 8)</p>
+
+%== shift(@$maps)
+
 <p>We add a river sources high up in the mountains (altitudes 7 and 8), merging
 them as appropriate. These rivers flow as indicated by the arrows. If the river
 source is not a mountain (altitude 8) or a bog (altitude 7), then we place a
@@ -1716,19 +1757,31 @@ otherwise dark-grey.</p>
 <p>Wherever there is water and no swamp, forests will form. The exact type again
 depends on the altitude: light green fir-forest (altitude 7 and higher), green
 fir-forest (altitude 6), green forest (altitude 4–5), dark-green forest
-(altitude 3 and lower). Once a forest is placed, it expands up to <%= $arid %> hexes
-away, even if those hexes have no water flowing through them. You probably need
-fewer peaks on your map to verify this (a <%= link_to
-url_with('alpinerandom')->query({peaks => 1}) => begin %>lonely mountain<% end
+(altitude 3 and lower). Once a forest is placed, it expands up to <%= $arid %>
+hexes away, even if those hexes have no water flowing through them. When
+considering neighbouring hexes, they have to be at the same altitude or lower;
+when considering hexes with an intermediary hex, the intermediary hex has to be
+at the same altitude or lower, and the other he has to be at the same altitude
+or lower as the intermediary hex.</p>
+
+<p>You probably need fewer peaks on your map to verify this (a <%= link_to
+url_with('alpinedocument')->query({peaks => 1}) => begin %>lonely mountain<% end
 %> map, for example).</p>
 
 %== shift(@$maps)
 
 <p>Any remaining hexes have no water nearby and are considered to be little more
-arid. They get bushes, a hill (20% of the time at altitudes 3 or higher), or
-some grass (60% of the time at altitudes 3 and lower). Higher up, these are
-light grey (altitude 6–7), otherwise they are light green (altitude 5 and
-below).</p>
+arid. At high altitudes, they get "light-grey grass"; at lower altitudes they
+get "light-green bushes". For these lower altitude badlands, we add more variety
+by simulating areas where conditions are bad. We pick a quarter of these hexes,
+and deteriorate them, and their immediate neighbours. That is, we take little
+"circles" of seven hexes each, and place them in these areas. Whenever they
+overlap, conditions deteriorate even further: light-green bushes → light-green
+grass → dust grass → dust hill → dust desert.</p>
+
+<p>You probably need fewer peaks on your map to verify this (a <%= link_to
+url_with('alpinedocument')->query({peaks => 1}) => begin %>lonely mountain<% end
+%> map, for example).</p>
 
 %== shift(@$maps)
 
@@ -1737,23 +1790,44 @@ below).</p>
 %== shift(@$maps)
 
 <p>Wherenver there is forest, settlements will be built. These reduce the
-density of the forest. There are three levels of settlements: thorps, villages
-and towns.</p>
+density of the forest. Of the settlements are big, trees disappear completely
+and are replaced by soil. If the village or town is next to a water hex, it gets
+a port and grows by one step. Note that currently it's impossibleto get a
+city.</p>
 
 <table>
-<tr><th>Settlement</th><th>Forest</th><th>Number</th><th>Minimum Distance</th></tr>
-<tr><td>Thorp</td><td>fir-forest, forest</td><td class="numeric">10%</td><td class="numeric">2</td></tr>
-<tr><td>Village</td><td>forest &amp; river</td><td class="numeric">5%</td><td class="numeric">5</td></tr>
-<tr><td>Town</td><td>forest &amp; river</td><td class="numeric">2½%</td><td class="numeric">10</td></tr>
-<tr><td>Law</td><td>white mountain</td><td class="numeric">2½%</td><td class="numeric">10</td></tr>
-<tr><td>Chaos</td><td>swamp</td><td class="numeric">2½%</td><td class="numeric">10</td></tr>
+<tr><th>Settlement</th><th>Conditions</th><th>Change to</th><th>Number</th>
+    <th>Minimum Distance</th><th>Near water</th></tr>
+<tr><td>thorp</td><td>fir-forest, or forest</td><td>firs, or trees</td><td class="numeric">10%</td>
+    <td class="numeric">2</td><td>unchanged</td></tr>
+<tr><td>village</td><td>forest &amp; river</td><td>trees</td><td class="numeric">5%</td>
+    <td class="numeric">5</td><td>town &amp; port</td></tr>
+<tr><td>town</td><td>forest or dark-forest &amp; river</td><td>soil</td><td class="numeric">2½%</td>
+    <td class="numeric">10</td><td>large town &amp; port</td></tr>
+<tr><td>large town</td><td>none</td><td>light soil</td><td class="numeric">0%</td>
+    <td class="numeric">n/a</td><td>city &amp; port</td></tr>
+<tr><td>city</td><td>none</td><td>light soil</td><td class="numeric">0%</td>
+    <td class="numeric">n/a</td><td>unchanged</td></tr>
+<tr><td>law</td><td>white mountain</td><td>unchanged</td><td class="numeric">2½%</td>
+    <td class="numeric">10</td><td>unchanged</td></tr>
+<tr><td>chaos</td><td>swamp</td><td>unchanged</td><td class="numeric">2½%</td>
+    <td class="numeric">10</td><td>unchanged</td></tr>
 </table>
 
 %== shift(@$maps)
 
 <p>Trails connect every settlement to any neighbor that is one or two hexes
 away. If no such neighbor can be found, we try to find neighbors that are three
-hexes away.</p>
+hexes away. If there are multiple options, we prefer the one at a lower
+altitude.</p>
+
+%== shift(@$maps)
+
+<p>Finally, we take advantage of the fact that rivers continue into the ocean.
+We identify river mouths where the altitude change is just 1 (i.e. no cliff) and
+extend the land into the water using a blue-green swamp. These are coastal
+marshes. We also check the next hex along the (invisible) river to check if this
+an ocean hex. If it is, we change it to water.
 
 %== shift(@$maps)
 
@@ -1792,8 +1866,7 @@ td, th {
 <p>
 <a href="https://campaignwiki.org/text-mapper">Text Mapper</a>&#x2003;
 <%= link_to 'Help' => 'help' %>&#x2003;
-<%= link_to 'Source' => 'source' %>&#x2003;
-<a href="https://alexschroeder.ch/cgit/hex-mapping/about/#text-mapper">Git</a>&#x2003;
+<a href="https://alexschroeder.ch/cgit/text-mapper/about/">Git</a>&#x2003;
 <a href="https://alexschroeder.ch/wiki/Contact">Alex Schroeder</a>
 </body>
 </html>

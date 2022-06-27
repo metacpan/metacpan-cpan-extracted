@@ -27,6 +27,7 @@ my @files = (
     't/Statements/Ellipsis.t',
     't/Statements/Expressions/ExprComma.t',
     't/Statements/Expressions/ExprNameNot.t',
+    't/Statements/Expressions/OpListKeywordExpr/OpKeywordBinmodeExpr.t',
     't/Statements/Expressions/OpListKeywordExpr/OpKeywordChmodExpr.t',
     't/Statements/Expressions/OpListKeywordExpr/OpKeywordOpenExpr.t',
     't/Statements/Expressions/OpListKeywordExpr/OpKeywordPrintExpr.t',
@@ -37,6 +38,7 @@ my @files = (
     't/Statements/Expressions/OpListKeywordExpr/OpKeywordSplitExpr.t',
     't/Statements/Expressions/OpListKeywordExpr/OpKeywordSprintfExpr.t',
     't/Statements/Expressions/OpNullaryKeywordExpr/OpKeywordSubExpr.t',
+    't/Statements/Expressions/OpUnaryKeywordExpr/OpKeywordReadlineExpr.t',
     't/Statements/Expressions/OpUnaryKeywordExpr/OpKeywordStatExpr.t',
     't/Statements/Expressions/Value/ArrowDerefVariable.t',
     't/Statements/Expressions/Value/Literal.t',
@@ -58,7 +60,8 @@ my @files = (
     't/Statements/UseNoStatement.t',
     't/Statements/WhileStatement.t',
     't/author-no-tabs.t',
-    't/author-pod-syntax.t'
+    't/author-pod-syntax.t',
+    't/bugs/rt_132920_regex_subset.t'
 );
 
 notabs_ok($_) foreach @files;

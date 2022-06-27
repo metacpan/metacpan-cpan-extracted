@@ -1,8 +1,8 @@
 .perlcriticrc
 .perltidyrc
-.travis.yml
 bin/mite
 Build.PL
+Changes
 lib/Mite.pm
 lib/Mite/App.pm
 lib/Mite/App/Command.pm
@@ -15,13 +15,13 @@ lib/Mite/Compiled.pm
 lib/Mite/Config.pm
 lib/Mite/MakeMaker.pm
 lib/Mite/ModuleBuild.pm
+lib/Mite/MyMoo.pm
 lib/Mite/Project.pm
 lib/Mite/Role/HasConfig.pm
 lib/Mite/Role/HasDefault.pm
 lib/Mite/Role/HasYAML.pm
 lib/Mite/Shim.pm
 lib/Mite/Source.pm
-lib/Mite/Types.pm
 LICENSE
 MANIFEST			This list of files
 MANIFEST.SKIP
@@ -34,12 +34,23 @@ t/MakeMaker/build.t
 t/MakeMaker/pm_to_blib.t
 t/MakeMaker/Some-Project/lib/Some/Project.pm
 t/MakeMaker/Some-Project/Makefile.PL
+t/Mite-Attribute/clearer_predicate.t
 t/Mite-Attribute/clone.t
+t/Mite-Attribute/coerce.t
 t/Mite-Attribute/defaults.t
+t/Mite-Attribute/init_arg.t
 t/Mite-Attribute/is.t
+t/Mite-Attribute/isa.t
+t/Mite-Attribute/lazy.t
+t/Mite-Attribute/required.t
 t/Mite-Attribute/ro.t
 t/Mite-Attribute/rw.t
+t/Mite-Attribute/rwp.t
+t/Mite-Attribute/trigger.t
+t/Mite-Attribute/weak_ref.t
 t/Mite-Class/attributes.t
+t/Mite-Class/build.t
+t/Mite-Class/buildargs.t
 t/Mite-Class/default.t
 t/Mite-Class/default_coderef.t
 t/Mite-Class/extends.t
@@ -75,4 +86,4 @@ t/Test-Mite/mite_command.t
 t/Test-Mite/mite_load.t
 t/Test-Mite/pragmas.t
 t/Test-Mite/sims.t
-t/types.t
+TODO

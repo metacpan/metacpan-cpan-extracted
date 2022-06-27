@@ -1,3 +1,29 @@
+0.16 2022-06-25T16:25:54+02:00
+ - Add Dog item fixture.
+ - Add InstanceOf::CommonLivingOrganism statement fixture.
+ - Rename Human fixture to better DouglasAdams.
+ - Update README file.
+
+0.15 2022-06-25T11:42:12+02:00
+ - Fix Mediainfo doc.
+ - Add fixture for Mediainfo.
+ - Add fixture for MediainfoSnak.
+ - Add fixture for MediainfoStatement.
+
+0.14 2022-06-24T13:37:55+02:00
+ - Add modified and explicit ns parameters to Item fixture.
+ - Add modified parameter to Lexeme fixture.
+ - Add modified parameter to Property fixture.
+ - Add tests for fixtures.
+ - Add tests for Lexeme.
+ - Change ns for Lexeme to 146 (as Wikidata).
+
+0.13 2022-06-23T00:09:39+02:00
+ - Add tests for fixtures.
+ - Add tests for Property.
+ - Fix ns default value in doc of Property.
+ - Fix place of error test in constructor in Item.
+
 0.12 2022-05-29T20:11:07+02:00
  - Add Property datatype.
  - Add test instance for Property.

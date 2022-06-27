@@ -8,48 +8,42 @@ no  warnings 'syntax';
 use experimental 'signatures';
 use experimental 'lexical_subs';
 
-our $VERSION = '2022030401';
+our $VERSION = '2022062101';
+
+use lib qw [lib];
 
 use Hash::Util::FieldHash qw [fieldhash];
 use List::Util            qw [min max];
-use Math::Sequence::DeBruijn;
 
-use Exporter ();
+use Regexp::Sudoku::Utils;
+use Regexp::Sudoku::Battenburg;
+use Regexp::Sudoku::Quadruple;
+use Regexp::Sudoku::Diagonal;
+use Regexp::Sudoku::Parity;
+use Regexp::Sudoku::Renban;
+use Regexp::Sudoku::German_Whisper;
 
-my $DEFAULT_SIZE   = 9;
-my $SENTINEL       = "\n";
-my $CLAUSE_LIST    = ",";
+our @ISA = qw [
+    Regexp::Sudoku::Battenburg
+    Regexp::Sudoku::Quadruple
+    Regexp::Sudoku::Diagonal
+    Regexp::Sudoku::Parity
+    Regexp::Sudoku::Renban
+    Regexp::Sudoku::German_Whisper
+];
 
-my $NR_OF_DIGITS   =  9;
-my $NR_OF_LETTERS  = 26;
-my $NR_OF_SYMBOLS  = $NR_OF_DIGITS + $NR_OF_LETTERS;
-
-my $ANTI_KNIGHT    = 1;
-my $ANTI_KING      = 2;
-
-my $MAIN_DIAGONAL  = 1;
-my $MINOR_DIAGONAL = 2;
 
 fieldhash my %size;
 fieldhash my %values;
-fieldhash my %evens;
-fieldhash my %odds;
 fieldhash my %box_width;
 fieldhash my %box_height;
 fieldhash my %values_range;
 fieldhash my %cell2houses;
 fieldhash my %house2cells;
 fieldhash my %clues;
-fieldhash my %is_even;
-fieldhash my %is_odd;
 fieldhash my %subject;
 fieldhash my %pattern;
 fieldhash my %constraints;
-fieldhash my %renban2cells;
-fieldhash my %cell2renbans;
-
-
-my sub has_bit ($vec) {$vec =~ /[^\x{00}]/}
 
 
 ################################################################################
@@ -61,36 +55,6 @@ my sub has_bit ($vec) {$vec =~ /[^\x{00}]/}
 ################################################################################
 
 sub new ($class) {bless \do {my $v} => $class}
-
-
-################################################################################
-#
-# sub cell_name ($row, $column)
-#
-# Given a row number and a cell number, return the name of the cell.
-#
-# TESTS: 090-cell_name_row_column.t
-#
-################################################################################
-
-sub cell_name ($row, $column) {
-    "R" . $row . "C" . $column
-}
-
-
-################################################################################
-#
-# sub cell_row_column ($cell_name)
-#
-# Given the name of a cell, return its row and column.
-#
-# TESTS: 090-cell_name_row_column.t
-#
-################################################################################
-
-sub cell_row_column ($name) {
-    $name =~ /R([0-9]+)C([0-9]+)/ ? ($1, $2) : (0, 0)
-}
 
 
 ################################################################################
@@ -133,8 +97,7 @@ sub init_size ($self, $args = {}) {
 #
 # size ($self)
 #
-# Returns the size of the sudoku. If there is no size supplied, use 
-# the default (9).
+# Returns the size of the sudoku.
 #
 # TESTS: 010_size.t
 #
@@ -165,14 +128,9 @@ sub init_values ($self, $args = {}) {
                 ($NR_OF_DIGITS + 1) .. min $size, $NR_OF_SYMBOLS;
     }
 
-    my $evens = do {my $i = 1; join "" => grep {$i = !$i} split // => $values};
-    my $odds  = do {my $i = 0; join "" => grep {$i = !$i} split // => $values};
-
     $values {$self} = $values;
-    $evens  {$self} = $evens;
-    $odds   {$self} = $odds;
-
     $self -> init_values_range ($args);
+    $self;
 }
 
 
@@ -219,49 +177,20 @@ sub values ($self) {
 
 ################################################################################
 #
-# evens ($self)
-#
-# Return the set of even values used in the sudoku. In list context, this will
-# be an array of characters; in scalar context, a string.
-#
-# TESTS: 020_values.t
-#
-################################################################################
-
-sub evens ($self) {
-    wantarray ? split // => $evens  {$self} : $evens  {$self};
-}
-
-
-################################################################################
-#
-# odds ($self)
-#
-# Return the set of odd values used in the sudoku. In list context, this will
-# be an array of characters; in scalar context, a string.
-#
-# TESTS: 020_values.t
-#
-################################################################################
-
-sub odds  ($self) {
-    wantarray ? split // => $odds   {$self} : $odds   {$self};
-}
-
-
-################################################################################
-#
-# values_range ($self)
+# values_range ($self, $with_zero = 0)
 #
 # Return the set of values used in the sudoku, as ranges to be used in
-# a character class. Calls $self -> values () to get the values.
+# a character class. If $with_zero is true, we include '0' in the range
+# as well. Note, '0' will *never* be an acceptable value.
 #
 # TESTS: 020_values.t
 #
 ################################################################################
 
-sub values_range ($self) {
-    $values_range {$self}
+sub values_range ($self, $with_zero = 0) {
+    my $range = $values_range {$self};
+       $range =~ s/1/0/ if $with_zero;
+       $range;
 }
 
 
@@ -605,132 +534,6 @@ sub set_center_dot_house ($self) {
 }
 
 
-################################################################################
-#
-# sub init_diagonal ($self, $args)
-#
-# If we have diagonals, it means cells on one or more diagonals 
-# should differ. This method initializes the houses for that.
-#
-# The main diagonal for a 9 x 9 sudoku is defined as follows:
-#
-#     * . .  . . .  . . .
-#     . * .  . . .  . . .
-#     . . *  . . .  . . .
-#
-#     . . .  * . .  . . .
-#     . . .  . * .  . . .
-#     . . .  . . *  . . .
-#
-#     . . .  . . .  * . .
-#     . . .  . . .  . * .
-#     . . .  . . .  . . *
-#
-# The minor diagonal for a 9 x 9 sudoku is defined as follows:
-#
-#     . . .  . . .  . . *
-#     . . .  . . .  . * .
-#     . . .  . . .  * . .
-#
-#     . . .  . . *  . . .
-#     . . .  . * .  . . .
-#     . . .  * . .  . . .
-#
-#     . . *  . . .  . . .
-#     . * .  . . .  . . .
-#     * . .  . . .  . . .
-#
-# TESTS: 050-set_diagonals.t
-#        051-set_diagonals.t
-#        052-set_diagonals.t
-#
-################################################################################
-
-my sub init_diagonal ($self, $type, $offset = 0) {
-    my $size = $self -> size;
-
-    return $self if $offset >= $size;
-
-    my @cells;
-    for (my ($r, $c) = $type == $MAIN_DIAGONAL
-                        ? ($offset >= 0 ? (1,               1 + $offset)
-                                        : (1 - $offset,     1))
-                        : ($offset >= 0 ? ($size,           1 + $offset)
-                                        : ($size + $offset, 1));
-        0 < $r && $r <= $size && 0 < $c && $c <= $size;
-        ($r, $c) = $type == $MAIN_DIAGONAL ? ($r + 1, $c + 1)
-                                           : ($r - 1, $c + 1)) {
-        push @cells => cell_name ($r, $c);
-    }
-
-    my $name;
-    if ($type == $MAIN_DIAGONAL) {
-        $name = "DM";
-        if ($offset) {
-            $name .= $offset > 0 ? "S" : "s";
-            $name .= "-" . abs ($offset);
-        }
-    }
-    else {
-        $name = "Dm";
-        if ($offset) {
-            $name .= $offset < 0 ? "S" : "s";
-            $name .= "-" . abs ($offset);
-        }
-    }
-
-    $self -> create_house ($name => @cells);
-}
-
-sub set_diagonal_main ($self) {
-    init_diagonal ($self, $MAIN_DIAGONAL);
-}
-sub set_diagonal_minor ($self) {
-    init_diagonal ($self, $MINOR_DIAGONAL);
-}
-sub set_cross ($self) {
-    $self -> set_diagonal_main
-          -> set_diagonal_minor
-}
-sub set_diagonal_double ($self) {
-    $self -> set_cross_1
-}
-sub set_diagonal_triple ($self) {
-    $self -> set_cross_1
-          -> set_cross
-}
-sub set_argyle ($self) {
-    $self -> set_cross_1
-          -> set_cross_4
-}
-
-
-foreach my $offset (1 .. $NR_OF_SYMBOLS - 1) {
-    no strict 'refs';
-
-    *{"set_diagonal_main_super_$offset"} =  sub ($self) {
-        init_diagonal ($self, $MAIN_DIAGONAL,    $offset);
-    };
-
-    *{"set_diagonal_main_sub_$offset"} =  sub ($self) {
-        init_diagonal ($self, $MAIN_DIAGONAL,  - $offset);
-    };
-
-    *{"set_diagonal_minor_super_$offset"} =  sub ($self) {
-        init_diagonal ($self, $MINOR_DIAGONAL, - $offset);
-    };
-
-    *{"set_diagonal_minor_sub_$offset"} =  sub ($self) {
-        init_diagonal ($self, $MINOR_DIAGONAL,   $offset);
-    };
-
-    *{"set_cross_$offset"} =  sub ($self) {
-        init_diagonal ($self, $MAIN_DIAGONAL,    $offset);
-        init_diagonal ($self, $MAIN_DIAGONAL,  - $offset);
-        init_diagonal ($self, $MINOR_DIAGONAL, - $offset);
-        init_diagonal ($self, $MINOR_DIAGONAL,   $offset);
-    };
-}
 
 
 ################################################################################
@@ -766,10 +569,19 @@ sub house2cells ($self, $house) {
 
 ################################################################################
 #
-# cells ($self)
+# cells ($self, $sorted = 0)
 #
 # Return the names of all the cells in the sudoku.
 #
+# If we want the cells to be sorted, then we use the following priorities:
+#    * Clues go first
+#    * Odd/Even cells go next
+#    * Then the other cells
+#    * Ties are broken in the following fashion:
+#        * The more clues seen, the better
+#        * The smallest Renban area the cell is in, the better
+#        * The more houses the cell is in, the better.
+#        
 # TESTS: 040-houses.t
 #
 ################################################################################
@@ -778,10 +590,13 @@ sub cells  ($self, $sorted = 0) {
     my @cells = sort keys %{$cell2houses  {$self}};
     if ($sorted) {
         state $CELL_NAME    = 0;
-        state $IS_CLUE      = $CELL_NAME  + 1;
-        state $EVEN_ODD     = $IS_CLUE    + 1;
-        state $CLUES_SEEN   = $EVEN_ODD   + 1;
-        state $NR_OF_HOUSES = $CLUES_SEEN + 1;
+        state $IS_CLUE      = $CELL_NAME    + 1;
+        state $EVEN_ODD     = $IS_CLUE      + 1;
+        state $CLUES_SEEN   = $EVEN_ODD     + 1;
+        state $NR_OF_HOUSES = $CLUES_SEEN   + 1;
+        state $RENBAN       = $NR_OF_HOUSES + 1;
+        state $GERMAN       = $RENBAN       + 1;
+        state $QUADRUPLE    = $GERMAN       + 1;
 
         #
         # For each cell, determine how many different clues it sees.
@@ -801,6 +616,9 @@ sub cells  ($self, $sorted = 0) {
                  sort {$$b [$IS_CLUE]      <=> $$a [$IS_CLUE]        ||       
                        $$b [$EVEN_ODD]     <=> $$a [$EVEN_ODD]       ||      
                        $$b [$CLUES_SEEN]   <=> $$a [$CLUES_SEEN]     ||   
+                       $$a [$RENBAN]       <=> $$b [$RENBAN]         ||
+                       $$b [$GERMAN]       <=> $$a [$GERMAN]         ||
+                       $$b [$QUADRUPLE]    <=> $$a [$QUADRUPLE]      ||
                        $$b [$NR_OF_HOUSES] <=> $$a [$NR_OF_HOUSES]   ||
                        $$a [$CELL_NAME]    cmp $$b [$CELL_NAME]}
                  map  {my $r = [];
@@ -809,7 +627,28 @@ sub cells  ($self, $sorted = 0) {
                        $$r [$EVEN_ODD]      =  $self -> is_even ($_) ||
                                                $self -> is_odd  ($_) ? 1 : 0;
                        $$r [$CLUES_SEEN]    =  keys (%{$sees {$_}    || {}});
-                       $$r [$NR_OF_HOUSES]  =  $self -> cell2houses ($_);
+                       $$r [$NR_OF_HOUSES]  =  $self -> cell2houses  ($_);
+                       $$r [$GERMAN]        =  $self -> cell2germans ($_);
+                       #
+                       # Find the *smallest* renban the cell is in
+                       #
+                       $$r [$RENBAN]        =
+                           (min map {scalar $self -> renban2cells ($_)}
+                               $self -> cell2renbans ($_)) // $self -> size;
+
+                       #
+                       # Assign quadruple points for each cell. A cell
+                       # gets points for each quadruple it is, and more
+                       # points the more values are in the quadruple.
+                       # More quadruples counts for more though.
+                       #
+                       $$r [$QUADRUPLE]     = 0;
+                       foreach my $quadruple ($self -> cell2quadruples ($_)) {
+                           $$r [$QUADRUPLE] += 10;
+                           $$r [$QUADRUPLE] ++ for
+                                $self -> quadruple_values ($quadruple);
+                       }
+
                        $r}
                  @cells;
     }
@@ -854,8 +693,6 @@ sub houses ($self) {
 
 sub set_clues ($self, $in_clues) {
     my $clues   = {};
-    my $is_even = {};
-    my $is_odd  = {};
     #
     # Turn a string into an array
     #
@@ -868,14 +705,12 @@ sub set_clues ($self, $in_clues) {
             my $val  = $$in_clues [$r] [$c];
             next if !$val || $val eq ".";
             my $cell = cell_name $r + 1, $c + 1;
-            if    ($val eq 'e') {$$is_even {$cell} = 1}
-            elsif ($val eq 'o') {$$is_odd  {$cell} = 1}
+            if    ($val eq 'e') {$self -> set_is_even ($cell)}
+            elsif ($val eq 'o') {$self -> set_is_odd  ($cell)}
             else                {$$clues   {$cell} = $val}
         }
     }
     $clues   {$self} = $clues;
-    $is_even {$self} = $is_even;
-    $is_odd  {$self} = $is_odd;
 
     $self;
 }
@@ -914,25 +749,6 @@ sub clue     ($self , $cell) {
 
 ################################################################################
 #
-# is_even ($self, $cell)
-# is_odd  ($self, $cell)
-#
-# Returns wether the cell is given to be even/odd. 
-#
-# TESTS: 081-is_even_odd.t
-#
-################################################################################
-
-sub is_even  ($self,  $cell) {
-    $is_even {$self} {$cell}
-}
-sub is_odd   ($self,  $cell) {
-    $is_odd  {$self} {$cell}
-}
-
-
-################################################################################
-#
 # set_anti_knight_constraint ($self)
 # set_anti_king_constraint ($self)
 #
@@ -952,77 +768,6 @@ sub set_anti_king_constraint ($self) {
     $self;
 }
 
-
-################################################################################
-#
-# set_renban ($self, @cells)
-#
-# Initialize any renban lines/areas
-#
-# TESTS: 170-set_renban.t
-#
-################################################################################
-
-sub set_renban ($self, @cells) {
-    if (@cells == 1 && "ARRAY" eq ref @cells) {
-        @cells = @{$cells [0]}
-    }
-
-    my $name = "REN-" . (1 + keys %{$renban2cells {$self} || {}});
-
-    foreach my $cell (@cells) {
-        $cell2renbans {$self} {$cell} {$name} = 1;
-        $renban2cells {$self} {$name} {$cell} = 1;
-    }
-
-    $self;
-}
-
-################################################################################
-#
-# cell2renbans ($self, $cell)
-#
-# Return a list of renbans a cell belongs to.
-#
-# TESTS: 170-set_renban.t
-#
-################################################################################
-
-sub cell2renbans ($self, $cell) {
-    keys %{$cell2renbans {$self} {$cell} || {}}
-}
-
-################################################################################
-#
-# renban2cells ($self, $cell)
-#
-# Return a list of cells in a renban.
-#
-# TESTS: 170-set_renban.t
-#
-################################################################################
-
-sub renban2cells ($self, $renban) {
-    keys %{$renban2cells {$self} {$renban} || {}}
-}
-
-################################################################################
-#
-# same_renban ($self, $cell1, $cell2)
-#
-# Return a list of renbans to which both $cell1 and $cell2 belong.
-# In scalar context, returns the number of renbans the cells both belong.
-#
-# TESTS: 171-same_renban.t
-#
-################################################################################
-
-sub same_renban ($self, $cell1, $cell2) {
-    my %seen;
-       $seen {$_} ++ for $self -> cell2renbans ($cell1),
-                         $self -> cell2renbans ($cell2);
-    grep {$seen {$_} > 1} keys %seen;
-}
 
 
 ################################################################################
@@ -1096,12 +841,6 @@ sub make_empty_statement ($self, $cell, $method = "values") {
 sub make_any_statement  ($self, $cell) {
     $self -> make_empty_statement ($cell, "values")
 }
-sub make_even_statement ($self, $cell) {
-    $self -> make_empty_statement ($cell, "evens")
-}
-sub make_odd_statement  ($self, $cell) {
-    $self -> make_empty_statement ($cell, "odds")
-}
 
 
 ################################################################################
@@ -1129,71 +868,6 @@ sub make_cell_statement ($self, $cell) {
 
 ################################################################################
 #
-# semi_debruijn_seq
-#
-# Return, for the given values, a De Bruijn sequence of size 2 with
-#  1) Duplicates removed and
-#  2) The first character copied to the end
-#
-# TESTS: 130-semi_debruijn_seq.t
-#
-################################################################################
-
-sub semi_debruijn_seq ($self, $values = $values {$self}) {
-    state $cache;
-    $$cache {$values} //= do {
-        my $seq = debruijn ($values, 2);
-        $seq .= substr $seq, 0, 1;  # Copy first char to the end.
-        $seq  =~ s/(.)\g{1}/$1/g;   # Remove duplicates.
-        $seq;
-    };
-}
-
-
-
-################################################################################
-#
-# make_renban_statement ($self, $cell1, $cell2)
-#
-# Given two cell names, which are assumed to be in the same renban,
-# return a sub subject and a sub pattern, which makes iff the difference
-# between the cells is less than the size of the renban.
-#
-# For now, we assume no pair of different size renbans intersect more
-# than once.
-#
-# TESTS: 140-make_renban_statement.t
-#
-################################################################################
-
-sub make_renban_statement ($self, $cell1, $cell2) {
-    my ($name)  = $self -> same_renban ($cell1, $cell2);
-    my  $size   = $self -> renban2cells ($name);
-    my  @values = $self -> values;
-    my  $subsub = "";
-    my  $subpat = "";
-
-    for (my $i = 0; $i < @values; $i ++) {
-        my $d1 = $values [$i];
-        for (my $j = max (0, $i - $size + 1);
-                $j < min ($i + $size, scalar @values); $j ++) {
-            next if $i == $j;
-            my $d2 = $values [$j];
-            $subsub .= "$d1$d2";
-       }
-    }
-
-    my $range = $self -> values_range ();
-    my $pair  = "(?:[$range][$range])";
-
-    $subpat   = "$pair*\\g{$cell1}\\g{$cell2}$pair*";
-
-    map {$_ . $SENTINEL} $subsub, $subpat;
-}
-
-
-################################################################################
-#
 # make_diff_statement ($self, $cell1, $cell2)
 #
 # Given two cell names, return a sub subject and a sub pattern which matches
@@ -1208,7 +882,7 @@ sub make_diff_statement ($self, $cell1, $cell2) {
     my @values = $self -> values;
     my $range  = $self -> values_range;
 
-    my $seq = $self -> semi_debruijn_seq;
+    my $seq = semi_debruijn_seq (scalar $self -> values);
     my $pat = "[$range]*\\g{$cell1}\\g{$cell2}[$range]*";
 
     map {$_ . $SENTINEL} $seq, $pat;
@@ -1267,6 +941,8 @@ sub init_subject_and_pattern ($self) {
 
     my @cells   = $self -> cells (1);
 
+    my %seen;
+
     for my $i (keys @cells) {
         #
         # First the part which picks up a value for this cell
@@ -1277,9 +953,11 @@ sub init_subject_and_pattern ($self) {
         $subject .= $subsub;
         $pattern .= $subpat;
 
+        $seen {$cell1} = 1;
+
         #
-        # Now, for all the previous cells, if there is a constraint
-        # between them, add a clause for them.
+        # Now, for all the previous cells, if there are constraints
+        # between them, add statements for each constraint.
         #
         for my $j (0 .. $i - 1) {
             my $cell2 = $cells [$j];
@@ -1289,20 +967,64 @@ sub init_subject_and_pattern ($self) {
             #
             next if $self -> clue ($cell1) && $self -> clue ($cell2);
 
-            my ($subsub, $subpat);
+            my ($subsub, $subpat) = ("", "");
+            my  $differs = 0;
+            my  @todo;
 
             if (my @renbans = $self -> same_renban ($cell1, $cell2)) {
-                ($subsub, $subpat) = $self -> make_renban_statement
-                                                 ($cell1, $cell2);
-            }
-            elsif ($self -> must_differ ($cell1, $cell2)) {
-                ($subsub, $subpat) = $self -> make_diff_statement
-                                                 ($cell1, $cell2);
+                push @todo => "make_renban_statement";
+                $differs = 1;
             }
 
-            if ($subsub && $subpat) {
+            if ($self -> same_battenburg ($cell1, $cell2)) {
+                push @todo => "make_battenburg_statement";
+            }
+
+            if ($self -> consecutive_in_german_whisper ($cell1, $cell2)) {
+                push @todo => "make_german_whisper_statement";
+                $differs = 1;
+            }
+
+            if (!$differs && $self -> must_differ ($cell1, $cell2)) {
+                push @todo => "make_diff_statement";
+            }
+
+            foreach my $method (@todo) {
+                my ($subsub, $subpat) = $self -> $method ($cell1, $cell2);
                 $subject .= $subsub;
                 $pattern .= $subpat;
+            }
+        }
+
+        #
+        # If the cell is part of an anti-Battenburg, and if the cell
+        # is the last cell seen of that anti-Battenburg, add the
+        # contraints.
+        #
+        foreach my $anti_battenburg ($self -> cell2anti_battenburgs ($cell1)) {
+            my @cells = $self -> anti_battenburg2cells ($anti_battenburg);
+            if (@cells == grep {$seen {$_}} @cells) {
+                my ($subsub, $subpat) =
+                    $self -> make_anti_battenburg_statement ($anti_battenburg);
+                $subject .= $subsub;
+                $pattern .= $subpat;
+            }
+        }
+
+        #
+        # If the cell is part of a quadruple constraint, and if the cell
+        # is the last cell seen of this quadruple, add the constraints
+        # for the quadruple.
+        #
+        foreach my $quadruple ($self -> cell2quadruples ($cell1)) {
+            my @cells = $self -> quadruple2cells ($quadruple);
+            if (@cells == grep {$seen {$_}} @cells) {
+                my ($subsubs, $subpats) =
+                    $self -> make_quadruple_statements ($quadruple);
+                foreach my $i (keys @$subsubs) {
+                    $subject .= $$subsubs [$i];
+                    $pattern .= $$subpats [$i];
+                }
             }
         }
     }
@@ -1347,796 +1069,5 @@ sub pattern ($self) {
 
 1;
 
+
 __END__
-=begin html
-
-<style>
-    ul#index::before {
-        content:                  "Regexp::Sudoku";
-        font-size:                            300%;
-        font-family:                     monospace;
-        font-weight:                          bold;
-        text-align:                         center;
-        line-height:                           2em;
-        margin-left:                           30%;
-        margin-top:                           -1em;
-    }
-    ul#index li ul li ul li {
-        font-family:                     monospace;
-    }
-    html {
-        margin-left:                            5%;
-        margin-right:                          10%;
-    }
-    h1 {
-        margin-left:                           -4%;
-    }
-    h2 {
-        margin-left:                           -3%;
-    }
-    h3 {
-        margin-left:                           -2%;
-    }
-    pre {
-        background:                          black;
-        padding-top:                           1em;
-        padding-bottom:                        1em;
-        border-radius:                         1em;
-    }
-    pre code {
-        color:                          lightgreen;
-    }
-</style>
-
-=end html
-
-=head1 NAME
-
-Regexp::Sudoku - Solve Sudokus with regular expressions.
-
-=head1 SYNOPSIS
-
- use Regexp::Sudoku;
- my $sudoku = Regexp::Sudoku:: -> new -> init
-                                      -> set_clues (<<~ '--');
-     5 3 .  . 7 .  . . .
-     6 . .  1 9 5  . . .
-     . 9 8  . . .  . 6 .
-
-     8 . .  . 6 .  . . 3
-     4 . .  8 . 3  . . 1
-     7 . .  . 2 .  . . 6
-
-     . 6 .  . . .  2 8 .
-     . . .  4 1 9  . . 5
-     . . .  . 8 .  . 7 9
-     --
-
- my $subject = $sudoku -> subject;
- my $pattern = $sudoku -> pattern;
-
- if ($subject =~ $pattern) {
-    for my $row (1 .. 9) {
-        for my $col (1 .. 9) {
-            print $+ {"R${r}C${c}"}, " ";
-        }
-        print "\n";
-    }
- }
-
-=head1 DESCRIPTION
-
-This module takes a Sudoku (or variant) as input, calculates a subject
-and pattern, such that, if the pattern is matched agains the subject,
-the match succeeds if, and only if, the Sudoku has a solution. And if
-it has a solution C<< %+ >> is populated with the values of the cells of
-the solved Sudoku.
-
-After constructing, initializing and constructing a Sudoku object using
-C<< new >>, C<< init >> and various C<< set_* >> methods (see below),
-the object can be queried
-with C<< subject >> and C<< pattern >>. C<< subject >> returns 
-a string, while C<< pattern >> returns a pattern (as a string).
-
-Once the subject has been matched against the pattern, 81 (or rather
-C<< N ** 2 >> for an C<< N x N >> Sudoku) named captures will be set:
-C<< R1C1 >> .. C<< R1C9 >> .. C<< R9C1 >> .. C<< R9C9 >>. These correspond
-to the values of the cells of a solved Sudoku, where the cell in the
-top left is named C<< R1C1 >>, the cell in the top right C<< R1C9 >>,
-the cell in the bottom left C<< R9C1 >> and the cell in the bottom right
-C<< R9C9 >>. In general, the cell on row C<< r >> and column C<< c >>
-is named C<< RrCc >>. Named captures are available in C<< %+ >>
-(see L<< perlvar >>).
-
-For regular, C<< 9 x 9 >> Sudokus, one would just call C<< new >>,
-C<< init >> and C<< set_clues >>. Various variants need to call
-different methods.
-
-Unless specified otherwise, all the methods below return the object
-it was called with; this methods can be chained.
-
-=head2 Main methods
-
-=head3 C<< new () >>
-
-This is a I<< class >> method called on the C<< Regexp::Sudoku >>
-package. It takes no arguments, and just returns an uninitialized
-object. (Basically, it just calls C<< bless >> for you).
-
-=head3 C<< init () >>
-
-C<< init >> initializes the Sudoku object. This method B<< must >> 
-be called on the return value of C<< new >> before calling any other
-methods.
-
-C<< init >> takes one, optional, (named) argument.
-
-=over 4
-
-=item C<< size => INTEGER >>
-
-Usually, Sudokus are C<< 9 x 9 >>. For a Sudoku of a different size,
-we need to pass in the size. Smallest size for which Sudokus exist,
-is C<< 4 >>. Largest size we accept is C<< 35 >>. For a Sudoku with
-a size exceeding 9, we will letters as values. (So, for a C<< 12 x 12 >>
-Sudoku, we have C<< 1 .. 9, 'A', 'B' >> as values.)
-
-The size directly influences the size of the boxes (the rectangles where
-each of the numbers appears exactly once). For a size C<< N >>, the size
-of a box will be those integers C<< p >> and C<< q >> where C<< N = p * q >>,
-and which minimizes C<< abs (p - q) >>. Common sizes lead to the following
-box sizes:
-
-    size (N x N) | box size (width x height)
-    =============+==========================
-          4 *    |      2 x 2
-          6      |      3 x 2
-          8      |      4 x 2
-          9 *    |      3 x 3  (Default)
-         10      |      5 x 2
-         12      |      4 x 3
-         15      |      5 x 3
-         16 *    |      4 x 4
-         24      |      6 x 4
-         25 *    |      5 x 5
-         30      |      6 x 5
-         35      |      7 x 5
-
-Sizes which are perfect squares (marked with C<< * >> in the table above)
-lead to square boxes.
-
-A size which is a prime number leads to boxes which are identical to
-rows -- you would need to configure different boxes.
-
-=back
-
-=head3 C<< set_clues (STRING | ARRAYREF) >>
-
-The C<< set_clues >> method is used to pass in the clues (aka givens)
-of a Suduko. Most Sudokus will have at least one clue, but there are
-a few variants which allow clueless Sudokus. For a standard C<< 9 x 9 >>
-Sudoku, the minimum amount of clues is 17.
-
-The clues are either given as a string, or a two dimensional arrayref. 
-
-In the case of a string, rows are separated by newlines, and values
-in a row by whitespace. The first line of the string corresponds
-with the first row of the Sudoku, the second line with the second 
-row, etc. In each line, the first value corresponds with the first
-cell of that row, the second value with the second cell, etc.
-In case of an arrayref, the array consists of arrays of values. Each
-array corresponds with a row, and each element of the inner arrays
-corresponds with a cell.
-
-The values have the following meaning:
-
-=over 4
-
-=item C<< '1' .. '9', 'A' .. 'Z' >>
-
-This corresponds to a clue/given in the corresponding cell. For standard
-Sudokus, we use C<< '1' .. '9' >>. Smaller Sudokus use less digits.
-For Sudokus greater than C<< 9 x 9 >>, capital letters are used, up to 
-C<< 'Z' >> for a C<< 35 x 35 >> Sudoku.
-
-=item C<< '.' >>, C<< 0 >>, C<< "" >>, C<< undef >>
-
-These values indicate the Sudoku does not have a clue for the corresponding
-cell: the cell is blank. C<< "" >> and C<< undef >> can only be used
-if the array form is being used.
-
-=item C<< 'e' >>
-
-This indicates the cell should have an I<< even >> number in its solution.
-(Note that C<< 'E' >> indicates a clue (if the size is at least C<< 15 x 15 >>),
-and is different from C<< 'e' >>).
-
-=item C<< 'o' >>
-
-This indicates the cell should have an I<< odd >> number in its solution.
-(Note that C<< 'O' >> indicates a clue (if the size is at least C<< 25 x 25 >>),
-and is different from C<< 'o' >>).
-
-=back
-
-=head2 Additional Houses
-
-A I<< house >> is a region which 
-contains each of the numbers C<< 1 .. 9 >> (or C<< 1 .. N >> for an
-C<< N x N >> sized Sudoku) exactly once. With a standard Sudoku, each
-row, each column, and each C<< 3 x 3 >> box is a house.
-
-Some variants have additional houses, next to the rows, columns and boxes.
-In this section, we describe the methods which can be used to configure
-the Sukodu to have additional houses.
-
-=head3 C<< set_nrc_houses () >>
-
-An I<< NRC >> Sudoku has four additional houses, indicated below with
-the numbers C<< 1 .. 4 >>. This variant is only defined for C<< 9 x 9 >>
-Sudokus:
-
-    . . .  . . .  . . .
-    . 1 1  1 . 2  2 2 .
-    . 1 1  1 . 2  2 2 .
-
-    . 1 1  1 . 2  2 2 .
-    . . .  . . .  . . .
-    . 3 3  3 . 4  4 4 .
-
-    . 3 3  3 . 4  4 4 .
-    . 3 3  3 . 4  4 4 .
-    . . .  . . .  . . .
-
-Calling the C<< set_nrc_houses () >> sets up those houses.
-
-The NRC Sudoku is named after the Dutch newspaper
-L<< NRC|https://www.nrc.nl/ >>, which first publishes such a Sudoku
-and still publishes one L<< daily|https://www.nrc.nl/sudoku/ >>.
-It is also known under
-the names I<< Windoku >> and I<< Hyper Sudoku >>.
-
-=head3 C<< set_asterisk_house () >>
-
-An I<< asterisk >> Sudoku has an additional house, roughly in the
-shape of an asterisk, as indicated below. This variant is only defined
-for C<< 9 x 9 >> Sudokus:
-
-    . . .  . . .  . . .
-    . . .  . * .  . . .
-    . . *  . . .  * . .
-
-    . . .  . . .  . . .
-    . * .  . * .  . * .
-    . . .  . . .  . . .
-
-    . . *  . . .  * . .
-    . . .  . * .  . . .
-    . . .  . . .  . . .
-
-Calling the C<< set_asterisk_house () >> sets up those houses.
-
-=head3 C<< set_girandola_house () >>
-
-An I<< girandola >> Sudoku has an additional house, roughly in the
-shape of a I<< windmill pinwheel >> (a childs toy), as indicated below.
-This variant is only defined for C<< 9 x 9 >> Sudokus:
-
-    * . .  . . .  . . *
-    . . .  . * .  . . .
-    . . .  . . .  . . .
-
-    . . .  . . .  . . .
-    . * .  . * .  . * .
-    . . .  . . .  . . .
-
-    . . .  . . .  . . .
-    . . .  . * .  . . .
-    * . .  . . .  . . *
-
-Calling the C<< set_girandola_house () >> sets up those houses.
-
-=head3 C<< set_center_dot_house () >>
-
-A I<< center dot >> house is an additional house which consists of
-all the center cell of all the boxes. This is only defined for Sudokus
-where the boxes have odd sizes. (Sizes C<< 9 >>, C<< 15 >>, C<< 25 >>,
-and C<< 35 >>; see the table with sizes above). For a C<< 9 x 9 >>
-Sudoku, this looks like:
-
-    . . .  . . .  . . .
-    . * .  . * .  . * .
-    . . .  . . .  . . .
-
-    . . .  . . .  . . .
-    . * .  . * .  . * .
-    . . .  . . .  . . .
-
-    . . .  . . .  . . .
-    . * .  . * .  . * .
-    . . .  . . .  . . .
-
-Calling the C<< set_center_dot_house () >> sets up those houses.
-
-
-
-=head2 Diagonals
-
-A common constraint used in variant Sudokus is uniqueness of one
-or more diagonals: all the values on each of the marked diagonals 
-should be unique.
-
-The I<< main >> diagonal of a Sudoku is the diagonal which runs
-from the top left to the bottom right. The I<< minor >> diagonal
-the diagonal which runs from the top right to the bottom left.
-
-
-    \ . .  . . .  . . .            . . .  . . .  . . /
-    . \ .  . . .  . . .            . . .  . . .  . / .
-    . . \  . . .  . . .            . . .  . . .  / . .
-
-    . . .  \ . .  . . .            . . .  . . /  . . .
-    . . .  . \ .  . . .            . . .  . / .  . . .
-    . . .  . . \  . . .            . . .  / . .  . . .
-
-    . . .  . . .  \ . .            . . /  . . .  . . .
-    . . .  . . .  . \ .            . / .  . . .  . . .
-    . . .  . . .  . . \            / . .  . . .  . . .
-
-      Main  Diagonal                 Minor Diagonal
-
-
-A I<< super >> diagonal is a diagonal which parallel and above
-of the main or minor diagonal. A I<< sub >> diagonal is a diagonal
-which runs parallel and below the main or minor diagonal.
-Super and sub diagonals have an I<< offset >>, indicating their
-distance from the main or minor diagonal. The super and sub diagonal
-directly next to the main and minor diagonals have an offset of 1.
-The maximum offset for an C<< N x N >> Sudoku is C<< N - 1 >>, although
-such an offset reduces the diagonal to a single cell.
-
-    . \ .  . . .  . . .            . . .  . . .  . / .
-    . . \  . . .  . . .            . . .  . . .  / . .
-    \ . .  \ . .  . . .            . . .  . . /  . . /
-
-    . \ .  . \ .  . . .            . . .  . / .  . / .
-    . . \  . . \  . . .            . . .  / . .  / . .
-    . . .  \ . .  \ . .            . . /  . . /  . . .
-
-    . . .  . \ .  . \ .            . / .  . / .  . . .
-    . . .  . . \  . . \            / . .  / . .  . . .
-    . . .  . . .  \ . .            . . /  . . .  . . .
-
-   Super and sub diagonals       Super and sub diagonals
-    off the main diagonal         off the minor diagonal
-
-
-In total, an C<< N x N >> Sudoku can have C<< 4 * N - 2 >> diagonals
-(34 for a standard C<< 9 x 9 >> Sudoku).
-
-There will be a method to set uniqness for each possible diagonal.
-
-=head3 C<< set_diagonal_main () >>
-
-This method sets a uniqness constraint on the I<< main diagonal >>.
-
-=head3 C<< set_diagonal_minor () >>
-
-This method sets a uniqness constraint on the I<< minor diagonal >>.
-
-=head3 C<< set_diagonal_main_super_1 () .. set_diagonal_main_super_34 () >>
-
-These methods set uniqness constraints on I<< super diagonals >> 
-parallel to the main diagonal, with the given offset. If the 
-offset equals or exceeds the size of the Sudoku, the diagonal
-falls completely outside of the Sudoku, and hence, does not add
-a constraint.
-
-=head3 C<< set_diagonal_main_sub () .. set_diagonal_main_sub () >>
-
-These methods set uniqness constraints on I<< sub diagonals >> 
-parallel to the main diagonal, with the given offset. If the 
-offset equals or exceeds the size of the Sudoku, the diagonal
-falls completely outside of the Sudoku, and hence, does not add
-a constraint.
-
-=head3 C<< set_diagonal_minor_super_1 () .. set_diagonal_minor_super_34 () >>
-
-These methods set uniqness constraints on I<< super diagonals >> 
-parallel to the minor diagonal, with the given offset. If the 
-offset equals or exceeds the size of the Sudoku, the diagonal
-falls completely outside of the Sudoku, and hence, does not add
-a constraint.
-
-=head3 C<< set_diagonal_minor_sub () .. set_diagonal_minor_sub () >>
-
-These methods set uniqness constraints on I<< sub diagonals >> 
-parallel to the minor diagonal, with the given offset. If the 
-offset equals or exceeds the size of the Sudoku, the diagonal
-falls completely outside of the Sudoku, and hence, does not add
-a constraint.
-
-
-=head2 Crosses and other diagonal sets
-
-It is quite common for variants which have constraints on diagonals
-to do so in a symmetric fashion. To avoid having to call multiple
-C<< set_diagonal_* >> methods, we provide a bunch of wrappers which
-set uniqness constraints on two or more diagonals.
-
-=head3 C<< set_cross () >>
-
-A common variant has uniqness constraints for both the main and minor
-diagonal -- this variant is widely known under the name I<< X-Sudoku >>.
-C<< set_cross () >> sets the uniqness constraints for both the main
-and minor diagonals:
-
-    \ . .  . . .  . . /
-    . \ .  . . .  . / .
-    . . \  . . .  / . .
-
-    . . .  \ . /  . . .
-    . . .  . X .  . . .
-    . . .  / . \  . . .
-
-    . . /  . . .  \ . .
-    . / .  . . .  . \ .
-    / . .  . . .  . . \
-
-     Cross constraints
-
-
-=head3 C<< set_cross_1 () .. set_cross_34 () >>
-
-Each of the C<< set_cross_N () >> methods enable a uniqness constraint
-on B<< four >> diagonals: the I<< super >> and I<< sub >> diaganols
-(relative to both the main and minor diagonals) with offset C<< N >>.
-Note that if C<< N >> is equal, or exceeds the size of the Sudoku, 
-all the diagonals lie fully outside the Sudoku, rendering the method
-useless.
-
-=head3 C<< set_diagonal_double () >>
-
-This method enables a uniqness constraints on the diagonals parallel,
-and directly next to the main and minor diagonals. This is method is
-equivalent to C<< set_cross_1 >>.
-
-    . \ .  . . .  . / .
-    \ . \  . . .  / . /
-    . \ .  \ . /  . / .
-
-    . . \  . X .  / . .
-    . . .  X . X  . . .
-    . . /  . X .  \ . .
-
-    . / .  / . \  . \ .
-    / . /  . . .  \ . \
-    . / .  . . .  . \ .
-
-      Diagonal Double
-
-
-=head3 C<< set_diagonal_triple () >>
-
-This methods enables uniqness constraints on six diagonals: the main
-and minor diagonals, and the diagonals parallel to them, and directly
-next to them. Calling this method is equivalent to calling both
-C<< set_cross () >> and C<< set_diagonal_double () >>.
-
-    \ \ .  . . .  . / /
-    \ \ \  . . .  / / /
-    . \ \  \ . /  / / .
-
-    . . \  X X X  / . .
-    . . .  X X X  . . .
-    . . /  X X X  \ . .
-
-    . / /  / . \  \ \ .
-    / / /  . . .  \ \ \
-    / / .  . . .  . \ \
-
-      Diagonal Triple
-
-=head3 C<< set_argyle () >>
-
-The I<< Argyle Sudoku >> variant has uniqness constraints on
-B<< eight >> diagonals. This is named after a L<< pattern consisting of
-lozenges|https://en.wikipedia.org/wiki/Argyle_(pattern) >>, which
-itself was named after the tartans of the 
-L<< Clan Cambell |https://en.wikipedia.org/wiki/Clan_Campbell >>
-in Argyll in the Scottish highlands.
-
-Calling C<< set_argyle () >> is equivalent to calling 
-C<< set_cross_1 () >> and C<< set_cross_4 () >>.
-
-    . \ .  . ^ .  . / .
-    \ . \  / . \  / . /
-    . \ /  \ . /  \ / .
-
-    . / \  . X .  / \ .
-    < . .  X . X  . . >
-    . \ /  . X .  \ / .
-
-    . / \  / . \  / \ .
-    / . /  \ . /  \ . \
-    . / .  . V .  . \ .
-
-       Argyle Pattern
-
-
-
-=head2 Global constraints
-
-There are Sudoku variants which enable specific constraints on
-all the cells in the Sudoku.
-
-=head3 C<< set_anti_knight_constraint () >>
-
-An I<< anti knight >> constraint implies that two cells which are
-a knights move (as in classical Chess) apart must have different values.
-(A knights move
-is first two cells in an orthognal direction, then one cell
-perpendicular). For each cell, this puts a restriction to up to
-eight different cells. In the diagram below, C<< * >> marks all
-the cells which are a knights move away from the cell marked C<< O >>.
-
-    . . .  . . .  . . .
-    . . .  . . .  . . .
-    . . *  . * .  . . .
-
-    . * .  . . *  . . .
-    . . .  O . .  . . .
-    . * .  . . *  . . .
-
-    . . *  . * .  . . .
-    . . .  . . .  . . .
-    . . .  . . .  . . .
-
-   Anti Knight Constraint
-
-
-=head3 C<< set_anti_king_constraint () >>
-
-Also known as the I<< no touch constraint >>.
-
-An I<< anti king >> constraint implies that two cells which are
-a kings move (as in classical Chess) apart must have different values.
-(A kings move is one step in any of the eight directions).
-
-For each cell, this puts a restriction to up to
-eight different cells. Four of them are already restricted
-because they are one the same row or columns. And at least
-one kings move will end in the same box. So, this restriction
-is far less restrictive than the anti knights move restriction.
-
-In the diagram below, C<< * >> marks all
-the cells which are a kings move away from the cell marked C<< O >>.
-
-    . . .  . . .  . . .
-    . . .  . . .  . . .
-    . . .  . . .  . . .
-
-    . . *  * * .  . . .
-    . . *  O * .  . . .
-    . . *  * * .  . . .
-
-    . . .  . . .  . . .
-    . . .  . . .  . . .
-    . . .  . . .  . . .
-
-   Anti King Constraint
-
-=head2 Retricted lines and areas
-
-=head3 C<< set_renban (LIST) >>
-
-A I<< Renban >> line (or area) consist of a number of cells where all
-the values should form a consecutive sets of numbers. The numbers do
-not have to be in order. For example, a Renban area of size four may
-contain the numbers C<< 5-7-4-6 >> or C<< 2-3-4-5 >>, but not 
-C<< 2-3-5-6 >>. 
-
-This method takes a list of cell names as argument, where each name
-is of the form C<< RxCy >>, with C<< 1 <= x, y <= N >>, where C<< N >>
-is the size of the Sudoku.
-
-No validation of cell names is performed. Names which aren't of the
-form C<< RxCy >>, or which are outside of the Sudoku have no effect.
-A Renban area with more cells than the size of the Sudoku leads to
-an unsolvable Sudoku.
-
-This method can be called more than once, and should be called more
-than once if a Sudoku has more than one Renban line/area.
-
-=head1 BUGS
-
-There are no known bugs.
-
-=head1 TODO
-
-=over 2
-
-=item *
-
-Disjoint Groups
-
-=item *
-
-Jigsaw
-
-=item *
-
-Battenburg
-
-=item *
-
-Greater Than
-
-=over 2
-
-=item *
-
-Thermo
-
-=item *
-
-Slow Thermo
-
-=item *
-
-Rossini
-
-=back
-
-=item *
-
-Consecutive Sudoku
-
-=over 2
-
-=item *
-
-Non-consecutive Sudoku
-
-=back
-
-=item *
-
-Kropki
-
-=over 2
-
-=item *
-
-Absolute difference = 1
-
-=item *
-
-Other differences
-
-=item *
-
-Ratio 1:2
-
-=item *
-
-Other ratios
-
-=back
-
-=item *
-
-XV Sudoku
-
-=item *
-
-CL Sudoku
-
-=item *
-
-Outsize Sudoku
-
-=item *
-
-Young Tableaux
-
-=item *
-
-Palindromes
-
-=item *
-
-Renban lines
-
-=over 2
-
-=item *
-
-Nabner
-
-=back
-
-=item *
-
-German Whisper
-
-=item *
-
-Clones
-
-=item *
-
-Quadruple
-
-=item *
-
-Killer Sudoku
-
-=item *
-
-Little Killer Sudoku
-
-=item *
-
-Frame Sudoku
-
-=item *
-
-Arrow Sudoku
-
-=item *
-
-Sandwich
-
-=item *
-
-Clock Sudoku
-
-=back
-
-=head1 SEE ALSO
-
-L<< Regexp::Sudoku::Constants >>.
-
-=head1 DEVELOPMENT
-
-The current sources of this module are found on github,
-L<< git://github.com/Abigail/Regexp-Sudoku.git >>.
-
-=head1 AUTHOR
-
-Abigail, L<< mailto:cpan@abigail.freedom.nl >>.
-
-=head1 COPYRIGHT and LICENSE
-
-Copyright (C) 2021-2022 by Abigail.
-
-Permission is hereby granted, free of charge, to any person obtaining a
-copy of this software and associated documentation files (the "Software"),   
-to deal in the Software without restriction, including without limitation
-the rights to use, copy, modify, merge, publish, distribute, sublicense,
-and/or sell copies of the Software, and to permit persons to whom the
-Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included
-in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT
-OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-=head1 INSTALLATION
-
-To install this module, run, after unpacking the tar-ball, the 
-following commands:
-
-   perl Makefile.PL
-   make
-   make test
-   make install
-
-=cut

@@ -37,8 +37,10 @@ my @select_arguments = (
     'drilldown',
     'drilldown_filter',
     'drilldown_output_columns',
+    'drilldown_sort_keys',
     'dynamic_columns',
-    'match_columns'
+    'match_columns',
+    'query_expander'
 );
 
 sub new {
@@ -78,7 +80,13 @@ sub _parse_arguments {
     }
     if (exists($args->{'output_columns'})) {
         $parsed_arguments .= '&';
-        $parsed_arguments .= "output_columns=" . $args->{'output_columns'};
+        $parsed_arguments .= "output_columns=";
+
+        my $output_columns = $args->{'output_columns'};
+        foreach my $output_column (@$output_columns) {
+            $parsed_arguments .= $output_column . ',';
+        }
+        chop($parsed_arguments);
     }
     if (exists($args->{'query'})) {
         $parsed_arguments .= '&';
@@ -119,37 +127,51 @@ sub _parse_arguments {
         $parsed_arguments .= '&';
         $parsed_arguments .= "drilldown_output_columns=" . $args->{'drilldown_output_columns'};
     }
+    if (exists($args->{'drilldown_sort_keys'})) {
+        $use_drilldown = 1;
+        $parsed_arguments .= '&';
+        $parsed_arguments .= "drilldown_sort_keys=" . $args->{'drilldown_sort_keys'};
+    }
     if (exists($args->{'dynamic_columns'})) {
-        if (exists($args->{'dynamic_columns'}->{'name'})
-            && exists($args->{'dynamic_columns'}->{'stage'})
-            && exists($args->{'dynamic_columns'}->{'type'})
-            && exists($args->{'dynamic_columns'}->{'value'})
-           ) {
-            ;
-        } else {
-            croak "Missing required argument";
-        }
-        my $name = $args->{'dynamic_columns'}->{'name'};
+        my $dynamic_columns = $args->{'dynamic_columns'};
 
-        $parsed_arguments .= '&';
-        $parsed_arguments .=
-            "columns[" . $name . "].stage=". $args->{'dynamic_columns'}->{'stage'};
-        $parsed_arguments .= '&';
-        $parsed_arguments .=
-            "columns[" . $name . "].type=". $args->{'dynamic_columns'}->{'type'};
-        $parsed_arguments .= '&';
-        $parsed_arguments .=
-            "columns[" . $name . "].value=". $args->{'dynamic_columns'}->{'value'};
+        for (my $i = 0; $i < scalar(@$dynamic_columns); $i++) {
+            if (exists($dynamic_columns->[$i]->{'name'})
+                && exists($dynamic_columns->[$i]->{'stage'})
+                && exists($dynamic_columns->[$i]->{'type'})
+                && exists($dynamic_columns->[$i]->{'value'})
+               ) {
+                ;
+            } else {
+                croak "Missing required argument";
+            }
 
-        if (exists($args->{'dynamic_columns'}->{'flags'})) {
+            my $name = $dynamic_columns->[$i]->{'name'};
+
             $parsed_arguments .= '&';
             $parsed_arguments .=
-                "columns[" . $name . "].flags=". $args->{'dynamic_columns'}->{'flags'};
+                "columns[" . $name . "].stage=". $dynamic_columns->[$i]->{'stage'};
+            $parsed_arguments .= '&';
+            $parsed_arguments .=
+                "columns[" . $name . "].type=". $dynamic_columns->[$i]->{'type'};
+            $parsed_arguments .= '&';
+            $parsed_arguments .=
+                "columns[" . $name . "].value=". $dynamic_columns->[$i]->{'value'};
+
+            if (exists($dynamic_columns->[$i]->{'flags'})) {
+                $parsed_arguments .= '&';
+                $parsed_arguments .=
+                    "columns[" . $name . "].flags=". $dynamic_columns->[$i]->{'flags'};
+            }
         }
     }
     if (exists($args->{'match_columns'})) {
         $parsed_arguments .= '&';
         $parsed_arguments .= "match_columns=" . $args->{'match_columns'};
+    }
+    if (exists($args->{'query_expander'})) {
+        $parsed_arguments .= '&';
+        $parsed_arguments .= "query_expander=" . $args->{'query_expander'};
     }
 
     return $parsed_arguments;
@@ -157,23 +179,45 @@ sub _parse_arguments {
 
 sub _parse_result {
     my $result = shift;
-    my $i = 0;
+    my %result_set = ();
+    my @records = ();
+    my @drilldown_result_records = ();
 
     if ($use_drilldown) {
-        $i += 1;
+        $result_set{'n_hits_drilldown'} = $result->[1][0][0];
+
+        my @column_names_drilldown;
+        for (my $i = 0; $result->[1][1][$i]; $i++) {
+            push(@column_names_drilldown, $result->[1][1][$i][0]);
+        }
+
+        for (my $i = 0, my $j = 2; $i < $result_set{'n_hits_drilldown'}; $i++, $j++) {
+            my %record = ();
+            for (my $k=0; $k < @column_names_drilldown; $k++) {
+                $record{"drilldown_" . $column_names_drilldown[$k]} = "$result->[1][$j][$k]";
+            }
+            push(@drilldown_result_records, \%record);
+        }
         $use_drilldown = 0;
     }
 
-    my $n_hits = $result->[$i][0][0];
-    my @records;
+    $result_set{'n_hits'} = $result->[0][0][0];
 
-    my $j = 0;
-    for ($j = 2; $j < ($n_hits+2); $j++) {
-        if (exists($result->[$i][$j])) {
-            push(@records, $result->[$i][$j]);
-        }
+    my @column_names;
+    for (my $i = 0; $result->[0][1][$i]; $i++) {
+        push(@column_names, $result->[0][1][$i][0]);
     }
-    return ($n_hits, \@records);
+    for (my $i = 0, my $j = 2; $i < $result_set{'n_hits'}; $i++, $j++) {
+        my %record = ();
+        for (my $k=0; $k < @column_names; $k++) {
+            $record{"$column_names[$k]"} = $result->[0][$j][$k];
+        }
+        push(@records, \%record);
+    }
+    $result_set{'records'} = \@records;
+    $result_set{'drilldown_result_records'} = \@drilldown_result_records;
+
+    return \%result_set;
 }
 
 sub _make_command {

@@ -86,6 +86,7 @@ MANIFEST.SKIP
 misc/app.psgi
 misc/MEIACORE-1811/client.pl
 misc/MEIACORE-1811/server.pl
+misc/MEIACORE-1849.pl
 misc/SRV-1746/client.plx
 misc/SRV-1746/server.plx
 misc/test.plx

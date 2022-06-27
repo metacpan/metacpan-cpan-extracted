@@ -13,7 +13,7 @@ using ClientSP = iptr<Client>;
 
 extern const string DEFAULT_UA;
 
-struct Client : Tcp, private ITcpSelfListener, private ITimerListener {
+struct Client : Tcp, private ITcpSelfListener {
     Client (const LoopSP& = Loop::default_loop());
 
     ~Client () { assert(!_request); }
@@ -23,6 +23,9 @@ struct Client : Tcp, private ITcpSelfListener, private ITimerListener {
 
     uint64_t      last_activity_time () const { return _last_activity_time; }
     const NetLoc& last_netloc        () const { return _netloc; }
+
+    bool uncompress_response () const { return _parser.uncompress_content; }
+    void uncompress_response (bool v) { _parser.uncompress_content = v; }
 
 protected:
     Client (Pool*);
@@ -44,8 +47,9 @@ private:
     void on_connect (const ErrorCode&, const ConnectRequestSP&) override;
     void on_write   (const ErrorCode&, const WriteRequestSP&) override;
     void on_read    (string& buf, const ErrorCode& err) override;
-    void on_timer   (const TimerSP&) override;
     void on_eof     () override;
+
+    void timed_out();
 
     void send_chunk       (const RequestSP&, const string&);
     void send_final_chunk (const RequestSP&, const string&);

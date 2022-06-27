@@ -1,0 +1,65 @@
+{
+   "abstract" : "Fast perceptual image hashing (DCT-based pHash)",
+   "author" : [
+      "Dimitrios Kechagias <dkechag@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Image-PHash",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Math::DCT" : "0",
+            "perl" : "5.008"
+         },
+         "suggests" : {
+            "Image::Imlib2" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Image::Imlib2" : "0",
+            "Image::Magick" : "0",
+            "Imager" : "0"
+         },
+         "requires" : {
+            "GD" : "0",
+            "Test2::V0" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/dkechag/Image-PHash.git",
+         "web" : "https://github.com/SpareRoom/Image-PHash"
+      }
+   },
+   "version" : "0.1",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

@@ -1,0 +1,33 @@
+NAME
+    Acme::Mitey::Cards - demo of Mite
+
+SYNOPSIS
+      use Acme::Mitey::Cards;
+  
+      my $deck = Acme::Mitey::Cards::Deck->new->shuffle;
+      my $hand = $deck->deal_hand( owner => 'Bob' );
+      print $hand->to_string, "\n";
+
+DESCRIPTION
+    This is a small distribution to test/demonstrate Mite.
+
+BUGS
+    Please report any bugs to <https://github.com/tobyink/p5-mite/issues>.
+
+SEE ALSO
+    Mite.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2022 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

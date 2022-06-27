@@ -1,13 +1,10 @@
 package Mite::App::Command;
-
-use Mouse;
-use MouseX::Foreign;
+use Mite::MyMoo;
 extends qw(App::Cmd::Command);
 
-use Method::Signatures;
+sub opt_spec {
+    my ($class, $app) = (shift, @_);
 
-
-method opt_spec($class: $app) {
     return(
       [ "search-mite-dir!" => "only look for .mite/ in the current directory",
         { default => 1 } ],
@@ -18,12 +15,16 @@ method opt_spec($class: $app) {
 }
 
 
-method options($class: $app) {
+sub options {
+    my ($class, $app) = (shift, @_);
+
     return;
 }
 
 
-method should_exit_quietly($opts) {
+sub should_exit_quietly {
+    my ($self, $opts) = (shift, @_);
+
     my $config = $self->config;
 
     return unless $opts->{exit_if_no_mite_dir};
@@ -32,12 +33,14 @@ method should_exit_quietly($opts) {
 }
 
 
-method project() {
+sub project {
     require Mite::Project;
     return Mite::Project->default;
 }
 
-method config() {
+sub config {
+    my $self = shift;
+
     return $self->project->config;
 }
 

@@ -12,9 +12,9 @@ use List::MoreUtils qw(firstidx);
 use Time::HiRes qw(gettimeofday tv_interval);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-03-27'; # DATE
+our $DATE = '2022-06-23'; # DATE
 our $DIST = 'Org-Parser'; # DIST
-our $VERSION = '0.557'; # VERSION
+our $VERSION = '0.558'; # VERSION
 
 has tags                    => (is => 'rw');
 has todo_states             => (is => 'rw');
@@ -225,19 +225,19 @@ sub _parse {
                     my ($firstline, $restlines) = $text =~ /(.*?\r?\n)(.+)/s;
                     if ($restlines) {
                         $restlines =~ /\A([ \t]*)/;
-                        my $rllevel = length($1);
+                        my $restlineslevel = length($1);
                         my $listlevel = length($last_el->parent->indent);
-                        if ($rllevel <= $listlevel) {
+                        if ($restlineslevel <= $listlevel) {
                             my $origparent = $parent;
                             # find lesser-indented list
                             $parent = $last_headline // $self;
-                            for (my $i=$rllevel-1; $i>=0; $i--) {
+                            for (my $i=$restlineslevel-1; $i>=0; $i--) {
                                 if ($last_lists->[$i]) {
                                     $parent = $last_lists->[$i];
                                     last;
                                 }
                             }
-                            splice @$last_lists, $rllevel;
+                            splice @$last_lists, $restlineslevel;
                             $self->_add_text($firstline, $origparent, $pass);
                             $self->_add_text($restlines, $parent, $pass);
                             goto SKIP1;
@@ -339,18 +339,19 @@ sub _parse {
                 $bullet =~ /^\d+\./ ? 'O' : 'U';
             my $bstyle  = $type eq 'O' ? '<N>.' : $bullet;
 
-            # parent for list is lesser-indented list (or last headline)
+            # parent for list is the last listitem of a lesser-indented list (or
+            # last headline, or document)
             $parent = $last_headline // $self;
             for (my $i=$level-1; $i>=0; $i--) {
                 if ($last_lists->[$i]) {
-                    $parent = $last_lists->[$i];
+                    $parent = $last_lists->[$i]->children->[-1];
                     last;
                 }
             }
 
             my $list = $last_lists->[$level];
             if (!$list || $list->type ne $type ||
-                    $list->bullet_style ne $bstyle) {
+                $list->bullet_style ne $bstyle) {
                 $list = Org::Element::List->new(
                     document => $self, parent => $parent,
                     indent=>$indent, type=>$type, bullet_style=>$bstyle,
@@ -808,7 +809,7 @@ Org::Document - Represent an Org document
 
 =head1 VERSION
 
-This document describes version 0.557 of Org::Document (from Perl distribution Org-Parser), released on 2022-03-27.
+This document describes version 0.558 of Org::Document (from Perl distribution Org-Parser), released on 2022-06-23.
 
 =head1 SYNOPSIS
 

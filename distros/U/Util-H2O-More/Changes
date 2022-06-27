@@ -25,3 +25,14 @@
 
 0.0.6 Thu Feb 24 12:07:08 2022 
     - POD fixes
+
+0.0.7 Thu Jun 23 12:07:08 2022
+    - using Util::H2O::o2h instead of the original
+      implementation. Bumped req'd version of
+      Util::H2O to >= 0.18 because of this.
+    - Updated documentation and removed "experimental"
+      warning. TPRC 2022 release!
+
+0.0.8 Thu Jun 23 14:16:00 2022
+    - for baptise created objects, needed to adjust
+      $Util::H2O::_PACKAGE_REGEX to be more general

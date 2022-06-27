@@ -1,0 +1,52 @@
+NAME
+
+    Plack::Middleware::Signposting - a base class for Plack implementations
+    of the Signposting <https://signposting.org> protocol
+
+SYNOPSIS
+
+        package Plack::Middleware::Signposting::Foo;
+    
+        use Moo;
+    
+        extends 'Plack::Middleware::Signposting';
+    
+        sub call {
+            my ($self, $env) = @_;
+    
+            ...
+            my @data = ("0001", $relation, $type);
+            $self->to_link_format(\@data);
+        }
+
+METHODS
+
+      * to_link_format(\@ARRAY)
+
+      This method produces the format for the link header.
+
+MODULES
+
+      * Plack::Middleware::Signposting::JSON
+
+      * Plack::Middleware::Signposting::Catmandu
+
+AUTHOR
+
+    Vitali Peil, <vitali.peil at uni-bielefeld.de>
+
+    Nicolas Steenlant, <nicolas.steenlant at ugent.be>
+
+CONTRIBUTORS
+
+    Mohammad S Anwar (@manwar)
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+    Plack::Middleware
+

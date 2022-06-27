@@ -26,6 +26,7 @@ WriteMakefile(
         'DateTime::Format::Strptime' => '1.79',
         'DateTime::TimeZone'    => '2.51',
         'Devel::StackTrace' => 0,
+        'Encode'        => 0,
         'Exporter'      => '5.70',
         # Used to require 1.13, but removed any requirement
         'Fcntl'         => 0,

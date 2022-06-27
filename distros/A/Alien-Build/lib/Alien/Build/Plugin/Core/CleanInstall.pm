@@ -7,7 +7,7 @@ use Alien::Build::Plugin;
 use Path::Tiny ();
 
 # ABSTRACT: Implementation for clean_install hook.
-our $VERSION = '2.48'; # VERSION
+our $VERSION = '2.50'; # VERSION
 
 
 sub init
@@ -53,7 +53,7 @@ Alien::Build::Plugin::Core::CleanInstall - Implementation for clean_install hook
 
 =head1 VERSION
 
-version 2.48
+version 2.50
 
 =head1 SYNOPSIS
 
@@ -133,7 +133,7 @@ nick nauwelaerts (INPHOBIA)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011-2020 by Graham Ollis.
+This software is copyright (c) 2011-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

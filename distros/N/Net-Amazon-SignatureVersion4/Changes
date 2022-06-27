@@ -1,0 +1,4 @@
+Revision history for Perl Module Net::Amazon::SignatureVersion4
+
+0.007    
+  * Update tests to pass with v5.32.0

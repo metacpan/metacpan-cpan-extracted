@@ -5,6 +5,11 @@
 #include "ppport.h"
 
 #include <fcntl.h>
+#include <errno.h>
+
+#ifdef __linux__
+#include <sys/sendfile.h>
+#endif
 
 #include "const-c.inc"
 
@@ -27,7 +32,12 @@ PREINIT:
     int fd_in = PerlIO_fileno(io_in);
     int fd_out = PerlIO_fileno(io_out);
 CODE:
+#ifdef __linux__
     RETVAL = tee(fd_in, fd_out, len, flags);
+#else
+    errno  = ENOSYS;
+    RETVAL = -1;
+#endif
 OUTPUT:
     RETVAL
 
@@ -41,7 +51,12 @@ PREINIT:
     int fd_in = PerlIO_fileno(io_in);
     int fd_out = PerlIO_fileno(io_out);
 CODE:
+#ifdef __linux__
     RETVAL = splice(fd_in, NULL, fd_out, NULL, len, flags);
+#else
+    errno  = ENOSYS;
+    RETVAL = -1;
+#endif
 OUTPUT:
     RETVAL
 
@@ -54,7 +69,12 @@ PREINIT:
     int fd_in = PerlIO_fileno(io_in);
     int fd_out = PerlIO_fileno(io_out);
 CODE:
+#ifdef __linux__
     RETVAL = sendfile(fd_out, fd_in, NULL, len);
+#else
+    errno  = ENOSYS;
+    RETVAL = -1;
+#endif
 OUTPUT:
     RETVAL
 

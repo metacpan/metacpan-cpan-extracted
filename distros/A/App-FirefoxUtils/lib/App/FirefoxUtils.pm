@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-27'; # DATE
+our $DATE = '2022-05-20'; # DATE
 our $DIST = 'App-FirefoxUtils'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 our %SPEC;
 
@@ -117,9 +117,10 @@ sub firefox_is_running {
 
 $SPEC{terminate_firefox} = {
     v => 1.1,
-    summary => "Terminate  (kill -KILL) Firefox",
+    summary => "Terminate Firefox (by default with -KILL signal)",
     args => {
         %App::BrowserUtils::args_common,
+        %App::BrowserUtils::argopt_signal,
     },
 };
 sub terminate_firefox {
@@ -171,7 +172,7 @@ App::FirefoxUtils - Utilities related to Firefox
 
 =head1 VERSION
 
-This document describes version 0.016 of App::FirefoxUtils (from Perl distribution App-FirefoxUtils), released on 2021-09-27.
+This document describes version 0.017 of App::FirefoxUtils (from Perl distribution App-FirefoxUtils), released on 2022-05-20.
 
 =head1 SYNOPSIS
 
@@ -570,13 +571,15 @@ Usage:
 
  terminate_firefox(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Terminate  (kill -KILL) Firefox.
+Terminate Firefox (by default with -KILL signal).
 
 This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<signal> => I<unix::signal>
 
 =item * B<users> => I<array[unix::local_uid]>
 
@@ -674,7 +677,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

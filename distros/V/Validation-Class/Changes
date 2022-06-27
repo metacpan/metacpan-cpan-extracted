@@ -1,61 +1,74 @@
 ==================================================
-Changes from 2014-10-21 00:00:00 +0000 to present.
+Changes from 2021-06-22 00:00:00 +0000 to present.
 ==================================================
 
 ---------------------------------------------
-version 7.900057 at 2015-10-21 13:40:51 +0000
+version 7.900058 at 2022-06-22 11:58:15 +0000
 ---------------------------------------------
 
-  Change: 375335b9d8536dde1bd1d0c737f96280fc0046b1
-  Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2015-10-21 13:39:58 +0000
+  Change: b687cf15cb4d82d62c7e76b1f213a81438e20d23
+  Author: Christiaan Kras <c.kras@pcc-online.net>
+  Date : 2022-06-22 13:51:59 +0000
 
-    updated the dist.ini and build 
+    v7.900058 
 
-  Change: 48df1c550f42c45ce91ec54f823d8bf371ee0ed8
-  Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2015-10-21 13:35:14 +0000
+  Change: 23492e055dd1a08153d103f1e382fe8716061b63
+  Author: Christiaan Kras <c.kras@pcc-online.net>
+  Date : 2022-06-22 13:49:34 +0000
 
-    added object param sharing test 
+    Merge pull request #1 from Htbaa/field-append-overrides-base-class
 
-  Change: cb38e53433a09309f6d4c638ff83c621243ece29
-  Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2015-10-21 13:35:06 +0000
+    Field append overrides base class 
 
-    removed Class::Forward dependency 
+  Change: 8d2f1a0903917dc627bcd09f62411623f247f298
+  Author: Christiaan Kras <c.kras@pcc-online.net>
+  Date : 2022-06-22 13:46:03 +0000
 
-  Change: 0e4c25dabe100c8c12efcaa3b38c83145c736a24
-  Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2015-05-22 00:54:48 +0000
+    .gitignore update 
 
-    Merge branch 'master' of github.com:alnewkirk/Validation-Class 
+  Change: aab9cce8c2fde3fe2738f91269a6ce76716f01e2
+  Author: Christiaan Kras <c.kras@pcc-online.net>
+  Date : 2022-02-07 11:59:40 +0000
 
-  Change: 513e06cc4a53ef53e570305efa1c789860d6a286
-  Author: Yanick Champoux <yanick@babyl.dyndns.org>
-  Date : 2015-05-16 23:01:08 +0000
+    Applied patch from RT-86158
 
-    Makes 'evaluate' idempotent.
+    Spelling errors 
 
-    Deals with #37. The optimization was making it such that calling
-    `validate` a second time would cause a stack trace. 
+  Change: 649e5a696cf3bb55b106aa65a3a136ad5cc612db
+  Author: Christiaan Kras <c.kras@pcc-online.net>
+  Date : 2022-02-07 11:55:52 +0000
 
-  Change: 2487096d709955875dc85dc48b738c766e10c13f
-  Author: Al Newkirk <anewkirk@ana.io>
-  Date : 2015-05-16 19:00:43 +0000
+    Fix Clone dependency in dist.ini 
 
-    Merge pull request #39 from yanick/validate-idempotent
+  Change: 8e540f9fd541d491d7286a53f5e527870afb009e
+  Author: Christiaan Kras <c.kras@pcc-online.net>
+  Date : 2022-02-07 11:53:38 +0000
 
-    Makes 'evaluate' idempotent. 
+    Style match 
 
-  Change: e368e5bb42a09dd8a7984da5fe49a30053f55847
-  Author: Yanick Champoux <yanick@babyl.dyndns.org>
-  Date : 2015-04-25 12:49:20 +0000
+  Change: fd98836ab6684f9b609db63bc8ee57f59fdb2315
+  Author: Christiaan Kras <c.kras@pcc-online.net>
+  Date : 2022-02-07 11:52:18 +0000
 
-    makes 'evaluate' idempotent
+    Declared Clone dependency
 
-    Deals with #37. The optimization was making it such that calling
-    `validate` a second time would cause a stack trace. 
+    This fixes RT-130246 
 
-=================================================
-Plus 57 releases after 2014-10-21 00:00:00 +0000.
-=================================================
+  Change: 2893fde604b0904bf868806335b3aad0caee232f
+  Author: Christiaan Kras <c.kras@pcc-online.net>
+  Date : 2022-02-07 11:50:25 +0000
+
+    Test for RT-124086 
+
+  Change: cb7c962bdb03a3d2a44395b1311849fe3cfe87b8
+  Author: Christiaan Kras <c.kras@pcc-online.net>
+  Date : 2022-02-07 11:49:16 +0000
+
+    Fix: Field append overrides field from base class
+
+    This fixes RT-124086 which caused field append to override the field in
+    the base class. 
+
+===============================================
+Plus 1 release after 2021-06-22 00:00:00 +0000.
+===============================================

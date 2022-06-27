@@ -6,11 +6,10 @@
     use warnings;
 
     use parent 'Fennec';
-    use Method::Signatures;
     use Path::Tiny;
 
     # func, not a method, to avoid altering @_
-    func import(...) {
+    sub import {
         # Turn on strict, warnings and 5.10 features
         strict->import;
         warnings->import;
@@ -20,11 +19,13 @@
         # Make everything in @INC absolute so we can chdir in tests
         @INC = map { path($_)->absolute->stringify } @INC;
 
+        #push @_, test_sort => 'ordered';
         goto &Fennec::import;
     }
 
     # Export our extra mite testing functions.
-    method defaults($class: ...) {
+    sub defaults {
+        my $class = shift;
         my %params = $class->SUPER::defaults;
 
         push @{ $params{utils} },
@@ -36,23 +37,24 @@
     }
 
     # Test with and without Class::XSAccessor.
-    method after_import($class: $info) {
+    sub after_import {
+        my ($class, $info) = (shift, @_);
         return unless $info->{meta}{with_recommends};
 
         # Test the pure Perl implementation.
         $info->{layer}->add_case(
             [$info->{importer}, __FILE__, __LINE__ + 1],
-            case_pure_perl => func(...) {
+            case_pure_perl => sub {
                 $ENV{MITE_PURE_PERL} = 1;
-            }
+            },
         );
 
         # Test with Class::XSAccessor, if available.
         $info->{layer}->add_case(
             [$info->{importer}, __FILE__, __LINE__ + 1],
-            case_xs => func(...) {
+            case_xs => sub {
                 $ENV{MITE_PURE_PERL} = 0;
-            }
+            },
         ) if eval { require Class::XSAccessor };
     }
 }
@@ -78,28 +80,32 @@
     );
 
     use Test::Sims;
-    use Method::Signatures;
     use Path::Tiny;
     use Child;
 
     use utf8;
     make_rand class_word => [qw(
+        Foo bar __9 h1N1 CAPITAL
+    )];
+
+    make_rand evil_class_word => [qw(
         Foo bar __9 h1N1 ünicode
     )];
 
-    func rand_method_name() {
-        return rand_class_word();
+    sub rand_method_name {
+        return rand_evil_class_word();
     }
 
     my $max_class_words = 5;
-    make_rand class_name => func() {
+    make_rand class_name => sub {
         my $num_words = (int rand $max_class_words) + 1;
         return join "::", map { rand_class_word() } (1..$num_words);
     };
 
     # Because some things are stored as weak refs, automatically created
     # sim objects can be deallocated if we don't hold a reference to them.
-    func _store_obj(Object $obj) {
+    sub _store_obj {
+        my $obj = shift;
         state $storage = [];
 
         push @$storage, $obj;
@@ -107,7 +113,8 @@
         return $obj;
     }
 
-    func sim_class(%args) {
+    sub sim_class {
+        my (%args) = @_;
         $args{name}   //= rand_class_name();
         $args{source} //= _store_obj( sim_source(
             class_name  => $args{name}
@@ -116,7 +123,8 @@
         return $args{source}->class_for($args{name});
     }
 
-    func sim_source(%args) {
+    sub sim_source {
+        my (%args) = @_;
         # Keep all the sources in one directory simulating a
         # project library directory
         state $source_dir = Path::Tiny->tempdir;
@@ -135,7 +143,8 @@
         return $args{project}->source_for($args{file});
     }
 
-    func sim_project(%args) {
+    sub sim_project {
+        my (%args) = @_;
         require Mite::Project;
         return Mite::Project->new;
     }
@@ -146,7 +155,9 @@
 
     make_rand "attr_is" => [qw(ro rw)];
 
-    func set_sometimes(HashRef $thing, Str $key, CodeRef $func, Int :$when=2) {
+    sub set_sometimes {
+        my ($thing, $key, $func, $when) = @_;
+        $when //= 2;
         return unless int rand $when;
 
         $thing->{$key} //= $func->();
@@ -154,7 +165,8 @@
         return;
     }
 
-    func sim_attribute(%args) {
+    sub sim_attribute {
+        my (%args) = @_;
         $args{name} //= rand_method_name;
         set_sometimes(\%args, "is", \&rand_attr_is);
         set_sometimes(\%args, "default", \&rand_attr_default);
@@ -163,14 +175,16 @@
         return Mite::Attribute->new( %args );
     }
 
-    func _class2pm(Str $class) {
+    sub _class2pm {
+        my $class = shift;
         my $pm = $class.'.pm';
         $pm =~ s{::}{/}g;
 
         return $pm;
     }
 
-    func mite_compile(Str $code) {
+    sub mite_compile {
+        my $code = shift;
         # Write the code to a temp file, make sure it survives this routine.
         my $file = Path::Tiny->tempfile( UNLINK => 0 );
         $file->spew_utf8($code);
@@ -188,7 +202,8 @@
         return $file;
     }
 
-    func mite_load(Str $code) {
+    sub mite_load {
+        my $code = shift;
         my $file = mite_compile($code);
 
         # Allow the same file to be recompiled and reloaded
@@ -197,7 +212,8 @@
         return $file;
     }
 
-    func run_in_child(CodeRef $code) {
+    sub run_in_child {
+        my $code = shift;
         # Avoid polluting the testing environment
         my $child = Child->new($code);
 
@@ -211,7 +227,8 @@
         return $process;
     }
 
-    func mite_command(@args) {
+    sub mite_command {
+        my @args = @_;
         return run_in_child(sub {
             require Mite::App;
             my $app = Mite::App->new;
@@ -219,7 +236,7 @@
         });
     }
 
-    func make() {
+    sub make {
         require Config;
 
         my $make = $Config::Config{make};
@@ -229,7 +246,7 @@
         return $make;
     }
 
-    func env_for_mite() {
+    sub env_for_mite {
         my $libdir = path("lib")->absolute;
         my $bindir = path("bin")->absolute;
 

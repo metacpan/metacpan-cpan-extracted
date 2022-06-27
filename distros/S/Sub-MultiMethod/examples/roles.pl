@@ -4,7 +4,7 @@ use warnings;
 
 package My::RoleA {
 	use Moo::Role;
-	use Sub::MultiMethod -role, qw(multimethod);
+	use Sub::MultiMethod qw( multimethod );
 	use Types::Standard -types;
 	
 	multimethod foo => (
@@ -16,7 +16,7 @@ package My::RoleA {
 
 package My::RoleB {
 	use Moo::Role;
-	use Sub::MultiMethod -role, qw(multimethod);
+	use Sub::MultiMethod qw( multimethod );
 	use Types::Standard -types;
 	
 	multimethod foo => (
@@ -27,12 +27,10 @@ package My::RoleB {
 
 package My::Class {
 	use Moo;
-	use Sub::MultiMethod qw(multimethod multimethods_from_roles);
+	use Sub::MultiMethod qw( multimethod );
 	use Types::Standard -types;
 	
 	with qw( My::RoleA My::RoleB );
-	
-	multimethods_from_roles qw( My::RoleA My::RoleB );
 	
 	multimethod foo => (
 		signature  => [ HashRef ],

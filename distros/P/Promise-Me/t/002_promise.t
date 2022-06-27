@@ -19,6 +19,9 @@ my $pid = $$;
 diag( "Main pid is '$pid'" ) if( $DEBUG );
 my $prom = Promise::Me->new(sub
 {
+    my( $resolve, $reject ) = @$_;
+    is( ref( $resolve ), 'CODE', 'resolve available in $_' );
+    is( ref( $reject ), 'CODE', 'reject available in $_' );
     my $str = 'Test 1';
     diag( "[pid = $$] $str" ) if( $DEBUG );
     pass( 'child sub' );
@@ -68,7 +71,7 @@ subtest 'concurrency' => sub
     {
         print( STDERR "Concurrent promise 1 ($$), sleeping.\n" ) if( $DEBUG );
         diag( "Is \$result tied ? ", tied( $result ) ? 'Yes' : 'No', ". Value is -> '$result'" ) if( $DEBUG );
-        sleep(2);
+        sleep(3);
         $result .= "concurrency 1\n";
         my $file = $tmpfile->clone;
         diag( "Writing 'concurrency 1' to file $tmpfile and my pid is '$$' vs parent '$pid'" ) if( $DEBUG );

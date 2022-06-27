@@ -12,7 +12,7 @@ use feature ();
 package Zydeco;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.614';
+our $VERSION   = '0.615';
 
 use Keyword::Simple ();
 use PPR;
@@ -176,32 +176,32 @@ our $GRAMMAR = qr{
 	
 		(?<PerlKeyword>
 		
-			(?: include         (?&MxpIncludeSyntax)   )|
-			(?: class           (?&MxpClassSyntax)     )|
-			(?: abstract        (?&MxpAbstractSyntax)  )|
-			(?: role            (?&MxpRoleSyntax)      )|
-			(?: interface       (?&MxpRoleSyntax)      )|
-			(?: toolkit         (?&MxpToolkitSyntax)   )|
-			(?: begin           (?&MxpHookSyntax)      )|
-			(?: end             (?&MxpHookSyntax)      )|
-			(?: after_apply     (?&MxpHookSyntax)      )|
-			(?: before_apply    (?&MxpHookSyntax)      )|
-			(?: type_name       (?&MxpTypeNameSyntax)  )|
-			(?: extends         (?&MxpExtendsSyntax)   )|
-			(?: with            (?&MxpWithSyntax)      )|
-			(?: requires        (?&MxpWithSyntax)      )|
-			(?: has             (?&MxpHasSyntax)       )|
-			(?: constant        (?&MxpConstantSyntax)  )|
-			(?: coerce          (?&MxpCoerceSyntax)    )|
-			(?: method          (?&MxpMethodSyntax)    )|
-			(?: factory         (?&MxpFactorySyntax)   )|
-			(?: factory         (?&MxpFactoryViaSyntax))|
-			(?: symmethod       (?&MxpSymMethodSyntax) )|
-			(?: before          (?&MxpModifierSyntax)  )|
-			(?: after           (?&MxpModifierSyntax)  )|
-			(?: around          (?&MxpModifierSyntax)  )|
-			(?: multi           (?&MxpMultiSyntax)     )|
-			(?: try             (?&TrySyntax)          )
+			(?: include              (?&MxpIncludeSyntax)   )|
+			(?: class                (?&MxpClassSyntax)     )|
+			(?: abstract             (?&MxpAbstractSyntax)  )|
+			(?: role                 (?&MxpRoleSyntax)      )|
+			(?: interface            (?&MxpRoleSyntax)      )|
+			(?: toolkit              (?&MxpToolkitSyntax)   )|
+			(?: begin                (?&MxpHookSyntax)      )|
+			(?: end                  (?&MxpHookSyntax)      )|
+			(?: after_apply          (?&MxpHookSyntax)      )|
+			(?: before_apply         (?&MxpHookSyntax)      )|
+			(?: type_name            (?&MxpTypeNameSyntax)  )|
+			(?: extends              (?&MxpExtendsSyntax)   )|
+			(?: with                 (?&MxpWithSyntax)      )|
+			(?: requires             (?&MxpWithSyntax)      )|
+			(?: (?:has|field|param)  (?&MxpHasSyntax)       )|
+			(?: constant             (?&MxpConstantSyntax)  )|
+			(?: coerce               (?&MxpCoerceSyntax)    )|
+			(?: method               (?&MxpMethodSyntax)    )|
+			(?: factory              (?&MxpFactorySyntax)   )|
+			(?: factory              (?&MxpFactoryViaSyntax))|
+			(?: symmethod            (?&MxpSymMethodSyntax) )|
+			(?: before               (?&MxpModifierSyntax)  )|
+			(?: after                (?&MxpModifierSyntax)  )|
+			(?: around               (?&MxpModifierSyntax)  )|
+			(?: multi                (?&MxpMultiSyntax)     )|
+			(?: try                  (?&TrySyntax)          )
 		)#</PerlKeyword>
 		
 		(?<MxpSimpleIdentifier>
@@ -1439,7 +1439,7 @@ sub _handle_package_keyword {
 }
 
 sub _handle_has_keyword {
-	my ($me, $names, $rawspec, $default) = @_;
+	my ($me, $kw, $names, $rawspec, $default) = @_;
 	
 	$rawspec = '()' if !defined $rawspec;
 	
@@ -1453,6 +1453,8 @@ sub _handle_has_keyword {
 	elsif (defined $default) {
 		$rawspec = "default => sub { $default }, $rawspec";
 	}
+	
+	$rawspec = "_has_keyword => q[$kw], $rawspec";
 	
 	my @names = $me->_handle_name_list($names);
 	
@@ -1583,7 +1585,8 @@ my @EXPORTABLES = qw(
 	class abstract role interface
 	begin end before_apply after_apply
 	include toolkit extends with requires
-	has constant method symmethod multi factory before after around
+	has field param
+	constant method symmethod multi factory before after around
 	type_name coerce
 	version authority overload
 );
@@ -1593,7 +1596,8 @@ sub unimport {
 	class abstract role interface
 	begin end before_apply after_apply
 	include toolkit extends with requires
-	has constant method symmethod multi factory before after around
+	has field param
+	constant method symmethod multi factory before after around
 	type_name coerce
 	version authority overload
 	>;
@@ -1888,25 +1892,27 @@ sub import {
 		$me->_inject($ref, $pos, $me->_handle_requires_keyword($name, $has_sig, $sig));
 	} if $want{requires};
 	
-	# `has` keyword
+	# `has`, `field`, and `param` keyword
 	#
-	Keyword::Simple::define has => sub {
-		my $ref = shift;
-		
-		$$ref =~ _fetch_re('MxpHasSyntax', anchor => 'start') or $me->_syntax_error(
-			'attribute declaration',
-			'has <names> (<spec>) = <default>',
-			'has <names> (<spec>)',
-			'has <names> = <default>',
-			'has <names>',
-			$ref,
-		);
-		
-		my ($pos, $name, $spec, $default) = ($+[0],  $+{name}, $+{spec}, $+{default});
-		my $has_spec    = !!exists $+{spec};
-		my $has_default = !!exists $+{default};
-		$me->_inject($ref, $pos, $me->_handle_has_keyword($name, $has_spec ? $spec : undef, $has_default ? $default : undef));
-	} if $want{has};
+	for my $kw ( qw/ has field param / ) {
+		Keyword::Simple::define $kw => sub {
+			my $ref = shift;
+			
+			$$ref =~ _fetch_re('MxpHasSyntax', anchor => 'start') or $me->_syntax_error(
+				'attribute declaration',
+				"$kw <names> (<spec>) = <default>",
+				"$kw <names> (<spec>)",
+				"$kw <names> = <default>",
+				"$kw <names>",
+				$ref,
+			);
+			
+			my ($pos, $name, $spec, $default) = ($+[0],  $+{name}, $+{spec}, $+{default});
+			my $has_spec    = !!exists $+{spec};
+			my $has_default = !!exists $+{default};
+			$me->_inject($ref, $pos, $me->_handle_has_keyword($kw, $name, $has_spec ? $spec : undef, $has_default ? $default : undef));
+		} if $want{$kw};
+	}
 	
 	# `constant` keyword
 	#
@@ -2197,6 +2203,23 @@ sub _has {
 	my $me = shift;
 	my ($attr, %spec) = @_;
 	
+	my $kw = delete( $spec{_has_keyword} ) // 'has';
+	if ( $kw eq 'param' ) {
+		unless ( exists $spec{default} or exists $spec{builder} ) {
+			$spec{required} //= 1;
+		}
+	}
+	elsif ( $kw eq 'field' ) {
+		$spec{init_arg} //= undef;
+		if ( defined( my $init_arg = $spec{init_arg} ) ) {
+			$init_arg =~ /\A_/ or
+			$me->_syntax_error('attribute declaration', 'If init_arg for field is defined, must start with underscore');
+		}
+		if ( !exists $spec{default} and !exists $spec{builder} ) {
+			$spec{is} //= 'rwp';
+		}
+	}
+	
 	_define_or_patch { $_->{has}{$attr} = \%spec } or
 	$me->_syntax_error('attribute declaration', 'Not supported outside class or role');
 }
@@ -2431,7 +2454,7 @@ sub _include {
 #{
 #	package Zydeco::Anonymous::Package;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.614';
+#	our $VERSION   = '0.615';
 #	use overload q[""] => sub { ${$_[0]} }, fallback => 1;
 #	sub DESTROY {}
 #	sub AUTOLOAD {
@@ -2442,7 +2465,7 @@ sub _include {
 #	
 #	package Zydeco::Anonymous::Class;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.614';
+#	our $VERSION   = '0.615';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub new {
 #		my $me = shift;
@@ -2455,12 +2478,12 @@ sub _include {
 #	
 #	package Zydeco::Anonymous::Role;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.614';
+#	our $VERSION   = '0.615';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	
 #	package Zydeco::Anonymous::ParameterizableClass;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.614';
+#	our $VERSION   = '0.615';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -2474,7 +2497,7 @@ sub _include {
 #
 #	package Zydeco::Anonymous::ParameterizableRole;
 #	our $AUTHORITY = 'cpan:TOBYINK';
-#	our $VERSION   = '0.614';
+#	our $VERSION   = '0.615';
 #	our @ISA       = qw(Zydeco::Anonymous::Package);
 #	sub generate_package {
 #		my $me  = shift;
@@ -2849,6 +2872,23 @@ class will not be able to see functions exported into the class.
   class MyClass {
     has name     = "Anonymous";
     has uc_name  = uc($self->name);
+  }
+
+=head2 C<< param >>
+
+Synonym for C<has> but defaults to C<< required => true >>.
+
+  class MyClass {
+    param foo ( type => Str );
+  }
+
+=head2 C<< field >>
+
+Synonym for C<has> but defaults to C<< init_arg => undef >>.
+
+  class MyClass {
+    field foo ( builder => true );
+    method _build_foo { ... }
   }
 
 =head2 C<< constant >>
@@ -3227,7 +3267,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2020 by Toby Inkster.
+This software is copyright (c) 2020-2022 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

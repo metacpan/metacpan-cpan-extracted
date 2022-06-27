@@ -1,7 +1,41 @@
 CHANGES
 -------
 
-  2.104 14 April 2022
+  2.201 27 June 2022
+
+      * Z_NULL should be 'UV' rather than 'PV'
+        https://github.com/pmqs/Compress-Raw-Zlib/issues/17
+        Sun Jun 26 22:02:04 2022 +0100
+        de28f0335d3d605d696b19d43fc48de42272455c
+
+  2.201 25 June 2022
+
+      * 2.021
+        Sat Jun 25 08:42:46 2022 +0100
+        85416cab509c18c5fa3f923de7b45b6c7c0f7a6f
+
+      * 2.201
+        Sat Jun 25 08:39:26 2022 +0100
+        b3d63862b2ff4ac9d28e23be500c0d32ad69dd11
+
+      * More zlib-ng updates
+        Thu Jun 23 22:42:13 2022 +0100
+        313f626425181702b5fc80af2b6ea7eed41d5a9d
+
+      * Fix test count regression in t/07bufsize.t (#16)
+        Wed Jun 22 09:45:11 2022 +0100
+        98dc5b4a2b30c26752b6f686462b06b8db72a5e4
+
+  2.200 21 June 2022
+
+      * Added zlib-ng support
+        https://github.com/pmqs/Compress-Raw-Zlib/issues/9
+
+      * Only set Z_SOLO when building zlib sources https://github.com/pmqs/Compress-Raw-Zlib/issues/12
+        Tue Jun 7 10:13:00 2022 +0100
+        c44e0b732e214b7f77d42a3af6ae64ef944cee90
+
+  2.105 14 April 2022
 
       * Add Compress::Raw::Zlib::VERSION to output
         Sat May 14 15:16:57 2022 +0100

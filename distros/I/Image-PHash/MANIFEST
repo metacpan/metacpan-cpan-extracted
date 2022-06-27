@@ -1,0 +1,21 @@
+Changes
+images/M31_mirr.jpg
+images/M31_s.jpg
+images/M31_th.jpg
+images/SolarEclipse.jpg
+images/M31.jpg
+lib/Image/PHash.pm
+Makefile.PL
+MANIFEST            This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/phash.t
+t/reduced.t
+t/util.t
+xt/author/critic.t
+xt/author/manifest.t
+xt/author/pod.t
+xt/author/pod-coverage.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

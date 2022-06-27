@@ -4,6 +4,7 @@ disabled: 1
 match:
   distribution: ^ARFREITAS/Foo-Bar
   perlconfig:
-    no_useithreads: 'define'
+    useithreads: '^$'
     osname: openbsd
     archname: Openbsd.amd64-openbsd
+

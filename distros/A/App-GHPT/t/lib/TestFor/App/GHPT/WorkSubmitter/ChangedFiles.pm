@@ -67,11 +67,11 @@ sub test_shutdown ( $self, @ ) {
     # git reset everything back the way it was, but
     # manually fix everything so we don't mess up anything else in
     # the working tree / staging area
-    system( 'git', 'reset', 'master', 't/test-data/not-committed-todelete' );
+    system( 'git', 'reset',    'main', 't/test-data/not-committed-todelete' );
     system( 'git', 'checkout', 't/test-data/not-committed-tomodify' );
     system( 'git', 'checkout', 't/test-data/not-committed-todelete' );
     unlink('t/test-data/not-committed-tocreate');
-    system( 'git', 'checkout', 'master' );
+    system( 'git', 'checkout', 'main' );
     system( 'git', 'branch', '-D', $self->branch_name );
 }
 
@@ -79,7 +79,7 @@ sub test_shutdown ( $self, @ ) {
 
 sub test_factory ( $self, @ ) {
     my $factory = App::GHPT::WorkSubmitter::ChangedFilesFactory->new(
-        merge_to_branch_name => 'master',
+        merge_to_branch_name => 'main',
     );
     my $changed_files = $factory->changed_files;
 

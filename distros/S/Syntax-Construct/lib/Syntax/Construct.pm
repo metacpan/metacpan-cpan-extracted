@@ -4,7 +4,7 @@ use 5.006002;
 use strict;
 use warnings;
 
-our $VERSION = '1.027';
+our $VERSION = '1.028';
 
 my %introduces = do { no warnings 'qw';
                  ( '5.036' => [qw[
@@ -43,6 +43,9 @@ my %introduces = do { no warnings 'qw';
                               ]],
                    '5.018' => [qw[
                                  computed-labels while-each method-on-any-string
+                              ]],
+                   '5.016' => [qw[
+                                 charnames
                               ]],
                    '5.014' => [qw[
                                  ?^ /r /d /l /u /a auto-deref
@@ -272,7 +275,7 @@ Syntax::Construct - Explicitly state which non-feature constructs are used in th
 
 =head1 VERSION
 
-Version 1.027
+Version 1.028
 
 =head1 SYNOPSIS
 
@@ -606,7 +609,9 @@ See L<perl5140delta/Single-term-prototype>.
 
 =head2 5.016
 
-No non-feature constructs were introduced in this version of Perl.
+=head3 charnames
+
+See L<perl5160delta/use charnames is no longer needed for \N{name}>.
 
 =head2 5.018
 
