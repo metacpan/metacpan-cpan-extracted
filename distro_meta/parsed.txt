@@ -79642,3 +79642,7 @@ V/VV/VVELOX/VM-Libvirt-CloneHelper-0.0.1.tar.gz
 S/SY/SYBER/XLog-1.1.3.tar.gz
 S/SY/SYBER/XS-Framework-1.5.3.tar.gz
 P/PE/PEVANS/XS-Parse-Keyword-0.24.tar.gz
+J/JD/JDEGUEST/HTTP-Promise-v0.1.0.tar.gz
+P/PJ/PJACKLAM/Math-BigRat-0.2624.tar.gz
+M/MI/MIRK/Net-Z3950-FOLIO-v3.0.1.tar.gz
+T/TI/TINITA/YAML-PP-0.033.tar.gz

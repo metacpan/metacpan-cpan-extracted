@@ -1,0 +1,66 @@
+---
+abstract: 'Asynchronous HTTP Request and Promise'
+author:
+  - 'Jacques Deguest (jack@deguest.jp)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  HTTP::Daemon: '6.14'
+  Test2::IPC: '1.302190'
+  Test2::V0: '0.000145'
+  Test::More: '1.302162'
+  Test::Pod: '1.52'
+  lib: '0'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTTP-Promise
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Cookie: v0.1.13
+  CryptX: '0.076'
+  Cwd: '0'
+  Data::UUID: '1.226'
+  DateTime: '1.57'
+  DateTime::Format::Strptime: '1.79'
+  DateTime::TimeZone: '2.51'
+  Encode: '3.16'
+  Errno: '0'
+  Fcntl: '0'
+  File::MMagic::XS: '0.09008'
+  HTTP::Parser2::XS: '0.01'
+  HTTP::XSHeaders: '0.400005'
+  IO::File: '0'
+  JSON: '4.02'
+  JSON::XS: '4.03'
+  Module::Generic: v0.24.1
+  Nice::Try: v1.3.0
+  Promise::Me: v0.3.0
+  Regexp::Common: '2017060201'
+  Scalar::Util: '1.54'
+  Socket: '2.031'
+  Symbol: '0'
+  Time::HiRes: '1.9764'
+  URI: '5.10'
+  URI::Encode::XS: '0.11'
+  URI::Escape::XS: '0.14'
+  Want: '0.29'
+  constant: '0'
+  curry: '0'
+  parent: '0'
+  perl: '5.026001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://gitlab.com/jackdeguest/HTTP-Promise/issues
+  repository: https://gitlab.com/jackdeguest/HTTP-Promise
+version: v0.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

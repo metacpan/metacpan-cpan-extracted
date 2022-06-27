@@ -1,0 +1,6 @@
+Dear «François Müller»,
+
+As you requested, I have written the HTTP::Promise modules to support
+the creation of HTTP multipart messages.
+
+Jacques

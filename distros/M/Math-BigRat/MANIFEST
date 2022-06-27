@@ -31,8 +31,12 @@ t/requirer.t
 t/rt121139.t
 t/trap.t
 TODO
+xt/author/as_float-mbr.t
+xt/author/as_int-mbr.t
+xt/author/as_number-mbr.t
+xt/author/as_rat-mbr.t
+xt/author/bfstr-mbr.t
 xt/author/blog-mbr.t
-xt/author/critic.t
 xt/author/relop-mbr.t
 xt/release/changelog.t
 xt/release/cpan-changes.t

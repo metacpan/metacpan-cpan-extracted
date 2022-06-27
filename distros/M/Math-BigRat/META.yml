@@ -25,5 +25,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/pjacklam/p5-Math-BigRat.git
-version: '0.2623'
+version: '0.2624'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

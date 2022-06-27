@@ -1,0 +1,79 @@
+=encoding utf-8
+
+=head1 NAME
+
+HTTP::Promise::Body::File - HTTP Message Body File Class
+
+=head1 SYNOPSIS
+
+    use HTTP::Promise::Body;
+    my $body = HTTP::Promise::Body::File->new || 
+        die( HTTP::Promise::Body::File->error, "\n" );
+    my $body = HTTP::Promise::Body::File->new( '/some/where/file,txt' );
+
+    if( $body->is_empty )
+    {
+        # do something
+    }
+
+    my $size = $body->length;
+
+    # $io is a Module::Generic::File::IO object
+    my $io = $body->open( 'r' ) || die( $body->error );
+    $io->read( $buffer, 2048 );
+    $io->close;
+
+    my $io = $body->open( 'r', { binmode => 'utf-8' } ) || die( $body->error );
+    $io->read( $buffer, 2048 );
+    $io->close;
+
+    # open the body as an utf-8 stream and print it to filehandle $filehandle
+    $body->print( $filehandle, { binmode => 'utf-8' } );
+
+    $body->purge;
+    # ditto
+    $body->reset;
+
+=head1 VERSION
+
+    v0.1.0
+
+=head1 DESCRIPTION
+
+This class represents an entity body as a file.
+
+This class inherits from L<HTTP::Promise::Body> and L<Module::Generic::File>
+
+=head1 METHODS
+
+Methods superseded by this class are as follow.
+
+=head2 path
+
+This returns the full path to the file.
+
+=head2 purge
+
+This removes the underlying file by calling L<Module::Generic::File/unlink>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 SEE ALSO
+
+L<HTTP::Promise>, L<HTTP::Promise::Request>, L<HTTP::Promise::Response>, L<HTTP::Promise::Message>, L<HTTP::Promise::Entity>, L<HTTP::Promise::Headers>, L<HTTP::Promise::Body>, L<HTTP::Promise::Body::Form>, L<HTTP::Promise::Body::Form::Data>, L<HTTP::Promise::Body::Form::Field>, L<HTTP::Promise::Status>, L<HTTP::Promise::MIME>, L<HTTP::Promise::Parser>, L<HTTP::Promise::IO>, L<HTTP::Promise::Stream>, L<HTTP::Promise::Exception>
+
+L<Module::Generic::File>, L<Module::Generic::Scalar>, L<Module::Generic::File::IO>, L<Module::Generic::Scalar::IO>
+
+L<PerlIO::scalar>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright(c) 2022 DEGUEST Pte. Ltd.
+
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

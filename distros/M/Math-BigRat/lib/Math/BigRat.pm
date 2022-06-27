@@ -21,7 +21,7 @@ use Scalar::Util qw< blessed >;
 
 use Math::BigFloat ();
 
-our $VERSION = '0.2623';
+our $VERSION = '0.2624';
 
 our @ISA = qw(Math::BigFloat);
 
@@ -675,36 +675,86 @@ sub config {
     $cfg;
 }
 
-##############################################################################
+###############################################################################
+# String conversion methods
+###############################################################################
 
 sub bstr {
-    my ($class, $x) = ref($_[0]) ? (undef, $_[0]) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), $_[0]) : objectify(1, @_);
 
-    if ($x->{sign} !~ /^[+-]$/) {               # inf, NaN etc
-        my $s = $x->{sign};
-        $s =~ s/^\+//;                          # +inf => inf
-        return $s;
+    carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
+
+    # Inf and NaN
+
+    if ($x->{sign} ne '+' && $x->{sign} ne '-') {
+        return $x->{sign} unless $x->{sign} eq '+inf'; # -inf, NaN
+        return 'inf';                                  # +inf
     }
+
+    # Upgrade?
+
+    return $upgrade -> bstr($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
+
+    # Finite number
 
     my $s = '';
     $s = $x->{sign} if $x->{sign} ne '+';       # '+3/2' => '3/2'
 
-    return $s . $LIB->_str($x->{_n}) if $LIB->_is_one($x->{_d});
-    $s . $LIB->_str($x->{_n}) . '/' . $LIB->_str($x->{_d});
+    my $str = $x->{sign} eq '-' ? '-' : '';
+    $str .= $LIB->_str($x->{_n});
+    $str .= '/' . $LIB->_str($x->{_d}) unless $LIB -> _is_one($x->{_d});
+    return $str;
 }
 
 sub bsstr {
-    my ($class, $x) = ref($_[0]) ? (undef, $_[0]) : objectify(1, @_);
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), $_[0]) : objectify(1, @_);
 
-    if ($x->{sign} !~ /^[+-]$/) {               # inf, NaN etc
-        my $s = $x->{sign};
-        $s =~ s/^\+//;                          # +inf => inf
-        return $s;
+    carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
+
+    # Inf and NaN
+
+    if ($x->{sign} ne '+' && $x->{sign} ne '-') {
+        return $x->{sign} unless $x->{sign} eq '+inf';  # -inf, NaN
+        return 'inf';                                   # +inf
     }
 
-    my $s = '';
-    $s = $x->{sign} if $x->{sign} ne '+';       # +3 vs 3
-    $s . $LIB->_str($x->{_n}) . '/' . $LIB->_str($x->{_d});
+    # Upgrade?
+
+    return $upgrade -> bsstr($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
+
+    # Finite number
+
+    my $str = $x->{sign} eq '-' ? '-' : '';
+    $str .= $LIB->_str($x->{_n});
+    $str .= '/' . $LIB->_str($x->{_d}) unless $LIB -> _is_one($x->{_d});
+    return $str;
+}
+
+sub bfstr {
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), $_[0]) : objectify(1, @_);
+
+    carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
+
+    # Inf and NaN
+
+    if ($x->{sign} ne '+' && $x->{sign} ne '-') {
+        return $x->{sign} unless $x->{sign} eq '+inf';  # -inf, NaN
+        return 'inf';                                   # +inf
+    }
+
+    # Upgrade?
+
+    return $upgrade -> bfstr($x, @r)
+      if defined($upgrade) && !$x -> isa($class);
+
+    # Finite number
+
+    my $str = $x->{sign} eq '-' ? '-' : '';
+    $str .= $LIB->_str($x->{_n});
+    $str .= '/' . $LIB->_str($x->{_d}) unless $LIB -> _is_one($x->{_d});
+    return $str;
 }
 
 sub bnorm {
@@ -1542,18 +1592,30 @@ sub blog {
         }
     }
 
+    # disable upgrading and downgrading
+
+    require Math::BigFloat;
+    my $upg = Math::BigFloat -> upgrade();
+    my $dng = Math::BigFloat -> downgrade();
+    Math::BigFloat -> upgrade(undef);
+    Math::BigFloat -> downgrade(undef);
+
     # At this point we are done handling all exception cases and trivial cases.
 
     $base = Math::BigFloat -> new($base) if defined $base;
+    my $xnum = Math::BigFloat -> new($LIB -> _str($x->{_n}));
+    my $xden = Math::BigFloat -> new($LIB -> _str($x->{_d}));
+    my $xstr = $xnum -> bdiv($xden) -> blog($base, @r) -> bsstr();
 
-    my $xn = Math::BigFloat -> new($LIB -> _str($x->{_n}));
-    my $xd = Math::BigFloat -> new($LIB -> _str($x->{_d}));
+    # reset upgrading and downgrading
 
-    my $xtmp = Math::BigRat -> new($xn -> bdiv($xd) -> blog($base, @r) -> bsstr());
+    Math::BigFloat -> upgrade($upg);
+    Math::BigFloat -> downgrade($dng);
 
-    $x -> {sign} = $xtmp -> {sign};
-    $x -> {_n}   = $xtmp -> {_n};
-    $x -> {_d}   = $xtmp -> {_d};
+    my $xobj = Math::BigRat -> new($xstr);
+    $x -> {sign} = $xobj -> {sign};
+    $x -> {_n}   = $xobj -> {_n};
+    $x -> {_d}   = $xobj -> {_d};
 
     return $neg ? $x -> bneg() : $x;
 }
@@ -2129,37 +2191,70 @@ sub numify {
 }
 
 sub as_int {
-    my ($self, $x) = ref($_[0]) ? (undef, $_[0]) : objectify(1, @_);
+    my ($class, $x) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
-    # NaN, inf etc
-    return Math::BigInt->new($x->{sign}) if $x->{sign} !~ /^[+-]$/;
+    return $x -> copy() if $x -> isa("Math::BigInt");
 
-    my $u = Math::BigInt->bzero();
-    $u->{value} = $LIB->_div($LIB->_copy($x->{_n}), $x->{_d}); # 22/7 => 3
-    $u->bneg if $x->{sign} eq '-'; # no negative zero
-    $u;
+    # disable upgrading and downgrading
+
+    require Math::BigInt;
+    my $upg = Math::BigInt -> upgrade();
+    my $dng = Math::BigInt -> downgrade();
+    Math::BigInt -> upgrade(undef);
+    Math::BigInt -> downgrade(undef);
+
+    my $y;
+    if ($x -> is_inf()) {
+        $y = Math::BigInt -> binf($x->sign());
+    } elsif ($x -> is_nan()) {
+        $y = Math::BigInt -> bnan();
+    } else {
+        my $int = $LIB -> _div($LIB -> _copy($x->{_n}), $x->{_d});  # 22/7 => 3
+        $y = Math::BigInt -> new($LIB -> _str($int));
+        $y = $y -> bneg() if $x -> is_neg();
+    }
+
+    # reset upgrading and downgrading
+
+    Math::BigInt -> upgrade($upg);
+    Math::BigInt -> downgrade($dng);
+
+    return $y;
 }
 
 sub as_float {
-    # return N/D as Math::BigFloat
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
-    # set up parameters
-    my ($class, $x, @r) = (ref($_[0]), @_);
-    # objectify is costly, so avoid it
-    ($class, $x, @r) = objectify(1, @_) unless ref $_[0];
+    return $x -> copy() if $x -> isa("Math::BigFloat");
 
-    # NaN, inf etc
-    return Math::BigFloat->new($x->{sign}) if $x->{sign} !~ /^[+-]$/;
+    # disable upgrading and downgrading
 
-    my $xflt = Math::BigFloat -> new($LIB -> _str($x->{_n}));
-    $xflt -> {sign} = $x -> {sign};
+    require Math::BigFloat;
+    my $upg = Math::BigFloat -> upgrade();
+    my $dng = Math::BigFloat -> downgrade();
+    Math::BigFloat -> upgrade(undef);
+    Math::BigFloat -> downgrade(undef);
 
-    unless ($LIB -> _is_one($x->{_d})) {
-        my $xd = Math::BigFloat -> new($LIB -> _str($x->{_d}));
-        $xflt -> bdiv($xd, @r);
+    my $y;
+    if ($x -> is_inf()) {
+        $y = Math::BigFloat -> binf($x->sign());
+    } elsif ($x -> is_nan()) {
+        $y = Math::BigFloat -> bnan();
+    } else {
+        $y = Math::BigFloat -> new($LIB -> _str($x->{_n}));
+        $y -> {sign} = $x -> {sign};
+        unless ($LIB -> _is_one($x->{_d})) {
+            my $xd = Math::BigFloat -> new($LIB -> _str($x->{_d}));
+            $y -> bdiv($xd, @r);
+        }
     }
 
-    return $xflt;
+    # reset upgrading and downgrading
+
+    Math::BigFloat -> upgrade($upg);
+    Math::BigFloat -> downgrade($dng);
+
+    return $y;
 }
 
 sub as_bin {

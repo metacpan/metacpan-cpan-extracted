@@ -51,6 +51,6 @@
          "web" : "https://github.com/pjacklam/p5-Math-BigRat"
       }
    },
-   "version" : "0.2623",
-   "x_serialization_backend" : "JSON::PP version 4.08"
+   "version" : "0.2624",
+   "x_serialization_backend" : "JSON::PP version 4.09"
 }

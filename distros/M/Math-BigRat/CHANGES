@@ -1,3 +1,9 @@
+0.2624 2022-06-27
+
+ * Improve stringification. Better handling of upgrading/downgrading in
+   stringification methods. Add new method bfstr() for compatibility with
+   Math::BigInt og Math::BigFloat. Add new author test files to confirm.
+
 0.2623 2022-05-16
 
  * Fix rounding issues.

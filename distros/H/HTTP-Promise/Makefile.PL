@@ -1,0 +1,82 @@
+use ExtUtils::MakeMaker;
+use strict;
+use warnings;
+
+my %WriteMakefileArgs = (
+    NAME                => 'HTTP::Promise',
+    VERSION_FROM        => 'lib/HTTP/Promise.pm',
+    ABSTRACT_FROM       => 'lib/HTTP/Promise.pm',
+    AUTHOR              => 'Jacques Deguest (jack@deguest.jp)',
+    INSTALLDIRS         => ($] < 5.011 ? 'perl' : 'site'),
+    PREREQ_PM           => {
+        'constant'              => 0,
+        'curry'                 => 0,
+        'parent'                => 0,
+        'strict'                => 0,
+        'warnings'              => 0,
+        'Cookie'                => 'v0.1.13',
+        'CryptX'                => '0.076',
+        'Cwd'                   => 0,
+        'Data::UUID'            => '1.226',
+        'DateTime'              => '1.57',
+        'DateTime::Format::Strptime' => '1.79',
+        'DateTime::TimeZone'    => '2.51',
+        'Encode'                => '3.16',
+        'Errno'                 => 0,
+        'Fcntl'                 => 0,
+        'File::MMagic::XS'      => '0.09008',
+        'HTTP::Parser2::XS'     => '0.01',
+        'HTTP::XSHeaders'       => '0.400005',
+        'IO::File'              => 0,
+        'JSON'                  => '4.02',
+        'JSON::XS'              => '4.03',
+        'Module::Generic'       => 'v0.24.1',
+        'Nice::Try'             => 'v1.3.0',
+        'Promise::Me'           => 'v0.3.0',
+        'Regexp::Common'        => '2017060201',
+        'Scalar::Util'          => '1.54',
+        'Socket'                => '2.031',
+        # URI::Fast is great, but only supports simple protocols
+        # 'URI::Fast'             => '0.55',
+        'Symbol'                => 0,
+        'Time::HiRes'           => '1.9764',
+        'URI'                   => '5.10',
+        'URI::Encode::XS'       => '0.11',
+        'URI::Escape::XS'       => '0.14',
+        'Want'                  => '0.29',
+    },
+    TEST_REQUIRES =>
+    {
+        'lib'           => 0,
+        # 'Test::HTTP::MockServer' => 'v0.0.1',
+        # 'Test::HTTP::LocalServer' => '0.74',
+        'HTTP::Daemon'  => '6.14',
+        'Test::More'    => '1.302162',
+        'Test::Pod'     => '1.52',
+        'Test2::IPC'    => '1.302190',
+        'Test2::V0'     => '0.000145',
+        'utf8'          => 0,
+    },
+    LICENSE             => 'perl_5',
+    MIN_PERL_VERSION    => 'v5.26.1',
+    (MM->can('signature_target') ? (SIGN => 1) : ()),
+    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', PREOP => './dev/cleanup.pl' },
+    clean               => { FILES => 'HTTP-Promise-*' },
+    ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {
+        'meta-spec' => { version => 2 },
+        dynamic_config => 1,
+        resources => {
+        #    homepage    => undef,
+            repository  => {
+                url         => 'git@gitlab.com:jackdeguest/HTTP-Promise.git',
+                web         => 'https://gitlab.com/jackdeguest/HTTP-Promise',
+                type        => 'git',
+            },
+            bugtracker => {
+                web         => 'https://gitlab.com/jackdeguest/HTTP-Promise/issues',
+            },
+        },
+    }) : ()),
+);
+
+WriteMakefile(%WriteMakefileArgs);

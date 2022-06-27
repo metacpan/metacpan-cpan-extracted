@@ -1,5 +1,9 @@
 # Revision history for Perl extension Net::Z3950::FOLIO.
 
+## [3.0.1](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v3.0.1) (Mon 27 Jun 13:26:46 BST 2022)
+
+* _sigh_ Remove spare comma from module-descriptor.
+
 ## [3.0.0](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v3.0.0) (Mon 27 Jun 12:42:48 BST 2022)
 
 * Perform principal search in `mod-search` instead of `mod-inventory-storage`. This became possible in R1-2021 (Iris), when `mod-search` was added, and is mandatory as of R2-2022 (Morning Glory), when the necessary full-text indexes will be removed from `mod-inventory-storage` (see MODINVSTOR-925). Fixes ZF-62. **Note** that the records returned currently omit `instanceTypeId`, `holdingsRecords2.temporaryLocation` and `bareHoldingsItems.materialType`, as we are getting some records back where those fields are undefined.
